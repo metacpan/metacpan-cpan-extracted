@@ -1,0 +1,10 @@
+<frameset cols="170,*" border="0">
+	<frame name="left" src="/left" scrolling="auto">
+	<frame name="right" src="/test_1" noresize>
+
+	<noframes>
+	 <body>
+		<p>This page uses frames, but your browser doesn't support them.</p>
+	 </body>
+	</noframes>
+</frameset>

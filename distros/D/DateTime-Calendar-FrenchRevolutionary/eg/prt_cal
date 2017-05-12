@@ -1,0 +1,232 @@
+#!/usr/local/bin/perl -w
+#
+#     Example script for DateTime::Calendar::FrenchRevolutionary:
+#     print a French Revolutionary calendar
+#     Copyright (C) 2003, 2004, 2010, 2011, 2014, 2016 Jean Forget. All rights reserved.
+#
+#     See the license in the embedded documentation below.
+#
+use utf8;
+use strict;
+use DateTime::Calendar::FrenchRevolutionary;
+use Getopt::Long;
+use Roman;
+use FindBin;
+
+my $lang = 'en';
+my $pict = undef;
+GetOptions('lang=s' => \$lang, 'kitten=s' => \$pict);
+
+#
+# I18N
+#
+my $ref_labels;
+if ($lang eq 'fr') {
+  $ref_labels = do "$FindBin::Bin/labels_fr";
+}
+else {
+  $ref_labels = do "$FindBin::Bin/labels_en";
+}
+my %labels = %$ref_labels;
+
+binmode STDOUT, ':utf8';
+
+my $annee;
+foreach $annee (@ARGV) {
+  warn "Invalid year", next if $annee <= 0;
+  prt_cal ($annee);
+}
+
+
+sub prt_cal {
+  my $year   = $_[0];		# French revolutionary year
+  my $year_1 = $year + 1791;	# first corresponding Gregorian year
+  my $year_2 = $year + 1792;	# second corresponding Gregorian year
+
+  # HTML header
+  print <<"EOT";
+<html>
+<head><title>$labels{calendar}</title>
+<meta http-equiv='content-type' content='Text/html; charset=utf-8' />
+</head>
+<body>
+EOT
+  print qq(<p align='center'><img src='$pict'>\n) if $pict;
+  # Column headers for the first six months
+  print <<"EOT";
+<h2 align='center'>@{[ Roman $year ]}</h2>
+<h3 align='center'>$year_1-$year_2</h3>
+<table border width='90%'>
+<tr align='center'>
+<td>Vendémiaire<br>$labels{month3}[8]-$labels{month3}[9]</td>
+<td>Brumaire<br>$labels{month3}[9]-$labels{month3}[10]</td>
+<td>Frimaire<br>$labels{month3}[10]-$labels{month3}[11]</td>
+<td>Nivôse<br>$labels{month3}[11]-$labels{month3}[0]</td>
+<td>Pluviôse<br>$labels{month3}[0]-$labels{month3}[1]</td>
+<td>Ventôse<br>$labels{month3}[1]-$labels{month3}[2]</td>
+</tr>
+EOT
+
+  # Building the first six months
+  my $row = '';
+  foreach my $m (1..6) {
+    my $cell = join '<br />', map { one_day($year, $m, $_) } (1..30);
+    $row .= "<td><pre><br>$cell</pre></td>\n";
+  }
+
+  # Printing the first six months and the headers for the last six months
+  print <<"EOT";
+<tr align='center'>$row</tr>
+<tr align='center'>
+<td>Germinal<br>$labels{month3}[2]-$labels{month3}[3]</td>
+<td>Floréal<br>$labels{month3}[3]-$labels{month3}[4]</td>
+<td>Prairial<br>$labels{month3}[4]-$labels{month3}[5]</td>
+<td>Messidor<br>$labels{month3}[5]-$labels{month3}[6]</td>
+<td>Thermidor<br>$labels{month3}[6]-$labels{month3}[7]</td>
+<td>Fructidor<br>$labels{month3}[7]-$labels{month3}[8]</td>
+</tr>
+EOT
+
+  # Building the "-al" and "-idor" months
+  $row = "";
+  foreach my $m (7..12) {
+    my $cell = join '<br />', map { one_day($year, $m, $_) } (1..30);
+    $row .= "<td><pre><br>$cell</pre></td>\n";
+  }
+  print "<tr align='center'>$row</tr>\n";
+  
+  # Additional days.
+  # By the way, how many additional days? 5 (normal year) or 6 (leap year)?
+  my $last = 5;
+  $last = 6 if DateTime::Calendar::FrenchRevolutionary->new(year => $year)->is_leap_year;
+  # The additional days are printed in an horizontal row, one per cell
+  $row = "";
+  foreach my $rd (1 .. $last) {
+    $row .= "<td><pre><br>" . one_day($year, 13, $rd) . "</pre></td>\n";
+  }
+  print <<"EOT";
+<tr align='center'><td colspan='6'>$labels{add_days}</td></tr>
+<tr align='center'>$row</tr>
+</table></body></html>
+EOT
+}
+
+sub one_day {
+  my ($ry, $rm, $rd) = @_; # Revolutionary year, month and day
+  my $date_r = DateTime::Calendar::FrenchRevolutionary->new(year => $ry, month => $rm, day => $rd);
+  my $date_g = DateTime->from_object(object => $date_r);
+  sprintf "%2d (%s %2d)", $rd, $labels{week1}[$date_g->day_of_week_0], $date_g->day;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+prt_cal -- print a French Revolutionary calendar
+
+=head1 SYNOPSIS
+
+  prt_cal [--lang=I<language>] [--kitten=I<file>] year
+
+=head1 DESCRIPTION
+
+This  program  prints  a  calendar,  using  the  French  Revolutionary
+calendar.   It is  not  limited  to the  historical  period when  this
+calendar was in use, you can ask for any year after its beginning. For
+example,  you  can  print  the   calendar  for  the  year  211,  which
+corresponds to 2002-2003  in the Gregorian calendar. The  output is in
+HTML,  and  contains  brief   indications  for  which  Gregorian  date
+corresponds to each French Revolutionary date.
+
+=head1 OPTIONS
+
+=over 4
+
+=item language
+
+Some  values  are  language  dependant:  Gregorian  weekday  initials,
+Gregorian month abbreviations  and a few titles. You  can select which
+language you will use.  Known languages are:
+
+=over 4
+
+=item en
+
+English (default)
+
+=item fr
+
+French
+
+=back
+
+=item kitten
+
+In France, traditionnally, the  postal service sells calendars for the
+next year during November / December. These calendars usually have the
+picture  of  one  or  more  kittens  in a  basket,  or  a  mountainous
+landscape. So, you can do the  same with this program, by specifying a
+JPEG or GIF  URL, which contains the photo of kittens  or a picture of
+mountains.  Don't  even  think  of  using  anything  else,  especially
+pictures involving scantily clad ladies.
+
+You can try
+
+  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=kitten+basket
+  http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&output=search&q=mountains
+
+but do not even think about
+
+  http://images.google.com/images?q=Delacroix+libert%C3%A9+guidant+peuple&hl=en&lr=&ie=UTF-8&output=search
+
+=back
+
+=head1 PARAMETERS
+
+There  is  a single  parameter,  the  year,  according to  the  French
+Revolutionary calendar.  This parameter  is numeric (Roman  number not
+permitted).
+
+=head1 KNOWN BUGS
+
+If given several years, the program prints all the requested calendars
+on standard output  as a single stream. There  are HTML delimiters for
+each, but they are concatenated.
+
+=head1 AUTHOR
+
+Jean Forget <JFORGET@cpan.org>
+
+=head1 LICENSE STUFF
+
+Copyright (c)  2003, 2004,  2010, 2012, 2014,  2016 Jean  Forget.  All
+rights reserved.  This program is  free software. You  can distribute,
+modify,  and otherwise  mangle DateTime::Calendar::FrenchRevolutionary
+under the same terms as perl 5.16.3.
+
+This program is  distributed under the same terms  as Perl 5.16.3: GNU
+Public License version 1 or later and Perl Artistic License
+
+You can find the text of the licenses in the F<LICENSE> file or at
+L<http://www.perlfoundation.org/artistic_license_1_0> and
+L<http://www.gnu.org/licenses/gpl-1.0.html>.
+
+Here is the summary of GPL:
+
+This program is  free software; you can redistribute  it and/or modify
+it under the  terms of the GNU General Public  License as published by
+the Free  Software Foundation; either  version 1, or (at  your option)
+any later version.
+
+This program  is distributed in the  hope that it will  be useful, but
+WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
+MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
+General Public License for more details.
+
+You  should have received  a copy  of the  GNU General  Public License
+along with this program; if not, see <http://www.gnu.org/licenses/> or
+write to the Free Software Foundation, Inc., L<http://fsf.org>.
+
+=cut

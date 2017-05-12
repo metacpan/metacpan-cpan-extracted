@@ -1,0 +1,34 @@
+---
+abstract: 'Evaluate and print out each line before it is executed.'
+author:
+  - "Marty O'Brien <mob@cpan.org>"
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-DumpTrace
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Text::Shorten
+    - Devel::DumpTrace::Const
+    - Devel::DumpTrace::CachedDisplayedArray
+    - Devel::DumpTrace::CachedDisplayedHash
+    - Devel::DumpTrace::noPPI
+requires:
+  File::Temp: '0'
+  Hash::SafeKeys: '0.01'
+  PadWalker: '1.5'
+  Scalar::Util: '1.14'
+  Test::More: '0'
+  perl: '5.008001'
+version: '0.26'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

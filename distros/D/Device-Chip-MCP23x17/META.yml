@@ -1,0 +1,26 @@
+---
+abstract: 'chip driver for the F<MCP23x17> family'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::Device::Chip::Adapter: '0'
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4211, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-MCP23x17
+provides:
+  Device::Chip::MCP23S17:
+    file: lib/Device/Chip/MCP23S17.pm
+    version: '0.01'
+  Device::Chip::MCP23x17:
+    file: lib/Device/Chip/MCP23x17.pm
+    version: '0.01'
+requires:
+  Device::Chip: '0.03'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

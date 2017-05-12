@@ -1,0 +1,78 @@
+{
+   "abstract" : "Template::Declare wrapper for Dancer",
+   "author" : [
+      "Yanick Champoux"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-TemplateDeclare",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3092",
+            "Dancer::Config" : "0",
+            "Dancer::Template::Abstract" : "0",
+            "FindBin" : "0",
+            "Template::Declare" : "0",
+            "base" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer" : "1.3050",
+            "Dancer::Test" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Plack::Handler::FCGI" : "0",
+            "Plack::Runner" : "0",
+            "Template::Declare::Tags" : "0",
+            "Test::More" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Template::TemplateDeclare" : {
+         "file" : "lib/Dancer/Template/TemplateDeclare.pm",
+         "version" : "v0.3.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dancer-template-templatedeclare at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Template-TemplateDeclare"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dancer-Template-TemplateDeclare/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dancer-Template-TemplateDeclare.git",
+         "web" : "https://github.com/yanick/Dancer-Template-TemplateDeclare"
+      }
+   },
+   "version" : "0.3.2",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK"
+}
+

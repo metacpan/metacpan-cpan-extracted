@@ -1,0 +1,95 @@
+=head1 NAME
+
+C<Devel::MAT::UserGuide> - a users' introduction to C<Devel::MAT>
+
+=head1 OVERVIEW
+
+The C<Devel::MAT> ecosystem allows developers of F<perl> programs to inspect
+and analyse memory-related problems such as memory leaks, unexpected memory
+consumption, or odd state. This is an "offline" analysis system, in the sense
+that the analysis tools all run in a different process, possibly at a later
+time, than the F<perl> process that is being analysed.
+
+The basic workflow consists of two main stages: first a I<heap dump> file is
+generated from the F<perl> process being debugged, at or around the time that
+the problem becomes apparent, and secondly this file is loaded by an analysis
+tool in order to inspect the contents.
+
+These two stages are described here separately. It is important to note that
+they don't have to be done at the same time, on the same F<perl> process, or
+even on the same sort of machine. It is fully possible to capture the heap
+from a process on, say, a small server, then copy the file to a development
+workstation or laptop and analyse it there at a later time.
+
+=head1 CAPTURING THE HEAP
+
+To generate the heap dump file that captures the contents of the heap, the
+L<Devel::MAT::Dumper> module is used. Ultimately the C<dump> function within
+it needs to be called, but usually one of the module load options can be used
+on the F<perl> commandline to achieve this without requiring the running code
+to be modified.
+
+For example, the C<-dump_at_DIE> option means that a heap dump will be written
+just before the process quits due to an uncaught exception:
+
+  $ perl -MDevel::MAT::Dumper=-dump_at_DIE program.pl
+
+At this point, the program will start up and run normally, but if it is about
+to die, it will first write a F<.pmat> file capturing the contents of the
+memory.
+
+  ...
+  Dumping to program.pl.pmat because of DIE
+  Can't call method "method" on an undefined value at program.pl line 123.
+
+There are a variety of other options for other situations, to suit other sorts
+of bugs and issues under investigation. For more options, see the
+documentation at L<Devel::MAT::Dumper/IMPORT OPTIONS>.
+
+=head1 ANALYSING THE HEAP
+
+=head2 The F<pmat> Shell
+
+Now that we have a F<.pmat> file, we can load it and start to inspect the
+contents. A lot of the smaller, simpler tools are built as plugins for the
+main F<pmat> command shell, so we can start by loading the heap file there.
+
+  $ pmat program.pl.pmat
+  Perl memory dumpfile from perl 5.24.1
+  Heap contains 15624 objects
+  pmat>
+
+For a brief overview, we can just count the total number of objects of various
+kinds in the heap:
+
+  pmat> count
+    Kind                 Count      (blessed) 
+    ARRAY                1259       89        
+    CODE                 274                  
+    GLOB                 326                  
+  ...
+
+We can inspect the callstack at the time the heap dump was made:
+
+  pmat> callstack
+  program.pl line 152: &main::func => void
+    $_[0]: 'arguments'
+    $_[1]: 'go'
+    $_[2]: 'here'
+  ...
+
+For more information about a tool, for example the C<count> tool, note that
+each one is implemented by a (correctly-cased) package under the
+C<Devel::MAT::Tool> namespace. In this instance, the C<count> tool is
+implemented by, and therefore more documentation can be found in, the
+L<Devel::MAT::Tool::Count> package.
+
+A list of the commands currently available in the shell can be found by
+
+  pmat> help
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

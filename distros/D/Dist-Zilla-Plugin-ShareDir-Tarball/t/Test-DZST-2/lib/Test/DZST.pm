@@ -1,0 +1,4 @@
+# ABSTRACT: DEFAULT MODULE TEMPLATE
+package Test::DZST;
+
+1;

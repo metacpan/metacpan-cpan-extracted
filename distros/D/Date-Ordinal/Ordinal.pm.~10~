@@ -1,0 +1,300 @@
+#-----------------------------------------------------------------------
+
+=head1 NAME
+
+Date::Ordinal - Conversion of dates to ordinal numbers and vice versa
+
+=head1 SYNOPSIS
+
+    use Date::Ordinal;
+    
+    $ord     = month2ord('January');           # $ord gets 1
+    $mon     = ord2month('1');                 # $mon gets 'January'
+    $mon     = ord2month(1);                   # $mon gets 'January'
+    $mon     = ord2month('01');                # $mon gets 'January'
+    $arryref = all_month_ordinations
+    @arry    = all_month_names
+    $arryref = all_month_names_ref
+    $arryref = all_short_month_names_ref
+    $arryref = all_day_ordinations
+
+    $arryref = all_hour_ordinations
+    $arryref = all_minute_ordinations
+
+
+    $hashref = ordination_month_pair # {'01' => 'January', ... }
+    @day     = days
+
+    
+=cut
+
+#-----------------------------------------------------------------------
+
+package Date::Ordinal;
+#use strict;
+
+#-----------------------------------------------------------------------
+
+=head1 DESCRIPTION
+
+This module is designed to aid in  creation of CGI popup_menus and also
+interaction with SQL databases.
+
+
+=cut
+
+#-----------------------------------------------------------------------
+
+require Exporter;
+use Carp;
+
+#-----------------------------------------------------------------------
+#	Public Global Variables
+#-----------------------------------------------------------------------
+use vars qw($VERSION @ISA @EXPORT @EXPORT_OK);
+$VERSION   = '2.8';
+@ISA       = qw(Exporter);
+@EXPORT    = qw(ord2month month2ord ordination_month_pair all_month_ordinationsall_day_ordinations all_hour_ordinations all_minute_ordinations prezero);
+
+#-----------------------------------------------------------------------
+#	Non-Private Global Variables
+#-----------------------------------------------------------------------
+@month=();
+
+#=======================================================================
+
+=head1 CONVERSION ROUTINES
+
+There are two conversion routines: C<ord2month()> and C<month2ord()>.
+
+=over 8
+
+=item ord2month()
+
+This function takes a month number [1..12] and returns a string
+which contains the name of the month identified. If the number is
+not a valid number, then C<undef> will be returned:
+
+    $mon = ord2month('3');
+
+=item C<month2ord()>
+
+This function takes a month name and returns the integer
+corresponding to the month name, if such exists.
+
+The match is a regexp match, so both 'Mar' and 'March' will return 3.
+
+If the argument could not be identified as a month name,
+then C<undef> will be returned:
+
+    $ord = month2ord('March');
+
+The case of the month name is not important.
+See the section L<KNOWN BUGS AND LIMITATIONS> below.
+
+=back
+
+=cut
+
+#=======================================================================
+sub ord2month
+{
+    my $ord = shift;
+
+    return undef unless (($ord >=1) && ($ord <=12));
+
+    my $month_count;
+    
+    while (1+$month_count++ != $ord) { ; }
+
+    return $month[$month_count-1];
+}
+
+sub month2ord
+{
+    my $month = shift;
+
+    $state = "\u\L$state";
+
+    my $month_count;
+
+    for ($month_count=0; $month_count < 12; ++$month_count) {
+	return ++$month_count if ($month[$month_count] =~ /$month/);
+    }
+
+    return undef;
+}
+
+#=======================================================================
+
+=head1 QUERY ROUTINES
+
+There is one function (and a reference variant) which can be used to
+obtain a list of all month names:
+
+
+=over 8
+
+=item C<all_month_names()>
+
+    Returns a list of all month names;
+
+=item C<all_month_names_ref()>
+
+    Returns a reference to a list of all month names;
+
+=item C<all_short_month_names_ref()>
+
+    Returns a reference to a list of all month names in 3-letter form
+
+=item C<ordination_month_pair()>
+
+    returns a reference to a hash of the ordination of a month name
+    and the month name
+
+=item C<all_month_ordinations()>
+
+    returns a reference  a hash of the ordination of a month name
+    and the month name
+
+=back
+
+=cut
+
+#=======================================================================
+sub all_month_names
+{
+    return @month;
+}
+
+sub all_month_names_ref
+{
+    return \@month;
+}
+
+sub all_short_month_names_ref
+{
+    return \@short_month;
+}
+
+sub ordination_month_pair
+{
+    my $counter=0;
+    
+    foreach (@month) {
+	$month_ordination = (++$counter < 10)
+	    ? "0" . $counter : $counter;
+	$ref{$month_ordination}=$_;
+    }
+
+    return \%ref;
+	
+}
+
+sub all_month_ordinations {
+
+sub bynumber {$a <=> $b}
+
+return [ (sort bynumber keys %{&ordination_month_pair}) ];
+}
+
+sub all_day_ordinations {
+
+    my @ary;
+    foreach (1..31) {
+	push @ary, prezero($_);
+    }
+    return \@ary;
+}
+
+sub all_hour_ordinations {
+
+    my @ary;
+    foreach (1..12) {
+	push @ary, prezero($_);
+    }
+    return \@ary;
+}
+
+sub all_minute_ordinations {
+
+    my @ary;
+    foreach (0..59) {
+	push @ary, prezero($_);
+    }
+    return \@ary;
+}
+
+
+#=======================================================================
+
+=head1 PRETTY-PRINTING ROUTINES
+
+=over 8
+
+=item C<prezero()>
+
+    if the current number is single-diit, prefix it with a '0'
+
+=back
+
+=cut
+
+#=======================================================================
+sub prezero() {
+    return (
+	    ($_[0] < 10) 
+	    ? "0$_[0]"
+	    :   $_[0]
+	    )
+	;
+}    
+
+
+#-----------------------------------------------------------------------
+
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+none
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Locale::US 
+
+
+=item Date::Manip
+
+=back
+
+=head1 AUTHOR
+
+Terrence Brannon E<lt>tbrannon@end70.comE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2000 End70 Corporation
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+#-----------------------------------------------------------------------
+
+#=======================================================================
+# initialisation code - stuff the DATA into the CODES hash
+#=======================================================================
+
+@month=qw(
+	  January February March April May June July
+	  August September October November December
+	  );
+
+@short_month = map { substr($_,0,3) } @month;
+
+
+1;
+

@@ -1,0 +1,42 @@
+--- #YAML:1.0
+name:                     Data-FormValidator-Filters-Demoroniser
+version:                  0.05
+abstract:                 A Data::FormValidator filter that allows you to demoronise a string
+author:
+  - Barbie <barbie@cpan.org>
+
+license:                  artistic_2
+distribution_type:        module
+installdirs:              site
+
+requires:
+  perl:                   5.006
+  Text::Demoroniser:      0
+recommends:
+  Data::FormValidator:    0
+  Test::CPAN::Meta:       0
+  Test::CPAN::Meta::JSON: 0
+  Test::Pod:              1.00
+  Test::Pod::Coverage:    0.08
+build_requires:
+  IO::File:               0
+  Test::More:             0.70
+
+provides:
+  Data::FormValidator::Filters::Demoroniser:
+    file:     lib/Data/FormValidator/Filters/Demoroniser.pm
+    version:  0.05
+no_index:
+  directory:
+    - t
+    - examples
+
+resources:
+  license:    http://www.perlfoundation.org/artistic_license_2_0
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-FormValidator-Filters-Demoroniser
+  repository: http://github.com/barbie/data-formvalidator-filters-demoroniser
+
+meta-spec:
+   version:   1.4
+   url:       http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: The Hand of Barbie 1.0

@@ -1,0 +1,88 @@
+Revision history for Device-FTDI
+
+0.13    2017/01/08 23:41:06
+        [CHANGES]
+         * Add debugging prints to SPI MPSSE subclass
+         * Improved I²C transfer speed
+
+        [BUGFIXES]
+         * Split writes longer than 1024 bytes into chunks to avoid stalling
+           the device on buffer overruns
+
+0.12    2016/10/02 22:18:57
+        [CHANGES]
+         * Rename 'CS' to 'SS' in the SPI subclass
+         * Expose and document methods in SPI subclass for interacting
+           directly with the SS pin
+         * Define methods required for Device::Chip's split-transaction SPI
+         * Add I2C read method
+         * Add sleep method
+
+        [BUGFIXES]
+         * Ensure that failed recv still sends I²C STOP condition
+         * Bugfix to Device::Chip::Adapter SPI protocol implementation to
+           allow ->read and ->readwrite to actually work
+
+0.11    2016/01/04 15:34:03
+        [CHANGES]
+         * Added 'autodie' feature
+         * Implement the 'GPIO' Device::Chip::Adapter protocol
+
+        [BUGFIXES]
+         * Complain if MPSSE is used without a defined clock edge sense
+         * Try 'libftdi1' as another platform library name (#6)
+
+0.10    2015/11/12 12:10:27
+        [CHANGES]
+         * Implement Device::Chip::Adapter 0.02:
+            + ->new_from_description constructor
+            + I2C protocol
+         * Have Device::Chip::MPSSE be a standalone class that composes a
+           Device::FTDI rather than subclassing it
+
+        [BUGFIXES]
+         * Fix race condition where completed Device::FTDI::MPSSE write futures
+           cause more writes that want more reads
+
+0.09    2015/11/10 00:29:32
+        [CHANGES]
+         * Implement a Device::Chip::Adapter class
+         * Make sure to correctly generate I²C STOP conditions
+         * Fix POD errors
+
+0.08    2015/11/07 18:34:18
+        [CHANGES]
+         * Added Device::FTDI::MPSSE; helper subclass for using MPSSE bitmode
+         * Added Device::FTDI::SPI and ::I2C
+
+0.07    2015/11/03 23:11:48
+        [CHANGES]
+         * Provide USB vendor/product ID constants
+         * Provide an export tag for each constant group
+         * Various documentation updates
+            + a complete SYNOPSIS example program
+            + barename =head2 function style
+
+-----
+
+0.06 Sun Nov  1 2015 Pavel Shaydo <zwon@cpan.org>
+    - export BITMODE_* constants (Paul "LeoNerd" Evans, see #3, #4)
+
+0.05 Sun Aug 19 2012 Pavel Shaydo <zwon@cpan.org>
+    - Pass interface parameter to _set_interface,
+      thanks to paxospaxos for the patch
+
+0.04 Thu Aug 16 2012 Pavel Shaydo <zwon@cpan.org>
+    - Add set_interface method
+
+0.03 Wed Feb 29 2012 Pavel Shaydo <zwon@cpan.org>
+    - Fix configure dependencies
+
+0.02 Mon Feb 27 2012 Pavel Shaydo <zwon@cpan.org>
+    - Add script to generate XS constants
+    - Check if libftdi is present when writing Makefile
+    - Add set_bitmode method
+
+0.01 Thu Feb 16 2012 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.
+

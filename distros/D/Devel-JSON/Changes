@@ -1,0 +1,22 @@
+Revision history for Devel::JSON
+
+1.000     2016-02-17 23:17:30+01:00 Europe/Paris
+	Dependencies: require Encode 2.73 on MSWin32 and netbsd.
+	Spéciale dédicace à Andéol !
+
+0.902     2015-10-19 00:07:39+02:00 Europe/Paris
+	Fix dependencies:
+	- Encode 2.05 required, 2.73 recommended
+	- JSON::MaybeXS 1.003004 recommended
+	Fix for environments where locale encoding detection (by
+	  &encoding::_get_locale_encoding) fails.
+	Doc: output encoding is now documented in SYNOPSIS.
+
+0.901     2015-04-17 08:30:06+02:00 Europe/Paris
+	Major fix: the expression is now evaluated in scalar context.
+	POD fixes.
+	Fixed 'Changes' and dzil release stuff.
+
+0.900     2015-04-17 00:46:40+01:00 Europe/Berlin
+	Initial working code. Made during the Perl QA Hackathon 2015.
+	Released from the c-base hackerspace in Berlin.

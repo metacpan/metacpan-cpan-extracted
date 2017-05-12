@@ -1,0 +1,42 @@
+#!/usr/bin/env perl
+use strict;
+use Data::STUID::Server;
+use Getopt::Long;
+
+my $p = Getopt::Long::Parser->new;
+$p->configure(qw(
+    posix_default
+    no_ignore_case
+    auto_help
+));
+my %opts = (
+    port => 9001
+);
+my @optspec = qw(
+    host_id=i
+    port=i
+    min_servers=i
+    min_spare_servers=i
+    max_servers=i
+    max_spare_servers=i
+    max_requests=i
+);
+
+if (! $p->getoptions(\%opts, @optspec)) {
+    exit 1;
+}
+
+my $server = Data::STUID::Server->new(%opts);
+$server->run;
+
+__END__
+
+=head1 NAME
+
+stuid-server - STUID ID Generator Server
+
+=head1 SYNOPSIS
+
+    stuid-server --host_id=unique_number
+
+=cut

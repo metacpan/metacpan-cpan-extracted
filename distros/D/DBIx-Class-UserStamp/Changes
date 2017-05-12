@@ -1,0 +1,5 @@
+0.11    2008-08-26
+        - Port to DBIx::Class::DynamicDefault
+
+0.10    2008-06-09
+        - Initial release.

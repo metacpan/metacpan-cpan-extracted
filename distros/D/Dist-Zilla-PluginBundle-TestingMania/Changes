@@ -1,0 +1,94 @@
+Changelog for Dist::Zilla::PluginBundle::TestingMania
+
+0.25      2015-03-21
+  - Bump DZP::Test::EOL version [dolmen]
+
+0.24      2014-10-25
+  - Test::EOL's test file changed names [rjeschmi]
+
+0.23      2014-08-29
+  - Added another back-compat synonym (Test::EOL)
+  - More robust manifest tests
+
+0.22      2014-04-29
+  - Silence NoTabsTests deprecation warnings
+
+0.21      2013-09-27
+  - Bump Dist::Zilla::Plugin::Test::Compile prereq for Win32 support
+
+0.20      2013-08-13
+  - Fix spurious test failures
+
+0.19      2013-03-02
+  - Allow setting your maximum target perl version explicitly
+   with max_target_perl [xdg++]
+
+0.18      2012-07-29
+  - Allow setting is_strict and has_version for Test::Version plugin
+
+0.17      2012-06-16
+  - Use decimal version numbers for prereqs
+
+0.16      2012-06-16
+  - Require JSON::PP 2.27103
+  - Allow specifying enable/disable multiple times in dist.ini instead of a comma-separated list
+
+0.15      2011-12-15
+  - List prereqs as prereqs instead of use-ing them [Caleb Cushing]
+  - Use DZP::Test::EOL (an author test) instead of EOLTests (a release test) [GH #13, thanks to Caleb Cushing]
+
+0.14      2011-09-08
+  - Packaging updates
+
+v0.13     2011-09-08
+  - Add mention of Test::Pod::LinkCheck plugin
+  - Update several Test:: plugins
+
+0.012     2011-06-05
+  - Add a Test::Version plugin by xenoterrocide; remove superseded plugins
+  - Add a Test::Mojibake plugin by creaktive
+
+0.011     2011-05-09
+  - Allow setting a perlcritic config file
+
+0.010     2011-04-20
+  - Forgotten hash key renamed [rstauner]
+  - Added tests
+
+0.009     2011-04-19
+  - Renamed options for clarity: add -> enable; skip -> disable
+  - Don't require the absolute latest prerequisites
+  - Require a version of the Test::CPAN::Meta::JSON plugin that prunes itself
+   when META.json isn't present. Users no longer need to disable this test
+   in that situation.
+
+0.008     2011-04-16
+  - Include a test for META.json - disable it if your dists don't include this
+  - Removed ProgCriticTests (was disabled by default)
+  - Removed CheckChangesTests
+  - Documentation improvements
+
+0.007     2011-04-12
+  - New prereq names
+
+0.006     2011-04-04
+  - Set default changelog; thanks to mjgardner
+
+0.005     2011-04-02
+  - Added ChangesTests
+
+0.004     2011-02-15
+  - Removed PodLinkTests; the dependencies are too immature
+
+0.003     2011-01-31
+  - Removed ApacheTests
+  - Removed PodSpellingTests, which has a fail in the dependency chain, wasn't
+   enabled by default, and is too annoying to bear.
+  - Added PodLinkTests
+
+0.002     2010-11-28
+  - Flesh out the chain of dependencies to get full functionality
+  - Use Perl_5 license
+
+0.001     2010-10-18
+  - Initial version

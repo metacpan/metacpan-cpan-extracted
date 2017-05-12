@@ -1,0 +1,68 @@
+[Changes for 0.32 - Nov 3, 2006]
+
+* Workaround various performance issues.  The real fix will be in 0.40.
+
+[Changes for 0.31 - Sep 7, 2006]
+
+* Fix a test assuming hash key orders.
+
+[Changes for 0.30 - Jul 25, 2006]
+
+* Big rewrite, simplifying the API and documenting everything.
+
+* Added to_relative (to help with SVK floating checkouts).
+
+[Changes for 0.21 - Nov 10, 2004]
+
+* fix store_recursively for empty key, which should find
+  all descendents. [Autrijus]
+
+[Changes for 0.20 - Sep 18, 2004]
+
+* Make store_fast faster.
+
+[Changes for 0.19 - Sep 13, 2004]
+
+* Use index rather than subtr, where Benchmark shows 20%-40%
+  performance improvements. [Autrijus Tang]
+
+* New API: store_fast.
+
+* Allow options in constructor. [Autrijus Tang]
+
+* Properly escape for regex.
+
+[Changes for 0.18 - May 29, 2004]
+
+* Fix - find sticky values was not working.
+
+[Changes for 0.17 - Mar 18, 2004]
+
+* New - store_override for overriding existing values on the entry.
+
+[Changes for 0.16 - Mar 17, 2004]
+
+* Fix - get_descenents is unhappy with older versions of Data::Hierarchy.
+
+[Changes for 0.15 - Mar 8, 2004]
+
+* New - properties beginning with '.' are now sticky to the entry.
+* New - merge function to merge two Data::Hierarchy objects.
+
+[Changes for 0.13 - Nov 4, 2003]
+
+* New - get_single and store_single.
+* Fix - get_* now return cloned hash to avoid being modified directly.
+
+[Changes for 0.12 - Oct 6, 2003]
+
+* New - Find descendents with a rule.
+* Fix - cleanup useless entries after store and store_recursively
+
+[Changes for 0.11 - Sep 26, 2003]
+
+* Fix an obvious edge case.
+
+[Changes for 0.10 - Sep 26, 2003]
+
+Initial release.

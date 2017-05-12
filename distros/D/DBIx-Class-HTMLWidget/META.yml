@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-Class-HTMLWidget
+version:      0.16
+version_from: lib/DBIx/Class/HTMLWidget.pm
+installdirs:  site
+requires:
+    DBIx::Class:                   0.05
+    HTML::Widget:                  1.10
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

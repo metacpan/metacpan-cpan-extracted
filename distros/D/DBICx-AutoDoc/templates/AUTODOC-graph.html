@@ -1,0 +1,26 @@
+#!/usr/bin/perl
+
+my $input = '[% output_filename( "AUTODOC-graph.dot", 1 ) %]';
+
+my $cmd = '[% graphviz_command.join( " " ) %] -Tcmapx '.$input;
+
+print <<"END";
+[% INCLUDE html_header.tt2 %]
+END
+
+open( my $infh, '-|', $cmd );
+while ( <$infh> ) {
+    s/&#45;/-/g;
+    if ( /href=".*#([^#"]+)"/ ) {
+        my $alt = $1;
+        s/alt=""/alt="$alt" title="$alt"/;
+    }
+    print $_;
+}
+close( $infh );
+
+my $png = '[% output_filename( "AUTODOC-graph.png" ) %]';
+print <<"END"
+<img src="$png" usemap="#dbixclass" border="0" />
+[% INCLUDE html_footer.tt2 %]
+END

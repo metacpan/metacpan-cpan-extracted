@@ -1,0 +1,155 @@
+NAME
+    Device::CableModem::SURFboard - Get info from a Motorola 'SURFboard'
+
+SYNOPSYS
+        use Device::CableModem::SURFboard;
+        my $modem = Device::CableModem::SURFboard->new
+            or die Device::CableModem::SURFboard->errstr;
+
+        # print upstream power range check
+        print $modem->upPowerStr . ' ' . $modem->upPowerCheck;
+
+        # print downstream power range check
+        print $modem->dnPowerStr . ' ' . $modem->dnPowerCheck;
+
+        # print Signal/Noise range check
+        print $modem->SNRatioStr . ' ' . $modem->SNRatioCheck;
+
+DESCRIPTION
+    The Motorola 'SURFboard' cable modem includes a built in web interface
+    that contains useful information like signal to noise ratios and power
+    levels. These values can be used to aid in trouble shooting modem
+    connection problems, or monitoring the health of the modem or cable
+    connection.
+
+    "Device::CableModem::SURFboard" connects to several different models of
+    'SURFboard' modems (currently confirmed: SB4100, SB4200, SB5100,
+    SB5100E, SB5101, SBV5120E), scraping the status page for the most
+    useful information regarding cable line condition.
+
+  CREATING A NEW MODEM OBJECT
+        $modem = Device::CableModem::SURFboard->new();
+
+    This will create a new modem object using default values. You can also
+    initialize the modem object from an associative array reference:
+
+        $modem = Device::CableModem::SURFboard->new(
+            dnPowerMax => 16,
+            dnPowerMin => -16,
+            upPowerMax => 54,
+            upPowerMin => 36,
+            SNRatioMax => 100,
+            SNRatioMin => 0,
+            modemIP => '192.168.100.1',
+            loginUsername => 'admin',
+            loginPassword => 'motorola');
+
+    The above example also demonstrates all of the configurable options with
+    their defaults.
+
+METHODS
+    errstr()
+      Returns the last error message (or empty). Currently this isn't much
+      use as a method as only pageRef() (used internally) will generate
+      errors. errstr() can also be called directly to determine why a new()
+      method failed.
+
+    modelGroup()
+      Returns the model group found. Different models of SURFboard modems
+      have different URL/page layouts. These can be grouped into similar
+      model groups that share the same basic layout. When a new modem object
+      is created, modelGroup will be set according to the first successful
+      status page retrieved.
+
+    channel()
+      Returns the up stream channel id (number).
+
+    upFreq()
+      Returns the up stream frequency value (Hz) as a simple number.
+
+    upFreqStr()
+      Returns the up stream frequency value as a text string with the unit
+      description attached. For example "25250000 Hz".
+
+    dnFreq()
+      Returns the down stream frequency value (Hz) as a simple number.
+
+    dnFreqStr()
+      Returns the down stream frequency value as a text string with the unit
+      description attached. For example "477000000 Hz".
+
+    SNRatio()
+      Returns the down stream Signal to Noise ratio value (dB) as a simple
+      number.
+
+    SNRatioStr()
+      Returns the down stream Signal to Noise ratio value as a text string
+      with the unit description attached. For example "40.5 dB".
+
+    SNRatioCheck()
+      Checks the current down stream Signal to Noise ratio against pre-
+      defined max/min limits and returns either "high", "low" or blank. The
+      pre-defined max/min (default 100/0) can be also be set with the
+      SNRatioMax/SNRatioMin parameters when the object is created.
+
+    dnPower()
+      Returns the down stream power value (dBmV) as a simple number.
+
+    dnPowerStr()
+      Returns the down stream power value as a text string with the unit
+      description attached. For example "7.3 dBmV".
+
+    dnPowerCheck()
+      Checks the current down stream power against pre-defined max/min
+      limits and returns either "high", "low" or blank. The pre-defined
+      max/min (default 16/-16) can be also be set with the
+      dnPowerMax/dnPowerMin parameters when the object is created.
+
+    upPower()
+      Returns the up stream power value (dBmV) as a simple number.
+
+    upPowerStr()
+      Returns the up stream power value as a text string with the unit
+      description attached. For example "49.5 dBmV".
+
+    upPowerCheck()
+      Checks the current up stream power against pre-defined max/min limits
+      and returns either "high", "low" or blank. The pre-defined max/min
+      (default 54/36) can be also be set with the upPowerMax/upPowerMin
+      parameters when the object is created.
+
+    pageRef()
+      Takes a URL path and an optional IP address to read a page from the
+      modem. pageRef() is used internally to get the signal information
+      page. It could also be used for grabbing other information pages from
+      modems. A valid page request returns a reference to a string
+      containing the page contents. A page request failure will return
+      undefined (check the $errstr value or call errstr() to find out why).
+
+SUPPORT
+    This script was developed and tested on a Motorla SURFboard cable modem.
+    (Models: SB4100, SB4200, SB5100, SB5100E, SB5101, SBV5120E).
+
+    It may work on other Motorla modems, but likely will not. If you have a
+    different cable modem that works, or you would like to have work, please
+    let me know.
+
+AUTHOR
+        Scott Mazur
+        CPAN ID: RUZAM
+        littlefish.ca
+        scott@littlefish.ca
+        http://littlefish.ca
+
+COPYRIGHT
+    copyright(C) 2007 Scott Mazur, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

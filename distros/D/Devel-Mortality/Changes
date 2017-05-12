@@ -1,0 +1,6 @@
+Revision history for Perl extension Devel::Mortality.
+
+0.01  Wed May  7 18:49:15 2008
+	- original version; created by h2xs 1.23 with options
+		-A -c -b 5.5.0 -n Devel::Mortality
+

@@ -1,0 +1,31 @@
+---
+abstract: 'Use the revision of the working directory'
+author:
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Version-FromSubversion
+requires:
+  Dist::Zilla: 4.3
+  Dist::Zilla::Role::TextTemplate: 0
+  Dist::Zilla::Role::VersionProvider: 0
+  Moose: 0
+  SVN::Client: 0
+  SVN::Core: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Version-FromSubversion
+  repository: https://dist-zilla-plugin-version-fromsubversion.googlecode.com/svn/trunk
+version: 1.000019

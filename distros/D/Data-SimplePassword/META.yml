@@ -1,0 +1,44 @@
+---
+abstract: 'Simple random password generator'
+author:
+  - 'Ryo Okamoto <ryo@aquahill.net>'
+build_requires:
+  List::MoreUtils: '0'
+  Test::Exception: '0'
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-SimplePassword
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::SimplePassword:
+    file: lib/Data/SimplePassword.pm
+    version: '0.11'
+recommends:
+  Math::Random::MT: '0'
+requires:
+  Crypt::Random: '0'
+  Math::Random::MT::Perl: '0'
+  Moo: '0'
+  MooX::ClassAttribute: '0'
+  UNIVERSAL::require: '0'
+resources:
+  bugtracker: https://github.com/ryochin/p5-data-simplepassword/issues
+  homepage: https://github.com/ryochin/p5-data-simplepassword
+  repository: git://github.com/ryochin/p5-data-simplepassword.git
+version: '0.11'

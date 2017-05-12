@@ -1,0 +1,28 @@
+---
+abstract: 'Interface to support multilanguage using Locale::Meta package.'
+author:
+  - 'Ruben Amortegui <ruben.amortegui@gmail.com>'
+build_requires:
+  Cwd: '0'
+  Dancer2: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Locale-Meta
+requires:
+  Dancer2::Plugin: '0'
+  Locale::Meta: '0.008'
+  strict: '0'
+  warnings: '0'
+version: '0.006'
+x_serialization_backend: 'YAML::Tiny version 1.69'

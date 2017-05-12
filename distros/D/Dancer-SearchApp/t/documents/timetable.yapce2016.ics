@@ -1,0 +1,3712 @@
+BEGIN:VCALENDAR
+CALSCALE:GREGORIAN
+PRODID:-//Act//Data::ICal 0.16//EN
+VERSION:2.0
+X-WR-CALNAME:YAPC::Europe 2016
+X-WR-TIMEZONE:Europe/Bucharest
+BEGIN:VTIMEZONE
+TZID:Europe/Bucharest
+X-LIC-LOCATION:Europe/Bucharest
+BEGIN:DAYLIGHT
+DTSTART:19700329T030000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+TZNAME:EEST
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0300
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:19701025T040000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+TZNAME:EET
+TZOFFSETFROM:+0300
+TZOFFSETTO:+0200
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DESCRIPTION:We're pleased to announce that the pre-conference party details
+  have been confirmed. We're going to have a nice ‪#‎rooftop party\, hosted
+  by Evozon\, on their premises. If you're making travel plans\, don't forg
+ et to mark the address: 62\, Moților street\, Cluj Napoca.\n\nWe want to t
+ hank our amazing sponsors\, for making our plans a reality. Food's on Elig
+ o Recruitment Ltd\, drinks are on Evozon\, you just make sure to bring the
+  good mood! Can't wait to meet you all!\n\nIf you still haven't seen all c
+ onference details && haven't purchased your tickets\, they all can be foun
+ d at the usual link: http://act.yapc.eu/ye2016
+DTEND;TZID=Europe/Bucharest:20160823T230000
+DTSTART;TZID=Europe/Bucharest:20160823T200000
+LOCATION:
+SUMMARY:Pre-Conference Rooftop event @ Evozon
+UID:http://act.yapc.eu/ye2016/event/1913
+URL:http://act.yapc.eu/ye2016/event/1913
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Welcome Coffee & Registration‎
+DTEND;TZID=Europe/Bucharest:20160824T085000
+DTSTART;TZID=Europe/Bucharest:20160824T080000
+LOCATION:Hall
+SUMMARY:‎Welcome Coffee & Registration‎
+UID:http://act.yapc.eu/ye2016/event/1914
+URL:http://act.yapc.eu/ye2016/event/1914
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:First Floor
+DTEND;TZID=Europe/Bucharest:20160824T133000
+DTSTART;TZID=Europe/Bucharest:20160824T123000
+LOCATION:Hall
+SUMMARY:‎Lunch Day 1‎
+UID:http://act.yapc.eu/ye2016/event/1915
+URL:http://act.yapc.eu/ye2016/event/1915
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Afternoon Coffee Break Day 1
+DTEND;TZID=Europe/Bucharest:20160824T163500
+DTSTART;TZID=Europe/Bucharest:20160824T160500
+LOCATION:Hall
+SUMMARY:‎Afternoon Coffee Break Day 1
+UID:http://act.yapc.eu/ye2016/event/1917
+URL:http://act.yapc.eu/ye2016/event/1917
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:The conference party will have a royal touch\, as the venue is 
+ none other than the courtyard of ‪#‎Banffy‬ palace\, located at the very h
+ eart of Cluj-Napoca\, in its most central spot\, Piata Unirii!\n\nAddress:
+  Piața Unirii 30\, Cluj-Napoca\n\nAlso\, as part of attending #yapceu2016\
+ , entrance to the museum for both participants && plus ones will be compli
+ mentary\, provided you show your badge to ticketing staff.\n\nThank you Mu
+ zeul de Arta Cluj-Napoca!
+DTEND;TZID=Europe/Bucharest:20160824T230000
+DTSTART;TZID=Europe/Bucharest:20160824T200000
+LOCATION:
+SUMMARY:Conference Party @ the Museum
+UID:http://act.yapc.eu/ye2016/event/1918
+URL:http://act.yapc.eu/ye2016/event/1918
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Morning Coffee Day 2
+DTEND;TZID=Europe/Bucharest:20160825T090000
+DTSTART;TZID=Europe/Bucharest:20160825T080000
+LOCATION:Hall
+SUMMARY:‎Morning Coffee Day 2
+UID:http://act.yapc.eu/ye2016/event/1921
+URL:http://act.yapc.eu/ye2016/event/1921
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Lunch Day 2
+DTEND;TZID=Europe/Bucharest:20160825T133000
+DTSTART;TZID=Europe/Bucharest:20160825T123000
+LOCATION:Hall
+SUMMARY:Lunch Day 2
+UID:http://act.yapc.eu/ye2016/event/1920
+URL:http://act.yapc.eu/ye2016/event/1920
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Afternoon Coffee Break Day 2
+DTEND;TZID=Europe/Bucharest:20160825T164500
+DTSTART;TZID=Europe/Bucharest:20160825T161500
+LOCATION:Hall
+SUMMARY:‎Afternoon Coffee Break Day 2
+UID:http://act.yapc.eu/ye2016/event/1919
+URL:http://act.yapc.eu/ye2016/event/1919
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Morning Coffee Day 3
+DTEND;TZID=Europe/Bucharest:20160826T090000
+DTSTART;TZID=Europe/Bucharest:20160826T080000
+LOCATION:Hall
+SUMMARY:‎Morning Coffee Day 3
+UID:http://act.yapc.eu/ye2016/event/1922
+URL:http://act.yapc.eu/ye2016/event/1922
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Lunch Day 3‎
+DTEND;TZID=Europe/Bucharest:20160826T133000
+DTSTART;TZID=Europe/Bucharest:20160826T123000
+LOCATION:Hall
+SUMMARY:‎Lunch Day 3‎
+UID:http://act.yapc.eu/ye2016/event/1923
+URL:http://act.yapc.eu/ye2016/event/1923
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:‎Afternoon Coffee Break Day 3‎
+DTEND;TZID=Europe/Bucharest:20160826T164500
+DTSTART;TZID=Europe/Bucharest:20160826T161500
+LOCATION:Hall
+SUMMARY:‎Afternoon Coffee Break Day 3‎
+UID:http://act.yapc.eu/ye2016/event/1924
+URL:http://act.yapc.eu/ye2016/event/1924
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:Laurent Dami
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Curtis Poe
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Job van Achterberg
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Eric de Hont
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Sori Salca
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:30 attendees
+DESCRIPTION:Even backend developers often find themselves writing frontend 
+ code. How can we make sure our websites and web applications work for ever
+ yone? And how does this influence the technical choices we make\, even on 
+ the backend side?
+DTEND;TZID=Europe/Bucharest:20160825T115000
+DTSTART;TZID=Europe/Bucharest:20160825T105000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Job van Achterberg
+SUMMARY:Making your web application work for everyone
+UID:http://act.yapc.eu/ye2016/talk/6709
+URL:http://act.yapc.eu/ye2016/talk/6709
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:Tom Hukins
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Andreas Holzner
+ATTENDEE:Sori Salca
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:26 attendees
+DESCRIPTION:This talk aims to give/explain some lessons learnt and tips on 
+ using\nDBIx::Class with a legacy database schema.\n\nAn overview of DBIx::
+ Class will be given\, although this will not be in\ngreat detail and there
+  is some expectation of knowledge of the basics\nof dbic\n\nThe basic skel
+ eton of the talk is as follows:\n\n        - Who am i?\n        - Why DBIx
+ ::Class\n        - Legacy Schema\n                + Grown organically\n   
+              + Poorly normalised\n                + No relational constrai
+ nts\n                + Polymorphic relationships\n                + Poor c
+ hoice of data types\n                + SQL Antipatterns\n        - Battlin
+ g the above with DBIx::Class\n                + Generating schema classes\
+ n                + Adding relationships\n                + Solving joins o
+ n polymorphic relationships\n                + Inflating columns\n        
+         + Fixing data types with filters\n                + Virtual views 
+ and reports\n                + Query tracing and profiling\n        - Ques
+ tions?\n\nOther topics touched upon may include:\n\n        - MVC\n       
+          + Thin controllers\n                + Fat model\n\nI expect the t
+ alk to last around 45 minutes\, and with a Q&A at the end\nthat should tak
+ e it to the 60 minute mark. The full presentation and\nexample code will a
+ vailable for view/fork/contribution on github.
+DTEND;TZID=Europe/Bucharest:20160826T145500
+DTSTART;TZID=Europe/Bucharest:20160826T135500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Lee Johnson
+SUMMARY:Battling a Legacy Schema with DBIx::Class
+UID:http://act.yapc.eu/ye2016/talk/6710
+URL:http://act.yapc.eu/ye2016/talk/6710
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Andrey Mikhaylenko
+COMMENT:30 attendees
+DESCRIPTION:Bikeshedding is boring\, let's go ride our bikes instead.
+DTEND;TZID=Europe/Bucharest:20160825T134500
+DTSTART;TZID=Europe/Bucharest:20160825T133000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Lee Johnson
+SUMMARY:Mocking APIs for Emulation Driven Development
+UID:http://act.yapc.eu/ye2016/talk/6711
+URL:http://act.yapc.eu/ye2016/talk/6711
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Steffen Winkler
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+COMMENT:24 attendees
+DESCRIPTION:Everybody complains that perl dies. But from where is this comi
+ ng from? Is because technical world is moving too fast and we cannot keep 
+ up? Is because we are not agile enough? Is TMTOWTDI the key factor of this
+ ? Will we\, as Perl developers survive in this world?\n\nThis talk is abou
+ t major issues that contribute to this misunderstanding  and patterns that
+  you can find in your day to day work
+DTEND;TZID=Europe/Bucharest:20160825T134500
+DTSTART;TZID=Europe/Bucharest:20160825T133000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Mirela Iclodean
+SUMMARY:Velociraptor in a Modern World
+UID:http://act.yapc.eu/ye2016/talk/6712
+URL:http://act.yapc.eu/ye2016/talk/6712
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Job van Achterberg
+ATTENDEE:Paulo Favinha
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Jorge Soares
+COMMENT:23 attendees
+DESCRIPTION:With CSV being a dataformat that does not define the variables 
+ required to parse it (encoding\, separator- and quotation character)\, we'
+ d like to have features that wil (try to) do so for us automatically.\n\nH
+ aving third party that ships CSV file sets that mix '\;' and '\,' for sepa
+ rators\, UTF-8 and UTF-16LE files and more weirdness that makes one curse\
+ , caused me to write a new method that takes care of most of those annoyan
+ ces.
+DTEND;TZID=Europe/Bucharest:20160824T104000
+DTSTART;TZID=Europe/Bucharest:20160824T101000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:H.Merijn Brand
+SUMMARY:CSV with flexible headers (perl5 & perl6)
+UID:http://act.yapc.eu/ye2016/talk/6713
+URL:http://act.yapc.eu/ye2016/talk/6713
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:Tom Hukins
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Curtis Poe
+ATTENDEE:Steffen Winkler
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:José Joaquín Atria
+COMMENT:47 attendees
+DESCRIPTION:A dissection of a rather simple API endpoint.\n\nSome likely to
+ pics:\n- NoFramework is the new NoSQL\n- Fat Models\n- Bearer Tokens\, JWT
+ s & true stateless APIs\n- Postgres Common Table Expressions and window fu
+ nctions
+DTEND;TZID=Europe/Bucharest:20160824T170500
+DTSTART;TZID=Europe/Bucharest:20160824T163500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Thomas Klausner
+SUMMARY:How to write an API endpoint in 2016
+UID:http://act.yapc.eu/ye2016/talk/6714
+URL:http://act.yapc.eu/ye2016/talk/6714
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Nicholas Clark
+ATTENDEE:Laurent Dami
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Diego Kuperman
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Michal Jurosz
+ATTENDEE:Moray Jones
+ATTENDEE:Jan Seidl
+ATTENDEE:István Almási
+ATTENDEE:Eric de Hont
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Martin Barth
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:28 attendees
+DESCRIPTION:Perl 6 has built-in support for grammars\, used in particular t
+ o parse itself. In this presentation I will tell you about my experiences 
+ in writing two real-world grammars with them\, TAP and YAML.
+DTEND;TZID=Europe/Bucharest:20160824T170500
+DTSTART;TZID=Europe/Bucharest:20160824T163500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Leon Timmermans
+SUMMARY:Real-world parsing with Perl 6
+UID:http://act.yapc.eu/ye2016/talk/6715
+URL:http://act.yapc.eu/ye2016/talk/6715
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:Aaron Crane
+ATTENDEE:Dave Cross
+ATTENDEE:Diego Kuperman
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Lance Wicks
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:José Joaquín Atria
+COMMENT:40 attendees
+DESCRIPTION:Swagger is a specification of a REST API.\nIt is now the base o
+ f the Open API Initiative supported by a number of companies\n\nWhat *you*
+  have to do:\n* Understand the spec and specify all your API endpoints (pa
+ rameters\, input and output schema)\n* Each item of the spec can have a "d
+ escription"\n\nWhat does it give you in return:\n* The spec and your descr
+ iptions are the public documentation - no need to seperately administrate 
+ docs that possibly get out of date\n* A nice javascript frontend for manua
+ l testing\, with OAuth2 support\n* A plugin for your web framework (*)\, w
+ hich creates the routes and does all the input/output validation\, so you 
+ only have to care about the actual business logic.\n* You can write it in 
+ YAML\n\n\nYou don't need to write the validation yourself\, but it helps t
+ o understand how it is done. I'll show you an example and some pitfalls yo
+ u should be aware of.\n\nI created an example git repository I'll use in m
+ y talk:\n<https://github.com/perlpunk/dancer-swagger-example-p5>\n\n(*) Cu
+ rrently Mojolicious and Dancer2
+DTEND;TZID=Europe/Bucharest:20160826T134500
+DTSTART;TZID=Europe/Bucharest:20160826T133000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Tina Müller
+SUMMARY:Why you want to use Swagger/OpenAPI for your REST API
+UID:http://act.yapc.eu/ye2016/talk/6718
+URL:http://act.yapc.eu/ye2016/talk/6718
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:mirod
+ATTENDEE:Aaron Crane
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Eric de Hont
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:44 attendees
+DESCRIPTION:How to write command line tools with a good user experience\n\n
+ Write a specification and get nested subcommands\, option and parameter sp
+ ecification and validation\, help\, documentation\, and advanced shell tab
+  completion.\n\n\nGood commandline tools\n* give good usage error messages
+ \n* have good usage output\n* have useful shell tab completion\n* have goo
+ d man pages\n\nYour CLI framework should do that work for you\, and you sh
+ ould not have to write duplicate code/pod.\n\nI'll show a framework that t
+ ries to implement all these things\, and some examples to demonstrate how 
+ advanced completion can make the life of your users much easier.
+DTEND;TZID=Europe/Bucharest:20160824T174500
+DTSTART;TZID=Europe/Bucharest:20160824T171500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Tina Müller
+SUMMARY:Writing command line tools made easy
+UID:http://act.yapc.eu/ye2016/talk/6720
+URL:http://act.yapc.eu/ye2016/talk/6720
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:Job van Achterberg
+ATTENDEE:Juan Julián Merelo-Guervós
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Eric de Hont
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Sori Salca
+COMMENT:13 attendees
+DESCRIPTION:After writing an open source novel using Markdown and github\, 
+ I have increasingly automatized and streamlined the toolbelt for writing e
+ ither literature or technical books using git and GitHub\, with continuous
+  integration thrown in for good measure. But this integration affords the 
+ quantification of the creative process: every commit and every test result
+  scores a diversity of things\, from number of words to text readability a
+ nd quality.\nIn this talk I will explain how I managed to reduce the conti
+ nuous integration of any text to a few lines in a continuous integration c
+ onf file\, and\, at the same time\, what these tests reveal about my own w
+ riting process quantitavely and\, a bit\, qualitatively.
+DTEND;TZID=Europe/Bucharest:20160824T174500
+DTSTART;TZID=Europe/Bucharest:20160824T171500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Juan Julián Merelo-Guervós
+SUMMARY:Quantifying creativity: using Perl to analyze the process of writin
+ g
+UID:http://act.yapc.eu/ye2016/talk/6723
+URL:http://act.yapc.eu/ye2016/talk/6723
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Curtis Poe
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Lukas Mai
+ATTENDEE:benjamin tietze
+ATTENDEE:Lance Wicks
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Manfred Heumann
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Tudor Constantin
+ATTENDEE:Anne Thorniley
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Aaron Rowe
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:56 attendees
+DESCRIPTION:It's a little hard not to be perplexed by Agile proselytizers w
+ ho intone the "Agile is not a silver bullet" mantra and then proceed to re
+ commend it for everything. They're like developers who recommend Perl for 
+ everything and wonder why people don't take them seriously.\n\nLearn how t
+ o tell the proselytizers when to shove it.\n\nBy the time this talk is don
+ e\, you'll understand what Agile is really about and when to use Agile\, L
+ ean\, and Structured project management techniques.
+DTEND;TZID=Europe/Bucharest:20160825T115000
+DTSTART;TZID=Europe/Bucharest:20160825T105000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Curtis Poe
+SUMMARY:When you don't want Agile
+UID:http://act.yapc.eu/ye2016/talk/6724
+URL:http://act.yapc.eu/ye2016/talk/6724
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Tom Hukins
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Christoph Ziebuhr
+COMMENT:23 attendees
+DESCRIPTION:Resque is a job-queue system on top of Redis originally develop
+ ed by github in ruby.\n\nI've ported Resque from Ruby to perl about four y
+ ears ago and since then we've been using it as soysuper.com queue for mill
+ ions of tasks daily over a ton of boxes/workers.\n\nIn this talk I'll expl
+ ain why I've decided to use it over other options\, some internals and exa
+ mples of how we use it.
+DTEND;TZID=Europe/Bucharest:20160824T104000
+DTSTART;TZID=Europe/Bucharest:20160824T101000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Diego Kuperman
+SUMMARY:Resque to the resque!
+UID:http://act.yapc.eu/ye2016/talk/6725
+URL:http://act.yapc.eu/ye2016/talk/6725
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Leon Timmermans
+ATTENDEE:Manfred Heumann
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:19 attendees
+DESCRIPTION:After you have secured an Interview and you have done all the p
+ rep work\, How do you know if its the right role ? How do you know if its 
+ the company culture? its about the questions you ask to extract the inform
+ ation you need. \n\nAlso I will speak from the client perspective on how t
+ o ask the right amount of questions to identify the right candidate for th
+ e role. \n\nWe will be looking in detail about what the questions say abou
+ t you as in individual or a company.
+DTEND;TZID=Europe/Bucharest:20160826T115000
+DTSTART;TZID=Europe/Bucharest:20160826T105000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Rick Deller
+SUMMARY:Its all in the questions you ask
+UID:http://act.yapc.eu/ye2016/talk/6726
+URL:http://act.yapc.eu/ye2016/talk/6726
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:mirod
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tom Hukins
+ATTENDEE:Salvador Fandiño
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Eitan Schuler
+ATTENDEE:Herbert Breunung
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Tudor Constantin
+ATTENDEE:Anne Thorniley
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Alexandra Haidu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:32 attendees
+DESCRIPTION:One of the fields that can be successfully applied to usability
+  testing is neuroscience\, which can be used in conducting long-term analy
+ ses on what a website’s usability would pose. I will explain how the human
+  brain is implicated in each process used in usability.
+DTEND;TZID=Europe/Bucharest:20160826T171500
+DTSTART;TZID=Europe/Bucharest:20160826T164500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Andreea Popescu
+SUMMARY:The neuroscience beyond the usability
+UID:http://act.yapc.eu/ye2016/talk/6727
+URL:http://act.yapc.eu/ye2016/talk/6727
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:Tom Hukins
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Diego Kuperman
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Tudor Constantin
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Andreas Holzner
+ATTENDEE:Aaron Rowe
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Virgil Dinu
+COMMENT:30 attendees
+DESCRIPTION:Perl Catalyst is a modern\, MVC (model-view-controller) develop
+ ment framework for building the server side of your web application. Its a
+ lso been around for a while (its in its 10th year!) and the current tutori
+ als\, books and various online documentation don't make it easy to see the
+  distilled wisdom of the ages. In this tutorial I'll show you my current a
+ pproach to building a moderately complex website\, starting with automatio
+ n and covering everything from database setup\, framework skeleton\, testi
+ ng\, API development and deployment to various cloud providers. We'll also
+  sketch out some ideas about what's next for Catalyst users\, and talk abo
+ ut the cutting edge of web development using web sockets and related persi
+ stent protocols and we and thoughts about a Catalyst component based archi
+ tecture.
+DTEND;TZID=Europe/Bucharest:20160824T145500
+DTSTART;TZID=Europe/Bucharest:20160824T132500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:john napiorkowski
+SUMMARY:Building the Modern Perl Catalyst Application
+UID:http://act.yapc.eu/ye2016/talk/6728
+URL:http://act.yapc.eu/ye2016/talk/6728
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:Tom Hukins
+ATTENDEE:Stefan Seifert
+ATTENDEE:Diego Kuperman
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Marco Pessotto
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Albert Hilazo
+ATTENDEE:Virgil Dinu
+COMMENT:17 attendees
+DESCRIPTION:Perl Catalyst is a modern MVC (model - view - controller) devel
+ opment framework for building the server side of your web application. It 
+ has a reputation for being a bit heavyweight\, but the classic design patt
+ erns its build upon have time and again demonstrated their worth to those 
+ who choose it. These design patterns encapsulate tried and true approaches
+  to solve common development problems in ways that are clear\, testable an
+ d maintainable. \n\nThis talk covers many of the design patterns built int
+ o Catalyst. Design patterns discussed include:\n\n-- Command\n-- Model/Vie
+ w/Controller\n-- Chain of Command\n-- Service Location\n-- Inversion of Co
+ ntrol\n-- Dependency Injection\n-- Middleware\n-- Proxy\, Decorators and M
+ ediators\n\nDiscussions will include examples as well as conversation arou
+ nd deficiencies in how Catalyst employs some of these patterns and what yo
+ u can do to mitigate. Discussion will include both core Catalyst functiona
+ lity and functionality as extended via several components in the extended 
+ Catalyst ecosystem on CPAN. Discussion will conclude with thoughts on the 
+ future of Catalyst design patterns and where Catalyst might evolve to impr
+ oves its already solid support for these classic\, best practice approach 
+ to developing maintainable and secure applications.
+DTEND;TZID=Europe/Bucharest:20160825T145500
+DTSTART;TZID=Europe/Bucharest:20160825T132500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:john napiorkowski
+SUMMARY:Perl Catalyst Design Pattern Deep Dive
+UID:http://act.yapc.eu/ye2016/talk/6729
+URL:http://act.yapc.eu/ye2016/talk/6729
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Laurent Dami
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tom Hukins
+ATTENDEE:Diego Kuperman
+ATTENDEE:Sue Spence
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Leon Timmermans
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Choroba
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:21 attendees
+DESCRIPTION:A quick tour of the features of Swift 2.2 as they compare to th
+ e equivalents in Perl.
+DTEND;TZID=Europe/Bucharest:20160826T104000
+DTSTART;TZID=Europe/Bucharest:20160826T102500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Sweth Chandramouli
+SUMMARY:A Quick Tour of Swift for Perl Programmers
+UID:http://act.yapc.eu/ye2016/talk/6732
+URL:http://act.yapc.eu/ye2016/talk/6732
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tom Hukins
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Lance Wicks
+ATTENDEE:Lance Wicks
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:35 attendees
+DESCRIPTION:How we use https://metacpan.org/pod/Toggle\, https://metacpan.o
+ rg/pod/Net::Statsd and https://metacpan.org/pod/Scientist to refactor our 
+ legacy Perl5 codebase.\n\nWorking on a 15 year old codebase\, we find many
+  "here be dragons" parts of the system.\n\nThis talk describes how we have
+  over the past 3 years or so developed some tools and methodologies for ta
+ ckling "scary" code.\n\nWe use feature toggles to turn new code on and off
+  by percentages or groups of users. StatsD lets us track performance eleme
+ nts such as timings and counters of events. Scientist lets us test new cod
+ e directly against new and confirm both results and timings.
+DTEND;TZID=Europe/Bucharest:20160825T175500
+DTSTART;TZID=Europe/Bucharest:20160825T172500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Lance Wicks
+SUMMARY:Refactoring with Statsd\, Toggle and Scientist
+UID:http://act.yapc.eu/ye2016/talk/6733
+URL:http://act.yapc.eu/ye2016/talk/6733
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tom Hukins
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Tudor Constantin
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:27 attendees
+DESCRIPTION:tired of arguing over the format of JSON data structures in RES
+ T communication? come to my talk and I'll show you how to avoid it.
+DTEND;TZID=Europe/Bucharest:20160824T123000
+DTSTART;TZID=Europe/Bucharest:20160824T120000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Mickey Nasriachi
+SUMMARY:PONAPI: let's REST
+UID:http://act.yapc.eu/ye2016/talk/6734
+URL:http://act.yapc.eu/ye2016/talk/6734
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Manfred Heumann
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Eric de Hont
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+COMMENT:27 attendees
+DESCRIPTION:BE API is a lean start up engine written in Perl 5 and Perl 6. 
+ Find out how the engine powers learning and earning\, so new ventures can 
+ pivot their way to profit with Perl.
+DTEND;TZID=Europe/Bucharest:20160825T145500
+DTSTART;TZID=Europe/Bucharest:20160825T135500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Nigel Hamilton
+SUMMARY:Starting up with Perl 6
+UID:http://act.yapc.eu/ye2016/talk/6735
+URL:http://act.yapc.eu/ye2016/talk/6735
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:mirod
+ATTENDEE:Tina Müller
+ATTENDEE:Herbert Breunung
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Paulo Favinha
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Marco Pessotto
+ATTENDEE:dan fumarel
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:11 attendees
+DESCRIPTION:Amusewiki is a wiki engine and publishing platform focused on h
+ igh quality output\, powered by Catalyst\, DBIx::Class and Git\, which tri
+ es to focus on the texts hosted and on the reading experience of the user\
+ , offering each text in PDF and EPUB\, allowing the creation of collection
+ s.\n\nIn this talk I present the basic architecture of the engine and the 
+ new features which were added in a year of constant development\, includin
+ g deploying (debian packaging vs. local::lib)\, Let's Encrypt\, and OPDS.\
+ n\nhttp://amusewiki.org/special/about
+DTEND;TZID=Europe/Bucharest:20160826T161500
+DTSTART;TZID=Europe/Bucharest:20160826T154500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Marco Pessotto
+SUMMARY:Amusewiki: a year of development
+UID:http://act.yapc.eu/ye2016/talk/6737
+URL:http://act.yapc.eu/ye2016/talk/6737
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Lukas Mai
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Paul Cochrane
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Andreas Holzner
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+COMMENT:27 attendees
+DESCRIPTION:Vulnerabilities are essentially bugs that some portion of the u
+ serbase will want to experience intentionally. As a result\, the handling 
+ of "vulnerabilities" is very different from the handling of normal "bugs".
+ \n\nThis talk will go over lessons learned while reporting vulnerabilities
+ \, responding to vulnerabilities\, and deploying fixes for upstream vulner
+ abilities on the cPanel Security Team.\n\nAttendees should come away with 
+ a better understanding of the process from all sides.
+DTEND;TZID=Europe/Bucharest:20160824T160500
+DTSTART;TZID=Europe/Bucharest:20160824T150500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:John Lightsey
+SUMMARY:Vulnerability discovery\, response and remediation for developers
+UID:http://act.yapc.eu/ye2016/talk/6747
+URL:http://act.yapc.eu/ye2016/talk/6747
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Todd Rinaldo
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+COMMENT:53 attendees
+DESCRIPTION:These Lightning Talks may be serious\, funny\, or both.  They m
+ ay be given by experienced speakers already giving full length talks or by
+  first time speakers just starting out (this is a great way to get started
+  if you have something to say).  If you are a first time speaker you will 
+ win a tie with an experience speaker when the schedule is made if it comes
+  to it.  Today's first time speaker could be tomorrow's keynote speaker.\n
+ \nWe will have about 10 Lightning Talks of 5 minutes each day.  Submit you
+ r talk through the submit talk link on this website.  The first deadline i
+ s with the full length talks.  The second deadline is one week before the 
+ conference starts and many proposals will be accepted.  At least two speak
+ ing spots on days 2 and 3 will be held open until the day before the talks
+  to give you a chance to see something at the conference and put together 
+ a Lightning Talk response.  However if you wait for the later deadlines no
+ te that there are fewer spots available and you are less likely to be acce
+ pted so please try to submit more than a week before the conference.\n\nIn
+  addition to the five minute Lightning Talks where you get to use your com
+ puter\, slides\, and any other tool\, we will also have some Lightning Adv
+ ertisements.  These are only 30 seconds\, you don't have to submit a propo
+ sal\, you don't get any slides\, and the only AV assistance offered is a m
+ icrophone.  If you have a BOF to announce\, an auction item so advertise o
+ r any other short message you can use the transition time that would be ot
+ herwise wasted between Lightning Talks to share your message.  Just show u
+ p before we start and take a seat in the assigned seats in the front of th
+ e room.\n\n\n\n\nWhy Would You Want to do a Lightning Talk?\n\nMaybe you'v
+ e never given a talk before\, and you'd like to start small. For a Lightni
+ ng Talk\, you don't need to make slides\, and if you do decide to make sli
+ des\, you only need to make three.\n\nMaybe you're nervous and you're afra
+ id you'll mess up. It's a lot easier to plan and deliver a five minute tal
+ k than it is to deliver a long talk. And if you do mess up\, at least the 
+ painful part will be over quickly.\n\nMaybe you don't have much to say. Ma
+ ybe you just want to ask a question\, or invite people to help you with yo
+ ur project\, or boast about something you did\, or tell a short cautionary
+  story. These things are all interesting and worth talking about\, but the
+ re might not be enough to say about them to fill up thirty minutes.\n\nMay
+ be you have a lot of things to say\, and you're already going to give a lo
+ ng talk on one of them\, and you don't want to hog the spotlight. There's 
+ nothing wrong with giving several Lightning Talks. Hey\, they're only five
+  minutes.\n\nOn the other side\, people might want to come to a lightning 
+ talk when they wouldn't come to a long talk on the same subject. The risk 
+ for the attendees is smaller: If the talk turns out to be dull\, or if the
+  person giving the talk turns out to be a really bad speaker\, well\, at l
+ east it's over in five minutes. With lightning talks\, you're never stuck 
+ in some boring lecture for forty-five minutes.\n\nStill having trouble pic
+ king a topic\, here are some suggestions:\n\n   1. Why my favorite module 
+ is X.\n   2. I want to do cool project X. Does anyone want to help?\n   3.
+  Successful Project: I did project X. It was a success. Here's how you cou
+ ld benefit.\n   4. Failed Project: I did project X. It was a failure\, and
+  here's why.\n   5. Heresy: People always say X\, but they're wrong. Here'
+ s why.\n   6. You All Suck: Here's what is wrong with the our community.\n
+    7. Call to Action: Let's all do more of X / less of X.\n   8. Wouldn't 
+ it be cool if X?\n   9. Someone needs to do X.\n  10. Wish List\n  11. Why
+  X was a mistake.\n  12. Why X looks like a mistake\, but isn't.\n  13. Wh
+ at it's like to do X.\n  14. Here's a useful technique that worked.\n  15.
+  Here's a technique I thought would be useful but didn't work.\n  16. Why 
+ algorithm X sucks.\n  17. Comparison of algorithms X and Y. \n\nOf course\
+ , you could give the talk on anything you wanted\, whether or not it is on
+  this list. If we get a full schedule of nothing but five minutes of ranti
+ ng and raving on each topic\, a good time will still be had by most.
+DTEND;TZID=Europe/Bucharest:20160824T190000
+DTSTART;TZID=Europe/Bucharest:20160824T180000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:R Geoffrey Avery
+SUMMARY:Lightning Talks Day 1
+UID:http://act.yapc.eu/ye2016/talk/6748
+URL:http://act.yapc.eu/ye2016/talk/6748
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Todd Rinaldo
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+COMMENT:51 attendees
+DESCRIPTION:An­oth­er 10 Lig­htn­ing Talks and the Lig­htn­ing An­noun­ce­m
+ ents bet­ween them. See Day 1 for the rest of the de­scrip­tion. Lightning
+  Talks Day 1
+DTEND;TZID=Europe/Bucharest:20160825T190000
+DTSTART;TZID=Europe/Bucharest:20160825T180000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:R Geoffrey Avery
+SUMMARY:Lightning Talks Day 2
+UID:http://act.yapc.eu/ye2016/talk/6749
+URL:http://act.yapc.eu/ye2016/talk/6749
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Todd Rinaldo
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:52 attendees
+DESCRIPTION:An­oth­er 10 Lig­htn­ing Talks and the Lig­htn­ing An­noun­ce­m
+ ents bet­ween them. See Day 1 for the rest of the de­scrip­tion. Lightning
+  Talks Day 1
+DTEND;TZID=Europe/Bucharest:20160826T190000
+DTSTART;TZID=Europe/Bucharest:20160826T180000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:R Geoffrey Avery
+SUMMARY:Lightning Talks Day 3
+UID:http://act.yapc.eu/ye2016/talk/6750
+URL:http://act.yapc.eu/ye2016/talk/6750
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:DrForr
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+ATTENDEE:Juan Camacho
+ATTENDEE:Andrey Mikhaylenko
+COMMENT:28 attendees
+DESCRIPTION:Jenkins is a Continuous Integration tool to manage your environ
+ ment that fires off jobs like cron or when a button is pushed.  This talk 
+ will walk you through setting up a Jenkins site\, complete with slave node
+ s on the servers doing the real work\, and some simple jobs to get a feel 
+ for what it can do for you.\n\nReal life examples included based on an act
+ ual migration between data centers requiring Jenkins had to be installed f
+ resh.
+DTEND;TZID=Europe/Bucharest:20160826T145500
+DTSTART;TZID=Europe/Bucharest:20160826T135500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:R Geoffrey Avery
+SUMMARY:Jenkins 101: Getting started
+UID:http://act.yapc.eu/ye2016/talk/6751
+URL:http://act.yapc.eu/ye2016/talk/6751
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Dave Cross
+ATTENDEE:Steffen Winkler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Michal Jurosz
+ATTENDEE:John Haltiwanger
+ATTENDEE:Choroba
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+COMMENT:10 attendees
+DESCRIPTION:The talk presents Karel\, once famous programming language taug
+ ht to children and students. It has been reimplemented in Perl using some 
+ state of the art tools like Marpa for parsing\, Moo for object orientation
+ \, Dancer2 for web GUI\, or Test::Spec for testing. Therefore\, it can be 
+ used to teach Perl\, too.
+DTEND;TZID=Europe/Bucharest:20160826T161500
+DTSTART;TZID=Europe/Bucharest:20160826T154500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Choroba
+SUMMARY:Karel: Educational programming language
+UID:http://act.yapc.eu/ye2016/talk/6752
+URL:http://act.yapc.eu/ye2016/talk/6752
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:mirod
+ATTENDEE:Aaron Crane
+ATTENDEE:Dave Cross
+ATTENDEE:Tom Hukins
+ATTENDEE:Max Maischein
+ATTENDEE:Sue Spence
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Choroba
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Stephen Hall
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:34 attendees
+DESCRIPTION:The talk presents the implementation of a local\nsearch engine 
+ using Dancer and Elasticsearch. The focus is on the three elements of a se
+ arch engine and their implementation:\n\n1. Crawler\n2. Indexer + Elastics
+ earch\n3. Search and results presentation
+DTEND;TZID=Europe/Bucharest:20160825T104000
+DTSTART;TZID=Europe/Bucharest:20160825T101000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Max Maischein
+SUMMARY:A local search engine using Elasticsearch and Dancer
+UID:http://act.yapc.eu/ye2016/talk/6753
+URL:http://act.yapc.eu/ye2016/talk/6753
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:Aaron Crane
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tom Hukins
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:dan fumarel
+ATTENDEE:José Joaquín Atria
+COMMENT:32 attendees
+DESCRIPTION:This talk presents an alternative history of Perl\, in a univer
+ se where no-one threw any mugs.\n\nI can't change history. My algorithms (
+ and estimates) never run in constant time\, so even if parallel universes 
+ exist\, we still can't reach them.\n\nBut what if a parallel universe exis
+ ts\, where no-one threw any mugs\, and the Perl 6 project we know had neve
+ r started? This talk explores an alternative fictional history\, where a o
+ nly a couple of key events turned out differently\, and ponders how things
+  evolved\, and whether history converges.\n\nIn this talk we'll learn abou
+ t many things in Perl's history\, and contrast Perl's current situation wi
+ th analogous dynamic languages and what could have been. Discover the wond
+ erful BUFFIE and Cube projects (and how they went wrong)\, and how they ma
+ p to the tricky problems in our universe.\n\nBased on more facts™ than you
+  might first realise - many things presented as fiction are actually prett
+ y much true\, with only the names changed to protect the innocent^Wguilty.
+ \n\nResearching this\, I got my hands dirty using CVS and Sourceforge\, so
+  that you don't have to. Come and discover the fun things that I learned.
+DTEND;TZID=Europe/Bucharest:20160826T115000
+DTSTART;TZID=Europe/Bucharest:20160826T105000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Nicholas Clark
+SUMMARY:The non-butterfly effect - a universe where Camelia didn't flap her
+  wings
+UID:http://act.yapc.eu/ye2016/talk/6754
+URL:http://act.yapc.eu/ye2016/talk/6754
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Peter Heuchert
+ATTENDEE:Martin Barth
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Sori Salca
+COMMENT:4 attendees
+DESCRIPTION:MIR (https://github.com/grubert65/Mir) is a Media Information R
+ etrieval System completely built in Perl and still under heavy development
+  (I've just started a few months ago and is basically a one-man-project am
+ ong many others I carry on). It can fetch and extract text from different 
+ sources (web sites\, directories\, emails\,...) and is geared around a dis
+ tributed architecture so can easily scale. Currently the platform has been
+  used by my company to index some branches of the internal documentation r
+ egarding projects and CVs (roughtly 1 million docs).\nThe talk will addres
+ s these topics:\n- Distributed architecture design\n- Tips to handle itera
+ tive tasks\n- Modern Perl (Moose)\n- Information Retrieval (basics)
+DTEND;TZID=Europe/Bucharest:20160824T174500
+DTSTART;TZID=Europe/Bucharest:20160824T171500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Marco Masetti
+SUMMARY:Mir\, a Media Information Retrieval System
+UID:http://act.yapc.eu/ye2016/talk/6755
+URL:http://act.yapc.eu/ye2016/talk/6755
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Pavel Scherbinin
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Andreas Holzner
+ATTENDEE:Sori Salca
+ATTENDEE:Jorge Soares
+COMMENT:20 attendees
+DESCRIPTION:Show u how to create good indexes for ur highload applications.
+  Tips&Triks\, Secrets and advices. It would be interesting for every level
+ s.
+DTEND;TZID=Europe/Bucharest:20160826T115000
+DTSTART;TZID=Europe/Bucharest:20160826T105000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Pavel Scherbinin
+SUMMARY:Index optimization: from B-tree to ICP
+UID:http://act.yapc.eu/ye2016/talk/6756
+URL:http://act.yapc.eu/ye2016/talk/6756
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:Aaron Crane
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+ATTENDEE:Juan Camacho
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:34 attendees
+DESCRIPTION:We've all done it. We've all written code that displays horribl
+ e things like "1 message(s) waiting" or "0 error(s) occurred.". It's not t
+ hat it's particularly hard to get it right\, it's just so incredibly tedio
+ us.\n\nBut it doesn't have to be like that. I'll show you an easier way to
+  display messages like these.
+DTEND;TZID=Europe/Bucharest:20160825T153500
+DTSTART;TZID=Europe/Bucharest:20160825T150500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Dave Cross
+SUMMARY:Error(s) Free Programming
+UID:http://act.yapc.eu/ye2016/talk/6757
+URL:http://act.yapc.eu/ye2016/talk/6757
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Moray Jones
+ATTENDEE:Eric de Hont
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+COMMENT:17 attendees
+DESCRIPTION:A light hearted comparison of Perl 6 and Perl 5 benchmarks whic
+ h hopefully isn't *too* misleading!
+DTEND;TZID=Europe/Bucharest:20160824T134500
+DTSTART;TZID=Europe/Bucharest:20160824T133000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:steve mynott
+SUMMARY:How to Lie With Benchmarks - Perl 6 is Faster!
+UID:http://act.yapc.eu/ye2016/talk/6760
+URL:http://act.yapc.eu/ye2016/talk/6760
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:Aaron Crane
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Sue Spence
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:42 attendees
+DESCRIPTION:Google's Go programming language is becoming increasingly popul
+ ar\, especially in the devops world. It is a stunningly fast\, C-like  com
+ piled language with  modern bells and whistles. I'll teach the basics of t
+ he language and compare it to Perl with lots of examples.
+DTEND;TZID=Europe/Bucharest:20160825T153500
+DTSTART;TZID=Europe/Bucharest:20160825T150500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Sue Spence
+SUMMARY:Go for Perl Programmers
+UID:http://act.yapc.eu/ye2016/talk/6761
+URL:http://act.yapc.eu/ye2016/talk/6761
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:Steffen Winkler
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:benjamin tietze
+ATTENDEE:Eitan Schuler
+ATTENDEE:Herbert Breunung
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Michal Jurosz
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+COMMENT:37 attendees
+DESCRIPTION:How do we document code?\n\nA good solution is to create self-e
+ xplanatory code\; this somewhat eliminates the need to document the code. 
+ We still need some very basic documentation. Code comments are one form of
+  documentation\, that is often misused.\n\nThis talk is about self-explana
+ tory code\, the documentation we need and code comment patterns and anti-p
+ atterns.
+DTEND;TZID=Europe/Bucharest:20160826T123000
+DTSTART;TZID=Europe/Bucharest:20160826T120000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Søren Lund
+SUMMARY:Documenting Code - Patterns and Anti-Patterns
+UID:http://act.yapc.eu/ye2016/talk/6762
+URL:http://act.yapc.eu/ye2016/talk/6762
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Choroba
+COMMENT:2 attendees
+DESCRIPTION:This talk is an escuse to show how I've been using Perl and how
+  the comunity have give me oportunities to pay back.
+DTEND;TZID=Europe/Bucharest:20160826T171500
+DTSTART;TZID=Europe/Bucharest:20160826T164500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Jose Luis Perez Diez
+SUMMARY:Why I joined to CPAN PRC and why I keep on it
+UID:http://act.yapc.eu/ye2016/talk/6764
+URL:http://act.yapc.eu/ye2016/talk/6764
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Eitan Schuler
+ATTENDEE:Leon Timmermans
+ATTENDEE:Andrew Beech
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Jorge Soares
+COMMENT:22 attendees
+DESCRIPTION:„Make easy things easy and hard things possible”\n    Lary Wall
+ \n\n„There are only two hard things in Computer Science: cache invalidatio
+ n and naming things.”\n   Phill Karlton\n\n\nThe internet and the HTTP spe
+ cs were specifically designed to allow responses to be cached. RFC 7234 is
+  a 43page long specification on how to do it.\n\nUnfortunately\, there is 
+ a whole plethora of modules on CPAN that take the 'easy way' and make cach
+ ing and cache invalidation very hard because of poor implementations.\n\nW
+ ith Perl\, it is not about "making the first hard thing – cache and invali
+ dation – possible" ... let's make it easy!
+DTEND;TZID=Europe/Bucharest:20160825T115000
+DTSTART;TZID=Europe/Bucharest:20160825T105000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Theo van Hoesel
+SUMMARY:Making the 'First Hard Thing' easy
+UID:http://act.yapc.eu/ye2016/talk/6766
+URL:http://act.yapc.eu/ye2016/talk/6766
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:Aaron Crane
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:DrForr
+ATTENDEE:Lukas Mai
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Leon Timmermans
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Jason Clifford
+ATTENDEE:Tudor Constantin
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:John Haltiwanger
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Andreas Holzner
+ATTENDEE:Aaron Rowe
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Victor Nițu
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:José Joaquín Atria
+COMMENT:59 attendees
+DESCRIPTION:So\, rakudo is here for keeps\, and 6.c has been finalised\, an
+ d now we get to play.\n\nBetter still\, there's both an Inline::Perl5 for 
+ rakudo\, and an Inline::Perl6 for perl5.\n\nWhich means that perl5 can hav
+ e access to grammars\, and rakudo can have access to CPAN\, and all sorts 
+ of fascinating possibilities unfold.\n\nBecause it turns out that with *tw
+ o* perls at once\, you get a lot more than twice as much rope.
+DTEND;TZID=Europe/Bucharest:20160826T123000
+DTSTART;TZID=Europe/Bucharest:20160826T120000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Matt S Trout
+SUMMARY:The raptor and the butterfly
+UID:http://act.yapc.eu/ye2016/talk/6767
+URL:http://act.yapc.eu/ye2016/talk/6767
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:mirod
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Herbert Breunung
+ATTENDEE:Leon Timmermans
+ATTENDEE:Manfred Heumann
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Paulo Favinha
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:39 attendees
+DESCRIPTION:On Saturday\, April 16th 2005 I did a very foolish thing.\n\nI 
+ joined an IRC network called irc.perl.org and a channel called #catalyst.\
+ n\nMy life (and the remaining fragments of my sanity) have never been the 
+ same\nagain.\n\nSo in this talk\, I thought I'd try and share a bit of wha
+ t it's been like\,\nthe fun parts\, the terrifying parts\, the straight up
+  batshit insane parts\,\nand especially the parts that I could never have 
+ predicted but probably ended\nup being the most awesome and the most usefu
+ l to other people.\n\nPart cautionary tale\, part encouragement to try thi
+ ngs you aren't really\ncompetent to do yet\, mostly a collection of random
+  anecdotes with a token\nattempt at an underlying theme\, this talk won't 
+ have a moral ... but if it\ndid\, it would be "most of the time things don
+ 't get done by the best person\nto do it\, but by whoever was stupid enoug
+ h to try it anyway".\n\nIf nothing else\, hopefully I'll successfully help
+  you make different mistakes\nthan I did ...
+DTEND;TZID=Europe/Bucharest:20160825T171500
+DTSTART;TZID=Europe/Bucharest:20160825T164500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Matt S Trout
+SUMMARY:A decade of dubious decisions
+UID:http://act.yapc.eu/ye2016/talk/6768
+URL:http://act.yapc.eu/ye2016/talk/6768
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Lukas Mai
+ATTENDEE:benjamin tietze
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Victor Nițu
+COMMENT:20 attendees
+DESCRIPTION:Debian is one of the largest and oldest Free Operating Systems.
+  The Debian Perl Group makes CPAN distributions available to users of Debi
+ an and its derivates as Debian packages.\nThis talk gives an overview of t
+ he group's work\, and presents some ideas to the Perl community how CPAN a
+ uthors can make our work even easier.
+DTEND;TZID=Europe/Bucharest:20160824T115000
+DTSTART;TZID=Europe/Bucharest:20160824T105000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Alex Muntada
+SUMMARY:From Debian\, with ♥
+UID:http://act.yapc.eu/ye2016/talk/6770
+URL:http://act.yapc.eu/ye2016/talk/6770
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:Stefan Seifert
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Steffen Winkler
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Eric de Hont
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Andreas Holzner
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Edin Omerdic
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:39 attendees
+DESCRIPTION:Sit back and learn about the top ten features that Perl 6 bring
+ s to the table\, like Unicode support\, functional programming\, reactive 
+ and concurrent programming\, built-in expression grammars\, built-in vecto
+ r operators and a full metaprogramming system including support for roles.
+  We'll talk about where Perl 6 started\, where it is today\, and where the
+  language is going in the future.
+DTEND;TZID=Europe/Bucharest:20160825T123000
+DTSTART;TZID=Europe/Bucharest:20160825T120000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:DrForr
+SUMMARY:Ten Things you Need to Know About Perl 6
+UID:http://act.yapc.eu/ye2016/talk/6771
+URL:http://act.yapc.eu/ye2016/talk/6771
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Laurent Dami
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Eric de Hont
+ATTENDEE:Martin Barth
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+COMMENT:18 attendees
+DESCRIPTION:The dream is real. Perl 6 is out\, and regular expressions are 
+ better than ever! We'll dream up a language of our own design\, and watch 
+ Perl 6 parse it and compile it to working Perl 6 code. Spend some time wit
+ h the author of the ANTLR-Perl6 converter as we go beyond regular expressi
+ ons into Parser Expressions\, and create a working DSL in Perl 6.
+DTEND;TZID=Europe/Bucharest:20160824T145500
+DTSTART;TZID=Europe/Bucharest:20160824T135500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:DrForr
+SUMMARY:Incepti0n in Perl 6: Design your own language
+UID:http://act.yapc.eu/ye2016/talk/6772
+URL:http://act.yapc.eu/ye2016/talk/6772
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Eitan Schuler
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Victor Nițu
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+COMMENT:36 attendees
+DESCRIPTION:We all use ref($foo) eq $ref_type. It has two use-cases and it 
+ sucks for both.\n\nI wrote Ref::Util to address this. It's implemented in 
+ XS and as an op-code.\n\nIn this talk I'll explain why ref() is wrong\, wh
+ at Ref::Util does\, how it works\, and cover both how it's written in both
+  XS and in interpreter op-codes.\n\nWe'll delve into internal Perl data ty
+ pes\, XS\, and operators.
+DTEND;TZID=Europe/Bucharest:20160824T145500
+DTSTART;TZID=Europe/Bucharest:20160824T135500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Sawyer X
+SUMMARY:Ref::Util: more than you ever wanted to know about ref()
+UID:http://act.yapc.eu/ye2016/talk/6775
+URL:http://act.yapc.eu/ye2016/talk/6775
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Gianni Ceccarelli
+ATTENDEE:Aaron Crane
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Lukas Mai
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Manfred Heumann
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Ivan Mitic
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Martin Steinbach
+ATTENDEE:Victor Nițu
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:47 attendees
+DESCRIPTION:Perl 5.24 is out and it contains interesting new features and c
+ hanges. I will probably cover a few nuggets you might have missed in older
+  versions.\n\nAnd for dessert\, we will have a glimpse for upcoming or pla
+ nned changes for 5.26!
+DTEND;TZID=Europe/Bucharest:20160826T145500
+DTSTART;TZID=Europe/Bucharest:20160826T135500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Sawyer X
+SUMMARY:Perl 5.24 and the Zen of Motorcycle Maintenance
+UID:http://act.yapc.eu/ye2016/talk/6776
+URL:http://act.yapc.eu/ye2016/talk/6776
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:DrForr
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Alba Ferrer
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Jose Luis Martinez Torres
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Nigel Hamilton
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:30 attendees
+DESCRIPTION:We'll see the innards of Paws and the AWS REST APIs\, as well a
+ s how Paws is built
+DTEND;TZID=Europe/Bucharest:20160824T160500
+DTSTART;TZID=Europe/Bucharest:20160824T150500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Jose Luis Martinez Torres
+SUMMARY:How AWS REST APIs work\, and how Paws is built
+UID:http://act.yapc.eu/ye2016/talk/6777
+URL:http://act.yapc.eu/ye2016/talk/6777
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Martin Kjeldsen
+ATTENDEE:Lukas Mai
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Herbert Breunung
+ATTENDEE:Peter Heuchert
+ATTENDEE:Michal Jurosz
+ATTENDEE:John Haltiwanger
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+COMMENT:17 attendees
+DESCRIPTION:Even if you learned C in a classroom at some point\, Perl's "XS
+ " API for writing perl subs in something purported to be C but is really a
+  cat on a tablet with caps lock on. In this talk I will show how difficult
+  it is to write subs in plain C. This talk will make XS seem like a cakewa
+ lk.
+DTEND;TZID=Europe/Bucharest:20160825T123000
+DTSTART;TZID=Europe/Bucharest:20160825T120000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:bulk 88
+SUMMARY:writing XS in plain C
+UID:http://act.yapc.eu/ye2016/talk/6778
+URL:http://act.yapc.eu/ye2016/talk/6778
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Job van Achterberg
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Marco Pessotto
+ATTENDEE:dan fumarel
+COMMENT:13 attendees
+DESCRIPTION:We stopped to use ACT after the first Dancer conference in 2014
+  due to various failures and of course because using Dancer to shake a web
+  site is way more fun. It was really a big relieve for us. We also intend 
+ to make the software behind it as general purpose tool for conferences. I 
+ share the features and technical solutions of the Perl Dancer Conference c
+ ode in this presentation.\n\nOur Git repository: https://github.com/interc
+ hange/Perl-Dancer-Conference
+DTEND;TZID=Europe/Bucharest:20160825T175500
+DTSTART;TZID=Europe/Bucharest:20160825T172500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Stefan Hornburg
+SUMMARY:No Act on ACT
+UID:http://act.yapc.eu/ye2016/talk/6780
+URL:http://act.yapc.eu/ye2016/talk/6780
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Dave Cross
+ATTENDEE:Eitan Schuler
+ATTENDEE:Leon Timmermans
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Moray Jones
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:István Almási
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Victor Nițu
+COMMENT:19 attendees
+DESCRIPTION:Bioinformatics is the application of computation to biology. It
+ s aims are to help better understand and inform human health\, combat issu
+ es of an ageing population\, help with food security and to further unders
+ tand climate change. We do so by analysing complex biological systems thro
+ ugh many different technicals not limited to wide scale population genome 
+ analyses\, 3D protein structures modelling\, systems biology and mining sc
+ ientific literature. Since its early days Bioinformatics has been heavily 
+ reliant on Perl and its powerful text manipulation helped by the most basi
+ c representation of genomes as the 4 nucleic acids ACGT. Perl was an obvio
+ us choice.\n\nThe Ensembl Project (http://www.ensembl.org)\, currently hos
+ ted at EMBL-EBI\, was founded in 1999 and was built to interpret genomic d
+ ata being generated by the international Human Genome Project. Ensembl has
+  been built with Perl as its primary programming language. It possess one 
+ of the most widely used biologically focused APIs powering our analysis pi
+ pelines predicting the location of genes and their control mechanisms\, fi
+ nding relationships between closely related species\, predicting the conse
+ quence of differences between people and finally powering our website and 
+ RESTful API. We are a completely open source project (https://github.com/E
+ nsembl) and provide all data produced by the project free of charge.\n\nHe
+ re we present a brief summary of the bioinformatics domain\, EMBL-EBI\, th
+ e Ensembl Project\, tools developed by Ensembl and how these will impact o
+ n our everyday lives. We will also present our pipeline management system 
+ eHive\; a tool currently used to schedule over 420 CPU years of compute in
+  a single year.
+DTEND;TZID=Europe/Bucharest:20160825T175500
+DTSTART;TZID=Europe/Bucharest:20160825T172500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Andrew Yates
+SUMMARY:Perl\, Bioinformatics and the Ensembl Project
+UID:http://act.yapc.eu/ye2016/talk/6782
+URL:http://act.yapc.eu/ye2016/talk/6782
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:Aaron Crane
+ATTENDEE:Tom Hukins
+ATTENDEE:Hermen Lesscher
+ATTENDEE:benjamin tietze
+ATTENDEE:Lance Wicks
+ATTENDEE:Job van Achterberg
+ATTENDEE:Manfred Heumann
+ATTENDEE:Jason Clifford
+ATTENDEE:Moray Jones
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Marco Pessotto
+ATTENDEE:Stephen Hall
+ATTENDEE:Ivan Mitic
+ATTENDEE:dan fumarel
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Virgil Dinu
+ATTENDEE:Andrey Mikhaylenko
+COMMENT:22 attendees
+DESCRIPTION:HTML::FormHandler provides a powerful\, flexible way to generat
+ e and validate HTML forms from Perl.\n\nThis talk introduces the module an
+ d shows different ways to use it effectively\, avoiding common problems.\n
+ \nThe speaker will share his experience of using HTML::FormHandler on seve
+ ral projects within different organisations.\n\nIdeally\, attendees will a
+ lready know about HTML forms\, Perl and the basics of Moose.
+DTEND;TZID=Europe/Bucharest:20160825T153500
+DTSTART;TZID=Europe/Bucharest:20160825T150500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Tom Hukins
+SUMMARY:HTML::FormHandler: Web Forms and More
+UID:http://act.yapc.eu/ye2016/talk/6783
+URL:http://act.yapc.eu/ye2016/talk/6783
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Lukas Mai
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Manfred Heumann
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Michal Jurosz
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Andreea Hosu
+ATTENDEE:Eric de Hont
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Petar Rastovac
+ATTENDEE:dan fumarel
+ATTENDEE:Andreas Holzner
+ATTENDEE:Sori Salca
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+COMMENT:31 attendees
+DESCRIPTION:An in-house application with hundreds of modules and a long lis
+ t of CPAN dependencies is running on perl 5.12. We try to double the perl 
+ version to 5.24. This talk describes problems we faced\, how we solved the
+ m\, and benefits of the upgrade.
+DTEND;TZID=Europe/Bucharest:20160826T171500
+DTSTART;TZID=Europe/Bucharest:20160826T164500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Lukas Mai
+SUMMARY:From 5.12 to 5.24: Upgrading a business application
+UID:http://act.yapc.eu/ye2016/talk/6787
+URL:http://act.yapc.eu/ye2016/talk/6787
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Job van Achterberg
+ATTENDEE:Peter Heuchert
+ATTENDEE:Stanislav Chernogritskii
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Marco Pessotto
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:13 attendees
+DESCRIPTION:Telegram is an app for secure instant messaging\, which provide
+ s a great API for building bots. I will go through its main API functional
+ ity and will demonstrate some examples of real bots that I use in my pract
+ ice.
+DTEND;TZID=Europe/Bucharest:20160825T161500
+DTSTART;TZID=Europe/Bucharest:20160825T154500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Andrew Shitov
+SUMMARY:Bots for Telegram
+UID:http://act.yapc.eu/ye2016/talk/6790
+URL:http://act.yapc.eu/ye2016/talk/6790
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+COMMENT:2 attendees
+DESCRIPTION:For close to 10 years now\, i have been working on my Maplat we
+ bserver\, written in Perl. \n\nWell\, when i say webserver\, it evolved in
+ to much more. Its Front- and Backends run a big system at work (automotive
+  supplier)\, my home air conditioner is controlled by it\, so is my person
+ al blog. My DNS runs on Maplat.\n\nOn Linuxdays in Graz it ran a distribut
+ ed Genetic algorithm for Strandbeest legs with real-time visualization - o
+ n a Raspberry Pi cluster. I also used it to live-demo a Zero Day exploit o
+ n a popular webservice.\n\nIn this talk\, i'll give an overview what Mapla
+ t is\, how you can use it in your projects and how it will evolve in the f
+ uture.
+DTEND;TZID=Europe/Bucharest:20160824T160500
+DTSTART;TZID=Europe/Bucharest:20160824T150500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Rene Schickbauer
+SUMMARY:10 years of Maplat framework
+UID:http://act.yapc.eu/ye2016/talk/6791
+URL:http://act.yapc.eu/ye2016/talk/6791
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Laurent Dami
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+COMMENT:13 attendees
+DESCRIPTION:During the course of a penetration test\, a malware analysis\, 
+ a forensic analysis or a Capture The Flag contest\, who has never been in 
+ the situation of having to develop \nThe Metabrik Platform [1] goal is to 
+ normalize how we use tools and how they interoperate together by providing
+  a Platform as a UNIX shell\, merged with a Perl REPL interpreter and a vi
+ rtually infinite number of Briks: small reusable components that just do o
+ ne task. Learning it is as simple as knowing the five Commands.\n\nYou glu
+ e Briks together through the Shell. Idea is to have a set of common bricks
+  having their own purpose and connect them to create a new tool or Brik. T
+ he more you write Briks\, the more complex tasks you will be able to achie
+ ve. Many Briks were written from already existing ones and Metabrik itself
+  is written using Briks. In the end\, Metabrik is a development platform w
+ hich brings normalization and weaponization for everyday tools\, being new
+  or existing ones.\n\nWe will cover forensic::scalpel Brik as an example o
+ f improving existing tools by glueing with new Briks. We will then show ho
+ w we solved a root-me challenge by using just a few Briks. As another exam
+ ple\, we will show VM instrumentation for extracting IOCs from malwares. M
+ ore examples are available on the Web site [1] and newest ones will be pre
+ sented during the conference thanks to the now more than 200 Briks.\n\n[1]
+  https://www.metabrik.org/
+DTEND;TZID=Europe/Bucharest:20160824T104000
+DTSTART;TZID=Europe/Bucharest:20160824T101000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Patrice Auffret
+SUMMARY:The Metabrik Platform: Rapid Development of Reusable Security Tools
+ 
+UID:http://act.yapc.eu/ye2016/talk/6798
+URL:http://act.yapc.eu/ye2016/talk/6798
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:Manfred Heumann
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Sori Salca
+COMMENT:10 attendees
+DESCRIPTION:Sharing my experience as a new Perl developer. How the environm
+ ent looks for a beginner and how it compares with other languages.
+DTEND;TZID=Europe/Bucharest:20160825T161500
+DTSTART;TZID=Europe/Bucharest:20160825T154500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Albert Hilazo
+SUMMARY:First months as a new Perl developer
+UID:http://act.yapc.eu/ye2016/talk/6803
+URL:http://act.yapc.eu/ye2016/talk/6803
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:mirod
+ATTENDEE:Diego Kuperman
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Job van Achterberg
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Lee Johnson
+ATTENDEE:Marco Pessotto
+ATTENDEE:Andreea Hosu
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:dan fumarel
+ATTENDEE:Sori Salca
+COMMENT:14 attendees
+DESCRIPTION:Imagemagick can do a lot of tricks to automate image processing
+ \, as well as it's MagickCore libraries. But how about doing same manipula
+ tion just with pure Perl\, and using Imager's powerful core as a base?\n\n
+ Imager:::Trim is a module which extends Imager to be able to automatically
+  crop empty space around a photo or picture. It's similar as Imagemagick's
+  autocrop\, and it can use so called "fuzziness" adjustment to set how muc
+ h variance in the background there can be.\n\nThis talk is about the journ
+ ey from theory to practice\, and explaining the steps how the code was eva
+ luated to be put into production (e.g. in a service\, which handles hundre
+ ds of images daily into perfection).
+DTEND;TZID=Europe/Bucharest:20160825T123000
+DTSTART;TZID=Europe/Bucharest:20160825T120000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Jussi Kinnula
+SUMMARY:Imager::Trim
+UID:http://act.yapc.eu/ye2016/talk/6810
+URL:http://act.yapc.eu/ye2016/talk/6810
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Nicholas Clark
+ATTENDEE:Thomas Klausner
+ATTENDEE:mirod
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Marco Pessotto
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Martin Barth
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Mark Stringer
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+COMMENT:31 attendees
+DESCRIPTION:Devel::QuickCover is a Perl module written in XS\, which gather
+ s run-time code coverage information with very little CPU and memory overh
+ ead\, so it is perfectly possible to use it with production code. I will e
+ xplain how the module is implemented\, what you get when you use it and wh
+ at you can do with that information. I will close by showing some examples
+  of actual usage at the company I work for.
+DTEND;TZID=Europe/Bucharest:20160826T153500
+DTSTART;TZID=Europe/Bucharest:20160826T150500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Gonzalo Diethelm
+SUMMARY:Finding dead code\, the quick and easy way\, with Devel::QuickCover
+ 
+UID:http://act.yapc.eu/ye2016/talk/6818
+URL:http://act.yapc.eu/ye2016/talk/6818
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:steve mynott
+ATTENDEE:Job van Achterberg
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Jason Clifford
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Paulo Favinha
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:dan fumarel
+ATTENDEE:Albert Hilazo
+ATTENDEE:Andrey Mikhaylenko
+COMMENT:18 attendees
+DESCRIPTION:This talk introduces Weasel\, a new webapp testing library shap
+ ed after - and improving on - php's Mink. With it's integration into Test:
+ :BDD::Cucumber (pherkin)\, extensibility and out-of-the-box features such 
+ as screenshot and test log recording\, it makes for an easy to use platfor
+ m for BDD style browser-based webapp testing. A spin-off from the LedgerSM
+ B project.\n[ See https://github.com/perl-weasel ]
+DTEND;TZID=Europe/Bucharest:20160824T115000
+DTSTART;TZID=Europe/Bucharest:20160824T105000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Erik Huelsmann
+SUMMARY:BDD: webapp testing with Pherkin+Weasel (perl's Behat+Mink)
+UID:http://act.yapc.eu/ye2016/talk/6827
+URL:http://act.yapc.eu/ye2016/talk/6827
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:mirod
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:Diego Kuperman
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:Alba Ferrer
+ATTENDEE:Jason Clifford
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Albert Hilazo
+ATTENDEE:Martin Steinbach
+ATTENDEE:Sori Salca
+ATTENDEE:Alexandra Haidu
+ATTENDEE:Mark Stringer
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+ATTENDEE:José Joaquín Atria
+COMMENT:31 attendees
+DESCRIPTION:A few git usage tips i've picked up over the years. From utilit
+ y scripts to actual git commands and general workflow. This will focus on 
+ the command line usage of git\, rather than any particular GUI.
+DTEND;TZID=Europe/Bucharest:20160824T134500
+DTSTART;TZID=Europe/Bucharest:20160824T133000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Lee Johnson
+SUMMARY:A few git bits
+UID:http://act.yapc.eu/ye2016/talk/6836
+URL:http://act.yapc.eu/ye2016/talk/6836
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:DrForr
+ATTENDEE:steve mynott
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Moray Jones
+ATTENDEE:dan fumarel
+COMMENT:6 attendees
+DESCRIPTION:Sailfish is a mobile operating system based on Linux and severa
+ l open source components.\n\nI have been using it in my phone for a few mo
+ nths\, and decided to try and write an app for it in Perl 6.\n\nIn this ta
+ lk\, I will show how I managed to cross compile rakudo to arm in the Sailf
+ ish SDK\, made an initial implementation of the Qt5 bindings for Perl 6\, 
+ and installed a demo Perl 6 application on my phone.
+DTEND;TZID=Europe/Bucharest:20160825T171500
+DTSTART;TZID=Europe/Bucharest:20160825T164500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:André Walker
+SUMMARY:Running Perl 6 in a SailfishOS phone
+UID:http://act.yapc.eu/ye2016/talk/6840
+URL:http://act.yapc.eu/ye2016/talk/6840
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Salvador Fandiño
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Andrew Beech
+ATTENDEE:Jose Luis Perez Diez
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Andreea Hosu
+ATTENDEE:Stephen Hall
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:dan fumarel
+ATTENDEE:Ivan Jovovic
+ATTENDEE:Sori Salca
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:Jorge Soares
+COMMENT:33 attendees
+DESCRIPTION:How modern CPUs work and why it is relevant when developing in 
+ a high level language - unleash that beast of server you have locked away 
+ and improve the performance orders of magnitude!
+DTEND;TZID=Europe/Bucharest:20160825T171500
+DTSTART;TZID=Europe/Bucharest:20160825T164500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Attila-Mihaly Balazs
+SUMMARY:Low level details for high level developers
+UID:http://act.yapc.eu/ye2016/talk/6841
+URL:http://act.yapc.eu/ye2016/talk/6841
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Oriol Soriano Vila
+ATTENDEE:Albert Hilazo
+ATTENDEE:Victor Nițu
+COMMENT:10 attendees
+DESCRIPTION:Ovid refering to 'perl' as 'Battle-tested' was one of my favori
+ te moments of last year's YAPC.\n\nWith this talk I aim to explain which e
+ lements of the perl ecosystem help you\, as a developer\, to worry only ab
+ out those things that actually are your responsability (EG: avoid dependen
+ cy hells).\n\nAfter having the chance to be this year's perl QAH "intern" 
+ and working closely with the CPANTesters team\, this very-idiosyncratic el
+ ement of our community will surely be on the menu.\n\nFinally\, I will tal
+ k about what can you do to contribute work to make perl more 'Battle-teste
+ d'.
+DTEND;TZID=Europe/Bucharest:20160824T170500
+DTSTART;TZID=Europe/Bucharest:20160824T163500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Oriol Soriano Vila
+SUMMARY:From npm to 'Battle-tested'
+UID:http://act.yapc.eu/ye2016/talk/6843
+URL:http://act.yapc.eu/ye2016/talk/6843
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:1 attendees
+DESCRIPTION:In this talk we have discuss way of how to monitor IPTV streams
+  for video and audio losses.
+DTEND;TZID=Europe/Bucharest:20160826T123000
+DTSTART;TZID=Europe/Bucharest:20160826T120000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Naim Shafiyev
+SUMMARY:Using Perl in Monitoring IPTV streams
+UID:http://act.yapc.eu/ye2016/talk/6846
+URL:http://act.yapc.eu/ye2016/talk/6846
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tom Hukins
+ATTENDEE:Diego Kuperman
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Curtis Poe
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:steve mynott
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Victor Nițu
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+COMMENT:30 attendees
+DESCRIPTION:Postgres has a lot of cool & powerful features. In this talk I'
+ ll show you a few I wish I learned about earlier. Some Perl included :-)
+DTEND;TZID=Europe/Bucharest:20160825T161500
+DTSTART;TZID=Europe/Bucharest:20160825T154500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Thomas Klausner
+SUMMARY:9 PostgreSQL features I wish I learned earlier
+UID:http://act.yapc.eu/ye2016/talk/6847
+URL:http://act.yapc.eu/ye2016/talk/6847
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Laurent Dami
+ATTENDEE:Dave Cross
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Moray Jones
+ATTENDEE:Jan Seidl
+ATTENDEE:Choroba
+ATTENDEE:Marco Pessotto
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Juan Camacho
+ATTENDEE:Jorge Soares
+COMMENT:16 attendees
+DESCRIPTION:Emacs offers even more ways to do it than Perl's TIMTOWTDI .\n\
+ nThis demonstration will show how to combine some .el packages to\ncreate 
+ a neatly integrated and productive Perl development\nenvironment. (well fr
+ om the authors perspective)\n\n\nIntended audience are Emacs users trying 
+ to navigate thru all these\npossibilities.\n \nAfter a short introduction 
+ into emacs (v24) for non-users we'll\nconcentrate on builtin Perl support 
+ and how to add some other language\nagnostic projects to approach the auth
+ or's IDE of what an IDE should\nlook like.\n\n* === For starters: Overwiew
+  of Emacs goodies and myth-busting\n\n- open source\n\n- available on all 
+ development platforms\n\n- runs in windows and TTY\n\n- start-up time and 
+ memory consumption comparable to VIM ( != VI) just\n  try "emacs -nw -Q"\n
+ \n- package management for a huge universe of extensions\n\n- CUA shortcut
+  emulations for "modern" applications C-x C-v C-z C-a\n  ...\n\n- VIM shor
+ tcut emulation evil-mode (includes text objects)\n\n- regional undo Undo o
+ nly in selected text.\n\n* === Out-of-The-Box support\n\n  What comes alre
+ ady builtin for Perl?\n\n** cperl-mode \n  \n  The Standard mode for Perl 
+ features\, including\n  \n    - imenu easy navigation for subs\n      \n  
+   - auto indentation\n      \n    - code transformation prettifying regex 
+ convert postfix <-> prefix\n      "if" \, "unless"\, etc\n      \n    - co
+ mpile options\n      \n    - formatting options akin to perltidy\n      \n
+     - documentation display\n      \n** perldb\n  Perl debugger integratio
+ n\, stepping through original file\n  \n** flymake-mode\n  Interactive syn
+ tax check while typing by running "perl -c" in\n  background\n  \n** dabbr
+ ev-mode \n  avoid typos of identifiers by expanding from dynamic abbreviat
+ ion\n  dictionary\n  \n  \n* === Recommended Extension Packages\n\n** Yasn
+ ippet\n\n Yasnippet (Yet Another Snippet Package) emulates the Textmate sn
+ ippet\n features\, which seem to become a standard now across all IDEs\n\n
+ ** Auto Complete\n  auto-complete.el shows completion alternatives in drop
+ -down while\n  typing from different sources (functions\, variables\, snip
+ pets\,...)\n\n** (Omni Complete)\n  probably covered\, this is a very prom
+ ising project but yet not\n  personally tested\n\n** ECB = Emacs Code Brow
+ ser\n  \n  The IDE "look an feel" with many specialized information panes 
+ to\n  explore\n \n link: http://ecb.sourceforge.net/\n\n** Regex-tool\n\n 
+  A tiny project to interactively test Perl-regexes against text an\n  see 
+ the resulting matches.\n\n  Demonstrates the extensibility of emacs.\n  \n
+ * === Visions\n\n** PIDE I - "Perl Integrated Development for Emacs"\n com
+ bining a stable set-up of Perl related el-modules and configs for\n a quic
+ k start with Emacs.\n\n** PIDE II - "Perl Integrated Development for Every
+  editor"\n\n   Is an editor agnostic framework possible?\n\nSnippets and C
+ ompletion-rules could be provided in POD "=for IDE" to\nsupport different 
+ projects like Moose or Mojolicious or whatever. A\nsimple script could par
+ se them on editor start-up and translate them\nto editor specific syntax.
+DTEND;TZID=Europe/Bucharest:20160824T123000
+DTSTART;TZID=Europe/Bucharest:20160824T120000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Rolf Langsdorf
+SUMMARY:Emacs as Perl IDE
+UID:http://act.yapc.eu/ye2016/talk/6851
+URL:http://act.yapc.eu/ye2016/talk/6851
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Aaron Crane
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:Job van Achterberg
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Peter Corrigan
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Moray Jones
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Martin Barth
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Victor Nițu
+ATTENDEE:Juan Camacho
+COMMENT:21 attendees
+DESCRIPTION:Last summer a new JavaScript standard came out - EcmaScript 201
+ 5 or ES 6. Although this happened more than a year go\, it was a lot of fu
+ n for me to see that features that are so common for us in Perl world\, ha
+ s finally come to Javascript. And I want to present them to others and dis
+ cuss a question - if other languages are borrowing from Perl (in some sens
+ e)\, maybe Perl is not *that* dead?
+DTEND;TZID=Europe/Bucharest:20160825T104000
+DTSTART;TZID=Europe/Bucharest:20160825T101000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Ilya Chesnokov
+SUMMARY:Is Javascript Perl?
+UID:http://act.yapc.eu/ye2016/talk/6853
+URL:http://act.yapc.eu/ye2016/talk/6853
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Steffen Winkler
+ATTENDEE:benjamin tietze
+ATTENDEE:steve mynott
+ATTENDEE:Andrew Beech
+ATTENDEE:Peter Heuchert
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Sweth Chandramouli
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:19 attendees
+DESCRIPTION:I'll tell about my experience in developing and optimizing of a
+  Perl program on Raspberry PI (model B)\, showing how I managed to reduce 
+ run time of an XML parser from 30 to 1 seconds.
+DTEND;TZID=Europe/Bucharest:20160826T175500
+DTSTART;TZID=Europe/Bucharest:20160826T172500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Ilya Chesnokov
+SUMMARY:Experience of Perl development for Raspberry PI
+UID:http://act.yapc.eu/ye2016/talk/6854
+URL:http://act.yapc.eu/ye2016/talk/6854
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Laurent Dami
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:benjamin tietze
+ATTENDEE:Eitan Schuler
+ATTENDEE:Peter Heuchert
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Paul Cochrane
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Sori Salca
+COMMENT:13 attendees
+DESCRIPTION:Geneva real estate transactions are published online\, in free 
+ text. Perl regexes and grammars provide powerful tools to extract structur
+ ed data from such free text and be able to get some trends and synthetic f
+ igures
+DTEND;TZID=Europe/Bucharest:20160825T104000
+DTSTART;TZID=Europe/Bucharest:20160825T101000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Laurent Dami
+SUMMARY:Studying Geneva real estate prices using Perl grammars
+UID:http://act.yapc.eu/ye2016/talk/6855
+URL:http://act.yapc.eu/ye2016/talk/6855
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Moray Jones
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Mark Stringer
+COMMENT:18 attendees
+DESCRIPTION:Writing an extension module for Perl in C is tricky: it is easy
+  to make a mistake that makes the interpreter catch fire and crash. XS API
+  also adds its share of complexity.\n\nRust is a new programming language 
+ that has a strong focus on memory safety — preventing bugs that cause memo
+ ry corruption and segfaults. It has thin runtime and can produce C-compati
+ ble shared libraries\, which makes it suitable for embedding into other pr
+ ograms.\n\nRust expressive type system\, macros\, and standard library mak
+ e it possible to abstract away many low-level details of XS API. The resul
+ t is safer and more friendly API for extending Perl.
+DTEND;TZID=Europe/Bucharest:20160826T161500
+DTSTART;TZID=Europe/Bucharest:20160826T154500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Vickenty Fesunov
+SUMMARY:Writing Perl extensions in Rust
+UID:http://act.yapc.eu/ye2016/talk/6856
+URL:http://act.yapc.eu/ye2016/talk/6856
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:Job van Achterberg
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Corrigan
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Andreas Holzner
+ATTENDEE:Sori Salca
+ATTENDEE:Virgil Dinu
+ATTENDEE:Ioana Minyo
+ATTENDEE:Ionel Mihai-Cimpan
+COMMENT:22 attendees
+DESCRIPTION:I will be telling the story of Calendis \, a CRM for SME-s. I w
+ ill describe the challenges the team encountered in using Agile \, testing
+  traction channels\,\ncustomer discovery\, support and many more.
+DTEND;TZID=Europe/Bucharest:20160826T153500
+DTSTART;TZID=Europe/Bucharest:20160826T150500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Claudiu Campean
+SUMMARY:A tale of a Perl start-up
+UID:http://act.yapc.eu/ye2016/talk/6858
+URL:http://act.yapc.eu/ye2016/talk/6858
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Laurent Dami
+ATTENDEE:Aaron Crane
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Tom Hukins
+ATTENDEE:Stefan Seifert
+ATTENDEE:Diego Kuperman
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Daniel Brunkhorst
+ATTENDEE:steve mynott
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Leon Timmermans
+ATTENDEE:Manfred Heumann
+ATTENDEE:Jason Clifford
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Andreea Hosu
+ATTENDEE:Martin Barth
+ATTENDEE:Sori Salca
+ATTENDEE:Jorge Soares
+COMMENT:23 attendees
+DESCRIPTION:Developers and their managers have various ideas about what cod
+ e review should involve and what it should avoid.\n\nIn this short talk\, 
+ I discuss some of these ideas\, considering how well they apply in differe
+ nt types of organisations with different attitudes to risk.\n\nThis talk m
+ ight interest anyone involved in development and assumes no previous exper
+ ience of code review or Perl.
+DTEND;TZID=Europe/Bucharest:20160826T134500
+DTSTART;TZID=Europe/Bucharest:20160826T133000
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Tom Hukins
+SUMMARY:Better Code Review?
+UID:http://act.yapc.eu/ye2016/talk/6859
+URL:http://act.yapc.eu/ye2016/talk/6859
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:mirod
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Job van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Peter Heuchert
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+COMMENT:10 attendees
+DESCRIPTION:Everyone has written their own accessors' lib. It's like creati
+ ng an IRC bot or your own ORM. But what does it take to make it fast? Real
+ ly fast?\n\nI'll talk about creating an accessors' library in XS that supp
+ orts a wide range of accessors's types and then optimizing it up to and be
+ yond famous Class::XSAccessor's speed.\n\nOn the top of that cake\, I'll s
+ how how to use extensible inherited accessors (Class::Accessor::Grouped-li
+ ke) for a great boost in DBIx::Class speed.
+DTEND;TZID=Europe/Bucharest:20160824T123000
+DTSTART;TZID=Europe/Bucharest:20160824T120000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Sergey Aleynikov
+SUMMARY:XS accessors under the hood
+UID:http://act.yapc.eu/ye2016/talk/6860
+URL:http://act.yapc.eu/ye2016/talk/6860
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tom Hukins
+ATTENDEE:Hermen Lesscher
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Andrew Beech
+ATTENDEE:Alba Ferrer
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Peter Heuchert
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Choroba
+ATTENDEE:Stephen Hall
+ATTENDEE:Sandra Schuhmacher
+COMMENT:14 attendees
+DESCRIPTION:Character classes form their own mini-language inside the regul
+ ar\nexpressions (which are a mini-language inside Perl). In recent\nversio
+ ns of Perl\, an algebra was added to this language.\n\nIn this talk\, we'l
+ l discuss character classes\; we'll show how to\nuse them\; how to make th
+ em work for you. And in particular\, we'll\nshow how you can use existing 
+ classes to create new ones.
+DTEND;TZID=Europe/Bucharest:20160826T153500
+DTSTART;TZID=Europe/Bucharest:20160826T150500
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Abigail
+SUMMARY:Regexp Mini-Tutorial: Character Classes
+UID:http://act.yapc.eu/ye2016/talk/6861
+URL:http://act.yapc.eu/ye2016/talk/6861
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tina Müller
+ATTENDEE:Hermen Lesscher
+ATTENDEE:Sue Spence
+ATTENDEE:Steffen Winkler
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Juan Julián Merelo-Guervós
+ATTENDEE:Andrew Beech
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Alba Ferrer
+ATTENDEE:Heinz Knutzen
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Michal Jurosz
+ATTENDEE:Moray Jones
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Andreas Holzner
+ATTENDEE:Victor Nițu
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Christoph Ziebuhr
+ATTENDEE:Jorge Soares
+COMMENT:41 attendees
+DESCRIPTION:In this talk\, we will show how we build microservices in Perl.
+  We will cover docker basics\, the stack we use for creating\, testing and
+  releasing our internal Perl distributions and for creating\, building and
+  deploying our Perl microservices.\n\nLet us reveal some details before th
+ e talk begins. We use:\n- Minilla for scaffolding new distribution\n- Team
+ city for testing and building\n- Pinto as our internal DarkPAN with MetaCP
+ AN GUI\n- Docker for testing and packaging the microservices\n- Mesos / Ma
+ rathon based internal cloud for running microservices in production\n\nWe 
+ will shortly describe each of mentioned technologies and how we use them t
+ ogether to build our continuous integration stack.
+DTEND;TZID=Europe/Bucharest:20160824T115000
+DTSTART;TZID=Europe/Bucharest:20160824T105000
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Miroslav Tynovsky
+SUMMARY:Symbiosis of Docker and Perl
+UID:http://act.yapc.eu/ye2016/talk/6862
+URL:http://act.yapc.eu/ye2016/talk/6862
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:benjamin tietze
+ATTENDEE:Leon Timmermans
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Patrick Mevzek
+ATTENDEE:Anne Thorniley
+ATTENDEE:Michal Jurosz
+ATTENDEE:Paulo Favinha
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Paul Cochrane
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Choroba
+ATTENDEE:István Almási
+ATTENDEE:Andreea Hosu
+ATTENDEE:Pablo Rodríguez González
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Cristian-Flaviu Rat
+ATTENDEE:Sori Salca
+ATTENDEE:Andrey Mikhaylenko
+ATTENDEE:José Joaquín Atria
+COMMENT:22 attendees
+DESCRIPTION:Why you should do centralized monitoring\, logging and how we d
+ o it in Avast (in Perl).
+DTEND;TZID=Europe/Bucharest:20160826T134500
+DTSTART;TZID=Europe/Bucharest:20160826T133000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Jan Seidl
+SUMMARY:Why you should do centralized monitoring\, logging and how we do it
+  in Avast (in Perl)
+UID:http://act.yapc.eu/ye2016/talk/6863
+URL:http://act.yapc.eu/ye2016/talk/6863
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Paulo Favinha
+COMMENT:2 attendees
+DESCRIPTION:Rx is a cross language obfuscator\, helps to obfuscating the co
+ de with communication continuity.\n \nA new challenge came to us\, that we
+  have to obfuscate a web application had a development of more than two ye
+ ars implemented in Perl.PHP\,JS\,HTML\,CSS \,PostgreSQL.\n\nA HTML element
+  in form (<input id=”first_name” >)\, validated in JavaScript (document.ge
+ tElementById(‘first_name’))\, formatted by element id method in CSS(#first
+ _name{..})\, communicated to PHP/Perl ($_POST[‘first_name’]/$CGI->param(‘f
+ irst_name’)\, inserted in DB as INSERT INTO table_name(first_name).. and f
+ inally send back to HTML by Template Variables(<TMPL_VAR FIRST_NAME>) from
+  PHP/Perl. It’s a straight communication\, but the real time usage has var
+ iance in different attitudes in implementation subject to the language met
+ hods. Now all the “first name” should be replaced by ‘*****’ \n\n\nA chall
+ enge and opportunity came together. Initial attempts were taken by commerc
+ ial tools and c in Linux environment.  But the cross language usage varian
+ ces become a challenge. We unable to treat different things as different t
+ hings\, we have to find different usages of single communication and treat
+  them similar way to maintain the communication between languages. \n\nIns
+ tead of find and replace\, we followed to capture the keys (first_name) in
+  various possible contexts\, then index it (1=>first_name) and finally obf
+ uscate it (1=>’zxcde’).  It‘s worked better than straight (A=>B) replaceme
+ nts.  \nIn this talk\, \n\nwe will share the journey of Rx tool evaluation
+  and how the Perl’s Regular Expression and natural expressiveness saved th
+ e day.  I will hint on basic usage\, internal structure\, scalability & ex
+ tendibility.
+DTEND;TZID=Europe/Bucharest:20160826T175500
+DTSTART;TZID=Europe/Bucharest:20160826T172500
+LOCATION:Amfiteatrul Mircea Dorofteiu\, 1st floor
+ORGANIZER:Raja Renga Bashyam
+SUMMARY:Rx – A cross language scalable & extendable code & db obfuscator ba
+ sed on patterns
+UID:http://act.yapc.eu/ye2016/talk/6864
+URL:http://act.yapc.eu/ye2016/talk/6864
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Peter Heuchert
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Choroba
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Jorge Soares
+COMMENT:13 attendees
+DESCRIPTION:At the London Perl Workshop 2014 we demonstrated how to combine
+  functional programming (for syntactic sugar) and a macro mechanism (for s
+ peed) to extend Perl in a "smarter" way.\n\nThat means with low investment
+ s\, backwards compatibility and a strategic perspective to include the pro
+ duct into CORE after a sufficient testing phase.\n\nNow we want to present
+  some hands-on examples demonstrating the realization of\n\n- Function Sig
+ natures\n- Meta Operators like functions\n- Compound Statements\n\nLast 10
+  minutes will be reserved for discussions.\n\nThe provided URLs for abstra
+ ct and talk are from LPW 2014.
+DTEND;TZID=Europe/Bucharest:20160825T145500
+DTSTART;TZID=Europe/Bucharest:20160825T135500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:Rolf Langsdorf
+SUMMARY:Extending Syntax - Signatures\, Operators and Compound Statements
+UID:http://act.yapc.eu/ye2016/talk/6865
+URL:http://act.yapc.eu/ye2016/talk/6865
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Job van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Moray Jones
+ATTENDEE:Paul Cochrane
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Andreas Holzner
+COMMENT:16 attendees
+DESCRIPTION:Larry Wall once described programming as a ballistic process --
+  we aim for a target\, run our attempt\, see where and how we missed\, adj
+ ust our aim\, run again\, ad nauseam until we hit the target. As an exampl
+ e\, the Perl 6 module called Terminal::Print now has the capability to han
+ dle async printing -- and it only took three full rewrites to get there! W
+ hat began with a one-liner to print falling snow on your command line (per
+ fected by Larry\, though he's never shared how many aims it took to get th
+ ere) is now a 'fully operational' solution for all of your fundamental ter
+ minal display needs. Please join me as I walk you through the ballistics b
+ ehind Terminal::Print and share the hardest fought lessons I learned as I 
+ inadvertently bootstrapped myself into knowing some Perl 6.
+DTEND;TZID=Europe/Bucharest:20160826T175500
+DTSTART;TZID=Europe/Bucharest:20160826T172500
+LOCATION:Amfiteatrul Teodor Goina\, ground floor
+ORGANIZER:John Haltiwanger
+SUMMARY:Ballistic Programming as a Bootstrap
+UID:http://act.yapc.eu/ye2016/talk/6866
+URL:http://act.yapc.eu/ye2016/talk/6866
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Julien Fiegehenn
+ATTENDEE:Moray Jones
+ATTENDEE:Paul Cochrane
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Stephen Hall
+ATTENDEE:Martin Barth
+ATTENDEE:Andreas Holzner
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+COMMENT:22 attendees
+DESCRIPTION:Why we built our new fraud prevention platform in Perl and some
+  of the "fun" challenges we had doing so.
+DTEND;TZID=Europe/Bucharest:20160826T104000
+DTSTART;TZID=Europe/Bucharest:20160826T101000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Jason Clifford
+SUMMARY:Fraudulent Perl
+UID:http://act.yapc.eu/ye2016/talk/6872
+URL:http://act.yapc.eu/ye2016/talk/6872
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:34 attendees
+DESCRIPTION:Keynote Day 1
+DTEND;TZID=Europe/Bucharest:20160824T100000
+DTSTART;TZID=Europe/Bucharest:20160824T090000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Amalia -
+SUMMARY:Keynote Day 1
+UID:http://act.yapc.eu/ye2016/talk/6879
+URL:http://act.yapc.eu/ye2016/talk/6879
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Stefan Seifert
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:36 attendees
+DESCRIPTION:Keynote Day 2
+DTEND;TZID=Europe/Bucharest:20160825T100000
+DTSTART;TZID=Europe/Bucharest:20160825T090000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Amalia -
+SUMMARY:Keynote Day 2
+UID:http://act.yapc.eu/ye2016/talk/6880
+URL:http://act.yapc.eu/ye2016/talk/6880
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Diego Kuperman
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Vidar Tyldum
+ATTENDEE:Lee Johnson
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Jorge Soares
+COMMENT:30 attendees
+DESCRIPTION:Keynote Day 3
+DTEND;TZID=Europe/Bucharest:20160826T100000
+DTSTART;TZID=Europe/Bucharest:20160826T090000
+LOCATION:Hall
+ORGANIZER:Amalia -
+SUMMARY:Keynote Day 3
+UID:http://act.yapc.eu/ye2016/talk/6881
+URL:http://act.yapc.eu/ye2016/talk/6881
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:Laurent Dami
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Wolfgang Pecho
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Moray Jones
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Martin Steinbach
+ATTENDEE:Aaron Rowe
+ATTENDEE:Sori Salca
+ATTENDEE:Juan Camacho
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:37 attendees
+DESCRIPTION:Opening - Welcome to YAPC::EU 2016!
+DTEND;TZID=Europe/Bucharest:20160824T090000
+DTSTART;TZID=Europe/Bucharest:20160824T085000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Amalia -
+SUMMARY:Opening - Welcome to YAPC::EU 2016!
+UID:http://act.yapc.eu/ye2016/talk/6894
+URL:http://act.yapc.eu/ye2016/talk/6894
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Jean Forget
+ATTENDEE:Thomas Klausner
+ATTENDEE:R Geoffrey Avery
+ATTENDEE:Dave Cross
+ATTENDEE:H.Merijn Brand
+ATTENDEE:Dagfinn Ilmari Mannsåker
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:DrForr
+ATTENDEE:benjamin tietze
+ATTENDEE:Mickey Nasriachi
+ATTENDEE:Eitan Schuler
+ATTENDEE:Job van Achterberg
+ATTENDEE:Andrew Beech
+ATTENDEE:Manfred Heumann
+ATTENDEE:Mallory van Achterberg
+ATTENDEE:Jason Clifford
+ATTENDEE:Anne Thorniley
+ATTENDEE:Peter Heuchert
+ATTENDEE:Paulo Favinha
+ATTENDEE:Artur Khabibullin
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Jan Seidl
+ATTENDEE:Andrew Nugged (nugged)
+ATTENDEE:Iaroslav Poliakov
+ATTENDEE:Lee Johnson
+ATTENDEE:Mark Nettlingham
+ATTENDEE:Martin Barth
+ATTENDEE:Sandra Schuhmacher
+ATTENDEE:Attila-Mihaly Balazs
+ATTENDEE:Mark Stringer
+ATTENDEE:Virgil Dinu
+ATTENDEE:Jorge Soares
+COMMENT:33 attendees
+DESCRIPTION:Closing Notes
+DTEND;TZID=Europe/Bucharest:20160826T191000
+DTSTART;TZID=Europe/Bucharest:20160826T190000
+LOCATION:Aula Iuliu Hatieganu\, ground floor
+ORGANIZER:Amalia -
+SUMMARY:Closing Notes
+UID:http://act.yapc.eu/ye2016/talk/6895
+URL:http://act.yapc.eu/ye2016/talk/6895
+END:VEVENT
+END:VCALENDAR

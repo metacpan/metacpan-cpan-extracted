@@ -1,0 +1,11 @@
+ChangeLog
+lib/Date/ISO.pm
+MANIFEST
+Makefile.PL
+README
+
+t/00load.t
+t/01new_ISO.t
+t/02new_EPOCH.t
+t/03compatible.t
+

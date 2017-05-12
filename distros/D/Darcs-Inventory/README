@@ -1,0 +1,26 @@
+Darcs::Inventory
+----------------
+
+Darcs::Inventory reads and parses the inventory file from the Darcs
+revision control system. The inventory file contains a list of the
+patches in the Darcs repository.
+
+
+Installation
+------------
+
+To build, test and install:
+
+ perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install
+
+
+License
+-------
+
+Copyright 2007-2012 David Caldwell <david@porkrind.org>
+
+This perl module is free software; it may be redistributed
+and/or modified under the same terms as Perl itself.

@@ -1,0 +1,29 @@
+#!/bin/sh
+
+# This script downloads the USC SIPI image database and creates a backup git
+# repo. If new URLs are added, it will get them from Data::TestImage.
+
+CURDIR=`dirname "$0"`
+TOP="$CURDIR/.."
+LIB="$TOP/lib"
+WORK="$CURDIR/work"
+GIT_REMOTE="git@github.com:zmughal/usc-sipi-image-database-backup.git"
+
+# all git commands will use this
+export GIT_WORK_TREE="$WORK"
+export GIT_DIR="$WORK/.git"
+
+if [ ! -d "$GIT_DIR" ]; then
+	mkdir -p $WORK
+	git init # uses $GIT_DIR
+	git remote add origin $GIT_REMOTE
+else
+	git clone $GIT_REMOTE $WORK
+fi
+
+# get list of URLs
+perl -I$LIB -MData::TestImage::USC::SIPI -E 'say join "\n", map { $_->{url} } values Data::TestImage::DB::USC::SIPI::IMAGE_DB_VOLUME' \
+	| wget -P $WORK -ci - # then download them
+
+# show file changes
+git status

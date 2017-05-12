@@ -1,0 +1,43 @@
+---
+abstract: 'Extensible DBIx::Class deployment'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.35'
+  File::Temp: '0'
+  Test::Fatal: '0.006'
+  Test::More: '0.88'
+  Test::Requires: '0.06'
+  aliased: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-DeploymentHandler
+requires:
+  Carp: '0'
+  Carp::Clan: '0'
+  Context::Preserve: '0.01'
+  DBIx::Class: '0.08121'
+  Log::Contextual: '0.005005'
+  Moo: '1.003'
+  Moose: '1'
+  MooseX::Role::Parameterized: '0.18'
+  Path::Class: '0.26'
+  SQL::Translator: '0.11005'
+  Sub::Exporter::Progressive: '0'
+  Text::Brew: '0.02'
+  Try::Tiny: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+  parent: '0.225'
+resources:
+  bugtracker: https://github.com/frioux/DBIx-Class-DeploymentHandler/issues
+  homepage: https://github.com/frioux/DBIx-Class-DeploymentHandler
+  repository: https://github.com/frioux/DBIx-Class-DeploymentHandler.git
+version: '0.002219'
+x_serialization_backend: 'YAML::Tiny version 1.70'

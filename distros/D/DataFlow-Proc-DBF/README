@@ -1,0 +1,30 @@
+DataFlow-Proc-DBF
+
+These are generic instructions to install the module. Please refer to:
+
+   http://beta.metacpan.org/module/DataFlow::Proc::DBF
+
+for the full documentation. That same documentation will also be
+available to you after installation at the command line. Just type:
+
+   perldoc DataFlow::Proc::DBF
+
+after the the module is installed.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011, Breno G. de Oliveira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

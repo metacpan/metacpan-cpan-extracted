@@ -1,0 +1,77 @@
+=head1 NAME
+
+DBD::Sys::Roadmap - high level to do list and targetted goals
+
+=head1 SYNOPSIS
+
+This page provides a high level overview about the future extensions of
+the DBD::Sys module and the improvements of the module itself.
+
+The planned extensions and improvements always cover testing, performance,
+portability etc.
+
+=head1 EXTENSIONS
+
+=head2 TABLES
+
+=over 8
+
+=item Disks and Volume Groups
+
+Desired coverage is lvm2 on Linux, Veritas Volume Manager, ZFS,
+lvm on AIX, Sun Logical Volume Manager, Vinum (FreeBSD), ccd or
+raidframe on NetBSD and (hopefully) many, many more.
+
+Associations should be possible between physical disks and volume groups
+as well as between volume groups or disks and file systems.
+
+=item Installed Software Packages
+
+All major packaging systems should be supported: rpm, dpkg, pkg (BSD), pkg
+(Solaris), lpp (AIX), sw_list (HP-UX), ...
+
+=item More Networking Tables
+
+... like routing information, firewall states, ...
+
+=item Health Information
+
+like last backup time, backup sizes, database roles, login failures (system,
+databases, ...)
+
+=back
+
+And there may be many, many more which can be collected via an SQL interface,
+collected at one single point via L<DBD::Gofer> proxying, added to reports
+via L<Template::DBI> and L<Template::Plugin::Latex>.
+
+=head1 IMPROVEMENTS
+
+=over 8
+
+=item Modification on some Tables
+
+For example, add a new row to C<PROCS> should start a new process (detached,
+in background) or deleting a row should kill that process.
+
+=item Support additional DBI information
+
+Get additional information via get_info, column_info, primary_key_info,
+primary_key, foreign_key_info, statistics_info, tables, type_info_all and
+type_info is currently not implemented.
+
+=item Extend Tests to more Platforms
+
+Being able to analyse the modules behaviour on several platforms would allow
+not just make tests pass, it would allow to improve the support for those
+platforms.
+
+=back
+
+=head1 RESOURCES AND CONTRIBUTIONS
+
+There're several ways how you can help to support future development: You can
+hire the author to implement the features you require at most (this also
+defines priorities), you can negotiate a support and maintenance contract
+with the company of the author and you can provide patches.
+

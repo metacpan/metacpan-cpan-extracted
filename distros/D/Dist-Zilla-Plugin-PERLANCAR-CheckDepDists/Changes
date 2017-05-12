@@ -1,0 +1,31 @@
+Revision history for Dist-Zilla-PERLANCAR-CheckDepDists
+
+0.06    2016-02-16 (PERLANCAR)
+
+	- Adjust to App::lcpan::Call 0.07.
+
+
+0.05    2016-02-14 (PERLANCAR)
+
+	- Find Bencher-Scenario dists that require our dist and alert a
+	  reminder to rebuild them.
+
+
+0.04    2015-07-28 (PERLANCAR)
+
+	- Search for .tag-requires-dist-<DISTNAME> tag files.
+
+
+0.03    2015-07-09 (PERLANCAR)
+
+	- Also search packed dists in ::FatPacked and ::DataPacked.
+
+
+0.02    2015-07-06 (PERLANCAR)
+
+	- Now support packed (depak) dists instead of fattened dists.
+
+
+0.01     2015-05-16 (PERLANCAR)
+
+         - First release.

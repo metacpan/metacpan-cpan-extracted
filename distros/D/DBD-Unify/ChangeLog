@@ -1,0 +1,350 @@
+0.87    - 27 Mar 2015, H.Merijn Brand
+    * primary_key to return correct info for composite keys
+    * Move project to github
+    * Fetching DOUBLE, FLOAT and AMOUNT now returns a NV instead of PV
+
+0.86    - 02 Jan 2015, H.Merijn Brand
+    * Correct handling of very small and very large numbers (Todd Zervas)
+    * Up copyright to 2014
+    * Up copyright to 2015
+
+0.85    - 02 Aug 2013, H.Merijn Brand
+    * Fix CPAN complaints
+
+0.84    - 02 Aug 2013, H.Merijn Brand
+    * Unicode versions update in README (5.18.0 shipped with Unicode 6.2)
+    * Unify   versions update (DBD::Unify::*Info share DBD::Unify's VERSION)
+    * Updated ChangeLog style
+
+0.83    - 17 Apr 2013, H.Merijn Brand
+    * Removed "defined but not used: n_dbh" compile warning (Todd Zervas)
+    * Code cleanup (Todd Zervas)
+    * Fixed "subscript out of range" warning on HP-UX (Todd Zervas)
+    * Tested against new DBI-1.625
+    * Document naming conflict for inflate (README)
+    * Up copyright to 2013
+
+0.82    - 02 Apr 2012, H.Merijn Brand
+    * Up copyright to 2012
+    * Fix core dump during statement cleanup when SQLBE aborts unexpectedly (Todd Zervas)
+    * Fix glib detected free() invalid pointer error during perl cleanup due
+      to use of internal putenv <http://search.cpan.org/dist/perl/INSTALL#Environment_access> (Todd Zervas)
+    * Added DATETIME support for 9.1 and up (Todd Zervas)
+
+0.81    - 10 Nov 2011, H.Merijn Brand (this was never released)
+    * Convert to Test::More::done_testing
+    * Up copyright to 2011
+    * NAME / DISTNAME in Makefile.PL
+    * Require perl-5.8.4 (prepare for Unicode support)
+    * Implement uni_unicode (slightly experimental)
+
+0.80    - 30 Aug 2010, H.Merijn Brand
+    * Spelling changes
+    * Remove the need for PERL_POLLUTE
+
+0.79    - 07 Jun 2010, H.Merijn Brand
+    * Use correct typedefs for date columns instead of generic UINTxx (Todd)
+    * Upped copyright to 2010
+    * Implement column_info ()
+    * Permanently removed DBDverbose (use dbd_verbose or uni_verbose instead)
+    * Implement private_attribute_info () methods
+    * Dropped YAML spec to 1.0
+
+0.78    - 11 Sep 2009, H.Merijn Brand
+    * Small speedup by using different XS code
+    * Added primary_key () info method
+    * SElinux relocation fix (Todd Zervas)
+    * Force ChopBlanks on internals
+    * Tested with perl-5.10.1
+    * Updated Unicode reference
+
+0.77    - 19 Jun 2009, H.Merijn Brand
+    * Default ld option "" for unsupported OS
+    * Better diag message for t/26-uni-multiarg.t
+    * Added success report in README
+    * Upped copyright to 2009
+    * Moved some TODO items to Unify.pm
+    * Row count incorrect returning from sth->execute (Todd Zervas)
+    * Several updates regarding error reporting
+      including the promotion of SQLWARN were appropriate
+    * The generated TypeInfo was very wrong. Corrected.
+    * Documentation in t/15-uni-fail.t about BUG 108243 (Todd Zervas)
+    * Register program with Unify logging system (Todd Zervas)
+    * $DBD_VERBOSE can overrule $DBD_TRACE
+    * Improved support for SQLSTATE and added tests
+
+0.76    - 19 Oct 2008, H.Merijn Brand
+    * Module does provide more than just Unify.pm now
+    * YAML declared 1.4 (META.yml) instead of 1.1 (YAML)
+
+0.75    - 23 Sep 2008, H.Merijn Brand
+    * Three-level dbd_verbose and documentation
+    * $ENV{DBD_TRACE} sets $dbh->{dbd_verbose} on/before connect
+    * New tests for $h->trace (...) and $h->{dbd_verbose}
+    * Added type_info_all (), get_info (), and parse_trace_flag ()
+    * Note that identifiers are now quoted
+    * Override quote_identifier () (UNIFY has no CATALOGS)
+    * Accept 2-arg and 3-arg ->do ()
+    * Accept %attr to ->prepare ()
+    * Raised all verbose levels by 1. 1 and 2 are now DBI only
+    * Removed 05-reauth.t
+    * NULLABLE now always 2, as it doesn't work
+    * Implemented CursorName  sth attribute
+    * Implemented ParamValues sth attribute
+    * Implemented ParamTypes  sth attribute
+    * Implemented RowsInCache sth attribute (always 0)
+    * Tested with Unify 6.3AB on HP-UX 10.20 with perl 5.8.8
+    * Tested with Unify 8.2BC on HP-UX 11.00 with perl 5.8.8
+    * Tested with Unify 8.3I  on HP-UX 11.23 with perl 5.10.0
+    * Tested with Unify 8.3K  on AIX 5.2.0.0 with perl 5.8.8
+      Tests will fail on older perls, as the test cases use scalarIO
+
+0.72    - 23 Apr 2008, H.Merijn Brand
+    * Kindly tell CPAN smokers not to bother when there is no Unify
+    * Add a correct(ed) META.yml
+    * Move to EU::MM's prompt () function for the questions
+
+0.71    - 04 Jan 2008, H.Merijn Brand
+    * Small change in Makefile.PL for HP-UX 11.23 ia64
+    * Refactor the date stuff in t/20-uni-basic
+      we need more tests for %ENV variable setting like
+      $LC_ALL, $DATEFMT etc
+
+0.70    - 04 Jan 2008, H.Merijn Brand
+    * Added the dTHX; calls for threaded perls
+    * Moved opt_v to dbd_verbose
+    * Added/Aliassed uni_verbose to dbd_verbose
+    * Made the first failure notices from Makefile.PL more verbose (castaway)
+    * Tested with DBI-1.59
+      ** 0.66 never made it to production due to lack of tuits
+    * Tested with DBI-1.601
+    * Prevent segfault under Linux (Todd Zervas)
+    * Better support for SQLBINARY (Todd Zervas) (adds t/25-binary.t)
+    * DBD::Unify now under git
+    * Upped copyright to 2008
+    * Tested with perl-5.10.0
+    * A few casts for 64bit perl
+    * Moved DBIh_SET_ERR_CHAR () to DBIc_ERR () and DBIc_ERRSTR ()
+    * Moved DBIc_TRACE_LEVEL (h) to dbis->debug where appropriate
+    * Raised minimal perl to 5.6.x, also for Test::More
+
+0.65    - 20 Aug 2007, H.Merijn Brand
+    * perlcritic OK
+    * BAILOUT -> BAIL_OUT
+    * BAIL_OUT () when table creation fails
+    * Segfault fix for failing do () calls (tazervas@earthlink.net)
+    * Split TEXT/BINARY for DS 9 (tazervas@earthlink.net) + test
+    * Added an example to show record count(s)
+
+0.64    - 14 May 2007, H.Merijn Brand
+    * Tested under DBI-1.56. Make sure to rebuild the DBD
+    * Added t/15-uni-fail.t
+    * Differentiate between carp (warnings) and croak (errors) better
+
+0.62    - 09 May 2007, H.Merijn Brand
+    * Extended Copyright's to 2007
+    * Fixed more typo's in the doc's
+    * Passed LICENSE only to MakeMaker >= 6.30
+    * Tested under DBI-1.55. Make sure to rebuild the DBD
+      *from scratch* (make distclean) when installing DBI-1.55
+    * Updated Unicode versions in README
+    * Added cover target
+    * Added some very basic foreign_key_info () tests
+
+0.61    - 27 Apr 2007, H.Merijn Brand
+    * Small README changes. Typo fixes.
+    * Swapped libusu and libudsu (Ron Kuris)
+    * Use DBIh_SET_ERR_CHAR () and support SQLSTATE throughout
+    * Use DBIc_TRACE_LEVEL () where possible
+    * Use DBIc_DBISTATE (imp_sth)->get_fbav (imp_sth) instead
+      of DBIS->get_fbav (imp_sth);
+      . All three of the above should also speed up the DBD
+
+0.60    - 09 Feb 2006, H.Merijn Brand
+    * TEXT/BINARY support
+
+0.51    - 16 Jan 2006, H.Merijn Brand
+    * Extended link options from Makefile.PL (Ron Kuris)
+    * Faster ping (Ron Kuris)
+    * Dynamic extension for shared libs from %Config
+    * Changed ok ($a eq $b, "name") tests to is ($a, $b, "name")
+
+0.50    - 30 Sep 2005, H.Merijn Brand
+    * Major changes to Makefile.PL to enable 8.3E and up
+      8.3E and up uses different library names, and might
+      require libgcc
+
+0.43    - 18 Sep 2005, H.Merijn Brand
+    * Added t/00-pod.t  for Test::Pod
+    * Added t/00-podc.t for Test::Pod::Coverage
+
+0.42    - 17 Aug 2005, H.Merijn Brand
+    * implemented foreign_key_info ()
+
+0.41    - 24 May 2004, H.Merijn Brand
+    * t/21-uni-regex.t now skips on uvsn < 8.2
+
+0.40    - 29 Apr 2004, H.Merijn Brand
+    * Made DBI-1.42 prerequisite
+    * All tests now under Test::More
+    * Ran Devel::Cover-0.41
+    * Added t/40-info.t
+    * Return error on table_info (catalog); # Unify has no catalogs
+
+0.31    - 22 Apr 2004, H.Merijn Brand
+    * Tested against DBI-1.41 through 1.42
+    * ScanLevel to uni_scanlevel
+    * Support for dynamic loading
+
+0.30    - 02 Mar 2004, H.Merijn Brand
+    * Tested against DBI-1.39 through 1.40
+    * Support for shared builds on HP-UX (Unify/DS 8.2B and up)
+    * Fix for $dbh attributes from 0.27 was not as good as it
+      should have been
+
+0.27    - 29 Aug 2003, H.Merijn Brand
+    * DBDverbose to uni_verbose
+    * Tested against DBI-1.36 through 1.38
+    * Removed Uniperl.pm (never knew what it was for anyway)
+    * Makefile.PL to return the status of WriteMakefile ()
+    * Fixed a buglet in assigning dbh attributes
+
+0.26    - 17 Mar 2003, H.Merijn Brand
+    * Fixed forgotten (essential) updates to ChangeLog and README
+
+0.25    - 14 Mar 2003, H.Merijn Brand
+    * Many README additions and updates
+    * Tested against DBI-1.32 through 1.35
+    * Workaround for problem number 22960: re-connecting to the
+      same database fails in DS 8.2 and below
+    * Allowed state S1000 in 10-dbi-drv for DS 8.2B
+
+0.24    - 28 May 2002, H.Merijn Brand
+    * Minor adjustments for perl-5.7.3 / DBI-1.21
+    * Disable networked databases by default
+    * Added installu.pl (make installu) to support multiple
+      versions alongside
+    * README changes for 8.1 (UTF-8, network support, install)
+    * Tested against DBI-1.21 through 1.23
+
+0.23    - 27 Aug 2001, H.Merijn Brand
+    * README tweaks and additions
+    * Unify => SQL types (->{TYPE} attribute is now ANSI/ODBC)
+      see README section RESTRICTIONS
+    * Tested against DBI-1.20
+
+0.22    - 24 Jul 2001, H.Merijn Brand
+    * Basic support for DATE/TIME (Tom Poage)
+    * Extended test suite for testing DATE/TIME
+    * Alter test behavior due to authorization failures
+    * Safer internals for field name and string values
+    * Optional attributes to table_info (from dbi_dev)
+    * Acknowledgements in README (Thanks Tom ;-)
+    * Many more changes in README (varargs is now solved; requirements;
+      todo; restrictions)
+    * Added COPYRIGHT & LICENSE to Unify.pm and README
+    * Suppressed PrintError in t/03-general for DBI-1.18 and up
+    * Minor doc additions in Unify.pm
+    * Major additions and changes to test suite. Notably t/21-uni-regex.t
+      to see if the SHLIKE bug exists in the current configuration
+    * Minor adjustments for DBI-1.19 and table_info change
+    * Added link_info (experimental)
+
+0.21    - 28 Mar 2001, H.Merijn Brand
+    * Some changes to README
+    * Reorganization of test suite; Signaling of not (yet) implemented
+      functionality; Testing all DBI's documented features
+    * prototypes (Tom Poage)
+    * varargs/stdarg from perl config
+
+0.20    - 26 Feb 2001, H.Merijn Brand
+    * Illegal memory access in debugging statement (oops)
+    * Internet references (requested by Tim)
+
+0.12    - 10 Jan 2001, H.Merijn Brand
+    * AIX nurse was killing the kids. Simplified nursing.
+    * Removed dTHR calls
+    * Added connect.t to move auto-destroy from general.t (which is now
+      more destroy safe)
+    * Small tweaks to Unify.pm pod
+
+0.11    - 11 Dec 2000, H.Merijn Brand
+    * Nursed the orphans myself :-))
+      (Destructable statement handles are now destroyed on commit,
+       rollback and disconnect)
+
+0.10    - 17 Nov 2000, H.Merijn Brand
+    * Added test for bind_columns (marked as tested in pod)
+    * Moved prepare destruction from finish to DESTROY
+    * Added test for execute after finish
+    * Changed internal return codes from -1 (failure) to 0
+    * Added a few tests (borrowed from Oracle)
+    * Checked for connection (and fail on some actions if not connected)
+    * Enabled 'ping' method
+    * Stripped SQL comments
+    * Implemented $sth->rows method + test
+
+0.09    - 02 Aug 2000, H.Merijn Brand
+    * Added doc for use of stdarg in README
+    * Added tests for statement handle attributes
+    * Added string length to sth->{PRECISION}
+    * Small README changes of what's done
+    * table_info () now returns the fields in the expected order
+    * Corrected small typo's in pod
+
+0.08    - 19 May 2000, H.Merijn Brand
+    * Described output (DBIc_NUM_FIELDS (imp_sth)) and input
+      (DBIc_NUM_PARAMS (imp_sth)) separately, so the {NAME} attribute
+      is now also supported for OSF/1
+    * Repaired ID allocation if exceeded default maximum of 32
+    * Added test for ID allocation
+
+0.07    - 03 May 2000, H.Merijn Brand
+    * Added imp_dbh.id to allow multiple DB handles on same DB preventing
+      conflicts with dynamic naming.
+      Multiple different Unify DB's is not (yet) supported by the Unify
+      E/SQL environment. :-((
+    * Stringified REAL, FLOAT and (HUGE) AMOUNT values on fetch, but still
+      preserving the numeric context (it's an SvNV alright).
+    * Updated pod sections in Unify.pm
+
+0.06    - 05 Apr 2000, H.Merijn Brand
+    * Saved field descriptor data to implement correct return values of
+      $sth->fetchrow_hashref () calls
+    * Test now really CHECKS what happened, not only spits out what I
+      would recognize as succeeded test output. I still rely on RaiseError
+      to crash the test on DB failures.
+
+0.05    - 23 Mar 2000, H.Merijn Brand
+    * Recognize strings w/ negative numbers in bind where !SvIOK (value)
+      In fact drop the SvIOK () check altogether and let SvIV () do the
+      job, including the warnings. I still want to be able to check the
+      value BEFORE the warning, but we'll see ...
+    * Index display in bind failure
+
+0.04    - 15 Feb 2000, H.Merijn Brand
+    * Oops, forgot to close open cursor on re-execute
+    * Full implementation of positional parameters includes
+      Auto conversion from SvPV's (string) to SvIV's (numeric)
+    * Test includes positional inserts
+    * Test includes updates and positional updates
+    * Added $dbh->{DBDverbose} (see pod)
+
+0.03    - 09 Feb 2000, H.Merijn Brand
+    * Changes to Makefile.PL to support AIX
+    * Forced prefer varargs over stdarg in dbdimp.ic :-(
+    * Implemented positional parameters :-)
+
+0.02    - 03 Feb 2000, H.Merijn Brand
+    * Support for SCANLEVEL
+    * connect () destroyed $DBPATH :-(
+    * Makefile.PL cleanup
+    * Minor changes to Unify.pm following DBI::DBD docs
+    * ChopBlanks honored (default on)
+    * sqlError () provides descriptive message
+    * Unlimited number of statement handles :-)
+      I found out I used outdated books :-(
+    * dbdimp.h cleanup started
+
+0.01    - 18 Jan 2000, H.Merijn Brand
+    * First public port

@@ -1,0 +1,18 @@
+Revision history for Perl extension Data-Queue-Batch
+
+0.04 2017-01-12T11:10:26Z
+
+    - tweak
+
+0.03 2017-01-12T06:34:59Z
+
+    - fix document
+
+0.02 2017-01-12T04:34:37Z
+
+    - fix cpanfile
+
+0.01 2017-01-12T04:29:27Z
+
+    - original version
+

@@ -1,0 +1,51 @@
+[
+  {
+    hash     => "QSS8CpM1wn8IbyS6IHpJEg==",
+    label    => "a",
+    master   => "a",
+    password => "QSS8CpM1",
+    why      => "label and master password are easy to type (i.e., short and the same)",
+  },
+  {
+    hash     => "09lEaAKkQll1XTjm0WPoIA==",
+    label    => 0,
+    master   => 1,
+    password => "09lEaAKk",
+    why      => "hash has a digit in first 8 characters & label differs from master password",
+  },
+  {
+    hash     => "hhOYXsSeuPdXrmQ56Hm7Kg==",
+    label    => 0,
+    master   => 9,
+    password => "56hhOYXs",
+    why      => "hash has a sequence of digits outside of first 8 chars",
+  },
+  {
+    hash     => "fLvECeyZDxnHjHW9HgbyFQ==",
+    label    => 0,
+    master   => 7,
+    password => "9fLvECey",
+    why      => "hash has a lone digit outside of first 8 chars",
+  },
+  {
+    hash     => "tLFHvFIoKHMfGgFr-nLAcw==",
+    label    => 0,
+    master   => 0,
+    password => "1tLFHvFI",
+    why      => "hash has no digits",
+  },
+  {
+    hash     => "fHFfKQlvumngcWEWq7HCgg==",
+    label    => "\xFC",
+    master   => 0,
+    password => "7fHFfKQl",
+    why      => "master password w/ UTF-8 char",
+  },
+  {
+    hash     => "pb3iGMs2S-VgWAX1kElklg==",
+    label    => "Aa",
+    master   => "Bb",
+    password => "pb3iGMs2",
+    why      => "mixed case, length greater than 1 for label and master",
+  },
+]

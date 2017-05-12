@@ -1,0 +1,11 @@
+struct archive * T_PTR
+string_or_null T_PV_OR_NULL
+
+OUTPUT
+T_PV_OR_NULL
+  $var != NULL ? sv_setpv((SV*)$arg, $var) : sv_setsv((SV*)$arg, &PL_sv_undef);
+
+INPUT
+T_PV_OR_NULL
+  $var = SvOK($arg) ? ($type)SvPV_nolen($arg) : NULL;
+

@@ -1,0 +1,59 @@
+{
+   "abstract" : "send an email on dist release",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-EmailNotify",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Email::Stuffer" : "0",
+            "IO::File" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xsawyerx/dist-zilla-plugin-emailnotify.git"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xsawyerx/dist-zilla-plugin-emailnotify.git",
+         "web" : "https://github.com/xsawyerx/dist-zilla-plugin-emailnotify"
+      }
+   },
+   "version" : "0.004"
+}
+

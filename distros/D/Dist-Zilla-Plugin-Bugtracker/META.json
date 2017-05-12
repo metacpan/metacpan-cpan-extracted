@@ -1,0 +1,63 @@
+{
+   "abstract" : "Automatically sets the bugtracker URL and mailto",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Bugtracker",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::MetaProvider" : 0,
+            "Moose" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::Differences" : 0,
+            "Test::MockObject" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Bugtracker" : {
+         "file" : "lib/Dist/Zilla/Plugin/Bugtracker.pm",
+         "version" : "1.111080"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-bugtracker at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Bugtracker"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-Bugtracker/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Dist-Zilla-Plugin-Bugtracker.git",
+         "web" : "http://github.com/hanekomu/Dist-Zilla-Plugin-Bugtracker"
+      }
+   },
+   "version" : "1.111080"
+}
+

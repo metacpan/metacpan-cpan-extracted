@@ -1,0 +1,26 @@
+Devel/Depend/CL version 0.04
+============================
+
+Perl extension for extracting dependency trees from c files using 'cl', microsoft's compiler.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+None for using 'Depend'.
+
+COPYRIGHT AND LICENCE
+
+Same licence as perl itself.
+
+Copyright (C) 2005 Emil Jansson.
+

@@ -1,0 +1,13 @@
+Revision history for Dancer::Plugin::reCAPTCHA
+ 
+0.04      2014/05/27
+          - Added option to set reCAPTCHA theme.
+          - Pod improvements
+
+0.03      2014/05/26
+          - Removed global configuration variable. Caused issues in certain
+            situations.
+
+0.02      2013
+          - Initial release
+

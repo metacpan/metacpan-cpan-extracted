@@ -1,0 +1,17 @@
+Revision history for Perl extension DBIx::PasswordIniFile
+
+1.1  2005-Apr-17
+     - First version, too many bugs
+
+2.00 2011-Jan-04
+
+    - Changed content model of .ini file. This release does not assume any 
+      specific DSN format. Maintained compatibility with previous version
+      
+    - Deprecated functions that subclass DBI
+      
+    - Changed default cipher algorith to Crypt::Blowfish instead of 
+      Crypt::Blowfish_PP
+      
+    - More tests
+

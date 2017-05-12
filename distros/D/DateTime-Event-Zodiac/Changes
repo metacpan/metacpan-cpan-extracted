@@ -1,0 +1,16 @@
+Revision history fon Perl module DateTime::Zodiac
+
+1.03 Wed Sep 11 2013
+    - Switch from DateTime::Utils::Astro -> DateTime::Astro
+
+1.02 Thu Feb 23 2012
+    - Switched to Module::Install
+    - symbol now '\x{2648}' instead of utf8 encoded character
+
+1.01 Thu Apr 03 2008
+    - extended documentation
+    - optimized zodiac_astro method
+    - added missing deps in Makefile.PL
+
+1.00 Wed Apr 02 2008
+    - original version

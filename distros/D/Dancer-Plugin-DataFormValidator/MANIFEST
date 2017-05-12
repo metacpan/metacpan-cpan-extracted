@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dancer/Plugin/DataFormValidator.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

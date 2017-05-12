@@ -1,0 +1,26 @@
+---
+abstract: 'Perl extension for dumping xD structures in compact form'
+author:
+  - 'Milan Sorm <sorm@is4u.cz>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-CompactDump
+requires:
+  Exporter: 0
+  base: 0
+  perl: 5.012
+  strict: 0
+resources:
+  repository: https://github.com/milsorm/data-compactdump.git
+version: 0.04

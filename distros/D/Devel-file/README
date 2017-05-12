@@ -1,0 +1,52 @@
+NAME
+    Devel::file - show source lines around errors and warnings
+
+VERSION
+    Version 0.01 - alpha, more of a sketch that a module
+
+SYNOPSIS
+        $ perl -d:file -we 'eval { 12/1 };' -e '/a/;' -e 'die 123'
+        Useless use of a constant in void context at -e line 1.
+        =W=  -e:1
+          1=> eval { 12/1 };
+          2:  /a/;
+        ...
+        Use of uninitialized value in pattern match (m//) at -e line 2.
+        =W=  -e:2
+          1:  eval { 12/1 };
+          2=> /a/;
+          3:  die 123
+        ...
+        123 at -e line 3.
+        =E=  -e:3
+          2:  /a/;
+          3=> die 123
+        ...
+
+        perl -d:file script.pl
+        PERL5OPT='-d:file' script.pl
+        perl -MDevel::file script.pl # run without debugger
+
+DESCRIPTION
+    Devel::file appends source code to warnings and fatal errors as a
+    potential debugging aid. It provides handlers for die and warn in order
+    to do this.
+
+    This module is still in alpha and is liable to change.
+
+AUTHOR
+    Brad Bowman, "<perl-cpan at bereft.net>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-file at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-file>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Brad Bowman, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

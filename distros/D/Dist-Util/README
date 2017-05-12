@@ -1,0 +1,66 @@
+NAME
+    Dist::Util - Dist-related utilities
+
+VERSION
+    This document describes version 0.06 of Dist::Util (from Perl
+    distribution Dist-Util), released on 2014-12-26.
+
+SYNOPSIS
+     use Dist::Util qw(
+         list_dist_modules
+         list_dists
+         packlist_for
+     );
+
+     say packlist_for("Text::ANSITable"); # sample output: /home/steven/perl5/perlbrew/perls/perl-5.18.2/lib/site_perl/5.18.2/x86_64-linux/auto/Text/ANSITable/.packlist
+     my @mods = list_dist_modules("Text::ANSITable"); # -> ("Text::ANSITable", "Text::ANSITable::BorderStyle::Default", "Text::ANSITable::ColorTheme::Default")
+
+DESCRIPTION
+FUNCTIONS
+  packlist_for($mod) => STR
+    Find ".packlist" file for installed module $mod (which can be in the
+    form of "Package::SubPkg" or "Package/SubPkg.pm"). Return undef if none
+    is found.
+
+    Depending on the content of @INC, the returned path may be absolute or
+    relative.
+
+  list_dists() => LIST
+    Find all ".packlist" files in @INC and then pick the dist names from the
+    paths, because ".packlist" files are put in:
+
+     $INC/$Config{archname}/auto/Foo/Bar/.packlist
+
+    Caveat: many Linux distributions strip ".packlist" files.
+
+  list_dist_modules($mod) => LIST
+    Given installed module name $mod (which must be the name of the main
+    module of its distribution), list all the modules in the distribution.
+    This is done by first finding the ".packlist" file, then look at all the
+    ".pm" files listed in the packlist.
+
+    Will return empty list if fails to get the packlist.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Util>.
+
+SOURCE
+    Source repository is at <https://github.com/perlancar/perl-Dist-Util>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Util>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

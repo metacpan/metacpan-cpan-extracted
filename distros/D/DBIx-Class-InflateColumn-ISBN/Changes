@@ -1,0 +1,25 @@
+Revision history for DBIx::Class::InflateColumn::ISBN
+
+0.04000 Sat Jun  2 12:56:12 2007
+    - Added as_string option to also store hyphens.
+    - Fixed 'validation error checked' test to work for future
+      versions of Business::ISBN.
+    - "Datatype is too small" is now an exception rather than a
+      warning.
+    - More tests.
+
+0.03000 Tue May 29 17:50:28 2007
+    - Tweaked Makefile.PL and TODO files.
+    - Nuked warnings from the tests.
+    - Added workaround for 'validation error checked' test.
+
+0.02000 Fri May 25 15:41:44 2007
+    - Started using longer version numbers.
+    - Fixed bug in deflate method for Business::ISBN 1.x.
+    - Minor POD tweaks.
+
+0.01 Fri May 25 15:14:08 2007
+    - First version, released on an unsuspecting world.
+
+0.00 Thu May 24 21:55:43 2007
+    - First version, not released, just a placeholder.

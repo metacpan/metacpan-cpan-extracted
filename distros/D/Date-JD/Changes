@@ -1,0 +1,87 @@
+version 0.005; 2011-07-17
+
+  * introduce new conversion functions *_to_*nn and *_to_*nf, which
+    do the job of *_to_*n but without the annoying context-sensitive
+    output convention
+
+  * reword the documentation of all the conversion functions
+
+  * skip Math::BigRat tests if Math::BigRat is of a version that doesn't
+    work adequately
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.004; 2010-07-29
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.003; 2009-03-22
+
+  * list all conversion functions explicitly in the documentation
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * include "distribution_type" entry in META.yml to satisfy CPANTS
+
+  * in documentation, separate "license" section from "copyright" section
+
+  * use full stricture in Build.PL
+
+  * remove from .cvsignore items that don't occur with Module::Build
+
+version 0.002; 2007-09-08
+
+  * bugfix: in initialisation, override any ambient $SIG{__DIE__}
+    handler when using eval { }
+
+  * in documentation, use correct parameter name "...DN" for jdn_to_mjd()
+    and similar functions
+
+  * test explicitly for correct class of result
+
+  * in documentation, more explicit definition of CJD in terms of JD
+
+  * in documentation, note that the DJD epoch coincides with J1900.0
+    only in Terrestrial Time
+
+  * in documentation, add more notes on the origin of the day count
+    systems
+
+  * include explicit ".0" on integral JD values, for clarity
+
+  * in documentation, reference Date::MSD (the Martian equivalent of
+    this module)
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * express relationship with versions of Math::BigRat as a conflict
+    rather than a dependency
+
+  * include signature in distribution
+
+version 0.001; 2007-01-20
+
+  * bugfix: functions should not modify their arguments (the functions
+    such as rjdn_to_jdn() attempted to if given a zero day fraction)
+
+  * use "day fraction" and "XYZDF" terminology in place of the less
+    specific "time of day" and "TOD"
+
+version 0.000; 2006-05-18
+
+  * initial released version

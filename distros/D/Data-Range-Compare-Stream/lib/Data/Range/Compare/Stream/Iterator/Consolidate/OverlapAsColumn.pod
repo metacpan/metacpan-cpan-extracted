@@ -1,0 +1,154 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn - Consolidates by moving overlaps to new columns
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn;
+  use Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  
+  my $compare=new  Data::Range::Compare::Stream::Iterator::Compare::Asc();
+  
+  foreach my $file (qw(source_a.src source_b.src source_d.src source_c.src source_d.src)) {
+    my $src=Data::Range::Compare::Stream::Iterator::File->new(filename=>$file);
+    my $con=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn($src,$compare);
+    $compare->add_consolidator($con);
+  }
+  
+  my $format='  | %-12s | %-26s |  %-26s|  %-26s|  %-26s|'."\n";
+  my $break="  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+\n";
+  printf "$break$format$break","Intersection","Set A",'Set B','Set C','Set D';
+  
+  while($compare->has_next) {
+  
+    my $result=$compare->get_next;
+    next if $result->is_empty;
+  
+    my $columns=$result->get_root_results($result);
+    my @row=($result->get_common);
+    foreach my $id (@{$result->get_root_ids}) {
+      if($#{$columns->[$id]}!=-1) {
+        push @row, join ', ',map { $_->get_common } @{$columns->[$id]};
+      } else {
+        push @row,"No Data";
+      }
+    }
+  
+    printf $format,@row;
+    print $break;
+  }
+
+=head1 DESCRIPTION
+
+This module extends the consolidation engine for Data::Range::Compare::Stream.  Unlike the default consolidation object this class does not merge ranges when they overlap:  It creates additional instances of itself and inserts them into the "Compare" object.  Each new object refers to the object that created it.
+
+Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn can consolidate ranges sorted in the following order:
+
+Consolidation Asc range_start asc,range_end desc.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $processor=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn($iterator,$cmp);
+
+Object constructor has 2 required arguments: $processor and $cmp:  An $iterator object must implement Data::Range::Compare::Stream::Iterator::Base.  A $cmp object must implement  Data::Range::Compare::Stream::Iterator::Compare::Asc.
+
+Optional Arguments:
+
+      factory_instance =>$obj
+        
+        # defines the object that implements the $obj->factory($start,$end,$data).
+        # new ranges are constructed from the factory interfcae.  If a factory interface
+        # is not created an instance of Data::Range::Compare::Stream is assumed.
+
+=item * while($processor->has_next) { do something }
+
+Returns true when the there are more ranges to consolidate
+
+=item * my $range=$processor->get_next;
+
+if $processor->has_next returns true Returns a instance of Data::Range::Compare::Stream::Iterator::Consolidate::Result.
+
+=item * $self->on_consolidate($new_range,$overlapping_range,$next_range)
+
+Called during the consolidation process to copy ranges that overlap with the current range being compared into the next valid column.
+
+=item * $processor->set_column_id($id);
+
+Sets the column_id value.  This is used by the Compare Layer
+
+=item * my $id=$processor->get_column_id($id);
+
+Gets the column_id, returns undef if not set.
+
+=item * my $cmp=$processor->get_compare
+
+Returns the Data::Range::Compare::Stream::Iterator::Compare::Asc object passed to the constructor.
+
+=item * my $result=$processor->get_current_result;
+
+Returns the last Data::Range::Compare::Stream::Iterator::Consolidate::Result object from the $processor->has_next call.
+
+=item * my $count=$processor->buffer_count;
+
+Returns the current buffer count.
+
+=item * if($processor->iterator_has_next) { ... }
+
+Returns the internal iterator has_next state
+
+=item * $self->push_to_buffer;
+
+Internal function.  Pushes results onto the buffer.
+
+=item * my $class=$processor->NEW_ARRAY_ITERATOR_FROM;
+
+Defines the class that will be used to create iterator objects:  $class must implement Data::Range::Compare::Stream::Iterator::Base.
+
+=item * my $class=$processor->NEW_CHILD_CONSOLIDATOR_FROM;
+
+Defines the class that will be used to create consolidator objects that will be pushed into the compare object at runtime.  $class must implement Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn .
+
+=item * my $id=$processor->get_root_column_id;
+
+Gets the parent object's column_id, returns undef if not set.
+
+=item * if($processor->is_child) { ... }
+
+Returns true if this object is a child of another Consolidator object.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn::Result
+
+Data::Range::Compare::Stream::Iterator::Base
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

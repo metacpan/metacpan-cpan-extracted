@@ -1,0 +1,89 @@
+---
+abstract: 'Dist::Zilla configuration the way MITHALDU does it'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Christian Walde <mithaldu@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0.29'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.143240'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-MITHALDU
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::PluginBundle::MITHALDU:
+    file: lib/Dist/Zilla/PluginBundle/MITHALDU.pm
+    version: '1.151340'
+  Dist::Zilla::PluginBundle::MITHALDU::Templates:
+    file: lib/Dist/Zilla/PluginBundle/MITHALDU/Templates.pm
+    version: '1.151340'
+  Pod::Weaver::PluginBundle::MITHALDU:
+    file: lib/Pod/Weaver/PluginBundle/MITHALDU.pm
+    version: '1.151340'
+requires:
+  CPAN::Meta: '0'
+  Data::Section::Simple: '0'
+  Dist::Zilla: '4.3'
+  Dist::Zilla::App::Command::cover: '0'
+  Dist::Zilla::Plugin::AutoVersion: '0'
+  Dist::Zilla::Plugin::Bugtracker: '1.102670'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckExtraTests: '0'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0.002'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::GithubMeta: '0.10'
+  Dist::Zilla::Plugin::InsertCopyright: '0.001'
+  Dist::Zilla::Plugin::MetaNoIndex: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '1.11044404'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0.001008'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.120051'
+  Dist::Zilla::Plugin::ReadmeFromPod: '0'
+  Dist::Zilla::Plugin::StaticVersion: '0'
+  Dist::Zilla::Plugin::TaskWeaver: '0.101620'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::Portability: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::PluginBundle::Filter: '0'
+  Dist::Zilla::PluginBundle::Git: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Util::FileGenerator: '0'
+  Moose: '0.99'
+  Moose::Autobox: '0'
+  Pod::Elemental::Transformer::List: '0.101620'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::WikiDoc: '0'
+  Pod::Weaver::Section::Support: '1.001'
+  Try::Tiny: '0'
+  autodie: '2.00'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  strictures: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-MITHALDU
+  homepage: https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu
+  repository: https://github.com/wchristian/dist-zilla-pluginbundle-mithaldu.git
+version: '1.151340'

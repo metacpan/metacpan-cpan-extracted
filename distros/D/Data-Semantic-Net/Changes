@@ -1,0 +1,50 @@
+Revision history for Perl extension Data-Semantic-Net
+
+1.101760  2010-06-25 12:52:32 Europe/Vienna
+
+1.101750  2010-06-24 12:49:16 Europe/Vienna
+    - improved checking whether an IPv6 address is internal
+    - added IPv6 test data, also normalization tests
+
+1.101730  2010-06-22 14:27:43 Europe/Vienna
+    - Data::Semantic::Net::IPAddress::TestData::IPv4: specifically add
+      'forbid_internal => 0' where appropriate now that the default is 1
+
+1.101610  2010-06-10 21:55:48 Europe/Vienna
+    - added normalize() to Data::Semantic::Net::IPAddress::IPv4, also test data
+
+1.100850  2010-03-26 14:09:59 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.03  Thu, 29 May 2008 12:03:38 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.03
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.02  Thu, 22 Nov 2007 13:08:54 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+      had a bug in make_real_object()
+
+0.01  Wed, 21 Nov 2007 18:22:09 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - Makefile.PL: fixed requirements
+    - Data::Semantic::Net::IPAddress::IPv4_TEST: instead of defining values
+      itself, it inherits also from
+      Data::Semantic::Net::IPAddress::TestData::IPv4
+    - Data::Semantic::Net::IPAddress: add boolean accessor forbid_internal(),
+      is_valid_normalized_value() uses it
+    - updated MANIFEST
+    - added lib/Data/Semantic/Net/IPAddress/IPv6_TEST.pm
+    - added lib/Data/Semantic/Net/IPAddress/TestData
+    - getting rid of the distinction between well-formedness and validity.
+      Only validity remains
+    - Data::Semantic::Base is no more; use Data::Semantic instead
+    - added documentation
+    - updated t/perlcriticrc

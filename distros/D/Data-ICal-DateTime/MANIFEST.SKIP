@@ -1,0 +1,12 @@
+try
+.tar.gz
+MYMETA\.
+^Makefile$
+Makefile.old
+.svn
+blib
+.cache
+benchmark
+^ics\/
+.git
+\.bak$

@@ -1,0 +1,68 @@
+0.14    7 December 2012
+        Added additional text for "Installation" that mentions that any
+        additional parameters to the Makefile.PL will simply be passed on.
+
+0.13    1 June 2012
+        Fixed problem with "Installation:" in text files, that would keep
+        adding the text at each run.
+
+0.12    31 May 2012
+        Added support for "maint_blead" parameter, so that we can automatically
+        add installation information for distributions that support a "maint"
+        and a "blead" version of the code.
+
+        Fixed error in tests for versions of perl / ExtUtils::MakeMaker that
+        would not leave test droppings (aka MYMETA.* files).
+
+0.11    30 May 2012
+        Fixed some test droppings (MYMETA.* files weren't cleaned up).
+
+0.10    4 May 2012
+        Some small fixes.  Verified it runs with 5.15.9 and that it indirectly
+        (already) supports the -package name version- version specification
+        format.
+
+        Added license information as a parameter.
+
+0.09    31 March 2012
+        Some more podfixes and made sure it runs with 5.14.2, threaded and
+        unthreaded.
+
+        7 August 2009
+        Brought up to 5.10.1, and to the latest coding esthetics insights.
+
+0.08    13 July 2007
+        Quick fix for problem showing up in 5.9.5.
+
+0.07    24 July 2006
+        Brought up to Perl Best Practices standards.
+
+        Added VERSION support, which automatically updates the pod and
+        README files with the version information obtained from the generated
+        Makefile.
+
+0.06    8 february 2004
+        Adapted check in source test from \n to use $/.  Hopefully this should
+        solve the problems with Win32 platforms.
+
+        28 January 2004
+        Made sure the test-suite cleans up on multi-versioned systems.
+
+0.05    15 January 2004
+        Removed the temporary file creation logic, as it was messing up my
+        symlinks structure.
+
+0.04    7 January 2004
+        Made the updating of files a little more secure after presentation at
+        the Amsterdam PM Meeting.
+
+0.03    4 January 2004
+        Added option to specify which text and pod files to check and possibly
+        update.  Suggested by Dan Browning.  Added documentation for these new
+        features and some more tests.
+
+0.02    29 December 2003
+        Some pod and debug statement updates.
+
+0.01    28 December 2003
+        First version of Devel::Required.

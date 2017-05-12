@@ -1,0 +1,67 @@
+{
+   "abstract" : "generic getter/setter/traverser for complex data structures",
+   "author" : [
+      "Toshio Ito <toshioito@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "https://metacpan.org/pod/CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Focus",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "inc",
+         "share",
+         "benchmark"
+      ],
+      "file" : [
+         "README.pod",
+         "README.md"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42",
+            "Module::Build::Prereqs::FromCPANfile" : "0.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "1.00",
+            "overload" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/debug-ito/Data-Focus/issues"
+      },
+      "repository" : {
+         "url" : "git://github.com/debug-ito/Data-Focus.git",
+         "web" : "https://github.com/debug-ito/Data-Focus"
+      }
+   },
+   "version" : "0.03"
+}

@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/Plugin/PickyPodWeaver.pm
+lib/Dist/Zilla/PluginBundle/Author/OLIVER.pm

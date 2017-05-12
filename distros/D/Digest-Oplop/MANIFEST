@@ -1,0 +1,9 @@
+bin/oplop
+Build.PL
+lib/Digest/Oplop.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+t/01-testdata.t
+t/testdata.pl

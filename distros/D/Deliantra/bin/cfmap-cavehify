@@ -1,0 +1,127 @@
+#!/opt/bin/perl
+
+# tries to convert cave tiles to caveh tiles, depending
+# on their surroundings
+
+# --guess switch enabled heuristic, otherwise, blocksview 0 is used
+
+use common::sense;
+
+use Deliantra;
+use Deliantra::Map;
+
+Deliantra::load_archetypes;
+
+our $heuristic = $ARGV[0] eq "--guess" ? (shift, 1) : 0;
+
+our $map;
+our $cols;
+
+# blackness parts
+my %bn = (
+   cave1  => 1+2+4,
+   cave2  => 2+4+8,
+   cave3  => 1+4+8,
+   cave4  => 1+2+8,
+   cave5  => 1+2,
+   cave6  => 2+4,
+   cave7  => 4+8,
+   cave8  => 1+8,
+   cave9  => 1+8,
+   cave10 => 1+2,
+   cave11 => 2+4,
+   cave12 => 4+8,
+   cave13 => 1+8,
+   cave14 => 1+2,
+   cave15 => 2+4,
+   cave16 => 4+8,
+   cave17 => 1+2+4+8,
+   cave18 => 1+2+4+8,
+   cave19 => 1+2+4+8,
+   cave20 => 1+2+4+8,
+   cave21 => 0,
+   cave22 => 1+2+4+8,
+   cave23 => 1+2+4+8,
+   cave24 => 1+2+4+8,
+   cave25 => 1+2+4+8,
+);
+
+sub xy($$) {
+   my ($x, $y) = @_;
+
+   $x >= 0 && $x < $map->{width}
+      && $y >= 0 && $y < $map->{height}
+      ? $cols->[$_[0]][$_[1]]
+      : undef
+}
+
+# on-map, not "blocked", has floor
+sub nonblocked($$) {
+   my $as = &xy
+      or return 1;
+
+   @$as
+      or return;
+
+   $as->[-1]{_name} eq "blocked"
+      and return;
+
+   grep $ARCH{$_->{_name}}{is_floor}, @$as
+}
+
+for my $path (@ARGV) {
+   eval {
+      open my $fh, "<:raw:perlio:utf8", $path
+         or die "$path: $!\n";
+
+      <$fh> =~ /^arch map$/
+         or die "$path: not a deliantra map file\n";
+
+      local $map = new_from_file Deliantra::Map $path
+         or die "$path: file load error\n";
+
+      local $cols = $map->{map};
+
+      for my $x (0 .. $#$cols) {
+         my $col = $cols->[$x]
+            or next;
+
+         for my $y (0 .. $#$col) {
+            my $as = $col->[$y];
+
+            grep $ARCH{$_->{_name}}{is_floor}, @$as
+               or next;
+
+            for my $cave (@$as) {
+               my $bn = $bn{ $cave->{_name} }
+                  or next;
+
+               if ($cave->{blocksview} ne 0) {
+                  $heuristic or next;
+
+                  $bn ^= 15;
+
+                  # H/V
+                  $bn & 1 or nonblocked $x  , $y-1 or next;
+                  $bn & 2 or nonblocked $x+1, $y   or next;
+                  $bn & 4 or nonblocked $x  , $y+1 or next;
+                  $bn & 8 or nonblocked $x-1, $y   or next;
+
+                  # diagonal
+                  $bn &  3 or nonblocked $x+1, $y-1 or next;
+                  $bn &  6 or nonblocked $x+1, $y+1 or next;
+                  $bn & 12 or nonblocked $x-1, $y+1 or next;
+                  $bn &  9 or nonblocked $x-1, $y-1 or next;
+               }
+
+               $cave->{_name} =~ s/^cave/caveh/;
+            }
+         }
+      }
+
+      $map->write_file ($path);
+
+      1
+   } or warn $@;
+}
+

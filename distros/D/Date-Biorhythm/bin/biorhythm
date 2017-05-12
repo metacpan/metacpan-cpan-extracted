@@ -1,0 +1,115 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Date::Biorhythm;
+use Date::Calc::Object qw(:all);
+use Getopt::Long;
+
+sub print_day {
+  my $biorhythm = shift;
+  printf(
+    qq/
+    '%s' => {
+      %s => '%1.5f',
+      %s => '%1.5f',
+      %s => '%1.5f',
+    },
+    /, 
+    $biorhythm->day->string,
+    'emotional',
+    $biorhythm->value('emotional'),
+    'intellectual',
+    $biorhythm->value('intellectual'),
+    'physical',
+    $biorhythm->value('physical'),
+  );
+}
+
+my $__birthday;
+my $__day;
+my $__range = "2:2";
+
+GetOptions(
+  "b|birthday=s" => \$__birthday,
+  "day=s"        => \$__day,
+  "r|range=s"    => \$__range,
+);
+
+die "--birthday=YYYY-MM-DD" unless ($__birthday);
+
+$__birthday = Date::Calc::Object->new(0, map { s/^0//; $_ } split(/-|\//, $__birthday));
+if ($__day) {
+  $__day = Date::Calc::Object->new(0, map { s/^0//; $_ } split(/-|\//, $__day));
+} else {
+  $__day = Date::Calc::Object->today;
+}
+
+my $biorhythm = Date::Biorhythm->new({
+  name     => $ENV{USER} || 'you',
+  birthday => $__birthday,
+  day      => $__day
+});
+
+my ($begin, $end) = split(':', $__range);
+
+die "positive integers please" if ($begin < 0);
+die "positive integers please" if ($end   < 0);
+
+my $iterations = 1;
+
+print "# $__birthday\n";
+print "# $__day\n";
+
+print "  {\n";
+if ($begin) {
+  $biorhythm->day($biorhythm->day - $begin);
+  for (1 .. $begin) {
+    print_day($biorhythm);
+    $biorhythm->next;
+  }
+}
+
+print_day($biorhythm);
+$biorhythm->next;
+
+if ($end) {
+  for (1 .. $end) {
+    print_day($biorhythm);
+    $biorhythm->next;
+  }
+}
+print "\n  }\n";
+
+exit 0;
+
+=head1 NAME
+
+biorhythm - biorhythm calculation utility
+
+=head1 SYNOPSIS
+
+Usage:
+
+  biorhythm [OPTIONS]
+
+Options:  
+
+  --birthday, -b YYYY-MM-DD             Your birthday.
+
+  --day, -d YYYY-MM-DD                  The day you're interested in.
+                                        (default: today)
+  --range, -r N:M                       Look N days back and M days forward
+                                        (default: 5:5)
+
+Example:
+
+  biorhythm --birthday 1970-01-01
+
+=head1 DESCRIPTION
+
+Given a birthday, a day, and a range, this utility will print the values
+of the various biorhythms as a Perl data structure.
+
+=cut

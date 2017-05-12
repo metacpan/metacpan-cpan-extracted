@@ -1,0 +1,23 @@
+
+1.05	[2007 Mar 07]
+	documentation changes as per phl.pm recommendation
+
+1.04	[2004 Apr 29]
+	regex issue
+
+1.03	[2003 Dec 8]
+	changed output format of <anon> lines
+	better time calculation for unfinished subs
+
+1.02	[2003 Jul 9]
+	handle void context
+	fix periodic save
+
+1.01	[2003 Apr 15]
+	corrected documentation
+	added test scripts
+	fixed 5.8.0 issue
+	fixed exception issue
+
+1.00	[2003 Apr 13]
+	initial public release

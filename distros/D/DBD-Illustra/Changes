@@ -1,0 +1,82 @@
+################################################################################
+#
+#   File name: Changes
+#   Project: DBD::Illustra
+#   Description: Change history
+#
+#   Author: Peter Haworth
+#   Date created: 09/09/1998
+#
+#   sccs version: 1.11    last changed: 10/13/99
+#
+#   Copyright (c) 1998 Institute of Physics Publishing
+#   You may distribute under the terms of the Artistic License,
+#   as distributed with Perl, with the exception that it cannot be placed
+#   on a CD-ROM or similar media for commercial distribution without the
+#   prior approval of the author.
+#
+################################################################################
+
+1999/10/13: 0.04 released
+  First shot at $dbh->type_info_all()
+  Replace $sth->blob_read with $dbh->func(...,'read_large_object')
+  Enable tests for bind parameters
+  Fix bug in bind parameters, allowing more than one placeholder
+
+1999/10/12: 0.03_005
+  Support for bind parameters, but no docs or tests yet
+  Update dbd-illustra.pod to latest version, but it's not going in the book now
+
+1999/05/25: 0.03_004
+  Allow user to mark columns as holding large objects with
+    bind_col(...,{TYPE => SQL_LONGVARBINARY})
+  Implement $sth->blob_read, but only after $sth->finish, and only for the
+    last row fetched. That's all Illustra allows by the look of it
+  Rename illustra.bookentry to dbd-illustra.pod so it gets installed, and
+    update to Tim's latest version
+
+1999/04/09: 0.03_003
+  Fix bizarre behaviour introduced in 0.03_002 with number of rows returned
+  Add illustra.bookentry to the distribution.
+    This is from the forthcoming DBI book by Tim Bunce
+
+1999/03/31: 0.03_002
+  Return correct number of rows for DDL and non-select DML
+
+1998/11/23: 0.03_001
+  Added $sth->{ill_TypeName} attribute
+  Beginnings of support for reading longs (except Illustra says they're normal)
+
+1998/09/30: 0.03 released (without these changes listed, oops)
+  Set $h->err to MI_ERROR when errors occur
+    (it is checked by at least the test suite, so it can't be left as zero)
+  Log callbacks to DBILOGFP if DBI_TRACE>=3
+  Don't try to describe queries with no fields, such as inserts and deletes
+  Fixed table_info so it actually does something useful
+  Fix up tests so they actually all pass (by ignoring some of them until later)
+  ChopBlanks somewhat supported (FETCH returns undef)
+
+1998/09/29: 0.02_001
+  Added table_info support (not that dbish seems to notice)
+  Have a go at implementing $h->errstr and $h->state ($h->err is useless)
+    - callbacks no longer warn
+  Add mostly empty dbd_bind_ph and completely empty dbd_st_blob_read
+  Pathetic attempt at supporting {TYPE} info. Illustra doesn't help
+  Replace useless test.pl with Jochen Wiedmann's DBD-test
+
+1998/09/22: 0.02 released
+  Added $dbh->ping support
+  Added more support for metadata @sth->{NULLABLE,PRECISION,SCALE}
+  AutoCommit and commit/rollback supported
+  Added minimal install info to README
+
+1998/09/18: 0.01_002
+  Fixed subsequent select problem (unset ACTIVE on sth when no more rows)
+  Added data_sources method (very cheap and cheerful method)
+  Added a bit of documentation
+
+1998/09/09: 0.01_001
+  Added NAME meta data
+  Only first select returns rows if no $sth->finish
+
+1998/08/12: 0.01 released

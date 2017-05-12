@@ -1,0 +1,12 @@
+--- 
+abstract: dead simple database for simple storage
+author: 
+  - Andrew Sterling Hanenkamp <hanenkamp@cpan.org>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.003
+license: perl
+name: DustyDB
+requires: 
+  DBM::Deep: 1.0015
+  Moose: 0
+  MooseX::Types::Path::Class: 0
+version: 0.06

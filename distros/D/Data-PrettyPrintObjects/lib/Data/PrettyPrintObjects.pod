@@ -1,0 +1,461 @@
+# Copyright (c) 2010-2010 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Data::PrettyPrintObjects - a pretty printing module with better support for objects
+
+=head1 SYNOPSIS
+
+This module is a fairly powerful pretty printer useful for printing out perl
+data structure in a readable fashion.
+
+The difference between this module and other data dumpers and pretty
+printers is that it can be configured to handle different types of
+references (or objects) in different ways, including using object
+methods to supply the printable value.
+
+If you have simple data structures without any blessed objects
+embedded in them, this module behaves similar to any other pretty
+printers. However, if you have objects embedded in them, this module is
+very useful for describing the data.
+
+Although modules such as Data::Dumper are often used for this purpose,
+this module is NOT a replacement for Data::Dumper, or any other similar
+module.  Data::Dumper examines raw data (including printing out the full
+representation of an embedded object).  A pretty printer, such as this
+one, is designed to print the data in a readable form, which may or may
+not mean displaying the raw data.
+
+As an example, if you have data structure which includes an
+Archive::Zip object, you may want the printable value of that object
+to be a list of all files in the archive, rather than a description of
+the Archive::Zip object.  If you have a Date::Manip::Date object, you
+probably want the printable value to be a date contained in the
+object.
+
+=head1 DISPLAYING DATA
+
+For displaying a data structure, the structure is examined recursively,
+and turned into a string. The format of the string depends on the type
+of data and the options described below.
+
+=over 4
+
+=item B<Displaying scalars>
+
+Most of the time, a scalar is displayed exactly as it exists. If the
+scalar includes embedded quotes, commas, spaces, or newlines, it will be
+quoted.  Embedded newlines will be emphasized by including '\n' in the
+string. This is not true perl quoting since embedded quotes will not
+be escaped.
+
+Embedded newlines will cause the output to be quoted, and an extra
+space added at the start of each line.  For example:
+
+   print PPO("a\nb\nc") =>
+      'a
+       b
+       c'
+
+Note the leading extra space on the second and third lines. This is so
+printing out a multi-line scalar will correctly line up after quotes
+have been added.
+
+=item B<Displaying lists>
+
+A list will be displayed as square brackets enclosing list elements.
+
+In other words:
+
+   [
+     ELE1,
+     ELE2,
+     ...
+     ELEN
+   ]
+
+=item B<Displaying hashes>
+
+A has will be displayed as:
+
+   {
+     KEY1    => VAL1,
+     KEY2    => VAL2,
+     ...
+     KEYN    => VALN
+   }
+
+=item B<Displaying objects>
+
+Objects will typically be displayed using their scalar representation
+(i.e. what you get with the function scalar($object)), but this can
+be overridden using the options described below.
+
+=back
+
+=head1 OPTIONS
+
+Options may be set in one of two ways.
+
+They may be set in a file specified by the PPO_OptionsFile function, or
+they may be set by passing them to PPO_Options.
+
+The argument to PPO_Options is a hash containing option/value key pairs.
+The argument to PPO_OptionsFile is a file containing a YAML hash.
+The following keys are known:
+
+=over 4
+
+=item B<indent>
+
+Each level of a data structure is indented a certain number of spaces
+relative per level. This defaults to 2, but this option can be used
+to change that.
+
+=item B<list_format>
+
+When displaying a list, the B<list_format> option defines how it will
+be formatted. Possible values include:
+
+standard     By default, a list is printed in a one per line
+             format. In other words:
+
+                [
+                  a,
+                  b,
+                  c
+                ]
+
+indexed      This is one item per line with an index. In other
+             words:
+
+                [
+                  0: a,
+                  1: b,
+                  2: c
+                ]
+
+=item B<max_depth>
+
+In a nested data structure, the depth of a piece of data refers to how
+many levels deep it is nested.  If max_depth is 0 (which is the default),
+all levels will be printed).
+
+For example, one data structure might be printed as:
+
+   [ 
+     a,
+     b,
+     [
+       c,
+       [
+         d
+       ]
+     ]
+   ]
+
+(if max_depth were 0).
+
+In this example, 'a' and 'b' are both at depth 1, 'c' is at depth 2,
+and 'd' is at depth 3.  Sometimes, you may only want to print out the
+top levels. By setting a max_depth to N, every scalar value (or object
+who's printable value is a scalar) who's depth is N or smaller will be
+printed out.  It will not recurse into more deeply nested data
+structures, but instead will print them out using the
+B<max_depth_method> described next.
+
+In this example, setting max_depth to 2 might result in the following
+output:
+
+   [
+     a,
+     b,
+     [
+       c,
+       ARRAY(0x111111)
+     ]
+   ]
+
+The format used to display the structures more deeply nested depend on
+the B<max_depth_method>.
+
+=item B<max_depth_method>
+
+When B<max_depth> is set, structure that is more deeply nested than that
+depth are displayed in some method to indicated that the structure is
+there, but it is not recursed into to display the actual data contained
+there.
+
+The possible values for B<max_depth_method> are:
+
+ref      This is the default, and means to display the
+         memory reference of the structure.  For example,
+         an array reference would be displayed:
+
+            ARRAY(0x111111)
+
+         and an object with a non-scalar printable
+         value would include the class, so an Archive::Zip
+         object (who's printable value might be defined to
+         be a list of files contained in the archive) might
+         be:
+
+            Archive::Zip=HASH(0x15c8e50)
+
+         If the printable value of an object is a scalar,
+         it will be printed using the methods defined for
+         that object.
+
+type     This is a simpler version when you are only
+         interested in seeing the type of structure/object
+         but not the memory reference. They might be
+         displayed as:
+
+            ARRAY
+            Archive::Zip
+
+=item B<duplicates>
+
+If a data structure has circular references, or structure/objects
+embedded in it multiple times, there are different ways to display
+it.
+
+For example, if you have the code:
+
+   $a  = [1];
+   $d1 = [$a,$a]
+
+   $d2 = [];
+   push(@$d2,2,$d2);
+
+the structures '$d1' and '$d2' will be displayed depending on
+the value of the B<duplicates> option. The value may be one of
+the following:
+
+link     This is the default. In this case, the first occurence
+         of a data structure is displayed normally, and the
+         second (or higher) occurence is listed as a link to
+         the first one.
+
+         '$d1' would be printed as:
+
+            [
+              [
+                1
+              ],
+              $VAR->[0]
+            ]
+
+         and '$d2' would be printed as:
+
+            [
+              2,
+              $VAR
+            ]
+
+reflink  This adds memory references to all duplicates. So
+         the '$d1' and '$d2' would be displayed as:
+
+            [
+              ARRAY(0x111111) [
+                1
+              ],
+              ARRAY(0x111111) $VAR->[0]
+            ]
+
+         and
+
+            ARRAY(0x111111) [
+              2,
+              ARRAY(0x111111) $VAR
+            ]
+
+ref      This simply prints second (or higher) occurrences
+         as memory references (but doesn't indicate what
+         it duplicates):
+
+            [
+              [
+                1
+              ],
+              ARRAY(0x111111)
+            ]
+
+         and
+
+            [
+              2,
+              ARRAY(0x111111)
+            ]
+
+=item B<objs>
+
+The B<objs> option is used to set the options for each type of
+object. The value of this is a hash described in the OBJECT OPTIONS
+section below.
+
+=back
+
+=head1 OBJECT OPTIONS
+
+The value of the B<objs> option is a hash. The keys in this hash are
+the full names for various objects. The value for each entry is a
+hash containing the options for that object.
+
+For example, to set options for displaying an Archive::Zip object,
+you would need to pass in the following to the PPO_Options function:
+
+   %obj_opts = ( 'Archive::Zip'  => { OPT => VAL, OPT => VAL, ... } );
+   PPO_Options(..., objs => \%obj_opts );
+
+The object options include the following:
+
+=over 4
+
+=item B<print>
+
+This tells how the printable value of an object should be obtained. Values
+can be:
+
+ref       The object will be printed out as a reference:
+
+             Archive::Zip(0x111111)
+
+          This is the default method.
+
+method    If this is passed in, the value is a string which
+          is a method name that can be used to return the
+          printable value.
+
+          In other words, if $obj is an object, the
+          printable value is obtained by calling:
+
+             $obj->METHOD(ARGS)
+
+          where METHOD is the value of the B<func> option, and ARGS is
+          the value of the B<args> option.  The arguments are passed
+          unmodified.
+
+func      This can either be the name of a function,
+          or a function reference.  The printable
+          value for the object is obtained by calling:
+
+             &FUNC(ARGS)
+
+          where FUNC is the value of the B<func> option and
+          ARGS is the value of the B<args> option.
+
+          Exactly one of the ARGS should be the
+          literal string '$OBJ' which will be
+          replaced with the actual object.
+
+          FUNC is looked for in the namespace of the
+          caller, the namespace of the object, and the main
+          namespace (in that order).
+
+data      This treats the object as a data structure
+          and displays it.
+
+=item B<func>
+
+This is the name of the method or function used to get the printable
+value of an object. It must be defined if B<print> is 'method' or
+'func'.  There is no default value.
+
+=item B<args>
+
+This is a list of arguments to pass to the method or function.
+
+=item B<type>
+
+This is only used if the value of the B<print> option is method or
+func. The output from the method/function will be treated as a scalar
+by default, but if this is set to any of the following, the output
+will be treated as that type of structure:
+
+   scalar
+   list
+   hash
+
+If the return value is a scalar that is a reference, it will be
+displayed using the rules for that type of data.
+
+=item B<ref>
+
+If this option is set to a non-zero value, the reference will be
+output along with the printable value. For example, if the object
+is an Archive::Zip object, and (using the method or func method)
+the printable value is defined to be the list of files, the
+printable version will be either:
+
+   [
+     file1,
+     file2
+   ]
+
+or
+
+   Archive::Zip(0x111111) [
+     file1,
+     file2
+   ]
+
+The second will be used if this is non-zero.
+
+This option is ignored if the print method is 'ref'.
+
+=back
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<PPO_Options>
+
+=item B<PPO_OptionsFile>
+
+   use Data::PrettyPrintObjects;
+   Options(%options);
+   OptionsFile($file);
+
+This sets any of the options described above. Any options already set which
+are not included in the %options argument are left unmodified.
+
+This does not hold true for the object options. If you set the object
+options for a type of object, it overrides completely all options
+previously set for that type of object.
+
+Any file passed in to OptionsFile must be a valid YAML file containing
+an %options hash.
+
+=item B<PPO>
+
+   $string = PPO($var);
+
+This formats $var (which can be any type of data structure) into a printable
+string.
+
+=back
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please send bug reports to the author.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

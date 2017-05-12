@@ -1,0 +1,26 @@
+[%-#
+   # expected args:
+   # toc - an array with keys: link, stitle, title, abstract, subs
+   #       (subs is optional and includes a similar array) 
+-%]
+
+[%- numbers = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X'] -%]
+
+[%- IF toc.size  -%]
+    [% SET chap_counter = 0 %]
+    <div class="toc">
+    [%- IF toc.0.group_title.defined;
+            SET counter = 0;
+            FOREACH group = toc;
+                 "<b>Part ${numbers.$counter}: ${group.group_title}</b>";
+                 PROCESS index_toc_section subs=group.subs;
+                 counter = counter + 1;
+            END;
+        ELSE;
+            INCLUDE index_toc_section subs=toc;
+        END;
+    -%]
+
+    </div>
+
+[%- END -%]

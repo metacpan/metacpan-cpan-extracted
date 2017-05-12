@@ -1,0 +1,33 @@
+0.007 Thu, Feb 21, 2013
+
+  * Fix pod (auto-wrapping...)
+
+0.006 Thu, Feb 21, 2013
+
+  * Remove reliance on regex.h for portability
+
+  * Update docs to mention RFC 3403 (which obsoleted RFC 2915)
+
+0.005 Tue, Feb 19, 2013
+
+  * Don't allow unescaped double quotes
+
+0.004 Sat, Feb 16, 2013
+
+  * Fix length checking (wasn't converting \(\d\d\d) to copied string)
+
+0.003 Fri, Feb 15, 2013
+
+  * Don't allow new-lines
+
+  * Doc updates - examples/POD fixes
+
+  * Github #3 - Parse character-strings properly
+
+0.002 Thu, Feb 14, 2013
+
+  * Github #2 - Parse backrefs properly
+
+0.001 Wed, Feb 13, 2013
+
+  * First release!

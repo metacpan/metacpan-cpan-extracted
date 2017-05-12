@@ -1,0 +1,6 @@
+name = "Data-WeightedRoundRobin"
+badges = ["travis"]
+authority="cpan:XAICRON"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,813 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBIx::PgLink::Manual::Usage</title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;DBIx::PgLink::Manual::Usage</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#usage_of_dbix__pglink">Usage of DBIx::PgLink</a></li>
+	<li><a href="#architecture">ARCHITECTURE</a></li>
+	<li><a href="#connection_setup">CONNECTION SETUP</a></li>
+	<ul>
+
+		<li><a href="#main_connection_record">Main connection record</a></li>
+		<li><a href="#mapping_between_local_and_remote_user">Mapping between local and remote user</a></li>
+		<li><a href="#roles">Roles</a></li>
+		<li><a href="#attributes">Attributes</a></li>
+		<li><a href="#environment_variables">Environment variables</a></li>
+	</ul>
+
+	<li><a href="#adhoc_queries">AD-HOC QUERIES</a></li>
+	<ul>
+
+		<li><a href="#setreturning_queries">Set-returning queries</a></li>
+		<li><a href="#data_modification_and_ddl_queries">Data modification and DDL queries</a></li>
+	</ul>
+
+	<li><a href="#transactions">TRANSACTIONS</a></li>
+	<li><a href="#disconnection">DISCONNECTION</a></li>
+	<li><a href="#persistent_accessors">PERSISTENT ACCESSORS</a></li>
+	<ul>
+
+		<li><a href="#building_accessors">Building accessors</a></li>
+		<ul>
+
+			<li><a href="#stored_procedures">Stored procedures</a></li>
+		</ul>
+
+		<li><a href="#using_accessors">Using accessors</a></li>
+		<ul>
+
+			<li><a href="#accessor_functions_for_table_view">Accessor functions for table/view</a></li>
+			<li><a href="#accessor_view">Accessor view</a></li>
+			<li><a href="#modification_of_table_view">Modification of table/view</a></li>
+			<li><a href="#query_filter">Query filter</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="usage_of_dbix__pglink">Usage of DBIx::PgLink</a></h1>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="architecture">ARCHITECTURE</a></h1>
+<pre>
+  -------------              .- - - -  - -.
+   |        |                | Views, etc |&lt;- - - - .
+   |        |                `- - - -  - -'         .
+   |    PostgreSQL                 |                .
+   |     database        .---------------------.    .
+   |        |            |  PL/Perl functions  |&lt;- -.
+   |        |            `---------------------'    .
+   |       ---                /             \       .
+   |        |         .--------------.  .---------------------.
+   |        |         | DBIx::PgLink |  | DBIx::PgLink::Local |
+   |        |         `--------------'  `---------------------'
+ Local      |                |                      .
+ server     |         .--------------.              .
+   |        |         |   Connector  |              .
+   |        |         `--------------'              .
+   |      Perl          /          \                .
+   |     modules  .-----------. .----------.        .
+   |        |     |  Adapter  | | Accessor |. . . . .
+   |        |     `-----------' `----------'
+   |        |           |
+   |        |     .===========.
+   |        |     | DBI + DBD |
+   |        |     `==========='
+   |       ---          |
+   |        |     .- - - - - - - - - - - - - - -.
+   |        |     | Driver  (native, ODBC, etc) |
+  -------------   `- - - - - - - - - - - - - - -'
+   Network              |
+  -------------   .-------------------.
+  Remote server   |  Remote database  |
+                  `-------------------'</pre>
+<dl>
+<dt><strong><a name="item_views_2c_pl_2fperl_functions"><em>Views</em>, <em>PL/Perl functions</em></a></strong>
+
+<dd>
+<p>Provides SQL interface for remote data source.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dbix_3a_3apglink_2f"><a href="../../../../../site/lib/DBIx/PgLink.html">the DBIx::PgLink manpage</a></a></strong>
+
+<dd>
+<p>Collection of named Connectors used in session.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dbix_3a_3apglink_3a_3aadapter_2f"><a href="../../../../../site/lib/DBIx/PgLink/Adapter.html">the DBIx::PgLink::Adapter manpage</a></a></strong>
+
+<dd>
+<p>Provides interface for DBI, handles driver incompatibilities 
+and adds extra functions.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dbix_3a_3apglink_3a_3aaccessor_2f"><a href="../../../../../site/lib/DBIx/PgLink/Accessor.html">the DBIx::PgLink::Accessor manpage</a></a></strong>
+
+<dd>
+<p>Store and retrieve metadata for remote objects in PostgreSQL database, 
+builds persistent accessor functions/views/triggers.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dbix_3a_3apglink_3a_3aconnector_2f"><a href="../../../../../site/lib/DBIx/PgLink/Connector.html">the DBIx::PgLink::Connector manpage</a></a></strong>
+
+<dd>
+<p>Initialize connection, join adapter and accessors together. 
+Interface for PL/Perl functions.</p>
+</dd>
+</li>
+<dt><strong><a name="item_dbix_3a_3apglink_3a_3alocal_2f"><a href="../../../../../site/lib/DBIx/PgLink/Local.html">the DBIx::PgLink::Local manpage</a></a></strong>
+
+<dd>
+<p>Emulation of DBI for local PostgreSQL database.</p>
+</dd>
+</li>
+</dl>
+<p>Metadata and helper functions stored in PostgreSQL <em>dbix_pglink</em> schema.</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="connection_setup">CONNECTION SETUP</a></h1>
+<p>
+</p>
+<h2><a name="main_connection_record">Main connection record</a></h2>
+<ul>
+<li>
+<p>Ensure that DBD driver works properly.</p>
+<p>Simple test perl script provided</p>
+<pre>
+  ./util/dbd_check.pl --dsn=&quot;dbi:...&quot; --user=... --password=...</pre>
+<p>It is OK to fail some catalog information tests, 
+if exists adapter for your database that cover that issues.
+If not, you cannot use persistent accessor, but (probably) can use ad-hoc queries.</p>
+</li>
+<li>
+<p>Login to PostgreSQL database as PostgreSQL superuser</p>
+<p>Run <code>psql</code> or <code>pgAdmin</code> or another query tool of your choice.</p>
+</li>
+<li>
+<p>Create main connection record:</p>
+<p>SELECT <code>dbix_pglink.create_connection</code>(<em>conn_name</em>, <em>data_source</em>,
+<em>adapter_class</em>, <em>logon_mode</em>, <em>use_libs</em>, <em>comment</em>);</p>
+<p>or</p>
+<p>SELECT <code>dbix_pglink.create_connection</code>(<em>conn_name</em>, <em>data_source</em>, <em>comment</em>)</p>
+<p>where</p>
+<dl>
+<dt><strong><a name="item_conn_name"><em>conn_name</em> (TEXT, mandatory)</a></strong>
+
+<dd>
+<p>Connection name</p>
+</dd>
+</li>
+<dt><strong><a name="item_data_source"><em>data_source</em> (TEXT, mandatory)</a></strong>
+
+<dd>
+<p>DBI connection string ('dbi:Driver:params...')</p>
+</dd>
+</li>
+<dt><strong><a name="item_adapter_class"><em>adapter_class</em> (TEXT)</a></strong>
+
+<dd>
+<p>Perl module name for used database, guessed if not specified.</p>
+</dd>
+</li>
+<dt><strong><a name="item_logon_mode"><em>logon_mode</em> (TEXT, mandatory)</a></strong>
+
+<dd>
+<p>Tells what credentials are used when no mapping exists
+between local PostgreSQL login and remote user</p>
+</dd>
+<dl>
+<dt><strong><a name="item__27empty_27">'empty'</a></strong>
+
+<dd>
+<p>Connect with empty user name and empty password</p>
+</dd>
+</li>
+<dt><strong><a name="item__27current_27">'current'</a></strong>
+
+<dd>
+<p>Connect as session_user without password</p>
+</dd>
+</li>
+<dt><strong><a name="item__27default_27">'default'</a></strong>
+
+<dd>
+<p>Connect as default user with default password (see below).</p>
+</dd>
+<dd>
+<p>This is default value.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27deny_27">'deny'</a></strong>
+
+<dd>
+<p>Connection refused</p>
+</dd>
+</li>
+</dl>
+<dt><strong><a name="item_use_libs"><em>use_libs</em> (TEXT[])</a></strong>
+
+<dd>
+<p>List of directories, which will be appended to Perl library path (@INC global variable).
+Useful when part of code resides out of default Perl locations (or PERL5LIB environment variable)
+and restart of main PostgreSQL process is undesirable.</p>
+</dd>
+<dd>
+<p>Main Connector class loaded *before* using this libs. 
+Setting this attribute can affects only class or role loaded at runtime.</p>
+</dd>
+</li>
+</dl>
+<li>
+<p>To modify connection update of <em>dbix_pglink.connections</em> table directly.</p>
+</li>
+<li>
+<p>To delete connection:</p>
+<p>SELECT <code>dbix_pglink.delete_connection</code>(<em>conn_name</em>)</p>
+<p>All metadata and database objects will be deleted as well.</p>
+</li>
+</ul>
+<p>Example:</p>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">create_connection</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="string">'dbi:ODBC:Northwind'</span><span class="operator">,</span>
+    <span class="string">'Sample database'</span>
+  <span class="operator">);</span>
+</pre>
+<pre>
+  or</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">create_connection</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="string">'dbi:ODBC:Northwind'</span><span class="operator">,</span>
+    <span class="string">'DBIx::PgLink::Adapter::MSSQL'</span><span class="operator">,</span>
+    <span class="string">'empty'</span><span class="operator">,</span>           <span class="operator">--</span><span class="keyword">use</span> <span class="variable">integrated</span> <span class="variable">security</span>
+    <span class="keyword">NULL</span><span class="operator">,</span>
+    <span class="string">'Sample database'</span>  <span class="operator">--</span><span class="variable">comment</span>
+  <span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h2><a name="mapping_between_local_and_remote_user">Mapping between local and remote user</a></h2>
+<p>SELECT <code>dbix_pglink.set_user</code>(<em>conn_name</em>, <em>local_user</em>, <em>remote_user</em>, <em>remote_password</em>);</p>
+<p>SELECT <code>dbix_pglink.delete_user</code>(<em>conn_name</em>, <em>local_user</em>);</p>
+<p>This is optional when</p>
+<pre>
+  - no authentication required (desktop database like DBF, SQLite)</pre>
+<pre>
+  - OS-level authentication of 'postgres' account on remote server
+    (MSSQL with integrated security mode, PostgreSQL with sspi)</pre>
+<p>There can be special &lt;default&gt; user entry for each connection, where <em>local_user</em> = '' (empty string).</p>
+<p><strong>WARNING: Password stored as plain text</strong></p>
+<p>
+</p>
+<h2><a name="roles">Roles</a></h2>
+<p>Roles requires disconnect from remote database to apply.</p>
+<p>SELECT <code>dbix_pglink.set_conn_role</code>(<em>conn_name</em>, <em>local_user</em>, <em>role_kind</em>, <em>role_name</em>, <em>position</em>, <em>replace</em>);</p>
+<p>SELECT <code>dbix_pglink.delete_conn_role</code>(<em>conn_name</em>, <em>local_user</em>, <em>role_kind</em>, <em>role_name</em>);</p>
+<p>where</p>
+<dl>
+<dt><strong><a name="item_role_kind"><em>role_kind</em> (TEXT)</a></strong>
+
+<dd>
+<p>To which object role will be applied, 'Adapter' or 'Connector'</p>
+</dd>
+</li>
+<dt><strong><a name="item_local_user"><em>local_user</em> (TEXT)</a></strong>
+
+<dd>
+<p>PostgreSQL user name or '' (empty string) for global.</p>
+</dd>
+</li>
+<dt><strong><a name="item_role_name"><em>role_name</em> (TEXT)</a></strong>
+
+<dd>
+<p>Perl class name.</p>
+</dd>
+<dd>
+<p>Can be full name like 'DBIx::PgLink::Adapter::Roles::InitSession' or just 'InitSession'.</p>
+</dd>
+<dd>
+<p>See directory lib/DBIx/PgLink/Roles.</p>
+</dd>
+</li>
+<dt><strong><a name="item_position"><em>position</em> (INTEGER)</a></strong>
+
+<dd>
+<p>For some roles loading order can matter. Use NULL to append role to end of list.</p>
+</dd>
+</li>
+<dt><strong><a name="item_replace"><em>replace</em> (BOOLEAN)</a></strong>
+
+<dd>
+<p>If true replace role in specified <em>position</em>. If false insert role in <em>position</em> and shift list down.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="attributes">Attributes</a></h2>
+<p>There is <em>DBI</em> database handle attibutes (with name in CamelCase) 
+and Adapter object attributes (with name in lower case). 
+Some roles may add extra Adapter attributes.</p>
+<p>SELECT <code>dbix_pglink.set_conn_attr</code>(<em>conn_name</em>, <em>local_user</em>, <em>name</em>, <em>value</em>);</p>
+<p>SELECT <code>dbix_pglink.delete_conn_attr</code>(<em>conn_name</em>, <em>local_user</em>, <em>name</em>);</p>
+<p>See description of DBI attributes in <em>DBI/ATTRIBUTES COMMON TO ALL HANDLES</em>:</p>
+<p>
+</p>
+<h2><a name="environment_variables">Environment variables</a></h2>
+<p>Environment variables will be set for backend process before connection start.
+Use it when environment of different connections conflicts with each others
+or PostgreSQL restart is not desirable.</p>
+<p>SELECT <code>dbix_pglink.set_conn_env</code>(<em>conn_name</em>, <em>local_user</em>, <em>name</em>, <em>value</em>);</p>
+<p>SELECT <code>dbix_pglink.delete_conn_env</code>(<em>conn_name</em>, <em>local_user</em>, <em>name</em>);</p>
+<p>Requires installation of <code>Environment</code> role.</p>
+<p>SELECT <code>dbix_pglink.set_role</code>(<em>conn_name</em>, '', 'Connector', 'Environment');</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="adhoc_queries">AD-HOC QUERIES</a></h1>
+<p>Note: first time in every session the PL/Perl function that initiates connection 
+take a lot of CPU for several seconds.</p>
+<p>This is a price for using great object system for Perl 5, <em>Moose</em>.</p>
+<p>After initialization all functions works pretty fast, 
+although not so fast as Perl code that use plain DBI.</p>
+<p>
+</p>
+<h2><a name="setreturning_queries">Set-returning queries</a></h2>
+<p>Function family for set-returning ad-hoc queries:</p>
+<ul>
+<li>
+<p><code>dbix_pglink.query</code>(<em>conn_name</em>, <em>query_text</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.query</code>(<em>conn_name</em>, <em>query_text</em>, <em>param_values</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.query</code>(<em>conn_name</em>, <em>query_text</em>, <em>param_values</em>, <em>param_types</em>)</p>
+</li>
+</ul>
+<p>where</p>
+<dl>
+<dt><strong><a name="item_query_text"><em>query_text</em> (TEXT)</a></strong>
+
+<dd>
+<p>Any text passed to remote database. Can contains positional parameter placeholders (?).</p>
+</dd>
+<dd>
+<p>Using of dollar-quoting for literal queries is preferable.</p>
+</dd>
+</li>
+<dt><strong><a name="item_param_values"><em>param_values</em> (array of TEXT)</a></strong>
+
+<dd>
+<p>List of values for parameterized query.
+All values must be converted to text, database driver do reverse conversion.</p>
+</dd>
+</li>
+<dt><strong><a name="item_param_types"><em>param_types</em> (array of TEXT)</a></strong>
+
+<dd>
+<p>List of parameter type names. 
+Use it when driver require explicit parameter type or value need conversion.
+Currently supported only SQL standard types.</p>
+</dd>
+</li>
+</dl>
+<p>Example:</p>
+<pre>
+  <span class="variable">SELECT</span> <span class="operator">*</span>
+  <span class="variable">FROM</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">query</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$SELECT</span> <span class="variable">OrderID</span><span class="operator">,</span> <span class="variable">OrderDate</span> <span class="variable">FROM</span> <span class="variable">Orders</span><span class="variable">$$</span>
+  <span class="operator">)</span> <span class="variable">as</span> <span class="regex">s("OrderID" int, "OrderDate" timestamp); -- &lt;-- column definition
+  </span>
+</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="operator">*</span>
+  <span class="variable">FROM</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">query</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$SELECT</span> <span class="variable">OrderID</span><span class="operator">,</span> <span class="variable">OrderDate</span> <span class="variable">FROM</span> <span class="variable">Orders</span>
+     <span class="variable">WHERE</span> <span class="variable">CustomerID</span> <span class="operator">=</span> <span class="regex">? AND OrderDate &gt;= ?</span><span class="variable">$$</span><span class="operator">,</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'VINET'</span><span class="operator">,</span> <span class="string">'1997-01-01'</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'VARCHAR'</span><span class="operator">,</span> <span class="string">'DATE'</span><span class="operator">]</span>
+  <span class="operator">)</span> <span class="variable">as</span> <span class="regex">s("OrderID" int, "OrderDate" timestamp);
+  </span>
+</pre>
+<p><strong>Important note: column definition list is required</strong></p>
+<p>You can write custom function that wraps <code>query()</code> with proper column definition list,
+or use persistent accessors.</p>
+<p>
+</p>
+<h2><a name="data_modification_and_ddl_queries">Data modification and DDL queries</a></h2>
+<p>Function family for non-returning data ad-hoc queries:</p>
+<ul>
+<li>
+<p><code>dbix_pglink.exec</code>(<em>conn_name</em>, <em>query_text</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.exec</code>(<em>conn_name</em>, <em>query_text</em>, <em>param_values</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.exec</code>(<em>conn_name</em>, <em>query_text</em>, <em>param_values</em>, <em>param_types</em>)</p>
+</li>
+</ul>
+<p>Example:</p>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="keyword">exec</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$UPDATE</span> <span class="variable">Orders</span> <span class="variable">SET</span> <span class="variable">OrderDate</span><span class="operator">=</span><span class="string">'2000-01-01'</span> <span class="variable">WHERE</span> <span class="variable">OrderID</span><span class="operator">=</span><span class="number">42</span><span class="variable">$$</span>
+  <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="keyword">exec</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$INSERT</span> <span class="variable">INTO</span> <span class="variable">Orders</span> <span class="operator">(</span><span class="variable">CustomerID</span><span class="operator">,</span><span class="variable">EmployeeID</span><span class="operator">,</span><span class="variable">OrderDate</span><span class="operator">)</span> <span class="variable">VALUES</span> <span class="operator">(</span><span class="regex">?,?</span><span class="operator">,</span><span class="regex">?)$$,
+    ARRAY['foo','5','2001-01-01']
+  );
+  </span>
+</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="keyword">exec</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$UPDATE</span> <span class="variable">Orders</span> <span class="variable">SET</span> <span class="variable">OrderDate</span><span class="operator">=</span><span class="regex">? WHERE OrderID=?</span><span class="variable">$$</span><span class="operator">,</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'2000-01-01'</span><span class="operator">,</span> <span class="string">'42'</span><span class="operator">]</span><span class="operator">,</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'DATE'</span><span class="operator">,</span> <span class="string">'INTEGER'</span><span class="operator">]</span>
+  <span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="keyword">exec</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span>
+    <span class="variable">$$CREATE</span> <span class="variable">VIEW</span> <span class="variable">MyOrders</span> <span class="variable">AS</span> <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">Orders</span> <span class="variable">WHERE</span> <span class="variable">EmployeeID</span><span class="operator">=</span><span class="number">5</span><span class="variable">$$</span>
+  <span class="operator">);</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="transactions">TRANSACTIONS</a></h1>
+<ul>
+<li>
+<p><code>dbix_pglink.begin</code>(<em>conn_name</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.rollback</code>(<em>conn_name</em>)</p>
+</li>
+<li>
+<p><code>dbix_pglink.commit</code>(<em>conn_name</em>)</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="disconnection">DISCONNECTION</a></h1>
+<ul>
+<li>
+<p><code>dbix_pglink.disconnect</code>(<em>conn_name</em>)</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="persistent_accessors">PERSISTENT ACCESSORS</a></h1>
+<p>Accessor is mapping of remote database object to local object.</p>
+<p>The benefits of accessors:</p>
+<ul>
+<li>
+<p>No need to describe output result-set for every query</p>
+</li>
+<li>
+<p>Provides safe access to remote database</p>
+<p>By default, users have no priveleges to any accessor. 
+You can grant/revoke permission as for usual PostgreSQL object.</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="building_accessors">Building accessors</a></h2>
+<p>SELECT dbix_pglink.build_accessors(
+<em>conn_name</em>, <em>local_schema</em>,
+<em>remote_catalog</em>, <em>remote_schema</em>, <em>remote_object</em>,
+<em>remote_object_types</em>, <em>object_name_mapping</em>
+);</p>
+<p>or</p>
+<p>SELECT dbix_pglink.build_accessors(<em>conn_name</em>, <em>local_schema</em>, <em>remote_schema</em>);</p>
+<p>where</p>
+<dl>
+<dt><strong><a name="item_local_schema"><em>local_schema</em> (TEXT)</a></strong>
+
+<dd>
+<p>Name of local PostgreSQL schema where accessors will be created.</p>
+</dd>
+<dd>
+<p>Schema created automatically if not exists.</p>
+</dd>
+</li>
+<dt><strong><a name="item_remote_object"><em>remote_catalog</em>, <em>remote_schema</em>, <em>remote_object</em> (TEXT)</a></strong>
+
+<dd>
+<p>Used for enumeration of remote objects. Like pattern allow '%' to list all objects.</p>
+</dd>
+<dd>
+<p>(<em>remote_catalog</em> is database name for Sybase/MSSQL)</p>
+</dd>
+</li>
+<dt><strong><a name="item_remote_object_types"><em>remote_object_types</em> (array of TEXT)</a></strong>
+
+<dd>
+<p>Mandatory. Specify object types like 'TABLE', 'VIEW', 'FUNCTION', 'PROCEDURE'</p>
+</dd>
+</li>
+<dt><strong><a name="item_object_name_mapping"><em>object_name_mapping</em> (array of TEXT)</a></strong>
+
+<dd>
+<p>Can be NULL. Each array element must have format 'remote_name=&gt;local_name'.</p>
+</dd>
+</li>
+</dl>
+<p>Creates function-based view for remote table/view and function for remote routine (stored procedure/function).</p>
+<p>Old accessors will be dropped unless exists dependent user objects.</p>
+<p>If you want to rebuild accessor you must drop dependent object manually
+or change its definition.</p>
+<p>To relax dependency chain in PL/PgSQL use dynamic EXECUTE.</p>
+<p>Example:</p>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">build_accessors</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">connection</span> <span class="variable">name</span>
+    <span class="string">'northwind'</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">new</span> <span class="keyword">local</span> <span class="variable">schema</span>
+    <span class="string">'dbo'</span>        <span class="operator">--</span><span class="variable">remote</span> <span class="variable">schema</span> <span class="operator">(</span><span class="variable">owner</span><span class="operator">)</span>
+  <span class="operator">);</span>
+</pre>
+<pre>
+  or</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">build_accessors</span><span class="operator">(</span>
+    <span class="string">'NORTHWIND'</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">connection</span> <span class="variable">name</span>
+    <span class="string">'northwind'</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">new</span> <span class="keyword">local</span> <span class="variable">schema</span>
+    <span class="string">'northwind'</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">remote</span> <span class="variable">catalog</span> <span class="operator">(</span><span class="variable">database</span><span class="operator">)</span>
+    <span class="string">'dbo'</span><span class="operator">,</span>       <span class="operator">--</span><span class="variable">remote</span> <span class="variable">schema</span> <span class="operator">(</span><span class="variable">owner</span><span class="operator">)</span>
+    <span class="string">'%'</span><span class="operator">,</span>         <span class="operator">--</span><span class="variable">all</span> <span class="variable">remote</span> <span class="variable">objects</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'TABLE'</span><span class="operator">,</span><span class="string">'VIEW'</span><span class="operator">,</span><span class="string">'PROCEDURE'</span><span class="operator">]</span><span class="operator">,</span> <span class="operator">--</span><span class="variable">object</span> <span class="variable">types</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span>
+      <span class="string">'Alphabetical list of products'</span><span class="operator">,</span> <span class="string">'products_with_category'</span><span class="operator">,</span>
+      <span class="string">'Current Product List'</span><span class="operator">,</span> <span class="string">'products'</span>
+    <span class="operator">]</span>  <span class="operator">--</span><span class="variable">name</span> <span class="variable">mapping</span>
+  <span class="operator">);</span>
+</pre>
+<p>
+</p>
+<h3><a name="stored_procedures">Stored procedures</a></h3>
+<p>Notes for Microsoft SQL Server / Sybase ASE users:</p>
+<ul>
+<li>
+<p>In general, stored procedure have no fixed resultset
+and therefore cannot be used as PostgreSQL function.
+PgLink adapter tries to detect resultset of procedure, calling it with NULL parameters in FMTONLY mode.
+It works only if procedure output same resultset structure for every input 
+and does not exit before returning resultset (when checks input parameters).</p>
+<p>You can create accessor for procedure with explicit resultset:</p>
+<p><code>dbix_pglink.build_procedure</code>(<em>conn_name</em>, <em>local_schema</em>, <em>remote_catalog</em>, <em>remote_schema</em>, <em>remote_procedure</em>, <em>local_name</em>, <em>column_info</em>)</p>
+<p>where <em>column_info</em> is array of text containing pairs of 'column_name', 'remote_type'.</p>
+<pre>
+  <span class="operator">--</span><span class="variable">function</span> <span class="variable">installed</span> <span class="variable">with</span> <span class="variable">Connector</span> <span class="variable">role</span> <span class="string">'SQLServerProc'</span>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">set_role</span><span class="operator">(</span><span class="string">'NORTHWIND'</span><span class="operator">,</span><span class="string">'Connector'</span><span class="operator">,</span><span class="string">'SQLServerProc'</span><span class="operator">);</span>
+  <span class="operator">--</span><span class="variable">reconnect</span> <span class="variable">needed</span>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">disconnect</span><span class="operator">(</span><span class="string">'NORTHWIND'</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="variable">SELECT</span> <span class="variable">dbix_pglink</span><span class="operator">.</span><span class="variable">build_procedure</span><span class="operator">(</span><span class="string">'NORTHWIND'</span><span class="operator">,</span> <span class="string">'northwind'</span><span class="operator">,</span> <span class="string">'Northwind'</span><span class="operator">,</span> <span class="string">'dbo'</span><span class="operator">,</span> <span class="string">'CustOrderHist'</span><span class="operator">,</span>
+    <span class="variable">ARRAY</span><span class="operator">[</span>
+      <span class="string">'ProductName'</span><span class="operator">,</span> <span class="string">'NVARCHAR'</span><span class="operator">,</span>
+      <span class="string">'Total'</span><span class="operator">,</span> <span class="string">'INT'</span>
+    <span class="operator">]</span>
+  <span class="operator">);</span>
+</pre>
+</li>
+<li>
+<p>Procedure return code and output parameters are not supported</p>
+</li>
+<li>
+<p>Multiple resultsets are not supported</p>
+</li>
+</ul>
+<p>
+</p>
+<h2><a name="using_accessors">Using accessors</a></h2>
+<p>For each table or view created several functions and one updatetable view.</p>
+<p>For each routine created one function.</p>
+<p>
+</p>
+<h3><a name="accessor_functions_for_table_view">Accessor functions for table/view</a></h3>
+<ul>
+<li>
+<p><em>table</em>$()</p>
+<p>Fetch all data rows from table or view (but see <a href="#query_filter">Query filter</a> below).</p>
+<p><em>table</em> is table or view name, with '$' suffix appended.
+Suffix prevents name clash of table and function accessors.</p>
+</li>
+<li>
+<p><em>table</em>$(<em>where</em>, <em>param_values</em>, <em>param_types</em>)</p>
+<p><em>where</em> is literal WHERE clause, appended to SELECT statement that will be executed on remote database.</p>
+<p>This is effective way to limit number of fetched rows, but require forming of literal SQL with proper value quoting.</p>
+<p>By default, no SQL check performed, so it opens a security hole to remote database.
+You can add basic checks with optional adapter role <code>CheckWhereClause</code>, which requires <a href="../../../../../site/SQL/Statement.html">the SQL::Statement manpage</a> module.
+<code>CheckWhereClause</code> role pass only basic ANSI SQL statement.</p>
+<p><em>param_values</em> is array of TEXT, that elements will be binded.</p>
+<p><em>param_types</em> is array of TEXT.</p>
+</li>
+</ul>
+<p>Example:</p>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">rows</span> <span class="variable">from</span> <span class="variable">table</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders$"</span><span class="operator">();</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">rows</span> <span class="operator">(</span><span class="variable">BAD</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">apply</span> <span class="keyword">local</span> <span class="variable">condition</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders$"</span><span class="operator">()</span> <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">apply</span> <span class="variable">condition</span> <span class="variable">on</span> <span class="variable">remote</span> <span class="variable">site</span> <span class="keyword">and</span> <span class="variable">fetch</span> <span class="variable">only</span> <span class="variable">needed</span> <span class="variable">rows</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders$"</span><span class="operator">(</span><span class="string">'WHERE OrderID = 1'</span><span class="operator">,</span> <span class="keyword">NULL</span><span class="operator">,</span> <span class="keyword">NULL</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">same</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders$"</span><span class="operator">(</span><span class="string">'WHERE OrderID = ?'</span><span class="operator">,</span> <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'1'</span><span class="operator">]</span><span class="operator">,</span> <span class="keyword">NULL</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">same</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders$"</span><span class="operator">(</span><span class="string">'WHERE OrderID = ?'</span><span class="operator">,</span> <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'1'</span><span class="operator">]</span><span class="operator">,</span> <span class="variable">ARRAY</span><span class="operator">[</span><span class="string">'integer'</span><span class="operator">]</span><span class="operator">);</span>
+</pre>
+<pre>
+  --stored procedure call
+  SELECT * FROM northwind.&quot;CustOrderHist&quot;('VINET')</pre>
+<p>
+</p>
+<h3><a name="accessor_view">Accessor view</a></h3>
+<p>Accessor view built on accessor function without arguments
+and fetch all rows (but see <a href="#query_filter">Query filter</a> below).</p>
+<p>Example:</p>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">rows</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">rows</span> <span class="operator">(</span><span class="variable">BAD</span><span class="operator">)</span> <span class="keyword">and</span> <span class="variable">apply</span> <span class="keyword">local</span> <span class="variable">filter</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<h3><a name="modification_of_table_view">Modification of table/view</a></h3>
+<p>Each table/view accessor view has rules that make it updatable.</p>
+<p>UPDATE/DELETE queries first fetch all data rows from accessor view,
+than apply local WHERE condition,
+than post changes back row-by-row.</p>
+<p>This is a major flaw both in <em>dbi_link</em> project and <em>DBIx::PgLink</em>.</p>
+<p><strong>Do not use SELECT, UPDATE, DELETE on large table without query filter!</strong></p>
+<p>INSERT queries do not fetch remote data and relatively fast
+(but 2-3x times slower than plain DBI).</p>
+<p>Accessor has statement-level trigger that start remote transaction before local statement and commit it after.</p>
+<p>There is unresolved problem with transaction coordination and error handling.
+Remote transaction rollback only if error occurs for row processing on remote site, 
+but stalls if error occured at local database before local statement end.
+You need explicitly call <code>SELECT dbix_pglink.rollback()</code> in exception handler of your application.
+2PC protocol is not used.</p>
+<p>Each SQL statement stored in <em>dbix_pglink.queries</em> table and can be manually tuned
+(and SELECT statement as well).</p>
+<p>Updated/deleted rows must be located by <em>search key</em>.
+If table has primary key and DBD can recognise it, than primary key columns used as search key.
+Otherwise search key contains all table columns.</p>
+<p>Example:</p>
+<pre>
+  <span class="variable">INSERT</span> <span class="variable">INTO</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="operator">(</span><span class="string">"CustomerID"</span><span class="operator">,</span> <span class="string">"EmployeeID"</span><span class="operator">,</span> <span class="string">"OrderDate"</span><span class="operator">)</span>
+  <span class="variable">VALUES</span> <span class="operator">(</span><span class="string">'foo'</span><span class="operator">,</span> <span class="number">5</span><span class="operator">,</span> <span class="string">'2001-01-01'</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">data</span> <span class="operator">(</span><span class="variable">BAD</span><span class="operator">),</span> <span class="variable">apply</span> <span class="keyword">local</span> <span class="variable">condition</span>
+  <span class="variable">UPDATE</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="variable">SET</span> <span class="string">"OrderDate"</span> <span class="operator">=</span> <span class="string">'2001-01-01'</span>
+  <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">fetch</span> <span class="variable">all</span> <span class="variable">data</span> <span class="operator">(</span><span class="variable">BAD</span><span class="operator">),</span> <span class="variable">apply</span> <span class="keyword">local</span> <span class="variable">condition</span>
+  <span class="variable">DELETE</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<p>
+</p>
+<h3><a name="query_filter">Query filter</a></h3>
+<p>Currently, PostgreSQL don't have parametrized views
+and PL/Perl can't get text of SQL query that call function.</p>
+<p>Query filter is a way to pass WHERE-clause to SELECT accessor (which used in UPDATE and DELETE too).
+It is not elegant solution, but do the job: 
+update/delete of remote table does not require fetching of all table.</p>
+<p>The worse disadvantage is that you need to repeat select criteria twice.</p>
+<p>Each table accessor has two functions:</p>
+<dl>
+<dt><strong><a name="item_table_set_filter"><em>table</em><code>_set_filter</code>(<em>where</em>, <em>param_values</em>, <em>param_types</em>)</a></strong>
+
+<dd>
+<p>Remember supplied WHERE-clause and parameters.
+Arguments stored as session global variable and used until disconnect or reset.</p>
+</dd>
+</li>
+<dt><strong><a name="item_table_reset_filter"><em>table</em><code>_reset_filter</code>()</a></strong>
+
+<dd>
+<p>Clear stored WHERE-clause and parameters.</p>
+</dd>
+</li>
+</dl>
+<p>Note, that in UPDATE/DELETE operation filter is NOT applied to each modified row.
+Each row located by search key only.
+This is feature, not a bug: you can set broad &quot;window&quot; of remote data
+just to limit traffic and apply precise condition on PostgreSQL side.</p>
+<p>Filter stored in global session variable for each accessor and not transactional.</p>
+<p>Example:</p>
+<pre>
+  <span class="operator">--</span><span class="variable">set</span> <span class="variable">filter</span> <span class="operator">(</span><span class="keyword">no</span> <span class="variable">actual</span> <span class="variable">data</span> <span class="variable">fetch</span><span class="operator">)</span>
+  <span class="variable">SELECT</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders_set_filter"</span><span class="operator">(</span><span class="string">'WHERE EmployeeID = 5'</span><span class="operator">,</span> <span class="variable">null</span><span class="operator">,</span> <span class="variable">null</span><span class="operator">);</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">now</span> <span class="variable">all</span> <span class="variable">SELECT</span><span class="operator">/</span><span class="variable">UPDATE</span><span class="operator">/</span><span class="variable">DELETEs</span> <span class="variable">work</span> <span class="variable">with</span> <span class="variable">subset</span> <span class="variable">of</span> <span class="variable">table</span> <span class="variable">with</span> <span class="variable">EmployeeID</span><span class="operator">=</span><span class="number">5</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">update</span> <span class="variable">filtered</span> <span class="variable">rows</span> <span class="variable">with</span> <span class="variable">EmployeeID</span> <span class="operator">=</span> <span class="number">5</span>
+  <span class="variable">UPDATE</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="variable">SET</span> <span class="string">"OrderDate"</span><span class="operator">=</span><span class="string">'2001-01-01'</span>
+  <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span> <span class="keyword">and</span> <span class="string">"EmployeeID"</span> <span class="operator">=</span> <span class="number">5</span><span class="operator">;</span> <span class="operator">--</span><span class="variable">double</span><span class="operator">-</span><span class="variable">check</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="keyword">do</span> <span class="variable">the</span> <span class="variable">same</span>
+  <span class="variable">UPDATE</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span> <span class="variable">SET</span> <span class="string">"OrderDate"</span><span class="operator">=</span><span class="string">'2001-01-01'</span>
+  <span class="variable">WHERE</span> <span class="string">"OrderID"</span> <span class="operator">=</span> <span class="number">1</span><span class="operator">;</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">remove</span> <span class="variable">filter</span>
+  <span class="variable">SELECT</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders_reset_filter"</span><span class="operator">();</span>
+</pre>
+<pre>
+  <span class="operator">--</span><span class="variable">now</span> <span class="variable">query</span> <span class="variable">returns</span> <span class="variable">whole</span> <span class="variable">table</span>
+  <span class="variable">SELECT</span> <span class="operator">*</span> <span class="variable">FROM</span> <span class="variable">northwind</span><span class="operator">.</span><span class="string">"Orders"</span><span class="operator">;</span>
+</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../../site/lib/DBIx/PgLink/Manual/Install.html">the DBIx::PgLink::Manual::Install manpage</a>,
+<a href="http://pgfoundry.org/projects/dbi-link/">http://pgfoundry.org/projects/dbi-link/</a></p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Alexey Sharafutdinov &lt;<a href="mailto:alexey.s.v.br@gmail.com">alexey.s.v.br@gmail.com</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2007 by Alexey Sharafutdinov</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.</p>
+<p><a href="#__index__"><small>Back to Top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;DBIx::PgLink::Manual::Usage</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

@@ -1,0 +1,368 @@
+NAME
+    Dir::Split - Split files of a directory to subdirectories
+
+SYNOPSIS
+     use Dir::Split;
+
+     # example arguments
+     $dir = Dir::Split->new(
+         mode    =>    'num',
+
+         source  =>    '/source',
+         target  =>    '/target',
+
+         verbose     =>        1,
+         override    =>        0,
+
+         identifier  =>    'sub',
+         file_limit  =>        2,
+         file_sort   =>      '+',
+
+         separator   =>      '-',
+         continue    =>        1,
+         length      =>        5,
+     );
+
+     $retval = $dir->split_dir;
+
+DESCRIPTION
+    "Dir::Split" moves files to either numbered or characteristic
+    subdirectories.
+
+  numeric splitting
+    Numeric splitting is an attempt to gather files from a source directory
+    and split them to numbered subdirectories within a target directory. Its
+    purpose is to automate the archiving of a great amount of files, that
+    are likely to be indexed by numbers.
+
+  characteristic splitting
+    Characteristic splitting allows indexing by using leading characters of
+    filenames. While numeric splitting is being characterised by dividing
+    file amounts, characteristic splitting tries to keep up the contentual
+    recognition of data.
+
+CONSTRUCTOR
+  new
+    Creates a new "Dir::Split" object.
+
+     # example arguments
+     $dir = Dir::Split->new(
+         mode    =>    'num',
+
+         source  =>    '/source',
+         target  =>    '/target',
+
+         verbose     =>        1,
+         override    =>        0,
+
+         identifier  =>    'sub',
+         file_limit  =>        2,
+         file_sort   =>      '+',
+
+         separator   =>      '-',
+         continue    =>        1,
+         length      =>        5,
+     );
+
+     $dir = Dir::Split->new(%args);
+
+METHODS
+  split_dir
+    Splits files to subdirectories.
+
+     $retval = $dir->split_dir;
+
+    Checking the return value will provide further insight, what action
+    split_dir() has taken. See (OPTIONS / debug) on how to become aware of
+    errors.
+
+   Return Values
+      1 / $ACTION           Files splitted
+
+      0 / $NOACTION         No action
+
+     -1 / $EXISTS           Files exist
+                            (see OPTIONS / debug)
+
+     -2 / $FAILURE          Failure
+                            (see OPTIONS / debug)
+
+ARGUMENTS
+  numeric
+    Split files to subdirectories with a numeric suffix.
+
+     %args = (
+         mode    =>    'num',
+
+         source  =>    '/source',
+         target  =>    '/target',
+
+         verbose     =>        1,
+         override    =>        0,
+
+         identifier  =>    'sub',
+         file_limit  =>        2,
+         file_sort   =>      '+',
+
+         separator   =>      '-',
+         continue    =>        1,
+         length      =>        5,
+     );
+
+    * "mode"
+        *num* for numeric.
+
+    * "source"
+        source directory.
+
+    * "target"
+        target directory.
+
+    * "verbose"
+        if enabled, mkpath will output the paths on creating subdirectories.
+
+         MODES
+           1  enabled
+           0  disabled
+
+    * "override"
+        overriding of existing files.
+
+         MODES
+           1  enabled
+           0  disabled
+
+    * "identifier"
+        prefix of each subdirectory created.
+
+    * "file_limit"
+        limit of files per subdirectory.
+
+    * "file_sort"
+        sort order of files.
+
+         MODES
+           +  ascending
+           -  descending
+
+    * "separator"
+        suffix separator.
+
+    * "continue"
+        numbering continuation.
+
+         MODES
+           1  enabled
+           0  disabled    (will start at 1)
+
+        If numbering continuation is enabled, and numbered subdirectories
+        are found within target directory which match the given identifier
+        and separator, then the suffix numbering will be continued.
+        Disabling numbering continuation may interfere with existing files /
+        directories.
+
+    * "length"
+        character length of the suffix.
+
+        This option will have no effect, if its smaller in length than the
+        current length of the highest suffix number.
+
+  characteristic
+    Split files to subdirectories with a characteristic suffix. Files are
+    assigned to subdirectories which suffixes equal the specified, leading
+    character(s) of the filenames.
+
+     %args = (
+         mode    =>    'char',
+
+         source  =>    '/source',
+         target  =>    '/target',
+
+         verbose     =>         1,
+         override    =>         0,
+
+         identifier  =>     'sub',
+
+         separator   =>       '-',
+         case        =>   'upper',
+         length      =>         1,
+     );
+
+    * "mode"
+        *char* for characteristic.
+
+    * "source"
+        source directory.
+
+    * "target"
+        target directory.
+
+    * "verbose"
+        if enabled, mkpath will output the pathes on creating
+        subdirectories.
+
+         MODES
+           1  enabled
+           0  disabled
+
+    * "override"
+        overriding of existing files.
+
+         MODES
+           1  enabled
+           0  disabled
+
+    * "identifier"
+        prefix of each subdirectory created.
+
+    * "separator"
+        suffix separator.
+
+    * "case"
+        lower / upper case of the suffix.
+
+         MODES
+           lower
+           upper
+
+    * "length"
+        character length of the suffix.
+
+        < 4 is highly recommended (26 (alphabet) ^ 3 == 17'576 suffix
+        possibilites). "Dir::Split" will not prevent using suffix lengths
+        greater than 3. Imagine splitting 1'000 files and using a character
+        length > 20. The file rate per subdirectory will almost certainly
+        approximate 1/1 - which equals 1'000 subdirectories.
+
+        Whitespaces in suffixes will be removed.
+
+OPTIONS
+  Tracking
+    %Dir::Split::track keeps count of how many files the source and
+    directories / files the target consists of. It may be useful, if the
+    amount of files that could not be transferred due to existing ones, has
+    to be counted. Each time a new splitting is attempted, the track will be
+    reseted.
+
+     %Dir::Split::track = (
+         source  =>    {  files  =>    512
+         },
+         target  =>    {  dirs   =>    128,
+                          files  =>    512,
+         },
+     );
+
+    Above example: directory consisting of 512 files successfully splitted
+    to 128 directories.
+
+  Debug
+    Existing
+
+    If "split_dir()" returns $EXISTS, this implys that the override option
+    is disabled and files weren't moved due to existing files within the
+    target subdirectories; they will have their paths appearing in
+    @Dir::Split::exists.
+
+     file    @Dir::Split::exists    # Existing files, not attempted to
+                                    # be overwritten.
+
+    Failures
+
+    If "split_dir()" returns $FAILURE, this most often implys that the
+    override option is enabled and existing files could not be overwritten.
+    Files that could not be copied / unlinked, will have their paths
+    appearing in the according keys in %Dir::Split::failure.
+
+     file    @{$Dir::Split::failure{copy}}      # Files that couldn't be copied,
+                                                # most often on overriding failures.
+
+             @{$Dir::Split::failure{unlink}}    # Files that could be copied but not unlinked,
+                                                # rather seldom.
+
+    It is recommended to evaluate those arrays on $FAILURE.
+
+    A @Dir::Split::exists array may coexist.
+
+  Unlinking
+    Files in a flat source directory may be unlinked by setting:
+
+     # Unlink files in flat source
+     $Dir::Split::UNLINK = 1;
+
+  Traversing
+    Traversal processing of files may be activated by setting:
+
+     # Traversal mode
+     $Dir::Split::TRAVERSE = 1;
+
+    No depth limit e.g. all underlying directories / files will be
+    evaluated.
+
+    Options
+
+     # Unlink files in source
+     $Dir::Split::TRAVERSE_UNLINK = 1;
+
+    Unlinks files after they have been moved to their new locations.
+
+     # Remove directories in source
+     $Dir::Split::TRAVERSE_RMDIR = 1;
+
+    Removes the directories in source, after the files have been moved. In
+    order to take effect, this option requires the
+    $Dir::Split::TRAVERSE_UNLINK to be set.
+
+     # Remove the source directory itself
+     $Dir::Split::TRAVERSE_RMDIR_SOURCE = 1;
+
+    It is not recommended to turn on the latter options
+    $Dir::Split::TRAVERSE_UNLINK, $Dir::Split::TRAVERSE_RMDIR and
+    $Dir::Split::TRAVERSE_RMDIR_SOURCE, unless one is aware of the
+    consequences they imply.
+
+EXAMPLES
+    Assuming the source directory contains these files:
+
+     +- _123
+     +- abcd
+     +- efgh
+     +- ijkl
+     +- mnop
+
+    After splitting the source directory tree to the target, it would result
+    in:
+
+  numeric splitting
+     +- sub-00001
+     +-- _123
+     +-- abcd
+     +- sub-00002
+     +-- efgh
+     +-- ijkl
+     +- sub-00003
+     +-- mnop
+
+  characteristic splitting
+     +- sub-_
+     +-- _123
+     +- sub-a
+     +-- abcd
+     +- sub-e
+     +-- efgh
+     +- sub-i
+     +-- ijkl
+     +- sub-m
+     +-- mnop
+
+SEE ALSO
+    File::Basename, File::Copy, File::Find, File::Path, File::Spec
+
+AUTHOR
+    Steven Schubiger <schubiger@cpan.org>
+
+LICENSE
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

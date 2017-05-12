@@ -1,0 +1,17 @@
+Mixin
+=====
+
+Make your applications and modules easier to debug
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

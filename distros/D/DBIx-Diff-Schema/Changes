@@ -1,0 +1,52 @@
+Revision history for DBIx-Diff-Schema
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-05-20 (PERLANCAR)
+
+	- Skip index when listing tables.
+
+
+0.05    2015-04-24 (PERLANCAR)
+
+        - Add functions: db_schema_eq(), table_schema_eq().
+
+        - diff_table_schema(): Check table existence first.
+
+        - diff_table_schema(): Allow specifying second database's table name
+          should it differ from the first database's table name.
+
+        - Replace Log::Any with Log::Any::IfLOG.
+
+
+0.04    2015-01-07 (PERLANCAR)
+
+        - Rename dist/module from DBIx-Diff-Struct to DBIx-Diff-Schema ("schema"
+          is the more common term in database parlance). Function name is also
+          changed from diff_db_{struct,schema}.
+
+
+0.03    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.02    2014-09-12 (PERLANCAR)
+
+        - No functional changes.
+
+        - Rebuild with updated Dist::Zilla::Plugin::Rinci::Validate.
+
+
+0.01    2014-09-12 (PERLANCAR)
+
+        - First release.

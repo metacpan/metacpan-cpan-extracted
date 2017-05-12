@@ -1,0 +1,60 @@
+---
+abstract: 'Have annotated source manifest'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Dist::Zilla::Plugin::ExecDir: '0'
+  Dist::Zilla::Plugin::ShareDir: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  POSIX: '0'
+  Test::Deep: '0'
+  Test::DiagINC: '0.002'
+  Test::Dist::Zilla::Build: '0'
+  Test::Dist::Zilla::BuiltFiles: v0.3.3
+  Test::More: '0'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  blib: '1.01'
+  if: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Manifest-Read
+provides:
+  Dist::Zilla::Plugin::Manifest::Read:
+    file: lib/Dist/Zilla/Plugin/Manifest/Read.pm
+    version: v0.5.0
+requires:
+  Dist::Zilla::File::OnDisk: '0'
+  Dist::Zilla::Plugin::FinderCode: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  Dist::Zilla::Role::FileFinder: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  List::Util: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Set::Object: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  version: '0.77'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Manifest-Read
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Manifest-Read
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-Manifest-Read
+version: v0.5.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

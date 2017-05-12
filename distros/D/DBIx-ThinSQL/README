@@ -1,0 +1,327 @@
+NAME
+    DBIx::ThinSQL - A lightweight SQL helper for DBI
+
+VERSION
+    0.0.48 (2016-11-01) development release.
+
+SYNOPSIS
+        use strict;
+        use warnings;
+        use DBIx::ThinSQL qw/ bv qv /;
+
+        my $db = DBIx::ThinSQL->connect(
+            'dbi:Driver:...'
+            'username',
+            'password',
+        );
+
+        # Some basic CrUD statements to show the simple stuff first. Note
+        # the inline binding of data that you normally have to call
+        # $dbh->bind_param() on.
+
+        my $success = $db->xdo(
+            insert_into => 'actors',
+            values      => {
+                id    => 1,
+                name  => 'John Smith',
+                photo => bv( $image, DBI::SQL_BLOB ),
+            },
+        );
+
+        # A "where" with a HASHref "AND"s the elements together
+
+        my $count = $db->xdo(
+            update => 'actors',
+            set    => { name => 'Jack Smith' },
+            where  => { id => 1, name => \'IS NOT NULL' },
+        );
+
+        # A "where" with an ARRAYref concatenates items together. Note the
+        # string that is quoted according to the database type.
+
+        my $count = $db->xdo(
+            delete_from => 'actors',
+            where       => [
+                'actor_id = 1', ' OR ',
+                'last_name != ', qv("Jones", DBI::SQL_VARCHAR ),
+            ],
+        );
+
+        # Methods for reading from the database depend on the type of
+        # structure you want back: arrayref or hashref references.
+
+        my $ref = $db->xhashref(
+            select => [ 'id', 'name', qv("Some string") ],
+            from   => 'actors',
+            where  => [
+                'id = ', qv( 1, DBI::SQL_INTEGER ),
+                ' AND photo IS NOT NULL',
+            ],
+            limit  => 1,
+        );
+
+        $db->xdo(
+            insert_into => [ 'table', 'col1', 'col2', 'col3' ],
+            select => [ 't1.col3', 't3.col4', bv( 'value', DBI::SQL_VARCHAR ) ],
+            from   => 'table AS t1',
+            inner_join => 'other_table AS t2',
+            on         => 't1.something = t2.else',
+            left_join  => 'third_table AS t3',
+            on    => [ 't3.dont = t1.care AND t1.fob = ', qv( 1, DBI::SQL_INT ) ],
+            where => [],
+            order_by => [ 't3.dont', 't1.col4' ],
+            limit    => 2,
+        );
+
+        $db->txn( sub {
+            # Anything you like, done inside a BEGIN/COMMIT pair, with
+            # nested calls to txn() done inside a SAVEPOINT/RELEASE pair.
+        })
+
+DESCRIPTION
+    Sorry, this documentation is invalid or out of date.
+
+    DBIx::ThinSQL is an extension to the Perl Database Interface (DBI). It
+    is designed for complicated queries and efficient access to results.
+    With an API that lets you easily write almost-raw SQL, DBIx::ThinSQL
+    gives you unfettered access to the power and flexibility of your
+    underlying database. It aims to be a tool for programmers who want their
+    databases to work just as hard as their Perl scripts.
+
+    DBIx::ThinSQL gives you access to aggregate expressions, joins, nested
+    selects, unions and database-side operator invocations. Transactional
+    support is provided via DBIx::Connector. Security conscious coders will
+    be pleased to know that all user-supplied values are bound properly
+    using DBI "bind_param()". Binding binary data is handled transparently
+    across different database types.
+
+    DBIx::ThinSQL offers a couple of very simple Create, Retrieve, Update
+    and Delete (CRUD) action methods. These are designed to get you up and
+    running quickly when your query data is already inside a hashref. The
+    methods are abstractions of the real API, but should still read as much
+    as possible like SQL.
+
+    Although rows can be retrieved from the database as simple objects,
+    DBIx::ThinSQL does not attempt to be an Object-Relational-Mapper (ORM).
+    There are no auto-inflating columns or automatic joins and the code size
+    and speed reflect the lack of complexity.
+
+    DBIx::ThinSQL uses the light-weight Log::Any for logging.
+
+CONSTRUCTOR
+    Works like a normal DBI. Can be used with things like DBIx::Connector to
+    get nice transaction support.
+
+DBH METHODS
+    share_dir -> Path::Tiny
+        Returns the path to the distribution share directory. If
+        $DBIx::ThinSQL::SHARE_DIR is set then that value will be returned
+        instead of the default method which uses File::ShareDir.
+
+    throw_error
+        If DBIX::ThinSQL or a statement raises an exception then the
+        "throw_error()" method will be called. By default it just croaks but
+        classes that inherit from DBIx::ThinSQL can override it. The
+        original use case was to turn database error text into blessed
+        objects.
+
+    xprepare
+        Does a prepare but knows about bind values and quoted values.
+
+    xprepare_cached
+        Does a prepare_cached but knows about bind values and quoted values.
+
+    xval
+        Creates a statement handle using xprepare(), executes it, and
+        returns the result of the val() method.
+
+    xlist
+        Creates a statement handle using xprepare(), executes it, and
+        returns the result of the list() method.
+
+    xarrayref
+        Does a prepare but knows about bind values and quoted values.
+
+    xarrayrefs
+        Does a prepare but knows about bind values and quoted values.
+
+    xhashref
+        Does a prepare but knows about bind values and quoted values.
+
+    xhashrefs
+        Does a prepare but knows about bind values and quoted values.
+
+    txn( &coderef )
+        Runs the &coderef subroutine inside an SQL transaction. If &coderef
+        raises an exception then the transaction is rolled back and the
+        error gets re-thrown.
+
+        Calls to "txn" can be nested. Savepoints will be used by nested
+        "txn" calls for databases that support them.
+
+    dump( $sql, [ @bind_values ] )
+    xdump( @tokens )
+        Debugging shortcut methods. Take either an SQL string (for "dump")
+        or a set of tokens (for "xdump"), run the query, and then call the
+        "dump_results" (which pretty-prints to STDOUT) on the resulting
+        statement handle.
+
+    log_debug( $sql, [ @bind_values ] )
+        Like "dump" but sends the results to Log::Any "debug()".
+
+    log_warn( $sql, [ @bind_values ] )
+        Like "dump" but displays the results using Perl's "warn" function.
+
+STH METHODS
+    val -> SCALAR
+        Return the first value of the first row as a scalar.
+
+    list -> LIST
+        Return the first row from the query as a list.
+
+    arrayref -> ARRAYREF
+        Return the first row from the query as an array reference.
+
+    arrayrefs -> ARRAYREF
+    arrayrefs -> LIST
+        Update rows in the database and return the number of rows affected.
+        This method is retricted to the wholesale replacement of column
+        values (no database-side calculations etc). Multiple WHERE
+        key/values are only 'AND'd together. An 'undef' value maps to SQL's
+        NULL value.
+
+    hashref -> HASHREF
+        Delete rows from the database and return the number of rows
+        affected.
+
+    hashrefs -> ARRAYREF[HASHREF]
+    hashrefs -> LIST
+        Delete rows from the database and return the number of rows
+        affected.
+
+CLASS FUNCTIONS
+    The following functions can be exported individually or all at once
+    using the ':all' tag. They all return an object which can be combined
+    with or used inside other functions.
+
+    bv( $value, [ $bind_type ] ) -> DBIx::ThinSQL::BindValue
+        This function returns an object which tells DBIx::ThinSQL to bind
+        $value using a placeholder. The optional $bind_type is a database
+        type (integer, varchar, timestamp, bytea, etc) which will be
+        converted to the appropriate bind constant during a prepare() or
+        prepare_cached() call.
+
+    qv( $value )
+    AND
+    OR
+    "sq ( @subquery )" -> DBIx::ThinSQL::_expr
+        A function for including a sub query inside another:
+
+            $db->xarrayref(
+                select => 'subquery.col',
+                from   => sq(
+                    select => 'col',
+                    from   => 'table',
+                    where  => 'condition IS NOT NULL',
+                )->as('subquery'),
+            );
+
+    sql_and( @args ) -> DBIx::ThinSQL::Expr
+        Maps to "$arg1 AND $arg2 AND ...".
+
+    sql_case( @stmts ) -> DBIx::ThinSQL::Expr
+        Wraps @stmts inside a CASE/END pair while converting arguments to
+        expressions where needed.
+
+            sql_case(
+                when => $actors->name->is_null,
+                then => 'No Name',
+                else => $actors->name,
+            )->as('name')
+
+            # CASE WHEN actors0.name IS NULL
+            # THEN ? ELSE actors0.name END AS name
+
+    sql_coalesce(@args) -> DBIx::ThinSQL::Expr
+        Maps to "COALESCE($arg1, $arg2, ...)".
+
+    sql_cast($arg1, as => $arg2) -> DBIx::ThinSQL::Expr
+        Maps to "CAST( $arg1 AS $arg2 )".
+
+    sql_concat(@args) -> DBIx::ThinSQL::Expr
+        Maps to "$arg1 || $arg2 || ...".
+
+    sql_count(@args) -> DBIx::ThinSQL::Expr
+        Maps to "COUNT($arg1, $arg2, ...)".
+
+    sql_exists(@args) -> DBIx::ThinSQL::Expr
+        Maps to "EXISTS(@args)".
+
+    sql_func('myfunc', @args) -> DBIx::ThinSQL::Expr
+        Maps to "MYFUNC($arg1, $arg2, ...)".
+
+    sql_hex(@args) -> DBIx::ThinSQL::Expr
+        Maps to "HEX($arg1, $arg2, ...)".
+
+    sql_length(@args) -> DBIx::ThinSQL::Expr
+        Maps to "LENGTH(@args)".
+
+    sql_lower(@args) -> DBIx::ThinSQL::Expr
+        Maps to "LOWER(@args)".
+
+    sql_ltrim(@args) -> DBIx::ThinSQL::Expr
+        Maps to "LTRIM(@args)".
+
+    sql_max(@args) -> DBIx::ThinSQL::Expr
+        Maps to "MAX(@args)".
+
+    sql_min(@args) -> DBIx::ThinSQL::Expr
+        Maps to "MIN(@args)".
+
+    sql_rtrim(@args) -> DBIx::ThinSQL::Expr
+        Maps to "RTRIM(@args)".
+
+    sql_sum(@args) -> DBIx::ThinSQL::Expr
+        Maps to "MIN(@args)".
+
+    sql_or(@args) -> DBIx::ThinSQL::Expr
+        Maps to "$arg1 OR $arg2 OR ...".
+
+    sql_replace(@args) -> DBIx::ThinSQL::Expr
+        Maps to "REPLACE($arg1,$arg2 [,$arg3])".
+
+    sql_substr(@args) -> DBIx::ThinSQL::Expr
+        Maps to "SUBSTR($arg1, $arg2, ...)".
+
+    sql_table($name, @columns) -> DBIx::ThinSQL::Expr
+        Maps to "name(col1,col2,...)".
+
+    sql_upper(@args) -> DBIx::ThinSQL::Expr
+        Maps to "UPPER(@args)".
+
+    sql_values(@args) -> DBIx::ThinSQL::Expr
+        Maps to "VALUES($arg1, $arg2, ...)".
+
+SEE ALSO
+    Log::Any
+
+DEVELOPMENT & SUPPORT
+    DBIx::ThinSQL is managed via Github:
+
+        https://github.com/mlawren/p5-DBIx-ThinSQL/tree/devel
+
+    DBIx::ThinSQL follows a semantic versioning scheme:
+
+        http://semver.org
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013 Mark Lawrence <nomad@null.net>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+

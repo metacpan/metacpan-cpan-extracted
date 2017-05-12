@@ -1,0 +1,77 @@
+{
+   "abstract" : "to manage a multiple validation for Data::Validator",
+   "author" : [
+      "Hiroyoshi Houchi <hixi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.5",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Validator-MultiManager",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::Validator" : "1.03",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Validator::Recursive" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validator::MultiManager" : {
+         "file" : "lib/Data/Validator/MultiManager.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hixi-hyi/p5-Data-Validator-MultiManager/issues"
+      },
+      "homepage" : "https://github.com/hixi-hyi/p5-Data-Validator-MultiManager",
+      "repository" : {
+         "url" : "git://github.com/hixi-hyi/p5-Data-Validator-MultiManager.git",
+         "web" : "https://github.com/hixi-hyi/p5-Data-Validator-MultiManager"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Hiroyoshi Houchi <git@hixi-hyi.com>"
+   ]
+}

@@ -1,0 +1,48 @@
+---
+abstract: "An implementation of Data Mapper Pattern described in\nPofEAA"
+author:
+  - 'Kentaro Kuribayashi E<lt>kentarok@gmail.comE<gt>'
+build_requires:
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Mapper
+no_index:
+  directory:
+    - inc
+provides:
+  Data::Mapper:
+    file: lib/Data/Mapper.pm
+    version: 0.06
+  Data::Mapper::Adapter:
+    file: lib/Data/Mapper/Adapter.pm
+    version: 0
+  Data::Mapper::Adapter::DBI:
+    file: lib/Data/Mapper/Adapter/DBI.pm
+    version: 0
+  Data::Mapper::Class:
+    file: lib/Data/Mapper/Class.pm
+    version: 0
+  Data::Mapper::Data:
+    file: lib/Data/Mapper/Data.pm
+    version: 0
+  Data::Mapper::Schema:
+    file: lib/Data/Mapper/Schema.pm
+    version: 0
+requires:
+  Class::Load: 0
+  DBIx::Inspector: 0.06
+  SQL::Maker: 1.00
+  parent: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

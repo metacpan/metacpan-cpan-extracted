@@ -1,0 +1,10 @@
+
+== stencil ==
+
+--input--
+    <% badge '3' %>
+--end input--
+
+--output--
+    <span class="badge">3</span>
+--end output--

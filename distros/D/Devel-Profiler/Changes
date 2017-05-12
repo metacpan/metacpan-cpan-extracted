@@ -1,0 +1,60 @@
+Revision history for Perl extension Devel::Profiler.
+
+0.01  Mon May 20 14:22:00 2002
+   - First release.
+
+0.02  Wed May 22 19:30:00 2002
+   - Fixed implementation of caller() override to more closely match
+     normal behavior.
+
+   - Added fork protection like Devel::DProf - only profile the parent.
+
+   - Added code to avoid instrumenting fake subs.  For details, see: 
+
+       http://perlmonks.org/index.pl?node_id=168546
+
+   - Added code to detect constant subs and avoid profiling them.
+
+   - Added Devel::Profiler::Apache module which works like
+     Apache::DProf to provide profiling for Apache/mod_perl.
+
+   - Added check for dprofpp to Makefile.PL - thanks are due to
+     "Automated Perl Test Account" for the catch.
+
+   - Fixed bug under Test::More version 0.44 where Test::More was
+     confused by my attempts to test skip() itself.  Thanks to Andreas
+     Marcel Riechert for the report.
+
+   - Added package_filter option to allow more flexible control over
+     packages to be profiled.  Thanks to Simon Rosenthal for inspiring
+     this feature.
+
+0.03  Tue Jun  4 16:54:03 EDT 2002
+   - Added hz option and code to scale output the hz.  This should
+     improve speed and smooth discrepencies between the accuracy of
+     times() and Time::HiRes.
+
+   - Added ability to pass options to Devel::Profiler::Apache.
+
+   - Allow package_filter to take an array of filters.
+
+   - Fixed bug where Devel::Profiler::Apache would initialize
+     Devel::Profiler more than once, resulting in garbled output.
+
+   - Set required Perl version to 5.6.0 rather than 5.6.1.  Testing
+     needed.
+
+   - Devel::Profiler::Apache now logs when it opens a new profiler
+     output file.
+
+   - Added sub_filter option to allow flexible exclusion of subs.
+
+   - Added Devel::Profiler::Apache to MANIFEST.  Now it will actually
+     be incldued in the release!  Thanks Jasper Zhao for the spot.
+
+0.04 Mon Jun 10 16:53:55 EDT 2002
+   - Fixed bug where exported subs could sneak around package_filter
+     unless they were checked again in sub_filter.
+
+   - Fixed some undefined value warnings when module is loaded but not
+     initialized.

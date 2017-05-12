@@ -1,0 +1,15 @@
+LICENSE
+Changes
+lib/Data/Money/Converter.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/simple.t
+t/pod.t
+t/manifest.t
+t/meta-json.t
+t/meta-yml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

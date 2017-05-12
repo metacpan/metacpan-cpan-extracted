@@ -1,0 +1,45 @@
+---
+abstract: 'Automatically include line and station info in Map::Metro map'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MapMetro-MakeLinePod
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Dist::Zilla::Plugin::MapMetro::MakeLinePod:
+    file: lib/Dist/Zilla/Plugin/MapMetro/MakeLinePod.pm
+    version: '0.1202'
+requires:
+  Dist::Zilla: '5.000'
+  List::AllUtils: '0'
+  Map::Metro: '0.2206'
+  Moose: '2.0000'
+  Path::Tiny: '0'
+  Syntax::Feature::Qi: '0.2004'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.014000'
+  syntax: '0'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-MapMetro-MakeLinePod
+  repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-MapMetro-MakeLinePod.git
+version: '0.1202'

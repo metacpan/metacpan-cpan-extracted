@@ -1,0 +1,50 @@
+{
+   "abstract" : "Procedural interface to DateTime functions",
+   "author" : [
+      "Audrey Tang <audreyt@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Functions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/DateTime-Functions",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/DateTime-Functions.git",
+         "web" : "https://github.com/neilb/DateTime-Functions"
+      }
+   },
+   "version" : "0.13"
+}
+

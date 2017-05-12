@@ -1,0 +1,28 @@
+Data::RandomKeep version 0.02
+================
+
+This module helps you randomly keep a given number of offered items,
+for example, 10 random lines from a file, or 6 numbers out of 49 (to
+pick a lottery ticket for example).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires Test::Usage for its tests.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Luc St-Louis
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,140 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+0.005004
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::lib
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002005 → 0.002006
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025020 → 2.025021
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib
+
+0.005003 2017-03-03T22:36:43Z
+ [Added / develop requires]
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001002 → 0.001003
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+0.005002 2016-09-10T06:01:15Z
+ [Added / develop requires]
+ - English
+ - Software::License::Perl_5
+
+ [Changed / develop requires]
+ - Test::More 0.88 → 0.96
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025001 → 2.025020
+
+0.005001 2015-07-11T14:36:47Z
+
+0.005000 2015-07-06T08:09:15Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001002
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024001 → 2.025001
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::MetaYAML
+
+0.004003 2015-06-19T04:15:00Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0 → 0.001002
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002000 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024000 → 2.024001
+
+0.004002 2015-03-01T08:13:27Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+
+ [Changed / develop recommends]
+ - Test::More 1.001009 → 0.99
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
+ - Test::More 0 → 0.88
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022001 → 2.024000
+
+0.004001 2014-12-10T10:06:39Z
+ [Changed / develop recommends]
+ - Test::More 1.001008 → 1.001009
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001003 → 0.002000
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022000 → 2.022001
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::ReadmeFromPod
+
+0.004000 2014-10-30T12:33:06Z
+ [Added / develop recommends]
+ - Test::More 1.001008
+
+ [Added / develop requires]
+ - Dist::Zilla 5
+ - Dist::Zilla::Plugin::Bootstrap::lib
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps
+ - Dist::Zilla::Plugin::Test::EOL
+ - Test::EOL
+ - Test::More
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::NextRelease 0 → 0.004000
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001002 → 0.001003
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020003 → 2.022000
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests
+
+0.003006 2014-09-27T07:03:04Z
+
+0.003005 2014-09-25T16:09:00Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020001 → 2.020003
+
+0.003004 2014-09-22T19:06:39Z
+
+0.003003 2014-09-21T12:42:45Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020000 → 2.020001
+
+0.003002 2014-09-04T19:09:39Z
+
+0.003001 2014-08-30T11:09:05Z
+
+0.003000 2014-08-30T00:17:44Z
+
+0.002003 2014-08-21T05:45:11Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.019000 → 2.020000
+
+0.002002 2014-08-18T04:36:16Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.018000 → 2.019000
+
+0.002001 2014-08-17T18:48:43Z
+
+0.002000 2014-08-17T09:16:08Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.017002 → 2.018000
+
+0.001001 2014-08-16T21:40:56Z

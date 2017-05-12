@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 41afe77d09271ca16b5193e53519b65dc833e0d1 Build.PL
+SHA1 e3f58b04c9f428233e97ac8fe95256549eda374d CONTRIBUTORS
+SHA1 92c971cefd1e65f9d81907e613ccd778946d8e8f Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 82008f572b7038b58ebd818dbe042a88542f4863 MANIFEST
+SHA1 e6d20b53e99a6dd6e1c567eb224d438a5e31c3c5 META.yml
+SHA1 c24dfd78f2f982e5e235391c0009f9316c0e7ceb README
+SHA1 ac4331553dbf373967cb825f5c0b059719025797 cpanfile
+SHA1 6cd5f0d72dfc2b94c78a6c7a2c51b0e702a38061 lib/Dancer2/Plugin/Shutdown/Redis.pm
+SHA1 c32a0780766b496a109e0fac10011851f4bf91b1 t/000.t
+SHA1 54bd4a916e8484b0fac248b4519ba395155357e7 t/001.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 542f30f31ec77f685e4d22aed7aefefd68d3549a t/ests.pm
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXS0RWAAoJEJVzeMw4kNooIegP/iTfTCA03xRPQCbA1Qh3sS9p
+Psq8JxTmQwRBUcb2RgCLw5y190SeDJPTbs2xSZqAwMACxIHWgIVH6eizh1iuZkpa
+x9CkACUL2qWM+b9v1cf+cjLwSZTkQfgDPEohuPSKLUvwvDGHxEuF1xfnmcEInfvp
+LY9l7PwWi+IXsY8kfSMcdC+Prbv78YQldp6X6614oJvpRWexGsl2Zd9n5+TD4kS1
+H/KS+223osQ/zg/23sK5fZCf8xYO6RBn4/EJTkOnI4qCgQ867zLevCAusNzs56gz
+OhGBAcZUOPr7SF012gfLQPXp4Zz1TS5GS/YWjsy9EYgUg8sStRrH2PIjIOsKS3E1
+DxMhTuoEmu6eu3L58w250uUIOwU0zsbbUvdg2/BoUYkJZgAYBdLBFbf5BPIpIgQu
+I1zyAiGO/EzV7xiiuEf9OzekGrpZWt721SCEMreO1a0jdOQ82X7XkmCxXQU5c5ei
+dOtSFe4uzh4jXON9IxNymXc7FWjszMnHRhjphLq4bHJ5qGSA+S1bobaxkXiOAYyk
+fN4UglsXBmEufLnlxesRH6NvqJn5tb2IEgxex7OOzvYv9Yphi7sfkUT5EIV14uGY
+bATC4KZYklfvYWg2hjXyhBONlQjMfcxhAeXkm3V9DtYB0KufZUeKbJHyUfmV9xkd
+L6nznRyCHKzmeGbJf1YB
+=fRwV
+-----END PGP SIGNATURE-----

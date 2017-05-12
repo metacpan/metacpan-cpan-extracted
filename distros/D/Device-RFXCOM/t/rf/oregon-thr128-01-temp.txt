@@ -1,0 +1,10 @@
+500a4d100a902300002a00
+
+master oregon 50.0a4d100a902300002a00:
+  sensor/thr128.0a[temp]=23.9
+  sensor/thr128.0a[battery]=90%
+
+
+
+
+

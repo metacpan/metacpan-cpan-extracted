@@ -1,0 +1,37 @@
+---
+abstract: 'An immutable subclass of DateTime'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires:
+  Test::Exception: '0.35'
+  Test::MockTime: '0.15'
+  Test::More: '0.87'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTimeX-Immutable
+provides:
+  DateTimeX::Immutable:
+    file: lib/DateTimeX/Immutable.pm
+    version: '0.36'
+  DateTimeX::Role::Immutable:
+    file: lib/DateTimeX/Role/Immutable.pm
+    version: '0.36'
+requires:
+  Carp: '1.0000'
+  Class::Method::Modifiers: '2.00'
+  DateTime: '1.00'
+  Role::Tiny: '1.000'
+  Sub::Install: '0.900'
+  namespace::autoclean: '0.21'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mvgrimes/perl-datetimex-immutable/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mvgrimes/perl-datetimex-immutable
+version: '0.36'

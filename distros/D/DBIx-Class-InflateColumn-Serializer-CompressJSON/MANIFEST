@@ -1,0 +1,26 @@
+Build.PL
+Changes
+ignore.txt
+lib/DBIx/Class/InflateColumn/Serializer/CompressJSON.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-compile.t
+t/00-load.t
+t/005_compressjson.t
+t/boilerplate.t
+t/lib/DBICTest.pm
+t/lib/DBICTest/Schema.pm
+t/lib/DBICTest/Schema/SerializeCompressJSON.pm
+t/lib/DBICTest/Schema/SerializeJSON.pm
+t/lib/DBICTest/Schema/SerializeStorable.pm
+t/lib/DBICTest/Schema/SerializeYAML.pm
+t/lib/DBICTest/Schema/TestTable.pm
+t/lib/sqlite.sql
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/release-distmeta.t
+t/release-pod-coverage.t

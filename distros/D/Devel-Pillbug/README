@@ -1,0 +1,7 @@
+Devel::Pillbug is a simple HTML::Mason server for dev environments.
+
+It is designed for zero configuration, and easy install from CPAN.
+
+See lib/Devel/Pillbug.pm for perldoc.
+
+--aayars

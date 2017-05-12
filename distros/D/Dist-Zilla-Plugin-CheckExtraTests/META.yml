@@ -1,0 +1,74 @@
+---
+abstract: 'check xt tests before release'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Jesse Luehrs <doy@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Dist::Zilla::App::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Params::Util: '0'
+  Sub::Exporter: '0'
+  Test::More: '0.88'
+  Test::Requires: '0'
+  Try::Tiny: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CheckExtraTests
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::App::Command::xtest:
+    file: lib/Dist/Zilla/App/Command/xtest.pm
+    version: '0.029'
+  Dist::Zilla::Plugin::CheckExtraTests:
+    file: lib/Dist/Zilla/Plugin/CheckExtraTests.pm
+    version: '0.029'
+  Dist::Zilla::Plugin::RunExtraTests:
+    file: lib/Dist/Zilla/Plugin/RunExtraTests.pm
+    version: '0.029'
+requires:
+  App::Prove: '3.00'
+  Archive::Tar: '0'
+  Dist::Zilla: '4.3'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::TestRunner: '0'
+  File::pushd: '0'
+  Moose: '2'
+  Path::Iterator::Rule: '0'
+  Path::Tiny: '0.013'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests.git
+version: '0.029'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Christopher J. Madsen <cjm@cpan.org>'
+  - 'David Golden <xdg@xdg.me>'
+  - 'David H. Adler <dha@pobox.com>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Kent Fredric <kentfredric@gmail.com>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+  - 'Ricardo Signes <rjbs@cpan.org>'

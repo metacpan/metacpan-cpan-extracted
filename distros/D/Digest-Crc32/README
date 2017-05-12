@@ -1,0 +1,19 @@
+Digest::Crc32 - Cyclic Redundency Check digests implementation
+
+0.01 2004.12.24 Initial public release
+
+Description :
+
+This module provides a perl implementation to generate 32 bits CRC digests for buffers and files.
+
+To install:
+
+perl Makefile.PL
+make
+make test
+make install
+
+License :
+
+Copyright 2004 by Faycal Chraibi. All rights reserved.
+This library is a free software. You can redistribute it and/or modify it under the same terms as Perl itself.

@@ -1,0 +1,20 @@
+Revision history for Device-RadioThermostat
+
+0.04  2016-07-02 21:17:58 EDT
+        - Better CT-80 Support (humidity & messages) from Timo Kokkonen (tjko) #2
+        - ensure ints are ints not strings in generated JSON from tjko #2
+
+0.03  2013-12-29 02:33:59 EST
+        - Lots of good stuff contributed by Philip Gladstone:
+        - Support older Perl 5.8
+        - get_uuid support
+        - find_all method to auto-discover RTCoA thermostats on the network
+
+0.02  2013-09-10 22:06:25 EDT
+        - Add datalog method
+        - implement clear_message which was in the POD but left out of the code
+        - remove leftover use Data::Printer in the module
+        - Indicate that the links for API docs are links to a pdf
+
+0.01  2013-09-09 23:17:45 EDT
+        - Initial release

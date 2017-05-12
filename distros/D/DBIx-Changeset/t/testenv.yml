@@ -1,0 +1,2 @@
+test: env
+history_db_dsn: dbi:SQLite:dbname=t/testenv.db

@@ -1,0 +1,63 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 b067d0d2dddabaca392cade4b176602b5414a309 .cvsignore
+SHA1 315deb7eb0f291ace3147367b2193e283eaf0812 Build.PL
+SHA1 33d0ec9045a050ff08ea6fc69829668269a45377 Changes
+SHA1 580c4d8fc8abc1763393aa0c4a6b5ef70a033ebd MANIFEST
+SHA1 dc13bcd483f7beb5639deeffc9b08fb4274aeaf3 META.json
+SHA1 3cf14cda878138d886184e0891b8000744a16cdc META.yml
+SHA1 a4df8e97ccd390a42212af5a9f4d0986c85e7a5f Makefile.PL
+SHA1 a23e2175f67ca5dbfa03b1495b80491ab6b91c1b README
+SHA1 4114c254af48c0bff2a442319789c0e330706d5b lib/Data/Entropy.pm
+SHA1 37525d8f1d5292f5e36d9b6832e36e751a962219 lib/Data/Entropy/Algorithms.pm
+SHA1 0fe4d9b8a4bb6bbc12a8f73cfdf9273a62527684 lib/Data/Entropy/RawSource/CryptCounter.pm
+SHA1 2486c496e520b99874b0090c692fcad99db8cc35 lib/Data/Entropy/RawSource/Local.pm
+SHA1 05cb6186f5a4fcd962a580a03ca21a8e50cf89e7 lib/Data/Entropy/RawSource/RandomOrg.pm
+SHA1 5b2bdfffbb627709795bddad81d961ec936bf00c lib/Data/Entropy/RawSource/RandomnumbersInfo.pm
+SHA1 ebd878f9bfcd640e29ea6ef2a80e464c2a4f965f lib/Data/Entropy/Source.pm
+SHA1 ef8740df2a27b3d21d883f05eb0155be65d3fc2b t/choose.t
+SHA1 6ced794fdd04236de951d4fa9f866b65e7869883 t/get_bits.t
+SHA1 52b3820cce3559a8ba0a1be7b9c8aa065cab6c7f t/get_int_large.t
+SHA1 acf42338a619677baa3863d51be341cc03219410 t/get_int_medium.t
+SHA1 5ec2ef70a86b3664ae59a0aa600c4713712d6bdf t/get_int_small.t
+SHA1 c9dcfd3c7f813c6911c019b7d2e23b7c4a1ab84d t/get_octet.t
+SHA1 294700cf76d9e230767fe621837e118e7436386f t/get_prob_2.t
+SHA1 1e22aaaf056ef4a1c121b22d4e666efa7d2275b0 t/get_prob_333a.t
+SHA1 861b1c3608a1ce07020fb40c781aecb975ae2413 t/get_prob_333b.t
+SHA1 ed87d26db685a5d12e6432d79aa6255864ecb166 t/pick.t
+SHA1 904d9a4f76525e2303e4b0c168c68230f223c8de t/pod_cvg.t
+SHA1 65c75abdef6f01a5d1588a307f2ddfe2333dc961 t/pod_syn.t
+SHA1 e6c93c92f5c87fdc137019afb2634a03942b438b t/rand.t
+SHA1 5a505b085dfca527ebc323d2a48260761d4ec9a1 t/rand_bits.t
+SHA1 16886c289e299ec26179ac5a62252bfba283cde3 t/rand_fix.t
+SHA1 cba3a9d9e5a2fe733894c95c0d917962d4a42cfd t/rand_flt.t
+SHA1 2bb3de3e135de7b3371910d4390d21253e5b7d03 t/rand_int.t
+SHA1 f2e95eb479099be951cf97a8ef315953cf3807f4 t/rand_prob.t
+SHA1 0c0b9f4980a202a31cc20936f47c40d966f347c6 t/rs_cryptcounter.t
+SHA1 3f23415aa25c5e594363abd15f3a3ef971c852da t/rs_local.t
+SHA1 6c0d1b517dda36f9b942466e58d34b3e8b9dbe50 t/rs_randomnumbersinfo.t
+SHA1 97a5991873e2c38cdb893012cbbdd0929189596d t/rs_randomorg.t
+SHA1 06bfd6407edadb2933dab36ea30af193dd0ba902 t/shuffle.t
+SHA1 3a2d1a1006f4f0b01cd6d3e651508da778913c3d t/test0.entropy
+SHA1 270c07416dfe3aa6e963c23a1c33c0b862a2f75c t/with.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAk24djUACgkQOV9mt2VyAVF5XgCgkRWQVQCNTqIFCfhIYBMCZFwO
+bYwAmwVrW9S6VTx+uMBN9mZTQ3bYAepY
+=4rxS
+-----END PGP SIGNATURE-----

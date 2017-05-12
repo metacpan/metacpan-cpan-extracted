@@ -1,0 +1,24 @@
+---
+abstract: 'Include geo, time zone, user-agent and throttling from App::Cerberus'
+author:
+  - 'Clinton Gormley <drtech@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300021, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Cerberus
+requires:
+  App::Cerberus::Client: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/clintongormley/Dancer-Plugin-Cerberus/issues
+  repository: git://github.com/clintongormley/Dancer-Plugin-Cerberus.git
+version: 0.03

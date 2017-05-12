@@ -1,0 +1,96 @@
+   ____  _               _                           ____  _  __  __ 
+  |  _ \(_)_ __ ___  ___| |_ ___  _ __ _   _   _ _  |  _ \(_)/ _|/ _|
+  | | | | | '__/ _ \/ __| __/ _ \| '__| | | | (_|_) | | | | | |_| |_ 
+  | |_| | | | |  __/ (__| || (_) | |  | |_| |  _ _  | |_| | |  _|  _|
+  |____/|_|_|  \___|\___|\__\___/|_|   \__, | (_|_) |____/|_|_| |_|  
+                                       |___/                         
+
+
+This is the README for Directory::Diff version 0.05.
+
+Directory::Diff is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains four
+sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Directory::Diff - recursively find differences between similar directories
+
+Directory::Diff finds differences between two directories and all
+their subdirectories, recursively. If it finds a file with the same
+name in both directories, it uses "File::Compare" to find out whether
+they are different. It is callback-based and takes actions only if
+required.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following websites:
+
+    * http://search.cpan.org/perldoc?Directory::Diff
+    * http://metacpan.org/release/Directory-Diff
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your computer
+using
+
+    perldoc Directory::Diff
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Directory::Diff
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Directory::Diff
+
+To install the module from the source file, Directory-Diff-0.05.tar.gz, follow
+this sequence of commands:
+
+    tar xfz Directory-Diff-0.05.tar.gz
+    cd Directory-Diff-0.05
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can report a
+bug at 
+
+<https://github.com/benkasminbullock/Directory-Diff/issues>,
+
+or if you want to alter the source code of Directory::Diff, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Directory-Diff>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Tue Aug 23 09:17:31 2016.
+
+-----------------------------------------------------------------------------

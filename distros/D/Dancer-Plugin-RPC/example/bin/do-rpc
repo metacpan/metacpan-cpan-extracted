@@ -1,0 +1,342 @@
+#! /usr/bin/perl -w
+use v5.10;
+use strict;
+
+no if $] >= 5.018, warnings => 'experimental::smartmatch';
+
+if (!caller()) { # run als script...
+    my $script = DO_RPC->new(
+        argv => \@ARGV
+    );
+    $script->run();
+}
+
+1;
+
+BEGIN {
+    package DO_RPC {
+        use Moo;
+        use JSON;
+        with 'MooseX::Log::Log4perl::Easy';
+        has url => (
+            is       => 'ro',
+            required => 1
+        );
+        has type => (
+            is      => 'ro',
+            default => 'jsonrpc'
+        );
+        has call => (
+            is => 'ro',
+            required => 0,
+        );
+        has method => (
+            is      => 'ro',
+            default => 'POST'
+        );
+        has arguments => (
+            is      => 'ro',
+            default => sub { {} }
+        );
+        has timeout => (
+            is => 'ro',
+            default => 300,
+        );
+        has certcheck => (
+            is => 'ro',
+            isa => sub { !defined($_[0]) || $_[0] =~ /^0|1$/; },
+            default => 1,
+        );
+
+        no if $] >= 5.018, warnings => 'experimental::smartmatch';
+        use Getopt::Long qw/GetOptionsFromArray :config no_ignore_case no_auto_help/;
+        use Data::Dumper;
+        $Data::Dumper::Indent = 0; $Data::Dumper::Sortkeys = 1; $Data::Dumper::Terse = 1;
+        use Log::Log4perl ':easy';
+
+        around BUILDARGS => sub {
+            my $new = shift;
+            my $class = shift;
+            my %argv = @_;
+
+            my %option;
+            GetOptionsFromArray(
+                $argv{argv},
+                \%option,
+                qw(
+                    url|u=s
+                    type|t=s
+                    call|c=s
+                    method|m=s
+                    json|j=s
+                    certcheck!
+                    timeout=i
+                    debug:1
+                )
+            );
+
+            my $level = $option{debug} ? $TRACE : $INFO;
+            Log::Log4perl->easy_init({level => $level, layout => "[%p %l] %m%n"});
+            my $logger = Log::Log4perl::get_logger;
+
+            my %arguments = $option{json}
+                ? %{ from_json($option{json}) }
+                : @{$argv{argv}}
+                    ? @{$argv{argv}} : ();
+
+            $logger->debug("OPTS: [ @{[Dumper(\%option) ]} ]");
+            $logger->debug("ARGV: [ @{[Dumper(\%arguments) ]} ]");
+
+            $option{call} //= '';
+
+            $class->$new(%option, arguments => \%arguments);
+        };
+
+        sub run {
+            my $self = shift;
+            my ($client, @method);
+            given ($self->type) {
+                when ('jsonrpc') {
+                    $client = JSONRPCClient->new(endpoint => $self->url);
+                }
+                when ('xmlrpc')  {
+                    $client = XMLRPCClient->new(endpoint => $self->url);
+                }
+                when ('restrpc') {
+                    $client = RESTRPCClient->new(endpoint => $self->url);
+                    @method = uc($self->method);
+                }
+            };
+
+            my $answer = $client->call($self->call, @method, $self->arguments);
+            {
+                local $Data::Dumper::Indent = 1;
+                $self->log_info(
+                    sprintf("%s>%s: \n%s", $self->type, $self->call, Dumper($answer))
+                );
+            }
+            return $answer;
+        }
+
+        1;
+    }
+
+    package HTTPClient {
+        use Moo::Role;
+        use URI;
+        use HTTP::Tiny;
+        use Scalar::Util 'blessed';
+
+        with 'MooseX::Log::Log4perl::Easy';
+
+        our $VERSION = '0.90';
+
+        has endpoint => (is => 'ro', isa => sub { blessed($_[0]) eq 'URI' });
+        has client   => (is => 'lazy', isa => sub { blessed($_[0]) eq 'HTTP::Tiny' });
+        has ssl_opts => (is => 'ro', default => undef);
+        has timeout  => (is => 'ro', default => 300);
+
+        requires 'call';
+
+        around BUILDARGS => sub {
+            my $method = shift;
+            my $class  = shift;
+            my %args = @_;
+            if (ref($args{endpoint}) ne 'URI') {
+                $args{endpoint} = URI->new($args{endpoint});
+            }
+            $class->$method(%args);
+        };
+
+        sub _build_client {
+            my $self = shift;
+            return HTTP::Tiny->new(
+                agent      => "XS4ALL-do-rpc/$VERSION",
+                verify_SSL => 0,
+                timeout    => $self->timeout,
+            );
+        }
+
+        1;
+    }
+
+    package JSONRPCClient {
+        use Moo;
+        with 'HTTPClient';
+        use JSON qw/encode_json decode_json/;
+        use UUID::Tiny qw(UUID_V4 create_UUID_as_string);
+        use Data::Dumper;
+
+        sub call {
+            my $self = shift;
+            my ($method_name, $data) = @_;
+
+            my $request = $self->jsonrpc_request($method_name => $data);
+            my $headers = {
+                'Content-Type'   => 'application/json',
+                'Content-Length' => length($request),
+            };
+            $self->log_debug(Dumper($headers));
+            $self->log_debug($request);
+            my $response = $self->client->request(
+                POST => $self->endpoint,
+                {
+                    headers => $headers,
+                    content => $request,
+                }
+            );
+            local $Data::Dumper::Indent = 1;
+            $self->log_trace("jsonrpc($method_name)". Dumper($response));
+            my $result;
+            if ($response->{success}) {
+                my $p_response = decode_json($response->{content});
+                $result = $p_response->{error} // $p_response->{result};
+            }
+            else {
+                $result = join(" ", @{$response}{qw/status reason/});
+            }
+            return $result;
+        }
+
+        sub jsonrpc_request {
+            my $self = shift;
+            my $method_name = shift;
+
+            my @params = @_ ? (params => shift) : ();
+            return encode_json(
+                {
+                    jsonrpc => '2.0',
+                    id      => create_UUID_as_string(UUID_V4),
+                    method  => $method_name,
+                    @params,
+                }
+            );
+        }
+    }
+
+    package XMLRPCClient {
+        use Moo;
+        with 'HTTPClient';
+        use RPC::XML;
+        use RPC::XML::ParserFactory;
+        use Scalar::Util 'blessed';
+        use Data::Dumper;
+
+        has parser => (
+            is  => 'lazy',
+            isa => sub { blessed($_[0]) eq 'RPC::XML::Parser::XMLParser' },
+        );
+
+        sub _build_parser {
+            my $self = shift;
+            return RPC::XML::ParserFactory->new();
+        }
+
+        sub call {
+            my $self = shift;
+            my ($method_name, $data) = @_;
+
+            my $request = RPC::XML::request->new($method_name => $data)->as_string();
+            $self->log_debug($request);
+            my $response = $self->client->request(
+                POST => $self->endpoint,
+                {
+                    headers => {
+                        'Content-Type'   => 'text/xml',
+                        'Content-Length' => length($request),
+                    },
+                    content => $request,
+                }
+            );
+            $self->log_trace(Dumper($response));
+
+            my $return;
+            if ( $response->{success} ) {
+                my $content = $response->{content};
+                $return = $self->parser->parse($response->{content})->value->value;
+                $self->log_debug(Dumper($data));
+            }
+            else {
+                $return = join(" ", @{$response}{qw/status reason/});
+            }
+            return $return;
+        }
+
+        1;
+    }
+
+    package RESTRPCClient {
+        use Moo;
+        with 'HTTPClient';
+        use JSON;
+        use URI;
+        use Data::Dumper;
+
+        sub call {
+            my $self = shift;
+            my $call = shift;
+            my $http_method = shift || 'GET';
+
+            (my $endpoint = $self->endpoint->as_string) =~ s{/+$}{};
+            $endpoint .= "/$call" if $call;
+
+            my $request = @_ ? encode_json(shift) : '';
+            $self->log_debug("$http_method: $endpoint => $request");
+
+            my $response = $self->client->request(
+                $http_method => $endpoint,
+                {
+                    headers => {
+                        'Content-Type'   => 'application/json',
+                        'Content-Length' => length($request),
+                    },
+                    content => $request,
+                }
+            );
+            local $Data::Dumper::Indent = 1;
+            $self->log_trace(Dumper($response));
+            my $result;
+            if ($response->{success}) {
+                $result = decode_json($response->{content});
+                if (exists $result->{error}) {
+                    return $result->{error};
+                }
+                else {
+                    return $result;
+                }
+            }
+            else {
+                $result = join(" ", @{$response}{qw/status reason/});
+            }
+            return $result;
+        }
+    }
+};
+
+=head1 NAME
+
+do-rpc - Doe een rpc-call.
+
+=head1 SYNOPSIS
+
+    do-rpc -t xmlrpc -u <url> -c <methodName> arguments...
+
+=head1 OPTIONS
+
+    --type|-t   <jsonrpc|xmlrpc|restrpc>   (verstek 'jsonrpc')
+    --url|-u    <base_url>                 De base_url for
+    --call|-c   <methodName>
+    --method|-m <GET|POST|PUT|DELETE>      (verstek 'POST')
+    --json <jsonstring>
+
+    --debug
+    --help
+
+    do-xmlrpc => do-rpc -t xmlrpc "$@"
+    do-json   => do-rpc -t restrpc "$@"
+
+=head1 STUFF
+
+(c) MMXV - Abe Timmerman <abeltje@cpan.org>
+
+=cut

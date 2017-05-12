@@ -1,0 +1,84 @@
+DataWarehouse
+
+Perl is a language optimized for scanning arbitrary text files, extracting
+information from those text files, and generating reports based on that
+information. It's also a good language for many system management tasks.
+The language is intended to be practical (easy to use, efficient,
+complete) rather than beautiful (tiny, elegant, minimal).
+
+A Data Warehouse (DW) is a repository of an organization's data, designed
+to facilitate reporting and analysis at different levels of aggregation.
+
+The main source of the data is extracted, cleaned, transformed, and made
+available to managers and other business professionals for data mining,
+online analytical processing, market research and decision support. This
+process is called ETL (Extract/Transform/Load).
+
+The Perl Data Warehouse Toolkit is a generic set of tools created to
+manage Data Warehouses meta-information, making simple ETL and DW tasks
+easy, and complex tasks possible.
+
+WARNING
+
+THIS IS ALPHA SOFTWARE. It could drink your beer and eat your hamster!
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DataWarehouse
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DataWarehouse
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DataWarehouse
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DataWarehouse
+
+    Search CPAN
+        http://search.cpan.org/dist/DataWarehouse/
+
+The complete source code is available at:
+
+    GitHub
+        http://github.com/nferraz/Perl-Data-Warehouse-Toolkit
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Nelson Ferraz
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+DISCLAIMER
+
+This module is not associated with Ralph Kimball's "Data Warehouse
+Toolkit" books. That said, I strongly recommend his books:
+
+  * The Data Warehouse Toolkit
+  http://www.amazon.com/Data-Warehouse-Toolkit-Complete-Dimensional/dp/0471200247
+
+  * The Data Warehouse ETL Toolkit
+  http://www.amazon.com/Data-Warehouse-ETL-Toolkit-Techniques/dp/0764567578
+
+I also recommend:
+
+  * Mastering Data Warehouse Aggregates
+  http://www.amazon.com/Mastering-Data-Warehouse-Aggregates-Performance/dp/0471777099

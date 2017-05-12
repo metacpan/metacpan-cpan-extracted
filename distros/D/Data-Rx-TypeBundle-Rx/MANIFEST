@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Rx/Type/Rx.pm
+lib/Data/Rx/TypeBundle/Rx.pm
+t/basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,20 @@
+Revision history for Data-Hash-Totals
+
+0.10    Wed Nov 17 23:53:35 CST 2004
+
+        [ENHANCEMENTS]
+        * Can now put commas in your numeric values.
+
+        [FIXES]
+        * Sorting of values is now using C<cmp> instead of C<< <=> >>
+
+0.02    Fri Oct 29 10:53:46 CDT 2004
+        [ENHANCEMENTS]
+        * Now exports as_table by default.
+
+        * as_table() now sorts by ascending key as a subsort to descending
+          value.
+
+0.01    Thu Sep  9 21:54:02 CDT 2004
+        First version, released on an unsuspecting world.
+

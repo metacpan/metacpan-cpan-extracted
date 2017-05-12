@@ -1,0 +1,60 @@
+If you are taking over the maintainership of DBD::ODBC - good luck.  I
+don't want to say anything more that will put you off ;-) so honestly,
+good luck.
+
+However there are a few things I can say that might help you:
+
+o make sure you install Test::Pod, Test::Pod::Coverage and
+  Test::Kwalitee as tests using those modules only get run when they
+  are installed. If you don't install them you can bet someone else
+  will (probably someone packaging Perl modules for a Linux distro)
+  and you will have missed the failures.
+
+o when a new DBI is released get hold of it, get the latest dbivport.h
+  and copy it into DBD::ODBC.
+
+o when a new Devel::PPPort is released get hold of it and copy the
+  latest ppport.h into DBD::ODBC as dbipport.h then persuade someone
+  looking after DBI to change DBIXS.h from
+
+  #include "dbipport.h"
+
+  to
+
+  #include <dbipport.h>
+
+  I never managed to get that done.
+
+o remember that when a user installs a new DBI he generally needs to
+  recompile his DBDs - people will forget this and it can cause a load
+  of problems.
+
+o a lot of people have worked on DBD::ODBC over the years and in all
+  cases I know they were volunteers. This means it was not their day
+  job and they did their best but sometimes took shortcuts. That
+  sometimes means a patch was provided and it looked ok and seemed to
+  solve a problem so it was committed and all was well even if the
+  patch did not look so good.
+
+o there are a lot of people using old and buggy ODBC drivers (or ODBC
+  driver managers) and DBD::ODBC has a lot of workarounds for
+  them. I'd suggest that if you don't know something is definitely
+  broken then don't change it. I wasted some time trying to trim
+  things down only to find I broke older drivers and driver managers.
+
+o dbi-dev mailing list is your friend - use it.
+
+o Microsoft wrote the ODBC spec then handed it to X/Open but continue
+  to change it without reference to X/Open. This will happen again.
+  Be aware of it and live with it (it has just happended again with
+  ODBC 3.8!) and it hit me hard when 32bit moved to 64bit and the spec
+  changed over night.
+
+o at this time, unicode in ODBC NEEDS a unicode aware ODBC Driver
+  i.e., it must have the wide SQLxxxW functions. People will tell you
+  that the driver manager can "translate" between ANSI and WIDE APIs
+  (or the driver can do UTF-8 etc) but it is nonesense e.g., unixODBC
+  does an ok job of this but it does not work with bound columns, ODBC
+  does not do UTF-8!
+
+

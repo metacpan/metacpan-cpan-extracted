@@ -1,0 +1,8 @@
+Revision history for Debian-Dpkg-Version
+
+0.02	21 Sep 2011
+    * skip `dpkg` tests
+
+0.01     2 Mar 2010
+    * extracted from Debian dpkg
+

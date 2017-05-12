@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+use Distribution::Cooker;
+
+Distribution::Cooker->run( @ARGV );
+
+__END__
+
+=head1 NAME
+
+dist_cooker - create a Perl distribution skeleton from personal templates
+
+=head1 SYNOPSIS
+
+	# from the command line, to create a distribution for Module::Name
+	% dist_cooker Module::Name
+
+=head1 DESCRIPTION
+
+C<dist_cooker> builds a Perl distribution skeleton from template
+files. You create the templates however you like.
+
+By default, I assume my own favorite values, and haven't made these
+customizable yet.
+
+=over 4
+
+=item C<ttree> (from Template) is in C</usr/local/bin/ttree>
+
+=item Your distribution template directory is F<~/.templates/dist_cooker>
+
+=item Your module template name is F<lib/Foo.pm>
+
+=back
+
+When C<cook> processes the templates, it provides definitions for
+these template variables:
+
+=over 4
+
+=item module      => the package name (Foo::Bar)
+
+=item module_file => module file name (Bar.pm)
+
+=item module_dist => the distribution name (Foo-Bar)
+
+=back
+
+=head2 Writing a subclass
+
+To provide a different set of defaults, or more customizable behavior,
+create your own subclass of C<Distribution::Cooker>. Specialize the
+parts that you need.
+
+=head1 TO DO
+
+C<Distribution::Cooker> needs to provide a way for people to override
+the defaults without having to write a subclass.
+
+=head1 SEE ALSO
+
+Other modules, such as C<Module:Starter>, do a similar job but don't
+give you as much flexibility with your templates.
+
+=head1 SOURCE AVAILABILITY
+
+This module is in Github:
+
+	http://github.com/briandfoy/distribution--cooker/
+
+=head1 AUTHOR
+
+brian d foy, C<< <bdfoy@cpan.org> >>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (c) 2008-2013, brian d foy, All Rights Reserved.
+
+You may redistribute this under the same terms as Perl itself.
+
+=cut

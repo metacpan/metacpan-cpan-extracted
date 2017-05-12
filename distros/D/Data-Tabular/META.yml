@@ -1,0 +1,51 @@
+---
+name: Data-Tabular
+version: 0.29
+author:
+  - '"G. Allen Morris III" <gam3@gam3.net>'
+abstract: Handy Table Manipulation and rendering Object
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.6.0
+build_requires:
+  Digest::MD5: 0
+  Test::More: 0
+recommends:
+  Spreadsheet::ParseExcel: 0
+  Spreadsheet::WriteExcel: 0
+  Spreadsheet::WriteExcel::Simple: 0
+  Spreadsheet::WriteExcel::Utility: 0
+provides:
+  Data::Tabular:
+    file: lib/Data/Tabular.pm
+    version: 0.29
+  Data::Tabular::Config::Extra:
+    file: lib/Data/Tabular/Config/Extra.pm
+  Data::Tabular::Config::Output:
+    file: lib/Data/Tabular/Config/Output.pm
+  Data::Tabular::Output::CSV:
+    file: lib/Data/Tabular/Output/CSV.pm
+  Data::Tabular::Output::HTML:
+    file: lib/Data/Tabular/Output/HTML.pm
+  Data::Tabular::Output::TXT:
+    file: lib/Data/Tabular/Output/TXT.pm
+  Data::Tabular::Output::XLS:
+    file: lib/Data/Tabular/Output/XLS.pm
+  Data::Tabular::Table:
+    file: lib/Data/Tabular/Table.pm
+  Data::Tabular::Type:
+    file: lib/Data/Tabular/Type.pm
+  Data::Tabular::Type::Date:
+    file: lib/Data/Tabular/Type.pm
+  Data::Tabular::Type::Dollar:
+    file: lib/Data/Tabular/Type.pm
+  Data::Tabular::Type::Number:
+    file: lib/Data/Tabular/Type.pm
+  Data::Tabular::Type::Text:
+    file: lib/Data/Tabular/Type.pm
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

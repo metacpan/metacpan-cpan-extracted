@@ -1,0 +1,6 @@
+Revision history for Perl extension DateTime::Format::Duration::XSD.
+
+0.01  Fri Feb 13 15:09:43 2009
+	- original version; created by h2xs 1.23 with options
+		-AXn DateTime::Format::Duration::XSD
+

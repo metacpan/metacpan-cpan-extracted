@@ -1,0 +1,36 @@
+version 0.08 09-Nov-2002
+    - Enhanced new constructor. Accepts a an already 
+      initialized $dbh, instead of DSN, username and password.
+    
+version 0.07 02-Feb-2002 
+	- maintenance version. Fixed installation problem.
+	
+version 0.06 02-Feb-2002 
+	- added installation script and proper namespace.
+
+version 0.05  16-Dec-2001
+	- modified error checking. DBI handles will use their own error checking.
+		Normalizer's errors handled by Carp.
+	- First packaged version for the external world. 
+		Includes readme, HTML documentation, test.pl, examples, test database.
+	
+version 0.04  15-Dec-2001
+	- added more documentation
+	- added some checking for delayed creation of indexes
+	- improved parsing of indexes
+	- The ultimate Laziness dream. Added support for one-liner
+		Normalization commands.
+	
+version 0.03  14-Dec-2001
+	- added indexes checking
+	- added parameters checking
+	- improved documentation
+	- tested with large tables (100_000 to 1_300_000 records): OK.
+	
+version 0.02  13-Dec-2001
+	- added simulation mode support
+	- added support for later built of indexes
+
+version 0.01 12-Dec-2001
+	- base version. Working just fine (Initial Laziness satisfied. More Hubris ahead).
+	

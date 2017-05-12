@@ -1,0 +1,77 @@
+{
+   "abstract" : "Append data to gathered files",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-AppendExternalData",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::FileFinderUser" : 0,
+            "Dist::Zilla::Role::FileMunger" : 0,
+            "Dist::Zilla::Role::FilePruner" : 0,
+            "Moose" : 0,
+            "Moose::Autobox" : 0,
+            "MooseX::Types::Path::Class" : 0,
+            "Path::Class" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::AppendExternalData" : {
+         "file" : "lib/Dist/Zilla/Plugin/AppendExternalData.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-appendexternaldata at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-AppendExternalData"
+      },
+      "homepage" : "https://github.com/dagolden/dist-zilla-plugin-appendexternaldata",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/dist-zilla-plugin-appendexternaldata.git",
+         "web" : "https://github.com/dagolden/dist-zilla-plugin-appendexternaldata"
+      }
+   },
+   "version" : "0.003"
+}
+

@@ -1,0 +1,11 @@
+Revision history for Maypole-TestTools
+
+0.2    Wed  Sept 21, 2005 20:50
+    - can install different types of resource to different subdirs
+    - persistent config data via Module::Build standard system, so 
+        other modules can discover where things have been installed
+    - extensive additions to docs
+
+0.1    Tues Sept 20, 2005 15:50
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,80 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+1.001000 2014-08-30T12:52:09Z
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+ - Test::DZil
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::EmulatePhase
+
+1.000001 2014-08-15T21:15:05Z
+
+1.000000 2014-08-02T05:44:00Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.1.2 2013-11-20T03:06:09Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::PrereqSource
+
+ [Changed / build requires]
+ - Module::Build 0.4200 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4200 → 0.4202
+
+0.1.1 2013-11-18T12:20:20Z
+ [Changed / build requires]
+ - Module::Build 0.4001 → 0.4200
+
+ [Changed / configure requires]
+ - Module::Build 0.4001 → 0.4200
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp

@@ -1,0 +1,21 @@
+Revision history for Perl extension Devel-CheckBin
+
+0.04 2015-07-22T07:35:08Z
+
+    - Test case fix.
+      * win32 fix.
+      * added quotes for perl installed into a path with spaces in it
+      (mohawk2++)
+
+0.03 2015-04-30T00:47:41Z
+
+    - re-packaging with EU::MM
+
+0.02 2013-08-14T03:17:03Z
+
+    - re-packaging
+
+0.01 2013-04-13T00:20:21Z
+
+    - original version
+

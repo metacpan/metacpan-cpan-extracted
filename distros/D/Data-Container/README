@@ -1,0 +1,78 @@
+NAME
+    Data::Container - Base class for objects containing a list of items
+
+VERSION
+    version 1.100840
+
+SYNOPSIS
+        package My::Container;
+        use parent 'Data::Container';
+        # ...
+
+        package main;
+        my $container = My::Container->new;
+        $container->items_push('some_item');
+
+DESCRIPTION
+    This class implements a container object. The container can contain any
+    object, scalar or reference you like. Typically you would subclass
+    Data::Container and implement custom methods for your specific
+    container.
+
+    When the container is stringified, it returns the concatenated
+    stringifications of its items, each two items joined by two newlines.
+
+METHODS
+  items_set_push
+    Like "items_push()", and it also takes a list of items to push into the
+    container, but it doesn't push any items that are already in the
+    container (items are compared deeply to determine equality).
+
+  item_grep
+    Given a package name, it returns those items from the container whose
+    "ref()" is equal to that package name.
+
+    For example, your container could contain some items of type
+    "My::Item::Foo" and some of type "My::Item::Bar". If you only want a
+    list of the items of type "My::Item::Foo", you could use:
+
+        my @foo_items = $container->item_grep('My::Item::Foo');
+
+  stringify
+    Stringifies the data container by concatenating the items together,
+    separated by an empty line.
+
+  prepare_comparable
+    Adds support for Data::Comparable by autovivifying the container items
+    array.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Container>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-Container/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Container/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

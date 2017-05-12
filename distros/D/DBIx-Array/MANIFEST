@@ -1,0 +1,26 @@
+Changes
+lib/DBIx/Array.pm
+lib/DBIx/Array/Export.pm
+lib/DBIx/Array/Session/Action.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/001_use.t
+t/001_connection.t
+t/002_sql_functions.t
+t/002_abs_functions.t
+t/008_sql_insert_update_delete.t
+t/004_abs_insert_update_delete.t
+t/005_binds.t
+t/010_objects.t
+t/011_bulk_inserts.t
+t/011_bulk_updates.t
+t/012_bulk_inserts_cursor.t
+Todo
+scripts/DBIx-Array-tablename.pl
+scripts/DBIx-Array-bind_param.pl
+scripts/DBIx-Array-export-xls.pl
+scripts/DBIx-Array-export-xls.pl.xls
+perl-DBIx-Array.spec
+META.yml                                 Module meta-data (added by MakeMaker)

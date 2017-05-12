@@ -1,0 +1,65 @@
+{
+   "abstract" : "Excel export for DBIx::Class using Spreedsheet::WriteExcel",
+   "author" : [
+      "Sean Zellmer <sean@lejeunerenard.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-ResultSet-Excel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.027"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.08250",
+            "File::Temp" : "0",
+            "Spreadsheet::WriteExcel" : "2.39",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lejeunerenard/DBIx-Class-ResultSet-Excel/issues"
+      },
+      "homepage" : "https://github.com/lejeunerenard/DBIx-Class-ResultSet-Excel",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/lejeunerenard/DBIx-Class-ResultSet-Excel.git",
+         "web" : "https://github.com/lejeunerenard/DBIx-Class-ResultSet-Excel"
+      }
+   },
+   "version" : "0.01"
+}
+

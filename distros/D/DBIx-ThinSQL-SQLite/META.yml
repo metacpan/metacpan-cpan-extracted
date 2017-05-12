@@ -1,0 +1,41 @@
+---
+abstract: 'add various functions to SQLite'
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  File::chdir: '0'
+  Log::Any::Adapter: '0'
+  Path::Tiny: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  CPAN::Meta: '0'
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: '0'
+generated_by: 'Module::Install version 1.16, CPAN::Meta::Converter version 2.142690'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-ThinSQL-SQLite
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+  package:
+    - DBIx::ThinSQL::SQLite::agg_sha1
+    - DBIx::ThinSQL::SQLite::agg_sha1_hex
+    - DBIx::ThinSQL::SQLite::agg_sha1_base64
+requires:
+  DBD::SQLite: '0'
+  DBIx::ThinSQL: v0.0.34
+  Exporter::Tidy: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/mlawren/p5-DBIx-ThinSQL-SQLite/issues
+  homepage: https://github.com/mlawren/p5-DBIx-ThinSQL-SQLite
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: git://github.com/mlawren/p5-DBIx-ThinSQL-SQLite.git
+version: 0.0.17

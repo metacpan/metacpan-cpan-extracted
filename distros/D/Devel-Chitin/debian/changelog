@@ -1,0 +1,50 @@
+libdevel-chitin-perl (0.07-1) unstable; urgency=low
+
+    * Fix for running tests on Windows (thanks, nanis)
+    * Preliminary support for decompiling.  Currently undocumented, but see
+        Devel::Chitin::OpTree->build_from_location() and t/20-optree.t
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 15 Aug 2016 14:53:00 -0500
+
+libdevel-chitin-perl (0.06-1) unstable; urgency=low
+
+    * When Devel::Callsite is available, Location objects have a 'callsite'
+        value indicating the address of the next opcode to execute
+    * notify_trace_resume() is called before the debugged program regains
+        control for clients that have turned on the trace flag.
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 21 Jan 2016 14:45:00 -0500
+
+libdevel-chitin-perl (0.05-1) unstable; urgency=low
+
+  * New feature: watch expressions - send notification when an expression changes
+  * Fix a bug when get_var_at_level() is called with a package-global hash
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 11 Dec 2014 17:00:00 -0500
+
+libdevel-chitin-perl (0.04-1) unstable; urgency=low
+
+  * Normalize stack frame 'hasargs' between different Perl versions
+  * Stack frame instances get unique UUIDs
+  * Breakpoint/Action 'code' is now mutable
+
+ -- Anthony Brummett <brummett@cpan.org>  Sat, 16 Aug 2014 10:00:00 -0500
+
+libdevel-chitin-perl (0.03-1) unstable; urgency=low
+
+  * get_var_at_level() works properly with vstrings
+  * Typo fixes from David Steinbrunner <dsteinbrunner@pobox.com>
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 24 Jun 2014 17:34:00 -0500
+
+libdevel-chitin-perl (0.01-2) unstable; urgency=low
+
+  * Fixed a packaging error.  Functionally the same as v0.01
+
+ -- Anthony Brummett <brummett@cpan.org>  Sat, 8 Mar 2014 14:23:00 -0500
+
+libdevel-chitin-perl (0.01-1) unstable; urgency=low
+
+  * First release
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 3 Mar 2014 14:41:00 -0500

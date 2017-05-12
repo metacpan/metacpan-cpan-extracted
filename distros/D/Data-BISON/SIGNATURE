@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0cc60b5ad05d02608b6b25e322cb9f2a23baba42 Changes
+SHA1 3fec510152bee11f24e366d7b963557807f4d695 MANIFEST
+SHA1 27e4bc2f03ab1d23be3815eabe4a5e4f5b20adb6 META.yml
+SHA1 95578836ecb318ae2396805ccb353cdd1e438314 Makefile.PL
+SHA1 1231b2360ef1ea0029829389753205d2439a724d README
+SHA1 de6fb3492c032387c68975cc548747c934ae0d7e TODO
+SHA1 aae0dfa72b8ed809d26a7563134191f7200e18cf doc/BISON_specification_1_0.pdf
+SHA1 a77fe8093e9c4e2d542e3549de2d51128cafd2b2 lib/Data/BISON.pm
+SHA1 112d7b3632ac9a9f1efd3de9aab266aa1838dd3b lib/Data/BISON/Base.pm
+SHA1 6a7126d340dba8078d038d0c94c2ed0cc12b3d7c lib/Data/BISON/Constants.pm
+SHA1 277aa84e0bbcf67d9425f38dd6117e530343a640 lib/Data/BISON/Decoder.pm
+SHA1 c66c03329f04a8ff588bf69095ea805288422c10 lib/Data/BISON/Encoder.pm
+SHA1 12a7c12bf6853af6abf63fa9a03756bb8806991d lib/Data/BISON/yEnc.pm
+SHA1 83041fa3d14d4d0f02ecc39a4c3fccbd9e096121 t/00.load.t
+SHA1 50887d366ed9f732ef0f87b1e7daa25a79c2a5ad t/10.encode.t
+SHA1 68a5c756a512face9be76e208c9ebccd38e45819 t/20.decode.t
+SHA1 372588ad3ddd3b10daedc16da42e4f86c83aed47 t/30.yenc.t
+SHA1 c07824aafc8fdf1f7909fa299c6c7f3b993a4717 t/40.roundtrip.t
+SHA1 cebc69ab5becd6effffc969d0896228c0ef70418 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (Darwin)
+
+iD8DBQFF3yoawoknRJZQnCERAoFCAKDV5TDOgtU/K0L3Hi4Xm3mnuhssjACcDeLE
+6ifpePksIITNzuiWcoLann0=
+=YJzs
+-----END PGP SIGNATURE-----

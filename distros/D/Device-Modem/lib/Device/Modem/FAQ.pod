@@ -1,0 +1,214 @@
+=head1 Device::Modem::FAQ
+
+This is a Frequently Asked Questions list about C<Device::Modem> perl extension.
+
+=head2 What is C<Device::Modem>?
+
+C<Device::Modem> is a L<perl> extension written in pure perl that allows to
+communicate with modems, or generically with C<AT command set compliant> devices
+connected to your computer via a B<serial port>.
+
+=head2 Who is the author of this work?
+
+Cosimo Streppone (L<cosimo@cpan.org>), an italian guy who works and
+enjoys writing perl programs and objects. If you want to know more,
+go to http://www.streppone.it/cosimo/work/perl/
+
+=head2 BTW, what is L<Perl>?
+
+If you are asking that, probably you are in the wrong place.
+
+L<Perl> is a wonderful programming language, that cuts development times, helps
+developer keep mental health, good life-style, doesn't pollute developer's mind,
+allows complete freedom of style, and (from perl manual), I<gives you enough
+rope to hang yourself>.
+
+Some starting points:
+
+=over 4
+
+=item *
+
+L<http://www.perl.com> - Reference site for Perl programmers
+
+=item *
+
+L<http://www.perl.org> - Perl Mongers home
+
+=item *
+
+L<http://cpan.perl.org> - Comprehensive Perl Archive Network
+
+=item *
+
+L<http://www.perlmonks.org> - Higher Perl souls
+
+=item *
+
+L<http://use.perl.org> - Large Perl community
+
+=back
+
+=head2 What is an C<AT command set>?
+
+It is a set of standard commands, also called C<Hayes>, in which
+(almost) all commands begin with C<AT> prefix and they allow to control
+a modem, router, whatever device. Also cellular phones work with
+a subset of standard C<AT> commands.
+
+=head2 What is a modem?
+
+What the heck are you doing here? http://www.google.com/search?q=Tech+glossary+modem
+
+=head2 What are the requisites of C<Device::Modem>?
+
+You must have:
+
+=over 4
+
+=item *
+
+A working computer with a standard RS-232 serial port
+
+=item *
+
+An AT-compliant device (a modem will do perfectly here :-)
+
+=item *
+
+A working Perl installation
+
+=item *
+
+C<Device::SerialPort> module installed if you are on some unix platform.
+C<Win32::SerialPort> module installed if you are on Win32 platform.
+
+=back
+
+=head2 Is it multi-platform?
+
+C<Device::Modem> works close to the serial port communication layer,
+which varies on many platforms. It relies on C<Device::SerialPort> and
+C<Win32::SerialPort> modules for all low-level communication layer.
+
+It tries to build a platform independent layer above these two low-level
+modules, so developers don't need to distinguish among different platforms.
+
+It's been reported to work on C<Win32>, C<Linux>, C<Mac OS X>, C<FreeBSD>,
+C<NetBSD>, C<OpenBSD>, C<ARM-Linux> and C<Solaris>.
+
+=head2 Can I use it for my commercial application?
+
+Yes, it is allowed by its license, that is the same as Perl language.
+If you are using it in a commercial package, or plan to do so, please
+inform the author (Cosimo Streppone, L<cosimo@cpan.org|mailto:cosimo@cpan.org>).
+Thank you.
+
+=head2 Why the [insert_you_preferred_feature_here] does not work?
+
+This is an open-source software developed in my little home spare time and
+for my personal interest and amusement. This module has a test suite, but it
+is not very extensive, so it is possible that some feature X does not work,
+or it is not implemented yet or I cannot test it.
+
+If you are in this situation, please contact L<me|mailto:cosimo@cpan.org>
+and provide the following information:
+
+=over 4
+
+=item *
+
+Your operating system version and architecture.
+Complete output of C<perl -V> command is good for this.
+
+=item *
+
+Your perl version.
+Again C<perl -V>.
+
+=item *
+
+Your C<Device::Modem>, C<Device::SerialPort> and (if you are using it)
+C<Device::Gsm> version.
+In case of doubt, send the output of:
+
+	perl -MDevice::Modem -le 'print Device::Modem->VERSION'
+
+=back
+
+Thank you.
+
+=head2 Do XModem transfers work?
+
+This is definitely reported to be working by several users, who
+also contributed patches and tested the feature.
+
+Otherwise, just look at Aaron Mitti's Device::SerialPort::Xmodem
+CPAN module.
+
+=head2 XModem sucks. What about ZModem?
+
+It might seem that XModem and ZModem should be well over dead at this point.
+But, looks like several old/new devices still support them.
+
+So, B<ZModem> support has been contributed by a user, and will be
+added to the main release Soon(tm).
+
+=head2 Why I keep getting "can't open device: /dev/xxxxx at .../Modem.pm line 468" errors ?
+
+First of all, be sure to use B<Device::Modem version 1.52+>.
+
+Probably you don't have the correct permissions to access your modem device
+(usually /dev/modem, or /dev/ttyS0 on unix and COM1/COM2/... on windows).
+Or you are trying to use the examples that come with Device::Modem distribution
+with an older version (Device::Modem <= 1.33).
+
+In this case, you should upgrade to Device::Modem 1.52+.
+
+=head2 Why I get the error "Can't call method "purge_all" on an undefined value at .../Modem.pm line 545" ?
+
+Again, B<upgrade to Device::Modem version 1.52+>.
+
+If you get this error, it means that the communication port could not be opened.
+Most probably you don't have permissions to access your serial port, or you have
+used a wrong device name (check your device entry in C</dev> folder).
+
+Since version 1.52, C<Device::Modem::connect()> will try to automatically reconnect
+if your port connection shuts down, or the C<Device::SerialPort>, or C<Win32::SerialPort>
+underlying object is deleted or invalidated.
+
+You should really upgrade to Device::Modem 1.52+.
+
+=head2 Can I make voice calls with this modem?
+
+B<No>. What you can do, is voice call B<dialing>.
+After the dialing though, you have to speak.
+Your computer can not do that, unless you have a PBX board,
+at least not with Device::Modem.
+
+=head2 This module is pretty slow. What can I do?
+
+Make sure you are using that latest version. From version 1.30, the main "send-command" / "wait-answer"
+cycle has been sensibly improved for speed, though you now have to specify a timeout if you want
+the module to wait an answer if modem is not ready.
+
+Probably this is the better compromise...
+
+=head2 Can I make a [insert_your_preferred_number_here] euro donation to you for this fantastic module?
+
+Oh, yes!
+Please feel free to contact L<cosimo@cpan.org> to decide details about this... :-)
+
+=for html
+Or, if you have nothing wrong with that, go to my <A HREF="http://www.amazon.com/gp/registry/registry.html?id=3TB9RMFORFIV5">Amazon wishlist</A>.
+
+=for pod
+Or, if you have nothing wrong with that, go to my amazon wishlist (C<http://www.amazon.com/gp/registry/registry.html?id=3TB9RMFORFIV5>).
+
+=head2 I think you are a ?#!x$*z!#(!* and your software sucks
+
+Uh.
+
+Please contact me, so I can improve my software design, ideas and coding,
+but only if you explain the reasons of your criticism. Thank you.
+

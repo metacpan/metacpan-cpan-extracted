@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3b010ab5281923c1be474de1a8275d66aaf51ab1 AUTHOR_PLEDGE
+SHA1 9361de0476554d0e6fe7ce34136c4181ca414125 CONTRIBUTORS
+SHA1 d717cee042943363c07af081d041237c17206aaa Changes
+SHA1 54d937ffd5cdfa8831978a3321b1805d56ee4ab3 INSTALL
+SHA1 73f01167fe93f49e71989d82937f26f2b9bb52f2 LICENSE
+SHA1 43b3a82c8034df3f0a34e57a719d1fca210b4e6d MANIFEST
+SHA1 80d0c9541e95e1c6941e4c1db99f26b5f087de66 META.json
+SHA1 0806aebfdc6f062033765817bf8494c28422c5fa META.yml
+SHA1 e7d215b53170f2081d599013a577702e596613a9 Makefile.PL
+SHA1 33b32d176b7999f110ca32a7766ffaeaf565c6c7 README
+SHA1 8c8e13ffe33fae6d7ef67fb350c85bbcc0366811 README.mkdn
+SHA1 b03b4e0d1355412db8c615300a8b47f19f17d0ba cpanfile
+SHA1 cf286e1b0c7224ca4b48b61daf29b93b4b851f51 doap.xml
+SHA1 f5a371cc4ccf29cda0968dd9c60e7cf19c379d8b lib/Dancer/Template/Handlebars.pm
+SHA1 1aae6404e8b1666b6727d4cc375e09776d0066c2 lib/Dancer/Template/Handlebars/Helpers.pm
+SHA1 747cd2ccbcc47a7b80d328cfd12c3a2ac1a62686 t/00-compile.t
+SHA1 c566900b8c044bfca4cbb7dbabe6cbbc3c5788b5 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 305cb0f127290d200980c9b3512f9c2f974b7f36 t/basic.t
+SHA1 492fbae0b45010feb681b0b6ded17bfc49d42bad t/layout.t
+SHA1 f7f4bd08cf25c10d93a4d590eb65d6f2c97bf5ea t/lib/MyHelpers.pm
+SHA1 2bbbe9805f4e92c969bfb3ec289ca849a7c99a58 t/views/hello.hbs
+SHA1 7a502b6b70949f60b38a82e82ae3ccf0220b1c6e t/views/helper.hbs
+SHA1 94dc3772a04c76d07a4a094a6ebf8f8a1b5261ab t/views/helper2.hbs
+SHA1 5040fdb52f07ce73806ff014fffbbb398922b836 t/views/layouts/layout.hbs
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlbR4ssACgkQ34Hwf+GwC4yM0ACfUmE4IrBUOC2ckZ7ZxgHGMt0m
+nuAAoPYIgoJeRy6lB3Wjq3yhoYeadTz9
+=mq6z
+-----END PGP SIGNATURE-----

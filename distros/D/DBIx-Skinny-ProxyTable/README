@@ -1,0 +1,62 @@
+NAME
+    DBIx::Skinny::ProxyTable - handling dynamic table for DBIx::Skinny
+
+SYNOPSIS
+      package Proj::DB;
+      use DBIx::Skinny;
+      use DBIx::Skinny::Mixin modules => [qw(ProxyTable)];
+
+      package Proj::DB::Schema;
+      use DBIx::Skinny::Schema;
+      use DBIx::Skinny::Schema::ProxyTableRule;
+
+      install_table 'access_log' => shcema {
+        proxy_table_rule 'named_strftime', 'access_log_%Y%m', 'accessed_on';
+
+        pk 'id';
+        columns qw/id/;
+      };
+
+      package main;
+
+      my $rule = Proj::DB->proxy_table->rule('access_log', accessed_on => DateTime->today);
+      $rule->table_name; #=> "access_log_200901"
+      $rule->copy_table;
+
+      my $iter = Proj::DB->search($rule->table_name, { foo => 'bar' });
+
+      # or you can call manually. ( NOT RECOMMEND )
+      Proj::DB->proxy_table->set(access_log => "access_log_200901");
+      Proj::DB->proxy_table->copy_table(access_log => "access_log_200901");
+
+DESCRIPTION
+    DBIx::Skinny::ProxyTable is DBIx::Skinny::Mixin for partitioning table.
+
+METHOD
+  set($from, $to)
+    set schema information for table that name is $to based on $from to your
+    project skinny's schema. I don't recommend to call this method directly
+    because of distributing naming rule.
+
+    see also rule method.
+
+  copy_table($from, $to)
+    copy table from $from to $to if it $to is not exist. SQLite and MySQL
+    only support.
+
+  rule($from, @args)
+    create DBIx::Skinny::ProxyTable::Rule object. @args is followed by your
+    project skinny's schema definition.
+
+    see also DBIx::Skinny::ProxyTable::Rule
+
+AUTHOR
+    Keiji Yoshimi <walf443 at gmail dot com>
+
+SEE ALSO
+    DBIx::Skinny, DBIx::Class::ProxyTable
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

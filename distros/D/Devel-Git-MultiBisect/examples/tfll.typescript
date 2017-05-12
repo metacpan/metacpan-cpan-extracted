@@ -1,0 +1,849 @@
+[multisect] $ perl transitions_full_lib_locale.pl
+Arguments provided to process_options():
+$VAR1 = {
+          'verbose' => 1,
+          'test_command' => 'harness',
+          'first' => 'v5.25.1',
+          'configure_command' => 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null',
+          'gitdir' => '/home/username/gitwork/perl',
+          'outputdir' => '/home/username/multisect/outputs',
+          'make_command' => 'make test_prep 1>/dev/null 2>&1',
+          'last' => 'd6e0ab90d221e0e0cbfcd8c68c96c721a688265f',
+          'workdir' => '/usr/home/username/multisect'
+        };
+ZZZ: get_commits_range:
+[
+  "001761daee58d9e33b457b762adae1f44a887a2d",
+  "7d376cf2211a31aecb2ae5e18343bf0d157125e8",
+  "5b145eb412326b9b57276229cfde0ef09e7ca2bc",
+  "3268d169edcb7724b8e271f088667b341d87f4f6",
+  "3d809c37fa60448b1ea99d2ccb4c331887f353c9",
+  "63c81c3f753ee347d0a9b62b314aa7e843093805",
+  "efdbe372ef49f72363879a5a2b598b0770415402",
+  "1e2ea6fa1a2eba023fc9e17082e8909395c79e5a",
+  "5ad999257778c656213e977c2fd782e515f02bad",
+  "a061ab0bf2cb11304132a96f31a2b0403912e9b6",
+  "cc5f9b8acb940eaa010ae87bdf61c7c118da5bf7",
+  "65985bd1d624ef3a5d827a74683c2bc1f24dfb96",
+  "738155d2fb1d2430e97c38da93d074e4e8b5974f",
+  "60e04ba1a34f784612d20e526a0ce38e47a53cf1",
+  "4be1619067a9654f65aef6cfd26153e246218fe8",
+  "8f7d85af81a1d45acb4b5bdd3ef5636dccc8c6fb",
+  "32e7f215b3ed0d58db0abe1375ecbf0b202ddc43",
+  "06c4bad0551a71302ea93b2f015f632a62e48d76",
+  "c2c360591864547f4210a9df74e0064cff39a11b",
+  "db629560b69530994e144a9d538421f72ec29483",
+  "a50cb9d2d06ab72d549eaebb8b648f4dbe054a3d",
+  "a55ca2cb1c0fdf584fada8400e3f4ebe160cfe0d",
+  "47011d98d8138b193bac04ac39d25acbe9b579ba",
+  "89e2fe5204324fa39466f06895daa50e855dd629",
+  "5ea3460bf04be858ac65dd690c9f49c3d1514ea4",
+  "29e10d39e1747dbb4f219bc660ccfa99ff864ee8",
+  "d88ca568f0ba6af079816962f37e415fd773f90e",
+  "881018827f9961cf5132d9243259ca1e9e2c0330",
+  "81477935a7844157c487842db13847814f93b52a",
+  "73665bc485938167ff7ce1082176b6dac0df99de",
+  "f7ce57d8b7fc8923088cd227564909509cc7f9bf",
+  "01bbc29fd9fddea39dc7b8194ad3cd950f7a466e",
+  "bea284c81588d5800ea7246f6a409ab0599e57e5",
+  "cd642408b70f009ca99d93c350a0bfc33707da9a",
+  "09783a0a55f86092ea742bd6915170b04f98af7f",
+  "ffd2521e4c1de43a59187823fbf6e3aedeab5433",
+  "5cb51e4d385f1a78e57460db8c624392985b7678",
+  "118a40c4aa59af9330f4c37e86423a8b7c0d301c",
+  "76734a3218e712760695898e424c2369ccdd49c6",
+  "28383d1aefa4f4c119153a5ed41ebf82ecd7a062",
+  "c534415b1fbad02ef209331a3c61dc6bf1356379",
+  "497064412d19d508aa2afbe2e8ab11407edc65e8",
+  "397c43d88a02adee0747f7e7e7db500858dac48b",
+  "09eb1f392c1b3fe7ceb75bc21d727f40789c9f88",
+  "1381beadb71549f2dc14a02454cdb7c11897f118",
+  "adff8e6f7019eb8effa545d376f566003c2ada46",
+  "5f602b3b7e2c9031e50c464666e93499c86a8fbe",
+  "f2b9631d5d19d2b71c1776e1193173d13f3620bf",
+  "4cb26c52ed90189e6e3564a4654b869fe4c4d3e6",
+  "d7244c9a613101b97077ed781e11a729c347555c",
+  "8687a6e6de7ce658ece8673ad56c37d0a1d8cbca",
+  "31f7d6b96b4add13808a033633e6dd1e4d791845",
+  "f68c540351c7aa8d731d66d76cce5fa9b18310e6",
+  "ad01aea0cf123e30f64d2b7f183dfa28c87af2ef",
+  "f17bc913886cd59ab68fde7bec9131dbb90186a0",
+  "4e615abd31bcd0bb8f321ae4687e5aef1a8aa391",
+  "00bf60caa5125511dc13041a21f3d1cf2abff837",
+  "165a1c52807daa7ad3ecc83f0811047937088904",
+  "59c018b996263ec705a1e7182f7fa996b72207da",
+  "6696cfa7cc3a0e1e0eab29a11ac131e6f5a3469e",
+  "4ebeff162503a0f3c404305458e4730ff29f1dea",
+  "3c5f993ee8b2fd0912839a82e5d7d8c871a363ea",
+  "c664130fefeaef47ddc7dcbf7ec1830d04af8ea7",
+  "79f120c89a6e123770f65fd49893ef0b379cd922",
+  "ff52fcf1dae90deb49f680d7cdbf78a04458ac47",
+  "a4a439fb9cd74c575855119abb55dc091955bdf4",
+  "78d57975d5aa732ef6dfba842558183e8880539c",
+  "2fcc0ca9e3b59e6224af067db588ef3249137029",
+  "55e5378d6579f68f700c44b38ccbeecf00493847",
+  "58eebef2d34f0f429943dd0ab07bead821d9daac",
+  "6ddd902ce7b4052f3d48e6dd638d08d705d1ee16",
+  "17f41037d4817b6618a903e12aa1377ae078f66a",
+  "81547f2e05510b240d229ed703948ebd9a1a515a",
+  "227883ef4e371529b73e31e13f3799ba3ad47cee",
+  "b9f119beb209b721e37523a5a5d1d72c901f3316",
+  "cbef69c1c0b28f5a8e50e67afea1ff67dcce20aa",
+  "a73158aa0ed4103b2fa187c058e354bf55e7e7af",
+  "1ee983f50d5e03f3a0d3f3a2fb92a6f6d49da9f2",
+  "27cdc72ee6ec3061d775f2ff7739a3b826d811a1",
+  "2c0879e73edf569030da235e2a6aa0d8fe1fa1a9",
+  "c389e68f6ee2168540f4380398361c24e9b985aa",
+  "e67bc19562c85b51b0d54a3997beeb3ceee2447a",
+  "c29dfc6a6c45f86648c51f961304254cc3c449b9",
+  "e9baa58dcb4000655dff6e7f49c2d012acc17a39",
+  "c97f3887922704b32d37f95cfd7f21cca51ef5a7",
+  "1f44a80e271feac30e0ddd10ca806f3914c2860a",
+  "c429f8edffbbd9861ff58188d59b44dab3946ac1",
+  "4f358de1e9bf7105dab7157d4cbbf73d0ec61f74",
+  "997990fd7b2db8e6636731fc98ed2e1e000c4718",
+  "d54f4edc5d7b2d0c486a36819c348aaec29b8470",
+  "18d04e70ad3150934855463233bb7dc953f33a23",
+  "fbe0543bcbaefe00657a5aa89d684a59c352cb84",
+  "58818a660dce0bbd7c77e5be9d0b7c86d30979af",
+  "4694301214bd05a1f063a10ecef2406f849bb30f",
+  "4911bc40d408c8c5acf325e388b3e0513ef90571",
+  "bdc905d035d4f835a808f1825dad9a8cd726d1ec",
+  "6830146276953868aad3dab123e7048a786f9452",
+  "d2bccf1b4e37b11ff1a8260cedb2164e0f382dcb",
+  "ad1bab996deb0d22bb36939fb1f256d22ccd68cb",
+  "3ecb55dd84519230479575c3898a0895dd4ba286",
+  "bd4dc8873aedf5144874edd7e1cf73988fb50bde",
+  "bc900e45a4498affce40e6fdd0282f3715c0b5be",
+  "ef55c6737a667b6853720247c181a0cbfbbe6116",
+  "198aaf386565cec44720e3fd597a6534d97017f5",
+  "e7127e21a1976771d8a5eaf45c257b1d97ca9232",
+  "cc93473c948e5db15d2a37d4e0df8ded0354f6e2",
+  "37808b008bc94c39c5452495998b0106d6d38f6f",
+  "21866d1330b560599ac45bc24574bbd830e59a37",
+  "f71079d3db9617c58ae7b6af4dbc508997966529",
+  "9c88bb56d60636172f099f56a2808249de0c55a6",
+  "e2733f9a9c4a5fa2b3718bce12d67b73111a9bf2",
+  "59f30b2e556f0c671940ad7066fa598d49f64cbb",
+  "4d092e9adf58e7e84cdda3a7ad11760494862343",
+  "404b28f3635e5d0c50f9e076d29cdadf9d75e99b",
+  "bd9daf582584bca02932cf1f7e2b8320ad778aae",
+  "33d95a65610de4b893a90e38c300d3f0b0bf2fb0",
+  "0a44e30b028e9918e549705da4512ad5b5a98493",
+  "6667f488a374c159ef434cbda98e3aea9193e401",
+  "1e834499d76393954f000065800c86f4ba9fe953",
+  "1ab337397b606052e0bf603ddd09115824d4192f",
+  "3b17061e8900d0a8d6eb91ef692333d2c3b2c5e9",
+  "f3fccad61d50bafd4048e7aa2ef581b869cef078",
+  "ebb13b509c428fd7f68640fb852002978e41c60f",
+  "aad46ae64df28b56b2fd339fb99a78a5747c6d66",
+  "af4a745c3de5c6ec8da1633d32df494af30acf4a",
+  "e6404dcec492d26d3bf483b36a4a0a3211f23634",
+  "078428fed963149aed67dec970b15c2e94c9bb69",
+  "98b8e3618fa8e92990412ad4eeab6b13fc76482a",
+  "514e62e37b812971a6aecaf30b28be6f6c8498b8",
+  "c6a6e1c8da974f7737a2fe6ac1e8fbd68546d67c",
+  "e17bc05a6e975416ade31d7743572631e930f1e2",
+  "2cd79449377bbb32a66849c7904f255698f78ad6",
+  "64320867983cca6494b5d7efcd95af322feacf0c",
+  "2104c6951fdadf57c33668bc253de5ea871c9335",
+  "79881ad7125261d7f9907e57713035b0602cd9de",
+  "1ba11575b2c75391c309a50dd8070f5c2af46656",
+  "ee072c898947f5fee316f1381b29ad692addcf05",
+  "8c4723656080526a8392690f30ec46d642de80ba",
+  "7eec73eb790f7c4982edfc28c17c011e8a072490",
+  "0bf54b1ecaec8f6d80845d6cb77d62f8c9f4c415",
+  "88bd7502bf4d3b88554da76bf1126e98dbacd997",
+  "596f7718608c57f0ddf6f274e2c8d12030fb4e9f",
+  "5e21a9a97fab08fc899f9b4b6e4cb01cdf27826e",
+  "016af03917eea80cc676de5e934ea517073e5976",
+  "5a0de58193409bae1e4b2ebb59c6d1af2c9b4f00",
+  "7720b61be266a671fcf072b6d38f8a2b3bc34eda",
+  "e4fc70828d25802f8f511e75d50813489648c124",
+  "1a3e97240d9aa40adfeecbebce3f3cce94fe131b",
+  "79409ac8354d04a53c3ba700bc429df2d9bd2043",
+  "7351909aac61b53787fd4089f63807c977a0db64",
+  "33a10326b09f0725eabc08dc590a6c35764f20a4",
+  "31b6f23ed55c460d17977de41cb3e9cb766fd414",
+  "81b22c1785a3942e35481ae675f1d9cfcd97ab0e",
+  "706d6f2a1d6296dc5d88c518b3eca906347ec936",
+  "222c4b0094b4145d06cb164bedd2a66a3141203b",
+  "5347602a6bb67df5acf516eeba93020f8a3bdf5f",
+  "f871eec40e9a7795680dac669164adc39cb6a2a2",
+  "b1d776ccb34b3542b2689c64ea05787e7a0fc931",
+  "ad96436a129f2e21607a1a5b00e1924ec0ed9cd1",
+  "a1e5c56130766aa646e4153d1f3ea60310a818d0",
+  "756a1fc445182059797b470a42abe2b0f18c3d03",
+  "43faffbc07b9c924ceb575fb48c43e4e7db46d78",
+  "971f6fbfde1db03544080e4ca5682549e5856597",
+  "4ef6d3801d0c96dcb38fbd4a1c2a0e49196ef033",
+  "24293753f0a72ccfbcb1da295e440f5d6cd6aa8f",
+  "a9eceb2d857bbc59b5154dab9e49408ea38b8148",
+  "955a736c2cd1ad6cd7868da807a056c4d540dfaa",
+  "d54523c40e947fbb41347e55dca669b20b9ae52e",
+  "c385646f2a7515c11ed819df7fd71e6476dd7bcb",
+  "1a961f9f4ca29c9cc14df1f66d0427e5cabfbf1b",
+  "32dfbb33d9d65fcaa08a476841459ef8b0801e45",
+  "44b1835744fc7d04d391b987c9b2ad4095b09b28",
+  "857716c91d72a6a564885f5d4ead75033c1840ee",
+  "60858fe86ce0e2182138f1006d72637ca0621048",
+  "8a094feeb16ec802357524d7ca31bc69c5c07bf1",
+  "bc4a5ad569b742afe08bedbf713cb595cef4e09e",
+  "3f6b66c14467c0f8c7459e32c576618155ca89f3",
+  "f32855156936eaf820046ce5030eea8ab1cc758d",
+  "3735683b023fce9f2d10ced6617390155313b6dd",
+  "0de6c762a26eee78d6c85af739cbb17ccbbeadc6",
+  "3bcfc7b32c9b00b9bf0355e7261883faed76aa08",
+  "9ed2d9d9590c246380663caa818775c693b29fb0",
+  "e23397c2eeebcfee7f88b590392f8b0aec393f79",
+  "0bac45c8ec730e2fa8dc539d8acfd2271778b4bf",
+  "8dd2ecb38ea33d0b1ddb80356f233a3848692e8a",
+  "8fe4bbc8847add0c39ceb548a6d7d7f7a42c06d0",
+  "69b63ee4908eb1aca0c1fcfee5f574ab3c3f7bf5",
+  "9f99f3e9e6ae0ec21101eb53f031516873ae9ac3",
+  "a1b6998077ae2b109cc93651b33f30c38a068f9e",
+  "8165798cc711507af4bd58859dae1d19860215fe",
+  "b20d3b89d707a2ac44e8fee8cae299ecd1bb7e28",
+  "6405d2efd52180a82bb921486ffeb4adf0167ecd",
+  "a1399808f7d0c25a44b5677fd6cafda57e658955",
+  "8e84dec289732f088323c1bdc1e82f10841b362a",
+  "e1711683d9d75ff4314d29ad0ca2e4268edcbaca",
+  "51e3e8c825a18bc0e09c2ae137d09f4a9c5bec08",
+  "ec5bd2262bb4e28f0dc6a0a3edb9b1f1b5befa2f",
+  "62ba63838458dc3df81eb419fc3c9fc1e41d7a77",
+  "12cb3c02e264d77fd9013f1b766d53f51de20f6f",
+  "2901a589f468669f5e9087642106e92479f89422",
+  "f72f2c070b0204ac6a1d3af58defbe641066e5b1",
+  "3b58a017360a47c8b94fbef2d6d902c41ad62f51",
+  "d60db39f8813951c8cc72a487997e8a8de5b9fb6",
+  "29002dbe17478ea0e63401923b1e8af041bcf556",
+  "d09711917ce23e8f0ea2c508ccef33f2da87d68e",
+  "18940b1f64e0cf2b55273c662167fdce8ba842b4",
+  "c04c2bf1bf7cf377ab523ecaa7b0bd9a8f93f0cd",
+  "2d41a263c0e09e6dfabecd28212d7e80b42dc3e6",
+  "ba3530a211029e1fe07e19b385b9f7c17af92ac5",
+  "683433bde86eadff5e1a6ecebc027e0eefcd25ca",
+  "bf89478047d514ae1f567b0f3a20b3123bfd3f70",
+  "d52d06a7c81cf08f525d196054b9352c5ce45261",
+  "323565712651fcba2b32b0b34a5e12fc169e3330",
+  "93e53d65b0b29c674bff7d23eff34925a1e79526",
+  "e388eafabcb845b5918222d97a454fea1600edaf",
+  "90a4dab5168f7b0f935a5e5497b7756f2004f80a",
+  "7984aa215389d9f2df23b11f387d8a0edcfb3245",
+  "8c3f6b0b0ae614484fa1c408f25a4cfbac77a513",
+  "d3cf57bba0f4ee08a63044d3c9001f1e4ec2d73c",
+  "d6e0ab90d221e0e0cbfcd8c68c96c721a688265f",
+]
+ZZZ: items in get_commits_range: 220
+AAA: set_targets
+[
+  {
+    path => "/home/username/gitwork/perl/lib/locale.t",
+    stub => "lib_locale_t",
+  },
+]
+Testing commit: 001761daee58d9e33b457b762adae1f44a887a2d
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/001761d.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/001761d.lib_locale_t.output.txt
+Tested commit:  001761daee58d9e33b457b762adae1f44a887a2d; returning to: blead
+Commit counter: 1
+Testing commit: d6e0ab90d221e0e0cbfcd8c68c96c721a688265f
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt
+Tested commit:  d6e0ab90d221e0e0cbfcd8c68c96c721a688265f; returning to: blead
+Commit counter: 2
+target count|sum of status values: 1|0
+Targeting file: /home/username/gitwork/perl/lib/locale.t
+
+At commit counter 2, preparing to test commit 110 of 220
+Testing commit: 9c88bb56d60636172f099f56a2808249de0c55a6
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt
+Tested commit:  9c88bb56d60636172f099f56a2808249de0c55a6; returning to: blead
+Commit counter: 3
+
+At commit counter 3, preparing to test commit 109 of 220
+Testing commit: f71079d3db9617c58ae7b6af4dbc508997966529
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/f71079d.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/f71079d.lib_locale_t.output.txt
+Tested commit:  f71079d3db9617c58ae7b6af4dbc508997966529; returning to: blead
+Commit counter: 4
+
+At commit counter 4, preparing to test commit 55 of 220
+Testing commit: f17bc913886cd59ab68fde7bec9131dbb90186a0
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt
+Tested commit:  f17bc913886cd59ab68fde7bec9131dbb90186a0; returning to: blead
+Commit counter: 5
+
+At commit counter 5, preparing to test commit 82 of 220
+Testing commit: e67bc19562c85b51b0d54a3997beeb3ceee2447a
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt
+Tested commit:  e67bc19562c85b51b0d54a3997beeb3ceee2447a; returning to: blead
+Commit counter: 6
+
+At commit counter 6, preparing to test commit 81 of 220
+Testing commit: c389e68f6ee2168540f4380398361c24e9b985aa
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/c389e68.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/c389e68.lib_locale_t.output.txt
+Tested commit:  c389e68f6ee2168540f4380398361c24e9b985aa; returning to: blead
+Commit counter: 7
+
+At commit counter 7, preparing to test commit 68 of 220
+Testing commit: 2fcc0ca9e3b59e6224af067db588ef3249137029
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/2fcc0ca.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/2fcc0ca.lib_locale_t.output.txt
+Tested commit:  2fcc0ca9e3b59e6224af067db588ef3249137029; returning to: blead
+Commit counter: 8
+
+At commit counter 8, preparing to test commit 67 of 220
+Testing commit: 78d57975d5aa732ef6dfba842558183e8880539c
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/78d5797.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/78d5797.lib_locale_t.output.txt
+Tested commit:  78d57975d5aa732ef6dfba842558183e8880539c; returning to: blead
+Commit counter: 9
+
+At commit counter 9, preparing to test commit 61 of 220
+Testing commit: 4ebeff162503a0f3c404305458e4730ff29f1dea
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/4ebeff1.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/4ebeff1.lib_locale_t.output.txt
+Tested commit:  4ebeff162503a0f3c404305458e4730ff29f1dea; returning to: blead
+Commit counter: 10
+
+At commit counter 10, preparing to test commit 60 of 220
+Testing commit: 6696cfa7cc3a0e1e0eab29a11ac131e6f5a3469e
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt
+Tested commit:  6696cfa7cc3a0e1e0eab29a11ac131e6f5a3469e; returning to: blead
+Commit counter: 11
+
+At commit counter 11, preparing to test commit 58 of 220
+Testing commit: 165a1c52807daa7ad3ecc83f0811047937088904
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/165a1c5.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/165a1c5.lib_locale_t.output.txt
+Tested commit:  165a1c52807daa7ad3ecc83f0811047937088904; returning to: blead
+Commit counter: 12
+
+At commit counter 12, preparing to test commit 57 of 220
+Testing commit: 00bf60caa5125511dc13041a21f3d1cf2abff837
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/00bf60c.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/00bf60c.lib_locale_t.output.txt
+Tested commit:  00bf60caa5125511dc13041a21f3d1cf2abff837; returning to: blead
+Commit counter: 13
+
+At commit counter 13, preparing to test commit 56 of 220
+Testing commit: 4e615abd31bcd0bb8f321ae4687e5aef1a8aa391
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt
+Tested commit:  4e615abd31bcd0bb8f321ae4687e5aef1a8aa391; returning to: blead
+Commit counter: 14
+
+At commit counter 14, preparing to test commit 138 of 220
+Testing commit: 8c4723656080526a8392690f30ec46d642de80ba
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/8c47236.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/8c47236.lib_locale_t.output.txt
+Tested commit:  8c4723656080526a8392690f30ec46d642de80ba; returning to: blead
+Commit counter: 15
+
+At commit counter 15, preparing to test commit 137 of 220
+Testing commit: ee072c898947f5fee316f1381b29ad692addcf05
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/ee072c8.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/ee072c8.lib_locale_t.output.txt
+Tested commit:  ee072c898947f5fee316f1381b29ad692addcf05; returning to: blead
+Commit counter: 16
+
+At commit counter 16, preparing to test commit 97 of 220
+Testing commit: 6830146276953868aad3dab123e7048a786f9452
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/6830146.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/6830146.lib_locale_t.output.txt
+Tested commit:  6830146276953868aad3dab123e7048a786f9452; returning to: blead
+Commit counter: 17
+
+At commit counter 17, preparing to test commit 96 of 220
+Testing commit: bdc905d035d4f835a808f1825dad9a8cd726d1ec
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/bdc905d.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/bdc905d.lib_locale_t.output.txt
+Tested commit:  bdc905d035d4f835a808f1825dad9a8cd726d1ec; returning to: blead
+Commit counter: 18
+
+At commit counter 18, preparing to test commit 76 of 220
+Testing commit: cbef69c1c0b28f5a8e50e67afea1ff67dcce20aa
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/cbef69c.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/cbef69c.lib_locale_t.output.txt
+Tested commit:  cbef69c1c0b28f5a8e50e67afea1ff67dcce20aa; returning to: blead
+Commit counter: 19
+
+At commit counter 19, preparing to test commit 75 of 220
+Testing commit: b9f119beb209b721e37523a5a5d1d72c901f3316
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/b9f119b.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/b9f119b.lib_locale_t.output.txt
+Tested commit:  b9f119beb209b721e37523a5a5d1d72c901f3316; returning to: blead
+Commit counter: 20
+
+At commit counter 20, preparing to test commit 66 of 220
+Testing commit: a4a439fb9cd74c575855119abb55dc091955bdf4
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt
+Tested commit:  a4a439fb9cd74c575855119abb55dc091955bdf4; returning to: blead
+Commit counter: 21
+
+At commit counter 21, preparing to test commit 65 of 220
+Testing commit: ff52fcf1dae90deb49f680d7cdbf78a04458ac47
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt
+Tested commit:  ff52fcf1dae90deb49f680d7cdbf78a04458ac47; returning to: blead
+Commit counter: 22
+
+At commit counter 22, preparing to test commit 59 of 220
+Testing commit: 59c018b996263ec705a1e7182f7fa996b72207da
+Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+Running 'make test_prep 1>/dev/null 2>&1'
+Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt 2>&1; cd -'
+Created /home/username/multisect/outputs/59c018b.lib_locale_t.output.txt
+Tested commit:  59c018b996263ec705a1e7182f7fa996b72207da; returning to: blead
+Commit counter: 23
+Ran 23 runs; elapsed: 4297 sec; mean: 186.83 sec
+BBB: multisect_all_targets: 1
+CCC: get_timings
+{ elapsed => 4297, mean => 186.83, runs => 23 }
+DDD: get_multisected_outputs
+{
+  lib_locale_t => [
+    {
+      commit => "001761daee58d9e33b457b762adae1f44a887a2d",
+      commit_short => "001761d",
+      file => "/home/username/multisect/outputs/001761d.lib_locale_t.output.txt",
+      md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "f17bc913886cd59ab68fde7bec9131dbb90186a0",
+      commit_short => "f17bc91",
+      file => "/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt",
+      md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+    },
+    {
+      commit => "4e615abd31bcd0bb8f321ae4687e5aef1a8aa391",
+      commit_short => "4e615ab",
+      file => "/home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt",
+      md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+    },
+    {
+      commit => "00bf60caa5125511dc13041a21f3d1cf2abff837",
+      commit_short => "00bf60c",
+      file => "/home/username/multisect/outputs/00bf60c.lib_locale_t.output.txt",
+      md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+    },
+    {
+      commit => "165a1c52807daa7ad3ecc83f0811047937088904",
+      commit_short => "165a1c5",
+      file => "/home/username/multisect/outputs/165a1c5.lib_locale_t.output.txt",
+      md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+    },
+    {
+      commit => "59c018b996263ec705a1e7182f7fa996b72207da",
+      commit_short => "59c018b",
+      file => "/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt",
+      md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+    },
+    {
+      commit => "6696cfa7cc3a0e1e0eab29a11ac131e6f5a3469e",
+      commit_short => "6696cfa",
+      file => "/home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt",
+      md5_hex => "b29d11b703576a350d91e1506674fd80",
+    },
+    {
+      commit => "4ebeff162503a0f3c404305458e4730ff29f1dea",
+      commit_short => "4ebeff1",
+      file => "/home/username/multisect/outputs/4ebeff1.lib_locale_t.output.txt",
+      md5_hex => "b29d11b703576a350d91e1506674fd80",
+    },
+    undef,
+    undef,
+    undef,
+    {
+      commit => "ff52fcf1dae90deb49f680d7cdbf78a04458ac47",
+      commit_short => "ff52fcf",
+      file => "/home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt",
+      md5_hex => "b29d11b703576a350d91e1506674fd80",
+    },
+    {
+      commit => "a4a439fb9cd74c575855119abb55dc091955bdf4",
+      commit_short => "a4a439f",
+      file => "/home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "78d57975d5aa732ef6dfba842558183e8880539c",
+      commit_short => "78d5797",
+      file => "/home/username/multisect/outputs/78d5797.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "2fcc0ca9e3b59e6224af067db588ef3249137029",
+      commit_short => "2fcc0ca",
+      file => "/home/username/multisect/outputs/2fcc0ca.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "b9f119beb209b721e37523a5a5d1d72c901f3316",
+      commit_short => "b9f119b",
+      file => "/home/username/multisect/outputs/b9f119b.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "cbef69c1c0b28f5a8e50e67afea1ff67dcce20aa",
+      commit_short => "cbef69c",
+      file => "/home/username/multisect/outputs/cbef69c.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "c389e68f6ee2168540f4380398361c24e9b985aa",
+      commit_short => "c389e68",
+      file => "/home/username/multisect/outputs/c389e68.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "e67bc19562c85b51b0d54a3997beeb3ceee2447a",
+      commit_short => "e67bc19",
+      file => "/home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "bdc905d035d4f835a808f1825dad9a8cd726d1ec",
+      commit_short => "bdc905d",
+      file => "/home/username/multisect/outputs/bdc905d.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "6830146276953868aad3dab123e7048a786f9452",
+      commit_short => 6830146,
+      file => "/home/username/multisect/outputs/6830146.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "f71079d3db9617c58ae7b6af4dbc508997966529",
+      commit_short => "f71079d",
+      file => "/home/username/multisect/outputs/f71079d.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "9c88bb56d60636172f099f56a2808249de0c55a6",
+      commit_short => "9c88bb5",
+      file => "/home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "ee072c898947f5fee316f1381b29ad692addcf05",
+      commit_short => "ee072c8",
+      file => "/home/username/multisect/outputs/ee072c8.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    {
+      commit => "8c4723656080526a8392690f30ec46d642de80ba",
+      commit_short => "8c47236",
+      file => "/home/username/multisect/outputs/8c47236.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    undef,
+    {
+      commit => "d6e0ab90d221e0e0cbfcd8c68c96c721a688265f",
+      commit_short => "d6e0ab9",
+      file => "/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt",
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+  ],
+}
+EEE: inspect_transitions
+{
+  lib_locale_t => {
+    newest => {
+      file => "/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt",
+      idx => 219,
+      md5_hex => "481032a28823c8409a610e058b34a047",
+    },
+    oldest => {
+      file => "/home/username/multisect/outputs/001761d.lib_locale_t.output.txt",
+      idx => 0,
+      md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+    },
+    transitions => [
+      {
+        newer => {
+                   file => "/home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt",
+                   idx => 55,
+                   md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+                 },
+        older => {
+                   file => "/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt",
+                   idx => 54,
+                   md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+                 },
+      },
+      {
+        newer => {
+                   file => "/home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt",
+                   idx => 59,
+                   md5_hex => "b29d11b703576a350d91e1506674fd80",
+                 },
+        older => {
+                   file => "/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt",
+                   idx => 58,
+                   md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+                 },
+      },
+      {
+        newer => {
+                   file => "/home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt",
+                   idx => 65,
+                   md5_hex => "481032a28823c8409a610e058b34a047",
+                 },
+        older => {
+                   file => "/home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt",
+                   idx => 64,
+                   md5_hex => "b29d11b703576a350d91e1506674fd80",
+                 },
+      },
+    ],
+  },
+}
+
+Finished
+

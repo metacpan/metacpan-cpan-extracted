@@ -1,0 +1,35 @@
+DBIx::Simple::Interpol
+
+The recommended way to use SQL::Interpol is via its DBIx::Simple
+integration, which provides an excellent alternative to plain DBI
+access.
+
+Ordinarily, the "iquery" method in DBIx::Simple integrates SQL::Interp.
+But by loading this module instead (or after) DBIx::Simple, the "iquery"
+method will be patched to use SQL::Interpol instead.
+
+This is all there is to this module.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Aristotle Pagaltzis.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

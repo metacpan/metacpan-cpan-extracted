@@ -1,0 +1,9 @@
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = true
+
+# The reason why the followings are set is because a template pm file is included
+[Modules::RequireFilenameMatchesPackage]
+severity = 1
+
+[TestingAndDebugging::RequireUseStrict]
+severity = 1

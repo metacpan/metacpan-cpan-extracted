@@ -1,0 +1,17 @@
+         Installation instructions for Devel::Cover::Report::Clover
+
+To install this module, just do:
+
+  perl Build.PL
+  ./Build
+  ./Build test
+  ./Build install  (this step may need to be done as the superuser)
+
+If you really want to, you can use a more traditional Makefile.PL:
+
+  perl Makefile.PL
+  make test
+  make install     (this step may need to be done as the superuser)
+
+There's heaps more information in the README and in the documentation
+of the various packages in this distribution.

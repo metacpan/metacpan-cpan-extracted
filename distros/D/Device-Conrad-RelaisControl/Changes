@@ -1,0 +1,13 @@
+Revision history for Perl extension Device::Conrad::RelaisControl.
+
+0.12 
+   - Frame is called with the right namespace Device::Conrad
+   - card test functions moved to cardtest.pl for test.pl to succeed
+     without card attached
+0.1  fixed bug in Frame.pm. As the method is considered static the
+     package name has to absolute
+
+0.01  Sat Mar  2 16:38:41 2002
+	- original version; created by h2xs 1.21 with options
+		-X Device::Conrad::RelaisControl
+

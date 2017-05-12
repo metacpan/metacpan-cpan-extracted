@@ -1,0 +1,2 @@
+This is level 0
+{% block block1 %}Block 0 as is{% endblock %}

@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               DBIx-MyServer
+version:            0.42
+abstract:           Server-side implementation of the MySQL network protocol
+author:
+    - Philip Stoev <philip@stoev.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBD::mysql:    0.00
+    DBI:           0.00
+    Digest::SHA1:  0.00
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

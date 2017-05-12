@@ -1,0 +1,68 @@
+This module contains a script to create and find directories in a
+filesystem interactively and a accompanying perl module that does the
+job of creating and finding the directories. You may install the
+module and script like any other perl module, i.e. either running
+
+  $ perl Build.PL
+  $ ./Build test
+  $ sudo ./Build install
+
+or
+
+  $ perl Makefile.PL
+  $ make test
+  $ sudo make install
+
+If you just want the script, you may take the script gen_single_file to
+incorporate the library into the script and have all in one place.
+
+  $ gen_single_file mkdir_heute > mkdir_heute_single
+
+Place mkdir_heute_single anywhere in your $PATH.
+
+mkdir_heute - create and find directories interactive
+-----------------------------------------------------
+This script scans a basedir (~/A) for directories named YYYY/MM/DD
+where YYYY, MM and DD are numbers corresponding to a year, month, day
+of month, prints them on STDERR and asks for your input on STDIN.
+
+You may
+
+  - choose a directory from the list with it’s number
+
+  - choose the current directory with ’q’ or ’.’
+
+  - advance to the next or last page with ’n’ or ’l’
+
+  - return to the previous or first page with ’p’ or ’f’
+
+  - constrain the shown directories with ’/’ and a pattern
+
+  - constrain the creation date of the directories with ’d’ followed by
+    ’=’, ’<’ or ’>’ and a date (eg. 2009, 2009-04 or 2009-04-24)
+
+  - create a new directory with ’+’ and a description for it
+
+End your input with <Return> or <Enter>.
+The script returns the choosen directory on STDOUT and may be used in a
+shell alias like this:
+
+  alias cdheute='cd `mkdir_heute`'
+
+or
+
+  alias cdheute='cd $(mkdir_heute)'
+
+so that you can say ’cdheute’ on the command line and your working
+directory will be changed to the choosen directory.
+
+Copyright (c) 2009 Mathias Weidner (mathias@weidner.in-bad-schmiedeberg.de).
+All rights reserved.
+
+This module is free software; you can redistribute and/or modify it
+under the same terms as Perl itself. See the Perl Artistic License.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MER‐
+CHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

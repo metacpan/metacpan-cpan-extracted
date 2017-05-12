@@ -1,0 +1,101 @@
+Revision history for Perl extension DB2.
+
+0.10
+    * Original version: a massive rewrite from the three or four
+      previous frameworks, first time prepared for possible
+      redistribution
+
+0.11
+    ! Added significant (read: non-trivial) test cases.  Found problems
+      while doing so.  Reorganised some code.
+
+0.12
+    + Added SELECT_join, find_join to DB2::Table
+    + Added case insensitive match for DB2::db::get_table
+
+0.13
+    ! API CHANGE
+    - Obsoleted get_row_table_relationship
+    + Add add_row_table_relationship (to add more flexibility,
+      and save me some significant typing)
+
+0.14
+    + Added !!!/!<tbl>! support to CONSTRAINT and FOREIGNKEY
+      column attributes
+    + Improved return codes from DB2::Row->save() - should be able
+      to reliably use "true" as success.  Note that if nothing has
+      changed, it is considered "true" that it saved okay.
+    + Add default ROW setting for setup_row_table_relationship
+      Defaults to C<$tablename . "R"> .
+    + Added add_table as a simpler way to call
+      add_row_table_relationship (especially when using the new
+      default)
+
+0.15
+    + Added default row type - now you don't need to derive a type
+      from DB2::Row if you have nothing to overload.  Deriving from
+      DB2::Table remains since you always have to overload data_order.
+    + Added add_tables as a simpler way to call add_table, only if
+      using the defaults.
+    + Added set_default_package for adding tables in other packages.
+
+0.16
+    + Added get_base_row_type (was base_row_type in 0.15, but not
+      documented).
+    * Submitted to CPAN for the first time
+
+0.17
+    + Added LICENSE file.  Woops.
+
+0.18
+    + Reworked SELECT to be a more general function.
+      + Added ability to pass in columns as array ref
+      + Added ability to pass in extra options
+        + Added FOR READ ONLY clause, made it the default for find*
+          functions
+      - Obsoleted SELECT_join and SELECT_distinct as they can both
+        be done via SELECT (simultaneously, even!)
+      + Added statement attributes
+    + Slight speed-up to DB2::db::get_row_type_for_table by converting
+      eval STR to eval BLOCK.
+    + Added DB2::Row::as_hash for *::Template users
+
+0.19
+    + Allowed table types to be pre-loaded - if you don't want to put
+      the table package into its own module, you'll need to use/require
+      it first, and then DB2::db::get_table will just use it.
+    + Setting $DB2::db::debug to greater than 1 will now Carp::cluck
+      the SQL statement about to be prepared so you can see the context
+      of any DBD::DB2 error messages.
+
+0.20
+    + Added table delete functions - delete_id, delete_where, allowing
+      for massive cleanups without having to retrieve the data first.
+
+0.21
+    ! Changed to Module::Build
+    ! API CHANGE
+      * All data_order tags were lowercased.  This is partly to follow
+        Perl conventions, and partly to follow XML conventions.
+        (Hoping to eventually add a DB2::TableFromXML or something)
+    + Added pod-coverage tests (CPANTS game)
+
+0.22
+    ! Forgot to add Test::NoWarnings as requirement
+    ! Added call to finish statement handle for generated identities
+    + Added WITH statement support (though if you start using this,
+      you're probably more advanced than the author of this framework,
+      and may be better off just using DBI directly)
+
+0.23
+    ! DB2::Row::as_hash wasn't returning hashes properly
+    ! DB2::db::create_db had a similar bug in precedence
+    ! get_column was lc'ing something that wasn't always passed in - woops
+
+0.24
+    + Add DB2::db::dsn, allowing override to connect to remote databases
+      that are not currently cataloged locally
+
+0.25
+    + Add sqldefault
+    ! Fix dsn - it seemed to break local connections?

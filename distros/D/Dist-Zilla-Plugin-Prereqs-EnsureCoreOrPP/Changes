@@ -1,0 +1,55 @@
+Revision history for Dist-Zilla-Plugin-Prereqs-EnsureCoreOrPP
+
+0.09    2016-02-19 (PERLANCAR)
+
+	- [Bugfix] Do not regard prerequisite 'perl' as a module.
+
+
+0.08    2016-02-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to App::lcpan::Call 0.07.
+
+
+0.07    2015-10-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update mentioned module App::fatten (has been renamed to
+	  App::depak).
+
+
+0.06    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- Forgot to use App::lcpan::Call in EnsurePP.pm.
+
+
+0.05    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use App::lcpan::Call.
+
+
+0.04    2015-04-21 (PERLANCAR)
+
+	- [ux] Show all errors before bailing out.
+
+
+0.03    2015-04-21 (PERLANCAR)
+
+	- [Bugfix] Incorrect usage of is_still_core (must be called as
+          Module::CoreList::More->is_still_core).
+
+
+0.02    2015-04-21 (PERLANCAR)
+
+	- Fix logic, add DZP:Prereqs::EnsurePP.
+
+
+0.01     2015-04-21 (PERLANCAR) - Happy Kartiny Day
+
+         - First release.

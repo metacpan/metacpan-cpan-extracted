@@ -1,0 +1,44 @@
+# $Id: CONFIG,v 1.9 2003/03/31 23:55:11 mpeppler Exp $
+# Configuration file for DBD::Sybase.
+#
+# The Makefile.PL file attempts to set reasonable defaults for the
+# variables in this file.
+#
+# Where is the Sybase directory on your system (include files &
+# libraries are expected to be found at SYBASE/include & SYBASE/lib
+# If not set, uses the SYBASE environment variable.
+SYBASE=$ENV{SYBASE}||'/opt/sybase'
+
+# Additional libraries.
+# Some systems require -lnsl or -lBSD.
+# Solaris 2.x needs -ltli
+# SGI IRIX needs -linsck (and may need need -ltli)
+# DEC OSF/1 needs -ldnet_stub and may need -lsdna and -linsck or -ltli
+# SunOS 4.x needs -linsck
+# HP-UX 10.x needs -linsck
+# AIX 3.2.5 needs -linsck
+# Linux needs -linsck
+# See the Sybase OpenClient Supplement for your OS/Hardware
+# combination.
+# If not set, will attempt to determine which libraries are needed by scanning the
+# $SYBASE/lib directory.
+EXTRA_LIBS=
+
+# DBI_INCLUDE
+# DBD::Sybase needs access to some C include files that are provided
+# by the DBI module. These are normally found in $Config{sitearchexp}/auto/DBI
+# but if they are in some other place on your system then you can specify
+# that directory here:
+# DBI_INCLUDE=/usr/local/lib/perl5/site_perl/sun4-solaris/
+
+# BUILD_TYPE
+# Set this to 64 if you are building in 64 bit mode on a platform
+# that supports the 64bit OpenClient libraries (libct64.a, etc).
+# BUILD_TYPE=64
+
+
+# LINKTYPE
+# If you wish to link DBD::Sybase statically
+# into perl uncomment the line below and run the make normally. Then,
+# when you run 'make test' a new perl binary will be built.
+#LINKTYPE=static

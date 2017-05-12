@@ -1,0 +1,71 @@
+Dist::Zilla::UtilRole::MaybeZilla
+
+"Dist::Zilla" Is Great. Long Live "Dist::Zilla" But when you're writing
+a utility class, loading "Dist::Zilla" may be not necessary, and can
+make testing things harder.
+
+Namely, because to test anything that requires "Dist::Zilla", requires
+that you have a valid build tree, which may be lots of unnecessary work
+if you only need "dzil" for simple things like error logging.
+
+Or perhaps, you have other resources that you only conventionally fetch
+from "dzil", such as the "dzil build-root", for the sake of making a
+"Git::Wrapper", but you're quite happy with passing "Git::Wrapper"
+instances directly for testing.
+
+And I found myself doing quite a lot of the latter, and re-writing the
+same code everywhere to do it.
+
+So, this role provides a "zilla" attribute that is ONLY required if
+something directly calls "$self->zilla", and it fails on invocation.
+
+And provides a few utility methods, that will try to use "zilla" where
+possible, but fallback to a somewhat useful default if those are not
+available to you.
+
+    package MyPlugin;
+    use Moose;
+    with 'Dist::Zilla::UtilRole::MaybeZilla';
+
+    ...
+
+    sub foo {
+        if ( $self->has_zilla ) {
+            $self->zilla->whatever
+        } else {
+            $slightlymessyoption
+        }
+    }
+
+Additionally, it provides a few compatibility methods to make life
+easier, namely
+
+    log_debug, log, log_fatal
+
+Which will invoke the right places in "dzil" if possible, but revert to
+a sensible default if not.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,27 @@
+Revision history for DateTime-Format-Oracle
+
+0.06  Tue Oct 11 21:18:12 2011
+	- added a test that specifies subsecond granularity
+	- now requires Convert::NLS_DATE_FORMAT 0.03
+	  (Thank you Jon Bjornstad and Zefram)
+
+0.05  Tue Jun 10 12:55:55 2008
+	- implemented parse_timestamp_with_timezone and
+	  format_timestamp_with_timezone
+	- patch provided by Jozef Kutej
+
+0.04  Wed Feb 27 11:09:41 2008
+	- implemented parse_timestamp and format_timestamp
+	- patch provided by Aldo Calpini
+
+0.03  Thu Aug 23 10:41:48 2007
+	- set default value for 'nls_date_format' to use when %ENV
+	  variable not set
+        - thanks to jaybuffington@gmail.com for sample patch
+
+0.02  Fri Nov  3 23:40:32 2006
+	- CPAN release
+
+0.01  Sun Jul 23 10:26:58 2006
+        - RFC version posted to datetime@perl.org
+

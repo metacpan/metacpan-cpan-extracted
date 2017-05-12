@@ -1,0 +1,18 @@
+Revision history for Dancer2-Plugin-Tail
+
+0.010   Tue Apr 11 19:54:03 GMT 2017
+        define_file_to_tail
+
+0.009   Sat Jan 28 00:40:12 GMT 2017
+        Added cpanfile
+
+0.008   2016-08-24
+        Update tail.tt
+        Add more settings to config file
+        Pass more settings to template
+
+0.007   2016-08-22
+        Correct typos and wording on documentation
+
+0.006   2016-08-21
+        First release

@@ -1,0 +1,47 @@
+Revision history for Perl module Devel::ModInfo
+
+2.04 2014-04-24 NEILB
+    - Realised there will probably be a lot of -I's going on in smokers,
+      so adding those directories to the .PL scripts...
+
+2.03 2014-04-22 NEILB
+    - Still lots of fails, try using $^X in the #! path...
+
+2.02 2014-04-22 NEILB
+    - The .PL scripts were all setting the #! path to Config{startperl},
+      which I think was causing a lot of failures due to Parse::RecDescent
+      not being found.
+
+2.01 2014-04-21 NEILB
+    - Needed to install a new version of Pod::Checker to find the pod error
+      that MetaCPAN was griping about :-(
+
+2.00 2014-04-21 NEILB
+    - Had to bump the version number because some of the sub-modules
+      previously had a version number 1.3
+    - Added MyModule to no_index -- it's an example in ex/
+
+0.06 2014-04-21 NEILB
+    - Fixed abstract in pod to follow convention
+    - Moved all modules into lib/Devel/
+    - Added "use warnings" to all modules.
+    - Added consistent $VERSION to all modules.
+    - All prereqs in PREREQ_PM, and added CONFIGURE_REQUIRES and TEST_REQUIRES
+    - Reformatted Changes as per CPAN::Changes::Spec
+    - Fixed pod errors
+    - Added github repo to metadata and pod
+    - Tweaked things so 'make clean' will remove the right things
+    - Specified license type as 'artistic_1' in doc and metadata
+    - pod and code no longer use indirect method call notation
+    - Min perl version set to 5.6.0
+
+0.05 2002-08-18 JTILLMAN
+    - Added README
+    - Added COPYING (Artistic License)
+    - Added License Statement to all code files
+    - Changed versioning convention on all code files
+    - Added modinfo2embpod.PL to the MANIFEST
+
+0.01 2002-08-17 JTILLMAN
+    - original version; created by h2xs 1.19
+

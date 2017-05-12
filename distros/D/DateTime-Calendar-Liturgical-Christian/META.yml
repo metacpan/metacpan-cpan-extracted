@@ -1,0 +1,22 @@
+---
+abstract: 'Calendar of the church year'
+author:
+  - 'Thomas Thurman <tthurman@gnome.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Calendar-Liturgical-Christian
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Date::Calc: 0
+  Exporter: 0
+  Storable: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.10

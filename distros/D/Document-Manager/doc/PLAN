@@ -1,0 +1,175 @@
+PLAN
+----
+
+Milestone 0
+===========
+   * (DONE) Add $self to all new routines
+   * (DONE) Put pseudocode for all new routines
+   * (DONE) Review existing routines for possible bits to extract
+   * (DONE) Consider renaming Document::Manager to Document::Repository
+   * (DONE) Post to CPAN
+
+Milestone 1
+===========
+   * (DONE) soap_client.pl - add capability to add a slew of svg's
+   * (DONE) Insert the svg's from the recent release
+   * (DONE) Evaluate ocal cgi's and scripts to determine DMS needs
+   * (DONE) Cut a release to CPAN & announce
+
+Milestone 2 - Get basics in place
+===========
+   * (DONE) Report # of docs
+   * (DONE) Flesh out Document::Manager with more functionality
+   * (DONE) Consider if I should create a WebService::DocSys module? - no
+   * (DONE) Make ls_docs display data about the files it lists
+   * (DONE) Figure out way to add a metadata "object" to Document::Manager
+   * (DONE) Update this plan
+   * (DONE) Flesh out POD in submit_clipart
+   * (DONE) Scope out a simple test to upload/download 4 files through SOAP
+   * (DONE) Figure out why ls_docs doesn't work on fdo
+   * (DONE) Allow overriding config file location via Makefile.PL
+   * (DONE) Test storing of content via D::Object::content()
+   * (DONE) Test getting and setting state via D::Object::state()
+   * (DONE) Do a new release
+
+Milestone 3 - Get it to do something useful
+===========
+   * (DONE) Storing templates in dms? - no
+   * (DONE) Hook up a simple way to alter the keywords for an SVG file 
+   * (DONE) Add POD for all of Document::Object's routines
+   * (DONE) Add detailed POD for all of Document::Manager's routines
+   * (DONE) Implement MIME decode downloading in a get_clipart script
+   * (DONE) Ensure document checkout works
+   * (DONE) Test adding keywords, that they don't replace other defined keywords
+   * (DONE) Create tests to do a basic perl -c on each script
+   * (DONE) Install 0.25 onto openclipart site [rejon]
+   * (DONE) Insert the latest release into the dms
+
+   * Set up a preliminary dms-client-cgi package
+   * dms-client-cgi:  Make it generate a list of docs
+   * dms-client-cgi:  Allow it to change the state of a document
+
+Milestone 4
+===========
+   * (DONE) Decide if submit_clipart and get_clipart should be renamed
+   * (DONE) Should I make some client libs to abstract the SOAP stuff better?
+   * (DONE) When there are no docs in system, have ls_docs print "dms is empty"
+   * Ensure document checkout works on fdo
+   * Verify Document::Object::log() works correctly
+   * Bundle CGI::Builder::TT2, etc. into a cgi package
+   * Create a TT2 template from http://openclipart.org/cgi-bin/upload_svg.cgi
+   * Create a simple CGI::Builder replacement for upload_svg.cgi
+   * Make the CGI::Builder cgi do SOAP calls
+   * Split out the submit_clipart and get_clipart to a client package
+   * Change get_error() to errormsg() throughout
+   * Research more generalized ways of handling file metadata for
+     non-svg, and plan implementation of it
+   * Implement a to_hash() function in SVG::Metadata and update
+     Document::Manager::add() to use it.
+   * Look at Document::Archive::create_document() for Document::Manager::add()
+   * Research into alternatives for error message handling
+   * Look into DoXFS more for replacing dms backend
+   * Figure out way to daemonize dmsd [rejon]
+   * Determine best port for dms
+   * Set up makefile to be able to add custom use lib paths
+   * Figure out way to customize where dms.conf is stored
+   * Figure out way to specify the -s options on cmdline tools
+   * Make Document::Repository error if _repository_dir not set instead
+     of defaulting to /var/dms
+   * Create script to list out the valid states for a document
+   * Plan out setting up certs [rejon?]
+
+Milestone 5
+===========
+   * Create a better way of setting default metadata
+   * Report # pending docs, # new today
+   * Report # authors
+   * Figure out how to specify perl lib paths with env var instead of in
+     scripts
+   * Make dmsd set the DMS location
+   * Determine how to set up certs for openclipart
+   * Investigate http://freshmeat.net/projects/libextractor/
+   * Write a cmdline script to create a dist tarball of the clipart
+
+Milestone 6
+===========
+   * Add SOAP routine to add/remove a keyword to a given document
+   * Consider breaking out Document class from Document::Manager
+     or Document::Metadata or Document::Object ?
+   * Implement replacement for PrintSubmittedFilesForMonth(incoming,
+     sort_by=FILEMTIME, sort_order=DESC)
+   * Function for determining if a file has an acceptable file ext
+   * Function for determining if a file has an acceptable mimetype
+   * Function to KeywordList (incl. descriptions)
+   * get_metainfo() - to get keywords; specify sorting criteria & num to
+     retrieve.  Also get license info to validate it's correct.
+   * verify_metadata() - returns error message, if any.
+   * make_thumbnail() - use svg2png - see make-thumbnail
+   * Attach bug report
+   * Set up way to auto-update VERSION (see TT2)
+
+Milestone 7
+===========
+   * (DONE) Plan out how / if I should add a db for caching info
+   * Implement a simple commenting system
+   * In Document::Object, can I eliminate the extra asserts by doing
+     them in the new() function?
+   * Review other DMS capabilities for other cmds to be added
+   * Investigate benefit of replacing backend with XFS file system
+   * Investigate methods of caching the state in a DBI
+   * Do further planning
+
+Future
+======
+   * Create some tests
+   * Ideally, documents() should never encounter an error condition...
+   * Should Document::Repository::add() really be put()?
+   * Add error_msg handling for new routines
+   * Document inputs/outputs for all new routines
+   * Should Document::Repository really die in its new() routine?
+   * Add logging / changelog
+   * Persist the next_id so it can be loaded...
+   * Access Control Lists?
+   * delete/undelete
+   * Attachment of notes (or should this be done as metadata?)
+   * diff's
+   * content search - namazu?
+   * What to do about localization, translations, etc.?
+   * Document format conversion (to pdf, png, html, etc.)
+   * Triggers / Events - whenever a change occurs, listeners are notified
+   * Automatic distribution - either on triggers or scheduled
+   * Status watching (notify when quantity of files reaches threshholds, etc.)
+   * Conversion of mail to DMS
+   * Repackaging (tar.gz / zip)
+   * Create docs like at
+     http://pwp.netcabo.pt/users/1/0154115101/software/newdocms/technical-info.html
+   * Consider caching of query results
+   * Get deleted document list
+   * Purge (permanently remove deleted documents)
+   * Prune (permanently remove old revisions of documents)
+   * Archive (creates backup of some or all of repository for
+     backup/pruning)
+   * Compress (compresses past versions of documents)
+   * On the fly (de)compression
+   * Apply hierarchical organization based on metadata
+   * Thumbnails
+   * Encryption
+   * Import tree (each dir or file representing a document)
+   * Generate dist package of some/all documents
+   * Different access levels based on group membership
+   * Scheduled changes of access (becomes public on date X)
+   * diff
+   * watchers
+   * Render
+   * Aggregate
+   * Branch
+   * Subscribe
+   * Apply converter/translator/test
+   * lock/unlock
+   * Revert
+   * validate_document_type
+   * validate_properties
+   * make_thumbnail
+   * report issue
+   * comment
+   * create_dist

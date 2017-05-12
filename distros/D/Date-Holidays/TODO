@@ -1,0 +1,45 @@
+TODO file for Date-Holidays
+
+$Id: TODO 1742 2007-02-22 19:47:55Z jonasbn $
+
+- Investigate whether we need an adapter at all
+
+- Look into implementing a Class Adapter pattern for exposure of adaptee's
+  extended APIs
+
+- Test Date::Holidays with Date::Holidays:CN (China)
+
+- Test Date::Holidays with Date::Holidays:AT (Austria)
+
+- Test Date::Holidays with Date::Holidays:ES (Spain)
+
+- Add ICal export features
+    http://www.faqs.org/rfcs/rfc2445.html, undecided on which CPAN
+    module to use.
+
+- Add more documentation on OOP or procedural approach
+  
+From processing of test results from bin/test_date-holidays_modules.t
+
+- Date::Holidays::UK misses holidays or similar method
+
+- Date::Holidays::FR misses holidays or similar method
+
+- Date::Holiday::PT misses holidays or similar method
+
+- Date::Holidays::DE misses is_holiday or similar method
+
+- Check out how to do integration with Data::ICal
+
+--
+
+- Should the holidays and is_holiday methods return return values others than
+  undef in order for Date::Holidays to act as real super class or should I
+  implement Date::Holidays::Super as an alternative to Date::Holidays::Abstract.
+
+  DONE, available on CPAN
+
+- BORUP suggests letting is_holiday and holidays take DateTime objects as 
+  parameters and also returning results of these types or DateTime::Spans.
+
+  DONE, added as an experiment to 0.02

@@ -1,0 +1,12 @@
+---
+objs:
+  'Date::Manip::Recur':
+    print: data
+  'Date::Manip::Date':
+    print: method
+    func: value
+    type: scalar
+  'Date::Manip::Delta':
+    print: method
+    func: value
+    type: scalar

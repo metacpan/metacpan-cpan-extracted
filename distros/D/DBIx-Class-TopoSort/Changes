@@ -1,0 +1,24 @@
+Revision history for DBIx::Class::TopoSort (ordered by revision number).
+
+0.050002 Mar 02 2014 08:30:00 PDT
+    - Require a useful YAML parser for testing
+
+0.050001 Feb 25 2014 09:15:00 PDT
+    - Zero changes to increment version number
+
+0.040001 Feb 25 2014 09:00:00 PDT
+    - Converted to use proper version numbers
+    - Allow the toposort method to be called as a class method of TopoSort
+        - This allows using this class without requiring it as a component.
+
+0.04 Sep 23 2013 18:30:00 PDT
+    - Fixed metadata issue
+
+0.03 Aug 31 2013 07:30:00 PDT
+    - Fixed commas in Makefile.PL (Thanks, ANDK!)
+
+0.02 Aug 12 2013 14:00:00 PDT
+    - Fixed Makefile.PL requirements
+
+0.01 Aug 10 2013 13:00:00 PDT
+    - Initial version

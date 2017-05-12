@@ -1,0 +1,15 @@
+@import "foo.css";
+background: url('foo.css');
+background:URL("bar.css");
+url(baz.css);
+
+/* These are in a comment and should be ignored:
+@import "foo.css";
+background: url('foo.css');
+background:url("bar.css");
+url(baz.css);
+*/
+
+"string \\\" data url('bar.css') so that isn't a real URL value";
+
+curl('foo');

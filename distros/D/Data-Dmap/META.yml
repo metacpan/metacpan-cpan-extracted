@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Data-Dmap
+version:             0.08
+abstract:            just like map, but on deep data structures
+license:             perl
+author:              
+    - "Michael Zedeler" <"michael@zedeler.dk">
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Scalar::Util:                  1.22
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

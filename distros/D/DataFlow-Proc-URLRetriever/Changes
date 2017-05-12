@@ -1,0 +1,43 @@
+Revision History for DataFlow-Proc-URLRetriever
+===============================================
+
+v1.121690 2012-06-16
+--------------------
+
+commit b36feac9250d45e9f3b84e48e907cae224fb539c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added URI usage to the module
+
+v1.112100 2011-07-28
+--------------------
+
+commit 2f52cad61eca3b4796b88ffbda6b3dcaf126aa31
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+commit 83f1213428bf2f332d4a51e2eff2e3c51f5e9961
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+v1.111810 2011-06-29
+--------------------
+
+commit 47336fbd477842d121d6e4a6503658dd20dcb4d2
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose "builder" rather than "default" (almost everywhere)
+
+v1.111751 2011-06-24
+--------------------
+
+commit 003741ab213c385aa5b8f73494c3f8e5219eb64f
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed extraneous HTTP Client code, using LWP::UserAgent now
+
+===================================
+End of changes in the last 365 days
+===================================

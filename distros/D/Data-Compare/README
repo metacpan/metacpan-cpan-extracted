@@ -1,0 +1,10 @@
+This module compares arbitrary data structures to see if they are copies
+of each other.
+
+To install, do the usual:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+

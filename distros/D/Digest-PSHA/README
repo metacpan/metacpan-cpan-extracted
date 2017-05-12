@@ -1,0 +1,43 @@
+Digest-PSHA version 0.50
+========================
+
+This module was written to support P_SHA-1 and P_SHA256
+digest (pseudorandom function) described in RFC 4346 and RFC 5246.
+
+P_hash(secret, seed) = HMAC_hash(secret, A(1) + seed) +
+                              HMAC_hash(secret, A(2) + seed) +
+                              HMAC_hash(secret, A(3) + seed) + ...
+
+   Where + indicates concatenation.
+
+   A() is defined as:
+
+       A(0) = seed
+       A(i) = HMAC_hash(secret, A(i-1))
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Digest::SHA
+  Digest::HMAC
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2014 by Alexey Semenoff [http://swaj.net].
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.008 or,
+at your option, any later version of Perl 5 you may have available.
+
+

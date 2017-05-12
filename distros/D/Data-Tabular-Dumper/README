@@ -1,0 +1,9 @@
+Data::Tabular::Dumper aims to make it easy to turn tabular data into as many
+file formats as possible.  This is useful when you need to provide data that
+folks will then process further.  Because you don't really know what format
+they want to use, you can provide as many as possible, and let them choose
+which they want.
+
+Tabular data means data that has 2 dimensions, like a list of lists,
+a hash of lists, a list of hashes or a hash of hashes.  
+

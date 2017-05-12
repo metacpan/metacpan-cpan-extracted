@@ -1,0 +1,15 @@
+#!/bin/bash
+# quick test for the "Active Directory.pl"
+
+
+## Generate hex strings
+# echo -n Joe | xxd -ps
+
+
+
+# for my VMWare lab
+#/opt/secure_login/bin/authorization_scripts/Active\ Directory/Active\ Directory.pl 7573657231 5040737377307264 Administrators,Replicator,Users
+
+
+# work
+/opt/secure_login/bin/authorization_scripts/Active\ Directory/Active\ Directory.pl 626f7572617367 6134343434343423 Administrators,Replicator,Users

@@ -1,0 +1,96 @@
+{
+   "abstract" : "run various tests on a distribution at build time",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.018, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Inkt-Role-Test",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Prove" : "0",
+            "File::chdir" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON::PP" : "0",
+            "Module::Metadata" : "0",
+            "Moose::Role" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Path::Tiny" : "0",
+            "Try::Tiny" : "0",
+            "Types::Standard" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010001",
+            "version" : "0.86"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Inkt::Role::Test" : {
+         "file" : "lib/Dist/Inkt/Role/Test.pm",
+         "version" : "0.002"
+      },
+      "Dist::Inkt::Role::Test::BumpedVersion" : {
+         "file" : "lib/Dist/Inkt/Role/Test/BumpedVersion.pm",
+         "version" : "0.002"
+      },
+      "Dist::Inkt::Role::Test::SaneVersions" : {
+         "file" : "lib/Dist/Inkt/Role/Test/SaneVersions.pm",
+         "version" : "0.002"
+      },
+      "Dist::Inkt::Role::Test::TestSuite" : {
+         "file" : "lib/Dist/Inkt/Role/Test/TestSuite.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Test"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Inkt-Role-Test",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-dist-inkt-role-test.git",
+         "web" : "https://github.com/tobyink/p5-dist-inkt-role-test"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Test/project"
+   },
+   "version" : "0.002"
+}

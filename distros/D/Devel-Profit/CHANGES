@@ -1,0 +1,11 @@
+Revision history for Perl module Devel::Profit:
+
+0.34 Thu Oct 16 20:25:41 BST 2008
+     - add documentation stub to Devel::Profit
+     - add human-readable license to the documentation
+
+0.33 Tue May 20 00:17:57 JST 2008
+     - whoops, include the XS file (spotted by Jesse Vincent)
+
+0.32 Mon May 19 08:04:09 JST 2008
+     - initial release

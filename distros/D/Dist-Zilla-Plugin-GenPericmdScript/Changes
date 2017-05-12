@@ -1,0 +1,255 @@
+0.40    2017-01-16 (PERLANCAR)
+
+	- Add configuration: use_cleanser.
+
+
+0.39    2017-01-13 (PERLANCAR)
+
+	- Add configuration: inline_generate_completer to allow suppressing
+	  the generation of completer script.
+
+
+0.38    2017-01-12 (PERLANCAR)
+
+	- Adjust to App::GenPericmdCompleterScript 0.10 (renamed function).
+
+	- Adjust to Perinci::CmdLine::Gen 0.42.
+
+
+0.37    2017-01-09 (PERLANCAR)
+
+	- [Bugfix] Don't set cmdline=undef.
+
+
+0.36    2017-01-06 (PERLANCAR)
+
+	- [Incompatible change] Adjust to Perinci::CmdLine::Gen 0.40+,
+	  subcommands is now a hash, syntax now changed to
+	  whitespace-separated list of SUBCOMMAND_NAME=URL[:SUMMARY].
+
+
+0.35    2017-01-06 (PERLANCAR)
+
+	- Add configuration: validate_args, pack_deps
+	  (Perinci::CmdLine::Gen 0.41).
+
+
+0.34    2016-12-15 (PERLANCAR)
+
+	- Add default_dry_run configuration (Perinci::CmdLine::Gen 0.36,
+	  Perinci::CmdLine::Lite 1.65).
+
+
+0.33    2016-10-27 (PERLANCAR)
+
+	- Add default_format configuration.
+
+
+0.32    2016-09-25 (PERLANCAR)
+
+	- Add configuration: per_arg_json, per_arg_yaml
+	  (Perinci::CmdLine::Gen 0.33).
+
+
+0.31    2016-06-02 (PERLANCAR)
+
+	- Add configuration allow_prereq (passed to backend,
+	  Perinci::CmdLine::Gen 0.31).
+
+
+0.30    2016-01-14 (PERLANCAR)
+
+	- Add use_utf8 option, other fixes.
+
+
+0.29    2016-01-07 (PERLANCAR)
+
+        - Add config_dirs configuration.
+
+        - Adjust to Perinci::CmdLine::Gen 0.25 (config_filename can now contain
+          multiple values, there is now func.extra_modules to give hints about
+          extra modules required).
+
+
+0.28    2015-12-07 (PERLANCAR)
+
+        - [Bugfix] Used wrong argument spelling.
+
+
+0.27    2015-10-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update (backend module changed from App::GenPericmdScript to
+	  Perinci::CmdLine::Gen).
+
+
+0.26    2015-09-15 (PERLANCAR)
+
+	- Add configuration: pass_cmdline_object.
+
+
+0.25    2015-09-12 (PERLANCAR)
+
+	- Add configuration: summary.
+
+	- Set default script name from package name if url is a package
+	  URL.
+
+
+0.24    2015-09-11 (PERLANCAR)
+
+	- Allow specifying code_* in multiple configuration lines.
+
+	- [Incompatible change] Rename snippet_* configuration to code_*,
+	  add code_after_end.
+
+
+0.23    2015-08-19 (PERLANCAR)
+
+	- Generate completer scripts for Perinci::CmdLine::Inline-generated
+	  scripts, using App::GenPericmdCompleterScript.
+
+
+0.22    2015-07-30 (PERLANCAR)
+
+	- [Bugfix] Add prereq to pericmd-inline for develop phase, not
+	  build.
+
+
+0.21    2015-07-20 (PERLANCAR)
+
+	- Add build_requires prereq to Perinci::CmdLine::Inline when using
+	  pericmd-inline.
+
+
+0.20    2015-07-12 (PERLANCAR)
+
+	- Add configuration: build_load_modules.
+
+
+0.19    2015-07-10 (PERLANCAR)
+
+	- Add prereq to script backend modules.
+
+
+0.18    2015-07-08 (PERLANCAR)
+
+        - Add config: skip_format (passed to pericmd backend).
+
+0.17    2015-07-06 (PERLANCAR)
+
+	- Generate script in the later file munging phase instead of the
+	  earlier file gathering phase, so we can get the more built
+	  version of modules when we need to include/embed dist modules
+	  into the generated script.
+
+
+0.16    2015-07-06 (PERLANCAR)
+
+        - Use built version of dist modules to include in scripts (i.e. when we
+          are using Perinci::CmdLine::Inline).
+
+        - Don't add runtime prereq to Perinci::CmdLine module if it's
+          Perinci::CmdLine::Inline.
+
+
+0.15    2015-07-02 (PERLANCAR)
+
+	- Pass version to App::GenPericmdScript's script_version (which
+	  will be passed on to Perinci::CmdLine::Inline).
+
+
+0.14    2015-07-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Forgot to document load_modules configuration.
+
+
+0.13    2015-07-01 (PERLANCAR)
+
+	- [Bugfix] Avoid setting undef value for extra_urls_for_version.
+
+
+0.12    2015-07-01 (PERLANCAR)
+
+        - Rename module/dist from Dist-Zilla-Plugin-Rinci-ScriptFromFunc to
+          Dist-Zilla-Plugin-GenPericmdScript.
+
+        - Change configuration so that all script specification are direct
+          plugin option, and each plugin only creates a single script (but you
+          can always load the same plugin again with [Plugin/Name] syntax to
+          create another script. Note that 'log' now becomes 'enable_log'
+          because it clashes with Dist::Zilla::Plugin's 'log' method.
+
+        - Add configuration: extra_urls_for_version.
+
+
+0.11    2015-03-06 (PERLANCAR)
+
+        - Rename script spec key 'func' to 'url' (old name will be supported for
+          a while).
+
+        - Add support for bulding CLI script with subcommands (new script spec
+          keys: subcommands, subcommands_from_package_functions,
+          include_package_functions_match, exclude_package_functions_match).
+
+
+0.10    2015-03-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- Extract core functionality to another dist App-GenPericmdScript.
+
+
+0.09    2015-02-24 (PERLANCAR)
+
+	- Fix setting prefer_lite=1 by default.
+
+
+0.08    2015-02-06 (PERLANCAR)
+
+	- Add load_modules to script spec.
+
+
+0.07    2015-02-06 (PERLANCAR)
+
+	- Adjust to Perinci::CmdLine -> Perinci::CmdLine::Classic rename,
+	  ::Lite is now the preferred default.
+
+
+0.06    2015-01-10 (PERLANCAR)
+
+	- Add config_filename to script spec.
+
+
+0.05    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.04    2014-12-31 (PERLANCAR)
+
+	- Add per-script snippet_before_instantiate_cmdline.
+
+        - Check valid properties in script configuration.
+
+
+0.03    2014-11-21 (PERLANCAR)
+
+	- Remove unneeded prereq.
+
+
+0.02    2014-11-09 (PERLANCAR)
+
+	- Adjust to Perinci::CmdLine 1.37 (rename log_any_app to log).
+
+	- Only load Markdown::To::POD if there is description property.
+
+
+0.01     2014-08-16 (SHARYANTO) - Happy 16th CPAN Day!
+
+         - First release.

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Device-WS2500PC.t
+lib/Device/WS2500PC.pm
+lib/Device/WS2500PC.pod
+example/ws2500.pl
+META.yml                                 Module meta-data (added by MakeMaker)

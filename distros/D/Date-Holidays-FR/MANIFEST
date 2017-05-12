@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Date-Holidays-FR.t
+lib/Date/Holidays/FR.pm
+META.yml                                 Module meta-data (added by MakeMaker)

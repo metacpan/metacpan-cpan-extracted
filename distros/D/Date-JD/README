@@ -1,0 +1,51 @@
+NAME
+
+Date::JD - conversion between flavours of Julian Date
+
+DESCRIPTION
+
+For date and time calculations it is convenient to represent dates by
+a simple linear count of days, rather than in a particular calendar.
+This is such a good idea that it has been invented several times.
+If there were a single such linear count then it would be the obvious
+data interchange format between calendar modules.  With several
+versions, calendar modules can use such sensible data formats and still
+have interoperability problems.  This module tackles that problem,
+by performing conversions between different flavours of day count.
+These day count systems are generically known as "Julian Dates", after
+the most venerable of them.
+
+Among Julian Date systems there are also some non-trivial differences
+of concept.  There are systems that count only complete days, and
+those that count fractional days also.  There are some that are fixed
+to Universal Time (time on the prime meridian), and others that are
+interpreted according to a timezone.  Some consider the day to start at
+noon and others at midnight, which is semantically significant for the
+complete-day counts.  The functions of this module appropriately handle
+the semantics of all the non-trivial conversions.
+
+The day count systems supported by this module are Julian Date, Reduced
+Julian Date, Modified Julian Date, Dublin Julian Date, Truncated Julian
+Date, Chronological Julian Date, Rata Die, and Lilian Date, each in both
+integral and fractional forms.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2010, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

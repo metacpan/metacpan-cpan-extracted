@@ -1,0 +1,113 @@
+<html>
+<head>
+	<link rel="StyleSheet" href="css/dtree.css" type="text/css" />
+	<script type="text/javascript" src="js/dtree.js"></script>
+
+</head>
+<body>
+<div class="dtree">
+
+	<script type="text/javascript">
+		<!--
+
+		d = new dTree('d');
+
+		d.config.useLines = true;
+		d.config.useIcons = true;
+		d.config.inOrder = false;
+
+		d.add(0,-1,'DBD::Teradata','tdatdbd.html#home', null, 'mainframe', 'img/openbook.gif');
+		//d.add(1, 0,'Synopsis', 'tdatdbd.html#synopsis', null, 'mainframe');
+		d.add(2, 0,'Description', 'tdatdbd.html#description', null, 'mainframe');
+		d.add(3, 0,'Version', 'tdatdbd.html#version', null, 'mainframe');
+		d.add(4, 0,'Prerequisites', 'tdatdbd.html#prereq', null, 'mainframe');
+		d.add(5, 0,'Installation', 'tdatdbd.html#install', null, 'mainframe', 'img/closedbook.gif', 'img/openbook.gif');
+		d.add(6, 0,'Usage Guide', 'tdatdbd.html#behavior', null, 'mainframe', 'img/closedbook.gif', 'img/openbook.gif');
+		d.add(7, 0,'Testing', 'tdatdbd.html#test', null, 'mainframe');
+		d.add(8, 0,'Conformance', 'tdatdbd.html#conform', null, 'mainframe');
+		d.add(9, 0,'Change History', 'tdatdbd.html#history', null, 'mainframe');
+		d.add(10, 0,'Tips & Tricks', 'tdatdbd.html#tips', null, 'mainframe');
+		d.add(11, 0,'TO DO List', 'tdatdbd.html#todo', null, 'mainframe');
+		d.add(12, 0,'References', 'tdatdbd.html#refs', null, 'mainframe');
+		d.add(13, 0,'Copyright', 'tdatdbd.html#copy', null, 'mainframe');
+
+		d.add(14, 6,'Data-Source Name', 'tdatdbd.html#dsn', null, 'mainframe');
+		d.add(15, 6,'Connections, Sessions and Transactions', 'tdatdbd.html#cst', null, 'mainframe');
+		d.add(16, 6,'Connection Character Sets', 'tdatdbd.html#charsets', null, 'mainframe');
+		d.add(17, 6,'Data Types', 'tdatdbd.html#types', null, 'mainframe');
+		d.add(18, 6,'prepare() Optimization', 'tdatdbd.html#optimize', null, 'mainframe');
+		d.add(19, 6,'Parameterized SQL', 'tdatdbd.html#parmsql', null, 'mainframe');
+		d.add(20, 6,'Multi-Statement and MACRO Requests', 'tdatdbd.html#mstmts', null, 'mainframe');
+		d.add(21, 6,'Summarized SELECT Requests', 'tdatdbd.html#sumsel', null, 'mainframe');
+		d.add(22, 6,'Using execute_array()', 'tdatdbd.html#arybind', null, 'mainframe');
+		d.add(23, 6,'Utility Interfaces', 'tdatdbd.html#utilsupp', null, 'mainframe', 'img/closedbook.gif', 'img/openbook.gif');
+		d.add(24, 6,'Double Buffering', 'tdatdbd.html#dblbuf', null, 'mainframe');
+		d.add(25, 6,'Updatable Cursors', 'tdatdbd.html#cursors', null, 'mainframe');
+		d.add(26, 6,'Stored Procedures', 'tdatdbd.html#sprocs', null, 'mainframe');
+		d.add(27, 6,'Error Handling', 'tdatdbd.html#errors', null, 'mainframe');
+		d.add(28, 6,'Diagnostics', 'tdatdbd.html#diags', null, 'mainframe');
+		d.add(29, 6,'Driver-Specific Attributes', 'tdatdbd.html#specattr', null, 'mainframe', 'img/closedbook.gif', 'img/openbook.gif');
+		d.add(30, 6,'Driver-Specific Functions', 'tdatdbd.html#funcs', null, 'mainframe', 'img/closedbook.gif', 'img/openbook.gif');
+
+		d.add(31, 23,'ETL Utility Interface', 'tdatdbd.html#utilif', null, 'mainframe');
+		d.add(32, 23,'Fastload', 'tdatdbdfl.html', null, 'mainframe');
+		d.add(33, 23,'MultiLoad', 'tdatdbdml.html', null, 'mainframe');
+		d.add(34, 23,'FastExport', 'tdatdbdfx.html', null, 'mainframe');
+		d.add(35, 23,'PM/API (MONITOR)', 'tdatdbd.html#pmpc', null, 'mainframe');
+		d.add(36, 23,'Remote Console', 'tdatdbd.html#dbccons', null, 'mainframe');
+
+		d.add(37, 29,'tdat_active', 'tdatdbd.html#active', null, 'mainframe');
+		d.add(38, 29,'tdat_bufsize', 'tdatdbd.html#bufsize', null, 'mainframe');
+		d.add(39, 29,'tdat_charset', 'tdatdbd.html#charset', null, 'mainframe');
+		d.add(40, 29,'tdat_compatible', 'tdatdbd.html#compatible', null, 'mainframe');
+		d.add(41, 29,'tdat_FORMAT', 'tdatdbd.html#format', null, 'mainframe');
+		d.add(42, 29,'tdat_formatted', 'tdatdbd.html#formatted', null, 'mainframe');
+		d.add(43, 29,'tdat_hostid', 'tdatdbd.html#hostid', null, 'mainframe');
+		d.add(44, 29,'tdat_keepresp', 'tdatdbd.html#keepresp', null, 'mainframe');
+		d.add(45, 29,'tdat_lsn', 'tdatdbd.html#lsn', null, 'mainframe');
+		d.add(46, 29,'tdat_mlmask', 'tdatdbd.html#mlmask', null, 'mainframe');
+		d.add(47, 29,'tdat_mode', 'tdatdbd.html#tdmode', null, 'mainframe');
+		d.add(48, 29,'tdat_more_results', 'tdatdbd.html#moreres', null, 'mainframe');
+		d.add(49, 29,'tdat_no_cli', 'tdatdbd.html#nocli', null, 'mainframe');
+		d.add(50, 29,'tdat_raw', 'tdatdbd.html#raw', null, 'mainframe');
+		d.add(51, 29,'tdat_raw_in', 'tdatdbd.html#raw_in', null, 'mainframe');
+		d.add(52, 29,'tdat_raw_out', 'tdatdbd.html#raw_out', null, 'mainframe');
+		d.add(53, 29,'tdat_progress', 'tdatdbd.html#progress', null, 'mainframe');
+		d.add(54, 29,'tdat_reqsize', 'tdatdbd.html#reqsize', null, 'mainframe');
+		d.add(55, 29,'tdat_respsize', 'tdatdbd.html#respsize', null, 'mainframe');
+		d.add(56, 29,'tdat_sessno', 'tdatdbd.html#sessno', null, 'mainframe');
+		d.add(57, 29,'tdat_sp_print', 'tdatdbd.html#spprint', null, 'mainframe');
+		d.add(58, 29,'tdat_sp_save', 'tdatdbd.html#spsave', null, 'mainframe');
+		d.add(59, 29,'tdat_stmt_num', 'tdatdbd.html#stnum', null, 'mainframe');
+		d.add(60, 29,'tdat_stmt_info', 'tdatdbd.html#stinfo', null, 'mainframe');
+		d.add(61, 29,'tdat_TITLE', 'tdatdbd.html#title', null, 'mainframe');
+		d.add(62, 29,'tdat_TYPESTR', 'tdatdbd.html#typestr', null, 'mainframe');
+		d.add(63, 29,'tdat_uses_cli', 'tdatdbd.html#usescli', null, 'mainframe');
+		d.add(64, 29,'tdat_utility', 'tdatdbd.html#utility', null, 'mainframe');
+		d.add(65, 29,'tdat_vartext_in', 'tdatdbd.html#vartext_in', null, 'mainframe');
+		d.add(66, 29,'tdat_vartext_out', 'tdatdbd.html#vartext_out', null, 'mainframe');
+		d.add(67, 29,'tdat_version', 'tdatdbd.html#dbver', null, 'mainframe');
+		d.add(68, 29,'tdat_versnum', 'tdatdbd.html#versnum', null, 'mainframe');
+
+		d.add(69, 30,'tdat_BindParamArray', 'tdatdbd.html#bindpary', null, 'mainframe');
+		d.add(70, 30,'tdat_BindColArray', 'tdatdbd.html#bindcary', null, 'mainframe');
+		d.add(71, 30,'tdat_CharSet', 'tdatdbd.html#charsetfunc', null, 'mainframe');
+		d.add(72, 30,'tdat_FirstAvailable', 'tdatdbd.html#first', null, 'mainframe');
+		d.add(73, 30,'tdat_FirstAvailList', 'tdatdbd.html#firstlist', null, 'mainframe');
+		d.add(74, 30,'tdat_Realize', 'tdatdbd.html#realize', null, 'mainframe');
+		d.add(75, 30,'tdat_UtilitySetup', 'tdatdbd.html#utilsetup', null, 'mainframe');
+
+		d.add(76, 5,'Unix/Linux Installation', 'tdatdbd.html#unixinst', null, 'mainframe');
+		d.add(77, 5,'Windows Installation', 'tdatdbd.html#wininst', null, 'mainframe');
+
+		document.write(d);
+
+		//-->
+	</script>
+
+</div>
+<p>
+<hr>
+<small><i>Last updated<br>Oct. 8, 2006</i></small>
+</body>
+</html>

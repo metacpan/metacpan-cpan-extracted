@@ -1,0 +1,144 @@
+LabJack Linux Installation
+
+For 2.4 kernel users
+---------------------
+Go to the driver/linux-2.4 directory.  To build the device driver, you must 
+first modify the makefile to point to the directory containing your kernel 
+headers.  Change the "KERNEL_SOURCES" line to something appropriate for your 
+system.  This can vary based upon distribution and no path is correct for 
+all systems.  Once "KERNEL_SOURCES" is correct, execute make in the 
+driver/linux-2.4 directory:
+
+	% make
+
+The device module, labjack.o, should be built.  Once the device driver is 
+built, you can use insmod to load the device.  As root, execute:
+
+	# insmod labjack.o
+
+You should see a message on the console (use dmesg to view the messages 
+if you are in X).
+
+If you are using devfs, the device node, /dev/usb/labjack0, should have 
+been created automatically.  If you are not using devfs, you must create 
+the device node with the following command executed as root:
+
+	# mkdir /dev/usb
+	# mknod --mode=a=rw /dev/usb/labjack0 c 180 240
+
+For multiple devices, run the mknod command again incrementing labjack0
+and 240 by 1.  This will create additional device nodes.  For example:
+
+	# mknod --mode=a=rw /dev/usb/labjack1 c 180 241	
+  	# mknod --mode=a=rw /dev/usb/labjack2 c 180 242
+	.
+	.
+	.
+	# mknod --mode=a=rw /dev/usb/labjack15 c 180 255
+
+(NOTE: you only need to make the device nodes once.)
+
+Once the driver is built, build the liblabjack library by changing to the 
+liblabjack directory and executing make:
+
+	% make
+
+Copy the liblabjack library (liblabjack.so) to the /usr/lib directory.
+
+You can then build the test applications by changing to the test directory 
+and executing make:
+
+	% make
+
+Finally, run the test application:
+
+	# ./firmware-revision 	or
+	# ./analog-outs		or
+	# ./list-all
+
+HID NOTE: If the hid module is loaded (use lsmod to view the modules and 
+look for "hid"), the provided labjack driver will not work correctly.  
+Since the Labjack is classified as a HID device, the hid driver will 
+claim the device. However, the hid driver does not support the "Interrupt" 
+out endpoint used by the Labjack and thus cannot communicate with the 
+Labjack.  You must remove the hid driver prior to loading the labjack 
+driver.  The following command, as root, should suffice:
+
+	# modprobe -r hid
+
+If you absolutely must have the hid device driver loaded, it is possible 
+to add the Labjack to the HID blacklist.  Add the Labjack USB vendor 
+(0x0cd5) and product (0x0001) IDs to the hid_blacklist structure in hid-core.c 
+in the drivers/usb directory.  An example of the line to insert into the 
+hid_blacklist structure would be: 
+{0x0cd5, 0x0001, HID_QUIRK_IGNORE}.  For the changes to take effect, a 
+kernel rebuild is necessary.
+
+For 2.6 kernel users
+--------------------
+Go to the driver/linux-2.6 directory.  To build the device driver, execute
+ make in the driver/linux-2.6 directory as root:
+
+	% make
+
+The device module, labjack.ko, should be built.  Once the device driver 
+is built, you can use insmod to load the device.  As root, execute:
+
+	# insmod labjack.ko
+
+You should see a message on the console (use dmesg to view the messages if
+ you are in X).
+
+If /dev/usb/labjack0 is not created automatically, then you must create 
+the device node with the following command executed as root:
+
+	# mkdir /dev/usb
+	# mknod --mode=a=rw /dev/usb/labjack0 c 180 240
+
+For multiple devices, run the mknod command again incrementing labjack0
+and 240 by 1.  This will create additional device nodes.  For example:
+                                                                                    
+        # mknod --mode=a=rw /dev/usb/labjack1 c 180 241
+        # mknod --mode=a=rw /dev/usb/labjack2 c 180 242
+        .
+        .
+        .
+        # mknod --mode=a=rw /dev/usb/labjack15 c 180 255
+
+(NOTE: you only need to make the device nodes once.)
+
+Once the driver is built, build the liblabjack library by changing to the 
+liblabjack directory and executing make:
+
+	% make
+
+Copy the liblabjack library (liblabjack.so) to the /usr/lib directory.
+
+You can then build the test applications by changing to the test directory 
+and executing make:
+
+	% make
+
+Finally, run the test application as root:
+
+	# ./firmware-revision
+
+HID NOTE: If the hid module is loaded (use lsmod to view the modules and 
+look for "hid"), the provided labjack driver will not work correctly.  
+Since the Labjack is classified as a HID device, the hid driver will claim 
+the device.  However, the hid driver does not support the "Interrupt" out 
+endpoint used by the Labjack and thus cannot communicate with the Labjack.  
+You must remove the hid driver prior to loading the labjack driver.  The 
+following command, as root, should suffice:
+
+	# modprobe -r hid
+
+If you absolutely must have the hid device driver loaded, it is possible to
+add the Labjack to the HID blacklist.  Add the Labjack USB vendor (0x0cd5) 
+and product (0x0001) IDs to the hid_blacklist structure in hid-core.c in 
+the drivers/usb/input directory.  An example of the line to insert in the 
+hid_blacklist structure would be:
+{0xcd5, 0x0001, HID_QUIRK_IGNORE}.  For the changes to take effect, a 
+kernel rebuild is necessary.
+ 
+Good Luck.

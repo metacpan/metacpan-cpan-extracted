@@ -1,0 +1,8 @@
+Perl module distribution Devel::Todo::Find
+
+Allows you to easily search for TODO items in your Perl code comments.
+
+Includes a ready-to-run utility named 'todofind'
+and a source code module if you want more control over how it works.
+
+Written by Martin Thurn

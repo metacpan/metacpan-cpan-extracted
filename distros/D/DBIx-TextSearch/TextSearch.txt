@@ -1,0 +1,133 @@
+NAME
+    DBIx::TextSearch
+
+SYNOPSIS
+    Database independent modules to index and search text/HTML files.
+    Supports indexing local files and fetching files by HTTP and FTP.
+
+     use DBIx::TextSearch;
+     use DBIx::TextSearch::Pg; # to use postgresql
+
+     $dbh = DBI->connect(...); # see the DBD documentation
+
+     $index = DBIx::TextSearch->new($dbh,
+                                   'index_name');
+
+     $index = DBIx::TextSearch->open($dbh,
+                                     ' index_name');
+
+     # uri is file:/// ftp:// or http://
+     $index->index_document(uri => $location);
+
+     # $results is a ref to an array of hashrefs
+     $results = $index->find_document(query => 'foo and not bar',
+                                      parser => 'simple');
+     $results = $index->find_document(query => 'foo and not bar',
+                                      parser => 'advanced');
+
+     foreach my $doc (@$results) {
+         print "Title: ", $doc->{title}, "\n";
+         print "Description: ", $doc->{description}, "\n";
+         print "Location: ", $doc->{uri}, "\n";
+     }
+
+     $index->delete_document('http://localhost/foo.txt');
+
+     $index->flush_index(); # clear the index
+
+DESCRIPTION
+    DBIx::TextSearch consists of an abstraction layer (TextSearch.pm)
+    providing a set of standard routines to index text and HTML files. These
+    routines interface to a set of database specific routines (not
+    separately documented) in much the same way as the perl DBI and DBD::foo
+    modules do.
+
+METHODS
+  new
+     $index = DBIx::TextSearch->new($dbh,
+                                    'index_name');
+
+    Create a new index on the database referenced by $dbh. The database must
+    exist.
+
+  open
+     $index = DBIx::TextSearch->open($dbh,
+                                     'index_name');
+
+    Connect to an existing index
+
+  index_document
+    Given a file:/// http:// or ftp:// URI, fetch and index the document.
+
+    For each document, this method stores the document URI, the document
+    title, a document description, keywords (HTML only from <meta
+    name="keywords"), the document contents and the document's modification
+    time. If the URI points to a html file, the document title is taken from
+    the contents of the HTML <title> tag and the description is taken from
+    the contents of <meta name="description">. The HTML tags are removed
+    before finally storing the document. If the URI is plain text (i.e. not
+    HTML), the title is the first non-blank line and the description is the
+    next paragraph (terminated by 2 newlines)
+
+    index_document compares the file's modification time against the
+    modification time for that URI stored in the index, and will only index
+    a document if that document is not already in the index, or if the
+    document is more recent than the indexed copy.
+
+    For file:/// URIs, you need to include the full (absolute) path.
+
+   FTP passwords
+    Pass the username and password in the ftp URI as shown here:
+    "ftp://user:password@foo.bar.com/wibble/barf.txt"
+
+   Sample URIs
+     file://usr/doc/HOWTO/en-html/index.html
+     /usr/doc/HOWTO/en-html/index.html
+     http://www.foo.bar.com/
+     ftp://foo.bar.com/wibble/barf.txt # anonymous - uses local email
+                                       # address as password
+     ftp://user:password@foo.bar.com/wibble/barf.txt
+
+  find_document
+    This method takes 2 parameters:
+
+   query
+    A boolean query string as per Text::Query::ParseSimple or
+    Text::Query::ParseAdvanced (an AltaVista style query)
+
+   parser
+    Either "simple" or "advanced" to use either Text::Query::ParseSimple or
+    Text::Query::ParseAdvanced to parse the query.
+
+    find_document returns a reference to an array of hash references. The
+    hash keys are URI, title, description.
+
+    The number of documents found by the last query is returned by
+    "$index-"match()>
+
+    To print information on all the documents matching a query, see this
+    code:
+
+     my $results = find_document("zot or grault");
+
+     foreach my $doc (@$results) {
+         print "Title: ", $doc->{title}, "\n";
+         print "Description: ", $doc->{description}, "\n";
+         print "Location: ", $doc->{uri}, "\n";
+     }
+
+     print $index->matches(), " results found";
+
+  flush_index
+    Remove all stored document data from the index, leaving the index tables
+    intact.
+
+  delete_document
+    Given a URI, remove that document from the index.
+
+SEE ALSO
+    Text::Query::ParseAdvanced, Text::Query::ParseSimple DBI
+
+AUTHOR
+    Stephen Patterson <s.patterson@freeuk.com> http://www.lexx.uklinux.net/
+

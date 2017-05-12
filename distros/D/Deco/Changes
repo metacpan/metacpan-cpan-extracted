@@ -1,0 +1,38 @@
+Revision history for Perl extension Deco.
+
+0.12  2006-10-17
+      Rewrite of Table package to produce no_stop table and full table of repetitive dive groups.
+ 
+0.11  2006-10-16
+      Added percentage() function to the Deco::Dive::Plot package to print out percentage saturation graph
+      Started on finding time limits for full table with repetitive dive groups
+
+0.10  2006-10-12
+      Started on the Deco::Dive::Table package to produce no decompression limit tables for given depths. 
+      Added the padi config.
+      Documented all public functions, so passing pod-coverage test.
+
+0.09  2006-08-15 
+      Added point function to Deco::Dive to set depth points manually. Got the buhlmann config included
+      Tried testing against published buhlmann no stop limits, but results still differ.
+
+0.08  2006-07-10 
+      Added suggested links to POD.
+
+0.07  2006-07-07
+      Added gas functions to tissue and dive, to set the gas mix manually
+
+0.06  2006-07-03
+      Added OTU's to Tissue, and setting of gaslist
+
+0.05  2006-06-29
+      Made test case more robust, changed nodeco_time handling
+
+0.03  2006-06-26
+      Finished POD. Checked Makefile.PL and cleaned up email addresses.
+
+0.01  Thu May  4 17:22:07 2006
+	- original version; created by h2xs 1.23 with options
+		-A -c -n Deco
+
+

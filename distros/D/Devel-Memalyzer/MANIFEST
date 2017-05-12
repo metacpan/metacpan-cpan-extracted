@@ -1,0 +1,22 @@
+Build.PL
+lib/Devel/Memalyzer.pm
+lib/Devel/Memalyzer/Base.pm
+lib/Devel/Memalyzer/Combine.pm
+lib/Devel/Memalyzer/Plugin.pm
+lib/Devel/Memalyzer/Plugin/ProcSmaps.pm
+lib/Devel/Memalyzer/Plugin/ProcStatus.pm
+lib/Devel/Memalyzer/Runner.pm
+MANIFEST			This list of files
+README
+script/memalyzer-combine.pl
+script/memalyzer.pl
+t/Combine.t
+t/Memalyzer.t
+t/ProcSmaps.t
+t/ProcStatus.t
+t/res/merge.head
+t/res/merge.raw
+t/res/smaps
+t/res/status
+t/Runner.t
+META.yml

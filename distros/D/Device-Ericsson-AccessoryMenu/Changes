@@ -1,0 +1,36 @@
+0.8	Monday 8th March, 2004
+	Applied the following patch by Arne Georg Gleditsch:
+		Added examples/x11pointer
+		Added xmms playlist clear/add directory to examples/remote 
+		Reworking of the timeout code to allow for better co-operation
+		with foreign event loops.
+		Setting of the default charset
+	Thanks Arne!
+
+0.7	Monday 22nd September, 2003
+	Fixed a packageing mistake - we weren't shipping 
+	lib/Device/Ericsson/AccessoryMenu/Mouse.pm due to a glitch in
+	MANIFEST.SKIP
+
+
+0.6	Wednesday 25th June, 2003
+	Rewrote everything to be stateful.  We now have a stack of
+	states.  You can enter a new state, or exit and query the
+	current state. The current state's handle method will be
+	invoked for each line received by ->control
+
+	It is expected that states will be based on, or at least
+	implement the interface of Device::Ericsson::AccessoryMenu::State, 
+ 	and that they will be named Device::Ericsson::AccessoryMenu::$state.
+
+	INCOMPATIBLE CHANGE moved send_menu over to Menu->on_enter
+
+	reimplemented send_text as a thin shim around enter_state( 'Text' )
+
+	implemented mouse_move as a similar shim
+
+	worked over examples/remote to be much more functional
+
+
+0.5	Thursday 14th June, 2003
+	Initial CPAN release

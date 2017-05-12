@@ -1,0 +1,2 @@
+foo=this is English
+bar=this is a test

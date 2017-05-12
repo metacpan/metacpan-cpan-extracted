@@ -1,0 +1,341 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBIx::FetchLoop - Fetch with change detection and aggregates</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<ul>
+
+		<li><a href="#instantiating_a_dbix__fetchloop_object_">Instantiating a DBIx::FetchLoop object:</a></li>
+		<li><a href="#retrieving_data_with_fetch_current_data_">Retrieving data with fetch_current_data:</a></li>
+		<li><a href="#retrieving_data_with_fetch_current_row_">Retrieving data with fetch_current_row:</a></li>
+		<li><a href="#accessor_methods_">Accessor methods:</a></li>
+		<li><a href="#conditional_testing_">Conditional testing:</a></li>
+		<li><a href="#data_utilities_">Data Utilities:</a></li>
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<ul>
+
+		<li><a href="#example_1__fetchrow_hashref__">Example 1 (fetchrow_hashref):</a></li>
+		<li><a href="#example_2__fetchrow_arrayref__">Example 2 (fetchrow_arrayref):</a></li>
+		<li><a href="#example_3__concatenation__fetchrow_hashref_and_substring_comparison_">Example 3 (concatenation, fetchrow_hashref and substring comparison)</a></li>
+	</ul>
+
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#todo">TO-DO</a></li>
+	<li><a href="#acknowledgements">ACKNOWLEDGEMENTS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DBIx::FetchLoop - Fetch with change detection and aggregates</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use DBIx::FetchLoop;</pre>
+<pre>
+  $lph = DBIx::FetchLoop-&gt;new($sth, $dbi_method);</pre>
+<pre>
+  $hash_ref = $lph-&gt;fetch_current_data;
+  $rowset = $hash_ref-&gt;{previous};
+  $rowset = $hash_ref-&gt;{current};
+  $rowset = $hash_ref-&gt;{next};</pre>
+<pre>
+  $rowset = $lph-&gt;fetch_current_row;</pre>
+<pre>
+  $rowset = $lph-&gt;previous;
+  $rowset = $lph-&gt;current;
+  $rowset = $lph-&gt;next;</pre>
+<pre>
+  $lph-&gt;set_aggregate($new_field, $field);
+  $lph-&gt;reset_aggregate($new_field);</pre>
+<pre>
+  $lph-&gt;set_concatenate($new_field, $field);
+  $lph-&gt;reset_concatenate($new_field);</pre>
+<pre>
+  $boolean = $lph-&gt;pre_loop($field);
+  $boolean = $lph-&gt;post_loop($field);</pre>
+<pre>
+  $boolean = $lph-&gt;pre_loop_substr($field,$offset,$length);
+  $boolean = $lph-&gt;post_loop_substr($field,$offset,$length);</pre>
+<pre>
+  $boolean = $lph-&gt;is_first;
+  $boolean = $lph-&gt;is_last;</pre>
+<pre>
+  $count = $lph-&gt;count;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>DBIx::FetchLoop is a supplemental approach for data retrieval with DBI. Result rows are queued 
+with hash references to previous, current and next rows.  Utility functions allow for simplified
+comparison of a field between previous and current or current and next rows.  Additional
+functions allow you automatically create new fields for aggregating or concatenating based on 
+fields in the resulting dataset.</p>
+<p>Note:
+This module was created with ease of use and performance in mind.  This module is intended to 
+eliminate the need for temporary variables for loop detection as well as aggregation and concatenation.
+The reason that not all DBI methods for data retrieval are not implemented (such as selectall_arrayref) 
+is that the module's design for performance would be defeated.</p>
+<p>In essence you can write cleaner looking, more efficient code minus a few hassles.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<p>
+</p>
+<h2><a name="instantiating_a_dbix__fetchloop_object_">Instantiating a DBIx::FetchLoop object:</a></h2>
+<p>DBIx::FetchLoop requires two arguements when creating an object: a dbi statement handle, and 
+a scalar identifying the DBI data retrieval method to utilize.  Supported DBI methods are:
+	fetchrow_arrayref
+	fetchrow_hashref</p>
+<p>The module automatically handles calling the $sth-&gt;execute and $sth-&gt;finish functions of DBI,
+therefore you only need to create the statement handle and pass it along.</p>
+<p>Instantiating an object would look like this:</p>
+<pre>
+  use DBI;
+  use DBIx::FetchLoop;</pre>
+<pre>
+  $dbh = DBI-&gt;connect($connect_string);
+  $sth = $dbh-&gt;prepare($sql);
+  $lph = DBIx::FetchLoop-&gt;new($sth,'fetchrow_hashref');</pre>
+<p>If $dbi_method is not supplied, the module will default to using fetchrow_hashref.</p>
+<p>The loop must be operated by calling $lph-&gt;fetch_current_data or $lph-&gt;fetch_current_row.</p>
+<p>When the loop is done operating, DBIx::FetchLoop will call $sth-&gt;finish on the statement handle.</p>
+<p>
+</p>
+<h2><a name="retrieving_data_with_fetch_current_data_">Retrieving data with fetch_current_data:</a></h2>
+<pre>
+  $d = $lph-&gt;fetch_current_data;</pre>
+<p>$d is a hashref with elements to previous, current and next datasets as available.</p>
+<p>eg (fetchrow_hashref)</p>
+<pre>
+  $d-&gt;{previous}-&gt;{field} 
+  $d-&gt;{current}-&gt;{field} 
+  $d-&gt;{next}-&gt;{field}</pre>
+<p>eg (fetchrow_arrayref)</p>
+<pre>
+  $d-&gt;{previous}-&gt;[1] 
+  $d-&gt;{current}-&gt;[1] 
+  $d-&gt;{next}-&gt;[1]</pre>
+<p>
+</p>
+<h2><a name="retrieving_data_with_fetch_current_row_">Retrieving data with fetch_current_row:</a></h2>
+<p>This was added as an implementation to make code a bit cleaner and simpler to use.</p>
+<pre>
+  $rowset = $lph-&gt;fetch_current_row;</pre>
+<p>eg (fetchrow_hashref)</p>
+<pre>
+  $rowset-&gt;{field}</pre>
+<p>eg (fetchrow_arrayref)</p>
+<pre>
+  $rowset-&gt;[1]</pre>
+<p>
+</p>
+<h2><a name="accessor_methods_">Accessor methods:</a></h2>
+<p>Regardless of calling $lph-&gt;fetch_current_row or $lph-&gt;fetch_current_data, you can use accessor methods to access the previous, next, and current rows.</p>
+<p>$rowset = $lph-&gt;previous;
+$rowset = $lph-&gt;current;
+$rowset = $lph-&gt;next;</p>
+<p>
+</p>
+<h2><a name="conditional_testing_">Conditional testing:</a></h2>
+<p>These functions exist to make the code necessary for detecting a new loop a little cleaner.</p>
+<pre>
+  $lph-&gt;pre_loop($field);  - compares $field between previous and current rows, returns true if different
+  $lph-&gt;post_loop($field); - compares $field between current and next rows, returns true if different
+ 
+  $lph-&gt;pre_loop_substr($field,$offset,$length);  - compares substring of $field between previous and current rows, returns true if different
+  $lph-&gt;post_loop_substr($field,$offset,$length);- compares substring of $field between current and next rows, returns true if different
+ 
+  $lph-&gt;is_first; - returns true if current record is first record
+  $lph-&gt;is_last;  - returns true if current record is last record</pre>
+<p>
+</p>
+<h2><a name="data_utilities_">Data Utilities:</a></h2>
+<pre>
+  $lph-&gt;set_aggregate($new_field, $field);
+  $lph-&gt;set_concatenate($new_field, $field);</pre>
+<p>These functions allow you to create new fields in the resulting dataset that are aggregates or
+concatenates of an original field in the data set. They must be called before the first time you
+call $lph-&gt;fetch_current_data.</p>
+<pre>
+  $lph-&gt;reset_aggregate($new_field);
+  $lph-&gt;reset_concatenate($new_field);</pre>
+<p>These functions reset the value of the specified field to undef in the current dataset.  They can be 
+called anytime during the running of the program.</p>
+<pre>
+  $lph-&gt;count; - return the number of the current row returned (starts at 1)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>
+</p>
+<h2><a name="example_1__fetchrow_hashref__">Example 1 (fetchrow_hashref):</a></h2>
+<pre>
+  use DBI;
+  use DBIx::FetchLoop;</pre>
+<pre>
+  $dbh = DBI-&gt;connect(...);
+  $sth = $dbh-&gt;prepare('select company, department, bank_account, balance from account_table&quot;);
+  $lph = DBIx::FetchLoop-&gt;new($sth,'fetchrow_hashref');</pre>
+<pre>
+  $lph-&gt;set_aggregate('department_rollup','balance');
+  $lph-&gt;set_aggregate('company_rollup','balance');</pre>
+<pre>
+  while (my $d = $lph-&gt;fetch_current_row) {</pre>
+<pre>
+    if ($lph-&gt;pre_loop('company')) {
+      print &quot;Company: &quot; . $d-&gt;{company} . &quot;\n&quot;;
+    }</pre>
+<pre>
+    if ($lph-&gt;pre_loop('department')) {
+      print &quot;Department: &quot; . $d-&gt;{department} . &quot;\n&quot;;
+    }</pre>
+<pre>
+    print &quot;Account: &quot; . $d-&gt;{bank_account} . &quot; : &quot; . $d-&gt;{balance} . &quot;\n&quot;;</pre>
+<pre>
+    if ($lph-&gt;post_loop('department')) {
+      print &quot;Department Balance: &quot; . $d-&gt;{department_rollup} . &quot;\n&quot;;
+      $lph-&gt;reset_aggregate('department_rollup');
+    }</pre>
+<pre>
+    if ($lph-&gt;post_loop('company')) {
+      print &quot;Company Balance: &quot; . $d-&gt;{company_rollup} . &quot;\n\n&quot;;
+      $lph-&gt;reset_aggregate('company_rollup');
+    }
+  }</pre>
+<pre>
+  $dbh-&gt;disconnect;</pre>
+<p>
+</p>
+<h2><a name="example_2__fetchrow_arrayref__">Example 2 (fetchrow_arrayref):</a></h2>
+<pre>
+  use DBI;
+  use DBIx::FetchLoop;</pre>
+<pre>
+  $dbh = DBI-&gt;connect(...);
+  $sth = $dbh-&gt;prepare('select company, department, bank_account, balance from account_table&quot;);
+  $lph = DBIx::FetchLoop-&gt;new($sth,'fetchrow_arrayref');</pre>
+<pre>
+  $lph-&gt;set_aggregate(4,3);
+  $lph-&gt;set_aggregate(5,3);</pre>
+<pre>
+  while (my $d = $lph-&gt;fetch_current_data) {
+        
+    if ($lph-&gt;pre_loop(0)) {
+      print &quot;Company: &quot; . $d-&gt;{current}-&gt;[0] . &quot;\n&quot;;
+    }</pre>
+<pre>
+    if ($lph-&gt;pre_loop(1)) {
+      print &quot;Department: &quot; . $d-&gt;{current}-&gt;[1] . &quot;\n&quot;;
+    }</pre>
+<pre>
+    print &quot;Account: &quot; . $d-&gt;{current}-&gt;[2] . &quot; : &quot; . $d-&gt;{current}-&gt;[3] . &quot;\n&quot;;</pre>
+<pre>
+    if ($lph-&gt;post_loop(1)) {
+      print &quot;Department Balance: &quot; . $d-&gt;{current}-&gt;[4] . &quot;\n&quot;;
+      $lph-&gt;reset_aggregate(4);
+    }</pre>
+<pre>
+    if ($lph-&gt;post_loop(0)) {
+      print &quot;Company Balance: &quot; . $d-&gt;{current}-&gt;[5] . &quot;\n\n&quot;;
+      $lph-&gt;reset_aggregate(5);
+    }
+  }</pre>
+<pre>
+  $dbh-&gt;disconnect;</pre>
+<p>
+</p>
+<h2><a name="example_3__concatenation__fetchrow_hashref_and_substring_comparison_">Example 3 (concatenation, fetchrow_hashref and substring comparison)</a></h2>
+<pre>
+  use DBI;
+  use DBIx::FetchLoop;</pre>
+<pre>
+  $dbh = DBI-&gt;connect(...);
+  $sth = $dbh-&gt;prepare('select news_group, message_header, message_part from news&quot;);
+  $lph = DBIx::FetchLoop-&gt;new($sth,'fetchrow_hashref');</pre>
+<pre>
+  $lph-&gt;set_concatenate('whole_message','message_part');</pre>
+<pre>
+  while (my $d = $lph-&gt;fetch_current_data) {</pre>
+<pre>
+    if ($lph-&gt;is_first) {
+      print &quot;News Viewing App\n&quot;;
+    }</pre>
+<pre>
+    if ($lph-&gt;pre_loop('news_group')) {
+      print &quot;Group: &quot; . $d-&gt;{current}-&gt;{news_group} . &quot;\n&quot;;
+    }</pre>
+<pre>
+    if ($lph-&gt;pre_loop_substr('message_header',4,10)) { 
+      print &quot;Title: &quot; . substr($d-&gt;{current}-&gt;{message_header},4,10) . &quot;\n&quot;;
+      print &quot;Author: &quot; . substr($d-&gt;{current}-&gt;{message_header},14,10) . &quot;\n&quot;;
+      print &quot;Result #&quot; . $lph-&gt;count . &quot;\n&quot;;
+    }</pre>
+<pre>
+    if (i$lph-&gt;post_loop_substr('message_header',4,10)) { 
+      print &quot;Message: \n&quot; . $d-&gt;{current}-&gt;{whole_message} . &quot;\n\n&quot;;
+      $lph-&gt;reset_concatenate('whole_message');
+    }</pre>
+<pre>
+    if ($lph-&gt;is_last) {
+      print &quot;All done\n&quot;;
+    }</pre>
+<pre>
+  }</pre>
+<pre>
+  $dbh-&gt;disconnect;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<p>Please see the CHANGES file in the module distribution.</p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TO-DO</a></h1>
+<pre>
+ - Spend more time on the documentation.</pre>
+<pre>
+ - More in-depth examples (with comments)</pre>
+<p>
+</p>
+<hr />
+<h1><a name="acknowledgements">ACKNOWLEDGEMENTS</a></h1>
+<p>Thanks to Tim Bunce for a lesson in the finer points of module naming.  :)</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Brendan Fagan &lt;suburbanantihero (at) yahoo (dot) com&gt;. Comments, bug reports, patches and flames are appreciated.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2002-2004 - Brendan Fagan</p>
+
+</body>
+
+</html>

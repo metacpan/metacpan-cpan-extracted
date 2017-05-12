@@ -1,0 +1,122 @@
+NAME
+    `Device::AVR::Info' - load data from Atmel AVR Studio device files
+
+SYNOPSIS
+     use Device::AVR::Info;
+
+     my $avr = Device::AVR::Info->new_from_file( "devices/ATtiny84.xml" );
+
+     printf "The signature of %s is %s\n",
+        $avr->name, $avr->signature;
+
+DESCRIPTION
+    This module loads an parses "part info" XML files as supplied with
+    Atmel's AVR Studio, and provides convenient access to the data stored
+    inside them.
+
+CONSTRUCTORS
+  $avr = Device::AVR::Info->new_from_file( $filename )
+    Loads the device information from the given XML file.
+
+ACCESSORS
+  $name = $avr->name
+    The device name (e.g. "ATtiny84")
+
+  $architecture = $avr->architecture
+    The device architecture (e.g. "AVR8")
+
+  $family = $avr->family
+    The device family (e.g. "tinyAVR")
+
+  @ifaces = $avr->interfaces
+  $iface = $avr->interface( $name )
+    Returns a list of interface instances, or a single one having the given
+    name, representing the programming interfaces supported by the device.
+
+    Each is a structure of the following fields.
+
+     $iface->name
+     $iface->type
+
+  @memories = $avr->memories
+  $memory = $avr->memory( $name )
+    Returns a list of memory instances, or a single one having the given
+    name, representing the available memories on the device.
+
+    Each is a structure of the following fields.
+
+     $memory->name
+     $memory->id
+     $memory->endianness
+     $memory->start # in bytes
+     $memory->size  # in bytes
+     @segments = $memory->segments
+
+    The `segments' field returns a list of structures of the following
+    fields:
+
+     $seg->start
+     $seg->size
+     $seg->name
+     $seg->type
+     $seg->can_read
+     $seg->can_write
+     $seg->can_exec
+     $seg->pagesize
+
+    Note that all sizes are given in bytes; for memories of 16-bit
+    word-size, divide this by 2 to obtain the size in words.
+
+  @ints = $avr->interrupts
+  $int = $avr->interrupt( $name )
+    Returns a list of interrupt instances, or a single one having the given
+    name, representing the interrupt sources available on the device.
+
+    Each is a structure of the following fields.
+
+     $int->name
+     $int->index
+     $int->caption
+
+  @periphs = $avr->peripherals
+  $periph = $avr->peripheral( $name )
+    Returns a list of peripheral instances, or a single one having the given
+    name, representing the peripherals or other miscellaneous information
+    available on the device.
+
+    Each is a structure of the following fields.
+
+     $periph->name
+     $periph->module     # instance of Device::AVR::Info::Module
+     $periph->regname
+     $periph->regspace   # instance of $memory
+
+     @registers = $periph->registers
+     # instances of $register from Device::AVR::Info::Module
+
+  @group_names = $avr->property_groups
+    Returns (in no particular order) the names of the defined property
+    groups.
+
+  \%values = $avr->property_group( $group_name )
+    Returns a HASH reference of all the properties in the given property
+    group.
+
+  $value = $avr->property( $group_name, $prop_name )
+    Returns a single value of a property in the given property group.
+
+    Any value given in the XML file in the form of a single hexadecimal
+    numerical constant is automatically converted into the appropriate
+    integer. Strings of multiple numbers (such as the HVSP and HVPP control
+    stacks) are not converted.
+
+DERIVED METHODS
+    These methods wrap information provided by the basic accessors.
+
+  $sig = $avr->signature
+    Returns a 6-character hexadecimal string consisting of the three bytes
+    of the device signature.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

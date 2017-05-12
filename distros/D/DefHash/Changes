@@ -1,0 +1,71 @@
+Revision history for DefHash
+
+1.0.11  2015-09-03 (PERLANCAR)
+
+	- No spec changes.
+
+	- Remove requirement of perl 5.010001.
+
+
+1.0.10  2015-04-24 (PERLANCAR)
+
+	- Introduce 'prop(LANG)' as shortcut for prop.alt.lang.LANG.
+
+
+1.0.9   2015-04-02 (PERLANCAR)
+
+	- Rename alt.numnoun.* to alt.plurality.*.
+
+
+1.0.8   2014-12-02 (PERLANCAR)
+
+	- Change alt.{neg,pos,posneg} to alt.bool.{not} to allow alternate
+	  combination; specify alt.numnoun.
+
+
+1.0.7   2014-11-20 (PERLANCAR)
+
+        - No spec changes.
+
+        - Mention 'alt.neg' and 'alt.posneg'.
+
+
+1.0.6   2014-10-22 (PERLANCAR)
+
+        - Introduce 'caption' property.
+
+
+1.0.5   2014-04-27 (SHARYANTO)
+
+        - No spec changes.
+
+        - Add Sah::Schema::DefHash.
+
+
+1.0.4   2014-03-27 (SHARYANTO)
+
+        - Specify that each tag in 'tags' can also be a defhash (this is already
+          practised by Perinci::Sub::Gen::AccessTable for some time).
+
+        - Fix typos.
+
+
+1.0.3   2013-04-11 (SHARYANTO)
+
+        - Introduce property 'x'.
+
+
+1.0.2   2012-11-10 (SHARYANTO)
+
+        - Property 'default_lang' should be set to LANG first before falling
+          back to 'en_US'.
+
+
+1.0.1   2012-09-14 (SHARYANTO)
+
+        - No spec changes. Fix typos.
+
+
+1.0.0   2012-09-14 (SHARYANTO)
+
+        - First version.

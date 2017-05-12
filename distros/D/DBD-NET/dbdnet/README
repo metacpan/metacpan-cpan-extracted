@@ -1,0 +1,100 @@
+NOTE: This document is essentially that of DBD::Oracle's README. Most of the
+      points from that still apply.
+
+Original document: (c)Tim Bunce <Tim.Bunce@ig.co.uk>
+Amendments: (c)Alligator Descartes <descarte@informix.com>
+
+---------8<-------------------8<--------------------
+
+DBD::Informix --  an Informix interface for Perl 5 using DBI.
+
+   Copyright (c) 1994,1995,1996  Alligator Descartes
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+WARNING: THIS IS ALPHA SOFTWARE. IT IS POSSIBLY UNRELIABLE!
+
+BEFORE BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5.
+    It is very important to test it and install it!
+
+*** NOTE: *** perl5 MUST BE INSTALLED TO VERSION 5.003 AT LEAST! ***
+
+    Build, test and install the DBI module.
+    It is very important to test it and install it!
+
+BUILDING
+
+    If Perl5 is installed do:
+
+	perl Makefile.PL
+
+    and answer the questions. The script will use your responses to attempt to
+    work out what it needs to build the module.
+
+    If Perl5 is NOT installed install it, and come back here later!
+
+    Then do:
+
+	make
+	make install
+	make test
+
+If it fails horribly, see below.
+
+Do NOT hand edit the generated Makefile unless you are completely sure
+you understand the implications! Always try to make changes via the
+Makefile.PL command line and/or editing the Makefile.PL.
+
+You should never need to make any changes. If you do *please* let me
+know so that I can try to make it automatic in a later release.
+
+KNOWN PROBLEMS:
+
+	o Make'ing generally fails first time around with a message like:
+
+		In file included from dbdimp.ec:21:
+                Informix.h:5: DBIXS.h: No such file or directory
+                *** Error code 1
+
+	  Just type 'make' immediately. It should complete without further
+	  problems.
+
+IF YOU HAVE PROBLEMS:
+
+Firstly, check the Frequently Asked Questions, Known Bugs and any other
+pertinent documents at:
+
+	http://www.hermetica.com/technologia/DBI
+
+If this does *not* resolve your problem, please post details to 
+perldb-interest@fugue.com and CC them to me at descarte@hermetica.com.  
+Please include:
+
+1. A complete log of a complete build, e.g.:
+
+	perl Makefile.PL           (do a make realclean first)
+	make
+	./test.pl
+	PERL_DBI_DEBUG=2 ./test.pl
+
+2. Full details of which version of Informix/esql and Perl you're using.
+
+3. The output of:
+	perl -e 'use Config; print Config::myconfig()'
+
+4. If you get a core dump, try to include a stack trace from it.
+   If the stack trace mentions XS_DynaLoader_dl_load_file then rerun
+   make test after setting the environment variable PERL_DL_DEBUG to 2.
+   Similarly, get the Devel::CoreStack module and use it.
+
+5. Please don't post problems to comp.lang.perl.misc or perl5-porters.
+
+6. If you are not currently subscribed to the mailing list please
+   also send a subscription request to perldb-interest-request@fugue.com.
+   Similarly, subscribe via http://www.fugue.com/dbi
+
+Regards,
+Tim & Al.

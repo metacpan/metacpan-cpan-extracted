@@ -1,0 +1,121 @@
+Revision history for Perl extension Date::Handler.
+Maintained by <bbeausej@pobox.com>
+
+1.2  August 26 2003
+   - Included Mathew Robertson's patch to allow missing members in Delta constructer as hash. 
+	  (year fix mainly)
+	- Included Sivaguru Sankaridurg's fix to the GmtOffset method's aberration.
+
+1.1  Jan 7 2003
+	- Included Mathew Robertson's patch for FreeBSD undefined locale problem.
+
+1.0  Sep 20 2002
+	- Version bump to 1.0!
+ 	- Added string checks for epoch format in constructor.
+	- Delta now represents itself in months and second in AsHash()
+
+0.19 Mar 26 2002
+	- Fixed problems with intuitive_hour being passed causing a one hour delayed date.
+
+0.18 Mar 21 2002
+	- Introduced INTUITIVE_TIME_CALCULATIONS()
+	- Introduced INTUITIVE_DST_ADJUSTMENT()
+	- Added intuition check when adding seconds directly to a date to follow constants.
+	
+0.17 Mar 20 2002
+	- Fixed bug with INTUITIVE_MONTH_CALCULATIONS where the month was caculated 0 based
+	when it's actually 1 based.
+
+0.16 Mar 15 2002
+	- Implemented INTUITIVE_MONTH_CALCULATIONS compensation on month calculations.
+	- Added additionnal test cases for standard month, and intuitive months calculations. 
+
+0.15 Mars 13 2002
+	- Reverted the fixes in version 0.14. POSIX does it's own day light compensation.
+	- Fixed a problem that caused the original reference of a date to be modified
+	when adding seconds to it.
+
+0.14 Mar 7 2002
+	- Fixed a bug that caused Date::Handler not to compensate when crossing
+	a day light savings border during the addition process. The fix will 
+	compensate the hour. 
+	(Thanks to Ethan Joffe <ethan@namimedia.com> for the spot)
+
+0.13 Jan 10 2002
+	- AsScalar() can now take an optionnal format argument. (i.e. Timeformat)
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+	
+	- Fixed problems with Delta and date differences causing the months
+          data member to be empty and preventing concatenation.
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+
+	- Fixed problems with locale and the new() constructor
+	(Thanks to Ron Savage <ron@savage.net.au> for the spot)
+		. Locale() is now only used to get the current locale for an object, 
+	  	. Locale() will now warn if attempt to set the locale with Locale(locale) is detected.
+		. SetLocale() is now used to set the locale instead of Locale()
+	
+0.12 Oct 23 2001
+	- Fixed a stupid precedence bug in IsLeapYear()
+
+0.11 Oct 18 2001
+	- Fixed bug with constructor and unknown locales, now passing through Locale()
+	- Made the locale tests optionnal in make test since some systems don't have locales installed by default (OBSD)
+	- Added somes exported functions to Date::Handler::Test for further unification of test suite
+
+0.10 Sept 26 2001
+	- Implemented $date->LocaleRealName() from the return of setlocale()
+	- Calling $date->Locale() with an unknown locale will now warn the user.
+	- Fixed the problem when an unknow locale was given to Locale and the locale key was desynched
+
+0.09 Aug 29 2001
+	- Implemented support for localisation using POSIX setlocale().
+	- Documentation update for localisation support
+	- Test cases name change to be more representative
+
+0.08 date Jul 15 2001 
+	- Fixed inheritance problem in Date::Handler::Add()
+	- Fixed inheritance problems in Date::Handler::Sub()
+	- Fixed inheritance problems in Date::Handler::Incr()
+	- Fixed inheritance problems in Date::Handler::Neg()
+	- Fixed inheritance problems with Delta objects
+	- Now support for classic style argument passing in constructor, thanks to Roland Rauch <roland@rauch.com> for the spot
+	- Added contributors in Handler.pod.
+
+
+0.07 Sun Jul 11 3:52PM 2001
+	- Moved Range documentation to Range.pm
+	- Some documentation update in Handler.pod
+	- Fixed a problem in Range objects when passing 'BACKWARDS' or 'FORWARDS' to the Direction() method.
+
+0.06  Saturday Jul 8 2:00 2001
+	- Implemented the Range object for handling ranges with dates and deltas.
+	- Fixed a problem in Add() when encountering a date that's the last day of month. No idea how that
+	got in here. (Thanks to Fraser Speirs for this bug)
+	- Allowed divisions of Delta when they are expressed in the same units.
+	- Added ApproximateInSeconds() method to Deltas.
+	- IMPORTANT API Change: Month() method now returns a 1 based value like the others.
+	- Some new tests in make test.
+	- Added a DEFAULT_TIMEZONE constant for when no tz is passed to the constructor.
+	- Moved documentation to Handler.pod
+	- Some documentation updates concerning the constructor
+
+0.05  Wed Jun 5 12:00 2001
+	- CPAN release, minor bug fixes.
+
+0.03  Wed Apr 6 12:00:00 2001
+	-Added documentation
+	-Fixed minor bugs	
+	-Change the format of Delta to months and seconds only.
+	-Fixed a bug when comparing 2 dates where one is dst the other std, it would return a missing hour.
+
+
+0.02  Wed Apr 5 23:00:00 2001
+	- implemented most of the core features.
+	- Created the Delta object
+	- Abstraced the Constants class
+
+0.01  Wed Apr  4 23:42:48 2001
+	- original version; created by h2xs 1.20 with options
+		-n Date::Object
+

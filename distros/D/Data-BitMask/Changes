@@ -1,0 +1,28 @@
+Revision history for Perl extension Data::BitMask
+
+0.91  Sat Mar 20 2004
+ - Now using create_makefile_pl => 'traditional' because passthrough
+   doesn't seem to work with subclassing (Thanks merlyn for reporting this)
+
+0.90  Sat Mar 20 2004
+ - Now using Module::Build!
+ - Now generating PPMs as well!
+ - Long live Module::Build!
+
+0.13  Sat Mar 13 2004
+ - Added support for full_match constants
+
+0.12  Mon Jan 19 2003
+ - Minor bug fixes with respect to $^W.
+ - Modified break_mask to call build_mask if necessary.
+ - Update directory structure to use lib for pm files.
+
+0.11  Mon Sep 8 2003
+ - Fixed test bug resulting from varying serialization
+   orders in Data::Dumper.  The error was entirely in
+   the test suite.
+ - Minor changes to POD
+ - Change from Artistic License to Standard-Perl
+
+0.10  Sun Sep 7 2003
+ - First CPAN release

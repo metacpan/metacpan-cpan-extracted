@@ -1,0 +1,19 @@
+<body xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:daizu="http://www.daizucms.org/ns/html-extension/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xml:base="daizu:///foo.com/blog/2006/fish-fingers/article-1.html"
+><p>Here are some links:</p>
+
+<ul>
+ <li>Full URL, should be left alone:
+  <a href="http://ungwe.org/blog/">link</a></li>
+ <li>Absolute path, should have domain added:
+  <a href="/foo/bar/thing.html">link</a></li>
+ <li>Relative path, should have path and domain added:
+  <a href="relative.html">link</a></li>
+ <li>Relative path going up the tree:
+  <a href="../above.html">link</a></li>
+</ul>
+
+<p>And here's an image: <img src="wibble.png" /></p>
+</body>

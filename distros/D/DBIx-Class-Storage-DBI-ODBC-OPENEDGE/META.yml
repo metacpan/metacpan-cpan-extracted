@@ -1,0 +1,25 @@
+---
+abstract: Support specific for OpenEdge over ODBC
+author:
+  - 'Kevin L. Esteb <kesteb@wsipc.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Storage-DBI-ODBC-OPENEDGE
+provides:
+  DBIx::Class::Storage::DBI::ODBC::OPENEDGE:
+    file: lib/DBIx/Class/Storage/DBI/ODBC/OPENEDGE.pm
+    version: 0.02
+requires:
+  DBIx::Class: 0.08210
+  DBIx::Class::Storage::DBI::OpenEdge: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

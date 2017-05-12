@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TableAutoSum.pm
+t/1.t
+t/CommonStuff.pm
+t/constructor.t
+t/data.t
+t/result.t
+t/as_string.t
+t/store_read.t
+t/change.t
+t/merge.t
+t/contains_row_col.t
+t/is_equal.t

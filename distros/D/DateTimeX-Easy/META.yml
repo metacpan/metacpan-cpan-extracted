@@ -1,0 +1,24 @@
+---
+abstract: 'Parse a date/time string using the best method available'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTimeX-Easy
+recommends: {}
+requires:
+  Date::Parse: 0
+  DateTime: 0
+  DateTime::Format::Flexible: 0
+  DateTime::Format::ICal: 0
+  DateTime::Format::Natural: 0
+  Scalar::Util: 0
+  Time::Zone: 0
+version: 0.089

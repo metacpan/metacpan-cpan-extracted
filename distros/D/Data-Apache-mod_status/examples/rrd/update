@@ -1,0 +1,27 @@
+#!/bin/bash -x
+
+RRD_FILE=$1
+URL=$2
+MAX_CLIENTS=$3
+
+if [ ! "$URL" ]; then
+    URL=$1
+    RRD_FILE=mod_status.rrd
+fi
+
+if [ ! "$URL" ]; then
+    echo 'pass url as argument'
+    exit 1;
+fi
+
+if [ ! "$MAX_CLIENTS" ]; then
+    MAX_CLIENTS="U"
+fi
+
+if [ ! -e $RRD_FILE ]; then
+    ./create $RRD_FILE
+fi;
+
+rrdtool update \
+    $RRD_FILE \
+    `mod_status-info --max-clients $MAX_CLIENTS --type rrd $URL`

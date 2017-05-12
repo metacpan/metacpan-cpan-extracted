@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               DateTime-Event-Cron-Quartz
+version:            0.05
+abstract:           OpensSymphony Quartz cron expression processor
+author:
+    - Vadim Loginov  <vadim.loginov@gmail.com>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Class::Accessor:   0.33
+    DateTime:          0.50
+    Exception::Class:  1.29
+    Readonly:          1.03
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

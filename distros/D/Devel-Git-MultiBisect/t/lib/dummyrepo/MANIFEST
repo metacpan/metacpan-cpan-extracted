@@ -1,0 +1,10 @@
+Changes
+lib/Dummy/Repo.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+README.md
+t/001_load.t
+t/002_add.t
+Todo

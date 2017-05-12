@@ -1,0 +1,277 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with DBIx::Async
+at lib/DBIx/Async.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 NAME
+
+DBIx::Async - use L<DBI> with L<IO::Async>
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+ #!/usr/bin/env perl 
+ use strict;
+ use warnings;
+ use feature qw(say);
+ use IO::Async::Loop;
+ use DBIx::Async;
+ my $loop = IO::Async::Loop->new;
+ say 'Connecting to db';
+ $loop->add(my $dbh = DBIx::Async->connect(
+   'dbi:SQLite:dbname=:memory:',
+   '',
+   '', {
+     AutoCommit => 1,
+     RaiseError => 1,
+   }
+ ));
+ $dbh->do(q{CREATE TABLE tmp(id integer primary key autoincrement, content text)})
+ # ... put some values in it
+ ->then(sub { $dbh->do(q{INSERT INTO tmp(content) VALUES ('some text'), ('other text') , ('more data')}) })
+ # ... and then read them back
+ ->then(sub {
+   # obviously you'd never really use * in a query like this...
+   my $sth = $dbh->prepare(q{select * from tmp});
+   $sth->execute;
+   # the while($row = fetchrow_hashref) construct isn't a good fit
+   # but we attempt to provide something reasonably close using the
+   # ->iterate helper
+   $sth->iterate(
+     fetchrow_hashref => sub {
+       my $row = shift;
+       say "Row: " . join(',', %$row);
+     }
+   );
+ })->on_done(sub {
+   say "Query complete";
+ })->on_fail(sub { warn "Failure: @_\n" })->get;
+
+=head1 DESCRIPTION
+
+Wrapper for L<DBI>, for running queries much slower than usual but without blocking.
+
+C<NOTE>: This is an early release, please get in contact via email (see L</AUTHOR>
+section) or RT before relying on it for anything.
+
+=head2 PERFORMANCE
+
+Greatly lacking. See C<examples/benchmark.pl>, in one sample run the results looked
+like this:
+
+               Rate DBIx::Async DBD::SQLite
+ DBIx::Async 1.57/s          --        -89%
+ DBD::SQLite 13.8/s        776%          --
+
+If you're doing anything more than occasional light queries, you'd probably be better
+off with blocking DBI-based code running in a fork.
+
+=head1 METHODS
+
+Where possible, L<DBI> method signatures are used.
+
+=head2 connect
+
+Constuctor. Sets up our instance with parameters that will be used when we attempt to
+connect to the given DSN.
+
+Takes the following options:
+
+=over 4
+
+=item * $dsn - the data source name, should be something like 'dbi:SQLite:dbname=:memory:'
+
+=item * $user - username to connect as
+
+=item * $pass - password to connect with
+
+=item * $opt - any options
+
+=back
+
+Options consist of:
+
+=over 4
+
+=item * RaiseError - set this to 1
+
+=item * AutoCommit - whether to run in AutoCommit mode by default, probably works better
+if this is set to 1 as well
+
+=back
+
+C<NOTE>: Despite the name, this method does not initiate a connection. This may change in
+a future version, but if this behaviour does change this method will still return C<$self>.
+
+Returns $self.
+
+=head2 dsn
+
+Returns the DSN used in the L</connect> request.
+
+=head2 user
+
+Returns the username used in the L</connect> request.
+
+=head2 pass
+
+Returns the password used in the L</connect> request.
+
+=head2 options
+
+Returns any options that were set in the L</connect> request.
+
+=head2 do
+
+Runs a query with optional bind parameters. Takes the following parameters:
+
+=over 4
+
+=item * $sql - the query to run
+
+=item * $options - any options to apply (can be undef)
+
+=item * @params - the parameters to bind (can be empty)
+
+=back
+
+Returns a L<Future> which will resolve when this query completes.
+
+=head2 begin_work
+
+Starts a transaction.
+
+Returns a L<Future> which will resolve when this transaction has started.
+
+=head2 commit
+
+Commit the current transaction.
+
+Returns a L<Future> which will resolve when this transaction has been committed.
+
+=head2 savepoint
+
+Marks a savepoint. Takes a single parameter: the name to use for the savepoint.
+
+ $dbh->savepoint('here');
+
+Returns a L<Future> which will resolve once the savepoint has been created.
+
+=head2 release
+
+Releases a savepoint. Takes a single parameter: the name to use for the savepoint.
+
+ $dbh->release('here');
+
+This is similar to L</commit> for the work which has been completed since
+the savepoint, although the database state is not updated until the transaction
+itself is committed.
+
+Returns a L<Future> which will resolve once the savepoint has been released.
+
+=head2 rollback
+
+Rolls back this transaction. Takes an optional savepoint which
+can be used to roll back to the savepoint rather than cancelling
+the entire transaction.
+
+Returns a L<Future> which will resolve once the transaction has been
+rolled back.
+
+=head2 prepare
+
+Attempt to prepare a query.
+
+Returns the statement handle as a L<DBIx::Async::Handle> instance.
+
+=head1 INTERNAL METHODS
+
+These are unlikely to be of much use in application code.
+
+=head2 queue
+
+Queue a request. Used internally.
+
+Returns a L<Future>.
+
+=head2 worker_class_from_dsn
+
+Attempts to locate a suitable worker subclass, given a DSN.
+
+For example:
+
+ $dbh->worker_class_from_dsn('dbi:SQLite:memory')
+
+should return 'DBIx::Async::Worker::SQLite'.
+
+Note that this method will load the class if it is not already
+present.
+
+Returns the class as a string.
+
+=head2 sth_ch
+
+The channel used for prepared statements.
+
+=head2 ret_ch
+
+The channel which returns values.
+
+=head2 _add_to_loop
+
+Sets things up when we are added to a loop.
+
+=head2 _remove_from_loop
+
+Doesn't do anything yet.
+
+=head1 TODO
+
+=over 4
+
+=item * Much of the L<DBI> API is not yet implemented. Fix this.
+
+=item * Provide a nicer wrapper around transactions.
+
+=item * Consider supporting L<Net::Async::PostgreSQL> and L<Net::Async::MySQL>
+natively, might lead to some performance improvements.
+
+=back
+
+=head1 SEE ALSO
+
+=over 4
+
+=item * L<DBI> - the database framework that does all the real work
+
+=item * L<Net::Async::PostgreSQL> - nonblocking interaction with PostgreSQL, not DBI compatible
+
+=back
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<IO::Async::Notifier>
+
+L<add_child|IO::Async::Notifier/add_child>, L<adopt_future|IO::Async::Notifier/adopt_future>, L<can_event|IO::Async::Notifier/can_event>, L<children|IO::Async::Notifier/children>, L<configure|IO::Async::Notifier/configure>, L<configure_unknown|IO::Async::Notifier/configure_unknown>, L<debug_printf|IO::Async::Notifier/debug_printf>, L<get_loop|IO::Async::Notifier/get_loop>, L<invoke_error|IO::Async::Notifier/invoke_error>, L<invoke_event|IO::Async::Notifier/invoke_event>, L<loop|IO::Async::Notifier/loop>, L<make_event_cb|IO::Async::Notifier/make_event_cb>, L<maybe_invoke_event|IO::Async::Notifier/maybe_invoke_event>, L<maybe_make_event_cb|IO::Async::Notifier/maybe_make_event_cb>, L<new|IO::Async::Notifier/new>, L<notifier_name|IO::Async::Notifier/notifier_name>, L<parent|IO::Async::Notifier/parent>, L<remove_child|IO::Async::Notifier/remove_child>, L<remove_from_parent|IO::Async::Notifier/remove_from_parent>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.

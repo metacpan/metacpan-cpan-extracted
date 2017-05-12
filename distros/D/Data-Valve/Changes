@@ -1,0 +1,41 @@
+Changes
+=======
+
+0.00010 - 02 Oct 2008
+  - Should now compile on Win32 platforms (mingw32 and VC8). (mattn)
+
+0.00009 - 01 Oct 2008
+  - Depend on MooseX::KeyedMutex.
+  - Qualify subtype names.
+
+0.00008 - 08 Sep 2008
+  - Recent versions of Moose (properly) unimport blessed(), which breaks
+    my code depending on it.
+
+0.00007 - 22 Jul 2008
+  - Add fill() and reset()
+
+0.00006 - 22 Jul 2008
+  - I finally learned how to use BUILDARGS
+  - Add strict interval mode.
+  - Slightly optimize expires calculation
+
+0.00005 - 15 Jul 2008
+  - Refactor constructor.
+
+0.00004 - 14 Jul 2008
+  - Refactor KeyedMutex to a role
+  - Refactor BucketStore::Object so it's easier to extend a BucketStore
+
+0.00003 - 10 Jul 2008
+  - Implemented distributed locking for memcached BucketStore via KeyedMutex
+
+0.00002 - 10 Jul 2008
+  - Implemented serialization/deserialization of buckets
+  - Implemented memcached BucketStore (WARNING: no locking whatsoever).
+    Probably not safe for production usage
+  - Tidy up .h file
+  - Added a bunch of accessors
+
+0.00001 - 10 Jul 2008
+  - Initial release

@@ -1,0 +1,24 @@
+---
+abstract: 'plugin bundle for distributions built by HEEB'
+author:
+  - 'Elmar S. Heeb <elmar@heebs.ch>'
+build_requires:
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-HEEB
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+version: 1.0.1

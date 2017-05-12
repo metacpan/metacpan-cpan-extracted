@@ -1,0 +1,106 @@
+#!/usr/bin/perl -w
+use strict;
+use Date::Roman;
+use Getopt::Long qw(:config require_order);
+my %args = ();
+
+GetOptions ("args=s" => \%args) || die "Bad options to RomanDate";;
+
+my $date;
+
+if (@ARGV == 3) {
+  my ($day,$month,$year) = @ARGV;
+  $date = Date::Roman->new(day => $day, month => $month, year => $year);
+}
+elsif (@ARGV == 0) {
+  $date = Date::Roman->new();
+}
+else {
+  die "Bad parameter number";
+}
+print $date->as_string(%args),"\n";
+
+sub usage {
+
+print STDERR<<EOU;
+usage: $0 [--args arg=value ...] [day month year]
+
+EOU
+
+}
+
+__END__
+
+
+=head1 NAME
+
+RomanDate - Print the Roman date corresponding to a given Christian date.
+
+=head1 SYNOPSIS
+
+  RomanDate [--args arg=value --args arg=value ...] [day month year]
+
+
+=head2 OPTIONS
+
+There is only one option, namely C<args>. This option can appears
+multiple times, each time followed by a string in the form
+C<arg=value>. arg, value pairs are those of the C<as_string> method of
+the L<Date::Roman> class.
+
+
+=head2 ARGUMENTS
+
+C<RomanDate> can be invoked either with exactly three arguments or
+with none at all. In the first case, the argument must be numerical
+and are interpreted as the day, month and year number respectively. In
+the second case, the script prints the current date.
+
+
+=head1 DESCRIPTION
+
+This script is a utilization sample of L<Date::Roman>. Given a
+Christian date, it prints on standard out the corresponding date in
+the Roman format (see the L<Date::Roman> man page for more details
+about the Roman calendar).
+
+=head1 EXAMPLES
+
+  RomanDate 19 7 1961
+
+prints I<a.d. XIV Kal. Aug. MMDCCXIV AUC>.
+
+  RomanDate --args words=complete --args auc=abbrev 19 7 1961
+
+prints I<ante diem XIV Kalendas Augustas MMDCCXIV AUC>
+
+  RomanDate
+
+prints the current date in the Roman form. 
+
+
+
+=head1 AUTHOR
+
+Leo Cacciari, aka TheHobbit E<lt>thehobbit@altern.orgE<gt>
+
+=head1 COPYRIGHT AND  DISCLAIMER
+
+This software is Copyright 2002 by Leo Cacciari.  This software is free
+software; you can redistribute it and/or modify it under the terms of
+the Perl Artistic License, either as stated in the enclosed LICENSE
+file or (at your option) as given on the Perl home site: 
+http://www.perl.com/language/misc/Artistic.html
+
+=head1 BUGS
+
+I dont know if this qualify as a bug. Anyhow, the scripts oly accepts
+dates in the format day month year.
+
+
+=head1 SEE ALSO
+
+The L<Date::Roman> man page.
+
+=cut
+

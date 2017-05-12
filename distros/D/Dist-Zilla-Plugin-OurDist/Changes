@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-Plugin-OurDist
+
+0.02    2015-07-04 (PERLANCAR)
+
+	- Don't replace #DIST below __DATA__ or __END__.
+
+
+0.01     2015-07-01 (PERLANCAR)
+
+         - First release.

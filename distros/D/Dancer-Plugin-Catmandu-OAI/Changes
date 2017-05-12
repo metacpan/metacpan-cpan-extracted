@@ -1,0 +1,83 @@
+Revision history for Dancer-Plugin-Catmandu-OAI
+
+0.0401  2017-04-24 13:54:38 CEST
+  - make adminEmail repeatable
+  - support setDescription, compression and description
+
+0.04  2017-02-14 10:50:59 CET
+  - xsl stylesheet support
+
+0.0310  2017-02-09 12:08:21 CET
+  - fix bug in ListRecords if metatadata format has fixes
+
+0.0309  2016-10-20 10:04:28 CEST
+  - fix date bug
+
+0.0308  2016-05-26 14:08:53 CEST
+  - more pod and a demo application
+  - bugfixes
+
+0.0307  2015-07-02 15:00:35 CEST
+  - put function call "content_type 'xml'" in function "render". Now errors also have content-type application/xml
+
+0.0306  2015-03-13 09:52:27 CET
+    - metadata_formats cql option
+    - fix pod
+    - more tests
+
+0.0305  2014-05-08 12:11:15 CEST
+    - make datestamp pattern configurable
+    - make uri_base configurable
+    - building with Dist::Milla
+    - test added
+    - docs
+    - default search params
+    - GetRecord is now a cql search
+
+0.0304  2014-04-22
+    - add missing dependency on Catmandu:Exporter::Template
+
+0.0303  2014-03-04
+    - "granularity" can be set to these two options in the plugin configuration:
+
+        - YYYY-MM-DDThh:mm:ssZ
+        - YYYY-MM-DD
+
+    - "fix" can be set in the plugin configuration:
+
+    - this "fix" fixes the input record(s). This is a global fix that is
+      applied before any action is taken on the record.
+
+      e.g. GetRecord, ListRecords, and ListIdentifiers share this fix
+
+        - This is not the same as the fix, as configured for every metadataPrefix.
+          First of all the global fix is applied, and later the fix for the metadataPrefix is applied.
+
+    - "datestamp" is copied from the fixed record (see above), instead of fixed by "_combined_utc_datestamp"
+
+        Fixing the datestamp values is up to the global fix (see: Catmandu::Fix::datetime_format).
+        One should make sure that the values in this field honor the configured "granularity".
+
+    - "default_search_params" can be set in the plugin configuration:
+
+        These arguments are given to the search method of the Catmandu::Bag.
+        Beware that these are overwritten inline by "start","limit", "query" and "cql_query",
+        so those cannot be used.
+
+    - $bag->get is changed by $bag->search in "GetRecord"
+
+        To honor the "default_search_params", the search method of the Catmandu::Bag is used.
+        These parameters are preset, and cannot be changed by "default_search_params".
+
+0.0302  2013-03-11
+    - fix date format in resumptionToken
+
+0.0301  2013-02-28
+    - explicit DateTime dependency
+
+0.03    2013-02-25
+    - configurable limit (default is 100)
+    - support collectionIcon
+
+0.02    2012-12-04
+    - initial release

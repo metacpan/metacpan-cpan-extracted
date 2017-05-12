@@ -1,0 +1,177 @@
+NAME
+    DBIx::TxnPool - Massive SQL updates by means of transactions with the
+    deadlock & signal solution
+
+SYNOPSIS
+    This module will help to you to make quickly DML statements of InnoDB
+    engine. You can forget about deadlocks ;-)
+
+        use DBIx::TxnPool;
+
+        my $pool = txn_item {
+            my ( $pool, $item ) = @_;
+
+            $pool->dbh->do( "UPDATE table SET val=? WHERE key=?", undef, $_->{val}, $_->{key} );
+            # or
+            $dbh->do("INSERT INTO table SET val=?, key=?", undef, $_->{val}, $_->{key} );
+        }
+        txn_post_item {
+            my ( $pool, $item ) = @_;
+
+            # Here we are if transaction is successful
+            unlink( 'some_file_' . $_->{key} );
+            # or
+            unlink( 'some_file_' . $item->{key} );
+        }
+        txn_commit {
+            my $pool = shift;
+            log( 'The commit was here...' );
+        } dbh => $dbh, size => 100;
+
+        # Here can be deadlocks but they will be resolved by module
+        # and repeated (to see example in xt/03_deadlock_solution.t)
+        $pool->add( { key => int( rand(100) ), val => $_ } ) for ( 0 .. 300 );
+        $pool->finish;
+
+    Or other way:
+
+        my $pool = txn_item {
+            $dbh->do( "UPDATE table SET val=? WHERE key=?", undef, $_->{val}, $_->{key} );
+        }
+        txn_sort {
+            $a->{key} <=> $b->{key}
+        }
+        dbh => $dbh, size => 100;
+
+        # Here no deadlocks because all keys are sorted before transaction:
+        # circle blocks inside the InnoDB not occur
+        $pool->add( { key => int( rand(100) ), val => $_ } ) for ( 0 .. 300 );
+        $pool->finish;
+
+DESCRIPTION
+    If you need massive quickly updates or inserts into InnoDB database -
+    this module for you! It helps to wrap some SQL manipulation statements
+    to one transaction and has the deadlock and signal solution.
+
+DETAILS
+    If you make alone insert/delete/update statement in the InnoDB engine,
+    MySQL server does fsync (data flushing to disk) after each statement. It
+    can be very slow for many updates. The best solution can be to wrap some
+    insert/delete/update statements in one transaction for example. But this
+    raises a new problem - deadlocks. If a deadlock occurs a DBI module
+    throws exceptions and ideal way to repeat SQL statements again. This
+    module helps to make it. It has a pool inside for data (FIFO buffer) and
+    calls your callbacks for each pushed item. When your pool to be fed by
+    your data, it wraps data in one transaction up to the maximum defined
+    size or up to the finish method. If deadlock occurs a pool repeats your
+    callbacks for every item again. You can define a second callback which
+    will be executed for every item after wrapped transaction. For example
+    there can be non-SQL statements, for example a deleting files, cleanups
+    and etc.
+
+CONSTRUCTOR
+    Please to see "SYNOPSIS" section
+
+  Shortcuts:
+    The "txn_item" should be first. Other sortcuts can follow in any order.
+    Parameters should be the last.
+
+    txn_item (Required)
+        The transaction item callback. There should be SQL statements and
+        code should be safe for repeating (when a deadlock occurs). The $_
+        consists a current item. You can modify it if one is hashref for
+        example. Passing arguments will be *DBIx::TxnPool* object and
+        *current item* respectively. Please don't catch exceptions here (by
+        try{} or eval{} for example) - by this way deadlocks are defined
+        outside under the hood!
+
+    txn_sort (Optional)
+        Here you can define sort function for your data before a transaction
+        will be made. If you have only one type SQL statement in txn_item
+        but you didn't sort keys before transaction you can have deadlocks
+        (they will be resolved and transaction will be repeated but you will
+        lose a processing time) unless you define this function. This method
+        minimize deadlock events!
+
+    txn_post_item (Optional)
+        The post transaction item callback. This code will be executed once
+        for each item (defined in $_). It is located outside of the
+        transaction. And it will be called if whole transaction was
+        successful. Passing arguments are *DBIx::TxnPool* object and
+        *current item* respectively. You can do here your own error handling
+        in callback. If your code here will throw an excetption it will be
+        propagated above.
+
+    txn_commit (Optional)
+        This callback will be called after each SQL commit statement. Here
+        you can put code for logging for example. The first argument is
+        *DBIx::TxnPool* object
+
+  Parameters:
+    dbh (Required)
+        The dbh to be needed for begin_work & commit method (wrap in a
+        transaction).
+
+    size (Optional)
+        The size of pool when a commit method will be called when feeding
+        reaches the same size.
+
+    block_signals (Optional)
+        An arrayref of signals (strings) which should be blocked in slippery
+        places for this *pool*. Defaults are [ qw( TERM INT ) ]. You can
+        change globaly this list by setting: "$DBIx::TxnPool::BlockSignals =
+        [ qw( TERM INT ALARM ... ) ]". For details to see here "SIGNAL
+        HANDLING"
+
+    max_repeated_deadlocks (Optional)
+        The limit of consecutive deadlocks. The default is 5. After limit to
+        be reached the "add" throws exception.
+
+METHODS
+    add You can add item of data to the pool. This method makes a wrap to
+        transaction. It can finish transaction if pool reaches up to size or
+        can repeat a whole transaction again if deadlock exception was
+        thrown. The size of transaction may be less than your defined size!
+
+    dbh The accessor of "dbh". It's readonly.
+
+    finish
+        It makes a final transaction if pool is not empty.
+
+    amount_deadlocks
+        The amount of deadlocks (repeated transactions)
+
+SIGNAL HANDLING
+    In DBD::mysql and may be in other DB drivers there is a some bad
+    behavior the bug as i think. If a some signal will arrive (TERM, INT and
+    other) in your program during a some SQL socket work this driver throws
+    an exception like "MySQL lost connection". It happens because the "recv"
+    or "read" system calls into MySQL driver return with error code "EINTR"
+    if signal arrives inside this system call. A right written software
+    should recall a system call again because the "EINTR" is not fatal
+    error. But i think MySQL driver decides this error as *lost connection
+    error*. *"Deferred Signals"* (or Safe Signals) of perl don't help
+    because the MySQL driver uses direct system calls.
+
+    Workaround is to use Signal::Mask module for example and to block these
+    signals (TERM / INT) during working with DBI subroutines. The version
+    0.09 of "DBIx::TxnPool" has helpers for this. The "DBIx::TxnPool" wraps
+    all slippery places by blocking your preferred signals (defaults are
+    "TERM" & "INT" ones) before entering and by unblocking after (for
+    example the callback handler txn_item and transaction code). This should
+    minimize raised errors like the "MySQL lost connection".
+
+AUTHOR
+    This module has been written by Perlover <perlover@perlover.com>
+
+LICENSE
+    This module is free software and is published under the same terms as
+    Perl itself.
+
+SEE ALSO
+    DBI, Deadlock Detection and Rollback
+    <http://dev.mysql.com/doc/refman/5.5/en/innodb-deadlock-detection.html>
+
+TODO
+    A supporting DBIx::Connector object instead DBI
+

@@ -1,0 +1,40 @@
+---
+abstract: 'Mason 2.x engine for Dancer2'
+author:
+  - 'David Betz <hashref@gmail.com>'
+build_requires:
+  Carp: '0'
+  Dancer2: '0'
+  Mason: '0'
+  Moo: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-Mason2
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dancer2::Template::Mason2:
+    file: lib/Dancer2/Template/Mason2.pm
+    version: '0.01'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/hashref/Dancer2-Template-Mason2/issues
+  homepage: https://github.com/hashref/Dancer2-Template-Mason2
+  repository: git://github.com/hashref/Dancer2-Template-Mason2.git
+version: '0.01'

@@ -1,0 +1,11 @@
+50fab8142f792060d865db
+
+master oregon 50.fab8142f792060d865db:
+  sensor/wtgr800.2f[temp]=20.7
+  sensor/wtgr800.2f[humidity]=86
+  sensor/wtgr800.2f[battery]=10%
+
+
+
+
+

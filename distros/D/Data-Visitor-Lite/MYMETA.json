@@ -1,0 +1,54 @@
+{
+   "abstract" : "an easy implementation of Data::Visitor::Callback",
+   "author" : [
+      "Daichi Hiroki <hirokidaichi {at} gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.04, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Visitor-Lite",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Data::Util" : 0,
+            "List::MoreUtils" : 0,
+            "Scalar::Util" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/hirokidaichi/p5-Data-Visitor-Lite/tree",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/hirokidaichi/p5-Data-Visitor-Lite.git"
+      }
+   },
+   "version" : "0.03"
+}

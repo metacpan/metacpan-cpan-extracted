@@ -1,0 +1,55 @@
+{
+   "abstract" : "Interface to Motorola SurfBoard 4200 Cable Modem",
+   "author" : [
+      "Burak Gursoy <burak@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-CableModem-Motorola-SB4200",
+   "no_index" : {
+      "directory" : [
+         "monolithic_version",
+         "builder",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.40"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exception::Class" : "0",
+            "HTML::Form" : "0",
+            "HTML::TableParser" : "0",
+            "LWP::UserAgent" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/burak/cpan-device-cablemodem-motorola-sb4200/"
+      }
+   },
+   "version" : "0.12",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,20 @@
+SYNOPSIS
+
+     use Dist::Zilla::Util::ParsePrereqsFromDistIni qw(parse_prereqs_from_dist_ini);
+    
+     my $prereqs = parse_prereqs_from_dist_ini(path => "dist.ini");
+
+    Sample result:
+
+    #CODE: require Dist::Zilla::Util::ParsePrereqsFromDistIni;
+    Dist::Zilla::Util::ParsePrereqsFromDistIni::parse_prereqs_from_dist_ini(path
+    => "dist.ini");
+
+DESCRIPTION
+
+    This module provides parse_prereqs_from_dist_ini().
+
+SEE ALSO
+
+    Dist::Zilla
+

@@ -1,0 +1,4 @@
+plugins:
+  Auth::SAFE:
+    safe_url: "https://safe.thomson.com/login/sso/SSOService?app=dcr-test"
+    shared_secret: "YggYu867hkhvNnggs/"

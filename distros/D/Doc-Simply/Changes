@@ -1,0 +1,17 @@
+0.032 Wednesday June 16 21:27:46 PDT 2010:
+    - Fixed documentation
+
+0.031 Wednesday June 16 19:21:24 PDT 2010:
+    - Got rid of some bogus dependencies and streamlined operations:
+    - No more YUI::Loader, Getopt::Chain, Moose (using Any::Moose)
+    - Minor tweaks to html, using latest YUI (2.8.?) .css
+    - Converted build system to dzpl
+    
+0.030 Sunday February 22 15:26:16 PST 2009:
+    - Got rid of XXX.pm appearance in t/ that was killing testability
+
+0.020 Wednesday October 08 18:16:40 PDT 2008: 
+    - Normalize leading space on blocks to the shortest lead (allows indented /* */ comments)
+
+0.010 Wednesday October 07 2008:
+    - Initial release

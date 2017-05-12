@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+config.ini
+dist.ini
+lib/DHTMLX/Core.pm
+lib/DHTMLX/dist.ini

@@ -1,0 +1,358 @@
+#   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+#
+#   file: lib/Dist/Zilla/Plugin/MetaResources/Template/Manual.pod
+#
+#   Copyright © 2015 Van de Bugger
+#
+#   This file is part of perl-Dist-Zilla-Plugin-MetaResources-Template.
+#
+#   perl-Dist-Zilla-Plugin-MetaResources-Template is free software: you can redistribute it and/or
+#   modify it under the terms of the GNU General Public License as published by the Free Software
+#   Foundation, either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Dist-Zilla-Plugin-MetaResources-Template is distributed in the hope that it will be
+#   useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+#   FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Dist-Zilla-Plugin-MetaResources-Template. If not, see <http://www.gnu.org/licenses/>.
+#
+#   - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+# PODNAME: Dist::Zilla::Plugin::MetaResources::Template::Manual
+# ABSTRACT: C<MetaResources::Template> plugin user manual
+
+#pod =for :this This is C<Manifest::Write> plugin user manual. Read this if you want to
+#pod use Perl code in distribution "resource" metadata.
+#pod
+#pod =for :those If you are going to hack or extend C<Dist-Zilla-Plugin-MetaResources-Template>, read the L<module
+#pod documentation|Dist::Zilla::Plugin::MetaResources::Template>. General topics like getting source, building, installing, bug
+#pod reporting and some others are covered in the F<README>.
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     [MetaResources::Template]
+#pod         license             = {{$dist->license->url}}
+#pod         bugtracker.web      = https://rt.example.org/Public/Dist/Display.html?Name={{$dist->name}}
+#pod         bugtracker.mailto   = mailto:bug-{{$dist->name}}@rt.example.org
+#pod         …
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<Dist-Zilla-Plugin-MetaResources-Template> is a replacement for C<MetaResources> standard plugin. To use C<Dist-Zilla-Plugin-MetaResources-Template> you
+#pod should replace line
+#pod
+#pod     [MetaResources]
+#pod
+#pod with
+#pod
+#pod     [MetaResources::Template]
+#pod
+#pod in your F<dist.ini>. Voilà! Now all the plugin options are treated as templates. It means text
+#pod surrounded by double braces (e. g. C<< {{$dist->name}} >>) is evaluated as Perl code, and
+#pod result of evaluation replaces the original text (and surrounding double braces). For example:
+#pod
+#pod     name = Foo
+#pod     …
+#pod     [MetaResources::Template]
+#pod         bugtracker.mailto = mailto:bug-{{$dist->name}}@rt.example.org
+#pod         # Option value will be "mailto:bug-Foo@rt.example.org".
+#pod
+#pod Within Perl code, two variables are set: C<$dist> and C<$plugin>. C<$dist> variable gives you
+#pod access to C<Dist::Zilla> instance and various distribution attributes:
+#pod
+#pod     $dit->name          # string
+#pod     $dist->version      # string
+#pod     $dist->abstract     # string
+#pod     $dist->authors      # arrayref
+#pod     …
+#pod
+#pod See L<Dist::Zilla/"ATTRIBUTES"> for full list of attributes.
+#pod
+#pod C<$plugin> variable is mostly useless and provided for conformance with other plugins
+#pod (C<GenerateFile>, C<GatherDir::Template>, C<TemplateFiles>, etc). In case of complex code (which is
+#pod unlikely to happen) you can use it for logging, though:
+#pod
+#pod     {{ …; $plugin->log( "message" ); …; }}
+#pod     {{ …; $plugin->log_fatal( "aborting…" ); …; }}
+#pod
+#pod You need to study C<Dist::Zilla> guts in order to understand what could be done through the plugin
+#pod reference.
+#pod
+#pod Actual evaluating and replacement (i. e. template processing) is performed by C<Text::Template>
+#pod module, so look for the gory details there.
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod = L<Dist::Zilla> — Distribution builder
+#pod = L<Dist::Zilla::Plugin::MetaResources> — Standard plugin
+#pod = L<Text::Template> — Template engine
+#pod = L<CPAN::Meta::Spec> — Distribution metainfo specification
+#pod = L<CPAN::Meta::Spec/"resources"> — Specification of "resources"
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod     ;   file: dist.ini
+#pod     name    = Assa
+#pod     version = 0.007
+#pod     author  = John Doe <john.doe@example.org>
+#pod     license = GPL_3::or_later
+#pod     [GenerateFile/Assa]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa;
+#pod         content  = # ABSTRACT: MetaResources::Template example
+#pod         content  = 1;
+#pod     [MetaResources::Template]
+#pod         homepage            = http://example.org/{{$dist->name}}
+#pod         license             = {{$dist->license->url}}
+#pod         bugtracker.web      = https://rt.example.org/{{$dist->name}}
+#pod         bugtracker.mailto   = mailto:bug-{{$dist->name}}@rt.example.org
+#pod         x_plugin            = Generated with {{$plugin->plugin_name}}
+#pod     [MetaYAML]
+#pod     [MetaJSON]
+#pod     ; end of file ;
+#pod
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+# doc/what.pod #
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Dist-Zilla-Plugin-MetaResources-Template> is a C<Dist::Zilla> plugin, a replacement for standard plugin C<MetaResources>.
+#pod Both provide resources for distribution metadata, but this one treats values as text templates.
+#pod
+#pod =cut
+
+# end of file #
+# doc/why.pod #
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod By using standard C<MetaResources> plugin you can specify resources for your distribution metadata,
+#pod e. g.:
+#pod
+#pod     [MetaResources]
+#pod         homepage          = http://example.org/~AUTHOR/NAME
+#pod         bugtracker.web    = http://example.org/bugs.html?dist=NAME
+#pod         bugtracker.mailto = bug-NAME@rt.example.org
+#pod         repository.url    = git://example.org/AUTHOR/NAME.git
+#pod         repository.web    = http://example.org/AUTHOR/NAME
+#pod         repository.type   = git
+#pod
+#pod Quite simple, but project name (I<NAME>) appears 5 times in 7 lines — it is far too many to my
+#pod taste. Repeating the same name multiple times is boring and error-prone, it complicates project
+#pod creation and maintenance.
+#pod
+#pod I know there are plugins like C<GitHib> or C<Bitbucket> which fulfill the resources. However, they
+#pod are not applicable if your project lives at another, less popular hosting, like SourceForge,
+#pod Savannah, or TuxFamily. There are no dedicated plugins for these hostings, and probably for many
+#pod others.
+#pod
+#pod C<MetaResources::Template> helps to reduce duplication without introducing any hosting-specific
+#pod details. C<MetaResources::Template> treats resources as text templates:
+#pod
+#pod     [MetaResources::Template]
+#pod         homepage          = http://example.org/~AUTHOR/{{$dist->name}}
+#pod         bugtracker.web    = http://example.org/bugs.html?dist={{$dist->name}}
+#pod         bugtracker.mailto = bug-{{$dist->name}}@rt.example.org
+#pod         repository.url    = git://example.org/AUTHOR/{{$dist->name}}.git
+#pod         repository.web    = http://example.org/AUTHOR/{{$dist->name}}
+#pod         repository.type   = git
+#pod
+#pod =cut
+
+# end of file #
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Plugin::MetaResources::Template::Manual - C<MetaResources::Template> plugin user manual
+
+=head1 VERSION
+
+Version v0.4.7, released on 2015-11-05 20:49 UTC.
+
+=head1 WHAT?
+
+C<Dist-Zilla-Plugin-MetaResources-Template> is a C<Dist::Zilla> plugin, a replacement for standard plugin C<MetaResources>.
+Both provide resources for distribution metadata, but this one treats values as text templates.
+
+This is C<Manifest::Write> plugin user manual. Read this if you want to
+use Perl code in distribution "resource" metadata.
+
+If you are going to hack or extend C<Dist-Zilla-Plugin-MetaResources-Template>, read the L<module
+documentation|Dist::Zilla::Plugin::MetaResources::Template>. General topics like getting source, building, installing, bug
+reporting and some others are covered in the F<README>.
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    [MetaResources::Template]
+        license             = {{$dist->license->url}}
+        bugtracker.web      = https://rt.example.org/Public/Dist/Display.html?Name={{$dist->name}}
+        bugtracker.mailto   = mailto:bug-{{$dist->name}}@rt.example.org
+        …
+
+=head1 DESCRIPTION
+
+C<Dist-Zilla-Plugin-MetaResources-Template> is a replacement for C<MetaResources> standard plugin. To use C<Dist-Zilla-Plugin-MetaResources-Template> you
+should replace line
+
+    [MetaResources]
+
+with
+
+    [MetaResources::Template]
+
+in your F<dist.ini>. Voilà! Now all the plugin options are treated as templates. It means text
+surrounded by double braces (e. g. C<< {{$dist->name}} >>) is evaluated as Perl code, and
+result of evaluation replaces the original text (and surrounding double braces). For example:
+
+    name = Foo
+    …
+    [MetaResources::Template]
+        bugtracker.mailto = mailto:bug-{{$dist->name}}@rt.example.org
+        # Option value will be "mailto:bug-Foo@rt.example.org".
+
+Within Perl code, two variables are set: C<$dist> and C<$plugin>. C<$dist> variable gives you
+access to C<Dist::Zilla> instance and various distribution attributes:
+
+    $dit->name          # string
+    $dist->version      # string
+    $dist->abstract     # string
+    $dist->authors      # arrayref
+    …
+
+See L<Dist::Zilla/"ATTRIBUTES"> for full list of attributes.
+
+C<$plugin> variable is mostly useless and provided for conformance with other plugins
+(C<GenerateFile>, C<GatherDir::Template>, C<TemplateFiles>, etc). In case of complex code (which is
+unlikely to happen) you can use it for logging, though:
+
+    {{ …; $plugin->log( "message" ); …; }}
+    {{ …; $plugin->log_fatal( "aborting…" ); …; }}
+
+You need to study C<Dist::Zilla> guts in order to understand what could be done through the plugin
+reference.
+
+Actual evaluating and replacement (i. e. template processing) is performed by C<Text::Template>
+module, so look for the gory details there.
+
+=head1 WHY?
+
+By using standard C<MetaResources> plugin you can specify resources for your distribution metadata,
+e. g.:
+
+    [MetaResources]
+        homepage          = http://example.org/~AUTHOR/NAME
+        bugtracker.web    = http://example.org/bugs.html?dist=NAME
+        bugtracker.mailto = bug-NAME@rt.example.org
+        repository.url    = git://example.org/AUTHOR/NAME.git
+        repository.web    = http://example.org/AUTHOR/NAME
+        repository.type   = git
+
+Quite simple, but project name (I<NAME>) appears 5 times in 7 lines — it is far too many to my
+taste. Repeating the same name multiple times is boring and error-prone, it complicates project
+creation and maintenance.
+
+I know there are plugins like C<GitHib> or C<Bitbucket> which fulfill the resources. However, they
+are not applicable if your project lives at another, less popular hosting, like SourceForge,
+Savannah, or TuxFamily. There are no dedicated plugins for these hostings, and probably for many
+others.
+
+C<MetaResources::Template> helps to reduce duplication without introducing any hosting-specific
+details. C<MetaResources::Template> treats resources as text templates:
+
+    [MetaResources::Template]
+        homepage          = http://example.org/~AUTHOR/{{$dist->name}}
+        bugtracker.web    = http://example.org/bugs.html?dist={{$dist->name}}
+        bugtracker.mailto = bug-{{$dist->name}}@rt.example.org
+        repository.url    = git://example.org/AUTHOR/{{$dist->name}}.git
+        repository.web    = http://example.org/AUTHOR/{{$dist->name}}
+        repository.type   = git
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 EXAMPLES
+
+    ;   file: dist.ini
+    name    = Assa
+    version = 0.007
+    author  = John Doe <john.doe@example.org>
+    license = GPL_3::or_later
+    [GenerateFile/Assa]
+        filename = lib/Assa.pm
+        content  = package Assa;
+        content  = # ABSTRACT: MetaResources::Template example
+        content  = 1;
+    [MetaResources::Template]
+        homepage            = http://example.org/{{$dist->name}}
+        license             = {{$dist->license->url}}
+        bugtracker.web      = https://rt.example.org/{{$dist->name}}
+        bugtracker.mailto   = mailto:bug-{{$dist->name}}@rt.example.org
+        x_plugin            = Generated with {{$plugin->plugin_name}}
+    [MetaYAML]
+    [MetaJSON]
+    ; end of file ;
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla> — Distribution builder
+
+=item L<Dist::Zilla::Plugin::MetaResources> — Standard plugin
+
+=item L<Text::Template> — Template engine
+
+=item L<CPAN::Meta::Spec> — Distribution metainfo specification
+
+=item L<CPAN::Meta::Spec/"resources"> — Specification of "resources"
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

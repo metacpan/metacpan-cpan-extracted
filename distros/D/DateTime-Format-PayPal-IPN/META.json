@@ -1,0 +1,76 @@
+{
+   "abstract" : "Parse PayPal IPN timestamps",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-PayPal-IPN",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "DateTime::TimeZone" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/oalders/datetime-format-paypal-ipn/issues"
+      },
+      "homepage" : "https://github.com/oalders/datetime-format-paypal-ipn",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/datetime-format-paypal-ipn.git",
+         "web" : "https://github.com/oalders/datetime-format-paypal-ipn"
+      }
+   },
+   "version" : "0.000001",
+   "x_contributors" : [
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ]
+}
+

@@ -1,0 +1,86 @@
+=head1 NAME
+
+Devel::StackBlech - Dumps your stack, all of it, somewhere
+
+=head1 FUNCTIONS
+
+=head2 PERL FUNCTIONS
+
+=over
+
+=item dumpStacks()
+
+Dumps your stack to C<Perl_debug_log> which is usually pointed at
+STDERR. Happens to also display DB::sub calls which are normally
+invisible. Please hack on this if you want more features. Commit bits
+are handed out freely.
+
+=back
+
+=head2 C FUNCTIONS
+
+All of the following C functions are available for importing.
+
+=over
+
+=item void dsb_dumpStacks()
+
+Dump all levels of the interpreter's runloop stacks.
+
+This is the backend, reuseable implementation for the perl function
+C<dumpStacks()>.
+
+=item void dsb_dumpFrames( PERL_SI *si )
+
+Dump all contexts in this runloop level.
+
+=item void dsb_dumpFrame( const PERL_CONTEXT *const cx )
+
+Dump a context.
+
+=back
+
+=head1 AUTHOR
+
+The internet. Kthxbai.
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-devel-stackblech
+at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-StackBlech>.  I
+will be notified, and then you'll automatically be notified of
+progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Devel::StackBlech
+
+You can also look for information at:
+
+=over
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-StackBlech>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Devel-StackBlech>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Devel-StackBlech>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Devel-StackBlech>
+
+=back
+
+Copyright 2008, 2009 Joshua ben Jore, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

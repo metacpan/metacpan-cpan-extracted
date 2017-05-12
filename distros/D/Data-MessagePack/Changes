@@ -1,0 +1,264 @@
+1.00 2016-08-21 15:30:00+0900
+
+    - Update major version for MessagePack versioning rule
+    - Support Bin/Str type again
+
+0.51 2016-08-21 15:20:00+0900
+
+    - Revert supporting Bin/Str type changes for MessagePack versioning rule
+
+0.50 2016-06-15 12:09:00+0900
+
+    - No feature changes. Official release for supporting Bin/Str format
+
+0.49_01 2016-03-01 14:40:00+0900
+
+    - Support Bin/Str type of newer MessegePack specification
+
+0.49 2015-11-21 20:07:30+0900
+
+    - Fix undefined behavior issue of overflow(#23, #24, Thanks kazuho)
+
+0.48 2013-09-01 15:42:51+0900
+
+    - Fix tests for bleadperl
+
+0.47
+
+    - Support PUREPERL_ONLY build
+      See the Lancaster Consensus:
+      https://github.com/sjn/toolchain-site/blob/219db464af9b2f19b04fec05547ac10180a469f3/lancaster-consensus.md#specifying-pure-perl-builds
+
+0.46
+
+    - fixed unpacking issue on big-endian system.
+    https://github.com/msgpack/msgpack-perl/issues/4
+
+0.45
+
+    - support tied hashes(rurban++)
+
+0.44
+
+    - do not display deprecated warnings from Data::MessagePack::Unpacker.
+      T::Xslate using it...
+
+0.43 2012-06-26T02:00:57
+
+    - Data::MessagePack::Unpacker was deprecated.
+
+
+0.42 2012-06-25 09:56:58
+
+    - fix failing to pack IV/NV with MAGIC (e.g. $$ in 5.16.0)
+
+0.41 2012-03-28 01:09:44
+
+    - Revert the privous changed utf8() behavior
+
+0.40 2012-03-28 00:37:28
+
+    - Fix $messagepack->utf8(1) behavior
+    - Fix tests on NV == long double env
+
+0.39 2011-12-05 00:08:58
+
+    - Resolve RT #72920 - packing float numbers fails on some cases,
+      e.g. after e.g. $flaot > 0
+
+0.38_02 2011-10-25 09:58:28
+
+    - More informative tests
+
+0.38_01 2011-10-25 09:44:05
+
+    - Add tests to reveal problems in Data::Encoder
+
+0.38 2011-10-10 16:17:03
+
+    - Add tests to unpacking double - the test was missing!
+
+0.37 2011-10-10 16:08:18
+
+    - Resolve RT #71407: broken pack()/pack() for double on arm-oabi arch
+      (the patch contributed by @shohex)
+
+0.36 2011-08-21 14:41:51
+
+    - Fix a PP issue incompatible with XS impl
+    - Fix docs
+
+0.35_01 2011-08-19 15:27:00
+
+    - address issue/20 (cho45): Data::MessagePack did not finish correctly
+      when was given devided packed data
+    - address pull-req/82 (cho45): canonical mode like JSON.pm
+    - added JSON.pm-compat interface
+    - added utf8 mode to apply utf8::decode() when unpacking
+    - deprecated $PreferInteger; use D::MP->new->prefer_integer
+    - repository is now https://github.com/msgpack/msgpack-perl
+
+0.34
+
+    - do not use the corrupt my_snprintf(%ll[du]) on win32(kazuho)
+
+0.33
+
+    - fix tests (gfx)
+    - optimize unpacking routines in Data::MessagePack::PP (gfx)
+
+0.32
+
+    - add tests to detect Alpha problems reported via CPAN testers (gfx)
+
+0.31
+
+    - update Module::Install::XSUtil for ccache support (gfx)
+    - add version check at bootstrap in order to avoid load old .so (gfx)
+
+0.30
+
+    - fix utf8 mode not to be reseted by $unpacker->reset method (gfx)
+
+0.29
+
+    - add $unpacker->utf8 mode, decoding strings as UTF-8 (gfx)
+
+0.28
+
+    - added more tests(gfx)
+    - refactor the PP code(gfx)
+
+0.27
+
+    - * 6d9a629 perl: modified trivial codes in PP::Unpacker(makamaka)
+    - * ead8edc modified be unpack_(u)int64 in PP(makamaka)
+
+0.26
+
+    - fixed a serious code typo in PP(makamaka)
+
+0.25
+
+    (NO FEATURE CHANGES)
+    - oops. I failed releng.
+
+0.24
+    - Fixed a lot of streaming unpacking issues (tokuhirom, gfx)
+    - Fixed unpacking issues for 64 bit integers on 32 bit perls (gfx)
+    - Improved performance, esp. in unpacking (gfx)
+
+0.23
+
+    (NO FEATURE CHANGES)
+    - fixed english docs(hanekomu++)
+
+0.22
+
+    - fixed issue on ithreads(broken from 0.21)
+
+0.21
+
+    - doc enhancments
+    - micro performance tuning.
+
+0.20
+
+    - first production ready release with PP driver.
+
+0.16_04
+
+    - no feature changes
+
+0.16_02
+
+    - document enhancement(tokuhirom)
+    - M::I::XSUtil 0.26 is broken. use 0.27.
+
+0.16_01
+
+    - added PP version (used in cases PERL_DATA_MESSAGEPACK=pp or fail to load XS).
+    - made Makefile.PL PP configurable.
+    - test_pp in author's test
+    - modified t/05_preferred_int.t for Win32
+      (makamaka)
+
+0.16
+
+    - tests on 64bit machines with -Duselongdouble
+      (reported by andk)
+
+0.15
+
+    - better argument validation.
+      (Dan Kogai)
+
+0.14
+
+    - fixed segv on serializing cyclic reference
+      (Dan Kogai)
+
+0.13
+
+    - clearly specify requires_c99(), because msgpack C header requires C99.
+
+0.12
+
+    - PERL_NO_GET_CONTEXT makes horrible dTHXs. remove it.
+
+0.11
+
+    - oops(no feature changes)
+
+0.10
+
+    - added more test cases.
+    - fixed portability issue
+    - (reviewed by gfx++)
+
+0.09_01
+
+    - fixed memory leak issue(reported by Maxime Soulé)
+
+0.09
+
+    - support NVTYPE=="long double" or IVTYPE=="long long" environment
+      (thanks to Jun Kuriyama++)
+
+0.08
+
+    - fixed PVNV issue...
+
+0.07
+
+    - do not use switch (SvTYPE(val)).
+
+0.06
+
+    - use SvNOK.
+
+0.05
+
+    - change type detection for old perl
+
+0.04
+
+    - check SvROK first(reported by yappo++)
+    - PreferInteger: faster string to integer conversion; support negative value
+      (frsyuki++)
+    - make PreferInteger variable magical and remove get_sv from _msgpack_pack_sv
+      (frsyuki++)
+
+0.03
+
+    - performance tuning for too long string
+    - fixed memory leaks in stream unpacker
+
+0.02
+
+    - added $Data::MessagePack::PreferInteger
+      (requested by yappo++)
+
+0.01
+
+    - initial release to CPAN

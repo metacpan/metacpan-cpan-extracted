@@ -1,0 +1,43 @@
+Changes
+=======
+
+0.04000 - 25 Aug 2008
+  [*** BACKWARDS INCOMPATIBILE CHANGES ***]
+  - Previously, invoking parsing methods on the class worked (by chance, not
+    by decision), but that is no longer the case. *ALWAYS* instantiate the
+    formatter.
+  - All default character encodings have been changed to UTF-8
+
+  [Others]
+  - Migrate to Module::Install
+  - All inernal data has been changed to UTF-8.
+  - Require newest DateTime::Calendar::Japanese::Era.
+  - Fix author info
+
+0.03 - 06 Jul 2006
+  - Require DateTime::Calendar::Japanese::Era 0.07
+  - Remove DateTime::Format::Japanese::Era (the functionality has
+    move to DateTime::Calendar::Japanese::Era)
+  - Add POD Tests
+  - Installing ::Traditional is no longer an option. If this is annoying,
+    I'll create a separate distro with just Traditional
+
+0.02
+  - This version was never released.
+  - Allow user to specify input and output encoding
+
+0.01
+  - Be more explicit about requiring perl >= 5.7 in Build.PL
+    (reported via CPAN Testers "Barbie")
+  - Doc tweaks
+
+0.01_02 08 Feb 2004
+  - Add DateTime::Format::Japanese::Traditional for processing
+    traditional Japanese calendar notation.
+  - Installation of DT::F::J::Traditional is optional
+  - minor fixes
+
+0.01_01 03 Feb 2004
+  - Initial alpha release.
+  - This release contains parsing/formatting of modern Japanese dates only
+  - Grudgingly require perl >= 5.7.x.

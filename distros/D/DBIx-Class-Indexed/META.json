@@ -1,0 +1,51 @@
+{
+   "abstract" : "Index data via external indexing facilities.",
+   "author" : [
+      "Adam Paynter <adapay@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Indexed",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : 0,
+            "Module::Load" : "0.22"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::Indexed" : {
+         "file" : "lib/DBIx/Class/Indexed.pm",
+         "version" : "0.03"
+      },
+      "DBIx::Class::Indexer" : {
+         "file" : "lib/DBIx/Class/Indexer.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

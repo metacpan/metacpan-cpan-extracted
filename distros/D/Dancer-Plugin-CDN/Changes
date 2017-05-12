@@ -1,0 +1,12 @@
+Revision history for Dancer-Plugin-CDN
+
+1.002     2016-09-11 16:46:23+12:00 Pacific/Auckland
+    - Fix unescaped left brace in test script regex - reported by Slaven Rezić
+
+1.001     2012-10-04 06:38:14 Pacific/Auckland
+    - Initialise route handler at module load time - after encountering
+      problems on Starman with preload enabled
+    - Add more tests
+
+1.000     2012-10-02 23:22:47 Pacific/Auckland
+    - Initial release

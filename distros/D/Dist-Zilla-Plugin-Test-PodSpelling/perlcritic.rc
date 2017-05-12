@@ -1,0 +1,7 @@
+theme = core
+severity = 3
+verbose  = 9
+
+# Turn these off
+[-Modules::RequireExplicitPackage]
+[-Subroutines::RequireFinalReturn]

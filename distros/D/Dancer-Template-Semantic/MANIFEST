@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dancer/Template/Semantic.pm
+t/01-use.t
+t/02-template.t
+t/index.html

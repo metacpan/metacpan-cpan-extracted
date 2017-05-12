@@ -1,0 +1,61 @@
+{
+   "abstract" : "Write a test that reports used module versions",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-ReportVersions",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::InlineFiles" : 0,
+            "Moose" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::ReportVersions" : {
+         "file" : "lib/Dist/Zilla/Plugin/ReportVersions.pm",
+         "version" : "1.110730"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-reportversions at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ReportVersions"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-ReportVersions/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Dist-Zilla-Plugin-ReportVersions.git",
+         "web" : "http://github.com/hanekomu/Dist-Zilla-Plugin-ReportVersions"
+      }
+   },
+   "version" : "1.110730"
+}
+

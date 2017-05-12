@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-Plugin-NexusRelease
+
+1.0.1     2016-09-27 01:07:28+01:00 Europe/Dublin
+
+ - Move credentials out to a Stash rather than dist.ini
+
+1.0.0     2016-09-26 23:51:30+01:00 Europe/Dublin
+
+ - Remove the 'repository' attribute and use 'nexus_URL' as the entire URL to a repo.
+ - Depend on Nexus::Uploader 1.0.0 or newer.
+
+0.0.3     2016-09-26 22:25:59+01:00 Europe/Dublin
+
+ - Using MetaProvides::Package to index the main module.
+
+0.0.2     2015-01-20 00:54:27+00:00 Europe/Dublin
+
+ - Improved Kwalitee scores by excluding corpus/ files.
+
+0.0.1     2014-12-27 19:57:01+00:00 Europe/Dublin
+
+ - Initial module release.

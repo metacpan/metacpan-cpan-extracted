@@ -1,0 +1,7 @@
+[
+  {
+    "name":"create table foo",
+    "deploy_sql":"CREATE TABLE foo(a,b)",
+    "verify_sql":"SELECT 1"
+  }
+]

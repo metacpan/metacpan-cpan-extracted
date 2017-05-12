@@ -1,0 +1,30 @@
+Revision history for DateTime-TimeAgo
+
+0.06    2012-04-20 16:43
+        Fixed a bug where yesterday but less than 24 hours ago
+        would be evaluated to 'this evening or some such'.
+        Thanks to Ben Rogers (bdr.org) for bug report.
+
+0.05    2011-05-20 17:37
+        Removed 'use integer' as it makes high number operations
+        fail on 32bit systems. Enable the ARCH_64BIT environmental
+        variable to 'use integer' (which adds to performance).
+
+0.04    2011-05-16 10:36
+        Optimized for speed;
+        thanks for patch to pepl (@CPAN).
+
+0.03    2010-12-15 16:12
+        No longer relying on DT::Duration->in_units method.
+        Added 'several months ago' and 'about a year ago'.
+        Removed 'this year'.
+
+0.02    2010-12-15 14:15
+        Renamed to DateTime::Duration::Fuzzy.
+        Now creating DateTime objects with the from_epoch method.
+        Fixed some typos.
+        thanks to moritz the perlmonk
+
+
+0.01    2010-12-12 20:19
+        First version, released on an unsuspecting world.

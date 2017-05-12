@@ -1,0 +1,54 @@
+NAME
+    Device::WS2000::IO - Perl extension for reading data from the ELV
+    Weatherstation WS2000 PC
+
+SYNOPSIS
+      use Device::WS2000::IO qw (:all);
+      $ok=open_ws("ttyS0");
+      send_ws($command,$parameter);
+      @buffer = read_ws();
+      close_ws();
+
+DESCRIPTION
+    This module contains lowlevel-routines for the communication with the
+    ELV Weatherstation WS2000 PC connected to a serial port.
+
+    Following functions are implemented:
+
+    open_ws ($port) opens the serial port and checks initial response,
+    returns 1 on success, 0 on failure
+
+    send_ws ($cmd,$par) send a command to the WS2000 Legal commands are: 0
+    read DCF-Time 1 read one datablock 2 next datablock 3 nine sensors 4 16
+    sensors 5 get status 6 uses parameter: set poll interval 1 - 60 minutes
+
+    read_ws read response from WS2000 returns read buffer length is checked
+    envelope is removed checksum is not yet checked (blame on me)
+
+    close_ws closes the serial port
+
+  EXPORT
+
+    None by default.
+
+    Tag :all open_ws close_ws send_ws read_ws
+
+SEE ALSO
+    perl(1).
+
+Thanks
+    My thanks go out to Friedrich Zabel for the C-Code used for the
+    low-level functions, taken from his project wx2000 at
+    http://wx2000.sourceforge.net/
+
+    To the opensource comunity in general which time and again show that
+    sharing / modifying code and returning it to all users actualy works.
+
+AUTHOR
+    Michael Böker <mmbk@cpan.org>
+
+Copyright
+    Copyright (c) 2002 by Michael Böker. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+

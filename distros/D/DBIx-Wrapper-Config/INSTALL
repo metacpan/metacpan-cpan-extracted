@@ -1,0 +1,11 @@
+Copyright (c) 2003-2005 Don Owens
+
+See the COPYRIGHT section in Config.pm for usage and distribution
+rights.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install

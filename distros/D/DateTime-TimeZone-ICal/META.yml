@@ -1,0 +1,36 @@
+---
+abstract: 'iCal VTIMEZONE entry to DateTime::TimeZone'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>'
+  - 'Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  Data::ICal: 0.21
+  DateTime: 0.70
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 1.001009
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.14'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-TimeZone-ICal
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DateTime::Format::ICal: 0.09
+  DateTime::Set: 0.31
+  DateTime::Span: 0
+  DateTime::TimeZone: 1.85
+  Moo: 1.006
+  URI: 1.60
+  namespace::autoclean: 0.20
+  perl: 5.10.0
+resources:
+  license: http://apache.org/licenses/LICENSE-2.0
+version: 0.04

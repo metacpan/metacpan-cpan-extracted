@@ -1,0 +1,103 @@
+DBD::SQLAnywhere -- a SQLAnywhere interface for Perl 5.
+
+   Portions Copyright (c) 1994,1995,1996            Tim Bunce
+   Portions Copyright (c) 2015			    SAP SE or an SAP affiliate company
+
+   For license information, please see license.txt included in this
+   distribution.
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (at least 5.6.0 is recommended).
+    It is very important to test it and install it!
+
+    Build, test and install the DBI module (at least DBI 1.51 is
+    required) if it is not already included in your perl distribution.
+
+    No SQL Anywhere software needs to be installed to build this
+    module; however, a SQL Anywhere client installation is required in
+    order to use the module.
+
+    A full SQLAnywhere client+server installation is recommended for
+    testing this module otherwise the tests will be skipped.
+
+Building:
+    On UNIX:
+	[ Linux, Solaris, AIX, HP-UX, etc. ]
+
+	source sa_config.sh (or sa_config.csh) from the SQL Anywhere
+	installation
+
+	perl Makefile.PL
+	make
+	copy demo.db from the SQL Anywhere installation directory
+	    to the current directory
+	make test
+	make install
+    
+    On Windows:
+       If ActiveState's builds are working correctly, you can install the driver from their repository:
+           ppm install DBD-SQLAnywhere
+
+	To build the driver yourself using ActivePerl 5.18 or later:
+	
+	    First install the MinGW Perl package:
+	    	ppm install MinGW
+
+	    Then add your <perl>\site\bin directory to your PATH if it is not already there
+
+	    Then run the following:
+		perl Makefile.PL
+		dmake
+		copy demo.db from the SQL Anywhere installation directory
+		    to the current directory
+		dmake test
+		dmake install
+
+	To build the driver yourself Using ActivePerl 5.16 or earlier:
+	    [ Note: Microsoft C is required ]
+
+	    First, ensure that your VisualStudio compilation environment is setup correctly
+	    by invoking the appropriate vcvars*.bat or vsvars*.bat provided in the Visual Studio
+	    installation.
+
+	    Then run the following:
+		perl Makefile.PL
+		nmake
+		copy demo.db from the SQL Anywhere installation directory
+		    to the current directory
+		nmake test
+		nmake install
+
+	    If you are using an old version of Visual Studio and/or a really old version of
+	    ActivePerl and you see errors about manifests, uncomment the following line
+	    in Makefile.PL and try again starting with 'perl Makefile.PL':
+	        #    $opts{LD} = "\$(PERL) dolink.pl \$@";
+
+    Do not hand-edit the generated Makefile as those changes will be
+    lost the next time 'perl Makefile.PL' is invoked. Always try to
+    make changes via the Makefile.PL command line and/or editing
+    Makefile.PL.
+
+---------------------------------------------------------------
+
+Notes:
+
+For information on how to use DBD::SQLAnywhere, please invoke the
+following after DBD::SQLAnywhere has been installed:
+
+    perldoc DBD::SQLAnywhere
+
+Prior to installation, you may instead run the following when
+SQLAnywhere.pm is in your current directory:
+
+    perldoc SQLAnywhere.pm
+
+Examples can be found in the 'eg' directory:
+    connect.pl  -> Demonstrates a simple connect.
+    retrieve.pl -> Demonstrates retrieving data from a table and displaying the result set.
+    blobs.pl    -> Demonstrates the use of blobs
+
+For further examples, consult the test scripts located in the 't'
+directory.
+

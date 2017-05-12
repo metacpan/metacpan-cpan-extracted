@@ -1,0 +1,18 @@
+Changes
+lib/DateTime/BusinessHours.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/10-basic.t
+t/20-weekends.t
+t/30-holiday.t
+t/80-rt34041.t
+t/81-rt39433.t
+t/82-rt81551.t
+t/83-rt85292.t
+t/pod-coverage.t
+t/pod.t
+t/var/holidayfile.txt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

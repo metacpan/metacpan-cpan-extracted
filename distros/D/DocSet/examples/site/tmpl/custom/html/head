@@ -1,0 +1,28 @@
+[%-
+  #
+  # head: standard header for HTML pages  
+  # ARGS:
+  #     title       # page title
+-%]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+    <head>
+[%- # these must come first because of the <base href="">
+    INCLUDE headers -%]
+        <style type="text/css">
+                body {
+                    background-color: #ffffff;
+                    background-image: url([% doc.dir.abs_doc_root %]/images/bgline.gif);
+                    background-attachment: fixed;  /* needed for mac/ie5*/
+                    color: #000000;
+                    font-family: helvetica, arial, verdana, sans-serif;
+                    /* font-size: 1.0em; */
+                    position: relative !important; /* needed for ie5*/
+                }
+         </style>
+         <title>mod_perl: [%- doc.meta.title -%]</title>
+        <link rel="shortcut icon" href="[% doc.dir.abs_doc_root %]/images/favicon.ico" type="image/x-icon">
+
+    </head>
+<body class="body-margins">
+<a name="top"></a>

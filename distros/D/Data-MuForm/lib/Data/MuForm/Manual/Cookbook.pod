@@ -1,0 +1,197 @@
+package Data::MuForm::Manual::Cookbook;
+# ABSTRACT: Cookbook recipes for using MuForm
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Cookbook - Cookbook recipes for using MuForm
+
+=head1 VERSION
+
+version 0.04
+
+=head1 NAME
+
+Data::MuForm::Manual::Cookbook
+
+=head1 RECIPES
+
+=head2 Update all fields
+
+In FormHandler you can do something like:
+
+    sub build_update_subfields {{
+        by_flag => { contains => { wrapper_class => ['rep_elem'] } },
+        by_type => { 'Select' => { wrapper_class => ['sel_wrapper'] },
+                     'Boolean' => { element_class => ['sel_elem'] },
+        },
+    }}
+
+You can achieve the equivalent in MuForm with:
+
+    sub after_build_fields {
+        my $self = shift;
+        foreach my $field ( $self->all_repeatable_fields ) {
+            $field->init_instance({ 'ra.wa.class' => ['rep_elem'] });
+        }
+        # the 'index' contains all fields, not just top level fields
+        foreach my $field ( values %{$self->index} ) {
+            if ( $field->type eq 'Select' ) {
+                $field->render_args->{wrapper_attr}{class} = ['sel_wrapper'];
+            }
+            elsif ( $field->type eq 'Boolean' ) {
+                $field->render_args->{element_attr}{class} = ['sel_elem'];
+            }
+        }
+    }
+
+=head2 apply roles to fields
+
+A role to overide the 'id' attribute. (Note: you can do this is in a
+built-in way with the 'build_field_id' form method, but this serves as
+an example.):
+
+    package My::DynamicFieldId;
+    use Moo::Role;
+    around 'id' => sub {
+        my $orig = shift;
+        my $self = shift;
+        my $form_name = $self->form->name;
+        return $form_name . "." . $self->full_name;
+    };
+
+Apply to the fields in an 'after_build_fields' sub.
+
+    package My::CustomIdForm2;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has '+name' => ( default => 'D123' );
+
+    has_field 'foo';
+    has_field 'bar';
+
+    sub after_build_fields {
+        my $self = shift;
+        # the 'index' contains all fields, not just top level fields
+        foreach my $field ( values %{$self->index} ) {
+            Role::Tiny->apply_roles_to_object($field, 'My::DynamicFieldId');
+        }
+    }
+
+=head2 Use an external validation method
+
+The form package has an attribute to hold the coderef which will
+do the validation, which is called in a validate method.
+
+    package SignupForm;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has check_name_availability => ( is => 'ro', required => 1 );
+
+    has_field 'name';
+    has_field 'email';
+
+    sub validate {
+        my $self = shift;
+        my $name = $self->value->{name};
+        my $meth = $self->check_name_availability;
+        if ( defined $name && length $name && !$meth->($name) ) {
+            $self->field('name')->add_error('That name is taken already');
+        }
+    }
+    1;
+
+A non-form Perl application has a method to validate a field, such
+as checking in the database that a username is unique:
+
+    package MyApp::Signup;
+    use Moo;
+
+    has 'form' => ( is => 'ro', builder => 'build_form' );
+    sub build_form {
+        my $self = shift;
+        return SignupForm->new(
+            {
+                check_name_availability => sub {
+                    my $name = shift;
+                    return $self->username_available($name);
+                },
+            }
+        );
+
+    }
+    sub username_available {
+        my ( $self, $name ) = @_;
+        return $name eq 'Sam' ? 1 : 0;
+    }
+    1;
+
+=head2 Order fields from a role
+
+Given a Moo::Role with fields:
+
+    package MyApp::Form::Role::MyFields;
+    use Moo::Role;
+    use Data::MuForm::Meta;
+
+    has_field 'r-one';
+    has_field 'r-two';
+    has_field 'r-three';
+
+...And a Form class which includes those fields.
+
+    package MyApp::Form::TestRole;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    with 'MyApp::Form::Role::MyFields';
+
+    has_field 'f-one';
+    has_field 'f-two';
+    has_field 'f-three';
+    has_field 'f-four';
+
+...Order the fields in an 'order_fields' sub in the form.
+
+    # put role fields between f-two and f-three
+    sub order_fields {
+        my $self = shift;
+        my @form_order = (1, 2, 6, 7, 8);
+        my @role_order = (3, 4, 5);
+        foreach my $field ( $self->all_fields ) {
+            my $order;
+            if ( $field->source eq __PACKAGE__ ) {
+                $order = shift @form_order;
+            }
+            else {
+                $order = shift @role_order;
+            }
+            $field->order($order);
+        }
+    }
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

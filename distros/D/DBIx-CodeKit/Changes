@@ -1,0 +1,24 @@
+    CodeKit Release Versions
+    ------------------------
+
+CodeKit-1.07 released 2003.05.12
+
+Moved Perl regression testing from t/test.t
+to regression.test.  test.pl now succeeds and is
+CPAN friendly.  Licenced under Perl or LGPL.
+
+CodeKit-1.06 released 2003.05.07
+
+Added an FAQ page.
+License changed from GPL to LGPL.
+
+CodeKit-1.05 released 2003.04.23
+
+You can now pass in in html select options such
+as 'onchange="submit()"'.  The PHP version now
+supports ADODB in addition to PEAR and phplib.
+Improved documentation and setup instructions. 
+
+CodeKit-1.04 released 2003.04.03
+
+Initial release.

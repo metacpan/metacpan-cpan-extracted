@@ -1,0 +1,39 @@
+Data::Lettertree
+================
+
+NAME
+
+    Data::Lettertree
+
+DESCRIPTION
+
+    This module provides perl binding over a native implementation of a letter
+    tree, allowing to index any kind of perl scalar variable by a large set of
+    string with a reduced memory footprint over native perl hashes by sharing
+    their prefixes.
+
+INSTALLATION
+
+    To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+    This module requires liblettertree, which has to be retrieved and installed
+    separatly from ftp://ftp.inria.fr/INRIA/Atoll/Guillaume.Rousse.
+
+AUTHOR
+
+    Guillaume Rousse <grousse@cpan.org>
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2005 INRIA
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself, either Perl version 5.8.7 or,
+    at your option, any later version of Perl 5 you may have available.

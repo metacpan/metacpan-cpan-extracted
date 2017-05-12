@@ -1,0 +1,25 @@
+0.006     2016-09-27 17:16:34 BST
+
+  - Fixed problem I would have fixed before if I could figure testing out
+
+0.005     2016-09-27 15:41:38 BST
+
+  - Comparison version now comes from schema_version before $VERSION
+
+0.004     2016-08-10 14:09:16 BST
+
+  - Fixed dependencies
+
+0.003     2016-08-10 13:37:58 BST
+
+  - Fixed search path to include 'upgrade'
+  - Fixed search path to be relative to build dir
+
+0.002     2016-08-10 13:25:36 BST
+
+  - Fixed search path to be good enough for our purposes for now
+
+0.001     2016-08-10 13:19:24 BST
+
+  - First release
+  - Not suitable for anyone not using defaults

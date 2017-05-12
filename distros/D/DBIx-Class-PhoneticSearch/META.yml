@@ -1,0 +1,28 @@
+---
+abstract: 'Phonetic search with DBIC'
+author:
+  - 'Moritz Onken <onken@netcubed.de>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-PhoneticSearch
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0.08103
+  SQL::Translator: 0
+  Text::Phonetic: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/monken/DBIx-Class-PhoneticSearch/tree/master
+version: 0.01

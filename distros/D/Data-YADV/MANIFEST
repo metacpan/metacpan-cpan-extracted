@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Data/YADV.pm
+lib/Data/YADV/Base.pm
+lib/Data/YADV/Checker.pm
+lib/Data/YADV/CheckerASub.pm
+lib/Data/YADV/Structure.pm
+lib/Data/YADV/Structure/Array.pm
+lib/Data/YADV/Structure/Base.pm
+lib/Data/YADV/Structure/Hash.pm
+lib/Data/YADV/Structure/Scalar.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/schema.t
+t/structure.t

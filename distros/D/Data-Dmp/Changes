@@ -1,0 +1,144 @@
+0.23    2017-01-30 (PERLANCAR)
+
+	- Add option: OPT_STRINGIFY_NUMBERS.
+
+
+0.22    2017-01-06 (PERLANCAR)
+
+	- Localize regex matching to avoid clobbering %+ (ref:
+	  https://github.com/ingydotnet/xxx-pm/pull/2).
+
+
+0.21    2016-10-26 (PERLANCAR)
+
+	- Add option $OPT_DEPARSE which can be set to 0 to disable
+	  deparsing.
+
+	- Add FAQ about the possibility of multiline dump.
+
+
+0.20    2016-06-03 (PERLANCAR)
+
+	- Return original result in the case of $var = dd $foo (previously
+	  it will return 1 which is scalar(@_)).
+
+
+0.19    2016-04-30 (PERLANCAR)
+
+	- [Bugfix] Quote inf/nan because perl doesn't recognize these
+	  numeric literals and they will choke under 'use strict subs'.
+
+
+0.18    2016-04-30 (PERLANCAR)
+
+	- [Bugfix] Stricter quoting of numbers (only number literal that
+	  would not be normalized is dumped without quotes).
+
+
+0.17    2016-04-30 (PERLANCAR)
+
+	- [Bugfix] Fix quoting criteria of hash key.
+
+
+0.16    2016-04-29 (PERLANCAR)
+
+	- [Bugfix] Quote 0123 as "0123" to avoid perl interpreting it as
+	  octal literal.
+
+
+0.15    2016-03-31 (PERLANCAR)
+
+        - No functional changes.
+
+        - [dist] List core modules prereqs.
+
+        - [doc] Tweak description.
+
+
+0.14    2015-12-27 (PERLANCAR)
+
+	- By-pass Data::Dumper and use B::Deparse directly to dump
+	  coderefs, add option $OPT_REMOVE_PRAGMAS.
+
+
+0.13    2015-09-27 (PERLANCAR)
+
+        - Support dumping coderefs (using Data::Dumper & Deparse option).
+
+        - Set default for $OPT_PERL_VERSION to 5.010.
+
+
+0.12    2015-09-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Data::Dumper::Limited & Data::Undump.
+
+
+0.11    2015-04-26 (PERLANCAR)
+
+	- Add benchmark devscript, show the result in POD.
+
+
+0.10    2015-03-24 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak description.
+
+
+0.09    2015-03-24 (PERLANCAR)
+
+        - Add tests (this is the first release that has tests :-$).
+
+        - Produce more compact output (remove whitespaces).
+
+        - Remove Data::Dmp::Simple because this module is not used.
+
+
+0.08    2015-01-06 (PERLANCAR)
+
+	- Use Regexp::Stringify, add setting OPT_PERL_VERSION.
+
+
+0.07    2015-01-02 (PERLANCAR)
+
+	- [Bugfix] Fix regexp pattern.
+
+
+0.06    2015-01-02 (PERLANCAR)
+
+        - Dump regexp object as qr/.../ instead of bless(...).
+
+        - Add coderef dumping support to Data::Dmp::Simple too.
+
+
+0.05    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Add Benchmarks and FAQ section.
+
+
+0.04    2014-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- Some wording and fmt changes.
+
+
+0.03    2014-12-19 (PERLANCAR)
+
+	- Dump coderef as "sub{'DUMMY'}".
+
+
+0.02    2014-10-24 (PERLANCAR)
+
+	- Add module: Data::Dmp::Simple.
+
+	- Bugfix: localize %_subscripts.
+
+
+0.01     2014-10-21 (PERLANCAR)
+
+         - First release.

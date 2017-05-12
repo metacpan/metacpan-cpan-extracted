@@ -1,0 +1,46 @@
+DateTimeX-Seinfeld version 1.000, released January 11, 2014
+
+
+This module calculates the the maximum Seinfeld chain length from
+a sorted list of DateTime objects.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                  Minimum Version
+  ------------------------ ---------------
+  perl                      5.10.0
+  Moose                     
+  MooseX::Types::DateTime   
+  MooseX::Types::Moose      
+  namespace::autoclean
+
+
+
+CHANGES
+    Here's what's new in version 1.000 of DateTimeX-Seinfeld:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Release tests moved to xt/
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

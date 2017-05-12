@@ -1,0 +1,119 @@
+version 0.009; 2013-09-21
+
+  * bugfix: correct ->offset_for_local_datetime for perpetual-DST ruleset
+    that can arise with the tzfile3 system
+
+version 0.008; 2013-09-20
+
+  * support the extended form of the recipe syntax that is used by
+    version 3 of the tzfile(5) file format
+
+version 0.007; 2013-07-14
+
+  * bugfix: permit time of day for a DST change to extend up to 24:59:59,
+    which POSIX (unclearly) permits and is actually seen in the current
+    rule for timezone Asia/Amman
+
+  * in META.{yml,json}, point to public git repository
+
+version 0.006; 2012-03-10
+
+  * eliminate use of Date::JD, because it's too heavy to justify the
+    minimal convenience gained from it
+
+  * in documentation, fully explicate the syntax for offsets and times
+    of day in recipes
+
+  * in documentation, describe the POSIX abbreviation length limit
+
+  * in documentation, link to the POSIX definition of the TZ environment
+    variable
+
+  * in documentation, fix parameter summary for constructor
+
+  * a little more testing of error cases
+
+  * test behaviour around leap seconds
+
+  * convert .cvsignore to .gitignore
+
+version 0.005; 2011-09-26
+
+  * support specifying a timezone name distinct from the recipe
+
+  * include the local time and zone name in error message about
+    non-existent local time
+
+  * check argument types in constructor
+
+  * in doc, use the word "recipe" to describe the timezone specification
+
+  * make test suite work even if DateTime is not available
+
+  * use new context-independent version of Date::JD function
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.004; 2010-07-30
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * abandon use of the "fields" module
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.003; 2009-03-22
+
+  * bugfix: cleanly reject non-ASCII digits in timezone specification
+
+  * use "fields" module to structure object
+
+  * test POD syntax and coverage, and rename an internal function to
+    satisfy the coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * in tests, avoid unreliable "\d" regexp element
+
+  * typo fix in documentation
+
+  * include "distribution_type" entry in META.yml to satisfy CPANTS
+
+  * in documentation, separate "license" section from "copyright" section
+
+  * use full stricture in Build.PL
+
+  * remove from .cvsignore items that don't occur with Module::Build
+
+version 0.002; 2007-09-09
+
+  * bugfix: require bugfixed version of Date::JD (for $SIG{__DIE__}
+    handling)
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+version 0.001; 2007-09-02
+
+  * avoid returning negative zero for offsets, which was confusing the
+    test suite
+
+  * move a misplaced ", in seconds" in the documentation
+
+version 0.000; 2007-02-04
+
+  * initial released version

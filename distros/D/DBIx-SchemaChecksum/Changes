@@ -1,0 +1,149 @@
+Revision history for DBIx-SchemaChecksum
+
+1.006   2016-02-17T10:50:05
+    - fix a deadly bad usage of try/catch (Thomas Klausner)
+    - show_update_path now can dump the whole path as scripts or one concated file (Thomas Klausner)
+
+
+1.005   2013-10-16T11:37:31+0200
+    - more stable fix for foreign keys (Thomas Klausner)
+
+
+1.004   2013-10-16T11:15:56+0200
+    - ignore ORDINAL_POSITION in foreign keys (Thomas Klausner)
+
+
+1.003   2013-10-09T15:02:40+0200
+    - make foreign keys work with current DBI/DBD/Pg (Thomas Klausner)
+    - removed given/when (Thomas Klausner)
+    - say that there are "No more changes" instead of "No update found
+      ..." (Jozef Kutej)
+    - require MooseX::App 1.13 (Klaus Ita)
+    - Better function introspection for postgres (breaks postgres
+      checksums) (Maros Kollar)
+    - fix test fails due to missing build_deps
+    - Do not exit, but return instead (Maros Kollar)
+
+
+1.002   2012-11-21T21:38:37+0100
+    - require MooseX::App 1.08, which should fix the test fails
+      reported by CPAN Testers (thanks!)
+    - updated documentation
+
+
+1.001   2012-11-15T17:40:04+0100
+    - app now based on MooseX::App
+    - lots of new options & commands
+    - doc update still pending...
+    - also use dzil
+
+
+0.27   2009-04-23 22:21:29
+    - remove schema name from nextval: because this causes a lot of 
+      trouble - THIS WILL BREAK YOUR OLD CHECKSUMS!! (Thomas Klausner)
+    - added option --dump_checksums which automatically dumps all 
+      checksum sources (Thomas Klausner)
+
+
+0.26   2008-11-24 11:35:07
+    - sort unique keys because sometimes PG reports them in a 
+      different order
+
+
+0.25   2008-11-10 19:01:37
+    - added option to show update path without applying anything
+
+
+0.24   2008-10-03 13:19:05
+    - nicer output (say instead of croak)
+    - fixed a bug in postgres unique key calculation that broke 
+      auto-updates
+
+
+0.23   2008-09-26 17:01:44
+    !!! BIG FAT WARNING !!!
+    Older checksums won't work, at least for postgres
+    !!! BIG FAT WARNING !!!
+    - added postgres unique keys to checksum
+    - include postgres enums in checksum
+    - fixed another problem with SAME_CHECKSUM, skip files without 
+      checksums
+
+
+0.22   2008-09-23 13:37:16
+    - ignore files without a checksum
+    - fixed more bugs with same-checksum updates
+
+
+0.21  2008-09-19 16:34:04
+    - find sql snippets in all dirs below the given dir
+    - handle update scripts that result in the same checksum
+
+
+0.20   2008-09-11 20:49:26
+    !!! BIG FAT WARNING !!!
+    Checksums calculated with version prior to 0.20 won't work with 
+    checksums calculated after 0.20
+    --- BIG FAT WARNING ---
+
+    - changed schemadump to list columns sorted by name so that funky 
+      postgres inheritance followed by changes to the table other 
+      tables inherit from don't f*ck up the checksum.
+
+
+0.10   2008-09-11 15:45:01
+    - add command line option to ignore ORDINAL_POSITION of columns 
+      
+
+0.09   2008-09-11 11:56:08
+    - ignore typed nextvals, which cause problems in postgres and 
+      different connection methods (socket/tcp)
+
+
+0.08 Thu Aug 21 09:48:23 CEST 2008
+	- Make checksum, type schema unaware. This funnily posed problems when
+	  connecting via socket or TCP to pg
+
+0.07   2008-06-19 09:41:26
+    - for strange reasons, MooseX::Getop does not work with DBI::db constraint
+      when used from other scripts
+      So I dumped the DBI::db constraint for now
+
+
+0.06   2008-06-16 10:46:19
+    - Test Coverage: 78.8%
+    - removed IO::Prompt
+    - Alternative construction via dbh (either dsn or dbh) (maros)
+    - fixed some problems with tests on various platforms
+
+
+0.05   2008-05-24 10:17:02
+    - Test Coverage: 82.4%
+    - make t/apply_sql_snippets.t skip instead of fail if we cannot
+      copy the testdb
+
+
+0.04    2008-05-23 22:40:26
+    - Test Coverage: 81.7%
+    - added dependecy on IO::Prompt (which I forgot in 0.02, but 
+      thanks to CPAN testers I was notified of this problem)
+    - added test
+    - added bin/schema_update.pl and supporting methods
+    - require Perl 5.10
+
+
+0.03    2008-05-23 ??:??:??
+    - added bin/schema_update.pl and supporting methods
+    - require Perl 5.10
+
+
+0.02   2008-05-21 22:13:53
+    - added bin/schema_checksum.pl
+    - added docs
+    - DB connection now takes user and password as optional params
+
+
+0.01    2008-05-20 16:10:17
+    - basic checksum calculation works
+    - started development
+

@@ -1,0 +1,172 @@
+NAME
+
+    Dist::Zilla::TravisCI - Travis CI plugins for your DZIL-based
+    distribution
+
+SYNOPSIS
+
+        [@Prereqs]
+        [TravisYML]
+     
+        [Git::CommitBuild]
+        release_branch  = build/%b
+        release_message = Release build of v%v (on %b)
+     
+        [@Git]
+        allow_dirty = dist.ini
+        allow_dirty = README
+        allow_dirty = .travis.yml
+        push_to = origin
+        push_to = origin build/master:build/master
+
+DESCRIPTION
+
+ What is Travis CI?
+
+    Travis CI <https://travis-ci.org/> is pure awesome! Travis is a free
+    and open source CI platform that hooks directly into GitHub
+    <https://github.com/>. It's extremely easy to configure, tests on every
+    major 5.10+ Perl version, and will notify you of test results, either
+    through email or IRC. (Yes, a bot will jump into an IRC room, tell you
+    the results, and bounce. How cool is that?!)
+
+    If you're not familiar with CI platforms, this is your chance to get
+    your feet wet. CI stands for Continuous Integration
+    <http://en.wikipedia.org/wiki/Continuous_integration>. This kind of
+    testing is designed around testing your code every time you commit/push
+    a change. In this case, this is a hook into Git via GitHub to make sure
+    that any change you make is going to pass tests.
+
+ Perl is already a "test-heavy" community. What does this add?
+
+    This is true. Travis CI has a much more profound use with languages
+    without a deep-seated testing platform like Perl's t/* directory (and
+    its hooks with CPAN).
+
+    However, adding Travis CI to your test platform has its benefits:
+
+      * Testing in a plain vanilla environment, which your work environment
+      is most definitely NOT.
+
+      * Testing with Perl 5.10, 5.12, 5.14, 5.16, and beyond, all at the
+      same time.
+
+      * Testing your DZIL environment, which not even CPAN can do.
+
+      * Use Windows or some other non-Linux OS for your work environment?
+      Great. Travis runs on Ubuntu, so you can confirm that it works on
+      Linux. (Eventually, Travis will support other OSs, like Windows, to
+      make this even sweeter!)
+
+      * Minimum Version Dependency Testing
+
+      * Public announcements of test results. If somebody breaks something
+      in master, make sure EVERYBODY knows it!
+
+      * If nothing else, you get many more tests before it even touchs
+      CPAN.
+
+ What about the automated CPAN testers?
+
+    They're great! But they are also a bit too late in the process. Sure,
+    you can fix what you find after you've found something, but you want
+    some extra insurance that your production release is actually
+    production ready.
+
+    Development releases on CPAN also work, but you have no idea what is on
+    those CPAN tester platforms. Does it cover the full gamut of Perl
+    versions, or are they just grabbing the latest? Are they all using the
+    latest module dependencies (which may not be want you want)?
+
+    You have more control over your Travis CI platform, so you can set up
+    the environment the way you want it. That's not to say that the massive
+    CPAN tester army isn't a great boon for Perl, but in the fight against
+    bugs, you want every weapon available.
+
+ This sounds complicated...
+
+    Actually, it's the polar opposite of complicated. This is literally a
+    full guide on how to make it work:
+
+      1. Sign into Travis CI <http://travis-ci.org/users/auth/github> with
+      your GitHub account.
+
+      2. Flip a bit on your distro through the profile page
+      <https://travis-ci.org/profile>.
+
+      3. Put the TravisYML plugin in your dist.ini.
+
+    There's some extra configuration you can do: build branches, MVDT, etc.
+    But, that's the basic setup. Easy!
+
+DONATIONS
+
+    Travis CI is a completely free service, and they put in a lot of hard
+    work to make it what it is.
+
+    Please donate! <https://love.travis-ci.org/>
+
+TODO
+
+      * MVDT - Yes, I actually need to finish MVDT on my own distros.
+
+AVAILABILITY
+
+    The project homepage is
+    https://github.com/SineSwiper/Dist-Zilla-TravisCI.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit http://www.perl.com/CPAN/ to find a
+    CPAN site near you, or see
+    https://metacpan.org/module/Dist::Zilla::TravisCI/.
+
+SUPPORT
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and talk to this
+      person for help: SineSwiper.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests via
+    https://github.com/SineSwiper/Dist-Zilla-TravisCI/issues.
+
+AUTHOR
+
+    Brendan Byrd <bbyrd@cpan.org>
+
+CONTRIBUTORS
+
+      * Alex Peters <lxp@cpan.org>
+
+      * Graham Knop <haarg@haarg.org>
+
+      * Kent Fredric <kentfredric@gmail.com>
+
+      * Peter Roberts <me+dev@peter-r.co.uk>
+
+      * Randy Stauner <randy@magnificent-tears.com>
+
+      * Torsten Raudssus <torsten@raudss.us>
+
+      * Yasutaka ATARASHI <yakex@cpan.org>
+
+      * ugexe (Nick Logan) <nlogan@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Brendan Byrd.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

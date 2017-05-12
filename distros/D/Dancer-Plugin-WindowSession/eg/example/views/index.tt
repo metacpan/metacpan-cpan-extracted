@@ -1,0 +1,79 @@
+[% USE Dumper %]
+
+<div class="container">
+
+<h1>Dancer::Plugin::WindowSession Example</h1>
+
+<button class="btn btn-info btn-small" data-toggle="collapse" href="#show_variables">Show Dancer's Template Variables</button>
+<br/>
+<div id="show_variables" class="collapse out">
+<pre>
+## Per-Window Session Variables (unique to each open browser window/tab) ##
+window_session = [% Dumper.dump_html(window_session) %]
+
+## Per-Session Variables (shared between all open browser windows/tabs) ##
+
+session = [% Dumper.dump_html(session) %]
+</pre>
+</div> <!-- show_variables -->
+
+
+<h2>Hello [% session.username %]</h2>
+
+Here's your chart:
+<br/>
+<br/>
+
+<img src="[% request.uri_base %]/image.png?winsid=[% winsid | uri %]"/>
+
+<br/>
+<a class="btn btn-primary" href="[% request.uri_base %]/settings?winsid=[% winsid | uri %]">Change Image Settings</a>
+<a class="btn btn-danger" target="_blank" href="/">Open a new Browser Window</a>
+
+<br/>
+<br/>
+<br/>
+
+<h1>What is this good for?</h1>
+
+Use this Dancer module if you need to maintain independent state variables for each open browser window (as opposed to the more standard state variables for each browser session, i.e. all open browser windows share the same state).
+
+<h3>Try it out</h3>
+<ol>
+<li>Click the "Change Settings" (blue button). Change the plot settings as you wish, click "save settings" to redraw the plot.</li>
+<li>Click the "open new browser window" (red button) - a new browser window/tab will be open, with the plot settings back to default.</li>
+<li>View the two open browser windows <b>side-by-side</b> (this is the whole point of this module).</li>
+<li>Click the "Change settings" (blue button) on either (or both) of the open windows, and change the plot settings.</li>
+<li>Each window maintain an independent set of state variables (plot color,type,size).</li>
+<li>Only the <b>username</b> variable is shared between the open windows</li>
+<li>Click "show template variables" (cyan button) to view Dancer's <code>session</code> and <code>window_session</code> variables</li>
+</ol>
+
+<h3>Is this really needed?</h3>
+<ul>
+<li>If you don't understand why multiple, independent state variables are useful - you probably don't need them for your website. Only some specialized applications might need them.
+<br/>
+Most commonly: On bioinformatic-related websites, users want to view the same data in different ways, and compare the views side-by-side.
+</li>
+
+<li>A simpler, alternative implementation would be to pass the all CGI variables in every URL (e.g. <a href="#">/generate_plot.pl?plot_type=bars&plot_color=blue&plot_width=400&plot_height=300</a>) - but as you need more and more parameters, this method becomes cumbersome to implement.
+</li>
+</ul>
+
+
+<br/>
+<h3>More information</h3>
+
+Contact: gordon at cshl dot edu
+<br/>
+GitHub: <a href="https://github.com/agordon/Dancer-Plugin-WindowSession">https://github.com/agordon/Dancer-Plugin-WindowSession</a>
+<br/>
+CPAN: <a href="https://metacpan.org/module/Dancer::Plugin::WindowSession">https://metacpan.org/module/Dancer::Plugin::WindowSession</a>
+<br/>
+
+<br/>
+<br/>
+<br/>
+<br/>
+
+</div> <!-- container -->

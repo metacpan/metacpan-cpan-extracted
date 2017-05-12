@@ -1,0 +1,22 @@
+Changes
+MANIFEST
+README
+README.html
+.perltidyrc
+.cvsignore
+Makefile.PL
+Handler.pm
+Handler.pod
+Handler/Delta.pm
+Handler/Constants.pm
+Handler/Range.pm
+Handler/Test.pm
+t/0compiles.t
+t/1handles.t
+t/2deltas.t
+t/3ranges.t
+t/4locale.t
+t/5intuitivemonth.t
+t/6stdmonth.t
+t/7intuitivedst.t
+META.yml                                 Module meta-data (added by MakeMaker)

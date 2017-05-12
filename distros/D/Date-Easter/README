@@ -1,0 +1,74 @@
+NAME
+    Date::Easter - Calculates Easter for any given year
+
+SYNOPSIS
+      use Date::Easter;
+      ($month, $day) = julian_easter(1752);
+      ($month, $day) = easter(1753);
+      ($month, $day) = gregorian_easter(1753);
+      ($month, $day) = orthodox_easter(1823);
+
+DESCRIPTION
+    Calculates Easter for a given year.
+
+    easter() is simply an alias to gregorian_easter(), since that's what
+    almost every country in the world currently uses.
+
+    Date::Easter provides the following functions:
+
+  julian_easter
+        ( $month, $day ) = julian_easter( $year );
+
+    Returns the month and day of easter in the given year, in the Julian
+    calendar.
+
+  gregorian_easter
+        ( $month, $day ) = gregorian_easter( $year );
+
+    Returns the month and day of easter in the given year, in the Gregorian
+    calendar, which is what most of the world uses.
+
+  easter
+        ( $month, $day ) = easter( $year );
+
+    Returns the month and day of easter in the given year, in the Gregorian
+    calendar, which is what most of the world uses.
+
+  orthodox_easter
+        ( $month, $day ) = orthodox_easter( $year );
+
+    Returns the month and day of easter in the given year, in the Orthodox
+    calendar.
+
+    From code by Pascalis Ligdas, based on original code by Apostolos
+    Syropoulos
+
+AUTHOR
+    Rich Bowen <rbowen@rcbowen.com>
+
+To Do
+    The use of localtime and timelocal locks us into the epoch, which is a
+    rather silly limitation. Need to move to Date::DayOfWeek or other module
+    to calculate the day of the week. This should immediately make the
+    module usable back to the beginning of celebration of Easter.
+
+Other Comments
+    Note that Date::Manip also has code to do this, and you should
+    probably use that module instead. This module was written as an
+    academic exercise, since I an intrigued by calendrical calculations.
+    On the other hand, Date::Manip is huge, so you might want to use
+    this for that consideration. YMMV.
+
+    See also http://www.pauahtun.org/CalendarFAQ/cal/node3.html for more
+    details on calculating Easter.
+
+    And many thanks to Simon Cozens who provided me with the code for the
+    orthodox_easter function.
+
+    The tests are taken from a table at
+    http://www.chariot.net.au/~gmarts/eastcalc.htm
+
+    The script 'easter' is just a simple way to find out when easter falls
+    in a given year. Type 'easter' to find easter for this year, and 'easter
+    1983' to find when easter falls in 1983.
+

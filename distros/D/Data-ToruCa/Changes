@@ -1,0 +1,29 @@
+Revision history for Perl extension Data::ToruCa.
+
+0.06  Wed Nov 16 15:51:45 JST 2005
+        - add test pattern files.
+		- 02-parse.t
+		- 03-build.t
+		- 04-pictgram.t
+
+0.05  Wed Nov 16 14:01:25 JST 2005
+        - refactaring of parse method.
+
+0.04  Tue Nov 15 22:41:20 JST 2005
+	- Add cat2pict exporter.
+	- Add detail_build method.
+	- Add pict method.
+        - refactaring of html_build method.
+
+0.03  Fri Nov 11 19:30:04 JST 2005
+	- Change of data1 filed size.
+	- Add mime setter/getter.
+
+0.02  Mon Oct 31 15:45:04 JST 2005
+	- It is deleted that _build overlapped.
+		report by konet3 at gmail.com
+
+0.01  Thu Oct 27 21:24:53 2005
+	- original version; created by h2xs 1.23 with options
+		-X -A Data::ToruCa
+

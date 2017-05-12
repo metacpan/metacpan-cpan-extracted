@@ -1,0 +1,54 @@
+
+* let the user make more formatting choices
+
+* test for debug option
+
+* option to print scalar values like:
+        Scalar 16 bytes ('a')
+        'a' => Scalar 16 bytes ('123')
+        'f' => Scalar 16 bytes ('0.23')
+
+* plain scalars do not yet print their address (make that an option)
+
+* document how to wrap your own report_size function
+
+* add a report_size_in_html() function? Or make generic "string-hooks" that
+  can be used to have a $preamble etc?
+
+* [ 1,2] is technically a ref to an array, \[ 1,2 ] is technically a ref to
+  an array ref. Currently, the first is reported as "Array ref", the second as
+  "Array ref Ref". The second case should be different (like "\1").
+
+* $x = 'a scalar'; report_size(substr($x,0,2), {}) prints:
+  Size report v0.06 for 'a ':
+    Scalar 115 bytes
+  Total: 115 bytes
+
+  While Devel::Peek says:
+  SV = PVLV(0x81a9598) at 0x829d568
+    REFCNT = 1
+    FLAGS = (PADMY,GMG,SMG,pPOK)
+    IV = 0
+    NV = 0
+    PV = 0x82b3db0 "a "\0
+    CUR = 2
+    LEN = 3
+    MAGIC = 0x82b4f30
+      MG_VIRTUAL = &PL_vtbl_substr
+      MG_TYPE = PERL_MAGIC_substr(x)
+    TYPE = x
+    TARGOFF = 0
+    TARGLEN = 2
+    TARG = 0x829d520
+    SV = PV(0x82a5018) at 0x829d520
+      REFCNT = 2
+      FLAGS = (PADBUSY,PADMY,POK,pPOK)
+      PV = 0x82b2648 "a scalar"\0
+      CUR = 8
+      LEN = 9
+
+   Surely our report could be better, and at least say "Magical Scalar".
+
+   (There is now SF_MAGIC(), but there doesn't seem to be any way from Perl
+    or Devel::Peek to ask for the equivalent of is_magic($scalar)...)
+

@@ -1,0 +1,97 @@
+#! /usr/local/bin/perl -w
+#
+# $Id$
+#
+use strict;
+my $PP = 0;
+eval { require Digest::MD5; };
+require Digest::Perl::MD5, $PP = 1 if $@;
+my $ctx = $PP ? Digest::Perl::MD5->new() : Digest::MD5->new();
+
+my $TEST_BLOCK_LEN = 10_000;
+my $TEST_BLOCK_COUNT = 100_000;
+
+my ($r,$q,$p) = (0)x3;
+
+# reading options:
+while (my $input = shift) {
+	unless ($input =~ s/^-//) { unshift @ARGV, $input; last; }
+	for my $opt (split //, $input) {
+		if ($opt eq 'p') {
+			$p = 1;
+		} elsif ($opt eq 'q') {
+			$q = 1;
+		} elsif ($opt eq 'r') {
+			$r = 1;
+		} elsif ($opt eq 't') {
+			local $|=1;
+			print "MD5 time trial. Digesting $TEST_BLOCK_COUNT $TEST_BLOCK_LEN-byte blocks ... ";
+			my $block;
+			for (0..$TEST_BLOCK_LEN-1) { $block .= chr($_ & 0xff) }
+			my $start = time;
+			for (1..$TEST_BLOCK_COUNT) { $ctx->add($block) }
+			my $stop = time;
+			my $diff = $stop - $start; $diff = 1 if $diff <= 0;
+			print "done\n";
+			print "Digest = ", $ctx->hexdigest(), "\n";
+			print "Time = $diff seconds\n";
+			print "Speed = ", int $TEST_BLOCK_LEN*$TEST_BLOCK_COUNT / $diff, " bytes/second\n";
+			exit;
+		} elsif ($opt eq 'x') {
+			print "MD5 test suite:\n";
+			for (
+				"",
+				"a",
+				"abc",
+				"message digest",
+				"abcdefghijklmnopqrstuvwxyz",
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+				"12345678901234567890123456789012345678901234567890123456789012345678901234567890"
+			) {
+				md5print(qq'"$_"', $ctx->add($_)->hexdigest());
+			}
+			exit;
+		} elsif ($opt eq 's') {
+			unless (@ARGV) {
+				die "md5: option requires an argument -- s\n", usage();
+			}
+			my $text = shift;
+			md5print(qq'"$text"', $ctx->add($text)->hexdigest());
+		} else {
+			die "md5: illegal option -- $opt\n", usage(); 
+		}
+	}
+}
+
+
+
+# files
+my $file;
+@ARGV = '-' unless @ARGV;
+foreach $file (@ARGV) {
+	my $fh;
+	if ($file eq '-') {
+		$fh = \*STDIN;
+		$q = 1;
+	} else {
+		open $fh, $file or die "md5: $file: $!\n";
+	}
+	if ($p) {
+		my ($len,$buf) = (0,'');
+		while ( $len = read STDIN, $buf, 8192 ) {
+			print $buf;
+			$ctx->add($buf);
+		}
+		die "read failed: $!\n" unless defined $buf;
+		md5print('',$ctx->hexdigest());
+	} else {
+		md5print($file, $ctx->addfile($fh)->hexdigest());
+	}
+}
+
+sub usage { "usage: md5 [-pqrtx] [-s string] [files ...]\n" }
+sub md5print {
+	my ($file, $md5) = @_;
+	if ($q) { print "$md5\n"; return }
+	print $r ? "$md5 $file" : "MD5 ($file) = $md5", "\n";
+}

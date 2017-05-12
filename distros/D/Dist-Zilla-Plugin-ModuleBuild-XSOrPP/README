@@ -1,0 +1,14 @@
+
+
+This archive contains the distribution Dist-Zilla-Plugin-ModuleBuild-XSOrPP,
+version 0.04:
+
+  Add a --pp option to your Build.PL to force an XS-less build
+
+This software is Copyright (c) 2012 by Dave Rolsky.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+

@@ -1,0 +1,103 @@
+NAME
+    DBIx::Replicate - Synchornizes an SQL table to anther table
+
+SYNOPSIS
+      use DBIx::Replicate qw/dbix_replicate/;
+  
+      # incrementally copy table to other database (copy by each zipcode)
+      dbix_replicate({
+        src_conn     => $src_dbh,
+        src_table    => 'tbl',
+        dest_conn    => $dest_dbh,
+        dest_table   => 'tbl',
+        copy_by      => [ qw/zipcode/ ],
+        load         => 0.5,
+      });
+  
+      # incrementally extract (by every 1000 rows) people younger than 20 years old
+      dbix_replicate({
+        src_conn     => $dbh,
+        src_table    => 'all_people',
+        dst_conn     => $dbh,
+        dest_table   => 'young_people',
+        primary_keys => [ qw/id/ ],
+        columns      => [ qw/id name age/ ],
+        block        => 1000,
+        extra_cond   => 'age<20',
+        load         => 0.1,
+      });
+
+
+      # OO interface
+      my $dr = DBIx::Replicate->new(
+        src => DBIx::Replicate::Node->new(...)
+        dest => DBIx::Replicate::Node->new(...)
+        strategy => DBIx::Replicate::Strategy::PK->new()
+      );
+      $dr->replicate();
+
+DESCRIPTION
+    DBIx::Replicate is a perl module that incrementally copies SQL tables
+    using "DBI" connections. The granuality and speed of the copy can be
+    controlled.
+
+FUNCTIONS
+  dbi_replicate
+    A functional interface of DBIx::Replicate. Accepts following parameters
+    through a hashref argument.
+
+   src_conn
+    "DBI" connection to source database
+
+   src_table
+    name of the source table (mandatory)
+
+   dest_conn
+    "DBI" connection to destination database (mandatory)
+
+   dest_table
+    name of the destination table (mandatory)
+
+   columns
+    an arrayref containing the name of columns to be copied (mandatory)
+
+   extra_cond
+    sql expression to filter rows to be copied. Only the rows that match the
+    condition will be copied. Rows that do not match the condition will be
+    removed from the destination table. (optional)
+
+   limit_cond
+    sql expression to limit replication to rows that match the condition.
+    Unlike "extra_cond", the rows that do not match the condition will be
+    preserved. (optional)
+
+   load
+    load average of the copy operation (optional). The value should be
+    greater than 0 and less or equal to 1.
+
+   copy_by
+    optionally takes an arrayref of column names. If given,
+    "DBIx::Replicate::Strategy::CopyBy" will be used for copying tables. The
+    strategy repeatedly copies a set of rows that contain identical values
+    in the specified columns.
+
+   primary_key
+    optionally takes an arrayref of primary key column names. If given,
+    "DBIx::Replicate::Strategy::PK" will be used for copying tables. The
+    strategy copies certain number of rows at once specified by parameter
+    "block", in the order sorted by "primary_key".
+
+   block
+    used together with "primary_key" to specify the number of rows copied at
+    once
+
+AUTHOR
+    Kazuho Oku
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 Cybozu Labs, Inc.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.6 or, at
+    your option, any later version of Perl 5 you may have available.
+

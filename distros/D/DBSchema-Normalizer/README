@@ -1,0 +1,173 @@
+WELCOME TO THE NORMALIZER
+    DBSchema::Normalizer is a Perl module to help you through the process of
+    transforming a MySQL database table from 1st to 2nd (and eventually 3rd)
+    normal form.
+
+    It is a tool for the database designer, who is supposed to know what it
+    has to be done. The Normalizer does not give you support for deciding
+    which tables need to be normalized and which fields to move across
+    tables.
+
+    What you get from DBSchema::Normalizer is a quick way of performing the operations
+    you have identified as needed. You can also have a certain degree of
+    flexibility, since the Normalizer can also simulate the operation
+    instead of executing it, giving you plenty of information to decide
+    whether you want to go on or not.
+
+DATABASE THEORY
+    You won't find database theory here. There are plenty of other places
+    where to get such information.
+    (http://www.palslib.com/Fundamentals/Database_Design.html is one of
+    them. A sort of crash course on normalization with an elegant example on
+    how to face this problem from a practical side can be found at
+    www.perlmonks.org/index.pl?node_id=129454)
+
+    I assume that you know what needs to be done, and that this knowledge
+    comes to you by either a regular course or long practice. Either way,
+    lacking the room to spread around some base theory, I feel that, having
+    some hands-on examples on normalization will help you gather some
+    insight on this process, which is too often explained only from a
+    designer point of view, leaving helpless the ones with practical needs.
+
+INSTALLATION
+	The usual procedure.
+
+	perl Makefile.PL
+	make
+	make install
+	make test
+
+
+USAGE
+     use DBSchema::Normalizer;
+     my $norm = DBSchema::Normalizer->new (\%param_hash); 
+     $norm->do();
+
+    %param_hash must contain at least the information to connect
+    successfully to a mysql database through the DBI. For example, the
+    following two calls are equivalent. The first one assumes that you have
+    a MySQL configuration file (.my.cnf) in your home directory. This syntax
+    is Unix specific. For other operating systems, please refer to the MySQL
+    manual.
+
+        # using a configuration file
+        my $norm = DBSchema::Normalizer->new ({
+            DSN           => "DBI:mysql:music;host=localhost;"
+                             . "mysql_read_default_file=$ENV{HOME}/.my.cnf", 
+            src_table     => "MP3",
+            index_field   => "album_id",
+            lookup_fields => "artist,album,genre",
+            lookup_table  => "tmp_albums", 
+            dest_table    => "songs",
+            copy_indexes  =>  1,
+            simulate      =>  1
+         });
+
+        # passing username and password explicitly
+        my $norm = DBSchema::Normalizer->new ({
+            DSN           => "DBI:mysql:music;host=localhost"
+            username      => "itsme",
+            password      => "secret",
+            src_table     => "MP3",
+            index_field   => "album_id",
+            lookup_fields => "artist,album,genre",
+            lookup_table  => "tmp_albums", 
+            dest_table    => "songs",
+            copy_indexes  =>  1,
+            simulate      =>  1
+         });
+
+    Examples of usage can be found in the DBSchema::Normalizer module itself
+
+        perldoc DBSchema::Normalizer
+
+DISTRIBUTION LIST
+     Changes                           Version log
+     MANIFEST                          List of files in this package
+     Makefile.PL                       (non) installation script
+     Normalizer.pm                     The Module Itself
+     README                            this file
+     test.pl                           test dependencies for DBSchema::Normalizer
+     docs/Normalizer.html              documentation in HTML format
+     docs/Normalizer.pod               documentation in POD format
+     docs/Normalizer.txt               plain text documentation
+     examples/mp3.mysql                sample database script MySQL 
+     examples/test_normalizer.pl       test with sample database
+
+DOCUMENTATION
+    All the documentation is embedded into the module itself in POD format,
+    which you can enjoy by typing
+
+        perldoc DBSchema::Normalizer
+
+    I decided to spare you some milliseconds of CPU usage (and waste some
+    kilobytes of mass storage in the process) and therefore you also have
+    the same documentation in the following formats:
+
+        Normalizer.pod  POD format, in case you have some CPU cycles to spare and want to
+                        produce your own docs.
+                    
+        Normalizer.html Browsable version
+    
+        Normalizer.txt  If you are using a limited resources connection, or if you just 
+                        like it, there is a plain text version.
+
+    And of course the best documentation is the code itself, which you are
+    welcome to peek at. However, try to use only the documented subs and
+    leave the private ones alone (the ones starting by "_"). Please refer to
+    the normal documentation, under "Architecture," to have an idea of the
+    terrible things that expect you if you don't follow my advice.
+
+DEPENDENCIES AND REQUIREMENTS
+    Normalizer.pm is built with direct references to MySQL databases, which
+    are accessed through DBI and DBD::mysql. Failing those dependencies, it
+    won't work. You may get the modules from the CPAN, but to try the
+    Normalizer you must have access to a MySQL database, either in your
+    computer or over a network connection.
+
+    Your account must have SELECT, INSERT, CREATE and DROP privileges in
+    order to use the Normalizer.
+
+SETTING UP THE EXAMPLES
+    DBSchema::Normalizer is distributed into a compressed package, containing, among
+    other things, two files that will let you experience a close encounter
+    with the practical side of Data Designing.
+
+        mp3.mysql
+        test_normalizer.pl
+
+    mp3.mysql is a sample from a MP3 table. It contains non-normalized data
+    referring to MP3 files. To install it, you need to have a valid account
+    to a MySQL database (with SELECT, CREATE, DROP and INSERT privileges)
+    and run, at your shell prompt
+
+        $ mysql [-u username] [-p] [-h hostname] < mp3.mysql
+
+    This command will create a database "music" (if it does not exists,) and
+    a table "MP3" populated with a few dozen records.
+
+    That done, if you have a MySQL configuration file with username and
+    password in your home directory, you can run the test_normalizer.pl
+    without further steps. If you don't, or if you aren't using "localhost",
+    then you need to edit the script and enter your DSN.
+
+    The unedited example will not perform any changes in your database. It
+    will run in "Simulation mode." (refer to the documentation for details.)
+    You can use its output for the purposes that suit you better. If you
+    turn simulation mode off ({simulate => 0}) then the Normalizer will act
+    on your behalf.
+
+    Make sure to read the documentation and to understand what is behind it
+    before venturing into something you may regret.
+
+    Note: Since I don't want to disrupt existing data, the MP3 table is not
+    created if it already exists. If this is the case, please edit both the
+    SQL and the Perl scripts to adjust them to your needs.
+
+AUTHOR
+    Normalizer.pm is copyright (C) Giuseppe Maxia 2001. All rights reserved.
+    Released under the GPL (GNU General Public License) version 2, April
+    1991.
+
+    My contact for bugs, comments, advice: gmax@karma.oltrelinux.com
+

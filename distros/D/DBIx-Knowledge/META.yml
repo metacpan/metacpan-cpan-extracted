@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               DBIx-Knowledge
+version:            1.13
+abstract:           Report creation on linear convergent data sets for Business Intelligence
+author:
+    - Reed Sandberg
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CGI::AutoForm:   0
+    CGI::CRUD:       0
+    DBI:             0
+    DBIx::IO:        ~
+    HTML::Entities:  0
+    POSIX:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

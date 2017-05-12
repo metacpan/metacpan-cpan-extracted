@@ -1,0 +1,13 @@
+Revision history for Dancer2-Plugin-Etcd
+
+0.003
+
+[BUGS]
+* Fixed Dependency list.
+
+0.002
+
+[BUGS]
+* Fixed bug where shepherd help page was undefined.
+* Shipped basic tests unless etcd env variables are set
+

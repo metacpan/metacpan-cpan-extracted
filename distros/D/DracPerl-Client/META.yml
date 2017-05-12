@@ -1,0 +1,44 @@
+---
+abstract: "API Client for Dell's management interface (iDRAC)"
+author:
+  - 'Jules Decol (@Apcros)'
+build_requires:
+  LWP::UserAgent::Mockable: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DracPerl-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DracPerl::Client:
+    file: lib/DracPerl/Client.pm
+    version: '0.10'
+requires:
+  LWP::Protocol::https: '0'
+  LWP::UserAgent: '0'
+  Log::Any: '0'
+  Moose: '0'
+  XML::Simple: '0'
+resources:
+  bugtracker: https://github.com/apcros/Drac-Perl/issues
+  homepage: https://github.com/apcros/Drac-Perl
+  repository: git://github.com/apcros/Drac-Perl.git
+version: '0.10'
+x_contributors:
+  - 'Apcros <apcros.mail@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,186 @@
+NAME
+    DBD::Amazon- DBI driver abstraction for the Amazon E-Commerce Services
+    API
+
+SYNOPSIS
+            $dbh = DBI->connect('dbi:Amazon:', $amznid, undef,
+                    { amzn_mode => 'books', 
+                            amzn_locale => 'us',
+                            amzn_max_pages => 3
+                    })
+                or die "Cannot connect: " . $DBI::errstr;
+            #
+            #       search for some Perl DBI books
+            #
+            $sth = $dbh->prepare("
+                    SELECT ASIN, 
+                            Title, 
+                            Publisher, 
+                            PublicationDate, 
+                            Author, 
+                            SmallImageURL, 
+                            URL, 
+                            SalesRank, 
+                            ListPriceAmt, 
+                            AverageRating
+                    FROM Books
+                    WHERE MATCHES ALL('Perl', 'DBI') AND 
+                            PublicationDate >= '2000-01-01'
+                    ORDER BY SalesRank DESC,
+                            ListPriceAmt ASC, 
+                            AverageRating DESC");
+
+            $sth->execute or die 'Cannot execute: ' . $sth->errstr;
+
+            print join(', ', @$row), "\n"
+                    while $row = $sth->fetchrow_arrayref;
+
+            $dbh->disconnect;
+
+DESCRIPTION
+    DBD::Amazon provides a DBI and SQL syntax abstraction for the Amazon(R)
+    E-Commerce Services 4.0 API *aka* ECS. <http://www.amazon.com/gp/>.
+    Using the REST interface, and a limited SQL dialect, it provides a
+    DBI-friendly interface to ECS.
+
+    Be advised that this is ALPHA release software and subject to change at
+    the whim of the author(s).
+
+  Prerequisites
+    Perl 5.8.0
+
+    DBI 1.42 minimum
+
+    SQL::Statement 1.14
+
+    SQL::Amazon 0.10 (included in this bundle)
+
+    Clone 0.15
+
+  Testing Considerations
+    To run the test package, you'll need
+
+    An Amazon ECS User ID
+        An environment variable DBD_AMZN_USER must be set to an Amazon ECS
+        user ID in order to connect and execute ECS requests. Registration
+        at the Amazon Web Services site is required to acquire a user ID.
+
+    An Internet Connection
+        Obviously.
+
+    Patience
+        Some of these tests download large amounts of Amazon catalog data,
+        which can take some time (esp. since a minimum 1 second delay
+        between requests is required).
+
+    Also, be prepared for possible intermittent 'Internal Error' reports;
+    these are problems within the Amazon ECS system, not failures in
+    DBD::Amazon itself.
+
+  Installation
+    For Unix:
+
+    *gunzip/untar as usual, then*
+
+        cd DBD-Amazon-0.10
+        perl Makefile.PL
+        make
+            make test
+        make install
+
+    Note that you probably need root or administrator permissions to
+    install. Refer to ExtUtils::MakeMaker for details on installing in your
+    own local directories.
+
+    For Windows:
+
+    *Unzip with your favorite utility, e.g., WinZIP, then*
+
+        cd DBD-Amazon-0.10
+        perl Makefile.PL
+        nmake
+            nmake test
+        nmake install
+
+  SQL Dialect
+    DBD::Amazon supports a subset of standard SQL, and additional predicate
+    functions for keyword searches. Review SQL::Amazon::Parser and
+    SQL::Statement for syntax details.
+
+    Use "table_info()" to retrieve the metadata for any of the defined
+    tables/views.
+
+    Currently, only the following tables are defined:
+
+    Books
+    Offers
+    CustomerReviews
+    EditorialReviews
+    BrowseNodes
+    ListManiaLists
+    Merchants
+    SimilarProducts
+    SysSchema
+
+  Driver-specific Attributes
+    amzn_locale *(Connection attribute)*
+        Sets the Amazon locale to use (i.e., the root ECS request URL).
+        Valid values are 'us', 'uk', 'de', 'fr', 'jp', 'ca' *(Currently,
+        only us is supported)*. Default is 'us'.
+
+    amzn_affiliate_id *(Connection attribute)*
+        An Amazon affiliate ID. Default none.
+
+    amzn_strict *(Connection attribute)*
+    amzn_rate_limit *(Connection attribute)*
+        Minimum number of seconds allowed between requests. Default 1. May
+        be fractional.
+
+    amzn_max_pages *(Connection and statement attribute)*
+        Maximum number of pages to return for each request. Default 20.
+
+    amzn_resp_group *(Connection and statement attribute)*
+        ECS Response Group to use; can be any of 'Small', 'Medium', or
+        'Large'; default is 'Large'.
+
+ACKNOWLEDGEMENTS
+    Many thanks to Jeff Zucker for his guidance/patience, and adding some
+    nice new features to SQL::Statement to help make DBD::Amazon a reality.
+
+FOR MORE INFO
+    <http://www.presicient.com/dbdamzn>
+
+AUTHOR AND COPYRIGHT
+    Copyright (C) 2005 by Presicient Corporation, USA
+
+    darnold@presicient.com
+
+    <http://www.presicient.com>
+
+    Permission is granted to use this software according to the terms of the
+    Artistic License, as specified in the Perl README file, with the
+    exception that commercial redistribution, either electronic or via
+    physical media, as either a standalone package, or incorporated into a
+    third party product, requires prior written approval of the author.
+
+    This software is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    Presicient Corp. reserves the right to provide support for this software
+    to individual sites under a separate (possibly fee-based) agreement.
+
+SEE ALSO
+    For help on the use of DBI, see the DBI users mailing list:
+
+    dbi-users-subscribe@perl.org
+
+    For general information on DBI see
+
+    <http://dbi.perl.org>
+
+    For information about the Amazon API, see
+
+    <http://www.amazon.com/gp/browse.html/102-3140335-1462533?%5Fencoding=UT
+    F8&node=3435361>
+

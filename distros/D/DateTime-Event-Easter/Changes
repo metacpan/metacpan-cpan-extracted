@@ -1,0 +1,126 @@
+Revision history for Perl module DateTime::Event::Easter
+
+Note on version conventions:
+0.0000
+|  | |
+|  | +-- Minor Decimal
+|  +---- Major Decimal
++------- Whole Number
+
+* Whole numbers are rewrite releases. They contain major rewrites
+  or alterations to the API. Read the docs before using them.
+* Major decimal number is patch release. Some coding has changed
+  but the API remains the same (or is extended). Upgrading to 
+  these should not change any expected behaviour, however it
+  will alter buggy behaviour. Read the docs and check if you've
+  been using work-arounds before using them.
+* Minor decimal number is a doc or installer patch only. If you have
+  the module installed and understand how it works, you don't need
+  this release.
+
+0.01 Mon Mar 24 2003
+        - original version - posted to DateTime mailing list
+
+0.02 Wed Mar 26 2003
+        - posted to DateTime mailing list with this message
+
+        Beta 2 includes support for Orthodox Easter, however I doubt
+        it handles it the best way possible. Please take a look and
+        offer suggestions (its the last sub before the POD). It
+        should also be noted that both Easters should return
+        Gregorian Dates as they do now.
+
+        I've renamed the two Easters as 'western' and 'eastern'.
+        This is still probably not the best names but its better
+        than my mistake concerning Orthodox easter in the previous
+        release :). If anyone can help with names that relate I'd
+        love it. I considered 'western' and 'orthodox', but I'd
+        prefer names that are related.
+
+        The ->set method is now ->as_list and I've added ->as_set
+        which returns a DateTime::Set object (although this isn't
+        tested at ALL! CPAN wouldn't give me DateTime::Set :))
+
+        The cache has been removed. This means years are sometimes
+        recalculated a second later, but the memory blow-out factor
+        isn't there.
+
+0.03 Sun Mar 30 2003
+        - posted to DateTime mailing list with this message:
+
+        I've poked it with sticks like years with no Orthodox Easter
+        (35000).
+
+        I'd like to make it run faster some time, so if anyone can
+        think of better ways to do things without the Caching
+        problem, let me know.
+
+1.00 Sun Mar 30 2003
+	- first release version
+        - first CPAN release
+
+        - Added support for any DateTime::Calendar module that subscibes
+          to the API (ie, has from_object and utc_rd_values)
+          - Thanks Eugene van der Pijll
+
+        - Added placeholder methods as_span and _tospan. Currently these
+          do nothing. Once DateTime::Span exists, we'll get them going.
+
+1.00.01 Mon Mar 31 2003
+        - Documentation and Version Number patch
+        - Hadn't updated the documentation for the release version. Done now.
+        - Hadn't updated $VERSION to match the version number on the release
+        * No functionality changed. See note 'Minor decimal number releases'
+
+1.00.02 Wed Apr  2 2003
+        - Installation now includes pre-req for DateTime::Calendar::Julian
+          which is only used if you're calculating Orthodox Easter.
+        * No functionality changed. See note 'Minor decimal number releases'
+
+1.0100 Sat Jun 28, 2003 +1000
+	- Changed versioning to only use one decimal point. Stops poor CPAN
+	  from getting confused!
+	- Altered closest() to compare delta_days rather than just the two
+	  DateTime::Duration objects. Not sure why I had to do this but it
+	  fixed the problem!
+	* This release fixes a bug and should be installed for correct 
+	  handling of closest().
+
+1.02 Sun Aug 17, 2003 +1000
+	- as_set() now works. Previously it called a non-existant method in 
+	  DateTime::Set (new()) where it should have called ->from_datetimes().
+	  This wasn't previously picked up by the tests because the t/05sets
+	  test was actually an exact duplicate of 04lists.t! This issue was
+	  discovered by Ron Hill.
+	  
+1.03 Sat Sep 20, 2003 +1000
+	- as_set() now works like a call to DateTime::Set and can accept all
+	  arguments that a DateTime::Set->from_recurrence can take.
+	  Based on idea and patch from Flavio S. Glock
+	- as_span and as_point now work to return spans rather than the old
+	  points. This means you can get a 24 hour span for a day rather than
+	  just midnight on that day.
+	- Similarly, the constructor has an 'as' attribute to set the preference
+	  at construction.
+	- Fixed (again) comparison of durations for determining 'closest'. We now
+	  get one duration and add it to the other datetime, comparing it to now:
+	 	 Duration = NextEaster - Now;
+	 	 Return NextEaster if PreviousEaster+Duration < Now
+	 	 otherwise Return PreviousEaster
+	  Error first noticed by automated CPAN tester.
+
+1.04 Sun Apr 04, 2004 +1000
+	- fixed incompatibility with newest versions of DateTime::Set (which
+	  changed the way DateTime::Set->from_recurrence worked with infinite
+	  values)
+	  Patch provided by Ronald Hill.
+		 
+1.05 Wed 2015-01-21
+        - New co-maintainer: Jean Forget
+        - Fixed POD issues declared in tickets 7598, 51892, 79041 and 101238.
+          Patches provided by Slaven Rezic and Frank Wiegand.
+        - Fixed kwalitee issues: buildtool not executable, META.yml
+        - Add a few other Easter-related events.
+        - Improve code coverage.
+        - Add a directory "eg" with an example script.
+

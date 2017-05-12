@@ -1,0 +1,18 @@
+{
+  "schema": {
+    "type": "//any",
+    "of": [ "//bool", "//nil" ]
+  },
+
+  "pass": {
+    "bool": "*",
+    "null": "*"
+  },
+
+  "fail": {
+    "arr" : { "*": { "error": [ "none" ], "data": [ ], "check": [ ] } },
+    "num" : { "*": { "error": [ "none" ], "data": [ ], "check": [ ] } },
+    "obj" : { "*": { "error": [ "none" ], "data": [ ], "check": [ ] } },
+    "str" : { "*": { "error": [ "none" ], "data": [ ], "check": [ ] } }
+  }
+}

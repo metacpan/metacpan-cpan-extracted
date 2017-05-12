@@ -1,0 +1,10 @@
+sub {
+    my $self = shift;
+
+    html {
+        head { title { 'My App' } };
+        body {
+            h1 { 'howdie ' . $self->name . '!' };
+        };
+    }
+}

@@ -1,0 +1,21 @@
+Changes
+lib/Data/Dump/Perl6.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/dd.t
+t/dollar-one.t
+t/dump.t
+t/glob.t
+t/hash.t
+t/quote-unicode.t
+t/quote.t
+t/ref.t
+t/regexp.t
+t/scalar-obj.t
+t/scalar.t
+t/tied.t
+t/utf8.t
+t/vstring.t

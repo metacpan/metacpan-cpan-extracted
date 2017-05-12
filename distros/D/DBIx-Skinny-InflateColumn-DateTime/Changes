@@ -1,0 +1,23 @@
+Revision history for Perl extension DBIx::Skinny::InflateColumn::DateTime
+
+0.06    Sat Jun 26 17:21:29 2010
+        - added options time_zone, rules, auto_insert_rules and auto_update_rules.
+        - these are nihen(Masahiro Chiba)'s work, thanks.
+
+0.05    Mon Jan 11 15:55:07 2010
+        - fixed Makefile.PL problem
+
+0.04    Mon Jan 04 09:11:31 2010
+        - upload to CPAN again
+          - 0.03 was deleted
+
+0.03    Tue Dec 23 01:44:50 2009
+        - fixed test files
+          - removed "use FindBin::libs"
+        - fixed wrong Pod
+
+0.02    Tue Dec 22 15:11:56 2009
+        - separated DBIx::Skinny::InflateColumn::DateTime::Auto
+
+0.01    Sun Oct 18 18:30:38 2009
+        - original version

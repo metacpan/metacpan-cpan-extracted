@@ -1,0 +1,44 @@
+Devel-GDB version 2.0
+=====================
+
+The Devel::GDB package provides an interface for communicating with GDB,
+the GNU debugger.  Complete documentation is available on the CPAN site:
+
+http://search.cpan.org/~JEZRA/Devel-GDB/GDB.pm
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+------------
+
+This module requires these other modules and libraries, which should be
+part of most standard Perl instalations:
+
+  Test::More
+  threads::shared
+  Thread::Semaphore
+
+The following modules are also recommended:
+
+  threads (i.e. Perl compiled with -Dusethreads)
+  Expect
+  IO::BufferedSelect
+
+In addition, for the module to be useful, you should have gdb installed :-)
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright (C) 2007 by Antal Novak & Josef Ezra
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

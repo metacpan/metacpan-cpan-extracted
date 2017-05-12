@@ -1,0 +1,27 @@
+---
+abstract: 'Automated site map for the Dancer web framework.'
+author:
+  - 'James Ronan <james@ronanweb.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-SiteMap
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: 1.175
+  Test::More: 0
+  XML::Simple: 0
+resources:
+  bugtracker: https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues
+  repository: https://github.com/jamesronan/Dancer-Plugin-SiteMap
+version: 0.14

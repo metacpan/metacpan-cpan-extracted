@@ -1,0 +1,26 @@
+---
+abstract: "SYP's Dist::Zilla minting profile"
+author:
+  - 'Stanislaw Pusep <stas@sysd.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-MintingProfile-SYP
+requires:
+  Dist::Zilla::Role::MintingProfile::ShareDir: '0'
+  Moose: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/creaktive/Dist-Zilla-MintingProfile-SYP/issues
+  homepage: https://github.com/creaktive/Dist-Zilla-MintingProfile-SYP
+  repository: git://github.com/creaktive/Dist-Zilla-MintingProfile-SYP.git
+version: '0.009'
+x_contributors:
+  - 'Sergey Romanov <complefor@rambler.ru>'

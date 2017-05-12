@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::Diff.
+
+0.01  Fri Oct 15 11:45:29 2004
+	- original version; created by h2xs 1.21 with options
+		-X -n Data::Diff
+

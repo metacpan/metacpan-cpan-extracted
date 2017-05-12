@@ -1,0 +1,16 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+SipHash.xs
+csiphash.c
+lib/Digest/SipHash.pm
+lib/Digest/SipHash/PP.pm
+t/00-load.t
+t/01-SipHash.t
+t/02-PP.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

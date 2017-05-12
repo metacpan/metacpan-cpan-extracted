@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+#
+# $Id: display_db_mgr_cfg,v 145.1 2007/08/06 19:59:36 biersma Exp $
+#
+
+use strict;
+use DB2::Admin;
+use Data::Dumper;
+use Text::FormatTable;
+
+#
+# Get the names of all database manager configuration params.  The
+# config file contains params for all releases, so filter out
+# non-relevant names by checking that the constant is defined.
+#
+# Real code would supply the config param names and not
+# read them out form an undocumented variable.
+#
+my @all_params;
+while (my ($param, $info) = each %{ $DB2::Admin::Constants::config_params} ) {
+    next unless ($info->{Domain} eq 'Manager');
+    next unless (DB2::Admin::Constants::->GetInfo($param));
+    push @all_params, $info->{Name};
+}
+
+#
+# Get delayed database config (no db connection required)
+#
+my @retval = DB2::Admin::->
+  GetDbmConfig('Param' => \@all_params,
+	       'Flag'  => 'Delayed');
+
+my %db_cfg;  # Param -> Value/Automatic
+foreach my $entry (@retval) {
+    my $name = $entry->{Name};
+    my $value = $entry->{Value};
+    my $automatic = $entry->{Automatic} || $entry->{Computed} || 0;
+    $db_cfg{$name} = { 'Value' => $value,
+                       'Automatic' => $automatic,
+                     };
+}
+
+#
+# Generate a pretty table
+#
+my $table = Text::FormatTable::->new('|l|l|l|');
+$table->head("Parameter", "Auto", "Value");
+$table->rule('-');
+foreach my $param (sort keys %db_cfg) {
+    $table->row($param, ($db_cfg{$param}{Automatic} ? 'Yes' : 'No'), $db_cfg{$param}{Value});
+}
+print $table->render();

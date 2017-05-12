@@ -1,0 +1,166 @@
+#!/opt/bin/perl
+
+#TODO: dwall3_3 => dwall_3_3
+#TODO: fix dialogue
+#TODO: update file format version
+
+# this script checks, fixes and simplifies @match expressions in a map
+
+use common::sense;
+
+use Deliantra;
+use Deliantra::Map;
+
+Deliantra::load_archetypes;
+
+our $dirty;
+our $path;
+
+sub fix_msg($) {
+   my ($msg) = @_;
+
+   local $_ = $msg;
+
+   # fx pretty common error of having "* First line of response"
+   my $response = s/^\* (.*)/*/ ? "\n$1" : "";
+
+   warn "$path ($_) unexpected characters in match \n" if !/^[a-zA-Z\[\]\|\*\!\' 0-9\-\?]+$/;
+
+   s/\[(.)(.)\]/(lc $1) eq (lc $2) ? lc $1 : "[$1$2]"/ge;
+
+   my %alt;
+
+   for my $kw (split /\|/) {
+      $kw =~ s/^\s+//;
+      $kw =~ s/\s+$//;
+
+      $alt{lc $kw} = $kw;
+   }
+
+   $_ = join "|", sort keys %alt;
+
+   $_ .= $response;
+
+   warn "$path <$msg><$_>\n" if $_ ne $msg;
+   warn "$path ($_) unexpected characters in match\n" if /[\[\]]/;
+
+   $_
+}
+
+sub patch_arch($) {
+   warn "$path: references unknown archetype $_[0]{_name}\n"
+      unless exists $ARCH{ $_[0]{_name} };
+
+   if ($_[0]{face} =~ /\.[1-9]\d\d$/) {
+      $_[0]{face} =~ s/\.([2-9])\1\1$/.x1$1/; # 222, 333, 444
+      $_[0]{face} =~ s/\.1(\d\d)$/.x$1/; # 1AB xAB
+      $dirty++;
+   }
+}
+
+sub patch_inv($) {
+  my ($arch) = @_;
+
+  my $inv = $arch->{inventory} || [];
+
+  for (@$inv) {
+     patch_arch $_;
+
+     if ($_->{type} == 116 || $_->{_name} =~ /^event_/) {
+        # deliantra to old deliantra+
+        if ($_->{slaying} eq '/python/IPO/send.py') {
+           $_->{title} = 'perl';
+           $_->{slaying} = 'ipo';
+           $dirty++
+        } elsif ($_->{slaying} eq '/python/IPO/receive.py') {
+           $_->{title} = 'perl';
+           $_->{slaying} = 'ipo';
+           $dirty++;
+        } elsif ($_->{slaying} eq '/python/IPO/board.py') {
+           $_ = { _name => 'event_apply', title => 'perl', slaying => 'board' };
+           $arch->{msg} = '@match *'."\n".'@eval board::command $who, $msg, $npc'."\n";
+           $dirty++;
+        } elsif ($_->{slaying} eq '/python/IPO/say.py') {
+           $arch->{msg} = '@match *'."\n".'@eval ipo::command $who, $msg, $npc'."\n";
+           $_ = undef;
+           $dirty++;
+        } elsif ($_->{slaying} eq '/python/IPO/banksay.py') {
+           $arch->{msg} = '@match *'."\n".'@eval bank::command $who, $msg, $npc'."\n";
+           $_ = undef;
+           $dirty++;
+        }
+
+        # old deliantra+ to new plug-in system
+        if ($_ && $_->{title} eq "perl") {
+           if ($_->{slaying} eq "board") {
+              push @{$arch->{attach}}, ["board"];
+              $_ = undef;
+              $dirty++;
+           } elsif ($_->{slaying} eq "ipo") {
+              if ($_->{_name} eq "event_close") {
+                 push @{$arch->{attach}}, ["ipo_mailbox"];
+              } elsif ($_->{_name} eq "event_apply") {
+                 #
+              }
+              $_ = undef;
+              $dirty++;
+           } elsif ($_->{slaying} eq "nimbus") {
+              push @{$arch->{attach}}, ["nimbus_exit", { restore => $_->{name} eq "restore"}];
+              $_ = undef;
+              $dirty++;
+           } elsif ($_->{slaying} eq "minesweeper") {
+              push @{$arch->{attach}}, ["minesweeper", { split /(?:\s+|=)/, $_->{name} }];
+              $_ = undef;
+              $dirty++;
+           } elsif ($_->{slaying} eq "reseller") {
+              if ($_->{_name} eq "event_drop_on") {
+                 push @{$arch->{attach}}, ["reseller_floor"];
+              } elsif ($_->{_name} eq "event_trigger") {
+                 my ($a, $b, $c) = split /,/, $_->{name};
+                 push @{$arch->{attach}}, ["reseller_shopmat", {npc_name => $a, npc_x => $b, npc_y => $c}];
+              }
+              $_ = undef;
+              $dirty++;
+           } else {
+              warn "WARNING: unsupported perl event<$_->{slaying}>\n";#d#
+           }
+        }
+     }
+  }
+
+  $arch->{inventory} = [grep $_, @$inv];
+}
+
+for $path (@ARGV) {
+   eval {
+      open my $fh, "<:raw:perlio:utf8", $path
+         or die "$path: $!\n";
+
+      <$fh> =~ /^arch \S+$/
+         or die "$path: not a deliantra map file\n";
+
+      my $map = new_from_file Deliantra::Map $path
+         or die "$path: file load error\n";
+
+      $dirty = 0;
+
+      for my $a (map @$_, grep $_, map @$_, grep $_, @{ $map->{map} }) {
+         patch_arch $a;
+         patch_inv $a if $a->{inventory};
+
+         next unless $a->{msg} =~ /^\@match /;
+
+         my $old = $a->{msg};
+
+         $a->{msg} =~ s/^(\@match\s+)(.*)$/$1 . fix_msg $2/gme;
+
+         $dirty ||= $old ne $a->{msg};
+      }
+
+      $map->write_file ($path)
+         if $dirty;
+
+      1
+   } or $@ =~ /not a deliantra map/ or warn $@;
+}
+

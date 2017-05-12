@@ -1,0 +1,33 @@
+Revision history for Perl extension Data::Pairs.
+
+0.07  Thu Jun 12 08:11:19 EDT 2008
+    - Fixed bug in test, using wrong class (per cpan tests)
+
+0.06  Tue Jun 10 16:41:17 EDT 2008
+    - added exporting of non-oo aliases for methods
+    - added tests to MANIFEST (and removed some for tie)
+    - because of duplicate keys, removed support for TIEHASH
+
+0.05  Sat Jun  7 07:35:18 EDT 2008
+    - croak if pos too large in set() and add()
+
+0.04  Fri Jun  6 08:38:49 EDT 2008
+    - fixed typos in pod
+    - added pos parameter to delete()
+
+0.03  Thu Jun  5 12:35:40 EDT 2008
+    - added use 5.008003; (from 5.8.0) based on cpan testing
+    - changed get_pos() to work with only one key
+    - added get_pos_hash() for handling multiple keys
+    - remove "inherits from Data::Omap" from pod
+    - added SEE ALSO Tie::IxHash in pod
+    - added hash slices to list of unsupported tied features in pod
+
+0.02  Wed Jun  4 23:21:11 EDT 2008
+    - validate incoming structure in new()
+
+0.01  Wed Jun  4 15:12:34 2008
+    - original version; created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n Data::Pairs -b 5.8.0
+    - New module: copied Data::Omap module changed it to allow duplicates
+

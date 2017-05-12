@@ -1,0 +1,12 @@
+---
+abstract: insert/update a database record from a hash
+author:
+- Uwe Voelker <uwe.voelker@gmx.de>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.007
+license: perl
+name: DBIx-InsertHash
+requires:
+  Class::Accessor: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+version: '0.011'

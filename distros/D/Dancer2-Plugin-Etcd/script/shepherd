@@ -1,0 +1,30 @@
+#!/usr/bin/env perl
+
+use strict;
+use 5.008001;
+use Dancer2::Plugin::Etcd::CLI;
+
+our $VERSION = '0.003';
+
+exit Dancer2::Plugin::Etcd::CLI->new->run(@ARGV);
+
+__END__
+
+=head1 NAME
+
+shepherd - Dancer configuration manager.
+
+=head1 SYNOPSIS
+
+  > shepherd get --version=2
+  > shepherd put
+
+=head1 DESCRIPTION
+
+For more documentation, refer to L<Shepherd> by running C<shepherd --help>.
+
+=head1 SEE ALSO
+
+L<Shepherd>
+
+=cut

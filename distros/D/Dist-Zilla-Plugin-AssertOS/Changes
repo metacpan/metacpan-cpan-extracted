@@ -1,0 +1,66 @@
+==================================================
+Changes from 2012-03-29 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.08 at 2017-03-28 15:31:12 +0000
+-----------------------------------------
+
+  Change: 8bde7a9f0a73caf8b49afc8cbf857cacb1f8bdc3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-03-28 16:31:12 +0000
+
+    When bundling handle perls without dot in @INC 
+
+-----------------------------------------
+version 0.06 at 2013-10-04 15:13:17 +0000
+-----------------------------------------
+
+  Change: 9d4695dacc63f803ccaa98df50fe15a09567a1f6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-10-04 16:13:17 +0000
+
+    Documented bundle option 
+
+  Change: 103683cff80480484c538061cc9492a1a7471b3d
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-10-04 08:01:23 +0000
+
+    Merge pull request #3 from rjbs/no-bundle
+
+    allow non-bundling use of [AssertOS] 
+
+  Change: f39508905e5a874e29b96a8ebd04f7a8a8c8e028
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2013-10-04 10:28:18 +0000
+
+    add support for bundle=0 to configure_requires instead 
+
+  Change: bfa237e70b8bb6160d417863394e58f2954dc6c4
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2013-10-04 10:25:16 +0000
+
+    terminate the statement of magic true value
+
+    in 5.19.4, becomes runaway expression! 
+
+  Change: 4ed7685c674889e68df6fcdc2b0de65e97ef678b
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-04-20 01:21:46 +0000
+
+    Merge pull request #2 from karenetheridge/topic/assert_load_order
+
+    generate a fatal error if the plugin is run too soon, before
+    Makefile.PL... 
+
+  Change: 51dc555f15b2b5225811753b36d55f27f4d2dfb1
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2013-04-19 18:54:33 +0000
+
+    generate a fatal error if the plugin is run too soon, before
+    Makefile.PL or Build.PL can be generated for receiving the
+    install-time OS-assertion code 
+
+================================================
+Plus 2 releases after 2012-03-29 00:00:00 +0000.
+================================================

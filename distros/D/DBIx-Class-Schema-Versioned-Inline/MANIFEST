@@ -1,0 +1,37 @@
+Changes
+lib/DBIx/Class/Schema/Versioned/Inline.pm
+lib/DBIx/Class/Schema/Versioned/Inline/Candy.pm
+lib/DBIx/Class/Schema/Versioned/Inline/Upgrade.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/candy_mysql.t
+t/candy_postgresql.t
+t/candy_sqlite.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test_mysql.t
+t/test_postgresql.t
+t/test_sqlite.t
+t/lib/Role/Database.pm
+t/lib/Role/MySQL.pm
+t/lib/Role/PostgreSQL.pm
+t/lib/Role/SQLite.pm
+t/lib/Test/Deploy.pm
+t/lib/Test/Upgrade.pm
+t/lib/TestCandy/Schema.pm
+t/lib/TestCandy/Schema/Candy.pm
+t/lib/TestCandy/Schema/Result/Bar.pm
+t/lib/TestCandy/Schema/Result/Foo.pm
+t/lib/TestCandy/Schema/Result/Tree.pm
+t/lib/TestCandy/Schema/Upgrade.pm
+t/lib/TestVersion/Schema.pm
+t/lib/TestVersion/Schema/Result/Bar.pm
+t/lib/TestVersion/Schema/Result/Foo.pm
+t/lib/TestVersion/Schema/Result/Tree.pm
+t/lib/TestVersion/Schema/Upgrade.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

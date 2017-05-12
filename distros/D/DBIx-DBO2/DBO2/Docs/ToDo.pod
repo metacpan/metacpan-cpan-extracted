@@ -1,0 +1,116 @@
+=head1 NAME
+
+DBIx::DBO2::Docs::ToDo - Tasks, ideas, and bug reports
+
+=head1 TODO
+
+Issues from Comparison.pod document:
+
+=head2 Supported databases
+
+Any database supported by one of the following: DBD::AnyData, DBD::CSV, DBD::MySQL, and DBD::Pg.
+
+TODO: Add ODBC to SQL Server.
+
+=head2 SQL Abstraction
+
+The base Record class does not support joins, although the underlying DBIx::SQLEngine classes do, and it is possible to provide your own query logic in a subclass.
+
+TODO: Examples of using a join.
+
+=head2 Deferred/Preloaded data retrieval
+
+There is not yet any way to defer the loading of given columns for a select. However, it always possible to specify only those columns which are needed at a given point in your code.
+
+TODO: Deferred loading of additional columns is expected in an upcoming release.
+
+=head2 Multiple rows and cursors
+
+DBIx::DBO2 currently returns multiple rows all at once. A RecordSet object similar to a cursor is used but it does not yet handle incremental retrieval.
+
+TODO: Support for cursors and automatic iteration with closures is expected in an upcoming release.
+
+=head2 Caching
+
+There is no built in caching support.
+
+TODO: Support for LRU caching and weak caching to ensuring that there is only a single instance of a given object in memory at any time are both expected in an upcoming release.
+
+=head2 Transactions
+
+DBIx::DBO2 does not support transactions.
+
+TODO: Basic transactions for drivers that support them are expected in an upcoming release.
+
+=head2 Auto-generated methods
+
+The included DBIx::DBO2::Fields package can generate a wide variety of methods, including customized accessors for each type of field or relationship. These currently require explicit declarations.
+
+TODO: Support for automatic detection of database columns and subsequent method generation is expected in an upcoming release.
+
+=head2 Documentation
+
+The documentation for this module is still fairly rough. In particular, it lacks non-reference material to introduce the its idioms.
+
+TODO: Tutorial or "getting started" guide.
+
+
+=head1 MISC ADDL ITEMS
+
+=over 4
+
+
+=item *
+
+The current test script is woefully inadqueate, and does not test the full public interface of this framework.
+ 
+
+=item *
+
+Records should be using prototypes for new(), to simplify both setting defaults  for specific fields, and for changing the default implementation class.
+
+
+=item *
+
+Continue to add field types, while trying to maintain some degree of consistency in naming and clarity in interface.
+
+
+=item *
+
+Move most of the primary key logic into primary_key field declarations, including fetch_id.
+
+
+=item *
+
+Add automatic generation of useful indexes.
+
+
+=item *
+
+Finish building out field auto-detection to include on-demand method generation.
+
+
+=item *
+
+Fix RecordSet filtering and sorting.
+
+
+=item *
+
+Replace Record::DefinedRow with Table::Static.
+
+
+=item *
+
+Move all of the AUTHORS and LICENSE blocks to ReadMe.pod
+Include a SEE ALSO in all modules pointing to ReadMe.pod.
+
+
+=back
+
+
+=head1 SEE ALSO
+
+L<DBIx::DBO2::ReadMe>
+
+=cut

@@ -1,0 +1,194 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Data::Table::Excel - Convert between Data::Table objects and Excel files.</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@gold.nonet" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#abstract">ABSTRACT</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Data::Table::Excel - Convert between Data::Table objects and Excel (xls/xlsx) files.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+
+  News: The package now includes &quot;Perl Data::Table Cookbook&quot; (PDF), which may serve as a better learning material.
+  To download the free Cookbook, visit https://sites.google.com/site/easydatabase/</pre>
+<pre>
+  use Data::Table::Excel qw (tables2xls xls2tables tables2xlsx xlsx2tables excelFileToTable is_xlsx xls2xlsx xlsx2xls);</pre>
+<pre>
+  # read in two CSV tables and generate an Excel .xls binary file with two spreadsheets
+  my $t_category = Data::Table::fromFile(&quot;Category.csv&quot;);
+  my $t_product = Data::Table::fromFile(&quot;Product.csv&quot;);
+  # the workbook will contain two sheets, named Category and Product
+  # parameters: output file name, an array of tables to write, and their corresponding names
+  tables2xls(&quot;NorthWind.xls&quot;, [$t_category, $t_product], [&quot;Category&quot;,&quot;Product&quot;]);</pre>
+<pre>
+  # read in NorthWind.xls file as two Data::Table objects
+  my ($tableObjects, $tableNames, $column_headers)=xls2tables(&quot;NorthWind.xls&quot;);
+  for (my $i=0; $i&lt;@$tableNames; $i++) {
+    print &quot;*** &quot;. $tableNames-&gt;[$i], &quot; ***\n&quot;;
+    print $tableObjects-&gt;[$i]-&gt;csv($column_headers[$i]);
+  }</pre>
+<pre>
+  Outputs:
+  *** Category ***
+  CategoryID,CategoryName,Description
+  1,Beverages,&quot;Soft drinks, coffees, teas, beers, and ales&quot;
+  2,Condiments,&quot;Sweet and savory sauces, relishes, spreads, and seasonings&quot;
+  3,Confections,&quot;Desserts, candies, and sweet breads&quot;
+  ...
+  
+  *** Product ***
+  ProductID,ProductName,CategoryID,UnitPrice,UnitsInStock,Discontinued
+  1,Chai,1,18,39,FALSE
+  2,Chang,1,19,17,FALSE
+  3,Aniseed Syrup,2,10,13,FALSE
+  ...</pre>
+<pre>
+  # to deal with Excel 2007 format (.xlsx), use xlsx2tables instead.
+  # since no table name is supplied, they will be named Sheet1 and Sheet2.
+  # here we also provide custom colors for each sheet, color array is for [OddRow, EvenRow, HeaderRow]</pre>
+<pre>
+  tables2xlsx(&quot;NorthWind.xlsx&quot;, [$t_category, $t_product], undef, [['silver','white','black'], [45,'white',37]]);
+  # read in NorthWind.xlsx file as two Data::Table objects
+  my ($tableObjects, $tableNames)=xlsx2tables(&quot;NorthWind.xlsx&quot;);
+  # note: Spreadsheet::ParseXLSX module is used to parse .xlsx file.</pre>
+<pre>
+  ($tableObjects, $tableNames, $column_headers)=excelFileToTable(&quot;NorthWind.xlsx&quot;);
+  # excelFileToTable will automatically detect the Excel format for the input file</pre>
+<pre>
+  # To convert Excel files between the two formats, use
+  xlsx2xls(&quot;NorthWind.xlsx&quot;, &quot;NorthWind.xls&quot;);
+  xls2xlsx(&quot;NorthWind.xls&quot;, &quot;NorthWind.xlsx&quot;);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="abstract">ABSTRACT</a></h1>
+<p>This perl package provide utility methods to convert between an Excel file and Data::Table objects. It then enables you to take advantage of the Data::Table methods to further manipulate the data and/or export it into other formats such as CSV/TSV/HTML, etc.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>To read and write Excel .xls (2003 and prior) format, we use Spreadsheet::WriteExcel and Spreadsheet::ParseExcel; to read and write Excel .xlsx (2007 format),
+we use Spreadsheet::ParseXLSX and Excel::Writer::XLSX.  If this module gives incorrect results, please check if the corresponding Perl modules are updated. (We switch to Spreadsheet::ParseXLSX from Spreadsheet::XLSX from version 0.5)</p>
+<dl>
+<dt><strong><a name="xls2tables" class="item">xls2tables ($fileName, $sheetNames, $sheetIndices)</a></strong></dt>
+
+<dt><strong><a name="xlsx2tables" class="item">xlsx2tables ($fileName, $sheetNames, $sheetIndices)</a></strong></dt>
+
+<dt><strong><a name="excelfiletotable" class="item">excelFileToTable ($fileName, $sheetNames, $sheetIndices, $excelFormat)</a></strong></dt>
+
+<dd>
+<p>xls2tables is for reading Excel .xls files (binary, 2003 and prior), xlsx2table is for reading .xlsx file (2007, compressed XML format).
+excelFileToTable can automatically detect Excel format if format is not specified.</p>
+<p>$fileName is the input Excel file.
+$sheetNames is a string or a reference to an array of sheet names.
+$sheetIndices is a int or a reference to an array of sheet indices.
+$excelFormat in excelFileToTable has to be either &quot;2003&quot; or &quot;2007&quot;. Auto-detected if not specified.
+If neither $sheetNames or $sheetIndices is provides, all sheets are converted into table objects, one table per sheet.
+If $sheetNames is provided, only sheets found in the @$sheetNames array is converted.
+If $sheetIndices is provided, only sheets match the index in the @$sheetIndices array is converted (notice the first spreadsheet has an index of 1).</p>
+<p>The method returns an array ($tableObjects, $tableNames, $columnHeaders).
+$tableObjects is a reference to an array of Data::Table objects.
+$tableNames is a reference to an array of sheet names, corresponding to $tableObjects.
+$columnHeaders is a reference to an array of booleans, indicating whether each table has original column header
+If a table does not have a column header, columns are named Col1, Col2, etc.</p>
+<pre>
+  # print each of spreadsheet into an HTML table on the web
+  ($tableObjects, $tableNames, $columnHeaders)=xls2tables(&quot;Tables.xls&quot;);
+  foreach my $t (@$tableObjects) {
+    print &quot;&lt;h1&gt;&quot;, shift @$tableNames, &quot;&lt;/h1&gt;&lt;br&gt;&quot;;
+    print $t-&gt;html;
+  }</pre>
+<pre>
+  ($tableObjects, $tableNames, $columnHeaders)=xlsx2tables(&quot;Tables.xlsx&quot;, undef, [1]);</pre>
+<p>This will only read the first sheet. By providing sheet names or sheet indicies, you save time if you are not interested in all the sheets.</p>
+</dd>
+<dt><strong><a name="tables2xls" class="item">tables2xls ($fileName, $tables, $names, $colors, $portrait, $columnHeaders)</a></strong></dt>
+
+<dt><strong><a name="tables2xlsx" class="item">tables2xlsx ($fileName, $tables, $names, $colors, $portrait, $columnHeaders)</a></strong></dt>
+
+<dt><strong><a name="tables2excel" class="item">tables2excel ($fileName, $tables, $names, $colors, $portrait, $excelFormat, $columnHeaders)</a></strong></dt>
+
+<dd>
+<p>table2xls is for writing Excel .xls files (binary, 2003 and prior), xlsx2table is for writing .xlsx file (2007, compressed XML format).
+tables2excel will export to 2007 format, if $excelFormat is not specified.</p>
+<p>$fileName is used to name the output Excel file.
+$tables is a reference to an array of Data::Table objects to be write into the file, one sheet per table.
+$names is a reference to an array of names used to name Spreadsheets, if not provided, it uses &quot;Sheet1&quot;, &quot;Sheet2&quot;, etc.
+$colors is a reference to an array of reference to a color array.
+Each color array has to contains three elements, defining Excel color index for odd rows, even rows and header row. 
+Acceptable color index (or name) is defined by the docs\palette.html file in the CPAN Spreadsheet::WriteExcel package.</p>
+<p>$portrait is a reference to an array of orientation flag (0 or 1), 1 is for Portrait (the default), where each row represents a table row.  In landscape (0) mode, each row represents a column.  (Similar to Data::Table::html and Data::Table::html2).</p>
+<p>$columnHeaders is a reference to an array of boolean, indicating whether to export column headers for each table. By default, column headers are exported.</p>
+<p>The arrays pointed by $names, $colors, $portraits and $columnHeader should be the same length as that of $tables. these customization values are applied to each table objects sequentially.
+If a value is missing for a table, the method will use the setting from the previous table.</p>
+<pre>
+  tables2xls(&quot;TwoTables.xls&quot;, [$t_A, $t_B], [&quot;Table_A&quot;,&quot;Table_B&quot;], [[&quot;white&quot;,&quot;silver&quot;,&quot;gray&quot;], undef], [1, 0], [1, 1]);</pre>
+<p>This will produce two spreadsheets named Table_A and Table_B for table $t_A and $t_B, respectively.  The first table is colored in a black-white style, the second is colored by the default style.
+The first table is the default portrait oritentation, the second is in the transposed orientation.</p>
+</dd>
+<dt><strong><a name="is_xlsx" class="item"><code>is_xlsx($fileName)</code></a></strong></dt>
+
+<dd>
+<p>Returns boolean whether the given file is 2007 format. It does not rely on file name, but reads the first two bytes of the file. .xlsx is in Zip format, therefore the first two bytes are &quot;PK&quot;.</p>
+</dd>
+<dt><strong><a name="xlsx2xls" class="item">xlsx2xls($fromFileName, $toFileName)</a></strong></dt>
+
+<dt><strong><a name="xls2xlsx" class="item">xls2xlsx($fromFileName, $toFileName)</a></strong></dt>
+
+<dd>
+<p>Converts an Excel file from one format to another. If $toFileName is not specified, $toFileName will be the same as $fromFileName, except with extension sets to .xlsx or .xls.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Copyright 2008, Yingyao Zhou. All rights reserved.</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<pre>
+
+Please send bug reports and comments to: easydatabase at gmail dot com. When sending
+bug reports, please provide the version of Data::Table::Excel.pm, the version of
+Perl.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<pre>
+  Data::Table.
+
+</pre>
+
+</body>
+
+</html>

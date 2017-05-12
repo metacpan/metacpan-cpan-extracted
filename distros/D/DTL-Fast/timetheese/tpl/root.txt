@@ -1,0 +1,8 @@
+{% spaceless %}
+    {% include "parent.txt" %}
+{% endspaceless %}
+    {% include "child1.txt" %}
+    {% include "child2.txt" %}
+    {% include "child3.txt" %}
+    {% include "child4.txt" %}
+    {% include "child5.txt" %}

@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Chip::SDCard;
+use Device::Chip::Adapter;
+
+use Getopt::Long;
+use Time::HiRes qw( sleep );
+
+GetOptions(
+   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+) or exit 1;
+
+my $card = Device::Chip::SDCard->new;
+$card->mount(
+   Device::Chip::Adapter->new_from_description( $ADAPTER )
+)->get;
+
+$card->initialise->get;
+print STDERR "Card initialised\n";
+
+my $sectors = $card->size->get / 512;
+
+foreach my $lba ( 0 .. $sectors ) {
+   my $bytes = $card->read_block( $lba )->get;
+   printf STDERR "BLOCK LBA %d of %d\n", $lba, $sectors;
+   print $bytes;
+}

@@ -1,0 +1,183 @@
+Revision history for Date-Baha-i
+
+0.1903 2014-09-18
+    - Removed documentation cruft.
+    - Removed accidental example duplication.
+    - Added a commandline example.
+
+0.1902  2010.06.09
+    - Test with normalized date format to (hopefully) fix from_bahai.t.
+
+0.1901  2010.06.07
+    - Forgot to flesh-out my Makefile.PL. Oops.
+
+0.19  2010.06.06
+    - Refactored with Module::Starter.
+    - Removed needless POD.
+    - Removed zero padding in hopes that my failing test will pass...
+
+** And now: Reverse history! **
+
+0.01  Tue Mar  4 17:53:30 2003
+	- original version; created by h2xs 1.22 with options
+		-X -n Date::Baha::i
+
+0.02  Wed Mar  5 2003
+    - Used constants in place of mystery literals.
+    - Moved the final date computations to a separate, private subroutine.
+    - Fixed feeble, broken test case.
+
+0.03  Wed Mar  5 2003
+    - Added a time zone offset key to the date () return.
+    - Made date () return a hash, instead of a hasref.
+    - Added functions to return the names of cycles, years, months, days, the days of the week, and hold days.
+    - Updated the test suite, of course.
+
+0.03.1  Wed Mar  5 2003
+    - Ack! I kept forgetting to add Date::Calc to the Makefile.PL dependencies.  *sob*
+
+0.04  Wed Mar  5 2003
+    - Added a Gregorian to Baha'i date function.
+    - Used Exporter.
+    - Updated the documentation and test suite, of course.
+
+0.04.1  Thu Mar  6 2003
+    - Fixed incomplete documentation.
+
+0.04.2  Thu Mar  6 2003
+    - Fixed export list.
+    - Gave _foo type names to "private" functions.
+    - Cleaned up documentation.
+
+0.04.3  Fri Mar  7 2003
+    - Oof!  I forgot to test install the package!  Fixed the name of a private function call.
+    - Cleaned up documentation.
+
+0.05  Fri Mar  7 2003
+    - Cleaned up and enhanced documentation.
+    - Returned friendly strings with the date names and ordinals, given scalar context for the date () and greg_to_bahai () functions.
+    - Updated test suite accordingly.
+
+0.06  Fri Mar 21 2003 - Naw Ruz!
+    - Oof!  Corrected the year calculation.
+    - Exported the as_string () function.
+    - Enhanced the as_string () function with diverse output representations.
+    - Updated documentation and test suite accordingly.
+    - Made the test suite non-lame.  Yay!
+
+0.06.1  Sat Mar 22 2003
+    - Cleaned up documentation.
+
+0.06.2  Sat Mar 22 2003
+    - Oof!  Fixed the syntax of a function call to which I had changed to interface.
+    - Deleted the timezone key from the returned date_hash in the test suite.
+
+0.07  Sat Mar 22 2003
+    - Used gmtime in the date and greg_to_bahai functions, if asked to.
+    - Incremented the day number if we are using localtime.  XXX: Why??
+    - Made tests use gmtime.
+
+0.08  Sun Mar 23 2003
+    - Corrected the "addition of one day" in the date () function.
+    - Fixed the syntax of the HOLY_DAYS constant hash.
+    - Added the current holy day to the date, if the day is on one.
+    - Added a next_holy_day () function.
+
+0.08.1  Sun Mar 23 2003
+    - Fixed documentation.
+    - Added a reminder to integrate with DateTime to the TO DO section.
+
+0.09  Tue Apr 29 2003
+    - Fixed documentation.
+    - Replaced the Date::Calc::Date_to_Time () function with Time::Local in the greg_to_bahai () function.
+
+0.10  Tue Apr 29 2003
+    - Ack.  I'm a dork.  I don't even need the greg_to_bahai() function.  It has a dumb name too...
+    - In the same purge, I got rid of the stupid conversion to epoch seconds and back.
+
+0.11  Tue Apr 29 2003 
+    - Added the first and twelfth days of Ridvan to the HOLY_DAYS hash.
+    - Corrected the off-by-one error in the _invert_holy_days() function.
+    - Updated the test script, accordingly.
+
+0.11.1  Wed Apr 30 2003
+    - Cleaned and fixed documentation.
+
+0.11.2  Mon May 5 2003
+    - Fixed documentation a bit.
+
+0.11.3  Wed May 7 2003
+    - Oof.  Fixed the incorrect holy_day documentation.
+
+0.12  Sun May 18 2003
+    - Fixed a misnaming that would miscalculate the holy day in a leap year Ayyam-i-Ha.
+    - Fixed the start date for the Ayyam-i-Ha HOLY_DAYS entry.
+    - Changed "timestamp" to "epoch".
+    - Renamed the date function to "to_bahai" and added sub date { goto &to_bahai }.
+    - Added a ymd from_bahai function.
+    - Replaced the heart of the to_bahai function with some simple date comparison code.
+    - Removed cumbersome helper functions that were only used in the to_bahai function.
+    - Made the next_holy_day function return a string in scalar context and a hash (instead of a hash reference) in array context.
+    - Cleaned up random bits of other code, in general.
+    - Fixed and enhanced documentation.
+    - Retooled the test suite to test every date in a Baha'i year for the to_bahai and from_bahai functions.
+
+0.12.1  Sun May 18 2003
+    - Corrected and enhanced documentation.
+
+0.12.2  Tue May 20 2003
+    - Cleaned a bit of code.
+    - Fixed as_string.t
+
+0.12.3  Wed May 21 2003
+    - Fixed, pruned and augmented documentation.
+
+0.13  Sun May 25 2003
+    - Deprecated (i.e. removed) the sub date.
+    - Fixed a semantic error in the "short alpha" clause of the as_string function.
+    - Removed the dow number from the "short numeric" as_string output.
+    - Changed the [month, day] HOLY_DAYS value to ['month.day'].
+    - Fixed the _invert_holy_days function accordingly.
+    - Removed the date returned by the next_holy_day function.  Also, I made the function only operate in scalar context.
+    - Fixed documentation.
+
+0.13.1  Fri Jul 11 2003
+    - Excised the unnecessary =head1 ABSTRACT section.
+
+0.14  Fri Jul 18 2003
+    - Replaced Lingua::Num2Word (which mysteriously prints absolutely nothing under my Mac OS X Perl 5.6.1) with Lingua::EN::Numbers (which works perfectly).
+    - Tweezed documentation.
+    - Moved i.pm under lib/Date/Baha/.
+
+0.15  Thu Jul 24 2003
+    - Ack!  Forgot a Lingua::Num2Word under the as_string tz clauses.
+    - Added the (superior to the Date::Calc) tz_offset() and tz_name() functions (which made as_string() rock finally) from Time::Zone.
+
+0.15.1  Thu Jul 24 2003
+    - Whoops.  Added Time::Zone to the Makefile.PL (and README dependencies).
+
+0.1502  Sun Sep 27 2003
+    - Updated POD.
+    - Put the version on it's own line.
+
+0.16  First day of Ayyam-i-ha year 160
+    - Got rid of the annoying "pre-open-paren space after sub" call syntax.
+    - Made next_holy_day() work without arguments and also return the (Gregorian) date of the holy day.
+
+0.1601 Sat Dec 1 2007
+    - Fixed the "non-numeric" test string that was changed since I last worked on this.
+
+0.17 Sun Dec 2 2007
+    - Improved the as_string() English with TorgoX's Lingua::EN::Numbers::Years package.
+    - Why am I computing timezone logic? This is a *date* module not a time module. TZ is out.
+
+0.18 Sun Dec 2 2007
+    - Improved as_string() yet again with num2en_ordinal().
+    - Updated tests for this.
+    - Removed cruft from the Makefile.
+
+0.1801 Sun Dec 2 2007
+    - Repaired crusty POD. *No code changes.*
+
+0.1802 Mon Dec 3 2007
+    - Whoops. Need to require 5.6 in the Makefile.

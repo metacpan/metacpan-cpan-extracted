@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+corpus/DZT/dist.ini
+corpus/DZT/lib/DZT.pm
+corpus/DZT/test/01-basic.t
+lib/Dist/Zilla/Plugin/test2t.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/basic.t
+t/use_ok.t
+xt/release/pod-syntax.t

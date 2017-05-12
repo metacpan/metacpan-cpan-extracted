@@ -1,0 +1,47 @@
+==================================================
+Changes from 1740-12-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2014-10-01 12:03:16 +0000
+------------------------------------------
+
+  Change: 29f1828e3f71784534fc3def430d718f65155288
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 14:02:57 +0000
+
+    Command line driver test utility 
+
+  Change: 2e62f2b9cdbff7e7723398f5bf3af3306883f818
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 12:14:19 +0000
+
+    Overload feature 
+
+  Change: b48fe9386b00a7b6bb82aabdcec1824c0acfce2f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 10:25:36 +0000
+
+    Little check 
+
+  Change: 266cb415d1711a9900e89d644b33503f5a87726b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 10:01:31 +0000
+
+    Added travis.yml 
+
+  Change: ede851ad5ef6f8a5422b748741813e745d0d8b60
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 10:01:05 +0000
+
+    First release, base concept idea 
+
+  Change: a35554697a5fb08bfe2ac65e7bc294dbe8683d00
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-10-01 07:48:27 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

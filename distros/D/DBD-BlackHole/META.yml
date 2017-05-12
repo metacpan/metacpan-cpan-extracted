@@ -1,0 +1,45 @@
+---
+abstract: 'NULL database driver for DBI'
+author:
+  - 'karupanerura <karupa@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.5, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-BlackHole
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBD::BlackHole:
+    file: lib/DBD/BlackHole.pm
+    version: '0.03'
+  DBD::BlackHole::db:
+    file: lib/DBD/BlackHole.pm
+  DBD::BlackHole::dr:
+    file: lib/DBD/BlackHole.pm
+  DBD::BlackHole::st:
+    file: lib/DBD/BlackHole.pm
+requires:
+  DBI: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/karupanerura/DBD-BlackHole/issues
+  homepage: https://github.com/karupanerura/DBD-BlackHole
+  repository: git://github.com/karupanerura/DBD-BlackHole.git
+version: '0.03'
+x_authority: cpan:KARUPA
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

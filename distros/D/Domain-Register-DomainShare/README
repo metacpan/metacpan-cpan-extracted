@@ -1,0 +1,18 @@
+Dot TK's DomainShare program
+
+This library allows you to integrate Dot TK's DomainShare API easily.
+
+Dot TK DomainShare is used to register free .TK domain names for others. 
+It's not only used by Internet hosting providers and Internet access 
+providers to register unlimited free domain names for their customers, 
+but also by a wide range of other software developers that use 
+DomainShare within their applications.
+
+You will need to signup for DomainShare before you can use the API. 
+
+For more info on DomainShare, please point your browser to http://domainshare.tk
+
+For support on this Perl module, please visit the Discussion Board at 
+http://fb-domainshare.tk 
+
+

@@ -1,0 +1,25 @@
+Revision history for Devel-StackBlech
+
+0.01
+  - 
+
+0.02 Sat Jun 21, 2008
+  - exports dumpStack as a C function
+  - exports dumpStack as a Perl function
+  - depends on itself
+
+0.03 Sat Jun 21, 2008
+  - Removing ppport.h like ppport.h suggests
+
+0.04 Mon Sep 29, 208
+  - Renamed all exported C functions to have a "dsb_" prefix to
+    hopefully be something unlikely to conflict with another module.
+  - Updated documentation. It used to document a stackBlech() function
+    but that never existed.
+  - Devel::StackBlech is no longer dependant on having
+    Devel::StackBlech 4294967295.0 pre-installed.
+
+0.05 Tue Dec 29, 2009
+  - Buildable on threaded perl
+  - Tested
+  - Aliased dumpStack to dumpStacks

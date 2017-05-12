@@ -1,0 +1,59 @@
+{
+   "abstract" : "Hexadecimal Range Dumper with color, bitfields and skip ranges",
+   "author" : [
+      "Nadim ibn hamouda el Khemir. <nkh@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-HexDump-Range",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Block" : "0",
+            "Test::Exception" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0",
+            "Text::Diff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::TreeDumper" : "0",
+            "Getopt::Long" : "0",
+            "List::MoreUtils" : "0",
+            "List::Util" : "0",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "Term::Bash::Completion::Generator" : "0",
+            "Text::Colorizer" : "0",
+            "Text::Pluralize" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::HexDump::Range" : {
+         "file" : "lib/Data/HexDump/Range.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.13.72"
+}

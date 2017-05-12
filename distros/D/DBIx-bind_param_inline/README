@@ -1,0 +1,29 @@
+DBIx-bind_param_inline version 0.03
+===================================
+
+Syntactic sugar that implies bind_param calls, so that one
+may embed package variables in SQL and they get bound for you
+at execute time.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  DBD::SQLite is used in the testing
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by David Nicol
+
+I hereby release this library into the public domain.
+

@@ -1,0 +1,395 @@
+=pod
+
+=head1 Embperl and DBIx::Recordset
+
+This introduction gives an overview how to use I<DBIx::Recordset> together
+with I<HTML::Embperl>. Since there are only a few I<Embperl> specific 
+things herein, it should be also usefull for non I<Embperl> users.
+
+=head2 Overview
+
+It is often very difficult to layout and design the output of normal CGI
+scripts, because you are dealing with
+HTML-sourcecode which spans  multiple prints, and it isn't possible to use
+some sort of  HTML-editor. Embperl takes a different approach to this problem.
+With Embperl, you  can build your HTML-pages 
+with any tool you like, and you can embed fragments of code directly 
+in the page. This makes it much easier for 
+non-programmers to use, because they are able to use 
+their usual tools and they see the fragments of code as normal text. 
+This indroduction will deal with the Perl Modules I<HTML::Embperl> and
+I<DBIx::Recordset>, with a focus on database access.
+
+=head2 Embperl
+
+In brief, the purpose of Embperl is to execute code that is
+embedded in HTML-pages as the page is requested from the server.
+There are two ways to do this with Embperl. The first way is to 
+embed the code between [- and -] tags. This will cause
+Embperl to execute the code and remove it from the source before sending
+the page. The second way is to use [+ and +] as the delimiter, in which case
+the code will be executed and the result of the execution is send to the
+browser in place of the code.
+All database access is done via the module I<DBIx::Recordset>, which simplifies
+a lot of common tasks when accessing a database via DBI.
+
+=head1 Basic Example 
+
+The following example shows the basic functions of both modules. It shows the
+contents of a table whose name is passed as a parameter:
+
+<body>
+  <h1>Contents of table "[+ $fdat{'!Table'} +]"</h1>
+
+  [-
+  use DBIx::Recordset ;
+ 
+  $fdat{'!DataSource'} = 'dbi:mysql:test' ;
+  *set = DBIx::Recordset -> Search(\%fdat) ;
+  $names = $set -> Names ;
+  -]
+
+  <table>
+    <tr>
+      <th>[+ $names -> [$col] +]</th>
+    </tr>
+    <tr>
+      [- $rec = $set[$row] -]
+      <td>[+ $rec -> {$names->[$col]} +]</td>
+    </tr>
+  </table>
+</body>
+
+
+To show the contents of the table C<address> you may call it with:
+
+  http://www.domain.com/path/to/example1.htm?!Table=address
+
+All query parameters are placed in the hash C<%fdat> by Embperl. In 
+our example, C<$fdat{'!Table'}> would contain the value C<address>.
+Additionally, Embperl replaces the code between C<[+> and C<+]> with the 
+result, so the headline of the page would be 'Contents of table "address"'.
+
+The following [- -] block will be executed by Embperl. No trace of it will show up
+in the page that is sent to the browser. The first line sets the database which should be
+accessed. The syntax is the same as for the DBI connect call. If you omit the line, you 
+must additionally send the databasename as a query parameter - but for security reasons,
+that isn't a very good idea. 
+
+=head2 Search
+
+Next we call the method C<Search> of I<DBIx::Recordset>, where we have the choice between
+the object and the class-method. This applies to a lot of other methods as well.
+When we call it as a class method, as we do in our example, it constructs a new I<DBIx::Recordset>
+object and uses the passed parameters to query the database. It's also possible to divide 
+these two steps and call C<Setup> to first construct the object and then 
+C<Search> with this  object to execute the Search. In the example above, we do
+not pass any query parameters -- so  C<Search> will return the contents of the
+whole table. (I<DBIx::Recordset> converts the call  internally to the SQL
+statement C<SELECT * FROM address>).
+
+The last line of the [- -] block retrieves the fieldnames of the table. Here we can see
+a special feature of I<DBIx::Recordset>, which we will discuss in detail later on. The
+constructor returns a B<typeglob> (C<*set>), but the call to C<Names> uses a B<scalar> (C<$set>).
+By returning a typeglob, I<DBIx::Recordset> is able to return a B<scalar>, an B<array> and 
+a B<hash> at the same time. (If you don't like the idea of using typeglobs, you can also
+construct all three with different methods).
+
+=head2 Display the table
+
+At first glance, the following might appear to be a simple HTML-table. But I<Embperl>
+expands it, so that the full contents of the database table is shown. Let us first look at
+the header, which should show the fieldnames of the database-table: C<$names>
+contains a reference to an array which contains the fieldnames. I<Embperl>
+gives us the magical variable C<$col>. C<$col> will be automatically
+incremented as long as the result of the expression which contains C<$col>
+doesn't return B<undefined>. At the same time, I<Embperl> repeats the
+surrounding C<<th>> or C<<td>> tags. If we have a table with the three columns
+C<name>, C<firstname> and C<town>, the output would look like this:
+
+  <th>name</th><th>firstname</th><th>town</th>
+
+Now the header is ready and we can start to output the contents. Here we use
+the array part of the typeglob that is returned by C<Search>. Access to the
+results of the SQL-query is done via the array C<@set>, and every row of the
+array "contains" one row of the database-table. It does not really contain the
+row, but I<DBIx::Recordset> will fetch the row from the databases for you if
+you access the corresponding array row. The rows are stored as a hash, where
+the fieldnames are the hashkeys. This is the same mechanism that helped us
+to expand the columns of the header, but it's at work here in a
+two-dimensional manner. C<$row> contains the row-count and C<$col> contains the
+column-count.
+
+=head2 Supplying query parameters
+
+But our small example can do even more: If we supply more query parameters 
+in our request, we can decide which parts of the table should be selected 
+(and therefor, shown). If we request the page with
+
+  http://wwww.domain.com/path/to/example1.htm?!Table=address&town=Berlin
+
+I<Embperl> will not only place C<!>C<T>C<able> in the hash C<%fdat>, but also C<town>.
+Since C<town> corresponds to a fieldname in our table, I<DBIx::Recordset> interprets
+it as a parameter for the C<WHERE> part of the C<SELECT> command. I<DBIx::Recordset>
+will generate the following SQL-query:
+
+  SELECT * FROM address WHERE town='Berlin' ;
+
+The programmer doesn't have to pay attention to datatypes or quoting, this is
+done automatically by I<DBIx::Recordset>.
+
+Also, complex queries are easy to implement: if, for example, the user wants
+to  be able to search for a name or for a town, it would be possible to use
+the  following form:
+
+  <form action="/path/to/example1.htm" method=GET >
+    <input type=text name="+name|town">
+    <input type=hidden name="!Table" value="address">
+    <input type=submit>
+  </form>
+
+If the user enters "Richter" to the input field and presses the submit button, 
+the following SQL-query will be generated:
+
+  SELECT * FROM address WHERE name='Richter' OR town='Richter' ;
+
+Just by varying the parameters, it is possible to create simple or complex queries.
+In this way, you can use the same page with different parameters to create 
+different sorts of queries.
+
+
+=head1 Multiple tables
+
+Until now, we only have worked with one table. In real life, you often have to
+deal with mulitple tables. For this reason, I<DBIx::Recordset> helps you to
+reduce the expense associated with dealing with multiple tables. The simplest
+way to  do this is to use the
+parameters C<!TabJoin> and C<!TabRelation> to tell I<DBIx::Recordset> to create
+an SQL-join between two or more tables. This will link the tables together and
+the result looks just like one great table.
+
+More interesting is the possibility to create B<"links">. As an example, we'll take the same
+table we used above and divide it into two tables: one table for the names and one
+table for the towns. As a link we add an id-field. If the fields are following some naming
+convention, I<DBIx::Recordset> is able to find this link automatically. If fields are
+named in another way, you have to tell I<DBIx::Recordset> manually how the tables belong
+together.
+
+  Table name:	    firstname, name, town_id
+  Table town:	    id, town
+
+Here, every name has exactly one town and every town has a number of names assigned.
+With a simple modification of our first example, we could get the same result
+as above (except that we are now dealing with two tables instead of one):
+
+                                                                      
+  [-
+  use DBIx::Recordset ;
+  $db = DBIx::Database -> new ('dbi:mysql:test') ;
+  $db -> TableAttr ('town', '!NameField', 'town') ;
+
+  $fdat{'!DataSource'} = $db ;
+  $fdat{'!LinkName'} = 3 ;
+  *set = DBIx::Recordset -> Search(\%fdat) ;
+  $names = $set -> Names ;
+  -]
+
+
+And the request would be:
+
+  http://www.domain.com/path/to/example2.htm?!Table=name
+
+
+=head2 DBIx::Database
+
+The new thing here is the C<DBIx::Database> object. It gathers meta-information 
+about the database and stores it for later use. Because of the names of the fields
+the object can detect that the field C<town_id> in the table C<name> points to
+field C<id> in the table C<town>. Additionally, we tell the C<DBIx::Database> object
+which column(s) contain the human-readable name of the table C<town>.
+These initialisations only have to be executed once. If you use 
+I<mod_perl>, for example, you should be able to move these lines into 
+a common startup file.
+
+Also new is the parameter C<!LinkName>. It tells I<DBIx::Recordset> to return
+the human-readable name (in our example, C<town>) instead of the field which links
+the two tables together (C<town_id> in our example). Internally, I<DBIx::Recordset>
+generates an SQL-join, so there is only one C<SELECT> command necessary and the result
+is just the same as in the last example.
+
+=head2 Sub-Objects
+
+But what to do if we have the C<id> of a town and want to display all the names that
+belongs to it? An I<Embperl>-page that does this job might look something like this: 
+
+<body>
+  [-
+  use DBIx::Recordset ;
+  $fdat{'!DataSource'} = 'dbi:mysql:test' ;
+  $fdat{'!Table'} = 'town' ;
+  *set = DBIx::Recordset -> Search(\%fdat) ;
+  -]
+
+  town: [+ $set{town} +]<br>
+  <table>
+    <tr>
+      <th>name</th><th>firstname</th>
+    </tr>
+    <tr>
+      [- $rec = $set{-name}[$row] -]
+      <td>[+ $rec -> {name} +]</td><td>[+ $rec -> {firstname} +]</td>
+    </tr>
+  </table>
+</body>
+
+A request to that page might look like this: 
+
+  http://www.domain.com/path/to/example3.htm?id=5
+
+In this example, we specify the name of the table directly inside the page, so it
+can't be overwritten from outside. The call to C<Search> returns the town for the
+given query parameters. In our example, it will select the town with the C<id> 5.
+The command C<[+ $set{town} +]> shows the value of the field town in the current
+record. After the call to C<Search>, this is the first selected record.
+Next, we need to display all the names. This is very easy using the special field
+C<-name>. C<-name> contains a sub-object for the table C<name>. The query parameters
+for this sub-object are set by I<DBIx::Recordset> in such a way that it contains all 
+names which meet the link-condition. We just wrap it in a table and we are already done.
+
+=head1 Modify the Database
+
+Up to this point, we have only discussed the retrieval and display of data.
+But of course it's also possible to modify data. The simplest way to do this
+is to assign new  values to the result of a C<Search> call. For example, you
+may write C<$set{town} = 'Frankfurt'> to change the name of the town.
+I<DBIx::Recordset> converts this into a vaild SQL-Update-command.
+
+While this is very useful in normal Perl scripts, you probably won't use it very 
+often in a cgi script. 
+The methods C<Insert>/C<Update>/C<Delete> will probably prove more useful. 
+Just like C<Search>, these directly accept query parameters posted to the page.
+The method C<Execute> combines all four of these together,
+making it possible to control the type of action via the CGI-parameters.
+
+Here is an example:
+
+<html>
+<head>
+<title>Database Access with HTML::Embperl and DBIx::Recordset</title>
+</head>
+<body>
+
+  [-
+  ### Database-parameter ###
+  use DBIx::Recordset ;
+  $fdat{'!DataSource'} = 'dbi:mysql:test' ;
+  $fdat{'!Table'} ||= 'town' ;
+  $fdat{'!PrimKey'} = 'id' ;
+  $fdat{'$max'}     = 10 ;
+
+  ### Execute action according to the query parameters ###
+  *set = DBIx::Recordset -> Execute (\%fdat) ;
+  -]
+
+  [$if $DBI::errstr $]
+	<h1>Database Error [+ $DBI::errstr +]</h1>
+  [$else$]
+    [-$names = $set -> AllNames ; -]
+    [$if $set[0] && $set -> MoreRecords $]
+      [### We found more then one record ###]
+      [### -> display as a table         ###]
+      <table>
+	<tr>  [### Display header ###]
+	  <th>[+ ucfirst ($names -> [$col]) +]</th>
+	</tr>
+	<tr>  [### Display record -> Table will be expanded by Embperl ###]
+	  [- $rec = $set[$row] -]
+	  <td>
+	    [- $name = $names -> [$col] -]
+	    [$if $name eq $fdat{'!PrimKey'} $]
+	      [### Generate HTML link to edit this record ###]
+	      <a href="example4.htm?!Table=[+ $fdat{'!Table'} +]&[+ $fdat{'!PrimKey'} +]=[+ $rec ->{$fdat{'!PrimKey'}} +]">[+ $rec -> {$name} +]</a>
+	    [$elsif $set -> Link4Field($name) $]
+	      [### Link to other table -> generate HTML link ###]
+	      [- $link = $set -> Link($set -> Link4Field($name)) -]
+	      <a href="example4.htm?!Table=[+ $link -> {'!Table'} +]&[+ $link -> {'!LinkedField'} +]=[+ $rec -> {$link -> {'!MainField'}} +]">[+$rec -> {$name}+]</a>
+	    [$else$] 
+	      [### Display contents of field ###]
+	      [+ $rec -> {$names->[$col]} +]
+	    [$endif$]
+	    </td>
+	</tr>
+      </table>
+      [+ $set -> PrevNextForm ('\<\<Prev', 'Next\>\>', \%fdat) +]
+      <hr>
+      <a href="example4.htm?!Table=[+ $fdat{'!Table'} +]&%3dempty=1">Search</a> record in table '[+ $fdat{'!Table'} +]' 
+    [$else$]
+      [### We found no/one record(s) ###]
+      [### -> Display form          ###]
+      <form>
+	<table>
+	<tr>
+	  [- $name = $names -> [$row] -]
+	  <td> [### Display fieldname ###]
+	    [+ ucfirst ($name) +]
+	  </td>
+	  <td> [### Display content of field ###]
+	    <input type=text name="[+ $name +]" value="[+ $set{$name} +]">
+	    [$if $set -> Link4Field($name) $]
+	      [### Link to other table -> generate HTML link ###]
+	      [- $link = $set -> Link($set -> Link4Field($name)) -]
+	      <a href="example4.htm?!Table=[+ $link -> {'!Table'} +]&[+ $link -> {'!LinkedField'} +]=[+ $set{$link -> {'!MainField'}} +]">Show record from table '[+ $link -> {'!Table'} +]'</a>
+	    [$endif$]
+	  </td>
+	</tr>
+	</table>
+	[### Buttons for the different actions, the "name" attribute determinates ###]
+	[###  which action should be taken                                        ###]
+	<input type=submit name="=search" value="Search">
+	<input type=submit name="=empty"  value="New">
+	<input type=submit name="=insert" value="Add">
+	<input type=submit name="=update" value="Update">
+	<input type=submit name="=delete" value="Delete">
+	<input type=hidden name="!Table"  value="[+ $fdat{'!Table'} +]">
+      </form>
+    [$endif$]
+  [$endif$]
+</body>
+</html>
+
+When you first request this page, it will show the contents of the 
+preset table. Alternatively, you can supply a tablename with the 
+parameter C<!T>C<able>. The link, which is shown at the bottom of the 
+page, leads you to an imput form. There, you can fill in one or 
+more fields and press the B<Search> button. This invokes the page 
+itself and C<Execute> will be instructed by the parameter C<=s>C<earch> 
+(Name of the button "Search") to retrieve all records which match 
+the entered values. 
+
+If the query finds more then one record, a table with all records found 
+will be shown. If there are more records than specified by the parameter C<$max>, only
+C<$max> records are displayed. If this is the case, the C<PrevNextForm> method 
+adds a "Previous" and a "Next" button to the page, allowing you to browse
+through the whole table. 
+In the example above, we assume that every table has a primary key, 
+which is passed 
+to I<DBIx::Recordset> by the line C<$fdat{'!PrimKey'} = 'id' ;>. The column which
+contains this primary key will be displayed as an HTML link containing the 
+parameters to execute a search for just this record. As you can see in 
+example4.htm, this can be used to display a form which includes some of 
+the data from the found record (see below). 
+Columns which are links to other tables will also be shown with an HTML-link. A click 
+on that link will open the linked table or record.
+
+If the search only selects one record, the same form is shown, but with the data from
+the record filled in. Now it's possible to change the content. The changes are
+written to the database when you press the button B<Update> (parameter C<=update>).
+A new, empty form could be shown with the button B<New> (parameter C<=empty>) and if
+you have written data into this empty form, you can add it as a new record with the
+B<Add> button (parameter C<=insert>). Last but not least, there is a B<Delete> button
+(parameter C<=delete>). In all of these cases, the content of the form is sent to the page 
+itself, and the C<Execute> method at the start of the page executes the desired action.
+
+More comments can be found inside the source ([# #] blocks).
+
+

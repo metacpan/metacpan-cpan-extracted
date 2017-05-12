@@ -1,0 +1,17 @@
+Revision history for Digest::MurmurHash3::PurePerl
+
+1.01 2014-09-10T12:16:05Z
+    - Fixed violation of CPAN Meta Spec
+
+1.00 2013-06-18T16:56:42Z
+    - Bump up version
+
+0.03 2013-06-18T15:37:29Z
+    - Improved test
+    - Change authoring tool to Minilla
+
+0.02 2013-06-16T23:15:00Z
+    - Fixed bit operation bug in 32-bit environment
+
+0.01 2013-06-08T16:14:58Z
+    - Initial release

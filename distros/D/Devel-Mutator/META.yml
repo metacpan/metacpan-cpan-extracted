@@ -1,0 +1,58 @@
+---
+abstract: 'Mutation testing for Perl'
+author:
+  - 'Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Mutator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::Mutator:
+    file: lib/Devel/Mutator.pm
+    version: '0.03'
+  Devel::Mutator::Command::Mutate:
+    file: lib/Devel/Mutator/Command/Mutate.pm
+  Devel::Mutator::Command::Test:
+    file: lib/Devel/Mutator/Command/Test.pm
+  Devel::Mutator::Generator:
+    file: lib/Devel/Mutator/Generator.pm
+requires:
+  Capture::Tiny: '0'
+  Docopt: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Path: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  PPI: '0'
+  Text::Diff: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/vti/devel-mutator/issues
+  homepage: https://github.com/vti/devel-mutator
+  repository: git://github.com/vti/devel-mutator.git
+version: '0.03'
+x_authority: cpan:VTI
+x_contributors:
+  - 'Alexandr Ciornii <alexchorny@gmail.com>'
+  - 'Patricio Valle <patricio.valle@globant.com>'
+  - 'Tim Teasdale <tim.teasdale@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

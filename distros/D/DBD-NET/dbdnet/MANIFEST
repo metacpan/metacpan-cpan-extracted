@@ -1,0 +1,17 @@
+ChangeLog
+Informix.bs
+Informix.h
+Informix.pm
+Informix.xs
+MANIFEST
+Makefile
+Makefile.PL
+README
+dbdimp.ec
+dbdimp.h
+extratests/dblist.pl
+extratests/multicursor.pl
+extratests/numerics.pl
+extratests/original_0.20pl0_test.pl
+extratests/primitives.pl
+test.pl

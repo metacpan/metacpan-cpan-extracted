@@ -1,0 +1,39 @@
+OVERVIEW
+
+The DateTime-Fiscal-Year module is intended to provide methods for adjusting the start date of a calendar to match the start 
+date of a fiscal calendar and calculate the day or week of the fiscal year for a target date.
+
+INSTALLATION
+
+This module uses Module-Build to install, please see the Module-Build documentation for further instructions on using it. To 
+install this module, type the following in the distribution directory:
+
+perl Build.PL
+Build
+Build test
+Build install
+
+
+USAGE 
+
+use DateTime;
+use DateTime::Fiscal::Year;
+use strict;
+
+my $dt = DateTime->new(year => 2003, month=> 02, day=>01);
+my $dt2	= DateTime->new(year => 2003, month=> 03, day=>01);
+
+my $fiscal = DateTime::Fiscal::Year->new( start => $dt );
+
+$fiscal->day_of_fiscal_year( $dt2 );		# February 1 is now day 1 so March 1 is day 29, not day 60
+$fiscal->week_of_fiscal_year( $dt2 );		# February 1 is now in week 1 so March 1 is now week 5 not 8
+
+
+Refer to the modules documentation for further details, or look at the test in t/  They provide serveral examples.
+
+
+SUPPORT
+
+Support for this module can be obtained from
+
+datetime@perl.org

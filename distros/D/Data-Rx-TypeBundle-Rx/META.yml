@@ -1,0 +1,19 @@
+---
+abstract: 'Build types from Data::Rx schema (experimental)'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  Data::Rx: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Rx-TypeBundle-Rx
+requires:
+  Data::Rx::TypeBundle: 0
+version: 0.103520

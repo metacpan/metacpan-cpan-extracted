@@ -1,0 +1,78 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 235bb5b73789953b46e47f314e8ad5151acce1f9 .shipit
+SHA1 4c9e53558a6dbc3a40ecb52bbc526a6d937a477b Changes
+SHA1 f7c8ae3700309058e19618cf3286b824ba20e159 MANIFEST
+SHA1 fa12086c9dd047fd1d090dd2b726a01cc04ed6bd META.yml
+SHA1 47e31537a23d060ed70e3b3c4d014c00f0f33d4b Makefile.PL
+SHA1 ec8bde7d78141c610ceeb9f8f74d48dfca294406 README
+SHA1 53368d91c157d1932b76db94854288903ae7ec59 doc/rfc2445.txt
+SHA1 1ca8755782cececa8cb19deddbcbe03be8e73cfc examples/ical2html.pl
+SHA1 10f1ba97180b54e94ab30d9efe4aaa0a70aa1e26 inc/Module/AutoInstall.pm
+SHA1 d2664c57b65686abbfbbe1e71229761625be4922 inc/Module/Install.pm
+SHA1 b084961275ae4b66a9a0766372b0a08803aa63d1 inc/Module/Install/AutoInstall.pm
+SHA1 da41a8d9904f7b409b49a5f6c338d3eb305a2b4b inc/Module/Install/Base.pm
+SHA1 0db0afe19cd298abba248fa089e5525bd5ab3ab6 inc/Module/Install/Can.pm
+SHA1 e7152bfd5ca67d0e33f96d09c59d600bca5c1f15 inc/Module/Install/Fetch.pm
+SHA1 bd2183c72617105d0b65f3ef81d013bf4af337d6 inc/Module/Install/Include.pm
+SHA1 29ee1cb0dc262b00983e3a2f5cf00b538dff5069 inc/Module/Install/Makefile.pm
+SHA1 e963f80cfe255f16e55067d1feb6841cff3ed2fe inc/Module/Install/Metadata.pm
+SHA1 65a1f09af1f4f9e47a98b6b45667c328b1b2f9c0 inc/Module/Install/Win32.pm
+SHA1 f191c49475b3f51775180cd4f7e41e3bdab7f85a inc/Module/Install/WriteAll.pm
+SHA1 81c4f06af61b620f2923c2243901f628a6675f50 lib/Data/ICal.pm
+SHA1 feb8209da2105652a8e4d4b8fb3bc9581a8d7b74 lib/Data/ICal/Entry.pm
+SHA1 2803481758009f66e096afa3d91626673970922f lib/Data/ICal/Entry/Alarm.pm
+SHA1 e84b1c79549b3f9279277cc4a9f44448d1cefd7f lib/Data/ICal/Entry/Alarm/Audio.pm
+SHA1 5f51e155a9f450c902e366cee93015a2ae0d900b lib/Data/ICal/Entry/Alarm/Display.pm
+SHA1 d1d2e1f3f3a346d0b617a548b517bf63fcdb3331 lib/Data/ICal/Entry/Alarm/Email.pm
+SHA1 0c0e4a91f7db859a2db9c8b60c67decf6904b1dd lib/Data/ICal/Entry/Alarm/None.pm
+SHA1 dd21809687792ac7e69f042eda03b0a72b54d0e1 lib/Data/ICal/Entry/Alarm/Procedure.pm
+SHA1 dcb93443ab59b9f40430750aecb77212f9e75682 lib/Data/ICal/Entry/Alarm/URI.pm
+SHA1 916bb3345aebfc323695ba88eb084c785c4b35a2 lib/Data/ICal/Entry/Event.pm
+SHA1 8064bcb0682d328a6416d87cb22c0b8002a4c88a lib/Data/ICal/Entry/FreeBusy.pm
+SHA1 cf397568e16ae4587e2dda22e627f0550543e609 lib/Data/ICal/Entry/Journal.pm
+SHA1 49e67d4a297668372912178128ba57e4e1746443 lib/Data/ICal/Entry/TimeZone.pm
+SHA1 a96e10f861fcb12cccadd209c0f38da9ba059320 lib/Data/ICal/Entry/TimeZone/Daylight.pm
+SHA1 dd46f62ef99d926d3e0ef33cf417ef230e66707e lib/Data/ICal/Entry/TimeZone/Standard.pm
+SHA1 15a6d5aded4edac787ed42c14553c8a588ac23d8 lib/Data/ICal/Entry/Todo.pm
+SHA1 6e4030477e12b751b9cf0c29ba6bd3d596189321 lib/Data/ICal/Property.pm
+SHA1 371dc48be4670c99ffa5f732e7d7584465e39edc t/00.load.t
+SHA1 33d5621be343fcf0a596391bafba78f4b59b04ba t/01.simplegen.t
+SHA1 0ef26a49106e23a1a99e77f48b18e94a002ca350 t/02.linewrap.t
+SHA1 7aec87bcc3d62d762a2ec4adfaf120016fa1e3e0 t/03.unknown-props.t
+SHA1 1b8e8dde570944000c11b1ac7bdfe44bcdda96ab t/04.mandatory-props.t
+SHA1 e96acd335c8651c924bb2132fd53140fa0423d9c t/05.prop-params.t
+SHA1 e19a41be80213d3a306738f074992457623aa200 t/06.prop-bad-quote.t
+SHA1 6a3f262179361be328ae6ba4a6c9b0f63b4fa2b9 t/07.roundtrip.t
+SHA1 1d27dd46b94878b7494701eb143393f0438675c0 t/08.parse.t
+SHA1 69fce006e3f65f2dfc3c028126d7052cdc676dbb t/09.mime.t
+SHA1 e82bdabfb8322259de9c583fc5c161c4a1d0dcd1 t/10.mime-vcal10.t
+SHA1 b21127ca78036efd5296828b7f9d76c9c2d8f4da t/11.crlf.t
+SHA1 4296bf4950cffca77098c8c85562c444e9c0f897 t/12.verson1.t
+SHA1 21854f472cd60fd9ce6f88872691f2a744e0af5e t/ics/badlyformed.ics
+SHA1 3157614223f00a48699992314b1d48946fc45af7 t/ics/noversion.ics
+SHA1 7ad07fa3318aec73b0fe97ccbb8caa1d35b63927 t/ics/test.ics
+SHA1 4ff82f77563bdd06b4aec84830238b4535cfd07a t/ics/version1.ics
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iEYEARECAAYFAlTi7KoACgkQMflWJZZAbqAP1ACgoLpNT7lOyQzlTx/McDJInVOl
+VbAAn2jrGQ2NmyfRnBXEYRbCW0rDUP3r
+=flwi
+-----END PGP SIGNATURE-----

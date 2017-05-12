@@ -1,0 +1,94 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                    'requires' => {
+                                  'Code::TidyAll' => '0.56',
+                                  'Code::TidyAll::Plugin::SortLines::Naturally' => '0.000003',
+                                  'Code::TidyAll::Plugin::Test::Vars' => '0.02',
+                                  'DateTime' => '0',
+                                  'File::Find::Rule' => '0',
+                                  'File::Spec' => '0',
+                                  'File::pushd' => '0',
+                                  'Getopt::Long' => '0',
+                                  'IO::Handle' => '0',
+                                  'IPC::Open3' => '0',
+                                  'IPC::System::Simple' => '0',
+                                  'List::Util' => '1.33',
+                                  'Locale::Country' => '3.11',
+                                  'Net::FTP' => '0',
+                                  'Parallel::ForkManager' => '1.19',
+                                  'Path::Class' => '0',
+                                  'Perl::Critic' => '1.126',
+                                  'Perl::Tidy' => '20160302',
+                                  'Pod::Coverage::TrustPod' => '0',
+                                  'Pod::Wordlist' => '0',
+                                  'Test::CPAN::Changes' => '0.19',
+                                  'Test::CPAN::Meta::JSON' => '0.16',
+                                  'Test::CleanNamespaces' => '0.15',
+                                  'Test::Code::TidyAll' => '0.50',
+                                  'Test::EOL' => '0',
+                                  'Test::Mojibake' => '0',
+                                  'Test::More' => '0.96',
+                                  'Test::NoTabs' => '0',
+                                  'Test::Output' => '0',
+                                  'Test::Pod' => '1.41',
+                                  'Test::Pod::Coverage' => '1.08',
+                                  'Test::Portability::Files' => '0',
+                                  'Test::Spelling' => '0.12',
+                                  'Test::Taint' => '0',
+                                  'Test::Vars' => '0.009',
+                                  'Test::Version' => '2.05',
+                                  'autodie' => '0',
+                                  'blib' => '1.01'
+                                }
+                  },
+       'runtime' => {
+                      'requires' => {
+                                      'Class::Singleton' => '1.03',
+                                      'Cwd' => '3',
+                                      'File::Basename' => '0',
+                                      'File::Compare' => '0',
+                                      'File::Find' => '0',
+                                      'File::Spec' => '0',
+                                      'List::Util' => '1.33',
+                                      'Module::Runtime' => '0',
+                                      'Params::ValidationCompiler' => '0.13',
+                                      'Specio::Library::Builtins' => '0',
+                                      'Specio::Library::String' => '0',
+                                      'Try::Tiny' => '0',
+                                      'constant' => '0',
+                                      'namespace::autoclean' => '0',
+                                      'parent' => '0',
+                                      'perl' => '5.008004',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Copy' => '0',
+                                   'File::Path' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Spec::Functions' => '0',
+                                   'File::Temp' => '0',
+                                   'Storable' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'Test::Fatal' => '0',
+                                   'Test::More' => '0.96',
+                                   'Test::Requires' => '0',
+                                   'base' => '0',
+                                   'lib' => '0',
+                                   'overload' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

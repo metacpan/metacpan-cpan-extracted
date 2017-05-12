@@ -1,0 +1,50 @@
+Revision history for Data-Unixish-ANSI
+
+0.07    2015-09-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Move spec prereqs from RuntimeRequires to
+	  DevelopRecommends to reduce deps but still allow indicating spec
+	  requirement.
+
+
+0.06    2015-08-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Log::Any to Log::Any::IfLOG.
+
+
+0.05    2014-04-24 (SHARYANTO)
+
+        - No functional changes.
+
+        - Rename module: Data::Unixish::{ansi,ANSI} to avoid ambiguity of
+          Data::Unixish::ansi (it's not a dux function but a subpackage).
+
+
+0.04    2014-04-20 (SHARYANTO)
+
+        - Adjust to App::dux 1.30+ (no longer uses x.dux.default_format but
+          x.perinci.cmdline.default_format).
+
+        - Fix a bug in ansi::color.
+
+        - Tweak Rinci metadata to make cmdline more convenient (set positional
+          argument, short options -i & -c).
+
+
+0.03    2014-04-20 (SHARYANTO)
+
+        - Adjust to Data::Unixish 1.43, tag functions as itemfunc.
+
+
+0.02    2013-04-20 (SHARYANTO)
+
+        - Add func: ansi::highlight.
+
+
+0.01    2013-04-12 (SHARYANTO)
+
+        - First version.

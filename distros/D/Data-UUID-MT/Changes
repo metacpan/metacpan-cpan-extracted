@@ -1,0 +1,38 @@
+Revision history for Data-UUID-MT
+
+1.001     2013-06-20 10:44:03 America/New_York
+
+    [FIXED]
+
+    - Fixed post-fork reseed
+
+1.000     2012-11-30 17:03:16 America/New_York
+
+    - Hex and string output is now lowercase, per RFC 4122 standard
+      [rt.cpan.org #81582]
+
+0.006     2012-04-18 05:53:08 America/New_York
+
+    - Added documentation about converting UUID formats with pack/unpack
+
+0.005     2012-03-15 05:45:44 EST5EDT
+
+    - Now backwards compatible to Perl v5.6 [fix suggested by Steffen
+      Mueller]
+
+0.004     2011-12-20 11:56:21 EST5EDT
+
+    - Bumped Test::More test prereq to 0.96 (needed for subtest support)
+      [reported by Javier Camuñas]
+
+0.003     2011-08-16 21:48:37 America/New_York
+    - Fixed typo: s/Data::GUID::MT/Data::UUID/MT
+      (Why do I find these things *after* I release. <sigh>)
+
+0.002     2011-08-16 21:39:59 America/New_York
+    - Added note recommending against use of pseudo-random UUIDs as
+      secure authentication tokens (suggested by Yuval Kogman)
+
+0.001     2011-08-15 23:45:36 America/New_York
+    - Initial release
+

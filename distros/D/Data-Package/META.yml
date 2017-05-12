@@ -1,0 +1,26 @@
+--- 
+abstract: Base class for packages that are purely data
+author: 
+  - Adam Kennedy <adamk@cpan.org>
+build_requires: 
+  ExtUtils::MakeMaker: 6.11
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Data-Package
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Class::Inspector: 1.07
+  File::ShareDir: 0.05
+  File::Spec: 0.80
+  Params::Coerce: 0.06
+  Params::Util: 0.21
+  perl: 5.005
+version: 1.05

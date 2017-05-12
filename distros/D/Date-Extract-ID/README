@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     my $parser = Date::Extract::ID->new();
+     my $dt = $parser->extract($arbitrary_text)
+         or die "No date found.";
+     return $dt->ymd;
+
+DESCRIPTION
+
+    This is a version of Date::Extract-compatible module to handle
+    Indonesian text. Underneath, it uses DateTime::Format::Alami::ID
+    instead of DateTime::Format::Natural (because the latter does not
+    handle non-English text). So actually this module is just a wrapper for
+    DateTime::Format::Alami::ID.
+
+METHODS
+
+ new
+
+ extract($text)
+
+SEE ALSO
+
+    Date::Extract, DateTime::Format::Alami
+

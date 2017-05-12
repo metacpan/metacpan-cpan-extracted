@@ -1,0 +1,121 @@
+=head1 NAME
+
+DBIx::Class::Migration::Features - Features of DBIx::Class::Migration
+
+=head1 DESCRIPTION
+
+This document summarizes the features and developer value of
+L<DBIx::Class::Migration> and its associated ecosystem.
+
+=head1 Standard Workflows
+
+Standard workflows for creating database versions, updates and downgrades
+between versions, management of seed data as well as testing and development
+fixtures are offered.
+
+You can start prototyping with an easy Sqlite database and move up to Mysql
+or Postgresql with a single switch.
+
+=head1 Database Installation
+
+Given an application where its database has evolved over many versions, you
+can install a database to any version in the history, as well as install
+development and fixture data for that version.
+
+    dbic-migration install
+    dbic-migration install --to_version 5
+    dbic-migration populate --fixture_set testing_data
+
+=head1 Upgrade / Downgrade Management
+
+Offers a system to move a database from any one version to any other version.
+Additionally lets you migrate data between versions and even offers the possibility
+to migrate between different types of databases
+
+    dbic-migration prepare
+    dbic-migration upgrade
+    dbic-migration downgrade
+
+=head1 Seed, Developer and Test Data
+
+Create and manage data in your database.  Create sets for testing, development
+and to manage system or 'seed' data (data that a database needs to properly
+function, such as a Country list).
+
+    dbic-migration dump_named_sets -fixture_set countries
+
+Data can be properly converted between database versions
+
+=head1 Testing
+
+Integrates with testing tools like L<Test::DBIx::Class> to make testing your
+database logic simple.
+
+    #!/usr/bin/env perl
+
+    use Test::Most;
+    use Test::DBIx::Class
+      -schema_class=>'MyApp::Schema',
+      -fixture_class => '::Population',
+      qw(Artist Country);
+
+    fixtures_ok ['all_tables'];
+
+    is Country->count, 3, 'Correct Number of Countries';
+    ok Artist->first->has_country, 'Artist has a country';
+
+    done_testing;
+
+=head1 Easy Creation of Developer level Database sandboxes
+
+Automatically create a developer controlled, local database for rapid prototyping
+and easy administration.  Supports Sqlite, MySQL and Postgresql sandboxes.
+
+=head1 Framework Integration
+
+Plays nice with popular web application development frameworks like L<Catalyst>.
+
+    package MyApp::Web::Model::Schema;
+
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
+
+    __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->config(
+      traits => ['FromMigration'],
+      schema_class => 'MyApp::Schema',
+      extra_migration_args => {
+        db_sandbox_class => 'DBIx::Class::Migration::MySQLSandbox'},
+      install_if_needed => {
+        on_install => sub {
+          my ($schema, $migration) = @_;
+          $migration->populate('all_tables')}},
+    );
+
+=head1 Straightforward subclassing
+
+Core code designed to be easily subclassed for local customizations.  However,
+subclassing is often unneeded for some customizations since you have the ability
+to control and configure many aspects of the code using init arguments.
+
+=head1 Tutorial and Documentation
+
+Extensively documented and ships with an end to end tutorial that covers everything
+from creating your first migration, through testing and integration with L<Catalyst>
+
+L<DBIx::Class::Migration::Tutorial>
+
+=head1 SEE ALSO
+
+L<DBIx::Class::Migration>, L<DBIx::Class::Migration::Tutorial>
+
+=head1 AUTHOR
+
+See L<DBIx::Class::Migration> for author information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<DBIx::Class::Migration> for copyright and license information
+
+=cut
+

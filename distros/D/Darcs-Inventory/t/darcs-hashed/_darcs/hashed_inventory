@@ -1,0 +1,44 @@
+pristine:da39a3ee5e6b4b0d3255bfef95601890afd80709
+[First test version
+David Caldwell <david@example.com>**20071024174843] 
+hash: 0000001672-d672e8c18c22cbd4cc8e65fe80a39e68384133083b0f623ae5d57cc563e5630b
+[First working version.
+David Caldwell <david@example.com>**20071024174904] 
+hash: 0000004173-f0c9b128a74b15b074c3f0ca8c6aa0feb619e0090175c10ec7fecb7adbf3b49d
+[Better error message when time doesn't parse.
+David Caldwell <david@example.com>**20071024175149] 
+hash: 0000000358-0bdcee082d3ff49427b55608b20ab2d6d9d9ecfd5b0f9b0bca59e3988ce753c2
+[Better error message when there are 2 patches with the same date.
+David Caldwell <david@example.com>**20071024175208] 
+hash: 0000000558-e1398d21dc6aa3b03a3ccc3f0055bf3f48d6f5e6df6bc371dec72501df39a218
+[Disambiguate patches with the same date by looking in the .gz.
+David Caldwell <david@example.com>**20071024190103] 
+hash: 0000001143-78f10f572bfa8020e0b2834901ee456c985b845f271ab3623cbc350f78a10720
+[Add support for UNDO patches.
+David Caldwell <david@example.com>**20071024190231] 
+hash: 0000001075-6d233fcda6821d69ca9fa636d95e04a92f3d5951a4cf6e67a8d37b078a9bc494
+[Stop printing ugly new "Ignore-this" lines.
+David Caldwell <david@porkrind.org>**20081222020535
+ Ignore-this: b0d54add2c9729dbc8484b27cbb21807
+] 
+hash: 0000000467-8fa3e06af2d9df7ab089cca3ab2fe1e1adf38fd18dd3c31370dba428d0973834
+[Move some stuff around to make it more logical.
+David Caldwell <david@porkrind.org>**20081222084223
+ Ignore-this: a2a879005561f4e8db4d396fa480ef04
+] 
+hash: 0000000368-4344dc8144ae6d1d593de627f8b37512196a1ceeca18fdb3d3255322aa71e807
+[Move the old inventory inside a third-party/darcs-notify/ directory.
+David Caldwell <david@porkrind.org>**20081222085948
+ Ignore-this: 7778b85acac4694235d890c8ad1959e7
+] 
+hash: 0000001197-a64d2f82135e172c4cedfbefb00710a34aba3b1f214d6604e97107e34a6bf59a
+[Fix typo in documentation so I don't look as stupid as I actually am.
+David Caldwell <david@porkrind.org>**20081224214759
+ Ignore-this: 30ce226b8789ed44252e6f06e177d51
+] 
+hash: 0000000344-af2c850c1cda902afbe9f5b29c35d04c242802b22cdb6078ddefb8ecb220733e
+[Better explain X-Darcs-Notify.
+David Caldwell <david@porkrind.org>**20081224215056
+ Ignore-this: 28bb2b40ed7e621de2660558ca8abb4d
+] 
+hash: 0000000301-09e4c82ca44b620d11ff7755177c0d3ebc4ec33826464f649c35729e04a84add

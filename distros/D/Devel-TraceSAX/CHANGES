@@ -1,0 +1,9 @@
+CHANGES file for Devel::TraceSAX
+
+0.21 Sun Feb  3 18:48:47 EST 2002
+    - start and end elements are now abbreviated more often, defined-but-empty
+      strings no longer cause full dumps of the parameter hash.
+    - Minor improvements to the format_characters() and format_comment()
+      double-quotish escaping.
+    - escape element names and attr names and values.
+    - added format_processing_instruction

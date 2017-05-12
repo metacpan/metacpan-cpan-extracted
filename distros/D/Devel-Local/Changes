@@ -1,0 +1,50 @@
+0.22 Mon Sep 22 08:11:23 PDT 2014
+ - Fix Issue/2. Tests were not passing on clean perl.
+
+0.21 Sat Aug 16 16:28:55 PDT 2014
+ - Change 'See' to 'See Also' in doc
+
+0.20 Sat Aug 16 10:57:58 PDT 2014
+ - Meta 0.0.2
+
+0.19 Fri Aug 15 19:54:33 PDT 2014
+ - Add t/000-require-modules.t
+
+0.18 Fri Aug 15 18:15:42 PDT 2014
+ - Add t/000-compile-modules.t
+
+0.17 Wed Aug 13 16:16:53 PDT 2014
+ - Switch to Zilla::Dist
+
+0.16 Thu Oct  6 11:32:14 EDT 2011
+ - Semi major refactor.
+ - Default of devel-local is pretty-print
+ - Refactor doc to put simple stuff first.
+
+0.15 Fri Aug 19 15:30:37 EEST 2011
+ - Always add lib if present
+ - Only add blib if there is an .xs file in the dist dir.
+
+0.14 Tue Jul 12 11:28:14 CDT 2011
+ - Switch ./.devel-local to more obvious ./devel-local
+
+0.13 Sun Jul 10 01:09:23 EDT 2011
+ - Major rewrite/refactor
+ - Devel::Local::PERL5LIB and Devel::Local::PATH
+ - Allow 'use Devel::Local'
+ - Allow arguments
+ - Support ! and ? commands
+ - More documentation
+
+0.12 Sun Jun  5 13:04:10 EST 2011
+ - Work on documentation
+ - Allow 'use Devel::Local' without die-ing.
+ - Use Stardoc and Module::Package
+
+0.11 Wed May 11 11:16:11 EST 2011
+ - Fixed bug with ':' at end of PATH
+ - Fixed a doc typo
+
+0.10 Tue May 10 22:38:27 EST 2011
+ - First Release
+

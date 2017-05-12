@@ -1,0 +1,155 @@
+Revision history for Dist-Zilla-PluginBundle-MITHALDU
+
+1.151340  2015-05-14 10:55:34+02:00 Europe/Berlin
+    - exclude_match needs to be an array with data or not passed on
+
+1.150590  2015-02-28 13:21:53+01:00 Europe/Berlin
+    - remove spelling test stuff
+    - Revert "use a readme plugin that actually generates a readme in the release"
+    - add a way to define prereq skipping options
+
+1.150521  2015-02-21 18:29:39+01:00 Europe/Berlin
+    - i am actually an idiot
+
+1.150520  2015-02-21 18:06:18+01:00 Europe/Berlin
+    - add cpanfile generation
+    - handle auto-generated files more sanely
+    - use a readme plugin that actually generates a readme in the release
+
+1.150512  2015-02-20 14:26:20+01:00 Europe/Berlin
+    - sync files Git::Check complains about and Git::Commit commits on release
+
+1.150511  2015-02-20 13:25:09+01:00 Europe/Berlin
+    - allow single values for exclude_match when loaded through @Filter
+
+1.150510  2015-02-20 04:42:01+01:00 Europe/Berlin
+    - copy Makefile.PL to build dir
+    - fix up a name replacement oversight
+
+1.141830  2014-07-02 23:40:35+02:00 Europe/Berlin
+    - updates for dzil 5.019
+
+1.120300  2012-01-30 14:36:47 Europe/Berlin
+
+    - Dist::Zilla::App::cover is now a dependency to ensure it's available on
+      the command line
+    - .gitignore, README.PATCHING and perlcritic.rc are now generated during the
+      build phase
+    - added an option to exclude files by regex
+    - release process now bumps the version in the release commit
+    - AutoVersion instead of Git::NextVersion
+    - minimize noise in development commits by restricting metadata updates to
+      version and github urls to release time
+
+0.023     2011-12-30 15:29:54 EST5EDT
+
+    - change PortabilityTests and CompileTests to the newer Test::* naming
+      scheme
+
+0.022     2011-12-13 17:26:28 EST5EDT
+
+    - re-enable Test::PodSpelling and added own 'stopwords' option as
+      passthrough and 'no_spellcheck' to disable
+    - Added Test::Perl::Critic and added 'no_critic' option to disable
+
+0.021     2011-12-07 10:49:46 EST5EDT
+
+    - make bugtracker pod section only list web link, not email; this
+      allow easier modification for use with github instead of RT which
+      does not provide an email option
+
+0.020     2011-09-23 15:11:51 America/New_York
+
+    - added code to copy README.pod and META.json to repo directory
+
+0.019     2011-07-18 17:23:28 America/New_York
+
+    - added Test::Version
+    - removed unused prereqs
+
+0.018     2011-07-11 21:52:26 America/New_York
+
+    - swapped in InsertCopyright for Prepender
+    - swapped in OurPkgVersion for PkgVersion
+    - removed Repository to rely soly on GithubMeta
+
+0.017     2011-02-06 21:57:53 EST5EDT
+
+    - added Dist::Zilla::Plugin::CheckPrereqsIndexed
+
+0.016     2011-01-31 22:14:12 EST5EDT
+
+    - added Pod::Weaver::Section::Support and Bugtracker to the mix
+
+0.015     2011-01-23 17:11:20 EST5EDT
+
+    - updated prereqs, including missing Pod::Elemental::Transformer::List
+
+0.014     2011-01-06 16:59:44 EST5EDT
+
+    - bump Repository prereq to 0.17
+
+0.013     2010-11-02 21:52:50 EST5EDT
+
+    - bump MetaProvides::Package prereq and tell it to honor MetaNoIndex
+    - add package 'DB' to MetaNoIndex
+
+0.012     2010-10-29 16:42:37 EST5EDT
+
+    - annotate example dist.ini in documents (suggeston from Tim Bunce)
+
+0.011     2010-10-10 22:47:05 EST5EDT
+
+    - replace BumpNextVersionFromGit with Git::NextVersion
+
+0.010     2010-10-07 13:42:21 EST5EDT
+
+    - adds GithubMeta to override Repository if repo is on github
+
+    - replaces AutoPrereq (deprecated) with AutoPrereqs
+
+0.009     2010-08-17 08:04:05 EST5EDT
+
+    - set a minimum TaskWeaver prereq to work with Dist::Zilla 2.X
+
+0.008     2010-08-11 17:50:46 EST5EDT
+
+    - add Pod::Weaver::PluginBundle::DAGOLDEN (which is @RJBS plus wikidoc)
+
+0.007     2010-05-26 12:49:30 America/New_York
+
+    - bump Dist::Zilla prereq to 3.101450
+
+    - bump Dist::Zilla::Plugin::Repository prereq to 0.13 for CPAN Meta
+      spec version 2 compatibility
+
+    - add MetaJSON plugin
+
+0.006     2010-05-14 10:36:01 EST5EDT
+
+    - fixes git commit/tag ordering; now commits dirty files
+      after release, then tags, then updates Changes for next
+      version and does a final commit before pushing
+
+    - Pod spelling tests disabled pending fixes to stopwords and
+      Pod::Weaver
+
+0.005     2010-05-14 10:07:40 EST5EDT
+
+    - fifth draft
+
+0.004     2010-05-14 09:33:45 EST5EDT
+
+    - fourth draft
+
+0.003     2010-05-14 09:30:05 EST5EDT
+
+    - third draft
+
+0.002     2010-05-14 07:00:04 EST5EDT
+
+    - second draft
+
+0.001     2010-05-14 06:57:53 EST5EDT
+
+    - first draft

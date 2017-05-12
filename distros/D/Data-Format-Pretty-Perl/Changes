@@ -1,0 +1,30 @@
+Revision history for Data-Format-Pretty-Perl
+
+0.05     2014-02-14 (SHARYANTO)
+
+         - Change default linum from 1 when interactive to 0 to avoid potential
+           annoyance for users that try to copy/paste output.
+
+
+0.04     2014-02-14 (SHARYANTO)
+
+         - Add options: color & linum. By default enable them on interactive
+           output.
+
+         - Add newline to output.
+
+
+0.03     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.02     2012-03-29 (SHARYANTO)
+
+         - Add content_type().
+
+
+0.01     2011-08-11 (SHARYANTO)
+
+         - First release.

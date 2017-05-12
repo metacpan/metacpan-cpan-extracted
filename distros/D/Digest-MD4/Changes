@@ -1,0 +1,44 @@
+Revision history for Perl extension Digest::MD4.
+
+*** 2000/08/26 Version 1.0
+
+Built by adapting MD5, code from RFC 1320. Some test data from 
+draft-ietf-pppext-mschap-00.txt
+
+*** 2001/07/28 Version 1.1
+
+Fixed compatibility with Digest::HMAC. add and reset now return
+their context, suggested by 
+Tim Meadowcroft <Tim.Meadowcroft@swapswire.com>. Thanks Tim.
+
+*** 2003/10/30 Version 1.2
+
+Rebuilt from Digest::MD5 1.30, to acheive Digest:: spec compatibility
+
+*** 2003/11/28 Version 1.3
+
+Fixed compile errors reported while being built unders windows cywin with Perl 5.8.2
+
+*** 2004/09/13 Version 1.4
+
+Fixed Makefile problems on some versions of perl 5.8.0
+
+*** 2004/11/17 Version 1.5
+
+ActivePerl version adds hexhash() for compatibility
+Contributed by Gisle Aas
+
+*** 200?/??/?? Version 1.6
+
+Fixed example output in doc in MD4.pm. Reported by jbwaters@gmail.com.
+
+*** 2013/03/14 Version 1.7
+Removed defunct code that caused incorrect error message when building on 64 bit platforms, patch by
+zefram
+
+*** 2013/03/14 Version 1.8
+Fixed a test error in files.t. Corrected the comment to do with the reason in
+verison 1.7
+
+*** 2013-03-22 Version 1.9
+Updated author and distribution location details to airspayce.com

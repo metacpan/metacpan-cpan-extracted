@@ -1,0 +1,25 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Rinci::AbstractFromMeta]
+
+    In your module/script:
+
+     # ABSTRACT:
+
+    During build, abstract will be filled with summary from Rinci package
+    metadata, or Rinci function metadata (if there are more than one, will
+    pick "the largest" function, measured by the dump length).
+
+    If Abstract is already filled, will leave it alone.
+
+DESCRIPTION
+
+    This plugin is another DRY module. If you have already put summaries in
+    Rinci metadata, why repeat it in the dzil Abstract?
+
+SEE ALSO
+
+    Rinci
+

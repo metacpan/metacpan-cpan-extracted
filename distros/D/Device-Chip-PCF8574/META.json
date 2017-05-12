@@ -1,0 +1,56 @@
+{
+   "abstract" : "chip driver for a F<PCF8574>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.422",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Chip-PCF8574",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Chip" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0.08",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::PCF8574" : {
+         "file" : "lib/Device/Chip/PCF8574.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::PCF8575" : {
+         "file" : "lib/Device/Chip/PCF8575.pm",
+         "version" : "0.02"
+      },
+      "Device::Chip::PCF857x" : {
+         "file" : "lib/Device/Chip/PCF857x.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

@@ -1,0 +1,60 @@
+=head1 NAME
+
+mod_perl 1.0 Win32 Configuration Instructions
+
+=head1 Description
+
+This document discusses how to configure mod_perl 1.0 under Win32.
+
+=head1 Configuration
+
+Add this line to F<C:\Apache\conf\httpd.conf>:
+
+ LoadModule perl_module modules/mod_perl.so
+
+Be sure that the path to your Perl binary (eg, F<C:\Perl\bin>) is in
+your C<PATH> environment variable. If you have a C<ClearModuleList>
+directive enabled in F<httpd.conf>, you may also need to add
+
+ AddModule mod_perl.c
+
+See the descriptions of the C<ClearModuleList> and C<AddModule>
+directives in the Apache documents for more details, especially
+concerning the relative order of these and the C<LoadModule>
+directive.
+
+
+=head1 See Also
+
+The directions for L<installing mod_perl 1.0 on
+Win32|docs::1.0::os::win32::install>, the L<mod_perl
+documentation|docs::index>, and http://take23.org/.
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item * 
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+=head1 Authors
+
+=over
+
+=item *
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

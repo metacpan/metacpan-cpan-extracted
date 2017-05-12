@@ -1,0 +1,101 @@
+Revision history for Perl extension Devel::StealthDebug.
+
+0.001 Wed Jan 30 22:15:47 2002
+	- original version; created by h2xs 1.21
+
+0.002 Added show(), fixed many bugs (even more remaining though)
+
+0.003 Polished a little bit the watch function
+
+0.004 Mainly rewrote the doc
+
+0.005 Wrote some tests
+
+0.006 Add some more tests, fix some bugs
+
+1.000 Renamed the module and thought to release it as the first public version
+
+1.001 Tim BUNCE's special edition ;-)
+	 	(FIRST PUBLIC VERSION RELEASED)
+
+      Implemented few suggestions, renamed some methods according to his 
+	  comments on the modules list.
+	  
+	  	show  -> dump
+	  	wait  -> when
+	  	print -> emit
+	  	emit  -> emit_type
+		
+	  Added some tests.
+
+	  And renamed this module (again) to its final name Devel::StealthDebug.
+
+1.002 Yann KEHERVE's special edition (Yes, it's now a tradition)
+
+		Thanks to his feedback, I 
+		
+	  Corrected some typos, completed the doc.
+	  Corrected a bug with watch() under use strict.
+
+1.003 Adam FOXSON's special edition
+
+	  Modified the dump() function to display hash sorted by keys
+	   (mainly to make t/dump.t consistent on different boxes)
+	  Added the ENABLE feature on the use line (Idea from Tim Bunce, and
+	  also asked by Yann...)
+
+1.004	  Modified t/emit_type2.t to create file 'mydebug' in the test dir.
+          (now remove it after the test)
+	
+1.005	  Corrected a bug in the test suite.
+
+1.006 Daniel GARDNER's special edition
+
+	  Who was kind enough to not only give me some (positive) feedback
+	  but also submited some enhancements to the code :
+
+	  	StealthDebug features are now disabled on commented line
+		(#my $foo=10; #!emit($foo)!) to allow you to disable StealthDebug
+		functions on large part of the code you've just commented out.
+
+		'emit' feature received some extra DWIMess :
+		namely the function is processed after the code beginning the line
+		my $foo='hello'; #!emit("$foo world")!
+		will now emit 'hello world' as most of you would expect...
+		Same behaviour for 'dump' BUT NOT for 'assert'
+		(this might change later as I'm not fixed yet)
+
+1.007  Gerald RICHTER's special edition
+
+	  Dedicated to another cool user, who use this module and additionally
+	  suggest enhancements (and even send me the patch implementing them !)
+
+	  'dump' has new features :
+	  _ It can have multiple args.
+	  _ The first arg can be an initial description
+	  	( #!dump("Some text ", $foo, $bar)! )
+	  _ It shows the variables names
+	  _ It can uses Data::Dumper (to prevent a memory problem with circular references)
+	    it's configurable via a DUMPER => 1 (otherwise the old "inhouse" dump 
+		will still be used by default)
+	  WARNING : The dump output has changed.  
+	  (Tell me if you need the old output back)
+	  The "inhouse" 'dump' output is sligtly different from the Data::Dumper one.
+	  (mainly beccause I sort the hash keys to ensure consistency accross
+	  different platform...)
+	  Depending on the feedback I'll get, I'll modify this feature which
+	  is far from being yet satisfying to me.
+
+	  'carp' and 'croak' are also enhanced to display more info.
+
+	  'watch' can now be used on already existing variable.
+
+	  So once again big thanks to you Gerald.
+
+	  I also tried to improve my testing-fu, so few test files were also
+	  added/rewritten/shortenned...
+
+1.008 
+	  Now, correctly testing Data::Dumper::Dumper use 
+	  (thanks to Eric Cholet and Philippe Bruhat)
+	  So, hopefully, no more tests fail on t/dump_data_dumper.t

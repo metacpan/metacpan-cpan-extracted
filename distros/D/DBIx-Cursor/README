@@ -1,0 +1,37 @@
+DBIx/Cursor version 0.14
+========================
+
+The class DBIx::Cursor represents a cursor for a single Database-table.
+You can select, update, insert or delete entries in a table easier than
+creating SQL-statements. It does not use any specific features of any
+database, so it should work with every DBD-driver.
+
+DBIx::Cursor is not a replacement for DBI, but a add-on. You can use
+DBI as usual and use SQL-statements as you need.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI version 1.15
+
+COPYRIGHT AND LICENCE
+
+This package is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+This package is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Copyright (C) 2001,2002 Tommi Mäkitalo, Dr. Eckhardt + Partner GmbH
+

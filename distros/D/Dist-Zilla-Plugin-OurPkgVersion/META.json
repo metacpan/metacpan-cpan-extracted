@@ -1,0 +1,104 @@
+{
+   "abstract" : "No line insertion and does Package version with our",
+   "author" : [
+      "Caleb Cushing <xenoterracide@gmail.com>",
+      "Grahan Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-OurPkgVersion",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ],
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::PPI" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Perl" : "0",
+            "PPI" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0",
+            "Test::Version" : "0.04",
+            "blib" : "1.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Dist-Zilla-Plugin-OurPkgVersion",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/dist-zilla-plugin-ourpkgversion.git",
+         "web" : "https://github.com/plicease/dist-zilla-plugin-ourpkgversion"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Alexei Znamensky <russoz@cpan.org>",
+      "Christian Walde <walde.christian@googlemail.com>",
+      "Christopher J. Madsen <perl@cjmweb.net>",
+      "David Golden <dagolden@cpan.org>",
+      "Graham Ollis <perl@wdlabs.com>",
+      "Graham Ollis <plicease@cpan.org>",
+      "Ian Sealy <git@iansealy.com>"
+   ]
+}
+

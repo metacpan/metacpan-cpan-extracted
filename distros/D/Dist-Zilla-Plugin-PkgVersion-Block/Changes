@@ -1,0 +1,40 @@
+Revision history for Dist-Zilla-Plugin-PkgVersion-Block
+
+0.0107 2015-05-31T15:27:16Z CEST
+ [Requirements]
+ - Use namespace::autoclean (instead of namespace::sweep). Fixes #1.
+
+0.0106 2015-02-18T15:01:48Z CET
+ [Requirements]
+ - Listed consumed DZ roles as runtime prereqs.
+
+0.0105 2015-02-18T14:52:22Z CET
+ [Meta]
+ - Removed cpanfile, prereqs now in dist.ini.
+
+ [Requirements]
+ - Specified version for Test::DZil (needs 5.000).
+ - Various new Dist::Zilla plugins.
+
+0.0104 2015-01-15T17:27:07Z CET
+ [Meta]
+ - Nothing was indexed. Now uses [MetaProvides::Package].
+
+0.0103 2015-01-15T16:40:32Z CET
+ [Documentation]
+ - Cleanup.
+
+ [Meta]
+ - Better dzil settings.
+
+0.0102 2014-09-17T23:09:34Z CEST
+ [Meta]
+ - Added build prereqs.
+
+0.0101 2014-09-16T21:05:40Z CEST
+ [Meta]
+ - Code cleanup
+
+0.0100 2014-09-16T18:47:32Z CEST
+ - Initial release
+

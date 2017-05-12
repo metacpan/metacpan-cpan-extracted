@@ -1,0 +1,21 @@
+Build.PL
+Changes
+examples/rrd/create
+examples/rrd/graph
+examples/rrd/update
+lib/Data/Apache/mod_status.pm
+lib/Data/Apache/mod_status/2XML.pm
+lib/Data/Apache/mod_status/Info.pm
+lib/Data/Apache/mod_status/Workers.pm
+MANIFEST			This list of files
+script/mod_status-info
+t/00_compile.t
+t/01_Data-Apache-mod_status.t
+t/data/server-status.html
+xslt/mod_status2xml.xslt
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t
+README
+META.yml
+META.json

@@ -1,0 +1,25 @@
+Revision history for Dancer-Logger-ColorConsole
+
+0.0005  Tue Sep  9 11:02:18 WEST 2014
+        - Added color to info log level [Pierre Vigier].
+        - Added metadata for metacpan et al.
+
+0.0004  Sun Apr  7 16:57:13 WEST 2013
+        - require a specific Term::ANSIColor version
+
+0.0003  Fri Jun  8 22:04:09 WEST 2012
+        - fix POD encoding.
+
+0.0002  Mon Jul  4 18:04:14 WEST 2011
+        - add a proper Changes file
+        - color HTTP requests
+
+0.0001  Sun Jul  3 19:54:19 WEST 2011
+        First version, released on an unsuspecting world of Dancers.
+        - include defaults for the four default levels of logging
+          (code/debug/warn/error)
+        - support coloring using regular expressions
+        - add basic default coloring for response codes (2XX, 4XX and 5XX)
+        - support disabling the default coloring schema
+
+

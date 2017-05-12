@@ -1,0 +1,188 @@
+
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Cookbook::Instance_and_Constants - Look inside the instance
+
+=head1 SYNOPSIS
+
+  package a_to_z;
+  use strict;
+  use warnings;
+  use vars qw(@ISA @list %ids %helper);
+  use Data::Range::Compare qw(:KEYS);
+  @ISA=qw(Data::Range::Compare);
+
+  use constant key_ids=>6;
+
+  @list=('a' .. 'z');
+  my $id=-1;
+  %ids=map { ($_,++$id) } @list; 
+  undef $id;
+
+  $helper{add_one}=\&add_one;
+  sub add_one {
+    my $here=$ids{$_[0]};
+    ++$here;
+    return 'z' if $#list<$here;
+    $list[$here]
+  }
+
+  $helper{sub_one}=\&sub_one;
+  sub sub_one {
+    my $here=$ids{$_[0]};
+    --$here;
+    return 'a' if $here<0;
+    $list[$here]
+  }
+  sub cmp_values { $_[0] cmp $_[1] }
+  $helper{cmp_values}=\&cmp_values;
+
+  sub new{
+    my ($class,$start,$end,$generated,$missing)=@_;
+    my $s=$class->SUPER::new(\%helper,$start,$end,$generated,$missing);
+    $s->[key_ids]=\%ids;
+    $s;
+  }
+
+  sub letter_ids { %{$_[0]->[key_ids]} }
+
+  sub range_compare { 
+     my ($s,@args)=@_;
+     $s->SUPER::range_compare(\%helper,@args) 
+  }
+
+  sub get_common_range {
+    my ($class,@args)=@_;
+    $class->SUPER::get_common_range(\%helper,@args);
+  }
+
+  sub first_letter () { $_[0]->[key_start] }
+
+  sub last_letter () { $_[0]->[key_end] }
+
+  1;
+
+=head2 Using a_to_z.pm
+
+Now you can create a perl script to load a_to_z and use the simplified functionality.
+
+ use a_to_z;
+
+ my $obj_a=a_to_z->new(qw(c f));
+ my $obj_b=a_to_z->new(qw(a z));
+ my $obj_c=a_to_z->new(qw(g j));
+
+ $list=[ [$obj_a] ,[$obj_b] ,[$obj_c] ];
+ $sub=a_to_z->range_compare($list);
+ while(my @row=$sub->()) { 
+  my ($obj_a,$obj_b,$obj_c)=@row;
+  my $common_range=a_to_z-->get_common_range(\@row);
+  print "\n";
+  print "Common Range: $common_range\n";
+  my ($obj_a,$obj_b,$obj_c)=@row;
+  my $range_a_state=$obj_a->missing ?
+       'Not in set a'
+       :
+       'in set a';
+       my $range_b_state=$obj_b->missing ?
+       'Not in set b'
+       :
+       'in set b';
+       my $range_c_state=$obj_c->missing ?
+       'Not in set c'
+       :
+       'in set c';
+
+       print "Range_a: $obj_a is $range_a_state\n";
+       print "Range_b: $obj_b is $range_b_state\n";
+       print "Range_c: $obj_c is $range_c_state\n";
+ }
+
+ Output:
+ Common Range: a - b
+ Range_a: a - b is Not in set a
+ Range_b: a - z is in set b
+ Range_c: a - f is Not in set c
+
+ Common Range: c - f
+ Range_a: c - f is in set a
+ Range_b: a - z is in set b
+ Range_c: a - f is Not in set c
+
+ Common Range: g - j
+ Range_a: g - z is Not in set a
+ Range_b: a - z is in set b
+ Range_c: g - j is in set c
+
+ Common Range: k - z
+ Range_a: g - z is Not in set a
+ Range_b: a - z is in set b
+ Range_c: k - z is Not in set c
+
+=head1 DESCRIPTION
+
+Simple example demonstrating HOWTO subclass the "a to z" example
+
+=head2 CONSTANTS
+
+Data::Range::Compare instances are array references and use numeric entries to identify each element.
+
+=over 4
+
+=item * key_helper
+
+This constant represents the position of \%helper in the array instance.
+
+  The value of key_helper is 0
+
+=item * key_start
+
+This constant represents the position of $start in this instance.
+
+  The value of key_start is 1
+
+=item * key_end
+
+This constant represents the position of $end in this instance.
+
+  The value of key_end is 2
+
+=item * key_generated
+
+This constant represents the position of $generated in this instance.
+
+  The value of key_generated is 3
+
+=item * key_missing
+
+This constant represents the position of $missing in this instance.
+
+  The value of key_missing is 4
+
+=item * key_key_data
+
+This constant represents the position of $key_data in this instance.
+
+  The value of key_key_data is 5
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 COPYRIGHT
+
+Copyright 2010 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Cookbook perlboot
+
+=cut
+

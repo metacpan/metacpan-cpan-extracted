@@ -1,0 +1,42 @@
+---
+abstract: 'Simplify the common case stuff for DBIx::Class.'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  DBD::SQLite: '0'
+  DateTime::Format::SQLite: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0.006'
+  Test::More: '0.94'
+  Test::Roo: '1.003'
+  aliased: '0.34'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Helpers
+requires:
+  Carp::Clan: '6.04'
+  DBIx::Class: '0.0826'
+  DBIx::Class::Candy: '0.003001'
+  DBIx::Introspector: '0.001002'
+  Lingua::EN::Inflect: '0'
+  List::Util: '0'
+  Module::Runtime: '0'
+  Moo: '2'
+  Safe::Isa: '0'
+  Sub::Exporter::Progressive: '0.001006'
+  Text::Brew: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0.23'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/frioux/DBIx-Class-Helpers/issues
+  homepage: https://github.com/frioux/DBIx-Class-Helpers
+  repository: https://github.com/frioux/DBIx-Class-Helpers.git
+version: '2.033003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

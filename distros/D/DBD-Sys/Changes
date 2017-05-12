@@ -1,0 +1,34 @@
+Revision history for Perl module DBD::Sys
+
+0.102
+    - fix alltables for tables with multiple implementors
+    - rename camelCase functions into lower_case functions on request of
+      Matt S. Trout (MSTROUT)
+    - add lazy loading of required modules for table content on request of
+      Matt S. Trout (MSTROUT)
+
+0.101 2010-07-25
+    - fix tests to run only when all dependencies are satisfied
+
+0.100 2010-07-21
+    - rename columns which were reserved sql words for table procs
+    - rework plugin-management and table-management:
+	* allow multiple implementors for one table
+	* merge the data from multiple implementors on primary key
+    - rely on DBI::DBD::SqlEngine
+    - add support for Win32::Process::Info
+    - fix DBD::Sys::Plugin::Unix::Users and DBD::Sys::Plugin::Unix::Groups
+      using setpwent/setgrent as recommended by
+      Ashish SHUKLA <ashish@freebsd.org> (and by Richard W. Stevens)
+    - add logins table to get a list of logged in users
+    - add openfiles table
+    - fix hwadress column in netint table to hwaddress
+    - add a second implementation for the netint table using
+      Net::Ifconfig::Wrapper and (for calculating broadcase address)
+      NetAddr::IP
+    - fixing duplicate group entries on FreeBSD (and maybe others)
+
+0.01 2010-05-14
+    - original version; released to an unsuspecting world ...
+
+

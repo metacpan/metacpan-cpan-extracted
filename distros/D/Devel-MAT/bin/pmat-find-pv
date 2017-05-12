@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+use Getopt::Long;
+
+GetOptions(
+   'eq'     => \my $EQ,
+   'regexp' => \my $REGEXP,
+) or exit 1;
+
+my $df = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" )->dumpfile;
+shift @ARGV;
+
+@ARGV or die "Need pattern\n";
+my $pattern = shift @ARGV;
+if( $EQ ) {
+   $pattern = qr/^\Q$pattern\E$/;
+}
+elsif( $REGEXP ) {
+   $pattern = qr/$pattern/;
+}
+else {
+   # substring
+   $pattern = qr/\Q$pattern\E/;
+}
+
+foreach my $sv ( $df->heap ) {
+   next unless $sv->type eq "SCALAR";
+   next unless defined( my $pv = $sv->pv );
+   next unless $pv =~ $pattern;
+
+   print $sv->desc_addr, "\n";
+   print "  :", $pv, "\n";
+}

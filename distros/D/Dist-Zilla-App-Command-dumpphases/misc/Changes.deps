@@ -1,0 +1,177 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000009
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.000008 2016-09-10T07:27:49Z
+
+1.000007 2015-04-13T01:57:06Z
+
+1.000006 2015-04-10T07:17:31Z
+
+1.000005 2014-10-31T00:00:38Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.000004 2014-08-16T00:00:52Z
+
+1.000003 2014-08-06T19:37:32Z
+
+1.000002 2014-08-03T09:31:26Z
+
+1.000001 2014-08-03T04:00:28Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / runtime requires]
+ - Path::ScanINC 0 → 0.011
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000000 2014-06-05T00:01:36Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4200
+
+ [Removed / configure requires]
+ - Module::Build 0.4200
+
+0.6.0 2013-11-13T03:54:53Z
+ [Added / runtime requires]
+ - Carp
+ - Path::ScanINC
+ - Path::Tiny
+
+ [Added / test requires]
+ - Cwd
+ - Dist::Zilla::App::Tester
+
+ [Removed / runtime requires]
+ - Moose::Autobox
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.5.1 2013-11-13T00:46:05Z
+
+0.5.0 2013-11-12T23:24:04Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::RoleDB
+
+ [Changed / build requires]
+ - Module::Build 0.4008 → 0.4200
+
+ [Changed / configure requires]
+ - Module::Build 0.4008 → 0.4200
+
+0.4.0 2013-11-10T18:47:19Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4008
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+0.3.4 2013-09-25T02:33:05Z
+ [Added / test requires]
+ - File::Spec
+
+0.3.3 2013-08-30T19:28:52Z
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.3.2 2013-08-23T13:21:54Z
+
+0.3.1 2013-08-22T10:34:10Z
+
+0.3.0 2013-08-22T09:38:29Z
+ [Added / runtime requires]
+ - Module::Runtime
+ - Moo
+ - Role::Tiny
+
+0.2.0 2013-08-21T14:32:08Z
+ [Added / test requires]
+ - Capture::Tiny
+ - blib
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.1.4 2013-05-17T12:45:25Z
+ [Changed / build requires]
+ - Module::Build 0.4003 → 0.4005
+
+ [Changed / configure requires]
+ - Module::Build 0.4003 → 0.4005
+
+0.1.3 2013-01-25T23:04:24Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4003
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.1.2 2012-05-09T07:25:48Z
+ [Added / runtime requires]
+ - perl 5.006
+
+0.1.1 2011-09-02T09:37:14Z
+ [Added / runtime requires]
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English

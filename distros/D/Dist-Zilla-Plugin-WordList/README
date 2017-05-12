@@ -1,0 +1,20 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Bencher::Scenario]
+
+DESCRIPTION
+
+    This plugin is to be used when building WordList::* distribution.
+    Currently it does the following:
+
+      * Replace # STATS placeholder (which must exist) with word list
+      statistics
+
+SEE ALSO
+
+    WordList
+
+    Pod::Weaver::Plugin::WordList
+

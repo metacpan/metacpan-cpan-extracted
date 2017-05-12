@@ -1,0 +1,53 @@
+{
+   "abstract" : "dump symbol names or the symbol table",
+   "author" : [
+      "Andreas Koenig <andreas.koenig.gmwojprw@franz.ak.mind.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "keywords" : [
+      "symbol table inspection"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Symdump",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "Test::More" : "0",
+            "perl" : "5.004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/andk/devel-symdump.git"
+      }
+   },
+   "version" : "2.18",
+   "x_serialization_backend" : "JSON::PP version 2.27400_02"
+}

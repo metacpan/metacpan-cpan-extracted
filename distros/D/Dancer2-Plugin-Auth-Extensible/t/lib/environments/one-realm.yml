@@ -1,0 +1,23 @@
+logger: capture
+plugins:
+    Auth::Extensible:
+        record_lastlogin: 1
+        realms:
+            config1:
+                provider: Provider::ConfigExtended
+                password_expiry_days: 2
+                users:
+                    - user: dave
+                      pass: beer
+                      name: "David Precious"
+                      roles:
+                          - BeerDrinker
+                          - Motorcyclist
+                    - user: bob
+                      pass: cider
+                      name: "Bob Smith"
+                      roles:
+                          - CiderDrinker
+                    - user: mark
+                      pass: wantscider
+                      name: "Update here"

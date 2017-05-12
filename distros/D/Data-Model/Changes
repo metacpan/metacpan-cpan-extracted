@@ -1,0 +1,48 @@
+Revision history for Perl extension Data::Model
+
+0.00008  2013-07-08 20:19:38 JST
+           - same as the order of the Data::MessagePack serialization for Driver::Memcached serialize
+           - fixed to perl 5.18 hash randomization bug
+           - fixed CREATE TABLE bug for MySQL test
+
+0.00007    2010-09-08T02:30:23+09:00
+           - fixed Iterator::Empty test error (thanks to ytnobody for report)
+
+0.00006    2010-03-08T18:52:06+09:00
+           - added requires check to mysql auto reconnect test
+           - dependend Test::Class 0.34
+             because broken was 't/020_mock/cache-driver-memcached.t' in perl 5.10
+
+0.00005    2010-01-12T21:36:59+09:00
+           - Core
+             add BIT type
+             add get_model method for Data::Model::Row
+             fixed validate tests broken using Params::Validate::PP
+           - Driver::Memcached
+             add ignore_undef_value option
+           - Driver::Cache
+             fixed bug, cache of defined value only
+           - Queue::Q4M:
+             add validation to 'no created queue table'
+
+0.00004    2009-08-26T13:19:05+09:00
+           - Iterator::Empty will be returned if get-method result is empty
+           - Driver::DBI
+             add reuse_dbh option
+             add isnt_reconnect option for rw_handle, r_handle
+             add on_duplicate_key_update support for mysql
+             add pseudo bigint emulation for sqlite
+           - Iterator
+             add $itr->has_next
+             add overloaded iteration
+
+0.00003    2009-07-04T14:20:27+09:00
+           - Driver::Memcached: add more KeyValueStorage friendly features.
+             see L<Data::Model::Driver::Memcached> OPTIONS
+
+0.00002    2009-06-18T13:55:21+09:00
+           - add dependency Encode
+           - Q4M: add queue_abort method
+
+0.00001    2009-06-10T20:57:30+09:00
+           - original version

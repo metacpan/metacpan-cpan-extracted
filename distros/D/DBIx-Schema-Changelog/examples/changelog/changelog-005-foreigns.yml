@@ -1,0 +1,1561 @@
+---
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: blog_entries
+      name: blog_entry_id
+    name: blog_comments
+    type: altertable
+  id: 005-1-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: blog_entry_type
+      name: entry_type
+    name: blog_entries
+    type: altertable
+  id: 005-2-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: clendar_attributes
+      name: clendar
+    name: venue_clendar
+    type: altertable
+  id: 005-3-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: forum_bans
+    type: altertable
+  id: 005-4-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: report_event
+    name: msg_session_msg_report
+    type: altertable
+  id: 005-5-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: report_event
+    name: msg_session_member_report
+    type: altertable
+  id: 005-6-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: forum_closed_topics
+    type: altertable
+  id: 005-7-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: forum_post_reports
+    type: altertable
+  id: 005-8-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: user_changelog
+    type: altertable
+  id: 005-9-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: forum_warnings
+    type: altertable
+  id: 005-10-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: events
+      name: event
+    name: messages_reports
+    type: altertable
+  id: 005-11-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_categories
+      name: cat
+    name: forum_cat_sort_table
+    type: altertable
+  id: 005-12-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_categories
+      name: forum_category
+    name: forum_category_need_permissions
+    type: altertable
+  id: 005-13-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_categories
+      name: category
+    name: forum_topics
+    type: altertable
+  id: 005-14-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_head_categories
+      name: forum_head_category
+    name: forum_head_category_need_permissions
+    type: altertable
+  id: 005-15-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_head_categories
+      name: head
+    name: forum_head_cat_sort_table
+    type: altertable
+  id: 005-16-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_head_categories
+      name: head
+    name: forum_categories
+    type: altertable
+  id: 005-17-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: result_post
+    name: forum_bans
+    type: altertable
+  id: 005-18-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: bleak_post
+    name: forum_post_bleaks
+    type: altertable
+  id: 005-19-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: post
+    name: forum_post_hits
+    type: altertable
+  id: 005-20-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: result_post
+    name: forum_post_reports
+    type: altertable
+  id: 005-21-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: last_post
+    name: forum_user_subscription
+    type: altertable
+  id: 005-22-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_post
+      name: result_post
+    name: forum_warnings
+    type: altertable
+  id: 005-23-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: topic
+    name: forum_post_answers
+    type: altertable
+  id: 005-24-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: topic
+    name: forum_post
+    type: altertable
+  id: 005-25-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: hit_topic
+    name: forum_topic_hits
+    type: altertable
+  id: 005-26-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: bleak_topic
+    name: forum_topic_bleaks
+    type: altertable
+  id: 005-27-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: result_topics
+    name: forum_topics_reports
+    type: altertable
+  id: 005-28-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: topic
+    name: forum_count_post
+    type: altertable
+  id: 005-29-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: topic
+    name: forum_user_subscription
+    type: altertable
+  id: 005-30-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: forum_topics
+      name: id
+    name: forum_closed_topics
+    type: altertable
+  id: 005-31-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: message_session
+      name: session
+    name: message_session_messages
+    type: altertable
+  id: 005-32-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: message_system
+      name: sys_message
+    name: forum_topics_reports
+    type: altertable
+  id: 005-33-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: message_system
+      name: sys_message
+    name: forum_topic_bans
+    type: altertable
+  id: 005-34-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: messages
+      name: message
+    name: messages_reports
+    type: altertable
+  id: 005-35-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: msg_session_messages
+      name: session_message
+    name: msg_session_msg_report
+    type: altertable
+  id: 005-36-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: msg_sessions
+      name: id
+    name: msg_session_record_vault
+    type: altertable
+  id: 005-37-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: msg_sessions
+      name: msg_session
+    name: msg_session_messages
+    type: altertable
+  id: 005-38-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: msg_sessions
+      name: msg_session
+    name: msg_session_member_report
+    type: altertable
+  id: 005-39-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: msg_sessions
+      name: msg_session
+    name: msg_session_members
+    type: altertable
+  id: 005-40-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: profile_interview_question
+      name: question
+    name: profile_interview_answer
+    type: altertable
+  id: 005-41-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: profile_question
+      name: question
+    name: profile_question_answer
+    type: altertable
+  id: 005-42-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: profile_question
+      name: question
+    name: profile_question_suggestions
+    type: altertable
+  id: 005-43-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: profile_question_suggestions
+      name: suggestions
+    name: profile_question_answer
+    type: altertable
+  id: 005-44-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: msg_user
+    name: msg_session_messages
+    type: altertable
+  id: 005-45-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: msg_session_msg_report
+    type: altertable
+  id: 005-46-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: msg_session_record_vault
+    type: altertable
+  id: 005-47-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: msg_sessions
+    type: altertable
+  id: 005-48-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_dashboard_widgets
+    type: altertable
+  id: 005-49-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_forum_language
+    type: altertable
+  id: 005-50-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_gb
+    type: altertable
+  id: 005-51-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: guest_user
+    name: profile_gb
+    type: altertable
+  id: 005-52-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_interview_answer
+    type: altertable
+  id: 005-53-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_question_answer
+    type: altertable
+  id: 005-54-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: profile_settings_attributes
+    type: altertable
+  id: 005-55-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: hit_user
+    name: forum_topic_hits
+    type: altertable
+  id: 005-56-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: blog_comments
+    type: altertable
+  id: 005-57-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: blog_entries
+    type: altertable
+  id: 005-58-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: blog_entry_type
+    type: altertable
+  id: 005-59-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: clendar_attributes
+    type: altertable
+  id: 005-60-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_bans
+    type: altertable
+  id: 005-61-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: banner
+    name: forum_bans
+    type: altertable
+  id: 005-62-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_closed_topics
+    type: altertable
+  id: 005-63-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_post
+    type: altertable
+  id: 005-64-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_post_answers
+    type: altertable
+  id: 005-65-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: user_id
+    name: forum_post_bleaks
+    type: altertable
+  id: 005-66-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_post_hits
+    type: altertable
+  id: 005-67-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_post_reports
+    type: altertable
+  id: 005-68-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_topic_bans
+    type: altertable
+  id: 005-69-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: user_id
+    name: forum_topic_bleaks
+    type: altertable
+  id: 005-70-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: address_information
+    type: altertable
+  id: 005-71-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_topics
+    type: altertable
+  id: 005-72-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_topics_reports
+    type: altertable
+  id: 005-73-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_user_subscription
+    type: altertable
+  id: 005-74-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: forum_warnings
+    type: altertable
+  id: 005-75-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: warned_by
+    name: forum_warnings
+    type: altertable
+  id: 005-76-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: imagine_someone
+    type: altertable
+  id: 005-77-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: user_1
+    name: imagine_someone
+    type: altertable
+  id: 005-78-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: user_2
+    name: imagine_someone
+    type: altertable
+  id: 005-79-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: localvalues
+    type: altertable
+  id: 005-80-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: message_session
+    type: altertable
+  id: 005-81-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: message_session_members
+    type: altertable
+  id: 005-82-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: message_session_messages
+    type: altertable
+  id: 005-83-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: sender
+    name: messages
+    type: altertable
+  id: 005-84-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: recipient
+    name: messages
+    type: altertable
+  id: 005-85-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: sender
+    name: messages_archives
+    type: altertable
+  id: 005-86-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: recipient
+    name: messages_archives
+    type: altertable
+  id: 005-87-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: archives_owner
+    name: messages_archives
+    type: altertable
+  id: 005-88-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: sender
+    name: messages_record_vault
+    type: altertable
+  id: 005-89-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: recipient
+    name: messages_record_vault
+    type: altertable
+  id: 005-90-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: record_vault_owner
+    name: messages_record_vault
+    type: altertable
+  id: 005-91-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: messages_reports
+    type: altertable
+  id: 005-92-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: first_user
+    name: messages_reports
+    type: altertable
+  id: 005-93-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: second_user
+    name: messages_reports
+    type: altertable
+  id: 005-94-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: third_user
+    name: messages_reports
+    type: altertable
+  id: 005-95-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: messages_system
+    type: altertable
+  id: 005-96-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: msg_session_member_report
+    type: altertable
+  id: 005-97-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: msg_user
+    name: msg_session_member_report
+    type: altertable
+  id: 005-98-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: msg_user
+    name: msg_session_members
+    type: altertable
+  id: 005-99-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: creator
+    name: user_changelog
+    type: altertable
+  id: 005-100-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_counts
+    type: altertable
+  id: 005-101-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_forum_language
+    type: altertable
+  id: 005-102-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_friends
+    type: altertable
+  id: 005-103-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: friend
+    name: user_friends
+    type: altertable
+  id: 005-104-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_friends_request
+    type: altertable
+  id: 005-105-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: friend
+    name: user_friends_request
+    type: altertable
+  id: 005-106-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_has_layout
+    type: altertable
+  id: 005-107-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_has_user_role
+    type: altertable
+  id: 005-108-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_password_request
+    type: altertable
+  id: 005-109-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_settings
+    type: altertable
+  id: 005-110-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_settings_forum
+    type: altertable
+  id: 005-111-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: id
+    name: user_settings_profile_overview
+    type: altertable
+  id: 005-112-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: id
+    name: user_templates
+    type: altertable
+  id: 005-113-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_visits
+    type: altertable
+  id: 005-114-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: visitor
+    name: user_visits
+    type: altertable
+  id: 005-115-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: venue_clendar
+    type: altertable
+  id: 005-116-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: venue_users
+    type: altertable
+  id: 005-117-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: venues
+    type: altertable
+  id: 005-118-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: gallery_categories
+    type: altertable
+  id: 005-119-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: hited_by
+    name: gallery_count_image_hits
+    type: altertable
+  id: 005-120-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: bleaked_by
+    name: gallery_count_image_bleaks
+    type: altertable
+  id: 005-121-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: viewed_by
+    name: gallery_count_image_views
+    type: altertable
+  id: 005-122-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: gallery_image_comments
+    type: altertable
+  id: 005-123-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: created_by
+    name: gallery_category_comments
+    type: altertable
+  id: 005-124-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: owner_by
+    name: gallery_global_permission_relation
+    type: altertable
+  id: 005-125-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: system_news_comments
+    type: altertable
+  id: 005-126-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: system_news_for_user
+    type: altertable
+  id: 005-127-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: id
+    name: track_user_nickname
+    type: altertable
+  id: 005-128-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: id
+    name: track_user_password
+    type: altertable
+  id: 005-129-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: users
+      name: dbuser
+    name: user_changelog
+    type: altertable
+  id: 005-130-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: system_layouts
+      name: layout
+    name: user_has_layout
+    type: altertable
+  id: 005-131-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: system_news
+      name: system_news
+    name: system_news_for_user
+    type: altertable
+  id: 005-132-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: system_news
+      name: system_news
+    name: system_news_comments
+    type: altertable
+  id: 005-133-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: templates
+      name: user_template
+    name: user_templates
+    type: altertable
+  id: 005-134-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_permissions
+      name: user_permission
+    name: forum_category_need_permissions
+    type: altertable
+  id: 005-135-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_permissions
+      name: user_permission
+    name: forum_head_category_need_permissions
+    type: altertable
+  id: 005-136-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_permissions
+      name: user_permission
+    name: user_role_has_permissions
+    type: altertable
+  id: 005-137-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_roles
+      name: user_role
+    name: user_has_user_role
+    type: altertable
+  id: 005-138-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_roles
+      name: parent
+    name: user_roles
+    type: altertable
+  id: 005-139-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: user_roles
+      name: user_role
+    name: user_role_has_permissions
+    type: altertable
+  id: 005-140-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: venues
+      name: venue
+    name: venue_clendar
+    type: altertable
+  id: 005-141-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: venues
+      name: venue
+    name: venue_users
+    type: altertable
+  id: 005-142-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_image_permissions
+      name: permission
+    name: gallery_image_permission_relation
+    type: altertable
+  id: 005-143-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_category_permissions
+      name: permission
+    name: gallery_global_permission_relation
+    type: altertable
+  id: 005-144-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_category_permissions
+      name: permission
+    name: gallery_category_permission_relation
+    type: altertable
+  id: 005-145-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_categories
+      name: category
+    name: gallery_category_order_idx
+    type: altertable
+  id: 005-146-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_categories
+      name: category
+    name: gallery_category_hierarchy
+    type: altertable
+  id: 005-147-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_categories
+      name: category
+    name: gallery_images
+    type: altertable
+  id: 005-148-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_categories
+      name: category
+    name: gallery_category_comments
+    type: altertable
+  id: 005-149-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_categories
+      name: category
+    name: gallery_category_permission_relation
+    type: altertable
+  id: 005-150-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_count_image_bleaks
+    type: altertable
+  id: 005-151-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_count_image_views
+    type: altertable
+  id: 005-152-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_image_comments
+    type: altertable
+  id: 005-153-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_image_permission_relation
+    type: altertable
+  id: 005-154-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_image_order_idx
+    type: altertable
+  id: 005-155-maz
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      foreign:
+        refcolumn: id
+        reftable: gallery_images
+      name: image
+    name: gallery_count_image_hits
+    type: altertable
+  id: 005-156-maz

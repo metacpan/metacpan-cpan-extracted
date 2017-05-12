@@ -1,0 +1,81 @@
+#!perl
+package dzooky;
+$dzooky::VERSION = '0.22';
+use strict;
+use warnings;
+use Dist::Zooky::App;
+# ABSTRACT: convert a dist to Dist::Zilla
+Dist::Zooky::App->run;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dzooky - convert a dist to Dist::Zilla
+
+=head1 VERSION
+
+version 0.22
+
+=head1 SYNOPSIS
+
+  $ cd Some-Dist-Dir
+  $ dzooky
+
+=head1 DESCRIPTION
+
+dzooky is L<Dist::Zilla>'s nephew. He has the ability to summon his uncle.
+
+dzooky will try its best to convert a distribution to use L<Dist::Zilla>. It
+supports L<ExtUtils::MakeMaker>, L<Module::Install> and L<Module::Build> based
+distributions, with certain limitations.
+
+Simply execute C<dzooky> in the directory containing the distribution you wish
+to convert to L<Dist::Zilla>. C<dzooky> will determine the type of distribution
+it is and execute the C<Makefile.PL> or C<Build.PL> and gather meta information
+to generate a C<dist.ini> file for you.
+
+It will C<die> on any error conditions it encounters.
+
+If you do not wish to execute C<Makefile.PL> or C<Build.PL> and have C<META.json>
+or C<META.yml>, you may use the C<metafile> command to merely examine those files.
+
+  $ dzooky metafile
+
+=head1 CAVEAT PROGRAMMER
+
+This should be considered as experimental for the moment. It does work in the main
+but there are some C<gotchas>.
+
+The L<ExtUtils::MakeMaker> examination is done by parsing the C<Makefile> that is
+produced by executing C<Makefile.PL>. L<Module::Install> will also fall back to
+this mechanism if a C<MYMETA.json> or C<MYMETA.yml> file is not generated.
+
+The L<Module::Build> examination is purely from C<MYMETA.json> or C<MYMETA.yml>.
+
+This has some limitations.
+
+=head1 TODO
+
+As we pull a lot of data from C<MYMETA.json> or C<MYMETA.yml> ( where applicable ), we could fill in
+a lot more of the C<dist.ini> automatically.
+
+The L<Module::Install> code does not take into account dists using L<Module::AutoInstall>,
+maybe it should. Any ideas for achieving this would be welcome.
+
+=head1 AUTHOR
+
+Chris Williams <chris@bingosnet.co.uk>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Chris Williams.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

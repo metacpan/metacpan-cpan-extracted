@@ -1,0 +1,23 @@
+---
+abstract: 'chip driver for a F<MAX7219>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-MAX7219
+provides:
+  Device::Chip::MAX7219:
+    file: lib/Device/Chip/MAX7219.pm
+    version: '0.04'
+requires:
+  Device::Chip: '0.03'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,19 @@
+NAME
+    Diamond - Diamond bundle
+
+SYNOPSIS
+      cpanm --interactive Diamond
+
+      # clone development git for all of those modules (You'll be prompted)
+      > perl -MDiamond -e 'git_clone'
+
+AUTHOR
+    Simon James Odell <simonjamesodell@live.co.uk>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://perlnights.com/>
+

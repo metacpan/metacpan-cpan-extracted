@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::Polipo.
+
+0.02  Fri Mar 26 15:05:11 HST 2010
+	- added binmode for Windows environment
+	- fixed some metadata
+
+0.01  Sun Aug  2 21:47:22 2009
+	- original version; created by h2xs 1.23 with options
+		-X -A Data::Polipo
+

@@ -1,0 +1,25 @@
+---
+abstract: 'An object that calculates business days and hours '
+author:
+  - 'Antano Solar <solar345@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.78, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-BusinessHours
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::MethodMaker: 0
+  DateTime: 0
+  Test::More: 0
+  perl: 5.008001
+version: 2.03

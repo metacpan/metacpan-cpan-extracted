@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DateTime-Format-Duration-XSD.t
+lib/DateTime/Format/Duration/XSD.pm
+META.yml                                 Module meta-data (added by MakeMaker)

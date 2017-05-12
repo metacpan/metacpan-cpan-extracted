@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Mojo::Template;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $dsn, $db_user, $db_password, $fact_table, @dimensions );
+
+my $result = GetOptions(
+    'dsn=s'                    => \$dsn,
+    'db_user|user|u=s'         => \$db_user,
+    'db_password|password|p=s' => \$db_password,
+    'fact=s'                   => \$fact_table,
+    'dimension|dim=s'          => \@dimensions,
+);
+
+pod2usage(1) if !$dsn or !$fact_table or !@dimensions;
+
+my $mt = Mojo::Template->new();
+
+my $template = do { local $/ = '__END__'; <DATA> };
+
+my %param = (
+    dsn         => $dsn,
+    db_user     => $db_user,
+    db_password => $db_password,
+    dimensions  => [ map { _fake_dimension($_) } @dimensions ],
+    fact_table  => $fact_table,
+);
+
+my $output = $mt->render( $template, %param );
+
+print $output;
+
+sub _fake_dimension {
+    my $name = shift;
+    return {
+        name        => $name,
+        attributes  => [ 'foo', 'bar', 'baz' ],
+        natural_key => "$name\_id",
+    };
+}
+
+=head1 NAME
+
+dw-load - generate a simple load script
+
+=head1 SYNOPSIS
+
+    dw-load [options]
+
+=head1 OPTIONS
+
+=over
+
+=item --dsn
+
+=item --db_user
+
+=item --db_password
+
+=item --fact
+
+The name of the fact table.
+
+=item --dimension
+
+The name of one or more dimensions.
+
+=back
+
+=head2 EXAMPLE
+
+    dw-load \
+        --dsn='dbi:SQLite:dbname=test.db' \
+        --fact='sales' \
+        --dimension='user' \
+        --dimension='product'
+
+=head1 DESCRIPTION
+
+dw-etl will create the base of a simple load script.
+
+The load script, by default, will read from a tab-separated file containing all
+the necessary columns for fact and dimensions.
+
+=head2 ETL
+
+The load script is the last step of the ETL (extract/transform/load) process.
+
+By now, we expect that the data was extracted from source systems, cleaned and
+exported to a tab-separated file. (Or any other format you think is convenient.)
+
+The load script will read the input file and load the Data Warehouse database.
+
+=head2 SLOWLY CHANGING DIMENSIONS
+
+One of the most important tasks of the load script is to take care of "slowly
+changing dimensions".
+
+Any dimensional attributes marked with "KEEP_HISTORY" flag will be checked
+against live data. Any changes to these fields will lead to the creation of a
+new record.
+
+If you believe that one attribute will change often, consider if it shouldn't
+have its own dimension?
+
+=head1 AUTHOR
+
+Nelson Ferraz, C<< <nferraz at gmail.com> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Nelson Ferraz.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+__END__
+% my %param = @_;
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DataWarehouse::ETL;
+
+my $etl = DataWarehouse::ETL->new(
+    dsn         => '<%= $param{dsn} %>',
+    db_user     => '<%= $param{db_user} %>',
+    db_password => '<%= $param{db_password} %>'
+);
+
+% for my $dim ( @{$param{dimensions}} ) {
+$etl->initialize_dimension(
+    TABLE        => '<%= $dim->{name} %>',
+    ATTRIBUTES   => [qw/ <%= join(' ', @{$dim->{attributes}}) %> /],
+    NATURAL_KEY  => '<%= $dim->{natural_key} %>',
+    #KEEP_HISTORY => [],
+);
+% }
+
+$etl->dbh->begin_work();
+
+while ( my $line = <> ) {
+    chomp $line;
+
+    my (<%= join(', ', map { '$' . $_ } map { @{ $_->{attributes} } } @{$param{dimensions}} ) %>) = split( /\t/, $line );
+
+% for my $dim ( @{$param{dimensions}} ) {
+    my $<%= $dim->{name} %>_id = $etl->populate_dimension(
+        TABLE    => '<%= $dim->{name} %>',
+%   for my $attr ( @{$dim->{attributes}} ) {
+        '<%= $attr %>' => $<%= $attr %>,
+%   }
+    );
+% }
+
+    $etl->populate_fact(
+        TABLE     => '<%= $param{fact_table} %>',
+% for my $dim ( @{$param{dimensions}} ) {
+        '<%= $dim->{name} %>' => $<%= $dim->{name} %>_id,
+% }
+    );
+
+    if ( $. % 10_000 == 0 ) {
+        $etl->dbh->commit();
+        $etl->dbh->begin_work();
+    }
+}
+
+$etl->dbh->commit();

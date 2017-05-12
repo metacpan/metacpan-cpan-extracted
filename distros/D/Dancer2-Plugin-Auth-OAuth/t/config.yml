@@ -1,0 +1,34 @@
+session: Simple
+plugins:
+  "Auth::OAuth":
+    prefix: /auth_test
+    success_url: /users
+    error_url: /?error=1
+    providers:
+      Twitter:
+        tokens:
+          consumer_key: consumer_key
+          consumer_secret: consumer_s3kr3t
+      Facebook:
+        tokens:
+          client_id: some_client_id
+          client_secret: some_client_s3kr3t
+      Google:
+        tokens:
+          client_id: some_client_id
+          client_secret: some_client_s3kr3t
+      Github:
+        tokens:
+          client_id: some_client_id
+          client_secret: some_client_s3kr3t
+      Stackexchange:
+        tokens:
+          client_id: some_client_id
+          client_secret: some_client_s3kr3t
+          key: some_key
+        site: stackoverflow
+      Linkedin:
+        tokens:
+          client_id: some_client_id
+          client_secret: some_client_s3kr3t
+        fields: id,formatted-name,picture-url,email-address

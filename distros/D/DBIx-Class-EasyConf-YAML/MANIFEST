@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-Class-EasyConf-YAML.t
+t/lib/MyApp/Schema/Result/SomeTable.pm
+t/lib/MyApp/Schema/Result/SomeOtherTable.pm
+lib/DBIx/Class/EasyConf/YAML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

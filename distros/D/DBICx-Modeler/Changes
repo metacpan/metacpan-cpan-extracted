@@ -1,0 +1,23 @@
+TODO:
+    - Handle immutable classes
+    - Handle many-to-many
+    - Make sure with $artist->cds( ... )->slice( 0 )->artist that $artist and ->artist are the same
+    - Make save alias for update_or_create
+    - Better ->_model__ accessor (so ugly)
+
+0.005 Friday October 23 13:22:37 PDT 2009:
+    - Integrated patch to fix deprecated cloning method (thanks gardejo)
+
+0.004 Friday June 12 09:09:24 PDT 2009:
+    - Integrated after, before, around method modification
+    - Added update_or_create
+
+0.003 Friday April 24 09:21:37 PDT 2009:
+    - _model__ renaming and additional accessors
+
+0.002 Thursday April 23 17:21:43 PDT 2009:
+    - Fixed some documentation
+
+0.001 Thursday April 23 16:56:48 PDT 2009:
+    - Initial release (wonder what this button does...)
+

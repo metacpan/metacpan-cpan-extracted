@@ -1,0 +1,8 @@
+bin/minisscii
+Build.PL
+ChangeLog
+META.yml
+lib/Device/MiniSSCII.pm
+MANIFEST			This list of files
+t/001_device_minisscii.t
+t/002_pod.t

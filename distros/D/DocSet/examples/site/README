@@ -1,0 +1,90 @@
+This directory is a sample project that you can start with and then
+modify it to use your files instead.
+
+If you are located in Docset-xx directory, cd to the 'examples/site'
+directory:
+
+  % cd examples/site
+
+It includes a shrinked version of perl.apache.org, with many docs
+removed or reduced to the mininumum. There are still quite a lot of
+documents left so you can see the big picture.
+
+To build the HTML version of the site and see what it does, run:
+
+  % bin/build -v
+
+Without -v the build won't print anything.
+
+Now you can see the output in the 'dst_html' directory.
+
+To build PDF, use -d option, e.g.:
+
+  % bin/build -vd
+
+Now you can read one of the generated PDF books from the 'dst_ps'
+directory and its sub-directories, e.g.:
+
+  % acroread dst_ps/docs/1.0/guide/guide.pdf
+
+or
+
+  % acroread dst_html/docs/1.0/guide/guide.pdf
+
+since it's copied there, so the dst_html dir is the final version that
+can be published on the web and includes the sources, the htmls and
+pdfs.
+
+Normally if you modify certain files, only they will be rebuilt, but
+if you change a template you may want to force a complete rebuilt with
+'-f':
+
+  % bin/build -vf
+
+========================================
+
+The layout of the project tree:
+
+./src/config.conf -- the main config file that you should change
+
+./README -- this file
+
+Sources directory:
+
+./src            -- the source files (pod, html, images, etc)
+./src/config.cfg     -- config file
+and lots of source files in various formats.
+
+After the first run cache files will also appear in the 'src' dir and
+its sub-dirs.
+
+Templates:
+
+./tmpl                -- templates files directory
+./tmpl/custom         -- custom templates
+./tmpl/std            -- standard templates libs (do not touch)
+
+Execution scripts:
+
+./bin/build       -- a sample script that builds the site
+
+In the directory conf you will find sample configuration files the
+behavior of html2ps:
+
+conf/html2ps.conf        -- normal book mode
+conf/hyphen.tex          -- this file is required by config files
+
+To learn how to modify the default html2ps behavior read the
+documentation at http://www.tdb.uu.se/~jan/html2ps.html. You specify
+which html2ps config file to use in the config.cfg file as explained
+in the DocSet::Config manpage.
+
+---
+
+If you want to build your own documentation project/site, simple start
+off this example and change things to fit your content/style. For more
+info read the DocSet manpages.
+
+Questions can be asked at the template-docset mailing list. For
+mailing list archives and subscription information please see:
+http://template-toolkit.org/mailman/listinfo/template-docset

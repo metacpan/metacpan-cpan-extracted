@@ -1,0 +1,27 @@
+0.05     2011-05-23
+
+- The EN language module also didn't provide any surnames. This time I wrote a
+  few tests.
+
+
+0.04     2011-05-23
+
+- The EN language module didn't provide any given names (this distro needs
+  some real tests).
+
+
+0.03     2011-05-22
+
+- Instead of assuming that /usr/share/dict/words exists (and is in English),
+  the Data::Random::Contact::Language::EN module now includes a copy of the
+  dictionary on my system.
+
+
+0.02     2011-05-20
+
+- Remove use of MooseX::Types::Common::String, which was not needed.
+
+
+0.01     2011-05-20
+
+- First release upon an unsuspecting world.

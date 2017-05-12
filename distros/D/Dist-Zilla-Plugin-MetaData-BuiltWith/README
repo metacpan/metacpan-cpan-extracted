@@ -1,0 +1,32 @@
+Dist::Zilla::Plugin::MetaData::BuiltWith
+
+This module provides extra metadata in your distribution, automatically
+documenting what versions of dependencies the author was using at the
+time of release.
+
+This allows consumers of said distributions to be able to see a range of
+versions that are "known good" should they experience problems.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

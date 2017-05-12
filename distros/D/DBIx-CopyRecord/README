@@ -1,0 +1,67 @@
+NAME
+    DBIx::CopyRecord - Perl module for copying records in databases within
+    same table including all child tables;
+
+SYNOPSIS
+      use DBIx::CopyRecord;
+
+      # connect 
+      my $dbh = DBI->connect('dbi:MySQL:','login','password');
+      my $CR = DBIx::CopyRecord->new($dbh);
+
+    ### child table_name only is not yet supported.
+
+      $rv=$CR->copyrecord(
+                          { table_name => 'invoice',
+                            primary_key => 'invoice_number',
+                            primary_key_value => 'select seq_invoice.nextvalue FROM dual',
+                            where => 'invoice_number=100',
+                            child => [ { table_name => products,
+                                         primary_key => line_item_id,
+                                         primary_key_value => 'select seq_invoice_detail.nextvalue FROM dual', 
+                                         foreign_key => invoice_number },
+                                       { table_name => services } ] });
+
+            # disconnect database
+            $dbh->disconnect;
+
+      NOTE:primary_key_value = 'NULL' for MySQL if auto_increment, 
+                               a value or 'select value from sequence'
+
+DESCRIPTION
+    This module can copy records in a database whild maintaining referential
+    integrity. The "copy" method is all that's needed.
+
+USAGE
+      use DBIx::CopyRecord;                    
+      my $CR = DBIx::CopyRecord->new( DB HANDLE );
+
+      RV = $CR->copyrecord(
+            { table_name => TABLE NAME,
+              primary_key => PRIMARY KEY COLUMN,
+              primary_key_value => VALUE, NULL or SELECT,
+              where => WHERE CONDITION,
+              child => [ { table_name => CHILD TABLE NAME,
+                           primary_key => CHILD PRIMARY KEY COLUMN,
+                           primary_key_value => CHILD VALUE, NULL or SELECT, 
+                           foreign_key => COLUMN NAME OF  },
+                         { table_name => CHILD TABLE NAME } ] });
+
+    Argument list: table_name primary_key primary_key_value where child
+
+    Child table_name entry without additional arguments will attempt to
+    figure out the primary key and foreign key from the database.
+
+AUTHOR
+        Jack Bilemjian <jck000@gmail.com>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    DBI(1).
+

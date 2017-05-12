@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Response.xs
+t/Dendral-HTTP-Response.t
+lib/Dendral/HTTP/Response.pm

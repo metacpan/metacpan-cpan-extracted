@@ -1,0 +1,64 @@
+                  =========================================
+                    Package "Data::Locations" Version 5.5
+                  =========================================
+
+
+                 Copyright (c) 1997 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Credits:
+--------
+
+Many thanks go to Mr. Gero Scholz <Gero.Scholz@dresdner-bank.com> (now Global
+Head of IT at the Dresdner Bank in Frankfurt, Germany) for his personal support
+and for writing the "ProMAC" macro processor (some sort of a precursor to Perl,
+in spirit) and for implementing the concept of "locations" in it, which inspired
+me to write this Perl module!
+
+Mr. Scholz owes his own inspiration to the "DELTA" macro processor (a tool
+widely used during the seventies, as it seems), where a rudimentary version
+of the concept of "locations" was implemented and where its name ("locations")
+seems to originate from.
+
+Many thanks also to my employer, software design & management, and especially
+to Andreas Hess <andi@sdm.de>, for their active support (i.e., for granting me
+a considerable time budget for my work on the first version of this module).
+
+Many thanks to Wolfgang Herbst <herbst@sdm.de>, Michael Hauser <mike@sdm.de>
+and Christian Reiber <christian.reiber@zeppelin.de> for choosing this module
+for use in a large software project and for being my first guinea pigs... ;-)
+
+I owe many thanks to Marc Lehmann <pcg@goof.com> for thoroughly testing this
+module, for discovering and reporting the bug fixed in version 4.3, and for
+pointing out a design weakness in the implementation of this module, which
+has been fixed in version 5.0.
+
+Also many thanks to Graham Barr <gbarr@ti.com> for responding to my bug
+report concerning the bug mentioned above, which I filed because it was
+not immediately clear from the beginning wether this was actually a bug
+in my module or in Perl 5.005 (I thought it was in Perl, because the
+module had worked flawlessly with all previous versions of Perl).
+
+Ironically, it turned out to be a bug in my module as well as a bug in
+previous versions of Perl, which had canceled out each other in the past.
+
+Moreover, I am especially grateful to Gurusamy Sarathy <gsar@umich.edu>
+for bearing with me and for investigating this bug together with me.
+
+Special thanks go to the MacPerl CPAN Testers team Paul J. Schinder
+<schinder@pobox.com>, Arved Sandstrom <Arved_37@chebucto.ns.ca> and
+Chris Nandor <pudge@pobox.com> for their invaluable help in getting
+the test case suite right for the MacOS platform (which has some
+peculiarities concerning error messages).
+
+Especially Arved Sandstrom <Arved_37@chebucto.ns.ca> was indefatigable
+in his testing of different versions of the regression test suite and
+in providing me with the necessary feedback (and output from his system)
+for my corrections.
+
+Many thanks go to the CPAN testers team <cpan-testers@perl.org> in general
+for all their efforts and for discussing (and settling) the issue of the
+failing test script with me (the one which has been fixed in version 5.1).
+
+

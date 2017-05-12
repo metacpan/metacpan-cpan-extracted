@@ -1,0 +1,9 @@
+Revision history for DBICx-TxnInsert
+
+0.02    28-08-2009
+        * Move to github
+        * Fix tests
+
+0.01    27-01-2009
+        First version.
+

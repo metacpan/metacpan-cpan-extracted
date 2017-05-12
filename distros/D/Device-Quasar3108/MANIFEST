@@ -1,0 +1,9 @@
+Build.PL
+Makefile.PL
+Changes
+example.pl
+lib/Device/Quasar3108.pm
+MANIFEST
+META.yml
+README
+t/00use.t

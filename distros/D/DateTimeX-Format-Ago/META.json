@@ -1,0 +1,73 @@
+{
+   "abstract" : "I should have written this module \"3 years ago\"!",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.023, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Format-Ago",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "DateTimeX::Format::Ago" : {
+         "file" : "lib/DateTimeX/Format/Ago.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=DateTimeX-Format-Ago"
+      },
+      "homepage" : "https://metacpan.org/release/DateTimeX-Format-Ago",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-datetimex-format-ago.git",
+         "web" : "https://github.com/tobyink/p5-datetimex-format-ago"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/DateTimeX-Format-Ago/project"
+   },
+   "version" : "0.005",
+   "x_contributors" : [
+      "JEEN Lee (JEEN) <jeen@cpan.org>",
+      "Steven Haryanto (SHARYANTO) <sharyanto@cpan.org>",
+      "Richard Eitz (EITZ) <eitz@cpan.org>"
+   ]
+}

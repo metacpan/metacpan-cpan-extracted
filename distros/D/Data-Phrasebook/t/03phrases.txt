@@ -1,0 +1,2 @@
+find_author=select class,title,author from books where author = :author
+find_fields=select :fields from books where author = :author

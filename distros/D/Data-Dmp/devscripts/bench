@@ -1,0 +1,49 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use warnings;
+use FindBin '$Bin';
+use lib "$Bin/../lib";
+
+use Benchmark::Dumb qw(cmpthese);
+use Data::Dmp  ();
+use Data::Dump ();
+use Data::Dumper;
+
+local $Data::Dumper::Indent = 0;
+
+my $data = {
+    array   => [1..10],
+    string1 => "This is a string",
+    string2 => "This is another string",
+    number1 => 1,
+    number2 => 1.2e-10,
+    re1     => qr/^a(bc)?$/i,
+    hash1   => {key1=>1, key2=>[2], key3=>{}},
+    undef   => undef,
+};
+
+say "[1..10]:";
+cmpthese(0, {
+    'Data::Dmp'    => sub { Data::Dmp::dmp([1..10]) },
+    'Data::Dump'   => sub { my $dmp = Data::Dump::dump([1..10]) },
+    'Data::Dumper' => sub { Dumper([1..10]) },
+});
+say "";
+
+say "[1..100]:";
+cmpthese(0, {
+    'Data::Dmp'    => sub { Data::Dmp::dmp([1..100]) },
+    'Data::Dump'   => sub { my $dmp = Data::Dump::dump([1..100]) },
+    'Data::Dumper' => sub { Dumper([1..100]) },
+});
+say "";
+
+say "Some mixed structure:";
+cmpthese(0, {
+    'Data::Dmp'    => sub { Data::Dmp::dmp($data) },
+    'Data::Dump'   => sub { my $dmp = Data::Dump::dump($data) },
+    'Data::Dumper' => sub { Dumper($data) },
+});
+say "";

@@ -1,0 +1,127 @@
+<?xml version = "1.0"?>
+<DBI database = "test">
+	<RESULTSET statement = "select * from pg_catalog.pg_am">
+		<ROW>
+			<amname>rtree</amname>
+			<amowner>1</amowner>
+			<amstrategies>8</amstrategies>
+			<amsupport>3</amsupport>
+			<amorderstrategy>0</amorderstrategy>
+			<amcanunique>0</amcanunique>
+			<amcanmulticol>0</amcanmulticol>
+			<amindexnulls>0</amindexnulls>
+			<amconcurrent>0</amconcurrent>
+			<amgettuple>rtgettuple</amgettuple>
+			<aminsert>rtinsert</aminsert>
+			<ambeginscan>rtbeginscan</ambeginscan>
+			<amrescan>rtrescan</amrescan>
+			<amendscan>rtendscan</amendscan>
+			<ammarkpos>rtmarkpos</ammarkpos>
+			<amrestrpos>rtrestrpos</amrestrpos>
+			<ambuild>rtbuild</ambuild>
+			<ambulkdelete>rtbulkdelete</ambulkdelete>
+			<amvacuumcleanup>-</amvacuumcleanup>
+			<amcostestimate>rtcostestimate</amcostestimate>
+		</ROW>
+		<ROW>
+			<amname>btree</amname>
+			<amowner>1</amowner>
+			<amstrategies>5</amstrategies>
+			<amsupport>1</amsupport>
+			<amorderstrategy>1</amorderstrategy>
+			<amcanunique>1</amcanunique>
+			<amcanmulticol>1</amcanmulticol>
+			<amindexnulls>1</amindexnulls>
+			<amconcurrent>1</amconcurrent>
+			<amgettuple>btgettuple</amgettuple>
+			<aminsert>btinsert</aminsert>
+			<ambeginscan>btbeginscan</ambeginscan>
+			<amrescan>btrescan</amrescan>
+			<amendscan>btendscan</amendscan>
+			<ammarkpos>btmarkpos</ammarkpos>
+			<amrestrpos>btrestrpos</amrestrpos>
+			<ambuild>btbuild</ambuild>
+			<ambulkdelete>btbulkdelete</ambulkdelete>
+			<amvacuumcleanup>btvacuumcleanup</amvacuumcleanup>
+			<amcostestimate>btcostestimate</amcostestimate>
+		</ROW>
+		<ROW>
+			<amname>hash</amname>
+			<amowner>1</amowner>
+			<amstrategies>1</amstrategies>
+			<amsupport>1</amsupport>
+			<amorderstrategy>0</amorderstrategy>
+			<amcanunique>0</amcanunique>
+			<amcanmulticol>0</amcanmulticol>
+			<amindexnulls>0</amindexnulls>
+			<amconcurrent>1</amconcurrent>
+			<amgettuple>hashgettuple</amgettuple>
+			<aminsert>hashinsert</aminsert>
+			<ambeginscan>hashbeginscan</ambeginscan>
+			<amrescan>hashrescan</amrescan>
+			<amendscan>hashendscan</amendscan>
+			<ammarkpos>hashmarkpos</ammarkpos>
+			<amrestrpos>hashrestrpos</amrestrpos>
+			<ambuild>hashbuild</ambuild>
+			<ambulkdelete>hashbulkdelete</ambulkdelete>
+			<amvacuumcleanup>-</amvacuumcleanup>
+			<amcostestimate>hashcostestimate</amcostestimate>
+		</ROW>
+		<ROW>
+			<amname>gist</amname>
+			<amowner>1</amowner>
+			<amstrategies>100</amstrategies>
+			<amsupport>7</amsupport>
+			<amorderstrategy>0</amorderstrategy>
+			<amcanunique>0</amcanunique>
+			<amcanmulticol>1</amcanmulticol>
+			<amindexnulls>0</amindexnulls>
+			<amconcurrent>0</amconcurrent>
+			<amgettuple>gistgettuple</amgettuple>
+			<aminsert>gistinsert</aminsert>
+			<ambeginscan>gistbeginscan</ambeginscan>
+			<amrescan>gistrescan</amrescan>
+			<amendscan>gistendscan</amendscan>
+			<ammarkpos>gistmarkpos</ammarkpos>
+			<amrestrpos>gistrestrpos</amrestrpos>
+			<ambuild>gistbuild</ambuild>
+			<ambulkdelete>gistbulkdelete</ambulkdelete>
+			<amvacuumcleanup>-</amvacuumcleanup>
+			<amcostestimate>gistcostestimate</amcostestimate>
+		</ROW>
+	</RESULTSET>
+	<RESULTSET statement = "select * from public.address">
+		<ROW>
+			<address_id>1</address_id>
+			<address_email>-</address_email>
+			<address_fax>-</address_fax>
+			<address_line>-</address_line>
+			<address_phone>-</address_phone>
+		</ROW>
+		<ROW>
+			<address_id>2</address_id>
+			<address_email>root@localhost</address_email>
+			<address_fax>9999 0000</address_fax>
+			<address_line>AUSTRALIA</address_line>
+			<address_phone>9999 0001</address_phone>
+		</ROW>
+	</RESULTSET>
+	<RESULTSET statement = "select * from public.billing_category">
+		<ROW>
+			<billing_category_id>1</billing_category_id>
+			<billing_category_name>No rate</billing_category_name>
+		</ROW>
+		<ROW>
+			<billing_category_id>2</billing_category_id>
+			<billing_category_name>Standard rate</billing_category_name>
+		</ROW>
+		<ROW>
+			<billing_category_id>3</billing_category_id>
+			<billing_category_name>Discount commercial rate</billing_category_name>
+		</ROW>
+		<ROW>
+			<billing_category_id>4</billing_category_id>
+			<billing_category_name>Commercial rate</billing_category_name>
+		</ROW>
+	</RESULTSET>
+</DBI>

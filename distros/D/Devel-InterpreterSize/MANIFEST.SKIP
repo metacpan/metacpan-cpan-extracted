@@ -1,0 +1,10 @@
+^Devel-InetrpreterSize
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak
+^MYMETA.json
+^MYMETA.yml
+^pm_to_blib
+blib/
+.git/
+

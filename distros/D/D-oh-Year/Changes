@@ -1,0 +1,7 @@
+0.06  Sun Jul  1 20:15:11 PDT 2007
+    Bug fixes
+    - Change from direct pseudo-hash declaration to fields.pm.
+
+0.05  Sat Jun 30 02:22:09 CDT 2007
+    Bug fixes
+    - Declare dependency on fields.pm

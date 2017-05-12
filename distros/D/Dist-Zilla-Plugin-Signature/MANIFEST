@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+SIGNATURE
+lib/Dist/Zilla/Plugin/Signature.pm
+t/00-load.t

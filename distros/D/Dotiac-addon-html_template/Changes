@@ -1,0 +1,15 @@
+0.4
+
+Fixed bug with perl 5.6.2 (worked fine in 5.6.1 and > 5.8)
+
+0.3
+
+Added Dotiac::DTL::Addon::html_template::Replace for faster work with Scalarrefs
+
+0.2
+
+Fixed namespace clashing
+
+0.1
+
+First version

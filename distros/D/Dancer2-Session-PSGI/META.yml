@@ -1,0 +1,41 @@
+---
+abstract: 'Dancer2 session storage via Plack::Middleware::Session'
+author:
+  - 'Russell Jenkins <russellj@cpan.org>'
+build_requires:
+  Dancer2: '0.152000'
+  File::Spec: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack: '1.0029'
+  Plack::Builder: '0'
+  Plack::Middleware::Session: '0.23'
+  Plack::Session::Store: '0'
+  Plack::Test: '0'
+  Test::More: '0.96'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-PSGI
+requires:
+  Dancer2: '0.152000'
+  Dancer2::Core::Role::SessionFactory: '0'
+  Moo: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/veryrusty/dancer2-session-psgi/issues
+  homepage: https://metacpan.org/release/Dancer2-Session-PSGI
+  repository: git://github.com/veryrusty/dancer2-session-psgi.git
+version: '0.009'

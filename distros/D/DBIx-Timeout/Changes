@@ -1,0 +1,10 @@
+Revision history for DBIx::Timeout
+
+1.01
+  - Resolved mysterious warning - PrintError silences it.
+
+  - Now using POSIX::_exit() to avoid problems where the exit-code
+    from calls to exit() doesn't make it to the parent.
+
+1.00 - Sep. 16th, 2006
+  - First release!

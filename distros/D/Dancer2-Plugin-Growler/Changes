@@ -1,0 +1,11 @@
+Revision history for Dancer2-Plugin-Growler
+
+0.03  2015-09-11 08:37:58
+    Fix non-in-memory bug
+
+0.02  2015-07-04 23:29:21
+	Fix template keyword to use dsl method and make it a coderef
+
+0.01  2015-04-03 23:58:07
+       Initial release.
+

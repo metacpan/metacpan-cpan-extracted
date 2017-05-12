@@ -1,0 +1,36 @@
+---
+abstract: 'Perl extension for 32 bit Jenkins Hashing Algorithm'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test: '0'
+  Test::More: '0'
+  blib: '1.01'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Digest-JHash
+provides:
+  Digest::JHash:
+    file: lib/Digest/JHash.pm
+    version: '0.10'
+requires:
+  DynaLoader: '0'
+  Exporter: '0'
+  perl: '5.008'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Digest-JHash
+  repository: https://github.com/shlomif/perl-Digest-JHash.git
+version: '0.10'

@@ -1,0 +1,9 @@
+Changes
+lib/Devel/Nopeep.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+Nopeep.xs
+ppport.h
+README
+t/Devel-Nopeep.t

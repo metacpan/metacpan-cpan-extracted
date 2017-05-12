@@ -1,0 +1,6 @@
+Release history for {{ $plugin->dist_name }}
+
+{{ '{{$NEXT}}' }}
+
+        First version, released on an unsuspecting world.
+

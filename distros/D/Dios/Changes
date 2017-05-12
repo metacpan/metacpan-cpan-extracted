@@ -1,0 +1,84 @@
+Revision history for Dios
+
+0.000001  Tue May 12 14:10:17 2015
+       Initial release.
+
+
+0.000002  Wed Jul 22 10:43:23 2015
+
+    First public release
+
+
+0.000003  Sun Jul 26 13:07:00 2015
+
+    Added missing dependency of Keyword::Declare
+    (thanks, Matt!)
+
+
+0.000004  Sat Aug  1 08:53:56 2015
+
+    Split test prereqs out in Makefile.PL
+    (Thanks Karen)
+
+    Added Variable::Magic dependency
+
+    Added missing paren in Synopsis code
+    (Thanks, Olivier)
+
+    Added Dios::Types::Pure to enable users
+    to take advantage of Dios::Types without
+    the compile-time and memory penalties of
+    the 'subtype' keyword
+    (Thanks, Olivier!)
+
+
+0.000005  Sun Aug  2 06:56:20 2015
+
+    Added Object::InsideOut as a prereq
+    (Thanks Slaven!)
+
+
+0.000006  Mon Aug 10 20:06:11 2015
+
+    Rejigged t/*lvalue* to avoid problems if Want.pm not installed
+    (thanks Matthias and Peter!)
+
+
+
+0.000007  Wed Aug 12 07:59:24 2015
+
+    Changed Makefile.PL to eliminated Data::Alias prereq under 5.22+
+    (thanks Peter and Karen)
+
+
+
+0.001001  Fri Jul  1 21:50:07 2016
+
+    MAJOR FEATURE RELEASE:
+
+        * Added multiple dispatch
+
+        * Added return types
+
+        * Added nameless sigiled positional variables
+
+        * Added type-only positional variables
+
+        * Added literal value constraints
+
+        * Added arrays and hashes as attributes
+
+        * Added typed lexical variables (via 'lex' declarator)
+
+
+    Other fixes:
+
+        * Documented unresolved issues with quotelikes,
+          and now generate error messages for them
+
+        * Various doc tweaks (mainly corrected code examples for Tuple type)
+
+        * Added Dios::Types::Pure to MANIFEST so it's actually indexed
+          (Sorry, Olivier!)
+
+

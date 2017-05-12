@@ -1,0 +1,116 @@
+Date: Wed, 11 Aug 2004 11:00:58 -0700 (PDT)
+From: Bryce Harrington <bryce@bryceharrington.org>
+To: Nicu Buculei <nicu@apsro.com>
+Cc: clipart-list <clipart@freedesktop.org>
+Subject: Re: [Clipart] Open Clip Art Library Release 0.05
+
+    [ The following text is in the "ISO-8859-1" character set. ]
+    [ Your display is set for the "US-ASCII" character set.  ]
+    [ Some characters may be displayed incorrectly. ]
+
+On Wed, 11 Aug 2004, Nicu Buculei wrote:
+> Alberto Simues wrote:
+> > We really need to create a repository for all the clipart, where we
+> > can work together on it, as adding metadata and such. A CVS
+> > repository would be very, very nice.
+>
+> i believe a web interface would be nicer - probably a solution could
+> be a script derived from upload_svg.cgi for editing metadata
+
+I had attempted to do a CVS repository for the clipart really early on
+(the module's still there if anyone wants to use it.)  But in playing
+with it and thinking about it, CVS seems too limited for our needs.
+
+First, it has a file hierarchy approach to storing things, whereas what
+we really want is a flat storage with metadata to do querying.  Second,
+CVS is hard to use programmatically because it doesn't have an API, so
+you have to parse stdout (I have done this in another project and it's a
+pain in the neck) to get your error codes.  Third, creating a web
+interface to CVS is quite hard - this is why the available interfaces
+are read-only.  Fourth, while we can use CVS ok, most ordinary users
+(esp. artists) will find it too technical, so you have to develop an
+interface.   Fifth, imagine doing a CVS checkout after we've been at
+this a few years and have gained tens of thousands of images.  Ack!
+
+But, it's definitely true that we need a repository for this.  Our
+current system is hindering each of us.  My release tools have to have a
+lot more smarts in them than they should, and end up having to do a lot
+of re-work on files to revalidate, etc. etc.  We run into issues
+updating the browsing tool each time we do a release.  We find ourselves
+having to put a surprising amount of intelligence directly into the
+upload tool to compensate.
+
+There are other version control systems besides CVS, such as subversion,
+arch, etc.  However, while these correct some of CVS' deficiencies,
+they're all still _source code_ repositories.  They lack some of the
+functions you'd want from a DMS, so we'd still need to work around
+that.  Plus, they tend to be a little more complex, and definitely don't
+simplify the amount that the user would need to learn.
+
+Looking at proper document management systems, there are a few out
+there, however most are web-only (via php or similar), so they don't
+give enough API-level access.
+
+Anyway, for our purposes, I think that the functionality we require is
+not so complex that we could not write our own.  Essentially we need to
+be able to check documents in and out, lock docs for a particular owner,
+assign document id's, query based on metadata (date, validation status,
+author, category, etc.), and alter metadata (such as categories).
+
+I've made a first pass at a DMS perl module called Document::Manager:
+
+    http://cpan.uwinnipeg.ca/htdocs/dms/Manager.html
+
+The idea here is to do provide the really core operations for a DMS.
+Most of the work has gone into establishing what the internal repository
+file structure looks like; internally it's a flat file system but
+spreads files across multiple directories to avoid too many nodes in any
+one dir (in case we eventually grow to 5 million documents).
+Currently it allows adding documents and checking them out.
+
+I'm really motivated to creating this, because this project is like the
+nineth time I've run into this same basic need.  I've seen all manner of
+ugly work arounds (including a couple of my own) and it's time to come
+up with a cleaner solution to it.  Such a module could have value far
+beyond our project.  For example, any project requiring distributed
+collaboration for creating multimedia has this same need - this means
+computer game developers, video creation teams, writers, and of course
+companies.
+
+I'd love having help working on this; I don't think it's going to be
+much work to create it, but I think the more brains that look at it, the
+better it'd be.  The next step needed is to flesh out its API further.
+Some of the functionality we need next:
+
+   * Query for a list of documents
+   * List revisions for a given document id
+   * Revert document to a prior revision number
+   * Lock/unlock document for a period of time for a given user
+   * Properties (e.g. file size, filename, metadata, owner, watchers)
+   * Whole-Repository stats (# docs, disk space used, etc.)
+
+
+I think for properties we want to stay as generic as possible, because
+while we could hard code things for our own usage (basing it on the SVG
+Metadata fields), I don't think we want to do that because, a) we will
+want to use this for things besides SVG files, such as JPG's, templates
+for other programs like Scribus or OpenOffice, etc. b) we may want to
+store info in addition to what's in the regular SVG Metadata, and c) I'd
+like to be able to add new kinds of properties without having to roll a
+new version of the module.
+
+Anyway, what do you guys think of this approach?  If anyone else would
+like to work on any of the above bits, go for it.
+
+Bryce
+
+
+
+
+OVERVIEW
+--------
+Clipart-Repository will be a high level interface for use by Open Clip
+Art Library to access the clip art repository.  It'll be built on a
+number of the lower level perl modules, combining things like
+SVG::Metadata, Document::Manager, and SOAP::Lite together to provide a
+server daemon that can be used by various interfaces.

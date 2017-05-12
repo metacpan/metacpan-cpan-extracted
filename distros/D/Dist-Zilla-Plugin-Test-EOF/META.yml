@@ -1,0 +1,48 @@
+---
+abstract: 'Check that all files in the projects end correctly'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  File::pushd: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::More: '0.96'
+  Test::Script: '0'
+  Test::Warnings: '0.009'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-EOF
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Dist::Zilla::Plugin::Test::EOF:
+    file: lib/Dist/Zilla/Plugin/Test/EOF.pm
+    version: '0.0501'
+requires:
+  Data::Section: '0'
+  Dist::Zilla: '5.000'
+  Moose: '2.00'
+  Sub::Exporter::ForMethods: '0'
+  Test::EOF: '0.0800'
+  namespace::autoclean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-dist-zilla-plugin-test-eof/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Test-EOF
+  repository: https://github.com/Csson/p5-dist-zilla-plugin-test-eof.git
+version: '0.0501'
+x_contributors:
+  - 'Harley Pig <harleypig@gmail.com>'

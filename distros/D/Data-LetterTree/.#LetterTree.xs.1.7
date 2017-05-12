@@ -1,0 +1,48 @@
+#include "EXTERN.h"
+#include "perl.h"
+#include "XSUB.h"
+
+#include "ppport.h"
+
+#include "lettertree.h"
+
+MODULE = Data::LetterTree		PACKAGE = Data::LetterTree
+
+Node *
+new(class)
+	char * class
+    CODE:
+	RETVAL = new_tree();
+    OUTPUT:
+       RETVAL
+
+MODULE = Data::LetterTree		PACKAGE = NodePtr
+
+int
+load_tree(tree, filename)
+	Node * tree
+	char * filename
+
+int
+add_word(tree, word)
+	Node * tree
+	char * word
+    CODE:
+	RETVAL = add_word(tree, word, NULL);
+    OUTPUT:
+       RETVAL
+
+int
+has_word(tree, word)
+	Node * tree
+	char * word
+
+int
+parse_tree(tree)
+	Node * tree
+
+void
+DESTROY(tree)
+	Node * tree
+    CODE:
+	delete_tree(tree);

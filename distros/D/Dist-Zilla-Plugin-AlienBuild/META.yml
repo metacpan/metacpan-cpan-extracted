@@ -1,0 +1,36 @@
+---
+abstract: 'Use Alien::Build with Dist::Zilla'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test2::Suite: '0.000060'
+  Test::More: '0.94'
+  perl: '5.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.014'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-AlienBuild
+no_index:
+  directory:
+    - corpus
+requires:
+  Alien::Build: '0.32'
+  Data::Section: '0.004'
+  Dist::Zilla: '6.000'
+  Moose: '0'
+  Path::Tiny: '0'
+  Sub::Exporter::ForMethods: '0'
+  perl: '5.014'
+resources:
+  IRC: irc://irc.perl.org/#native
+  bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-AlienBuild/issues
+  homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::AlienBuild
+  repository: git://github.com/plicease/Dist-Zilla-Plugin-AlienBuild.git
+version: '0.16'
+x_serialization_backend: 'YAML::Tiny version 1.70'

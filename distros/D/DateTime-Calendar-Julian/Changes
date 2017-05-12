@@ -1,0 +1,40 @@
+Revision history for Perl extension DateTime::Calendar::Julian.
+
+0.04  2003-03-13
+    - changed output of datetime() to 2000-01-01J00:00:00, to be
+      different from Gregorian dates.
+
+    - removed bug in day_of_year calculation
+
+    - removed "use Params::Validate", which was superfluous after v0.03
+
+0.03  2003-03-08
+    - removed a bug: adding years now works correctly
+
+    - added gregorian_deviation() function
+
+    - changed module source to the development standards of the DateTime
+      project
+
+    - changed required version of DateTime to 0.08, and removed some
+      workarounds that were necessary for version 0.07
+      (last_day_of_month, _greg2rd, _rd2greg)
+
+0.02  2003-02-16
+    - replaced POSIX::floor with a homegrown version
+
+    - renamed _greg2rd and _rd2greg to _ymd2rd and _rd2ymd, in
+      anticipation of a possible change in DateTime. The old names will
+      still be available for a while for backward compatibility.
+
+    - corrected the POD documentation on from_object (reported by Dave
+      Rolsky)
+
+    - removed some bugs in the test script (patch by Tatsuhiko Miyagawa)
+
+    - perhaps most importantly, changed comment in t/1.t: -4712/1/1 is
+      not JD 1, but JD 0
+
+0.01  2003-02-14
+	- original version; the methods that are inherited from DateTime are
+	  not well tested yet

@@ -1,0 +1,90 @@
+DBIx-BlackBox
+
+DBIx::BlackBox - access database with stored procedures only
+
+SYNOPSIS
+    DBIx::BlackBox provides access to database using stored procedures only
+    (the only SQL command available is *exec*). That allows to treat your
+    database as a black box into which only the database administrator
+    provides access by stored procedures.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Sybase and FreeTDS INSTALLATION
+    Following installation steps were tested with both Microsoft SQL Server
+    2000 and Microsoft SQL Server 2008.
+
+  unixODBC
+    Install unixODBC from your system packages or download sources from
+    <http://www.unixodbc.org/>.
+
+  FreeTDS
+    Download dev release of FreeTDS from <http://www.freetds.org> (tested
+    with freetds-0.83.dev.20100122).
+
+        ./configure --with-unixodbc=/usr/local/ \
+            --with-tdsver=8.0 --prefix=/usr/local/freetds
+        make
+        sudo make install
+
+    Edit /usr/local/freetds/etc/freetds.conf and specify access to your
+    database.
+
+        ...
+        [sqlserver]
+            host = 1.2.3.4
+            port = 1433
+            tds version = 8.0
+
+  DBD::Sybase
+    Install DBD::Sybase.
+
+        SYBASE=/usr/local/freetds perl Makefile.PL
+        make
+        sudo make install
+
+    If you want to test DBD::Sybase most likely you would need to modify
+    tests that come with the module (some queries in test files will not
+    work with MS SQL Server).
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::BlackBox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-BlackBox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-BlackBox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-BlackBox
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-BlackBox/
+
+AUTHOR
+    Alex J. G. Burzyński, <ajgb at cpan.org>
+
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Alex J. G. Burzyński.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

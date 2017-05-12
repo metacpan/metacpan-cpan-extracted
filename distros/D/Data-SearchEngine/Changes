@@ -1,0 +1,122 @@
+Revision history for Data-SearchEngine
+
+0.33 Jan 25 2012
+    * Add fields attribute to Data::SearchEngine::Query.
+
+0.32 Dec 16 2011
+    * Allow Query's order to be an ArrayRef
+
+0.31 Dec 16 2011
+    * Doc Fix (Shawn Moore)
+
+0.30 Dec 4 2011
+    * Just kidding, clone was a bad idea.
+
+0.29 Dec 4 2011
+    * Add clone method to Item.
+
+0.28 Dec 3 2011
+    * Add find_by_id
+
+0.27 Oct 22 2011
+    * Change raw Any
+
+0.26 Oct 22 2011
+    * Add debug attribute to Query
+    * Add raw attribute to Results
+
+0.25 Oct 21 2011
+    * Relax type constraint on Item::values to HashRef (user beware!)
+
+0.24 Aug 8 2011
+    * Fix bug in Synopsis (jshirley)
+
+0.23 Jul 10 2011
+    * Add facets to Query
+    * Change filters type to HashRef[Any] for more complex backends.
+    * Change type of index to Str|ArrayRef[Str], allowing for backends that
+      use multiple indices.
+
+0.22    2011-07-04
+    * Add a debug attribute for backends to use
+
+0.21    2011-07-04
+    * Convert README to README.mkdn
+    * Various tiny form and style fixes related to rejiggering docs for
+      Pod::Weaver
+    * Convert to Dist::Zilla and Pod::Weaver
+    * Change 'order' to be a Str|HashRef for more complex sorting features.
+    * Add index attribute to Query
+    * POD clarifications wrt subclassing and such
+    * Add type to Query
+    * Add Digestable trait to a few attributes that were missing it.
+    * Make Query's original_query rw
+
+0.20    2011-07-03
+  * Add defaults to Data::SearchEngine
+
+0.19    2011-02-25
+  * POD updates
+
+0.18
+  * Make Query's order rw
+
+0.17
+  * Add remove_by_id to Modifiable role.
+
+0.16
+  * Add spelled_correctly attribute to Spellcheck role
+
+0.15
+  * Make query rw
+
+0.14
+  * Allow original_query to be undefined, since query might be
+
+0.13    March 23, 2010
+  * Remove required flag from Query's query attribute
+  * Add has_query predicate to Query
+
+0.12
+  * Swap out deprecated Class::MOP methods used for digest
+  * Add has_filter_like method to Query
+
+0.11
+  * POD fixes
+  * Allow Str or ArrayRef[Str|Undef] for Item values
+
+0.10
+  * Add Spellcheck role
+
+0.09
+  * Add original_query attribute to Query
+  * Fix busted storage test
+
+0.08
+  * Use MooseX::Storage::Deferred
+
+0.07
+  * Break out facet functionality to a Faceted role
+  * Update to latest Data::Paginator
+
+0.06
+  * Switch to an MD5 digest as it is faster.
+  * POD updates
+  * Digestable filters
+  * Switch to Data::Paginator
+  * Improve tests
+
+0.05
+  * Change Query->has_filters to return false unless the hashref has keys
+
+0.04
+  * POD improvements
+  * Use Data::Page for Results
+  * Fix busted POD in Query
+  * Change query method to search, which is a way better name.
+  * Get rid of MX::AH in favor of native traits.
+  * Add Result facets.
+  * Add Query filters.
+
+0.03  November 17, 2009
+  * Add JSON::Any to deps

@@ -1,0 +1,8 @@
+Revision history for DateTime-Format-LDAP
+
+0.002     2014-09-29 04:57:10+00:00 UTC
+          - use 5.8.0 and warnings
+          - fix and improve dist.ini
+
+0.001     2014-09-15 03:33:59+00:00 UTC
+          - initial release

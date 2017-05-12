@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+# dredd-hooks-perl - Code for running the TCP socket for Dredd hooks
+#
+# Dredd runs its hooks by starting up a script that must
+# start a TCP server that will receive transactions as JSON.
+# It should run each hook associated with the submitted event
+# and return the modified transaction data.
+#
+# This script provides the socket handler and hands each event to
+# event handler. It is also responsible for gather the hook files
+# from the command line and passing them to the event handler
+
+use strict;
+use warnings;
+
+use Dredd::Hooks;
+use IO::All;
+use JSON;
+use Try::Tiny;
+
+my $hooks = Dredd::Hooks->new(hook_files => [glob(join ' ', @ARGV)]);
+
+my $serialiser = JSON->new->convert_blessed->utf8;
+my $socket = io('127.0.0.1:61321');
+
+# Dredd awaits for the word 'Starting' to appear on STDOUT
+print "Starting\n";
+
+# We need to flush the buffered output to stop the tests failing
+STDOUT->flush;
+
+# Listen to the socket for client connection
+while (my $client = $socket->accept){
+    # Read each line (Each transaction is delimited by "\n"
+    while (my $message = try { $serialiser->decode($client->getline) }){
+        $client->autoflush;
+
+        # Run the specified event hooks
+        my $event = $message->{event};
+        if ($event && (my $method = $hooks->can($event."_hook"))){
+
+            # Return the serialised transaction from the hook to the
+            # client over the socket
+            $client->print(
+                $serialiser->encode({
+                    "uuid"  => $message->{uuid},
+                    "event" => $event,
+                    "data"  => $hooks->$method($message->{data})
+                })
+                ."\n"
+            );
+        } else {
+            # If we don't know how to handle the event then just return
+            # the input (handle if new events are added before an update)
+            $client->print(JSON::encode_json($message)."\n");
+        }
+    }
+}

@@ -1,0 +1,27 @@
+---
+abstract: 'Parse output of /lex a e/ command for the iSDC PABX'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-PABX-ParseLex
+provides:
+  Data::PABX::ParseLex:
+    file: lib/Data/PABX/ParseLex.pm
+    version: 1.05
+requires:
+  Carp: 0
+  Data::Dumper: 2.139
+  strict: 0
+  warnings: 0
+resources:
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 1.05

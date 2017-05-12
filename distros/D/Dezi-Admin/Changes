@@ -1,0 +1,25 @@
+Revision history for Dezi-Admin
+
+0.006 xxx
+ - fix bug with serializing term frequency
+ - use Try::Tiny instead of eval/$@
+ - make stats search query more generous, 
+   matching path:*/search rather than path:/search
+ - switch from SWISH::Prog to Dezi 0.4.0
+
+0.005 04 March 2014
+ - force Response to stringify when handing to body() so that
+   Deflater middleware doesn't choke on an object.
+
+0.004 28 Feb 2013
+ - require Dezi::Stats::DBI >= 0.001005 for tests, otherwise skip
+
+0.003 16 Feb 2013
+ - add missing dependencies to Makefile.PL
+
+0.002 13 Feb 2013
+ - fix bug with missing 'path' field in API::Stats
+
+0.001 08 Feb 2013 
+ - First version, released on an unsuspecting world.
+

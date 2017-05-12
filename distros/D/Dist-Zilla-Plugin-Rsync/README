@@ -1,0 +1,13 @@
+SYNOPSIS
+    Upload your distribution tarball using "rsync":
+
+        [Rsync]
+        where = user@somewhere:destination/path
+        options = --progress -e ssh
+
+DESCRIPTION
+    The "where" config key is required. The "options" default to "-e ssh".
+
+AUTHOR
+    Tomáš Znamenáček, zoul@fleuron.cz
+

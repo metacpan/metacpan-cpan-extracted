@@ -1,0 +1,8 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Devel/TraceSAX.pm
+lib/Devel/TraceSAX/DB.pm
+t/compiles.t

@@ -1,0 +1,6 @@
+lib/DJabberd/Authen/SQLite.pm
+Makefile.PL
+README
+MANIFEST			This list of files
+t/00-use.t
+META.yml                                 Module meta-data (added by MakeMaker)

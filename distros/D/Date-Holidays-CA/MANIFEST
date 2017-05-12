@@ -1,0 +1,14 @@
+Changes
+CREDITS
+lib/Date/Holidays/CA.pm
+MANIFEST			This list of files
+META.yml
+README
+t/01usage.t
+t/02stress.t
+t/03sanity.t
+t/04correctness.t
+t/05internals.t
+t/10pod.t
+t/11pod-coverage.t
+Build.PL 

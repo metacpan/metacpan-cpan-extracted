@@ -1,0 +1,144 @@
+{
+   "abstract" : "Have annotated distribution manifest",
+   "author" : [
+      "Van de Bugger <van.de.bugger@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Manifest-Write",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Hook::Init" : "0",
+            "Dist::Zilla::PluginBundle::Author::VDB" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::GPL_3::or_later" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::File::FromCode" : "0",
+            "Dist::Zilla::Role::BeforeArchive" : "0",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "Dist::Zilla::Role::File" : "5.023",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "ExtUtils::Manifest" : "0",
+            "List::Util" : "0",
+            "Module::Util" : "0",
+            "Moose" : "0",
+            "Path::Tiny" : "0",
+            "Readonly" : "0",
+            "Set::Object" : "0",
+            "String::RewritePrefix" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Archive::Tar" : "0",
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Plugin::GenerateFile" : "0",
+            "Dist::Zilla::Plugin::InlineFiles" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0",
+            "Dist::Zilla::Plugin::PkgVersion" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::EOL" : "0.14",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0.09",
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Deep" : "0",
+            "Test::DiagINC" : "0.002",
+            "Test::Dist::Zilla::Build" : "v0.4.3",
+            "Test::Dist::Zilla::BuiltFiles" : "0",
+            "Test::More" : "0",
+            "Test::Routine" : "0",
+            "Test::Routine::Util" : "0",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "blib" : "1.01",
+            "if" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Manifest::Write" : {
+         "file" : "lib/Dist/Zilla/Plugin/Manifest/Write.pm",
+         "version" : "v0.9.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "mailto:bug-Dist-Zilla-Plugin-Manifest-Write@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Manifest-Write"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-Manifest-Write",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-Manifest-Write"
+      }
+   },
+   "version" : "v0.9.7",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

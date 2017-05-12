@@ -1,0 +1,62 @@
+#!/usr/bin/perl -w
+
+# Create some large memory structures, then create a report on them.
+
+use Math::String;
+use Devel::Size::Report qw/report_size/;
+use Time::HiRes qw/time/;
+use strict;
+
+BEGIN { $|++; }
+
+my $i = abs(shift || 4000) || 1;
+print "Creating deep structure with $i levels...\n";
+my $struct = [ ];
+my $cur = $struct;
+
+for (1 .. $i)
+  {
+  push @$cur, [ ];
+  $cur = $cur->[-1];
+  }
+print " done. Generating report...\n";
+
+my $time = time();
+
+my $r = report_size($struct, { terse => 1, debug => 1, first => ' ' });
+
+$time = time() - $time;
+print $r;
+print "Done. Took ", sprintf("%0.2f", $time), " seconds.\n";
+
+#############################################################################
+
+print "\nUsing Math::String to create complex objects as an example.\n";
+print "Generating data...";
+
+$i = 0; my $hash = {};
+for (1 .. 100)
+  {
+  # Math::String objects share equal Math::String::Charsets, so we create
+  # them anew for each one, to blow the data set into huge proportions
+
+  # large set of strings
+  my $set_huge = Math::String::Charset->new( [ 'zaa' .. 'zzz' ] );
+  my $set_huge2 = Math::String::Charset->new( [ 'ZAA' .. 'ZZZ' ] );
+
+  my $grouped = Math::String::Charset->new( { sets => { 0 => $set_huge2, 1 => $set_huge, } } );
+
+  my $x = Math::String->new( 'zaaZAA', $grouped );
+
+  $hash->{$i++} = $x;
+
+  }
+
+print " done. Generating report...\n";
+$time = time();
+
+$r = report_size($hash, { terse => 1, debug => 1, first => ' ', summary => 1, debug => 1, });
+$time = time() - $time;
+print $r;
+print "Done. Took ", sprintf("%0.2f", $time), " seconds.\n";
+print "All tests done.\n\n\n";

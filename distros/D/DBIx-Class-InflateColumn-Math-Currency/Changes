@@ -1,0 +1,6 @@
+0.2.0     2015-03-22 18:01:05-05:00 America/Chicago
+    - Modified Inflation Logic to only attach if is_currency => 1
+
+0.0.1     2013-10-14 21:22:08-05:00 America/Chicago
+    - Initial Implementation
+    - Inflates and Deflates Database Decimal into Math::Currency

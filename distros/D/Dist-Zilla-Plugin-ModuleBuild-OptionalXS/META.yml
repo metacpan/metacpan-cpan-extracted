@@ -1,0 +1,25 @@
+---
+abstract: 'Build a module that has an XS component that only optionally needs to be built.'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-ModuleBuild-OptionalXS
+no_index: {}
+requires:
+  Dist::Zilla::Plugin::ModuleBuild: 0
+  Moose: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ModuleBuild-OptionalXS
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-ModuleBuild-OptionalXS
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/Dist-Zilla-Plugin-ModuleBuild-OptionalXS.git
+version: 0.01
+x_authority: cpan:ARODLAND

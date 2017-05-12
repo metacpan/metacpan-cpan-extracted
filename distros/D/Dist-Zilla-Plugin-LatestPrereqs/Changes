@@ -1,0 +1,14 @@
+Revision history for Dist-Zilla-Plugin-LatestPrereqs
+
+0.4   Wed May 25 14:31:46 UTC 2011
+        - Don't require latest versions of core modules (RT #63345) [Mike Doherty]
+        - add skip_core_modules to make optional, off by default
+
+0.3   Tue Jul 27 16:52:38 UTC 2010
+         - Updated to Dist-Zilla version 4
+
+0.2    Wed Mar 31 22:01:53 UTC 2010
+         - Updated to Dist-Zilla version 2
+
+0.1    Wed Oct  7 15:44:27 UTC 2009
+         - First version

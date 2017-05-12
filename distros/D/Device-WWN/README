@@ -1,0 +1,148 @@
+NAME
+    Device::WWN - Encode/Decode Fiber Channel World Wide Names
+
+SYNOPSIS
+        use Device::WWN;
+    
+        my $wwn = Device::WWN->new( '500604872363ee43' );
+        print "Serial Number: ".$wwn->serial_number."\n";
+        print "Vendor ".$wwn->oui->organization."\n";
+
+DESCRIPTION
+    This module provides an interface to decode fiber channel World Wide
+    Name values (WWN, also called World Wide Identifier or WWID). The WWN
+    value is similar to a network cards hardware MAC address, but for fiber
+    channel SAN networks.
+
+METHODS
+  Device::WWN->find_subclasses( $wwn )
+    This class method searches through the installed Device::WWN subclasses,
+    and returns a list of class names of the subclasses that reported they
+    were able to handle the provided WWN.
+
+  Device::WWN->new( $wwn )
+    Creates and returns a new Device::WWN object. The WWN value is required.
+    Note that the object you get back might be a subclass of Device::WWN, if
+    there is a more specific handler class for the WWN you provided. This is
+    the case for example when the WWN indicates that it belongs to an EMC
+    Symmetrix or Clariion array, in which case you will get back a
+    Device::WWN::EMC::Symmetrix or Device::WWN::EMC::Clariion object. These
+    handler subclasses are intended to be able to decode the vendor-specific
+    portions of the WWN, and may be able to give you information such as the
+    storage system serial number and the port number.
+
+  $wwn->wwn
+    Return the WWN that this object was created with.
+
+  $wwn->oui
+    Returns a Device::OUI object representing the OUI (Organizationally
+    Unique Identifier) for the WWN. This object can give you information
+    about the vendor of the SAN port represented by this WWN.
+
+  $wwn->naa
+    Returns the 'Network Address Authority' value. This is the first
+    character of the WWN, and indicates the format of the WWN itself. The
+    possible values are:
+
+        1 - IEEE 803.2 standard 48 bit ID
+        2 - IEEE 803.2 extended 48-bit ID
+        5 - IEEE Registered Name
+        6 - IEEE Extended Registered Name
+
+  $wwn->normalized
+    Return a 'normalized' WWN value for this object. The normalized value is
+    in lower-case hex, with no separators (such as '500604872363ee43').
+
+    Device::WWN objects have stringification overloaded to return this
+    value. If the object doesn't have a WWN assigned, stringification will
+    return an object address value just as if it were not overloaded.
+
+  $wwn->vendor_id
+    Returns the unique vendor ID value for the WWN.
+
+  $wwn->vendor_code
+    NAA Type 2 defines a 1.5 byte section of the WWN as a 'vendor specific
+    code'. Some vendors use this to identify the port on a specific device,
+    some use it simply as an extension of the serial number. Generally this
+    won't be a very useful value on it's own, unless there is a Device::WWN
+    subclass for the vendor which can decode it.
+
+FUNCTIONS / EXPORTS
+    Although this module is entirely object oriented, there are a handful of
+    utility functions that you can import from this module if you find a
+    need for them. Nothing is exported by default, so if you want to import
+    any of them you need to say so explicitly:
+
+        use Device::WWN qw( ... );
+
+    You can get all of them by importing the ':all' tag:
+
+        use Device::WWN ':all';
+
+    The exporting is handled by Sub::Exporter.
+
+  normalize_wwn( $wwn )
+    Given a WWN in any common format, normalizes it into a lower-case, zero
+    padded, hexadecimal format.
+
+  wwn_cmp( $wwn1, $wwn2 )
+    This is a convenience method, given two Device::WWN objects, or two WWNs
+    (in any format acceptable to "normalize_wwn") will return -1, 0, or 1,
+    depending on whether the first WWN is less than, equal to, or greater
+    than the second one.
+
+    Device::WWN objects have "cmp" and "<=>" overloaded so that simply
+    comparing them will work as expected.
+
+  wwn_to_integers( $wwn )
+    Decodes a WWN into a list of 8 integers. This is primarily used
+    internally, but may be useful in some circumstances.
+
+INTERNAL METHODS
+    These are internal methods that you generally won't have to worry about.
+
+  BUILDARGS
+    The BUILDARGS method overloads Moose::Object to allow you to pass a
+    single string argument containing the WWN when calling "new".
+
+  overload_cmp
+    A utility method that calls wwn_cmp with the appropriate arguments. Used
+    by overload.
+
+  overload_stringify
+    Internal method for overload to call when attempting to stringify the
+    object. If the object has a WWN value, then it will stringify to the
+    output of "normalized", otherwise it will stringify the same as if it
+    had not been overloaded (using the output of "StrVal" in overload.
+
+  clear_wwn_dependent
+    This utility method clears the values of any attributes that depend on
+    the WWN. It is called when the WWN attribute it set. Normally you
+    shouldn't need to care, but if you are creating a new Device::WWN
+    subclass, then you should wrap this with a Moose/after to also clear any
+    attributes you add that are dependent on the WWN.
+
+MODULE HOME PAGE
+    The home page of this module is
+    <http://www.jasonkohles.com/software/device-wwn>. This is where you can
+    always find the latest version, development versions, and bug reports.
+    You will also find a link there to report bugs.
+
+SEE ALSO
+    <http://www.jasonkohles.com/software/device-wwn>
+
+    <http://en.wikipedia.org/wiki/World_Wide_Name>
+
+    Device::OUI
+
+AUTHOR
+    Jason Kohles "<email@jasonkohles.com>"
+
+    <http://www.jasonkohles.com>
+
+COPYRIGHT AND LICENSE
+    Copyright 2008, 2009 Jason Kohles
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

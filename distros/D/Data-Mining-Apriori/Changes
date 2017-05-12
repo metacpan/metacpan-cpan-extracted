@@ -1,0 +1,47 @@
+Revision history for Perl extension Data::Mining::Apriori.
+
+0.01  Fri Jun 26 20:18:26 2015
+	- original version; created by h2xs 1.23 with options
+		-AX -n Data::Mining::Apriori
+
+0.02  Thu Jul 16 15:33:17 2015
+		- updated synopsis and variables
+
+0.03  Mon Aug 17 15:03:06 2015
+		- updated "no if $] >= 5.017011, warnings => 'experimental::smartmatch'" to no display warnings
+
+0.05  Sat Jul 02 20:50:37 2016
+		- updated display messages and implemented the module Excel::Writer::XLSX to output the results and chart in excel file
+
+0.06  Mon Jul 11 16:55:49 2016
+		- updated output messages
+
+0.07  Mon Jul 25 17:33:17 2016
+		- updated code, synopsis, pod and implemented data persistence with Storable module.
+
+0.08  Fri Jul 29 13:15:25 2016
+		- updated code, synopsis and test.
+
+0.09  Mon Aug 08 19:20:03 2016
+		- add limit of rules; metrics lift, leverage, conviction and coverage.
+
+0.10  Mon Aug 15 18:49:11 2016
+		- updated code, synopsis; added method quantity_possible_rules, removed recursively and quantityPossibleRules attributes and association_rules_itemset_size method.
+
+0.11  Fri Aug 25 18:50:33 2016
+		- updated code, synopsis; added method insert_key_items_transaction, input_data_file and implemented the module Algorithm::Combinatorics to generates rules.
+
+0.12  Sat Aug 27 08:45:52 2016
+		- updated code, synopsis.
+
+0.13  Thu Sep 01 18:03:52 2016
+		- updated code, synopsis; added metrics correlation, cosine, laplace, jaccard; removed data persistence.
+
+0.14  Mon Sep 05 15:23:15 2016
+		- updated code, synopsis; renamed the attributes itemsKeyDescription and itemsKeyTransaction.
+
+0.15  Fri Sep 09 11:37:03 2016
+		- updated code, synopsis, pod; added limit of subsets.
+
+0.16  Fri Sep 09 12:27:05 2016
+		- updated code.

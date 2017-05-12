@@ -1,0 +1,369 @@
+WHAT?
+
+Dist-Zilla-Role-TextTemplater is a Dist::Zilla role, a replacement for standard
+role TextTemplate. Both roles have the same great Text::Template engine under
+the hood, but this one provides better control over the engine and much better
+error reporting.
+
+WHY?
+
+TextTemplate role from Dist::Zilla distribution v5.037 has the same great
+Text::Template engine under the hood, but lacks of control and has *awful* error
+reporting.
+
+Error Reporting
+
+Let us consider an example. For sake of example simplicity, it contains only one
+file, dist.ini. Two files, lib/Assa.pm and lib/Assa.pod, are generated
+on-the-fly with GenerateFile plugin.
+
+Have a look at dist.ini:
+
+    name     = Assa
+    version  = 0.001
+    abstract = Example
+    [GenerateFile/lib/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [GenerateFile/lib/Assa/Manual.pod]
+        filename = lib/Assa/Manual.pod
+        content  = =head1 NAME
+        content  =
+        content  = {{$dst->name} - {{$dist->abstract}}
+        content  =
+        content  = Version {{$dist->version}}.
+        content  =
+        content  = {{$dist->license->notice}}
+    [TemplateFiles]
+        filename = lib/Assa.pm
+        filename = lib/Assa/Manual.pod
+    [MetaResources::Template]
+        homepage = https://example.org/release/{{$dist->name}}
+        license  = {{$dist->license->url}}
+
+(Do you see a typo? How many? Note this is a small example, real files are much
+larger.) Now let us build the distribution:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [TemplateFiles] Filling in the template returned undef for:
+    [TemplateFiles] =head1 NAME
+    [TemplateFiles]
+    [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+    [TemplateFiles]
+    [TemplateFiles] Version {{$dist->version}}.
+    [TemplateFiles]
+    [TemplateFiles] {{$dist->license->notice}}
+
+    [TemplateFiles] Filling in the template returned undef for:
+    [TemplateFiles] =head1 NAME
+    [TemplateFiles]
+    [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+    [TemplateFiles]
+    [TemplateFiles] Version {{$dist->version}}.
+    [TemplateFiles]
+    [TemplateFiles] {{$dist->license->notice}}
+     at /home/vdb/.usr/opt/local-lib/lib/perl5/x86_64-linux-thread-multi/Moose/Meta/Method/Delegation.pm line 110.
+
+Oops. What's happened? Where? Why? All we have is a highly unclear error message
+
+    Filling in the template returned undef for:
+
+and file content printed twice. (Yep, if the file had 1000 lines, we would have
+it printed twice too.) We do not ever have a file name and have to guess it by
+the content. Good bug hunting, dude.
+
+Ok, let us fix the problem (mistyped closing delimiter in the first line of file
+lib/Assa/Manual.pod) and build the distribution again:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    Can't call method "name" on an undefined value at template line 3.
+
+Oops. Error message much is better now, but where the problem is? There are many
+templates in the project: lib/Assa.pm, lib/Assa/Manual.pod, and even resources
+in META.yml — all are generated from templates. Where is the problem? Good bug
+hunting for us all.
+
+Such error reporting is simply unacceptable. I am a human, I often make
+mistakes, and I want the tool clearly warns me *what* and *where* the problem
+is, so I can fix it quickly. For example, in the first case I want to see:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [Templates] Unmatched opening delimiter at lib/Assa/Manual.pod line 3.
+    [Templates] lib/Assa/Manual.pod:
+    [Templates]     1: =head1 NAME
+    [Templates]     2:
+    [Templates]     3: {{$dst->name} - {{$dist->abstract}}
+    [Templates]        ^^^ Unmatched opening delimiter at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]     4:
+    [Templates]     5: Version {{$dist->version}}.
+    [Templates]        ... skipped 2 lines ...
+    Aborting...
+
+In the second case:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [Templates] Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3.
+    [Templates] Bad code fragment begins at lib/Assa/Manual.pod line 3.
+    [Templates] lib/Assa/Manual.pod:
+    [Templates]     1: =head1 NAME
+    [Templates]     2:
+    [Templates]     3: {{$dst->name}} - {{$dist->abstract}}
+    [Templates]        ^^^ Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]        ^^^ Bad code fragment begins at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]     4:
+    [Templates]     5: Version {{$dist->version}}.
+    [Templates]        ... skipped 2 lines ...
+    Aborting...
+
+TextTemplater makes it real. All I need is using TextTemplater-based plugins:
+Templates, MetaResources::Template (starting from v0.002).
+
+Engine Control
+
+TextTemplater allows the end-user to specify delimiters, package and prepend
+engine options in dist.ini file, while TextTemplate allows to specify prepend
+only programmatically, and does *not* allow to specify delimiters and package.
+
+NAMING
+
+perl-Dist-Zilla-Role-TextTemplater is official software name.
+
+However, in Perl world prefix "perl-" is redundant and not used. For example, on
+meta::cpan <https://metacpan.org/> this software is named as
+Dist-Zilla-Role-TextTemplater. In the rest of the documentation shortened name
+Dist-Zilla-Role-TextTemplater is used as synonym for full name
+perl-Dist-Zilla-Role-TextTemplater. We are in the Perl world, aren't we?
+
+You may notice that name may be spelled with dashes
+(Dist-Zilla-Role-TextTemplater) or with double colons
+(Dist::Zilla::Role::TextTemplater). Strictly speaking, there is difference: the
+first one is software name, while the second is name of Perl package, but often
+these names are interchangeable especially if software consists of single
+package.
+
+FORMS
+
+You may face Dist-Zilla-Role-TextTemplater in *source* or *distribution* forms.
+
+If you are going to have text templating capabilities in your Dist::Zilla
+plugin, you will likely be interested in *using* Dist-Zilla-Role-TextTemplater
+*distribution*. If you are going to *develop* (or *hack*) the
+Dist-Zilla-Role-TextTemplater itself, you will likely need the *source*, not
+distribution.
+
+Since Perl is an interpreting language, modules in the distribution *look* like
+sources. Actually, they are Perl source files. But they are not *actual*
+sources, because they are *built* (preprocessed or generated) by Dist-Zilla.
+
+How to distinguish source and distribution:
+
+*   Source may contain Mercurial files and directories .hgignore, .hgtags, .hg/,
+    while distribution should not.
+
+*   Source should contain dist.ini file, while distribution may not.
+
+*   Source should *not* contain xt/ directory, while distribution should.
+
+*   Name of source directory does *not* include version (e. g.
+    Dist-Zilla-Role-TextTemplater), while name of distribution does (e. g.
+    Dist-Zilla-Role-TextTemplater-v0.7.1).
+
+SOURCE
+
+Dist-Zilla-Role-TextTemplater source is in Mercurial repository hosted on
+fedorapeople.org. To clone the entire repository:
+
+    $ hg clone https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Role-TextTemplater
+
+Source Files
+
+Dist-Zilla-Role-TextTemplater source files usually include a comment near the
+top of the file:
+
+    This file is part of perl-Dist-Zilla-Role-TextTemplater.
+
+Not all source files are included into distribution. Some source files are used
+at distribution build time only, and not required for installation.
+
+DISTRIBUTION
+
+Dist-Zilla-Role-TextTemplater distributions are published on CPAN
+<https://metacpan.org/release/Dist-Zilla-Role-TextTemplater>.
+
+Generated Files
+
+Distribution may contain files preprocessed or generated by Dist-Zilla and its
+plugins. Some generated files are made from Dist-Zilla-Role-TextTemplater
+source, but some are generated from third-party templates. Files generated from
+third-party templates usually include a comment near the top of the file:
+
+    This file was generated with NAME
+
+(where *NAME* is a name of the plugin generated the file). Such files are *not*
+part of Dist-Zilla-Role-TextTemplater source, and Dist-Zilla-Role-TextTemplater
+copyright and license are not applicable to such files.
+
+INSTALLING
+
+With cpanm
+
+cpanm tool is (probably) the easiest way to install distribution. It automates
+downloading, building, testing, installing, and uninstalling.
+
+To install the latest version from CPAN:
+
+    $ cpanm Dist::Zilla::Role::TextTemplater
+
+To install a specific version (e. g. *v0.7.1*) from CPAN:
+
+    $ cpanm Dist::Zilla::Role::TextTemplater@v0.7.1
+
+To install locally available distribution (e. g. previously downloaded from CPAN
+or built from sources):
+
+    $ cpanm ./Dist-Zilla-Role-TextTemplater-v0.7.1.tar.gz
+
+To uninstall the distribution:
+
+    $ cpanm -U Dist::Zilla::Role::TextTemplater
+
+Manually
+
+To install distribution tarball manually (let us assume you have version
+*v0.7.1* of the distribution):
+
+    $ tar xaf Dist-Zilla-Role-TextTemplater-v0.7.1.tar.gz
+    $ cd Dist-Zilla-Role-TextTemplater-v0.7.1
+    $ perl Build.PL
+    $ ./Build build
+    $ ./Build test
+    $ ./Build install
+
+See Also
+
+How to install CPAN modules <http://www.cpan.org/modules/INSTALL.html>
+
+HACKING
+
+For hacking, you will need Mercurial, Perl interpreter and Dist-Zilla (with some
+plugins), and likely cpanm to install missed parts.
+
+Clone the repository first:
+
+    $ hg clone https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Role-TextTemplater
+    $ cd perl-Dist-Zilla-Role-TextTemplater
+
+To build a distribution from the source, run:
+
+    $ dzil build
+
+If required Dist-Zilla plugins are missed, the dzil tool will warn you and show
+the command to install all the required plugins, e. g.:
+
+    Required plugin Dist::Zilla::Plugin::Test::EOL isn't installed.
+
+    Run 'dzil authordeps' to see a list of all required plugins.
+    You can pipe the list to your CPAN client to install or update them:
+
+        dzil authordeps --missing | cpanm
+
+To run the tests (to check primary software functionality):
+
+    $ dzil test
+
+To run extended tests (to check source code style, documentation and other
+things which are not too important for software end users):
+
+    $ dzil xtest
+
+To install the distribution:
+
+    $ dzil install
+
+or
+
+    $ cpanm ./Dist-Zilla-Role-TextTemplater-VERSION.tar.gz
+
+where *VERSION* is a version of built distribution.
+
+To clean the directory:
+
+    $ dzil clean
+
+DOCUMENTATION
+
+Online
+
+The easiest way is browsing the documentation online at meta::cpan
+<https://metacpan.org/release/Dist-Zilla-Role-TextTemplater>.
+
+Locally Installed
+
+If you have the distribution installed, use perldoc tool to browse locally
+installed documentation:
+
+    $ perldoc Dist::Zilla::Role::TextTemplater::Manual
+    $ perldoc Dist::Zilla::Role::TextTemplater
+
+Built from Source
+
+Build Dist-Zilla-Role-TextTemplater first (see "HACKING"), then:
+
+    $ cd Dist-Zilla-Role-TextTemplater-VERSION
+    $ perldoc Dist::Zilla::Role::TextTemplater::Manual
+    $ perldoc Dist::Zilla::Role::TextTemplater
+
+where *VERSION* is a version of built distribution.
+
+FEEDBACK
+
+CPAN Request Tracker
+
+The quickest way to report a bug in Dist-Zilla-Role-TextTemplater is by sending
+email to bug-Dist-Zilla-Role-TextTemplater [at] rt.cpan.org.
+
+CPAN request tracker can be used via web interface also:
+
+Browse bugs
+<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Role-TextTemplater
+>
+    Browsing bugs does not require authentication.
+
+Report bugs
+<https://rt.cpan.org/Public/Bug/Report.html?Queue=Dist-Zilla-Role-TextTemplater>
+    You need to be a CPAN author, have a BitCard <https://www.bitcard.org/>
+    account, or OpenID in order to report bugs via the web interface.
+
+    (On 2015-04-27 I have logged in successfully with my LiveJournal OpenID, but
+    my Google OpenID did not work for CPAN. I did not check other OpenID
+    providers.)
+
+Send Email to Author
+
+As a last resort, send email to author: Van de Bugger <van.de.bugger@gmail.com>.
+Please start message subject with "perl-Dist-Zilla-Role-TextTemplater:".
+
+GLOSSARY
+
+CPAN
+    Comprehensive Perl Archive Network, a large collection of Perl software and
+    documentation. See cpan.org <http://www.cpan.org>, What is CPAN?
+    <http://www.cpan.org/misc/cpan-faq.html#What_is_CPAN>.
+
+Distribution
+    Tarball, containing Perl modules and accompanying files (documentation,
+    metainfo, tests). Usually distributions are uploaded to CPAN, and can be
+    installed with dedicated tools (cpan, cpanm, and others).
+
+Module
+    Perl library file, usually with .pm suffix. Usually contains one package.
+    See perlmod <http://perldoc.perl.org/perlmod.html#Perl-Modules>.
+
+Package
+    Perl language construct. See package
+    <http://perldoc.perl.org/functions/package.html> and perlmod
+    <http://perldoc.perl.org/perlmod.html#Packages>.

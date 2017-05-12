@@ -1,0 +1,83 @@
+Release history for Dist-Zilla-Plugin-RewriteVersion-Sanitized
+
+0.001006 2017-03-03T09:50:16Z 764c60c
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-RewriteVersion-Sanitized/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001005, see misc/*.deps* for details
+ - configure: (suggests: +1)
+ - develop: +5 ↑4 -1 (suggests: ↑2)
+ - test: ↓1
+
+0.001005 2015-01-14T10:21:26Z 3f09793
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001004, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +9 ↑2 -2 (recommends: +1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Documentation]
+ - Add See Also section (dolmen++, closes #1)
+ - Better README file
+ - Better DESCRIPTION in favour of Synopsis
+
+0.001004 2014-09-13T16:45:16Z
+ [00 Trivial]
+ - no code changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: +2 (recommends: ↑1)
+
+ [Metadata]
+ - Set author = kentnl
+
+ [Tests]
+ - add some basic tests.
+
+0.001003 2014-08-15T21:19:05Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+0.001002 2014-08-07T15:58:29Z
+ [00 Trivial]
+ - update test::reportprereqs
+ - minor POD derp
+ - no code changes
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+0.001001 2014-07-20T11:07:16Z
+ [00 Trivial]
+ - Misc packaging cleanups.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: +2 ↑1 (recommends: +1)
+
+0.001000 2014-05-25T20:17:17Z
+ - First version.
+
+ [Dependencies::Aggregate]
+ - 5.008009 : 204
+ - 5.010001 : 183
+ - 5.018002 : 169
+ - 5.019009 : 164

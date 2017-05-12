@@ -1,0 +1,33 @@
+1.2.0 2016-12-20
+
+ - Use Net::IP to encode/decode IPv6 when inet_pton() is not supported (WinXP without IPv6 installed)
+
+1.1.1 2016-12-06
+
+ - Bump version number of Socket - require 2.021+ to include fix for inet_pton() on Windows
+
+1.1.0 2016-12-06
+
+ - Added support for tagged attributes (RFC2868)
+ - Require ExtUtils::MakeMaker 6.64+ for TEST_REQUIRES support
+
+1.0.4 2016-09-19
+
+ - Added missing README file
+
+1.0.3 2016-09-19
+
+ - Fixing Kwalitee warnings
+
+1.0.2 2016-09-16
+
+ - Require Perl v5.10
+ - Require Socket v1.99
+
+1.0.1 2016-09-16
+
+ - Fixed license tag
+
+1.0 2016-09-15
+
+ - Initial release

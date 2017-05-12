@@ -1,0 +1,55 @@
+NAME
+	Data::Interactive::Inspect - Inspect and manipulate perl data structures interactively
+
+SYNOPSIS
+        use Data::Interactive::Inspect;
+        my $data = foo(); # get a hash ref from somewhere
+
+        # new shell object, the simple way
+        my $shell = Data::Interactive::Inspect->new($data);
+
+        # or
+        my $shell = Data::Interactive::Inspect->new(
+          struct   => $data,
+          name     => 'verkehrswege',
+          begin    => sub { .. },
+          commit   => sub { .. },
+          rollback => sub { .. },
+          editor   => 'emacs',
+          more     => 'less'
+        );
+
+        $data = $shell->inspect(); # opens a shell and returns modified hash ref on quit
+
+DESCRIPTION
+       This module provides an interactive shell which can be used to inspect
+       and modify a perl data structure.
+ 
+INSTALLATION
+
+	to install, type:
+	  perl Makefile.PL
+	  make
+	  make test
+	  make install
+
+	to read the complete documentation, type:
+	perldoc Data::Interactive::Inspect
+
+AUTHOR
+       T.v.Dein <tlinden@cpan.org>
+
+BUGS
+       Report bugs to
+       http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data::Interactive::Inspect
+
+COPYRIGHT
+       Copyright (c) 2015-2017 by T.v.Dein <tlinden@cpan.org>.  All rights
+       reserved.
+
+LICENSE
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+VERSION
+       This is the manual page for Data::Interactive::Inspect Version 0.07.

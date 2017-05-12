@@ -1,0 +1,31 @@
+---
+name: Devel-TraceLoad
+version: 1.04
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Discover which modules a Perl program loads.
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-TraceLoad
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Devel--TraceLoad.git
+requires:
+  Data::Dumper: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::Deep: 0.096
+  Test::More: 0
+  YAML: 0
+provides:
+  Devel::TraceLoad:
+    file: lib/Devel/TraceLoad.pm
+    version: 1.04
+  Devel::TraceLoad::Hook:
+    file: lib/Devel/TraceLoad/Hook.pm
+    version: 1.04
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

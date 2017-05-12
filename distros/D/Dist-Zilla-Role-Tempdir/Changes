@@ -1,0 +1,207 @@
+Revision history for Dist-Zilla-Role-Tempdir
+
+1.001003 2017-03-10T12:01:20Z e93ce4e
+ - Ship previous devrel changes as stable
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001002, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: ↓1
+
+1.001002 2016-05-01T00:22:36Z edbd3ac
+ - Added MetaConfig data to consumers.
+ - This however requires a TRIAL releases, as this change module requires ::Plugin to already be composed in, but our
+   tests and documentation unfortunately instructed users to compose it in *before* that, leading to a breakage.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1 (recommends: +2)
+ - test: +2 (recommends: +1 ↑1 ↓1)
+
+1.001001 2014-08-15T21:39:24Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+ - POD reorganised.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+ [Documentation]
+ - POD reorganised for consistency.
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update ReportPrereqs test
+
+1.001000 2014-07-29T09:21:17Z
+ [00 Major]
+ - ::Dir has new 'keepalive' method to mark/unmark scratch dirs for destruction.
+ - ::Dir nas new 'keepalive_fail' method to trigger a croak, keep the temporary directory, and tell the user where to
+   find it.
+ - ::Dir::run_in()  and thus, ::Role::Tempdir::capture_tempdir(), now pass the Dir object itself as $_[0] for easy
+   access.
+ - ::Dir now generates tempdirs with the prefix "DZ_R_Tempdir_" for easy cleanup if tempdirs are left around.
+ - ::Dir now supports property '_tempdir_owner' which will be normalised and included in the tempdir prefix if
+   specified.
+ - ::Role::Tempdir::capture_tempdir) now automatically passes the name of the consuming plugin as "_tempdir_owner",
+   giving consuming plugins clear tempdir locations when things fail.
+
+1.000001 2014-07-29T06:22:12Z
+ [Bugfix]
+ - encoded content fetching content was broken, and so, emitted files were all empty! Great!
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: +3 ↑1 (recommends: +1)
+
+1.000000 2014-05-16T19:09:54Z
+ [00 Major]
+ - DZil Encoding support added.
+ - Internals overhauled to use newer things.
+ - Tooling overhauls
+ - Version Scheme overhauls
+
+ [01 Minor backwards incompatible API change]
+ - Accessing $item->{name} is now gone entirely, use $item->name instead.
+ - $item->{state} may also vanish in the near future, stop using it.
+
+ [02 Dzil Encoding Support]
+ - Should now be compatible with DZil 5, and reading files from a tempdir will now default to reading their content as
+   "encoded_content" to an InMemory object.
+
+ [03 Path/IO Replaced]
+ - Usage of Path::Class and File::Slurp have both been eliminated and replaced by Path::Tiny
+ - File::Find::Rule is replaced with Path::Iterator::Rule
+ - File::Tempdir usage eliminated in favour of custom + Path::Tiny
+
+ [04 Toolkit moved to EUMM]
+ - Toolkit is now EUMM instead of Module::Build
+ - Toolkit upgrade dependencies now prefer "latest" via "recommends", instead of "requires"
+
+ [05 Version Scheme change]
+ - Mantissa length has shortened to 6
+ - Version semantics are now X.YYYZZZ
+ - This is the primary motivation for the 1.x on the box.
+
+ [Bugfixes]
+ - No longer does any ->isa checking for digest modules. This closes #1
+
+ [Dependencies::Aggregate]
+ - 5.010001 : 185
+ - 5.018002 : 168
+ - 5.019009 : 163
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01053722, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +44 -2 (recommends: -1, suggests: +1 -1)
+ - runtime: +4 ↑1 -4
+ - test: +4 ↑1 ↓1 -2 (recommends: +4)
+
+0.01053722 2013-04-08T08:04:30Z
+ - Maintenance Release for Module::Build 0.4004
+
+ [Dependencies::Noteworthy]
+ - Module::Build 0.3601 → 0.4004
+ - Test::More 0.88 → 0.98
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01053721, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Update Copyright year
+ - Add README.mkdn
+
+ [Meta]
+ - Bug tracker to github issues
+
+ [Packaging]
+ - Utilise Module Build 0.4004 test_requires
+
+0.01053721 2012-02-02T19:54:07Z
+ - Maintenance release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01053720, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3 -1
+ - test: -1
+
+ [Internals]
+ - Name-spaces declare $AUTHORITY
+ - Name-spaces no longer declare $VERSION in BEGIN
+
+ [Packaging]
+ - Update LICENSE ( Date, Indent, Address )
+ - extra tests moved to xt/
+ - GIT url's moved to https://
+ - Declares x_authority
+ - Versions now done via git
+
+0.01053720 2011-04-05T19:34:41Z
+ - Maintenance only release, no really user visible changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01027622, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - test: +1 -1
+
+ [Packaging]
+ - move to @Author::KENTNL
+ - Ship with .perltidyrc
+ - Rework Changes into CPAN::Changes normalized form.
+ - Move perlcriticrc to perlcritic.rc
+ - ship with weaver.ini
+
+ [Tests]
+ - Drop portability tests
+ - Drop hand-coded critic tests and replace with generated.
+ - Add cpan-changes tests.
+
+0.01027622 2010-07-23T21:29:14Z
+ - Dropped the hardcoded Test::Kwalitee xt-test in favour of the TestKwalitee plugin. ( This will hopefully get this
+   module and all dependents out of the heavy 100 )
+ - Documentation updated a bit.
+ - digest_for is now a public method.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01021401, see misc/*.deps* for details
+ - build: -9
+ - runtime: +2
+ - test: +8
+
+0.01022319 2010-06-01T18:03:23Z
+ - Updated synopsis to recommend OO way.
+ - Tests added for OO mode.
+ - Replaced hash with a more pragmatic object. ( Backwards compatible ).
+ - Fix tests relying on unixisms on Win(64/32)
+
+0.01021401 2010-05-23T00:16:50Z
+ - use @KENTNL
+ - upgrade to Dist::Zilla 2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000003, see misc/*.deps* for details
+ - build: +10
+ - configure: +1
+ - runtime: +2 ↑1
+
+0.01000003 2009-10-26T02:51:22Z
+ - First version.

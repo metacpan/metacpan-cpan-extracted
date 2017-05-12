@@ -1,0 +1,9 @@
+Revision history for Perl extension D64::Disk::Layout::Sector.
+
+0.02  2013-02-10
+    - bug fixed: added missing dependency on Text::Convert::PETSCII, which is
+      required to print out formatted disk sector data into a file handle
+
+0.01  2013-02-08
+    - initial version (provides an abstraction layer over physical sector data
+      of various Commodore disk image formats)

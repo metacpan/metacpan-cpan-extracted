@@ -1,0 +1,90 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Preload]
+
+    In lib/MyMain.pm:
+
+     package MyMain;
+     use constant PRELOAD_MODULES => $ENV{PRELOAD};
+
+    In lib/MyOther.pm:
+
+     use MyMain;
+    
+     # INSERT_PRELOADS: MyMain::PRELOAD_MODULES
+    
+     sub foo {
+         require Data::Dump; # PRELOAD
+         ...
+     }
+    
+     sub bar {
+         require Text::ANSITable; # PRELOAD
+         ...
+     }
+    
+     ...
+
+    After build, lib/MyOther.pm will become:
+
+     use MyMain;
+     if (MyMain::PRELOAD_MODULES) { require Data::Dump; require Text::ANSITable; } # INSERT_PRELOADS: MyMain::PRELOAD_MODULES
+    
+     sub foo {
+         unless (MyMain::PRELOAD_MODULES) { require Data::Dump } # PRELOAD
+         ...
+     }
+    
+     sub bar {
+         unless (MyMain::PRELOAD_MODULES) { require Text::ANSITable } # PRELOAD
+         ...
+     }
+    
+     ...
+
+DESCRIPTION
+
+    This plugin is a Dist::Zilla-based alternative to preload, please read
+    the rationale of that module first.
+
+    First, this plugin will search # PRELOAD directives in a script/module
+    file. The line must be in the form of:
+
+     require SomeModule; # PRELOAD
+
+    Then, this plugin will search for # INSERT_PRELOADS: condition
+    directive. The directive must exist if there are # PRELOAD directives
+    in the same file. condition is a Perl expression that should determine
+    whether modules should be preloaded. To allow Perl to optimize things
+    away, the expression should be a constant, like in the example above.
+
+    This plugin will replace this line:
+
+     # INSERT_PRELOADS: condition
+
+    to this:
+
+     if (condition) { require SomeModule; require AnotherModule; ... } # INSERT_PRELOADS: condition
+
+    where each module mentioned in # PRELOAD lines will be put in.
+
+    Finally, the # PRELOAD lines will also be changed, from:
+
+     require SomeModule; # PRELOAD
+
+    to:
+
+     unless (condition) { require SomeModule } # PRELOAD
+
+    The final effect is, if preloading is turned on, then modules will be
+    loaded by the # INSERT_PRELOADS line and the # PRELOAD lines will
+    become no-ops. On the other hand if preloading is turned off, #
+    INSERT_PRELOADS line will become a no-op while # PRELOAD lines will
+    load the modules as usual.
+
+SEE ALSO
+
+    preload
+

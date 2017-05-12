@@ -1,0 +1,22 @@
+*** STDOUT ***
+ Index  Name  Phone   Address   Date  
+ -----  ----  -----  ---------  ----  
+     1  Alan> 555-1> 1234     > 1998>
+       <    ><234   <Something><-10->
+       <Steb>       < St., CA  <22   
+       <bens                         
+     2  Bob > 555-1> 9234     > 2001>
+       <Fran><235   <Nowhere  ><-01->
+       <kel         <Way, WA   <02   
+     3  Mr. > 555-9> 1238 Car > 2004>
+       <Good><432   <Lane Pl.,><-04->
+       <wren>       < NY       <20   
+       <ch                           
+     4  Mr. > 555-3> 9876     > 2008>
+       <Ed   <215   <Cowbarn  ><-09->
+                    <Home, VA  <12   
+     5  Gunt> 44-55> Kartophel> 2013>
+       <her ><-555-><hause 345><.10.>
+       <Sveb><5555  <, Munich,><22   
+       <org         < Germany        
+

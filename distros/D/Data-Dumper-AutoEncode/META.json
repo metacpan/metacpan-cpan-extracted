@@ -1,0 +1,58 @@
+{
+   "abstract" : "Dump with recursive encoding",
+   "author" : [
+      "Dai Okabayashi <bayashi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-AutoEncode",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "IO::Interactive::Tiny" : "0"
+         },
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Data::Recursive::Encode" : "0.05",
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Dumper::AutoEncode" : {
+         "file" : "lib/Data/Dumper/AutoEncode.pm",
+         "version" : "0.107"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/bayashi/Data-Dumper-AutoEncode"
+      }
+   },
+   "version" : "0.107",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,81 @@
+Revision history for Perl extension Devel::SizeMe.
+
+0.19 - 2013-09-05 - Tim Bunce
+
+  * Fix S & E token output for systems where NV is long double.
+  * Report "Unknown SV type" as "Freed" if SvTYPE==SVTYPEMASK
+
+0.18 - 2013-09-03 - Tim Bunce
+
+  * Work in progress - lots of internals improvements - released for smoke testing
+
+0.16 - 2013-06-08 - Tim Bunce
+
+ * Work in progress - lots of internals improvements - released for smoke testing
+
+0.13 - 2013-06-01 - Tim Bunce
+
+ * Assorted portability fixes and updates.
+ * This version is what I demoed at the Texas Linux Festival
+
+0.11 - 2013-05-31 - Tim Bunce
+
+ * Major update.
+ * Uses ref counts to limit extent of crawling.
+ * Optionally collapses cop_file's, hek's and other 'noise' nodes.
+ * Outputs Graph::Easy (for small graphs) and GEXF (for large).
+ * Many updates to treemap interface.
+ * Don't follow method cache entries, thanks to Rafael Garcia-Suarez.
+ * This is rather rough release to get a usable version out before YAPC::NA.
+
+0.07 2013-01-10 Tim Bunce
+
+ *  Updated README
+ *  Added ptest target for parallel testing
+ *  Modernize Makefile.PL and add META info, including repo and bug tracker.
+ *  Fixed to work on Perl 5.8 thanks to Rafael Garcia-Suarez
+ *  Enabled travis-ci.org CI thanks to Jonathan "Duke" Leto.
+ *  Pod fix thanks to Olivier Mengué
+
+0.06 2012-10-17 Tim Bunce
+
+ * fix madprop_size, hopefully (untested)
+ * fix pod NAME, thanks to Moritz
+ * fix to work with Mojolocious < v2.49, thanks to Peter (Stig) Edwards.
+
+0.05 2012-10-11 Tim Bunce
+
+ * Assorted version portability and compiler warning fixes.
+
+0.04 2012-10-05 Tim Bunce
+
+ * Removed Mojolicious::Lite as a prerequisite as it was stoping people
+    using SizeMe with perl 5.8.
+
+0.03 2012-10-04 Tim Bunce
+
+ * Fixup logic and tests to be portable across more perl versions.
+ * Applied some polish to the docs.
+
+0.02 2012-10-02 Tim Bunce
+
+ * Renamed to Devel::SizeMe.
+ * Assorted fixes, cleanups and polish.
+ * Greatly extended perl_size coverage thanks to rafl.
+
+0.01 2012-09-29 Tim Bunce
+
+ * Created new Devel::Memory extension using a modified version of
+    Devel::Size's perl memory data crawler, extended to support
+    callbacks, a 'data path name' concept, data streaming,
+    data processing and visualization.
+
+ * The Devel::Memory core was based on 0.77. The generic changes
+    will be fed back to Devel::Size so it will remain the
+    canonical source of knowledge of how to crawl perl internals.
+    Once Devel::Size has the changes then Devel::Memory will use
+    it as the core, but compiled with options to enable the extra
+    features. That way Devel::Size won't have any performance penalty.
+
+ * This is very much experimental 'alpha' software. You're milage will
+    vary and anything may change between releases.

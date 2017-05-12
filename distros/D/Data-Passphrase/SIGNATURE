@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d443ccfd9ea289f0744b6a7fef120e13b0eb424c MANIFEST
+SHA1 8c7b090df46c2740af2ca11404095f548c1f4c0b META.yml
+SHA1 c6d688ec4452b93428d2681fcba601988288ddb6 Makefile.PL
+SHA1 c918b64323e74b59949504fc9623b563bc789628 README
+SHA1 36f31e01ebc92b907dfece172b068eff53d93ab0 examples/meter/meter.html
+SHA1 51156be1abccc9ee69d105814eb88a641473a01e examples/meter/meter.js
+SHA1 6f49449e2c62f9d49888315caff615fa97df4f8c examples/passphrase_deny
+SHA1 7f94c7b1a84daa4f3365840c3ebdec10599c7a9a examples/passphrase_rules
+SHA1 df984e75627f3128bf85f371bd3c17803de954d6 examples/passphrase_rules_no_scoring
+SHA1 5cadb4d8dc98682c30c6e8e76c9b7fd32b2811f3 lib/Data/Passphrase.pm
+SHA1 b1dd76de78fddeb0af0bd1c800eaecef80ac1218 lib/Data/Passphrase/Apache.pm
+SHA1 4d7ebe738c6adf950cac777a7276f8ed525487b8 lib/Data/Passphrase/Graph.pm
+SHA1 1b9564d1beadfdd99c7c8e3be78928463bd59c49 lib/Data/Passphrase/Graph/Qwerty.pm
+SHA1 3bd02ea884a43fd8ff8b9e8952302027cc155516 lib/Data/Passphrase/Graph/Roman.pm
+SHA1 1b02d26e551caba9c2a4ccf5b0744962dffb25f5 lib/Data/Passphrase/Phrasebook.pm
+SHA1 a4f35516da469fe0411b149bd83cfcf06548d788 lib/Data/Passphrase/Phrasebook/Bloom.pm
+SHA1 be895ddd1152423e0bc1a699c5630ee909268172 lib/Data/Passphrase/Request.pm
+SHA1 703c20091e1d290a0c7dc6cca142c4fbcbe081e5 lib/Data/Passphrase/Response.pm
+SHA1 40157ad4121446fcc19192079525d81856922886 lib/Data/Passphrase/Rule.pm
+SHA1 b08cb03f6bbc0c27536bc82e30b39b82dc430806 lib/Data/Passphrase/Ruleset.pm
+SHA1 0f543052d5955e575e07e6bdb2549a42ecfa4cf9 scripts/passphrase-test
+SHA1 10e309bf592dde9742b7387d5e2a05b6faeabdf4 t/00-load.t
+SHA1 9626024bdf7c0a093318891a7c81e8140cdd7087 t/01-scoring.t
+SHA1 b69bdd0e085a81b04c4ad82cb8d59669a526e145 t/02-no-scoring.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (GNU/Linux)
+
+iD8DBQFGwdGl8gM8+Mr5peERAtA1AKCpjDYKeDv4eNgyUfU3QAGGC2RWfQCgtZGV
+yMXX2i0yBB7Ou0+Egsw2Rrs=
+=H/k8
+-----END PGP SIGNATURE-----

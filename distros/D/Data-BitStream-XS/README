@@ -1,0 +1,103 @@
+Data::BitStream::XS version 0.08
+================================
+
+A class providing read/write access to bit streams, implemented in XS for
+speed.  It includes many integer coding methods.
+
+Bit streams are often used in data compression and in embedded products where
+memory is at a premium.
+
+
+SYNOPSIS
+
+  use Data::BitStream::XS;
+  my $stream = Data::BitStream::XS->new;
+  $stream->put_gamma($_) for (1 .. 20);
+  $stream->rewind_for_read;
+  my @values = $stream->get_gamma(-1);
+
+See the POD module documentation for examples and more information on all the
+methods included.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Perl 5.6.2 or later.  No modules outside of Core have been used.
+
+
+TESTING
+
+Tested with perl 5.8.0 and 5.14.2 on 32-bit big-endian PA-RISC HP/UX.
+
+Tested with perl 5.6.2, 5.8.9, 5.10.1, 5.12.4, 5.14.2, and 5.15.2
+   on 64-bit x86 RHEL6 Linux.
+
+Tested with perl 5.14.2 on 32-bit ARM.
+
+Tested with 32-bit and 64-bit Perl on 32-bit x86 Ubuntu.
+
+I'm watching CPAN Testers to see what issues come up.
+
+
+PERFORMANCE
+
+If you're a typical C programmer, then I would say the base C code is reasonably
+optimized -- more than Bit::Vector and similar to the Scalar::Vec::Util code,
+for instance.  On the other hand, if you're an embedded programmer used to
+counting cycles in inner loops, it could certainly use improvement.  People
+have very different ideas of what "highly optimized code" means.
+
+While shaving cycles is crucial for the inner loops on embedded products,
+this code is being called from Perl so the main benefit will come from
+efficiently getting in and out of the C code.  This class is over 50x faster
+than the Pure Perl Mouse class, and over 100x faster than Pure Perl Moo/Moose.
+Tests on ARM devices (133MHZ NSLU2 and 1.2GHz Sheeva) show even larger
+improvements.
+
+It turns out that for most uses we can get almost all the performance benefit
+while still using the Moose/Mouse wrapper for Yummy Perly Goodness.  The
+Data::BitStream class will attempt to use this module if it is installed.
+
+Times for encoding/decoding some Gamma codes, in ns per value
+  5342ns   7782ns   Data::BitStream::BitVec  (using Bit::Vector)
+  2780ns   8072ns   Data::BitStream::WordVec (using Perl vec)
+    51ns    166ns   Data::BitStream::BLVec   (using Data::BitStream::XS)
+    39ns     88ns   Data::BitStream::XS      (Data::BitStream::XS directly)
+
+Clearly having this module installed is a huge improvement, even if you use
+the Data::BitStream class.  The above times are for inserting an array of
+values.  Here are timing for one-at-a-time insertion and extraction:
+  9038ns  11554ns   Data::BitStream::BitVec  (using Bit::Vector)
+  7434ns  11771ns   Data::BitStream::WordVec (using Perl vec)
+  5415ns   5770ns   Data::BitStream::BLVec   (using Data::BitStream::XS)
+   839ns   1015ns   Data::BitStream::XS      (Data::BitStream::XS directly)
+
+showing:
+  (1) regardless of implementation, sending or getting multiple values
+      spends more time doing work and less time in object code.
+  (2) there is still an advantage to having the XS class installed.
+  (3) the XS class has less overhead than even the Mouse version of
+      Data::BitStream (Mouse being much faster at this than Moo and Moose,
+      as of late 2011, due to its XS accessor code).
+Reinforcing point #1, note the time difference between this module inserting
+values one at a time (839ns / 1015ns) and Mouse Data::BitStream internally
+using this module (51ns / 166ns).  Always insert values as a list if it works
+for your application.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2014 by Dana Jacobsen <dana@acm.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

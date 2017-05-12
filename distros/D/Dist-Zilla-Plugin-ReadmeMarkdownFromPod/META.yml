@@ -1,0 +1,38 @@
+---
+abstract: 'Automatically convert POD to a README.mkdn for Dist::Zilla'
+author:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'
+  - 'Jacob Helwig <jhelwig@cpan.org>'
+build_requires:
+  Carp: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Scalar::Util: 0
+  Test::DZil: 0
+  Test::More: 0.94
+  Test::Most: 0
+  autodie: 0
+  perl: 5.006
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-ReadmeMarkdownFromPod
+no_index:
+  directory:
+    - corpus
+requires:
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: 0.120120
+  Moose: 0
+  perl: 5.006
+  strict: 0
+resources:
+  homepage: https://github.com/DarwinAwardWinner/Dist-Zilla-Plugin-ReadmeMarkdownFromPod
+  repository: https://github.com/DarwinAwardWinner/Dist-Zilla-Plugin-ReadmeMarkdownFromPod.git
+version: 0.141140

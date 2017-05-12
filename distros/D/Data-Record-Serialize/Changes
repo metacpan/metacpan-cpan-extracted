@@ -1,0 +1,62 @@
+0.07	2015-01-21T14:50:25-0500
+
+    * CPAN testers is all green!
+    * bump version for stable release
+
+0.06_01	2014-12-30T09:59:24-0500
+
+  [BUILD]
+
+    * correct incorrect bug URL (RT#101112)
+    * fix test which triggered Perl warning under 5.21.X (RT#101113)
+
+0.06	2014-12-23T17:26:07-0500
+
+  * release as stable version
+
+0.05_03 2014-06-18T09:58:58-0400
+
+  [TEST FIX]
+
+    * fix breakage on *BSD due to exclusive lock contention on temp
+      SQLite file, (see File::Temp docs on EXLOCK). srezic++
+
+0.05_02	2014-05-05T10:13:23-0400
+
+  [BUILD]
+    * specify minimum required version of Moo
+
+0.05_01	2014-05-04T00:18:21-0400
+
+  [BUILD]
+    * specify minimum required version of Types::Standard
+
+0.05	2014-05-02T15:51:19-0400
+
+  [OTHER]
+
+    * minor documentation fixes
+
+0.04	2014-04-07T00:15:05-0400
+
+  [ENHANCEMENT]
+
+    * new dbitrace parameter for DBI encoder
+
+
+0.03	2014-03-25T21:02:15-0400
+
+  [BUG FIX]
+
+    * DBI drop_table option was broken
+
+0.02	2014-03-22T16:46:43-0400
+
+  [ENHANCEMENT]
+
+    * DBI writes are now written as batche in a transaction to improve
+      performance
+
+0.01	2014-03-18T15:19:58-0400
+
+    * initial release

@@ -1,0 +1,10 @@
+{
+    "welcome": {
+        "fr": "Bienvenue",
+        "en": "Welcome"
+    },
+    "path_not_found %1": {
+        "fr": "Repertoire %1 non trouve",
+        "en": "%1 not found"
+    }
+}

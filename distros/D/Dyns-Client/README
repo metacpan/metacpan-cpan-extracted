@@ -1,0 +1,29 @@
+Dyns/Client version 0.01
+========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+	LWP::UserAgent
+	HTTP::Request
+	Sys::Hostname
+	Socket
+	CGI::Util
+
+All part of standard perl 5.6 + distro.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 
+Johan Van den Brande <johan@vandenbrande.com> 
+

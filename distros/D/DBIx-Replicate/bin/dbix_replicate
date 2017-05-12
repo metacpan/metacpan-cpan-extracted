@@ -1,0 +1,94 @@
+#! /usr/bin/perl
+
+use strict;
+use warnings;
+
+use DBI;
+use DBIx::Replicate qw/dbix_replicate/;
+use Getopt::Long;
+
+sub usage {
+    print << "EOT";
+$0 options
+
+Options:
+  --src=path          source table
+  --dest=path         destination table
+  --copy-by=cols      copy by block of rows with same values in ``colums''
+  --primary-key=cols  primary key columns
+  --columns=cols      list of column names (required if using --primary-key)
+  --block=num_rows    number of rows to be copied at once (same as above)
+  --extra-cond=expr   SQL expression for filtering rows to be copied
+
+Examples:
+
+  # copy using DBIx::Replicate::Strategy::CopyBy
+  $0 \
+    --src='dbi:mysql:test;table=t;host=db1;user=root;mysql_enable_utf8=1' \
+    --dest='dbi:mysql:test;table=t;host=db2;user=root;mysql_enable_utf8=1' \
+    --copy-by='id,subid'
+
+  # copy using DBIx::Replicate::Strategy::PK
+  $0 \
+    --src='dbi:mysql:test;table=t;host=db1;user=root;mysql_enable_utf8=1' \
+    --dest='dbi:mysql:test;table=t;host=db2;user=root;mysql_enable_utf8=1' \
+    --primary-key='id' \
+    --columns='subid,name,flags'
+
+EOT
+;
+    exit 0;
+}
+
+sub connect_to_db {
+    my $addr = shift;
+    $addr =~ s/;table=([^;]+)//
+        or die "table name missing in operand: $addr\n";
+    my $table = $1;
+    my $dbh = DBI->connect($addr)
+        or die "failed to connect to database: $addr\n";
+    ($dbh, $table);
+}
+
+my ($src, $dest, $copy_by, $primary_key, $columns, $block, $extra_cond, $load,
+    $help);
+
+GetOptions(
+    'src:s'         => \$src,
+    'dest:s'        => \$dest,
+    'copy-by:s'     => \$copy_by,
+    'primary-key:s' => \$primary_key,
+    'columns:s'     => \$columns,
+    'block:i'       => \$block,
+    'extra_cond:s'  => \$extra_cond,
+    'load:f'        => \$load,
+    help            => \$help,
+) or exit 1;
+usage() if $help;
+
+die "mandatory arguments --src and --dest are missing.\n"
+    unless $src && $dest;
+
+if ($copy_by) {
+    die "following arguments cannot be used together with --copy-by: --primary-key, --columns, --block\n"
+        if $primary_key || $columns || $block;
+} elsif ($primary_key) {
+} else {
+    die "either --copy-by or --primary-key should be set.\n";
+}
+
+my ($src_conn, $src_table) = connect_to_db($src);
+my ($dest_conn, $dest_table) = connect_to_db($dest);
+
+dbix_replicate({
+    src_conn    => $src_conn,
+    src_table   => $src_table,
+    dest_conn   => $dest_conn,
+    dest_table  => $dest_table,
+    copy_by     => $copy_by,
+    primary_key => $primary_key && [ split /\s*,\s*/, $primary_key ],
+    columns     => $columns && [ split /\s*,\s*/, $columns ],
+    block       => $block,
+    extra_cond  => $extra_cond,
+    load        => $load,
+});

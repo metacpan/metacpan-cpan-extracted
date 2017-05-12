@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/App/Command/podpreview.pm
+t/00-compile.t
+t/author-pod-spell.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t
+weaver.ini

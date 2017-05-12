@@ -1,0 +1,75 @@
+Revision history for Data::CloudWeights
+
+0.15.1    2015-05-22 09:14:54
+          - Added MetaConfig to dist.ini
+          - Added badges and public repository
+
+0.14.1    2015-01-20 13:10:13
+          - Fixed undef warning in tests
+
+0.13.1    2015-01-19 12:56:52
+          - Skip tests broken smoker 0a0d65bf-7a6f-1014-ab5e-171548f0d22a
+          - Replaced ns::sweep with autoclean
+          - Removed Ident lines
+          - Toolchain updates
+
+0.12.1    2013-09-03 15:05:13
+          - Bumped version dependencies
+
+0.11.1    2013-08-21 21:18:15
+          - Fixed metadata after change to DZ
+
+0.10.1    2013-08-15 16:09:33
+          - Truncated changelog to fix date format
+          - Switched to Dist::Zilla
+
+0.9.5     2013-07-15 13:39:39
+          - Excluded Jason Clifford from CPAN Testing
+            21ecef88-ea3c-11e2-9b36-562531b64f85
+          - Excluded C Thomas from CPAN Testing
+            8d51a280-e872-11e2-9fd4-a5333fc76d31
+          - POD Updates
+          - Dropped Color::Spectrum dependency
+          - Dropped Unexpected dependency
+          - Mooified
+
+0.8.2     2013-05-16 22:51:23
+          - Fixed type in Build.PL
+          - Converted from SVN to Git
+
+0.7.144   2012-09-06
+          - Added POD spelling tests
+          - Updated inc::Bob to 1.3
+
+0.7.143   2012-04-25
+          - Excluded the usual list of CPAN testing platforms due to
+            008a5fc8-8e59-11e1-9ec4-a796756b88d3
+
+0.7.141   2012-04-20
+          - Added missing dependency on namespace::autoclean
+
+0.7.140   2012-04-19
+          - Turned CPAN testing on
+          - Updated inc::Bob to 1.3
+          - Updated inc::Bob. Added inc::CPANTesting
+          - Added more tests
+          - Updated inc::Bob
+
+0.6.128   2011-04-12
+          - Suppressed dcollins CPAN testing
+          - Moved boilerplate M::B subclass code to inc/Bob.pm
+          - Suppressed Konig CPAN testing again
+
+0.6.122   2010-12-18
+          - Uses Color::Spectrum
+          - Moosed
+
+0.5.112   2010-09-28
+          - Removed execute permission from Build.PL
+
+0.5.108   2010-09-22
+          - Switched to M::B for installs
+
+0.4.106   2010-09-22
+          - Increased prescision to 3 decimal places
+

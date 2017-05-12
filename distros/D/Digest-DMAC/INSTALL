@@ -1,0 +1,7 @@
+To install Digest::DMAC
+
+perl Makefile.PL
+make
+make test
+make install
+

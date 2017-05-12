@@ -1,0 +1,7 @@
+0.0.2
+    - config_files added to conform to DBIx::Class::Schema::Config options
+    - File::HomeDir used to find the user's home directory over ENV{HOME}
+    - Documentation updated.
+
+0.0.1
+    - Inital version on CPAN

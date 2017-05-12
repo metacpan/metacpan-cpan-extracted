@@ -1,0 +1,48 @@
+NAME
+    Dancer::Logger::Spinner - Show a spinner in the console on Dancer log
+    messages!
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        # in your Dancer app:
+        setting logger => 'spinner';
+
+        # or in your Dancer config file:
+        logger: 'spinner'
+
+    Et voila!
+
+DESCRIPTION
+    When using this logger and running your application in the terminal, you
+    will see a text spinner running on each message it gets. If you have a
+    page with a lot of request, and they will come in fast, you'll see the
+    spinner running. If you have an app with very little requests in each
+    page or if it is slow, the spinner will run slowly.
+
+    Each request matches another rotation of the spinner.
+
+SUBROUTINES/METHODS
+  init
+    Sets the spinner's characters and position.
+
+  advance_spinner
+    Advanced the spinner onefold by cleaning a terminal line and printing
+    the next spinner position.
+
+  _log
+    Gets a message to log and calls "advance_spinner".
+
+SEE ALSO
+    The Dancer Advent Calendar 2010.
+
+AUTHOR
+      Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,54 @@
+Revision history for Dist-Zilla-PluginBundle-Author-MELO
+
+0.012     2013-01-18T11:29:04Z
+        * New default for skip_prereqs: '^t::'
+        * Tweak SUPPORT section of our Pod sections
+        * Switch part of our Metadata collection to the GitHub PluginBundle
+        * bug tracker set to Github issues by default now
+
+0.011     2013-01-06T15:49:13Z
+        * Generate a simpler .travis.yml
+        * Make sure .travis.yml is not excluded by MANIFEST.SKIP
+        * Add support for DZIL_FIRST_RELEASE ENV
+        * Test::Pod::LinkCheck is disable by default for now
+        * Test::Pod::No404s is disable by default for now
+
+0.010     2012-09-05T17:37:47Z
+        * Updated abstract to the real truth about this module
+        * Generate a .travis.yml file for all projects using this bundle
+
+0.009     2012-09-05T00:36:10Z
+        * Fix bug with plugin order: Git::CommitBuild must be
+          before @Git
+
+0.008     2012-09-05T00:31:36Z
+        * Will the real Git::CommitBuild config work this time?
+
+0.007     2012-09-05T00:15:16Z
+        * Fix Git::CommitBuild setup
+        * Didn't make it to CPAN, botched up release phase
+
+0.006     2012-09-04T23:59:04Z
+        * New release to fix timestamp problems on the previous dist
+        * Add Git::CommitBuild with both per-build and per-release
+          extra branches
+        * Add PrereqsClean plugin
+        * Tweak cover_db/ exception
+
+0.005     2012-09-04T11:19:08Z
+        * disable_tests accepts multiple values, in line with
+          @TestingMania behaviour
+
+0.004     2012-05-11T11:25:40Z
+        * Added missing dependency not detected auto-magically
+
+0.003     2012-03-14T10:54:01Z
+        * Add default authority to make Dist::Zilla::Plugin::Authority
+          work with default travis-ci.org install
+
+0.002     2011-10-28T11:15:39Z
+        * Make ReportVersions::Tiny plugin optional and off by default
+        * Cleanup after a release
+
+0.001     2011-10-28T10:58:32Z
+        * Initial release

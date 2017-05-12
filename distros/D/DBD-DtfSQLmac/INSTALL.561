@@ -1,0 +1,53 @@
+
+(INSTALL.561)
+
+
+*** Please read the README document first. ***
+
+
+
+--------------------------------- NOTE -------------------------------------
+This distribution contains shared libraries, which are loaded dynamically  
+by MacPerl -- well, normally. Currently, dynamic loading of shared libs  
+does NOT work with the MPW MacPerl tool when built with Apple's MrC compiler. 
+However, dynamic loading always works with the MacPerl application and the 
+MacPerl tool when built with the Metrowerks compilers. Hence, those of you 
+who have downloaded a pre-built MacPerl 5.6.1 distribution should have
+no problems. Note also that dynamic loading is NOT supported by the 68K 
+versions of the MacPerl application and tool. 
+----------------------------------------------------------------------------
+
+
+
+Installation for new MacPerl 5.6.1 (and higher):
+=================================================
+
+Installation is quite easy. Always install the DBI module first. The pre-built 
+DBI module (version 1.21 as of this writing) for MacPerl 5.6.1 is available via 
+the MacPerl Module Porters page (http://dev.macperl.org/mmp/). As with every 
+module, use the installme.plx droplet for installation. This droplet is part of 
+the MacPerl 5.6.1 distribution. 
+
+After you've installed the DBI module, simply drop the DBD-DtfSQLmac-0.3201.tar.gz 
+packed archive or the unpacked folder DBD-DtfSQLmac-0.3201 on the installme.plx 
+droplet. Answer the upcoming question "Convert all text and MacBinary files?" with 
+"Yes". This should install the module properly. 
+
+Afterwards, you have to install the dtF/SQL 2.01 shared library 'dtFPPCSV2.8K.shlb'
+by hand. The dtF/SQL 2.01 shared library comes with the distribution that you have
+to download from sLAB's web site (see the README document or DtfSQL.pm for details).
+Either put the 'dtFPPCSV2.8K.shlb' shared library (or at least an alias to it) in 
+the SAME folder as the shared library 'DtfSQL' that comes with this module (by 
+default, this folder is ':site_perl:MacPPC:auto:Mac:DtfSQL:) or put the dtF/SQL 2.01 
+shared library in the System Extensions folder. This is crucial since this module 
+can only be used in conjunction with the dtF/SQL 2.01 shared library.
+
+To be sure that everything is ok and the module loads properly, run the test.pl script 
+first. Then run the test scripts located in the 't' folder. Some samples are provided 
+in the 'samples' folder, to help you getting started.
+
+Have fun.
+
+
+
+

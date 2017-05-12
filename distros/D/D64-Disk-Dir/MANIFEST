@@ -1,0 +1,11 @@
+Changes
+Dir.pm
+Makefile.PL
+MANIFEST
+README
+t/01-basic.t
+t/02-dir.t
+t/03-entry.t
+t/04-iterator.t
+Dir/Entry.pm
+Dir/Iterator.pm

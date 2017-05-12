@@ -1,0 +1,14 @@
+Build.PL
+Changes
+examples/mcp4725.pl
+lib/Device/Chip/MCP4725.pm
+MANIFEST			This list of files
+t/00use.t
+t/01read.t
+t/02write.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

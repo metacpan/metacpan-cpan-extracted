@@ -1,0 +1,14 @@
+Changes
+hdr_check.h
+lib/Data/UUID/LibUUID.pm
+lib/Data/UUID/LibUUID/DataUUIDCompat.pm
+LibUUID.xs
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+t/basic.t
+t/compat.t
+t/fork.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

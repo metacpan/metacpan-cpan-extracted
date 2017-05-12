@@ -1,0 +1,20 @@
+Revision history for Perl extension Digest::TransformPath
+
+1.00  Mon  4 Sep 2006
+	- Importing from old CVS to new SVN repository
+	- Upgrading to Module::Install 0.64
+	- Removing uses of C< use UNIVERSAL 'isa' >
+
+0.04  Fri Nov 19 2004
+	- Added support for providing transforms as extra arguments
+	  to the constructor.
+
+0.03  Skipped
+
+0.02  Tue Sep 21 2004
+	- Changed name from Digest::PathKey to Digest::TransformPath
+	- Wrote actual module code
+	- Wrote full set of unit tests
+
+0.01  Mon Sep 20 2004
+	- Created the initial implementation

@@ -1,0 +1,10 @@
+You install this package using CPAN.pm or the normal:
+
+perl Makefile.PL
+make
+make test 
+make install 
+
+process.
+
+See the perldoc inside Callsite.pm or README.pod for more information.

@@ -1,0 +1,26 @@
+---
+abstract: 'a distro that always fails the `make` stage'
+author:
+  - 'Martin Thurn'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+  Test::Simple: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.82'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Devel::Fail::Make
+name: Devel-Fail-Make
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.016

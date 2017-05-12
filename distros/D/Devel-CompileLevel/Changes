@@ -1,0 +1,10 @@
+Revision history for Devel-CompileLevel
+
+0.001002 - 2016-10-31
+  - fix detection on perl 5.16
+
+0.001001 - 2016-10-15
+  - fix detection when warnings are left at default
+
+0.001000 - 2015-08-28
+  - initial release

@@ -1,0 +1,118 @@
+==================================================
+Changes from 2012-11-07 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.007 at 2013-11-07 04:17:59 +0000
+------------------------------------------
+
+  Change: 4e88b7c457388e9d1add83055971de8d3724bda0
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 22:17:59 +0000
+
+    Merge branch 'master' of
+    github.com:fffinkel/dist_zilla_pluginbundle_fffinkel 
+
+  Change: df241475a5dba7fa0752ffd7ff62ba73e552ee1e
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 02:31:30 +0000
+
+    Don't fake release 
+
+------------------------------------------
+version 0.001 at 2013-11-07 04:05:20 +0000
+------------------------------------------
+
+  Change: 5daa7a7c5d5944cc5a77a9fa814041c2570600ee
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 22:05:20 +0000
+
+    Update POD, clean up comments, no functional changes 
+
+  Change: 2159d5f8231b9750d4e2bfa075b2ac34705b651d
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-11-06 22:05:02 +0000
+
+    Remove PodCoverageTests
+
+    Temporary? 
+
+------------------------------------------
+version 0.005 at 2013-10-21 02:31:30 +0000
+------------------------------------------
+
+  Change: df241475a5dba7fa0752ffd7ff62ba73e552ee1e
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-21 02:31:30 +0000
+
+    Don't fake release 
+
+------------------------------------------
+version 0.004 at 2013-10-20 00:59:13 +0000
+------------------------------------------
+
+  Change: c932e6cc0f665d951874715a9b23b18acaa8cc0d
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:59:13 +0000
+
+    v0.004 
+
+------------------------------------------
+version 0.003 at 2013-10-20 00:48:21 +0000
+------------------------------------------
+
+  Change: 81576c923cdd346abc94095bdad83fdb3656458f
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:48:21 +0000
+
+    Remove fake release plugin 
+
+------------------------------------------
+version 0.002 at 2013-10-20 00:45:40 +0000
+------------------------------------------
+
+  Change: 1408e66d1b36e699aef1900a5168f18d10ef79af
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:45:40 +0000
+
+    Update main module pod 
+
+  Change: d67fb1d5f340d440fbf2cce11fd003989e10fc6e
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:39:46 +0000
+
+    Clean up dist.ini
+
+    Lexical sort 
+
+  Change: d5cf2ab5fb164e64bfbdbb621a0a6bbcfcb76ebe
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:39:04 +0000
+
+    Clean up syntax, add pod for configure method
+
+    Was failing POD coverage release test 
+
+  Change: a7987bb231ee39504622ca9a77e2b578825a1a1d
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 00:16:06 +0000
+
+    Fix up main module pod, add Git::Check plugin 
+
+  Change: dd8ebc1493188aa0c261224379cc5b98906c84e2
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-19 23:27:13 +0000
+
+    My dist zilla profile
+
+    Everything updated from clone of RJBS' profile 
+
+  Change: ea610aa99da60d38141bab4a343d528a186d278c
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-18 04:47:34 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

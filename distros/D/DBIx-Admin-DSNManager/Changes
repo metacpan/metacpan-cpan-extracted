@@ -1,0 +1,27 @@
+Revision history for Perl extension DBIx::Admin::DSNManager.
+
+2.01  Mon Mar 10 13:30:55 2014
+	- Add Test::Version to the pre-reqs.
+	- Remove FindBin from pre-reqs.
+	- Remove scripts/find.homedir.pl.
+
+2.00  Thu Mar  6 09:45:07 2014
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Rename CHANGES to Changes as per CPAN::Spec::Changes.
+	- Move t/pod.t to xt/author/.
+	- Add t/version.t.
+	- Switch from Hash::FieldHash to Moo. But not Moops - I don't need that level of complexity.
+	- If file_name is provided to new(), it is not checked for absolute/relative (it never was), but rather
+		it is just used as provided. This means stop using File::HomeDir.
+		If file_name is not provided to new(), default to 'dsn.ini'.
+		This also means stop using Try::Tiny. That is now up to the user of this module.
+	- The our variable $errstr has been removed. All errors die with a message.
+	- Clean up handling of situations when the user does not specify any value for various attributes.
+		Previously, these were assumed to exist and/or not set properly when a file was written.
+	- Add use strict and use warnings to Build.PL and Makefile.PL.
+	- Newsflash: DBIx::Admin::CreateTable and DBIx::Admin::DSNManager are now used for the author's testing of
+		DBIx::Admin::TableInfo.
+
+1.00  Mon Nov 15 17:54:00 2010
+	  - Original version.

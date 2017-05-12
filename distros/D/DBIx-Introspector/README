@@ -1,0 +1,200 @@
+NAME
+    DBIx::Introspector - Detect what database you are connected to
+
+VERSION
+    version 0.001005
+
+SYNOPSIS
+     my $d = DBIx::Introspector->new(drivers => '2013-12.01');
+
+     # standard dialects
+     $d->decorate_driver_unconnected(Pg     => concat_sql => '? || ?');
+     $d->decorate_driver_unconnected(SQLite => concat_sql => '? || ?');
+
+     # non-standard
+     $d->decorate_driver_unconnected(MSSQL  => concat_sql => '? + ?');
+     $d->decorate_driver_unconnected(mysql  => concat_sql => 'CONCAT( ?, ? )');
+
+     my $concat_sql = $d->get($dbh, $dsn, 'concat_sql');
+
+DESCRIPTION
+    "DBIx::Introspector" is a module factored out of the DBIx::Class
+    database detection code. Most code that needs to detect which database
+    it is connected to assumes that there is a one-to-one mapping from
+    database drivers to database engines. Unfortunately reality is rarely
+    that simple. For instance, DBD::ODBC is typically used to connect to SQL
+    Server, but ODBC can be used to connect to PostgreSQL, MySQL, and
+    Oracle. Additionally, while ODBC is the most common way to connect to
+    SQL Server, it is not the only option, as DBD::ADO can also be used.
+
+    "DBIx::Introspector" can correctly detect which database you are
+    connected to, because it was factored out of a complex, working
+    codebase. On top of that it has been written to be very extensible. So
+    if you needed to detect which version of your given database you are
+    connected to that would not be difficult.
+
+    Furthermore, "DBIx::Introspector" does its best to try to detect
+    information based on the dsn you give it if you have not yet connected,
+    so you can possibly avoid connection or at least defer connection.
+
+METHODS
+  "add_driver"
+     $dbii->add_driver({
+       name => 'Pg',
+       parents => ['DBI'],
+       unconnected_options => {
+          concat_sql => '? || ?',
+          random_func => 'RANDOM()',
+       })
+
+    Takes a hashref defining a new driver .
+
+  "replace_driver"
+     $dbii->replace_driver({
+       name => 'Pg',
+       parents => ['DBI'],
+       unconnected_options => {
+          concat_sql => '? || ?',
+          random_func => 'RANDOM()',
+       })
+
+    Takes a hashref replacing an existing driver . Replaces the driver
+    already defined with the same name.
+
+  "decorate_driver_connected"
+     $dbii->decorate_driver_connected('MSSQL', 'concat_sql', '? + ?')
+
+    Takes a "driver name", "key" and a "value". The "key value" pair will be
+    inserted into the driver's "connected_options".
+
+  "decorate_driver_unconnected"
+     $dbii->decorate_driver_unconnected('SQLite', 'concat_sql', '? || ?')
+
+    Takes a "driver name", "key" and a "value". The "key value" pair will be
+    inserted into the driver's "unconnected_options".
+
+  "get"
+     $dbii->get($dbh, $dsn, 'concat_sql')
+
+    Takes a "dbh", "dsn", "key", and optionally a hashref of "options".
+
+    The "dbh" can be a coderef returning a "dbh". If you provide the
+    "dbh_fallback_connect" option it will be used to connect the "dbh" if it
+    is not already connected and then queried, if the "dsn" was
+    insufficient.
+
+    So for example, one might do:
+
+     my $dbh;
+     $dbii->get(sub { $dbh }, $dsn, 'concat_sql', {
+        dbh_fallback_connect => sub { $dbh = DBI->connect($dsn, $user, $pass) },
+     });
+
+    Which will only connect if it has to, like if the user is using the
+    "DBD::ODBC" driver to connect.
+
+ATTRIBUTES
+  "drivers"
+    This has no default and is required, though a sane defaultish value does
+    exist.
+
+    Currently there is one predefined set of drivers, named "2013-12.01". If
+    drivers or facts or just the general structure of drivers changes they
+    will always be as a new named set of drivers. "2013-12.01" matches the
+    0.08250 release of DBIx::Class and probably many previous and following
+    releases.
+
+    If you need to define it from scratch, you can just pass an arrayref of
+    drivers; see the "DRIVER DEFINITION" section on what is required for
+    that. But generally it will look something like this (from the tests):
+
+     my $d = DBIx::Introspector->new(
+       drivers => [ map DBIx::Introspector::Driver->new($_),
+          {
+             name => 'DBI',
+             connected_determination_strategy => sub { $_[1]->{Driver}{Name} },
+             unconnected_determination_strategy => sub {
+                my $dsn = $_[1] || $ENV{DBI_DSN} || '';
+                my ($driver) = $dsn =~ /dbi:([^:]+):/i;
+                $driver ||= $ENV{DBI_DRIVER};
+                return $driver
+             },
+          },
+          {
+             name => 'SQLite',
+             parents => ['DBI'],
+             connected_determination_strategy => sub {
+                my ($v) = $_[1]->selectrow_array('SELECT "value" FROM "a"');
+                return "SQLite$v"
+             },
+             connected_options => {
+                bar => sub { 2 },
+             },
+             unconnected_options => {
+                borg => sub { 'magic ham' },
+             },
+          },
+          { name => 'SQLite1', parents => ['SQLite'] },
+          { name => 'SQLite2', parents => ['SQLite'] },
+       ]
+     );
+
+DRIVER DEFINITION
+    Drivers ("DBIx::Introspector::Driver" objects) have the following six
+    attributes:
+
+  "name"
+    Required. Must be unique among the drivers contained in the
+    introspector.
+
+  "parents"
+    Arrayref of parent drivers. This allows parent drivers to implement
+    common options among children. So for example on might define a driver
+    for each version of PostgreSQL, and have a parent driver that they all
+    use for common base info.
+
+  "connected_determination_strategy"
+    This is a code reference that is called as a method on the driver with
+    the "dbh" as the first argument and an optional "dsn" as the second
+    argument. It should return a driver name.
+
+  "unconnected_determination_strategy"
+    This is a code reference that is called as a method on the driver with
+    the "dsn" as the first argument. It should return a driver name.
+
+  "connected_options"
+    Hashref of "key value" pairs for detecting information based on the
+    "dbh". A value that is not a code reference is returned directly, though
+    I suggest non-coderefs all go in the "unconnected_options" so that they
+    may be used without connecting if possilbe.
+
+    If a code reference is passed it will get called as a method on the
+    driver with the following list of values:
+
+    "dbh"
+      This is the connected "dbh" that you can use to introspect the
+      database.
+
+    "dsn"
+      This is the "dsn" passed to "get", possibly undefined.
+
+  "unconnected_options"
+    Hashref of "key value" pairs for detecting information based on the
+    "dsn". A value that is not a code reference is returned directly.
+
+    If a code reference is passed it will get called as a method on the
+    driver with the following list value:
+
+    "dsn"
+      This is the connected "dsn" that you can use to introspect the
+      database.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

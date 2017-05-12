@@ -1,0 +1,74 @@
+Good ideas that might be worth adding with appropriate attention to the
+dangers of feeping creaturism:
+
+- Add a good example of a profile with comments about what things mean.  
+  Factorial might be a good choice.
+
+- Use the rusage call (in UNIX, at least) and gettimeofday to remove dependance
+  on Time::HiRes and to give processor time reports.
+
+- Write a coverage script to go with SmallProf to do coverage analysis.
+
+From Philippe VERDRET:
+
+- And some other ideas:
+  o build a wrapper for launching the program to profile: so you can
+    define and manipulate easily many profiling options. In the pass
+    I have used this program:
+
+        #!/usr/local/bin/perl -w
+        use File::Basename;
+        BEGIN {
+          $^W = 0;
+          ($basename, $dirname, $suffix) = fileparse($0, '\.pl');
+          push(@INC, "$dirname");
+        }
+
+        use Getopt::Long;
+        $usage = "usage: $basename program to profile";
+        &GetOptions('h',                # Help
+                    'l:s',              # -l logfile, not used
+                   ) or die "$usage\n";
+        $^W = 1;
+        die "$basename: $usage$EOM" if not @ARGV;
+
+        if (not -s $ARGV[0]) {
+          die qq!$basename: no program to profile$EOM!;
+        }
+        $ENV{'PERLDB_OPTS'} = "NonStop=1";
+        $ENV{'PERL5DB'} = qq!BEGIN { require "$dirname/myprof3.pl" }!;
+
+        # Execute
+        print STDERR "$basename - Launching context: $^X -d @ARGV\n";
+        exec $^X, '-d', @ARGV;
+
+    Just a crude version.
+
+  o don't compute the time statistics during the runtime, just collect
+    informations and display the profile later, with a specific program.
+    (Editor's note.  Hmm... concerns about time and space usage.  Definitely
+      do not want to do disk i/o anytime during the run.)
+
+From Ed Peshko:
+
+- Add the ability to just profile a certain subroutine and all of its 
+  underlying subroutines rather than the whole thing.
+  (Editor's note: The $DB::profile variable could do something like this.  
+    Set it to zero at the beginning of the script (or in .smallprof) and then
+    set it to 1 at the beginning of the sub and 0 at the end).
+
+- Another idea: I noticed that when SmallProf profiles, in subroutines it
+  doesn't count all the 'sub code' underneath the code itself. Hence, when you
+  say something like:
+
+  a();
+
+  sub a { take_a_long_time(); }
+
+  a comes out as '.005' seconds. How easy (as an option) would it be to have a
+  summation, so that the call to a() reflects the call to take_a_long_time()?
+
+  (Editor's note:  The sub sub (just added) might allow something along these
+    lines, but there doesn't seem to be a call made when a subroutine *returns*
+    and I'm afraid that the cost of faking it up would be high).
+

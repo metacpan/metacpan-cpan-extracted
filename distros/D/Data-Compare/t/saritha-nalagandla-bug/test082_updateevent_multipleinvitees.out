@@ -1,0 +1,51 @@
+{
+   "REQUEST" : {
+      "BUILD" : "5.0 akanjila 20080806-1047",
+      "DTSTAMP_UTC" : "20080807T001048",
+      "INTL" : "us",
+      "OPERATION" : "UPDATE_EVENT",
+      "SERVICE" : "CAL",
+      "SERVICE_VERSION" : "1.2",
+      "USER" : "autocaljson3"
+   },
+   "RESPONSE" : {
+      "CODE" : 0,
+      "VALUE" : {
+         "ACCOUNT_ID" : "autocaljson3",
+         "ALL_DAY" : false,
+         "ATTENDEE" : [
+            {
+               "EMAIL" : "f323_bart1@yahoo.com",
+               "PARTSTAT" : "ACCEPTED",
+               "RSVP" : false
+            },
+            {
+               "EMAIL" : "f323_bart2@yahoo.com",
+               "PARTSTAT" : "DECLINED",
+               "RSVP" : false
+            }
+         ],
+         "CLASS" : "PUBLIC",
+         "COMMENT" : [
+            "test comment"
+         ],
+         "COMPONENT_TYPE" : "EVENT",
+         "DESCRIPTION" : "go party",
+         "DTEND" : "20080820T093000",
+         "DTEND_TZID" : "America/Los_Angeles",
+         "DTSTART" : "20080820T090000",
+         "DTSTART_TZID" : "America/Los_Angeles",
+         "DURATION" : "PT30M",
+         "FOLDER_ID" : 131,
+         "INVID" : "331-330",
+         "LAST_MODIFIED" : "20080807T001048",
+         "LOCATION" : "test loc",
+         "ORGANIZER" : "autocaljson3@yahoo.com",
+         "STATUS" : "CONFIRMED",
+         "SUMMARY" : "Party Update event 082",
+         "TRANSP" : "OPAQUE",
+         "TYPE" : 10,
+         "UID" : "8f060ff2-28bc-4e32-8ba6-3d03dd40d900"
+      }
+   }
+}

@@ -1,0 +1,10 @@
+234	Orange
+463	Strawberry
+53	Apple
+234     Banana
+412	Peach
+467	Pear
+234     Pear
+147	Pear
+141	Orange
+375	Orange

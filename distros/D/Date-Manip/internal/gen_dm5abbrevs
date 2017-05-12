@@ -1,0 +1,255 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2010-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+# This script is used to automatically generate the Date::Manip::DM5abbrevs
+# modeul used in Date::Manip 5.xx .
+
+use lib "./lib";
+
+require 5.010000;
+use strict;
+use warnings;
+
+use Date::Manip::Zones;
+use Date::Manip::TZ;
+
+our($VERSION);
+$VERSION='6.58';
+
+our($DEBUG);
+$DEBUG = 0;
+
+our(@keep);
+@keep = qw(
+      idlw   -1200
+      nt     -1100
+      sat    -0400
+      cldt   -0300
+      at     -0200
+      utc    +0000
+      mewt   +0100
+      mez    +0100
+      fwt    +0100
+      gb     +0100
+      swt    +0100
+      mesz   +0200
+      fst    +0200
+      metdst +0200
+      eetdst +0300
+      eetedt +0300
+      bt     +0300
+      it     +0330
+      zp4    +0400
+      zp5    +0500
+      ist    +0530
+      zp6    +0600
+      awst   +0800
+      rok    +0900
+      aest   +1000
+      acdt   +1030
+      cadt   +1030
+      aedt   +1100
+      eadt   +1100
+      nzt    +1200
+      idle   +1200
+         );
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+my $year = ( localtime(time) )[5] + 1900;
+my $tz   = new Date::Manip::TZ;
+
+my $podstr = '=pod';    # so the CPAN indexer won't treat this as a POD file
+
+print "package Date::Manip::DM5abbrevs;
+# Copyright (c) 2003-$year Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+########################################################################
+########################################################################
+
+$podstr
+
+=head1 NAME
+
+Date::Manip::DM5abbrevs - A list of all timezone abbreviations
+
+=head1 SYNPOSIS
+
+This module is not intended to be used directly. Date::Manip 5.xx
+will load it as needed.
+
+This module contains all of the time zone abbreviations from
+Date::Manip 6.xx copied backwards to 5.xx to provide slightly
+better support for time zones.
+
+Note that this is only a bandaid fix, and does not add proper
+time zone handling to version 5.xx .
+
+=cut
+
+require 5.000;
+
+use strict;
+use warnings;
+
+our(\$VERSION);
+\$VERSION='6.58';
+
+END {
+   my \$tmp;
+   \$tmp = \\\$Date::Manip::DM5::Abbrevs;
+}
+
+\$Date::Manip::DM5::Abbrevs = join(' ',qw(
+";
+
+my @tmp = @keep;
+my %off;
+while (@tmp) {
+   my($abb) = shift(@tmp);
+   my($off) = shift(@tmp);
+   $off{$abb} = $off;
+   print "      $abb" . " "x(6-length($abb)) . " $off\n";
+}
+print "\n";
+
+# We have to come up with the best offset for each abbreviation.
+#
+# We'll look first at values in the current year.
+# Then we'll look back in time.
+
+ABBREV: foreach my $abbrev (sort keys %Date::Manip::Zones::Abbrev) {
+   my @zone = @{ $Date::Manip::Zones::Abbrev{$abbrev} };
+
+   foreach my $zone (@zone) {
+      my @period = $tz->all_periods($zone,$year);
+      foreach my $period (@period) {
+         my @per = @$period;
+         my $abb = lc($per[4]);
+         next  if ($abb ne $abbrev);
+         my $off = $per[3];
+         my ($h,$m,$s) = @$off;
+         $h += 0;
+         next  if ($s != 0);
+
+         my $sign;
+         if ($h < 0) {
+            $h *= -1;
+            $m *= -1;
+            $sign = "-";
+         } else {
+            $sign = "+";
+         }
+         $h = "0$h"  if (length($h) == 1);
+         $m = "0$m"  if (length($m) == 1);
+         $off = "$sign$h$m";
+
+         print "      $abb" . " "x(6-length($abb)) . " $off\n";
+         $off{$abb} = $off;
+         next ABBREV;
+      }
+   }
+
+   # If we've arrived here, we didn't find the abbreviation in
+   # the current year, so we need to go back in time.
+
+   my $best_off  = "";
+   my $best_date = "0001010100:00:00";
+
+   print ":: Abbrev = $abbrev...\n"  if ($DEBUG);
+
+ ZONE:foreach my $zone (@zone) {
+      my @period = $tz->periods($zone,undef,$year);
+      while (@period) {
+         my $period = pop(@period);
+
+         my @per  = @$period;
+         my $date = $per[10];
+         my $abb  = lc($per[4]);
+         next  if ($abb ne $abbrev);
+         my $off = $per[3];
+         my ($h,$m,$s) = @$off;
+         $h += 0;
+         next  if ($s != 0);
+
+         my $sign;
+         if ($h < 0  ||
+             ($h == 0  &&  $m < 0)) {
+            $h *= -1;
+            $m *= -1;
+            $sign = "-";
+         } else {
+            $sign = "+";
+         }
+         $h = "0$h"  if (length($h) == 1);
+         $m = "0$m"  if (length($m) == 1);
+
+         if ($date lt $best_date) {
+            print "::     $zone => $best_off [ $best_date ]\n"  if ($DEBUG);
+            next ZONE;
+         }
+
+         $best_off = "$sign$h$m";
+         $best_date = $date;
+
+         print "::     $zone => $best_off [ $best_date ] ***\n"  if ($DEBUG);
+         next ZONE;
+      }
+   }
+
+   if ($best_off) {
+      $off{$abbrev} = $best_off;
+      print "      $abbrev" . " "x(6-length($abbrev)) . " $best_off\n";
+   }
+   next ABBREV;
+}
+
+print "));
+
+$podstr
+
+=head1 TIMEZONES
+
+The following timezones are defined:
+
+";
+
+foreach my $abb (sort keys %off) {
+   my $off = $off{$abb};
+   print "      " . uc($abb) . " "x(6-length($abb)) . " $off\n";
+}
+
+print "
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck\@cpan.org)
+
+=cut
+
+1;
+";
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

@@ -1,0 +1,22 @@
+---
+abstract: 'Parse and format RFC3501 datetime strings'
+author:
+  - 'Alex Muntada <alexm@cpan.org>'
+build_requires:
+  English: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110420'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-RFC3501
+requires:
+  Carp: 0
+  DateTime: 0
+resources:
+  repository: http://github.com/alexm/DateTime-Format-RFC3501
+version: 0.02

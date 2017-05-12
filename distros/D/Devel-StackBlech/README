@@ -1,0 +1,71 @@
+NAME
+    Devel::StackBlech - Dumps your stack, all of it, somewhere
+
+FUNCTIONS
+  PERL FUNCTIONS
+    dumpStacks()
+        Dumps your stack to "Perl_debug_log" which is usually pointed at
+        STDERR. Happens to also display DB::sub calls which are normally
+        invisible. Please hack on this if you want more features. Commit
+        bits are handed out freely.
+
+  C FUNCTIONS
+    All of the following C functions are available for importing.
+
+    void dsb_dumpStacks()
+        Dump all levels of the interpreter's runloop stacks.
+
+        This is the backend, reuseable implementation for the perl function
+        "dumpStacks()".
+
+    void dsb_dumpFrames( PERL_SI *si )
+        Dump all contexts in this runloop level.
+
+    void dsb_dumpFrame( const PERL_CONTEXT *const cx )
+        Dump a context.
+
+AUTHOR
+    The internet. Kthxbai.
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-stackblech at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-StackBlech>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::StackBlech
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-StackBlech>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Devel-StackBlech>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Devel-StackBlech>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Devel-StackBlech>
+
+    Copyright 2008, 2009 Joshua ben Jore, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 18:
+        You forgot a '=back' before '=head2'
+

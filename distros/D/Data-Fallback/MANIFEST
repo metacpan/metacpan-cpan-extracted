@@ -1,0 +1,13 @@
+Changes
+Fallback.pm
+Makefile.PL
+MANIFEST
+README
+TO_DO
+t/01_simple.t
+Fallback/ConfFile.pm
+Fallback/DBI.pm
+Fallback/Memory.pm
+Fallback/WholeFile.pm
+Fallback/Client.pm
+Fallback/Daemon.pm

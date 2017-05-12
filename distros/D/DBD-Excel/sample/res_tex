@@ -1,0 +1,56 @@
+#--------------------------------------------------------------
+# 1. SELECT(with no params)
+DATA:1,Kawai,Takanori,OpenDept.,37,GCD00051@nifty.ne.jp
+DATA:2,Kabaya-Two thousand,Hippo2000 and Co.,2001,
+DATA:3,Hippo2000,Hippo2000 and Co.,37,kawait@nippon-rad.co.jp
+#--------------------------------------------------------------
+# 2. SELECT(with params)
+DATA:3,Hippo2000,Hippo2000 and Co.,37,kawait@nippon-rad.co.jp
+#--------------------------------------------------------------
+# 3. INSERT(with params)
+#--------------------------------------------------------------
+# 4. DELETE(with params)
+#--------------------------------------------------------------
+# 5. UPDATE(with params)
+#--------------------------------------------------------------
+# 6. SELECT(again)
+DATA:2,Kabaya-Two thousand,Hippo2000 and Co.,2001,Mail Upd
+DATA:4,Newman 4,New Dept,30,newman4@hippo2000.net
+DATA:5,Newman 5,New Dept,32,newman5@hippo2000.net
+#--------------------------------------------------------------
+# 7. CREATE TABLE, DROP TABLE
+#--------------------------------------------------------------
+# 1. SELECT(with no params): VTBL
+DATA:1,Kawai,Takanori,OpenDept.,37
+DATA:2,Kabaya-Two thousand,Hippo2000 and Co.,2001
+DATA:3,Hippo2000,Hippo2000 and Co.,37
+#--------------------------------------------------------------
+# 2. SELECT(with params)
+DATA:2,Kabaya-Two thousand,Hippo2000 and Co.,2001
+DATA:3,Hippo2000,Hippo2000 and Co.,37
+#--------------------------------------------------------------
+# 3. UPDATE(with params)
+#--------------------------------------------------------------
+# 4. DELETE(with params)
+#--------------------------------------------------------------
+# 5. INSERT(with params)
+#--------------------------------------------------------------
+# 6. SELECT(again)
+DATA:1,Kawai,Takanori,OpenDept.,37
+DATA:3,Hippo2000,Hippo2000 and Co.,50
+DATA:4,Newman 4,New Dept,30
+DATA:5,Newman 5,New Dept,32
+#--------------------------------------------------------------
+# 7. List tables, data sources
+TABLE: TEST
+TABLE: TEST_JAPAN
+TABLE: NEW_TBL
+TABLE: DEL_TEST
+TABLE: TEST_V
+TABLE: TESTV
+DSN: DBI:Excel:file=./dbdtest.xls
+DSN: DBI:Excel:file=./newxl.xls
+DSN: DBI:Excel:file=./newxlj.xls
+DSN: DBI:Excel:file=./testj.xls
+#--------------------------------------------------------------
+# 8. Save this Excel file

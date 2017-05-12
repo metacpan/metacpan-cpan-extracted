@@ -1,0 +1,162 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use autodie qw( :all );
+
+use File::pushd;
+use Getopt::Long;
+use Net::FTP;
+use Path::Class qw( dir tempdir );
+
+sub main {
+    my %opts = (
+        download => 1,
+        tests    => 1,
+    );
+
+    GetOptions(
+        'download!' => \$opts{download},
+        'dir:s'     => \$opts{dir},
+        'tests!'    => \$opts{tests},
+    );
+
+    my $olson_version;
+    my $dir
+        = $opts{dir}
+        ? dir( $opts{dir} )
+        : tempdir( CLEANUP => 1 );
+
+    if ( $opts{download} ) {
+        $olson_version = _download($dir);
+    }
+    else {
+        ($olson_version) = $dir =~ m{/([^/]+)$};
+    }
+
+    _compile_tzdata($dir);
+    _parse_olson( $dir, $olson_version, $opts{tests} );
+}
+
+sub _download {
+    my $pushed = pushd(shift);
+
+    my $host = 'ftp.iana.org';
+
+    my $ftp = Net::FTP->new( $host, Passive => 1 )
+        or die "Cannot connect to $host: $@";
+    $ftp->login()
+        or die 'Cannot login: ', $ftp->message;
+
+    my $dir = '/tz/releases';
+    $ftp->cwd($dir)
+        or die "Cannot cwd to $dir: ", $ftp->message;
+
+    my @code;
+    my @data;
+    for my $file ( $ftp->ls() ) {
+        next unless $file =~ /tz(code|data)(\d+)(\w+)\.tar\.gz/;
+
+        if ( $1 eq 'code' ) {
+            push @code, [ $file, $2, $3 ];
+        }
+        else {
+            push @data, [ $file, $2, $3 ];
+        }
+    }
+
+    my $data
+        = ( sort { $b->[1] <=> $a->[1] or $b->[2] cmp $a->[2] } @data )[0]
+        ->[0];
+
+    my $code
+        = ( sort { $b->[1] <=> $a->[1] or $b->[2] cmp $a->[2] } @code )[0]
+        ->[0];
+
+    $ftp->binary();
+
+    my $olson_version;
+    for my $file ( $code, $data ) {
+        print "Getting $file\n";
+        $ftp->get($file)
+            or die "Cannot fetch $file: ", $ftp->message;
+
+        system( 'tar', 'xzf', $file );
+
+        ($olson_version) = $file =~ /(\d\d\d\d\w)/;
+
+        die "Did not retrieve anything from elsie"
+            unless $olson_version;
+    }
+
+    return $olson_version;
+}
+
+sub _compile_tzdata {
+    my $dir = shift;
+
+    my $pushed = pushd($dir);
+
+    system('make')
+        and die "Cannot run make: $!";
+
+    my $target = $dir->subdir('target');
+    $target->mkpath( 0, 0755 );
+
+    my @files = qw(
+        africa
+        antarctica
+        asia
+        australasia
+        europe
+        northamerica
+        southamerica
+        etcetera
+        factory
+        backward
+        systemv
+        pacificnew
+    );
+
+    for my $f (@files) {
+        system( './zic', '-d', $target, $f )
+            and die "Cannot run zic on $f";
+    }
+
+    # The rdfind and symlinks bits are copied from the Debian tzdata packages
+    # rules file.
+    system(
+        'rdfind',
+        '-outputname',       '/dev/null',
+        '-makesymlinks',     'true',
+        '-removeidentinode', 'false',
+        $target
+    );
+
+    system( qw( symlinks -r -s -c ), $target );
+
+    system(qw( sudo rm -fr /usr/share/zoneinfo ));
+    system( qw( sudo mv ), $target, '/usr/share/zoneinfo' );
+    system(qw( sudo chown -R root:root /usr/share/zoneinfo ));
+}
+
+sub _parse_olson {
+    my $dir            = shift;
+    my $olson_version  = shift;
+    my $generate_tests = shift;
+
+    system(
+        './tools/parse_olson',
+        '--clean',
+        '--version', $olson_version,
+        '--dir',     $dir,
+    ) and die "Cannot run parse_olson: $!";
+
+    if ($generate_tests) {
+        print "Generating tests from zdump\n";
+        system('./tools/tests_from_zdump')
+            and die "Cannot run tests_from_zdump: $!";
+    }
+}
+
+main();

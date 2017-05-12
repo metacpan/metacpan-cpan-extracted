@@ -1,0 +1,27 @@
+<h1>Custom Login Page</h1>
+
+<p>You must log in to continue.</p>
+
+[%- IF login_failed -%]
+  <p>LOGIN FAILED</p>
+[%- END -%]
+
+<form method="post">
+  <label for="username">Username:</label>
+  <input type="text" name="__auth_extensible_username" id="username">
+  <br />
+  <label for="password">Password:</label>
+  <input type="password" name="__auth_extensible_password" id="password">
+  <br />
+  <input type="submit" value="Login">
+</form>
+
+<form method="post" action="[% login_page %]">
+  [%- IF reset_password_handler -%]
+    <h2>Password reset</h2>
+    <p>Enter your username to obtain an email to reset your password</p>
+    <label for="username_reset">Username:</label>
+    <input type="text" name="username_reset" id="username_reset">
+    <input type="submit" name="submit_reset" value="Submit">
+  [%- END -%]
+</form>

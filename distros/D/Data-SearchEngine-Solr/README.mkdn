@@ -1,0 +1,142 @@
+# NAME
+
+Data::SearchEngine::Solr
+
+# VERSION
+
+version 0.20
+
+# SYNOPSIS
+
+  my $solr = Data::SearchEngine::Solr->new(
+    url => 'http://localhost:8983/solr',
+    options => {
+        fq => 'category:Foo',
+        facets => 'true'
+    }
+  );
+
+  my $query = Data::SearchEngine::Query->new(
+    count => 10,
+    page => 1,
+    query => 'ice cream',
+  );
+
+  my $results = $solr->search($query);
+
+  foreach my $item ($results->items) {
+    print $item->get_value('name')."\n";
+  }
+
+# DESCRIPTION
+
+Data::SearchEngine::Solr is a [Data::SearchEngine](http://search.cpan.org/perldoc?Data::SearchEngine) backend for the Solr
+search server.
+
+# NAME
+
+Data::SearchEngine::Solr - Data::SearchEngine backend for Solr
+
+# SOLR FEATURES
+
+## FILTERS
+
+This module uses the values from Data::SearchEngine::Query's `filters` to
+populate the `fq` parameter.  Before talking to Solr we iterate over the
+filters and add the filter's value to `fq`.
+
+  $query->filters->{'last name watson'} = 'last_name:watson';
+
+Will results in fq=name:watson.  Multiple filters will be appended.
+
+## FACETS
+
+Facets may be enabled thusly:
+
+  $solr->options->{facets} = 'true';
+  $solr->options->{facet.field} = 'somefield';
+
+You may also use other `facet.*` parameters, as defined by Solr.
+
+To access facet data, consult the documentation for
+[Data::SearchEngine::Results](http://search.cpan.org/perldoc?Data::SearchEngine::Results) and it's `facets` method.
+
+## SPELLCHECK
+
+Queries may be spellchecked using Solr's spellcheck component. If you supply
+the correct parameters through the URL or to your URI handler then
+Data::SearchEngine::Solr will see it in the results and populate the bits from
+[Data::SearchEngine::Results::Spellcheck](http://search.cpan.org/perldoc?Data::SearchEngine::Results::Spellcheck).  Note that some of the features
+may not work properly unless `spellcheck.extendedResults` is true in your
+query.
+
+# ATTRIBUTES
+
+## options
+
+HashRef that is passed to [WebService::Solr](http://search.cpan.org/perldoc?WebService::Solr).  Please see the above
+documentation on filters and facets before using this directly.
+
+## url
+
+The URL at which to contact the Solr instance.
+
+# METHODS
+
+## add (\@items)
+
+Adds a list of [Data::SearchEngine::Item](http://search.cpan.org/perldoc?Data::SearchEngine::Item)s to the Solr index.  The Items
+are converted into [WebService::Solr::Document](http://search.cpan.org/perldoc?WebService::Solr::Document)s using the follow means:
+
+- `score` is used as the bonus.
+- `id` is used as the document's id.
+- Multiple-value fields are broken up into multiple
+[WebService::Solr::Field](http://search.cpan.org/perldoc?WebService::Solr::Field) objects per [WebService::Solr](http://search.cpan.org/perldoc?WebService::Solr)'s convention.  This
+is merely a formality, it has no real affect.
+
+## optimize
+
+Calls WebService::Solr's `optimize` method.
+
+## remove
+
+Deletes an item from the index.  A straight dispatch to [WebService::Solr](http://search.cpan.org/perldoc?WebService::Solr)'s
+`delete`.
+
+## remove_by_id
+
+Delete a specific document by it's id.
+
+## search ($query)
+
+Accepts a [Data::SearchEngine::Query](http://search.cpan.org/perldoc?Data::SearchEngine::Query) and returns a
+[Data::SearchEngine::Results](http://search.cpan.org/perldoc?Data::SearchEngine::Results) object containing the data from Solr.
+
+## update
+
+Alias for `add`.
+
+# AUTHOR
+
+Cory G Watson, `<gphat at cpan.org>`
+
+# COPYRIGHT & LICENSE
+
+Copyright 2009 - 2011 Cory G Watson.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

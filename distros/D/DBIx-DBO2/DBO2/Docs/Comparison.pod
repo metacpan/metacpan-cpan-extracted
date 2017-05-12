@@ -1,0 +1,97 @@
+=head1 NAME
+
+DBIx::DBO2::Docs::Comparison - Entry for poop-comparison
+
+
+=head1 DESCRIPTION
+
+Numerous modules on CPAN provide some type of system to map objects to and from SQL databases, including L<Class::DBI>, L<Alzabo>, and L<Tangram>.
+
+Dave Rolsky and the Poop-Group discussion list have assembled a very useful comparison of several such CPAN modules at http://poop.sourceforge.net/.
+
+For comparison purposes, this document reviews some of the points of comparison used by the Poop-Group summary and their answers for this module.
+
+
+=head1 COMPARISON
+
+=over 4
+
+=item * DBIx::DBO2
+
+ Author:         M. Simon Cavalletto <simonm@cavalletto.org>
+ Homepage:       http://www.evoscript.org/DBIx-DBO2/
+ Latest Version: 0.005 - March 24th, 2002
+ First Release:  25th January 2002
+
+=back
+
+=head2 Supported databases
+
+Any database supported by one of the following: DBD::AnyData, DBD::CSV, DBD::MySQL, and DBD::Pg.
+
+Providing support for other drivers involves creating a DBD-specific subclass of DBIx::SQLEngine (which will be loaded via DBIx::AnyDBD when appropriate), and should only require a limited amount of coding.
+
+=head2 SQL Abstraction
+
+This module supports moderately complex selects, inserts, updates, and deletes, based on the DBIx::SQLEngine abstraction layer. It is possible to apply order by and group by clauses to operations, as well as limits.
+
+Inserts with sequences are supported, with DBIX::SQLEngine providing a workaround using its own sequence table logic for DBDs which don't have native sequence/auto_increment equivalents.
+
+The base Record class does not support joins, although the underlying DBIx::SQLEngine does, and it is possible to provide your own query logic in a subclass. 
+
+=head2 Invalid SQL
+
+The automated SQL generation should produce valid SQL, but if you pass in incorrect information, such as explicitly requesting a column name which does not exist in the database, or if you pass in a SQL snippet as part of a query, there is no way to validate this prior to actually executing the query and receiving an error from the DBMS.
+
+=head2 Deferred/Preloaded data retrieval
+
+There is not yet any way to defer the loading of given columns for a select. However, it always possible to easily specify only those columns which are needed at a given point in your code. (Deferred loading of additional columns is expected in an upcoming release.)
+
+=head2 Table Relationships
+
+DBIx::DBO2 supports both many-to-one (foreign key) and one-to-many (reverse foreign key) relationships. Support for one-to-many relationships includes your choice of cascading delete, nullify after delete, and restrict delete rules. You can establish relationships between classes regardless of whether their data is actually stored in the same underlying SQL database.
+
+=head2 Multiple rows and cursors
+
+DBIx::DBO2 currently returns multiple rows all at once. A RecordSet object similar to a cursor is used but it does not yet handle incremental retrieval. (Support for cursors and automatic iteration with closures is expected in an upcoming release.)
+
+=head2 Caching
+
+There is no built in caching support. (Support for LRU caching and ensuring that there is only a single instance of a given object in memory at any time are both expected in an upcoming release.)
+
+=item Transactions
+
+DBIx::DBO2 does not support transactions. (Basic transactions for DBDs which support them are expected in an upcoming release.)
+
+=head2 Auto-generated methods
+
+The included DBIx::DBO2::Fields package can generate a wide variety of methods, including customized accessors for each type of field or relationship. (These currently require explicit declarations, but support for automatic detection of database columns and subsequent method generation is expected in an upcoming release.)
+
+=head2 Documentation
+
+The documentation for this module is still fairly rough, although efforts are continuing to improve this.
+
+=head2 License
+
+GPL/Artistic disjunction. The same as Perl itself.
+
+=head2 Support
+
+Support for this module is available from the author (simonm@cavalletto.org). (The author is also available for support contracts or consulting engagements.)
+
+=head2 Status
+
+Actively developed and supported by the author. Recently released to CPAN after several years of in-house use, including current use on several e-commerce sites.
+
+=head2 Other
+
+A callback mechanism allows you to specify method names or arbitrary subroutines to be called immediately before or after each record is retrieved, inserted, updated, or deleted. You can add these callbacks to all record classes, to a particular class, or even to a particular object instance. 
+
+The method-generator code leverages this capability; for example, declaring a one-to-many relationship using the "line_items --cascade_delete" option both declares a delete_items method, and adds that method to the "post_delete" callback so that it will be called when the main record is deleted.
+
+
+=head1 SEE ALSO
+
+See L<DBIx::DBO2> for an overview of this framework.
+
+=cut

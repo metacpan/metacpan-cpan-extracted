@@ -1,0 +1,4 @@
+plugins:
+    ElasticModel:
+        es:
+            transport:  httptiny

@@ -1,0 +1,8 @@
+Revision history for Dancer::Plugin::Memcached
+
+0.01    2010-11-03
+        Initial release.
+
+0.02    2013-01-03
+        * Various fixes to tests
+        * Basic support for Dancer 2

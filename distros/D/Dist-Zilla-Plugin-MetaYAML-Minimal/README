@@ -1,0 +1,43 @@
+Dist::Zilla::Plugin::MetaYAML::Minimal
+
+Generally, if you're creating both "META.json" and "META.yml", then
+you're doing so purely for compatibility reasons.
+
+In such circumstances, using the same meta-data for both leads to a lot
+of cruft in "META.yml"
+
+This "Dist::Zilla" extension is for such circumstances.
+
+However, if you are *only* shipping "META.yml" and NOT "META.json", then
+using this extension would be harmful and cause loss of information.
+
+Presently, this extension is a *PROTOTYPE*, and just culls fields
+leading with "x_" passed by "Dist::Zilla".
+
+The final behavior may require enhancements to "CPAN::Meta::Converter"
+and might be possibly superseded by patches to "MetaYAML" itself.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

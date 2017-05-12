@@ -1,0 +1,132 @@
+NAME
+    Device::Video::PWC
+
+SYNOPSIS
+            use Device::Video::PWC;
+        
+            my $cam = Device::Video::PWC->new( '/dev/video0' );
+            $cam->set_pan (  3000 );
+            $cam->set_tilt( -1000 );
+            $cam->set_framerate( 15 );
+            $cam->set electronic sharpness( 35000 );
+            $cam->dump_current_settings;
+            $cam->restore_factory_settings;
+
+DESCRIPTION
+    This module is an adaptation of source code of "setpwm" program. With
+    this tool, you can only set settings specific to the Philips WebCams.
+
+SUBROUTINES/METHODS
+    new( '/path/to/video/device' )
+        Constructor. The parameter is a path to video devices. Default value
+        is set to "/dev/video0".
+
+    set_device( '/path/to/video/device' )
+        This method allows to change used device.
+
+    dump_current_settings()
+        Dump current settings.
+
+    set_framerate( $framerate )
+        Set framerate. Parameter $framerate has to be in a range 0 - 63.
+
+    set_dimensions_and_framerate( $width, $height, $framerate)
+        Set dimensions and framerate. All parameters must be set. Framerate
+        has to be in a range 0 - 63.
+
+    flash_settings()
+        Store settings in nonvolatile RAM.
+
+    restore_settings()
+        Restore settings from nonvolatile RAM.
+
+    restore_factory_settins()
+        Restore factory settings.
+
+    set_compression_preference( $val )
+        Set compression preference. Value has to be in a range 0 - 3.
+
+    set_automatic_gain_control( $val )
+        Set automatic gain control. Value has to be in a range 0 - 65535.
+
+    set_shutter_speed( $val )
+        Set shutter speed. Value has to be in a range 1 - 65535.
+
+    set_automatic_white_balance_mode( $val )
+        Set automatic white balance mode. Value has to be one of
+        "auto/manual/indoor/outdoor/fl" .
+
+    red_balance( $val )
+        Set red balance (only if white balance mode is set to "manual").
+        Value has to be in a range 0 - 65535.
+
+    blue_balance( $val )
+        Set blue balance (only if white balance mode is set to "manual").
+        Value has to be in a range 0 - 65535.
+
+    set_automatic_white_balance_speed( $val )
+        Set speed of automatic white balance. Value has to be in a range 1 -
+        65535.
+
+    set_automatic_white_balance_delay( $val )
+        Set delay for automatic white balance. Value has to be in a range 1
+        - 65535.
+
+    set_led_on_time( $val )
+        Set led on time in ms. Value has to be in a range 0 - 25500.
+
+    set_led_off_time( $val )
+        Set led off-time.
+
+    set_electronic_sharpness( $val )
+        Set electronic sharpness. Value has t obe in a range 0 - 65535.
+
+    set_backlight_compensation( $val )
+        Set backlight compensation. Possible values are 0 (for off) and 1
+        (for on).
+
+    set_antiflicker_mode( $val )
+        Set antiflicker mode. Possible values are 0 (for off) and 1 (for
+        on).
+
+    set_noise_reduction($val)
+        Set noise reduction mode. Possible values are from 0 (none) to 3
+        (high).
+
+    reset_pan()
+        Reset pan.
+
+    reset_tilt()
+        Reset tilt.
+
+    query_pan_tilt_status()
+        Query pan/tilt status.
+
+    set_pan( $val )
+        Set pan position.
+
+    set_tilt
+        Set tilt position.
+
+DEPENDENCIES
+    None.
+
+INCOMPATIBILITIES
+    None known.
+
+BUGS AND LIMITATIONS
+    None. I hope.
+
+THANKS
+    Thanks to Folkert van Heusden <folkert@vanheusden.com>, who is an author
+    of original source code for "setpwc".
+
+AUTHOR
+    Strzelecki Lukasz <lukasz@strzeleccy.eu>
+
+LICENCE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

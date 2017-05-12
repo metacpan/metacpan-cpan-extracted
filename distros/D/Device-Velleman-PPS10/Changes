@@ -1,0 +1,15 @@
+Revision history for Perl extension Device::Velleman::PPS10.
+
+0.03
+	- Minor change in comments.
+
+0.02  
+	- Added Device::SerialPort as PREREQ_PM in Makefile.PL
+	- Improved pod a bit.
+	- Was not counting the number of parsed packets.
+	- Was not counting read_total_bytes correctly.
+
+0.01  Sat Dec 25 13:04:30 2010
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -AX --skip-exporter --use-new-tests -n Device::Velleman::PPS10
+

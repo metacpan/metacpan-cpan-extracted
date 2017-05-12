@@ -1,0 +1,47 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Dancer2' => '0.203000',
+                                      'Dancer2::Core::HTTP' => '0.203000',
+                                      'Dancer2::Plugin' => '0',
+                                      'List::Util' => '0',
+                                      'perl' => 'v5.12.0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Dancer2' => '0.203000',
+                                   'Dancer2::Core::Request' => '0',
+                                   'Data::Dumper' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'HTTP::Request::Common' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'JSON' => '0',
+                                   'Module::Runtime' => '0',
+                                   'Plack::Test' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

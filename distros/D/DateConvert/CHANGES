@@ -1,0 +1,10 @@
+
+0.16:
+	- BUG: Hebrew broken, off-by-one error in rosh calulations
+
+0.15:
+	- BUG: no initialize for Julian!  How embarassing.
+	- reworded docs to replace "Absolute" for "Astro"
+
+0.14:
+	- first public release

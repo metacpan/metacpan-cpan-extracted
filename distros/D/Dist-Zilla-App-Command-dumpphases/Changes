@@ -1,0 +1,290 @@
+Release history for Dist-Zilla-App-Command-dumpphases
+
+1.000009 2017-03-07T07:38:33Z 1b7e8bb
+ [Bugfix]
+ - Fix tests with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000008, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: ↓1
+
+1.000008 2016-09-10T07:27:49Z d11870f
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000007, see misc/*.deps* for details
+ - configure: (suggests: +1)
+ - develop: +5 ↑1 -1 (suggests: ↑2)
+
+ [Features / Win32 ANSI Colors]
+ - ANSI Escape code colours should render correctly on Win32 if users have Win32::Console::ANSI installed.
+ - Patched (with thanks) by Roy Ivy III ( #5 )
+
+1.000007 2015-04-13T01:57:06Z e09e102
+ [Documentation]
+ - Redirect media URIs to different repo.
+
+ [Packaging]
+ - Nuke embedded media to slim installation/download.
+
+1.000006 2015-04-10T07:17:31Z d9fc4b6
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000005, see misc/*.deps* for details
+ - develop: +3 ↑3 -1 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +2)
+ - test: (recommends: ↓1)
+
+ [Internals]
+ - Avoid pointless method calls to resolve defaults.
+ - Use simple loading to validate themes instead of complex dir scanning, and only attempt dir scanning to report
+   alternative themes when no matching theme is found.
+
+1.000005 2014-10-31T00:00:38Z 45e3144
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000004, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑2 -1 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1
+ - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - stop requiring utf8
+ - now supports 5.006
+
+1.000004 2014-08-16T00:00:52Z
+ [00 Trivial]
+ - CPANDAY!
+ - Metadata changes re: contributors
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Metadata]
+ - 2 contributors now listed as such using x_contributors instead of authors
+
+ [Misc]
+ - Moved POD around in source so there's less whitespace prior to relevant code in built source
+
+1.000003 2014-08-06T19:37:32Z
+ [Documentation]
+ - Add SEE ALSO for ReportPhase.
+ - Closes #4
+
+1.000002 2014-08-03T09:31:26Z
+ [Bugfix]
+ - Fix documentaiton links to point to kentnl org
+
+1.000001 2014-08-03T04:00:28Z
+ [Bugfix]
+ - Require a newer Path::ScanINC due to Win32 issues.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑2)
+ - runtime: ↑1
+ - test: +1 -3 (recommends: ↑1 -1)
+
+1.000000 2014-06-05T00:01:36Z
+ [00 Major]
+ - Moderate packaging changes that will affect hand-operated downstreams.
+
+ [01 New Version Scheme]
+ - Version scheme is now x.yyyyyy instead of x.y.z
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+ - This is the primary reason for the 1.x on the box.
+
+ [02 Switched to EUMM]
+ - Used ExtUtils::MakeMaker for deployment instead of Module::Build
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+ - Dependencies softened.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.6.0, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +8 -11 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+0.6.0 2013-11-13T03:54:53Z
+ [00 Minor]
+ - Color handling is now validated, and spews list of dynamically determined themes on your system
+ - TERMINOLOGY documentation moved down
+ - Tests added (Finally!)
+ - Moose autobox code removed.
+ - Actually remove Test::Compile
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.5.1, see misc/*.deps* for details
+ - runtime: +3 -1
+ - test: +2 -3
+
+0.5.1 2013-11-13T00:46:05Z
+ [00 Doc Fix]
+ - Added a TERMINOLOGY section, to help clear up the use of the term "phase" relative to this module, as it deals with
+   a few things that aren't really "phases" in the proper sense of the term.
+
+0.5.0 2013-11-12T23:24:04Z
+ [00 Major]
+ - Reimplement guts in terms of the new RoleDB utility.
+ - This means some of the phase titles have changed
+ - However, it now means all phases have descriptions
+ - Phases are now printed in alphabetical order, because execution  order is indeterminate anyway.
+ - Though individual plugins are still printed in the order they're executed within the phase.
+ - Now shows phase_method data documenting what method dzil calls on the plugins during the given phase.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.4.0, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 ↑1 -1
+ - runtime: +1
+
+ [Tests]
+ - Replace Test::Compile with Test::Compile::PerFile
+
+0.4.0 2013-11-10T18:47:19Z
+ [00 Minor]
+ - Add native display of -EncodingProvider role.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.4, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - test: ↑1
+
+0.3.4 2013-09-25T02:33:05Z
+ [Bugfix]
+ - Update compile tests to avoid bugs on Win32
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.3, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: +1
+
+0.3.3 2013-08-30T19:28:52Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.2, see misc/*.deps* for details
+ - test: +2 -2
+
+ [Minor]
+ - Bump to get latest Test::Compile test.
+
+0.3.2 2013-08-23T13:21:54Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.1, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Minor]
+ - Bundle images in dist
+ - Add Travis CI checking
+
+0.3.1 2013-08-22T10:34:10Z
+ [Bug fixes]
+ - Accidentally left broken code with colored -> _colored transition
+
+ [Documentation]
+ - Screenshot images added to all the themes.
+
+0.3.0 2013-08-22T09:38:29Z
+ [!Major]
+ - Now supports custom color themes controllable on the CLI
+ - Internals have MetaPOD coverage
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - runtime: +3
+
+ [Documentation]
+ - MetaPOD annotations and graphs added.
+
+0.2.0 2013-08-21T14:32:08Z
+ [!Major]
+ - New feature, shows aggregate of plugins that were not in any predefined phase.
+ - Better docs on a few phases.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.4, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 (suggests: ↑1)
+ - test: +2 -2
+
+0.1.4 2013-05-17T12:45:25Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.3, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 (suggests: ↑1)
+
+ [Documentation]
+ - Change hotlink image URI to a github-pages based one to be more friendly to githubs service.
+ - https://github.com/blog/1482-
+ - https://help.github.com/articles/using-submodules-with-pages
+
+ [Packaging]
+ - Utilise test_requires
+
+0.1.3 2013-01-25T23:04:24Z
+ - Bugfix release
+
+ [Bugs]
+ - Load Term::ANSIColor lazily to stop it being loaded when all the other commands are ( Thanks Oliver Mengué ).
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.2, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Copyright = 2013
+
+ [Meta]
+ - Bugtracker switched to github
+
+ [Tests]
+ - Regenerated 000-report-versions-tiny.t
+
+0.1.2 2012-05-09T07:25:48Z
+ - Maintenance Release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +1
+
+ [Internals]
+ - add $AUTHORITY to all packages.
+
+ [Packaging]
+ - Update LICENSE ( Year, Indent, Address )
+ - Export x_authority in Meta
+
+ [Tests]
+ - Add a minimum version release test
+
+0.1.1 2011-09-02T09:37:14Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +2
+ - test: -1
+
+ [Documentation]
+ - Document how to turn off colouring ( thanks harleypig / ayoung / Alan Young )
+
+ [Metadata]
+ - Github Urls updated/corrected.
+
+ [Packaging]
+ - Author/Release tests now in xt/
+ - Alan Young is now an author.
+
+ [Tests]
+ - compile test updated.
+
+0.1.0 2011-07-14T06:13:32Z
+ - First version.

@@ -1,0 +1,52 @@
+---
+abstract: 'Generate README from Pod, as simply as possible'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Pod2Readme
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::Pod2Readme:
+    file: lib/Dist/Zilla/Plugin/Pod2Readme.pm
+    version: '0.004'
+requires:
+  Dist::Zilla: '5'
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  List::Util: '0'
+  Moose: '0'
+  Pod::Text: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme.git
+version: '0.004'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'David Golden <xdg@xdg.me>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

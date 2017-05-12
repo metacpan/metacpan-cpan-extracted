@@ -1,0 +1,30 @@
+DBIx::Simple
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Or use CPANPLUS to automate the process.
+
+PREREQUISITES
+
+    DBI
+
+Optionally, SQL::Interp can be used for added functionality.
+
+Optionally, SQL::Abstract can be used for added functionality.
+
+Optionally, DBIx::XHTML_Table can be used for added functionality.
+
+Optionally, Text::Table can be used for added functionality.
+
+Optionally, Object::Accessor can be used for added functionality.
+
+These modules are available from CPAN, <http://cpan.org/>.
+#
+#

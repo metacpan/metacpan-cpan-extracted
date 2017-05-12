@@ -1,0 +1,65 @@
+Revision history for Perl extension DBIx::HA.
+
+1.10 Mon Jun 16 09:21:32 CDT 2008
+
+  - prepare() now passes $attr through, which allows it to work with drivers
+    like DBD::Gofer. (Tim Bunce)
+  - Numerous documentation improvements (Mark Stosberg)
+
+1.00 Wed May 02 01:24:00 2007
+  - Made compatible with DBD::Gofer
+  - Added DBIX_HA_DEBUG env var to enable debug at runtime
+  - Increase default connect and execute timeouts to 30 seconds.
+
+0.99 Wed Oct 04 18:18:00 2006
+	- Fix for Apache children always starting at index 0 and
+	  overwriting shared file if under app failover.
+	- Simplified logic of _readsharedfile().
+	- Changed and simplified execute(): now it always both reconnects
+	  and reexecutes a statement in case of hard failure (it used
+	  to only reconnect).
+
+0.98 Tue Oct 03 13:11:12 2006 (unreleased)
+	- Cleanup of statement handles when database handle is swapped
+	- Better logging
+	- Now requires DBI version 1.49
+
+0.97 Fri Aug 18 16:37:00 2006 (unreleased)
+	- Added the Error Fail Test functionality.
+
+0.96 Tue Dec 07 10:35:00 2004 (unreleased)
+	- Added a sth->finish if the server returns an sql error.
+
+0.95 Mon Nov 29 16:11:00 2004
+	- Much more reliable operation, especially in regards to timeouts.
+	- Now requires DBD::Sybase 1.04_14 or above if using Sybase.
+	- Got rid of the non-portable "select 1" and replaced it with	
+	  a reconnect.
+
+0.91 Tue Oct 19 11:42:17 2004
+	- Significant rewrite to take advantage of DBI 1.44+'s
+	  swap_inner_handle(), simplifying the code a lot. It is now
+	  unnecessary to set up a callback only to clear cached handles.
+	- Multiple additional bug fixes and documentation updates.
+
+0.61 Wed Apr 28 11:51:52 2004
+	- Major bug fixes, specifically in the application failover logic.
+	- Some code optimizations.
+	- Now checking the prepare() method for validity of active handle.
+	- POD updates. Added dependencies section.
+
+0.56 Wed Feb 04 12:02:00 2004
+	- Removed dependencies on Apache::DBI. There was no error
+	  under 5.8.1 but 5.8.0 wasn't passing tests. Apache::DBI
+	  will still be used if found.
+
+0.55 Fri Jan 30 12:42:00 2004
+	- Added test scripts
+
+0.54 Wed Jan 21 19:20:00 2004
+	- Prepped for first outside release.
+	- Added extensive POD.
+
+0.01  Wed Jan 21 19:20:00 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n DBIx::HA

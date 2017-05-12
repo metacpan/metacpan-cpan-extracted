@@ -1,0 +1,469 @@
+# Copyright (c) 1995-2017 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Date::Manip::Base - Base methods for date manipulation
+
+=head1 SYNOPSIS
+
+   use Date::Manip::Base;
+   $dmb = new Date::Manip::Base;
+
+=head1 DESCRIPTION
+
+The Date::Manip package of modules consists of several modules
+for doing high level date operations with full error checking
+and a lot of flexibility.
+
+The high level operations, though intended to be used in most
+situations, have a lot of overhead associated with them. As such, a
+number of the most useful low level routines (which the high level
+routines use to do much of the real work) are included in this module
+and are available directly to users.
+
+These low level routines are powerful enough that they can be used
+independent of the high level routines and perform useful (though much
+simpler) operations. They are also significantly faster than the high
+level routines.
+
+These routines do NO error checking on input. Invalid data will result
+in meaningless results.  If you need error checking, you must call the
+higher level Date::Manip routines instead of these.
+
+These routines also ignore all effects of time zones and daylight
+saving time. One way to think of these routines is working with times
+and dates in the GMT time zone.
+
+=head1 BASE METHODS
+
+This class inherits several base methods from the L<Date::Manip::Obj>
+class. Please refer to the documentation for that class for a
+description of those methods.
+
+=over 4
+
+=item B<err>
+
+=item B<new>
+
+=item B<new_config>
+
+Please refer to the L<Date::Manip::Obj> documentation for these methods.
+
+=item B<config>
+
+   $dmb->config($var1,$val1,$var2,$val2,...);
+
+This will set the value of any configuration variable. Please refer to the
+L<Date::Manip::Config> manual for a list of all configuration variables and their
+description.
+
+=back
+
+=head1 DATE METHODS
+
+In all of the following methods, the following variables are used:
+
+=over 4
+
+=item B<$date>
+
+This is a list reference containing a full date and time:
+
+   [$y, $m, $d, $h, $mn, $s]
+
+=item B<$ymd>
+
+A list reference containing only the date portion:
+
+   [$y, $m, $d]
+
+=item B<$hms>
+
+A list reference containing only the time portion:
+
+   [$h, $mn, $s]
+
+=item B<$time>
+
+A list reference containing an amount of time:
+
+   [$dh, $dmn, $ds]
+
+=item B<$delta>
+
+A list containing a full delta:
+
+   [$dy, $dm, $dw, $dd, $dh, $dmn, $ds]
+
+=item B<$offset>
+
+A list containing a time zone expressed as an offset:
+
+   [ $offh, $offm, $offs ]
+
+=back
+
+In all of the above, the elements C<($y, $m, $d, $h, $mn, $s)> are all
+numeric. In most of the routines described below, no error checking is
+done on the input.  C<$y> should be between 1 and 9999, C<$m> between 1 and
+12, C<$d> between 1 and 31, C<$h> should be between 0 and 23, C<$mn> and C<$s>
+between 0 and 59.
+
+C<$hms> can be between 00:00:00 and 24:00:00, but an C<$offset> must be
+between -23:59:59 and +23:59:59.
+
+Years are not translated to 4 digit years, so passing in a year of
+"04" will be equivalent to "0004", NOT "2004".
+
+The elements C<($dy, $dm, $dw, $dd, $dh, $dmn, $ds)> are all numeric,
+but can be positive or negative. They represent an elapsed amount
+of time measured in years, months, weeks, etc.
+
+Since no error checking is done, passing in C<($y,$m,$d) = (2004,2,31)>
+will NOT trigger an error, even though February does not have 31 days.
+Instead, some meaningless result will be returned.
+
+=over 4
+
+=item B<calc_date_date>
+
+=item B<calc_date_days>
+
+=item B<calc_date_delta>
+
+=item B<calc_date_time>
+
+=item B<calc_time_time>
+
+These are all routines for doing simple date and time calculations.
+As mentioned above, they ignore all affects of time zones and daylight
+saving time.
+
+The following methods are available:
+
+   $time = $dmb->calc_date_date($date1,$date2);
+
+This take two dates and determine the amount of time between them.
+
+   $date = $dmb->calc_date_days($date,$n [,$subtract]);
+   $ymd  = $dmb->calc_date_days($ymd,$n [,$subtract]);
+
+This returns a date C<$n> days later (if C<$nE<gt>0>) or earlier (if C<$nE<lt>0>)
+than the date passed in. If C<$subtract> is passed in, the sign of C<$n> is reversed.
+
+   $date = $dmb->calc_date_delta($date,$delta [,$subtract]);
+
+This take a date and add the given delta to it (or subtract the delta
+if C<$subtract> is non-zero).
+
+   $date = $dmb->calc_date_time($date,$time [,$subtract]);
+
+This take a date and add the given time to it (or subtract the time
+if C<$subtract> is non-zero).
+
+   $time = $dmb->calc_time_time(@time1,@time2 [,$subtract]);
+
+This take two times and add them together (or subtract the second from
+the first if C<$subtract> is non-zero).
+
+=item B<check>
+
+=item B<check_time>
+
+   $valid = $dmb->check($date);
+   $valid = $dmb->check_time($hms);
+
+This tests a list of values to see if they form a valid date or time
+ignoring all time zone affects. The date/time would be valid in GMT,
+but perhaps not in all time zones.
+
+1 is returned if the the fields are valid, 0 otherwise.
+
+C<$hms> is in the range 00:00:00 to 24:00:00.
+
+=item B<cmp>
+
+   $flag = $dmb->cmp($date1,$date2);
+
+Returns -1, 0, or 1 if date1 is before, the same as, or after date2.
+
+=item B<day_of_week>
+
+   $day = $dmb->day_of_week($date);
+   $day = $dmb->day_of_week($ymd);
+
+Returns the day of the week (1 for Monday, 7 for Sunday).
+
+=item B<day_of_year>
+
+   $day = $dmb->day_of_year($ymd);
+   $day = $dmb->day_of_year($date);
+
+In the first case, returns the day of the year (1 to 366) for C<($y, $m, $d)>.
+In the second case, it returns a fractional day (1.0 <= C<$day> < 366.0 or
+1.0 <= C<$day> < 367.0 for a leap-year).  For example, day 1.5
+falls on Jan 1, at noon.  The somewhat non-intuitive answer (1.5
+instead of 0.5) is to make the two forms return numerically equivalent
+answers for times of 00:00:00 . You can look at the integer part of
+the number as being the day of the year, and the fractional part of
+the number as the fraction of the day that has passed at the given
+time.
+
+The inverse operations can also be done:
+
+   $ymd   = $dmb->day_of_year($y,$day);
+   $date  = $dmb->day_of_year($y,$day);
+
+If C<$day> is an integer, the year, month, and day is returned. If C<$day>
+is a floating point number, it returns the year, month, day, hour,
+minutes, and decimal seconds.
+
+C<$day> must be greater than or equal to 1 and less than 366 on non-leap years
+or 367 on leap years.
+
+=item B<days_in_month>
+
+   $days = $dmb->days_in_month($y,$m);
+
+Returns the number of days in the month.
+
+   @days = $dmb->days_in_month($y,0);
+
+Returns a list of 12 elements with the days in each month of the year.
+
+=item B<days_in_year>
+
+   $days = $dmb->days_in_year($y);
+
+Returns the number of days in the year (365 or 366)
+
+=item B<days_since_1BC>
+
+   $days = $dmb->days_since_1BC($date);
+   $days = $dmb->days_since_1BC($ymd);
+
+Returns the number of days since Dec 31, 1BC. Since the calendar has
+changed a number of times, the number returned is based on the current
+calendar projected backwards in time, and in no way reflects a true
+number of days since then. As such, the result is largely meaningless,
+except when called twice as a means of determining the number of days
+separating two dates.
+
+The inverse operation is also available:
+
+   $ymd = $dmb->days_since_1BC($days);
+
+Returns the date C<$days> since Dec 31, 1BC. So day 1 is Jan 1, 0001.
+
+=item B<leapyear>
+
+   $flag = $dmb->leapyear($y);
+
+Returns 1 if the argument is a leap year.  Originally copied from code
+written by David Muir Sharnoff.
+
+=item B<nth_day_of_week>
+
+   $ymd = $dmb->nth_day_of_week($y,$n,$dow);
+
+Returns the C<$n>th occurrence of C<$dow> (1 for Monday, 7 for Sunday) in the
+year.  C<$n> must be between 1 and 53 or -1 through -53.
+
+   $ymd = $dmb->nth_day_of_week($y,$n,$dow,$m);
+
+Returns the C<$n>th occurrence of C<$dow> in the given month.  C<$n> must be between
+1 and 5 or it can be -1 through -5.
+
+In all cases, nothing is returned if C<$n> is beyond the last actual
+result (i.e. the 5th Sunday in a month with only four Sundays).
+
+=item B<secs_since_1970>
+
+   $secs = $dmb->secs_since_1970($date);
+
+Returns the number of seconds since Jan 1, 1970 00:00:00 (negative if date is
+earlier).
+
+   $date = $dmb->secs_since_1970($secs);
+
+Translates number of seconds into a date.
+
+=item B<split>
+
+=item B<join>
+
+The split and join functions are used to take a string containing a common
+type of time data and split it into a list of fields. The join function takes
+the list and forms it into a string.
+
+Rudimentary error checking is performed with both of these functions
+and undef is returned in the case of any error. No error checking is done
+on the specific values.
+
+The following are allowed:
+
+   $date = $dmb->split("date",$string);
+   $string = $dmb->join("date",$date);
+
+This splits a string containing a date or creates one from a list reference.
+The string split must be of one of the forms:
+
+   YYYYMMDDHH:MN:SS
+   YYYYMMDDHHMNSS
+   YYYY-MM-DD-HH:MN:SS
+
+The string formed by join is one of the above, depending on the value of
+the Printable config variable. The default format is YYYYMMDDHH:MN:SS,
+but if Printable is set to 1, YYYYMMDDHHMNSS is produced, and if Printable
+is set to 2, the YYYY-MM-DD-HH:MN:SS form is produced.
+
+   $hms = $dmb->split("hms",$string);
+   $string = $dmb->join("hms",$hms);
+
+This works with the hours, minutes, and seconds portion of a date.
+
+When splitting a string, the string can be of any of the forms:
+
+   H
+   H:MN
+   H:MN:SS
+   HH
+   HHMN
+   HHMNSS
+
+Here, H is a 1 or 2 digit representation of the hours. All other fields are
+two digit representations.
+
+The string formed by the join function will always be of the form HH:MN:SS.
+
+The time must be between 00:00:00 and 24:00:00.
+
+   $offset = $dmb->split("offset",$string);
+   $string = $dmb->join("offset",$offset);
+
+An offset string should have a sign (though it is optional if it is
+positive) and is any of the forms:
+
+   +H
+   +H:MN
+   +H:MN:SS
+   +HH
+   +HHMN
+   +HHMNSS
+
+Here, H is a 1 or 2 digit representation of the hours. All other fields are
+two digit representations.
+
+The string formed by the join function will always be of the form
++HH:MN:SS.
+
+The offset must be between -23:59:59 and +23:59:59 .
+
+   $time = $dmb->split("time",$string [,$no_normalize]);
+   $string = $dmb->join("time",$time [,$no_normalize]);
+
+This works with an amount of time in hours, minutes, and seconds. The
+string is of the format:
+
+   +H:MN:S
+
+where all signs are optional. The returned value (whether a list reference
+from the split function, or a string from the join function) will have
+all fields normalized unless C<$no_normalize> is passed in.
+
+   $delta = $dmb->split("delta",$string [,$no_normalize]);
+   $delta = $dmb->split("business",$string [,$no_normalize]);
+
+   $string = $dmb->join("delta",$delta [,$no_normalize]);
+   $string = $dmb->join("business",$delta [,$no_normalize]);
+
+Both of these split a string containing a delta, or create a string
+containing one. The difference is whether the delta is treated as
+a business or non-business delta (see L<Date::Manip::Delta> documentation
+for a detailed description).
+
+The string that can be split is of the form:
+
+  +Y:M:+W:+D:H:MN:S
+
+All signs are optional in the string being split. The string
+produced is of the form +Y:M:+W:D:H:MN:S (for a non-business
+delta) or +Y:M:+W:+D:H:MN:S (for a business delta).
+
+Fields may be omitted entirely. For example:
+
+  D:H:MN:S
+  D:::S
+
+are both valid.
+
+The string or list output is normalized unless L<$no_normalize> is passed
+in.
+
+=item B<week1_day1>
+
+   $ymd = $dmb->week1_day1($y);
+
+This returns the date of the 1st day of the 1st week in the given year.
+Note that this uses the ISO 8601 definition of week, so the year returned
+may be the year before the one passed in.
+
+This uses the FirstDay and Jan1Week1 config variables to evaluate the
+results.
+
+=item B<weeks_in_year>
+
+   $w = $dmb->weeks_in_year($y);
+
+This returns the number of ISO 8601 weeks in the year. It will always be
+52 or 53.
+
+=item B<week_of_year>
+
+   ($y,$w) = $dmb->week_of_year($date);
+   ($y,$w) = $dmb->week_of_year($ymd);
+
+This returns the week number (1-53) of the given date and the year
+that it falls in. Since the ISO 8601 definition of a week is used, the
+year returned is not necessarily the one passed in (it may differ for
+the first or last week of the year).
+
+The inverse operation is also available:
+
+   $ymd = $dmb->week_of_year($y,$w);
+
+which returns the first day of the given week.
+
+This uses the FirstDay and Jan1Week1 config variables to evaluate the
+results.
+
+=back
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the L<Date::Manip::Problems> documentation for
+information on submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+L<Date::Manip>        - main module documentation
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

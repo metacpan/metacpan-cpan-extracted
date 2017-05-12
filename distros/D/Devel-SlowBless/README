@@ -1,0 +1,28 @@
+Devel-SlowBless version 0.06
+============================
+
+This module provides functions to introspect the current value of the
+PL_sub_generation and the PL_amagic_generation internal perl variables,
+as well as a perl debugger implementation that will print out a stack
+trace whenever either of these variables changes.  As of Perl 5.17.1,
+PL_amagic_generation is no longer used, and the value is always 0.
+
+Whenever either of these variables changes, the bless() function slows
+down as perl examines the entire class heirarchy recomputing the overloads
+that are normally cached in the stash.  The penalty is paid just once for
+each class, but if these variables are changing frequently, and your program
+has deep class hierarchies with overloading, performance can suffer badly.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 by Benjamin Holzman and Grant Street Group, Inc.
+All rights reserved.

@@ -1,0 +1,9 @@
+* Change public/app/video-stream/ to build sources list dynamically
+* Implement GPIO (PWM): https://code.google.com/p/webiopi/wiki/RESTAPI
+* Catch exceptions and throw right error code
+* Implement PWM interface
+* Invent interfaces:
+    * SPI
+    * I2C
+    * 1-Wire
+    * Serial

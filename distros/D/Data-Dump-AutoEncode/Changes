@@ -1,0 +1,7 @@
+Revision history for Data-Dump-AutoEncode
+
+0.02 2014/06/18
+  - forgot to load Data::Dump (orz)
+
+0.01 2014/06/18
+  - initial release

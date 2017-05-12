@@ -1,0 +1,460 @@
+Revision history for Perl extension DBIx::DataModel.
+
+v2.46 02.06.2015
+  - let SQL::Abstract quote identifiers in ON conditions (Sergiy Zuban++)
+  - fix some edge cases for $statement->row_count() (Sergiy Zuban++)
+  - RT#102908, schema generator accepts databases without any foreign key assoc
+  - RT#104856, allow dots in DBMS function names (like Oracle DBMS_LOB.SUBSTR)
+
+v2.45 08.01.2015
+  - fix incorrect handling of column aliases in nested subqueries
+
+v2.44 19.12.2014
+  - RT100996, allow literal SQL in inserts
+  - RT099205, transactions & changing dbh
+
+v2.43 21.04.2014
+  - drop statement methods ->goto_page(), ->shift_page(), ->next_page()
+  - new recipe in Cookbook : how to quote table and column names (RT#93529)
+  - check reftypes through Scalar::Does
+  - call ->finish() on sth (Sergiy Zuban++)
+
+v2.42 04.01.2014 : adding support for Plack::App::AutoCRUD
+  - case-insensitivity for method $schema->db_table($db_name)
+  - Schema::Generator::fromDBI takes new arguments $catalog, $schema, $type
+
+v2.41 22.07.2013
+  - fix bug in define_class() when DBIDM was artificially pre-populated
+  - added method $schema->db_table($db_name)
+  - don't generate duplicate associations with same names between same tables
+  - better API for Generator.pm
+  - Statement::Oracle, correct handling of -page_size / -page_index
+
+v2.40 24.06.2013
+  - fix multiple inheritance bug in joins with the same table twice
+
+v2.39 17.06.2013
+  - fix https://rt.cpan.org/Ticket/Display.html?id=86219 (-where_on side effect)
+
+v2.38 25.05.2013
+  - fixed test in v2_generator.t when Lingua::Inflect::EN is not installed
+
+v2.37 21.05.2013
+  - removed workaround for DBD::Oracle bug (fixed in v1.62)
+
+v2.36 18.04.2013
+  - adapt for SQLAM 1.15 : bind values with types must be of shape
+    [{dbd_attrs => \%datatype}, $orig_value] (like in DBIx::Class)
+
+v2.35 14.04.2013
+  - reintroduced tmp workaround for DBD::Oracle bug (will only be fixed in v1.61)
+  - adapt for SQLAM 1.14
+
+v2.34 08.04.2013
+  - new arg for select() : "-where_on" (still experimental)
+  - Schema::Generator automatically infers compositions from ON DELETE CASCADE
+  - support for for values of shape [$orig_value, \%datatype] that will be
+     passed to the 3-args form of DBI::bind_param()
+  - remove workaround for https://rt.cpan.org/Ticket/Display.html?id=84170
+     (was fixed in DBD::Oracle 1.60)
+
+v2.33 24.03.2013
+  - removed old workaround for DBD::Oracle bug 
+       https://rt.cpan.org/Ticket/Display.html?id=76410
+  - require minimal version 1.45 for DBD::Oracle (which fixed #76410)
+  - tmp workaround for new DBD::Oracle bug 
+       https://rt.cpan.org/Ticket/Display.html?id=84170
+
+v2.32 19.02.2013
+  - do the right thing when SQL::Abstract(array_datatypes => 1)
+  - new feature: $schema->autolimit_firstrow(1);
+
+v2.31 08.02.2013
+  - Support for DBIx::RetryOverDisconnects in transactions
+  - Schema::Generator uses Lingua::EN::Inflect::Phrase; test implemented
+    using DBD::SQLite v1.38_01
+
+v2.30 31.08.2012
+  - changed check if should return pKey from "exists" to "defined" 
+    in _singleInsert
+
+v2.29 18.08.2012
+  - fix insert() when primary key is over several columns
+  - removed deprecated call to defined(@array)
+  - declare POD =encoding so that Pod::Simple is happy
+
+v2.28 03.06.2012
+  - fix ->row_count() on UNION/INTERSECT
+
+v2.27 29.05.2012
+  - new dependency on Try::Tiny for better evals
+  - support for set operators for compound queries (UNION/INTERSECT/etc)
+
+v2.26 05.05.2012
+  - automatic composition of handlers when multiple under the same name
+  - added TO_JSON method so that the JSON module can happily encode 
+    DBIDM data rows
+
+v2.25 21.04.2012
+  - skip Oracle tests when DBD::Oracle is not installed
+
+v2.24 20.04.2012
+  - fixed a bug with Oracle cursors
+
+v2.23 19.03.2012
+  - added support for INSERT .. RETURNING .. INTO .. (used by Oracle)
+
+v2.22 08.03.2012
+  - fixed bug in ->update() with nested refs, bug introduced in v2.20
+
+v2.21 29.02.2012
+  - fixed bug in $meta_source->tables(), ->associations(), etc.
+
+v2.20 14.02.2012
+  - fixed bug on update() in multi-schema mode
+  - bulk updates now apply the 'to_DB' handler
+todo upd Reference
+  - REMOVED AUTOMATIC COMPATIBILITY v1; now needs arg Compatibility => 1.0
+
+v2.10 26.01.2012
+  - fixed bug on delete() method, introduced in v2.09
+
+v2.09 21.01.2012
+  - error message when wrong call to $schema->Table(..)
+  - error message when wrong call to ->do_transaction(sub {...})
+  - update() accepts refs to refs or scalars for verbatim SQL
+
+v2.08 18.12.2011
+  - forgot to declare use POSIX qw/LONG_MAX/ -- buggy on Perl 5.8
+
+v2.07 16.12.2011
+  - using new SQLA::More API for insert/update/delete
+  - new class Statement::Oracle, support for scrollable cursors
+
+v2.06 07.12.2011
+  - new method Path::opposite()
+
+v2.05 14.11.2011
+  - bug fix in strict V2 mode : Table.pm was still using old V1 syntax "componentRoles"
+
+v2.04 14.11.2011
+  - bug fix in strict V2 mode : Path.pm was still using old V1 syntax
+
+v2.03 11.11.2011
+  - forgot to use Meta::Utils in Statement.pm.
+
+v2.02 12.10.2011
+  - namespace::autoclean conflicts with autoload. Replaced by namespace::clean
+
+v2.01 07.10.2011
+  - missing AutoExpand in v1 compatibility mode
+  - suppress 1 warning in string comparison
+
+v2.0 12.09.2011
+   CPAN publish
+
+v1.99_06 21.08.2011
+  - refactoring : new class ConnectedSource, not to confuse with Statements
+
+v1.99_05 14.08.2011
+
+v1.99_04 13.08.2011
+  - fixed broken test on perl 5.8/5.10 (MRO::Compat loaded too late)
+  - yet more doc (Design.pod)
+
+v1.99_03 06.08.2011
+  - Reference.pod finished. Still work to do on other pods.
+
+v1.99_02 02.08.2011
+  - many updates in doc (not totally finished yet)
+
+v1.99_01 31.07.2011
+  MAJOR REVISION, see Doc/Delta_2.0.pod
+  - new metaclass / reflection layer
+  - use base ==> use parent
+  - deprecated Autoload()
+  - removed keepLasth, lasth
+  - dropped support for positional args to select()
+
+v1.29 25.07.2011
+  - fixed limit/offset in Statement::JDBC (old bug never discovered!)
+
+v1.28 10.06.2011
+  - fixed tests when DBD::Mock < 1.39 ("skip" statement was wrong)
+  - statement status is a dualvar (int, string)
+  - $source->createStatement() is deprecated
+  - new parameter for select() : -prepareAttrs 
+
+v1.27 30.05.2011
+  - fetch() : do not allow undefs in primary key
+  - reuseRow() : hash key names are taken from $sth->{FetchHashKeyName};
+  - bug fix: -resultAs => flat_arrayref does preserve column order
+  - $schema->dbh(undef) erases the current $dbh
+
+v1.26 31.10.2010
+  - -postFetch renamed as -postBless
+  - no longer import deprecated UNIVERSAL qw/isa/
+  - fix tests broken by SQL::Abstract::Test 1.69 no longer case-insensitive
+
+v1.25 03.06.2010
+  - added the -returning option to insert()
+
+v1.24 18.04.2010
+  - implemented 'primKey' for views, and moved method to Source.pm
+  - added the -resultAs => "hashref" option to select()
+
+v1.23 29.03.2010
+  - back to use POSIX qw(INT_MAX); # because import () breaks on 5.8, 
+    see http://rt.cpan.org/Public/Bug/Display.html?id=55989
+
+v1.22 26.03.2010
+  - use POSIX (); (because import() was buggy on Win32)
+  - added property 'limitOffset' in sqlDialect
+
+v1.21 01.03.2010
+  - localize $@ in Schema::_State::DESTROY 
+  - selectImplicitlyFor not applied when -resultAs => 'subquery'
+  - updated doc : no longer necessary to use BEGIN blocks
+
+v1.20 17.02.2010
+  - more flexible parameterization for calling last_insert_id
+
+v1.19 17.08.2009
+  - insert(..) now accepts a list of arrayrefs (kind of 'populate' method)
+  - fixes in the doc (thanks to Terrence Brannon for many suggestions)
+  - announce discussion group @ googlegroups & public source @ svn.ali.as
+  
+v1.18 31.07.2009
+  - added missing "use DBI" in Schema::Generator
+  - added Schema methods 'table' and 'view'
+  - more liberal in _createPackage, just check not clobbering @ISA
+
+v1.17 10.06.2009
+  - treat case when $schema->dbh is undef
+
+v1.16 10.06.2009
+  - doTransaction properly calls dbh() instead of direct access to classData
+  - localizeState properly calls setter methods when restoring previous state
+
+v1.15 02.06.2009
+  - bug fix on reporting rollback exceptions
+
+v1.14 20.04.2009
+  - bug fix on adaptations for SQL::Abstract v1.51 (select(-where => [...]))
+
+v1.13 08.04.2009
+  - adaptations for SQL::Abstract v1.51 (syntax change for -and/-or)
+
+v1.12 17.03.2009
+  - stupid error in count of SKIP tests (MsAccess.t) when DBD::Mock is absent
+
+v1.11
+  - dependency on SQL::Abstract v1.50, tests adapted
+  - nested records in insert(): allow for empty arrayref
+
+v1.10
+  - exceptions during doTransaction are returned as a blessed arrayref
+
+v1.09
+  - fixed bug with ->fetch(@prim_key) when scalar(@prim_key) > 1
+
+v1.08
+  - fixed bug with -pageIndex (missing code)
+
+v1.07
+   - adapted tests for DBD::Mock 1.39
+
+v1.06
+  - Schema.pm : replaced deprecated 
+        if(defined(%{$pck.".."})) 
+    by 
+        if(%{$pck.".."})
+  - t/Storable.t : 
+      - parent process in eval() to avoid child zombie if parent dies
+      - if Perl < 5.8, fallback to IO::String
+  - t/DBIx-DataModel.t : 
+      - pre-test DBD::Mock on functionality rather than version number
+  - Schema.pm, View.pm : dynamic subclasses created through
+       @{$subclass."::ISA"} = @$aref;
+    instead of 
+       *{$subclass."::ISA"} = $aref;
+    so that Perl5.10 method cache is properly invalidated.
+
+v1.05
+  - fixed hanging test because of bug 37054 in DBD::Mock
+
+v1.04 
+  - removed non-portable v-string in View.pm
+  - fixed test when Acme::Damn is not installed
+
+v1.03 23.09.2008 CPAN release
+
+v1.01
+  - added method Schema->statementClass
+  - bug fixes in Statement::_resolve_source and Statement::JDBC::execute
+  - added -resultAs => 'flat_array' | 'subquery'
+  - better error message when missing foreign keys in a $object->join(...)
+
+v1.0
+  MAJOR REVISION, see Doc/Delta_1.0.pod
+  - added fetch_cached() method
+  - fixed bug in select(..., -orderBy =>...)
+  - better error message if missing foreign key 
+  - corrected _addSelectCriteria algorithm for merging several %where structs
+  - new statement object
+  - new method rowCount
+  - AbstractTable renamed as Source
+  - schema name is automatically prepended in table and views
+
+  INCOMPATIBLE CHANGES
+  - totally removed deprecated methods selectSth, applyColumnHandlers, 
+    SqlDialect
+  - -resultAs => 'statement' now means 'DBIx::DataModel::Statement' 
+    (formerly was a synonym for 'sth'
+
+v0.42
+  - fix bug in Schema.pm (loading Cursor class)
+
+v0.41
+  - documentation: splitting into several parts and general reworking
+  - Schema() : added an option to supply a customized SQL::Abstract instance
+  - Cursor : forbids ->next(..) and ->all() on "fast cursors"
+  - "ViewFromRoles", "selectFromRoles" renamed as "join", "selectJoined"
+  - new method Schema->localizeState()
+
+v0.40
+  - added fast iterators, using DBI's bind_columns() and fetch() methods
+  - bug fix : fetch("") was returning the whole table!
+  - scrollable cursor for JDBC
+
+v0.39 08.02.2008
+  - "longColumn|alias" syntax for -columns no longer modifies original data
+
+v0.38
+  - bug fix Schema::FROM_THAW
+
+v0.37
+  - ->select(-fetch => $key)
+  - doTransaction : all commits at the end
+  - support for Storable::freeze/thaw
+
+v0.36
+  - Schema::doTransaction(): support for localizing the dbh
+
+v0.35 12.11.2007
+  - Schema::doTransaction(): support for nested transactions
+  - insert() : if component subtrees, the composite gets the prim. keys
+
+v0.34 30.10.2007
+  - minor change in Schema::doTransaction because rollback() problem in JDBC
+  
+v0.33 19.10.2007
+  - minor fix in Table.pm, don't delete a hash key from an each() loop
+  - Schema() : added options tableParent and viewParent
+  - select() : added option -resultAs => 'firstrow'
+
+v0.32 21.08.2007
+  - minor adaptation for perl 5.9 (because strict 'refs' is stricter!)
+
+v0.31 30.05.2007
+  - additional parameter in handlers called by autoUpdateColumns
+
+v0.30 29.03.2007
+  - fixed bug in Schema::dbh
+
+v0.29 14.03.2007
+  - AutoUpdateColumns was not called on insert -- fixed
+  - added AutoInsertColumns()
+  - added "longColumn|alias" syntax for -columns
+
+v0.28 12.12.2006 CPAN release
+  - fixed bug in _rawInsert (was unblessing $self in case of exceptions)
+
+v0.27 14.11.2006
+  - added Table::componentRoles()
+  - primKey returns column names (class method) or values (instance method)
+  - restructured insert(), added _singleInsert and _rawInsert
+
+v0.26 12.11.2006
+  - default values for column names in Associations
+  - primKey returns list or scalar depending on wantarray
+  - added optional arguments to Schema->dbh() 
+  - fixed arguments to last_insert_id
+  - consistency checks on Compositions
+
+v0.25 09.11.2006
+  - more liberal parsing of multiplicities
+
+v0.24 08.11.2006
+  - insert() returns list or scalar depending on wantarray
+
+v0.23 07.11.2006
+  - added Composition() and cascaded insert/delete
+  - added support for prefixes +/- for -orderBy
+
+v0.22 14.09.2006
+  - added option -postSQL to select()
+  - Build.pl option to support old-style Makefile.PL
+  - ViewFromRoles creates views in $schema::View namespace
+
+v0.21 CPAN release 06.09.2006
+  - check args for ViewFromRoles
+  - check -resultAs value
+  - fixed SKIP numbers in tests (when DBD::Mock is not installed)
+  - fixed requires and recommends in Build.pl
+
+v0.20 CPAN release 27.05.2006
+	
+v0.18, v0.19 - internal releases, major rewrite:
+  - reshuffled the inheritance tree
+  - restructured the documentation
+  - selectFromRoles() accepts roles from any table in the stack
+  - added many-to-many Associations
+  - added MethodFromRole()
+  - added -distinct, -groupBy and -having clauses
+  - insert() returns DBI->last_insert_id()
+
+v0.17
+  - Minor fixes in documentation
+  - SqlDialect() is deprecated (replaced by arg in Schema() method)
+
+v0.16 CPAN release 26.01.2006
+  - Associations now install an "insert_into_..." method
+  - ViewFromRoles can take explicit join kinds (_INNER_|_LEFT_)
+  - Schema->dbh(..) checks that RaiseError is true
+  - term 'arity' replaced by 'multiplicity' in doc and code
+  - Association() checks that multiplicities are not many to many
+  - fixed internal hyperlinks in POD documentation
+
+v0.15 internal release
+  - added Schema methods 'classes' and 'views'
+  - debug method now also prints the bind values
+
+v0.14 CPAN release 28.11.2005
+  - added clause "-for (readonly | update)" to select() and
+    added method "selectImplicitlyFor"
+  - doTransaction starts with $dbh->begin_work
+  - role methods reuse cached results from "expand"
+  - added method Autoload(1|0)
+
+v0.13 internal release
+  - Added doTransaction
+  - Added Schema->lasth;
+
+v0.12
+  - Added the named arguments API to select()
+  - new methods preselectWhere() and selectFromRoles()
+  - new internal functions _parseSelectArgs() and _addSelectCriteria
+  - rewrote implentation of Association role methods using these new functions
+  - new method SqlDialect	
+  
+v0.11 internal release
+  - Updated the doc, explaining about writing role methods by hand
+  - Added a check in fetch() that we are in a Table class
+  - Changed implementation of ViewFromRoles, using INNER JOIN
+
+v0.10 16.09.2005 First CPAN release, 
+
+
+
+

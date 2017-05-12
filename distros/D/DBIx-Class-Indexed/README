@@ -1,0 +1,93 @@
+NAME
+    DBIx::Class::Indexed - Index data via external indexing facilities.
+
+SYNOPSIS
+        package Foo;
+    
+        use base qw( DBIx::Class );
+    
+        __PACKAGE__->load_components( qw( Indexed Core ) );
+        __PACKAGE__->set_indexer( 'WebService::Lucene', {
+            server => 'http://localhost:8080/lucene/',
+            index  => 'stuff',
+        });
+    
+        __PACKAGE__->add_columns(
+            foo_id => {
+                data_type         => 'integer',
+                is_auto_increment => 1,
+            },
+            name => {
+                data_type => 'varchar',
+                size      => 256,
+                indexed   => 1,
+            },
+            description => {
+                data_type => 'text',
+                indexed  => 1,
+            },
+        );
+
+ACCESSORS
+  indexer_package( [ $indexer ] )
+    Sets which indexer will be responsible for indexing this class' data.
+    Corresponds to the package name after the DBIx::Class::Indexer prefix.
+
+  indexer_connection_info( [ \%info ] )
+    Sets the extra information passed to the indexer on instantiation.
+
+  index_on_insert
+    Determines whether or not DBIx::Class::Indexed will index the document
+    when it is inserted.
+
+  index_on_update
+    Determines whether or not DBIx::Class::Indexed will index the document
+    when it is updated.
+
+  index_on_delete
+    Determines whether or not DBIx::Class::Indexed will remove the document
+    when it is deleted.
+
+METHODS
+  indexer( )
+    Accessor for the indexer object; lazy loaded.
+
+  set_indexer( $name [, \%connection_info ] )
+    Set the indexer information. Connection information is stored in the
+    "indexer_connection_info" accessor and the package name is stored in
+    "indexer_package".
+
+  insert( )
+    Sends the object to the indexer's "insert" method, if "index_on_insert"
+    is true.
+
+  update( )
+    Sends the object to the indexer's "update" method, if "index_on_update"
+    is true.
+
+  delete( )
+    Sends the object to the indexer's "delete" method, if "index_on_delete"
+    is true.
+
+  register_column ( $column, \%info )
+    Overrides DBIx::Class's "register_column". If %info contains the key
+    'indexed', calls "register_field".
+
+  add_index_fields ( @fields )
+    Behaves similarly to DBIx::Class's "add_columns". Calls "register_field"
+    underneath.
+
+  register_field( $field, \%info )
+    Registers a field as indexed.
+
+AUTHORS
+    *   Adam Paynter <adapay@cpan.org>
+
+    *   Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Adam Paynter, 2007-2011 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

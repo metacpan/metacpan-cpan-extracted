@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.69.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1415a63106f84b736b04806f6289422fa6eb1c7 Changes
+SHA1 268ab0c57b05e4585f89ca3101472078efba81b9 INSTALL
+SHA1 8e1bbc507f96b7043c901fe822f0a2a6ae5ab952 LICENSE
+SHA1 e2c51ca2fbaab970a8c52805ebd5105bef2f677a MANIFEST
+SHA1 42b1dac4cb3eb5ed018f522ba01257285e24c4b9 META.yml
+SHA1 b2132fb3ca267355a10eecbda0e70dd40570ce12 Makefile.PL
+SHA1 0dede3ca54f676541b53dfc295e772934bb33411 README.md
+SHA1 a6b50ea5c2665318927f7dc42bcd42c26fbb2dfa THANKS
+SHA1 e287d3b0b35b3a1f3e970491be7f3f0bb8242a3c lib/DBIx/Abstract.pm
+SHA1 20722f4dc2f27b4d08200a15f0079a183eb0576e t/2-dbix-abstract.t
+SHA1 b2131e5af08c2702a3742365d55f365e9cc0cf15 t/pod.t
+SHA1 54ed25287b7e1c9ff328eaf126d438438c8a1d48 t/release-minimum-version.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 8d931d5c7b6fc03e39a744d59522e4b7077562a1 t/release-portability.t
+SHA1 612226d447015079c046d65932f774304a4b9f20 t/release-synopsis.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQIcBAEBAgAGBQJS2ZCEAAoJEF6ojHedHIiFtSoP/jtSICToFuoEX4UZ2TmXQKXy
+mlxvBcLP8eujENDqApD71wLkGqC2AmbIxBF1xZic5nHpInr4mXwQimiDjxnRgKpj
+0drRqjJ+mRL8cN9QFpWmHZfbP3OvcgHBDSVrf4RfOdk/SXLQIRqxGMTiz6kDfgW9
+bXinQso2cp4wQRy3prj71qtqSJqFuVOvQDYaFgaUqlg/KOTsjiy5v+bBV/Acso8Y
+h1eVEXD/99fjtvhdK14EklWdze70UCFuh8emZJEUokwEiv3TyJOW8inEtEbZcvav
+dXuHy1X5TT3/wpmb04ZcniGEjfGXoLb2fncqX+RtpNbjX8mWMrkCY56RkCMAInzI
+t2JNMN7/8aBUVzt0QzGYtwln86KmSS94gkfZclvdWhU0PBBVgjq6miuHeVt9vehq
+axFV2mNfWZcZMVbgU29Kg/WNX2G5pKP3SiF6/xVdpG6T1axniLEUiJOMbuULso0f
+kUZntz8NT/2SLP7TBFoy47ISLoeEYhIuKOxj4LqeL7kVRpnP03MG7P/KJJqQW7yu
+ntQg2m50613fM+x8yRO/hvHpqbxngkQzMklu1/XpfxIBlQgIcIf++96oMJPQIAa6
+AQHzXmOX4sbmvdPT/Nwi/FqgHkgnmSbGRW4aoe1e24NKtapJYXMJl4gTzvmwZDcX
+eyV+LcemaGiycVmFMegV
+=tzoq
+-----END PGP SIGNATURE-----

@@ -1,0 +1,37 @@
+Changelog for Dist-Zilla-MintingProfile-SYP
+
+0.009 2014-06-23T10:06:51
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+
+0.008 2014-01-17T10:54:53
+ - Regenerated POD (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.007 2013-10-16T08:15:46
+ - Minor consistency fixes (Stanislaw Pusep)
+ - Version bump (Stanislaw Pusep)
+ - "Mudam-se os tempos, mudam-se as vontades..." (Stanislaw Pusep)
+
+0.006 2012-12-04T15:06:39
+ - bumped version (Stanislaw Pusep)
+ - increased perlcritic severity (Stanislaw Pusep)
+
+0.005 2012-10-17T15:13:46
+ - version bump (Stanislaw Pusep)
+ - more authordeps (Stanislaw Pusep)
+
+0.004 2012-10-16T13:26:27
+ - Kwalitee-related fix (Stanislaw Pusep)
+
+0.003 2012-10-15T15:20:06
+ - routine update (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.002 2012-03-30T15:23:12
+ - ++perlcritic.rc (Stanislaw Pusep)
+ - Changelog (Stanislaw Pusep)
+
+0.001 2012-03-29T19:55:19
+ - fix (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

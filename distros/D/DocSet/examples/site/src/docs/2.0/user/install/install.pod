@@ -1,0 +1,73 @@
+=head1 NAME
+
+Installing mod_perl
+
+=head1 Description
+
+This chapter provides an indepth mod_perl 2.0 installation coverage.
+
+=head1 Prerequisites
+
+The mod_perl 2.0 prerequisites are:
+
+=over
+
+=item prefork MPM
+
+Requires at least Perl version 5.6.0. But we strongly suggest to use
+at least version 5.6.1, since 5.6.0 is quite buggy.
+
+You don't need to have threads-support enabled in Perl. If you do have
+it, it B<must> be I<ithreads> and not I<5005threads>! If you have:
+
+  % perl5.8.0 -V:use5005threads
+  use5005threads='define';
+
+you must rebuild Perl without threads enabled or with
+C<-Dusethreads>. Remember that threads support slows things down, so
+don't enable it unless you really need it.
+
+=item threaded MPMs
+
+Require at least Perl version 5.8.0 with ithreads support
+built-in. That means that it should report:
+
+  % perl5.8.0 -V:useithreads -V:usemultiplicity
+  useithreads='define';
+  usemultiplicity='define';
+
+If that's not what you see rebuild Perl with C<-Dusethreads>.
+
+=back
+
+
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Doug MacEachern E<lt>dougm (at) covalent.netE<gt>
+
+=back
+
+=head1 Authors
+
+=over
+
+=item *
+
+Doug MacEachern E<lt>dougm (at) covalent.netE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

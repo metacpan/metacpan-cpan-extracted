@@ -1,0 +1,34 @@
+Revision History for Daemon-Shutdown-Monitor-transmission
+=========================================================
+
+v0.004 2011-10-22
+-----------------
+
+commit 4ff18e477a9d4f8e8bbb678bab5795e65ce57f99
+Author: Ioan Rogers <ioan.rogers@gmail.com>
+Date:   Sat Oct 22 14:30:24 2011 -0700
+
+    Really fixed github updating in dist.ini
+
+v0.003 2011-10-22
+-----------------
+
+commit 3dbc3a74cb84c4d204746599583d917a9d4eee5a
+Author: Ioan Rogers <ioan.rogers@gmail.com>
+Date:   Sat Oct 22 14:29:02 2011 -0700
+
+    Fixed github updating in dist.ini
+
+v0.002 2011-10-22
+-----------------
+
+commit a50e89ead04804bffad5e5e3bf1d3d6956725404
+Author: Ioan Rogers <ioan.rogers@gmail.com>
+Date:   Sat Oct 22 14:22:44 2011 -0700
+
+    * Fixed pod formatting
+    * added meta.yml
+
+===================================
+End of changes in the last 365 days
+===================================

@@ -1,0 +1,257 @@
+Add option to Recur: ignore holidays
+   then flags like NBD ignore holidays (but count weekends)
+When calculating holidays, use this option by default to simplify
+   holidays.  Then, order of definitions is not important.
+
+Add options:
+   onlyiso8601, etc. to parse
+   no-delta-secs   (not delta as a plain number)
+   no-timezone
+
+Can I reduce the number of timezone modules loaded when parsing a date
+with an abbreviation or offset by loading one and testing it before
+loading a second?
+
+Make sure the following work:
+   1*12:0:24:0:0:0*FW1 = Christmas Day (observed)
+   December 25 2015    = Christmas Day
+
+Add a new type of recurrence (???):
+   *Christmas Day*NWD
+
+Add ability to supply holidays via. a list rather than a config file.
+   ksublondie on perlmonks
+
+########################################################################
+# Deprecated variables:
+
+03/01/2017  TZ
+
+Delete Obj.pm line 89 block
+
+########################################################################
+# +1 significant release
+########################################################################
+
+Check performance if changing
+   sub ... {
+      return &sub(...)
+   }
+to
+      goto &sub(...)
+
+In Recur.pm, handle encodings in parse
+
+Add delta.parse_LANG tests
+
+Add UseTZ
+  = %all      use all timezones
+  = %local    use local timezone
+  = Z1 Z2 ... use zones Z1, Z2, etc. (one can be %local)
+Only affects parsing.
+
+Add ways to get timezone in cygwin
+
+Cache Date::Manip::TZ::zone for ($abbrev,isdst), ($abbrev,$isdst,$offset),
+other???
+
+Profile it and look for optimizations.
+
+Date::Manip::Base : get rid of
+   _calc_date_time_strings
+   _delta_convert
+
+Benchmarks
+   Modules
+      5.x
+      6.00
+      6.00 parse_format
+      DateCalc
+      TimeDate
+      ???
+   Tests
+      10,000 dates (parse)                          time + size
+      10,000 dates (parse + 2 adds + 1 unix date)   time + size
+      10,000 scripts (parse 1 date + 2 adds + 1 unix date each) time
+
+Rewrite Problems.pod (Date Manip is slow)
+
+Clear out all problems from CPAN
+
+Methods which require a valid object (secs_since_1970_GMT) should exit
+instead of trying to perform the operation if the object is invalid.
+RT #60662 (Matt Blythe)
+
+########################################################################
+# +2 significant release
+########################################################################
+
+Everywhere a timezone can be entered, allow:
+   zone
+   abbrev
+   offset
+followed by an option:
+   std       either STD or DST time, test STD first (default always)
+   dst       either STD or DST time, test DST first
+   stdonly   only test STD
+   dstonly   only test DST
+
+Change Date::Manip::Base so that $date input can be reference or
+string.
+
+Clear as much of the backlog of suggestions as possible.
+
+########################################################################
+# TO DO
+########################################################################
+
+Make sure there is a correspondance between:
+  time,localtime,gmtime
+  Date_SecsSince1970,Date_SecsSince1970GMT
+  UnixDate(...,"%s"),UnixDate(...,"%u")
+and document it all.
+
+Support timezones of the format +500.  David Coppit
+
+Make sure that &DateCalc($date1,"") returns an error.  Jim Anderson
+
+Change the Jan1Week1 variable to accept the values "m1-m7" (1st week contains
+Jan X) or "d1-d7" (1st week contains the 1st dX day of week ... so d1
+means that the 1st week of the year contains the 1st Monday).
+
+Free up the '%u', '%h', and '%X' printf formats. Reserve '%X' for
+  extended formats (%Xa, %Xb, ...).
+
+########################################################################
+# TO CONSIDER
+########################################################################
+
+Special date formats in language file:
+   extra{LABEL} = [ ... ]         extra words of type LABEL
+   offset_date =>
+      FORMAT => 'OFFSET'
+         where FORMAT is similar to parse_format
+         %LABEL is a regexp with any of the words
+         OFFSET can include %y, %d, %w, %m, %h, %mn, $s in them
+   same for offset_time, times, and others
+   ex.
+      offset_time =>  { "%h o'clock" => "%h:00:00" }
+   Support some of the special Russian dates supplied by Yuri Nikulin
+
+Add a method:
+   ($date0,$date1) = $date->week_range();
+where $date0 and $date1 are the start and end of the week containing
+$date.  Ha Quach
+
+Add Date_LocaleInit which calls Date_Init and then sets DateFormat
+config varialbe.  Benjamin Low
+   Essentially, I use POSIX::strftime to print a known date in the locale
+   'native' format ('%x'), and parse the result to determine d/m/y, m/d/y,
+   or y/m/d.
+   
+   Here's what I do for Date::Parse, perhaps for your module you could just
+   substitute a default value for DateFormat:
+   
+   sub _dmorder
+   # determine the "natural" day/month order for the current locale
+   # - returns a sub which will expect two arguments (month, day) and
+   #   return the arguments swapped as appropriate
+   {  
+	# %x - preferred (year, month, day) representation
+	# - some examples: 1999-12-31, 31/12/99, 30.12.1999, 12/31/99
+	my @d = (POSIX::strftime('%x', 0, 0, 0, 31, 12-1, 99) =~ 
+		/(\d+)\D+(\d+)\D+(\d+)/);
+
+	# check we got one each of "31", "12", and "[19]99" back
+	$@ = "couldn't determine day,month order (got [@d])";
+	warn("$@\n"), return sub { @_ } unless @d == 3;
+	my %d;	$d{$1} = $d{$2} = $d{$3} = 1;
+	warn("$@\n"), return sub { @_ } 
+		unless ($d{31} and $d{12} and ($d{99} or $d{1999}));
+
+	if ($1 == 31) { $@ = undef; return sub { ($_[1], $_[0]) } };	# d/m/y
+	if ($2 == 31) { $@ = undef; return sub { ($_[0], $_[1]) } };	# m/d/y
+	if ($3 == 31) { $@ = undef; return sub { ($_[0], $_[1]) } };	# y/m/d
+
+	return sub { @_ };	# undetermined, use default
+   }
+   
+   *dmorder = _dmorder();
+   
+   # and then later in Parse::Date, after month/day regexps (\d+/\d+)...
+     - ($month, $day) = ($1, $2);    becomes...
+     + ($month, $day) = dmorder($1, $2);
+
+
+Make DateFormat variable handle y/m/d y/d/m m/d/y and d/m/y formats
+in addition to m/d vs. d/m .  Also, make "%D" and "%x" UnixDate formats
+use this variable.  Benjamin Low
+
+Make the following work for ParseDate Adrian Conte:
+  1 epoch
+  epoch 1
+  -1 epoch
+  epoch -1
+
+Make work weeks able to start and stop on arbitrary days (even across
+weekends).  Mohammed Saggaf
+
+Switch to Math::BigInt instead of using "no integer".  Vishal Bhatia
+
+Use autoloader.  Ted Ashton
+
+Better support for fractional seconds.  RT 61535
+
+########################################################################
+# GRANULARITY
+########################################################################
+
+$flag=&Date_GranularityTest($date,$base,$granularity [,$flags] [$width])
+   $date and $base are dates
+   $granularity and $width are deltas
+   $flags is a list of flags
+
+   To test if a day is one of every other Friday (starting at Friday
+   Feb 7, 1997), go:
+      $base=&ParseDate("Friday Feb 7 1997");
+      $date=&ParseDate("...");
+      $granularity=&ParseDateDelta("+ 2 weeks");
+      $flag=&Date_Granularity($date,$base,$granularity,"exact");
+   If $flag is 1, the $date is a 2nd Friday from Feb 7.
+
+   The most important field in $granularity is the last non-zero element.
+   In the above example, 2 weeks returns the delta 0:0:14:0:0:0 so the
+   last non-zero element is days with a value of 14.
+
+   If $flags is empty, $date is checked to see if it occurs some multiple
+   of 14 days before or after $base.  In this case, hourse, minutes, and
+   seconds are completely ignored.
+
+   If $flags contains the words "before" or "after", $date must come
+   before or after $base.
+
+   If $flags contains any other options, or if $width is passed in, the
+   test is treated in an approximate way.  A flag of "approx" forces this
+   behavior.
+
+   If $width is not passed in in an approximate comparison, it defaults
+   to 1 in the last non-zero element.  Here, the default width is 1 day.
+   If the flag "half" is used, the width (default or passed in) is
+   halved.
+
+   For example if $width is 1 day, add a multiple of $granularity to
+   $base to get as close to $date as possible.  If $date is within plus
+   or minus 1 day of this new base, the test is successful.  A flag of
+   "plus" or "minus" means that $date must be with plus 1 day or within
+   minus one day of this new base.  Flags of "before" or "after" work
+   as well.
+
+@list=&Date_GranularityList($date,$N,$granularity)
+   Returns a list of $N dates AFTER $date which are created by adding
+   $granularity to $date $N times.  If $N<0, it returns $N dates BEFORE
+   $date (the list is in chronological order).
+
+   Make it work in business mode as well which will return only working
+   days.  Example, every other friday and it can be told that if friday
+   falls on a holiday to return either thursday or the following monday
+   or leave it out.

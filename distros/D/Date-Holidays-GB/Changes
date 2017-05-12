@@ -1,0 +1,46 @@
+Revision history for Date-Holidays-GB
+
+0.008  2016-04-11 10:28:05 BST
+
+ [Bugfix]
+ - export methods from sub-region classes (EAW, NIR, SCT) - [Peter Newman]
+
+thanks.007  2016-01-29 13:44:18 GMT
+
+ [Update]
+ - 2017 dates added
+
+0.006  2015-01-07 17:07:12 GMT
+
+ [Update]
+ - 2012 and 2013 dates reinstated (side effect of switching to JSON source)
+
+ [Maintenance]
+ - generate from gov.uk JSON not ical
+ - simplify generation script, remove templating 
+
+0.005  2014-05-22 13:48:14 BST
+
+ [Update]
+ - 2013 dates removed, 2016 dates added
+
+ [Maintenance]
+ - Switched to Dist::Milla
+ - tests using static sample data
+
+0.004
+
+ [Development]
+ - Fake release
+
+0.003     2013-07-23 21:53:52 Europe/London
+
+ - Region modules, date_generated method, POD and script improvements
+
+0.002     2013-07-11 12:34:02 Europe/London
+
+ - Generate script takes data from gov.uk site not sample files
+
+0.001     2013-07-11 09:15:16 Europe/London
+
+ - Initial release - dates for 2013, 2014, 2015

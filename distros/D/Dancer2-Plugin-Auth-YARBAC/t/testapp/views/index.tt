@@ -1,0 +1,4 @@
+<h1>Welcome</h1>
+[% IF logged_in_user %]
+<p>Logged in user: [% logged_in_user %]</p>
+[% END %]

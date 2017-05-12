@@ -1,0 +1,7 @@
+Makefile.PL
+lib/Dyer/CLI.pm
+MANIFEST
+t/0.t
+bin/mkperlbin
+bin/renamerfpi
+META.yml                                 Module meta-data (added by MakeMaker)

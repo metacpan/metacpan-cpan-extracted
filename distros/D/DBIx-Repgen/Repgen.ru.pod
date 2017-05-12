@@ -1,0 +1,656 @@
+
+package DBIx::Repgen;
+
+=head1 NAME
+
+  DBIx::Repgen - simple report generator from DB-selected data
+
+=head1 SYNOPSIS
+
+ use Repgen;
+
+ $r = DBIx::Repgen->new(
+		 dbh => DBI->connect(...),
+		 query => 'select ... from ...',
+
+		 repdata => {
+			     today => `date`
+			    },
+
+		 group => ['id'],
+		 header => "========\n",
+		 footer => sub {my ($r, $data) = @_; return "$data->{NAME} : $data->{VALUE}"},
+		 item => ["%20s %s", qw/NAME VALUE/],
+
+		 output => \$out;
+		);
+
+ $r->run(cust => 'tolik');
+ print $out;
+
+=head1 DESCRIPTION
+
+Модуль реализует класс C<DBIx::Repgen>, представляющий собой простой генератор отчетов по данным,
+полученным из БД некоторым select-оператором. Отчеты могут содержать иерархическую группировку
+по значениям полей, счетчики количества записей и нарастающие итоги числовых полей
+как в пределах каждой группы, так и по всему отчету. Форматирование каждой части отчета может выполняться
+различными способами: задаваться как аргументы функции C<sprintf>, литеральной строкой или
+ссылкой на код.
+
+This package implements class C<DBIx::Repgen>, which is simple report generator from data
+received from relational database by some select-statement. Such a report can contain
+hyerarchical grouping by field values, record counters and cumulative totals (sums) of numeric
+fields for each group as well as for whole report. Each rerort part formatting may be set
+as literal string, arguments of C<sprint> function or be code reference.
+
+=head2 new, class constructor
+
+Конструктор класса имеет один аргумент, хэш,
+различные элементы которого описывают отчет.
+
+Constructor has one argument, hashe. Elements of this hashe define the report and are
+descriebed below.
+
+=over
+
+=item sth, dbh, query - data source setting
+
+Данные для отчета получаются выполнением некоторого select-оператора в среде БД.
+Возможны следующие методы задания этого оператора.
+
+The report data are got by executing some select statement against relational database
+environment. There are following wais for defining this statement.
+
+=over
+
+=item 1.
+
+Конструктору передается в элементе C<sth>
+подготовленный (т.е. полученный выполнением C<$dbh->prepare>), но еще не выполненный
+(C<$sth->execute>) хэндл оператора.
+
+Constructor receives in C<sth> element prepared (C<$dbh->prepare>) but not executed
+(C<$sth->execute>) statement handle.
+
+=item 2.
+
+Конструктору передаются хэндл коннекции к БД и полный текст select-оператора в параметрах C<dbh> и C<query>,
+соответственно. При этом необходимые C<prepare> и C<execute> будет выполнен при запуске отчета.
+
+Constructor receives database connection handle (from C<DBI->connect(...)>) and full text
+of select statement to be executed. Needed C<prepare> and C<execute> calls will perform
+by the report run.
+
+=item 3.
+
+Конструктору передается уже хэндл выполенного (C<execute>) оператора, например при динамическом формировании
+sql-запроса в вызывающей программе. В этом случае при запуске отчета на выполнение I<не будут>
+выполняться C<prepare> и C<execute>. Более того, для повторного запуска отчета необходимо (методом
+C<Set>) установить для отчета новый хэндл оператора, данные из которого еще не считывались.
+
+В этом случае конструктору отчета передается параметр C<noexec>  установленный в true.
+
+Constructor receives already prepared and executed statement handle. In this case C<noexec>
+constructor parameter must be set to true. This feature may be useful by dynamic-made select
+queryes in calling programm. No prepare nor execute action will be performed by report run.
+
+I<Important note>: you have to reset (by C<Set> method) this statemeny handle before each next
+report run.
+
+=back
+
+ Samples:
+
+ $dbh = DBI->connect('dbi:Oracle:SID', 'user', 'password');
+ $sth1 = $dbh->prepare('select name, value from tab where value between ? and ?');
+ $rep1 = DBIx::Repgen->new(sth => $sth);
+
+ $rep2 = DBIx::Repgen->new(dbh => $dbh, query => "select ... ");
+
+ $sth3 = $dbh->prepare('select ...');
+ $sth3->execute(@param);
+ $rep3 = DBIx::Repgen->new(sth => $sth3, noexec => 1);
+
+При использовании первых двух методов отчет может быть параметризован, т.е. sql-запрос
+может содержать placeholder-ы, значения на место которых будут
+подставлены при выполнении отчета методом C<run>. См. далее о параметризации отчета.
+
+Using first two methods you may parametrize the report. This means sql-query can contain
+placeholders, for substituting values in report run time. See below about report parameters.
+
+=item param - report parameters
+
+Отчет может иметь набор именованных параметров. Описание параметра состоит в задании его имени,
+номера (или нескольких номеров) placeholder-ов, на место которых параметр будет подставляться и
+необязательного умолчательного значения.
+Описание параметров помещается в хэш, значение параметра
+конструктора C<param>. Ключи этого хэша - имена пареметров, а значения определяют
+номера placeholder-ов и умолчательные значения.
+
+The report may have set of named parameters. Single parameter definition contain its name,
+number (or some numbers) of placeholders in source select query and optional default value.
+Parametrs definition is a hash reference, value of constructor's C<param> element. Keys in this
+hash are parameter names and values contain placeholder numbers and default values.
+
+В простейшем случае описание параметра может быть просто (zero based) номером того единственного
+placeholder-а, на место которого подставляется этот параметр. В более сложных случаях
+описание параметра является ссылкой на хэш. Этот хэш I<должен> содержать ключ C<n>
+со значением целого числа или списка целых чисел и I<может> содержать ключ
+C<dflt>, со значением скаляра, ссылки на код или
+ссылки на массив, в котором первый элемент - ссылка на код (см. пример ниже).
+
+In the simpliest case parameter definition can be just zero-based number of the only placeholder
+corresponding to this parameter. In more complex cases is is hash reference. This hash I<must>
+have C<n> key with value of integer or list of integers and I<may> have C<dflt> key, which
+value must be scalar, code reference or array reference (where first element is code reference).
+
+Ключ C<n> определяет (zero based) номера placeholder-ов в выполняемом select-запросе, на место которых
+будет подставляться значение этого параметра, а C<dflt> - умолчательное значение для
+опциональных параметров. Если значение C<dflt> есть ссылка на код, то в качестве умолчательного
+значения принимается результат вызова I<без параметров> указанной функции. Если C<dflt> есть
+ссылка на массив, то первый элемент этого массива должен быть ссылкой, на код, и умолчательным значением
+для параметра принимается результат вызова указанного кода с параметрами - остальными элементами массива.
+
+The C<n> key defines zero based number (or numbers) of placeholdes in source select query
+corresponding to this parameter. The C<dflt> key defines default value for optional
+parameters. If value of C<dflt> is code reference then default value is result of this code call (without
+arguments). If value of C<dflt> is array reference then first element of this array must
+be code reference. Default value of parameter in this case is result of call this code with arguments -
+the rest of array.
+
+Пример описания параметров.
+
+Sample of parameter definition.
+
+  $rep = DBIx::Repgen->new(
+    ...
+    param => {
+      name => 0,
+      dep => {n => 1},
+      startdate => {n => [2, 4], dflt => '2000/01/01'},
+      enddate => {n => 3, dflt => \&DefEndDate},
+      salary => {n => 5, dflt => [sub {...}, 1000, 2000]}
+    }
+  );
+
+В примере C<name> и C<dep> - обязательные параметры, подставляемые на место нулевого и первого
+placeholder-ов. C<startdate> имеет явно заданное умолчание, и подставляется на место второго и четвертого
+placeholder-а. C<enddate> и C<salary> имеют умолчания, определяемые вызовами кода при выполнении отчета,
+без параметров и с параметрами, соответственно.
+
+In the example C<name> and C<dep> are required parameters corresponding to zero and first placeholders.
+C<startdate> has explicit default value and substituted to second and fouth placeholders.
+C<enddate> and C<salary> have defaults defining by code call in report run time, without and
+with arguments in correspondence.
+
+
+=item output - the way of report output способ вывода полученного отчета
+
+Параметр C<output> конструктора определяет способ вывода полученного отчета. Он может принимать
+следующие значения.
+
+The C<output> constructor's parameter sets how and where the report puts its output data.
+
+=over
+
+=item undef or not present
+
+В этом случае весь сформированный отчет возвращается как результат вызова метода C<run>.
+
+The whole output data are the result of C<run> method call.
+
+=item string reference
+
+При этом очередная сформированная порция отчета будет добавляться к указанной строке.
+
+The output data are put into this string.
+
+=item code reference
+
+Для вывода очередной готовой порции отчета будет вызываться указанная функция, при этом будут
+переданы два параметра - собственно объект отчета и выводимая строка.
+
+This code will be called with two arguments: the report object and string to be out.
+
+=back
+
+Output samples.
+
+ $r = DBIx::Repgen(...);
+ print $r->run();
+
+ $s = '';
+ $r = DBIx::Repgen(..., output => \$s,);
+ $r->run();
+ print $s;
+
+ sub myprint {
+   my ($r, $s) = @_;
+   print "*** $s ***";
+ }
+ $r = DBIx::Repgen(..., output => \&myprint,);
+ $r->run();
+
+=item group - repport groupping
+
+Отчет может быть B<сгруппирован>. Группа - это последовательность записей, возвращенных
+сервером, в которых значение какого-то поля (называемого групповым полем) остается постоянным. В отчете
+может быть несколько вложенных групп. Для указания групп в отчете надо определить
+значение элемента C<group> параметра как ссылку на массив из имен групповых полей.
+
+The report may be I<groupped>. The group is sequence of records having the constant value of some
+field. This field called I<group field>. The report may have several includded groups. For
+group setting you have to define C<group> parameter of report constructor as a reference to
+an array of group fields.
+
+Следует отметить, что правильная последовательность записей для группировки должна обеспечиваться
+указанием в select-операторе нужной части C<order by>. Например для группировки данных отчета
+по странам и городам мог бы применяться такой конструктор.
+
+Note that the right record's sequence must be provided by C<order> part in used select query, not
+by report itself. Sample of grouping by countries and cities.
+
+ $r = DBIx::Repgen->new(
+   ...,
+   query => "select country, city, population from cities
+             order by country, city",
+   group => [qw/COUNTRY CITY/],
+   ...
+ );
+
+Обращаем внимание на то, что I<все> имена полей полученных данных записываются в верхнем
+регистре, независимо от используемого сервера БД.
+
+Note I<all> field names are in uppercase, regardless used database server.
+
+=item total - cumulative totals нарастающие итоги
+
+Значение этого аргумента - ссылка на список, содержащий имена полей отчета, по
+которым надо производить суммирование. Суммирование для каждого поля будет производиться как
+в пределах всего отчета, так и по каждой из групп. О доступе к значениям сумматоров см. ниже.
+
+Value of this constructor's argument is reference to array with report fields to compute
+totals. Each field summation executed for all the report as well as for each group. See
+below about access to totals values.
+
+=item header, footer, item etc. - definition of report parts и пр. - форматирование частей отчета
+
+При выводе отчета формируются следующие его "части" (parts).
+
+There are following I<parts> during report output.
+
+=over
+
+=item item
+
+Выводится для каждой записи отчета.
+
+Outputs for each report's record.
+
+=item header
+
+Выводится в начале всего отчета.
+
+Begin of whole report.
+
+=item footer
+
+Выводится в самом конце отчета.
+
+Outputs after all, in the end of report.
+
+=item header_GROUPFIELD
+
+Выводится в начале группы записей по полю GROUPFIELD.
+
+Outputs in the begin of record group by GROUPFIELD field.
+
+=item footer_GROUPFIELD
+
+Выводится в конце группы записей по полю GROUPFIELD.
+
+Outputs after record group by GROUPFIELD field.
+
+=back
+
+Форматирование каждой из этих групп (т.е. значение соответствующего параметра
+конструктора) может задаваться одним из следующих методов.
+
+Each of these report pats may be defined by several ways.
+
+=over
+
+=item string строка
+
+Указанная строка будет выводиться "как есть", без всякой дополнительной обработки.
+
+The string will be printed "as is", without any procession.
+
+ $r = DBIx::Repgen->new(
+   header => "\t\tReport about countries and cities\n",
+   ...
+ );
+ 
+
+=item reference to array of strings указатель на список строк
+
+Первый элемент этого списка рассматиривается как формат функции C<sprintf>,
+а остальные - как I<имена> (а не значения!) в текущих данных отчета. Об этих именах
+см. ниже.
+
+First element of this array have to be in form of C<sprintf> function format. The rest
+of values in the array are I<names> (no values!) of current report data. See below
+about current report data.
+
+ $r = DBIx::Repgen->new(
+   footer => ["Total %d countries, %d cities, population %d people\n",
+              qw/num_COUNTRY num_CITY sum_POPULATION/],
+   ...
+ );
+
+=item code reference ссылка на код
+
+Указанная функция вызывается с двумя параметрами - объектом отчета и указателем на
+хэш - хранилище текущих данных отчета.
+
+The code is called with two arguments: report object and hash reference storing
+current report data. Subroutine may use C<Output> method for output any needed
+information or just return output string as its result.
+
+ $r = DBIx::Repgen->new(
+   item => sub {
+     my ($r, $d) = @_;
+     $r->Output("%d %s",
+                $d->{POPULATION},
+                $d->{POPULATION} > 1_000_000 ? '*' : ' ');
+   }
+
+   footer => sub {return "Report ended at " . `date`}
+   ...
+ );
+
+=item reference to array where first element is code reference ссылка на список, в котором первый элемент - ссылка на код
+
+Указанный фрагмент кода вызывается со следующими параметрами: объект отчета,
+хэш с текущими данными отчета, все остальные элементы списка.
+
+The code is called with following arguments: report object, current report data, the rest of
+array elements.
+
+ $r = DBIx::Repgen->new(
+   header_COUNTRY => [\&hfcountry, 'header'],
+   header_COUNTRY => [\&hfcountry, 'footer'],
+   ...
+ );
+
+ sub hfcountry {
+  my ($r, $d, $header_or_footer) = @_;
+  if ($header_or_footer eq 'header') {...} else {...};
+ }
+
+=item max_items - max record number limit ограничение количества выводимых записей
+
+Если конструктору отчета передается этот параметр (целое число), то будет выведено не более
+C<max_items> записей. Узнать о том, выдены все записи или нет можно вызовом метода C<Aborted>
+(см. ниже).
+
+If this parameter (integer number) is present then no more than C<max_items> records will be
+output. It is possible to know if not all records were output via C<Aborted> method call.
+
+=back
+
+=head3 Current report data Текущие данные отчета
+
+При выводе отчета во внутренних переменных объекта отчета хранятся все данные, определяющие
+текущее состояние отчета. При выводе различных секций отчета доступ к этим данным производится
+по их именам. Среди текущих данных отчета имеются такие поля.
+
+All report state data are stored in internal report variables. Access to these data from
+report parts is possible by data names. There are following fields in current
+report data.
+
+=over
+
+=item FIELDNAME
+
+Поля текущей записи отчета, полученные из БД оператором select I<в верхнем регистре>.
+
+Fields of current report's record. Name is in I<uppercase>.
+
+=item prev_FIELDNAME
+
+Значение этого поля в предыдущей записи отчета. Обращение к этим полям целесообразно при выводе
+завершителей групп - так как ообнаружена граница группы, то значение группового поля уже изменилось,
+но предыдущее его значение, т.е. значение для только что завершившейся группе, еще хранится.
+
+Value of FIELDNAME in previous record. When group boundary is detected group field has new value,
+but its previous value is still stored. This value can be used in group footers.
+
+=item num_report
+
+Номер выводимой записи в пределах всего отчета. Этот номер не сбрасывается в процессе вывода отчета.
+
+Number (one-based) of current output record for the whole report. This counter never resets.
+
+=item num_item
+
+Номер выводимой записи в пределах группы самого младшего уровня.
+
+Number of record in the innermost group.
+
+=item num_GROUPNAME
+
+номер соответствующей группы внутри группы более высокого уровня.
+
+Number of group GROUPNAME in including group.
+
+=item total_FIELDNAME
+
+Сумматор по данному полю в пределах всего отчета. Напомним, что C<FIELDNAME> должно быть
+перечислено в параметре C<total> конструктора.
+
+Cumulative total of FIELDNAME field for the whole report. Remember FIELDNAME must be listed
+in C<total> constructor's parameter.
+
+=item total_GROUPNAME_FIELDNAME
+
+Сумматор по данному полю в пределах указанной группы.
+
+Cumulative total by FIELDNAME field into GROUPNAME. These summators are reset each time
+the group boundary is reached.
+
+=back
+
+
+=back
+
+
+=cut
+
+use strict;
+
+sub new {
+  my ($class, %par) = @_;
+
+  return bless \%par, ($class || ref $class);
+}
+
+=head2 run, report execution выполнение отчета
+
+ $r->run(%param);
+
+Выполняется и выводится отчет. Пареметры метода передаются в качестве значений
+placeholder-ов методу C<execute> оператора (см. выше об описании параметров отчета).
+Если в конструкторе отчета не был задан параметр
+C<output>, то текст отчета является результатом вызова метода.
+
+The report is run and output. Input parameters are substituted as values for select query
+placeholders (see above) about report's parameters. If there was no C<output> constructor's parameter
+then the text of report returned as a result of this method.
+
+=cut
+
+=head2 Output
+
+ $r->Output("Any values: %s and %d", 'qazwsx', 654);
+
+Аргуметны метода - те же, что у функции C<sprintf>. Метод добавляет сформатированную строку
+к выходному потоку отчета (определенную параметром C<output>). Этим методом можно пользоваться
+в коде, вызываемом при выводе различных частей отчета.
+
+This method has the same arguments as C<sprintf> function. It adds formatted string to the output
+stream (set by C<output> param). This method is useful in the code called during the output of
+report parts.
+
+=cut
+
+=head2 Get, querying of report parameters опрос параметров отчета
+
+  @group = @{$r->Get('group')};
+
+Метод возвращает значение указанного параметра, переданного ранее конструктору класса или
+установленного методом C<Set>.
+
+Method returns value of named parameter which is set in constructor or via C<Set> method.
+
+=cut
+
+=head2 Set, setting report parameters установка параметров отчета
+
+ $r->Set(
+   header => "Very new header",
+   item => ["%s %s", qw/NAME VALUE/]
+ );
+
+Метод переопределяет параметры отчета.
+
+Method redefines report parameters.
+
+=cut
+
+sub Set {
+  my ($r, %set) = @_;
+  while (my ($k, $v) = each %set) {
+    $r->{$k} = $v;
+  }
+}
+
+=head2 Abort
+
+ $r->Abort();
+
+Будучи вызванным в коде, выполняемом при выводе частей отчета этот метод прекращает дальнейшее
+выполнение отчета.
+
+Being called in the code it breaks report running.
+
+=cut
+
+=head2 Aborted
+
+  if ($r->Aborted()) {...}
+
+Метод позволяет узнать - было ли выполнение отчета прервано методом C<Abort> или были выведены
+все записи данных.
+
+Method returns true if report excution was aborted by C<Abort> method.
+
+=cut
+
+=head1 EXAMPLE
+
+Приведем полный пример скрипта, работающего с генератором отчетов и его результат.
+Данные для отчета берутся из таблицы, имеющей такую структуру:
+
+Full example of report and its result. The data are taken from data table having following
+structure.
+
+ create table population (
+  country varchar2(30) not null,
+  city varchar2(30) not null,
+  population int not null
+ );
+
+Далее приведен полный текст скрипта и результаты его работы (на совершенно условных данных!).
+
+Full text of the perl script and output data are following. These are just demo data!
+
+ #!/usr/bin/perl -w
+
+ use strict;
+ use DBI;
+ use DBIx::Repgen;
+
+ my $dbh = DBI->connect('dbi:Oracle:SID',
+                    'user', 'password') or die $@;
+ my $sth = $dbh->prepare(<<EOM);
+ select
+  country,
+  city,
+  population
+ from
+  population
+ order by
+  country,
+  city
+ EOM
+
+ my $r = DBIx::Repgen->new
+  (
+   sth => $sth,
+   group => [qw/COUNTRY/],
+   total => [qw/POPULATION/],
+
+   header => [\&makeheader,
+              '=', "Countries, cities and thier population"],
+   footer => ["Total %d countries, %d cities, %d people\n",
+              qw/num_COUNTRY num_report total_POPULATION/],
+
+   header_COUNTRY => sub {
+     my (undef, $d) = @_;
+     return makeheader(undef, undef, '-', $d->{COUNTRY});
+   },
+   footer_COUNTRY => ["%d cities, %d people in %s\n\n",
+          qw/num_item total_COUNTRY_POPULATION prev_COUNTRY/],
+
+   item => ["\t\t%-20s %10d\n", qw/CITY POPULATION/],
+  );
+
+ print $r->run();
+
+ sub makeheader {
+  my (undef, undef, $c, $s) = @_;
+  return sprintf("%s\n%s\n%s\n", $c x length($s), $s, $c x length($s));
+ }
+
+ ======================================
+ Countries, cities and thier population
+ ======================================
+ ---------
+ Australia
+ ---------
+		Kanberra                 900000
+		Sidney                  6400000
+ 2 cities, 7300000 people in Australia
+
+ ------
+ Russia
+ ------
+		Moscow                  9500000
+		Rostov-on-Don           1200000
+		St.Petersberg           4500000
+		Taganrog                 250000
+ 4 cities, 15450000 people in Russia
+
+ ---
+ USA
+ ---
+		Los Angeles             4000000
+		New York               12000000
+		Washington              2000000
+ 3 cities, 18000000 people in USA
+
+ Total 3 countries, 9 cities, 40750000 people
+
+=cut
+

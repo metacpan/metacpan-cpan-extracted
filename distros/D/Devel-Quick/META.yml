@@ -1,0 +1,20 @@
+---
+abstract: 'Write single-step debugger one-liners easily (DB::DB)'
+author:
+  - 'Matthew Horsfall (alh) <WolfSage@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Quick
+resources:
+  homepage: https://github.com/wolfsage/Devel-Quick
+  repository: git://github.com/wolfsage/Devel-Quick.git
+version: 0.08

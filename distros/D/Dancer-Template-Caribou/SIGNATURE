@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a4127c725c07bf813333abaf7e9c4ba52e4263a8 AUTHOR_PLEDGE
+SHA1 2b12d69a1655a1f1109ac346ded38650ef29164c CONTRIBUTORS
+SHA1 0390713497d07a69b2b055945872411e8112dcf5 Changes
+SHA1 afef68078d5de0a010c60c1474a53fd575763c75 INSTALL
+SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
+SHA1 e7d7fd875ff72fd7d2a698cb9f518b1af0a12467 MANIFEST
+SHA1 552bba34b94299c30872a22aa56f246d86355e74 META.json
+SHA1 50642f4c1ec81c8184cf22165e740a6aa973cc22 META.yml
+SHA1 ff7351ff761eb826592d7e7ef6699168151c9ed4 Makefile.PL
+SHA1 e7848ba738a08c26badfb2b0f0fa8784ee0a01ec README.mkdn
+SHA1 4b80b93e49df0353770184b3260a99d29afefe47 cpanfile
+SHA1 73790e176e21dd1022e7eda850c1c4ba17ce9839 doap.xml
+SHA1 3da37968a66916856a363236dc95d10092237e47 lib/Dancer/Template/Caribou.pm
+SHA1 b15bf3e54e551535171bf6b3601eabff00268154 t/00-compile.t
+SHA1 0fa1e3af42dd88414b07a23cf4c85bcb6f13d027 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 57a9e886cd8be9285d3120d6565a678c22237b0e t/hello-views.t
+SHA1 22e70776030db160ba8d169dc7720a8a20c3f257 t/simple.t
+SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/howdie/bou
+SHA1 e88e728be0a16202a2be0470b29d445da508d45d t/views/howdie/page.bou
+SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/hullo/bou
+SHA1 c33495a799d64ad90303f3fa0313e3377875ed80 t/views/hullo/inner_template.bou
+SHA1 d999b601758f66cfc8819a52762f8876c2a5d4cc t/views/layouts/main/bou
+SHA1 0a7b494cab56984ef3ef87aee066f9b519eb8a34 t/views/layouts/main/page.bou
+SHA1 b4b6971b642256cd59cca1a2043f57159e4dac5d t/views/welcome/bou
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljhY90ACgkQ34Hwf+GwC4z4qQCfRL8SFd8b5UOy846QTafMQ5fZ
+FG4Ani4kkXHUZCbcj5xD44Npb5pVOSun
+=JHsO
+-----END PGP SIGNATURE-----

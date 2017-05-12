@@ -1,0 +1,16 @@
+severity = 1
+exclude = RequireTidyCode RequirePodSections ProhibitPostfixControls RequireRcsKeywords RequireExplicitPackage ProhibitUnlessBlocks ProhibitBuiltinHomonyms RequirePodLinksIncludeText ProhibitUnusedPrivateSubroutines
+include = Moose::ProhibitMultipleWiths Moose::ProhibitNewMethod Moose::RequireCleanNamespace Moose::RequireMakeImmutable CodeLayout::ProhibitTrailingWhitespace
+color = 1
+verbose = 9
+
+[BuiltinFunctions::ProhibitStringyEval]
+allow_includes = 1
+
+[CodeLayout::ProhibitTrailingWhitespace]
+
+[Documentation::PodSpelling]
+stop_words = CPAN Str TODO rw HashRef ArrayRef PLUGINS unimport DataCouplet DataCoupletImpl DataCoupletPlugin Plugins
+
+[NamingConventions::ProhibitAmbiguousNames]
+forbid = abstract bases close contract last left no record right second

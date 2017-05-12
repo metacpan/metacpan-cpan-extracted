@@ -1,0 +1,34 @@
+ DBIx::Class::QueriesTime
+====================================
+
+"DBIx::Class::QueriesTime" is extension to DBIx::Class.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ - strict
+ - warnings
+ - DBIx::Class
+ - Time::HiRes
+
+SEE ALSO
+
+ - DBIx::Class
+ - Time::HiRes
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Atsushi Kobayashi (E<lt>nekokak@cpan.orgE<gt>). All rights reserved.
+
+This library is free software; you can redistribute it and/or modify it
+ under the same terms as Perl itself.

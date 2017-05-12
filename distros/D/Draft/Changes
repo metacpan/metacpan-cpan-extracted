@@ -1,0 +1,27 @@
+Revision history for Draft.
+
+0.06  Thu Oct 07 10:00:00 2004
+      - system ('sync'), fixes bugginess revealed by Undo and Redo
+
+0.05  Tue Oct  5 11:58:00 2004
+      - Added journaling, undo and redo functionality
+      - Depends on diff and patch
+
+0.04  Tue Sep 28 10:28:00 2004
+      - moved lots of files around and split off File::Atomism
+      - Changed original file format extension (not backward compatible)
+      - Added support for YAML serialised data (.yml extension)
+
+0.03  Sun Feb 29 13:55:12 2004
+      - abandoned Gtk2 switched to Tk::WorldCanvas
+      - More example drawings
+      - Zooming in and out
+      - Panning with middle-mouse click and drag
+      - Edit/move objects by simply dragging them
+
+0.02  Fri Oct  3 22:16:10 2003
+      - cleaned-up and added pod documentation
+
+0.01  Sun Aug 17 23:08:22 2003
+      - first release
+

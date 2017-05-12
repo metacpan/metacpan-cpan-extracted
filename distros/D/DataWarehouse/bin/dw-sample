@@ -1,0 +1,191 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my $lines  = 20;
+my $output = 'sample.txt';
+
+GetOptions(
+    'lines|l=i'  => \$lines,
+    'output|o=s' => \$output,
+);
+
+my @planets        = Planets::list();
+my @constellations = Constellations::list();
+my @stars          = Stars::list();
+
+for ( 1 .. $lines ) {
+    print join( "\t", sample() ), "\n";
+}
+
+sub sample {
+    return (
+        pick( \@planets ),
+        pick( \@constellations ),
+        pick( \@stars ),
+        rand(1000),
+    );
+}
+
+sub pick {
+    my @list = @{ shift() };
+
+    my $n = scalar @list;
+
+    return $list[ int( rand($n) ) ];
+}
+
+package Constellations;
+
+sub list {
+    return qw(
+      Andromeda Antlia Apus Aquarius Aquila Ara Aries Auriga Bootes Caelum
+      Camelopardalis Cancer Canes_Venatici Canis_Major Canis_Minor Capricornus
+      Carina Cassiopeia Centaurus Cepheus Cetus Chamaeleon Circinus Columba
+      Coma_Berenices Corona_Australis Corona_Borealis Corvus Crater Crux Cygnus
+      Delphinus Dorado Draco Equuleus Eridanus Fornax Gemini Grus Hercules
+      Horologium Hydra Hydrus Indus Lacerta Leo Leo_Minor Lepus Libra Lupus
+      Lynx Lyra Mensa Microscopium Monoceros Musca Norma Octans Ophiuchus Orion
+      Pavo Pegasus Perseus Phoenix Pictor Pisces Piscis_Austrinus Puppis Pyxis
+      Reticulum Sagitta Sagittarius Scorpius Sculptor Scutum Serpens Sextans
+      Taurus Telescopium Triangulum Triangulum_Australe Tucana Ursa_Major
+      Ursa_Minor Vela Virgo Volans Vulpecula
+    );
+}
+
+package Stars;
+
+sub list {
+    return qw(
+      Acamar Achernar Acrux Acubens Adhafera Adhara Agena Albali Albireo Alcor
+      Alcyone Aldebaran Alderamin Alfirk Algedi Algenib Algieba Algol Algorab
+      Alhena Alioth Alkaid Alkalurops Alkes Almach Alnilam Alnitak Alphard
+      Alphecca Alpheratz Alshain Altair Altais Alterf Aludra Alula_Australis
+      Alula_Borealis Alya Ancha Ankaa Antares Arcturus Arkab Arneb Ascella
+      Aspidiske Asterope Atik Atlas Atria Avior Azha Baten_Kaitos Becrux Beid
+      Bellatrix Benetnasch Betelgeuse Canopus Capella Caph Castor Celaeno Chara
+      Cheleb Chertan Chort Cursa Dabih Deneb Deneb_Algedi Deneb_Kaitos Denebola
+      Diphda Dnoces Dschubba Dubhe Edasich Electra Elnath Eltanin Enif Errai
+      Fomalhaut Furud Gacrux Gomeisa Graffias Grumium Hadar Hamal Homam Izar
+      Kaus_Australis Kaus_Borealis Kaus_Media Keid Kitalpha Kochab Kornephoros
+      Lesath Maia Marfik Markab Matar Mebsuta Media Megrez Meissa Mekbuda
+      Menkab Menkalinan Menkar Menkent Merak Merope Mesarthim Miaplacidus Mimosa
+      Mintaka Mira Mirach Mirfak Mirzam Mizar Mothallah Muhlifain Muscida Naos
+      Nashira Navi Nekkar Nihal Nunki Nusakan Peacock Phact Phad Phecda Pherkad
+      Pleione Polaris Pollux Porrima Procyon Propus Pulcherrima Rasalgethi
+      Rasalhague Rastaban Regor Rigel Rigil_Kentaurus Rotanev Ruchba Ruchbah
+      Rukbat Sabik Sadalbari Sadalmelik Sadalsuud Sadatoni Sadr Saiph Sargas
+      Scheat Schedar Seginus Shaula Sheliak Sheratan Sirius Situla Skat Spica
+      Sualocin Suhail Sulafat Syrma Talitha Tania_Australis Tania_Borealis
+      Tarazed Taygeta Tegmine Thuban Unukalhai Vega Vindemiatrix Wasat Wezen
+      Yed_Posterior Yed_Prior Yildun Zaniah Zaurak Zavijava Zubenelakrab
+      Zubenelgenubi Zubeneschamali
+    );
+}
+
+package Planets;
+
+sub list {
+    return qw(
+      Mercury Venus Earth Mars Jupiter Saturn Uranus Neptune Pluto
+    );
+}
+
+__END__
+
+=head1 NAME
+
+dw-sample - generate a sample dataset
+
+=head1 SYNOPSIS
+
+    # generate a sample.txt file containing 10,000 lines of random data
+    dw-sample --lines=10000 > sample.txt
+
+=head1 DESCRIPTION
+
+This script will generate a sample dataset for a sample database, that can be
+used for testing purposes.
+
+Right now, this is our (very simple) sample star schema:
+
+    sqlite3 universe.db <<"SQL"
+    CREATE TABLE space_travel (
+        id              INTEGER PRIMARY KEY,
+        planet          INTEGER,
+        constellation   INTEGER,
+        star            INTEGER,
+        value           FLOAT,
+        n               INTEGER DEFAULT 1
+    );
+
+    CREATE TABLE planet (
+        id      INTEGER PRIMARY KEY,
+        name    VARCHAR(50)
+    );
+
+    CREATE TABLE constellation (
+        id      INTEGER PRIMARY KEY,
+        name    VARCHAR(50)
+    );
+
+    CREATE TABLE star (
+        id      INTEGER PRIMARY KEY,
+        name    VARCHAR(50)
+    );
+    SQL
+
+This dataset is very crude and meaningless; I just copied some information
+from Acme::MetaSyntactic modules. Ideally we would populate planets,
+constellations and stars with more interesting information. Please let
+me know if you have any ideas on how to improve this.
+
+Anyway, this dataset is enough to demonstrate the concepts behind the
+Perl Data Warehouse Toolkit.
+
+    # generate the sample data
+    dw-sample --lines=100000 > universe.txt
+
+    # generate the load script called "my-load-script.pl"
+    dw-load \
+        --dsn='dbi:SQLite:dbname=universe.db' \
+        --fact='space_travel' \
+        --dimension='planet' \
+        --dimension='constellation' \
+        --dimension='star' \
+            > my-load-script.pl
+
+    # the load script is not perfect yet; you'll have to change
+    # a few lines of code there before you proceed to the next
+    # step
+
+    # run the load script
+    perl my-load-script.pl < universe.txt
+
+    # Now you have a populated "universe.db" database!
+    # The load script took care of indexes, slowly changing
+    # dimensions, etc
+
+    # Now it is time to generate your data warehouse navigator,
+    # which is a simple web frontend to your data warehouse
+    dw-nav \
+        --dsn='dbi:SQLite:dbname=universe.db' \
+        --fact='space_travel' \
+        --dimension='planet' \
+        --dimension='constellation' \
+        --dimension='star' \
+            > my-dw-navigator.pl
+
+    # That's it!
+
+    # Start your server and connect to localhost:3000 to see
+    # your data warehouse in action:
+    perl my-dw-navigator.pl daemon
+
+=head1 AUTHOR
+
+Nelson Ferraz

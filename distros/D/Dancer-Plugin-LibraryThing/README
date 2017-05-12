@@ -1,0 +1,90 @@
+NAME
+    Dancer::Plugin::LibraryThing - Plugin for LibraryThing APIs.
+
+VERSION
+    Version 0.0003
+
+SYNOPSIS
+        use Dancer::Plugin::LibraryThing;
+
+        get '/images/covers/*.jpg' => sub {
+            my ($isbn) = splat;
+
+            unless (-f "public/images/covers/$isbn.jpg") {
+                @ret = librarything_cover($isbn);
+
+                if (@ret < 3) {
+                    debug("Error retrieving cover for ISBN $isbn");
+                    status 'not_found';
+                    forward 404;
+                }
+            }
+
+            return send_file "images/covers/$isbn.jpg";
+        }
+
+DESCRIPTION
+    Retrieves book covers from LibraryThing based on ISBN-10 numbers.
+
+    Please checkout the terms of use first.
+
+CONFIGURATION
+        plugins:
+          LibraryThing:
+            api_key: d231aa37c9b4f5d304a60a3d0ad1dad4
+            directory: public/images/covers
+            size: large
+
+    Size defaults to medium.
+
+FUNCTIONS
+  librarything_cover
+    Requests a cover from LibraryThing and stores it in the directory set in
+    the configuration.
+
+    First (mandatory) parameter is the ISBN-10 number. Optional parameters
+    can be given as hash (directory and size), defaults are given in the
+    configuration.
+
+AUTHOR
+    Stefan Hornburg (Racke), `<racke at linuxia.de>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-dancer-plugin-librarything at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Plugin-LibraryThin
+    g. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Plugin::LibraryThing
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-LibraryThing
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-LibraryThing
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-LibraryThing
+
+    * Search CPAN
+        http://search.cpan.org/dist/Dancer-Plugin-LibraryThing/
+
+ACKNOWLEDGEMENTS
+    None so far.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

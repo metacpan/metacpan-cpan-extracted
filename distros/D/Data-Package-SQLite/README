@@ -1,0 +1,145 @@
+NAME
+    Data::Package::SQLite - A data package for a SQLite database
+
+SYNOPSIS
+      ### Creating a SQLite data package
+  
+      package My::Data;
+  
+      use strict;
+      use base 'Data::Package::SQLite';
+  
+      sub sqlite_locate { file => '/var/cache/mydata.sqlite' }
+  
+      1;
+  
+      ### Using your SQLite data package
+  
+      use My::Data;
+  
+      # Default data access
+      $dbh = My::Data->get;
+  
+      # ... or if you want to be explicit
+      $dbh = My::Data->get('DBI::db');
+
+DESCRIPTION
+    One of the best ways to distribute medium-sized (100k - 100meg) packages
+    containing datasets is using SQLite databases.
+
+    It allows you to have full SQL access to your data, and you can still
+    provide the data as a single file that does not need user/password
+    access and provides it's own security model (tied to filesystem access).
+
+    "Data::Package::SQLite" is a Data::Package sub-class for providing
+    simplified read-only access to these databases in the form of a DBI
+    connection handle, without the caller needing to know anything about
+    where the data is actually stored.
+
+METHODS
+    Although the primary interface when using a "Data::Package::SQLite"
+    module should be the same as for any other Data::Package module, some
+    additional methods are defined for people creating their own sub-classes
+    of "Data::Package::SQLite".
+
+  sqlite_dsn
+    The "sqlite_dsn" method return a valid DBI dsn for the creation of the
+    database handle. For any "Data::Package::SQLite" package that you "get"
+    a database handle from, the "sqlite_dsn" method will always return the
+    location of the database that was loaded.
+
+    When creating a sub-class, you should not return this directly, but are
+    encouraged to instead define your own "sqlite_file" or even better your
+    own "sqlite_location".
+
+    Returns a DSN string, or throws an exception on error.
+
+  sqlite_file
+      sub sqlite_file { '/var/cache/my_class/data.sqlite' }
+
+    The "sqlite_file" method returns the location of the SQLite file to be
+    loaded.
+
+    Please note that the fact a file name is returned by this method does
+    not necesarily mean it exists, because in some cases incorrect file
+    names can be generated, or a sub-class might defined this method
+    (incorrectly) directly.
+
+    Returns a file path string, or throws an exception in some error
+    situations.
+
+  sqlite_location
+      # A general file location somewhere
+      sub sqlite_location { file => '/var/cache/my_class/data.sqlite' }
+  
+      # The default data.sqlite for a distribution
+      sub sqlite_location { dist_file => 'My-Dist' }
+  
+      # A specific file for a distribution
+      sub sqlite_location { dist_file => 'My-Dist', 'sqlite.db' }
+  
+      # The default data.sqlite for a module
+      sub sqlite_location { module_file => 'My::Module' }
+  
+      # A specific file for a module
+      sub sqlite_location { module_file => 'My::Module', 'sqlite.db' }
+
+    The "sqlite_location" method is the primary method for sub-classes to
+    specify the location of the SQLite database file.
+
+    It should return a simple 2-3 element list, consisting of a location
+    type and 1 or more location values.
+
+    The "sqlite_location" method currently accepts 3 location types.
+
+    file
+        Mostly provides a direct pass-through to "sqlite_file".
+
+        Takes a second param of the location of the file as a simple string.
+
+    dist_file
+        The "dist_file" option provides access to the functionality provided
+        by the File::ShareDir function "dist_file".
+
+        It takes two additional values, the name of the distribution and the
+        name of the file within the dist dir.
+
+        If the file name is not provided, a default value of data.sqlite is
+        used.
+
+    module_file
+        The "module_file" option provides access to the functionality
+        provided by the File::ShareDir function "module_file".
+
+        It takes two additional values, the name of the module and the name
+        of the file within the dist dir.
+
+        If the file name is not provided, a default value of data.sqlite is
+        used.
+
+    If not provided, the default implementation of "sqlite_location" will
+    return "( module_file => $class )", where $class is the name of the
+    Data::Package::SQLite sub-class.
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at:
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Package-SQLite>
+
+    For other issues, contact the author.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Data::Package, DBD::SQLite, <http://ali.as/>
+
+COPYRIGHT
+    Copyright 2006 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

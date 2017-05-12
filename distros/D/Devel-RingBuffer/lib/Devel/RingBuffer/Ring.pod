@@ -1,0 +1,72 @@
+
+=pod
+
+=head1 NAME
+
+Devel::RingBuffer::Ring - Single ring of a L<Devel::RingBuffer>
+
+=head1 SYNOPSIS
+
+    #
+    #    create ringbuffer
+	#
+	use Devel::RingBuffer;
+	use Devel::RingBuffer::TieInt;
+
+	my $ringbuf = Devel::RingBuffer->new(
+		File => 'somefile.trace',
+		Rings => 20,
+		Slots => 20,
+		MessageSize => 256,
+		GlobalSize => 24 * 1024,
+		StopOnCreate => 0,
+		TraceOnCreate => 1) || die "Can't create a ring buffer.";
+
+	my $ring = $ringbuf->allocate();
+	#
+	#	setup the next slot in the ring
+	#
+	$depth = $ring->nextSlot();
+	#
+	#	update the current slot with the new linenumber and timestamp
+	#
+	$ring->updateSlot();
+	#
+	#	free the current slot when we return from its subroutine call
+	#
+	$depth = $ring->freeSlot();
+
+
+=head1 DESCRIPTION
+
+Provides shared memory structures (using memory mapped files via
+L<IPC::Mmap> and L<Devel::RingBuffer>).
+
+=head1 METHODS
+
+Refer to included classdocs for summary and detailed method descriptions.
+
+=head1 SEE ALSO
+
+L<Devel::RingBuffer>
+
+L<Devel::STrace>
+
+L<IPC::Mmap>
+
+L<perldebguts>
+
+strace(1) I<(or truss(1))>
+
+=head1 AUTHOR, COPYRIGHT, AND LICENSE
+
+Dean Arnold L<mailto:darnold@presicient.com>
+
+Copyright(C) 2006, Dean Arnold, Presicient Corp., USA.
+All rights reserved.
+
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the L<Perl Artistic License|perlartistic> for details.
+
+
+=cut

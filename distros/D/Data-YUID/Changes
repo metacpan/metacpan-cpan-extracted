@@ -1,0 +1,33 @@
+Revision history for Data::YUID
+
+0.06 2011-06-11
+    - Fixed sequence generation to reset timestamp every second, thus
+      fixing out of order sequences for 2+ servers (at the second
+      granularity).
+    - Added timeout configurations
+    - Added more tools, tests and documentation
+    - Fixed RT#68215 $^X in tests (ANDK)
+
+0.04
+    - Added 32bits Perl support
+
+0.03 2007-06-11
+    - Tweaking 0.02 after some testing, revising the way the cached socket
+      is used, and forcing reconnect after 1,000 + rand(1,000) connections
+      to force rebalancing after a server goes down and comes back up.
+
+0.02 2007-06-05
+    - The original behavior is that the client would create a connection to
+      every server it knows about on new().  Those connections would be chached,
+      but the next new() call would create four new connections anyway.  So each
+      YUID server was getting a persistent (but not re-used) connection from
+      every (TypePad) app server, and they were choking on the sheer number of 
+      connections.
+
+      So now, we connect only when a get_id request comes in, and only
+      to one server. If that server can't get us an ID, we try the
+      other ones. Each server will only have to maintain N/S connections,
+      instead of N (N=number of app servers, S=number of YUID servers).
+
+0.01  2005.11.22
+    - Initial distribution.

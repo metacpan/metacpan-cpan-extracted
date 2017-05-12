@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+cpanfile
+lib/DBIx/Class/ResultSet/AccessorsEverywhere.pm
+t/basic.t
+t/lib/Test/Schema.pm
+t/lib/Test/Schema/Result/User.pm
+t/lib/Test/Schema/ResultSet/User.pm

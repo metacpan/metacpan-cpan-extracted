@@ -1,0 +1,55 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cce9e2c409869bdd378b5714152010fe8bdd4af8 Build.PL
+SHA1 7b34ff2237fb2a46cd5f7c78723cfa7e8970d188 Changes
+SHA1 7293e276711ec3ffb1a41f6b57387720d1cf3d24 LICENSE
+SHA1 8f59c5dc5bd891f0abe0527921dae2d55fdb1a99 MANIFEST
+SHA1 f98a55a7b90a60fbf6497706837bd1b4d030f26c META.json
+SHA1 cc9165c95b7fdb1bc0dc8d6216885cc719be7a5b META.yml
+SHA1 12f051e19f5295382f17be16a415ef053ebdd13c README
+SHA1 f0f0ff4378416410c11467966ba244602b1cfb29 lib/Data/Validation.pm
+SHA1 07930c339d7c429d8d1884c344755a3ee4887287 lib/Data/Validation/Constants.pm
+SHA1 d26b5f2f5e7b1c9fb080683a09e35c9b1b0a7a6b lib/Data/Validation/Constraints.pm
+SHA1 5793e0c004dec0062be6d4024132046e5dbe0639 lib/Data/Validation/Constraints/Date.pm
+SHA1 b77525a71adac82efdd5946814f9b42c5ed04a70 lib/Data/Validation/Constraints/Email.pm
+SHA1 7dd8117f5f2d860577a251f7fa53a4cc723e060a lib/Data/Validation/Constraints/Password.pm
+SHA1 c41a1d08ee766eb6f87cb1b80853013cb823ac97 lib/Data/Validation/Constraints/Path.pm
+SHA1 baddd821bf3bbbefbc6a5007395b2b9724f30f56 lib/Data/Validation/Constraints/Postcode.pm
+SHA1 2516b042d5c38531e4cb85877280d2e29e1159e8 lib/Data/Validation/Constraints/URL.pm
+SHA1 67200d0fd65b4f5b42b31522aa43c1ad6581b4e0 lib/Data/Validation/Exception.pm
+SHA1 afe02147649746b64dad9f9c06de2fd7920558bd lib/Data/Validation/Filters.pm
+SHA1 e716c1dca95332ee2c9151ea67985d321f261209 lib/Data/Validation/Utils.pm
+SHA1 dc3e1ae0178c0dd3024f7537f7c4e30f045d25c5 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 b0001e6e684dbe198bfac16ac9504f2104d98962 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 8017accd1eef25a48a2ed79e8136dcdedf9aee35 t/07podspelling.t
+SHA1 f8250d47d23b9478e3911d999ad2b6e4be8bb62a t/10base.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 54f72038b8b07c81955113a8580a03ed7931f1bc t/exceptions.dd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYcmUCAAoJEK492j4Im1Bpq8IIAMeeF0ArDWSjc+6KRNlkarxy
+ICKED7BHcC5m41a//xEM5eKXJVqvCTVUjC3gQYKHsZmfMp0YNzp2cSLMgeEutscH
+QzbI3ZIjQWsAKysgchp+cNWMbpEOCPof8CSIOmuLFJvzbFxgt2gzAyVqezsx1VcW
+1jIeLFF87PYACUP71s301w8t4zYtIwCqOKmH1vuDxU0bxgYPol3ih+hrLg9OKOt6
+0IUNzxrJyCjidVr4qpmSwnCWGCVvtKhIogWdrrT+QClBoaH5UniLBUyuqRj5hrUD
+4uajuEac1h1GbYpU8UyForbmpWc/ILUgkYd3fFaG6IwqjVWexCZpigzFxfrdCtU=
+=x6HC
+-----END PGP SIGNATURE-----

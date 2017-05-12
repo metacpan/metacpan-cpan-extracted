@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Devel-DumpSizes.t
+lib/Devel/DumpSizes.pm

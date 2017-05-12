@@ -1,0 +1,60 @@
+Device::PiLite
+
+This is a module to interface with the Pi-Lite device for the Raspberry
+PI from Ciseco.  This is a self contained board based on the Lots of
+Leds shield for the Arduino that supports the Raspberry PI by embedding
+an Atmel AVR with (by default) firmware that allows the Raspberry PI to
+communicate with it over the GPIO serial port.
+
+This module simply encapsulates the required serial messages in order
+to control the board.
+
+INSTALLATION
+
+It is assumed you have installed the board and followed the instructions
+at:
+
+http://openmicros.org/index.php/articles/94-ciseco-product-documentation/raspberry-pi/283-setting-up-my-raspberry-pi
+
+to prepare your Raspberry PI to work with your board.  The instructions
+are for the default Debian based OS, if you are using some other
+distribution I'm assuming that you know enough to do the functional
+equivalent. (For reference I developed this on a Fedora based
+dsitribution.)
+
+To install this module, run the following commands:
+
+	perl Build.PL ./Build ./Build test ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Device::PiLite
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+	http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-PiLite
+
+    AnnoCPAN, Annotated CPAN documentation
+	http://annocpan.org/dist/Device-PiLite
+
+    CPAN Ratings
+	http://cpanratings.perl.org/d/Device-PiLite
+
+    Search CPAN
+	http://search.cpan.org/dist/Device-PiLite/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Jonathan Stowe
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

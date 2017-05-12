@@ -1,0 +1,34 @@
+DateStamp version 1.0.4
+
+DateStamp is a simple OO interface to current system time and date. Call this module from other applications to get a quick handle (timestamp/datestamp) on system time and date information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2005-2006, Todd Wylie (perldev@monkeybytes.org).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,147 @@
+Revision history for Perl extension DateTime::Calendar::FrenchRevolutionary.
+
+0.14  Primidi 11 Frimaire CCXXV, jour de la cire, 212th anniversary of Napoleon's crowning, 211th anniversary of the Battle of Austerlitz (or Thursday 2016-12-01)
+        - fix a few typos
+        - Makefile.PL no longer uses Module::Build
+        - add Params::Validate as a prerequisite
+
+0.13  Octidi 18 Brumaire CCXXV, jour de la dentelaire, 217th anniversary of Bonaparte's coup (also known as Tuesday 2016-11-08)
+        - fix RT ticket 117246: compatibility with perl-5.25, add a backslash to escape a literal brace in a regexp
+
+0.12  Octidi 28 Frimaire CCXXIII, jour de la Truffe (also known as Thursday 2014-12-18)
+        - add the GPL-mandated comments in all Perl code files
+        - fix RT ticket 100311: produce real UTF-8 strings, instead of Mojibake ISO-8859 which
+          will accidently display in a UTF-8 terminal as a proper string.
+        - playing the CPANTS game (when appropriate): use strict and use warnings in all Perl code
+        - improve coverage in tests (and remove some dead code)
+        - fix RT ticket 61228: check the various localized strings (feasts and "on_date")
+
+0.11  Octidi 18 Brumaire CCXXI, jour de la dentelaire, 213th anniversary of Bonaparte's coup (also known as Thursday 2012-11-08)
+        - French locale: replacing the "4" and "5" "possible genre" indicators for feasts by "0" 
+        or "1". The only indicator I am still not sure of is for "bagarade", but let us get rid 
+        of "4" and "5".
+        - testing dates with big years (>= 1000)
+        - fix the %EY and %Ey date specifiers when outside of the Roman number range (1--3999)
+
+0.10  Nonidi 9 Thermidor CCXX, jour de la mûre, 218th anniversary of Robespierre's downfall (also known as Thursday 2012-07-26)
+        - a few documentation fixes
+        - use the oe ligature where appropriate
+        - check the English translations for feasts
+        - checking the "now" constructor
+
+0.09  Sextidi 26 Messidor CCXIX, jour de la sauge (also known as Bastille Day, Thursday 2011-07-14)
+        - Fix the long running bug shown by 45_lastday.t when using an interpreter 
+        configured with long double (closing ticket 61230)
+        - Add still more tests.
+        - A few minor modification in the "on_date" data
+        - A few typos in the documentation (partial resolution of ticket 61228, but I am
+        sure some other typos exist).
+        - Remove the semi-support of the old parameter "language". Anyhow, it was
+        rejected by Params::Validate.
+        - add encoding POD directive, hoping the documentation will look better on the web
+
+0.08  Tridi 3 Thermidor CCXVIII, jour du melon (Wednesday 2010-07-21)
+        - strftime uses "%*" as an alternative to "%Ej" (closing ticket 17231)
+        - various spelling errors in the "on_date" method
+        - new 46_lastday.t test script, to analyse the spurious errors found by some CPAN testers
+        - requires Roman 1.22 or later, because some CPAN Testers reported that 
+        Roman.pm could not be built without a Build.PL or a Makefile.PL
+        - Add a few tests, including a test file for DT::C::FR::Locale::{en,fr}
+        module methods
+        - Fixed a bug with default date / time / datetime formats
+        - Fixed a bug with the English short feast
+        INCOMPATIBLE CHANGES
+        - Change from ISO-8859 to UTF-8
+
+0.07  Duodi 22 Fructidor CCXII, jour de la noisette (Tuesday 2004-09-07)
+        - I used to believe that a capturing split would allow for one set
+        of capturing parentheses which would capture the whole delimiter.
+        I did not know that you can capture only a part of the delimiter if you want.
+        My knowledge of Perl is fixed, together with the on_date method
+        and the _load_event subroutine.
+        - Add _raw_feast private method.
+        - Add several methods for compatibility with DateTime: day_of_week,
+        wday, dow, week_number.
+        - Add the %{method} specifier for strftime
+        - In the Locale::xx modules, add some methods for compatibility with 
+        DateTime::Locale: month_names, am_pms, day_names, full_date_format, etc.
+        - Still more propaganda in the on_date method
+        - Insert empty lines in the on_date method, so the today example script
+        can now wrap the text
+        - The "ce_jour" method is removed, use the "on_date" method with 
+        a parameter set to "fr" instead.
+        - Check the few possible values for the locale and the time-zone.
+        - Add a few tests.
+        - The eg/result directory contains the year 213 calendar now.
+        INCOMPATIBLE CHANGES
+        - The decimal equivalent of the 1..12 clock is the 1..10 clock, 
+        not 1..5. This is because it represents the numbers printed on clockfaces.
+        - The decade method returns a 2-element list, just like DateTime's
+        week method. And by the way, the decade method is aliased to week.
+
+0.06  Septidi 27 Frimaire CCXII, jour du liège (Wednesday 2003-12-17)
+	- add test for nanoseconds... and fixed nanosecond related bug
+	- add basic support for Locale, with two languages: French and English
+	- add much more shameless propaganda for the French Revolutionary armies
+
+0.05  Décadi 30 Fructidor CCXI, jour du panier (Tuesday 2003-09-16)
+	- removed the reference to Makefile.PL in README
+	- pod fixes thanks to Iain Truskett
+	- add minimal support for nanoseconds (so conversion Greg->FR->Greg will not
+	lose the precision)
+	- add much stuff for the events that occurred in Vendémiaire
+	- replace the CCXI calendars by CCXII calendars in the eg/result directory.
+
+0.04  Primidi 11 Thermidor CCXI, jour du panis (Tuesday 2003-07-29)
+	- the _offset_from_local_time was unduly commented out. Fixed.
+	- removed Makefile.PL. Or rather, replaced by a file suggesting that
+	the user adopts Module::Build instead of ExtUtils::MakeMaker.
+
+0.03  Primidi 11 Floréal CCXI, jour de la rhubarbe (Wednesday 2003-04-30)
+	- I had forgotten the Roman.pm prerequisite in Makefile.PL. Fixed.
+	- A few words about Roman.pm in README, too.
+
+0.02  Décadi 10 Floréal CCXI, jour du rateau (Tuesday 2003-04-29)
+        - altered Makefile.PL so the existence of Build.PL will not cause problems.
+	- negative dates (prior to 22 September 1792): I do not know whether
+	they give proper results (year 0? leap year?) but at least you can
+	convert back to Gregorian and get the same result.
+	- added a few tests and examples
+
+0.01  Nonidi 9 Floréal CCXI, jour de la jacinthe (Monday 2003-04-28)
+        - initial version.
+
+Revision history for Perl extension Date::Convert::French_Rev.
+
+0.05  Nonidi 9 Floréal CCXI, jour de la jacinthe (Monday 2003-04-28)
+        - last version compatible with Date::Convert, next one will
+        be in the DateTime::Calendar namespace, compatible with DateTime.pm
+        - I had always believed that the additional days were not called
+        Primidi, Duodi etc. But I have found a document where they are
+        called Primidi etc. The bug in the module is fixed.
+
+0.04  Tridi 13 Fructidor CCX, jour de l'épine-vinette (2002-08-30, Friday)
+	- reorganise the directory structure along Matt Sergeant's tips
+        - include the 4000-modulus rule for leap years (according to emacs-21.2)
+        - reorganise the absolute -> FR conversion
+	- rephrase the README file
+	- add the  prerequisite for Date::Convert  in Makefile.PL (the
+	use statement and the @ISA array are not sufficient)
+        - add a few examples in the eg/ subdirectory
+	- fix a few bugs: $_ was squashed by date_string, the month value
+	was not controlled
+	- compatibility with diagnostics-1.2
+
+0.03  20 Thermidor CCIX (2001-08-07, Tuesday)
+        - rewrite the Changes file, with proper dates
+        - it seems that the 4th additional day should rather be "jour
+	de l'opinion"
+	- reformat the code
+
+0.02  19 Prairial CCIX (2001-06-07, Thursday)
+        - add the prerequisite for Roman.pm in Makefile.PL
+        - extend the "SEE ALSO" section
+
+0.01  4 Prairial CCIX (2001-05-23, Wednesday)
+	- original version; created by h2xs 1.19
+

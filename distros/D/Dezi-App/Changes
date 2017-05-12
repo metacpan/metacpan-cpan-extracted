@@ -1,0 +1,56 @@
+Revision history for Dezi-App
+
+0.014  01 Dec 2015
+  - replace namespace::sweep with namespace::autoclean
+
+0.013  01 Sept 2014
+  - move Dezi::Indexer::Headers to SWISH::3::Headers, require SWISH::3 1.000012
+  - add 'boost' param to internal Compiler object in D::Lucy::Searcher, for Lucy 0.4.0
+
+0.012  15 Aug 2014
+  - fix error checking in Lucy::Searcher to Search::Query::Dialect
+  - zapped .svn from git repo (never included in dist)
+
+0.011  14 Aug 2014
+  - add missing MooseX::Getopt to Makefile.PL for deziapp CLI
+
+0.010  04 Aug 2014
+  - use Try::Tiny in ReplaceRules
+  - require Compress::Zlib on behalf of SWISH::Filter
+  - require CAM:PDF on behalf of SWISH::Filter
+
+0.009  01 Aug 2014
+  - add missing dependencies to Makefile.PL
+
+0.008  31 July 2014
+  - bump SWISH::3 dependency to 1.0.10
+  - InvIndex::Header->data now coerces into full hash on build.
+  - fix bug where Indexer::Config->new($hashref) was ignoring $hashref
+
+0.007  31 July 2014
+  - add missing dependencies to Makefile.PL
+
+0.006  30 July 2014
+  - allow Indexer::Doc->action and ->parser to be undef in new()
+  - fix Indexer::Config coercion from HashRef
+
+0.005  30 July 2014
+  - optimizations
+  - fix filter() option in Dezi::App to access a string as documented.
+  - warn if reserved field name is used in Indexer::Config
+  - add missing HTTP::Date dependency to Makefile.PL
+
+0.004  22 July 2014
+  - improve support for Multi-Value fields
+  - fix failing leak test
+
+0.003  21 July 2014
+  - add ->make_immutable to all classes for speed.
+  - minor optimizations after running through NYTProf
+
+0.002  19 July 2014
+  - add missing CLI options for backcompat with swish3
+
+0.001  18 July 2014
+  - Initial release, ported from SWISH::Prog
+

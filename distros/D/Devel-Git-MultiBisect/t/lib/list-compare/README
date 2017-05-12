@@ -1,0 +1,79 @@
+List::Compare - Compare elements of two or more lists
+
+This document refers to version 0.53 of List::Compare.  This version was
+released June 07 2015.
+
+To install this module on your system, place the tarball archive file in a
+temporary directory and call the following:
+
+% gunzip List-Compare-0.53.tar.gz
+% tar xf List-Compare-0.53.tar
+% cd List-Compare-0.53
+% perl Makefile.PL
+% make
+% make test
+% make install
+
+If during installation you wish to view more information on test results,
+substitute the fllowing for the sixth line in the sequence of commands
+above:
+
+% make test TEST=VERBOSE
+
+If you are installing this module over any earlier version, you may
+substitute the following for the last line in the sequence of commands
+above:
+
+% make install UNINST=1
+
+If you are installing this module on a Win32 system with 'nmake',
+substitute 'nmake' for 'make' in the sequence of commands above.
+
+The author has found that trying to install this distribution with
+(a) older (pre-6.16) versions of ExtUtils::MakeMaker, (b) on older
+versions of Perl (e.g., 5.6.0), and (c) on older Linux distributions
+(e.g., RedHat Linux 7.3) can result in a situation where the module's
+Plain Old Documentation, when transformed into manual pages, is not
+automatically placed in the optimal location for reading thru 'man'
+and 'info' (even though it reads perfectly through 'perldoc').  If you
+experience this problem, issue the following at the command line
+(adapted from a suggestion by Michael Schwern on the module-authors
+mailing list):
+
+% perl Makefile.PL INSTALLSITEMAN3DIR=/usr/share/man/man3
+
+List::Compare uses the Carp module which is part of the standard Perl
+distribution.  Other than that, there are no module dependencies in
+this version of List::Compare.
+
+Certain methods in this version of List::Compare are included solely
+for backwards compatibility with earlier versions and are deprecated.
+When called, they print warning messages via Carp.  In earlier versions
+of List::Compare these warning messages would appear when you called
+'make test' as part of the installation process.  This was harmless
+but annoying and has been fixed.
+
+Beginning with version 0.25 in April 2004, there is a modification to the
+interface of two methods/functions: are_members_which() and
+are_members_any().  Whereas previously the strings to be tested could be
+passed to the subroutine either as a flat list or via a reference to an
+anonymous array, now those items must be passed via reference to an
+anonymous array.
+
+Beginning with version 0.26 in April 2004, the functionality previously
+found in List::Compare::SeenHash has been incorporated directly into
+List::Compare.  Hence, List::Compare::SeenHash and the test suite files
+associated with it have been deprecated and are no longer included in the
+CPAN distribution.  Please see the List::Compare documentation for
+further details.
+
+In sending e-mail to the author, please put "List::Compare" or
+"List-Compare" in the subject line.
+
+Author:  James E. Keenan (jkeenan@cpan.org).
+Originally created May 20, 2002.
+
+Copyright (c) 2002-15 James E. Keenan.  United States.  All rights reserved.
+This is free software and may be distributed under the same terms as Perl
+itself.
+

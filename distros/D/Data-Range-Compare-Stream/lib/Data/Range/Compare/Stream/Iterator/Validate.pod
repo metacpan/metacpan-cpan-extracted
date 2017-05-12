@@ -1,0 +1,113 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Validate - Iterator Result Validation
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream::Iterator::Validate;
+  
+  
+  my $list=[
+    
+    # Invalid range 1
+    Data::Range::Compare::Stream->new(),
+
+    # Invalid range 2
+    Data::Range::Compare::Stream->new(0),
+    # Invalid range 3
+    Data::Range::Compare::Stream->new(undef,0),
+    # Invalid range 4
+    Data::Range::Compare::Stream->new(1,0),
+
+    # Valid range 1
+    Data::Range::Compare::Stream->new(0,0),
+
+    # Valid range 2
+    Data::Range::Compare::Stream->new(1,2),
+
+    # Invalid range 5
+    Data::Range::Compare::Stream->new(2,1),
+  ];
+  
+  sub bad_range {
+    my ($range)=@_;
+    print "Invalid range found\n";
+  }
+  
+  my $it=new Data::Range::Compare::Stream::Iterator::Array(range_list=>$list,sorted=>1);
+  
+  my $valid=new Data::Range::Compare::Stream::Iterator::Validate($it,on_bad_range=>\&bad_range);
+  while($valid->has_next) {
+    my $result=$valid->get_next;
+    print $result,"\n";
+  }
+
+=head1 DESCRIPTION
+
+This class validates result objects returned from iterators that implement Data::Range::Compare::Stream::Iterator::Base.
+
+=head2 How ranges are defined as not valid.
+
+Data::Range::Compare::Stream and all classes that implement have a instance->boolean interface.  When the boolean interface returns false the range is considered invalid.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $valid=new Data::Range::Compare::Stream::Iterator::Validate($iterator);
+
+=item * my $valid=new Data::Range::Compare::Stream::Iterator::Validate($iterator,key=>value);
+
+Required Arguments: 
+
+  $iterator
+    # object extends or implements L<Data::Range::Compare::Stream::Iterator::Base>
+
+Optional Arguments
+
+  on_bad_range=>undef|code_ref
+    # Default: undef,  Code ref called with the the invalid range found as an argument.
+    
+
+=item * while($iterator->has_next) { ... }
+
+Returns true if there is a valid range.
+
+=item * my $range=$iterator->get_next;
+
+Returns the next valid range.
+
+=item $self->on_bad_range($range);
+
+This function is called internally when a range is found to be invalid.  This function does nothing by default unless on_bad_range=>code_ref has been defined.  When on_bad_range is defined the code ref is called with the range as the only argument.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,165 @@
+# NAME
+
+Dancer2::Plugin::Adapter - Wrap any simple class as a service for Dancer2
+
+# VERSION
+
+version 0.007
+
+# SYNOPSIS
+
+    # in config.yml
+
+    plugins:
+      Adapter:
+        ua:
+          class: HTTP::Tiny
+          scope: request
+          options:
+            max_redirect: 3
+
+    # in your app
+
+    use Dancer2::Plugin::Adapter;
+
+    get '/proxy/:url' => sub {
+      my $res = service('ua')->get( params->{'url'} );
+      if ( $res->{success} ) {
+        return $res->{content};
+      }
+      else {
+        template 'error' => { response => $res };
+      }
+    };
+
+# DESCRIPTION
+
+The problem: you want to use some perl class in your Dancer2 app, but there's
+no plugin for it.
+
+The solution: as long as the class needs only static data to construct an
+object, then `Dancer2::Plugin::Adaptor` can do the wrapping for you.  Think
+of it as a "just-in-time" plugin (or maybe a poor-man's [Bread::Board](https://metacpan.org/pod/Bread::Board)).
+
+Here's another example: you want to send emails via
+[Postmark](http://postmarkapp.com) using [WWW::Postmark](https://metacpan.org/pod/WWW::Postmark).
+
+In your config.yml, you put this:
+
+    plugins:
+      Adapter:
+        postmark:
+          class: WWW::Postmark
+          scope: singleton
+          options: POSTMARK_API_TEST
+
+In your production config.yml, you can replace 'POSTMARK\_API\_TEST' with your
+real Postmark API key.
+
+Then, in your application, here's how you use it:
+
+    get '/' => sub {
+      eval {
+        service("postmark")->send(
+          from    => 'me@domain.tld',
+          to      => 'you@domain.tld, them@domain.tld',
+          subject => 'an email message',
+          body    => "hi guys, what's up?"
+        );
+      };
+
+      return $@ ? "Error: $@" : "Mail sent";
+    };
+
+`Dancer2::Plugin::Adapter` takes care of constructing and caching the
+[WWW::Postmark](https://metacpan.org/pod/WWW::Postmark) object based on the configuration data, and lets you access
+the object with the `service()` function.
+
+# CONFIGURATION
+
+One or more objects are defined by `NAME => HASHREF` pairs.  The hash
+reference for each NAME must contain a 'class' key, whose value is the class
+to wrap.
+
+The 'scope' key determines how long the generated object persists.  The choice
+of scope will depend on whether the object holds onto any state that should not
+last across requests.  The following scope values are allowed:
+
+- `request` 
+
+    (default) the object persists in the `vars` hash for the duration of the request
+
+- `singleton` 
+
+    the objects persists in a private, lexical hash for the duration of the process
+
+- `none` 
+
+    the object is not cached; a fresh object is created on each call
+
+If the hash reference contains an 'options' key, its value will be dereferenced
+(if it is a hash or array reference) and passed to `new()` when the object is
+created.  Note that if the class requires a reference for the constructor,
+you have to wrap it in an extra array.  E.g.
+
+    # config.yml:
+    plugins:
+      Adapter:
+        foo:
+          class: Foo::Bar
+          scope: request 
+          options:
+            -
+              wibble: wobble
+              biff: boff
+
+    # constructor called as:
+    Foo::Bar->new( { wibble => wobble, biff => boff } );
+
+If the class does not use 'new' as the name of its constructor, an alternate
+can be specified with the 'constructor' key.
+
+    # config.yml:
+    plugins:
+      Adapter:
+        tmpdir:
+          class: File::Temp
+          constructor: newdir
+
+    # constructor called as:
+    File::Temp->newdir()
+
+When caching under `request` scope, Dancer2::Plugin::Adaptor uses
+the key `_dpa` in the `vars`.
+
+# USAGE
+
+## service
+
+    $object = service($name);
+
+This function returns the object corresponding to the name defined in the
+configuration file.  The object is created on demand and may be cached for
+future use based on its `scope` configuration option.
+
+# SEE ALSO
+
+- [Dancer2](https://metacpan.org/pod/Dancer2)
+- [Dancer2::Plugin](https://metacpan.org/pod/Dancer2::Plugin)
+
+# ACKNOWLEDGMENTS
+
+Thank you to Matt S. Trout for suggesting the 'scope' controls.
+
+# AUTHORS
+
+- David Golden <dagolden@cpan.org>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by David Golden.
+
+This is free software, licensed under:
+
+    The Apache License, Version 2.0, January 2004

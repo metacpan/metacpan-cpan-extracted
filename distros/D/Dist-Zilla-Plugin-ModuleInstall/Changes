@@ -1,0 +1,190 @@
+Revision history for Dist-Zilla-Plugin-ModuleInstall
+
+1.001002 2017-03-07T08:09:04Z 3a4ccbf
+ - Amended missing changelog entry in a previous release
+
+ [Bugfix]
+ - Avoid test failures on -Ddefault_inc_excludes_dot
+ - Generated Makefile.PL now has a `use lib` stanza to avoid -Ddefault_inc_excludes_dot issues
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: ↓1
+
+1.001001 2016-04-29T12:17:45Z 78daba4
+ - Marked distribution deprecated.
+ - Simplified runtime dependency graph.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +15 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -3 (recommends: +1)
+ - test: +2 -1 (recommends: +1 ↑1 ↓1)
+
+1.001000 2014-09-04T20:16:02Z
+ [00 Minor]
+ - tests updated.
+ - uses dump_config
+ - metadata fixes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +1 -1 (recommends: ↑1)
+
+ [Metadata]
+ - copyright holder email address set.
+
+ [Tests]
+ - Tests rewritten with dztest
+
+1.000003 2014-08-15T21:17:57Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+1.000002 2014-08-05T03:20:44Z
+ [00 Trivial]
+ - no code changes.
+ - Test code updated.
+ - Pod::Weaver -SingleEncoding turned on
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: -3
+
+1.000001 2014-07-30T04:06:36Z
+ [Bugfix]
+ - Declare test requires for a Path::Tiny that can export tempdir
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - test: ↑1 -1 (recommends: ↑1 -2)
+
+1.000000 2014-07-29T10:55:00Z
+ [00 Major]
+ - Packaging changes that may affect downstream who work by hand
+
+ [01 Version Scheme Change]
+ - Migrating from x.yyyyyyyy ( = 8 ) to x.yyyyyy ( = 6 )
+ - This is the primary reason for the 1.x on the box.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 Toolkit Change]
+ - Shipping is now done exclusively with ExtUtils::MakeMaker
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+ - This means it may be some more time before this actually has tests.
+ - No More Dogfood
+
+ [03 Misc]
+ - Handling failure cases with MI slightly improved.
+ - Depending on a version of ::Tempdir that acutally emits files.
+ - Moved to kentnl org
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02000000, see misc/*.deps* for details
+ - build: -1
+ - configure: ↓1 (recommends: +1)
+ - develop: +44 -2 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +3 ↑2 -1
+ - test: +10 ↓1 -2 (recommends: +5)
+
+0.02000000 2013-04-06T06:45:47Z
+ - Maintenance/Bugfix release
+
+ [!Noteworthy Changes]
+ - Properly supports BuildRunner role now so works again with dzil xtest
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01054021, see misc/*.deps* for details
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - runtime: +3
+ - test: ↑1
+
+ [Documentation]
+ - Update copyright year
+ - add README.mkdn
+
+ [Internals]
+ - defer build/test to MakeMaker::Runner, copying implementation details from MakeMaker
+
+ [Meta]
+ - Bug tracker to github
+
+ [Packaging]
+ - Rebuilt with Module::Install 1.06
+
+0.01054021 2012-02-02T19:30:41Z
+ - Maintenance release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01054020, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Packaging]
+ - Update LICENSE ( Indent, Date, Address )
+ - Move extra-tests to xt/
+ - Git urls moved to https://
+ - x_authority declared in meta.
+ - Update to M::I 1.04
+ - Move to git based versioning.
+
+0.01054020 2011-04-04T15:36:00Z
+ [BugFix]
+ - rt#61170 "wrong inc::module::install prereq" should be fixed in this release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01029216, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: -1
+ - test: +1
+
+ [Packaging]
+ - No longer indexes ^inc:: things. ( rt#61170 )
+ - Move to @Author::KENTNL
+ - use Bootstrap::lib
+ - Changes to CPAN::Changes style.
+ - no longer ship inc/
+ - Ship .perltidyrc and perlcritic.rc
+
+ [Tests]
+ - Remove hand-spun critic-tests.
+ - Drop portability tests.
+ - Add CPAN::Changes tests.
+
+0.01029216 2010-08-04T11:37:06Z
+ - Upgraded codebase to work with DZil 4.
+ - New support for build/test/config/recommends phases.
+ - Now dies and leaves you in the tempdir if it manages to generate  a fubared Makefile.PL
+ - Now using Latest Role::Tempdir
+ - General overhaul of everything.
+ - This release hopefully resolves rt #55840 ( reported by Salve J. Nilsen )
+ - This now ships its own default test-runner.
+ - Attempted support at supporting scripts via :ExecFiles
+ - More errors moved to occur in the dzil phase, not in the templater  ( which suppresses sneaky errors that I had
+   happening because the code in the templates were dying, and emitting "hurp, something failed" into the template,
+   which, being perl code, wasn't too great )
+ - Emitted Makefile.PL has more comments explaining whats happening.
+ - Injects a "Hey, don't modify this file!" warning.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002219, see misc/*.deps* for details
+ - runtime: +7 ↑1 -1
+ - test: +3
+
+0.01002219 2009-11-13T14:03:57Z
+ - First version.

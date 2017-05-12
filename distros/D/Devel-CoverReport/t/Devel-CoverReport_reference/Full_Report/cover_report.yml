@@ -1,0 +1,364 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        coverable: 
+          caption: Coverable
+          f: "%d"
+          fs: ''
+        coverage: 
+          caption: Coverage
+          f: "%.1f%%"
+          fs: "%.1f%%"
+        covered: 
+          caption: Covered
+          f: "%d"
+          fs: ''
+        criterion: 
+          caption: Criterion
+          class: head
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - criterion
+        - coverable
+        - covered
+        - coverage
+      label: "Coverage summary:"
+      rows: 
+        - 
+          coverable: 107
+          coverage: 
+            class: c3
+            v: 91.588785046729
+          covered: 98
+          criterion: Statement
+        - 
+          coverable: 22
+          coverage: 
+            class: c3
+            v: 95.4545454545455
+          covered: 21
+          criterion: Subroutine
+        - 
+          coverable: 3
+          coverage: 
+            class: c0
+            v: 33.3333333333333
+          covered: 1
+          criterion: POD
+        - 
+          coverable: 18
+          coverage: 
+            class: c1
+            v: 61.1111111111111
+          covered: 11
+          criterion: Branch
+        - 
+          coverable: 18
+          coverage: 
+            class: c1
+            v: 55.5555555555556
+          covered: 10
+          criterion: Condition
+      summary: 
+        - 
+          coverage: 
+            class: c1
+            v: 67.4086661002549
+          criterion: Overall coverage
+    - 
+      headers: 
+        branch: 
+          caption: Br.
+          f: "%d%%"
+          fs: "%.1f%%"
+        condition: 
+          caption: Cond.
+          f: "%d%%"
+          fs: "%.1f%%"
+        file: 
+          caption: File
+          class: file
+          f: "%s"
+          fs: "%s"
+        pod: 
+          caption: POD
+          f: "%d%%"
+          fs: "%.1f%%"
+        runs: 
+          caption: Runs
+          f: "%d"
+          fs: "%d"
+        statement: 
+          caption: St.
+          f: "%d%%"
+          fs: "%.1f%%"
+        subroutine: 
+          caption: Sub.
+          f: "%d%%"
+          fs: "%.1f%%"
+        time: 
+          caption: Time
+          f: "%.3fs"
+          fs: "%.3fs"
+      headers_order: 
+        - file
+        - statement
+        - subroutine
+        - pod
+        - branch
+        - condition
+        - time
+        - runs
+      label: "Covered files:"
+      rows: 
+        - 
+          branch: 
+            class: c2
+            href: lib-Sample-Simple-Bar-pm-branch
+            v: 83.3333333333333
+          condition: 
+            class: c1
+            v: 66.6666666666667
+          file: 
+            href: lib-Sample-Simple-Bar-pm
+            v: lib/Sample/Simple/Bar.pm
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: lib-Sample-Simple-Bar-pm-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c4
+            href: lib-Sample-Simple-Baz-pm-branch
+            v: 100
+          condition: 
+            class: c4
+            v: 100
+          file: 
+            href: lib-Sample-Simple-Baz-pm
+            v: lib/Sample/Simple/Baz.pm
+          pod: 
+            class: c4
+            v: 100
+          runs: 3
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: lib-Sample-Simple-Baz-pm-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c0
+            href: lib-Sample-Simple-Foo-pm-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: lib-Sample-Simple-Foo-pm
+            v: lib/Sample/Simple/Foo.pm
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c0
+            v: 0
+          subroutine: 
+            class: c0
+            href: lib-Sample-Simple-Foo-pm-subroutine
+            v: 0
+        - 
+          _class: partial_summary
+          branch: 
+            class: c1
+            v: 61.1111111111111
+          condition: 
+            class: c1
+            v: 55.5555555555556
+          file: 
+            v: lib/Sample/Simple
+          pod: 
+            class: c0
+            v: 33.3333333333333
+          runs: ~
+          statement: 
+            class: c2
+            v: 76.9230769230769
+          subroutine: 
+            class: c2
+            v: 85.7142857142857
+          time: 
+            class: c0
+            v: 0
+        - 
+          branch: 
+            class: c0
+            href: t-Bar-t-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: t-Bar-t
+            v: t/Bar.t
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: t-Bar-t-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c0
+            href: t-Baz-a-t-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: t-Baz-a-t
+            v: t/Baz-a.t
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: t-Baz-a-t-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c0
+            href: t-Baz-b-t-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: t-Baz-b-t
+            v: t/Baz-b.t
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: t-Baz-b-t-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c0
+            href: t-Baz-t-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: t-Baz-t
+            v: t/Baz.t
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: t-Baz-t-subroutine
+            v: 100
+        - 
+          branch: 
+            class: c0
+            href: t-Foo-t-branch
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            href: t-Foo-t
+            v: t/Foo.t
+          pod: 
+            class: c0
+            v: 0
+          runs: 1
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            href: t-Foo-t-subroutine
+            v: 100
+        - 
+          _class: partial_summary
+          branch: 
+            class: c0
+            v: 0
+          condition: 
+            class: c0
+            v: 0
+          file: 
+            v: t
+          pod: 
+            class: c0
+            v: 0
+          runs: ~
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            v: 100
+          time: 
+            class: c0
+            v: 0
+      summary: 
+        - 
+          branch: 
+            class: c1
+            v: 61.1111111111111
+          condition: 
+            class: c1
+            v: 55.5555555555556
+          file: 
+            v: Total coverage
+          pod: 
+            class: c0
+            v: 33.3333333333333
+          runs: ~
+          statement: 
+            class: c3
+            v: 91.588785046729
+          subroutine: 
+            class: c3
+            v: 95.4545454545455
+          time: 
+            class: c0
+            v: 0
+metadata: 
+  title: Coverage summary
+  version: 0.05

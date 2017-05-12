@@ -1,0 +1,52 @@
+{
+   "abstract" : "calculate week of the year (ISO 8601 weeks, or 'CPAN weeks')",
+   "author" : [
+      "Neil Bowers <neil@bowers.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-WeekNumber",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Date::Calc" : "0",
+            "Exporter" : "0",
+            "POSIX" : "0",
+            "Scalar::Util" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Date-WeekNumber",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Date-WeekNumber.git",
+         "web" : "https://github.com/neilb/Date-WeekNumber"
+      }
+   },
+   "version" : "0.05"
+}
+

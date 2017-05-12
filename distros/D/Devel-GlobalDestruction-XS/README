@@ -1,0 +1,34 @@
+NAME
+    Devel::GlobalDestruction::XS - Faster implementation of the
+    Devel::GlobalDestruction API
+
+SYNOPSIS
+        use Devel::GlobalDestruction;
+
+DESCRIPTION
+    This is an XS backend for Devel::GlobalDestruction and should be used
+    through that module.
+
+AUTHORS
+    Yuval Kogman <nothingmuch@woobling.org>
+
+    Florian Ragwitz <rafl@debian.org>
+
+    Jesse Luehrs <doy@tozt.net>
+
+    Peter Rabbitson <ribasushi@cpan.org>
+
+    Arthur Axel 'fREW' Schmidt <frioux@gmail.com>
+
+    Elizabeth Mattijsen <liz@dijkmat.nl>
+
+    Graham Knop <haarg@haarg.org>
+
+COPYRIGHT
+    Copyright (c) 2008 - 2013 the Devel::GlobalDestruction::XS "AUTHORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

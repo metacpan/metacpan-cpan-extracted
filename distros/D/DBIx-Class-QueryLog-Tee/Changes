@@ -1,0 +1,7 @@
+Revision history for DBIx-Class-QueryLog-Tee
+
+0.001001  2016-08-28 21:47:58-07:00 America/Los_Angeles
+ - Fix SYNOPSIS (Thanks Felix Ostmann!)
+
+0.001000  2014-02-26 13:37:38CST-0600 America/Chicago
+ - Initial Release

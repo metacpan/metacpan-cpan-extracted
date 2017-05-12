@@ -1,0 +1,10 @@
+<html>
+<body>
+<h1>holla</h1>
+<form method="POST" action="/">
+	<input type="text" name="привет" value="">
+	<input type="submit">
+</form>
+
+</body>
+</html>

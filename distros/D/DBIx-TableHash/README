@@ -1,0 +1,507 @@
+NAME
+    DBIx::TableHash - Tie a hash to a mysql table + SQL utils
+
+SYNOPSIS
+        use DBIx::TableHash;
+        my $DBHash = DBIx::TableHash->create_or_die
+        (my $Params =
+         {
+             DBIDriver      => 'mysql', 
+             Database       => 'mydatabase',
+             HostName       => 'localhost', 
+             Port           => undef,
+             Login          => '',
+             Password       => '',
+
+             TableName      => 'SalesPeople',
+             KeyField       => 'FullName',  
+
+             ## For multi-key lookup:
+             FixedKeys      => {AreaCode   => 415,
+                                StatusCode => 'Active',
+                                RecordType => 'Primary'},
+         
+             ## To retrieve a single value:
+             ValueField     => 'PhoneNumber',
+
+             ## ... or for "multi-value" retrieval...
+             ValueField     => undef,
+
+             ## ... optionally specifying...
+             RetrieveFields => [qw(Title Territory Quota)],
+        
+             ## For caching:
+             CacheMode => 'CacheBeforeIterate'
+             ## or...
+             CacheMode => 'CacheOneTime'
+             ## or...
+             CacheMode => 'CacheNone'
+            }
+         );
+
+        my %DBHash; tie(%DBHash, 'DBIx::TableHash', $Params);
+
+        my $DBHash = DBIx::TableHash->create($Params) or die "Help!";
+        my $DBHash = DBIx::TableHash->create_or_die($Params);
+
+        my $DBHash = DBIx::TableHash->create_copy($Params) or die "Help!";
+        my $DBHash = DBIx::TableHash->create_copy_or_die($Params);
+
+OVERVIEW
+    All parameters are passed via a single anonymous hash.
+
+    All parameters are optional, but you'll almost always need to specify
+    Database, TableName, and KeyField.
+
+    Omitting ValueField puts the hash in "multi-value" mode, where you
+    store/retrieve a hash of fields/values instead of a single value. In
+    "multi-value" mode all fields in each record are retrieved on every
+    fetch; RetrieveFields limits fields retrieved to a specified list.
+
+    Specifying FixedKeys puts the hash in "multi-key" mode, in which only a
+    subset of the database table, corresopnding to records that match the
+    spec in FixedKeys, is operated on.
+
+    Cache modes reduce querying, but lose synchronization and hog memory.
+
+    The object is designed to be easy subclass. Try making a subclass that
+    sets defaults for all or most of the parameters, so the caller doesn't
+    have to supply any at instantiation time.
+
+    "create_copy" methods efficiently create and return potentially huge
+    untied hash "snapshot" of the same data that would have been retrieved
+    by the corresponding tied hash.
+
+DETAILS
+    The DBHash object is designed to tie a hash to a table or a subset of
+    records in a table in a DBI database (only tested with mysql in the
+    current version, but expected to work with any vendor).
+
+    If the table only has a single KeyField, which this modules assumes to
+    be a unique key field in the table, then the hash keys are stored and
+    retrieved in that field, and the values are saved in and returned from
+    the ValueField. Records are automatically created and deleted as the
+    hash is used like any other hash. (If the table is read-only, be sure
+    not to try to store into the tied hash!)
+
+    To access only a subset of the records in a table, you may specify hash
+    of "FixedKeys", which is a hash mapping OTHER field names to fixed
+    values that those fields must have for all lookups, updates, and inserts
+    done via the hash interface. This sets up a virtual hash corresponding
+    to a subset of the table where N key fields are fixed at given values
+    and a different key field may vary.
+
+    There are several ways to use this module.
+
+    Quick and dirty mode (single-key, single-value) using tie:
+
+        use DBIx::TableHash;
+        my %PhoneNumbers;
+        tie (%PhoneNumbers, 'DBIx::TableHash', 
+             {Database      => 'mydatabase', 
+              TableName     => 'SalesPeople',
+              KeyField      => 'FullName',
+              ValueField    => 'PhoneNumber'})
+            or die "Failed to connect to database";
+
+    Then you can use %PhoneNumbers like any hash mapping FullName to
+    PhoneNumber. Any retrieval of data results in corresponding SQL queries
+    being made to the database. Modifying the hash modifies the database.
+
+    Even quicker mode using create():
+
+    For convenience, you can use the create() class method to do the tying
+    for you. It creates an anonymous hash, ties it and, returns it. It takes
+    the same parameters as new() and tie().
+
+        use DBIx::TableHash;
+        my $PhoneNumbers = DBIx::TableHash->create(......)
+            or die "Failed to connect to database";
+
+    Quicker still using create_or_die():
+
+        use DBIx::TableHash;
+        my $PhoneNumbers = DBIx::TableHash->create_or_die(......);
+
+    create() carps and returns undef if it can't connect to the database.
+
+    create_or_die() croaks (dies) your program, with the same error message
+    as create() would have given.
+
+    Normally, create() will carp() (warn) you with an error message upon
+    failure, and return undef.
+
+    If you would have handled your error by saying "or die", and ar
+    comfortable with create's error message rather than your own, then
+    create_or_die() is for you.
+
+    Using one of the create() methods instead of new() and tie() works with
+    all of the different modes discussed below, and all parameters are the
+    same either way.
+
+    Cooler subclassing mode:
+
+    You can create a simple subclass that provides default parmas in an
+    initialize method so they don't have to be provided by the caller ...
+
+        ### MyCompany/SalesPhoneHash.pm:
+
+        #!/usr/bin/perl
+
+        use strict;
+
+        package   MyCompany::SalesPhoneHash;
+        use       vars qw(@ISA);
+        use       DBIx::TableHash;
+        @ISA = qw(DBIx::TableHash);
+
+        sub initialize
+        {
+            my $this = shift;
+
+            $this->{Database}   ||= 'mydatabase';   ## Name of database to connect to.
+            $this->{TableName}  ||= 'SalesPeople';  ## Table in which to store the data
+            $this->{KeyField}   ||= 'FullName';     ## Name of the key field
+            $this->{ValueField} ||= 'PhoneNumber';  ## Name of the value field.
+
+          done:
+            return($this->SUPER::initialize());
+        }
+        1;
+
+    Then to use the object, your script merely does:
+
+        use MyCompany::SalesPhoneHash;
+        my %PhoneNumbers = MyCompany::SalesPhoneHash->create_or_die();
+
+    Of course, when instantiating a subclass, if you wish you can still
+    override any parameters you wish, as long as the initialize() method in
+    the subclass uses ||= rather than = to set defaults for any unspecified
+    parameters.
+
+    Multi-key mode:
+
+    You may also use the "FixedKeys" parameter to specify a hash of some
+    additional key fields and their fixed values that must match exactly for
+    any records that are retrieved, deleted, or created by the tied object,
+    effectively allowing the hash to operate on only a subset of the data in
+    the database. This is typically helpful in a multi-keyed table where,
+    for the purposes of your script, all key values should be fixed except
+    one (and that one is the hash key).
+
+        use DBIx::TableHash;
+        my $PhoneNumbers = 
+            DBIx::TableHash->
+                create_or_die(
+                              {Database     => 'mydatabase', 
+                               TableName    => 'SalesPeople',
+                               KeyField     => 'FullName',
+                               ValueField   => 'PhoneNumbers',
+                               FixedKeys        =>
+                               {AreaCode        => 415,
+                                StatusCode      => 'Active',
+                                RecordType      => 'Primary'}});
+
+    Multi-value mode:
+
+    If instead of getting and setting a single value, you'd like to get or
+    set a hash of all fields in the record, simply don't specify ValueField,
+    and the object will use "multi-value" mode, where an entire record, as a
+    hash, is gotten or set on each fetch or store. Feel free to combine this
+    mode with multi-key mode.
+
+    When storing a record in multi-value mode, if the record already exists,
+    only the specified fields are overwritten. If it did not already exist,
+    then only the specified fields will be written and the others will be
+    NULL or defaulted according to the table schema.
+
+    When storing a record in multi-value mode, you can't change the values
+    of the primary key field or any other key field specified in FixedKeys
+    (if any), since that would mess up the whole point of this module which
+    is to leave the main key and fixed keys fixed while mucking with the
+    other values in the record. Any changed values in key fields are simply
+    ignored.
+
+        use DBIx::TableHash;
+        my $SalesPeopleTable = 
+            DBIx::TableHash->
+                create_or_die(
+                              {Database     => 'mydatabase', 
+                               TableName    => 'SalesPeople',
+                               KeyField     => 'FullName'});
+
+        my $SalesPersonFullName = "Joe Jones";
+        my $EntireRecord = $SalesPeopleTable->{$SalesPersonFullName};
+
+    When fetching records in multi-value mode, you can limit the list of
+    returned fields to a subset of all available fields in case there might
+    be some very big ones that you don't want to waste bandwidth getting.
+    Just set the RetrieveFields parameter to an anonymous list of the fields
+    you care to retrieve. (This setting does not limit the fields you can
+    SET, just the ones that get retrieved.)
+
+        use DBIx::TableHash;
+        my $SalesPeopleTable = 
+            DBIx::TableHash->
+                create_or_die(
+                              {Database     => 'mydatabase', 
+                               TableName    => 'SalesPeople',
+                               KeyField     => 'FullName',
+                               RetrieveFields=> [qw(Territory Quota)]});
+
+    Warning:
+
+    In multi-value mode, you might expect that this:
+
+        $Hash->{$MyKey}->{FieldX} = 'foo';
+
+    would set the value of the FieldX field in the appropriate record in the
+    database. IT DOES NOT.
+
+    This is because the anonymous hash returned by $Hash->{$MyKey} is not in
+    any way tied back to the database. You'd have to retrieve the record
+    hash, change any value in it, and then set $Hash->{$MyKey} back to it.
+
+    Making the above syntax work with a multi-valued tied hash to set a
+    value in the database is a possible future enhancement under
+    consideration by the author. Let me know if you would like to have that
+    work.
+
+    In the meanwhile, here's how you do could do it:
+
+        (my $Record = $Hash->{$MyKey})->{FieldX} = 'foo';
+        $Hash->{$MyKey}->{FieldX} = $Record;
+
+    WARNING: If you use the above approach to update a record in multi-value
+    mode, beware that there's potentially a race condition in the above code
+    if someone else updates the same record after you've copied it but
+    before you've modified and set it. So use this technique with caution
+    and understanding. If in doubt, don't use this module and instead use an
+    SQL query to update the record in a single transaction. Only you know
+    the usage patterns of your database, the concurrency issues, and the
+    criticality of errors.
+
+    Caching modes:
+
+    The object has several ways it can cache data to help minimize the
+    number of SQL queries to the database, at the expense of potentially
+    dramatically increased memory usage. The following cache parameters can
+    be specified to enable caching:
+
+        CacheMode => 'CacheBeforeIterate'
+
+        CacheMode => 'CacheOneTime'
+
+    To disable caching, specify:
+
+        CacheMode => 'CacheNone'
+
+    (You can also assign undef to CacheMode, but you'll get warnings.)
+
+    Normally, every time you fetch a value from the hash, it makes an SQL
+    query to the database. This, of course, is the intended and normal mode
+    of operation.
+
+    Unfortunately, in Perl, just calling values(%Hash) or each(%Hash) or
+    even copying the hash with {%Hash} results in a separate FETCH, and
+    consequently, a separate SQL query made by this module, for each item.
+    This could result in thousands of queries just to fetch all the values
+    from a thousand-item table in the database.
+
+    However, often you want to iterate over all the elements of a hash
+    without it having to go back to the database and issue another query for
+    each item that you retrieve.
+
+    Using the 'CacheBeforeIterate' mode, all keys and values are cached upon
+    each call to FIRSTKEYS (i.e. at the start of any iteration or
+    enumeration). Then, any subsequent calls to FETCH data from the hash
+    retrieve it from the cache instead of doing an SQL query. STORING or
+    DELETING any items from the hash results in them being stored and
+    deleted from both the database and the cache.
+
+    Using the CacheOneTime mode, the full cache is built at object
+    instantiation and time never fully rebuilt. In fact, its contents never
+    change unless you make alterations by using it to store into and/or
+    delete from the database.
+
+    CACHE WARNING: With both caching modes, of course, you must be
+    comfortable with the fact that the data being retrieved is a "snapshot"
+    of the database and consequently will not reflect updates done by other
+    parties during the lifetime of the object; it will only reflect updates
+    that you make by storing or deleting values from it. If other people are
+    using the database simultaneously, your cache and the actual data could
+    "drift" out of agreement. This is mainly dangerous to you, not others,
+    unless you then go make updates to the data based on potentially
+    outdated values.
+
+    All modes may be combined...
+
+    All modes and parameters are orthogonal, so any combination of
+    parameters may be specified, with the exception that the RetrieveFields
+    parameter is only meaningful when ValueField is not unspecified.
+
+    With subclassing, you may create objects that pre-specify any
+    parameters, even those that affect the major modes of operation. For
+    example, you may combine the subclassing technique and the multi-key
+    mode to make an object that accesses only the appropriate subset of a
+    multi-keyed table without requiring any parameters to be supplied by the
+    caller.
+
+    Getting a COPY of the data instead of a tied hash:
+
+    What if you just want a big copy -- a snapshot -- of the data in the
+    table, in a regular old hash that's no longer tied to the database at
+    all? (Memory constraints be damned!)
+
+    Just use the create_copy() or create_copy_or_die() methods. They work
+    just like create() and create_or_die(), but instead of returning a tied
+    object, they just return a potentially huge hash containing a copy of
+    all the data.
+
+    In other words:
+
+       create_copy()        is equivalent to: {%{create() || {} }}
+       create_copy_or_die() is equivalent to: {%{create_or_die()}}
+
+    ... but the _copy methods are more efficient because internally, a
+    caching mode is used to minimize the queries to the database and
+    generate the hash as efficiently as possible.
+
+    In all other respects, create_copy() and create_copy_or_die() perform
+    exactly like their non-copying namesakes, taking all the same
+    parameters, except CacheMode which is not relevant when making a static
+    copy.
+
+    Please remember that the object returned by the _copy methods is no
+    longer tied to the database.
+
+PARAMETER SUMMARY
+    The full list of recognized parameters is:
+
+    DBI Parameters
+
+        Param       Default         Description
+        ------------------------------------------------------------------------
+        DBIDriver   'mysql'         Name of DBI driver to try to use (only
+                                        mysql has currently been tested by the
+                                        author).
+
+        HostName    'localhost'     Host name containing the database and table;
+
+        Port        undef           Port number if different from the standard.
+    
+        Login       ''              Login to use when connecting, if any.
+
+        Password       ''               Password to use when connecting, if any.
+
+    SQL Parameters
+
+        Param       Default         Description
+        ------------------------------------------------------------------------
+        Database    ''              Name of database to connect to.
+
+        TableName   ''              Table to connect to.
+
+        KeyField    ''              Name of field in which lookup key is found.
+
+        ValueField  ''              Name of field to pull value from.
+                                    If empty or undef, then a
+                                    multi-value hash is used both for
+                                    saving and retrieving.  This is
+                                    called "multi-value mode".
+
+    Module Parameters
+
+        Param       Default         Description
+        ------------------------------------------------------------------------
+        FixedKeys   {}              If supplied, gives names and
+                                    fixed, hardcoded values that other
+                                    keys in the table must have; this
+                                    effectively limits the scope of
+                                    the tied hash from operating over
+                                    the entire table to operating over
+                                    just the subset of records that
+                                    match the values in FixedKeys.
+                                    This is called "multi-key mode".
+
+        RetrieveFields  []          In multi-value mode, limits the
+                                    fields that are retrieved; default
+                                    is all fields in the record.
+
+SUPPORT
+    I am unable to provide any technical support for this module. The whole
+    reason I had to make it was that I was way too busy (lazy?) to write all
+    that SQL code...
+
+    But you are encouraged to send patches, bug warnings, updates, thanks,
+    or suggestions for improvements to the author as listed below.
+
+    Just be aware that I may not have time to respond. Please be sure to put
+    the name of this module somewhere in the Subject line.
+
+    The code is a pretty simple tied hash implementation, so you're on your
+    own to debug it. If you're having trouble debugging via the "tie"
+    interface, try instantiating an object directly (or retrieving it when
+    you tie (see perltie)) and calling its methods individually. Use the
+    debugger or Data::Dumper to dump intermediate values at key points, or
+    whatever it takes. Use your database server logs if you want to see what
+    SQL code is getting generated. Or contribute a debugging mode to this
+    module which prints out or logs the SQL statements before executing
+    them.
+
+BUGS/GOTCHAS
+    Problem: If you iterate or enumerate the hash, all keys get pulled in
+    from the database and stay stored in memory for the lifetime of the
+    object. FIRSTKEY, which is called every time you do a keys(), each() or
+    any full iteration or enumeration over the tied hash (such as copying
+    it) retrieves and hangs on to a full list of all keys in KeyField. If
+    the keys are long or there are lots of them, this could be a memory
+    problem. (Don't confuse this with CacheMode in which BOTH keys AND
+    values are stored in memory.)
+
+    Solutions:
+
+        1) Don't iterate or enumerate.  Just fetch and store.
+        2) Only iterate or enumerate on short tables. 
+        3) LValue or RValue hash slices should be safe to do.
+
+INSTALLATION
+    Using CPAN module:
+
+        perl -MCPAN -e 'install DBIx::TableHash'
+
+    Or manually:
+
+        tar xzvf DBIx-TableHash*gz
+        cd DBIx-TableHash-?.??
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SEE ALSO
+    The DBIx::TableHash home page:
+
+        http://christhorman.com/projects/perl/DBIx-TableHash/
+
+    The implementation in TableHash.pm.
+
+    The perlref and perltie manual pages.
+
+    The mysql home page:
+
+        http://mysql.com/
+
+THANKS
+    Thanks to Mark Leighton Fisher <fisherm@tce.com> for providing a patch
+    to fix -w support (change in standard "none" setting of CacheMode from
+    undef to CacheNone).
+
+AUTHOR
+    Chris Thorman <chthorman@cpan.org>
+
+    Copyright (c) 1995-2002 Chris Thorman. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,15 @@
+
+
+This archive contains the distribution DarkSky-API,
+version 0.05:
+
+  The Dark Sky API lets you query for short-term 
+precipitation forecast data at geographical points inside
+the United States.
+
+This software is copyright (c) 2012 by Martin-Louis Bright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

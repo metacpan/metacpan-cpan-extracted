@@ -1,0 +1,27 @@
+#!/usr/bin/perl -w
+#-------------------------------------------------------
+# Quick and dirty test script
+#-------------------------------------------------------
+
+use strict;
+use Data::Walker qw(:direct);
+
+my $s = {
+
+	a => [ 10, 20, "thirty" ],
+	b => { 
+		"w" => "forty", 
+		"x" => "fifty", 
+		"y" => 60,
+		"z" => \70,
+	},
+	c => sub { print "I'm a data structure!\n"; },
+	d => 80,
+};
+
+$s->{e}      = \$s->{d};
+$s->{b}->{v} =  $s->{b};   #recursive 
+
+### Data::Walker->cli($s);
+
+1;

@@ -1,0 +1,83 @@
+==================================================
+Changes from 2012-02-19 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.22 at 2017-02-17 19:58:46 +0000
+-----------------------------------------
+
+  Change: e7c1612ee42609a3bf1a26a92b974d2c57077609
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-17 19:58:46 +0000
+
+    Switch to using my plugin bundle. No functional changes 
+
+-----------------------------------------
+version 0.20 at 2017-02-17 19:48:24 +0000
+-----------------------------------------
+
+  Change: 55e6cb74cbd28f02ca0b6d102d4e8f68d7314c80
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-17 19:48:24 +0000
+
+    Actually pass the bundle arg to the distini generator 
+
+-----------------------------------------
+version 0.18 at 2017-02-17 17:41:28 +0000
+-----------------------------------------
+
+  Change: b180e89d968cf246c4b711421737b69794203f40
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-17 17:41:28 +0000
+
+    Added bundle parameter
+
+    dzooky --bundle BINGOS
+
+    Use the BINGOS plugin bundle instead of the default dist.ini 
+
+-----------------------------------------
+version 0.16 at 2015-06-05 14:55:47 +0000
+-----------------------------------------
+
+  Change: 1f281b5fd86abe27755f38122183d11d5d40983a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-06-05 15:55:47 +0000
+
+    Add 'metafile' command to examine existing META.* files 
+
+-----------------------------------------
+version 0.14 at 2014-11-06 10:43:20 +0000
+-----------------------------------------
+
+  Change: cc7f6bccc60e3356ee54c823bba5ebf5333f04ca
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-11-06 10:43:20 +0000
+
+    Release engineering for 0.14 
+
+  Change: cf1d01296db09418ad1f4b15db2fa197926b33fe
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-11-06 10:23:48 +0000
+
+    Adjusted the regex in the distini test 
+
+  Change: a89432dc27eba73219c2845bd6d8e042c248fc8a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-11-06 10:22:16 +0000
+
+    Handle licenses that don't have new() 
+
+-----------------------------------------
+version 0.12 at 2013-11-29 00:16:10 +0000
+-----------------------------------------
+
+  Change: 71f8e66cef9aeef9980c9b363747042a67b94966
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-11-29 00:16:10 +0000
+
+    [RT#90933] "New Moose may break your code" 
+
+================================================
+Plus 5 releases after 2012-02-19 00:00:00 +0000.
+================================================

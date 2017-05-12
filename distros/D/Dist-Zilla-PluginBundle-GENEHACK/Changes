@@ -1,0 +1,68 @@
+Changes file for Dist-Zilla-PluginBundle-GENEHACK
+
+0.700     2015-04-11 21:55:46-07:00 America/Los_Angeles
+
+  * No changes from last dev release. (See dev release changes.)
+
+0.6_06    2015-04-11 21:53:46-07:00 America/Los_Angeles
+
+  * Try commit then tag
+
+0.6_05    2015-04-11 21:47:37-07:00 America/Los_Angeles
+
+  * Fix version badge
+  * Add Git::Push
+
+0.6_04    2015-04-11 21:42:43-07:00 America/Los_Angeles
+
+  * Relocate PkgVersion to silence warning.
+
+0.6_03    2015-04-11 21:30:49-07:00 America/Los_Angeles
+
+  * Another crack at proper release archive/commit combo
+
+0.6_02    2015-04-11 21:26:43-07:00 America/Los_Angeles
+
+   * Hopefully fix release archiving working with committing
+
+0.6_01    2015-04-11 21:06:38-07:00 America/Los_Angeles
+
+   * Huge update and re-organization of plugins
+   * Remove PWP::Encoding dependancy (Sergey Romanov)
+
+0.6       2012-05-21 06:28:13 America/New_York
+
+   * Munge DZP::Git::NextVersion first_version
+   * Properly add DZP::CopyFilesFromBuild
+   * Add Pod::Weaver::Plugin::Encoding prereq
+   * update copyright year
+   * Remove Kwalitte stuff
+
+0.5       2012-04-22 15:43:08 America/New_York
+
+    * Bogus release, testing twitter integration...
+
+0.4       2012-04-22 15:40:16 America/New_York
+
+    * s/ReadmeFromPod/ReadmeMarkdownFromPod/
+    * CopyFilesFromBuild, copy => README.mkdn
+    * +Git::Commit, +Git::Tag
+
+0.3       2011-09-27 09:09:04 America/New_York
+
+    * Deal with deprecated modules
+
+0.2       2011-07-08 21:38:14 America/New_York
+
+    * Add GithubMeta
+
+0.1       2011-04-22 17:11:01 America/New_York
+
+    * Remove GitFmtChanges
+    * Add CheckContentHasChanges
+    * change first_version to 0.1
+      - also fix stupid typo...
+
+0.04
+
+    Hadn't been maintaining Changes file. Bad coder, no cookie.

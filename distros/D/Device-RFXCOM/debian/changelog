@@ -1,0 +1,67 @@
+libdevice-rfxcom-perl (1.142000-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess (Debian Packages) <soft-debian@temporalanomaly.com>  Sat, 19 Jul 2014 13:21:31 +0100
+
+libdevice-rfxcom-perl (1.110800-1) unstable; urgency=low
+
+  * Fix some windows test errors.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 21 Mar 2011 20:05:29 +0000
+
+libdevice-rfxcom-perl (1.110471-1) unstable; urgency=low
+
+  * Fix sensor device name.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed, 16 Feb 2011 22:23:50 +0000
+
+libdevice-rfxcom-perl (1.110470-1) unstable; urgency=low
+
+  * Add electrisave battery reporting - thanks to dmb on xpl-perl trac.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed, 16 Feb 2011 22:05:18 +0000
+
+libdevice-rfxcom-perl (1.110440-1) unstable; urgency=low
+
+  * Minor test portability fixes.
+  * CM119 channel fixes and more test coverage.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 13 Feb 2011 20:54:26 +0000
+
+libdevice-rfxcom-perl (1.110430-1) unstable; urgency=low
+
+  * Initial CM119 support.  Thanks to Guigui Abloc and Bert.
+  * Fix serial port setup (issue #1).  Thanks to maxatome.
+  * Fix test error in W800 test script.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 12 Feb 2011 11:21:41 +0000
+
+libdevice-rfxcom-perl (1.103260-2) unstable; urgency=low
+
+  * Dependency fixes.
+  * Minor lintian fixes.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 28 Nov 2010 19:27:54 +0000
+
+libdevice-rfxcom-perl (1.103260-1) unstable; urgency=low
+
+  * Improve message encoding error messages.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 22 Nov 2010 20:51:12 +0000
+
+libdevice-rfxcom-perl (1.103250-1) unstable; urgency=low
+
+  * Fix NAME sections in script Pod.
+  * Fix tests on EV event loop.
+  * Add w800-rx example script.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sun, 21 Nov 2010 10:36:52 +0000
+
+libdevice-rfxcom-perl (1.103240-1) unstable; urgency=low
+
+  * Support for Digimax sensors.
+  * More flexible handling of duplicates.
+  * Initial CPAN release extracted from my code at http://www.xpl-perl.org.uk/
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 20 Nov 2010 08:15:17 +0000

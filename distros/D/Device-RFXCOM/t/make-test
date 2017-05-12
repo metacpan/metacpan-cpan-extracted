@@ -1,0 +1,47 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use lib 'blib/lib';
+use lib 'lib';
+use Device::RFXCOM::RX;
+use t::Helpers qw/:all/;
+
+{
+  package My::RX;
+  use base 'Device::RFXCOM::RX';
+  sub _open {
+  }
+  sub _init {
+  }
+  1;
+}
+
+my $rx = My::RX->new();
+@ARGV = sort @ARGV if (@ARGV && -f $ARGV[0]);
+foreach my $test (@ARGV) {
+  my $ofh;
+  my $do_close = 0;
+  if (-f $test) {
+    my $file = $test;
+    open my $fh, '<', $file or die "Failed to read $file: $!";
+    do {
+      $test = <$fh>;
+    } while ($test =~ /^\s*$/);
+    close $fh;
+    open $ofh, '>', $file or die "Failed to write $file: $!";
+    chomp $test;
+    $do_close = 1;
+  } else {
+    $ofh = \*STDOUT;
+  }
+  print $ofh $test, "\n\n";
+  my $buf = pack 'H*', $test.'deadbeef';
+  my $res;
+  my $warn = test_warn(sub { $res = $rx->read_one(\$buf) });
+  print $ofh ($res ? $res->summary : ''),"\n\n";
+  print $ofh $warn||'', "\n\n";
+  substr $buf, -4, 4, '';
+  my $rem = unpack 'H*', $buf;
+  print $ofh $rem, "\n\n";
+  close $ofh if ($do_close);
+}

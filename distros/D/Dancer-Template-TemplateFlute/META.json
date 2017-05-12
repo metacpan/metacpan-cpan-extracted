@@ -1,0 +1,51 @@
+{
+   "abstract" : "Template::Flute wrapper for Dancer",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-TemplateFlute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "0",
+            "Template::Flute" : "0.014",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/racke/Dancer-Template-TemplateFlute.git",
+         "web" : "https://github.com/racke/Dancer-Template-TemplateFlute",
+         "x_bugtracker" : "https://github.com/racke/Dancer-Template-TemplateFlute/issues"
+      }
+   },
+   "version" : "0.0142"
+}

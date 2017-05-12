@@ -1,0 +1,52 @@
+#!/usr/bin/perl -w
+# This is an example of how we could code a JAPH using DBI and DBD::Oracle.
+#
+# Original oraperl script by Kevin Stock
+# Date:     1st December 1992
+
+use DBI;
+
+use strict;
+
+# Set trace level if '-# trace_level' option is given
+DBI->trace( shift ) if 1 < @ARGV && $ARGV[0] =~ /^-#/ && shift;
+
+die "syntax: $0 [-# trace] base user pass" if 3 > @ARGV;
+my ( $inst, $user, $pass ) = @ARGV;
+
+# Connect to database
+my $dbh = DBI->connect( "dbi:Oracle:$inst", $user, $pass,
+    { AutoCommit => 0, RaiseError => 1, PrintError => 0 } )
+    or die $DBI::errstr;
+
+# Create the sample table
+$dbh->do( "CREATE TABLE japh ( word CHAR(7), posn NUMBER(1) )" );
+
+# Loop to insert data into the table
+my $sth = $dbh->prepare( "INSERT INTO japh VALUES ( ?, ? )" );
+while ( <DATA> ) {
+    chomp;
+    $sth->execute( split ':',  $_ );
+}
+
+# Now retrieve the data, printing it word by word
+$sth = $dbh->prepare( "SELECT word FROM japh ORDER BY posn" );
+$sth->execute;
+my $word;
+$sth->bind_columns( {}, \$word );
+$sth->{ChopBlanks} = 1; # Wouldn't you rather use VARCHAR2 instead of CHAR?
+while ( $sth->fetch ) {
+    print " $word";
+}
+$sth->finish;
+print "\n";
+
+# delete the table
+$dbh->do( 'DROP TABLE japh' );
+$dbh->disconnect;
+
+__END__
+DBI:3
+another:2
+hacker:4
+just:1

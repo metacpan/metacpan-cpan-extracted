@@ -1,0 +1,26 @@
+---
+abstract: 'skip the install rule of MakeMaker'
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MakeMaker-SkipInstall
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::CheckChangeLog: '0'
+  File::Copy: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Test::Fatal: '0'
+  Test::More: '0.92'
+resources:
+  repository: http://github.com/melo/dist-zilla-tools
+version: '1.201'
+x_serialization_backend: 'YAML::Tiny version 1.69'

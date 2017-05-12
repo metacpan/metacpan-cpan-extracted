@@ -1,0 +1,121 @@
+NAME
+    Data::Digest - Objects that represent a digest values
+
+SYNOPSIS
+      $digest = Data::Digest->new(
+          'MD5.d41d8cd98f00b204e9800998ecf8427e'
+      );
+  
+      $digest = Data::Digest->new(
+          'SHA-256' => '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU',
+      );
+  
+      $digest->matches( \$data );
+      $digest->matches( $filename );
+
+DESCRIPTION
+    The "Data::Digest" class provides utility objects that represents a
+    digest value. It is used primarily as a convenience and to simplify code
+    when dealing with situations where you are provided with a digest, and
+    need to check it against some data.
+
+    It initially supports 4 different digest types, (MD5, SHA-1, SHA-256 and
+    SHA-512) to provide varying strengths of checking. The default, which is
+    intended for speed and basic non-cryptographic file integrity checking,
+    is MD5.
+
+    Users hand-crafting guest specifications may want to use a stronger
+    digest.
+
+METHODS
+  new
+      # Two-argument digest constructor
+      $digest = Data::Digest->new(
+          'SHA-256' => '47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU',
+      );
+  
+      # One-argument digest constructor
+      $digest = Data::Digest->new(
+          'MD5.d41d8cd98f00b204e9800998ecf8427e'
+      );
+
+    The "new" constructor takes one or two strings parameters, and creates a
+    new digest object, that can be stored or used to compared the digest
+    value to existing data, or a file.
+
+    The basic two-argument form takes the name of a supported digest driver,
+    and the digest value.
+
+    The digest driver is case sensitive and should be one of 'MD5', 'SHA-1',
+    'SHA-256' or 'SHA-512'. (case sensitive)
+
+    The second param should be a string containing the value of the digest
+    in either binary, hexidecimal or base 64 format.
+
+    The constructor will auto-detect the encoding type.
+
+    For example, for a 128-bit MD5 digest, the constructor will allow a
+    16-character binary string, a 32-character hexedecimal string, or a
+    22-character base 64 string.
+
+    Returns a "Data::Digest" object, or throws an exception on error.
+
+  driver
+    The "driver" accessor returns the digest driver name, which be one of
+    either 'MD5', 'SHA-1', 'SHA-256' or 'SHA-512'.
+
+  digest
+    The "digest" accessor returns the digest value, in the original format.
+
+    This could be either binary, hexidecimal or base 64 and without knowing
+    what was originally entered you may not necesarily know which it will
+    be.
+
+  as_string
+    The "as_string" method returns the stringified form of the digest, which
+    will be equivalent to and suitable for use as the value passed to the
+    single-parameter form of the constructor.
+
+      print $digest->as_string . "\n";
+      > MD5.d41d8cd98f00b204e9800998ecf8427e
+
+    Returns a string between around 15 and 90 characters, depending on the
+    type and encoding of the digest value.
+
+  matches
+      # Check the digest against something
+      $digest->matches( $filename  );
+      $digest->matches( $io_handle );
+      $digest->matches( \$string   );
+
+    The "matches" methods checks the digest object against various forms of
+    arbitrary data to determine if they match the digest.
+
+    It takes a single parameter, consisting of either the name of a file, an
+    IO::Handle object, or the reference to a "SCALAR" string.
+
+    Returns true if the digest matches the data, false if not, or throws an
+    exception on error.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Digest>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    Digest, Digest::MD5, Digest::SHA
+
+COPYRIGHT
+    Copyright 2006 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

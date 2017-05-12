@@ -1,0 +1,747 @@
+2011-05-10
+
+    * Applies patch from Mark Alway for situation where min, hour, and
+    sec are all '00'. However, a reminder that you should be using the
+    DateTime modules instead.
+
+2009-08-19 09:23  rbowen
+
+    * No functional changes in this revision, just a move to svn and a
+    cleanup of the documentation, removing references to long-defunct
+    URLs, and adding references to the datetime.perl.org project, where
+    you really should be looking for all of your Perl datetime needs.
+
+2003-01-18 15:11  rbowen
+
+	* MANIFEST (1.10): Added license to manifest
+
+2003-01-18 15:10  rbowen
+
+	* LICENSE (1.1): Put LICENSE in the distribution, since we had
+	never made it clear what license we were distributing under.
+
+2003-01-18 15:09  rbowen
+
+	* lib/Date/ICal.pm (1.72): Patch received from Martijn, to make
+	days_this_year run faster.
+
+2003-01-13 07:23  rbowen
+
+	* lib/Date/ICal.pm (1.71), t/08offset.t (1.10): Make
+	_offset_(from|to)_seconds into offset_(from|to)_seconds. ie. make
+	them public functions, rather than hidden ones, since they are
+	useful from more places than just inside the module. Requested by
+	Martijn.
+
+2003-01-10 15:57  rbowen
+
+	* Makefile.PL (1.20): Had this patch for a long time. Requires a
+	particular verion of prereq's for functionality that we are using.
+
+2002-08-31 22:46  rbowen
+
+	* t/: 02normalize.t (1.4), 03components.t (1.3), 04epoch.t (1.3),
+	05ical.t (1.2), 06add.t (1.7), 07compare.t (1.2): Change a bunch of
+	tests from ok() to is() in order that 'make test' will report more
+	useful things on failure.
+
+2002-08-31 22:37  rbowen
+
+	* t/01sanity.t (1.7): Moved from ok() tests to is() tests, in order
+	to get more useful failure messages.
+
+2002-06-26 17:21  rbowen
+
+	* lib/Date/ICal.pm (1.70): Documentation bug. new() does not in
+	fact accept a 'tz' argument.
+
+2002-02-07 06:33  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.61, Date-ICal-1_69): Bumping up the
+	version number on Duration.pm so that CPAN reports useful
+	information about what the latest version is.
+
+2002-02-07 06:32  rbowen
+
+	* lib/Date/ICal.pm (1.69), t/08offset.t (1.9) (utags:
+	Date-ICal-1_69): Remove skip in test, and actually test the
+	localtime functionality.  Adjust seconds the correct direction in
+	the ical method.
+
+2002-01-21 14:44  jesse
+
+	* lib/Date/ICal.pm (1.68): Date::ICal->new bitched if you were
+	setting an epoch time and had even an offset of "0". That's not
+	useful to anyone. it now explicitly checks to make sure an offset
+	isn't 0 before bitching.
+
+2001-12-27 21:15  rbowen
+
+	* lib/Date/ICal.pm (1.67), t/12add.t (1.1, Date-ICal-1_69): We are
+	now able to use + and += to add durations (either a string or a
+	Date::ICal::Duration object) to a Date::ICal object. Added tests
+	for same.
+
+2001-12-26 21:37  rbowen
+
+	* t/: 09greg.t (1.2), 10subtract.t (1.5) (utags: Date-ICal-1_69):
+	Spacing changes (courtesy of perltidy) in the tests, so that I can
+	better read what is going on here. No functional change.
+
+2001-12-26 21:27  rbowen
+
+	* Makefile.PL (1.19, Date-ICal-1_69): Add a vim syntax highlighting
+	line to the Change log file so that it looks pretty.
+
+2001-12-26 21:25  rbowen
+
+	* lib/Date/ICal.pm (1.66): No longer need to do strange workaround
+	to subtract dates resulting in negative duration. It Just Works
+	(tm).
+
+2001-12-26 21:07  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.10), t/11duration.t (1.5,
+	Date-ICal-1_69): Permit the creation of Duration objects with
+	negative attributes. Note that all attributes have to have the same
+	sign. Mixed-sign attributes will result in the entire duration
+	being negative. This could stand to be documented more clearly. 
+	Also, all accessors have been modified to explicitly return undef
+	if that attribute has zero value. I'm not sure if this is desired,
+	but it's the way that it is documented, and what the tests expect. 
+	Tests added to verify all this stuff.
+
+2001-12-26 20:21  rbowen
+
+	* Makefile.PL (1.18): Add the Duration documentation to the README
+	on make dist
+
+2001-12-26 20:15  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.9): Code folds. No functional
+	change.
+
+2001-12-26 15:55  rbowen
+
+	* lib/Date/ICal.pm (1.65), t/10subtract.t (1.4): A small
+	work-around because D::I::Duration does not correctly handle
+	negative arguments yet. See diff 1.7 -> 1.8 of
+	Date::ICal::Duration.  When D::I::Duration correctly handles
+	negative arguments, this patch should be mostly reversed.  Added
+	tests for subtracting dates to get negative duration.
+
+2001-12-26 15:50  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.8): This is step one. Components now
+	return signed. And the 'sign' argument is being honored now, rather
+	than being discarded. Need to add tests for this stuff. Still does
+	not correctly handle negative arguments.
+
+2001-12-20 16:04  rbowen
+
+	* lib/Date/ICal.pm (1.64), t/10subtract.t (1.3): Added the ability
+	to subtract durations from a date, either as a Date::ICal::Duration
+	object, or as a ICal duration string. Tests to match.
+
+2001-12-20 10:20  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.7): Documentation: The parameter is
+	'ical' not 'string' to create an object with an ical duration
+	string.
+
+2001-12-19 07:52  rbowen
+
+	* Makefile.PL (1.17), README (1.4): As suggested, generatel README
+	at release time, rather than having it in CVS.
+
+2001-12-18 21:24  rbowen
+
+	* README (1.3), lib/Date/ICal.pm (1.63): Bring README up to date
+	with the POD. Minor POD fix in ICal.pm
+
+2001-12-18 21:21  rbowen
+
+	* lib/Date/ICal.pm (1.62): Patch from Yitzchak. Adds day_of_week
+	method. Other minor POD fixes.
+
+2001-12-16 19:21  rbowen
+
+	* MANIFEST (1.9, Date-ICal-1_69, Date-ICal-1_61): Added
+	t/11duration.t to MANIFEST
+
+2001-12-16 19:06  rbowen
+
+	* Makefile.PL (1.16, Date-ICal-1_61): Added warning back in about
+	possibly changing API.
+
+2001-12-16 17:15  rbowen
+
+	* Makefile.PL (1.15), lib/Date/ICal.pm (1.61, Date-ICal-1_61),
+	t/10subtract.t (1.2, Date-ICal-1_61): sub subtract in Date::ICal
+	now uses Date::ICal::Duration objects, rather than doing its own
+	math. Added tests to test this functionality, and some TODO notes
+	for what I would like it to do in the near future.
+
+2001-12-16 17:14  rbowen
+
+	* lib/Date/ICal/Duration.pm (1.6, Date-ICal-1_61): Added sub
+	as_days to return the number of days without weeks %'ed out.  And
+	some code folding foo.
+
+2001-12-16 16:54  coral
+
+	* lib/Date/ICal/Duration.pm (1.5): Extracting clarity from
+	Duration.pm's synopsis is HARD.
+
+2001-12-16 16:52  rbowen
+
+	* t/11duration.t (1.4, Date-ICal-1_61): Removes some redundant 'my'
+	in tests.
+
+2001-12-16 16:30  coral
+
+	* lib/Date/ICal/Duration.pm (1.4): TODO: Figure out what we're
+	going to do with sign data.
+
+2001-12-16 16:12  srl
+
+	* lib/Date/ICal/Duration.pm (1.3): Added code for accesors and
+	as_elements.
+
+2001-12-16 16:11  srl
+
+	* t/11duration.t (1.3): Added tests for as_elements and for
+	accessors.  Added a new sign() read-only accessor.
+
+2001-12-16 15:47  srl
+
+	* lib/Date/ICal/Duration.pm (1.2): Fleshed out some more of the
+	methods; this is largely drawn from Net::ICal::Duration, which I
+	expect to be replaced by this module.
+
+2001-12-16 15:45  srl
+
+	* t/11duration.t (1.2): Added more tests for Duration
+	functionality.
+
+2001-12-16 15:14  rbowen
+
+	* Changes (1.3), Makefile.PL (1.14): Take Changes out of cvs.
+	Autogenerate it on make dist.
+
+2001-12-16 15:11  rbowen
+
+	* MANIFEST (1.8): Add Changes to the manifest so that it gets
+	shipped with the dist.
+
+2001-12-14 21:24  rbowen
+
+	* Changes (1.2): Updated change log to include the entire project,
+	using cvs2cl
+
+2001-12-14 00:29  rbowen
+
+	* INTERNALS (1.2, Date-ICal-1_69, Date-ICal-1_61): Remove
+	inaccurate and/or outdates notes about the internals. Once the
+	internals stabilize, I'll write something more useful here.
+
+2001-12-14 00:27  rbowen
+
+	* Changes (1.1): Starter Changes file. Jesse said something about
+	generating a Changes file from CVS, which is what this is. Perhaps
+	his is a little more pleasant looking
+
+2001-12-14 00:01  rbowen
+
+	* lib/Date/ICal.pm (1.60): Primarily documentation updates.
+
+2001-12-14 00:01  rbowen
+
+	* README (1.2, Date-ICal-1_61): Bring README up to date with the
+	module.
+
+2001-12-13 22:20  rbowen
+
+	* MANIFEST (1.7), lib/Date/ICal.pm (1.59), t/06add.t (1.6,
+	Date-ICal-1_69, Date-ICal-1_61): Patch submitted by Yitzchak to
+	make add() DWIMier, to permit more reliable subtraction of dates
+	via the add() method, and tests to make sure that it is all doing
+	what it should. Also provides the eom_mode parameter to make adding
+	months do what you expect ALL THE TIME. All tests still pass. 
+	Yitzchak++
+
+2001-12-13 17:33  srl
+
+	* lib/Date/ICal/Duration.pm (1.1), t/11duration.t (1.1): Added
+	Date::ICal::Duration trivial skeleton and basic tests. API comments
+	welcome; code coming soon.
+
+2001-12-12 21:58  rbowen
+
+	* lib/Date/ICal.pm (1.58), t/10subtract.t (1.1): Possible
+	implementation of subtraction of dates. Comments welcomed.
+
+2001-12-12 19:25  rbowen
+
+	* MANIFEST (1.6), Makefile.PL (1.13): ICal.pm has (finally!) moved
+	into lib/Date where it should have been to begin with.
+
+2001-12-11 10:12  rbowen
+
+	* lib/Date/ICal.pm (1.57): I've removed some warnings, because we
+	are basically warning when people use documented default behavior.
+	This is very irritating. I also need to update the documentation so
+	that it is more clear on this point, but for the moment, this
+	scratches my immediate itch. --DrBacchus
+
+2001-12-08 22:30  rbowen
+
+	* Makefile.PL (1.12): Memoize no longer a prereq
+
+2001-11-30 22:25  rbowen
+
+	* lib/Date/ICal.pm (1.56): This is, I believe, the intent of
+	Yitzchak's first two patches. There is no content in this diff,
+	just style things. Ran perltidy on it to make the whole file
+	conform to agreed-upon style standards. And standardized the usage
+	of code folding characters.
+
+2001-11-30 12:02  rbowen
+
+	* Makefile.PL (1.11): Need Test::More to support skip().
+
+2001-11-27 21:00  rbowen
+
+	* lib/Date/ICal.pm (1.55), t/06add.t (1.5): Able to add n years to
+	a date via the add method. Tests to match.
+
+2001-11-26 09:38  rbowen
+
+	* MANIFEST (1.5): Most of the tests are not making it into the
+	distribution, because the MANIFEST never got updated.
+
+2001-11-24 13:57  rbowen
+
+	* lib/Date/ICal.pm (1.54): Oops. I reversed the order of the
+	argument list when I added this function back in, thereby breaking
+	all code that was calling it.
+
+2001-11-24 11:25  rbowen
+
+	* lib/Date/ICal.pm (1.53): Since _seconds_from_offset returns a
+	number, not a string, we only need the sign if it is negative.
+	Resolves some test failures that I was seeing in t/08offset.t for
+	negative offsets.
+
+2001-11-23 22:42  rbowen
+
+	* lib/Date/ICal.pm (1.52): Resolves one of the test failures in
+	offset/add - when add crossed a day boundary by virtue of a
+	difference in seconds, it was not compenting in the day value, and
+	could end up with negative times.
+
+2001-11-23 22:15  rbowen
+
+	* Makefile.PL (1.10): There is no longer a module called
+	Pod::Tests. It is now called Test::Inline.
+
+2001-11-23 22:11  rbowen
+
+	* lib/Date/ICal.pm (1.51): Added back in days_this_year method
+	using new greg2jd method.
+
+2001-11-23 22:03  rbowen
+
+	* Makefile.PL (1.9): There are no embedded tests at this time, so
+	this is generating bogus test failures. Uncomment if you add inline
+	tests back in.
+
+2001-11-23 21:54  rbowen
+
+	* lib/Date/ICal.pm (1.50), t/09greg.t (1.1, Date-ICal-1_61): This
+	is Yitzchak's patch to give us much more efficient gregorian <->
+	julian conversions, and to remove strange anomolous problems in the
+	17th and 18 centuries. Note that we lose a few internal methods
+	here, at least one of which I'll be putting back in a minute.
+
+2001-11-22 05:56  srl
+
+	* lib/Date/ICal.pm (1.49), t/08offset.t (1.8, Date-ICal-1_61): This
+	version incorporates a patch by Yitzchak Scott-Thoennes to adjust
+	the offset() API. It no longer takes integer seconds as a
+	parameter, because there's no programmatic way to tell the
+	difference between, say, +3600 (UTC+1 in seconds) and +3600
+	(UTC+36, if you interpret that as an HHMM value).
+	
+	I also refactored things a bit, creating an _offset_from_seconds
+	method to match _offset_to_seconds; this should eliminate some
+	duplication. There's also new POD to clear up some confusion about
+	new(offset => foo) used together with offset().
+
+2001-11-22 04:22  srl
+
+	* lib/Date/ICal.pm (1.48): API-consistency patch from Yitzchak
+	Scott-Thoennes <sthoenna@efn.org>; Makes the ical() method take a
+	hash of parameters, not a hashref, so that ical() is like the other
+	methods. This crept in around 1.44, and it shouldn't have. My
+	mistake.
+
+2001-11-22 04:02  srl
+
+	* lib/Date/ICal.pm (1.47): Fixed some 5.6isms; patch contributed by
+	Yitzchak Scott-Thoennes <sthoenna@efn.org>.
+
+2001-11-15 08:25  srl
+
+	* lib/Date/ICal.pm (1.46), t/08offset.t (1.7): Minor patches to
+	tests; another piece of optimization from Mike Heins.
+
+2001-11-15 00:32  srl
+
+	* benchmark.pl (1.1, Date-ICal-1_69, Date-ICal-1_61),
+	lib/Date/ICal.pm (1.45), t/08offset.t (1.6): Added benchmark.pl to
+	help developers in optimizing the module.  Also modified new() to
+	warn more clearly if the $TZ environment variable isn't set, and
+	not to utterly fail tests if $TZ isn't there.
+
+2001-11-15 00:11  srl
+
+	* lib/Date/ICal.pm (1.44), t/08offset.t (1.5): Further patches from
+	Mike Heins, plus some documentation from me:	    - added
+	localtime argument to ical() for output in localtime.	  Added
+	documentation about the localtime argument. Note	    that
+	$ENV{$TZ} is now relevant to some of the module's behavior.    -
+	removed a memoize() that wasn't providing significant speed    
+	improvements.	      - minor optimization of _calc_local_offset
+
+2001-11-14 23:20  srl
+
+	* lib/Date/ICal.pm (1.43): Committed another small patch by Mike
+	Heins, which precalculates the values returned by the months()
+	function so that the module is faster at runtime.
+
+2001-11-14 23:11  srl
+
+	* lib/Date/ICal.pm (1.42): Another patch from Mike Heins
+	(mheins@minivend.com); an optimizing cheat for leapyears; uses a
+	precalculated table of values instead of always calculating
+	leapyear values. I edited Mike's patch slightly so that @leapcheat
+	isn't a package global.
+
+2001-11-14 22:58  srl
+
+	* lib/Date/ICal.pm (1.41): Incorporated part of a patch by Mike
+	Heins (mheins@minivend.com); an optimization. Internal storage of
+	julian times is now in $self->{julian} and $self->{julsec}, instead
+	of using an array.  This gives us slightly better speed. Also, made
+	some of the UTC behaviors slightly more consistent.
+
+2001-10-16 06:33  srl
+
+	* lib/Date/ICal.pm (1.40), t/01sanity.t (1.6, Date-ICal-1_69,
+	Date-ICal-1_61), t/02normalize.t (1.3, Date-ICal-1_69,
+	Date-ICal-1_61), t/03components.t (1.2, Date-ICal-1_69,
+	Date-ICal-1_61), t/04epoch.t (1.2, Date-ICal-1_69, Date-ICal-1_61),
+	t/06add.t (1.4), t/08offset.t (1.4): Further fixes to the offset()
+	method. This code isn't as well-tested as I'd like it to be, but it
+	seems to do the right thing for all the tests that are there. I had
+	to revise many of the tests, because the API semantics have
+	changed. Times must now be explicitly specified with a Z in order
+	to be handled as UTC.
+
+2001-10-14 21:58  rbowen
+
+	* MANIFEST (1.4): Rename Readme to README, per request of coral
+
+2001-10-14 21:56  rbowen
+
+	* README (1.1), Readme (1.3): coral says README is prefered to
+	Readme, wrt CPAN. I had no opinions either way, so here it is.
+
+2001-10-09 22:58  srl
+
+	* lib/Date/ICal.pm (1.39), t/08offset.t (1.3): Added some tests,
+	reorganized some code to prepare spaces for offset/timezone-aware
+	output. Added at least one test that's known to fail for purposes
+	of knowing when we succeed. :)
+
+2001-10-09 00:28  srl
+
+	* lib/Date/ICal.pm (1.38), t/08offset.t (1.2): Started working on
+	code to properly handle times with offsets from GMT.  added a new
+	_calc_local_offset method to figure out what the current machine's
+	UTC offset is. We need tests for this that will work in any
+	timezone; patches welcome.
+
+2001-09-30 09:19  lotr
+
+	* lib/Date/ICal.pm (1.37): * Oops, forgot some bits when I added
+	month to add() * use overload for compare
+
+2001-09-29 07:01  lotr
+
+	* lib/Date/ICal.pm (1.36): Add the ability to add months to a date.
+	Needed for Net::ICal::Recurrence
+
+2001-09-26 11:26  lotr
+
+	* lib/Date/ICal.pm (1.35), t/06add.t (1.3): * fix off-by-one error
+	in months() and add tests for that
+
+2001-09-11 23:26  rbowen
+
+	* lib/Date/ICal.pm (1.34): There's no particular reason to have
+	Date::ICal be 5.6 dependant.
+
+2001-08-25 08:20  rbowen
+
+	* lib/Date/ICal.pm (1.33), t/06add.t (1.2): Fixed bug reported by
+	Chris Jones. In sub add, I was checking one attribute and using
+	another. Added tests for this bug, and for adding durations by
+	attribute.
+
+2001-08-09 23:27  srl
+
+	* lib/Date/ICal.pm (1.32), t/08offset.t (1.1): Started adding
+	timezone support by making an offset() method and an offset
+	property. This still needs to be wired into the new() method and
+	the output methods, but we have to resolve some interface details
+	first.
+
+2001-08-06 22:41  rbowen
+
+	* lib/Date/ICal.pm (1.31): Test::More gets angry if there are no
+	tests.
+
+2001-08-06 22:30  rbowen
+
+	* lib/Date/ICal.pm (1.30): Moved the inline tests into t/ for the
+	sake of making the module more readable. Please don't let this
+	discorage you from writing inline tests.
+
+2001-08-06 22:25  rbowen
+
+	* t/: 04epoch.t (1.1), 05ical.t (1.1, Date-ICal-1_69,
+	Date-ICal-1_61), 06add.t (1.1), 07compare.t (1.1, Date-ICal-1_69,
+	Date-ICal-1_61): Moved a lot of tests out of the module into .t
+	files.
+
+2001-08-06 15:32  rbowen
+
+	* Makefile.PL (1.8), lib/Date/ICal.pm (1.29): Creating an object
+	without args was calling gmtime( $args{epoch} ).  Fixed and added
+	tests. Also added Time::HiRes to PREREQ list.
+
+2001-08-06 14:45  rbowen
+
+	* lib/Date/ICal.pm (1.28): sub epoch was referencing another sub
+	that has gone away. Fixed, and added tests.
+
+2001-08-02 00:38  srl
+
+	* lib/Date/ICal.pm (1.27): Adjusted the add() method to return a
+	copy of $self instead of the return value of $self->jd(). This was
+	important to making the Net::ICal tests pass, but it's also the
+	Right Way, I think.
+
+2001-08-01 23:47  rbowen
+
+	* lib/Date/ICal.pm (1.26): Handle negative durations correctly.
+
+2001-07-31 22:19  rbowen
+
+	* lib/Date/ICal.pm (1.25): Two main changes here.  1) Split the
+	internal date/time representation into date, time integers, so that
+	we don't have any more roundoff error.	2) Memoized the parsetime
+	and parsedate methods, so that we're not doing that three times
+	every time we want three components, which we were doing.
+
+2001-07-31 22:17  rbowen
+
+	* Makefile.PL (1.7): Added Memoize, Storable to prereq list, so
+	that I can memoize some functions.
+
+2001-07-31 07:43  rbowen
+
+	* lib/Date/ICal.pm (1.24): Create a new D::I object using another
+	D::I object (or subclass) as the initial value. This allows for
+	immediate conversion of a date from one calendar format to another,
+	which was one of my main goals to start with. :-)
+
+2001-07-27 12:24  rbowen
+
+	* lib/Date/ICal.pm (1.23), t/03components.t (1.1): Creating objects
+	from components was not working. Fixed.
+
+2001-07-26 14:36  rbowen
+
+	* MANIFEST (1.3), lib/Date/ICal.pm (1.22): Removed unused internal
+	methods.  Updated ToDo list.
+
+2001-07-26 14:14  rbowen
+
+	* INTERNALS (1.1): Discussion of the internals, and the limitations
+	thereof.
+
+2001-07-26 11:49  rbowen
+
+	* lib/Date/ICal.pm (1.21): To compare two dates, just need to
+	compare their mjd representation.
+
+2001-07-26 11:21  rbowen
+
+	* Readme (1.2): Generated from POD
+
+2001-07-26 11:19  rbowen
+
+	* MANIFEST (1.2): Added Readme
+
+2001-07-25 21:32  srl
+
+	* Makefile.PL (1.6): Added a requirement for Time::Local to the
+	Makefile.PL.
+
+2001-07-25 21:04  srl
+
+	* Makefile.PL (1.5): Did a release tag on Date-ICal-1_20, since
+	DrBacchus forgot to; then added a line for Date::Leapyear in the
+	PREREQ section of Makefile.PL.
+
+2001-07-25 19:31  rbowen
+
+	* t/: 01sanity.t (1.5), 02normalize.t (1.2) (utags:
+	Date-ICal-1_20): Updated tests for changes to ICal. Removed some
+	that are no longer relevant. "fixed" some due to round-off error.
+	This all works, for some slightly relaxed definition of "works".
+	After releasing, we need to be a little more rigorous.
+
+2001-07-25 19:29  rbowen
+
+	* lib/Date/ICal.pm (1.20, Date-ICal-1_20): Complete rewrite.
+	Internals all changed. More discussion on the mailing list.
+
+2001-07-23 23:21  srl
+
+	* lib/Date/ICal.pm (1.19): Added a minor fix to Date::ICal to allow
+	accessors to be set to 0.
+
+2001-07-23 22:28  rbowen
+
+	* Readme (1.1, Date-ICal-1_20): Readme generated from POD
+
+2001-07-23 21:54  srl
+
+	* Makefile.PL (1.4, Date-ICal-1_20), lib/Date/ICal.pm (1.18)
+	(utags: date-ical-1_18_01): Minor spelling corrections. Also, added
+	a note about the future Julian rework to TODO, and a note about
+	failing tests in Makefile.PL.
+
+2001-07-08 01:17  srl
+
+	* lib/Date/ICal.pm (1.17): Added some arithmetic-verification tests
+	to Date::ICal--- they all fail currently. The problems are related
+	to addition when the parameter is a duration string--- unit
+	rollover seems to be breaking, and second values seem to be
+	particularly off.
+
+2001-07-07 22:24  rbowen
+
+	* lib/Date/ICal.pm (1.16): Should not attempt to calculate an epoch
+	time for dates outside of the epoch. Added tests also.
+
+2001-07-07 18:20  rbowen
+
+	* Makefile.PL (1.3): Pod::Tests and Test::More are prereq's for
+	this module.
+
+2001-07-07 15:44  rbowen
+
+	* lib/Date/ICal.pm (1.15): ICal is now the only authoritative
+	internal format, as far as I can tell. There are still some parts
+	of this that confuse me, but epoch is being recalculated from ICal
+	when it is requested. We need to make sure that if epoch is called
+	for dates outside of the epoch, that we warn. That is not being
+	done yet. But all tests currently pass. At least for me. There are
+	probably some timezone dependencies still, and I'd appreciate some
+	tests by folks in other timezones. However, I did not comment out
+	any tests in order to make it pass the tests. In fact, I added
+	several.
+
+2001-07-07 15:25  rbowen
+
+	* t/01sanity.t (1.4, date-ical-1_18_01): It helps if you are
+	actually testing the right object.
+
+2001-07-07 00:10  srl
+
+	* lib/Date/ICal.pm (1.7), t/01sanity.t (1.3): Adjusted some tests
+	in Date::ICal to use == in tests instead of eq.
+	
+	Tried to adjust some mistakes in Date::ICal's 01sanity.t so that
+	those tests will pass, but no luck. Dates before the epoch are
+	still failing.
+
+2001-07-06 13:05  rbowen
+
+	* lib/Date/ICal.pm (1.6): Calling accessor methods rather than hash
+	keys. Certain attributes get calculated the first time you call the
+	method, rather than being calculated up front, in case you never
+	actually need it. All Pod::Tests now succeed.
+
+2001-07-05 22:37  srl
+
+	* lib/Date/ICal.pm (1.5): Added a bunch of tests for some error
+	conditions in Date::ICal.
+	
+	In particular, we need to check out the results of the accessors,
+	and we need to decide whether they're supposed to return numbers
+	with leading zeroes.
+
+2001-07-03 23:33  rbowen
+
+	* t/00load.t (1.2, Date-ICal-1_69, Date-ICal-1_61, Date-ICal-1_20,
+	date-ical-1_18_01): Moved to Test::More for added readability
+
+2001-07-03 23:33  rbowen
+
+	* t/01sanity.t (1.2): Moved the test to Test::More. Uncommented
+	several failing tests, so that I have some motivation to fix the
+	problem. Ran perltidy. I know, it's a fetish ...
+
+2001-07-02 22:55  srl
+
+	* lib/Date/ICal.pm (1.4): Committed a bunch of tests for Date::ICal
+	that are failing; I don't have a solution, but I wanted to share
+	this in hopes someone can help.
+
+2001-06-29 14:07  lotr
+
+	* lib/Date/ICal.pm (1.3): _epoch_from_ical:    fix to change month
+	and year to be in the format timegm expects in	  the DATE-TIME
+	case, just like the DATE case already had
+
+2001-06-27 22:22  srl
+
+	* Makefile.PL (1.2), lib/Date/ICal.pm (1.2): Implemented the
+	compare() function (with tests) for Date::ICal.
+	
+	Added a section in the Makefile.PL to compile the embedded tests
+	into a t/ file.
+	
+	Corrected some of the podtests that were already in D::I, because
+	pod2test didn't like them.
+
+2001-06-27 20:53  rbowen
+
+	* MANIFEST (1.1.1.1, Date-ICal-1_20, date-ical-1_18_01),
+	Makefile.PL (1.1.1.1), lib/Date/ICal.pm (1.1.1.1), t/00load.t
+	(1.1.1.1), t/01sanity.t (1.1.1.1), t/02normalize.t (1.1.1.1,
+	date-ical-1_18_01) (utags: Date-ICal-1_14): Moving Date::ICal to
+	sourceforge reefknot repository. I hope I don't regret this.
+
+2001-06-27 20:53  rbowen
+
+	* MANIFEST (1.1), Makefile.PL (1.1), lib/Date/ICal.pm (1.1),
+	t/00load.t (1.1), t/01sanity.t (1.1), t/02normalize.t (1.1):
+	Initial revision
+

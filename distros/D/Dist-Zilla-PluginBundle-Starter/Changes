@@ -1,0 +1,17 @@
+0.005     2017-04-06 21:36:59 EDT
+  - Revision 2 added. Please check documentation for details.
+    - [Pod2Readme] used to generate standard README instead of [ReadmeAnyFromPod].
+    - inherit_version defaulted to 0 in [MetaProvides::Package].
+    - Added installer option to support different installer plugins.
+
+0.004     2016-04-22 14:24:43 EDT
+  - Documentation updates
+
+0.003     2016-04-14 21:28:20 EDT
+  - Documentation updates
+
+0.002     2016-04-13 03:16:29 EDT
+  - Added a Starter minting profile
+
+0.001     2016-04-08 14:54:56 EDT
+  - First release

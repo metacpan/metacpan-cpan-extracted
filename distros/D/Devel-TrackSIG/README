@@ -1,0 +1,71 @@
+NAME
+    Devel::TrackSIG - Track those pesky signal handlers
+
+SYNOPSIS
+    At the VERY start of your script:
+
+      use Devel::TrackSIG;
+
+    Then, somewhen deep inside the codebase:
+
+      warn "Foo\n"; # WHY DOESN'T THIS GO TO MY SCREEN?
+
+    So you add a debugging line like this:
+
+      print STDERR tied(%SIG)->get_source('__WARN__');
+      warn "Foo\n"; # WHY DOESN'T THIS GO TO MY SCREEN?
+
+    Or more comprehensively like this:
+
+      tied(%SIG)->dump_all_sources;
+      warn "Foo\n"; # WHY DOESN'T THIS GO TO MY SCREEN?
+
+DESCRIPTION
+    Let's face it, signal handlers are a mess. Sometimes, output simply
+    disappears into a maze of twisty little handlers all alike and YOU
+    CANNOT FIND OUT WHY!
+
+    Well, now you can. Maybe. This module tells you where each and every
+    signal handler in effect was set.
+
+    Doing this requires some ugly hacks, so don't leave this in production
+    code!
+
+  Import Options
+    When loading the module, you can pass any of two named options:
+
+    track_source (default: 1)
+      When enabled, all writing %SIG accesses are tracked for later
+      reporting.
+
+    report_write_access (default: 0)
+      Always shows a stack trace on writing %SIG access.
+
+  get_source
+    Given the name of the signal handler you care about, returns the
+    backtrace from its origin.
+
+  dump_all_sources
+    Dumps all signal handlers origin backtraces to STDERR. Includes those
+    signal handlers for which the last access was actually deletion. (Except
+    for falling out of scope due to a "local". In this case, we revert to
+    the previous backtrace.)
+
+AUTHOR
+    Steffen Mueller, "smueller@cpan.org"
+
+ACKNOWLEDGMENT
+    This module was originally developed for booking.com. With approval from
+    booking.com, this module was generalized and put on CPAN, for which the
+    author would like to express his gratitude.
+
+COPYRIGHT AND LICENSE
+     (C) 2010-2011 Steffen Mueller. All rights reserved.
+ 
+     This code is available under the same license as Perl version
+     5.8.1 or higher.
+ 
+     This program is distributed in the hope that it will be useful,
+     but WITHOUT ANY WARRANTY; without even the implied warranty of
+     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

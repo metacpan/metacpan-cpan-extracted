@@ -1,0 +1,13 @@
+NAME
+    Dist::Zilla::Plugin::PodWeaverIfPod - Apply PodWeaver if there is
+    already Pod
+
+SYNOPSIS
+    In your Dist::Zilla `dist.ini':
+
+        [PodWeaverIfPod]
+
+DESCRIPTION
+    Dist::Zilla::Plugin::PodWeaverIfPod will only PodWeaver a .pm if there
+    appears to be Pod there (i.e. a `=head1' section).
+

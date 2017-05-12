@@ -1,0 +1,33 @@
+Revision history for Perl extension Data::TemporaryBag.
+
+0.09 Wed Jan 25 16:13:33 2006
+	- Changed to create temporary files in tmpdir(). $TempPath is obsolete now.
+
+0.08 Thu Jan 29 00:15:00 2004
+	- Segmentation fault occurred under a certain condition. Fixed.
+						(Thanks to David K. Watson)
+
+0.07 Mon Dec 15 22:45:00 2003
+	- Changed an implementation of length method.
+	- Removed some warnings.
+
+0.06 Sun Nov 11 00:00:00 2002
+	- Minor fix to pass -w.
+
+0.05 Thu Oct 17 01:18:00 2002
+	- Added a manager of opened temporary files.
+	- Rewrote substr method.
+
+0.04 Mon Dec  3 22:26:00 2001
+	- Fixed mistake in 0.03.
+
+0.03 Mon Dec  3 22:02:00 2001
+	- Minor fix to pass -w.
+
+0.02 Tue Nov 27 17:17:47 2001
+        - The new object didn't initialize properly - fixed.
+
+0.01 Wed Oct 31 22:55:57 2001
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Data::TemporaryBag
+

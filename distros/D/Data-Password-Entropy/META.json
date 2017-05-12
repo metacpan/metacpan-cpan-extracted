@@ -1,0 +1,31 @@
+{
+   "abstract" : "Calculate password strength",
+   "author" : [
+      "Oleg Alistratov <zero@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Password-Entropy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/alistratov/data-password-entropy.git",
+         "web" : "https://github.com/alistratov/data-password-entropy"
+      }
+   },
+   "version" : "0.08"
+}

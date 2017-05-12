@@ -1,0 +1,33 @@
+---
+abstract: 'Dist::Zilla plugins for anelson'
+author:
+  - 'Andrew Nelson <anelson@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-ANELSON
+requires:
+  Dist::Zilla::Plugin::AutoMetaResources: 0
+  Dist::Zilla::Plugin::CopyFilesFromBuild: 0
+  Dist::Zilla::Plugin::Git: 0
+  Dist::Zilla::Plugin::Git::NextVersion: 0
+  Dist::Zilla::Plugin::GithubMeta: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::ReadmeMarkdownFromPod: 0
+  Dist::Zilla::Plugin::SynopsisTests: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+resources:
+  bugtracker: https://github.com/holophrastic/dist-zilla-pluginbundle-anelson/issues
+  homepage: https://github.com/holophrastic/dist-zilla-pluginbundle-anelson
+  repository: https://github.com/holophrastic/dist-zilla-pluginbundle-anelson.git
+version: 0.01

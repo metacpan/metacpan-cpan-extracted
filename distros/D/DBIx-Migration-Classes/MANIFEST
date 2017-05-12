@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-Migration-Classes.t
+t/lib/MyTestChanges/AddUserName.pm
+t/lib/MyTestChanges/CreateTableUser.pm
+t/test.pl
+lib/DBIx/Migration/Classes.pm
+lib/DBIx/Migration/Classes/Change.pm
+META.yml                                 Module meta-data (added by MakeMaker)

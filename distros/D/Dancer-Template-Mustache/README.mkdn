@@ -1,0 +1,51 @@
+# NAME
+
+Dancer::Template::Mustache - Wrapper for the Mustache template system
+
+# VERSION
+
+version 0.3.0
+
+# SYNOPSIS
+
+     # in config.yml
+    template: mustache
+
+    # in the app
+    get '/style/:style' => sub {
+        template 'style' => {
+            style => param('style')
+        };
+    };
+
+    # in views/style.mustache
+    That's a nice, manly {{style}} mustache you have there!
+
+# DESCRIPTION
+
+This module is a [Dancer](https://metacpan.org/pod/Dancer) wrapper for [Template::Mustache](https://metacpan.org/pod/Template::Mustache). 
+
+For now, the extension of the mustache templates must be `.mustache`.
+
+Partials are supported, as are layouts. For layouts, the content of the inner
+template is sent via the usual _content_ template variable. So a typical 
+mustached layout would look like:
+
+    <body>
+    {{ content }}
+    </body>
+
+# SEE ALSO
+
+The Mustache templating system: [http://mustache.github.com/](http://mustache.github.com/)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

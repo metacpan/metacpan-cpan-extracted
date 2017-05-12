@@ -1,0 +1,11 @@
+Revision history for Debug-Xray
+
+0.03    12/17/2011  
+        Streamlined watch_vars to only take a reference to a scalar and figure out the variable name from that. (Need to implement on arrays and hashes.)
+        More consistent naming. Routines with the word 'hook' in the name are changed to 'watch' to be more consistent with the watch variables routines.  
+
+0.04    12/18/2011
+        Fixed signal trapping so it could be turned off and on. It passes tests, but needs a better workout.
+
+0.05    12/20/2011
+        Got Xray.pm ready for CPAN. Put in POD and straightened things out a little.

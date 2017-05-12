@@ -1,0 +1,28 @@
+Revision history for Perl extension Device::Nest.
+
+0.01  Jul  9 2014
+    - original version; created by h2xs 1.23 with options
+      - AXc -n Device::Nest
+0.02  Jul 13 2014
+    - added methods to fetch ambient temp in F and C
+    - added method to fetch thermostat designation
+    - added more detailed documentation
+0.03  Jul 13 2014
+    - added functions to fetch all remaining parameters
+0.04  Jul 14 2014
+    - added functions to set target temperatures
+0.05  Jul 16 2014
+    - added functions to fetch and set "away" state
+0.06  Jul 16 2014
+    - added option for debug printouts
+    - added method to dump contents of $self
+0.07  July 24, 2014
+    - Added decoding of the HTTP code and reason for most recent request
+    - Added functions to fetch last code and last reason
+    - Moved common code to __process_get and __process_set
+0.08  Oct 31, 2014
+    - Added calculation of execution of Fetch commands
+    - Added function to retrieve time of last execution
+0.09  Nov 20, 2014
+    - Added fetch_Can_Cool, fetch_Can_Heat, fetch_Has_Fan, fetch_Is_Online, 
+      fetch_Is_Using_Emergency_Heat    

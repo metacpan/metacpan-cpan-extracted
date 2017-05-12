@@ -1,0 +1,59 @@
+{
+   "abstract" : "Self Contained SQLite RDBMS in a DBI Driver",
+   "author" : [
+      "Adam Kennedy <adamk@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBD-SQLite",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "util"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Spec" : "0.82",
+            "Test::More" : "0.42"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "DBI" : "1.57",
+            "ExtUtils::MakeMaker" : "6.48",
+            "File::Spec" : "0.82"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.57",
+            "Scalar::Util" : "0",
+            "Tie::Hash" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-SQLite"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/DBD-SQLite/DBD-SQLite"
+      },
+      "x_MailingList" : "http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbd-sqlite"
+   },
+   "version" : "1.54"
+}

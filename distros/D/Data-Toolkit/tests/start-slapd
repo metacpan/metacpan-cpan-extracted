@@ -1,0 +1,57 @@
+#!/bin/sh
+#
+# start-slapd
+#
+# Start the directory server and load the root entry
+
+PATH=/usr/local/openldap/libexec:/usr/local/libexec:/usr/lib/openldap:/usr/sbin:/usr/local/openldap/bin:/usr/local/openldap/sbin:/usr/local/bin:/usr/local/sbin:/usr/bin:/bin:$PATH
+export PATH
+LD_AOUT_LIBRARY_PATH=/usr/local/lib
+export LD_AOUT_LIBRARY_PATH
+
+if test ! -f slapd.conf.test
+then
+	echo "start-slapd: must be run from the directory containing slapd.conf.test" 1>&2
+	exit 1
+fi
+
+# Create the database directory if needed
+mkdir openldap-db > /dev/null 2>&1
+
+# Work out where the schema files are
+# Follow same order as PATH in case there are several copies of slapd installed
+for d in /usr/local/etc/openldap/schema /usr/local/etc/schema /usr/local/openldap/etc/schema /etc/openldap/schema
+do
+	if test -f $d/core.schema
+	then
+		SCHEMADIR=$d
+		break;
+	fi
+done
+
+if test -z "${SCHEMADIR}"
+then
+	echo "Cannot find core.schema" 1>&2
+	exit 1
+fi
+
+export SCHEMADIR
+sh slapd.conf.test > openldap-db/slapd.conf
+
+slapd	-f openldap-db/slapd.conf \
+	-h ldap://localhost:19389/
+
+RET=$?
+
+sleep 5
+ldapadd -x -H ldap://localhost:19389/ -D cn=root,dc=example,dc=org -w secret <<EOF
+dn: dc=example,dc=org
+objectclass: organization
+objectclass: dcobject
+o: The Example Organisation
+dc: example
+
+EOF
+
+exit $RET
+

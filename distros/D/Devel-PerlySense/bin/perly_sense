@@ -1,0 +1,811 @@
+#!/usr/bin/env perl
+$|++;
+use lib q|/Users/johanl/Documents/Projects/Dev/CPAN2/Devel-PerlySense/source/lib|;
+use lib "/Users/johanl/Documents/Projects/Dev/CPAN2/Devel-CoverX-Covered/trunk/source/lib";
+use lib "/home/j.lindstrom/dev/personal/p5-Devel-PerlySense/source/lib";
+
+use strict;
+
+# Must do this early to silence noisy CPAN modules which keep breaking
+# the output
+use Devel::PerlySense::Util::Log;
+BEGIN { $SIG{__WARN__} = sub { debug(@_); }; }
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use File::Path;
+use File::Find;
+use Path::Class;
+use Cache::FileCache;
+use List::Util qw/ max /;
+use List::MoreUtils qw/ any /;
+
+use lib "../lib", "lib";
+use Devel::PerlySense;
+use Devel::PerlySense::Home;
+use Devel::PerlySense::Editor;
+use Devel::PerlySense::Editor::Emacs;
+use Devel::PerlySense::Editor::Vim;
+use Time::HiRes qw/time/;
+use YAML::Tiny;
+use Cwd;
+
+use Data::Dumper;
+use Devel::TimeThis;
+
+
+main();
+
+sub main {
+
+    my $oPs = createPerlySense();
+
+    if (($ARGV[0] || "") eq "--stdin") {
+
+        chomp(my $dir = <STDIN>);
+        chomp(my $command = <STDIN>);
+        $dir && $command or warn(q|Please enter ABS_DIR\nARGV\n| . "\n"), exit(0);
+
+        chdir($dir) or warn("Could not chdir to ($dir)\n"), exit(0);
+
+        local @ARGV = split(/\s+/, $command);
+        s/^(["'])(.*)\1$/$2/ for @ARGV; #Remove quotes
+
+        eval { main_perly_sense($oPs) };
+        $@ and print $@;
+    } else {
+#     my $total = Devel::TimeThis->new("Total loop");
+#      for (1..5) {
+#          my $iteration = Devel::TimeThis->new("Iteration");
+#          local @ARGV = @ARGV;
+#          sleep(5);
+        main_perly_sense($oPs);
+#      }
+    }
+}
+
+
+
+
+
+#Oh yes, this file is in serious need of a makeover...
+sub main_perly_sense {
+    my ($oPs) = @_;
+
+    my ($dirOrigin, $fileOrigin, $module, $dir, $file, $row, $col, $sub, $nameClass, $nameMethod, $clearCache, $widthDisplay, $typeIo, $useAlternateCommand);
+    my @aShow;
+    debug("CWD: (" . getcwd() . "), ARGV: (" . join(" ", map { "|$_|" } ("perly_sense",  @ARGV)) . ")");
+
+    GetOptions(
+        "module:s"              => \$module,
+        "file:s"                => \$file,
+        "dir:s"                 => \$dir,
+        "row:i"                 => \$row,
+        "col:i"                 => \$col,
+        "sub:s"                 => \$sub,
+        "file_origin:s"         => \$fileOrigin,
+        "dir_origin:s"          => \$dirOrigin,
+        "class_name:s"          => \$nameClass,
+        "method_name:s"         => \$nameMethod,
+        "show:s"                => \@aShow,
+        "clear_cache"           => \$clearCache,
+        "use_alternate_command" => \$useAlternateCommand,
+        "width_display:s"       => \$widthDisplay,
+        "io_type:s"             => \$typeIo,
+    );
+    my ($command) = @ARGV;
+    $command or syntax("Missing command");
+
+    $typeIo ||= "editor_emacs";
+    my $rhIoClass = {
+        editor_emacs => "Devel::PerlySense::Editor::Emacs",
+        editor_vim   => "Devel::PerlySense::Editor::Vim",
+    };
+    my $classIo = $rhIoClass->{$typeIo}
+            or syntax("Invalid --io_type ($typeIo)");
+    my $oEditor = $classIo->new(
+        oPerlySense => $oPs,
+        widthDisplay => $widthDisplay,
+    );
+
+    if ($clearCache && (my $dirHomeCache = $oPs->oHome->dirHomeCache)) {
+        warn("Clearing cache directory ($dirHomeCache)\n");
+        rmtree([$dirHomeCache]); -d $dirHomeCache and die("Could not clear cache ($dirHomeCache)\n");
+        mkpath([$dirHomeCache]); -d $dirHomeCache or die("Could not re-create cache dir ($dirHomeCache)\n");
+    }
+
+
+
+
+
+    if($command eq "external_dir") {
+        print Devel::PerlySense::Editor->dirExtenal;
+    } elsif($command eq "find_module_source_file") {
+        $fileOrigin and $dirOrigin = dirname($fileOrigin);
+        $dirOrigin ||= ".";
+        $module or syntax("Missing option --module");
+
+        eval {
+            my $file = $oPs->fileFindModule(nameModule => $module, dirOrigin => $dirOrigin) || "";
+            print $file;
+        };
+        $@ and warn("Internal error: $@\n");
+
+    } elsif($command eq "find_callers") {
+        $fileOrigin and $dirOrigin = dirname($fileOrigin);
+        $dirOrigin ||= ".";
+        $sub or syntax("Missing option --sub");
+
+        eval {
+            my $callSites = $oPs->raCallSiteForMethod(
+                nameMethod => $sub,
+                dirOrigin  => $dirOrigin,
+            );
+            print $oEditor->formatOutputDataStructure(
+                rhData => { callers => $callSites },
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "visualize_callers") {
+        my $source = "";
+        # Wow, this is getty waaaay too hacky. Replace with a web server already!.
+        while(my $line = <STDIN>) {
+            chomp($line);
+            $line eq "" and last;
+            $source .= "$line\n";
+        }
+
+        eval {
+            my $rhFileCaller = $oPs->rhFileCallerVisualized(
+                source => $source,
+            );
+            print $oEditor->formatOutputDataStructure(
+                rhData => $rhFileCaller,
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "display_module_pod") {
+        $fileOrigin and $dirOrigin = dirname($fileOrigin);
+        $dirOrigin ||= ".";
+        $module or syntax("Missing option --module");
+
+        eval {
+            if(my $file = $oPs->fileFindModule(nameModule => $module, dirOrigin => $dirOrigin)) {
+                my $pod = $oPs->podFromFile(file => $file) || "";
+                print $oEditor->formatOutputDataStructure(rhData => {pod => $pod});
+            } else {
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {message => "Module ($module) not found"},
+                );
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "smart_go_to") {
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            if(my $oLocation = $oPs->oLocationSmartGoTo(
+                file => $file,
+                row => $row,
+                col => $col,
+            )) {
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        file => $oLocation->file,
+                        row  => $oLocation->row,
+                        col  => $oLocation->col,
+                    },
+                );
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "smart_doc") {
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            if(my $oLocation = $oPs->oLocationSmartDoc(
+                file => $file,
+                row => $row,
+                col => $col,
+            )) {
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        found    => $oLocation->rhProperty->{found},
+                        name     => $oLocation->rhProperty->{name},
+                        doc_type => $oLocation->rhProperty->{docType},
+                        text     => $oLocation->rhProperty->{text} || "",
+                    },
+                );
+           }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "class_overview") {
+        $file || $nameClass or syntax("Missing option --file or --class_name");
+
+        eval {
+
+            my $oClass;
+            if($file) {
+                $row or syntax("Missing option --row");
+                $col or syntax("Missing option --col");
+
+                $oClass = $oClass = $oPs->classAt(
+                    file => $file,
+                    row => $row,
+                    col => $col,
+                );
+            }
+            else {
+                $dirOrigin or syntax("Missing option --dir_origin");
+
+                $oClass = $oClass = $oPs->classByName(
+                    name => $nameClass,
+                    dirOrigin => $dirOrigin,
+                );
+            }
+
+            if($oClass) {
+                my $raClassOverviewShow = $oEditor->raClassOverviewShow;
+
+                my $raOverviewShow = $oEditor->raClassOverviewShowDefault;
+                if(@aShow) {
+                    $raOverviewShow = [ @aShow ];
+                    for my $show (@$raOverviewShow) {
+                        if( ! any(sub { $show eq $_ }, @$raClassOverviewShow) ) {
+                            my $showValuesValid = join(", ", @$raClassOverviewShow);
+                            die("Invalid --show option ($show). Valid values are: $showValuesValid\n");
+                        }
+                    }
+                }
+
+                my $overview = $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        class_name => $oClass->name,
+                        class_overview => $oEditor->classOverview(
+                            oClass => $oClass,
+                            raShow => $raOverviewShow,
+                        ),
+                        message => "Class Overview for (" . $oClass->name . ")",
+                        dir => $oClass->dirModule,
+                    },
+                );
+                debug($overview);
+                print $overview;
+            } else {
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        message => "No class found",
+                    },
+                );
+            }
+        };
+        $@ and warn("Error: $@\n");
+
+    } elsif($command eq "method_doc") {
+        $nameClass or syntax("Missing option --class_name");
+        $nameMethod or syntax("Missing option --method_name");
+        $dirOrigin or syntax("Missing option --dir_origin");
+
+        eval {
+            my $oClass = $oPs->classByName(
+                name => $nameClass,
+                dirOrigin => $dirOrigin,
+            );
+            if($oClass) {
+                if (my $oLocation = $oClass->oLocationMethodDoc(method => $nameMethod)) {
+                    print $oEditor->formatOutputDataStructure(
+                        rhData => {
+                            found    => $oLocation->rhProperty->{found},
+                            name     => $oLocation->rhProperty->{name},
+                            doc_type => $oLocation->rhProperty->{docType},
+                            text     => $oLocation->rhProperty->{text} || "",
+                        },
+                    );
+                }
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "inheritance_doc") {
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            my $oClass = $oPs->classAt(file => $file, row => $row, col => $col);
+            if($oClass) {
+                my $textInheritance = $oEditor->textClassInheritance(oClass => $oClass);
+                chomp($textInheritance);
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        class_name =>  $oClass->name,
+                        class_inheritance => $textInheritance,
+                    },
+                );
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "use_doc") {
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            my $oClass = $oPs->classAt(file => $file, row => $row, col => $col);
+            if($oClass) {
+                my $textUses = $oEditor->textClassUses(oClass => $oClass);
+                chomp($textUses);
+                print $oEditor->formatOutputDataStructure(
+                    rhData => {
+                        class_name =>  $oClass->name,
+                        class_use => $textUses,
+                    },
+                );
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    ###TODO: unify the output to use the formatOutputDataStructure,
+    ###this is just silly and doing way too much
+    } elsif($command eq "method_go_to") {
+        if($nameClass) {
+            $dirOrigin or syntax("Missing option --dir_origin");
+        }
+        elsif ($file) {
+            $row && $col or syntax("Missing option --row, and --col");
+        }
+        else {
+            syntax("Missing option --class_name or --file");
+        }
+
+        eval {
+            my $oClass;
+            if($nameClass) {
+                $oClass = $oPs->classByName(
+                    name => $nameClass,
+                    dirOrigin => $dirOrigin,
+                );
+            }
+            else {
+                $oClass = $oPs->classAt(file => $file, row => $row, col => $col);
+            }
+
+            if($oClass) {
+                my $oLocation = $oClass->oLocationMethodGoTo(method => $nameMethod);
+
+                if($nameClass) {
+                    if ($oLocation) {
+                        print join("\t", $oLocation->file, $oLocation->row, $oLocation->col);
+                    }
+                }
+                else {
+                    print $oEditor->formatOutputDataStructure(
+                        rhData => {
+                            file =>  $oLocation->file,
+                            row => $oLocation->row,
+                            col => $oLocation->col,
+                        },
+                    );
+                }
+            };
+            $@ and warn("Error: $@\n");
+        }
+
+    } elsif($command eq "base_class_go_to") {
+        ###TODO: Too much code here, push into method in Class or
+        ###PerlySense, tests
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            my $oClass = $oPs->classAt(file => $file, row => $row, col => $col);
+            if($oClass) {
+                my $oLocationSub = $oClass->oLocationSubAt(row => $row, col => $col);
+                my $nameSub = "";
+                $oLocationSub and $nameSub = $oLocationSub->rhProperty->{nameSub};
+                my $raClassInfo = [
+                    map {
+                        my $oClassBase = $_;
+
+                        my $nameBaseSub = "";
+                        my $rowBaseSub = 0;
+                        my $description = $oClassBase->name;
+                        if($nameSub) {
+                            if( my $oLocationBaseSub = $oClassBase->oLocationSub(name => $nameSub) ) {
+                                $nameBaseSub = $oLocationBaseSub->rhProperty->{nameSub};
+                                $rowBaseSub = $oLocationBaseSub->row;
+                                $description .= "->$nameBaseSub";
+                            }
+                        }
+
+                        chomp( my $class_inheritance = $oEditor->textClassInheritance(
+                            oClass => $oClassBase,
+                        ));
+                        {
+                            class_name => $oClassBase->name,
+                            class_description => $description,
+                            class_inheritance => $class_inheritance,
+                            file => $oClassBase->raDocument->[0]->file,
+                            row => $rowBaseSub,
+                        }
+                    } values %{$oClass->rhClassBase()}
+                ];
+                print $oEditor->formatOutputDataStructure(
+                    rhData => { class_list => $raClassInfo },
+                );
+            }
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "test_other_files") {
+        $file or syntax("Missing option --file");
+
+        eval {
+            $oPs->setFindProject(file => $file);
+            my $raFileTestOther = $oPs->raFileTestOther(file => $file, sub => $sub);
+            @$raFileTestOther or die("No related test files found\n");
+
+            print $oEditor->formatOutputDataStructure(
+                rhData => {
+                    other_files => $raFileTestOther,
+                    project_dir => $oPs->oProject->dirProject,
+                },
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "project_other_files") {
+        $file or syntax("Missing option --file");
+
+        eval {
+            $oPs->setFindProject(file => $file);
+            my $raFileProjectOther = $oPs->raFileProjectOther(file => $file, sub => $sub);
+            @$raFileProjectOther or die("No related project files found\n");
+
+            print $oEditor->formatOutputDataStructure(
+                rhData => {
+                    other_files => $raFileProjectOther,
+                    project_dir => $oPs->oProject->dirProject,
+                },
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "run_file") {
+        $file or syntax("Missing option --file");
+        my $commandKey = "command";
+        $useAlternateCommand and $commandKey = "alternate_command";
+
+        eval {
+            print $oEditor->formatOutputDataStructure(
+                rhData => $oPs->rhRunFile(file => $file, keyConfigCommand => $commandKey),
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "debug_file") {
+        $file or syntax("Missing option --file");
+        my $commandKey = "command";
+        $useAlternateCommand and $commandKey = "alternate_command";
+
+        eval {
+            print $oEditor->formatOutputDataStructure(
+                rhData => $oPs->rhDebugFile(file => $file, keyConfigCommand => $commandKey),
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "flymake_file") {
+        $file or syntax("Missing option --file");
+
+        eval { $oPs->flymakeFile(file => $file) };
+        if(my $err = $@) {
+            chomp($err);
+            debug($err);
+            print $err;
+        }
+
+    } elsif($command eq "create_project") {
+        $dir ||= ".";
+
+        $oPs->createProject(dir => $dir);
+        print "PerlySense Project Created\n";
+
+    } elsif($command eq "class_api") {
+        # Experimental
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            my ($package, $oApi) = $oPs->aApiOfClass(file => $file, row => $row, col => $col);
+            if($oApi) {
+                my $rhSub = $oApi->rhSub;
+                print "$package\n" . join("\n",
+                           map {
+                               sprintf("%s:%d %s", $_->{file}, $_->{row}, $_->rhProperty->{sub});
+                           } sort {
+                               $a->{file} cmp $b->{file}
+                                       or
+                               $a->{row} <=> $b->{row}
+                           }
+                           values %$rhSub
+                       );
+            }
+        };
+        $@ and warn("Error: $@\n");
+
+    } elsif($command eq "process_inc") {
+        processFilesInDirs($oPs, \@INC);
+
+    } elsif($command eq "process_project") {
+        $oPs->setFindProject(dir => $dir || ".");
+        processFilesInDirs($oPs, [ $oPs->oProject->dirProject ]);
+
+    } elsif($command eq "regex") {
+        $file or syntax("Missing option --file");
+        $row or syntax("Missing option --row");
+        $col or syntax("Missing option --col");
+
+        eval {
+            print $oEditor->formatOutputDataStructure(
+                %{ $oPs->rhRegexExample(file => $file, row => $row, col => $col) },
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "covered_subs") {
+        $file or syntax("Missing option --file");
+
+        eval {
+            print $oEditor->formatOutputDataStructure(
+                rhData => {
+                    sub_quality => $oPs->rhSubCovered(file => $file),
+                },
+            );
+        };
+        if(my $err = $@) {
+            chomp($err);
+            print $oEditor->formatOutputDataStructure( rhData => { message => $err } );
+        }
+
+    } elsif($command eq "info") {
+        $dir ||= ".";
+        $oPs->setFindProject(dir => $dir);
+
+#        print "PROJECT CONFIG: " . YAML::Tiny::Dump($oPs->rhConfig);
+        print "VERSION: (" . Devel::PerlySense->VERSION . ")\n";
+        print "PROJECT: (" . $oPs->oProject->dirProject . ")\n";
+        print "HOME: (" . $oPs->oHome->dirHome . ")\n";
+        print "HOME DEBUG LOG: (" . file($oPs->oHome->dirHome, "log", "debug.log") . ")\n";
+
+    } elsif($command eq "log_file") {
+        $dir ||= ".";
+        $oPs->setFindProject(dir => $dir);
+
+        ###TODO: extract property of Util::Log?
+        print file($oPs->oHome->dirHome, "log", "debug.log") . "\n";
+
+    } elsif($command eq "project_dir") {
+        $dir ||= ".";
+        $oPs->setFindProject(dir => $dir, file => $file);
+        print $oEditor->formatOutputDataStructure(
+            rhData => { project_dir => $oPs->oProject->dirProject },
+        );
+
+    } elsif($command eq "vcs_dir") {
+        $dir ||= ".";
+        $oPs->setFindProject(dir => $dir);
+        print $oEditor->formatOutputDataStructure(
+            rhData => {
+                project_dir => $oPs->oProject->dirProject,
+                vcs_name    => $oPs->oProject->nameVcs,
+            },
+        );
+
+    } else {
+        syntax("Invalid command ($command)");
+    }
+    return(1);
+}
+
+
+
+sub syntax {
+    my ($message) = @_;
+    print "Error: $message\n\n";    #pod2usage -msg doesn't do this for me... :(
+    pod2usage(-verbose => 2, exitval => "NOEXIT");
+    die("\n");
+}
+
+
+
+###TODO: refactor: make method in PerlySense
+sub processFilesInDirs {
+    my ($oPs, $raDir) = @_;
+
+    print file($oPs->oHome->dirHome, "log", "debug.log") . "\n";
+
+    my @aFile;
+    find({
+        wanted => sub { /\.pm$/ and push(@aFile, file($_)->absolute . ""); },
+        no_chdir => 1,
+    }, @$raDir);
+
+    my %hFileTime;
+    for my $file (@aFile) {
+        debug("Processing file ($file)");
+        my $timeStart = time();
+        eval {
+            $oPs->oDocumentParseFile($file);
+            $oPs->clearInMemoryDocumentCache();
+        };
+        $@ and debug($@);
+        my $timeDuration = time() - $timeStart;
+        $hFileTime{$file} = $timeDuration;
+        debug(sprintf("  %0.6fs", $timeDuration));
+    }
+
+    debug("REPORT");
+    for my $file (
+        sort { $hFileTime{$a} <=> $hFileTime{$b} }
+                keys %hFileTime) {
+        debug(sprintf("%0.6f : $file", $hFileTime{$file}));
+    }
+
+}
+
+
+
+sub createPerlySense {
+
+    my $oPs = Devel::PerlySense->new();
+
+    my $oHome = $oPs->oHome;
+    my $dirHomeCache = $oHome->dirHomeCache
+            or warn(
+                "Could not create cache dir in either of:\n",
+                join(":", $oHome->aDirHomeCandidate) . "\n",
+            );
+    my $oCache = Cache::FileCache->new({cache_root => $dirHomeCache})
+            or warn("Could not create cache in ($dirHomeCache)\n");
+    $oPs->oCache($oCache);
+
+    return $oPs;
+}
+
+
+
+__END__
+
+=head1 NAME
+
+perly_sense -- CLI for L<Devel::PerlySense> with support for Emacs and
+Vim output formats.
+
+
+=head1 OPTIONS
+
+perly_sense COMMAND OPTIONS
+
+(Note that these docs are incomplete. if you really need to know, read
+the source of the script).
+
+=head2 smart_go_to --file, --row, --col
+
+Look in --file at --row, --col and print a location for the origin of
+the source at that location,
+
+
+=head2 smart_doc --file, --row, --col
+
+Look in --file at --row, --col and print a smart doc text for the
+source at that location
+
+
+=head2 class_overview --file, --row, --col
+
+Look in --file at --row, --col and find the class overview for the
+package at that location. Return keys:
+
+If a class was found: class_overview, class_name, message.
+
+If a class was not found: message.
+
+On error: error.
+
+
+=head2 process_inc
+
+Process and cache all modules found in @INC
+
+
+=head2 process_project
+
+Process and cache all modules found in the current project
+
+
+=head2 --clear_cache
+
+Clears the cache before doing anything else
+
+=head2 --width_display=COLUMNS
+
+Sets the display width COLUMNS wide. Default can be configured per
+Project
+.
+
+
+=head1 SYNOPSIS
+
+perly_sense smart_doc --file=perly_sense --row=102 --col=42
+
+perly_sense smart_go_to --file=Foo/Bar.pm --row=32 --col=3
+
+perly_sense smart_doc --file=Foo/Bar.pm --row=32 --col=3
+
+perly_sense process_inc
+
+
+
+=head1 EDITOR INTEGRATION
+
+If you want to use this from within an editor/IDE you need to be able to shell
+out to call this program and to do something useful with the result using the
+editor's macro/programming facilities.
+
+=cut

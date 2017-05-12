@@ -1,0 +1,28 @@
+!Table=book
+%? $max=100
+!ContentType=text/html
+%RGV PreserveCase=1
+%T die_on_bad_params=0
+!DataSource=dbi:mysql:funlib:localhost
+!PrimKey=id
+!IgnoreEmpty=2
+$substring_search=keywords,author,title
+#!Links/-copy/!Table=book_copy,transaction,transaction_type,defaultdb.personell
+!Links/-copy/!Table=book_copy,transaction,transaction_type
+#!Links/-copy/!TabRelation=book_copy.id=transaction.book_copy and transaction_type.id=transaction.type and defaultdb.personell.login=transaction.actor
+!Links/-copy/!TabRelation=book_copy.id=transaction.book_copy and transaction_type.id=transaction.type
+!Links/-copy/!Order=transaction.created desc
+!Links/-copy/$max=1
+!Links/-copy/!LinkedField=book_copy.book
+!Links/-copy/!MainField=id
+!Links/-copy/!PrimKey=id
+!Links/-copy/$fetch_when_found_one
+!Links/-copy/$generate_booleans=type
+!Links/-copy/!ConvertTimestampMysql2Iso=created
+/nt/!Table=transaction
+/nt/!PrimKey=id
+/nt/!DataSource=dbi:mysql:funlib:localhost
+
+
+
+

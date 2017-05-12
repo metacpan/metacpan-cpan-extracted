@@ -1,0 +1,13 @@
+Revision history for Perl extension Devel::AutoProfiler.
+
+0.01  Sun Apr  7 15:28:56 2002
+	- original version; created by h2xs 1.20 with options
+		-X -n Devel::AutoProfiler
+
+1.100	- renamed module to Devel::AutoProfiler from plain AutoProfiler.
+	- now supports prototyped subroutines (Thanks Mike!)
+	- warnings about redefined subroutines are silenced.
+	- clean up the output dumped at end of execution.
+
+1.2	- user can provide own callback to format caller information
+	- use Devel::AutoProfiler( -command => sub{my(%info) = @_;} );

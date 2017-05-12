@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Dist/Zilla/Plugin/MakeMaker/IncShareDir.pm
+t/basic.t
+t/dist/share/hello.txt
+t/release-pod-syntax.t

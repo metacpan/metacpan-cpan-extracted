@@ -1,0 +1,15 @@
+0.22    Sunday, 13 September 2015
+        Tests is changed.
+
+0.21    Friday, 11 September 2015
+        Using 'Scalar::Util::reftype()' instead 'ref()'.
+
+0.2     Wednesday, 10 September 2015
+        Added new functions 'every_keys' and 'some_keys'.
+
+0.02    Monday, 16 Mar 2015
+        Renamed 'is_exists' to 'key_exists'.
+
+0.01    Sunday, 15 Mar 2015
+        First version, released on an unsuspecting world.
+

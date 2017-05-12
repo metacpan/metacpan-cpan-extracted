@@ -1,0 +1,169 @@
+#!/bin/sh
+
+# Copyright 2001-2016, Paul Johnson (paul@pjcj.net)
+
+# This software is free.  It is licensed under the same terms as Perl itself.
+
+# The latest version of this software should be available from my homepage:
+# http://www.pjcj.net
+
+set -e
+
+export AUTOMATED_TESTING=1
+export NONINTERACTIVE_TESTING=1
+
+CPANCOVER_STAGING=~/staging
+CPANCOVER_DIR=$CPANCOVER_STAGING
+DOCKER=docker
+DOCKER_IMAGE=pjcj/cpancover
+
+case "$1" in
+    "update-copyright")
+        from="${2:-$(date +'%Y' --date='last year')}"
+        to="${3:-$(date +'%Y')}"
+        echo "Updating copyright from $from to $to"
+        files=$(git ls-files)
+        # shellcheck disable=SC2086
+        perl -pi -e "s/Copyright \d+-\K$from(, Paul Johnson)/$to\$1/i" $files
+        # shellcheck disable=SC2086
+        perl -pi -e "s/Copyright $from\K(, Paul Johnson)/-$to\$1/i"    $files
+        ;;
+    "install_dependencies")
+        cpan -iTf Sereal Digest::MD5 Template Pod::Coverage::CountParents     \
+                  Capture::Tiny Parallel::Iterator Template Class::XSAccessor \
+                  Moo namespace::clean CPAN::Releases::Latest                 \
+                  < /dev/null
+        ;;
+    "nice_cpus")
+        perl -Iutils -MDevel::Cover::BuildUtils=nice_cpus -e 'print nice_cpus'
+        ;;
+    "all_versions")
+        shift
+        ./utils/all_versions "$@"
+        ;;
+    "cpancover")
+        shift;
+        jobs=$($0 nice_cpus)
+        if [ -z "$CPANCOVER_LOCAL" ]; then
+            cpancover=cpancover
+        else
+            cpancover="perl -Mblib bin/cpancover -local"
+        fi
+        if ! [ -z "$CPANCOVER_VERBOSE" ]; then
+            cpancover="$cpancover -verbose"
+        fi
+        if ! [ -z "$CPANCOVER_FORCE" ]; then
+            cpancover="$cpancover -force"
+        fi
+        cmd="$cpancover -results_dir $CPANCOVER_DIR -workers $jobs $*"
+        # echo $cmd
+        $cmd
+        ;;
+    "cpancover-compress")
+        find $CPANCOVER_DIR/ -name __failed__ -prune -o \
+                               -type f -not -name '*.gz' -not -name '*.json' \
+                               -exec gzip -f9 {} \;
+        ;;
+    "cpancover-latest")
+        $0 cpancover -latest
+        ;;
+    "cpancover-build-module")
+        module="$2"
+        $0 cpancover -local_build -docker $DOCKER -workers 1 "$module"
+        $0 cpancover-compress
+        ;;
+    "cpancover-docker-shell")
+        staging="${2:-$CPANCOVER_DIR}"
+        mkdir -p "$staging"
+        # echo $name
+        $DOCKER run -it                                    \
+            --volume=/home/pjcj/g/perl/Devel--Cover:/dc:rw \
+            --volume=$CPANCOVER_STAGING:/remote_staging:rw \
+            --workdir=/dc --rm=false                       \
+            --memory=1g                                    \
+            $DOCKER_IMAGE /bin/bash
+        ;;
+    "cpancover-docker-module")
+        module="$2"
+        name="$3"
+        staging="${4:-$CPANCOVER_DIR}"
+        mkdir -p "$staging"
+        # echo $name
+        container=$($DOCKER run -d                                     \
+                    --volume=/home/pjcj/g/perl/Devel--Cover:/dc:ro     \
+                    --volume=$CPANCOVER_STAGING:/remote_staging:ro     \
+                    --workdir=/dc --rm=false --name="$name"            \
+                    --memory=1g                                        \
+                    $DOCKER_IMAGE dc cpancover-build-module "$module")
+        # https://github.com/dotcloud/docker/issues/3986
+        echo "container is $container"
+        $DOCKER wait "$name" > /dev/null
+        if [ $? = 0 ]; then
+            $DOCKER logs "$name" > "$staging/$name.out"
+            local_staging="$staging/$name"
+            mkdir -p "$local_staging"
+            $DOCKER cp "$name:/root/staging" "$local_staging"
+            if [ -d "$local_staging" ]; then
+                sudo chmod -R 755 "$local_staging"
+                sudo find "$local_staging" -type f -exec chmod 644 {} \;
+                sudo chown -R pjcj:pjcj "$local_staging"
+                cd "$local_staging"/* || exit
+                for f in *; do
+                    if [ -d "$f" ]; then
+                        rm -rf "${staging:?}/$f"
+                        mv "$f" "$staging"
+                    fi
+                done
+                rm -r "$local_staging"
+            fi
+        fi
+        $DOCKER rm "$name"
+        ;;
+    "cpancover-generate-html")
+        echo "Generating HTML at $(date)"
+        # perl -V
+        $0 cpancover -generate_html
+        $0 cpancover-compress
+        json=$CPANCOVER_DIR/cpancover.json
+        tmp=$json-tmp-$$.gz
+        echo Compressing $json
+        pigz < $json > $tmp && mv $tmp $json.gz
+        echo Done
+        ;;
+    "cpancover-run")
+        export CPANCOVER_LOCAL=1
+        export DEVEL_COVER_CPUS=10
+        while true; do
+            echo "Starting cpancover run at $(date) on $DEVEL_COVER_CPUS cpus"
+            $0 cpancover-rm-docker  # just in case something bad happened
+            $0 cpancover-latest | $0 cpancover
+            $0 cpancover-generate-html
+            echo "Finished cpancover run at $(date)"
+            sleep 600  # 10 minutes
+        done
+        ;;
+    "cpancover-kill-docker")
+        $DOCKER ps -a | tail -n +2 | awk '{ print $1 }' | xargs -r $DOCKER kill
+        ;;
+    "cpancover-rm-docker")
+        $DOCKER ps -a | tail -n +2 | awk '{ print $1 }' | xargs -r $DOCKER rm -f
+        ;;
+    "sereal_each_bug")
+        perl="${2:-perl}"
+        $perl Makefile.PL
+        make
+        rm -rf cover_db
+        cp tests/trivial tests/change
+        $perl -Mblib -MDevel::Cover tests/change
+        cp tmp/change tests
+        $perl -Mblib -MDevel::Cover tests/change
+        $perl -Mblib bin/cover -report text
+        rm tests/change
+        ;;
+    "options")
+        perl -nE 'say $1 if /^    "([\w-]+)"\)$/ && $1 !~ /^_/' < "$0"
+        ;;
+    *)
+        echo Unknown option "$1"
+        ;;
+esac

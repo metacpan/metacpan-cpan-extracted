@@ -1,0 +1,26 @@
+NAME
+    Date::PeriodParser - Turns English descriptions into time periods
+
+SYNOPSIS
+      use Date::PeriodParser;
+      my ($midnight, $midday) = parse_period("this morning");
+      my ($monday_am, $sunday_pm) = parse_period("this week");
+      ... parse_period("sometime last September");
+      ... parse_period("around two weeks ago");
+
+DESCRIPTION
+    The subroutine "parse_period" attempts to turn the English description
+    of a time period into a pair of Unix epoch times. As a famous man once
+    said, "Of course, this is a heuristic, which is a fancy way of saying
+    that it doesn't work". I'm happy with it, though. (or at least, I will
+    be; this is currently very much a work in progress, and only knows about
+    recent dates.)
+
+    If you enter something it can't parse, it'll return an error code and an
+    explanation instead of two epoch time values. Error code -1 means "You
+    entered gibberish", error code -2 means "you entered something
+    ambiguous", and the explanation will tell you how to disambiguate it.
+
+AUTHOR
+    Simon Cozens, "simon@cpan.org"
+

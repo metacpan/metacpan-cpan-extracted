@@ -1,0 +1,79 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.003002
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.003001 2016-06-06T21:15:46Z
+
+0.003000 2016-05-28T16:13:51Z
+ [Added / test requires]
+ - Dist::Zilla::App::Tester
+ - Test::TempDir::Tiny
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.005000
+
+0.002012 2015-04-15T00:35:51Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0 → 1.005000
+
+0.002011 2015-04-13T02:42:56Z
+
+0.002010 2015-04-13T01:38:43Z
+ [Added / runtime requires]
+ - Path::ScanINC
+ - Path::Tiny
+
+ [Added / test requires]
+ - Dist::Zilla::Plugin::AutoVersion
+ - Dist::Zilla::Util::Test::KENTNL
+ - Test::DZil
+
+0.002003 2014-10-31T15:02:11Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - Moose::Autobox
+ - utf8
+
+0.002002 2014-08-15T21:14:38Z
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+0.002001 2014-07-31T10:07:33Z
+
+0.002000 2014-07-31T09:56:35Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4008
+
+ [Removed / configure requires]
+ - Module::Build 0.4008

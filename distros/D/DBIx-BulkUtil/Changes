@@ -1,0 +1,19 @@
+Revision history for Perl extension DBIx::BulkUtil.
+
+0.05  Thu May 26 18:12:23 2016
+    - Support fixed width file for sqlldr
+    - Do not save all errors from sqlldr
+
+0.04  Mon Jan 11 16:13:52 2016
+    - Remove obsolete docs.
+
+0.03  Mon Jan 11 15:13:52 2016
+    - Add functions to xbcp that were in external file.
+
+0.02  Tue Nov 24 15:13:52 2015
+    - Fixed and documented 'NoBlankNull' iq_connect option.
+
+0.01  Wed Sep 16 15:13:52 2015
+	- original version; created by h2xs 1.23 with options
+		-A -X -n DBIx::BulkUtil
+

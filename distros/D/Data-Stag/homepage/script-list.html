@@ -1,0 +1,504 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<html>
+  <head>
+    <title>Stag Script Index</title>
+    <link rel="stylesheet" type="text/css" href="./stylesheet.css">
+    </link>
+  </head>
+  <body>
+    <h1>Stag Scripts</h1>
+    <div class="intro">
+        <p>These scripts come with the stag and dbstag distributions</p>
+    </div>
+    <h2>Data::Stag Script List</h2>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-autoschema.html">stag-autoschema.pl</a>
+    </h3>
+    <div class="summary">writes the implicit stag-schema for a stag file</div>
+    <div class="codeblock">
+        <pre>
+stag-autoschema.pl -w sxpr sample-data.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Takes a stag compatible file (xml, sxpr, itext), or a file in any
+format plus a parser, and writes out the implicit underlying stag-schema
+
+stag-schema should look relatively self-explanatory.
+
+Here is an example stag-schema, shown in sxpr syntax:
+(db
+   (person*
+    (name "s"
+    (address+
+     (address_type "s")
+     (street "s")
+     (street2? "s")
+     (city "s")
+     (zip? "s")))))
+
+The database db contains zero or more persons, each person has a
+mandatory name and at least one address.
+
+The cardinality mnemonics are as follows:</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-db.html">stag-db.pl</a>
+    </h3>
+    <div class="summary">persistent storage and retrieval for stag data (xml, sxpr, itext)</div>
+    <div class="codeblock">
+        <pre>
+stag-db.pl -r person -k social_security_no -i ./person-idx myrecords.xml
+  stag-db.pl -i ./person-idx -q 999-9999-9999 -q 888-8888-8888</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Builds a simple file-based database for persistent storage and
+retrieval of nodes from a stag compatible document.
+
+Imagine you have a very large file of data, in a stag compatible
+format such as XML. You want to index all the elements of type
+B&lt;person&gt;; each person can be uniquely identified by
+B&lt;social_security_no&gt;, which is a direct subnode of B&lt;person&gt;
+
+The first thing to do is to build an index file, which will be stored
+in your current directory:
+stag-db.pl -r person -k social_security_no -i ./person-idx myrecords.xml
+
+You can then use the index "person-idx" to retrieve B&lt;person&gt; nodes by
+their social security number
+
+  stag-db.pl -i ./person-idx -q 999-9999-9999 &gt; some-person.xml
+
+You can export using different stag formats
+
+  stag-db.pl -i ./person-idx -q 999-9999-9999 -w sxpr &gt; some-person.xml
+
+You can retrieve multiple nodes (although these need to be rooted to
+make a valid file)
+
+  stag-db.pl -i ./person-idx -q 999-9999-9999 -q 888-8888-8888 -top personset
+
+Or you can use a list of IDs from a file (newline delimited)
+
+  stag-db.pl -i ./person-idx -qf my_ss_nmbrs.txt -top personset</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-diff.html">stag-diff.pl</a>
+    </h3>
+    <div class="summary">finds the difference between two stag files</div>
+    <div class="codeblock">
+        <pre>
+stag-diff.pl -ignore foo-id -ignore bar-id file1.xml file2.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Compares two data trees and reports whether they match. If they do not
+match, the mismatch is reported.</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-drawtree.html">stag-drawtree.pl</a>
+    </h3>
+    <div class="summary">draws a stag file (xml, itext, sxpr) as a PNG diagram</div>
+    <div class="codeblock">
+        <pre>
+stag-drawtree.pl -o my.png myfile.xml
+
+  stag-drawtree.pl -p My::MyFormatParser -o my.png myfile.myfmt</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>requires GD library and GD perl module</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-eval.html">stag-eval.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+stag-eval.pl '' file2.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre></pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-filter.html">stag-filter.pl</a>
+    </h3>
+    <div class="summary">filters a stag file (xml, itext, sxpr) for nodes of interest</div>
+    <div class="codeblock">
+        <pre>
+stag-filter.pl person -q name=fred file1.xml
+
+  stag-filter.pl person 'sub {shift-&gt;get_name =~ /^A*/}' file1.xml
+
+  stag-filter.pl -p My::Foo -w sxpr record 'sub{..}' file2</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>parsers an input file using the specified parser (which may be a built
+in stag parser, such as xml) and filters the resulting stag tree
+according to a user-supplied subroutine, writing out only the
+nodes/elements that pass the test.
+
+the parser is event based, so it should be able to handle large files
+(although if the node you parse is large, it will take up more memory)</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-findsubtree.html">stag-findsubtree.pl</a>
+    </h3>
+    <div class="summary">finds nodes in a stag file</div>
+    <div class="codeblock">
+        <pre>
+stag-findsubtree.pl 'person/name' file.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>parses in an input file and writes out subnodes</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-flatten.html">stag-flatten.pl</a>
+    </h3>
+    <div class="summary">turns stag data into a flat table</div>
+    <div class="codeblock">
+        <pre>
+stag-flatten.pl MyFile.xml dept/name dept/person/name</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>reads in a file in a stag format, and 'flattens' it to a tab-delimited
+table format. given this data:
+(company
+   (dept
+    (name "special-operations")
+    (person
+     (name "james-bond"))
+    (person
+     (name "fred"))))
+
+the above command will return a two column table
+
+  special-operations      james-bond
+  special-operations      fred</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-grep.html">stag-grep.pl</a>
+    </h3>
+    <div class="summary">filters a stag file (xml, itext, sxpr) for nodes of interest</div>
+    <div class="codeblock">
+        <pre>
+stag-grep.pl person -q name=fred file1.xml
+
+  stag-grep.pl person 'sub {shift-&gt;get_name =~ /^A*/}' file1.xml
+
+  stag-grep.pl -p My::Foo -w sxpr record 'sub{..}' file2</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>parsers an input file using the specified parser (which may be a built
+in stag parser, such as xml) and filters the resulting stag tree
+according to a user-supplied subroutine, writing out only the
+nodes/elements that pass the test.
+
+the parser is event based, so it should be able to handle large files
+(although if the node you parse is large, it will take up more memory)</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-handle.html">stag-handle.pl</a>
+    </h3>
+    <div class="summary">streams a stag file through a handler into a writer</div>
+    <div class="codeblock">
+        <pre>
+stag-handle.pl -w itext -c my-handler.pl myfile.xml &gt; processed.itext
+  stag-handle.pl -w itext -p My::Parser -m My::Handler myfile.xml &gt; processed.itext</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>will take a Stag compatible format (xml, sxpr or itext), turn the data
+into an event stream passing it through my-handler.pl</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-join.html">stag-join.pl</a>
+    </h3>
+    <div class="summary">joins two stag files together based around common key</div>
+    <div class="codeblock">
+        <pre>
+stag-join.pl  -w xml country/city_id=capital/capital_id countries.xml capitals.xml
+
+  stag-join.pl  -w itext gene/tax_id=species/tax_id genedb.itext speciesdb.itext</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Performs a relational-style INNER JOIN between two stag trees; this
+effectively merges two files together, based on some kind of ID in the
+file</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-merge.html">stag-merge.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+stag-merge.pl  -xml file1.xml file2.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>script wrapper for the Data::Stag modules</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-mogrify.html">stag-mogrify.pl </a>
+    </h3>
+    <div class="summary">mangle stag files</div>
+    <div class="codeblock">
+        <pre>
+stag-mogrify.pl  -w itext file1.xml file2.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>script wrapper for the Data::Stag modules
+
+feeds in files into a parser object that generates nestarray events,
+and feeds the events into a handler/writer class</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-parse.html">stag-parse.pl</a>
+    </h3>
+    <div class="summary">parses a file and fires events (e.g. sxpr to xml)</div>
+    <div class="codeblock">
+        <pre>
+# convert XML to IText
+  stag-parse.pl -p xml -w itext file1.xml file2.xml
+
+  # use a custom parser/generator and a custom writer/generator
+  stag-parse.pl -p MyMod::MyParser -w MyMod::MyWriter file.txt</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>script wrapper for the Data::Stag modules
+
+feeds in files into a parser object that generates nestarray events,
+and feeds the events into a handler/writer class</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-query.html">stag-query.pl</a>
+    </h3>
+    <div class="summary">aggregare queries</div>
+    <div class="codeblock">
+        <pre>
+stag-query.pl avg person/age file.xml
+
+  stag-query.pl sum person/salary file.xml
+
+  stag-query.pl 'sub { $agg .= ", ".shift }' person/name file.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Performs aggregate queries</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-splitter.html">stag-splitter.pl</a>
+    </h3>
+    <div class="summary">splits a stag file into multiple files</div>
+    <div class="codeblock">
+        <pre>
+stag-splitter.pl -split person -name social_security_no file.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Splits a file using a user specified parser (default xml) around a
+specified split node, naming each file according to the name argument
+
+the files will be named anonymously, unless the '-name' switch is specified; this will use the value of the specified element as the filename
+
+eg; if we have
+&lt;top&gt;
+    &lt;a&gt;
+      &lt;b&gt;foo&lt;/b&gt;
+      &lt;c&gt;yah&lt;/c&gt;
+      &lt;d&gt;
+        &lt;e&gt;xxx&lt;/e&gt;
+      &lt;/d&gt;
+    &lt;/a&gt;
+    &lt;a&gt;
+      &lt;b&gt;bar&lt;/b&gt;
+      &lt;d&gt;
+        &lt;e&gt;wibble&lt;/e&gt;
+      &lt;/d&gt;
+    &lt;/a&gt;
+  &lt;/top&gt;
+
+if we run
+
+  stag-splitter.pl -split a -name b
+
+it will generate two files, "foo.xml" and "bar.xml"
+
+input format can be 'xml', 'sxpr' or 'itext' - if this is left blank
+the format will be guessed from the file suffix
+
+the output format defaults to the same as the input format, but
+another can be chosen.
+
+files go in the current directory, but this can be overridden with the
+'-dir' switch</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-view.html">stag-view.pl</a>
+    </h3>
+    <div class="summary">draws an expandable Tk tree diagram showing stag data</div>
+    <div class="codeblock">
+        <pre>
+stag-view.pl  file1.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Draws a Tk tree, with expandable/convertable nodes</pre>
+    </div>
+    <h2>DBIx::DBStag Script List</h2>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/selectall_html.html">selectall_html.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+selectall_html.pl -d "dbi:Pg:dbname=mydb;host=localhost" "SELECT * FROM a NATURAL JOIN b"</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre></pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/selectall_xml.html">selectall_xml.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+selectall_xml.pl [-d &lt;dbi&gt;] [-f file of sql] [-nesting|n &lt;nesting&gt;] SQL</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>This script will query a database using either SQL provided by the
+script user, or using an SQL templates; the query results will be
+turned into XML using the L&lt;DBIx::DBStag&gt; module. The nesting of the
+XML can be controlled by the DBStag SQL extension "USE NESTING..."</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-autoddl.html">stag-autoddl.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+stag-autoddl.pl -parser XMLAutoddl -handler ITextWriter file1.txt file2.txt
+
+  stag-autoddl.pl -parser MyMod::MyParser -handler MyMod::MyWriter file.txt</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>script wrapper for the Data::Stag modules</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-bulkload.html">stag-bulkload.pl</a>
+    </h3>
+    <div class="summary">creates bulkload SQL for input data</div>
+    <div class="codeblock">
+        <pre>
+# convert XML to IText
+  stag-bulkload.pl -l person file1.xml file2.xml
+
+  # use a custom parser/generator and a custom writer/generator
+  stag-bulkload.pl -p MyMod::MyParser file.txt</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Creates bulkload SQL statements for an input file
+
+Works only with certain kinds of schemas, where the FK relations make
+a tree (not a graph); i.e. the only FKs are to the parent
+
+You do not need a connection to the DB
+
+It is of no use for incremental loading - it assumes integer surrogate
+promary keys and starts these from 1</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-ir.html">stag-ir.pl</a>
+    </h3>
+    <div class="summary">information retrieval using a simple relational index</div>
+    <div class="codeblock">
+        <pre>
+stag-ir.pl -r person -k social_security_no -d Pg:mydb myrecords.xml
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -q 888-8888-8888</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>Indexes stag nodes (XML Elements) in a simple relational db structure
+- keyed by ID with an XML Blob as a value
+
+Imagine you have a very large file of data, in a stag compatible
+format such as XML. You want to index all the elements of type
+B&lt;person&gt;; each person can be uniquely identified by
+B&lt;social_security_no&gt;, which is a direct subnode of B&lt;person&gt;
+
+The first thing to do is to build the index file, which will be stored
+in the database mydb
+stag-ir.pl -r person -k social_security_no -d Pg:mydb myrecords.xml
+
+You can then use the index "person-idx" to retrieve B&lt;person&gt; nodes by
+their social security number
+
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 &gt; some-person.xml
+
+You can export using different stag formats
+
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -w sxpr &gt; some-person.xml
+
+You can retrieve multiple nodes (although these need to be rooted to
+make a valid file)
+
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -q 888-8888-8888 -top personset
+
+Or you can use a list of IDs from a file (newline delimited)
+
+  stag-ir.pl -d Pg:mydb -qf my_ss_nmbrs.txt -top personset</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-pgslurp.html">stag-pgslurp.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+stag-pgslurp.pl -d "dbi:Pg:dbname=mydb;host=localhost" myfile.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>This script is for storing data (specified in a nested file format
+such as XML or S-Expressions) in a database. It assumes a database
+schema corresponding to the tags in the input data already exists.</pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-sl2sql.html">stag-sl2sql.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre></pre>
+    </div>
+    <div class="scriptdesc">
+        <pre></pre>
+    </div>
+    <hr></hr>
+    <h3>
+      <a href="script-docs/stag-storenode.html">stag-storenode.pl</a>
+    </h3>
+    <div class="summary"></div>
+    <div class="codeblock">
+        <pre>
+stag-storenode.pl -d "dbi:Pg:dbname=mydb;host=localhost" myfile.xml</pre>
+    </div>
+    <div class="scriptdesc">
+        <pre>This script is for storing data (specified in a nested file format
+such as XML or S-Expressions) in a database. It assumes a database
+schema corresponding to the tags in the input data already exists.</pre>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,5 @@
+.git
+ignore.txt
+\.bak$
+\.old$
+\.tar.gz$

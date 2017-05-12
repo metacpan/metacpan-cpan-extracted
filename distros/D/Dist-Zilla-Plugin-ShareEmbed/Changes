@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-Plugin-ShareEmbed
+
+0.003  2016-07-10 20:45:55 JST
+    - fix packaging issue; bump version
+
+0.002  2016-07-10 19:42:02 JST
+    - remove prereq of Data::Section::Simple
+
+0.001  2016-07-10 17:27:25 JST
+    - Initial release

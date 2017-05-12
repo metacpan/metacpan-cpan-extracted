@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/DateTime/Event/Klingon.pm
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-signature.t
+t/01-load.t
+t/gdtd.t
+t/perl-critic.t
+t/perlcriticrc
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+SIGNATURE    Added here by Module::Build
+SIGNATURE    Added here by Module::Build

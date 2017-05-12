@@ -1,0 +1,105 @@
+Revision history for Device-USB
+
+0.35   2010/07/21
+        Re-examined typecasting patch from release 0.32, thanks to a bug report
+        from Magnus Sulland. Some of the wrong void* parameters were changed to
+        char* and a few were missed that should have been changed. Should
+        prevent segfaults.
+0.34   2010/07/05
+        Apply patch from Vadim Mikhailov that silences warnings on C99-compliant
+        compilers.
+0.33   2010/03/22
+        Correct a unit test that failed on FreeBSD.
+0.32   2010/03/21
+        Corrected a unit test that was too strict, identified by H. Merljn Brand.
+        Added 64-bit lib directories to the dependency check. Thanks to
+        H. Merljn Brand.
+        Corrected typecasting as found by Stephen Cliffe.
+0.31   2009/12/22
+        R. Barrabas modified Makefile.PL to better support building on
+        Strawberry Perl.
+0.30   2009/12/16
+        Updated to support the Device::USB::Win32Async module.
+0:29   2009/04/02
+        Corrected handling of reads when passed uninitialized 'bytes'
+        variables. Thanks to William King for finding this one.
+0.28   2009/02/12
+        Thanks to Vadim Mikhailov for patches supporting the ActiveState
+        5.10 version, including upgrading to VS 2005.
+0.27   2008/11/08
+        Add dependency on Inline:MakeMaker to help CPAN Testers builds.
+        Update documentation to reference the Google Code project.
+0.26   2008/11/02
+        Correct skip count on test 13 to fix FreeBSD tests.
+0.25   2008/10/10
+        Yet another modification to try to get the tests cleaned up for the
+        CPAN Testers. Modify tests 13 and 14 to skip if no USB busses are
+        found instead of failing.
+0.24   2008/10/09
+        Undo a modification to the parameter handling on bulk_read and
+        interrupt read. The change broke the methods completely. Thanks to
+        Tony Shadwick for pointing it out.
+0.23   2008/10/04
+        More documentation cleanup, including correcting the spelling of
+        John Hogerhuis's name.
+        Correcting tests 15, 16, and 17 to skip if no devices are found
+        instead of failing.
+0.22   2008/10/02
+        Perform cleanup of tests for Mac OSX, as well as changes to clean
+        code for newer Perl::Critic policies.
+        Correction to documentation of Device::USB::Device methods bulk_write
+        and interrupt_write (reported by John R. Hogerhuis).
+        Modified the Inline attributes to make building under systems other
+        than Linux a bit easier. (thanks to John R. Hogheruis for the insight).
+        Make creation of makefile fail if Windows and environment not properly
+        set up.
+0.21    2007/04/16
+        Thanks to Vadim Mikhailov for spotting a problem with use of the macro
+        Inline_Stack_Vars that prevented compilation under Windows. Applied
+        Vadim's patch.
+0.20    2006/11/18
+        Added support for interface objects and corrected the code
+        returning the code. Previous versions had only returned the first
+        setting of the interface.
+        Deprecate the Device::USB::Device::config method as badly named and
+        incomplete. Replaced with Device::USB::Device::configurations and
+        Device::USB::Device::get_configuration.
+0.19    2006/09/18
+        Modified Inline::C code to be correct C. (reported by Craig DeForest.)
+        Changes Device::USB::Device interface to automatically open the
+        USB device if needed, as requested by Ray Brinzer.
+0.18    2006/09/17
+        Added CLASS_* constants to the Device::USB module.
+        Added class support for the configuration objects.
+        Try again to fix assumption in tests, this time found by Ray Brinzer.
+0.17    2006/09/04
+        Added FAQ document. Added new Device::USB::list_devices_if() and
+        Device::USB::find_device_if() methods for more flexible device
+        searching. Minor documentation cleanup.
+0.16    2006/09/01
+        Modified Device::USB::list_devices() to support listing all devices.
+        Thanks to Tony Awtrey for pointing this out. He also spotted an
+        invalid assumption in the tests; that has been corrected.
+0.15    2006/08/08
+        Applied patch from Mike McCauley that adds
+        Device::USB::Device::get_driver_np() and
+        Device::USB::Device::detach_kernel_driver_np() methods, as well as
+        extending the debugging modes.
+0.14    2006/07/10
+        Corrected the bInterfaceClass field in the interface
+        descriptor. Thanks to Josep Monés Teixidor for spotting it.
+0.13    2006/05/18
+        Added debug mode to simplify debugging VSI module.
+0.12    2006/05/08
+        Fixed a bug that prevented Device::USB::Device::control_msg() from
+        returning data.
+0.11    2006/04/05
+        Correct some typing errors in the documentation.
+        Correct return code on Device::USB::Device::open().
+0.10    2006/04/01
+        Build test suite and shake out bugs with testing.
+0.03    2006/03/27
+        Rename to Device::USB with permission of the owner of that module.
+        (Not released)
+0.02    2006/03/25
+        Mostly complete first version available for limited distribution.

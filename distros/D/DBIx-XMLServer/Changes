@@ -1,0 +1,13 @@
+Revision history for Perl extension DBIx::XMLServer.
+
+0.01  Mon Oct 27 20:40:07 2003
+	- original version.
+
+0.02
+        - Mechanism for including meta-data about search in result
+        - Two ways of counting total number of matching rows
+        - Alternative way of parsing XPaths; no more Parse::RecDescent
+        - Named-parameter interface to functions
+        - Ordering of results
+        - User selection of templates
+        - Many more tests

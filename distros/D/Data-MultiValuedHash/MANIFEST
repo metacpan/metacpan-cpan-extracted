@@ -1,0 +1,6 @@
+ChangeLog
+lib/Data/MultiValuedHash.pm
+Makefile.PL
+MANIFEST
+ReadMe
+t/Data-MultiValuedHash.t

@@ -1,0 +1,108 @@
+NAME
+    Dist::Zilla::Plugin::Test::ReportPrereqs - Report on prerequisite
+    versions during automated testing
+
+VERSION
+    version 0.027
+
+SYNOPSIS
+      # in dist.ini
+      [Test::ReportPrereqs]
+      include = Acme::FYI
+      exclude = Acme::Dont::Care
+
+DESCRIPTION
+    This Dist::Zilla plugin adds a t/00-report-prereqs.t test file and an
+    accompanying t/00-report-prereqs.dd data file. It reports the version of
+    all modules listed in the distribution metadata prerequisites (including
+    'recommends', 'suggests', etc.). However, any 'develop' prereqs are not
+    reported (unless they show up in another category).
+
+    If a MYMETA.json file exists and CPAN::Meta is installed on the testing
+    machine, MYMETA.json will be examined for prerequisites in addition, as
+    it would include any dynamic prerequisites not set in the distribution
+    metadata.
+
+    Versions are reported based on the result of "parse_version" from
+    ExtUtils::MakeMaker, which means prerequisite modules are not actually
+    loaded (which avoids various edge cases with certain modules). Parse
+    errors are reported as "undef". If a module is not installed, "missing"
+    is reported instead of a version string.
+
+    Additionally, if CPAN::Meta is installed, unfulfilled required
+    prerequisites are reported after the list of all versions based on
+    either MYMETA (preferably) or META (fallback).
+
+CONFIGURATION
+  include
+    An "include" attribute can be specified (multiple times) to add modules
+    to the report. This can be useful if there is a module in the dependency
+    chain that is problematic but is not directly required by this project.
+    These modules will be listed in an "Other Modules" section at the end of
+    the report.
+
+  exclude
+    An "exclude" attribute can be specified (multiple times) to remove
+    modules from the report (if you had a reason to do so).
+
+  verify_prereqs
+    When set, installed versions of all 'requires' prerequisites are
+    verified against those specified. Defaults to true, but requires
+    CPAN::Meta to be installed.
+
+  version_extractor
+    Specifies the module to use to extract each installed prerequisite's
+    version. Defaults to ExtUtils::MakeMaker, which is recommended for most
+    situations. It can also be specified as Module::Metadata, which can be
+    useful if ExtUtils::MakeMaker's mechanism is too naive, or if
+    ExtUtils::MakeMaker is not already a prerequisite of the distribution.
+
+SEE ALSO
+    Other Dist::Zilla::Plugins do similar things in slightly different ways
+    that didn't suit my style and needs.
+
+    *   Dist::Zilla::Plugin::Test::PrereqsFromMeta -- requires prereqs to be
+        satisfied
+
+    *   Dist::Zilla::Plugin::Test::ReportVersions -- bundles a copy of
+        YAML::Tiny, reads prereqs only from META.yml, and attempts to load
+        them with "require"
+
+    *   Dist::Zilla::Plugin::ReportVersions::Tiny -- static list only, loads
+        modules with "require"
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs/issues
+    >. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Test-ReportPrereqs.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Brendan Byrd <Perl@ResonatorSoft.org>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+    *   Kent Fredric <kentfredric@gmail.com>
+
+    *   Randy Stauner <randy@magnificent-tears.com>
+
+    *   Yanick Champoux <yanick@babyl.dyndns.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

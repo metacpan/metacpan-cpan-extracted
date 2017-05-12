@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 a8acedb01e8aa274e07de606d860fa61085ba576 Build.PL
+SHA1 58e8ba771ea38d3e53743c59ce0f63bc572a00b1 ChangeLog
+SHA1 47d7b6556fe25aa2d9171353b9a9f9e1a158c0bd GNUmakefile
+SHA1 ce5b61a8652d10fdccaa962fbdaeb45b02b1fd40 MANIFEST
+SHA1 9dd0146e5221b385840885547e49ed95932ebac4 META.json
+SHA1 2ed8a5d9b79fce0332657e7fd86d8a7fd9dd28d4 META.yml
+SHA1 a306765a010702845e45dc0e031b7e0c1e96927f Makefile.PL
+SHA1 63ec4eecd29214980099dc2771b1eb27a0916690 NEWS
+SHA1 27b1413e0c6d1a27080a3a381a113f907f4b910d README.md
+SHA1 d7dd19d8ceb8ebefb6f76a42b3bb39236d0cbff4 example/fib.pl
+SHA1 54143c54b0c6a3aff1d43427d57fec9dc43fed2e example/five.pl
+SHA1 096186bb5e5f581f1cc5c49fb1e488797f35b558 example/multiline.pl
+SHA1 4cc77b90af91e615a64ae04893fdffa7939db84c gpl-2.0.txt
+SHA1 64cc4e8163a16f35248936ae0e743fffa91659a6 lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm
+SHA1 efdc4035402b6ac2aa8d68c9deb6a0049a998da0 lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Auto_Subcmd/Deparse.pm
+SHA1 88da87e733ba54188d241587b17a49a0f7df1808 lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Auto_Subcmd/Deparse.pm
+SHA1 205ae03d1619b0e59e3c8351a43b6bf22007009e lib/Devel/Trepan/Deparse.pm
+SHA1 ed87e3a312aa11a6ceb95f174e2769b78b1df898 t/00load.t
+SHA1 0028fef9be7783d9eba29ae4d3940cc99cc8d14e t/00test-pod.t
+SHA1 2e14c07b6781226a03f74517bf0e29afa7609a7f t/10test-cmd-complete.t
+SHA1 edd6cd809b747aab63ed62329b732ef094156ef4 t/20test-deparse.t
+SHA1 ccf0e0ff54ff8e8033d6af079ab08a9c816c47f3 t/Helper.pm
+SHA1 741718bb69697f67d0d0ff5f52f77f6a7f7752ae t/Makefile
+SHA1 3cdb1621b47ad694bebf83df4e86d35dc675f615 t/data/deparse.cmd
+SHA1 93c569bfa12942ef684012c4c05eb7d49dce8b0e t/data/deparse.right
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlZSSgsACgkQGo3lAIJ17CEksQCdHPE7gndr06zVrcsjigtVTotd
+x+sAnjCHACruTMkCrFnC8e6ZIg5sJXl3
+=dooo
+-----END PGP SIGNATURE-----

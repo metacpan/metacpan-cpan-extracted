@@ -1,0 +1,57 @@
+Revision history for Device-Chip
+
+0.09    2016/10/02 20:57:15
+        [CHANGES]
+         * Defined a ->sleep method on adapters
+         * Allow test expectations to expect failures
+
+0.08    2016/06/06 15:20:32
+        [CHANGES]
+         * Declare dependence on perl5.10 for use of // syntax
+
+        [BUGFIXES]
+         * Remember to implement I²C ->read method on Test::Device::Chip::Adapter
+         * Avoid perl5.14ism of package NAME BLOCK
+
+0.07    2016/05/05 15:14:10
+        [CHANGES]
+         * Defined a ->read method on I2C protocol
+         * Moved the Tickit-based GPIO example code into an installable module
+           so that other distributions can easily reuse it
+
+0.06    2016/01/21 16:00:24
+        [CHANGES]
+         * Added methods to perform 'split transaction' SPI operations
+         * Added ->tris_gpios method
+
+        [BUGFIXES]
+         * Ensure Test::Device::Chip::Adapter can handle GPIO methods
+
+0.05    2015/11/24 19:24:10
+        [CHANGES]
+         * Added Test::Device::Chip::Adapter
+
+0.04    2015/11/18 01:16:47
+        [CHANGES]
+         * Define the GPIO protocol and the methods a protocol instance can
+           use to provide access to GPIO lines
+         * Added some example scripts for GPIOs
+         * Pass mount options through to PNAME_options
+         * Added ->mount_from_paramstr as a further script convenience for
+           mount-time options
+
+0.03    2015/11/13 00:32:07
+        [CHANGES]
+         * Added Device::Chip::Base::RegisteredI2C
+         * Optionally invoke $chip->PNAME_options to configure a protocol at
+           mount time
+
+0.02    2015/11/12 00:30:29
+        [CHANGES]
+         * Renamed ->connect to ->mount
+         * Added Adapter->new_from_description as a utility for wrapper
+           scripts
+         * Define I2C protocol
+
+0.01    2015/11/09 23:42:42
+        First version, released on an unsuspecting world.

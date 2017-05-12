@@ -1,0 +1,19 @@
+{% extends "blog_base.html" %}
+{% block content %} {# Overwrite the content block from blog_base.html #}
+<form action="{% url base_url %}" method="post">
+	{% if cgi.author or cgi.content or cgi.title %}
+	{# Print an error message if needed #} {# This can be done in the template and not in the script #}
+		<p style="border:1px solid red;color:red"><span style="color:black">Error, can't publish:</span><br />
+			{% if not cgi.content %}Field "Text" is missing or empty.<br />{% endif %}
+			{% if not cgi.title %}Field "Title" is missing or empty.<br />{% endif %}
+			{% if not cgi.author %}Field "Author" is missing or empty.<br />{% endif %}
+		</p>
+	{% endif %}
+	<p>Title:<br /><input style="width:100%" name="title" value="{{ cgi.title }}" /></p>
+	<p>Author:<br /><input style="width:100%" name="author" value="{{ cgi.author }}" /></p>
+	<p>Text (no html allowed):<br /><textarea style="width:100%" rows="20" name="content">{{ cgi.content }}</textarea></p>
+	<input type="submit" value="Publish" />
+	<input type="hidden" name="action" value="{{ action }}" />
+</form>
+{% endblock content %}
+{# We don't overwrite the block "morecss" here, it will stay empty #}

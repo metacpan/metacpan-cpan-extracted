@@ -1,0 +1,2 @@
+find_author=select title,author from books where author = :author
+count_author=select count(1) from books where author = :author

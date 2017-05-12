@@ -1,0 +1,13 @@
+Revision history for DateTime-Indic
+
+0.2     Mon Aug 17 01:25:54 EDT 2015
+        Happy CPAN day!
+        Various documentation fixes only.
+
+0.1     Mon Jul 20 17:07:02 EDT 2009
+        Initial Release.
+        The following calendars are supported:
+            South Indian Shalivahana Shaka
+            Gujarati Vikrama Samvata
+            Halari/Kutchhi Samvata
+

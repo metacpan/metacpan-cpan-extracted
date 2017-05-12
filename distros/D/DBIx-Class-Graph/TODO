@@ -1,0 +1,2 @@
++ support undirected graphs via __PACKAGE__->undirected_graph(1);
++ prohibit multigraphs (in _add_edge)

@@ -1,0 +1,34 @@
+---
+abstract: 'introspect overloaded operators'
+author:
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+build_requires:
+  Test::Fatal: '0'
+  Test::More: '0.88'
+  base: '0'
+  parent: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-OverloadInfo
+requires:
+  Exporter: '5.57'
+  MRO::Compat: '0'
+  Package::Stash: '0.14'
+  Scalar::Util: '0'
+  Sub::Identify: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-OverloadInfo
+  repository: git://github.com/ilmari/Devel-OverloadInfo.git
+version: '0.004'

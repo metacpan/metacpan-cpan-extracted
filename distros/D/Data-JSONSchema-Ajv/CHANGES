@@ -1,0 +1,5 @@
+0.02  - 06-Oct-2016
+- Bumped required JavaScript::Duktape version:
+    http://www.cpantesters.org/cpan/report/d119e0ea-89f0-11e6-bfb8-d6a6247258b5
+0.01  - 04-Oct-2016
+- Initial release

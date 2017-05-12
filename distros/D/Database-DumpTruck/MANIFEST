@@ -1,0 +1,7 @@
+lib/Database/DumpTruck.pm	Relaxing interface to SQLite
+Build.PL			Build script
+MANIFEST			This list of files
+t/dumptruck.t			Functional test
+t/pod.t				POD test
+META.yml			Distribution Metadata
+META.json			Distribution Metadata

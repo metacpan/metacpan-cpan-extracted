@@ -1,0 +1,42 @@
+---
+abstract: 'Parses and formats Date of JavaScript'
+author:
+  - 'Daisuke (yet another) Maki'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.2, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-JavaScript
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DateTime::Format::JavaScript:
+    file: lib/DateTime/Format/JavaScript.pm
+    version: 0.02
+requires:
+  DateTime::Format::Builder: 0
+  DateTime::TimeZone: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript/issues
+  homepage: https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript
+  repository: https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript.git
+version: 0.02
+x_contributors:
+  - 'Daisuke (yet another) Maki <maki.daisuke@gmail.com>'

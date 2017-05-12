@@ -1,0 +1,18 @@
+Revision history for Drupal-Admin
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	Wed Mar 25 15:02:12 MDT 2009
+	Fixed version (.01 -> 0.02) to make cpanplus happy.
+	Minor documentation change.
+
+0.03	Mon Apr  6 13:52:57 MDT 2009
+	Changed ModuleState.pm to use the tick() method instead
+        of field() for checkboxes in commit(). This is problematic
+	since tick() doesn't support an index argument and checkbox
+	names are not guaranteed to be unique.
+
+0.04	Tue Apr 14 11:41:41 MDT 2009
+	Added check for access denied in Drupal::Admin::update().
+	This can happen if we are redirected from http to https.

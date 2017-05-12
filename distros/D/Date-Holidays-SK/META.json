@@ -1,0 +1,58 @@
+{
+   "abstract" : "determine Slovak Republic bank holidays",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "keywords" : [
+      "date",
+      "holiday",
+      "SK"
+   ],
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Holidays-SK",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Easter" : "0",
+            "Date::Simple" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Holidays::SK" : {
+         "file" : "lib/Date/Holidays/SK.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Date-Holidays-SK/issues"
+      },
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jozef/Date-Holidays-SK"
+      }
+   },
+   "version" : "0.02"
+}

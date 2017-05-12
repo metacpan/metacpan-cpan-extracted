@@ -1,0 +1,33 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-MapMetro-MakeLinePod
+
+prereqs:
+  runtime:
+    recommends:
+    requires:
+     - perl: 5.014000
+     - Moose: 2.0000
+     - Dist::Zilla: 5.000
+     - namespace::autoclean
+     - Path::Tiny
+     - Types::Standard
+     - List::AllUtils
+     - Syntax::Feature::Qi: 0.2004
+     - syntax
+     - Map::Metro: 0.2206
+
+plugins:
+  - +config: Author::CSSON
+
+  - +add_plugin: TravisYML
+    +before: Git::Tag
+    perl_version: 5.16 5.20
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

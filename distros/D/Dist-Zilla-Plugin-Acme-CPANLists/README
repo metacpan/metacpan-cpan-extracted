@@ -1,0 +1,19 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Acme::CPANLists]
+
+DESCRIPTION
+
+    This plugin is to be used when building Acme::CPANLists::*
+    distribution. It currently does the following:
+
+      * Fill the Abstract from the first module/author list's summary
+
+SEE ALSO
+
+    Acme::CPANLists
+
+    Pod::Weaver::Plugin::Acme::CPANLists
+

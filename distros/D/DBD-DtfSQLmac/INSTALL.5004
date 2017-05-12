@@ -1,0 +1,43 @@
+
+(INSTALL.5004)
+
+
+
+*** Please read the README document first. ***
+
+
+
+Installation for old MacPerl 5.2.0r4:
+======================================
+
+Installation is quite easy. First, install the Mac build of the DBI 1.08 module, 
+available from the MacPerl Module Porters page (http://dev.macperl.org/mmp/). As 
+with every module, use Chris Nandor's installme.plx droplet for installation. This 
+installer is part of the cpan-mac-0.50 module, available from CPAN 
+
+    http://www.perl.com/CPAN-local/authors/id/CNANDOR/ 
+	
+or via Chris Nandor's MacPerl page 
+
+    http://pudge.net/macperl/.
+
+After you've installed the DBI module, simply drop the DBD-DtfSQLmac-0.3201.tar.gz 
+packed archive or the unpacked folder DBD-DtfSQLmac-0.3201 on the installme.plx 
+droplet. Answer the upcoming question "Convert all text and MacBinary files?" with 
+"Yes". This should install the module properly. 
+
+Afterwards, you have to install the dtF/SQL 2.01 shared library 'dtFPPCSV2.8K.shlb'
+by hand. The dtF/SQL 2.01 shared library comes with the distribution that you have
+to download from sLAB's web site (see the README document or DtfSQL.pm for details).
+Either put the 'dtFPPCSV2.8K.shlb' shared library (or at least an alias to it) in 
+the SAME folder as the shared library 'DtfSQL' that comes with this module (by 
+default, this folder is ':site_perl:MacPPC:auto:Mac:DtfSQL:) or put the dtF/SQL 2.01 
+shared library in the System Extensions folder. This is crucial since this module 
+can only be used in conjunction with the dtF/SQL 2.01 shared library.
+
+To be sure that everything is ok and the module loads properly, run the test.pl script 
+first. Then run the test scripts located in the 't' folder. Some samples are provided 
+in the 'samples' folder, to help you getting started.
+
+Have fun.
+

@@ -1,0 +1,23 @@
+abstract: 'Romani is a SQL and database abstraction layer, inspired by Creole, which aims to help adapt to the differences in SQL dialects'
+author: David Snopek
+build_requires:
+  Carp: 0
+  Data::Dumper: 0
+  Test::Class: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.62
+license: gpl
+name: DBIx-Romani
+no_index:
+  directory:
+    - test
+    - inc
+    - t
+requires:
+  DBI: 0
+  Data::Dumper: 0
+  Exception::Class: 0
+  Exception::Class::DBI: 0
+  XML::DOM: 0
+version: '@XMLDOOM_VERSION'

@@ -1,0 +1,90 @@
+{
+   "abstract" : "Wrap any simple class as a service for Dancer2",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Adapter",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Class::Load::XS" : "0",
+            "Dancer2" : "0.153000"
+         },
+         "requires" : {
+            "Class::Load" : "0",
+            "Dancer2::Plugin" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900",
+            "WWW::Postmark" : "0"
+         },
+         "requires" : {
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.19",
+            "HTTP::Request::Common" : "0",
+            "HTTP::Tiny" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::Adapter" : {
+         "file" : "lib/Dancer2/Plugin/Adapter.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/dancer2-plugin-adapter/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/dancer2-plugin-adapter",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlDancer/dancer2-plugin-adapter.git",
+         "web" : "https://github.com/PerlDancer/dancer2-plugin-adapter"
+      }
+   },
+   "version" : "0.007",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Blabos de Blebe <blabos@blabos.org>",
+      "mascip (Pierre Masci) <piemas25+git@gmail.com>",
+      "Peter Mottram <peter@sysnix.com>",
+      "Russell Jenkins <veryrusty@gmail.com>"
+   ]
+}
+

@@ -1,0 +1,49 @@
+Revision history for Perl extension Dist-Zilla-Plugin-InstallGuide
+
+1.200007  2016-06-11
+  - Updated text to suggest local::lib, and not recommend sudo [gh-9]
+
+1.200006  2015-01-08
+  - Don't import Moose::Autobox [gh-8; ether]
+
+1.200005  2014-10-26
+  - revert phase change made in last release [gh-7]
+
+1.200004  2014-10-25
+  - Enable subclasses to override installation instruction text [gh-4]
+  - Run one phase later to ensure install tools have already run [gh-5]
+
+1.200003  2014-04-29
+  - create file at in the GatherFiles phase and munge it with a FromCode file
+    type, to ensure the file exists early enough that other plugins can see it
+
+1.200002  2013-11-27
+  - Re-release with a compile test that won't hang on
+    Windows (thanks, chorny)
+
+1.200001  2013-09-27
+  - only mention one installer tool even if both are in use, and prefer
+    Build.PL over Makefile.PL, just as cpan clients do
+
+1.200000  2012-05-22
+  - New maintainer: Mike Doherty, doherty@cpan.org
+  - Include instructions for both EUMM and MB if both install tools
+    are shipped [RT #56350]
+
+1.101461  2010-05-26 17:30:09 Europe/Vienna
+  - Various small grammar and spelling tweaks. Also added mention of sudo.
+    (thanks autarch)
+
+1.101460  2010-05-26 10:12:15 Europe/Vienna
+  - added support Module::Build
+  - note cpanm as preferred installation method
+
+1.101420  2010-05-22 17:05:12 Europe/Vienna
+  - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+  - removed unused variable
+
+1.100701  2010-03-11 23:47:35 Europe/Vienna
+  - it's not an "online" documentation (thanks avar)
+
+1.100700  2010-03-11 14:35:45 Europe/Vienna
+  - original version

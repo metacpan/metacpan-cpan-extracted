@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DateTime-Format-x509,
+version 0.01:
+
+  parse and format x509 type dates
+
+This software is copyright (c) 2012 by Andrew Nelson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

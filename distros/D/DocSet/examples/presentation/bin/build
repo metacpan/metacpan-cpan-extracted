@@ -1,0 +1,18 @@
+#!/usr/bin/perl -w
+
+# this file is used to simplify the use of pod2hpp so you don't have to
+# specify the path to the config file on every execution
+
+# you call this script just like pod2hpp but without the configuration
+# file at the end.
+
+use FindBin qw($Bin);
+
+# use the local lib for testing + any env vars
+my $perl5lib = $ENV{PERL5LIB} || $ENV{PERLLIB};
+$ENV{PERL5LIB} = join ":", grep defined($_), "$Bin/../lib", $perl5lib;
+
+# forward the @ARGV
+my $command = "docset_build @ARGV $Bin/.. src/config.cfg";
+#print $command;
+system $command;

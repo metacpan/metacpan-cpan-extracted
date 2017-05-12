@@ -1,0 +1,28 @@
+Revision history for Device-Chip-AVR_HVSP
+
+0.04    2016/07/02 00:56:25
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::AVR_HVSP
+         * Changed to implement Device::Chip interface
+
+Previously, this distribution was called Device-BusPirate-Chip-AVR_HVSP
+
+0.03    2015/01/10 21:59:32
+        [CHANGES]
+         * Provide detailed information about fuses via
+           Device::BusPirate::Chip::AVR_HVSP::FuseInfo
+         * Rewritten tinyfuse.pl to use new FuseInfo - allows it to work on
+           other devices - ATtiny13, ATtiny85, ATtiny841
+         * Install avr_hvsp as real 'bin' script
+
+0.02    2014/11/01 15:56:45
+        [CHANGES]
+         * Add signatures and memory sizes for 8-pin ATtiny parts
+         * Neater memory information representation; allow caller to inspect
+           details about memory
+         * Enable POWER before AUX, allowing Vcc to settle before setting +12V
+           on RESET
+
+0.01    2014/09/29 01:22:00
+        First version, released on an unsuspecting world.
+

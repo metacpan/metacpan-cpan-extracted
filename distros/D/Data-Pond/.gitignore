@@ -1,0 +1,13 @@
+/Build
+/Makefile
+/_build
+/blib
+/META.json
+/META.yml
+/MYMETA.json
+/MYMETA.yml
+/Makefile.PL
+/SIGNATURE
+/Data-Pond-*
+/lib/Data/Pond.c
+/lib/Data/Pond.o

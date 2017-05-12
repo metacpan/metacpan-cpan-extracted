@@ -1,0 +1,31 @@
+Revision history for DBICx-Backend-Move
+
+1.000009    2012-10-11
+            - raw mode added by Steffen Schwigon
+
+1.000008    2012-10-09
+            - Fixed: version hickup, try again
+
+1.000007    2012-10-08
+            - Fixed: version hickup
+
+1.000006    2012-10-08
+            - Fixed: calculation of sequence numbers
+
+1.000005    2012-10-08
+            - Fixed: filtered column handling
+
+1.000004    2012-09-26
+            - Fixed: credentials are now transfered to commit (Steffen Schwigon)
+            - Show life signal only on -vv (Steffen Schwigon)
+            - Skip views for transfer (Bug #3, reported by Steffen Schwigon)
+
+1.000003    2012-09-17
+            - set user in portable way
+            - documentation on command line tool
+
+1.000002    2012-09-10
+            - Added a script to use the module
+
+1.000001    2012-09-10
+            - First version

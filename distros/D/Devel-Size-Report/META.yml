@@ -1,0 +1,15 @@
+---
+name: Devel-Size-Report
+version: 0.11
+version_from: lib/Devel/Size/Report.pm
+license: perl
+distribution_type: module
+generated_by: Devel-Size-Report version 0.11
+installdirs: site
+requires:
+  Array::RefElem: 1
+  Devel::Peek: 1
+  Devel::Size: 0.59
+  Scalar::Util: 1.13
+  Test::Simple: 0.47
+  Time::HiRes: 1.52

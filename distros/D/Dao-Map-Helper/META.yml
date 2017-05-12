@@ -1,0 +1,30 @@
+---
+abstract: 'Simplify the creation of DAO (Data Access Objects). Kind of a low level ORM, where you can still use SQL and then map the result set to the class objects.'
+author:
+  - 'Arjun Surendra <arjuns@cpan.org>'
+build_requires:
+  Carp: 0
+  DBD::mysql: 0
+  DBI: 0
+  Error: 0
+  ExtUtils::Command: 0
+  File::Spec: 0
+  Getopt::Long: 0
+  Pod::Usage: 1.21
+  Test::Harness: 0.21
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dao-Map-Helper
+provides:
+  Dao::Map::Helper:
+    file: lib/Dao/Map/Helper.pm
+    version: 0.04
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

@@ -1,0 +1,394 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+dh-make-pm - build Debian packages (dh-make-perl on pbuilder+cowdancer  steroids)
+
+=head1 SYNOPSIS
+
+	dh-make-pm --cpan Debian::Apt::PM
+	
+		--cpan              which module to build
+		--no-retry          will skip packaging modules that already failed to package
+		--dh-make-perl=s    set different command to execute instead of dh-make-perl to create debian/ folder.
+		--no-cpan-patches   do not apply CPAN::Patches
+		--tilde=s           string that should apper after version~ (ex. 2.00~string)
+		--debian-version	set debian version string, default is 1 (ex. 2.00-1)
+
+=head1 DESCRIPTION
+
+F<dh-make-pm> is basically recursive F<dh-make-perl> that will build the
+deb package from CPAN distribution and all it's dependencies properly
+indexing and creating repository.
+
+=head1 USAGE
+
+=head1 pbuilder set-up
+
+	# execute
+	sudo apt-get install cowdancer
+	cowbuilder --create --distribution sid
+	echo "dh-make-pm" > /var/cache/pbuilder/base.cow/etc/debian_chroot
+
+	# add to /etc/pbuilderrc
+	MIRRORSITE=http://ftp.cz.debian.org/debian/
+	BINDMOUNTS="/var/cache/pbuilder/result"
+	PDEBUILD_PBUILDER=cowbuilder
+	
+	mkdir /var/cache/pbuilder/result/unstable
+	wget http://bratislava.pm.org/tutorial/debian-simple-repo/Makefile -O /var/cache/pbuilder/result/Makefile
+	wget http://bratislava.pm.org/tutorial/debian-simple-repo/Release.conf -O /var/cache/pbuilder/result/Release.conf
+	
+	vim /var/cache/pbuilder/base.cow/etc/apt/sources.list    # update to your taste
+	echo "deb file:///var/cache/pbuilder/result/ unstable/" >> /var/cache/pbuilder/base.cow/etc/apt/sources.list
+	echo "deb file:///var/cache/pbuilder/result/ unstable/" >> /etc/apt/sources.list
+
+	# generate a key without passphrase
+	gpg --gen-key
+	gpg --export --armor $KEYID
+	apt-key add -
+	chroot /var/cache/pbuilder/base.cow/
+	apt-key add -
+	exit
+
+	cd /var/cache/pbuilder/result/
+	make
+
+	cowbuilder --update --bindmounts /var/cache/pbuilder/result/
+	
+	cpan -i Debian::Apt::PM
+	
+	# patch DhMakePerl.pm
+	cd /usr/share/perl5/
+	patch -p1 < $DIST_ROOT/patch/DhMakePerl.pm.patch
+
+=head1 create deb files
+
+	dh-make-pm --cpan Debian::Apt::PM
+	dh-make-pm --cpan Tatsumaki
+
+=head1 when something goes wrong
+
+I most cases when there is a missing or wrong dependency then the .deb
+build will fail.
+
+	cd $HOME/.dh-make-pm/build/$TAR_BALL_FOLDER/
+	vim debian/control
+	# set correct dependencies
+	pdebuild
+	mv /var/cache/pbuilder/result/*-perl* /var/cache/pbuilder/result/unstable/
+	cd /var/cache/pbuilder/result
+	make
+	dh-make-pm --cpan $THE_MODULE_YOU_WANTED_TO_BUILD
+
+=cut
+
+
+use strict;
+use warnings;
+
+our $VERSION = '0.08';
+
+use 5.010;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::HomeDir;
+use File::Path 2.01 'make_path', 'remove_tree';
+use CPAN;
+use File::Basename 'basename';
+use File::Copy 'copy';
+use JSON::Util;
+use Module::Depends::Intrusive;
+use CPAN::Patches;
+use CPAN::Patches::Plugin::Debian 0.03;    # needed for `cpan-patches --update-debian`
+use POSIX 'SEEK_SET';
+
+use Debian::Apt::PM::SPc;
+use Debian::Apt::PM;
+our $aptpm = Debian::Apt::PM->new();
+
+exit main();
+
+sub main {
+	my $help;
+	my $module_name;
+	my $repository_folder = '/var/cache/pbuilder/result';
+	my $build_folder      = File::Spec->catdir(File::HomeDir->my_home, '.dh-make-pm', 'build');
+	my $no_build_retry    = 0;
+	my $dh_make_perl      = 'dh-make-perl';
+	my $no_cpan_patches   = 0;
+	my $tilde             = '';
+	my $debian_pkg_version;
+	my $print_version;
+	GetOptions(
+		'help|h'  => \$help,
+		'cpan=s'  => \$module_name,
+		'repo=s'  => \$repository_folder,
+		'build=s' => \$build_folder,
+		'no-retry' => \$no_build_retry,
+		'dh-make-perl=s' => \$dh_make_perl,
+		'no-cpan-patches' => \$no_cpan_patches,
+		'tilde=s' => \$tilde,
+		'debian-version=s' => \$debian_pkg_version,
+		'version|V'         => \$print_version,
+	) or pod2usage;
+	pod2usage if $help;
+	print_version() if $print_version;
+	pod2usage if not $module_name;
+	
+	if ($tilde and defined $debian_pkg_version) {
+		print STDERR '--tilde and --debian-version can not be set both at the same time';
+		pod2usage;
+	}
+
+	my ($deb_in_root_of_repo) = </var/cache/pbuilder/result/*.deb>;
+	die $deb_in_root_of_repo.' left unsorted'
+		if $deb_in_root_of_repo;
+	
+	die $repository_folder.' folder does not exists'
+		if not -d $repository_folder;
+	die $build_folder.' folder does not exists'
+		if not -d $build_folder;
+		
+	my %all_prereq;
+	my @to_make = ($module_name);
+
+	# update Perl indexes
+	system('apt-pm', 'update') and die $!;
+
+	my $i = 0;
+	while (@to_make > $i) {
+		my %prereq = find_prereq($to_make[$i++]);
+		foreach my $new_req (keys %prereq) {
+			$new_req =~ s/-/::/xmsg;     # some META.yml prereq has "-" insted of ::
+			if (not $all_prereq{$new_req}) {
+				$all_prereq{$new_req} = 1;
+				push @to_make, $new_req;
+			}
+			else {
+				# put the new_req that was already needed to the end (needs to be build first)
+				@to_make = ((grep { $_ ne $new_req } @to_make),  $new_req);
+			}
+		}
+		die 'too many pre requisities ('.join(',', @to_make).') for '.$module_name.' giving up'
+			if (@to_make > 100);
+	}
+	
+	print STDERR 'going to build deb from ', join(', ', @to_make), "\n";
+
+	while (my $build = pop @to_make) {
+		chdir(File::Spec->catdir($build_folder, '..'));
+		
+		# clean-up build directory
+		remove_tree( $build_folder, {keep_root => 1} );
+
+		my $dist = CPAN::Shell->expand('Module', $build)->distribution;
+		my $meta = $dist->parse_meta_yml;
+		my ($dist_folder, $dist_tarball) = $dist->run_preps_on_packagedir;
+
+		copy($dist_tarball, $build_folder) or die "Copy failed: $!";;
+		$dist_tarball = basename($dist_tarball);
+		
+		# don't retry to build a tarball that failed build before
+		die $dist_tarball.' previous build failed'
+			if ($no_build_retry and build_history($dist_tarball)->{'fail'});
+
+		# refresh the repository
+		system('sudo', 'cowbuilder', '--update', '--bindmounts', '/var/cache/pbuilder/result/') and die $!;
+				
+		# mark current tarball as fail
+		build_history($dist_tarball, 'fail');
+		
+		chdir($build_folder) or die $!;
+
+		extract_dist_tarball($dist_tarball);
+		
+		my ($folder) = grep { -d $_ } <*>;
+		die 'distribution '.$dist_tarball.' folder not found'
+			if not $folder;
+		
+		rename($folder, $folder.'.orig');
+		extract_dist_tarball($dist_tarball);
+		
+		# make sure we have META.yml dh-make-perl needs it
+		eval { CPAN::Patches->read_meta($folder) } || CPAN::Patches->read_meta_intrusive($folder);
+		
+		chdir($folder);
+		system($dh_make_perl) and die $!;
+		if (not $no_cpan_patches) {
+			system(
+				'cpan-patches',
+				'--patch-set=/var/lib/cpan-patches/set',
+				'--patch-set=/var/lib/cpan-patches/debian-set',
+				'update-debian'
+			) and die $!;
+		}
+		
+		my $changes_file = IO::Any->slurp('debian/changelog');
+		die 'failed to parse package name and version from debian/changelog'
+			if $changes_file !~ m/ \A ([-a-z0-9]+) \s+ \( ([^)]+) \) (.+) \Z/xms;
+		my ($package_name, $package_version, $change_log_rest) = ($1, $2, $3);
+		
+		# update/set package version string
+		if ($tilde or (defined $debian_pkg_version)) {
+			if ($tilde) {
+				$package_version =~ s/~ .* $//xms;
+				$package_version =~ s/- .* $//xms;
+				$package_version .= '~'.$tilde;
+			}
+			elsif (defined $debian_pkg_version) {
+				$package_version =~ s/- .* $//xms;
+				$package_version .= '-'.$debian_pkg_version;
+			}
+			IO::Any->spew('debian/changelog', $package_name.' ('.$package_version.')'.$change_log_rest)
+		}
+		
+		chdir('..');
+		my $debian_folder = $package_name.'-'.$package_version;
+		$debian_folder =~ s/-[^-]+$//xms;    # strip debian packaging version
+		my $debian_filename = $package_name.'_'.$package_version;
+		$debian_filename =~ s/-[^-]+$//xms;    # strip debian packaging version
+		die 'ups' if $folder eq $debian_folder;     # should never happend but if than better die
+		rename($folder.'.orig', $debian_folder);
+		system('tar', 'cvzf',  $debian_filename.'.orig.tar.gz', $debian_folder);
+		rename($debian_folder, $debian_folder.'.orig');
+		rename($folder, $debian_folder);
+		system('diff -Naur '.$debian_folder.'.orig '.$debian_folder.' | gzip -9 > '.$package_name.'_'.$package_version.'.diff.gz');
+		remove_tree($debian_folder.'.orig');
+
+		chdir($debian_folder);
+		eval {
+			local $SIG{ALRM} = sub { die "alarm" };
+			alarm(30*60);
+			system('pdebuild', '--pbuilder', 'cowbuilder') and die $!;		
+			alarm(0);
+		};
+		
+		my ($generated_deb) = </var/cache/pbuilder/result/*.deb>;
+		die $dist_tarball.' deb build failed'
+			if not $generated_deb;
+		die 'is '.$generated_deb.' deb archive?'
+			if $generated_deb !~ m{^ ([^_]+) _ [^/]+ $}xms;
+		my $deb_basename = $1;
+		
+		system('mv', glob($deb_basename.'*'), '/var/cache/pbuilder/result/unstable') and die $!;
+
+		# mark current tarball as pass
+		build_history($dist_tarball, 'pass');
+
+		# refresh repository and apt-pm index
+		chdir($repository_folder);
+		system('make', 'all') and die $!;
+		system('apt-pm', 'update') and die $!;
+	}
+	
+	
+	return 0;
+}
+
+sub find_prereq {
+	my $module_name = shift;
+		
+	my $dist = CPAN::Shell->expand('Module', $module_name);
+	$dist = $dist->distribution
+		if $dist;
+	die $module_name.' not found'
+		if not $dist;
+	
+	$dist->get;
+	my $meta =
+		$dist->parse_meta_yml
+		|| Module::Depends::Intrusive->new->dist_dir( $dist->{"build_dir"} )->find_modules
+		|| die 'failed to resolv dependencies for '.$module_name
+	;
+	
+	my %prereq;
+	foreach my $req_type (qw(requires build_requires configure_requires recommends)) {
+		my %req = %{$meta->{$req_type} || {}};
+		while (my ($need_module, $need_version) = each %req) {
+			return if $need_module ~~ ['perl'];
+
+			# we need the highest version of a module
+			next if (
+				(exists $prereq{$need_module})
+				and (CPAN::Version->vcmp($need_version, $prereq{$need_module}) != 1)
+			);
+			
+			$prereq{$need_module} = $need_version;
+		}
+		
+	}
+
+    my @debs;
+    my @build_dep;
+    while (my($need_module, $need_version) = each %prereq) {
+		# ignore Perl version requires, no clue how to handle
+		if ($need_module ~~ ['perl']) {
+			delete $prereq{$need_module};
+			next;
+		};
+		
+        my $debs = $aptpm->find($need_module, $need_version);
+		delete $prereq{$need_module}
+        	if ($debs and $debs->{'min'});
+    }
+    
+    return %prereq;
+}
+
+sub extract_dist_tarball {
+	my $dist_tarball = shift or die;
+	given ($dist_tarball) {
+		when (/(\.tar\.gz|\.tgz)$/) {
+			system('tar', 'xvzf', $dist_tarball);
+		}
+		when (/\.tar\.bz2$/) {
+			system('tar', 'xvjf', $dist_tarball);
+		}
+		when (/\.zip$/) {
+			system('unzip', $dist_tarball);
+		}
+		default {
+			die 'unsupported dist format - '.$dist_tarball;
+		}
+	}
+}
+
+sub build_history {
+	my $tarball = shift;
+	my $status  = shift;
+	
+	state $build_history_filename = Debian::Apt::PM::SPc->sharedstatedir.'/dh-make-pm/build-history.json';
+
+	my $fh = IO::Any->new([$build_history_filename], '+>>', { 'LOCK_EX' => 1 });
+	seek($fh, 0, SEEK_SET);
+	my $json_string = do {local $/; <$fh>} || '{}';
+
+	my %build_history = %{JSON::Util->decode(\$json_string)};
+	
+	if ($status) {
+		$build_history{$tarball} ||= {};
+		delete $build_history{$tarball}->{'fail'};
+		delete $build_history{$tarball}->{'pass'};
+		$build_history{$tarball} = { $status => time() };
+		truncate($fh, 0);
+		print $fh JSON::Util->encode(\%build_history);
+	}
+	
+	close $fh;
+	
+	return $build_history{$tarball} || {};
+}
+
+sub print_version {
+	print "$0 $VERSION, Debian::Apt::PM $Debian::Apt::PM::VERSION, CPAN::Patches::Plugin::Debian $CPAN::Patches::Plugin::Debian::VERSION\n";
+	exit 0;
+}
+
+__END__
+
+=head1 TODO
+
+    * when source Debian package already exists, get the source and backport
+    * build conflicts from the apt-file

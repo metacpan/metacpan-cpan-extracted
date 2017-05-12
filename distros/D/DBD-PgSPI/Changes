@@ -1,0 +1,7 @@
+Revision history for Perl extension DBD-PgSPI.
+
+0.00 Apr 11 2000
+	-  Started off, using DBD-Pg
+
+0.01 Jun 21 2001
+	-  First public release

@@ -1,0 +1,41 @@
+==============================
+2011-10-09 20:25:52 +0100 0.04
+==============================
+
+  commit 202abb2e56d7593cfcf466a9c2a609a4b168aa07
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Sun Oct 9 20:25:52 2011 +0100
+  
+    Bump version to 0.04
+
+  commit b6c4804f034aa3d3b1a1505b94d9cea577e5f89b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Jun 7 10:56:45 2011 +0100
+  
+    Add a see also for FakeFaker
+
+  commit f7b243b80967831cbd428d48103cfec88eac6978
+  Author: Leon Timmermans <fawaka@gmail.com>
+  Date:   Sun Oct 9 22:36:15 2011 +0800
+  
+    Refactor most logic into a role for future reuse 
+
+==============================
+2011-06-07 11:00:34 +0100 0.02
+==============================
+
+  commit 4488fb2e910c205057b1d127218ebefc2fd463c3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Jun 7 11:00:34 2011 +0100
+  
+    Fix Pod::Coverage release tests
+
+  commit d1a67643f88ab4354411685d7f2ccf4edb3bfd3f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date:   Tue Jun 7 10:56:45 2011 +0100
+  
+    Add a see also for FakeFaker 
+
+====================================
+End of changes in the last 1825 days
+====================================

@@ -1,0 +1,22 @@
+benchmark/generate_test_array.pl
+benchmark/tests/01_100x10
+benchmark/tests/02_1000x10
+benchmark/vs_dumper.pl
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+lib/Data/StreamSerializer.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+StreamSerializer.xs
+t/01-data-ss.t
+t/02-empty-objects.t
+t/03_big_object.t
+t/04_recursive.t
+t/05_memory_leak.t
+META.yml                                 Module meta-data (added by MakeMaker)

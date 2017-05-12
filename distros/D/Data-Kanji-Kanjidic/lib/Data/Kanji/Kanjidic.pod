@@ -1,0 +1,664 @@
+
+
+
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Kanji::Kanjidic - parse the "kanjidic" kanji data file
+
+=head1 SYNOPSIS
+
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanji = parse_kanjidic ('/path/to/kanjidic');
+    for my $k (keys %$kanji) {
+        print "$k has radical number $kanji->{$k}{radical}.\n";
+    }
+
+(This example is included as L<F<example.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/example.pl> in the distribution.)
+
+
+=head1 VERSION
+
+This documents Data::Kanji::Kanjidic version 0.15
+corresponding to git commit L<6e3f60569b57b1a8254b10873437769812964c26|https://github.com/benkasminbullock/Data-Kanji-Kanjidic/commit/6e3f60569b57b1a8254b10873437769812964c26> released on Thu Feb 2 14:36:47 2017 +0900.
+
+=head1 DESCRIPTION
+
+This extracts the data from the old-format F<kanjidic> kanji
+dictionary file. See L</About Kanjidic> if you are not familiar with
+this data file.
+
+This module's basic function is to read the F<kanjidic> file into
+memory and create a data structure from it. Parsing Kanjidic takes a
+second or two. Here the Kanjidic file is the as-downloaded text file
+in the old format, rather than the new-format XML file.
+
+=head1 FUNCTIONS
+
+=head2 parse_kanjidic
+
+    
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanjidic = parse_kanjidic ('/path/to/kanjidic');
+    print "@{$kanjidic->{猫}{english}}\n";
+    # This prints out "cat".
+    
+
+(This example is included as L<F<parse-kanjidic.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/parse-kanjidic.pl> in the distribution.)
+
+
+The input is the file name where Kanjidic may be found. The return
+value is a hash reference. The keys of this hash reference are kanji,
+encoded as Unicode. Each of the values of the hash reference are
+entries corresponding to the kanji in the keys. Each value represents
+one line of Kanjidic. Each is a hash reference, with the keys
+described in L</parse_entry>.
+
+This function assumes that the kanjidic file is encoded using the
+EUC-JP encoding.
+
+=head2 parse_entry
+
+    my %values = parse_entry ($line);
+
+Parse one line of Kanjidic. The input is one line from Kanjidic,
+encoded as Unicode. The return value is a hash containing each field
+from the line.
+
+The possible keys and values of the returned hash are as
+follows. Values are scalars unless otherwise mentioned.
+
+=over
+
+=item kanji
+
+The kanji itself (the same as the key).
+
+=item jiscode
+
+The JIS code for the kanji in hexadecimal. This is a two-byte number
+which identifies the kanji in the L<JIS X 0208 encoding
+scheme|http://www.sljfaq.org/afaq/encodings.html#encodings-JIS-X-0208>. The
+JIS value is the second value in Kanjidic after the kanji in encoded
+form and before the Unicode code point.
+
+
+
+=item B
+
+Bushu (radical as defined by the Nelson kanji dictionary).
+
+=item C
+
+Classic radical (the usual radical, where this is different from the Nelson radical).
+
+=item DA
+
+The index numbers used in the 2011 edition of the Kanji & Kana book, by Spahn & Hadamitzky.
+This may take multiple values, so the value is an array reference.
+
+=item DB
+
+Japanese for Busy People textbook numbers.
+
+=item DC
+
+The index numbers used in "The Kanji Way to Japanese Language Power" by Dale Crowley.
+
+=item DF
+
+"Japanese Kanji Flashcards", by Max Hodges and Tomoko Okazaki.
+
+=item DG
+
+The index numbers used in the "Kodansha Compact Kanji Guide".
+
+=item DH
+
+The index numbers used in the 3rd edition of "A Guide To Reading and Writing Japanese" edited by Kenneth Hensall et al.
+
+=item DJ
+
+The index numbers used in the "Kanji in Context" by Nishiguchi and Kono.
+
+=item DK
+
+The index numbers used by Jack Halpern in his Kanji Learners Dictionary.
+
+=item DL
+
+The index numbers used in the 2013 edition of Halpern's Kanji Learners Dictionary.
+
+=item DM
+
+The index numbers from the French-language version of "Remembering the kanji".
+
+=item DN
+
+The index number used in "Remembering The Kanji, 6th Edition" by James Heisig.
+
+=item DO
+
+The index numbers used in P.G. O'Neill's Essential Kanji.
+
+=item DP
+
+The index numbers used by Jack Halpern in his Kodansha Kanji Dictionary (2013), which is the revised version of the "New Japanese-English Kanji Dictionary" of 1990.
+
+=item DR
+
+The codes developed by Father Joseph De Roo, and published in his book "2001 Kanji" (Bonjinsha).
+
+=item DS
+
+The index numbers used in the early editions of "A Guide To Reading and Writing Japanese" edited by Florence Sakade.
+
+=item DT
+
+The index numbers used in the Tuttle Kanji Cards, compiled by Alexander Kask.
+
+=item E
+
+The numbers used in Kenneth Henshall's kanji book.
+
+=item F
+
+Frequency of kanji.
+
+The following example program prints a list of kanji from most to least
+frequently used.
+
+    
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanji = parse_kanjidic ('/path/to/kanjidic');
+    my @sorted;
+    for my $k (keys %$kanji) {
+        if ($kanji->{$k}->{F}) {
+            push @sorted, $kanji->{$k};
+        }
+    }
+    @sorted = sort {$a->{F} <=> $b->{F}} @sorted;
+    for (@sorted) {
+        print "$_->{kanji}: $_->{F}\n";
+    }
+    
+
+(This example is included as L<F<frequency.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/frequency.pl> in the distribution.)
+
+
+=item G
+
+Year of elementary school this kanji is taught.
+
+This field is also used by kanjidic to give information on whether the
+kanji is part of the Joyo or Jinmeiyo Kanji sets. If the grade is
+between 1 and 8, the kanji is part of L<the Joyo
+Kanji|http://www.sljfaq.org/afaq/jouyou-kanji.html>. If the grade is 9 or 10, then the kanji is not part of the
+Joyo kanji, but it is part of the L<Jinmeiyo
+Kanji|http://www.sljfaq.org/afaq/jinmeiyou-kanji.html>.
+
+See also L</grade>.
+
+
+=item H
+
+Number in Jack Halpern dictionary.
+
+=item I
+
+The Spahn-Hadamitzky book number.
+
+=item IN
+
+The Spahn-Hadamitzky kanji-kana book number.
+
+=item J
+
+Japanese proficiency test level.
+
+=item K
+
+The index in the Gakken Kanji Dictionary (A New Dictionary of Kanji Usage).
+
+=item L
+
+Code from "Remembering the Kanji" by James Heisig.
+
+=item MN
+
+Morohashi index number.
+
+=item MP
+
+Morohashi volume/page.
+
+=item N
+
+Nelson code from original Nelson dictionary.
+
+=item O
+
+The numbers used in P.G. O'Neill's "Japanese Names".
+This may take multiple values, so the value is an array reference.
+
+=item P
+
+SKIP code.
+
+=item Q
+
+Four-corner code.
+This may take multiple values, so the value is an array reference.
+
+=item S
+
+Stroke count.
+This may take multiple values, so the value is an array reference.
+
+=item T
+
+SPECIAL.
+
+=item U
+
+Unicode code point as a hexadecimal number.
+
+=item V
+
+Nelson code from the "New Nelson" dictionary.
+This may take multiple values, so the value is an array reference.
+
+=item W
+
+Korean pronunciation.
+This may take multiple values, so the value is an array reference. 
+
+The following example program prints a list of Korean pronunciations,
+romanised. This example also requires L<Lingua::KO::Munja>.
+
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    use Lingua::KO::Munja ':all';
+    my $kanji = parse_kanjidic ($ARGV[0]);
+    for my $k (sort keys %$kanji) {
+        my $w = $kanji->{$k}->{W};
+        if ($w) {
+            my @h = map {'"' . hangul2roman ($_) . '"'} @$w;
+            print "$k is Korean ", join (", ", @h), "\n";
+        }
+    }
+
+(This example is included as L<F<korean.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/korean.pl> in the distribution.)
+
+
+=item X
+
+Cross reference.
+
+=item XDR
+
+De Roo cross-reference.
+This may take multiple values, so the value is an array reference.
+
+=item XH
+
+Cross-reference.
+This may take multiple values, so the value is an array reference.
+
+=item XI
+
+Cross-reference.
+
+=item XJ
+
+Cross-reference.
+This may take multiple values, so the value is an array reference.
+
+=item XN
+
+Nelson cross-reference.
+This may take multiple values, so the value is an array reference.
+
+=item XO
+
+Cross-reference.
+
+=item Y
+
+Pinyin pronunciation.
+This may take multiple values, so the value is an array reference.
+
+=item ZBP
+
+SKIP misclassification by both stroke count and position.
+This may take multiple values, so the value is an array reference.
+
+=item ZPP
+
+SKIP misclassification by position.
+This may take multiple values, so the value is an array reference.
+
+=item ZRP
+
+SKIP classification disagreement.
+This may take multiple values, so the value is an array reference.
+
+=item ZSP
+
+SKIP misclassification by stroke count.
+This may take multiple values, so the value is an array reference.
+
+=item radical
+
+This is the Kangxi radical of the kanji. This overrides Kanjidic's
+preference for the Nelson radical. In other words, this is the same as
+the L</B> field for most kanji, but if a L</C> field exists, this is
+the value of the C field rather than the B field.
+
+=item kokuji
+
+This has a true value (1) if the character is marked as a "kokuji" in
+Kanjidic. See L<Which kanji were created in Japan?|http://www.sljfaq.org/afaq/kokuji.html>
+for more on kokuji.
+
+=item english
+
+This contains an array reference to the English-language meanings
+given in Kanjidic. It may be undefined, if there are no
+English-language meanings listed.
+
+    # The following "joke" program converts English into kanji.
+    
+    # Call it with two arguments, first the location of kanjidic, and
+    # second a file of English text to "corrupt":
+    #
+    # ./english-to-kanji.pl /where/is/kanjidic english-text-file
+    
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    use Convert::Moji 'make_regex';
+    my $kanji = parse_kanjidic ($ARGV[0]);
+    my %english;
+    for my $k (keys %$kanji) {
+        my $english = $kanji->{$k}->{english};
+        if ($english) {
+            for (@$english) {
+                push @{$english{$_}}, $k;
+            }
+        }
+    }
+    my $re = make_regex (keys %english);
+    open my $in, "<", $ARGV[1] or die $!;
+    while (<$in>) {
+        s/\b($re)\b/$english{$1}[int rand (@{$english{$1}})]/ge;
+        print;
+    }
+    
+
+(This example is included as L<F<english-to-kanji.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/english-to-kanji.pl> in the distribution.)
+
+
+Given input like this,
+
+    This is an example of the use of "english-to-kanji.pl", a program which
+    converts English words into kanji. This may or may not be regarded as a
+    good idea. What do you think?
+
+
+it outputs this:
+
+    This is an 鑒 之 彼 使 之 "english負to負kanji.pl", a program 孰
+    converts 英 辭 into kanji. This 得 将 得 無 跨 regarded as a
+    臧 見. What 致 尓 憶?
+
+
+=item onyomi
+
+This is an array reference which contains the L<on'yomi|http://www.sljfaq.org/afaq/kanji-pronunciation.html> of the kanji. It may be
+undefined, if no I<on'yomi> readings are listed. The I<on'yomi>
+readings are in katakana, as per Kanjidic itself. It is encoded in
+Perl's internal Unicode encoding.
+
+The following example prints a list of kanji which have the same on'yomi:
+
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanji = parse_kanjidic ($ARGV[0]);
+    my %all_onyomi;
+    for my $k (keys %$kanji) {
+        my $onyomi = $kanji->{$k}->{onyomi};
+        if ($onyomi) {
+            for my $o (@$onyomi) {
+                push @{$all_onyomi{$o}}, $k;
+            }
+        }
+    }
+    for my $o (sort keys %all_onyomi) {
+        if (@{$all_onyomi{$o}} > 1) {
+            print "Same onyomi 「$o」 for 「@{$all_onyomi{$o}}」!\n";
+        }
+    }
+
+(This example is included as L<F<onyomi-same.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/onyomi-same.pl> in the distribution.)
+
+
+=item kunyomi
+
+This is an array reference which contains the L<kun'yomi|http://www.sljfaq.org/afaq/kanji-pronunciation.html>.  It may be undefined, if no
+I<kun'yomi> readings are listed. The I<kun'yomi> readings are in
+hiragana, as per Kanjidic itself. It is encoded in Perl's internal
+Unicode encoding.
+
+=item nanori
+
+This is an array reference which contains I<nanori> (名乗り) readings
+of the character, which are readings of the kanji used in names. It
+may be undefined, if no I<nanori> readings are listed. The I<nanori>
+readings are in hiragana, as per Kanjidic itself. They are encoded in
+Perl's internal Unicode encoding.
+
+=item morohashi
+
+This is a hash reference containing data on the kanji's location in
+the Morohashi 'Dai Kan-Wa Jiten' kanji dictionary. The hash reference
+has the following keys.
+
+=over
+
+=item volume
+
+The volume number of the character.
+
+=item page
+
+The page number of the character.
+
+=item index
+
+The index number of the character.
+
+=back
+
+If there is no information, this remains unset.
+
+For example, to print all the existing values,
+
+    
+    use Data::Kanji::Kanjidic 'parse_kanjidic';
+    my $kanji = parse_kanjidic ("/path/to/kanjidic");
+    for my $k (sort keys %$kanji) {
+        my $mo = $kanji->{$k}->{morohashi};
+        if ($mo) {
+            print "$k: volume $mo->{volume}, page $mo->{page}, index $mo->{index}.\n";
+        }
+    }
+    
+
+(This example is included as L<F<morohashi.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/morohashi.pl> in the distribution.)
+
+
+=back
+
+For detailed explanations of these codes, see the kanjidic
+documentation, which is linked to under L</About Kanjidic>.
+
+=head2 kanjidic_order
+
+    my @order = kanjidic_order ($k);
+
+This returns a list of the keys of C<$k> sorted by their JIS code
+number, which is the ordering used by the Kanjidic file itself.
+
+=head2 kanji_dictionary_order
+
+    my @sorted = sort {kanji_dictionary_order ($kanjidic_ref, $a, $b)} @kanji;
+
+This is a comparision function which puts kanji in the order they
+would be found in a Japanese kanji dictionary. Elements are sorted by
+the value of the L</radical> field, then by the first stroke count
+value (the first entry of the L</S> field) if they both have the same
+radical. Elements with the same stroke count and radical are finally
+sorted in order of their JIS code value.
+
+This also adds a new field "kanji_id" to each element of
+C<$kanjidic_ref> so that the order can be reconstructed when referring
+to elements.
+
+See L<How is a kanji dictionary
+used?|http://www.sljfaq.org/afaq/using-a-kanji-dictionary.html>
+for more on kanji dictionary ordering. See L<What
+are kanji radicals?|http://www.sljfaq.org/afaq/radicals.html>
+for more on kanji radicals.
+
+=head2 stroke_radical_jis_order
+
+    @list = sort { stroke_radical_jis_order ($kanjidic, $a, $b) } @list;
+
+This is a comparison function which sorts kanji C<$a> and C<$b>
+according to stroke count, the L</S> field. If the stroke count is
+identical, it sorts them according to L</radical>. If both the stroke
+count and radical are the same, it sorts them according to
+L</jiscode>.
+
+=head2 grade_stroke_order
+
+This is like L</kanji_dictionary_order> and
+L</stroke_radical_jis_order>, except it sorts the kanji by school
+grade, then by stroke number, then by JIS number.
+
+This function is used to make this L<List of kanji
+by elementary school grade|http://www.sljfaq.org/afaq/grade-list.html>.
+
+=head2 grade
+
+    my $grade2 = grade ($kanjidic_ref, 2);
+
+Given a school grade such as C<2> above, and the return value of
+L</parse_kanjidic>, C<$kanjidic_ref>, return an array reference
+containing a list of all of the kanji from that grade. See L<How is Japanese writing taught to Japanese
+children?|http://www.sljfaq.org/afaq/education.html>
+for more on details of the Japanese education system.
+
+The following example prints a list of the kanji from each school
+grade to standard output:
+
+    
+    use Data::Kanji::Kanjidic qw/parse_kanjidic grade/;
+    my $kanjidic = parse_kanjidic ('/path/to/kanjidic');
+    for my $grade (1..6) {
+        my $list = grade ($kanjidic, $grade);
+        print "Grade $grade:\n\n";
+        my $count = 0;
+        for (sort @$list) {
+            print "$_ ";
+            $count++;
+            if ($count % 20 == 0) {
+                print "\n";
+            }
+        }
+        print "\n";
+    }
+    
+
+(This example is included as L<F<grades.pl>|https://api.metacpan.org/source/BKB/Data-Kanji-Kanjidic-0.15/examples/grades.pl> in the distribution.)
+
+
+=head1 SEE ALSO
+
+=head2 Other Perl modules
+
+=over
+
+=item L<Lingua::JP::Kanjidic>
+
+This module parses an old version of F<kanjidic>.
+
+=back
+
+=head2 About Kanjidic
+
+Kanjidic is a product of the L<Electronic Dictionary Research and
+Development Group (EDRDG)|http://www.edrdg.org/>, headed by Professor
+J.W. Breen, formerly of Monash University, Australia.
+
+Kanjidic is currently supplied in two formats, a text format with the
+kanji encoded in the EUC-JP encoding, and an XML format with the same
+kanji data encoded in Unicode. This module parses the older text
+format of kanjidic.
+
+=over
+
+=item Documentation
+
+The following links point to the documentation of Kanjidic.
+
+=over
+
+=item L<Summary description of kanjidic|http://www.edrdg.org/kanjidic/kanjidic.html>
+
+=item L<Full documentation|http://www.edrdg.org/kanjidic/kanjidic_doc.html>
+
+=back
+
+=item Download
+
+Download the F<kanjidic> file at one of the following sites:
+
+=over
+
+=item L<ftp://ftp.edrdg.org/pub/Nihongo/00INDEX.html>
+
+=item L<http://ftp.monash.edu.au/pub/nihongo/00INDEX.html>
+
+=back
+
+=item Licence
+
+Kanjidic's licence terms are explained at
+L<http://www.edrdg.org/edrdg/licence.html>.
+
+=back
+
+=head1 EXPORTS
+
+Nothing is exported by default. All the functions and variables
+exported by the module may be exported by using the export tag ":all":
+
+    use Data::Kanji::Kanjidic ':all';
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2011-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

@@ -1,0 +1,13 @@
+operations
+	Rmath
+	plyr
+
+see also
+	https://metacpan.org/pod/PDL::Dims
+	https://github.com/yuki-kimoto/Rstats
+	https://metacpan.org/pod/Data::Table
+	https://metacpan.org/pod/TableData::Object
+
+work with
+	https://metacpan.org/pod/PDL::IO::CSV
+	https://metacpan.org/pod/PDL::IO::DBI

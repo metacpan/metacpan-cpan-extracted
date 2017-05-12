@@ -1,0 +1,6 @@
+/*HEADER
+
+Version: %v
+Year: %y
+
+HEADER*/

@@ -1,0 +1,33 @@
+---
+abstract: 'DBIx::Class extension to update and create date and time based fields'
+author:
+  - 'J. Shirley <jshirley@gmail.com>'
+build_requires:
+  Class::Accessor::Grouped: 0
+  DateTime::Format::MySQL: 0
+  DateTime::Format::SQLite: 0
+  ExtUtils::MakeMaker: 6.42
+  Time::HiRes: 0
+  Time::Warp: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-TimeStamp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0.08009
+  DBIx::Class::DynamicDefault: 0.03
+  DateTime: 0.55
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://dev.catalyst.perl.org/repos/bast/trunk/DBIx-Class-TimeStamp/
+version: 0.14

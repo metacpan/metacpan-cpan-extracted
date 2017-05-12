@@ -1,0 +1,258 @@
+NAME
+    DateTimeX::Easy - Parse a date/time string using the best method
+    available
+
+VERSION
+    version 0.089
+
+SYNOPSIS
+        # Make DateTimeX object for "now":
+        my $dt = DateTimeX::Easy->new("today");
+
+        # Same thing:
+        my $dt = DateTimeX::Easy->new("now");
+
+        # Uses ::F::Natural's coolness (similar in capability to Date::Manip)
+        my $dt = DateTimeX::Easy->new("last monday");
+
+        # ... but in 1969:
+        my $dt = DateTimeX::Easy->new("last monday", year => 1969);
+
+        # ... at the 100th nanosecond:
+        my $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100);
+
+        # ... in US/Eastern: (This will NOT do a timezone conversion)
+        my $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100, timezone => "US/Eastern");
+
+        # This WILL do a proper timezone conversion:
+        my $dt = DateTimeX::Easy->new("last monday", year => 1969, nanosecond => 100, timezone => "US/Pacific");
+        $dt->set_time_zone("US/Eastern");
+
+        # Custom DateTimeX ability:
+        my $dt = DateTimeX::Easy->new("last second of last month");
+        $dt = DateTimeX::Easy->new("last second of first month of last year");
+        $dt = DateTimeX::Easy->new("last second of first month of 2000");
+
+DESCRIPTION
+    DateTimeX::Easy makes DateTime object creation quick and easy. It uses a
+    variety of DateTime::Format packages to do the bulk of the parsing, with
+    some custom tweaks to smooth out the rough edges (mainly concerning
+    timezone detection and selection).
+
+PARSING
+    Currently, DateTimeX::Easy will attempt to parse input in the following
+    order:
+
+    DateTime - Is the input a DateTime object?
+    ICal - Was DT::F::ICal able to parse the input?
+    DateParse - Was DT::F::DateParse able to parse the input?
+        A caveat, I actually use a modified version of DateParse in order to
+        avoid DateParse's default timezone selection.
+
+    Natural - Was DT::F::Natural able to parse the input?
+        Since this module barfs pretty loudly on strange input, we use a
+        silent $SIG{__WARN__} to hide errors.
+
+    Flexible - Was DT::F::Flexible able to parse the input?
+        This step also looks at the string to see if there is any timezone
+        information at the end.
+
+    DateManip - Was DT::F::DateManip able to parse the input?
+        DateManip isn't very nice with preserving the input timezone, but
+        it's here as a last resort.
+
+"last second of first month of year of 2005"
+    DateTimeX::Easy also provides additional parsing and transformation for
+    input like:
+
+        "first day of last month"
+        "last day of last month"
+        "last day of this month"
+        "last day of next month"
+        "last second of first month of last year"
+        "ending day of month of 2007-10-02"
+        "last second of first month of year of 2005"
+        "last second of last month of year of 2005"
+        "beginning day of month of 2007-10-02"
+        "last month of year of 2007"
+
+    It will look at each sequence of "<first|last> of <period>" and do
+    ->add, ->subtract, and ->truncate operations on the parsed DateTime
+    object
+
+    Also, It's best to be as explicit as possible; the following will work:
+
+        "last month of 2007"
+        "last second of last month of 2005"
+        "beginning day of 2007-10-02"
+
+    This won't, though:
+
+        "last day of 2007"
+
+    You'll have to do this instead:
+
+        "last day of year of 2007"
+
+    The reason is that the date portion is opaque to the parser. It doesn't
+    know whether it has "2007" or "2007-10" or "now" as the last input. To
+    fix this, you can give a hint to the parser, like "<period> of
+    <date/time>" (as in "year of 2007" above).
+
+    WARNING: This feature is still somewhat new, so there may be bugs
+    lurking about. Please forward failing tests/scenarios.
+
+METHODS
+  DateTimeX::Easy->new( ... )
+  DateTimeX::Easy->parse( ... )
+  DateTimeX::Easy->parse_date( ... )
+  DateTimeX::Easy->parse_datetime( ... )
+  DateTimeX::Easy->date( ... )
+  DateTimeX::Easy->datetime( ... )
+  DateTimeX::Easy->new_date( ... )
+  DateTimeX::Easy->new_datetime( ... )
+    Parse the given date/time specification using ::F::Flexible or
+    ::F::Natural and use the result to create a DateTime object. Returns a
+    DateTime object.
+
+    You can pass the following in:
+
+        parse       # The string or DateTime object to parse.
+
+        year        # A year to override the result of parsing
+        month       # A month to override the result of parsing
+        day         # A day to override the result of parsing
+        hour        # A hour to override the result of parsing
+        minute      # A minute to override the result of parsing
+        second      # A second to override the result of parsing
+
+        truncate    # A truncation parameter (e.g. year, day, month, week, etc.)
+
+        time_zone   # - Can be:
+        timezone    # * A timezone (e.g. US/Pacific, UTC, etc.)
+        tz          # * A DateTime special timezone (e.g. floating, local)
+                    #
+                    # - If neither "tz", "timezone", nor "time_zone" is set, then it'll use whatever is parsed.
+                    # - If no timezone is parsed, then the default is floating.
+                    # - If the given timezone is different from the parsed timezone,
+                    #   then a time conversion will take place (unless "soft_time_zone_conversion" is set).
+                    # - Either "time_zone", "timezone", "tz" will work (in that order), with "time_zone" having highest precedence
+                    # - See below for examples!
+
+        soft_time_zone_conversion   # Set this flag to 1 if you don't want the time to change when a given timezone is
+                                    # different from a parsed timezone. For example, "10:00 UTC" soft converted to
+                                    # PST8PDT would be "10:00 PST8PDT".
+
+        time_zone_if_floating       # The value of this option should be a valid timezone. If this option is set, then a DateTime object
+                                    # with a floating timezone has it's timezone set to the value.
+        default_time_zone           # Same as "time_zone_if_floating"
+
+        ambiguous   # Set this flag to 0 if you want to disallow ambiguous input like:
+                    # "last day of 2007" or "first minute of April"
+                    # This will require you to specify them as "last day of year of 2007" and "first minute of month of April"
+                    # instead. This flag is 1 (false) by default.
+
+        ... and anything else that you want to pass to the DateTime->new constructor
+
+    If "truncate" is specificied, then DateTime->truncate will be run after
+    object creation.
+
+    Furthermore, you can simply pass the value for "parse" as the first
+    positional argument of the DateTimeX::Easy call, e.g.:
+
+        # This:
+        DateTimeX::Easy->new("today", year => 2008, truncate => "hour");
+
+        # ... is the same as this:
+        DateTimeX::Easy->new(parse => "today", year => 2008, truncate => "hour");
+
+    Timezone processing can be a little complicated. Here are some examples:
+
+        DateTimeX::Easy->parse("today"); # Will use a floating timezone
+
+        DateTimeX::Easy->parse("2007-07-01 10:32:10"); # Will ALSO use a floating timezone
+
+        DateTimeX::Easy->parse("2007-07-01 10:32:10 US/Eastern"); # Will use US/Eastern as a timezone
+
+        DateTimeX::Easy->parse("2007-07-01 10:32:10"); # Will use the floating timezone
+
+        DateTimeX::Easy->parse("2007-07-01 10:32:10", time_zone_if_floating => "local"); # Will use the local timezone
+
+        DateTimeX::Easy->parse("2007-07-01 10:32:10 UTC", time_zone => "US/Pacific"); # Will convert from UTC to US/Pacific
+
+        my $dt = DateTime->now->set_time_zone("US/Eastern");
+        DateTimeX::Easy->parse($dt); # Will use US/Eastern as the timezone
+
+        DateTimeX::Easy->parse($dt, time_zone => "floating"); # Will use a floating timezone
+
+        DateTimeX::Easy->parse($dt, time_zone => "US/Pacific", soft_time_zone_conversion => 1);
+                                                                # Will use US/Pacific as the timezone with NO conversion
+                                                                # For example, "22:00 US/Eastern" will become "22:00 PST8PDT" 
+
+        DateTimeX::Easy->parse($dt)->set_time_zone("US/Pacific"); # Will use US/Pacific as the timezone WITH conversion
+                                                                  # For example, "22:00 US/Eastern" will become "19:00 PST8PDT" 
+
+        DateTimeX::Easy->parse($dt, time_zone => "US/Pacific"); # Will ALSO use US/Pacific as the timezone WITH conversion
+
+EXPORT
+  parse( ... )
+  parse_date( ... )
+  parse_datetime( ... )
+  date( ... )
+  datetime( ... )
+  new_date( ... )
+  new_datetime( ... )
+    Same syntax as above. See above for more information.
+
+MOTIVATION
+    Although I really like using DateTime for date/time handling, I was
+    often frustrated by its inability to parse even the simplest of
+    date/time strings. There does exist a wide variety of
+    DateTime::Format::* modules, but they all have different interfaces and
+    different capabilities. Coming from a Date::Manip background, I wanted
+    something that gave me the power of ParseDate while still returning a
+    DateTime object. Most importantly, I wanted explicit control of the
+    timezone setting at every step of the way. DateTimeX::Easy is the
+    result.
+
+THANKS
+    Dave Rolsky and crew for writing DateTime
+
+SEE ALSO
+    DateTime
+
+    DateTime::Format::Natural
+
+    DateTime::Format::Flexible
+
+    DateTime::Format::ICal
+
+    DateTime::Format::DateManip
+
+    DateTime::Format::ParseDate
+
+    Date::Manip
+
+SOURCE
+    You can contribute or fork this project via GitHub:
+
+    <http://github.com/robertkrimen/datetimex-easy/tree/master>
+
+        git clone git://github.com/robertkrimen/datetimex-easy.git DateTimeX-Easy
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2007 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

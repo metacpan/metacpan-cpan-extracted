@@ -1,0 +1,25 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBIx/Class/FrozenColumns.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/02pod.t
+t/03podcoverage.t
+t/04basic.t
+t/05frozen.t
+t/06recursive.t
+t/FrozenTest-Schema-1-SQLite.sql
+t/lib/FrozenTest.pm
+t/lib/FrozenTest/Schema.pm
+t/lib/FrozenTest/Schema/Source.pm

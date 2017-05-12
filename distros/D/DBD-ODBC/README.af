@@ -1,0 +1,238 @@
+=for humans
+This file is written in the POD format, use pod2html or similar to view it.
+
+=head1 NOTE
+
+This file is now really historical. Unicode support in DBD::ODBC has
+matured greatly since Alexander's initial patch although I greatly
+appreciate it.
+
+=head1 Unicode patch for DBD::ODBC 1.13
+
+Date: 2006-03-04
+
+=head2 Goals
+
+=over 4
+
+=item * Allow an application on Win32 using DBD::ODBC to store and fetch Unicode
+strings in a MS SQL Server 2000 database.
+
+=item * Minimal changes to the existing driver code.
+
+=item * Don't break working code.
+
+=item * Make the DBD::ODBC "do the right thing" with the UTF8 flag.
+
+=item * A first step towards proper Unicode support for DBD:ODBC.
+
+=back
+
+
+=head2 Legal disclaimer
+
+The Unicode patch for DBD::ODBC was initially written by Alexander Foken
+(alexander at foken dot de). I wrote this patch during my working hours for a
+project that needs Unicode support in DBD::ODBC on Windows, and I have the
+permission of my former employer to publish this patch.
+
+You may distribute under the terms of either the GNU General Public License or
+the Artistic License, as specified in the Perl README file.
+
+=head2 Applying the Patch
+
+=over 4
+
+=item 1. get DBD::ODBC 1.13 from CPAN
+
+=item 2. unpack it
+
+=item 3. C<patch -p1 E<lt> DBD-ODBC-1.13-Unicode.patch>
+
+=item 4. build DBD::ODBC as usual (C<perl Makefile.pl>, C<make>, C<make test>,
+C<make install>)
+
+=back
+
+=head2 Tested Databases
+
+=over 4
+
+=item Microsoft SQL Server 2000 SP3
+
+Works, using the ODBC driver from the MS SQL 2000 CDROM.
+
+You need to install SP1, SP2, and SP3 on both client and server, because
+DBD::ODBC needs a recent set of MDAC libraries.
+
+=item Oracle 9.2
+
+Works, using the ODBC driver from the Oracle 9.2 CDROM.
+
+You have to set the environment variables C<NLS_NCHAR=AL32UTF8> and
+C<NLS_LANG=AMERICAN_AMERICA.AL32UTF8> (or any other language setting ending with
+"C<.AL32UTF8>") before loading the patched DBD::ODBC to make Oracle return
+Unicode data. (See also "Oracle and Unicode" in the POD of DBD::Oracle.)
+
+And you have to enable the "C<Force SQL_WCHAR support>" Workaround in the Oracle
+ODBC Driver Configuration to make Oracle return Unicode to a non-Unicode
+application. Alternatively, you can include "C<FWC=T>" in your connect string.
+
+Better try to use DBD::Oracle to access Oracle with less overhead and better
+support for Oracle-specific stuff.
+
+=item Oracle 8.x
+
+Not tested but known not to support Unicode very well.
+
+Quoting the DBD::Oracle man page: "I<Oracle 8 client libraries have a number of
+bugs related to character set handling, especially when connected to an Oracle
+9+ server.> [...] I<If you wish to use Unicode, I recommend upgrading client and
+server to Oracle 9 or later.>"
+
+=item MS Access 2000
+
+Unicode tests fail because MS Access 2000 seems not to give any hints about
+Unicode, so all data is treated as non-Unicode. You do not want to use this
+combination.
+
+You may want to try the MSDE, it has the SQL Server engine, but with a lower
+connection limit and without GUI tools. There are several 3rd party GUIs for the
+MSDE.
+
+=item PostgreSQL 8.0.3
+
+Some tests from the original DBD::ODBC 1.13 fail with PostgreSQL 8.0.3, so you
+may not want to use DBD::ODBC to connect to PostgreSQL 8.0.3.
+
+Unicode tests fail because PostgreSQL seems not to give any hints about Unicode,
+so all data is treated as non-Unicode.
+
+Better try to use DBD::Pg to access PostgreSQL with less overhead and better
+support for PostgreSQL-specific stuff. DBD::Pg has a driver attribute named
+C<pg_enable_utf8>, set it to 1 and you have proper Unicode support.
+
+=back
+
+=head2 Tested Operating Systems and ODBC Managers
+
+=over 4
+
+=item MS Windows 2000 Professional and Server, using the standard ODBC Manager
+from Microsoft.
+
+=back
+
+(Yes, this list should be longer.)
+
+=head2 Known Problems
+
+Perl 5.8.1 or newer is required. Older Perl before 5.8.0 lacked proper Unicode
+support. Perl 5.8.0 lacks some auxillary functions for Unicode.
+
+Unicode is supported only for SQL statement parameters and data returned by the
+fetch methods, SQL statements are still treated as native encoding. If you need
+a unicode constant in an SQL statement, you have to pass it as parameter or use
+SQL functions to convert your constant from native encoding to Unicode.
+
+All data passed to the patched DBD::ODBC for C<SQL_C_WCHAR>, C<SQL_WCHAR>,
+C<SQL_WVARCHAR>, and C<SQL_WLONGVARCHAR> is treated as Unicode, even if it is
+not Unicode. F<unicode_helper.c> should check the UTF8 flag of the scalar and
+pass a value different from C<CP_UTF8> as first argument to
+C<WideCharToMultiByte()>. The problem is to know what encoding is used for the
+data in the scalar.
+
+Binding of unicode output parameters is untested (I don't need them) and likely
+to fail.
+
+The patched DBD::ODBC may fail to compile on non-Win32 platforms. It needs a
+header file named F<wchar.h> defining at least the following:
+
+=over 4
+
+=item A C<WCHAR> data type capable of storing a single Unicode character.
+
+Microsoft uses C<typedef wchar_t WCHAR> in F<wchar.h>, and C<typedef unsigned
+short wchar_t;> in F<ctype.h>.
+
+=item C<WCHAR * wcscpy(WCHAR *, const WCHAR *)>
+
+C<strcpy()> for wide characters. Microsoft declares this function in both
+F<string.h> and F<wchar.h>.
+
+=item C<size_t wcslen(const WCHAR *)>
+
+C<strlen()> for wide characters, returns character count, not bytes. Microsoft
+declares this function in both F<string.h> and F<wchar.h>.
+
+=item WideCharToMultiByte() and MultiByteToWideChar() functions
+
+Encoding converter functions. WideChar in this context means the native Unicode
+representation of the ODBC API (UCS-2 or UTF-16LE for Windows), MultiByte in
+this context means Perls native Unicode representation (UTF-8). Microsoft
+declares the two functions in F<winnls.h>. The C<CP_UTF8> argument tells the
+function that the MultiByte string is in UTF-8 encoding.
+
+=back
+
+=head2 Technical
+
+This patch adds support for C<SQL_C_WCHAR>, C<SQL_WCHAR>, C<SQL_WVARCHAR>, and
+C<SQL_WLONGVARCHAR>. Strings written to columns that are reported as
+C<SQL_WCHAR>, C<SQL_WVARCHAR>, or C<SQL_WLONGVARCHAR> are automatically
+converted to 16 bit Unicode using the Windows API function
+C<WideCharToMultiByte()>, return values reported as C<SQL_C_WCHAR>,
+C<SQL_WCHAR>, C<SQL_WVARCHAR>, or C<SQL_WLONGVARCHAR> are converted back to 8
+bit Unicode (UTF-8) using the Windows API function C<MultiByteToWideChar()> and
+have Perl's UTF8 flag set except for empty strings.
+
+=head2 Tests
+
+This patch adds two new tests, F<t/40UnicodeRoundTrip.t> and F<t/41Unicode.t>.
+Test 40 checks that Unicode strings can be entered as bound parameters and are
+returned unmodified. Test 41 creates a table, writes and reads unicode data
+using various bind variants.
+
+When using Oracle, the empty string test in F<t/40UnicodeRoundTrip.t> is skipped
+because Oracle converts empty strings to NULL in this situation.
+
+I had to add C<SQL_WCHAR>, C<SQL_WVARCHAR>, C<SQL_WLONGVARCHAR> to
+F<t/ODBCTEST.pm>, because Oracle in the setup described above returns Unicode
+more often than expected.
+
+I added F<t/UChelp.pm>, that exports two utility functions for unicode string
+tests:
+
+=over 4
+
+=item C<dumpstr($)>
+
+Dumps a string, indicating its Unicode flag, length and all characters in ASCII
+notation.
+
+=item C<utf_eq_ok($$$)>
+
+Compares two strings that may be contain Unicode, and calls C<pass()> or
+C<cmp_ok()>.
+
+=back
+
+=head2 See also
+
+=over 4
+
+=item * Microsoft ODBC documentation
+
+=item * Microsoft API documentation
+
+=item * http://www.unicode.org/
+
+=item * DBI
+
+=item * DBD::ODBC
+
+=item * DBD::Oracle
+
+=item * DBD::Pg
+
+=back

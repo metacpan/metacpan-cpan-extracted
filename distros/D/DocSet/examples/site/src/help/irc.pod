@@ -1,0 +1,22 @@
+=head1 NAME
+
+IRC Channel for mod_perl
+
+=head1 Description
+
+If you want to get some help with mod_perl, or just want to discuss
+mod_perl-related things, you might want to check out the mod_perl IRC
+channel.
+
+=head1 The IRC Channel
+
+Although there is nothing "official" about, mod_perl people usually
+hang out on the I<irc.rhizomatic.net> IRC server (on port 6667), on
+the channel I<#modperl>.
+
+You might also want to check in at the I<#axkit-dahut> channel where
+many mod_perl people hang out for non-serious talk, and the I<#axkit>
+channel for AxKit related talk. See http://axkit.org/irclog.xml for
+more info.
+
+=cut

@@ -1,0 +1,11 @@
+.png_icon_container, body>nav, body>article, body>div.error_message, body>div.warning_message, body>div.info_message, body>div.form_box {
+  width: 1000px;
+}
+
+body>div.error_message, body>div.warning_message, body>div.info_message {
+  width: 925px;
+}
+
+body>header hgroup h1, body>header hgroup h2 {
+  width: 875px;
+}

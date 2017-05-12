@@ -1,0 +1,53 @@
+{
+   "abstract" : "Authenticate with Google",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Auth-Google",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer" : "0",
+            "Furl" : "0",
+            "IO::Socket::SSL" : "0",
+            "JSON" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "URI" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/garu/Dancer-Plugin-Auth-Google"
+      }
+   },
+   "version" : 0.06
+}

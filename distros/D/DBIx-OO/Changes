@@ -1,0 +1,58 @@
+Revision history for DBIx-OO
+
+0.0.9    Nov 26, 2008
+
+         Fixed bug in search_join_X methods: $#{@$row} no longer works
+         to determine the index of the last element in an array ref,
+         it returns -1 instead.  Either it never worked (but AFAIR it
+         did) or it somehow broke in Perl 5.10.
+
+0.0.8    Nov 5, 2008
+
+         Added (succinct) POD for naked subroutines, and more
+         prerequisites, so that build won't fail.
+
+0.0.7    Nov 5, 2008
+
+         Minor changes but releasing a new version to support some
+         projects I'm working on:
+
+         - $obj->retrieve will re-fetch data from DB
+         - $package->update will now be able to update more rows
+         - fixed some problems with autocreate
+
+0.0.6    Sep 29, 2007
+
+         Added a rudimentary DB auto-create/upgrade facility.
+         Some minor other changes as well (I forgot).
+
+0.0.5    Jul 03, 2007
+
+         Minor fixes, added tree_get_next / tree_get_prev functions in
+         DBIx::OO::Tree.
+
+0.0.4    Nov 26, 2006
+
+         DBIx::OO::Tree:
+
+         - fixed a bug that caused bad integrity when you tried to
+           append multiple root nodes in a tree.
+
+         - tree_reparent supports "undef" (to move as root node)
+
+         - added tree_move_before, tree_move_after
+
+0.0.3    Nov 25, 2006
+
+         Minor fixes to DBIx::OO.  Added DBIx::OO::Tree to facilitate
+         manipulation of hierarchical data using the "nested sets
+         model".
+
+0.0.2    Nov 25, 2006
+
+         Messed up MANIFEST so CPAN didn't get all the files.  Version
+         removed. :-)
+
+0.0.1    Oct 18, 2006
+
+         First version, released on an unsuspecting world.

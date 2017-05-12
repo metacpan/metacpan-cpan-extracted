@@ -1,0 +1,14 @@
+POE::Filter::Zlib
+=================
+
+A POE filter wrapped around Compress::Zlib.
+
+Installation:-
+
+perl Makefile.PL
+make
+make test
+su -
+make install
+
+>;o)

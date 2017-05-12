@@ -1,0 +1,23 @@
+
+Product:
+  many_to_many: Tag
+  attributes: [ name, 'price:int', 'description:text' ]
+
+HardDisk:
+  extends: Product
+  attributes: [ 'capacity:int', 'rpm:int' ]
+
+Monitor:
+  extends: Product
+  attributes: [ resolution, 'contrast_ratio:int' ]
+
+CurvedMonitor:
+  extends: Monitor
+  attributes: [ 'angle:int' ]
+
+FancyMonitor:
+  extends: CurvedMonitor
+  attributes: [ foobar ]
+
+Tag:
+  attributes: [ name ]

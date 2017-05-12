@@ -1,0 +1,80 @@
+==================================================
+Changes from 2008-12-11 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.08 at 2013-12-10 18:46:10 +0000
+-----------------------------------------
+
+  Change: 93cb8baa45de31bbda1e7df60b7e0429265e33f9
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-12-10 18:46:10 +0000
+
+    Release engineering for 0.08 
+
+  Change: 65d154bfe17989de9cbd54281747d7da9771b6d5
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-12-10 10:43:43 +0000
+
+    Merge pull request #2 from karenetheridge/topic/munge_all_installers
+
+    modify either or both of Makefile.PL, Build.PL as available, rather
+    than just Makefile.PL 
+
+  Change: a1b7e5f474593519da2bb352c63715304ad8b9ad
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2013-12-10 10:40:05 +0000
+
+    modify either or both of Makefile.PL, Build.PL as available, rather
+    than just Makefile.PL 
+
+-----------------------------------------
+version 0.06 at 2013-05-25 11:31:41 +0000
+-----------------------------------------
+
+  Change: 6c76c8fed014c6ee2e71d51893565d66c541661e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-25 12:31:41 +0000
+
+    Bump to version 0.06 
+
+  Change: 8267199b285708eff8817fd2d4602038067370c9
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-25 04:30:15 +0000
+
+    Merge pull request #1 from karenetheridge/patch-1
+
+    die if plugin order results in a no-op 
+
+  Change: 06f9454752f6f232c83026878ad9a76f51979451
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2013-05-24 16:11:38 +0000
+
+    die if plugin order results in a no-op
+
+    The user might not notice the plugin order is wrong... this way
+    they're sure to notice. 
+
+-----------------------------------------
+version 0.04 at 2013-02-10 20:20:50 +0000
+-----------------------------------------
+
+  Change: a736474be475c481b02474cd766468d2b9d83c76
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-10 20:20:50 +0000
+
+    Update to use BINGOS plugin 
+
+-----------------------------------------
+version 0.02 at 2010-06-11 14:04:39 +0000
+-----------------------------------------
+
+  Change: 07703519603b58db46b5a3cf54073550915f1dda
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-06-11 15:04:39 +0000
+
+    No Smoking 
+
+================
+End of releases.
+================

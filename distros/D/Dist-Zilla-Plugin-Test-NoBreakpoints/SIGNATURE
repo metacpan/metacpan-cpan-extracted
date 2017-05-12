@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0f54e15ba8faebd83aae654b8365787ae783df49 Changes
+SHA1 ccee2d33d830e2dabe61e50e27da259cd43b29a5 LICENSE
+SHA1 071c9bc187a78df6bf5388f87aa81929ebeab6ba MANIFEST
+SHA1 16bd37a3560ce622c7189e6fe6dacc30109e9053 META.yml
+SHA1 f0ae1c7980e22bd392f3038731c068ce40eb9a34 Makefile.PL
+SHA1 cdb70a90e617cbe949822b76071e5376f9169efc README.mkdn
+SHA1 ba130d244e9bf890b755485d867f6f9b33c9311e dist.ini
+SHA1 e025b8dca1f2d85571efdbd2a89d47133aa11495 lib/Dist/Zilla/Plugin/Test/NoBreakpoints.pm
+SHA1 86cd488198ef1835477613f6a2256994986660aa t/00-load.t
+SHA1 5c3edbaf2d0badc06a046583d0f748b99cda2e2c t/author-no-tabs.t
+SHA1 a8a3b6c291113fff0f1765ef584a08bc4498bdc0 t/release-kwalitee.t
+SHA1 5cf386f49901e8ccaad5ab271036754d67114081 t/release-pod-coverage.t
+SHA1 dc3eefcab3399f9a70861c332bb4a81ddcbb45e4 t/release-pod-syntax.t
+SHA1 2a17eb5700f98afcee54d074ded68d514c94e9f0 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.14 (GNU/Linux)
+
+iEYEARECAAYFAlYuAEgACgkQh4j7xTiFuxFZxgCgyMWrWBygakm0tuM+CzpDHWDG
+tc4AoKeI9qhCpM7xCrzWT9yMaWdf3Fw4
+=PPto
+-----END PGP SIGNATURE-----

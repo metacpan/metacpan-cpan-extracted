@@ -1,0 +1,56 @@
+NAME
+    Dancer::Template::Xslate - Text::Xslate wrapper for Dancer
+
+VERSION
+    version 0.03
+
+DESCRIPTION
+    This class is an interface between Dancer's template engine abstraction
+    layer and the Text::Xslate module.
+
+    In order to use this engine, use the template setting:
+
+        template: xslate
+
+    This can be done in your config.yml file or directly in your app code
+    with the set keyword.
+
+    You can configure Text::Xslate:
+
+        template: xslate
+        engines:
+          xslate:
+            cache_dir: .xslate_cache/
+            cache:     1
+            extension: tx                     # Dancer's default template extension is "tt"
+            module:
+              - Text::Xslate::Bridge::TT2Like # to keep partial compatibility with Template Toolkit
+
+CAVEATS
+    Cascading
+        Dancer already provides a <cascade>-like feature, called a "layout",
+        in order to augment other template engines lacking such a feature.
+        In order to use Xslate's "cascade", turn off "layout" by commenting
+        out or removing the appropriate line in your Dancer application
+        config.
+
+    Smart HTML Escaping
+        Use of Dancer's "layout" feature will cause HTML templates to be
+        HTML-entity encoded twice if Xslate's "smart HTML escaping" feature
+        is enabled. Xslate's "type" option can be set to "text" to disable
+        smart-escaping, or, once again, "layout" can be disabled in favor of
+        "cascade".
+
+SEE ALSO
+    Dancer
+    Text::Xslate
+
+AUTHOR
+    franck cuny <franck@lumberjaph.net>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by franck cuny.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

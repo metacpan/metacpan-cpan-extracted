@@ -1,0 +1,50 @@
+SYNOPSIS
+    Format your DateTime values as usual in Czech. Now also with month
+    names, day names and less sugar!
+
+DESCRIPTION
+        my $fmt = DateTime::Format::Czech->new;
+        my $date = DateTime->new(year => 2010, month => 6, day => 13);
+        say $fmt->format_datetime($date); # 13. června 2010
+
+ATTRIBUTES
+    show_time
+        Include time in the output. Off by default.
+
+    show_date
+        Include date in the output. On by default.
+
+    show_year
+        Include year in the date output (“1. 12. 2010”). Off by default.
+
+    show_day_name
+        Include day name in date output (“neděle 13. 6.”). Off by default.
+
+    show_month_name
+        Use month name instead of its number (“1. prosince 2010”). On by
+        default.
+
+    compound_format
+        The "sprintf" pattern used to glue the time and date parts. The
+        default value is "%s v %s" (“5. 6. v 16.30”).
+
+METHODS
+    format_date
+        Takes a DateTime value, returns a string representation of its date
+        part.
+
+    format_time
+        Takes a DateTime value, returns a string representation of its time
+        part in 24-hour time system. Minutes are zero-padded if needed
+        (“13.00”, “19.01”).
+
+    format_datetime
+        Formats a given DateTime value, returning date and time parts as
+        configured by the "show_date" and "show_time" attributes. The date
+        and time parts are glued together using the "compound_format"
+        pattern. You can also call this method using the shorter "format"
+        name.
+
+AUTHOR
+    Tomáš Znamenáček, zoul@fleuron.cz
+

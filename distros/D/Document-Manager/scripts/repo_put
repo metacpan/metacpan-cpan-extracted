@@ -1,0 +1,127 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# repo_put
+#
+# DESCRIPTION
+#
+#   Administrative tool for directly updating the files in a document,
+#   using Document::Repository.
+#
+# AUTHOR
+#   Bryce W. Harrington <bryce at bryceharrington dot com>
+#
+# COPYRIGHT
+#   Copyright (C) 2004 Bryce W. Harrington  
+#   All Rights Reserved.
+#
+#   This module is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#------------------------------------------------------------------------
+#
+# Last Modified:  $Date: 2005/06/11 05:36:59 $
+#
+# $Id: repo_put,v 1.1.1.1 2005/06/11 05:36:59 bryce Exp $
+#
+# $Log: repo_put,v $
+# Revision 1.1.1.1  2005/06/11 05:36:59  bryce
+# Initial import
+#
+# Revision 1.2  2005/02/06 07:06:14  bryce
+# Address change
+#
+# Revision 1.1  2004/08/15 22:39:34  bryce
+# Adding some new commands to init a repository, put revisions of existing
+# documents, and export documents from the repository.
+#
+#
+#========================================================================
+
+use strict;                             # Forces variable decl's
+use Carp;                               # Improved error/warning prints
+use Pod::Usage;                         # To report program usage
+use Getopt::Long;                       # Basic cmdline arg handling
+use Document::Repository;
+
+#------------------------------------------------------------------------
+# Commandline option processing
+#------------------------------------------------------------------------
+
+our $opt_help            = 0;    # Prints a brief help message
+our $opt_debug           = 0;    # Prints debug messages
+our $opt_repository_dir  = '';   # Location of the repository
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");  
+GetOptions(
+           "help|h",             # Prints a brief help message
+           "debug|D=i",          # Prints debug messages
+	   "repository_dir|R=s", # Location of the repository
+            ) || pod2usage(1);
+
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_help;
+
+my $repo = new Document::Repository( repository_dir => $opt_repository_dir,
+				     debug          => $opt_debug );
+
+my $doc_id = shift @ARGV;
+
+pod2usage(-verbose => 1, -exitstatus => 0)
+    unless ( $doc_id =~ /^\d+$/ && @ARGV>0 );
+
+my $revision = $repo->put($doc_id, @ARGV);
+
+if (! $revision ) {
+    die $repo->get_error();
+} else {
+    print "Revision '$revision' of doc id '$doc_id' created.\n";
+}
+    
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+repo_put - Administrative tool to directly add a document to a document
+repository.
+
+=head1 SYNOPSIS
+
+repo_put [options] filename [ filename [...] ]
+
+ Options:
+   -h, --help                    Prints a brief help message
+   -D, --debug=integer           Prints debug messages
+   -R, --repository_dir=string   Location of the repository
+
+=head1 DESCRIPTION
+
+B<repo_put> - This is an administrative tool that directly accesses a
+document repository via the Document::Repository module.  It creates a
+new document from the set of files specified on the commandline.  Note 
+that all files are added as a single document.
+
+The user executing this script must have direct read/write/execute
+permisison into the document repository.
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce at bryceharrington dot comE<gt>
+
+L<http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.1.1.1 $
+
+=cut

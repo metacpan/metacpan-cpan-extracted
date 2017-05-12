@@ -1,0 +1,614 @@
+Revision history for Perl extension DBIx::SearchBuilder.
+
+1.67
+ - Add ->QueryHint and ->QueryHintFormatted to collection API for Oracle
+
+1.66
+ - No changes since 1.65_02
+
+1.65_02
+ - Stop unilaterally disabling the "UTF8" flag before executing queries
+ - Make ->Fields case-sensitive in the column names it returns, as well
+   as in the table name it takes.
+
+1.65_01
+ - Make ->Fields only lookup information on the table requested, not all
+   fields, for performance.  It also is now case-sensitive in table name.
+ - Omit calls to ->Fields entirely for PostgreSQL 9.1 and above
+
+1.65 2013-07-03
+ - Bug fix for DateTimeInterval extraction on Pg
+
+1.64 2013-07-01
+ - No changes since 1.63_03.  Simply a non-dev release of everything since
+   1.63.
+
+1.63_03 2013-06-14
+ - warn when rollback and commit are mixed
+ - Handle->NullsOrder
+ - skip timezone tests on SQLite when tzinfo is not there
+ - skip tests if mysql can not do timezones
+ - DISTINCT argument in Join method
+ - DISTINCT argument in Join and NewAlias
+ - Reset the iterator position whenever a search is run
+ - Return the correct record from ->Last instead of the first record
+ - Document the caveat of using GotoItem with a non-zero N
+
+1.63_02 2013-04-17
+ - _Set now can take undef as argument to mean default or NULL. Still may
+   result in error if default is not defined and no_nulls is true for the
+   column. If old behaviour is required set $record->{'no_undefs_in_set'}
+   to true value.
+ - FUNCTION argument is now allowed in Limit. Code to combine FUNCTION,
+   ALIAS and FIELD was refactored and unified in one place -
+   CombineFunctionWithField method. Used in Column, GroupBy and Limit. This
+   change should be backwards compatible.
+ - Handle->DateTimeIntervalFunction
+
+1.63_01 2013-03-27
+ - IN and NOT IN operators in ->Limit method
+ - Add an AdditionalColumn method to collections
+ - Add an AS parameter to Column method in collections
+ - Consistent query generation by sorting hash keys/values
+
+1.63 2012-09-14
+ - joins_are_distinct hint to indicate that distinct is not required for
+   the current set of joins.
+
+1.62 2012-03-26
+ - Bind values were ignored in SimpleUpdateFromSelect
+
+1.61 2011-09-16
+ - New methods in Handle for mass changes from select statements:
+   InsertFromSelect, DeleteFromSelect and SimpleUpdateFromSelect
+ - New methods in Handle for generation of date time related SQL
+
+1.60 2011-09-15
+ - custom BuildDSN for Oracle
+ - Database is treated as SID if SID is not provided
+ - Build 'dbi:Oracle:<SID>' instead of 'dbi:Oracle:sid=<SID>'
+ - changes in DBIx::SearchBuilder->Column method
+ - complete documentation
+ - support for empty FIELD argument
+ - column naming fix when explicit ALIAS => 'main' passed
+
+1.59 2010-11-19
+ - DBIx::SearchBuilder->DistinctFieldValues method
+
+1.58 2010-10-20
+ - SIGNATURE fix
+ - delete obsolete cvs metadata from a module
+
+1.57 2010-09-04
+ - INCOMPATIBLE CHANGE: NextPage and PrevPage were adding rows from the
+   previous page. Jesse claims that when he wrote this code, he  was 20
+   years old and it seemed like a good idea at the time.
+ - When logging queries, include full stack trace
+ - support $sb->NewAlias( 'table' => 'LEFT' );
+ - allow join to depend on nothing
+ - catch cases when there are more closing parens then should be
+ - Oracle: Use ROW_NUMBER() to propagate row ordering from inside the
+   DISTINCT
+ - Various performance improvements through small internal refactorings
+ - Implemented 'sub Fields' on Oracle
+ - unify case insensitive characters to avoid using LOWER() in some cases
+ - We now RedoSearch when RowsPerPage is changed
+ - No longer RedoSearch if FirstRow is called, but is not actually changed
+ - Document all paging functions and test them
+ - handle LOWER() in redundant LEFT joins optimizer, for Oracle and may be
+   Pg
+ - Make debugging problems easier by passing errors back
+   https://rt.cpan.org/Ticket/Display.html?id=55203
+ - fix Record->PrimaryKeys, field names in values hash are lc'ed
+   https://rt.cpan.org/Ticket/Display.html?id=18280
+ - doc updates and cleanups
+
+1.56 2009-07-17
+ - Don't use LOWER/ILIKE with dates, heuristic is used, but shouldn't harm
+   other things
+ - Don't apply DISTINCT on queries with group by, COUNT(DISTINCT x) is
+   different and covered in Column method
+
+1.55 2009-05-07
+ - Put test suite SQLite databases inside of tempdirs so they get garbage
+   collected properly. Thanks to Andreas Koenig [rt.cpan.org #41322]
+ - Allow ->Join to pre-existing collection object
+ - Imlement and test SB::Handle::Fields
+ - Pg can not guaranty order in the following queries: SELECT ... FROM
+   (SELECT... ORDER BY ...) we use them to build distinct sets with
+   ordering by columns in joined tables. Switched to group by instead of
+   sub-selects.
+
+1.54 2008-07-09
+ - When aborting transactions, we need to flush our cache, because SQLite
+   is reusing the primary id for later inserts and the cache can otherwise
+   become inconsistent.
+
+1.53 2008-04-02
+ - Fix mysql version check in DistinctQuery function
+ - Fix order by outer column on Oracle
+ - Improve tests
+
+1.52 2008-04-01
+ - Fix order by outer column on SQLite, mysql, adjust Pg. Add test that
+   cover this.
+
+1.51 2008-01-15
+ - Fix CountAll method when paging is enabled and data is in memory already
+
+1.50 2007-11-23
+ - Oracle: Don't DISTINCT query when there is a group by clause
+ - Fix a problem when we have more then two collections in a union and some
+   of them are empty
+
+1.49 2007-07-07
+ - Fix a CPAN signature issue
+
+1.48 2007-03-11
+ - Fix a problem when left joins optimizer fails to calculate a boolean
+   expression because of lower case aggregators.
+
+1.47 2007-03-04
+ - Do the search in unions only when we must do them, not on every call to
+   the Next method
+ - Don't index ex/ dir to avoid complains by the indexer of PAUSE/CPAN
+
+1.46 2007-02-25
+ - when doing a union, we need to actually search, rather than just doing a
+   count
+ - add support for testing with Oracle backend
+ - Use CROSS JOIN instead of ',' as SQL parsers in Pg and some mysql are
+   buggy and cannot parse "FROM X, Y JOIN Z ON Z.f = X.f"
+ - deprecate DEBUG method, it's still there but produce warning
+ - fix CleanSlate method that was missing several keys
+ - fix a long standing bug we had, we didn't write depends_on data about a
+   join, so we could build queries with incorrect parens around join
+   conditions
+ - fix default values for ALIAS1 argument in the Join method, istead of
+   defaulting FIELD1 to 'main' value
+ - fix a TODO test
+ - internal refactoring of a storage for query's conditions, instead of
+   building query strings right after the limit or join, we now build a
+   perl structure
+ - don't clone attributes that don't exists in the Clone method
+ - we use Encode module without perl version check for a long time, so we
+   can get rid of all checks for the version and load the module at compile
+   time everywhere we need it
+ - implement MayBeNull method in the handler that checks if applied
+   conditions allow NULLs in the result set
+ - implement cascaded LEFT JOINs optimization
+ - additional tests for CleanSlate and Clone methods, ENTRY_AGGREGATOR
+   argument, different types of joins and LEFT JOIN optimizer
+
+1.45 2006-09-26
+ - Postgres: fix "$rec->Create();"
+ - Postgres: fix "$rec->Create( IntegerColumn => '' );"
+ - Postgres: fix "$rec->SetIntegerColumn( '' );"
+ - Postgres: add test
+ - cleanup ::Record::Cachable
+ - use cache in: $a->LoadByCols(...); $b->LoadById( $a->id );
+ - add cache tests
+
+1.44 2006-05-27
+ - DBIx::SearchBuilder::Handle::DatabaseVersion enhancements
+
+1.43 2006-04-12
+ - Fix to the sequence compatibility fixes. For backwards compatibility.
+
+1.42 2006-04-10
+ - Signatures fixed
+
+1.41 2006-04-10
+ - PG 8.1 sequence compatibility fixes from Daniel Tabuenca
+
+1.40 2006-03-10
+ - 'NOT STARTSWITH' and 'NOT ENDSWITH'
+
+1.39 2006-02-16
+ - Allow ORs on left joins
+
+1.38 2005-12-29
+ - Released 1.37 dev series
+
+1.37_01 2005-12-08
+ - Switched Postgres sequence lookups to use CURRVAL, rather than OIDs
+
+1.36 2005-12-02
+ - Change to how we resolve virtual columns to deal with a   "no such
+   attribute" bug in RT
+
+1.35 2005-11-02
+ - Doc fixes and OrderBy cleanup from ruslan
+
+1.34 2005-11-02
+ - Clone support from Ruslan
+
+1.33 2005-09-22
+ - Better SQL statement logging from alex
+
+1.32 2005-09-01
+ - DBD::SQLite is necessary for the test suite to run correctl
+
+1.31 2005-07-29
+ - Updated MANIFEST to fix a build issue -  Thanks to Andy Lester and David
+   Glasser
+
+1.30_03 2005-06-09
+ - Significant new tests from Ruslan Zakirov and Dave Glasser
+ - You no longer need to explicitly bless a DBIx::SearchBuilder::Handle
+   subclass
+ - Start of a major overhaul of the subclass API for
+   DBIx::SearchBuilder::Record objects. A new "schema" method will define
+   the data in _ClassAccessible and also generate database schema using
+   DBIx::DBSchema.
+ - for numeric types, make the empty check be "null or 0", not "null or ''"
+ - New search tests from ruslan
+ - added an init_data method to t/utils.pl
+ - CleanSlate doesnt init show_rows
+ - CleanSlate doesnt clean _{open|close}_parens
+ - get rid of stupid ifs in CleanSlate
+ - get rid of evals in _DoSearch and _DoCount, use Handle methods to
+   control DBI error handling
+ - rewrite LoadByPrimaryKeys args handling to consistent with other Load*
+   methods
+ - report error when PK filed is missing in LoadByPrimaryKeys
+ - fix warning in __Set methods when newvalue is undef
+ - small code cleanups
+ - test coverage grows from 75.2% to 84.7% for Record.pm
+
+1.30_02 2005-05-22
+ - Lots of patches from Ruslan: First and main change is using of `goto
+   &$AUTOLOAD` syntax, that helps avoid code duplication and hides AUTOLOAD
+   sub from stack trace. I think  this also would help implement
+   CompileAllAutoSubs method easier.
+ - It's also one of the steps to better tests coverage.
+ - Test coverage for Record.pm grows from 66% to 75.2%.
+ - _LoadFromSQL never reported error when PK fields are missed. Fixed.
+ - fetchrow_hashref dies only when RaiseErrors is true, because we can
+   control this from Handle obj so we should die according to
+   $Handle->RaiseErrors property. Fixed.
+ - When RaiseErrors is "false" then fetchrow_hashref returns undef and we
+   should check $sth->err(see `perldoc DBI`). Fixed.
+ - After call to fetchrow we should clean "fetched" internal hash and fill
+   it only when we return successful result. Fixed.
+ - If SimpleQuery fails, _LoadFromSQL method doesn't return any error
+   message. Fixed.
+
+1.30_01 2005-05-16
+ - Patches from Ruslan to switch to using 'capitalization.pm' for our
+   regular_case subroutine aliases
+
+1.30 2005-07-28
+ - Removed {{{ and  }}} fold markers. Patch from Ruslan
+
+1.27 2005-05-08
+ - Added supoprt for functions containing "?" to represent the parameter in
+   ->Column()
+ - Added better support for functional columns in search listings and group
+   by clauses
+
+1.26 2005-04-17
+ - Added support for expression based left joins
+
+1.25 2005-04-09
+ - Backed out a change introduced in 1.23 that caused table and column
+   names to be quoted, causing Postgres to flip out.
+
+1.24 2005-04-06
+ - Added a new "SearchBuilder::Unique" module for uniquifying search
+   results
+
+1.23
+ - Now use DBI->quote_identifier to quote column and table names (Ruslan)
+ - Test suite updates (Ruslan)
+
+1.22 2005-01-24
+ - Require encode since we require encode.
+
+1.21 2005-01-22
+ - Oracle LOB handling caused us to corrupt item values on update.
+ - Just before inserting things into the database, turn off their utf8
+   flag. The flag didn't have any positve impact _and_ it can take down
+   recent DBD::Oracle releases. (This is a new failure in DBD::Oracle 1.16)
+
+1.20 2005-01-18
+ - Minor test suite fixes from Ruslan.
+
+1.19 2005-01-08
+ - Performing a search multiple times could result in multiple copies of
+   records in a collection. Uncovered thanks to Kevin Chen and Alex
+   Vandiver.
+
+1.18
+ - Release the changes from 1.17
+
+1.17_03
+ - Properly mark BLOB columns in UPDATE calls. (DBD::Oracle 1.16 broke
+   without this)
+
+1.17_02
+ - Better handling of empty values for SB::Record::_Accessible. ( --Ruslan)
+
+1.17_01
+ - More record tests from Ruz
+
+1.16 2004-12-09
+ - Fixed a bug in D::SB::R::Cachable that could cause it to load the wrong
+   row from the cache if you were loading by alternate keys and had since
+   changed one of the attributes of a previous row.  This was unmasked by a
+   bug that Ruslan Zakirov found in RT 3.3's custom field handling
+
+1.15 2004-11-27
+ - Fix a testsuite bug when DBD::SQLite isn't there
+
+1.14
+ - Silenced warnings about uninitialized warnings when inserting null cols
+   into the database.
+ - Started adding lowercase method name aliases
+ - Minor refactoring of 'id' method for a stupid, tiny perf improvement
+ - Refactoring of DBIx::SearchBuilder::Record::Cachable for performance
+   improvement
+ - Added a FlushCache method to DBIx::SearchBuilder::Record::Cachable.
+ - Started to flesh out a...test suite
+ - SearchBuilder now truncates strings before inserting them into character
+   types in the database as mysql generally does. Additionally, it
+   truncates things at utf8 character boundaries...as mysql does not.
+ - Fix for an undefined record cache warning on load from Autrijus Tang
+ - Major documentation cleanups --Simon Cavalletto
+ - A few tweaks to the ::Record class to eliminate the hard-coding of the
+   name of the id column --Simon Cavalletto
+
+1.12
+ - Better error handling for some query build failure cases
+ - Corrected query builder for SQLite
+ - More refactoring.
+
+1.11
+ - When loading an object whose "id" has been altered, as in the case of
+   RT's "Merge" functionality, the wrong object was returned by the caching
+   layer. Special casing for the "id" method was removed.
+
+1.10_05
+ - Reworked the _Accessible mechanism in DBIx::SearchBuilder::Record to
+   remove a horribly crufty old caching mechanism that created a copy of
+   the accessible hash for each and every object instantiated, sometimes
+   quite slowly.
+
+1.10_04 2004-08-30
+ - A query builder fix for an issue that bit RT2: Unsatisfied dependency
+   chain in Joins Users_2 at
+   /usr/local/share/perl/5.8.3/DBIx/SearchBuilder/Handle.pm line 965,  line
+   69.
+
+1.10_03 2004-08-30
+ - Cache Sanity fixes from Autrijus Tang <autrijus@autrijus.org>
+
+1.10_02 2004-08-26
+
+1.10_01 2004-08-26
+ - Reimplemented DBIx::SearchBuilder:::Record::Cachable to use
+   Cache::Simple::TimedExpiry. This should make it faster and more memory
+   efficient.
+
+1.10
+ - Identical to 1.10_05
+
+1.02_03 2004-07-22
+ - Additional bullet proofing for joins. Now we default to ALIAS1 being
+   "main"  (cubic@acronis.ru)
+
+1.02_02 2004-07-20
+ - Fixed a join bug that mostly manifests as a 'Dependency chain' error on
+   RT2.
+
+1.02_01 2004-07-07
+ - magic _Object instantiation from cubic@acronis.ru
+ - make SB::_Handle settable directly  (cubic@acronis.ru)
+ - document the above
+
+1.01 2004-06-27
+ - Releasing 1.00_06 as stable
+
+1.00_06
+ - Pg/Oracle: Don't attempt to do case insensitive comparisons on integer
+   values.
+
+1.00_05
+ - Force utf8 flag on when doing searches for utf8 data; this is a
+   workaround for DBDs that don't do it themselves.
+
+1.00_04
+ - Move Postgres specific join behaviour to the superclass so everyone gets
+   the benefit.
+
+1.00_03
+ - Remove "AS" from table name aliases on joins, since Oracle doesn't like
+   em.
+
+1.00_02
+ - Slightly cleaner code in SearchBuilder->GotoPage
+
+1.00_01
+ - Better handling of case insensitive comparisons on Postgres
+ - Proper support for query paging on SQLite
+
+0.99
+ - Bundled changes from 0.98* and released production version
+ - Removed duplicate code in cache expiry routines Experimental
+   SearchBuilder::Union collection object.
+ - Released at the YAPC::Taipei::22004 Release Party
+
+0.98_04
+ - New mysql/oracle "Join" code that allows more complex bundling of joins
+   from Linda and Robert
+
+0.98_03
+ - New test infrastructure from Andy Lester
+
+0.98_02
+ - Better handling of != clauses on Postgres
+
+0.97_02
+ - Support for "Group By" clauses.
+ - Support for delayed load of certain columns from Autrijus Tang.
+
+0.97_01
+ - Oracle doesn't support binary-safe clobs in a reasonable manner.
+
+0.96_01
+ - Fix a couple of spurious warnings in Record::Cachable
+ - Records loaded from multiple-record searches were never cached
+ - correctly
+
+0.96
+ - Releasing 0.96_01 as usable
+
+0.95_03
+ - Allow case-insensitive loading by columns in SearchBuilder::Record
+ - Record::LoadByCols now lets you specify operator and values
+
+0.95_01
+ - Removed historical escaping for non-ascii searche queries
+
+0.94
+ - Fix for multiple handles in one app from Autrijus Tang
+
+0.93
+ - Added ODBC database driver from Autrijus Tang
+ - Added the ability to sort on functions of columns from Autrijus Tang
+ - Improved case-insensitve searching behavior for PostgreSQL
+ - Added support for multiple handles in one app from Autrijus Tang (#4167)
+ - Added initial Informix database driver from Oliver Tappe
+
+0.92 2003-09-04
+ - Fixed a bug that caused certain types of pre-canned table aliases to
+   fail to work on join
+
+0.90 2003-08-08
+ - Disable Class::ReturnValue's stack trace feature as it interacted poorly
+   with a stack containing lots of data
+
+0.89_02 2003-07-19
+ - Patch from Grant DeGraw to allow ordering by multiple columns.
+
+0.89_01 2003-07-18
+ - Patch from Brook for:
+ - better oracle support
+ - remove "SELECT DISTINCT" when it's not necessary
+
+0.88 2003-06-23
+ - More correct generation of "Distinct" keyword on counts for queries with
+   left joins
+
+0.87 2003-06-16
+ - Changed DBIx::SB::Record::Cachable to expire cached object when a
+   "deeper" method call changes their values
+
+0.86 2003-06-07
+ - Doing conditional connections was failing on postgres, because the
+   handle was defined, but not connected
+
+0.85 2003-06-07
+ - Stan's destroy fix was actually badly breaking RT
+ - It's now an optional parameter.
+
+0.84 2003-06-04
+ - Bumped the version for release
+
+0.83_05 2003-06-02
+ - Provide support for blowing away nested transactions that aren't yet
+   committed.
+
+0.83_04 2003-06-02
+ - Fixed how values of returned hashes are downcased.
+ - Should be a minor perf improvement
+
+0.83_03 2003-05-30
+ - Moved Stan's destryo fix to the right file
+
+0.83_02 2003-05-27
+ - Better oracle support for unique ids on indexes from Brook
+
+0.83_01 2003-05-27
+ - Stan's DESTROY fix
+ - Mathieu Arnold's patch to make function naming for autoloaded functions
+   a bit more flexible
+
+0.82 2003-05-19
+ - Query builder changes to improve some join performance
+ - Fixes to a tight loop for cache expiry
+
+0.81_04 2003-04-14
+ - Fixed a bug in "Distinct" logic introduced in 0.81_01
+
+0.81_03 2003-04-13
+ - Patches for Oracle BLOB support from Brook Schofield
+
+0.81_02 2003-04-13
+ - Rebuilt Postgres query generator.
+
+0.81_01 2003-03-27
+ - Select Distinct altered to support oracle
+
+0.80 2003-03-08
+ - Count method enhanced to ignore "LIMIT"s
+ - LIMIT behaviour changed to be handle specific
+
+0.79 2003-01-19
+ - ReadableAttributes and WritableAttributes added as methods to Record.pm
+
+0.78 2003-01-16
+ - SB->Count should return no results unless the search is limited
+ - Eliminate a warning on empty searches
+
+0.77 2003-01-15
+ - No longer attempt to cache (and fail) objects that haven't been
+   database-loaded
+
+0.76 2002-12-30
+ - Extra checking for cache misses in DBIx::SearchBuilder::Record::Cachable
+ - The start of support for checking database version, so that we can do
+   version-specific SQL
+ - A patch from Autrijus Tang that allows utf-8 safe searching
+
+0.75 2002-12-06
+ - Applying a patch from Rob Spier <rspier@pobox.com> which enables
+   arbitrarily complex grouping clauses. It's a hack, but we love it
+   anyway....at least until SB gets redone with proper arbitrarily complex
+   query generation.
+
+0.74 2002-10-11
+ - Adding support for mysqlPP
+
+0.73 2002-09-10
+ - More class-returnvalue ification
+ - Fixed a caching bug that caused multiple copies of an object in memory
+   to not be kept in sync
+
+0.72 2002-08-28
+ - Fixed bug in setting a column to the value of an SQL statement.
+
+0.70 2002-08-27
+ - Better support for Postgres 7.2 and transactions.
+
+0.62 2002-07-05
+ - Support for Class::ReturnValue to channel errors up when expected
+ - Dependency on Class::ReturnValue
+ - Minor cleanups and refactorings to allow percolation of errors on create
+
+0.34 2001-05-23
+ - SearchBuilder.pm - refactored to allow LEFT joins.
+
+0.31 2001-05-12
+ - SearchBuilder::Record::Cachable now constructs cache keys in a way that
+   doesn't lose when records in different tables have the same keys.
+
+0.30 2001-05-11
+ - Added DBIx::SearchBuilder::Record::Cachable from <mhat@netlag.com>
+ - Changed SearchBuilder->Count to do the right thing if no query has been
+   performed
+ - No longer specify a sort order if no sort order was specified ;)
+
+0.01 2000-08-29
+ - original version; created by h2xs 1.19
+

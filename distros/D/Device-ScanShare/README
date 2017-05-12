@@ -1,0 +1,54 @@
+Device::ScanShare 
+===============================================
+manage USERDIRTS.TXT ecopy file to manage scanner device options
+
+ScanShare is a oo module to work with the USERDIRS.TXT file used by ecopy for use with 
+their ShareScan software.
+This enables you to control what the entries are via perl. 
+You can add and remove entries to the file.
+
+MOTIVATION:
+
+We use ecopy and sharescan software in the office. This is so someone can step 
+up to the scanner and scan to a predetermined place. They have a little touchscreen.. 
+you punch in where you want to send it to, the name of the file, and voila. 
+What you can select from is controlled via a file called USERDIRS.TXT. 
+In it are entries like ;
+
+   The Label=relative\dir\path,The Label,HostName,1,0
+
+You can edit the damn thing in a text editor. If you have a jillion entries (like we have, 
+upwards of 500), then you do not want to micro manage this by either using their crippled 
+interface or via a text editor. Linux and perl to the rescue. 
+
+Included is also a utility called sharescan that will let you edit the file via the 
+command line. It is called L<scanshare>.
+
+
+
+
+INSTALLATION
+
+perl Makefile.PL
+make test
+make install
+
+DEPENDENCIES
+
+   Carp
+   Cwd
+   File::Path
+   Getopt::Std
+   LEOCHARRE::CLI
+   Smart::Comments
+   Test::Simple
+   YAML
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Leo Charre leocharre at cpan dot org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+   

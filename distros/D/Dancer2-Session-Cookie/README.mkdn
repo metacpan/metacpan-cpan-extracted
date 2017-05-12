@@ -1,0 +1,80 @@
+# NAME
+
+Dancer2::Session::Cookie - Dancer 2 session storage in secure cookies
+
+# VERSION
+
+version 0.008
+
+# SYNOPSIS
+
+    # In Dancer 2 config.yml file
+
+    session: Cookie
+    engines:
+      session:
+        Cookie:
+          secret_key:           your secret passphrase
+          default_duration:     604800
+          with_request_address: 0
+
+# DESCRIPTION
+
+This module implements a session factory for Dancer 2 that stores session state
+within a browser cookie.  Features include:
+
+- Data serialization and compression using [Sereal](https://metacpan.org/pod/Sereal)
+- Data encryption using AES with a unique derived key per cookie
+- Enforced expiration timestamp (independent of cookie expiration)
+- Cookie integrity protected with a message authentication code (MAC)
+
+See [Session::Storage::Secure](https://metacpan.org/pod/Session::Storage::Secure) for implementation details and important
+security caveats.
+
+# ATTRIBUTES
+
+## secret\_key (required)
+
+This is used to secure the cookies.  Encryption keys and message authentication
+keys are derived from this using one-way functions.  Changing it will
+invalidate all sessions.
+
+## default\_duration
+
+Number of seconds for which the session may be considered valid.  If
+`cookie_duration` is not set as part of the session configuration,
+this is used instead to expire the session after
+a period of time, regardless of the length of the browser session.  It is
+unset by default, meaning that sessions expiration is not capped.
+
+## with\_request\_address
+
+If set to `true`, the secret key will have the request address
+(as provided by `<$request-`address>>)
+appended to it. This can help defeat some replay attacks 
+(e.g. if the channel is not secure).
+But it will also cause session interruption for people on dynamic addresses.
+
+# SEE ALSO
+
+CPAN modules providing cookie session storage (possibly for other frameworks):
+
+- [Dancer::Session::Cookie](https://metacpan.org/pod/Dancer::Session::Cookie) -- Dancer 1 equivalent to this module
+- [Catalyst::Plugin::CookiedSession](https://metacpan.org/pod/Catalyst::Plugin::CookiedSession) -- encryption only
+- [HTTP::CryptoCookie](https://metacpan.org/pod/HTTP::CryptoCookie) -- encryption only
+- [Mojolicious::Sessions](https://metacpan.org/pod/Mojolicious::Sessions) -- MAC only
+- [Plack::Middleware::Session::Cookie](https://metacpan.org/pod/Plack::Middleware::Session::Cookie) -- MAC only
+- [Plack::Middleware::Session::SerializedCookie](https://metacpan.org/pod/Plack::Middleware::Session::SerializedCookie) -- really just a framework and you provide the guts with callbacks
+- [Dancer2::Core::Role::SessionFactory](https://metacpan.org/pod/Dancer2::Core::Role::SessionFactory) -- documentation of the base package, some more attributes to configure the cookie
+
+# AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by David Golden.
+
+This is free software, licensed under:
+
+    The Apache License, Version 2.0, January 2004

@@ -1,0 +1,11 @@
+A few people have reported the following error when running DBD::ODBC
+on MAC OS X 10.5 (Leopard):
+
+install_driver(ODBC) failed: Can't load '/Library/Perl/5.8.8/darwin-thread-multi-2level/auto/DBD/ODBC/ODBC.bundle' for module DBD::ODBC: dlopen(/Library/Perl/5.8.8/darwin-thread-multi-2level/auto/DBD/ODBC/ODBC.bundle, 1): Symbol not found: ___CFConstantStringClassReference
+  Referenced from: /Library/Perl/5.8.8/darwin-thread-multi-2level/auto/DBD/ODBC/ODBC.bundle
+  Expected in: dynamic lookup
+
+A possible workaround for this is to add "-framework CoreFoundation"
+to the Makefile for the LDLOADLIBS and EXTRALIBS symbols.
+
+Since DBD::ODBC post 1.16, this has been automated.

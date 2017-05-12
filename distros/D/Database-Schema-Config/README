@@ -1,0 +1,207 @@
+NAME
+    Database::Schema::Config - Perl extension for storing generic config
+    strings with revision control in a table
+
+SYNOPSIS
+    This is an interface module to our database. All SQL queries should be
+    done at this level and only leave the actual config parsing to the upper
+    level modules.
+
+    *Note: All references to timestamp or date/time are usually stored as
+    Time::Timestamp objects, see Time::Timestamp for output options.
+
+DESCRIPTION
+    An API for storing and manipulating configuration files RCS-style using
+    a database backend. This allows the author to utilize any Config module
+    they wish (config::General, Config::Simple, etc...).
+
+SQL Table [mysql]
+      -- 
+      -- Table structure for table `config`
+      -- 
+
+      CREATE TABLE `config` (
+        `rev` int(11) NOT NULL auto_increment,
+        `xlock` tinyint(4) NOT NULL default '0',
+        `dt` int(11) NOT NULL default '0',
+        `user` varchar(32) NOT NULL default '',
+        `config` text NOT NULL,
+        `log` text,
+        PRIMARY KEY  (`rev`)
+      ) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+
+OBJECT METHODS
+  new()
+    Constructor
+
+      my $cfg = Database::Schema::Config->new(
+            -dbh => $myDBI_handler,
+            -str => $configString,
+            -user => $user,
+            -table => 'myConfigTable',
+      );
+
+    Returns:
+
+      (undef,$obj) on success
+
+  listConfigs()
+    Fetch a listing of all of the stored configs. The listing will contain
+    the rev, timestamp, lock status, and user. If you want the log and
+    config, use getConfig().
+
+    Returns:
+
+     (errstr,undef) something failed with the DB
+     (undef,HASHREF) on success containing keys: "rev", "timestamp","lock", "user". Each of those point to ARRAYREFs.
+
+    So the revision of the first config in the list (which should be the
+    oldest) is $hr->{'rev'}->[0]
+
+  isConfigLocked()
+    Check to see if the latest config is currently locked. If it is, return
+    information about the lock.
+
+      $cfg->isConfigLocked();
+
+    Returns
+
+      (errstr,undef) on failure
+      (undef,HASHREF) locked. see keys for details.
+      (undef,0) not locked
+
+  lockConfig()
+    Lock the configuration so other people know we are editting it. A note
+    will be appended to the "log" for the configuration. The latest
+    configuration will be "locked" unless "rev" is specified. This should be
+    called from the getConfig() method, not directly.
+
+    Accepts:
+
+      -rev => [int], defaults to 0
+      -user => [string],
+
+      $cfg->lockConfig(-rev => $rev, -user => $username);
+
+    Returns:
+
+      (errstr,undef) on failure
+      ('lock failed',0) if already locked
+      (undef,$rev) on success
+
+  unlockConfig()
+    Unlock the configuration. Both parameters are required. Should be called
+    by the getConfig() method, not directly.
+
+    Accepts:
+
+      -rev => [int], defaults to 0
+      -user => [string],
+
+      $cfg->unlockConfig(-rev => $rev, -user => $username);
+
+    Returns:
+
+      (errstr,undef) on failure
+      (undef,1) on success
+
+  appendLogToConfig()
+    Accepts:
+
+      # required
+      -user => undef,
+      -rev => 0,
+      -log => [],
+
+      $cfg->appendLogToConfig(-rev => rev, -user => username, -log => ['myLogEntry']);
+
+    Add a log entry to the given config revision.
+
+    Returns
+
+      (errstr,undef) on failure
+      (undef,1) on success
+
+  getConfig()
+    Fetch the specified configuration from the database. If "rev" is not
+    give, fetch the highest (latest) config from the database. If "lock" is
+    "1", place an advisory lock on the configuration so that other people
+    can't edit it without a warning.
+
+      $cfg->getConfig(-rev => integer, -user => $username, -lock => [0|1]);
+
+    Accepts:
+
+      # required
+      -rev => [int], defaults to 0
+      -user => [string],
+
+      # legal
+      -lock => [0|1], default is 0 # lock for editing?
+
+    Returns:
+
+      (errstr,undef) on failure
+      (undef,HASHREF) containing keys:
+
+            {
+                    'config'    => ARRAYREF,
+                    'log'       => ARRAYREF,
+                    'timestamp' => integer,
+                    'rev'       => integer,
+                    'user'      => scalar string
+            }
+
+  putConfig()
+    Insert a new configuration file into the database ("config" table). It's
+    up to the calling application to "notice" the config rev was updated.
+
+      $cfg->putConfig(
+            -config => ARRAYREF, # or ['string for array ref'] or [qw(my super cool string)]
+            -user => [string],
+            -log => ARRAYREF,
+            -autounlock => [0|1], # default is to unlock the config if isConfigLocked() == true
+            -init => [1|0], default is 0 # truncates the table and posts a blank config to rev 1. When you save, it becomes rev2
+      );
+
+    Returns
+
+      (errstr,undef) on failure
+      (undef,1) on success
+
+  resetLocks()
+    This function resets the xLock in the event that something screws up.
+
+    Accepts:
+
+      -rev # optional, default is 'clear all locks'
+
+    Returns:
+
+      (errstr,undef) on failure
+      (undef,1) on success
+
+  dbh()
+    Sets and returns the Database handle
+
+  table()
+    Sets and returns the base config table
+
+  string()
+    Sets and returns the config string
+
+SEE ALSO
+    Time::Timestamp
+
+    sourceforge://netpass
+
+AUTHOR'S
+    Original Author - Jeff Murphy - <jcmurphy@buffalo.edu>
+
+    Stolen By - Wes Young - <saxguard9-cpan@yahoo.com>
+
+LICENSE
+       (c) 2006 University at Buffalo.
+       Available under the "Artistic License"
+       http://www.gnu.org/licenses/license-list.html#ArtisticLicense
+

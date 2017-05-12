@@ -1,0 +1,77 @@
+ NAME
+
+    Dist::HomeDir
+
+ SUMMARY
+
+        use Dist::HomeDir;
+        my $dist_home = Dist::Homedir::dist_home(); # A Path::Tiny object of the Dist home
+    
+        use Dist::HomeDir lib => [qw( script/lib t/lib )];
+        # @INC now contains $dist_home->child('script/lib') and t/lib
+
+    Easily find the dist homedir for an application set up as a cpan(ish)
+    distribution but intended to be deployed via git checkout or by a
+    tarball in a self contained directory. You can also optionally modify
+    @INC as documented above.
+
+    DO NOT use this in code that is ever likely to be installed via cpan or
+    other package manager.
+
+ DESCRIPTION
+
+    This module was inspired by Catalyst::Utils->home() to obtain the root
+    directory for obtaining application code and self-contained support
+    data in directories relative to the distribution root. It does this by
+    returning a Path::Tiny object which has a very nice interface. However
+    Catalyst::Utils->home only works for perl classes. This works for class
+    files and perl scripts via examining (caller)[1] and thus should never
+    be used in code that will be instaled via a cpan client or other
+    package manager.
+
+    Sometimes support libaries will also live in the t/lib directory and
+    the script/lib directory. dist_home will ignore these lib directories
+    as part of finding the distribution root. Future versions of this
+    module may make the list of what directories to ignore other lib sub
+    directories user-configurable (patches welcome).
+
+    If you want to modify @INC with the import syntax in the second example
+    <<<<<<< HEAD in the summary, be careful. In particular if you use "
+    Dist::HomeDir" in test files and in code to be used in production, @INC
+    might be modified in unexpeted ways depending on the structure of your
+    codebase. The best thing to do here is only use the import syntax in
+    test files or maybe other support files (e.g. in script), and never in
+    code in the main package hierarchy.
+
+ FUNCTIONS
+
+    dist_home
+
+    Returns a Path::Tiny object of where the current code file executed
+    thinks the distribution home directory is.
+
+ ALTERNATIVES
+
+    Mojo::Home - lots of features, no non-core perl dependencies
+
+    FindBin - perl core, comes with gotchas if called multiple times.
+
+    Test::InDistDir - where the import syntax for Dist::HomeDir came from.
+
+ AUTHOR
+
+    Kieren Diment <zarquon@cpan.org>
+
+ COPYRIGHT
+
+    This code can be distributed under the same terms as perl itself.
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 40:
+
+      L<> starts or ends with whitespace
+

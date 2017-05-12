@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-Plugin-OurDate
+
+0.03    2015-07-04 (PERLANCAR)
+
+	- Don't replace #DATE below __DATA__ or __END__.
+
+
+0.02    2014-12-06 (PERLANCAR)
+
+	- [Bugfix] Forgot to 'use POSIX' [GH#1].
+
+
+0.01     2014-04-16 (SHARYANTO)
+
+         - First release.

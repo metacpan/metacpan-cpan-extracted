@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::RandomKeep.
+
+0.02  Sun Aug  3 11:49:45 EDT 2008
+        - offer() now accepts a list of items instead of just a single
+          one.
+
+0.01  Tue Jul  1 21:29:01 EDT 2008
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Data::RandomKeep
+

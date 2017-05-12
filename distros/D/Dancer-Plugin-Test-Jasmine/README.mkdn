@@ -1,0 +1,152 @@
+# NAME
+
+Dancer::Plugin::Test::Jasmine - Inject and run Jasmine tests in your web pages
+
+# VERSION
+
+version 0.2.0
+
+# SYNOPSIS
+
+In `config.yml`:
+
+    plugins:
+        'Test::Jasmine':
+            specs_dir: t/specs
+            prefix: /test
+            lib_dir: /path/to/jasmine/dir
+            additional_scripts:
+                - /uri/to/script.js
+            additional_css:
+                - /usr/to/other.css
+
+In application:
+
+    package MyApp;
+
+    use Dancer;
+
+    use if $ENV{DANCER_ENVIRONMENT} eq 'development', 
+        'Dancer::Plugin::Test::Jasmine';
+
+    ...;
+
+# DESCRIPTION
+
+This plugin helps running [Jasmine](http://jasmine.github.io) tests for your Dancer application.
+
+If the plugin is enabled, a request with queries having one or more `test` fields will
+make the application inject the Jasmine library and the tests in the response (if no `test`
+parameter is present, the response is left untouched). The library is injected
+at the end of the head section of the page, and the tests at the end of its body.
+
+To incorporate those tests to your Perl test suites, see
+[Dancer::Plugin::Test::Jasmine::Results](https://metacpan.org/pod/Dancer::Plugin::Test::Jasmine::Results).
+
+In addition to Jasmine itself, this plugin also load
+[jasmine-jquery](https://github.com/velesin/jasmine-jquery).
+
+# CONFIGURATION PARAMETERS
+
+- specs\_dir 
+
+    The directory where the Jasmine tests are to be found.  Defauls to `t/specs`.
+
+- prefix
+
+    The uri prefix under which the Jasmine library and the Jasmine
+    specs files will be available . Defaults to `/test`.
+
+- lib\_dir
+
+    By default the plugin uses a version of Jasmine and its JSON reporter bundled
+    in its share folder. If you prefer to use your own version of 
+    Jasmine, you can specify its directory via this parameter.
+
+- additional\_scripts
+- additional\_css
+
+    If specified, the plugin will include those scripts
+    and css files in addition of (and after) the Jasmine stuff. The paths 
+    are just the straight uris where to find those files.
+
+    For example, to test an Angular application one can add:
+
+        plugins:
+            Test::Jasmine:
+                additional_scripts:
+                    - /js/angular-mocks.js
+
+# RUNNING TESTS AS PART OF PERL TEST SUITES
+
+Obviously, the tests need to be run from within 
+a browser with a JavaScript engine. But if you desire to have the
+tests included in your regular test suites, there are
+several test modules allowing interactions ([Test::WWW::Selenium](https://metacpan.org/pod/Test::WWW::Selenium),
+[WWW::Mechanize::PhantomJS](https://metacpan.org/pod/WWW::Mechanize::PhantomJS)) with browsers. 
+
+In addition of the regular HTML report, the Jasmine test results are also
+accessible via the JavaScipt function `jasmine.getJSReportAsString()`,
+thanks to the 
+[Jasmine-jsreporter](https://github.com/detro/jasmine-jsreporter) plugin. The module [Dancer::Plugin::Test::Jasmine::Results](https://metacpan.org/pod/Dancer::Plugin::Test::Jasmine::Results) 
+provides a helper function `jasmine_results` that takes in the Jasmine results, and
+produce equivalent TAP output.
+
+## WWW::Mechanize::PhantomJS
+
+For example, if we wanted to run the test 't/specs/verify\_title.js' via 
+PhantomJS, we could use:
+
+    use strict;
+    use warnings;
+
+    use Test::More;
+
+    use JSON qw/ from_json /;
+
+    use Test::TCP;
+    use WWW::Mechanize::PhantomJS;
+
+    use Dancer::Plugin::Test::Jasmine::Results;
+
+    Test::TCP::test_tcp(
+        client => sub {
+            my $port = shift;
+
+            my $mech = WWW::Mechanize::PhantomJS->new;
+
+            $mech->get("http://localhost:$port?test=verify_title");
+
+            jasmine_results from_json
+                $mech->eval_in_page('jasmine.getJSReportAsString()'; 
+        },
+        server => sub {
+            my $port = shift;
+
+            use Dancer;
+            use MyApp;
+            Dancer::Config->load;
+
+            set( startup_info => 0,  port => $port );
+            Dancer->dance;
+        },
+    );
+
+    done_testing;
+
+# SEE ALSO
+
+- [The original blog entry](http://techblog.babyl.ca/entry/dancer-jasmine)
+- [Jasmine](http://jasmine.github.io/) - the JavaScript testing framework
+- [jasmine-jsreporter](https://github.com/detro/jasmine-jsreporter) - Jasmine plugin used to get the results via JSON
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

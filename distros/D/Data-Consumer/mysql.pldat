@@ -1,0 +1,2 @@
+$table = 'TEMP_DATA_CONSUMER_TEST_TABLE';
+@connect_args = ();

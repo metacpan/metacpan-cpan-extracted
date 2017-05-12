@@ -1,0 +1,33 @@
+---
+abstract: 'Cache::Memcached::Fast based session backend for Dancer'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Session-Memcached-Fast
+requires:
+  CBOR::XS: '0'
+  Cache::Memcached::Fast: '0'
+  Carp: '0'
+  Dancer::Config: '0'
+  Dancer::Session::Abstract: '0'
+  mro: '0'
+  parent: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer-session-memcached-fast-perl/issues
+  homepage: https://github.com/zurborg/libdancer-session-memcached-fast-perl
+  repository: https://github.com/zurborg/libdancer-session-memcached-fast-perl.git
+version: '0.002'

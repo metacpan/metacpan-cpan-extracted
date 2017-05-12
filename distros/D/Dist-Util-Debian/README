@@ -1,0 +1,64 @@
+SYNOPSIS
+
+     use Dist::Util::Debian qw(
+         dist2deb
+         deb_exists
+         dist_has_deb
+         deb_ver
+         dist_deb_ver
+     );
+    
+     say dist2deb("HTTP-Tiny"); # -> libhttp-tiny-perl
+    
+     say dist_has_deb("HTTP-Tiny"); # -> 1
+     say dist_has_deb("Foo");       # -> 0
+     say dist_has_deb({use_allpackages=>1}, "HTTP-Tiny", "Foo"); # -> (1, 0)
+    
+     say dist_deb_ver("HTTP-Tiny"); # -> "0.070-1"
+     say dist_deb_ver("Foo");       # -> undef
+     say dist_deb_ver({use_allpackages=>1}, "HTTP-Tiny", "Foo"); # -> ("0.070-1", undef)
+
+DESCRIPTION
+
+FUNCTIONS
+
+ dist2deb($dist, ...) => list
+
+    It uses the simple rule of turning $dist to lowercase and adds "lib" +
+    "-perl" prefix and suffix. A small percentage of distributions do not
+    follow this rule.
+
+ dist_has_deb([ \%opts, ] $dist, ...) => bool|list[bool]
+
+    Return true if distribution named $dist has a corresponding Debian
+    package. Currently the way the routine checks this is rather naive: it
+    checks the corresponding Debian package against this URL:
+    https://packages.debian.org/sid/$package.
+
+    Will warn and return undef on error, e.g. the URL cannot be checked or
+    does not contain negative/positive indicator of existence.
+
+    Can accept multiple dists and will return a list of bools in that case.
+
+    Known options:
+
+      * use_allpackages => bool
+
+      If you need to check a lot of distributions (hundreds or more) then
+      the default way of checking each distribution against a URL might be
+      too slow. An alternative way, enabled if you set this option to true,
+      is to download
+      https://packages.debian.org/unstable/allpackages?format=txt.gz (at
+      the time of this writing, Jan 2017, the size is about 1.7M) then
+      parse it locally. The file will be cached to a temporary file and
+      reused for a day.
+
+      Function will return undef if the allpackages index cannot be
+      donwloaded.
+
+ deb_exists([ \%opts, ] $deb, ...) => bool|list[bool]
+
+ deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+
+ dist_deb_ver([ \%opts, ] $deb, ...) => str|list[str]
+

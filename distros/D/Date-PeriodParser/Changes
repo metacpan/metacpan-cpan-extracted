@@ -1,0 +1,114 @@
+Revision history for Perl extension Date::PeriodParser.
+0.17  Sat Jan 26 01:27:56 PST 2013
+    - Formerly, you could only do date offsets in days. You can now do
+      them in days, months, weeks, and years, and they no longer mess up
+      when going over a month or year boundary (thanks to Mark Adler from
+      Nokia for sending me a patch, which I proceeded to distort out of
+      recognizability to add the week/month/year offsets).
+    - Updated the docs so we all know what works now.
+    - Somehow managed to badly hash up the Changelog; now fixed.
+    - I spelled Mark's name wrong (d'oh!).
+    - There was a bug in _zyprexa() for dates rolling forward over a
+      month boundary. Fixed.
+
+0.16  Fri Jan 25 22:15:27 PST 2013
+    - Realized that _zyprexa (the sub that makes dates sane) now makes
+      week, month and year ranges (like day ranges) easy to add, so now 
+      ranges like 'six weeks ago' and 'in two weeks' work as well.
+
+0.15  Fri Jan 25 21:47:11 PST 2013
+    - Fixed year-end and month-end rollovers from 'xxx days ago'
+      (thank you to Mark Adler at Nokia for the original patch, which
+      I twisted into a horrible parody of itself in the name of
+      generalizing it)
+
+0.14  Tue Jul 12 21:45:37 PDT 2011
+    - Still problems with some time zone or another in CEST timezone.
+      Added a little more debugging for this situation in timezone test.
+    - Spelling fix in Changes.
+
+0.13  Mon Jul 11 12:45:25 PDT 2011
+    - Neglected to update changelog; no actual code changes in this release
+
+0.12  Mon Jul 11 12:44:19 PDT 2011
+    - fixed timezone test to skip on Windows (tzset doesn't work there)
+    - dropped use vars in two tests that were throwing errors on 5.6
+
+0.11  Fri Jul  8 22:48:22 PDT 2011
+	- Dropped the Devel::Hide requirement and test; we don't really need it.
+
+0.10  ...
+	- Mis-incremented the vesion number, oops.
+
+0.09  Thu Jul  7 21:48:39 MDT 2011
+        - 09vague.t bug finally found: caused by different starts of daylight
+          savings. Luckily (or unluckily) the date chosen crosses the DST
+          boundary in CEST (Central Europe Summer Time) but not in any 
+          US time zone (code has previously been run in EDT/PDT and EST/PST).
+          A huge thank-you to the CPAN Testers who exposed this bug.
+          If the computed range around the time crosses the daylight savings
+          time boundary *in the current timezone*, we have to adjust the 
+          resulting time either forward or back an hour to get a consistent
+          result in every timezone.
+        - Added a test to run the problematic vague test in a lot of different 
+          timezones, both north and south of the equator, including some
+          of the odd ones, like Phoenix AZ, and Indiana.
+        - Added POSIX to the prereqs, since we need it for the timezone tests.
+
+0.08  Thu Jul  7 00:58:24 PDT 2011
+        - Still some reports of vague.t failing by an hour; suspect remaining
+          DST-related errors. Added diags to show the timezone and whether the
+          machine running the tests thinks the time is daylight savings or not.
+
+0.07  Mon Feb 25 14:29:33 PDT 2007
+	- Integrated most excellent patch from Doug Fischer, fixing a problem in
+	  vague and  recent times related to different interpretations of 
+          epoch-seconds in different timezones (which is why I could never 
+          duplicate the error ...)
+	
+0.06  Thu Sep 20 15:17:10 PDT 2007
+	- Weird '._*' files in distribution removed.
+	- Tabs removed. :/
+	- Made dependency on Lingua::EN::Words2Nums unconditional.
+
+0.05  Sat Mar  3 15:33:33 PST 2002 (3/3 3:33 - you can't make this stuff up!)
+	- Several patches from Michael Hendrix incorporated (thanks Michael!)
+		- "this week"/"this month"/"this year" support
+		- "last week"/"last month"/"last year" support
+		- "month year" (e.g., "May 2005", "Dec 1990") support
+		- Conditional loading of Lingua::EN::Words2Nums
+	- "next week"/"next month"/"next year" support
+	- Added explicit dependencies and documented them
+	- Converted directory layout to standard layout (lib/Date/PeriodParser.pm
+	  instead of PeriodParser.pm at the toplevel)
+	- Corrected the changelog to actually reflect the changes that happened.
+
+0.04  Wed Aug 31              2005
+	- Added pod.t and pod-coverage.t
+	- Privatized methods not needed by external modules
+	- Added comments
+	- Slight expansion of documentation
+
+0.03  Mon Feb  7              2005	
+    - Replace tests with more extensive Test::More-based tests.
+	- Changed date math to use Date::Calc.
+	- Added global Test::More-compatible debugging.
+	- Support for vague "now"
+    - fix 'night' to be a non-overlapping period with 'morning'
+      (is now 21:00:00 to 05:59:59 the next day).
+    - better support for odd but acceptable wording ("the day
+      before tomorrow", etc.).
+    - support for "in the" (particularly, support for "in the
+      morning/afternoon" meaning "tomorrow morning/afternoon" 
+      if it's not currently morning).
+	- Added non-stub docs, including a description of what's supported.
+ 
+0.02  Sat Jun  1 10:14:50 BST 2002
+    - Fix dependencies.
+	- Fix test harness.
+	- Add Lingua::EN::Words2Nums dependency.
+
+0.01  Fri Apr 12 21:44:22 2002
+	- original version; created by h2xs 1.21 with options
+		-AX -n Date::PeriodParser
+

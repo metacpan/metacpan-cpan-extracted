@@ -1,0 +1,28 @@
+---
+# -------------------- owners
+
+- schema: Owner
+  name: Alfred
+  data:
+    idx: 1
+    name: Alfred 
+    surname: Nobel
+    title: Donor
+    status: sick
+
+
+- schema: Owner
+  name: Niels
+  data:
+    idx: 2
+    name: Niels 
+    surname: Bohr
+    title: ~
+    status: work
+
+- schema: Host
+  name: Content
+  data:
+    idx: 1
+    name: Curie
+    desc: "Marie"

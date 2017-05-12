@@ -1,0 +1,9 @@
+Revision history for DBIx::JSON
+
+0.02  Sat Jun  02 10:20:32 2006
+        - Added hash_array option
+        - Updated error handling
+
+0.01  Sat Apr  15 23:01:11 2006
+        - original version
+

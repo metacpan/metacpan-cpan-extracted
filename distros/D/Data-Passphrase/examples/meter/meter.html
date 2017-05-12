@@ -1,0 +1,36 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Passphrase Strength Meter</title>
+<script type="text/javascript" src="meter.js"></script> 
+</head>
+<body style="text-align: center">
+<div id="content">
+<form id="myform">
+<h1>Passphrase Strength Meter</h1> 
+<h2>Passphrase:</h2>
+<input
+ id="mypassword"
+ name="mypassword"
+ onkeyup="update_meter(this.value, 'mypassword');"
+ size="40"
+ tabindex="1"
+ type="password"
+/>
+<br />
+<br />
+<h2>Passphrase Strength:</h2>
+<div style="margin: auto; width: 400px;"> 
+<div
+ id="mypassword_text"
+ style="font-family: sans-serif; font-size: 16px; font-weight: bold;"
+></div>
+<div style="background-color: #ccc; width: 100%"><div
+ id="mypassword_bar"
+ style="font-size: 1px; height: 20px; width: 0px;"
+></div></div>
+</div>
+</form>
+</div>
+</body>
+</html>

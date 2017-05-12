@@ -1,0 +1,7 @@
+=head2 Bugs
+
+The quickest way to report a bug in C<{{$MY::name}}>
+is by sending email to {{$MY::bt_mail}}.
+
+Bug tracker can be used via
+L<web interface|{{$MY::bt_web}}>.

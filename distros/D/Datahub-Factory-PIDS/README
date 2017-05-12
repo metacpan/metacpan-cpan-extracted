@@ -1,0 +1,79 @@
+NAME
+
+    Datahub::Factory::Importer::PIDS - Insert PIDS from an external source
+
+SYNOPSIS
+
+        use Datahub::Factory::Importer::PIDS;
+        use Data::Dumper qw(Dumper);
+    
+        my $pids = Datahub::Factory::Importer::PIDS->new(
+            username       => 'datahub',
+            api_key        => 'datahub',
+            container_name => 'datahub'
+        );
+    
+        $pids->temporary_table($pids->get_object('test.csv'), 'id');
+
+DESCRIPTION
+
+    The module uses Catmandu to create a SQLite database from a CSV
+    containing an export of the Resolver
+    <https://github.com/PACKED-vzw/resolver> that can be used in Catmandu
+    fixes to insert PIDS (Persistent Identifiers).
+
+    The CSV's are stored on a protected Rackspace cloud files instance.
+
+    It has absolutely no use outside of the Datahub
+    <https://github.com/thedatahub/> use case.
+
+PARAMETERS
+
+    username
+
+      Rackspace Cloud Files username to access the files.
+
+    api_key
+
+      API key for the Cloud Files user.
+
+    container_name
+
+      Name of the container where the files are stored. Optional, defaults
+      to datahub.
+
+METHODS
+
+    get_object($filename)
+
+      Get the object called $filename from the Cloud files instance and
+      store it in /tmp. Only accepts CSV's.
+
+      Returns the local path of the object it just fetched.
+
+    temporary_table($csv_location, $id_column)
+
+      Create a SQLite database (in /tmp) that stores the CSV that is stored
+      in $csv_location. Create an _id column (as expected by
+      Catmandu::Fix::lookup_in_store) in the database from the column in
+      the CSV called $id_column.
+
+      Returns nothing.
+
+AUTHOR
+
+    Pieter De Praetere <pieter at packed.be >
+
+COPYRIGHT
+
+    Copyright 2017- PACKED vzw
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Datahub::Factory Catmandu
+

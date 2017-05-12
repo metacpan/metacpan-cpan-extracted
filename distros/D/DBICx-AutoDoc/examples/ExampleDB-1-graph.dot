@@ -1,0 +1,57 @@
+/* vim:syntax=dot */
+digraph dbixclass {
+    graph [overlap=false,sep=.1,splines=true,model=subset,ratio=auto];
+    node [shape=plaintext];
+    edge [];
+
+    
+
+
+Address [ label=< <TABLE> <TR><TD COLSPAN="3" HREF="ExampleDB-1.html#Address">Address (addresses)</TD></TR> <TR> <TD PORT="id">id </TD> <TD>integer </TD> <TD>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </TD> </TR> <TR> <TD PORT="person_id">person_id </TD> <TD>integer </TD> <TD>NOT NULL, FOREIGN KEY </TD> </TR> <TR> <TD PORT="name">name </TD> <TD>varchar(64) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="address1">address1 </TD> <TD>varchar(128) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="address2">address2 </TD> <TD>varchar(128) </TD> <TD> </TD> </TR> <TR> <TD PORT="city">city </TD> <TD>varchar(64) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="state">state </TD> <TD>varchar(2) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="zip_code">zip_code </TD> <TD>varchar(10) </TD> <TD>NOT NULL </TD> </TR> </TABLE> > ]
+
+EmailAddress [ label=< <TABLE> <TR><TD COLSPAN="3" HREF="ExampleDB-1.html#EmailAddress">EmailAddress (email_addresses)</TD></TR> <TR> <TD PORT="id">id </TD> <TD>integer </TD> <TD>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </TD> </TR> <TR> <TD PORT="person_id">person_id </TD> <TD>integer </TD> <TD>NOT NULL, FOREIGN KEY </TD> </TR> <TR> <TD PORT="name">name </TD> <TD>varchar(64) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="email">email </TD> <TD>varchar(128) </TD> <TD>NOT NULL </TD> </TR> </TABLE> > ]
+
+Person [ label=< <TABLE> <TR><TD COLSPAN="3" HREF="ExampleDB-1.html#Person">Person (people)</TD></TR> <TR> <TD PORT="id">id </TD> <TD>integer </TD> <TD>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </TD> </TR> <TR> <TD PORT="name">name </TD> <TD>varchar(64) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="username">username </TD> <TD>varchar(16) </TD> <TD> </TD> </TR> <TR> <TD PORT="birthdate">birthdate </TD> <TD>date </TD> <TD>NOT NULL, INFLATED </TD> </TR> </TABLE> > ]
+
+PhoneNumber [ label=< <TABLE> <TR><TD COLSPAN="3" HREF="ExampleDB-1.html#PhoneNumber">PhoneNumber (phone_numbers)</TD></TR> <TR> <TD PORT="id">id </TD> <TD>integer </TD> <TD>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </TD> </TR> <TR> <TD PORT="person_id">person_id </TD> <TD>integer </TD> <TD>NOT NULL, FOREIGN KEY </TD> </TR> <TR> <TD PORT="name">name </TD> <TD>varchar(64) </TD> <TD>NOT NULL </TD> </TR> <TR> <TD PORT="phone_number">phone_number </TD> <TD>varchar(32) </TD> <TD>NOT NULL </TD> </TR> </TABLE> > ]
+
+
+
+    
+    
+    
+        Address:person_id -> Person:id [ label = "person (belongs_to)" ];
+    
+
+    
+    
+    
+        EmailAddress:person_id -> Person:id [ label = "person (belongs_to)" ];
+    
+
+    
+    
+    
+        Person:id -> Address:person_id [ label = "addresses (has_many)" ];
+    
+
+    
+    
+    
+        Person:id -> EmailAddress:person_id [ label = "emails (has_many)" ];
+    
+
+    
+    
+    
+        Person:id -> PhoneNumber:person_id [ label = "phone_numbers (has_many)" ];
+    
+
+    
+    
+    
+        PhoneNumber:person_id -> Person:id [ label = "person (belongs_to)" ];
+    
+
+}
+

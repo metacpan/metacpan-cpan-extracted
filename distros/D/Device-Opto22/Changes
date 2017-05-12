@@ -1,0 +1,5 @@
+Revision history for Perl extension Device::Opto22.
+
+0.90  Wed Mar 31 2010
+	- Fixed dist. Added Opto22/Firewire.pm to MANEFEST
+

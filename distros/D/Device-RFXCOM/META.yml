@@ -1,0 +1,43 @@
+---
+abstract: 'Perl modules for RFXCOM RF receivers and transmitters'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  AnyEvent: '0'
+  AnyEvent::Handle: '0'
+  AnyEvent::MockTCPServer: '0'
+  AnyEvent::Socket: '0'
+  File::Temp: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-RFXCOM
+requires:
+  Carp: '0'
+  Device::SerialPort: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  IO::Handle: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  Module::Pluggable: '0'
+  Symbol: '0'
+  Time::HiRes: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/beanz/device-rfxcom-perl/issues
+  homepage: http://search.cpan.org/dist/Device-RFXCOM/
+  repository: git://github.com/beanz/device-rfxcom-perl.git
+version: '1.163170'
+x_serialization_backend: 'YAML::Tiny version 1.69'

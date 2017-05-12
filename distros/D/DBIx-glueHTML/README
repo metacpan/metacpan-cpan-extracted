@@ -1,0 +1,65 @@
+glueHTML -  Class for creating a CGI interface to a database
+(c) Copyright 1999-2000 James Furness <furn@base6.com>
+
+------------------------------------------------------------------------
+Copyright (c)1999-2000 James Furness <furn@base6.com>. All Rights Reserved.
+This module is free software; it may be used freely and redistributed
+for free providing this copyright header remains part of the module. You may
+not charge for the redistribution of this module. Selling this code without
+James Furness' written permission is expressly forbidden.
+
+This module may not be modified without first notifying James Furness
+<furn@base6.com> (This is to enable me to track modifications). In all
+cases the copyright header should remain fully intact in all
+modifications.
+
+This code is provided on an "As Is" basis, without warranty, expressed or
+implied. The author disclaims all warranties with regard to this software,
+including all implied warranties of merchantability and fitness, in no
+event shall the author, James Furness be liable for any special, indirect
+or consequential damages or any damages whatsoever including but not
+limited to loss of use, data or profits. By using this module you agree to
+indemnify James Furness from any liability that might arise from it's use.
+Should this code prove defective, you assume the cost of any and all
+necessary repairs, servicing, correction and any other costs arising
+directly or indrectly from it's use.
+
+The copyright notice must remain fully intact at all times.
+Use of this program or its output constitutes acceptance of these terms.
+
+Parts of this module are based upon mysql-lib.pl by Ron Crisco.
+------------------------------------------------------------------------
+
+Description
+-----------
+
+The glueHTML class allows a CGI interface to a database.
+It enables a CGI interface to a database to be created, supporting record addition,
+modification, deletion and searching. It provides a user friendly interface with
+descriptions of fields provided. The field descriptions along with information on
+whether the field is visible, hidden or excluded are extracted from a table, allowing
+easy modification and addition of fields and tables without having to edit code.
+
+Build and Install
+-----------------
+
+To install, simply change into the folder containing the uncompressed distribution 
+and at the command prompt type:
+
+perl Makefile.PL
+make
+make test
+make install
+
+No testing routines are currently available in this beta.
+
+Further Information
+-------------------
+
+Full documentation is provided in POD format in glueHTML.pm. You should be 
+able to view this after installation using the perldoc command.
+
+Author
+------
+
+  James Furness <furn@base6.com>

@@ -1,0 +1,44 @@
+Revision history for Dancer::Session::DBI
+
+0.006 Wed Mar  9 17:59:59 2016 CET
+
+     German Perl Workshop 2016 release.
+
+     [BUG FIXES]
+
+     * Use data_column from configuration as accessor in retrieve method
+       (Peter Mottram, GH #8).
+
+0.005 Sun Mar 22 07:10:38 2015 CET
+
+     [ENHANCEMENTS]
+
+     * Use Dancer::Plugin::DBIC to provide schema if 'schema' is passed
+       in the options as a string (Yanick Champoux, GH #6).
+     * Pass convert_blessed => 1 to to_json in order to allow objects inside
+       sessions (Peter Mottram, GH #5).
+
+     [DOCUMENTATION]
+
+     * Add example for Session result class (Yanick Champoux, GH #7).
+
+0.004 Sun Feb 22 10:15:27 2015 CET
+
+     [BUG FIXES]
+
+     * Fix broken deserialization of UTF-8 characters (GH #3).
+
+0.003 Sat Jul  5 12:52:17 2014 CEST
+
+     [BUG FIXES]
+
+     * Fix prototype mismatch (GH #1, GH #2).
+
+0.002 Sun Dec 29 08:30:40 2013 CET
+
+    * First official release to CPAN.
+    * Fix resources in Makefile.PL.
+
+0.001 Fri Dec 20 23:48:00 2013 CET
+
+    * Initial release.

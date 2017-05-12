@@ -1,0 +1,195 @@
+#!/usr/bin/perl
+
+# Created on: 2013-11-09 08:31:52
+# Create by:  Ivan Wills
+# $Id$
+# $Revision$, $HeadURL$, $Date$
+# $Revision$, $Source$, $Date$
+
+use strict;
+use warnings;
+use version;
+use Scalar::Util;
+use List::Util;
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper qw/Dumper/;
+use English qw/ -no_match_vars /;
+use FindBin qw/$Bin/;
+use Path::Tiny;
+use Data::Context::BEM;
+use Data::Context::Log;
+
+our $VERSION = version->new('0.1');
+my ($name)   = $PROGRAM_NAME =~ m{^.*/(.*?)$}mxs;
+
+my %option = (
+    out           => undef,
+    dc_path       => 'dc/',
+    template_INCLUDE_PATH => 'bem/',
+    debug         => 1,
+    verbose       => 0,
+    man           => 0,
+    help          => 0,
+    VERSION       => 0,
+);
+
+if ( !@ARGV ) {
+    pod2usage( -verbose => 1 );
+}
+
+main();
+exit 0;
+
+sub main {
+
+    Getopt::Long::Configure('bundling');
+    GetOptions(
+        \%option,
+        'out|o=s',
+        'dc_path|path|p=s',
+        'template_INCLUDE_PATH|Path|P=s',
+        'debug|d=i',
+        'verbose|v+',
+        'man',
+        'help',
+        'VERSION!',
+    ) or pod2usage(2);
+
+    if ( $option{'VERSION'} ) {
+        print "$name Version = $VERSION\n";
+        exit 1;
+    }
+    elsif ( $option{'man'} ) {
+        pod2usage( -verbose => 2 );
+    }
+    elsif ( $option{'help'} ) {
+        pod2usage( -verbose => 1 );
+    }
+
+    # do stuff here
+    $Data::Dumper::Indent = 1;
+    my $log_file = path('bem-static.log')->opena;
+    my $bem = Data::Context::BEM->new(
+        path     => $option{dc_path},
+        Template => {
+            map {
+                (/^template_(.*)/) => $option{$_},
+            }
+            grep { /^template_/ }
+            keys %option
+        },
+        log => Data::Context::Log->new(
+            fh    => $log_file,
+            level => $option{debug},
+        ),
+        debug => $option{debug},
+    );
+
+    $option{out} .= '/' if $option{out} !~ m{/$};
+
+    my @files = path( $option{dc_path} )->children;
+    while ( my $file = shift @files ) {
+        if ( -d $file ) {
+            push @files, $file->children;
+            next;
+        }
+        next if $file !~ /[.]dc[.]\w+$/xms;
+
+        my $out_file = $file;
+        $out_file =~ s/^$option{dc_path}/$option{out}/;
+        $out_file =~ s/[.]dc[.]\w+$/.html/;
+        $out_file = path($out_file);
+
+        my $script = "$file";
+        $script =~ s(^$option{dc_path}/?)();
+        $script =~ s([.]dc[.]\w+$)();
+
+        my $msg = "Processing $file (as $script) to $out_file";
+        $bem->log->debug($msg);
+        print "$msg\n" if $option{verbose};
+        my $html = $bem->get_html($script);
+        if ( $option{verbose} > 1 ) {
+            my $instance = $bem->get($script);
+            warn Dumper $instance;
+        }
+
+        $out_file->parent->mkpath;
+        $out_file->spew($html);
+
+        my $styles = $bem->get_styles($script);
+        my $css = "$out_file";
+        $css =~ s/[.]html$/.css/;
+        path($css)->spew($styles);
+    }
+
+    warn Dumper $bem->block_map if $option{verbose} > 1;
+
+    return;
+}
+
+__DATA__
+
+=head1 NAME
+
+bem-static - Generate static html from BEM data
+
+=head1 VERSION
+
+This documentation refers to bem-static version 0.1
+
+=head1 SYNOPSIS
+
+   bem-static [option]
+
+ OPTIONS:
+  -o --out[=]dir
+                Output directory
+  -p --path[=]path
+                Path for find configuration files
+  -P --Path[=]template-path
+                Path for templates
+  -d --debug[=]level
+                Set the debug level
+
+  -v --verbose  Show more detailed option
+     --version  Prints the version information
+     --help     Prints this help information
+     --man      Prints the full documentation for bem-static
+
+=head1 DESCRIPTION
+
+=head1 SUBROUTINES/METHODS
+
+=head1 DIAGNOSTICS
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+=head1 DEPENDENCIES
+
+=head1 INCOMPATIBILITIES
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2013 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

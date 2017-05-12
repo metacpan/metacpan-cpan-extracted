@@ -1,0 +1,41 @@
+Devel-Command version 0.07
+==========================
+
+Devel::Command is used to automatically find and load debugger command
+extension modules, automatically patching the debugger to enable them.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Then place the following in your .perldb file (or equivalent on
+your platform):
+
+   use Devel::Command;
+
+That's it. Devel::Command will find all of the command plugins
+in the Devel::Command:: namespace and load them for you.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Module::Pluggable, Test::More
+
+The debugger patch plugins provided with this version of Devel::Command
+will handle any version of Perl 5.6 and Perl 5.8. If your Perl is not
+supported by this module, and it can handle Module::Pluggable, please
+write me at mcmahon@cpan.org and I will create a new patch module for it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, 2006 by Joe McMahon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

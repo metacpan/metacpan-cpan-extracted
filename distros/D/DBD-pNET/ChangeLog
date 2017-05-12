@@ -1,0 +1,14 @@
+Revision history for Perl extension DBD::pNET.
+
+0.1003  Added binding parameters.
+	Fixed use of setlogsock again: _PATH_LOG is missing on Solaris.
+	Added "debug" attribute to DSN.
+	Added query restrictions.
+
+0.1002  Modified test suite to make use of .mtest and .dbtest files.
+	Checked for existence of Sys::Syslog::setlogsock before using
+	it: It's in perl 5.004.03 only. (Lars Thegler <lth@dannet.dk>)
+
+0.1001  Thu Aug  7 22:28:41 1997
+	- original version; created by h2xs 1.16
+

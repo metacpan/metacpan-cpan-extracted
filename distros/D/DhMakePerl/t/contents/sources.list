@@ -1,0 +1,12 @@
+# dummy sources.list file used only for testing
+
+deb http://test/debian sid main
+deb http://test/debian testing main
+deb http://test/debian testing main
+deb     http://security.debian.org/ stable/updates main contrib non-free
+deb     http://www.toastfreeware.priv.at/debian stable/
+deb     http://www.kiberpipa.org/~minmax/cinelerra/builds/sid/ ./
+deb     http://debian.cihar.com/ unstable main contrib non-free
+deb-src http://debian.cihar.com/ unstable main contrib non-free
+deb http://nightlies.videolan.org/build/sid-i386/arch ./
+deb file:/home/jason/debian stable main contrib non-free

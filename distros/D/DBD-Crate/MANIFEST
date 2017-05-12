@@ -1,0 +1,14 @@
+Changes
+examples/app.psgi
+lib/DBD/Crate.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/1_crate.t
+t/blob.t
+t/createtable.t
+t/error.t
+t/zvp_1_crate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,28 @@
+# Set default behaviour, in case users don't have core.autocrlf set.
+* text=auto
+
+# Explicitly declare text files we want to always be normalized and converted 
+# to native line endings on checkout.
+
+
+# Declare files that will always have LF line endings on checkout.
+*.PL text eol=lf
+*.pl text eol=lf
+Changes text eol=lf
+ignore.txt text eol=lf
+MANIFEST text eol=lf
+META.json text eol=lf
+MYMETA.json text eol=lf
+META.yml text eol=lf
+MYMETA.yml text eol=lf
+README text eol=lf
+*.t text eol=lf
+*.pm text eol=lf
+*.PM text eol=lf
+
+# Declare files that will always have CRLF line endings on checkout.
+*.bat text eol=crlf
+
+# Denote all files that are truly binary and should not be modified.
+*.png binary
+*.jpg binary

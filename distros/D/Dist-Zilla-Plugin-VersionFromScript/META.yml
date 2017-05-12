@@ -1,0 +1,24 @@
+---
+abstract: 'run command line script to provide version number'
+author:
+  - 'Reid Augustin <reid@hellosix.com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-VersionFromScript
+requires:
+  Dist::Zilla::Role::TextTemplate: 0
+  Dist::Zilla::Role::VersionProvider: 0
+  File::Basename: 0
+  Moose: 0
+  perl: 5.002
+  strict: 0
+  warnings: 0
+version: 0.017

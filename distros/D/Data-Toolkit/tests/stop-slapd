@@ -1,0 +1,17 @@
+#!/bin/sh
+#
+# stop-slapd
+
+if test ! -f slapd.conf.test
+then
+	echo "stop-slapd: must be run from the directory containing slapd.conf.test" 1>&2
+	exit 1
+fi
+
+if test -f openldap-db/slapd.pid
+then
+	kill -INT `cat openldap-db/slapd.pid`
+fi
+
+exit 0
+

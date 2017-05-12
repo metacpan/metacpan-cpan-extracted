@@ -1,0 +1,29 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+README.md
+t/DBIx-ActiveRecord.t
+t/DBIx-ActiveRecord-WithMySQL.t
+t/DBIx-ActiveRecord-Arel.t
+lib/DBIx/ActiveRecord.pm
+lib/DBIx/ActiveRecord/Model.pm
+lib/DBIx/ActiveRecord/Arel.pm
+lib/DBIx/ActiveRecord/Relation.pm
+lib/DBIx/ActiveRecord/Scope.pm
+lib/DBIx/ActiveRecord/Arel/Column.pm
+lib/DBIx/ActiveRecord/Arel/Value.pm
+lib/DBIx/ActiveRecord/Arel/Join.pm
+lib/DBIx/ActiveRecord/Arel/NakidWhere.pm
+lib/DBIx/ActiveRecord/Arel/Native.pm
+lib/DBIx/ActiveRecord/Arel/Query.pm
+lib/DBIx/ActiveRecord/Arel/Where.pm
+lib/DBIx/ActiveRecord/Arel/Order.pm
+lib/DBIx/ActiveRecord/Arel/SubQuery.pm
+lib/DBIx/ActiveRecord/Arel/Query/Delete.pm
+lib/DBIx/ActiveRecord/Arel/Query/Select.pm
+lib/DBIx/ActiveRecord/Arel/Query/Update.pm
+lib/DBIx/ActiveRecord/Arel/Query/Insert.pm
+lib/DBIx/ActiveRecord/Arel/Query/Count.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

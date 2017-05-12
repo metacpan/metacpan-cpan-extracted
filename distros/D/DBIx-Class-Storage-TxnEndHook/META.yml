@@ -1,0 +1,45 @@
+---
+abstract: 'transaction hook provider for DBIx::Class'
+author:
+  - 'This library is free software; you can redistribute it and/or modify'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Test::Fatal: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Storage-TxnEndHook
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Class::Schema::TxnEndHook:
+    file: lib/DBIx/Class/Schema/TxnEndHook.pm
+  DBIx::Class::Storage::TxnEndHook:
+    file: lib/DBIx/Class/Storage/TxnEndHook.pm
+    version: '0.01'
+requires:
+  DBIx::Class: '0'
+  Try::Tiny: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/soh335/DBIx-Class-Storage-TxnEndHook/issues
+  homepage: https://github.com/soh335/DBIx-Class-Storage-TxnEndHook
+  repository: git://github.com/soh335/DBIx-Class-Storage-TxnEndHook.git
+version: '0.01'
+x_contributors:
+  - 'soh335 <sugarbabe335@gmail.com>'

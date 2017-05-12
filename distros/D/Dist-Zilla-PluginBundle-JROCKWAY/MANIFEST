@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/Plugin/BeJROCKWAY.pm
+lib/Dist/Zilla/PluginBundle/JROCKWAY.pm
+t/load.t
+t/release-pod-syntax.t

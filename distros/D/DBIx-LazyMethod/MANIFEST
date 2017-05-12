@@ -1,0 +1,14 @@
+INSTALL
+LICENSE
+MANIFEST			This list of files
+README
+Changes				Version changes described
+Makefile.PL
+lib/SomeDB.pm
+lib/DBIx/LazyMethod.pm
+t/LazyMethod.t
+t/MySQL.t
+t/Pg.t
+t/CSV.t
+t/pod.t
+t/pod-coverage.t

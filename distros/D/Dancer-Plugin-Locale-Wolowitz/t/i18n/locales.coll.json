@@ -1,0 +1,16 @@
+{
+    "welcome": {
+        "fr": "Bienvenue",
+        "en": "Welcome",
+        "da": "Velkomst"
+    },
+    "hello": {
+        "fr": "Salut",
+        "en": "Hello",
+        "da": "Hej"
+    },
+    "path_not_found %1": {
+        "fr": "Repertoire %1 non trouve",
+        "en": "%1 not found"
+    }
+}

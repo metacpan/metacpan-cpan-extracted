@@ -1,0 +1,14 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::ALTREUS - BeLike::ALTREUS, who is
+    exactly like DBOOK (except less obsessed with Mojolicious)
+
+DESCRIPTION
+
+    This is exactly DBOOK's bundle except I've overridden the default
+    github username.
+
+SEE ALSO
+
+    Dist::Zilla::PluginBundle::Author::DBOOK
+

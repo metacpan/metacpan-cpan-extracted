@@ -1,0 +1,1122 @@
+<HTML>
+<HEAD>
+
+	<META NAME="CONTACT" CONTENT="Turner, Jim">
+
+	<META NAME="SENSITIVITY" CONTENT="UNRESTRICTED">
+<TITLE>DBD::Sprite - Perl extension for DBI, providing database emmulation via flat files.</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#INSTALLATION">INSTALLATION</A>
+	<LI><A HREF="#GETTING_STARTED_">GETTING STARTED:</A>
+	<LI><A HREF="#CREATING_AND_DROPPING_TABLES">CREATING AND DROPPING TABLES</A>
+	<LI><A HREF="#INSERTING_FETCHING_AND_MODIFYIN">INSERTING, FETCHING AND MODIFYING DATA</A>
+	<LI><A HREF="#JOINS">JOINS</A>
+	<LI><A HREF="#ERROR_HANDLING">ERROR HANDLING</A>
+	<LI><A HREF="#METADATA">METADATA</A>
+	<LI><A HREF="#DRIVER PRIVATE METHODS">DRIVER PRIVATE METHODS</A>
+	<LI><A HREF="#RESTRICTIONS">RESTRICTIONS</A>
+	<LI><A HREF="#CHANGES">LATEST CHANGES</A>
+	<LI><A HREF="#TODO">TODO</A>
+	<LI><A HREF="#KNOWN BUGS">KNOWN BUGS</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+<PRE>     DBD::Sprite - Perl extension for DBI, providing database emmulation via flat files.  
+</PRE>
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+<PRE>    This module is Copyright (C) 2000, 2001, 2002, 2003, 2004 by
+</PRE>
+<P>
+<PRE>                Jim Turner
+                
+        Email: turnerjw@wwol.com
+</PRE>
+<P>
+<PRE>    All rights reserved.
+</PRE>
+<P>
+<PRE>    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.
+</PRE>
+<P>
+<PRE>        DBD::Sprite is a derived work by Jim Turner from Sprite.pm, a module 
+        written and copyrighted (c) 1995-1998, by Shishir Gurdavaram 
+        (shishir@ora.com).
+</PRE>
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>     use DBI;
+     $dbh = DBI-&gt;connect(&quot;DBI:Sprite:spritedb&quot;,'user','password')
+         or die &quot;Cannot connect: &quot; . $DBI::errstr;
+     $sth = $dbh-&gt;prepare(&quot;CREATE TABLE a (id INTEGER, name CHAR(10))&quot;)
+         or die &quot;Cannot prepare: &quot; . $dbh-&gt;errstr();
+     $sth-&gt;execute() or die &quot;Cannot execute: &quot; . $sth-&gt;errstr();
+     $sth-&gt;finish();
+     $dbh-&gt;disconnect();
+</PRE>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+DBD::Sprite is a DBI extension module adding database emulation via
+flat-files or XML documents to Perl's database-independent database interface. Unlike other
+DBD::modules, DBD::Sprite does not require you to purchase or obtain a
+database. Every thing you need to prototype database-independent
+applications using Perl and DBI are included here. You will, however,
+probably wish to obtain a real database, such as &quot;mysql&quot;, for your
+production and larger data needs. This is because emulating databases and
+SQL with flat text files gets very slow as the size of your &quot;database&quot;
+grows to a non-trivial size (a few thousand records or so per table).  
+
+<P>
+DBD::Sprite is built upon an old Perl module called &quot;Sprite&quot;, written by
+Shishir Gurdavaram. This code was used as a starting point. It was
+completly reworked and many new features were added, producing a module
+called &quot;JSprite.pm&quot; (Jim Turner's Sprite). This was then merged in to
+DBI::DBD to produce what you are installing now. (DBD::Sprite). JSprite.pm
+is included in this module as a separate file, and is required.
+
+<P>
+Many thanks go to Mr. Gurdavaram.
+
+<P>
+The main advantage of DBD::Sprite is the ability to develop and test
+prototype applications on personal machines (or other machines which do not
+have an Oracle licence or some other &quot;mainstream&quot; database) before
+releasing them on &quot;production&quot; machines which do have a &quot;real&quot;
+database. This can all be done with minimal or no changes to your Perl
+code.
+
+<P>
+Another advantage of DBD::Sprite is that you can use Perl's regular
+expressions in your SQL &quot;WHERE-clauses&quot; to search through your data (ie. &quot;...where FIELD =~ /\S/...&quot;). 
+Maybe, someday, more &quot;real&quot; databases will include this feature too!
+
+<P>
+DBD::Sprite provides the ability to emulate basic database tables and SQL
+calls via flat-files. The primary use envisioned for this to permit website
+developers who can not afford to purchase an Oracle licence to prototype
+and develop Perl applications on their own equipment for later hosting at
+larger customer sites where Oracle is used. :-)
+
+<P>
+DBD::Sprite attempts to do things in as database-independent manner as
+possible, but where differences occurr, DBD::Sprite most closely emmulates
+Oracle, for example &quot;sequences/autonumbering. DBD::Sprite uses tiny one-line
+text files called `&quotsequence files (.seq). and `&quotseq_file_name.NEXTVAL
+function to insert into autonumbered fields. The reason for this is that
+the Author works in an Oracle shop and wrote this module to allow himself
+to work on code on his PC, and machines which did not have Oracle on them,
+since obtaining Oracle licences was sometimes time-consuming.
+
+<P>
+DBD::Sprite is similar to DBD::CSV, but differs in the following ways:  
+
+<P>
+<UL>
+        <LI>1) It creates and works on true &quot;databases&quot; with user-ids and passwords. 
+        <LI>2) The  database author specifies the field delimiters, record delimiters, 
+        users, passwords, table file path, AND extension for each database. 
+        <LI>3) <B>Transactions</B> (commits and rollbacks) are fully supported! 
+        <LI>4) <B>Autonumbering</B> and user-defined functions are supported.
+        <LI>5) Sprite supports basic two-table <B>JOINS!</B>
+        <LI>6) You don't need any other modules or databases.  (NO prerequisites 
+        except Perl 5 and the DBI module!
+        <LI>7) It is not necessary to call the &quot;$dbh-&gt;quote()&quot; method all the time 
+        in your sql.
+        <LI>8) NULL is handled as an empty string.
+        <LI>9) Users can &quot;register&quot; their own data-conversion functions for use in
+        sql.  See &quot;fn_register&quot; method below.
+        <LI>10) Oracle Sequences are supported!
+        <LI>11) Numeric, Char(#), and Varchar(#) datatypes are supported and 
+        completely sortable!
+        <LI>12) Separate files for large "BLOB" data now supported.
+        <LI>13) Your choice of <B>Encryption</B> is now supported.
+        <LI>14) Storage in <B>XML</B>-format now supported.
+</UL>
+<P>
+<HR>
+<H1><A NAME="INSTALLATION">INSTALLATION</A></H1>
+<P>
+<PRE>    Installing this module (and the prerequisites from above) is quite
+    simple. You just fetch the archive, extract it with
+</PRE>
+<P>
+<PRE>        gzip -cd DBD-Sprite-0.1000.tar.gz | tar xf -
+</PRE>
+<P>
+<PRE>    (this is for Unix users, Windows users would prefer WinZip or something
+    similar) and then enter the following:
+</PRE>
+<P>
+<PRE>        cd DBD-Sprite-#.###
+        perl Makefile.PL
+        make
+        make test
+</PRE>
+<P>
+<PRE>    If any tests fail, let me know. Otherwise go on with
+</PRE>
+<P>
+<PRE>        make install
+</PRE>
+<P>
+<PRE>    Note that you almost definitely need root or administrator permissions.
+    If you don't have them, read the ExtUtils::MakeMaker man page for
+    details on installing in your own directories. the ExtUtils::MakeMaker
+    manpage.
+</PRE>
+<P>
+<PRE>        NOTE:  You will also need to copy &quot;makesdb.pl&quot; to /usr/local/bin or 
+        somewhere in your path.
+</PRE>
+<P><H2>Windows installation</H2>
+<PRE>
+		If installing in Windows, you must 1st install the DBI module, 
+	create a DBD subdirectory in your Perl's path (run "perl -V" to find out 
+	what this is), copy "Sprite.pm" to it, then copy the other files (
+	JSprite.pm, OraSpriteFns.pl, and to_date.pl to the same directory you 
+	created the DBD subdirectory in.  Then copy the file makesdb.pl to the 
+	directory perl itself is in.  These directories (in ActivePerl) are: 
+	c:\perl\site\lib and c:\perl\bin respectively.  You do NOT need to use 
+	"make" or "nmake" to build DBD::Sprite!
+</PRE>
+<P>
+<HR>
+<H1><A NAME="GETTING_STARTED_">GETTING STARTED:</A></H1>
+<P>
+<PRE>        1) cd to where you wish to store your database.
+        2) run makesdb.pl to create your database, ie.
+        
+                Database name: mydb
+                Database user: me
+                User password: mypassword
+                Database path: .
+                Table file extension (default .stb): 
+                Record delimiter (default \n): 
+                Field delimiter (default ::): 
+</PRE>
+<P>
+<PRE>                This will create a new database text file (mydb.sdb) in the current 
+                directory.  This ascii file contains the information you enterred 
+                above.  To add additional user-spaces, simply rerun makesdb.pl with 
+                &quot;mydb&quot; as your database name, and enter additional users (name, 
+                password, path, extension, and delimiters).  For an example, after 
+                running &quot;make test&quot;, look at the file &quot;test.sdb&quot;.               
+                
+                When connecting to a Sprite database, Sprite will look in the current 
+                directory, then, if specified, the path in the SPRITE_HOME environment 
+                variable.
+</PRE>
+<P>
+<PRE>                The database name, user, and password are used in the &quot;db-&gt;connect()&quot; 
+                method described below.  The &quot;database path&quot; is where your tables will 
+                be created and reside.  Table files are ascii text files which will 
+                have, by default, the extension &quot;.stb&quot; (Sprite table).  By default, 
+                each record will be written to a single line (separated by \n -- 
+                Windows users should probably use &quot;\r\n&quot;).  Each field datum will be 
+                written without quotes separated by the &quot;field delimiter (default: 
+                double-colon).  The first line of the table file consists of the 
+                a field name, an equal (&quot;=&quot;) sign, an asterisk if it is a key field, 
+                then the datatype and size.  This information is included for each 
+                field and separated by the field separator.  For an example, after 
+                running &quot;make test&quot;, look at the file &quot;testtable.stb&quot;.          
+</PRE>
+<P>
+<PRE>        3) write your script to use DBI, ie:
+        
+                #!/usr/bin/perl
+                use DBI;
+                
+                $dbh = DBI-&gt;connect('DBI:Sprite:mydb','me','mypassword') || 
+                                die &quot;Could not connect (&quot;.$DBI-&gt;err.':'.$DBI-&gt;errstr.&quot;)!&quot;;
+                ...
+                #CREATE A TABLE, INSERT SOME RECORDS, HAVE SOME FUN!
+                
+        4) get your application working.
+        
+        5) rehost your application on a &quot;production&quot; machine and change &quot;Sprite&quot; 
+        to a DBI driver for a &quot;real&quot; database!
+</PRE>
+<P>
+<HR>
+<H1><A NAME="CREATING_AND_DROPPING_TABLES">CREATING AND DROPPING TABLES</A></H1>
+<P>
+<PRE>    You can create and drop tables with commands like the following:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;do(&quot;CREATE TABLE $table (id INTEGER, name CHAR(64))&quot;);
+        $dbh-&gt;do(&quot;DROP TABLE $table&quot;);
+</PRE>
+<P>
+<PRE>    A drop just removes the file without any warning.
+</PRE>
+<P>
+<PRE>    See the DBI(3) manpage for more details.
+</PRE>
+<P>
+<PRE>    Table names cannot be arbitrary, due to restrictions of the SQL syntax.
+    I recommend that table names are valid SQL identifiers: The first
+    character is alphabetic, followed by an arbitrary number of alphanumeric
+    characters. If you want to use other files, the file names must start
+    with '/', './' or '../' and they must not contain white space.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="INSERTING_FETCHING_AND_MODIFYIN">INSERTING, FETCHING AND MODIFYING DATA</A></H1>
+<P>
+<PRE>    The following examples insert some data in a table and fetch it back:
+    First all data in the string:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;do(&quot;INSERT INTO $table VALUES (1, 'foobar')&quot;);
+</PRE>
+<P>
+<PRE>    Note the use of the quote method for escaping the word 'foobar'. Any
+    string must be escaped, even if it doesn't contain binary data.
+</PRE>
+<P>
+<PRE>    Next an example using parameters:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;do(&quot;INSERT INTO $table VALUES (?, ?)&quot;, undef,
+                 2, &quot;It's a string!&quot;);
+</PRE>
+<P>
+<PRE>    To retrieve data, you can use the following:
+</PRE>
+<P>
+<PRE>        my($query) = &quot;SELECT * FROM $table WHERE id &gt; 1 ORDER BY id&quot;;
+        my($sth) = $dbh-&gt;prepare($query);
+        $sth-&gt;execute();
+        while (my $row = $sth-&gt;fetchrow_hashref) {
+            print(&quot;Found result row: id = &quot;, $row-&gt;{'id'},
+                  &quot;, name = &quot;, $row-&gt;{'name'});
+        }
+        $sth-&gt;finish();
+</PRE>
+<P>
+<PRE>    Again, column binding works: The same example again.
+</PRE>
+<P>
+<PRE>        my($query) = &quot;SELECT * FROM $table WHERE id &gt; 1 ORDER BY id&quot;;
+        my($sth) = $dbh-&gt;prepare($query);
+        $sth-&gt;execute();
+        my($id, $name);
+        $sth-&gt;bind_columns(undef, \$id, \$name);
+        while ($sth-&gt;fetch) {
+            print(&quot;Found result row: id = $id, name = $name\n&quot;);
+        }
+        $sth-&gt;finish();
+</PRE>
+<P>
+<PRE>    Of course you can even use input parameters. Here's the same example for
+    the third time:
+</PRE>
+<P>
+<PRE>        my($query) = &quot;SELECT * FROM $table WHERE id = ?&quot;;
+        my($sth) = $dbh-&gt;prepare($query);
+        $sth-&gt;bind_columns(undef, \$id, \$name);
+        for (my($i) = 1;  $i &lt;= 2;   $i++) {
+            $sth-&gt;execute($id);
+            if ($sth-&gt;fetch) {
+                print(&quot;Found result row: id = $id, name = $name\n&quot;);
+            }
+            $sth-&gt;finish();
+        }
+</PRE>
+<P>
+<PRE>    See the DBI(3) manpage for details on these methods. See the
+    SQL::Statement(3) manpage for details on the WHERE clause.
+</PRE>
+<P>
+<PRE>    Data rows are modified with the UPDATE statement:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;do(&quot;UPDATE $table SET id = 3 WHERE id = 1&quot;);
+</PRE>
+<P>
+<PRE>    Likewise you use the DELETE statement for removing rows:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;do(&quot;DELETE FROM $table WHERE id &gt; 1&quot;);
+</PRE>
+<P>
+<EM>fn_register</EM>
+
+
+
+<P>
+Method takes 2 arguments: Function name and optionally, a package name
+(default is &quot&quotmain&quot).
+
+<P>
+<PRE>                $dbh-&gt;fn_register ('myfn','mypackage');
+  
+-or-
+</PRE>
+<P>
+<PRE>                use JSprite;
+                JSprite::fn_register ('myfn',__PACKAGE__);
+</PRE>
+<P>
+Then, you could say in sql:
+
+<P>
+<PRE>        insert into mytable values (myfn(?))
+        
+and bind some value to &quot;?&quot;, which is passed to &quot;myfn&quot;, and the return-value 
+is inserted into the database.  You could also say (without binding):
+</PRE>
+<P>
+<PRE>        insert into mytable values (myfn('mystring'))
+        
+-or (if the function takes a number)-
+</PRE>
+<P>
+<PRE>        select field1, field2 from mytable where field3 = myfn(123) 
+        
+I&lt;Return Value&gt;
+</PRE>
+<P>
+<PRE>        None
+</PRE>
+<P>
+<HR>
+<H1><A NAME="JOINS">JOINS</A></H1>
+<P>
+	As of v. 0.50, basic two-table inner-joins are now supported.  For example:
+
+<PRE>        select t1.field1, t2.field1, t1.field2 from table1 t1, table2 t2
+        where t1.field1 = t2.field3 order by t2.field1 desc, t1.field1
+</PRE>
+
+This would return the three fields requested based on a set intersection 
+of all records in table1 and table2 such that field1 of table1 matches 
+field3 of table3.  NOTE:  This is the ONLY type of join currently supported!
+You can, however add additional selection criteria and or ordering 
+arguments.  You can also omit the where-clause and get a "set union" of 
+the specified fields for all records of both tables.
+</P>
+<PRE></PRE>
+<P>
+<HR>
+<H1><A NAME="ERROR_HANDLING">ERROR HANDLING</A></H1>
+<P>
+<PRE>    In the above examples we have never cared about return codes. Of course,
+    this cannot be recommended. Instead we should have written (for
+    example):
+</PRE>
+<P>
+<PRE>        my($query) = &quot;SELECT * FROM $table WHERE id = ?&quot;;
+        my($sth) = $dbh-&gt;prepare($query)
+            or die &quot;prepare: &quot; . $dbh-&gt;errstr();
+        $sth-&gt;bind_columns(undef, \$id, \$name)
+            or die &quot;bind_columns: &quot; . $dbh-&gt;errstr();
+        for (my($i) = 1;  $i &lt;= 2;   $i++) {
+            $sth-&gt;execute($id)
+                or die &quot;execute: &quot; . $dbh-&gt;errstr();
+            if ($sth-&gt;fetch) {
+                print(&quot;Found result row: id = $id, name = $name\n&quot;);
+            }
+        }
+        $sth-&gt;finish($id)
+            or die &quot;finish: &quot; . $dbh-&gt;errstr();
+</PRE>
+<P>
+<PRE>    Obviously this is tedious. Fortunately we have DBI's *RaiseError*
+    attribute:
+</PRE>
+<P>
+<PRE>        $dbh-&gt;{'RaiseError'} = 1;
+        $@ = '';
+        eval {
+            my($query) = &quot;SELECT * FROM $table WHERE id = ?&quot;;
+            my($sth) = $dbh-&gt;prepare($query);
+            $sth-&gt;bind_columns(undef, \$id, \$name);
+            for (my($i) = 1;  $i &lt;= 2;   $i++) {
+                $sth-&gt;execute($id);
+                if ($sth-&gt;fetch) {
+                    print(&quot;Found result row: id = $id, name = $name\n&quot;);
+                }
+            }
+            $sth-&gt;finish($id);
+        };
+        if ($@) { die &quot;SQL database error: $@&quot;; }
+</PRE>
+<P>
+<PRE>    This is not only shorter, it even works when using DBI methods within
+    subroutines.
+</PRE>
+<P>
+<HR>
+<H1><A NAME="METADATA">METADATA</A></H1>
+<P>
+<PRE>    The following attributes are handled by DBI itself and not by DBD::Sprite,
+    thus they should all work as expected:  I have only used the last 3.
+</PRE>
+<P>
+<PRE>        Active
+        ActiveKids
+        CachedKids
+        CompatMode             (Not used)
+        InactiveDestroy
+        Kids
+        PrintError
+        RaiseError
+        Warn
+</PRE>
+<P>
+<PRE>    The following DBI attributes are handled by DBD::Sprite:
+</PRE>
+<P>
+<PRE>    AutoCommit
+        Works
+</PRE>
+<P>
+<PRE>    ChopBlanks
+        Should Work
+</PRE>
+<P>
+<PRE>    NUM_OF_FIELDS
+        Valid after `$sth-&gt;execute'
+</PRE>
+<P>
+<PRE>    NUM_OF_PARAMS
+        Valid after `$sth-&gt;prepare'
+</PRE>
+<P>
+<PRE>    NAME
+        Valid after `$sth-&gt;execute'; undef for Non-Select statements.
+</PRE>
+<P>
+<PRE>    NULLABLE
+        Not really working. Always returns a reference to an array of '1's, as
+        DBD::Sprite always allows NULL (handled as an empty string). 
+        Valid after `$sth-&gt;execute'.
+        
+    PRECISION
+                Works
+                
+    SCALE
+                Works
+</PRE>
+<P>
+<PRE>    LongReadLen
+                Should work
+</PRE>
+<P>
+<PRE>    LongTruncOk
+		    		works, except setting to zero allows any length of data to be 
+		    		read.
+
+</PRE>
+<P>
+<PRE>    These attributes and methods are not supported:
+</PRE>
+<P>
+<PRE>        bind_param_inout
+        CursorName
+</PRE>
+<P>
+<PRE>    In addition to the DBI attributes, you can use the following dbh
+    attributes.  These attributes are read-only after &quot;connect&quot;.
+</PRE>
+<P>
+<PRE>
+    The following are Sprite-specific options which can be set when connecting.
+
+    sprite_dbdir
+            Path to tables for database.
+                
+    sprite_dbext
+        File extension used on table files in the database.
+                
+    sprite_dbuser
+        Current database user.
+
+    sprite_field
+        Field delimiter string in use for the database.
+        Default specified in database configuration file (<dbname>.sdb)
+                
+    sprite_read
+        Field delimiter string in use for inputting the database.
+        Default = sprite_field
+                
+    sprite_write
+        Field delimiter string in use for outputting the database.
+        Default = sprite_field
+                
+    sprite_xsl  (NEW)
+        Allows specifying of a url to an xsl template to be written to xml 
+        documents (when using the "xml" option).  This makes it very easy to 
+        view your tables via M$ Internet Explorer browser!
+
+        Example:  sprite_xsl => 'http://turnerville.wwol.com/jim/spritexml2html.xsl'
+        
+        Default is none.  Only applies if "sprite_field" is set to "xml"!
+
+    sprite_dbfdelim - DEPRECIATED, now use "sprite_field"!
+        Field delimiter string in use for the database.
+                
+    sprite_dbrdelim - DEPRECIATED, now use "sprite_record"!
+        Record delimiter string in use for the database.
+                
+    sprite_CaseTableNames
+        By default, table names are case-insensitive (as they are in Oracle),
+        to make table names case-sensitive (as in MySql), so that one could
+        have two separate tables such as "test" and "TEST", set this option
+        to 1.
+
+    sprite_CaseFieldNames  (NEW)
+        By default, field names are case-insensitive (as they are in Oracle),
+        to make field names case-sensitive (as in XML), so that one could
+        have two separate fields such as "field1" and "Field1", set this option
+        to 1.
+
+    sprite_Crypt
+        "0" by defalt.  Specifies that encryption is to be used when storing 
+        the data in the flat-file.  To use, download "Crypt::CBC", and one 
+        or more of "Crypt::DES", "Crypt::IDEA", or "Crypt::Blowfish".  You 
+        can specify using any of the following formats:
+        
+            sprite_Crypt => 'my key string'
+                Use Blowfish encryption.
+            sprite_Crypt => 'DES;my key string'
+                Use DES encryption.
+            sprite_Crypt => 'encrypt=CBC;IDEA;my key string'
+                Use IDEA encription, but read in table as unencrypted, then 
+                write it out encrypted (great for encrypting previously 
+                unencrypted tables).
+            sprite_Crypt => 'decrypt=CBC;Blowfish;my key string'
+                use Blowfish encryption, but write out table unencrypted. 
+                This allows one to fetch an encrypted table and write it back 
+                out unencrypted.
+
+    sprite_reclimit  (aka. sprite_sizelimit)
+        Allows user to specify the maximum number of records to be returned 
+        by a single query.  Default is "0", which permits an unlimited number.
+
+    sprite_StrictCharComp
+        CHAR fields are always right-padded with spaces to fill out
+        the field.  Old (pre 5.17) Sprite behaviour was to require the
+        padding be included in literals used for testing equality in
+        "where" clauses.    I discovered that Oracle and some other databases
+        do not require this when testing DBIx-Recordset, so Sprite will
+        automatically right-pad literals when testing for equality.
+        To disable this and force the old behavior, set this option to 1.
+
+    sprite_lock_file
+        Specify alternate path/file to use for file-locking on os'es without 
+        a working "flock" (ie. M$ os'es).  Default is 
+        "/path/to/where/my/tables/are/Sprite.lck".  This is useful if the 
+        file-system your tables are on is read-only.
+
+    sprite_lock_try
+        Allows user-specification of the number of times to try to create 
+        lock-file on os'es without a working "flock" (ie. M$ os'es).  Default 
+        is 10.
+
+    sprite_forcereplace
+        Forces existing Sprite table file to be deleted and recreated in lieu 
+        of being overwritten.  This was necessary because the author uses a 
+        Samba filesystem which for some reason does not permit overwriting 
+        of files.
+
+    SPRITE_HOME
+        Environment variable specifying a path to search for Sprite 
+        databases (*.sdb) files.
+</PRE>
+<P>
+<H1><A NAME="DRIVER PRIVATE METHODS">DRIVER PRIVATE METHODS</A></H1>
+<P>
+<PRE>    DBI-&gt;data_sources()
+        The `data_sources' method returns a list of &quot;databases&quot; (.sdb files) 
+        found in the current directory and, if specified, the path in 
+        the SPRITE_HOME environment variable.
+        
+    $dbh-&gt;tables()
+        This method returns a list of table names specified in the current 
+        database.
+        Example:
+</PRE>
+<P>
+<PRE>            my($dbh) = DBI-&gt;connect(&quot;DBI:Sprite:mydatabase&quot;,'me','mypswd');
+            my(@list) = $dbh-&gt;func('tables');
+</PRE>
+<P>
+<PRE>
+    JSprite::fn_register ('myfn',__PACKAGE__);
+        This method takes the name of a user-defined data-conversion function 
+        for use in SQL commands.  Your function can optionally take arguments, 
+        but should return a single number or string.  Unless your function 
+        is defined in package &quot;main&quot;, you must also specify the package name 
+        or &quot;__PACKAGE__&quot; for the current package.  For an example, see the 
+        section &quot;INSERTING, FETCHING AND MODIFYING DATA&quot; above or (JSprite(3)).
+                
+</PRE>
+<H1><A NAME="OTHER SUPPORTING UTILITIES">OTHER SUPPORTING UTILITIES</A></H1>
+<P>
+<PRE>        makesdb.pl
+                This utility lets you build new Sprite databases and later add 
+                additional user-spaces to them.  Simply cd to the directory where 
+                you wish to create / modify a database, and run.  It prompts as 
+                follows:
+                
+                Database name: Enter a 1-word name for your database.
+                Database user: Enter a 1-word user-name.
+                User password: Enter a 1-word password for this user.
+                Database path: Enter a path (no trailing backslash) to store tables.
+                Table file extension (default .stb): 
+                Record delimiter (default \n): 
+                Field delimiter (default ::): 
+</PRE>
+<P>
+<PRE>                The last 6 prompts repeat until you do not enter another user-name 
+                allowing you to set up multiple users in a single database.  Each 
+                &quot;user&quot; can have it's own separate tables by specifying different 
+                paths, file-extensions, password, and delimiters!  You can invoke 
+                &quot;makesdb.pl&quot; on an existing database to add new users.  You can 
+                edit it with vi to remove users, delete the 5 lines starting with 
+                the path for that user.  The file is all text, except for the 
+                password, which is encrypted for your protection!
+                
+</PRE>
+<H1><A NAME="RESTRICTIONS">RESTRICTIONS</A></H1>
+<P>
+<PRE>        Although DBD::Sprite supports the following datatypes:
+                NUMBER FLOAT DOUBLE INT INTEGER NUM CHAR VARCHAR VARCHAR2 
+                DATE LONG BLOB MEMO and RAW, there are really only 4 basic datatypes 
+                (NUMBER, CHAR, VARCHAR, and BLOB).  This is because Perl treates 
+                everything as simple strings.  The first 6 are all treated as &quot;numbers&quot; 
+                by Perl for sorting purposes and the rest as strings.  This is seen 
+                when sorting, ie NUMERIC types sort as 1,5,10,40,200, whereas 
+                STRING types sort these as 1,10,200,40,5.  CHAR fields are right-
+                padded with spaces when stored.  LONG-type fields are subject to 
+                truncation by the &quot;LongReadLen&quot; attribute value.  BLOB-type 
+                fields have their data stored on separate files created by Sprite.
+</PRE>
+<P>
+<PRE>        DBD::Sprite works with the tieDBI module, if &quot;Sprite =&gt; 1&quot; lines are added 
+        to the &quot;%CAN_BIND&quot; and &quot;%CAN_BINDSELECT&quot; hashes.  This should not be 
+        necessary, and I will investigate when I have time.
+
+	Data field names must NOT be the same as any of Perl's string operators 
+	(eq lt le ge gt, etc) or boolean operators (and or not)!
+
+        
+</PRE>
+<H1><A NAME="CHANGES">LATEST CHANGES</A></H1>
+Revision history for Perl extension DBD::Sprite.
+
+<UL>
+	<LI>0.01  Fri Feb 25 13:00:55, 2000
+		<BR>- original version; created by h2xs 1.18
+	<LI>0.02  Fri Mar 03, 2000
+		<BR>- Fixed single-quote handling on bound parameters.
+	<LI>0.07  Fri Apr 14, 2000
+		<BR>- Refixed test-14 failure (CHAR datatype).  Also create and alter 
+		  table commands should now work properly (save your table 1st! ;)
+	<LI>0.08  Wed May 03, 2000
+		<BR>- Fix Windows glob problem for Perl2EXE
+		<BR>- Added missing file &quot;OraSpriteFns.pl&quot; to build
+	<LI>0.09  Fri Jun 09, 2000
+		<BR>- Fix bug in DELETE which occassionally caused infinite loop.
+	<LI>0.10  Wed Aug 16, 2000
+		<BR>- Fix bug involving &quot;like&quot; and field values containing regex-
+		  special characters, ie. &quot;.&quot;.
+	<LI>0.11  Thu Aug 31, 2000
+		<BR>- Fix regex bug in Sprite.pm and add error-checking for SQL 
+		<BR>- commands wo/space after table-name, ie &quot;update table-name\n...&quot;.
+	<LI>0.12  Tue Sep 05, 2000
+		<BR>- Show the size fields are truncated to in &quot;-519&quot; error message.
+	<LI>0.13  Tue Oct 10, 2000
+		<BR>- Fix CaseTableNames attribute to &quot;sprite_CaseTableNames.
+		<BR>- Minor docs fix.
+	<LI>0.14  Thu Oct 12, 2000
+		<BR>- Added Oracle TO_DATE and CONCAT functions.  Fixed bug now 
+		  allowing more than 1 argument for functions, and minor bug 
+		  which stripped wild-card chars from function results in &quot;LIKE&quot; 
+		  expressions.
+	<LI>0.15  Thu Nov 02, 2000
+		<BR>- Fix bug that caused question marks in bound parameter values to be 
+		  treated as additional parameters.
+	<LI>0.16  Thu Dec 21, 2000
+		<BR>- Fixed bug which would not allow lower-case versions of the &quot;AND&quot; and 
+		  &quot;OR&quot; operators.  Also made field-names used as right-values return 
+		  the appropriate value they represent rather than just a literal 
+		  string of the field name, ie. &quot;update table set FIELD1 = FIELD2&quot; 
+		  should now work properly instead of setting FIELD1 to &quot;FIELD2&quot; in 
+		  every record of &quot;table&quot;.
+	<LI>0.17  Fri Mar 09, 2001
+		<BR>- Fixed bug where types not returned for cursor after update, 
+		  Fixed bug where table names not returned if space appeared after 
+		  &quot;table_name&quot;?
+		<BR>- Fixed bug in &quot;makesdb.pl&quot; -<BR>- was encrypting wrong argument.
+	<LI>0.18  Wed Mar 13, 2001
+		<BR>- Changed comparisens of literal data with &quot;CHAR&quot; fields to first 
+		  pad the literal with appropriate spaces so that eqality tests would 
+		  pass (to work like Oracle and the way DBIx-Recordset expects).
+		  Also added new option &quot;sprite_StrictCharComp&quot; to force the old behavior.
+		<BR>- Fixed bug that occasionally inserted a &quot;0&quot; instead of &quot;&quot; in numeric 
+		  fields when inserting NULL.  To get the proper &quot;old&quot; behavior, 
+		  specify a default of zero for each numeric field, ie.
+		  &quot;NUMFIELD=NUMBER=0&quot; in the top line of your Sprite table files.
+		<BR>- Added some code to check syntax of &quot;where&quot; clauses. (for DBIx-
+		  Recordset.
+		<BR>- Fixed a couple of other small bugs that DBIx-Recordset tests found.
+	<LI>0.19  Wed Mar 21, 2001
+		<BR>- Fixed problem seeing all Windows file-names due to case-insensitivity 
+		  in Windows.
+	<LI>0.20  Fri Aug 15, 2001
+		<BR>- Fixed bug involving autocommit on statements containing &quot;select&quot; in data. 
+		  Caught by Simon Elliott, Thanks!  Also fixed several other minor glitches.
+		<BR>- Fixed bug forbidding sequence files in mixed-case directories unless 
+		  CaseTableNames was set (CaseTableNames only applies to the file-name).
+		  Also added code to display &quot;$@&quot; and &quot;$?&quot; in the error details message on 
+		  -511 errors (could not [over]write file).
+	<LI>0.21	 Wed Sep 12, 2001
+		<BR>- Fixed AutoCommit to actually work.  Caught by Jojo Kamote Escubil, Thanks,
+		  Jojo!  Also fixed another bug affecting quoted value strings containing 
+		  question marks (Caught by me!)
+	<LI>0.22  Mon Sep 17, 2001
+		<BR>- Removed regex optimization (s///o) which caused record and field separators 
+		  to not work right when one opened a database, closed that database, then 
+		  opened a second database with different record and or field separators.
+		  Caught by Larry Yudelson, Thanks!
+	<LI>0.23  Thu Oct 23, 2001
+		<BR>- Added new regex feature to allow one to capture regex matches and update 
+		  field values, ie:  
+		       update MYTABLE set FIELD1 = '$1' where FIELD2 =~ '(\d+)'
+		  This will set FIELD1 to the 1st number found in FIELD2 in the same 
+		  record.  Up to 2 matches for each &quot;where&quot; expression containing &quot;=~&quot; or 
+		  &quot;!~&quot; may be captured.  $1 .. $n correspond to each set of unescaped 
+		  parenthesis from left to right in the &quot;where&quot; clause.
+		<BR>- Added TO_CHAR function for converting Perl &quot;time&quot; values to printable 
+		  formats.  Has most date and numeric functions in the two-argument 
+		  form of the Oracle &quot;TO_CHAR&quot; function, which it is designed to emulate.
+		<BR>- Added some optimization for mass-updates.
+		<BR>- Added many other new Oracle functions (TO_NUMBER, USER, ABS, COS, EXP, 
+          FLOOR, MOD, POWER, ROUND, SIGN, SIN, TRUNC, CHR, INITCAP, LTRIM, 
+          REPLACE, RTRIM, TRANSLATE, ASCII, LENGTH, SYSDATE.  All should now 
+          work when selected from &quot;DUAL&quot;.
+        <BR>- Selecting from &quot;DUAL&quot; should now work as expected.
+	<LI>0.26  Mon Oct 29, 2001
+		<BR>- Fixed bug introduced in 0.24 where tests failed not finding &quot;makesdb.pl&quot;.
+		<BR>- Fixed test failure on Windows platforms (I think).
+	    <BR>- Added still more Oraclish functions (CEIL, EXP, INSTR, INSTRB, LAST_DAY, 
+	      LPAD, NVL, RPAD, LAST_DAY, and SQRT.  Fixed FLOOR.
+	      It should be noted that these functions do almost no error-checking.
+	    <BR>- Added date-handling capability to TRUNC.
+	    <BR>- Added &quot;AUTONUMBER&quot; datatype to allow autonumbering without sequences.  
+	      This emulates the way M$-Access(ODBC) does things.
+	<LI>0.27	 Fri Nov 15, 2001
+		<LI>Eliminated &quot;reserved&quot; status of special characters \x02 .. \x06 and \n 
+		  by now using single &quot;reserved&quot; string pattern:  &quot;\x02\^#jSpR1tE\x02&quot;, 
+		  where &quot;#&quot; can be any digit 0..9.  The purpose of this is to allow for 
+		  temporarily protecting some strings while performing string searches 
+		  and substitutions, ie. protecting commas within quoted literal values 
+		  while splitting the encompassing string on commas as separators.  \n 
+		  has previously been &quot;flattened&quot; out into spaces in order to treat 
+		  multiline queries as a single line.  This is still done, but numerous 
+		  regices were modified with the &quot;s&quot; option.  Please report anything that 
+		  might be broken by this new release!
+	<LI>0.30  Thu Jan 10
+		<BR>- Fixed bug where specifying a negative number in a &quot;where&quot; clause 
+		  as an unbound constant, returned all records and set the field in all 
+		  records to that number (ouch!)
+		<BR>- Fixed bug there double-backslashes in data inserted into a table were 
+		  converted to a single backslash.
+		<BR>- Added better &quot;BLOB&quot; support.  BLOB/LONG/MEMO fields no longer have 
+		  default length specified as 5000 and data should no longer be truncated.
+		<BR>- ADDED ENCRYPTION OPTION!  If the &quot;Crypt::CBC&quot;, and &quot;Crypt::IDEA&quot;, &quot;Crypt::Blowfish&quot; or 
+		  &quot;Crypt::DES&quot; are available, you can connect specifying 
+		  &quot;sprite_Crypt => 'IDEA;any_key_string'&quot; (use &quot;DES&quot; in lieu of &quot;IDEA&quot;, 
+		  if so inclined).  To read in existing unencrypted tables and write them 
+		  out encrypted, use &quot;sprite_Crypt => 'encrypt=IDEA;your_key_string'&quot;.
+		  To read in encrypted databases and write them back unencrypted, use: 
+		  &quot;sprite_Crypt => 'decrypt=IDEA;your_key_string'&quot;.  Note:  Any method 
+		  of encryption that Crypt::CBC supports may be used instead of IDEA or 
+		  DES, if you have the module installed.
+	<LI>0.31  Thu Feb 22
+		<BR>- Fixed bug which prevented one from using single-letter field names.
+		  (caught by me).
+		<BR>- Fixed bug which caused SELECTs to sometimes fail with psuedo-columns and 
+		  functions, ie. sequence.NEXTVAL (caught by me).
+		<BR>- Fixed bug that caused extra &quot;-528:Could not read/write BLOB file&quot; errors 
+		  to be displayed after other errors (caught by me).
+		<BR>- Added code so &quot;darwin&quot; (new Mac-OS) would use unix &quot;/&quot; separator, was 
+		  using WinDOwS separators (&quot;\\&quot;) for directories (caught by Thabo).
+		<BR>- Changed internal &quot;lock_file&quot; and &quot;lock_try&quot; to &quot;sprite_lock_file&quot; and 
+		  &quot;sprite_lock_try&quot; respectively to allow user to override defaults.  This 
+		  was requested to permit Sprite databases to exist on read-only filesystems.
+		  This is only applicable to os'es originating from a huge corporation 
+		  based in Redmond, VA. that don't support flock.  See the README file for 
+		  more notes about file locking!
+		<BR>- Added code to check &quot;Create&quot; command to make sure tables/sequences 
+		  actually get created or else report error (caught by Dave Thorn).
+		<BR>- Added RAW datatype (psuedonym for VARCHAR), since in Perl, any 
+		  valid ASCII character can be inserted into a string.  NOTE:  Oracle 
+		  requires packing and unpacking to hex!
+	<LI>0.33  Fri May 10
+		<BR>- Added code so "bsdos" (BSD/OS) would use unix "/" separator, was 
+	  	  being treated as "dos" and using WinDOwS separators ("\\") for 
+	  	  directories (caught by Sweth Chandramouli), Thanks!
+		<BR>- Added ability to specify path and or extension to database names in the 
+	  	  connect function (The default of ".sdb" and path ($ENV{SPRITE_HOME}/, 
+	  	  "./", then $ENV{HOME}/ still apply).  If database name contains a dot 
+	  	  ("."), then the ".sdb" extension is not added.  If the database name 
+	  	  begins with a "/", then it is assumed to be an absolute path, otherwise, 
+	  	  the dafault search-paths (described above) are applied.
+	<LI>0.34  Wed May 22
+		<BR>- Added beta (incomplete) XML support!  By specifying 'XML' as your record 
+		  seperator, your tables will be stored in XML format instead of Sprite's 
+		  usual delimited text format.  Special XML characters (<, >, &, and --) 
+		  are escaped to proper XML format, ie. &lt;, etc.  Use of this option requires 
+		  the installation of the Perl module "XML::Simple".  The reason this is 
+		  beta is because I'm a newbe to XML and have not yet been able to get 
+		  all binary data to work correctly, namely high-ascii characters.  If 
+		  you see what I am missing, please feel free to tell me and or send 
+		  patches!
+		<BR>- Fixed bug where single-quotes appearing in fields in UPDATE statements 
+		  caused -517 errors.
+		<BR>- Added ability to separately specify the field separator string for input 
+		  vs output.  Original Sprite supported this, but I always set them to be 
+		  the same.  By default they still are.  This became useful to me when 
+		  testing XML because I could specify the output field separator as 'XML' 
+		  and the input one as whatever my existing table was, read it in and 
+		  write it right back out as XML!  The new options are:  sprite_read, 
+		  sprite_write, and sprite_field.  The latter sets both to the same thing.
+		  sprite_record sets the record separator.
+	<LI>0.35  Thu May 30
+		<BR>- Made global variable "CBC" an object variable fixing bug which caused 
+	  	  problems when one used both an encrypted database and an unencrypted one 
+	  	  in the same program (caught by me).  
+		<BR>- Added base-64 encoding to the new XML stuff and fixed up the encoding so 
+		  that binary data should now work properly both in and out.  Encoded 
+		  fields now have a 'xml:encoding="base64"' attribute.  Note:  the 
+		  "MIME::Base64" module is now a prerequisite if using XML.
+		<BR>- Restored the "sprite_sizelimit" attribute (alias for the "sprite_reclimit" 
+		  attribute) for backward compatability sake (I once used this in another 
+		  program and DBD::LDAP uses "ldap_sizelimit" - I can't remember why).
+	<LI>0.36  Thu Jun 6
+		<BR>- Removed -402 warning if SELECT finds no records so Sprite will work like 
+		  other DBI databases.  To test if SELECT returned records or not, test the 
+		  return value of $sth->execute().  It will be the number of records 
+		  returned or "0E0" if none, or undef if error!
+		<BR>- Initialize "LongReadLen" attribute because regular DBI returns a default 
+		  value of 80, but DBI::PurePerl returns undef (caused Perl warning in test).
+		<BR>- Dropping table now returns "0E0" on success instead of 1 (as DBD::Oracle 
+		  does).
+	<LI>0.37  Tue Jun 11
+		<BR>- Fixed bug which prevented Sprite from loading tables with zero or one 
+		  records.
+		<BR>- Added new option:  "sprite_xsl" to allow one to specify an xsl template 
+	 	  url to be written into the xml document containing each table.  Default 
+	 	  is none.  Only applies when using the "xml" option!
+	<LI>0.38  Never released.
+		<BR>- Added "rows" attribute to "select" tag in XML-formatted tables.
+	<LI>0.39  Mon Jun 24
+		<BR>- Added "rows" attribute to "select" tag in XML-formatted tables.
+		<BR>- Added option "sprite_CaseFieldNames".  Default is zero.  If set, causes 
+		  field names to be case-sensitive, allowing same table to have multiple 
+		  fields with same name and different cases, ie. "field1", and "FIELD1". 
+		  Traditional behavior was to convert all field names to upper-case as 
+		  does Oracle(tm).  This is similar to the "sprite_CaseTableNames" option 
+		  for table names.
+	<LI>0.40	 Tue Jul 9
+		<BR>- Fixed restriction which prevented one from sorting on fields not in the 
+		  selected result-set.
+		<BR>- Added multiple ascending/descending selection to the sort "order by" 
+		  clause.  Previously, one could only specify ascending/descending once 
+		  after the last field and all sorts would be in that direction.  Now, one 
+		  can use things like:  "order by field1 desc, field2 asc, field3 desc"
+		  Please note that previous queries like "order by field1, field2 desc" 
+		  WERE broken since both would sort in descending order!  Now it works like 
+		  Oracle where field1 will sort ascending and within that, field2 sorts 
+		  descending.
+	<LI>0.41	Fri Aug 16
+		<BR>- Fixed bug resulting from a missing "require" stmt that returned error 
+		  when unencoding base64-encoded values in XML tables.
+	<LI>0.42  Thu Sep 5
+		<BR>- Added support for DBIx::GeneratedKey.  This ment adding code to save the 
+		  current value of the last sequence or "AUTONUMBER" field incremented.  
+		  The former are incremented by a call to "sequencename".NEXTVAL in a query, 
+		  the latter are incremented by inserting NULL into a "AUTONUMBER" field 
+		  in an "INSERT" query.
+	<LI>0.43	 Thu Oct 24
+		<BR>- Fixed problem with error-handling with DBI when DBI->connect() fails.
+		  Sprite now calls "warn" if "PrintError" is in effect and returns error 
+		  code and string separated by a colon in "$_", if DBI->connect() fails. 
+		  This is due to DBI::set_err() failing when no DBI handle yet created. 
+		<BR>- Fixed "create table" to now actually create an XML table when in an XML 
+		  database (previously new tables were always created in text format by 
+		  very old code that predated the XML option.  It now calls "write_file()" 
+		  via "commit()" as it should and as "alter table" does.  Thanks to 
+		  Roland Bauer for catching this embarrassing omission.  I guess I had 
+		  never actually created a "new" XML table, I had just used "sprite_write" 
+		  and sql.pl to change my existing text tables to the new XML format.
+		<BR>- Added code to "drop()" (drop table) function to make sure no dangling 
+	  	  data is left in memory from the dropped table.
+	<LI>0.44	 Tue Feb 11
+		<BR>- Fixed 2 bugs related to the "sprite_CaseFieldNames" option.  First, the 
+		  option did not work with the "xml" option.  Second, the option precedence 
+		  was wrong -- Options specified in the connect() method should override 
+		  any in the database (.sdb) file.  This was not happening.
+	<LI>0.45  Fri Jun 27
+		<BR>- Fixed Makefile.PL bug in Perl 5.8+ where make would fail with something 
+		  like "Can't use string ("*.xsi") as a HASH ref...".  Thanks to everyone 
+		  who reported this.
+	<LI>0.46  Mon Sep 29
+		<BR>- Fixed problem with Windows path separators (changed \\ to / for ActivePerl.  
+		<BR>- Added Oracle "Truncate" function.
+	<LI>0.47  Fri Nov 28 2003
+		<BR>- Fixed "_set_fbav"-reported error when sorting field containing a "null" 
+		  element.
+	<LI>0.50  Fri Mar 5
+		<BR>- *JOINS ARE FINALY HERE!*  One can now do very basic two-table inner 
+		  equi-joins using Sprite.  This is based on the pre-Oracle-9 syntax, 
+		  which supports table name aliasing.  The table-name or alias must be 
+		  specified qualifying each fieldname (tablename.fieldname).  See the 
+		  docs for an example.  Test & enjoy! ;)
+		<BR>- Fixed small bug that prevented passing bind-arguments containing an 
+		  escaped single-quote to a "like" expression in a where-clause.
+	<LI>0.51  Thu Apr 22
+		<BR>- Added new DBI function "last_insert_id" to return the value of the last 
+		  sequence number used.  Refer to the DBI docs for arguments and how to 
+		  use this function.  The general format is:
+		  $number = $dB->func(undef, undef, 'tablename', 'fieldname', 'last_insert_id')
+		<BR>- Added new option "sprite_nocase" to support case-insensitive 
+		  where-clauses like LDAP.  NOTE - only currently for "LIKE/NOT LIKE".  If 
+		  set to a true value, then case is ignored for expressions like:  
+		  "where FIELD like 'abc%'".  Default is false.
+		<BR>- Fixed bug which prevented the argument to a "like" expression from working 
+		  if it contained an escaped single-quote.
+	<LI>0.52	 -not released.
+	<LI>0.53  Wed Sep 29
+		<BR>- Fixed a bug affecting joins where selects without fields, ie. select from 
+		  table.. failed.
+		<BR>- Fixed another bug affecting joins when queries failed unless both 
+		  CaseTableNames and CaseFieldNames were set if field names were lower-case.
+	<LI>0.54  Wed Nov 10
+		<BR>- Fixed bug involving misinterpretation of the DBI::set_err() function which 
+		  caused a null warning to sometimes be issued by perfectly successfull 
+		  "Prepare" statements.  Changed the 2nd argument to DBI::set_err() from 
+		  zero to undef when clearing error status.  Caught by Steven Bray and me.
+		<BR>- Changed all (misspelled) references to the Oracle-ish function "CURVAL"
+		  to "CURRVAL".  Caught by Steven Bray.
+		<BR>- Fixed variable declaration buglet which "masked earlier declaration".
+		  Caught by Steven Bray.  Thanks, Steven.
+	<LI>0.55	 Fri Apr 29 2005
+		<BR>- Fixed bug that caused single-quotes enclosed in variables bound to 
+		  placeholders to fail and or seg-fault.
+		<BR>- Fixed bug that caused single-quotes in in-line where-cluse values 
+		  (those not bound using placeholders) to be converted to a pair of 
+		  double-quotes, causing condition test to fail.
+	<LI>0.56  Sat May 14 2005
+		<BR>- Fixed bug that prevented sorting from working and returning all records 
+		  when doing a SELECT DISTINCT with ORDER BY on a single column.
+	<LI>0.57  Tue Jun 14 2006
+		<BR>- Fixed bug involving reversal of the increment and start values of 
+		  sequences in the "Create Sequence" command.  Should work now, even 
+		  though the variable names appear reverse in "NEXTVAL" code.
+		<BR>- Added code to support DBI's "primary_key_info" query.
+	<LI>0.58  Thu Jul 20 2006
+		<BR>- Fixed bug that prevented empty-strings (two quotes in succession) as 
+		  arguments to functions (caught by me).
+		<BR>- Fixed bug that had sequence values and increments reversed.
+		<BR>- Added "primary_key_info()" DBI function.
+	<LI>0.59  Sat Oct 21 2006
+		<BR>- Fixed bug that prevented last_insert_id() from working with AUTONUMBER 
+		  fields.
+		<BR>- Added MySQL-like "select fn()" capability.  Previously, one had to use 
+		  the Oracle-ish "select fn() from DUAL".
+		<BR>- Fixed CaseTableNames bug.
+		<BR>- Fixex problem that caused warning message when doing a $dB->disconnect() 
+		  when using AutoCommit.
+		<BR>- Added several numeric datatype names and mapped them to the existing 
+		  numeric types.
+		<BR>- Added 2 MySQL-ish functions:  CURDATE, NOW (and now).
+	<LI>0.60  Mon Jan 11 2015
+		<BR>- Fixed bug that prevented "sprite_nocase" from working properly in some 
+		  cases.  Also added "o" switch to numerous unchanging regices for 
+		  optimization.
+	<LI>6.01  Sat Jan 15 2016
+		<BR>- Fixed dropping of trailing zeroes in decimal places of scaled numbers,
+		  Changed version number to 6.01 to sync up w/version# in JSprite.pm
+		<BR>Added support for the "LIMIT" clause in SELECT statements.  This differs 
+		  from "sprite_reclimit" option.  That option limited the fetch to the 
+		  first N records in the file UNSORTED before applying any sort.  This 
+		  was added to speed up queries used only to fetch column data 
+		  descriptors, ie. TYPE, PRECISION, etc. without need to read and process 
+		  the entire table.  This new "LIMIT" option limits the RESULTS RETURNED 
+		  to N records AFTER sorting and works as it would in other databases.  
+		  For compatibility, this can also be specified in the options hash in 
+		  PREPARE statements as "sprite_actlimit" ("actual limit").
+</UL>
+
+<H1><A NAME="TODO">TODO</A></H1>
+    Extensions of DBD::Sprite
+<P>
+<PRE>    *       Additional Oracle-ish functions built-in as requested.
+</PRE>
+<P>
+<PRE>    *       Delete dangling blob-files when dropping a table.
+
+</PRE>
+<H1><A NAME="KNOWN BUGS">KNOWN BUGS</A></H1>
+<PRE>
+    *       The module is using flock() internally. However, this function is
+            not available on platforms. Using flock() is disabled on MacOS
+            and Windows 95: There's no locking at all (perhaps not so
+            important on these operating systems, as they are for single
+            users anyways).
+
+    *       Unique-key violations on updates probably will not be caught 
+            if the argument is a function-call or a field-name.
+
+    *       Sorting for joins:  In order to obtain correct sorting, all 
+            fields specifying desired sort order must be grouped together by 
+            table, ie. "order by t1.field1, t1.field2, t2.field1, t2.field2", 
+            which should work fine.  This is due to the fact that the records 
+            are merged together after data for each table is sorted 
+            independently.  This should not be an issue for 95+% of all sorts,  
+            If it is, patches are welcome and my very own "sort_elements()" 
+            module is available to you!  An example of a sort known NOT to 
+            work exactly right would be:  
+            "order by t1.field1, t2.field1, t1.field2".
+
+</PRE>
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<PRE>        JSprite(3), DBI(3), perl(1)
+</PRE>
+<IMG SRC="http://turnerville.wwol.com/cgi-bin/access_log.pl?VA_DBDSprite">
+</BODY>
+
+</HTML>

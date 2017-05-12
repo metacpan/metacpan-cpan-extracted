@@ -1,0 +1,52 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+TO DO
+=====
+
+Play the CPANTS game
+--------------------
+
+But remember that this is not an end in itself. It is just
+a mean (kwalitee checking) towards an end (quality).
+For example, the module did not get the points for
+the LICENSE POD paragraph. Yet, there is a LICENSE POD paragraph. Just the
+automated CPANTS check did not recognize its contents.
+But any human reader will admit the paragraph is correct.
+So this is a kwalitee issue I will not fix.
+And I will not complain to the authors of the programs
+that power the CPANTS site. I have better things to
+do and they have better things to do.
+
+But there are other issues that need to be fixed.
+I will fix them (when the CPANTS website is up; at
+the moment it is down).
+
+Play the Devel::Cover game
+--------------------------
+
+I know that you can have 100% code coverage and still
+have bugs in your module. Yet, having a poor coverage
+is a sure recipe to have lurking bugs in your code.
+So I will strive to have a better code coverage, 
+while not forgetting to expand the data coverage.
+
+Yet, the original author has provided six trigonometrical
+function using degrees: sin, cos, tan, asin, acos, atan.
+But only three of them are used in the module. So
+the other three are not covered by the tests. I will leave
+them just like that, I will neither delete them, nor create
+a bogus test file just to ensure there are green-colored
+in the Devel::Cover reports.
+
+Other topics
+------------
+
+I have mentionned data coverage. In fact, the "precise" algorithm
+is not truly checked. It is colored in green with Devel::Cover,
+but I have not compared its output with another source.
+
+Since this module is OO, there could be convenience accessors,
+retrieving the longitude and the latitude of a given 
+DT::E::Sunrise object.
+
+There is always room for improvement in the documentation.

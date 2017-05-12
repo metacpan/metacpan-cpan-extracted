@@ -1,0 +1,26 @@
+---
+abstract: 'Methods for pre-filtering Perl code for Doxygen'
+author:
+  - 'Bret Jordan'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Doxygen-Filter-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Log::Log4perl: '1.46'
+  Pod::POM: '0.29'
+  Pod::POM::View::HTML: '1.06'
+  Test::More: '0.98'
+  Test::Output: '1.03'
+version: '1.72'

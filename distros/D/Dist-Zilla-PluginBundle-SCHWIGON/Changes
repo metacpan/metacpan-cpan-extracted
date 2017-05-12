@@ -1,0 +1,64 @@
+Revision history for Dist-Zilla-PluginBundle-SCHWIGON
+
+0.019     2016-04-29
+        - added Dist::Zilla::Plugin::MetaProvides::Package
+        - turn Dist::Zilla::Plugin::Test::Compile into normal dependency
+
+0.018     2016-01-08
+        - fix META freakup: replace [MetaProvides::Class] with [MetaProvides::Package]
+        - added DZP::Test::Compile author dependency to fix 'listdeps' [Mark Gardner]
+
+0.017     2015-09-28
+        - (broken)
+        - Kwalitee improvements: +[MetaProvides::Class], minimum Perl version
+
+0.016     2015-09-24
+        - option 'test_compile_skip': regex what Test::Compile skips
+
+0.015     2015-09-23
+        - add [Test::Compile]
+
+0.014     2015-09-08
+        - dependencies cleanup
+
+0.013     2015-09-08
+        - Replace NoTabsTest with Test::NoTabs (kentnl, GH#1)
+        - Replace [PodCoverageTests] with [Test::Pod::Coverage::Configurable],
+          now allowing an additional regex which modules to skip:
+            skip_pod_modules = qr/^My::Known::Undocumented::Plugins::/
+
+0.012     2012-12-05
+        - more prereqs
+
+0.011     2012-08-06
+        - more deps declared
+
+0.010     2012-07-05
+        - new option "disable_tab_tests"
+
+0.009     2012-07-02
+        - explicitely declare more deps
+
+0.008     2012-06-07
+        - add [Git::Describe]
+
+0.007     2012-06-03
+        - fix a 'Odd number of elements in anonymous hash' in eol tests
+
+0.006     2012-04-11
+        - NextRelease.0.019     2016-04-29 more CPAN::Changes::Spec conform
+        - add [CheckChangesHasContent]
+
+0.005     2012-04-04
+        - configurable release branch
+        - no more CheckFor::Fixup as this doesn't know other tag
+          formats
+
+0.004     2012-04-04
+        - Changes file
+
+0.003     2012-04-04
+        - add sensible git and version handling
+
+0.001     2012-04-03
+        - initial plugin bundle roughly based on FLORA

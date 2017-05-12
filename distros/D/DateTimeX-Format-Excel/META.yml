@@ -1,0 +1,49 @@
+---
+abstract: 'Microsofty conversion of Excel epochs'
+author:
+  - 'Jed Lund <jandrew@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Test::Moose: '0'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.04'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.044, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTimeX-Format-Excel
+provides:
+  DateTimeX::Format::Excel:
+    file: lib/DateTimeX/Format/Excel.pm
+    version: v0.14.0
+  DateTimeX::Format::Excel::Types:
+    file: lib/DateTimeX/Format/Excel/Types.pm
+    version: v0.14.0
+requires:
+  Carp: '0'
+  DateTime: '0'
+  List::Util: '1.33'
+  Module::Runtime: '0.014'
+  Moose: '2.1213'
+  MooseX::HasDefaults::RO: '0'
+  MooseX::StrictConstructor: '0'
+  Smart::Comments: '0'
+  Test::Exception: '0.43'
+  Type::Library: '1.000'
+  Type::Utils: '0'
+  Types::Standard: '0'
+  lib: '0'
+  perl: '5.010'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jandrew/DateTimeX-Format-Excel/issues
+  homepage: https://github.com/jandrew/DateTimeX-Format-Excel
+  repository: https://github.com/jandrew/DateTimeX-Format-Excel.git
+version: v0.14.0
+x_authority: cpan:JANDREW

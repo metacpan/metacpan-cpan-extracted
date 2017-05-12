@@ -1,0 +1,47 @@
+---
+abstract: 'Show all dzil plugins on your system, with descriptions'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-lsplugins
+provides:
+  Dist::Zilla::App::Command::lsplugins:
+    file: lib/Dist/Zilla/App/Command/lsplugins.pm
+    version: '0.003001'
+  Dist::Zilla::lsplugins::Module:
+    file: lib/Dist/Zilla/lsplugins/Module.pm
+    version: '0.003001'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Util: '0'
+  Module::Metadata: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Path::ScanINC: '0'
+  Path::Tiny: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-lsplugins/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-lsplugins
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-lsplugins.git
+version: '0.003001'

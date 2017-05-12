@@ -1,0 +1,43 @@
+---
+abstract: 'Sanitize versions handed to you by Git::NextVersion'
+author:
+  - 'Kent Fredric <kentnl@gmail.com>'
+build_requires:
+  Dist::Zilla::Util::Test::KENTNL: '1.003001'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Git::Wrapper::Plus::Support: '0'
+  Git::Wrapper::Plus::Tester: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Git-NextVersion-Sanitized
+provides:
+  Dist::Zilla::Plugin::Git::NextVersion::Sanitized:
+    file: lib/Dist/Zilla/Plugin/Git/NextVersion/Sanitized.pm
+    version: '0.002003'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Role::Version::Sanitize: '0'
+  Moose: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Git-NextVersion-Sanitized/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Git-NextVersion-Sanitized
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Git-NextVersion-Sanitized.git
+version: '0.002003'

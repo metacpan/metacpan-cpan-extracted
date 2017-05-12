@@ -1,0 +1,77 @@
+=pod
+
+=head1 NAME
+
+Devel::WxProf::Manual - How to use WxProf
+
+=head1 PREFERENCES
+
+C<wxprofile>'s preferences are stored in the C<.wxprofile> directory in the
+current user's application data directory (home directory on UNIX) in YAML.
+
+There are two kinds of preferences: User preferences and dynamic preferences.
+
+=head2 User preferences
+
+=head2 Dynamic preferences
+
+Dynamic preferences are stored in C<dynamic_preferences> in the preferences
+directory.
+
+Dynamic preferences are read at program start, and written at program end.
+They cover data such as the default directory, or window size and position
+(not implemented yet).
+
+Errors reading or writing dynamic preferences are ignored.
+
+=head1 Troubleshooting
+
+If wxprofile does not remember it's last open location, you should check the
+following:
+
+=over
+
+=item * Application data directory
+
+The application data directory exists and is read/writeable.
+
+ perl -MFile::HomeDir -e "print File::HomeDir->my_data"
+
+will tell you the location of that directory (or what perl thinks it is...).
+
+=item * .wxprofile directory
+
+C<wxprofile> stores it's preferences in the directory C<.wxprofile> in the
+application data directory. The directory will be created if not present.
+
+If it is present, check whether it is read- and writeable.
+
+=item * dynamic_preferences
+
+Check whether there is a file named C<dynamic_preferences> in the preferences
+directory. If there is one, along with one or more C<dynamic_preferences.1234>
+files, wxprofile cannot rename its temp file back to C<dynamic_preferences>.
+
+Make sure C<dynamic_preferences> is read-/writable.
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008 Martin Kutter.
+
+This file is part of Devel::WxProf. You may distribute/modify it under
+the same terms as perl itself
+
+=head1 AUTHOR
+
+Martin Kutter E<lt>martin.kutter fen-net.deE<gt>
+
+=head1 REPOSITORY INFORMATION
+
+ $Rev: 583 $
+ $LastChangedBy: kutterma $
+ $Id: $
+ $HeadURL: $
+
+=cut

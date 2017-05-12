@@ -1,0 +1,10 @@
+events: Ticks
+
+fl=/home/anyuser/temp/x.pl
+fn=main::RUNTIME
+cfl=/home/anyuser/temp/x.pl
+cfn=main::aFunction
+calls=1 8
+5 265
+
+

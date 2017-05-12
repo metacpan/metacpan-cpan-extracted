@@ -1,0 +1,91 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cwd qw(cwd);
+use File::chdir;
+use Path::FindDev qw(find_dev);
+
+local($CWD) = find_dev(cwd);
+
+my %travis_opts = (
+	should_sign          => 0,
+	should_compress      => 0,
+	should_release       => 0,
+	skip_prebuild_tests  => 1,
+	skip_build_tests     => 1,
+	skip_tarball_tests   => 1,
+);
+
+my %opts = map {
+	/^--TRAVIS$/     ? (%travis_opts) :
+	/^--(\w+)=(.+)$/ ? ($1 => $2) :
+	/^--(\w+)$/      ? ($1 => 1) :
+	die("Unrecognized argument: $_");
+} @ARGV;
+
+require Dist::Inkt;
+my $dist = 'Dist::Inkt'->new_from_ini(undef, %opts);
+$dist->BuildAll;
+exit(0);
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords gzipped tarball distinkt-dist --targetdir --travis
+
+=head1 NAME
+
+distinkt-dist - build a tarball for a Dist::Inkt-based distribution
+
+=head1 SYNOPSIS
+
+   distinkt-dist [OPTIONS]
+
+=head1 DESCRIPTION
+
+Supported options:
+
+=over
+
+=item B<< --targetdir=Str >>
+
+Defaults to "$name-$version".
+
+=item B<< --should_compress=Bool >>
+
+Defaults to true.
+
+=item B<< --should_sign=Bool >>
+
+Defaults to true.
+
+=item B<< --TRAVIS >>
+
+Shortcut for C<< --should_sign=0 --should_compress=0 >>.
+
+=back
+
+By rooting through the source code for Dist::Inkt you may be able
+to find other options that might or might not work.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2013-2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

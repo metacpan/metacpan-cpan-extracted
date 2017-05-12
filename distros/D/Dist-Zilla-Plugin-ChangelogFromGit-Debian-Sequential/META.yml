@@ -1,0 +1,31 @@
+---
+abstract: 'Add changelog entries into debain/changelog'
+author:
+  - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
+build_requires:
+  File::pushd: 0
+  Git::Wrapper: 0
+  Test::DZil: 0
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-ChangelogFromGit-Debian-Sequential
+requires:
+  DateTime::Format::Mail: 0
+  Debian::Control: 0
+  Dist::Zilla::File::InMemory: 0
+  Dist::Zilla::Plugin::ChangelogFromGit: 0
+  Dist::Zilla::Role::AfterRelease: 0
+  Dpkg::Changelog::Parse: 0
+  Moose: 0
+  Text::Wrap: 0
+  version: 0
+version: 0.6

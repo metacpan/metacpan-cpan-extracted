@@ -1,0 +1,14 @@
+*** STDOUT ***
+ Index     Name       Phone            Address           Date   
+ -----  ----------  ---------  -----------------------  ------  
+     1  Alan      > 555-1234   1234 Something St., CA   1998-1>
+       <Stebbens                                       <0-22   
+     2  Bob       > 555-1235   9234 Nowhere Way, WA     2001-0>
+       <Frankel                                        <1-02   
+     3  Mr.       > 555-9432   1238 Car Lane Pl., NY    2004-0>
+       <Goodwrench                                     <4-20   
+     4  Mr. Ed      555-3215   9876 Cowbarn Home, VA    2008-0>
+                                                       <9-12   
+     5  Gunther   > 44-55-555> Kartophelhause 345,    > 2013.1>
+       <Sveborg    <-5555     <Munich, Germany         <0.22   
+

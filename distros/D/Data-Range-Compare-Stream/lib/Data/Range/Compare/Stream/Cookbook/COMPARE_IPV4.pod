@@ -1,0 +1,150 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Cookbook::COMPARE_IPV4 - IPV4 Howto for Data::Range::Compare::Stream
+
+=head1 DESCRIPTION
+
+This section covers how to create a compare class that can handle ipv4 ranges.
+
+=head1 Special notes
+
+One thing to keep in mind when dealing with IPV4 data: There are alot of valid formats!  With that in  mind the internals of Data::Range::Compare::Stream process integers, wich for the most part will handle just about everything we need wth 2 exceptions.
+
+These 2 examples work with integers but do not work with IPV4 address ranges
+
+Less than 0:
+
+  0/0 -1
+
+Greater than 0xffffffff:
+
+  255.255.255.255/32 + 1
+
+The solution is to add add some sanity checking into our Range class
+
+=head1 Parsing ranges
+
+Data::Range::Compare::Stream handles integers, but not notations and processing
+integers is always faster than converting strings on the fly.
+
+The solution is to add a parser interface into our base class.
+
+=head2 Implementing a new Data::Range::Compare::Stream class
+
+Example package
+
+  package Data::Range::Compare::Stream::IPV4;
+  
+  use strict;
+  use warnings;
+  use Data::IPV4::Range::Parse qw(auto_parse_ipv4_range int_to_ip ALL_BITS);
+  use base qw(Data::Range::Compare::Stream);
+  
+  use constant NEW_FROM_CLASS=>'Data::Range::Compare::Stream::IPV4';
+  
+  
+  # our sanity checking consists of 2 parts
+  # 1. overloading the bool operator
+  # 2. creating our boolean function
+  
+  # Sanity check 1
+  # overloading the default bool operator and defining our boolean function
+  use overload
+    bool=>\&boolean,
+    fallback=>1
+  ;
+  
+  # Sanity check 2
+  sub boolean {
+    my ($self)=@_;
+    return -4 unless defined($self->range_start);
+    return -3 unless defined($self->range_end);
+  
+    return -2 if $self->cmp_values($self->range_start,$self->range_end)==1;
+    return -1 if $self->cmp_values($self->range_end,ALL_BITS)==1;
+    return 0 if $self->cmp_values(0,$self->range_start)==1;
+  
+    1;
+  }
+  
+  sub parse_range {
+    my ($class,@args)=@_;
+    my ($start,$end)= auto_parse_ipv4_range(@args);
+    print $class->NEW_FROM_CLASS,"\n";
+    return $class->NEW_FROM_CLASS->new($start,$end);
+  }
+  
+  sub range_start_to_string () {
+    my ($self)=@_;
+    return int_to_ip($self->range_start);
+  }
+  
+  sub range_end_to_string () {
+    my ($self)=@_;
+    return int_to_ip($self->range_end);
+  }
+  
+  1;
+
+=head2 Putting it all togeather
+
+Now we can use the new Compare package to handle processing our IPV4 Ranges
+
+  use strict;
+  use warnings;
+  use Data::IPV4::Range::Parse qw(ALL_BITS);
+  use Data::Range::Compare::Stream::IPV4;
+  
+  # parse and check a valid range
+  my $range_a=Data::Range::Compare::Stream::IPV4->parse_range('0/0');
+  if($range_a) {
+    print "yes [$range_a] is valid\n";
+  }
+  
+  # parse and check an invalid cidr
+  my $range_b=Data::Range::Compare::Stream::IPV4->parse_range('0/');
+  unless($range_b) {
+    print "no range_b is not valid!\n";
+  }
+  
+  # build a new valid instance from integers
+  my $range_c=new Data::Range::Compare::Stream::IPV4(0,11);
+  if($range_c) {
+    print "yes [$range_c] is valid\n";
+  }
+  
+  # build an new range with the start value as invalid
+  my $range_d=new Data::Range::Compare::Stream::IPV4(-1,11);
+  unless($range_d) {
+    print "No range_d is no valid\n";
+  }
+  
+  
+  # build an new range with the end value as invalid
+  my $range_e=new Data::Range::Compare::Stream::IPV4(0,(ALL_BITS + 1));
+  unless($range_e) {
+    print "No range_e is no valid\n";
+  }
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

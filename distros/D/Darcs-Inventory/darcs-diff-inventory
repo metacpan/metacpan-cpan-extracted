@@ -1,0 +1,68 @@
+#!/usr/bin/perl
+# Copyright (c) 2007-2012 David Caldwell,  All Rights Reserved. -*- perl -*-
+
+use warnings;
+use strict;
+use IPC::Run qw(run);
+use Getopt::Long;
+use Darcs::Inventory;
+use Darcs::Inventory::Diff;
+
+my $smtp_server = "localhost";
+my $help;
+GetOptions('h|help'        => \$help)
+    and scalar @ARGV == 2 and !$help or die "usage: $0 <inventory-1> <inventory-2>\n";
+
+my @inventory = @ARGV;
+
+
+my $a = Darcs::Inventory->load($inventory[0]) or die "Couldn't read $inventory[0]";
+my $b = Darcs::Inventory->load($inventory[1]) or die "Couldn't read $inventory[1]";
+
+my ($not_in_a, $not_in_b) = Darcs::Inventory::Diff::diff($a, $b);
+
+for (@$not_in_a) {
+    print "-".$_->name."\n";
+}
+
+for (@$not_in_b) {
+    print "+".$_->name."\n";
+}
+
+__END__
+
+=head1 NAME
+
+darcs-diff-inventory - Compute the difference between two darcs inventories
+
+=head1 SYNOPSIS
+
+darcs-diff-inventory <inventory-1> <inventory-2>
+
+=head1 DESCRIPTION
+
+darcs-diff-inventory computes the difference between two darcs
+inventories. It is a simple test program written using
+B<L<Darcs::Inventory::Diff>>.
+
+It will output a list of patch short names with a prefix character. If the
+prefix is '-' then the patch is in the first inventory but not in the
+second. If the prefix is '+' then the patch is in the second but not in the
+first.
+
+=head1 SEE ALSO
+
+L<Darcs::Inventory::Diff>, L<Darcs::Inventory>
+
+=head1 COPYRIGHT
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Copyright (C) 2007-2012 David Caldwell
+
+=head1 AUTHOR
+
+David Caldwell <david@porkrind.org>
+
+=cut

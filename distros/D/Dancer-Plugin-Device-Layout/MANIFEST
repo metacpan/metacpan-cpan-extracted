@@ -1,0 +1,15 @@
+AUTHORS
+CHANGES
+Example.pod
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README.md
+TODO
+dist.ini
+lib/Dancer/Plugin/Device/Layout.pm
+t/001-base.t
+t/002-device_layout.t
+t/900-release/901-pod.t
+t/900-release/902-pod-coverage.t

@@ -1,0 +1,25 @@
+Revision history for Dancer2-Session-MongoDB
+
+0.004     2016-08-17 13:41:44-05:00 America/Chicago
+
+    - Skip tests (rather than fail) if MongoDB is not installed (Jason Crome)
+    - Add _change_id method in preparation for upcoming change_session_id
+      app method in Dancer2 (Peter Mottram)
+
+0.003     2016-08-09 15:30:36-05:00 America/Chicago
+
+    - Numerous Dist::Zilla fixes (Peter Mottram, David Golden)
+    - Switch to Plack::Test instead of Test::TCP and 
+      LWP::UserAgent (Peter Mottram)
+
+0.002     2013-02-23 22:27:55 America/New_York
+
+    - Renamed from Dancer-SessionFactory-MongoDB to
+      Dancer2-Session-MongoDB
+     
+    - Internals updated for new Dancer2 release
+
+0.001     2013-01-24 20:07:45 America/New_York
+
+    - First release
+

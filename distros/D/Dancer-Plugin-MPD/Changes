@@ -1,0 +1,12 @@
+Revision history for Dancer-Plugin-MPD
+
+0.03    2012-01-02 (Happy New Year!)
+        Add an mpd_connected hook.
+
+0.02    2011-05-10
+        Handle conntype properly - actually do default to 'reuse', but allow
+        that to be overridden.  Thanks to Alan Berndt in RT #68753
+
+0.01    2010-11-05 (Remember, remember, the 5th of November)
+        Initial version - very basic at the moment.
+

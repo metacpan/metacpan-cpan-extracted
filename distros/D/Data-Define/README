@@ -1,0 +1,69 @@
+NAME
+    Data::Define - Make undef's defined
+
+SYNOPSIS
+     use Data::Define;
+ 
+     print define undef; # prints ''
+
+     use Data::Define qw/ brockets /;
+
+     print define undef; # prints '<undef>';
+ 
+     use Data::Define qw/ define_html brockets /;
+
+     print define_html undef; # prints '&lt;undef&gt;';
+ 
+     use Data::Define qw/ define_html div-class-undef /;
+
+     print define_html undef; # prints '&lt;undef&gt;';
+ 
+DESCRIPTION
+    Data::Define
+
+METHODS
+  define
+    This method takes one parameter and returns it defined even if it was
+    not defined primordially.
+
+    This method is exported by default.
+
+    Default return value is ''. If you asked to export 'brockets' using
+    Data::Define, return value becomes '<undef>'. You can specify your own
+    default value using Data::Define->"set_undef_value".
+
+  define_html
+    This method works exactly the same as 'define', but when exporting
+    'brockets', return value becomes '&lt;undef*gt;', so you can send it to
+    HTML browser without need to escape.
+
+    Additionally, you can ask to export 'div-class-undef', then return value
+    will be '<div class="undef"></div>'.
+
+    You can specify your own default value using
+    Data::Define->"set_undef_value_html".
+
+  set_undef_value( $value )
+    This method allows you to specify your own default value for define.
+    Usage is "Data::Define->set_undef_value( $value )".
+
+    If $value is not defined, default value ('', or '<undef>' if 'brockets'
+    is exported) is used.
+
+  set_undef_value_html( $value )
+    This method allows you to specify your own default value for
+    define_html. Usage is "Data::Define->set_undef_value_html( $value )".
+
+    If $value is not defined, default value ('', or '&lt;undef&gt;' if
+    'brockets' is exported, or '<div class="undef"></div>' if
+    'div-class-undef' is exported) is used.
+
+AUTHORS
+    Serguei Trouchelle <stro@railways.dp.ua>
+
+COPYRIGHT
+    Copyright (c) 2006 Serguei Trouchelle. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

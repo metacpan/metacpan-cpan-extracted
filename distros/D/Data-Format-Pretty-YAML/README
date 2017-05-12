@@ -1,0 +1,86 @@
+NAME
+    Data::Format::Pretty::YAML - Pretty-print data structure as YAML
+
+VERSION
+    This document describes version 0.08 of Data::Format::Pretty::YAML (from
+    Perl distribution Data-Format-Pretty-YAML), released on 2014-12-10.
+
+SYNOPSIS
+     use Data::Format::Pretty::YAML qw(format_pretty);
+     print format_pretty($data);
+
+    Some example output:
+
+    *   format_pretty({a=>1, b=>2})
+
+          a: 1
+          b: 2
+
+DESCRIPTION
+    This module uses YAML::Syck to encode data as YAML.
+
+FUNCTIONS
+  format_pretty($data, \%opts)
+    Return formatted data structure as YAML. Currently there are no known
+    options. YAML::Syck's settings are optimized for prettiness, currently
+    as follows:
+
+     $YAML::Syck::ImplicitTyping = 1;
+     $YAML::Syck::SortKeys       = 1;
+     $YAML::Syck::Headless       = 1;
+
+    Options:
+
+    *   color => BOOL (default: from env or 1)
+
+        Whether to enable coloring. The default is the enable only when
+        running interactively.
+
+    *   pretty => BOOL (default: 1)
+
+        Whether to focus on prettyness. If set to 0, will focus on producing
+        valid YAML instead of prettiness.
+
+    *   linum => BOOL (default: from env or 0)
+
+        Whether to enable line numbering.
+
+  content_type() => STR
+    Return "text/yaml".
+
+ENVIRONMENT
+  COLOR => BOOL
+    Set "color" option (if unset).
+
+  LINUM => BOOL
+    Set "linum" option (if unset).
+
+FAQ
+SEE ALSO
+    Data::Format::Pretty
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Format-Pretty-YAML>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Format-Pretty-YAML>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-YA
+    ML>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,32 @@
+---
+abstract: 'Moo Role for Data::Money Converters.'
+author:
+  - 'Corey Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.052, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Money-Converter
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Data::Money::Converter:
+    file: lib/Data/Money/Converter.pm
+    version: '0.07'
+requires:
+  Data::Money: '0.17'
+  Moo: '2.000000'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Data-Money-Converter.git
+version: '0.07'
+

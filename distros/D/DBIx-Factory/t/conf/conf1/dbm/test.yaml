@@ -1,0 +1,6 @@
+#userid: bahoo
+#passwd: typer
+dsn: dbi:DBM:f_dir=t/dbm
+attr:
+  RaiseError: 1
+  PrintError: 0

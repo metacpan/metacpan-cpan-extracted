@@ -1,0 +1,7 @@
+Changes
+lib/DBIx/Class/QueriesTime.pm
+Makefile.PL
+README
+MANIFEST			This list of files
+t/00_compile.t
+META.yml                                 Module meta-data (added by MakeMaker)

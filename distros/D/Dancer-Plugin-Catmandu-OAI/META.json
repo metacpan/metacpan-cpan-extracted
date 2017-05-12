@@ -1,0 +1,80 @@
+{
+   "abstract" : "OAI-PMH provider backed by a searchable Catmandu::Store",
+   "author" : [
+      "Nicolas Steenlant, C<< <nicolas.steenlant at ugent.be> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer-Plugin-Catmandu-OAI",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catmandu" : "0.8014",
+            "Catmandu::Exporter::Template" : "0.03",
+            "Clone" : "0.36",
+            "Dancer" : "1.3123",
+            "DateTime" : "1.08",
+            "DateTime::Format::Strptime" : "0",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::Test" : "1.3123",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI/issues"
+      },
+      "homepage" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI.git",
+         "web" : "https://github.com/LibreCat/Dancer-Plugin-Catmandu-OAI"
+      }
+   },
+   "version" : "0.0401",
+   "x_contributors" : [
+      "Nicolas Franck <Nicolas.Franck@ugent.be>",
+      "Nicolas Franck <njfranck@ca20c533.ugent.be>",
+      "Nicolas Steenlant <nicolas.steenlant@gmail.com>",
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>",
+      "njfranck <njfranck@ca20c521.ugent.be>",
+      "Patrick Hochstenbach <patrick.hochstenbach@ugent.be>",
+      "Vitali Peil <vitali.peil@uni-bielefeld.de>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0231"
+}
+

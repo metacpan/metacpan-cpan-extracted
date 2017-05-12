@@ -1,0 +1,11 @@
+5c2a19043f300080220120230a
+
+master oregon 5c.2a19043f300080220120230a:
+  sensor/pcr800.3f[speed]=0.76mm/h
+  sensor/pcr800.3f[distance]=31.19mm
+  sensor/pcr800.3f[battery]=90%
+
+
+
+
+

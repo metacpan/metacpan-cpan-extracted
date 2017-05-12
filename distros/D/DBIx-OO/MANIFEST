@@ -1,0 +1,12 @@
+.cvsignore
+Changes
+lib/DBIx/OO.pm
+lib/DBIx/OO/Tree.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,35 @@
+NAME
+    Dist::Zilla::Plugin::FakeFaker - Because sometimes you just have to fake
+    it
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+      # in dist.ini
+
+      [FakeFaker]
+
+DESCRIPTION
+    Dist::Zilla::Plugin::FakeFaker is a Dist::Zilla plugin for those
+    situations where one has already got a "Makefile.PL" file of one's own
+    that has been lovingly handcrafted to do funky things and one wishes to
+    "leverage" the power of Dist::Zilla.
+
+    Instead of specifying "[MakeMaker]" in one's "dist.ini", just specify
+    "[FakeFaker]" and your "Makefile.PL" will be used.
+
+METHODS
+    "setup_installer"
+        This is basically a no-op and merely returns without creating a
+        "Makefile.PL".
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

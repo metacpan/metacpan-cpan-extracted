@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/DBGp/Client/AnyEvent.pm
+lib/DBGp/Client/AnyEvent/Connection.pm
+lib/DBGp/Client/AnyEvent/Listener.pm
+MANIFEST			This list of files
+t/001_load.t
+t/010_basic.t
+t/lib/Test.pm
+t/scripts/fake.pl
+META.yml
+META.json

@@ -1,0 +1,11 @@
+This module provides useful method to modify the nature of data within a structure
+
+Here are the basic install instructions.
+
+perl Build.PL
+./Build
+./Build test
+./Build install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

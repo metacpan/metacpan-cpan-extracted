@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::Leap.
+
+0.01  Tue Jan 22 00:40:02 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Device::Leap
+

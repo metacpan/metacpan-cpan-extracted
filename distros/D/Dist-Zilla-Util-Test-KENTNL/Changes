@@ -1,0 +1,335 @@
+Revision history for Dist-Zilla-Util-Test-KENTNL
+
+1.005014 2017-03-01T19:59:32Z 679d730
+ [Bugfix]
+ - Update tooling to avoid test failures with '.' leaving @INC
+ - Closes https://github.com/kentnl/Dist-Zilla-Util-Test-KENTNL/issues/3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.005013, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑1)
+
+1.005013 2015-10-19T11:29:36Z 0343510
+ [Dependencies::Stats]
+ - Dependencies changed since 1.005012, see misc/*.deps* for details
+ - configure: +2
+ - develop: +5 ↑1 -1 (suggests: ↑2)
+
+ [Packaging]
+ - Use a simpler version of DynamicPrereqs invokation, thanks @karenetheridge
+ - Closes #1
+
+1.005012 2015-04-13T03:25:53Z 2f733bb
+ [Tests]
+ - Todoize more of the "sniff out Moose loaders" test for now.
+
+1.005011 2015-04-12T03:04:32Z 5d69b6a
+ [Dependencies::Stats]
+ - Dependencies changed since 1.005010, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1
+ - runtime: ↓1 -1
+ - test: ↓1
+
+ [Minor]
+ - Drop utf8 and 5.008 minimums. Had intended to do this in previous release, but slipped my mind.
+ - Some doc fixes too.
+ - Avoid issues with older chainsmokes needing sanity
+
+1.005010 2015-04-11T10:03:55Z 63f0907
+ [Dependencies::Stats]
+ - Dependencies changed since 1.005000, see misc/*.deps* for details
+ - develop: +3 ↑3 -2 (recommends: ↓1, suggests: ↑2)
+ - runtime: +2 -1 (recommends: +2 ↓1 -1)
+ - test: (recommends: ↓1)
+
+ [Minor]
+ - Moved to Moo where Moose was required
+ - Load Dzil lazier for App::Commands'
+
+1.005000 2014-11-06T15:24:12Z 0194343
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004002, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: ↑1)
+ - runtime: +1 -1 (recommends: +1 ↑1)
+ - test: (recommends: ↑1)
+
+ [Features]
+ - Now optionally uses Test::TempDir::Tiny for the temporary directory.
+
+ [Internals]
+ - use recommended.pm to load optional modules.
+
+1.004002 2014-11-01T11:43:22Z dc767c8
+ [Bugfix]
+ - Require a version of Test::More with a useable subtest.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: ↑1
+ - test: ↑1
+
+1.004001 2014-10-30T12:56:17Z cab1d68
+ [Bugfix]
+ - Soften DPath dependency till upstream can fix it for 5.8
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +4 -1 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1 ↑1)
+ - test: +1 (recommends: ↑2)
+
+1.004000 2014-10-12T15:44:27Z b3d5941
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003003, see misc/*.deps* for details
+ - develop: +3 ↑1 (suggests: ↑1)
+ - runtime: +1
+ - test: +1
+
+ [Features]
+ - dztest now has ->run_command() proxy for DZ:App::Tester::test_dzil
+
+1.003003 2014-09-28T07:27:06Z
+ [Bugfix]
+ - spew_raw to avoid \r\n translation on Win32
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+1.003002 2014-09-07T09:07:01Z
+ [00 Bugfix]
+ - Warn and auto-wrap $expected in meta_path_deeply to avoid other instances of
+   kentnl/Dist-Zilla-Plugin-Prereqs-MatchInstalled#3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: (recommends: ↑1)
+ - test: (recommends: ↑1)
+
+1.003001 2014-08-29T09:27:43Z
+ [00 Bugfix]
+ - Make sure failing to create a build dir is handled properly
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003000, see misc/*.deps* for details
+ - runtime: ↑1
+
+1.003000 2014-08-29T07:46:22Z
+ [00 Minor]
+ - Add create_plugin utility.
+ - Test enhancements.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.002000, see misc/*.deps* for details
+ - runtime: +2
+
+ [Tests]
+ - Test coverage improved.
+
+1.002000 2014-08-22T17:40:28Z
+ [00 Minor]
+ - Prefer Test::Differences everywhere it is possible.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001002, see misc/*.deps* for details
+ - develop: +1
+ - runtime: (recommends: +1)
+
+1.001002 2014-08-21T05:38:29Z
+ [Bugfix]
+ - make sure build is in fact, always invoked when builder is required.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+1.001001 2014-08-18T23:05:17Z
+ [Bugfix]
+ - Not all versions of Data::DPath exist on <5.10, so if you happen to say "Ignore that" somehow the dpath related
+   tests will instead TODOskip
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - runtime: +1
+
+1.001000 2014-08-18T21:14:28Z
+ [00 Major]
+ - add `dztest` function.
+ - add `::dztest` package which has been floating around in various dists so far.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑2)
+ - runtime: +5 (recommends: +1)
+ - test: -1
+
+1.000003 2014-08-03T12:37:40Z
+ [00 Trivial]
+ - Migrate github links to org ( was advised in last release ... was wrong -_- )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+1.000002 2014-07-25T06:22:28Z
+ [00 Trivial]
+ - Newer report versions script autoadded.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: +2 ↑1 (recommends: +1)
+
+1.000001 2014-07-13T18:11:06Z
+ [00 Trivial]
+ - Minor packaging changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: (recommends: ↑2)
+
+1.000000 2014-02-02T07:19:39Z
+ [00 Major]
+ - Toolkit switched to EUMM
+ - Toolkit deps softened to recommendations.
+ - Version moved to mantissa = 6 ( primary reason for 0 → 1 )
+
+ [Dependencies::Aggregate]
+ - 5.008 : was 197 → 199 :(
+ - 5.010 : was 178 → 184 :(
+ - 5.019 : was 161 → 164 :(
+ - Growth induced in dependencies.
+ - Limited by DZIL → Path::Class → Module::Build
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01015824, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 ↑1 -9
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+0.01015824 2013-11-21T10:47:13Z
+ [00 Maintenance]
+
+ [Dependencies::Noteworthy]
+ - Ramp MB and TM
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01015823, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +45 -1 (recommends: -1, suggests: +1 -1)
+ - test: ↑1 -2
+
+ [Packaging]
+ - use new fallback code for MB
+
+ [Tests]
+ - Replace Test::Compile with Test::Compile::PerFile
+ - Regen ReportVersions to hide devel deps
+ - Regen CPAN::Changes test
+ - Regen Kwalitee test
+
+0.01015823 2013-04-09T02:43:44Z
+ - Maintenance Release for MB 0.4004
+
+ [Dependencies::Noteworthy]
+ - Ramp MB and TM
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01015822, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Copyright year update.
+ - Add README.mkdn
+
+ [Meta]
+ - Bugtracker to github issues.
+
+ [Packaging]
+ - Utilise test_requires in Build.PL
+
+0.01015822 2012-02-03T03:21:20Z
+ - Maintenance Release.
+
+ [Dependencies::Noteworthy]
+ - perl 5.006 is now minimum
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01015821, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - All namespaces export $AUTHORITY
+ - $VERSION no longer in BEGIN
+
+ [Packaging]
+ - Update LICENSE ( Year, Indent, Address )
+ - extratests moved to xt/
+ - Git urls moved to https://
+ - exports x_authority
+ - Git based versioning
+
+0.01015821 2011-04-07T01:33:45Z
+ [Dependencies::Noteworthy]
+ - Drop Moose::Autobox
+ - Drop Params::Util
+ - Add Test::DZil ( Dist::Zilla 4.200002 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000510, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+ - runtime: +1 -2
+
+ [Interface]
+ - no longer export simple_ini or dist_ini, ask Test::DZil if you want those.
+
+ [Internals]
+ - A lot of the internal code has been nuked and it just steals it from Test::DZil which is now CPANized. This leaves
+   this as a glorified wrapper for that, that adds a tonne of easy.
+
+ [Packaging]
+ - Move to @Author::KENTNL
+ - Update critic rules
+ - Rework Changes to CPAN::Changes form.
+ - Ship .perltidyrc
+
+ [Tests]
+ - Added CPAN::Changes tests
+ - Dropped portability tests.
+
+0.01000510 2010-11-08T14:01:08Z
+ - Fix ns::ac problems.
+ - Add possible solve for Builder() not existing.
+ - Add some tests.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000011, see misc/*.deps* for details
+ - test: +1
+
+0.01000011 2010-11-03T15:01:43Z
+ - Returns a Zilla instance if no magic is performed.
+ - More documentation.
+ - Default behaviour on a death.
+ - Pass plugin to find_plugin callbacks
+
+0.01000004 2010-11-03T08:28:59Z
+ - Refactored to actually work -_-
+
+0.01000001 2010-11-03T05:02:07Z
+ - First version.

@@ -1,0 +1,38 @@
+---
+abstract: 'gather distribution metadata in local'
+author:
+  - 'Shoichi Kaji'
+build_requires:
+  File::pushd: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Distribution-Metadata
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  CPAN::DistnameInfo: '0'
+  CPAN::Meta: '0'
+  ExtUtils::Packlist: '0'
+  JSON: '0'
+  Module::Metadata: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/shoichikaji/Distribution-Metadata/issues
+  homepage: https://github.com/shoichikaji/Distribution-Metadata
+  repository: https://github.com/shoichikaji/Distribution-Metadata.git
+version: '0.05'
+x_contributors:
+  - 'Shoichi Kaji <skaji@cpan.org>'

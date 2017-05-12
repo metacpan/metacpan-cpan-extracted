@@ -1,0 +1,654 @@
+---
+abstract: 'DZIL Author Bundle for BBYRD'
+author:
+  - 'Brendan Byrd <BBYRD@CPAN.org>'
+build_requires:
+  Test::CheckDeps: 0.010
+  Test::More: 0.94
+  perl: v5.10.1
+configure_requires:
+  File::ShareDir::Install: 0.06
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Author-BBYRD
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+provides:
+  Dist::Zilla::MintingProfile::Author::BBYRD:
+    file: lib/Dist/Zilla/MintingProfile/Author/BBYRD.pm
+    version: 1.06
+  Dist::Zilla::PluginBundle::Author::BBYRD:
+    file: lib/Dist/Zilla/PluginBundle/Author/BBYRD.pm
+    version: 1.06
+  Pod::Weaver::PluginBundle::Author::BBYRD:
+    file: lib/Pod/Weaver/PluginBundle/Author/BBYRD.pm
+    version: 1.06
+requires:
+  Dist::Zilla: 5.040
+  Dist::Zilla::Plugin::Authority: 1.009
+  Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes: 0.108
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: 0.016
+  Dist::Zilla::Plugin::Clean: 0.07
+  Dist::Zilla::Plugin::ContributorsFromGit: 0.017
+  Dist::Zilla::Plugin::CopyFilesFromBuild: 0.151680
+  Dist::Zilla::Plugin::Git: 2.036
+  Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: 0.013
+  Dist::Zilla::Plugin::GitHub::Update: 0.41
+  Dist::Zilla::Plugin::GithubMeta: 0.54
+  Dist::Zilla::Plugin::InstallGuide: 1.200006
+  Dist::Zilla::Plugin::InstallRelease: 0.008
+  Dist::Zilla::Plugin::MetaProvides::Package: 2.003001
+  Dist::Zilla::Plugin::MojibakeTests: 0.8
+  Dist::Zilla::Plugin::OurPkgVersion: 0.06
+  Dist::Zilla::Plugin::PodWeaver: 4.006
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: 0.150250
+  Dist::Zilla::Plugin::ReportPhase: 0
+  Dist::Zilla::Plugin::RunExtraTests: 0.028
+  Dist::Zilla::Plugin::Test::CPAN::Changes: 0.009
+  Dist::Zilla::Plugin::Test::CPAN::Meta::JSON: 0.004
+  Dist::Zilla::Plugin::Test::CheckDeps: 0.013
+  Dist::Zilla::Plugin::Test::CheckManifest: 0.04
+  Dist::Zilla::Plugin::Test::Compile: 2.054
+  Dist::Zilla::Plugin::Test::DistManifest: 2.000005
+  Dist::Zilla::Plugin::Test::EOL: 0.18
+  Dist::Zilla::Plugin::Test::MinimumVersion: 2.000006
+  Dist::Zilla::Plugin::Test::NoTabs: 0.15
+  Dist::Zilla::Plugin::Test::Portability: 2.000006
+  Dist::Zilla::Plugin::Test::ReportPrereqs: 0.021
+  Dist::Zilla::Plugin::Test::UnusedVars: 2.000007
+  Dist::Zilla::Plugin::Travis::TestRelease: 1.15
+  Dist::Zilla::Plugin::TravisYML: 1.15
+  Dist::Zilla::PluginBundle::Git: 2.036
+  Dist::Zilla::PluginBundle::Prereqs: 0.93
+  Dist::Zilla::PluginBundle::TestingMania: 0.25
+  Dist::Zilla::Role::BundleDeps: 0.002002
+  Dist::Zilla::Role::PluginBundle::Merged: 1.00
+  Dist::Zilla::Role::PluginBundle::PluginRemover: 0.103
+  Moose: 2.1603
+  Pod::Coverage::TrustPod: 0.100003
+  Pod::Elemental::Transformer::List: 0.101620
+  Pod::Weaver: 4.012
+  Pod::Weaver::Plugin::WikiDoc: 0.093004
+  Pod::Weaver::Section::Availability: 1.20
+  Pod::Weaver::Section::Contributors: 0.009
+  Pod::Weaver::Section::Support: 1.001
+  Test::CPAN::Meta::JSON: 0.16
+  perl: v5.10.1
+  sanity: 1.03
+resources:
+  bugtracker: https://github.com/SineSwiper/Dist-Zilla-PluginBundle-Author-BBYRD/issues
+  homepage: https://github.com/SineSwiper/Dist-Zilla-PluginBundle-Author-BBYRD
+  repository: https://github.com/SineSwiper/Dist-Zilla-PluginBundle-Author-BBYRD.git
+version: 1.06
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Bootstrap::lib
+      config:
+        Dist::Zilla::Role::Bootstrap:
+          distname: Dist-Zilla-PluginBundle-Author-BBYRD
+          fallback: 1
+          try_built: ~
+          try_built_method: mtime
+      name: Bootstrap::lib
+      version: 1.001000
+    -
+      class: Dist::Zilla::Plugin::ReportPhase
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::BBYRD/ReportPhase'
+      version: 0.03
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::BBYRD/MakeMaker'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::BBYRD/Authority'
+      version: 1.009
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      config:
+        Dist::Zilla::Plugin::Git::NextVersion:
+          first_version: 0.90
+          version_by_branch: 0
+          version_regexp: '(?^:^v(.+)$)'
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/Git::NextVersion'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: 0
+          include_dotfiles: 0
+          prefix: ''
+          prune_directory: []
+          root: '.'
+        Dist::Zilla::Plugin::Git::GatherDir:
+          include_untracked: 0
+      name: '@Author::BBYRD/Git::GatherDir'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::BBYRD/OurPkgVersion'
+      version: 0.06
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          config_plugins:
+            - '@Author::BBYRD'
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Author::BBYRD/SingleEncoding'
+              version: 4.012
+            -
+              class: Pod::Weaver::Plugin::WikiDoc
+              name: '@Author::BBYRD/WikiDoc'
+              version: 0.093004
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: 4.012
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Author::BBYRD/Name'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::BBYRD/Prelude'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@Author::BBYRD/Synopsis'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@Author::BBYRD/Description'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Generic
+              name: '@Author::BBYRD/Overview'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Attributes
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Methods
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Collect
+              name: Functions
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Author::BBYRD/Leftovers'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::BBYRD/postlude'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Availability
+              name: '@Author::BBYRD/Availability'
+              version: 1.20
+            -
+              class: Pod::Weaver::Section::Support
+              name: '@Author::BBYRD/Support'
+              version: 1.007
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Author::BBYRD/Authors'
+              version: 4.012
+            -
+              class: Pod::Weaver::Section::Contributors
+              name: '@Author::BBYRD/Contributors'
+              version: 0.009
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Author::BBYRD/Legal'
+              version: 4.012
+            -
+              class: Pod::Weaver::Plugin::Transformer
+              name: '@Author::BBYRD/List'
+              version: 4.012
+      name: '@Author::BBYRD/PodWeaver'
+      version: 4.006
+    -
+      class: Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/ChangelogFromGit::CPAN::Changes'
+      version: 0.108
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::BBYRD/PruneCruft'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::BBYRD/ManifestSkip'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::BBYRD/Manifest'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::BBYRD/License'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmePodInRoot'
+      version: 0.150250
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmeTextInBuild'
+      version: 0.150250
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::BBYRD/ReadmeHTMLInBuild'
+      version: 0.150250
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Author::BBYRD/InstallGuide'
+      version: 1.200006
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::BBYRD/ExecDir'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@Author::BBYRD/@TestingMania/Test::UnusedVars'
+      version: 2.000007
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: '@Author::BBYRD/@TestingMania/Test::Portability'
+      version: 2.000006
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::BBYRD/@TestingMania/Test::CPAN::Changes'
+      version: 0.009
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::BBYRD/@TestingMania/Test::CPAN::Meta::JSON'
+      version: 0.004
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::BBYRD/@TestingMania/Test::DistManifest'
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: 0
+          fail_on_warning: author
+          fake_home: 0
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: 0
+          phase: test
+          script_finder:
+            - ':PerlExecFiles'
+          skips: []
+      name: '@Author::BBYRD/@TestingMania/Test::Compile'
+      version: 2.054
+    -
+      class: Dist::Zilla::Plugin::Test::NoTabs
+      config:
+        Dist::Zilla::Plugin::Test::NoTabs:
+          filename: xt/author/no-tabs.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+      name: '@Author::BBYRD/@TestingMania/Test::NoTabs'
+      version: 0.15
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::BBYRD/@TestingMania/Test::MinimumVersion'
+      version: 2.000006
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::BBYRD/@TestingMania/PodSyntaxTests'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::BBYRD/@TestingMania/MojibakeTests'
+      version: 0.8
+    -
+      class: Dist::Zilla::Plugin::RunExtraTests
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Author::BBYRD/RunExtraTests'
+      version: 0.028
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      config:
+        Dist::Zilla::Plugin::Test::EOL:
+          filename: xt/author/eol.t
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+            - ':TestFiles'
+          trailing_whitespace: 0
+      name: '@Author::BBYRD/Test::EOL'
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::Test::CheckDeps
+      config:
+        Dist::Zilla::Plugin::Test::CheckDeps:
+          fatal: 0
+          filename: t/00-check-deps.t
+          level: classic
+          todo_when: 0
+      name: '@Author::BBYRD/Test::CheckDeps'
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: '@Author::BBYRD/Test::ReportPrereqs'
+      version: 0.021
+    -
+      class: Dist::Zilla::Plugin::Test::CheckManifest
+      name: '@Author::BBYRD/Test::CheckManifest'
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@Author::BBYRD/CheckPrereqsIndexed'
+      version: 0.016
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::BBYRD/MetaConfig'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::BBYRD/MetaJSON'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::BBYRD/MetaYAML'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::BBYRD/MetaNoIndex'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: '@Author::BBYRD/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+              version: 5.040
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: 1
+          inherit_version: 1
+          meta_noindex: 1
+      name: '@Author::BBYRD/MetaProvides::Package'
+      version: 2.003001
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@Author::BBYRD/GithubMeta'
+      version: 0.54
+    -
+      class: Dist::Zilla::Plugin::ContributorsFromGit
+      name: '@Author::BBYRD/ContributorsFromGit'
+      version: 0.017
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@Author::BBYRD/CopyFilesFromBuild'
+      version: 0.151680
+    -
+      class: Dist::Zilla::Plugin::TravisYML
+      name: '@Author::BBYRD/TravisYML'
+      version: 1.15
+    -
+      class: Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+      config:
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/Git::CheckFor::CorrectBranch'
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      config:
+        Dist::Zilla::Plugin::Git::CommitBuild:
+          branch: ''
+          build_root: ~
+          message: 'Build results of %h (on %b)'
+          multiple_inheritance: 0
+          release_branch: build/%b
+          release_message: 'Release build of v%v (on %b)'
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/Git::CommitBuild'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      config:
+        Dist::Zilla::Plugin::Git::Check:
+          untracked_files: die
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - '.travis.yml'
+            - README.pod
+            - dist.ini
+          allow_dirty_match: []
+          changelog: ''
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/@Git/Check'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      config:
+        Dist::Zilla::Plugin::Git::Commit:
+          add_files_in: []
+          commit_msg: 'Release v%v'
+        Dist::Zilla::Role::Git::DirtyFiles:
+          allow_dirty:
+            - '.travis.yml'
+            - README.pod
+            - dist.ini
+          allow_dirty_match: []
+          changelog: ''
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::BBYRD/@Git/Commit'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      config:
+        Dist::Zilla::Plugin::Git::Tag:
+          branch: ~
+          changelog: ''
+          signed: 0
+          tag: v1.06
+          tag_format: v%v
+          tag_message: v%v
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+        Dist::Zilla::Role::Git::StringFormatter:
+          time_zone: local
+      name: '@Author::BBYRD/@Git/Tag'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      config:
+        Dist::Zilla::Plugin::Git::Push:
+          push_to:
+            - 'origin master:master'
+            - 'origin build/master:build/master'
+          remotes_must_exist: 1
+        Dist::Zilla::Role::Git::Repo:
+          repo_root: '.'
+      name: '@Author::BBYRD/@Git/Push'
+      version: 2.036
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      config:
+        Dist::Zilla::Plugin::GitHub::Update:
+          metacpan: 1
+      name: '@Author::BBYRD/GitHub::Update'
+      version: 0.41
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::BBYRD/TestRelease'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Travis::TestRelease
+      name: '@Author::BBYRD/Travis::TestRelease'
+      version: 1.15
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::BBYRD/ConfirmRelease'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::BBYRD/UploadToCPAN'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::BBYRD/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: '@Author::BBYRD/Clean'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: '@Author::BBYRD/::Role::BundleDeps'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: requires
+      name: DevelopRequires
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: develop
+          type: recommends
+      name: DevelopRecommends
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::LatestPrereqs
+      name: LatestPrereqs
+      version: 0.4
+    -
+      class: Dist::Zilla::Plugin::PrereqsClean
+      name: PrereqsClean
+      version: 0.93
+    -
+      class: Dist::Zilla::Plugin::ModuleShareDirs
+      name: ModuleShareDirs
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExtraTestFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':PerlExecFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: 5.040
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: '@Author::BBYRD/MetaProvides::Package/AUTOVIV/:InstallModulesPM'
+      version: 5.040
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.040
+x_authority: cpan:BBYRD
+x_contributors:
+  - 'Sergey Romanov <complefor@rambler.ru>'

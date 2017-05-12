@@ -1,0 +1,86 @@
+  <style type="text/css">
+    <!--
+    .add{
+    font-size: smaller;
+    }
+    .level1
+    {
+    }
+    .level2{
+    margin-left: 1em;
+    }
+    .level3{
+    margin-left: 2em;
+    }
+    .level4{
+    margin-left: 3em;
+    }
+    .level5{
+    margin-left: 4em;
+    }
+    .level6{
+    margin-left: 5em;
+    }
+    .level7{
+    margin-left: 6em;
+    }
+    .level8{
+    margin-left: 7em;
+    }
+    .level9{
+    margin-left: 8em;
+    }
+    .error{
+    color: red;
+    }
+    
+    -->
+  </style>
+  <!-- TMPL_IF SHOW_NODES -->
+  <h1>Nodes!</h1>
+  <!-- TMPL_LOOP PARENTS -->
+  <p class="level<!-- TMPL_VAR LEVEL -->" style="background: #cccccc; padding: 0px; margin-top: 0px; margin-bottom: 0px; font-size: smaller;">
+    <a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=show_nodes;id=<!-- TMPL_VAR ID ESCAPE=URL -->"><!-- TMPL_VAR NAME --></a> -> 
+  </p>
+  <!-- /TMPL_LOOP -->
+  <p><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=add_child_form;id=<!-- TMPL_VAR CURRENT_ID -->">Add Sub Category under <b>"<!-- TMPL_VAR NAME -->"</b></a>
+    <!-- TMPL_LOOP CURRENT_NODES -->
+    <p class="level<!-- TMPL_VAR LEVEL -->">
+      <a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=add_child_form;id=<!-- TMPL_VAR ID ESCAPE=URL -->" class="add"><img src="/webicons/addNode.gif" border=0></a><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=edit_node;id=<!-- TMPL_VAR ID ESCAPE=URL -->" class="add"><img src="/webicons/editNode.gif" border=0></a><!-- TMPL_IF UPPER_SIBLING --><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=move_up;up_id=<!-- TMPL_VAR UPPER_SIBLING ESCAPE=URL -->;id=<!-- TMPL_VAR ID ESCAPE=URL -->" class="add"><img src="/webicons/moveUp.gif" border=0></a><!-- TMPL_ELSE --><img src="/webicons/shim.gif" width=16><!-- /TMPL_IF --><!-- TMPL_IF LOWER_SIBLING --><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=move_down;down_id=<!-- TMPL_VAR LOWER_SIBLING ESCAPE=URL -->;id=<!-- TMPL_VAR ID ESCAPE=URL -->" class="add"><img src="/webicons/moveDown.gif" border=0></a><!-- TMPL_ELSE --><img src="/webicons/shim.gif" width=16 height=1><!-- /TMPL_IF --><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=delete_node;id=<!-- TMPL_VAR ID ESCAPE=URL -->" class="add"><img src="/webicons/delete.gif" border=0></a><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=show_nodes;id=<!-- TMPL_VAR ID ESCAPE=URL -->"><!-- TMPL_VAR NAME --></a> 
+    </p>
+    <!-- /TMPL_LOOP -->
+    <!-- /TMPL_IF -->
+    
+    <!-- TMPL_IF ADD_CHILD_FORM -->
+    <h2>Add Child?</h2>
+    <!-- TMPL_IF ERRORS -->
+    <!-- TMPL_IF ERROR_NO_NAME -->
+    <p class="error">You need to give your new category a name!</p>
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+    <p>Please enter a name for the new child category under <b>"<!-- TMPL_VAR PARENT -->"</b>.</p>
+    
+    <!-- TMPL_VAR FORM -->
+    <!-- /TMPL_IF -->
+    
+    <!-- TMPL_IF CONFIRM_NODE_DELETION -->
+    <!-- TMPL_IF NODE_CAN_BE_DELETED -->
+    <h2>Are you sure?</h2>
+    <p>Are you sure you want to delete <b>"<!-- TMPL_VAR NODE_NAME -->"</b> and all its children?</p>
+    <p><b>Note:</b> This could be catastrophically destructive. Please be sure.</p>
+    <p><a href="<!-- TMPL_VAR SCRIPT_NAME -->?rm=delete_node;confirm=1;id=<!-- TMPL_VAR ID ESCAPE=URL -->">Yes</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="<!-- TMPL_VAR SCRIPT_NAME -->">No</a></p>
+    <!-- TMPL_ELSE -->
+    <h2>You can't delete that node.</h2>
+    <p>I'm sorry, you can't delete <b>"<!-- TMPL_VAR NODE_NAME -->"</b> because there are documents assigned to it or its children.</p>
+    <p><a href="javascript:history.back();">Back</a></p>
+    
+    <!-- /TMPL_IF -->
+    <!-- /TMPL_IF -->
+    
+    <!-- TMPL_IF EDIT_NODE -->
+    <h2>Edit "<!-- TMPL_VAR NODE_NAME -->"</h2>
+    <!-- TMPL_VAR START_FORM -->
+    <p><!-- TMPL_VAR NAME_TEXTFIELD --></p>
+    <p><!-- TMPL_VAR SUBMIT --></p>
+    <!-- TMPL_VAR END_FORM -->
+    <!-- /TMPL_IF -->

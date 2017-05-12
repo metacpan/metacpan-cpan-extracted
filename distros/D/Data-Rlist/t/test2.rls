@@ -1,0 +1,48 @@
+# -*-cperl-*-
+#
+# test3.rls
+#
+# Random Lists (Rlist) data file.
+# Created with Rlist.pm 1.3.0 on Tue Aug 14 15:40:33 2007 by <spindlea>.
+# See <http://www.visualco.de> for more information.
+
+# TODO: the C Rlist parser cannot parse this file (HERE documents).
+
+{
+	foo; bar; foo = (42); bar = {42;}; foo;
+	<<EOF = {
+Sample code literally copied from Rlist.pm; this here-doc is eventually used as the
+key string.
+EOF
+			 "Famous words" = {
+				 foobar = <<HERE; # value as here-document
+[JARGON] A widely used metasyntactic variable; see foo for etymology.  Probably
+originally propagated through DECsystem manuals [...] in 1960s and early 1970s;
+confirmed sightings there go back to 1972. [...]
+HERE
+			 };
+
+			 "Famous numbers" =
+			 {
+			  3.141592653589793 = {
+								   "The ratio of a circle's circumference to its diameter" =
+								   "http://en.wikipedia.org/wiki/Pi"; 
+# Note: missing ; allowed here - at the final pair of a hash.
+								  };
+
+			  42 = { "The Answer to Life, the Universe, and Everything" =
+					 "http://en.wikipedia.org/wiki/The_Answer_to_Life%2C_the_Universe%2C_and_Everything"; };
+
+			  .3; -.4; .1e7; 0.0e8991; 1.0e-7;
+			  2.718281828459045 = { <<HERE = # Key string encoded as here-document.
+The mathematical constant e is the unique real number such that the value of
+the derivative (slope of the tangent line) of f(x) = e^x at the point x = 0 is
+exactly 1.
+HERE
+									"http://en.wikipedia.org/wiki/E_%28mathematical_constant%29";
+								  };
+
+			 };
+			};
+
+}

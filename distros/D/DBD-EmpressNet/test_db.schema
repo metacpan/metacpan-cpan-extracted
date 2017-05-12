@@ -1,0 +1,6 @@
+create table test_table (
+	fname	nlschar,
+	lname	nlschar,
+	age	integer,
+	id	longinteger);
+create unique index on t1 (id);

@@ -1,0 +1,42 @@
+Revision history for Dancer-Plugin-EscapeHTML
+
+0.22    2012-06-18
+        Documentation tweak only - mention Template::Stash::EscapeHTML (mst)
+
+0.21    2011-11-04
+        Er, adding new files to MANIFEST would give the test suite more chance
+        of running.  Muppet!  (Thanks to ambs for reporting!)
+
+0.20    2011-11-03
+        Avoid messing around escaping the internals of blessed objects in the
+        template tokens unless the new traverse_objects setting is set to a true
+        value - thanks to Tom Rathborne again (@trathborne)
+
+0.11    2011-10-03
+        More changes kindly submitted by Tom Rathborne:
+         - Avoid reference loops properly
+         - Remove outdated documentation
+         - Slight performance boost
+        Thanks again, Tom!
+
+0.10    2011-10-03
+        Changes kindly submitted by Tom Rathborne (@trathborne):
+         - Avoid unitialised value in interpolation warning
+         - Reduce excessive debugging unless specifically enabled
+         - Compile exclude_pattern only once, not once for every template token
+         - fix bug passing config to recursing calls
+        Thanks, Tom!
+
+0.04    2011-08-15
+        Declaring Dancer as a dependency would be useful!  No other changes.
+
+0.03    2011-08-10
+        Add exclude_pattern option, to exclude certain template param/token
+        names from automatic escaping.
+
+0.02    2011-08-09
+        Add some tests; no functional changes.
+
+0.01    2011-08-09
+        Initial version - basic, but works.
+

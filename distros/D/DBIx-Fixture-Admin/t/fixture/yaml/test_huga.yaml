@@ -1,0 +1,19 @@
+---
+-
+  data:
+    id: 1
+    name: aaa
+  name: 1
+  schema: test_huga
+-
+  data:
+    id: 2
+    name: bbb
+  name: 2
+  schema: test_huga
+-
+  data:
+    id: 3
+    name: ccc
+  name: 3
+  schema: test_huga

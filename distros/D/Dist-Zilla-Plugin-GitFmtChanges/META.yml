@@ -1,0 +1,34 @@
+---
+abstract: "Build CHANGES file from a project's git log using git log format."
+author:
+  - 'Kathryn Andersen'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-GitFmtChanges
+provides:
+  Dist::Zilla::Plugin::GitFmtChanges:
+    file: lib/Dist/Zilla/Plugin/GitFmtChanges.pm
+    version: '0.006'
+requires:
+  Date::Simple: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Git::Wrapper: '0'
+  Moose: '0'
+  POSIX: '0'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/rubykat/dzp-GitFmtChanges
+  repository: https://github.com/rubykat/dzp-GitFmtChanges.git
+version: '0.006'

@@ -1,0 +1,63 @@
+=head1 NAME
+
+Data::Maker::Tutorial - Learning the basics of Data::Maker
+
+=head1 INTRODUCTION
+
+Data::Maker aims to provide simple, flexible and extensible generation of I<realistic and meaningful> data.  It includes the data generation routines, a library of common fields -- even lists of seed data for certain fields.
+
+However, Data::Maker does not presume to know precisely what kind of data you need to generate, so it is designed to be extensible.  Use the Format class to create your own field format, the File class to provide a file of your own seed data, the Code class to generate data using your own coderef, or add your own subclasses to generate the complex data that you need.
+
+=head1 TUTORIAL
+
+=head2 A Simple Example
+
+Let's say you need 10,000 US phone numbers, all formatted the same way:
+
+    # Instantiate the object, telling Data::Maker how many 
+    # records you want and defining a simple "format" field 
+    # (which will use the Data::Maker::Field::Format class)
+    
+    my $maker = Data::Maker->new(
+      record_count => 10_000,
+      fields => [
+        { name => 'phone', format => '(\d\d\d)\d\d\d-\d\d\d\d' }  
+      ]
+    );
+
+    while (my $record = $maker->next_record) {
+      # $record is a L<Data::Maker::Record> object
+      print $record->phone->value . "\n";
+    }
+
+=head2 Next Steps
+
+If you have more than one field, you can add a delimiter and automatically get back delimited lines:
+Note that the "phone" field is the same as in the previous example, except it is explicitly 
+defined as field of type L<Data::Maker::Field::Format>:
+
+    my $maker = Data::Maker->new(
+      record_count => 10,
+      delimiter => "\t",
+      fields => [
+        { 
+          name => 'firstname', 
+          class => 'Data::Maker::Field::Person::FirstName',
+        },
+        { 
+          name => 'lastname', 
+          class => 'Data::Maker::Field::Person::LastName',
+        },
+        { 
+          name => 'phone', 
+          class => 'Data::Maker::Field::Format',
+          args => {
+            format => '(\d\d\d)\d\d\d-\d\d\d\d' 
+          }  
+        }
+      ]
+    );
+
+    while (my $record = $maker->next_record) {
+      print $record->delimited . "\n";
+    }

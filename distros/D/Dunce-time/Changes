@@ -1,0 +1,9 @@
+Revision history for Perl extension Dunce::time.
+
+0.02  Tue Jun 12 03:21:34 JST 2001
+	+ Added Duunce::time::Zerofill.
+	  Thanks to M. Simon Cavalletto <simonm@evolution.com>
+
+0.01  Sun Jun  3 14:21:58 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,85 @@
+{
+   "abstract" : "Check the compiler's availability",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.5",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-CheckCompiler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "ExtUtils::CBuilder" : "0",
+            "File::Temp" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::AssertC99" : {
+         "file" : "lib/Devel/AssertC99.pm"
+      },
+      "Devel::CheckCompiler" : {
+         "file" : "lib/Devel/CheckCompiler.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Devel-CheckCompiler/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Devel-CheckCompiler",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Devel-CheckCompiler.git",
+         "web" : "https://github.com/tokuhirom/Devel-CheckCompiler"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Neil Bowers <neil@bowers.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

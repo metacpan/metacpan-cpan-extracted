@@ -1,0 +1,84 @@
+NAME
+    DBIx::Class::CompressColumns - Automatic Compression/Decompression of
+    columns
+
+SYNOPSIS
+    In your DBIx::Class table class:
+
+      __PACKAGE__->load_components(qw/CompressColumns ... Core/);
+
+      __PACKAGE__->compresscolumns(
+          columns   => [qw/ column_foo /],
+          auto      => 1,
+      );
+
+    Note: The component needs to be loaded *before* Core.
+
+    Alternatively you could call each method individually
+
+      __PACKAGE__->compress_columns(qw/ column_foo /);
+      __PACKAGE__->compress_auto(1);
+
+DESCRIPTION
+    This DBIx::Class component can be used to automatically compress and
+    decompress data in selected columns.
+
+METHODS
+  compresscolumns
+      __PACKAGE__->compresscolumns(
+          columns   => [qw/ column_foo /],
+          auto      => 1,
+      );
+
+    Calls "compress_columns" and "digest_auto" if the corresponding argument
+    is defined.
+
+  compress_columns
+    Takes a list of columns to be compressed/decompressed during insert or
+    retrieval.
+
+      __PACKAGE__->compress_columns(qw/ column_foo /);
+
+  _get_compressed_binary $value
+    Handles the actual compression of column values into binary objects.
+    When given a $value it will return the compressed binary for that value.
+
+  _get_uncompressed_scalar $value
+    Handles the actual decompression of column values into scalar strings.
+    When given a $value it will return the uncompressed scalar for that
+    compressed binary value.
+
+  _compress_column_values
+    Go through the columns and compress the values that need it.
+
+    This method is called by insert and update when automatic compression is
+    turned on.
+
+  compress_auto
+      __PACKAGE__->compress_auto(1);
+
+    Turns on and off automatic compression/decompression of columns. When
+    on, this feature makes all UPDATEs and INSERTs automatically insert a
+    compressed binary into selected columns. SELECTS will retrieve the
+    decompressed scalar from selected columns.
+
+    The default is for compress_auto is to be on.
+
+EXTENDED METHODS
+    The following DBIx::Class::Row methods are extended by this module:-
+
+    insert
+    update
+
+  get_column
+  get_columns
+SEE ALSO
+    DBIx::Class, Compress::Zlib
+
+AUTHOR
+    Jesse Stay (jessestay) <jesse@staynalive.com>
+
+    A Product of SocialToo.com
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.

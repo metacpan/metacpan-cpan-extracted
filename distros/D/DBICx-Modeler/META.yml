@@ -1,0 +1,33 @@
+---
+abstract: 'A Moose-based model layer over DBIx::Class'
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+build_requires:
+  DBD::SQLite: 0
+  Directory::Scratch: 0
+  ExtUtils::MakeMaker: 6.42
+  Test::Memory::Cycle: 0
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-Modeler
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan::Share: 0
+  Class::Inspector: 0
+  DBIx::Class: 0
+  Moose: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/dbicx-modeler/tree/master
+version: 0.005

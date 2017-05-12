@@ -1,0 +1,21 @@
+---
+abstract: 'Pretty printing of data structures as Ruby code'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Data::Dump: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Dump-Ruby
+requires:
+  perl: 5.010001
+resources:
+  homepage: http://search.cpan.org/dist/Data-Dump-Ruby/
+  repository: http://github.com/sharyanto/perl-Data-Dump-Ruby
+version: 0.02

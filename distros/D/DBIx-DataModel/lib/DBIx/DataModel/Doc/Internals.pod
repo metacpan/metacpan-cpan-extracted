@@ -1,0 +1,133 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Internals - Description of the internal structure
+
+
+=head1 DOCUMENTATION CONTEXT
+
+This chapter is part of the C<DBIx::DataModel> manual.
+
+
+=over
+
+=item * 
+
+L<SYNOPSIS AND DESCRIPTION|DBIx::DataModel>
+
+=item * 
+
+L<DESIGN|DBIx::DataModel::Doc::Design>
+
+=item * 
+
+L<QUICKSTART|DBIx::DataModel::Doc::Quickstart>
+
+=item *
+
+L<REFERENCE|DBIx::DataModel::Doc::Reference>
+
+=item *
+
+L<MISC|DBIx::DataModel::Doc::Misc>
+
+=item *
+
+INTERNALS
+
+=item *
+
+L<GLOSSARY|DBIx::DataModel::Doc::Glossary>
+
+=back
+
+
+This chapter documents some details that normally should not be
+relevant to clients; you only want to read about them if you
+intend to extend the framework.
+
+
+
+=head1 PRIVATE METHODS
+
+
+=head2 _rawInsert
+
+  my $sth = $obj->_rawInsert(%args);
+
+Internal implementation for insertions into the database :
+takes keys and values within C<%$obj>, generates SQL for 
+insertion of those values into C<< $obj->db_from() >>,
+and executes it. Never called directly, but used by the protected method
+L</"_singleInsert">.
+
+The optional C<%args> argument can pass additional options
+to L<SQL::Abstract::More/insert>; currently only one option is 
+available : C<-returning>.
+
+The method returns the statement handle just created, in case the caller
+would need to retrieve some values after the insert : for example when
+using a RETURNING clause in PostgreSQL, the values can be obtained through
+a subsequent call to C<< $sth->fetch >>.
+
+
+=head1 "PROTECTED" METHODS
+
+=head2 _singleInsert
+
+  $obj->_singleInsert(%options);
+
+Implementation for inserting a record into the
+database; should never be called directly, but is used as 
+a backend by the 
+L<insert|DBIx::DataModel::Doc::Reference/"insert()">
+method. 
+
+This method receives an object blessed into some table class; the
+object hash should only contain keys and values to be directly
+inserted into the database, i.e. the C<no_update_columns> and all
+references to foreign objects should have been removed (
+normally the
+L<insert|DBIx::DataModel::Doc::Reference/"insert">
+method has already done that job).  
+The C<_singleInsert> method calls L</"_rawInsert">
+for performing the database update, and then makes
+sure that the object contains its own key, calling
+DBI's L<last_insert_id()|DBI/last_insert_id> if necessary,
+as explained in the L<insert|DBIx::DataModel::Doc::Reference/"insert()">
+documentation.
+
+You may redeclare C<_singleInsert> in your own table classes,
+for example if you need to compute a key by other means, like
+constructing it from other fields, or generating it from
+a random number. 
+
+The return value from C<_singleInsert> depends on C<%options> :
+
+=over
+
+=item *
+
+if C<< $options{-returning} >> is a scalar or arrayref,
+that option is passed to C<_rowInsert>,  then 
+to L<SQL::Abstract/insert> and finally to the SQL level 
+(INSERT ... RETURNING ...);  whatever is returned from the 
+database gets transmitted back to the caller.
+
+=item *
+
+if C<< $options{-returning} >> is a hashref, the 
+return value is also a hashref, containing the column
+name(s) and value(s) of the primary key for that record
+
+=item *
+
+if C<< $options{-returning} >> is absent, the
+return value is the list of values of the primary key
+for that record.
+
+=back
+
+
+

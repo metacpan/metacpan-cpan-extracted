@@ -1,0 +1,19 @@
+Changes
+lib/DBD/Google.pm
+lib/DBD/Google/db.pm
+lib/DBD/Google/dr.pm
+lib/DBD/Google/GetInfo.pm
+lib/DBD/Google/parser.pm
+lib/DBD/Google/st.pm
+lib/SQL/Dialects/Google.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/connect.t
+t/load.t
+t/parser.t
+t/pod.t
+t/regexes.t
+t/sample-key
+t/sth.t
+META.yml                                 Module meta-data (added by MakeMaker)

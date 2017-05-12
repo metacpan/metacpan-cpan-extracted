@@ -1,0 +1,80 @@
+{
+   "abstract" : "Timing Statistics Class (Catalyst::Stats fork)",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@q1software.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.4.4",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-TimeStats",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.002",
+            "Term::ExtendedColor" : "0.224",
+            "Text::UnicodeTable::Simple" : "0.08",
+            "Time::HiRes" : "1.9725",
+            "Tree::Simple" : "1.18",
+            "Tree::Simple::Visitor::FindByUID" : "0.02",
+            "namespace::autoclean" : "0.13",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::TimeStats" : {
+         "file" : "lib/Devel/TimeStats.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/Devel-TimeStats/issues"
+      },
+      "homepage" : "https://github.com/cafe01/Devel-TimeStats",
+      "repository" : {
+         "url" : "git://github.com/cafe01/Devel-TimeStats.git",
+         "web" : "https://github.com/cafe01/Devel-TimeStats"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "bayashi <bayashi@cpan.org>"
+   ]
+}

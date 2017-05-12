@@ -1,0 +1,10 @@
+#defaults
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^Build$
+^Build.bat$
+^_build/
+.svn
+.tmp

@@ -1,0 +1,49 @@
+---
+abstract: 'facilitate data management by the fixtures'
+author:
+  - 'meru_akimbo <merukatoruayu0@gmail.com>'
+build_requires:
+  DBIx::Sunny: '0'
+  Test::Exception: '0'
+  Test::More: '0.98'
+  Test::mysqld: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.2, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Fixture-Admin
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Fixture::Admin:
+    file: lib/DBIx/Fixture/Admin.pm
+    version: '0.15'
+requires:
+  Class::Accessor::Lite: '0'
+  DBIx::FixtureLoader: '0'
+  Data::Validator: '0'
+  File::Spec: '0'
+  Set::Functional: '0'
+  Teng::Schema::Loader: '0'
+  Text::CSV_XS: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/meru-akimbo/DBIx-Fixture-Admin/issues
+  homepage: https://github.com/meru-akimbo/DBIx-Fixture-Admin
+  repository: git://github.com/meru-akimbo/DBIx-Fixture-Admin.git
+version: '0.15'
+x_authority: cpan:MERU
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

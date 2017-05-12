@@ -1,0 +1,74 @@
+#
+# sql commands for creating tables for demodbixbrowse script
+#
+create table locale(
+	id      integer auto_increment primary key,
+	lang	varchar(25) not null,				# denominacio
+	name	varchar(25) default 'desconegut' not null,	# nom del llenguatge
+	icon	varchar(25) default '/icons/unknown.gif'	# url icona.
+);
+
+create unique index lang on locale(lang);
+
+insert into locale(lang,name,icon) values('ca','català','/icons/ca.png');
+insert into locale(lang,name,icon) values('es','español','/icons/es.png');
+insert into locale(lang,name,icon) values('en','english','/icons/en.png');
+
+create table resource (
+	id	integer auto_increment  primary key,
+	name	varchar(25)	not null,
+	tipus	varchar(25)	default 'txt' not null
+);
+
+create unique index res_name_tip on resource(name,tipus);
+
+insert into resource(name) values( 'copyright');
+insert into resource(name) values( 'maximcount');
+insert into resource(name) values( 'next');
+insert into resource(name) values( 'prev');
+insert into resource(name) values( 'first');
+insert into resource(name) values( 'last');
+
+create table message (
+	id		integer auto_increment primary key,
+	resource	int,    # identificador (resource).
+	locale		int,	# locale.
+	msg		varchar(80),	# varchar(25)e del message.
+	foreign key (resource) references resource,
+	foreign key (locale)   references locale
+);
+
+create unique index resource_locale on message(resource,locale);
+
+# copyright #
+insert into message(msg,resource,locale)
+select 'tots els drets reservats',r.id,l.id
+from locale l,resource  r
+where l.lang ='ca' and
+      r.name  ='copyright';
+
+insert into message(msg,resource,locale)
+select 'all rights reserved',r.id,l.id
+from locale l,resource  r
+where l.lang ='en' and
+      r.name  ='copyright';
+
+#- prev #-
+insert into message(msg,resource,locale)
+select 'enrere',r.id,l.id
+from locale l,resource  r
+where l.lang ='ca' and
+      r.name  ='prev';
+
+insert into message(msg,resource,locale)
+select 'back',r.id,l.id
+from locale l,resource  r
+where l.lang ='en' and
+      r.name  ='prev';
+
+insert into message(msg,resource,locale)
+select 'atrás',r.id,l.id
+from locale l,resource  r
+where l.lang ='es' and
+      r.name  ='prev';
+

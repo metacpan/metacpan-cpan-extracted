@@ -1,0 +1,13 @@
+#!/usr/bin/perl 
+
+use strict;
+use warnings;
+
+use Device::PiLite;
+
+my $p = Device::PiLite->new();
+
+$p->all_off();
+
+$p->frame_buffer("000000000000000000000111000011111110011111110111111111111101111111101111011000110011000110000000000000000000000000000000000000");
+sleep 10;

@@ -1,0 +1,625 @@
+NAME
+     DBSchema::Normalizer - database normalization. - Convert a table from 1st to 2nd normal form
+
+SYNOPSIS
+      # the easy way is to give all parameters to the constructor
+      # and then call do()
+      #
+      use DBSchema::Normalizer;
+      my $norm = DBSchema::Normalizer->new ( 
+            { 
+                DSN           => $DSN,
+                username      => $username,
+                password      => $password,
+                src_table     => $sourcetable,
+                index_field   => $indexfield,
+                lookup_fields => $lookupfields, # comma separated list
+                lookup_table  => $lookuptable,
+                dest_table    => $dest_table,
+                copy_indexes  => "yes", 
+            });
+      $norm->do();  # Just Do It!
+
+      # Alternatively, you can have some more control, by
+      # creating the lookup table and normalized table separately,
+      # especially useful if one of them is an intermediate step.
+      #
+      use DBSchema::Normalizer qw(create_lookup_table create_normalized_table);
+      my $norm = DBSchema::Normalizer->new( 
+            { 
+                DSN      => $DSN,
+                username => $username,
+                password => $password
+            });
+      $norm->create_lookup_table (
+              {
+                 src_table     => $tablename,
+                 index_field   => $indexfield,
+                 lookup_fields => $lookupfields,
+                 lookup_table  => $lookuptable
+          });
+      $norm->create_normalized_table (
+              {
+                 src_table     => $tablename,
+                 index_field   => $indexfield,
+                 lookup_fields => $lookupfields,
+                 lookup_table  => $lookuptable,
+                 dest_table    => $dest_table,
+                 copy_indexes  => "yes",
+          });
+
+DESCRIPTION
+    DBSchema::Normalizer is a module to help transforming MySQL database
+    tables from 1st to 2nd normal form. Simply put, it will create a lookup
+    table out of a set of repeating fields from a source table, and replace
+    such fields by a foreign key that points to the corresponding fields in
+    the newly created table. All information is taken from the database
+    itself. There is no need to specify existing details. The module is
+    capable of re-creating existing indexes, and should deal with complex
+    cases where the replaced fields are part of a primary key.
+
+  Algorithm
+
+    The concept behind DBSchema::Normalizer is based upon some DBMS
+    properties. To replace repeating fields with a foreign key pointing to a
+    lookup table, you must be sure that for each distinct set of values you
+    have a distinct foreign key. You might be tempted to solve the problem
+    with something like this:
+
+             I. Read all records into memory
+            II. for each record, identify the unique value for the fields to be
+                moved into a lookup table and store it in a hash
+            II. again, for each record, find the corresponding value in the 
+                previously saved hash and save the non-lookup fields plus the 
+                    unique key into a new table
+            IV. for each key in the hash, write the values to a lookup table
+
+    I can find four objections against such attempt:
+
+    1. Memory problems. The source table can be very large (and some of the
+    table I had to normalize were indeed huge. This kind of solution would
+    have crashed any program trying to load them into memory.) Instead of
+    reading the source table into memory, we could just read the records
+    twice from the database and deal with them one at the time. However,
+    even the size of the hash could prove to be too much for our computer
+    memory. A hash of 2_000_000 items is unlikely to handle memory
+    efficiently in most nowadays desktops.
+
+    2. Data specific solution. To implement this algorithm, we need to
+    include details specific to our particular records in our code. It is
+    not a good first step toward re-utilization.
+
+    3. Data conversion. We need to fetch data from the database, eventually
+    transform it into suitable formats for our calculation and then send it
+    back, re-packed in database format. Not always an issue, but think about
+    the handling of floating point fields and timestamp fields with reduced
+    view. Everything can be solved, but it could be a heavy overhead for
+    your sub.
+
+    4. Finally, I would say that this kind of task is not your job. Nor is
+    Perl's. It belongs in the database engine, which can easily, within its
+    boundaries, identify unique values and make a lookup table out of them.
+    And it can also easily make a join between source and lookup table.
+
+    That said, the solution springs to mind. Let the database engine do its
+    job, and have Perl drive it towards the solution we need to achieve. The
+    algorithm is based upon the fact that a table created from a SELECT
+    DISTINCT statement is guaranteed to have a direct relationship with each
+    record of the source table, when compared using the same elements we
+    considered in the SELECT DISTINCT.
+
+    The algorithm takes four steps:
+
+    I. create the lookup table
+
+            CREATE TABLE lookup ({lookupID} INT NOT NULL auto_increment 
+                      primary key, {LOOKUP FIELDS});
+
+            #(and add a key for each {LOOKUP FIELDS})
+
+    II. fill in the lookup table
+
+            INSERT INTO lookup 
+            SELECT DISTINCT NULL {LOOKUP FIELDS} FROM source_table;
+            #(the {lookupID} is automatically created, being auto_increment)
+
+    III. create the normalized table
+
+            CREATE TABLE norm_table ({source_table FIELDS} - 
+                     {LOOKUP FIELDS} + {lookupID}) 
+
+    IV. fill in the normalized table
+
+            INSERT INTO normalized table 
+            SELECT {source_table FIELDS} - {LOOKUP FIELDS} + {lookupID}
+            FROM source_table 
+            INNER JOIN lookup 
+                on (source_table.{LOOKUP FIELDS}= lookup.{LOOKUP FIELDS}) 
+
+    As you can see, the entire operation is run in the server workspace,
+    thus avoiding problems of (a) fetching records (less network traffic),
+    (b) handling data conversion, (c) memory occupation and (d) efficiency.
+
+    Let's see an example.
+
+    Having a table MP3 with these fields
+
+     mysql> describe MP3;
+     +----------+-------------+------+-----+----------+----------------+
+     | Field    | Type        | Null | Key | Default  | Extra          |
+     +----------+-------------+------+-----+----------+----------------+
+     | ID       | int(11)     |      | PRI | NULL     | auto_increment |
+     | title    | varchar(40) |      | MUL |          |                |
+     | artist   | varchar(20) |      | MUL |          |                |
+     | album    | varchar(30) |      | MUL |          |                |
+     | duration | time        |      |     | 00:00:00 |                |
+     | size     | int(11)     |      |     | 0        |                |
+     | genre    | varchar(10) |      | MUL |          |                |
+     +----------+-------------+------+-----+----------+----------------+
+     7 rows in set (0.00 sec)
+
+    We want to produce two tables, the first one having only [ID, title,
+    duration, size], while the second one should get [artist, album, genre].
+    (The second one will also needed to be further split into [artist] and
+    [album, genre] but we can deal with that later).
+
+    Here are the instructions to normalize this table:
+
+            DROP TABLE IF EXISTS tmp_albums;
+            CREATE TABLE tmp_albums (album_id INT NOT NULL AUTO_INCREMENT 
+                   PRIMARY KEY, 
+            artist varchar(20) not null,
+            album varchar(30) not null,
+            genre varchar(10) not null, 
+            KEY artist (artist), KEY album (album), KEY genre (genre));
+
+            INSERT INTO tmp_albums 
+            SELECT DISTINCT NULL, artist,album,genre FROM MP3;
+
+            DROP TABLE IF EXISTS songs;
+            CREATE TABLE songs (ID int(11) not null auto_increment,
+            title varchar(40) not null,
+            duration time not null default '00:00:00',
+            size int(11) not null, 
+            album_id INT(11) NOT NULL, 
+            PRIMARY KEY (ID), KEY title (title), KEY album_id (album_id));
+ 
+            INSERT INTO songs SELECT src.ID, src.title, src.duration, 
+                 src.size, album_id 
+            FROM MP3 src INNER JOIN tmp_albums lkp 
+                    ON (src.artist =lkp.artist and src.album =lkp.album 
+                            and src.genre =lkp.genre);
+
+    Eventually, we can use the same technique to normalize the albums into a
+    proper table.
+
+            DROP TABLE IF EXISTS artists;
+            CREATE TABLE artists (artist_id INT NOT NULL AUTO_INCREMENT 
+                 PRIMARY KEY, 
+            artist varchar(20) not null, 
+            KEY artist (artist)) ;
+        
+            INSERT INTO artists 
+            SELECT DISTINCT NULL, artist FROM tmp_albums;
+
+            DROP TABLE IF EXISTS albums;
+        
+            CREATE TABLE albums (album_id int(11) not null auto_increment,
+            album varchar(30) not null,
+            genre varchar(10) not null, 
+            artist_id INT(11) NOT NULL, 
+            PRIMARY KEY (album_id), 
+            KEY genre (genre), KEY album (album), KEY artist_id (artist_id));
+        
+            INSERT INTO albums 
+            SELECT src.album_id, src.album, src.genre, artist_id 
+            FROM tmp_albums src 
+            INNER JOIN artists lkp ON (src.artist =lkp.artist);
+
+     mysql> describe artists;
+     +-----------+-------------+------+-----+---------+----------------+
+     | Field     | Type        | Null | Key | Default | Extra          |
+     +-----------+-------------+------+-----+---------+----------------+
+     | artist_id | int(11)     |      | PRI | NULL    | auto_increment |
+     | artist    | varchar(20) |      | MUL |         |                |
+     +-----------+-------------+------+-----+---------+----------------+
+     2 rows in set (0.00 sec)
+ 
+     mysql> describe albums;
+     +-----------+-------------+------+-----+---------+----------------+
+     | Field     | Type        | Null | Key | Default | Extra          |
+     +-----------+-------------+------+-----+---------+----------------+
+     | album_id  | int(11)     |      | PRI | NULL    | auto_increment |
+     | album     | varchar(30) |      | MUL |         |                |
+     | genre     | varchar(10) |      | MUL |         |                |
+     | artist_id | int(11)     |      | MUL | 0       |                |
+     +-----------+-------------+------+-----+---------+----------------+
+     4 rows in set (0.00 sec)
+ 
+     mysql> describe songs;
+     +----------+-------------+------+-----+----------+----------------+
+     | Field    | Type        | Null | Key | Default  | Extra          |
+     +----------+-------------+------+-----+----------+----------------+
+     | ID       | int(11)     |      | PRI | NULL     | auto_increment |
+     | title    | varchar(40) |      | MUL |          |                |
+     | duration | time        |      |     | 00:00:00 |                |
+     | size     | int(11)     |      |     | 0        |                |
+     | album_id | int(11)     |      | MUL | 0        |                |
+     +----------+-------------+------+-----+----------+----------------+
+     5 rows in set (0.00 sec)
+ 
+    It should be clear now WHAT we have to do. Less clear is HOW. The above
+    instructions seem to imply that we manually copy the field structure
+    from the source table to the lookup and normalized tables.
+
+    Actually, that SQL code (except the DESCRIBEs) was produced by this very
+    module and printed to the STDOUT, so that all I had to do was some
+    cut-and-paste. And then we are back to the question of the algorithm. If
+    this is all SQL, where is Perl involved? The answer is that Perl will
+    reduce the amount of information we need to give to the database engine.
+    The information about the field structure and indexes is already in the
+    database. Our Perl module (with a [not so] little help from the DBI) can
+    extract the structure from the database and create the appropriate SQL
+    statements. On the practical side, this means that, before producing SQL
+    code, this module will gather information about the source table. It
+    will issue a "SHOW FIELDS FROM tablename" and a "SHOW INDEX FROM
+    tablename" statements, and parse their results to prepare the
+    operational code.
+
+    That's it. It seems a rather small contribution to your average
+    workload, but if you ever have to deal with a project involving several
+    large tables, with many fields, to be transformed into many normalized
+    tables, I am sure you will appreciate the GPL (Golden Perl Laziness)
+    behind this module.
+
+    BTW, this is the code used to produce the above SQL statements:
+
+            #!/usr/bin/perl -w
+            use strict;
+
+            use DBSchema::Normalizer;
+
+            my $norm = DBSchema::Normalizer->new ({
+                    DSN  => "DBI:mysql:music;host=localhost;"
+                             . "mysql_read_default_file=$ENV{HOME}/.my.cnf", 
+                    src_table     => "MP3",
+                    index_field   => "album_id",
+                    lookup_fields => "artist,album,genre",
+                    lookup_table  => "tmp_albums", 
+                    dest_table    => "songs",
+                    copy_indexes  =>  1,
+                    simulate      =>  1
+             });
+
+            $norm->do();
+
+            $norm->create_lookup_table ({ 
+              src_table     => "tmp_albums",
+              index_field   => "artist_id",
+              lookup_fields => "artist",
+              lookup_table  => "artists"
+            });
+
+            $norm->create_normalized_table ({
+              src_table     => "tmp_albums",
+              lookup_table  => "artists",
+              index_field   => "artist_id",
+              lookup_fields => "artist",
+              dest_table    => "albums"
+            });
+
+    Twenty-five lines of code. Not bad for such a complicated task. But even
+    that could have been replaced by these two one-liners:
+
+     perl -e 'use DBSchema::Normalizer; DBSchema::Normalizer->snew(qw(localhost music MP3 \ 
+           album_id album,artist,genre tmp_albums songs 1 1 1))->do()'
+        
+     perl -e 'use DBSchema::Normalizer; DBSchema::Normalizer->snew(qw(localhost music \ 
+        tmp_albums artist_id artist artists albums 1 1 1))->do()'
+
+    (See below item "snew" for more details.)
+
+    One thing that this module won't do for you, though, is to decide which
+    columns should stay with the source table and which ones should go to
+    the lookup table. This is something for which you need to apply some
+    database theory, and I don't expect you to know it unless you have
+    studied it (unless you happen to be J.F. Codd) either at school or
+    independently. I am planning (in a very idle and distant way) another
+    module that will analyze a database table and decide if it is a good
+    design or not. The examples from commercial software I have seen so far
+    did not impress me a lot. I am still convinced that humans are better
+    than machines at this task. But, hey! Ten years ago I was convinced that
+    humans were much better than machines at chess, and instead, not long
+    ago, I had to see an IBM box doing very nasty things to Gary Kasparov.
+    So maybe I'll change my mind. In the meantime, I am enjoying my present
+    intellectual superiority and I keep analyzing databases with the same
+    pleasure that I once felt when solving a chess problem.
+
+  Simulation mode
+
+    This module can do the data transfer for you, or you may want to run it
+    in "simulation mode", by adding simulate => "1" to the constructor
+    parameters. When in simulation mode, the DBSchema::Normalizer will just
+    print the necessary SQL statements to STDOUT, without passing them to
+    the database engine. You can thus check the queries and eventually
+    change them and use them within some other application.
+
+  EXPORT
+
+    new, snew, create_lookup_table, create_normalized_table
+
+  DEPENDENCIES
+
+    DBI, DBD::mysql
+
+  Architecture
+
+    The Normalizer doesn't enforce private data protection. You are only
+    supposed to call the methods which are documented here as public. In the
+    spirit of Perl OO philosophy, nobody will prevent you from calling
+    private methods (the ones beginning with "_") or fiddling with internal
+    hash fields. However, be aware that such behaviour is highly
+    reprehensible, could lead to unpredictable side effects, of which You
+    are entirely, utterly an irrimediably responsible (not to mention that
+    your reputation will be perpetually tarnished, your nephews will call
+    you "Cheating Joe" and you won't be ever - EVER - invited as dinner
+    speaker to any Perl OO conference and even if you manage to sneak in you
+    will find a hair in your soup.)
+
+  PORTABILITY
+
+    The algorithm used here is general. It was initially developed in C for
+    an embedded RDBMS and there is no reason to assume that it won't work in
+    any other database engine. However, the information about field types
+    and indexes is, in this module, MySQL dependent. At the moment, I
+    haven't found a clean method to get such information in a
+    database-independent way. To adapt this module for a different database,
+    corresponding SQL statements for the MYSQL specific SHOW INDEX and SHOW
+    FIELDS should be provided. Also the syntax for INNER JOIN might not be
+    portable across databases.
+
+  CAVEAT
+
+    As always, when dealing with databases, some caution is needed. The
+    create_lookup_table() method will drop the lookup table, if exists. Be
+    careful about the name you supply for this purpose. If you want to use
+    an existing lookup table (whose data integrity and relational
+    correspondence you can swear upon), then skip the create_lookup_table()
+    and ask only for create_normalized_table(). Also for this one, a DROP
+    TABLE statement is issued before the creation. Exercise double care on
+    the names you pass to the module.
+
+    Be also aware that the tables created by this module are of default
+    type. You may either choose to convert them after the data transfer or
+    run the Normalizer in "simulation mode" and then manually modify the SQL
+    statements.
+
+    The Normalizer will usually warn you (and exit with flags and bells) if
+    one or more designated lookup fields in the source table are not
+    indexed. This fact could result in VERY SLOW PERFORMANCE, even for a
+    reasonably low number of records involved. You can choose to ignore this
+    warning, by setting the appropriate parameter, but it is not advisable.
+
+    If the source table does not have a primary key (don't laugh, I have
+    seen some of them) then a fatal error is issued, without any possible
+    remedy. The reason is simple. If there is no primary key, the engine
+    doesn't have a way of identifying which rows should go in a JOIN and
+    then your result may have duplicates (and in addition you will be
+    waiting a lot to get it.)
+
+  TO DO
+
+    1. Parametrizing the statements for fields and indexes information
+    should improve the chances for portability.
+
+            # e.g.: MySQL index information comes in this flavor
+            $mysql_index_info = {
+              function_name => "SHOW INDEX FROM $table", 
+              info_names => "Table,Non_unique,Key_name,Index_seq,Col_name" #etc
+            };
+            # but it is hard to generalize, especially if another database 
+            # engine defines
+            # as positive (Unique) what here is negative (Non_unique)
+
+    Maybe a more effective way would be to have a polymorphic version of
+    DBSchema::Normalizer, with the base class calling abstract subs, which
+    the descendant classes are supposed to implement. Sounds interesting,
+    even though I feel that I might have some clashes with the DBI.
+
+    2. Adding support for intermediate steps in converting should also speed
+    up some ugly cases with nested normalization problems, when the lookup
+    table needs to be further normalized.
+
+    3. Adding support for conversion from Zero normal form to First is not
+    straightforward. Some cases are easy to identify and to deal with (e.g.
+    columns Student1, Student2, Student3, StudentN can be converted to
+    column Student_id pointing at a Students table), but others are more
+    subtle and difficult to generalize (e.g. having two column for Male and
+    Female, with yes/no content).
+
+  DISCLAIMER
+
+    This software can alter data in your database. If used improperly, it
+    can also damage existing data. (And so can any most powerful software on
+    your machine, such as Perl itself. Sorry to scare you, but I have to
+    warn users about potential misuse.) There is NO WARRANTY of any sort on
+    this software. This software is provided "AS IS". Please refer to the
+    GPL, GNU General Public License, Version 2, paragraphs 11 and 12, for
+    more details.
+
+SEE ALSO
+    DBI, DBD::mysql
+
+Class methods
+    new
+         DBSchema::Normalizer->new ({ 
+                DSN => $DSN, 
+                username => $username, 
+                password => $password 
+              });
+
+        new() - object constructor. Requires a hash reference with at least
+        the following keys
+
+                DSN
+                username
+                password
+
+        Alternatively, you may pass one already initialized database handler
+
+            dbh => $dbh
+
+        Optional fields (in the sense that if you omit them here, you must
+        declare them when calling *create_lookup_table* or
+        *create_normalized_table*)
+
+                src_table       The table in 1st normal form
+                index_field     the index field that we need to create
+                                will become foreign key in the source table
+                                and primary key in the lookup table
+                lookup_fields   the fields depending on the index, 
+                                in a comma-separated list
+                lookup_table    the lookup table
+                dest_table      the Normalized (2nd form) table
+
+        Really optional fields. You may not mention them at all. Their
+        default is 0.
+
+                copy_indexes    three values:
+                                "no" or "0"    : no indexes are copied
+                                "yes" or "1"   : indexes from the source table will
+                                                 be immediately replicated to the 
+                                                 destination table
+                                "later" or "2" : indexes will be created after the 
+                                                                 data transfer,
+                                                 as an ALTER TABLE statement. 
+                                                 It may speed up the insertion
+                                                 for large tables.
+                verbose         if "1", messages indicating what is going on
+                                will be sent to STDOUT. 
+                                Using "2", even more verbose information is 
+                                given (all queries printed before execution);
+                                Level "3" will also show details about src_table 
+                                fields and indexes;
+                ignore_warning  if "1", warning on missing indexes on lookup fields 
+                                are ignored, and the requested operation carried 
+                                                out even at a price of long waiting. Default "0"
+                simulate        if "1", no operation is carried out
+                                but the queries are printed to STDOUT (as in 
+                                                verbose => 2)
+
+        note: src_table, dest_table and lookup_table cannot be called *src*
+        or *lkp*, which are used internally by the Normalizer. If such names
+        are given, a fatal error is issued.
+
+        If the keys for src_table, index_field, lookup table and fields are
+        missing, they can (actually they MUST) be later provided by calls to
+        create_lookup_table() and create_normalized_table().
+
+    snew
+        snew is a shortcut for new(). It is called with parameters passed by
+        position instead of using a hash reference. It is a
+        "quick-and-dirty" ("dirty" being the operational word) method
+        intended for the impatient who does not want to write a script.
+        Assumes that you have a configuration file for MySQL with username
+        and password. Parameters are passed in this order:
+
+                host
+                database
+                source table
+                index field
+                lookup fields
+                lookup table
+                destination table
+                copy indexes
+                verbose
+                simulate
+        
+        Here is an example of one-liner normalization call:
+
+         perl -e 'use DBSchema::Normalizer; DBSchema::Normalizer->snew(qw(localhost music MP3 \
+            album_id album,artist,genre tmp_albums songs 1 1 1))->do()'
+
+        Note: ALL 11 parameters must be passed, or an "use of uninitialized
+        value" error is issued.
+
+        This one-liner is equivalent to the following script:
+
+                #!/usr/bin/perl 
+                no warnings; # Yeah. No warnings. I said it is equivalent, 
+                                         # not recommended.
+                no strict;   # Yup. No strict either. 
+                use DBSchema::Normalizer;
+                $norm = DBSchema::Normalizer->new ( 
+                {
+                        DSN => "DBI:mysql:music;host=localhost;"
+                                . "mysql_read_default_file=$ENV{HOME}/.my.cnf", 
+                        src_table     => "MP3",
+                        index_field   => "album_id",
+                        lookup_fields => "artist,album,genre",
+                        lookup_table  => "tmp_albums", 
+                        dest_table    => "songs",
+                        copy_indexes  =>  1,
+                        verbose       =>  1,
+                        simulate      =>  1,
+                 });
+                $norm->do();
+
+        It is definitely not as safe as the normal call. However, TMTOWTDI,
+        and it's your call. I am using it, but I don't recommend it. Read my
+        lips: I DON'T RECOMMEND IT.
+
+    do  do();
+
+        do() performs the Normalization according to the parameters already
+        received. Internally calls *create_lookup_table()* and
+        *create_normalized_table()*
+
+        Will fail if not enough parameters have been supplied to new()
+
+    create_normalized_table()
+        create_normalized_table() will create a 2nd normal form table,
+        getting data from a source table and a lookup table. Lookup fields
+        in the source table will be replaced by the corresponding index
+        field in the lookup table.
+
+        If called without parameters, assumes the parameters passed to the
+        object constructor.
+
+        Parameters are passed as a hash reference, and are the same given to
+        new() except *DSN*, *username* and *password*. None are compulsory
+        here. The missing ones are taken from the constructor. However, a
+        check is done to ensure that all parameters are passed from either
+        sub.
+
+    create_lookup_table
+        create_lookup_table() will create a lookup table, extracting
+        repeating fields from a 1st normal form table. A numeric primary key
+        is created.
+
+        When called without parameters, assumes the values passed to the
+        object constructor (*new*).
+
+        Parameters are passed as a hash reference, and should include the
+        following
+
+                src_table      table where to take the values from
+                lookup_fields  which fields to take
+                lookup_table   table to create
+                index_field        primary key (will be foreign key in src_table) 
+                           to be created
+
+AUTHOR
+    Giuseppe Maxia, giuseppe@gmaxia.it
+
+COPYRIGHT
+    The DBSchema::Normalizer module is Copyright (c) 2001 Giuseppe Maxia,
+    Sardinia, Italy. All rights reserved.
+
+    You may distribute this software under the terms of either the GNU
+    General Public License version 2 or the Artistic License, as specified
+    in the Perl README file.
+
+    The embedded and encosed documentation is released under the GNU FDL
+    Free Documentation License 1.1
+

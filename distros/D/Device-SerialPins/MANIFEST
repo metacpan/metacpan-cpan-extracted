@@ -1,0 +1,11 @@
+Build.PL
+Changes
+examples/blinker.pl
+examples/forks_ok.pl
+examples/switch_switcher.pl
+lib/Device/SerialPins.pm
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t

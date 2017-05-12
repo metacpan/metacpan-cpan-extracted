@@ -1,0 +1,61 @@
+
+- better documentation for text methods (add_code, code_get, code_put, ...)
+
+- documentation for BLVec
+
+- tests for consistent die return strings
+  x read unary off end of stream
+  x put negative numbers should give "value must be >= 0" for all put_*
+  x write with undefined value
+  - put_* with undefined parameters or undef value
+  - get_* with undefined parameters
+  - put_string with invalid string (e.g. '0012')
+
+- test all open modes, especially write-only
+
+- Export
+
+- text code needs some redoing
+
+- tie to a file to avoid holding everything in memory.
+  Either File::Map or PerlIO :mmap or Sys::Mmap
+
+- Better documentation for Additive.
+
+- range testing for comma and block taboo codes
+
+- test for read_open.  Should read_open / write_open be private?  Should they
+  take a hash like new?  (e.g. write_open( file=>'foo') )
+
+- Change test library and usage to get an encoding list by stream, rather than
+  a global list.
+
+- Add BER and Varint to standard test list.
+  This requires encoding lists by stream (the previous TODO).
+
+
+CODES:
+
+- Sayood's NF3 codes (Lossless Compression Handbook pages 67-70).  Generalized
+  Fibonacci code, with terminator change.  Can be a little shorter than the
+  C2 codes, and he claims they're faster to encode/decode.
+
+- Adaptive Golomb.
+
+- Fenwick punctured codes
+
+- Stout codes
+
+- Yamamoto C(a,f)(n) codes (Yamamoto 2000)
+
+- Pigeon's unconstrained taboo codes.  Described in taboo.ps.  Block codes are
+  done.  Since the unconstrained codes have identical lengths to generalized
+  Fibonacci codes, and these are efficiently implemented here and in XS, I
+  don't think there is a pressing need to do these.
+
+- Thoughts on Huffman, arithmetic
+
+- Methods should return self, so we could do:
+    say Data::BitStream->new->put_fib(@values)->to_string;
+
+- Document BER and Varint

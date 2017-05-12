@@ -1,0 +1,23 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [AddModule::FromFS]
+     name=Module::List
+     dest=t/lib/Module/List.pm
+
+    To add more files:
+
+     [AddModule::FromFS / AddModulePathMore]
+     name=Module::Path::More
+     dest=t/lib/Module/Path/More.pm
+
+DESCRIPTION
+
+    This plugin adds a module source file from local filesystem to your
+    build.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::AddFile::FromFS
+

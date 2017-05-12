@@ -1,0 +1,41 @@
+---
+abstract: 'Hstore Inflator'
+author:
+  - 'Jeen Lee'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.7, CPAN::Meta::Converter version 2.132620'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-InflateColumn-Serializer-Hstore
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  DBIx::Class::InflateColumn::Serializer::Hstore:
+    file: lib/DBIx/Class/InflateColumn/Serializer/Hstore.pm
+    version: 0.02
+requires:
+  DBIx::Class::InflateColumn::Serializer: 0
+  Pg::hstore: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore/issues
+  homepage: https://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore
+  repository: git://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore.git
+version: 0.02
+x_contributors:
+  - 'Jeen Lee <aiatejin@gmail.com>'

@@ -1,0 +1,61 @@
+0.13 20130529
+    + We now croak if we can't get the information on a column
+
+0.12 20090307
+    + Added optional where clause to dbix-dataaudit.pl and DBIx::DataAudit
+
+0.11 20090302
+    + Corrected minimum parent.pm version
+    + Fixed typos in bin/dbix-dataaudit.pl
+    + Enabled t/01-sqlite.t
+
+0.10 20090218
+    + Added Excel-output to dbix-dataaudit script
+
+0.09 20090217
+    + Added schema support. Supply "schema.tablename" if you want to
+      specify a schema
+    . Fixed passing of table to ->get_column_info
+
+0.08 20080822
+    . Fixed t/01-sqlite.t to require DBD::SQLite 1.14 at minimum
+      before it runs its tests, because the SQL trim() funciton is needed
+
+0.07 20080822
+    . Added NUMERIC and UNSIGNED BIGINT as types
+    . Added SMALLINT as type
+      (suggested by David Steinbrunner)
+    . Added C<values> column that counts the number of different values per column
+      (suggested by David Steinbrunner)
+
+0.06 20080429
+    . Fixed embarrassing bug, reported by David Steinbrunner
+    . Added test against that bug
+
+0.05 20080428
+    . Pg bugfixes - ENUM should now be treated differently from a string
+    . The trait hierarchy should now work
+
+0.04 20080427
+    . Changed documentation to indicate class vs. instance methods
+    + Use ORDINAL_POSITION for ordering of columns where possible
+      (suggested by David Steinbrunner)
+    + Guess ENUM types when using Postgres
+      (suggested by David Steinbrunner)
+    + Better discrimination between types - this reduces information
+      on less discriminate DBs like SQLite but should make things
+      work on Pg.
+      Maybe this feature will be disabled unless you're using Pg
+      to provide a maximum of information no matter how useless
+      it may appear. avg(DATETIME) does not really make sense.
+
+0.03 20080408
+    . Fixed missing prerequisites
+    + Added unquoting of quoted column names (patch by Erik Rijkers)
+
+0.02 20080408
+    . Fixed embarassing typos. That's what you get when you don't
+      write automated tests for your code.
+
+0.01 20080407
+    . Released unto an unsuspecting world

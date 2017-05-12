@@ -1,0 +1,339 @@
+NAME
+    Date::Manip - Date manipulation routines
+
+DESCRIPTION
+    Date::Manip is a series of modules designed to make any common date/time
+    operation easy to do. Operations such as comparing two times,
+    determining a date a given amount of time from another, or parsing
+    international times are all easily done. It deals with time as it is
+    used in the Gregorian calendar (the one currently in use) with full
+    support for time changes due to daylight saving time.
+
+    From the very beginning, the main focus of Date::Manip has been to be
+    able to do ANY desired date/time operation easily. Many other modules
+    exist which may do a subset of these operations quicker or more
+    efficiently, but no other module can do all of the operations available
+    in Date::Manip.
+
+    Since many other date/time modules exist, some of which may do the
+    specific operation(s) you need faster, be sure to read "SHOULD I USE
+    DATE::MANIP" in Date::Manip::Misc before deciding which of the Date and
+    Time modules from CPAN is for you. However, if you want one module to do
+    it all, Date::Manip is the one to use.
+
+    Date::Manip has functionality to work with several fundamental types of
+    data.
+
+    dates
+        The word date is used extensively here and is somewhat misleading.
+        In Date::Manip, a date consists of three pieces of information: a
+        calendar date, a time of day, and time zone information. Calendar
+        dates and times are fully handled. Time zones are handled as well,
+        but depending on how you use Date::Manip, there may be some
+        limitations as discussed below.
+
+    delta
+        A delta is an amount of time (i.e. the amount of time between two
+        different dates). A delta refers only to an amount of time. It
+        includes no information about a starting or ending date/time. Most
+        people will think of a delta as an amount of time, but the term
+        'time' is already used so much in this module that I didn't want to
+        use it here in order to avoid confusion.
+
+    recurrence
+        A recurring event is something which occurs on a regular recurring
+        basis.
+
+    holidays and events
+        Holidays and events are basically named dates or recurrences.
+
+    Among other things, Date::Manip allow you to:
+
+    *   Enter a date in practically any format you choose.
+
+    *   Compare two dates, entered in widely different formats to determine
+        which is earlier.
+
+    *   Extract any information you want from a date using a format string
+        similar to the Unix date command.
+
+    *   Determine the amount of time between two dates, or add an amount of
+        time to a date to get a second date.
+
+    *   Work with dates with dates using international formats (foreign
+        month names, 12/10/95 referring to October rather than December,
+        etc.).
+
+    *   To find a list of dates where a recurring event happens.
+
+    Each of these tasks is trivial (one or two lines at most) with this
+    package.
+
+VERSION 5 AND VERSION 6
+    Date::Manip version 6.00 was a complete rewrite of the module (for more
+    information, please refer to the Date::Manip::Changes5to6 document). The
+    rewrite made use of features introduced in perl 5.10 which made the date
+    parsing routines significantly more robust. However, since not everyone
+    has access to a new version of perl where Date::Manip is needed, the
+    Date::Manip distribution actually includes two different versions of the
+    module. It includes the older (5.xx) release and the newer (6.xx)
+    release.
+
+    In addition, the 6.xx release was written with both a functional and an
+    object-oriented interface, so there are actually three different ways to
+    use Date::Manip (though only one is available if you have a version of
+    perl older than 5.10).
+
+    For those who still run an older version of perl, the 5.xx functional
+    interface is still available. It is known to work with perl 5.6 (and
+    probably works with even older versions of perl). There are some
+    limitations to this as described below.
+
+    Version 6.xx was rewritten as a series of object-oriented modules, but a
+    functional interface (which is mostly backward compatible with the
+    version 5 functional interface) is included. The functional interface is
+    simply wrapper functions which call the OO modules.
+
+    A more detailed description of each interface is included below (to help
+    you decide which interface is right for you). If you already know which
+    interface you want to use, just go to the "SEE ALSO" section below for
+    instructions on using each interface.
+
+    It should be noted that all three interfaces will be installed, but they
+    will only all be usable with a recent version of perl.
+
+FUNCTIONAL INTERFACE (VERSION 5)
+    When using a version of perl older than 5.10, this is the only interface
+    available. This interface is documented in the "Date::Manip::DM5
+    document". This interface has several weaknesses that need to be
+    understood when using it:
+
+    Limited Support
+        The version 5 functional interface is no longer being developed, and
+        only limited support is available for it.
+
+        As of December 2012, no development will be done, and I will not
+        correct any remaining bugs in version 5. If a patch is supplied by
+        someone else to fix bugs, I will apply it, provided it applies
+        cleanly, and the resulting code continues to pass all tests. I will
+        not apply patches to add features.
+
+        I will continue to distribute version 5 for several years. I do not
+        have a date in mind where version 5 will be removed.
+
+    Limited Time Zone Support
+        Time zone support is extremely limited, and is often broken. The
+        lack of good time zone support was the primary reason for rewriting
+        Date::Manip .
+
+        Time zone information for 5.xx is now automatically generated from
+        the 6.xx time zone list, and every time time zones are updated in
+        6.xx, the 5.xx release will be similarly updated.
+
+        Prior to the release of 6.00, time zones were added manually to
+        Date::Manip upon request. Since time zone information in 5.xx is now
+        automatically generated, I no longer take requests for time zones.
+
+        The version 5 interface does not handle daylight saving time changes
+        properly.
+
+    Performance Issues
+        Considerable time has been spent speeding up Date::Manip, and fairly
+        simple benchmarks show that version 6 is around twice as fast as
+        version 5.
+
+    Feel free to email me concerns and comments.
+
+FUNCTIONAL INTERFACE (VERSION 6)
+    The version 6 functional interface is almost completely identical to the
+    version 5 functional interface, except that it uses the object-oriented
+    modules to do all the real work.
+
+    Time zone support is greatly improved, but is still somewhat limited.
+    Since the version 6 interface is backward compatible, dates do not store
+    time zone information in them, so the programmer is responsible for
+    keeping track of what time zone each date is in. If you want full access
+    to the time zone support offered in Date::Manip, you have to use the
+    object-oriented interface.
+
+    For the most part, scripts written for older versions of Date::Manip
+    will continue to work (and scripts written for the version 6 functional
+    interface will run with the version 5 interface), however in a few
+    cases, you may need to modify your scripts. Please refer to the
+    Date::Manip::Migration5to6 document for a list of changes which may be
+    necessary.
+
+OBJECT-ORIENTED INTERFACE
+    As of 6.00, Date::Manip consists of a set of OO modules. Each have their
+    own document (see the "SEE ALSO" section below).
+
+    The OO interface consists of the following modules: Date::Manip::Date,
+    Date::Manip::Delta, Date::Manip::Recur, Date::Manip::TZ, and
+    Date::Manip::Base.
+
+    The object-oriented interface is the only way to get the full
+    functionality of Date::Manip. It fully support time zones (and daylight
+    saving time).
+
+SELECTING AN INTERFACE
+    If you are running an older version of perl, the version 5 functional
+    interface is the only one available to you, and it will automatically be
+    used.
+
+    If you are running a newer version of perl (5.10 or higher), you can use
+    the object-oriented modules by loading them directly, or you can use a
+    functional interface.
+
+    If you use a functional interface, it will default to the version 6
+    interface, but you can choose to run the version 5 interface in one of
+    three ways:
+
+    Use the default functional interface
+        By including:
+
+           use Date::Manip;
+
+        in your script, one of the functional interfaces will be loaded. If
+        you are running a version of perl older than 5.10, it will
+        automatically be the version 5 interface. If you are running a newer
+        version of perl, it will automatically load the version 6 interface.
+
+    DATE_MANIP ENVIRONMENT VARIABLE
+        By setting the DATE_MANIP environment variable to 'DM5' before
+        running the perl script, the version 5 interface will be used.
+
+    Date::Manip::Backend VARIABLE
+        Alternately, you can set the Date::Manip::Backend variable to be
+        'DM5' before loading the module. Typically, this will be done in the
+        following way:
+
+           BEGIN {
+                $Date::Manip::Backend = 'DM5';
+           }
+           use Date::Manip;
+
+    Once a functional interface is loaded, you cannot switch between the
+    version 5 and version 6 interfaces.
+
+SEE ALSO
+    The following documents describe various parts of Date::Manip. The
+    following documents describe the basic operation of the Date::Manip
+    package:
+
+  A description of the functional interfaces:
+    Date::Manip::DM5
+        The version 5 functional interface
+
+    Date::Manip::DM6
+        The version 6 functional interface
+
+  Date::Manip objects and configuration
+    An introduction to the Date::Manip classes used by the object-oriented
+    interface and how to configure them:
+
+    Date::Manip::Objects
+        An overview of the various Date::Manip modules, and how to use them.
+
+    Date::Manip::Config
+        Information for configuring Date::Manip
+
+  Date::Manip object-oriented modules
+    These are the modules for using the object-oriented interface.
+
+    Date::Manip::Obj
+        This is the base class. All other classes listed here inherit the
+        methods defined in this class.
+
+    Date::Manip::Base
+        A module for doing low-level date operations.
+
+    Date::Manip::TZ
+        A module for working with time zones.
+
+    Date::Manip::Date
+        The module for working with dates.
+
+    Date::Manip::Delta
+        The module for working with deltas (amount of time).
+
+    Date::Manip::Recur
+        The module for working with recurrences (recurring dates).
+
+  Timezone information
+    Date::Manip::DM5abbrevs
+        Time zone abbreviations used in the version 5 interface.
+
+    Date::Manip::Zones
+        Time zone data included in Date::Manip used in the version 6
+        interfaces.
+
+  Miscellaneous information:
+    Date::Manip::Calc
+        Detailed information on how date calculations are done.
+
+    Date::Manip::Holidays
+        Information on defining and using holidays and events.
+
+    Date::Manip::ConfigFile
+        A sample config file.
+
+    Date::Manip::Lang
+        Information about the languages supported by Date::Manip and how to
+        add a new language.
+
+    Date::Manip::Lang::english
+    Date::Manip::Lang::catalan
+    Date::Manip::Lang::danish
+    Date::Manip::Lang::dutch
+    Date::Manip::Lang::finnish
+    Date::Manip::Lang::french
+    Date::Manip::Lang::german
+    Date::Manip::Lang::italian
+    Date::Manip::Lang::norwegian
+    Date::Manip::Lang::polish
+    Date::Manip::Lang::portugue
+    Date::Manip::Lang::romanian
+    Date::Manip::Lang::russian
+    Date::Manip::Lang::spanish
+    Date::Manip::Lang::swedish
+    Date::Manip::Lang::turkish
+        A description of the parseable words in each language currently
+        supported by Date::Manip.
+
+  Information about the module and administrative things:
+    Date::Manip::Migration5to6
+        Information on changes necessary to scripts when upgrading from 5.xx
+        to 6.xx.
+
+    Date::Manip::Changes5
+        Change log for Date::Manip 5.xx
+
+    Date::Manip::Changes5to6
+        Differences between version 5.xx and 6.00 (including information on
+        upgrading); this contains more details than the Migration5to6
+        document.
+
+    Date::Manip::Changes6
+        Change log for Date::Manip 6.xx
+
+    Date::Manip::Misc
+        Miscellaneous information about Date::Manip (who should use it;
+        acknowledgments).
+
+    Date::Manip::History
+        Musings on the history of Date::Manip written around it's 20th
+        birthday.
+
+    Date::Manip::Problems
+        Common problems and instructions for reporting bugs.
+
+    Date::Manip::Examples
+        Examples of how to use Date::Manip.
+
+LICENSE
+    This script is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Sullivan Beck (sbeck@cpan.org)
+

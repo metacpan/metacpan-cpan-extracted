@@ -1,0 +1,7 @@
+Revision history for Deeme-Backend-Mango
+
+0.02  2014-06-24 11:18:22 CEST
+        - Switching to Deeme::Obj base class
+
+0.01  2014-06-22 11:34:05 CEST
+        - Initial release

@@ -1,0 +1,37 @@
+NAME
+    Dist::Zilla::Plugin::ModuleBuild::RequireXS
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+    In your dist.ini:
+
+       # Any module that contains 'XS'
+       [ModuleBuild::RequireXS]
+
+       # Only specified modules
+       [ModuleBuild::RequireXS]
+       module = JSON::XS
+       module = YAML::XS
+
+DESCRIPTION
+    Use this plugin instead of the regular "ModuleBuild" plugin when you are
+    relying on XS modules that have a pure Perl fallback, eg JSON, JSON::XS
+    and JSON::PP.
+
+    It generates a Build.PL which will promote XS modules from "recommends"
+    to "requires" if there is a working C compiler. This behaviour can be
+    disabled by passing a "--pp" flag to "Build.PL".
+
+    By default, it will select any module in the "recommends" list that
+    include "XS" in the name. Otherwise you can specify a list of modules in
+    your "dist.ini"
+
+SUPPORT
+    If you have any suggestions for improvements, or find any bugs, please
+    report them to
+    <http://github.com/clintongormley/Dist-Zilla-Plugin-ModuleBuild-RequireX
+    S/issues>. I will be notified, and then you'll automatically be notified
+    of progress on your bug as I make changes.
+

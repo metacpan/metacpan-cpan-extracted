@@ -1,0 +1,34 @@
+---
+abstract: 'Extract License and Copyright from its main_module file'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: '0.037'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-LicenseFromModule
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Dist::Zilla: '4.30003'
+  Module::Load: '0.32'
+  Software::License: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule/issues
+  homepage: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule
+  repository: https://github.com/miyagawa/Dist-Zilla-Plugin-LicenseFromModule.git
+version: '0.05'
+x_contributors:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'

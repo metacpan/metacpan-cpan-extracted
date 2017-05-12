@@ -1,0 +1,13 @@
+Revision history for perl module Digest::ED2K
+
+v1.1 2012-09-22
+
+	- Improved documentation
+	- Improved performance
+	- Improved tests
+	- Reduced memory usage
+	- Relicensed as Artistic 2.0
+
+v1.0 2011-05-11
+
+	- First release

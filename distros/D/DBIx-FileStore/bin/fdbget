@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+
+use DBIx::FileStore;
+
+main();
+
+sub Usage {
+    "fdbget [-local=filename] FILENAME [FILENAMES...]\n" .
+    "  Copies files out of the filestore onto the filesystem.\n" .
+    "  --local option specifies different target on the filesystem\n".
+    "  and can only be used with a single filename\n";
+}
+
+sub main {
+    my $filestore = new DBIx::FileStore();
+    my $localname = "";
+
+    # fdbget: copies a file (or files) from the db
+    GetOptions("localname=s" => \$localname ) || die Usage();
+    $|++;
+
+    die "fdbget: pass files to copy from DB\n" unless @ARGV;
+    die "fdbget: can't use --local option with multiple files\n" if (@ARGV > 1 && $localname);
+
+    for my $filename (@ARGV) {
+        $filestore->read_from_db($localname || $filename, $filename); 
+    }
+}
+
+__END__     
+
+=pod
+            
+=head1 NAME     
+            
+fdbget - Copies files from DBIx::Filestore to filesystem
+                    
+=head1 SYNOPSIS     
+                
+    % fdbget filename.txt
+
+fetches filename.txt from filestore, writes to filename.txt on filesystem
+
+    % fdbget filename.txt filename2.txt
+
+fetches named files from filestore, writes to filesystem
+
+    % fdbget filename.txt -local=/tmp/filename-now.txt
+
+fetches named files from filestore, writes to filesystem
+under filename specifed by --local=filename option.
+
+=head1 DESCRIPTION 
+
+Copies files from filestore to filesystem. --local option
+allows user to specify different name on the filesystem from
+the name used in the filestore.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbls>, L<fdbmv>,  L<fdbput>,  
+L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+    
+=cut    
+

@@ -1,0 +1,91 @@
+NAME
+    Data::SmartMunge - Munge scalars, hashes and arrays in flexible ways
+
+VERSION
+    version 1.101612
+
+SYNOPSIS
+        use Data::SmartMunge qw(:all);
+
+        my $s  = smart_munge('foo bar baz', sub { uc $_[0] });
+        my $s2 = smart_munge('foo bar baz bar baz', delete_matching(qr/bar\s*/, 'g'));
+
+        my $a_ref = smart_munge([ 1 .. 4 ], sub { [ reverse @{ $_[0] } ] });
+        my @a = smart_munge([ 1 .. 4 ], sub { [ reverse @{ $_[0] } ] });
+
+        my %h = smart_munge(
+            { a => 'foo', b => 'bar' },
+            sub {
+                +{ map { $_ => uc $_[0]->{$_} } keys %{ $_[0] } };
+            },
+        );
+
+        my $h_ref = smart_munge(
+            { a => 'foo', b => 'bar' },
+            { a => undef, c => 'baz' },
+        );
+
+DESCRIPTION
+    This module provides a generic way to munge scalars, hashes and arrays.
+
+FUNCTIONS
+  smart_munge
+    Takes as the first argument - the *data* - either a scalar, an array
+    reference or a hash reference. Takes as the second argument - the
+    *munger* - either a hash or a code reference. It tries to apply the
+    munger to the data. For example, if the munger is a code reference, that
+    code will be run with the data as an argument. If both data and munger
+    are hash references, the munger hash will be overlaid onto the data hash
+    and the result will be returned.
+
+    If called in scalar context, any resulting array or hash will be
+    returned as a reference. In list context, the array or hash will be
+    returned as is.
+
+    If the munger is not defined, the data will be returned unchanged, again
+    respecting context.
+
+  delete_matching
+    Takes a regular expression as the first argument and flags like "s///"
+    does as the optional second argument. Returns a ready-made munger that
+    deletes the part of the data that matches the regular expression. If the
+    flag argument contains "g", all occurrences will be deleted.
+
+    For example:
+
+        smart_munge('foo bar baz bar baz', delete_matching(qr/bar\s*/);
+        # returns 'foo baz bar baz'
+
+        smart_munge('foo bar baz bar baz', delete_matching(qr/bar\s*/, 'g');
+        # returns 'foo baz baz'
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-SmartMunge/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-SmartMunge/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

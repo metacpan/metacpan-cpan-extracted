@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:georss="http://www.georss.org/georss"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:gml="http://www.opengis.net/gml"
+ xmlns:datacasting="http://datacasting.jpl.nasa.gov/datacasting"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://omiopsmds1:8202/service/rss?esdt=OMCLDO2&amp;as=10003">
+<title>10003 OMCLDO2</title>
+<link>http://omiopsmds1:8202/service/rss?esdt=OMCLDO2&amp;as=10003</link>
+<description>OMCLDO2 data</description>
+<dc:language>en-us</dc:language>
+<dc:date>2009-11-24</dc:date>
+<dc:subject>rss feed for OMCLDO2 data in arcvive set 10003</dc:subject>
+<syn:updatePeriod>daily</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1901-01-01T00:00+00:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov:8000/data/438eefef4fb3e42e48e9d181999dd617/OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov:8000/data/837cc5240f0550d413574493196bc147/OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov:8000/data/9efb1cb3722739524741d149e0e4d84b/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov:8000/data/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5" />
+ </rdf:Seq>
+</items>
+</channel>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov:8000/data/438eefef4fb3e42e48e9d181999dd617/OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5">
+<title>OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov:8000/data/438eefef4fb3e42e48e9d181999dd617/OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2009-11-24 08:54:42-05
+esdt: OMCLDO2
+fileid: 7979433
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5
+key: 28517
+md5: 438eefef4fb3e42e48e9d181999dd617
+orbit: 28517
+source: OMI
+starttime: 2009-11-24 07:15:49-05
+unique_identifier: 10003=OMCLDO2=28517
+</description>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:fileid>7979433</datacasting:fileid>
+<datacasting:dataSource>10003=OMCLDO2</datacasting:dataSource>
+<datacasting:channelUID>10003=OMCLDO2</datacasting:channelUID>
+<datacasting:key>28517</datacasting:key>
+<datacasting:esdt>OMCLDO2</datacasting:esdt>
+<datacasting:filename>OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5</datacasting:filename>
+<datacasting:starttime>2009-11-24 07:15:49-05</datacasting:starttime>
+<datacasting:orbit>28517</datacasting:orbit>
+<datacasting:unique_identifier>10003=OMCLDO2=28517</datacasting:unique_identifier>
+<datacasting:endtime>2009-11-24 08:54:42-05</datacasting:endtime>
+<datacasting:md5>438eefef4fb3e42e48e9d181999dd617</datacasting:md5>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov:8000/data/837cc5240f0550d413574493196bc147/OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5">
+<title>OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov:8000/data/837cc5240f0550d413574493196bc147/OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2009-11-24 07:15:49-05
+esdt: OMCLDO2
+fileid: 7979427
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5
+key: 28516
+md5: 837cc5240f0550d413574493196bc147
+orbit: 28516
+source: OMI
+starttime: 2009-11-24 05:36:56-05
+unique_identifier: 10003=OMCLDO2=28516
+</description>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:fileid>7979427</datacasting:fileid>
+<datacasting:dataSource>10003=OMCLDO2</datacasting:dataSource>
+<datacasting:channelUID>10003=OMCLDO2</datacasting:channelUID>
+<datacasting:key>28516</datacasting:key>
+<datacasting:esdt>OMCLDO2</datacasting:esdt>
+<datacasting:filename>OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5</datacasting:filename>
+<datacasting:starttime>2009-11-24 05:36:56-05</datacasting:starttime>
+<datacasting:orbit>28516</datacasting:orbit>
+<datacasting:unique_identifier>10003=OMCLDO2=28516</datacasting:unique_identifier>
+<datacasting:endtime>2009-11-24 07:15:49-05</datacasting:endtime>
+<datacasting:md5>837cc5240f0550d413574493196bc147</datacasting:md5>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov:8000/data/9efb1cb3722739524741d149e0e4d84b/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5">
+<title>OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov:8000/data/9efb1cb3722739524741d149e0e4d84b/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2009-11-24 05:36:56-05
+esdt: OMCLDO2
+fileid: 7978158
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5
+key: 28515
+md5: 9efb1cb3722739524741d149e0e4d84b
+orbit: 28515
+source: OMI
+starttime: 2009-11-24 03:58:03-05
+unique_identifier: 10003=OMCLDO2=28515
+</description>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:fileid>7978158</datacasting:fileid>
+<datacasting:dataSource>10003=OMCLDO2</datacasting:dataSource>
+<datacasting:channelUID>10003=OMCLDO2</datacasting:channelUID>
+<datacasting:key>28515</datacasting:key>
+<datacasting:esdt>OMCLDO2</datacasting:esdt>
+<datacasting:filename>OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248.he5</datacasting:filename>
+<datacasting:starttime>2009-11-24 03:58:03-05</datacasting:starttime>
+<datacasting:orbit>28515</datacasting:orbit>
+<datacasting:unique_identifier>10003=OMCLDO2=28515</datacasting:unique_identifier>
+<datacasting:endtime>2009-11-24 05:36:56-05</datacasting:endtime>
+<datacasting:md5>9efb1cb3722739524741d149e0e4d84b</datacasting:md5>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov:8000/data/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5">
+<title>OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov:8000/data/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2009-11-24 05:36:56-05
+esdt: OMCLDO2
+fileid: 7978158
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5
+key: 28515
+md5: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+orbit: 28515
+source: OMI
+starttime: 2009-11-24 03:58:03-05
+unique_identifier: 10003=OMCLDO2=28515
+</description>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:fileid>7978158</datacasting:fileid>
+<datacasting:dataSource>10003=OMCLDO2</datacasting:dataSource>
+<datacasting:channelUID>10003=OMCLDO2</datacasting:channelUID>
+<datacasting:key>28515</datacasting:key>
+<datacasting:esdt>OMCLDO2</datacasting:esdt>
+<datacasting:filename>OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5</datacasting:filename>
+<datacasting:starttime>2009-11-24 03:58:03-05</datacasting:starttime>
+<datacasting:orbit>28515</datacasting:orbit>
+<datacasting:unique_identifier>10003=OMCLDO2=28515</datacasting:unique_identifier>
+<datacasting:endtime>2009-11-24 05:36:56-05</datacasting:endtime>
+<datacasting:md5>aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa</datacasting:md5>
+</item>
+
+</rdf:RDF>

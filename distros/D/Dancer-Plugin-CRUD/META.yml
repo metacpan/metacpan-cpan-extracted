@@ -1,0 +1,40 @@
+---
+abstract: 'A plugin for writing RESTful apps with Dancer'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+  - 'Alexis Sukrieh <sukria@sukria.net> (Author of Dancer::Plugin::REST)'
+  - 'Franck Cuny <franckc@cpan.org> (Author of Dancer::Plugin::REST)'
+build_requires:
+  Dancer::ModuleLoader: '0'
+  Dancer::Test: '0'
+  Data::Dumper: '0'
+  Test::More: '0'
+  Try::Tiny: '0'
+  perl: '5.009005'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.009005'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-CRUD
+requires:
+  Carp: '0'
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Sub::Name: '0'
+  Text::Pluralize: '0'
+  Validate::Tiny: '0'
+  perl: '5.009005'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer-plugin-crud-perl/issues
+  homepage: https://github.com/zurborg/libdancer-plugin-crud-perl
+  repository: https://github.com/zurborg/libdancer-plugin-crud-perl.git
+version: '1.031'
+x_contributors:
+  - 'David Zurborg <d.zurborg@propartner-it.de>'

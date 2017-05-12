@@ -1,0 +1,31 @@
+---
+abstract: 'PSGI Log handler for Dancer'
+author:
+  - 'Franck Cuny <franck@lumberjaph.net>'
+build_requires:
+  Dancer: 1.3059
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Plack::Builder: 0
+  Plack::Loader: 0
+  Test::More: 0
+  Test::TCP: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.132830'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Logger-PSGI
+requires:
+  Dancer: 1.3059
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/rsimoes/dancer-logger-psgi/issues
+  homepage: https://metacpan.org/release/Dancer-Logger-PSGI
+  repository: git://github.com/rsimoes/dancer-logger-psgi.git
+version: v1.0.1

@@ -1,0 +1,40 @@
+Revision history for Perl module DateTime::TimeZone::Alias
+
+0.06 Sat Sep 25 17:47:05 MST 2010
+    - update to handle DateTime::TimeZoneCatalog ->
+      DateTime::TimeZone::Catalog rename
+
+0.0501 Sun May 16 15:08:21 HST 2004
+    - fix new warnings
+    - minor test cleanup
+
+0.05 Sun Jul 20 21:30:57 HST 2003
+    - floating, local, UTC, Z, and offsets can now be aliased
+    - docs updated
+    
+0.04 Thu Jun 19 00:13:30 HST 2003
+    - poor man's DT::TZ::Alias added to docs
+    - value method returns the timezone of an alias
+    - add and set methods now croak without params
+
+0.03 Sun Jun 15 12:45:24 HST 2003
+    - aliases can now be aliased
+    - aliases must now point to a TZ that actually exists
+    - add method that will only create new aliases and not redefine
+    - remove method now throws an exception on unknown aliases
+    - is_defined method that checks if an alias or timezone is defined
+    - is_alias method that checks if an alias is defined
+    - is_timezone methods that check if a timezone is known
+    - aliases method that returns a hash of all defined aliases
+    - timezones method that returns an array of all known timezones
+    - much better docs
+    - many more tests
+
+0.02 Thu Jun 12 17:06:13 HST 2003
+    - fixed the del/remove test, thanks to Ben Bennett for catching this
+
+0.01 Thu Jun 12 10:19:39 HST 2003
+    - renamed del method to remove
+
+0.01pre1 Wed Jun 11 14:58:26 2003
+    - original version; created by ExtUtils::ModuleMaker 0.31229

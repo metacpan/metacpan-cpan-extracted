@@ -1,0 +1,38 @@
+---
+abstract: 'Generate automatic documentation of DBIx::Class::Schema objects'
+author:
+  - 'Jason Kohles, <email@jasonkohles.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-AutoDoc
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - templates
+    - xt
+requires:
+  Carp: 0
+  Class::Accessor::Grouped: 0
+  DBIx::Class: 0
+  Data::Dump: 0
+  File::ShareDir: 1.00
+  File::Temp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+  Template: 0
+  Tie::IxHash: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

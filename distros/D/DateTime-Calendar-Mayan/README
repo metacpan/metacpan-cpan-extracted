@@ -1,0 +1,14 @@
+DateTime::Calendar::Mayan
+========================
+
+This is a companion module to DateTime.pm. It implements the Mayan Long Count
+calendar.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL
+make
+make test
+make install

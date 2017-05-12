@@ -1,0 +1,13 @@
+#
+# sql comand to create the tables need by the test scripts
+# 
+create table class (
+	id integer auto_increment primary key,
+	name varchar(25)
+);
+create table item (
+	id	integer auto_increment primary key,
+	name	varchar(25),
+	class	integer,
+	foreign key(class) references class
+);

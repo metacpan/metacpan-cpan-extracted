@@ -1,0 +1,15 @@
+README
+ARTISTIC.txt
+CHANGELOG
+GPL2.txt
+t/all.t
+t/lib/DCQWTestSchema.pm
+t/lib/DCQWTestSchema/Result/Hlagh.pm
+t/pod-coverage.t
+t/pod.t
+lib/DBIx/Class/QueryLog/WithStackTrace.pm
+lib/DBIx/Class/QueryLog/WithStackTrace/Query.pm
+Makefile.PL
+MANIFEST
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

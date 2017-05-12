@@ -1,0 +1,54 @@
+
+			-------------------------
+				Docserver
+			-------------------------
+
+This is a README file for the docserver/docclient project.
+
+The docclient/docserver allow you to convert MS proprietary formats
+to other formats using remote Windows machine and the original MS
+software. The docclient/docserver setup provides the transfer of the
+file from client machine to the Windows host and runs the conversion
+using Word, Excel or Office on that Windows machine.
+
+On the Windows machine, the docserver script has to run. It accepts
+network connections, reads the input file, uses OLE calls to convert
+that file and sends the output back to client. On the client (most
+probably Un*x box) you run a docclient that gets the input file,
+sends it to docserver and gets back converted file. You can also use
+the Docclient.pm module directly to do the conversion inside of your
+larger Perl project.
+
+Installation:
+	Please read the INSTALL file for information about getting
+	Docserver set and running.
+
+What it does when it works:
+	We are able to convert any doc document that is not "too
+	complicated". Basically we're dependent on features of MS
+	software and on it working correctly. Remember, everything
+	that docclient/docserver does is transfer the file to the
+	Windows machine and the run Word or Excel on it. Surely there
+	are bugs in this code but they are probably not related to the
+	quality of the conversion.
+	
+Problems and bug reports:
+	When reporting error, write to me (adelton@fi.muni.cz) and
+	mention the word "docserver" somewhere in the Subject line.
+	Add info about versions of the modules and output of perl -V,
+	on both sides if appropriate.
+
+	You can also add the input doc/xls file that causes you
+	problem (attachment is fine, try to gzip it first).
+
+Available:
+	http://www.fi.muni.cz/~adelton/perl/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1998--2002 Jan Pazdziora, adelton@fi.muni.cz,
+	http://www.fi.muni.cz/~adelton/
+	Pieces of code by Michal Brandejs (client side post processing)
+	and Pavel Smerk (server side hacking). All rights reserved.
+	This package is free software; you can redistribute it and/or
+	modify it under the same terms as Perl itself.
+

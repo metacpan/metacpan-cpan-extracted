@@ -1,0 +1,150 @@
+{
+   "abstract" : "NoSQL-ish overlay for an SQL database",
+   "author" : [
+      "Robert Krimen <robertkrimen@gmail.com>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-NoSQL",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "DBD::SQLite" : "1.44",
+            "DBIx::Class" : "0.08124",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::SQLMaker" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Data::GUID" : "0",
+            "Digest::SHA" : "0",
+            "Hash::Merge::Simple" : "0",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "Moose" : "0",
+            "Path::Class" : "0",
+            "SQL::Translator" : "0.11016",
+            "Try::Tiny" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "DateTime" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Scalar::Util" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::NoSQL" : {
+         "file" : "lib/DBIx/NoSQL.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::ClassScaffold" : {
+         "file" : "lib/DBIx/NoSQL/ClassScaffold.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::ClassScaffold::ResultClass" : {
+         "file" : "lib/DBIx/NoSQL/ClassScaffold.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::ClassScaffold::Schema" : {
+         "file" : "lib/DBIx/NoSQL/ClassScaffold.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Entity" : {
+         "file" : "lib/DBIx/NoSQL/Entity.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Model" : {
+         "file" : "lib/DBIx/NoSQL/Model.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Model::Field" : {
+         "file" : "lib/DBIx/NoSQL/Model/Field.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Model::Index" : {
+         "file" : "lib/DBIx/NoSQL/Model/Index.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Search" : {
+         "file" : "lib/DBIx/NoSQL/Search.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Stash" : {
+         "file" : "lib/DBIx/NoSQL/Stash.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Storage" : {
+         "file" : "lib/DBIx/NoSQL/Storage.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Storage::Cursor" : {
+         "file" : "lib/DBIx/NoSQL/Storage.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::Store" : {
+         "file" : "lib/DBIx/NoSQL/Store.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::TypeMap" : {
+         "file" : "lib/DBIx/NoSQL/TypeMap.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQL::TypeMap::Type" : {
+         "file" : "lib/DBIx/NoSQL/TypeMap.pm",
+         "version" : "0.0021"
+      },
+      "DBIx::NoSQLite" : {
+         "file" : "lib/DBIx/NoSQLite.pm",
+         "version" : "0.0021"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/DBIx-NoSQL/issues"
+      },
+      "homepage" : "https://github.com/yanick/DBIx-NoSQL",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/DBIx-NoSQL.git",
+         "web" : "https://github.com/yanick/DBIx-NoSQL"
+      }
+   },
+   "version" : "0.0021",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "John Lifsey <nebulous@crashed.net>",
+      "nebulous <nebulous@crashed.net>"
+   ]
+}
+

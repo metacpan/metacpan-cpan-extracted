@@ -1,0 +1,40 @@
+Revision history for Perl extension Devel::WarnGlobal.
+
+0.09 2013-08-24
+    - Added a link to github
+    - Added an abstract
+    - Shortened the module short description
+    - Requires perl 5.6.0
+
+0.08 2013-08-23
+    - Moved test.pl to t/1.t and un-hardcoded the file name
+    - Switched to Dist::Zilla OurPkgVersion
+    - Reformatted the Changes file
+    - Added 'use warnings' to Devel::WarnGlobal
+
+0.07 2013-07-18
+    - Letting PodWeaver handle manpage boilerplate
+
+0.06 2013-06-21
+    - Eliminated 'use fields'
+    - Moved to Dist::Zilla
+
+0.05 2001-05-08
+    - More documentation fixes
+    - Added tests for read-versions of warn and die_on_write methods
+    - Changed name to Devel::WarnGlobal, as per modulelist folks'
+      recommendation
+
+0.04 2001-05-07
+    - Documentation fixes
+
+0.03 2001-05-07
+    - Added convenience methods to Tie::WarnGlobal package
+    - Added die_on_write() method to Tie::WarnGlobal::Scalar
+    - Fixed e-mail address and other documentation issues
+
+0.02 2001-05-07
+    - Fixed problem with %FIELDS
+
+0.01 2001-05-06
+    - original version; created by h2xs 1.19

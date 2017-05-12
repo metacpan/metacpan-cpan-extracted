@@ -1,0 +1,24 @@
+
+Complete version history
+========================
+
+############################################################################## 
+Dev::Bollocks:
+
+2001-09-14 0.01: first version
+2001-10-24 0.02: changed to use Math::String::Charset::Grouped
+		 added some more words and removed double "portals"
+		 added examples/bollocks.pl
+2001-11-05 0.03: added adverbs (minlen is 3)
+		 biannually transition mission-critical relationships
+2001-11-25 0.04: added lot's of words like entrench, high-end, appliances,
+		 percormance-oriented, market-growth, guinine etc
+		 fixed: pod and links
+2002-02-20 0.05: fixed: _core_lib() => config()->{lib}
+		 added: a few phrases and some more real-life examples in doc
+2006-10-29 0.06 178 tests (no code changes)
+  * fix (c) and license
+  * require Perl 5.8.1 (anything older is simple untested and unsupported)
+  * add t/pod.t and t/pod_cov.t
+  * add META.yml
+  * use Module::Install		

@@ -1,0 +1,34 @@
+* run
+    make orig
+  this will create ../dh-make-perl_$VERSION.orig.tar.gz and
+  ../DhMakePerl-$VERSION.tar.gz (hardlinked to each other).
+
+* build the package as usual and watch for failing tests
+
+* apply the usual quality checks, e.g. lintian
+
+* make sure Changes is populated for the new release. Good source of changes to
+  include there is debian/changelog and/or git logs
+
+  (assuming debian/changelog is already updated with the list of changes)
+
+* if everything seems ok, run
+    dch -r
+  and build again
+
+* upload
+  - ../dh-make-perl_$VERSION.orig.tar.gz to alioth, naming the release $VERSION
+  - ../DhMakePerl-$VERSION.tar.gz to PAUSE, e.g. with cpan-upload
+
+* tag
+    debcommit -a -r
+
+* increase version number
+    git grep $ver
+    sed -i -e 's/$ver/$ver+1/' file...
+    git ci -a -m'increment version to $ver+1'
+
+* push
+    dpt push
+
+* serve yourself a piece of cake :)

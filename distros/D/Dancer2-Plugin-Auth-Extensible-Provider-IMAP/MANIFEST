@@ -1,0 +1,16 @@
+Changes
+lib/Dancer2/Plugin/Auth/Extensible/Provider/IMAP.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/environments/provider-imap.yml
+t/environments/provider-imap-with-roles.yml
+t/plugin-provider-imap.t
+t/plugin-provider-imap-with-roles.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

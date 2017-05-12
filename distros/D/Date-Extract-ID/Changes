@@ -1,0 +1,10 @@
+Revision history for Date-Extract-ID
+
+0.002   2016-04-08 (PERLANCAR)
+
+	- Bump prereq version of DateTime::Format::Alami::ID [RT#113604].
+
+
+0.001   2016-04-06 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,33 @@
+---
+abstract: 'Validate DNS Certification Authority Authorization (CAA) values'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Scalar::Util: '0'
+  Test::More: '0'
+  Test::Signature: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-DNS-CAA
+requires:
+  Data::Validate::Email: '0'
+  Data::Validate::URI: '0'
+  Exporter: '0'
+  Syntax::Keyword::Junction: '0'
+  Taint::Util: '0'
+  base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Validate-DNS-CAA
+  homepage: http://search.cpan.org/dist/Data-Validate-DNS-CAA/
+  repository: git://github.com/mschout/perl-data-validate-dns-caa.git
+version: '0.02'
+x_serialization_backend: 'YAML::Tiny version 1.69'

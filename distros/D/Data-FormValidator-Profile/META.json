@@ -1,0 +1,48 @@
+{
+   "abstract" : "Profile object for Data::FormValidator",
+   "author" : [
+      "Graham TerMarsch (cpan@howlingfrog.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4004, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-FormValidator-Profile",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::FormValidator" : "4.5",
+            "List::MoreUtils" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::FormValidator::Profile" : {
+         "file" : "lib/Data/FormValidator/Profile.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

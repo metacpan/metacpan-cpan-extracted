@@ -1,0 +1,40 @@
+dansguardian version 0.01
+=========================
+
+"DansGuardian is an award winning Open Source web content filter which currently
+runs on Linux, FreeBSD, OpenBSD, NetBSD, Mac OS X, HP-UX, and Solaris. It filters
+the actual content of pages based on many methods including phrase matching, PICS
+filtering and URL filtering. It does not purely filter based on a banned list of 
+sites like lesser totally commercial filters."
+
+Dansguardian Perl module is small module for administer dansguardian's content 
+control files. It let you add, remove and get information from files control 
+across methods.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires only core modules:
+    Perl 5.8.x
+    strict
+    warnings
+
+The tests will use non-core modules if available
+but these are not required for normal use.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Alejandro Garrido Mota <garridomota@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,44 @@
+Dist-Zilla-Plugin-VersionFromScript
+===================================
+
+This is a plugin to generalize Dist::Zilla's concept of a version number.
+In your dist.ini file, add lines like:
+
+; get version from number of Git logs
+[VersionFromScript]
+script = git-logs2version.pl
+
+The script can be any script or program that prints a version-type number
+(which will be used as the release version number) to STDOUT.
+
+Included in this package are two scripts for generating versions from
+Subversion (svnversion.pl) and Git (git-logs2version.pl).  These scripts
+can take arguments of:
+
+    --major  2      # add a major revision number
+    --offset 35     # adds offset to the minor revision
+
+So for example, if you are at revision 50, calling
+
+    script = svnversion.pl --major 3 --offset 35
+
+produces 3.085 as the version number.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Reid Augustin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

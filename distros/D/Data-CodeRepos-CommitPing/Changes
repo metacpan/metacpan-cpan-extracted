@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::CodeRepos::CommitPing
+
+0.03    2008-04-21T13:22:50+09:00
+        - lang/javascript/userscripts support
+
+0.02    2008-04-21T13:09:20+09:00
+        - skip root directory on changes_base method
+
+0.01    2008-04-19T22:10:31+09:00
+        - original version

@@ -1,0 +1,49 @@
+Revision history for Perl extension DBIx::ProcedureCall.
+
+0.11    Mon Nov 23 2009
+        - no changes to module, just update test suite
+          (skip tests when DBI is not available)
+
+0.10    Sat Oct 07 2006
+        - fix critical regression bug in 0.09 
+	   (named parameters to function calls broken in Oracle driver, 
+	    http://rt.cpan.org/Public/Bug/Display.html?id=21877 )
+
+
+0.09	Sun Jan 29 2006
+        - Oracle :boolean function
+        - more robust handling of ORA-22905 bug
+        - mock tests using DBD::Mock
+	
+0.08	Mon Apr 11 2005
+	- Command line interface (DBIx::ProcedureCall::CLI)
+	- lowered Perl version requirement to 5.6
+
+0.07 Mon Feb 14 2005
+	- support for PostgreSQL
+	- Oracle table functions
+	- fixed bug that accidentally disallowed :cursor
+
+0.06  Wed Jan 19 2005
+	- out and inout parameters
+	- binding with optional arguments
+	- bug fix in fetch[{}] (did not slice properly)
+
+0.05	 Thu Dec 16 2004
+	- cursor handling
+	- checking for unknown attributes
+
+0.04  Wed Dec 08 2004
+	- added attributes :package, :packaged
+
+0.03  Tue Nov 30 2004
+	- changed name to DBIx::ProcedureCall
+	- added attributes :cached, :function, :procedure
+
+0.02  Thu Nov 25 2004
+	- changed name to DBIx::Call
+	- separated DB-independent interface from Oracle-specific backend
+
+0.01  Mon Nov 22 11:10:14 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Oracle::Procedures

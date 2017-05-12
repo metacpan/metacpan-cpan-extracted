@@ -1,0 +1,23 @@
+0.04  Sat, 14 Apr 2012 10:09:00 +0100
+ Matt S Trout:
+     Fix a massive pessimisation causing repeated ->result_source_instance
+     invocations resulting in get_inherited from C::A::Grouped being the
+     biggest thing in a startup profile.
+
+0.03  Thu, 11 Sep 2008 18:42:48 +0200
+ Florian Ragwitz (1):
+     Require DBIx::Class >= 0.08009.
+
+0.02  Wed, 10 Sep 2008 23:02:57 +0200
+ Florian Ragwitz (4):
+     Another SYNOPSIS example.
+     Test accessor handling.
+     Test behaviour when columns with default values are set explicitly.
+     Improve documentation.
+     Tests for always_update.
+     Document always_update.
+     Implement always_update.
+
+0.01  Sat, 28 Jun 2008 13:39:27 +0200
+ Florian Ragwitz (1):
+     Initial version.

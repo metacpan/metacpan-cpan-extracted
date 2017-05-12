@@ -1,0 +1,41 @@
+# NAME
+
+Data::Object::Immutable - Immutable Object for Perl 5
+
+# VERSION
+
+version 0.08
+
+# SYNOPSIS
+
+    use Data::Object::Immutable;
+
+    my $object = Data::Object::Immutable->new([1..9]);
+
+    $object->isa('Data::Object::Array'); # 1
+    $object->count; # 9
+
+    $object->[0]++; # fatal ... modification of a read-only value attempted
+
+# DESCRIPTION
+
+Data::Object::Immutable provides a mechanism for making any [Data::Object](https://metacpan.org/pod/Data::Object)
+data type object immutable. An immutable object is an object whose state cannot
+be modified after it is created; Immutable objects are often useful because
+they are inherently thread-safe, easier to reason about, and offer higher
+security than mutable objects.
+
+# AUTHOR
+
+Al Newkirk &lt;anewkirk@ana.io>
+
+# CONTRIBUTOR
+
+Developer &lt;dev@example.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,70 @@
+Revision history for Perl extension Date::Gregorian.
+
+0.01  Mon Nov 29 23:40:56 1999
+	- original version; created by h2xs 1.1.1.1.2.1
+
+0.02  Sat Jun 17 12:01:29 2000
+	- revised integer arithmetic to deal with years before AD 1
+
+0.03  Tue Aug  7 08:19:25 2001
+	- extended POD documentation and test suite
+
+0.04  Tue Oct 16 13:13:15 2001
+	- merged set_{first|next|prev|last}_wd methods into set_weekday
+	- added module Date::Gregorian::Exact
+
+0.05  Fri Apr 19 20:05:01 2002
+	- got rid of pseudo-hashes
+
+0.06  Tue May 21 23:06:02 2002
+	- revised POD documentation
+	- added rounding in Date::Gregorian::Exact
+
+0.07  Thu Jan 19 07:38:43 2006
+	- added methods today and get_days_in_year
+	- added module Date::Gregorian::Business
+	- split test.pl into t/*.t
+	- fixed set_yd for years without Jan 1 (which can happen
+	  close to a user-defined calendar reformation date)
+	- portability fix for set/get_gmtime where OS-specific gmtime(0)
+	  is something else than 00:00:00, January 1, 1970.
+
+0.08  Fri Jan 20 13:30:40 2006
+	- added t/pod.t
+	- fixed META.yml
+
+0.09  Sat Jan 21 13:26:57 2006
+	- added iterators to Date::Gregorian and Date::Gregorian::Business
+	- fixed check_ywd for pre-gregorian dates
+	- fixed empty and very short years in businessday calculations
+	- fixed detail of holiday definition parsing and related documentation
+	- changed alignment accessor to no longer use isa
+	- added more checks in t/basic.t and t/business.t
+
+0.10 Thu Jun 15 21:47:00 2007
+	- replaced Date::Gregorian::Exact by a dummy croaking when imported
+	- updated t/exact.t to reflect Date::Gregorian::Exact suspension
+	- added DateTime interoperability
+	- added methods get_string and set_string
+	- added methods get_days_until and compare
+	- added method get_localtime
+	- added calendar example script
+	- fixed a bug in get_ywd/check_ywd related to days late in December
+	- fixed return value of set_weekday
+	- revised documentation
+	- upgraded META.yml to conform to spec v1.3
+	- added checks in t/basic.t and t/business.t
+	- added t/datetime.t, t/localtime.t and t/string.t
+	- added t/pod-coverage.t
+
+0.11 Mon Jun 18 07:26:29 2007
+	- bugfix: t/pod-coverage.t crashed when Test::Pod::Coverage was
+	  not installed
+	- perl5lib bug workaround: "use base" would not work in perl 5.9.x
+	  when a constant named "FIELDS" was present
+
+0.12 Tue Jun 19 14:02:53 2007
+	- fixed META.yml
+	- added t/version_numbers.t
+	- added examples/today
+

@@ -1,0 +1,90 @@
+Revision history for Perl extension Data::ParseBinary.
+
+0.29 Dec 4, 2010
+	- Documentation fixes
+
+0.26 Sep 19, 2010
+	- Fixed a bug in Data::ParseBinary::FileSystem::MBR (thanks paul)
+
+0.25 Aug 25, 2009
+	- Completed unit tests for all int 64 numbers 
+	- Bugfix: CString now respects its name (thanks Niobos)
+
+0.24 Aug 17, 2009
+	- Fixes to the Netflow library
+	- Fixes to big (64) integers
+	- L/BFloat64 still defective
+
+0.23 July 30, 2009
+	- Started work on big-integers constructs. (64 bit)
+	- Now dependes on Math::BigInt
+	- Fixed bug in signed int 32
+	- Added Data::Netflow to the library (thanks Andrej)
+	(released on the jawish fest - Tisha Be'av - again...)
+
+0.22 July 26, 2009
+	- Fixed the name of ReversedBitStream
+	- Cleanup: now everyone are using $parser->runCodeRef
+
+0.21 July 19, 2009
+    - Added ReversedBitStruct and ReversedBitField
+
+0.20 January 31, 2009
+	- Strings now support encoding
+	- Added the Char construct
+
+0.13 January 5, 2009
+	- Documentation
+	- Anchor is now a Value
+
+0.12 December 28, 2008
+	- Documentation
+	- Peek now is a NOP on build
+	- Peek can now Peek Far (not zero)
+	- BitStream now tell but can not seek
+
+0.11 December 11, 2008
+	- Completing the design changes
+	- Depricated Ranges, Optional and Select
+	- Improve error report
+
+0.10 December 4, 2008
+	- Design changes
+	- Changed the way Enum default value was defined
+	- Library parsers get their own independant module
+
+0.07 September 21, 2008
+    - Add Library modules: FileSystem-MBR
+    - Fixed test filename: NOTEPAD.EXE -> notepad.exe
+    - Shortened the cap2.cap to 15kb.
+	- Fixed FlagsEnum
+
+0.06 September 17, 2008
+	- Add Library modules: Executable-PE32, Executable-ELF32, Data-TermCapture
+	- Add $Data::ParseBinary::print_debug_info
+	- Add Adapters: FlagsEnum
+
+0.05 September 11, 2008
+    - Add Constructs: RoughUnion, Aligned, Restream, Bitwise, Magic, Select, Optional
+    - Add the Library function
+    - Add Library modules: Graphics: BMP, EMF, PNG, WMF.
+    - Add Adapters: ExtractingAdapter, IndexingAdapter
+	(released after my first child's birth)
+
+0.04  August 13, 2008
+    - Worked on the Streams
+    - Created File Stream
+    - Revisied Flush operation
+
+0.03  August 10, 2008
+    - Worked on the streams (string, stringref, warp, bit)
+	- Created StringBuffer
+	- Added 02streams.t
+	(released on the jawish fest - Tisha Be'av)
+
+0.02  July 22, 2008
+	- A lot of bug fixes, especially in the build op.
+
+0.01  July 12, 2008
+	- original version; created by Shmuel Fomberg.
+

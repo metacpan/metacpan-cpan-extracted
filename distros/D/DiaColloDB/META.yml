@@ -1,0 +1,47 @@
+---
+abstract: 'Diachronic collocation index'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DiaColloDB
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  DDC::XS: '0.15'
+  PDL: '2.007'
+  PDL::CCS: v1.23.1
+  PDL::VectorValued: v1.0.5
+  forks: '0.36'
+requires:
+  Algorithm::BinarySearch::Vec: '0.07'
+  DB_File: '0'
+  DDC::Concordance: '0.34'
+  File::Copy: '0'
+  File::Find: '0'
+  File::Map: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  Getopt::Long: '0'
+  IPC::Run: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Log::Log4perl: '1.07'
+  Test::More: '0'
+  Tie::File::Indexed: '0.08'
+  Time::HiRes: '0'
+  XML::LibXML: '1.70'
+  perl: '5.01'
+resources: {}
+version: v0.12.004

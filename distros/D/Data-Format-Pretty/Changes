@@ -1,0 +1,21 @@
+Revision history for Data-Format-Pretty
+
+0.04     2013-04-26 (SHARYANTO)
+
+         No functional changes. Fixed a typo in Synopsis (release nudged by Tim
+         Esselens).
+
+
+0.03     2011-10-19 (SHARYANTO)
+
+         Add pretty_print() and ppr(). Export ppr() by default.
+
+
+0.02     2011-08-11 (SHARYANTO)
+
+         No functional changes. Fix/update Synopsis & Description.
+
+
+0.01     2011-08-11 (SHARYANTO)
+
+         First release.

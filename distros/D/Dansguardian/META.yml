@@ -1,0 +1,11 @@
+name:         dansguardian
+version:      0.5
+version_from: lib/dansguardian.pm
+installdirs:  site
+license:      perl
+author: 
+   - 'Alejandro Garrido Mota <mogaal@cpan.org>'
+requires:
+    Tie::File:                    0
+
+distribution_type: module

@@ -1,0 +1,48 @@
+-------------------------
+Version 0.08 (2008-12-13)
+-------------------------
+
+* add UnknownCode configuration option
+
+-------------------------
+Version 0.07 (2008-04-19)
+-------------------------
+
+* fix bug in the test suite where some test cases were
+  randomly generating wrong results
+
+-------------------------
+Version 0.06 (2008-04-13)
+-------------------------
+
+* add Comments configuration option
+* handle special characters like tabs (\t) correctly
+* add pod tests
+* add license tag
+
+-------------------------
+Version 0.05 (2005-02-14)
+-------------------------
+
+* don't generate superfluous goto statements
+
+-------------------------
+Version 0.04 (2005-01-31)
+-------------------------
+
+* new options: Indent, StringLength, Strategy, MergeSwitches
+
+* update directory structure
+
+-------------------------
+Version 0.03 (2004-02-03)
+-------------------------
+
+* cleaned up revision handling
+
+-------------------------
+Version 0.01 (2003-03-17)
+-------------------------
+
+* initial release
+

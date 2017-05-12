@@ -1,0 +1,111 @@
+<link rel="stylesheet" href="/css/typeahead-bootstrap-3-fix/typeahead.css" />
+
+<!-- Styling for the autosuggestion feature, this should move into
+     its own CSS or the main CSS, some day -->
+<style>
+.tt-highlight { font-weight: 1200 };
+</style>
+
+<div id="page">
+      <div id="content">
+        <div id="header">
+          <h1>Search results</h1>
+        </div>
+        <!-- Autocompletion -->
+        <!-- https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters-completion.html -->
+
+        <a href="<% request.uri_for( '/', { q => params.q, type => "" }) %>">All Files</a>
+        <a href="<% request.uri_for( '/', { q => params.q, type => "audio/mpeg" }) %>">Audio Files</a>
+        <form action="/" method="GET" enctype="multipart/form-data">
+          <div class="row">
+          <div class="form-group">
+          <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-lg-offset-3">
+              <input id="q" name="q" class="form-control col-xs-12 col-lg-12" type="text" placeholder="Your query" value="<% params.q |html %>">
+          </div>
+          </div>
+          </div>
+
+          <div class="row">
+          <div class="col-md-12 col-lg-6">&nbsp;</div>
+          </div>
+
+          <div class="form-group">
+          <div id="buttons" class="row">
+            <div class="text-center">
+              <button type="submit" name="Go" class="btn btn-default">Go</button>
+              <button type="submit" name="lucky" class="btn">I'm feeling lucky</button>
+            </div>
+          </div>
+          </div>
+
+          <input type="hidden" name="type" value="<% params.type %>">
+        </form>
+        <a href="<% request.uri_for( '/', { q => params.q, type => params.type, from => params.from + params.size, size => params.size }) %>">Next <% params.size %></a>
+        <% IF statistics %>
+        <div><h2>Statistics</h2>
+        <% statistics.total %> documents
+        </div>
+        <% END %>
+        <% IF results.total %>
+        <h1><% results.total %> Results</h1>
+            <!-- paginate later, if at all -->
+            <% FOR hit IN results.hits %>
+              <div class="result">
+              <h3>
+              <p><% hit.source.folder %></p>
+              <% IF hit.type == "mail" %>
+              <!-- mail -->
+              <a href="thunderlink://messageid=<%hit.source.url %>" >
+              <% ELSIF hit.type == 'http' %>
+              <a href="<% hit.source.url %>" >
+              <% ELSE %>
+              <!-- file -->
+              <a href="/cache/<%hit.index |uri%>/<%hit.type |uri%>/<% hit.id | uri | uri %>?q=<% params.q |uri %>">
+              <% END %>
+              <% hit.source.title |html %>
+              </a> - (<% hit.type %>) - <% hit.source.creation_date |html %> <% hit.source.language %>(<a href="/open/<%hit.index |uri%>/<%hit.type |uri%>/<% hit.id | uri | uri %>">download</a>)</h3>
+              <p><% IF hit.highlight  %>
+                   <style>em {background: yellow; font-color: black;}</style>
+                   <% FOR line IN hit.highlight.content %>
+                     <% IF line.page %><a href="/inline/<%hit.index |uri%>/<%hit.type |uri%>/<% hit.id | uri | uri %>#page=<% line.page %>"><br><% END %>
+                     <% line.snippet %><%# XXX ugh, no HTML escaping here #%><% END %>
+                     <% IF line.page %></a><% END %>
+                 <% ELSE %>
+                  <% hit.source.content |html %>
+                 <% END %>
+                  <% IF hit.source.mime_type == 'audio/mpeg' %><audio src="/inline/<% hit.index |uri%>/<%hit.type |uri%>/<% hit.id | uri | uri %>" controls="controls"></audio><% END %>
+              </p>
+              </div>
+              <% END %>
+        <% END %>
+
+      </div>
+</div>
+<script src="<% request.uri_base %>/javascripts/typeahead/typeahead-0.11.1.bundle.js"></script>
+<script>
+var urlBase = '<% request.uri_for('/suggest') %>';
+var fetch = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  // prefetch: urlBase,
+  remote: {
+    url: urlBase + '/%QUERY.json',
+    wildcard: '%QUERY'
+  }
+});
+
+$('#q').typeahead({
+    highlight: true,
+    minLength: 1
+  },
+  {
+  name: 'fetch',
+  display: 'value',
+  source: fetch,
+  templates: {
+    suggestion: function(obj) {return '<div><strong>'+obj.value+'</strong><br><small>'+obj.url+'</small></div>'},
+  }
+});
+
+$('#q').focus();
+</script>

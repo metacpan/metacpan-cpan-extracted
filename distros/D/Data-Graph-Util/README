@@ -1,0 +1,58 @@
+SYNOPSIS
+
+     use Data::Graph::Util qw(toposort is_cyclic is_acyclic);
+    
+     my @sorted = toposort(
+         { a=>["b"], b=>["c", "d"], d=>["c"] },
+     ); # => ("a", "b", "d", "c")
+    
+     # sort specified nodes (nodes not mentioned in the graph will be put at the
+     # end), duplicates not removed
+     my @sorted = toposort(
+         { a=>["b"], b=>["c", "d"], d=>["c"] },
+         ["e", "a", "b", "a"]
+     ); # => ("a", "a", "b", "e")
+    
+     say is_cyclic ({a=>["b"]}); # => 0
+     say is_acyclic({a=>["b"]}); # => 1
+    
+     say is_cyclic ({a=>["b"], b=>["c"], c=>["a"]}); # => 1
+     say is_acyclic({a=>["b"], b=>["c"], c=>["a"]}); # => 0
+
+DESCRIPTION
+
+    Early release. More functions will be added later.
+
+FUNCTIONS
+
+    None are exported by default, but they are exportable.
+
+ toposort(\%graph[ , \@nodes ]) => sorted list
+
+    Perform a topological sort on graph (currently using the Kahn
+    algorithm). Will return the nodes of the graph sorted topologically.
+
+    If \@nodes is specified, will instead return @nodes sorted according to
+    the topological order. Duplicates are allowed and not removed. Nodes
+    not mentioned in graph are also allowed and will be put at the end.
+
+ is_cyclic(\%graph) => bool
+
+    Return true if graph contains at least one cycle. Currently implemented
+    by attempting a topological sort on the graph. If it can't be
+    performed, this means the graph contains cycle(s).
+
+ is_acyclic(\%graph) => bool
+
+    Return true if graph is acyclic, i.e. contains no cycles. The opposite
+    of is_cyclic().
+
+SEE ALSO
+
+    https://en.wikipedia.org/wiki/Graph_(abstract_data_type)
+
+    https://en.wikipedia.org/wiki/Topological_sorting#Kahn.27s_algorithm
+
+    Sort::Topological can also sort a DAG, but cannot handle cyclical
+    graph.
+

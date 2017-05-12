@@ -1,0 +1,111 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use vars qw/$opt_v $opt_i/;
+
+use DNS::BL;
+use Getopt::Std;
+
+our $VERSION = '0.00_01';
+$VERSION = eval $VERSION;  # see L<perlmodstyle>
+
+getopts('vi');
+
+my $bl = new DNS::BL;
+
+if ($opt_i)
+{
+    use Term::ReadLine;
+    my $t = new Term::ReadLine 'dnsbltool/$VERSION';
+    my $OUT = $t->OUT || \*STDOUT;
+    my $line = '';
+    while ( defined ($_ = $t->readline('dnsbltool' 
+				       . (length($line) ? ': ' : '> '))) ) 
+    {
+	$line .= $_;
+	if ($line =~ s/\\$//)
+	{
+	    next;
+	}
+	print $OUT "<< $line\n" if $opt_v;
+	my ($c, $x, @things) = $bl->parse($line);
+	if ($opt_v or ($c != &DNS::BL::DNSBL_OK))
+	{
+	    print $OUT "[$c] " . $x . "\n";
+	}
+	print scalar @things, " additional return values\n" if @things;
+	$t->addhistory($line) if /\S/;
+	$line = '';
+    }    
+    print $OUT "\n\n";
+}
+else
+{
+    my $line = '';
+    while (<>)
+    {
+	chomp;
+	$line .= $_;
+	if ($line =~ s/\\$//)
+	{
+	    next;
+	}
+	print "$line\n" if $opt_v;
+	my ($c, $x) = $bl->parse($line);
+	die "[$c] " . $x . "\n"	if $c != &DNS::BL::DNSBL_OK;
+	$line = '';
+    }
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+dnsbltool - Front-end for DNS::BL
+
+=head1 SYNOPSIS
+
+    dnsbltool [-v] [-i|command-files...]
+
+=head1 DESCRIPTION
+
+C<dnsbltool> interprets and executes commands for the L<DNS::BL>
+framework. Commands must be placed entirely on a single line. See
+L<DNS::BL>, L<DNS::BL::cmds> and its references for more information
+on command syntax and semantycs.
+
+The B<-v> option can be used to produce more verbose output, suitable
+for debugging. The B<-i> option places C<dnsbltool> in interactive
+mode.
+
+=head1 HISTORY
+
+=over
+
+=item Sep, 2004
+
+Began working in the first version of the code.
+
+=back
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), L<DNS::BL>.
+
+=cut

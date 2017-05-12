@@ -1,0 +1,65 @@
+NAME
+    DISCO - DISCO client interface
+
+SYNOPSIS
+     use DISCO;
+
+     my $disco = DISCO->new(URI => 'http://');
+     print 'ref: ' . $disco->get_ref . "\n";
+     print 'docRef: ' . $disco->get_docRef . "\n";
+     print 'address: ' . $disco->get_address;
+
+DESCRIPTION
+    This module provide functions to interpret DISCO. DISCO (short for
+    Discovery) is a pseudo-standard by Microsoft. A published .disco file,
+    which is an XML document that contains links to other resources that
+    describe the XML Web service, enables programmatic discovery of an XML
+    Web service. More information at
+    *msdn.microsoft.com/library/en-us/cpguide/html/cpconwebservicediscovery.
+    asp*.
+
+    The interface exposed provides access to the ref, docRef and address
+    attributes of a DISCO file.
+
+FUNCTIONS
+    The following functions are provided. All are exported by default. All
+    the get_xxx() return the value of the xxx attribute in the provided XML.
+    The constructor expects the URI of the DISCO file in the URI parameter.
+
+    get_ref()
+        This function returns the value of the ref element in the DISCO
+        file.
+
+    get_docRef()
+        This function returns the value of the docRef element in the DISCO
+        file.
+
+    get_address()
+        This function returns the value of the address element in the DISCO
+        file.
+
+GLOBALS
+  $URI
+    The URI of the DISCO file.
+
+BUGS AND LIMITATIONS
+    Does not understand (yet) multiple entries in the DISCO file
+    Does not support (yet) local DISCO files
+    Limited support for auto-generated DISCO files by Visual Studio .NET
+    Automatic generation of WSDL proxies (using SOAP::Lite) not yet
+    implemented
+
+SEE ALSO
+    DISCO reqires use XML::Simple and LWP::UserAgent.
+
+    http://msdn.microsoft.com/library/en-us/cpguide/html/cpconwebservicedisc
+    overy.asp
+
+AUTHOR
+    Christian Wenz <wenz@cpan.org>
+
+    Copyright 2004 Christian Wenz -- http://www.hauser-wenz.de/
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

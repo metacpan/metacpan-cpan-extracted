@@ -1,0 +1,102 @@
+Revision history for Perl module Data::Structure::Util
+
+0.16 2015-03-08
+    - Removed assertion that signature(undef) ne signature(undef) - no
+      longer valid for Perl 5.20 (ANDYA)
+    - Fix GCC warnings (AMBS)
+    - Fix Clang warnings (ANDYA)
+
+0.15 2008-03-09
+    - Fixed Makefile patching on platforms that use double quotes.
+
+0.14 2008-03-09
+    - Use Storable::freeze instead of Data::Dumper for signature
+      generation
+    - Remove Clone dependency.
+
+0.13 2008-03-06
+    - Fixed signature to ignore SVf_OOK
+    - Fixed t/04utf8.t failure by adding use bytes. The default
+      behaviour of unpack changed for 5.10 and that was causing
+      breakage.
+
+0.12 Wed Jun 21 15:37:40 2006
+
+  - Check return value of av_fetch in the debug code
+  - Need to check the return value of av_fetch() in circular_off
+  - Avoid the "unknown error" (which was actually the hash or array we were
+    traversing suddenly being deleted from underneath us) by holding an additional
+    reference to the passed in structure.
+  - Make the "Unknown error" message a lot more helpful
+  - _circular_ref should check the return value of av_fetch
+  - Substitute a sane way of chosing the test plan
+  - Convert t/02circular to Test::More
+  - _signature should check the return value of av_fetch
+  - _get_refs should check the return value of av_fetch
+  - Convert t/05refs.t to Test::More
+  - Check the return value from av_fetch in _utf8_flag and _utf8_flag_set
+  - _has_utf8 should check the return value of av_fetch 
+  - convert 04utf8.t to Test::More
+  - Check return value from av_fetch in _unbless
+  - Check the return value from av_fetch is not NULL before deferencing it in
+    _get_blessed
+  - Use Test::More rather than Test::Simple in t/03bless.t
+  - Use Test::More's eq/ne functiosn rather than comparisons inside the
+    arguments to ok()
+  - Have to use a hash ref rather than a hash and keep taking references for
+    the signature test, as temporary refs are in the signature, and their
+    address can
+  - differ each time round the loop
+  - Remove C99-isms from the debugging code
+  - Use the SvFLAGS() macro rather than a direct structure access
+
+0.11 Fri Sep 10 11:00:00 2004
+
+  - Fixed t/00pod.t for those who don't have Test::POD installed - Thanks Jeremy
+  - Major doc updates
+  - fixed some utf8 bugs with magic scalars (length caching for utf8) - Thanks Mark
+
+0.10 Sat Jun 26 19:25:00 2004
+  - Updated tests to be compatible vith perl 5.6 - Thanks Jeremy
+  - Added _utf8_on() and _utf8_off()
+
+0.09 Fri Mar 26 15:10:00 2004
+  - Updated tests to pass on perls without unicode - Tom
+  - Updated doc
+
+0.08 Mon Jan 20 12:00:00 2004
+  - Fixed memory leaks (very embarassing I must admit) - Thanks Richard Clamp
+
+0.07 Mon Jan 19 09:50:00 2004
+  - Added get_refs() and signature()
+  - Updated doc
+
+0.06 Tue Dec 30 10:27:00 2003
+  - Changed C++ style comments to C style comments - Thanks Leon
+  - Fixed bug in has_circular_ref() and circular_off() where there was a weak ref:
+    in some cases, a circular ref could be wrongly reported.
+
+0.05
+  - Added circular_off() to weaken references when a circular ref is found
+  - Added 02circular_off.t
+  - Added bin/packages.pl to scan all global variables for circular refs
+  - Cleaned 02circular.t - Thanks autarch
+  - Updated doc
+
+0.04
+  - Circular reference detection is smarter in presence of weak references
+  - Removed warnings from tests
+
+0.03 Tue Nov 05 23:25:00 2003
+  - Added support for weaken references in has_circular_ref()
+  - Added prototyping of XS functions
+  - Updated documentation
+
+0.02 Tue Nov 04 22:05:00 2003
+  - Fixed compilations issues with old versions of gcc - Thanks Leon
+  - has_utf8(), utf8_on() and utf8_off() now return the first parameter
+  - skip utf8 tests if perl version < 5.8.0
+  - Removed SIGNATURE from MANIFEST
+
+0.01 Fri Oct 31 14:00:00 2003
+  - original version

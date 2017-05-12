@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<config xmlns="http://www.daizucms.org/ns/config/">
+
+ <!-- How to connect to the database.  -->
+ <database dsn="dbi:Pg:dbname=web_geoff" />
+
+ <!-- How to connect to the Subversion repository.  -->
+ <repository url="file:///home/geoff/svn/repos/web_geoff" />
+
+ <!-- Which working copy should the live sites be generated from?
+      This will usually be '1' because that will be the ID number
+      assigned to the first working copy you check out.
+   -->
+ <live-working-copy id="1" />
+
+ <!-- Domains/email addresses to use, with associated dates of
+      ownership, for minting tag URIs as GUIDs for each file.
+      There must be exactly one global one to act as a default.
+   -->
+ <guid-entity entity="foobar.com,2006" />
+
+ <!-- Write all output for example.com into the directory where
+      Apache will look for it (assuming Apache has been told to).
+   -->
+ <output url="http://www.example.com/"
+         path        ="/var/www/example.com"
+         redirect-map="/var/www/example.com-redirect.map"
+         gone-map    ="/var/www/example.com-gone.map" />
+
+ <!-- The stuff in this <config> element will only apply to
+      content at or below the specified path.
+   -->
+ <config path="example.com">
+
+  <!-- Use a different domain and date for creating GUID URIs
+       for content on the 'example.com' website.
+    -->
+  <guid-entity entity="example.com,2006-03" />
+
+  <!-- Provide extra configuration for the Daizu::Gen generator,
+       when it is used on a particular website, to enable the
+       creation of a XML sitemap file (for Google and other
+       search engines).
+    -->
+  <generator class="Daizu::Gen">
+   <xml-sitemap />
+  </generator>
+
+ <!-- End of configuration specific to 'example.com'. -->
+ </config>
+
+ <!-- You'll need at least one plugin to load articles from
+      files.  This one is for files which have XHTML fragments
+      as their content.  -->
+ <plugin class="Daizu::Plugin::XHTMLArticle" />
+
+ <!-- Enable the syntax-highlighting plugin, which is supplied
+      with Daizu CMS.  -->
+ <plugin class="Daizu::Plugin::SyntaxHighlight" />
+
+ <!-- This plugin adds convenient 'anchors' to headings, so
+      that you can link to specific sections of pages.  -->
+ <plugin class="Daizu::Plugin::HeaderAnchor" />
+
+ <!-- Add missing width, height, alt, and title attributes to
+      images.  -->
+ <plugin class="Daizu::Plugin::ImageMetadata" />
+
+ <!-- Provide a box of 'related links' on some articles.  -->
+ <plugin class="Daizu::Plugin::RelatedLinks" />
+
+ <!-- Use templates from the filesystem instead of the
+      database.
+   -->
+ <template-test path="/home/geoff/svn/web_geoff" />
+
+</config>

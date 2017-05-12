@@ -1,0 +1,22 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [CopyrightYearFromGit]
+
+DESCRIPTION
+
+    This plugin will set copyright year to something like:
+
+     2017, 2015, 2014, 2013
+
+    where the years will be retrieved from 1) the date of git tags that
+    resemble version string (qr/^(version|ver|v)?\d/); 2) current date; and
+    will be listed in descending order in a comma-separated list. This
+    format is commonly used in books, where the year of each
+    revision/edition is mentioned, e.g.:
+
+     Copyright (c) 2013, 2010, 2008, 2006 by Pearson Education, Inc.
+
+SEE ALSO
+

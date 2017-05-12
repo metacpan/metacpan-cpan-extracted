@@ -1,0 +1,16 @@
+lib/Docs/Site_SVD/Data_SecsPack.pm
+MANIFEST
+Makefile.PL
+README
+lib/Data/SecsPack.pm
+t/Data/SecsPack.d
+t/Data/SecsPack.pm
+t/Data/SecsPack.t
+t/Data/SecsPackStress.d
+t/Data/SecsPackStress.pm
+t/Data/SecsPackStress.t
+t/Data/File/Package.pm
+t/Data/Test/Tech.pm
+t/Data/Data/Secs2.pm
+t/Data/Data/Startup.pm
+t/Data/Data/Str2Num.pm

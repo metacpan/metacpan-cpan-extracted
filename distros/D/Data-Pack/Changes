@@ -1,0 +1,18 @@
+Revision history for Perl extension Data-Pack
+
+1.101611  2010-06-10 16:13:21 Europe/Vienna
+    - fixed bug so that array elements are still processed in scalar context
+
+1.101610  2010-06-10 12:56:31 Europe/Vienna
+    - add tests for overlaid hashes
+    - pack_data() respects wantarray
+    - added pack_hash() and pack_array()
+
+1.100850  2010-03-26 10:47:31 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02  Wed 2009.10.21 16:51:05 CEST (Marcel Gruenauer <marcel@cpan.org>)
+    - major repo maintenance
+
+0.01  2008-10-08T15:53:00Z (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

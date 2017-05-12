@@ -1,0 +1,16 @@
+Revision history for DJabberd-VCard-LDAP
+
+0.04	2010-02-15
+	Add rpm spec file
+	ability to specify ldap version
+	make sure to include DJabberd::Log
+
+0.03	2007-09-04
+	Make sure to Base64 encode the jpegPhoto
+
+0.02    2007-08-23
+	More complete vCard.  Support substituting domain as well as userid in filter
+
+0.01    2007-08-23
+        First version, released on an unsuspecting world.
+

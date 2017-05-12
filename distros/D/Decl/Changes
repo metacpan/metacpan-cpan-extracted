@@ -1,0 +1,43 @@
+Revision history for Class-Declarative
+
+0.01    2010-02-15
+        Got this thing uploaded to CPAN, with unit tests actually checking it first.
+
+0.02    2010-02-16
+        Upon restarting my work with Wx, immediately found egregious errors I had failed to test in the unit tests.
+        Like the source filter didn't work because I changed the start function to be called.  Stupid stuff.
+
+0.03    2010-02-17
+        Added magic variables, did more little fixes.
+        
+0.04    2010-07-02
+        Wrote a new parsing engine back in April.  Got things working on a fresh install of Strawberry (moved to
+        a development laptop while traveling).
+
+0.05	2010-07-09
+	Sigh.  Forgot to add a file to MANIFEST.
+
+0.06	2010-07-10
+	Added another file to the manifest and fixed some little formatting issues.
+
+0.07    2010-12-05
+        Changes to permit direct 'use' of semantic modules (e.g. 'use Wx::Declarative;' instead of 'use Class::Declarative qw(Wx::Declarative)')
+        Added the ability to load a node using an arrayref of its components (first line, then children) instead of having to pass a text.
+        Probably other stuff, but those two are the main reasons this version is being published.
+
+0.08	2010-12-06
+	Removed dependency on Tie::ExtraHash (it's perl >= 5.10, oops)
+	Thanks, CPAN Daily Testers!
+	
+0.09    2011-sometime
+        Added DBI interface and magic code to access it
+        Numerous other small tweaks with use
+        
+0.10    2011-10-20
+        Renamed the whole damn thing to Decl to save typing and because it didn't really belong in Class:: anyway.
+        Reworked the tag-to-class mapping code to rely on a Decl-native node structure for definition.
+        Added a macro system and ... I'm not even sure what.
+        
+0.11    2011-10-20
+        Oh, right, *that* is why I never uploaded my Windows-built modules.
+        (See http://perl.bristolbath.org/blog/lyle/2009/01/packaging-cpan-modules-from-windows-in-linux-style.html)

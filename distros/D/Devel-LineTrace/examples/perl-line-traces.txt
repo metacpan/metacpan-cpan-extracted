@@ -1,0 +1,2 @@
+test.pl:12
+    print "\$n=$n\n\$next=$next\n\$this=$this\n"

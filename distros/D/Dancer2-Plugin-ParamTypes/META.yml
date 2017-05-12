@@ -1,0 +1,33 @@
+---
+abstract: 'Parameter type checking plugin for Dancer2'
+author:
+  - 'Sawyer X'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Test: '0'
+  Test::Memory::Cycle: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-ParamTypes
+provides:
+  Dancer2::Plugin::ParamTypes:
+    file: lib/Dancer2/Plugin/ParamTypes.pm
+    version: '0.003'
+requires:
+  Dancer2: '0'
+resources:
+  bugtracker: https://github.com/xsawyerx/dancer2-plugin-paramtypes/issues
+  repository: git://github.com/xsawyerx/dancer2-plugin-paramtypes.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,32 @@
+Revision history for Dancer-Plugin-SporeDefinitionControl
+
+0.14    2016-02-24, Nicolas Oudard
+        Fix typo in error message when a parameter is wrong (Simon Lenne)
+        manage form-data in check_spore_definition (Frederic Lechauve)
+
+0.13    2012-10-25, Nicolas Oudard
+        Load spore fiel on the first use instead of on the load of the module
+
+0.12    2012-10-24, Nicolas Oudard
+        new get_functions_from_request which return all function 
+          on specs which match to path and method
+
+0.11    2012-06-25, Nicolas Oudard
+        Change error returned if no route pattern is find
+
+0.10    2011-07-03, Nicolas Oudard
+        New before call from new Dancer version (Dams)
+
+0.08    2011-07-03, Nicolas Oudard
+        Allow functions to have the same route
+
+0.03    2010-12-23, Nicolas Oudard
+        Delete dependence of Dancer patch
+        Use at least Dancer version 1.3000
+
+0.02    2010-12-31, Nicolas Oudard
+        add tests
+
+0.01    2010-09-01, Nicolas Oudard
+        First version.
+

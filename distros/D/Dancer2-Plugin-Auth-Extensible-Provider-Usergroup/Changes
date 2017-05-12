@@ -1,0 +1,27 @@
+Revision history for Dancer2-Plugin-Auth-Extensible-Provider-Usergroup
+
+0.620 Fri  4 Nov 10:35:28 CET 2016
+
+    * Updates for compatibility with plugin v0.620
+      - croak unstead of return undef
+      - add config3 + schema3.ddl for tests
+      - update test script for new tests in plugin
+
+0.600   2016-04-01
+
+    Module is no longer deprecated.
+    Reworked to use new Dancer2 plugin2 by SysPete <peter@sysnix.com>.
+    Added base tests from Dancer2::Plugin::Auth::Extensible.
+   
+0.25	2015-12-07
+	This module is deprecated.
+	It uses plugins in pugins. That is deprecated in Dancer2.
+
+0.24	2015-03-22
+	Use realm_dsl
+
+0.23	2015-03-02
+	Fix Dancer2 deprecations
+
+0.22	2014-12-17
+	Dancer2 version of DPAEPU

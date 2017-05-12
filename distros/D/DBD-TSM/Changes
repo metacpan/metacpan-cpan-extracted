@@ -1,0 +1,64 @@
+** MODULE: DBD::TSM
+
+Revision history for Perl extension DBD::TSM
+
+** VERSION 0.01 - Sat Feb 26 20:51:46 2005
+
+Original version; created by h2xs 1.23 with options -A -X -n DBD::TSM
+
+** VERSION 0.02 - Sun Mar  6 21:54:06 CET 2005
+
+* BUG1:
+This message about DBD-TSM was sent to you by corion@corion.net <corion@corion.net> via rt.cpan.org
+
+Full context and any attached attachments can be found at:
+<URL: https://rt.cpan.org/Ticket/Display.html?id=11767 >
+
+Hello,
+
+the Makefile.PL distributed with DBD::TSM 0.01 enters an infinite loop 
+when no terminal is connected to give input, thus eating CPU ressources 
+when the module is installed unattended. The Makefile.PL should instead 
+bail out when it finds no terminal connected and can't find a 
+proper/fitting directory itself.
+
+Thank you,
+-max
+
+* RESPONSE:
+Right, I do not think about silent use of my Makefile.PL. I do a correction to improve this point.
+List of file changed:
+- Makefile.PL
+- Changes
+- README
+- DBD/TSM.pm (just change the version)
+
+** VERSION 0.03 - Thu Mar 10 21:16:37 CET 2005
+
+* BUG:
+forget configure.pl
+
+** VERSION 0.04 - Thu Jun 23 22:20:17 CEST 2005
+
+* BUG:
+Test failed with environment not set
+
+** VERSION 0.10 - Thu Jan 24 23:35:26 NFT 2008
+
+* BUG:
+Test failed for tables with join
+
+** VERSION 0.11 - Wed Mar 19 12:18:52 NFT 2008
+
+Add support to darwin platform during make. Optimize memory requirement
+for select statement. Not perfect, try an other method later.
+
+** VERSION 0.13 - Sun Apr 20 18:20:16 CEST 2008
+
+Resolve issue with CPAN upload
+
+** VERSION 0.14 - Wed Aug 20 00:37:25 CEST 2008
+
+Update test to work with Perl 5.10 CPAN Test
+
+

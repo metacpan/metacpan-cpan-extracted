@@ -1,0 +1,35 @@
+Revision history for Perl extension DBIx::Skinny::ProxyTable
+
+0.10    Fri Feb 11 11:40:17 JST 2011
+        - trivial update. fixed DBIx::Skinny's dependency.
+
+0.09    Thu Feb  3 23:47:28 JST 2011
+        - follow DBIx::Skinny 0.0732
+
+0.08    Tue Dec 21 08:33:32 JST 2010
+        - minor fix: test dependencies.
+
+0.07    Mon Dec  6 22:57:34 JST 2010
+        - follow DBIx::Skinny 0.0729
+        - fixed pod.
+
+0.06    Wed Apr 14 23:56:36 JST 2010
+        - fixed bug that many proxy_table instance cannot exist in a process. ( thanks nekokak )
+
+0.05    Fri Feb 26 06:31:42 JST 2010
+        - added rule: named_strftime, keyword
+
+0.04    Mon Feb 22 08:05:17 JST 2010
+        - fixed test for failing when DBD::SQLite is not installed.
+        - use Module::Install::Repository.
+
+0.03    Sat Feb 20 02:05:44 JST 2010
+        - fixed bug: not work sprintf (nekokak++)
+
+0.02    Thu Feb 18 22:20:07 JST 2010
+        - fixed bug: copy_table for mysql is broken.
+        - romeve search method
+        - fixed unneed dependency.
+
+0.01    Sun Jan 17 19:27:49 JST 2010
+        - original version

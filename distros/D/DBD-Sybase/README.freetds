@@ -1,0 +1,61 @@
+$Id: README.freetds,v 1.2 2003/04/03 19:07:00 mpeppler Exp $
+
+Using DBD::Sybase with FreeTDS
+==============================
+
+DBD::Sybase 1.00 or later works reasonably well with FreeTDS 0.61,
+but some capabilities are limited or not available.
+
+Build process:
+--------------
+
+FreeTDS normally installs in /usr/local, with the libraries in 
+/usr/local/lib and the include files in /usr/local/include. This
+location is assumed below.
+
+To build DBD::Sybase you need to set the SYBASE environment variable
+to /usr/local. When you now run "perl Makefile.PL" you will get
+warnings for a few missing libraries:
+	Note (probably harmless): No library found for -lcs
+	Note (probably harmless): No library found for -lsybtcl
+	Note (probably harmless): No library found for -lcomn
+	Note (probably harmless): No library found for -lintl
+This is OK because FreeTDS doesn't package the functions in the
+same libraries as Sybase.
+
+The "make test" process will fail for a number of tests:
+
+Failed Test Stat Wstat Total Fail  Failed  List of Failed
+-------------------------------------------------------------------------------
+t/exec.t       0   139    ??   ??       %  ??
+t/main.t                  16    2  12.50%  13-14
+t/xblob.t                  6    2  33.33%  5-6
+13 subtests skipped.
+
+This is expected.
+
+Missing Features:
+-----------------
+
+* ?-style placeholders are not supported.
+* Setting $dbh->{LongReadLen} doesn't work
+  Use $dbh->do("set textsize <value>") instead.
+* The special text/image handling functions don't work
+  (i.e. ct_fetch_data(), etc).
+* The $dbh->{syb_row_count} attribute doesn't work.
+  Use $dbh->do("set rowcount <value>") instead.
+* The $dbh->{syb_quoted_identifier} attribute doesn't work.
+  Use $dbh->do("set quoted_identifier <value>") instead.
+
+Bugs:
+-----
+
+FreeTDS 0.61 has a bug when executing queries that return 0 rows, 
+which manifests itself when trying to do a fetchrow_hashref()
+after such a query with the following error:
+
+    Can't get DBI::st=HASH(0x811cfa8)->{NAME}: unrecognised attribute at...
+
+This is fixed in the 0.62-dev version of FreeTDS.
+
+

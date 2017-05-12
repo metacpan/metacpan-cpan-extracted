@@ -1,0 +1,7 @@
+TYPEMAP
+my_unpacker_t*       T_MY_UNPACKER
+
+INPUT
+T_MY_UNPACKER
+    $var = ($type)mg_find(SvRV($arg), PERL_MAGIC_ext)->mg_obj;
+

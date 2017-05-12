@@ -1,0 +1,110 @@
+# NAME
+
+Dancer::Plugin::FontSubset - Generate font subsets on-the-fly
+
+# VERSION
+
+version 0.1.2
+
+# SYNOPSIS
+
+In config.yml:
+
+    plugins:
+        FontSubset:
+            fonts_dir:      public/fonts
+            font_base_url:  /font
+            use_cache:      0
+
+In the app:
+
+    package MyApp;
+
+    use Dancer;
+    use Dancer::Plugin::FontSubset;
+
+    ...
+
+in the template:
+
+    <html>
+    <head>
+        <script src="/javascripts/jquery.js"></script>
+        <script src="/font/subset.js"></script>
+    </head>
+    <body>
+        <h1 class="subfont" data-font="my_font">Hi there</h1>
+    </body>
+
+# DESCRIPTION
+
+_Dancer::Plugin::FontSubset_ generate subsets of the glyphs of given fonts,
+a little like what [Google Font provides](https://developers.google.com/fonts/docs/getting\_started\#Optimizing\_Requests).
+Currently, _Dancer::Plugin::FontSubset_ only works for a subset TTF fonts. Always test that any
+given font will work well with the plugin before throwing it in a production
+system.
+
+## Basic Usage
+
+to use this plugin, put your fonts in the directory `public/fonts`. The
+original font file can be accessed via the url `/fonts/thefont.tff` (natch),
+and its subsets via the route `/font/thefont.ttf?t=abc`, where the characters 
+to be included in the subset are passed via the _t_ parameter. For example,
+the url required to generate the font subset required to render 'Hello world'
+would be `/font/thefont.ttf?t=%20Helowrd` (including the whitespace (%20) is 
+important, as it is often a glyph by its own right).
+
+## JQuery Helping Script
+
+A JQuery utility script is also available at `/font/subset.js`. If the script
+is loaded by a page, it will find all elements having the _subfont_ class,
+generate the characters required and query the application for the subset of
+whichever font provided in the _data-font_ attribute. In other words, 
+
+    <html>
+    <head>
+        <script src="/javascripts/jquery.js"></script>
+        <script src="/font/subset.js"></script>
+    </head>
+    <body>
+        <h1 class="subfont" data-font="my_font">Hi there</h1>
+    </body>
+    </html>
+
+is all that is required to have the `h1` element of this document 
+rendered using the appropriate subset of the `my_font.ttf` font.
+
+## Caching
+
+To improve performance you can enable caching, which will use 
+[Dancer::Plugin::Cache::CHI](http://search.cpan.org/perldoc?Dancer::Plugin::Cache::CHI) to cache the generated font subsets.
+
+# CONFIGURATION PARAMETERS
+
+## fonts\_dir
+
+The system directory containing the fonts. Defaults to `public/fonts`.
+
+## font\_base\_url
+
+The root route for the subset fonts. Defaults to `/font`.
+
+## use\_cache
+
+Boolean indicating if caching should be used. Defaults to _false_. If set to
+true, the application will also use [Dancer::Plugin::Cache::CHI](http://search.cpan.org/perldoc?Dancer::Plugin::Cache::CHI).
+
+# SEE ALSO
+
+[Font::TTF::Font](http://search.cpan.org/perldoc?Font::TTF::Font)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

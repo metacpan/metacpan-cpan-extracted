@@ -1,0 +1,55 @@
+This example demonstrates how to build presentations handouts and
+slides using DocSet. 
+
+To build run: 
+
+  % bin/build -df
+
+(after you have installed DocSet, -f forces rebuild, -d generates pdfs)
+
+What you get is dst_html/ which includes the HTML version of the
+slides and the PDF versions linked with [PDF] buttons. Notice that the
+slides/ directory builds the slides PDF in the Landscape mode, whereas
+the handouts/ directory builds a normal Portrait mode book. You can
+then view them with:
+
+  % acroread dst_html/slides/mod_perl-2.0.pdf
+  % acroread dst_html/handouts/mod_perl-2.0.pdf
+
+and HTML version by going to /whereever/you/build/them/dst_html/.
+
+Notice that the POD files in src/slides dir are written in simplified
+POD, where all bullets are simple * or * *. There are other
+simplification there. To learn more about it see this example's
+presentation files in src/slides/ and read the DocSet::Source::POD and
+DocSet::Doc::POD2HTMLPS manpages.
+
+Notice that both handouts and slides were cut to the very minimum so
+not to take much space, but include enough material to demonstrate all
+the available features/syntax. 
+
+Notice that the default config is to enumerate all the
+sections. Therefore if you prepare the src/handouts first and then
+copy them over to the src/slides directory and keep the same section
+order/names the numbers will match, making it easier for your audience
+to match the slides to their handouts during the presentation. (In
+this example it's messed up because I've cut off many things to save
+space.)
+
+That's how I present my slides. Write and polish the pod files in
+src/handouts/, then copy them to src/slides/, reduce them to slides
+and I'm done.
+
+Notice that you can include several chapters and can mix pod, html,
+just like any other DocSet project. See the ../site/ example for more
+details.
+
+---
+
+If you want to build your own presentation, simple start off this
+example and change things to fit your content/style. For more info
+read the DocSet manpages.
+
+Questions can be asked at the template-docset mailing list. For
+mailing list archives and subscription information please see:
+http://template-toolkit.org/mailman/listinfo/template-docset

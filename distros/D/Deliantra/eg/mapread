@@ -1,0 +1,5 @@
+#!/opt/perl/bin/perl
+# DELIANTRA_LIBDIR=/opt/deliantra/share/deliantra-server/ eg/mapread ../maps/scorn/kar/drink 
+use Deliantra;
+
+my $m = Deliantra::read_arch ($ARGV[0]);

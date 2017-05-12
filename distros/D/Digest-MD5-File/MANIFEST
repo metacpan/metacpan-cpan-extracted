@@ -1,0 +1,11 @@
+Changes
+File.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+t/hello-world
+t/teststruct/a
+t/teststruct/b
+t/teststruct/subdir/c
+META.yml                                Module meta-data (added by MakeMaker)

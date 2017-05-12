@@ -1,0 +1,68 @@
+{
+   "abstract" : "Guess distribution name from the current directory",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.046, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-NameFromDirectory",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.300030",
+            "Path::Tiny" : "0.053",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Dist-Zilla-Plugin-NameFromDirectory/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Dist-Zilla-Plugin-NameFromDirectory",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Dist-Zilla-Plugin-NameFromDirectory.git",
+         "web" : "https://github.com/miyagawa/Dist-Zilla-Plugin-NameFromDirectory"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ]
+}
+

@@ -1,0 +1,97 @@
+Revision history for Data-CSel
+
+0.11    2016-11-23 (PERLANCAR)
+
+	- csel(): Add options {get,set}_{parent,children}_method to allow
+	  customizing method names.
+
+
+0.10    2016-09-10 (PERLANCAR)
+
+	- [Bugfix] Workaround the problem of backtracking in the case of
+	  attribute selector [foo() eq 1] or [foo.bar.baz() ne 2] (a
+	  combination of paren in the last attribute name and an
+	  alphanumeric operator) messing up the result.
+
+	- Add (*PRUNE) to avoid backtracking in the case of foobar in
+	  [foobar(,)=1] to fooba, foob, ...
+
+
+0.09    2016-09-01 (PERLANCAR)
+
+	- Support method call e.g. T[attr("arg1",2)] as well as chained
+	  attribute/method calls e.g. T[attr1.attr2().attr3(1,2) = 42].
+
+	- [doc] Mention Data::CSel::WrapStruct & CSel::Examples.
+
+
+0.08    2016-05-31 (PERLANCAR)
+
+	- Temporarily set minimum perl version to 5.20.0 because of failing
+	  test reports for 5.18.4 and earlier perls [CT].
+
+
+0.07    2016-04-03 (PERLANCAR)
+
+	- [Experimental] Allow chained attribute in attribute selector,
+	  e.g. [date.month = 12].
+
+
+0.06    2016-04-02 (PERLANCAR)
+
+	- [Bugfix] Bump prereq version Code::Includable::Tree::NodeMethods
+	  to 0.09 where ancestors() starts to appear.
+
+	- [Bugfix] Parser fix: regex literal was too eager.
+
+
+0.05    2016-04-01 (PERLANCAR)
+
+	- [Optimization] Make :has and :not more efficient/less stupid.
+
+	- [Optimization] Don't repeatedly recompile main regex pattern.
+
+
+0.04    2016-03-23 (PERLANCAR)
+
+	- Introduce option: class_prefixes.
+
+	- csel(): Die on expression parse error.
+
+	- POD formatting, L<blah|/Section> links are not always properly
+	  rendered in metacpan.org.
+
+
+0.03    2016-03-23 (PERLANCAR)
+
+	- [ux] Word string value in attribute selector, and selector
+	  argument for pseudo-classes :has & :not can be unquoted, for
+	  convenience (like in CSS selector).
+
+
+0.02     2016-03-22 (PERLANCAR)
+
+         This release improves "compatibility" with CSS selector.
+
+         - [Incompatible change] Type selector no longer uses isa() but string
+           comparison of class name. This means the expression 'T' only matches
+           objects of class T and not subclasses of T. To match subclasses, use
+           the newly implemented class selector.
+
+         - Implement class (.CLASS) and ID selector (#ID).
+
+         - Type or universal selector is optional if there is at least one
+           attribute/class/ID selector or pseudo-classes, like in CSS selector
+           syntax.
+
+         - Allow <> inequality operator in addition to !=.
+
+         - Add pseudo-classes: :root & :empty.
+
+         - [Internal] Reuse methods from Class::Includable::Tree::NodeMethods to
+           avoid code duplication.
+
+
+0.01     2016-03-20 (PERLANCAR)
+
+         - First release.

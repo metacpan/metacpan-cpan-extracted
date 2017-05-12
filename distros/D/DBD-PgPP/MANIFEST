@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/DBD/PgPP.pm
+README
+DEVEL_NOTES
+t/old/00_load.t
+t/old/05_connect.t
+t/old/06_setup.t
+t/old/07_insert.t
+t/old/08_select.t
+t/old/09_update.t
+t/old/10_delete.t
+t/old/11_transaction.t
+t/old/12_errorhandle.t
+t/old/99_cleanup.t
+t/new/00_basic.t
+t/new/01_connect.t
+t/new/10_fetch.t
+t/new/11_nested.t
+t/new/12_lastinsertid.t
+t/new/13_statement_parse.t
+script/pgsql.pl
+META.yml                                 Module meta-data (added by MakeMaker)

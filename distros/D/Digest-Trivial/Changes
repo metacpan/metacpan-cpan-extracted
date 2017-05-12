@@ -1,0 +1,10 @@
+Version 2010011301 Wed Jan 13 22:05:38 CET 2010
++ Kwalitee test changed to an author only one
+
+Version 2009112401
++ POD & Kwalitee tests
++ Mention all requirements in Makefile.PL
++ Test::NoWarnings & done_testing
+
+Version 2009070801
++ Initial Release

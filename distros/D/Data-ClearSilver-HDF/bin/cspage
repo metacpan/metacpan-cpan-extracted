@@ -1,0 +1,94 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use ClearSilver;
+use Getopt::Long;
+use Data::ClearSilver::HDF;
+use Pod::Usage;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+my ($defines, $output, $input, $csfile, $help);
+
+GetOptions(
+    "define=s@" => \$defines,
+    "output-hdf=s" => \$output,
+    "input-hdf=s" => \$input,
+    "help|?" => \$help,
+);
+
+$csfile = shift @ARGV;
+
+pod2usage(1) if $help;
+
+my $data = {};
+
+for my $define (@$defines) {
+    my ($key, $val) = split(/=/, $define);
+    $key = join("", map {q|{|. $_ .q|}|} split(/\./, $key));
+    eval q|$data->|.qq|$key = |.q|$val;|;
+}
+
+if ($csfile && -e $csfile) {
+	my $hdf;
+
+	if ($input) {
+		$hdf = ClearSilver::HDF->new;
+		$hdf->readFile($input);
+	}
+	else {
+		$hdf = Data::ClearSilver::HDF->hdf($data);
+	}
+
+	my $cs = ClearSilver::CS->new($hdf);
+	$cs->parseFile($csfile);
+	print $cs->render;
+}
+else {
+	my $hdf = Data::ClearSilver::HDF->hdf($data);
+
+	if ($output) {
+		$hdf->writeFile($output);
+	}
+	else {
+		print Data::ClearSilver::HDF->hdf_dump($hdf);
+	}
+}
+
+1;
+
+=head1 NAME
+
+cspage -- Generate ClearSilver HDF, Render CS Template
+
+=head1 SYNOPSIS
+
+cspage [options] [file.cs]
+
+ Options:
+   -? -help                  Display this help and exits
+   --define var=value        Define template variable
+                             If you want to create nested variable, 
+                             you should specify dot speparated var name.
+   --output-hdf filename     Save as hdf file.
+   --input-hdf filename      Load from hdf file.
+
+ See also:
+   perldoc Data::ClearSilver::HDF
+
+=head1 DESCRIPTION
+
+Generate ClearSilver HDF format/file.
+
+=head1 AUTHOR
+
+Toru Yamaguchi <zigorou@cpan.org>
+
+=head1 COPYRIGHT
+
+This library is free software, you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

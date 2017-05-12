@@ -1,0 +1,116 @@
+0.032     2016-11-23 16:07:57 EST
+  - Add irc option to set x_IRC resource metadata
+
+0.031     2016-09-29 15:35:49 EDT
+  - Regenerate files for release commit automatically
+
+0.030     2016-09-29 15:20:00 EDT
+  - Also set munge_build_pl = 0 for BumpVersionAfterRelease
+
+0.029     2016-09-29 15:14:30 EDT
+  - RewriteVersion does not modify files in tree so [Git::Commit] does not need to allow for that
+
+0.028     2016-09-29 15:04:43 EDT
+  - Regenerated files no longer need to be allowed in [Git::Check] and [Git::Commit] on release
+
+0.027     2016-09-29 13:50:21 EDT
+  - Use [Regenerate] instead of [CopyFilesFromBuild] to regenerate files in root
+  - Because of this, files previously copied from the build to the repository
+    during `dzil build`, `dzil test`, or `dzil release` will now require running
+    `dzil regenerate` to update.
+
+0.026     2016-07-22 02:07:45 EDT
+  - Bump required version of [Test::ReportPrereqs] for Module::Metadata version extractor option
+
+0.025     2016-07-21 14:37:00 EDT
+  - Generate CONTRIBUTING.md in build and copy from build to root
+  - Add basic bundle and minter tests
+  - Add perl 5.24 to travis config in minting profile
+
+0.024     2016-05-02 14:25:27 EDT
+  - Use Module::Metadata as the version_extractor for Test::ReportPrereqs if
+    ExtUtils::MakeMaker is not the installer
+
+0.023     2016-05-02 13:33:42 EDT
+  - Add [MetaConfig] and [Test::ReportPrereqs]
+
+0.022     2016-03-14 17:38:19 EDT
+  - Use [RunExtraTests] instead of [ExtraTests], so xt/ tests will not be
+    copied to t/ in the released distribution.
+
+0.021     2015-11-13 13:24:55 EST
+  - Add PluginRemover role to allow -remove option
+
+0.020     2015-09-18 10:10:44 EDT
+  - Update copied files on build instead of release
+  - Don't add self to develop-requires
+
+0.019     2015-09-08 18:24:07 EDT
+  - Generate INSTALL document
+  - Add CONTRIBUTING.md to minting profile, and exclude root-level CONTRIBUTING
+    documents from distribution gathering
+  - Allow setting an empty value for github_user to use [GithubMeta] default
+
+0.018     2015-09-02 19:03:32 EDT
+  - Allow for version rewriting in script or bin in git commits
+
+0.017     2015-09-02 01:01:32 EDT
+  - Exclude both installer files from Git::GatherDir
+
+0.016     2015-08-31 16:14:04 EDT
+  - Allow [ModuleBuildTiny::Fallback] as installer
+
+0.015     2015-08-28 18:21:03 EDT
+  - Add script/ as another ExecDir for [ModuleBuildTiny] compatibility
+
+0.014     2015-08-28 16:43:08 EDT
+  - Fix installer option to allow for Build.PL when using [ModuleBuildTiny]
+
+0.013     2015-08-28 15:24:52 EDT
+  - Add [ModuleBuildTiny] as prereq to support installer option
+  - Remove makemaker option in favor of installer = MakeMaker::Awesome
+
+0.012     2015-08-28 14:59:32 EDT
+  - Add installer option
+
+0.011     2015-08-17 12:24:04 EDT
+  - Remove now unnecessary mma_* options
+
+0.010     2015-08-16 22:25:27 EDT
+  - Add pluginbundle role Config::Slicer so options can be specified for any plugin
+  - Add .travis.yml to minting profile
+
+0.009     2015-08-15 14:11:22 EDT
+  - add pod_tests option to use PodSyntaxTests and PodCoverageTests
+
+0.008     2015-08-10 13:32:38 EDT
+  - add minting profile
+
+0.007     2015-07-27 13:01:26 EDT
+  - add Git::Contributors and MetaNoIndex for better metadata
+  - generate dist README with ReadmeAnyFromPod instead of Readme
+
+0.006     2015-07-27 11:51:10 EDT
+  - Git-add files newly created during build
+  - Support FAKE_RELEASE=1 env var
+
+0.005     2015-07-27 10:24:59 EDT
+  - Depend on plugins explicitly used
+  - Add package of $self as prereq to allow subclassing
+
+0.004     2015-06-27 00:11:59 EDT
+  - Turn off munge_makefile_pl in BumpVersionAfterRelease
+
+0.003     2015-05-22 23:38:07 EDT
+  - Always use cpanfile
+  - Include files from release in root to allow installation without Dist::Zilla
+  - Remove from_cpanfile and include_license options
+  - Plugin bundle adds itself as develop requires
+
+0.002     2015-04-10 02:23:03 EDT
+  - Update Changes datetime format
+  - Use Git::GatherDir
+  - Add some more options
+
+0.001     2015-04-08 23:29:46-04:00 America/New_York
+  - First release

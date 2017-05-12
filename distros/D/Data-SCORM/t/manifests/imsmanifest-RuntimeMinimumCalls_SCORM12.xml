@@ -1,0 +1,224 @@
+<?xml version="1.0" standalone="no" ?>
+<!--
+Minimum calls, run-time example. . SCORM 1.2.
+
+Provided by Rustici Software - http://www.scorm.com
+
+This example builds upon the single file per SCO example to add the bare minimum SCORM 
+run-time calls.
+-->
+
+<manifest identifier="com.scorm.golfsamples.runtime.minimumcalls.12" version="1"
+       xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+       xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd
+                           http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd
+                           http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+  
+  <metadata>
+    <schema>ADL SCORM</schema>
+    <schemaversion>1.2</schemaversion>
+  </metadata>
+  <organizations default="golf_sample_default_org">
+    <organization identifier="golf_sample_default_org">
+      <title>Golf Explained - Minimum Run-time Calls</title>
+
+      <item identifier="playing_item">
+        <title>Playing the Game</title>
+        <item identifier="playing_playing_item" identifierref="playing_playing_resource">
+          <title>How to Play</title>
+        </item>
+        <item identifier="playing_par_item" identifierref="playing_par_resource">
+          <title>Par</title>
+        </item>
+        <item identifier="playing_scoring_item" identifierref="playing_scoring_resource">
+          <title>Keeping Score</title>
+        </item>
+        <item identifier="playing_otherscoring_item" identifierref="playing_otherscoring_resource">
+          <title>Other Scoring Systems</title>
+        </item>
+        <item identifier="playing_rules_item" identifierref="playing_rules_resource">
+          <title>The Rules of Golf</title>
+        </item>
+        <item identifier="playing_quiz_item" identifierref="playing_quiz_resource" parameters="?questions=Playing">
+          <title>Playing Golf Quiz</title>
+        </item>
+      </item>
+      <item identifier="etiquette_item">
+        <title>Etiquette</title>
+        <item identifier="etiquette_course_item" identifierref="etiquette_course_resource">
+          <title>Taking Care of the Course</title>
+        </item>
+        <item identifier="etiquette_distracting_item" identifierref="etiquette_distracting_resource">
+          <title>Avoiding Distraction</title>
+        </item>
+        <item identifier="etiquette_play_item" identifierref="etiquette_play_resource">
+          <title>Playing Politely</title>
+        </item>
+        <item identifier="etiquette_quiz_item" identifierref="etiquette_quiz_resource" parameters="?questions=Etiquette">
+          <title>Etiquette Quiz</title>
+        </item>
+      </item>
+      <item identifier="handicapping_item">
+        <title>Handicapping</title>
+        <item identifier="handicapping_overview_item" identifierref="handicapping_overview_resource">
+          <title>Handicapping Overview</title>
+        </item>
+        <item identifier="handicapping_calchandi_item" identifierref="handicapping_calchandi_resource">
+          <title>Calculating a Handicap</title>
+        </item>
+        <item identifier="handicapping_calcscore_item" identifierref="handicapping_calcscore_resource">
+          <title>Calculating a Handicapped Score</title>
+        </item>
+        <item identifier="handicapping_example_item" identifierref="handicapping_example_resource">
+          <title>Handicapping Example</title>
+        </item>
+        <item identifier="handicapping_quiz_item" identifierref="handicapping_quiz_resource" parameters="?questions=Handicapping">
+          <title>Handicapping Quiz</title>
+        </item>
+      </item>
+      <item identifier="havingfun_item">
+        <title>Having Fun</title>
+        <item identifier="havingfun_howto_item" identifierref="havingfun_howto_resource">
+          <title>How to Have Fun Playing Golf</title>
+        </item>
+        <item identifier="havingfun_makefriends_item" identifierref="havingfun_makefriends_resource">
+          <title>How to Make Friends Playing Golf</title>
+        </item>
+        <item identifier="havingfun_bestylish_item" identifierref="havingfun_bestylish_resource">
+          <title>How to Look Stylish Playing Golf</title>
+        </item>
+        <item identifier="havingfun_quiz_item" identifierref="havingfun_quiz_resource" parameters="?questions=HavingFun">
+          <title>Having Fun Quiz</title>
+        </item>
+      </item>
+
+    </organization>
+  </organizations>
+
+  <resources>
+    <!-- Note that with the addition of run-time calls, we changed the scormtype to SCO.-->
+    <resource identifier="playing_playing_resource" type="webcontent" adlcp:scormtype="sco" href="Playing/Playing.html">
+      <file href="Playing/Playing.html"/>
+      <file href="Playing/playing.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="playing_par_resource" type="webcontent" adlcp:scormtype="sco" href="Playing/Par.html">
+      <file href="Playing/Par.html"/>
+      <file href="Playing/par.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="playing_scoring_resource" type="webcontent" adlcp:scormtype="sco" href="Playing/Scoring.html">
+      <file href="Playing/Scoring.html"/>
+      <file href="Playing/scoring.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="playing_otherscoring_resource" type="webcontent" adlcp:scormtype="sco" href="Playing/OtherScoring.html">
+      <file href="Playing/otherscoreing.jpg"/>
+      <file href="Playing/OtherScoring.html"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="playing_rules_resource" type="webcontent" adlcp:scormtype="sco" href="Playing/RulesOfGolf.html">
+      <file href="Playing/rules.jpg"/>
+      <file href="Playing/RulesOfGolf.html"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="playing_quiz_resource" type="webcontent" adlcp:scormtype="sco" href="shared/assessmenttemplate.html">
+      <file href="Playing/questions.js"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="etiquette_course_resource" type="webcontent" adlcp:scormtype="sco" href="Etiquette/Course.html">
+      <file href="Etiquette/Course.html"/>
+      <file href="Etiquette/course.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="etiquette_distracting_resource" type="webcontent" adlcp:scormtype="sco" href="Etiquette/Course.html">
+      <file href="Etiquette/Distracting.html"/>
+      <file href="Etiquette/distracting.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="etiquette_play_resource" type="webcontent" adlcp:scormtype="sco" href="Etiquette/Play.html">
+      <file href="Etiquette/Play.html"/>
+      <file href="Etiquette/play.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="etiquette_quiz_resource" type="webcontent" adlcp:scormtype="sco" href="shared/assessmenttemplate.html">
+      <file href="Etiquette/questions.js"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="handicapping_overview_resource" type="webcontent" adlcp:scormtype="sco" href="Handicapping/Overview.html">
+      <file href="Handicapping/Overview.html"/>
+      <file href="Handicapping/overview.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="handicapping_calchandi_resource" type="webcontent" adlcp:scormtype="sco" href="Handicapping/CalculatingHandicap.html">
+      <file href="Handicapping/calchandi.jpg"/>
+      <file href="Handicapping/CalculatingHandicap.html"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="handicapping_calcscore_resource" type="webcontent" adlcp:scormtype="sco" href="Handicapping/CalculatingScore.html">
+      <file href="Handicapping/calcscore.jpg"/>
+      <file href="Handicapping/CalculatingScore.html"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="handicapping_example_resource" type="webcontent" adlcp:scormtype="sco" href="Handicapping/CalculatingScore.html">
+      <file href="Handicapping/Example.html"/>
+      <file href="Handicapping/example.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="handicapping_quiz_resource" type="webcontent" adlcp:scormtype="sco" href="shared/assessmenttemplate.html">
+      <file href="Handicapping/questions.js"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="havingfun_howto_resource" type="webcontent" adlcp:scormtype="sco" href="HavingFun/HowToHaveFun.html">
+      <file href="HavingFun/HowToHaveFun.html"/>
+      <file href="HavingFun/fun.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="havingfun_makefriends_resource" type="webcontent" adlcp:scormtype="sco" href="HavingFun/MakeFriends.html">
+      <file href="HavingFun/friends.jpg"/>
+      <file href="HavingFun/MakeFriends.html"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="havingfun_bestylish_resource" type="webcontent" adlcp:scormtype="sco" href="HavingFun/HowToBeStylish.html">
+      <file href="HavingFun/HowToBeStylish.html"/>
+      <file href="HavingFun/stylish.jpg"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <resource identifier="havingfun_quiz_resource" type="webcontent" adlcp:scormtype="sco" href="shared/assessmenttemplate.html">
+      <file href="HavingFun/questions.js"/>
+      <dependency identifierref="common_files" />
+    </resource>
+
+    <!--The shared files remain as an asset-->
+    <resource identifier="common_files" type="webcontent" adlcp:scormtype="asset">
+      <file href="shared/assessmenttemplate.html"/>
+      <file href="shared/background.jpg"/>
+      <file href="shared/cclicense.png"/>
+      <file href="shared/contentfunctions.js"/>
+      <file href="shared/launchpage.html"/>
+      <file href="shared/scormfunctions.js"/>
+      <file href="shared/style.css"/>
+    </resource>
+
+  </resources>
+</manifest>

@@ -1,0 +1,45 @@
+NAME
+    Devel::OverrideGlobalRequire - Override CORE::GLOBAL::require safely
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+      use Devel::OverrideGlobalRequire;
+
+      override_global_require( sub { ... } );
+
+DESCRIPTION
+    This module overrides "CORE::GLOBAL::require" with a code reference in a
+    way that plays nice with any existing overloading and ensures the right
+    calling package is in scope.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-OverrideGlobalR
+    equire>. You will be notified automatically of any progress on your
+    issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-OverrideGl
+    obalRequire.git;a=summary>
+
+      git clone git://git.shadowcat.co.uk/p5sagit/Devel-OverrideGlobalRequire.git
+
+AUTHORS
+    *   Peter Rabbitson <ribasushi@cpan.org>
+
+    *   Andrew Main <zefram@cpan.org>
+
+    *   David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Peter Rabbitson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

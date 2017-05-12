@@ -1,0 +1,44 @@
+Revision history for Perl extension Data::TableAutoSum.
+
+0.08  Mon Aug 12
+        - implemented is_equal method
+
+0.07  Thu Aug 08
+        - implemented contains_row and contains_col methods
+
+0.06  The Aug 01
+        - implemented merge operation to merge two tables
+        - refacturing: used Tie::CSV_File to implement the store and read methods
+        - added Tie::CSV_File to the requirements
+
+0.05  Tue Jul 30
+        - implemented change(\&change_method) method
+
+0.04  Mon Jul 29
+        - implemented named rows/columns
+        - fixed result test to avoid floating point error
+        - fixed typo in doc
+        - removed dependendancy of Perl 5.8.0
+
+0.03  Fri Jul 26
+        - implemented the 
+          ->store($filename)
+          ->read($filename)
+          methods
+        - added Tie::File to the requirements
+
+0.02  Thu Jul 25
+        - implemented ->as_string method without any arguments
+
+0.01  Wed Jul 24
+	- original version; created by h2xs 1.22 with options
+		-XA Data::TableAutoSum
+        - implemented
+           ->new(rows => $nr_of_rows,
+                           cols => $nr_of_cols)
+           ->data($row,$col,$new_value) : lvalue
+           ->rows()
+           ->cols()
+           ->rowresult($row)
+           ->colresult($col)
+           ->totalresult() 

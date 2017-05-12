@@ -1,0 +1,69 @@
+=head1 NAME
+
+DBIx::TransactionManager::Developers - docs for developers
+
+=head1 DESCRIPTION
+
+This document describes a document for O/R mapper writer and/or DBIx::* writer.
+
+=head1 MORE DOCUMETNS for DBIx::TransactionManager class
+
+=over 4
+
+=item my $txn = $tm->txn_scope(%args)
+
+Create a new DBIx::TransactionManager::ScopeGuard's instance object.
+
+You can pass an optional argument to C<%args>, to tell the scope guard
+where the scope was generated, like so:
+
+    package Foo;
+    use Moose;
+    sub mymethod {
+        my $self = shift;
+        my $txn = $tm->txn_scope( caller => [ caller() ] );
+        return $txn;
+    }
+
+    package main;
+    my $obj = Foo->new();
+    my $txn = $obj->mymethod();
+
+This will allow the guard object to report the caller's location
+from the perspective of C<mymethod()>, not where C<txn_scope()> was
+called.
+
+see L</DBIx::TransactionManager::ScopeGuard's METHODS>
+
+=item $tm->txn_begin(%args)
+
+Start the transaction.
+
+C<txn_begin> may optionally take a 'caller' argument. This will allow you to
+provide caller information which will be used in C<in_transaction>. For example
+if you have a wrapper function that calls C<txn_begin>, you may want to 
+let the user think that the caller was one stack above your wrapper.
+
+    # use __my__ caller!
+    $tm->txn_begin( caller => [ caller(0) ] ); 
+
+=item $tm->txn_commit()
+
+Commit the current transaction.
+
+If the C<$dbh> is in a nested transaction, TransactionManager doesn't do COMMIT at here. TM just poped transaction stack and do nothing.
+
+=item $tm->txn_rollback()
+
+Rollback the current transaction.
+
+If the C<$dbh> is in a nested transaction, TransactionManager doesn't do ROLLBACK at here. TM just poped transaction stack and do nothing.
+
+=item $tm->in_transaction() : Bool
+
+Returns true if $txn is currently in a middle of a transaction. While normally
+you only need to use this value as a boolean, it actually returns a hashref
+consisting of 'caller' and 'pid' element. This will tell you exactly where
+the currently valid transaction started.
+
+=back

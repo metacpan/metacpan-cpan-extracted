@@ -1,0 +1,47 @@
+DBIx-Knowledge version 1.13
+===========================
+
+DBIx::Knowledge provides a Business Intelligence framework to
+create reports and drill-down into an aggregated data set (database
+table or view). Furthermore, the available fields and data points
+to choose from may be managed from a web UI.
+
+See SmartCruddy! for a quick-start and example implementation:
+
+L<http://www.thesmbexchange.com/smartcruddy/index.html>
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  POSIX
+  HTML::Entities
+  CGI::AutoForm
+  CGI::CRUD
+  DBI
+  DBIx::IO
+
+  A DBD driver for your RDBMS, currently only DBD::Oracle
+  is supported.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2012 Reed Sandberg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.
+

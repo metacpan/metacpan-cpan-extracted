@@ -1,0 +1,27 @@
+---
+abstract: 'A Client to access the Babel web service.'
+author:
+  - 'Victor Cassen <phonybone@gmail.com>'
+build_requires:
+  Carp: 0
+  Class::AutoClass: 1.54
+  Data::Dumper: 0
+  HTTP::Request::Common: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Babel-Client
+provides:
+  Data::Babel::Client:
+    file: lib/Data/Babel/Client.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

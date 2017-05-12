@@ -1,0 +1,50 @@
+Revision history for perl module DBIx::TxnPool
+
+0.12 2015-11-26
+    - fix bug - sometimes callback the txn_commit was not called
+    - commit improvements
+
+0.11 2015-11-13
+    - (improvement) The deadlock definition was changed - now by err codes not by regexp of errstr
+    - (fix) DESTROY method now localises $@ and doesn't do finish method if a deadlock limit was reached
+    - (improvement) Few fixes of docs
+
+0.10 2014-06-12
+    - Improved docs.
+    - Fix small bug as i think (but i am not sure)
+
+0.09 2014-02-16
+    - Added the signal blocking for minimizing "MySQL lost connection" errors.
+    - Added test for the signal blocking
+
+0.08 2013-12-09
+    - Added 'txn_sort' shortcut for sorting method of data before transaction.
+      It will reduce deadlock events. Added test for this (author's tests in xt/*).
+    - Some inside improvements of code
+
+0.07 2013-11-27
+    - 'die' directives were been changed to 'croak' fot the better diagnostics
+    - Increased incremental delay for repeated deadlocks
+
+0.06 2013-11-14
+    - Changed the searched string for deadlock conflicts in MySQL
+      Now it's the string "try restarting transaction" because some time not only deadlocks occur but some other locks
+
+0.05 2013-10-24
+    - Removed MYMETA.* files from MANIFEST and added to exclude lists (.gitignore & MANIFEST.SKIP)
+      (Thanks to dolmen@cpan.org)
+
+0.04 2013-08-31
+    - Added 'txn_commit' shortcut as 'commit' callback
+    - Some code improvements
+    - Added 'dbh' accessor
+    - All callbacks now get a $pool object and may be $item as second argument
+
+0.03 2013-08-28
+    - Some doc fixes
+
+0.02 2013-08-27
+    - Some fixes
+
+0.01 2013-08-27
+    - Final release for CPAN

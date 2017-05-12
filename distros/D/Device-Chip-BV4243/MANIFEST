@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/dump-eeprom
+examples/echo
+lib/Device/Chip/BV4243.pm
+MANIFEST			This list of files
+t/00use.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

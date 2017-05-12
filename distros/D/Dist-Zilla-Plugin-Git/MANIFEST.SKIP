@@ -1,0 +1,11 @@
+~$
+\$$
+^\#
+^blib/
+\bcjm_
+^pm_to_blib$
+^Dist-Zilla-Plugin-Git-\d
+^_build\b
+^Build$
+^Build.bat$
+^tmp/

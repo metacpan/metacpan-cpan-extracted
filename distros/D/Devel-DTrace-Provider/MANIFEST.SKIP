@@ -1,0 +1,13 @@
+.*\.o
+.*~
+\.git
+blib
+.*\.a
+t/dtrace_lib.pl
+Provider.c
+Provider.bs
+MYMETA.*
+^Makefile$
+MANIFEST.bak
+tar.gz$
+test_usdt\d*$

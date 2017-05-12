@@ -1,0 +1,10 @@
+
+
+This archive contains the distribution DBIx-Pg-CallFunction, version
+0.019:
+
+  Simple interface for calling PostgreSQL functions from Perl
+
+This software is copyright (c) 2012 by Joel Jacobson <joel@trustly.com>.
+
+This software is released under the MIT license.

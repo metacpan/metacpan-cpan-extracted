@@ -1,0 +1,42 @@
+
+filter_incoming_client
+    |
+   \|/
+switch_incoming_client
+  |
+  +-->  process_client_stanza   (if no to='' or to='' is for server)
+  |
+  +-->  deliver
+
+
+filter_incoming_server
+    |
+   \|/
+switch_incoming_server
+  |
+  +-->  process_server_stanza   (if to='' is for server)
+  |
+  +-->  deliver   ( same as earlier deliver )
+
+
+pre_stanza_write  (before a stanza gets written to client)
+
+
+
+
+Roster
+----------------------------------------------------------------------------
+RosterGet ($conn, $cb)
+   where $cb supports methods:
+      ->set_roster(DJabberd::Roster)
+      ->decline
+
+Users subclasses DJabberd::RosterStorage can override get_roster, which gets:
+
+     my ($plugininstance, $cb, $conn, $jid) = @_;
+
+(where $jid is just the $conn->bound_jid)
+
+
+
+

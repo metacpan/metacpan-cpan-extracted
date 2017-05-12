@@ -1,0 +1,4 @@
+Fnv32_t     T_UV
+Fnv32_t     T_UV
+Fnv64_t *   T_PTROBJ
+Fnv64_t *   T_PTROBJ

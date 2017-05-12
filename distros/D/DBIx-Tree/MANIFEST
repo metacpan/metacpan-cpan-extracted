@@ -1,0 +1,17 @@
+.gitignore
+Build.PL
+Changelog.ini
+Changes
+examples/tk-tree-example.pl
+examples/tkexample.pl
+lib/DBIx/Tree.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.json
+META.yml
+README
+scripts/demo.pl
+t/INSTALL.SQL
+t/pod.t
+t/test.t

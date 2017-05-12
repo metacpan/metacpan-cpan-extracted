@@ -1,0 +1,22 @@
+---
+abstract: 'check whether a given value is a valid IBAN'
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-WithYAML-Plugin-IBAN
+requires:
+  Algorithm::CheckDigits: '0'
+  Data::Validate::WithYAML: '0.12'
+resources:
+  bugtracker: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-IBAN/issues
+  homepage: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-IBAN
+  repository: http://github.com/reneeb/Data-Validate-WithYAML-Plugin-IBAN.git
+version: '0.03'

@@ -1,0 +1,35 @@
+DBIx::Objects
+=======================
+
+SYNOPSIS
+
+This module is intended to provide an object-oriented framework for
+accessing data sources.  The source of the data is completely abstract,
+allowing for complete flexibility for the data back-end.  This module is
+NOT intended to provide a persistance layer - please use another module
+(like TANGRAMS) if you require object persistance.
+
+For more complete documentation, please check the POD documentation
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDANCIES
+
+This library is not intrinsicly dependant on any non-core modules.
+However, libraries which subclass this one, will most likely require
+the use of additional libraries, such as DBI.  Additionally, some of
+the default methods included make use of DBI, but the library can
+install without DBI.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c)2003, 2004 Issac Goldstand - All rights reserved.
+This library is free software. It can be redistributed and/or modified
+under the same terms as Perl itself.

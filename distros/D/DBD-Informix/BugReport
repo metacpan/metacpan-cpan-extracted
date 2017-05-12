@@ -1,0 +1,23 @@
+#! /usr/bin/perl -w
+#
+#	@(#)$Id: BugReport,v 100.5 2002/02/08 22:48:42 jleffler Exp $
+#
+#	Produce output for a Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) Bug Report
+#
+#	Copyright 1999 Jonathan Leffler
+#	Copyright 2000 Informix Software Inc
+#	Copyright 2002 IBM
+#
+# * See Notes/bug.reports for lots more details.
+# * By default (no arguments), produces just the most basic bug
+#   reporting info - versions and platform and environment.
+# * If given an argument A or B or C, produces the info for that
+#   type of bug report.
+# * If given an argument D and one or more specific test names,
+#   produces the info for a type D bug report.
+# * Assuming you use a Bourne/Korn/BornAgain shell, it is quite
+#   reasonable to build DBD::Informix using:
+#       perl BugReport C 2>&1 | tee bugreport.out
+
+use DBD::Informix::TechSupport;
+bug_report(@ARGV);

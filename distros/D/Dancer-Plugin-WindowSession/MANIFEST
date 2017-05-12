@@ -1,0 +1,27 @@
+Changes
+ignore.txt
+lib/Dancer/Plugin/WindowSession.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+eg/example/lib/window_session_test.pm
+eg/example/views/layouts/main.tt
+eg/example/views/settings.tt
+eg/example/views/index.tt
+eg/example/bin/app.pl
+eg/example/environments/production.yml
+eg/example/environments/development.yml
+eg/example/public/dispatch.cgi
+eg/example/public/404.html
+eg/example/public/favicon.ico
+eg/example/public/dispatch.fcgi
+eg/example/public/500.html
+eg/example/config.yml
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

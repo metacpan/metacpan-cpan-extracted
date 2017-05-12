@@ -1,0 +1,58 @@
+# Copyright (c) 2010-2017 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Date::Manip::TZ_Base - Methods common to the TZ and Base classes
+
+=head1 SYNOPSIS
+
+The Date::Manip::TZ_Base class is a second base class used for the
+following Date::Manip classes:
+
+=over 4
+
+=item L<Date::Manip::Base>
+
+=item L<Date::Manip::TZ>
+
+=back
+
+This module is not intended to be called directly and performs no
+useful function by itself. Instead, use the various derived classes
+which inherit from it.
+
+=head1 DESCRIPTION
+
+This module contains no public methods and is used internally by
+the Base and TZ classes. In some instances, basic date operations
+depend on timezone information, and all timezone operations depend
+on the base class.  In order to avoid a circular dependency, I created
+this class which allowed me to avoid that.
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the L<Date::Manip::Problems> documentation for
+information on submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+L<Date::Manip>       - main module documentation
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

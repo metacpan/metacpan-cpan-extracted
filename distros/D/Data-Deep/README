@@ -1,0 +1,40 @@
+
+Introduction
+------------
+This module intends to be your best tool to manipulate
+every kind of Perl complex data structure.
+When using Perl with complex data structure (see man perldsc),
+you enter the world of Perl structure which is just powerfull
+(no limitation on heterogeneous type, no limitation on size and quite simple)
+Here you have the essentials functions :
+compare, navigate and applying patch (for modifying). 
+
+Resources on the Internet
+-------------------------
+The latest Data::Deep module can be found at:
+http://www.perl.com/CPAN/modules/by-module/Data/Deep/
+
+Installing
+----------
+To install, do the usual "perl Makefile.PL ; make ; make install".
+
+Improvement :
+-------------
+
+Bugs are always need to be seeken as it is complex module for me.
+Encoding tests are very expermimental.
+Perhaps patch formats could be improved, ...
+
+Feel Free to make it evolve trying to keep it as pratical as possible,
+could be integrated as CORE module if somebody have time for improve it.
+Could be quicker implemented in C (XS).
+
+Anyway, use and abuse it,
+
+Stay cool!
+
+Matthieu Damerose
+damo@cpan.org
+
+February 19, 2012
+

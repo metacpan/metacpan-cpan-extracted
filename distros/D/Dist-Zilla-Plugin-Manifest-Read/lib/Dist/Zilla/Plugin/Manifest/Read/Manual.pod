@@ -1,0 +1,605 @@
+#   ---------------------------------------------------------------------- copyright and license ---
+#
+#   file: lib/Dist/Zilla/Plugin/Manifes/Read/Manual.pod
+#
+#   Copyright © 2015, 2016 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Manifest-Read.
+#
+#   perl-Dist-Zilla-Plugin-Manifest-Read is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Dist-Zilla-Plugin-Manifest-Read is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Dist-Zilla-Plugin-Manifest-Read. If not, see <http://www.gnu.org/licenses/>.
+#
+#   ---------------------------------------------------------------------- copyright and license ---
+
+# PODNAME: Dist::Zilla::Plugin::Manifest::Read::Manual
+# ABSTRACT: C<Manifest::Read> plugin user manual
+
+#pod =for :this This is C<Manifest::Read> plugin user manual. Read this if you want to
+#pod have annotated source manifest.
+#pod
+#pod =for :those If you are going to hack or extend C<Manifest::Read>, read the L<module
+#pod documentation|Dist::Zilla::Plugin::Manifest::Read>. General topics like getting source, building, installing, bug
+#pod reporting and some others are covered in the F<README>.
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     ...
+#pod     ; Add files listed in source MANIFEST to the distribution
+#pod     ;     (Manifest::Read does FileGatherer role):
+#pod     [Manifest::Read]        ; Read *source* MANIFEST
+#pod                             ;     and add files to the distribution.
+#pod     ...
+#pod     [Manifest::Write]       ; Write *distribution* MANIFEST.
+#pod         ; or [Manifest]
+#pod     ...
+#pod     ; Use files listed in source MANIFEST
+#pod     ;     (Manifest::Read does FileFinder role):
+#pod     [Templates]                              ; Treat as templates
+#pod         templates = Manifest::Read/:AllFiles ;   all *your* files.
+#pod     [Test::EOL]                              ; Check line endings are consistent
+#pod         finder = Manifest::Read/:TestFiles   ;   in *your* test files.
+#pod     [Test::NoTabs]                           ; Ensure there are no tabs
+#pod         finder = Manifest::Read/:ExecFiles   ;   in *your* exec files.
+#pod     ...
+#pod
+#pod In your source F<MANIFEST>:
+#pod
+#pod     # Files marked with "+" will be added to distribution.
+#pod     # Files marked with "-" will *not* be added to distribution.
+#pod     # Entries marked with "/" are directories.
+#pod     # All the enlisted entities must exist, regardless of mark.
+#pod
+#pod     lib/                / Modules to install:
+#pod     lib/Foo.pm          + Perl module
+#pod     lib/Foo/Manual.pod  + and user manual.
+#pod
+#pod     t/                  / Tests.
+#pod     t/basic.t           + Test basic functionality.
+#pod     t/extended.t        - Do not include, not ready yet.
+#pod
+#pod     Changes             + Release history.
+#pod     COPYING             + License.
+#pod     MANIFEST            - Exclude *source* manifest.
+#pod     dist.ini            - Exclude Dist-Zilla config.
+#pod     weaver.ini          - Exclude PodWeaver config.
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<Manifest::Read> reads the I<annotated source manifest>. Default manifest name is F<MANIFEST>, but
+#pod it may be changed with C<manifest> option.
+#pod
+#pod Manifest enlists all the source files and directories. C<Manifest::Read> ensures all the manifested
+#pod files and directories exist, and adds files marked with C<+> to the distribution. Files marked with
+#pod C<-> and directories marked with C</> should exist, but they are I<not> added to the distribution.
+#pod
+#pod C<Manifest::Read> also provides a bunch of C<FileFinder>s, which can be used by other plugins, see
+#pod L</"File Finders"> section below.
+#pod
+#pod =head2 Manifest File Format
+#pod
+#pod Manifest is a plain text file in UTF-8 encoding. Empty and whitespace-only lines are ignored.
+#pod Comment line should have hash (C<#>) as the first non-whitespace character, comment lines are
+#pod ignored too. Other lines must match  the following regular expression:
+#pod
+#pod     ^ \s* filename ( \s+ mark ( \s+ comment )? )? \s* $
+#pod
+#pod =over
+#pod
+#pod =item I<filename>
+#pod
+#pod Filename should be Perl single-quoted string or should not contain whitespaces. It should not
+#pod start with hash or apostrophe. Example of valid filenames:
+#pod
+#pod     lib/Assa.pm
+#pod     '/Program Files/Common Files/Dummy File.txt'
+#pod     'That\'s all, folks!'
+#pod
+#pod Within single-quoted string C<\\> denotes backslash, C<\'> denotes apostrophe, all other characters
+#pod are treated literally: C<\n> denotes two characters C<\> and C<n>, I<not> newline (these are
+#pod regular Perl rules for single-quoted strings).
+#pod
+#pod =item I<mark>
+#pod
+#pod Either plus (C<+>) or minus (C<->) sign, or slash (C</>). Plus sign is also used as default mark if
+#pod no mark is explicitly specified.
+#pod
+#pod =item I<comment>
+#pod
+#pod Comment is arbitrary text.
+#pod
+#pod =back
+#pod
+#pod =head2 File Finders
+#pod
+#pod C<Manifest::Read> provides bunch of file finders:
+#pod
+#pod =for :list
+#pod =   Manifest::Read/:AllFiles
+#pod =   Manifest::Read/:ExecFiles
+#pod =   Manifest::Read/:ExtraTestFiles
+#pod =   Manifest::Read/:IncModules
+#pod =   Manifest::Read/:InstallModules
+#pod =   Manifest::Read/:NoFiles
+#pod =   Manifest::Read/:PerlExecFiles
+#pod =   Manifest::Read/:ShareFiles
+#pod =   Manifest::Read/:TestFiles
+#pod
+#pod You can pass them to any plugin expecting C<FileFinder> (see L</"EXAMPLES">).
+#pod
+#pod Each of these finders returns the list of files read from the manifest, added to the distribution,
+#pod not pruned, I<and> falling to the specified category. Strictly speaking, a file finder
+#pod C<Manifest::Read/:I<X>> returns intersection of two sets: (1) files listed in the source manifest
+#pod and (2) files found by standard C<:I<X>> file finder (see
+#pod L<Dist::Zilla::Role::FileFinderUser/"default_finders"> for the list of the standard file finders).
+#pod
+#pod C<Manifest::Read> itself returns the I<complete> list of the files read from the manifest. It
+#pod I<includes> the files which are I<not> added to the distribution. It also includes pruned files,
+#pod if any.
+#pod
+#pod =option manifest
+#pod
+#pod Name of manifest file to read. Default value is F<MANIFEST>.
+#pod
+#pod The option may be used if you want to name differently source and distribution manifests, e. g.:
+#pod
+#pod     [Manifest::Read]
+#pod         manifest = Manifest.source
+#pod     [Manifest::Write]
+#pod
+#pod In such a case the source manifest has name F<Manifest.source>, while distribution manifest has
+#pod default name F<MANIFEST>.
+#pod
+#pod =note File Finder Names
+#pod
+#pod When C<Manifest::Read> is passed to another plugin as a file finder, you should pass plugin
+#pod I<name>, not I<moniker>:
+#pod
+#pod     [Manifest::Read/MR]             ; Plugin name is MR.
+#pod     [Test::EOL]
+#pod         finder = MR/AllFiles        ; *Not* Manifest::Read/AllFiles!
+#pod     [Test::Version]
+#pod         finder = MR/InstallModules  ; *Not* Manifest::Read/InstallModules!
+#pod
+#pod =note Source Manifest Can Enlist Itself
+#pod
+#pod Source manifest can enlist itself but normally it should be I<excluded> from distribution:
+#pod
+#pod     ...
+#pod     MANIFEST        - Source manifest, this file.
+#pod     #              ^^^ *Not* +!
+#pod     ...
+#pod
+#pod because source and distribution manifests (may) have the same name but they are distinctly
+#pod different files with different content. Source manifest enlists source files and itself is a part
+#pod of source, while distribution manifest enlists distribution files (including automatically
+#pod generated files like F<Build.PL>, F<META.json>, F<META.yml>) and itself is a part of distribution.
+#pod Distribution manifest may be a part of source (if created manually), but usually it is generated by
+#pod C<Manifest> (or C<Manifest::Write>) plugin.
+#pod
+#pod =example C<Test::EOL> and C<Test::NoTabs> tests
+#pod
+#pod By default, C<Test::EOL> and C<Test::NoTabs> are applied to I<all> install modules, executable
+#pod files, and test files (i. e. to the files returned by the C<:InstallModules>, C<:ExecFiles>,
+#pod C<:TestFiles> standard finders). Some of these files may be out of your control. For example,
+#pod F<t/00-compile.t> test is generated by C<Test::Compile>. There is no point in testing
+#pod F<t/00-compile.t>: even if the test fails you cannot fix it (at least, easily). At the same time
+#pod you may want to apply these tests to other your files, like F<README> or F<Changes>. To apply the
+#pod tests to all I<your> files:
+#pod
+#pod     [Manifest::Read]
+#pod     [Test::EOL]
+#pod         finder = Manifest::Read/:AllFiles
+#pod     [Test::NoTabs]
+#pod         finder = Manifest::Read/:AllFiles
+#pod
+#pod =example C<Test::Version> test
+#pod
+#pod By default, C<Test::Version> is applied to I<all> the Perl modules in the F<lib/> directory. Some
+#pod of these files may be out of your control. For example, F<Inline.pm> file is generated by
+#pod C<InlineModule> plugin. This file does not have C<$VERSION> assignment and so fails the test.
+#pod Applying the test to I<your> modules only solves the problem:
+#pod
+#pod     [Manifest::Read]
+#pod     [Test::Version]
+#pod         finder = Manifest::Read/:InstallModules
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod =   L<Dist::Zilla>
+#pod =   L<Dist::Zilla::Plugin::GatherDir>
+#pod =   L<Dist::Zilla::Plugin::GatherFromManifest>
+#pod =   L<Dist::Zilla::Plugin::Test::EOL>
+#pod =   L<Dist::Zilla::Plugin::Test::NoTabs>
+#pod =   L<Dist::Zilla::Plugin::Test::Version>
+#pod =   L<Dist::Zilla::Role::FileFinder>
+#pod =   L<Dist::Zilla::Role::FileGatherer>
+#pod =   L<Dist::Zilla::Role::FilePruner>
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+#pod =pod
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Dist-Zilla-Plugin-Manifest-Read> (or C<Manifest::Read> for brevity) is a C<Dist::Zilla> plugin. It reads
+#pod I<annotated source> manifest, checks existence of all listed files and directories, and adds
+#pod selected files to the distribution. C<Manifest::Read> also does C<FileFinder> role, providing the
+#pod list of files for other plugins.
+#pod
+#pod =cut
+
+#pod =pod
+#pod
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod C<Dist::Zilla> advertises using C<GatherDir> plugin to populate the distribution. However,
+#pod C<GatherDir> has disadvantage: it grabs really all the files from the source directory, including
+#pod files which are not meant to be added to distribution, like previously built distribution tarball.
+#pod You have to use either C<GatherDir> parameters or dedicated plugins (e. g. C<PruneCruft>) to
+#pod exclude unwanted files from the distribution. However, risk to grab unwanted files remains.
+#pod
+#pod There is another (better to my taste) approach: grab only the files explicitly listed in
+#pod the F<MANIFEST> file. This is implemented by nice C<GatherFromManifest> plugin.
+#pod
+#pod However I want a bit more. I also want to specify (and document) files (and directories) which are
+#pod part of source, but should not be included to the distribution. For example:
+#pod
+#pod     ex/                     / Examples.
+#pod     ex/Assa/                / Very basic example.
+#pod     ex/Assa/dist.ini        - dzil config file.
+#pod     ex/Assa/dzil.out        - dzil output, included into user manual.
+#pod
+#pod     lib/                    / Modules to install:
+#pod     lib/Assa.pm             + The primary module.
+#pod
+#pod     t/                      / Tests:
+#pod     t/advanced.t            - Not ready yet, do not distribute.
+#pod     t/basic.t               + Basic functional test.
+#pod
+#pod     tools/                  / Build tools:
+#pod     tools/run-examples.sh   - Run examples, refresh dzil.out file.
+#pod
+#pod     Changes                 + Release history.
+#pod     COPYING                 + License text.
+#pod     README                  - Source documentation.
+#pod     TODO                    - Plans and ideas.
+#pod     VERSION                 + Version number.
+#pod
+#pod =cut
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Plugin::Manifest::Read::Manual - C<Manifest::Read> plugin user manual
+
+=head1 VERSION
+
+Version v0.5.0, released on 2016-11-21 19:18 UTC.
+
+=head1 WHAT?
+
+C<Dist-Zilla-Plugin-Manifest-Read> (or C<Manifest::Read> for brevity) is a C<Dist::Zilla> plugin. It reads
+I<annotated source> manifest, checks existence of all listed files and directories, and adds
+selected files to the distribution. C<Manifest::Read> also does C<FileFinder> role, providing the
+list of files for other plugins.
+
+This is C<Manifest::Read> plugin user manual. Read this if you want to
+have annotated source manifest.
+
+If you are going to hack or extend C<Manifest::Read>, read the L<module
+documentation|Dist::Zilla::Plugin::Manifest::Read>. General topics like getting source, building, installing, bug
+reporting and some others are covered in the F<README>.
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    ...
+    ; Add files listed in source MANIFEST to the distribution
+    ;     (Manifest::Read does FileGatherer role):
+    [Manifest::Read]        ; Read *source* MANIFEST
+                            ;     and add files to the distribution.
+    ...
+    [Manifest::Write]       ; Write *distribution* MANIFEST.
+        ; or [Manifest]
+    ...
+    ; Use files listed in source MANIFEST
+    ;     (Manifest::Read does FileFinder role):
+    [Templates]                              ; Treat as templates
+        templates = Manifest::Read/:AllFiles ;   all *your* files.
+    [Test::EOL]                              ; Check line endings are consistent
+        finder = Manifest::Read/:TestFiles   ;   in *your* test files.
+    [Test::NoTabs]                           ; Ensure there are no tabs
+        finder = Manifest::Read/:ExecFiles   ;   in *your* exec files.
+    ...
+
+In your source F<MANIFEST>:
+
+    # Files marked with "+" will be added to distribution.
+    # Files marked with "-" will *not* be added to distribution.
+    # Entries marked with "/" are directories.
+    # All the enlisted entities must exist, regardless of mark.
+
+    lib/                / Modules to install:
+    lib/Foo.pm          + Perl module
+    lib/Foo/Manual.pod  + and user manual.
+
+    t/                  / Tests.
+    t/basic.t           + Test basic functionality.
+    t/extended.t        - Do not include, not ready yet.
+
+    Changes             + Release history.
+    COPYING             + License.
+    MANIFEST            - Exclude *source* manifest.
+    dist.ini            - Exclude Dist-Zilla config.
+    weaver.ini          - Exclude PodWeaver config.
+
+=head1 DESCRIPTION
+
+C<Manifest::Read> reads the I<annotated source manifest>. Default manifest name is F<MANIFEST>, but
+it may be changed with C<manifest> option.
+
+Manifest enlists all the source files and directories. C<Manifest::Read> ensures all the manifested
+files and directories exist, and adds files marked with C<+> to the distribution. Files marked with
+C<-> and directories marked with C</> should exist, but they are I<not> added to the distribution.
+
+C<Manifest::Read> also provides a bunch of C<FileFinder>s, which can be used by other plugins, see
+L</"File Finders"> section below.
+
+=head2 Manifest File Format
+
+Manifest is a plain text file in UTF-8 encoding. Empty and whitespace-only lines are ignored.
+Comment line should have hash (C<#>) as the first non-whitespace character, comment lines are
+ignored too. Other lines must match  the following regular expression:
+
+    ^ \s* filename ( \s+ mark ( \s+ comment )? )? \s* $
+
+=over
+
+=item I<filename>
+
+Filename should be Perl single-quoted string or should not contain whitespaces. It should not
+start with hash or apostrophe. Example of valid filenames:
+
+    lib/Assa.pm
+    '/Program Files/Common Files/Dummy File.txt'
+    'That\'s all, folks!'
+
+Within single-quoted string C<\\> denotes backslash, C<\'> denotes apostrophe, all other characters
+are treated literally: C<\n> denotes two characters C<\> and C<n>, I<not> newline (these are
+regular Perl rules for single-quoted strings).
+
+=item I<mark>
+
+Either plus (C<+>) or minus (C<->) sign, or slash (C</>). Plus sign is also used as default mark if
+no mark is explicitly specified.
+
+=item I<comment>
+
+Comment is arbitrary text.
+
+=back
+
+=head2 File Finders
+
+C<Manifest::Read> provides bunch of file finders:
+
+=over 4
+
+=item Manifest::Read/:AllFiles
+
+=item Manifest::Read/:ExecFiles
+
+=item Manifest::Read/:ExtraTestFiles
+
+=item Manifest::Read/:IncModules
+
+=item Manifest::Read/:InstallModules
+
+=item Manifest::Read/:NoFiles
+
+=item Manifest::Read/:PerlExecFiles
+
+=item Manifest::Read/:ShareFiles
+
+=item Manifest::Read/:TestFiles
+
+=back
+
+You can pass them to any plugin expecting C<FileFinder> (see L</"EXAMPLES">).
+
+Each of these finders returns the list of files read from the manifest, added to the distribution,
+not pruned, I<and> falling to the specified category. Strictly speaking, a file finder
+C<Manifest::Read/:I<X>> returns intersection of two sets: (1) files listed in the source manifest
+and (2) files found by standard C<:I<X>> file finder (see
+L<Dist::Zilla::Role::FileFinderUser/"default_finders"> for the list of the standard file finders).
+
+C<Manifest::Read> itself returns the I<complete> list of the files read from the manifest. It
+I<includes> the files which are I<not> added to the distribution. It also includes pruned files,
+if any.
+
+=head1 OPTIONS
+
+=head2 manifest
+
+Name of manifest file to read. Default value is F<MANIFEST>.
+
+The option may be used if you want to name differently source and distribution manifests, e. g.:
+
+    [Manifest::Read]
+        manifest = Manifest.source
+    [Manifest::Write]
+
+In such a case the source manifest has name F<Manifest.source>, while distribution manifest has
+default name F<MANIFEST>.
+
+=head1 EXAMPLES
+
+=head2 C<Test::EOL> and C<Test::NoTabs> tests
+
+By default, C<Test::EOL> and C<Test::NoTabs> are applied to I<all> install modules, executable
+files, and test files (i. e. to the files returned by the C<:InstallModules>, C<:ExecFiles>,
+C<:TestFiles> standard finders). Some of these files may be out of your control. For example,
+F<t/00-compile.t> test is generated by C<Test::Compile>. There is no point in testing
+F<t/00-compile.t>: even if the test fails you cannot fix it (at least, easily). At the same time
+you may want to apply these tests to other your files, like F<README> or F<Changes>. To apply the
+tests to all I<your> files:
+
+    [Manifest::Read]
+    [Test::EOL]
+        finder = Manifest::Read/:AllFiles
+    [Test::NoTabs]
+        finder = Manifest::Read/:AllFiles
+
+=head2 C<Test::Version> test
+
+By default, C<Test::Version> is applied to I<all> the Perl modules in the F<lib/> directory. Some
+of these files may be out of your control. For example, F<Inline.pm> file is generated by
+C<InlineModule> plugin. This file does not have C<$VERSION> assignment and so fails the test.
+Applying the test to I<your> modules only solves the problem:
+
+    [Manifest::Read]
+    [Test::Version]
+        finder = Manifest::Read/:InstallModules
+
+=head1 NOTES
+
+=head2 File Finder Names
+
+When C<Manifest::Read> is passed to another plugin as a file finder, you should pass plugin
+I<name>, not I<moniker>:
+
+    [Manifest::Read/MR]             ; Plugin name is MR.
+    [Test::EOL]
+        finder = MR/AllFiles        ; *Not* Manifest::Read/AllFiles!
+    [Test::Version]
+        finder = MR/InstallModules  ; *Not* Manifest::Read/InstallModules!
+
+=head2 Source Manifest Can Enlist Itself
+
+Source manifest can enlist itself but normally it should be I<excluded> from distribution:
+
+    ...
+    MANIFEST        - Source manifest, this file.
+    #              ^^^ *Not* +!
+    ...
+
+because source and distribution manifests (may) have the same name but they are distinctly
+different files with different content. Source manifest enlists source files and itself is a part
+of source, while distribution manifest enlists distribution files (including automatically
+generated files like F<Build.PL>, F<META.json>, F<META.yml>) and itself is a part of distribution.
+Distribution manifest may be a part of source (if created manually), but usually it is generated by
+C<Manifest> (or C<Manifest::Write>) plugin.
+
+=head1 WHY?
+
+C<Dist::Zilla> advertises using C<GatherDir> plugin to populate the distribution. However,
+C<GatherDir> has disadvantage: it grabs really all the files from the source directory, including
+files which are not meant to be added to distribution, like previously built distribution tarball.
+You have to use either C<GatherDir> parameters or dedicated plugins (e. g. C<PruneCruft>) to
+exclude unwanted files from the distribution. However, risk to grab unwanted files remains.
+
+There is another (better to my taste) approach: grab only the files explicitly listed in
+the F<MANIFEST> file. This is implemented by nice C<GatherFromManifest> plugin.
+
+However I want a bit more. I also want to specify (and document) files (and directories) which are
+part of source, but should not be included to the distribution. For example:
+
+    ex/                     / Examples.
+    ex/Assa/                / Very basic example.
+    ex/Assa/dist.ini        - dzil config file.
+    ex/Assa/dzil.out        - dzil output, included into user manual.
+
+    lib/                    / Modules to install:
+    lib/Assa.pm             + The primary module.
+
+    t/                      / Tests:
+    t/advanced.t            - Not ready yet, do not distribute.
+    t/basic.t               + Basic functional test.
+
+    tools/                  / Build tools:
+    tools/run-examples.sh   - Run examples, refresh dzil.out file.
+
+    Changes                 + Release history.
+    COPYING                 + License text.
+    README                  - Source documentation.
+    TODO                    - Plans and ideas.
+    VERSION                 + Version number.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla>
+
+=item L<Dist::Zilla::Plugin::GatherDir>
+
+=item L<Dist::Zilla::Plugin::GatherFromManifest>
+
+=item L<Dist::Zilla::Plugin::Test::EOL>
+
+=item L<Dist::Zilla::Plugin::Test::NoTabs>
+
+=item L<Dist::Zilla::Plugin::Test::Version>
+
+=item L<Dist::Zilla::Role::FileFinder>
+
+=item L<Dist::Zilla::Role::FileGatherer>
+
+=item L<Dist::Zilla::Role::FilePruner>
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015, 2016 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

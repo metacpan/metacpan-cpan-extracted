@@ -1,0 +1,32 @@
+{
+        "might_have": {
+            "fetch": 0
+        },
+        "has_many": {
+            "fetch": 0
+        },
+        "sets": [{
+            "class": "CD",
+            "ids": ["5"]
+        }, {
+            "class": "Artist",
+            "ids": ["1"],
+            "fetch": [{
+                "rel": "cds",
+                "quantity": "all"
+            }]
+        }],
+        "rules": {
+            "might_have": {
+                "fetch": 0
+            },
+            "CD": {
+                "cond": [{ "tags.tag": "Cheesy" }],
+                "join": ["tags"],
+                "fetch": [{
+                    "rel": "tracks",
+                    "cond": { "position": 2 }
+                }]
+            }                    
+        }
+}

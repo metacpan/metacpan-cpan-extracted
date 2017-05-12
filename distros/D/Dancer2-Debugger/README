@@ -1,0 +1,139 @@
+NAME
+    Dancer2::Debugger - Dancer2 panels for Plack::Debugger
+
+VERSION
+    0.008
+
+SYNOPSIS
+    In your .psgi file:
+
+        #!/usr/bin/env perl
+
+        use strict;
+        use warnings;
+        use FindBin;
+        use lib "$FindBin::Bin/../lib";
+
+        use Plack::Builder;
+
+        use Dancer2::Debugger;
+        my $debugger = Dancer2::Debugger->new;
+
+        use MyApp;
+        my $app = MyApp->to_app;
+
+        builder {
+            $debugger->mount;
+            mount '/' => builder {
+                $debugger->enable;
+                $app;
+            }
+        };
+
+    In environments/development.yml file:
+
+        plugins:
+            Debugger:
+                enabled: 1
+
+    In MyApp.pm:
+
+        use Dancer2::Plugin::Debugger
+
+DESCRIPTION
+    Dancer2::Debugger makes using the excellent Plack::Debugger much more
+    convenient and in addition provides a number of Dancer2 panels.
+
+    Current panels included with this distribution:
+
+    Plack::Debugger::Panel::Dancer2::Logger
+    Plack::Debugger::Panel::Dancer2::Routes
+    Plack::Debugger::Panel::Dancer2::Session
+    Plack::Debugger::Panel::Dancer2::Settings
+    Plack::Debugger::Panel::Dancer2::TemplateTimer
+    Plack::Debugger::Panel::Dancer2::TemplateVariables
+
+    Some of the debugger panels make use of collectors which are imported
+    into your Dancer2 app using Dancer2::Plugin::Debugger which is also
+    included in this distribution.
+
+ATTRIBUTES
+  app
+    Instantiated Plack::App::Debugger object.
+
+  data_dir
+    See "data_dir" in Plack::Debugger::Storage.
+
+    Defaults to "debugger_panel" in the system temp directory (usually
+    "/tmp" on Linux/UNIX systems).
+
+    Attempts to create the directory if it does not exist.
+
+  debugger
+    Instantiated Plack::Debugger object.
+
+  deserializer
+    See "deserializer" in Plack::Debugger::Storage.
+
+    Defaults to the value of "serializer".
+
+  filename_fmt
+    See "filename_fmt" in Plack::Debugger::Storage.
+
+    Defaults to "%s.json".
+
+  injector_ignore_status
+    If set to a true value then we override "should_ignore_status" in
+    Plack::Middleware::Debugger::Injector to always return false so that the
+    injector tries to add the javascript snippet to the page irrespective of
+    the http status code.
+
+    Defaults to false.
+
+  panels
+    Array reference of panel class names to load. Defaults to all classes
+    found in @INC under Plack::Debugger::Panel.
+
+  panel_objects
+    Imported and instantiated panel objects.
+
+  serializer
+    See "serializer" in Plack::Debugger::Storage.
+
+    Defaults to "JSON::MaybeXS->new( convert_blessed => 1, utf8 => 1 )"
+
+  storage
+    Instantiated Plack::Debugger::Storage object.
+
+METHODS
+  BUILD
+    Handle "injector_ignore_status" if it is true.
+
+  enable
+    Convenience method for use in psgi file which runs the following
+    methods:
+
+    "make_injector_middleware" in Plack::App::Debugger and
+    "create_middleware" in Plack::Debugger.
+
+  mount
+    Convenience method for use in psgi file to mount Plack::App::Debugger.
+
+SEE ALSO
+    Plack::Debugger, Plack::Debugger::Panel::Dancer2::Version
+
+AUTHORS
+    Peter Mottram (SysPete), "peter@sysnix.com"
+
+CONTRIBUTORS
+     James Morrison - GH #2
+
+LICENSE AND COPYRIGHT
+    Copyright 2016 Peter Mottram (SysPete).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,40 @@
+{
+   "abstract" : "Generates sequential unique ids",
+   "author" : [
+      "Iain Campbell <cpanic@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-SUID",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::Random" : "0",
+            "Net::Address::Ethernet" : "0",
+            "Readonly" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.8.8"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.0.3"
+}
+

@@ -1,0 +1,83 @@
+Revision history for Perl module Daiku
+
+1.004 2015-01-02T17:00:22Z
+
+    - Daiku::File can be a directory
+
+1.003 2015-01-02T15:40:37Z
+
+    - use lib 'lib' implicitly in Daikufile
+
+1.002 2014-11-03T13:38:03Z
+
+    - Documentation improvements. (debug-ito++)
+    - use Exporter in Daiku.pm instead of manually writing import(). (debug-ito++)
+
+1.001 2014-05-11T12:39:01Z
+
+    - pass argv to merged task callbacks
+      (Shoichi Kaji)
+    - support multiple suffix rule
+      (Shoichi Kaji)
+    - support coredef src in suffix rule
+      (Songmu)
+
+1.00 2014-05-08T09:38:05Z
+
+    - fix outputs
+    - [INCOMPATIBLE] 'default' is a default target of `daiku`
+    - [INCOMPATIBLE] remove Daiku::Registory#first_target method
+
+0.10 2014-05-07T04:38:11Z
+
+    - support namespace inspired by rake
+      (songmu)
+    - support argument of task using brackets
+      (songmu)
+    - fix bug in `daiku -T`
+      (Shoichi Kaji)
+
+0.09 2014-05-06T05:01:51Z
+
+    - implement 'sh' DSL inspired by rake
+      (songmu)
+    - description support inspired by rake
+      (songmu)
+
+0.08 2014-03-12T20:38:25Z
+
+    - daiku command requires Getopt::Long 2.39+
+      (tokuhirom)
+
+0.07 2014-03-10T00:32:43Z
+
+    - Fixed dependency issue.
+      (tokuhirom)
+
+0.06 2014-03-09T13:54:34Z
+
+    - Added daiku command
+      (Shoichi Kaji)
+
+0.05 2013-10-06T23:49:23Z
+
+    - Migrate with Minilla
+    - Fixed Changes Spec
+      (neilb)
+
+0.04 2011-08-05
+
+    - added better error detection code for fucking win32 hell.
+
+0.03 2011-05-08
+
+    - fixed deps
+
+0.02 2011-04-27
+
+    - merge additional deps and code.
+
+0.01 2011-04-23
+
+    - original version
+

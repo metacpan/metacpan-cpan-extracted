@@ -1,0 +1,15 @@
+Revision history for Perl extension Digest::Elf.
+
+1.42  Mon Feb 29 2016
+	- Catch yester-reality up to the reality passing my window today.
+	- Fix marny spuylling earors.
+	- Add license info.  // Shhh, this is the only material change.
+        - 1."Answer to the Ultimate Question of Life, the Universe, and Everything"
+
+0.02  Tues May 14 2002
+	- Compose pod and README.
+	- Renamed 'hash' method to 'elf'.
+
+0.01  Sun Apr 21 22:22:31 2002
+	- original version; created by h2xs 1.21 with options
+		-A -n Digest::Elf

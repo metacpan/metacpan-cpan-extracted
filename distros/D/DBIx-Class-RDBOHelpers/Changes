@@ -1,0 +1,44 @@
+Revision history for DBIx-Class-RDBOHelpers
+
+0.12 24 Nov 2015
+ - fix https://rt.cpan.org/Ticket/Display.html?id=109596 for newer DBIC API.
+
+0.11 03 March 2014
+ - move to github
+ - add meta to Makefile.PL, make pod tests respect RELEASE_TESTING env var
+ - fix https://rt.cpan.org/Ticket/Display.html?id=93435
+
+0.10 31 July 2012
+ - add missing deps in Makefile.PL
+
+0.09 13 May 2010
+ - fix primary_key_uri_escaped per Rose::DBx::Object::MoreHelpers 0.07.
+
+0.08 17 Nov 2008
+ - add unique_value() method similar to Rose::DBx::Object::MoreHelpers
+
+0.07 10 Sept 2008
+ - fix case in m2m detection where a class is mapped to itself
+
+0.06 5 Sept 2008
+ - fix column_is_boolean() to detect if has_column() first
+
+0.05 26 Aug 2008
+ - change 'use base' to 'use parent' to reduce dependencies
+
+0.04 25 Aug 2008
+ - oops. *_column was being assigned backwards in m2m. added map_to_column
+   and map_from_column as well.
+ - add new method column_is_boolean() to match RDBO::MoreHelpers
+
+0.03 24 Aug 2008
+ - fix map_from/map_to and add class_column/foreign_column to
+   relationship_info() for m2m
+
+0.02 24 Aug 2008
+ - add {m2m}->{class} value to identify the class that owns the m2m
+   relationship.
+
+0.01 23 Aug 2008
+ - First version, released on an unsuspecting world.
+

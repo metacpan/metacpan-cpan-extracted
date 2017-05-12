@@ -1,0 +1,503 @@
+<!DOCTYPE html 
+     PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+     "DTD/xhtml1-strict.dtd">
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
+<meta name="GENERATOR" content="/bin/vi" />
+<title>Chip's Challenge File Layout Information</title>
+<style type="text/css">
+
+body { font-family: verdana, arial, helvetica, sans-serif; }
+h1 { color: #006; }
+h2 { color: #006; }
+</style>
+</head>
+
+
+<body>
+
+<h1>Chip's Challenge File Layout Information </h1>
+<h2>(Copyright 1997 Greg Heier)</h2>
+
+<p><strong>NOTE: This document was contributed by a visitor who wishes to 
+remain anonymous, and replaces the information I had on this site before 
+(it is far more complete). There may be an inaccuracy here and there, and 
+needs some editing, but other than that it should prove to be very useful 
+to those who might hack CHIPS.DAT a bit.</strong></p>
+
+<p><strong>Amended and HTML cleaned up by John Elliott</strong></p>
+
+<p>Below you will find a description of the layout of
+the file CHIPS.DAT.</p>
+
+<p>Each level of Chips Challenge is made up on a 32x32 tile grid. In 
+addition, each Chip's Challenge level is made up of two layers: upper and 
+lower. This allows chips to be placed under dirt blocks and monsters on top 
+of cloning machines.</p>
+
+<h2>File Header</h2>
+
+<table border="1" summary="This lists the fixed six-byte area at the start of CHIPS.DAT">
+<tr><th>Offset</th> <th colspan="2">Description</th></tr>
+<tr><td>$00-$03</td><td>Unsigned Long</td><td>
+		    This is a 'magic number'. CHIPS.EXE uses this to check 
+		    for a valid CHIPS.DAT file. The value must be
+		    $0002AAAC. Tile World also accepts $0102AAAC and uses it
+                    to select Atari Lynx rules.</td></tr>
+<tr><td>$04-$05</td><td>Unsigned Word</td><td>Number of levels in the file</td></tr>
+</table>
+
+<h2>Format of a level:</h2>
+<h3>General information</h3>
+
+<p>The first 8 bytes of a level have fixed meanings:</p>
+<table border="1" summary="This table describes the start of a level record">
+<tr><td>Unsigned Word</td>
+    <td>Number of bytes in this level (not including this word)</td></tr>
+<tr><td>Unsigned Word</td><td>Level number </td></tr>
+<tr><td>Unsigned Word</td><td>Time (in seconds).
+	A value of ZERO indicates no time limit.</td></tr>
+<tr><td>Unsigned Word</td><td>Number of chips to pick up </td></tr>
+</table>
+
+<h3>Map details</h3>
+
+<table border="1" summary="This table summarises the layout of the map area">
+<tr><td>Unsigned Word</td><td>0 or 1: Map detail</td></tr>
+<tr><td>Unsigned Word</td><td>Number of bytes in first layer</td></tr>
+<tr><td>...</td><td>Map detail, first layer</td></tr>
+<tr><td>Unsigned Word</td><td>Number of bytes in second layer</td></tr>
+<tr><td>...</td><td>Map detail, second layer</td></tr>
+</table>
+<ul>
+    <li>The first word must always be 0 or 1, though 0 is not used in the
+    existing CHIPS.DAT. Possibly it was intended to indicate whether the level
+    data are uncompressed or compressed.</li>
+    <li> Map detail is created using a series of object codes (outlined later) </li>
+    <li> Valid object codes range from $0-$6F </li>
+    <li> Object codes $70-$9F are used internally as "OR'd" copies of
+    codes $3F-$6F </li>
+    <li> Object codes $9F-$CF are used internally as "XOR'd" copies
+    of codes $70-$9F </li>
+    <li> An object code of $FF is an indicator of RLE (run-length-encoding) </li>
+    <li> RLE takes the form: $FF, #copies.byte, object-code.byte </li>
+    <li> Therefore an rle code of "$FF,$08,$02" would create a row of 8
+    chips </li>
+</ul>
+
+<p>(If the second layer is not used, it appears as,
+"FF FF 00 FF FF 00 FF FF 00 FF FF 00 FF 04 00", which indicates that there are
+255+255+255+255+4 = 1024 = 32x32 spaces under the objects.) </p>
+ 
+<h3>"Optional" fields</h3>
+
+<p>The "Optional" fields are preceded by a word describing how many bytes 
+there are. If there are more than 1152 bytes, "Chip's Challenge" will crash
+when loading the level.</p>
+
+<table border="1" summary="Layout of the 'optional' fields area">
+<tr><td>Unsigned Word</td>
+    <td>Number of bytes of optional fields</td></tr>
+<tr><td>...</td>
+    <td>One or more optional fields</td></tr>
+
+</table>
+
+<p>All "Optional" fields start with two bytes:</p>
+<table border="1" summary="General structure of an 'optional' field">
+<tr><td>Unsigned Byte</td><td>Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Number of additional bytes in field</td></tr>
+</table>
+<p>Since all field types include the number of additional bytes, CHIPS.EXE 
+can skip over fields which it does not recognise.</p>
+<p>Field types are:</p>
+    <ul>
+    <li> Field 1 is the level time (not used)</li>
+    <li> Field 2 is the number of chips on the level (not used)</li>
+    <li> Field 3 is the map title. </li>
+    <li> Field 4 is used to map brown buttons to traps. </li>
+    <li> Field 5 is used to map red buttons to cloning machines. </li>
+    <li> Field 6 is used to indicate password. </li>
+    <li> Field 7 is used to indicate hint text </li>
+    <li> Field 8 is also used to indicate the password (not used)</li>
+    <li> Field 9 is not used. </li>
+    <li> Field 10 is used to indicate where moving objects (monsters) occur</li>
+    <li> All other field types are treated like Field 9.</li>
+    </ul>
+
+<p>The standard levels file contains extra fields in the order 3,7,6,4,5,10;
+but this is not required.</p>
+<p>Each level will always include fields 3 and 6.</p>
+
+<h4>Field 1 - Level time</h4>
+
+<table border="1" summary="Detailed layout of optional field type 1">
+<tr><td>Unsigned Byte</td><td>$01 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>$02 = Field length</td></tr>
+<tr><td>Unsigned Word</td><td>Time in seconds, 0 for none</td></tr>
+</table>
+
+<p>This field is not found in CHIPS.DAT because it is completely unnecessary.</p>
+
+<h4>Field 2 - Chip count </h4>
+
+<table border="1" summary="Detailed layout of optional field type 2">
+<tr><td>Unsigned Byte</td><td>$02 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>$02 = Field length</td></tr>
+<tr><td>Unsigned Word</td><td>Number of chips on the level</td></tr>
+</table>
+
+<p>This field is not found in CHIPS.DAT because it is completely unnecessary.</p>
+
+<h4>Field 3 - Map Title</h4>
+
+<table border="1" summary="Detailed layout of optional field type 3">
+<tr><td>Unsigned Byte</td><td>$03 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Length of string including the terminating 0</td></tr>
+<tr><td>ASCII</td><td>Map title. Can be up to 63 bytes. </td></tr>
+<tr><td>Byte</td><td>0 (end of string) </td></tr>
+</table>
+
+<h4>Field 4 - Trap Controls</h4>
+
+<table border="1" summary="Detailed layout of optional field type 4">
+<tr><td>Unsigned Byte</td><td colspan="2">$04 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td colspan="2">Length of field, a multiple of $0A bytes</td></tr>
+<tr><td rowspan="5">Trap records</td>
+	<td>Unsigned Word</td><td>Button X position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Button Y position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Trap X position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Trap Y position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Always zero (used in the game for open/closed?)</td></tr>
+</table>
+<ul>
+    <li>Traps are assigned to appropriate brown buttons on the map detail. </li>
+    <li>An X-Y coordinate system is used. Since the map is a 32x32 tile grid, 
+    valid X-Y values are $00-$1F</li>
+</ul>
+
+<h4>Field 5 - Cloning Machine Controls</h4>
+
+<table border="1" summary="Detailed layout of optional field type 5">
+<tr><td>Unsigned Byte</td><td colspan="2">$05 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td colspan="2">Length of field, a multiple of $08 bytes</td></tr>
+<tr><td rowspan="5">Cloning machine records</td>
+	<td>Unsigned Word</td><td>Button X position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Button Y position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Trap X position</td></tr>
+<tr>	<td>Unsigned Word</td><td>Trap Y position</td></tr>
+</table>
+<ul>
+    <li> Cloning Machines are assigned to appropriate Red buttons on the map 
+    detail. </li>
+    <li> An X-Y coordinate system is used, as in Field 4 above. </li>
+    <li> Each coordinate pair is NOT terminated with a 0 word, therefore Cloning
+    Machine data is always a multiple of $08 bytes. (Don't ask me why the
+    inconsistencies, I didn't have anything to do with the programming J ) 
+    </li>
+</ul>
+
+<h4>Field 6 - Map Password</h4>
+
+<table border="1" summary="Detailed layout of optional field type 6">
+<tr><td>Unsigned Byte</td><td>$06 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Length of string including the terminating 0</td></tr>
+<tr><td>ASCII</td><td>Encoded password.</td></tr>
+<tr><td>Byte</td><td>0 (end of string) </td></tr>
+</table>
+<p>Standard passwords are always 4 bytes long, but the game engine allows 
+passwords to be up to 9 bytes.</p>
+
+<p>The password is encoded by XORing each byte in it with $99. This gives 
+character encodings:</p>
+<table border="1" summary="XOR-encoded password characters">
+<tr><td>A</td><td>D8</td><td>N</td><td>D7</td></tr>
+<tr><td>B</td><td>DB</td><td>O</td><td>D6</td></tr>
+<tr><td>C</td><td>DA</td><td>P</td><td>C9</td></tr>
+<tr><td>D</td><td>DD</td><td>Q</td><td>C8</td></tr>
+<tr><td>E</td><td>DC</td><td>R</td><td>CB</td></tr>
+<tr><td>F</td><td>DF</td><td>S</td><td>CA</td></tr>
+<tr><td>G</td><td>DE</td><td>T</td><td>CD</td></tr>
+<tr><td>H</td><td>D1</td><td>U</td><td>CC</td></tr>
+<tr><td>I</td><td>D0</td><td>V</td><td>CF</td></tr>
+<tr><td>J</td><td>D3</td><td>W</td><td>CE</td></tr>
+<tr><td>K</td><td>D2</td><td>X</td><td>C1</td></tr>
+<tr><td>L</td><td>D5</td><td>Y</td><td>C0</td></tr>
+<tr><td>M</td><td>D4</td><td>Z</td><td>C3</td></tr>
+</table>
+
+<h4>Field 7 - Map Hint</h4>
+
+<table border="1" summary="Detailed layout of optional field type 7">
+<tr><td>Unsigned Byte</td><td>$07 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Length of string including the terminating 0</td></tr>
+<tr><td>ASCII</td><td>Hint text. Can be up to 127 bytes.</td></tr>
+<tr><td>Byte</td><td>0 (end of string) </td></tr>
+</table>
+
+<h4>Field 8 - Map Password</h4>
+
+<table border="1" summary="Detailed layout of optional field type 8">
+<tr><td>Unsigned Byte</td><td>$08 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Length of string including the terminating 0</td></tr>
+<tr><td>ASCII</td><td>Password (not encoded).</td></tr>
+<tr><td>Byte</td><td>0 (end of string) </td></tr>
+</table>
+<ul>
+<li>This is the same as field 6, but the password is stored in plain ASCII
+rather than encoded. </li>
+<li>This field type does not appear in CHIPS.DAT.</li>
+</ul>
+
+<h4>Field 9 - Unknown</h4>
+
+<table border="1" summary="Detailed layout of optional field type 9">
+<tr><td>Unsigned Byte</td><td>$09 = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td>Length of field data</td></tr>
+<tr><td>...</td><td>Field data.</td></tr>
+</table>
+<p>This field is ignored by CHIPS.EXE.</p>
+
+<h4>Field 10 - Movement</h4>
+
+<table border="1" summary="Detailed layout of optional field type 10">
+<tr><td>Unsigned Byte</td><td colspan="2">$0A = Field type</td></tr>
+<tr><td>Unsigned Byte</td><td colspan="2">Length of field, a multiple of $02 bytes</td></tr>
+<tr><td rowspan="2">Monster movement records</td>
+	<td>Unsigned Byte</td><td>Monster X position</td></tr>
+<tr>	<td>Unsigned Byte</td><td>Monster Y position</td></tr>
+</table>
+<ul>
+    <li> Each Monster placed on the map must be listed in this field in order 
+    for movement to occur. If not listed, it will simply remain in its 
+    starting position. </li>
+    <li> An X-Y coordinate system is used. Since the map is a 32x32 tile grid, 
+    valid X-Y values are $00-$1F. </li>
+    <li>There can be at most 128 moving monsters.</li>
+</ul>
+
+<h3>Example dump of CHIPS.DAT</h3>
+
+<table border="1" summary="Table displaying the first level in CHIPS.DAT">
+<tr><th>Offset</th> <th colspan="2">Description</th></tr>
+<tr><td>$00-$03</td><td>Unsigned Long</td> <td>$0002AAAC - magic number </td></tr>
+<tr><td>$04-$05</td><td>Unsigned Word</td> <td>$95 -&gt; 149, number of levels</td></tr>
+
+<tr><td colspan="3">The information below applies to the first record.
+The levels that follow are in the same format.</td></tr>
+
+<tr><td>$06-$07</td><td>Unsigned Word</td>
+		    <td>Offset to next record. Level 1 = $135 bytes in level. 
+		    $08+$135=$13D=begin next level. </td></tr>
+
+<tr><td>$08-$09</td><td>Unsigned Word</td><td>Level number </td></tr>
+
+<tr><td>$0A-$0B</td><td>Unsigned Word</td><td>Time (in seconds).
+			A value of ZERO indicates no time limit </td></tr>
+
+<tr><td>$0C-$0D</td><td>Unsigned Word</td><td>Number of chips to pick up </td></tr>
+
+<tr><td>$0E-$0F</td><td>Unsigned Word</td><td>Always = 1 = field 1 = Map detail Upper layer </td></tr>
+
+<tr><td>$10-$11</td><td>Unsigned Word</td><td>Number of bytes in Map detail, first layer. Level 1 = $C1.
+$12+$C1=$D3=begin lower layer
+</td></tr>
+
+<tr><td>$12-$D2</td><td>N/A</td><td>Level 1 map detail Upper layer </td></tr>
+
+<tr><td>$D3-$D4</td><td>Unsigned Word</td><td>Number of bytes in Map detail, second layer. Level 1 = $0F. $D5+$0F=$E4=end
+map detail </td></tr>
+
+<tr><td>$D5-$E3</td><td>N/A</td><td>Level 1 map detail (second layer) </td></tr>
+
+<tr><td>$E4-$E5</td><td>Unsigned Word</td><td>Number of
+bytes to end of level. Level 1 = $57. $E6+$57=$13D </td></tr>
+
+<tr><td>$E6</td><td>Unsigned Byte</td><td>Always = 3. Field 3 = Level Title </td></tr>
+
+<tr><td>$E7</td><td>Unsigned Byte</td><td>Number of bytes in Title. Level 1 = 9 </td></tr>
+
+<tr><td>$E8-$F0</td><td>N/A</td><td>Level Title. Level 1 = "Lesson 1",0 </td></tr>
+
+<tr><td>$F1</td><td>Unsigned Byte</td><td>Always 7 = Field 7 = Hint text </td></tr>
+
+<tr><td>$F2</td><td>Unsigned Byte</td><td>Number of bytes in Hint text. Level 1 = $43. $F3+$43=$136=end Hint Text </td></tr>
+
+<tr><td>$F3-$135</td><td>N/A</td><td>ASCII - Hint text. Level 1 = "Collect chips to get past the chip
+socket. Use keys to open doors.",00 </td></tr>
+
+<tr><td>$136</td><td>Unsigned Byte</td><td>Always 6. Field 6 = Password </td></tr>
+
+<tr><td>$137</td><td>Unsigned Byte</td><td>Always 5. Password length </td></tr>
+
+<tr><td>$138-$13C</td><td>N/A</td>
+                      <td>Level Password (encrypted). 
+		      Level 1 = $DB,$DD,$D1,$C9,$00 = BDHP</td></tr>
+</table>
+
+<h2>Chip's Challenge Object Codes</h2>
+
+<p>This is a listing of the object codes used in the
+Map Detail. This will be helpful to those who wish to change their maps. 
+Please read File Layout Information for more information.</p>
+
+<table border="1" summary="All the object codes">
+<tr><td>$00</td><td>Empty Tile (Space)</td>
+    <td>$26</td><td>Switch Block, Open</td>
+    <td>$4C</td><td>Tank (N) </td></tr>
+<tr><td>$01</td><td>Wall</td>
+    <td>$27</td><td>Brown Button - Traps</td>
+    <td>$4D</td><td>Tank (W) </td></tr>
+
+<tr><td>$02</td><td>Computer Chip</td>
+    <td>$28</td><td>Blue Button - Tanks</td>
+    <td>$4E</td><td>Tank (S) </td></tr>
+
+<tr><td>$03</td><td>Water</td>
+    <td>$29</td><td>Teleport</td>
+    <td>$4F</td><td>Tank (E) </td></tr>
+
+<tr><td>$04</td><td>Fire</td>
+    <td>$2A</td><td>Bomb</td>
+    <td>$50</td><td>Ghost (N) </td></tr>
+
+<tr><td>$05</td><td>Invisible Wall (won't appear)</td>
+    <td>$2B</td><td>Trap</td>
+    <td>$51</td><td>Ghost (W) </td></tr>
+
+<tr><td>$06</td><td>Blocked North</td>
+    <td>$2C</td><td>Invisible Wall (Will appear)</td>
+    <td>$52</td><td>Ghost (S) </td></tr>
+
+<tr><td>$07</td><td>Blocked West</td>
+    <td>$2D</td><td>Gravel</td>
+    <td>$53</td><td>Ghost (E) </td></tr>
+
+<tr><td>$08</td><td>Blocked South</td>
+    <td>$2E</td><td>Pass Once</td>
+    <td>$54</td><td>Frog (N) </td></tr>
+
+<tr><td>$09</td><td>Blocked East</td>
+    <td>$2F</td><td>Hint</td>
+    <td>$55</td><td>Frog (W) </td></tr>
+
+<tr><td>$0A</td><td>Movable Dirt Block</td>
+    <td>$30</td><td>Blocked South - East</td>
+    <td>$56</td><td>Frog (S) </td></tr>
+
+<tr><td>$0B</td><td>Dirt</td>
+    <td>$31</td><td>Cloning Machine</td>
+    <td>$57</td><td>Frog (E) </td></tr>
+
+<tr><td>$0C</td><td>Ice</td>
+    <td>$32</td><td>Force All Direction</td>
+    <td>$58</td><td>Dumbbell (N) </td></tr>
+
+<tr><td>$0D</td><td>Force South (S)</td>
+    <td>$33</td><td>Drowning Chip</td>
+    <td>$59</td><td>Dumbbell (W) </td></tr>
+
+<tr><td>$0E</td><td>Cloning Block North (N)</td>
+    <td>$34</td><td>Burned Chip</td>
+    <td>$5A</td><td>Dumbbell (S) </td></tr>
+
+<tr><td>$0F</td><td>Cloning Block West (W)</td>
+    <td>$35</td><td>Burned Chip(2)</td>
+    <td>$5B</td><td>Dumbbell (E) </td></tr>
+
+<tr><td>$10</td><td>Cloning Block South (S)</td>
+    <td>$36</td><td>NOT used</td>
+    <td>$5C</td><td>Blob (N) </td></tr>
+
+<tr><td>$11</td><td>Cloning Block East (E)</td>
+    <td>$37</td><td>NOT used</td>
+    <td>$5D</td><td>Blob (W) </td></tr>
+
+<tr><td>$12</td><td>Force North (N)</td>
+    <td>$38</td><td>NOT used</td>
+    <td>$5E</td><td>Blob (S) </td></tr>
+
+<tr><td>$13</td><td>Force East (E)</td>
+    <td>$39</td><td>Chip in Exit - end game</td>
+    <td>$5F</td><td>Blob (E) </td></tr>
+
+<tr><td>$14</td><td>Force West (W)</td>
+    <td>$3A</td><td>Exit - end game</td>
+    <td>$60</td><td>Centipede (N) </td></tr>
+
+<tr><td>$15</td><td>Exit</td>
+    <td>$3B</td><td>Exit - end game</td>
+    <td>$61</td><td>Centipede (W) </td></tr>
+
+<tr><td>$16</td><td>Blue Door</td>
+    <td>$3C</td><td>Chip Swimming (N)</td>
+    <td>$62</td><td>Centipede (S)</td></tr>
+
+<tr><td>$17</td><td>Red Door</td>
+    <td>$3D</td><td>Chip Swimming (W)</td>
+    <td>$63</td><td>Centipede (E) </td></tr>
+
+<tr><td>$18</td><td>Green Door</td>
+    <td>$3E</td><td>Chip Swimming (S)</td>
+    <td>$64</td><td>Blue Key </td></tr>
+
+<tr><td>$19</td><td>Yellow Door</td>
+    <td>$3F</td><td>Chip Swimming (E)</td>
+    <td>$65</td><td>Red Key </td></tr>
+
+<tr><td>$1A</td><td>South« East Ice Slide</td>
+    <td>$40</td><td>Bug (N)</td>
+    <td>$66</td><td>Green Key </td></tr>
+
+<tr><td>$1B</td><td>South« West Ice Slide</td>
+    <td>$41</td><td>Bug (W)</td>
+    <td>$67</td><td>Yellow Key </td></tr>
+
+<tr><td>$1C</td><td>North« West Ice Slide</td>
+    <td>$42</td><td>Bug (S)</td>
+    <td>$68</td><td>Flippers </td></tr>
+
+<tr><td>$1D</td><td>North« East Ice Slide</td>
+    <td>$43</td><td>Bug (E)</td>
+    <td>$69</td><td>Fire Boots </td></tr>
+
+<tr><td>$1E</td><td>Blue Block, becomes Tile</td>
+    <td>$44</td><td>Fire Bug (N)</td>
+    <td>$6A</td><td>Ice Skates </td></tr>
+
+<tr><td>$1F</td><td>Blue Block, becomes Wall</td>
+    <td>$45</td><td>Fire Bug (W)</td>
+    <td>$6B</td><td>Suction Boots </td></tr>
+
+<tr><td>$20</td><td>NOT used</td>
+    <td>$46</td><td>Fire Bug (S)</td>
+    <td>$6C</td><td>Chip (N) </td></tr>
+
+<tr><td>$21</td><td>Thief</td>
+    <td>$47</td><td>Fire Bug (E)</td>
+    <td>$6D</td><td>Chip (W) </td></tr>
+
+<tr><td>$22</td><td>Socket</td>
+    <td>$48</td><td>Pink Ball (N)</td>
+    <td>$6E</td><td>Chip (S) (Always used) </td></tr>
+
+<tr><td>$23</td><td>Green Button - doors</td>
+    <td>$49</td><td>Pink Ball (W)</td>
+    <td>$6F</td><td>Chip (E) </td></tr>
+
+<tr><td>$24</td><td>Red Button - cloning</td>
+    <td>$4A</td><td>Pink Ball (S) </td></tr>
+
+<tr><td>$25</td><td>Switch Block, Closed</td>
+    <td>$4B</td><td>Pink Ball (E) </td></tr>
+</table>
+<p>Codes $20,$36,$37,$38 work apparently in the same
+fashion as code $05. However they are not used in the original game.</p>
+
+<p>Codes $39-$3F are only used internally by the
+game. </p>
+
+
+<p><img src="ccfile_files/chip.jpg" width="64" height="64" align="bottom" alt="[Back]" /> 
+<a href="http://www.telusplanet.net/public/nfield/ChipChallenge/chip.htm">Back to Chip's Challenge for Windows Main Page</a></p>
+</body></html>

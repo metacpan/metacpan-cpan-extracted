@@ -1,0 +1,25 @@
+# vim: ts=8 sw=2 sts=0 noexpandtab:
+
+Devel::NYTProf Installation Notes
+=================================
+
+For the most part, users on Unix-like operating system can do:
+
+perl Makefile.PL
+make
+make test
+make install
+
+The module library tried to speed thing up when running in forkmode by using
+fpruge() to delete potential duplicated buffers.  Unfortunately, althrough
+fpurge() *is* in the GNU manual, operating systems largely implement it very
+differently.  The Makefile.PL does some magic to find out where your particular
+version of fpurge is.  Usually it can be found in stdio.h or stdio_ext.h, so
+make sure those are in your INCLUDE path.  It is also sometimes named fpurge
+_fpurge or __fpurge.
+
+COMPILE NOTES
+
+The module was written to compile silently with -Wall -pedantic -ansi.  Some
+warnings might be generated from methods like XS_blah.  These are in Perl
+generated code and cannot be fixed by me.

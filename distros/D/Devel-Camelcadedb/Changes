@@ -1,0 +1,23 @@
+Revision history for Devel-Camelcadedb
+
+2017.1
+        New versioning.
+        Added uWSGI + Plack support https://github.com/Camelcade/Perl5-IDEA-Debugger/pull/26
+
+1.6.1.6
+        Fixed possible problems with destructor corrupting sub result
+
+1.6.1.5
+        Added initialization debugger code support
+
+1.6.1.3
+        Improved performance of breakpoints setting
+        Introduced IDE-side options for non-interactive mode and compile-time breakpoints (since 2.101)
+
+1.6.1.2
+        Fixed problem with debugging flow after exception been thrown
+        Fixed problem with Cwd::realpath failure without an exception on linux systems
+
+1.6.1.1    23 May 2016
+        First version, released on an unsuspecting world.
+

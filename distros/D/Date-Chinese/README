@@ -1,0 +1,68 @@
+NAME
+    Date::Chinese - Calculate dates in the Chinese calendar
+
+SYNOPSIS
+      use Date::Chinese;
+
+      $year = yearofthe( 1999 ); # "Year of the hare, earth"
+
+DESCRIPTION
+    Please note that the API of this module is *guaranteed* to change in
+    future versions. I'll hopefully be adding more details about the date,
+    rather than just the year.
+
+    You should also note that the Chinese new year does not conicide with
+    the Gregorian new year, so the determination of what year it is in the
+    Chinese calendar is only going to be correct for a portion of the
+    Gregorian year.
+
+SUPPORT
+    datetime@perl.org
+
+AUTHOR
+            Rich Bowen
+            CPAN ID: RBOW
+            rbowen@rcbowen.com
+            http://www.rcbowen.com
+
+COPYRIGHT
+    Copyright (c) 2001 Rich Bowen. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+     perl(1).
+     http://dates.rcbowen.com/
+
+About the Chinese calendar
+    Reference: The Oxford Companion to the Year - Bonnie Blackburn and
+    Leofranc Holford-Strevens. Pg 696-707
+
+    The Chinese calendar is a 19 year cycle. Seven of these 19 years have 13
+    months, and the rest have 12. There's a whole heck of a lot more to it
+    than the 12 animals that you see on your placemat at your favorite
+    Chinese restaurant.
+
+    There is a cycle of 10 stems and 12 branches. Each stem has associated
+    with it an element (wood, fire, earth, metal, water) a yang (fir,
+    kindling, hill, weapons, waves) a yin (bamboo, lamp-flame, plain,
+    kettle, brooks) a cardinal point (east, south, centre, west, north) and
+    a planet (Jupiter, Mars, Saturn, Venus, Mercury).
+
+    Likewise, each branch has associated with it an animal, an element, a
+    double-hour, a compass point, and a sign of the zodiac.
+
+    Each of these various cycles are going on at the same time, and so
+    interact with each other to produce combinations of all of these
+    different components. And various combinations mean various things.
+
+    There are, of course, many folks that have more knowledge of how this
+    all works than I do. I just used to be a mathematician.
+
+    http://www.math.nus.edu.sg/aslaksen/calendar/chinese.shtml seems like a
+    good place to start, but there are many other very informative sites on
+    the net.
+

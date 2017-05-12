@@ -1,0 +1,19 @@
+Revision history for Perl extension DBIx::Compare
+
+1.0	Tue August 19 12:00:00 2008
+	- First CPAN release
+1.2	Mon September 15 09:00:00 2008
+	- Fixed bug in deep_compare() where the order of database handles affected output
+1.3	Tue September 30 09:20:00 2008
+	- Implemented aggregate (mathematical) comparison
+	- Implemented DBD plug-ins to support the above
+	- Many other changes
+1.4	Mon December 01 12:00:00 2008
+	- Minor change to setting of table primary keys
+	- Many fixes and enhancements to DBIx::Compare::Pg, thanks to Mark Kirkwood
+1.6	Wed December 11 15:55:00 2008
+	- This version thanks to more input from Mark Kirkwood
+	- Better handling of possible different DSN arguments in the database handle
+	- Bug fixes in field statistic comparisons
+1.7	Mon February 16 11:00:00 2009
+	- Fixed a bug with older DBD-Pg drivers

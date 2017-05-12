@@ -1,0 +1,33 @@
+Revision history for Perl extension Devel::CheckCompiler
+
+0.07 2016-11-18T15:32:45Z
+    - Correct test dependency
+
+0.06 2015-06-30T05:22:51Z
+    - More strict C99 check code
+      (tokuhirom)
+    - Fix for older GCC(< 5.0)
+      (Syohei YOSHIDA)
+
+0.05 2013-12-03T22:52:46Z
+
+    - Add extra_linker_flags to check_compiler()
+      (Syohei YOSHIDA)
+
+0.04 2013-10-05T06:05:09Z
+
+    - Add executable flag to check_compiler()
+      (Syohei YOSHIDA)
+
+0.03 2013-10-02T06:15:48Z
+
+    - Export check_compiler() function.
+      (tokuhirom)
+
+0.02 2012-11-11
+
+    - docs
+
+0.01 2012-11-09
+
+    - original version

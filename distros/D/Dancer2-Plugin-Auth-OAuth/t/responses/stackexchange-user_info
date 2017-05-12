@@ -1,0 +1,30 @@
+HTTP/1.1 200 OK
+Content-Type: application/json; charset=UTF-8
+Status: 200 OK
+
+{
+  "items": [
+    {
+      "badge_counts": {
+        "bronze": 8,
+        "silver": 1,
+        "gold": 0
+      },
+      "last_modified_date": 1337656466,
+      "last_access_date": 1449843597,
+      "age": 30,
+      "reputation_change_year": 39,
+      "reputation_change_quarter": -1,
+      "reputation_change_month": 0,
+      "reputation_change_week": 0,
+      "reputation_change_day": 0,
+      "reputation": 157,
+      "creation_date": 1313242661,
+      "user_type": "registered",
+      "location": "Sydney, Australia"
+    }
+  ],
+  "has_more": false,
+  "quota_max": 10000,
+  "quota_remaining": 9998
+}

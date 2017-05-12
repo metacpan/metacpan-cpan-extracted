@@ -1,0 +1,86 @@
+Revision history for Date::Saka::Simple
+
+0.18  Fri Jan 20 11:55:00 2017
+      - Updated the dependency on Date::Utils v0.22.
+
+0.17  Mon Nov 07 07:00:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.16  Sun Aug 07 08:15:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.15  Sat Aug 06 11:45:00 2016
+      - Updated the dependency on Date::Utils v0.21.
+
+0.14  Sun Jul 24 08:50:00 2016
+      - Updated the dependency on Date::Utils v0.20.
+      - Dropped method get_calendar() as it's no longer relevant here.
+
+0.13  Thu Jun 30 10:30:00 2016
+      - Addressed issue raised in the CPAN Tester Report.
+        http://www.cpantesters.org/cpan/report/48e6a3f6-3d02-11e6-a5ff-abe4273a1f7f
+
+0.12  Sun May 22 03:00:00 2016
+      - Added unit test for method days_in_month_year().
+      - Refactored method days_in_chaitra() and days_in_month_year().
+      - Added missing dependency on Date::Exception.
+
+0.11  Fri May 20 10:30:00 2016
+      - Updated the dependency on Date::Utils v0.19.
+      - Updated method get_calendar() and method as_string() to use get_month_name().
+      - Renamed method saka_months() to months().
+      - Renamed method saka_days() to days().
+      - Renamed method get_days_in_saka_month_year() to get_days_in_month_year().
+      - Updated method get_calendar() to respect the above changes.
+
+0.10  Sat Apr 23 13:20:00 2016
+      - Updated the dependency on Date::Utils v0.16.
+      - Added section "SEE ALSO".
+      - Updated copyright year information.
+
+0.09  Thu Aug 27 10:50:00 2015
+      - Added the dependency on Date::Utils v0.11.
+      - Updated the following methods to make use of Date::Exception package:
+        - add_days()
+        - minus_days()
+        - add_months()
+        - minus_months()
+        - add_years()
+        - minus_years()
+
+0.08  Mon Jul 20 11:45:00 2015
+      - Added the dependency on Date::Utils v0.10.
+      - Added method get_calendar().
+
+0.07  Mon Jul 06 09:15:00 2015
+      - Added the dependency on Date::Utils v0.09.
+      - Tidied up pod document in general.
+
+0.06  Wed Jun 24 12:40:00 2015
+      - Added unit test for method from_gregorian() and from_julian().
+      - Added code for method from_gregorian() and from_julian() to the pod.
+
+0.05  Mon May 25 14:30:00 2015
+      - Removed the dependency on Date::Utils::Saka.
+      - Added the dependency on Date::Utils v0.08.
+      - Added the dependency on List::Util v1.41.
+      - Merged the code from Date::Utils::Saka into Date::Saka::Simple.
+      - Updated unit test w.r.t the merged code.
+      - Added more code to the section "SYNOPSIS".
+
+0.04  Wed May 20 09:40:00 2015
+      - Added missing dependency Date::Calc.
+      - Updated method as_string() to return Saka date in correct format i.e. days to be 2-digits always.
+      - Added unit test for the following methods:
+        - add_days(), minus_days(), add_months, minus_months, add_years and minus_years().
+      - Updated the following methods to return $self, so that it can be chained.
+        - add_days(), minus_days(), add_months, minus_months, add_years and minus_years().
+
+0.03  Thu Apr 23 23:33:00 2015
+      - Re-structured and consumed Date::Utils::Saka as Moo Role.
+
+0.02  Mon Apr 20 11:25:00 2015
+      - Made Date::Utils v0.06 as minimum requirement, as reported by CPAN Testers.
+
+0.01  Sun Apr 19 19:10:00 2015
+      - First version, released.

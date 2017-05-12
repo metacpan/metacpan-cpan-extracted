@@ -1,0 +1,42 @@
+---
+abstract: 'Secure conversion of CGI params hash to SQL'
+author:
+  - 'Alex Efros <powerman@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::Database: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-SecureCGI
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  DBIx::SecureCGI:
+    file: lib/DBIx/SecureCGI.pm
+    version: v3.0.0
+requires:
+  AnyEvent: '0'
+  AnyEvent::DBI::MySQL: v1.0.2
+  DBD::mysql: '0'
+  DBI: '0'
+  List::Util: '1.33'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/powerman/perl-DBIx-SecureCGI/issues
+  homepage: https://github.com/powerman/perl-DBIx-SecureCGI
+  repository: https://github.com/powerman/perl-DBIx-SecureCGI.git
+version: v3.0.0

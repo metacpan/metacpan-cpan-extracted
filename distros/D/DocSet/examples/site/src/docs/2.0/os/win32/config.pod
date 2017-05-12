@@ -1,0 +1,79 @@
+=head1 NAME
+
+Configuring mod_perl 2.0 for Win32
+
+=head1 Description
+
+This document discusses how to configure mod_perl 2.0.
+
+=head1 Configuration
+
+Add this line to F<C:/Apache2/conf/httpd.conf>:
+
+ LoadModule perl_module modules/mod_perl.so
+
+Be sure that the path to your Perl binary (eg, F<C:/Perl/bin>) is in
+your C<PATH> environment variable. You may also want to use a start-up
+script to load commonly used modules; this can be done with a
+directive as, eg,
+
+ PerlRequire "C:/Apache2/conf/extra.pl"
+
+where a sample start-up script F<C:/Apache2/conf/extra.pl> is
+
+  use Apache2 ();
+  use ModPerl::Util ();
+  use Apache::RequestRec ();
+  use Apache::RequestIO ();
+  use Apache::RequestUtil ();
+  use Apache::Server ();
+  use Apache::ServerUtil ();
+  use Apache::Connection ();
+  use Apache::Log ();
+  use Apache::Const -compile => ':common';
+  use APR::Const -compile => ':common';
+  use APR::Table ();
+  use Apache::compat ();
+  use ModPerl::Registry ();
+  use CGI ();
+  1;
+
+The C<Apache2> module is used to add to C<@INC> the relevant
+directories underneath, eg, F</Perl/site/lib/Apache2/> used when
+building mod_perl 2.0 with an C<MP_INST_APACHE2=1> option to C<perl
+Makefile.PL> (the C<PPM> packages discussed above were built this
+way). C<Apache::compat> is used to provide backwards compatibility
+with mod_perl 1.0.  C<ModPerl::Registry>, named so as not to conflict
+with C<Apache::Registry> of mod_perl 1.0, is used for registry
+scripts.
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item * 
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+=cut
+

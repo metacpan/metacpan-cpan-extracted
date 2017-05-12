@@ -1,0 +1,45 @@
+---
+abstract: 'DBRs Dist::Zilla PluginBundle'
+author:
+  - 'Daniel Bruder <dbr@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-DBR
+requires:
+  Dist::Zilla: 0
+  Dist::Zilla::Plugin::AutoPrereqs: 0
+  Dist::Zilla::Plugin::ConfirmRelease: 0
+  Dist::Zilla::Plugin::EOLTests: 0
+  Dist::Zilla::Plugin::InstallRelease: 0
+  Dist::Zilla::Plugin::MetaJSON: 0
+  Dist::Zilla::Plugin::ModuleBuild: 0
+  Dist::Zilla::Plugin::NoTabsTests: 0
+  Dist::Zilla::Plugin::PkgVersion: 0
+  Dist::Zilla::Plugin::PodCoverageTests: 0
+  Dist::Zilla::Plugin::PodSyntaxTests: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::ReadmeFromPod: 0
+  Dist::Zilla::Plugin::Run::Release: 0
+  Dist::Zilla::Plugin::TaskWeaver: 0
+  Dist::Zilla::Plugin::Test::CheckDeps: 0
+  Dist::Zilla::Plugin::Test::Compile: 0
+  Dist::Zilla::Plugin::Test::Kwalitee: 0
+  Dist::Zilla::Plugin::Test::Portability: 0
+  Dist::Zilla::Plugin::Test::ReportPrereqs: 0
+  Dist::Zilla::Plugin::TestRelease: 0
+  Dist::Zilla::PluginBundle::Filter: 0
+  MooseX::Declare: 0
+version: 0.024
+x_authority: cpan:DBR

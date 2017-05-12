@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+#
+#  Sample code to list all lights.
+#
+
+use strict;
+use warnings;
+
+use Device::Osram::Lightify::Hub;
+
+my $x = Device::Osram::Lightify::Hub->new( host => "192.168.10.136" );
+
+foreach my $light ( $x->lights() )
+{
+    print $light;
+}

@@ -1,0 +1,49 @@
+
+- file handling code:
+  best API?
+  mmap?
+  It works with imcomp.pl now, so covers everything Data::BitStream has.
+
+- push trim to Data::BitStream
+
+- redo Data::BitStream to use our pos and len
+
+- revisit assert / croak / die.
+   - Carp::croak for any user input that isn't right.
+   - die if we mess up internally.
+   - assert() only for "OMG, something is really wrong with our state"
+     No user input or stream data should get us to assert.  You can think
+     of the assert lines as a comment to the programmer saying "obviously
+     this condition holds right now."  Code below that point now can go
+     on with its task knowing that is true.  Any time an assertion fires,
+     that means all the code below must be carefully examined to make sure
+     it can work with the new case.  It also means someone's assumptions
+     about the state of the world / input were incorrect.
+  As someone on perlmonks (jettero, May 2008) put it:
+      You use die when the error is something you or your code didn't do right.
+      You use croak when it's something your caller isn't doing right.
+      die "error: $!" indicates the error is on the line where the error
+      occured. croak "error: $!" indicates the error is on the line where
+      the caller called your code.
+ This is a bit tricky for us given that we have codes calling codes.
+
+- All read / get_* commands should either:
+    1) return the proper value
+  or
+    2) give a consistent error message and leave the position unchanged.
+
+  We have lots of tests for #1, not very many for #2.  The test 71-bad_gets.t
+  makes a start at testing these.  This includes cases where reading the code
+  goes off the end of the stream, as well as various cases where part of the
+  code is invalid (e.g. a base higher than 32/64).
+  More work needs to be done, both in testing (e.g. Evenrodeh) and in making
+  sure the position is correct after a short read (e.g. Rice, Golomb).
+
+
+- primes and Goldbach behavior needs to be examined near the 32-bit boundary
+  when running on 32-bit Perl.  In fact, all the primes code should be examined
+  for possible overflow issues.
+
+- Use proper print/croak % macros instead of %lu etc.
+
+- use UV instead of int.

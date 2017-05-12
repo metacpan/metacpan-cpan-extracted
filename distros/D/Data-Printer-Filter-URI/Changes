@@ -1,0 +1,33 @@
+Changelog for Data-Printer-Filter-URI
+
+0.008 2014-06-25T17:15:40
+ - Dist::Zilla maintenance (Stanislaw Pusep)
+ - drop PWP::Encoding dependency (Sergey Romanov)
+
+0.007 2012-11-29T20:44:25
+ - fix the compatibility with URI::urn::uuid (Stanislaw Pusep)
+
+0.006 2012-11-12T13:46:11
+ - hostname boldification fix; proper scp/sftp support (Stanislaw Pusep)
+
+0.005 2012-11-09T20:32:20
+ - (optional) test for Mojo::URL (Stanislaw Pusep)
+ - Mojo::URL support (Stanislaw Pusep)
+
+0.004 2012-11-07T19:01:30
+ - bugs fixes; tests added (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.003 2011-10-15T19:45:00
+ - perl >= 5.010 (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.002 2011-10-15T15:26:58
+ - separate colors for scheme/host (Stanislaw Pusep)
+ - Changes (Stanislaw Pusep)
+
+0.001 2011-10-14T21:12:46
+ - Dist::Zilla[2] (Stanislaw Pusep)
+ - Dist::Zilla (Stanislaw Pusep)
+ - INIT (Stanislaw Pusep)
+

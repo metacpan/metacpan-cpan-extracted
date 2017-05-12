@@ -1,0 +1,98 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Consolidate::FillMissing - Post Consolidation Iterator used to fill gaps
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream::Iterator::Consolidate;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::FillMissing;
+
+  my $array=Data::Range::Compare::Stream::Iterator::Array->new;
+
+  $array->create_range(0,0);
+  $array->create_range(1,1);
+  $array->create_range(3,4);
+  $array->create_range(6,7);
+  
+  $array->set_sorted(1);
+
+  my $con=Data::Range::Compare::Stream::Iterator::Consolidate->new($array);
+  my $fill=new Data::Range::Compare::Stream::Iterator::Consolidate::FillMissing($con);
+
+  while($fill->has_next) {
+    my $result=$fill->get_next;
+    my $missing=$result->is_missing ? ' Gap' : '';
+    print $result,$missing,"\n";
+  }
+
+Resulting Output:
+
+  Commoon Range: [0 - 0] Starting range: [0 - 0] Ending Range: [0 - 0]
+  Commoon Range: [1 - 1] Starting range: [1 - 1] Ending Range: [1 - 1]
+  Commoon Range: [2 - 2] Starting range: [2 - 2] Ending Range: [2 - 2] Gap
+  Commoon Range: [3 - 4] Starting range: [3 - 4] Ending Range: [3 - 4]
+  Commoon Range: [5 - 5] Starting range: [5 - 5] Ending Range: [5 - 5] Gap
+  Commoon Range: [6 - 7] Starting range: [6 - 7] Ending Range: [6 - 7]
+
+=head1 DESCRIPTION
+
+This class Extends L<Data::Range::Compare::Stream::Iterator::Base>.  Any gaps in the input data set are filled in and marked as missing.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $iterator=new Data::Range::Compare::Stream::Iterator::Consolidate::FillMissing($consolidator);
+
+Instance Constructor:  $consolidator needs to be an object that implements or extends Data::Range::Compare::Stream::Iterator::Consolidate.
+
+Optional Arguments:
+
+      factory_instance =>$obj
+        
+        # defines the object that implements the $obj->factory($start,$end,$data).
+        # new ranges are constructed from the factory interfcae.  If a factory interface
+        # is not created an instance of Data::Range::Compare::Stream is assumed.
+
+=item * my $class=$iterator->NEW_RESULT_FROM;
+
+$class will contain the name of the class new result objects will be constructed from.  Default value is L<Data::Range::Compare::Stream::Iterator::Consolidate::Result>.
+
+=item * while($iterator->has_next) { ... }
+
+Returns true when there are more rows to fetch.
+
+=item * my $result=$iterator->get_next;
+
+Returns the next Result object.  $result->is_missing will be true if the range was not in that set of data.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

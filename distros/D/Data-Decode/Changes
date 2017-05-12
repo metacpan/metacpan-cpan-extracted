@@ -1,0 +1,25 @@
+Changes
+=======
+
+0.00006 07 Nov 2007
+  - Fix Data::Decode::decode to actuall respect Data::Decode::Exception
+
+0.00005 07 Nov 2007
+  - Forgot to add new module to MANIFEST.
+  - No code changes
+
+0.00004 06 Nov 2007
+  - Be more tolerant about decoding, from HTTP response hints.
+    Now we can decode far more cases where the HTTP headers are saying
+    charset=X, but the META tags in the HTML says another charset
+
+0.00003 06 Nov 2007
+  - Add ability to decode HTTP response from its META tags on top of
+    the headers.
+
+0.00002 03 Nov 2007
+  - Fix naming of Data::Decode::Encode::HTTP::Response
+  - Fix for POD tests
+
+0.00001 03 Nov 2007
+  - Initial release

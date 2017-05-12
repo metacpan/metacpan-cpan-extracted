@@ -1,0 +1,11 @@
+DBR Examples!
+
+I've always found it best to learn by example, rather than reading through gobs of documentation as a first resort.
+So here are some simple examples of how to use DBR.
+
+Provided you have all the required dependencies installed, you should be able to run any of the example scripts here right out of the box.
+If you are in doubt about this, please run the following to find out:
+   cd .. ; perl Makefile.PL
+
+Each example will use DBR::Sandbox to create a sqlite DBR environment in a bottle.
+Sniff around the _sandbox directory and the generated_dbr.conf to get an idea of how things work.

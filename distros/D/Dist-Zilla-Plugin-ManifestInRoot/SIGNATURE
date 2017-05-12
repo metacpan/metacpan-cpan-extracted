@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 82d4b1e911897f3c5f9624a7df7eea917bde7864 Build.PL
+SHA1 fee142edfc073d0f77e11529ec4dfe0c57deff44 Changes
+SHA1 29ab49f99a2635740ca1339316c8d96ba6dc9ed8 LICENSE
+SHA1 63f41a522c0b12f856fa3b34a85394d34c20bc98 MANIFEST
+SHA1 27c31cc695dd0c165191728047487c8a04fd54b5 META.json
+SHA1 a88ad784a000720dac5b7465b22c16d337cb81f7 META.yml
+SHA1 3283de3d7cb5a2e6a6462236f85e7449fd5c6696 README
+SHA1 8f887661830f39ff5a6f2e393ff53ffb5196c33d lib/Dist/Zilla/Plugin/ManifestInRoot.pm
+SHA1 d821db7a239f079d09b7d89029f24b1c116c46e5 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 427b1a5820b3d6bc52044b99c999e458eba7d6dc t/02pod.t
+SHA1 905a84ed4a01bba172b682620964560f04ff93d2 t/03podcoverage.t
+SHA1 c1c29d14c961c30f0ea1ff84dd3b6acb7f4d3e81 t/05kwalitee.t
+SHA1 8b1ef2c2000dda84911be6a6bf76d4de88a4d4dc t/06yaml.t
+SHA1 58e9f09841a3e1d458d8fcdb1a5eb12b41db0867 t/07podspelling.t
+SHA1 4528db450cd67c1fa2c50d5e9f6e945ebc50455a t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 c59720b8c7015622b0a96279c37696b6847786b5 t/exceptions.dd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYZVoJAAoJEK492j4Im1Bpu4gH/2PBtbTQSkFqD13rTeCm3Opp
+saPuw1sZNBxwDnnlwBKAAucSFH75mElmwmsvk49Zq7MxLvOw7+XhYCMuceU4gNhj
++uApw41zbh10esQA5mx8ahIhOLzmYbOPvQNYrOL842awZoudHH01n0aJi2LhEZ1i
+oNiWmMJr5rK3mI9wFHf+YvxPnXsLXh71brCw6k0iaMX9iHU7bKYm3v8Dj74ukgmY
+AuzQzgN9Z95bmkNGP7q7WsmpGwYMH68pCPJENgTcrG8Ju3bVabFvfNVGrNcesbJu
+Dncd3PQ4WocPbXpUIQYNQhAuxiFGy8PRm0O1qq1ga/JpaqUnPDbYMMPi64kbwLE=
+=GhdE
+-----END PGP SIGNATURE-----

@@ -1,0 +1,31 @@
+---
+base_url: http://localhost:4500
+version: 0.2
+format:
+  - json
+  - xml
+  - yml
+methods:
+  create_object:
+    required_params:
+      - name_object
+    optional_params:
+      - created_at
+    path: /object
+    method: POST
+  update_object:
+    required_params:
+      - id
+      - name_object
+    optional_params:
+      - created_at
+    path: /object/:id
+    method: PUT
+  delete_object:
+    required_params:
+      - id
+      - name_object
+    optional_params:
+      - created_at
+    path: /object/:id
+    method: DELETE

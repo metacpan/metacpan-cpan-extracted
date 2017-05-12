@@ -1,0 +1,62 @@
+NAME
+    Dist::Zilla::Plugin::CheckMetaResources - Ensure META includes resources
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+      # in dist.ini
+
+      [CheckMetaResources]
+
+DESCRIPTION
+    This is a "before release" Dist::Zilla plugin that ensures that your
+    META file will contain some "resources" data.
+
+    By default, it requires you to have at least 'repository' and
+    'bugtracker' sections, but 'homepage' is optional.
+
+    You can toggle any of these checks on or off. For example:
+
+      [CheckMetaResources]
+      repository = 1
+      bugtracker = 0
+      homepage = 1
+
+SEE ALSO
+    *   Dist::Zilla
+
+    *   Dist::Zilla::Plugin::MetaResources
+
+    *   Dist::Zilla::Plugin::GithubMetas
+
+    *   Dist::Zilla::Plugin::AutoMetaResources
+
+    *   ... and plenty more (search metacpan.org for "dist zilla plugin
+        meta")
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Chec
+    kMetaResources>. You will be notified automatically of any progress on
+    your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dist-zilla-plugin-checkmetaresources>
+
+      git clone https://github.com/dagolden/dist-zilla-plugin-checkmetaresources.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

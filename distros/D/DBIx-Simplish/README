@@ -1,0 +1,242 @@
+NAME
+
+    DBIx::Simplish - DBIx::Simple + DBIx::Connector + extras.
+
+VERSION
+
+    version 1.002001
+
+SYNOPSIS
+
+ DBIx::Simplish
+
+        $db = DBIx::Simplish->new(dsn => ..., user => ..., password => ..., ...)
+        $db = DBIx::Simplish->connect(...)
+    
+        $db->keep_statements = 16
+        $db->lc_columns = 1
+    
+        $db->begin_work         $db->commit
+        $db->rollback           $db->disconnect
+        $db->func(...)          $db->last_insert_id
+    
+        $result = $db->query(...)
+    
+        $result = $db->iquery('INSERT INTO table', \%item)
+        $result = $db->iquery('UPDATE table SET',  \%item, 'WHERE y <> ', \2)
+        $result = $db->iquery('DELETE FROM table WHERE y = ', \2)
+        $result = $db->iquery('SELECT * FROM table WHERE x = ', \$s, 'AND y IN', \@v)
+        $result = $db->iquery('SELECT * FROM table WHERE', {x => $s, y => \@v})
+    
+        $result = $db->select($table, \@fields, \%where, \@order)
+        $result = $db->insert($table, \%fieldvals || \@values)
+        $result = $db->update($table, \%fieldvals, \%where)
+        $result = $db->delete($table, \%where)
+    
+        # Only for MySQL
+        $result = $db->call($procedure, @args)
+
+ DBIx::Simplish::Result
+
+        @columns = $result->columns
+    
+        $result->into($foo, $bar, $baz)
+        $row = $result->fetch
+    
+        @row = $result->list      @rows = $result->flat
+        $row = $result->array     @rows = $result->arrays
+        $row = $result->hash      @rows = $result->hashes
+        @row = $result->kv_list   @rows = $result->kv_flat
+        $row = $result->kv_array  @rows = $result->kv_arrays
+    
+        %map = $result->map_arrays(...)
+        %map = $result->map_hashes(...)
+        %map = $result->map
+    
+        $rows = $result->rows
+    
+        $dump = $result->text
+    
+        $result->finish
+
+DESCRIPTION
+
+    DBIx::Simplish has (mostly) the same interface as DBIx::Simple. It's a
+    rewrite to add little bits I wanted, and remove some bits I never used.
+    Maybe you'll find it useful too.
+
+    DBIx::Simplish is backed by DBIx::Connector, SQL::Abstract and
+    SQL::Interp.
+
+ Differences from DBIx::Simple
+
+      * Automatically enables UTF-8 when using MySQL or SQLite.
+
+      * Automatically sets proper quotes and limit dialect on
+      SQL::Abstract::Limit methods when using MySQL or SQLite
+
+      * Uses SQL::Abstract::Limit instead of SQL::Abstract.
+
+      * Can call last_insert_id without parameter when using MySQL or
+      SQLite.
+
+      * The omniholder (??) is a bit smarter.
+
+      * Can't set result class. It's always DBIx::Simplish::Result.
+
+      * No fancy error handling returning dummy objects.
+
+      * SQL::Abstract::Limit and SQL::Interp are now dependencies. Not
+      recommendations.
+
+      * xto, html and text methods removed.
+
+      * object and objects methods of result class no longer has a default
+      implementation. You must always provide a class name.
+
+ATTRIBUTES
+
+ dsn
+
+    Sets the connection DSN. See DBI.
+
+ user
+
+    Sets the connection user naem.
+
+ password
+
+    Sets the connecton password.
+
+ options
+
+    Set the DBI options. See DBI.
+
+ connector
+
+    Sets the DBIx::Connector instance to use for connections. If not set, a
+    new instance will be created. If set dsn, user, password and options
+    attributes will be ignored.
+
+ keep_statements
+
+    Sets the number of statements to keep in cache. See also
+    keep_statements in DBIx::Simple.
+
+ lc_columns
+
+    Set to true to use lower case column names. See also lc_columns in
+    DBIx::Simple
+
+ abstract
+
+    Sets the SQL::Abstract instance to use for SQL generation. If not set,
+    a new instance will be created.
+
+ connection_mode
+
+    Sets the DBIx::Connecter connection mode. Valid values are 'ping',
+    'fixup' and 'no_ping'. Default value 'fixup'.
+
+ sql_quote_char
+
+    Set the SQL quote char to use. See also quote_char in SQL::Abstract
+    Default value is ` for MySQL and " for SQLite.
+
+ sql_name_sep
+
+    Sets the SQL name seperator char to use See also name_sep in
+    SQL::Abstract. Default value is . for MySQL and SQLite.
+
+METHODS
+
+ connect($dsn, $user, $pass, \%options)
+
+    Constructor. Same arguments as for DBI connect. See DBI for details.
+    Same as
+
+        DBIx::Simplish->new(dsn => $dsn, user => $user, password => $pass, options => \%options);
+
+ query($query, @binds)
+
+    Prepares and executes the query and returns a result object.
+
+    If the string (??) is present in the query, it is replaced with a list
+    of as many question marks as @binds minus number of ordinary ? binds.
+
+    The database drivers substitute placeholders (question marks that do
+    not appear in quoted literals) in the query with the given @binds,
+    after them escaping them. You should always use placeholders, and never
+    use raw user input in database queries.
+
+    On success, returns a DBIx::Simplish::Result object.
+
+ select, insert, update, query
+
+    Calls the corresponding SQL::Abstract::Limit method. The resulting
+    query and binds is then passed to the query method.
+
+    See also: SQL::Abstract and SQL::Abstract::Limit.
+
+ iquery
+
+    Calls SQL::Interp's sql_interp method. Sends the resulting query and
+    binds to the query method.
+
+    See also: SQL::Interp.
+
+ call
+
+    Shortcut for calling a MySQL procedure. $db->call($procedure_name,
+    @args) is equivalent to $db->query("CALL $procedure_name(??)", @args).
+
+ func
+
+    Proxy for func method of DBI
+
+ last_insert_id
+
+    Calls the last_insert_id method of DBI
+
+    Can be called without parameters for MySQL and SQLite (no more
+    last_insert_id(undef, undef, undef, undef)).
+
+ begin_work
+
+    Proxy for begin_work method of DBI.
+
+ begin
+
+    Alias for begin_work.
+
+ commit
+
+    Proxy for commit method of DBI.
+
+ rollback
+
+    Proxy for rollback method of DBI.
+
+ error
+
+    Proxy for errstr method of DBI.
+
+TODO
+
+    Add more - and better - documentation.
+
+SEE ALSO
+
+    DBIx::Simple, DBIx::Connector, SQL::Abstract and SQL::Interp.
+
+AUTHOR
+
+    Hans Staugaard <staugaard@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Hans Staugaard.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

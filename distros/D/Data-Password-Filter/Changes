@@ -1,0 +1,61 @@
+Revision history for Data::Password::Filter
+
+0.16  2017-04-15T13:00:00+01:00
+      - Improved type handling.
+
+0.15  2016-08-29T22:55:00+01:00
+      - Updated Copyright year information.
+      - Tidied up unit test script t/00-load.t.
+
+0.14  2016-01-29T09:40:00+01:00
+      - Added key 'provides' to the Makefile.PL script.
+      - Added test scripts t/meta-json.t and t/meta-yml.t.
+
+0.13  2015-09-08T12:10:00+01:00
+      - Patched bug RT: #106940 (thanks to HKCLARK).
+
+0.12  2015-03-06T16:40:00+01:00
+      - Added LICENSE file.
+
+0.11  2015-03-05T10:40:10+01:00
+      - Added File::ShareDir::Install as configure requires in the Makefile.PL file.
+      - Tidied up pod document a bit.
+
+0.10  2015-01-16T15:45:10+01:00
+      - Removed SIGNATURE file.
+      - Updated MANIFEST.SKIP file to ignore folder 'eumm/'.
+      - Updated Copyright year information.
+
+0.09  2014-10-26T18:13:20+01:00
+      - Updated Changes file according to CPAN::Changes::Spec package.
+      - Added unit test changes.t file.
+
+0.08  2014-10-24T22:38:10+01:00
+      - Made the package File::ShareDir::Install pre-requisite in the Makefile.PL file.
+
+0.07  2014-10-19T19:00:00+01:00
+      - Restructure the code using 'Moo'.
+      - Extracted the dictionary data into seprate file.
+
+0.06  2014-10-19T16:35:00+01:00
+      - Removed Build.PL file.
+      - General tidied up code base.
+
+0.05  2013-02-02T13:14:19+01:00
+      - Fixed the bug RT# 83027, RT# 83090.
+
+0.04  2011-09-01T01 09:10:11+01:00
+      - Added more test around the user defined dictionary file.
+      - Minor changes to the pod of Data::Password::Filter::Dictionary module.
+      - Minor changes to the pod of Data::Password::Filter.
+      - Cosmetics changes to the method BUILD().
+
+0.03  2011-08-30T07:08:09+01:00
+      - Refactored code base.
+      - Added more unit test case.
+
+0.02  2011-08-29T13:14:15+01:00
+      - Cleaned up code slightly.
+
+0.01  2011-08-28T07:00:00+01:00
+      - Module Created.

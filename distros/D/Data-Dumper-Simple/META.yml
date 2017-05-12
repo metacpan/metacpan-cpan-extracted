@@ -1,0 +1,20 @@
+---
+name: Data-Dumper-Simple
+version: 0.11
+author:
+  - Curtis "Ovid" Poe <ovid@cpan.org>
+abstract: Easily dump variables with names
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Filter::Simple: 0.77
+  Test::More: 0
+provides:
+  Data::Dumper::Simple:
+    file: lib/Data/Dumper/Simple.pm
+    version: 0.11
+generated_by: Module::Build version 0.2703
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

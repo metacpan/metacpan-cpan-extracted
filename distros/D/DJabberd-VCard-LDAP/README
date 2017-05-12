@@ -1,0 +1,29 @@
+DJabberd-VCard-LDAP
+
+Provides an LDAP VCard backend.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+LATEST SOURCE
+
+Latest source code is available via http://git.outoforder.cc/
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc DJabberd::Plugin::VCard::LDAP
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Edward Rudd
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

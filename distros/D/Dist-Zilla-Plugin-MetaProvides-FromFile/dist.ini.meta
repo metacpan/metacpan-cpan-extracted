@@ -1,0 +1,23 @@
+; vim: syntax=dosini
+name    = Dist-Zilla-Plugin-MetaProvides-FromFile
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+main_module = lib/Dist/Zilla/Plugin/MetaProvides/FromFile.pm
+
+[Bootstrap::lib]
+
+[@Author::KENTNL]
+:version = 2.020000
+twitter_extra_hash_tags = #distzilla
+normal_form  = numify
+mantissa     = 6
+bumpversions = 1
+toolkit      = eumm
+toolkit_hardness = soft
+copyfiles    = LICENSE
+srcreadme    = mkdn
+
+[Prereqs / RuntimeRequires]
+Dist::Zilla::Plugin::MetaProvides = 1.11034201
+Config::INI::Reader = 0

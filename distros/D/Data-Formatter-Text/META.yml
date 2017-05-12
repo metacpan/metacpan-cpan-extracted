@@ -1,0 +1,35 @@
+---
+name: Data-Formatter-Text
+version: 1.0
+author: ["Zachary Blair <zblair@cpan.org>"]
+abstract: 'Formats data stored in scalars, hashes, and arrays into strings, definition lists, bulletted lists, and tables.'
+license: perl
+distribution_type: module
+generated_by: 'Zachary Blair'
+resources:
+  license: http://dev.perl.org/licenses/
+configure_requires:
+  ExtUtils::MakeMaker: 0
+build_requires:
+  ExtUtils::MakeMaker: 0
+  Test::More: 0
+requires:
+  perl: 5.006
+  Attribute::Abstract: 0
+  Scalar::Util: 0
+  List::Util: 0
+  List::MoreUtils: 0
+  Roman: 0
+no_index:
+  directory:
+    - t
+provides:
+  Data::Formatter::Text:
+    file: lib/Data/Formatter/Text.pm
+    version: 1.0
+keywords:
+  - serialization
+  - list
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

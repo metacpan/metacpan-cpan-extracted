@@ -1,0 +1,64 @@
+{
+   "abstract" : "Override existing VERSION in a module",
+   "author" : [
+      "Graham Knop <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-OverridePkgVersion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Perl" : "0",
+            "PPI" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-Plugin-OverridePkgVersion@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Dist-Zilla-Plugin-OverridePkgVersion"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/Dist-Zilla-Plugin-OverridePkgVersion.git",
+         "web" : "https://github.com/haarg/Dist-Zilla-Plugin-OverridePkgVersion"
+      }
+   },
+   "version" : "0.002"
+}
+

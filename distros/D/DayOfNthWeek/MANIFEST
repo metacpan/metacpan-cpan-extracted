@@ -1,0 +1,9 @@
+Changes
+DayOfNthWeek.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+Examples/calc_week.pl
+Examples/months.txt
+Examples/mcpm.pl

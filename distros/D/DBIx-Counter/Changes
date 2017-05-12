@@ -1,0 +1,13 @@
+Revision history for Perl extension DBIx::Counter.
+
+0.03  2006-11-20  Rhesa Rozendaal <rhesa@cpan.org>
+    - Moved the pod after __END__
+    - dist improvements conforming to CPANTS
+
+0.02  Wed Apr 20 04:22:53 2005
+	- Documentation modified
+		
+0.01  Wed Apr 13 02:22:32 2005
+	- original version; created by h2xs 1.23 with options
+		-XA -b 5.4.0 -n DBIx::Counter
+

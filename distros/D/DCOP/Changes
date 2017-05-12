@@ -1,0 +1,13 @@
+Revision history for Perl extension DCOP.
+
+0.036	Mon Apr 02 12:00:00 2006
+	- Implemented run() method.
+
+0.0032 Wed Mar 29 22:39:00 2006
+	added a more universal dcop call
+
+0.01  Fri Jul 22 09:17:10 2005
+	- original version; created by h2xs 1.22 with options
+		-A -X -n DCOP
+
+

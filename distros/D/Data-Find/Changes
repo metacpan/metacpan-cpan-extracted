@@ -1,0 +1,10 @@
+Revision history for Data-Find
+
+0.01    2009-05-21
+        - Initial release.
+
+0.02    2009-05-21
+        - Return path /and/ data
+
+0.03    2009-05-29
+        - Move to GitHub

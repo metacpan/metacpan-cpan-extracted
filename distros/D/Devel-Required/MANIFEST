@@ -1,0 +1,11 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib/Devel/Required.pm
+t/001basic.t
+t/010specific.t
+t/020installation.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

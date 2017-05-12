@@ -1,0 +1,24 @@
+Revision history for Perl extension DateTimeX::Factory
+
+1.00 2013-05-14T15:05:28Z
+
+    - no codes and documents are changed (version number issue fix)
+
+0.10.0 2013-05-12T16:13:22Z
+
+    - all constructor options thrown to DateTime factory methods
+    - remove Mouse and Data::Validator
+    - change Changes format
+    [IMCOMPATIBLE CHANGES]
+    - remove DateTimeX::Factory::Declare
+
+v0.03 2012-02-01T12:11:34Z
+    - fix pod spell miss
+    - add set_time_zone and get_time_zone method
+    - add DateTimeX::Factory::Declare
+
+v0.02 2012-01-29T11:44:47Z
+    - fix dependencies (No code changes)
+
+v0.01 2012-01-25T23:34:30Z
+    - original version

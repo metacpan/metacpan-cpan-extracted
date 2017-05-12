@@ -1,0 +1,52 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature qw( say );
+
+use Devel::MAT;
+use List::UtilsBy qw( nsort_by );
+
+my $pmatA = Devel::MAT->load( $ARGV[0] // die "Need dumpfile A\n" );
+my $pmatB = Devel::MAT->load( $ARGV[1] // die "Need dumpfile B\n" );
+
+my @svsA = nsort_by { $_->addr } $pmatA->dumpfile->heap;
+my @svsB = nsort_by { $_->addr } $pmatB->dumpfile->heap;
+
+say "A\tB";
+
+my $countA = 0;
+my $countB = 0;
+my $countC = 0;
+
+while( @svsA && @svsB ) {
+   my $svA = $svsA[0];
+   my $svB = $svsB[0];
+
+   if( $svA->addr < $svB->addr ) {
+      $countA++;
+      say $svA->desc_addr;
+      shift @svsA;
+   }
+   elsif( $svB->addr < $svA->addr ) {
+      $countB++;
+      say "\t", $svB->desc_addr;
+      shift @svsB;
+   }
+   else {
+      # common - no print
+      $countC++;
+      shift @svsA;
+      shift @svsB;
+   }
+}
+
+while( @svsA ) {
+   say +( shift @svsA )->desc_addr;
+}
+while( @svsB ) {
+   say "\t", ( shift @svsB )->desc_addr;
+}
+
+printf "---\n%d unique to A\n%d unique to B\n%d common\n",
+   $countA, $countB, $countC;

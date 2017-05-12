@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Class::ResultClass::HashRefInflator::UTF8.
+
+0.01  Tue Jul  5 17:00:29 2016
+	- original version; created by h2xs 1.23 with options
+		-AX -n DBIx::Class::ResultClass::HashRefInflator::UTF8 -v 0.01
+

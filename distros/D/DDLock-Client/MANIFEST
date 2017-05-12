@@ -1,0 +1,11 @@
+Changes
+lib/DDLock/Client.pm
+lib/DDLock/Client/Daemon.pm
+lib/DDLock/Client/File.pm
+Makefile.PL
+MANIFEST
+t/00_require.t
+t/01_all.t
+t/02_error.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

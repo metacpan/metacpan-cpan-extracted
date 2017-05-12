@@ -1,0 +1,7 @@
+=head1 NAME
+
+DZT::Manual - documentation
+
+=head1 VERSION
+
+This document ({{$module}}) describes {{$dist}} {{$version}}.

@@ -1,0 +1,17 @@
+Assert.xs
+Changes
+lib/Devel/Assert.pm
+lib/Devel/Assert.pod
+lib/Devel/Assert/Global.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01_use.t
+t/10_assertions.t
+t/11_no_parens.t
+t/12_global_arg.t
+t/13_deparse.t
+t/14_global_module.t
+t/15_off_arg.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

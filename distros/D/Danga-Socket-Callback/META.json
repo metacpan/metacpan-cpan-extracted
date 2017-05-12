@@ -1,0 +1,74 @@
+{
+   "abstract" : "Use Danga::Socket From Callbacks",
+   "author" : [
+      "Copyright (c) Daisuke Maki <daisuke@endeworks.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.53",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Danga-Socket-Callback",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.0.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Danga::Socket" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Danga::Socket::Callback" : {
+         "file" : "lib/Danga/Socket/Callback.pm",
+         "version" : "0.013"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/p5-Danga-Socket-Callback/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/p5-Danga-Socket-Callback",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-Danga-Socket-Callback.git",
+         "web" : "https://github.com/lestrrat/p5-Danga-Socket-Callback"
+      }
+   },
+   "version" : "0.013",
+   "x_contributors" : [
+      "Daisuke Maki <lestrrat+github@gmail.com>"
+   ]
+}

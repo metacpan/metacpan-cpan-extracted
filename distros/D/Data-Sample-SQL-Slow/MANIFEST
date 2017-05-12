@@ -1,0 +1,11 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Data/Sample/SQL/Slow.pm
+t/00_compile.t
+t/01_main.t
+META.yml
+MANIFEST

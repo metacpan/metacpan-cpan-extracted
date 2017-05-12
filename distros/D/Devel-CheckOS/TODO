@@ -1,0 +1,3 @@
+Detect different types of MS Windows
+
+use-devel-assertos should not add itself twice (update, if run a second time)

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Data/Password/Check/JPassword.pm
+t/00_compile.t
+t/01_pod.t
+t/02_pod_coverage.t
+t/10_functions.t
+t/11_oo.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,98 @@
+{
+   "abstract" : "Mutation testing for Perl",
+   "author" : [
+      "Viacheslav Tykhanovskyi, <viacheslav.t@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Mutator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Docopt" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find" : "0",
+            "File::Path" : "0",
+            "File::Slurp" : "0",
+            "File::Spec" : "0",
+            "PPI" : "0",
+            "Text::Diff" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Mutator" : {
+         "file" : "lib/Devel/Mutator.pm",
+         "version" : "0.03"
+      },
+      "Devel::Mutator::Command::Mutate" : {
+         "file" : "lib/Devel/Mutator/Command/Mutate.pm"
+      },
+      "Devel::Mutator::Command::Test" : {
+         "file" : "lib/Devel/Mutator/Command/Test.pm"
+      },
+      "Devel::Mutator::Generator" : {
+         "file" : "lib/Devel/Mutator/Generator.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vti/devel-mutator/issues"
+      },
+      "homepage" : "https://github.com/vti/devel-mutator",
+      "repository" : {
+         "url" : "git://github.com/vti/devel-mutator.git",
+         "web" : "https://github.com/vti/devel-mutator"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:VTI",
+   "x_contributors" : [
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Patricio Valle <patricio.valle@globant.com>",
+      "Tim Teasdale <tim.teasdale@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

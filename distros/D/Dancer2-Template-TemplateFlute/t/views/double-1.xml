@@ -1,0 +1,5 @@
+<specification>
+  <form name="edit">
+    <field name="role" id="role" iterator="roles" keep="empty_value"/>
+  </form>
+</specification>

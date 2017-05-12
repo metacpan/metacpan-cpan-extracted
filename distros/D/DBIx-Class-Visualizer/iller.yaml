@@ -1,0 +1,53 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: DBIx-Class-Visualizer
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - GraphViz2: 2.42
+      - List::Util
+      - DateTime::Tiny: 1.06
+      - Moo: 2.00
+      - JSON::MaybeXS
+      - Log::Handler: 0.84
+      - PerlX::Maybe
+      - ReadonlyX: 1.03
+      - Syntax::Keyword::Gather: 1.002000
+      - Types::Standard
+    recommends:
+      - Mojolicious: 6.0
+  test:
+    requires:
+      - DBIx::Class: 0.08260
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: TravisYML
+   # perl_version: 5.10 5.14 5.18 5.20 5.22
+    sudo: 1
+    post_before_install:
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install: cpanm GraphViz2
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile

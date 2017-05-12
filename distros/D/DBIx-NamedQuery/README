@@ -1,0 +1,27 @@
+DBIx-NamedQuery version 0.10
+============================
+
+This module improves database application structure by using only symbolic
+names instead of hardcoded SQL queries in the code. The module may also
+extend the interface of DBI database handle class for more comfortable work
+with named queries.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Not quite a dependency, but a presence of DBI module is rather useful.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Boleslav Bobcik.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

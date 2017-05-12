@@ -1,0 +1,14 @@
+Changes
+corpus
+lib/Data/Undump.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/01_undump.t
+t/02_error.t
+t/03_bulk.t
+t/04_corrupt.t
+Undump.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

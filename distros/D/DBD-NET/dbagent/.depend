@@ -1,0 +1,11 @@
+net.o: net.c \
+ /usr/local/lib/gcc-lib/hppa1.1-hp-hpux/2.7.2/include/stdio.h \
+ /usr/local/lib/gcc-lib/hppa1.1-hp-hpux/2.7.2/include/stdarg.h \
+ /usr/local/lib/gcc-lib/hppa1.1-hp-hpux/2.7.2/include/va-pa.h \
+ /usr/include/sys/stdsyms.h \
+ /usr/local/lib/gcc-lib/hppa1.1-hp-hpux/2.7.2/include/sys/types.h \
+ /usr/include/netinet/in_systm.h /usr/include/sys/socket.h \
+ /usr/include/sys/ioctl.h \
+ /usr/local/lib/gcc-lib/hppa1.1-hp-hpux/2.7.2/include/netinet/in.h \
+ proto.h
+t.o: t.c a.h

@@ -1,0 +1,15 @@
+#########
+# TYPEMAP
+const char *    T_PV
+blkid_loff_t    T_IV
+dev_t           T_U_LONG
+Cache           T_PTROBJ
+Device          T_PTROBJ
+DevIter         T_PTROBJ
+TagIter         T_PTROBJ
+
+#######
+# INPUT
+
+########
+# OUTPUT

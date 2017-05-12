@@ -1,0 +1,35 @@
+Revision history for Dancer2-Plugin-OAuth2-Server
+
+0.10  2016-01-05 16:45:26 CET
+        - Allow to whitelist redirect uri, by providing the redirect_uri to the verify_client method
+
+0.09  2016-01-05 14:39:47 CET
+        - Minimal changes to remove deprecation warnings for new Plugin code. Thanks Peter Mottram
+
+0.08  2016-01-03 23:27:52 CET
+        - Add missing compulsory methods to the Role Dancer2::Plugin::OAuth2::Server::Role
+        - Update documentation
+
+0.07  2016-01-02 23:58:47 CET
+        - Add state_required configuration option:
+        Make the state parameter requried to get an authorization code
+
+0.06  2015-12-20 08:28:08 CET
+        - Bug fix, function to check is user is logged did not get access to dsl
+
+0.05  2015-12-18 22:45:17 CET
+        - Breaking change here :( , with the dsl as an attribute of the server class, access to session was not working
+          dsl and settings are now passed to every function instead of begin an attribute
+
+0.04  2015-12-12 21:22:29 SGT
+        - Share the access token in "var" when Bearer access token is correct
+
+0.03  2015-12-05 12:49:48 SGT
+        - Publication to CPAN
+
+0.02  2015-12-05 12:39:37 SGT
+        - Fix the route protection mechanism
+        - Bug fixing in scope management
+
+0.01  2015-11-22 14:41:48 SGT
+        - Initial release

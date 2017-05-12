@@ -1,0 +1,32 @@
+Revision history for Perl extension DBIx-Schema-DSL-Dumper
+
+0.07 2015-02-07T04:11:38Z
+    - fixed index bug
+    - update index key format
+
+0.06 2015-02-05T11:09:43Z
+    - fixed unique key bug.
+
+0.05 2015-02-04T09:27:40Z
+    - fixed TODO test
+    - fixed MySQL unsigned bug. 
+
+0.04 2015-02-03T14:29:46Z
+    - not treated as a constant CURRENT_TIMESTAMP 
+    - support has_one,has_many
+    - ignore default size
+    - not use set_primary_key when single primary key
+
+0.03 2015-02-02T08:18:05Z
+    - added tests
+    - fixed bugs
+        - MySQL auto_increment
+    - support ENUM, SET type
+
+0.02 2015-02-01T14:24:48Z
+    - update meta info 
+
+0.01 2015-02-01T14:02:34Z
+
+    - initial
+

@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    In your source code:
+
+     use Data::Dump::Patch::Deparse;
+     use Data::Dump;
+    
+     dd(sub { [1,2] }); # now prints "sub { [1, 2] }" instead of "sub { ... }"
+
+    On the command-line:
+
+     % perl -MData::Dump::Patch::Deparse -MData::Dump -e'dd ...'
+
+DESCRIPTION
+
+PACKAGE VARIABLES
+
+ $OPT_REMOVE_PRAGMAS
+
+    Like in Data::Dmp.
+
+ $OPT_PERL_VERSION
+
+    Like in Data::Dmp.
+
+SEE ALSO
+
+    Data::Dump
+

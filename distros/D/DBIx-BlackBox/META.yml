@@ -1,0 +1,41 @@
+---
+abstract: 'Access database with stored procedures only'
+author:
+  - 'Alex J. G. Burzyński <ajgb@cpan.org>'
+build_requires:
+  Test::More: 0.94
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-BlackBox
+provides:
+  DBIx::BlackBox:
+    file: lib/DBIx/BlackBox.pm
+    version: 0.02
+  DBIx::BlackBox::Driver:
+    file: lib/DBIx/BlackBox/Driver.pm
+    version: 0.01
+  DBIx::BlackBox::Driver::Sybase:
+    file: lib/DBIx/BlackBox/Driver/Sybase.pm
+    version: 0.01
+  DBIx::BlackBox::Procedure:
+    file: lib/DBIx/BlackBox/Procedure.pm
+    version: 0.02
+  DBIx::BlackBox::Result:
+    file: lib/DBIx/BlackBox/Result.pm
+    version: 0.01
+requires:
+  DBD::Sybase: 1.09
+  DBI: 1.609
+  DBIx::Connector: 0.33
+  Module::Find: 0.08
+  Moose: 0.98
+  MooseX::Role::Parameterized: 0.18
+  namespace::autoclean: 0.09
+resources:
+  repository: git://github.com/ajgb/dbix-blackbox.git
+version: 0.02

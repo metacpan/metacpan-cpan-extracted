@@ -1,0 +1,61 @@
+---
+abstract: 'List prereqs conditional on operating system'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Params::Util: '0'
+  Sub::Exporter: '0'
+  Test::Deep: '0'
+  Test::Deep::JSON: '0'
+  Test::More: '0.88'
+  YAML::Tiny: '0'
+  lib: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150010'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-OSPrereqs
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::OSPrereqs:
+    file: lib/Dist/Zilla/Plugin/OSPrereqs.pm
+    version: '0.008'
+requires:
+  Dist::Zilla::Plugin::MakeMaker: '5.022'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::MetaProvider: '0'
+  List::Util: '1.33'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.008001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-OSPrereqs.git
+version: '0.008'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Ioan Rogers <ioanr@cpan.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Steven Haryanto (on PC, Bandung) <stevenharyanto@gmail.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,17 @@
+0.03 2015-10-13T23:32:55+02:00
+ - Fix test.
+ - Fix test dependencies.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Improve SEE ALSO section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name in Makefile.PL.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-08-07T09:25:47+02:00
+ - Add DESCRIPTION section to doc.
+ - Add File::Find::Rule::Dicom to SEE ALSO section in doc.
+ - Add minimum Perl version.
+
+0.01 2014-08-05T16:59:33+02:00
+ - First version.

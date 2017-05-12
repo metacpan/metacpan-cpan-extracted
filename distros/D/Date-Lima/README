@@ -1,0 +1,18 @@
+
+
+    use Date::Lima qw/beek_date/;
+
+    my $d1 = beek_date( "127:34" ); # 1h40m
+    my $d2 = beek_date("2:46:40" ); # 2h46m40s
+    my $d3 = beek_date( 7654321 );  # 2mo4w14h12m1s
+
+
+-or-
+
+
+    use Time::DeltaString qw/delta_string/;
+
+    my $d1 = delta_string( "127:34" ); # 1h40m
+    my $d2 = delta_string("2:46:40" ); # 2h46m40s
+    my $d3 = delta_string( 7654321 );  # 2mo4w14h12m1s
+

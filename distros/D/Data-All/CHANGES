@@ -1,0 +1,53 @@
+Revision history for Perl extension Data::All.
+
+0.036  Fri Jul 15 16:01:10 2005
+    - Spelling correction
+
+0.032  Wed Apr 27 15:48:22 2005
+    - Commented out several troublesome warns()
+
+0.031  Mon May 17 15:46:29 2004
+	- Overhauled interface to Data::All
+		- The usage of from => ..., to => ... now standardized
+		- Removed the notion of monikers (useless!)
+	- Collections can now be converted record by record rather than 
+		atomically (setting atomic => 1 will do the opposite)
+	- Many bug fixes
+
+0.026  Mon May 10 10:21:54 2004
+	- Bug fixes (option parsing, creating new files)
+	- Added Data::All::IO::FTP (not fully implemented)
+
+0.025  Thu May 06 08:51:02 2004
+	- Added test t/Data-All.t
+	- Bug fixes to Data::All::IO::Database, in particular the way data
+		is read from a select.
+	- Record terminator in Data::All::Format::Fixed is hardcoded to \n
+		(temporarily). The record teminator needs to be revisited at
+		some point and this will be fixed at that time.
+
+0.023  Wed Apr 29 09:28:21 2004
+        - Nominal distribution fix (again :[ )
+
+0.021  Wed Apr 28 17:32:11 2004
+	- Nominal distribution fix
+
+0.020  Wed Apr 28 17:23:00 2004
+	- Data:All::convert() changes
+		- requires parameters as a hash (or hashref)
+		- defaults to processing record by record (rather than 
+			by entire collection)
+		- now accepts various (yet undocumented, sorry) options
+			(such as whether to process record by record or 
+			whether to output a field list record in the output)
+	- Several Data::All::IO::Database changes
+		- Autocommit now defaults to off (currently hardcoded). A
+			commit is run in Data::All::IO::Database::close().
+		- Interpolated query variables (i.e. ?,?,?) can be included
+			before and after the field vars. 
+	- Initial inclusion of Log::Log4perl. Currently at a useless state
+		though
+
+0.016  Fri Apr 23 16:31:25 2004
+	- Initial CPAN distribution
+

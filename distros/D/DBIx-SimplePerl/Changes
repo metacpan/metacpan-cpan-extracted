@@ -1,0 +1,82 @@
+Revision history for Perl extension DBIx::SimplePerl.
+1.95 Sun Mar 21 13:42:00 2010
+	- fixed multi-field delete search conditional
+1.90 Wed Dec  5 15:33:00 2007
+	- added in operation to set which
+	  operation is used to combine the search fields
+	  in a db_search call.  By default the operation is 
+	  'AND'.  This change gives the user the capability to 
+	  use 'OR' 
+	- added in the "DISTINCT=>column_name(s)" option for
+	  db_search
+1.80 Mon Jun 11 23:53:00 2007
+	- fixed db_next to return what it should, and added in
+	  db_array to return an array version of db_next.  Document
+	  these elements in greater detail.
+1.72 Sat Jun  9 12:49:00 2007
+	- fixed min,max,count so that the will work with db_search 
+	  and not interfere with each other.  Added some tests for
+	  this.
+1.70 Sun Apr 29 20:26:00 2007
+	- fixed db_next, db_rows, db_rollback, db_ping.  Sadly, some of these
+	  are broken in DBI/DBD::SQLite.  This means that it will be hard to test
+	  db_ping and db_rows for now.
+	- cleaned up code a little
+	- added db_next test cases, and a few others.  db_next is a very sane
+	  method for getting the next row hash.
+1.60 Sat Mar 17 14:40:00 2007
+	- added a saner OO iterator to return the next record in a query
+
+1.50 Mon Aug 14 20:50:00 2006
+	- Major changes/simplification to the error detection code
+	- Simplification of error checking
+	- Documentation fixes and extensions to include new features
+	- Improved behavior and consistency in the face of errors
+	- Trimmed uneeded code, module is smaller than it was before ...
+	- Added internal function to handle replicated internal code
+	- Tests added to check errors ...
+1.42 Mon Aug 14 15:09:00 2006
+	- added order and cols to db_search.  Order sorts by that column, and cols
+          returns only those columns that you specify
+1.41 Sun Jun 25 20:30:01 2006
+	- added boolean condition search
+1.40 Sun Jun 25 02:30:01 2006
+	- added count, min, max methods to search
+	- added count, min, max tests
+1.31 Mon Jun 12 15:40:01 2006
+	- added DBI in as an explicit requirement. Who knew
+	  that someone would try to install a DBIx module without
+	  DBI. 
+1.30 Sun Jun 11 10:51:01 2006
+	- added additional db_open option processing
+	- fixed some style errors in the program text
+	- added db_commit
+1.24 Thu Dec 22 15:30:01 2005
+	- bug fix for SQLite, incorrect field quoting...
+1.23 Sun Dec 04 20:43:01 2005
+	- bug fix for PostGreSQL quoting
+	- bug fix for db_update, used a _quote_field call where
+	  we needed a _quote_value call.
+1.22 Sun Dec 04 15:36:01 2005
+	- added quoting checks for postgresql and others
+	  change by setting $object->{quoting} explicitly 
+	  or letting the module decide for you.
+1.21 Sun Nov 29 12:08:01 2005
+        - minor bug fixes, YAML build,...
+1.2  Sun Nov 28 12:08:01 2005
+	- added create table function
+1.1  Sun Nov 27 12:08:01 2005
+	- RENAMED DBI::Simple to DBIx::SimplePerl.  This had
+	  caused unintended confusion on the part of the users
+	  whom needed DBI to remain for DBI bits only, and DBIx
+	  for DBI-extensions.
+	- added table creation
+	- fixed some of the documentation and other bits as suggested 
+	  by various users
+
+1.0  Mon Oct 31 23:28:39 2005
+	- original version; created by h2xs 1.23 with options
+		-AX --skip-exporter --use-new-tests -n DBI::Simple -b 5.8.0 --email=landman@scalableinformatics.com -v1.0
+
+	Imported SICE.pm into DBI::Simple, created tests, did
+	basic documentation fixup.

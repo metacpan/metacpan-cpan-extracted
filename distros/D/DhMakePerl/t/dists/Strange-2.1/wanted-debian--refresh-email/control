@@ -1,0 +1,20 @@
+Source: libstrange-perl
+Section: perl
+Priority: optional
+Maintainer: Florian Geekwurt <florian@geekwurt.org>
+Build-Depends: debhelper (>= 9.20140227~),
+ libmodule-build-tiny-perl,
+ perl
+Standards-Version: 3.9.6
+Homepage: https://metacpan.org/release/Strange
+
+Package: libstrange-perl
+Architecture: any
+Depends: ${misc:Depends}, ${perl:Depends}, ${shlibs:Depends}
+Description: Perl extension for blah blah blah
+ Stub documentation for Strange was created by h2xs. It looks like the author
+ of the extension was negligent enough to leave the stub unedited.
+ .
+ Blah blah blah.
+ .
+ This description was automagically extracted from the module by dh-make-perl.

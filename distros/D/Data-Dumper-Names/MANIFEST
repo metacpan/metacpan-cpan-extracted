@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/Data/Dumper/Names.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/10-dump.t
+t/20-import.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL

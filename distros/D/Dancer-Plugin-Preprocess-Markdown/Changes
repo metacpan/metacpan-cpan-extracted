@@ -1,0 +1,12 @@
+Revision history for Dancer-Plugin-Preprocess-Markdown
+
+0.021     2014-04-26
+          * Added error handling for HTML file opening
+          * Fixed path handling
+
+0.020     2013-10-26
+          * Repaired request path matching
+          * Added support for setting layouts
+
+0.010     2013-10-24
+          First version, released on an unsuspecting world.

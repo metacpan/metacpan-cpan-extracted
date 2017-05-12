@@ -1,0 +1,119 @@
+Release history for perl-Dist-Zilla-Plugin-Manifest-Read
+
+v0.5.0 @ 2016-11-21 19:18 UTC
+
+    -   **BREAKING CHANGE** `Manifest::Read` file finder now returns the *complete* list of all the
+        manifested files, including the files which are not going to the distribution (files with
+        `-` mark). Replace `Manifest::Read` with `Manifest::Read/:AllFiles` to keep your code
+        working.
+
+    -   All the sub-finders now have colon in name to better mimic standard `Dist::Zilla` finders,
+        e. g.: `Manifest::Read/:AllFiles`, `Manifest::Read/:InstallModules`. Old finders (e. g.
+        `Manifest::Read/AllFiles`) are also available but will be removed in future.
+
+    -   Few more file finders added: `:IncModules`, `:NoFiles`, `:ShareFiles`.
+
+v0.4.2 @ 2015-11-05 14:08 UTC
+
+    -   Test: `:AllFiles` file finder was introduced in `Dist::Zilla` 5.007. So, a test fails with
+        older `Dist::Zilla` due to lack of this finder. Test modified not to use these finders if
+        `Dist::Zilla` is older than required.
+
+v0.4.1 @ 2015-11-02 21:58 UTC
+
+    -   Test: `:ExtraTestFiles` and `:PerlExecFiles` file finders were introduced in `Dist::Zilla`
+        5.038. So, a test fails with older `Dist::Zilla` due to lack of these finders. Test
+        modified not to use these finders if `Dist::Zilla` is older than required.
+
+v0.4.0 @ 2015-11-01 17:30 UTC
+
+    -   Additional file finders are implemented: `Manifest::Read/AllFiles`,
+        `Manifest::Read/InstallModules`, etc.
+
+    -   Test reworked: `Dist::Zilla::Plugin::Templates` is not used in tests any more.
+
+v0.3.5 @ 2015-10-29 22:42 UTC
+
+    -   Test fails if `Dist::Zilla::Role::ErrorLogger` is older than v0.9.0. Fixed by requiring
+        this version.
+
+v0.3.4 @ 2015-10-22 13:20 UTC
+
+    [Overall]
+
+    -   Distribution is rebuilt with the latest `Dist::Zilla` plugin bundle `@Author::VDB` v0.10.0.
+        It includes few more tests. Most of the changes are made to make these new tests pass.
+
+    [Code]
+
+    -   `use version 0.77;` added. Just in case.
+
+    [Documentation]
+
+    -   Bad link found by the `Test::Pod::LinkCheck`, bad link fixed, `Test::Pod::LinkCheck`
+        passes.
+
+    [Tests]
+
+    -   Test uses `# REQUIRE:` hint instead of direct `use`.
+
+    -   Explicit requiring `Dist::Zilla::Tester::DieHard` v0.4.0 (added in v0.3.0) now dropped.
+        The problem debugged and fixed, there is no need in this requirement any more.
+
+    -   Test code simplified a bit.
+
+    [Internals]
+
+    -   `aspell.en.pws` file renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+    -   Minor fixes in POD to make `Test::Synopsis` happy.
+
+v0.3.3 @ 2015-10-03 11:56 UTC
+
+    [Documentation]
+
+    -   Documentation improved a bit.
+
+    [Tests]
+
+    -   Cygwin also has troubles with filenames containing backslashes. Such filenames are not used
+        when tests run on Cygwin.
+
+    -   Version v0.3.3 of `Test::Dist::Zilla::BuiltFiles` is explicitly required — it contains a
+        workaround for `Path::Tiny` bug which affects tests.
+
+v0.3.2 @ 2015-09-25 21:26 UTC
+
+    [Tests]
+
+    -   On MSWin32 platform `Dist::Zilla` rejects filenames containing backslashes with error "File
+        name 'source/filename\3' does not seem to be legal on the current OS". To avoid test
+        failure, let's exclude such names from testing on the problem platform.
+
+v0.3.1 @ 2015-09-23 11:45 UTC
+
+    -   Mostly internal changes:
+
+        -   `log_errors_in_file` (from `ErrorLogger`) utilized. Error messages are slightly
+            changed.
+
+        -   Bunch of obsolete source files removed.
+
+        -   A typo found and fixed in the test. Not sure it affects test failure on MSWin32, but
+            let me see.
+
+v0.3.0 @ 2015-09-20 21:56 UTC
+
+    -   The test does not explicitly use but requires `Dist::Zilla::Tester::DieHard` v0.4.0 because
+        the latter includes few debug warnings which (I hope) help me to debug strange test failure
+        on MSWin32 machines.
+
+    -   Decimal version switched to new dotted-decimal style.
+
+0.002 @ 2015-08-29 18:32 UTC
+
+    -   Bug #106739 "Test suite may fail with non-English locale". Fixed.
+
+0.001 @ 2015-08-28 21:09 UTC
+
+    -   Initial release

@@ -1,0 +1,41 @@
+---
+abstract: 'dzil plugin to generate README from POD'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Ævar Arnfjörð Bjarmason <avar@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ReadmeFromPod
+no_index:
+  directory:
+    - t
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::InstallTool: '5'
+  IO::String: '0'
+  List::Util: '1.33'
+  Moose: '0'
+  Pod::Readme: v1.1.1
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ReadmeFromPod
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-ReadmeFromPod
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/fayland/dist-zilla-plugin-readmefrompod.git
+version: '0.35'
+x_authority: cpan:FAYLAND

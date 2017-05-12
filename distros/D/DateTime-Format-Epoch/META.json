@@ -1,0 +1,96 @@
+{
+   "abstract" : "Convert dates to seconds since epoch, for arbritrary epochs",
+   "author" : [
+      "Eugene van der Pijll (pijll@gmx.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-Epoch",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.31",
+            "Math::BigInt" : "1.66",
+            "Params::Validate" : "0",
+            "perl" : "5.00503",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::Epoch" : {
+         "file" : "lib/DateTime/Format/Epoch.pm",
+         "version" : "0.16"
+      },
+      "DateTime::Format::Epoch::ActiveDirectory" : {
+         "file" : "lib/DateTime/Format/Epoch/ActiveDirectory.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::DotNet" : {
+         "file" : "lib/DateTime/Format/Epoch/DotNet.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::JD" : {
+         "file" : "lib/DateTime/Format/Epoch/JD.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::Lilian" : {
+         "file" : "lib/DateTime/Format/Epoch/Lilian.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::MJD" : {
+         "file" : "lib/DateTime/Format/Epoch/MJD.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::MacOS" : {
+         "file" : "lib/DateTime/Format/Epoch/MacOS.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::NTP" : {
+         "file" : "lib/DateTime/Format/Epoch/NTP.pm",
+         "version" : "0.14"
+      },
+      "DateTime::Format::Epoch::RJD" : {
+         "file" : "lib/DateTime/Format/Epoch/RJD.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::RataDie" : {
+         "file" : "lib/DateTime/Format/Epoch/RataDie.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::TAI64" : {
+         "file" : "lib/DateTime/Format/Epoch/TAI64.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::TJD" : {
+         "file" : "lib/DateTime/Format/Epoch/TJD.pm",
+         "version" : "0.13"
+      },
+      "DateTime::Format::Epoch::Unix" : {
+         "file" : "lib/DateTime/Format/Epoch/Unix.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/chorny/DateTime-Format-Epoch"
+      }
+   },
+   "version" : "0.16"
+}

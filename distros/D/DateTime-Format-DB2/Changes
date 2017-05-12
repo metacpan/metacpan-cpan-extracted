@@ -1,0 +1,7 @@
+2007-01-20:
+0.05 - Added parse_datetime the same as parse_timestamp, since some seem to expect it (DBIx::Class!)
+2005-12-18:
+0.04 - Added parsing of YYYY-MM-DD HH:MM:SS.NNNNNN since thats what DBI
+actually gives us. (odd that)
+
+0.03 - Fixed SYNOPSIS.

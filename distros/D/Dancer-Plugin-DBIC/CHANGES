@@ -1,0 +1,803 @@
+==================================================
+Changes from 2005-11-11 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.2104 at 2015-11-09 12:27:36 +0000
+-------------------------------------------
+
+  Change: dbd5bdaa7daa7e89efe7bb2cb0aa920a318f7b05
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-11-09 07:26:51 +0000
+
+    v0.2104 
+
+  Change: 9d2cba1d3e7c3825f34898270daef2092337f999
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-11-09 07:25:18 +0000
+
+    removed unnecessary Module::Load import 
+
+  Change: 14fc6672e7befed9b4cdc12f74a812762f3b4714
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-11-09 06:36:31 +0000
+
+    v0.2103 
+
+  Change: 95416a379f6fc8a4f483e62be09fc7ba4e2766ee
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-11-09 06:35:24 +0000
+
+    removed plugin_args call 
+
+  Change: 69812f09c160b2a101889c8ed4a9347c13f13946
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-11-09 06:31:29 +0000
+
+    Merge pull request #20 from Relequestual/master
+
+    Call own schema function rather than DBICx::Sugar 
+
+  Change: f639de7050d32cf2743cb63f1b948b671ea86f6e
+  Author: Ben Hutton <relequestual@gmail.com>
+  Date : 2015-11-05 10:02:11 +0000
+
+    Call own schema function
+
+    Fixes https://github.com/ironcamel/Dancer-Plugin-DBIC/issues/19 
+
+  Change: c185d432d0d094dab3e59ae8808c86897a062696
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-29 06:03:31 +0000
+
+    updated synopsis 
+
+-------------------------------------------
+version 0.2102 at 2015-03-29 09:44:09 +0000
+-------------------------------------------
+
+  Change: 96eacfc5c44a2ac4c5f6ae5c4e8202c1e9f7c059
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-29 05:44:09 +0000
+
+    this plugin is now a thin wrapper around DBICx::Sugar
+
+    I created DBICx::Sugar to factor out the code duplication between
+    Dancer::Plugin::DBIC and Dancer2::Plugin::DBIC. Now this plugin is
+    just a thin wrapper around DBICx::Sugar. 
+
+-------------------------------------------
+version 0.2101 at 2015-02-14 02:52:24 +0000
+-------------------------------------------
+
+  Change: b4b29aa82925bc53370ae15aa66e897085c31db5
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-02-13 21:52:24 +0000
+
+    updated SQL::Translator version requirement to fix cpantesters
+    failures 
+
+  Change: 2ee1a4bfad6362fad5907dfe85fb8d866835cef6
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-01-12 01:16:15 +0000
+
+    Merge pull request #17 from monsieurp/test-code-refactoring
+
+    Test code refactoring 
+
+  Change: c2b09c695a711a336e753771926c01d4a53a4c31
+  Author: Patrice Clement <monsieurp@gentoo.org>
+  Date : 2015-01-11 19:48:35 +0000
+
+    get rid of eval {} and make use of Test::Requires instead 
+
+  Change: 9270cfe02c06f1de469d6e19171c3e8d1ecb2f47
+  Author: Patrice Clement <monsieurp@gentoo.org>
+  Date : 2015-01-10 20:32:36 +0000
+
+    test code refactoring and import tyding. 
+
+-------------------------------------------
+version 0.2100 at 2014-04-05 06:59:23 +0000
+-------------------------------------------
+
+  Change: 72ba5fadea989d087feddf36f7e72d6be70b3dec
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-04-05 02:59:23 +0000
+
+    Merge pull request #15 from ironcamel/balancer-args
+
+    added support for more ::Replicated options 
+
+  Change: 9ee389e9fde37bc56ed71fbb8b37d0a4fcd5d756
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-04-05 02:56:29 +0000
+
+    added support for more ::Replicated options
+
+    Added support for options: balancer_args, pool_type, and pool_args.
+    Also getting ready to release v0.2100. 
+
+  Change: 7786e1b86267dc1e487a17e4b7d7768278b9f707
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-12 04:27:32 +0000
+
+    releasing v0.2001 
+
+  Change: 488d55a763c10217debc9bfbd4850da80b0d182b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-12 04:22:42 +0000
+
+    Removed deprecated pckg option.
+
+    Also added deprecation warning for the pass option and updated the
+    documentation. 
+
+  Change: 20309bc791e8c0388ef86cc8cc3b0590f126d380
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-12 04:21:12 +0000
+
+    skip the replicated tests if the required deps are not installed 
+
+-------------------------------------------
+version 0.2000 at 2014-03-11 20:00:09 +0000
+-------------------------------------------
+
+  Change: 5845b02557d12f571d4fee5b3fc43c17705cc06d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-11 16:00:09 +0000
+
+    Merge pull request #14 from ironcamel/replicated
+
+    added support for database slaves via
+    DBIx::Class::Storage::DBI::Replicated 
+
+  Change: 8054506283bd590628b3964ae53568a01466daa2
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-11 15:50:50 +0000
+
+    added support for database slaves via
+    DBIx::Class::Storage::DBI::Replicated 
+
+-------------------------------------------
+version 0.1901 at 2014-02-05 03:07:46 +0000
+-------------------------------------------
+
+  Change: 18328b1c8ef7010c97e34a2b2d9968a3ce2a20d5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-02-04 22:07:46 +0000
+
+    Added SQL::Translator prereq for tests to pass. 
+
+-------------------------------------------
+version 0.1900 at 2014-02-04 22:49:09 +0000
+-------------------------------------------
+
+  Change: a5a03b2c41f54a05e8e04304959e7b0c3ce4bd81
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-02-04 14:49:09 +0000
+
+    Merge pull request #12 from ironcamel/schema-alias
+
+    added support for schema aliases 
+
+  Change: d8a263847cdb792653a54b41d8712e301b7d89a2
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-02-04 17:48:09 +0000
+
+    releasing v0.1900 
+
+  Change: 29fe667579534a02f53c8d0eb6b750c0951ba9ea
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-02-04 16:30:04 +0000
+
+    added support for schema aliases 
+
+  Change: 653785a8790f8597a3eb0e8038c0c52f39d1b03e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-10-06 23:54:38 +0000
+
+    Releasing v0.1803 
+
+  Change: 34dd735a8f99c13fe7ef22a880ffe0acecc159fc
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-04-05 21:57:45 +0000
+
+    Merge pull request #11 from bentglasstube/master
+
+    Show root cause when unable to load schema. 
+
+  Change: 865b34ce28081f0e31beedb1caaee876339bb851
+  Author: Alan Berndt <alan@eatabrick.org>
+  Date : 2013-04-05 15:21:23 +0000
+
+    Show reason when unable to load schema. 
+
+  Change: 65d3c0d347c2075ff6d7d4efef0e0396354b7d17
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-22 09:57:07 +0000
+
+    Updated version requirement for Dancer.
+
+    A newer Dancer is required to use the plugin_args() function. 
+
+-------------------------------------------
+version 0.1801 at 2013-01-21 05:13:44 +0000
+-------------------------------------------
+
+  Change: 1a178ea47c1c1e875429c55d7e9a3b79742f1876
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-21 00:13:44 +0000
+
+    Getting ready to release v0.1801 
+
+  Change: 0f88ba279fdb33f06f8c7fffc48ffa8d9619af3b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-20 20:03:49 +0000
+
+    Merge pull request #7 from yanick/dancer-2
+
+    compatibility with Dancer 2 
+
+  Change: 1608e5924745a9e385d109b2fbaaae498a18d46f
+  Author: Yanick Champoux <yanick@babyl.dyndns.org>
+  Date : 2013-01-20 12:17:07 +0000
+
+    compatibility with Dancer 2 
+
+-------------------------------------------
+version 0.1800 at 2013-01-19 03:30:17 +0000
+-------------------------------------------
+
+  Change: 5203af9276578c9de4ac6ec5a95d72cab2229951
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-18 22:30:17 +0000
+
+    Added resultset and rset keywords. Setting version to v0.1800. 
+
+  Change: 509ec32b84487d851ca997d31700dd62b860293d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-07 00:57:55 +0000
+
+    Fixed pod encoding 
+
+-------------------------------------------
+version 0.1700 at 2013-01-01 19:30:37 +0000
+-------------------------------------------
+
+  Change: 4ccdbcc5717b286df227b4996c9d60f2dc1dd6ec
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-01 14:30:37 +0000
+
+    Getting ready to cut v0.1700 
+
+  Change: 91c2eb89e4a50fd6bbf125eed639e0648c8ac7d0
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-01-01 10:42:44 +0000
+
+    Merge pull request #5 from shumphrey/master
+
+    Support for Dancer2 
+
+  Change: 2cf8ac7154bb2047577e711838bb05f2f31d5223
+  Author: Steven Humphrey <shumphrey@inview.co.uk>
+  Date : 2012-12-16 10:25:18 +0000
+
+    Support for Dancer2 
+
+  Change: 99a9c7e4b40281e3414917c0c117db77ba2c0b9d
+  Author: Steven Humphrey <shumphrey@inview.co.uk>
+  Date : 2012-12-16 10:21:43 +0000
+
+    Merge remote-tracking branch 'upstream/master'
+
+    * upstream/master:
+
+    Skip some tests when DBIx::Class::Schema::Loader is missing.
+
+    Started using Module::Load for dynamically loading modules.
+
+    Make DBIx::Class::Schema::Loader an optional dependency, required at
+    runtime.
+
+    Updated POD documentation.
+
+    Adding README for github.
+
+    Updating POD documentation
+
+    Cleaning up dist.ini
+
+    Add myself to authors
+
+    Include GH issues in META.yml resources too
+
+    Add GitHub URLs to meta.yml
+
+    Typo fix
+
+    Some typo fixes and improving the synopsis examples
+
+    Typo in config file example
+
+    Keyboarding fail.
+
+    Strongly discourage dynamic schema introspection
+
+    Updating authors, removing tabs and changed Prereq to Prereqs. 
+
+  Change: 0bea04dfec01221ec7f5895079225b597e510386
+  Author: Steven Humphrey <shumphrey@inview.co.uk>
+  Date : 2012-12-15 10:50:22 +0000
+
+    Support for Dancer2 
+
+  Change: 9caba887b31a0026eb64fa3a8e5f41c2ecc7f31d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-03-22 11:23:45 +0000
+
+    Merge pull request #10 from ilmari/default-schema
+
+    Add default schema support 
+
+-------------------------------------------
+version 0.1601 at 2012-10-01 06:41:17 +0000
+-------------------------------------------
+
+  Change: 36dad6bf98fabf9df5d28142f572955c7e3c2508
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-10-01 02:41:17 +0000
+
+    Skip some tests when DBIx::Class::Schema::Loader is missing. 
+
+-------------------------------------------
+version 0.1600 at 2012-09-29 05:52:36 +0000
+-------------------------------------------
+
+  Change: 6e7f6789d4ef517c6628e590065068ec892735a7
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-09-29 01:52:36 +0000
+
+    Started using Module::Load for dynamically loading modules.
+
+    Updated version for new release 0.1600 
+
+  Change: 66e3d7be95e9f13dcb92a30f4b44834d3a6fa3ca
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-09-17 18:40:56 +0000
+
+    Merge pull request #3 from fgabolde/master
+
+    Make DBIx::Class::Schema::Loader an optional dependency 
+
+  Change: 1004f2b1c6c1e80d338d40ebe422bcfe7851a27f
+  Author: Fabrice Gabolde <fabrice.gabolde@gmail.com>
+  Date : 2012-09-16 13:28:27 +0000
+
+    Make DBIx::Class::Schema::Loader an optional dependency, required at
+    runtime. 
+
+-------------------------------------------
+version 0.1506 at 2012-04-13 03:20:47 +0000
+-------------------------------------------
+
+  Change: 30e34f2054fc43ac7fe7a55f3493136a965efae5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-04-12 23:20:47 +0000
+
+    Updated POD documentation. 
+
+  Change: c7d0bc3633964a1445149985b1c5a524b180a64d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-04-10 03:52:22 +0000
+
+    Merge remote-tracking branch 'ilmari/default-schema'
+
+    Conflicts:
+
+    lib/Dancer/Plugin/DBIC.pm 
+
+  Change: 223c7ad3bb4738f7386caddbe7ce34531c2a8114
+  Author: Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>
+  Date : 2012-03-22 16:57:13 +0000
+
+    Fix POD typo 
+
+  Change: e36a706da1995924c8b1869edbfe871f4519e20c
+  Author: Dagfinn Ilmari MannsÃ¥ker <ilmari@ilmari.org>
+  Date : 2012-03-22 16:50:16 +0000
+
+    Add default schema support
+
+    Return the 'default' schema if multiple are defined and it exists,
+    otherwise throw an error. If only one schema is defined, continue to
+    return that. 
+
+  Change: 91284f1b60e37c87a5cf9756318f8fb1bbe6bebb
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-08 14:07:07 +0000
+
+    Adding README for github. 
+
+-------------------------------------------
+version 0.1505 at 2012-02-08 04:23:43 +0000
+-------------------------------------------
+
+  Change: 985fbe2299b6fd99852d0b2b119456bedea0d437
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-07 23:23:43 +0000
+
+    Updating POD documentation 
+
+  Change: 20e03ef7ba066deebe1a76a1bedc5c249d9e20c4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2012-02-07 22:09:31 +0000
+
+    Cleaning up dist.ini 
+
+  Change: 0e3ae43385ea6e6b1aa58bc459b852074184c646
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:51:12 +0000
+
+    Add myself to authors
+
+    (even though I've mostly only done doc improvements so far...) 
+
+  Change: 70be79e5451ddb65ee62360f5f0ff2dff6c4e1c9
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:50:36 +0000
+
+    Include GH issues in META.yml resources too 
+
+  Change: e6d5392031371f1063aa549844c69ae4048ba9b0
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:43:07 +0000
+
+    Add GitHub URLs to meta.yml
+
+    It's useful for canonical repo to be listed on MetaCPAN 
+
+  Change: b77284cedf2a8b3beb6290b9378b5912056d3edb
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:38:01 +0000
+
+    Typo fix 
+
+  Change: 6eef227aa8f333f3e8bdb25f63ab6f17d22bf8e1
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:35:42 +0000
+
+    Some typo fixes and improving the synopsis examples 
+
+  Change: 0697504336929a26266e5962b121c0648379d6b0
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:27:23 +0000
+
+    Typo in config file example 
+
+  Change: 5ee60afb11a43f5eb8ae2d254b7c47230db94e5e
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:26:13 +0000
+
+    Keyboarding fail. 
+
+  Change: 7727042dfbecfa28c4c38ab09943a31329851e36
+  Author: David Precious <davidp@preshweb.co.uk>
+  Date : 2012-02-07 21:23:47 +0000
+
+    Strongly discourage dynamic schema introspection 
+
+  Change: 802d718f90a707255074caf5f813e8de493e939f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-11-24 12:34:22 +0000
+
+    Updating authors, removing tabs and changed Prereq to Prereqs. 
+
+  Change: 30665b94fdfb5c4fbd48ba4b9a0c46946bc8e660
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-23 23:30:01 +0000
+
+    manually unlink test dbs 
+
+  Change: 2986d2d65ee765cf9bd0832dbceefd1089f9f2ee
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-23 23:05:33 +0000
+
+    fixed test for windows compatibility 
+
+  Change: 127f1266d6a0df8e4a1065b3dfaa5b42f2ff0a53
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-23 22:32:37 +0000
+
+    Updating tests to use tempfile instead of tempdir. Also some minor
+    cleanup. 
+
+  Change: 41036cf91bc00e6c2e171167b5a505dd0c1fd58f
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-23 20:51:31 +0000
+
+    removed unlinks 
+
+  Change: 9cf2981f072ce37ff315f65d73eb0c94cb631ccf
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-23 20:22:11 +0000
+
+    Merge branch 'master' of
+    git://github.com/alnewkirk/Dancer-Plugin-DBIC 
+
+  Change: edcdb12454b7b77650369956261a900119ede57a
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-23 20:21:19 +0000
+
+    new version, POD update, tests fail 
+
+  Change: dc17f97f26864a90d9f9aad0ba832c058ed0e869
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-23 19:14:45 +0000
+
+    Merge branch 'master' of github.com:alnewkirk/Dancer-Plugin-DBIC 
+
+  Change: 904531c4f2c94a46a7c6601f0f79fd4a13e10d92
+  Author: franck cuny <franck@lumberjaph.net>
+  Date : 2010-10-23 15:00:30 +0000
+
+    add simple TestApp to test with Dancer 
+
+  Change: e8466f7bec40c119f162f1d7d8f1efd13656c977
+  Author: franck cuny <franck@lumberjaph.net>
+  Date : 2010-10-23 15:00:12 +0000
+
+    use File::Spec and File::Temp for temp. db 
+
+  Change: 85942ba4a199db88bfacf58d05e288d697d403df
+  Author: franck cuny <franck@lumberjaph.net>
+  Date : 2010-10-23 14:59:51 +0000
+
+    update .gitignore 
+
+  Change: f8c6106dba97bd91109d1cdff53eea6c89c8702e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-22 01:52:08 +0000
+
+    Updating version. 
+
+  Change: 1206fed0773d8b68d1880446cfbec948b96ff97a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-22 01:48:50 +0000
+
+    The setup in the tests no longer need to be in BEGIN blocks. Thanks
+    to sukria's idea of not calling plugin_setting() at compile time. 
+
+  Change: 32ddee89133e1c44dec3e8f92176b8e2e6351e71
+  Author: Alexis Sukrieh <sukria@sukria.net>
+  Date : 2010-10-19 18:42:59 +0000
+
+    FIX for Dancer::Test 
+
+  Change: 4623f97cfa6e328054e54c8027d11c87c13c97d5
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-10-17 04:30:04 +0000
+
+    new version 
+
+  Change: 2a29b4e6d320085f347a8c66d86bc443018827d4
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-10-12 04:44:24 +0000
+
+    new version 
+
+  Change: 142002882d5052741b5ff81f9d0bd6a8a112e211
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-12 03:40:27 +0000
+
+    Fixed a bug where schema was reloaded unnecessarily when schema() is
+    invoked with no arguments. Now we will use cached schema if it is
+    available. 
+
+  Change: 652a782d2eb723a4b8b8c7f76dba66527e312b72
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 19:13:21 +0000
+
+    Updating README. 
+
+  Change: fb3fe7dbdebe380c4d0db5ce5ca402d9c3b5cbed
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 19:11:05 +0000
+
+    Updating documentation to describe 'schema' function and new usage. 
+
+  Change: e5dfe24aafed0a34ac4aa38e6da723ba51a80a12
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 17:47:52 +0000
+
+    Handle the case where a schema that isn't configured is requested. 
+
+  Change: 84c11b14c534996d5f5c2869c77020926beacd60
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 17:21:47 +0000
+
+    Added 01-single-schema.t for testing simplest usage, where only 1
+    schema is configured. Also there is no reason to define routes in the
+    test, so I removed those. 
+
+  Change: 226f155d4df05f3b12a33446b8878a92dfccb509
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 16:49:39 +0000
+
+    Renaming test files. 
+
+  Change: 4b52d79c83a28992dc1b9bfb9a522894c71f6ac5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 16:46:27 +0000
+
+    Plugin now registers exactly one keyword, schema. This works more
+    like the Database plugin, which exports just the keyword database. So
+    usage now is:
+
+    schema->resultset('Users')->find($id)
+
+    or
+
+    schema('foo')->resultset('Users')->find($id) 
+
+  Change: 47a5fc78b6c5faee62ccf32b7b827b61963f8910
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-09 02:22:39 +0000
+
+    Fixed warning in tests about redefining 'pass'. 
+
+  Change: f3630e7119a43697b7c94195b0f2cc3b2bc83146
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 20:01:35 +0000
+
+    Updating version info. 
+
+  Change: 05f9a80e44a5d30c97e32076edfdac0ffabff618
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 20:00:24 +0000
+
+    Minor pod edit in SYNOPSIS. 
+
+  Change: e84749351fff769bb04942dc7bb21dc730a5b9a5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 16:40:21 +0000
+
+    Added tests for multiple schemas. 
+
+  Change: febd2f426c69ea80f701ee6af854d75ee8e69378
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 07:36:57 +0000
+
+    Capture db connection info in a more succint way. 
+
+  Change: eeda87362ad6ff475cc3b82683c058f1120aae58
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 07:30:23 +0000
+
+    Adding tests for actual DBIC classes. 
+
+  Change: c076e5bed3843c6597d5d4c2012acc0ac3020389
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 03:18:57 +0000
+
+    Removing auto_load option from tests. It is implied when schema_class
+    is not provided. 
+
+  Change: 519e37016a5b2d31b782eb2765a8446826b554f1
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 02:54:15 +0000
+
+    Making example in README nicer. 
+
+  Change: 70557240fe8720619fe3998ea8c4a6e9f0b80943
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 02:51:10 +0000
+
+    Updating DESCRIPTION pod. 
+
+  Change: 2d7751a82779b93636ba6a9213e064e47b0cac3a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 02:27:30 +0000
+
+    Making example in SYNOPSIS pod nicer. 
+
+  Change: b00f081d7d775fa225fba6ed2e819d63f7fc9409
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 02:18:55 +0000
+
+    Cleaning up POD and README. 
+
+  Change: 98ca5f2512cf14a6903f26bae45dd2f1266cb4ad
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-06 02:09:53 +0000
+
+    Auto loading will now happen if a schema_class option is not
+    provided. 
+
+  Change: f1e65d3282a9a1e8b13ef2e2d2852808e6dfd2f5
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-05 23:35:35 +0000
+
+    Changed 'generate' config param to 'auto_load'. Updated tests to
+    reflect that. 
+
+  Change: c08d144537f7520dbbfac0e578666d7d39eb076b
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-05 23:11:17 +0000
+
+    pckg config param is renamed to schema_class. Cleaned up code as
+    well. 
+
+  Change: 66a73d284d3daa456477449e155bd2c8bf6698f7
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-04 18:53:02 +0000
+
+    Initial check in of some basic tests. Got tests passing. 
+
+  Change: 789ecf25ae720391aa996795b07b621b0367d6fc
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-04 16:47:34 +0000
+
+    Revert "Adding Makefile.PL. Adding version and abstract to main
+    module."
+
+    This reverts commit 240eee073c3aa29579b4b7de64da4229f93ce1b4. 
+
+  Change: 240eee073c3aa29579b4b7de64da4229f93ce1b4
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2010-10-04 15:57:22 +0000
+
+    Adding Makefile.PL. Adding version and abstract to main module. 
+
+  Change: 853c2e1069f534f710b4a82b7da3bf9f8f9c7ed1
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-03 13:22:23 +0000
+
+    new version 
+
+  Change: 6cda2da35e7666c6c92290650bdc1d10a61fb4ea
+  Author: Al Newkirk <root@alnewkirk.com>
+  Date : 2010-10-03 13:19:46 +0000
+
+    added better connection definition thanks to franckcuny 
+
+  Change: 4355d3b1422e06a56f884ecd385538a630e9cff1
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-10-02 15:28:58 +0000
+
+    new version, reverse auto-gen policy 
+
+  Change: 3a71fc305917aec09f04a806b6d05b90a4adaf99
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-09-11 00:07:51 +0000
+
+    updated gitignore 
+
+  Change: 8a404f90b2dc156d70a6e630fae5c76ba21eb9c3
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-09-11 00:06:56 +0000
+
+    added skip_automake for classes with existing schemas, now only calls
+    connect once 
+
+  Change: 7e7ea606462aaee44346ca82990881c34c0fdb94
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-09-05 20:34:13 +0000
+
+    updated README 
+
+  Change: 373175eab1bb2aac0bcf870ac4bdee5edf3ba1c5
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-09-05 19:48:49 +0000
+
+    fixed dist.ini 
+
+  Change: fb8c47e91d6a8249c88b53eb5d26d2d3083c580d
+  Author: unknown <Administrator@.(none)>
+  Date : 2010-09-05 19:43:21 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

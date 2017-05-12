@@ -1,0 +1,14 @@
+Revision history for Decision-ParseTree
+
+0.01    Oct 2007
+        The always amazing 'you have to start somewhere' release.
+
+0.02    Oct 2007
+        Opps it helps to make sure that you have all your deps in check, Thanks CPANTS.
+
+0.03    Oct 2007
+        Opps it helps to make sure that you have all your deps in check, Thanks CPANTS, in Makefile.PL
+
+0.04    Nov 2007
+        Updated POD, more about tracking and fixed a spelling error.
+

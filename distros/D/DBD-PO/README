@@ -1,0 +1,43 @@
+DBD::PO version 2.10
+====================
+
+This is a driver to read/write PO files.
+More about PO-Files see module Locale::PO or Locale::Maketext.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    version
+    parent
+    DBI
+    Set::Scalar
+    SQL::Statement
+    Params::Validate
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2008 - 2010,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

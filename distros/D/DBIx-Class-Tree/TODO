@@ -1,0 +1,14 @@
+
+ - Support DAGs.
+ - Tree::Visitor
+ - Come up with a better name for attach_before and
+   attach_after.
+ - Support multiple columns for ordering.
+ - Declare both the parent column and the position column
+   in one call.
+ - Add an ancestors() and descendants() method with
+   support for resultset cacheing.
+ - Not all methods are covered by the tests.
+ - has_ancestor() method.
+ - DBIx::Class::Tree::NestedSet
+

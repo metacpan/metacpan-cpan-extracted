@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+Makefile.PL
+German.pm
+README
+install.cmd
+install.sh
+t/basic.t
+META.yml                                 Module meta-data (added by MakeMaker)

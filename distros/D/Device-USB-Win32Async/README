@@ -1,0 +1,33 @@
+Device-USB-Win32Async version 0.30
+
+This module modifies the Device::USB module to expose extra functionality
+supported by the LibUSB-Win32 library.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+Device::USB, Carp, Inline::C
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Rajstennaj Barrabas
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.10.0.

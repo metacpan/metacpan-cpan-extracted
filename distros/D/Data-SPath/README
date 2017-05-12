@@ -1,0 +1,209 @@
+NAME
+    Data::SPath - lookup on nested data with simple path notation
+
+VERSION
+    version 0.0004
+
+SYNOPSIS
+        use Data::SPath
+            spath => {
+                # sets up default error handling
+                method_miss => \&_method_miss,
+                key_miss => \&_key_miss,
+                index_miss => \&_index_miss,
+                key_on_non_hash => \&_key_on_non_hash,
+                args_on_non_method => \&_args_on_non_method
+            };
+
+        my $data = {
+            foo => [ qw/foobly fooble/ ],
+            bar => [ { bat => "boo" }, { bat => "bar" } ]
+            "foo bar" => 1,
+            "foo\"bar" => { "foo/bar" => 20 }
+            obj => SomeClass->new,
+        };
+
+        my $match;
+
+        # returns foobly
+        $match = spath $data, "/foo/0";
+
+        # returns boo
+        $match = spath $data, "/bar/0/bat";
+
+        # returns { bat => "bar" }
+        $match = spath $data, "/bar/1";
+
+        # returns 1
+        $match = spath $data, q{/"foo bar"};
+
+        # returns 20
+        $match = spath $data, q{/"foo\\"bar/"foo/bar"};
+
+        # returns the call to method passing arguments
+        $match = spath $data, q{/obj/method( "arg1", 'arg2', bareword )};
+
+DESCRIPTION
+    This module implements very simple path lookups on nested data
+    structures. At the time of this writing there are two modules that
+    implement path matching. They are Data::Path and Data::DPath. Both of
+    these modules have more complicated matching similar to "XPath". This
+    module does not support matching, only lookups. So one call will alway
+    return a single match. Also, when this module encounters a "blessed"
+    reference, instead of access the references internal data structure
+    (like Data::DPath) a method call is made on the object by the name of
+    the key. See "SYNOPSIS".
+
+FUNCTIONS
+  "spath( $data, $path, $opts )"
+    "spath" takes the data to perform lookup on as the first argument. The
+    second argument should be a string with a path specification in it. The
+    third optional argument, if specified, should be a hash reference of
+    options. Currently the only supported options are error handlers. See
+    "ERROR HANDLING". "spath" returns the lookup if it is found, calls
+    croak() otherwise with the error. This behavior can be changed by
+    setting error handlers. If the error handler returns, that value is
+    returned.
+
+    *   data
+
+        Data can be any type of data, although it makes little sense to pass
+        in something other than a hash reference, an array reference or an
+        object.
+
+    *   path
+
+        Path should start with a slash and be a slash separated list of keys
+        to lookup. Each level of key is one level deeper in the data.
+
+        *   hash
+
+            When the current level in the data is a hash reference, the key
+            is looked up in the hash, and the current level is set to the
+            return of the lookup on the hash.
+
+        *   array
+
+            When the current level is an array reference, the key should be
+            an index into the array, the current level is then set to the
+            return of the lookup on the array reference.
+
+        *   object
+
+            If the current level is an object, the key is treated as the
+            name of a method to call on the object. The method is called in
+            list context if "spath" was called in list context, otherwise
+            scalar context. If the method returns more than one item, the
+            current level is set to an array reference of the return,
+            otherwise the current level is set to the return of the method
+            call. It is possible to pass in arguments to object methods.
+            Arguments are expected to be a comma separated list of either
+            quoted structures or barewords which must match "\w+". See
+            "SYNOPSIS" for examples.
+
+        Quotes are allowed on each level. You only need quotes if you have
+        spaces or "/" in your keys. For example:
+
+            my $data = { "foo bar" => 1, "foo/bar" => 1 };
+            spath $data, q{/"foo bar"};
+            spath $data, q{/"foo/bar"};
+
+        You can also use "\" to escape quotes:
+
+            spath $data, q{/"foo\"bar"}; # embedded quotes
+
+    *   opts
+
+        The only options currently accepted are error handlers. See "ERROR
+        HANDLING".
+
+EXPORTS
+    Nothing is exported by default. You can request "spath" be exported to
+    you namespace. This module uses Sub::Exporter for exporting.
+
+ERROR HANDLING
+    Data::SPath defaults to calling Carp::croak() when any kind of error
+    occurs. You can change any of the error handlers by passing in a third
+    argument to "spath":
+
+        spath $data, "/path", {
+            method_miss => \&_method_miss,
+            key_miss => \&_key_miss,
+            index_miss => \&_index_miss,
+            key_on_non_hash => \&_key_on_non_hash,
+            args_on_non_method => \&_args_on_non_method
+        };
+
+    Or you can setup default error handlers at compile time by passing them
+    into your call to "import()":
+
+        use Data::SPath
+            spath => {
+                method_miss => \&_method_miss,
+                key_miss => \&_key_miss,
+                index_miss => \&_index_miss,
+                key_on_non_hash => \&_key_on_non_hash,
+                args_on_non_method => \&_args_on_non_method
+            };
+
+    The default error handlers look like this:
+
+        sub _method_miss {
+            my ( $method_name, $current, $depth ) = @_;
+            my $reftype = reftype( $current );
+            croak "tried to call nonexistent method '"
+                . $method_name
+                . "' on object with type $reftype at spath path element "
+                . $depth;
+        }
+
+        sub _key_miss {
+            my ( $key, $current, $depth ) = @_;
+            croak "tried to access nonexistent key '"
+                . $key
+                . "' in hash at spath path element "
+                . $depth;
+        }
+
+        sub _index_miss {
+            my ( $index, $current, $depth ) = @_;
+            croak "tried to access nonexistent index '"
+                . $index
+                . "' in array at spath path element "
+                . $depth;
+        }
+
+        sub _key_on_non_hash {
+            my ( $key, $current, $depth ) = @_;
+            my $reftype = reftype( $current ) || '(non reference)';
+            croak "tried to access key '"
+                . $key
+                . "' on a non-hash type $reftype at spath path element "
+                . $depth;
+        }
+
+        sub _args_on_non_method {
+            my ( $key, $current, $args, $depth ) = @_;
+            my $reftype = reftype( $current ) || '(non reference)';
+            croak "tried to pass arguments '"
+                . $args
+                . "' to a non-method '"
+                . $key
+                . "' of type "
+                . $reftype
+                . "at spath path element "
+                . $depth;
+        }
+
+    If you return from an error handler, that value is returned from
+    "spath".
+
+AUTHOR
+    Scott Beck <scottbeck@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Scott Beck <scottbeck@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

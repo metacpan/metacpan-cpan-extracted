@@ -1,0 +1,42 @@
+=head1 NAME
+
+DBIx::Class::Migration::Tutorial::Conclusion - Final thoughts
+
+=head1 GOAL
+
+A quite recap and thoughts about where to go next.
+
+=head1 SUMMARY
+
+Nice to see you get this far!  I hope you now have the basic understanding
+needed to be able to integrate migrations into your DBIC workflow, testing
+and web development.  The next bit is up to you.  Use the tools, think about
+where the gaps are, and give me some feedback.  Hopefully over time this
+tutorial can become better and we can also start to create some basic recipes
+for good approaches to common problems.  Thanks!
+
+=head1 NEXT STEPS
+
+You might find looking at L<DBIx::Class::Migration::FAQ> useful in debugging
+some of the more common error messages that I've seen while preparing this
+tutorial.
+
+Also, at this point reviewing the API level documentation for
+L<DBIx::Class::Migration> and L<DBIx::Class::Migration::Script> useful.  For
+more on some of the testing stuff we covered see L<DBIx::Class::Migration::Population>
+and L<Test::DBIx::Class>.
+
+Lastly, its definitely a good idea to review the documention for both
+L<DBIx::Class::DeploymentHandler> and L<DBIx::Class::Fixtures> if you have not
+already.  Looking at L<SQL::Translator> may not be a bad idea either.
+
+=head1 AUTHOR
+
+See L<DBIx::Class::Migration> for author information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<DBIx::Class::Migration> for copyright and license information
+
+=cut
+

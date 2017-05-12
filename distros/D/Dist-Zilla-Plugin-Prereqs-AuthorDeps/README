@@ -1,0 +1,60 @@
+NAME
+    Dist::Zilla::Plugin::Prereqs::AuthorDeps - Add Dist::Zilla authordeps to
+    META files as develop prereqs
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+        # in dist.ini:
+
+        [Prereqs::AuthorDeps]
+
+DESCRIPTION
+    This adds Dist::Zilla itself and the result of the "dzil authordeps"
+    command to the 'develop' phase prerequisite list.
+
+ATTRIBUTES
+  phase
+    Phase for prereqs. Defaults to 'develop'.
+
+  relation
+    Relation type. Defaults to 'requires'.
+
+  exclude
+    Module to exclude from prereqs. May be specified multiple times.
+
+SEE ALSO
+    Dist::Zilla::Plugin::Prereqs::Plugins is similar but puts all plugins
+    after expanding any bundles into prerequisites, which is a much longer
+    list that you would get from "dzil authordeps".
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps/issues
+    >. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

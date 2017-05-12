@@ -1,0 +1,172 @@
+#! /usr/bin/env perl
+
+# dbs_empty - erases any data from a given SQL database
+
+# Copyright (C) 1999-2012 Stefan Hornburg
+
+# Author: Stefan Hornburg (Racke) <racke@linuxia.de>
+# Maintainer: Stefan Hornburg (Racke) <racke@linuxia.de>
+# Version: 0.19
+
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2, or (at your option) any
+# later version.
+
+# This file is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this file; see the file COPYING.  If not, write to the Free
+# Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+use strict;
+use warnings;
+
+use DBIx::Easy;
+use Getopt::Long;
+use Term::ReadKey;
+
+# process commandline parameters
+my %opts;
+my $whandler = $SIG{__WARN__};
+$SIG{__WARN__} = sub {print STDERR "$0: @_";};
+unless (GetOptions (\%opts, 'exclude-matching-tables=s', 'tables|t')) {
+    exit 1;
+}
+$SIG{__WARN__} = $whandler;
+
+# sanity check on commandline parameters
+if (exists $opts{'exclude-matching-tables'}) {
+    eval {'' =~ /$opts{'exclude-matching-tables'}/;};
+    if ($@) {
+        $@ =~ s%at /.*$%%;
+        die "$0: $@";
+    }
+}
+
+my $dbif;
+my $pwdused = 0;
+
+my ($driver, $database, $user) = @ARGV;
+$dbif = new DBIx::Easy ($driver, $database, $user);
+
+# handler for DBI error messages and missing password
+$dbif -> install_handler (\&fatal);
+
+# we need to explicitly establish the connection
+# for the case that a password is needed
+$dbif -> connect;
+
+my %fieldmap;
+
+my ($sth, $keyfield, $update);
+my ($table, $key, $fieldnames, @values, $headline);
+my (@columns, $routine);
+
+for ($dbif->tables) {
+    # skip tables preserved by user
+    if (exists $opts{'exclude-matching-tables'}) {
+        next if $table =~ /$opts{'exclude-matching-tables'}/;
+    }
+
+    if ($opts{'tables'}) {
+        # remove table from database
+        $dbif -> process ("DROP TABLE $_");
+    } else {
+        # empty table
+        $dbif -> process ("DELETE FROM $_ WHERE 1 = 1");
+    }    
+}
+
+# ensures commit 
+undef $dbif;
+
+# -----------------------------------
+# FUNCTION: fatal
+#
+# Error handler called by DBIx::Easy.
+# -----------------------------------
+
+sub fatal {
+  my ($statement, $err, $msg) = @_;
+  my $pwd;
+
+  if ($dbif->is_auth_error ($err)) {
+    unless ($pwdused) {
+      print "We need a password.\n";
+      $pwd = querypwd();
+      $pwdused = 1;
+    
+      # retry the connection
+      if (length ($pwd)) {
+        $dbif = new DBIx::Easy ($driver, $database, $user, $pwd);
+        $dbif -> install_handler (\&fatal);
+        $dbif -> connect ();
+        return;
+      } else {
+        die ("$statement: $msg.\n");
+      }
+    }
+  }
+  die ("$statement: $msg.\n");
+}
+
+# ----------------------------
+# FUNCTION: querypwd
+#
+# Queries user for a password.
+# ----------------------------
+
+sub querypwd () {
+  my $pwd;
+
+  print "Password: ";
+  ReadMode ('noecho');  # turn echo off
+  $pwd = ReadLine (0);
+  ReadMode ('restore'); # restore terminal
+  print "\n";
+  chomp ($pwd);
+  $pwd;
+}
+
+# script documentation (POD style)
+
+=head1 NAME
+
+dbs_empty - Empty SQL Databases
+
+=head1 DESCRIPTION
+
+dbs_empty is an utility that B<completely erases> any data from
+a given SQL database.
+
+=head1 COMMAND LINE PARAMETERS
+
+Required command line parameters are the DBI driver
+(C<Pg> for Postgres or C<mysql> for MySQL)
+and the database name. The third parameter is optionally
+and specifies the database user and/or the host where the
+database resides (C<racke>, C<racke@linuxia.de> or C<@linuxia.de>).
+
+=head1 COMMAND LINE OPTIONS
+
+=head2 B<--exclude-matching-tables>=REGEXP
+
+Excludes any table matching the regular expression REGEXP from dumping.
+
+=head2 B<-t, --tables>
+
+Remove tables from database too.
+
+=head1 AUTHOR
+
+Stefan Hornburg (Racke), racke@linuxia.de
+
+=head1 SEE ALSO
+
+perl(1), DBIx::Easy(3)
+
+=cut    

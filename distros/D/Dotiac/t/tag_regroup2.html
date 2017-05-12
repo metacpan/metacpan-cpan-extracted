@@ -1,0 +1,1 @@
+{% regroup loop by name|lower as var %}{% for x in var %}{{ x.grouper }}{% for y in x.list %}{{ y.text }}{% endfor %}{% endfor %}

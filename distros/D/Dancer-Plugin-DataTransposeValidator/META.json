@@ -1,0 +1,62 @@
+{
+   "abstract" : "Data::Transpose::Validator plugin for Dancer and Dancer2",
+   "author" : [
+      "Peter Mottram <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-DataTransposeValidator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Email::Valid" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "JSON" : "0",
+            "Plack" : "1.0035",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Transpose" : "0.0020",
+            "Moo" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Dancer-Plugin-DataTransposeValidator/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Dancer-Plugin-DataTransposeValidator.git"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.010",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

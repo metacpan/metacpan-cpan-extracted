@@ -1,0 +1,16 @@
+0.004     2016-08-04 16:49:02 BST
+
+  - Croak if host looks like URL
+
+0.003     2016-07-12 12:16:27 BST
+
+  - Force retry of releasing to flaky server
+
+0.002     2015-07-30 15:34:16 BST
+
+  - Use @Author::ALTREUS
+  - Actually release to CPAN
+
+0.001     2015-07-24 18:07:55+01:00 Europe/London
+
+  - First release

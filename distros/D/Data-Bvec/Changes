@@ -1,0 +1,9 @@
+Revision history for Perl extension Data::Bvec.
+
+1.01  Fri May 28 08:50:09 EDT 2010
+  - added missing prerequisite
+
+1.00  Sat May 22 21:44:36 2010
+  - original distributed version; created by h2xs 1.23 with
+    options -AX --skip-exporter --use-new-tests -n Data::Bvec
+

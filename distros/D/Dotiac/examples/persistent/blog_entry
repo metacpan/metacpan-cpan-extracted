@@ -1,0 +1,34 @@
+id,date,title,author,content
+1,1233048113,"A entry in this blog",Maluku,"Text goes here"
+2,1233048114,"A entry in this blog",Maluku,"Text goes here"
+3,1233048115,"A entry in this blog",Maluku,"Text goes here"
+4,1233048116,"A entry in this blog",Maluku,"Text goes here"
+5,1233048117,"A entry in this blog",Maluku,"Text goes here"
+6,1233048118,"A entry in this blog",Maluku,"Text goes here"
+7,1233048119,"A entry in this blog",Maluku,"Text goes here"
+8,1233048120,"A entry in this blog",Maluku,"Text goes here"
+9,1233048121,"A entry in this blog",Maluku,"Text goes here"
+10,1233048122,"A entry in this blog",Maluku,"Text goes here"
+19,1233048123,"A entry in this blog",Maluku,"Text goes here"
+21,1233062562,"This blog",Maluku,"This is a demo using Dotiac::DTL, a small and very simple blog.
+It has no other functions, except:
+View the blog (2 views)
+Posting a blog entry
+Adding a comment
+Removing a comment
+
+It is written in Perl + Dotiac-DTL and uses DBI for database interface. You can see the sourcecode in the blog.pl file.
+
+It uses 2 tables to store its data:
+blog_entry: An entry in this blog
+blog_comments: The comments for each entry
+
+There are 5 templates used here:
+blog_base.html: This is the parent template all the other templates inherit from, it contains the design ( if you could call it that) of the page.
+blog.html: The mainpage (overview) which shows all posts in pages
+blog_view.html: The detail view, which shows one post and all the comments.
+blog_new.html: Add a new post page
+blog_error.html: An error-page which displays a message.
+
+It also uses a global 'redirect' template to stop the browser from resending the data when the user refreshes the page.
+"

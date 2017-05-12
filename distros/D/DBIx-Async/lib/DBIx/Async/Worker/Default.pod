@@ -1,0 +1,30 @@
+=for comment POD_DERIVED_INDEX_GENERATED
+The following documentation is automatically generated.  Please do not edit
+this file, but rather the original, inline with DBIx::Async::Worker::Default
+at lib/DBIx/Async/Worker/Default.pm
+(on the system that originally ran this).
+If you do edit this file, and don't want your changes to be removed, make
+sure you change the first line.
+
+=encoding utf8
+
+=cut
+
+=head1 INHERITED METHODS
+
+=over 4
+
+=item L<DBIx::Async::Worker>
+
+L<begin_work|DBIx::Async::Worker/begin_work>, L<commit|DBIx::Async::Worker/commit>, L<connect|DBIx::Async::Worker/connect>, L<dbh|DBIx::Async::Worker/dbh>, L<do|DBIx::Async::Worker/do>, L<execute|DBIx::Async::Worker/execute>, L<fetchrow_hashref|DBIx::Async::Worker/fetchrow_hashref>, L<finish|DBIx::Async::Worker/finish>, L<new|DBIx::Async::Worker/new>, L<parent|DBIx::Async::Worker/parent>, L<prepare|DBIx::Async::Worker/prepare>, L<release|DBIx::Async::Worker/release>, L<ret_ch|DBIx::Async::Worker/ret_ch>, L<rollback|DBIx::Async::Worker/rollback>, L<run|DBIx::Async::Worker/run>, L<savepoint|DBIx::Async::Worker/savepoint>, L<sth_ch|DBIx::Async::Worker/sth_ch>
+
+=back
+
+=head1 AUTHOR
+
+Tom Molesworth <cpan@perlsite.co.uk>
+
+=head1 LICENSE
+
+Copyright Tom Molesworth 2012-2015. Licensed under the same terms as Perl itself.
+

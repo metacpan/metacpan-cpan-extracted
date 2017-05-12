@@ -1,0 +1,8 @@
+Release history for Dist::Zilla::PluginBundle::SILEX
+
+v0.0.2    2014-02-27 03:46:54+09:00 Asia/Seoul
+    - ignore Git::NextVersion generated file
+    - Fix typo: ReadmeAnyFromPod
+
+v0.0.1    2014-02-26 17:31:27+09:00 Asia/Seoul
+    - new dzil config for SILEX

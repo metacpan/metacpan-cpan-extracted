@@ -1,0 +1,19 @@
+Revision history for Devel-EndStats-LoadedMods
+
+0.03    2014-10-10 (PERLANCAR)
+
+	- Show perl version.
+
+	- Bug: forgot to include sample output.
+
+	- Fix Abstract (copy-paste mistake).
+
+
+0.02    2014-10-09 (PERLANCAR)
+
+	- Skip absolute paths in %INC keys.
+
+
+0.01    2014-10-09 (PERLANCAR)
+
+        - First release.

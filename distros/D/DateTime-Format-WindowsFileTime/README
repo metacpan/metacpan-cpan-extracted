@@ -1,0 +1,40 @@
+DateTime-Format-WindowsFileTime version 0.01
+============================================
+
+Converts a Windows FILETIME into a DateTime object. The Windows FILETIME
+structure holds a date and time associated with a file.  The structure 
+identifies a 64-bit integer specifying the number of 100-nanosecond intervals 
+which have passed since January 1, 1601.
+
+SYNOPSIS
+
+use DateTime::Format::WindowsFileTime;
+my $dt = DateTime::Format::WindowsFileTime->parse_datetime('01C4FA8464623000');
+# $dt is a regular DateTime object
+print "$dt\n";  # yields '2005-01-15T03:00:00'
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime
+  Math::BigInt (part of standard dist, you should already have this)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 by Jim
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

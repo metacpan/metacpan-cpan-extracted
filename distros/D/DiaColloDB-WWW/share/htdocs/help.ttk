@@ -1,0 +1,1727 @@
+[% FILTER null %]
+[% SET root_dir = "../"; ##-- dstar root dir %]
+[%
+  #------------------------------------------------------------
+  # globals
+  PROCESS "dc-common.ttk"
+%]
+[%#=====================================================================
+  # config: top-level
+  # %]
+[% SET
+   html_title = diacollo_standalone ? ("DiaCollo Help: " _ root_title) : (root_title _ ": DiaCollo Help")
+   dc_link_dchome = 1;
+   dc_link_info   = 0;
+   dc_link_help   = 0;
+%]
+[%#=====================================================================
+  # config: abbreviations & formatting
+  # %]
+[% SET
+  dmax = "<i>d</i><sub>max</sub>";
+  cfmin = "<i>f</i><sub>min</sub>";
+  N  = "<i>N</i>";
+  log  = "<b>log</b>"
+  exp  = "<b>exp</b>"
+  log2 = "<b>log</b><sub>2</sub>"
+  log = "<b>log</b>"
+  sgn = "<b>sgn</b>"
+  lambda = "&#x03bb;"
+  sub1 = "<sub>1</sub>";
+  sub2 = "<sub>2</sub>";
+  sub12 = "<sub>12</sub>";
+  f1 = "<i>f</i><sub>1</sub>";
+  f2 = "<i>f</i><sub>2</sub>";
+  f12 = "<i>f</i><sub>12</sub>";
+  w1 = "<i>w</i><sub>1</sub>";
+  w2 = "<i>w</i><sub>2</sub>";
+  w12 = w1 _ w2;
+  suba = "<sub>a</sub>";
+  subb = "<sub>b</sub>";
+  qa = "<i>q<sub>a</sub></i>";
+  qb = "<i>q<sub>b</sub></i>";
+  xa = "<i>s<sub>a</sub></i>";
+  xb = "<i>s<sub>b</sub></i>";
+  eps = "<i>&#x025b;</i>";
+  pa = "<i>p<sub>a</sub></i>";
+  pb = "<i>p<sub>b</sub></i>";
+  pdiff = "<i>p<sub>a-b</sub></i>";
+  cup = "&#x222a;";
+  cap = "&#x2229;";
+  score = "<b>score</b>";
+  diff = "<b>diff</b>";
+  diffdiff = diff _ "<sub><a href=\"#diff\"><i>diff</i></a></sub>";
+  subdiff = "<sub>diff</sub>";
+  subadiff = "<sub>adiff</sub>";
+  subsum = "<sub>sum</sub>";
+  submin = "<sub>min</sub>";
+  submax = "<sub>max</sub>";
+  subavg = "<sub>avg</sub>";
+  subhavg = "<sub>havg</sub>";
+  subgavg = "<sub>gavg</sub>";
+  sublavg = "<sub>lavg</sub>";
+  deltaab = "&Delta;<sub>" _ xa _ xb _ "</sub>";
+  subf = "<sub>f</sub>";
+  subfm = "<sub>fm</sub>";
+  sublf = "<sub>lf</sub>";
+  sublfm = "<sub>lfm</sub>";
+  submilf = "<sub>milf</sub>";
+  submi1 = "<sub>mi1</sub>";
+  submi3 = "<sub>mi3</sub>";
+  subld = "<sub>ld</sub>";
+  subll = "<sub>ll</sub>";
+  %]
+[%#=====================================================================
+  # config: examples & links
+  # %]
+[% SET
+   puburl = "//kaskade.dwds.de/~jurish/pubs/";
+
+   dcurl.dta = "//kaskade.dwds.de/dstar/dta/diacollo/";
+   dcurl.dta_dwds = "//kaskade.dwds.de/dstar/dta+dwds/diacollo/";
+   dcurl.kern = "//kaskade.dwds.de/dstar/kern/diacollo/";
+   dcurl.spiegel_print = "//kaskade.dwds.de/dstar/spiegel_print/diacollo/";
+   dcurl.zeit = "//kaskade.dwds.de/dstar/zeit/diacollo/";
+   dcurl.current = dc_root;
+
+   topurl.dta = "//www.deutschestextarchiv.de";
+   topurl.kern = "//zwei.dwds.de/r?corpus=kern";
+   topurl.spiegel_print = dcurl.spiegel_print _ ".."; #"http://zwei.dwds.de/r?corpus=spiegel_print";
+   topurl.dta_dwds = dcurl.dta_dwds _ ".."; #"http://zwei.dwds.de/r?corpus=dta%2Bdwds";
+   
+   collocates = "<a href=\"#prf-collocations\">collocates</a>";
+   unigrams = "<a href=\"#prf-unigrams\">unigrams</a>";
+%]
+[% PERL %]
+  my $cdb = $stash->get('cdb');
+  my $dcurl = $stash->get('dcurl');
+  *escapeHTML = \&CGI::escapeHTML;
+  $stash->set('exlink' => sub {
+		my ($corpus,$params) = @_;
+		my (@pkeys,$pform);
+		if (UNIVERSAL::isa($params,'HASH')) {
+		  $pform = $params;
+		  @pkeys = sort keys %$pform;
+		} else {
+		  $pform = { @$params };
+		  @pkeys = map {$params->[$_*2]} (0..($#$params/2));
+		}
+		my $curl = $dcurl->{$corpus} // "../../$corpus/diacollo/";
+		my $url = escapeHTML($cdb->quri($curl, $pform));
+		my $str = '{'.join(" ; ",
+				   map {
+				     (qq(<span class="expar">).escapeHTML($_)."</span>"
+				      .':'
+				      .qq(<span class="exval">).escapeHTML($pform->{$_})."</span>"
+				     )
+				   } @pkeys).'}';
+		return "<a class=\"exlink\" href=\"$url\">$str</a>";
+	      });
+  $stash->set('corpuslink' => sub {
+		my ($corpus,$txt,$params) = @_;
+		my $pform = $params ? (UNIVERSAL::isa($params,'HASH') ? $params : { @$params }) : {};
+		my $curl  = $dcurl->{$corpus} // "//kaskade.dwds.de/dstar/$corpus/diacollo/";
+		my $url   = escapeHTML($cdb->quri($curl, $pform));
+		return "<a class=\"corpuslink\" href=\"$url\">".($txt//$corpus)."</a>";
+	      });
+[% END %]
+[% END FILTER null %]
+[% cdb.cgi('header','-type'=>'text/html') %]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>[% html_title %]</title>
+  [% PROCESS "dc-html-head.ttk" favicon_url=diacollo_icon %]
+</head>
+<body>
+    <div class="outer">
+      <div class="headers">
+	<a href="[% root_url %]" style="float: right;"><img class="dlogo" src="[% diacollo_logo | url %]"/></a>
+	<h1>[% html_title %]</h1>
+	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
+      </div>
+
+      <!-- div.content -->
+      <div class="content">
+
+	<!--=================================================-->
+	<div id="toc" class="section headers">
+	  <a name="toc"><h2>Contents</h2></a>
+  	  <ul>
+[% PERL %]
+  my $toc = [
+	     {label=>"Introduction",href=>"#intro",
+	      sub=>[
+		    {label=>"Requests &amp; Parameters",href=>"#intro_reqs"},
+		    {label=>"Profiles &amp; Diffs",href=>"#intro_profiles"},
+		    {label=>"Indices &amp; Attributes",href=>"#intro_attrs"},
+		    {label=>"Scores &amp; Formats",href=>"#intro_scores"},
+   		    {label=>"Souce Code &amp; Services",href=>"#intro_sources"},
+		    {label=>"Other Useful Links",href=>"#intro_links"},
+	      ]},
+	     {label=>"Parameters",href=>"#params",
+	      sub=>[
+		    {label=>"query",href=>"#query"},
+		    {label=>"date",href=>"#date"},
+		    {label=>"slice",href=>"#slice"},
+		    {label=>"bquery",href=>"#bquery"},
+		    {label=>"bdate",href=>"#bdate"},
+		    {label=>"bslice",href=>"#bslice"},
+		    {label=>"groupby",href=>"#groupby"},
+		    {label=>"score",href=>"#score"},
+		    {label=>"kbest",href=>"#kbest"},
+		    {label=>"cutoff",href=>"#cutoff"},
+		    {label=>"diff",href=>"#diff"},
+		    {label=>"global",href=>"#global"},
+		    {label=>"1pass",href=>"#1pass"},
+		    {label=>"debug",href=>"#debug"},
+		    {label=>"profile",href=>"#profile"},
+		    {label=>"format",href=>"#format"},
+	      ]},
+	     {label=>"Query Syntax",href=>"#queries",
+	     sub=>[
+		   {label=>"Native Query Syntax",href=>"#qnative"},
+		   {label=>"DDC Query Syntax",href=>"#qddc"},
+		   {label=>"Grouping",href=>"#qgroupby"},		   
+		  ]},
+	     {label=>"Score Functions",href=>"#scores",
+	      sub=>[
+		    {label=>"f",href=>"#score-f"},
+		    {label=>"fm",href=>"#score-fm"},
+		    {label=>"lf",href=>"#score-lf"},
+		    {label=>"lfm",href=>"#score-lfm"},
+		    {label=>"mi1",href=>"#score-mi1"},
+    		    {label=>"mi3",href=>"#score-mi3"},
+    		    {label=>"milf",href=>"#score-milf"},
+		    {label=>"ld",href=>"#score-ld"},
+    		    {label=>"ll",href=>"#score-ll"},
+		   ]},
+	     {label=>"Diff Operations",href=>"#diffs",
+	      sub=>[
+		    {label=>"adiff",href=>"#diff-adiff"},
+		    {label=>"diff",href=>"#diff-diff"},
+		    {label=>"sum",href=>"#diff-sum"},
+		    {label=>"min",href=>"#diff-min"},
+		    {label=>"max",href=>"#diff-max"},
+		    {label=>"avg",href=>"#diff-avg"},
+		    {label=>"havg",href=>"#diff-havg"},
+		    {label=>"gavg",href=>"#diff-gavg"},
+		    {label=>"lavg",href=>"#diff-lavg"},
+		   ]},
+	     {label=>"Profile Types",href=>"#profiles",
+	      sub=>[
+		    {label=>"collocations",href=>"#prf-collocations"},
+		    {label=>"unigrams",href=>"#prf-unigrams"},
+   		    {label=>"tdf",href=>"#prf-tdf"},
+		    {label=>"ddc",href=>"#prf-ddc"},
+		    {label=>"diff-collocations",href=>"#prf-diff-collocations"},
+		    {label=>"diff-unigrams",href=>"#prf-diff-unigrams"},
+		    {label=>"diff-tdf",href=>"#prf-diff-tdf"},
+		    {label=>"diff-ddc",href=>"#prf-diff-ddc"},
+		   ]},
+	     {label=>"Output Formats",href=>"#formats",
+	      sub=>[
+		    {label=>"txt",href=>"#fmt-txt"},
+		    {label=>"json",href=>"#fmt-json"},
+		    {label=>"html",href=>"#fmt-html"},
+		    {label=>"storable",href=>"#fmt-storable"},
+		    {label=>"gmotion",href=>"#fmt-gmotion"},
+		    {label=>"hichart",href=>"#fmt-hichart"},
+		    {label=>"bubble",href=>"#fmt-bubble"},
+		    {label=>"cloud",href=>"#fmt-cloud"},
+		   ]},
+	     {label=>"Keyboard Bindings",href=>"#keys",
+	      sub=>[],
+	      },
+	     {label=>"Examples",href=>"#examples",
+	      sub=>[
+		    {label=>"Basic Examples",href=>"#ex-basic"},
+		    {label=>"Diff Examples",href=>"#ex-diff"},
+		    {label=>"Attribute Examples",href=>"#ex-attrs"},
+    		    {label=>"TDF Examples",href=>"#ex-tdf"},
+		    {label=>"DDC Examples",href=>"#ex-ddc"},
+		   ]},
+	     {label=>"References",href=>"#references",
+	      sub=>[
+     		    {label=>"DiaCollo",href=>"#ref-diacollo"},
+		    {label=>"General",href=>"#ref-general"},
+		   ]},
+	  ];
+  sub tocprint {
+    my ($elt,$indent) = @_;
+    $indent //= '';
+    print
+      ("${indent}<li>",
+       ($elt->{href} ? "<a href=\"$elt->{href}\">" : ''),
+       $elt->{label},
+       ($elt->{href} ? "</a>" : ''),
+       "\n",
+      );
+    if ($elt->{sub} && @{$elt->{sub}}) {
+      print "${indent}  <ul>\n";
+      tocprint($_, "${indent}    ") foreach (@{$elt->{sub}});
+      print "${indent}  </ul>\n";
+    }
+    print "${indent}</li>\n";
+  };
+  tocprint($_,"\t\t") foreach (@$toc);
+[% END +%]
+  	  </ul>
+	  <p/>
+	</div>
+	<!-- /div.section#toc -->
+
+	<!--=================================================-->
+	<div class="section" id="intro">
+	  <a name="intro"><h2>Introduction</h2></a>
+	  DiaCollo (pronounced /diːˈakəloʊ/, &quot;<i>dee-<b>ah</b>-kə-loh</i>&quot;, analogous
+	  to the <a href="//en.wikipedia.org/wiki/Diabolo">well-known juggling prop</a>)
+	  is a tool for efficient extraction of <a href="//en.wikipedia.org/wiki/Synchrony_and_diachrony">diachronic</a>
+	  <a href="//en.wikipedia.org/wiki/Collocation">collocations</a>
+	  from an underlying <a href="//en.wikipedia.org/wiki/Text_corpus">text corpus</a>.
+	  Unlike other collocation extractors
+	  such as
+	  <a href="//www.dwds.de/static/website/publications/pdf/didakowski_geyken_internetlexikografie_2012_final.pdf">DWDS Wortprofil</a>,
+	  <a href="//www.sketchengine.co.uk/documentation/wiki/Website/Features#Wordsketches">Sketch Engine</a>,
+	  or the <a href="http://www.collocations.de/software.html">UCS toolkit</a>,
+	  DiaCollo is suitable for extraction and analysis of <a href="//en.wikipedia.org/wiki/Synchrony_and_diachrony">diachronic</a>
+	  collocation data, i.e. collocations whose significance depends on the <a href="#date">date</a> of their occurrence.
+	  By tracking changes in a word's typical collocates over time and applying
+	  <a href="//en.wikipedia.org/wiki/John_Rupert_Firth">J. R. Firth's</a>
+	  famous principle that &quot;you shall know a word by the company it keeps&quot;,
+	  DiaCollo can help to provide a clearer picture of diachronic changes in
+	  the word's usage, in particular those related to <a href="//en.wikipedia.org/wiki/Semantic_change">semantic shift</a>.
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_reqs">
+	    <h3><a name="intro-reqs">Requests &amp; Paramters</a></h3>
+	    DiaCollo is designed as a request-oriented service:
+	    it accepts a user request as a set of <a href="#params"><i>parameter</i>=<i>value</i> pairs</a>
+	    and returns a corresponding <a href="#intro-profiles">profile</a> for the term(s) queried.
+	    Paramters are passed to the DiaCollo web-service
+	    <a href="//en.wikipedia.org/wiki/Representational_state_transfer">REST</a>-itutionally
+	    via the <a href="//en.wikipedia.org/wiki/Query_string">URL query string</a>
+	    or <a href="//en.wikipedia.org/wiki/POST_(HTTP)#Use_for_submitting_web_forms">HTTP POST request</a>
+	    as for a standard <a href="//en.wikipedia.org/wiki/Form_(HTML)">web form</a>.
+	    The URL for the low-level request including all user parameters
+	    is displayed in the DiaCollo <a href="[% dc_root %]">web front-end</a>
+	    as a hyperlink labelled &quot;Raw URL&quot; at the top of the data display area.
+	  </div>
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_profiles">
+	    <h3><a name="intro-profiles">Profiles &amp; Diffs</a></h3>
+	    The results of a simple DiaCollo user request
+	    are returned as a tabular <a href="#profiles">profile</a> of
+	    the <a href="#kbest"><i>k</i>-best</a> collocates
+	    for the <a href="#query">queried</a> word(s) in the requested
+	    <a href="#date">date-range</a>, aggregated
+	    into sub-intervals (&quot;epochs&quot;, e.g. decades) as specified by the <a href="#slice">slice</a>
+	    request parameter.
+	    Alternatively, the user may request a <a href="#prf-diff">comparison or &quot;diff&quot; profile</a>
+	    in order to highlight the most prominent differences between two quasi-independent queries, e.g.
+	    between two different words or between occurrences of the same word in different date intervals.
+	  </div>
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_attrs">
+	    <h3><a name="intro-attrs">Indices &amp; Attributes</a></h3>
+	    For maximum efficiency, DiaCollo uses an internal &quot;native&quot; index structure
+	    over the input corpus <a href="//en.wikipedia.org/wiki/Content_word">content words</a>
+	    to compute <a href="#prf-collocations">collocations</a>.
+	    Each indexed word is treated as a <a href="//en.wikipedia.org/wiki/Tuple">tuple</a> of
+	    linguistically salient <a href="//en.wikipedia.org/wiki/Attribute_(computing)">attributes</a>
+	    in addition to the document date.
+	    By default, the attributes <a href="//en.wikipedia.org/wiki/Lemma_(morphology)">&quot;Lemma&quot;</a>
+	    and <a href="//en.wikipedia.org/wiki/Part_of_speech">&quot;Pos&quot; (part-of-speech)</a> are indexed.
+	    User <a href="#query">query</a> and <a href="#groupby">groupby</a> request parameters are interpreted as logical
+	    conjunctions of restrictions over these attributes, selecting the precise token tuple(s) to be profiled.
+	    For finer-grained selection of profiling targets, DiaCollo supports
+	    boolean query expressions and document meta-data filters
+	    via the <a href="#prf-tdf">tdf</a> and <a href="#prf-diff-tdf">diff-tdf</a> profile types,
+	    and the full range of the <a href="[% help_url %]">DDC query language</a>
+	    via the <a href="#prf-ddc">ddc</a> and <a href="#prf-diff-ddc">diff-ddc</a>
+	    profile types.
+	  </div>
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_scores">
+	    <h3><a name="intro-scores">Scores &amp; Formats</a></h3>
+	    DiaCollo offers several different <a href="#scores">score functions</a> for
+	    ranking candidate profile collocates, as well as various
+	    <a href="#formats">output formats</a> for returning profile results;
+	    see below for details.
+	  </div>
+  	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_sources">
+	    <h3><a name="intro-sources">Source Code &amp; Services</a></h3>
+	    DiaCollo is implemented as a Perl library, and
+	    distributed under the same terms as Perl itself.
+	    Source code is available from <a href="http://www.cpan.org">CPAN</a>,
+	    e.g. at <a href="//metacpan.org/release/DiaColloDB">http://metacpan.org/release/DiaColloDB</a>.
+	    In addition to the source code, a number of DiaCollo instances
+	    are accessible by means of an online RESTful web-service plugin
+	    for the DDC/D* corpus management framework.  In particular,
+	    DiaCollo instances for the following corpora should be available:
+	    <ul>
+	      <li>[% corpuslink('blogs') %]: Blogs</li>
+	      <li>[% corpuslink('bz') %]: <i>Berliner Zeitung</i></li>
+	      <!--<li>[% corpuslink('c4') %]: C4</li>-->
+	      <li>[% corpuslink('dingler') %]: Dingler's <i>Polytechnisches Journal</i></li>
+	      <li>[% corpuslink('dta+dwds') %]: Aggregate <i>Deutsches Textarchiv</i> + <i>DWDS-Kerncorpus</i></li>
+	      <li>[% corpuslink('dta') %]: <i>Deutsches Textarchiv</i></li>
+	      <li>[% corpuslink('kern') %]: <i>DWDS-Kerncorpus</i></li>
+	      <li>[% corpuslink('korpus21') %]: <i>DWDS-Kerncorpus 21</i></li>
+	      <li>[% corpuslink('tagesspiegel') %]: <i>Tagesspiegel</i></li>
+	      <!--<li>[% corpuslink('untertitel') %]: <i>Filmuntertitel</i></li>-->
+	      <li>[% corpuslink('wende') %]: <i>Berliner Wendekorpus</i></li>
+	      <li>[% corpuslink('zeit') %]: <i>DIE ZEIT</i></li>
+	    </ul>
+	  </div>
+	  <!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+	  <div class="subsection" id="intro_links">
+	    <h3><a name="intro-links">Other Useful Links</a></h3>
+	    <ul>
+	      <li><a href="//kaskade.dwds.de/diacollo-tutorial/">DiaCollo Tutorial</a> (in German)</li>
+	      <li><a href="//clarin-d.de/de/kollokationsanalyse-in-diachroner-perspektive">CLARIN-D Showcase</a> for DiaCollo (in German)</li>
+	      <li>The <a href="#ref-diacollo">DiaCollo References</a> section contains a list of selected DiaCollo-related publications.</li>
+	    </ul>
+	  </div>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="params">
+	  <a name="params"><h2>Parameters</h2></a>
+	  <dl>
+	    <dt><a name="query">query</a></dt>
+	    <dd>Target <i>LEMMA(s)</i> or <i>/REGEX/</i> or DDC <i>QUERY</i> (aliases: query q lemmata lemmas lemma lem l; <b>REQUIRED</b>).
+	    See <a href="#queries">Query Syntax</a> for details.
+	    </dd>
+
+	    <dt><a name="date">date</a></dt>
+	    <dd>Target <i>DATE(s)</i> or <i>/REGEX/</i> or range <i>MIN:MAX</i> (aliases: dates date d; default=all).
+	    In date-ranges, either or both of <i>MIN</i> and <i>MAX</i> may be specified as an asterisk (&quot;<tt>*</tt>&quot;, ASCII 0x2A)
+	    to represent the minimum (rsp. maximum) date in the stored index, thus &quot;<tt>*:*</tt>&quot; represents the
+	    entire date range of the indexed corpus.
+	    The <a href="#prf-ddc">DDC</a> and <a href="#prf-diff-ddc">diff-DDC</a> profile types
+	    currently do not support date regexes; see <a href="#profiles">Profile Types</a> for details.
+	    </dd>
+
+	    <dt><a name="slice">slice</a></dt>
+	    <dd>Target epoch size or "0" (zero) for global profile (aliases: dslice slice ds sl s; default=10).
+	    DiaCollo returns up to <a href="#kbest">\$KBEST</a> items for each date sub-interval in the requested range.
+	    Date intervals (also called &quot;epochs&quot; or &quot;slices&quot;) are labelled in DiaCollo result sets by their minimum element,
+	    i.e.
+	    <!--<span class="math"><b>sliceof</b>(<i>YEAR</i>) = <i>SLICE</i>*<b>int</b>(<i>YEAR</i>/<i>SLICE</i>)</span>.-->
+	    <span class="math"><b>epoch</b>(<i>YEAR</i>) = <i>SLICE</i>*&lfloor;<i>YEAR</i>/<i>SLICE</i>&rfloor;</span>.
+	    Epochs in <a href="#prf-diff-collocations">diff profiles</a> are labelled
+	    by the epochs of the aligned sub-profile slices, separated by a hyphen character, i.e.
+	    <span class="math"><b>diffEpoch</b>($pa,$pb) = "<i>EPOCH$suba</i>-<i>EPOCH$subb</i>"</span>.
+	    </dd>
+
+	    <dt><a name="bquery">bquery</a></dt>
+	    <dd>Diff target query (aliases: bquery bq blemmata blemmas blemma blem bl; <b>REQUIRED</b> for diff profiles).
+	    See <a href="#queries">Query Syntax</a> for details.
+	    </dd>
+
+	    <dt><a name="bdate">bdate</a></dt>
+	    <dd>Diff target date(s)  (aliases: bdates bdate bd; default=<a href="#date">\$DATE</a>)</dd>
+
+	    <dt><a name="bslice">bslice</a></dt>
+	    <dd>Diff target epoch size (aliases: bdslice bslice bds bsl bs; default=<a href="#slice">\$SLICE</a>)</dd>
+
+	    <dt><a name="groupby">groupby</a></dt>
+	    <dd>Aggregation attribute list with optional restrictions (aliases: groupby group gr gb g; default=l,p).
+	    See <a href="#queries">Query Syntax</a> and <a href="#qgroupby">Grouping</a> for details.
+	    </dd>
+
+	    <dt><a name="score">score</a></dt>
+	    <dd>Score function, one of (f fm lf lfm mi ld ll) (aliases: score sc sf; default=ld).
+	    See <a href="#scores">Score Functions</a> for details.
+	    </dd>
+
+	    <dt><a name="kbest">kbest</a></dt>
+	    <dd>Number of items to return per <a href="#slice">epoch</a> (aliases: kbest kb k; default=10)</dd>
+
+	    <dt><a name="cutoff">cutoff</a></dt>
+	    <dd>Score cutoff per <a href="#slice">epoch</a> (aliases: cutoff cut co; default=none).
+	    Currently has no effect for <a href="#prf-diff">diff profiles</a>.
+	    </dd>
+
+	    <dt><a name="diff">diff</a></dt>
+	    <dd>Score aggregation function for <a href="#prf-diff">diff profiles</a>
+	    (aliases: diffop diff D; default=adiff).
+	    See <a href="#diffs">Diff Operations</a> for details.
+	    </dd>
+
+	    <dt><a name="global"><a name="global">global</a></a></dt>
+	    <dd>Boolean indicating whether to prune profiles globally
+	    or locally for each <a href="#slice">epoch</a> (aliases: global glob glo gl G; default=0 (disabled)).
+	    If this option is in effect, each epoch returned should contain exactly the same set of collocate items $w2;
+	    otherwise (default) the set of collocates may differ between epochs.
+	    </dd>
+
+	    <dt><a name="1pass"><a name="1pass">1pass</a></a></dt>
+	    <dd>Boolean indicating whether to use approximate single-pass f2 acquisition method for
+	    native <a href="#prf-collocations">collocations</a> 
+	    and <a href="#prf-diff-collocations">diff:collocations</a> profiles.
+	    (Aliases: onepass 1pass 1p; default=0 (disabled)).
+	    DiaColloDB versions &lt;= v0.08.006 used this method by default.
+	    As of DiaColloDB v0.10.000, single-pass f2 acquisition is still supported,
+	    but the speed benefits are minimal, and single-pass profiles may in fact
+	    be slower to compute than full dual-pass profiles.
+	    </dd>
+
+	    <dt><a name="debug">debug</a></dt>
+	    <dd>Debug mode? (aliases: debug dbg; default=0)</dd>
+
+	    <dt><a name="profile">profile</a></dt>
+	    <dd>Profile type to compute (aliases: profile prof prf pr p; default=2).
+	    See <a href="#profiles">Profile Types</a> for details.
+	    </dd>
+
+	    <dt><a name="format">format</a></dt>
+	    <dd>Output format (aliases: format fmt f; default=html).
+	    See <a href="#formats">Output Formats</a> for details.
+	    </dd>
+	  </dl>
+	  <p/>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="queries">
+	  <a name="queries"><h2>Query Syntax</h2></a>
+
+	  DiaCollo supports both a &quot;native&quot; shorthand query syntax
+	  appropriate for simple queries and the <a href="[% help_url %]">DDC Query Language</a>
+	  (since DiaCollo v0.06.004),
+	  although not all <a href="#profiles">profile types</a> support
+	  all DDC query operations.
+
+	  <div class="subsection" id="#qnative">
+	    <h3><a name="qnative">Native Query Syntax</a></h3>
+
+	    A native <a href="#query">query</a> is simply a list of search criteria of the form <i>ATTR=VALUE</i>
+	    interpreted as a logical conjunction of the specified conditions for single match token,
+	    with multiple request clauses separated by commas (,) or whitespace:
+	    <table class="qsyn"><tbody>
+	      <tr><td><i>q_native</i></td><td>::=</td><td><i>qn_clause</i> ([\s,]+ <i>qn_clause</i>)*</td>
+	      </tr>
+	      <tr><td><i>qn_clause</i></td><td>::=</td><td>"\$"? <i>qnc_attr</i> &quot;=&quot; <i>qnc_value</i></td></tr>
+	      <tr><td/><td>|</td><td><i>qnc_value</i></td>
+	      </tr>
+	      <tr><td><i>qnc_value</i></td><td>::=</td><td>&quot;/&quot; <i>REGEX</i> &quot;/&quot; ([gimsadlux]*)</td></tr>
+	      <tr><td/><td>|</td><td><i>STRING</i> (&quot;|&quot; <i>STRING</i>)*</td></tr>
+	    </tbody></table>
+	    <ul>
+	      <li>If the attribute name (<i>qnc_attr</i>) is omitted from a restriction clause,
+	      a default attribute is used (currently &quot;lemma&quot;).
+	      </li>
+	      <li>Native <a href="#groupby">groupby</a> requests are defined analogously, but allow omission
+	      of the value-part of the clause (<i>qnc_value</i>) rather than the attribute name;
+	      see <a href="#qgroupby">Grouping</a> for details.
+	      </li>
+	      <li>Special characters in regular expressions or strings can be escaped by
+	      preceeding them with a backslash (\).
+	      </li>
+	      <li>See <a href="http://perldoc.perl.org/perlre.html">the perlre manpage</a> for details on the
+	      regular expressions supported by DiaCollo.
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#qnative-->
+
+	  <div class="subsection" id="#qddc">
+	    <h3><a name="qddc">DDC Query Syntax</a></h3>
+
+	    As of v0.06.004, DiaCollo additionally supports DDC query syntax,
+	    although not all <a href="#profiles">profile types</a> support
+	    all DDC query operations.
+	    In particular:
+	    <ul>
+	      <li>
+		The native profile types
+		<a href="#prf-collocations">collocations</a>,
+		<a href="#prf-unigrams">unigrams</a>,
+		<a href="#prf-diff-collocations">diff:collocations</a>,
+		and <a href="#prf-diff-unigrams">diff:unigrams</a>
+		only support <a href="[% help_url %]#rule_qc_word">single-token queries</a>
+		over the natively indexed token attributes (by default &quot;lemma&quot; and &quot;pos&quot;).
+	      </li>
+	      <li>
+		The (term x document) matrix profile types
+		<a href="#prf-tdf">tdf</a>
+		and <a href="#prf-diff-tdf">diff-tdf</a>
+		additionally support
+		<a href="[% help_url %]#rule_qc_boolean">Boolean query expressions</a>
+		and <a href="[% help_url %]#rule_q_filter">document meta-data filters</a>.
+		These profile types may also employ indexed document metadata fields
+		in the <a href="#groupby">groupby</a> clause.
+	      </li>
+	      <li>
+		The DDC profile types
+		<a href="#prf-ddc">DDC</a> and <a href="#prf-diff-ddc">diff-ddc</a>
+		require that an explicit <a href="[% help_url %]#rule_matchid">match-id</a> <span class="math">=2</span> is included
+		to indicate the position(s) of the collocate target(s) for which a profile is to be computed,
+		otherwise a default <a href="[% help_url %]#rule_qc_near">NEAR()</a> query is automatically generated.
+	      </li>		
+	    </ul>
+	    <p/>
+	    See the <a href="[% help_url %]">DDC Query Language manpage</a> for details
+	    on the core DDC query language.
+	    DiaCollo's DDC dialect additionally supports the following shorthand aliases:
+	    <dl>
+	      [% SET qc_word = "<i><a href=\"" _ help_url _ "#rule_qc_word\">qc_word</a></i>"; %]
+	      <dt>$qc_word (" "|",")+ $qc_word</dt>
+	      <dd>Commas or spaces separating $qc_word sub-expressions
+	      are mapped to <a href="[% help_url %]#rule_qw_with">WITH-clauses</a>, i.e. token-local logical conjunction
+	      of independent restriction clauses, analogous to the <a href="#qnative">native syntax</a>.
+	      </dd>
+
+	      <dt>#LIMIT[<i>N</i>]</dt>
+	      <dd>Requests that DDC retrieve at most <i>N</i> items; useful for speeding up response times for large result-sets
+	      </dd>
+
+	      <dt>#SAMPLE[<i>N</i>]</dt>
+	      <dd>Requests that generated <a href="[% help_url %]#count">count()-queries</a> operate on a random sample of at most <i>N</i> tokens.
+	      Can actually wind up taking longer than without a #SAMPLE clause, since this requires hits to be (randomly) sorted.
+	      </dd>
+
+	      <dt>#DMAX[<i>D</i>]</dt>
+	      <dd>Set maximum proximity distance (+1) for implicit <a href="[% help_url %]#rule_qc_near">NEAR()</a> queries.
+	      Note that the value for <i>D</i> should be 1 greater than the value passed to the DDC <a href="[% help_url %]#rule_qc_near">NEAR()</a>
+	      operator itself.
+	      The default value depends on the DiaCollo index, but is usually 5 (up to 4 intervening tokens between $w1 and $w2).
+	      </dd>
+
+	      <dt>#FMIN[<i>N</i>]</dt>
+	      <dd>Set minimum frequency of collocate targets to be profiled.
+	      Useful for reducing network I/O overhead between the client and the DDC server.
+	      Default value depends on the DiaCollo index, but is usally 2.
+	      Higher values should result in shorter running times, but may filter out some interesting results.
+	      Note that this frequency thresshold applies on a DDC subcorpus basis,
+	      </dd>
+
+	      <dt>#FCOEF[<i>C</i>]</dt>
+	      <dd>Override the relation-specific frequency scaling coefficient for this query.
+	      For formal reasons, the independent frequencies $f1, $f2, and $N are scaled up
+	      by a query-specific factor when computing <a href="#scores">score-functions</a> from DDC data,
+	      in order to ensure that the quantities involved can be interpreted as probabilities.
+	      The scaling coefficient is usually automatically guessed from the DDC query
+	      (e.g. <i>C=2(N+1)</i> for a query of the form <tt class="math">NEAR(* =2,<i>X</i>,<i>N</i>)</tt>,
+	      <i>C=N+1</i> for a query of the form <tt class="math">&quot;* =2 #&lt;<i>N</i> <i>X</i>&quot;</tt>,
+	      and <i>C=1</i> for <tt class="math">&quot;* =2 #=<i>N</i> <i>X</i>&quot;</tt>).
+	      </dd>
+
+	      [% SET l_countkeys = "<i><a href=\"" _ help_url _ "#rule_l_countkeys\">l_countkeys</a></i>"; %]	      
+	      <dt>"[" $l_countkeys "]"</dt>
+	      <dd>A <a href="#groupby">groupby</a> request can be explicitly wrapped in square brackets
+	      to force its interpretation as a DDC $l_countkeys
+	      count-key list as opposed to a <a href="#qnative">native groupby request</a>.
+	      Potentially useful if you want/need to use alternative target offsets,
+	      biliographic metadata fields, or regex transformations on the result tuple attributes.
+	      </dd>
+	    </dl>
+	    <p/>
+	  </div>
+	  <!--/div.subsection#qddc-->
+
+	  <div class="subsection" id="#qgroupby">
+	    <h3><a name="qgroupby">Grouping</a></h3>
+	      The <a href="#groupby">groupby</a> parameter can be used to specify which indexed attributes
+	      of the candidate collocates are to be projected and to impose optional restrictions on the values
+	      of those attributes.  It can be informally understood as a combination of
+	      <a href="https://en.wikipedia.org/wiki/SQL#Queries">SQL's</a>
+	      <span class="math">GROUP BY</span> and <span class="math">HAVING</span> clauses.
+	    <p>
+	      The value of the <a href="#groupby">groupby</a> parameter is a comma-separated list of
+	      grouping expressions <i>gb_expr</i>:
+	      <table class="qsyn"><tbody>
+		<tr><td><i>q_groupby</i></td><td>::=</td><td><i>gb_expr</i> ([\s,]+ <i>gb_expr</i>)*</td></tr>
+		<tr><td><i>gb_expr</i></td><td>::=</td><td>"\$"? <i>qnc_attr</i></td></tr>
+		<tr><td/><td>|</td><td>"\$"? <i>qnc_attr</i> &quot;=&quot; <i>qnc_value</i></td></tr>
+	      </tbody></table>
+	    </p>
+	    <p>
+	      Only the attributes <i>qnc_attr</i> explicty specified in the groupby clause are projected from
+	      candidate collocates, so that if you request for example <span class="math"><b>groupby:</b> Lemma</span>,
+	      then a result-set will include at most one entry for the lemma "flood", even if that lemma occurs in your corpus
+	      with multiple part-of-speech tags (e.g. as both a noun and a verb).  If instead you request
+	      <span class="math"><b>groupby:</b> Lemma, Pos</span>, then the result-set will treat
+	      distinct <i>(Lemma,Pos)</i> pairs as distinct collocate items.
+	    </p>
+	    <p>
+	      If the groupby expression is of the form <span class="math"><i>ATTR</i>=<i>HAVING</i></span>, the <i>HAVING</i>
+	      expression (<i>qnc_value</i>) is interpreted as a restriction on the candidate collocates&apos; values for the
+	      associated projected attribute <i>ATTR</i> (<i>qnc_attr</i>).
+	      For example, <span class="math"><b>groupby:</b> Lemma, Pos=NN</span> will return only those collocates with the
+	      PoS-tag "NN" (common noun), and <span class="math"><b>groupby:</b> Lemma, Pos=/^ADJ/</span> will return only
+	      collocates whose PoS-tag begins with "ADJ".
+	    </p>
+	    <p>
+	      Note that the <a href="#fmt-bubble">bubble</a> and <a href="#fmt-cloud">cloud</a>
+	      formats only display the first projected collocate attribute by default, although the entire
+	      projected collocate n-tuple should be available through the "details" popup window
+	      display after (double-)clicking on a collocate item in the main display canvas.
+	    </p>
+	  </div>
+	  <!--/div.subsection#qgroupy-->
+	  
+	  <p/>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="scores">
+	  <a name="queries"><h2>Score Functions</h2></a>
+          <p>
+	    DiaCollo assigns each collocate in a unary profile a real-valued score by means of a user-specified
+	    <i>score function</i>. Currently, DiaCollo supports the following score functions:
+
+	    <table class="funcHelp">
+	      <tr>
+		<th><a name="score-f">f</a></th>
+		<td>
+		  Raw collocation frequency,
+		  <span class="math">$score$subf = $f12</span>.
+		  Despite its immediate and intuitive interpretability, ranking by raw frequency alone does not usually provide a very
+		  good picture of collocations' &quot;significance&quot;, since high-frequency items
+		  such as <a href="//en.wikipedia.org/wiki/Determiner">determiners</a>
+		  tend to get ranked highest simply by virtue of their (uninteresting) high overall likelihood,
+		  rather than any particular (and potentially interesting) affinity for the search term(s) in question.
+		  While the native DiaCollo <a href="#profiles">profile types</a> filter out determiners (and all other function words) by default,
+		  the basic problem of uninteresting high-frequency collocates (e.g. &quot;Herr&quot;) remains for raw frequency
+		  rankings.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-f.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-f.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-fm">fm</a></th>
+		<td>
+		  Collocation frequency per million tokens,
+		  <span class="math">$score$subfm = 1000000 * $f12 / $N</span>.
+		  This is just a linear normalized variant of <a href="#score-f">raw collocation frequency</a>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-fm.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-fm.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-lf">lf</a></th>
+		<td>
+		  Collocation log-frequency,
+		  <span class="math">$score$sublf = $log2($f12 + $eps)</span>.
+		  This is just a logarithmic variant of <a href="#score-f">raw collocation frequency</a>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-lf.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-lf.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-lfm">lfm</a></th>
+		<td>
+		  Collocation log-frequency per million,
+		  <span class="math">$score$sublfm = $log2(1000000 * ($f12+$eps) / ($N+$eps))</span>.
+		  This is just a logarithmic variant of the <a href="#score-fm">normalized collocation frequency</a>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-lfm.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-lfm.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-mi1">mi1</a></th>
+		<td>
+		  Raw <a href="//en.wikipedia.org/wiki/Pointwise_mutual_information">pointwise mutual information</a>,
+		  <span class="math">$score$submi1 = $log2( (($f12+$eps)*($N+$eps)) / (($f1+$eps)*($f2+$eps)) )</span>.
+		  Attempts to address the shortcomings of raw-frequency rankings
+		  by estimating the change in code-lengths for jointly encoded collocation pairs <i>versus</i>
+		  independent encoding of each collocate.  It generally works well for high- and mid-frequency
+		  collocation pairs, but tends to return <a href="http://nlp.stanford.edu/fsnlp/colloc/">disproportionately large values</a>
+		  for low-frequency collocates.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-mi1.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-mi1.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-mi3">mi3</a></th>
+		<td>
+		  Pointwise mutual information variant using the cube of the raw co-occurrence frequency $f12
+		  to boost association scores for high-frequency pairs,
+		  <span class="math">$score$submi3 = $log2( (($f12+$eps)<sup>3</sup> * ($N+$eps)) / (($f1+$eps)*($f2+$eps)) )</span>.
+		  Heuristic score function investigated by both <a href="#evert2004">Evert (2004)</a> and <a href="#rychly2008">Rychlý (2008)</a>,
+		  attributed to <a href="#daille1994">Daille (1994)</a>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-mi3.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-mi3.png"/></a></td>
+	      </tr>
+	   
+	      <tr>
+		<th><a name="score-milf"><a name="score-mi">milf</a></a></th>
+		<td>
+		  (alias: mi)<br/>
+		  Pointwise mutual information * log-frequency product as described by <a href="#rychly2008">Rychlý (2008)</a>,
+		  <span class="math">$score$submilf = $log2( (($f12+$eps)*($N+$eps)) / (($f1+$eps)*($f2+$eps)) ) * $log2( $f12+$eps )</span>.
+		  Multiplying the <a href="#score-mi1">raw PMI</a> by the log-frequency of the collocation pair is a <i>post-hoc</i> attempt
+		  to ameliorate raw MI's preference for low-frequency collocates, but this strategy is not always successful.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-milf.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-milf.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-ld">ld</a></th>
+		<td>
+		  Scaled <a href="//en.wikipedia.org/wiki/S%C3%B8rensen%E2%80%93Dice_coefficient">log-Dice coefficient</a>,
+		  <span class="math">$score$subld = 14 + $log2( 2*($f12+$eps) / (($f1+$eps) + ($f2+$eps)) )</span>.
+		  Suggested by <a href="#rychly2008">Rychlý (2008)</a> as an association score for collocations and
+		  related to the intersection of fuzzy sets<!-- moo: wikipedia says this, but I don't see the relation -->,
+		  the Dice coefficient is less susceptible to low-frequency outliers than pointwise mutual information
+		  or the PMI * log-frequency product while still managing to filter out most &quot;chance&quot;
+		  collocations with (uninteresting) high-frequency items returned by a raw-frequency ranking.
+		  This is the default score function used by the synchronic collocation profiler
+		  <a href="//www.dwds.de/wp"><i>DWDS Wortprofil</i></a> as described by
+		  <a href="#didakowski2013">Didakowski &amp; Geyken (2013)</a>,
+		  and is also currently the default score function for the DiaCollo web front-end.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-ld.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-ld.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="score-ll">ll</a></th>
+		<td>
+		  Variant of the popular
+		  <a href="https://en.wikipedia.org/wiki/Binomial_distribution">binomial</a>
+		  <a href="https://en.wikipedia.org/wiki/Likelihood-ratio_test">log likelihood ratio</a>
+	          as suggested by <a href="#dunning1993">Dunning (1993)</a>:
+		  <span class="math">$score$subll = $sgn$subll * $log(1 + $log $lambda)</span>,
+		  where
+		  <span class="math">$sgn$subll = $f12 &lt; $f1*$f2/$N ? -1 : 1</span>
+		  and
+		  <span class="math">$log $lambda =
+		      $f12*$log($f12/($f1*$f2/$N))
+		      + ($f1-$f12)*$log(($f1-$f12)/(($f1*($N-$f2)/$N)))
+		      + ($f2-$f12)*$log(($f2-$f12)/(($N-$f1)*$f2/$N))
+		      + ($N-$f1-$f2+$f12)*$log(($N-$f1-$f2+$f12)/(($N-$f1)*($N-$f2)/$N))</span>.
+		  The first term <span class="math">$sgn$subll</span>
+	          is a sign coefficient implementing a one-sided association measure following
+		  <a href="#evert2008">Evert (2008)</a>, which assigns non-negative values only to &quot;attracting&quot; collocate pairs which
+		  co-occur more often than expected, whereas the &quot;pure&quot; log-likelihood ratio also assigns large values
+		  to &quot;repelling&quot; pairs which co-occur less often than expected.
+		  Raw log-likelihood ratio values <span class="math">$log $lambda</span>
+		  tend to vary much more widely than e.g. <a href="#score-ld">scaled log-Dice coefficients</a>,
+		  leading visualizations based on this quantity to over-emphasize a small number
+		  of very strong collocates and relegating weaker associations to the background.
+		  To ameliorate this effect, DiaCollo reports and scales based on the quantity
+		  <span class="math">$log(1 + $log $lambda)</span>.
+		  Values are unbounded, but are typically in the range <span class="math">[-10:10]</span>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/score-ll.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/score-ll.png"/></a></td>
+	      </tr>
+	    </table>
+	  </p>
+
+	  ... where the variables in the above definitions are interpreted per epoch as:
+	  <table style="margin-left:3em"><tbody>
+	    <tr><td>$w1</td><td>: target token matching the user <a href="#query">query</a> request</td></tr>
+	    <tr><td>$w2</td><td>: collocate token matching the user <a href="#groupby">groupby</a> request</td></tr>
+	    <tr><td>$N</td><td>: total number of collocation relations in the corpus epoch</td></tr>
+	    <tr><td>$f12</td><td>: frequency of the collocation ($w1,$w2)</td></tr>
+	    <tr><td>$f1</td><td>: total frequency of the query term ($w1) in the selected <a href="#profiles">profile type</a></td></tr>
+	    <tr><td>$f2</td><td>: total frequency of the collocate term ($w2) in the selected <a href="#profiles">profile type</a></td></tr>
+	    <tr><td>$eps</td><td>: smoothing constant, by default zero.</td></tr>
+	  </tbody></table>
+	  <p/>
+
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="diffs">
+	  <a name="queries"><h2>Diff Operations</h2></a>
+          <p>
+	    In comparison (&quot;diff&quot;) mode, DiaCollo computes an aggregate
+	    score <span class="math">$diffdiff($xa,$xb)</span> for a pair of independent
+	    <a href="#scores">item scores</a> <span class="math">$xa</span> and <span class="math">$xb</span>
+	    by applying a binary &quot;diff operation&quot;
+	    as dictated by the <a href="#diff">diff</a> request parameter.
+	    In addition to determining the aggregate score
+	    to be associated with a pair of independent score operands,
+	    the choice of diff operations also determines the method by which
+	    returned items are to be <i>ranked</i> and selected for return
+	    e.g. by the <a href="#kbest">kbest</a> parameter,
+	    as well as the domain over which the diff operation is to be applied:
+	    <i>pre-trimmed</i> diff operations act only on the
+	    up to <a href="#kbest">2*<i>KBEST</i></a> items in
+	    <span class="math">(dom(kbest($pa)) $cup dom(kbest($pb)))</span>,
+	    <i>restricted</i> diff operations act on the domain intersection
+	    <span class="math">(dom($pa) $cap dom($pb))</span>,
+	    while non-trimmed operations act on the entire
+	    domain union <span class="math">(dom($pa) $cup dom($pb))</span>,
+	    where <span class="math">$pa</span> and <span class="math">$pb</span> are the unary profiles resulting
+	    from independent evaluation of
+	    the <a href="#query">query</a> and <a href="#bquery">bquery</a>
+	    request parameters <span class="math">$qa</span> and <span class="math">$qb</span>, respectively.
+	    Currently, DiaCollo supports the following diff operations:
+
+	    <table class="funcHelp">
+	      <tr>
+		<th><a name="diff-diff">diff</a></th>
+		<td>
+		  Raw score difference (pre-trimmed, asymmetric):
+		  <span class="math">$diff$subdiff($xa,$xb) = $xa-$xb</span>.
+		  Useful for selecting collocates strongly associated only with <a href="#query">$qa</a>.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-diff.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-diff.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-adiff">adiff</a></th>
+		<td>
+		  Pseudo-absolute score difference (pre-trimmed, symmetric).
+		  Selects based on
+		  <span class="math">$diff$subadiff($xa,$xb) = |$xa-$xb|</span>,
+		  but returns raw differences as for raw <a href="#diff-diff">diff</a>.
+		  This is the default diff operation,
+		  which selects the most extreme differences among the prominent collocates
+		  of <a href="#query">$qa</a> and <a href="#bquery">$qb</a>, regardless of
+		  the the direction those differences, which itself is expressed as the sign
+		  of the returned diff score.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-adiff.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-adiff.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-sum">sum</a></th>
+		<td>
+		  Score sum (symmetric):
+		  <span class="math">$diff$subsum($xa,$xb) = $xa+$xb</span>.
+		  Selects strong associations for 
+		  either <a href="#query">$qa</a> or <a href="#bquery">$qb</a>, preferring
+		  shared associations, but not very sensitive to non-uniform operand values
+		  (e.g. <span class="math">$diff$subsum(0,8) = $diff$subsum(4,4) = 8</span>,
+		  but only the latter configuration indicates similar collocation behavior
+		  of the associated collocates).
+		  Returned rankings are equivalent to the <a href="#diff-avg">avg</a> operation.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-sum.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-sum.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-min">min</a></th>
+		<td>
+		  Score minimum (<!--pre-trimmed-->restricted, symmetric):
+		  <span class="math">$diff$submin($xa,$xb) = min($xa,$xb)</span>.
+		  Punishes non-uniform operand values by
+		  selecting only the weaker of the operand association scores.
+		  Highly sensitive to sparse data problems, since missing data
+		  are assigned scores of 0 (zero).
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-min.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-min.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-max">max</a></th>
+		<td>
+		  Score maximum (pre-trimmed, symmetric):
+		  <span class="math">$diff$submax($xa,$xb) = max($xa,$xb)</span>.
+		  Selects only the stronger of the operand association scores.
+		  Potentially useful for discovering interesting target collocations
+		  for further investigation.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-max.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-max.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-avg">avg</a></th>
+		<td>
+		  Score average (restricted, symmetric):
+		  <span class="math">$diff$subavg($xa,$xb) = avg($xa,$xb) = ($xa+$xb)/2</span>.
+		  Suffers from the same drawbacks as the <a href="#diff-sum">sum</a> operation,
+		  to which the returned rankings are equivalent,
+		  although values are more immediately comparable to those returned for unary profiles.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-avg.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-avg.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-havg">havg</a></th>
+		<td>
+		  Pseudo-<a href="//en.wikipedia.org/wiki/Harmonic_mean">harmonic average</a> (restricted, symmetric):
+		  <span class="math">$diff$subhavg($xa,$xb) ~ havg($xa,$xb) = 2*($xa*$xb)/($xa+$xb)</span>.
+		  Selects collocates with strong associations to both
+		  <a href="#query">$qa</a> and <a href="#bquery">$qb</a>.
+		  Attempts to address the shortcomings of the <a href="#diff-sum">sum</a> and
+		  <a href="#diff-avg">avg</a> diff operations by penalizing dissimilar operand values.
+		  In order to avoid singularities resulting from sparse data,
+		  this operation actually computes the arithmetic average
+		  of the harmonic and raw arithmetic means; i.e.
+		  <table class="jc math">
+		    <tr>
+		      <td class="jr vjmid" rowspan="2">havg($xa,$xb)</td>
+		      <td class="jc vjmid" rowspan="2">:=</td>
+		      <td class="jc vjmid" rowspan="2" style="font-size:3em;">{</td>
+		      <td class="jl">0</td>
+		      <td class="restr">if $xa&le;0 or $xb&le;0</td>
+		      <td class="cmt">singularity</td>
+		    </tr>
+		    <tr>
+		      <td class="jl">2*($xa*$xb)/($xa+$xb)</td>
+		      <td class="restr">otherwise</td>
+		      <td class="cmt">harmonic mean</td>
+		    </tr>
+		    <tr>
+		      <td class="jr">$diff$subhavg($xa,$xb)</td>
+		      <td class="jc">:=</td>
+		      <td class="jl" colspan="3">avg<big>(</big> havg($xa,$xb), avg($xa,$xb) <big>)</big></td>
+		      <td class="cmt">arithmetic average of harmonic and arithmetic means</td>
+		    </tr>
+		  </table>
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-havg.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-havg.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-gavg">gavg</a></th>
+		<td>
+		  Pseudo-<a href="//en.wikipedia.org/wiki/Geometric_mean">geometric average</a> (restricted, symmetric):
+		  <span class="math">$diff$subgavg($xa,$xb) ~ gavg($xa,$xb) = &radic;<span style="border-top:1px solid #000;">$xa*$xb</span></span>.
+		  Selects collocates with strong associations to both
+		  <a href="#query">$qa</a> and <a href="#bquery">$qb</a>,
+		  similar to the <a href="#diff-havg">havg</a> operation.
+		  To avoid singularities resulting from sparse data,
+		  this operation actually computes the arithmetic average
+		  of the geometric and the raw arithmetic means, analogous to
+		  the method used to compute the <a href="#diff-havg">havg</a> diff score.
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-gavg.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-gavg.png"/></a></td>
+	      </tr>
+
+	      <tr>
+		<th><a name="diff-lavg">lavg</a></th>
+		<td>
+		  Pseudo-logarithmic average (restricted, symmetric):
+		  <span class="math">$diff$sublavg($xa,$xb) ~ $exp( avg($log($xa),$log($xb)) )</span>.
+		  Selects collocates with strong associations to both
+		  <a href="#query">$qa</a> and <a href="#bquery">$qb</a>,
+		  penalizing dissimilar operand values logarithmically.
+		  To avoid negative log values, the target values are forced into the range
+		  <span class="math">[1,&infin;]</span> before averaging, i.e.:
+		  <table class="jc math">
+		    <tr>
+		      <td class="jr vjmid" rowspan="2">$deltaab</td>
+		      <td class="jc vjmid" rowspan="2">:=</td>
+		      <td class="jc vjmid" rowspan="2" style="font-size:3em;">{</td>
+		      <td class="jl">1-min($xa,$xb)</td>
+		      <td class="restr">if min($xa,$xb) &lt; 1</td>
+		      <td class="cmt">avoid negative logarithms</td>
+		    </tr>
+		    <tr>
+		      <td class="jl">0</td>
+		      <td class="restr">otherwise</td>
+		      <td class="cmt">safe operands</td>
+		    </tr>
+		    <tr>
+		      <td class="jr">$diff$sublavg($xa,$xb)</td>
+		      <td class="jc">:=</td>
+		      <td class="jl" colspan="3">exp<big>(</big> avg(log($xa+$deltaab), log($xb+$deltaab)) <big>) - $deltaab</big></td>
+		      <td class="cmt">adjusted log-average</td>
+		    </tr>
+		  </table>
+		</td>
+		<td><a href="[% root_dir %]images/diacollo-plots/diff-lavg.png"><img class="funcPlot" src="[% root_dir %]images/diacollo-plots/diff-lavg.png"/></a></td>
+	      </tr>
+	    </table>
+
+	  </p>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="profiles">
+	  <a name="profiles"><h2>Profile Types</h2></a>
+
+	  DiaCollo offers several different methods for acquiring raw frequency data
+	  on the basis of which to score, rank, and select &quot;significant&quot;
+	  collocations. These methods are referred to here as &quot;profile types&quot;,
+	  and the data returned as &quot;profiles&quot;.  Currently, DiaCollo
+	  supports the following profile types:
+	  <dl>
+           <dt><a name="prf-native"><a name="prf-collocations">collocations</a></a></dt>
+	   <dd>(aliases: colloc cof c f12 2)<br/>
+	   Native collocation profile.
+	   Retrieves and ranks all content words ($w2)
+	   occurring together with the search term ($w1)
+	   within a context window of $dmax content words and
+	   without an intervening boundary of the selected
+	   DDC &quot;break collection&quot;.
+	   Only collocation tuple-pairs with a minimum frequency of $cfmin are considered.
+	   Note that for reasons of efficiency,
+	   the frequency threshold $cfmin,
+	   the context-window size $dmax,
+	   and the boundary DDC break collection must be specified at compile-time,
+	   and cannot be changed by the user.  The default DiaCollo configuration
+	   uses sentence-break boundaries, <span class="math">$dmax = 5</span>,
+	   and <span class="math">$cfmin = 5</span>.
+	   </dd>
+
+           <dt><a name="prf-unigrams">unigrams</a></dt>
+	   <dd>(aliases: ug u f1 1)<br/>
+	   Native unigram profile.
+	   Retrieves and ranks all terms matching the search query ($w1).
+	   Can be useful together with with prefix-, suffix-, or regular-expression
+	   queries in order to profile e.g. stems in compounds.
+	   Currently, DiaCollo cannot acquire an independent value for the
+	   variable $f2 for unigram profiles (since this would entail very large
+	   prefix- rsp. suffix-indices and/or regular expression operations unsupported
+	   by the underlying library), so that <span class="math">$f2 = $f12</span> for
+	   each item returned.  As a consequence, the <a href="#score-mi">mutual information</a>
+	   and <a href="#score-ld">log-Dice</a> score function rankings are isomorphic to
+	   the raw <a href="#score-f">frequency</a> score function for this profile type.
+	   </dd>
+
+           <dt><a name="prf-tdf">tdf</a></dt>
+	   <dd>(aliases: tdf tdm TDF TDM)<br/>
+	   Native collocation profile based on an underlying term-document frequency matrix.
+	   Retrieves and ranks all content words ($w2)
+	   occurring together with the search term ($w1)
+	   within a single "document" as defined by the DDC &quot;break collection&quot; specified
+	   via the compile-time option <span class="math">-dbreak</span>
+   	   (by default, source paragraphs are used as "document" boundaries for matrix construction).
+	   Allows more flexible queries and result-set aggregation than
+	   the simple <a href="#prf-collocations">collocations</a> profiles, but generally slower
+	   to evaluate and less sensitive to proximity effects.
+	   </dd>
+
+           <dt><a name="prf-ddc">ddc</a></dt>
+	   <dd>(aliases: ddc DDC)<br/>
+	   Advanced profile using <a href="[% help_url %]#rule_count_query">DDC count() queries</a> to acquire raw frequency data.
+	   Unlike the <a href="#prf-collocations">collocations</a> or <a href="#prf-unigrams">unigrams</a> profile types,
+	   DDC profiles are not limited to the default break collection or a fixed context window size
+	   (although by default DDC profiles approximate the <a href="#prf-collocations">collocations</a> profile type
+	   by means of the <a href="[% help_url %]#rule_qc_near">NEAR()</a> operator).
+	   Indeed, DDC profiling can use the full range of the <a href="[% help_url %]">DDC query language</a>
+	   to express search queries, provided that an explicit <a href="[% help_url %]#rule_matchid">match-id</a> <span class="math">=2</span> is included
+	   to indicate the position(s) of the collocate target(s) for which a profile is to be computed.
+	   See <a href="#queries">Query Syntax</a> for more details.
+	   Note that the DDC profile type does not currently support regular expression <a href="#date">date</a> restrictions.
+	   Note also that DDC profiles are usually much slower and more memory-intensive than their native counterparts,
+	   and should be avoided if possible.
+	   </dd>
+
+           <dt><a name="prf-diff"><a name="prf-diff-collocations">diff-collocations</a></a></dt>
+	   <dd>(aliases: diff-colloc diff-cof diff-c diff-f12 diff-2 d2)<br/>
+	   Comparison of two native <a href="#prf-collocations">collocation profiles</a>.
+	   &quot;Diff&quot; queries compute independent profiles $pa and $pb for
+	   the <a href="#query">query</a> and <a href="#bquery">bquery</a> parameters, respectively.
+	   After ranking according to the selected <a href="#scores">score function</a>,
+	   a comparison-profile $pdiff is computed as
+	   <span class="math">$score($pdiff) = $diff<sub><i><a href="#diff">diff</a></i></sub>($score($pa), $score($pb))</span>
+	   by applying the selected <a href="#diffs">diff operation</a>,
+	   and the <a href="#kbest">\$KBEST</a> items are selected and returned based on their
+	   aggregate diff scores.
+	   </dd>
+
+           <dt><a name="prf-diff-unigrams">diff-unigrams</a></dt>
+	   <dd>(aliases: diff-ug diff-u diff-f1 diff-1 d1)<br/>
+	   Comparison of two native <a href="#prf-unigrams">unigram profiles</a>.
+	   See <a href="#prf-diff-collocations">diff-collocations</a> for details on comparison profiles.
+	   </dd>
+
+           <dt><a name="prf-diff-tdf">diff-tdf</a></dt>
+	   <dd>(aliases: diff-tdf diff-TDF dtdf dTDF)<br/>
+	   Comparison of two <a href="#prf-tdf">TDF profiles</a>.
+	   See <a href="#prf-diff-collocations">diff-collocations</a> for details on comparison profiles.
+	   </dd>
+
+           <dt><a name="prf-diff-ddc">diff-ddc</a></dt>
+	   <dd>(aliases: diff-DDC dDDC dddc)<br/>
+	   Comparison of two <a href="#prf-ddc">DDC profiles</a>.
+	   See <a href="#prf-diff-collocations">diff-collocations</a> for details on comparison profiles,
+	   Note that DDC (diff) profiles are usually slower and more memory-intensive than their native counterparts,
+	   and should be avoided if possible.
+	   </dd>
+	  </dl>
+	  <p/>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="formats">
+	  <a name="formats"><h2>Output Formats</h2></a>
+
+	  DiaCollo currently supports the following output formats:
+	  <dl>
+           <dt><a name="fmt-txt">txt</a></dt>
+	   <dd>(aliases: text txt t tsv csv)<br/>
+	   TAB-separated UTF-8 plain text output,
+	   suitable for importing into the spreadsheet application of your choice,
+	   e.g. <a href="http://www.gnumeric.org/">Gnumeric</a>
+	   or <a href="http://www.libreoffice.org/discover/calc/">LibreOffice Calc</a>.
+	   </dd>
+
+           <dt><a name="fmt-json">json</a></dt>
+	   <dd>(aliases: json js j)<br/>
+	   Native <a href="http://json.org/">JSON</a> format suitable for further automated
+	   processing, web-services, etc.
+	   </dd>
+
+           <dt><a name="fmt-html">html</a></dt>
+	   <dd>(aliases: html htm)<br/>
+	   Simple <a href="http://www.w3.org/html/">HTML</a> table format, used for live display in the demo interface.
+	   In addition to a tabular display of the <a href="#profiles">profile</a> data,
+	   the web front-end HTML display uses <a href="//en.wikipedia.org/wiki/JavaScript">JavaScript</a>
+	   to generate hyperlinks to underlying corpus hits (&quot;KWIC-links&quot;)
+	   as well as a color-coded representation
+	   of the <a href="#scores">association score</a> (rsp. score-difference for <a href="#prf-diff">diff profiles</a>)
+	   associated with each row.
+	   Due to the implicit compile-time filtering of <a href="#intro_attrs">native index data</a>
+	   by content words and the index parameters $dmax and $cfmin,
+	   the number of hits returned by the KWIC-links
+	   for native <a href="#prf-collocations">collocation</a> profiles
+	   may differ somewhat from the $f12 pair frequency reported in the table.
+	   <a href="#prf-ddc">DDC</a> profiles however should report $f12 values identical
+	   to the number of corpus hits returned by the associated KWIC-links.
+	   </dd>
+
+           <dt><a name="fmt-storable">storable</a></dt>
+	   <dd>(aliases: storable sto bin)<br/>
+	   Binary format using the Perl <a href="//metacpan.org/pod/Storable">Storable</a> module,
+	   suitable for further automated processing with <a href="http://www.perl.org/">Perl</a>.
+	   </dd>
+
+           <dt><a name="fmt-gmotion">gmotion</a></dt>
+	   <dd>(aliases: gmotion gm)<br/>
+	   Online visualization using <a href="http://developers.google.com/chart/interactive/docs/gallery/motionchart">Google Motion Chart</a>.
+	   Requires flash player<!--, e.g. <a href="http://get.adobe.com/flashplayer/">Adobe Flash Player</a>-->.
+	   For best results, it is recommended that you set the <a href="#global">global</a> parameter to a true value (e.g. 1 (one))
+	   when using this output format.
+	   See also <a href="http://members.unine.ch/martin.hilpert/motion.html">Martin Hilpert's motion chart resource page</a>
+	   for some examples, use cases, and discussion.
+	   </dd>
+
+           <dt><a name="fmt-hichart">hichart</a></dt>
+	   <dd>(aliases: hc hi chart hichart highchart highcharts)<br/>
+	   Online visualization using the <a href="http://www.highcharts.com">Highcharts</a> JavaScript library.
+	   For best results, it is recommended that you set the <a href="#global">global</a> parameter to a true value (e.g. 1 (one))
+	   when using this output format.
+	   Clicking on any data point causes a popup window to be displayed containing
+	   hyperlinks to corpus hits for the corresponding collocation pairs as for the <a href="#fmt-html">HTML format</a>,
+	   which see with respect to caveats.
+	   </dd>
+
+           <dt><a name="fmt-bubble">bubble</a></dt>
+	   <dd>(aliases: b bub bubble bubbles)<br/>
+	   Online interactive visualization using the <a href="//d3js.org/">D3.js</a> JavaScript library
+	   <a href="https://github.com/mbostock/d3/wiki/Force-Layout">force-layout</a>.
+	   Collocates are displayed as labelled circles whose radii and color represent the
+	   correspondig <a href="#scores">association score</a>.
+	   Node colors are the same hues as those used in the <a href="fmt-html">HTML table format</a>,
+	   but may appear &quot;washed-out&quot; or &quot;pastel-ized&quot; due to their (partial) transparency.
+	   For best results, it is recommended that you set the <a href="#global">global</a> parameter to a true value (e.g. 1 (one))
+	   when using this output format.
+	   </dd>
+
+           <dt><a name="fmt-cloud">cloud</a></dt>
+	   <dd>(aliases: c cl cld cloud)<br/>
+	   Online interactive visualization using Jason Davies'
+	   <a href="https://github.com/jasondavies/d3-cloud">d3-cloud</a>
+	   layout for the
+	   <a href="//d3js.org/">D3.js</a> JavaScript visualization library.
+	   Collocates are displayed as text labels whose size and color represent the
+	   correspondig <a href="#scores">association score</a>.
+	   Node colors are the same hues as those used in the <a href="fmt-html">HTML table format</a>,
+	   but will appear somewhat darker (&quot;dirty&quot; or &quot;shadowed&quot;) for better
+	   legibility on a white background.
+	   For best results, it is recommended that you set the <a href="#global">global</a> parameter to a true value (e.g. 1 (one))
+	   when using this output format.
+	   </dd>
+
+	  </dl>
+	  <p/>
+	</div>
+
+	<!--=================================================-->
+	<div class="section" id="keys">
+	  <a name="keys"><h2>Keyboard Bindings</h2></a>
+	  The online visualizations based on the <a href="//d3js.org/">D3.js</a> JavaScript library
+	  (<a href="#fmt-bubble">bubble</a>, <a href="#fmt-cloud">cloud</a>)
+	  support the following keyboard shortcuts whenever the display canvas has the keyboard focus
+	  (as indicated by a drop-shadow around the canvas itself as well as the
+	  <img src="[% root_dir %]images/keyboard-24px.png" style="height:1em" alt="keyboard icon"/> icon in the header area):
+	  <p/>
+	  <center>
+	    <table class="dbViewTable keysTable">
+	      <tr><th>Key(s)</th><th>Action</th></tr>
+	      <tr><td>space</td><td>toggle playback animation</td></tr>
+	      <tr><td>up-arrow</td><td>increase playback speed (coarse)</td></tr>
+	      <tr><td>down-arrow</td><td>decrease playback speed (coarse)</td></tr>
+	      <tr><td>shift+up-arrow</td><td>increate playback speed (fine)</td></tr>
+	      <tr><td>shift+down-arrow</td><td>decrease playback speed (fine)</td></tr>
+	      <tr><td>number 1 or 0</td><td>reset playback speed to default (1&times;)</td></tr>
+	      <tr><td>number 2-9</td><td>set playback speed to N &times; default</td></tr>
+	      <tr><td>shift+number 2-9</td><td>set playback speed to 1/N &times; default</td></tr>
+	      <tr><td>Home</td><td>snap to first epoch</td></tr>
+	      <tr><td>End</td><td>snap to final epoch</td></tr>
+	      <tr><td>left-arrow</td><td>snap to previous whole epoch</td></tr>
+	      <tr><td>right-arrow</td><td>snap to next whole epoch</td></tr>
+	      <tr><td>shift+left-arrow</td><td>interpolate backward by one quarter epoch</td></tr>
+	      <tr><td>shift+right-arrow</td><td>interpolate forward by one quarter epoch</td></tr>
+	      <tr><td>x</td><td>export snapshot of current display canvas as <a href="https://en.wikipedia.org/wiki/Scalable_Vector_Graphics">SVG</a></td></tr>
+	    </table>
+	  </center>
+	  <p/>
+	</div>
+
+
+	<!--=================================================-->
+	<div class="section" id="examples">
+	  <a name="examples"><h2>Examples</h2></a>
+          <div class="subsection" id="ex_basic">
+	    <h3><a name="ex-basic">Basic Examples</a></h3>
+	    <ul class="exlist">
+	      <li>[% exlink("current", ["q","Kohl","slice","10","score","f","kbest",1,"p",2]) %]
+	      The <a href="#kbest">most</a> <a href="#score-f">frequent</a> $collocates
+	      of &quot;Kohl&quot; by <a href="#slice">decade</a> in the current corpus.
+	      </li>
+
+	      <li>[% exlink("current", ["q","Kohl","slice","10","score","ld","kbest",1,"p",2]) %]
+	      "Kohl"-$collocates in the current corpus
+	      ranked by <a href="#score-ld">log Dice-coefficient</a> instead of raw frequency.
+	      </li>
+
+	      <li>[% exlink("current", ["q","Mann","slice","0","score","ld","kbest",10,"p",2]) %]
+	      The <a href="#kbest">10 best</a> $collocates of "Mann" over the entire corpus (<a href="#slice">slice</a>=0).
+	      </li>
+
+	      <li>[% exlink("current", ["q","/panzer\$/", "slice",5, "score","f", "kbest",1, "p",1]) %]
+	      The <a href="#kbest">most</a> <a href="#score-f">frequent</a> &quot;-panzer&quot; $unigrams
+	      in 5-year <a href="#slice">epochs</a>.
+	      </li>
+
+	      <li>[% exlink("kern", ["q","/mann\$/", "slice",1, "date","1980:1989", "score","f", "kbest",1, "p",1]) %]
+	      The <a href="#kbest">most</a> <a href="#score-f">frequent</a> &quot;-mann&quot; $unigrams
+	      by <a href="#slice">year</a> in the <a href="#date">1980s</a> of the <a href="[% topurl.kern %]">DWDS Kerncorpus</a>.
+	      </li>
+
+	      <li>[% exlink("kern", ["q","Maus", "slice",1, "date","1970:1999", "score","ld", "kbest",2]) %]
+	      The <a href="#kbest">2 best</a> $collocates of &quot;Maus&quot; in 2-year <a href="#slice">epochs</a>
+	      betweehn <a href="#date">1970 and 1999</a> ranked by <a href="#score-ld">log Dice-coefficient</a>
+	      in the <a href="[% topurl.kern %]">DWDS Kerncorpus</a>.
+	      </li>
+
+	      <li>[% exlink("kern", ["q","Maus", "slice",1, "date","1970:1999", "score","ld", "kbest",10, "f","gm"]) %]
+	      ... as above, with <a href="#kbest">kbest=10</a> as a <a href="#fmt-gmotion">Google motion chart</a>;
+	      watch e.g. &quot;Katze&quot; and &quot;Tastatur&quot;.
+	      </li>
+
+	      <li>[% exlink("zeit", ["q","Krise", "slice",10, "score","ld", "kbest",10, "f","cloud", "gb","l,p=NE"]) %]
+	      <a href="#kbest">10-best</a> proper name collocates of the noun <i>Krise</i> (&quot;crisis&quot;)
+	      in <a href="#slice">10-year epochs</a> over the German weekly newspaper <a href="http://www.zeit.de"><i>DIE ZEIT</i></a>,
+	      displayed as a <a href="#fmt-cloud">d3 tag-cloud</a>.
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#ex_basic-->
+
+          <div class="subsection" id="ex_diff">
+	    <h3><a name="ex-diff">Diff Examples</a></h3>
+	    <ul class="exlist">
+	      <li>[% exlink("current", ["q","wissen", "bq","glauben|denken|vermuten", "slice",0, "p","d2"]) %]
+	      Compare $collocates of &quot;wissen&quot;
+	      versus any of {&quot;glauben&quot;,&quot;denken&quot;,&quot;vermuten&quot;} over the entire current corpus.
+	      </li>
+
+	      <li>[% exlink("current", ["q","wissen", "bq","@{glauben,denken,vermuten}", "slice",0, "p","d2"]) %]
+	      ... same as above, using <a href="#qddc">DDC query syntax</a>.
+	      </li>
+
+	      <li>[% exlink("current", ["q","Mann", "bq","Frau", "slice",25, "p","d2"]) %]
+	      Compare $collocates of &quot;Mann&quot; vs. &quot;Frau&quot; in 25-year <a href="#slice">epochs</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Mann", "bq","Frau", "slice",25, "p","d2", "f","gm"]) %]
+	      ... same as above, as a <a href="#fmt-gmotion">Google motion chart</a>
+	      in the <a href="[% topurl.dta %]">DTA corpus</a>: &quot;Kind&quot; (<i>child</i>) is interesting to watch here.
+	      </li>
+
+
+	      <li>[% exlink("dta", ["q","Mann", "bq","Frau", "date","1700:1899", "slice",25, "p","d2", "diff","havg", "f","cloud", "global",1]) %]
+	      ... same as above, as a <a href="#fmt-cloud">d3 tag-cloud</a>,
+	      using the <a href="#global">global</a> option and
+	      the <a href="#diff-havg">harmonic mean</a> diff operation to highlight invariant similarities
+	      in the targets' collocation behavior.
+	      </li>
+
+	      <li>[% exlink("spiegel_print", ["q","Einheit", "bq","Demokratie", "slice",5, "p","d2", "gb","l,p=ADJA", "f","gm"]) %]
+	      Adjective $collocates of &quot;Einheit&quot; versus &quot;Demokratie&quot; as a
+	      <a href="#fmt-gmotion">Google motion chart</a>
+	      in the <a href="[% topurl.spiegel_print %]">Spiegel (print) corpus</a>: watch &quot;sozialistisch&quot; and &quot;arabisch&quot;.
+	      </li>
+
+	      <li>[% exlink("kern", ["q","Mann", "bq","Mann", "slice",0, "adate","1900:1959", "bdate","1960:1999", "p","d2"]) %]
+	      Compare $collocates of &quot;Mann&quot; in the interval <a href="#date">1900-1959</a> 
+	      vs. the interval <a href="#bdate">1960-1999</a> in the <a href="[% topurl.kern %]">DWDS Kerncorpus</a>.
+	      </li>
+
+	      <li>[% exlink("current", ["q","/^Ehe./", "bq","/.mann\$/", "slice",0, "p","d1"]) %]
+	      Compare $unigrams matching &quot;Ehe-&quot; vs. those matching &quot;-mann&quot;.
+	      These results are somewhat difficult to interpret, but the intersection (&quot;Ehemann&quot;)
+	      should have a <a href="#prf-diff">score difference</a> of 0 (zero), and will probably not be displayed at all.
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#ex_diff-->
+
+          <div class="subsection" id="ex_attrs">
+	    <h3><a name="ex-attrs">Attribute Examples</a></h3>
+	    <ul class="exlist">
+	      <li>[% exlink("current", ["q","Mann p=NE", "slice",0, "kbest",10]) %]
+	      <a href="#kbest">10 best</a> $collocates of &quot;Mann&quot; occurring as a proper name.
+	      </li>
+
+	      <li>[% exlink("current", ["q","\$l=@Mann with \$p=NE", "slice",0, "kbest",10]) %]
+	      ... same as above, using <a href="#qddc">DDC query syntax</a>.
+	      </li>
+
+	      <li>[% exlink("dta_dwds", ["q","Mann p=NN", "bq","Frau p=NN", "date","1600:2000", "bdate","1600:2000", "slice","100", "kbest",10, "gb","l,p=ADJA", "p","d2"]) %]
+	      Compare <a href="#kbest">10 best</a> adjective $collocates of &quot;Mann&quot; versus &quot;Frau&quot; as common nouns
+	      in 100-year <a href="#slice">epochs</a>
+	      over the <a href="[% topurl.dta_dwds %]">DTA+DWDS Corpus</a>,
+	      <a href="#groupby">aggregating</a> results by LEMMA,POS pairs.
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#ex_attrs-->
+
+          <div class="subsection" id="ex_tdf">
+	    <h3><a name="ex-tdf">TDF Examples</a></h3>
+	    <ul class="exlist">
+	      <li>[% exlink("current", ["q","Maus", "slice",10, "gb","l,p=NN", "p","tdf", "global",1]) %]
+	      Noun collocates of &quot;Maus&quot; by selected document-break in the current corpus, using the <a href="#prf-tdf">tdf</a> profile class.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Mann #has[textClass,Wissenschaft*]",
+	                            "bq","Mann #has[textClass,Belletristik*]",
+				    "slice",0,
+				    "gb","l,p=ADJA",
+				    "p","diff-tdf"])
+                  %]
+              Adjective document-collocates of &quot;Mann&quot; in text-class &quot;Wissenschaft&quot; versus text-class &quot;Belletristik&quot;
+	      in the <a href="[% topurl.dta %]">DTA corpus</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Vernunft #has[author,/Kant/]",
+	                            "bq","Vernunft !#has[author,/Kant/]",
+				    "slice",0,
+				    "gb","l,p=ADJA",
+				    "p","diff-tdf"])
+                  %]
+              Adjective collocates of `Vernunft' ("reason") in the works of <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
+	      versus other authors in the <a href="[% topurl.dta %]">DTA corpus</a>.
+	      </li>
+
+	      <li>[% exlink("dta", [
+				    #"q","* #has[textClass,/./]",
+	      			    #"gb","genre,l=Vernunft",
+				    "q","Vernunft !#has[textClass,/^\$/]",
+	      			    "gb","genre",
+	                            "date","1600:1899",
+				    "slice",50,
+				    "p","tdf",
+				    "f","hichart"])
+                  %]
+		  Profile 17th- to 19th-century use of the term `Vernunft' ("reason") by primary text-class
+		  using the <a href="[% topurl.dta %]">DTA corpus</a>
+		  and displaying the results as a static 2d <a href="#fmt-hichart">Highcharts plot</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Vernunft",
+	                            "date","1700:1899",
+				    "slice",50,
+				    "k",4, ##-- since we don't have trimmed author names (yet)
+    				    #"gb","[author~s/ \\(.*\$//]",
+				    "gb","author",
+				    "p","tdf",
+				    "f","cloud"])
+                  %]
+		  Profile 18th- to 19th-century authors' predilection for the term `Vernunft' ("reason")
+		  using the <a href="[% topurl.dta %]">DTA corpus</a>
+		  and displaying the results as a <a href="#fmt-cloud">d3 tag-cloud</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Vernunft #has[author,/Kant/]",
+	                            "bq","Vernunft !#has[author,/Kant/]",
+				    "slice",0,
+				    "gb","l,p=ADJA",
+				    "p","diff-tdf"])
+                  %]
+	      Paragraph-level adjective collocates of `Vernunft' ("reason") in the works of
+	      <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
+	      versus other authors in the <a href="[% topurl.dta %]">DTA corpus</a>.
+	      </li>
+	      
+	      <li>[% exlink("dta", ["q","* #has[author,/Kant/]",
+	                            "bq","* #has[author,/Hegel/]"
+				    "slice",0,
+				    "gb","l,p=NN",
+				    "p","diff-tdf",
+				    "k",50,
+				    "f","cloud"])
+                  %]
+		  Compare nouns typically employed by 
+		  <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
+		  versus
+		  <a href="//www.deutschestextarchiv.de/api/pnd/118547739">Georg W. F. Hegel</a>
+		  in the <a href="[% topurl.dta %]">DTA corpus</a>,
+		  displaying the results as a <a href="#fmt-cloud">d3 tag-cloud</a>.
+	      </li>
+
+      	      <li>[% exlink("dta", ["q","* #has[author,/Kant/]",
+	                            "bq","* #has[author,/Hegel/]"
+				    "slice",0,
+				    "gb","l,p=NN",
+				    "p","diff-tdf",
+				    "D","havg",
+				    "k",50,
+				    "f","cloud"])
+                  %]
+		  As above, highlighting characteristic similarities via <a href="#diff-havg">harmonic average</a>
+		  rather than differences as returned by the default <a href="#diff-adiff">absolute difference comparison</a>.
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#ex_tdf-->
+	  
+          <div class="subsection" id="ex_ddc">
+	    <h3><a name="ex-ddc">DDC Examples</a></h3>
+	    <ul class="exlist">
+	      <li>[% exlink("current", ["q","Mann", "slice",0, "gb","l,p=ADJA", "p","ddc"]) %]
+	      Adjective collocates of &quot;Mann&quot; in the current corpus using <a href="#prf-ddc">DDC</a> back-end.
+	      Note that the frequencies returned will likely never be identical to those returned by the
+	      <a href="#prf-collocations">collocations</a> profile-type, due to lack of content-word
+	      filtering in <a href="#prf-ddc">DDC</a> queries.
+	      </li>
+
+	      <li>[% exlink("current", ["q","near(* =2, Mann, 4)", "slice",0, "gb","l,p=ADJA", "p","ddc"]) %]
+	      ... same as above, with explicit <a href="#prf-ddc">DDC</a> <a href="[% help_url %]#rule_qc_near">NEAR()</a> operator
+	      and <a href="[% help_url %]#rule_matchid">match-id</a> for the collocate target term.
+	      </li>
+
+	      <li>[% exlink("current", ["q","\"* =2 Mann\"", "slice",0, "gb","l,p=ADJA", "p","ddc"]) %]
+	      Immediate adjective predecessors of &quot;Mann&quot;, using implicit restriction of candidate collocates
+	      via the <a href="#groupby">groupby</a> clause.
+	      </li>
+
+	      <li>[% exlink("current", ["q","\"\$p=ADJA =2 Mann\"", "slice",0, "gb","l", "p","ddc"]) %]
+	      ... as above, grouping collocates by lemma only and expressing the collocate restriction to
+	      attributive adjectives (ADJA) directly in the <a href="#query">query</a> clause.
+	      </li>
+
+	      <li>[% exlink("current", ["q","\"\$p=ADJA =2 Mann\"", "slice",0, "gb","[\$l,textClass]", "p","ddc"]) %]
+	      ... as above, using DDC <a href="http://odo.dwds.de/~moocow/software/ddc/querydoc.html#rule_count_by">DDC count-by</a>
+	      syntax in the <a href="#groupby">groupby</a> clause and including the &quot;textClass&quot; metadata attribute
+	      in the profile target tuples.
+	      </li>
+
+	      <li>[% exlink("dta", ["q",'"(Getränk|gn-sub WITH $p=NN)=2 (trinken WITH $p={VVINF,VVPP})" #FMIN 1',
+				    "date","1600:1899",
+				    "slice",25,
+				    "p","ddc",
+				    "f","bubble",
+				    "global",1])
+		   %]
+	      Consumption of potable liquids in the <a href="[% topurl.dta %]">DTA corpus</a>,
+	      using <a href="http://www.sfs.uni-tuebingen.de/GermaNet">GermaNet</a>
+	      term expansion via the <a href="https://shibboleth.bbaw.de/proxied/germanet/?q=Getr%C3%A4nk">gn-sub</a> pipeline
+	      as a <a href="#fmt-bubble">d3 bubble chart</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","\"* =2 Mann\" #has[textClass,Wissenschaft*]",
+	                            "bq","\"* =2 Mann\" #has[textClass,Belletristik*]",
+				    "slice",0,
+				    "gb","l,p=ADJA",
+				    "p","diff-ddc"])
+                  %]
+	      Adjective collocates of &quot;Mann&quot; in primary
+	      text-class &quot;Wissenschaft&quot; (science) versus &quot;Belletristik&quot; (belles lettres)
+	      in the <a href="[% topurl.dta %]">DTA corpus</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Vernunft #has[author,/Kant/]",
+	                            "bq","Vernunft !#has[author,/Kant/]",
+				    "slice",0,
+				    "gb","l,p=ADJA",
+				    "p","diff-ddc"])
+                  %]
+              Adjective collocates of `Vernunft' ("reason") in the works of <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
+	      versus other authors in the <a href="[% topurl.dta %]">DTA corpus</a>.
+	      </li>
+
+       	      <!-- complex ddc examples: moved to 'tdf' section, since tdf handles these better
+	      <li>[% exlink("dta", ["q","Vernunft=2",
+	                            "date","1700:1899",
+				    "slice",50,
+				    "gb","[author~s/ \\(.*\$//]",
+				    "p","ddc",
+				    "f","cloud"])
+                  %]
+		  Profile 18th- to 19th-century authors' predilection for the term `Vernunft' ("reason")
+		  using the <a href="[% topurl.dta %]">DTA corpus</a>
+		  and displaying the results as a <a href="#fmt-cloud">d3 tag-cloud</a>.
+		  [%# (<b>Caveat inquisitor:</b> KWIC-links may not resolve correctly.) %]
+	      </li>
+
+	      <li>[% exlink("dta", ["q","Vernunft=2 #has[textClass,/./]",
+	                            "date","1600:1899",
+				    "slice",50,
+				    "gb","textClass",
+				    "p","ddc",
+				    "f","hichart"])
+                  %]
+		  Profile 17th- to 19th-century use of the term `Vernunft' ("reason") by primary text-class
+		  using the <a href="[% topurl.dta %]">DTA corpus</a>
+		  and displaying the results as a static 2d <a href="#fmt-hichart">Highcharts plot</a>.
+	      </li>
+
+	      <li>[% exlink("dta", ["q","*=2 #fmin 10 #has[author,/Kant/]",
+	                            "bq","*=2 #fmin 10 #has[author,/Hegel/]"
+				    "slice",0,
+				    "gb","l,p=NN",
+				    "p","diff-ddc",
+				    "k",50,
+				    "f","cloud"])
+                  %]
+		  Compare nouns typically employed by 
+		  <a href="//www.deutschestextarchiv.de/api/pnd/118559796">Immanuel Kant</a>
+		  versus
+		  <a href="//www.deutschestextarchiv.de/api/pnd/118547739">Georg W. F. Hegel</a>
+		  in the <a href="[% topurl.dta %]">DTA corpus</a>,
+		  displaying the results as a <a href="#fmt-cloud">d3 tag-cloud</a>.
+		  (<b>Caveat inquisitor:</b>
+		  pure-wildcard queries such as these are computationally expensive
+		  and can sometimes lead to timeouts.)
+		  [%# , and KWIC-links may not resolve correctly.) %]
+		</li>
+		-->
+	    </ul>
+	  </div>
+	  <!--/div.subsection#ex_ddc-->
+
+          <div class="subsection" id="ex_more">
+	    <h3><a name="ex-more">More Examples</a></h3>
+	    ... are welcome; please <a href="mailto:jurish@bbaw.de">drop me a line</a> if you find a good one!
+	  </div>
+
+	</div>
+	<!--/div.section#examples-->
+
+	<!--=================================================-->
+	<div class="section" id="references">
+	  <a name="references"><h2>References</h2></a>
+
+	  <div class="subsection" id="ref_diacollo">	  
+	    <h3><a name="ref-diacollo">DiaCollo</a></h3>
+	    <ul>
+	      <li>
+		<a name="jurish2016genre">Bryan Jurish (2016).</a>
+		&quot;Diachronic Collocations and Genre: a case for DiaCollo?&quot;
+		In R.<!--Richard--> J.<!--Jason--> Whitt (editor),
+		<!--<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf">Proceedings</a>
+		    of the conference <a href="http://nottinghamcorpusconference2016.weebly.com/">Diachronic Corpora, Genre, and Language Change</a>,
+		-->
+		<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf#page=22">Diachronic Corpora, Genre, and Language Change: Book of Abstracts</a>,
+		Nottingham, UK, 8th-9th April,
+		pages 22-24.
+		(<a href="[% puburl %]jurish2016genre.pdf">PDF</a>,
+		<a href="http://nottinghamcorpusconference2016.weebly.com/uploads/4/8/0/8/48086357/dcglc_abstractbook.pdf#page=22">EPUB</a>		,
+		<a href="[% puburl %]jurish2016genre-slides.pdf">Slides</a>)
+		<!--<a href="jurish2016genre.bib">bib</a>)-->
+	      </li>
+	      <li>
+		<a name="jgw2016dhd">Bryan Jurish, Alexander Geyken, and Thomas Werneke (2016).</a>
+		&quot;DiaCollo: diachronen Kollokationen auf der Spur.&quot;
+		In <a href="http://dhd2016.de"><i>DHd 2016: Modellierung - Vernetzung - Visualisierung</i></a>,
+		<!--Die Digital Humanities als fächerübergreifendes Forschungsparadigma-->
+		Leipzig, 7th-12th March,
+		<!--Digital Humanities im deutschprachigen Raum eV-->
+		pages 172-175.
+		(<a href="[% puburl %]jgw2016diacollo.pdf">PDF</a>,
+		 <a href="http://dhd2016.de/boa.pdf#page=172">EPUB</a> [contains typesetting errors])
+	      </li>
+	      <li>
+		<a name="jurish2015diacollo">Bryan Jurish (2015)</a>.
+	        &quot;DiaCollo: On the trail of diachronic collocations.&quot;
+		In K.<!-- Koenraad --> De Smedt (editor),
+		<a href="http://www.clarin.eu/sites/default/files/book%20of%20abstracts%202015.pdf">Proceedings</a> of the
+		<a href="https://www.clarin.eu/event/2015/clarin-annual-conference-2015-wroclaw-poland"><i>CLARIN Annual Conference 2015</i></a>,
+		Wrocław, Poland, 15th-17th October,
+		pages 28-31.
+		(<a href="[% puburl %]jurish2015diacollo-clarin.pdf">PDF</a>,
+		<a href="[% puburl %]jurish2015diacollo-clarin-poster.pdf">poster</a>)
+	      </li>
+	    </ul>
+	  </div>
+	  <!--/div.subsection#refs_score-->
+	  
+	  <div class="subsection" id="ref_general">	  
+	    <h3><a name="ref-general">General</a></h3>
+	    <ul>
+	      <li>
+		<a name="didakowski2013">Jörg Didakowski and Alexander Geyken (2013)</a>.
+		&quot;From DWDS corpora to a German Word Profile – methodological problems and solutions.&quot;
+		In: <i>Network Strategies, Access Structures and Automatic Extraction of Lexicographical Information</i>. 2nd Work Report of the
+		Academic Network &quot;Internet Lexicography&quot;. Mannheim, Institut für Deutsche Sprache.
+		(OPAL - Online publizierte Arbeiten zur Linguistik X/2012), pages 43-52.
+		(<a href="//www.dwds.de/static/website/publications/pdf/didakowski_geyken_internetlexikografie_2012_final.pdf">PDF</a>)
+	      </li>
+	      <li>
+		<a name="daille1994">Béatrice Daille (1994)</a>.
+		<i>Approche mixte pour l&apos;extraction automatique de terminologie: statistiques lexicales et filtres linguistiques.</i>
+		Ph.D. thesis, Université Paris 7.
+	      </li>
+	      <li>
+		<a name="dunning1993">Ted Dunning (1993)</a>.
+		&quot;Accurate methods for the statistics of surprise and coincidence.&quot;
+		<i>Computational Linguistics</i> 19(1), 61-74.
+		(<a href="http://www.aclweb.org/anthology/J93-1003">PDF</a>)
+	      </li>
+	      <li>
+		<a name="evert2004">Stefan Evert (2004)</a>.
+		<i>The Statistics of Word Cooccurrences: Word Pairs and Collocations</i>.
+		Ph.D. thesis, Universität Stuttgart.
+		(<a href="http://purl.org/stefan.evert/PUB/Evert2004phd.pdf">PDF</a>)
+              </li>
+	      <li>
+		<a name="evert2008">Stefan Evert (2008)</a>. &quot;Corpora and collocations.&quot;
+		In A. Lüdeling and M. Kytö (eds.),
+      		<i>Corpus Linguistics. An International Handbook</i>,
+		article 58, Berlin, Mouton de Gruyter, pages 1212-1248.
+      		(<a href="http://purl.org/stefan.evert/PUB/Evert2007HSK_extended_manuscript.pdf">PDF [extended manuscript]</a>)
+	      </li>
+	      <li>
+		<a name="rychly2008">Pavel Rychlý (2008)</a>.
+		&quot;A lexicographer-friendly association score&quot;.
+		In P. Sojka and A. Horák (eds.)
+		<i>Proceedings of Recent Advances in Slavonic Natural Language Processing</i>.
+		RASLAN 2008, pages 6-9.
+		(<a href="http://www.muni.cz/research/publications/937193">PDF</a>, <a href="http://www.fi.muni.cz/usr/sojka/download/raslan2008/13.pdf">PDF(2)</a>)
+	      </li>
+	      <li>
+		<a name="kilgarriff2002">Adam Kilgarriff and David Tugwell (2002)</a>.
+		&quot;Sketching words&quot;. In M.-H. Corréard (ed.)
+		<i>Lexicography and Natural Language Processing: A Festschrift in Honour of B. T. S. Atkins</i>.
+		EURALEX, pages 125-137.
+		(<a href="http://www.kilgarriff.co.uk/Publications/2002-KilgTugwell-AtkinsFest.pdf">PDF</a>)
+	      </li>
+	    </ul>
+	    <p/>
+	  </div>
+	  <!--/div.subsection#ref_general-->
+
+	</div>
+	<!--/div.section#references-->
+	
+      </div>
+      <!--/div.content-->
+      [% SET html_foot = root_dir _ "html-foot.ttk" %]
+      [% PROCESS $html_foot linkbar=0 linkttk="dc-links.ttk" %]
+      <script type="text/javascript">ttk_elapsed = [% cdb.t_elapsed.json %];</script>
+    </div>
+    <!--/div.outer-->
+  </body>
+</html>
+[%#--
+ ;; Local Variables:
+ ;; mode: nxml
+ ;; coding: utf-8
+ ;; End:
+%]

@@ -1,0 +1,54 @@
+---
+abstract: 'make dists require external commands'
+author:
+  - 'Mark Gardner <mjgardner@cpan.org>'
+build_requires:
+  Carp: '0'
+  English: '0'
+  Env::Path: '0.18'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Scalar::Util: '0'
+  Test::DZil: '0'
+  Test::More: '0.94'
+  Test::Most: '0'
+  blib: '1.01'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-RequiresExternal
+provides:
+  Dist::Zilla::Plugin::RequiresExternal:
+    file: lib/Dist/Zilla/Plugin/RequiresExternal.pm
+    version: '1.006'
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::MetaProvider: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Env::Path: '0.18'
+  List::MoreUtils: '0'
+  Modern::Perl: '0'
+  Moose: '0'
+  MooseX::AttributeShortcuts: '0'
+  MooseX::Types::Moose: '0'
+  Path::Class: '0'
+  Test::Most: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  utf8: '0'
+resources:
+  bugtracker: https://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-RequiresExternal/
+  repository: git://github.com/mjgardner/Dist-Zilla-Plugin-RequiresExternal.git
+version: '1.006'

@@ -1,0 +1,45 @@
+#!/bin/bash -x
+
+INCOMING=$REPREPRO_BASE_DIR/incomming
+
+cd $INCOMING && \
+for CODE_NAME in *; do
+	# exit if no codename folder
+	if [ "$CODE_NAME" == "*" ]; then
+		exit 1
+	fi
+	
+	CODE_NAME=`basename $CODE_NAME`
+	
+	for CHANGES_FILE in $INCOMING/$CODE_NAME/*.changes; do
+
+	# skip if no .changes files
+	if [ "$CHANGES_FILE" == "$INCOMING/$CODE_NAME/*.changes" ]; then
+		break
+	fi
+	
+	# Import package to 'sarge' distribution.
+	reprepro -v include $CODE_NAME $CHANGES_FILE
+	
+	# Delete the referenced files
+	sed '1,/Files:/d' $CHANGES_FILE | sed '/BEGIN PGP SIGNATURE/,$d' \
+		| while read MD SIZE SECTION PRIORITY NAME; do    
+		if [ -z "$NAME" ]; then
+	    	continue
+		fi
+	
+	    #
+    	#  Delete the referenced file
+	    #
+	    if [ -f "$INCOMING/$CODE_NAME/$NAME" ]; then
+    	    rm "$INCOMING/$CODE_NAME/$NAME"  || exit 1
+	    fi
+		done
+
+		# Finally delete the .changes file itself.
+		rm  $CHANGES_FILE
+	done
+done
+
+dpkg-scan-pm $REPREPRO_BASE_DIR
+

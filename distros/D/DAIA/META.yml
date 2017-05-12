@@ -1,0 +1,79 @@
+---
+abstract: 'Document Availability Information API'
+author:
+  - 'Jakob Voß'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DAIA
+provides:
+  DAIA:
+    file: lib/DAIA.pm
+    version: 0.43
+  DAIA::Availability:
+    file: lib/DAIA/Availability.pm
+    version: 0.43
+  DAIA::Available:
+    file: lib/DAIA/Available.pm
+    version: 0.43
+  DAIA::Department:
+    file: lib/DAIA/Department.pm
+    version: 0.43
+  DAIA::Document:
+    file: lib/DAIA/Document.pm
+    version: 0.43
+  DAIA::Entity:
+    file: lib/DAIA/Entity.pm
+    version: 0.43
+  DAIA::Institution:
+    file: lib/DAIA/Institution.pm
+    version: 0.43
+  DAIA::Item:
+    file: lib/DAIA/Item.pm
+    version: 0.43
+  DAIA::Limitation:
+    file: lib/DAIA/Limitation.pm
+    version: 0.43
+  DAIA::Message:
+    file: lib/DAIA/Message.pm
+    version: 0.43
+  DAIA::Object:
+    file: lib/DAIA/Object.pm
+    version: 0.43
+  DAIA::Response:
+    file: lib/DAIA/Response.pm
+    version: 0.43
+  DAIA::Storage:
+    file: lib/DAIA/Storage.pm
+    version: 0.43
+  DAIA::Unavailable:
+    file: lib/DAIA/Unavailable.pm
+    version: 0.43
+requires:
+  Carp: 0
+  Carp::Clan: 0
+  Data::Validate::URI: 0
+  DateTime: 0
+  DateTime::Duration: 0
+  DateTime::Format::Duration: 0
+  Getopt::Long: 0
+  IO::File: 0
+  IO::Scalar: 0
+  JSON: 0
+  LWP::Simple: 0
+  POSIX: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  XML::LibXML::Simple: 0
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/nichtich/DAIA/issues
+  homepage: https://github.com/nichtich/DAIA
+  repository: https://github.com/nichtich/DAIA.git
+version: 0.43

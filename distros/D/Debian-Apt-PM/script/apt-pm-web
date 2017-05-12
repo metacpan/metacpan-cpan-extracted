@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.08';
+
+use Getopt::Long;
+use Pod::Usage;
+use CPAN::PackageDetails;
+use Debian::Apt::PM;
+use Digest::MD5 'md5_hex';
+use JSON::Util;
+use MetaCPAN::API;
+use List::MoreUtils 'uniq';
+use DateTime;
+
+exit main();
+
+sub main {
+	my $help;
+	my $packages_file;
+	my $output_folder;
+	my $dependencies;
+	my $print_version;
+	GetOptions(
+		'help|h'       => \$help,
+		'packages-file|p=s' => \$packages_file,
+		'output-folder|o=s' => \$output_folder,
+		'dependencies|d'    => \$dependencies,
+		'version|V'         => \$print_version,
+	) or pod2usage;
+	pod2usage if $help;
+	print_version() if $print_version;
+	pod2usage if not $packages_file;
+	pod2usage if not $output_folder;
+	
+	die 'no such folder'
+		if not -d $output_folder;
+
+	my $cpan_folder = File::Spec->catdir($output_folder, 'CPAN');
+	system('mkdir', '-p', $cpan_folder)
+		if not -d $cpan_folder;
+	
+	my $dists_cache_filename = [ Debian::Apt::PM::SPc->cachedir, 'apt', 'apt-pm', 'dist-dependencies.json' ];
+	
+	my $apm = Debian::Apt::PM->new();
+	my $package_details = CPAN::PackageDetails->read( $packages_file );
+	my $metacpan = MetaCPAN::API->new;
+	
+	my $entries = $package_details->entries->entries;
+	
+	my %json_buckets;
+	my %dists;
+	%dists = eval { %{JSON::Util->decode($dists_cache_filename)} }
+		if $dependencies;
+	my %current_dists;
+	
+	foreach my $module_name ( keys %{$entries} ) {
+		my ($version, $entry) = (%{$entries->{$module_name}});
+		
+		my %apm_entry = %{$apm->find($module_name) || {}};
+		
+		my $letter_index = lc substr(md5_hex($module_name), 0, 2);
+		$json_buckets{$letter_index}->{$module_name} = {
+			'CPAN' => {
+				path    => $entry->path,
+				version => $entry->version,
+			},
+			'Debian' => [
+				map {
+					$apm_entry{$_}
+				}
+				map {
+					$apm_entry{$_}->{'perl_version'} = $_;
+				}
+				sort { CPAN::Version->vcmp($a, $b) }
+				keys %apm_entry
+			],
+		};
+		
+		if ($dependencies) {
+			my $dist_name = dist_name($entry->path);
+			$current_dists{$dist_name} = ();
+			
+			my @dependencies;
+			if (exists $dists{$dist_name}) {
+				@dependencies = @{$dists{$dist_name}};
+			}
+			else {
+				my $release = eval { $metacpan->release( distribution => $dist_name ) };
+				sleep(1);    # sleep 1s after each call to metacpan
+				
+				if ($release) {
+					@dependencies =
+						uniq
+						sort
+						map {
+							$_->{'module'}
+							.($_->{'version'} eq '0' ? '' : '/'.$_->{'version'})
+						}
+						@{$release->{'dependency'}}
+					;
+					$dists{$dist_name} = \@dependencies;
+					JSON::Util->encode(\%dists, $dists_cache_filename);
+				}
+				else {
+					warn $dist_name.' not in metacpan'
+						unless $release;
+				}
+			}
+			$entry->{'path'} = join(' ', @dependencies);
+		}
+	}
+	
+	while (my ($letter_index, $modules_info) = each %json_buckets ) {
+		JSON::Util->new(pretty => 0)->encode($modules_info, [ $cpan_folder, $letter_index.'.json' ]);
+	}
+
+	JSON::Util->new()->encode({
+		'time'     => time(),
+		'datetime' => DateTime->now->iso8601(),
+	}, [ $cpan_folder, 'info.json' ]);
+
+	if ($dependencies) {
+		$package_details->write_file(File::Spec->catdir($cpan_folder, '02packages.dependencies.txt.gz'));
+		foreach my $dist_name (keys %dists) {
+			delete $dists{$dist_name}
+				unless exists $current_dists{$dist_name};
+		}
+		JSON::Util->encode(\%dists, $dists_cache_filename);
+	}
+	
+	return 0;
+}
+
+sub dist_name {
+	my $path = shift;
+	
+	my $dist_name = substr($path, 5);
+	$dist_name =~ s{[.] (tar [.] (gz|bz2) | zip | tgz)$}{}xms;
+	$dist_name =~ s{/.+/}{/}xms;
+	return $dist_name;
+}
+
+sub print_version {
+	print "$0 $VERSION, Debian::Apt::PM $Debian::Apt::PM::VERSION\n";
+	exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+apt-pm-web - generate json files for the CPAN package => Debian package mapping
+
+=head1 SYNOPSIS
+
+	apt-pm update
+	rm examples/web/CPAN/*.json
+	apt-pm-web -p $HOME/.cpan/sources/modules/02packages.details.txt.gz -o examples/web/
+	
+		--packages-file   a path to to the 02packages.details.txt.gz file
+		--output-folder   a folder where the web json files should be generated
+		--dependencies    generate also 02packages.dependencies.txt.gz
+
+=head1 DESCRIPTION
+
+Script that will generate json files that are needed for the mapping page.
+
+See L<http://pkg-perl.alioth.debian.org/cpan2deb/>
+
+=cut

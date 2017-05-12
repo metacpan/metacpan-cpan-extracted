@@ -1,0 +1,32 @@
+---
+abstract: 'multiple Dezi::Server applications in a single instance'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dezi-MultiTenant
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Dezi: 0.002006
+  Plack::Middleware::Deflater: 0
+  Plack::Middleware::JSONP: 0
+  Test::More: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-MultiTenant
+  homepage: https://github.com/karpet/dezi-multitenant
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: http://github.com/karpet/dezi-multitenant
+version: 0.003

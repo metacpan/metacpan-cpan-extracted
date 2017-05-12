@@ -1,0 +1,7 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Document::TriPart::Cabinet::App;
+Document::TriPart::Cabinet::App->run;

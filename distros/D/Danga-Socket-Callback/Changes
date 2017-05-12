@@ -1,0 +1,16 @@
+Changes
+=======
+
+0.013 2013-04-26T05:19:22Z
+    - No code change
+    - Import from CPAN, and migrate from using Module::Install to Module::Build
+
+0.01200 - 01 Dec 2007
+  - Kwalitee release. No need to upgrade
+
+0.011 - Thu 10 May 2007
+  - Tweak documentation and mention the "context" key
+  - Remove execution bit from Makefile.PL
+
+0.01 - Tue 08 May 2007
+  - Initial release.

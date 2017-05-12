@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+README
+README.html
+Makefile.PL
+Sequence.pm
+.perltidyrc
+t/0basic.t
+t/1ext.t
+t/2ext.t
+t/3ext.t
+t/4ext.t

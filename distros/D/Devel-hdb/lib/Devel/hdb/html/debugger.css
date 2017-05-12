@@ -1,0 +1,296 @@
+/* the time after "run" is pressed, but before another breakpoint */
+.control-button[disabled] {
+    cursor: wait;
+}
+
+.PerlValue {
+    font-size: x-small;
+}
+.PerlValue dt {
+    font-family: Verdana;
+    font-weight: bold;
+    float: left;
+}
+.PerlValue dl {
+    margin-top: 2px;
+    margin-bottom: 0px;
+}
+.PerlValue dd > span {
+    margin-left: 1em;
+}
+
+.program-code .active .code  {
+    background-color: rgba(0,101,204,0.5) !important;
+}
+.program-code .code-line:hover {
+    background-color: rgba(0,0,0,0.05);
+}
+.program-code .breakpoint .lineno span {
+    background-color: rgb(255,0,0);
+}
+.program-code .conditional-breakpoint .lineno span {
+    background-color: rgba(0,0,255, 0.675);
+}
+.program-code .inactive-breakpoint .lineno span {
+    opacity: 0.4;
+}
+.program-code .action .lineno span {
+    border-color: black;
+}
+.program-code .lineno {  /* breakable line numbers */
+    cursor: pointer;
+}
+.program-code .unbreakable .lineno {  /* unbreakable line numbers */
+    text-decoration: line-through;
+    cursor: default;
+}
+.program-code .lineno {
+    width: 5%;
+    display: inline-block;
+    text-align: center;
+}
+.program-code .lineno span {  /* The circle/ellipse indicating a breakpoint/action */
+    padding-bottom: 1px;
+    border-radius: 50% 50%;
+    border: 1px solid transparent;
+    /* padding: 2px; */
+}
+.program-code .code {
+    width: 94%;
+    padding-bottom: 1px;
+    display: inline-block;
+}
+
+.program-code .code-line {
+    font-size:0.875em;
+    line-height: 1em;
+}
+
+.code {
+    font-family: monospace;
+    white-space: pre;
+}
+
+div#controls {
+    /* leave space above and below the control buttons */
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+
+#add-file  {
+    padding: 0.2em;
+    border-radius: 50%;
+    vertical-align: middle;
+}
+
+.close-button {
+    height: 18px;
+    width: 18px;
+    display: inline-block;
+    background-color: red;
+    border-radius: 50%;
+    text-align: center;
+}
+.close-button > i {
+    margin: 0;
+    vertical-align: center;
+}
+#file-content {
+    /*clear:both;*/
+}
+
+#stack-tabs {
+    padding-top: 1em;
+    margin-bottom: 0;
+    margin-right: 0.1em;
+}
+#stack-tabs .active a  {
+    box-shadow: -2px 10px 3px -2px;
+}
+#stack-panes {
+    overflow-x: hidden;
+    overflow-y: hidden;
+}
+
+#stack-tabs {
+    overflow-y: auto;
+    overflow-x: hidden;
+    max-width: 30%;
+}
+
+/* These make the tabs across the top wider and darker than
+   in the basic Bootstrap stuff */
+#filewindow > ul {
+    border-bottom: 2px solid rgb(170, 170, 170);
+    margin-bottom: 0;
+}
+#filewindow > ul > li {
+    max-width: 150px;
+}
+#filewindow > ul a {
+    background-color: white;
+    border-top: 2px solid rgb(170, 170, 170);
+    border-left: 2px solid rgb(170, 170, 170);
+    border-right: 2px solid rgb(170, 170, 170);
+}
+/* In practice, this is for the filewindow tabs */
+li.trunc-left {
+    white-space: nowrap;
+    overflow: hidden;
+    direction: rtl;
+    text-align: left;
+    text-overflow: ellipsis;
+}
+
+.current-sub-and-args {
+    margin-bottom: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.current-sub-and-args ul.sub-arg-list {
+    display: inline;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.current-sub-and-args ul.sub-arg-list li { display: inline; }
+.current-sub-and-args ul.sub-arg-list li:after { content: ","; }
+.current-sub-and-args ul.sub-arg-list li:last-child:after { content: ""; }
+.current-sub-and-args .current-subroutine {
+    font-weight: bold;
+}
+
+
+#filewindow {
+    border-top: 1px solid black;
+    border-right: 1px solid black;
+    border-top-right-radius: 1%;
+    background-color: rgb(240, 240, 240);
+}
+#file-content {
+    background-color: white;
+}
+
+div.managed-height {
+    overflow: auto;
+}
+div#stack-tab-container {
+    display: inline-block;
+}
+
+div.program-code-container {
+    /* border: 1px solid black; */
+    /* overflow: scroll; */
+}
+
+body {
+    min-width: 550px;
+}
+#columnator {
+    padding-left: 0;
+    padding-right: 250px;
+}
+#columnator > :first-child {
+    float: left;
+    width: 100%;
+}
+.container-column {
+    position: relative;
+    float: left;
+}
+#drag-divider {
+    width: 3px;
+    float: left;
+    background: transparent;
+    cursor: col-resize;
+    margin-right: -4px;
+    display: inline-block;
+    z-index: 10;
+}
+#ghost-divider {
+    width: 3px;
+    background: black;
+    opacity: 0.5;
+    position: absolute;
+    cursor: col-resize;
+    z-index: 99;
+}
+
+#breakpoint-container {
+    z-index: 9;  /* higher than watch-expressions, lower than drag-divider */
+    position: absolute;
+    width: 15px;
+}
+#breakpoint-container.extended {
+    box-shadow: 10px 10px 10px;
+}
+#breakpoints {
+    width: 100%;
+    background-color: white;
+    float: left;
+    margin-right: -15px;
+}
+#breakpoints-list {
+    list-style: none;
+    margin-left: 1em;
+}
+#breakpoint-container-handle {
+    width: 15px;
+    background-color: lightgray;
+    float: left;
+}
+.breakpoint-pane-item {
+    list-style: none;
+    border-bottom: 1px solid black;
+}
+.breakpoint-pane-item:before {
+
+}
+
+#side-tray {
+    width: 234px;  /* leave 1px for the #filewindow border */
+    margin-right: -234px;
+/*    margin-left: 0.5em;*/
+}
+#watch-expressions {
+    width: 100%;
+    margin-left: 15px;  /* should be the same as the #breakpoint-container-handle width */
+}
+div#watch-expressions-title {
+    margin-bottom: 0.25em;
+    padding-bottom: 0.25em;
+    padding-left: 1em;
+    border-bottom: 1px solid black;
+}
+
+.watched-expression {
+    border-bottom: 1px solid black;
+    padding-left: 0.25em;
+    padding-bottom: 0.25em;
+}
+
+.watched-expression .expr.flashed {
+    background-color: yellow;
+}
+
+.expr-collapse-button.collapsed:after {
+    content: '...';
+}
+
+/* The right-click breakpoint menu */
+.breakpoint-details,.action-details .bpaction-code {
+    display: inline-block;
+    height: 2em;
+}
+.breakpoint-details,.action-details .bpaction-code form {
+    display: inline-block;
+    margin-bottom: 0;
+}
+.breakpoint-details,.action-details .bpaction-code input {
+    margin-bottom: 0;
+}
+
+.hovered-perl-var {
+    background-color: rgba(255,255,0,0.3);
+}

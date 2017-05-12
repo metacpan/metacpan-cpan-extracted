@@ -1,0 +1,8 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Homepage
+
+1.101420  2010-05-22 17:01:13 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - removed unused variable
+
+1.100700  2010-03-11 12:50:35 Europe/Vienna
+    - original version

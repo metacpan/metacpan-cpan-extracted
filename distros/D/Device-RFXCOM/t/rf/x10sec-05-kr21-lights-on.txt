@@ -1,0 +1,10 @@
+29c6c98679ef80
+
+master x10security 29.c6c98679ef80:
+  security/x10sec63/disarm
+  sensor/x10sec63[battery]=90%
+
+
+
+
+

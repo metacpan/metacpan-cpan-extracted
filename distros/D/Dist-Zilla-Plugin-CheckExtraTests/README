@@ -1,0 +1,69 @@
+NAME
+    Dist::Zilla::Plugin::CheckExtraTests - check xt tests before release
+
+VERSION
+    version 0.029
+
+SYNOPSIS
+    In your dist.ini:
+
+      [CheckExtraTests]
+
+DESCRIPTION
+    Runs all xt tests before release. Dies if any fail. Sets RELEASE_TESTING
+    and AUTHOR_TESTING.
+
+    If you use Dist::Zilla::Plugin::TestRelease, you should consider using
+    Dist::Zilla::Plugin::RunExtraTests instead, which enables xt tests to
+    run as part of "[TestRelease]" and is thus a bit more efficient as the
+    distribution is only built once for testing.
+
+ATTRIBUTES
+  default_jobs
+    This attribute is the default value that should be used as the "jobs"
+    argument for prerelease tests.
+
+SEE ALSO
+    *   Dist::Zilla
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests/issues>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-CheckExtraTests.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Jesse Luehrs <doy@cpan.org>
+
+CONTRIBUTORS
+    *   Christopher J. Madsen <cjm@cpan.org>
+
+    *   David Golden <xdg@xdg.me>
+
+    *   David H. Adler <dha@pobox.com>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+    *   Kent Fredric <kentfredric@gmail.com>
+
+    *   Olivier Mengué <dolmen@cpan.org>
+
+    *   Ricardo Signes <rjbs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

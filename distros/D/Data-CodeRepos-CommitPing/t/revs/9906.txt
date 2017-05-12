@@ -1,0 +1,8 @@
+---
+author: yappo
+comment: 俺は何をやっていたんだ、環境変数の問題じゃないかorz
+date: 2008-04-19 21:12:57 +0900
+files:
+  - path: websites/coderepos.org/scripts/commit-ping-hook.pl
+    status: U
+rev: 9906

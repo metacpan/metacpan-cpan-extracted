@@ -1,0 +1,91 @@
+=head1 NAME
+
+Source mod_perl distributions
+
+=head1 Description
+
+This document explains how to get the mod_perl 1.0 and 2.0 source
+distributions.
+
+Please note that mod_perl 2.0 is considered BETA and should not be
+used in a production environment.
+
+See also L<the binary distributions|download::binaries> and the
+L<bundles|download::bundles>.
+
+=head1 mod_perl 1.0
+
+Be sure to read the I<README> and I<INSTALL> documents (in the
+distribution package) and the longer L<the installation
+guide|docs::1.0::guide::install>.
+
+=head2 Stable Source Distribution
+
+=over
+
+=item * Master Source distribution
+
+Release http://perl.apache.org/dist
+
+=item * CPAN
+
+http://www.cpan.org/modules/by-module/Apache/
+
+=back
+
+=head2 Development Source Distribution
+
+=over
+
+=item * The latest CVS snapshot
+
+http://cvs.apache.org/snapshots/modperl/
+
+=item * Access to the CVS repository
+
+Using anoncvs (password is "anoncvs"):
+
+  % cvs -d ":pserver:anoncvs@cvs.apache.org:/home/cvspublic" login
+  % cvs -d ":pserver:anoncvs@cvs.apache.org:/home/cvspublic" co modperl
+
+For more information on using CVS see L<the CVS
+Howto|contribute::cvs_howto>
+
+=back
+
+=head1 mod_perl 2.0
+
+Be sure to read the I<README> and I<INSTALL> documents (in the
+distribution package) and the longer mod_perl 2.0 L<installation
+guide|docs::2.0::user::install::install>.
+
+=head2 2.0 Development Source Distribution
+
+=over 
+
+=item * tarballs
+
+Download the httpd-2.0 (http://www.apache.org/dist/httpd/) and
+modperl-2.0 tarballs (http://perl.apache.org/dist/), and extract them
+in the same directory.
+
+=item * cvs
+
+Using anoncvs (password is "anoncvs"):
+
+  % cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic login
+  % cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co modperl-2.0
+  % cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co httpd-2.0
+  % cd httpd-2.0/srclib
+  % cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co apr
+  % cvs -d :pserver:anoncvs@cvs.apache.org:/home/cvspublic co apr-util
+
+For more information on using CVS see L<the CVS
+Howto|contribute::cvs_howto>
+
+=back
+
+=cut
+
+
+

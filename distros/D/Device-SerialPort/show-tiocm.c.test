@@ -1,0 +1,28 @@
+#include <stdio.h>
+
+// for TIOCM* stuff...
+#define TRY_TIOCM
+#ifdef TRY_TIOCM
+# include <termios.h>
+#endif
+
+// for TC* stuff...
+#define TRY_TC
+#ifdef TRY_TC
+# include <sys/termiox.h>
+#endif
+
+int main()
+{
+#ifdef TRY_TIOCM
+        printf("eval \"sub %s { 0x%x }\";\n","TIOCMBIS", TIOCMBIS);
+        printf("eval \"sub %s { 0x%x }\";\n","TIOCMBIC", TIOCMBIC);
+        printf("eval \"sub %s { 0x%x }\";\n","TIOCMGET", TIOCMGET);
+#endif
+#ifdef TRY_TC
+        printf("eval \"sub %s { 0x%x }\";\n","TCGETX", TCGETX);
+        printf("eval \"sub %s { 0x%x }\";\n","TCSETX", TCSETX);
+#endif
+        return 0;
+}
+

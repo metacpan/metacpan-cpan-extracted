@@ -1,0 +1,64 @@
+NAME
+    Dancer::Template::Mason - Mason wrapper for Dancer
+
+VERSION
+    version 0.004001
+
+SYNOPSIS
+      # in 'config.yml'
+      template: 'mason'
+
+      # in the app
+ 
+      get '/foo', sub {
+        template 'foo' => {
+            title => 'bar'
+        };
+      };
+
+    Then, on "views/foo.mason":
+
+        <%args>
+        $title
+        </%args>
+
+        <h1><% $title %></h1>
+
+        <p>Mason says hi!</p>
+
+DESCRIPTION
+    This class is an interface between Dancer's template engine abstraction
+    layer and the HTML::Mason templating system. For templates using Mason
+    version 2.x, what you want is Dancer::Template::Mason2.
+
+    In order to use this engine, set the template to 'mason' in the
+    configuration file:
+
+        template: mason
+
+HTML::Mason::Interp CONFIGURATION
+    Parameters can also be passed to the HTML::Mason::Interp interpreter via
+    the configuration file, like so:
+
+        engines:
+            mason:
+                default_escape_flags: ['h']
+
+    If unspecified, "comp_root" defaults to the "views" configuration
+    setting or, if it's undefined, to the "/views" subdirectory of the
+    application.
+
+SEE ALSO
+    Dancer, HTML::Mason.
+
+    For Mason v2, see Mason and Dancer::Template::Mason2.
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

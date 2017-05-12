@@ -1,0 +1,33 @@
+DateTime-Event-MultiCron version 0.01
+=====================================
+
+The DateTime::Event::MultiCrom is an extension to the DateTime::Event::Cron
+module, that allow to create a DateTime::Set from multiple cron scheduling
+definitions.
+
+It implements only a from_multicron method, that gets multiple cron
+definitions and returns a single DateTime::Set.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime::Event::Cron
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Marco Neves
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

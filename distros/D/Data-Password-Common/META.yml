@@ -1,0 +1,50 @@
+---
+abstract: 'Check a password against a list of common passwords'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Test::File::ShareDir: 0
+  Test::More: 0.96
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.001, CPAN::Meta::Converter version 2.132830'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Password-Common
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Data::Password::Common:
+    file: lib/Data/Password/Common.pm
+    version: 0.004
+requires:
+  File::ShareDir: 0
+  IO::File: 0
+  Search::Dict: 0
+  Sub::Exporter: 0
+  autodie: 2.00
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/Data-Password-Common/issues
+  homepage: https://github.com/dagolden/Data-Password-Common
+  repository: https://github.com/dagolden/Data-Password-Common.git
+version: 0.004
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'superfly1031 <RavetcoFX@gmail.com>'

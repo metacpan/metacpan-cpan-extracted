@@ -1,0 +1,10 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dancer/Plugin/ExtDirect.pm
+t/00-compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

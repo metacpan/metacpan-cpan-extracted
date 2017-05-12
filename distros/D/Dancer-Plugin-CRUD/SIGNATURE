@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e6bf141fc98f5be36790e2259e36f1468e08c9f3 CONTRIBUTORS
+SHA1 18d09dada2d33cf7d076a76916ac509d772931a0 Changes
+SHA1 d294b2b43aa9eee0d5ed93bef79ce51f1aa02ada LICENSE
+SHA1 fade7d2375b178f176044e8d0fbcd2f61e2042d0 MANIFEST
+SHA1 12f108dc776d706df9eb169b989bb8fac4ef9971 META.yml
+SHA1 6f8b053c53ed75310a09e275e0d6b170d003fa8d Makefile.PL
+SHA1 2016edd92879535f8811ee4b2266f041b58313be README
+SHA1 2776c396cea5c28dd4891cc60c6bd857b6b3fa14 dist.ini
+SHA1 ae9b7c3b28317c510335e23c531fc9d4b6969075 lib/Dancer/Plugin/CRUD.pm
+SHA1 498a08c3e2bff276c5c7aed0794ed495f5c70aec t/00-load.t
+SHA1 5ec54af02ee815e315684f090cc41e74e67a39a2 t/01-prepare_serializer_for_format.t
+SHA1 b65e1e75b8c856d1bba58b77f69e2244e4e450a5 t/02-resource.t
+SHA1 f539837f0f278a16dfccb3934260129d8244707f t/02-resource_alt.t
+SHA1 c060b099e9aabc02fe1856ab6b8f8aff997b6a20 t/03-helpers.t
+SHA1 ad1e78fe6eadd26a8d88b0148682e04b6499224d t/04-plugin_settings.t
+SHA1 25d00766d44b632426426286acb9c45e43de55d4 t/05-serializer_and_resource.t
+SHA1 a6fd11e5ffe888a18a52edc3e4da8ebd84b2e5a2 t/06-prefix.t
+SHA1 917a0e1361665f79986885a41f0011e63fd3fc87 t/07-suffix.t
+SHA1 3a7001e9713a113d00ea2d38186d19973ab41808 t/08-stacking.t
+SHA1 f39a7042f0cc67592ca570d074ecb0aed6e5683d t/09-validate.t
+SHA1 324b57dbe2ac811a6529c704bf4c2be1ad79f16f t/10-wrap.t
+SHA1 14190e56b32d77cc0eda3e72f1a26ca7c8b69ca8 t/11-patch.t
+SHA1 bcf483e94cd3d5d9b36b08f30daad3765d0189e0 t/12-chain.t
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBAgAGBQJUkatpAAoJEHwWRyBU62lqv2sP/AkXvDW1F8KHuXCtkWMXRjJa
+3uRz7LojZcLS0bUk/zY6sQ1KfA54nZWrlsfV31RGHkzbh+dkjOsj2i7djdP78n99
+CmH3S77xSmW22H9DzqrqLXg82L16CUbh15PJAOfUtT/L5bdpAPaM90qFkY5HhrDK
+mtNc2epd15NJc47Dn7ArQkDKjt6ypdtVKjQRg5r+/h7DrMtJYtVimv5qsdRT/Pv5
+qDZWw1RGwehnC2rRuEldehr3jZoHST8UXxa9E9EqPRoJoqUrP0FEHZEOjPWQf6ci
+qs/eXA57qK3QhguYxiXCTUnlY7rQDgOwb1f5kLa/KxHdI7iLvJO+uXxD6pw65YVX
+jwhNUeEAkvJ0UEAHcJzTF6y3LhdRQ2iFodRC2xShud2Z75JNdH5BUXrDILfYKP+D
+kplLZxaeh1Fenx7FI7+Cdf84QUQhJAN5mlA7a3GvBcOHmAvmgd6vyfZGN8fQrjwD
+lMtm5PE2hbOEmtdD3VDXjHQwvbWdWe+PQYQ7NVE3cxaCACPGaui+YBBi7Tb5AN7+
+v6o2tqKKV8JBvmYm2DSeGBXbKIKF8SolAVPCrRkaYF/LQQH0LTbw2BVl5ZBb5aq3
+5ISzIn/bTUeHd9OYz/UhNiBfGuMHkzNfz2weR9mnbo5uDOuue40iGCMqMdxAB8Wo
+0RiQ7jLjvcWn6znBT0/w
+=4Hy7
+-----END PGP SIGNATURE-----

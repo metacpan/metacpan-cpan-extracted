@@ -1,0 +1,30 @@
+Revision history for DBIx-Class-Indexer-WebService-Dezi
+
+0.08    09/21/2012
+        Added a disable flag for Result configurations. This was requested by
+        the Duck Duck Go team (Getty|crazedpsyc)
+
+0.07    08/21/2012
+        Cleaned up how attributes are set and some messy code. Added some more
+        complete unit tests.
+
+0.06    01/03/2012
+        Adding fixes suggested by Andreas Koenig to satisfy cpantester
+        and hopefully fix remaining failures.
+
+0.05    12/29/2011
+        Removed references to Moo, now just using Moose.
+
+0.04    12/29/2011
+        Fixed broken unit tests by adding Moose as a dependency
+        in Makefile.PL
+
+0.03    12/28/2011
+        Added is_binary and base64 encoding upon indexing.
+        Various other documentation updates.
+
+0.02    10/19/2011
+        Added skipping unnecessary repo files.
+
+0.01    10/19/2011
+        Initial release

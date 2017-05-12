@@ -1,0 +1,514 @@
+=head1
+
+=head2 Iterator.pm - shows paths/values of complex data structures
+
+=head2 B<1. Description>
+
+Iterator.pm is an object orientated (pure) Perl module to iterate over complex data structures (LoL, LoH, HoL, HoH etc.).
+While Perl's built-in functions foreach(), each(), keys() and values() handle just a given level of a structure, Iterator digs deeper - handling a structure like an one-dimensional hash.
+
+For each element of a nested data structure the symbolic name ("data path"), The Value - as is! - plus some additional information are retrieved.
+
+That is, Iterator provides an unified syntax for simple handling of data sources of different types.
+
+Iterator does not alter the referenced structure, though values may be explicitly modified by the user.
+
+Iterator does not export any variables or functions. You I<can> call arbitrary packet subs via &Packetname::subname(), but you I<might> be surprised of the results :-)
+
+Well, there are exceptions:
+
+=over 2
+
+=item B<Data::Iterator::cfg()>
+
+lets you get/set module-wide settings.
+
+=item B<$Data::Iterator::VERSION>
+
+the module's version number.
+
+=back
+
+=head2 B<2. Dependencies>
+
+Iterator uses the modules Module Carp and FileHandle (delivered with Perl's standard distribution).
+
+=head2 B<3. Usage>
+
+=begin text
+
+    #!perl -w
+
+	# adopt perl's path to your environment (if not on Windows)
+
+	use strict;
+	use Data::Iterator;                 # assuming you put it into
+	                                    # your [/site]/lib/Data-
+	                                    # directory
+
+	# Create a data structure, e.g. a hash:
+    my %data  = (a => 1,
+                 b => [ qw(b0 b1 b2) ],
+                 c => {c1 => sub {warn "No parms!" unless @_;
+                                  return qw(first second third)
+                                 },
+                       c2 => undef,
+                       c3 => 'val_of_c3'
+                      }
+                );
+
+    ## Create an Iterator-object:
+    my $dobj = new Data::Iterator (\%data)
+         || die "Oops. Creation of Iterator-object failed: $!";
+
+    ## Now let's get all the names + values...
+    while (my ($path, $val) = $dobj->element) {
+      print "all data: path: $path, value: $val\n";
+      # or whatever is to be done with $path, $val :-)
+    }
+    # ...and prepare for a new loop, if necessary:
+    $dobj->reset;
+    # ...
+
+    ## Lookup data in $data{'c'}...
+    while (my ($path, $val) = $dobj->element('{c}*')) { # note the asterisk!
+      print "just {c}: path: $path, value: $val\n";
+      # or whatever is to be done with $path, $val :-)
+    }
+    # ...and prepare for a new loop, if necessary:
+    $dobj->reset('{c}');
+    # ...
+
+    ## Just retrieve a single value...
+    my $distinct_val   = $dobj->element ('{b}[1]');
+
+    ## ...or set a value (autovivificates data element, if necessary)
+    my $old_val_of_b_1 = $dobj->element ('{b}[1]', 'A New Value!');
+    my $new_val_of_b_1 = $dobj->element ('{b}[1]');
+
+	print "\nThe value of b.1:      $distinct_val\n",
+	      "is returned on change: $old_val_of_b_1\n",
+	      "b.1 is now:            $new_val_of_b_1\n";
+
+	# Now let's get all the keys:
+	print "\n- Keys:   \n", join "\n", $dobj->keys;
+
+	# ...and the values:
+	print "\n\n- Values: \n", join "\n", $dobj->values;
+
+    ## Lookup a file's content...
+    my $fobj = new Data::Iterator ('-FILE:path/to/file.ext')
+         || die "Oops. Creation of Iterator-object failed: $!";
+	print "\n\n- Listing a file:\n";
+    while (my ($path, $val) = $fobj->element) {
+      print "path: $path, value: $val\n";
+      # or whatever is to be done with $path, $val :-)
+    }
+
+    ## ...OR:
+    open (FH, '< path/to/file.ext')
+         || die "Oops. Could not open file: $!";
+    $fobj = new Data::Iterator (\*FH)
+         || die "Oops. Creation of Iterator-object failed: $!";
+    # ...
+
+=end text
+
+
+=head2 B<4. Methods>
+
+=over 2
+
+=item B<new()>
+
+Creates a new Iterator-object as a blessed hash reference; returns undef in case of a failure.
+
+Parameter (reference to your data structure):
+
+ (1) \%hash
+ (2) \@array
+ (3) \&code
+ (4) \*glob
+ (5) \$scalar   (not too structural...)
+ (6) '-FILE:Path/to/file.ext'
+ (7) $scalar    (ditto not very structural...)
+
+Return values:
+
+ - Scalar: Blessed reference to an Iterator-Objekt, or
+ - undef:  on failure (object could not be created, e.g. because of an unknown reference type)
+
+
+
+=item B<cfg()>
+
+Gets/sets the configuration of the respective Iterator-object (called as  I<object method>) or the module wide configuration (called as I<class method> Data::Iterator->cfg()). Named options are returned in an I<array> in the same order as they were passed to cfg().
+
+Which options are read and/or set, is subject to the option names passed to cfg():
+
+- Given the name of a option, followed by a value (i.e. not an options name), the value of this option will be modified. the old value will be returned:
+
+ my @object_opts = $dobj->cfg          (-opt1 => 'val1', -opt2 => 'val2', ...);
+ my @global_opts = Data::Iterator->cfg (-opt1 => 'val1', -opt2 => 'val2', ...);
+
+ sets -opt1 and -opt2 to 'val1' rsp. 'val2' and returns:
+
+ (old_val_of_opt1, old_val_of_opt2, ...)
+
+- Given just an options name (no value following), cfg() returns the corresponding value:
+
+ my @object_opts = $dobj->cfg          ('-opt2', '-opt1', ...);
+ my @global_opts = Data::Iterator->cfg ('-opt2', '-opt1', ...);
+
+ returns:
+
+ (val_of_opt2, val_of_opt1, ...)
+
+- Setting and reading of options can be arbitrarily combined:
+
+ my @object_opts = $dobj->cfg          (-opt3, -opt1 => 'new!');
+ my @global_opts = Data::Iterator->cfg (-opt3, -opt1 => 'new!');
+
+ returns:
+
+ (val_of_opt3, old_val_of_opt1)
+
+- With no parameter given, cfg() returns a I<hash> containing all settings:
+
+ my %object_opts = $dobj->cfg;
+ my %global_opts = Data::Iterator->cfg;
+
+For information about the settings see section B<5. Options>.
+
+
+=item B<element()>
+
+If called in an array context, returns information about the current element of the data structure passed to new(), an empty list, if no more elements are available (i.e. end of structure is reached).
+
+If called in scalar context, returns 1, if an element is present, undef, if end of structure is reached.
+
+element() does I<not> create a list and does I<not copy> the respective data structure. It parses the data tree element wise and returns a list (sic!) if called in list context, containing several information about the current element. Thus using a  while-loop is a good idea to walk the whole tree.
+
+Calling element() in a foreach-loop is not necessarily a very good idea, unless you know exactly what you do (hint: foreach expects a list context, and creates it automagically).
+
+ my ($p, $v, $k, $l, $r, $pp, $p) = $obj->element;
+
+that is:
+
+ [0] $p:  "data path", i.e. a string like {'key'}|[index]{'key'}|[index] etc.
+ [1] $v:  The Value
+ [2] $k:  Key/index of the current element
+ [3] $l:  Level of the current element within the structure's hierarchy
+ [4] $r:  Reference to the current element
+ [5] $pp: "parent path", name of the preceding element (Array, Hash etc.)
+          parentpath.({key}|[index]) is eq to data path [0].
+ [6] $p:  Parent of the current element
+
+Listing of each element's information can be done with:
+
+ while (my @elm = $dobj->element) {
+   print join ('|', @elm),"\n";
+ }
+
+or:
+
+ while ($dobj->element) {
+   print $dobj->{path}.' = '.$dobj->{val}.', at '.$dobj->{vref}."\n";
+ }
+
+To retrieve a partial structure, element() can be called with a data path (string) as parameter:
+
+ while (my @elm = $dobj->element('{c}*')) {
+   print join ('|', @elm),"\n";
+ }
+
+To retrieve just a single value, remove the asterisk:
+
+ print join ('|', $dobj->element ('{c}')),"\n";
+
+In case of an error you can check
+
+ $dobj->{'err'}
+
+if warnings were turned off.
+
+You may set an element's value via element(). This is done by passing the element's path plus the desired value as second parameter:
+
+ print $dobj->element ('{c}{c3}', 'a new value!');
+ # prints 'val_of_c3'
+ print ($dobj->element ('{c}{c3}'))[1];
+ # prints 'a new value!'
+
+This will not work on Glob-, FileHandle- and '-File:...'-type elements.
+
+
+=item B<reset()>
+
+Resets the internal stacks of element(). I.e. after an incomplete iteration over the data structure, element() will return to the beginning of the structure:
+
+ $dobj->reset;
+
+reset() works selectively. If a data path is provided, only the stack for the respective substructure will be reset:
+
+ $dobj->reset ('data path');
+
+
+=item B<keys()>
+
+Returns an array containing the data paths ("element names") of the object:
+
+ my @keys   = $dobj->keys;
+ my @c_keys = $dobj->keys('{c}');
+
+You may pass an initial data path to keys(). This will cause keys() to return the data paths of the substructure found at 'initial_data_path', if any.
+
+
+=item B<values()>
+
+returns an array containing the values of the object:
+
+  my @vals   = $dobj->values;
+  my @c_vals = $dobj->values('{c}');
+
+You may pass an initial data path to values(). This will cause values() to return the values of the substructure found at 'initial_data_path', if any.
+
+=back
+
+=head2 B<5. Options>
+
+There are three groups of options:
+
+=over 2
+
+=item (1) What to retrieve (module's or object's configuration):
+
+"-Nodes"
+Setting: 0|1
+
+Switches returning of nodes (elements containing a substructure-reference, e.g. to an array or hash) on (1) or off(0). Default is 0.
+
+Note: The reference itself will always get resolved.
+
+"-DigLevel"
+Setting: undef|Integer
+
+Set retrieval of all levels on (undef) or limit digging down to (including) level n. Default is undef.
+
+=item (2) Handling references passed to new() (to be set as module's configuration):
+
+"-SRefs"
+Setting: 0|1
+
+Resolve scalar references in-depth until a non-scalarref is found (1) or not (0). Default is 1.
+
+Setting this option to 0 will cause element() to just return the initial reference unless "-DigSRefs" is set to 1.
+
+"-Files"
+Setting: 0|1
+
+Resolve (open file for reading) an initial "-File:..."-argument on init (1) or leave it as string (0). Default is 1.
+
+Setting this option to 0 will cause element() to just return the initial string ("-File:...") unless "-DigFiles" is set to 1.
+
+"-Code"
+Settings: 0|1
+
+Resolve (i.e. execute) a coderef-argument on init (1) or not (0). Default is 1.
+
+If set to 0, element() will just return the initial coderef unless "-DigCode" is set to 1.
+
+
+=item (3) Handling of references by element(), keys(), values() (object's configuration):
+
+"-DigSRefs"
+Settings: 0|1
+
+Resolve scalar references (1) or leave them alone (0). Default is 1.
+
+Note: Chained scalar references will be completely resolved.
+
+"-DigFiles"
+Settings: 0|1
+
+Resolve "-File:..."-type elements (i.e. open file and read it line by line): yes please (1) or don't (0). Default is 1.
+
+"-DigCode"
+Settings: 0|1
+
+Resolve (i.e. execute) a coderef-value (1) or not (0). Default is 1.
+
+"-DigGlobs"
+Settings: 0|1
+
+Resolve glob references (i.e. read from referenced handle) (1) or not (0). Default is 1.
+
+=back
+
+
+=head2 B<6. Details>
+
+=over 2
+
+=item Data types
+
+Iterator handles data of the following types:
+
+- Scalar values: are returned "as is".
+
+- References: get resolved. The common Perl types (Scalar, Array, Hash, Code, Glob) are recognized. REF-type references are handled as simple scalar values.
+
+- FileHandle-objects are handled, i.e. Iterator reads from the referenced handle.
+
+- Additionally Iterator handles a kind of symbolic reference to a file. This is a string of the format:
+
+"-File:path/name.ext"
+
+If Iterator cannot open the referenced file, Iterator will warn() you.
+
+
+=item Self references
+
+An element's value containing a reference pointing to an ancestor will not be resolved. A non-fatal error is generated instead. The current value is returned as undef.
+
+This applies to '-File:...'-type elements as well, if the referenced file - or a file referenced in a file etc. -  contains an entry pointing to an "ancestor file".
+
+If a data path is provided, the referenced element may point to one of it's ancestors. It will be resolved anyway.
+
+=item element()
+
+- How it works
+
+If element reaches the end of a data structure, element() called in a following loop will start again with the first element.
+
+If you bail out of a structure-parsing loop, following calls to element() will resume parsing at the point it was interrupted.
+
+If you don't want this, call reset(). This will reset (sic!) element() to the beginning of the structure.
+
+This works for partial structures (data path provided) as well. You should pass the appropriate data path to reset().
+
+Note: calling several element()-s with different data paths do I<not> interfere.
+
+Same applies to keys() rsp. values(). These won't interfere with element()-s.
+
+
+-Data
+
+element() sets these data fields of its object:
+
+@{$dobj}{'path','val','key','level','vref','ppath','parent'}
+
+Ok. this feature is not very OO-ish, but it allows for getting the results of the last element() call.
+This does I<not> apply if a value was set via element().
+
+- Files
+
+You cannot write to files/handles referenced via "-File:...", \*Glob or FileHandle-objects. See item "Pseudo arrays".
+
+- Autovivification:
+
+If you pass a data path to element(), pointing to an element with an inexisting ancestor(s), no ancestor(s) will be created automagically. This differs from Perl's standard lookup feature.
+
+OTHO, if a value is I<set> via element(), ancestors will be generated as necessary.
+
+=item Levels
+
+element() returns the nesting level of the current element, relative to the current root. The level is counted from 0.
+
+That is, level 0 of the root structure is not identical to level 0 of a substructure, which can reside on any level of the root structure.
+
+Accordingly the option -DigLevel limits digging always to n levels deep from the current root
+
+
+=back
+
+
+=over 2
+
+=item Data paths, format
+
+You can pass data paths to element(), keys() and values() in different formats.
+
+Standard is the Perl-like format for Hashes/Arrays:
+
+ my $path = "{'key1'}{'key2'}[2][1]";
+
+If you are too busy to write all the brackets and braces, this will do ok:
+
+ my $path = 'key1.key2.2.1';
+
+If you choose not to use brackets/braces, hash keys have to contain at least one non-numerical character. Otherwise they will be taken as an array index - and will cause a non-fatal error plus warning.
+
+Additionally you can define an arbitrary delimiter to separate keys/indices - quite useful, if the . occurs within a hash key:
+
+ my $path = "#key1#key2#2#1";
+
+Note:
+
+- If the first character of the path non-alphanumeric, it will be treated as separator. Except for [ and {.
+
+- If the first character is alphanumeric, the . will be used as separator.
+
+- You may combine bracket-/braceless keys/indices "normal" ones: "#key1{key2}[2]#[1]"
+
+- Better avoid using the backslash \ as separator.
+
+- Quoting of hash keys is not mandatory.
+
+=item Handling of Coderefs
+
+Coderefs will be resolved by executing the referenced code. This happens on initialization of the respective element.
+
+Before execution, $SIG{__WARN__} and $SIG{__DIE__} are redirected locally to point to some replacement routine. So, errors generated by the referenced code won't let your script die().
+
+Messages generated by the code's calls to warn() or die() get captured.
+
+The return values of the referenced code are stuffed into a "pseudo array" and return by element() rsp. values() subsequently.
+
+If the first element of the code's results array contains an array named {'__ERR__'}, the code has warn()ed or carp()ed or execution was cancelled by die() or croak().
+
+You can check for the messages' prefix ('WARN : ' or 'FATAL: ') to see what happened.
+
+=item Pseudo arrays
+
+Results of parsing "-FILE:..."- or coderef-elements are retrieved as pseudo arrays.
+
+Pseudo because these do not exist as real arrays - they just look alike. That is, you cannot read/write these "arrays'" elements directly by providing the respective data path.
+
+The reason is, Iterator does not modify the original data structure in any way, and thus does not know/generate a handle/data path that would allow for "direct access".
+
+=back
+
+
+=head2 B<7. Version>
+
+=over 2
+
+=item 0.021 dated from: 30.12.2000
+
+bugfix release:
+
+ - Squashed a bug preventing iteration over array objects
+   if data path is given
+ - Cleaned up some "Use of uninitialized value..."-warnings
+ - Example code corrected
+
+=item 0.02 dated from: 10.12.2000
+
+initial release
+
+=back
+
+
+=head2 B<8. Author>
+
+  Hartmut Camphausen <h.camp@creagen.de>
+  Internet: http://www.creagen.de/
+
+
+=head2 B<9.Copyright>
+
+Copyright (c) 2000 by CREAGEN Computerkram Hartmut Camphausen <h.camp@creagen.de>. All rights reserved.
+
+This module is free software. You can use, redistribute and/or modify it under the same terms as Perl itself.
+
+=cut

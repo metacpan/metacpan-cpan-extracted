@@ -1,0 +1,59 @@
+{
+   "abstract" : "load mauke's favorite modules",
+   "author" : [
+      "Lukas Mai <l.mai@web.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Defaults-Mauke",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Function::Parameters" : "1.06",
+            "bareword::filehandles" : "0",
+            "indirect" : "0.16",
+            "perl" : "5.016000",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mauke/Defaults-Mauke",
+         "web" : "https://github.com/mauke/Defaults-Mauke"
+      }
+   },
+   "version" : "0.10"
+}

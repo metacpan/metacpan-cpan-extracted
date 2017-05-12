@@ -1,0 +1,349 @@
+#!/usr/bin/env perl
+
+use strict ;
+use warnings ;
+use Carp ;
+
+=head1 NAME 
+
+ $>hdr - hexadecimal [decimal] ascii, colorizing, range dump
+
+=head1 USAGE
+
+ $> hdr -r range_definitions file_to_dump
+ 
+ $> hdr file_to_dump -r 'cookie,10,yellow :padding,8 :size,4:data,100' -o ver
+
+The integer part can of a range definition and offset values can be hexadecimal value starting with I<0x>
+
+=head1 RANGE DEFINITION 
+
+                  format                          range example
+		  
+  normal range => integer                         header, 4, bright_blue
+  comment      => #                               data section start, # 
+  extra header => @                               header, @, red 
+  bitfield     => [XInteger][xInteger]bInteger    bitfield, X2x4b4 (offset: X byte, x bit)
+  skip range   => XInteger                        boring, X256,, your comment
+
+=head1 OPTIONS
+
+Options can be given before or after the name of the file to dump.
+
+ range_description|r              file name containing a description
+                                  or a string description formated as:
+			                   'name,size,color:name,size:name,size:...'
+ dump_original_range_description  dump the un-processed range descriptions
+ dump_range_description           dump the processed range descriptions
+
+ offset                           position in the data where to start dumping
+ offset_start                     value added to the offset before display
+ 
+ maximum_size                     amount of data to dump
+ 
+ orientation|o                    'horizontal' or 'vertical'
+ display_column_names|col         display columns names
+ display_ruler|rul                display horizontal ruler
+ format|f                         'ANSI' or 'ASCII' or 'HTML' 
+ display_command_line             make the command line part of the output
+ 
+ color                            'cycle', 'no_cycle', or 'bw'
+ colors                           file containing custom colors
+ start_color                      name of the first random color to use
+ start_tag/end_tag                text that is output before and after the dump
+                                       see L<hdr_examples.pod>
+ 
+ data_width|w                     number of bytes per dump line
+ 
+ offset_format                    'hex' or 'dec' 
+ display_offset                   0 == no the offset display
+ display_cumulative_offset        0 == no cumulative offset display
+ display_zero_size_range          0 == no display of range with size 0
+ display_zero_size_range_warning  0 == no warnings about ranges with size 0
+ display_comment_range            0 == no comment range display 
+ 
+ display_range_name               1 == display of the range name
+ maximum_range_name_size          truncate range name if longer
+ display_range_size               1 == prepend the range size to the name
+ 
+ display_hex_dump                 1 == display hexadecimal dump column
+ display_hexascii_dump            1 == display vombined HEX and ASCII dump column
+ display_dec_dump                 1 == display decimal dump column
+ display_ascii_dump               1 == display ASCII dump column
+ display_user_information         1 == display user information columns
+ maximum_user_information_size    truncate user information if longer
+ 
+ display_bitfields                1 == display bitfields
+ display_source                   1 == display source for bitfields 
+ maximum_bitfield_source_size     truncate bitfield source name if longer
+ 
+ bit_zero_on_left                 1 == bit index zero is on the left
+ 
+ h|help                           display this scripts help page
+ generate_completion_script|bash  generates a completion script on STDOUT
+ 
+
+=head1 EXAMPLES
+
+See L<hdr_examples.pod> in the distribution.
+
+=head1 EXIT STATUS
+
+Non zero if an error occured.
+
+=head1 AUTHOR
+
+  Nadim ibn hamouda el Khemir
+  CPAN ID: NKH
+  mailto: nkh@cpan.org
+
+=cut
+
+#------------------------------------------------------------------------------------------------------------------------
+
+use Getopt::Long ;
+use English qw( -no_match_vars ) ;
+
+use File::Slurp ;
+use IO::Select ;
+
+use Data::HexDump::Range qw() ;
+use Term::Bash::Completion::Generator ;
+
+our $VERSION = '0.05' ;
+
+use Readonly ;
+Readonly my $SIZE_IF_RANGE_ERROR=> 256 ;
+Readonly my $DEFAULT_SIZE => 16 ;
+Readonly my $DEFAULT_USER_INFORMATION_SIZE => 20 ;
+Readonly my $DEFAULT_BITFIELD_SOURCE_SIZE => 8 ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+my @options = 
+	(
+	'range_description|r=s' => \ my $range_description,
+	'dump_range_description|d' =>\my $dump_range_description,
+	'dump_original_range_description' =>\my $dump_original_range_description,
+	
+	'offset=o' =>  \my $offset,
+	'offset_start=o' => \my $offset_start,
+	
+	'maximum_size=o' =>  \my $maximum_size,
+	'orientation|o=s' => \my $orientation,
+	'display_column_names|col' => \my $display_column_names,
+	'display_ruler|rul' => \my $display_ruler,
+
+	'format|f=s' => \my $format,
+	'display_command_line' => \my $display_command_line,
+	
+	'color=s' => \my $color,
+	'colors=s' => \my $color_file,
+	'start_color=s' => \my $start_color,
+	'start_tag=s' => \my $start_tag,
+	'end_tag=s' => \my $end_tag,
+	
+	'data_width=o' =>  \my $data_width,
+
+	'offset_format=s' => \my $offset_format,
+	'display_offset=i' => \my $display_offset,
+	'display_cumulative_offset=i' => \my $display_cumulative_offset,
+	
+	'display_zero_size_range=i' => \my $display_zero_size_range,
+	'display_comment_range=i' => \my $display_comment_range,
+	'display_zero_size_range_warning=i' => \my $display_zero_size_range_warning,
+
+	'display_range_name=i' => \my $display_range_name,
+	'maximum_range_name_size=i' => \my$maximum_range_name_size,
+	'display_range_size=i' => \my $display_range_size,
+
+	'display_hex_dump=i' => \my $display_hex_dump,
+	'display_hexascii_dump=i' => \my $display_hexascii_dump,
+	'display_dec_dump=i' => \my $display_dec_dump,
+	'display_ascii_dump=i' => \my $display_ascii_dump,
+	'display_user_information=i' => \my $display_user_information,
+	'maximum_user_information_size=i' => \my $maximum_user_information_size,
+
+	'display_bitfields=i' => \my $display_bitfields,
+	'display_bitfield_source=i' => \my $display_bitfield_source,
+	'maximum_bitfield_source_size=i' => \my $maximum_bitfield_source_size,
+	
+	'bit_zero_on_left' => \my $bit_zero_on_left,
+
+	'h|help' => \&display_help, 
+	'generate_completion_script|bash' => \my $generatebash_completion,
+	) ;
+
+my @ARGV_COPY = @ARGV ; # getopt removes elements
+
+display_help() unless GetOptions(@options) ;
+
+generate_completion_script(@options) if $generatebash_completion ;
+
+print "\n$start_tag\n\n" if defined $start_tag ;
+
+if($display_command_line)
+	{
+	use Text::Colorizer ;
+	my $c= Text::Colorizer->new(FORMAT => $format || 'ANSI', JOIN => q{ }) ;
+	
+	print $c->color_all('bright_white', 'hdr', grep{! /-output_command_line/xsm} @ARGV_COPY) ;
+	}
+
+my $data ;
+
+my $io_select = IO::Select->new(\*STDIN) ;
+if($io_select->can_read(0))
+	{
+	local $INPUT_RECORD_SEPARATOR = undef ;
+	$data =  <STDIN> ; ## no critic (InputOutput::ProhibitExplicitStdin)
+	}
+else
+	{
+	my $file_to_dump = shift @ARGV ;
+	
+	if(defined $file_to_dump)
+		{
+		$data = read_file  $file_to_dump;
+		}
+	else
+		{
+		croak "Error: You didn't give me anything to generate an hexdump from. Try the --help option.\n";
+		}
+	}
+
+$offset ||= 0 ;
+
+my $range ;
+
+if(defined $range_description )
+	{
+	if($range_description =~ /,/xsm)
+		{
+		$range = $range_description ;
+		}
+	else
+		{
+		# a file
+		#~ $range  = do $range_description || ["hdr: range error $@", $SIZE_IF_RANGE_ERROR ] ;
+		
+		unless ($range  = do $range_description ) 
+			{
+			 if($@)
+				{
+				carp "ERROR: Couldn't parse $range_description:\n\t$@";
+				}
+			elsif(! defined $range)
+				{
+				carp "ERROR: Couldn't do $range_description:\n\t$!"
+				}
+			
+			$range = ["hdr: range error", $SIZE_IF_RANGE_ERROR ] ;
+			}		
+		}
+	}
+else
+	{
+	$range = ['no range definition', length($data) ] ;
+	$display_range_name = 0 ;
+	$display_bitfield_source = 0 ;
+	}
+	
+	
+my @color_file ;
+@color_file = (COLOR_NAMES => $color_file) if(defined $color_file) ;
+
+my $hdr = Data::HexDump::Range->new
+			(
+			INTERACTION => {WARN => sub {warn @_}}, ## no critic (ErrorHandling::RequireCarping)
+			
+			ORIENTATION => $orientation || 'horizontal',
+			DISPLAY_COLUMN_NAMES => defined $display_column_names ? $display_column_names : 0,
+			DISPLAY_RULER => defined $display_ruler ? $display_ruler : 0,
+			
+			FORMAT => $format || 'ANSI',
+			COLOR => defined $color ? $color : 'cycle',
+			START_COLOR => $start_color,
+			
+			OFFSET_FORMAT => $offset_format || 'hex',
+			OFFSET_START => $offset_start || 0,
+			
+			DATA_WIDTH => $data_width || $DEFAULT_SIZE,
+			
+			DISPLAY_RANGE_NAME => defined $display_range_name ? $display_range_name : 1 ,
+			DUMP_RANGE_DESCRIPTION => defined $dump_range_description ? $dump_range_description : 0 ,
+			DUMP_ORIGINAL_RANGE_DESCRIPTION => defined $dump_original_range_description ? $dump_original_range_description : 0 ,
+
+			MAXIMUM_RANGE_NAME_SIZE => defined $maximum_range_name_size ? $maximum_range_name_size : $DEFAULT_SIZE,
+			DISPLAY_RANGE_SIZE => defined $display_range_size ? $display_range_size : 0,
+			
+			DISPLAY_OFFSET  => defined $display_offset ? $display_offset : 1 ,
+			DISPLAY_CUMULATIVE_OFFSET  => defined $display_cumulative_offset ? $display_cumulative_offset : 1 ,
+			DISPLAY_HEX_DUMP => defined $display_hex_dump ? $display_hex_dump : 1,
+			DISPLAY_HEXASCII_DUMP => defined $display_hexascii_dump ? $display_hexascii_dump : 0,
+			DISPLAY_DEC_DUMP => defined $display_dec_dump ? $display_dec_dump : 0,
+			DISPLAY_ASCII_DUMP => defined $display_ascii_dump ? $display_ascii_dump :  1 ,
+			DISPLAY_USER_INFORMATION => defined $display_user_information ? $display_user_information :  0 ,
+			MAXIMUM_USER_INFORMATION_SIZE => defined $maximum_user_information_size ? $maximum_user_information_size : $DEFAULT_USER_INFORMATION_SIZE,
+		
+			DISPLAY_ZERO_SIZE_RANGE => defined $display_zero_size_range ? $display_zero_size_range : 1,
+			DISPLAY_ZERO_SIZE_RANGE_WARNING => defined  $display_zero_size_range_warning ? $display_zero_size_range_warning : 1,
+			DISPLAY_COMMENT_RANGE => defined  $display_comment_range ? $display_comment_range : 1,
+			
+			DISPLAY_BITFIELDS => $display_bitfields,
+			DISPLAY_BITFIELD_SOURCE => defined $display_bitfield_source ? $display_bitfield_source : 1,
+			MAXIMUM_BITFIELD_SOURCE_SIZE => defined $maximum_bitfield_source_size ? $maximum_bitfield_source_size: $DEFAULT_BITFIELD_SOURCE_SIZE,
+			
+			BIT_ZERO_ON_LEFT =>  defined $bit_zero_on_left ? $bit_zero_on_left : 0,
+			@color_file
+			) ;
+
+print $hdr->dump( $range, $data, $offset, $maximum_size) ;
+
+print "\n$end_tag\n\n" if defined $end_tag ;
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub display_help
+{
+
+#~ =head2 display_help()
+
+#~ I<Arguments> - None
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1>
+
+#~ =cut
+
+my ($this_script) = ($PROGRAM_NAME =~m/(.*)/sxm ) ;
+
+print {*STDERR} `perldoc $this_script`  or croak 'Error: Can\'t display help!' ; ## no critic (InputOutput::ProhibitBacktickOperators)
+exit(1) ;
+}
+
+#------------------------------------------------------------------------------------------------------------------------
+
+sub generate_completion_script
+{
+#~ =head2 generate_completion_script(@definitions)
+
+#~ I<Arguments> - @definitions - getop options description
+
+#~ I<Returns> - Nothing
+
+#~ I<Exceptions> - exits with status code B<1> after emitting the completion script on stdout
+
+#~ =cut
+
+my (@definitions) = @_ ;
+
+my $flip = 0 ;
+my @options = grep {++$flip % 2} @definitions ;
+
+print Term::Bash::Completion::Generator::generate_bash_completion_function('hdr', [@options], undef, 1) ;
+
+exit(0) ;
+}
+

@@ -1,0 +1,22 @@
+Changes
+lib/Dancer/Plugin/Nitesi.pm
+lib/Dancer/Plugin/Nitesi/Business/OnlinePayment.pm
+lib/Dancer/Plugin/Nitesi/Cart/DBI.pm
+lib/Dancer/Plugin/Nitesi/Cart/Session.pm
+lib/Dancer/Plugin/Nitesi/Routes.pm
+lib/Dancer/Plugin/Nitesi/Routes/Cart.pm
+lib/Dancer/Plugin/Nitesi/Routes/Checkout.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/account.t
+t/account_dbi.t
+t/cart.t
+t/cart_dbi.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

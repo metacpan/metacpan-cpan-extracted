@@ -1,0 +1,9 @@
+Build.PL
+Changes
+lib/Digest/ED2K.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/ed2k.t
+LICENSE

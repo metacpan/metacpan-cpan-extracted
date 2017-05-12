@@ -1,0 +1,13 @@
+Changes
+Dialog.pm
+Dialog.pod
+Dialog.xs
+MANIFEST
+Makefile.PL
+README
+test.pl
+typemap
+Dialog/Const.pm
+Dialog/TButton.pm
+Dialog/TInputLine.pm
+Dialog/TLabel.pm

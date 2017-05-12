@@ -1,0 +1,28 @@
+#!/usr/bin/perl -w
+use strict;
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init({ level => $DEBUG, layout => "%F{1}:%L %m%n"});
+
+use Data::Throttler;
+
+#warn "unlinking data.db";
+#unlink "data.db";
+
+my $throttler = Data::Throttler->new(
+    interval  => 120,
+    max_items =>  2,
+    db_file   => "data.db",
+);
+
+$throttler->buckets_rotate();
+print $throttler->buckets_dump();
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "barfoo");
+print $throttler->buckets_dump();
+sleep(3);
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "barfoo");
+print $throttler->buckets_dump();

@@ -1,0 +1,3 @@
+name = "Dancer2-Template-Haml"
+[release]
+pause_config = "/home/theathlete/.pause"

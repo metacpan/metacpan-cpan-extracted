@@ -1,0 +1,285 @@
+NAME
+    WxM2 - Davis Weather Monitor II Station device driver
+
+SYNOPSYS
+      use Device::WxM2;
+
+  Constructor
+      my $ws = new Device::WxM2 ("/dev/ttyS0");
+
+  Destructor
+      undef $ws;
+
+  Archive Retrieval and Logging Functions
+      my @wxArchiveImage = $ws->getArcImg($archivePtr);
+      my @currentWx      = $ws->getSensorImage;
+      my $void           = $ws->archiveCurImage();
+      my $status         = $ws->updateArchiveFromPtr($lastArchivedPtr, $file);
+      my $status         = $ws->batchRetrieveArchives($x, $filename);
+      my $void           = $ws->printRawLogHeader();
+      my $ptr            = $ws->getNewPtr;
+      my $ptr            = $ws->getLastPtr;
+      my $ptr            = $ws->getOldPtr;
+      my $status         = $ws->setLastArcTime($time_in_minutes_since_midnight);
+      my $minutes_since_midnight = $ws->getLastArcTime;
+
+  Individual Access Functions
+      my $outside_temp                       = $ws->getOutsideTemp;
+      my $inside_temp                        = $ws->getInsideTemp;
+      my $dewpoint                           = $ws->getDewPoint;
+      my $wind_speed                         = $ws->getWindSpeed;
+      my $wind_dir                           = $ws->getWindDir;
+      my ($windHi, $hour, $min, $mon, $day)  = $ws->getHiWind;
+      my ($dewHi, $hour, $min, $mon, $day)   = $ws->getHiDewPoint;
+      my ($dewLo, $hour, $min, $mon, $day)   = $ws->getLoDewPoint;
+      my ($wndChLo, $hour, $min, $mon, $day) = $ws->getLoWindChill;
+      my ($temp, $hour, $min, $mon, $day)    = $ws->getHiInsideTemp;
+      my ($temp, $hour, $min, $mon, $day)    = $ws->getLoInsideTemp;
+      my ($temp, $hour, $min, $mon, $day)    = $ws->getHiOutsideTemp;
+      my ($temp, $hour, $min, $mon, $day)    = $ws->getLoOutsideTemp;
+      my ($hum, $hour, $min, $mon, $day)     = $ws->getHiInsideHumidity;
+      my ($hum, $hour, $min, $mon, $day)     = $ws->getLoInsideHumidity;
+      my ($hum, $hour, $min, $mon, $day)     = $ws->getHiOutsideHumidity;
+      my ($hum, $hour, $min, $mon, $day)     = $ws->getLoOutsideHumidity;
+
+      my $rainfall_float           = $ws->getYearlyRain;
+      my $rainfall_float           = $ws->getDailyRain;
+      my $bp_float                 = $ws->getBarometricPressure;
+      my $value                    = $ws->getBaroCal;
+      my ($hour, $minute, $second) = $ws->getTime;
+      my ($month, $day)            = $ws->getDate;
+
+      my $status = $ws->setTime($hour_24_format, $min);
+      my $status = $ws->clearHiWind;
+      my $status = $ws->clearHiDewPoint;
+      my $status = $ws->clearLoDewPoint;
+      my $status = $ws->clearLoWindChill;
+      my $status = $ws->clearHiLoOutTemp;
+      my $status = $ws->clearHiLoInTemp;
+      my $status = $ws->clearHiLoOutHum;
+      my $status = $ws->clearHiLoInHum;
+      my $status = $ws->clearDailyRain;
+      my $status = $ws->clearYearlyRain;
+
+  Configuration Functions
+      my $void     = $ws->setArchiveLogFilename($filename);
+      my $filename = $ws->getArchiveLogFilename();
+      my $void     = $ws->setStationDescription("text");
+      my $string   = $ws->getStationDescription();
+      my $void     = $ws->setSerialPortReadTime($timeout_value_in_milliseconds);
+      my $void     = $ws->configPort();
+      my $timeout_value_in_milliseconds = $ws->getSerialPortReadTime();
+      my $status   = $ws->setArchivePeriod($time_in_minutes);
+      my $time_in_minutes  = $ws->getArchivePeriod();
+      my $status   = $ws->setLastArcTime($time_in_minutes);
+      my $time_in_minutes  = $ws->getLastArcTime();
+
+DESCRIPTION
+  Installation
+    This driver depends on the Device::SerialPort Perl driver found on CPAN.
+    You must install it somewhere on the @INC list, so that wxm2.pm can call
+    it with 'use'. The standard CPAN install works fine.
+
+    To install WxM2, use:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+    For all the regression tests to pass, your Davis Weather Monitor II must
+    be operating and connected to your computer's serial port. The test will
+    query you for the name of the serial port. It will also ask if you
+    weather station is operating and connected. If it is not, the regression
+    test will skip 5 of the 8 tests. You can re-run the regression test at
+    any time with either:
+
+        make test
+
+        OR
+
+        perl -w test.pl
+
+  Setup
+    To use the WxM2 driver, simply create a class object with 'new', ie.
+
+       $ws = new Device::WxM2("/dev/ttyS0");
+
+    The only parameter to &new is the port to which your weather station is
+    connected. The constructor initializes all the class variables and
+    configures the Device::SerialPort parameters for the Davis Weather
+    Station.
+
+    Note: I found that I had to fiddle with a parameter in the SerialPort,
+    called 'read_const_time', which is like a timeout value when waiting for
+    read data. I found that the value needed to be increased significantly
+    for the WxM2. I use 5000 (units are milliseconds) and this is the
+    default setting in this package. Should you need to change it, use
+    &setSerialPortReadTime(time_in_millseconds). Then call &configPort,
+    which puts the new setting into effect.
+
+    If you want to change to archive period, use &setArchivePeriod and
+    &getArchivePeriod. Just remember that if you screw up the values, you
+    station's archive will behave strangely until you fix it.
+
+    Use &getLastArcTime and &setLastArcTime to establish the time at which
+    the archives are captured into the weather station's archive memory.
+
+  Individual Access Functions
+    There are a bunch of individual functions that retrieve one weather
+    value from the weather station, such as b<&getOutsideTemp>. These are
+    fairly self-explanatory.
+
+  Archive Retrieval and Logging Functions
+    There are 2 primary archive retrieval functions:
+
+      &getArcImg       - get Archive Image
+      &getSensorImage  - get the "live" sensor data image
+
+    &getArcImg retrieves the archive image at the address given to it as a
+    parameter. To retrieve the most recent archived image, use this:
+
+      my $lastPtr = $ws->getLastPtr;
+      my @archiveData = $ws->getArcImg($lastPtr);
+
+    &getArcImg takes the archive data, reformats it where necessary, stores
+    the results in class variables, and returns an array of the data.
+
+            @array= ($avgInsideTempInArchivePeriod, 
+                     $averageOutsideTempInArchivePeriod, 
+                     $outsideTempMaximumInPeriod, 
+                     $outsideTempMinimumInPeriod, 
+                     $barometricPressure,
+                     $avgWindSpeedInPeriod, 
+                     $avgWindDirInPeriod, 
+                     $maxWindGustInPeriod, 
+                     $rainInPeriod, 
+                     $insideHumidity,
+                     $outsideHumidity, 
+                     $monthOfSample, 
+                     $dayOfSample, 
+                     $hourOfSample, 
+                     $minuteOfSample, 
+                     $outsideTempHumIndex, 
+                     $outsideTempHumIndexMaximum,
+                     $avgWindChill, 
+                     $windChillMinimum);
+
+    &getSensorImage enables a continuous streaming of "live" weather data
+    from the Davis Wx Station. I've found this stream to be very easy to get
+    out of sync, so this funcion reads a single block, stops the streaming,
+    and flushes the serial receive buffer. The data returned by this
+    function are the current values and not average values within a sample
+    period, like &getArcImg returns. The array returned is as follows:
+
+        @array = ($insideTemp, 
+                  $outsideTemp, 
+                  $windSpeed, 
+                  $windDirection, 
+                  $barometricPressure, 
+                  $insideHumidity, 
+                  $outsideHumidity, 
+                  $totalRainfallToday); 
+
+    There are 4 configuration functions for logging the archive data:
+
+      &setArchiveLogFilename  - set the name of the log file to write
+                                archive data
+      &getArchiveLogFilename  - returns the name of the log file
+      &setStationDescription  - sets the station description text (used by
+                                &printRawLogHeader)
+      &getStationDescription  - returns the station description string
+
+    Use &setArchiveLogFilename to set the log file name. It is used by all
+    logging function calls in the class.
+
+    There are two logging functions:
+
+      &archiveCurImage   - Writes the periodic data samples to a file
+      &printRawLogHeader - Prints Header for the periodic samples log file
+
+    &archiveCurImage writes the data samples held in the class variables to
+    a filename passed in as its only parameter. For example,
+
+      $ws->archiveCurImage();
+
+    will write the data samples as 1 line of data in the file
+    &getArchiveLogFilename.
+
+    &printRawLogHeader writes a header for the data samples into the
+    filename in &getArchiveLogFilename. The second line of the header for
+    your weather station description. Set it with
+    &setStationDescription("description"). Typically it contains the name
+    and location of the weather station.
+
+    The function &batchRetrieveArchives is handy for retrieving multiple
+    archived images from the WxM2's archive memory. I use it primarily after
+    an extended power outage, but there are lots of other reasons to use it.
+    Us is at follows:
+
+      $ws->batchRetrieveArchives($number, $filename);
+
+    where $number is the number of archives to retrieve starting with the
+    most recent and counting back. And $filename is the string for the file
+    to write all the archive to.
+
+    The function &updateArchiveFromPtr is a low-level function that
+    retrieves archives from an initial pointer value. &batchRetrieveArchives
+    is a user-friendly front-end for this funtion. In most all cases
+    &batchRetrieveArchives should be used. Just in case, you can use
+    &updateArchiveFromPtr as follows:
+
+      $ws->updateArchiveFromPtr($lastArchivePtr, $file);
+
+    where $lastArchivePtr is the address of the last archive image that you
+    read. &updateArchiveFromPtr will call &getArcImg and &archiveCurImage
+    for each address between $lastArchivePtr and the currently active
+    archive image. It will NOT return the image at $lastArchivePtr or the
+    currently active image, only the ones in between. $file is a filename in
+    which all the output will be written.
+
+KNOWN LIMITATIONS AND BUGS
+    This driver is primarily for archive retrieval, so things like alarm
+    functions on the WxM2 are not implemented.
+
+    &getSensorImage data tends to get out of sync or overflow the receive
+    buffer, so it currently terminates the intended nearly infinite stream
+    of data after 1 complete block.
+
+HISTORY / CHANGES
+    Version 1.03 - added getInsideTemp, getWindSpeed, getWindDir, and
+    getBarometricPressure functions. Fixed barometer calibration bug.
+
+    Version 1.02 - added barometer calibration and bug fix in
+    batchRetrieveArchives.
+
+    Version 1.00 is the first public version. I have been using it for about
+    2 years, and it seems stable.
+
+AUTHOR
+    Mark Mabry: mmabry@cpan.org
+
+  NOTE
+    If you use, or even try out, this software, please drop me a short email
+    at mmabry@cpan.org, to let me know that others are using it.
+
+SEE ALSO
+    Device::SerialPort
+
+ACKNOWLEDGEMENTS
+    Thanks to Davis Instruments for publishing the reference specifications
+    needed to access the Weather Monitor II.
+
+    Chris Snell added the getInsideTemp, getWindSpeed, and getWindDir
+    functions.
+
+    Wayne Hahn fixed a bug in a pack call that popped up in Perl 5.8. He
+    also added a sleep 1 to getSensorImage command to get it to run
+    smoothly.
+
+COPYRIGHT
+    Copyright (C) 2003, 2004 Mark Mabry. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU public license.
+

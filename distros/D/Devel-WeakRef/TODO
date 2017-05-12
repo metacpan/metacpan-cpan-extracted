@@ -1,0 +1,15 @@
+-*- Outline -*-
+
+* Better stuff
+Weak-referring arrays. Proxying weak refs.
+
+* Related things
+Example cachers and whatnot.
+
+* Tests
+
+** Tilde-magic
+Confirm interaction with other tilde-magic users. Perhaps the tilde-magic
+should be pushed onto the end of the magic chain to reduce the chance of
+conflict; or perhaps that would just obscure the problem more. But sv_magic is
+probably unsafe.

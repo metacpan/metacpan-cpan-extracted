@@ -1,0 +1,126 @@
+
+The 4.0 release addresses several lingering concerns I've had with the
+interface but didn't now how to address until now. Here's a summary of
+the parts of the interface that now have updated alternatives. The old
+syntax will still work. 
+
+* Using 'validator_packages' re-invents module loading and importing. 
+  'constraint_methods' can be loaded normally:
+    use My::Constraints qw(my_constraint);
+
+* Custom constraint_methods don't need to be named "valid_" or "match_".
+
+* Passing parameters to constraints was awkward. It looked like this:
+
+  my_field => {
+ 		constraint => 'my_constraint',
+		params => [\'string',\'bling'],
+  }
+
+  constraint_methods allows normal looking parameter passing:
+
+  my_field => FV_length_between(10,20);
+
+* Using a 'constraint_method' as a hash was awkward, because you had  
+  to use a hashref to pass it in:
+
+  constraints =>
+	  my_date_field => {
+			constraint_method => 'date_and_time'
+	  }
+  }
+
+  Now these kinds of constraints can be used with less effort with the
+  'constraint_methods' profile key:
+
+  constraint_methods => {
+	 my_date_field => 'date_and_time',
+  }
+  
+  All of the built-in constraints have been updated to support this alternate
+  interface in which constraint subroutines actually look and work like normal
+  subroutines. 
+
+  Where there is no need to convert old code, here is an example difference of
+  using a built-in constraint with the new syntax:
+
+  BEFORE:
+  
+   constraints => {
+   	my_email => 'email',
+   }
+  
+  AFTER:
+  
+   constraint_methods => {
+  	my_email => email(), 
+   }
+  
+  As well, the Regexp::Common support has been improved so that you can
+  call these routines through the normal subroutine interface provided,
+  and DFV will keep track of the name of the constraint for later use
+  in the 'msgs' error message system. 
+  
+  BEFORE: 
+  
+    constraints => {
+        my_ip => {
+                constraint => 'RE_net_IPv4',
+                params => [ \'-sep'=> \' ' ],
+        },
+    }
+  
+  AFTER: 
+  
+    constraint_methods => {
+        my_ip =>  FV_net_IPv4Z('-sep'=> ' ');
+    }
+
+  The 'filter' code has not yet been updated. It has been less of an issue
+  since I've never seen a filter that took parameters. If someone wants to work
+  on this update, feel free.
+
+* Writing your own constraints is easier. This is where the secret lies for
+  making all of these improvements possible.
+
+  Here are the fundamental problems that had to be solved: When declaring a
+  constraint, you are really declaring a function that needs to be called, but
+  you can't actually call the function then, because you don't have the value
+  to validate yet, or the DFV object, or the other data which you might want to
+  refer to. However, you might have /some/ parameters you want to provide, such
+  as minimum and maximum value on a coolness() constraint you've written.
+
+  The solution? Closures. This is the concept that took me years to understand
+  the value of. The subroutine called in the profile will take the parameters
+  that you know at that time. It then returns a customized anonymous subroutine.
+  When this is called, it will have everything that's needed to complete job.
+  Let's look at an example.
+
+  sub coolness {
+ 	my ($min_cool,$max_cool) = @_; 
+	return sub {
+		my $dfv = shift;
+
+		# Name it to refer to in the 'msgs' system.
+		$dfv->name_this('coolness');
+
+		my $val = $dfv->get_current_constraint_value();
+
+		return ( ($val >= $min_cool) && ($val <= $max_cool) );
+	}
+  }
+
+  Getting this far leaves one wrinkle left to work out. How can we refer to values of other 
+  fields that have been submitted? 
+
+  This is partly solved by the C<$dfv->get_input_data()> method that lets you get at the hash
+  of input data from within the constraint method. 
+
+  The following is recommended (but not required) for refering to other fields. 
+  I suggest making the final parameter a hashref that names a 'fields' arrayref.
+  Like this:
+
+   coolness(1,10,{fields => [qw/personality smarts good_looks/]});
+
+  This would indicate that you are going to use the values of these three
+  fields as factors in your C<coolness()> constraint method. 

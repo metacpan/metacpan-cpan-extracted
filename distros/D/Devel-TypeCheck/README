@@ -1,0 +1,34 @@
+Devel-TypeCheck v0.01
+
+The TypeCheck program uses static analysis to infer types for
+expressions and variables.  An error is reported if the type use is
+inconsistent.  For instance, it will report when a reference is used
+where a string or number is expected, and vice versa.
+
+This program relies on the B compiler back end (which is included with
+Perl).  It has only been tested with Perl 5.8.1.
+
+To run, invoke as one would normally do with a compiler back end
+module.  The following example type checks the main block of
+PROGRAM.pl and prints out the operand tree while it runs:
+
+perl -MO=TypeCheck,-main,-verbose PROGRAM.pl
+
+For more information, see Devel::TypeCheck(3).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Gary Jackson
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

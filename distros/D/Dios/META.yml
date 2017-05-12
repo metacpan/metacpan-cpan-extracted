@@ -1,0 +1,32 @@
+---
+abstract: 'Declarative Inside-Out Syntax'
+author:
+  - 'Damian Conway <DCONWAY@CPAN.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dios
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Const::Fast: '0'
+  Data::Alias: '0'
+  Data::Dump: '0'
+  Keyword::Declare: '0'
+  Object::InsideOut: '0'
+  Sub::Uplevel: '0.24'
+  Variable::Magic: '0.59'
+  perl: '5.014'
+version: '0.001001'

@@ -1,0 +1,543 @@
+NAME
+    DBIx::SQLEngine::Docs::Changes - Revision history for DBIx::SQLEngine.
+
+HISTORY
+  Version 0.93
+
+    2004-11-?? Released as DBIx-SQLEngine-0.93.
+
+    2004-11-29 Rearranged some documentation in top-level module's POD.
+
+    2004-11-29 Removed test config logic from Makefile and adjusted flow of
+    test.pl and test_cfg.pl.
+
+    2004-11-29 Fixed case-insensitive matching of "from" in sql_limit of
+    several drivers; thanks to Michael Kroll for pointing out the issue.
+
+  Version 0.92
+
+    2004-11-28 Released as DBIx-SQLEngine-0.92.
+
+    2004-11-21 Added incomplete implementation of RecordSet::NextPrev class.
+
+    2004-11-21 Moved table-specific Record code into new Record::Table
+    class.
+
+    2004-11-21 Sketched out interface for a new Record::PKey object.
+
+    2004-11-16 Modified Record class factory to use new Class::MixinFactory
+    distribution.
+
+    2004-11-16 Eliminated unnecessary extra level in Record namespace for
+    mixins.
+
+    2004-11-16 Moved Record::Set to a new RecordSet namespace to allow new
+    mixins.
+
+    2004-11-16 Fixed SQLite definition for sequential fields, thanks to Ron
+    Savage.
+
+    2004-11-13 Adjusted Related.pod docs for Rosetta based on email from
+    Darren Duncan.
+
+    2004-11-13 Fixed test.config.pl to not die when run for the first time.
+
+  Version 0.91
+
+    2004-11-12 Released as DBIx-SQLEngine-0.91.
+
+    2004-11-12 Replaced compile-time @MIXINS in Record hierarchy with
+    run-time NEXT method.
+
+    2004-11-12 Ran coverage tests and added test cases and documentation for
+    missing items. We're now at over 90% for POD coverage, but still under
+    60% overall.
+
+    2004-11-12 Changed test_core/examplep.t to case-insensitive regex to
+    compensate for case mangling on VMS file system, thanks to pitch from
+    Peter (Stig) Edwards.
+
+    2004-11-09 Additional work on driver tests.
+
+    2004-11-09 Bumped up version number in preparation for a 1.0 release
+    soon.
+
+    2004-11-08 Moved common behaviors of CSV and AnyData drivers to new
+    shared trait named PerlDBLib. Added driver class for XBase.
+
+    2004-11-08 Additional work on test scripts.
+
+    2004-11-06 Added test.pl and reorganized test scripts for better driver
+    testing.
+
+    2004-11-06 Reorganized ReadMe.pod and clipped credits from end of
+    SQLEngine.pod. Other minor documentation cleanups.
+
+    2004-10-08 Fixed problem with define_named_connections and array
+    reference reported via CPAN RT ticket 7464.
+
+    2004-06-06 Applied Driver::Oracle patch from Michael Kroll that should
+    improve optimization of queries with rownum limits.
+
+  Version 0.028
+
+    2004-04-19 Released as DBIx-SQLEngine-0.028.
+
+    2004-04-19 Fixed file missing from manifest which made 027 totally
+    broken.
+
+  Version 0.027
+
+    2004-04-19 Released as DBIx-SQLEngine-0.027.
+
+    2004-04-19 Moved Driver docs and Default code to a separate Driver
+    module.
+
+    2004-04-18 Documentation tweaks, including labeling methods public or
+    internal.
+
+  Version 0.026
+
+    2004-04-16 Released as DBIx-SQLEngine-0.026.
+
+    2004-04-15 Added subclasses to Driver::Mysql for various versions.
+
+    2004-04-15 Added Driver::Sybase and Driver::Sybase::MSSQL.
+
+    2004-04-15 Added Driver::Trait::DatabaseFlavors,
+    Driver::Trait::NoPlaceholders.
+
+    2004-04-15 Minor bits of documentation cleanup.
+
+    2004-04-14 Fixed missing import of clone_with_parameters for
+    interpret_named_connection(); thanks to Ron Savage for the bug report.
+
+    2004-04-14 Documentation fixes in Record::Trait::Cache POD.
+
+    2004-04-14 Added new makefile targets for development convenience; the
+    following are now all supported:
+
+      make everything    - clean build with testsuite 
+      make again         - rebuilds Makefile and blib
+  
+      make cleandist     - clean build with manifest, docs, and dist 
+      make cleanmanifest - rebuilds MANIFEST
+      make docs          - runs pod2text on SQLEngine/Docs/*.pod files
+  
+      make compile       - makes sure that all of the modules compile
+      make testsuite     - runs tests against multiple data sources
+      make t/*.t         - runs whichever test scripts you name
+      make cover         - runs testsuite under Devel::Cover with report
+
+  Version 0.025
+
+    2004-04-14 Released as DBIx-SQLEngine-0.025.
+
+    2004-04-14 Fixed undocumented (and un-necessary) dependency on
+    String::Escape in Record::Trait::Cache which was causing a test failure.
+    Thanks to the folks running automated cpan smokers, which caught this a
+    few hours after I posted it.
+
+  Version 0.024
+
+    2004-04-14 Released as DBIx-SQLEngine-0.024.
+
+    2004-04-13 Fixed support for literal SQL in Schema::Table,
+    Record::Trait::Cache.
+
+    2004-04-13 Added a few more methods to Record::Trait::Extras for
+    compatibility with older DBO classes.
+
+    2004-04-11 Fixed a few problems in Record::Trait::Cache and
+    Cache::TrivialCache. Added initial test script for record caching.
+
+  Version 0.023
+
+    2004-04-10 Released as DBIx-SQLEngine-0.023.
+
+    2004-04-10 Added feature matrix to Docs::Related. Added
+    Docs::Comparison.
+
+    2004-04-10 Fixed test crasher in visit_select for
+    Driver::Trait::NoUnions.
+
+  Version 0.022
+
+    2004-04-09 Released as DBIx-SQLEngine-0.022.
+
+    2004-04-09 Merged many methods from DBIx::DBO2::RecordSet into
+    Record::Set.
+
+    2004-04-09 Added Record::Trait::Accessors and increased the minimum
+    version of Class::MakeMethods to 1.006 to get the Autoload interface it
+    uses.
+
+    2004-04-09 Added Record::Trait::Cached based on
+    DBIx::DBO2::Record::Cached. Added cache packages
+    DBIx::SQLEngine::Cache::TrivialCache and
+    DBIx::SQLEngine::Cache::BasicCache.
+
+    2004-04-09 Added Record::Trait::Hooks based on DBIx::DBO2::Record and
+    built a few tests.
+
+    2004-04-09 Initial working support for multiply-combinable Record class
+    traits. Moved traits into nested namespaces Driver::Trait and
+    Record::Trait.
+
+    2004-04-09 Revised synopsis and description to include more recent
+    features.
+
+    2004-04-09 Added support for sql_select( columns =>
+    \%colnames_as_aliases ) and sql_select( tables => { "table1.column1" =>
+    "table2.column2" } ), both inspired by the interface described in the
+    Sql::Simple documentation.
+
+    2004-04-08 Fixed tight loop detection (self-reference) in
+    CloneWithParameters.
+
+    2004-04-06 Beginning support for multiply-combinable Record class
+    traits.
+
+  Version 0.021
+
+    2004-04-05 Released as DBIx-SQLEngine-0.021.
+
+    2004-04-05 Doc adjustments. Additional work on Record classes.
+
+  Version 0.020
+
+    2004-04-05 Released as DBIx-SQLEngine-0.020.
+
+    2004-04-05 Added initial Row classes.
+
+    2004-04-04 Added named_connection interface.
+
+    2004-04-04 Migrated clone function to new Utility::CloneWithParams
+    package. Generalized string substitution. Added more tests and
+    documentation.
+
+    2004-04-04 Renamed Mixin::* packages to DriverTrait::*.
+
+    2004-04-04 Added "where" as a synonym for "criteria" in sql_* methods
+    and changed documentation to use it instead. Added "distinct" support to
+    sql_select.
+
+  Version 0.019
+
+    2004-04-04 Released as DBIx-SQLEngine-0.019.
+
+    2004-04-03 Added initial support for constructing complex joins and
+    Mixin::NoComplexJoins to provide emulation for the simplest inside
+    joins.
+
+    2004-04-03 Added Mixin::NoUnions to provide emulation of unions where
+    needed.
+
+    2004-04-02 Added initial support for selects with unions.
+
+  Version 0.018
+
+    2004-03-30 Released as DBIx-SQLEngine-0.018.
+
+    2004-03-30 Fixed sequential type in Driver::SQLite to say "integer" not
+    "int".
+
+    2004-03-30 Removed driver for DBD::File, which isn't intended to be used
+    directly.
+
+    2004-03-30 Changed Criteria::HashGroup to asciibetically sort the hash
+    keys, so that criteria are predictable for testing and better statement
+    handle caching.
+
+    2004-03-26 Fixed Mixin::SeqTable's seq_fetch_current, which returned
+    undef due to scope confusion with return inside an eval block.
+
+    2004-03-26 Minor cleanup to Schema::Table to improve documentation.
+
+    2004-03-26 Fixed Schema::Column's new_from_hash() and type() methods.
+
+  Version 0.017
+
+    2004-03-26 Released as DBIx-SQLEngine-0.017.
+
+    2004-03-26 Fixed parens in Oracle's sql_limit, with apologies to Michael
+    Kroll.
+
+    2004-03-25 Brough Schema::Table up to workable condition and added basic
+    tests.
+
+    2004-03-25 Added simple last_query method to NullP for faster testing.
+
+    2004-03-23 Added fetch_select_rows() and visit_select_rows().
+
+    2004-03-23 Re-ordered a few chunks of code so that the POD pages are
+    clearer.
+
+  Version 0.016
+
+    2004-03-23 Released as DBIx-SQLEngine-0.016.
+
+    2004-03-23 Fixed files missing from manifest.
+
+  Version 0.015
+
+    2004-03-22 Released as DBIx-SQLEngine-0.015.
+
+    2004-03-22 Added some database capability methods inspired by
+    DBIx::Compat.
+
+    2004-03-22 Added create_ and drop_index methods inspired by
+    DBIx::Renderer.
+
+    2004-03-22 Added create_ and drop_database methods inspired by
+    DBIx::DataSource.
+
+    2004-03-22 Removed do_ prefix from create_ and drop_table methods, with
+    aliases for backwards compatibility.
+
+    2004-03-22 Added initial interface for DBMS stored procedures.
+
+    2004-03-22 Added NullP subclass and null.t test with basic SQL
+    generation and named query tests.
+
+    2004-03-22 Added named_query interface to support libraries of named
+    queries.
+
+    2004-03-22 Added visit_sql_rows.
+
+    2004-03-22 Applied patch to Driver::Oracle's sql_limit() from Michael
+    Kroll.
+
+    2004-03-22 Incorporated support for mixing explicit SQL and additional
+    criteria by having sql_where() splice them together, based on a patch
+    from Michael Kroll.
+
+  Version 0.014
+
+    2004-03-14 Released as DBIx-SQLEngine-0.014.
+
+    2004-03-13 Fixed spacing problem for long column names in
+    sql_create_columns, curtesy of a patch from Ron Savage.
+
+    2004-03-13 Ported schema classes from DBO2 to DBIx::SQLEngine::Schema
+    namespace. These are not yet in use, but will be supported through
+    additions to the SQLEngine interface in upcoming versions in a way that
+    should not break any existing code.
+
+  Version 0.013
+
+    2004-03-12 Released as DBIx-SQLEngine-0.013.
+
+    2004-03-12 Fixed another minor POD error.
+
+  Version 0.012
+
+    2004-03-11 Released as DBIx-SQLEngine-0.012.
+
+    2004-03-11 Fixed several minor POD errors. Adjusted checking of
+    wantarray to preserve its value across eval{} boudaries.
+
+  Version 0.011
+
+    2004-03-10 Released as DBIx-SQLEngine-0.011.
+
+    2004-03-10 Moved driver-specific subclasses to a new Driver:: namespace
+    and added documentation to each of them. The external public interface
+    is identical, but this may break naughty code that checked ref() or
+    isa(); however the fix is straightforward and this keeps our namespaces
+    clearer. If your code was negatively impacted by this, let me know for
+    future reference!
+
+    2004-02-24 Integrated some patches from Michael Kroll, including new
+    Oracle subclass, and created a new Criteria::StringComparison class as
+    an alternate way of addressing an issue raised in email.
+
+  Version 0.010
+
+    2003-09-07 Released as DBIx-SQLEngine-0.010.
+
+  Version 0.009
+
+    2003-02-02 Released as DBIx-SQLEngine-0.009.
+
+    2003-02-02 Merged the "Default" class used by AnyDBD into base class via
+    stash aliasing, simplifying documentation.
+
+  Version 0.008
+
+    2002-11-02 Released as DBIx-SQLEngine-0.008.
+
+    2002-11-02 Added basic subclass for MSSQL.
+
+    2002-11-02 Added "is null" support based on patches from Michael Kroll
+    at University of Innsbruck.
+
+    2002-11-02 Added some introductory documentation to
+    Criteria::Comparison.
+
+    2002-11-02 For compatibility with the CPAN installer and automated
+    testing tools, the Makefile.PL now suggests that you set your
+    environment's DBI_DSN, rather than prompting you to enter it
+    interactively in test.pl.
+
+    2002-11-02 Refactored test script into several separate files.
+
+    2002-11-02 Added initial basic transaction support.
+
+  Version 0.007
+
+    2002-05-24 Minor error-handling improvements.
+
+    2002-05-24 Collect and return the results from visit_* methods.
+
+    2002-05-24 Added DBIx::SQLEngine::Criteria::Not, contributed by
+    Christian Glahn at University of Innsbruck.
+
+    2002-04-10 Added "fetch without execute" to the catch_query_exception
+    handler for MySQL and Pg.
+
+  Version 0.006
+
+    2002-03-23 Released as DBIx-SQLEngine-0.006.
+
+    2002-03-23 Added basic support for passing SQL functions and expressions
+    to SQLEngine::Default and SQLEngine::Critera::Comparison in a way that
+    allows them to be used directly, rather than being treated as literals
+    and bound to placeholders.
+
+    2002-03-01 Fixed syntax errors in MySQL subclass. Fixed suspected
+    Perl-version dependency (return from inside eval) in Default detect_any.
+
+  Version 0.005
+
+    2002-03-01 Released as DBIx-SQLEngine-0.005.
+
+    2002-02-19 Simon: Added Pg catch_query_exception REDO for "out of range
+    0..-1". I don't know what this error means but it always seems to
+    succeed when we retry.
+
+    2002-02-10 Simon: Modified format of error messages in Default.pm
+
+    2002-02-02 Eliminated complaint about empty subclauses in
+    Criteria::Compound
+
+    2002-01-31 Extracted Default sql_* criteria handling into
+    DBIx::SQLEngine::Criteria->auto* methods.
+
+    2002-01-31 Added catch_query_exception to Pg subclass for automatic
+    reconnection.
+
+    2002-01-31 Created new Criteria::LiteralSQL package. Remove redundant
+    parentheses around single-item list in Criteria::Compound.
+
+  Version 0.004
+
+    2002-01-30 Released as DBIx-SQLEngine-0.004.
+
+    2002-01-30 Expanded Pg subclass. Fixed Default's type_info handling to
+    not fall over when a type has multiple info hashes (needed for Pg).
+    Adjusted error handling to call $sth->finish() if there's an exception
+    after we prepare but before we complete retrieving the results.
+
+    2002-01-27 Filled out documentation, especially of the public interface
+    in SQLEngine.pm. Added skeletal Pg subclass.
+
+  Version 0.003
+
+    2002-01-25 Released as DBIx-SQLEngine-0.003
+
+    2002-01-21 Fixed AnyData sql_create_column_text_long_type.
+
+    2002-01-20 Fixed typo in sql_drop_table. Added detect_any and
+    detect_table methods.
+
+    2002-01-15 Improvements to sql_create_table to support primary key
+    declarations. Completed DBIx::SQLEngine::Mixin::SeqTable. Added
+    DBIx::SQLEngine::CSV.
+
+    2002-01-14 Added initial version of DBIx::SQLEngine::Mixin::SeqTable.
+
+    2002-01-14 Fixed bug in test script; user and password were not used!
+    (Bug report from Terrence Brannon.)
+
+  Version 0.002
+
+    2002-01-14 Released as DBIx-SQLEngine-0.002
+
+    2002-01-13 Fixed logging scope errors. Filled in several mising chunks
+    of documentation. Makefile.PL touchups for distribution.
+
+    2001-12-01 Separated from object-relational mapping functionality. Moved
+    to DBIx::SQLEngine namespace.
+
+    2001-11-30 Began adjusting namespace for CPAN distribution. Fixed use of
+    AnyDBD to not require non-standard patch.
+
+  Version 0.001
+
+    2001-06-28 Use DBIx::AnyDBD for platform-specific issues. Moved
+    SQL-generation code from Table to SQLEngine.
+
+    2001-06-28 Ported some Criteria classes from earlier code into the new
+    SQLEngine class hierarchy.
+
+    2001-06-27 New version moved into separate DBIx::DBO2 namespace. Renamed
+    Adaptor to SQLEngine. Flattened class hierarchy; we're only going to
+    support DBI. Expunged old code. Switched to new Class::MakeMethods
+    distribution.
+
+PRIOR VERSIONS
+  DBO
+
+    2001-02-14 Reversed boolean sense of 'nullable' to 'required'.
+
+    2001-01-29 Fixed code to detect length and nullable column information.
+
+    2001-01-29 Added boolean required to store whether column is nullable.
+
+    2001-01-13 Added retry on "Lost connection to MySQL" errors
+
+    2000-12-22 Added new_with_contents constructor to Criteria::Compound.
+
+    2000-12-13 Substantial revisions to record set functionality
+
+    2000-11-29 Switched to use of Class::MethodMaker 2.0 features.
+
+    2000-03-31 Added SQL-string to execution failure.
+
+    2000-03-03 Adjusted clear_connection.
+
+    1999-08-18 Added MySQL tinyint column code
+
+    1999-07-27 Added use of DBO::Column package.
+
+    1999-04-21 Added explicit disconnect if existing connection's ping
+    fails.
+
+    1999-04-05 Added reconnect if can't ping server behaviour; add'l type
+    codes
+
+    1998-12-08 Cleanup of logging.
+
+    1998-12-08 Added parameter handling and on-demand class loading.
+
+    1998-11-01 Changed importing style for Class::MethodMaker.
+
+    1998-10-05 Revised. Rewrote POD.
+
+    1998-05-09 Moved connection behaviour from SQL Table into Adaptor
+    classes.
+
+    1998-03-16 DBAdaptor package (and subpackages) renamed to DBO::Table.
+
+    1997-11-18 Simon: Updated to current practice.
+
+  DBAdaptor
+
+    1997-09-24 IntraNetics97 Version 1.00.000
+
+    1997-08-20 Eric: Extracted DBAdaptor class from prior code.
+
+SEE ALSO
+    the DBIx::SQLEngine::ReadMe manpage
+

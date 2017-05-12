@@ -1,0 +1,7 @@
+Build.PL
+lib/Data/Edit/Xml.pm
+MANIFEST			This list of files
+test.pl
+README
+META.yml
+META.json

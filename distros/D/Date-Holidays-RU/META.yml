@@ -1,0 +1,29 @@
+---
+abstract: 'Determine Russian Federation official holidays and business days.'
+author:
+  - 'Alexander Nalobin <alexander@nalobin.ru>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-RU
+requires:
+  Carp: '0'
+  Exporter: '0'
+  List::Util: '0'
+  Time::Piece: '0'
+  base: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/nalobin/Date-Holidays-RU.git
+version: 1.2017.0

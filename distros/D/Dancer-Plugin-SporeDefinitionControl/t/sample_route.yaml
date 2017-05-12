@@ -1,0 +1,56 @@
+---
+base_url: http://localhost:4500
+version: 0.2
+format:
+  - json
+  - xml
+  - yml
+methods:
+  get_object:
+    required_params:
+      - id
+      - name_object
+    optional_params:
+      - created_at
+    path: /object/:id
+    method: GET
+  create_object:
+    required_params:
+      - name_object
+    optional_params:
+      - created_at
+    path: /object
+    method: POST
+  get_or_create_object:
+    required_params:
+      - name_object
+    optional_params:
+      - created_at
+    path: /object?params_sup=1
+    method: POST
+  update_object:
+    required_params:
+      - id
+      - name_object
+    optional_params:
+      - created_at
+    path: /object/:id
+    method: PUT
+  delete_object:
+    required_params:
+      - id
+      - name_object
+    optional_params:
+      - created_at
+    path: /object/:id
+    method: DELETE
+  create_anotherobject:
+    required_params:
+      - name_object
+    optional_params:
+      - created_at
+    form-data:
+      my_file: ":my_file"
+    path: /anotherobject
+    method: POST
+

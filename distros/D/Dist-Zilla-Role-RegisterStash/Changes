@@ -1,0 +1,12 @@
+Revision history for Dist-Zilla-Role-RegisterStash
+
+0.003     2014-05-14 01:57:34 PDT-0700
+	* add _register_or_retrieve_stash()
+
+0.002     2012-12-30 09:24:24 CST6CDT
+	* specify minimum version of autobox::Core to resolve test failures
+	* remove MX::AS dep; unused
+	* No code changes, only tests
+
+0.001     2012-11-21 21:31:12 PST8PDT
+	* initial release

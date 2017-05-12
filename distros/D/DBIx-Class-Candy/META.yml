@@ -1,0 +1,29 @@
+---
+abstract: 'Sugar for your favorite ORM, DBIx::Class'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Candy
+requires:
+  DBIx::Class: '0.08123'
+  Lingua::EN::Inflect: '0'
+  MRO::Compat: '0.11'
+  String::CamelCase: '0'
+  Sub::Exporter: '0.982'
+  namespace::clean: '0.18'
+resources:
+  bugtracker: https://github.com/frioux/DBIx-Class-Candy/issues
+  homepage: https://github.com/frioux/DBIx-Class-Candy
+  repository: https://github.com/frioux/DBIx-Class-Candy.git
+version: '0.005002'

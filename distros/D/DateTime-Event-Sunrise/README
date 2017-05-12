@@ -1,0 +1,48 @@
+DateTime/Event/Sunrise version 0.0505
+=====================================
+
+This module will return a DateTime Object for sunrise and sunset for a
+given day.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or use your favorite utility: CPAN shell, cpanplus, cpanminus, dist-zilla, etc.
+
+Note: do not be disturbed by warnings "sun never rises" or "sun never sets" during
+"make test". They are nothing more than warnings.
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime.pm
+  DateTime::Set
+  DateTime::Duration
+  DateTime::Span
+  DateTime::SpanSet
+  POSIX
+  Math::Trig
+  Carp
+  Params::Validate
+  Set::Infinite
+  Test::More
+  Test::Exception
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003, 2013, 2015 Ron Hill and Jean Forget
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.16.3. For more details, see the full
+text of the licenses in the LICENSE file.
+
+This program is distributed in the hope that it will be useful, but it
+is provided “as is” and without any express or implied warranties. For
+details, see the full text of the licenses in the file LICENSE.
+
+Based on a public domain C program sunriset.c (c) Paul Schlyter, 1989, 1992

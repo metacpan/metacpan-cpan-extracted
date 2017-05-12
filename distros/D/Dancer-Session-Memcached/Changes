@@ -1,0 +1,17 @@
+Revision history for Dancer-Session-Memcached
+
+0.202   19.10.11
+        * Use Carp::croak instead of die(). (GH #2)
+
+0.201   05.10.11
+        * Call SUPER::init on the beginning, not end.
+
+0.200   03.10.11
+        * Fixing calling SUPER::init so it works with the new objects.
+        * Moving to Dist::Zilla.
+        * Changelog becomes useful. :)
+        * New co-maintainer: Sawyer X. FTW!
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

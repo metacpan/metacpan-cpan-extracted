@@ -1,0 +1,62 @@
+---
+abstract: 'Die hard Dist::Zilla, but save the messages'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Dist::Zilla::Role::Plugin: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  IPC::System::Simple: '0'
+  Path::Tiny: '0.059'
+  Scalar::Util: '0'
+  Software::License::GPL_3::or_later: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::DiagINC: '0.002'
+  Test::Fatal: '0'
+  Test::More: '0'
+  autodie: '0'
+  blib: '1.01'
+  if: '0'
+  lib: '0'
+  perl: '5.006'
+  version: '0.77'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Tester-DieHard
+provides:
+  Dist::Zilla::Tester::DieHard:
+    file: lib/Dist/Zilla/Tester/DieHard.pm
+    version: v0.6.4
+  Dist::Zilla::Tester::DieHard::Builder:
+    file: lib/Dist/Zilla/Tester/DieHard.pm
+    version: v0.6.4
+  Dist::Zilla::Tester::DieHard::Survivor:
+    file: lib/Dist/Zilla/Tester/DieHard.pm
+    version: v0.6.4
+requires:
+  Dist::Zilla::Chrome::Test: '0'
+  Dist::Zilla::Tester: '0'
+  Moose: '0'
+  Sub::Exporter: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Tester-DieHard
+  homepage: https://metacpan.org/release/Dist-Zilla-Tester-DieHard
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Tester-DieHard
+version: v0.6.4
+x_serialization_backend: 'YAML::Tiny version 1.69'

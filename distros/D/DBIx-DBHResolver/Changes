@@ -1,0 +1,52 @@
+Revision history for Perl extension DBIx::DBHResolver
+
+0.17    Mon Oct 22 00:26:28 2012
+        - Upgrade Module::Install (No code changes)
+
+0.13    Wed Sep  1 19:16:22 2010
+        - add resolve, resolve_node_keys methods
+        - add strategy base class
+
+0.12    Tue Aug 31 13:37:30 2010
+        - Support alias handle
+        - Add Key strategy instead of Remainder (deprecated)
+        - Add List, Range strategy
+        - use Config::Any instread of YAML
+        - s/cluster/clusters/, keep cluster method but do not use it.
+        - Enable to execute 'connect_info' non cluster with args
+
+0.11    Mon Aug 23 01:41:51 2010
+        - add test_requires (Test::Exception)
+        - no module changes
+
+0.10    Thu Aug 19 20:07:22 2010
+        - Supports to use as object
+        - Supports custom DBI subclass or similar interface module 
+          and method on connect() and connect_cached() method
+        - Supports scalar args on connect_info for Remainer strategy alias.
+        - Add is_cluster and is_node method
+        - Add dependencies (Try::Tiny, Class::Accessor::Fast)
+
+0.07    Mon Now 30 20:57:00 2009
+        - Reversioned
+
+0.06    Thu Nov 11 13:29:00 2009
+        - disconnect_all depends on DBI->installed_drivers
+        - connect_cached methods is used DBI->connect_cached again
+
+0.05    Thi Nov 11 19:36:11 2009
+        - fixed connect_cached() method is not cached dbh.
+
+0.04    Web Nov 11 14:43:50 2009
+        - dbh is not cached on using connect() method
+
+0.03    Sat Oct 31 22:11:00 2009
+        - change to own dbh cache from using DBI::connect_cached
+        - Add disconnect_all method
+
+0.02    Wed Sep 15 18:50:00 2009
+        - load cluster data and modify yaml format.
+        - pod was wrong.. correct it.
+
+0.01    Thu Aug 13 05:01:13 2009
+        - original version

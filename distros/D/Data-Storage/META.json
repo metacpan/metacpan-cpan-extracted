@@ -1,0 +1,133 @@
+{
+   "abstract" : "Base class for storages",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>",
+      "Florian Helmberger <fh@univie.ac.at>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Storage",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Complex" : 0,
+            "Class::Accessor::Constructor" : 0,
+            "Class::Null" : 0,
+            "DBI" : 0,
+            "Data::Miscellany" : 0,
+            "Error" : 0,
+            "Error::Hierarchy" : 0,
+            "Error::Hierarchy::Internal::DBI" : 0,
+            "Error::Hierarchy::Util" : 0,
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Storage" : {
+         "file" : "lib/Data/Storage.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI" : {
+         "file" : "lib/Data/Storage/DBI.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::Mock" : {
+         "file" : "lib/Data/Storage/DBI/Mock.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::Oracle" : {
+         "file" : "lib/Data/Storage/DBI/Oracle.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::Pg" : {
+         "file" : "lib/Data/Storage/DBI/Pg.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::Result" : {
+         "file" : "lib/Data/Storage/DBI/Result.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::SQLite" : {
+         "file" : "lib/Data/Storage/DBI/SQLite.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBI::Unrealized" : {
+         "file" : "lib/Data/Storage/DBI/Unrealized.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::DBIC" : {
+         "file" : "lib/Data/Storage/DBIC.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Exception" : {
+         "file" : "lib/Data/Storage/Exception.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Exception::Connect" : {
+         "file" : "lib/Data/Storage/Exception/Connect.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Filesystem" : {
+         "file" : "lib/Data/Storage/Filesystem.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Filesystem::Record" : {
+         "file" : "lib/Data/Storage/Filesystem/Record.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Memory" : {
+         "file" : "lib/Data/Storage/Memory.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Mock" : {
+         "file" : "lib/Data/Storage/Mock.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Null" : {
+         "file" : "lib/Data/Storage/Null.pm",
+         "version" : "1.102720"
+      },
+      "Data::Storage::Statement" : {
+         "file" : "lib/Data/Storage/Statement.pm",
+         "version" : "1.102720"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-storage at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Storage"
+      },
+      "homepage" : "http://search.cpan.org/dist/Data-Storage/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Data-Storage"
+      }
+   },
+   "version" : "1.102720"
+}
+

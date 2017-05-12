@@ -1,0 +1,14 @@
+================
+DBM::Any License
+================
+
+This module and all files in this distribution are copyright 
+(c) 2001 Tony Monroe <tmonroe+perl@nog.net>.  All rights reserved.
+
+This module may be redistributed under the same licensing terms as
+Perl itself.
+
+DBM::Any bears NO WARRANTIES WHATSOEVER, express, implied, or
+otherwise.
+
+$Id: LICENSE,v 1.1 2002/07/19 20:41:53 tony Exp $

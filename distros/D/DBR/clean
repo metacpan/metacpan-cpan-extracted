@@ -1,0 +1,2 @@
+#!/bin/sh
+rm -rf Makefile Makefile.old MANIFEST* dbr_test.log t/sandbox/*/ blib pm_to_blib _sandbox example/_sandbox example/dbr_example.log example/generated_dbr.conf

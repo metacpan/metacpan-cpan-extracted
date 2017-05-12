@@ -1,0 +1,25 @@
+Revision history for Perl extension DBIx::Wrapper::VerySimple.
+
+0.051 Wed Nov  1 20:07:47 PST 2006
+    - Fixed some typos and smal improvements to pod.
+
+0.05  Wed Nov  1 09:10:22 PST 2006
+    - Changed namespace from DBI::Wrapper to DBIx::Wrapper::VerySimple
+      First CPAN release.
+
+0.04  Sun Aug 20 12:38:43 PDT 2006
+    - Added Unit Tests
+    - Added aliases fetch_all() and fetch_hash()
+    - Added dbh() method.
+
+0.03  Mon Jan 17 17:28:21 PST 2005
+    - Include  dbh->{errstr} when confessing errors.
+    
+0.02  Wed Oct  1 12:57:08 PDT 2003
+	- Require DBI 1.34 or later
+	- Use  prepare_cached   instead of prepare
+	- Improved perldoc
+
+0.01  Sun Nov  4 09:29:15 2001
+	- original version; created by h2xs 1.21
+

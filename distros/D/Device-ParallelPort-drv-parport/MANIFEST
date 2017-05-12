@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+parport.pm
+parport.xs
+parport.h
+README
+LICENSE
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

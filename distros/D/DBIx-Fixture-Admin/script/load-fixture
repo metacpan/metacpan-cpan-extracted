@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use utf8;
+
+use DBIx::Fixture::Admin;
+use Cwd;
+use File::Spec;
+use DBI;
+
+sub conf {
+    my $cwd  = Cwd::getcwd();
+    my $path = File::Spec->catfile($cwd, '.fixture');
+
+    return do $path;
+}
+
+sub dbh {
+    my $conf = shift;
+    return DBI->connect(
+        @{$conf->{db}},
+    );
+}
+
+sub load {
+    my $conf = shift;
+    my $dbh = dbh($conf);
+
+    my $admin = DBIx::Fixture::Admin->new(
+        conf => $conf,
+        dbh  => $dbh,
+    );
+
+    $admin->load_all();
+}
+
+load(conf());
+
+

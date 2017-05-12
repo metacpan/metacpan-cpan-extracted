@@ -1,0 +1,24 @@
+Revision history for Perl extension Debug::Trace.
+
+0.01  Thu Oct  3 09:14:47 2002
+	- initial version
+
+0.02  Thu Oct  3 11:10:44 2002
+        - Added kit files README, MANIFEST and such.
+	- Added self test program.
+	- Use Data::Dumper to format values.
+	- Send output using warn() bu default.
+	- Implement modifiers: :warn :nowarn
+
+0.03  Fri Oct  4 02:20:00 2002
+        - Add where/from in trace output.
+	- Rework configuring.
+        - More config options: caller stacktrace maxlen.
+	- DD options via config: indent useqq maxdepth quotekeys sortkeys.
+
+0.04  Fri Oct  4 22:01:45 2002
+        - Add tests, update documentation and small fixes for caller,
+	  stacktrace, maxlen.
+
+0.05  Thu Nov  7 2002
+	- Update tests for Carp >= 1.32.

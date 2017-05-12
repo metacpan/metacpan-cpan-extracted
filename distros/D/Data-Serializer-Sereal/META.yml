@@ -1,0 +1,27 @@
+---
+abstract: 'Creates bridge between Data::Serializer and Sereal'
+author:
+  - 'James Rouzier <rouzier@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Serializer-Sereal
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Serializer: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  Test::More: '0'
+resources:
+  repository: https://github.com/rouzier/Data-Serializer-Sereal.git
+version: '1.05'

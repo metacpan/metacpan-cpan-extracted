@@ -1,0 +1,137 @@
+#!/usr/bin/perl -w
+#
+# $Id: DemoDBIxBrowse,v 1.8 2002/04/27 11:21:44 evilio Exp $
+#
+use diagnostics;
+use DBI;
+use CGI qw( :all -no_debug );
+use CGI::Carp qw( fatalsToBrowser );
+use DBIx::Browse::CGI;
+
+use vars qw( $q );
+
+$q   = new CGI;
+
+###################################################
+#
+# Change the following line to your desired DSN
+my $dsn = "DBI:Pg:dbname=dbixbrowse;host=localhost";
+###################################################
+
+my $dbh = DBI->connect($dsn)
+    or croak "Can't connect to database: $@";
+
+
+print
+    $q->header(),
+    $q->start_html(
+		   -title => "Test DBIx::Browse",
+                   -style => {'src'=>'demodbixbrowse.css'}
+		   );
+# Title
+print
+    $q->h2({-align => 'center'},"Test DBIx::Browse" ),
+    $q->p( {-align => 'justify'},
+"This is an example database for DBIx::Browse. You can browse (explore,
+add, delete, update) any record. The tables 'resource' and 'languages' are simple. The third one, 'messages' is related to the other two with a sentence like
+",
+	   $q->pre("SELECT * FROM message, resource, locale WHERE message.resource = resource.id AND message.locale = locale.id;"),
+	   ". The DBIx::Browse module helps to show not the referential links (IDs) but the ``human'' values (names) of the related tables.
+"),
+    $q->hr;
+
+# Choose Table
+my %Tables = ('message'  => 'Messages',
+	      'resource' => 'Labels',
+	      'locale'   => 'Languages');
+
+my $table = $q->param('Table');
+my $debug = $q->param('Debug');
+$table = 'message' unless $table;
+$debug = '0'       unless $debug;
+print
+    $q->start_multipart_form(  -name => 'Browser', -method => 'POST' ),
+    $q->p({-class => 'Bar'},
+	  $q->popup_menu(
+			  -name     => 'Table',
+			  -values   => [keys %Tables],
+			  -labels   => \%Tables,
+			  -default  => "$table",
+			  -onChange => 'this.form.submit()'
+			  ),
+	  ),
+    $q->p({-class => 'Bar'},
+	  $q->checkbox(
+		       -name    => 'Debug',
+		       -checked => "$debug",
+		       -value   => '1',
+		       -label   => 'Debug DBIx::Browse',
+		       -onChange => 'this.form.submit()'
+		       )
+	  ),
+    $q->end_form(),
+    $q->hr;
+
+#
+# browse object
+#
+my $dbb;
+
+if ( $table eq 'message' ) {
+    $dbb = new  DBIx::Browse::CGI({
+	dbh => $dbh, 
+	debug => $debug,
+	table => 'message', 
+	proper_fields => [ qw ( msg ) ],
+	linked_fields => [ qw ( resource locale ) ], 
+	linked_tables => [ qw ( resource locale ) ], 
+	linked_values => [ qw ( name      name    ) ], 
+	linked_refs   => [ qw ( id       id     ) ],
+	primary_key   => 'id',
+	cgi           => $q,
+	form_params   => { 'Table' => "$table", 'Debug' => "$debug" }
+	});
+} elsif ( $table eq 'resource' ) {
+    $dbb = new  DBIx::Browse::CGI({
+	dbh => $dbh, 
+	debug => $debug,
+	table => 'resource', 
+	proper_fields => [ qw ( name tipus ) ],
+	primary_key   => 'id',
+	cgi           => $q,
+	form_params   => { 'Table' => $table, 'Debug' => "$debug" }
+	});
+} elsif ( $table eq 'locale' ) {
+    $dbb = new  DBIx::Browse::CGI({
+	dbh => $dbh, 
+	debug => $debug,
+	table => 'locale', 
+	proper_fields => [ qw ( name lang icon ) ],
+	primary_key   => 'id',
+	cgi           => $q,
+	form_params   => { 'Table' => $table, 'Debug' => "$debug" }
+	});
+} else {
+	die "Unknown table: $table";
+}
+
+# List
+$dbb->browse();
+
+# Signature
+print
+    $q->hr,
+    $q->address(
+		$q->a(
+		      {href=>'mailto:evilio@users.sourceforge.net'},
+		      'Evilio de Rio'
+		      )
+		);
+print
+    $q->end_html;
+#
+#
+#
+END {
+    $dbh->disconnect();
+}

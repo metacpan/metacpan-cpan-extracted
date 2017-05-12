@@ -1,0 +1,25 @@
+Revision history for Perl extension Data::VString.
+
+0.0.4  Mon Mar 19 2007
+        - doc fixes (bug #18100)
+        - META.yml is not written by hand anymore
+        - added a test for POD coverage
+        - this version removes this distribution from
+          the twilight zone created by being a development
+          version - I don't know exactly why: maybe I just
+          felt that after two years it should be promoted.
+
+0.0.3  Tue Jul 11 2005
+        - confessed the Unicode bug 
+        - added dependencies on Test::More and Carp
+        - docs now mention the distribution 'version'
+          which is much more famous (even Damian used it)
+        - added new function 'vstring_cmp' and a test
+
+0.0.2  Tue Jul 11 2005
+        - POD tweaks
+
+0.0.1  Tue Jul 10 2005
+        - started
+
+

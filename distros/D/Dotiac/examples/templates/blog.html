@@ -1,0 +1,55 @@
+{% extends "blog_base.html" %}
+{% block content %} {# Overwrite the content block from blog_base.html #}
+{% for entry in blog %} {# Iterate over the blog entries #}
+	<div class="blog_entry">
+		<div class="blog_entry_title"><a href="{% url base_url "action"="view","id"=entry.id %}">{{ entry.title|title }}</a></div>
+		{# Some more info about the post #}
+		<div class="blog_entry_small">
+			{{ entry.author }} at {{ entry.date|date:"r" }}
+		</div> 
+		<div class="blog_entry_text">
+			{{ entry.content|truncatewords:100|linebreaks }} {# print only a preview #}
+			<a class="morelink" href="{% url base_url "action"="view","id"=entry.id %}">Read More</a>
+		</div>
+		{# Display how many comments are there (0 comments, 1 comment, 2 comments) :#}
+		<div class="blog_entry_small">
+			<a href="{% url base_url "action"="view","id"=entry.id %}#comments">
+				{{ entry.comments|length }} comment{{ entry.comments|length|pluralize }}
+			</a>
+		</div> 
+		
+	</div>
+{% endfor  %}
+
+<p>
+	{% ifnotequal page 0 %} {# We are not on the first page #}
+	<a href="{% url base_url "page"=page|add:"-1" %}">Previous page</a>
+	{% endifnotequal %}
+
+	{% ifnotequal page pages %} {# We are not on the last page #}
+	<a href="{% url base_url "page"=page|add:"1" %}">Next page</a>
+	{% endifnotequal %}
+</p>
+
+{% endblock %}
+
+{% block morecss %} {# Add some more stylesheets #}
+			.blog_entry_title {
+				color:#1F20AF;
+				font-weight:bold;
+				font-size:1.5em;
+				margin-top:25px;
+			}
+			.blog_entry_small {
+				font-size:0.8em;
+				color:grey;
+			}
+			.blog_entry_text {
+				padding-left:10px;
+			}
+			.morelink {
+				display:block;
+				text-align:right;
+				font-size:0.7em;
+			}
+{% endblock %}

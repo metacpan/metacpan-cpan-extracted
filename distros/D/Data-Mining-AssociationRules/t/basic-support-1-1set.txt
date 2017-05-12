@@ -1,0 +1,6 @@
+1 Strawberry
+1 Banana
+1 Apple
+3 Orange
+1 Peach
+3 Pear

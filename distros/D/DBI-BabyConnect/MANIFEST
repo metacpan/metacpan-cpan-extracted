@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBI-BabyConnect.t
+lib/DBI/BabyConnect.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+Revision history for Data-Dump-SortKeys
+
+0.04    2015-12-28 (PERLANCAR)
+
+        - Implement coderef dumping and add option $REMOVE_PRAGMAS, like in
+          Data::Dmp.
+
+
+0.03    2015-12-23 (PERLANCAR)
+
+	- [Incompatible change] To simplify interface, $SORT_KEYS hook
+	  accepts just the original hashref, instead of arrayref of keys +
+	  hashref.
+
+
+0.02    2015-12-23 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention RT ticket which suggests addition of custom sort
+	  keys feature to Data::Dump.
+
+
+0.01     2015-12-23 (PERLANCAR)
+
+         - First release.

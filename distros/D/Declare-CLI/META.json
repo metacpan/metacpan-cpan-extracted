@@ -1,0 +1,62 @@
+{
+   "abstract" : "Declarative command line interface builder.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Declare-CLI",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Fennec" : "2.004",
+            "Fennec::Declare" : "1.001",
+            "Parallel::Runner" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter::Declare" : "0.105"
+         }
+      }
+   },
+   "provides" : {
+      "Declare::Args" : {
+         "file" : "lib/Declare/Args.pm",
+         "version" : "0.009"
+      },
+      "Declare::CLI" : {
+         "file" : "lib/Declare/CLI.pm",
+         "version" : "0.009"
+      },
+      "Declare::Opts" : {
+         "file" : "lib/Declare/Opts.pm",
+         "version" : "0.009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Declare-CLI"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Declare-CLI"
+      }
+   },
+   "version" : "0.009"
+}

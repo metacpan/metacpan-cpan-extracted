@@ -1,0 +1,56 @@
+{
+   "abstract" : "If at first you don't succeed, try, try again.",
+   "author" : [
+      "Brian Duggan <bduggan@matatu.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-TryAgain",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.37",
+            "DBI" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::TryAgain" : {
+         "file" : "lib/DBIx/TryAgain.pm",
+         "version" : "0.05"
+      },
+      "DBIx::TryAgain::db" : {
+         "file" : "lib/DBIx/TryAgain/db.pm",
+         "version" : 0
+      },
+      "DBIx::TryAgain::st" : {
+         "file" : "lib/DBIx/TryAgain/st.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.05"
+}

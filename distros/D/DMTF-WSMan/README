@@ -1,0 +1,34 @@
+DMTF-WSMan version 0.05
+
+The DMTF::WSMan module provides low level access to the WS-Management protocol
+as specified in the DMTF's DSP0226.  This module is intended for use with
+DMTF::CIM::WSMan.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Broadcom Corporation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

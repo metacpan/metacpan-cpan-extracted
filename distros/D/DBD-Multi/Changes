@@ -1,0 +1,64 @@
+0.18    2013-04-09
+
+  - Added get_info() patch from Jon Isbell (RT #84240)
+
+0.17    2011-03-08
+
+  - New regression test verifying that previously failed databases are
+    eventually re-tried.  
+
+0.16    2010-09-05
+
+  - No longer derived from DBD::File.   Fixes compatability issues with DBI
+    versions between 1.611_90 and 1.614.  (RT #60193)
+
+0.15    2010-07-15
+
+  - Catch error when a coderef datasource fails to connect to the database
+    properly.  Thanks to NCLEATON (RT #58769)
+
+0.14    2008-03-03
+
+  - Updated required perl version from 5.5.0 to 5.8.0 after receiving
+    reports of core dumps under 5.6.2 from cpantesters.  Tried to diagnose
+    the problem but didn't really get anywhere.
+
+0.13    2008-02-20
+
+  - Added support for DBI_AUTOPROXY environment variable.  Suggested by 
+    Tim Bunce.  (RT #30250)
+
+0.12    2007-08-28
+
+  - Added dependency listing for DBI to the Makefile to try and satisfy cpan
+    testers.
+  - Added dependency listing for DBD::SQLite, required for regression tests.
+
+0.11    2007-07-25
+
+  - When two DSN's had the same priority, Multi was always attempting the first
+    one in the list first rather than picking one randomly.   This has been
+    corrected.
+  - Don't make a connection to every DB just to call disconnect().
+
+0.10    2007-07-05
+
+  - Added 'timeout' configuration parameter to keep connections from hanging
+    forever.
+  - Added support for coderef connect option from Mark Stosberg (RT #24400)
+  - Added lazy-load.t regression test from Mark Stosberg (RT #24399)
+  - Updated pod based on suggestions from Mark Stosberg  (RT #24399)
+
+0.03    2007-01-08
+
+  - Regression tests to verify random selection works, submitted by
+    MARKSTOS@cpan.org
+
+0.02    2006-06-21
+
+  - Cleaned up documentation a little.
+  - Fixed some regression tests.
+
+0.01    2005-04-10
+
+  - Initial version.

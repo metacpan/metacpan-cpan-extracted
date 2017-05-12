@@ -1,0 +1,47 @@
+---
+abstract: 'Add table schema as comment to your ORM file. This module is inspired by annotate_models.'
+author:
+  - 'tokubass <tokubass@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.1, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Schema-Annotate
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Schema::Annotate:
+    file: lib/DBIx/Schema/Annotate.pm
+    version: '0.06'
+  DBIx::Schema::Annotate::Driver::Base:
+    file: lib/DBIx/Schema/Annotate/Driver/Base.pm
+  DBIx::Schema::Annotate::Driver::SQLite:
+    file: lib/DBIx/Schema/Annotate/Driver/SQLite.pm
+  DBIx::Schema::Annotate::Driver::mysql:
+    file: lib/DBIx/Schema/Annotate/Driver/mysql.pm
+requires:
+  DBIx::Inspector: '0.03'
+  IO::All: '0'
+  Smart::Args: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tokubass/p5-DBIx-Schema-Annotate/issues
+  homepage: https://github.com/tokubass/p5-DBIx-Schema-Annotate
+  repository: git://github.com/tokubass/p5-DBIx-Schema-Annotate.git
+version: '0.06'
+x_authority: cpan:TOKUBASS

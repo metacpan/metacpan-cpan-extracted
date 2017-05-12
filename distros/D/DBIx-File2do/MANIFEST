@@ -1,0 +1,7 @@
+MANIFEST
+README
+Makefile.PL
+File2do.pm
+t/001_load.t
+Todo
+META.yml                                 Module meta-data (added by MakeMaker)

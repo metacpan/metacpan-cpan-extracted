@@ -1,0 +1,162 @@
+NAME
+    Data::Collector - Collect information from multiple sources
+
+VERSION
+    version 0.15
+
+SYNOPSIS
+    Data::Collector collects various information from multiple sources and
+    makes it available in different formats, similar to Puppet's Facter.
+
+        use Data::Collector;
+
+        my $collector = Data::Collector->new(
+            engine      => 'OpenSSH', # default
+            engine_args => { password => read_password('Pass: ') },
+            format      => 'JSON', # default
+        );
+
+        my %data = $collector->collect;
+        ...
+
+    Data::Collector uses *Info*s to determine what information is collected.
+    It then uses *Serialize*rs to serialize that information.
+
+    An important concept in Data::Collector is that it does not use any
+    modules to fetch the information, only shell commands. This might seem
+    like a pain at first but it allows it to be run on remote machines
+    without any RPC server/client set up. It might be changed in the future,
+    but (at least now) it seems unlikely.
+
+    The main purpose of Data::Collector is to facilitate an information
+    gatherning subsystem, much like Puppet's Facter, to be used in system
+    monitoring and administration.
+
+    However, Data::Collector is much more dynamic. It supports any number of
+    engines and formats. Thus, it can be used for push or pull situations,
+    can work with monitoring systems, integrate with testing suites and
+    otherwise a pretty wide variety of situations.
+
+ATTRIBUTES
+  engine(Str)
+    The engine that will be used to collect the information. This is the
+    underlying layer that will gather the information. The default is
+    OpenSSH, you can use any other one you want and even create your own.
+
+    By implementing your own, you can have fetching done via database
+    queries, online searching, local system commands or even telnet, if
+    that's what you're using.
+
+  engine_args(HashRef)
+    Any arguments that the engine might need. These are passed to the
+    engine's *new* method. Other than making sure it's a hash reference, the
+    value is not checked and is left for the engine's discression.
+
+    Data::Collector::Engine::OpenSSH requires a *host*, and allows a *user*
+    and *passwd*.
+
+  format(Str)
+    This is the format in which you want the information. This will most
+    likely refer to the serializer you want, but it doesn't have to be. For
+    example, you could implement your own *Serializer* which will actually
+    be a module to push all the changes you want in a database you have.
+
+    The default is JSON.
+
+  format_args(HashRef)
+    Much like *engine_args*, you can supply any additional arguments that
+    will reach the serializer's *new* method.
+
+  info_args(HashRef)
+    Much like *engine_args* and *info_args*, you can supply any additional
+    arguments that should go to specific Info module's *new* method.
+
+        info_args => {
+            IFaces => {
+                ignore_ip    => ['127.0.0.1'],
+                ignore_iface => ['lo'],
+            },
+        },
+
+  data(HashRef)
+    While (and post) collecting, this attribute contains all the information
+    [being] gathered. It is this data that is sent to the serializer in
+    order to do whatever it wants with it.
+
+  engine_object(Object)
+    This attributes holds the engine object. This should probably be left
+    for either testing or advanced usage. Please refrain from playing with
+    it if you're unsure how it works.
+
+SUBROUTINES/METHODS
+  collect
+    The main function of Data::Collector. It runs all the information
+    collecting modules. When it is done, it runs the *serialize* method in
+    order to serialize the information fetched.
+
+  serialize
+    Loads the serializer (according to the *format* selected) and asks it to
+    serialize the data it collected.
+
+    This method can be run manually as well, but it is automatically run
+    when you run *collect*.
+
+  clear_registry
+    Clears the information registry. The registry keeps all the keys of
+    different information modules. The registry makes sure information
+    modules don't step on each other.
+
+    This is merely a helper method. It simply runs:
+
+        Data::Collector::Info->clear_registry;
+
+    This is actually only a mere helper method.
+
+  BUILD
+    Internal initialize subroutine that sets the default OS to CentOS.
+
+  load_info
+    Loads all the infos available.
+
+  load_os
+    Currently not being used.
+
+BUGS
+    Please report any bugs or feature requests to "bug-data-collector at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Collector>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Collector
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Collector>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-Collector>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-Collector>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-Collector/>
+
+AUTHOR
+    Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

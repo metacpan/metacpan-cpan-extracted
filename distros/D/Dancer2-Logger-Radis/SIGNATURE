@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4b7a7240e0b848080505d8a0a08becf8c5e8efe6 Build.PL
+SHA1 ec325fd8d760072efef1cebad9a36a5dd8823a4f Changes
+SHA1 4a5871f916adaf6e49f2a2c64223bbddd3c6e5f5 LICENSE
+SHA1 f5c963ea962eeb0679a19af3c04b128eb70335da MANIFEST
+SHA1 15157b23a07ff7b446a60b6d53546e5cfc2261eb META.yml
+SHA1 58fa5c37b9c48ca988da9058d8340a8a990fc7e0 README
+SHA1 0ffbcbf7859f71ca62a85eb0e63db893fd58b540 cpanfile
+SHA1 a21ee9a2afd7f6906299b1bc65159514122d1be9 lib/Dancer2/Logger/Radis.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 127303f699a1c56b44fc31a728c449007435a34f t/000.t
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 7f48bbe295b4f038d03c069d68352c73fc8a4c2c t/ests.pm
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXbOXhAAoJEJVzeMw4kNooqvUP/1HAo1kwqBbipK5tGYaErHem
+WZxlI8xk9yPdrY4o4Nc0OIgKw7XESLCXwqZgtrD6rNSRvWtDch1m4pSG8bA1uAWb
+RZSa4gn+Psd4U77FlIhpmKLnri17bk68v9GmYOoDx9IE80B6LoSZbficekvpUHVR
+48P6zBbnUSAwtuzU9voIQ8IeP6i2Qck5Bjq4DrQgPmfisal8dhZF/5jy3ZpeuFnG
+wapdp8ERj5HZ0ljA45shzz0Y6u+84k0L5eaEqnsFMWp/0OjggmNLJFePSVXkMgTS
+E5s0PmA7rVx1WN3wdIRNhzwrI9czxUaZJBBJbXDzX/H1AzexFmZR97BkApAWG1Ze
+wgW2p0DDcUsacBoNL5ZrLFFo7rWJZUEYJeRnn5EzrkFeGR4YTzhMADc55SUDYP5i
+XYmv1QCfEbt5FVTHa8fa21QAoixeDyNHUFfOZ+3mxq9zZXRa9SxCkxKVpWEHMlPm
+B4Dbz0mkxE8IqSwvccAnhe9+mzLKLVkuo8Fnin8Olis+OQjS6zqfSj5SAdCf/633
+KUGFONcqELmcCduA2azPrlmEK1AR8uqu0HETn85q3WaRbgQ0l4f3NQNkuR8nRU9w
+DZ2rABck2oPinSN/fYgJ39lmCi5RrSU0gqWHuEYJtj3dnhxXVhn2EkPT+ewIkCr3
+h47MEhDwFGeJg9KZ7Cdt
+=0lAa
+-----END PGP SIGNATURE-----

@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Devel-FindBlessedRefs
+version:            1.253
+abstract:           ~
+author:
+    - Paul Miller <jettero@cpan.org>
+license:            LGPL
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    perl:  5.006001
+resources:
+    repository:  http://github.com/jettero/devel--findblessedrefs/
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - blessed
+    - refs

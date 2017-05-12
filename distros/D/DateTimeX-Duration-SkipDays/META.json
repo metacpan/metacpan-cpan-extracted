@@ -1,0 +1,62 @@
+{
+   "abstract" : "Given a starting date, a number of days and a list of days to be skipped, returns the date X number of days away.",
+   "author" : [
+      "Alan Young <harleypig@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Duration-SkipDays",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "DateTime::Event::Holiday::US" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "List::MoreUtils" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Test::CheckDeps" : "0.002",
+            "Test::Deep" : "0",
+            "Test::More" : "0.94",
+            "Test::NoWarnings" : "0",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.002"
+}
+

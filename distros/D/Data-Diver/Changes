@@ -1,0 +1,14 @@
+Revision history for Perl module Data::Diver.
+
+1.01_01 2005-09-01
+  - Add DiveVal()
+  - Support using scalar ref as key to force hash derefence.
+
+1.00_02 2005-07-25
+  - First module distribution
+
+1.00_01 2005-07-22
+  - A fleshier twinkle on my scratchpad
+
+1.00_00 2005-07-22
+  - Just a twinkle on my scratchpad

@@ -1,0 +1,30 @@
+
+Adjust return codes wrt the spec
+
+bind_param_inout():
+Can we impl. this w/o additional code in execute(), i.e.
+bind $bind_value to the ADO parameter?
+
+Implement $sth->{ParamTypes}
+
+Add $dbh->last_insert_id
+
+Reimplement 'invalid attribute' test in t/21sth.t (catch warning).
+
+Reimplement the t/23warn.t tests.
+
+Improve LOB tests.
+
+ParamValues: What's the reason for the following problem?
+
+  sub FETCH {
+    ...
+    if ( $attrib eq 'ParamValues') {
+      my $comm = $sth->{ado_comm};
+      my $p = $comm->Parameters;  # ??? supresses '... with ParamValues: 1=77]'
+      my $h = {};
+      for ( Win32::OLE::in( $sth->{ado_comm}->Parameters ) ) {
+        $h->{$_->Name} = $_->Value;
+      }
+      return $h;
+    }

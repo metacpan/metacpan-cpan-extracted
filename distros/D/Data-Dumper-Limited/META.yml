@@ -1,0 +1,27 @@
+---
+abstract: 'Vastly faster subset of Data::Dumper functionality'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Dumper-Limited
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Undump: 0.11
+  Scalar::Util: 0
+  XSLoader: 0
+  perl: 5.008
+resources:
+  repository: git://github.com/tsee/Data-Dumper-Limited.git
+version: 0.03

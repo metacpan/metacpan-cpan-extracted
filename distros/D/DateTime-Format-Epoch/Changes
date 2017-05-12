@@ -1,0 +1,77 @@
+Revision history for Perl module DateTime::Format::Epoch
+
+0.16  2015-04-17
+    - Fixed problem when GMP library was used.
+
+0.15  2015-04-12
+    - Forgot to update MANIFEST
+
+0.14  2015-04-12
+    - NTP epoch added (Michiel Beijen)
+
+0.13  2010-08-25
+    - GMP is used in two places, so fix second
+
+0.12  2010-08-23
+    - Move to Module::Build
+    - Do not use GMP on Windows
+    - Report bigint library used in tests
+
+0.11  2007-12-04
+    - Tried to make code work with Math::BigInt::* packages (tries to
+      solve bug reported by Philip (Flip) Kromer)
+
+0.10  2006-05-23
+    - Removed midnight bug, reported by Jason Thaxter.
+
+0.09  2004-10-18
+    - Worked around Math::BigInt bug on Solaris (hopefully)
+    - For the predefined epoch modules, format_datetime() and
+      parse_datetime() can now be called as class methods.
+
+0.0801  2004-08-31
+    - Documentation change only
+
+0.08  2004-08-27
+    - Added DateTime::Format::Epoch::ActiveDirectory.  Thanks to Andrew
+      Sterling Hanenkamp for the information.
+    - Added modules for day counts: JD, MJD, RJD, TJD, RataDie, Lillian.
+      Thanks again to Andrew Sterling Hanenkamp for the idea.
+
+0.07  2004-07-28
+    - Changed ::TAI64, test scripts after a DateTime.pm change
+      concerning leap seconds.
+
+      +++ ATTENTION +++
+      If you use an epoch before 1972, and you do not ignore leap
+      seconds, you may see a 1 second difference in the results compared
+      to the output of version 0.06 or earlier.
+
+      If you use ::TAI64, the epoch has been corrected for this, and
+      timestamps after 1972 are unchanged.
+
+      If you use ::Unix or any of the other predefined epochs, you're
+      safe; these ignore leap seconds
+
+0.06  2003-11-25
+    - Added support for other time units
+    - Added DateTime::Format::Epoch::DotNet
+
+0.05  2003-07-18
+    - Changed API of DT::F::E::TAI64 (the format_datetime_as_string()
+      method is replaced by a parameter to the constructor)
+    - Added dhms parameter to new(), to return '2d, 4h, 15m, 45s'
+      values
+
+0.04  2003-06-19
+    - Added start_at parameter to new()
+    - Added DateTime::Format::Epoch::TAI64
+
+0.03  2003-05-06
+    - Removed a bug, which appeared after a DateTime change
+
+0.02  2003-05-05
+    - First CPAN release version, with too many changes to mention
+
+0.01  2003-04-27
+    - original version, only released to the sourceforge CVS

@@ -1,0 +1,169 @@
+#!/usr/bin/env perl
+
+use 5.008004;
+
+use strict;
+use warnings;
+
+use Devel::Symdump;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use List::Util qw{ max };
+use Module::Load;
+use Pod::Usage;
+
+our $VERSION = '0.902';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ all! blib! exclude=s@ },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV != 1 or pod2usage( { -verbose => 0 } );
+
+@ARGV
+    or @ARGV = qw{ DateTime DateTime::Fiction::JRRTolkien::Shire };
+
+if ( $opt{blib} ) {
+    require blib;
+    blib->import();
+}
+
+if ( $opt{exclude} ) {
+    @{ $opt{exclude} } = map { qr{$_} } @{ $opt{exclude} };
+} else {
+    $opt{exclude} = [
+	qr{ \A _ }smx,
+	qr{ \A [_[:upper:]0-9]+ \z }smx,
+    ];
+}
+
+foreach ( @ARGV ) {
+    local $@ = undef;
+    load( $_ );
+}
+
+my $all = 0;
+my $mask = 1;
+my %found;
+
+foreach my $module ( @ARGV ) {
+    my %tried;
+    my $dumper = Devel::Symdump->rnew( $module );
+    my $name_space = qr{ \A $module :: }smx;
+    foreach my $method ( $dumper->functions() ) {
+	$method =~ s/ $name_space //smx
+	    or next;
+	$method =~ m/ \W /smx
+	    and next;
+	grep { $method =~ $_ } @{ $opt{exclude} }
+	    and next;
+	$found{$method} |= $mask;
+    }
+} continue {
+    $all |= $mask;
+    $mask <<= 1;
+}
+
+my $wid = max( map { length $_ } keys %found );
+my $tplt = join '  ', map { "%-@{[ max( $wid, length $_ ) ]}s" } @ARGV;
+$tplt .= "\n";
+
+printf $tplt, @ARGV;
+foreach my $symbol ( sort keys %found ) {
+    ( my $value = $found{$symbol} ) == $all
+	and not $opt{all}
+	and next;
+    my @arg;
+    while ( $value ) {
+	push @arg, $value & 1 ? $symbol : '';
+	$value >>= 1;
+    }
+    @arg < @ARGV
+	and push @arg, ( '' ) x ( @ARGV - @arg );
+    printf $tplt, @arg;
+}
+
+__END__
+
+=head1 TITLE
+
+diff-methods - Difference in methods provided between two or more Perl modules.
+
+=head1 SYNOPSIS
+
+ diff-methods
+ diff-methods -help
+ diff-methods -version
+
+=head1 OPTIONS
+
+=head2 -all
+
+If this Boolean option is asserted, the output includes methods
+implemented by all modules.
+
+The default is C<-noall>.
+
+=head2 -blib
+
+If this Boolean option is asserted, the equivalent of C<use blib;> is
+done before loading any modules.
+
+The default is C<-noblib>.
+
+=head2 -exclude
+
+This option specifies a regular expression that is matched against each
+method found. A match means that the method is not included in the
+output.
+
+This option can be specified more than once. If it is specified multiple
+times, a match on any one of the regular expressions excludes the
+method.
+
+If this option is not specified, the default is equivalent to
+
+    -exclude '\A_' -exclude '\A[_[:upper:]0-9\z'
+
+The first C<-exclude> excludes any method whose name begins with an
+underscore. The second excludes any method with no lower-case characters
+in its name.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script takes the names of two or more Perl packages on the
+command line, and produces as output a list of all methods which are
+C<not> implemented by all packages.
+
+If no packages are specified, the default is to report on the
+differences between C<DateTime> and
+C<DateTime::Fiction::JRRTolkien::Shire>.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

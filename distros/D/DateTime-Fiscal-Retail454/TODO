@@ -1,0 +1,9 @@
+Method(s) to return the R454 week_of_year data for an object.
+
+Method(s) need to be added that generate comparison tables with
+R454 leap years restated or not as desired.
+
+Method(s) to return the R454 period or week_of_year for various holidays.
+
+Enhance tests and documentation.  (Any volunteers?)
+

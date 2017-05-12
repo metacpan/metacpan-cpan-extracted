@@ -1,0 +1,10 @@
+$Id: README,v 1.1 2001/03/06 01:17:21 mpeppler Exp $
+
+The files in this directory are *examples*.
+
+In particular, dbschema.pl is a quick port I did from the 
+dbschema.pl version using Sybase::DBlib, and has not been updated
+with recent enhancements and bug fixes to dbschema.pl (now maintained
+by David Owen, http://www.midsomer.org).
+
+Michael

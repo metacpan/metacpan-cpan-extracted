@@ -1,0 +1,33 @@
+DBIx::FetchLoop - Changelog
+
+v.6 Major release
+ - Added accessor methods $lph->previous, $lph->current and $lph->next
+ - Added $lph->fetch_current_row for cleaner code
+
+v.5 Major release
+ - Fixed bugs in the parameter validation of the substring functions
+ - Added better error handling and error messages on failure
+
+v.41 Minor release
+ - FetchLoop.pm had DOS newline characters, this caused pod2html to fail
+   replaced with Unix EOLs
+
+v.4 Major release
+ - Added (still) more error handling
+ - Added $lph->pre_loop_substr and $lph->post_loop_substr
+ - Added the CHANGES file to distribution
+ - Documentation changes
+
+v.3 Major release
+ - Changed module name to DBIx::FetchLoop (per Tim Bunce)
+ - Added more error handling
+ - Added $lph->count
+ - Added $lph->is_first and $lph->is_last
+ - Added the INSTALL file to distribution
+
+v.2 Major release
+ - Support for both fetchrow_hashref and fetchrow_arrayref
+
+v.1 Major release
+ - Initial version (module named DBIx::Loop)
+

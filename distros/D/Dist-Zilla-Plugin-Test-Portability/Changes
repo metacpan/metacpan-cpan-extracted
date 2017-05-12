@@ -1,0 +1,47 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Test-Portability
+
+2.001000  2016-08-15 03:24:06Z
+  - use the 'deprecated' warning category to issue the warning in
+    [PortabilityTests]
+
+2.000007  2016-06-11
+  - Add Test::Portability::Files as a develop phase prereq on distros which
+    use this plugin. GH #5 (Dave Rolsky)
+  - make this test an author rather than release test -- it is a test you want
+    passing on every commit. (GH#6, ether)
+
+2.000006  2015-01-22
+  - Add the file in one shot, rather than adding then munging
+  - Remove dependency on Moose::Autobox for tests [kentnl; GH #4]
+
+2.000005  2013-08-03
+  - Don't shoot ourselves in the foot in the tests [kentnl; GH #3]
+
+2.000004  2013-04-09
+  - Test only for our deprecation warnings
+
+2.000003  2012-06-16
+  - Use a decimal version number
+
+2.0.2     2011-09-12
+  - Update SYNOPSIS
+
+2.0.1     2011-09-07
+  - Packaging updates
+
+v2.0.0    2011-09-07
+  - Renamed to Dist::Zilla::Plugin::Test::Portability
+
+1.111840  2011-07-03 14:36:35 Europe/Vienna
+  - Added support for options (thanks magnificent-tears)
+
+1.101420  2010-05-22 18:10:41 Europe/Vienna
+  - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+  - list Test::Portability::Files in dist.ini so we don't use() it anymore
+
+1.100700  2010-03-11 17:40:30 Europe/Vienna
+  - fixing error message in generated file
+  - shortcut synopsis tests
+
+1.100690  2010-03-10 23:56:29 Europe/Vienna
+  - original version

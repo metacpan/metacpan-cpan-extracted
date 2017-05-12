@@ -1,0 +1,112 @@
+Release history for Dist-Zilla-Plugin-Author-KENTNL-Prereqs-Latest-Selective
+
+1.001001 2017-03-09T08:10:59Z 4ac6519
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Avoid use of Test::KENTNL in tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +13 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1 (recommends: +1)
+ - test: +1 ↓1 -1 (recommends: ↑1 ↓1)
+
+1.001000 2014-08-30T12:52:09Z
+ [00 Minor]
+ - metadata
+ - tests
+ - internals
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: -1
+ - test: +2
+
+ [Internals]
+ - DZPU:EmulatePhase no longer used.
+
+ [Metadata]
+ - fix author to kentnl
+
+ [Tests]
+ - Coverage testing
+
+1.000001 2014-08-15T21:15:05Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace adjustments
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+1.000000 2014-08-02T05:44:00Z
+ [00 Major]
+ - Yes. Still Deprecated.
+ - Changes that affect hand-operated downstreams.
+
+ [01 Version Scheme]
+ - Migrated to x.yyyyyy
+ - This is the primary reason for the 1.x on the box
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 Tooling]
+ - Migrated to EUMM for releasing
+ - Tooling dependencies softened to be 'recommended' for latest things.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.2, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 -11 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +2 ↓1 (recommends: +3)
+
+0.1.2 2013-11-20T03:06:09Z
+ [00 Bugfix]
+ - Make sure PrereqSource role is a dep
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: +1
+
+0.1.1 2013-11-18T12:20:20Z
+ [00 Minor]
+ - Deprecate
+ - Drop 5.10 minimum
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +50 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↓1
+ - test: ↑1 -2
+
+ [Documentation]
+ - Add README.mkdn
+ - Copyright 2013
+ - Add MetaPOD
+
+ [Meta]
+ - Bugs to github issues
+
+ [Packaging]
+ - Use new Module::Build features
+
+ [Tests]
+ - Compile tests now ::PerFile
+ - Regen CPAN-Changes test
+ - Regen Kwalitee test
+ - Regen ReportVersions::Tiny test
+
+0.1.0 2012-07-07T08:44:42Z
+ - First version.

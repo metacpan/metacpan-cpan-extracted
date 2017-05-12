@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/load-device
+lib/Device/AVR/Info.pm
+lib/Device/AVR/Info/Module.pm
+MANIFEST			This list of files
+t/00use.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

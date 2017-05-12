@@ -1,0 +1,18 @@
+
+# $Id$
+
+severity = 1
+
+#------------------------------------------------------------------------------
+
+[-CodeLayout::RequireTidyCode]
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME|DESCRIPTION|SYNOPSIS|AUTHOR
+script_sections = NAME|DESCRIPTION|SYNOPSIS|AUTHOR
+
+[Miscellanea::RequireRcsKeywords]
+keywords = Id
+
+[CodeLayout::ProhibitHardTabs]
+allow_leading_tabs = 1

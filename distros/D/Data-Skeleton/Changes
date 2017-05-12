@@ -1,0 +1,22 @@
+0.06      2015-08-04 12:44:57-06:00 America/Denver
+          - Replace with an empty array reference instead of an empty string
+            in th ecase of an array with no HASH or ARRAY values (thanks steveb)
+          - Remove un-needed portion of conditional (thanks rafl)
+
+0.05      2015-08-03 12:34:15-06:00 America/Denver
+          - Improve POD
+          - Remove cargo copy vestige
+
+0.04      2015-08-03 08:40:17-06:00 America/Denver
+          - Add a method to delete undefined and empty string hash values
+
+0.03      2012-07-07 12:18:08 America/Denver
+          - Handle circular references to avoid deep recursion
+            [RT#78222] (garu)
+
+0.02      2012-05-02 14:50:01 America/Denver
+          - Migrate from MooX::Types::MooseLike
+          to MooX::Types::MooseLike::Base
+
+0.01      2011-11-17 15:11:59 America/Denver
+          - Initial Release

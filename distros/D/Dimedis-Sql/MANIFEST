@@ -1,0 +1,21 @@
+bin/dsql_export
+bin/dsql_import
+lib/Dimedis/Sql.pm
+lib/Dimedis/SqlDriver/Pg.pm
+lib/Dimedis/SqlDriver/Sybase.pm
+lib/Dimedis/SqlDriver/ASAny.pm
+lib/Dimedis/SqlDriver/ODBC.pm
+lib/Dimedis/SqlDriver/Oracle.pm
+lib/Dimedis/SqlDriver/Informix.pm
+lib/Dimedis/SqlDriver/mysql.pm
+lib/Dimedis/Sql/Import.pm
+lib/Dimedis/Sql/Export.pm
+lib/Dimedis/Sql/CSV.pm
+TODO
+dsql_test.pl
+Changes
+test.pl
+Makefile.PL
+MANIFEST
+README
+META.yml                                 Module meta-data (added by MakeMaker)

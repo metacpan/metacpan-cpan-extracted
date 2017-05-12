@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-SmokeTests
+
+0.002     2016-03-17 03:35:18Z
+          - add extra checks for older [MakeMaker]
+
+0.001     2016-03-16 05:14:53Z
+          - Initial release.

@@ -1,0 +1,9 @@
+MANIFEST
+CHANGELOG
+README
+TODO
+Makefile.PL
+lib/Devel/MaintBlead.pm
+t/001basic.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

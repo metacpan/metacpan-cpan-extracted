@@ -1,0 +1,22 @@
+Revision history for Perl extension Dancer::Plugin::TimeoutManager.
+
+0.07 Thu Jan 5 12:35:00 2015
+        - Update Changes
+
+0.06 Thu Jan 5 12:35:00 2015
+        - Add missing dependencie
+
+0.05 Fri Dec 19 12:00:00
+        - Manage version number
+
+0.04 Thu Dec 18 12:00:00
+        - Update documentation
+
+0.03 Thu Dec 16 14:00:00 2015
+        - Manage empty timeout and manage header X-Dancer-Timeout
+
+0.02  Mon Dec 15 17:05:00 2014
+	-  when timeout is set to 0, the behavior is exactly the same that without timeout
+
+0.01  Thu Dec 11 14:38:37 2014
+	- First version of Dancer::Plugin::TimeoutManager

@@ -1,0 +1,41 @@
+Dist::Zilla::App::Command::dumpphases
+
+Working out what Plugins will execute in which order during which phase
+can be a little confusing sometimes.
+
+This Command exists primarily to make developing Plugin Bundles and
+debugging dist.ini a bit easier, especially for newbies who may not
+fully understand Bundles yet.
+
+If you want to turn colors off, use "Term::ANSIcolor"'s environment
+variable "ANSI_COLORS_DISABLED". E.g:
+
+  ANSI_COLORS_DISABLED=1 dzil dumpphases
+
+Alternatively, since 0.3.0 you can specify a color-free theme:
+
+    dzil dumpphases --color-theme=basic::plain
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

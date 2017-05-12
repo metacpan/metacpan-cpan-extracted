@@ -1,0 +1,104 @@
+NAME
+    Devel::Memalyzer - Base framework for analyzing program memory usage
+
+DESCRIPTION
+    Devel-Memalyzer is a base framework for analyzing program memory usage.
+    You can use it to run a program and collect statistics about overall
+    memory usage, or you can use it in your code itself and record
+    statistics at specific points.
+
+COMMAND LINE SYNOPSYS
+    To run a program and collect overall statistics:
+
+        $ memalyzer.pl output.csv "perl -I lib -e 'use MyModule; MyModule->go'"
+        $ memalyzer.pl output.csv "scripts/mything.pl"
+
+    If you needed to interrupt the process you can use the data that was
+    collected:
+
+        $ memalyzer-combine.pl output.csv
+
+    This will take output.csv.head and output.csv.raw and combine them to
+    create output.csv. This is done automatically if your program finishes
+    itself.
+
+IN PROGRAM SYNOPSYS
+    You can also use memalyzer in a program:
+
+        use Devel::Size qw(size total_size);
+        use Devel::Memalyzer;
+        my $mem = Devel::Memalyzer->new( ... );
+        ...
+        $mem->record;
+
+        my $obj = MyObj->new;
+
+        # This will add columns to the output.
+        for my $thing ( @things ) {
+            $mem->add_column( $thing => sub { total_size( obj->$thing )})
+        }
+
+        while ( $obj->iteration ) {
+            # Records data from plugins as well as your custom columns.
+            $mem->record;
+        }
+
+    This will produce output.csv.head and output.csv.raw, to combine them:
+
+        $ memalyzer-combine.pl output.csv
+
+SINGLETON SYNOPSYS
+    Sometimes you want to use Memalyzer in a broader scope and don't want to
+    worry about passing your object around, in these cases you can use it as
+    a singleton.
+
+        use Devel::Memalyzer
+
+        Devel::Memalyzer->init(
+            output => 'output.csv',
+            plugins => [ 'Devel::Memalyzer::Plugin::ProcStatus' ];
+        );
+
+        my $mem = Devel::Memalyzer->singleton;
+
+    You can also initialize the singleton at use-time:
+
+        use Devel::Memalyzer output => 'output.csv',
+                             plugins => [ 'Devel::Memalyzer::Plugin::ProcStatus' ];
+
+        my $mem = Devel::Memalyzer->singleton;
+
+INTERFACE METHODS
+    These are the methods useful to the average user.
+
+    $obj = $class->new( output => $file, plugins => [ ... ])
+        Create a new instance of Devel-Memalyzer
+
+    $obj = $class->init( output => $file, plugins => [ ... ])
+        Initialize the singleton instance of Devel-Memalyzer
+
+    $obj = $class->singleton()
+        Retrieve the singleton instance of Devel-Memalyzer
+
+    $obj->record()
+        Write current memory statistics to the data files
+
+    $obj->add_column( name => sub { ... })
+        Add a column to future output. The column will have the provided
+        name. The coderef should return the value that will be inserted into
+        data rows under the specified column.
+
+    $obj->del_column( 'name' )
+        Remove a row from future output (previously recorded rows will not
+        be modified)
+
+    $obj->finish()
+        Close the filehandles, you will need to do this if you want to use
+        combine() and the instance has not been destroyed or is a singleton.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Rentrak Corperation
+

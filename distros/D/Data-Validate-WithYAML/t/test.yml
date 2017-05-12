@@ -1,0 +1,33 @@
+---
+default:
+    email:
+        type: required
+        regex: ^[\w.-]+\@.+\..{2,5}$
+    plz:
+        type: optional
+        regex: ^\d{4,5}$
+    greeting:
+        enum:
+            - Herr
+            - Frau
+            - Firma
+    age:
+        type: optional
+        enum:
+            - 1
+            - 2
+step1:
+    street:
+        type: optional
+        regex: ^[A-Z].+$
+    age:
+        type: required
+        min: 18
+        max: 67
+    password:
+        length: 5,
+    admin:
+        enum:
+            - administrator
+            - root
+            - superuser

@@ -1,0 +1,38 @@
+[%- IF doc.meta.title.defined -%]
+
+        <!-- some space -->
+        <tr>
+            <td height="20" colspan="4"><br></td>
+        </tr>
+
+        <tr>
+            <!-- title begin -->
+            <td><small class="nbr"><br class="smallbr"></small></td>
+            <td colspan="2" class="headline" valign="bottom" width="100%">[%- doc.meta.title -%]</td>
+            <td width="1"><small class="nbr"><br class="smallbr"></small></td>
+            <!-- title end -->
+        </tr>
+
+
+        <tr>
+            <td height="2" colspan="4"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+        <tr>
+            <td><small class="nbr"><br class="smallbr"></small></td>
+            <!-- title line begin -->
+            <td colspan="2" class="blue-bg" height="4"><small class="nbr"><br class="smallbr"></small></td>
+            <td width="1"><small class="nbr"><br class="smallbr"></small></td>
+            <!-- title line end -->
+        </tr>
+        <tr>
+            <td height="2" colspan="4"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+
+        <tr>
+            <!-- download begin -->
+            <td colspan="3" align="right" valign="bottom" nowrap>[%- INCLUDE download_link -%]</td>
+            <td width="1"><small class="nbr"><br class="smallbr"></small></td>
+            <!-- download end -->
+        </tr>    
+
+[%- END -%]

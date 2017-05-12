@@ -1,0 +1,45 @@
+Dist-Inkt-DOAP
+==============
+
+Created:      2014-05-26
+Home page:    <https://metacpan.org/release/Dist-Inkt-DOAP>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-DOAP>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.022	2014-09-23
+
+ - ETHER wants me to use a version range string in x_breaks.
+
+0.021	2014-09-14
+
+ - Include test to check if changelog data is up-to-date.
+
+0.020	2014-09-13
+
+ - Support x_IRC.
+
+0.019	2014-08-12
+
+ [ Bug Fixes ]
+ - Cope better with nulls when generating CREDITS file.
+
+ [ Documentation ]
+ - Add a DESCRIPTION to Dist::Inkt::DOAP.
+
+0.018	2014-06-03
+
+ [ Bug Fixes ]
+ - Don't need to load RDF::DOAP::ChangeSets.
+
+ [ Test Suite ]
+ - Test that all roles actually compile.
+
+ [ Packaging ]
+ - Require Dist::Inkt 0.017.
+
+0.017	2014-05-26
+
+ [ Bug Fixes ]
+ - Fix syntax error in DetermineRightsFromRdf.pm.
+
+0.016	2014-05-26	Initial release

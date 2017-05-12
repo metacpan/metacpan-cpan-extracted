@@ -1,0 +1,22 @@
+Revision history for Device-SCSI
+
+1.004     2011-05-13 19:40:55 Europe/London
+        updated distribution to use Dist::Zilla
+
+1.003 2004-07-15
+
+CPAN-ification of an old module
+
+* Packaging changed from Debian-style to CPAN style (use dh-make-perl
+  if you want a Debian package)
+* Namespace changed from SCSI to Device::SCSI to fit CPAN conventions
+* Modules are now actually versioned
+* A simple test added to make CPAN testers happy
+
+--- Before CPAN-ification 2003-10-16
+
+There was a bug in SCSI::linux::enumerate() where it used stat() instead of
+lstat() to check if a file in /dev was a SCSI generic device. This meant
+that in some cases, symlinks to devices would show up rather than the
+devices themselves.
+

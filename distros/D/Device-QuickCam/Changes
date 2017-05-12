@@ -1,0 +1,9 @@
+Revision history for Perl extension Device::QuickCam.
+
+0.01  Fri Dec 27 19:58:18 2002
+	- original version
+
+0.02  Tue Jan 14 15:00:00 2003
+	- Fixed bug in width
+	- Added dump to STDOUT
+	- Added basic HTTP support

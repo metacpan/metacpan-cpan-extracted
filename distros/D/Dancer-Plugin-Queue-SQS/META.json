@@ -1,0 +1,47 @@
+{
+   "abstract" : "SQS Adapter for Dancer::Plugin::Queue",
+   "author" : [
+      "Colin Ewen (colin@draecas.com)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Queue-SQS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0",
+            "YAML" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Amazon::SQS::Simple" : "2.03",
+            "Dancer" : "0",
+            "Dancer::Plugin::Queue" : "0.002",
+            "Moo" : "2.000001",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v1.0.0"
+}

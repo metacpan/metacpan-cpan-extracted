@@ -1,0 +1,38 @@
+---
+abstract: 'Relationship patterns for DBIx::Class::Schema::Loader'
+author:
+  - 'Aleksey Dvoriannikov <lewa::cpan.org>'
+build_requires:
+  DBD::SQLite: '1.29'
+  DBI: '1.57'
+  Exporter: '5.63'
+  ExtUtils::MakeMaker: 6.59
+  File::Path: '2.07'
+  File::Temp: '0.16'
+  Test::Exception: '0.31'
+  Test::More: '0.94'
+  namespace::clean: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.15'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Schema-Loader-DBI-RelPatterns
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan: 0
+  Class::Accessor::Grouped: '0.09002'
+  DBIx::Class::Schema::Loader: '0.05'
+  MRO::Compat: '0.09'
+  perl: 5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/azlewa/DBIx-Class-Schema-Loader-DBI-RelPatterns
+version: '0.01043'

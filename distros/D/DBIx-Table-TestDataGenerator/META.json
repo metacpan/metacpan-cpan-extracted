@@ -1,0 +1,121 @@
+{
+   "abstract" : "Automatic test data creation, cross DBMS",
+   "author" : [
+      "Jose Diaz Seng <josediazseng@gmx.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Table-TestDataGenerator",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Pod::Coverage" : 0,
+            "Pod::Coverage::Moose" : 0,
+            "Test::CheckManifest" : 0,
+            "Test::More" : 0,
+            "Test::Pod" : 0,
+            "Test::Pod::Coverage" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "DBIx::Class" : "0.08203",
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Cwd" : 0,
+            "DBD::CSV" : 0,
+            "DBD::SQLite" : 0,
+            "DBI" : 0,
+            "DBI::Const::GetInfoType" : 0,
+            "DBIx::Class::Helper::ResultSet::Random" : "2.016004",
+            "DBIx::Class::Optional::Dependencies" : 0,
+            "DBIx::Class::Relationship" : 0,
+            "DBIx::Class::Schema::Loader" : 0,
+            "DBIx::RunSQL" : 0,
+            "Data::GUID" : 0,
+            "File::Basename" : 0,
+            "File::Spec" : 0,
+            "List::Util" : 0,
+            "Moo" : 0,
+            "Readonly" : 0,
+            "SQL::Abstract" : 0,
+            "SQL::Translator" : "0.11006",
+            "Test::Exception" : 0,
+            "aliased" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Table::TestDataGenerator" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::DBIxHelper" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/DBIxHelper.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::DBIxSchemaDumper" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/DBIxSchemaDumper.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::DataType" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/DataType.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::ForeignKey" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/ForeignKey.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::Increment" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/Increment.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::Query" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/Query.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::Randomize" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/Randomize.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::ResultSetWithRandom" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/ResultSetWithRandom.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::SelfReference" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/SelfReference.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::String" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/String.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::Tree" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/Tree.pm",
+         "version" : "0.005"
+      },
+      "DBIx::Table::TestDataGenerator::UniqueConstraint" : {
+         "file" : "lib/DBIx/Table/TestDataGenerator/UniqueConstraint.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.005"
+}

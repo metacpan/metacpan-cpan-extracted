@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dancer-Template-Caribou</name>
+  <shortdesc>Template::Caribou wrapper for Dancer</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/yanick/Dancer-Template-Caribou" />
+  <bug-database rdf:resource="https://github.com/yanick/Dancer-Template-Caribou/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/Dancer-Template-Caribou" />
+      <location rdf:resource="https://github.com/yanick/Dancer-Template-Caribou.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-20</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-22</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1.0.0</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2017-02-25</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -1,0 +1,8 @@
+Revision history for Device-Chip-PCF8574
+
+0.02    2017/02/18 23:07:02
+        [CHANGES]
+         * Additionally support PCF8575, the 16-bit version of PCF8574
+
+0.01    2016/06/07 23:57:43
+        First version, released on an unsuspecting world.

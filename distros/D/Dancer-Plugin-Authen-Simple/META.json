@@ -1,0 +1,53 @@
+{
+   "abstract" : "Easy Authentication for Dancer applications via Authen::Simple",
+   "author" : [
+      "Andrew Grangaard <spazm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Authen-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::Simple" : "0",
+            "Dancer" : "0",
+            "Dancer::Plugin" : "0",
+            "Memoize" : "0",
+            "Module::Load" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Authen::Simple::Adapter" : "0",
+            "Dancer::Test" : "0",
+            "Test::More" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/spazm/p5-dancer-plugin-authen-simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/spazm/p5-dancer-plugin-authen-simple.git",
+         "web" : "http://github.com/spazm/p5-dancer-plugin-authen-simple"
+      }
+   },
+   "version" : "0.130500"
+}
+

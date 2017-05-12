@@ -1,0 +1,31 @@
+NAME
+    DateTime::Format::XSD - Format DateTime according to xsd:dateTime
+
+SYNOPSIS
+      my $str = DateTime::Format::XSD->format_datetime($dt);
+
+DESCRIPTION
+    XML Schema defines a usage profile which is a subset of the ISO8601
+    profile. This profile defines that the following is the only possible
+    representation for a dateTime, despite all other options ISO provides.
+
+       YYYY-MM-DD"T"HH:MI:SS(Z|[+-]zh:zm)
+
+    This module is a subclass of DateTime::Format::ISO8601, therefore it
+    will be able to parse all other ISO options, but will only format it in
+    this exact spec.
+
+SEE ALSO
+    DateTime, DateTime::Format::ISO8601, The XML Schema speficitation.
+
+AUTHORS
+    Daniel Ruoso "daniel@ruoso.com"
+
+BUG REPORTS
+    Please submit all bugs regarding "DateTime::Format::XSD" to
+    "bug-datetime-format-xsd@rt.cpan.org"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

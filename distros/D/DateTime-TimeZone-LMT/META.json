@@ -1,0 +1,55 @@
+{
+   "abstract" : "Perl DateTime extension for a Local Mean Time time zone",
+   "author" : [
+      "Rick Measham <rickm@cpan.org>",
+      "Jean Forget <JFORGET@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-TimeZone-LMT",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.57_02",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0.12",
+            "DateTime::TimeZone" : "0.13",
+            "Params::Validate" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::TimeZone::LMT" : {
+         "file" : "lib/DateTime/TimeZone/LMT.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/DateTime-TimeZone-LMT.git",
+         "web" : "https://github.com/jforget/DateTime-TimeZone-LMT"
+      }
+   },
+   "version" : "1.01"
+}

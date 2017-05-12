@@ -1,0 +1,9 @@
+Revision history for perl module Device::WebIO::PCDuino
+
+0.002 2014-??-??
+
+- all_desc() and pin_desc() implemented
+
+0.001 2014-08-28
+
+- Implement basic Device::WebIO interfaces

@@ -1,0 +1,2643 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Random-Lists</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:rurban@x-ray.at" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#venue">VENUE</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#venue">Venue</a></li>
+		<li><a href="#character_encoding">Character Encoding</a></li>
+		<li><a href="#values_and_default_values">Values and Default Values</a></li>
+		<li><a href="#numbers__strings_and_heredocuments">Numbers, Strings and Here-Documents</a></li>
+		<li><a href="#list_values">List Values</a></li>
+		<li><a href="#binary_data">Binary Data</a></li>
+		<li><a href="#embedded_perl_code__nanoscripts_">Embedded Perl Code (Nanoscripts)</a></li>
+		<li><a href="#comments">Comments</a></li>
+	</ul>
+
+	<li><a href="#package_interface">PACKAGE INTERFACE</a></li>
+	<ul>
+
+		<li><a href="#construction">Construction</a></li>
+		<li><a href="#attribute_access">Attribute Access</a></li>
+		<li><a href="#public_functions">Public Functions</a></li>
+		<li><a href="#static_functions">Static Functions</a></li>
+		<li><a href="#implementation_functions">Implementation Functions</a></li>
+		<li><a href="#auxiliary_functions">Auxiliary Functions</a></li>
+		<li><a href="#predefined_options">Predefined Options</a></li>
+		<li><a href="#exports">Exports</a></li>
+		<ul>
+
+			<li><a href="#exporter_tags">Exporter Tags</a></li>
+			<li><a href="#autoexported_functions">Auto-Exported Functions</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#examples">EXAMPLES</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#data__dumper"><em>Data::Dumper</em></a></li>
+	<ul>
+
+		<li><a href="#rlist_vs__perl_syntax">Rlist vs. Perl Syntax</a></li>
+		<li><a href="#debugging_data">Debugging Data</a></li>
+		<li><a href="#speeding_up_compilation__explicit_quoting_">Speeding up Compilation (Explicit Quoting)</a></li>
+		<li><a href="#quoting_strings_that_look_like_numbers">Quoting strings that look like numbers</a></li>
+		<li><a href="#installing_rlist_pm_locally">Installing <em>Rlist.pm</em> locally</a></li>
+		<li><a href="#an_rlistmode_for_emacs">An Rlist-Mode for Emacs</a></li>
+		<li><a href="#implementation_details">Implementation Details</a></li>
+		<ul>
+
+			<li><a href="#perl">Perl</a></li>
+			<ul>
+
+				<li><a href="#package_dependencies">Package Dependencies</a></li>
+				<li><a href="#a_short_story_of_typeglobs">A Short Story of Typeglobs</a></li>
+			</ul>
+
+			<li><a href="#c__">C++</a></li>
+		</ul>
+
+	</ul>
+
+	<li><a href="#bugs">BUGS</a></li>
+	<li><a href="#copyright_license">COPYRIGHT/LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="venue">VENUE</a></h1>
+<p>Data::Rlist - A lightweight data language for Perl and C++</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Data::Rlist;</pre>
+<p>File and string I/O for any Perl data <em>$thing</em>:</p>
+<pre>
+    ### Compile data as text.</pre>
+<pre>
+                  WriteData $thing, $filename;  # compile data into file
+                  WriteData $thing, \$string;   # compile data into buffer
+    $string_ref = WriteData $thing;             # dto.</pre>
+<pre>
+    $string     = OutlineData $thing;           # compile printable text
+    $string     = StringizeData $thing;         # compile text in a compact form (no newlines)
+    $string     = SqueezeData $thing;           # compile text in a super-compact form (no whitespace)</pre>
+<pre>
+    ### Parse data from text.</pre>
+<pre>
+    $thing      = ReadData $filename;           # parse data from file
+    $thing      = ReadData \$string;            # parse data from string buffer</pre>
+<p><em><a href="#item_readdata">ReadData</a></em>,  <em><a href="#item_writedata">WriteData</a></em> etc.  are  <a href="#exports">auto-exported functions</a>.   Alternately we
+use:</p>
+<pre>
+    ### Qualified functions to parse text.</pre>
+<pre>
+    $thing      = Data::Rlist::read($filename);
+    $thing      = Data::Rlist::read($string_ref);
+    $thing      = Data::Rlist::read_string($string_or_string_ref);</pre>
+<pre>
+    ### Qualified functions to compile data into text.</pre>
+<pre>
+                  Data::Rlist::write($thing, $filename);
+    $string_ref = Data::Rlist::write_string($thing);
+    $string     = Data::Rlist::write_string_value($thing);</pre>
+<pre>
+    ### Print data to STDOUT.</pre>
+<pre>
+    PrintData $thing;</pre>
+<p>The object-oriented interface:</p>
+<pre>
+    ### For objects the '-output' attribute refers to a string buffer or is a filename.
+    ### The '-data' attribute defines the value or reference to be compiled into text.</pre>
+<pre>
+    $object     = new Data::Rlist(-data =&gt; $thing, -output =&gt; \$target)</pre>
+<pre>
+    $string_ref = $object-&gt;write;           # compile into $target, return \$target
+    $string_ref = $object-&gt;write_string;    # compile into new string ($target not touched)
+    $string     = $object-&gt;write_string_value; # dto. but return string value</pre>
+<pre>
+    ### Print data to STDOUT.</pre>
+<pre>
+    print $object-&gt;write_string_value;
+    print ${$object-&gt;write};                # returns \$target</pre>
+<pre>
+    ### Set output file and write $thing to disk.</pre>
+<pre>
+    $object-&gt;set(-output =&gt; &quot;.foorc&quot;);</pre>
+<pre>
+    $object-&gt;write;                         # write &quot;./.foorc&quot;, return 1
+    $object-&gt;write(&quot;.barrc&quot;);               # write &quot;./.barrc&quot; (the filename overrides -output)</pre>
+<pre>
+    ### The '-input' attribute defines the text to be compiled, either as
+    ### string reference or filename.</pre>
+<pre>
+    $object-&gt;set(-input =&gt; \$input_string); # assign some text</pre>
+<pre>
+    $thing      = $object-&gt;read;            # parse $input_string into Perl data
+    $thing      = $object-&gt;read($other_string); # parse $other_string (the argument overrides -input)</pre>
+<pre>
+    $object-&gt;set(-input =&gt; &quot;.foorc&quot;);       # assign some input file</pre>
+<pre>
+    $foorc      = $object-&gt;read;            # parse &quot;.foorc&quot;
+    $barrc      = $object-&gt;read(&quot;.barrc&quot;);  # parse some other file
+    $thing      = $object-&gt;read(\$string);  # parse some string buffer
+    $thing      = $object-&gt;read_string($string_or_ref); # dto.</pre>
+<p>Create deep-copies  of any Perl data.  The  metaphor ``keelhaul'' vividly connotes  that <em>$thing</em> is
+stringified, then compiled back:</p>
+<pre>
+    ### Compile a value or ref $thing into text, then parse back into data.</pre>
+<pre>
+    $reloaded   = KeelhaulData $thing;
+    $reloaded   = Data::Rlist::keelhaul($thing);</pre>
+<pre>
+    $object     = new Data::Rlist(-data =&gt; $thing);
+    $reloaded   = $object-&gt;keelhaul;</pre>
+<p>Do deep-comparisons of any Perl data:</p>
+<pre>
+    ### Deep-compare $a and $b and get a description of all type/value differences.</pre>
+<pre>
+    @diffs      = CompareData($a, $b);</pre>
+<p>For more information see <em><a href="#item_compile">compile</a></em>, <em><a href="#item_keelhaul">keelhaul</a></em>, and <em><a href="#item_deep_compare">deep_compare</a></em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>
+</p>
+<h2><a name="venue">Venue</a></h2>
+<p><em>Random-Lists</em> (Rlist)  is a tag/value  text format, which  can ``stringify'' any data  structure in
+7-bit ASCII text.  The basic types are lists  and scalars.  The syntax is similar, but not equal to
+Perl's.  For example,</p>
+<pre>
+    ( &quot;hello&quot;, &quot;world&quot; )
+    { &quot;hello&quot; = &quot;world&quot;; }</pre>
+<p>designates two lists, the first of which is sequential, the second associative.  The format...</p>
+<p>- allows the definition of hierachical and constant data,</p>
+<p>- has no user-defined types, no keywords, no variables,</p>
+<p>- has no arithmetic expressions,</p>
+<p>- uses 7-bit-ASCII character encoding and escape sequences,</p>
+<p>- uses C-style numbers and strings,</p>
+<p>- has an extremely minimal syntax implementable in any programming language and system.</p>
+<p>You can  write any  Perl data  structure into  files as legible  text.  Like  with CSV  the lexical
+overhead of Rlist is minimal: files are merely data.</p>
+<p>You can  read compiled texts back  in Perl and C++  programs.  No information will  be lost between
+different program languages, and floating-point numbers keep their precision.</p>
+<p>You can also compile structured CSV text  from Perl data, using special functions from this package
+that will keep numbers precise and properly quote strings.</p>
+<p>Since Rlist has no  user-defined types the data is structured out of  simple scalars and lists.  It
+is conceivable, however, to develop a simple  type system and store type information along with the
+actual data.  Otherwise the data structures are  tacit consents between the users of the data.  See
+also the implemenation notes for <a href="#perl">Perl</a> and <a href="#c__">C++</a>.</p>
+<p>
+</p>
+<h2><a name="character_encoding">Character Encoding</a></h2>
+<p>Rlist text uses the  7-bit-ASCII character set.  The 95 printable character  codes 32 to 126 occupy
+one  character.  Codes  0 to  31 and  127  to 255  require four  characters each:  the <em>\</em>  escape
+character followed by  the octal code number.  For example, the  German Umlaut character <em>&uuml;</em>
+(252) is translated into <em>\374</em>.  An exception are the following codes:</p>
+<pre>
+    ASCII               ESCAPED AS
+    -----               ----------
+      9 tab               \t
+     10 linefeed          \n
+     13 return            \r
+     34 quote     &quot;       \&quot;
+     39 quote     '       \'
+     92 backslash \       \\</pre>
+<p>
+</p>
+<h2><a name="values_and_default_values">Values and Default Values</a></h2>
+<p><em>Values</em> are either scalars,  array elements or the value of a pair.   Each value is constant.</p>
+<p>The default scalar value is the empty string <code>&quot;&quot;</code>.  So in Perl <em>undef</em> is compiled into <code>&quot;&quot;</code>.</p>
+<p>
+</p>
+<h2><a name="numbers__strings_and_heredocuments">Numbers, Strings and Here-Documents</a></h2>
+<p>Numbers constants adhere to the IEEE 754  syntax for integer- and floating-point numbers (i.e., the
+same lexical conventions as in C and C++ apply).</p>
+<p>Strings constants consisting only of  <code>[a-zA-Z_0-9-/~:.@]</code> characters ``look like identifiers'' (aka
+symbols) need  not to be  quoted.  Otherwise string  constants follow the C  language lexicography.
+They strings must  be placed in double-quotes (single-quotes are not  allowed).  Quoted strings are
+also escaped (i.e., characters are converted to the input character set of 7-bit ASCII).</p>
+<p>You  can  define  a  string  using  a  line-oriented  form of  quoting  based  on  the  UNIX  shell
+<em>here-document</em> syntax and RFC 111.  Multiline quoted strings can be expressed with</p>
+<pre>
+    &lt;&lt;DELIMITER</pre>
+<p>Following the sigil <em> &lt;&lt; </em> an identifier  specifies how to terminate the string scalar.  The value
+of the  scalar will be  all lines  following the current  line down to  the line starting  with the
+delimiter (i.e., the delimiter must be at column  1).  There must be no space between the sigil and
+the identifier.</p>
+<p><strong>EXAMPLES</strong></p>
+<p>Quoted strings:</p>
+<pre>
+    &quot;Hello, World!&quot;</pre>
+<p>Unquoted strings (symbols, identifiers):</p>
+<pre>
+    foobar   cogito.ergo.sum   Memento::mori</pre>
+<p>Here-document strings:</p>
+<pre>
+    &lt;&lt;hamlet
+    &quot;This above all: to thine own self be true&quot;. - (Act I, Scene III).
+    hamlet</pre>
+<p>Integegers and floats:</p>
+<pre>
+    38   10e-6   -.7   3.141592653589793</pre>
+<p>For more information see <em><a href="#item_is_symbol">is_symbol</a></em>, <em><a href="#item_is_number">is_number</a></em> and <em><a href="#item_escape7">escape7</a></em>.</p>
+<p>
+</p>
+<h2><a name="list_values">List Values</a></h2>
+<p>We have two types of lists: sequential (aka array) and associative (aka map, hash, dictionary).</p>
+<p><strong>EXAMPLES</strong></p>
+<p>Arrays:</p>
+<pre>
+    ( 1, 2, ( 3, &quot;Audiatur et altera pars!&quot; ) )</pre>
+<p>Maps:</p>
+<pre>
+    {
+        key = value;
+        standalone-key;
+        Pi = 3.14159;</pre>
+<pre>
+        &quot;meta-syntactic names&quot; = (foo, bar, &quot;lorem ipsum&quot;, Acme, ___);</pre>
+<pre>
+        var = {
+            log = {
+                messages = &lt;&lt;LOG;
+    Nov 27 21:55:04 localhost kernel: TSC appears to be running slowly. Marking it as unstable
+    Nov 27 22:34:27 localhost kernel: Uniform CD-ROM driver Revision: 3.20
+    Nov 27 22:34:27 localhost kernel: Loading iSCSI transport class v2.0-724.&lt;6&gt;PNP: No PS/2 controller found. Probing ports directly.
+    Nov 27 22:34:27 localhost kernel: wifi0: Atheros 5212: mem=0x26000000, irq=11
+    LOG
+            };
+        };
+    }</pre>
+<p>
+</p>
+<h2><a name="binary_data">Binary Data</a></h2>
+<p>Binary data can  be represented as base64-encoded string,  or <a href="#numbers__strings_and_heredocuments">here-document</a> string.  For example,</p>
+<pre>
+    use MIME::Base64;</pre>
+<pre>
+    $str = encode_base64($binary_buf);</pre>
+<p>The result <em>$str</em> will be a string broken into  lines of no more than 76 characters each; the 76th
+character  will be  a  newline <code>&quot;\n&quot;</code>.   Here  is a  complete  Perl program  that  creates a  file
+<em>random.rls</em>:</p>
+<pre>
+    use MIME::Base64;
+    use Data::Rlist;</pre>
+<pre>
+    our $binary_data = join('', map { chr(int rand 256) } 1..300);
+    our $sample = { random_string =&gt; encode_base64($binary_data) };</pre>
+<pre>
+    WriteData $sample, 'random.rls';</pre>
+<p>These few lines create a file <em>random.rls</em> containing text like the following:</p>
+<pre>
+    {
+        random_string = &lt;&lt;___
+    w5BFJIB3UxX/NVQkpKkCxEulDJ0ZR3ku1dBw9iPu2UVNIr71Y0qsL4WxvR/rN8VgswNDygI0xelb
+    aK3FytOrFg6c1EgaOtEudmUdCfGamjsRNHE2s5RiY0ZiaC5E5XCm9H087dAjUHPtOiZEpZVt3wAc
+    KfoV97kETH3BU8/bFGOqscCIVLUwD9NIIBWtAw6m4evm42kNhDdQKA3dNXvhbI260pUzwXiLYg8q
+    MDO8rSdcpL4Lm+tYikKrgCih9UxpWbfus+yHWIoKo/6tW4KFoufGFf3zcgnurYSSG2KRLKkmyEa+
+    s19vvUNmjOH0j1Ph0ZTi2pFucIhok4krJi0B5yNbQStQaq23v7sTqNom/xdRgAITROUIoel5sQIn
+    CqxenNM/M4uiUBV9OhyP
+    ___
+    ;
+    }</pre>
+<p>Note that <em><a href="#item_writedata">WriteData</a></em>  uses the predefined <code>&quot;default&quot;</code> configuration,  which enables here-doc
+strings.  See also <a href="/MIME/Base64.html">the MIME::Base64 manpage</a>.</p>
+<p>
+</p>
+<h2><a name="embedded_perl_code__nanoscripts_">Embedded Perl Code (Nanoscripts)</a></h2>
+<p>Rlist text  can define embedded Perl  programs, called <em>nanonscripts</em>.  The  embedded program text
+has the form of a <a href="#numbers__strings_and_heredocuments">here-document</a> with the special delimiter
+<code>&quot;perl&quot;</code>.  After  the Rlist text has  been parsed you call  <em><a href="#item_evaluate_nanoscripts">evaluate_nanoscripts</a></em> to <em>eval</em>
+all embedded Perl in the order of definiton.  The function arranges it that within the <em>eval</em>...</p>
+<ul>
+<li>
+<p>the <em>$root</em> variable refers to the root of the input, as unblessed array- or hash-reference;</p>
+</li>
+<li>
+<p>the <em>$this</em> variable refers to the array or hash that stores the currently <em>eval</em>'d nanoscript;</p>
+</li>
+<li>
+<p>the <em>$where</em> variable stores the name of the key, or the index, within <em>$this</em>.</p>
+</li>
+</ul>
+<p>The nanoscript  can use  this information to  oriented itself  within the parsed  data, or  even to
+modify the  data in-place.  The result  of <em>eval</em>'ing will  replace the nanoscript text.   You can
+also  <em>eval</em>  the   embedded  Perl  codes  programmatically,  using   the  <em><a href="#item_nanoscripts">nanoscripts</a></em>  and
+<em><a href="#item_result">result</a></em> functions.</p>
+<p><strong>EXAMPLES</strong></p>
+<p>Simple example of an Rlist text that hosts Perl code:</p>
+<pre>
+    (&lt;&lt;perl)
+    print &quot;Hello, World!&quot;;
+    perl</pre>
+<p>Here is a more complex example that defines a list of nanoscripts, and evaluates them:</p>
+<pre>
+    use Data::Rlist;</pre>
+<pre>
+    $data = join('', &lt;DATA&gt;);
+    $data = EvaluateData \$data;</pre>
+<pre>
+    __END__
+    ( &lt;&lt;perl, &lt;&lt;perl, &lt;&lt;perl, &lt;&lt;perl )
+    print &quot;Hello World!\n&quot;          # english
+    perl
+    print &quot;Hallo Welt!\n&quot;           # german
+    perl
+    print &quot;Bonjour le monde!\n&quot;     # french
+    perl
+    print &quot;Olá mundo!\n&quot;            # spanish
+    perl</pre>
+<p>When we execute the above script the following output is printed before the script exits:</p>
+<pre>
+    Hello World!
+    Hallo Welt!
+    Bonjour le monde!
+    Olá mundo!</pre>
+<p>Note  that  when  the  Rlist  text  after  <em>__END__</em>  is  placed  in  <em>some_file</em>,  we  can  call
+<em><a href="#item_evaluatedata">EvaluateData(<code>&quot;some_file&quot;</code>)</a></em> for the same effect.  The next example modifies the parsed data
+in place.  Imagine a file <em>this_file_modifies_itself</em> with the following content:</p>
+<pre>
+    ( &lt;&lt;perl )
+    ReadData(\\'{ foo = bar; }');
+    perl</pre>
+<p>When we parse this file using</p>
+<pre>
+    $data = ReadData(&quot;this_file_modifies_itself&quot;);</pre>
+<p>to <em>$data</em> will be assigned the following Perl value</p>
+<pre>
+    [ &quot;ReadData(\\'{ foo = bar; }');\n&quot; ]</pre>
+<p>Next we call <em>Data::Rlist::<a href="#item_evaluate_nanoscripts">evaluate_nanoscripts</a>()</em> to ``morph'' this value into</p>
+<pre>
+    [ { 'foo' =&gt; 'bar' } ]</pre>
+<p>The same effect can be achieved in just one call</p>
+<pre>
+    $data = EvaluateData(&quot;this_file_modifies_itself&quot;);</pre>
+<p>
+</p>
+<h2><a name="comments">Comments</a></h2>
+<p>Rlist  supports multiple  forms  of comments:  <em>//</em>  or <em>#</em>  single-line-comments,  and <em>/*  */</em>
+multi-line-comments. You may use all three forms at will.</p>
+<p>
+</p>
+<hr />
+<h1><a name="package_interface">PACKAGE INTERFACE</a></h1>
+<p>The  core  functions to  cultivate  package objects  are  <em><a href="#item_new">new</a></em>,  <em><a href="#item_dock">dock</a></em>, <em><a href="#item_set">set</a></em>  and
+<em><a href="#item_get">get</a></em>.  When a regular package function is called in object context some omitted arguments are
+read from object attributes.  This is  true for the following functions: <em><a href="#item_read">read</a></em>, <em><a href="#item_write">write</a></em>,
+<em><a href="#item_read_string">read_string</a></em>,   <em><a href="#item_write_string">write_string</a></em>,  <em><a href="#item_read_csv">read_csv</a></em>,   <em><a href="#item_write_csv">write_csv</a></em>,  <em><a href="#item_read_conf">read_conf</a></em>,
+<em><a href="#item_write_conf">write_conf</a></em> and <em><a href="#item_keelhaul">keelhaul</a></em>.</p>
+<p>Unless called  in object  context the first  argument has  an indifferent meaning  (i.e., it  is no
+<em>Data::Rlist</em> reference).  Then <em><a href="#item_read">read</a></em> expects an  input file or string, <em><a href="#item_write">write</a></em> the data
+to compile etc.</p>
+<p>
+</p>
+<h2><a name="construction">Construction</a></h2>
+<dl>
+<dt><strong><a name="item_new"><em>new([ATTRIBUTES])</em></a></strong>
+
+<dd>
+<p>Create a <em>Data::Rlist</em> object from the hash ATTRIBUTES. For example,</p>
+</dd>
+<dd>
+<pre>
+    $self = Data::Rlist-&gt;new(-input =&gt; 'this.dat',
+                             -data =&gt; $thing,
+                             -output =&gt; 'that.dat');</pre>
+</dd>
+<dd>
+<p>For   this   object   the   call   <em><a href="#item_read">$self-&gt;read()</a></em>  reads   from   <em>this.dat</em>,   and
+<em><a href="#item_write">$self-&gt;write()</a></em> writes any Perl data <em>$thing</em> to <em>that.dat</em>.</p>
+</dd>
+<dd>
+<p><strong>REGULAR OBJECT ATTRIBUTES</strong></p>
+</dd>
+<dl>
+<dt><strong><a name="item__2dinput__3d_3e_input"><code>-input =&gt; INPUT</code></a></strong>
+
+<dt><strong><a name="item__2dfilter__3d_3e_filter"><code>-filter =&gt; FILTER</code></a></strong>
+
+<dt><strong><a name="item__2dfilter_args__3d_3e_filter_2dargs"><code>-filter_args =&gt; FILTER-ARGS</code></a></strong>
+
+<dd>
+<p>Defines what  Rlist text to  parse and  how to preprocess  an input file.   INPUT is a  filename or
+string reference.  FILTER can be 1 to  select the standard C preprocessor <em>cpp</em>.  These attributes
+are applied by <em><a href="#item_read">read</a></em>, <em><a href="#item_read_string">read_string</a></em>, <em><a href="#item_read_conf">read_conf</a></em> and <em><a href="#item_read_csv">read_csv</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2ddata__3d_3e_data"><code>-data =&gt; DATA</code></a></strong>
+
+<dt><strong><a name="item__2doptions__3d_3e_options"><code>-options =&gt; OPTIONS</code></a></strong>
+
+<dt><strong><a name="item__2doutput__3d_3e_output"><code>-output =&gt; OUTPUT</code></a></strong>
+
+<dd>
+<p>Defines  the Perl  data to  be <a href="#item_compile">compiled</a>  into  text (DATA),  how it  shall be  compiled
+(OPTIONS) and  where to  store the  compiled text (OUTPUT).   When OUTPUT  is string  reference the
+compiled text  will be stored  in that string.   When OUTPUT is <em>undef</em>  a new string  is created.
+When OUTPUT  is a string  value it is  a filename.  These  attributes are applied  by <em><a href="#item_write">write</a></em>,
+<em><a href="#item_write_string">write_string</a></em>, <em><a href="#item_write_conf">write_conf</a></em>, <em><a href="#item_write_csv">write_csv</a></em> and <em><a href="#item_keelhaul">keelhaul</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dheader__3d_3e_header"><code>-header =&gt; HEADER</code></a></strong>
+
+<dd>
+<p>Defines an array  of text lines, each of which will  by prefixed by a <em>#</em> and  then written at the
+top of the output file.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2ddelimiter__3d_3e_delimiter"><code>-delimiter =&gt; DELIMITER</code></a></strong>
+
+<dd>
+<p>Defines the field delimiter for <em>.csv</em>-files. Applied by <em><a href="#item_read_csv">read_csv</a></em> and <em><a href="#item_read_conf">read_conf</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dcolumns__3d_3e_strings"><code>-columns =&gt; STRINGS</code></a></strong>
+
+<dd>
+<p>Defines the column names for <em>.csv</em>-files to be written into the first line.</p>
+</dd>
+</li>
+</dl>
+<p><strong>ATTRIBUTES THAT MASQUERADE PACKAGE GLOBALS</strong></p>
+<p>The attributes  listed below raise  new values for  package globals for  the time an  object method
+runs.</p>
+<dl>
+<dt><strong><a name="item__2dinputrecordseparator__3d_3e_flag"><code>-InputRecordSeparator =&gt; FLAG</code></a></strong>
+
+<dd>
+<p>Masquerades <em>$/</em>, which affects  how lines are read and written to  and from Rlist- and CSV-files.
+You may also set <em>$/</em> by yourself.  See <em>perlport</em> and <em>perlvar</em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dmaxdepth__3d_3e_integer"><code>-MaxDepth =&gt; INTEGER</code></a></strong>
+
+<dt><strong><a name="item__2dsafecppmode__3d_3e_flag"><code>-SafeCppMode =&gt; FLAG</code></a></strong>
+
+<dt><strong><a name="item__2droundscientific__3d_3e_flag"><code>-RoundScientific =&gt; FLAG</code></a></strong>
+
+<dd>
+<p>Masquerade  <em><a href="#debugging_data">$Data::Rlist::MaxDepth</a></em>, <em><a href="#item_open_input">$Data::Rlist::SafeCppMode</a></em>
+and <em><a href="#item_round">$Data::Rlist::RoundScientific</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2dechostderr__3d_3e_flag"><code>-EchoStderr =&gt; FLAG</code></a></strong>
+
+<dd>
+<p>Print read errors and warnings message on STDERR (default: off).</p>
+</dd>
+</li>
+<dt><strong><a name="item__2ddefaultcsvdelimiter__3d_3e_regex"><code>-DefaultCsvDelimiter =&gt; REGEX</code></a></strong>
+
+<dt><strong><a name="item__2ddefaultconfdelimiter__3d_3e_regex"><code>-DefaultConfDelimiter =&gt; REGEX</code></a></strong>
+
+<dd>
+<p>Masquerades <em>$Data::Rlist::DefaultCsvDelimiter</em>  and <em>$Data::Rlist::DefaultConfDelimiter</em>.  These
+globals define  the default regexes  to use  when the <em>-options</em>  attribute does not  specifiy the
+<a href="#compile_options"><code>&quot;delimiter&quot;</code></a> regex.  Applied by <em><a href="#item_read_csv">read_csv</a></em> and <em><a href="#item_read_conf">read_conf</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__2ddefaultconfseparator__3d_3e_string"><code>-DefaultConfSeparator =&gt; STRING</code></a></strong>
+
+<dd>
+<p>Masquerades <em>$Data::Rlist::DefaultConfSeparator</em>,  the default string to use  when the <em>-options</em>
+attribute   does  not  specifiy   the  <a href="#compile_options"><code>&quot;separator&quot;</code></a>  string.    Applied  by
+<em><a href="#item_write_conf">write_conf</a></em>.</p>
+</dd>
+</li>
+</dl>
+<dt><strong><a name="item_dock"><em>dock(SELF, SUB)</em></a></strong>
+
+<dd>
+<p>Localize object  SELF within the  package and run  SUB.  This means  that some of  SELF's attribute
+masqquerade  few  package globals  for  the  time  SUB runs.   SELF  then  locks the  package,  and
+<em>$Data::Rlist::Locked</em> is greater than 0.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="attribute_access">Attribute Access</a></h2>
+<dl>
+<dt><strong><a name="item_set"><em>set(SELF[, ATTRIBUTE]...)</em></a></strong>
+
+<dd>
+<p>Reset or initialize object attributes, then return SELF.  Each ATTRIBUTE is a name/value-pair.  See
+<em><a href="#item_new">new</a></em> for a list of valid names.  For example,</p>
+</dd>
+<dd>
+<pre>
+    $obj-&gt;set(-input =&gt; \$str, -output =&gt; 'temp.rls', -options =&gt; 'squeezed');</pre>
+</dd>
+</li>
+<dt><strong><a name="item_get"><em>get(SELF, NAME[, DEFAULT])</em></a></strong>
+
+<dt><strong><a name="item_require"><em>require(SELF[, NAME])</em></a></strong>
+
+<dt><strong><a name="item_has"><em>has(SELF[, NAME])</em></a></strong>
+
+<dd>
+<p>Get some  attribute NAME from object SELF.   Unless NAME exists returns  DEFAULT.  The <em>require</em>
+method has  no default value,  hence it dies  unless NAME exists.  <em>has</em> returns true  when NAME
+exists, false otherwise.  For NAME the leading hyphen is optional.  For example,</p>
+</dd>
+<dd>
+<pre>
+    $self-&gt;get('foo');          # returns $self-&gt;{-foo} or undef
+    $self-&gt;get(-foo=&gt;);         # dto.
+    $self-&gt;get('foo', 42);      # returns $self-&gt;{-foo} or 42</pre>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="public_functions">Public Functions</a></h2>
+<dl>
+<dt><strong><a name="item_read"><em>read(INPUT[, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dd>
+<p>Parse data from INPUT, which specifies some Rlist-text.  See also <em><a href="#item_errors">errors</a></em>, <em><a href="#item_write">write</a></em>.</p>
+</dd>
+<dd>
+<p><strong>PARAMETERS</strong></p>
+</dd>
+<dd>
+<p>INPUT shall be either</p>
+</dd>
+<dd>
+<p>- some Rlist object created by <em><a href="#item_new">new</a></em>,</p>
+</dd>
+<dd>
+<p>- a string reference, in which case <em>read</em> and <em><a href="#item_read_string">read_string</a></em> parse Rlist text from it,</p>
+</dd>
+<dd>
+<p>- a string scalar, in which case <em>read</em> assumes a file to parse.</p>
+</dd>
+<dd>
+<p>See <em><a href="#item_open_input">open_input</a></em>  for the FILTER and FILTER-ARGS  parameters, which are used  to preprocess an
+input file.  When an input file cannot  be <em>open</em>'d and <em>flock</em>'d this function dies.  When INPUT
+is  an  object,  arguments for  FILTER  and  FILTER-ARGS  eventually  override the  <em>-filter</em>  and
+<em>-filter_args</em> attributes.</p>
+</dd>
+<dd>
+<p><strong>RESULT</strong></p>
+</dd>
+<dd>
+<p>The parsed data as array- or hash-reference, or  <em>undef</em> if there was no data. The latter may also
+be the case when file consist only of comments/whitespace.</p>
+</dd>
+<dd>
+<p><strong>NOTES</strong></p>
+</dd>
+<dd>
+<p>This function  may die.  Dying  is Perl's  mechanism to raise  exceptions, which eventually  can be
+catched with <em>eval</em>.  For example,</p>
+</dd>
+<dd>
+<pre>
+    my $host = eval { use Sys::Hostname; hostname; } || 'some unknown machine';</pre>
+</dd>
+<dd>
+<p>This code fragment  traps the <em>die</em> exception, so  that <em>eval</em> returns <em>undef</em> or  the result of
+calling <em>hostname</em>. The following example uses <em>eval</em> to trap exceptions thrown by <em>read</em>:</p>
+</dd>
+<dd>
+<pre>
+    $object = new Data::Rlist(-input =&gt; $thingfile);
+    $thing = eval { $object-&gt;read };</pre>
+</dd>
+<dd>
+<pre>
+    unless (defined $thing) {
+        if ($object-&gt;errors) {
+            print STDERR &quot;$thingfile has syntax errors&quot;
+        } else {
+            print STDERR &quot;$thingfile not found, is locked or empty&quot;
+        }
+    } else {
+        # Can use $thing
+            .
+            .
+    }</pre>
+</dd>
+</li>
+<dt><strong><a name="item_read_csv"><em>read_csv(INPUT[, OPTIONS, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dt><strong><a name="item_read_conf"><em>read_conf(INPUT[, OPTIONS, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dd>
+<p>Parse data from INPUT, which specifies some comma-separated-values (CSV) text.  Both functions</p>
+</dd>
+<dd>
+<p>- read data from strings or files,</p>
+</dd>
+<dd>
+<p>- use an optional delimiter,</p>
+</dd>
+<dd>
+<p>- ignore delimiters in quoted strings,</p>
+</dd>
+<dd>
+<p>- ignore empty lines,</p>
+</dd>
+<dd>
+<p>- ignore lines begun with <em>#</em>.</p>
+</dd>
+<dd>
+<p><em>read_conf</em> is a variant of <em>read_csv</em> dedicated to configuration files. Such files consist
+of lines of the form</p>
+</dd>
+<dd>
+<pre>
+    key = value</pre>
+</dd>
+<dd>
+<p><strong>PARAMETERS</strong></p>
+</dd>
+<dd>
+<p>For INPUT see <em><a href="#item_read">read</a></em>.  For FILTER,  FILTER-ARGS see <em><a href="#item_open_input">open_input</a></em>.</p>
+</dd>
+<dd>
+<p>OPTIONS  can be  used to  override the  <a href="#compile_options"><code>&quot;delimiter&quot;</code></a>  regex.  For  example, a
+delimiter of <code>'\s+'</code>  splits the line at horizontal whitespace into  multiple values (with respect
+of quoted strings).   For <em>read_csv</em> the delimiter defaults to  <code>'\s*,\s*'</code>, and for <em>read_conf</em>
+to <code>'\s*=\s*'</code>.  See also <em><a href="#item_write_csv">write_csv</a></em> and <em><a href="#item_write_conf">write_conf</a></em>.</p>
+</dd>
+<dd>
+<p><strong>RESULT</strong></p>
+</dd>
+<dd>
+<p>Both functions return a list of lists.  Each embedded array defines the fields in a line.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<p>Un/quoting of values happens implicitly.  Given a file <em>db.conf</em></p>
+</dd>
+<dd>
+<pre>
+    # Comment
+    SERVER      = hostname
+    DATABASE    = database_name
+    LOGIN       = &quot;user,password&quot;</pre>
+</dd>
+<dd>
+<p>the call <em>$opts=ReadConf(<code>&quot;db.conf&quot;</code>)</em> assigns</p>
+</dd>
+<dd>
+<pre>
+    [ [ 'SERVER', 'hostname' ],
+      [ 'DATABASE', 'database_name' ],
+      [ 'LOGIN', 'user,password' ]
+    ]</pre>
+</dd>
+<dd>
+<p>The <em><a href="#item_writeconf">WriteConf</a></em> function can be used to create or update the configuration:</p>
+</dd>
+<dd>
+<pre>
+    push @$opts, [ 'MAGIC VALUE' =&gt; 3.14_15 ];</pre>
+</dd>
+<dd>
+<pre>
+    WriteConf('db.conf', { precision =&gt; 2 });</pre>
+</dd>
+<dd>
+<p>This writes to <em>db.conf</em>:</p>
+</dd>
+<dd>
+<pre>
+    SERVER = hostname
+    DATABASE = database_name
+    LOGIN = &quot;user,password&quot;
+    &quot;MAGIC VALUE&quot; = 3.14</pre>
+</dd>
+</li>
+<dt><strong><a name="item_read_string"><em>read_string(INPUT)</em></a></strong>
+
+<dd>
+<p>Calls <em><a href="#item_read">read</a></em>  to parse Rlist language  productions from the string  or string-reference INPUT.
+When INPUT is an object do this for its <em>-input</em> attribute.</p>
+</dd>
+</li>
+<dt><strong><a name="item_result"><em>result([SELF])</em></a></strong>
+
+<dd>
+<p>Return  the last  result  of  calling <em><a href="#item_read">read</a></em>,  which  is either  <em>undef</em>  or  some array-  or
+hash-reference.  When SELF is passed as object  reference, returns the result that occured the last
+time SELF had called <em><a href="#item_read">read</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_nanoscripts"><em>nanoscripts([SELF])</em></a></strong>
+
+<dd>
+<p>In list context return an array of nanoscripts  defined by the last call to <em><a href="#item_read">read</a></em>.  When SELF
+is passed return this information for the last time SELF had called <em><a href="#item_read">read</a></em>. The result has the
+form:</p>
+</dd>
+<dd>
+<pre>
+    ( [ $hash_or_array_ref, $key_or_index ], # 1st nanoscript
+      [ $hash_or_array_ref, $key_or_index ], # 2nd nanoscript
+        .
+        .
+        .
+    )</pre>
+</dd>
+<dd>
+<p>In scalar context  return a reference to the  above.  This information defines the  location of all
+embedded Perl  scripts within the result,  and can be  used to <em>eval</em> them  programmatically.  See
+also <em><a href="#item_result">result</a></em>, <em><a href="#item_evaluate_nanoscripts">evaluate_nanoscripts</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_evaluate_nanoscripts"><em>evaluate_nanoscripts([SELF])</em></a></strong>
+
+<dd>
+<p>Evaluates all nanoscripts defined by the last call to <em><a href="#item_read">read</a></em>.  When called as method evaluates
+the  nanoscripts defined  by the  last time  SELF had  called <em><a href="#item_read">read</a></em>.   Returns the  number of
+scripts or  0 if none  were available.  Each  script is replaced by  the result of  <em>eval</em>'ing it.
+(For details and examples see <a href="#embedded_perl_code__nanoscripts_">Embedded Perl Code (Nanoscripts)</a>.)</p>
+</dd>
+</li>
+<dt><strong><a name="item_messages"><em>messages([SELF])</em></a></strong>
+
+<dd>
+<p>In  list context  returns  a list  of  compile-time messages  that  occurred in  the  last call  to
+<em><a href="#item_read">read</a></em>.  In scalar context returns an array  reference.  When an package object SELF is passed
+returns the information for the last time SELF had called <em><a href="#item_read">read</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_errors"><em>errors([SELF])</em></a></strong>
+
+<dt><strong><a name="item_warnings"><em>warnings([SELF])</em></a></strong>
+
+<dd>
+<p>Returns the  number of syntax errors  and warnings that occurred  in the last  call to <em><a href="#item_read">read</a></em>.
+When called as method returns the number that occured the last time SELF had called <em><a href="#item_read">read</a></em>.</p>
+</dd>
+<dd>
+<p>Example:</p>
+</dd>
+<dd>
+<pre>
+    use Data::Rlist;</pre>
+</dd>
+<dd>
+<pre>
+    our $data = ReadData 'things.rls';</pre>
+</dd>
+<dd>
+<pre>
+    if (Data::Rlist::errors() || Data::Rlist::warnings()) {
+        print join(&quot;\n&quot;, Data::Rlist::messages())
+    } else {
+        # Ok, $data is an array- or hash-reference.
+        die unless $data;</pre>
+</dd>
+<dd>
+<pre>
+    }</pre>
+</dd>
+</li>
+<dt><strong><a name="item_broken"><em>broken([SELF])</em></a></strong>
+
+<dd>
+<p>Returns the  number of times the last  <em><a href="#item_compile">compile</a></em> violated <em><a href="#debugging_data">$Data::Rlist::MaxDepth</a></em>.  When  called  as method  returns  the  information  for  the  last time  SELF  had  called
+<em><a href="#item_compile">compile</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_missing_input"><em>missing_input([SELF])</em></a></strong>
+
+<dd>
+<p>Returns true  when the last  call to  <em><a href="#item_parse">parse</a></em> yielded <em>undef</em>,  because there was  nothing to
+parse.   When  called  as method  returns  the  information  for  the  last time  SELF  had  called
+<em><a href="#item_parse">parse</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_write"><em>write(DATA[, OUTPUT, OPTIONS, HEADER])</em></a></strong>
+
+<dd>
+<p>Transliterates Perl data into  Rlist text and write the text to a  file or string buffer.  <em>write</em>
+is auto-exported as <em><a href="#item_writedata">WriteData</a></em>.</p>
+</dd>
+<dd>
+<p><strong>PARAMETERS</strong></p>
+</dd>
+<dd>
+<p>DATA is either an object generated by <em><a href="#item_new">new</a></em>,  or any Perl data including <em>undef</em>.  In case of
+an object  the actual DATA  value is defined  by its <em>-data</em>  attribute. (When <em>-data</em>  refers to
+another Rlist object, this other object is invoked.)</p>
+</dd>
+<dd>
+<p>OUTPUT defines the  output location, as filename, string-reference or  <em>undef</em>.  When <em>undef</em> the
+function allocates  a string  and returns  a reference to  it.  OUTPUT  defaults to  the <em>-output</em>
+attribute when DATA defines an object.</p>
+</dd>
+<dd>
+<p>OPTIONS  define how  to compile  DATA: when  <em>undef</em> or  <code>&quot;fast&quot;</code> uses  <em><a href="#item_compile_fast">compile_fast</a></em>, when
+<code>&quot;perl&quot;</code>  uses  <em><a href="#item_compile_perl">compile_Perl</a></em>,  otherwise   <em><a href="#item_compile">compile</a></em>.   Defaults  to  the  <em>-options</em>
+attribute when DATA is an object.</p>
+</dd>
+<dd>
+<p>HEADER is  a reference to  an array of  strings that shall  be printed literally  at the top  of an
+output file. Defaults to the <em>-header</em> attribute when DATA is an object.</p>
+</dd>
+<dd>
+<p><strong>RESULT</strong></p>
+</dd>
+<dd>
+<p>When <em>write</em> creates a  file it returns 0 for failure or 1 for  success.  Otherwise it returns a
+string reference.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<pre>
+    $self = new Data::Rlist(-data =&gt; $thing, -output =&gt; $output);</pre>
+</dd>
+<dd>
+<pre>
+    $self-&gt;write;   # Compile $thing into a file ($output is a filename)
+                    # or string ($output is a string reference).</pre>
+</dd>
+<dd>
+<pre>
+    Data::Rlist::write($thing, $output);    # dto., but using the functional interface.</pre>
+</dd>
+</li>
+<dt><strong><a name="item_write_csv"><em>write_csv(DATA[, OUTPUT, OPTIONS, COLUMNS])</em></a></strong>
+
+<dt><strong><a name="item_write_conf"><em>write_conf(DATA[, OUTPUT, OPTIONS, HEADER])</em></a></strong>
+
+<dd>
+<p>Write  DATA as  comma-separated-values  (CSV) to  file  or string  OUTPUT.  <em>write_conf</em>  writes
+configuration  files where  each  line contains  a  tagname, a  separator and  a  value.</p>
+</dd>
+<dd>
+<p><strong>PARAMETERS</strong></p>
+</dd>
+<dd>
+<p>DATA is either  an object, or defines the data  to be compiled as reference to  an array of arrays.
+<em>write_conf</em> uses only the first and second fields. For example,</p>
+</dd>
+<dd>
+<pre>
+    [ [ a, b, c ],      # fields of line 1
+      [ d, e, f, g ],   # fields line 2
+        .
+        .
+    ]</pre>
+</dd>
+<dd>
+<p></p>
+</dd>
+<dd>
+<p>OPTIONS  specifies  the  comma-separator  (<code>&quot;separator&quot;</code>),  how to  quote  (<code>&quot;auto_quote&quot;</code>),  the
+linefeed (<code>&quot;eol_space&quot;</code>) and the numeric precision (<code>&quot;precision&quot;</code>).  COLUMNS specifies the column
+names to be written to the first line.  Likewise  the text from the HEADER array is written in form
+of <em>#</em>-comments at the top of an output file.</p>
+</dd>
+<dd>
+<p><strong>RESULT</strong></p>
+</dd>
+<dd>
+<p>When a  file was  created both function  return 0 for  failure, or  1 for success.   Otherwise they
+return a reference to the compiled text.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<p>Functional interface:</p>
+</dd>
+<dd>
+<pre>
+    use Data::Rlist;            # imports WriteCSV</pre>
+</dd>
+<dd>
+<pre>
+    WriteCSV($thing, &quot;foo.dat&quot;);</pre>
+</dd>
+<dd>
+<pre>
+    WriteCSV($thing, &quot;foo.dat&quot;, { separator =&gt; '; ' }, [qw/GBKNR VBKNR EL LaD/]);</pre>
+</dd>
+<dd>
+<pre>
+    WriteCSV($thing, \$target_string);</pre>
+</dd>
+<dd>
+<pre>
+    $string_ref = WriteCSV($thing);</pre>
+</dd>
+<dd>
+<p>Object-oriented interface:</p>
+</dd>
+<dd>
+<pre>
+    $object = new Data::Rlist(-data =&gt; $thing, -output =&gt; &quot;foo.dat&quot;,
+                              -options =&gt; { separator =&gt; '; ' },
+                              -columns =&gt; [qw/GBKNR VBKNR EL LaD LaD_V/]);</pre>
+</dd>
+<dd>
+<pre>
+    $object-&gt;write_csv;         # write $thing as CSV to foo.dat
+    $object-&gt;write;             # write $thing as Rlist to foo.dat</pre>
+</dd>
+<dd>
+<pre>
+    $object-&gt;set(-output =&gt; \$target_string);</pre>
+</dd>
+<dd>
+<pre>
+    $object-&gt;write_csv;         # write $thing as CSV to $target_string</pre>
+</dd>
+<dd>
+<p>See also <em><a href="#item_write">write</a></em> and <em><a href="#item_read_csv">read_csv</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_write_string"><em>write_string(DATA[, OPTIONS])</em></a></strong>
+
+<dd>
+<p>Stringify any Perl data  and return a reference to the string.   Works like <em><a href="#item_write">write</a></em> but always
+compiles  to a  new string  to which  it  returns a  reference.  The  default for  OPTIONS will  be
+<a href="#predefined_options"><code>&quot;string&quot;</code></a>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_write_string_value"><em>write_string_value(DATA[, OPTIONS])</em></a></strong>
+
+<dd>
+<p>Stringify  any  Perl  dats  and  return  the  compiled  text  string  value.   OPTIONS  default  to
+<a href="#predefined_options"><code>&quot;default&quot;</code></a>.  For example,</p>
+</dd>
+<dd>
+<pre>
+    print &quot;\n\$thing dumped: &quot;, Data::Rlist::write_string_value($thing);</pre>
+</dd>
+<dd>
+<pre>
+    $self = new Data::Rlist(-data =&gt; $thing);</pre>
+</dd>
+<dd>
+<pre>
+    print &quot;\nsame \$thing dumped: &quot;, $self-&gt;write_string_value;</pre>
+</dd>
+</li>
+<dt><strong><a name="item_keelhaul"><em>keelhaul(DATA[, OPTIONS])</em></a></strong>
+
+<dd>
+<p>Do a deep copy of DATA according  to <a href="#compile_options">OPTIONS</a>.  First the function compiles DATA
+to Rlist text, then restores the data  from exactly this text.  This process is called ``keelhauling
+data'', and allows us to</p>
+</dd>
+<dd>
+<p>- adjust the accuracy of numbers,</p>
+</dd>
+<dd>
+<p>- break circular-references,</p>
+</dd>
+<dd>
+<p>- drop <em>\*foo{THING}</em>s,</p>
+</dd>
+<dd>
+<p>- bring multiple data sets to the same, common basis.</p>
+</dd>
+<dd>
+<p>It is useful (e.g.)  when  DATA had been hatched by some other code, and  you don't know whether it
+is hierachical, or if typeglob-refs nist inside.  Then  keelhaul it to clean it from its past.  For
+example, to bring all numbers in</p>
+</dd>
+<dd>
+<pre>
+    $thing = { foo =&gt; [ [ .00057260 ], -1.6804e-4 ] };</pre>
+</dd>
+<dd>
+<p>to a certain accuracy, use</p>
+</dd>
+<dd>
+<pre>
+    $deep_copy_of_thing = Data::Rlist::keelhaul($thing, { precision =&gt; 4 });</pre>
+</dd>
+<dd>
+<p>All number scalars in  <em>$thing</em> are rounded to 4 decimal places,  so they're finally comparable as
+floating-point numbers.  To <em>$deep_copy_of_thing</em> is assigned the hash-reference</p>
+</dd>
+<dd>
+<pre>
+    { foo =&gt; [ [ 0.0006 ], -0.0002 ] }</pre>
+</dd>
+<dd>
+<p>Likewise one can convert all floats to integers:</p>
+</dd>
+<dd>
+<pre>
+    $make_integers = new Data::Rlist(-data =&gt; $thing, -options =&gt; { precision =&gt; 0 });</pre>
+</dd>
+<dd>
+<pre>
+    $thing_without_floats = $make_integers-&gt;keelhaul;</pre>
+</dd>
+<dd>
+<p>When <em><a href="#item_keelhaul">keelhaul</a></em> is called in an array context it also returns the text from which the copy had
+been built.  For example,</p>
+</dd>
+<dd>
+<pre>
+    $deep_copy = Data::Rlist::keelhaul($thing);</pre>
+</dd>
+<dd>
+<pre>
+    ($deep_copy, $rlist_text) = Data::Rlist::keelhaul($thing);</pre>
+</dd>
+<dd>
+<pre>
+    $deep_copy = new Data::Rlist(-data =&gt; $thing)-&gt;keelhaul;</pre>
+</dd>
+<dd>
+<p><strong>DETAILS</strong></p>
+</dd>
+<dd>
+<p><em><a href="#item_keelhaul">keelhaul</a></em> won't throw <em>die</em> nor return an error, but be prepared for the following effects:</p>
+</dd>
+<ul>
+<li>
+<p><em>ARRAY</em>, <em>HASH</em>, <em>SCALAR</em> and <em>REF</em> references were compiled, whether blessed or not.  (Since
+compiling does not store type information, <em>keelhaul</em> will turn blessed references into barbars
+again.)</p>
+</li>
+<li>
+<p><em>IO</em>, <em>GLOB</em> and <em>FORMAT</em> references have been converted into strings.</p>
+</li>
+<li>
+<p>Depending on the compile options, <em>CODE</em> references are invoked, deparsed back into their function
+bodies, or dropped.</p>
+</li>
+<li>
+<p>Depending on the compile options floats are rounded, or are converted to integers.</p>
+</li>
+<li>
+<p><em>undef</em>'d array elements are converted into the default scalar value <code>&quot;&quot;</code>.</p>
+</li>
+<li>
+<p>Unless <em>$Data::Rlist::MaxDepth</em> is 0, anything deeper than <em>$Data::Rlist::MaxDepth</em> will be
+thrown away.</p>
+</li>
+<li>
+<p>When the data contains objects, no special methods are triggered to ``freeze'' and ``thaw'' the
+objects.</p>
+</li>
+</ul>
+<p>See also <em><a href="#item_compile">compile</a></em> and <em><a href="#item_deep_compare">deep_compare</a></em></p>
+</dl>
+<p>
+</p>
+<h2><a name="static_functions">Static Functions</a></h2>
+<dl>
+<dt><strong><a name="item_predefined_options"><em>predefined_options([PREDEF-NAME])</em></a></strong>
+
+<dd>
+<p>Return   are   predefined   hash-reference    of   compile   otppns.    PREDEF-NAME   defaults   to
+<a href="#predefined_options"><code>&quot;default&quot;</code></a>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_complete_options"><em>complete_options([OPTIONS[, BASICS]])</em></a></strong>
+
+<dd>
+<p>Completes OPTIONS  with BASICS, so that  all pairs not already  in OPTIONS are  copied from BASICS.
+Always returns a new hash-reference, i.e., neither OPTIONS nor BASICS are modified.  Both arguments
+define  hashes  or  some  <a href="#predefined_options">predefined  options  name</a>.   BASICS  defaults  to
+<a href="#predefined_options"><code>&quot;default&quot;</code></a>.  For example,</p>
+</dd>
+<dd>
+<pre>
+    $options = complete_options({ precision =&gt; 0 }, 'squeezed')</pre>
+</dd>
+<dd>
+<p>merges  the  predefined  options  for  <a href="#predefined_options"><code>&quot;squeezed&quot;</code> text</a>  with  a  numeric
+precision of 0  (converts all floats to  integers).</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="implementation_functions">Implementation Functions</a></h2>
+<dl>
+<dt><strong><a name="item_open_input"><em>open_input(INPUT[, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dt><strong><a name="item_close_input"><em>close_input</em></a></strong>
+
+<dd>
+<p>Open/close  Rlist text  file  or string  INPUT for  parsing.   Used internally  by <em><a href="#item_read">read</a></em>  and
+<em><a href="#item_read_csv">read_csv</a></em>.</p>
+</dd>
+<dd>
+<p><strong>PREPROCESSING</strong></p>
+</dd>
+<dd>
+<p>The function  can preprocess the INPUT  file using FILTER.  Use  the special value 1  to select the
+default  C preprocessor  (<em>gcc  -E -Wp,-C</em>).   FILTER-ARGS  is an  optional  string of  additional
+command-line arguments to be appended to FILTER.  For example,</p>
+</dd>
+<dd>
+<pre>
+    my $foo = Data::Rlist::read(&quot;foo&quot;, 1, &quot;-DEXTRA&quot;)</pre>
+</dd>
+<dd>
+<p>eventually does not parse <em>foo</em>, but the output of the command</p>
+</dd>
+<dd>
+<pre>
+    gcc -E -Wp,-C -DEXTRA foo</pre>
+</dd>
+<dd>
+<p>Hence within <em>foo</em> now C-preprocessor-statements are allowed. For example,</p>
+</dd>
+<dd>
+<pre>
+    {
+    #ifdef EXTRA
+    #include &quot;extra.rlist&quot;
+    #endif</pre>
+</dd>
+<dd>
+<pre>
+        123 = (1, 2, 3);
+        foobar = {
+            .
+            .</pre>
+</dd>
+<dd>
+<p><strong>SAFE CPP MODE</strong></p>
+</dd>
+<dd>
+<p>This mode uses <em>sed</em> and a  temporary file.  It is enabled by setting <em>$Data::Rlist::SafeCppMode</em>
+to 1  (the default is  0).  It  protects single-line <em>#</em>-comments  when FILTER begins  with either
+<em>gcc</em>, <em>g++</em>  or <em>cpp</em>.  <em><a href="#item_open_input">open_input</a></em>  then additionally runs  <em>sed</em> to convert  all input
+lines beginning  with whitespace plus the  <em>#</em> character.  Only the  following <em>cpp</em>-commands are
+excluded, and only when they appear in column 1:</p>
+</dd>
+<dd>
+<p>- <em>#include</em> and <em>#pragma</em></p>
+</dd>
+<dd>
+<p>- <em>#define</em> and <em>#undef</em></p>
+</dd>
+<dd>
+<p>- <em>#if</em>, <em>#ifdef</em>, <em>#else</em> and <em>#endif</em>.</p>
+</dd>
+<dd>
+<p>For  all other  lines <em>sed</em>  converts <em>#</em>  into  <em>##</em>.  This  prevents the  C preprocessor  from
+evaluating them.   Because of Perl's  limited <em>open</em> function,  which isn't able to  dissolve long
+pipes, the invocation  of <em>sed</em> requires a temporary  file.  The temporary file is  created in the
+same directory  as the input file.   When you only use  <em>//</em> and <em>/* */</em>  comments, however, this
+read mode is not required.</p>
+</dd>
+</li>
+<dt><strong><a name="item_lex"><em>lex()</em></a></strong>
+
+<dd>
+<p>Lexical scanner.  Called by <em><a href="#item_parse">parse</a></em> to split  the current line into tokens.  <em>lex</em> reads <em>#</em>
+or <em>//</em> single-line-comment and <em>/* */</em> multi-line-comment as regular white-spaces.  Otherwise it
+returns tokens according to the following table:</p>
+</dd>
+<dd>
+<pre>
+    RESULT      MEANING
+    ------      -------
+    '{' '}'     Punctuation
+    '(' ')'     Punctuation
+    ','         Operator
+    ';'         Punctuation
+    '='         Operator
+    'v'         Constant value as number, string, list or hash
+    '??'        Error
+    undef       EOF</pre>
+</dd>
+<dd>
+<p><em>lex</em> appends all here-doc-lines with a newline character. For example,</p>
+</dd>
+<dd>
+<pre>
+        &lt;&lt;test1
+        a
+        b
+        test1</pre>
+</dd>
+<dd>
+<p>is effectively read as <code>&quot;a\nb\n&quot;</code>, which is the same value as the equivalent here-doc in Perl has.
+So, not all  strings can be encoded as a  here-doc.  For example, it might not  be quite obvious to
+many programmers that <code>&quot;foo\nbar&quot;</code> cannot be expressed as here-doc.</p>
+</dd>
+</li>
+<dt><strong><a name="item_lexln"><em>lexln()</em></a></strong>
+
+<dd>
+<p>Read the next line of text from the current input.  Return 0 if <em><a href="#item_at_eof">at_eof</a></em>, otherwise return 1.</p>
+</dd>
+</li>
+<dt><strong><a name="item_at_eof"><em>at_eof()</em></a></strong>
+
+<dd>
+<p>Return true if current input file/string is exhausted, false otherwise.</p>
+</dd>
+</li>
+<dt><strong><a name="item_parse"><em>parse()</em></a></strong>
+
+<dd>
+<p>Read Rlist language productions from current input.  This is a fast, non-recursive parser driven by
+the  parser  map  <em>%Data::Rlist::Rules</em>, and  fed  by  <em><a href="#item_lex">lex</a></em>.   It  is called  internally  by
+<em><a href="#item_read">read</a></em>.   <em>parse</em>  returns an  array-  or  hash-reference, or  <em>undef</em>  in  case of  parsing
+<em><a href="#item_errors">errors</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_compile"><em>compile(DATA[, OPTIONS, FH])</em></a></strong>
+
+<dd>
+<p>Build  Rlist text  from DATA:</p>
+</dd>
+<ul>
+<li>
+<p>Reference-types <em>SCALAR</em>, <em>HASH</em>, <em>ARRAY</em> and <em>REF</em> are compiled into text, whether blessed or
+not.</p>
+</li>
+<li>
+<p>Reference-types <em>CODE</em> are compiled depending on the <a href="#compile_options"><code>&quot;code_refs&quot;</code></a> setting in
+OPTIONS.</p>
+</li>
+<li>
+<p>Reference-types <em>GLOB</em> (<a href="#a_short_story_of_typeglobs">typeglob-refs</a>), <em>IO</em> and <em>FORMAT</em> (file-
+and  directory  handles) cannot  be  dissolved,  and are  compiled  into  the strings  <code>&quot;?GLOB?&quot;</code>,
+<code>&quot;?IO?&quot;</code> and <code>&quot;?FORMAT?&quot;</code>.</p>
+</li>
+<li>
+<p><em>undef</em>'d values in arrays are compiled into the default Rlist <code>&quot;&quot;</code>.</p>
+</li>
+</ul>
+<p>When FH is defined compile directly to this file and return 1.  Otherwise build a string and return
+a reference  to it.  This is  the compilation function called  when the OPTIONS  argument passed to
+<em><a href="#item_write">write</a></em> is not omitted, and is not <code>&quot;fast&quot;</code> or <code>&quot;perl&quot;</code>.</p>
+<dt><strong><a name="item_compile_fast"><em>compile_fast(DATA)</em></a></strong>
+
+<dd>
+<p>Build Rlist  text from  DATA, as  fast as actually possible  with pure Perl:</p>
+</dd>
+<ul>
+<li>
+<p>Reference-types <em>SCALAR</em>, <em>HASH</em>, <em>ARRAY</em> and <em>REF</em> are compiled into text, whether blessed or
+not.</p>
+</li>
+<li>
+<p><em>CODE</em>, <em>GLOB</em>, <em>IO</em> and <em>FORMAT</em> are compiled into the strings <code>&quot;?CODE?&quot;</code>, <code>&quot;?IO?&quot;</code>,
+<code>&quot;?GLOB?&quot;</code> and <code>&quot;?FORMAT?&quot;</code>.</p>
+</li>
+<li>
+<p><em>undef</em>'d values in arrays are compiled into the default Rlist <code>&quot;&quot;</code>.</p>
+</li>
+</ul>
+<p><em><a href="#item_compile_fast">compile_fast</a></em> is  the default compilation  function. It is  called when you pass  <em>undef</em> or
+<code>&quot;fast&quot;</code>  in  place of  the  OPTIONS  parameter  (see <em><a href="#item_write">write</a></em>,  <em><a href="#item_write_string">write_string</a></em>).   Since
+<em><a href="#item_compile_fast">compile_fast</a></em>  considers no  compile options  it will  not call  code, round  numbers, detect
+self-referential data etc.  Also <em><a href="#item_compile_fast">compile_fast</a></em> always compiles into a unique package variable
+to which it returns a reference.</p>
+<dt><strong><a name="item_compile_perl"><em>compile_Perl(DATA)</em></a></strong>
+
+<dd>
+<p>Like <em><a href="#item_compile_fast">compile_fast</a></em>,  but do not compile  Rlist text - compile  DATA into Perl  syntax. It can
+then  be <em>eval</em>'d.   This renders  more compact,  and more  exact output  as  <a href="/Data/Dumper.html">the Data::Dumper manpage</a>. For
+example, only  strings are quoted.  To  enable this compilation  function pass <code>&quot;perl&quot;</code> to  as the
+OPTIONS argument, or set the <em>-options</em> attribute of package objects to this string.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="auxiliary_functions">Auxiliary Functions</a></h2>
+<p>The  utility  functions in  this  section  are generally  useful  when  handling stringified  data.
+Internally  <em><a href="#item_quote7">quote7</a></em>, <em><a href="#item_escape7">escape7</a></em>,  <em><a href="#item_is_integer">is_integer</a></em>  etc. apply  precompiled regexes  and
+precomputed    ASCII     tables.     <em><a href="#item_split_quoted">split_quoted</a></em>    and     <em><a href="#item_parse_quoted">parse_quoted</a></em>    simplify
+<a href="#text__parsewords">Text::ParseWords</a>.   <em><a href="#item_round">round</a></em>  and <em><a href="#item_equal">equal</a></em>  are  working  solutions for  floating-point
+numbers.   <em><a href="#item_deep_compare">deep_compare</a></em>  is a  smart  function  to ``diff''  two  Perl  variables.  All  these
+functions are very fast and mature.</p>
+<dl>
+<dt><strong><a name="item_is_integer"><em>is_integer(SCALAR-REF)</em></a></strong>
+
+<dd>
+<p>Returns  true when  a scalar  looks like  a positive  or negative  integer constant.   The function
+applies the compiled regex <em>$Data::Rlist::REInteger</em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_is_number"><em>is_number(SCALAR-REF)</em></a></strong>
+
+<dd>
+<p>Test for strings  that look like numbers. <em>is_number</em>  can be used to test whether  a scalar looks
+like  a  integer/float  constant  (numeric  literal).   The function  applies  the  compiled  regex
+<em>$Data::Rlist::REFloat</em>.  Note that it doesn't match</p>
+</dd>
+<dd>
+<p>- leading or trailing whitespace,</p>
+</dd>
+<dd>
+<p>- lexical conventions such as the <code>&quot;0b&quot;</code> (binary), <code>&quot;0&quot;</code> (octal), <code>&quot;0x&quot;</code> (hex) prefix to denote
+  a number-base other than decimal, and</p>
+</dd>
+<dd>
+<p>- Perls' legible numbers, e.g. <em>3.14_15_92</em>,</p>
+</dd>
+<dd>
+<p>- the IEEE 754 notations of Infinite and NaN.</p>
+</dd>
+<dd>
+<p>See also</p>
+</dd>
+<dd>
+<pre>
+    $ perldoc -q &quot;whether a scalar is a number&quot;</pre>
+</dd>
+</li>
+<dt><strong><a name="item_is_symbol"><em>is_symbol(SCALAR-REF)</em></a></strong>
+
+<dd>
+<p>Test for symbolic names.   <em>is_symbol</em> can be used to test whether a  scalar looks like a symbolic
+name.   Such strings  need not  to be  quoted.  Rlist  defines symbolic  names as  a superset  of C
+identifier names:</p>
+</dd>
+<dd>
+<pre>
+    [a-zA-Z_0-9]                    # C/C++ character set for identifiers
+    [a-zA-Z_0-9\-/\~:\.@]           # Rlist character set for symbolic names</pre>
+</dd>
+<dd>
+<pre>
+    [a-zA-Z_][a-zA-Z_0-9]*                  # match C/C++ identifier
+    [a-zA-Z_\-/\~:@][a-zA-Z_0-9\-/\~:\.@]*  # match Rlist symbolic name</pre>
+</dd>
+<dd>
+<p>For example, names such as <em>std::foo</em>, <em>msg.warnings</em>, <em>--verbose</em>, <em>calculation-info</em> need not
+be quoted.</p>
+</dd>
+</li>
+<dt><strong><a name="item_is_value"><em>is_value(SCALAR-REF)</em></a></strong>
+
+<dd>
+<p>Returns true when a scalar is an integer, a number, a symbolic name or some quoted string.</p>
+</dd>
+</li>
+<dt><strong><a name="item_is_random_text"><em>is_random_text(SCALAR-REF)</em></a></strong>
+
+<dd>
+<p>The opposite of <em><a href="#item_is_value">is_value</a></em>.  Such scalars will be turned into quoted strings by <em><a href="#item_compile">compile</a></em>
+and <em><a href="#item_compile_fast">compile_fast</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_quote7"><em>quote7(TEXT)</em></a></strong>
+
+<dt><strong><a name="item_escape7"><em>escape7(TEXT)</em></a></strong>
+
+<dd>
+<p>Converts TEXT into 7-bit-ASCII.  All characters not in the set of the 95 printable ASCII characters
+are escaped.  The following  ASCII codes will be converted to escaped  octal numbers, i.e. 3 digits
+prefixed by a slash:</p>
+</dd>
+<dd>
+<pre>
+    0x00 to 0x1F
+    0x80 to 0xFF
+    &quot; ' \</pre>
+</dd>
+<dd>
+<p>The  difference  between  the  two  functions  is that  <em>quote7</em>  additionally  places  TEXT  into
+double-quotes.    For  example,   <em>quote7(qq'``Fr&uuml;her  Mittag\n''')</em>   returns  <code>&quot;\&quot;Fr\374her
+Mittag\n\&quot;&quot;</code>, while <em>escape7</em> returns <code>\&quot;Fr\374her Mittag\n\&quot;</code></p>
+</dd>
+</li>
+<dt><strong><a name="item_maybe_quote7"><em>maybe_quote7(TEXT)</em></a></strong>
+
+<dd>
+<p>Return <em>quote7(TEXT)</em> if  <em><a href="#item_is_random_text">is_random_text</a>(TEXT)</em>; otherwise (TEXT defines a  symbolic name or
+number) return TEXT.</p>
+</dd>
+</li>
+<dt><strong><a name="item_maybe_unquote7"><em>maybe_unquote7(TEXT)</em></a></strong>
+
+<dd>
+<p>Return <em>unquote7(TEXT)</em> when TEXT is enclosed by double-quotes; otherwise returns TEXT.</p>
+</dd>
+</li>
+<dt><strong><a name="item_unquote7"><em>unquote7(TEXT)</em></a></strong>
+
+<dt><strong><a name="item_unescape7"><em>unescape7(TEXT)</em></a></strong>
+
+<dd>
+<p>Reverses what <em><a href="#item_quote7">quote7</a></em> and <em><a href="#item_escape7">escape7</a></em> did with TEXT.</p>
+</dd>
+</li>
+<dt><strong><a name="item_unhere"><em>unhere(HERE-DOC-STRING[, COLUMNS, FIRSTTAB, DEFAULTTAB])</em></a></strong>
+
+<dd>
+<p>Combines  recipes   1.11  and   1.12  from   the  Perl  Cookbook.    HERE-DOC-STRING  shall   be  a
+<a href="#numbers__strings_and_heredocuments">here-document</a>.   The function  checks  whether each  line
+begins with  a common prefix,  and if so,  strips that off.   If no prefix  it takes the  amount of
+leading whitespace found the first line and removes that much off each subsequent line.</p>
+</dd>
+<dd>
+<p>Unless  COLUMNS  is defined  returns  the  new here-doc-string.  Otherwise,  takes  the string  and
+reformats it into  a paragraph having no line  more than COLUMNS characters long.  FIRSTTAB will be
+the indent  for the first  line, DEFAULTTAB  the indent for  every subsequent line.  Unless passed,
+FIRSTTAB and DEFAULTTAB default to the empty string <code>&quot;&quot;</code>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_split_quoted"><em>split_quoted(INPUT[, DELIMITER])</em></a></strong>
+
+<dt><strong><a name="item_parse_quoted"><em>parse_quoted(INPUT[, DELIMITER])</em></a></strong>
+
+<dd>
+<p>Divide the string INPUT into a list of strings.  DELIMITER is a regular expression specifying where
+to split (default: <code>'\s+'</code>).  The functions won't  split at DELIMITERs inside quotes, or which are
+backslashed.</p>
+</dd>
+<dd>
+<p><em>parse_quoted</em> works like <em>split_quoted</em> but  additionally removes all quotes and backslashes
+from   the   splitted   fields.    Both   functions   effectively   simplify   the   interface   of
+<em>Text::ParseWords</em>.  In an array context they return  a list of substrings, otherwise the count of
+substrings.    An  empty   array   is  returned   in   case  of   unbalanced  double-quotes,   e.g.
+<em>split_quoted(<code>'foo,&quot;bar'</code>)</em>.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<pre>
+    sub split_and_list($) {
+        print ($i++, &quot; '$_'\n&quot;) foreach split_quoted(shift)
+    }</pre>
+</dd>
+<dd>
+<pre>
+    split_and_list(q(&quot;fee foo&quot; bar))</pre>
+</dd>
+<dd>
+<pre>
+        0 '&quot;fee foo&quot;'
+        1 'bar'</pre>
+</dd>
+<dd>
+<pre>
+    split_and_list(q(&quot;fee foo&quot;\ bar))</pre>
+</dd>
+<dd>
+<pre>
+        0 '&quot;fee foo&quot;\ bar'</pre>
+</dd>
+<dd>
+<p>The  default   DELIMITER  <code>'\s+'</code>  handles   newlines.   <em>split_quoted(<code>&quot;foo\nbar\n&quot;</code>)</em>  returns
+<em>('foo',&nbsp;'bar',&nbsp;&nbsp;'')</em> and hence can  be used to to  split a large string  of un<em>chomp</em>'d input
+lines into words:</p>
+</dd>
+<dd>
+<pre>
+    split_and_list(&quot;foo  \r\n bar\n&quot;)</pre>
+</dd>
+<dd>
+<pre>
+        0 'foo'
+        1 'bar'
+        2 ''</pre>
+</dd>
+<dd>
+<p>The DELIMITER matches everywhere outside of quoted constructs, so in case of the default <code>'\s+'</code>
+you may want to remove heading/trailing whitespace. Consider</p>
+</dd>
+<dd>
+<pre>
+    split_and_list(&quot;\nfoo&quot;)
+    split_and_list(&quot;\tfoo&quot;)</pre>
+</dd>
+<dd>
+<pre>
+        0 ''
+        1 'foo'</pre>
+</dd>
+<dd>
+<p>and</p>
+</dd>
+<dd>
+<pre>
+    split_and_list(&quot; foo &quot;)</pre>
+</dd>
+<dd>
+<pre>
+        0 ''
+        1 'foo'
+        2 ''</pre>
+</dd>
+<dd>
+<p><em>parse_quoted</em> additionally removes all quotes and backslashes from the splitted fields:</p>
+</dd>
+<dd>
+<pre>
+    sub parse_and_list($) {
+        print ($i++, &quot; '$_'\n&quot;) foreach parse_quoted(shift)
+    }</pre>
+</dd>
+<dd>
+<pre>
+    parse_and_list(q(&quot;fee foo&quot; bar))</pre>
+</dd>
+<dd>
+<pre>
+        0 'fee foo'
+        1 'bar'</pre>
+</dd>
+<dd>
+<pre>
+    parse_and_list(q(&quot;fee foo&quot;\ bar))</pre>
+</dd>
+<dd>
+<pre>
+        0 'fee foo bar'</pre>
+</dd>
+<dd>
+<p><strong>MORE EXAMPLES</strong></p>
+</dd>
+<dd>
+<p>String <code>'field\ one  &quot;field\ two&quot;'</code>:</p>
+</dd>
+<dd>
+<pre>
+    ('field\ one', '&quot;field\ two&quot;')  # split_quoted
+    ('field one', 'field two')      # parse_quoted</pre>
+</dd>
+<dd>
+<p>String <code>'field\,one, field&quot;, two&quot;'</code> with a DELIMITER of <code>'\s*,\s*'</code>:</p>
+</dd>
+<dd>
+<pre>
+    ('field\,one', 'field&quot;, two&quot;')  # split_quoted
+    ('field,one', 'field, two')     # parse_quoted</pre>
+</dd>
+<dd>
+<p>Split a large string <em>$soup</em> (mnemonic: slurped from a file) into lines, at LF or CR+LF:</p>
+</dd>
+<dd>
+<pre>
+    @lines = split_quoted($soup, '\r*\n');</pre>
+</dd>
+<dd>
+<p>Then transform all <em>@lines</em> by correctly splitting each line into ``naked'' values:</p>
+</dd>
+<dd>
+<pre>
+    @table = map { [ parse_quoted($_, '\s*,\s') ] } @lines</pre>
+</dd>
+<dd>
+<p>Here is some more complete code to parse a <em>.csv</em>-file with quoted fields, escaped commas:</p>
+</dd>
+<dd>
+<pre>
+    open my $fh, &quot;foo.csv&quot; or die $!;
+    local $/;                   # enable localized slurp mode
+    my $content = &lt;$fh&gt;;        # slurp whole file at once
+    close $fh;
+    my @lines = split_quoted($content, '\r*\n');
+    die q(unbalanced &quot; in input) unless @lines;
+    my @table = map { [ map { parse_quoted($_, '\s*,\s') } ] } @lines</pre>
+</dd>
+<dd>
+<p>In  core  this  is  what  <em><a href="#item_read_csv">read_csv</a></em>  does.   <em><a href="#item_deep_compare">deep_compare</a></em>  allows  you  to  test  what
+<em><a href="#item_split_quoted">split_quoted</a></em> and  <em><a href="#item_parse_quoted">parse_quoted</a></em> return.  For  example, the following code  shall never
+die:</p>
+</dd>
+<dd>
+<pre>
+    croak if deep_compare([split_quoted(&quot;fee fie foo&quot;)], ['fee', 'fie', 'foo']);
+    croak if deep_compare( parse_quoted('&quot;fee fie foo&quot;'), 1);</pre>
+</dd>
+</li>
+<dt><strong><a name="item_equal"><em>equal(NUM1, NUM2[, PRECISION])</em></a></strong>
+
+<dd>
+<p><em><a href="#item_equal">equal</a></em>  returns true  if  NUM1 and  NUM2  are equal  to PRECISION  number  of decimal  places
+(default: 6).  For details see <em><a href="#item_round">round</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_round"><em>round(NUM1[, PRECISION])</em></a></strong>
+
+<dd>
+<p>Compare and round floating-point numbers NUM1 and NUM2 (as string- or number scalars).</p>
+</dd>
+<dd>
+<p>When the <code>&quot;precision&quot;</code> compile option is defined, <em><a href="#item_round">round</a></em> is called during compilation on all
+numbers.</p>
+</dd>
+<dd>
+<p>Normally  <em>round</em>  will  return  a  number  in  fixed-point  notation.   When  the  package-global
+<em>$Data::Rlist::RoundScientific</em> is true, however, <em>round</em>  formats the number in either normal or
+exponential (scientific) notation,  whichever is more appropriate for  its magnitude.  This differs
+slightly from fixed-point notation  in that insignificant zeroes to the right  of the decimal point
+are  not included.  Also,  the  decimal point  is  not included  on  whole  numbers.  For  example,
+<em><a href="#item_round">round</a>(42)</em> does not return 42.000000, and <em>round(0.12)</em> returns 0.12, not 0.120000.</p>
+</dd>
+<dd>
+<p><strong>MACHINE ACCURACY</strong></p>
+</dd>
+<dd>
+<p>One needs a function like <em>equal</em> to compare floats, because IEEE 754 single- and double precision
+implementations are  not absolute -  in contrast  to the numbers  they actually represent.   In all
+machines  non-integer numbers are  only an  approximation to  the numeric  truth.  In  other words,
+they're not commutative.  For  example, given two floats <em>a</em> and <em>b</em>,  the result of <em>a+b</em> might
+be different than that of <em>b+a</em>.  For another example, it is a mathematical truth that <em>a * b = b
+* a</em>, but not necessarily in a computer.</p>
+</dd>
+<dd>
+<p>Each machine has its own accuracy, called the <em>machine epsilon</em>, which is the difference between 1
+and the smallest exactly representable number greater than one. Most of the time only floats can be
+compared that have been carried out to a  certain number of decimal places.  In general this is the
+case when  two floats that result  from a numeric operation  are compared - but  not two constants.
+(Constants are accurate through to lexical conventions of the language. The Perl and C syntaxes for
+numbers simply won't allow you to write down inaccurate numbers.)</p>
+</dd>
+<dd>
+<p>See also recipes 2.2 and 2.3 in the Perl Cookbook.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<pre>
+    CALL                    RETURNS NUMBER
+    ----                    --------------
+    round('0.9957', 3)       0.996
+    round(42, 2)             42
+    round(0.12)              0.120000
+    round(0.99, 2)           0.99
+    round(0.991, 2)          0.99
+    round(0.99, 1)           1.0
+    round(1.096, 2)          1.10
+    round(+.99950678)        0.999510
+    round(-.00057260)       -0.000573
+    round(-1.6804e-6)       -0.000002</pre>
+</dd>
+</li>
+<dt><strong><a name="item_deep_compare"><em>deep_compare(A, B[, PRECISION, TRACE_FLAG])</em></a></strong>
+
+<dd>
+<p>Compare and  analyze two numbers, strings or  references.  Generates a list  of messages describing
+exactly all unequal data.  Hence, for any Perl data <em>$a</em> and <em>$b</em> one can assert:</p>
+</dd>
+<dd>
+<pre>
+    croak &quot;$a differs from $b&quot; if deep_compare($a, $b);</pre>
+</dd>
+<dd>
+<p>When PRECISION is defined all numbers in A and B are <em><a href="#item_round">round</a></em>'d before actually comparing them.
+When TRACE_FLAG is true traces progress.</p>
+</dd>
+<dd>
+<p><strong>RESULT</strong></p>
+</dd>
+<dd>
+<p>Returns an array of messages, each describing unequal data, or data that cannot be compared because
+of type- or value-mismatching.  The array is empty when deep comparison of A and B found no unequal
+numbers or strings, and only indifferent types.</p>
+</dd>
+<dd>
+<p><strong>EXAMPLES</strong></p>
+</dd>
+<dd>
+<p>The  result is line-oriented,  and for  each mismatch  it returns  a single  message. For  a simple
+example,</p>
+</dd>
+<dd>
+<pre>
+    Data::Rlist::deep_compare(undef, 1)</pre>
+</dd>
+<dd>
+<p>yields</p>
+</dd>
+<dd>
+<pre>
+    &lt;&lt;undef&gt;&gt; cmp &lt;&lt;1&gt;&gt;   stop! 1st undefined, 2nd defined (1)</pre>
+</dd>
+</li>
+<dt><strong><a name="item_fork_and_wait"><em>fork_and_wait(PROGRAM[, ARGS...])</em></a></strong>
+
+<dd>
+<p>Forks a process  and waits for completion.   The function will extract the  exit-code, test whether
+the  process died  and prints  status messages  on <em>STDERR</em>.   <em>fork_and_wait</em> hence  is  a handy
+wrapper around the built-in <em>system</em> and <em>exec</em> functions.  Returns an array of three values:</p>
+</dd>
+<dd>
+<pre>
+    ($exit_code, $failed, $coredump)</pre>
+</dd>
+<dd>
+<p><em>$exit_code</em> is -1  when the program failed to  execute (e.g. it wasn't found or  the current user
+has insufficient rights).  Otherwise <em>$exit_code</em> is between  0 and 255.  When the program died on
+receipt of a signal (like <em>SIGINT</em> or  <em>SIGQUIT</em>) then <em>$signal</em> stores it. When <em>$coredump</em> is
+true the program died and a <em>core</em>-file was written.</p>
+</dd>
+</li>
+<dt><strong><a name="item_synthesize_pathname"><em>synthesize_pathname(TEXT...)</em></a></strong>
+
+<dd>
+<p>Concatenates and  forms all  TEXT strings  into a  symbolic name that  can be  used as  a pathname.
+<em>synthesize_pathname</em>  is a  useful  function to  concatenate  strings and  nearby converting  all
+characters that do  not qualify as filename-characters, into <code>&quot;_&quot;</code> and  <code>&quot;-&quot;</code>.  The result cannot
+only be used as file- or URL name, but also (coinstantaneously) as hash key, database name etc.</p>
+</dd>
+</li>
+</dl>
+<dl>
+<dt><strong><a name="item__27precision_27__3d_3e_places">'precision' =&gt; PLACES</a></strong>
+
+<dd>
+<p>Make <em><a href="#item_compile">compile</a></em>  round all numbers  to PLACES decimal  places, by calling <em><a href="#item_round">round</a></em>  on each
+scalar that <a href="#item_is_number">looks  like a number</a>.  By default PLACES is  <em>undef</em>, which means floats
+are not rounded.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27scientific_27__3d_3e_flag">'scientific' =&gt; FLAG</a></strong>
+
+<dd>
+<p>Causes <em><a href="#item_compile">compile</a></em>  to masquerade  <em>$Data::Rlist::RoundScientific</em>.  See <em><a href="#item_round">round</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27code_refs_27__3d_3e_token">'code_refs' =&gt; TOKEN</a></strong>
+
+<dd>
+<p>Defines  how <em><a href="#item_compile">compile</a></em>  shall treat  <em>CODE</em> reference.   Legal values  for TOKEN  are  0 (the
+default), <code>&quot;call&quot;</code> and <code>&quot;deparse&quot;</code>.</p>
+</dd>
+<dd>
+<p>- 0 compiles subroutine references into the string <code>&quot;?CODE?&quot;</code>.</p>
+</dd>
+<dd>
+<p>- <code>&quot;call&quot;</code> calls the code, then compiles the return value.</p>
+</dd>
+<dd>
+<p>- <code>&quot;deparse&quot;</code> serializes the code using <em>B::Deparse</em> (reproducing the Perl source).</p>
+</dd>
+</li>
+<dt><strong><a name="item__27threads_27__3d_3e_count">'threads' =&gt; COUNT</a></strong>
+
+<dd>
+<p>If enabled <em><a href="#item_compile">compile</a></em> internally use multiple  threads.  Note that can speedup compilation only
+on machines with at least COUNT CPUs.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27here_docs_27__3d_3e_flag">'here_docs' =&gt; FLAG</a></strong>
+
+<dd>
+<p>If enabled strings with at least two newlines in them are written as
+<a href="#heredocuments">here-document</a>, when possible.  To qualify as here-document a string has to have
+at least two LFs (<code>&quot;\n&quot;</code>), one of which must terminate it.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27auto_quote_27__3d_3e_flag">'auto_quote' =&gt; FLAG</a></strong>
+
+<dd>
+<p>When true (default)  do not quote strings that look like  identifiers (see <em><a href="#item_is_symbol">is_symbol</a></em>).  When
+false quote <em>all</em> strings.  Hash keys are not affected.</p>
+</dd>
+<dd>
+<p><em><a href="#item_write_csv">write_csv</a></em> and <em><a href="#item_write_conf">write_conf</a></em> interpret this flag differently: false means not to quote at
+all; true quotes only strings that don't look like numbers and that aren't yet quoted.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27outline_data_27__3d_3e_number">'outline_data' =&gt; NUMBER</a></strong>
+
+<dd>
+<p>When NUMBER is  greater than 0 use <code>&quot;eol_space&quot;</code>  (linefeed) to split data to many  lines. It will
+insert a linefeed after every NUMBERth array value.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27outline_hashes_27__3d_3e_flag">'outline_hashes' =&gt; FLAG</a></strong>
+
+<dd>
+<p>If enabled, and <code>&quot;outline_data&quot;</code> is also enabled, prints <em>{</em> and <em>}</em> on distinct lines when
+compiling Perl hashes with at least one pair.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27separator_27__3d_3e_string">'separator' =&gt; STRING</a></strong>
+
+<dd>
+<p>The comma-separator string to be used by <em><a href="#item_write_csv">write_csv</a></em>.  The default is <code>','</code>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27delimiter_27__3d_3e_regex">'delimiter' =&gt; REGEX</a></strong>
+
+<dd>
+<p>Field-delimiter for <em><a href="#item_read_csv">read_csv</a></em>.  There is no  default value.  To read configuration files, for
+example, you may use <code>'\s*=\s*'</code> or <code>'\s+'</code>. To read CSV-files use e.g. <code>'\s*[,;]\s*'</code>.</p>
+</dd>
+</li>
+</dl>
+<p>The following options format the generated Rlist; normally you don't want to modify them:</p>
+<dl>
+<dt><strong><a name="item__27bol_tabs_27__3d_3e_count">'bol_tabs' =&gt; COUNT</a></strong>
+
+<dd>
+<p>Count of physical, horizontal TAB characters to use at the begin-of-line per indentation
+level. Defaults to 1. Note that we don't use blanks, because they blow up the size of generated
+text without measure.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27eol_space_27__3d_3e_string">'eol_space' =&gt; STRING</a></strong>
+
+<dd>
+<p>End-of-line string to  use (the linefeed).  For  example, legal values are <code>&quot;&quot;</code>,  <code>&quot; &quot;</code>, <code>&quot;\n&quot;</code>,
+<code>&quot;\r\n&quot;</code> etc. The default  is <em>undef</em>, which means to use the current  value of <em>$/</em>.  Note that
+this  is  a compile-option  that  only  affects <em><a href="#item_compile">compile</a></em>.   When  parsing  files the  builtin
+<em>readline</em> function is called, which uses <em>$/</em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27paren_space_27__3d_3e_string">'paren_space' =&gt; STRING</a></strong>
+
+<dd>
+<p>String to write after <em>(</em> and <em>{</em>, and before <em>}</em> and <em>)</em> when compiling arrays and hashes.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27comma_punct_27__3d_3e_string">'comma_punct' =&gt; STRING</a></strong>
+
+<dt><strong><a name="item__27semicolon_punct_27__3d_3e_string">'semicolon_punct' =&gt; STRING</a></strong>
+
+<dd>
+<p>Comma and semicolon strings, which shall be at least <code>&quot;,&quot;</code> and <code>&quot;;&quot;</code>.  No matter what,
+<em><a href="#item_compile">compile</a></em> will always print the <code>&quot;eol_space&quot;</code> string after the <code>&quot;semicolon_punct&quot;</code> string.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27assign_punct_27__3d_3e_string">'assign_punct' =&gt; STRING</a></strong>
+
+<dd>
+<p>String to make up key/value-pairs. Defaults to <code>&quot; = &quot;</code>.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h2><a name="predefined_options">Predefined Options</a></h2>
+<p>The <a href="#compile_options">OPTIONS</a> parameter accepted by some package functions is either a hash-ref
+or the name of a predefined set:</p>
+<dl>
+<dt><strong><a name="item__27default_27">'default'</a></strong>
+
+<dd>
+<p>Default if writing to a file.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27string_27">'string'</a></strong>
+
+<dd>
+<p>Compact, no newlines/here-docs. Renders a ``string of data''.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27outlined_27">'outlined'</a></strong>
+
+<dd>
+<p>Optimize the compiled Rlist for maximum readability.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27squeezed_27">'squeezed'</a></strong>
+
+<dd>
+<p>Very compact, no whitespace at all. For very large Rlists.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27perl_27">'perl'</a></strong>
+
+<dd>
+<p>Compile data in Perl syntax, using <em><a href="#item_compile_perl">compile_Perl</a></em>, not <em><a href="#item_compile">compile</a></em>.  The output then
+can be <em>eval</em>'d, but it cannot be <em><a href="#item_read">read</a></em> back.</p>
+</dd>
+</li>
+<dt><strong><a name="item__27fast_27_or_undef">'fast' or <em>undef</em></a></strong>
+
+<dd>
+<p>Compile data as fast as possible, using <em><a href="#item_compile_fast">compile_fast</a></em>, not <em><a href="#item_compile">compile</a></em>.</p>
+</dd>
+</li>
+</dl>
+<p>All  functions   that  define   an  <a href="#compile_options">OPTIONS</a>   parameter  do   implicitly  call
+<em><a href="#item_complete_options">complete_options</a></em> to complete the argument from  one of the predefined sets, and additionally
+from <code>&quot;default&quot;</code>.   Therefore you can always  define nothing, or  a ``lazy subset of  options''. For
+example,</p>
+<pre>
+    my $obj = new Data::Rlist(-data =&gt; $thing);</pre>
+<pre>
+    $obj-&gt;write('thing.rls', { scientific =&gt; 1, precision =&gt; 8 });</pre>
+<p>
+</p>
+<h2><a name="exports">Exports</a></h2>
+<p>Example:</p>
+<pre>
+    use Data::Rlist qw/:floats :strings/;</pre>
+<p>
+</p>
+<h3><a name="exporter_tags">Exporter Tags</a></h3>
+<dl>
+<dt><strong><a name="item__3afloats"><em>:floats</em></a></strong>
+
+<dd>
+<p>Imports <em><a href="#item_equal">equal</a></em>, <em><a href="#item_round">round</a></em> and <em><a href="#item_is_number">is_number</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__3astrings"><em>:strings</em></a></strong>
+
+<dd>
+<p>Imports  <em><a href="#item_maybe_quote7">maybe_quote7</a></em>,  <em><a href="#item_quote7">quote7</a></em>,  <em><a href="#item_escape7">escape7</a></em>,  <em><a href="#item_unquote7">unquote7</a></em>,  <em><a href="#item_unescape7">unescape7</a></em>,
+<em><a href="#item_unhere">unhere</a></em>, <em><a href="#item_is_random_text">is_random_text</a></em>,  <em><a href="#item_is_number">is_number</a></em>, <em><a href="#item_is_symbol">is_symbol</a></em>, <em><a href="#item_split_quoted">split_quoted</a></em>, and
+<em><a href="#item_parse_quoted">parse_quoted</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__3aoptions"><em>:options</em></a></strong>
+
+<dd>
+<p>Imports <em><a href="#item_predefined_options">predefined_options</a></em> and <em><a href="#item_complete_options">complete_options</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item__3aaux"><em>:aux</em></a></strong>
+
+<dd>
+<p>Imports <em><a href="#item_deep_compare">deep_compare</a></em>, <em><a href="#item_fork_and_wait">fork_and_wait</a></em> and <em><a href="#item_synthesize_pathname">synthesize_pathname</a></em>.</p>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<h3><a name="autoexported_functions">Auto-Exported Functions</a></h3>
+<p>The following functions are implicitly imported into the callers symbol table.  (But you may say
+<em>require Data::Rlist</em> instead of <em>use Data::Rlist</em> to prohibit auto-import.  See also
+<em>perlmod</em>.)</p>
+<dl>
+<dt><strong><a name="item_readdata"><em>ReadData(INPUT[, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dt><strong><a name="item_readcsv"><em>ReadCSV(INPUT[, OPTIONS, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dt><strong><a name="item_readconf"><em>ReadConf(INPUT[, OPTIONS, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dd>
+<p>These    are   aliases    for   <em>Data::Rlist::<a href="#item_read">read</a></em>,    <em>Data::Rlist::<a href="#item_read_csv">read_csv</a></em>   and
+<em>Data::Rlist::<a href="#item_read_conf">read_conf</a></em>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_evaluatedata"><em>EvaluateData(INPUT[, FILTER, FILTER-ARGS])</em></a></strong>
+
+<dd>
+<p>Like <em><a href="#item_readdata">ReadData</a></em>  but implicitly call <em>Data::Rlist::<a href="#item_evaluate_nanoscripts">evaluate_nanoscripts</a></em>  in case parsing
+was successful.</p>
+</dd>
+</li>
+<dt><strong><a name="item_writedata"><em>WriteData(DATA[, OUTPUT, OPTIONS, HEADER])</em></a></strong>
+
+<dt><strong><a name="item_writecsv"><em>WriteCSV(DATA[, OUTPUT, OPTIONS, COLUMNS, HEADER])</em></a></strong>
+
+<dt><strong><a name="item_writeconf"><em>WriteConf(DATA[, OUTPUT, OPTIONS, HEADER])</em></a></strong>
+
+<dd>
+<p>These     are    aliases     for     <em>Data::Rlist::<a href="#item_write">write</a></em>,    <em>Data::Rlist::<a href="#item_write_string">write_string</a></em>
+<em>Data::Rlist::<a href="#item_write_csv">write_csv</a></em> and <em>Data::Rlist::<a href="#item_write_conf">write_conf</a></em>.  OPTIONS default to <code>&quot;default&quot;</code>.</p>
+</dd>
+</li>
+<dt><strong><a name="item_outlinedata"><em>OutlineData(DATA[, OPTIONS])</em></a></strong>
+
+<dt><strong><a name="item_stringizedata"><em>StringizeData(DATA[, OPTIONS])</em></a></strong>
+
+<dt><strong><a name="item_squeezedata"><em>SqueezeData(DATA[, OPTIONS])</em></a></strong>
+
+<dd>
+<p>These   are  aliases  for   <em>Data::Rlist::<a href="#item_write_string_value">write_string_value</a></em>.   <em>OutlineData</em>   applies  the
+predefined   <a href="#predefined_options"><code>&quot;outlined&quot;</code></a>   options,   while   <em>StringizeData</em>   applies
+<a href="#predefined_options"><code>&quot;string&quot;</code></a> and <em>SqueezeData</em>() <a href="#predefined_options"><code>&quot;squeezed&quot;</code></a>.  When
+specified, OPTIONS are merged into the.  For example,</p>
+</dd>
+<dd>
+<pre>
+    print &quot;\n\$thing: &quot;, OutlineData($thing, { precision =&gt; 12 });</pre>
+</dd>
+<dd>
+<p><em><a href="#item_round">rounds</a></em> all numbers in <em>$thing</em> to 12 digits.</p>
+</dd>
+</li>
+<dt><strong><a name="item_printdata"><em>PrintData(DATA[, OPTIONS])</em></a></strong>
+
+<dd>
+<p>An alias for</p>
+</dd>
+<dd>
+<pre>
+    print OutlineData(DATA, OPTIONS);</pre>
+</dd>
+</li>
+<dt><strong><a name="item_keelhauldata"><em>KeelhaulData(DATA[, OPTIONS])</em></a></strong>
+
+<dt><strong><a name="item_comparedata"><em>CompareData(A, B[, PRECISION, TRACE_FLAG])</em></a></strong>
+
+<dd>
+<p>These are  aliases for <em><a href="#item_keelhaul">keelhaul</a></em> and <em><a href="#item_deep_compare">deep_compare</a></em>. For example,</p>
+</dd>
+<dd>
+<pre>
+    use Data::Rlist;
+        .
+        .
+    my($copy, $as_text) = KeelhaulData($thing);</pre>
+</dd>
+</li>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="examples">EXAMPLES</a></h1>
+<p>String- and number values:</p>
+<pre>
+    &quot;Hello, World!&quot;
+    foo                         # compiles to { 'foo' =&gt; undef }
+    3.1415                      # compiles to { 3.1415 =&gt; undef }</pre>
+<p>Array values:</p>
+<pre>
+    (1, a, 4, &quot;b u z&quot;)          # list of numbers/strings</pre>
+<pre>
+    ((1, 2),
+     (3, 4))                    # list of list (4x4 matrix)</pre>
+<pre>
+    ((1, a, 3, &quot;foo bar&quot;),
+     (7, c, 0, &quot;&quot;))             # another list of lists</pre>
+<p>Here-document strings:</p>
+<pre>
+        $hello = ReadData(\&lt;&lt;HELLO)
+        ( &lt;&lt;DEUTSCH, &lt;&lt;ENGLISH, &lt;&lt;FRANCAIS, &lt;&lt;CASTELLANO, &lt;&lt;KLINGON, &lt;&lt;BRAINF_CK )
+    Hallo Welt!
+    DEUTSCH
+    Hello World!
+    ENGLISH
+    Bonjour le monde!
+    FRANCAIS
+    Ola mundo!
+    CASTELLANO
+    ~ nuqneH { ~ 'u' ~ nuqneH disp disp } name
+    nuqneH
+    KLINGON
+    ++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++
+    ..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.
+    BRAINF_CK
+    HELLO</pre>
+<p>Compiles <em>$hello</em> as</p>
+<pre>
+    [ &quot;Hallo Welt!\n&quot;, &quot;Hello World!\n&quot;, &quot;Bonjour le monde!\n&quot;, &quot;Ola mundo!\n&quot;,
+      &quot;~ nuqneH { ~ 'u' ~ nuqneH disp disp } name\n&quot;,
+      &quot;++++++++++[&gt;+++++++&gt;++++++++++&gt;+++&gt;+&lt;&lt;&lt;&lt;-]&gt;++.&gt;+.+++++++\n..+++.&gt;++.&lt;&lt;+++++++++++++++.&gt;.+++.------.--------.&gt;+.&gt;.\n&quot; ]</pre>
+<p>Configuration object as hash:</p>
+<pre>
+    {
+        contribution_quantile = 0.99;
+        default_only_mode = Y;
+        number_of_runs = 10000;
+        number_of_threads = 10;
+        # etc.
+    }</pre>
+<p>Altogether:</p>
+<pre>
+    Metaphysic-terms =
+    {
+        Numbers =
+        {
+            3.141592653589793 = &quot;The ratio of a circle's circumference to its diameter.&quot;;
+            2.718281828459045 = &lt;&lt;___;
+The mathematical constant &quot;e&quot; is the unique real number such that the value of
+the derivative (slope of the tangent line) of f(x) = e^x at the point x = 0 is
+exactly 1.
+___
+            42 = &quot;The Answer to Life, the Universe, and Everything.&quot;;
+        };</pre>
+<pre>
+        Words =
+        {
+            ACME = &lt;&lt;Value;
+A fancy-free Company [that] Makes Everything: Wile E. Coyote's supplier of equipment and gadgets.
+Value
+            &lt;&lt;Key = &lt;&lt;Value;
+foo bar foobar
+Key
+[JARGON] A widely used meta-syntactic variable; see foo for etymology.  Probably
+originally propagated through DECsystem manuals [...] in 1960s and early 1970s;
+confirmed sightings go back to 1972. [...]
+Value
+        };
+    };</pre>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>The  <em>Random Lists</em> (Rlist)  syntax is  inspired by  NeXTSTEP's <em>Property  Lists</em>.  But  Rlist is
+simpler, more readable  and more portable.  The  Perl and C++ implementations are  fast, stable and
+free.  Markus Felten,  with whom I worked a few  month in a project at  Deutsche Bank, Frankfurt in
+summer 1998,  arrested my attention  on Property lists.   He had implemented  a Perl variant  of it
+(<em><a href="http://search.cpan.org/search?dist=Data-PropertyList">http://search.cpan.org/search</a></em>).</p>
+<p>The term ``Random'' underlines the fact that the language</p>
+<ul>
+<li>
+<p>has four primitive/anonymuous types;</p>
+</li>
+<li>
+<p>the basic building block is a list, which is combined at random with other lists.</p>
+</li>
+</ul>
+<p>Hence the term <em>Random</em> does not mean <em>aimless</em> or <em>accidental</em>.  <em>Random Lists</em> are
+<em>arbitrary</em> lists.</p>
+<p>
+</p>
+<hr />
+<h1><a name="data__dumper"><em>Data::Dumper</em></a></h1>
+<p>The main  difference between <em>Data::Dumper</em>  and <em>Data::Rlist</em> is  that scalars will  be properly
+encoded as number or string.  <em>Data::Dumper</em> writes numbers always as quoted strings, for example</p>
+<pre>
+    $VAR1 = {
+                'configuration' =&gt; {
+                                    'verbose' =&gt; 'Y',
+                                    'importance_sampling_loss_quantile' =&gt; '0.04',
+                                    'distribution_loss_unit' =&gt; '100',
+                                    'default_only' =&gt; 'Y',
+                                    'num_threads' =&gt; '5',
+                                            .
+                                            .
+                                   }
+            };</pre>
+<p>where <em>Data::Rlist</em> writes</p>
+<pre>
+    {
+        configuration = {
+            verbose = Y;
+            importance_sampling_loss_quantile = 0.04;
+            distribution_loss_unit = 100;
+            default_only = Y;
+            num_threads = 5;
+                .
+                .
+        };
+    }</pre>
+<p>As one can  see <em>Data::Dumper</em> writes the data  right in Perl syntax, which means  the dumped text
+can be simply <em>eval</em>'d, and the data can  be restored very fast. Rlists are not quite Perl-syntax:
+a dedicated parser  is required.  But therefore Rlist  text is portable and can be  read from other
+programming languages such as <a href="#c__">C++</a>.</p>
+<p>With  <em>$Data::Dumper::Useqq</em>   enabled  it  was  observed  that   <em>Data::Dumper</em>  renders  output
+significantly slower  than <em><a href="#item_compile">compile</a></em>. This  is actually suprising, since  <em>Data::Rlist</em> tests
+for each scalar  whether it is numeric, and truely  quotes/escapes strings.  <em>Data::Dumper</em> quotes
+all scalars (including numbers), and it does not  escape strings.  This may also result in some odd
+behaviors.  For example,</p>
+<pre>
+    use Data::Dumper;
+    print Dumper &quot;foo\n&quot;;</pre>
+<p>yields</p>
+<pre>
+    $VAR1 = 'foo
+    ';</pre>
+<p>while</p>
+<pre>
+    use Data::Rlist;
+    PrintData &quot;foo\n&quot;</pre>
+<p>yields</p>
+<pre>
+    { &quot;foo\n&quot;; }</pre>
+<p>Finally, <em>Data::Rlist</em>  generates smaller files.   With the default <em>$Data::Dumper::Indent</em>  of 2
+<em>Data::Dumper</em>'s output  is 4-5  times that of  <em>Data::Rlist</em>'s. This is  because <em>Data::Dumper</em>
+recklessly  uses blanks,  instead  of horizontal  tabulators,  which blows  up  file sizes  without
+measure.</p>
+<p>
+</p>
+<h2><a name="rlist_vs__perl_syntax">Rlist vs. Perl Syntax</a></h2>
+<p>Rlists are not Perl syntax:</p>
+<pre>
+    RLIST    PERL
+    -----    ----
+     5;       { 5 =&gt; undef }
+     &quot;5&quot;;     { &quot;5&quot; =&gt; undef }
+     5=1;     { 5 =&gt; 1 }
+     {5=1;}   { 5 =&gt; 1 }
+     (5)      [ 5 ]
+     {}       { }
+     ;        { }
+     ()       [ ]</pre>
+<p>
+</p>
+<h2><a name="debugging_data">Debugging Data</a></h2>
+<p>To  reduce recursive data  structures (into  true hierachies)  set <em>$Data::Rlist::MaxDepth</em>  to an
+integer above 0.  It then defines the  depth under which <em><a href="#item_compile">compile</a></em> shall not venture deeper.
+The compilation of Perl data (into Rlist text)  then continues, but on <em>STDERR</em> a message like the
+following is printed:</p>
+<pre>
+    ERROR: compile2() broken in deep ARRAY(0x101aaeec) (depth = 101, max-depth = 100)</pre>
+<p>This  message will  also be  repeated as  comment when  the compiled  Rlist is  written to  a file.
+Furthermore  <em>$Data::Rlist::Broken</em>  is  incremented  by  one. While  the  compilation  continues,
+effectively  any  attempt to  venture  deeper as  suggested  by  <em>$Data::Rlist::MaxDepth</em> will  be
+blocked.</p>
+<p>See <em><a href="#item_broken">broken</a></em>.</p>
+<p>
+</p>
+<h2><a name="speeding_up_compilation__explicit_quoting_">Speeding up Compilation (Explicit Quoting)</a></h2>
+<p>Much work  has been spent to  optimize <em>Data::Rlist</em> for speed.   Still it is  implemented in pure
+Perl (no XS).  A rough estimation for Perl 5.8 is ``each MB takes one second per GHz''.  For example,
+when the resulting  Rlist file has a size of 13  MB, compiling it from a Perl  script on a 3-GHz-PC
+requires  about 5-7  seconds.   Compiling  the same  data  under Solaris,  on  a sparcv9  processor
+operating at 750 MHz, takes about 18-22 seconds.</p>
+<p>The process of compiling can be speed up by calling <em><a href="#item_quote7">quote7</a></em> explicitly on scalars. That is,
+before calling <em><a href="#item_write">write</a></em> or <em><a href="#item_write_string">write_string</a></em>.  Big data sets may compile faster when for
+scalars, that certainly not qualify as symbolic name, <em><a href="#item_quote7">quote7</a></em> is called in advance:</p>
+<pre>
+    use Data::Rlist qw/:strings/;</pre>
+<pre>
+    $data{quote7($key)} = $value;
+        .
+        .
+    Data::Rlist::write(&quot;data.rlist&quot;, \%data);</pre>
+<p>instead of</p>
+<pre>
+    $data{$key} = $value;
+        .
+        .
+    Data::Rlist::write(&quot;data.rlist&quot;, \%data);</pre>
+<p>It depends on the case whether  the first variant is faster: <em><a href="#item_compile">compile</a></em> and <em><a href="#item_compile_fast">compile_fast</a></em>
+both have to call  <em><a href="#item_is_random_text">is_random_text</a></em> on each scalar.  When the scalar  is already quoted, i.e.,
+its first character is <code>&quot;</code>, this test ought to run faster.</p>
+<p>Internally <em><a href="#item_is_random_text">is_random_text</a></em> applies the precompiled regex <em>$Data::Rlist::REValue</em>.  Note that
+the  expression <em>($s!~$Data::Rlist::REValue)</em>  can  be up  to  20% faster  than the  equivalent
+<em>is_random_text($s)</em>.</p>
+<p>
+</p>
+<h2><a name="quoting_strings_that_look_like_numbers">Quoting strings that look like numbers</a></h2>
+<p>Normally  you  don't  have to  care  about  strings,  since  un/quoting  happens as  required  when
+reading/compiling Rlist or CSV  text.  A common problem, however, occurs when  some string uses the
+same lexicography than numbers do.</p>
+<p>Perl defines  the string as the  basic building block for  all program data, then  lets the program
+decide <em>what strings mean</em>.   Analogical, in a printed book the reader  has to decipher the glyphs
+and  decide  what evidence  they  hide.   Printed text  uses  well-defined  glyphs and  typographic
+conventions, and finally the competence of the reader, to recognize numbers.  But computers need to
+know the exact number type and  format.  Integer?  Float?  Hexadecimal?  Scientific?  Klingon?  The
+Perl Cookbook recommends the use of a  regular expression to distinguish number from string scalars
+(recipe 2.1).</p>
+<p>In Rlist,  string scalars  that look  like numbers need  to be  quoted explicitly.   Otherwise, for
+example, the  string scalar <code>&quot;-3.14&quot;</code> appears as  <em>-3.14</em> in the output,  <code>&quot;007324&quot;</code> is compiled
+into 7324 etc. Such text is lost and read back  as a number.  Of course, in most cases this is just
+what you want. For hash keys, however, it might be a problem.  One solution is to prefix the string
+with <code>&quot;_&quot;</code>:</p>
+<pre>
+    my $s = '-9'; $s = &quot;_$s&quot;;</pre>
+<p>Such strings do not qualify as a number anymore.  In the C++ implementation it will then become
+some <em>std::string</em>, not a <em>double</em>.  But the leading <code>&quot;_&quot;</code> has to be removed by the reading
+program.  Perhaps a better solution is to explicitly call <em><a href="#item_quote7">quote7</a></em>:</p>
+<pre>
+    use Data::Rlist qw/:strings/;</pre>
+<pre>
+    $k = -9;
+    $k = quote7($k);            # returns qq'&quot;-9&quot;'</pre>
+<pre>
+    $k = 3.14_15_92;
+    $k = quote7($k);            # returns qq'&quot;3.141592&quot;'</pre>
+<p>Again, the  need to quote  strings that  look like numbers  is a problem  evident only in  the Perl
+implementation of Rlist, since Perl is a  language with weak types.  With the C++ implementation of
+Rlist  there's  no  need  to  quote  strings  that  look  like  numbers.</p>
+<p>See    also   <em><a href="#item_write">write</a></em>,    <em><a href="#item_is_number">is_number</a></em>,   <em><a href="#item_is_symbol">is_symbol</a></em>,    <em><a href="#item_is_random_text">is_random_text</a></em>   and
+<em><a href="http://en.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange">http://en.wikipedia.org/wiki/American_Standard_Code_for_Information_Interchange</a></em>.</p>
+<p>
+</p>
+<h2><a name="installing_rlist_pm_locally">Installing <em>Rlist.pm</em> locally</a></h2>
+<p>Installing CPAN  packages usually requires  administrator privileges.  Another  way is to  copy the
+<em>Rlist.pm</em> file  into a directory  of your choice.   Instead of <em>use Data::Rlist;</em>,  however, you
+then use the following code.  It will find  <em>Rlist.pm</em> also in <em>.</em> and <em>~/bin</em>, and it calls the
+<em>Exporter</em> explicitly:</p>
+<pre>
+    BEGIN {
+        $0 =~ /[^\/]+$/;
+        push @INC, $`||'.', &quot;$ENV{HOME}/bin&quot;;
+        require Rlist;
+        Data::Rlist-&gt;import();
+        Data::Rlist-&gt;import(qw/:floats :strings/);
+    }</pre>
+<p>
+</p>
+<h2><a name="an_rlistmode_for_emacs">An Rlist-Mode for Emacs</a></h2>
+<pre>
+    (define-generic-mode 'rlist-generic-mode
+       (list &quot;//&quot; ?#)
+       nil
+       '(;; Punctuators
+         (&quot;\\([(){},;?=]\\)&quot; 1 'cperl-array-face)
+         ;; Numbers
+         (&quot;\\([-+]?[0-9]+\\(\\.[0-9]+\\)?[dDlL]?\\)&quot; 1 'font-lock-constant-face)
+         ;; Identifier names
+         (&quot;\\([-~A-Za-z_][-~A-Za-z0-9_]+\\)&quot; 1 'font-lock-variable-name-face))
+       (list &quot;\\.[rR][lL][iI]?[sS]$&quot;)
+       ;; Extra functions to setup mode.
+       (list 'generic-bracket-support
+             '(lambda()
+               (require 'cperl-mode)
+               ;;(hl-line-mode t)                      ; highlight cursor-line
+               (local-set-key [?\t] (lambda()(interactive)(cperl-indent-command)))
+               (local-set-key [?\M-q] 'fill-paragraph)
+               (set-fill-column 100)))
+       &quot;Generic mode for Random Lists (Rlist) files.&quot;)</pre>
+<p>
+</p>
+<h2><a name="implementation_details">Implementation Details</a></h2>
+<p>
+</p>
+<h3><a name="perl">Perl</a></h3>
+<p>
+</p>
+<h4><a name="package_dependencies">Package Dependencies</a></h4>
+<p><em>Data::Rlist</em> depends only on few other packages:</p>
+<pre>
+    Exporter
+    Carp
+    strict
+    integer
+    Sys::Hostname
+    Scalar::Util        # deep_compare() only
+    Text::Wrap          # unhere() only
+    Text::ParseWords    # split_quoted(), parse_quoted() only</pre>
+<p><em>Data::Rlist</em> is free of <em>$&amp;</em>, <em>$`</em> or <em>$'</em>.  Reason: once Perl sees that you need one of these
+meta-variables anywhere in the  program, it has to provide them for  every pattern match.  This may
+substantially slow your program (see also <em>perlre</em>).</p>
+<p>
+</p>
+<h4><a name="a_short_story_of_typeglobs">A Short Story of Typeglobs</a></h4>
+<p>This is supplement  information for <em><a href="#item_compile">compile</a></em>, the function  internally called by <em><a href="#item_write">write</a></em>
+and   <em><a href="#item_write_string">write_string</a></em>.    We  will   discuss   why   <em><a href="#item_compile">compile</a></em>,  <em><a href="#item_compile_fast">compile_fast</a></em>   and
+<em><a href="#item_compile_perl">compile_Perl</a></em>  transliterate  typeglobs  and  typeglob-refs  into <code>&quot;?GLOB?&quot;</code>.   This  is  an
+attempted explanation.</p>
+<p><strong>TYPEGLOBS ARE A PERL IDIOSYNCRACY</strong></p>
+<p>Perl uses a symbol table per package to map symbolic names like <em>x</em> to Perl values.  Typeglob (aka
+glob) objects are complete symbol table entries,  as hash values.  The symbol table hash (<em>stash</em>)
+is an  ordinary hash, named like  the package with two  colons appended.  In the  package stash the
+symbol name is mapped to a memory address which  holds the actual data of your program.  In Perl we
+do not  have real  global values, only  package globals.  Any  Perl code  is always running  in one
+package or another.</p>
+<p>The  main symbol  table's name  is <em>%main::</em>,  or <em>%::</em>.   In the  C implementation  of  the Perl
+interpreter, the main  symbol is simply a global variable, called  the <em>defstash</em> (default stash).
+The  symbol <em>Data::</em>  in stash  <em>%::</em> addresses  the  stash of  package <em>Data</em>,  and the  symbol
+<em>Rlist::</em> in the stash <em>%::Data::</em> addresses the stash of package <em>Data::Rlist</em>.</p>
+<p>Typeglobs are  an idiosyncracy  of Perl: different  types need  only one stash  entry, so  that one
+symbol can name all  types of Perl data (scalars, arrays, hashes)  and nondata (functions, formats,
+I/O handles).  The symbol <em>x</em> is mapped to the typeglob <em>*x</em>.  In the typeglob coexist the scalar
+<em>$x</em>, the list <em>@x</em>, the hash <em>%x</em>, the code <em>&amp;x</em> and the I/O-handle or format specifieer <em>x</em>.</p>
+<p>Most  of the  time only  one glob  slot is  used.  Do  typeglobs waste  space then?   Probably not.
+(Although some  authors believe that.)  Other script  languages like (e.g.)  Python  is not forcing
+decoration characters  -- the  interpreter already  knows the type.   In terms  of C,  symbol table
+entries are then  struct/union-combinations with a type field, a <em>double</em>  field, a <em>char*</em> field
+and so forth.   Perl symbols follow a contrary  design: globs are really pointer  sets to low-level
+structs that hold numbers, strings etc.  Naturally pointers to non-existing values are NULL, and so
+no type  field is required.   Perl interpreters can  now implement fine-grained  smart-pointers for
+reference-counting and copy-on-write, and must  not necessarily handle abstract unions.  In theory,
+the garbage-collector  should have ``increased recycling  opportunities.''  We do  know, for example,
+that <em>perl</em> is very greedy with RAM: it almost never returns any memory to the operating system.</p>
+<p>Modifying <em>$x</em>  in a Perl  program won't  change <em>%x</em>, because  the typeglob <em>*x</em>  is interposed
+between the stash and  the program's actual values for <em>$x</em>, <em>@x</em> etc.   The sigil <em>*</em> serves as
+wildcard for the other sigils <em>%</em>, <em>@</em>, <em>$</em> and <em>&amp;</em>. (Hint: a <em>sigil</em> is a symbol ``created for
+a specific magical purpose''; the name derives  from the latin <em>sigilum</em> = seal.)</p>
+<p>Typeglobs cannot be dissolved  by <em><a href="#item_compile">compile</a></em>, because when (e.g.)  <em>$x</em> and  <em>%x</em> are in use,
+the glob <em>*x</em> does not return some useful value like</p>
+<pre>
+    (SCALAR =&gt; \$x, HASH =&gt; \@x)</pre>
+<p>Typeglobs  are  also  not  interpolated  in  strings.   <em>perl</em> always  plays  the  ball  back.   A
+typeglob-value is simply a string:</p>
+<pre>
+    $ perl -e '$x=1; @x=(1); print *x'
+    *main::x</pre>
+<pre>
+    $ perl -e 'print &quot;*x is not interpolated&quot;'
+    *x is not interpolated</pre>
+<pre>
+    $ perl -e '$x = &quot;this&quot;; print &quot;although &quot;.*x.&quot; could be a string&quot;'
+    although *main::x could be a string</pre>
+<p>As one  can see, even when only  <em>$x</em> is defined the  <em>*x</em> does not return  its value.  Typeglobs
+(stash entries) are arranged by <em>perl</em> on the fly, even with the <em>use strict</em> pragma in effect:</p>
+<pre>
+    $ perl -e 'package nirvana; use strict; print *x'
+    *nirvana::x</pre>
+<p>Each  typeglob is  a full  path into  the <em>perl</em>  stashes, down  from the  <em>defstash</em>:</p>
+<pre>
+    $ perl -e 'print &quot;*x is \&quot;*main::x\&quot;&quot; if *x eq &quot;*main::x&quot;'
+    *x is &quot;*main::x&quot;</pre>
+<pre>
+    $ perl -e 'package nirvana; sub f { local *g=shift; print *g.&quot;=$g&quot; }; package main; $x=42; nirvana::f(*x)'
+    *main::x=42</pre>
+<p><strong>GLOB-REFS</strong></p>
+<p>In the C implementation of Perl, typeglobs have the struct-type <em>GV</em> for ``Glob value''.  Each <em>GV</em>
+is merely a  set of pointers to sub-objects  for scalars, arrays, hashes etc.  In  Perl the special
+syntax <em>*x{ARRAY}</em>  accesses the  array-sub-object, and is  another way  to say <em>\@x</em>.   But when
+applied to  a typeglob as <em>\*foo</em>  it returns a typeglob-ref,  or globref.  So  the Perl backslash
+operator <code>\</code> works like the address-of operator <code>&amp;</code> in C.</p>
+<pre>
+    $ perl -e 'print *::'
+    *main::main::               # ???</pre>
+<pre>
+    $ perl -e '$x = 42; print $::{x}'
+    *main::x                    # typeglob-value 'x' in the stash</pre>
+<pre>
+    $ perl -e 'print \*::'
+    GLOB(0x10010f08)            # some globref</pre>
+<p>Little do we know what happens inside <em>perl</em>, when we assign REFs to typeglobs:</p>
+<pre>
+    $ perl -e '$x = 42; *x = \$x; print $x'
+    42
+    $ perl -e '$y = 42; *x = \$y; print $x'
+    42</pre>
+<p>In Perl4 you had to pass typeglob-refs  to call functions by references (the backslash-operator was
+not  yet ``invented'').   Since  Perl5 saw  the  light of  day, typeglob-refs  can  be considered  as
+artefacts.  Note, however, that these veterans  are still faster than true references, because true
+references  are themselves stored  in a  typeglob (as  REF type)  and so  need to  be dereferenced.
+Globrefs can be used directly (as <em>GV*</em>'s) by <em>perl</em>.  For example,</p>
+<pre>
+    void f1 { my $bar = shift; ++$$bar }
+    void f2 { local *bar = shift; ++$bar }</pre>
+<pre>
+    f1(\$x);                  # increments $x
+    f1(*x);                   # dto., but faster</pre>
+<p><strong>GLOB-ALIASES</strong></p>
+<p>Typeglob-aliases offer  another interesting application for typeglobs.   For example, <em>*bar=*x</em>
+aliases the symbol <em>bar</em> in the current stash, so that <em>x</em> and <em>bar</em> point to the same typeglob.
+This means  that when  you declare <em>sub&nbsp;&nbsp;x&nbsp;{}</em> after  casting the  alias, <em>bar</em> is  <em>x</em>.</p>
+<p>This smells like  a free lunch.  The penalty,  however, is that the <em>bar</em> symbol  cannot be easily
+removed from the stash.   One way is to say <em>local *bar</em>, wich  temporarily assigns a new typeglob
+to <em>bar</em> with all pointers zeroized:</p>
+<pre>
+    package nirvana;</pre>
+<pre>
+    sub f { print $bar; }
+    sub g { local *bar; $bar = 42; f(); }</pre>
+<pre>
+    package main;</pre>
+<pre>
+    nirvana::g();</pre>
+<p>Running this code as  Perl script prints the number assigned in <em>g</em>.  <em>f</em>  acts as a closure. The
+<em>local</em>-statement will  put the  <em>bar</em> symbol temporarily  into the package  stash <em>%::nirvana</em>,
+i.e., the same stash in which <em>f</em> and <em>g</em> exist.  It will remove <em>bar</em> when <em>g</em> returns.</p>
+<p><strong>*foo{THINGS}s</strong></p>
+<p>The <em>*x{NAME}</em> expression family is fondly called ``the <em>*foo{THING}</em> syntax'':</p>
+<pre>
+    $scalarref = *x{SCALAR};
+    $arrayref  = *ARGV{ARRAY};
+    $hashref   = *ENV{HASH};
+    $coderef   = *handlers{CODE};</pre>
+<pre>
+    $ioref     = *STDIN{IO};
+    $ioref     = *STDIN{FILEHANDLE};    # same as *STDIN{IO}</pre>
+<pre>
+    $globref   = *x{GLOB};
+    $globref   = \*x;                   # same as *x{GLOB}
+    $undef     = *x{THIS_NAME_IS_NOT_SUPPORTED} # yields undef</pre>
+<pre>
+    die unless defined *x{SCALAR};      # ok -&gt; will not die
+    die unless defined *x{GLOB};        # ok
+    die unless defined *x{HASH};        # error -&gt; will die</pre>
+<p>When THINGs are accessed this way few rules apply.  Firstofall, <em>*foo{THING}s</em> are not hashes. The
+syntax is a stopgap:</p>
+<pre>
+    $ perl -e 'print \*x, *x{GLOB}, \*x{GLOB}'
+    GLOB(0x100110b8)GLOB(0x100110b8)REF(0x1002e944)</pre>
+<pre>
+    $ perl -e '$x=1; exists *x{GLOB}'
+    exists argument is not a HASH or ARRAY element at -e line 1.</pre>
+<p>Some <em>*foo{THING}</em> is <em>undef</em> if the  requested THING hasn't been used yet.  Only <em>*foo{SCALAR}</em>
+returns an anonymous scalar-reference:</p>
+<pre>
+    $ perl -e 'print &quot;nope&quot; unless defined *foo{HASH}'
+    nope
+    $ perl -e 'print *foo{SCALAR}'
+    SCALAR(0x1002e94c)</pre>
+<p>In Perl5 it is still not possible to  get a reference to an I/O-handle (file-, directory- or socket
+handle) using  the backslash operator.  When a  function requires an I/O-handle  you must therefore
+pass a globref.  More precisely, it is possible to pass an <em>IO::Handle</em>-reference, a typeglob or a
+typeglob-ref as the filehandle.  This is obscure bot only for new Perl programmers.</p>
+<pre>
+    sub logprint($@) {
+        my $fh = shift;
+        print $fh map { &quot;$_\n&quot; } @_;
+    }</pre>
+<pre>
+    logprint(*STDOUT{IO}, 'foo');   # pass IO-handle -&gt; IO::Handle=IO(0x10011b44)
+    logprint(*STDOUT, 'bar');       # ok, pass typeglob-value -&gt; '*main::STDOUT'
+    logprint(\*STDOUT, 'bar');      # ok, pass typeglob-ref -&gt; 'GLOB(0x10011b2c)'
+    logprint(\*STDOUT{IO}, 'nope'); # ERROR -&gt; won't accept 'REF(0x10010fe0)'</pre>
+<p>It is very amusing that Perl, although refactoring  UNIX in form of a language, does not make clear
+what a file-  or socket-handle is.  The  global symbol STDOUT is actually  an <em>IO::Handle</em> object,
+which <em>perl</em>  had silently  instantiated.  To functions  like <em>print</em>,  however, you may  pass an
+<em>IO::Handle</em>, globname or globref.</p>
+<p><strong>VIOLATING STASHES</strong></p>
+<p>As we saw we can access the Perl guts without using a scalpel.  Suprisingly, it is also possible to
+touch the stashes themselves:</p>
+<pre>
+    $ perl -e '$x = 42; *x = $x; print *x'
+    *main::42</pre>
+<pre>
+    $ perl -e '$x = 42; *x = $x; print *42'
+    *main::42</pre>
+<p>By assigning the scalar value <em>$x</em> to <em>*x</em> we have demolished the stash (at least, logically):
+neither <em>$42</em> nor <em>$main::42</em> are accessible.  Symbols like <em>42</em> are invalid, because 42 is a
+numeric literal, not a string literal.</p>
+<pre>
+    $ perl -e '$x = 42; *x = $x; print $main::42'</pre>
+<p>Nevertheless it is easy to confuse <em>perl</em> this way:</p>
+<pre>
+    $ perl -e 'print *main::42'
+    *main::42</pre>
+<pre>
+    $ perl -e 'print 1*9'
+    9</pre>
+<pre>
+    $ perl -e 'print *9'
+    *main::9</pre>
+<pre>
+    $ perl -e 'print *42{GLOB}'
+    GLOB(0x100110b8)</pre>
+<pre>
+    $ perl -e '*x = 42; print $::{42}, *x'
+    *main::42*main::42</pre>
+<pre>
+    $ perl -v
+    This is perl, v5.8.8 built for cygwin-thread-multi-64int
+    (with 8 registered patches, see perl -V for more detail)</pre>
+<p>Of course these  behaviors are not reliable, and  may disappear in future versions  of <em>perl</em>.  In
+German  you  say   ``Schmutzeffekt''  (dirt  effect)  for  certain   mechanical  effects  that  occur
+non-intendedly,  because machines  and electrical  circuits are  not perfect,  and so  is software.
+However, ``Schmutzeffekts'' are neither bugs nor features; these are phenomenons.</p>
+<p><strong>LEXICAL VARIABLES</strong></p>
+<p>Lexical variables (<em>my</em> variables) are not stored in stashes, and do not require typeglobs.  These
+variables are stored in a special array, the <em>scratchpad</em>, assigned to each block, subroutine, and
+thread. These are really private variables, and they cannot be <em>local</em>ized.  Each lexical variable
+occupies a  slot in the scratchpad;  hence is addressed by  an integer index, not  a symbol.  <em>my</em>
+variables are like <em>auto</em> variables in C.  They're also faster than <em>local</em>s, because they can be
+allocated at compile time, not runtime. Therefore you cannot declare <em>*x</em> lexically:</p>
+<pre>
+    $ perl -e 'my(*x)'
+    Can't declare ref-to-glob cast in &quot;my&quot; at -e line 1, near &quot;);&quot;</pre>
+<p>Seel also the Perl man-pages <em>perlguts</em>, <em>perlref</em>, <em>perldsc</em> and <em>perllol</em>.</p>
+<p>
+</p>
+<h3><a name="c__">C++</a></h3>
+<p>In C++  we use a  <em>flex</em>/<em>bison</em> scanner/parser combination  to read Rlist  language productions.
+The  C++  parser  generates  an   <em>Abstract  Syntax  Tree</em>  (AST)  of  <em>double</em>,  <em>std::string</em>,
+<em>std::vector</em> and <em>std::map</em> values.   Since each value is put into the  AST, as separate object,
+we use a free store management that allows the allocation of huge amounts of tiny objects.</p>
+<p>We also use reference-counted smart-pointers, which allocate themselves on our fast free store.  So
+RAM will not be fragmented, and the allocation of RAM is significantly faster than with the default
+process heap.   Like with Perl,  Rlist files can  have hundreds of megabytes  of data (!),  and are
+processable in constant time, with constant  memory requirements.  For example, a 300 MB Rlist-file
+can be read from a C++ process which will not peak over 400-500 MB of process RAM.</p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs">BUGS</a></h1>
+<p>There are no known bugs, this package is stable.  Deficiencies and TODOs:</p>
+<ul>
+<li>
+<p>The <code>&quot;deparse&quot;</code> functionality for the <code>&quot;code_refs&quot;</code> <a href="#compile_options">compile option</a> has not
+yet been implemented.</p>
+</li>
+<li>
+<p>The <code>&quot;threads&quot;</code> <a href="#compile_options">compile option</a> has not yet been implemented.</p>
+</li>
+<li>
+<p>IEEE 754 notations of Infinite and NaN not yet implemented.</p>
+</li>
+<li>
+<p><em><a href="#item_compile_perl">compile_Perl</a></em> is experimental.</p>
+</li>
+</ul>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_license">COPYRIGHT/LICENSE</a></h1>
+<p>Copyright 1998-2008 Andreas Spindler</p>
+<p>Maintained   at  CPAN   (<em><a href="http://search.cpan.org/dist/Data-Rlist/">http://search.cpan.org/dist/Data-Rlist/</a></em>)  and   the   author's  site
+(<em><a href="http://www.visualco.de">http://www.visualco.de</a></em>). Please send mail to <em><a href="mailto:rlist@visualco.de">rlist@visualco.de</a></em>.</p>
+<p>This library  is free software; you  can redistribute it and/or  modify it under the  same terms as
+Perl itself, either Perl version 5.8.8 or, at your option, any later version of Perl 5 you may have
+available.</p>
+<p>Contact the author for the C++ library at <em><a href="mailto:rlist@visualco.de">rlist@visualco.de</a></em>.</p>
+<p>Thank you for your attention.</p>
+
+</body>
+
+</html>

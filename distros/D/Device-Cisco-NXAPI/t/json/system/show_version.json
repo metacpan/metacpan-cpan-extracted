@@ -1,0 +1,32 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "header_str": "Cisco Nexus Operating System (NX-OS) Software\nTAC support: http://www.cisco.com/tac\nCopyright (C) 2002-2016, Cisco and/or its affiliates.\nAll rights reserved.\nThe copyrights to certain works contained in this software are\nowned by other third parties and used and distributed under their own\nlicenses, such as open source.  This software is provided \"as is,\" and unless\notherwise stated, there is no warranty, express or implied, including but not\nlimited to warranties of merchantability and fitness for a particular purpose.\nCertain components of this software are licensed under\nthe GNU General Public License (GPL) version 2.0 or \nGNU General Public License (GPL) version 3.0  or the GNU\nLesser General Public License (LGPL) Version 2.1 or \nLesser General Public License (LGPL) Version 2.0. \nA copy of each such license is available at\nhttp://www.opensource.org/licenses/gpl-2.0.php and\nhttp://opensource.org/licenses/gpl-3.0.html and\nhttp://www.opensource.org/licenses/lgpl-2.1.php and\nhttp://www.gnu.org/licenses/old-licenses/library.txt.\n",
+      "bios_ver_str": "07.41",
+      "kickstart_ver_str": "7.0(3)I2(2b)",
+      "bios_cmpl_time": "10/12/2015",
+      "kick_file_name": "bootflash:///nxos.7.0.3.I2.2b.bin",
+      "kick_cmpl_time": " 2/28/2016 21:00:00",
+      "kick_tmstmp": "02/29/2016 05:21:45",
+      "chassis_id": "Nexus9000 C9372PX chassis",
+      "cpu_name": "Intel(R) Core(TM) i3- CPU @ 2.50GHz",
+      "memory": 16401952,
+      "mem_type": "kB",
+      "proc_board_id": "SAL1911BCSU",
+      "host_name": "switch",
+      "bootflash_size": 7906304,
+      "kern_uptm_days": 2,
+      "kern_uptm_hrs": 22,
+      "kern_uptm_mins": 31,
+      "kern_uptm_secs": 24,
+      "rr_usecs": 832622,
+      "rr_ctime": " Mon Dec 19 04:57:51 2016\n",
+      "rr_reason": "Reset Requested by CLI command reload",
+      "rr_sys_ver": "11.3(2h)",
+      "rr_service": "PolicyElem Ch reload",
+      "manufacturer": "Cisco Systems, Inc."
+    }
+  },
+  "id": 1
+}

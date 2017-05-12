@@ -1,0 +1,70 @@
+NAME
+    Data::Format::Pretty::Perl - Pretty-print data structure as Perl code
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+     use Data::Format::Pretty::Perl qw(format_pretty);
+     print format_pretty($data);
+
+    Some example output:
+
+    *   format_pretty({a=>1, b=>2})
+
+         { a => 1, b => 2 }
+
+DESCRIPTION
+    This module uses Data::Dump or Data::Dump::Color to format data as Perl
+    code.
+
+FUNCTIONS
+  format_pretty($data, \%opts)
+    Return formatted data structure as Perl code. Options:
+
+    *   color => BOOL
+
+        Whether to enable coloring. The default is the enable only when
+        running interactively. Currently also enable line numbering.
+
+    *   linum => BOOL (default: 0)
+
+        Whether to add line numbers.
+
+  content_type()
+ENVIRONMENT
+  COLOR => BOOL
+    Set "color" option (if unset).
+
+  LINUM => BOOL
+    Set "linum" option (if unset).
+
+FAQ
+SEE ALSO
+    Data::Format::Pretty
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Format-Pretty-Perl>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Data-Format-Pretty-Perl>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-Pe
+    rl>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

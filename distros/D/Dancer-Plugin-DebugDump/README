@@ -1,0 +1,73 @@
+NAME
+    Dancer::Plugin::DebugDump - dump objects to debug log with Data::Dump
+    [DEPRECATED]
+
+DEPRECATION NOTICE
+    *NOTE* : this module is now deprecated; there's no need for it, as
+    Dancer's own debug keyword automatically serialises any references
+    passed to it using Data::Dumper, so you can just say e.g.:
+
+        debug \%foo;
+
+    or
+
+        debug "User details", \%foo;
+
+    This plugin may be removed from CPAN at some point in the future; I've
+    decided to leave it around with a deprecation notice for the time being
+    so that it's still available for anyone already using it.
+
+DESCRIPTION
+    Provides a `debug_dump' keyword, which takes an optional label and an
+    object or reference to dump, and calls Dancer's `debug' keyword after
+    dumping the object / reference with Data::Dump.
+
+    Allows quick and easy debugging by dumping stuff to your log/console.
+
+SYNOPSIS
+        use Dancer::Plugin::DebugDump;
+
+        debug_dump("My nice object" => $object);
+        debug_dump("My hash" => \%hash);
+        debug_dump($anotherref);
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-dancer-plugin-debugdump at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Plugin-DebugDump.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Plugin::DebugDump
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-DebugDump
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-DebugDump
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-DebugDump
+
+    * Search CPAN
+        http://search.cpan.org/dist/Dancer-Plugin-DebugDump/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

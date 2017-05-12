@@ -1,0 +1,9 @@
+Changes
+LICENSE
+LineBuffer.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+test.pl
+tst.in

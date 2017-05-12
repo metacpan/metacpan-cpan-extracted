@@ -1,0 +1,32 @@
+==============================
+DNS::Bananafonana Version 0.1
+==============================
+
+This module handles numbers in base 85, via strings and Math::BigInt.
+Instead of the 85 characters as defined rfc1924, this modules uses 85
+consonant-vowel combination that will make the result pronouncable by human
+beings. This scheme was suggested in a comment by DGolden on Slashdot
+(http://tech.slashdot.org/comments.pl?sid=649579&cid=24654733).
+
+For more information, read the module or rfc1924.txt.
+
+The usual installation instructions apply:
+
+	/path/to/perl Makefile.PL
+	make
+	make test
+	make install
+
+Please report bugs to the author at <michiel at fokke dot org>
+
+---------------------
+Copyright and License
+---------------------
+
+This distribution (with the exception of any included RFC's) is
+copyright (c) 2011 Michiel Fokke.  All rights reserved.  This
+software is distributed under the same license terms as Perl itself.
+This software comes with NO WARRANTIES WHATSOEVER, express, implied,
+or otherwise.
+
+$Id: README 297 2011-10-23 20:13:36Z michielf $

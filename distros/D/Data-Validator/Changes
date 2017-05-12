@@ -1,0 +1,65 @@
+Revision history for Perl extension Data::Validator
+
+1.07 2014-07-17T14:05:12Z
+    [BUG FIXES]
+    - Fix a wrong expansion in the case of the last optional hashref (#7 robario)
+
+1.06 2014-07-15T13:19:35Z
+    [NEW FEATURES]
+    - Add Data::Validator::Role::SmartSequenced (#5 robario)
+
+1.04 2013-11-26T13:34:13Z
+    [BUG FIXES]
+    - Fix an issue that sharing parameters threw cryptic errors
+      (@hirobanex++)
+
+1.03 2013-06-11T07:09:44Z
+    [FEATURES]
+    - Add Data::Validator::Role::NoRestricted not to make the args restricted
+     (thanks to keigow for the request)
+
+1.02 2012-11-26 16:23:33
+    [DOCUMENT]
+    - fix documents about StrictSequenced
+
+1.01 2012-11-26 15:43:11
+    [INCOMPATIBLE CHANGE]
+    - Named-style arguments are NOT available in StrictSequenced since this version (karupanerura)
+
+1.00 2012-10-20 20:58:51
+    - Bump version to 1.00.
+    - No feature changes. Just upgrade Module::Install.
+
+0.09 2012-02-16 16:23:07
+    - Add StrictSequenced role (karupanerura)
+
+0.08 2011-06-19 21:19:51
+    - No code changes
+    - Fix tests for latest Moose
+
+0.07 2011-06-03 00:38:00
+    - No code changes
+    - Now API is considered stable
+
+0.06 2010-11-16 15:57:33
+    - Just cleaning up
+
+0.05 2010-11-13 17:49:23
+    - Add 'coerce' attribute for rules (default to true)
+    - Documentation improvements
+
+0.04 2010-11-13 10:12:07
+    - Default to confess(), not croak()
+    - Add two extentions: Croak and NoThrow
+
+0.03 2010-11-12 20:24:25
+    - Change error handling to report all the errors at once
+
+0.02 2010-11-12 17:36:33
+    - No functionality changes
+    - Fix error messages
+    - Improve documents
+
+0.01 2010-11-12 14:58:04
+    - original version; created by /home/gfx/perl5/perlbrew/bin/dim
+      at Tue Nov  9 13:39:21 2010.

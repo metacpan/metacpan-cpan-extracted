@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+bt.xs
+dist.ini
+lib/Devel/bt.pm
+t/basic.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

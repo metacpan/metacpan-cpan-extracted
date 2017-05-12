@@ -1,0 +1,99 @@
+Release history for Dist-Zilla-Plugin-Readme-Brief
+
+0.003002 2017-03-18T06:42:04Z c2d2242
+ - Stop using ConfigDumper
+ - Stop using Test::KENTNL
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - develop: +1 -1 (suggests: ↑2)
+ - runtime: -1
+ - test: +1 -1 (recommends: +1)
+
+0.003001 2017-03-02T00:03:42Z 5be0432
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Readme-Brief/issues/6
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑1)
+ - test: ↓1
+
+0.003000 2016-01-09T15:17:41Z 910e00a
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002005, see misc/*.deps* for details
+ - develop: +5 ↑3 -1 (suggests: ↑2)
+
+ [Features]
+ - Can now specify `source_file` which forces the name of a file to use instead of `main_module` ( aristotle++ #5 )
+ - Can now automatically use the `.pod` file alternative for your `main_module` if you ship one. ( aristotle++ #5 )
+ - Can override which section to take brief from instead of DESCRIPTION by setting `description_label` ( #4 )
+
+0.002005 2015-03-04T15:21:15Z 03b80f3
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002004, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Features]
+ - Now matches DESCRIPTION and COPYRIGHT/LICENSE headers case insensitively. Patch thanks to David Wheeler w/ #3.
+
+0.002004 2015-02-10T05:40:49Z c959a13
+ [Bugfix]
+ - Require PPI::Document manually for older DZils that didn't load it on their own.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002003, see misc/*.deps* for details
+ - runtime: +1
+
+0.002003 2015-02-07T13:50:23Z 7a70821
+ [Bugfix]
+ - When manual installation instructions are impossible to devise, don't give instructions pertaining to manual
+   techniques.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +1 ↑1 -1 (recommends: ↓1, suggests: ↑1)
+ - runtime: +1 (recommends: +1)
+ - test: +2 (recommends: ↓2)
+
+ [Internals]
+ - Factor out document name extraction logic into PPIx::DocumentName
+
+ [Tests]
+ - Some added!
+
+0.002002 2015-01-10T08:32:27Z c5f7a4f
+ [Documentation]
+ - Add a SEE ALSO section
+
+0.002001 2015-01-06T05:12:46Z a5cdb4b
+ [Documentation]
+ - Fix up outdated references/properly reference new attribute.
+ - More minor spelling mistakes
+ - Tidier whitespace (aristotle++, #2)
+
+ [Generation]
+ - Improved README text copywriting (aristotle++, #2)
+
+ [Internals]
+ - Improved structuring (aristotle++, #2)
+
+0.002000 2015-01-05T19:51:57Z c592ce7
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+
+ [Documentation]
+ - More spelling/punctuation mistakes. (ether++, #1)
+
+ [Features]
+ - Now have `installer` parameter which allows you to force which(plural) installers to document.
+
+0.001001 2015-01-05T09:53:04Z f6de193
+ - Spelling mistake (aristotle++)
+
+0.001000 2015-01-05T09:44:06Z 7628164
+ - First version.

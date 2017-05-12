@@ -1,0 +1,49 @@
+{
+   "abstract" : "parse and format x509 type dates",
+   "author" : [
+      "Andrew Nelson <anelson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-x509",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Paginator" : "0.03",
+            "DateTime" : "0",
+            "DateTime::TimeZone" : "0",
+            "JSON::Any" : "0",
+            "JSON::XS" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/holophrastic/datetime-format-x509"
+      }
+   },
+   "version" : "0.01"
+}
+

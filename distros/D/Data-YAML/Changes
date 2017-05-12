@@ -1,0 +1,16 @@
+Revision history for Data-YAML
+
+0.0.3   2007-03-17
+      - Initial release.
+    
+0.0.4   2007-03-17
+      - Added tests for input / output modes
+      - Added the tests to MANIFEST. D'oh.
+
+0.0.5   2007-03-20
+
+0.0.6   2009-03-07
+      - Fix ESCAPE_CHAR regex. Refs #31804.
+
+0.0.7   2015-04-17
+      - Quote values that end with a colon (schwigon@cpan.org)

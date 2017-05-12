@@ -1,0 +1,51 @@
+Revision history for Dancer-Plugin-CORS
+
+{{$NEXT}}
+ - fix leftover Modern::Perl in CORS::Sharing
+ - dzilation
+ - fix version format
+
+0.12 ????-??-??
+ - smartmatch and given are experimental
+ - use strict and warnings directly
+ - allow arrayrefs to be passed
+ - fix experimental warning
+ - fix typo
+ - bump to version 0.12
+
+0.11 2014-09-24
+ - fix typo
+ - return object itself in order to chain actions
+ - fix missing symbol
+ - implement resource-timing feature
+ - add t/09-timing.t to MANIFEST
+ - bump to version 0.11
+
+0.10 2014-06-17
+ - add Travis CI configuration
+ - convert README to Markdown
+ - new sharing feature
+ - change error message
+ - delete useless code
+ - add documentation
+ - debug only of DEBUG flag is set
+ - Revert "debug only of DEBUG flag is set"
+ - debug only of DEBUG flag is set
+ - cleanup test 07
+ - more documentation
+ - add tests
+ - fix bug in new()
+ - bump to v0.10
+ - add Sharing.pm to manifest
+
+0.02 2014-06-10
+ - update prerequisites
+ - wrong requirement in BuildOptions.pm
+ - bump to v0.02
+
+0.11 2014-09-24
+ - (no information about this release available)
+
+0.01 2014-06-02
+ - (no information about this release available)
+

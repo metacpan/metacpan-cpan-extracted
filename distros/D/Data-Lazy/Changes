@@ -1,0 +1,14 @@
+Revision history for Perl extension Data::Lazy.
+
+0.1  Wed Aug 11 19:16:51 1999
+	- original version; created by h2xs 1.18
+
+up to 0.5
+	- too lazy to maintain this.
+
+0.5	Fri Feb  8 23:30:19 2002 GMT
+	- module renamed to Data::Lazy
+
+0.6	Mon Jan  5 12:49:16 NZDT 2004
+	- added untie support, test suite
+	- POD fixes and enhancements

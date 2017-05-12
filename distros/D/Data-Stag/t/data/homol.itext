@@ -1,0 +1,37 @@
+db:
+  species_set:
+    species:
+      common_name: house mouse
+      binomial: Mus musculus
+      tax_id: 10090
+    species:
+      common_name: fruitfly
+      binomial: Drosophila melanogaster
+      tax_id: 7227
+    species:
+      common_name: human
+      binomial: Homo sapiens
+      tax_id: 9606
+  gene_set:
+    gene:
+      symbol: HGNC
+      tax_id: 9606
+      phenotype: Hemochromatosis 
+      phenotype: Porphyria variegata
+      GO_term: iron homeostasis
+      map: 
+        cytological: 
+          chromosome: 6
+          band: p21.3
+    gene:
+      symbol: Hfe
+      synonym: MR2
+      tax_id: 10090
+      GO_term: integral membrane protein
+  similarity_set:
+    pair:
+      symbol: HGNC
+      symbol: Hfe
+    pair:
+      symbol: WNT3A
+      symbol: Wnt3a

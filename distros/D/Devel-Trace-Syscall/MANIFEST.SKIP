@@ -1,0 +1,8 @@
+^Syscall.c$
+^syscall-lookup.h$
+^pm_to_blib$
+^MYMETA.*
+^config.h$
+.*o$
+^blib/
+^Makefile$

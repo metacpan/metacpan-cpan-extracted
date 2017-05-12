@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 8f70b070e6590c5d771c94a979ce258bcbfe4ecb AUTHOR_PLEDGE
+SHA1 9c0606b214f2cadd4d7572d39fc8e8efb646e725 CONTRIBUTORS
+SHA1 3111b7ac6c41debed73c78b1aff67a3e7d2a2b92 Changes
+SHA1 7415b42c1be938eb51368064ddddc1dab64e91e6 INSTALL
+SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
+SHA1 b965fadf0c37d6301d2bbe9ef977bcbd24901805 MANIFEST
+SHA1 b443733ad640c3c0f291efc38e61585ff8e6ee63 META.json
+SHA1 493e523f6364c5e7a78db77900f06ab49523d3cc META.yml
+SHA1 f5226815f40960b11096f26bebc2bebe767dd1f2 Makefile.PL
+SHA1 be18da2b526188dc677bd267f428fb09f782df85 README.mkdn
+SHA1 01b10888e6eae027846bbd1fe79913fcac155a21 cpanfile
+SHA1 c2255bdcf6252331c5dfa97b28fca8d80e6d0cac doap.xml
+SHA1 ccadf1e0de59332f845f261ad66de5ceb68f0b45 lib/Dancer2/Template/Caribou.pm
+SHA1 4a54de8649b9ba7d4cf30a2d548e2592a217ef3e lib/Dancer2/Template/Caribou/DancerVariables.pm
+SHA1 3542602ec10d5f0bd07640e34864a8c024d18e34 t/00-compile.t
+SHA1 1c150194467fbec654f5cc2c85199404c13ef14b t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 26629cc7b3e82ce1ba66a86da146b0bf94ad2fa3 t/hello-views.t
+SHA1 11186870b415acd2fdd96436fb405bec0f5e46ad t/simple.t
+SHA1 1f83284338fc14a2156496d06300a744f7e67d98 t/variables.t
+SHA1 c9e7b518d2fd5d8525685f6bc8d503ae8ac23a84 t/views/dancer_variables/bou
+SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/howdie/bou
+SHA1 48bec84fcb4f3b5cf8f3a94797e07169b1d2134c t/views/howdie/page.bou
+SHA1 c7889f58c18dc01960e630a7957d23e1ed854efa t/views/hullo/bou
+SHA1 428ed6eb66c8df3374826d0f04878ce46bedd284 t/views/hullo/inner_template.bou
+SHA1 202dccf52a60cd96cca92170bc979586e33f3c71 t/views/layouts/main/bou
+SHA1 950c77472e6f6cd948b2b510994ef8a417efecaa t/views/layouts/main/page.bou
+SHA1 b4b6971b642256cd59cca1a2043f57159e4dac5d t/views/welcome/bou
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAliyP7YACgkQ34Hwf+GwC4yRzACffPcsEweWIPvQeat45rnlKuMI
+U0oAoPJGGkzL3+kQWy4vlcfdDjt2QXty
+=Ff3O
+-----END PGP SIGNATURE-----

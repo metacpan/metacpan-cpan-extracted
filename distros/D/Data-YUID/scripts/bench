@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+use DBI;
+use Getopt::Long;
+use Benchmark;
+
+use Data::YUID::Client;
+
+
+sub test_yuid {
+    my ($records, $dbh, $yuidd) = @_;
+
+    my $yuid = Data::YUID::Client->new(
+        servers => [ $yuidd ],
+    );
+
+    $dbh->do('drop table test_yuid');
+    $dbh->do('create table test_yuid (yuid bigint primary key not null, data integer not null)');
+    my $sth = $dbh->prepare('insert into test_yuid (yuid, data) values (?, 0)');
+
+    return Benchmark::timethis($records, sub {
+        $sth->execute($yuid->get_id) or die;
+    });
+}
+
+sub test_native {
+    my ($records, $dbh) = @_;
+
+    $dbh->do('drop table test_native');
+    $dbh->do('create table test_native (id bigint primary key not null auto_increment, data integer not null)');
+    my $sth = $dbh->prepare('insert into test_native (data) values (0)');
+
+    return Benchmark::timethis($records, sub {
+        $sth->execute or die;
+    });
+}
+
+sub test {
+    my ($records, $db, $yuidd) = @_;
+
+    my $dbh = DBI->connect("dbi:mysql:database=$db");
+
+    Benchmark::cmpthese({
+        "yuid"   => test_yuid($records, $dbh, $yuidd),
+        "native" => test_native($records, $dbh),
+    });
+
+    $dbh->disconnect;
+}
+
+
+my ($records, $db, $yuidd);
+GetOptions(
+    "n|records=i" => \$records,
+    "db=s"        => \$db,
+    "yuidd=s"     => \$yuidd,
+);
+
+if($records && $db && $yuidd) {
+    test($records, $db, $yuidd);
+}
+
+
+=head1 NAME
+
+bench - benchmark creation of database records using yuidd versus database's native sequences
+
+=head1 USAGE
+
+    mysqladmin -u root create yuidtest
+    mysql -u root -e 'grant all privileges on yuidtest.* to '`whoami`'@localhost'
+    bin/yuidd --port 7357 --daemon
+    scripts/bench -n 50000 --db yuidtest --yuidd localhost:7357
+
+=head1 SYNOPSIS
+
+    bench -n <records> --db <local mysql database name> --yuidd <yuidd host and port>
+
+=head1 DESCRIPTION
+
+This is an experiment in finding and evaluating performance metrics for the
+Data::YUID system and server as a replacement for the automatic, native
+numbering of records by the database.
+
+=head1 TODO
+
+=over 4
+
+=item * can we compare against a LiveJournal-like app-managed sequence?
+
+=item * is data realistic?
+
+=item * is this useful at all whatsoever?
+
+=back
+
+=cut
+
+1;
+

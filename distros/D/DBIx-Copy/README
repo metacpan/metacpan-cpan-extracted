@@ -1,0 +1,86 @@
+             ***************************************
+             README!
+
+Be aware that the testing done during the installation is /NOT GOOD
+ENOUGH/.  Testing should be done towards a real database.  I strongly
+advise anyone to manually do through the easy synopsis section to test
+if it actually works.
+
+The rest of the README can safely be ignored, but remember to read the
+POD.
+
+
+             ***************************************
+             DESCRIPTION
+
+This should be an exact copy of the DESCRIPTION part in the POD:
+
+== 
+For copying a DB.  Future versions might handle mirroring as well, but
+it's generally better if the source might send over a transaction log
+somehow.
+
+The current version takes a crude "select * from table" from the
+source table, and crudely puts it all into the destination table, with
+a "delete from table" and "insert into table values (?, ?, ?, ...)".
+There might be problems with this approach for all I know.  Anyway, I
+think I can promise that the synopsis above will behave the same way 
+also for future versions of DBIx::Copy.
+
+Currently the module can only copy data content.  Data definitions
+might be handled in a future version.
+
+No options are respected in this version.  Look at the TODO section
+for all planned features.
+== 
+
+Please mail me if you have needs this module can't take care of.
+
+
+             ***************************************
+             PERSONAL MOTIVATION
+
+For the time beeing, this is a very simple module.  The POD is bigger
+than the code.  Anyway, I think such a module might be useful, and I
+think it might grow - I have a long Todo-list.
+
+I'm to update/upgrade quite a lot of things locally, and I found that
+I needed to copy from one DBMS at one computer to another DBMS at
+another computer - twice, first for testing, then I have to move the
+production DB.  The old DB system doesn't give me transaction logs in
+an open format, so the easiest thing is to do the complete copy twice.
+So the operation should be redoable by hitting ^R at the command
+line...
+
+The export facility at the old database is ... well, at least it does
+bump the data into `well-behaving' file formats ... but I felt more
+for doing this operation through the DBI interface than to handle
+export, network copying, and then try to tell the new DBMS to import
+the data - I have no clue if the special conditions (like single
+quotes and newlines) are handled equally in the export and import
+tool.
+
+I've spent more time making this into a proper CPAN module and
+documenting this than what I've actually spent coding.  It doesn't
+really make sense for such a one-time project, or what?  Well - I'm
+completely fresh as a CPAN author, and before humiliating myself by
+trying to release some of my uglier hacks, I want a bit of experience.
+I hope this module will provide me with useful feedback.  Please flame
+me at tobix@irctos.org.
+
+
+             ***************************************
+             INSTALLATION
+
+Standard installation:
+ 
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+
+
+Mail tobix@irctos.org for more information. I'm glad to get any
+feedback whether this module is usable or not.

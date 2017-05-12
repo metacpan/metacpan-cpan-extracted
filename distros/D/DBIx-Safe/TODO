@@ -1,0 +1,11 @@
+
+Possible future ideas for DBIx::Safe:
+
+* Support for prepare_cached
+* Support for errstr
+* Better trace read/write separation
+* Group privs e.g. $safe->allow_readonly_attributes
+* Allow peronalized messages via deny_regex
+
+
+

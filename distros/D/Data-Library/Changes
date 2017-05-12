@@ -1,0 +1,9 @@
+Revision history for Perl module Data::Library
+
+0.1   14 Jan 2003
+	- Extracted all the file-access code from DBIx::Librarian
+	  and moved it here.  Using Log::Channel.  With (basic) test suite.
+
+0.2   25 Mar 2005
+	- missing VERSION in subfiles, forgot Class::Virtual dependency,
+	  Log::Channel dependency, bumped to 0.2

@@ -1,0 +1,10 @@
+Revision history for Perl extension DBIx::DisconnectAll
+
+0.03    Wed Dec 5 0:53:10 2012
+        - switch to Module::Install
+
+0.02    Tue Dec  4 18:10:22 2012
+        - update Makefile.PL
+
+0.01    Tue Dec  4 15:26:49 2012
+        - original version

@@ -1,0 +1,431 @@
+March 26th, 2009
+
+DBD::DB2 1.71
+
+  Retrieving CLOB type gave truncated for DB2 version 9.1fp2 fixed. - 173663
+  Segmentation fault unless db2profile is sourced - CPAN - 44505
+
+March 17th, 2009
+
+DBD::DB2 1.7
+
+  Improved support for Getting Client Info using DB2 CLP. Enhancement on 160229
+  Errors while retrieving multiple resultsets from stored procedures using db2_more_results defect number 172486
+  Support for Decfloat Datatype - 172301
+  Support for SQLRowCount to prefetch the number of rows that can be retured by a Select/Update/Delete/Insert query - 173018
+
+February 18th, 2009
+
+DBD::DB2 1.61
+
+  Version 1.6 broke the CPAN install. Thus I renamed and reuploaded as 1.61
+  Improved Error and Warning Handling - Internal Bug - 166025
+  Improved XML Support to handle large XML Files - 171868
+  Include SQL_ATTR_INFO_PROGRAMNAME as Constant - 166029
+  Include SQL_ATTR_CALL_RETURN as Constant - 171813
+  Memory Cleanup - 170940
+
+December 25th, 2008
+
+DBD::DB2 1.3
+
+  Added support for DB2 on MacOS
+  Changes in Makefile.PL to support compilation with dmake with ActivePerl 5.8.X and 5.10.X
+
+September 4th, 2008
+
+DBD::DB2 1.2
+
+  Release and Code Changes to support Trusted Context.
+  Fixed Bug for Driver Compilation Failing on Solaris.
+
+May 24th, 2007
+
+DBD::DB2 1.1
+  
+  Fixed compile error which was caused due to changes made with DBIc_CACHED_KIDS in DBIv1.55.
+
+October 2nd, 2006
+
+DBD::DB2 1.0
+
+  Fixed bug in cancel method
+
+  Fixed bug to enable iterative execute and fetch
+
+  Fixed bug to handle multiple result sets (compatible with DBIv1.53)
+
+  Fixed memory leak when accessing column names
+
+  Add support for tolerated error handling
+
+DBD::DB2 0.9a
+
+  Add support for multi-byte locales, such as UTF-8
+
+  Add native XML support
+
+  Fix bug in get_info
+
+  Updated DB2.pod
+  Add examples for binding LOB files
+  Add examples for fetching LOB pieces
+
+August 04, 2006
+
+DBD::DB2 0.80
+
+  Add set current schema as a connection attribute
+
+  Add support for cancel method
+
+  Add support for get_info in order to avoid errors when unsupported InfoType codes are requested
+
+  Add support for full connection string during DBI->connect
+
+  Add 64 and 32 bit support during compilation
+
+  Updated DB2.pod
+  Add link to the DB2 Information Center
+  Add link to the IBM DB2 Perl Database Interface guide
+
+July 21, 2006
+
+DBD::DB2 0.79a
+
+  Add support for SQL_ATTR_LOGIN_TIMEOUT
+
+September 20, 2004
+
+DBD::DB2 0.78
+
+  Add support for C-style comments in sql
+
+September 15, 2004
+
+DBD::DB2 0.77
+
+  NOTE: DBD::DB2 now requires DBI 1.21, which requires
+  perl 5.005_03 or later.
+
+  Add support for primary_key_info and primary_key
+
+  Add support for foreign_key_info
+
+  Add support for column_info
+
+  Add support for get_info
+
+  Add support for type_info_all and type_info
+     - Read CAVEATS file for hints
+
+  Fix statement handle leak. Statements handles
+  are not destroyed properly.
+
+  Fix memory leak in $sth->prepare
+  Column buffers are not freed
+
+  Fix Linux and Fedora Core build problem by adding
+  -I$Config{vendorarch}/auto/DBI to Makefile.PL
+
+  Updated CAVEATS
+  Add documentation for binding CLI packages
+  Add information on metadata functions
+  Add note to remove constants to bypass a linux build error
+
+  Update DB2.pod
+  Add metadata function examples
+
+October 1, 2001
+
+DBD::DB2 0.76
+
+  Remove cached statement attributes for multiple result sets
+
+  Add support for AS/400
+
+  Replace 'split' function in Constants/Makefile.PL due to apparent
+  bug in Perl 5.6.1 on AIX.  Get error: "Bizarre copy of ARRAY in
+  aassign at ../Carp/Heavy.pm line 79."
+
+  Add support for DBI->data_sources.
+
+  Add support for multiple result sets
+
+  Fix memory overwrite problem with parameter binding when new parameter
+  value is one byte larger than largest value used so far.
+
+  Fix small memory leek in $dbh->do, $dbh->ping, $dbh->tables and
+  $sth->blob_read.
+
+  Fix $sth->bind_param($p_num, $bind_value, $bind_type) &
+  $sth->bind_param_inout($p_num, \$bind_value, $max_len, $bind_type).
+  $bind_type was ignored.
+
+  Fixed $dbh->tables to work with MVS, VM and AS/400 databases.
+
+  Changed $dbh->tables to return tables for all schemas.  The table
+  names returned are now qualified with the schema.
+
+  Add support for attributes in $dbh->tables and $dbh->table_info.
+
+March 29, 2001
+
+DBD::DB2 0.75
+
+  Add new statement attributes.
+
+  Removed db2_async_enable and db2_auto_ipd connection attributes as
+  they have no relevance to a DBI program.
+
+  Set $h->state=02000 when no more data available to be fetched.
+
+  Fixed bug where bind_col/bind_columns failed if called prior to
+  execute and the statement contained parameter markers.
+
+  Fixed problem with result sets returned from stored procedures.
+
+  Add support for 64bit Windows.
+
+  Replace 'shift' function in Constants/Makefile.PL due to apparent
+  bug in Perl 5.6.0 on AIX.  Get error: "Bizarre copy of ARRAY in
+  aassign at ../Carp/Heavy.pm line 79."
+
+  Add support for $dbh->ping.
+
+
+September 6, 2000
+
+DBD::DB2 0.74
+
+  Use execute immediate for $dbh->do() when statement does not use
+  parameter markers.
+
+  Fix ChopBlanks.
+
+  Fix a problem when fetched data is truncated due to LongReadLen.
+
+  Add support for spaces in DB2 install path name on Windows NT.
+
+  Fixed build problem with ActivePerl on Windows NT when ActivePerl
+  was installed without a compiler environment (i.e. libpth in
+  Config.pm does not include the compiler library paths).
+
+  DB2_HOME is no longer required if the build is performed in a
+  properly configured DB2 environment (i.e. the DB2 'bin' directory
+  is in the PATH environment variable).
+
+  Rename DB2 specific attributes to comply with DBI naming
+  convention (i.e. use lower case and prefix with db2_).  Old
+  attributes still accepted for the time being.
+
+  Add new connection attributes.
+
+  Miscellaneous performance enhancements.
+
+
+May 12, 2000
+
+DBD::DB2 0.73
+
+  Automatically set CAPI=TRUE in Makefile.PL when Perl Object
+  abtraction is enabled.
+
+  Fixed incorrect usage of '==' for Perl string comparison in DB2.pm.
+
+  Added support for $dbh->tables and $dbh->table_info.
+
+  Fixed build failure when using Perl 5.004_04: Undeclared
+  identifier PL_sv_undef.
+
+  Fixed problem with InactiveDestroy for statement handles, DB2
+  statement handle was being freed even when $sth->{InactiveDestroy}
+  was turned on.
+
+
+April 14, 2000
+
+DBD::DB2-0.72
+
+  Added support for bind_param_inout.
+
+  Added support for binary (including BLOB) columns.  Added new
+  attribute type $attrib_binary for inserting raw data.
+
+  Added support for LOB input from file (bind attribute 'File=1').
+  Added new attribute types $attrib_blobfile, $attrib_clobfile and
+  $attrib_dbclobfile.
+
+  Added support for LongReadLen, LongTruncOk and ChopBlanks
+  attributes.
+
+  Fixed retrieval of binary columns so data is returned unconverted.
+  (i.e. binary data x'abcd' is not converted to 4 byte string "abcd"
+  but rather results in 2 bytes of data 0xabcd).
+
+  General performance improvements.
+
+
+January 12, 1999
+
+DBD::DB2-0.71
+
+  Ported to Windows NT!
+
+  It is now mandatory for the user to set the DB2_HOME environment
+  variable to the installed location of DB2 UDB.  It will no longer
+  default to /usr/lpp/db2_05_00.  This was done to accommodate ports
+  to other platforms which have different default installation paths.
+
+  Calls to deprecated CLI functions replaced by newer ones
+  (i.e. SQLAllocStmt() replaced by SQLAllocHandle(SQL_HANDLE_STMT,...).
+
+  A couple of bugs in dbd_bind_ph() were fixed.
+
+
+September 25, 1998
+
+DBD::DB2-0.70
+
+   Corrected values returned from execute().
+   Added support for CursorName, TYPE, PRECISION,
+      and SCALE statement attributes.
+   Minor cleanup.
+
+
+July 5, 1998
+
+DBD::DB2-0.68
+
+   Found and fixed a couple of bugs relating to the handling of
+      remote data
+
+
+May 11, 1998
+
+DBD::DB2-0.67
+
+    Fixed a bug dealing with functions returning SUCCESS_WITH_INFO
+
+
+April 2, 1998
+
+DBD::DB2-0.66
+    Rewrote code to support multiple concurrent connections
+
+    Fixed a pair of bugs, dealing with nested error codes not
+    being properly returned.
+
+    Tested against DB2 version 5
+
+****
+    Added untested routines to SetConnectionOptions and to
+    SetStmtOptions ****  Experimental needs to be moved to
+    private_*
+****
+
+
+Dec 10, 1997
+
+    Fixed a pair of errors which resulted in the infamous
+      "DBI Handle has uncleared implementors data" on finishing
+      statements prior to disconnect.
+
+
+Feb 7, 1997
+
+        Created a small pod for DBD::DB2.  Hopefully, this
+        will lighten the email load.
+
+        Rolled in all the changes needed to make it compile cleanly
+        on Solaris
+
+        Output Parameters for stored procedures now work.
+
+Dec 12, 1996
+        1. This version fixes a problem with setting/unsetting
+       AutoCommit on the database handle...I need a better
+       test suite :-(
+
+        2. Fixed problem with connect/disconnect/connect cycle
+
+Oct 7, 1996
+
+Added access to the SetStmtOption call, which in conjunction with
+DB2 v 2.1.1 NLV2 will allow asynchronous database access among other
+things.  SEE the DB2 CLI manual for details.
+
+NOTE:  I don't have any sufficiently large database to tell if
+asynchronous access is working properly.  Other options appear to
+be working.....so I'm assuming that asynchronous access is.
+
+
+Aug 16, 1996
+
+Fixed the following:
+
+    1. Prototype warnings from xsub.
+
+    2. Invalidated cursor messages when exiting after finishing the
+       cursors.
+
+June 21, 1996
+
+Fixed the following:
+
+    1. Fixed a package naming problem with the Constants package.
+
+           Screwed up the package name change which caused the tests
+       to fail on a clean build system.  Unfortunately, on my test
+       systems I was picking up an old copy....
+
+NOTE:  **********************************************************
+
+      Any reference to               DB2::Constants,
+      MUST now be               DBD::DB2::Constants
+
+*****************************************************************
+
+June 12, 1996
+
+Fixed the following:
+
+    1.  Not returning the SQLCODE associated with the error.
+
+        All error information is now available from perl - you
+        can get SQLCODE from err, sql message string from errstr,
+        and SQLSTATE from state.
+
+    2.  Returning a perl failure on connect when a sql failure was
+        needed.
+
+        Perl will now see a !defined($var) on connection failure, so
+        that scripts my fail gracefully.
+
+
+April 25, 1996
+    No KNOWN problems -- it is however alpha software.
+
+
+Nov. 17, 1995
+
+        NOTE: ***********************************************************
+          This will be the last release of DB2perl this year.  I will
+          be migrating the functionality to the new foundation just
+          announced by Tim.Bunce@ig.co.uk.  Only major bug fixes will
+          be done.
+    NOTE: ***********************************************************
+
+    Fetching of BLOBs (not CLOBs, or DLOBs) is working.
+
+    Fixed some problems with inserting explicit NULLs into tables and
+      retrieving rows containing explict NULLs reported by
+      chet@watson.ibm.com
+
+
+Sept. 22, 1995
+    Fetching data works by either
+       @row = $sth->fetchrow()  or ($f1, $f2, $f2) = $sth->fetchrow()
+
+Sept. 19, 1995
+        Initial beta release

@@ -1,0 +1,14 @@
+lib/Date/Easter.pm
+MANIFEST
+Makefile.PL
+README
+LICENSE
+
+t/00basics.t
+t/01gregorian.t
+t/02orthodox.t
+
+bin/easter
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

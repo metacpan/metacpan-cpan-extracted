@@ -1,0 +1,32 @@
+---
+abstract: 'Rapid creation of RESTful Web Services with sessions and persistent data'
+author:
+  - 'George Bouras <george.mpouras@yandex.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer2-Plugin-WebService
+provides:
+  Dancer2::Plugin::WebService:
+    file: lib/Dancer2/Plugin/WebService.pm
+    version: 3.014
+requires:
+  Dancer2: 0
+  Dancer2::Plugin: 0
+  Data::Dumper: 0
+  JSON::XS: 0
+  Moo: 0
+  Plack: 0
+  Plack::Middleware::Deflater: 0
+  Starman: 0
+  Storable: 0
+  XML::Hash::XS: 0
+  YAML::XS: 0
+version: 3.014
+x_serialization_backend: 'YAML::Tiny version 1.51'

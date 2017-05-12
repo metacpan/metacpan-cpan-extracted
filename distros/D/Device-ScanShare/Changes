@@ -1,0 +1,77 @@
+2009-09-25 09:27  cvs
+
+	* README, t/2_cli.t: Had to make slight debug on cli test to check
+	  for dep beforehand.
+
+2009-09-24 16:20  cvs
+
+	* Makefile.PL, README, lib/Device/ScanShare.pm, t/0.t: Took out use
+	  of File::Slurp, was giving funny errors in some archs.
+
+2009-09-23 15:37  cvs
+
+	* Changes, Device-ScanShare-1.002.tar.gz, Makefile.PL, README,
+	  cgi-bin/scanshare.cgi, lib/Device/ScanShare.pod: Made sure perl
+	  license shows.  Made sure abstract is placed in META.yml and
+	  README.
+
+2009-08-19 14:18  cvs
+
+	* lib/Device/ScanShare.pm: Fixed a bug in windows path
+	  interpretation .. problem with backslashes and resolving to path
+	  on disk.. etc.
+
+2009-05-05 17:15  cvs
+
+	* bin/scanshare, lib/Device/ScanShare.pm, lib/Device/ScanShare.pod,
+	  t/0.t: added some methods to help maintain you can turn a
+	  unixpath to windowspath, etc.  added checking in bin/scanshare to
+	  see if entries are still on disk if not, you can use a cli
+	  command to remove entries not on disk
+
+2009-04-08 16:02  cvs
+
+	* bin/scanshare, lib/Device/ScanShare.pm, t/0.t: still working on
+	  this, needs to be better at detecting arguments, right now it's
+	  too conservative in the input it accepts
+
+2009-04-08 10:36  cvs
+
+	* bin/dyerscanshareupdate, lib/Device/ScanShare.pm: in script,
+	  added dms reset cache, needed - otherwise errors occur
+
+2009-01-14 17:28  cvs
+
+	* lib/Device/ScanShare.pm, t/0.t: made it a little smarter on
+	  taking a path as argument
+
+2009-01-14 16:24  cvs
+
+	* bin/scanshare: Cleaned up code, made sure scanshare prints
+	  version and exit on -v.  Fixed up bug "Bareword found in
+	  conditional at /usr/bin/scanshare line 29"
+
+2007-07-18 11:34  cvs
+
+	* bin/dyerscanshareupdate: made label just as dir
+
+2007-07-18 11:28  cvs
+
+	* MANIFEST, Makefile.PL, bin/dyerscanshareupdate, bin/scanshare,
+	  lib/Device/ScanShare.pm: added dyer update script
+
+2007-06-12 14:07  cvs
+
+	* lib/Device/ScanShare.pm: newline added
+
+2007-04-20 18:04  cvs
+
+	* MANIFEST, Makefile.PL, bin/.scanshare.swp, bin/scanshare,
+	  cgi-bin/scanshare.cgi, lib/Device/ScanShare.pm: Initial revision
+
+2007-04-20 18:04  cvs
+
+	* MANIFEST, Makefile.PL, bin/.scanshare.swp, bin/scanshare,
+	  cgi-bin/scanshare.cgi, lib/Device/ScanShare.pm: replacement for
+	  old ScanShare module
+

@@ -1,0 +1,27 @@
+TYPEMAP
+
+dv_bucket *            O_DV_BUCKET
+dv_bucket_item *       O_DV_BUCKET_ITEM
+
+OUTPUT
+O_DV_BUCKET
+    sv_setref_pv($arg, "Data::Valve::Bucket", (void *) $var);
+
+O_DV_BUCKET_ITEM
+    sv_setref_pv($arg, "Data::Valve::BucketItem", (void *) $var);
+
+INPUT
+O_DV_BUCKET
+    if (sv_isobject($arg)) {
+        $var = INT2PTR( $type, SvIV( (SV *) SvRV($arg) ) );
+    } else {
+        croak( \"${Package}::$func_name() -- $var is not a blessed SV reference \" );
+    }
+
+O_DV_BUCKET_ITEM
+    if (sv_isobject($arg)) {
+        $var = INT2PTR( $type, SvIV( (SV *) SvRV($arg) ) );
+    } else {
+        croak( \"${Package}::$func_name() -- $var is not a blessed SV reference \" );
+    }
+

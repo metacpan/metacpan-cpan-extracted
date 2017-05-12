@@ -1,0 +1,13 @@
+BitSequence *					T_PV
+DataLength					T_UV
+HashReturn					T_PTROBJ
+const BitSequence *				T_PV
+const u08b_t *					T_PV
+hashState *					T_PTROBJ
+u08b_t *					T_PV
+u64b_t						T_NV
+
+Digest::Skein::256	T_PTROBJ
+Digest::Skein::512	T_PTROBJ
+Digest::Skein::1024	T_PTROBJ
+

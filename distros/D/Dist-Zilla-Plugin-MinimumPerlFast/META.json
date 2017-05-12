@@ -1,0 +1,71 @@
+{
+   "abstract" : "Quickly detects the minimum version of Perl required for your dist",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-MinimumPerlFast",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "4.102345",
+            "Dist::Zilla::Role::PrereqSource" : "4.102345",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Perl" : "0.101340",
+            "Perl::MinimumVersion::Fast" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::MinimumPerlFast" : {
+         "file" : "lib/Dist/Zilla/Plugin/MinimumPerlFast.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-minimumperlfast at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MinimumPerlFast"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/dist-zilla-plugin-minimumperlfast.git",
+         "web" : "https://github.com/Leont/dist-zilla-plugin-minimumperlfast"
+      }
+   },
+   "version" : "0.003"
+}
+

@@ -1,0 +1,341 @@
+Revision history for Dancer2-Plugin-Auth-Extensible
+
+0.704 Wed 12 Apr 15:04:46 CEST 2017
+
+    [BUG FIXES]
+
+    * Fix password reset when user is object (Andy Beverley GH#73)
+    * Fix custom login template (Tadeusz “tadzik” Sośnierz GH#72)
+
+    [MISC]
+
+    * Deduplicate code related to login page rendering (Tadeusz “tadzik”
+      Sośnierz GH#71)
+
+0.703 Tue 29 Nov 10:25:10 CET 2016
+
+    [BUG FIXES]
+
+    * Bump dep on Dancer2 to 0.204000. Prior to that release after `forward`
+      `params` were still available but were not cloned into `parameters`.
+      This should fix GH #66.
+
+0.702 Mon 28 Nov 12:34:53 CET 2016
+
+    [TESTS]
+
+    * Chasing down GH#66 and (hopefully) cut down on unexpected warnings
+      causing no-realms-configured test to fail.
+
+0.701 Tue 22 Nov 10:32:27 CET 2016
+
+    [BUG FIXES]
+
+    * Try to make File::ShareDir::Install more reliable (Peter Mottram).
+
+    [TESTS]
+
+    * Stop tests failing due to 'Name "YAML::XS::NonStrict" used only once'
+      warning (Peter Mottram).
+    * Remove debug log from output in no-reset-password-handle test
+      (Peter Mottram).
+
+0.700 Fri 18 Nov 13:13:36 CET 2016
+
+    [ENHANCEMENTS]
+
+    * Add new "no-redirect" login handler (Peter Mottram).
+    * Break out /login and /login/denied html into external files
+      (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Escape all params used as input to default login page to prevent
+      potential injection attacks (Peter Mottram).
+    * Bump dep on Test::Deep for noneof (Peter Mottram GH#65).
+
+    [TESTS]
+
+    * Lots more tests added resulting in much better coverage (Peter Mottram).
+
+0.622 Wed  9 Nov 11:35:15 CET 2016
+
+    * Add back missing $VERSION to Provider::Example
+
+0.621 Tue  8 Nov 16:44:51 CET 2016
+
+    [ENHANCEMENTS]
+
+    * auth_provider now croaks if no realm is supplied (Peter Mottram).
+
+    [BUG FIXES]
+
+    * query_parameter should be query_parameters in get /login route
+      (Peter Mottram).
+    * user_password logic corrected (Peter Mottram).
+    * realm_name should be realm_names in update_user (Peter Mottram).
+
+    [TESTS]
+
+    * Huge number of new tests added (Peter Mottram).
+    * Add build dep on HTTP::Cookies (Peter Mottram).
+
+    [MISC]
+
+    * Remove old Provider::Example since Provider::Config is a much better
+      example provider (Peter Mottram).
+    * logged_in_user_lastlogin now stored in session as epoch (Peter Mottram).
+    * Removed unused _try_realms method (Peter Mottram).
+
+0.620 Thu  3 Nov 16:01:22 CET 2016
+
+    [ENHANCEMENTS]
+
+    * User returned by providers can now be any kind of object. Previously
+      the providers were required to return a hashref (Peter Mottram).
+    * Most provider methods can now throw exceptions which will be caught
+      by the plugin (Peter Mottram).
+    * Added new hooks: after_authenticate_user, before_create_user and
+      after_create_user (Peter Mottram).
+    * If password is provided to create_user then set it immediately.
+
+    [TESTS]
+
+    * New tests for testing provider methods directly (Peter Mottram).
+    * Major test overhaul to enable clearer testing (Peter Mottram).
+    * Create extended version of Provider::Config for use in tests to allow
+      most plugin features to be tested without relying on external providers.
+
+0.614 Thu Oct 27 16:03:17 2016 CEST 
+
+    [ENHANCEMENTS]
+
+    * Add priority attribute to force order in which realms are checked
+      (Peter Mottram).
+    * Upgrade default encryption algo to SHA-512 (Peter Mottram GH#57).
+    * Implement disable_roles in plugin (Peter Mottram GH#38).
+
+    [DOCUMENTATION]
+
+    * Add missing optional methods to Role::Provider (Peter Mottram).
+
+    [TESTS]
+
+    * Convert tests to Plack::Test's OO style (Peter Mottram).
+
+    [MISC]
+
+    * Split out LDAP provider into its own distro (Peter Mottram).
+    * Avoid a memory cycle (Peter Mottram).
+
+0.613 Tue Oct 18 15:35:19 2016 CEST
+
+    [DOCUMENTATION]
+
+    * Update docs to reflect Provider::Database being an external module
+      (Henk van Oers, GH #55).
+
+    [TESTS]
+
+    * Cope with get_user_details in providers returning an object rather
+      than a hash reference (Peter Mottram).
+
+0.612 Tue Oct 11 12:44:01 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add before_authenticate_user hook (Peter Mottram).
+
+    [DOCUMENTATION]
+
+    * Add change_session_id to example POST login code (Andy Beverley).
+
+0.611 Tue Aug 30 16:59:49 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add 'after_login_success' hook (Peter Mottram).
+
+0.610 Mon Aug 15 08:17:46 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Call Dancer2's change_session_id on successful login. This method has
+      not yet been merged into Dancer2 core but we want to be ready for it
+      (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Incorrect call to user_password from app not plugin
+      (Andrew Beverly, GH #53).
+    * Avoid memory leaks in BUILD by passing weakened ref to plugin into
+      add_route callbacks (Peter Mottram).
+    * Call $app->session instead of $app->app->session in _post_login_route
+      (Peter Mottram).
+
+    [MISC]
+
+    * Creation of temp lexical vars adds overhead so remove some where not
+      needed (Peter Mottram).
+
+0.601 Tue Jul 12 16:23:22 2016 CEST
+
+    [BUG FIXES]
+
+    * Don't localise $username in user_password when checking reset code.
+      This caused user_password( code => '...') to always fail (Peter Mottram).
+    * Use $plugin instead of $app to call password_reset_send method
+      (Roman Studenikin, Peter Mottram, GH #50).
+    * Rename generate-crypted-password (Henk van Oers, Peter Mottram, GH #30).
+
+    [ENHANCEMENTS]
+
+    * Use Carp::croak instead of die for better stack traces (Peter Mottram).
+    * Added `use strict` for CPANTS Kwalitee score (Guillermo O. Freschi).
+    * Added MIN_PERL_VERSION to Makefile.PL (Guillermo O. Freschi).
+    * Simplify use of from_config and default in plugin attributes (Peter Mottram).
+    * Use current plugin in route setup (Peter Mottram).
+
+0.600 Tue May 31 15:38:56 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Major update for compatibility with plugin2 (Peter Mottram).
+      For plugin2 details see: https://github.com/PerlDancer/Dancer2/pull/1010
+      Any old providers that have not been updated will die on using
+      Provider::Base.
+    * Add disable_roles attr to Provider roles. This allows this setting to
+      be different for each realm.
+    * Providers are now Moo classes. Provider::Base is no longer used
+      and is replaced by Role::Provider Moo::Role.
+    * Provider settings now handled as class attributes.
+    * Use strict and warnings everywhere (except in Moo classes).
+
+    [MISC]
+
+    * Dancer2::Plugin::Auth::Extensible::Provider::Database moved into its
+      own repository.
+    * Switch from Types::Standard to Dancer2::Core::Types instead.
+    * Switch all evals to Try::Tiny.
+    * Update Moo dependency to v2.
+    * Add security warning to Provider::Unix.
+
+    [TESTS]
+
+    * Make base tests compatible with Provider::Usergroup.
+    * Split out DBIC provider role tests into new subtest.
+
+0.502 Thu 11 Feb 16:06:29 CET 2016
+
+    [BUG FIXES]
+
+    * Use getpwnam/getgrent in Unix provider instead of Unix::Passwd::File.
+      In addition to the obvious benefit of removing a dependency this also
+      solves a problem with Unix::Passwd::File where it likes to lock the
+      passwd file but that will fail if the user does not have permissions
+      which is normal for a web app (Peter Mottram).
+      Thanks to Jason Lewis for the heads up about this issue.
+
+0.501 Wed Jan 20 12:07:17 2016 CET
+
+    [TESTS]
+
+    * Always output log messages on get/post errors (Peter Mottram).
+
+0.500 Tue Jan 19 15:08:37 2016 CET
+
+    [TESTS]
+
+    * Add infrastructure for provider tests and various other
+      improvements for testing (Peter Mottram).
+
+0.402 Tue Dec  8 14:44:19 2015 CET
+
+    [BUG FIXES]
+
+    * Adjust regexp for routes to be stricter in order to prevent
+      incorrect matches causing redirect loops (Evan Brown, GH #32).
+
+0.401 Wed Jun 10 19:23:30 2015 CEST
+
+	[ENHANCEMENTS]
+
+	* Allow custom random password generator to be specified
+	  (Andrew Beverly, GH #23).
+
+0.400 Thu May 21 08:36:36 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Add logged_in_user_password_expired keyword (Andrew Beverly, GH #26).
+    * Add functionality to record the last successful login (Andrew Beverly, GH #25).
+    * Cache user details within each request (Andrew Beverly, GH #24).
+    * Create and edit users, and manage user passwords (Andrew Beverly, GH #10).
+
+    [DOCUMENTATION]
+
+    * Add documentation on users method for the example provider (Stefan Hornburg).
+    * Add documentation for methods of the base provider class (Stefan Hornburg).
+    * Add documentation for auth_provider method (Stefan Hornburg).
+    * Fix a few typos (Evan Brown, GH #20).
+
+    [TESTS]
+
+    * Add POD coverage test (Stefan Hornburg).
+
+0.306 Thu Mar 26 18:41:53 2015 CET
+
+    [BUG FIXES]
+
+    * Fix crash on /login when already logged in (Gabor Szabo, Stefan Hornburg, GH #18).
+
+0.305 Tue Mar 17 09:48:43 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Include the dsl object in the provider constructor (Henk van Oers, GH #13).
+
+    [BUG FIXES]
+
+    * Fix no_default_pages and no_login_handler options (Andrew Beverly, GH #17).
+    * Add missing "Permission Denied" route (Stefan Hornburg, GH #15).
+    * Use Dancer2 in the example and test the example (Gabor Szabo, GH #16).
+    * Remove Mock::Quick from prerequisites (Henk van Oers, GH #8).
+
+    [DOCUMENTATION]
+
+    * Include the name of the command line tool in the pod (Gabor Szabo, GH #11).
+
+0.304 Fri Feb 20 09:12:18 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for DBI provider (Andrew Beverley, GH #7).
+    * Add warning if no realms are configured (Andrew Beverley, GH #6).
+    * Add simple script to generate crypted passwords (David Precious).
+
+    [DOCUMENTATION]
+
+    * Fix module name in POD of Database provider (Vince Willems, GH #5).
+    * Fix mix-up of login_page and login_url (David Precious).
+
+0.303 Tue Oct 28 09:13:46 2014 CET
+
+    [BUG FIXES]
+
+    * Add version to Dancer2 prerequisite (GH #2, Stefan Hornburg).
+      Prevents test failure in case psgi_app method isn't present.
+
+    [TESTS]
+
+    * Suppress core and debug logging for tests.
+
+0.302 Sun Oct 26 17:09:57 2014 CET
+
+    [BUG FIXES]
+
+    * Fix MANIFEST (Stefan Hornburg).
+
+0.301 Sat Oct 25 21:26:39 2014 CEST
+
+    Initial port from Dancer1 (Stefan Hornburg).

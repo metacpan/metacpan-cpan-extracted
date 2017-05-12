@@ -1,0 +1,70 @@
+---
+abstract: 'Advanced coverage reports based on Devel::Cover'
+author:
+  - 'BartÅomiej SyguÅa <bs@bs502.pl>'
+build_requires:
+  Data::Compare: 1.22
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-CoverReport
+provides:
+  Devel::CoverReport:
+    file: lib/Devel/CoverReport.pm
+    version: 0.05
+  Devel::CoverReport::App::CoverReport:
+    file: lib/Devel/CoverReport/App/CoverReport.pm
+    version: 0.05
+  Devel::CoverReport::App::ProveCover:
+    file: lib/Devel/CoverReport/App/ProveCover.pm
+    version: 0.05
+  Devel::CoverReport::DB:
+    file: lib/Devel/CoverReport/DB.pm
+    version: 0.05
+  Devel::CoverReport::Feedback:
+    file: lib/Devel/CoverReport/Feedback.pm
+    version: 0.05
+  Devel::CoverReport::Formatter:
+    file: lib/Devel/CoverReport/Formatter.pm
+    version: 0.05
+  Devel::CoverReport::Formatter::Html:
+    file: lib/Devel/CoverReport/Formatter/Html.pm
+    version: 0.05
+  Devel::CoverReport::Formatter::YAML:
+    file: lib/Devel/CoverReport/Formatter/YAML.pm
+    version: 0.05
+  Devel::CoverReport::Table:
+    file: lib/Devel/CoverReport/Table.pm
+    version: 0.05
+  Devel::CoverReport::VCS::Fake:
+    file: lib/Devel/CoverReport/VCS/Fake.pm
+    version: 0.05
+  Devel::CoverReport::VCS::Git:
+    file: lib/Devel/CoverReport/VCS/Git.pm
+    version: 0.05
+  Devel::CoverReport::VCS::SVN:
+    file: lib/Devel/CoverReport/VCS/SVN.pm
+    version: 0.05
+requires:
+  App::Prove: 3.11
+  Carp::Assert::More: 1.12
+  Cwd: 3.12
+  Devel::Cover: 0.74
+  File::Path: 1.07
+  File::Slurp: 9999.13
+  FindBin: 1.47
+  Getopt::Long: 2.36
+  JSON: 2.17
+  Params::Validate: 0.88
+  Pod::Usage: 1.35
+  Storable: 2.15
+  YAML::Syck: 1.05
+  perl: v5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

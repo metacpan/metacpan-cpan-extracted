@@ -1,0 +1,11 @@
+<specification>
+<form name="registration" link="name">
+<field name="email"/>
+<field name="password"/>
+<field name="verify"/>
+</form>
+<form name="login" link="name">
+<field name="email_2"/>
+<field name="password_2"/>
+</form>
+</specification>

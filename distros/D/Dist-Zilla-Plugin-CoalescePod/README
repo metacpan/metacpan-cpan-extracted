@@ -1,0 +1,24 @@
+NAME
+    Foo - merge .pod files into their .pm counterparts
+
+VERSION
+    version 0.2.2
+
+SYNOPSIS
+        # in dist.ini
+        [CoalescePod]
+
+DESCRIPTION
+    If the files *Foo.pm* and *Foo.pod* both exist, the pod file is removed
+    and its content appended to the end of the ".pm" file (or just before a
+    "__DATA__" marker if present)
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

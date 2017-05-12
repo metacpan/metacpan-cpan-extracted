@@ -1,0 +1,51 @@
+NAME
+    DBIx::Skinny::Pager -
+
+SYNOPSIS
+      package Proj::DB;
+      use DBIx::Skinny;
+      use DBIx::Skinny::Mixin modules => ['Pager'];
+
+      package main;
+      use Proj::DB;
+
+      my $rs = Proj::DB->resultset_with_pager('MySQLFoundRows');
+      # $rs can handle like DBIx::Skinny::SQL.
+      $rs->from(['some_table']);
+      $rs->add_where('foo' => 'bar');
+      $rs->limit(10);
+      $rs->offset(20);
+      $rs->select([qw(foo bar baz)]);
+      my ($iter, $pager) = $rs->retrieve;
+      # $iter is a DBIx::Skinny::Iterator
+      # $pager is a Data::Page
+
+      # or you can set page
+      my $rs2 = Proj::DB->resultset_with_pager;
+      $rs2->from(['some_table']);
+      $rs2->add_where('foo' => 'bar');
+      $rs2->limit(10);
+      $rs2->page(2); # offset is 10 * ( 2 - 1) = 10.
+      $rs2->select([qw(foo bar baz)]);
+      my $result = $rs2->retrieve;
+      $result->iterator #=> DBIx::Skinny::Iterator
+      $result->pager #=> Data::Page
+
+DESCRIPTION
+    DBIx::Skinny::Pager is resultset pager interface for DBIx::Skinny. This
+    module is not support for search_by_sql or search_named.
+
+    and This modele is not support Oracle connection.
+
+    XXX: THIS PROJECT IS EARLY DEVELOPMENT. API may change in future.
+
+AUTHOR
+    Keiji Yoshimi <walf443 at gmail dot com>
+
+SEE ALSO
+    DBIx::Skinny, DBIx::Skinny::SQL, DBIx::Skinny::Mixin, Data::Page
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

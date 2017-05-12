@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3ebe434e512211f6fa214cac6eda1a65b7901dd6 Bananafonana.pm
+SHA1 5cb4c0e086241e648551451895729d8837bc6bbb Changes
+SHA1 b498368231a7de828ac2229ee3c9a13f3fe604df MANIFEST
+SHA1 ea799b7228be21a4c166c832acad9fc265b8db53 META.yml
+SHA1 68bc4a7fcad0f46d5aa9d0c31c662cf33525e32f Makefile.PL
+SHA1 8abcde2bd34cc5e030e3d03469482cda68703a34 README
+SHA1 c5075bbd43c24f52f2a748e21c16c88df38ba7e9 rfc1924.txt
+SHA1 0ab46f99007dcc803b38b28de44825b4353dfd23 test.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk6tt6cACgkQ0t/5DVBNODF4qQCeJ21LtwPdnEDbC0VK7Z2P+TK4
+UTUAnjpJgXD+3mo5CuOeaJInW/X7K3JK
+=5qPi
+-----END PGP SIGNATURE-----

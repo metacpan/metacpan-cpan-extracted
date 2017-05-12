@@ -1,0 +1,14 @@
+=head2 Template Variables
+
+In a distribution, I have to duplicate the same pieces of information again and again. For example,
+bug report email and web URLs should be written in C<[MetaResources]> section of F<dist.ini> and in
+the documentation, like F<BUGS.pod>.
+
+With a help from C<Templates> plugin I can eliminate duplication. If F<BUGS.pod> is a template,
+I can use email and web URLs defined in F<dist.ini>, e. g.:
+
+    {{$dist->distmeta->{resources}->{bugtracker}->{mailto};}}
+
+Err… This works but requires a lot of typing (so it is typo-prone), and looks ugly. With C<Hook> I
+can make it not only working, but also elegant. C<[Hook::Init]> section defines few variables in
+C<MY> package, which can be used in various templates, including documentation and meta resources.

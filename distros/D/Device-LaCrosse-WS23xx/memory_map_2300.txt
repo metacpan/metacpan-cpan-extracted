@@ -1,0 +1,5158 @@
+MEMORY MAP FOR WS-2300
+version 1.6, 2004 Apr 22
+
+   macro TEMPERATURE = $BCD / 100.0 - 30 [C]
+   macro PRESSURE    = $BCD / 10.0 [hPa]
+   macro RAIN        = $BCD / 100.0 [mm]
+   macro PERCENT     = $BCD [%]
+   macro YYMMDDhhmm  = _time_convert($BCD) [time_t]
+
+Address Data_Sample Function
+
+0000 4
+0001 F
+0002 F
+0003 B
+0004 0
+0005 0
+0006 2    Bitsettings: bit3=buzzer off
+0007 0
+0008 0
+0009 0
+000A 0
+000B 0
+000C 0
+000D 1
+000E 6
+000F 0    | Wind unit: 0=m/s, 1=knots, 2=beaufort, 3=km/h, 4=mph
+0010 2
+0011 0
+0012 0
+0013 0
+0014 4
+0015 0
+0016 7    Bitsettings: bit0=backlight
+0017 0
+0018 0
+
+ALARM SET FLAGS (bits 3/2/1/0)
+0019 0    Alarm set flags: -/Storm warning/-/Time
+001A 0    Alarm set flags: Pressure Hi/Pressure Ho/-/-
+001B 0    Alarm set flags: T out Hi/T out Lo/T in Hi/T in Lo
+001C 0    Alarm set flags: Dew Hi/Dew Lo/Windchill Hi/Windchill Lo
+001D 0    Alarm set flags: Hum in Hi/Hum in Lo/Hum out Hi/Hum out Lo
+001E 0    Alarm set flags: -/-/Rain 1h/Rain 24h
+001F 0    Alarm set flags: -/Wind dir/Wind speed Hi/Wind speed Lo
+0020 4    Alarm active flags: -/Alarm Icon/-/Time?
+0021 0    Alarm active flags: Pressure Hi/Pressure Ho/-/-
+0022 0    Alarm active flags: T out Hi/T out Lo/T in Hi/T in Lo
+0023 0    Alarm active flags: Dew Hi/Dew Lo/Windchill Hi/Windchill Lo
+0024 0    Alarm active flags: Hum in Hi/Hum in Lo/Hum out Hi/Hum out Lo
+0025 0    Alarm active flags: -/-/Rain 1h/Rain 24h
+0026 0    Alarm active flags: -/Wind dir/Wind speed Hi/Wind speed Lo
+0027 0    Alarm active flags: Pressure Hi/Pressure Ho/-/-
+0028 0    Alarm active flags: T out Hi/T out Lo/T in Hi/T in Lo
+0029 0    Alarm active flags: Dew Hi/Dew Lo/Windchill Hi/Windchill Lo
+002A 0    Alarm active flags: Hum in Hi/Hum in Lo/Hum out Hi/Hum out Lo
+002B 0    Alarm active flags: -/-/Rain 1h/Rain 24h
+002C 0    Alarm active flags: -/-/Wind speed Hi/Wind speed Lo
+002D 5
+002E 0
+002F 0
+0030 A
+0031 A
+0032 0
+0033 0
+0034 0
+0035 0
+0036 0
+0037 0
+0038 0
+0039 0
+003A 0
+003B 0
+003C 0
+003D 0
+003E 0
+003F 0
+0040 0
+0041 0
+0042 0
+0043 0
+0044 0
+0045 0
+0046 0
+0047 0
+0048 0
+0049 0
+004A 0
+004B 0
+004C 0
+004D 0
+004E 0
+004F 0
+0050 0
+0051 0
+0052 0
+0053 0
+0054 0
+0055 0
+0056 0
+0057 0
+0058 0
+0059 0
+005A 0
+005B 0
+005C 0
+005D 0
+005E 0
+005F 0
+0060 0
+0061 0
+0062 0
+0063 0
+0064 0
+0065 0
+0066 0
+0067 0
+0068 0
+0069 0
+006A 0
+006B 0
+006C 0
+006D 0
+006E 0
+006F 0
+0070 0
+0071 0
+0072 0
+0073 0
+0074 0
+0075 0
+0076 0
+0077 0
+0078 0
+0079 0
+007A 0
+007B 0
+007C 0
+007D 0
+007E 0
+007F 0
+0080 0
+0081 0
+0082 0
+0083 0
+0084 0
+0085 0
+0086 0
+0087 0
+0088 0
+0089 0
+008A 0
+008B 0
+008C 0
+008D 0
+008E 0
+008F 0
+0090 0
+0091 0
+0092 0
+0093 0
+0094 0
+0095 0
+0096 0
+0097 0
+0098 0
+0099 0
+009A 0
+009B 0
+009C 0
+009D 0
+009E 0
+009F 0
+00A0 0
+00A1 0
+00A2 0
+00A3 0
+00A4 0
+00A5 0
+00A6 0
+00A7 0
+00A8 0
+00A9 0
+00AA 0
+00AB 0
+00AC 0
+00AD 0
+00AE 0
+00AF 0
+00B0 0
+00B1 0
+00B2 0
+00B3 0
+00B4 0
+00B5 0
+00B6 0
+00B7 0
+00B8 0
+00B9 0
+00BA 0
+00BB 0
+00BC 0
+00BD 0
+00BE 0
+00BF 0
+00C0 0
+00C1 0
+00C2 0
+00C3 0
+00C4 0
+00C5 0
+00C6 0
+00C7 0
+00C8 0
+00C9 0
+00CA 0
+00CB 0
+00CC 0
+00CD 0
+00CE 0
+00CF 0
+00D0 0
+00D1 0
+00D2 0
+00D3 0
+00D4 0
+00D5 0
+00D6 0
+00D7 0
+00D8 0
+00D9 0
+00DA 0
+00DB 0
+00DC 0
+00DD 0
+00DE 0
+00DF 0
+00E0 0
+00E1 0
+00E2 0
+00E3 0
+00E4 0
+00E5 0
+00E6 0
+00E7 0
+00E8 0
+00E9 0
+00EA 0
+00EB 0
+00EC 0
+00ED 0
+00EE 0
+00EF 0
+00F0 0
+00F1 0
+00F2 1
+00F3 1
+00F4 0
+00F5 1
+00F6 2
+00F7 1
+00F8 E
+00F9 9
+00FA 4
+00FB 0
+00FC 0
+00FD 0
+00FE 5
+00FF 0
+0100 0
+0101 0
+0102 0
+0103 0
+0104 0
+0105 0
+0106 0
+0107 0
+0108 0
+0109 0
+010A 0
+010B 0
+010C 0
+010D 0
+010E 0
+010F 0
+0110 0
+0111 0
+0112 0
+0113 0
+0114 0
+0115 0
+0116 0
+0117 0
+0118 0
+0119 0
+011A 0
+011B 0
+011C 0
+011D 0
+011E 0
+011F 0
+0120 0
+0121 0
+0122 0
+0123 0
+0124 0
+0125 0
+0126 0
+0127 0
+0128 0
+0129 0
+012A 0
+012B 0
+012C 0
+012D 0
+012E 0
+012F 0
+0130 0
+0131 0
+0132 0
+0133 0
+0134 0
+0135 0
+0136 0
+0137 0
+0138 0
+0139 0
+013A 0
+013B 0
+013C 0
+013D 0
+013E 0
+013F 0
+0140 0
+0141 0
+0142 0
+0143 0
+0144 0
+0145 0
+0146 0
+0147 0
+0148 0
+0149 0
+014A 0
+014B 0
+014C 0
+014D 0
+014E 0
+014F 0
+0150 0
+0151 0
+0152 0
+0153 0
+0154 0
+0155 0
+0156 0
+0157 0
+0158 0
+0159 0
+015A 0
+015B 0
+015C 0
+015D 0
+015E 0
+015F 0
+0160 0
+0161 0
+0162 0
+0163 0
+0164 0
+0165 0
+0166 0
+0167 0
+0168 0
+0169 0
+016A 0
+016B 0
+016C 0
+016D 0
+016E 0
+016F 0
+0170 0
+0171 0
+0172 0
+0173 0
+0174 0
+0175 0
+0176 0
+0177 0
+0178 0
+0179 0
+017A 0
+017B 0
+017C 0
+017D 0
+017E 0
+017F 0
+0180 0
+0181 0
+0182 0
+0183 0
+0184 0
+0185 0
+0186 0
+0187 0
+0188 0
+0189 0
+018A 0
+018B 0
+018C 0
+018D 0
+018E 0
+018F 0
+0190 0
+0191 0
+0192 0
+0193 0
+0194 2
+0195 E
+0196 0
+0197 0
+0198 2
+0199 E
+019A 0
+019B 0
+019C 5
+019D 1
+019E 0
+019F 0
+01A0 7
+01A1 F
+01A2 B
+01A3 0
+01A4 5
+01A5 2
+01A6 C
+01A7 0
+01A8 3
+01A9 1
+01AA D
+01AB 0
+01AC 2
+01AD 4
+01AE 6
+01AF 1
+01B0 C
+01B1 0
+01B2 C
+01B3 3
+01B4 E
+01B5 F
+01B6 B
+01B7 3
+01B8 5
+01B9 C
+01BA 4
+01BB 0
+01BC 2
+01BD A
+01BE 6
+01BF 0
+01C0 C
+01C1 0
+01C2 C
+01C3 3
+01C4 2
+01C5 E
+01C6 0
+01C7 0
+01C8 2
+01C9 E
+01CA 0
+01CB 0
+01CC 2
+01CD E
+01CE 0
+01CF 0
+01D0 0
+01D1 B
+01D2 4
+01D3 0
+01D4 B
+01D5 9
+01D6 6
+01D7 0
+01D8 0
+01D9 B
+01DA 4
+01DB 0
+01DC 3
+01DD A
+01DE 6
+01DF 0
+01E0 C
+01E1 E
+01E2 A
+01E3 2
+01E4 2
+01E5 7
+01E6 2
+01E7 0
+01E8 9
+01E9 9
+01EA 6
+01EB 0
+01EC C
+01ED E
+01EE 3
+01EF 0
+01F0 A
+01F1 7
+01F2 3
+01F3 0
+01F4 D
+01F5 3
+01F6 5
+01F7 0
+01F8 F
+01F9 1
+01FA 5
+01FB 0
+01FC 0
+01FD 0
+01FE 0
+01FF 0
+
+TIME
+0200 0    Current time: Seconds BCD 1s
+0201 1    Current time: Seconds BCD 10s
+0202 6    Current time: Minutes BCD 1s
+0203 2    Current time: Minutes BCD 10s
+0204 3    Current time: Hours BCD 1s
+0205 0    Current time: Hours BCD 10s
+0206 4
+0207 4
+0208 2
+0209 4
+020A 0
+020B 3
+020C 0
+020D 0
+020E 0
+020F 0
+0210 0
+0211 1
+0212 0
+0213 8
+0214 0
+0215 3
+0216 0
+0217 0
+0218 4
+0219 2
+021A 4
+021B 0
+021C 3
+021D 0
+021E 0
+021F 0
+0220 0
+0221 0
+0222 0
+0223 0
+0224 1
+0225 5
+0226 3
+0227 0
+0228 0
+0229 0
+022A 0
+022B 0
+022C 0
+022D 0
+022E 0
+022F 0
+0230 0
+0231 0
+0232 9
+0233 0
+0234 0
+0235 0
+0236 0
+0237 0
+0238 0
+0239 0
+023A 0
+
+TIME
+023B 6    Current Time: Minutes BCD 1s
+023C 2    Current Time: Minutes BCD 10s
+023D 3    Current Time: Hours BCD 1s
+023E 0    Current Time: Hours BCD 10s
+023F 4    Current Weekday: Mon-Sun = 1-7
+0240 4    Current day of month: BCD 1s
+0241 2    Current day of month: BCD 10s
+0242 4    Current month: BCD 1s
+0243 0    Current month: BCD 10s
+0244 3    Current year: BCD 1s last two digits
+0245 0    Current year: BCD 10s last two digit
+0246 0
+0247 0
+0248 7
+0249 0
+024A 8
+024B 1
+024C 1
+
+DATE UNIT SET
+024D 1    Date the unit was last set to: BCD 1s
+024E 2    Date the unit was last set to: BCD 10s
+024F 4    Month the unit was last set to: BCD 1s
+0250 0    Month the unit was last set to: BCD 10s
+0251 3    Year the unit was last set to: BCD 1s
+0252 0    Year the unit was last set to: BCD 10s
+0253 0
+0254 0
+0255 0
+0256 0
+0257 0
+0258 0
+0259 0
+025A 0
+025B 0
+025C 0
+025D 2
+025E 1
+025F 7
+0260 F
+0261 0
+0262 0
+0263 0
+0264 3
+0265 5
+0266 4    | LCD contrast: $BCD+1 (Read Only: changing it has no impact on LCD.)
+0267 1
+0268 0
+0269 0
+026A 0
+
+TENDENCY/FORECAST
+026B 0    | Forecast: 0=Rainy, 1=Cloudy, 2=Sunny       (=Rainy)
+026C 2    | Tendency: 0=Steady, 1=Rising, 2=Falling    (=Falling)
+026D 0
+026E 0
+026F 0
+0270 6
+0271 8
+0272 2
+0273 0
+0274 1
+0275 1
+0276 8
+0277 0
+0278 8
+0279 3
+027A 0
+027B 0
+027C 0
+027D 0
+027E 0
+027F 0
+0280 0
+0281 0
+0282 4
+0283 0
+0284 0
+0285 0
+0286 0
+0287 0
+0288 2
+0289 7
+028A C
+028B 1
+028C 7
+028D C
+028E 1
+028F 7
+0290 4
+0291 0
+0292 0
+0293 0
+0294 0
+0295 0
+0296 0
+0297 0
+0298 0
+0299 0
+029A C
+029B 1
+029C 0
+029D 0
+029E 0
+029F C
+02A0 F
+02A1 F
+02A2 F
+02A3 F
+02A4 F
+02A5 F
+02A6 F
+02A7 F
+02A8 1
+02A9 D
+02AA E
+02AB 1
+02AC 8
+02AD 3
+02AE 0
+02AF 0
+02B0 0
+02B1 8
+02B2 F
+02B3 F
+02B4 F
+02B5 F
+02B6 F
+02B7 F
+02B8 F
+02B9 F
+02BA 3
+02BB A
+02BC D
+02BD 3
+02BE 0
+02BF 7
+02C0 0
+02C1 0
+02C2 0
+02C3 0
+02C4 F
+02C5 F
+02C6 F
+02C7 F
+02C8 F
+02C9 F
+02CA F
+02CB F
+02CC 7
+02CD 4
+02CE B
+02CF 7
+02D0 0
+02D1 0
+02D2 0
+02D3 0
+02D4 0
+02D5 0
+02D6 0
+02D7 0
+02D8 0
+02D9 8
+02DA F
+02DB 7
+02DC 0
+02DD 0
+02DE 0
+02DF 0
+02E0 0
+02E1 0
+02E2 6
+02E3 F
+02E4 9
+02E5 0
+02E6 0
+02E7 0
+02E8 0
+02E9 0
+02EA 0
+02EB 0
+02EC 0
+02ED 0
+02EE 0
+02EF 0
+02F0 0
+02F1 0
+02F2 0
+02F3 0
+02F4 4
+02F5 7
+02F6 3
+02F7 8
+02F8 3
+02F9 1
+02FA 5
+02FB 6
+02FC 8
+02FD 6
+02FE 8
+02FF 7
+0300 2
+0301 0
+0302 0
+0303 0
+0304 0
+0305 0
+0306 9
+0307 1
+0308 5
+0309 0
+030A 9
+030B 2
+030C 5
+030D 0
+030E 8
+030F 3
+0310 5
+0311 0
+0312 8
+0313 4
+0314 5
+0315 0
+0316 0
+0317 0
+0318 2
+0319 9
+031A 1
+031B 2
+031C 0
+031D 0
+031E 2
+031F 9
+0320 1
+0321 2
+0322 0
+0323 0
+0324 0
+0325 0
+0326 0
+0327 0
+0328 0
+0329 0
+032A 1
+032B 8
+032C C
+032D D
+032E A
+032F A
+0330 F
+0331 1
+0332 6
+0333 0
+0334 0
+0335 0
+0336 4
+0337 0
+0338 0
+0339 0
+033A 0
+033B 0
+033C 1
+033D 2
+033E 1
+033F F
+0340 F
+0341 2
+0342 1
+0343 0
+0344 0
+0345 0
+
+INDOOR TEMPERATURE
+0346 0     | Current Indoor Temperature: <TEMPERATURE>		(=28.6)
+0347 6     |
+0348 8     |
+0349 5    _/
+034A 0
+034B 0     | Minimum Indoor Temperature: <TEMPERATURE>		(=15.5)
+034C 5     |
+034D 5     |
+034E 4    _/
+034F 0
+0350 0     | Maximum Indoor Temperature: <TEMPERATURE>		(=29.7)
+0351 7     |
+0352 9     |
+0353 5    _/
+0354 0     | Date/Time min Indoor Temperature: <YYMMDDhhmm> (=2001-01-01 12:20)
+0355 2     |
+0356 2     |
+0357 1     |
+0358 1     |
+0359 0     |
+035A 1     |
+035B 0     |
+035C 1     |
+035D 0    _/
+035E 5     | Date/Time max Indoor Temperature: <YYMMDDhhmm> (=2003-04-21 17:55)
+035F 5     |
+0360 7     |
+0361 1     |
+0362 1     |
+0363 2     |
+0364 4     |
+0365 0     |
+0366 3     |
+0367 0    _/
+0368 0
+0369 0     | Low Alarm Indoor Temperature: <TEMPERATURE>	(=17.1)
+036A 1     |
+036B 7     |
+036C 4    _/
+036D 0
+036E 0     | High Alarm Indoor Temperature: <TEMPERATURE>	(=29.6)
+036F 6     |
+0370 9     |
+0371 5    _/
+0372 0
+
+OUTDOOR TEMPERATURE
+0373 0     | Current Outdoor Temperature: <TEMPERATURE>		(=7.4)
+0374 4     |
+0375 7     |
+0376 3    _/
+0377 0
+0378 0     | Minimum Outdoor Temperature: <TEMPERATURE>		(=2.5)
+0379 5     |
+037A 2     |
+037B 3    _/
+037C 0
+037D 0     | Maximum Outdoor Temperature: <TEMPERATURE>		(=35.8)
+037E 8     |
+037F 5     |
+0380 6    _/
+0381 5     | Date/Time min Outdoor Temperature: <YYMMDDhhmm> (=2003-04-17 06:25)
+0382 2     |
+0383 6     |
+0384 0     |
+0385 7     |
+0386 1     |
+0387 4     |
+0388 0     |
+0389 3     |
+038A 0    _/
+038B 1     | Date/Time max Outdoor Temperature: <YYMMDDhhmm> (=2003-04-17 17:01)
+038C 0     |
+038D 7     |
+038E 1     |
+038F 7     |
+0390 1     |
+0391 4     |
+0392 0     |
+0393 3     |
+0394 0    _/
+0395 0
+0396 0     | Low Alarm Outdoor Temperature: <TEMPERATURE>	(=0)
+0397 0     |
+0398 0     |
+0399 3    _/
+039A 0
+039B 0     | High Alarm Outdoor Temperature: <TEMPERATURE>	(=40)
+039C 0     |
+039D 0     |
+039E 7    _/
+039F 0
+
+WINDCHILL
+03A0 0     | Current Windchill: <TEMPERATURE>			(=7.4)
+03A1 4     |
+03A2 7     |
+03A3 3    _/
+03A4 8
+03A5 0     | Minimum Windchill: <TEMPERATURE>			(=-11.8)
+03A6 2     |
+03A7 8     |
+03A8 1    _/
+03A9 0
+03AA 0     | Maximum Windchill: <TEMPERATURE>			(=19.8)
+03AB 8     |
+03AC 9     |
+03AD 4    _/
+03AE 2     | Date/Time min Windchill: <YYMMDDhhmm>	(=2003-04-19 06:02)
+03AF 0     |
+03B0 6     |
+03B1 0     |
+03B2 9     |
+03B3 1     |
+03B4 4     |
+03B5 0     |
+03B6 3     |
+03B7 0    _/
+03B8 6     | Date/Time max Windchill: <YYMMDDhhmm>	(=2003-04-23 08:46)
+03B9 4     |
+03BA 8     |
+03BB 0     |
+03BC 3     |
+03BD 2     |
+03BE 4     |
+03BF 0     |
+03C0 3     |
+03C1 0    _/
+03C2 0
+03C3 0     | Low Alarm Windchill: <TEMPERATURE>			(=5)
+03C4 0     |
+03C5 5     |
+03C6 3    _/
+03C7 0
+03C8 0     | High Alarm Windchill: <TEMPERATURE>		(=30)
+03C9 0     |
+03CA 0     |
+03CB 6    _/
+03CC 0
+03CD 0
+
+DEWPOINT
+03CE 9     | Current Dewpoint: <TEMPERATURE>			(=2.49)
+03CF 4     |
+03D0 2     |
+03D1 3    _/
+03D2 6
+03D3 1     | Minimum Dewpoint: <TEMPERATURE>			(=-6.89)
+03D4 1     |
+03D5 3     |
+03D6 2    _/
+03D7 0
+03D8 4     | Maximum Dewpoint: <TEMPERATURE>			(=8.44)
+03D9 4     |
+03DA 8     |
+03DB 3    _/
+03DC 7     | Date/Time min Dewpoint: <YYMMDDhhmm>	(=2003-04-20 17:17)
+03DD 1     |
+03DE 7     |
+03DF 1     |
+03E0 0     |
+03E1 2     |
+03E2 4     |
+03E3 0     |
+03E4 3     |
+03E5 0    _/
+03E6 2     | Date/Time max Dewpoint: <YYMMDDhhmm>	(=2001-01-01 00:02)
+03E7 0     |
+03E8 0     |
+03E9 0     |
+03EA 1     |
+03EB 0     |
+03EC 1     |
+03ED 0     |
+03EE 1     |
+03EF 0    _/
+03F0 0
+03F1 0     | Low Alarm Dewpoint: <TEMPERATURE>		(=0)
+03F2 0     |
+03F3 0     |
+03F4 3    _/
+03F5 0
+03F6 0     | High Alarm Dewpoint: <TEMPERATURE>		(=20)
+03F7 0     |
+03F8 0     |
+03F9 5    _/
+03FA 2
+
+HUMIDITY INDOORS
+03FB 4     | Relative Humidity Indoors: <PERCENT>		(=24)
+03FC 2    _/
+03FD 9     | Minimum Relative Humidity Indoors: <PERCENT>	(=19)
+03FE 1    _/
+03FF 7     | Maximum Relative Humidity Indoors: <PERCENT>	(=47)
+0400 4    _/
+0401 8     | Date/Time Min Relative Humidity Indoors: <YYMMDDhhmm>
+0402 1     |
+0403 0     |
+0404 0     |
+0405 1     |
+0406 2     |
+0407 4     |
+0408 0     |
+0409 3     |
+040A 0    _/
+040B 5     | Date/Time Max Relative Humidity Indoors: <YYMMDDhhmm>
+040C 4     |
+040D 3     |
+040E 2     |
+040F 4     |
+0410 1     |
+0411 4     |
+0412 0     |
+0413 3     |
+0414 0    _/
+0415 5     | Low Alarm Relative Humidity Indoors: <PERCENT>	(=35)
+0416 3    _/
+0417 5     | High Alarm Relative Humidity Indoors: <PERCENT>	(=65)
+0418 6    _/
+
+HUMIDITY OUTDOORS
+0419 1     | Relative Humidity Outdoors: <PERCENT>		(=71)
+041A 7    _/
+041B 9     | Minimum Relative Humidity Outdoors: <PERCENT>	(=19)
+041C 1    _/
+041D 8     | Maximum Relative Humidity Outdoors: <PERCENT>	(=78)
+041E 7    _/
+041F 9     | Date/Time min Relative Humidity Outdoors: <YYMMDDhhmm>
+0420 1     |
+0421 7     |
+0422 1     |
+0423 1     |
+0424 2     |
+0425 4     |
+0426 0     |
+0427 3     |
+0428 0    _/
+0429 6     | Date/Time max Relative Humidity Outdoors: <YYMMDDhhmm>
+042A 2     |
+042B 7     |
+042C 0     |
+042D 9     |
+042E 1     |
+042F 4     |
+0430 0     |
+0431 3     |
+0432 0    _/
+0433 5     | Low Alarm Relative Humidity Outdoors: <PERCENT>	(=45)
+0434 4    _/
+0435 0     | High Alarm Relative Humidity Outdoors: <PERCENT>	(=70)
+0436 7    _/
+0437 6
+0438 0
+0439 2
+043A C    Next many addresses could be related to rain counting
+043B F    it seems that this is the same numbers that are used
+043C 0    in the history data for rain. It must be the area the
+043D C    station keeps track of rain fall by minutes and hours
+043E F    in order to be able to give figures for rainfall in
+043F 0    the last hour and the last 24 hours.
+0440 C
+0441 F
+0442 0
+0443 C
+0444 F
+0445 0
+
+
+
+
+
+
+0446 0    Rain 24 h area
+0447 0    At 0446 to 2 Reads of 12.
+0448 0    Store as 24 byte array.
+0449 0    What this is, is a rolling queue of the last 24hours of "impulses" from the rain gauge.
+044A 0    Each "impulse" is 0.0204" or 0.51826mm of rain.
+044B 0    This measurement is simply (# impulses * unitOfMeasure)
+044C 0    Rain 24 h area
+044D 0    Rain 24 h area
+044E 0    Rain 24 h area
+044F 0    Rain 24 h area
+0450 0    Rain 24 h area
+0451 0    Rain 24 h area
+0452 0    Rain 24 h area
+0453 0    Rain 24 h area
+0454 0    Rain 24 h area
+0455 0    Rain 24 h area
+0456 0    Rain 24 h area
+0457 0    Rain 24 h area
+0458 0    Rain 24 h area
+0459 0    Rain 24 h area
+045A 0    Rain 24 h area
+045B 0    Rain 24 h area
+045C 0    Rain 24 h area
+045D 0    Rain 24 h area
+045E 0    Rain 24 h area
+045F 0    Rain 24 h area
+0460 0    Rain 24 h area
+0461 0    Rain 24 h area
+0462 0    Rain 24 h area
+0463 0    Rain 24 h area
+0464 0    Rain 24 h area
+0465 0    Rain 24 h area
+0466 0    Rain 24 h area
+0467 0    Rain 24 h area
+0468 0    Rain 24 h area
+0469 0    Rain 24 h area
+046A 0    Rain 24 h area
+046B 0    Rain 24 h area
+046C 0    Rain 24 h area
+046D 0    Rain 24 h area
+046E 0    Rain 24 h area
+046F 0    Rain 24 h area
+0470 0    Rain 24 h area
+0471 0    Rain 24 h area
+0472 0    Rain 24 h area
+0473 0    Rain 24 h area
+0474 0    Rain 24 h area
+0475 0    Rain 24 h area
+0476 C
+0477 F
+0478 0
+0479 0    Rain 1h area
+047A 0    Start your read at 0479. Read 2 sets of 15.
+047B 0    Store as a 30 byte array.
+047C 0    What this is, is a rolling queue
+047D 0    Each "impulse" is 0.0204" or 0.51826mm of rain.
+047E 0    This measurement is simply (# impulses * unitOfMeasure)
+047F 0    Exact encoding not yet decoded
+0480 0    Rain 1h area
+0481 0    Rain 1h area
+0482 0    Rain 1h area
+0483 0    Rain 1h area
+0484 0    Rain 1h area
+0485 0    Rain 1h area
+0486 0    Rain 1h area
+0487 0    Rain 1h area
+0488 0    Rain 1h area
+0489 0    Rain 1h area
+048A 0    Rain 1h area
+048B 0    Rain 1h area
+048C 0    Rain 1h area
+048D 0    Rain 1h area
+048E 0    Rain 1h area
+048F 0    Rain 1h area
+0490 0    Rain 1h area
+0491 0    Rain 1h area
+0492 0    Rain 1h area
+0493 0    Rain 1h area
+0494 0    Rain 1h area
+0495 0    Rain 1h area
+0496 0    Rain 1h area
+
+RAIN 24 HOUR
+0497 0     | Rain 24 hour: <RAIN>			(=0)
+0498 0     |
+0499 0     |
+049A 0     |
+049B 0     |
+049C 0    _/
+049D 8     | Rain max 24 hour: <RAIN>			(=128.98)
+049E 9     |
+049F 8     |
+04A0 2     |
+04A1 1     |
+04A2 0    _/
+04A3 9     | Date/Time max rain 24h: <YYMMDDhhmm>	(=2003-04-21 14:59)
+04A4 5     |
+04A5 4     |
+04A6 1     |
+04A7 1     |
+04A8 2     |
+04A9 4     |
+04AA 0     |
+04AB 3     |
+04AC 0    _/
+04AD 0
+04AE 0    Alarm Rain 24h, BCD 0.01 [mm] (probably not really used)
+04AF 0    Alarm Rain 24h, BCD 0.1 [mm]
+04B0 7    Alarm Rain 24h, BCD 1 [mm]
+04B1 0    Alarm Rain 24h, BCD 10 [mm]
+04B2 0    Alarm Rain 24h, BCD 100 [mm]
+04B3 0    Alarm Rain 24h, BCD 1000 [mm]
+
+RAIN 1 HOUR
+04B4 0     | Rain 1 hour: <RAIN>			(=0)
+04B5 0     |
+04B6 0     |
+04B7 0     |
+04B8 0     |
+04B9 0    _/
+04BA 6     | Rain max 1 hour: <RAIN>			(=128.46)
+04BB 4     |
+04BC 8     |
+04BD 2     |
+04BE 1     |
+04BF 0    _/
+04C0 8     | Date/Time max rain 1h: <YYMMDDhhmm>	(=2003-04-20 16:08)
+04C1 0     |
+04C2 6     |
+04C3 1     |
+04C4 0     |
+04C5 2     |
+04C6 4     |
+04C7 0     |
+04C8 3     |
+04C9 0    _/
+04CA 0
+04CB 0    Alarm Rain 1h, BCD 0.01 [mm] (probably not really used)
+04CC 7    Alarm Rain 1h, BCD 0.1 [mm]
+04CD 0    Alarm Rain 1h, BCD 1 [mm]
+04CE 0    Alarm Rain 1h, BCD 10 [mm]
+04CF 0    Alarm Rain 1h, BCD 100 [mm]
+04D0 0    Alarm Rain 1h, BCD 1000 [mm]
+04D1 2
+
+RAIN TOTAL
+04D2 2     | Rain Total: <RAIN>			(=144.52)
+04D3 5     |
+04D4 4     |
+04D5 4     |
+04D6 1     |
+04D7 0    _/
+04D8 0     | Date/Time for reset of rain total: <YYMMDDhhmm>
+04D9 4     |
+04DA 3     |
+04DB 2     |
+04DC 4     |
+04DD 1     |
+04DE 4     |
+04DF 0     |
+04E0 3     |
+04E1 0    _/
+04E2 F
+04E3 F
+04E4 F
+04E5 F
+04E6 0
+04E7 0
+04E8 0
+04E9 0
+04EA 0
+04EB 0
+04EC 0
+04ED 0
+WIND MIN/MAX
+04EE 0     | Minimum wind: hex($BCD) / 360.0 [m/s]		(=0)
+04EF 0     |
+04F0 0     |
+04F1 0    _/
+04F2 0
+04F3 0
+04F4 C     | Maximum wind: hex($BCD) / 360.0 [m/s]		(=25.5)
+04F5 D     |
+04F6 3     |
+04F7 2    _/
+04F8 6     | Date/Time min wind: <YYMMDDhhmm>	(=2003-04-24 03:26)
+04F9 2     |
+04FA 3     |
+04FB 0     |
+04FC 4     |
+04FD 2     |
+04FE 4     |
+04FF 0     |
+0500 3     |
+0501 0    _/
+0502 5     | Date/Time max wind: <YYMMDDhhmm>	(=2003-04-24 03:25)
+0503 2     |
+0504 3     |
+0505 0     |
+0506 4     |
+0507 2     |
+0508 4     |
+0509 0     |
+050A 3     |
+050B 0    _/
+050C 0
+050D 0
+
+WIND ALARM (Read Only - Set values at 533-535 and 538-53A)
+050E 0    Low wind alarm setting (Read Only): binary nibble 0 [km/h / 100]
+050F 0    Low wind alarm setting (Read Only): binary nibble 1 [km/h / 100]
+0510 0    Low wind alarm setting (Read Only): binary nibble 2 [km/h / 100]
+0511 0    Low wind alarm setting (Read Only): binary nibble 3 [km/h / 100]
+0512 F
+0513 F
+0514 7    Low wind alarm setting (Read Only): binary nibble 0 [km/h / 100]
+0515 6    Low wind alarm setting (Read Only): binary nibble 1 [km/h / 100]
+0516 1    Low wind alarm setting (Read Only): binary nibble 2 [km/h / 100]
+0517 0    Low wind alarm setting (Read Only): binary nibble 3 [km/h / 100]
+0518 0
+0519 0    Alarmed windspeed (or current if no alarm): BCD 0.1s [m/s]
+051A 0    Alarmed windspeed (or current if no alarm): BCD 1s [m/s]
+051B 0    Alarmed windspeed (or current if no alarm): BCD 10s [m/s]
+051C 0
+051D 0
+051E 0
+051F 0
+0520 0
+0521 0
+0522 0
+0523 5
+0524 5
+0525 2
+0526 0
+
+WIND SPEED AND DIRECTION
+0527 0    Wind overflow flag: 0 = normal
+0528 0    Wind minimum code: 0=min, 1=--.-, 2=OFL
+0529 0     | Wind Speed: hex($BCD) / 10.0 [m/s]			(=0)
+052A 0     |
+052B 0    _/
+052C 8    | Wind Direction: hex($BCD) * 22.5 [degrees]		(=180)
+052D 8    Wind Direction 1 measurement ago
+052E 9    Wind Direction 2 measurement ago
+052F 8    Wind Direction 3 measurement ago
+0530 7    Wind Direction 4 measurement ago
+0531 7    Wind Direction 5 measurement ago
+0532 0
+
+WIND ALARM SETTING (Changing this causes 50E-511 or 514-517 to be updated)
+0533 0     | Low wind alarm setting: $BCD / 10.0 [m/s]		(=0)
+0534 0     |
+0535 0    _/
+0536 0
+0537 0
+0538 0     | High wind alarm setting: $BCD / 10.0 [m/s]		(=1)
+0539 1     |
+053A 0    _/
+053B 0
+053C F
+053D F
+053E 9
+053F 0
+0540 0
+0541 0
+0542 0
+0543 0
+0544 0
+0545 0
+0546 0
+0547 0
+0548 2
+0549 8
+054A F
+054B 0
+
+HF Reception, 550/54F start value: 0F=cable, 3F=lost, FF=Wireless
+054C D
+054D 0     | Connection Type: 0=Cable, 3=lost, F=Wireless	(=Cable)
+054E 0
+054F C     | Countdown time to next datBinary: hex($BCD) / 2.0 [seconds] (=6)
+0550 0    _/
+0551 0
+0552 0
+0553 0
+0554 0
+0555 0
+0556 0
+0557 0
+0558 0
+0559 5
+055A 0
+055B F
+055C C
+055D 2
+055E 0
+055F 3
+0560 8
+0561 0
+0562 0
+0563 0
+0564 F
+0565 3
+0566 4
+0567 7
+0568 5
+0569 0
+056A 0
+056B 0
+056C 0
+056D 0
+056E 0
+056F 0
+0570 0
+0571 0
+0572 0
+0573 0
+0574 0
+0575 0
+0576 0
+0577 0
+0578 0
+0579 0
+057A 0
+057B 0
+057C 0
+057D 0
+057E 0
+057F 0
+0580 0
+0581 0
+0582 0
+0583 0
+0584 0
+0585 0
+0586 0
+0587 0
+0588 0
+0589 0
+058A 0
+058B 0
+058C 0
+058D 0
+058E 0
+058F 0
+0590 0
+0591 0
+0592 0
+0593 0
+0594 0
+0595 0
+0596 0
+0597 0
+0598 0
+0599 0
+059A 4
+059B 5
+059C 6
+059D B
+059E C
+059F 5
+05A0 F
+05A1 4
+05A2 2
+05A3 E
+05A4 C
+05A5 9
+05A6 B
+05A7 E
+05A8 1
+05A9 C
+05AA F
+05AB D
+05AC 7
+05AD 4
+05AE 2
+05AF 5
+05B0 D
+05B1 5
+05B2 C
+05B3 2
+05B4 B
+05B5 5
+05B6 B
+05B7 A
+05B8 8
+05B9 0
+05BA 7
+05BB 0
+05BC 3
+05BD 0
+05BE 3
+05BF 7
+05C0 2
+05C1 0
+05C2 D
+05C3 3
+05C4 1
+05C5 0
+05C6 C
+05C7 1
+05C8 0
+05C9 0
+05CA F
+05CB D
+05CC 7
+05CD 4
+05CE 2
+05CF 5
+05D0 D
+05D1 5
+05D2 0
+05D3 0
+05D4 0
+05D5 0
+05D6 0
+05D7 4
+
+AIR PRESSURE
+05D8 2     | Absolute air pressure: <PRESSURE>			(=1016.2)
+05D9 6     |
+05DA 1     |
+05DB 0     |
+05DC 1    _/
+05DD 0
+05DE 0
+05DF 0
+05E0 3
+05E1 0
+05E2 4     | Relative air pressure: <PRESSURE>			(=1018.4)
+05E3 8     |
+05E4 1     |
+05E5 0     |
+05E6 1    _/
+05E7 7
+05E8 0
+05E9 0
+05EA 3
+05EB 0
+05EC 2     | Air pressure correction: <PRESSURE> - 1000		(=2.2)
+05ED 2     |
+05EE 0     |
+05EF 0     |
+05F0 1    _/
+05F1 7
+05F2 0
+05F3 0
+05F4 0
+05F5 1
+05F6 0     | Absolute air pressure minimum: <PRESSURE>		(=1013)
+05F7 3     |
+05F8 1     |
+05F9 0     |
+05FA 1    _/
+05FB 1
+05FC 9
+05FD 9
+05FE 2
+05FF 0
+0600 2     | Relative air pressure minimum: <PRESSURE>		(=1015.2)
+0601 5     |
+0602 1     |
+0603 0     |
+0604 1    _/
+0605 7
+0606 9
+0607 9
+0608 2
+0609 0
+060A 6     | Absolute air pressure maximum: <PRESSURE>		(=1034.6)
+060B 4     |
+060C 3     |
+060D 0     |
+060E 1    _/
+060F 5
+0610 5
+0611 0
+0612 3
+0613 0
+0614 8     | Relative air pressure maximum: <PRESSURE>		(=1036.8)
+0615 6     |
+0616 3     |
+0617 0     |
+0618 1    _/
+0619 1
+061A 6
+061B 0
+061C 3
+061D 0
+061E 2     | Date/Time min air pressure: <YYMMDDhhmm>	(=2003-04-23 05:02)
+061F 0     |
+0620 5     |
+0621 0     |
+0622 3     |
+0623 2     |
+0624 4     |
+0625 0     |
+0626 3     |
+0627 0    _/
+0628 6     | Date/Time max air pressure: <YYMMDDhhmm>	(=2003-04-18 02:46)
+0629 4     |
+062A 2     |
+062B 0     |
+062C 8     |
+062D 1     |
+062E 4     |
+062F 0     |
+0630 3     |
+0631 0    _/
+0632 4
+0633 1
+0634 6
+0635 9
+0636 0
+0637 9
+0638 3
+0639 8
+063A 2
+063B 0
+063C 6     | Low Alarm air pressure: <PRESSURE>			(=963.6)
+063D 3     |
+063E 6     |
+063F 9     |
+0640 0    _/
+0641 6
+0642 4
+0643 8
+0644 2
+0645 0
+0646 8
+0647 8
+0648 3
+0649 0
+064A 1
+064B 7
+064C 6
+064D 0
+064E 3
+064F 0
+0650 0     | High Alarm air pressure: <PRESSURE>		(=1041)
+0651 1     |
+0652 4     |
+0653 0     |
+0654 1    _/
+0655 4
+0656 7
+0657 0
+0658 3
+0659 0
+065A 6
+065B 8
+065C 5
+065D 0
+065E 0
+065F 0
+0660 5
+0661 1
+0662 0
+0663 1
+0664 0
+0665 0
+0666 0
+0667 0
+0668 0
+0669 0
+066A 0
+066B 0
+066C F
+066D F
+066E F
+066F F
+0670 9
+0671 5
+0672 1
+0673 0
+0674 1
+0675 D
+0676 2
+0677 8
+0678 F
+0679 7
+067A 9
+067B 0
+067C F
+067D 9
+067E 9
+067F 2
+0680 1
+0681 0
+0682 0
+0683 0
+0684 8
+0685 9
+0686 9
+0687 9
+0688 A
+0689 5
+068A 1
+068B 2
+068C 1
+068D 0
+068E 6
+068F 2
+0690 0
+0691 3
+0692 2
+0693 6
+0694 2
+0695 0
+0696 0
+0697 C
+0698 0
+0699 4
+069A 9
+069B A
+069C 9
+069D 6
+069E 0
+069F 9
+06A0 9
+06A1 0
+06A2 0
+06A3 0
+06A4 0
+06A5 2
+06A6 F
+06A7 0
+06A8 F
+06A9 F
+06AA F
+06AB F
+06AC 5
+06AD 2
+06AE 1
+06AF 0
+06B0 0
+06B1 4
+
+HISTORY SETTINGS
+06B2 1     | History saving interval: hex($BCD) [minutes]
+06B3 0     |
+06B4 0    _/
+06B5 1     | Countdown to next saving: hex($BCD) [minutes]
+06B6 0     |
+06B7 0    _/
+06B8 6     | Date/Time last record: <YYMMDDhhmm>	(=2003-04-24 03:26)
+06B9 2     |
+06BA 3     |
+06BB 0     |
+06BC 4     |
+06BD 2     |
+06BE 4     |
+06BF 0     |
+06C0 3     |
+06C1 0    _/
+06C2 6     | Pointer to last written Record: hex($BCD)	(Range 00-AE)
+06C3 9    _/
+06C4 F     | Number of Records: hex($BCD)		(Range 00-AF)
+06C5 A    _/
+
+HISTORY
+4,3,2,1,0: Indoor and outdoor temperature
+Tindoor = (value % 1000)/10 - 30 [C]
+Toutdoor = (value - (value % 1000))/10000 - 30 [C]
+Where % is the modulus operator.
+
+9,8,7,6,5: Absolute Air Pressure and Indoor Humidity.
+Pressure= 1000 + (value % 10000)/10. If pressure is greater than or equal to 1500 then you subtract 1000.
+Indoor humidity =(value-(value % 10000))/10000
+
+11,10: Outdoor Humidity in plain human readable BCD
+
+14,13,12: Rain. (RAINCOUNTn)
+The value is binary and steps 0.518 mm/step.
+The absolute value does not seem to be related to anything else than an internal "household" value inside the station.
+Every period the current 12-bit rain count value is stored as history data.
+You use it by keeping a reference total rain value RAINref, the corresponding reference count RAINCOUNTref.
+RAINtotal = RAINref + (RAINCOUNTn - RAINCOUNTref)*0.518 [mm]
+
+17-16-15: Windspeed = value in binary / 10 [m/s]
+
+18: Wind direction = value * 22.5 degrees. North is 0 and degrees are clockwise on the circle.
+
+
+
+
+Record 0
+06C6 F    History data area should start here
+06C7 C
+06C8 1
+06C9 F
+06CA 5
+06CB 9
+06CC 1
+06CD A
+06CE A
+06CF 3
+06D0 2
+06D1 6
+06D2 C
+06D3 F
+06D4 0
+06D5 0
+06D6 0
+06D7 0
+06D8 7
+06D9 7
+06DA E
+06DB D
+06DC E
+06DD 5
+06DE 9
+06DF 1
+06E0 A
+06E1 A
+06E2 3
+06E3 2
+06E4 6
+06E5 C
+06E6 F
+06E7 0
+06E8 0
+06E9 0
+06EA 0
+06EB 7
+06EC 7
+06ED E
+06EE D
+06EF E
+06F0 5
+06F1 9
+06F2 1
+06F3 A
+06F4 A
+06F5 3
+06F6 2
+06F7 6
+06F8 C
+06F9 F
+06FA 0
+06FB 0
+06FC 0
+06FD 0
+06FE 7
+06FF 7
+0700 E
+0701 D
+0702 E
+0703 5
+0704 A
+0705 1
+0706 A
+0707 A
+0708 3
+0709 2
+070A 6
+070B C
+070C F
+070D 0
+070E 0
+070F 0
+0710 0
+0711 7
+0712 7
+0713 E
+0714 D
+0715 E
+0716 5
+0717 A
+0718 1
+0719 A
+071A A
+071B 3
+071C 2
+071D 6
+071E C
+071F F
+0720 0
+0721 0
+0722 0
+0723 0
+0724 7
+0725 7
+0726 E
+0727 D
+0728 E
+0729 5
+072A A
+072B 1
+072C A
+072D A
+072E 3
+072F 2
+0730 6
+0731 C
+0732 F
+0733 0
+0734 0
+0735 0
+0736 0
+0737 7
+0738 7
+0739 E
+073A D
+073B E
+073C 5
+073D A
+073E 1
+073F A
+0740 A
+0741 3
+0742 2
+0743 6
+0744 C
+0745 F
+0746 0
+0747 0
+0748 0
+0749 0
+074A 7
+074B F
+074C F
+074D 9
+074E E
+074F 5
+0750 A
+0751 1
+0752 A
+0753 A
+0754 3
+0755 2
+0756 6
+0757 C
+0758 F
+0759 0
+075A 0
+075B 0
+075C 0
+075D 7
+075E F
+075F F
+0760 9
+0761 E
+0762 5
+0763 B
+0764 1
+0765 A
+0766 A
+0767 3
+0768 2
+0769 6
+076A C
+076B F
+076C 0
+076D F
+076E F
+076F 0
+0770 E
+0771 F
+0772 F
+0773 9
+0774 E
+0775 5
+0776 B
+0777 1
+0778 A
+0779 A
+077A 3
+077B 2
+077C 6
+077D C
+077E F
+077F 0
+0780 0
+0781 0
+0782 0
+0783 7
+0784 F
+0785 F
+0786 9
+0787 E
+0788 5
+0789 A
+078A 1
+078B A
+078C A
+078D 3
+078E 2
+078F 6
+0790 C
+0791 F
+0792 0
+0793 0
+0794 0
+0795 0
+0796 7
+0797 7
+0798 1
+0799 6
+079A E
+079B 5
+079C B
+079D 1
+079E A
+079F A
+07A0 3
+07A1 2
+07A2 6
+07A3 C
+07A4 F
+07A5 0
+07A6 0
+07A7 0
+07A8 0
+07A9 7
+07AA 7
+07AB 1
+07AC 6
+07AD E
+07AE 5
+07AF B
+07B0 1
+07B1 A
+07B2 A
+07B3 3
+07B4 2
+07B5 6
+07B6 C
+07B7 F
+07B8 0
+07B9 0
+07BA 0
+07BB 0
+07BC 7
+07BD F
+07BE 2
+07BF 2
+07C0 E
+07C1 5
+07C2 C
+07C3 1
+07C4 A
+07C5 A
+07C6 3
+07C7 2
+07C8 6
+07C9 C
+07CA F
+07CB 0
+07CC 0
+07CD 0
+07CE 0
+07CF 7
+07D0 F
+07D1 2
+07D2 2
+07D3 E
+07D4 5
+07D5 C
+07D6 1
+07D7 A
+07D8 A
+07D9 3
+07DA 2
+07DB 6
+07DC C
+07DD F
+07DE 0
+07DF 0
+07E0 0
+07E1 0
+07E2 7
+07E3 7
+07E4 4
+07E5 E
+07E6 D
+07E7 5
+07E8 C
+07E9 1
+07EA A
+07EB A
+07EC 3
+07ED 3
+07EE 6
+07EF C
+07F0 F
+07F1 0
+07F2 0
+07F3 0
+07F4 0
+07F5 7
+07F6 7
+07F7 4
+07F8 E
+07F9 D
+07FA 5
+07FB C
+07FC 1
+07FD A
+07FE A
+07FF 3
+0800 2
+0801 6
+0802 C
+0803 F
+0804 0
+0805 F
+0806 F
+0807 0
+0808 E
+0809 7
+080A 4
+080B E
+080C D
+080D 5
+080E D
+080F 1
+0810 A
+0811 A
+0812 3
+0813 3
+0814 6
+0815 C
+0816 F
+0817 0
+0818 0
+0819 0
+081A 0
+081B 7
+081C 7
+081D 4
+081E E
+081F D
+0820 5
+0821 C
+0822 1
+0823 A
+0824 A
+0825 3
+0826 3
+0827 6
+0828 C
+0829 F
+082A 0
+082B 0
+082C 0
+082D 0
+082E 7
+082F F
+0830 5
+0831 A
+0832 D
+0833 5
+0834 C
+0835 1
+0836 A
+0837 A
+0838 3
+0839 4
+083A 6
+083B C
+083C F
+083D 0
+083E 0
+083F 0
+0840 0
+0841 7
+0842 7
+0843 7
+0844 6
+0845 D
+0846 5
+0847 C
+0848 1
+0849 A
+084A A
+084B 3
+084C 4
+084D 6
+084E C
+084F F
+0850 0
+0851 0
+0852 0
+0853 0
+0854 7
+0855 7
+0856 7
+0857 6
+0858 D
+0859 5
+085A C
+085B 1
+085C A
+085D A
+085E 3
+085F 4
+0860 6
+0861 C
+0862 F
+0863 0
+0864 0
+0865 0
+0866 0
+0867 7
+0868 7
+0869 7
+086A 6
+086B D
+086C 5
+086D C
+086E 1
+086F A
+0870 A
+0871 3
+0872 4
+0873 6
+0874 C
+0875 F
+0876 0
+0877 0
+0878 0
+0879 0
+087A 7
+087B 7
+087C 7
+087D 6
+087E D
+087F 5
+0880 C
+0881 1
+0882 A
+0883 A
+0884 3
+0885 4
+0886 6
+0887 C
+0888 F
+0889 0
+088A 0
+088B 0
+088C 0
+088D 7
+088E 7
+088F 7
+0890 6
+0891 D
+0892 5
+0893 C
+0894 1
+0895 A
+0896 A
+0897 3
+0898 4
+0899 6
+089A C
+089B F
+089C 0
+089D 0
+089E 0
+089F 0
+08A0 7
+08A1 7
+08A2 7
+08A3 6
+08A4 D
+08A5 5
+08A6 C
+08A7 1
+08A8 A
+08A9 A
+08AA 3
+08AB 4
+08AC 6
+08AD C
+08AE F
+08AF 0
+08B0 0
+08B1 0
+08B2 0
+08B3 7
+08B4 7
+08B5 7
+08B6 6
+08B7 D
+08B8 5
+08B9 C
+08BA 1
+08BB A
+08BC A
+08BD 3
+08BE 4
+08BF 6
+08C0 C
+08C1 F
+08C2 0
+08C3 0
+08C4 0
+08C5 0
+08C6 7
+08C7 F
+08C8 8
+08C9 2
+08CA D
+08CB 5
+08CC C
+08CD 1
+08CE A
+08CF A
+08D0 3
+08D1 4
+08D2 6
+08D3 C
+08D4 F
+08D5 0
+08D6 0
+08D7 0
+08D8 0
+08D9 7
+08DA F
+08DB 8
+08DC 2
+08DD D
+08DE 5
+08DF C
+08E0 1
+08E1 A
+08E2 A
+08E3 3
+08E4 4
+08E5 6
+08E6 C
+08E7 F
+08E8 0
+08E9 0
+08EA 0
+08EB 0
+08EC 7
+08ED F
+08EE 8
+08EF 2
+08F0 D
+08F1 5
+08F2 C
+08F3 1
+08F4 A
+08F5 A
+08F6 3
+08F7 4
+08F8 6
+08F9 C
+08FA F
+08FB 0
+08FC 0
+08FD 0
+08FE 0
+08FF 7
+0900 F
+0901 8
+0902 2
+0903 D
+0904 5
+0905 C
+0906 1
+0907 A
+0908 A
+0909 3
+090A 4
+090B 6
+090C C
+090D F
+090E 0
+090F 0
+0910 0
+0911 0
+0912 7
+0913 F
+0914 8
+0915 2
+0916 D
+0917 5
+0918 D
+0919 1
+091A A
+091B A
+091C 3
+091D 5
+091E 6
+091F C
+0920 F
+0921 0
+0922 0
+0923 0
+0924 0
+0925 7
+0926 F
+0927 8
+0928 2
+0929 D
+092A 5
+092B D
+092C 1
+092D A
+092E A
+092F 3
+0930 4
+0931 6
+0932 C
+0933 F
+0934 0
+0935 F
+0936 F
+0937 0
+0938 E
+0939 F
+093A 8
+093B 2
+093C D
+093D 5
+093E D
+093F 1
+0940 A
+0941 A
+0942 3
+0943 5
+0944 6
+0945 C
+0946 F
+0947 0
+0948 0
+0949 0
+094A 0
+094B 7
+094C F
+094D 8
+094E 2
+094F D
+0950 5
+0951 D
+0952 1
+0953 A
+0954 A
+0955 3
+0956 5
+0957 6
+0958 C
+0959 F
+095A 0
+095B 0
+095C 0
+095D 0
+095E 7
+095F 7
+0960 A
+0961 E
+0962 C
+0963 5
+0964 D
+0965 1
+0966 A
+0967 A
+0968 3
+0969 5
+096A 6
+096B C
+096C F
+096D 0
+096E 0
+096F 0
+0970 0
+0971 7
+0972 F
+0973 8
+0974 2
+0975 D
+0976 5
+0977 E
+0978 1
+0979 A
+097A A
+097B 3
+097C 5
+097D 6
+097E C
+097F F
+0980 0
+0981 0
+0982 0
+0983 0
+0984 7
+0985 F
+0986 B
+0987 A
+0988 C
+0989 5
+098A D
+098B 1
+098C A
+098D A
+098E 3
+098F 5
+0990 6
+0991 C
+0992 F
+0993 0
+0994 0
+0995 0
+0996 0
+0997 7
+0998 F
+0999 B
+099A A
+099B C
+099C 5
+099D E
+099E 1
+099F A
+09A0 A
+09A1 3
+09A2 5
+09A3 6
+09A4 C
+09A5 F
+09A6 0
+09A7 0
+09A8 0
+09A9 0
+09AA 7
+09AB 7
+09AC D
+09AD 6
+09AE C
+09AF 5
+09B0 D
+09B1 1
+09B2 A
+09B3 A
+09B4 3
+09B5 5
+09B6 6
+09B7 C
+09B8 F
+09B9 0
+09BA 0
+09BB 0
+09BC 0
+09BD 7
+09BE 7
+09BF D
+09C0 6
+09C1 C
+09C2 5
+09C3 E
+09C4 1
+09C5 A
+09C6 A
+09C7 3
+09C8 5
+09C9 6
+09CA C
+09CB F
+09CC 0
+09CD 0
+09CE 0
+09CF 0
+09D0 7
+09D1 8
+09D2 D
+09D3 6
+09D4 C
+09D5 5
+09D6 C
+09D7 1
+09D8 A
+09D9 A
+09DA 3
+09DB 5
+09DC 6
+09DD C
+09DE F
+09DF 0
+09E0 0
+09E1 0
+09E2 0
+09E3 7
+09E4 8
+09E5 D
+09E6 6
+09E7 C
+09E8 5
+09E9 D
+09EA 1
+09EB A
+09EC A
+09ED 3
+09EE 5
+09EF 6
+09F0 C
+09F1 F
+09F2 0
+09F3 0
+09F4 0
+09F5 0
+09F6 7
+09F7 8
+09F8 D
+09F9 6
+09FA C
+09FB 5
+09FC D
+09FD 1
+09FE A
+09FF A
+0A00 3
+0A01 5
+0A02 6
+0A03 C
+0A04 F
+0A05 0
+0A06 0
+0A07 0
+0A08 0
+0A09 7
+0A0A 0
+0A0B F
+0A0C 2
+0A0D C
+0A0E 5
+0A0F F
+0A10 1
+0A11 A
+0A12 A
+0A13 3
+0A14 5
+0A15 6
+0A16 C
+0A17 F
+0A18 0
+0A19 0
+0A1A 0
+0A1B 0
+0A1C 7
+0A1D 8
+0A1E D
+0A1F 6
+0A20 C
+0A21 5
+0A22 E
+0A23 1
+0A24 A
+0A25 A
+0A26 3
+0A27 5
+0A28 6
+0A29 C
+0A2A F
+0A2B 0
+0A2C 0
+0A2D 0
+0A2E 0
+0A2F 7
+0A30 0
+0A31 F
+0A32 2
+0A33 C
+0A34 5
+0A35 E
+0A36 1
+0A37 A
+0A38 A
+0A39 3
+0A3A 5
+0A3B 6
+0A3C C
+0A3D F
+0A3E 0
+0A3F 0
+0A40 0
+0A41 0
+0A42 7
+0A43 0
+0A44 F
+0A45 2
+0A46 C
+0A47 5
+0A48 F
+0A49 1
+0A4A A
+0A4B A
+0A4C 3
+0A4D 5
+0A4E 6
+0A4F C
+0A50 F
+0A51 0
+0A52 0
+0A53 0
+0A54 0
+0A55 7
+0A56 0
+0A57 F
+0A58 2
+0A59 C
+0A5A 5
+0A5B E
+0A5C 1
+0A5D A
+0A5E A
+0A5F 3
+0A60 5
+0A61 6
+0A62 C
+0A63 F
+0A64 0
+0A65 0
+0A66 0
+0A67 0
+0A68 7
+0A69 0
+0A6A F
+0A6B 2
+0A6C C
+0A6D 5
+0A6E E
+0A6F 1
+0A70 A
+0A71 A
+0A72 3
+0A73 5
+0A74 6
+0A75 C
+0A76 F
+0A77 0
+0A78 0
+0A79 0
+0A7A 0
+0A7B 7
+0A7C 0
+0A7D F
+0A7E 2
+0A7F C
+0A80 5
+0A81 F
+0A82 1
+0A83 A
+0A84 A
+0A85 3
+0A86 5
+0A87 6
+0A88 C
+0A89 F
+0A8A 0
+0A8B 0
+0A8C 0
+0A8D 0
+0A8E 7
+0A8F 8
+0A90 0
+0A91 F
+0A92 B
+0A93 5
+0A94 E
+0A95 1
+0A96 A
+0A97 A
+0A98 3
+0A99 5
+0A9A 6
+0A9B C
+0A9C F
+0A9D 0
+0A9E 0
+0A9F 0
+0AA0 0
+0AA1 7
+0AA2 8
+0AA3 0
+0AA4 F
+0AA5 B
+0AA6 5
+0AA7 F
+0AA8 1
+0AA9 A
+0AAA A
+0AAB 3
+0AAC 5
+0AAD 6
+0AAE C
+0AAF F
+0AB0 0
+0AB1 0
+0AB2 0
+0AB3 0
+0AB4 7
+0AB5 8
+0AB6 0
+0AB7 F
+0AB8 B
+0AB9 5
+0ABA F
+0ABB 1
+0ABC A
+0ABD A
+0ABE 3
+0ABF 5
+0AC0 6
+0AC1 C
+0AC2 F
+0AC3 0
+0AC4 0
+0AC5 0
+0AC6 0
+0AC7 7
+0AC8 0
+0AC9 2
+0ACA B
+0ACB B
+0ACC 5
+0ACD F
+0ACE 1
+0ACF A
+0AD0 A
+0AD1 3
+0AD2 6
+0AD3 6
+0AD4 C
+0AD5 F
+0AD6 0
+0AD7 0
+0AD8 0
+0AD9 0
+0ADA 7
+0ADB 0
+0ADC 2
+0ADD B
+0ADE B
+0ADF 5
+0AE0 F
+0AE1 1
+0AE2 A
+0AE3 A
+0AE4 3
+0AE5 6
+0AE6 6
+0AE7 C
+0AE8 F
+0AE9 0
+0AEA 0
+0AEB 0
+0AEC 0
+0AED 7
+0AEE 0
+0AEF 2
+0AF0 B
+0AF1 B
+0AF2 5
+0AF3 F
+0AF4 1
+0AF5 A
+0AF6 A
+0AF7 3
+0AF8 6
+0AF9 6
+0AFA C
+0AFB F
+0AFC 0
+0AFD 0
+0AFE 0
+0AFF 0
+0B00 7
+0B01 0
+0B02 2
+0B03 B
+0B04 B
+0B05 5
+0B06 0
+0B07 2
+0B08 A
+0B09 A
+0B0A 3
+0B0B 6
+0B0C 6
+0B0D C
+0B0E F
+0B0F 0
+0B10 0
+0B11 0
+0B12 0
+0B13 7
+0B14 0
+0B15 2
+0B16 B
+0B17 B
+0B18 5
+0B19 F
+0B1A 1
+0B1B A
+0B1C A
+0B1D 3
+0B1E 6
+0B1F 6
+0B20 C
+0B21 F
+0B22 0
+0B23 0
+0B24 0
+0B25 0
+0B26 7
+0B27 0
+0B28 2
+0B29 B
+0B2A B
+0B2B 5
+0B2C F
+0B2D 1
+0B2E A
+0B2F A
+0B30 3
+0B31 6
+0B32 6
+0B33 C
+0B34 F
+0B35 0
+0B36 0
+0B37 0
+0B38 0
+0B39 7
+0B3A 0
+0B3B 2
+0B3C B
+0B3D B
+0B3E 5
+0B3F 0
+0B40 2
+0B41 A
+0B42 A
+0B43 3
+0B44 6
+0B45 6
+0B46 C
+0B47 F
+0B48 0
+0B49 0
+0B4A 0
+0B4B 0
+0B4C 7
+0B4D 0
+0B4E 2
+0B4F B
+0B50 B
+0B51 5
+0B52 0
+0B53 2
+0B54 A
+0B55 A
+0B56 3
+0B57 6
+0B58 6
+0B59 C
+0B5A F
+0B5B 0
+0B5C 0
+0B5D 0
+0B5E 0
+0B5F 7
+0B60 0
+0B61 2
+0B62 B
+0B63 B
+0B64 5
+0B65 0
+0B66 2
+0B67 A
+0B68 A
+0B69 3
+0B6A 6
+0B6B 6
+0B6C C
+0B6D F
+0B6E 0
+0B6F 0
+0B70 0
+0B71 0
+0B72 7
+0B73 8
+0B74 3
+0B75 7
+0B76 B
+0B77 5
+0B78 0
+0B79 2
+0B7A A
+0B7B A
+0B7C 3
+0B7D 6
+0B7E 6
+0B7F C
+0B80 F
+0B81 0
+0B82 0
+0B83 0
+0B84 0
+0B85 7
+0B86 8
+0B87 3
+0B88 7
+0B89 B
+0B8A 5
+0B8B 0
+0B8C 2
+0B8D A
+0B8E A
+0B8F 3
+0B90 7
+0B91 6
+0B92 C
+0B93 F
+0B94 0
+0B95 0
+0B96 0
+0B97 0
+0B98 7
+0B99 8
+0B9A 3
+0B9B 7
+0B9C B
+0B9D 5
+0B9E F
+0B9F 1
+0BA0 A
+0BA1 A
+0BA2 3
+0BA3 7
+0BA4 6
+0BA5 C
+0BA6 F
+0BA7 0
+0BA8 0
+0BA9 0
+0BAA 0
+0BAB 7
+0BAC 9
+0BAD 3
+0BAE 7
+0BAF B
+0BB0 5
+0BB1 0
+0BB2 2
+0BB3 A
+0BB4 A
+0BB5 3
+0BB6 7
+0BB7 6
+0BB8 C
+0BB9 F
+0BBA 0
+0BBB 0
+0BBC 0
+0BBD 0
+0BBE 7
+0BBF 9
+0BC0 3
+0BC1 7
+0BC2 B
+0BC3 5
+0BC4 F
+0BC5 1
+0BC6 A
+0BC7 A
+0BC8 3
+0BC9 7
+0BCA 6
+0BCB C
+0BCC F
+0BCD 0
+0BCE 0
+0BCF 0
+0BD0 0
+0BD1 7
+0BD2 9
+0BD3 3
+0BD4 7
+0BD5 B
+0BD6 5
+0BD7 F
+0BD8 1
+0BD9 A
+0BDA A
+0BDB 3
+0BDC 7
+0BDD 6
+0BDE C
+0BDF F
+0BE0 0
+0BE1 0
+0BE2 0
+0BE3 0
+0BE4 7
+0BE5 0
+0BE6 5
+0BE7 3
+0BE8 B
+0BE9 5
+0BEA F
+0BEB 1
+0BEC A
+0BED A
+0BEE 3
+0BEF 7
+0BF0 6
+0BF1 C
+0BF2 F
+0BF3 0
+0BF4 0
+0BF5 0
+0BF6 0
+0BF7 7
+0BF8 1
+0BF9 5
+0BFA 3
+0BFB B
+0BFC 5
+0BFD 0
+0BFE 2
+0BFF A
+0C00 A
+0C01 3
+0C02 7
+0C03 6
+0C04 C
+0C05 F
+0C06 0
+0C07 E
+0C08 F
+0C09 1
+0C0A 0
+0C0B 9
+0C0C 3
+0C0D 7
+0C0E B
+0C0F 5
+0C10 0
+0C11 2
+0C12 A
+0C13 A
+0C14 3
+0C15 7
+0C16 6
+0C17 C
+0C18 F
+0C19 0
+0C1A 0
+0C1B 0
+0C1C 0
+0C1D 7
+0C1E 1
+0C1F 5
+0C20 3
+0C21 B
+0C22 5
+0C23 0
+0C24 2
+0C25 A
+0C26 A
+0C27 3
+0C28 7
+0C29 6
+0C2A C
+0C2B F
+0C2C 0
+0C2D 0
+0C2E 0
+0C2F 0
+0C30 7
+0C31 1
+0C32 5
+0C33 3
+0C34 B
+0C35 5
+0C36 1
+0C37 2
+0C38 A
+0C39 A
+0C3A 3
+0C3B 8
+0C3C 6
+0C3D C
+0C3E F
+0C3F 0
+0C40 0
+0C41 0
+0C42 0
+0C43 7
+0C44 1
+0C45 5
+0C46 3
+0C47 B
+0C48 5
+0C49 0
+0C4A 2
+0C4B A
+0C4C A
+0C4D 3
+0C4E 8
+0C4F 6
+0C50 C
+0C51 F
+0C52 0
+0C53 0
+0C54 0
+0C55 0
+0C56 7
+0C57 1
+0C58 5
+0C59 3
+0C5A B
+0C5B 5
+0C5C 1
+0C5D 2
+0C5E A
+0C5F A
+0C60 3
+0C61 8
+0C62 6
+0C63 C
+0C64 F
+0C65 0
+0C66 0
+0C67 0
+0C68 0
+0C69 8
+0C6A 9
+0C6B 3
+0C6C 7
+0C6D B
+0C6E 5
+0C6F 1
+0C70 2
+0C71 A
+0C72 A
+0C73 3
+0C74 8
+0C75 6
+0C76 C
+0C77 F
+0C78 0
+0C79 0
+0C7A 0
+0C7B 0
+0C7C 8
+0C7D 9
+0C7E 3
+0C7F 7
+0C80 B
+0C81 5
+0C82 1
+0C83 2
+0C84 A
+0C85 A
+0C86 3
+0C87 8
+0C88 6
+0C89 C
+0C8A F
+0C8B 0
+0C8C 0
+0C8D 0
+0C8E 0
+0C8F 8
+0C90 1
+0C91 5
+0C92 3
+0C93 B
+0C94 5
+0C95 0
+0C96 2
+0C97 A
+0C98 A
+0C99 3
+0C9A 8
+0C9B 6
+0C9C C
+0C9D F
+0C9E 0
+0C9F 0
+0CA0 0
+0CA1 0
+0CA2 8
+0CA3 9
+0CA4 3
+0CA5 7
+0CA6 B
+0CA7 5
+0CA8 1
+0CA9 2
+0CAA A
+0CAB A
+0CAC 3
+0CAD 8
+0CAE 6
+0CAF C
+0CB0 F
+0CB1 0
+0CB2 0
+0CB3 0
+0CB4 0
+0CB5 8
+0CB6 9
+0CB7 3
+0CB8 7
+0CB9 B
+0CBA 5
+0CBB 0
+0CBC 2
+0CBD A
+0CBE A
+0CBF 3
+0CC0 8
+0CC1 6
+0CC2 C
+0CC3 F
+0CC4 0
+0CC5 0
+0CC6 0
+0CC7 0
+0CC8 8
+0CC9 9
+0CCA 3
+0CCB 7
+0CCC B
+0CCD 5
+0CCE 0
+0CCF 2
+0CD0 A
+0CD1 A
+0CD2 3
+0CD3 8
+0CD4 6
+0CD5 C
+0CD6 F
+0CD7 0
+0CD8 0
+0CD9 0
+0CDA 0
+0CDB 8
+0CDC 9
+0CDD 3
+0CDE 7
+0CDF B
+0CE0 5
+0CE1 0
+0CE2 2
+0CE3 A
+0CE4 A
+0CE5 3
+0CE6 8
+0CE7 6
+0CE8 C
+0CE9 F
+0CEA 0
+0CEB 0
+0CEC 0
+0CED 0
+0CEE 8
+0CEF 9
+0CF0 3
+0CF1 7
+0CF2 B
+0CF3 5
+0CF4 0
+0CF5 2
+0CF6 A
+0CF7 A
+0CF8 3
+0CF9 8
+0CFA 6
+0CFB C
+0CFC F
+0CFD 0
+0CFE 0
+0CFF 0
+0D00 0
+0D01 8
+0D02 9
+0D03 3
+0D04 7
+0D05 B
+0D06 5
+0D07 0
+0D08 2
+0D09 A
+0D0A A
+0D0B 3
+0D0C 8
+0D0D 6
+0D0E C
+0D0F F
+0D10 0
+0D11 0
+0D12 0
+0D13 0
+0D14 8
+0D15 9
+0D16 3
+0D17 7
+0D18 B
+0D19 5
+0D1A F
+0D1B 1
+0D1C A
+0D1D A
+0D1E 3
+0D1F 8
+0D20 6
+0D21 C
+0D22 F
+0D23 0
+0D24 0
+0D25 0
+0D26 0
+0D27 8
+0D28 9
+0D29 3
+0D2A 7
+0D2B B
+0D2C 5
+0D2D F
+0D2E 1
+0D2F A
+0D30 A
+0D31 3
+0D32 8
+0D33 6
+0D34 C
+0D35 F
+0D36 0
+0D37 0
+0D38 0
+0D39 0
+0D3A 8
+0D3B 9
+0D3C 3
+0D3D 7
+0D3E B
+0D3F 5
+0D40 0
+0D41 2
+0D42 A
+0D43 A
+0D44 3
+0D45 8
+0D46 6
+0D47 C
+0D48 F
+0D49 0
+0D4A 0
+0D4B 0
+0D4C 0
+0D4D 8
+0D4E 9
+0D4F 3
+0D50 7
+0D51 B
+0D52 5
+0D53 F
+0D54 1
+0D55 A
+0D56 A
+0D57 3
+0D58 8
+0D59 6
+0D5A C
+0D5B F
+0D5C 0
+0D5D 0
+0D5E 0
+0D5F 0
+0D60 8
+0D61 9
+0D62 3
+0D63 7
+0D64 B
+0D65 5
+0D66 0
+0D67 2
+0D68 A
+0D69 A
+0D6A 3
+0D6B 8
+0D6C 6
+0D6D C
+0D6E F
+0D6F 0
+0D70 0
+0D71 0
+0D72 0
+0D73 8
+0D74 9
+0D75 3
+0D76 7
+0D77 B
+0D78 5
+0D79 F
+0D7A 1
+0D7B A
+0D7C A
+0D7D 3
+0D7E 8
+0D7F 6
+0D80 C
+0D81 F
+0D82 0
+0D83 0
+0D84 0
+0D85 0
+0D86 8
+0D87 9
+0D88 3
+0D89 7
+0D8A B
+0D8B 5
+0D8C F
+0D8D 1
+0D8E A
+0D8F A
+0D90 3
+0D91 8
+0D92 6
+0D93 C
+0D94 F
+0D95 0
+0D96 0
+0D97 0
+0D98 0
+0D99 8
+0D9A 9
+0D9B 3
+0D9C 7
+0D9D B
+0D9E 5
+0D9F F
+0DA0 1
+0DA1 A
+0DA2 A
+0DA3 3
+0DA4 8
+0DA5 6
+0DA6 C
+0DA7 F
+0DA8 0
+0DA9 0
+0DAA 0
+0DAB 0
+0DAC 8
+0DAD 9
+0DAE 3
+0DAF 7
+0DB0 B
+0DB1 5
+0DB2 0
+0DB3 2
+0DB4 A
+0DB5 A
+0DB6 3
+0DB7 8
+0DB8 6
+0DB9 C
+0DBA F
+0DBB 0
+0DBC F
+0DBD F
+0DBE 0
+0DBF E
+0DC0 9
+0DC1 3
+0DC2 7
+0DC3 B
+0DC4 5
+0DC5 0
+0DC6 2
+0DC7 A
+0DC8 A
+0DC9 3
+0DCA 8
+0DCB 6
+0DCC C
+0DCD F
+0DCE 0
+0DCF 0
+0DD0 0
+0DD1 0
+0DD2 8
+0DD3 9
+0DD4 3
+0DD5 7
+0DD6 B
+0DD7 5
+0DD8 0
+0DD9 2
+0DDA A
+0DDB A
+0DDC 3
+0DDD 8
+0DDE 6
+0DDF C
+0DE0 F
+0DE1 0
+0DE2 0
+0DE3 0
+0DE4 0
+0DE5 8
+0DE6 9
+0DE7 3
+0DE8 7
+0DE9 B
+0DEA 5
+0DEB 0
+0DEC 2
+0DED A
+0DEE A
+0DEF 3
+0DF0 8
+0DF1 6
+0DF2 C
+0DF3 F
+0DF4 0
+0DF5 0
+0DF6 0
+0DF7 0
+0DF8 8
+0DF9 9
+0DFA 3
+0DFB 7
+0DFC B
+0DFD 5
+0DFE F
+0DFF 1
+0E00 A
+0E01 A
+0E02 3
+0E03 8
+0E04 6
+0E05 C
+0E06 F
+0E07 0
+0E08 0
+0E09 0
+0E0A 0
+0E0B 8
+0E0C 9
+0E0D 3
+0E0E 7
+0E0F B
+0E10 5
+0E11 F
+0E12 1
+0E13 A
+0E14 A
+0E15 3
+0E16 8
+0E17 6
+0E18 C
+0E19 F
+0E1A 0
+0E1B 0
+0E1C 0
+0E1D 0
+0E1E 8
+0E1F 9
+0E20 3
+0E21 7
+0E22 B
+0E23 5
+0E24 F
+0E25 1
+0E26 A
+0E27 A
+0E28 3
+0E29 8
+0E2A 6
+0E2B C
+0E2C F
+0E2D 0
+0E2E 0
+0E2F 0
+0E30 0
+0E31 8
+0E32 9
+0E33 3
+0E34 7
+0E35 B
+0E36 5
+0E37 0
+0E38 2
+0E39 A
+0E3A A
+0E3B 3
+0E3C 8
+0E3D 6
+0E3E C
+0E3F F
+0E40 0
+0E41 0
+0E42 0
+0E43 0
+0E44 8
+0E45 9
+0E46 3
+0E47 7
+0E48 B
+0E49 5
+0E4A F
+0E4B 1
+0E4C A
+0E4D A
+0E4E 3
+0E4F 8
+0E50 6
+0E51 C
+0E52 F
+0E53 0
+0E54 0
+0E55 0
+0E56 0
+0E57 8
+0E58 9
+0E59 3
+0E5A 7
+0E5B B
+0E5C 5
+0E5D F
+0E5E 1
+0E5F A
+0E60 A
+0E61 3
+0E62 9
+0E63 6
+0E64 C
+0E65 F
+0E66 0
+0E67 0
+0E68 0
+0E69 0
+0E6A 7
+0E6B 9
+0E6C 3
+0E6D 7
+0E6E B
+0E6F 5
+0E70 F
+0E71 1
+0E72 A
+0E73 A
+0E74 3
+0E75 9
+0E76 6
+0E77 C
+0E78 F
+0E79 0
+0E7A 4
+0E7B 0
+0E7C 0
+0E7D 7
+0E7E 9
+0E7F 3
+0E80 7
+0E81 B
+0E82 5
+0E83 F
+0E84 1
+0E85 A
+0E86 A
+0E87 3
+0E88 9
+0E89 6
+0E8A C
+0E8B F
+0E8C 0
+0E8D 0
+0E8E 0
+0E8F 0
+0E90 8
+0E91 1
+0E92 2
+0E93 B
+0E94 B
+0E95 5
+0E96 0
+0E97 2
+0E98 A
+0E99 A
+0E9A 3
+0E9B 8
+0E9C 6
+0E9D C
+0E9E F
+0E9F 0
+0EA0 0
+0EA1 0
+0EA2 0
+0EA3 8
+0EA4 1
+0EA5 2
+0EA6 B
+0EA7 B
+0EA8 5
+0EA9 F
+0EAA 1
+0EAB A
+0EAC A
+0EAD 3
+0EAE 8
+0EAF 6
+0EB0 C
+0EB1 F
+0EB2 0
+0EB3 0
+0EB4 0
+0EB5 0
+0EB6 8
+0EB7 1
+0EB8 2
+0EB9 B
+0EBA B
+0EBB 5
+0EBC 1
+0EBD 2
+0EBE A
+0EBF A
+0EC0 3
+0EC1 9
+0EC2 6
+0EC3 C
+0EC4 F
+0EC5 0
+0EC6 0
+0EC7 0
+0EC8 0
+0EC9 8
+0ECA 1
+0ECB 2
+0ECC B
+0ECD B
+0ECE 5
+0ECF 0
+0ED0 2
+0ED1 A
+0ED2 A
+0ED3 3
+0ED4 9
+0ED5 6
+0ED6 C
+0ED7 F
+0ED8 0
+0ED9 0
+0EDA 0
+0EDB 0
+0EDC 8
+0EDD 1
+0EDE 2
+0EDF B
+0EE0 B
+0EE1 5
+0EE2 F
+0EE3 1
+0EE4 A
+0EE5 A
+0EE6 3
+0EE7 9
+0EE8 6
+0EE9 C
+0EEA F
+0EEB 0
+0EEC 0
+0EED 0
+0EEE 0
+0EEF 8
+0EF0 1
+0EF1 2
+0EF2 B
+0EF3 B
+0EF4 5
+0EF5 0
+0EF6 2
+0EF7 A
+0EF8 A
+0EF9 3
+0EFA 9
+0EFB 6
+0EFC C
+0EFD F
+0EFE 0
+0EFF 0
+0F00 0
+0F01 0
+0F02 8
+0F03 1
+0F04 2
+0F05 B
+0F06 B
+0F07 5
+0F08 0
+0F09 2
+0F0A A
+0F0B A
+0F0C 3
+0F0D 9
+0F0E 6
+0F0F C
+0F10 F
+0F11 0
+0F12 0
+0F13 0
+0F14 0
+0F15 8
+0F16 1
+0F17 2
+0F18 B
+0F19 B
+0F1A 5
+0F1B F
+0F1C 1
+0F1D A
+0F1E A
+0F1F 3
+0F20 9
+0F21 6
+0F22 C
+0F23 F
+0F24 0
+0F25 0
+0F26 0
+0F27 0
+0F28 8
+0F29 1
+0F2A 2
+0F2B B
+0F2C B
+0F2D 5
+0F2E F
+0F2F 1
+0F30 A
+0F31 A
+0F32 3
+0F33 9
+0F34 6
+0F35 C
+0F36 F
+0F37 0
+0F38 0
+0F39 0
+0F3A 0
+0F3B 8
+0F3C 2
+0F3D 2
+0F3E B
+0F3F B
+0F40 5
+0F41 F
+0F42 1
+0F43 A
+0F44 A
+0F45 3
+0F46 9
+0F47 6
+0F48 C
+0F49 F
+0F4A 0
+0F4B 0
+0F4C 0
+0F4D 0
+0F4E A
+0F4F A
+0F50 3
+0F51 7
+0F52 B
+0F53 5
+0F54 F
+0F55 1
+0F56 A
+0F57 A
+0F58 3
+0F59 9
+0F5A 6
+0F5B C
+0F5C F
+0F5D 0
+0F5E 0
+0F5F 0
+0F60 0
+0F61 A
+0F62 2
+0F63 2
+0F64 B
+0F65 B
+0F66 5
+0F67 F
+0F68 1
+0F69 A
+0F6A A
+0F6B 3
+0F6C 9
+0F6D 6
+0F6E C
+0F6F F
+0F70 0
+0F71 0
+0F72 0
+0F73 0
+0F74 9
+0F75 A
+0F76 3
+0F77 7
+0F78 B
+0F79 5
+0F7A F
+0F7B 1
+0F7C A
+0F7D A
+0F7E 3
+0F7F 9
+0F80 6
+0F81 C
+0F82 F
+0F83 0
+0F84 0
+0F85 0
+0F86 0
+0F87 9
+0F88 2
+0F89 2
+0F8A B
+0F8B B
+0F8C 5
+0F8D F
+0F8E 1
+0F8F A
+0F90 A
+0F91 3
+0F92 9
+0F93 6
+0F94 C
+0F95 F
+0F96 0
+0F97 0
+0F98 0
+0F99 0
+0F9A 9
+0F9B 2
+0F9C 2
+0F9D B
+0F9E B
+0F9F 5
+0FA0 F
+0FA1 1
+0FA2 A
+0FA3 A
+0FA4 3
+0FA5 9
+0FA6 6
+0FA7 C
+0FA8 F
+0FA9 0
+0FAA 0
+0FAB 0
+0FAC 0
+0FAD 9
+0FAE 2
+0FAF 2
+0FB0 B
+0FB1 B
+0FB2 5
+0FB3 0
+0FB4 2
+0FB5 A
+0FB6 A
+0FB7 3
+0FB8 9
+0FB9 6
+0FBA C
+0FBB F
+0FBC 0
+0FBD F
+0FBE F
+0FBF 0
+0FC0 E
+0FC1 2
+0FC2 2
+0FC3 B
+0FC4 B
+0FC5 5
+0FC6 F
+0FC7 1
+0FC8 A
+0FC9 A
+0FCA 3
+0FCB 9
+0FCC 6
+0FCD C
+0FCE F
+0FCF 0
+0FD0 0
+0FD1 0
+0FD2 0
+0FD3 6
+0FD4 2
+0FD5 2
+0FD6 B
+0FD7 B
+0FD8 5
+0FD9 F
+0FDA 1
+0FDB A
+0FDC A
+0FDD 3
+0FDE 0
+0FDF 7
+0FE0 C
+0FE1 F
+0FE2 0
+0FE3 0
+0FE4 0
+0FE5 0
+0FE6 8
+0FE7 2
+0FE8 2
+0FE9 B
+0FEA B
+0FEB 5
+0FEC 0
+0FED 2
+0FEE A
+0FEF A
+0FF0 3
+0FF1 9
+0FF2 6
+0FF3 C
+0FF4 F
+0FF5 0
+0FF6 F
+0FF7 F
+0FF8 0
+0FF9 E
+0FFA 2
+0FFB 2
+0FFC B
+0FFD B
+0FFE 5
+0FFF 0
+1000 2
+1001 A
+1002 A
+1003 3
+1004 9
+1005 6
+1006 C
+1007 F
+1008 0
+1009 F
+100A F
+100B 0
+100C E
+100D 2
+100E 2
+100F B
+1010 B
+1011 5
+1012 0
+1013 2
+1014 A
+1015 A
+1016 3
+1017 9
+1018 6
+1019 C
+101A F
+101B 0
+101C 0
+101D 0
+101E 0
+101F B
+1020 2
+1021 2
+1022 B
+1023 B
+1024 5
+1025 0
+1026 2
+1027 A
+1028 A
+1029 3
+102A 9
+102B 6
+102C C
+102D F
+102E 0
+102F 0
+1030 0
+1031 0
+1032 8
+1033 2
+1034 2
+1035 B
+1036 B
+1037 5
+1038 0
+1039 2
+103A A
+103B A
+103C 3
+103D 9
+103E 6
+103F C
+1040 F
+1041 0
+1042 0
+1043 0
+1044 0
+1045 8
+1046 2
+1047 2
+1048 B
+1049 B
+104A 5
+104B 0
+104C 2
+104D A
+104E A
+104F 3
+1050 9
+1051 6
+1052 C
+1053 F
+1054 0
+1055 0
+1056 0
+1057 0
+1058 8
+1059 2
+105A 2
+105B B
+105C B
+105D 5
+105E 0
+105F 2
+1060 A
+1061 A
+1062 3
+1063 9
+1064 6
+1065 C
+1066 F
+1067 0
+1068 0
+1069 0
+106A 0
+106B 9
+106C 2
+106D 2
+106E B
+106F B
+1070 5
+1071 0
+1072 2
+1073 A
+1074 A
+1075 3
+1076 9
+1077 6
+1078 C
+1079 F
+107A 0
+107B 0
+107C 0
+107D 0
+107E 9
+107F 2
+1080 2
+1081 B
+1082 B
+1083 5
+1084 0
+1085 2
+1086 A
+1087 A
+1088 3
+1089 9
+108A 6
+108B C
+108C F
+108D 0
+108E 0
+108F 0
+1090 0
+1091 9
+1092 2
+1093 2
+1094 B
+1095 B
+1096 5
+1097 0
+1098 2
+1099 A
+109A A
+109B 3
+109C 9
+109D 6
+109E C
+109F F
+10A0 0
+10A1 F
+10A2 F
+10A3 0
+10A4 E
+10A5 2
+10A6 2
+10A7 B
+10A8 B
+10A9 5
+10AA 0
+10AB 2
+10AC A
+10AD A
+10AE 3
+10AF 9
+10B0 6
+10B1 C
+10B2 F
+10B3 0
+10B4 0
+10B5 0
+10B6 0
+10B7 8
+10B8 2
+10B9 2
+10BA B
+10BB B
+10BC 5
+10BD 1
+10BE 2
+10BF A
+10C0 A
+10C1 3
+10C2 9
+10C3 6
+10C4 C
+10C5 F
+10C6 0
+10C7 0
+10C8 0
+10C9 0
+10CA 8
+10CB 2
+10CC 2
+10CD B
+10CE B
+10CF 5
+10D0 1
+10D1 2
+10D2 A
+10D3 A
+10D4 3
+10D5 9
+10D6 6
+10D7 C
+10D8 F
+10D9 0
+10DA 0
+10DB 0
+10DC 0
+10DD 8
+10DE 2
+10DF 2
+10E0 B
+10E1 B
+10E2 5
+10E3 1
+10E4 2
+10E5 A
+10E6 A
+10E7 3
+10E8 9
+10E9 6
+10EA C
+10EB F
+10EC 0
+10ED 0
+10EE 0
+10EF 0
+10F0 8
+10F1 2
+10F2 2
+10F3 B
+10F4 B
+10F5 5
+10F6 2
+10F7 2
+10F8 A
+10F9 A
+10FA 3
+10FB 0
+10FC 7
+10FD C
+10FE F
+10FF 0
+1100 0
+1101 0
+1102 0
+1103 8
+1104 2
+1105 2
+1106 B
+1107 B
+1108 5
+1109 2
+110A 2
+110B A
+110C A
+110D 3
+110E 0
+110F 7
+1110 C
+1111 F
+1112 0
+1113 0
+1114 0
+1115 0
+1116 8
+1117 2
+1118 2
+1119 B
+111A B
+111B 5
+111C 2
+111D 2
+111E A
+111F A
+1120 3
+1121 0
+1122 7
+1123 C
+1124 F
+1125 0
+1126 0
+1127 0
+1128 0
+1129 8
+112A 2
+112B 2
+112C B
+112D B
+112E 5
+112F 2
+1130 2
+1131 A
+1132 A
+1133 3
+1134 0
+1135 7
+1136 C
+1137 F
+1138 0
+1139 0
+113A 0
+113B 0
+113C 8
+113D 2
+113E 2
+113F B
+1140 B
+1141 5
+1142 2
+1143 2
+1144 A
+1145 A
+1146 3
+1147 0
+1148 7
+1149 C
+114A F
+114B 0
+114C 0
+114D 0
+114E 0
+114F 8
+1150 A
+1151 3
+1152 7
+1153 B
+1154 5
+1155 2
+1156 2
+1157 A
+1158 A
+1159 3
+115A 0
+115B 7
+115C C
+115D F
+115E 0
+115F 0
+1160 0
+1161 0
+1162 7
+1163 A
+1164 3
+1165 7
+1166 B
+1167 5
+1168 3
+1169 2
+116A A
+116B A
+116C 3
+116D 0
+116E 7
+116F C
+1170 F
+1171 0
+1172 0
+1173 0
+1174 0
+1175 7
+1176 A
+1177 3
+1178 7
+1179 B
+117A 5
+117B 2
+117C 2
+117D A
+117E A
+117F 3
+1180 0
+1181 7
+1182 C
+1183 F
+1184 0
+1185 0
+1186 0
+1187 0
+1188 9
+1189 2
+118A 5
+118B 3
+118C B
+118D 5
+118E 2
+118F 2
+1190 A
+1191 A
+1192 3
+1193 0
+1194 7
+1195 C
+1196 F
+1197 0
+1198 0
+1199 0
+119A 0
+119B 8
+119C A
+119D 3
+119E 7
+119F B
+11A0 5
+11A1 2
+11A2 2
+11A3 A
+11A4 A
+11A5 3
+11A6 0
+11A7 7
+11A8 C
+11A9 F
+11AA 0
+11AB 0
+11AC 0
+11AD 0
+11AE 8
+11AF 2
+11B0 5
+11B1 3
+11B2 B
+11B3 5
+11B4 3
+11B5 2
+11B6 A
+11B7 A
+11B8 3
+11B9 0
+11BA 7
+11BB C
+11BC F
+11BD 0
+11BE 0
+11BF 0
+11C0 0
+11C1 9
+11C2 2
+11C3 5
+11C4 3
+11C5 B
+11C6 5
+11C7 3
+11C8 2
+11C9 A
+11CA A
+11CB 3
+11CC 0
+11CD 7
+11CE C
+11CF F
+11D0 0
+11D1 0
+11D2 0
+11D3 0
+11D4 9
+11D5 A
+11D6 3
+11D7 7
+11D8 B
+11D9 5
+11DA 3
+11DB 2
+11DC A
+11DD A
+11DE 3
+11DF 0
+11E0 7
+11E1 C
+11E2 F
+11E3 0
+11E4 0
+11E5 0
+11E6 0
+11E7 8
+11E8 A
+11E9 3
+11EA 7
+11EB B
+11EC 5
+11ED 2
+11EE 2
+11EF A
+11F0 A
+11F1 3
+11F2 1
+11F3 7
+11F4 C
+11F5 F
+11F6 0
+11F7 0
+11F8 0
+11F9 0
+11FA 9
+11FB F
+11FC 3
+11FD 9
+11FE 0
+11FF 6
+1200 9
+1201 1
+1202 A
+1203 A
+1204 3
+1205 9
+1206 5
+1207 C
+1208 F
+1209 0
+120A 0
+120B 0
+120C 0
+120D 8
+120E 7
+120F 5
+1210 5
+1211 0
+1212 6
+1213 9
+1214 1
+1215 A
+1216 A
+1217 3
+1218 0
+1219 6
+121A C
+121B F
+121C 0
+121D F
+121E F
+121F 0
+1220 E
+1221 7
+1222 5
+1223 5
+1224 0
+1225 6
+1226 9
+1227 1
+1228 A
+1229 A
+122A 3
+122B 0
+122C 6
+122D C
+122E F
+122F 0
+1230 0
+1231 0
+1232 0
+1233 8
+1234 7
+1235 5
+1236 5
+1237 0
+1238 6
+1239 9
+123A 1
+123B A
+123C A
+123D 3
+123E 0
+123F 6
+1240 C
+1241 F
+1242 0
+1243 0
+1244 0
+1245 0
+1246 7
+1247 7
+1248 5
+1249 5
+124A 0
+124B 6
+124C 9
+124D 1
+124E A
+124F A
+1250 3
+1251 1
+1252 6
+1253 C
+1254 F
+1255 0
+1256 0
+1257 0
+1258 0
+1259 7
+125A 7
+125B 5
+125C 5
+125D 0
+125E 6
+125F 9
+1260 1
+1261 A
+1262 A
+1263 3
+1264 1
+1265 6
+1266 C
+1267 F
+1268 0
+1269 0
+126A 0
+126B 0
+126C 7
+126D 7
+126E 5
+126F 5
+1270 0
+1271 6
+1272 9
+1273 1
+1274 A
+1275 A
+1276 3
+1277 1
+1278 6
+1279 C
+127A F
+127B 0
+127C 0
+127D 0
+127E 0
+127F 7
+1280 F
+1281 6
+1282 1
+1283 0
+1284 6
+1285 9
+1286 1
+1287 A
+1288 A
+1289 3
+128A 1
+128B 6
+128C C
+128D F
+128E 0
+128F 0
+1290 0
+1291 0
+1292 7
+1293 F
+1294 6
+1295 1
+1296 0
+1297 6
+1298 9
+1299 1
+129A A
+129B A
+129C 3
+129D 1
+129E 6
+129F C
+12A0 F
+12A1 0
+12A2 0
+12A3 0
+12A4 0
+12A5 7
+12A6 F
+12A7 6
+12A8 1
+12A9 0
+12AA 6
+12AB 9
+12AC 1
+12AD A
+12AE A
+12AF 3
+12B0 1
+12B1 6
+12B2 C
+12B3 F
+12B4 0
+12B5 0
+12B6 0
+12B7 0
+12B8 7
+12B9 7
+12BA 8
+12BB D
+12BC F
+12BD 5
+12BE 9
+12BF 1
+12C0 A
+12C1 A
+12C2 3
+12C3 1
+12C4 6
+12C5 C
+12C6 F
+12C7 0
+12C8 0
+12C9 0
+12CA 0
+12CB 7
+12CC 7
+12CD 8
+12CE D
+12CF F
+12D0 5
+12D1 9
+12D2 1
+12D3 A
+12D4 A
+12D5 3
+12D6 1
+12D7 6
+12D8 C
+12D9 F
+12DA 0
+12DB 0
+12DC 0
+12DD 0
+12DE 7
+12DF 7
+12E0 8
+12E1 D
+12E2 F
+12E3 5
+12E4 9
+12E5 1
+12E6 A
+12E7 A
+12E8 3
+12E9 1
+12EA 6
+12EB C
+12EC F
+12ED 0
+12EE 0
+12EF 0
+12F0 0
+12F1 7
+12F2 7
+12F3 8
+12F4 D
+12F5 F
+12F6 5
+12F7 9
+12F8 1
+12F9 A
+12FA A
+12FB 3
+12FC 1
+12FD 6
+12FE C
+12FF F
+1300 0
+1301 0
+1302 0
+1303 0
+1304 7
+1305 F
+1306 9
+1307 9
+1308 F
+1309 5
+130A 9
+130B 1
+130C A
+130D A
+130E 3
+130F 1
+1310 6
+1311 C
+1312 F
+1313 0
+1314 0
+1315 0
+1316 0
+1317 7
+1318 F
+1319 9
+131A 9
+131B F
+131C 5
+131D 9
+131E 1
+131F A
+1320 A
+1321 3
+1322 1
+1323 6
+1324 C
+1325 F
+1326 0
+1327 0
+1328 0
+1329 0
+132A 7
+132B F
+132C 9
+132D 9
+132E F
+132F 5
+1330 9
+1331 1
+1332 A
+1333 A
+1334 3
+1335 1
+1336 6
+1337 C
+1338 F
+1339 0
+133A 0
+133B 0
+133C 0
+133D 7
+133E F
+133F 9
+1340 9
+1341 F
+1342 5
+1343 9
+1344 1
+1345 A
+1346 A
+1347 3
+1348 1
+1349 6
+134A C
+134B F
+134C 0
+134D 0
+134E 0
+134F 0
+1350 7
+1351 F
+1352 9
+1353 9
+1354 F
+1355 5
+1356 9
+1357 1
+1358 A
+1359 A
+135A 3
+135B 1
+135C 6
+135D C
+135E F
+135F 0
+1360 0
+1361 0
+1362 0
+1363 7
+1364 F
+1365 9
+1366 9
+1367 F
+1368 5
+1369 9
+136A 1
+136B A
+136C A
+136D 3
+136E 1
+136F 6
+1370 C
+1371 F
+1372 0
+1373 0
+1374 0
+1375 0
+1376 7
+1377 F
+1378 9
+1379 9
+137A F
+137B 5
+137C A
+137D 1
+137E A
+137F A
+1380 3
+1381 1
+1382 6
+1383 C
+1384 F
+1385 0
+1386 0
+1387 0
+1388 0
+1389 7
+138A 7
+138B B
+138C 5
+138D F
+138E 5
+138F 9
+1390 1
+1391 A
+1392 A
+1393 3
+1394 1
+1395 6
+1396 C
+1397 F
+1398 0
+1399 0
+139A 0
+139B 0
+139C 7
+139D 7
+139E B
+139F 5
+13A0 F
+13A1 5
+13A2 9
+13A3 1
+13A4 A
+13A5 A
+13A6 3
+13A7 1
+13A8 6
+13A9 C
+13AA F
+13AB 0
+13AC 0
+13AD 0
+13AE 0
+13AF 7
+13B0 F
+13B1 C
+13B2 1
+13B3 F
+13B4 5
+13B5 9
+13B6 1
+13B7 A
+13B8 A
+13B9 3
+13BA 1
+13BB 6
+13BC C
+13BD F
+13BE 0
+13BF 0
+13C0 0
+13C1 0
+13C2 7
+13C3 0
+13C4 0
+13C5 0
+13C6 0
+13C7 0
+13C8 0
+13C9 0
+13CA 0
+13CB 0
+13CC 0
+13CD 0
+13CE 0
+13CF 0

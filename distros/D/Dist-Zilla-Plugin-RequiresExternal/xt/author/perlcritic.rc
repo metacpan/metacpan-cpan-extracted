@@ -1,0 +1,31 @@
+severity = brutal
+verbose = 8
+exclude = Modules::RequirePerlVersion Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Tics::ProhibitLongLines CodeLayout::ProhibitHashBarewords
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = diagnostics feature perlversion strict warnings utf8
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+# since we're using Modern::Perl
+[Compatibility::PerlMinimumVersionAndWhy]
+above_version = 5.010
+[Compatibility::PodMinimumVersion]
+above_version = 5.010
+
+[Documentation::PodSpelling]
+stop_words = Perldoc perldoc annonations PASSed dists executables metadata plugin
+
+[Documentation::RequirePodSections]
+lib_sections    = NAME | VERSION | DESCRIPTION | SYNOPSIS | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | OPTIONS | EXIT STATUS | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::has Moose::with MooseX::Has::Sugar::auto_deref MooseX::Has::Sugar::lazy MooseX::Has::Sugar::required MooseX::Has::Sugar::ro Path::Class::file
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = Modern::Perl
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Modern::Perl

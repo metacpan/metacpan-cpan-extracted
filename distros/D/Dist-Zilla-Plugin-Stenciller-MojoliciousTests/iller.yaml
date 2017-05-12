@@ -1,0 +1,46 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-Stenciller-MojoliciousTests
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - namespace::autoclean
+      - Stenciller: 0.1400
+      - Types::Standard
+      - Types::Path::Tiny
+      - Dist::Zilla::File::InMemory
+      - Dist::Zilla::Role::FileGatherer
+      - Path::Tiny
+      - Stenciller::Plugin::ToMojoliciousTest: 0.0102
+  test:
+    requires:
+     - Test::DZil
+     - Test::Differences
+     - Test::Mojo::Trim
+     - File::Temp
+     - syntax
+     - Syntax::Feature::Qi
+     - String::Cushion
+     - Mojolicious: 5.00
+  develop:
+    requires:
+      - Test::NoTabs
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: MetaNoIndex
+    directory:
+      - corpus
+      - t/corpus
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

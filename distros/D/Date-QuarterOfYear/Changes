@@ -1,0 +1,13 @@
+Revision history for Perl module Date::QuarterOfYear
+
+0.03 2015-10-27 NEILB
+    - Updated github repo URL after changing my github username
+    - Include a META.json in releases, and tag & push to github on release
+
+0.02 2014-05-29 NEILB
+    - Added a couple more modules to SEE ALSO, and added more specific
+      details of what DateTime provides.
+
+0.01 2014-05-18 NEILB
+    - First release to CPAN
+

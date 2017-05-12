@@ -1,0 +1,60 @@
+{
+   "abstract" : "Detect if warnings have been left at defaults",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-DefaultWarnings",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "develop" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-DefaultWarnings@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-DefaultWarnings"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/Devel-DefaultWarnings",
+         "web" : "https://github.com/haarg/Devel-DefaultWarnings"
+      },
+      "x_IRC" : "irc://irc.perl.org/#toolchain"
+   },
+   "version" : "0.001002"
+}

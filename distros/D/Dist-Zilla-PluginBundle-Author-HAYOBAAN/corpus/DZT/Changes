@@ -1,0 +1,4 @@
+Revision history for {{$dist->name}}
+
+{{$NEXT}}
+    Changes file added for Dist::Zilla 6.005 and newer

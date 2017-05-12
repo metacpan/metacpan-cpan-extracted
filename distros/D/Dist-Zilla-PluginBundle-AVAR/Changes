@@ -1,0 +1,161 @@
+Revision history for Dist-Zilla-PluginBundle-AVAR
+
+0.32 2015-02-08 08:48:53
+
+    - fix warnings from given/when on perl 5.18+
+
+0.31 2014-05-18 11:17:59
+
+    - fix crash in Config::MVP due to empty plugin config
+
+0.30 2013-09-21 06:00:47
+
+    - Update docs to indicate that we don't use VersionFromPrev, which
+      we haven't in *forever*.
+
+0.29 2013-09-21 05:49:37
+
+    - Add the no_Authority option which can be used to disable the
+      "Authority" module.
+
+    - Stop whining if github is used as a bugtracker, I'm not a child.
+
+0.28 2013-01-14 11:56:10
+
+    - Disable InstallRelease unless install_command is set
+
+0.27 2013-01-14 08:21:25
+
+    - Add InstallRelease with install_command = "cpanm ."
+
+    - Replace CompileTests with Test::Compile as CompileTests is deprecated
+
+    - Read dist and authority from dzil config and github_user from git config
+      github.user or $ENV{GITHUB_USER}
+
+0.26 2011-07-29 01:54:18
+
+    - Update dist to match Prereq -> Prereqs change
+
+    - Use Plugin::Git::NextVersion from PluginBundle::Git instead of
+      Plugin::BumpVersionFromGit, and set first_version to '0.01'
+
+    - Change the default homepage to use metacpan.org
+
+0.24 2010-10-07 16:07:09
+
+    - Use BumpVersionFromGit instead of VersionFromPrev. It uses
+      Version::Next, which supports GNU-style (e.g. 1.2.2) versions.
+
+0.23 2010-06-22 18:10:37
+
+    - Make [NextRelease] format=* and [Git] tag_message configurable
+      for Hinrik.
+
+0.22 2010-06-21 17:48:10
+
+    - authority= parameter to override Authority's authority param.
+
+0.21 2010-06-21 17:10:32
+
+    - Fix POD typo pointed out by Hinrik
+
+0.20 2010-06-18 13:01:23
+
+    - Make the AVAR: die() a warn(). dngor's snerp-vortex is still
+      using this.
+
+    - Fix META validation errors. Remove Ratings entry, and
+      bugtracker.web, not bugtracker.url.
+
+0.19 2010-05-27 19:32:08
+
+    - Use v3-like repo/bugtracker metadata. And use Authority too.
+
+0.18 2010-05-26 12:38:13
+
+    - Use RT, not Github as the bugtracker by default
+
+0.17 2010-05-01 21:24:30
+
+    - Re-release due to Makefile.PL breakage caused by Dist::Zilla
+      FAIL: http://github.com/rjbs/dist-zilla/commit/2e47b6c205
+
+0.16 2010-04-23 04:25:18
+
+    - Add repository=* option
+
+    - Document options in synopsis
+
+0.15 2010-04-09 13:21:35
+
+    - Ignore PodCoverageTests which in DZ2 was split from the now
+      obsolete PodTests.
+
+    - Support homepage=* parameter
+
+0.14 2010-03-31 14:23:02
+
+    - Depend on Dist::Zilla::Plugin::MakeMaker::Awesome
+
+0.13 2010-03-27 21:08:19
+
+    - Use Dist::Zilla::Plugin::CompileTests
+
+    - Use MakeMaker by default in my dists. Hailo can do its own
+      thing.
+
+0.12 2010-03-27 18:09:41
+
+    - Don't use Dist::Zilla::Plugin::OverridableMakeMaker by
+      default. I only use this for Hailo.
+
+0.11 2010-03-22 11:26:50
+
+    - Also noindex the example and examples directories if they exist.
+
+0.10 2010-03-20 19:12:07
+
+    - Use the public RT urls instead of the private ones that require
+      you to log in.
+
+0.09 2010-03-13 12:43:29
+
+    - Support a bugtracker option for setting github, rt or any other
+      trackers in META.*
+
+0.08 2010-03-13 07:41:31
+
+    - Replace MakeMaker with OverridableMakeMaker
+
+0.07 2010-03-12 22:37:51
+
+    - Correctly declare dependencies for this module
+
+    - Flesh out POD documentation for the module.
+
+0.06 2010-03-12 20:11:40
+
+    - Use my shiny new VersionFromPrev plugin to manage releases
+
+0.05 2010-03-12 18:45:40
+
+    - Silly error in previous releases broke all Git stuff
+
+0.04 2010-03-12 18:43:57
+
+    - Test CPAN release
+
+0.03 2010-03-12 18:42:57
+
+    - Another shot at making Git work, now with
+      Dist::Zilla::PluginBundle::Git
+
+0.02 2010-03-12 18:37:30
+
+    - Also use Git::Commit in my configuration
+
+0.01 2010-03-12 18:35:44
+
+    - Forked from The Dist::Zilla::PluginBundle::RJBS with settings
+      AVAR likes

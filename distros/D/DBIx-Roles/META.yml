@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-Roles
+version:      1.04
+version_from: Roles.pm
+installdirs:  site
+requires:
+    DBI:                           0
+    Scalar::Util:                  0
+    SQL::Abstract:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

@@ -1,0 +1,11 @@
+[% SET authors = entry.authors -%]
+[%- IF authors.size -%]
+ <p>By
+  [% FOR author = authors -%]
+   <span class="author vcard"><span class="fn">[% IF author.homepage
+    %]<a href="[% author.homepage |html %]">[% author.name || author.username |encode |html %]</a>[% ELSE
+    %][% author.name || author.username |encode |html %][% END
+   %]</span></span>[% IF !loop.last %],[% END %]
+  [% END -%]
+ </p>
+[% END -%]

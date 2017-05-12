@@ -1,0 +1,31 @@
+{
+   "abstract" : "apply database migrations via scripts in a directory",
+   "author" : [
+      "Jonathan Taylor <jon@local>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DB-SQL-Migrations",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jontaylor/DB-SQL-Migrations.git",
+         "web" : "https://github.com/jontaylor/DB-SQL-Migrations"
+      }
+   },
+   "version" : "0.07"
+}

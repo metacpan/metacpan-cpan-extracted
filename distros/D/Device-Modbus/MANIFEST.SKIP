@@ -1,0 +1,10 @@
+cover_db/
+\.git/
+\.gitignore
+pm_to_blib
+Makefile$
+MYMETA\.
+\.bak$
+examples/
+blib/
+

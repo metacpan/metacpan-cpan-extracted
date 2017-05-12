@@ -1,0 +1,19 @@
+Revision history for Perl extension Date::Roman
+1.06  Thu May 19 00:44:57 CEST 2005
+       - corrected some Latin typos
+
+1.05  Sun Apr 21 09:36:08 2002
+	- corrected a bug in the RomanDate, 
+		added test for the script,
+		revised CPAN version;
+
+1.04  Sun Apr 21 00:10:04 2002
+	- added the RomanDate script;
+
+1.03  Sat Apr 20 21:44:07 2002
+	- corrected typos in the pod
+		original CPAN version;
+
+1.02  Sat Apr 20 21:42:12 2002
+	- preliminar CPAN version;
+

@@ -1,0 +1,13 @@
+\.bak$
+\.old$
+\.swp$
+Makefile$
+pm_to_blib
+^app\.pl$
+^sessions
+MYMETA\.(json|yml)$
+^blib
+^lib/Template/
+^\.git.*
+\.travis\.yml
+README\.md

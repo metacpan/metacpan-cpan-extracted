@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+Item.pm
+t/01-sanity.t
+t/02-simple.t
+t/03-verify.t
+t/04-transform.t
+t/05-validate_missing.t
+t/06-validate_alpha_values.t
+t/07-validate_numeric_values.t
+t/08-validate_undefined.t
+t/09-validate_min_max.t
+t/10-validate_match.t
+t/11-put.t
+

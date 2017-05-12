@@ -1,0 +1,6 @@
+msgid "Please select"
+msgstr "Scegli un’opzione"
+
+msgid "Select %s"
+msgstr "Scegli un’opzione %s"
+

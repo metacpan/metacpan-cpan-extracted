@@ -1,0 +1,103 @@
+,=======================================.
+| Device::Gsm            perl extension |
+`======================================='
+
+Copyright 2002-2015 (C) Cosimo Streppone, <cosimo@cpan.org>
+
+
+This is a perl module extension. If you don't know
+what this means, please take the time to go to
+http://www.cpan.org/ or http://www.perl.org/.
+
+
+,----------------------------.
+| WHAT DOES DEVICE::GSM DO ? |
+`----------------------------'
+
+This module works as an interface to GSM phones or GSM modems
+connected on your local serial ports.
+It can control your GSM *standard* functions and status.
+It can send SMS messages in a simple and convenient way.
+It can read messages stored on your sim card.
+
+
+,--------------------------------.
+| WHAT DOES DEVICE::GSM NOT DO ? |
+`--------------------------------'
+
+It does not use free internet web portals to send SMS.
+If you want to send SMS, you must have your mobile phone
+or GSM OEM module and a sim card connected to either
+serial, irda or bluetooth ports.
+
+
+,-------------------------.
+|     PRE-REQUISITES      |
+`-------------------------'
+
+- a working perl installation (version 5.005+ recommended, although this
+  module has been reported to work also for 5.004)
+
+- Device::Modem perl extension (possibly version >= 1.30)
+  Download this extension from [http://cpan.perl.org/modules/by-module/Device/]
+
+- Device::Modem, in turn, requires Device::SerialPort (for unix-like systems)
+  or Win32::SerialPort (on Win32 systems) to communicate with serial port.
+  Download these extensions from [http://cpan.perl.org/modules/by-module/Device/]
+  or [http://cpan.perl.org/modules/by-module/Win32/]
+
+- a GSM cellular phone or GSM modem. Various models have been
+  reported to work. Some of these are:
+
+	Nokia 6600           (19200 baud)
+	Nokia 6310           (19200 baud)
+	Nokia 3310           (19200 baud)
+	Siemens C45          (19200 baud)
+	Siemens S35          (19200 baud)
+	Iridium Satellite    (19200 baud)
+	Nokia Communicator    (9600 baud)
+	Falcom A2/Swing       (9600 baud)
+	Digicom GSM modems    (9600 baud)
+	...
+
+  If your GSM phone/modem is not reported in this little list, don't
+  despair. Most probably it will work without problems.
+
+  PLEASE NOTE:
+  without a GSM phone/cellular connected to a serial port at your
+  choice, you will not be able to use this module in ANY useful way.
+
+
+,--------------------------------.
+|           PLATFORMS            |
+`--------------------------------'
+
+I normally test it with both Linux and Win32 and
+it works equally well. It is known to work also on Solaris,
+FreeBSD, NetBSD (packaged with NetBSD perl installation
+as Feb 2003), OpenBSD and Commodore 64 eventually :-)
+
+
+,-------------------------.
+| INSTALLATION PROCEDURE  |
+`-------------------------'
+
+As with 99,9% of perl extensions, can be installed with:
+
+- perl Makefile.PL
+- make
+- make test
+- make install (normally, as super-user)
+
+
+,-------------------------.
+|    LICENSING TERMS      |
+`-------------------------'
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+Additionally, this is BETA software, so use it at your own risk,
+and without ANY warranty!
+
+Have fun.
+

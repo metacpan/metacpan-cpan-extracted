@@ -1,0 +1,49 @@
+{
+   "abstract" : "Moose Roles for building next generation DateTime formats",
+   "author" : [
+      "Evan Carroll, C<< <me at evancarroll.com> >>, Evan Carroll <me@evancarroll.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Format",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "DateTime" : 0,
+            "DateTime::Locale" : 0,
+            "DateTime::TimeZone" : 0,
+            "Moose" : 0,
+            "Moose::Role" : 0,
+            "MooseX::Types::DateTime::ButMaintained" : "0.13",
+            "namespace::clean" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.04"
+}

@@ -1,0 +1,33 @@
+---
+abstract: 'Component for DBIx::Class that allows the use of accessor names in search/create/etc'
+author:
+  - 'Mark Grimes E<lt>mgrimes@cpan.orgE<gt>'
+build_requires:
+  DBD::SQLite: '0'
+  SQL::Translator: '0.11018'
+  Try::Tiny: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'App::ModuleBuildTiny version 0.011, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ResultSet-AccessorsEverywhere
+provides:
+  DBIx::Class::ResultSet::AccessorsEverywhere:
+    file: lib/DBIx/Class/ResultSet/AccessorsEverywhere.pm
+    version: '0.10'
+requires:
+  Carp: '0'
+  DBIx::Class: '0'
+  Module::Build::Tiny: '0.011'
+  autovivification: '0'
+  perl: '5.010'
+resources:
+  bugtracker: http://github.com/mvgrimes/DBIC-ResultSet-AccessorsEverywhere/issues
+  repository: http://github.com/mvgrimes/DBIC-ResultSet-AccessorsEverywhere.git
+version: '0.10'
+x_contributors: []
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

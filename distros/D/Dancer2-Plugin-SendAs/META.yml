@@ -1,0 +1,39 @@
+---
+abstract: '(DEPRECATED) Dancer2 plugin to send data as specific content type'
+author:
+  - 'Russell Jenkins <russellj@cpan.org>'
+build_requires:
+  Dancer2: '< 0.200000'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '7.1101'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-SendAs
+requires:
+  Class::Load: '0'
+  Dancer2: '< 0.200000'
+  Dancer2::Plugin: '0'
+  Encode: '0'
+  List::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/veryrusty/dancer2-plugin-sendas/issues
+  homepage: https://metacpan.org/release/Dancer2-Plugin-SendAs
+  repository: git://github.com/veryrusty/dancer2-plugin-sendas.git
+version: '0.002'
+x_deprecated: 1

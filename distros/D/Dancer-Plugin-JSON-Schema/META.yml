@@ -1,0 +1,35 @@
+---
+abstract: 'JSON::Schema interface for Dancer applications'
+author:
+  - 'Daniel Perrett <dp13@sanger.ac.uk>'
+  - 'Al Newkirk <awncorp@cpan.org>'
+  - 'Naveed Massjouni <naveed@vt.edu>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-JSON-Schema
+requires:
+  Dancer: '1.3098'
+  Dancer::Plugin: '0'
+  JSON: '0'
+  JSON::Hyper: '0'
+  JSON::Schema: '0'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/pdl/Dancer-Plugin-JSON-Schema/issues
+  repository: git://github.com/pdl/Dancer-Plugin-JSON-Schema.git
+version: '0.001'

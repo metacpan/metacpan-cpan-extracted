@@ -1,0 +1,84 @@
+NAME
+
+Data::ShortNameProvider - Generate short names with style
+
+SYNOPSIS
+
+Create a name provider:
+
+    my $np = Data::ShortNameProvider->new(
+        style           => 'Basic',       # default
+        timestamp_epoch => 1400023019,    # defaults to time()
+        max_name_length => 32,            # croak if a longer name is generated
+
+        # style-specific arguments
+        prefix  => 'dbit',
+        version => 1,
+    );
+
+Generate a shortname:
+
+    $short_name = $np->generate_name('foo');   # returns "dbit1_140513__foo"
+
+Parse a generated shortname:
+
+    $hash = $np->parse_generated_name($short_name);
+
+$hash contains something like:
+
+    # depends on the style
+    {
+        prefix          => 'dbit',
+        version         => 1,
+        timestamp       => '140513',
+        timestamp_epoch => 1400023019,
+        name            => 'foo',
+    }
+
+or "undef" if $short_name could not be parsed as a short name generated
+with that style.
+
+Check if a string is parsable:
+
+    my @names = grep { $np->is_generated_name($_) } @names;
+
+DESCRIPTION
+
+Create short names that encode a timestamp and a fixed label in a format
+that's unlikely to match normal names.
+
+A typical use-case would be the creation of database table names or file
+names in situations where you need to minimize the risk of clashing with
+existing items.
+
+The generated names can be detected and parsed to extract the timestamp
+and other components.
+
+ACKNOWLEDGEMENTS
+
+This module is based on an idea and proposal by Tim Bunce, on the
+"dbi-dev" mailing-list.
+
+The initial thread about Test::Database shortcomings:
+<http://www.nntp.perl.org/group/perl.dbi.dev/2014/04/msg7792.html>
+
+Tim's proposal for a short name provider:
+<http://www.nntp.perl.org/group/perl.dbi.dev/2014/05/msg7815.html>
+
+The first implementaion of the module was written during the first two
+days of the Perl QA Hackathon 2015 in Berlin (with Tim Bunce providing
+extensive feedback on IRC). Many thanks to TINITA for organizing this
+event!
+
+AUTHOR
+
+Philippe Bruhat (BooK), <book@cpan.org>.
+
+COPYRIGHT
+
+Copyright 2014-2015 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

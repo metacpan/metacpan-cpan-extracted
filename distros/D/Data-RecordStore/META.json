@@ -1,0 +1,52 @@
+{
+   "abstract" : "Simple and fast record based data store",
+   "author" : [
+      "Eric Wolf        coyocanid@gmail.com"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-RecordStore",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "v5.9.4"
+         }
+      }
+   },
+   "provides" : {
+      "Data::RecordStore" : {
+         "file" : "lib/Data/RecordStore.pm",
+         "version" : "2.0"
+      },
+      "Data::RecordStore::FixedStore" : {
+         "file" : "lib/Data/RecordStore.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "2.0",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

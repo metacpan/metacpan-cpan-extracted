@@ -1,0 +1,25 @@
+Revision history for Perl extension Devel::Refactor.
+
+0.5 Thu March 17 14:47:00 PST 2005
+    + Fixed example/factory.pl to work with latest version of Refactor.
+
+0.4 Sun Feb  6 18:32:44 PST 2005
+    + added  rename_subroutine
+    + added several tests in t/
+    + extract_subroutine is now a object method
+    + added perldoc for accessor methods
+    + refactored code and perldoc, hopefully better organized.
+    - Removes t/1.t (replaced with t/basic.t)
+
+0.03  Mon, 24 Jan 2005
+    + Added patches submitted by J Matisse Enzer and removed 'use 5.008' requirement
+    + Also added a few cosmetic changes.
+    
+0.02  Mon Dec 22 23:08:00 2003
+    + Added optional syntax checking to the results of 
+        the refactoring.
+        
+0.01  Sat Dec 20 00:48:19 2003
+	- original version; created by h2xs 1.22 with options
+		-XA -n Devel::Refactor
+

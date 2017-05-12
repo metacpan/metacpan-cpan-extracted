@@ -1,0 +1,19 @@
+Revision history for Perl extension D64::Disk::Status.
+
+0.03  2013-03-09
+    - fixed "First argument to Readonly must be a reference" compilation error
+      of a status factory class for Perl 5.6.2 by extracting a constant list of
+      DOS error messages and supplying a backslash over their value assignment
+      (this is needed since Readonly has got a slightly different syntax for
+      versions of Perl prior to 5.8, when it requires a reference as the first
+      parameter)
+
+0.02  2013-02-13
+    - fixed "First argument to Readonly must be a reference" compilation error
+      for Perl 5.6.2 by replacing "%errors" hash in a status factory class with
+      "$errors" hash reference
+
+0.01  2013-02-09
+    - initial version (provides basic status class definition and accessor
+      methods, as well as a factory class with all existing 1541 DOS error
+      messages)

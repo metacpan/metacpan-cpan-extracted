@@ -1,0 +1,361 @@
+//-*- Mode: C++ -*-
+// Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' Query.h.in '-vt=^[mb]_' -o out '-dn=free' '-dt=Node|Compiler|Options'
+
+%module{DDC::XS};
+
+//======================================================================
+// CQuery
+%name{DDC::XS::CQuery} class CQuery : public %name{DDC::XS::Object} ddcObject
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Label} string m_Label %get %set;
+	%name{Options} CQueryOptions* m_Options %get; //%set;
+  	void setOptions(CQueryOptions* val) %code %{ ddcxs_obj_set(m_Options, val); %};
+  public:
+	%name{CQuery} CQuery(string label="");
+  public:
+	%name{Evaluate} void Evaluate();
+	%name{Negated} bool Negated();
+	%name{Negate} bool Negate();
+	%name{GetMatchId} BYTE GetMatchId();
+	%name{SetMatchId} BYTE SetMatchId(BYTE matchId);
+	%name{HasMatchId} bool HasMatchId();
+	%name{RootOK} bool RootOK();
+	%name{ClearOptions} void ClearOptions();
+	%name{Clear} void Clear(bool deep=true);
+
+	%name{optionsToString} string optionsToString();
+	string toStringFull() %code %{ RETVAL = THIS->toString() + THIS->optionsToString(); %};
+};
+
+//======================================================================
+// CQNegatable
+%name{DDC::XS::CQNegatable} class CQNegatable : public %name{DDC::XS::CQuery} CQuery
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Negated} bool m_Negated %get %set;
+  public:
+	%name{CQNegatable} CQNegatable(string label="", bool negated=false);
+  //%name{CQNegatable_bool} CQNegatable(bool negated);
+  //%name{NegString} string NegString(string s);
+};
+
+//======================================================================
+// CQAtomic
+%name{DDC::XS::CQAtomic} class CQAtomic : public %name{DDC::XS::CQNegatable} CQNegatable
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQAtomic} CQAtomic(string label="", bool negated=false);
+};
+
+//======================================================================
+// CQBinOp
+%name{DDC::XS::CQBinOp} class CQBinOp : public %name{DDC::XS::CQNegatable} CQNegatable
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{dtr1} CQuery* m_dtr1 %get; //%set;
+  	void setDtr1(CQuery* val) %code %{ ddcxs_obj_set(m_dtr1, val); %};
+
+	%name{dtr2} CQuery* m_dtr2 %get; //%set;
+	void setDtr2(CQuery* val) %code %{ ddcxs_obj_set(m_dtr2, val); %};
+
+	%name{OpName} string m_OpName %get %set;
+  public:
+	%name{CQBinOp} CQBinOp(CQuery* dtr1=NULL, CQuery* dtr2=NULL, string opName="", bool negated=false);
+};
+
+//======================================================================
+// CQAnd
+%name{DDC::XS::CQAnd} class CQAnd : public %name{DDC::XS::CQBinOp} CQBinOp
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQAnd} CQAnd(CQuery* dtr1=NULL, CQuery* dtr2=NULL);
+};
+
+//======================================================================
+// CQOr
+%name{DDC::XS::CQOr} class CQOr : public %name{DDC::XS::CQBinOp} CQBinOp
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQOr} CQOr(CQuery* dtr1=NULL, CQuery* dtr2=NULL);
+};
+
+//======================================================================
+// CQWith
+%name{DDC::XS::CQWith} class CQWith : public %name{DDC::XS::CQBinOp} CQBinOp
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  	%name{MatchId} BYTE m_MatchId %get %set;
+  public:
+	%name{CQWith} CQWith(CQuery* dtr1=NULL, CQuery* dtr2=NULL, BYTE matchId=0);
+};
+
+//======================================================================
+// CQWithout
+%name{DDC::XS::CQWithout} class CQWithout : public %name{DDC::XS::CQWith} CQBinOp
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  	%name{CQWithout} CQWithout(CQuery* dtr1=NULL, CQuery* dtr2=NULL, BYTE matchId=0);
+};
+
+//======================================================================
+// CQWithor
+%name{DDC::XS::CQWithor} class CQWithor : public %name{DDC::XS::CQWith} CQBinOp
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  	%name{CQWithor} CQWithor(CQuery* dtr1=NULL, CQuery* dtr2=NULL, BYTE matchId=0);
+};
+
+//======================================================================
+// CQToken
+%name{DDC::XS::CQToken} class CQToken : public %name{DDC::XS::CQAtomic} CQAtomic
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{IndexName} string m_IndexName %get %set;
+	%name{Value} string m_Value %get %set;
+	%name{MatchId} BYTE m_MatchId %get %set;
+  public:
+	%name{CQToken} CQToken(string indexName="", string value="", BYTE matchId=0);
+        %name{OperatorKey} char* OperatorKey()
+			     %code{% RETVAL = (char*)THIS->OperatorKey(); %};
+	%name{IndexName} string IndexName(string DefaultIndexName="");
+	%name{BreakName} string BreakName(string DefaultBreakName="");
+  //%name{IndexString} string IndexString();
+  //%name{ValueString} string ValueString();
+  //%name{MatchIdString} string MatchIdString();
+  //%name{jsonValue} string jsonValue();
+};
+
+//======================================================================
+// CQTokExact
+%name{DDC::XS::CQTokExact} class CQTokExact : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokExact} CQTokExact(string indexName="", string value="");
+};
+
+//======================================================================
+// CQTokAny
+%name{DDC::XS::CQTokAny} class CQTokAny : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokAny} CQTokAny(string indexName="", string value="*");
+};
+
+//======================================================================
+// CQTokAnchor
+%name{DDC::XS::CQTokAnchor} class CQTokAnchor : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{ValueInt} int m_ValueInt %get %set;
+  public:
+	%name{CQTokAnchor} CQTokAnchor(string indexName="", string value="");
+};
+
+//======================================================================
+// CQTokRegex
+%name{DDC::XS::CQTokRegex} class CQTokRegex : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{RegexNegated} bool m_bRegexNegated %get %set;
+  public:
+	%name{CQTokRegex} CQTokRegex(string indexName="", string regex="", bool negated=false);
+};
+
+//======================================================================
+// CQTokSet
+%name{DDC::XS::CQTokSet} class CQTokSet : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Values} set_string m_Values %get %set;
+  public:
+	%name{CQTokSet} CQTokSet(string indexName="", string rawValue="", set_string values=set_string());
+  //%name{SetValueString} string SetValueString(set_string values);
+  //%name{SetValueString_} string SetValueString();
+  //%name{jsonValues} string jsonValues();
+};
+
+//======================================================================
+// CQTokInfl
+%name{DDC::XS::CQTokInfl} class CQTokInfl : public %name{DDC::XS::CQTokSet} CQTokSet
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Expanders} vector_string m_Expanders %get %set;
+  //%name{Txc} TxChain m_Txc %get %set;
+  public:
+	%name{new} CQTokInfl(string indexName="", string value="", vector_string expanders=vector_string());
+  	%name{newSet} CQTokInfl(string indexName="", set_string values=set_string(), vector_string expanders=vector_string());
+  //%name{GetChain} TxChain& GetChain();
+  //%name{ExpanderString} string ExpanderString();
+  //%name{ExpanderJson} string ExpanderJson();
+};
+
+//======================================================================
+// CQTokSetInfl
+%name{DDC::XS::CQTokSetInfl} class CQTokSetInfl : public %name{DDC::XS::CQTokInfl} CQTokInfl
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{RawValues} set_string m_RawValues %get %set;
+  public:
+	%name{CQTokSetInfl} CQTokSetInfl(string indexName="", set_string values=set_string(), vector_string expanders=vector_string());
+};
+
+//======================================================================
+// CQTokPrefix
+%name{DDC::XS::CQTokPrefix} class CQTokPrefix : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokPrefix} CQTokPrefix(string indexName="", string prefix="");
+};
+
+//======================================================================
+// CQTokSuffix
+%name{DDC::XS::CQTokSuffix} class CQTokSuffix : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokSuffix} CQTokSuffix(string indexName="", string suffix="");
+};
+
+//======================================================================
+// CQTokInfix
+%name{DDC::XS::CQTokInfix} class CQTokInfix : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokInfix} CQTokInfix(string indexName="", string infix="");
+};
+
+//======================================================================
+// CQTokPrefixSet
+%name{DDC::XS::CQTokPrefixSet} class CQTokPrefixSet : public %name{DDC::XS::CQTokSet} CQTokSet
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokPrefixSet} CQTokPrefixSet(string indexName="", set_string prefixes=set_string());
+};
+
+//======================================================================
+// CQTokSuffixSet
+%name{DDC::XS::CQTokSuffixSet} class CQTokSuffixSet : public %name{DDC::XS::CQTokSet} CQTokSet
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokSuffixSet} CQTokSuffixSet(string indexName="", set_string suffixes=set_string());
+};
+
+//======================================================================
+// CQTokInfixSet
+%name{DDC::XS::CQTokInfixSet} class CQTokInfixSet : public %name{DDC::XS::CQTokSet} CQTokSet
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokInfixSet} CQTokInfixSet(string indexName="", set_string infixes=set_string());
+};
+
+//======================================================================
+// CQTokMorph
+%name{DDC::XS::CQTokMorph} class CQTokMorph : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Items} vector_string m_Items %get %set;
+  public:
+	%name{CQTokMorph} CQTokMorph(string indexName="MorphPattern", vector_string morphItems=vector_string());
+	%name{Append} void Append(string morphItem);
+};
+
+//======================================================================
+// CQTokLemma
+%name{DDC::XS::CQTokLemma} class CQTokLemma : public %name{DDC::XS::CQTokMorph} CQTokMorph
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokLemma} CQTokLemma(string indexName="Lemma", string value="");
+};
+
+//======================================================================
+// CQTokThes
+%name{DDC::XS::CQTokThes} class CQTokThes : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokThes} CQTokThes(string indexName="Thes", string value="");
+};
+
+//======================================================================
+// CQTokChunk
+%name{DDC::XS::CQTokChunk} class CQTokChunk : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokChunk} CQTokChunk(string indexName="", string value="");
+};
+
+//======================================================================
+// CQTokFile
+%name{DDC::XS::CQTokFile} class CQTokFile : public %name{DDC::XS::CQToken} CQToken
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{CQTokFile} CQTokFile(string indexName="", string fileName="");
+};
+
+//======================================================================
+// CQNear
+%name{DDC::XS::CQNear} class CQNear : public %name{DDC::XS::CQNegatable} CQNegatable
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{dtr1} CQuery* m_dtr1 %get; //%set;
+  	void setDtr1(CQuery* val) %code %{ ddcxs_obj_set(m_dtr1, val); %};
+
+	%name{dtr2} CQuery* m_dtr2 %get; //%set;
+	void setDtr2(CQuery* val) %code %{ ddcxs_obj_set(m_dtr2, val); %};
+	
+	%name{dtr3} CQuery* m_dtr3 %get; //%set;
+	void setDtr3(CQuery* val) %code %{ ddcxs_obj_set(m_dtr3, val); %};
+
+	%name{Dist} BYTE m_Dist %get %set;
+  public:
+	%name{CQNear} CQNear(BYTE dist=1, CQuery* dtr1=NULL, CQuery* dtr2=NULL, CQuery* dtr3=NULL);
+};
+
+//======================================================================
+// CQSeq
+%name{DDC::XS::CQSeq} class CQSeq : public %name{DDC::XS::CQAtomic} CQAtomic
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  	%name{Items} vector_CQTokenPtr m_Items %get; //%set;
+	void setItems(vector_CQTokenPtr items_) %code %{ ddcxs_obj_setvec(vector_CQTokenPtr,m_Items,items_); %};
+
+	%name{Dists} vector_BYTE m_Dists %get %set;
+
+  //-- hacks to get/set DistOps as perl-array of single-character strings
+  %name{DistOps} vector_BYTEasCHAR m_DistOps %get %set;
+
+  public:
+  	%name{new} CQSeq(vector_CQTokenPtr items_=vector_CQTokenPtr(), vector_BYTE dists_=vector_BYTE(), vector_BYTEasCHAR distops_=vector_BYTEasCHAR());
+  	%name{new1} CQSeq(CQToken* item);
+	%name{Append} void Append(CQToken* nextItem, BYTE nextDist=0, char nextDistOp=0x3c); //-- nextDistOp='<'
+};
+

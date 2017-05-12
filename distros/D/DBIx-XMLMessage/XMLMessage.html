@@ -1,0 +1,779 @@
+<HTML>
+<HEAD>
+<TITLE>DBIx::XMLMessage - XML Message exchange between DBI data sources</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A></LI>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A></LI>
+	<UL>
+
+		<LI><A HREF="#OUTBOUND_MESSAGE">OUTBOUND MESSAGE</A></LI>
+		<LI><A HREF="#INBOUND_MESSAGE">INBOUND MESSAGE</A></LI>
+	</UL>
+
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A></LI>
+	<LI><A HREF="#SALES_PITCH">SALES PITCH</A></LI>
+	<LI><A HREF="#TEMPLATE_TAGS">TEMPLATE TAGS</A></LI>
+	<UL>
+
+		<LI><A HREF="#TEMPLATE">TEMPLATE</A></LI>
+		<LI><A HREF="#REFERENCE">REFERENCE</A></LI>
+		<LI><A HREF="#CHILD">CHILD</A></LI>
+		<LI><A HREF="#COLUMN">COLUMN</A></LI>
+		<LI><A HREF="#KEY">KEY</A></LI>
+		<LI><A HREF="#PARAMETER">PARAMETER</A></LI>
+	</UL>
+
+	<LI><A HREF="#TEMPLATE_TAG_ATTRIBUTES">TEMPLATE TAG ATTRIBUTES</A></LI>
+	<UL>
+
+		<LI><A HREF="#NAME">NAME</A></LI>
+		<LI><A HREF="#ACTION">ACTION</A></LI>
+		<LI><A HREF="#BLTIN">BLTIN</A></LI>
+		<LI><A HREF="#CARDINALITY">CARDINALITY</A></LI>
+		<LI><A HREF="#DATATYPE">DATATYPE</A></LI>
+		<LI><A HREF="#DEBUG">DEBUG</A></LI>
+		<LI><A HREF="#DEFAULT">DEFAULT</A></LI>
+		<LI><A HREF="#EXPR">EXPR</A></LI>
+		<LI><A HREF="#FACE">FACE</A></LI>
+		<LI><A HREF="#GENERATE_PK">GENERATE_PK</A></LI>
+		<LI><A HREF="#HIDDEN">HIDDEN</A></LI>
+		<LI><A HREF="#MAXROWS">MAXROWS</A></LI>
+		<LI><A HREF="#PARENT_NAME">PARENT_NAME</A></LI>
+		<LI><A HREF="#PROC">PROC</A></LI>
+		<LI><A HREF="#RTRIMTEXT">RTRIMTEXT</A></LI>
+		<LI><A HREF="#TABLE">TABLE</A></LI>
+		<LI><A HREF="#TOLERANCE">TOLERANCE</A></LI>
+		<LI><A HREF="#WHERE_CLAUSE">WHERE_CLAUSE</A></LI>
+	</UL>
+
+	<LI><A HREF="#METHODS">METHODS</A></LI>
+	<UL>
+
+		<LI><A HREF="#new">new</A></LI>
+		<LI><A HREF="#set_handlers">set_handlers</A></LI>
+		<LI><A HREF="#prepare_template">prepare_template</A></LI>
+		<LI><A HREF="#prepare_template_from_file">prepare_template_from_file</A></LI>
+		<LI><A HREF="#input_xml">input_xml</A></LI>
+		<LI><A HREF="#input_xml_file">input_xml_file</A></LI>
+		<LI><A HREF="#populate_objects">populate_objects</A></LI>
+		<LI><A HREF="#rexec">rexec</A></LI>
+		<LI><A HREF="#output_message">output_message</A></LI>
+	</UL>
+
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A></LI>
+	<LI><A HREF="#AUTHORS">AUTHORS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+DBIx::XMLMessage - XML Message exchange between DBI data sources
+
+</P>
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<HR>
+<H2><A NAME="OUTBOUND_MESSAGE">OUTBOUND MESSAGE</A></H2>
+<P>
+<PRE>    #!/usr/bin/perl
+</PRE>
+</P>
+<P>
+<PRE>    use DBI;
+    use DBIx::XMLMessage;
+</PRE>
+</P>
+<P>
+<PRE>    # Template string
+    my $tpl_str =&lt;&lt; &quot;_EOT_&quot;;
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;TEMPLATE NAME='SysLogins' TYPE='XML' VERSION='1.0' TABLE='syslogins'&gt;
+    &lt;KEY NAME='suid' DATATYPE='NUMERIC' PARENT_NAME='OBJECT_ID' /&gt;
+    &lt;COLUMN NAME='LoginId' EXPR='suid' DATATYPE='NUMERIC' /&gt;
+    &lt;COLUMN NAME='PasswordDate' EXPR='pwdate' DATATYPE='DATETIME'
+        BLTIN=&quot;fix_gmdatetime&quot; /&gt;
+    &lt;CHILD NAME='SysUsers' TABLE='sysusers'&gt;
+        &lt;KEY NAME='suid' PARENT_NAME='LoginId' DATATYPE='NUMERIC' /&gt;
+        &lt;COLUMN NAME='UserId' EXPR='uid' DATATYPE='NUMERIC' /&gt;
+        &lt;COLUMN NAME='UserName' EXPR='name' /&gt;
+    &lt;/CHILD&gt;
+    &lt;/TEMPLATE&gt;
+    _EOT_
+    my $msg = new DBIx::XMLMessage ('TemplateString' =&gt; $tpl_str);
+    my $ghash = { 'OBJECT_ID' =&gt; [ 1, 2 ] };
+    my $dbh = DBI-&gt;connect('dbi:Sybase:server=x;database=master','sa','secret');
+    $msg-&gt;rexec ($dbh, $ghash);
+</PRE>
+</P>
+<P>
+<PRE>    print &quot;\n\n&quot;, $msg-&gt;output_xml(0,0);
+    print &quot;\n\n&quot;, $msg-&gt;output_xml(0,1);
+</PRE>
+</P>
+<P>
+<HR>
+<H2><A NAME="INBOUND_MESSAGE">INBOUND MESSAGE</A></H2>
+<P>
+<PRE>    #!/usr/bin/perl
+</PRE>
+</P>
+<P>
+<PRE>    use DBI;
+    use DBIx::XMLMessage;
+</PRE>
+</P>
+<P>
+<PRE>    my $template_xml =&lt;&lt; &quot;_EOD1_&quot;;
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; ?&gt;
+    &lt;TEMPLATE NAME='SysLogins' TYPE='XML' VERSION='1.0' TABLE='syslogins'
+        ACTION='SAVE'&gt;
+    &lt;KEY NAME='suid' DATATYPE='NUMERIC' PARENT_NAME='OBJECT_ID' /&gt;
+    &lt;COLUMN NAME='LoginId' EXPR='suid' DATATYPE='NUMERIC' /&gt;
+    &lt;COLUMN NAME='PasswordDate' EXPR='pwdate' DATATYPE='DATETIME'
+        BLTIN=&quot;fix_gmdatetime&quot; /&gt;
+    &lt;CHILD NAME='SysUsers' TABLE='sysusers'&gt;
+        &lt;KEY NAME='suid' PARENT_NAME='LoginId' DATATYPE='NUMERIC' /&gt;
+        &lt;COLUMN NAME='UserId' EXPR='uid' DATATYPE='NUMERIC' /&gt;
+        &lt;COLUMN NAME='UserName' EXPR='name' /&gt;
+    &lt;/CHILD&gt;
+    &lt;/TEMPLATE&gt;
+    _EOD1_
+</PRE>
+</P>
+<P>
+<PRE>    my $message_xml =&lt;&lt; &quot;_EOD2_&quot;;
+    &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot;?&gt;
+    &lt;SysLogins&gt;
+    &lt;LoginId&gt;1&lt;/LoginId&gt;
+    &lt;PasswordDate&gt;1999/08/17 08:31&lt;/PasswordDate&gt;
+    &lt;SysUsers&gt;
+        &lt;UserId&gt;1&lt;/UserId&gt;
+        &lt;UserName&gt;sa&lt;/UserName&gt;
+    &lt;/SysUsers&gt;
+    &lt;/SysLogins&gt;
+    _EOD2_
+</PRE>
+</P>
+<P>
+<PRE>    my $xmlmsg = new DBIx::XMLMessage ('TemplateString' =&gt; $template_xml);
+    my $msgtype = $xmlmsg-&gt;input_xml($message_xml);
+    my $ghash = {
+        'OBJECT_ID' =&gt; [ 1 ]
+    };
+    $xmlmsg-&gt;populate_objects ($ghash);
+</PRE>
+</P>
+<P>
+<PRE>    my $dbh = DBI-&gt;connect('dbi:Sybase:server=x;database=master','sa','secret');
+    $xmlmsg-&gt;rexec ($dbh, $ghash);
+    print $xmlmsg-&gt;output_message();
+</PRE>
+</P>
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+The package maintains simple XML templates that describe object structure.
+
+</P>
+<P>
+The package is capable of generating SQL statements based on these
+templates and executing them against DBI data sources. After executing the
+SQL, the package formats the data results into XML strings. E.g. the
+following simple template
+
+</P>
+<P>
+<PRE>    &lt;TEMPLATE NAME='SysLogins' TYPE='XML' VERSION='1.0' TABLE='syslogins'
+        ACTION='SAVE'&gt;
+    &lt;KEY NAME='suid' DATATYPE='NUMERIC' PARENT_NAME='OBJECT_ID' /&gt;
+    &lt;COLUMN NAME='LoginId' EXPR='suid' DATATYPE='NUMERIC' /&gt;
+    &lt;/TEMPLATE&gt;
+</PRE>
+</P>
+<P>
+being executed with key value = 1, will be tranlated into this SQL:
+
+</P>
+<P>
+SELECT suid LoginId FROM syslogins where suid = 1
+
+</P>
+<P>
+and the result will be formatted into this XML string:
+
+</P>
+<P>
+<PRE>    &lt;SysLogins&gt;
+        &lt;LoginId&gt;1&lt;LoginId&gt;
+    &lt;/SysLogins&gt;
+</PRE>
+</P>
+<P>
+Inbound messages can be processed according to the same kind of templates
+and the database is updated accordingly. Templates are capable of defining
+the SQL operators, plus new SAVE operation which is basically a combination
+of SELECT and either INSERT or UPDATE depending on whether the record was
+found by the compound key value or not.
+
+</P>
+<P>
+<HR>
+<H1><A NAME="SALES_PITCH">SALES PITCH</A></H1>
+<P>
+This package allows for objects exchange between different databases. They
+could be from different vendors, as long as they both have DBD drivers. In
+certain cases it is even possible to exchange objects between databases
+with different data models. Publishing of databases on the web could
+potentially be one of the applications as well.
+
+</P>
+<P>
+<HR>
+<H1><A NAME="TEMPLATE_TAGS">TEMPLATE TAGS</A></H1>
+<P>
+<HR>
+<H2><A NAME="TEMPLATE">TEMPLATE</A></H2>
+<P>
+This is manadatory top-level tag. It can correspond to a certain table and
+be processed just like table-level REFERENCE and CHILD attributes described
+below. Some of TEMPLATE attributes are related to the whole template (e.g.
+TYPE or VERSION) while others desribe the table ti's based on (e.g. TABLE)
+
+</P>
+<P>
+If the TABLE attribute is defined, the generated SQL is going to run
+against some table. Otherwise a SQL with no table will be generated. This
+only makes sense for outbound messages and only possible on certain
+engines, like Sybase. Also, the immediate child columns should contain
+constants only for apparent reasons.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="REFERENCE">REFERENCE</A></H2>
+<P>
+REFERENCE is a table-level tag. It's meant to represent a single record
+from another table that's retrieved by unique key. E.g. if my current table
+is EMPL then DEPARTMENT would be a REFERENCE since employee can have no
+more than one departament.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="CHILD">CHILD</A></H2>
+<P>
+This tag meant to represent a number of child records usually retrieved by
+a foreign key value (probably primary key of the current table). Right now
+there's no difference in processing between CHILD and REFERENCE, but it may
+appear in the future releases.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="COLUMN">COLUMN</A></H2>
+<P>
+This tag is pretty self-explanatory. Each COLUMN tag will appear on the
+SELECT, INSERT or UPDATE list of the generated SQL.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="KEY">KEY</A></H2>
+<P>
+Key represents linkage of this table's records to the parent table. All
+KEY's will appear on the WHERE clause as AND components. This way of
+linkage is typical for most of relational systems and considered to be a
+good style. I guess it shouldn't be much of a restriction anyway. If it
+gets that, you could try tweak up the WHERE_CLAUSE attribute..
+
+</P>
+<P>
+<HR>
+<H2><A NAME="PARAMETER">PARAMETER</A></H2>
+<P>
+This tag represents a parameter that will be passsed to a stored procedure.
+Currently, only Sybase-style stored procedures are supported, i.e.
+
+</P>
+<P>
+exec proc_name <CODE>@param_name</CODE> = 'param_value', ...
+
+</P>
+<P>
+Fixes for Oracle, DB2 and Informix are welcome..
+
+</P>
+<P>
+<HR>
+<H1><A NAME="TEMPLATE_TAG_ATTRIBUTES">TEMPLATE TAG ATTRIBUTES</A></H1>
+<P>
+<HR>
+<H2><A NAME="NAME">NAME</A></H2>
+<P>
+<PRE>    Applicable to:  All template tags
+    Required for:   All template tags
+</PRE>
+</P>
+<P>
+NAME is the only required attribute for all of the template tags. The main
+purpose of it is to specify the tag name as it will appear in the resulting
+XML document. Also, depending on the template tag type (COLUMN, PARAMETER
+and KEY) it may serve as default value for EXPR discussed below. Here's a
+small example of how it works. If my column is represented in the template
+like this:
+
+</P>
+<P>
+<PRE>    &lt;COLUMN NAME='ObjectId' /&gt;
+</PRE>
+</P>
+<P>
+the resulting SQL will contain
+
+</P>
+<P>
+<PRE>    SELECT ObjectID, ...
+</PRE>
+</P>
+<P>
+whereas if I have
+
+</P>
+<P>
+<PRE>    &lt;COLUMN NAME='ObjectId' EXPR='igObjectId' /&gt;
+</PRE>
+</P>
+<P>
+it will generate the following SQL:
+
+</P>
+<P>
+<PRE>    SELECT igObjectId ObjectID, ...
+</PRE>
+</P>
+<P>
+I.e. in the latter example, NAME used as an alias and EXPR as a real
+database column name. The column in the first example has no alias.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="ACTION">ACTION</A></H2>
+<P>
+<PRE>    Applicable to:  TEMPLATE, REFERENCE, CHILD
+    Required for:   None
+</PRE>
+</P>
+<P>
+Possible values for this attibute are SELECT, INSERT, UPDATE, EXEC and
+SAVE. If action is not provided, it is assumed that t he action should be
+SELECT. The first 4 values correspond to SQL data management operators
+(EXEC is vendor-specific and represents execution of a stored procedure).
+The fifth value, SAVE, is basically a combination of SELECT and either
+INSERT or UPDATE, depending on whether the record was found by the compound
+key value or not. This often helps to avoid usage of complicated stored
+procedures with primary key generation and keep things generic and
+scalable. Primary key generation issue is addressed separately by using of
+the GENERATE_PK attribute (see below).
+
+</P>
+<P>
+<HR>
+<H2><A NAME="BLTIN">BLTIN</A></H2>
+<P>
+<PRE>    Applicable to:  COLUMN
+    Required for:   None
+</PRE>
+</P>
+<P>
+Represents a perl built-in function. before invocation of this subroutine
+the package prepares array <CODE>@_</CODE> and makes it visible to the
+built-in function. The 3 arguments received by the built-in are:
+<CODE>$self</CODE> - DBIx::XMLMessage object <CODE>$node</CODE> -
+Correspondent DBIx::XMLMessage::COLUMN object. You can use it to obtain
+other column attributes, e.g. $node-&gt;{DATATYPE} <CODE>$value</CODE> -
+The column value
+
+</P>
+<P>
+Meaning of the value depends on direction of the message, i.e. whether the
+message is inbound or outbound. In case of inbound message, this is the
+value received by the package from outside world; if the message is inbound
+then this is the value selected from database. There's one built-in
+function that comes with the package -- fix_gmdatetime. It converts date
+and time to GMT for outbound messages and from GMT to the database
+date/time for inbound messages. Just add one attribute to your datetime
+column:
+
+</P>
+<P>
+<PRE>    ... BLTIN=&quot;fix_gmdatetime&quot; ...
+</PRE>
+</P>
+<P>
+<HR>
+<H2><A NAME="CARDINALITY">CARDINALITY</A></H2>
+<P>
+<PRE>    Applicable to:   KEY, PARAMETER, REFERENCE, CHILD
+    Required for:    None
+    Possible values: REQUIRED, OPTIONAL
+    Default:         REQUIRED
+</PRE>
+</P>
+<P>
+This parameter has different meaning for different element types. Optional
+KEYs and PARAMETERs allow to proceed execution if the value for it was not
+found at some point of execution. Optional CHILDs and REFERENCEs will be
+skipped from execution, and hence from output, if the package failed to
+collect all the key values.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="DATATYPE">DATATYPE</A></H2>
+<P>
+<PRE>    Applicable to:   KEY, PARAMETER, COLUMN
+    Required for:    None
+    Possible values: CHAR, VARCHAR, VARCHAR2, DATE, DATETIME, NUMERIC
+    Default:         CHAR
+</PRE>
+</P>
+<P>
+This attribute loosely corresponds to the database column type. The only
+processing difference in the core package is quoting of the non-numeric
+datatypes, particularly those containign substrings CHAR, DATE or TIME. The
+built-in fix_gmdatetime utilizes this attribute more extensively.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="DEBUG">DEBUG</A></H2>
+<P>
+Recognized but not currently supported
+
+</P>
+<P>
+<HR>
+<H2><A NAME="DEFAULT">DEFAULT</A></H2>
+<P>
+<PRE>    Applicable to:   PARAMETER, COLUMN
+    Required for:    None
+    Possible values: Any string or number
+</PRE>
+</P>
+<P>
+This attribute allows to provide a default value for COLUMNs and
+PARAMETERS. Please note that default values are not being formatted, so
+they have to represent the literal value. E.g. if you want to provide a
+string DEFAULT it would look somewhat like this: ... DEFAULT =
+``'UNKNOWN'''
+
+</P>
+<P>
+<HR>
+<H2><A NAME="EXPR">EXPR</A></H2>
+<P>
+<PRE>    Applicable to:  All template tags
+    Required for:   None
+</PRE>
+</P>
+<P>
+For COLUMN and KEY this attribute represents the actual database column
+name or a constant. For PARAMETER
+
+</P>
+<P>
+<HR>
+<H2><A NAME="FACE">FACE</A></H2>
+<P>
+<PRE>    Applicable to:   COLUMN
+    Required for:    None
+    Possible values: ATTRIBUTE, TAG
+    Default:         TAG
+</PRE>
+</P>
+<P>
+This attribute allows to output certain columns as attributes, as opposed
+to the default TAG-fasion output. Since it's not supported for inbound
+messages yet, usage of this feature is not recommended.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="GENERATE_PK">GENERATE_PK</A></H2>
+<P>
+<PRE>    Applicable to:   COLUMN
+    Required for:    None
+    Possible values: HASH, SQL returning one value or name
+</PRE>
+</P>
+<P>
+This attribute allows you to specify how to generate primary key values.
+You have 2 options here:
+
+</P>
+<P>
+1. You can write your own Perl function, put its reference to the global
+hash under the name of the table for which you intend to generate primary
+key values and provide the value of 'HASH' as the GENERATE_PK value
+
+</P>
+<P>
+2. You can put the generating SQL block/statement into the GENERATE_PK
+value
+
+</P>
+<P>
+<HR>
+<H2><A NAME="HIDDEN">HIDDEN</A></H2>
+<P>
+<PRE>    Applicable to:   COLUMN
+</PRE>
+</P>
+<P>
+Indicates that the column will be excluded from the output. This attribute
+only makes sense for outbound messages.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="MAXROWS">MAXROWS</A></H2>
+<P>
+Currently not supported. In future, intends to limits the number of
+selected rows.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="PARENT_NAME">PARENT_NAME</A></H2>
+<P>
+<PRE>    Applicable to:   KEY
+</PRE>
+</P>
+<P>
+Indicates the name of the tag one level up to which this one tag is
+corresponding. E.g.
+
+</P>
+<P>
+<PRE>    ...
+    &lt;COLUMN NAME='OBJECT_ID'/&gt;
+    &lt;REFERENCE ...&gt;
+        &lt;KEY NAME='nOrderId' PARENT_NAME='OBJECT_ID'/&gt;
+    &lt;/REFERENCE&gt;
+</PRE>
+</P>
+<P>
+This feature is a workaround allowing to have two columns descending from
+the same parent column at the same level. There was some other prolem it
+was helping to resolve, but I forgot what it was ;^)
+
+</P>
+<P>
+<HR>
+<H2><A NAME="PROC">PROC</A></H2>
+<P>
+<PRE>    Applicable to:   TEMPLATE, REFERENCE, CHILD
+</PRE>
+</P>
+<P>
+Used in conjunction with ACTION='PROC'. Defines the name of the stored
+procedure to invoke.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="RTRIMTEXT">RTRIMTEXT</A></H2>
+<P>
+Currently not supported. The package does automatic right-trimming for all
+the character data.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="TABLE">TABLE</A></H2>
+<P>
+Name of the table against which the SQL will be run.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="TOLERANCE">TOLERANCE</A></H2>
+<P>
+<PRE>    Applicable to:   TEMPLATE, REFERENCE, CHILD
+    Possible values: IGNORE, CREATE, REJECT
+    Default:         IGNORE
+</PRE>
+</P>
+<P>
+Allows to adjust package behaviour when SQL execution produces unexpected
+result columns. E.g. if there's a stored procedure that will return the
+results for your message, you can omit describing of all the resulting
+COLUMNS in the template and instead specify ... TOLERANCE='CREATE' Whatever
+columns are returned by the stored procedure (Sybase &amp; MS SQL) will be
+added on-the-fly and available for the output.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="WHERE_CLAUSE">WHERE_CLAUSE</A></H2>
+<P>
+Additional where clause. Added as an AND component at the end of generated
+where clause.
+
+</P>
+<P>
+<HR>
+<H1><A NAME="METHODS">METHODS</A></H1>
+<P>
+<HR>
+<H2><A NAME="new">new</A></H2>
+<P>
+<PRE>    my $xmsg = new DBIx::XMLMessage (
+        [ _OnError =&gt; $err_coderef, ]
+        [ _OnTrace =&gt; $trace_coderef, ]
+        [ _OnDebug =&gt; $debug_coderef, ]
+        [ Handlers =&gt; $expat_handlers_hashref, ]
+        [ TemplateString =&gt; $xml_template_as_a_string, ]
+        [ TemplateFile =&gt; $xml_template_file_name, ]
+    )
+</PRE>
+</P>
+<P>
+You can specify either TemplateString or TemplateFile, but not both. If any
+of those specified, the template will be parsed.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="set_handlers">set_handlers</A></H2>
+<P>
+<PRE>    $xmsg-&gt;set_handlers ($expat_handlers_hashref)
+</PRE>
+</P>
+<P>
+Set additional expat handlers, see XML::Parser::Expat. Normally you won't
+use this. The only case I could think of is processing of encoding..
+
+</P>
+<P>
+<HR>
+<H2><A NAME="prepare_template">prepare_template</A></H2>
+<P>
+<PRE>    $xmsg-&gt;prepare_template ($template_xml_string)
+</PRE>
+</P>
+<P>
+This method can be invoked if the template was not specified in the 'new'
+method invocation.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="prepare_template_from_file">prepare_template_from_file</A></H2>
+<P>
+<PRE>    $xmsg-&gt;prepare_template_from_file ($template_file_name)
+</PRE>
+</P>
+<P>
+Same as above, but template is read from file here.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="input_xml">input_xml</A></H2>
+<P>
+<PRE>    $xmsg-&gt;input_xml ($inbound_xml_message_content)
+</PRE>
+</P>
+<P>
+Parse an inbound XML message. The values form this message will be used to
+fill in COLUMNS and PARAMETERS. The structure of this message should comply
+with template. Uses Tree parsing style.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="input_xml_file">input_xml_file</A></H2>
+<P>
+<PRE>    $xmsg-&gt;input_xml_file ($inbound_xml_message_file_name)
+</PRE>
+</P>
+<P>
+Same as above, but the XML message is read from a file.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="populate_objects">populate_objects</A></H2>
+<P>
+<PRE>    $xmsg-&gt;populate_objects ($global_hash_ref [, $matching_object
+        [, $tag_name [, $tag_content, [$parameter_index]]]])
+</PRE>
+</P>
+<P>
+This method is trying to stuff the existing template with the inbound
+message previously parsed by one of the 'input_xml' methods. The only
+mandatory attribute is global hash reference, which has to contain key
+values for the topmost tag TEMPLATE.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="rexec">rexec</A></H2>
+<P>
+<PRE>    $xmsg-&gt;rexec ($dbh, $global_hash_ref)
+</PRE>
+</P>
+<P>
+This method is running the created query against a DBI/DBD source and fills
+in the template with results in order to make them available for subsequent
+output_message call. In case of INSERT/UPDATE operations only key values
+will be filled in.
+
+</P>
+<P>
+<HR>
+<H2><A NAME="output_message">output_message</A></H2>
+<P>
+This method returns a string with query results in XML format suitable for
+printing or whatever manupulations seem appropriate.
+
+</P>
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<PRE>    XML::Parser
+    XML::Parser::Expat
+</PRE>
+</P>
+<P>
+<HR>
+<H1><A NAME="AUTHORS">AUTHORS</A></H1>
+<P>
+<PRE>  Andrei Nossov &lt;andrein@andrein.com&gt;
+</PRE>
+</P>
+<P>
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+</P>
+
+</BODY>
+
+</HTML>

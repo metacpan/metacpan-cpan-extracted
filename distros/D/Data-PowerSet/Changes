@@ -1,0 +1,25 @@
+Revision history for Perl extension Data::PowerSet
+
+0.05 2008-05-13 09:09:48 UTC
+    - no code changes
+    - move POD tests to separate file
+    - add a distinct LICENSE file
+    - hopefully generate a correct META.yml file
+	- tweak LICENSE key in Makefile.PL
+
+0.04 2007-04-10 17:55:57 UTC
+    - Corrected an error in the synopsis code.
+    - Noted that the module works with 5.005_04 (!)
+
+0.03 2006-11-03 13:26:31 UTC
+    - Clarified the license in Makefile.PL (requires a
+      modern version of ExtUtils::MakeMaker).
+
+0.02 2005-11-23 09:37:12 UTC
+    - Added a link to C<List::PowerSet>, as noted by
+      Robert Rothenberg. Fixed up the POD, which was
+      seriously messed up. No changes in functionality.
+
+0.01 2005-11-17 15:17:48 UTC
+    - original version; created by genpm v1.1
+

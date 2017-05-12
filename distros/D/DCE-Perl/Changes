@@ -1,0 +1,127 @@
+=item 0.21 - 07/26/01
+
+added sec_acl_bind_to_addr method.
+
+
+=item 0.20 - 04/18/01
+
+updated for newer versions of perl.
+
+
+=item 0.19 - 06/28/99
+
+fixed minor bugs where the return value of a function would be accessed
+before the status of the function was checked, which occasionally caused
+core dumps :(.
+
+
+added new module DCE::rpcbase for access to RPC constants.
+
+
+added new module DCE::attrbase for access to extended registry attribute
+constants.
+
+
+added some limited support for extended registry attributes to
+DCE::Registry.
+
+
+=item 0.17 - 05/11/98
+
+Minor fixes to ACL.xs involving foreign ACL types. Thanks to Reggie Hunt
+<rhunt@hunt.llnl.gov> for contributing the fix.
+
+
+=item 0.16 - 03/10/98
+
+Paul Henson <henson@acm.org> takes over maintenance of DCE-Perl from Doug
+MacEachern, who is off in consultant-land earning lots of beer.
+
+
+Added new method to Registry class to obtain default registry handle:
+
+     ($rgy, $status) = DCE::Registry->site_default();
+
+
+Added patch from Joel Murphy <jmurphy@cnu.acsu.buffalo.edu> to fix
+gcc-ism of declaring variable size arrays on the stack.
+
+
+=item 0.15 - 06/22/97
+
+applied patches from Paul Whaley <whaley@ucs.ubc.ca> for solaris sanity
+and other cleanups
+
+got rid of ugly `config' file
+
+fix bug in DCE::ACL::entry->entry_info to use SvOK not SvTRUE thanks to Paul Henson
+
+added configuration tips for DEC from Paul Henson
+
+=item 0.14 11/19/96
+
+added DFS fix to DCE::ACL->bind from Paul Henson
+
+added Solaris fix to aclbase.xs from Paul Henson
+
+move location of perl include files to avoid warnings of 
+'TRUE' and 'FALSE' being redefined
+
+=item 0.13
+
+if any method that needs an ACL manager uuid, does not get one, the underlying
+C code will do a sec_acl_get_manager_types, using the first one returned.
+
+DCE::ACL::entry->entry_info now deals with foreign_user and foreign_group
+
+started cleaning and moving *.t scripts into t/ so we can 'make test'
+
+DCE::ACL::entry->add now checks to make sure the entry does not already exist
+
+Added DCE::ACL::handle->new_list method
+
+Renamed classes in DCE::ACL package, will not disturb any existing code
+
+Added DCE::Registry->domain method
+$domain = $rgy->domain("user"); #returns 0
+$domain = $rgy->domain("group"); #returns 1
+
+Added aliases for DCE::Registry->domain_*
+$rgy->p; #domain_person
+$rgy->g; #domain_group
+$rgy->o; #domain_org
+
+If DCE::Registry->site_binding_get_info is called in a scalar context,
+only the cell_name is returned
+
+If any DCE::Registry->pgo_*_to_* method is called in a scalar context,
+the status value will not be returned e.g.
+$uuid = $rgy->pgo_name_to_id($uuid)
+
+All the DCE::Registry->*_bind* method now default to "" for the cell_name
+argument and &sv_undef for the auth_info argument
+DCE::Registry->site_open* methods now default to "" for cell_name
+methods can be invoked as simply:
+($rgy, $status) = DCE::Registry->site_bind;
+
+when $aclh->get_manager_types is called in a scalar context, 
+only the $manager_types array reference is returned.
+
+when $aclh->get_printstrings is called in a scalar context, 
+only the $prinstrings array reference is returned.
+
+added DCE::ACL->delete method
+
+fixed bug in DCE::ACL->lookup spotted by Paul Henson
+ 
+fixed bug in DCE::ACL->get_manager_types, thanks to Paul Henson
+
+added documentation to Status.pm
+
+added documentation to ACL.pm
+
+$list->acls now returns a list of all acls if no index argument 
+is passed, when called in a scalar context, only the first acl is returned
+
+$acl->entries now returns a list of all entries if no index argument 
+is passed

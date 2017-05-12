@@ -1,0 +1,84 @@
+Revision history for Perl module Data::Remember
+
+0.140490  2014-02-18 10:03:17 America/Chicago
+
+    * Added the recall_each() method to Data::Remember::Class.
+    * Added the recall_each() subroutine to Data::Remember.
+    * Updated the documentation for QUE to describe the useful empty que: []
+    * Fixed a couple broken links in the docs.
+
+0.140480  2014-02-16 19:32:58 America/Chicago
+
+    * Added Data::Remember::Class to provide an object-oriented interface to
+      the Data::Remember library. Actually, Data::Remember is now a functional
+      wrapper around Data::Remember::Class.
+    * Extracted teh init_brain, and process_que utility methods that are shared
+      by Data::Remember::Class, Data::Remember::POE, and Data::Remember::Hybrid
+      into a common Data::Remember::Util.
+    * Switched to Class::Load from UNIVERSAL::require.
+    * Added t/05-memory-overwrite.t test to make sure remember() and recall()
+      work correctly when encountering non-hash values when traversing a que.
+    * Modified Data::Remember so that the tests pass.
+    * An undefined que now results in the request to remember(), recall(),
+      forget(), etc. being ignored and a warning shown.
+    * Added a DIAGNOSTICS section to Data::Remember to highlight the important
+      messages of the main class.
+    * Migrated to Dist::Zilla for managing releng. Added github README.
+
+0.07 Sun Oct 14 0:38:17 2007
+    * Added the forget_when() function for forgetting parts of a fact based upon
+    * a predicate.
+    * Expanded the tests in t/test-brain.pl to make sure the new forget_when()
+    * function works as expected.
+    * Fixed a dumb bug in t/02-pod-coverage.t left from when I copied the file
+      from HTML::ParagraphSplit. Always make sure you check your files when you
+      copy them!
+
+0.06 Fri Oct 12 20:03:01 2007
+    * Made brain_for() of Data::Remember::Hybrid a little more reliable.
+    * Added t/06-hybrid-brain_for.t to establish brain_for()'s robustness.
+    * Added t/20-yaml-dump.t to reveal a bug in the YAML brain's dump() method.
+    * Improved t/20-yaml-load.t to test the YAML brain's load() method.
+    * Fixed a bug in the YAML brain's dump() method that prevented it from
+      dumping the brain back out to file properly.
+    * Added the remember_these() function for remember a group of things on a
+      single que.
+    * Added the recall_and_update() function to allow a fact to be updated and
+      recalled at the same time.
+    * Added new tests to t/test-brain.pl to test for the success of
+      remember_these() and recall_and_update().
+
+0.05 Wed Oct 10 0:23:49 2007
+    * Added brain_for() to Data::Remember::Hybrid.
+    * Updated t/20-poe.t to include a test for forget().
+    * Fixed Data::Remember::POE::forget() which was incorrectly calling the
+      heap brain's recall() instead of forget().
+
+0.04 Sat Oct 6 17:09:52 2007
+    * Added t/load-test.yml as a test for YAML loading.
+    * Added t/20-yaml-load.t in an attempt to reveal a bug I'm seeing in an
+      application I'm writing elsewhere, but all tests passed.
+    * Added t/20-hybrid-yaml-load.t and found the bug I was looking for.
+    * Fixed a bug in Data::Remember::Hybrid where _best_brain() was not, in
+      fact, returning the best brain, ever.
+
+0.03 Sat Oct 6 10:30:02 2007
+    * Refactored tests into a much nicer (and less noisy) setup.
+    * Added a test for dependencies.
+    * Added a test for POD errors.
+    * Added a test for POD coverage problems.
+    * Added the POE brain.
+    * Fixed the dependencies in Makefile.PL.
+
+0.02 Fri Oct 5 15:17:32 2007
+    * Updating t/brains.t to precreate t/test.yml to prevent test failurs on
+      some versions of YAML::Syck.
+
+0.01 Mon Oct 1 16:00:55 2007
+    * Initial release.
+    * Data::Remember added as main interface module featuring remember(),
+      recall(), forget(), and brain()
+    * Data::Remember::Memory brain driver
+    * Data::Remember::DBM brain driver using DBM::Deep
+    * Data::Remember::YAML brain driver using YAML::Syck
+    * Data::Remember::Hybrid brain driver for mixing drivers

@@ -1,0 +1,22 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Bugtracker
+
+1.111080  2011-04-18 11:53:54 Europe/Vienna
+    - fixed POD
+    - bugtracker URL is no longer a URI::http object, which is unsupported
+      (thanks doherty)
+
+1.102670  2010-09-24 18:38:23 Europe/Vienna
+    - make bugtracker URL and email address configurable (idea by Mike Doherty)
+
+1.101490  2010-05-29 22:33:57 Europe/Vienna
+    - comply with CPAN::Meta::Resources and Dist::Zilla v3 (thanks apocalypse)
+
+1.101420  2010-05-22 14:11:15 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - removed unused variable
+
+1.100701  2010-03-11 12:40:00 Europe/Vienna
+    - fix POD
+
+1.100700  2010-03-11 12:33:29 Europe/Vienna
+    - original version

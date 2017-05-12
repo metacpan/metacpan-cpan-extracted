@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+sub main {
+    my $branch = grep { $_ =~ /branch/ } @ARGV;
+
+    print $branch ? 'default' : 'a42207909e7bdfc81dde25f307e9076ba71e04bf';
+    print "\n";
+}
+
+main unless caller;
+
+# vim: se et ts=4 sw=4 sts=4 ft=perl :

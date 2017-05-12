@@ -1,0 +1,12 @@
+Changes
+libk8055.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+typemap
+t/Device-Velleman-K8055-libk8055.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Device/Velleman/K8055/libk8055.pm
+META.yml                                 Module meta-data (added by MakeMaker)

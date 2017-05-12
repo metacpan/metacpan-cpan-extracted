@@ -1,0 +1,45 @@
+--- 
+abstract: DBI driver for CSV files
+author: 
+  - Jochen Wiedmann
+  - Jeff Zucker
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+  - Jens Rehsack <rehsack@cpan.org>
+build_requires: 
+  Config: 0
+configure_requires: 
+  DBI: '1.628'
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150005
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-CSV
+provides: 
+  DBD::CSV: 
+    file: lib/DBD/CSV.pm
+    version: '0.49'
+recommends: 
+  DBD::File: '0.44'
+  DBI: '1.636'
+  SQL::Statement: '1.410'
+  Test::More: '1.302015'
+  Text::CSV_XS: '1.23'
+requires: 
+  Cwd: 0
+  DBD::File: '0.42'
+  DBI: '1.628'
+  Encode: 0
+  SQL::Statement: '1.405'
+  Test::Harness: 0
+  Test::More: '0.90'
+  Text::CSV_XS: '1.01'
+  charnames: 0
+  perl: '5.008001'
+resources: 
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-dbi/DBD-CSV.git
+version: '0.49'
+x_installdirs: site

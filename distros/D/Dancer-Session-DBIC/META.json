@@ -1,0 +1,56 @@
+{
+   "abstract" : "DBIx::Class based session engine for Dancer",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Session-DBIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "DBIx::Class::TimeStamp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.63"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "Dancer" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0.01",
+            "parent" : "0.215"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Dancer-Session-DBIC/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Dancer-Session-DBIC.git"
+      }
+   },
+   "version" : "0.006"
+}

@@ -1,0 +1,28 @@
+Revision history for Perl extension DBIx::CouchLike
+
+0.16    Thu Jun 10 12:40:43 2010
+        - fix POD (thanks to Michael Mueller)
+        - requires Math::BigInt >= 1.55
+
+0.15    Tue Jun  8 11:28:27 2010
+        - add versioning
+        - fix tests (requires DBD::SQLite etc.)
+        - remove dependency of Test::Exception.
+
+0.13    Fri Sep 18 01:50:15 2009
+        - requires Unicode::RecursiveDowngrade
+
+0.12    Mon Sep 14 14:57:37 2009
+        - added post_with_views(), put_with_views().
+
+0.10    Fri Sep 11 15:35:59 2009
+        - release to CPAN
+
+0.03    Thu Apr 16 15:10:16 2009
+        - add view query syntax: key => HASHREF, key => ARRAYREF, key => SCALARREF
+
+0.02    Thu Feb 26 21:17:50 2009
+        - add view query option: key_reverse, value_reverse
+
+0.01    Thu Feb  5 20:45:46 2009
+        - original version

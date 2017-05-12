@@ -1,0 +1,11 @@
+Changes
+=======
+
+0.03 - 11 Jun 2014
+  * Add explicit -lstdc++ (smly, PR #1)
+
+0.02 - 10 Dec 2013
+  * Fix rt #91280 where build failed on some platforms
+
+0.01 - 22 May 2011
+  * Initial release.

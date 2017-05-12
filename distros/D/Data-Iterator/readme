@@ -1,0 +1,125 @@
+
+	Iterator.pm - shows paths/values of complex data structures
+
+DESCRIPTION
+
+	Iterator.pm is an object orientated (plain) Perl module to
+	iterate over complex data structures (LoL, LoH, HoL, HoH etc.).
+
+	While Perl's built-in functions foreach(), each(), keys() and
+	values() handle just a given level of a structure, Iterator digs
+	deeper - handling a structure like an one-dimensional hash.
+
+	For each element of a nested data structure the symbolic name
+	("data path"), The Value - as is! - plus some additional
+	information are retrieved.
+
+	That is, Iterator provides an unified syntax for simple handling
+	of data sources of different types.
+
+	Iterator does not alter the referenced structure, though values
+	may be explicitly modified by the user.
+
+	Iterator does not export any variables or functions. You /can/
+	call arbitrary packet subs via &Packetname::subname(), but you
+	/might/ be surprised of the results :-)
+
+
+INSTALLATION
+
+	- Just copy/move Iterator.pm into your Perl's [/site]/lib/Data-
+	directory. In your script,
+
+		use Data::Iterator;
+
+	- If you want to keep Iterator.pm in any directory not in @INC,
+	BEGIN unshift()ing this dir to @INC or
+
+		use lib 'your/dir/here';
+
+	In your script,
+
+		use Iterator;
+
+
+METHODS
+
+	(see Iterator's documentation for details.)
+
+	- Data::Iterator->new(\data_structure)
+
+	Takes the reference to a structure (Hash, Array, Scalar, Glob,
+	FileHandle, '-File:path/to/file.ext') and returns a blessed hash
+	reference (further on known as "$obj"). Returns undef on failure.
+
+	- $obj->cfg()              # (1)
+	- Data::Iterator->cfg()    # (2)
+	- Data::Iterator::cfg()    # (2)
+
+	Gets/sets the object's configuration (1) or the modules defaults
+	(2). The latter will affect new() objects.
+
+	- $obj->element('data path')
+
+	returns information (data path, The Value, plus some more stuff)
+	about the current element. Can be used to iterate over the data
+	structure passed to new(), or to iterate over a sub-structure (if
+	parameter 'data path' is provided)
+
+	Data paths are strings in the form '[1]{key1}{key2}[0]'. Kind of
+	stringified Perl data indices.
+
+	- $obj->keys('data path')
+
+	returns an array with all keys (no 'data path' provided) of the
+	structure, those of a sub-structure, if 'data path' is present
+	(and valid).
+
+	- $obj->values('data path')
+
+	returns an array with all values (no 'data path' provided) of the
+	structure, those of a sub-structure, if 'data path' is present
+	(and valid).
+
+	- $obj->reset('data path')
+
+	prepares for a new $obj->element()-iteration, if a previous loop
+	(e.g. while...) was left before the last element of the structure
+	(no data path provided) or of a substructure (data path provided)
+	had been reached.
+
+
+VERSION
+
+  0.021 dated from: 30.12.2000 (bugfix release)
+    - Squashed a bug preventing iteration over array objects if data
+      path is given
+    - Cleaned up some "Use of uninitialized value..."-warnings
+    - Example code corrected
+
+  0.02  dated from: 10.12.2000 (initial release)
+
+
+CONTENTS OF THE ARCHIVE FILE
+
+  readme          - module description (this file)
+  Iterator.pm     - The Module (including POD (in German))
+  Iterator_en.pod - documentation in POD-Format (in English (hmmm...))
+
+
+AUTHOR
+
+  Hartmut Camphausen
+  Am kleinen Born 1
+  35287 Amöneburg
+  Fon:   06422/850527
+  Fax:   06422/850528
+  Email: h.camp@creagen.de
+  WWW:   http://www.creagen.de
+
+
+LICENCE
+
+  Copyright (c) 2000 by Hartmut Camphausen. All rights reserved. This
+  is free software. It may be used, redistributed and/or modified
+  under the same terms as Perl itself.

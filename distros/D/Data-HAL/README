@@ -1,0 +1,25 @@
+=encoding UTF-8
+
+Data-HAL version 1.000 is Copyright © 2013, Lars Dɪᴇᴄᴋᴏᴡ
+
+=head1 NAME
+
+README - basic information for users prior to downloading
+
+=head1 INSTALLATION
+
+See L<How to install CPAN modules|http://www.cpan.org/modules/INSTALL.html>,
+L<perlfaq8/"How do I install a module from CPAN?">,
+L<perlfaq8/"How do I keep my own module/library directory?">.
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright © 2013 Lars Dɪᴇᴄᴋᴏᴡ C<< <daxim@cpan.org> >>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.18.0.
+
+=head2 Disclaimer of warranty
+
+This library is distributed in the hope that it will be useful, but without
+any warranty; without even the implied warranty of merchantability or fitness

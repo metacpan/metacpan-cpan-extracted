@@ -1,0 +1,46 @@
+This is the README file for the Perl module Device::TNC
+
+What does Device::TNC provide?
+
+The module Device::TNC provides the basis of a generic set of modules that can
+be used to interface with a Terminal Node Controller (TNC).
+The subclass module has been developed to talk to KISS mode TNC's.
+
+What's a TNC?
+
+If you don't know then this module probably won't interest you.
+A TNC provides an interface between radio communication and the user.
+In some cases this is via a display on the TNC but in other cases this is simply
+a connection to a serial port on a computer.
+The serial port could be an RS232 connection, a USB to Serial adaptor or a USB
+conneciton with a software defined serial port.
+
+The initial versions of this module have been developed on Linux and Windows 
+2000 with a KISS mode TNC (TNC-X).
+It is hoped (but not guarenteed) that this module will have been developed in
+such a way as it's easily extended for use with other TNC's.
+I expect the API to change as people subclass this module to work with other
+TNC's.
+If you do this sort of thing please let me know so that I can assist with your
+development work and any re-design that may (probably will) be necessary.
+
+Installation
+
+Installation follows the usual Perl module installation procedure.
+
+perl Makefile.PL
+make
+make test (This is optional but recommended)
+make install
+
+Bugs
+
+Bugs should be reported to bug-Device-TNC@rt.cpan.org.
+If using the Device::TNC::KISS module please include a raw KISS log file that
+contains examples of the frames that are not being processed correctly.
+
+Copyright (C) 2007, Australian Space Research Institute.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+

@@ -1,0 +1,9 @@
+Revision history for Data-Censor
+
+0.02    2014-03-12
+        Rename censored_data to clone_and_censor, make it work as class or
+        object method, better docs.
+        
+0.01    2014-03-12
+        Initial release.
+

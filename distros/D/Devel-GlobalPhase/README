@@ -1,0 +1,51 @@
+NAME
+    Devel::GlobalPhase - Detect perl's global phase on older perls.
+
+SYNOPSIS
+        use Devel::GlobalPhase;
+        print global_phase; # RUN
+
+        use Devel::GlobalPhase -var;
+        print ${^GLOBAL_PHASE}; # RUN
+
+DESCRIPTION
+    This gives access to ${^GLOBAL_PHASE} in versions of perl that don't
+    provide it. The built in variable will be used if it is available.
+
+    If all that is needed is detecting global destruction,
+    Devel::GlobalDestruction should be used instead of this module.
+
+EXPORTS
+  global_phase
+    Returns the global phase either from "${^GLOBAL_PHASE}" or by
+    calculating it.
+
+OPTIONS
+  -var
+    If this option is specified on import, the global variable
+    "${^GLOBAL_PHASE}" will be created if it doesn't exist, emulating the
+    built in variable from newer perls.
+
+BUGS
+    *   There are tricks that can be played with B or XS that would fool
+        this module for the INIT and END phase.
+
+    *   During an "END {}" block created at runtime after this module is
+        loaded, the phase may be reported as "RUN". While this could be made
+        more accurate, it would slow down the module significantly during
+        the RUN phase, and has the potential to segfault perl.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+  CONTRIBUTORS
+    Uses some code taken from Devel::GlobalDestruction.
+
+COPYRIGHT
+    Copyright (c) 2013 the Devel::GlobalPhase "AUTHOR" and "CONTRIBUTORS" as
+    listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

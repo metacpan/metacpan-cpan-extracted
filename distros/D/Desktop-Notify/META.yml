@@ -1,0 +1,24 @@
+---
+abstract: 'Communicate with the Desktop Notifications framework'
+author:
+  - 'Stephen Cavilia <sac@atomicradi.us>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Desktop-Notify
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: '0'
+  Net::DBus: '0'
+  Test::More: '0'
+version: '0.05'

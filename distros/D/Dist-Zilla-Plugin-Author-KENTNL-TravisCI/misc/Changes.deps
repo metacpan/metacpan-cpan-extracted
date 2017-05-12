@@ -1,0 +1,13 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001004
+
+0.001003 2017-02-28T09:02:40Z
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.001002 2015-03-01T09:37:04Z
+
+0.001001 2015-02-05T04:53:48Z
+ [Changed / runtime requires]
+ - Dist::Zilla::Plugin::TravisCI 0 → 0.008

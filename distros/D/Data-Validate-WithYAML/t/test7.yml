@@ -1,0 +1,16 @@
+---
+step1:
+    password:
+        length: 5,
+        message: 'Password is too short'
+        depends_on: admin
+        type: required
+        case:
+            dummy:
+                type: optional
+    admin:
+        type: required
+        enum:
+            - administrator
+            - root
+            - dummy

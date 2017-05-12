@@ -1,0 +1,77 @@
+Generated from the Device::MegaSquirt documentation:
+
+  perldoc -t lib/Device/MegaSquirt.pm > README
+
+NAME
+    Device::MegaSquirt - Perl5 module for communicating with a MegaSquirt
+    controller
+
+SYNOPSIS
+     $dev = '/dev/ttyUSB0';
+     $ms = Device::MegaSquirt->new($dev);
+
+     $tbl = $ms->read_advanceTable1();
+     $tbl = $ms->write_advanceTable1();
+
+     $tbl = $ms->read_veTable1();
+     $tbl = $ms->write_veTable1();
+
+     $val = $ms->read_crankingRPM();
+     $res = $ms->write_crankingRPM($val);
+
+     $data = $ms->read_BurstMode();
+
+     $version = $ms->get_version();
+
+DESCRIPTION
+    Device::MegaSquirt provides operations for communicating with a
+    MegaSquirt controller [http://www.msextra.com]. Operations such as
+    reading/writing tables, reading live data, and writing configuration
+    variables.
+
+    This part of the module (Device::MegaSquirt) is a template and version
+    specific modules (Device::MegaSquirt::*) implement the interface.
+
+OPERATIONS
+  Device::MegaSquirt->new($dev);
+      Returns object (TRUE) on success, FALSE on error
+
+      $ms = Device::MegaSquirt->new($dev);
+
+    The device ($dev) is the file name of the serial device on which the
+    Megasquirt controller is connected (e.g.: /dev/ttyUSB0, /dev/ttyS0).
+
+    "new" will attempt to open the device and determine the version and
+    signature of the controller. It will return a version specific object on
+    success.
+
+  $ms->get_version()
+      Returns: version number on success, FALSE on error
+
+      $version = $ms->get_version();
+
+  
+    Remaining operations are implemented in the version specific module.
+
+     Device::MegaSquirt::*
+
+VERSION
+    This document refers to Device::MegaSquirt version 0.01.
+
+REFERENCES
+      [1]  MegaSquirt Engine Management System
+           http://www.msextra.com/
+
+AUTHOR
+        Jeremiah Mahler <jmmahler@gmail.com>
+        CPAN ID: JERI
+        http://www.google.com/profiles/jmmahler#about
+
+COPYRIGHT
+    Copyright (c) 2010, Jeremiah Mahler. All Rights Reserved. This module is
+    free software. It may be used, redistributed and/or modified under the
+    same terms as Perl itself.
+
+SEE ALSO
+    Text::LookUpTable, Device::MegaSquirt::Serial
+

@@ -1,0 +1,50 @@
+{
+   "abstract" : "Dokuwiki::RPC::XML::Client - A RPC::XML::Client for dokuwiki (https://www.dokuwiki.org)",
+   "author" : [
+      "Marc Chantreux <khatar@phear.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dokuwiki-RPC-XML-Client",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Modern::Perl" : "0",
+            "Net::Netrc" : "0",
+            "RPC::XML::Client" : "0",
+            "YAML" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/eiro/p5-dokuwiki-rpc-xml-client",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/eiro/p5-dokuwiki-rpc-xml-client.git",
+         "web" : "https://github.com/eiro/p5-dokuwiki-rpc-xml-client"
+      }
+   },
+   "version" : "0.2"
+}
+

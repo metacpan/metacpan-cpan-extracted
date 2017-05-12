@@ -1,0 +1,219 @@
+#   @(#)$Id: DBD-Informix.nmd,v 2015.10 2015/11/01 07:37:12 jleffler Exp $
+#   @(#)DBD::Informix - Perl Database Driver for Informix
+#   @(#)Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+#   @(#)Definitive list of files -- Non-Modifiable Source Distribution
+#
+#   -- The Source file column contains the name of the source file to be
+#      created.  The name is quoted relative to the target directory.
+#   -- The RCS file column contains the name of the RCS file (or SCCS
+#      file) from which the source is to be extracted.
+#   -- The version column contains the version number to be extracted.
+#
+#   -- It is assumed that all files are under RCS or SCCS control.
+#      Despite this, the `,v' suffix or `s.' prefix and the RCS or SCCS
+#      sub-directory name MUST be specified.
+#
+#   -- Note that it is possible to include variable definitions as in a
+#      shell script.  If necessary, these can include defaults such as
+#      ${JH:-/u/j/h} but not termination constructs such as: ${XYZ:?}
+#      Note that spaces are not allowed in definitions.
+#
+#   -- Comment lines start with a hash (#)
+#   -- Blank lines are ignored
+#   -- Tabs are non-preferred characters
+##################################################################
+
+##################################################################
+# Source file               RCS file                    Version  #
+##################################################################
+
+# Library Files
+debug.h                     RCS/debug.h,v               3.10
+decfix.c                    RCS/decfix.c,v              3.17
+decsci.c                    RCS/decsci.c,v              4.12
+decsci.h                    RCS/decsci.h,v              3.15
+decsetexp.c                 RCS/decsetexp.c,v           2.5
+dumpesql.h                  RCS/dumpesql.h,v            1.18
+esql5_00.h                  RCS/esql5_00.h,v            2008.2
+esql7_20.h                  RCS/esql7_20.h,v            2009.1
+esql_ius.h                  RCS/esql_ius.h,v            2008.2
+esqlc.h                     RCS/esqlc.h,v               2013.1
+esqlcver.ec                 RCS/esqlcver.ec,v           2003.1
+esqllib.h                   RCS/esqllib.h,v             2008.1
+esqltype.h                  RCS/esqltype.h,v            2008.3
+esqlutil.h                  RCS/esqlutil.h,v            2009.1
+ifmxdec.h                   RCS/ifmxdec.h,v             1.19
+ixblob.ec                   RCS/ixblob.ec,v             2008.2
+ixblob.h                    RCS/ixblob.h,v              50.5
+jtypes.c                    RCS/jtypes.c,v              2008.1
+kludge.c                    RCS/kludge.c,v              1.10
+kludge.h                    RCS/kludge.h,v              1.15
+sqltoken.c                  RCS/sqltoken.c,v            2009.1
+sqltoken.h                  RCS/sqltoken.h,v            2004.3
+sqltype.ec                  RCS/sqltype.ec,v            2011.1
+
+# Source Files
+Announce                        RCS/Announce,v          2015.6
+BugReport                       RCS/BugReport,v         100.5
+ChangeLog                       RCS/ChangeLog,v         2015.4
+
+InformixTechSupport             RCS/InformixTechSupport,v   2013.1
+ItWorks                         RCS/ItWorks,v               100.5
+MANIFEST                        RCS/MANIFEST,v              2015.5
+MANIFEST.SKIP                   RCS/MANIFEST.SKIP,v         2004.2
+META.yml                        RCS/META.yml,v              2015.3
+Makefile.PL                     RCS/Makefile.PL,v           2015.8
+README                          RCS/README,v                2015.3
+TODO                            RCS/TODO,v                  2013.1
+
+apply.setminref.sh              RCS/apply.setminref.sh,v    1.1
+
+Informix.h                      RCS/Informix.h,v        100.3
+Informix.pm                     RCS/Informix.pm,v       2015.2
+Informix.xs                     RCS/Informix.xs,v       2010.1
+dbdattr.ec                      RCS/dbdattr.ec,v        2011.2
+dbdimp.ec                       RCS/dbdimp.ec,v         2013.3
+dbdimp.h                        RCS/dbdimp.h,v          2013.1
+dbdixmap.h                      RCS/dbdixmap.h,v        100.6
+eprintf.c                       RCS/eprintf.c,v         60.1
+esqlbasic.ec                    RCS/esqlbasic.ec,v      2015.1
+esqlc_v5.ec                     RCS/esqlc_v5.ec,v       100.2
+esqlc_v6.ec                     RCS/esqlc_v6.ec,v       2007.1
+esqlcc.pl                       RCS/esqlcc.pl,v         2015.1
+esqlld.pl                       RCS/esqlld.pl,v         2015.1
+esqlperl.h                      RCS/esqlperl.h,v        2007.2
+esqlsed.pl                      RCS/esqlsed.pl,v        2015.1
+esqltest.ec                     RCS/esqltest.ec,v       2015.1
+link.c                          RCS/link.c,v            2007.1
+link.h                          RCS/link.h,v            2003.1
+odbctype.c                      RCS/odbctype.c,v        2008.1
+odbctype.h                      RCS/odbctype.h,v        100.1
+setminref.pl                    RCS/setminref.pl,v      2015.3
+setperl.pl                      RCS/setperl.pl,v        2015.1
+test.all.sh                     RCS/test.all.sh,v       2015.1
+test.c4gl.sh                    RCS/test.c4gl.sh,v      2015.1
+test.one.sh                     RCS/test.one.sh,v       2015.1
+test.quiet.sh                   RCS/test.quiet.sh,v     2015.1
+test.run.sh                     RCS/test.run.sh,v       2015.1
+
+# Release mechanism stuff - not needed elsewhere, mostly.
+Release.Checklist               RCS/Release.Checklist,v 2015.3
+
+# Supporting tools
+lib/Bundle/DBD/Informix.pm          lib/Bundle/DBD/RCS/Informix.pm,v        2013.1
+lib/DBD/Informix/Configure.pm       lib/DBD/Informix/RCS/Configure.pm,v     2015.2
+lib/DBD/Informix/GetInfo.pm         lib/DBD/Informix/RCS/GetInfo.pm,v       2014.1
+lib/DBD/Informix/Metadata.pm        lib/DBD/Informix/RCS/Metadata.pm,v      2014.1
+lib/DBD/Informix/Summary.pm         lib/DBD/Informix/RCS/Summary.pm,v       2014.1
+lib/DBD/Informix/TechSupport.pm     lib/DBD/Informix/RCS/TechSupport.pm,v   2015.2
+lib/DBD/Informix/TestHarness.pm     lib/DBD/Informix/RCS/TestHarness.pm,v   2015.1
+lib/DBD/Informix/TypeInfo.pm        lib/DBD/Informix/RCS/TypeInfo.pm,v      2014.1
+
+# Test scripts
+bug-lvcnn.ec                    RCS/bug-lvcnn.ec,v      1.4
+bug-lvcnn.pl                    RCS/bug-lvcnn.pl,v      2007.13
+t/decgen.pl                     t/RCS/decgen.pl,v       2003.1
+t/dtgen.pl                      t/RCS/dtgen.pl,v        2003.1
+t/t00basic.t                    t/RCS/t00basic.t,v      2014.1
+t/t01stproc.t                   t/RCS/t01stproc.t,v     2014.1
+t/t02ixtype.t                   t/RCS/t02ixtype.t,v     2014.1
+t/t05dbase.t                    t/RCS/t05dbase.t,v      2014.1
+t/t07dblist.t                   t/RCS/t07dblist.t,v     2014.1
+t/t08fork.t                     t/RCS/t08fork.t,v       2014.1
+t/t09date.t                     t/RCS/t09date.t,v       2014.1
+t/t10sqlca.t                    t/RCS/t10sqlca.t,v      2014.1
+t/t12bindval.t                  t/RCS/t12bindval.t,v    2014.1
+t/t13bindref.t                  t/RCS/t13bindref.t,v    2014.1
+t/t14bindcol.t                  t/RCS/t14bindcol.t,v    2014.1
+t/t15bindtyp.t                  t/RCS/t15bindtyp.t,v    2014.1
+t/t20error.t                    t/RCS/t20error.t,v      2014.1
+t/t21mconn.t                    t/RCS/t21mconn.t,v      2014.1
+t/t22mconn.t                    t/RCS/t22mconn.t,v      2014.1
+t/t23mconn.t                    t/RCS/t23mconn.t,v      2014.1
+t/t24mcurs.t                    t/RCS/t24mcurs.t,v      2014.1
+t/t25dratt.t                    t/RCS/t25dratt.t,v      2014.1
+t/t28dtlit.t                    t/RCS/t28dtlit.t,v      2014.1
+t/t29update.t                   t/RCS/t29update.t,v     2014.1
+t/t30update.t                   t/RCS/t30update.t,v     2014.1
+t/t31nulls.t                    t/RCS/t31nulls.t,v      2014.1
+t/t32nulls.t                    t/RCS/t32nulls.t,v      2014.1
+t/t33holdcurs.t                 t/RCS/t33holdcurs.t,v   2014.1
+t/t35cursor.t                   t/RCS/t35cursor.t,v     2014.1
+t/t40rows.t                     t/RCS/t40rows.t,v       2014.1
+t/t41txacoff.t                  t/RCS/t41txacoff.t,v    2014.1
+t/t42txacon.t                   t/RCS/t42txacon.t,v     2014.1
+t/t43trans.t                    t/RCS/t43trans.t,v      2014.1
+t/t44txansi.t                   t/RCS/t44txansi.t,v     2014.1
+t/t46chpblk.t                   t/RCS/t46chpblk.t,v     2014.1
+t/t50update.t                   t/RCS/t50update.t,v     2014.1
+t/t51getinfo.t                  t/RCS/t51getinfo.t,v    2014.1
+t/t53types.t                    t/RCS/t53types.t,v      2014.1
+t/t54native.t                   t/RCS/t54native.t,v     2014.1
+t/t55mdata.t                    t/RCS/t55mdata.t,v      2014.1
+t/t56tabinfo.t                  t/RCS/t56tabinfo.t,v    2014.1
+t/t57tables.t                   t/RCS/t57tables.t,v     2014.1
+t/t58typeinfoall.t              t/RCS/t58typeinfoall.t,v    2014.1
+t/t60unlog.t                    t/RCS/t60unlog.t,v      2014.1
+t/t61varchar.t                  t/RCS/t61varchar.t,v    2014.1
+t/t65updcur.t                   t/RCS/t65updcur.t,v     2014.1
+t/t66insert.t                   t/RCS/t66insert.t,v     2014.1
+t/t72blob.t                     t/RCS/t72blob.t,v       2014.1
+t/t73blobupd.t                  t/RCS/t73blobupd.t,v    2014.1
+t/t74blob.t                     t/RCS/t74blob.t,v       2014.1
+t/t75blob.t                     t/RCS/t75blob.t,v       2014.1
+t/t76blob.t                     t/RCS/t76blob.t,v       2014.1
+t/t77varchar.t                  t/RCS/t77varchar.t,v    2014.1
+t/t78varchar.t                  t/RCS/t78varchar.t,v    2014.1
+t/t90ius.t                      t/RCS/t90ius.t,v        2014.1
+t/t91udts.t                     t/RCS/t91udts.t,v       2014.1
+t/t92rows.t                     t/RCS/t92rows.t,v       2014.1
+t/t93lvarchar.t                 t/RCS/t93lvarchar.t,v   2014.1
+t/t94bool.t                     t/RCS/t94bool.t,v       2014.1
+t/t95int8.t                     t/RCS/t95int8.t,v       2014.1
+t/t96bigint.t                   t/RCS/t96bigint.t,v     2014.1
+t/t98pod.t                      t/RCS/t98pod.t,v        2014.1
+t/t99clean.t                    t/RCS/t99clean.t,v      2014.1
+
+# Various scraps of documentation.
+Notes/FAQ                       Notes/RCS/FAQ,v                     2010.2
+Notes/Working.Versions          Notes/RCS/Working.Versions,v        2015.1
+Notes/bug.reports               Notes/RCS/bug.reports,v             100.7
+Notes/environment.variables     Notes/RCS/environment.variables,v   2007.1
+Notes/eprintf                   Notes/RCS/eprintf,v                 100.1
+Notes/hpux                      Notes/RCS/hpux,v                    100.2
+Notes/hpux-gcc-build.sh         Notes/RCS/hpux-gcc-build.sh,v       100.3
+Notes/linux                     Notes/RCS/linux,v                   100.1
+Notes/load.unload               Notes/RCS/load.unload,v             100.3
+Notes/nonroot.install           Notes/RCS/nonroot.install,v         100.2
+Notes/nt                        Notes/RCS/nt,v                      100.4
+Notes/olipcshm                  Notes/RCS/olipcshm,v                100.1
+Notes/static.build              Notes/RCS/static.build,v            100.1
+Notes/web.servers               Notes/RCS/web.servers,v             100.1
+
+# Examples - how to use Perl + DBI + DBD::Informix
+examples/README                         examples/RCS/README,v                   100.1
+examples/fixin.pl                       examples/RCS/fixin.pl,v                 1.2
+examples/x01fetchall.pl                 examples/RCS/x01fetchall.pl,v           100.1
+examples/x02fetchrow_array.pl           examples/RCS/x02fetchrow_array.pl,v     100.1
+examples/x03fetchrow_arrayref.pl        examples/RCS/x03fetchrow_arrayref.pl,v  100.1
+examples/x04fetchrow_hashref.pl         examples/RCS/x04fetchrow_hashref.pl,v   100.1
+examples/x05fetchall_arrayref.pl        examples/RCS/x05fetchall_arrayref.pl,v  100.1
+examples/x06chopblanks.pl               examples/RCS/x06chopblanks.pl,v         100.1
+examples/x07fetchrow_array.pl           examples/RCS/x07fetchrow_array.pl,v     100.1
+examples/x10cgi_nodbi.pl                examples/RCS/x10cgi_nodbi.pl,v          100.1
+examples/x11cgi_nodbi.pl                examples/RCS/x11cgi_nodbi.pl,v          100.1
+examples/x12cgi_noform.pl               examples/RCS/x12cgi_noform.pl,v         100.1
+examples/x13cgi_noform.pl               examples/RCS/x13cgi_noform.pl,v         100.1
+examples/x14cgi_form.pl                 examples/RCS/x14cgi_form.pl,v           100.1
+examples/x15cgi_form.pl                 examples/RCS/x15cgi_form.pl,v           100.1
+
+# Experiment - simulate scroll cursors.
+examples/fetchscroll.pl                 examples/RCS/fetchscroll.pl,v           1.4
+
+inc/ExtUtils/AutoInstall.pm             inc/ExtUtils/AutoInstall.pm             -
+
+DBD-Informix.jdc            RCS/DBD-Informix.jdc,v      2015.6
+DBD-Informix.msd            RCS/DBD-Informix.msd,v      2015.4
+DBD-Informix.nmd            RCS/DBD-Informix.nmd,v      $Revision: 2015.10 $
+mknmd.sh                    RCS/mknmd.sh,v              2012.1
+prodverstamp.sh             RCS/prodverstamp.sh,v       2015.1

@@ -1,0 +1,45 @@
+* Dancer::Plugin::RPC ==> Example
+
+* This example app has 4 functions grouped in 2 groups:
+    system:   ping, version, list_methods
+    metacpan: search (query => $query)
+These 4 functions are reachable with 3 different protocols (xmlrpc, jsonrpc2 and restrpc) on the same daemon.
+
+* Dependencies
+This example code uses some extra dependencies, I've stated all of them in the cpanfile.
+To install these dependencies in the local directory using Carton:
+
+    $ cd example
+    $ carton install
+
+This installs all dependencies in the example/local directory.
+
+* Start Example app
+Start the Example daemon (simple way):
+
+    $ cd example
+    $ carton exec -- perl -Ilib -I../lib bin/app.psgi
+
+* Testing Example app
+Testing the daemon (with example/bin/do-rpc):
+
+    $ cd example
+
+Any of:
+
+    $ carton exec -- bin/do-rpc -t xmlrpc -u http://localhost:3000/rpc/system -c ping
+    $ carton exec -- bin/do-rpc -t jsonrpc -u http://localhost:3000/rpc/system -c ping
+    $ carton exec -- bin/do-rpc -t restrpc -u http://localhost:3000/rest/system/ping
+
+    $ carton exec -- bin/do-rpc -t xmlrpc -u http://localhost:3000/rpc/system -c version
+    $ carton exec -- bin/do-rpc -t jsonrpc -u http://localhost:3000/rpc/system -c version
+    $ carton exec -- bin/do-rpc -t restrpc -u http://localhost:3000/rest/system/version
+
+    $ carton exec -- bin/do-rpc -t xmlrpc -u http://localhost:3000/rpc/system -c list_methods
+    $ carton exec -- bin/do-rpc -t jsonrpc -u http://localhost:3000/rpc/system -c list_methods
+    $ carton exec -- bin/do-rpc -t restrpc -u http://localhost:3000/rest/system/list_methods
+
+    $ carton exec -- bin/do-rpc -t xmlrpc -u http://localhost:3000/rpc/metacpan -c search query Dancer::Plugin::RPC
+    $ carton exec -- bin/do-rpc -t jsonrpc -u http://localhost:3000/rpc/metacpan -c search query Dancer::Plugin::RPC
+    $ carton exec -- bin/do-rpc -t restrpc -u http://localhost:3000/rest/metacpan/search query Dancer::Plugin::RPC
+

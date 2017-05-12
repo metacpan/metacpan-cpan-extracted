@@ -1,0 +1,55 @@
+
+This is the to-do list for the XBase and DBD::XBase packages:
+
+Short term (I will do them as my time allows):
+
+	Improve write index support.
+
+	Date cdx and dbf bug reports by Dan Albertsson (1999/05/12).
+
+	Handling large cdx files, patch provided by Jon Bloom (1999/08/04).
+
+	Bug report and patch for ntx by Maksim Bazhanov (1999/11/09).
+
+	Bug report (undefined value) by Jose L. Ornelas pending
+	(1999/12/16).
+
+	Bug report and patch for ntx by Sergey Wasiliew pending
+	(2000/01/05).
+
+	Gregory McCann reports (2000/01/13) that the Visual FoxPro v6
+	dbf file leads to Can't use string ("") as a subroutine ref
+	while "strict refs" in use warning. I'd need a test file
+	for that (provided the 0.160 patch for _NULLFLAGS didn't fix
+	it, in which case I'd still appreciate some ideas of what
+	that type means).
+
+	The cdx parsing is still not exactly correct -- Carlos H. Lopez
+	reports (2000/02/07) different number of records than
+	XBase::Index finds for big (50k records) files.
+
+Mid term (would appreciate help or comments):
+
+	Need to fix handling attributes in DBD ...
+
+	When creating table, have option to specify version.
+
+	Finish write index support.
+
+	Add sorting on more than one field in DBD.
+
+	Polish error reporting from XBase::Index.
+
+Long term (it really depends on many things, mainly whether other
+people will demand the feature, offer help):
+
+	Add index support to DBD::XBase (once it's stable in XBase.pm).
+
+	Add memo position caching.
+
+	Some support for LIMIT SQL clause, perhaps.
+
+--
+
+Jan Pazdziora
+

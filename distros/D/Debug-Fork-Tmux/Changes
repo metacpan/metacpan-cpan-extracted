@@ -1,0 +1,583 @@
+Changelog for Debug-Fork-Tmux
+
+v1.000011 2012-12-08T07:31:32
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Moved config init code to subs, no MANIFEST for Git
+   
+   Ticket: 104 (eb29821a-4247-4f54-b851-f6ee696fde56)
+   
+     - Made the init code structured by subs in
+   lib/Debug/Fork/Tmux/Config.pm:
+   
+       - Put paths init code to _default_tmux_paths();
+   
+       - Tests for _default_tmux_paths();
+   
+       - Put fqfn init code to _default_tmux_fqfn().
+   
+   Ticket: 130 (2aee61ba-6027-4e41-8bd3-c06a74684dcc)
+   
+     - Missing test files from git snapshot's MANIFEST
+       ('Warning: the following files are missing in your kit'):
+   
+       - Changes
+   
+       - t/00-compile.t
+   
+       - t/000-report-versions.t
+   
+       - xt/author/critic.t
+   
+       - xt/author/pod-spell.t
+   
+       - xt/author/test-eol.t
+   
+       - xt/release/changes_has_content.t
+   
+       - xt/release/cpan-changes.t
+   
+       - xt/release/dist-manifest.t
+   
+       - xt/release/distmeta.t
+   
+       - xt/release/kwalitee.t
+   
+       - xt/release/meta-json.t
+   
+       - xt/release/minimum-version.t
+   
+       - xt/release/mojibake.t
+   
+       - xt/release/no-tabs.t
+   
+       - xt/release/pod-coverage.t
+   
+       - xt/release/pod-linkcheck.t
+   
+       - xt/release/pod-syntax.t
+   
+       - xt/release/portability.t
+   
+       - xt/release/synopsis.t
+   
+       - xt/release/test-version.t
+   
+       - xt/release/unused-vars.t
+
+
+v1.000010 2012-12-02T19:28:10
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Searching for tmux binary and perl-5.8.9 minimum
+   
+   Ticket: 104 (eb29821a-4247-4f54-b851-f6ee696fde56)
+   
+     Try for several tmux locations
+   
+     Searching is made in:
+   
+       - $ENV{PATH}
+   
+       - Perl interpreter binary's directory
+   
+       - Current directory
+   
+     Just 'tmux' is the last default if that fails.
+   
+   Ticket: 117 (eb4b4931-7c76-4547-a0b3-cf1278251224)
+   
+     perl-5.8.9 in POD
+   
+     Documentation is made according to the fact that 'make test' is 'just
+     fine' under Tmux in perl-5.8.9.
+
+
+v1.000009 2012-11-30T11:24:44
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Carp croaking without '.' on an end
+   
+   Carp::croak()'s message with a '.' at the end should be understanded in
+   t/20-cmd.t
+   
+   Thanks: Richard Foley <richard.foley@rfi.net>
+
+
+v1.000008 2012-11-30T06:31:27
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Better description for POD
+
+
+v1.000007 2012-11-25T13:53:43
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Perl6::Slurp unmet dependency for an author test
+   
+   Perl6::Slurp is required for 'xt/author/10-mkdn-no-backslashes.t' test.
+   Added dependensy to:
+   
+     - Makefile.PL
+   
+     - Build.PL
+
+
+v1.000006 2012-11-23T12:21:03
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Added GitHub page link
+
+ - Ticket: 76 (f80aff98-37f9-41a4-aae3-088c5475a3d2)
+   
+   More links in the 'Support' section
+   
+     - Changes in Support section of weaver.ini;
+   
+     - More content in the module built;
+
+
+v1.000005 2012-11-20T15:51:59
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - id: 82 (03eb37ec-a0d9-4563-8d84-a3ac0464d9e7)
+   
+   summary: disable versions' report in HTML:
+   
+     - No versions shouldn't be regenerated on every build;
+   
+     - tidy up HTML for Docs/, too.
+
+
+v1.000004 2012-11-20T09:51:59
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Ticket: 87 (ecc4ad40-c3f0-41d6-9ced-80ca3d508023)
+   
+   Test::Version seems to be missing from prereqs.  Some of the tests
+   require Test::Version:
+   
+     t/10-use.t 	    (Wstat: 256 Tests: 46 Failed: 1)
+       Failed test:  40
+       Non-zero exit status: 1
+     t/30-tmux.t	    (Wstat: 0 Tests: 1 Failed: 0)
+       Parse errors: Bad plan.	You planned 0 tests but ran 1.
+     Files=7, Tests=114,  2 wallclock secs ( 0.03 usr  0.09 sys +  1.13
+   cusr  1.36 csys =  2.61 CPU)
+   
+     It was observed that the test suite seem to fail without these
+   modules:
+   
+       Test::Version
+   
+   Plan for t/30-tmux.t 'skip_all' should be fixed, too.
+
+
+v1.000003 2012-11-19T14:38:23
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Ticket: 69 (f6be26b2-2de0-4905-889a-47e16120efa1)
+   
+   '\_' in headers in markdown README
+   
+     https://github.com/petr999/Debug-Fork-Tmux
+   
+   Test should be created for no backslashes in the resulting README.mkdn,
+   headers at the least.
+   
+   GitHub page contains backslashes:
+   
+     - SPUNGE\_TMUX\_FQDN
+   
+     - SPUNGE\_TMUX\_CMD\_NEWW
+   
+     - SPUNGE\_TMUX\_CMD\_NEWW\_EXEC
+   
+     - SPUNGE\_TMUX\_CMD\_TTY
+   
+     - DB::get\_fork\_TTY()
+   
+     - \_spawn\_tty()
+   
+     - \_tmux\_new\_window()
+   
+     - \_tmux\_window\_tty( $window\_id )
+   
+     - \_read\_from\_cmd( $cmd => @args )
+   
+     - \_croak\_on\_cmd( $cmd => @args, $happen )
+   
+   Remove them.
+
+
+v1.000002 2012-11-18T18:11:37
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Ticket: 69 (f6be26b2-2de0-4905-889a-47e16120efa1)
+   
+   '\_' in headers in markdown README
+   
+     https://github.com/petr999/Debug-Fork-Tmux
+   
+   GitHub page contains backslashes:
+   
+     - SPUNGE\_TMUX\_FQDN
+   
+     - SPUNGE\_TMUX\_CMD\_NEWW
+   
+     - SPUNGE\_TMUX\_CMD\_NEWW\_EXEC
+   
+     - SPUNGE\_TMUX\_CMD\_TTY
+   
+     - DB::get\_fork\_TTY()
+   
+     - \_spawn\_tty()
+   
+     - \_tmux\_new\_window()
+   
+     - \_tmux\_window\_tty( $window\_id )
+   
+     - \_read\_from\_cmd( $cmd => @args )
+   
+     - \_croak\_on\_cmd( $cmd => @args, $happen )
+   
+   Remove them.
+
+
+v1.000001 2012-11-16T19:12:09
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Ticket: 71 (723ec51b-a15b-41e9-883c-086f13781d8e)
+   
+   skip some author tests
+   
+   Some of the xt/ tests shouldn't be in the master branch. They are too
+   devel-centric. Technically this means: remove xt/ from master branch.
+   
+   Tests known to be absent in DZPB:TestingMania:
+   
+     - 30-fixme.t
+   
+     - 30-nobreakpoints.t
+   
+     - 50-complexity.t
+   
+     - 70-code-coverage.t
+   
+   They should stay.
+
+
+1.000012 2013-03-22T07:59:46
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - Avoid build on ms-windows and other fixes
+   
+   Ticket: 97 (bfe4e01a-8c9a-40b5-bda4-3f1739637231)
+   
+     - Perl6::Slurp unmet dependency for 'no backslashes in markdown' test:
+     "Can't locate Perl6/Slurp.pm in @INC"
+   
+       - Perl6::Slurp is no more required for
+	 'xt/author/10-mkdn-no-backslashes.t' test as it skips test if the
+	 module isn't found;
+   
+       - Removed dependency from:
+   
+	 - Makefile.PL
+   
+	 - Build.PL .
+   
+   Ticket: 106 (d325fed4-72a7-4896-943c-6b99ef1f3bb8)
+   
+     - Mention running under tmux in the docs: "failed to connect to
+   server:
+       Connection refused" if tmux was not found
+   
+       - Description section was added with Tmux dependency.
+   
+       - Configuration and environment section was added that if use
+	 Debug::Fork::Tmux outside tmux then the command line parameters
+   may
+	 point to the right tmux server and session.
+   
+   Ticket: 109 (0604acf5-45ac-4912-9e0d-e641af1ba5ca)
+   
+     - Added tmux version requirement into Description of the POD: "tmux:
+   unknown
+       option -- F" for Tmux version < 1.6.
+   
+   Ticket: 126 (a9ccd0f6-2fc1-4ef4-a98b-92702f90cf09)
+   
+     - Add perl-debugger links to POD
+   
+       - Added to the  'See Also' section of the POD:
+   
+	 - nntp://nntp.perl.org/perl.debugger
+   
+	 - http://debugger.perl.org/
+   
+   Ticket: 134 (bb9900f5-8092-4101-8e13-0cf80f2e2955)
+   
+     - format diags
+   
+       - Formatted error messages in the Diagnostics section in the POD
+   with
+	 C<>.
+   
+   Ticket: 136 (c473ead6-7a08-4cb5-bc98-93cae79bc4e3)
+   
+     - ms-windows avoid build and install
+   
+       - mentioned ms-windows as a (restricted) dependency in the meta info
+   so
+	 build for this platform shall be avoided.
+   
+       - Devel::AssertOS included itself into inc/
+
+
+v1.000000 2012-11-13T17:11:03
+ [Peter Vereshagin <peter@vereshagin.org>]
+ - CPAN preparations
+   
+   Ticket: 59 (8af01bf2-7400-41fc-8d01-5d535f1b7d13)
+   
+     Rename to 'Debug-Fork-Tmux'
+   
+     'Debug-Fork-Tmux' is a more appropriate name for the module. This
+   includes
+     but not limited to:
+   
+       - Namespace change from Spunge::DB to Debug::Fork::Tmux;
+   
+       - Repositories rename from Spunge-DB to Debug-Fork-Tmux.
+   
+   Ticket: 61 (4d0f20cf-f671-41ac-b8aa-1f6b42e8c1b4)
+   
+     Skip tests when no 'tmux' binary found
+   
+     Tests should be skipped if any of this:
+   
+       - No 'tmux' binary is found for execution;
+   
+       - 'tmux' binary returns the version < 1.6;
+   
+       - test is trying to run not under Tmux.
+   
+     'TMUX' environment varuiable seems to show if we're under Tmux.
+
+ - Naming improvements and a config tweakery feature
+   
+   Ticket 52 (612a1586-80e9-4c87-a471-41da4af27900) start private subs
+   with '_'
+   
+     This includes every sub in:
+   
+       - Spunge::DB namespace
+   
+       - Spunge::DB::Config namespace besides get_config()
+   
+   Private subs are those intended to be called from inside of the
+   package only. Start each them with an underscore. This includes
+   subroutines' names:
+   
+     - in the POD
+   
+     - in the tests
+   
+     - in the code
+   
+   Ticket 54 (727e4754-fa31-4e2a-bb0a-187fbbfbf8d2)
+   
+   configuration with environment variables
+   
+   Make it possible for the user to change by mean of environment the
+   values of the configuration parameters, mostly adding the 'SPUNGE_' as
+   a prefix to name them.
+   
+   Make the package Spunge::DB::Config:
+   
+     - all the settings should be retrieved into the Spunge::DB with
+       get_spunge_conf( 'variable_name' ) command
+   
+     - POD on the settings should stay in the Spunge::DB.
+       Spunge::DB::Config should link to the 'CONFIGURATION AND
+       ENVIRONMENT' section though
+   
+     - names of the settings should be lowercase
+   
+     - all of the settings should be kept in the package lexical
+       %_CONF
+   
+   Ticket 56 (7ba4dc92-fbb3-4140-b059-6e2cba45d010)
+   
+   Make a constant or environment variable for a command in the tmux new
+   window
+   
+   Currently Tmux makes a new window with a system command
+   
+     sleep 1000000
+   
+   Make the command to be the constant assigned at the compilation from
+   the environment variable.
+   
+     - config key is 'tmux_cmd_neww_exec'
+   
+     - environment variable is SPUNGE_TMUX_CMD_NEWW_EXEC
+
+ - POD and tests improvements
+   
+   Ticket 30 (82676ebc-d911-43d7-96d9-8c9cbc906508)
+   
+     set up web links:
+   
+       - GitHub page of the Spunge-DB project;
+   
+       - GitWeb page  of the Spunge-DB project at a Vereshagin.Org;
+   
+       - Bugzilla page of the Spunge-DB project at a Vereshagin.Org, and
+	 in a BUGS AND LIMITATIONS section, too.
+   
+   Ticket 37 (120bc9ce-ad91-469f-8060-96aef1d0420e)
+   
+     Tmux and Perl dependencies in POD. Add to the DEPENDENCIES section
+     of the POD:
+   
+       - Tmux, the terminal multiplexer;
+   
+       - Perl, the programmin language.
+   
+     supplied with web links to each of them.
+   
+   Ticket 39 (eb90c260-f020-48f7-a230-5262a04d57f0)
+   
+     don't check xt/ for strict and warnings
+   
+     t/10-use.t should not check xt/ for:
+   
+       - use strict
+   
+       - use warnings
+   
+     It should only check xt/ for syntax.
+   
+   Ticket 41 (08917361-a765-4390-91a8-c7dacca551b2)
+   
+     dependencies satisfied in POD by perl minimum requirement
+   
+     The POD's 'DEPENDENCIES' section contains the modules already found
+     in the minimum Perl version:
+   
+       - Config
+   
+       - Cwd
+   
+       - DB
+   
+       - ExtUtils::MakeMaker
+   
+       - File::Find
+   
+       - File::Spec
+   
+     Such a dependencies should be listed in one line.
+   
+   Ticket 43 (ae7f0794-ef68-43d8-beeb-42940c997fd1)
+   
+     Wrap text (flatten) on READMEs
+   
+     Make POD and READMEs lines of text no longer than 76 characters
+
+ - version bump to 0.0.10
+
+ - No Changes needed in the master branch
+
+ - Bump up to v0.0.9
+
+ - version bump to v0.0.9
+
+ - More correct template syntax for Changes
+
+ - Manifest about Changes
+
+ - version bump to v0.0.8
+
+ - Changes are added to the master branch
+
+ - PEADME.pod version bump
+
+ - More files on the block
+
+ - Removed timestamp from README.html
+
+ - Removed timestamp from README.html
+
+ - README.html removed due to having a timestamp
+
+ - added READMEs
+
+ - Files of a build in the master branch
+
+ - README.pod version bump
+
+ - added README.pod
+
+ - Ticket 30 (82676ebc-d911-43d7-96d9-8c9cbc906508)
+   
+   set up web links:
+   
+     - GitHub repository of the Spunge-DB project;
+   
+     - GitWeb page  of the Spunge-DB project at a Vereshagin.Org;
+   
+     - Bugzilla page of the Spunge-DB project at a Vereshagin.Org, and in a
+       BUGS AND LIMITATIONS section, too.
+
+ - POD fixes
+   
+   Ticket 11 (fb4da310-a328-4fa3-b8b7-0185e95919a7)
+   Smaller POD fixes:
+   
+     - build POD SYNOPSIS section. Disable DZP:PodVersion in favor of
+       PodWeaver;
+   
+     - ' $DB::fork_TTY to the same <Str> ' should be enclosed in C<>;
+   
+     - AUTHOR section should include http://vereshagin.org;
+   
+     - Function names in the POD headers should be supplied the braces();
+   
+     - Build CONFIGURATION AND ENVIRONMENT section in the POD;
+   
+     - Some of the  =sub headers lack '>' in favor of E<gt>.
+   
+   Ticket 14 (0ec84f72-560e-4850-a31f-34b90518b338)
+   DEPENDENCIES section:
+   
+     - Make a DEPENDENCIES section in the POD in a PBP way.
+   
+   Ticket 17 (127641d7-69f1-4c5c-b937-3866c7ecd76b)
+   write croak messages to DIAGNOSTICS POD
+   
+   DIAGNOSTICS POD should be filled with croak_on_cmd() messages.
+   
+   Ticket 19 (85782e29-4094-4cb4-9cf4-c9be38b5fa8a)
+   Point POD links from perl built-ins to the corresponding perlfunc
+   sections. Make them work in the resulting HTML:
+   
+     - L<system>;
+   
+     - L<fork>.
+   
+   all of them are perl built-in subroutines.
+
+ - WORKSFORME
+   
+   Working code is created:
+   
+     - the module Spunge::DB with subs, docs, etc.
+     - tests include:
+   
+       - 10-use.t tries to use the module. No bad if it only require()s the
+	 module instead of use() as module does not @EXPORT anything;
+       - 20-cmd.t tries the basic commands and the module's built-in
+   exception
+	 catching;
+       - 30-tmux.t tries to call functions executing the Tmux.
+
+ - Added 'use' and 'strict' test
+
+ - Added synopsis to POD.
+
+ - Test build
+
+ - initial commit
+
+

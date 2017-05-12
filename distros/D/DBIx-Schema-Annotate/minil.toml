@@ -1,0 +1,6 @@
+name = "DBIx-Schema-Annotate"
+# badges = ["travis"]
+authority="cpan:TOKUBASS"
+
+module_maker="ModuleBuildTiny"
+

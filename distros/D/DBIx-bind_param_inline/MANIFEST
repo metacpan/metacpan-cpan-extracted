@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/SQLite.t
+lib/DBIx/bind_param_inline.pm
+META.yml                                 Module meta-data (added by MakeMaker)

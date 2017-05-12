@@ -1,0 +1,39 @@
+Revision history for Dist-Zilla-Plugin-MungeFile-WithDataSection
+
+0.009     2015-08-19 01:20:12Z
+          - split off much of this distribution into
+            Dist::Zilla::Plugin::MungeFile, for greater visibility
+
+0.008     2015-08-18 01:55:04Z
+          - mark Dist::Zilla::Plugin::MungeFile::WithData as deprecated in metadata
+          - updated some bits of the distribution packaging
+
+0.007     2014-01-27 01:31:07Z
+          - include our full config data in target dist's metadata
+          - properly handle files where __DATA__ appears after __END__
+          - renamed to [MungeFile::WithDataSection] (the original plugin still
+            lives on, for now, in deprecated form)
+
+0.006     2013-12-08 17:25:42Z
+          - bump prereq for MooseX::SlurpyConstructor to bypass old metaclass
+            issues
+
+0.005     2013-11-30 17:41:00Z
+          - warnings tests bypassed during installation
+          - re-release to fix compile test
+
+0.004     2013-08-27 01:01:57Z
+          - fixed option names to match documentation (sorry, neilb!)
+          - now documenting that we pass the dist and plugin objects to
+            templates
+
+0.003     2013-08-20 01:53:02Z
+          - now also passing the $plugin variable into templates
+
+0.002     2013-08-16 05:43:08Z
+          - simplified code, and greatly simplified use, by no longer loading
+            the target file before applying the templating
+
+0.001     2013-08-16 05:24:16Z
+          - Initial release.
+

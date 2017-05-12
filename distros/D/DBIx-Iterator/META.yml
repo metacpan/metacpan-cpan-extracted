@@ -1,0 +1,24 @@
+---
+abstract: 'Query your database using iterators and save memory'
+author:
+  - 'Robin Smidsrød <robin@smidsrod.no>'
+build_requires:
+  DBI: 0
+  SQL::Statement: 1.401
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Iterator
+requires:
+  Carp: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/robinsmidsrod/DBIx-Iterator.git
+version: 0.0.2

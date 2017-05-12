@@ -1,0 +1,551 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>
+      Debug::Fork::Tmux::Config
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <style type="text/css">
+<!--/*--><![CDATA[/*><!--*/
+    BODY {
+    background: white;
+    color: black;
+    font-family: arial,sans-serif;
+    margin: 0;
+    padding: 1ex;
+    }
+
+    A:link, A:visited {
+    background: transparent;
+    color: #006699;
+    }
+
+    A[href="#POD_ERRORS"] {
+    background: transparent;
+    color: #FF0000;
+    }
+
+    DIV {
+    border-width: 0;
+    }
+
+    DT {
+    margin-top: 1em;
+    margin-left: 1em;
+    }
+
+    .pod { margin-right: 20ex; }
+
+    .pod PRE     {
+    background: #eeeeee;
+    border: 1px solid #888888;
+    color: black;
+    padding: 1em;
+    white-space: pre;
+    }
+
+    .pod H1      {
+    background: transparent;
+    color: #006699;
+    font-size: large;
+    }
+
+    .pod H1 A { text-decoration: none; }
+    .pod H2 A { text-decoration: none; }
+    .pod H3 A { text-decoration: none; }
+    .pod H4 A { text-decoration: none; }
+
+    .pod H2      {
+    background: transparent;
+    color: #006699;
+    font-size: medium;
+    }
+
+    .pod H3      {
+    background: transparent;
+    color: #006699;
+    font-size: medium;
+    font-style: italic;
+    }
+
+    .pod H4      {
+    background: transparent;
+    color: #006699;
+    font-size: medium;
+    font-weight: normal;
+    }
+
+    .pod IMG     {
+    vertical-align: top;
+    }
+
+    .pod .toc A  {
+    text-decoration: none;
+    }
+
+    .pod .toc LI {
+    line-height: 1.2em;
+    list-style-type: none;
+    }
+
+    /*]]>*/-->
+    </style>
+  </head>
+  <body class='pod'>
+    <!--
+
+ If you want to change this HTML document, you probably shouldn't do that
+   by changing it directly.  Instead, see about changing the calling options
+   to Pod::Simple::HTML, and/or subclassing Pod::Simple::HTML,
+   then reconverting this document from the Pod source.
+   When in doubt, email the author of Pod::Simple::HTML for advice.
+   See 'perldoc Pod::Simple::HTML' for more info.
+
+-->
+    <!-- start doc -->
+    <a name='___top' class='dummyTopAnchor'></a>
+    <h1>
+      Debug::Fork::Tmux::Config
+    </h1>
+    <p>
+      Configuration system for Debug::Fork::Tmux
+    </p>
+    <div class='indexgroup'>
+      <ul class='indexList indexList1'>
+        <li class='indexItem indexItem1'>
+          <a href='#NAME'>NAME</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#VERSION'>VERSION</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SYNOPSIS'>SYNOPSIS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DESCRIPTION'>DESCRIPTION</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SUBROUTINES%2FMETHODS'>SUBROUTINES/METHODS</a>
+          <ul class='indexList indexList2'>
+            <li class='indexItem indexItem2'>
+              <a href='#PUBLIC'>PUBLIC</a>
+              <ul class='indexList indexList3'>
+                <li class='indexItem indexItem3'>
+                  <a href=
+                  '#get_config(_Str_the_name_of_the_option_)'>get_config(
+                  Str the name of the option )</a>
+                </li>
+              </ul>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#PRIVATE'>PRIVATE</a>
+              <ul class='indexList indexList3'>
+                <li class='indexItem indexItem3'>
+                  <a href=
+                  '#get_all_config_keys()'>get_all_config_keys()</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#CONFIGURATION_AND_ENVIRONMENT'>CONFIGURATION AND
+          ENVIRONMENT</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DIAGNOSTICS'>DIAGNOSTICS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#BUGS_AND_LIMITATIONS'>BUGS AND LIMITATIONS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SUPPORT'>SUPPORT</a>
+          <ul class='indexList indexList2'>
+            <li class='indexItem indexItem2'>
+              <a href='#Perldoc'>Perldoc</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Websites'>Websites</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Email'>Email</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Bugs_%2F_Feature_Requests'>Bugs / Feature
+              Requests</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Source_Code'>Source Code</a>
+            </li>
+          </ul>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#AUTHOR'>AUTHOR</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#COPYRIGHT_AND_LICENSE'>COPYRIGHT AND LICENSE</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SEE_ALSO'>SEE ALSO</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DISCLAIMER_OF_WARRANTY'>DISCLAIMER OF WARRANTY</a>
+        </li>
+      </ul>
+    </div>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="VERSION" id="VERSION">VERSION</a>
+    </h2>
+    <p>
+      This documentation refers to the module contained in the distribution
+      <code>Debug-Fork-Tmux</code> version 1.000012.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SYNOPSIS" id="SYNOPSIS">SYNOPSIS</a>
+    </h2>
+    <pre>
+    use Debug::Fork::Tmux;
+
+    my $tmux_fqfn = Debug::Fork::Tmux-&gt;config( 'tmux_fqfn' );
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DESCRIPTION" id="DESCRIPTION">DESCRIPTION</a>
+    </h2>
+    <p>
+      This module reads description from environment variables and use
+      defaults if those are not set.
+    </p>
+    <p>
+      For example <code>tmux_fqfn</code> can be overridden with
+      <code>DFTMUX_FQFN</code> variable, and so on.
+    </p>
+    <p>
+      The <code>SPUNGE_*</code> variables are supported yet but deprecated
+      and will be removed.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SUBROUTINES/METHODS">SUBROUTINES/METHODS</a>
+    </h2>
+    <p>
+      All of the following are static methods:
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="PUBLIC" id="PUBLIC">PUBLIC</a>
+    </h3>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="get_config(_Str_the_name_of_the_option_)"><code>get_config( Str
+      the name of the option )</code></a>
+    </h4>
+    <p>
+      Retrieves configuration stored in an internal
+      <code>Debug::Fork::Tmux::Config</code> constants.
+    </p>
+    <p>
+      Returns <code>Str</code> value of the configuration parameter.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="PRIVATE" id="PRIVATE">PRIVATE</a>
+    </h3>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="get_all_config_keys()"><code>get_all_config_keys()</code></a>
+    </h4>
+    <p>
+      Returns <code>Array[Str]</code> names of all the configuration
+      parameters.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="CONFIGURATION_AND_ENVIRONMENT" id=
+      "CONFIGURATION_AND_ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a>
+    </h2>
+    <p>
+      See <a href=
+      "http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux#CONFIGURATION_AND_ENVIRONMENT"
+      class="podlinkpod">"CONFIGURATION AND ENVIRONMENT" in
+      Debug::Fork::Tmux</a>.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DIAGNOSTICS" id="DIAGNOSTICS">DIAGNOSTICS</a>
+    </h2>
+    <dl>
+      <dt>
+        <a name="Undefined_in_a_configuration:_&lt;key&gt;"><code>Undefined
+        in a configuration: &lt;key&gt;</code></a>
+      </dt>
+      <dd>
+        <p>
+          Dies if no key asked was found in the configuration.
+        </p>
+      </dd>
+    </dl>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="BUGS_AND_LIMITATIONS" id="BUGS_AND_LIMITATIONS">BUGS AND
+      LIMITATIONS</a>
+    </h2>
+    <p>
+      You can make new bug reports, and view existing ones, through the web
+      interface at <a href=
+      "http://bugs.vereshagin.org/product/Debug-Fork-Tmux" class=
+      "podlinkurl">http://bugs.vereshagin.org/product/Debug-Fork-Tmux</a>.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SUPPORT" id="SUPPORT">SUPPORT</a>
+    </h2>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Perldoc" id="Perldoc">Perldoc</a>
+    </h3>
+    <p>
+      You can find documentation for this module with the perldoc command.
+    </p>
+    <pre>
+  perldoc Debug::Fork::Tmux
+</pre>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Websites" id="Websites">Websites</a>
+    </h3>
+    <p>
+      The following websites have more information about this module, and
+      may be of help to you. As always, in addition to those websites
+      please use your favorite search engine to discover more resources.
+    </p>
+    <ul>
+      <li>MetaCPAN
+        <p>
+          A modern, open-source CPAN search engine, useful to view POD in
+          HTML format.
+        </p>
+        <p>
+          <a href="http://metacpan.org/release/Debug-Fork-Tmux" class=
+          "podlinkurl">http://metacpan.org/release/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>Search CPAN
+        <p>
+          The default CPAN search engine, useful to view POD in HTML
+          format.
+        </p>
+        <p>
+          <a href="http://search.cpan.org/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://search.cpan.org/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>RT: CPAN's Bug Tracker
+        <p>
+          The RT ( Request Tracker ) website is the default bug/issue
+          tracking system for CPAN.
+        </p>
+        <p>
+          <a href=
+          "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux" class=
+          "podlinkurl">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>AnnoCPAN
+        <p>
+          The AnnoCPAN is a website that allows community annotations of
+          Perl module documentation.
+        </p>
+        <p>
+          <a href="http://annocpan.org/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://annocpan.org/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Ratings
+        <p>
+          The CPAN Ratings is a website that allows community ratings and
+          reviews of Perl modules.
+        </p>
+        <p>
+          <a href="http://cpanratings.perl.org/d/Debug-Fork-Tmux" class=
+          "podlinkurl">http://cpanratings.perl.org/d/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Forum
+        <p>
+          The CPAN Forum is a web forum for discussing Perl modules.
+        </p>
+        <p>
+          <a href="http://cpanforum.com/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://cpanforum.com/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPANTS
+        <p>
+          The CPANTS is a website that analyzes the Kwalitee ( code metrics
+          ) of a distribution.
+        </p>
+        <p>
+          <a href="http://cpants.perl.org/dist/overview/Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://cpants.perl.org/dist/overview/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers
+        <p>
+          The CPAN Testers is a network of smokers who run automated tests
+          on uploaded CPAN distributions.
+        </p>
+        <p>
+          <a href="http://www.cpantesters.org/distro/D/Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://www.cpantesters.org/distro/D/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers Matrix
+        <p>
+          The CPAN Testers Matrix is a website that provides a visual
+          overview of the test results for a distribution on various
+          Perls/platforms.
+        </p>
+        <p>
+          <a href="http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers Dependencies
+        <p>
+          The CPAN Testers Dependencies is a website that shows a chart of
+          the test results of all dependencies for a distribution.
+        </p>
+        <p>
+          <a href="http://deps.cpantesters.org/?module=Debug::Fork::Tmux"
+          class=
+          "podlinkurl">http://deps.cpantesters.org/?module=Debug::Fork::Tmux</a>
+        </p>
+      </li>
+    </ul>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Email" id="Email">Email</a>
+    </h3>
+    <p>
+      You can email the author of this module at
+      <code>peter@vereshagin.org</code> asking for help with any problems
+      you have.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Bugs_/_Feature_Requests">Bugs / Feature Requests</a>
+    </h3>
+    <p>
+      Please report any bugs or feature requests by email to
+      <code>peter@vereshagin.org</code>, or through the web interface at
+      <a href="http://bugs.vereshagin.org/product/Debug-Fork-Tmux" class=
+      "podlinkurl">http://bugs.vereshagin.org/product/Debug-Fork-Tmux</a>.
+      You will be automatically notified of any progress on the request by
+      the system.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Source_Code" id="Source_Code">Source Code</a>
+    </h3>
+    <p>
+      The code is open to the world, and available for you to hack on.
+      Please feel free to browse it and play with it, or whatever. If you
+      want to contribute patches, please send me a diff or prod me to pull
+      from your repository :)
+    </p>
+    <p>
+      <a href="http://gitweb.vereshagin.org/Debug-Fork-Tmux" class=
+      "podlinkurl">http://gitweb.vereshagin.org/Debug-Fork-Tmux</a>
+    </p>
+    <pre>
+  git clone https://github.com/petr999/Debug-Fork-Tmux.git
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="AUTHOR" id="AUTHOR">AUTHOR</a>
+    </h2>
+    <p>
+      <a href="http://vereshagin.org" class="podlinkurl">Peter
+      Vereshagin</a> &lt;peter@vereshagin.org&gt;
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="COPYRIGHT_AND_LICENSE" id="COPYRIGHT_AND_LICENSE">COPYRIGHT AND
+      LICENSE</a>
+    </h2>
+    <p>
+      This software is Copyright (c) 2013 by Peter Vereshagin.
+    </p>
+    <p>
+      This is free software, licensed under:
+    </p>
+    <pre>
+  The (three-clause) BSD License
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SEE_ALSO" id="SEE_ALSO">SEE ALSO</a>
+    </h2>
+    <p>
+      Please see those modules/websites for more information related to
+      this module.
+    </p>
+    <ul>
+      <li>
+        <a href="http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux"
+        class="podlinkpod">Debug::Fork::Tmux</a>
+      </li>
+      <li>
+        <a href=
+        "http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux%3A%3AConfig"
+        class="podlinkpod">Debug::Fork::Tmux::Config</a>
+      </li>
+      <li>
+        <a href="http://perlmonks.org/?node_id=128283" class=
+        "podlinkurl">http://perlmonks.org/?node_id=128283</a>
+      </li>
+      <li>
+        <a href="nntp://nntp.perl.org/perl.debugger" class=
+        "podlinkurl">nntp://nntp.perl.org/perl.debugger</a>
+      </li>
+      <li>
+        <a href="http://debugger.perl.org/" class=
+        "podlinkurl">http://debugger.perl.org/</a>
+      </li>
+    </ul>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DISCLAIMER_OF_WARRANTY" id="DISCLAIMER_OF_WARRANTY">DISCLAIMER
+      OF WARRANTY</a>
+    </h2>
+    <p>
+      BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO
+      WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+      EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+      OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY
+      KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+      IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+      PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+      SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+      THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+    </p>
+    <p>
+      IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+      WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+      REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+      LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL,
+      INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR
+      INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF
+      DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR
+      THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+      SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGES.
+    </p><!-- end doc -->
+  </body>
+</html>

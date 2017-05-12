@@ -1,0 +1,69 @@
+---
+abstract: 'entropy (randomness) management'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Crypt::Rijndael: 0
+  Data::Float: 0.008
+  IO::File: 1.03
+  Module::Build: 0
+  Test::More: 0
+  constant: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+conflicts:
+  Math::BigInt: 0
+  Math::BigRat: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Entropy
+provides:
+  Data::Entropy:
+    file: lib/Data/Entropy.pm
+    version: 0.007
+  Data::Entropy::Algorithms:
+    file: lib/Data/Entropy/Algorithms.pm
+    version: 0.007
+  Data::Entropy::RawSource::CryptCounter:
+    file: lib/Data/Entropy/RawSource/CryptCounter.pm
+    version: 0.007
+  Data::Entropy::RawSource::Local:
+    file: lib/Data/Entropy/RawSource/Local.pm
+    version: 0.007
+  Data::Entropy::RawSource::RandomOrg:
+    file: lib/Data/Entropy/RawSource/RandomOrg.pm
+    version: 0.007
+  Data::Entropy::RawSource::RandomnumbersInfo:
+    file: lib/Data/Entropy/RawSource/RandomnumbersInfo.pm
+    version: 0.007
+  Data::Entropy::Source:
+    file: lib/Data/Entropy/Source.pm
+    version: 0.007
+requires:
+  Carp: 0
+  Crypt::Rijndael: 0
+  Data::Float: 0.008
+  Errno: 1.00
+  Exporter: 0
+  HTTP::Lite: 2.2
+  IO::File: 1.03
+  Params::Classify: 0
+  constant: 0
+  integer: 0
+  parent: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.007

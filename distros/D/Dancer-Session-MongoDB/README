@@ -1,0 +1,132 @@
+NAME
+    Dancer::Session::MongoDB - MongoDB session backend for Dancer.
+
+SYNOPSIS
+            # in your config.yml file:
+            session: "MongoDB"
+            mongodb_session_db: "myapp_database"    # required
+            mongodb_session_coll: "myapp_sessions"  # optional, defaults to 'sessions'
+
+            # you can pass connection options to MongoDB::MongoClient::new() by
+            # prefixing them with 'mongodb_' like so:
+            mongodb_host: "mongo.server.com"        # defaults to 'localhost'
+            mongodb_port: 27017                     # this is the default
+            mongodb_username: "mongodb_user"
+            mongodb_password: "secret_password"
+
+            # now you can use sessions in your app as described in L<Dancer::Session>.
+            # for example:
+            session user => params->{user};
+        
+            ...
+        
+            if (session('user')) {
+                    my $msg = "Welcome back, ".session('user');
+            }
+
+DESCRIPTION
+    This module implements a MongoDB based session engine for Dancer
+    applications. It keeps session data in a MongoDB collection, providing
+    you with a simple, easy to setup, yet powerful session backend.
+
+    If you're running your Dancer application in a PSGI/Plack environment,
+    please consider using Plack::Session::Store::MongoDB with
+    Dancer::Session::PSGI instead.
+
+    This module is a subclass of Dancer::Session::Abstract.
+
+CONFIGURATION
+    In order to use this session engine, you need to define a few settings
+    in your app's settings file (or in your app's code):
+
+    *   session
+
+        Give this the value "MongoDB" (using this *exact* capitalization).
+        This is required.
+
+    *   mongodb_session_db
+
+        Give this the name of the MongoDB database to use. This is required.
+
+    *   mongodb_session_coll
+
+        The name of the collection in which session objects will be stored.
+        Optional, defaults to 'sessions'.
+
+    Optionally, you can also define options for initiating the connection to
+    the MongoDB server, as described in "ATTRIBUTES" in MongoDB::Connection,
+    by prefixing them with 'mongodb_'. For example, if your database
+    requires authentication, you can pass the 'mongodb_username',
+    'mongodb_password' and possibly 'mongodb_db_name' to authenticate. Or,
+    if your database server is not located on the same server your
+    application resides, then you can provide 'mongodb_host' and possibly
+    'mongodb_port'.
+
+CLASS METHODS
+  init()
+  create()
+    Creates a new session object and returns it.
+
+  retrieve( $id )
+    Returns the session object whose ID is $id if exists, otherwise returns
+    a false value.
+
+OBJECT METHODS
+  flush()
+    Writes the session object to the MongoDB database. If a database error
+    occurs and the object is not saved, this method will die.
+
+  destroy()
+    Removes the session object from the MongoDB database. If a database
+    error occurs and the object is not removed, this method will generate a
+    warning.
+
+AUTHORS
+    Ido Perlmuter, "<ido at ido50 dot net>"
+
+    Rodrigo de Oliveira, "<rodrigolive at gmail dot com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dancer-session-mongodb at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Session-MongoDB>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Session::MongoDB
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Session-MongoDB>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Dancer-Session-MongoDB>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Dancer-Session-MongoDB>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Dancer-Session-MongoDB/>
+
+ACKNOWLEDGEMENTS
+    Alexis Sukrieh, author of Dancer::Session::Memcached, on which this
+    module is based.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2014 Ido Perlmuter.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

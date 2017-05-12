@@ -1,0 +1,42 @@
+Dancer-Plugin-RPC-XML
+
+This Plugin defines RPC::XML handlers in Dancer.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Plugin::RPC::XML
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-RPC-XML
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-RPC-XML
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-RPC-XML
+
+    Search CPAN
+        http://search.cpan.org/dist/Dancer-Plugin-RPC-XML/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Jesper Dalberg
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

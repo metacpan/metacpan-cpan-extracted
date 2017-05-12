@@ -1,0 +1,59 @@
+---
+abstract: 'Dancer 2 session storage with MongoDB'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dancer2: '0.1'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.22'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  MongoDB: '0'
+  Plack::Test: '0'
+  Safe::Isa: '0'
+  Test::More: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-MongoDB
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dancer2::Session::MongoDB:
+    file: lib/Dancer2/Session/MongoDB.pm
+    version: '0.004'
+requires:
+  Dancer2: '0.1'
+  Dancer2::Core::Role::SessionFactory: '0'
+  Dancer2::Core::Types: '0'
+  MongoDB::MongoClient: '0'
+  MongoDB::OID: '0'
+  Moo: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/dancer2-session-mongodb/issues
+  homepage: https://github.com/PerlDancer/dancer2-session-mongodb
+  repository: https://github.com/PerlDancer/dancer2-session-mongodb.git
+version: '0.004'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Jason A. Crome <jason@crome-plated.com>'
+  - 'Peter Mottram <peter@sysnix.com>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

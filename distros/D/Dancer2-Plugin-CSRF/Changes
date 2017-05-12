@@ -1,0 +1,8 @@
+Revision history for Dancer2-Plugin-CSRF
+
+1.01 2016-12-25T14:14:00
+        Dancer2 required version fixed
+
+1.0 2016-12-23T16:21:00
+        First version, released on an unsuspecting world.
+

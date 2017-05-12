@@ -1,0 +1,282 @@
+Revision history for DBIx-NinjaORM
+
+v3.1.0  2017-03-22
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies.
+
+v3.0.2  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - Added option to customize the dumper function used (GH-3).
+        - General cleanup.
+
+v3.0.1  2013-08-25
+        - Fixed double-planning tests when memcache isn't running (GH-21).
+        - Reordered new tests.
+
+v3.0.0  2013-08-25
+        - SEE UPGRADE NOTES: refactored class configuration into
+          DBIx::NinjaORM::StaticClassInfo (GH-15).
+        - SEE UPGRADE NOTES: added get_info() and deprecated some accessors
+          which will be removed in a next version (GH-19).
+        - Added document to gather upgrade instructions between versions.
+        - Added ability to use real date types for 'created' and 'modified'
+          fields (GH-2).
+        - Set up mechanism to retrieve and cache schema information, to power
+          new features of NinjaORM that rely on knowing the table structures (GH-16).
+        - Added the ability to select explicitely or exclude fields from the
+          underlying table as part of retrieve_list(), as opposed to table.* (GH-14).
+        - Fixed bug where an object ID would exist in the list cache but have
+          been deleted from the database and return undef instead of being
+          skipped in the results of retrieve_list().
+        - Fixed bug when retrieving cache misses by ID, now passing the correct
+          arguments for dbh/show_queries.
+        - Refactored retrieve_list() argument handling for list cache key
+          generation.
+        - Code cleanup.
+        - Better test coverage (including GH-10, GH-18).
+				* Massive tests cleanup, reusable test classes are now in
+          t/lib/TestSubclass/.
+
+v2.5.1  2013-07-11
+        - Fixed retrieve_list() when a 'created' field is not present (GH-17).
+          Thanks Kate Kirby!
+        - Added tests for retrieve_list() and update() without created/modified
+          fields.
+        - Documented pagination for retrieve_list().
+        - Added release tests for file encoding.
+
+v2.5.0  2013-05-22
+        - Added 'like' and 'not_like' operators to retrieve_list() (GH-13).
+          Thanks Brian Voorhes!
+
+v2.4.4  2013-03-30
+        - Replaced Test::NoWarnings with Test::FailWarnings.
+        - Added new release tests.
+        - Moved release tests to xt/, updated Build.PL.
+
+v2.4.3  2013-03-21
+        - (GitHub #7) Fixed warnings in Perl 5.16.
+        - (GitHub #8) Fixed manifest.
+        - (GitHub #9) Fixed prerequisite.
+
+v2.4.2  2013-03-18
+        - Moved request tracker from RT to GitHub.
+        - Changed links from Search CPAN to MetaCPAN.
+
+v2.4.1  2013-02-24
+        - (RT #83513) Fixed incorrect croak() in verbose mode.
+        - (RT #83514) Don't delete cache if no cache key can be determined.
+        - Modified validate_data() to check for existence, not just defineness
+          of keys, as undefined keys would still impact insert/update.
+
+v2.4.0  2013-02-19
+        - Fixed detecting invalid filtering criteria [].
+
+v2.3.2  2013-01-27
+        - Fixed propagation of DBI failures in update().
+        - Added tests to cover DBI failures for insert(), update(), and
+          remove().
+        - Added 'allow_subclassing' option for retrieve_list().
+        - Added new tests for pagination in retrieve_list_nocache().
+        - Cleaned up tests and code.
+
+v2.3.1  2013-01-05
+        - Fixed call to selectall_arrayref() in retrieve_list_nocache() and
+          added error handling (thanks Jacob Rose).
+        - Added tests to cover locking with joins in retrieve_list_nocache().
+        - Fixed list of locked IDs in retrieve_list_nocache().
+        - retrieve_list_nocache() now ignores lock=1 for SQLite.
+
+v2.3.0  2012-12-04
+        - Refactored to use Log::Any instead of carp/confess.
+
+v2.2.1  2012-12-04
+        - Split limit and offset, for PostgreSQL.
+
+v2.2.0  2012-12-04
+        - Modified assert_dbh() to allow coderefs that return a DBI::db object
+          in either default_dbh from static_class_information() or from its
+          first parameter.
+        - Added tests for the pagination feature of retrieve_list().
+        - Added tests for assert_dbh().
+        - Cleaned up warning that should only show up in verbose mode.
+
+v2.1.3  2012-12-03
+        - Fixed pagination in retrieve_list().
+
+v2.1.2  2012-11-30
+        - Added tests for remove() and commit().
+        - If custom clauses are present, filters are not required anymore.
+        - Checked filters argument in new() to detect issues early.
+        - Sorted filters in parse_filtering_criteria() to make output easily
+          testable.
+
+v2.1.1  2012-11-26
+        - Ignored Devel::Cover output files.
+        - Added Perl 5.10 as a requirement.
+
+v2.1.0  2012-11-22
+        - Refactored retrieve_list() and new() to use a hashref as first
+          argument, like insert() and update().
+        - Reorganized methods alphabetically.
+
+v2.0.0  2012-11-19
+        - Generalized code, added more tests and documentation.
+        - First public release.
+
+v1.9.1  2012-10-24
+        - Added 'not_null' operator.
+
+v1.9.0  2012-10-18
+        - Updated to use two separate cache times, one for the translation from
+          arguments to IDs (list cache) and one for the objects (object cache).
+          Thanks Jennifer Pinkham!
+
+v1.8.4  2012-10-02
+        - Added get_object_cache_keys().
+
+v1.8.3  2012-10-01
+        - Added "set" parameter to update() to allow specifying complex set
+          clauses.
+
+v1.8.2  2012-09-07
+        - Added option to trace cache operations.
+
+v1.8.1  2012-09-06
+        - Adjusted the order of when we invalidate the object cache in update().
+        - Forced the cache keys and values to be lower case, to account for
+          case-insensitive collations.
+
+v1.8.0  2012-08-30
+        - Implemented cache of the translation from arguments to IDs in
+          retrieve_list(). Thanks Kate Kirby for pair programming this change!
+
+v1.7.7  2012-05-22
+        - Modified parse_filtering_criteria() to return whether filtering fields
+          were detected in the arguments passed to retrieve_list(),
+          independently of whether filtering clauses are generated or not.
+        - Tweaked retrieve_list() to warn about missing filtering fields only
+          when none was passed to retrieve_list(), and ignore the case when all
+          of them are undef or empty arrays.
+
+v1.7.6  2012-05-08
+        - Improved get() to prevent retrieving private properties and to error
+          on non-existent properties only when the object comes from
+          retrieve_list() which is guaranteed to populate the object correctly.
+
+v1.7.5  2012-03-20
+        - Fixed trying to invalidate the cached object for keys with undefined
+          values.
+
+v1.7.4  2012-03-20
+        - Added unitary operator 'null'.
+
+v1.7.3  2012-02-24
+        - Added get().
+        - Added 'ignore' argument to insert(). Thanks Jamie McCarthy!
+
+v1.7.2  2011-08-08
+        - Added operator 'between' for retrieve_list(), reengineered the return
+          values of build_filtering_clause() to allow for more than one bind
+          variable to be returned.
+
+v1.7.1  2011-06-10
+        - Added more trace information for cache operations.
+        - Modified update() to invalidate cached versions of objects.
+        - Added meta information 'cache_key_field' to allow specifying a
+          different cache key field than the primary key.
+        - Added get_object_cache_key(), to allow subclassing to create complex
+          cache keys.
+
+v1.7.0  2011-06-07
+        - Refactored filtering operators to use (?:=|not|<=|>=|<|>).
+        - Added code to detect parameters that cannot be handled by
+          retrieve_list(). This helps the calling code to detect typos, missing
+          filtering fields in the static class declaration or obsolete argument
+          names.
+        - Set up a list of reserved arguments for retrieve_list().
+        - Fixed retrieve_list( id => [ 1, 2 ] ) that was converting to
+          WHERE id = 1 AND id = 2 instead of WHERE id IN ( 1, 2 ).
+
+v1.6.1  2011-05-17
+        - Added last insert ID value to the object upon successful insert.
+
+v1.6.0  2011-03-29
+        - Refactored reload().
+
+v1.5.4  2011-03-04
+        - Added 'show_queries' argument to retrieve_list().
+
+v1.5.3  2011-01-31
+        - Added dump().
+
+v1.5.2  2011-01-27
+        - Added function to flatten an object based on a list of fields.
+
+v1.5.1  2011-01-24
+        - Changed retrieve_list() to return pagination info in addition to the
+          results only when pagination was requested to begin with.
+        - Added option to set "pagination => 1"  in retrieve_list(), as a
+          shortcut to get all the defaults.
+
+v1.5.0  2011-01-10
+        - Implemented delete().
+
+v1.4.1  2011-01-06
+        - Simplified 'order_by', removed option to pass a data structure in
+          favor of raw SQL.
+        - Fixed retrieve_list() to handle the case when the query has joins but
+          we need to lock the rows.
+
+v1.4.0  2010-12-21
+        - Split validation from setting properties.
+        - Added concept of read-only fields.
+        - Added cached_static_class_info(), which is ~6x faster than
+          static_class_info().
+
+v1.3.0  2010-12-16
+        - Added 'unique_fields' to the meta object information and created a
+          method to access it.
+        - Simplified caching of objects.
+        - Expanded parse_filtering_criteria() to allow filtering on the opposite
+          of a criteria.
+        - Implemented pagination for retrieve_list().
+        - Refactored how cache keys are generated.
+        - Added invalidate_cached_object() to remove all the cached versions of
+          a given object.
+        - Added 'lock' and 'allow_all' arguments to retrieve_list().
+        - Added option to specify pre-generated primary keys in insert().
+        - Added warnings to prevent hash/hashref confusion in the first argument
+          of insert() and update()
+        - Fixed insert() to work with tables that don't have a primary key.
+        - Added unique fields to the list of available filtering criteria in
+          retrieve_list().
+        - Improved 'order_by' parsing and defaults in retrieve_list(), allowed
+          raw SQL in 'order_by'.
+        - Modified update() to accept restrictions on the where clause.
+
+v1.2.0  2010-02-10
+        - Changed insert() to allow calling it directly on a class, if no
+          object is needed afterwards.
+        - Added static_class_info() and accessors for its configurable options.
+        - Added object-level cache.
+        - Added 'force' argument to set(), to optionally disable validation.
+
+v1.1.0  2010-12-08
+        - Added insert(), update(), and new().
+        - Fixed set() to remove primary key fields and fields starting with an
+          underscore.
+        - Added id().
+        - Refactored retrieve_list() to allow subclassing.
+        - Added table prefix for the fields not specifing one explicitely when
+          creating filtering criteria.
+
+v1.0.2  2010-10-28
+        - Added reload().
+
+v1.0.1  2010-02-01
+        - Added clone().
+
+v1.0.0  2009-12-17
+        - First version.

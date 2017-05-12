@@ -1,0 +1,50 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2003 Julius C. Duque
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::SHA2;
+
+my $string1 = "This is a string.";
+my $string2 = "This is another string.";
+my $string3 = "This is a string.This is another string.";
+my $string4 = "abc";
+
+my $testdigest = "ddaf35a193617abacc417349ae20413112e6fa4e89a97ea20a9eeee64b55d39a2192992a274fc1a836ba3c23a3feebbd454d4423643ce80e2a9ac94fa54ca49f";
+
+my $sha2obj = new Digest::SHA2 512;
+print "hash size = ", $sha2obj->hashsize, " bits\n";
+print "number of rounds = ", $sha2obj->rounds, "\n";
+
+$sha2obj->add($string1);
+my $digest = $sha2obj->hexdigest();
+print "1. Hash string1 only\n";
+print "$digest\n\n";
+
+$sha2obj->reset();
+$sha2obj->add($string1, $string2);
+my $digest2 = $sha2obj->hexdigest();
+print "2. Hash string1 and then hash string2\n";
+print "$digest2\n\n";
+
+$sha2obj->reset();
+$sha2obj->add($string3);
+print "3. Hash the two concatenated strings\n";
+my $digest3 = $sha2obj->hexdigest();
+print "$digest3\n\n";
+
+$sha2obj->reset();
+$sha2obj->add($string4);
+print "4. Hash test string\n";
+my $digest4 = $sha2obj->hexdigest();
+print "SHA2 hash OK\n\n" if ($digest4 eq $testdigest);
+
+$sha2obj->reset();
+$sha2obj->add($string1);
+$sha2obj->add($string2);
+print "5. Hash the two concatenated strings again\n";
+my $digest5 = $sha2obj->hexdigest();
+print "$digest5\n\n";
+

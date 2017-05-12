@@ -1,0 +1,6 @@
+May be its own error class for easier error catching;
+
+Methods to retrieve entire attribute into a hash or even entire record
+into a hash. And to store hash as a record/attribute.
+
+XML export/import methods.

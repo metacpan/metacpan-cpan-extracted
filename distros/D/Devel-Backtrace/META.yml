@@ -1,0 +1,32 @@
+---
+name: Devel-Backtrace
+version: 0.12
+author:
+  - 'Christoph Bussenius <pepe@cpan.org>'
+abstract: Object-oriented backtrace
+license: perl
+resources:
+  license: ~
+requires:
+  Carp: 0
+  Class::Accessor: 0
+  String::Escape: 0
+  perl: 5.006_000
+build_requires:
+  Test::More: 0
+provides:
+  Devel::Backtrace:
+    file: lib/Devel/Backtrace.pm
+    version: 0.12
+  Devel::Backtrace::Point:
+    file: lib/Devel/Backtrace/Point.pm
+    version: 0.11
+  Devel::DollarAt:
+    file: lib/Devel/DollarAt.pm
+    version: 0.02
+no_index:
+  directory: example
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

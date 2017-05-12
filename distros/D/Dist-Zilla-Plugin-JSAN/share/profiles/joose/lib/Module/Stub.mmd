@@ -1,0 +1,150 @@
+Name
+====
+
+{{ $plugin->dist_name }} - Some clever yet compact description
+
+
+SYNOPSIS
+========
+
+        // declaring our class
+        Class('{{ $plugin->dist_name }}', {
+        
+        })
+        
+        // then instantiating it
+        var instance = new {{ $plugin->dist_name }}({
+        })
+        
+        // and doing something totally awesome with it :D
+        instance.method(param1, param2)
+        
+
+If you are reading this file as README from github, you may want to open [this link](http://samuraijack.github.com/{{ $plugin->zilla->name }}) instead. 
+
+
+INSTALLATION
+============
+
+From `npm`:
+    
+    > [sudo] npm install {{ lc($plugin->zilla->name) }}
+
+Tarballs are available for downloading at: <http://search.npmjs.org/#/{{ lc($plugin->zilla->name) }}>
+
+
+SETUP
+=====
+
+In NodeJS:
+
+    require('task-joose-nodejs')
+    require('{{ lc($plugin->zilla->name) }}')
+    
+    
+In browsers (assuming you've completed the 3.1 item from this [document](http://joose.github.com/Joose/doc/html/Joose/Manual/Installation.html)):
+
+    <script type="text/javascript" src="/jsan/Task/Joose/Core.js"></script>
+    <script type="text/javascript" src="/jsan/Task/{{ join('/', split(/-/, $plugin->zilla->name)) }}/Core.js"></script>
+
+
+
+DESCRIPTION
+===========
+
+`{{ $plugin->dist_name }}` is a stub for Joose-orientied modules.
+
+
+ISA
+===
+
+None.
+
+
+DOES
+====
+
+None.
+
+
+TRAITS
+======
+
+None.
+
+
+
+ATTRIBUTES
+==========
+
+### attributeName
+
+> `AttributeType attributeName`
+
+> Attribute description
+
+
+METHODS
+=======
+
+### methodName
+
+> `method signature`
+
+> Method description
+
+
+EXAMPLES
+========
+
+Our class can be used like this:
+
+        // then instantiating it
+        var instance = new {{ $plugin->dist_name }}({
+        })
+
+and like that:
+
+        // then instantiating it
+        var instance = new {{ $plugin->dist_name }}({
+        })
+
+
+GETTING HELP
+============
+
+This extension is supported via github issues tracker: <http://github.com/SamuraiJack/{{ $plugin->zilla->name }}/issues>
+
+For general Joose questions you can also visit [#joose](http://webchat.freenode.net/?randomnick=1&channels=joose&prompt=1) 
+on irc.freenode.org or mailing list at: <http://groups.google.com/group/joose-js>
+ 
+
+
+SEE ALSO
+========
+
+Web page of this module: <http://github.com/SamuraiJack/{{ $plugin->zilla->name }}/>
+
+General documentation for Joose: <http://joose.github.com/Joose>
+
+
+BUGS
+====
+
+All complex software has bugs lurking in it, and this module is no exception.
+
+Please report any bugs through the web interface at <http://github.com/SamuraiJack/{{ $plugin->zilla->name }}/issues>
+
+
+
+AUTHORS
+=======
+
+{{ $OUT .= $_ . "\n\n" foreach (@{$dist->authors})  }}
+
+
+
+COPYRIGHT AND LICENSE
+=====================
+
+{{ $dist->license->notice }}

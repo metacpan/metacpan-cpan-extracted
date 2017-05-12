@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Daemon-Simple.t
+lib/Daemon/Simple.pm

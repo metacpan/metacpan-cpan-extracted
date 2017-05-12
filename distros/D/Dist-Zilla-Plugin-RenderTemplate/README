@@ -1,0 +1,64 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [RenderTemplate]
+
+    In /some/path/template.txt:
+
+     Hello, {{ username }}!
+
+    In lib/Foo.pm:
+
+     ...
+    
+     # RENDER_TEMPLATE: file=>"/some/path/template.txt", context=>{username=>"ujang"}
+    
+     ...
+
+    After build, lib/Foo.pm will become:
+
+     ...
+    
+     Hello, ujang!
+    
+     ...
+
+DESCRIPTION
+
+    This plugin finds #RENDER_TEMPLATE: ... directive in your
+    scripts/modules, renders the specified template (currently using
+    DTL::Fast), and replaces the directive with the rendered result.
+
+    The ... part is parsed as Perl using eval and should produce a hash of
+    arguments. Known arguments:
+
+      * file => str
+
+      Specify the path to template file. Either specify this, or dist and
+      dist_file.
+
+      * dist => str
+
+      Specify that template file is to be retrieved from per-dist shared
+      dir (see File::ShareDir). This argument specify the dist name. You
+      also have to specify dist_file. The path to template will be
+      retrieved using dist_file($dist, $dist_file).
+
+      * dist_file => str
+
+      See dist argument.
+
+      * context => hashref
+
+      Specify context (variables).
+
+SEE ALSO
+
+    DTL::Fast
+
+    Dist::Zilla::Plugin::InsertBlock
+
+    Dist::Zilla::Plugin::InsertExample - which basically insert whole files
+    instead of just a block of text from a file
+

@@ -1,0 +1,19 @@
+Total Elapsed Time = 672.4153 Seconds
+  User+System Time = 269.0453 Seconds
+Exclusive Times
+%Time ExclSec CumulS #Calls sec/call Csec/c  Name
+ 93.6   251.9 251.92  79993   0.0031 0.0031  DBI::st::execute
+ 1.77   4.760 19.050      1   4.7601 19.050  Data::Sync::writedbi
+ 1.08   2.900 250.20      1   2.8998 250.20  Data::Sync::sourceToAoH
+ 0.82   2.210  2.210  79998   0.0000 0.0000  DBI::common::DESTROY
+ 0.65   1.760  1.760 139990   0.0000 0.0000  Data::Sync::log
+ 0.51   1.370  2.770  40001   0.0000 0.0001  DBI::_new_handle
+ 0.43   1.160  1.160  40001   0.0000 0.0000  DBI::_setup_handle
+ 0.25   0.670  3.430  39997   0.0000 0.0001  DBI::_new_sth
+ 0.22   0.590  4.500  39992   0.0000 0.0001  DBD::Pg::db::prepare
+ 0.20   0.530  0.530  20000   0.0000 0.0000  DBI::st::fetchrow
+ 0.18   0.480  0.480  39992   0.0000 0.0000  DBD::Pg::st::_prepare
+ 0.15   0.410  0.770      1   0.4100 0.7699  Data::Sync::remap
+ 0.13   0.350  4.850  39997   0.0000 0.0001  DBI::db::prepare
+ 0.12   0.310  0.640      1   0.3100 0.6399  Data::Sync::runTransform
+ 0.09   0.240  0.240  40001   0.0000 0.0000  DBI::st::TIEHASH

@@ -1,0 +1,7 @@
+DCE::ACL::list		T_PTROBJ
+DCE::ACL::handle	T_PTROBJ
+DCE::ACL::entry		T_PTROBJ
+DCE::ACL		T_PTROBJ
+DCE::ACL::printstring 	T_PTROBJ
+sec_acl_type_t 		T_IV
+sec_acl_permset_t	T_IV

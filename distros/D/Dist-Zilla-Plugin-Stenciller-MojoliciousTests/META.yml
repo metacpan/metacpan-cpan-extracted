@@ -1,0 +1,58 @@
+---
+abstract: 'Create Mojolicious tests from text files parsed with Stenciller'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Mojolicious: '5.00'
+  String::Cushion: '0'
+  Syntax::Feature::Qi: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::Mojo::Trim: '0'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1408, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Stenciller-MojoliciousTests
+no_index:
+  directory:
+    - corpus
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - t/corpus
+    - xt
+provides:
+  Dist::Zilla::Plugin::Stenciller::MojoliciousTests:
+    file: lib/Dist/Zilla/Plugin/Stenciller/MojoliciousTests.pm
+    version: '0.0200'
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Moose: '2.1405'
+  Path::Tiny: '0.072'
+  Stenciller: '0.1400'
+  Stenciller::Plugin::ToMojoliciousTest: '0.0102'
+  Types::Path::Tiny: '0.005'
+  Types::Standard: '1.000005'
+  namespace::autoclean: '0.22'
+  perl: '5.010000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-Stenciller-MojoliciousTests/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Stenciller-MojoliciousTests
+  repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-Stenciller-MojoliciousTests.git
+version: '0.0200'
+x_authority: cpan:CSSON

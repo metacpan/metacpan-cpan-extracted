@@ -1,0 +1,57 @@
+A test suite for the DtfSQLmac driver
+=====================================
+
+Most of the tests are borrowed from Jochen Wiedmann's test suite for  
+DBD drivers, which is part of the Msql-Mysql-modules distribution 
+found on CPAN. Credits to Jochen Wiedmann.
+
+I've adapted that testsuite to (a) Mac OS and (b) to my needs while
+testing the DtfSQLmac driver.
+
+
+
+What's currently included?
+==========================
+
+The test suite consists of a lot of files, currently these are:
+
+  lib.pl				Is the core of the test suite, being included in nearly
+  						any test before doing anything; in short it defines
+            			some global variables and also some global functions 
+						used within any test.
+
+  README.tests    		This file.
+
+  00load.t				Tests loading of required modules and driver.
+  
+  01base.t	    		This is essentially the base.t from DBD::Oracle. It
+						checks whether the driver may be installed.
+
+  10dsn_driverlist.t   	This test lists all available DBI drivers, checks if 
+  						the DtfSQLmac driver is found and lists all available 
+						data sources for our driver.
+
+  20connect.t   		This test connects and disconnects to the test database, 
+  						checks if the connection is alive or not and checks if we 
+						can connect a second time and as an unknown user.
+
+  30createdrop.t   		Creates a table and drops it.
+
+  40insertfetch.t  		Inserts a row into a table and retrieves it.
+
+  50bindparam.t    		Checks the bind_col() method and the internal function 
+  						dbd_ph_bind().
+						
+  51listfields.t   		Checks the attributes of a statement handle, currently
+		   				NUM_OF_FIELDS, NAME and NULLABLE.
+
+  52nulls.t        		Checks working with NULLS.
+
+  53numrows.t			Tests, whether the number of rows can be retrieved.
+
+  60chopblanks.t   		Checks the "ChopBlanks" attribute.
+
+  61commit.t       		Checks commit, rollback and the "AutoCommit" attribute.
+
+  90failure.t			Various (failure-) tests. Many of them *should* fail in order 
+  						to stress test the internal error handling.

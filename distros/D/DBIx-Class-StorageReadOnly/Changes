@@ -1,0 +1,18 @@
+Revision history for DBIx-Class-StorageReadOnly
+
+0.0.5 2007-05-14
+       FIX: ## no critic thanks to yappo-san.
+
+0.0.4 2007-05-02
+       CHG: orz...TT.pm and hide from PAUSE.
+       
+0.0.3 2007-04-30
+       CHG: use original insert update delete code.
+
+0.0.2  2007-04-20
+       FIX: changed it to check readonly storage in Storage::DBI.
+       ADD: use tt version. for Yappo-san.
+
+0.0.1  Wed Dec 13 13:09:57 2006
+       Initial release.
+

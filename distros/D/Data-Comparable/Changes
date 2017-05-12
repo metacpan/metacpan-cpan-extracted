@@ -1,0 +1,27 @@
+Revision history for Perl extension Data-Comparable
+
+1.100840  2010-03-25 21:12:27 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - optimizations
+
+0.03  Thu, 29 May 2008 12:02:35 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - added t/perlcriticrc
+     - updated MANIFEST
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.02  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.01  Thu, 04 Oct 2007 17:21:07 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

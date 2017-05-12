@@ -1,0 +1,8 @@
+Revision history for Perl extension Device::USB::PX1674.
+
+0.01  Fri Feb 24 09:46:39 2017
+    - original version; created by h2xs 1.23 with options
+        -A -X -n Device::USB::PX1674
+
+1.03 Fix Issue more than one devices on usb-bus
+1.04 dies und das

@@ -1,0 +1,121 @@
+Revision history for Deliantra
+
+1.30  Sat Apr 24 10:08:05 CEST 2010
+        - changed the order of overrides in Deliantra.pm of Data.pm.
+          Keep an eye on the gde/editor attributes!
+        - added unique and buildable flags to types.xml.
+        - support post-2.93 server UPD_SP_LEVEL.
+        - added spell damage field to res/types.xml.
+        - fixed range/combat slot encoding.
+        - new version protocol for client and server.
+        - remove support for toggleextendedtext.
+        - support octets_in/out measurement in Deliantra::Protocol::Base.
+
+1.29  Tue Dec 22 10:51:04 CET 2009
+        - improved torch editor description.
+        - added match_compat to altar/pedestal slaying description
+          for deliantra >= 2.81.
+        - add matches in door/container key strings for deliantra > 2.82.
+        - use "move_block 0" for "no_pass 0" when normalising.
+        - added type=19 (match) for deliantra >= 2.82.
+	- add inscribable type.
+        - minor doc fixes and improvements.
+        - add type 32 (pedestal triggers).
+        - cfmap-tagify no longer patches bidirectionally.
+        - cfmap-plushify now attempts to patch (some) face names as well.
+        - cfmap-plushify now warns about unknown archetypes.
+        - support trailing space in arch files, to import old archetype
+          files.
+        - delete "editable" field when seen.
+        - add mood floor types.
+        - nuke support for image_sums/image_info.
+        - added >= operator for MoveType.
+        - explicitly defined attributes are not ignored anymore.
+
+1.25  Tue Sep 15 21:06:16 CEST 2009
+	- tuned normalisation again to reduce differences.
+
+1.24  Tue Sep  1 23:37:04 CEST 2009
+	- use common::sense.
+	- add TO_JSON to MoveType.
+        - added lamp & torch archetypes.
+        - fix a bug in the movetype normalising algorithm.
+
+1.23  Thu Jan 15 00:40:23 CET 2009
+	- allow map scrolling with mod1/meta + button1 in addition
+          to the middle mouse button.
+        - added no_skill_ident flag for readables.
+        - add mapscript type.
+        - convert "connected" slot to type string.
+        - add send_pickup request.
+
+1.222 Tue Sep 16 01:38:19 CEST 2008
+	- remove type 110 (formerly ability, now inscribable).
+
+1.221 Mon Sep  8 23:59:57 CEST 2008
+	- elmex loves to add files to Makefile.PL and leaving
+          them out of MANIFEST. he does it again, and again, and again,
+          no matter how often you have to clean up behind him and tell him.
+
+1.22 Fri Sep  5 17:27:34 CEST 2008
+	- add range field to pits.
+        - correctly decode ex command text to unicode.
+        - support lzf-compressed packets.
+        - implement simple packet fragmentation.
+
+1.21 Fri Aug  1 15:49:37 CEST 2008
+	- remove more crossfire cruft.
+
+1.2  Mon Jul  7 09:57:28 CEST 2008
+	- make dmg, mana and grace in spell packets signed.
+	- use anyevent's non-blocking connect and resolver lib.
+	- use canonical ordering when storing attach attribute.
+	- fix scripts.
+        - set TCP_NODELAY flag on server connections.
+
+1.14 Wed Dec 26 19:12:04 CET 2007
+	- renamed from Crossfire to Deliantra.
+
+1.13 Wed Dec  5 12:38:58 CET 2007
+	- really switch to JSON::XS 2.01.
+
+1.12 Wed Dec  5 12:01:05 CET 2007
+	- switch to JSON::XS 2.01.
+
+1.11 Thu Nov  8 02:21:06 CET 2007
+	- add cfmap-tagify, which was missing.
+
+1.1  Sat Oct 20 23:49:15 CEST 2007
+	- started to remove crossfire compatibility cruft.
+
+1.0  Sun Sep  2 10:45:36 CEST 2007
+	- better support for new facedata structure.
+        - support use Crossfire::MoveType for thawing.
+        - use customised json encoder/decoder.
+        - actually allow multiple simul. transfers
+          in ix (as allowed by the protocol),
+          sending as version 2 of fxsxix.
+        - updated/fixed msg protocol (version 2).
+        - fix import of attribute types.
+
+0.99 Mon May 28 23:32:53 CEST 2007
+	- elmex claims to have something done but of course didn't give a shit
+          about documenting it even with a single line.
+
+0.98 Wed May  9 13:44:15 CEST 2007
+	- switch to JSON::XS.
+        - much better setup negotiation capabilities.
+        - incompatibly changed some interfaces to allow
+          for callback-driven programming styles.
+
+0.97 Mon Mar  5 02:07:42 CET 2007
+	- fix movement type handling.
+
+0.96 Thu Jan 25 06:13:37 CET 2007
+	- bug/portability fixes.
+
+0.92 Wed Oct 18 14:57:04 CEST 2006
+	- bug/portability fixes.
+
+0.9  Tue Sep 12 22:27:17 CEST 2006
+	- many bugfixes. blurp.

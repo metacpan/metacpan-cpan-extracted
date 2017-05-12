@@ -1,0 +1,72 @@
+# NAME
+
+Dancer::Logger::Syslog - Dancer logger engine for Sys::Syslog
+
+# VERSION
+
+version 0.6
+
+# DESCRIPTION
+
+This module implements a logger engine that send log messages to syslog,
+through the Sys::Syslog module.
+
+# CONFIGURATION
+
+The setting __logger__ should be set to `syslog` in order to use this session
+engine in a Dancer application.
+
+You can also specify the other configuration via the 'syslog' config key, e.g.
+
+    syslog:
+      facility: 'local0'
+      ident: 'my_app'
+
+The allowed options are:
+
+- facility 
+
+    Which syslog facility to use, defaults to 'USER'
+
+- ident 
+
+    String prepended to every log line, defaults to the configured _appname_ or,
+    if not defined, to the executable's basename.
+
+- logopt
+
+    Log options passed top `openlog()` as per Sys::Syslog's docs. Defaults to
+    'pid'. 
+
+# METHODS
+
+## init()
+
+The init method is called by Dancer when creating the logger engine
+with this class.
+
+## format\_message()
+
+This method defines how to format messages for Syslog, it's a bit different 
+than the standard one provided by [Dancer::Logger::Abstract](https://metacpan.org/pod/Dancer::Logger::Abstract) because Syslog
+already provides a couple of information.
+
+# DEPENDENCY
+
+This module depends on [Sys::Syslog](https://metacpan.org/pod/Sys::Syslog).
+
+# SEE ALSO
+
+See [Dancer](https://metacpan.org/pod/Dancer) for details about logging in route handlers.
+
+# AUTHORS
+
+- Alexis Sukrieh <sukria@sukria.net>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alexis Sukrieh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

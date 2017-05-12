@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+      <!DOCTYPE phrasebook [
+                    <!ELEMENT phrasebook (dictionary)*>
+                    <!ELEMENT dictionary (phrase)*>
+                    <!ATTLIST dictionary name CDATA #REQUIRED>
+                    <!ELEMENT phrase (#PCDATA)>
+                    <!ATTLIST phrase name CDATA #REQUIRED>
+      ]>
+<phrasebook>
+    <dictionary name="testdictionary">
+    <phrase name="test.query">
+        select now();
+    </phrase>
+
+
+    </dictionary>
+</phrasebook>

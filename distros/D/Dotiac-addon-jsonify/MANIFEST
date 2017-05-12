@@ -1,0 +1,11 @@
+lib/Dotiac/DTL/Addon/jsonify.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+META.yml
+README
+t/2_filter_jsonify.t
+t/4_pod.t
+t/filter_jsonify.html
+t/Dtest.pm

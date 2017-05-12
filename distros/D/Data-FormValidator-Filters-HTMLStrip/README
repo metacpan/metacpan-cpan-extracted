@@ -1,0 +1,72 @@
+NAME
+    Data::FormValidator::Filters::HTMLStrip - Filter that removes html tags from input
+
+SYNOPSIS
+    use Data::FormValidator::Filters::HTMLStrip qw( html_strip );
+
+    # Build a Data::FormValidator Profile:
+    my $my_profile = {
+        required => qw( text ),
+        field_filters => {
+            text => html_strip,
+        },
+    };
+
+    # Be sure to use a CGI.pm object as the form input
+    # when using this filter
+    my $q = new CGI;
+    my $dfv = Data::FormValidator->check($q,$my_profile);
+
+
+DESCRIPTION
+    This is a Data::FormaValidator filter that acts as a wrapper for HTML::Strip.
+    It removes html tags from variable data to help protect against cross-site
+    scripting attacks.
+
+
+FILTERS
+  html_strip
+
+    This will create a filter that will strip html tags from
+    the value of filtered variables. This assists in protecting cross site
+    scripting exploits from users attempting to embed html tags into input
+    fields.
+
+SEE ALSO
+    Data::FormValidator
+
+AUTHOR
+    David Baxter <david@sitesuite.com.au>
+
+CREDITS
+    Thanks to SiteSuite (http://www.sitesuite.com.au) for funding the
+    development of this plugin and for releasing it to the world.
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2008, SiteSuite. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY
+    AND/ORREDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+    LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+    ORCONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

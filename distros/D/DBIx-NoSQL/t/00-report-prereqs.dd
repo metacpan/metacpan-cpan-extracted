@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Clone' => '0',
+                                      'DBD::SQLite' => '1.44',
+                                      'DBIx::Class' => '0.08124',
+                                      'DBIx::Class::Core' => '0',
+                                      'DBIx::Class::SQLMaker' => '0',
+                                      'DBIx::Class::Schema' => '0',
+                                      'Data::GUID' => '0',
+                                      'Digest::SHA' => '0',
+                                      'Hash::Merge::Simple' => '0',
+                                      'JSON' => '0',
+                                      'JSON::XS' => '0',
+                                      'Moose' => '0',
+                                      'Path::Class' => '0',
+                                      'SQL::Translator' => '0.11016',
+                                      'Try::Tiny' => '0',
+                                      'base' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DateTime' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Scalar::Util' => '0',
+                                   'Test::Deep' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Most' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

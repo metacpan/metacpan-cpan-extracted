@@ -1,0 +1,13 @@
+NAME
+    DB::CouchDB::Schema - A schema oriented CouchDB Module
+
+AUTHORS
+    Jeremy Wall <jeremy@marzhillstudios.com>
+
+COPYRIGHT
+    Copyright 2008 Jeremy Wall
+    All Rights Reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

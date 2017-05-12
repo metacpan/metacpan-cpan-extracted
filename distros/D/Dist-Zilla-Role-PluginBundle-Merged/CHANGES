@@ -1,0 +1,47 @@
+Revision History for Dist-Zilla-Role-PluginBundle-Merged
+========================================================
+
+v1.00 2013-06-27
+----------------
+
+commit de96bf5a4138c9aa65cc9ddb4f1c9a1221e006db
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Thu Jun 27 18:27:17 2013 -0400
+
+    Add config_short_merge option
+    Add warnings for undesired mistakes in the PB build
+    Add extra docs
+
+v0.92 2013-02-28
+----------------
+
+commit e085672502c9f6081572c4e041cc283f66655013
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Thu Feb 28 09:14:32 2013 -0500
+
+    Release v0.92
+
+commit 465e70b3ba1db8eb6fa1ff130b419d47d4055160
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Thu Feb 28 08:31:47 2013 -0500
+
+    Fix docs
+
+v0.91 2012-08-06
+----------------
+
+commit 8d7ac789aa61213c45b3bbc0929596722e3849a3
+Author: SineSwiper <BBYRD@CPAN.org>
+Date:   Mon Aug 6 12:04:48 2012 -0400
+
+    Release v0.91
+
+commit 241cf22c75a10fffc7295bf5ed56fbea79dcbaf8
+Author: SineSwiper <BBYRD@CPAN.org>
+Date:   Wed Aug 1 09:07:30 2012 -0400
+
+    Fix "keys $hash" bug that only impacted older Perls
+
+===================================
+End of changes in the last 365 days
+===================================

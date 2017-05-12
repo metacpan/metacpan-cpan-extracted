@@ -1,0 +1,8 @@
+Revision history for Perl extension Data::Dumper::HTML.
+
+0.0.2  Wed Sep 14 11:33:57 2006
+	- re bundled without Mac's ._ files in the tarball
+	
+0.0.1  Tue Aug 29 19:03:43 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Data::Dumper::HTML

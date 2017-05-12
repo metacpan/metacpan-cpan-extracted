@@ -1,0 +1,107 @@
+<HTML>
+<HEAD>
+<TITLE>stag-grep</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-grep.pl - filters a stag file (xml, itext, sxpr) for nodes of interest</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-grep.pl person -q name=fred file1.xml</PRE>
+<PRE>
+  stag-grep.pl person 'sub {shift-&gt;get_name =~ /^A*/}' file1.xml</PRE>
+<PRE>
+  stag-grep.pl -p My::Foo -w sxpr record 'sub{..}' file2</PRE>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<PRE>
+  stag-grep.pl [-p|parser PARSER] [-w|writer WRITER] NODE -q tag=val FILE</PRE>
+<PRE>
+  stag-grep.pl [-p|parser PARSER] [-w|writer WRITER] NODE SUB FILE</PRE>
+<PRE>
+  stag-grep.pl [-p|parser PARSER] [-w|writer WRITER]  NODE -f PERLFILE FILE</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>parsers an input file using the specified parser (which may be a built
+in stag parser, such as xml) and filters the resulting stag tree
+according to a user-supplied subroutine, writing out only the
+nodes/elements that pass the test.</P>
+<P>the parser is event based, so it should be able to handle large files
+(although if the node you parse is large, it will take up more memory)</P>
+<P>
+<HR>
+<H1><A NAME="arguments">ARGUMENTS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dp%7Cparser_FORMAT">-p|parser FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dw%7Cwriter_FORMAT">-w|writer FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P></P>
+<DT><STRONG><A NAME="item_%2Dc%7Ccount">-c|count</A></STRONG><BR>
+<DD>
+prints the number of nodes that pass the test
+<P></P>
+<DT><STRONG><A NAME="item_%2Dfilterfile%7Cf">-filterfile|f</A></STRONG><BR>
+<DD>
+a file containing a perl subroutine (in place of the SUB argument)
+<P></P>
+<DT><STRONG><A NAME="item_%2Dq%7Cquery_TAG1%3DVAL1_%2Dq%7Cquery_TAG2%3DVAL2_">-q|query TAG1=VAL1 -q|query TAG2=VAL2 ...  -q|query TAGN=VALN</A></STRONG><BR>
+<DD>
+filters based on the field TAG
+<P>other operators can be used too - eg &lt;, &lt;=, etc</P>
+<P>multiple q arguments can be passed in</P>
+<P>for more complex operations, pass in your own subroutine, see below</P>
+<P></P>
+<DT><STRONG><A NAME="item_SUB">SUB</A></STRONG><BR>
+<DD>
+a perl subroutine. this subroutine is evaluated evry time NODE is
+encountered - the stag object for NODE is passed into the subroutine.
+<P>if the subroutine passes, the node will be passed to the writer for
+display</P>
+<P></P>
+<DT><STRONG><A NAME="item_NODE">NODE</A></STRONG><BR>
+<DD>
+the name of the node/element we are filtering on
+<P></P>
+<DT><STRONG><A NAME="item_FILE">FILE</A></STRONG><BR>
+<DD>
+the file to be parser. If no parser option is supplied, this is
+assumed to a be a stag compatible syntax (xml, sxpr or itext);
+otherwise you should parse in a parser name or a parser module that
+throws stag events
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="./Data/Stag.html">the Data::Stag manpage</A></P>
+
+</BODY>
+
+</HTML>

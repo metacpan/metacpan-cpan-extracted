@@ -1,0 +1,66 @@
+NAME
+    Data::Serializer::Sereal - Creates bridge between Data::Serializer and
+    Sereal
+
+VERSION
+    Version 1.00
+
+SYNOPSIS
+    Creates bridge between Data::Serializer and Sereal
+
+SUBROUTINES/METHODS
+  serialize
+    serialize object/data
+
+  deserialize
+    deserialize object/data
+
+  decoder
+    gets the decoder from options or uses the default decoder
+
+  encoder
+    gets the encoder from options or uses the default encoder
+
+AUTHOR
+    James Rouzier, "<rouzier at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-data-serializer-sereal at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Serializer-Sereal>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Serializer::Sereal
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Serializer-Sereal>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-Serializer-Sereal>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-Serializer-Sereal>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-Serializer-Sereal/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2014 James Rouzier.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

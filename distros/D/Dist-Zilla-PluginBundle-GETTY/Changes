@@ -1,0 +1,20 @@
+Revision history for Dist-Zilla-PluginBundle-GETTY
+
+0.008     2012-07-05 08:33:48 America/New_York
+
+0.007     2011-04-22 21:05:53 Europe/Berlin
+	- Added InstallRelease option for custom command cpanm .
+
+0.006     2010-12-20 21:19:55 Europe/Berlin
+
+0.005     2010-12-08 03:56:37 Europe/Berlin
+	- Added Dist::Zilla::Plugin::Authority
+
+0.004     2010-11-14 05:26:34 Europe/Berlin
+
+0.003     2010-11-13 21:25:25 Europe/Berlin
+	- Added LocalInstall
+
+0.002     2010-11-04 22:57:11 Europe/Berlin
+
+0.001     2010-11-04 20:00:13 Europe/Berlin

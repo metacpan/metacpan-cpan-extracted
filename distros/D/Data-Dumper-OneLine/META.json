@@ -1,0 +1,79 @@
+{
+   "abstract" : "Dumps data as one line string",
+   "author" : [
+      "Hiroki Honda <cside.story@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.0.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-OneLine",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Recursive::Encode" : "0",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Encode" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Dumper::OneLine" : {
+         "file" : "lib/Data/Dumper/OneLine.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Cside/Data-Dumper-OneLine/issues"
+      },
+      "homepage" : "https://github.com/Cside/Data-Dumper-OneLine",
+      "repository" : {
+         "url" : "git://github.com/Cside/Data-Dumper-OneLine.git",
+         "web" : "https://github.com/Cside/Data-Dumper-OneLine"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:CSIDE"
+}

@@ -1,0 +1,20 @@
+<html>
+<head>
+<title>[% params.name %] (code)</title>
+</head>
+<body>
+<h3><a href="/[% params.name %]">[% params.name %]</a> (code)</h3>
+<pre>
+sub [% params.name %] {<br/>
+[% params.sub | html %]
+}<br />
+</pre>
+<form action="/save" enctype="multipart/form-data" method="POST">
+<input type="hidden" name="sub" value="[% params.name %]"/>
+<textarea name="code" style="width: 100%; height: 300px;">
+[% params.sub | html %]
+</textarea>
+<input type="submit" name="save" value="save" />
+</form>
+</body>
+</html>

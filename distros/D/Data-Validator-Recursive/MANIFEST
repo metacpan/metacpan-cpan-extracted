@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Data/Validator/Recursive.pm
+t/00_compile.t
+t/01_new.t
+t/02_validate.t
+t/03_arrayref.t
+META.yml
+MANIFEST

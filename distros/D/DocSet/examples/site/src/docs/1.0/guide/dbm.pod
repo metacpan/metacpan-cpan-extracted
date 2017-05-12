@@ -1,0 +1,114 @@
+=head1 NAME
+
+mod_perl and dbm files
+
+=head1 Description
+
+Small databases can be implemented pretty efficiently using dbm files,
+but there are still some precautions that must be taken to use
+properly under mod_perl.
+
+=head1 DB_File::Lock2
+
+Here is F<code/DB_File-Lock2.pm> which does the locking by using an
+external lockfile.
+
+This allows you to gain the lock before the file is tied.  Note that
+it's not yet on CPAN and so is linked from here in its entirety.  Note
+also that this code still needs some testing, so I<be careful> if you
+use it on a production machine.
+
+You use it like this:
+
+  use DB_File::Lock2 ();
+
+A simple tie, READ lock and untie
+
+  use DB_File::Lock2 ();
+  my $dbfile = "/tmp/test";
+  tie my %mydb, 'DB_File::Lock2', $dbfile, 'read';
+  print $mydb{foo} if exists $mydb{foo};
+  untie %mydb;
+
+You can even skip the C<untie()> call.  When C<$mydb> goes out of
+scope everything will be done automatically.  However it is better to
+use the explicit call, to make sure the critical sections between lock
+and unlock are as short as possible.  This is especially important
+when requesting an exclusive (write) lock.
+
+The following example shows how it might be convenient to skip the
+explicit C<untie()>.  In this example, we don't need to save the
+intermediate result, we just return and the cleanup is done
+automatically.
+
+  use DB_File::Lock2 ();
+  my $dbfile = "/tmp/test";
+  print user_exists("stas") ? "Yes" : "No";
+  sub user_exists{
+    my $username = shift || '';
+  
+    warn("No username passed\n"), return 0 unless $username;
+  
+    tie my %mydb, 'DB_File::Lock2', $dbfile, 'read';
+  
+    # if we match the username return 1, else 0
+    return $mydb{$username} ? 1 : 0;
+  
+  } # end of sub user_exists
+
+Now let's write all the upper case characters and their respective
+ASCII values to a dbm file. Then read the file and print the contents
+of the DB, unsorted.
+
+  use DB_File::Lock2 ();
+  my $dbfile = "/tmp/test";
+  
+    # write 
+  tie my %mydb, 'DB_File::Lock2', $dbfile,'write';
+  for (0..26) {
+    $mydb{chr 65+$_} = $_;
+  }
+  untie %mydb;
+  
+    # now, read them and printout (unsorted) 
+    # notice that 'read' is a default lock mode
+  tie %mydb, 'DB_File::Lock2', $dbfile;
+  while (my($k,$v) = each %mydb) {
+    print "$k => $v\n";
+  }
+  untie %mydb;
+
+If your CGI script is interrupted, the C<DESTROY> block will take care
+of unlocking the dbm file and flush any changes.  So your DB will be
+safe against possible corruption because of unclean program
+termination.
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

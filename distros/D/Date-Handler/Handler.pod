@@ -1,0 +1,523 @@
+=head1 NAME
+
+Date::Handler - Easy but complete date object (1.1)
+
+=head1 SYNOPSIS
+
+  use Date::Handler;
+ 
+  my $date = new Date::Handler({ date => time, time_zone => 'Europe/Paris', locale => 'french'});
+  my $date = new Date::Handler({ date => [2001,04,12,03,01,55], time_zone => 'EST', });
+  my $date = new Date::Handler({ date => {
+						year => 2001,
+						month => 4,
+						day => 12,
+						hour => 3,
+						min => 1,
+						sec => 55,
+					}, 
+					time_zone => 'America/Los_Angeles', 
+					locale => 'en_US', 
+				});
+
+   print $date;
+   print "$date";
+   print $date->AllInfo();
+
+   $date->new()				Constructor
+   $date->Year()			2001
+   $date->Month()			1..12
+   $date->Day()				1..31
+   $date->Hour()			0..23
+   $date->Min()				0..59
+   $date->Sec()				0..59
+   $date->Epoch($epoch)			Seconds since epoch (GMT)
+   $date->TimeZone()			America/Montreal,EST,PST and so on
+   $date->Locale()			french, en_US, fr_FR, spanish and so on
+   $date->SetLocale(locale)		Set the locale to the argument, returns locale or undef.
+   $date->LocaleRealName()		Current locale's real name on the system
+   $date->TimeZoneName()		EST, PST and so on
+   $date->LocalTime()			localtime of the object's epoch 
+   $date->TimeFormat($format_string)	strftime
+   $date->GmtTime()			gmtime of object's epoch
+   $date->UtcTime()			same as GmtTime()
+   $date->GmtOffset() 			Offset of object's TZ in seconds
+   $date->MonthName()			April
+   $date->WeekDay()			1..7 (1 monday)
+   $date->WeekDayName()			Wednesday
+   $date->FirstWeekDayOfMonth()		1..7
+   $date->WeekOfMonth()			1..4
+   $date->DaysInMonth()			31,30,29,28 depending on month and year.
+   $date->IsLeapYear()			1 if true, 0 if false
+   $date->DayLightSavings()		1 if true, 0 if false
+   $date->DayOfYear()			Return the day of the year
+   $date->DaysInYear()			Returns the number of days in the year.
+   $date->DaysLeftInYear()		Returns the number of days remaining in the year
+   $date->Array2Epoch([])			Transfer [y,m,d,h,mm,ss] to epoch time
+   $date->AsScalar ()			Same as TimeFormat("%A, %B%e %Y %R (%Z)") 
+   $date->AsNumber()			same as Epoch()
+   $date->AsArray()			Returns [y,m,d,h,mm,ss]
+   $date->AsHash()			Returns { year => y, month => m, day => d, hour => h, min => mm, sec => ss }
+   $date->AllInfo()			Returns a string containing all of the Object's related information.
+   
+
+   my $delta = new Date::Handler::Delta([3,1,10,2,5,5]);
+   my $delta = new Date::Handler::Delta({
+						years => 3,
+						months => 1,
+						days => 10,
+						hours => 2,
+						minutes => 5,
+						seconds => 5,
+					});
+
+   $delta->new				(More information in perldoc Date::Handler::Delta)
+   $delta->Months() 			Number of months in delta
+   $delta->Seconds() 			Number of seconds in delta
+   $delta->AsScalar() 			"%d months and %d seconds"
+   $delta->AsNumber() 			"%d-%d-%d"
+   $delta->AsArray()			[y,m,ss]
+   $delta->AsHash()			{ months => m, seconds => ss }
+
+   $date + $delta = Date::Handler
+   $date - $delta = Date::Handler
+   $date - $date2 = Date::Handler::Delta
+   $date + n = (+n seconds)
+   $date - n = (-n seconds)
+
+   $delta + $delta = Date::Handler::Delta
+   $delta - $delta = Date::Handler::Delta
+   $delta * n = Date::Handler::Delta
+   $delta / n = Date::Handler::Delta
+   $delta + n = (+n seconds)
+   $delta - n = (-n seconds)
+
+
+   my $range = Date::Handler::Range->new({
+						date => $date,
+						delta => $delta,
+					});
+   my $range = Date::Handler::Range->new({
+						date => [2001,06,08,2,00,00],
+						delta => [0,0,1,0,0],
+					});
+
+   $range->new			(More info in perldoc Date::Handler::Range)
+   $range->Direction()		Specifies the direction of a range ('FORWARDS' || 'BACKWARDS')
+   $range->StartDate()		Start Date::Handler object for this range and direction
+   $range->EndDate()		End Date::Handler object for this range and direction
+   $range->Overlaps($range2)	Returns true if range overlaps range2. undef otherwise.
+
+
+=head1 DESCRIPTION
+
+Date::Handler is a container for dates that holds all the methods to transform itself
+from Timezone to Timezone and format itself. This module idea comes from an original version
+written by dLux (Szabó, Balázs) <dlux@kapu.hu> in his module Class::Date.
+
+Date::Handler is implemented in pure Perl using POSIX modules, it encapsulates the environnement variable
+TZ for it's time zone management so you don't have to play with it externally in the implementation. Date::Handler
+also supports localisation using POSIX where available.
+
+It uses operator overloading and Delta date objects to calculates time differences.
+
+=head1 IMPLEMENTATION
+
+Using the Date::Handler is simple.
+
+=head2 Creating the absolute Date::Handler
+
+The new() constructor receives only one argument as a hashref:
+
+	my $date = new Date::Handler({
+				date => time,
+				time_zone => 'Japan',
+			});
+
+
+	my $date = new Date::Handler({
+				date => time(),
+				time_zone => 'America/Los_Angeles',
+				locale => 'spanish',
+			});
+
+The 'date' key of this argument can be either:
+
+=over 3 
+
+=item * Epoch time
+
+=item * Anonymous array of the form: [y,m,d,h,mm,ss]
+
+=item * A hashref of the form : { year => y,month => m, day => d, hour => h, min => mm, sec => ss }
+
+=back 
+
+The items in the array (or hash) of the 'date' key should follow these rules:
+
+=over 3
+
+=item * year	-	The year number 
+
+=item * mon	-	The number of months since January, in the range 1 to 12.
+
+=item * day	-	The day of the month, in the range 1 to 31.
+
+=item * hour	-	The number of hours past midnight, in the range 0 to 23.
+
+=item * min	-	The number of minutes after the hour, in the range 0 to 59.
+
+=item * sec	-	The number of seconds after the minute, normally in the range 0 to 59.
+
+=back
+
+The optional 'time_zone' key represents the time zone name this date is considered in.  i.e. Africa/Dakar, EST, PST, EDT
+
+The optional 'locale' key represents the locale used to represent this date. i.e. spanish, japananese, de_DE , fr_FR
+
+You can also pass an 'intuitive_day' key to the constructor. This is described in the
+"USING INTUITIVE MONTH CALCULATIONS" section.
+
+=head2 Accessors
+
+You can access the data inside the object using any of the provided methods.
+These methods are detailed in the SYNOPSIS up above.
+
+
+=head2 Modifying the object
+
+A created Date::Handler can be modified on the fly by many ways:
+
+=over 3
+
+=item * Changing the time_zone of the object using TimeZone()
+
+=item * Changing the object's locale on the fly using SetLocale()
+
+=item * Changing the internal date of the object using Epoch()
+
+=item * By using operators in combination with Date::Handler::Delta objects
+
+
+=back
+
+Examples:
+
+	#Start off with a basic object for NOW.	
+	my $date = new Date::Handler({ date => time });
+
+	#Go through the time zones...
+	$date->TimeZone('Asia/Tokyo');
+	print "Time in tokyo: ".$date->LocalTime()."\n";
+	$date->Epoch(time);
+	$date->TimeZone('America/Montreal');
+	print "Time in Montreal: ".$date->LocalTime()."\n";
+	$date->TimeZone('GMT');
+	print "Greenwich Mean Time: ".$date->LocalTime()."\n";
+
+	# Go through some locales...
+
+	$date->SetLocale('french');
+	print "Time in ".$date->Locale().": ".$date."\n";
+	$date->SetLocale('deutsch');
+	print "Time in ".$date->Locale().": ".$date."\n";
+	$date->SetLocale('spanish');
+	print "Time in ".$date->Locale().": ".$date."\n";
+
+	
+=head2 Operator overload special cases
+
+The Date::Handler overloaded operator have special cases. Refer to the
+SYNOPSIS to get a description of each overloaded operator's behaviour.
+
+One special case of the overload is when adding an integer 'n' to a Date::Handler's reference. This is treated as if 'n' was in seconds. Same thing for substraction.
+
+Example Uses of the overload:
+
+	my $date = new Date::Handler({ date =>
+					{
+						year => 2001,
+						month => 5,
+						day => 14,
+						hour => 5,
+						min => 0,
+						sec => 0,
+					}});
+	#Quoted string overload 
+	print "Current date is $date\n";
+	
+	my $delta = new Date::Handler::Delta({ days => 5, });
+	
+	#'+' overload, now, $date is 5 days in the future.	
+	$date += $delta;
+
+	#Small clock. Not too accurate, but still ;)
+	while(1)
+	{
+		#Add one second to the date. (same as $date + 1)
+		$date++;
+		print "$date\n";
+		sleep(1);
+	}
+
+
+
+
+=head1 INHERITANCE
+
+A useful way of using Date::Handler in your code is to implement that a class
+that ISA Date::Handler. This way you can overload methods through the inheritance
+tree and change the object's behaviour to your needs.
+
+Here is a small example of an overloaded class that specifies a default
+timezone different than the machine's timezone.
+
+	#!/usr/bin/perl
+	package My::Date::Handler;
+	
+	use strict;
+	use vars qw(@ISA $VERSION);
+	
+	use Date::Handler;
+	@ISA = qw(Date::Handler);
+	
+	use constant DEFAULT_TIMEZONE => 'Europe/Moscow';
+	use consant DEFAULT_LOCALE => 'russian';
+		
+	sub TimeZone
+	{
+		my ($self) = @_;
+	
+		my $time_zone = $self->SUPER::TimeZone(@_);
+	
+		return $time_zone if defined $time_zone;
+	
+		return $self->DEFAULT_TIMEZONE();
+	}	
+	
+	1;
+	__END__
+
+=head1 USING INTUITIVE MONTH CALCULATIONS (off by default)
+
+Date::Handler contains a feature by witch a date handler object can use intuitive
+month calculation. This means that Date::Handler will compensate for month
+overflows during delta operations.
+
+For example, if you have a date handler that is 2002/01/30, and you add to it a delta
+of 1 month, standard Date::Handler object will give you a new object that is 2002/03/02.
+This is because POSIX will compensate for the month overflow and add 2 days to the date
+because February does not have a 29 or 30th in 2002. Date::Handler can compensate for
+that by using the INTUITIVE_MONTH_CALCULATIONS constant. (this is turned off by default).
+
+This constant can be turned on during overloading (inheritance):
+
+	use constant INTUITIVE_MONTH_CALCULATIONS => 1;
+
+Turning this constant on will tell Date::Handler to follow track of month overflow during
+operations. This will make it so that adding a month to 2002/01/30 will bring you to 
+2002/02/28. Adding another month to this will bring you (with intuition) to 2002/03/30, 
+because Date::Handler keeps track of the "intuitive" day of the month.
+
+Using INTUITIVE_MONTH_CALCULATIONS will also make it possible to pass an "intuitive_day" 
+key to the new() constructor in order to simulate a previous addition.
+
+	i.e.
+		
+	my $date = Date::Handler->new({ 
+				date => [2002,02,28,1,0,0,0], 
+				time_zone => 'America/Montreal',
+				intuitive_day => '30',
+	});
+
+	my $onemonth = Date::Handler::Delta->new([0,1,0,0,0,0]);
+
+	print ($date + $onemonth)."\n";
+
+In this example, the start date of 2002/02/28 with intuitive_day set to 30 will make it
+so that adding 1 month to the date will bring us to march 30th. Note that INTUITIVE_MONTH_CALCULATIONS will only affect month/day calculations and no time modifications will be applied.
+
+=head1 USING INTUITIVE_DST_ADJUSTMENTS (off by default)
+
+Date::Handler provides a facility called INTUITIVE_DST_ADJUSTMENTS. This is implemented via an
+inherited constant, like the other options above. When INTUITIVE_DST_ADJUSTMENTS are turned on, 
+Date::Handler will compensate for day light savings changes. For example, 2002/04/07 1AM + 1 day
+would give you 2002/04/08 1AM instead of 2AM. Note that INTUITIVE_DST_ADJUSTMENTS will not apply
+this compensation when the exact "turn over" date/time is detected. For example, 2002/04/06 2AM
++ 1 day would give you 2002/04/07 3AM because we don't compensate for this specific case.
+
+=head1 USING INTUITIVE_TIME_CALCULATIONS (off by default)
+
+Date::Handler provides yet another facility to add intuitive date calculations. By using
+INTUITIVE_TIME_CALCULATIONS (via inherited constant), Date::Handler will "remember" that it
+compensated for a DST adjustment and try to compensate for it. 
+
+For example, 2002/04/06 2AM + 1day would give you 2002/04/07 3AM. Adding a day to this date
+under INTUITIVE_TIME_CALCULATIONS would give you 2002/04/08 2AM because Date::Handler remembers
+it compensated for day light savings.
+
+Combining INTUITIVE_DST_ADJUSTMENTS, INTUITIVE_MONTH_CALCULATIONS and INTUITIVE_TIME_CALCULATIONS
+will give a behaviour closer to the way humans expect the module to react.
+
+This can be very useful to make date calculations a little more "humanized".
+
+The intuitive "hour" can be faked by passing it to the new() constructor:
+
+	package MyDateHandler;
+
+	use strict;
+	use base qw(Date::Handler);
+
+	use constant INTUITIVE_DST_ADJUSTMENTS => 1;
+	use constant INTUITIVE_TIME_CALCULATIONS => 1;
+
+	1;
+
+
+then:
+
+	my $date = MyDateHandler->new({ 
+			date => [2002,04,08,5,0,0], 
+			time_zone => 'America/Montreal',
+			intuitive_hour => 2,
+	});
+
+=head1 NOTES ON TIME ZONES, LOCALISATION AND FORMATTING
+
+Date::Handler supports locales using POSIX setlocale() functions. The allowed values for the locale
+are listed (on most unix system) using the `locale -a` command. The Date::Handler defaults to "en_US" for
+it's locale when no locale are passed to the constructor. The constant DEFAULT_LOCALE can be overloaded
+to change this behaviour. Special note that the locales "english" and "en" are not implemented on most linux 
+(Red Hat here) systems. You need to use the locale en_US, en_GB etc etc.
+
+Date::Handler supports time zones using POSIX tzset() and tzname() functions. The allowed values for the
+time_zone key are listed (on linux systems) by look at the /usr/share/zoneinfo directory. The Date::Handler
+default to "GMT" for it's time zone when to time_zone key are passed to the constructor. The constant DEFAULT_TIME_ZONE
+can be overloaded to change this behaviour.
+
+Date::Handler's formatting is provided by POSIX's strfmtime() function. The allowed parameters to the TimeFormat()
+method can be listed (on most unix system) using `man strftime`. By default, Date::Handler uses the format
+string '%c' to represent itself in most cases. The constant DEFAULT_FORMAT_STRING can be overloaded to change
+this behaviour.
+
+=head1 OTHER DATE::HANDLER MODULES
+
+Here is a brief description of the other modules in this package.
+
+=head2 Using Date::Handler::Delta objects
+
+To go forward or backward in time with a date object, you can use
+the Date::Handler::Delta objects. These objects represent a time lapse
+represented in months and seconds. Since Date::Handler uses
+operator overloading, you can 'apply' a Delta object on an absolute date
+simply by using '+' and '-'.
+
+Example:
+
+	#A Delta of 1 year.
+	my $delta = new Date::Handler::Delta([1,0,0,0,0,0]);
+
+	my $date = new Date::Handler({ date => time } );
+
+	#$newdate is now one year in the furure.
+	my $newdate = $date+$delta;
+	
+	
+Refer to the Date::Handler::Delta(1) documentation for more on Deltas.
+
+
+=head2 Using Date::Handler::Range objects 
+
+Range objects are used to define a time range using a start date and a delta object.
+Can be useful to calculate recurrences of events and event overlap.
+
+Example:
+		
+	A simple range for an event of 3 days:
+
+	my $range = Date::Handler::Range->new({
+							date => Date::Handler->new({ date => time() }),
+							delta => Date::Handler::Delta->new([0,0,3,0,0,0]),
+						});
+
+	print "This event starts on ".$range->StartDate()." and end on ".$range->EndDate()."\n";
+
+See perldoc Date::Handler::Range(1) for more information on how to use Date::Handler::Range objects. 
+
+
+=head1 BUGS (known)
+
+Dates after 2038 are not handled by this module yet. (POSIX)
+
+Dates before 1970 are not handled by this module. (POSIX)
+
+If you find bugs with this module, do not hesitate to contact the author.
+Your comments and rants are welcomed :)
+
+
+=head1 SUPPORT, CVS AND BLEEDING VERSIONS
+
+For the latest developments,changes files, history, CVS access and more, please visit:
+
+http://labs.turbulent.ca/
+
+Please, if you use this module in a project, let me know! 
+
+Commercial support for this module is available, please contact me for more info!
+
+=head1 TODO
+
+Add support for dynamic locale using perllocales functions. This will plugin directly with the use of strftime in the Date::Handler and provide locales.
+
+Add a list of supported timezones in the Constants class.Just didnt around
+to do it yet :) Feel free :) If you have patches, recommendations or suggestions on this module, please come forward :)
+
+=head1 COPYRIGHT
+
+Copyright(c) 2001 Benoit Beausejour <bbeausej@pobox.com>
+
+All rights reserved. This program is free software; you can redistribute it and/or modify it under the same
+terms as Perl itself. 
+
+Portions Copyright (c) Philippe M. Chiasson <gozer@cpan.org>
+
+Portions Copyright (c) Szabó, Balázs <dlux@kapu.hu>
+
+Portions Copyright (c) Larry Rosler 
+
+
+=head1 AUTHOR
+
+Benoit Beausejour <bbeausej@pobox.com>
+
+=head1 CONTRIBUTORS
+
+=over 3 
+
+=item * Ron Savage <ron@savage.net.au>
+
+=item * Roland Rauch <roland@rauch.com>
+
+=item * Patrick Bradley <peanut@burstofindifference.com>
+
+=item * Phillippe M. Chiasson <gozer@cpan.org>
+
+=item * Jamie Letual <jamie@letual.net>
+
+=item * Ethan Joffe <ethan@namimedia.com>
+
+=item * Mathew Robertson <mathew.robertson@redsheriff.com>
+
+=item * Sivaguru Sankaridurg <uc_regents@yahoo.com>
+
+=back
+
+=head1 SEE ALSO
+
+Class::Date(1).
+Time::Object(1).
+Date::Calc(1).
+perl(1).
+
+=cut
+

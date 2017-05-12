@@ -1,0 +1,18 @@
+Changes
+examples/mychecks.pl
+examples/MyPassword.pm
+lib/Data/Password/Check.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+patches/diverse_characters.diff
+README
+t/Data-Password-Check.t
+t/Data-Password-Check_alphanumeric.t
+t/Data-Password-Check_alphanumeric_only.t
+t/Data-Password-Check_append_tests.t
+t/Data-Password-Check_diverse_characters.t
+t/Data-Password-Check_length.t
+t/Data-Password-Check_mixed_case.t
+t/Data-Password-Check_repeated.t
+t/Data-Password-Check_silly.t

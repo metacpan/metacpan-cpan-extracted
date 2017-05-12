@@ -1,0 +1,59 @@
+
+=head1 SUMMARY
+
+Data::ID::URL::Shrink - Shorten numeric IDs, for nicer URLs and more.
+
+
+This module is intended to help those looking for a way to shorten numerical ID
+values.
+
+Additionally, it provides a way to generate a random ID where uniqueness can be
+probable, depending on the length of the ID.
+
+This module DOES NOT and WILL NOT GUARANTEE a unique ID. It can come close, but
+it is more of a supplement to truly unique IDs.
+
+=head1 BACKGROUND
+
+While I gave my particular implementation a name (with some friendly advice),
+neither the concept nor the mechanics behind this kind of encoding are mine.
+
+I did research it out of curiosity though, and found there was plenty of
+information available on the topic. However, while many experienced developers
+were willing to share samples of their solutions to illustrate the process, I
+did not see as many packaged solutions as I expected; this seemed most true with
+regards to Perl.
+
+I thought there might be value in making the functionality available in a single
+package. This way, less experienced programmers, or those who lack the time or
+interest to learn the mechanics, will be able to proceed without delay.
+
+=head1 ACKNOWLEDGEMENTS
+
+=head2 mst
+
+Thanks for help with the module name and answering PAUSE and CPAN questions.
+
+=head2 internets
+
+Thanks to the authors of the articles, Q&A posts, etc. which I read to get
+this module working.
+
+=head1 AVAILABILITY
+
+GitHub L<https://github.com/yakubori/Data-ID-URL-Shrink>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2013 Rick Yakubowski (yakubori) <yakubori@cpan.org>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Rick Yakubowski (yakubori) <yakubori@cpan.org>
+
+=cut
+

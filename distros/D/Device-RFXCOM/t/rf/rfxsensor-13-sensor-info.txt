@@ -1,0 +1,9 @@
+2853454e0026
+
+master rfxsensor 28.53454e0026
+
+RFXSensor SEN0, type 26 (DS2438)
+
+
+
+

@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dc105ded55d865f15f5c4f9891afb781d0f1dee3 COPYRIGHT
+SHA1 fcc0855cf164ac1fe3b59e6c6aee83afc2624e37 CREDITS
+SHA1 f1cdb6cf03a6c62d738cf8bf622529023db93395 Changes
+SHA1 dcd4206242b4a950ac03e6ce2bdb9e51d89ba817 INSTALL
+SHA1 c4c1e6c578edcfd14d13eadebc8f56dd9ca46821 LICENSE
+SHA1 6d3fe90b709ef6a1f09a68ebcd4f279ab03f8162 MANIFEST
+SHA1 4c24ce8f18b38af61d770bcf0c18046af6581876 META.json
+SHA1 0975a3bb59a221872e373d902698b2ef01ff3d20 META.yml
+SHA1 72c87d063d4d4690feab733e2f859f03c5d2ff22 Makefile.PL
+SHA1 40616f90fbef6ba6e868703ca78726c4b7100a9c README
+SHA1 ca02c63e94f49d94b46fe19ab88b401ad63a6cf2 dist.ini
+SHA1 6c1f822c351329cab2e44db9e7559b24d22f5c42 doap.ttl
+SHA1 82c7c07e605d952cbe2f3516c98c290282c3c0de examples/p5-acme-example-dist/cpanfile
+SHA1 a690b388032c6a3f4ee2e39be738fe9e35eb3130 examples/p5-acme-example-dist/dist.ini
+SHA1 e47ef7ecef48b27d0d9467b59d2ce15ff8f71d32 examples/p5-acme-example-dist/lib/Acme/Example/Dist.pm
+SHA1 b4c6387b21ed54fa72c5cba9646292bb0a725781 examples/p5-acme-example-dist/t/01basic.t
+SHA1 1bc41d24cf02eeb438d9f379cccd7e330c23d946 lib/Dist/Inkt.pm
+SHA1 ddf391f9581203319a788c61bf49c09c94605d3e lib/Dist/Inkt/Profile/Simple.pm
+SHA1 0f7e70280199d5cc267c801c39ec27ca1516b99e lib/Dist/Inkt/Role/CPANfile.pm
+SHA1 28f176f4a6801309bcc7a6ebba147a4d40ec273c lib/Dist/Inkt/Role/CopyFiles.pm
+SHA1 7640309770b91c42cec4c7f8662c771b00258537 lib/Dist/Inkt/Role/CopyStandardDocuments.pm
+SHA1 b9774365c06f6ce5ab05f03a5c5dc36cd30a21e1 lib/Dist/Inkt/Role/MetaProvides.pm
+SHA1 4f6a5c0c5f73dd4a61d58cf5b04f72993d65c874 lib/Dist/Inkt/Role/MetaProvidesScripts.pm
+SHA1 fb2944e386368e9128ea0bb053a748c95e675213 lib/Dist/Inkt/Role/SignDistribution.pm
+SHA1 9d3debb67f828b39b88c5ee44d00e0c8def0637a lib/Dist/Inkt/Role/StaticInstall.pm
+SHA1 85477c5a7fcc00d399f03ba7c35c0be7eb480493 lib/Dist/Inkt/Role/WriteDOAPLite.pm
+SHA1 3d6a70a2e4a55d32d5c91d04b6cee198f9257236 lib/Dist/Inkt/Role/WriteINSTALL.pm
+SHA1 466a90ebdfc53aff2c0f535459966ecb4e136686 lib/Dist/Inkt/Role/WriteLICENSE.pm
+SHA1 8cb0874ccdce0d31ada31a0096fc6c7899a97011 lib/Dist/Inkt/Role/WriteMakefilePL.pm
+SHA1 eb08faea2947298062465967cd433597ec2b111f lib/Dist/Inkt/Role/WriteMetaJSON.pm
+SHA1 22d7500ef4caa44c47b5c60de9dc5b7997b7200f lib/Dist/Inkt/Role/WriteMetaYML.pm
+SHA1 e5cfce46b4e38d375ece315926b36df1f1c2812e lib/Dist/Inkt/Role/WriteREADME.pm
+SHA1 5ba76616e3d569942971a08fb82e9ce13ba950e4 script/distinkt-dist
+SHA1 33c68bcd6f6bf9cea1a3530d0278856bb621e61d script/distinkt-travisyml
+SHA1 70cfda8dedef237f2ac1ba42bd929dd1c5e29a4e t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlkMrykACgkQzr+BKGoqfTlYwwCgp3e79RwsTMzxNLY2El+lnieK
+zPQAnj/g2SgsBnVFS3WEYP29JI8/OLVw
+=+b+3
+-----END PGP SIGNATURE-----

@@ -1,0 +1,13 @@
+Index: t/TEST
+*** perl5.004_56/t/TEST	Thu Nov 27 09:57:39 1997
+--- src//t/TEST	Mon Jan 12 19:07:12 1998
+***************
+*** 49,54 ****
+--- 49,55 ----
+      }
+      $te = $test;
+      chop($te);
++     $ENV{REGRESSION_TEST} = $te;
+      print "$te" . '.' x (18 - length($te));
+      if ($sharpbang) {
+  	-x $test || (print "isn't executable.\n");

@@ -1,0 +1,72 @@
+{
+   "abstract" : "Dancer2 logger engine for Fluent::Logger",
+   "author" : [
+      "Arnold Tan Casis <atancasis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Logger-Fluent",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.204002",
+            "Fluent::Logger" : "0.19",
+            "Moo" : "2.000000",
+            "Time::Moment" : "0.41",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "6.11",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96",
+            "Test::Pod" : "1.51",
+            "Test::Pod::Coverage" : "1.10"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/atancasis/Dancer2-Logger-Fluent/issues"
+      },
+      "homepage" : "https://github.com/atancasis/Dancer2-Logger-Fluent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/atancasis/Dancer2-Logger-Fluent.git",
+         "web" : "https://github.com/atancasis/Dancer2-Logger-Fluent"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

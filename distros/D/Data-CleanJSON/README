@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     use Data::CleanJSON qw(clean_json_in_place clone_and_clean_json);
+    
+     clean_json_in_place($data);
+     $cleaned = clone_and_clean_json($data);
+
+DESCRIPTION
+
+    This has the same functionality as Data::Clean::JSON except that the
+    code to perform the cleaning is pre-generated, so we no longer need
+    Data::Clean> during runtime.
+
+FUNCTIONS
+
+    None of the functions are exported by default.
+
+ clean_json_in_place($data)
+
+ clone_and_clean_json($data) => $cleaned
+
+SEE ALSO
+
+    Data::Clean::JSON
+

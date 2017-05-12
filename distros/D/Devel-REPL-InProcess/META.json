@@ -1,0 +1,74 @@
+{
+   "abstract" : "debugger-like in-process REPL",
+   "author" : [
+      "Mattia Barbon <mbarbon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-REPL-InProcess",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "1.0031",
+            "Devel::REPL" : "1.003012",
+            "IO::Pty" : "1.12",
+            "PadWalker" : "2.2",
+            "Term::ReadKey" : "2.30",
+            "Term::ReadLine" : "1.14",
+            "perl" : "v5.10.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Differences" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::REPL::Client::AnyEvent" : {
+         "file" : "lib/Devel/REPL/Client/AnyEvent.pm"
+      },
+      "Devel::REPL::Client::AnyEvent::Connection" : {
+         "file" : "lib/Devel/REPL/Client/AnyEvent/Connection.pm"
+      },
+      "Devel::REPL::Client::Select" : {
+         "file" : "lib/Devel/REPL/Client/Select.pm"
+      },
+      "Devel::REPL::InProcess" : {
+         "file" : "lib/Devel/REPL/InProcess.pm",
+         "version" : "0.05"
+      },
+      "Devel::REPL::Plugin::InProcess" : {
+         "file" : "lib/Devel/REPL/Plugin/InProcess.pm"
+      },
+      "Devel::REPL::Server::Select" : {
+         "file" : "lib/Devel/REPL/Server/Select.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbarbon/devel-repl-inprocess/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/mbarbon/devel-repl-inprocess.git"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

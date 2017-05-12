@@ -1,0 +1,303 @@
+---
+abstract: "Determine the local system's time zone on Windows"
+author:
+  - 'David Pinkowitz <dapink@cpan.org>'
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  Sys::Hostname: '0'
+  Test::More: '0.88'
+  constant: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.024, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-TimeZone-Local-Win32
+provides:
+  DateTime::TimeZone::Local::Win32:
+    file: lib/DateTime/TimeZone/Local/Win32.pm
+    version: '1.98'
+requires:
+  Try::Tiny: '0'
+  Win32::TieRegistry: '0.27'
+  parent: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/dapink/DateTime-TimeZone-Local-Win32
+version: '1.98'
+x_Dist_Zilla:
+  perl:
+    version: '5.020001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: GatherDir
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: PruneCruft
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker::Awesome
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: MakeMaker::Awesome
+      version: '0.35'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: Manifest
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: '1.200005'
+    -
+      class: Dist::Zilla::Plugin::Repository
+      name: Repository
+      version: '0.20'
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: TestRelease
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: ConfirmRelease
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: UploadToCPAN
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::Metadata
+      name: Metadata
+      version: '3.03'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+              version: '5.024'
+          include_underscores: 0
+        Dist::Zilla::Role::MetaProvider::Provider:
+          $Dist::Zilla::Role::MetaProvider::Provider::VERSION: '2.002003'
+          inherit_missing: '1'
+          inherit_version: '1'
+          meta_noindex: '1'
+        Dist::Zilla::Role::ModuleMetadata:
+          Module::Metadata: '1.000024'
+          version: '0.004'
+      name: MetaProvides::Package
+      version: '2.004002'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::Test::ChangesHasContent
+      name: Test::ChangesHasContent
+      version: '0.007'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: '0'
+          filename: xt/author/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: '0'
+          phase: develop
+          script_finder:
+            - ':ExecFiles'
+          skips: []
+      name: Test::Compile
+      version: '2.051'
+    -
+      class: Dist::Zilla::Plugin::Test::Kwalitee::Extra
+      name: Test::Kwalitee::Extra
+      version: v0.2.1
+    -
+      class: Dist::Zilla::Plugin::Test::ReportPrereqs
+      name: Test::ReportPrereqs
+      version: '0.021'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Default/SingleEncoding'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Default/Name'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Default/Version'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/prelude'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Default/Leftovers'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Default/postlude'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Default/Authors'
+              version: '4.008'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Default/Legal'
+              version: '4.008'
+      name: PodWeaver
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::CustomLicense
+      name: CustomLicense
+      version: 1.0.2
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmeAnyFromPod
+      version: '0.142470'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.024'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+      version: '5.024'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.024'
+x_cpants:
+  ignore:
+    prereq_matches_use: 'Avoiding circular dependency'

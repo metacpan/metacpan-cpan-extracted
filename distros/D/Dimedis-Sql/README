@@ -1,0 +1,100 @@
+NAME
+    Dimedis::Sql - Database Independent SQL Layer
+
+DESCRIPTION
+    This module allows to create database independent applications
+    with Perl, not only on the data transport layer, as provided by
+    DBI, but also on the SQL layer. It defines methods for SQL
+    operations, for which the different RDBMS are not compatible
+    with their SQL language.
+
+    Dimedis::Sql can interact with Dimedis::Ddl, which generates
+    DDL code to create database objects in a database independent
+    manner. Refer to the correspondent manpage for details.
+
+    Dimedis::Sql currently supports the following RDBMS:
+    
+      * Oracle
+      * MySQL  (>= 4.0.13)
+      * Microsoft MS-SQL
+      * Sybase SQL Anywhere
+      * Sybase Adaptive Server
+      * Informix
+      * PostgreSQL
+
+    Support for other RDBMS can be added easily by implementing
+    corresponding Dimedis::SqlDriver:: modules.
+    
+SYNOPSIS
+    use Dimedis::Sql;
+    
+    # Construction and initialization
+    my $sqlh = new Dimedis::Sql ( ... );
+    $sqlh->install ( ... );
+
+    # Basic I/O operations
+    my $seq_id    = $sqlh->insert ( ... );    # also blob insertion
+    my $modified  = $sqlh->update ( ... );    # also blob updates
+    my $blob_sref = $sqlh->blob_read ( ... );
+
+    # Handle different database schemas on one DBI connection
+    $sqlh->use_db ( ...)
+    my $db_prefix = $sqlh->db_prefix ( ...)
+
+    # Handy methods for arbitrary SQL execution
+    my $modified = $sqlh->do ( ... );
+    my $href = $sqlh->get ( ... );
+    my @row  = $sqlh->get ( ... );
+
+    # Create database specific code for specific operations
+    my ($from, $where) = $sqlh->outer_join ( ... );
+    my $cond = $sqlh->cmpi ( ... );
+    my $where = $sqlh->contains ( ... );
+
+    # Get compatibility flags of the current connected
+    # database system
+    my $feature_href = $sqlh->get_features;
+
+    Additionally two programs for database independent export and
+    import are shipped with Dimedis::Sql:
+    
+      dsql_import
+      dsql_export
+
+INSTALLING Dimedis::Sql
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DOCUMENTATION
+    Currently the documentation of this module is available in
+    German only. There are several manpages:
+    
+      Dimedis::Sql
+        The Dimedis::Sql API itself, and how you use it from
+	within your programs.
+
+      dsql_export
+      dsql_import
+        The export/import programs provide their own manpages.
+
+NOTE
+    The module name Dimedis::Sql is subject to change, because
+    having the company's name in the module's namespace isn't
+    a good idea for publically available modules. Namespace
+    suggestions are welcome, please send them to the author.
+
+AUTHOR
+    Joern Reder <joern AT dimedis.de>
+
+COPYRIGHT
+    Copyright (C) 1999-2003 by dimedis GmbH, 50672 Koeln, Germany
+
+    All Rights Reserved.
+
+    This library is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+SEE ALSO
+    DBI, Dimedis::Ddl

@@ -1,0 +1,31 @@
+Digest-Luffa
+============
+
+This module provides an interface to the Luffa message digest algorithm.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Digest
+    MIME::Base64
+    Test::More
+    parent
+
+A C compiler is required to build this module.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by gray <gray@cpan.org>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

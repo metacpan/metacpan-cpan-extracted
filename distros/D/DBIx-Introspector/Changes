@@ -1,0 +1,20 @@
+Revision history for DBIx-Introspector
+
+0.001005  2015-01-29 17:47:49-06:00 America/Chicago
+ - Fix error message for missing values (Thanks Wes Malone!)
+
+0.001004  2014-11-30 21:50:34-06:00 America/Chicago
+ - Fix bug that disallowed false values
+
+0.001003  2014-06-21 09:47:56-05:00 America/Chicago
+ - Fix ::Announcement POD which was shadowing the real docs
+
+0.001002  2014-02-28 07:30:00CST-0600 America/Chicago
+ - fix missing version numbers
+ - fix Advent pod (thanks for the issue oalders!)
+
+0.001001  2014-02-25 21:11:58-06:00 America/Chicago
+ - Add method to override driver selection, eg for testing
+
+0.001000
+ - Initial Release

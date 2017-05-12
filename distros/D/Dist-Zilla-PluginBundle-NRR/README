@@ -1,0 +1,18 @@
+NAME
+    Dist::Zilla::PluginBundle::NRR - Rampage through CPAN-Tokyo the NRR way!
+
+VERSION
+    version 0.121220
+
+SYNOPSIS
+    Rawr!
+
+AUTHOR
+    Nathaniel Reindl <nrr@corvidae.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Nathaniel Reindl.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

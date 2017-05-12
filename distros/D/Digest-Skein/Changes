@@ -1,0 +1,34 @@
+Revision history for Perl extension Digest::Skein.
+
+0.05  Thu Dec 10 10:43:19 IST 2009
+	- fixed RT#52551 -- digest() should reset the object
+
+0.04  Sat Nov 14 00:09:15 IST 2009
+	- updated to spec v1.2
+
+0.03  Mon Nov 17 18:43:25 CET 2008
+	- fixed documentation bug (thanks, depesz)
+	- get rid of the ShortMsgKat*.txt from the *.tar.gz (too large)
+	- add digest-benchmark (not installed)
+	- minor cleanups
+
+0.02  Sat Nov 15 19:30:06 CET 2008
+	- sync with http://www.schneier.com/code/Skein_NIST_CD_111008.zip
+	  this fixes a bug with the block padding size, see
+	  http://www.schneier.com/blog/archives/2008/10/the_skein_hash.html#c323784
+	- NOTE: the hash values for 512 and 1024 have changed because of the above!
+
+0.01  Sat Nov 15 14:16:45 CET 2008
+	- patch from Taro Nishino <taro.nishino at gmail> to compile on Win32
+	- fix compilation on DragonFly (treat it as BSD)
+
+0.00_03  Thu Nov  6 16:05:20 CET 2008
+	- Makefile.PL tweaks: proper dependencies
+
+0.00_02  Tue Nov  4 10:55:10 CET 2008
+	- Makefile.PL tweaks to shut up the CPAN tester trying "make dynamic"
+
+0.00_01  Fri Oct 31 19:11:12 2008
+	- original version; created by h2xs 1.23 with options
+		-x -O -b 5.8.0 -A -B -n Digest::Skein Optimized_64bit/SHA3api_ref.h
+

@@ -1,0 +1,7 @@
+
+Install the normal way:
+
+perl Makefile.PL
+make
+make test
+make install

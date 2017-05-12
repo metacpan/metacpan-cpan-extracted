@@ -1,0 +1,38 @@
+DBD::mysqlPP - Pure Perl MySQL driver for the DBI
+=====================================================================
+
+DBD::mysqlPP is a Pure Perl MySQL dirver for the Perl5 Database
+Interface(DBI). This module implements network protool between
+server and client of MySQL, thus you don't need external MySQL
+client library like libmysqlclient for this module to work.
+It means this module enables you to connect to MySQL server from
+some operation systems which MySQL is not ported. How nifty!
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Check that 'make test' of Net::MySQL is successful.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  Net::MySQL
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2002-2011 Hiroyuki OYAMA. Japan. All rights reserved.
+
+Copyright (C) 2011 Takuya Tsuchida
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

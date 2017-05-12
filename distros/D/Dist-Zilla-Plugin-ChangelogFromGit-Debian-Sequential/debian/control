@@ -1,0 +1,20 @@
+Source: libdist-zilla-plugin-changelogfromgit-debian-sequential-perl
+Section: perl
+Priority: optional
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8), libfile-pushd-perl, libgit-wrapper-perl,
+ libdist-zilla-perl, libdist-zilla-plugin-git-perl, libdist-zilla-plugin-changelogfromgit-perl,
+ libdatetime-format-mail-perl, dh-make-perl, libdpkg-perl, lsb-release
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-ChangelogFromGit-Debian-Sequential/
+
+Package: libdist-zilla-plugin-changelogfromgit-debian-sequential-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}, lsb-release, libdist-zilla-perl,
+ libdatetime-format-mail-perl, dh-make-perl, libdist-zilla-plugin-changelogfromgit-perl, libdpkg-perl
+Description: Add changelog entries into debain/changelog
+ ChangelogFromGit::Debian::Sequential extends
+ Dist::Zilla::Plugin::ChangelogFromGit to create/update Debian changelog. It
+ does not recreate changelog every time like
+ Dist::Zilla::Plugin::ChangelogFromGit::Debian.

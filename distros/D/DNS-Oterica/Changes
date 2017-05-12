@@ -1,0 +1,49 @@
+Revision history for DNS-Oterica
+
+0.304     2016-10-10 16:27:44-04:00 America/New_York
+        - DKIM version tag now always come first
+
+0.303     2016-10-04 16:46:56-04:00 America/New_York
+        - TinyDNS DKIM lines were not newline terminated; this has been fixed
+
+0.206     2016-10-04 16:06:59-04:00 America/New_York
+        - BREAKING CHANGE: networks now have "subnets" rather than one subnet
+        - BREAKING CHANGE: txt records now octal-escape possible special
+          characters;  if you were already doing that, it will be
+          double-encoded now
+        - added ->dkim to recordmaker
+        - further special-case our stupid internal special-case 0-24 code
+
+0.205     2014-12-15 09:37:04-05:00 America/New_York
+        - fix broken validation of SRV records with no target
+
+0.204     2014-12-12 17:06:48-05:00 America/New_York
+        - add ->srv to recordmaker
+
+0.203     2014-09-05 15:34:10-04:00 America/New_York
+        - make it possible to emit MX records without an IP (no_ip => 1)
+        - change the way that fallback/other network PTRs are generated
+        - update test utilities to deal with ' lines (TXT records) in tinydns
+        - allow "name" argument to "txt" record in TinyDNS to avoid needing a
+          node
+
+0.202     2013-12-13 08:22:25 America/New_York
+          update repo and bugtracker
+
+0.201     2013-07-01 22:27:24 America/New_York
+          update bug tracker
+
+0.200     2013-05-30 14:50:07 America/New_York
+          [ WILL TOTALLY BREAK YOUR SETUP! ]
+
+          "locations" are now "networks" and make sense
+
+          a host node can have multiple interfaces, across multiple networks,
+          which will result in a split horizon
+
+          the "world" location is now the "FALLBACK" network, the "ALL" network
+          performs a similar role
+
+0.100001  2011-03-01 13:09:07 America/New_York
+
+          first revision with a changelog

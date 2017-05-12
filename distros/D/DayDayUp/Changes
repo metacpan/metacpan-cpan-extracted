@@ -1,0 +1,49 @@
+Revision history for DayDayUp
+
+0.95    2009.09.15
+    for the new Mojo
+
+0.94    2009.05.09
+    Tags
+
+0.93    2009.04.28
+    CPAN dist fix (Not indexed because DayDayUp-0.09/lib/DayDayUp/Context.pm
+            in F/FA/FAYLAND/DayDayUp-0.09.tar.gz has a higher version
+            number (0.09))
+
+0.92    2009.04.28
+    make CPAN happy
+
+0.91    2009.04.28
+    pod updates
+
+0.90    2009.04.28
+    totally rewrite (based on KiokuDB+MooseX::Declare)
+    change TT2 COMPILE_DIR to tmpdir
+
+0.09    2009.02.21
+    add 'rejected' to notes
+    change log path
+
+0.07    2008.12.15
+    use MojoX::Fixup::XHTML
+    back to MojoX::Renderer::TT
+
+0.06    2008.12.08
+    fix log/development.log
+
+0.05    2008.12.06
+    add DayDayUp::Backup
+
+0.04    2008.11.21
+    add DayDayUp::Contacts
+
+0.03    2008.11.20
+    re-package
+
+0.02    2008.11.20
+    add DayDayUp::Perl
+
+0.01    2008.11.19
+    First version, released on an unsuspecting world.
+

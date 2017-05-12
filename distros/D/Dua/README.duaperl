@@ -1,0 +1,98 @@
+
+		NOTES AND INSTALLATION FOR DUAPERL
+			Version 1.0a3
+
+INSTALLATION
+
+	Extract the distributed tar archive into the usub directory
+	of your Perl distribution. DUAPerl was developed using
+	Perl version 4.036 under Solaris 2.3. For example:
+
+		zcat duaperl.tar.Z | (cd <perldir>/usub; tar xfvo -)
+
+	Once the archive has been extracted, edit usersub.c in
+	the Perl usub directory, and add init_duaperl() to the
+	userinit() function. Comment out any other Perl extensions
+	packages that you don't intend to use. DUAPerl should not
+	conflict with other packages if you need to use them.
+
+	Edit Makefile and set appropriate values as indicated. Make
+	sure that the C compiler you use is the same that Perl
+	is configured for, otherwise, optional compilation flags
+	within the Perl configuration scripts will haunt you.
+	Type `make'. If all goes well, you'll end up with an
+	executable called `duaperl'. Install the executable and
+	the man page where it's appropriate for your system.
+	An example script called `ditops' is available in the
+	the EXAMPLES/ directory. There is also a sample data
+	file for use with ditops. The operational fundamentals
+	should be apparent after quickly glancing through
+	the ditops script. Briefly, the command arguments are:
+
+	ditops -f inputfile [-r] 
+	where:
+		-f	specifies the file to operate on.
+		-r 	specifies that records found in inputfile
+			should be removed rather than added.
+
+	Before using this DUAPerl script, edit it and set the
+	hardcoded values to whatever is appropriate for your site.
+
+OPERATIONAL NOTES
+
+ Multivalue Attributes
+	Multivalue attributes operate the same way that they do
+	within DISH. The attribute values are all entered on a single
+	line, with each value separated by an `&' character. MV attributes
+	are also returned this way from DUAPerl. Unlike DISH, I haven't
+	yet gone through the trouble of stripping off spaces from the
+	attribute seperation, so something like:
+
+		objectClass= top & quipuObject & person
+
+	should be considered prohibited for the time being, and
+	something like:
+
+		objectClass=top&quipuObject&person
+
+	preferred.
+
+ BER Encoded Values
+	Quite simply, not supported. I intend to support these in the
+	next release; I'm searching for an elegant way to support the
+	appropriate syntaxes for various encode/decode operations.
+
+ Access Control Lists
+	I have never been able to get DUAPerl to correctly deal
+	with ACL's. Upon further investigation, it looks as if
+	the ldapd child process dies whenever it encounters an
+	ACL. This may simply be a consquence of my port of ldapd
+	to Solaris 2.x., or maybe a deeper problem within libl{dap,ber}.a
+	or DUAPerl. If anyone else gets DUAPerl to successfully deal
+	with ACL's, please notify my directly.
+
+
+FUTURE DEVELOPMENT
+	Possibly a compilation flag which would select a purely DAP
+	interface to the DSA, for very intensive operations. It should
+	be noted however that I have no problems managing my DIT in
+	large batch operations strictly with LDAP.
+
+	BER support, as mentioned above.
+
+LICENSING ISSUES
+	Consider this software under the same license that Perl comes
+	with, regardless of the Berkeley-ish type agreement which
+	is present in the source code. I'll clarify further when I actually
+	have time to read the GNU Copyleft licensing stipulations, and 
+	see how they apply to this software.
+
+DISCLAIMER
+	The California State University and myself assume no responsibility
+	for any damages which may be encountered as a consequence of using
+	this software. In other words: USE AT YOUR OWN RISK. This part
+	of the use agreement found within the source files does apply.
+
+AUTHOR
+	Eric W. Douglas, California State University, Fresno.
+	EMAIL: <eric_douglas@csufresno.edu>

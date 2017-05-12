@@ -1,0 +1,6 @@
+TODO list for Perl module DateTime::Format::Baby
+
+-- Work out why someone might actually use this.
+
+-- Move to DateTime::Acme::Baby ??
+

@@ -1,0 +1,78 @@
+---
+abstract: 'Command-line interface description language'
+author:
+  - 'tokuhirom <tokuhirom@gmail.com>'
+build_requires:
+  JSON::PP: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.9, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Docopt
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Docopt:
+    file: lib/Docopt.pm
+    version: 0.03
+  Docopt::Argument:
+    file: lib/Docopt.pm
+  Docopt::BranchPattern:
+    file: lib/Docopt.pm
+  Docopt::Command:
+    file: lib/Docopt.pm
+  Docopt::Either:
+    file: lib/Docopt.pm
+  Docopt::Exception:
+    file: lib/Docopt.pm
+  Docopt::Exceptions::DocoptExit:
+    file: lib/Docopt.pm
+  Docopt::Exceptions::DocoptLanguageError:
+    file: lib/Docopt.pm
+  Docopt::LeafPattern:
+    file: lib/Docopt.pm
+  Docopt::OneOrMore:
+    file: lib/Docopt.pm
+  Docopt::Option:
+    file: lib/Docopt.pm
+  Docopt::Optional:
+    file: lib/Docopt.pm
+  Docopt::OptionsShortcut:
+    file: lib/Docopt.pm
+  Docopt::Pattern:
+    file: lib/Docopt.pm
+  Docopt::Required:
+    file: lib/Docopt.pm
+  Docopt::Tokens:
+    file: lib/Docopt.pm
+  Docopt::Util:
+    file: lib/Docopt/Util.pm
+requires:
+  Class::Accessor::Lite: 0.05
+  List::MoreUtils: 0
+  List::Util: 0
+  Pod::Usage: 0
+  Scalar::Util: 0
+  boolean: 0
+  parent: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tokuhirom/Docopt/issues
+  homepage: https://github.com/tokuhirom/Docopt
+  repository: git://github.com/tokuhirom/Docopt.git
+version: 0.03

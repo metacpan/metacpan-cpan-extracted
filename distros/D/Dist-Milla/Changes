@@ -1,0 +1,147 @@
+Revision history for Dist::Milla
+
+v1.0.17  2016-11-25 00:24:43 PST
+        - Update Dist::Zilla requirement to version 6 #44
+
+v1.0.16  2016-05-08 11:49:31 PDT
+        - Add VERSION to Dist::Zilla::PluginBundle::Milla #38
+        - Use ReadmeAnyFromPod for POD #39
+
+v1.0.15  2015-03-31 16:25:26 PDT
+        - Update documentation
+
+v1.0.14  2015-01-19 11:23:45 PST
+        - switched from ContributorsFromGit to Git::Contributors
+
+v1.0.13  2015-01-18 22:11:26 PST
+        - revert Git::Contributors because it doesn't build clean on `milla new`
+        - add $VERSION to Dist::Milla::App so `milla version` would work correctly
+
+v1.0.12  2015-01-18 17:38:22 PST
+        - switched from ContributorsFromGit to Git::Contributors
+
+v1.0.11  2015-01-18 11:15:10 PST
+        - Minor documentation updates
+
+v1.0.10  2015-01-12 12:52:44 PST
+        - Work around ReadmeFromPod update (#28)
+
+v1.0.9  2014-11-22 09:55:34 PST
+        - bump minimum perl requirement
+
+v1.0.8  2014-09-10 17:18:28 PDT
+        - Add PluginRemover role so you can easily remove plugin from Milla bundle. #27
+
+v1.0.7  2014-09-10 14:31:56 PDT
+        - add Dist::Milla to the META as a develop dependency. #8
+
+v1.0.6  2014-09-10 14:11:08 PDT
+        - bump LicenseFromModule
+
+v1.0.5  2014-05-08 08:35:25 PDT
+        - Documentation fixes
+        - Bump Test::More dependency
+
+v1.0.4  2013-08-25 20:23:42 PDT
+        - Include generated LICENSE in the repository
+
+v1.0.3  2013-07-23 13:57:21 PDT
+        - Allow MakeMaker::IncShareDir
+
+v1.0.2  2013-04-21 08:47:50 CST
+        - Added ManifestSkip by default
+
+v1.0.1  2013-04-14 17:21:54 JST
+        - LicenseFromModule: author information is now peoprely generated out of .pm 
+        - Prereq::FromCPANfile: support 'feature' DSL encoded into META
+
+v1.0.0  2013-04-06 21:22:44 PDT
+        - This be 1.0.0
+
+v0.9.7  2013-04-02 22:54:20 PDT
+        - Bump LicenseFromModule and use override_author hack
+
+v0.9.6  2013-04-02 11:17:59 PDT
+        - remove Test::Compile
+
+v0.9.5  2013-04-01 20:41:29 PDT
+        - Bump ReversionOnRelease dependency
+
+v0.9.4  2013-04-01 17:25:29 PDT
+        - Added ContributorsFromGit
+
+v0.9.3  2013-03-30 15:14:03 PDT
+        - Add MetaNoIndex to add sensible directories to no_index in META
+
+v0.9.2  2013-03-29 23:40:11 PDT
+        - bump Dist::Zilla dep to 4.300032
+
+v0.9.1  2013-03-27 17:55:31 PDT
+        - Bump Dist::Zilla dependency (ranguard)
+        - Minor fix to documentation
+
+v0.9.0  2013-03-27 01:36:14 PDT
+        - Initial release on CPAN
+
+v0.1.18  2013-03-27 00:22:00 PDT
+        - Run the initial build to get build & META in git
+        - Add Dist::Zilla version to generated_by
+        - Bump Git::Init dependency
+
+v0.1.17  2013-03-26 15:58:26 PDT
+        - Advertize Milla in generated_by META data
+
+v0.1.16  2013-03-26 12:33:57 PDT
+        - Extract ReversionOnRelease
+        - Up Perl dependency to 5.8.5
+
+v0.1.15  2013-03-26 10:43:04 PDT
+        - Properly support subclassing Dist::Zilla::App (rjbs++)
+
+v0.1.14  2013-03-26 02:30:15 PDT
+        - Add .gitignore and .travis.yml in Minting
+
+v0.1.13  2013-03-26 02:11:32 PDT
+        - Add milla command wrapper for new and install
+
+v0.1.12  2013-03-25 14:17:06 PDT
+        - Internal
+
+v0.1.11  2013-03-25 01:28:53 PDT
+        - Keep the empty line in reversion
+
+v0.1.10  2013-03-24 23:30:00 PDT
+        - Added 'script' dir to ExecDir
+
+v0.1.9  2013-03-24 23:00:35 PDT
+        - Added LicenseFromModule
+        - Added a bit more verbose logging in ReversionOnRelease
+
+v0.1.8  2013-03-24 17:29:35 PDT
+        - Allow README to be dirty
+        - Added prompt to ReversionOnRelease
+
+v0.1.7  2013-03-23 23:13:36 PDT
+        - Separate NameFromDirectory as a CPAN module
+
+v0.1.6  2013-03-23 20:46:35 PDT
+        - Change header for the next release
+
+v0.1.5    2013-03-23 20:33:34 America/Los_Angeles
+        - Support FAKE_RELEASE environment variable
+        - Add installer option
+        
+v0.1.4    2013-03-22 17:04:58 America/Los_Angeles
+        - Internal
+
+v0.1.3    2013-03-22 16:19:50 America/Los_Angeles
+        - Internal
+
+v0.1.2    2013-03-22 16:03:24 America/Los_Angeles
+        - Internal
+
+v0.1.1    2013-03-22 15:56:28 America/Los_Angeles
+        - Debugging
+
+v0.1.0    2013-03-22 15:47:25 America/Los_Angeles
+        - original version

@@ -1,0 +1,442 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Cookbook - Guide for Data::Range::Compare::Stream
+
+=head1 DESCRIPTION
+
+This Cook book acts as a documentation hub for Data::Range::Compare::Stream and its child modules.
+
+=head1 Solving Common Problems
+
+This section contains many solutions to common problems.
+
+=head2 How do I validate my data?
+
+Wrap your iterator object in a Validator and create a call back handler to deal with invalid ranges.
+
+Example:
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  use Data::Range::Compare::Stream::Iterator::Validate;
+
+  sub on_bad_range {
+    my ($range)=@_;
+    print "invalid range found\n";
+
+    my $start=$self->range_start;
+    my $end=$self->range_end;
+   
+    unless(defined($start)) {
+      print "Starting value for the range is not defined\n";
+      return;
+    }
+    unless(defined($end)) {
+      print "Ending value for the range is not defined\n";
+      return;
+    }
+
+    if($self->cmp_values($start,$end)==1) {
+      print "Start value is gt End Value\n";
+    }
+
+  }
+
+  my $unvalidated=new Data::Range::Compare::Stream::Iterator::File(
+    filename=>'somefile'
+  );
+
+  my $validated=new Data::Range::Compare::Stream::Iterator::Validate(
+    $unvalidated,
+    on_bad_range=>\&on_bad_range
+  )
+
+=head2 I want to load a CSV file and retain the original line the range was parsed from.
+
+Data::Range::Compare::Stream::Iterator::File supports->new supports a parse_line argument.  Pass in a code ref to handle line parsing and save your original line as the data argument.
+
+Example CSV File Columns 2 and 3 Contain the range value:
+  
+  Col1   Col2 Col3 Col4 Col5 Col6
+  Col_1#   3   7   33   9    128
+  Col_2#   7   9   33   9    128
+
+Creating the call back function:
+
+  sub parse_line {
+    my ($line)=@_;
+    my @fields=split /\s+/,$line;
+
+    return [@fields[1,2],$line];
+  }
+
+Create the File Iterator:
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  my $it=new Data::Range::Compare::Stream::Iterator::File(
+    filename=>'some.csv',
+    parse_line=>\&parse_line
+  );
+
+=head2 Help my data is to big to sort!!
+
+Data::Range::Compare::Stream::Iterator::File::MergeSortAsc does a merge sort by spooling parts of the sort process out onto disk.  Using this package requires the creation of 2 or more call backs:  parse_line and result_to_line.
+
+We will borrow from the CSV Example above.
+
+Example CSV File Columns 2 and 3 Contain the range value:
+  
+  Col1   Col2 Col3 Col4 Col5 Col6
+  Col_1#   3   7   33   9    128
+  Col_2#   7   9   33   9    128
+
+Creating the call back function:
+
+  sub parse_line {
+    my ($line)=@_;
+    my @fields=split /\s+/,$line;
+
+    return [@fields[1,2],$line];
+  }
+
+Creating the result_to_line function.
+
+The result_to_line takes the given range and converts it to a line that parse_line can read.
+
+  sub result_to_line {
+    my ($range)=@_;
+    return $range->data;
+  }
+
+Now we can create our MergeSortAsc instance.
+
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc;
+
+  my $ms=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    filename=>'some.csv',
+    parse_line=>\&parse_line,
+    result_to_line=>\&result_to_line
+  );
+
+=head2 I created a custom Data::Rage::Compare::Stream class for my data but no iterators work with it?
+
+This problem has 2 areas that need to be looked at.  1. Iterator arguments.  2 constant NEW_FROM_CLASS.
+
+1. Most of the iterator classes support the NEW_FROM argument.
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  my $it=new Data::Range::Compare::Stream::Iterator::File(
+    filename=>'some.csv',
+    NEW_FROM=>'MyRangeClass'
+  );
+
+2. Make sure you overload the constant NEW_FROM_CLASS in your range class as well.
+
+  package MyRangeClass;
+
+  use base qw(Data::Range::Compare::Stream);
+  use constant NEW_FROM_CLASS=>'MyRangeClass';
+
+  1;
+
+=head2 I'm running out of disk space using Data::Range::Compare::Stream::Iterator::File::MergeSortAsc.
+
+Data::Range::Compare::Stream::Iterator::File::MergeSortAsc supports a tmpdir option.
+  
+  my $ms=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    filename=>'some.csv',
+    parse_line=>\&parse_line,
+    result_to_line=>\&result_to_line,
+    tmpdir=>'/some/path/with/loads/of/space'
+  );
+
+=head2 I'm running out of inodes when using Data::Range::Compare::Stream::Iterator::File::MergeSortAsc.
+
+You can reduce the number of temp files Data::Range::Compare::Stream::Iterator::File::MergeSortAsc creates by raising the bucket size.  Raising the bucket size causes Data::Range::Compare::Stream::Iterator::File::MergeSortAsc to use more memory but produces fewer temp files.  The default bucket size is 4000, it should be safe to raise this value to 50000 on most machines.
+
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc;
+  my $ms=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    filename=>'some.csv',
+    parse_line=>\&parse_line,
+    result_to_line=>\&result_to_line,
+    tmpdir=>'/some/path/with/loads/of/space',
+    bucket_size=>50000,
+  );
+
+=head2 Help I'm running perl 5.6.x and my sort calls are not working correctly!
+
+Perl versions prior to 5.8.x used quick-sort.  Quick-sort is noted to be unstable.  The simple solution is to upgrade to a current stable version of perl.  If upgrading to a current stable version of perl is not an option you can use the Data::Range::Compare::Stream::Iterator::File::MergeSortAsc and set the bucket_size to 1.
+
+If you can't upgrade sort using Data::Range::Compare::Stream::Iterator::File::MergeSortAsc.
+
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc;
+  my $ms=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    filename=>'some.csv',
+    parse_line=>\&parse_line,
+    result_to_line=>\&result_to_line,
+    tmpdir=>'/some/path/with/loads/of/space',
+    bucket_size=>1,
+  );
+
+=head2 Help Data::Range::Compare::Stream::Iterator::Compare::Asc is dieing!
+
+This is caused by 1 of 2 things: 1. Ranges returned from the iterators do not pass the $range->boolean check. 2 Ranges are not sorted in sorted_in_consolidate_asc_order. 
+
+1. First wrap your iterators in validators.
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  use Data::Range::Compare::Stream::Iterator::Validate;
+
+  my $unvalidated=new Data::Range::Compare::Stream::Iterator::File(
+    filename=>'somefile'
+  );
+
+  my $validated=new Data::Range::Compare::Stream::Iterator::Validate(
+    $unvalidated,
+    on_bad_range=>\&on_bad_range
+  )
+
+2. Sort your data.
+
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc;
+
+  my $sorted=Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    iterator_list=>[$validated],
+    parse_line=>\&parse_line,
+    result_to_line=>\&result_to_line,
+  );
+
+Now the compare should run without error:
+
+  my $cmp=new Data::Range::Compare::Stream::Iterator::Compare::Asc;
+
+  $cmp->add_consolidator($sorted);
+
+=head2 I want to add a Data::Range::Compare::Stream::Iterator::Compare::Asc as an iterator to Data::Range::Compare::Stream::Iterator::Compare::Asc.
+
+This works, but there are better ways.  Most results from compare objects need to be filtered in some way in order to be useful.  Examples include: Skipping empty result sets, Skipping full result sets, Skipping result sets that match some other criteria.
+
+This will work, but its not recommended:
+
+  my $column=new Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  my $cmp=Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  $cmp->add_consolidator($column);
+
+A better way is to use Data::Range::Compare::Stream::Iterator::Compare::LayerCake and create a filter call back.
+
+When the filter call back returns true the result will be returned by get_next.
+
+  sub filter {
+    my ($result)=@_;
+    $result->is_full;
+  }
+  use Data::Range::Compare::Stream::Iterator::Compare::LayerCake;
+  use Data::Range::Compare::Stream::Iterator::Compare:Asc;
+
+  my $column=new Data::Range::Compare::Stream::Iterator::Compare::LayerCake(
+    filter=>\&filter
+  );
+  my $cmp=Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  $cmp->add_consolidator($column);
+
+=head2 How do I deal with dates?
+
+Dates are not directly supported by Data::Range::Compare::Stream, but its not hard to subclass Data::Range::Compare::Stream.
+
+If you have the DateTime module, and don't mind creating DateTime objects as the start and end values use this example:
+
+  package Data::Range::Compare::Stream::DateTime;
+
+  use strict;
+  use warnings;
+  use DateTime;
+  use base qw(Data::Range::Compare::Stream);
+  use overload
+    '""'=>\&to_string,
+    fallback=>1;
+
+  #
+  # Define the class internals will use when creating a new object instance(s)
+  use constant NEW_FROM_CLASS=>'Data::Range::Compare::Stream::DateTime';
+
+  use constant TIME_FORMAT=>'%Y-%m-%d %H:%M:%S';
+
+  sub cmp_values ($$) {
+    my ($self,$value_a,$value_b)=@_;
+    return DateTime->compare($value_a,$value_b);
+  }
+
+  sub add_one ($) {
+    my ($self,$value)=@_;
+    return $value->clone->add(seconds=>1);
+  }
+
+  sub sub_one ($) {
+    my ($self,$value)=@_;
+    return $value->clone->subtract(seconds=>1);
+  }
+
+  sub range_start_to_string {
+    my ($self)=@_;
+    return $self->range_start->strftime($self->TIME_FORMAT);
+  }
+
+  sub range_end_to_string {
+    my ($self)=@_;
+    return $self->range_end->strftime($self->TIME_FORMAT);
+  }
+
+  sub duration_in_seconds {
+    my ($self)=@_;
+    1 + $self->range_end->epoch - $self->range_start->epoch;
+  }
+
+  sub to_string {
+    my ($self)=@_;
+    $self->range_start_to_string.' - '.$self->range_end_to_string;
+  }
+
+If you don't have the DateTime module you can use epoch and the POSIX module.
+
+  package Data::Range::Compare::Stream::PosixTime;
+
+  use strict;
+  use warnings;
+  use POSIX qw(strftime);
+  use overload
+    '""'=>\&to_string,
+    fallback=>1;
+
+  use base qw(Data::Range::Compare::Stream);
+
+  use constant NEW_FROM_CLASS=>'Data::Range::Compare::Stream::PosixTime';
+
+  sub format_range_value {
+    my ($self,$value)=@_;
+    strftime('%Y%m%d%H%M%S',localtime($value));
+  }
+
+  sub range_start_to_string {
+    my ($self)=@_;
+    $self->format_range_value($self->range_start);
+  }
+
+  sub time_count {
+    my ($self)=@_;
+    $self->range_end - $self->range_start
+  }
+
+  sub range_end_to_string {
+    my ($self)=@_;
+    $self->format_range_value($self->range_end);
+  }
+
+  sub to_string {
+    my ($self)=@_;
+    $self->range_start_to_string.' - '.$self->range_end_to_string;
+  }
+
+  1;
+
+
+=head1 Comparing Data Examples
+
+This section provides examples on how to extend Data::Range::Compare::Stream to support various data types.
+
+=head2 IPV4 Example See:
+
+L<Data::Range::Compare::Stream::Cookbook::COMPARE_IPV4|Data::Range::Compare::Stream::Cookbook::COMPARE_IPV4>
+
+=head2 DateTime Example See:
+
+L<Data::Range::Compare::Stream::Cookbook::COMPARE_DateTime|Data::Range::Compare::Stream::Cookbook::COMPARE_DateTime>
+
+=head1 Range Iterator Examples
+
+This section covers how to create your own range iterator class, based on various data source types
+
+=head2 Consolidate Iterator Examples
+
+The Adjacent Range example: L<Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc>
+
+=head2 The File Examples:
+
+=over 3
+
+=item * Basic File example
+
+If your raw files sorted with the start range value in ASC and the range end value DESC order 
+then refer to the Base Iterator class.
+
+L<Data::Range::Compare::Stream::Iterator::Base>
+
+=item * Basic File Result Example
+
+If you your raw file has no duplicates, overlaps and is sorted use this example:
+
+L<Data::Range::Compare::Stream::Cookbook::FILE_RESULT_EXAMPLE>
+
+=item * File Iterator support classes
+
+Basic File iterator class
+
+L<Data::Range::Compare::Stream::Iterator::File>
+
+Basic Consolidator ( assuming your data is sorted and consolidated all ready )
+
+L<Data::Range::Compare::Stream::Iterator::Consolidate::FileAsc>
+
+=item * How do I sort really big data sets?
+
+See:
+
+L<Data::Range::Compare::Stream::Iterator::File::MergeSortAsc>
+
+For more detailed examples see:
+
+L<Data::Range::Compare::Stream::Cookbook::CustomFileFormat>
+
+=item * How do I load ranges from Custom CSV Files?
+
+See the OO constructor arguments for:
+
+L<Data::Range::Compare::Stream::Iterator::File>
+
+L<Data::Range::Compare::Stream::Iterator::File::MergeSortAsc>
+
+For Coding examples see:
+
+L<Data::Range::Compare::Stream::Cookbook::CustomFileFormat>
+
+=back
+
+=head2 The Layer Cake:
+
+Quick and dirty result filtering how to can be found here.
+
+L<Data::Range::Compare::Stream::Iterator::Compare::LayerCake>
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+
+=head1 SVN Location
+
+L<http://data-range-comp.svn.sourceforge.net/viewvc/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

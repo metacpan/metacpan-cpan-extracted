@@ -1,0 +1,101 @@
+DDL::Oracle - A Perl tool to reverse engineer the DDL of Oracle  
+              objects from Oracle (versions 7.3, 8.0 and 8i)
+              by Richard Sutherland.
+
+Copyright (c) 2000, 2001  Richard Sutherland, United States
+
+See COPYRIGHT section in Oracle.pm for usage and distribution rights.
+
+QUICK START GUIDE:
+
+    DDL::Oracle requires the DBI and DBD::Oracle modules to talk to the 
+    database.  It is designed to reverse engineer DDL for Oracle 8i 
+    instances.
+
+    Read the DBI README then Build/test/install the DBI by doing
+	    perl Makefile.PL
+	    make
+	    make test
+	    make install
+    Then delete the source directory tree since it's no longer needed.
+    Use the 'perldoc DBI' command to read the DBI documentation.
+
+    Fetch the DBD::Oracle driver module and unpack it.  Install it the 
+    same way by doing
+	    perl Makefile.PL
+	    make
+	    make test
+	    make install
+
+The DBI.pm file contains the DBI specification and other documentation.
+PLEASE READ IT. It'll save you asking questions on the mailing list
+which you will be told are already answered in the documentation.  If you 
+cannot connect to Oracle, then your problem is with your Perl, DBI or 
+DBD::Oracle installation(s).  Please solve these problems before reporting 
+problems with DDL::Oracle.
+
+For more information and to keep informed about progress on DDL::Oracle, you 
+can join the mailing list via 
+
+    http://sourceforge.net/projects/ddl-oracle/
+
+See also http://www.perl.com/CPAN/
+
+
+BEFORE BUILDING, TESTING AND INSTALLING DDL::Oracle you will need to:
+
+    Build, test and install Perl 5 (preferably 5.004_04 or later).
+    It is very important to test it and actually install it!
+    (You can use "Configure -Dprefix=..." to build a private copy.)
+    Build, test and istall the DBI and DBD::Oracle modules.
+
+BUILDING DDL::Oracle
+
+    perl Makefile.PL
+    make
+    make test
+    make install (if the tests look okay)
+
+IF YOU HAVE PROBLEMS:
+
+If you can't fix it yourself, please email details to:
+
+     ddl-oracle-users@lists.sourceforge.net.  
+
+I'm on the mailing list, so I'll see the message.  Please include:
+
+1. A complete log of a complete build, e.g.:
+
+    perl Makefile.PL           (do a make realclean first)
+    make
+    make test
+    make install
+
+2. Full details of which version of Oracle you're using.
+
+3. The output of perl -V
+
+Please don't post problems to comp.lang.perl.* or perl5-porters.
+This software is supported via the ddl-oracle-users mailing list.  For 
+more information and to keep informed about progress you can join the
+mailing list via http://sourceforge.net/projects/ddl-oracle/.  On the 
+SourceForge site for this project, there is also an Open Discussion 
+forum (where you are encouraged to submit suggestions and RFC's) and a 
+Bug Tracking list.  
+
+It is important to check that you are using the latest version before
+posting. If you're not then I'm *very* likely to simply say "upgrade to
+the latest". You would do yourself a favor by upgrading beforehand.
+
+There is pod documentation for using DDL::Oracle in the Oracle.pm file.
+From the .../DDL directory, try 'pod2text Oracle.pm'.
+
+Please remember that I'm (hopefully employed and) busy. Try to help 
+yourself first, then try to help me help you by following these 
+guidelines carefully.  (Note specifically that I'm unlikely to answer a 
+question that's answered clearly in the on-line documentation.)
+
+Regards,
+Richard Sutherland
+
+__END__

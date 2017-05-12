@@ -1,0 +1,6 @@
+name = "DateTimeX-Moment"
+badges = ["travis"]
+authority="cpan:KARUPA"
+
+module_maker="ModuleBuildTiny"
+

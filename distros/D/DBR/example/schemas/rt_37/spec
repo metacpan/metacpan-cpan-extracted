@@ -1,0 +1,14 @@
+schema=rt_37	table=artist	field=royalty_rate	cmd=TRANSLATOR	translator=PERCENT
+schema=rt_37	table=album	field=artist_id	cmd=RELATION	reltable=artist	relfield=artist_id	relname=artist	reverse_name=albums	type=CHILDOF
+schema=rt_37	table=album	field=rating	cmd=TRANSLATOR	translator=ENUM
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=lv_evry_sec	enum_id=11	override_id=NULL	name=Loved Every Second
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=exceptional	enum_id=4	override_id=NULL	name=Exceptional
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=great	enum_id=5	override_id=NULL	name=Great
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=good	enum_id=6	override_id=NULL	name=Good
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=fair	enum_id=7	override_id=NULL	name=Fair
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=poor	enum_id=8	override_id=NULL	name=Poor
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=sucks	enum_id=9	override_id=NULL	name=It Sucks
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=stinks	enum_id=10	override_id=NULL	name=Absolutely Stinks
+schema=rt_37	table=album	field=rating	cmd=ENUMOPT	handle=earbleed	enum_id=12	override_id=NULL	name=My Ears are Bleeding
+schema=rt_37	table=album	field=date_released	cmd=TRANSLATOR	translator=UNIXTIME
+schema=rt_37	table=track	field=album_id	cmd=RELATION	reltable=album	relfield=album_id	relname=album	reverse_name=tracks	type=CHILDOF

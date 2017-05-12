@@ -1,0 +1,26 @@
+0.07
+    - Declare dependency on a Test::More with done_testing
+
+0.06
+    - Fix test failures on new versions of Test::Simple
+    - Some internal refactoring, as well as some micro-optimisations
+
+0.05
+	- Work around a strange lexical scoping issue with string eval and 5.6
+
+0.04
+	- Fix a bug where UNIVERSAL's symbols are wrapped and the wrappers
+	  overwrite manually defined versions
+	- remove the perl 5.10 requirement because tests seem to be passing. This
+	  might cause problems with thunks vivifying to non overloaded objects in
+	  older perls.
+
+0.03
+	- unbreak release
+	- Add Data::Thunk::Object
+
+0.02
+	- Break release
+
+0.01
+	- Initial release

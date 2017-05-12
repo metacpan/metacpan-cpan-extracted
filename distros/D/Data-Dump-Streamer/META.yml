@@ -1,0 +1,68 @@
+---
+abstract: 'Accurately serialize a data structure as Perl code.'
+author:
+  - 'Yves Orton <yves@cpan.org>, Joshua ben Jore <jjore@cpan.org>'
+build_requires:
+  B::Deparse: '0'
+  Carp: '0'
+  Config: '0'
+  Data::Dumper: '0'
+  Devel::Peek: '0'
+  ExtUtils::CBuilder: '0'
+  Symbol: '0'
+  Test::More: '0'
+  Text::Abbrev: '0'
+  base: '0'
+  overload: '0'
+  re: '0'
+  strict: '0'
+  utf8: '0'
+  vars: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::Depends: '0'
+  Module::Build: '0'
+  perl: '5.006'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Dump-Streamer
+provides:
+  Data::Dump::Streamer:
+    file: lib/Data/Dump/Streamer.pm
+    version: '2.40'
+  Data::Dump::Streamer::Deparser:
+    file: lib/Data/Dump/Streamer.pm
+    version: '2.40'
+recommends:
+  Algorithm::Diff: '0'
+  Compress::Zlib: '0'
+  JSON::XS: '0'
+  MIME::Base64: '0'
+  PadWalker: '0.99'
+requires:
+  B: '0'
+  B::Deparse: '0'
+  B::Utils: '0'
+  Data::Dumper: '0'
+  DynaLoader: '0'
+  Exporter: '0'
+  Hash::Util: '0'
+  IO::File: '0'
+  Symbol: '0'
+  Text::Abbrev: '0'
+  Text::Balanced: '0'
+  overload: '0'
+  re: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+  warnings::register: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/demerphq/Data-Dump-Streamer
+version: '2.40'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

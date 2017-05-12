@@ -1,0 +1,78 @@
+{
+   "abstract" : "Parameterized Moose role which provides accessor methods for values stored in a hash-like structure",
+   "author" : [
+      "Manfred Stock <mstock@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "MooseX::Role::Parameterized" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::InflateColumn::Serializer" : "0",
+            "DBIx::Class::InflateColumn::Serializer::Hstore" : "0",
+            "DBIx::Class::InflateColumn::Serializer::JSON" : "0",
+            "DBIx::Class::Schema" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "JSON::MaybeXS" : "0",
+            "Moose" : "0",
+            "MooseX::MarkAsMethods" : "0",
+            "MooseX::NonMoose" : "0",
+            "Pg::hstore" : "0",
+            "Test::Class" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mstock/DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor",
+         "web" : "https://github.com/mstock/DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor"
+      }
+   },
+   "version" : "0.001000"
+}
+

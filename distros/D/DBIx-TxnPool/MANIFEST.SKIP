@@ -1,0 +1,10 @@
+\.komodoproject$
+\.git.*
+^Makefile.old
+^Makefile$
+^blib(/|$)
+^pm_to_blib$
+\.bak$
+^DBIx-TxnPool-
+MYMETA\.yml
+MYMETA\.json

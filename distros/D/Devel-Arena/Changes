@@ -1,0 +1,84 @@
+Revision history for Perl extension Devel::Arena.
+
+0.23  Mon Feb 27 18:28:39 GMT 2006
+      Collect stats on magic
+
+0.22  Sun Jan  8 11:30:11 GMT 2006
+      Count the files used by GPs, PVCVs and PVFMs
+      Count the prototypes of PVFMs
+
+0.21  Sat Jan  7 20:06:54 GMT 2006
+      Collect stats on the reference counts of GPs
+      Use PTR2UV to avoid a cast warning on -Duse64bitint builds.
+      Avoid "used only once" warning in the typeglob tests.
+
+0.20  Fri Jan  6 21:25:39 GMT 2006
+      Enable prototypes in the XS.
+      Collect stats on the frequency of CV prototypes.
+      Update copyright years.
+      Reverse the order of this Changes file.
+
+0.19  Sun Jun 12 00:06:40 BST 2005
+      Collect stats on shared string scalars, and use these to estimate the
+      effectiveness of the shared string table.
+
+0.18  Sat Jun 11 21:19:02 BST 2005
+      Collect stats on the shared string table, and calculate whether it is
+      actually saving memory.
+
+0.17  Wed Jun  8 11:40:19 BST 2005
+      Jim Cromie sent a patch to store o store $^X, $0, @ARGV and @INC in the
+      dump from write_stats_at_end
+
+0.16  Tue May 31 11:33:06 BST 2005
+      Marcus Holland-Moritz discovered that Devel::Arena was leaking memory,
+      and sent a patch. It turns out *I* hadn't read
+      http://search.cpan.org/~nwclark/perl/pod/perlxs.pod#Returning_SVs,_AVs_and_HVs_through_RETVAL
+      (I just tried returning HV*, and found that the default typemaps seemed
+      to handle it. Bad plan)
+
+0.15  Mon May 23 20:03:10 BST 2005
+      Collect stats on GvNAME()
+
+0.14  Sun May 22 00:31:46 BST 2005
+      Count the types in the GV's slots.
+
+0.13  Sat May 21 00:28:47 BST 2005
+      Find PMOPs from magic when necessary (needed for 5.9).
+
+0.12  Fri May 20 23:29:59 BST 2005
+      Collect lots of stats on GVs.
+
+0.11  Fri May 20 22:18:44 BST 2005
+      Collect the HvNAMES, and count to see if any repeat.
+
+0.10  Fri May 20 11:11:10 BST 2005
+      Collect stats for HvRITER and HvEITER
+
+0.09  Mon May 16 22:45:12 BST 2005
+      Collect stats for SvSTASH(). Surprisingly few things have stashes.
+
+0.08  Mon May 16 00:50:02 BST 2005
+      Collect stats for arrays with AvARYLEN
+
+0.07  Sat May 14 18:56:08 BST 2005
+      Add write_stats_at_END
+
+0.06  Fri May 13 20:48:37 BST 2005
+      Collect stats for the amount of magic on all types
+
+0.05  Fri May 13 16:06:19 BST 2005
+      Collect stats for the amount of magic on HVs
+
+0.04  Thu May 12 23:06:10 BST 2005
+      Now with better HV stats
+
+0.03  Thu May 12 15:10:32 BST 2005
+      Now with counts of different SV types.
+
+0.02  Wed May 11 23:26:11 BST 2005
+      Now with sizes of arenas.
+
+0.01  Wed May 11 22:14:53 2005
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.5.0 -n Devel::Arena

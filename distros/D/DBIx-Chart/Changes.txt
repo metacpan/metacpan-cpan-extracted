@@ -1,0 +1,27 @@
+Change History for DBIx::Chart:
+
+Release 0.05:
+
+	- fixed incompatbility for some DBD's that don't
+		support multiple open stmt handles; permits
+		DBD::Chart to execute() handles if needed
+
+Release 0.04:
+
+	- Fixed placeholder mapping for source statements
+	- Fixed bad sth subclassing
+	- added test for same
+	- changed test suite to use temp tables
+	- removed unneeded dbh methods
+
+Release 0.03:
+
+	- Several bug fixes for DBIx::Threaded testing
+
+Release 0.02:
+
+	- Several bug fixes for SQL::Preproc testing
+
+Release 0.01:
+
+	Coded; first beta release

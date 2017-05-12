@@ -1,0 +1,95 @@
+# NAME
+
+Dancer::Session::DBI - DBI based session engine for Dancer
+
+# SYNOPSIS
+
+This module implements a session engine by serializing the session, 
+and storing it in a database via [DBI](http://search.cpan.org/perldoc?DBI). The default serialization method is [JSON](http://search.cpan.org/perldoc?JSON),
+though one can specify any serialization format you want. [YAML](http://search.cpan.org/perldoc?YAML) and [Storable](http://search.cpan.org/perldoc?Storable) are
+viable alternatives.
+
+JSON was chosen as the default serialization format, as it is fast, terse, and portable.
+
+Supported databases are MySQL > 4.1.1, PostgreSQL > 9.1, and SQLite > 3.0
+
+# USAGE
+
+In config.yml
+
+    session: "DBI"
+    session_options:
+        dsn:      "DBI:mysql:database=testing;host=127.0.0.1;port=3306" # DBI Data Source Name
+        table:    "sessions"  # Name of the table to store sessions
+        user:     "user"      # Username used to connect to the database
+        password: "password"  # Password to connect to the database
+
+Alternatively, you can set the database handle in your application, by passing
+an anonymous sub that returns an active DBH connection. Specifying a custom
+serializer / deserializer is also possible
+
+    set 'session_options' => {
+        dbh          => sub { DBI->connect( 'DBI:mysql:database=testing;host=127.0.0.1;port=3306', 'user', 'password' ); },
+        serializer   => sub { YAML::Dump(@_); },
+        deserializer => sub { YAML::Load(@_); },
+        table        => 'sessions',
+    };
+
+The following schema is the minimum requirement.
+
+    CREATE TABLE `sessions` (
+        `id`           CHAR(40) PRIMARY KEY,
+        `session_data` TEXT
+    );
+
+If using a `Memory` table, you must use a `VARCHAR` type for the `session_data` field, as that
+table type doesn't support `TEXT`
+
+A timestamp field that updates when a session is updated is recommended, so you can expire sessions
+server-side as well as client-side. You can do this in MySQL with the following SQL. Other database
+engines are left as an exercise for the reader.
+
+    `last_active` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
+This session engine will not automagically remove expired sessions on the server, but with a timestamp
+field as above, you should be able to to do this manually.
+
+# METHODS
+
+## create()
+
+Creates a new session. Returns the session object.
+
+## flush()
+
+Write the session to the database. Returns the session object.
+
+## retrieve($id)
+
+Look for a session with the given id.
+
+Returns the session object if found, `undef` if not. Logs a debug-level warning
+if the session was found, but could not be deserialized.
+
+## destroy()
+
+Remove the current session object from the database.
+
+# SEE ALSO
+
+[Dancer](http://search.cpan.org/perldoc?Dancer), [Dancer::Session](http://search.cpan.org/perldoc?Dancer::Session), [Plack::Session::Store::DBI](http://search.cpan.org/perldoc?Plack::Session::Store::DBI)
+
+
+
+# AUTHOR
+
+James Aitken <jaitken@cpan.org>
+
+
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) James Aitken.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

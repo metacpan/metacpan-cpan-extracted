@@ -1,0 +1,24 @@
+====================
+DBM::Any version 0.1
+====================
+
+DBM::Any puts an object-oriented interface on AnyDBM_File.  The
+BerkeleyDB modules support an OO interface, which I like, and it
+makes them easier to pass around; why shouldn't the other formats
+support it?
+
+The usual installation instructions apply:
+
+    /path/to/perl Makefile.PL
+    make
+    make test
+    make install
+
+DBM::Any requires these other modules and libraries:
+
+    AnyDBM_File
+
+You will also need at least one DBM-type module installed.
+Fortunately, Perl tends to come with one. :-)
+
+$Id: README,v 1.1 2002/07/19 20:41:53 tony Exp $

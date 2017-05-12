@@ -1,0 +1,28 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-MintingProfile-Iller-CSSON
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Dist::Zilla::Role::MintingProfile: 5.000
+      - File::ShareDir
+      - Moose: 2.00
+      - Path::Class
+      - Carp
+      - namespace::autoclean
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: ShareDir
+    dir: profiles
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

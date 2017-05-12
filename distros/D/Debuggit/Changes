@@ -1,0 +1,277 @@
+Revision history for Perl module Debuggit
+
+
+2.06 Mar 31, 2015
+    - fix warnings in newer versions of Perl
+        - thanks to ANDK for the patch
+        - closes RT/90433
+    - test suite stuff:
+        - rename nomem1.t to nomem-old.t
+        - do a skip_all in all cases
+            - this avoids GTop failures on certain Perl versions
+        - rename nomem2.t to nomem.t
+        - Memory::Usage is now the official way to test we're not adding RAM
+
+2.05 Nov  5, 2013
+    - more distro fixes:
+        - remove evil stuff that had crept into MANIFEST
+        - updated MANIFEST.SKIP to hopefully keep that from happening again
+        - moved POD tests to xt/ so they can't cause install failures
+        - fixed Makefile.PL to generate both META.yml *and* META.json
+
+2.04 Feb 15, 2013
+    - added support for Data::Printer via a new config option
+    - DUMP function (with Data::Dumper) now sorts hash keys
+    - doco for DataPrinter option, plus more doco tweaks
+    - fixed many distribution/testing errors:
+        - added configure_requires for YAML::Tiny
+            - should fix UNKNOWN reports on CPAN Testers
+        - revamped default_funcs.t to work on Windows
+        - added testing Perl snippet framework to work across Windows/Linux
+            - working with DANBOO to get this stuff into Test::Command
+        - now sorting Data::Dumper hash keys in all tests too
+
+2.03 Dec 30, 2012
+    - very slight doco tweaks
+    - fixed Module::Install version as per Miyagawa
+        (http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04)
+
+2.02 Feb 19, 2012
+    - fixed annoying "redefined" warnings
+    - fixed annoying "naked subroutines" test failures for callers of Debuggit
+        - proper handling of Pod::Coverage's absence in t/pod_coverage.t
+    - can now override the system wide DEBUG for a specific module
+    - adding another test to insure no additional memory is used
+        - refactored t/nomem1.t to match t/nomem2.t
+        - more cautious handling of Memory::Usage to avoid non-Linux problems
+    - updated / extended all POD
+        - now have main POD, manual, and cookbook
+    - fixed the problem with Moose classes autocleaning DEBUG
+
+2.01 Jul 29, 2011
+    - initial CPAN release
+    - updates to POD
+    - fixed Changes file (now in reverse chronological order)
+
+2.00 Mar 29, 2011
+    - initial version as Debuggit.pm
+        - rebuilt from the ground up (again)
+        - still using TDD; now using TAP
+        - all previous features retained except:
+            - messing about with VC working dirs removed
+            - that probably should have always been separate, really
+    - designed to be released onto CPAN
+        - distro built up (using ExtUtils::ModuleMaker::PBP)
+        - added POD
+        - tests fully TAP compliant
+        - added lots of comparisons with other CPAN modules
+        - now verifying claims of 0 memory and 0 code via tests
+    - added some new features:
+        - removed dependence on Exporter (wasn't really using it for anything anyway)
+        - DEBUG moved to package Debuggit:: (of course)
+        - DEBUG already defined in caller not an exception (similar to VCtools::Base)
+            - can't remember why I thought it should be an error in the first place
+        - min debugging level (first arg to debuggit) is now optional (default: 1)
+        - separated out formatter so you can change how the debugging output looks
+        - separated out output method so you can change where the debugging output goes
+        - exposed default_formatter as part of the public interface
+        - formalized the debugging functions
+            - added $self arg
+            - added add_func
+            - added remove_func
+        - added POLICY arg to import for exporting up a level
+    - tested all this in production code for roughly two years before deemed ready for CPAN
+        - as noted below, original Debuggit.pm dates from Aug 7, 2008
+
+
+[END OF LIFE (such as it was) for Company::Debug]
+
+1.99 Summer, 2008
+    - initial version as Company::Debug
+    - first idea for debugging functions
+        - default function DUMP for runtime require'ing of Data::Dumper
+        - flexible multi-arg functions for handling repititious debugging like in the POOF code
+            - so, thanks to BMILLARES for giving me the brainstorm! (albeit inadvertently)
+            - the OBJDATA example in Debuggit.pm is almost verbatim what Benny was doing
+    - eventually abandoned this idea in favor getting Debuggit.pm ready for CPAN
+
+[creation of Company::Debug]
+[this idea was never completed, and consequently never checked in]
+
+
+[END OF LIFE for Barefoot.pm]
+
+1.13 Jul 11, 2009
+    - cleaned up super-obscure bug caused by trying to call debuggit() from inside _set_debuggit_func()
+        - not only avoids spurious warning, but should provide better performance as well
+
+1.12 Jul 11, 2009
+    - fixed bug where testing modules redirect didn't work when Debuggit was loaded
+    - trying new, simpler method of redirecting to testing modules
+        - not sure why I was doing it so complicated-ly anyway ...
+    - fixed some debugging statements and added a few more
+
+1.11 Jul 9, 2009
+    - think I managed to fix the Debuggit/Barefoot conflicts, finally
+
+1.10 Jun 24, 2009
+    - now allows Debuggit.pm to override DEBUG and debuggit(), as long as it's loaded first
+        - any DEBUG parameter to Barefoot is ignored
+        - Barefoot modules are still redirected to test areas
+    - fixed bug where call to croak() bombs because Carp wasn't loaded
+      (this bug was hardly ever hit in actual code)
+
+
+[work on 2.x branch (actual Debuggit.pm) started here: Aug 7, 2008]
+
+1.04 Jun 23, 2008
+    - updated debuggit() to surround strings with leading or trailing spaces with << >>
+    - updated doco and tests to match
+    - checking eval for errors
+
+
+1.03 Jul 14, 2007
+    - updated some comments
+
+1.02 Jan 22, 2007
+    - updated copyright
+
+1.01 Jan 19, 2007
+    - debuggit() now catches undef values and displays them as <<undef>>
+        - avoids "uninitialized" warnings
+        - distinguishes between undef vs empty string
+    - no longer relying on $"; using join(' ') instead
+
+1.00 Sep 13, 2006
+    - initial version as Barefoot.pm
+        - rebuilt from the ground up
+        - now using TDD (but still not TAP)
+    - a new module designed to replace both Barefoot::base and Barefoot::debug
+    - consolidation into a single module (incorporated from Geek::Dev::Debug)
+    - first version with debuggit()
+        - very simple implementation
+        - min debugging level (first arg) is required
+        - supplies spaces between args (via $") and newline
+        - printing to STDERR (always)
+        - function is eval'ed to guarantee no memory usage when not in debugging mode
+    - uses more sophisticated @INC hook (incorporated from VCtools::Base) for finding local copy of
+      library modules when in debugging mode
+
+
+[END OF LIFE for Barefoot::debug / Barefoot::base ]
+
+[VCtools::Base receives no new development after this point]
+[(simply gets features backported from 1.x line)]
+
+
+0.64 May 23, 2004
+    - provided explicit path for calling vctools-config (should better pass taint checks,
+      and fix some testing glitches as well)
+
+0.63 May 1, 2004
+    - added a few stray debugging statements
+    - fixed a potential buglet (chomping in the wrong order)
+
+0.62 Apr 14, 2004
+    - updated comments in header
+
+0.61 Apr 11, 2004
+    - corrected leftover testing bug
+    - fixed bug where it was pulling up test modules even if DEBUG off
+
+0.60 Apr 9, 2004
+    - initial version as VCtools::Base
+    - created new module for handling VCtools' debugging (breaks dependency on Geek::Dev::Debug)
+    - DEBUG already defined in caller no longer an exception
+    - much more sophisticated handling of VCtools working dir (natch)
+
+
+[END OF LIFE for Geek::Dev::Debug]
+
+0.57 Apr 26, 2004
+    - removed all directory fiddling, as it's not necessary w/ the new all-1-one website-in-the-proj dir scheme
+    - took out prohibition against multiple DEBUG setting: this is a temporary fix only!
+
+0.56 Apr 23, 2004
+    - changed project name to reflect repository changes
+    - changed BASE_DIR to reflect proposed new production location
+
+0.55 Apr 4, 2004
+    - now sets BASE_DIR for use when debugging is turned off
+    - now only uses VCtools working dir stuff if debugging is non 0
+    - also adds protection against adding dirs into @INC multiple times
+    - rearranged untainting stuff now that we're using an external program as opposed to an env var
+      (for VCtools working dir)
+
+0.54 Apr 3, 2004
+    - now allowed to use Debug twice in a row, as long as (at least) second one has no args
+
+0.52 Mar 29, 2004
+    - tweaked comments a hair
+
+0.51 Jan 22, 2004
+    - updated to work with ThinkGeek environment
+    - now using VCtools instead of CVS (for future upgrade to Subversion while maintaining backward
+      compatibility)
+    - changed fallthrough around a bit:
+        - no longer requires two modules
+        - using Geek:: instead of Barefoot::
+    - added ability to turn off debugging via a string arg to Debug (one of: qw< OFF FALSE NOT! >)
+        - this feature didn't survive the death of Geek::Dev::Debug
+    - updated all tests and comments
+
+0.50 Jan 21, 2004
+    - initial version as Geek::Dev::Debug
+    - formalized test scripts (although still not using standard TAP)
+
+0.22 Nov 17, 2003
+    - now includes cvsdir.pm instead of cvs.pm to avoid chicken-and-egg problem (cvs.pm includes base.pm)
+    - added debug statement for master debug var
+
+
+0.21 Dec 22, 2002
+    - initial attempt at DEBUG macro (using source filter) unsuccessful (commented out)
+    - now stores DEBUG value in Barefoot:: for easier retrieval (for instance, if running under mod_perl)
+    - now understands to draw default value for DEBUG (for fall-through) from Barefoot:: (not main::)
+    - this means that "top-level script" no longer defined as "main", but rather whoever includes
+      this module first
+    - changed a die() (when DEBUG already defined) to a croak() for better error output
+
+0.20 May 12, 2002
+    - now allows specification of debug level at use statement
+    - defaults to 1, but can specify any number you like
+    - gave up on export_to_level and just doing eval in calling package
+    - implemented "fall-through" from top-level script: now passes through main::DEBUG if present
+    - defaults to 0 if not present in calling package and not present in main::
+    - no longer getting "redefined" errors
+
+0.11 Dec 2, 2001
+    - changed DEBUG_MODE to DEBUG (still only either 1 or 0)
+    - finally worked out how to do DEBUG as compile-time constant with various values
+    - now using Exporter and export_to_level() to export constants
+    - constant already extant in calling package is a fatal error
+    - moved master value from package main to package Barefoot::base
+
+0.10 Oct 7, 2001
+    - initial version using Barefoot::base (in addition to Barefoot::debug)
+    - changed variable $debug_mode to constant DEBUG_MODE
+    - always either 1 or 0
+    - force package main to avoid problems with inclusive use's
+
+0.03 Sep 14, 2001
+    - debug can now be used in -T scripts without tainting @INC
+
+0.02 Sep 12, 2001
+    - added $debug_mode as a substitute for $debug
+    - left $debug in for backward compatibility, but noted that it was depracated
+
+0.01 Dec 27, 2000
+    - fixed dir to match new private CVS copies location
+    - cleaned up comments
+
+0.00 Aug 28, 2000
+    - original version (Barefoot::debug)
+    - integration of CVS working dir to pull Barefoot:: modules from there when in DEBUG mode
+    - simple $debug variable
+    - always either 1 or undefined
+

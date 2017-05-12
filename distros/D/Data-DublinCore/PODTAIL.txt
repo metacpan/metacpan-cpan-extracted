@@ -1,0 +1,11 @@
+=head1 SEE ALSO
+
+This module is part of $project distribution version $version,
+built on $today.$web
+
+=head1 COPYRIGHTS
+
+Copyrights of the perl code and the related documentation by
+$year$author.$contrib
+
+$lictext

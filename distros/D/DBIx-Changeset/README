@@ -1,0 +1,24 @@
+DBIx-Changeset
+
+DBIx::Changeset provides an application to aid with the distrubution and application of database
+schemas and schema data as incremental updates. A Changeset is a discrete chunk of sql stored
+in a file with a unique id. DBIx::Changeset will compare a list of changesets against a table of 
+applied changesets and apply the differences using the target databases native sql insertion tool 
+in order. This greatly aids the distrubted development of a database application.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004-2008 Grox Pty Ltd.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

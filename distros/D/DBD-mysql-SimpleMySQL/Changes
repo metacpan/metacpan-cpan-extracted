@@ -1,0 +1,24 @@
+$Header: $
+
+
+REVISION HISTORY:
+
+
+0.1
+	- Created module
+
+0.2
+	- Changed the name from SimpleMySQL to DBD::mysql::SimpleMySQL
+	- Added perldoc documentation and added additional values that can be passed to dbconnect
+
+0.3
+	- Fixed "package" line to match new name
+
+0.4
+	- "Overloaded" build_select function to all you to pass either 5 args (select, from, joins, wheres, order)
+          or 1 arg (hashref containing select, from, joins, wheres, order keys)
+	- Fixed bug in "build_select" that returned a blank WHERE statement when an empty arrayref was passed in
+          causing a broken select statement to be created.
+
+0.5	
+	- Fixed stupid syntax error :)

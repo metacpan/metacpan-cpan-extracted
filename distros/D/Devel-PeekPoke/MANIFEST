@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Devel/PeekPoke.pm
+lib/Devel/PeekPoke/BigInt.pm
+lib/Devel/PeekPoke/Constants.pm
+lib/Devel/PeekPoke/PP.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+META.json
+README.md
+t/00info.t
+t/01basic.t
+t/02describe_bytestring.t
+t/03torture.t
+t/04thread-torture.t

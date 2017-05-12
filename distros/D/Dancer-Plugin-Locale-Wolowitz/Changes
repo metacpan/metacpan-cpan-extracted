@@ -1,0 +1,35 @@
+Revision history for Dancer-Plugin-Locale-Wolowitz
+
+0.160190  2016-01-20 00:02:10+01:00 Europe/Paris
+
+    Speedup: less temp scalars, index instead of regex
+    Added optional third argument (force language)
+    handling to loc()
+    Shortcut lang detection on multiple loc() calls within
+    one request, when no session is used
+    Typos and such
+
+0.140120  2014-01-12 01:53:54CET+0100 Europe/Paris
+
+    Few cosmetic things.
+    Fix unitialized value in substitution when accept_language is empty, thanks
+    to isync for the patch.
+
+0.122470  2012-09-03 23:32:10 Europe/Paris
+
+    Add few tests.
+    Add exception if translate directory not found.
+
+0.121720  2012-06-20 23:31:40 Europe/Paris
+
+    Persistent Wolowitz obj so json isn't parsed over and over again.
+    Don't need use a session engine.
+
+0.121391  2012-05-18 23:39:44 Europe/Paris
+
+    Fix global variable.
+    Fix tests.
+
+0.121390  2012-05-18 21:24:33 Europe/Paris
+
+    Initial version developed.

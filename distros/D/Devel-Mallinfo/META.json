@@ -1,0 +1,64 @@
+{
+   "abstract" : "Get mallinfo() malloc memory stats, and more.",
+   "author" : [
+      "Kevin Ryde <user42_kevin@yahoo.com.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Mallinfo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "devel"
+      ]
+   },
+   "optional_features" : {
+      "maximum_tests" : {
+         "description" : "Have \"make test\" do as much as possible.",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Scalar::Util" : "0",
+                  "Test::Weaken" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test" : "0",
+            "lib" : "0",
+            "perl" : "5",
+            "vars" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://user42.tuxfamily.org/devel-mallinfo/index.html",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl.html"
+      ]
+   },
+   "version" : "14"
+}

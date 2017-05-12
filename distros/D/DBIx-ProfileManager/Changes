@@ -1,0 +1,11 @@
+Revision history for Perl extension DBIx::ProfileManager
+
+0.03    Thr Mar 11 17:25:20 2010
+        - no depends on Hook::WrapSub because DBI::db::disconnect is not works collectly.
+
+0.02    Wed Mar 10 13:19:47 2010
+        - apply profiling created db handles after profile_start()
+        - fetch profiled data on disconnect or DESTROY of DBI::db
+
+0.01    Wed Feb 24 17:50:57 2010
+        - original version

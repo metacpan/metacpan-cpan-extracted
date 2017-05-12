@@ -1,0 +1,8 @@
+
+this is var="<TMPL_VAR NAME=var >"
+this is foo.bar="<TMPL_VAR NAME=foo.bar >"
+this is foo.baz.klong="<TMPL_VAR NAME=foo.baz.klong >"
+this is foo="<TMPL_VAR NAME=foo >"
+tricky stuff is <TMPL_VAR NAME=0.tricky >
+<TMPL_LOOP NAME=testloop><TMPL_VAR NAME=i>-<TMPL_VAR NAME=label>
+</TMPL_LOOP>

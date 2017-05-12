@@ -1,0 +1,44 @@
+---
+abstract: 'Release tests for checking changes'
+author:
+  - 'Marcel Grünauer <marcel@cpan.org>'
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+  autodie: '0'
+  blib: '1.01'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-CheckChanges
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+requires:
+  Dist::Zilla::Plugin::InlineFiles: '0'
+  Moose: '0'
+  Test::CheckChanges: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-Test-CheckChanges/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-Test-CheckChanges/
+  repository: git://github.com/doherty/Dist-Zilla-Plugin-Test-CheckChanges.git
+version: '2.000004'

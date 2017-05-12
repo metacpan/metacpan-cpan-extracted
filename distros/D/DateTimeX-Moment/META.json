@@ -1,0 +1,94 @@
+{
+   "abstract" : "EXPERIMENTAL DateTime like interface for Time::Moment",
+   "author" : [
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Moment",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7",
+            "feature" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Data::Util" : "0",
+            "DateTime" : "0"
+         },
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "Class::Inspector" : "0",
+            "DateTime::Locale" : "0",
+            "DateTime::TimeZone" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Time::Moment" : "0.38",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Test::Warnings" : "0.005"
+         }
+      }
+   },
+   "provides" : {
+      "DateTimeX::Moment" : {
+         "file" : "lib/DateTimeX/Moment.pm",
+         "version" : "0.05"
+      },
+      "DateTimeX::Moment::Duration" : {
+         "file" : "lib/DateTimeX/Moment/Duration.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/karupanerura/DateTimeX-Moment/issues"
+      },
+      "homepage" : "https://github.com/karupanerura/DateTimeX-Moment",
+      "repository" : {
+         "url" : "git://github.com/karupanerura/DateTimeX-Moment.git",
+         "web" : "https://github.com/karupanerura/DateTimeX-Moment"
+      }
+   },
+   "version" : "0.05",
+   "x_authority" : "cpan:KARUPA",
+   "x_contributors" : [
+      "chansen <chansen@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

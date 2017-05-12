@@ -1,0 +1,25 @@
+SYNOPSIS
+
+     # dist.ini
+     [@Author::PERLANCAR]
+
+    is equivalent to (see source).
+
+DESCRIPTION
+
+    The gist:
+
+    I avoid stuffs that might change line numbers (so OurPkgVersion instead
+    of PkgVersion, etc). I also always add #ABSTRACT, #PODNAME, and POD at
+    the end of file).
+
+    I still maintain dependencies and increase version number manually (so
+    no AutoVersion and AutoPrereqs).
+
+    I install my dists after release (the eat-your-own-dog-food principle),
+    except when INSTALL=0 environment is specified. I also archive them
+    using a script called archive-perl-release. This is currently a script
+    on my computer, you can get them from my 'scripts' github repo but this
+    is optional and the release process won't fail if the script does not
+    exist.
+

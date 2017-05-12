@@ -1,0 +1,12 @@
+Revision history for Perl extension DR::Msgpuck.
+
+0.04  Thu Sep 22 15:55:52 MSK 2016
+        - Add msgunpack_check method.
+0.03  Thu Jun 23 19:41:04 MSK 2016
+        - Add Str/Num classes.
+0.02  Thu Jun 23 18:28:45 MSK 2016
+	- Fix long double problems in tests (by cpan testers)
+0.01  Fri May 27 01:37:30 2016
+	- original version; created by h2xs 1.23 with options
+		-c DR::Msgpuck
+

@@ -1,0 +1,114 @@
+Revision history for Devel::Size::Report
+
+2008-04-06 v0.13 Tels 147 tests
+  * require at least Perl 5.006 (Devel::Size doesn't compile on 5.005)
+  * fix failing tests  on v5.10 and version
+
+2008-03-28 v0.12 Tels 148 tests
+  * fix failing tests (due to bugfix in Devel::Size, thanx Wolfgang Schemmel!)
+  * add POD tests and POD coverage tests
+  * fix POD errors revealed by coverage testing
+  * require at least Perl 5.005002
+
+2006-09-09 v0.11 Tels 146 tests
+  * clean up Makefile.PL
+  * add a SF_MAGIC() flag (not yet used)
+  * fix failing tests under 64 bit (need to add more than 7 bytes)
+  * fix undef warning from blessed()
+  * "use constant" instead of "sub () ..."
+
+Older revision history:
+
+2004-01-06 v0.01 Tels 42 tests (not released)
+  * first release with:
+     report_size(), track_size(), element_type(), entries_per_element() 
+
+2004-01-09 v0.02 Tels 42 tests
+  * fixed bug in calculating overhead with contained hashes
+  * added example/psize
+
+2004-01-10 v0.03 Tels 49 tests
+  * psize: don't print out added "use" statements
+  * report_size(): print overhead in %, too (Thanx nadim!)
+  * knows about CODE, REGEXP, LVALUE and Scalar refs and prints them correctly
+  * stop at cyclic references (e.g. don't loop forever)
+  * disable Devel::Size warnings (about incomplete CV etc, thanx nadim!)
+  * drop the "Key " from the output, it is rendundand (thanx nadim!)
+  * report_size: bytes => '' in $options works correctly now (thanx nadim!)
+
+2004-01-10 v0.04 Tels 55 tests
+  * fixed the bug that sometimes looking at a scalar again after looking at
+    a longer scalar reported the wrong (bigger) size. $pre = shift vs. $_[0]
+    usage in total_size() was the culprit (slot reusing).  Thanx Sadahiro!
+  * Size report outputs version of Devel::Size::Report, too
+  * refactored tests into three files, added some more tests
+  * use Scalar::Util to get reftype and refaddr
+  * added option 'addr' to report_size() to print elem address
+  * example/psize takes options as second string argument
+
+2004-01-13 v0.05 Tels 76 tests
+  * references to ARRAY, HASH are handled properly
+  * references to SCALARs are now reported likewise than ARRAY/HASH refs
+  * fixed indendation bug with hash keys pointing to SCALARs
+  * more tests, especially for the addr => 1 feature
+  * psize takes options as single-letter abbrev., too
+  * added option "class" to optionally show classnames
+
+2004-10-18 v0.06 Tels 76 tests
+  * fixed example/size.pl - duh!
+  * some small cleanups in comments in Report.pm
+  * amended TODO
+  * scalar references (\0) are now reported with their correct size
+
+2004-10-23 v0.07 Tels 100 tests
+  * rename S_KEY and S_REF to SF_KEY and SF_REF
+  * document exportable methods
+  * small comments added
+  * The "Total" line now includes the number of elements
+  * added options 'terse' (supresss gory details) and 'summary' (include
+    per-class overview at end of report) to report_size()
+  * added S_VSTRING
+  * added SF_WEAK, SF_RO, SF_DUAL
+  * simplify test code by using like()
+  * added 'te' and 's' option to psize
+  * added more examples to example/size.pl
+
+2004-11-10 v0.08 Tels 116 tests (released 2005-02-27)
+  * confess() if options to report_size() is not a hash
+  * option debug: print time and memory used to make stats
+  * streamline element_type()
+  * report_size(): inline element_type() for a tad more speed
+  * use undef instead of '' for unblessed things to save a bit of memory
+  * more tests (element_type, type, options, double ref, cycles)
+  * return blessed() from _type() and use it to avoid second call to blessed()
+  * fix bug with double scalars in a hash (f.i. via Array-RefElem)
+  * use Array-RefElem to save about 50% of the %SEEN hash (which represents
+    about 3-6% of the memory when generating reports on huge structures)
+
+2005-02-27 v0.09 Tels 122 tests
+  * Don't need to track simple scalars with a REFCNT of 1 in the SEEN hash,
+    this reduces the memory overhead quite a bit 
+  * add option "track_doubles", that only tracks double/shared hash keys and
+    array elemts if requested. Default is off, this saves memory.
+  * Rewrote _track_size() to modify a global array instead of passing the
+    results back via the stack. This avoids that the entire results array
+    exists temporarily twice when returning the results and speeds up anything
+    by a factor of two to three :o)
+  * add a test for "Glob"
+  * streamline array and hash member tracking (for simple elements)
+  * streamline type()
+  * add track_sizes() and hide_tracks()
+
+2005-03-04 v0.10 Tels 145 tests
+  * amend README, SYNOPSIS, example/size.pl
+  * psize: support for option "d", print help if no arguments are given
+  * indend => indent (Thanx Jim Cromie!)
+  * sizes for array/hash refs were missing the ref itself (16 bytes on 32 bit
+    systems, more on 64 bit). This also makes "[]" and "[ 1, [] ]" report
+    consistent sizes for the inner array.
+  * compute correct size for circular references
+  * rewrote the size-gathering code to use size() instead of total_size(),
+    this makes it much faster, especially for deep structures and ones with
+    cycles
+  * track_size() and track_sizes() also need to honor option "doubles"
+  * does no longer warn about "deep recursion"

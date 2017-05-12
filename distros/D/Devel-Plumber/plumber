@@ -1,0 +1,175 @@
+#!/usr/bin/perl
+#
+# Copyright (C) 2011 by Opera Software Australia Pty Ltd
+#
+# This library is free software; you can redistribute it and/or modify
+# it under the same terms as Perl itself.
+#
+
+use strict;
+use warnings;
+use File::Basename;
+use lib dirname($0);
+use lib dirname($0) . "/lib";
+use Devel::Plumber;
+use Getopt::Long qw(:config no_ignore_case bundling);
+
+my $binfile;
+my $corefile;
+my $pid;
+my $verbose = 0;
+my $progress = 0;
+my $dodump = 0;
+
+sub usage
+{
+    print STDERR <<EOF;
+Usage: dumpit.pl [options] bin-file core-file
+       dumpit.pl [options] bin-file pid
+options are:
+    --verbose	  be more verbose
+    --progress    give a progress report
+EOF
+    exit 1;
+}
+
+sub parse_arguments
+{
+    GetOptions(
+	'verbose+' => \$verbose,
+	'progress' => \$progress,
+	'dump-blocks' => \$dodump,
+    ) or usage;
+
+    $binfile = shift @ARGV || usage;
+    die "No such binary file: $binfile"
+	unless -f $binfile;
+
+    $corefile = shift @ARGV || usage;
+    if ($corefile =~ m/^\d+$/)
+    {
+	$pid = $corefile;
+	$corefile = undef;
+    }
+    else
+    {
+	die "No such core file: $corefile"
+	    unless -f $corefile;
+    }
+    usage if scalar(@ARGV);
+}
+
+parse_arguments();
+# print "binfile=$binfile\n";
+# print "corefile=$corefile\n" if defined $corefile;
+# print "pid=$pid\n" if defined $pid;
+# print "verbose=$verbose\n";
+# print "progress=$progress\n";
+# exit 0;
+
+my $plumber = new Devel::Plumber(binfile => $binfile,
+				 corefile => $corefile,
+				 pid => $pid,
+				 progress => $progress,
+				 verbose => $verbose);
+
+$plumber->find_leaks();
+if ($dodump)
+{
+    $plumber->dump_blocks();
+}
+else
+{
+    $plumber->report_leaks();
+}
+
+=head1 NAME
+
+plumber - memory leak finder for C programs
+
+=head1 SYNOPSIS
+
+B<plumber> [ I<options> ] I<binfile> I<pid>
+
+B<plumber> [ I<options> ] I<binfile> I<corefile>
+
+=head1 DESCRIPTION
+
+B<Plumber> is a memory leak finder for C programs, implemented in
+Perl.  It uses GDB to walk internal glibc heap structures, so it can
+work on either a live process (the first synopsis) or a core file
+(the second synopsis).
+
+Compared to Valgrind, Purify, or various malloc debugging libraries,
+B<plumber>
+
+=over
+
+=item *
+is very slow,
+
+=item *
+does not provide stack traces showing how memory was allocated,
+
+=item *
+does not work on multi-threaded programs (although this could be fixed).
+
+=back
+
+However B<plumber> is much easier to use in a production environment
+(rather than a test environment) because the program under test
+
+=over
+
+=item *
+does not require any special building or instrumentation before running,
+
+=item *
+does not need to be launched specially,
+
+=item *
+can already be running, for any length of time, or
+may have already crashed and left a core,
+
+=item *
+will continue unmolested after B<plumber> has finished.
+
+=back
+
+=head1 OPTIONS
+
+B<Plumber> accepts the following options
+
+=over
+
+=item B<--progress>
+
+Cause a progress indicator to be emitted to stderr.  B<Plumber>
+can be quite slow.
+
+=item B<--verbose>
+
+Cause debugging messages to be emitted to stderr.
+
+=back
+
+=head1 CAVEATS
+
+See CAVEATS for B<Devel::Plumber>(3perl).
+
+=head1 AUTHOR
+
+Greg Banks <gnb@fastmail.fm>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2011 by Opera Software Australia Pty Ltd
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+B<Devel::Plumber>(3perl).
+
+=cut

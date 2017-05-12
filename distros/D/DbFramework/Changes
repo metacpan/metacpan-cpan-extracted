@@ -1,0 +1,341 @@
+DbFramework change log
+
+2008-05-03	version 1.12
+	 1. Makefile.PL and Build.PL: Provide a valid default DSN for
+	    DBD::mysql, DBD::mSQL and DBD::Pg.
+	 2. Makefile.PL and Build.PL: Do not create the schema if
+	    answer is "no".
+
+2008-04-21
+	 1. Changes: Updated.
+	 2. Build.PL: Renamed test database from "dbframework_test" to
+	    "test", to adapt the convention of MySQL and PostgreSQL.
+	 3. TODO: Added.
+	 4. AUTHORS: Added.
+	 5. Artistic and COPYING: Added.
+	 6. Makefile.PL: Added PL_FILES to disable PL files searching
+	    behavior, in order to work with ExtUtils::MakeMaker earlier
+	    than 6.25 that treats Build.PL as one of the PL files to run.
+
+2008-04-20
+	 1. Added lib and lib/DbFramework subdirectory.  Move everything
+	    inside, to make the directory cleaner.
+	 2. Makefile.PL: Clean up.  Removed PMLIBDIRS since it is not
+	    required anymore.  Removed linkext.  linkext is only needed
+	    for ExtUtils::MakeMaker before version 5.  That is too old
+	    today.
+	 3. Makefile.PL and Build.PL: Use "use lib qw(lib);
+	    use DbFramework::Util;" instead of "require "./Util.pm"", in
+	    order to be more portable on different platforms.
+	 4. Makefile.PL: Renamed test database from "dbframework_test" to
+	    "test", to adapt the convention of MySQL and PostgreSQL.
+	 5. README: Moved Paul's BackPen URL to the previous line.
+
+2008-04-19
+	 1. Added lib and lib/DbFramework subdirectory.  Move everything
+	    inside, to make the directory cleaner.
+	 2. Changes: Added, with contents from original Paul's README file.
+	    This is to adapt the Perl module convention.
+
+2008-04-19	version 1.11
+	Maintainance taken over by imacat.
+	 1. Makefile.PL: Updated to use prompt() from ExtUtils::MakeMaker
+	    instead of reading STDIN directly, in order to prevent infinite
+	    loop with automated CPAN testers.  (RT#34538)
+	 2. t/util.pl: Subroutine yn() removed.  It is not used anymore,
+	    due to the prompt() fix.
+	 3. README: Add notice about the distribution ownership change.
+	 4. Makefile.PL: ABSTRACT, AUTHOR, LICENSE and SIGN added to the
+	    WriteMakefile() arguments.  VERSION is added in replace of
+	    VERSION_FROM.
+	 5. SIGNATURE: Digital signature added.
+	 6. META.yml: YAML distribution meta-nformation added.
+	 7. Build.PL: Module::Build build support added.
+
+Original change log by Paul Sharpe follows.
+==================================
+History
+=======
+
+15-05-1999               Paul Sharpe          <paul@miraclefish.com>
+--------------------------------------------------------------------
+RELEASE 1.10
+
+Added support for PostgreSQL.
+
+INTERFACE CHANGES
+  PrimaryKey::
+    - New method as_hidden_html()
+
+30-04-1999               Paul Sharpe          <paul@miraclefish.com>
+--------------------------------------------------------------------
+RELEASE 1.09
+
+dbforms.cgi
+  - Can now update primary keys.
+  - Removed dependency on ePerl.
+  - Now takes dsn arguments to cater for variance between DBDs.
+
+INTERFACE CHANGES
+  Catalog::
+    - set_primary_key() now sets labels if defined in the catalog.
+  DataModel::
+    - New method dsn().
+    - new() now requires name to be the database name as pattern match
+      to get database name forgot that this part of a DBI DSN is *non
+      standard*
+    - init_db_metadata() now requires DSN for catalog as it varies
+      between drivers.  Also now allows username/password for authentication
+      against catalog database.
+  ForeignKey::
+    - New method sql_where().
+  Makefile.PL
+    - Moved most of the catalog initialisation here.
+    - Manual creation of databases now required as there's no standard
+      for creating databases.  Each driver can use an arbitrarily named
+      database for testing.
+  Persistent::
+    - new() now requires a Catalog object.
+    - update now takes %attributes argument so that a primary key can be
+      updated.  The current object state is used to update the row WHERE the
+      primary key matches the values in %attributes.
+  PrimaryKey::
+    - html_select_field() now has 'Any' *and* 'NULL' entries.  I have a
+      feeling this still isn't quite right.
+    - New method as_hidden_html()
+    - Signature to new() has changed now that label columns are
+      supported by the catalog.
+    - html_select_field() now follows label columns which are foreign
+      keys back to their associated primary key table and uses the label
+      columns from that table.  This gives more meaningful select fields.
+  Table::
+    - init_db_metadata() now requires catalog object argument.  This
+      should improve performance as a new catalog object (which involves a
+      database connect()) won't be created every time this method is called.
+    - in_foreign_key() now returns a list of foreign keys containing
+      $attribute
+  DataType::ANSII::
+    - Signature to new() has changed.  Now requires $ansii_type
+      argument.  All data type objects will need to return their closest
+      ANSII types as this is the $type which needs to be supplied to
+      $dbh->quote($value,$type).
+    - New method ansii_type().
+
+1-04-1999               Paul Sharpe           <paul@miraclefish.com>
+--------------------------------------------------------------------
+RELEASE 1.08
+
+BUG FIX
+  - Test database wasn't being created which was causing tests to
+    fail.
+
+28-03-1999              Paul Sharpe           <paul@miraclefish.com>
+--------------------------------------------------------------------
+RELEASE 1.07
+
+Highlights
+==========
+  + Support for Msql (and potentially all DBI drivers.)
+  + Improved template support.
+
+= API
+  Attribute::
+    -- BUG FIXES
+	- as_html_form_field() was producing invalid HTML for date fields.
+    - as_html_heading() now takes $bgcolor argument.
+  Catalog.pm (NEW CLASS)
+  DataModel::
+    - new() now takes data source name to move away from dependence on Mysql.
+    - init_db_metadata() now needs to be called explicity (not called in
+      new()).
+    - New methods driver() and db().
+  DataType::ANSII:: (NEW CLASS)
+  DataType/Mysql:: (NEW CLASS)
+  ForeignKey::
+    -- BUG FIX
+       - as_html_form_field() was using pk attribute names to select
+         defaults in select field.  Should use fk attribute names.
+  Table::
+    - read_form now takes ($name,$path) arguments.
+    - get_dbh() now takes data source name to move away from dependence on
+      Mysql.
+  Persistent::
+    - New method init_pk()
+    - New method table_qualified_attribute_hashref()
+    - Removed method fill_template().  Templates now handled by Template.pm.
+    - select() now takes extra argument $order.
+  PrimaryKey::
+    - New method as_query_string()
+    - html_select_field() sets null value labels to the string 'NULL'.
+  Table::
+    -- BUG FIXES
+      - insert() should only try to insert values which are defined.
+      - Don't try to update columns where the value is undefined.
+      - as_html_heading() required more specific pattern match.
+      - Quoting in insert() and update() required type to correctly quote
+        numeric fields.
+      - new() was using wrong argument in belongs_to()
+
+    - new() now takes optional DataModel argument
+    - New method belongs_to()
+    - get_attribute_names renamed attribute_names()
+    - New method select_loh()
+    - @columns in select() and select_loh() can contain references to
+      database functions to be applied to the column.
+    - removed methods set_templates(), read_form() and fill_templates()
+      as template handling is now done in Template.pm
+    - as_html_heading() now adds one heading for each key attribute.
+    - insert() returns -1 for non auto increment columns.
+  Template:: (NEW CLASS)
+  Util::
+    - Removed get_db() as it was Mysql specific.  The database name can
+      be retrieved from DbFramework::DataModel::db
+    - New sub do_sql()
+    - get_dbh() now takes data source name to move away from
+      dependence on Mysql.
+
+= Makefile.PL configures drivers to test at 'make test' stage.
+
+= dbforms.cgi
+  - Now accepts DBI driver CGI parameter (default is Mysql.)
+
+= Overhaul of test scripts.
+
+
+12-1-1999                   Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.06
+
+= UI
+  Default input templates now produce 'datasheet' view.
+
+= API
+  Attribute::
+    - New method as_html_heading()
+  Key::
+    - New method as_html_heading()
+  PrimaryKey::
+    - New method as_html_heading()
+  Table::
+    - New method as_html_heading()
+
+
+6-1-1999                    Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.05
+
+= INTERFACE
+  Table
+    - New method dbh($dbh) (added pod for AUTOLOAD() method)
+    = Improved form and template support
+      - new() now takes list of forms rather than template definitions and
+        evals configuration from config.pl files.
+      - New method read_form()
+      - More pod  
+  - Default output templates now handle foreign keys by replacing them
+    with columns from the related table.
+  - <DbValue> template tag can now contain a list of attributes to be
+    substituted for values.
+  dbforms.cgi
+    - fills values from related table for foreign keys in default
+      output template.
+    - Now handles user-defined forms.
+
+18-Dec-1998                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.04
+
+= INTERFACE
+  ForeignKey
+    - New method as_html_form_field(\%values)
+  Table
+    - as_html_form() now returns fields for foreign keys too.
+    - fill_template() now creates selection boxes for <DbFKey> tags.
+
+= dbforms.cgi
+  New experimental UI separating search and modify.
+  Catches and displays SQL errors.
+
+11-Dec-1998                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.03
+- Bug fixes.
+
+11-Dec-1998                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.02
+- dbforms.cgi HTML forms application
+- Bug fixes: Table::select(), Attribute::as_html_form_field()
+- INTERFACE
+  *_h_byname() methods take an array rather than an arrayref
+  Persistent
+    - New method make_class()
+    - New method fill_template()
+    - New method as_html_form()
+    - fill_template() now takes $name argument
+  Table
+    - New method in_foreign_key()
+    - as_html_form() doesn't return <FORM></FORM> container so doesn't
+      require $action argument.
+    - New method in_key()
+    - New method in_primary_key()
+    - New method in_any_key()
+    - New method non_key_attributes()
+    - Removed method html_pk_select_field()
+    - New attribute/methods HAS_FOREIGN_KEYS_H
+    - fill_template() now supports <DbFKey table.name> placeholders.
+  Key
+    - New method belongs_to()
+    - new() now takes a reference to a hash of templates.
+    - fill_template() now takes a template name and reference to a hash of
+      values.
+    - templates() removed
+    - New method set_templates()
+    - New method bgcolor()
+  Attribute
+    - New method _input_template()
+    - New method _output_template()
+    - New method bgcolor()
+  PrimaryKey
+    - New method html_select_field()
+
+26-Nov-1998                 Paul Sharpe                  <paul@miraclefish.com>
+-------------------------------------------------------------------------------
+RELEASE 1.01 (FIRST PUBLIC RELEASE)
+
+
+To do
+=====
+
+* BUG: dbforms.cgi delete on row consisting of all foreign keys silently fails.
+
+* Improve dbforms.cgi interface.  Perhaps a rename is in order too.
+I'm thinking of having a single record interface with record
+navigation.  The form can then be designed and specified as an
+argument.
+
+* Fri Jan 8, 1999
+  BUG - >1 fk relating to the same pk table in a single table is not
+       handled by dbforms.cgi
+  
+4/1/1999
+  - User-defined templates specify attributes to be used for foreign keys
+    and ordering
+  - Allow relationships between the same table (in different roles).
+    Needs documenting
+
+* Make Bundle::DbFramework
+
+* Schema grammar
+  - might be better off using Jeeves (from the Panther book)
+  - should handle relationships of degree >2
+  - could be CDIF compliant
+
+* Attributes of relationships should be stored so that full schema
+  including attributes of relationships can be built from meta-data.
+
+* add support for UNIQUE columns (different to ordinary KEYs)
+
+* make primary key in grammar optional (1:1 relationships) 
+
+* make relationships optional in grammar

@@ -1,0 +1,87 @@
+Revision history for Dist-Zilla-Rinci-Wrap
+
+0.13    2016-06-02 (PERLANCAR)
+
+	- No functional changes.
+
+	- Bump prereq version Perinci::Sub::Wrapper to 0.83.
+
+	- [doc] Mention Dist::Zilla::Plugin::Rinci::Validate,
+	  Data::Sah::Manual::ParamsValidating,
+	  Data::Sah::Manual::ResultValidating.
+
+
+0.12    2016-01-14 (PERLANCAR)
+
+	- [Bugfix] Fix removed code after comment due to comment removal,
+	  we should squish preamble first before adding more code.
+
+
+0.11    2015-09-26 (PERLANCAR)
+
+	- Add configuration: exclude_func, include_func.
+
+
+0.10    2015-03-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Forgot to change target variable when refactoring $_ ->
+	  $line (boy, implicit variable should not be used for loops,
+	  ever!).
+
+
+0.09    2015-03-06 (PERLANCAR)
+
+        - [Bugfix] Fix variable names.
+
+
+0.08    2015-02-26 (PERLANCAR)
+
+	- Generate code to set $SPEC{foo} to the new metadata returned by
+	  wrapper, not the old one (e.g. with logs entry, result_naked etc
+	  normalized).
+
+
+0.07    2015-02-25 (PERLANCAR)
+
+	- Put in '## this line put by Dist::Zilla::Plugin::Rinci::Wrap'
+	  markers in the source code.
+
+
+0.06     2015-02-22 (PERLANCAR)
+
+         - Observe #NO_RINCI_WRAP directive.
+
+         - [ux] Instead of complaining about missing prereq in dist.ini, add
+           dynamically with register_prereqs().
+
+
+0.05     2014-03-15 (SHARYANTO)
+
+         - No functional changes. Fix missing dependency to Dist::Zilla [CT].
+
+
+0.04     2014-03-08 (SHARYANTO)
+
+         - Some more fixes.
+
+         - Observe x.dist.zilla.plugin.rinci.wrap.wrap_args attribute in
+           function metadata to let functions customize their wrapping.
+
+
+0.03     2014-03-08 (SHARYANTO)
+
+         - Check modules required by wrapper code in dist.ini's Prereqs.
+
+
+0.02     2014-03-08 (SHARYANTO)
+
+         - Minor fixes and tidy output.
+
+         - Add marker comments on debug.
+
+
+0.01     2014-03-07 (SHARYANTO)
+
+         - First release.

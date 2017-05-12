@@ -1,0 +1,10 @@
+Revision history for Data-CSel-WrapStruct
+
+0.002   2016-09-01 (PERLANCAR)
+
+	- Hash: add methods has_key(), pair_value().
+
+
+0.001    2016-08-26 (PERLANCAR)
+
+         - First release.

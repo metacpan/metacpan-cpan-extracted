@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-TextSearch
+version:      0.3
+version_from: lib/DBIx/TextSearch.pm
+installdirs:  site
+requires:
+    DBI:                           Carp
+    Env:                           English
+    HTML::TokeParser:              Socket
+    LWP::UserAgent:                HTTP::Response
+    Net::FTP:                      LWP::Simple
+    SGML::StripParser:             Text::Query::BuildSQL
+    Sys::Hostname:                 Digest::MD5
+    URI:                           File::Basename
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

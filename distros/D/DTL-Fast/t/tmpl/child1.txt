@@ -1,0 +1,6 @@
+
+{% extends "parent.txt" %}
+
+blahblah
+
+{% block more_text %}Child more text{% endblock %}

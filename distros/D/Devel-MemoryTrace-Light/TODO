@@ -1,0 +1,5 @@
+== Todo for 0.0*
+  - Testing of actual GTop/BSD::Process modules (skip if not installed).
+    - This can use the same logic 02-real.t uses
+
+  - Ability to keep tracing after END

@@ -1,0 +1,84 @@
+NAME
+    Data::Enumerator - some iterator utilities for perl
+
+SYNOPSIS
+        use Data::Enumerator qw/pattern generator/;
+
+        my $cases = generator(
+            {   hoge  => pattern(qw/a b c/),
+                fuga  => pattern(qw/x y z/),
+                fixed => 0
+            }
+        );
+
+        for my $case ( $cases->list ){
+               print pp($case);
+        }
+
+         # { hoge => 'a',fuga => 'x'}
+         # { hoge => 'a',fuga => 'y'}
+         # { hoge => 'a',fuga => 'z'}
+         # { hoge => 'b',fuga => 'x'}
+         # { hoge => 'b',fuga => 'y'}
+         # { hoge => 'b',fuga => 'z'}
+         # { hoge => 'c',fuga => 'x'}
+         # { hoge => 'c',fuga => 'y'}
+         # { hoge => 'c',fuga => 'z'}
+
+DESCRIPTION
+    Data::Enumerator is utilities for iteration and test data generation
+    like itertools in python or C# IEnumerable.
+
+    This module is marked EXPERIMENTAL. API could be changed without any
+    notice.
+
+  pattern
+    to create an iterator by a provided list.
+
+        my $gen = pattern(qw/a b c/);
+        # $gen->list => ('a','b','c')
+
+    a generator can product another generator
+
+        my $gen = pattern(qw/a b c/)->product(pattern(qw/x y/));
+        # $gen->list
+        #  ["a", "x"],
+        #  ["a", "y"],
+        #  ["b", "x"],
+        #  ["b", "y"],
+        #  ["c", "x"],
+        #  ["c", "y"],
+
+  generator
+    to create all pattern of data structure which contains pattern.
+
+        my $users = generator({
+            sex      => pattern(qw/male female/),
+            age      => range(10,90,5),
+            category => pattern(qw/elf human dwarf gnome lizardman/)
+        })
+
+    this code is a syntax sugar of the following code:
+
+        my $user = pattern(qw/male female/)
+            ->product( range(10,90,5) )
+            ->product( pattern(qw/elf human dwarf gnome lizardman/))
+            ->select(sub{
+                +{ sex => $_[0]->[0],age => $_[0]->[1],category => $_[0]->[2]}
+            });
+
+    so you can enumerate all pattern of users.
+
+        $user->each(sub{
+            my $user = shift;
+            $ do stuff
+        });
+
+AUTHOR
+    Daichi Hiroki <hirokidaichi {at} gmail.com>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,19 @@
+Revision history for Data::Validate::WithYAML::Plugin::EMail
+============================================================
+
+0.03    2015-02-18
+
+        [MISC]
+        * Add metadata about resources to dist.ini
+        * Fix Changes file (date format, add missing entry)
+        * Use @Git Bundle
+
+0.02    2012-01-05
+
+        [TESTS]
+        * Fix Perl::Critic test (test only with core theme and severity 5)
+
+0.01    2012-01-03
+
+        First version, released on an unsuspecting world.
+

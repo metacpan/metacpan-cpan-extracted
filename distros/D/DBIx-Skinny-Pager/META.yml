@@ -1,0 +1,36 @@
+---
+abstract: ~
+author:
+  - 'Keiji Yoshimi <walf443 at gmail dot com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Module::Install::ReadmeFromPod: 0
+  Module::Install::Repository: 0
+  Test::Deep: 0
+  Test::Differences: 0
+  Test::More: 0
+  Test::Requires: 0
+  Test::UseAllModules: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Skinny-Pager
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Class::Accessor::Lite: 0
+  DBIx::Skinny: 0.0729
+  Data::Page: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/walf443/p5-dbix-skinny-pager.git
+version: 0.11

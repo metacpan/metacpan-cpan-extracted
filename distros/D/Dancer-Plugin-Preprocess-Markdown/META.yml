@@ -1,0 +1,48 @@
+---
+abstract: 'Generate HTML content from Markdown files'
+author:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'
+build_requires:
+  Dancer::Test: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Preprocess-Markdown
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer::Plugin::Preprocess::Markdown:
+    file: lib/Dancer/Plugin/Preprocess/Markdown.pm
+    version: 0.021
+requires:
+  Cwd: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  File::Spec::Functions: 0
+  Text::Markdown: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/odyniec/p5-Dancer-Plugin-Preprocess-Markdown/issues
+  homepage: https://github.com/odyniec/p5-Dancer-Plugin-Preprocess-Markdown
+  repository: https://github.com/odyniec/p5-Dancer-Plugin-Preprocess-Markdown.git
+version: 0.021

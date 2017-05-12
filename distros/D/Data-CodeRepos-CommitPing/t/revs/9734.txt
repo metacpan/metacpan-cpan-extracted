@@ -1,0 +1,40 @@
+---
+author: hanekomu
+comment: |-2
+   r6034@nbgr:  marcel | 2008-04-18 16:11:20 +0200
+   lang/perl/Attribute-TieClasses: initial commit
+date: 2008-04-18 23:11:43 +0900
+files:
+  - path: lang/perl/
+    status: _U
+  - path: lang/perl/Attribute-TieClasses/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/.shipit
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/Changes
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/MANIFEST
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/Makefile.PL
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/README
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/lib/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/lib/Attribute/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/lib/Attribute/TieClasses.pm
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/t/
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/t/00_compile.t
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/t/01_all.t
+    status: A
+  - path: lang/perl/Attribute-TieClasses/tags/Attribute-TieClasses-0.02/t/testlib/
+    status: A
+rev: 9734

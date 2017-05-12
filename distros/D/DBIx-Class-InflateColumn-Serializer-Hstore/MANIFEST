@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/DBIx/Class/InflateColumn/Serializer/Hstore.pm
+t/00_compile.t
+META.yml
+MANIFEST

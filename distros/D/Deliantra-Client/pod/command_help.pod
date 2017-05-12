@@ -1,0 +1,1021 @@
+=head1 Deliantra Command ListingX<command>
+
+=head2 accept-invitation
+
+Accepts an invitation previously issued by another player using the invite
+command. This will transfer you to the location you were invited to.
+
+=head2 afk
+
+Puts you into AFK (Away From Keyboard) mode. This can be used when you
+are away for some time but not long enough to log off. It will not save
+you from starvation and will merely list you as AFK in the user list.
+
+=head2 apply
+
+Apply applies an object.
+
+If no options are given, it applies an object you are standing on.
+
+If an object name is given, it will apply/unapply that object (toggle)
+
+Extra options to apply:
+
+   -a   Always applies the object
+   -u   Always unapplies the object.
+
+These two options disable the toggling feature.
+
+=head2 X<applymode>applymode (nochoice|never|always)
+
+the C<applymode> controls what happens when you are equipping something that would
+require something else to be unequipped.
+
+The options are:
+
+=over 4
+
+=item B<nochoice>
+
+In this case, if there is no choice for the item(s) being removed in order
+to equip your new item. An example of this is a wand - there can only be
+one other item needed to be unequipped for the new item to be equipped.
+Note that in the case of two handed objects, like bows, it can result in
+two (or more) items being unequipped to equip your new item.
+
+=item B<never>
+
+In this case, it will never unequip something for you. It will instead
+tell you want you need to unequip - this can be a list of many objects.
+
+=item B<always>
+
+This will unequip whatever is needed to equip your new item.
+
+=back
+
+An example of how the above works:
+
+If your character currently has two rings, and tries to equip a third, the
+B<nochoice> mode will print the two rings you currently have equipped. The
+B<always> mode will unequip one of the rings in your inventory. The ring
+unequipped is fairly indeterminate - it depends on how the server has
+ordered your inventory (which is not the same as the order your window
+displays).
+
+If your character is currently wearing a suit of armor, and you try to
+equip another suit, both B<nochoice> and B<always> will cause the new suit
+to get equipped.
+
+See L<apply|command/apply>.
+
+=head2 body
+
+Shows how much (and what) you are wielding on certain body parts.
+
+For example as fireborn, you have 4 fingers to put rings on. If you have
+3 rings on it will say: "on your finger 3 1", meaning you have 3 fingers
+full and one free.
+
+Both items as well as skills and other more esoteric objects can use those
+body parts.
+
+=head2 X<bowmode>bowmode (normal|threewide|spreadshot|bestarrow|.*)
+
+The C<bowmode> controls how you will fire arrows and bolts.
+
+The options are:
+
+=over 4
+
+=item B<normal>
+
+As you would expect.
+
+=item B<threewide>
+
+Fires three arrows in parallel.
+
+=item B<spreadshot>
+
+Fires three arrows which spread out over distance.
+
+=item B<fire>I<direction>
+
+Locks in the direction the missiles will fire, specify by compass position:
+B<firenorth>, B<firene>, B<fireeast>, B<firese>, B<firesouth>, B<firesw>, B<firewest>, B<firenw>.
+
+=item B<bestarrow>
+
+Selects and fires the probable best arrow from your inventory.
+
+=back
+
+=head2 brace
+
+When you enter the B<brace> command to brace your character, your
+character will no longer move. It can still attack adjoining
+spaces. Bracing can be useful to hold a location.
+
+When you are braced, you lose your Dex bonus and incur a 2 point
+ac penalty beyond that (if you have a negative Dex bonus, you may in
+fact come out ahead. You also only get 20% of the normal experience
+for killing creatures, and incur a 4 point WC (to hit) penalty. 
+
+=head2 chat
+
+   chat <message>
+
+Sends a message to all players on the server. This is the normal way to
+chat with others.
+
+=head2 cast
+
+You use the cast command to set your range-action-slot to the spell you
+want. Example:
+
+   cast burning hands
+
+sets your I<range> slot to B<spell: burning hands>.
+
+If you don't know the spell, shows which spells you do know.
+
+It is helpful to bind string like B<cast burning hands> to keys.
+
+See C<help range> for more information on range weapons.
+
+=head2 X<drop>drop (all|unpaid|cursed|unlocked|.*)
+
+   drop [number] name
+
+B<name> is the name of the item(s) to drop. It may match multiple items.
+An object name matches when it contains the name. The name matching is
+case insensitive.
+
+There are a few special name values:
+
+=over 4
+
+=item B<all>: matches any item.
+
+=item B<unpaid>: matches unpaid items.
+
+=item B<cursed>: drops items known to be cursed or damned.
+
+=item B<unlocked>: drops items not locked in your inventory.
+
+=back
+
+B<number> is optional. This acts as the number of the object to drop. The
+objects number must be at least the number for it to be dropped. For
+example, if you do B<drop 10 scroll>, only groupings of 10 or more scrolls
+will be dropped. A collection of 5 scrolls will not be dropped.
+
+See also B<dropall> and mouse button control within client for dropping
+objects.
+
+
+=head2 cointoss
+
+Tosses a coin and reports the outcome to you and other players on the same
+map, much like the say command does.
+
+
+=head2 orcknuckle
+
+Throws your orcknuckle set and reports the outcome to you and other
+players on the same map, much like the say command does. Your first
+three orcknuckle throws can report I<beholder>, I<ghost>, I<knight>,
+I<princess>, I<dragon>, while the fourth can additionally roll up to
+I<orc>.
+
+
+=head2 dropall
+
+   dropall [type]
+
+B<dropall> drops all items in your inventory to the ground, excepting
+locked items. The type parameter will also control what is dropped:
+
+=over 4
+
+=item nothing specified
+
+Drops all objects except food, money, keys, and containers.
+
+=item B<weapons>
+
+Drops weapons, bows, and arrows.
+
+=item B<armor> (armour)
+
+Drops armor, shield, and helmets.
+
+=item B<misc>
+
+Drops horns, books, girdles, amulets, rings, cloaks, boots, gloves,
+bracers, scrolls, wands, rods, and potions.
+
+=back
+
+See also 'drop' and mouse button control for dropping objects.
+
+=head2 examine
+
+Without arguments, this will give some information on the item below you,
+with arguments it will give information on a matching item in your inventory.
+For example:
+
+   examine rucksack
+
+This will show you something like:
+
+   That is rucksack
+   Its weight limit is 647.1 kg.
+   It is made of: cloth.
+   It weighs 0.100 kg.
+
+=head2 follow
+
+This enables the follow mode (cf+ only).
+
+The player issuing the follow
+command is required to stand
+on a space right next to the
+player that is to be followed.
+
+To start following a player,
+use:
+
+   follow <playername>
+
+To stop following, use:
+
+   follow
+
+Without arguments.
+
+=head2 get
+
+   get [item]
+
+This will pick up an item from the floor with the name [item]. If there is
+more than one unique item with that name, they are all picked up.
+
+=head2 gsay
+
+If you are in a party (party join or party form), you will be able to message
+only your party. Even people standing right next to you can't hear it.
+
+=head2 help
+
+Gives you online help for the command or help topic specified.
+
+=head2 hintmode (show|mark|hide)
+
+   hintmode show|mark|hide
+
+Sets the I<hint mode> to the given value: Throughout the game you can find
+hints that sometimes help you to solve a puzzle or manage a situation
+better than without. You can change the display of these hints with this
+command:
+
+=over 4
+
+=item show
+
+Show the hints (the default mode).
+
+=item mark
+
+Do not show the hints themselves, but notify you when a hint would have
+been available.
+
+=item hide
+
+Hide all hints: You will not be able to tell whether there is a hint
+available or not.
+
+=back
+
+=head2 hiscore
+
+Shows a list of the highest level players in the game.
+
+=head2 ignore
+
+   ignore list
+
+Lists all players that you currently ignore.
+
+   ignore <player> <tell|shout|all> [timeout]
+
+This command ignores the specified messages (B<tell> ignores tells,
+B<shout> ignores chat and shout and B<all> ignores everything from the given
+user).
+
+The optional timeout (specified in hours) specifies when the ignore entry
+expires. The default is 24 (one day). The reason why all ignore entries
+expire after a day by default is that most troublemakers stop soon after
+they are being ignored.
+
+To revoke an ignore, use the B<unignore> command.
+
+=head2 inventory
+
+Lists all items in your inventory along with their locked/applied/wielded
+status. Example:
+
+   inventory
+
+   Inventory:
+   - arrow                  0.1
+   - Knife *                2
+   - long sword (wielded)  15
+
+This shows that you have one arrow which weighs 0.1kg and one Knife which you
+protected from dropping by locking it as well as a long sword which you are
+currently using to attack.
+
+=head2 invite
+
+This command invites another player to where you are currently located.
+There are four levels of inviting that can be earned by doing quests.
+Quest descriptions can be found in a house in scorn.
+
+=over 4
+
+=item Level 1 can invite only into private rooms such as apartments.
+
+=item Level 2 can invite into private rooms and unique maps such as guilds.
+
+=item Level 3 can invite to anywhere in the world if there are no monsters on
+the map.
+
+=item Level 4 can invite any player to any map with or without monsters. This is
+a very dangerous skill and should be used wisely.
+
+=back
+
+In any of these levels, the invited player is required to acknowledge and
+allow the transport.
+
+One can never transport from nor to an unholy place. That means, one can
+not be saved out of jail using invite.
+
+=head2 invoke
+
+The invoke command is used to cast a spell immediately, or when it is
+necessary to give a parameter to the spell. Invoke will not set the range
+weapon.
+
+Examples:
+
+   invoke restoration
+   invoke magic rune of large fireball
+   invoke reincarnation of Iamdead
+   invoke create food of waybread
+
+It is very helpful to bind healing spells to keys, for example go to your
+I<playerbook>, tab I<spells>, the press the right mouse button on the
+spell I<medium healing> and choose C<bind invoke ... to a key>. It is
+recommended to bind a healing spell or potion to an easily-accessible-key,
+such as '1'.
+
+
+=head2 killpets
+
+   killpets [name]
+
+The killpets command is a quick and convenient way
+to get rid of all your pets when they are no longer
+useful or are getting in the way. Any equipment
+they had will be left behind, but you will get no
+experience for their death. However, it kills them
+instantaneously.
+
+If a name is specified then only pets with that 
+name will be killed, e.g. killpets bat will kill bats
+but not bees. If a number is specified, the pet 
+corresponding to that number is killed.
+
+=head2 lock
+
+   lock [object]
+
+The lock command is a quick and convenient way to
+lock items in your inventory.
+
+If a object name is specified then only the
+objects that match that name are locked.
+e.g lock materials will lock any materials
+in your inventory and not touch anything else.
+
+lock by itself will lock everything in your
+inventory.
+
+=head2 mapinfo
+
+Shows some information about the map like this:
+
+   world_105_115 (/world/world_105_115) in scorn
+   Creator: Gnat the Gnu
+   Email: gnu@foo.bar
+   Date: Sun Dec 16 20:53:13 2001
+
+world_105_115:        The map name
+/world/world_105_115: The relative map path
+scorn:                Region the map is in
+
+The rest is information the mapper may or may not provide. Often, this is
+the mapper's name, email and map creation date as this example shows.
+
+=head2 maps
+
+   maps <mapname>
+
+Shows a list of maps matching the regex <mapname> that are currently being
+known to the server. The different fields are Pl, I, Svd, Reset and Path:
+
+=over 4
+
+=item Pl: the number of players on that map currently.
+
+=item I: B<I>n memory, B<S>wapped out or B<L>oading.
+
+The server keeps maps in memory only for a short time (by default about
+40 seconds). After that time, it saves them to disk. As the server loads
+most maps in the background it is possible that you can see a map that is
+currently being loaded, but that's rare, as loading a map is fast.
+
+=item Svd: the amount of seconds the map was last saved (++ means >99).
+
+The server by default tries to save each map at least every 20 seconds if
+it changed, so in case of a disastrous crash (one where the server cannot
+emergency save), at most 20 seconds of gameplay are lost.
+
+=item Reset: the minimum number of seconds the map will stay as is (will not reset).
+
+Most maps will not reset as long as players are on it, and usually the
+reset counter only starts going down when all players left the map. Some
+maps will never reset in the common sense, these are usually marked with a
+very high number (such as C<1e+99>).
+
+=item Path: the name that uniquely identifies the map, can be used for goto etc.
+
+=back
+
+
+=head2 mark
+
+B<mark> is used to mark items for items that apply other items. Examples of
+these are flint & steel marked for apply torches, a weapon marked for
+improve weapon scrolls.
+
+B<mark> without options shows your currently marked item.
+
+Usage examples:
+
+   mark sword +3
+   mark three torches
+   mark sword
+
+B<mark> will look for best match first, and then look for matches based
+on shortened name, object name, archetype name. It prints the match it
+finds.
+
+=head2 me
+
+   me <message>
+
+Sends a message to all players on the server, similar to chat, but instead
+of using C<name chats: message>, the form C<* name message> is used, which
+is useful to describe yourself, such as:
+
+   me feels lonely
+   =>
+   * schmorp feels lonely
+
+
+=head2 motd
+
+Shows the message of the day. It takes no arguments.
+
+=head2 output-count
+
+   output-count [lines]
+
+output-count sets after how many messages of the same type, they are
+then printed out.  If the value was 10, then after killing ten orcs, the
+message '10 times you kill orc' would be printed out. The default value is
+1 - this means that all messages get printed out as they are requested -
+buffering is disabled in this regard.
+
+output-sync controls how often information is sent to the screen. Each
+buffer has its own time value, and will be flushed independently. The
+default value is usually less than a second.
+
+See also L<output-sync>.
+
+=head2 output-rate
+
+   output-rate [bytes per second]
+
+Show the current setting of the output-rate, or set it to the provided
+value. The server will try very hard not to send more than this many bytes
+per second to your client. If the rate is exceeded, the server tries to
+hold back less important information (such as new images) to increase
+responsiveness.
+
+The server-side default is usually quite high, around 100000. If the
+server is running on a Linux kernel, it will adjust to the actual
+bandwidth available, and output-rate only sets an upper bound. That is,
+the server will automatically set an optimal send rate and adjusting your
+output-rate is not required.
+
+=head2 output-sync
+
+   output-sync [seconds]
+
+output-sync controls how often information is sent to the screen. Each
+buffer has its own time value, and will be flushed independently. The
+default value is usually less than a second.
+
+output-count sets after how many messages of the same type, they are
+then printed out.  If the value was 10, then after killing ten orcs, the
+message '10 times you kill orc' would be printed out. The default value is
+1 - this means that all messages get printed out as they are requested -
+buffering is disabled in this regard.
+
+See also L<output-count>.
+
+=head2 party
+
+party join partyname
+        Puts you in a party, prompts you for a passwd if there is
+one
+
+party form partyname
+        Forms a party and puts you as leader, 32 character max.
+At the moment, being party leader does nothing. May be used in
+the future.
+
+party list
+        Lists currently formed parties and their 'leader'
+
+party passwd <password>
+        Changes the passwd for the party you are in, 8 character max.
+
+party who
+        lists the members of the party you are in
+
+party say <msg>
+        sends messsage to party members 
+
+party leave
+        takes you out of current party
+
+=head2 peaceful
+
+TODO: rework for deliantra, intended future behaviour is to toggle
+peaceful mode with regards to npc and monsters only, not with regards to
+players (which will be controlled by priests).
+
+The B<peaceful> command will switch you between peaceful and hostile attack
+modes.
+
+When peaceful is on you will not automatically attack other player when
+bumping into them and will do reduced damage against other players if
+you do attack them (friendly fire).  Having peaceful mode on only lowers
+damage against other players, it has no effect on damage done to monsters
+or other NPCs, so it is generally advisable to remain in peaceful mode
+unless you are looking for trouble.  It is still entirely possible to kill
+other players when in peaceful mode so you should still be careful when
+interacting with other players.  Hostile mode (peaceful off) will enable
+melee combat when bumping into other players and does normal damage for
+other attacks as well.
+
+Damage done by area effect attacks like cone spells, explosive
+detonations, fireballs, poisons, cloud or swarm attacks, runes or disease
+are not modified by peaceful/hostile mode.
+
+=head2 X<petmode>petmode (normal|sad|defend|arena)
+
+B<petmode> controls how your pets (charmed monsters) will behave.
+
+The options are:
+
+=over 4
+
+=item B<normal>
+
+Monsters behave normally, i.e. according to their own character.
+
+=item B<sad> (search and destroy)
+   
+Pets will roam and seek out things to attack.
+
+=item B<defend>
+
+Pets will try to stay close and defend you.
+
+=item B<arena>
+
+Like B<normal>, except that pets will attack other players in the arena.
+
+=back
+
+=head2 pickup
+
+   pickup +mode
+   pickup -mode
+   pickup density
+
+B<pickup> changes whether you pick up items when you step on them. To
+pickup an item manually, use the ',' key.
+
+The B<Pickup> tab in the playerbook is usually a better way to modify your
+autopickup settings than using this command.
+
+Mode can be one of:
+
+    "debug", "inhibit", "stop", "food", "drink", "valuables", "bow",
+    "arrow", "helmet", "shield", "armour", "boots", "gloves", "cloak",
+    "key", "missile", "allweapon", "magical", "potion", "spellbook",
+    "skillscroll", "readables", "magicdevice", "notcursed", "jewels",
+    "flesh"
+
+If a number (C<density>, must be 0..15) is specified, then items of at
+least the specified value density are picked up. Value density is given as
+gold/weight in kilograms.
+
+The value in gold is what the item is worth if you sold it in the shop.
+
+=head2 prepare
+
+The same as cast. Usage:
+
+   prepare <spell>
+
+
+=head2 quit
+
+Deletes your character from the server. If you want to quit the session
+without deleting your character, you must use a I<Bed to Reality>. Find a
+bed (probably in a building close to where you entered the game), get on
+top of it, and apply it using B<Tab> ro the B<apply> command.
+
+
+=head2 range
+
+Your range weapon can be one of several weapons, a spell you cast, a
+bow-and-arrow, a rod, or a wand, to name a few.
+
+Your range weapon is fired when you press SHIFT-direction, and will be
+fired in that direction.
+
+
+=head2 ready_skill
+
+   ready_skill <name of skill>
+
+Readies the given L<skill|pod/skill_help> by putting it in your L<range
+slot|glossary/range slot>. Some skills are used automatically when
+readied, some need to be actively used by "firing" them.
+
+If you just want to invoke a skill once, leaving your range slot
+untouched, use L<use_skill> instead.
+
+
+=head2 rename
+
+Changes/removes the custom name of given item (or the marked one).
+
+   rename oldname to newname
+   rename "old item name" to "new item name"
+
+If either of the names contain spaces, you have to use the C<">-form,
+otherwise you can just write the name as-is. If you omit the old name, the
+marked item will be used instead.
+
+If the new name is empty (i.e. C<"">), then the original (before the
+rename) name will be restored.
+
+Note: maximum allowed name length is 127 characters.
+
+
+=head2 resistances
+
+This shows you the resistances you have to specific attack types.
+If you have for example "cold +20", it means you get 20% damage done
+by cold attacks. If you have "ghost hit -50", you will get 50% more
+damage by ghost hits.
+
+If you are a dragon, you will also get your natural skin resistances
+appened to the list. These will never lower, only rise.
+
+=head2 rotateshoottype
+
+Switches between spell, skill and weapon. Example:
+
+   cast burning hands
+   ready_skill disarm traps
+   apply wand of medium fireball
+
+   rotateshoottype   # Switches to the spell (burning hands)
+   rotateshoottype   # Switches to the wand (of medium fireball)
+   rotateshoottype   # Switches to the skill (disarm traps)
+   rotateshoottype   # Disables the range slot (won't use anything)
+   rotateshoottype   # Switches back to the spell.. and so on
+
+=head2 say
+
+Will tell all players on the same map as yourself a message.
+
+=head2 save
+
+Updates players status to disk. This can be useful for making backup
+copies if you fear the server is about to crash.
+
+The server saves your character automatically in certain intervals,
+and also on clean shutdowns, so there is little practical use for this
+command.
+
+WARNING - if you want to leave the game without destroying your player,
+you must find a I<Bed to Reality> and hit B<Tab> on the bed to apply
+it. Doing B<save> and then B<quit>ing will still delete your character.
+
+=head2 search-items
+
+   search-items <word>
+
+Automatically picks up all items with <word> in their name. C<search-items
+rod> will pick up all rods and heavy rods. C<search-items of fire> will
+pick up all bolts, arrows, swords, etc. of Fire, C<search-items magic+1>
+will pick up all items with magic+1, and so on, and so on.
+
+You can also specify C<all> (to pick up I<everything>), C<cursed> to pick
+up only cursed items or C<unpaid>, which picks up only unpaid items.
+
+While this mode is active, you will be slower and the normal autopickup is
+disabled. To disable search mode again, execute C<search-items> without
+any arguments.
+
+=head2 seen
+
+   seen <login>
+
+Tells you when the player named <login> was last seen on the server (cf+
+only).
+
+=head2 shout
+
+   shout <message>
+
+Sends a message to all players on the server. It is mainly useful for
+emergency messages ("I am trapped on xxx, can somebody help me?") and
+should not be used for general chat. Use L<chat|command/chat> instead.
+
+=head2 showpets
+
+   showpets <number>
+
+Shows a numbered list of the pets owned by the player. If a number is
+specified, instead shows a detailed printout about that pet.
+
+=head2 skills
+
+Lists all skills you have along with the experience you have in those skills.
+Example:
+
+   skills
+
+   literacy................................lvl:  4 (xp:9944/16000/25%)
+   one handed weapons......................lvl:  4 (xp:15059/16000/25%)
+
+This shows you that you have two skills, literacy and one handed weapons. You
+are level 4 in both skills and in literacy, you have 9944 experience points.
+You need to reach 16000 to gain another level. The 25% at the end show you what
+percentage of your experience is permanent, which means you cannot lose it if
+you die.
+
+=head2 sort_inventory
+
+If sort_inventory is set, items will be inserted into your inventory
+in order by type than alphabetical. This, all scrolls will be grouped
+together, but in alphabetical order. Same for all weapons. This only
+applies to new items you pick up - items that you are already holding will
+not be sorted.
+
+If sort_inventory is not set (default), items will be inserted via type,
+subtype and magic. This, all axes will be grouped together in magic order,
+all daggers by magic order, etc. Unfortunately, for scrolls and rings, new
+ones just get inserted last.
+
+If you have a lot of stuff that is not in alphabetical order but you would
+like it to be, the best method is to drop all of it and then pick it up.
+
+=head2 sound
+
+Toggles between sound enabled and disabled. This has no relevance to the
+sound settings of the client, it only governs whether the server will send
+sound effect command to the client and is enabled if the client supports
+sound (i.e. always for the deliantra client).
+
+=head2 sourcecode
+
+This command displays the means to download the source code (server code,
+maps and archetypes) used to implement this version of the game.
+
+Every player has the right to download and modify the source code of the
+server, as required by both the GNU General Public License and the GNU
+Affero General Public license.
+
+If you modify your version of the server, you will have to provide a means
+to download the modified sources (and resources) via this command. If you
+run an unmodified version of the server, the default will do.
+
+=head2 statistics
+
+B<statistics> shows various useful information about your character.
+None of the information it shows is stuff that is not contained in the
+documentation.
+
+As of now, it shows how much experience you need for your next level. It
+also shows natural, real, and maximum statistic values.
+
+Your natural stat is the stat without any items/spells applied.
+
+Real is what the current value is (same as in the stat window.)
+
+Maximum is the maximum value for your natural stat.
+
+=head2 suicide
+
+Kills yourself. No, really.
+
+This command might not look useful at first, but sometimes you can get
+yourself into a corner you can't escape anymore, either due to a map
+bug or your own stupidity. Killing oneself can be difficult and time
+consuming, that's why this command is provided. It is fast, painless,
+effective, humane.
+
+=head2 take
+
+The take commands take object(s) on the space the player is standing on,
+and inserts them into the players inventory.
+
+If no parameter is given, take will get the top object that can be taken
+and put it in the players inventory. If no object can be taken, that will
+be stated.
+
+A parameter can be given to take. In this case, all object that have names
+that match the parameter will be picked up. Thus, if there is a 'sword of
+WOE', and 'sword +1' and a 'sword -3' on the ground, 'take sword' will
+pick all of them up.
+
+By default, take is bound to the comma key, with no parameters. To change
+this, look at the bind command.
+
+=head2 tell
+
+   tell <playername> <message>...
+
+Sends a private message to the given player I<only>.
+
+=head2 throw
+
+Throws an unlocked item in your inventory, be it applied or not, into the
+direction you are looking. If you mark an item in your inventory, this item
+is thrown first. If there is more than one copy of an item, only one of it is
+thrown away. God-given items can not be thrown. You need the skill throwing
+for this to work.
+
+=head2 time
+
+Shows the Deliantra in-game time, not the server time. It looks like this:
+
+   It is 52 minutes past 8 o'clock am, on the Day of the Bull,
+   the 2nd Day of the Month of the Frost Giant, Year 63.
+   Time of Year: The Season of New Year.
+
+An hour of game time passes in 3 minutes of real time. The time and
+calendar uses 60 minutes per hour, 28 hours per day, seven days per week,
+five weeks per month, and 17 months per year. The year is additionally
+split into four seasons of 4 months each, except the season of the
+Blizzard, which is 5 months long.
+
+The number "zero" is unknown, which is why the minutes go from 1 to 60.
+
+Seasons and the time of the day affect the overall outdoor daylight.
+
+=head2 title
+
+   title <new title>
+   title clear   # Sets your title back to your race.
+
+Players can change their title. For example you called yourself Gandalf and
+your race is elf, you can use the title command to change your name from
+"Gandalf the elf" to "Gandalf the white" by using C<title the white>.
+
+Dragons cannot set their title because it changes during the game.
+
+=head2 unignore
+
+   unignore <login>
+
+Cancels all ignores set for the specified login. See B<ignore>.
+
+=head2 unlock
+
+   unlock [object]
+
+The unlock command is a quick and convenient way to
+unlock items in your inventory.
+
+If a object name is specified then only the
+objects that match that name are unlocked.
+
+e.g unlock materials will unlock any materials
+in your inventory and not touch anything else.
+
+unlock by itself will unlock everything in your
+inventory.
+
+=head2 uptime
+
+Tells you something about the time the server was started and how long ago
+that was.
+
+=head2 use_skill
+
+   use_skill <name of skill>
+
+Uses the given L<skill|pod/skill_help> immediately, once. See also
+L<ready_skill>.
+
+=head2 usekeys (inventory|keyrings|containers)
+
+The B<usekeys> option determines the behaviour of using keys.
+
+Values are:
+
+=over 4
+
+=item B<inventory>: Only keys in the top level inventory are used (default)
+
+=item B<keyrings>: Only keys in active key rings are used.
+
+=item B<containers>: Only keys in active containers are used.
+
+=back
+
+Note that key rings are just a specialized container, so the containers
+will also find keys in key rings.
+
+Only active containers are used - keys will not jump out of closed
+containers, but hints will be given if you have keys in such containers.
+
+=head2 version
+
+Shows what version of the software the server is running on and what people
+have contributed what to the game.
+
+=head2 weather
+
+Gives you information about the current weather of outside areas, if the
+server has weather support (which is unlikely, as it is very broken).
+
+=head2 whereabouts
+
+The whereabouts command gives a summary about the
+regions in which players are currently staying.
+
+=head2 whereami
+
+Tells you some historical information on the region you are currently in.
+
+=head2 who
+
+Shows what players are playing in the world and where they are. It may also
+show their levels and race or title. (See the L<title|command/title> command)
+
+B<who> optionally takes an argument that limits the players shown to
+the specified region, e.g. B<who brest> will show all players playing
+somewhere in Brest.
+
+=head2 wimpy
+
+The wimpy level is the amount of health points (hp) that may be left before you
+automatically run away. This may be useful in hand-to-hand combats but should
+not be used when the opponent attacks with spells.
+
+
+=head1 Authors
+
+Parts of this document were originally taken from the crossfire server
+help files with unknown authors.
+
+Adapted for use by I<deliantra>, enhanced and corrected by Pippijn van
+Steenhoven and Marc A. Lehmann.
+

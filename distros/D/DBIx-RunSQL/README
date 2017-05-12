@@ -1,0 +1,323 @@
+NAME
+
+    DBIx::RunSQL - run SQL from a file
+
+SYNOPSIS
+
+        #!/usr/bin/perl -w
+        use strict;
+        use lib 'lib';
+        use DBIx::RunSQL;
+    
+        my $test_dbh = DBIx::RunSQL->create(
+            dsn     => 'dbi:SQLite:dbname=:memory:',
+            sql     => 'sql/create.sql',
+            force   => 1,
+            verbose => 1,
+        );
+    
+        ... # run your tests with a DB setup fresh from setup.sql
+
+METHODS
+
+ DBIx::RunSQL->create ARGS
+
+ DBIx::RunSQL->run ARGS
+
+    Runs the SQL commands and returns the database handle. In list context,
+    it returns the database handle and the suggested exit code.
+
+      * sql - name of the file containing the SQL statements
+
+      The default is sql/create.sql
+
+      If sql is a reference to a glob or a filehandle, the SQL will be read
+      from that. not implemented
+
+      If sql is undefined, the $::DATA or the 0 filehandle will be read
+      until exhaustion. not implemented
+
+      This allows one to create SQL-as-programs as follows:
+
+        #!/usr/bin/perl -w -MDBIx::RunSQL -e 'create()'
+        create table ...
+
+      If you want to run SQL statements from a scalar, you can simply pass
+      in a reference to a scalar containing the SQL:
+
+          sql => \"update mytable set foo='bar';",
+
+      * dsn, user, password - DBI parameters for connecting to the DB
+
+      * dbh - a premade database handle to be used instead of dsn
+
+      * force - continue even if errors are encountered
+
+      * verbose - print each SQL statement as it is run
+
+      * verbose_handler - callback to call with each SQL statement instead
+      of print
+
+      * verbose_fh - filehandle to write to instead of STDOUT
+
+ DBIx::RunSQL->run_sql_file ARGS
+
+        my $dbh = DBI->connect(...)
+    
+        for my $file (sort glob '*.sql') {
+            DBIx::RunSQL->run_sql_file(
+                verbose => 1,
+                dbh     => $dbh,
+                sql     => $file,
+            );
+        };
+
+    Runs an SQL file on a prepared database handle. Returns the number of
+    errors encountered.
+
+    If the statement returns rows, these are printed separated with tabs.
+
+      * dbh - a premade database handle
+
+      * sql - name of the file containing the SQL statements
+
+      * force - continue even if errors are encountered
+
+      * verbose - print each SQL statement as it is run
+
+      * verbose_handler - callback to call with each SQL statement instead
+      of print
+
+      * verbose_fh - filehandle to write to instead of STDOUT
+
+      * output_bool - whether to exit with a nonzero exit code if any row
+      is found
+
+      This makes the function return a nonzero value even if there is no
+      error but a row was found.
+
+      * output_string - whether to output the (one) row and column, without
+      any headers
+
+ DBIx::RunSQL->run_sql ARGS
+
+        my $dbh = DBI->connect(...)
+    
+        for my $file (sort glob '*.sql') {
+            DBIx::RunSQL->run_sql_file(
+                verbose => 1,
+                dbh     => $dbh,
+                sql     => 'create table foo',
+            );
+        };
+
+    Runs an SQL string on a prepared database handle. Returns the number of
+    errors encountered.
+
+    If the statement returns rows, these are printed separated with tabs,
+    but see the output_bool and output_string options.
+
+      * dbh - a premade database handle
+
+      * sql - string or array reference containing the SQL statements
+
+      * force - continue even if errors are encountered
+
+      * verbose - print each SQL statement as it is run
+
+      * verbose_handler - callback to call with each SQL statement instead
+      of print
+
+      * verbose_fh - filehandle to write to instead of STDOUT
+
+      * output_bool - whether to exit with a nonzero exit code if any row
+      is found
+
+      This makes the function return a nonzero value even if there is no
+      error but a row was found.
+
+      * output_string - whether to output the (one) row and column, without
+      any headers
+
+ DBIx::RunSQL->format_results %options
+
+      my $sth= $dbh->prepare( 'select * from foo' );
+      $sth->execute();
+      print DBIx::RunSQL->format_results( sth => $sth );
+
+    Executes $sth->fetchall_arrayref and returns the results either as tab
+    separated string or formatted using Text::Table if the module is
+    available.
+
+    If you find yourself using this often to create reports, you may really
+    want to look at Querylet instead.
+
+      * sth - the executed statement handle
+
+      * formatter - if you want to force tab or Text::Table usage, you can
+      do it through that parameter. In fact, the module will use anything
+      other than tab as the class name and assume that the interface is
+      compatible to Text::Table.
+
+    Note that the query results are returned as one large string, so you
+    really do not want to run this for large(r) result sets.
+
+ DBIx::RunSQL->split_sql ARGS
+
+      my @statements= DBIx::RunSQL->split_sql( <<'SQL');
+          create table foo (name varchar(64));
+          create trigger foo_insert on foo before insert;
+              new.name= 'foo-'||old.name;
+          end;
+          insert into foo name values ('bar');
+      SQL
+      # Returns three elements
+
+    This is a helper subroutine to split a sequence of
+    (semicolon-newline-delimited) SQL statements into separate statements.
+    It is documented because it is not a very smart subroutine and you
+    might want to override or replace it. It might also be useful outside
+    the context of DBIx::RunSQL if you need to split up a large blob of SQL
+    statements into smaller pieces.
+
+    The subroutine needs the whole sequence of SQL statements in memory. If
+    you are attempting to restore a large SQL dump backup into your
+    database, this approach might not be suitable.
+
+PROGRAMMER USAGE
+
+    This module abstracts away the "run these SQL statements to set up your
+    database" into a module. In some situations you want to give the setup
+    SQL to a database admin, but in other situations, for example testing,
+    you want to run the SQL statements against an in-memory database. This
+    module abstracts away the reading of SQL from a file and allows for
+    various command line parameters to be passed in. A skeleton
+    create-db.sql looks like this:
+
+        #!/usr/bin/perl -w
+        use strict;
+        use lib 'lib';
+        use DBIx::RunSQL;
+    
+        my $exitcode = DBIx::RunSQL->handle_command_line('myapp');
+        exit $exitcode;
+    
+        =head1 NAME
+    
+        create-db.pl - Create the database
+    
+        =head1 ABSTRACT
+    
+        This sets up the database. The following
+        options are recognized:
+    
+        =over 4
+    
+        =item C<--user> USERNAME
+    
+        =item C<--password> PASSWORD
+    
+        =item C<--dsn> DSN
+    
+        The DBI DSN to use for connecting to
+        the database
+    
+        =item C<--sql> SQLFILE
+    
+        The alternative SQL file to use
+        instead of C<sql/create.sql>.
+    
+        =item C<--force>
+    
+        Don't stop on errors
+    
+        =item C<--help>
+    
+        Show this message.
+    
+        =cut
+
+ DBIx::RunSQL->handle_command_line
+
+    Parses the command line. This is a convenience method, which passes the
+    following command line arguments to ->create:
+
+      --user
+      --password
+      --dsn
+      --sql
+      --force
+      --verbose
+
+    In addition, it handles the following switches through Pod::Usage:
+
+      --help
+      --man
+
+    See also the section PROGRAMMER USAGE for a sample program to set up a
+    database from an SQL file.
+
+NOTES
+
+ COMMENT FILTERING
+
+    The module tries to keep the SQL as much verbatim as possible. It
+    filters all lines that end in semicolons but contain only SQL comments.
+    All other comments are passed through to the database with the next
+    statement.
+
+ TRIGGER HANDLING
+
+    This module uses a very simplicistic approach to recognize triggers.
+    Triggers are problematic because they consist of multiple SQL
+    statements and this module does not implement a full SQL parser. An
+    trigger is recognized by the following sequence of lines
+
+        CREATE TRIGGER
+            ...
+        END;
+
+    If your SQL dialect uses a different syntax, it might still work to put
+    the whole trigger on a single line in the input file.
+
+ OTHER APPROACHES
+
+    If you find yourself wanting to write SELECT statements, consider
+    looking at Querylet instead, which is geared towards that and even has
+    an interface for Excel or HTML output.
+
+    If you find yourself wanting to write parametrized queries as .sql
+    files, consider looking at Data::Phrasebook::SQL or potentially
+    DBIx::SQLHandler.
+
+SEE ALSO
+
+    ORLite::Migrate
+
+REPOSITORY
+
+    The public repository of this module is
+    http://github.com/Corion/DBIx--RunSQL.
+
+SUPPORT
+
+    The public support forum of this module is http://perlmonks.org/.
+
+BUG TRACKER
+
+    Please report bugs in this module via the RT CPAN bug queue at
+    https://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-RunSQL or via
+    mail to bug-dbix-runsql@rt.cpan.org.
+
+AUTHOR
+
+    Max Maischein corion@cpan.org
+
+COPYRIGHT (c)
+
+    Copyright 2009-2016 by Max Maischein corion@cpan.org.
+
+LICENSE
+
+    This module is released under the same terms as Perl itself.
+

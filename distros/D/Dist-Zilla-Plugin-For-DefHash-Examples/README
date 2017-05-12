@@ -1,0 +1,21 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [For::DefHash::Examples]
+
+DESCRIPTION
+
+    This plugin is to be used when building DefHash-Examples distribution
+    (see DefHash::Examples). Currently it does the following:
+
+      * For share/examples/*.json, check that the file contains valid JSON
+      and valid defhash (or invalid defhash, if filename begins with
+      'error-')
+
+SEE ALSO
+
+    DefHash
+
+    DefHash::Examples
+

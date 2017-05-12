@@ -1,0 +1,358 @@
+Revision history for Perl module Digest::SHA::PurePerl.
+
+5.96  Wed Jul 27 20:04:34 MST 2016
+	- prevented shasum from possibly running malicious code
+		-- remove '.' from @INC before module loading
+		-- ref. rt.cpan.org #116513
+	- namespace cleanup (ref. rt.cpan.org #105371 and #105372)
+
+5.95  Sat Jan 10 12:15:36 MST 2015
+	- supplied a bit-ordering test (ref. t/bitorder.t)
+		-- to mimic Digest::SHA distribution
+
+5.94  Sat Jan 10 00:45:28 MST 2015
+	- changes only to Digest::SHA for version 5.94
+
+5.93  Sun Oct 26 06:00:48 MST 2014
+	- provided workaround in t/methods.t for unreliable -T test
+		-- Some Perl 5.8's mistake text for binary
+
+5.92  Sun Jun  1 00:15:44 MST 2014
+	- changes only to Digest::SHA for version 5.92
+
+5.91  Fri May 16 10:21:44 MST 2014
+	- re-established inheritance from Digest::base
+		-- to pick up future Digest enhancements automatically
+	- cleaned up documentation
+
+5.90  Wed May  7 07:57:08 MST 2014
+	- enhanced Makefile.PL to allow 'use warnings'
+		-- automatically reverts to $^W for early Perls
+	- scrubbed Perl code to remove all compiler warnings
+
+5.89  Sat Apr 19 05:14:48 MST 2014
+	- added universal newlines mode ("U") to addfile and shasum
+		-- based on Python Universal Newlines concept
+			-- newlines identical across MacOS, DOS, and UNIX
+		-- will deprecate portable mode ("p") in future
+			-- "U" mode is cleaner and more efficient
+	- eliminated experimental -M option in favor of new -R option
+		-- reverses the order of digest module preference
+		-- undocumented: for test and development use only
+
+5.88  Mon Mar 17 08:46:10 MST 2014
+	- changed text file test (-T) to act on filehandles
+		-- ref. addfile portable mode
+		-- improves consistency when reading from STDIN
+		-- still must act on filenames for early Perls (< 5.6)
+	- added -M and -V options to shasum
+		-- undocumented: for development and testing use only
+
+5.87  Mon Feb 17 16:42:02 MST 2014
+	- simplified capture of intermediate SHA states
+		-- can now be done via strings (ref. getstate/putstate)
+
+5.86  Thu Jan 30 08:24:28 MST 2014
+	- changes only to Digest::SHA for version 5.86
+
+5.85  Wed Jun 26 04:05:26 MST 2013
+	- corrected typos in shasum script
+		-- ref. Bug #85430 (posted at Digest::SHA)
+
+5.84  Sat Mar  9 17:36:08 MST 2013
+	- changes only to Digest::SHA for version 5.84
+
+5.83  Mon Mar  4 08:12:00 MST 2013
+	- trimmed "Wide character" error messages on Perl 5.8+
+		-- too much unhelpful info from utf8::downgrade
+		-- error messages now identical on Perl 5.6+
+
+5.82  Thu Jan 24 04:54:12 MST 2013
+	- added code to emulate utf8::downgrade for Perl 5.6
+		-- module behavior now consistent under all Perls 5.6+
+			-- ref: new test script t/unicode.t
+		-- SHA routines now always croak on wide chars (5.6+)
+	- provided documentation to describe Unicode handling
+		-- ref: Bug #82378
+	- updated documentation of NIST statement on SHA-1
+
+5.81  Mon Jan 14 05:17:08 MST 2013
+	- harmonized with Digest::SHA (Bug #54490: unicode problems)
+		-- perform utf8::downgrade for Perl 5.8+
+			-- croak on wide character inputs
+		-- thanks to Victor Efimov for suggestions
+
+5.80  Mon Dec 10 14:15:26 MST 2012
+	- changes only to Digest::SHA for version 5.80
+
+5.74  Sat Nov 24 03:10:18 MST 2012
+	- changes only to Digest::SHA for version 5.74
+
+5.73  Wed Oct 31 04:32:44 MST 2012
+	- changes only to Digest::SHA for version 5.73
+
+5.72  Mon Sep 24 15:22:08 MST 2012
+	- changes only to Digest::SHA for version 5.72
+
+5.71  Wed Feb 29 04:06:10 MST 2012
+	- prevented $! from getting clobbered in _bail() routine
+		-- thanks to Zefram for patch
+	- added example of BITS mode usage to shasum documentation
+
+5.70  Wed Dec 14 02:32:10 MST 2011
+	- added BITS mode to addfile method and shasum
+		-- partial-byte inputs now possible via files/STDIN
+		-- allows shasum to check all 8074 NIST Msg vectors
+			-- previously required special programming
+
+5.63  Tue Nov  8 02:36:42 MST 2011
+	- added code to allow very large data inputs all at once
+		-- previously limited to several hundred MB at a time
+		-- many thanks to Thomas Drugeon for his elegant patch
+	- removed outdated reference URLs from several test scripts
+		-- these URLs aren't essential, and often go stale
+		-- thanks to Leon Brocard for spotting this
+			-- ref. rt.cpan.org #68740
+
+5.62  Sat May 14 04:00:34 MST 2011
+	- removed unnecessary loading of MIME::Base64 module
+		-- thanks to dolmen for pointing this out
+
+5.61  Wed Mar  9 05:26:36 MST 2011
+	- modified dump/load methods to match behavior of Digest::SHA
+		-- in the case of I/O to STDIN/STDOUT
+	- addressed minor documentation oversights
+
+5.60  Thu Mar  3 05:26:42 MST 2011
+	- added new SHA-512/224 and SHA-512/256 transforms
+		-- ref. NIST Draft FIPS 180-4 (February 2011)
+	- simplified shasum by removing duplicative text
+	- improved efficiency of Addfile
+		-- expensive -T test now occurs only in portable mode
+
+5.50  Tue Dec 14 06:20:08 MST 2010
+	- adopted convention that '-' always means STDIN
+		-- actual filename '-' accessed as './-'
+		-- accords with behavior of sha1sum/md5sum
+	- corrected undefined subroutine oversight in shasum
+		-- inadvertent migration of _bail() from PurePerl.pm
+
+5.49  Sun Dec 12 07:22:04 MST 2010
+	- modified Addfile to accept all POSIX filenames
+		-- standard allows all characters except NUL and '/'
+	- updated shasum to more closely mimic sha1sum/md5sum
+		-- added "backslash processing" to handle newlines
+			and backslashes in filenames
+		-- now accepts all POSIX filenames via Addfile
+		-- thanks to Sean Burke for identifying edge cases
+
+5.48  Mon Jan  4 16:32:52 MST 2010
+	- fixed "shasum -a0" option (ref. rt.cpan.org #53319)
+		-- incorrectly accepted 0 as a valid algorithm
+			-- thanks to Zefram for patch
+	- updated URL for NIST test vectors
+		-- ref. files t/nistbit.t, t/nistbyte.t
+			-- thanks to Leon Brocard for patch
+
+5.47  Wed Apr 30 04:00:54 MST 2008
+	- moved .pm file to appropriate lib directory
+	- minor addition to META.yml
+
+5.46  Wed Apr  9 05:04:00 MST 2008
+	- modified _Addfile to recognize leading and trailing
+		whitespace in filenames (ref. rt.cpan.org #34690)
+	- previous version commandeered the warnings flag ($^W)
+		-- this version disables warnings only when
+			compiling 64-bit constants
+
+5.45  Tue Jun 26 02:36:00 MST 2007
+	- extended portability to earlier Perls
+		-- works on Perl 5.003 and later
+		-- thanks to Jim Doble for testing on legacy platforms
+	- updated META.yml to conform to current META spec (1.3)
+	- minor documentation fixes
+
+5.44  Sat Oct 14 00:42:44 MST 2006
+	- removed SIGNATURE file from distribution
+		-- spurious errors from CPANPLUS can break build
+
+5.43  Sat Aug  5 02:36:18 MST 2006
+	- undid Perl Best Practice of favoring 3-argument "open"
+		-- 3-arg version uses different semantics for "-"
+			causing bugs in addfile/shadump/shaload/shasum
+
+5.42  Mon Jul 24 04:04:40 MST 2006
+	- minor code changes suggested by Perl::Critic
+		-- e.g. no bareword filehandles, no 2-argument open's
+	- updated public key (ref. B538C51C)
+		-- previous one (0AF563FE) expired July 2, 2006
+	- added documentation to warn that Base64 digests are NOT padded
+		-- padding must be done by user if interoperability
+			with other software is required
+
+5.41  Sat Jun  3 01:50:46 MST 2006
+	- corrected addfile
+		-- process $file argument as a filehandle unless passed
+			as a SCALAR (which indicates a file name)
+
+5.40  Fri Jun  2 04:00:30 MST 2006
+	- modified addfile to accept indirect filehandles
+		-- ref. rt.cpan.org #19627 and #19641
+
+5.39  Sun May 28 03:22:24 MST 2006
+	- modified shasum to warn rather than die for file errors
+		-- to follow conventions of GNU sha1sum/md5sum
+
+5.38  Thu May 25 02:02:02 MST 2006
+	- added new capabilities to the "addfile" method
+		-- now able to accept file names as well as handles
+		-- includes mode for portable digest calculation
+			-- thanks to Adam Kennedy for emails and ideas
+				ref. File::LocalizeNewlines
+	- used expanded addfile interface to simplify shasum (sumfile)
+		-- regex a tad less general than 5.37, but handles all
+			known newline variants in UNIX/Windows/MacOS
+	- enhanced WARNING messages from shasum checkfile processing
+		-- to mimic behavior of md5sum
+
+5.37  Mon May  8 04:30:09 MST 2006
+	- modified shasum to avoid file slurping (ref. sub sumfile)
+	- improved error handling of checksum files in shasum
+		-- to better mimic the behavior of md5sum
+	- refined line-break regex in shasum (ref. sub sumfile)
+		-- catches multiple CR's preceding LF
+			thanks to Gisle Aas for suggested patch
+
+5.36  Mon May  8 01:38:36 MST 2006
+	- fixed the "portable" option in shasum
+		-- normalize line-breaks in text files only
+
+5.35  Thu May  4 16:54:42 MST 2006
+	- added "portable" option to shasum
+		-- to make digests match across Windows/Unix/MacOS
+	- enabled bundling of shasum command line options
+		-- to mimic behavior of md5sum
+	- removed \r's from text files in t/nist directory
+		-- resolves SIGNATURE clashes (rt.cpan.org #18983)
+	- specified minimum Perl version for module and Makefile.PL
+		-- closes rt.cpan.org #18984
+
+5.34  Thu Feb  2 18:55:40 MST 2006
+	- removed Unix-style pathnames in test scripts
+		-- causing problems on OpenVMS
+		-- thanks to Steve Peters for patch
+	- added PERL_CORE check to test scripts
+		-- allows module to be built into Perl distribution
+
+5.32  Fri Dec  2 02:32:20 MST 2005
+	- added POD section to shasum script
+		-- thanks to Gunnar Wolf for patch
+	- inserted code in test scripts for POD checking
+		-- to recover gracefully if Test::More isn't installed
+
+5.31  Mon Sep  5 00:52:42 MST 2005
+	- added standard tests for pod and pod-coverage checking
+	- inserted subtest to check for failure when using
+		unrecognized SHA algorithm
+	- consolidated code for SHA and HMAC-SHA functions
+		-- removed 190 lines by building functions at runtime
+	- harmonized _sharewind and _shaopen subs with C versions
+		-- other minor code cleanups
+
+5.30  Sat Aug 20 16:46:08 MST 2005
+	- updated docs with recent NIST statement on SHA-1
+		-- advises use of larger and stronger hash functions
+			(i.e. SHA-224/256/384/512) for new developments
+
+5.29  Sun Aug 14 04:48:34 MST 2005
+	- updated docs with cautionary note about SHA-1
+
+5.28  Wed Nov 10 15:33:20 MST 2004
+	- provided more flexible formatting of SHA state files
+		-- entries may now contain embedded whitespace
+			for improved readability
+	- minor code cleanups
+
+5.27  Sun Oct 24 02:54:00 MST 2004
+	- minor code cleanups
+		-- reduces size of dump files for SHA-1/224/256
+
+5.26  Thu Oct  7 14:52:00 MST 2004
+	- streamlined distribution
+		-- reduced NIST vector tests from 200 to 20
+			-- former number was overkill
+			-- distro now downloads and builds more quickly
+	- rewrote SYNOPSIS sections in pod file
+	- made additional tweaks to t/8-shasum.t for portability
+	- cleaned up test scripts
+
+5.25  Sun Sep 12 18:48:00 MST 2004
+	- removed non-essential test script
+		-- t/8-shasum.t causes problems on sparc64-linux
+	- reverted to using eval "require $module" in shasum
+
+5.24  Sun Sep 12 02:50:18 MST 2004
+	- modified shasum to use barewords in "require" statements
+		-- ref. perl.cpan.testers (157305)
+
+5.23  Thu Sep  9 23:06:18 MST 2004
+	- corrected bug in test script
+		-- use blib when invoking perl as an external
+			command in t/8-shasum.t
+
+5.22  Tue Sep  7 19:12:40 MST 2004
+	- minor changes to documentation
+
+5.21  Mon Aug 23 04:02:00 MST 2004
+	- improved test script for "shasum" (t/8-shasum.t)
+		-- exercises check file option (-c)
+
+5.20  Sun Aug 15 04:24:48 MST 2004
+	- introduced "shasum" script
+		-- mimics the usage and behavior of "md5sum"
+		-- adds "-a" option to select SHA algorithm
+		-- for help, just type "shasum -h"
+
+5.10  Fri Aug  6 02:10:12 MST 2004
+	- simplified module documentation
+		-- made it consistent with Digest::SHA docs
+
+0.06  Tue Aug  3 02:12:40 MST 2004
+	- improved performance of SHA-384/512
+		-- using inline eval'ed code instead of subroutines
+		-- 5.7 x faster than Version 0.05
+			-- on alpha-dec_osf, using Gisle's benchmark
+
+0.05  Sun Aug  1 03:56:54 MST 2004
+	- fixed HMAC-SHA-384/512 bug
+		-- code was using hardwired blocksize of SHA-1/256
+	- added test cases to check HMAC-SHA-384/512 behavior
+		-- thanks to Adam Woodbury for vectors and script mods
+	- corrected misspelling in docs
+		-- apologies to Gisle Aas
+
+0.04  Fri Jul  2 01:10:48 MST 2004
+	- added support for SHA-384/512
+		-- module now offers full functionality of Digest::SHA
+		-- however, use of SHA-384/512 requires 64-bit integers
+	- included a SIGNATURE file
+		-- for stronger authentication of module contents
+			-- ref. Module::Signature on CPAN
+
+0.03  Fri Jun 25 00:06:54 MST 2004
+	- portability fix
+		-- dump files caused warnings on 64-bit platforms
+		-- enhanced "dump-load.t" to check correct behavior
+	- performance tweak for 64-bit machines
+		-- eliminated upper-32-bit masking on left shifts
+		-- instead, need to mask only in _digcpy and _shadump
+
+0.02  Tue Jun 22 04:24:00 MST 2004
+	- Increased speed of SHA transforms
+		-- using optimization ideas from Digest::SHA package
+		-- SHA-1       ~  20% faster
+		-- SHA-224/256 ~ 120% faster
+
+0.01  Thu Jun 17 00:04:00 MST 2004
+	- Initial version, derived from Digest::SHA 5.01
+		-- hand-translation from C to Perl

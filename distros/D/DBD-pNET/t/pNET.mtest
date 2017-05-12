@@ -1,0 +1,181 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: pNET.mtest,v 1.1.1.1 1997/09/19 20:34:23 joe Exp $
+#
+# database specific definitions for the DBI proxy 'DBD::pNET'
+
+
+#
+#   DSN being used; EDIT THIS!
+#
+my $cipherDef = "";
+my ($hostname, $dsn);
+if (!$test_dsn) {
+    die "Need \$test_dsn being set in lib.pl.\n";
+}
+if ($dbdriver eq 'Ingres') {
+    $hostname = $ENV{'II_HOST'} || $ENV{'PNET_HOST'} || 'localhost';
+} else {
+    $hostname = $ENV{'PNET_HOST'} || 'localhost';
+}
+TryToConnect($hostname, $test_dsn, $test_user, $test_password);
+$dsn = "DBI:pNET:hostname=$hostname:port=3334";
+$@ = '';
+eval "use Crypt::DES";
+if (!$@) {
+    $dsn .= ":key=0123456789abcdef:cipher=DES";
+    $cipherDef .= "        encryption DES\n"
+	. "        key 0123456789abcdef\n"
+	    . "        encryptModule Crypt::DES\n";
+    eval "use Crypt::IDEA";
+    if (!$@) {
+	$dsn .= ":userkey=0123456789abcdef0123456789abcdef"
+	    . ":usercipher=IDEA";
+	$cipherDef .= "        $test_user encrypt=\"Crypt::IDEA,IDEA,"
+	    . "0123456789abcdef0123456789abcdef\"\n"
+	    }
+}
+$test_dsn = "$dsn:dsn=DBI:$dbdriver:test";
+
+
+#  For testing DBD::pNET, we need a server available. So, fork
+#  a child and let it run as a server.
+
+$childPid = undef;
+
+sub childGone () {
+    my $pid = wait;
+    if (defined($childPid) && $pid == $childPid) {
+	undef $childPid;
+    }
+    $SIG{'CHLD'} = \&childGone;
+}
+
+sub StartServer () {
+    my ($path, $file, $clients);
+    if (!open(CLIENTS, ">t/clients")) {
+	die "Cannot create 'clients' file: $!\n";
+    }
+    print CLIENTS <<"EOF";
+accept localhost
+	users $test_user
+$cipherDef
+
+deny .*
+EOF
+    close(CLIENTS);
+
+    foreach $file ("./blib/script/pNETagent",
+		   "../blib/script/pNETagent",
+		   "./pNETagent",
+		   "../pNETagent") {
+	if (-x $file) {
+	    $path = $file;
+	    last;
+	}
+    }
+
+    if (!$path) {
+	die "Cannot find pNETagent script.\n";
+    }
+
+    $SIG{'CHLD'} = \&childGone;
+
+    my $pid;
+    if (!defined($pid = fork())) {
+	die "Cannot fork: $!";
+    }
+    if (!$pid) {
+	# This is the child, start as the server
+	exec "perl -Iblib/lib -Iblib/arch $path --port 3334 --debug --configFile t/clients --pidFile pNETagent.pid";
+    } else {
+	$childPid = $pid;
+    }
+}
+
+sub StopServer () {
+    if (defined($childPid)) {
+	kill 15, $childPid;
+	undef $childPid;
+	sleep 5;
+    }
+}
+
+use Sys::Syslog;
+if (defined(&Sys::Syslog::setlogsock)) {
+    Sys::Syslog::setlogsock('unix');
+}
+Sys::Syslog::openlog($0, '', 'daemon');
+StartServer();
+sleep 5;
+END {
+    StopServer();
+#     if (-f 't/clients') { unlink 't/clients'; }
+     if (-f 'pNETagent.pid') { unlink 'pNETagent.pid'; }
+    exit 0;
+}
+
+
+############################################################################
+#
+#   For typical drivers, we'd define a function ListTables here.
+#   As of pNET, however, we are interested in using $dbdriver's
+#   ListTables function.
+#
+#   As a workaround we define a hook $listTablesHook pointing to
+#   pNetListTables, that's called from within FindNewTable.
+#   Advantages are:
+#
+#     - We reuse the drivers ListTables
+#     - We don't bother driver authors and testers with details
+#       of DBD::pNET.
+#
+#   Drawback is, this is getting somewhat complicated ...
+#
+############################################################################
+
+use vars qw($listTablesHook);
+
+{
+    my $listTablesData;
+    my $listTablesHostname;
+
+    sub TryToConnect ($$$$) {
+	my ($hostname, $dsn, $user, $password) = @_;
+	
+	$listTablesData = [HostDsn($hostname, $dsn), $user, $password];
+	my $dbh = eval { DBI->connect(@$listTablesData) };
+	if (!$dbh) {
+	    if( $0 !~ /00base\.t/) {
+		print "1..0\n";
+		print STDERR q{
+Unable to execute test suite on this platform. The test suite can only be
+executed if a
+
+    DBI->connect("DBI:$dbdriver:test", "$test_user", "$test_password");
+
+succeeds or you modify the test suite.
+};
+		exit 0;
+	    }
+	} else {
+	    $listTablesHook = \&pNetListTables;
+	    $dbh->disconnect;
+	    my $file;
+	}
+    }
+
+    sub pNetListTables ($) {
+	my ($dbh) = shift;
+	my ($ndbh) = DBI->connect(@$listTablesData);
+	if (!$ndbh) {
+	    die "Cannot connect to dsn " . $listTablesData->[0] . ":"
+		. $DBI::errstr;
+	}
+	my @tables = ListTables($ndbh);
+	$ndbh->disconnect;
+	@tables;
+    }
+}
+
+1;

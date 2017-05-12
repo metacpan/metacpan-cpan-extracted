@@ -1,0 +1,86 @@
+NAME
+
+Devel::Timer - Track and report execution time for parts of code
+
+SYNOPSIS
+
+  use Devel::Timer;
+
+  my $t = Devel::Timer->new();
+
+  $t->mark('first db query');
+
+  ## do some work
+
+  $t->mark('second db query');
+
+  ## do some more work
+
+  $t->mark('end of second db query');
+
+  $t->report();
+
+DESCRIPTION
+
+Devel::Timer allows developers to accurately time how long a specific
+piece of code takes to execute.  This can be helpful in locating the
+slowest parts of an existing application.
+
+First, the Devel::Timer module is used and instantiated.
+
+  use Devel::Timer;
+
+  my $t = Devel::Timer->new();
+
+Second, markers are placed before and after pieces of code that need to be
+timed.  For this example, we are profiling the methods get_user_score() and
+get_average_user_score().
+
+  $t->mark('first db query');
+  &get_user_score($user);
+
+  $t->mark('second db query');
+  &get_average_user_score();
+
+Finally, at the end of the code that you want to profile, and end marker
+is place, and a report is generated on stderr.
+
+  $t->mark('END');
+  $t->report();
+
+Sample report:
+
+  Devel::Timer Report -- Total time: 0.3464 secs
+  Interval  Time    Percent
+  ----------------------------------------------
+  02 -> 03  0.3001  86.63%  second db query -> END
+  01 -> 02  0.0461  13.30%  first db query -> second db query
+  00 -> 01  0.0002   0.07%  INIT -> first db query
+
+The report is output using the method Devel::Timer::print() which currently
+just prints to stderr.  If you want to send the output to a custom location
+you can override the print() method.  The initialize() and shutdown() methods
+can also overridden if you want to open and close log files or database
+connections.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT
+
+Jason Moore
+
+This is free software.
+It is licensed under the same terms as Perl itself.
+
+AUTHOR
+
+  Author:      Jason Moore - jmoore@sober.com (no longer valid)
+  Maintainer:  Gabor Szabo - gabor@pti.co.il
+  Contributor: Jay Hannah  - jay@jays.net

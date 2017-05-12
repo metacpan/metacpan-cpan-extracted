@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+dist.ini
+lib/DBIx/Class/ResultSet/Void.pm
+t/00-load.t
+t/01-basic.t
+t/lib/Schema.pm

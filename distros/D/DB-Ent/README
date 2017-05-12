@@ -1,0 +1,26 @@
+DB::Ent - A database abstraction layer
+
+This module presents an interface to an entity-centric database
+schema, providing all necessary methods to create, discover and
+manipulate entities and associated data.
+
+At present this module has been tested with mysql only but please
+note that driver modules are siple to create.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2002-2003 Erick Calder <ecalder@cpan.org>
+
+This product is free and distributed under the Gnu Public License (GPL).
+A copy of this license was included in this distribution in a file called
+LICENSE. If for some reason, this file was not included, please see
+F<http://www.gnu.org/licenses/> to obtain a copy of this license.

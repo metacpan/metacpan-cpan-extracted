@@ -1,0 +1,16 @@
+Changes
+EmpressNet.h
+EmpressNet.pm
+EmpressNet.xs
+MANIFEST
+Makefile.PL
+README
+dbdimp.c
+dbdimp.h
+install.sh
+lib/libsse.a
+runtest
+se.h
+test.pl
+test_db.data
+test_db.schema

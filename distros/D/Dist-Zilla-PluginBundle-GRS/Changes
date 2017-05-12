@@ -1,0 +1,23 @@
+0.08  2013-12-15 19:35:40 GMT
+    * Feature #387 : Move description on before synopsis
+
+0.07  2013-10-14 22:54:24 GMT
+    * Feature #340 : Add Test::Pod dependency (Celogeek San)
+
+0.06  2013-10-14 21:42:37 GMT
+    * Bug #339 : Remove useless deps (Celogeek San)
+
+0.05  2013-10-14 19:56:59 GMT
+    * Bug #337 : Fix issue with deps (Celogeek San)
+
+0.04  2013-10-14 19:11:21 GMT
+    * Feature #336 : Add Kwalitee extra tests (Celogeek San)
+
+0.03  2013-06-19 16:02:11 GMT
+    * Feature #248 : Add missing deps (Celogeek San)
+
+0.02  2013-05-10 13:49:02 GMT
+    * Feature #201 : Auto Release if build on master succeed (Celogeek San)
+
+0.01  2013-05-10 10:30:13 GMT
+    * Init Project

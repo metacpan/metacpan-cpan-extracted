@@ -1,0 +1,244 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+#option -bw means that only user defined colors are used not that the output is bw
+	- make bw option bw only
+	- add no-auto-color option
+
+column order can be decided by user as well as if the column is displayed or not
+
+! compact vertical mode where the hexdump is always aligned to the left
+
+! bitfield padding character '-', should be replaced by a character that disturbs the display less and maybe in a different color.
+
+give start offset on the command line (may be done)
+
+2/4/6/8 byte offset display depending on the offset of the actual data
+	- also depends on start offset when the input data is a fragment for which we know the start offset
+	- user can specify minimum with for offset display
+	! - dimm offset to grey from white
+	! - user offset color
+	- may interfere on bitfield display that requires 8 character display
+		- bit field is max 32 bits but can start at any offset in source data, how is the offset displayed
+		if the offset is more than 0xff? 
+		there an error in the way it is dsplayed today, it shifts te colums to the right after oxff
+
+
+bitfield ruler
+	- relevant only if the offset is less than 32
+
+bitfiels offset should be writen the other way around when bit zero is on the right (default case)
+
+bitfield with width value zero (0), still displays one bit
+
+bitfields to ranges with zero data are displayed even when display_zero_byte_range is set to 0
+	- should not be displayed
+	- error is displayed correctly, even if nothing should be displayed
+
+when display_zero_size_range_warning is set to 0, bitfields warning are still displayed
+	Warning: bitfield description 'all bits' can't be applied to empty source
+
+zero size range displays a warning instead for an empty data dump
+	- currently quotes the range name with <>, as it should, but is not helpful enough
+
+range name width auto calculated
+	- length can be forced by user
+
+make range separator, in string mode, user definable  a,12 : b,15 : c,3  vs   a,12 | b,15 | c,3 
+
+align range fields in documentation examples
+
+csv export, another format like ANSI, HTML, ...
+
+error in documentation MYDATA should be BITMAp
+
+# replace "oxff oxff ... skiped" with "skipped 0xff 0xff bytes"
+
+# Do not show cumulative offset which is zero, first cumulative offset
+
+Do not show extra zeroes in cumulative offset only the part that is necessary
+	 means that all the ranges cumulative offset must be knows before deciding on format
+
+! when displaying more than 2 lines of dump for the same range only the start on the last range name are displayed
+	- continuation signs in the same color provide a clue
+
+! color the offset as the data in vertical mode
+
+make data split by _gather available through the API so user can use it in own code
+
+!range has color attributes for the comment
+	=> uses range color
+
+range has a visibility field, a name
+	- name  is used to decide if the range is is to e displayed or skipped
+	this allows for a data dump definition with all the details but lets the user decide how much of the details are displayed
+	- visibility can be set, by name, on the command line
+	- multiple ranges can have the same visibility field name
+	
+	- applies to data ranges and bitfields
+	- applies to comment, skip, and other ranges
+
+	- when a range is made not visible, a message is optionaly displayed, log entry is added
+
+	- if a data range is silenced, its corrsponding itfields are also silence
+
+	- ranges are extracted and presented to the user and the ranges that can be made not visible showed
+
+	- visibility field contains a default value, visible/not visible
+		- lets the user defining the range setup a default display
+
+	- multiple names can be assigned to the same range
+
+full name for comment, skip and header ranges as well as shortcuts #, X, @
+
+! ASCII ruler is always decimal and should be hexadecimal
+	=> already hex
+
+ruler and column name are displayed in a user definable color, today color is fixed to white
+
+decimal and hexadecimal dump can co-exist but offset is in hexadecimal, should the co-existance be forbidden?
+
+!previous_field_ color as a valid color name
+	allows the user to define blocks of data colors, specially useful in bitmaps
+	=> type the color
+
+#error displayed when giving, eg, -r 'a,1:b3' is not clear enough
+	- colorize the fields that are erroneous 
+	- give example of valid definitions
+
+option to display the ranges definitions in color and well aligned, with  field names instead for positon
+
+hdr accepts multiple -r options
+	-r can be of mixed types, string and file
+	- skip fields can be used to synch between the -r ranges
+		- skip fields can be hidden, visibily, default to 0
+	- comment range to inform about the next data dump
+	- skip range via perl sub can do dynamic synch
+		- may need to push back data
+	- range definition sub can, base on context, decide what the next data dump is 
+ 	
+	- is offset cumulative or reset between data dumps?
+		- offset reset range type can let the user decide when it is reset and to which values
+	
+cyclic ranges
+	- given a user option is set, the ranges are applied on all the data available, if there is more data, the ranges are used again till the data is consumed
+
+hdr accepts a stream of data instead for a set amount of data
+	- need to rework the internals
+
+in code, in documentation of sub, $container refers to real variable name $collected_data
+
+in code, comment eeek! is to be replaced with code ... and @array == 1
+
+option to show stats on dumped data
+	- amount of data consummed
+	- total fields displayed
+	- total data per field name , since names can be reused
+	- data skipped
+	- data hidden
+
+range object creation steps
+	range array and string is first parsed and error are displayed if any, only then the ranges can be dumped. It would be
+	preferable to handle the parsing of the ranges one by one and be able to dump the range information till an error is found
+	this makes it easier for the user to find which range description is wrong
+
+range warnings and errors
+	- if a range detects an error (eg comment about size in examples), the range is displayed in a warning color, a warning is logged, all warning can be displayed after the dump is done
+
+
+	- if an error is detected by a range sub, we must still display some information, offset, data, ... and the error
+
+hdr provides a LOG that can be used by ranges, as it does INFO, DIE, ...
+
+data gathered in chunks should be reference to the data and an offset
+	- when stream mode is implemented, we may not have the data left
+
+	- DUMP RANGE DESCRIPTION uses DTD and a reference to data could mean a very long dump for every field
+		- this is already a problem if the range is long
+		- dump of range should go through a method and the amount of data displayed controlled
+
+in code $last_data should be a reference not a copy
+
+range type 'recurrent header' 
+	- displayed every x lines, defined by user, useful when a single range has many lines
+	- may need a comment, or a recurrent comment type
+	- the type is also named so multiple headers can be recurrent
+	- setting a recurrent header to zero stops it
+
+comments can be multi line
+
+comment range can be implemented with sub which gets context information so it can generate text dynamically
+
+in code, split.pm: 193
+	range_source is a reference.
+
+DUMP RANGE DESCRIPTION only displays relevant fields
+	- or structure can be replaced by different types and have their own dumpers
+	- make truncated ranges obvious
+
+spacing column type to add space between column
+	- or separator colum that can be any string, allowing '|' to be used to make it look more column like
+
+Column can be repeated, eg, offset at beginin and end of line
+
+#mixed hexadecimal and ascii dump
+	63:c 6f:o
+
+ranged defined in file can defined options to hdr
+	- or options can be defined in separate file (what is the difference with a bash/perl file?)
+
+
+
+	
+
+
+vocabulary list
+	field
+	range
+	data dump
+	...
+
+
+ 
+
+
+
+	- user can force color
+
+
+
+
+make t/test_color.pl work, allows default color and user colors to co-exist
+
+range error location is not very helpful as the location is the line where the object is defined not the line where the array is defined. It also doesn't help much to know that a structure with tens of lines failed, it would be good to pinpoint a location in the array.
+
+	do not accept '::' as a valid range
+
+	dump the whole range definition with DTD
+		colorize the failing range
+		colorize all ranges that would fail ?
+
+	Text::Context
+	PBS::Output::GetLineWithContext
+	Carp::source
+
+	# display the error range elements
+
+tests
+	#Can we get to Error: too few elements in range description 
+	\&parser vs [\&parser]
+
+
+refactoring
+	do not cary a copy of the data in the ranges
+	split should use $self->{FIELD_LENGTH}
+	author tests
+	spelling
+	skip range code
+	bitfield column display code
+		cleaner
+		more effective
+	data flow and architectural overview
+		specially for complex ranges
+	remove ugly goto

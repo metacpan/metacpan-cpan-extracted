@@ -1,0 +1,23 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Devel/Cover/Report/Phabricator.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod.t
+t/simple.t
+t/test_cover_dbs/test_cover_db/cover.13
+t/test_cover_dbs/test_cover_db/expected.json
+t/test_cover_dbs/test_cover_db/lib/Test.pm
+t/test_cover_dbs/test_cover_db/structure/28b6bc54537721f52b885821d2ab746a

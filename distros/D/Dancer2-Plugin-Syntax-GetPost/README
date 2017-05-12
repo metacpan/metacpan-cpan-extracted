@@ -1,0 +1,48 @@
+NAME
+    Dancer2::Plugin::Syntax::GetPost - Syntactic sugar for GET+POST handlers
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      use Dancer2::Plugin::Syntax::GetPost;
+
+      get_post '/myform' => sub { ... };
+
+DESCRIPTION
+    This module provides very simple syntactic sugar to define a handler for
+    GET and POST requests. Instead of writing this:
+
+      any [qw/get post/] => '/form' => sub { ... };
+
+    You can write just this:
+
+      get_post '/form' => sub { ... };
+
+SEE ALSO
+    *   Dancer2
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/dancer2-plugin-syntax-getpost/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dancer2-plugin-syntax-getpost>
+
+      git clone git://github.com/dagolden/dancer2-plugin-syntax-getpost.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

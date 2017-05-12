@@ -1,0 +1,12 @@
+542a1d00863000815540031b
+
+master oregon 54.2a1d00863000815540031b:
+  sensor/rgr918.86[speed]=3mm/h
+  sensor/rgr918.86[distance]=558mm
+  sensor/rgr918.86[count]=1flips
+  sensor/rgr918.86[battery]=90%
+
+
+
+
+

@@ -1,0 +1,67 @@
+NAME
+    Devel::Leak::Object - Detect leaks of objects
+
+SYNOPSIS
+      # Track a single object
+      use Devel::Leak::Object;
+      my $obj = Foo::Bar->new;
+      Devel::Leak::Object::track($obj);
+      
+  # Track every object
+      use Devel::Leak::Object qw{ GLOBAL_bless };
+
+      # Track every object including where they're created
+      use Devel::Leak::Object qw{ GLOBAL_bless };
+      $Devel::Leak::Object::TRACKSOURCELINES = 1;
+
+DESCRIPTION
+    This module provides tracking of objects, for the purpose of detecting
+    memory leaks due to circular references or innappropriate caching
+    schemes.
+
+    Object tracking can be enabled on a per object basis. Any objects thus
+    tracked are remembered until DESTROYed; details of any objects left are
+    printed out to STDERR at END-time.
+
+      use Devel::Leak::Object qw(GLOBAL_bless);
+
+    This form overloads bless to track construction and destruction of all
+    objects. As an alternative, by importing bless, you can just track the
+    objects of the caller code that is doing the use.
+
+    If you use GLOBAL_bless to overload the bless function, please note that
+    it will ONLY apply to bless for modules loaded AFTER Devel::Leak::Object
+    has enabled the hook.
+
+    Any modules already loaded will have already bound to CORE::bless and
+    will not be impacted.
+
+    Setting the global variable $Devel::Leak::Object::TRACKSOURCELINES makes
+    the report at the end include where (filename and line number) each
+    leaked object originates (or where call to the ::new is made).
+
+BUGS
+    Please report bugs to http://rt.cpan.org
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+    With some additional contributions from David Cantrell
+    <david@cantrell.org.uk> and Sven Dowideit <svendowideit@home.org.au>
+
+SEE ALSO
+    Devel::Leak
+
+COPYRIGHT
+    Copyright 2007 - 2010 Adam Kennedy.
+
+    Rewritten from original copyright 2004 Ivor Williams.
+
+    Some documentation also copyright 2004 Ivor Williams.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

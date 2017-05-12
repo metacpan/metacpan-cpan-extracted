@@ -1,0 +1,23 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Regexp::Pattern]
+
+DESCRIPTION
+
+    This plugin is to be used when building Regexp::Pattern::*
+    distribution. It currently does the following:
+
+      * Make sure that Regexp::Pattern is added as a DevelopRecommends
+      prerequisite
+
+      This is an informal way to express that the module follows the
+      specification specified in Regexp::Pattern.
+
+SEE ALSO
+
+    Regexp::Pattern
+
+    Pod::Weaver::Plugin::Regexp::Pattern
+

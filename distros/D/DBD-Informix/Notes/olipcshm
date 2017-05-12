@@ -1,0 +1,128 @@
+Date: Fri, 27 Jun 1997 10:16:11 -0700
+From: johnl@informix.com (Jonathan Leffler)
+Subject: Error -27000: problems with shared memory connections
+
+>Date: Fri, 27 Jun 1997 09:23:13 -0500
+>From: Jason Bodnar <jcbodnar@mail.utexas.edu>
+>Subject: Re: SQL: -27000 on HPUX
+>
+>A couple of people have answered this, but didn't give the whole answer.
+
+I gave an answer too, but Jason's answer is the most complete to date.
+I've edited Jason's answer for this document.  I've also removed all the
+'>' prefixes, so you cannot actually tell what Jason wrote and what I
+edited.  Thanks, Jason.
+
+---------------------------------------------------------------------------
+
+If the esqltest program gives you error -27000, you will need to alter your
+database environment to be able to build (more strictly, to test)
+DBD::Informix.  As of version 0.95, you should not see the -27000 error
+message; you will see an assertion that you are using two shared memory
+connections and you will be notified that the multiple connection tests
+will be skipped.  If you want to test multiple connections, you need to
+follow the information in this note.
+
+The Informix finderr utility says:
+
+    -27000  Cannot support multiple connections over shared memory.
+
+    An application cannot use the CONNECT statement to make more than one
+    connection that uses shared-memory communication (IPC).
+
+    Ensure that the application makes only one shared-memory connection at
+    a time. If the application must use concurrent connections, the OnLine
+    administrator might need to change the connection type (as specified in
+    the nettype field of the sqlhosts file) from a shared memory
+    connection to a network connection.
+
+Basically, it means what it says.  You can't use shared memory for multiple
+connections.  So you have a couple of options on how to connect.  You will
+have to use one non-olipcshm (eg network) connection rather than (or as
+well as) the shared memory connection.
+
+To do that you may need to change the entry for your server
+($INFORMIXSERVER) in your sqlhosts file ($INFORMIXDIR/etc/sqlhosts by
+default, unless you set $INFORMIXSQLHOSTS to point to a different file).
+Currently yours probably looks something like this:
+
+# db server     connection      host                    service name
+#               type
+
+ifmx_online     onipcshm        Taz                     xyz
+
+Either change the onipcshm (or olipcshm) entry to oltlitcp, or add a couple
+of lines to it, one for the network connection (oltlitcp) and one for a
+streams connection (olipcstr).  Something like this:
+
+ifmx_online_tcp ontlitcp        Taz                     ifmx_online_tcp
+ifmx_online_str onipcstr        Taz                     ifmx_online_str
+
+The db server and service name can be anything you like, but should be
+systematically related.  You can also use a streamed pipe connection which
+is faster than tcp/ip but a bit slower than shared memory.  Plus, it saves
+you a step because you don't have to list the service name in
+/etc/services.  This allows me to connect via shared memory, stream pipes
+and tcp/ip.  The service name is not used (ignored) with this connection
+type.
+
+Then you'll need to add your network service name to /etc/services (or the
+NIS or YP equivalent of it) if it is not already present, and you'll need
+to add the new dbservers to the aliases section of your onconfig file
+($INFORMIXDIR/etc/$ONCONFIG).  It'll look something like this:
+
+DBSERVERNAME    ifmx_online     # Name of default database server
+DBSERVERALIASES ifmx_online_str, infm_online_tcp
+
+Remember to add the db server name to onconfig.  After all that you'll need
+to restart the db server.  This obviously needs cooperation from your
+OnLine DBA, but doing "onmode -ky; oninit" takes only a few seconds if the
+database is idle.
+
+Then, when you are building DBD::Informix be sure to set your environment
+variables correctly (you have read the README file, haven't you?).
+Specifically your db name needs to be db@ifmx_online_str or
+db@ifmx_online_tcp.  You can also set $INFORMIXSERVER to one of the aliases
+and just use the db name without the server name.
+
+Note that you can still use one shared memory connection; you just can't
+use two shared memory connections simulataneously.  Therefore, only one of
+the databases needs to be qualified with a non-olipcshm server name.  It
+would be 100% legitimate to use DBD_INFORMIX_DATABASE=stores with
+INFORMIXSERVER=ifmx_online (the olipcshm connection) and to have
+DBD_INFORMIX_DATABASE2=stores@ifmx_online_tcp.
+
+Note that you can set the INFORMIXSQLHOSTS environment variable to point to
+the (absolute) name of the sqlhosts file you want to use.  This might allow
+you to have a local SE as well as your DBA's OnLine system:
+
+ifmx_online	olipcshm	machine	sqlexec
+local_se	seipcpip	machine	sqlexec
+
+Note that the two sqlexec fields have different meanings.  The OnLine entry
+indicates the service name in /etc/services (or NIS/YP equivalents).  The
+SE entry indicates the name of the program in $INFORMIXDIR/lib (unless
+specified as a full pathname, I think) that is to be run; sqlexec is the
+name of the SE 'server' program, of course.  You could then use SE to
+create a local database and use that.  This assumes you have both OnLine
+and SE on your machine.
+
+--
+
+1999-11-27:
+Note that if you really cannot get away from the using shared memory
+connections, then (as of version 0.95) you no longer have to modify
+anything.  The esqltest program will report that you are using two shared
+memory connections and that the multiple connection tests will be skipped.
+The actual multiple connection tests attempt to detect the use of two
+shared memory connections before making either connection, and skip the test
+if both connections will use shared memory.  The multiple connection tests
+are t/t2[123]mconn.t.  Note that the code that identifies shared memory
+connections may fail (especially on NT) and therefore the multiple
+connection tests may still fail.  If this happens and the cause of failure
+is error -27000, then you can ignore the failures (and if everything else
+passes, you can install the product).
+
+--
+
+@(#)$Id: olipcshm,v 100.1 2002/02/08 22:50:00 jleffler Exp $

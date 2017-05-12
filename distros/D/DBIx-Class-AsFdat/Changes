@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-AsFdat
+
+0.03
+    2008-11-12
+       FIX: Makefile.pl etc...
+
+0.02
+    2008-11-11
+       FIX: add test code etc..
+0.01
+    Fri Oct 13 16:19:16 2006
+       Initial release.
+

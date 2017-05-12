@@ -1,0 +1,17 @@
+0.002001 - 2016-04-19
+  - Really a stable release; sigh
+
+0.002_000 - 2016-04-18
+  - Stable release; no other changes
+
+0.001_003 - 2016-01-08
+  - Fix optional dependency on SQL::Translator.
+
+0.001_002 - 2015-12-16
+  - Fix broken dist (Aaron Crane)
+
+0.001_001 - 2015-12-16
+  - Reimplement parameter localization (Aaron Crane)
+
+0.000001 - 2015-12-15
+  - Initial release.

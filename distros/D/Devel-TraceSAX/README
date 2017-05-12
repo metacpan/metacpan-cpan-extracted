@@ -1,0 +1,24 @@
+NAME
+    Devel::TraceSAX - Trace SAX events
+
+SYNOPSIS
+      ## From the command line:
+        perl -d:TraceSAX script.pl
+
+      ## Or procedural:
+      use Devel::TraceSAX;
+
+      trace_SAX $obj1;
+
+DESCRIPTION
+    Traces SAX events in a program. Works by applying Devel::TraceCalls to a
+    tracer on the desired classes for all known SAX event types (according
+    to XML::SAX::Shims and XML::SAX::Machines).
+
+AUTHOR
+        Barrie Slaymaker <barries@slaysys.com>
+
+LICENSE
+    You may use this under the terms of either the Artistic License or any
+    version of the BSD or GPL licenses :).
+

@@ -1,0 +1,15 @@
+Revision history for Perl extension Devel::TrackSIG.
+
+0.04 Fri Mar 20 12:10 2015
+  - Get rid of recursive longmess() by using a simple stack trace as Carp
+    now touches %SIG.
+
+0.03  Sun May 06 14:45 2012
+  - Test fixes [Burak Gürsoy]
+
+0.02  Fri May 04 07:41 2012
+  - Include Devel::TrackGlobalScalar
+
+0.01  Wed Mar 16 14:29 2011
+  - original version
+

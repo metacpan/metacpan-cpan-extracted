@@ -1,0 +1,123 @@
+NAME
+    Dancer::Plugin::NYTProf - easy Devel::NYTProf profiling for Dancer apps
+
+SYNOPSIS
+        package MyApp;
+        use Dancer ':syntax';
+
+        # enables profiling and "/nytprof"
+        use Dancer::Plugin::NYTProf;
+
+    Or, if you want to enable it only under development environment (as you
+    should!), you can do something like:
+
+        package MyApp;
+        use Dancer ':syntax';
+
+        # enables profiling and "/nytprof"
+        if (setting('environment') eq 'development') {
+            eval 'use Dancer::Plugin::NYTProf';
+        }
+
+DESCRIPTION
+    A plugin to provide easy profiling for Dancer applications, using the
+    venerable Devel::NYTProf.
+
+    By simply loading this plugin, you'll have the detailed, helpful
+    profiling provided by Devel::NYTProf.
+
+    Each individual request to your app is profiled. Going to the URL
+    `/nytprof' in your app will present a list of profiles; selecting one
+    will invoke `nytprofhtml' to generate the HTML reports (unless they
+    already exist), then serve them up.
+
+    WARNING This is an early version of this code which is still in
+    development. In general this isn't a plugin I'd advise to use in a
+    production environment anyway, but in particular, it uses `system' to
+    execute `nytprofhtml', and I need to very carefully re-examine the code
+    to make sure that user input cannot be used to nefarious effect. You are
+    recommended to only use this in your development environment.
+
+CONFIGURATION
+    The plugin will work by default without any configuration required - it
+    will default to writing profiling data into a dir named `profdir' within
+    your Dancer application's `appdir', present profiling output at
+    `/nytprof' (not yet configurable), and profile all requests.
+
+    Below is an example of the options you can configure:
+
+        plugins:
+            NYTProf:
+                enabled: 1
+                profdir: '/tmp/profiledata'
+                nytprofhtml_path: '/usr/local/bin/nytprofhtml'
+                show_durations: 1
+
+  profdir
+    Where to store profiling data. Defaults to: `$appdir/nytprof'
+
+  nytprofhtml_path
+    Path to the `nytprofhtml' script that comes with Devel::NYTProf.
+    Defaults to the first one we can find in your PATH environment. You
+    should only need to change this in very specific environments, where
+    `nytprofhtml' can't be found by this plugin.
+
+  enabled
+    Profiling comes with a penalty, and even in development environments you
+    might want to enable/disable it via configuration file. This lets you do
+    so. You can toggle this plugin by setting the `enabled' option to 0 or
+    1. It is, of course, enabled by default.
+
+    More configuration (such as the URL at which output is produced, and
+    options to control which requests get profiled) will be added in a
+    future version. (If there's something you'd like to see soon, do contact
+    me and let me know - it'll likely get done a lot quicker then!)
+
+  show_durations
+    When listing profile runs, show the duration of each run, extracted from
+    the profiling data. If you have a lot of profiled runs, this might get
+    slow, so this option is provided if you don't need the profile durations
+    displayed when listing profiles, preferring a faster list. Defaults to
+    1.
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+ACKNOWLEDGEMENTS
+    Stefan Hornburg (racke)
+
+    Neil Hooey (nhooey)
+
+    J. Bobby Lopez (jbobbylopez)
+
+    leejo
+
+    Breno G. de Oliveira (garu)
+
+BUGS
+    Please report any bugs or feature requests at
+    http://github.com/bigpresh/Dancer-Plugin-NYTProf/issues.
+
+CONTRIBUTING
+    This module is developed on GitHub:
+
+    http://github.com/bigpresh/Dancer-Plugin-NYTProf
+
+    Bug reports, suggestions and pull requests all welcomed!
+
+SEE ALSO
+    Dancer
+
+    Devel::NYTProf
+
+    Plack::Middleware::Debug::Profiler::NYTProf
+
+LICENSE AND COPYRIGHT
+    Copyright 2011-2014 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

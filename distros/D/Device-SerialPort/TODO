@@ -1,0 +1,15 @@
+
+High
+- document intr_count and wait_modemlines
+- spread POD docs out across the module
+- export the POSIX names too, MS_* is for optional porting compatibility
+- fix AIX hardware flow control (whats wrong with it?)
+
+Medium
+- fix lockfile support (maybe using a generic File::Lock routine?)
+- create a method to call "new" without a device name (cleaner way to test)
+- split up tests so we can do non-device testing (as the default)
+- make error handling behavior an option (don't die on device failure)
+
+Low
+- add a mechanism to set any modem lines in one function call

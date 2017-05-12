@@ -1,0 +1,65 @@
+NAME
+
+    Device::Chip::HTU21D - chip driver for HTU21D
+
+SYNOPSIS
+
+     use Device::Chip::HTU21D;
+    
+     my $chip = Device::Chip::HTU21D->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     printf "Current temperature is is %.2f C\n",
+        $chip->read_temperature->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a TE
+    Connectivity HTU21D attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+ACCESSORS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Returns a HASH reference of the contents of the user register.
+
+       RES        => "12/14" | "11/11" | "10/13" | "8/12"
+       OTPDISABLE => 0 | 1
+       HEATER     => 0 | 1
+       ENDOFBATT  => 0 | 1
+
+change_config
+
+       $chip->change_config( %changes )->get
+
+    Writes updates to the user register.
+
+METHODS
+
+ read_temperature
+
+       $temperature = $chip->read_temperature->get
+
+    Triggers a reading of the temperature sensor, returning a number in
+    degrees C.
+
+ read_humidity
+
+       $humidity = $chip->read_humidity->get
+
+    Triggers a reading of the humidity sensor, returning a number in % RH.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

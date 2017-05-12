@@ -1,0 +1,682 @@
+SYNOPSIS
+
+     use Data::CSel qw(csel);
+    
+     my @cells = csel("Table[name=~/data/i] TCell[value != '']:first", $tree);
+    
+     # ditto, but wrap result using a Data::CSel::Selection
+     my $res = csel({wrap=>1}, "Table ...", $tree);
+    
+     # call method 'foo' of each node object (works even when there are zero nodes
+     # in the selection object, or when some nodes do not support the 'foo' method
+     $res->foo;
+
+DESCRIPTION
+
+    This module lets you use a query language (hereby named CSel) that is
+    similar to CSS Selector to select nodes from a tree of objects.
+
+EXPRESSION SYNTAX
+
+    The following is description of the CSel query expression. It is
+    modeled after the CSS Selector syntax with some modification (see
+    "Differences with CSS selector").
+
+    An expression is a chain of one or more selectors separated by commas.
+
+    A selector is a chain of one or more simple selectors separated by
+    combinators.
+
+    A combinator is either: whitespace (descendant combinator), > (child
+    combinator), ~ (general sibling combinator), or + (adjacent sibling
+    combinator). E F, or two elements combined using descendant combinator,
+    means F element descendant of an E element. E > F means F element child
+    of E element. E ~ F means F element preceded by an E element. E + F
+    means F element immediately preceded by an E element.
+
+    A simple selector is either a type selector (see "Type selector") or
+    universal selector (see "Universal selector") followed immediately by
+    zero or more attribute selectors (see "Attribute selector" or class
+    selector (see "Class selector"" in ") or ID selector (see "ID
+    selector") or pseudo-classes (see "Pseudo-class"" in "), in any order.
+    Type or universal selector is optional if there is at least one
+    attribute selector or pseudo-class.
+
+ Type selector
+
+    A type selector is a Perl class/package name.
+
+    Example:
+
+     My::Class
+
+    will match any My::Class object. Subclasses of My::Class will not be
+    matched, use class selector for that.
+
+ Universal selector
+
+    A universal selector is * and matches any class/package.
+
+    Example:
+
+     *
+
+    will match any object.
+
+ Attribute selector
+
+    An attribute selector filters objects based on the value of their
+    attributes. The syntax is:
+
+     [ATTR]
+     [ATTR OP LITERAL]
+
+    [ATTR] means to only select objects that have an attribute named ATTR,
+    for example:
+
+     [length]
+
+    means to select objects that respond to (can()) length().
+
+    Note: to select objects that do not have a specified attribute, you can
+    use the :not pseudo-class (see "Pseudo-class"), for example:
+
+     :not([length])
+
+    [ATTR OP LITERAL] means to only select objects that have an attribute
+    named ATTR that has value that matches the expression specified by
+    operator OP and operand LITERAL. For example:
+
+     [length > 12]
+     [is_done is true]
+     [name =~ /foo/]
+
+    Calling methods ATTR can also be replaced by METH() or METH(LITERAL,
+    ...) to allow passing arguments to methods. Note that this specific
+    syntax:
+
+     [METH()]
+
+    does not simply mean to select objects that respond to METH, but
+    actually:
+
+     [METH() is true]
+
+    For example:
+
+     # select objects that have non-zero length
+     [length()]
+    
+     # while this means to select objects that have 'length' attribute
+     [length]
+    
+     # select objects for which the method call returns true
+     [has_key('foo')]
+
+    Experimental: a chain of attributes is allowed for the attribute, for
+    example:
+
+     [date.month = 12]
+
+    will select only objects that has an attribute date, and the value of
+    date is an object that has an attribute month, and the value of month
+    is 12.
+
+  Literal
+
+    There are several kinds of literals supported.
+
+    Numbers. Examples:
+
+     1
+     -2.3
+     4.5e-6
+
+    Boolean:
+
+     true
+     false
+
+    Null (undef):
+
+     null
+
+    String. Either single-quoted (only recognizes the escape sequences \\
+    and \'):
+
+     'this is a string'
+     'this isn\'t hard'
+
+    or double-quoted (currently recognizes the escape sequences \\, \", \',
+    \$ [literal $], \t [tab character], \n [newline], \r [linefeed], \f
+    [formfeed], \b [backspace], \a [bell], \e [escape], \0 [null], octal
+    escape e.g. \033, hexadecimal escape e.g. \x1b):
+
+     "This is a string"
+     "This isn't hard"
+     "Line 1\nLine 2"
+
+    For convenience, a word string can be unquoted in expression, e.g.:
+
+     [name = ujang]
+
+    is equivalent to:
+
+     [name = 'ujang']
+
+    Regex literal. Must be delimited by / ... /, can be followed by zero of
+    more regex modifier characters m, s, i):
+
+     //
+     /ab(c|d)/i
+
+  Operators
+
+    The following are supported operators:
+
+      * eq
+
+      String equality using Perl's eq operator.
+
+      Example:
+
+       Table[title eq "TOC"]
+
+      selects all Table objects that have title() with the value of "TOC".
+
+      * = (or ==)
+
+      Numerical equality using Perl's == operator.
+
+      Example:
+
+       TableCell[length=3]
+
+      selects all TableCell objects that have length() with the value of 3.
+
+      To avoid common trap, will switch to using Perl's eq operator when
+      operand does not look like number, e.g.:
+
+       Table[title = 'foo']
+
+      is the same as:
+
+       Table[title eq 'foo']
+
+      * ne
+
+      String inequality using Perl's ne operator.
+
+      Example:
+
+       Table[title ne "TOC"]
+
+      selects all Table objects that have title() with the value not equal
+      to "TOC".
+
+      * != (or <>)
+
+      Numerical inequality using Perl's != operator.
+
+      Example:
+
+       TableCell[length != 3]
+       TableCell[length <> 3]
+
+      selects all TableCell objects that have length() with the value not
+      equal to 3.
+
+      To avoid common trap, will switch to using Perl's ne operator when
+      operand does not look like number, e.g.:
+
+       Table[title != 'foo']
+
+      is the same as:
+
+       Table[title ne 'foo']
+
+      * gt
+
+      String greater-than using Perl's gt operator.
+
+      Example:
+
+       Person[first_name gt "Albert"]
+
+      selects all Person objects that have first_name() with the value
+      asciibetically greater than "Albert".
+
+      * >
+
+      Numerical greater-than using Perl's > operator.
+
+      Example:
+
+       TableCell[length > 3]
+
+      selects all TableCell objects that have length() with the value
+      greater than 3.
+
+      To avoid common trap, will switch to using Perl's gt operator when
+      operand does not look like number, e.g.:
+
+       Person[first_name > 'Albert']
+
+      is the same as:
+
+       Person[first_name gt "Albert"]
+
+      * ge
+
+      String greater-than-or-equal-to using Perl's ge operator.
+
+      Example:
+
+       Person[first_name ge "Albert"]
+
+      selects all Person objects that have first_name() with the value
+      asciibetically greater than or equal to "Albert".
+
+      * >=
+
+      Numerical greater-than-or-equal-to using Perl's >= operator.
+
+      Example:
+
+       TableCell[length >= 3]
+
+      selects all TableCell objects that have length() with the value
+      greater than or equal to 3.
+
+      To avoid common trap, will switch to using Perl's ge operator when
+      operand does not look like number, e.g.:
+
+       Person[first_name >= 'Albert']
+
+      is the same as:
+
+       Person[first_name ge "Albert"]
+
+      * lt
+
+      String less-than using Perl's lt operator.
+
+      Example:
+
+       Person[first_name lt "Albert"]
+
+      selects all Person objects that have first_name() with the value
+      asciibetically less than "Albert".
+
+      * <
+
+      Numerical less-than using Perl's < operator.
+
+      Example:
+
+       TableCell[length < 3]
+
+      selects all TableCell objects that have length() with the value less
+      than 3.
+
+      To avoid common trap, will switch to using Perl's lt operator when
+      operand does not look like number, e.g.:
+
+       Person[first_name < 'Albert']
+
+      is the same as:
+
+       Person[first_name lt "Albert"]
+
+      * le
+
+      String less-than-or-equal-to using Perl's le operator.
+
+      Example:
+
+       Person[first_name le "Albert"]
+
+      selects all Person objects that have first_name() with the value
+      asciibetically less than or equal to "Albert".
+
+      * <=
+
+      Numerical less-than-or-equal-to using Perl's <= operator.
+
+      Example:
+
+       TableCell[length <= 3]
+
+      selects all TableCell objects that have length() with the value less
+      than or equal to 3.
+
+      To avoid common trap, will switch to using Perl's le operator when
+      operand does not look like number, e.g.:
+
+       Person[first_name <= 'Albert']
+
+      is the same as:
+
+       Person[first_name le "Albert"]
+
+      * =~ and !~
+
+      Filter only objects where the attribute named attr has the value
+      matching regular expression value. Operand should be a regex literal.
+      Regex literal must be delimited by //.
+
+      Example:
+
+       Person[first_name =~ /^Al/]
+
+      selects all Person objects that have first_name() with the value
+      matching the regex /^Al/.
+
+       Person[first_name =~ /^al/i]
+
+      Same as previous example except the regex is case-insensitive.
+
+      !~ is the opposite of =~, just like in Perl. It checks whether attr
+      has value that does not match regular expression.
+
+      * is and isnt
+
+      Testing truth value or definedness. Value can be null or boolean
+      literal.
+
+      Example:
+
+       DateTime[is_leap_year is true]
+
+      will select all DateTime objects where its is_leap_year attribute has
+      a true value.
+
+       DateTime[is_leap_year is false]
+
+      will select all DateTime objects where its is_leap_year attribute has
+      a false value.
+
+       Person[age isnt null]
+
+      will select all Person objects where age is defined.
+
+ Class selector
+
+    A class selector is a . (dot) followed by Perl class/package name.
+
+     .CLASSNAME
+
+    It selects all objects that isa() a certain class. The difference with
+    type selector is that inheritance is observed. So:
+
+     .My::Class
+
+    will match instances of My::Class as well as subclasses of it.
+
+ ID selector
+
+    An ID selector is a # (hash) followed by an identifier:
+
+     #ID
+
+    It is a special/shortcut form of attribute selector where the attribute
+    is id and the operator is =:
+
+     [id = ID]
+
+    The csel() function allows you to configure which attribute to use as
+    the ID attribute, the default is id.
+
+ Pseudo-class
+
+    A pseudo-class is : (colon) followed by pseudo-class name (a
+    dash-separated word list), and optionally a list of arguments enclosed
+    in parentheses.
+
+     :PSEUDOCLASSNAME
+     :PSEUDOCLASSNAME(ARG, ...)
+
+    It filters result set based on some criteria. Currently supported
+    pseudo-classes include:
+
+      * :first
+
+      Select only the first object from the result set.
+
+      Example:
+
+       Person[name =~ /^a/i]:first
+
+      selects the first person whose name starts with the letter A.
+
+      * :last
+
+      Select only the last item from the result set.
+
+      Example:
+
+       Person[name =~ /^a/i]:last
+
+      selects the last person whose name starts with the letter A.
+
+      * :first-child
+
+      Select only objects that are the first child of their parent.
+
+      * :last-child
+
+      Select only objects that are the last child of their parent.
+
+      * :only-child
+
+      Select only objects that is the only child of their parent.
+
+      * :nth-child(n)
+
+      Select only objects that are the nth child of their parent.
+
+      * :nth-last-child(n)
+
+      Select only objects that are the nth last child of their parent.
+
+      * :first-of-type
+
+      Select only objects that are the first child of their parent of their
+      type. So if a parent's children is:
+
+       id1(type=T1) id2(T2) id3(T2)
+
+      then both id1 and id2 are first children of their respective types.
+
+      * :last-of-type
+
+      Select only objects that are the last child of their parent of their
+      type.
+
+      * :only-of-type
+
+      Select only objects that are the only child of their parent of their
+      type.
+
+      * :nth-of-type(n)
+
+      Select only objects that are the nth child of their parent of their
+      type.
+
+      * :nth-last-of-type(n)
+
+      Select only objects that are the nth last child of their parent of
+      their type.
+
+      * :root
+
+      Select only root node(s).
+
+      * :empty
+
+      Select only leaf node(s).
+
+      * :not(S)
+
+      Select all objects not matching selector S. S can be a string or an
+      unquoted CSel expression.
+
+      Example:
+
+       :not('.My::Class')
+       :not(.My::Class)
+
+      will select all objects that are not of My::Class type.
+
+      * :has(S)
+
+      Select all objects that have a descendant matching selector S. S can
+      be a string or an unquoted CSel expression.
+
+      Example:
+
+       :has('T')
+       :not(T)
+
+      will select all objects that have a descendant of type T.
+
+ Differences with CSS selector
+
+  Type selector can contain double colon (::)
+
+    Since Perl package names are separated by ::, CSel allows it in type
+    selector.
+
+  Syntax of attribute selector is a bit different
+
+    In CSel, the syntax of attribute selector is made simpler and more
+    regular.
+
+    There are operators not supported by CSel, but CSel adds more operators
+    from Perl. In particular, the whole substring matching operations like
+    [attr^=val], [attr$=val], [attr*=val], [attr~=val], and [attr|=val] are
+    replaced with the more flexible regex matching instead [attr =~ /re/].
+
+  Different pseudo-classes supported
+
+    Some CSS pseudo-classes only make sense for a DOM or a visual browser,
+    e.g. :link, :visited, :hover, so they are not supported.
+
+  There is no concept of CSS namespaces
+
+    CSS namespaces are used when there are foreign elements (e.g. SVG in
+    addition to HTML) and one wants to use the same stylesheet for both.
+    There is no need for something like this CSel, as we deal with only
+    Perl objects.
+
+FUNCTIONS
+
+ csel([ \%opts , ] $expr, @tree_nodes) => list|selection_object
+
+    Select from tree node objects @tree_nodes using CSel expression $expr.
+    Will return a list of mattching node objects (unless when wrap option
+    is true, in which case will return a Data::CSel::Selection object
+    instead). Will die on errors (e.g. syntax error in expression, objects
+    not having the required methods, etc).
+
+    A tree node object is any regular Perl object satisfying the following
+    criteria: 1) it supports a parent method which should return a single
+    parent node object, or undef if object is the root node); 2) it
+    supports a children method which should return a list (or an arrayref)
+    of children node objects (where the list/array will be empty for a leaf
+    node). Note: you can use Role::TinyCommons::Tree::Node to enforce this
+    requirement. Note: the parent and children method names can actually be
+    customized, see options.
+
+    Known options:
+
+      * class_prefixes => array of str
+
+      Array of namespace to check when matching type in type selector as
+      well as class selector. This is like PATH environment variable in
+      Unix shell. For example, if class_prefixes is ["Foo::Bar", "Baz"],
+      then this expression:
+
+       T
+
+      will match class Foo::Bar::T, or Baz::T, or T.
+
+      * wrap => bool
+
+      If set to true, instead of returning a list of matching nodes, the
+      function will return a Data::CSel::Selection object instead (which
+      wraps the result, for convenience). See the selection object's
+      documentation for more details.
+
+      * get_parent_method => str
+
+      Example:
+
+       get_parent_method => 'get_parent'
+
+      This option can be used if your node object uses method other than
+      the default parent to get parent node.
+
+      * set_parent_method => str
+
+      Example:
+
+       set_parent_method => 'set_parent'
+
+      This option can be used if your node object uses method other than
+      the default parent to set parent node.
+
+      * get_children_method => str
+
+      Example:
+
+       get_children_method => 'get_children'
+
+      This option can be used if your node object uses method other than
+      the default children to get children nodes.
+
+      * set_children_method => str
+
+      Example:
+
+       set_children_method => 'set_children'
+
+      This option can be used if your node object uses method other than
+      the default children to set children nodes.
+
+ parse_csel($expr) => hash|undef
+
+    Parse an expression. On success, will return a hash containing parsed
+    information. On failure, will return undef.
+
+FAQ
+
+ Can I use csel() against a regular data structure (instead of a tree of
+ objects)?
+
+    Use Data::CSel::WrapStruct to create a tree of object from the data
+    structure, then perform csel() on the resulting tree.
+
+SEE ALSO
+
+    CSS4 Selectors Specification, https://www.w3.org/TR/selectors4/.
+
+    These modules let you use XPath (or XPath-like) syntax to select nodes
+    of a data structure: Data::DPath. Like CSS selectors, XPath is another
+    query language to select nodes of a document. XPath specification:
+    https://www.w3.org/TR/xpath/.
+
+    These modules let you use JSONPath syntax to select nodes of a data
+    structure: JSON::Path. JSONPath is a query language to select nodes of
+    a JSON document (data structure). JSONPath specification:
+    http://goessner.net/articles/JsonPath.
+
+    These modules let you use CSS selector syntax (or its subset) to select
+    nodes of an HTML document: Mojo::DOM (or DOM::Tiny), jQuery, pQuery,
+    HTML::Selector::XPath (or via Web::Query). The last two modules can
+    also handle XPath expression.
+
+    Data::CSel::WrapStruct
+
+    CSel::Examples
+

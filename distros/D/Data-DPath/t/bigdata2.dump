@@ -1,0 +1,148 @@
+$VAR1 = {
+          'report' => {
+                        'reportgroup_testrun_id' => '30862',
+                      },
+          'results' => [
+                         {
+                           'section' => {
+                                          'SLBench-results' => {
+                                                                 'tap' => bless( {
+                                                                                   'parse_errors' => [],
+                                                                                   'tests_run' => 1,
+                                                                                   'version' => '13',
+                                                                                   'exit' => 0,
+                                                                                   'start_time' => '1269439582.7107',
+                                                                                   'skip_all' => undef,
+                                                                                   'lines' => bless ([
+                                                                                                {
+                                                                                                  'is_comment' => 0,
+                                                                                                  'has_skip' => 0,
+                                                                                                  'is_test' => 0,
+                                                                                                  'is_yaml' => 0,
+                                                                                                  'is_plan' => 0,
+                                                                                                  'is_actual_ok' => 0,
+                                                                                                  'is_unknown' => 0,
+                                                                                                  'has_todo' => 0,
+                                                                                                  'is_bailout' => 0,
+                                                                                                  'is_pragma' => 0,
+                                                                                                  'is_version' => 1
+                                                                                                },
+                                                                                                {
+                                                                                                  'is_comment' => 0,
+                                                                                                  'has_skip' => 0,
+                                                                                                  'is_test' => 0,
+                                                                                                  'is_yaml' => 0,
+                                                                                                  'is_plan' => 1,
+                                                                                                  '_children' => [
+                                                                                                                   {
+                                                                                                                     'is_comment' => 1,
+                                                                                                                     'has_skip' => 0,
+                                                                                                                     'is_test' => 0,
+                                                                                                                     'is_yaml' => 0,
+                                                                                                                     'is_plan' => 0,
+                                                                                                                     'is_actual_ok' => 0,
+                                                                                                                     'is_unknown' => 0,
+                                                                                                                     'has_todo' => 0,
+                                                                                                                     'is_bailout' => 0,
+                                                                                                                     'is_pragma' => 0,
+                                                                                                                     'is_version' => 0
+                                                                                                                   }
+                                                                                                                 ],
+                                                                                                  'is_actual_ok' => 0,
+                                                                                                  'is_unknown' => 0,
+                                                                                                  'has_todo' => 0,
+                                                                                                  'is_bailout' => 0,
+                                                                                                  'is_pragma' => 0,
+                                                                                                  'is_version' => 0
+                                                                                                },
+                                                                                                {
+                                                                                                  'is_comment' => 0,
+                                                                                                  'is_yaml' => 0,
+                                                                                                  'is_plan' => 0,
+                                                                                                  'number' => '1',
+                                                                                                  'is_unknown' => 0,
+                                                                                                  'is_bailout' => 0,
+                                                                                                  'is_pragma' => 0,
+                                                                                                  'is_unplanned' => 0,
+                                                                                                  'has_skip' => 0,
+                                                                                                  'is_test' => 1,
+                                                                                                  '_children' => [
+                                                                                                                   {
+                                                                                                                     'is_comment' => 0,
+                                                                                                                     'has_skip' => 0,
+                                                                                                                     'is_test' => 0,
+                                                                                                                     'is_yaml' => 1,
+                                                                                                                     'is_plan' => 0,
+                                                                                                                     'data' => {
+                                                                                                                                 'glibc' => 'xglibc, 2.4',
+                                                                                                                                 'count' => 'x150',
+                                                                                                                                 'language_series' => 'xarch_barcelona',
+                                                                                                                                 'language_binary' => 'x/opt/artemis/slbench/python/arch_barcelona/2.7/bin/python',
+                                                                                                                                 'standard_deviation' => 'x0.0164822946672',
+                                                                                                                                 'hostname' => 'xfoo.dept.lhm.com',
+                                                                                                                                 'operating_system' => 'xLinux',
+                                                                                                                                 'release' => 'x2.6.30.10-105.2.23.fc11.x86_64',
+                                                                                                                                 'median' => 'x0.58355140686',
+                                                                                                                                 'mean' => 'x0.592707689603',
+                                                                                                                                 'architecture' => 'x64bit',
+                                                                                                                                 'number_CPUs' => 'x16',
+                                                                                                                                 'benchmark' => 'xcall_simple',
+                                                                                                                                 'machine' => 'xx86_64'
+                                                                                                                               },
+                                                                                                                     'is_actual_ok' => 0,
+                                                                                                                     'is_unknown' => 0,
+                                                                                                                     'has_todo' => 0,
+                                                                                                                     'is_bailout' => 0,
+                                                                                                                     'is_pragma' => 0,
+                                                                                                                     'is_version' => 0
+                                                                                                                   }
+                                                                                                                 ],
+                                                                                                  'is_actual_ok' => 0,
+                                                                                                  'description' => '- benchmark results',
+                                                                                                  'is_ok' => 1,
+                                                                                                  'has_todo' => 0,
+                                                                                                  'explanation' => '',
+                                                                                                  'directive' => '',
+                                                                                                  'type' => 'test',
+                                                                                                  'is_version' => 0
+                                                                                                }
+                                                                                              ], "Foo::Bar::Lines"),
+                                                                                   'is_good_plan' => 1,
+                                                                                   'has_problems' => 0,
+                                                                                   'end_time' => '1269439582.71287',
+                                                                                   'summary' => {
+                                                                                                  'parse_errors' => 0,
+                                                                                                  'status' => 'PASS',
+                                                                                                  'todo_passed' => 0,
+                                                                                                  'all_passed' => 1,
+                                                                                                  'exit' => 0,
+                                                                                                  'has_errors' => 0,
+                                                                                                  'passed' => 1,
+                                                                                                  'total' => 1,
+                                                                                                  'failed' => 0,
+                                                                                                  'elapsed_timestr' => ' 0 wallclock secs ( 0.00 usr +  0.00 sys =  0.00 CPU)',
+                                                                                                  'elapsed' => bless( [
+                                                                                                                        0,
+                                                                                                                        '0',
+                                                                                                                        '0',
+                                                                                                                        0,
+                                                                                                                        0,
+                                                                                                                        0
+                                                                                                                      ], 'Benchmark' ),
+                                                                                                  'skipped' => 0,
+                                                                                                  'has_problems' => 0,
+                                                                                                  'wait' => 0,
+                                                                                                  'todo' => 0
+                                                                                                },
+                                                                                   'pragmas' => [],
+                                                                                   'plan' => '1..1',
+                                                                                   'tests_planned' => '1'
+                                                                                 }, 'TAP::DOM' ),
+                                                                 'meta' => {
+                                                                             'section' => 'SLBench-results'
+                                                                           }
+                                                               }
+                                        }
+                         },
+                       ]
+        };

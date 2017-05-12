@@ -1,0 +1,8 @@
+Revision history for DBIx-Class-Migration-RunScript-Trait-AuthenPassphrase
+
+0.002   01 January 2013
+        - Fixed egregious documentation errors
+        - added missing version global
+
+0.001   03 October 2012
+        - initial release

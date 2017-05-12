@@ -1,0 +1,36 @@
+---
+abstract: 'Collect and report caller (test file) and covered (source file) statistics from the cover_db'
+author:
+  - 'Johan Lindstrom <johanl@cpan.org>'
+build_requires:
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-CoverX-Covered
+requires:
+  DBD::SQLite: 0
+  DBIx::Simple: 0
+  Data::Dumper: 0
+  Devel::Cover: 1.17
+  File::Basename: 0
+  File::Path: 0
+  File::chdir: 0
+  Getopt::Long: 0
+  Memoize: 0
+  Moose: 0
+  POSIX: 0
+  Path::Class: 0
+  Pod::Usage: 0
+  SQL::Abstract: 0
+  lib: 0
+  strict: 0
+version: 0.016

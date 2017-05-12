@@ -1,0 +1,18 @@
+abstract: Declarative Validation of Data Structures
+author: "Robert 'phaylon' Sedlacek <phaylon@dunkelheit.at>"
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Declare-Constraints-Simple
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp::Clan: 0
+  Class::Inspector: 0
+  Scalar::Util: 0
+  aliased: 0
+version: 0.03

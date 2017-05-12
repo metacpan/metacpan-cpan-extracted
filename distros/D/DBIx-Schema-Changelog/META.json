@@ -1,0 +1,76 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Mario Zieschang <mziescha@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Schema-Changelog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.4",
+            "DBI" : "1.632",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "2.42",
+            "Hash::MD5" : "0.08",
+            "Moose" : "2.1403",
+            "MooseX::HasDefaults::RO" : "0",
+            "MooseX::Types::LoadableClass" : "0.013",
+            "MooseX::Types::Moose" : "0.45",
+            "MooseX::Types::Path::Class" : "0.06",
+            "MooseX::Types::PerlVersion" : "0.002",
+            "SQL::Abstract" : "1.81",
+            "Time::Piece" : "1.27",
+            "YAML" : "1.13",
+            "YAML::XS" : "0.55",
+            "perl" : "5.010000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Usage" : "0",
+            "Test::CheckManifest" : "0",
+            "Test::Cmd" : "0",
+            "Test::Exception" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Requires" : "0",
+            "Test::Spelling" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/GeoffreyDB/Geoffrey.git",
+         "web" : "https://github.com/GeoffreyDB/Geoffrey"
+      }
+   },
+   "version" : "v0.9.0"
+}

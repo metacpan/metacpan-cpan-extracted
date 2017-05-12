@@ -1,0 +1,35 @@
+---
+abstract: 'DayDayUp - good good study, day day up'
+author:
+  - 'Fayland Lam<fayland@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.910'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DayDayUp
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBD::SQLite: 1.25
+  KiokuDB: 0.32
+  KiokuDB::Backend::DBI: 0.07
+  Mojo: 0.991251
+  MojoX::Fixup::XHTML: 0
+  MojoX::Renderer::TT: 0.31
+  Moose: 0.89
+  MooseX::Declare: 0.30
+  MooseX::Types: 0.20
+  Template: 2.20
+  Template::Plugin::FillInForm: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/fayland/daydayup/tree/master
+version: 0.95

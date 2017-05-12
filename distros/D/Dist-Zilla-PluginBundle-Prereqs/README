@@ -1,0 +1,88 @@
+NAME
+    Dist::Zilla::PluginBundle::Prereqs - Useful Prereqs modules in a
+    Dist::Zilla bundle
+
+SYNOPSIS
+        ; Instead of this...
+        [AutoPrereqs]
+        skip = ^Foo|Bar$
+        [MinimumPerl]
+        [MinimumPrereqs]
+        minimum_year = 2008
+        [PrereqsClean]
+        minimum_perl = 5.8.8
+        removal_level = 2
+ 
+        ; ...use this
+        [@Prereqs]
+        skip = ^Foo|Bar$
+        minimum_year = 2008
+        minimum_perl = 5.8.8
+        removal_level = 2
+ 
+        ; and potentially put some manual entries afterwards...
+        [Prereqs]
+        ; ...
+        [RemovePrereqs]
+        ; ...
+        [RemovePrereqsMatching]
+        ; ...
+        [Conflicts]
+        ; ...
+
+DESCRIPTION
+    This is a handy Dist::Zilla plugin bundle that ties together several
+    useful Prereq plugins:
+
+    *   AutoPrereqs
+
+    *   MinimumPerl
+
+    *   MinimumPrereqs
+
+    *   PrereqsClean
+
+    This also delegates the ordering pitfalls, so you don't have to worry
+    about that. All of the options from those plugins are directly supported
+    from within the bundle, via PluginBundle::Merged.
+
+SEE ALSO
+    "Manual entry" Dist::Zilla Prereq plugins: Prereqs, RemovePrereqs,
+    RemovePrereqsMatching, Conflicts
+
+AVAILABILITY
+    The project homepage is
+    <https://github.com/SineSwiper/Dist-Zilla-PluginBundle-Prereqs>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Dist::Zilla::PluginBundle::Prereqs/>.
+
+SUPPORT
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and talk to this
+        person for help: SineSwiper.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests via
+    <https://github.com/SineSwiper/Dist-Zilla-PluginBundle-Prereqs/issues>.
+
+AUTHOR
+    Brendan Byrd <BBYRD@CPAN.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Brendan Byrd.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

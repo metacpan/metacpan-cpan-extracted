@@ -1,0 +1,11 @@
+Revision history for Data-Validate-VIN
+
+0.02    2011-05-17 13:55:00 America/Los_Angeles
+        Initial release
+
+0.03    2011-05-18 10:00:00 America/Los_Angeles
+        test & POD fixes
+
+0.04    2014-07-28 11:45:00 America/Los_Angeles
+        Fixed a bug where special characters would send validator into an infinite loop
+        Thanks to moltar for the patch and test updates.

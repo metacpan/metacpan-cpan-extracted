@@ -1,0 +1,55 @@
+{
+   "abstract" : "determine Czech Republic bank holidays",
+   "author" : [
+      "Smithfarm <presnypreklad@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Holidays-CZ",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Date::Calc" : "5"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Software::License" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "5",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Holidays::CZ" : {
+         "file" : "lib/Date/Holidays/CZ.pm",
+         "version" : "0.13"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/smithfarm/date-holidays-cz/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/bsd-license.php"
+      ],
+      "repository" : {
+         "url" : "https://github.com/smithfarm/date-holidays-cz.git"
+      }
+   },
+   "version" : "0.13",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

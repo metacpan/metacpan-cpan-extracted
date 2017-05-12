@@ -1,0 +1,184 @@
+#!/usr/bin/perl -w
+use lib "c:/Dokument/Project/Dev/CPAN/Devel-CoverX-Covered/trunk/source/lib";
+$|++;
+use strict;
+
+use Getopt::Long;
+use Pod::Usage;
+use File::Basename;
+use POSIX;
+use Data::Dumper;
+use Path::Class;
+
+
+use lib "../lib", "lib";
+use Devel::CoverX::Covered;
+use Devel::CoverX::Covered::Db;
+
+=head1 NAME
+
+covered -- Command line interface to L<Devel::CoverX::Covered>
+
+
+=head1 SYNOPSIS
+
+See L<Devel::CoverX::Covered>
+
+=cut
+
+
+
+if($INC{"Devel/Cover.pm"}) {
+    print STDERR "$0 shouldn't be run with Devel::Cover enabled.\n";
+    POSIX::_exit(1);
+}
+
+
+
+main();
+sub main {
+    my @rex_skip_source_file;
+    GetOptions(
+        "cover_db:s"              => \(my $cover_db = "./cover_db"),
+        "source_file:s"           => \(my $source_file = ""),
+        "sub:s"                   => \(my $sub),
+        "test_file:s"             => \(my $test_file = ""),
+        "rex_skip_calling_file:s" => \(my $rex_skip_calling_file),
+        "rex_skip_source_file:s"  => \@rex_skip_source_file,
+    );
+    my $command = $ARGV[0] or syntax("Please specify a command");
+
+    my $db = Devel::CoverX::Covered::Db->new(
+        dir         => dir($cover_db)->absolute,
+        report_file => sub { print "$_[0]\n" },
+    );
+
+    if ($rex_skip_calling_file) {
+        $db->rex_skip_calling_file( rex_from_qr($rex_skip_calling_file) );
+    }
+
+    $db->rex_skip_source_file([ map { rex_from_qr($_) } @rex_skip_source_file ]);
+
+
+    if($command eq "runs") {
+        $db->collect_runs();
+    }
+    elsif($command eq "covering") {
+        $source_file or syntax("Please specify --source_file");
+        print( join("\n", $db->test_files_covering($source_file, $sub)) . "\n" );
+    }
+    elsif($command eq "by") {
+        $test_file or syntax("Please specify --test_file");
+        print( join("\n", $db->source_files_covered_by($test_file)) . "\n" );
+    }
+    elsif($command eq "subs") {
+        $source_file or syntax("Please specify --source_file");
+        print( join("\n", map { join("\t", @$_) } $db->covered_subs($source_file)) . "\n" );
+    }
+    elsif($command eq "info") {
+        print( "* Covered *\nVersion: " . Devel::CoverX::Covered->VERSION . "\n" );
+        print("\n");
+        print( "* Test files *\n" . join("\n", $db->test_files()) . "\n" );
+        print("\n");
+        print( "* Covered files *\n" . join("\n", $db->covered_files()) . "\n" );
+    }
+    else {
+        syntax("Unknown command ($command)");
+    }
+
+    return(1);
+}
+
+
+
+# syntax($message)
+#
+# Die with the syntax text and the $message.
+sub syntax {
+    my ($message) = @_;
+
+    my $error = "";
+    $message and $error = "Error: $message\n";
+    
+    die q{NAME - covered
+SYNOPSIS
+
+* Collect test run statistics
+
+  covered runs
+      [--cover_db=./cover_db]
+      [--rex_skip_calling_file='/ prove ([.]bat)? $/x']
+      [--rex_skip_source_file]
+
+Run this right after the test run, before you run "cover" (because
+that will throw away some information).
+
+Avoid collection any information from test files matching
+$rex_skip_calling_file (default: the prove command), and from source
+files matching any of @rex_skip_source_file.
+
+
+* Show files in database
+
+ covered info
+
+Print version, and two lists of known files: test files and covered
+files.
+
+
+* List test files covering file
+
+  covered covering \
+      --source_file=SOURCE_FILE [--sub=SUB_NAME] \
+      [--cover_db=./cover_db]
+
+List all test files (usually .t files) that cover any line in
+--source_file.
+
+Or, if --sub is specified, limit the list to test files covering that
+sub.
+
+Note that in the case of the same sub name appearing in many packages
+in the same file, all of them will be matched. Well, that's not the
+way to do it, is it?
+
+
+* List source files covered by test
+
+  covered by --test_file=TEST_FILE [--cover_db=./cover_db]
+
+List all source files that are covered by any line in --test_file.
+
+
+* List subs in --source_file that are covered any test file
+
+  covered subs --source_file=SOURCE_FILE [--cover_db=./cover_db]
+
+List all "sub names \t coverage count" for --source_file.
+
+} . $error;
+}
+
+
+
+sub rex_from_qr {
+    my ($rex_string) = @_;
+    my $rex = eval "qr $rex_string";
+    $@ and die("Could not parse regexp ($rex_string):
+$@
+Correct regex syntax is e.g. '/ prove [.] bat /x'
+");
+    return $rex;
+}
+
+
+
+__END__
+
+[--row=N] [--sub=SUB]
+
+If --row (1..) is specified, limit the list to test files that cover
+that row in particular.
+
+If --sub is specified, limit the list to test files that cover that
+sub in particular.

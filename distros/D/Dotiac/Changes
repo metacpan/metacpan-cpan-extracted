@@ -1,0 +1,54 @@
+0.8
+
+Moved Tagnames from Tag.pm to Parser.pm so the addons won't break Reduced.
+Fixed Bug in Value.pm so reftype is not ambigious.
+Fixed Bug in include/extend/ssi so they won't autoescape the filename
+Fixed missing exists in devar_var.
+Made devar_var call __getitem__ if it's there.
+Removed useless variable from {% for %} perl output
+Fixed multiple keyword issue of https://sourceforge.net/tracker2/?func=detail&aid=2569310&group_id=249411&atid=1126348
+Added parser switching while parsing (parse() not unparsed());
+Fixed useless error while rendering empty output.
+Fixed hickup in cunjunction with scalarrefs and the current directory
+Improved cache, added reparse if needed.
+Template.pm's param() now works exactly like HTML::Template's param().
+Stored more stuff in Template.pm (parameter, parser, current directory)
+Improved file-changed detection.
+Added %NOCOMPILE to Addon.pm to skip addons that are not needed with compiled templates
+
+0.7
+
+Fixed bugs in Meta.YML.
+Added some more tests.
+
+0.6
+
+Fixed bug in {% url %} with autoescaping
+Added example (blog.pl)
+Added Test::Pod::Coverage
+Made Test::Pod::Coverage not fail.
+Fixed bugs in META.yml
+Added version to every module.
+
+0.5
+
+Extracted Parser/Template into seperate files
+Made set variables with dots in them work
+Skipped unicode test with perl 5.6.X
+
+0.4
+
+Fixed a single test that had problems on most systems.
+
+0.3
+
+Works now in perl 5.6.1.
+Fixed requirements.
+Added pod tests.
+Fixed tests to be skipped on systems with a different time format. (MirBSD)
+Added some more info to Meta.YML .
+
+0.2
+
+Fixed Documentation
+Fixed tests to not use localtime..

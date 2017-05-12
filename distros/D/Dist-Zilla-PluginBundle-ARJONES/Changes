@@ -1,0 +1,59 @@
+1.133200  2013-11-16 22:22:16 Europe/London
+    Remove TravisYML plugin from build
+    Change PWP::Encoding to PWP::SingleEncoding (Thanks sergeyromanov)
+
+1.133170  2013-11-13 19:34:01 Europe/London
+    Fix dependencies
+    Set allow_dirty for Git::Check
+
+1.131000  2013-04-10 22:14:10 Europe/London
+
+    Add Dist::Zilla::Plugin::Test::ChangesHasContent
+    Add Dist::Zilla::Plugin::ReportVersions::Tiny
+
+1.130720  2013-03-13 21:40:55 Europe/London
+    Credit contributors based on great advice by dagolden (http://www.dagolden.com/index.php/1921/how-im-using-distzilla-to-give-credit-to-contributors/)
+    Add Pod::Weaver::Plugin::Encoding
+
+1.130670  2013-03-08 14:04:40 Europe/London
+    PodWeaver: Print EVENTS before ATTRIBUTES and METHODS
+
+1.120690  2012-03-09 16:22:02 Europe/London
+    Add [Test::Compile]
+
+1.120570  2012-02-26 23:39:52 Europe/London
+    Remove [Test::PodSpelling] - more trouble than its worth
+
+1.120460  2012-02-15 12:53:29 Europe/London
+    Add [Clean]
+
+1.120240  2012-01-24 15:25:10 America/Los_Angeles
+    Add [NoSmartCommentsTests]
+
+1.120110  2012-01-11 12:10:04 Europe/London
+    Fix Dist::Zilla::Plugin::NoTabsTests prereq
+    Remove [EOLTests]. Too annoying
+
+1.113460  2011-12-12 11:52:06 Europe/London
+    Add [Test::Portability]
+    Add [Test::PodSpelling]
+    Add [Test::Pod::No404s]
+
+1.113320  2011-11-28 13:47:14 Europe/London
+    Add [NoTabsTests], [EOLTests] and [Test::Kwalitee]
+
+1.113210  2011-11-17 23:17:29 Europe/Zurich
+    Add the following missing Prereqs:
+      Pod::Elemental::Transformer::List
+      Test::Pod::Coverage
+      Test::Pod
+      Test::Perl::Critic
+      Pod::Coverage::TrustPod
+
+1.113180  2011-11-14 19:05:20 Europe/London
+    Update Prereqs
+    Add [PodCoverageTests]
+    Add Dist::Zilla::App::Command::cover and Dist::Zilla::App::Command::perltidy as Prereqs
+
+1.112790  2011-10-06 20:58:17 Europe/London
+    Initial version.

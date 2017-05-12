@@ -1,0 +1,12 @@
+This file contains ALL changes in dependencies in both REQUIRED / OPTIONAL dependencies for all phases (configure/build/runtime/test/develop)
+
+0.002001
+
+0.002000 2016-05-19T12:30:00Z
+ [Added / develop requires]
+ - Test::Needs
+
+ [Added / runtime requires]
+ - namespace::clean
+
+0.001001 2016-04-01T09:31:35Z

@@ -1,0 +1,381 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ABSPERL	Makefile	/^ABSPERL = $(PERL)$/;"	m
+ABSPERLRUN	Makefile	/^ABSPERLRUN = $(ABSPERL)$/;"	m
+ABSPERLRUNINST	Makefile	/^ABSPERLRUNINST = $(ABSPERLRUN) "-I$(INST_ARCHLIB)" "-Iinc" "-I$(INST_LIB)"$/;"	m
+AR	Makefile	/^AR = ar$/;"	m
+AR_STATIC_ARGS	Makefile	/^AR_STATIC_ARGS = cr$/;"	m
+AUTOLOAD	inc/Module/Install/Base.pm	/^sub AUTOLOAD {$/;"	s
+AUTOLOAD	inc/Module/Install/Base.pm	/^sub AUTOLOAD {}$/;"	s
+AUTOSPLITFILE	Makefile	/^AUTOSPLITFILE = $(ABSPERLRUN)  -e 'use AutoSplit;  autosplit($$ARGV[0], $$ARGV[1], 0, 1, 1)' --$/;"	m
+AutoInstall	inc/Module/Install/AutoInstall.pm	/^sub AutoInstall { $_[0] }$/;"	s
+BASEEXT	Makefile	/^BASEEXT = MultipleTableInheritance$/;"	m
+BOOTDEP	Makefile	/^BOOTDEP = $/;"	m
+BOOTSTRAP	Makefile	/^BOOTSTRAP =$/;"	m
+C	inc/Module/Install/Win32.pm	/^C:\\WINDOWS\\COMMAND\\), then launch the MS-DOS command line shell, "cd" to$/;"	l
+CC	Makefile	/^CC = cc$/;"	m
+CCCDLFLAGS	Makefile	/^CCCDLFLAGS = -fPIC$/;"	m
+CCDLFLAGS	Makefile	/^CCDLFLAGS = -Wl,-E$/;"	m
+CHMOD	Makefile	/^CHMOD = chmod$/;"	m
+CI	Makefile	/^CI = ci -u$/;"	m
+COMPRESS	Makefile	/^COMPRESS = gzip --best$/;"	m
+CONFIGDEP	Makefile	/^CONFIGDEP = $(PERL_ARCHLIB)$(DFSEP)Config.pm $(PERL_INC)$(DFSEP)config.h$/;"	m
+CP	Makefile	/^CP = cp$/;"	m
+C_FILES	Makefile	/^C_FILES  = $/;"	m
+CafeInsertion	t/lib/CafeInsertion.pm	/^	CafeInsertion;$/;"	p
+CafeInsertion::Result::Chair	t/lib/CafeInsertion/Result/Chair.pm	/^	CafeInsertion::Result::Chair;$/;"	p
+CafeInsertion::Result::Coffee	t/lib/CafeInsertion/Result/Coffee.pm	/^    CafeInsertion::Result::Coffee;$/;"	p
+CafeInsertion::Result::Cream	t/lib/CafeInsertion/Result/Cream.pm	/^    CafeInsertion::Result::Cream;$/;"	p
+CafeInsertion::Result::Sugar	t/lib/CafeInsertion/Result/Sugar.pm	/^    CafeInsertion::Result::Sugar;$/;"	p
+CafeInsertion::Result::Sumatra	t/lib/CafeInsertion/Result/Sumatra.pm	/^    CafeInsertion::Result::Sumatra;$/;"	p
+DBIx::Class::ResultSource::MultipleTableInheritance	lib/DBIx/Class/ResultSource/MultipleTableInheritance.pm	/^package DBIx::Class::ResultSource::MultipleTableInheritance;$/;"	p
+DEFINE_VERSION	Makefile	/^DEFINE_VERSION = -D$(VERSION_MACRO)=\\"$(VERSION)\\"$/;"	m
+DESTDIR	Makefile	/^DESTDIR = $/;"	m
+DESTINSTALLARCHLIB	Makefile	/^DESTINSTALLARCHLIB = $(DESTDIR)$(INSTALLARCHLIB)$/;"	m
+DESTINSTALLBIN	Makefile	/^DESTINSTALLBIN = $(DESTDIR)$(INSTALLBIN)$/;"	m
+DESTINSTALLMAN1DIR	Makefile	/^DESTINSTALLMAN1DIR = $(DESTDIR)$(INSTALLMAN1DIR)$/;"	m
+DESTINSTALLMAN3DIR	Makefile	/^DESTINSTALLMAN3DIR = $(DESTDIR)$(INSTALLMAN3DIR)$/;"	m
+DESTINSTALLPRIVLIB	Makefile	/^DESTINSTALLPRIVLIB = $(DESTDIR)$(INSTALLPRIVLIB)$/;"	m
+DESTINSTALLSCRIPT	Makefile	/^DESTINSTALLSCRIPT = $(DESTDIR)$(INSTALLSCRIPT)$/;"	m
+DESTINSTALLSITEARCH	Makefile	/^DESTINSTALLSITEARCH = $(DESTDIR)$(INSTALLSITEARCH)$/;"	m
+DESTINSTALLSITEBIN	Makefile	/^DESTINSTALLSITEBIN = $(DESTDIR)$(INSTALLSITEBIN)$/;"	m
+DESTINSTALLSITELIB	Makefile	/^DESTINSTALLSITELIB = $(DESTDIR)$(INSTALLSITELIB)$/;"	m
+DESTINSTALLSITEMAN1DIR	Makefile	/^DESTINSTALLSITEMAN1DIR = $(DESTDIR)$(INSTALLSITEMAN1DIR)$/;"	m
+DESTINSTALLSITEMAN3DIR	Makefile	/^DESTINSTALLSITEMAN3DIR = $(DESTDIR)$(INSTALLSITEMAN3DIR)$/;"	m
+DESTINSTALLSITESCRIPT	Makefile	/^DESTINSTALLSITESCRIPT = $(DESTDIR)$(INSTALLSITESCRIPT)$/;"	m
+DESTINSTALLVENDORARCH	Makefile	/^DESTINSTALLVENDORARCH = $(DESTDIR)$(INSTALLVENDORARCH)$/;"	m
+DESTINSTALLVENDORBIN	Makefile	/^DESTINSTALLVENDORBIN = $(DESTDIR)$(INSTALLVENDORBIN)$/;"	m
+DESTINSTALLVENDORLIB	Makefile	/^DESTINSTALLVENDORLIB = $(DESTDIR)$(INSTALLVENDORLIB)$/;"	m
+DESTINSTALLVENDORMAN1DIR	Makefile	/^DESTINSTALLVENDORMAN1DIR = $(DESTDIR)$(INSTALLVENDORMAN1DIR)$/;"	m
+DESTINSTALLVENDORMAN3DIR	Makefile	/^DESTINSTALLVENDORMAN3DIR = $(DESTDIR)$(INSTALLVENDORMAN3DIR)$/;"	m
+DESTINSTALLVENDORSCRIPT	Makefile	/^DESTINSTALLVENDORSCRIPT = $(DESTDIR)$(INSTALLVENDORSCRIPT)$/;"	m
+DESTROY	inc/Module/Install/Base.pm	/^sub DESTROY {}$/;"	s
+DEV_NULL	Makefile	/^DEV_NULL = > \/dev\/null 2>&1$/;"	m
+DFSEP	Makefile	/^DFSEP = $(DIRFILESEP)$/;"	m
+DIRFILESEP	Makefile	/^DIRFILESEP = \/$/;"	m
+DISTNAME	Makefile	/^DISTNAME = DBIx-Class-ResultSource-MultipleTableInheritance$/;"	m
+DISTVNAME	Makefile	/^DISTVNAME = DBIx-Class-ResultSource-MultipleTableInheritance-0.01$/;"	m
+DIST_CP	Makefile	/^DIST_CP = best$/;"	m
+DIST_DEFAULT	Makefile	/^DIST_DEFAULT = tardist$/;"	m
+DLBASE	Makefile	/^DLBASE = $(BASEEXT)$/;"	m
+DLEXT	Makefile	/^DLEXT = so$/;"	m
+DLSRC	Makefile	/^DLSRC = dl_dlopen.xs$/;"	m
+DOC_INSTALL	Makefile	/^DOC_INSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'perllocal_install' --$/;"	m
+ECHO	Makefile	/^ECHO = echo$/;"	m
+ECHO_N	Makefile	/^ECHO_N = echo -n$/;"	m
+EQUALIZE_TIMESTAMP	Makefile	/^EQUALIZE_TIMESTAMP = $(ABSPERLRUN) -MExtUtils::Command -e 'eqtime' --$/;"	m
+ERROR	inc/Module/Install/Makefile.pm	/^ERROR: Can't determine distribution version. Please specify it$/;"	l
+EXE_EXT	Makefile	/^EXE_EXT = $/;"	m
+EXPORT_LIST	Makefile	/^EXPORT_LIST        = $/;"	m
+FALSE	Makefile	/^FALSE = false$/;"	m
+FIRST_MAKEFILE	Makefile	/^FIRST_MAKEFILE = Makefile$/;"	m
+FIXIN	Makefile	/^FIXIN = $(ABSPERLRUN) -MExtUtils::MY -e 'MY->fixin(shift)' --$/;"	m
+FULLEXT	Makefile	/^FULLEXT = DBIx\/Class\/ResultSource\/MultipleTableInheritance$/;"	m
+FULLPERL	Makefile	/^FULLPERL      = \/home\/amiri\/local\/bin\/perl$/;"	m
+FULLPERL	Makefile	/^FULLPERL = \/home\/amiri\/local\/bin\/perl "-Iinc"$/;"	m
+FULLPERLRUN	Makefile	/^FULLPERLRUN = $(FULLPERL)$/;"	m
+FULLPERLRUNINST	Makefile	/^FULLPERLRUNINST = $(FULLPERLRUN) "-I$(INST_ARCHLIB)" "-Iinc" "-I$(INST_LIB)"$/;"	m
+FULL_AR	Makefile	/^FULL_AR = \/usr\/bin\/ar$/;"	m
+H_FILES	Makefile	/^H_FILES  = $/;"	m
+INSTALLARCHLIB	Makefile	/^INSTALLARCHLIB = \/home\/amiri\/local\/lib\/perl5\/5.12.3\/x86_64-linux-thread-multi$/;"	m
+INSTALLBIN	Makefile	/^INSTALLBIN = \/home\/amiri\/local\/bin$/;"	m
+INSTALLDIRS	Makefile	/^INSTALLDIRS = site$/;"	m
+INSTALLMAN1DIR	Makefile	/^INSTALLMAN1DIR = \/home\/amiri\/local\/share\/man\/man1$/;"	m
+INSTALLMAN3DIR	Makefile	/^INSTALLMAN3DIR = \/home\/amiri\/local\/share\/man\/man3$/;"	m
+INSTALLPRIVLIB	Makefile	/^INSTALLPRIVLIB = \/home\/amiri\/local\/lib\/perl5\/5.12.3$/;"	m
+INSTALLSCRIPT	Makefile	/^INSTALLSCRIPT = \/home\/amiri\/local\/bin$/;"	m
+INSTALLSITEARCH	Makefile	/^INSTALLSITEARCH = \/home\/amiri\/local\/lib\/perl5\/site_perl\/5.12.3\/x86_64-linux-thread-multi$/;"	m
+INSTALLSITEBIN	Makefile	/^INSTALLSITEBIN = \/home\/amiri\/local\/bin$/;"	m
+INSTALLSITELIB	Makefile	/^INSTALLSITELIB = \/home\/amiri\/local\/lib\/perl5\/site_perl\/5.12.3$/;"	m
+INSTALLSITEMAN1DIR	Makefile	/^INSTALLSITEMAN1DIR = \/home\/amiri\/local\/share\/man\/man1$/;"	m
+INSTALLSITEMAN3DIR	Makefile	/^INSTALLSITEMAN3DIR = \/home\/amiri\/local\/share\/man\/man3$/;"	m
+INSTALLSITESCRIPT	Makefile	/^INSTALLSITESCRIPT = \/home\/amiri\/local\/bin$/;"	m
+INSTALLVENDORARCH	Makefile	/^INSTALLVENDORARCH = $/;"	m
+INSTALLVENDORBIN	Makefile	/^INSTALLVENDORBIN = $/;"	m
+INSTALLVENDORLIB	Makefile	/^INSTALLVENDORLIB = $/;"	m
+INSTALLVENDORMAN1DIR	Makefile	/^INSTALLVENDORMAN1DIR = $/;"	m
+INSTALLVENDORMAN3DIR	Makefile	/^INSTALLVENDORMAN3DIR = $/;"	m
+INSTALLVENDORSCRIPT	Makefile	/^INSTALLVENDORSCRIPT = $/;"	m
+INST_ARCHAUTODIR	Makefile	/^INST_ARCHAUTODIR = $(INST_ARCHLIB)\/auto\/$(FULLEXT)$/;"	m
+INST_ARCHLIB	Makefile	/^INST_ARCHLIB = blib\/arch$/;"	m
+INST_ARCHLIBDIR	Makefile	/^INST_ARCHLIBDIR  = $(INST_ARCHLIB)\/DBIx\/Class\/ResultSource$/;"	m
+INST_AUTODIR	Makefile	/^INST_AUTODIR     = $(INST_LIB)\/auto\/$(FULLEXT)$/;"	m
+INST_BIN	Makefile	/^INST_BIN = blib\/bin$/;"	m
+INST_BOOT	Makefile	/^INST_BOOT        = $/;"	m
+INST_DYNAMIC	Makefile	/^INST_DYNAMIC     = $/;"	m
+INST_LIB	Makefile	/^INST_LIB = blib\/lib$/;"	m
+INST_LIBDIR	Makefile	/^INST_LIBDIR      = $(INST_LIB)\/DBIx\/Class\/ResultSource$/;"	m
+INST_MAN1DIR	Makefile	/^INST_MAN1DIR = blib\/man1$/;"	m
+INST_MAN3DIR	Makefile	/^INST_MAN3DIR = blib\/man3$/;"	m
+INST_SCRIPT	Makefile	/^INST_SCRIPT = blib\/script$/;"	m
+INST_STATIC	Makefile	/^INST_STATIC      = $/;"	m
+LD	Makefile	/^LD = cc$/;"	m
+LDDLFLAGS	Makefile	/^LDDLFLAGS = -shared -O2 -L\/usr\/local\/lib -fstack-protector$/;"	m
+LDFLAGS	Makefile	/^LDFLAGS =  -fstack-protector -L\/usr\/local\/lib$/;"	m
+LDFROM	Makefile	/^LDFROM = $(OBJECT)$/;"	m
+LIBC	Makefile	/^LIBC = \/lib\/libc-2.12.1.so$/;"	m
+LIBPERL_A	Makefile	/^LIBPERL_A = libperl.a$/;"	m
+LIB_EXT	Makefile	/^LIB_EXT = .a$/;"	m
+LINKTYPE	Makefile	/^LINKTYPE = dynamic$/;"	m
+LoadTest	t/lib/LoadTest.pm	/^	LoadTest;$/;"	p
+LoadTest::Result::Bar	t/lib/LoadTest/Result/Bar.pm	/^    LoadTest::Result::Bar;$/;"	p
+LoadTest::Result::Foo	t/lib/LoadTest/Result/Foo.pm	/^    LoadTest::Result::Foo;$/;"	p
+LoadTest::Result::JustATable	t/lib/LoadTest/Result/JustATable.pm	/^	LoadTest::Result::JustATable;$/;"	p
+LoadTest::Result::Mixin	t/lib/LoadTest/Result/Mixin.pm	/^    LoadTest::Result::Mixin;$/;"	p
+MACROEND	Makefile	/^MACROEND = $/;"	m
+MACROSTART	Makefile	/^MACROSTART = $/;"	m
+MAKE	Makefile	/^MAKE = make$/;"	m
+MAKEFILE_OLD	Makefile	/^MAKEFILE_OLD = Makefile.old$/;"	m
+MAKEMAKER	Makefile	/^MAKEMAKER   = \/home\/amiri\/local\/lib\/perl5\/5.12.3\/ExtUtils\/MakeMaker.pm$/;"	m
+MAKE_APERL_FILE	Makefile	/^MAKE_APERL_FILE = Makefile.aperl$/;"	m
+MAN1EXT	Makefile	/^MAN1EXT = 1$/;"	m
+MAN1PODS	Makefile	/^MAN1PODS = $/;"	m
+MAN3EXT	Makefile	/^MAN3EXT = 3$/;"	m
+MAN3PODS	Makefile	/^MAN3PODS = lib\/DBIx\/Class\/ResultSource\/MultipleTableInheritance.pm$/;"	m
+MAP_TARGET	Makefile	/^MAP_TARGET    = perl$/;"	m
+MKPATH	Makefile	/^MKPATH = $(ABSPERLRUN) -MExtUtils::Command -e 'mkpath' --$/;"	m
+MM_REVISION	Makefile	/^MM_REVISION = 65600$/;"	m
+MM_Unix_VERSION	Makefile	/^MM_Unix_VERSION = 6.56$/;"	m
+MM_VERSION	Makefile	/^MM_VERSION  = 6.56$/;"	m
+MOD_INSTALL	Makefile	/^MOD_INSTALL = $(ABSPERLRUN) -MExtUtils::Install -e 'install([ from_to => {@ARGV}, verbose => '\\''$(VERBINST)'\\'', uninstall_shadows => '\\''$(UNINST)'\\'', dir_mode => '\\''$(PERM_DIR)'\\'' ]);' --$/;"	m
+MV	Makefile	/^MV = mv$/;"	m
+Makefile	inc/Module/Install/Makefile.pm	/^sub Makefile { $_[0] }$/;"	s
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{META.yml} => q{Module meta-data (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	Makefile	/^	$(NOECHO) cd $(DISTVNAME) && $(ABSPERLRUN) -MExtUtils::Manifest=maniadd -e 'eval { maniadd({q{SIGNATURE} => q{Public-key signature (added by MakeMaker)}}) } ' \\$/;"	m
+Manifest	Makefile	/^	$(PERLRUN) "-MExtUtils::Manifest=manicopy,maniread" \\$/;"	m
+Meta	inc/Module/Install/Metadata.pm	/^sub Meta              { shift          }$/;"	s
+Meta_ArrayKeys	inc/Module/Install/Metadata.pm	/^sub Meta_ArrayKeys    { @array_keys    }$/;"	s
+Meta_BooleanKeys	inc/Module/Install/Metadata.pm	/^sub Meta_BooleanKeys  { @boolean_keys  }$/;"	s
+Meta_ResourceKeys	inc/Module/Install/Metadata.pm	/^sub Meta_ResourceKeys { @resource_keys }$/;"	s
+Meta_ScalarKeys	inc/Module/Install/Metadata.pm	/^sub Meta_ScalarKeys   { @scalar_keys   }$/;"	s
+Meta_TupleKeys	inc/Module/Install/Metadata.pm	/^sub Meta_TupleKeys    { @tuple_keys    }$/;"	s
+Module::AutoInstall	inc/Module/AutoInstall.pm	/^package Module::AutoInstall;$/;"	p
+Module::Install	inc/Module/Install.pm	/^package Module::Install;$/;"	p
+Module::Install::AutoInstall	inc/Module/Install/AutoInstall.pm	/^package Module::Install::AutoInstall;$/;"	p
+Module::Install::Base	inc/Module/Install/Base.pm	/^package Module::Install::Base;$/;"	p
+Module::Install::Base::FakeAdmin	inc/Module/Install/Base.pm	/^package Module::Install::Base::FakeAdmin;$/;"	p
+Module::Install::Can	inc/Module/Install/Can.pm	/^package Module::Install::Can;$/;"	p
+Module::Install::Fetch	inc/Module/Install/Fetch.pm	/^package Module::Install::Fetch;$/;"	p
+Module::Install::Include	inc/Module/Install/Include.pm	/^package Module::Install::Include;$/;"	p
+Module::Install::Makefile	inc/Module/Install/Makefile.pm	/^package Module::Install::Makefile;$/;"	p
+Module::Install::Metadata	inc/Module/Install/Metadata.pm	/^package Module::Install::Metadata;$/;"	p
+Module::Install::Win32	inc/Module/Install/Win32.pm	/^package Module::Install::Win32;$/;"	p
+Module::Install::WriteAll	inc/Module/Install/WriteAll.pm	/^package Module::Install::WriteAll;$/;"	p
+NAME	Makefile	/^NAME = DBIx::Class::ResultSource::MultipleTableInheritance$/;"	m
+NAME_SYM	Makefile	/^NAME_SYM = DBIx_Class_ResultSource_MultipleTableInheritance$/;"	m
+NOECHO	Makefile	/^NOECHO = @$/;"	m
+NOOP	Makefile	/^NOOP = $(TRUE)$/;"	m
+NoSequenceSalad	t/lib/NoSequenceSalad.pm	/^	NoSequenceSalad;$/;"	p
+NoSequenceSalad::Result::Dressing	t/lib/NoSequenceSalad/Result/Dressing.pm	/^    NoSequenceSalad::Result::Dressing;$/;"	p
+NoSequenceSalad::Result::Mesclun	t/lib/NoSequenceSalad/Result/Mesclun.pm	/^    NoSequenceSalad::Result::Mesclun;$/;"	p
+NoSequenceSalad::Result::Salad	t/lib/NoSequenceSalad/Result/Salad.pm	/^    NoSequenceSalad::Result::Salad;$/;"	p
+OBJECT	Makefile	/^OBJECT = $/;"	m
+OBJ_EXT	Makefile	/^OBJ_EXT = .o$/;"	m
+OSNAME	Makefile	/^OSNAME = linux$/;"	m
+OSVERS	Makefile	/^OSVERS = 2.6.35-28-generic$/;"	m
+O_FILES	Makefile	/^O_FILES  = $/;"	m
+PARENT_NAME	Makefile	/^PARENT_NAME = DBIx::Class::ResultSource$/;"	m
+PASTHRU	Makefile	/^PASTHRU = LIBPERL_A="$(LIBPERL_A)"\\$/;"	m
+PERL	Makefile	/^PERL = \/home\/amiri\/local\/bin\/perl "-Iinc"$/;"	m
+PERLMAINCC	Makefile	/^PERLMAINCC = $(CC)$/;"	m
+PERLPREFIX	Makefile	/^PERLPREFIX = \/home\/amiri\/local$/;"	m
+PERLRUN	Makefile	/^PERLRUN = $(PERL)$/;"	m
+PERLRUNINST	Makefile	/^PERLRUNINST = $(PERLRUN) "-I$(INST_ARCHLIB)" "-Iinc" "-I$(INST_LIB)"$/;"	m
+PERL_ARCHIVE	Makefile	/^PERL_ARCHIVE       = $/;"	m
+PERL_ARCHIVE_AFTER	Makefile	/^PERL_ARCHIVE_AFTER = $/;"	m
+PERL_ARCHLIB	Makefile	/^PERL_ARCHLIB = \/home\/amiri\/local\/lib\/perl5\/5.12.3\/x86_64-linux-thread-multi$/;"	m
+PERL_CORE	Makefile	/^PERL_CORE = 0$/;"	m
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) "-MExtUtils::Command::MM" "-e" "test_harness($(TEST_VERBOSE), 'inc', '$(INST_LIB)', '$(INST_ARCHLIB)')" $(TEST_FILES)$/;"	m
+PERL_DL_NONLAZY	Makefile	/^	PERL_DL_NONLAZY=1 $(FULLPERLRUN) $(TESTDB_SW) "-Iinc" "-I$(INST_LIB)" "-I$(INST_ARCHLIB)" $(TEST_FILE)$/;"	m
+PERL_INC	Makefile	/^PERL_INC = \/home\/amiri\/local\/lib\/perl5\/5.12.3\/x86_64-linux-thread-multi\/CORE$/;"	m
+PERL_LIB	Makefile	/^PERL_LIB =$/;"	m
+PERL_MALLOC_DEF	Makefile	/^PERL_MALLOC_DEF = -DPERL_EXTMALLOC_DEF -Dmalloc=Perl_malloc -Dfree=Perl_mfree -Drealloc=Perl_realloc -Dcalloc=Perl_calloc$/;"	m
+PERM_DIR	Makefile	/^PERM_DIR = 755$/;"	m
+PERM_RW	Makefile	/^PERM_RW = 644$/;"	m
+PERM_RWX	Makefile	/^PERM_RWX = 755$/;"	m
+PM_TO_BLIB	Makefile	/^PM_TO_BLIB = lib\/DBIx\/Class\/ResultSource\/MultipleTableInheritance.pm \\$/;"	m
+POD2MAN	Makefile	/^POD2MAN = $(POD2MAN_EXE)$/;"	m
+POD2MAN_EXE	Makefile	/^POD2MAN_EXE = $(PERLRUN) "-MExtUtils::Command::MM" -e pod2man "--"$/;"	m
+POSTOP	Makefile	/^POSTOP = $(NOECHO) $(NOOP)$/;"	m
+PREFIX	Makefile	/^PREFIX = $(SITEPREFIX)$/;"	m
+PREOP	Makefile	/^PREOP = $(NOECHO) $(NOOP)$/;"	m
+RANLIB	Makefile	/^RANLIB = :$/;"	m
+RCS_LABEL	Makefile	/^RCS_LABEL = rcs -Nv$(VERSION_SYM): -q$/;"	m
+RM_F	Makefile	/^RM_F = rm -f$/;"	m
+RM_RF	Makefile	/^RM_RF = rm -rf$/;"	m
+SHAR	Makefile	/^SHAR = shar$/;"	m
+SHELL	Makefile	/^SHELL = \/bin\/sh$/;"	m
+SITEARCHEXP	Makefile	/^SITEARCHEXP = \/home\/amiri\/local\/lib\/perl5\/site_perl\/5.12.3\/x86_64-linux-thread-multi$/;"	m
+SITELIBEXP	Makefile	/^SITELIBEXP = \/home\/amiri\/local\/lib\/perl5\/site_perl\/5.12.3$/;"	m
+SITEPREFIX	Makefile	/^SITEPREFIX = \/home\/amiri\/local$/;"	m
+SO	Makefile	/^SO = so$/;"	m
+SUFFIX	Makefile	/^SUFFIX = .gz$/;"	m
+TAR	Makefile	/^TAR = tar$/;"	m
+TARFLAGS	Makefile	/^TARFLAGS = cvf$/;"	m
+TESTDB_SW	Makefile	/^TESTDB_SW = -d$/;"	m
+TEST_F	Makefile	/^TEST_F = test -f$/;"	m
+TEST_FILE	Makefile	/^TEST_FILE = test.pl$/;"	m
+TEST_FILES	Makefile	/^TEST_FILES = t\/00use.t t\/01load.t t\/02view_def.t t\/03insert.t t\/04no_sequence_defined.t$/;"	m
+TEST_TYPE	Makefile	/^TEST_TYPE=test_$(LINKTYPE)$/;"	m
+TEST_VERBOSE	Makefile	/^TEST_VERBOSE=0$/;"	m
+TOUCH	Makefile	/^TOUCH = touch$/;"	m
+TO_INST_PM	Makefile	/^TO_INST_PM = lib\/DBIx\/Class\/ResultSource\/MultipleTableInheritance.pm$/;"	m
+TO_UNIX	Makefile	/^TO_UNIX = $(NOECHO) $(NOOP)$/;"	m
+TRUE	Makefile	/^TRUE = true$/;"	m
+UMASK_NULL	Makefile	/^UMASK_NULL = umask 0$/;"	m
+UNINST	Makefile	/^UNINST = 0$/;"	m
+UNINSTALL	Makefile	/^UNINSTALL = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'uninstall' --$/;"	m
+USEMAKEFILE	Makefile	/^USEMAKEFILE = -f$/;"	m
+VENDORARCHEXP	Makefile	/^VENDORARCHEXP = $/;"	m
+VENDORLIBEXP	Makefile	/^VENDORLIBEXP = $/;"	m
+VENDORPREFIX	Makefile	/^VENDORPREFIX = $/;"	m
+VERBINST	Makefile	/^VERBINST = 0$/;"	m
+VERSION	Makefile	/^VERSION = 0.01$/;"	m
+VERSION_FROM	Makefile	/^VERSION_FROM = lib\/DBIx\/Class\/ResultSource\/MultipleTableInheritance.pm$/;"	m
+VERSION_MACRO	Makefile	/^VERSION_MACRO = VERSION$/;"	m
+VERSION_SYM	Makefile	/^VERSION_SYM = 0_01$/;"	m
+WARN_IF_OLD_PACKLIST	Makefile	/^WARN_IF_OLD_PACKLIST = $(ABSPERLRUN) -MExtUtils::Command::MM -e 'warn_if_old_packlist' --$/;"	m
+Write	inc/Module/AutoInstall.pm	/^sub Write {$/;"	s
+WriteAll	inc/Module/Install/WriteAll.pm	/^sub WriteAll {$/;"	s
+WriteMyMeta	inc/Module/Install/Metadata.pm	/^sub WriteMyMeta {$/;"	s
+XS_DEFINE_VERSION	Makefile	/^XS_DEFINE_VERSION = -D$(XS_VERSION_MACRO)=\\"$(XS_VERSION)\\"$/;"	m
+XS_FILES	Makefile	/^XS_FILES = $/;"	m
+XS_VERSION	Makefile	/^XS_VERSION = 0.01$/;"	m
+XS_VERSION_MACRO	Makefile	/^XS_VERSION_MACRO = XS_VERSION$/;"	m
+ZIP	Makefile	/^ZIP = zip$/;"	m
+ZIPFLAGS	Makefile	/^ZIPFLAGS = -r$/;"	m
+_CLASS	inc/Module/Install.pm	/^sub _CLASS ($) {$/;"	s
+__extract_license	inc/Module/Install/Metadata.pm	/^sub __extract_license {$/;"	s
+__index__	README.html	/^<p><a name="__index__"><\/a><\/p>$/;"	a
+_accept_default	inc/Module/AutoInstall.pm	/^sub _accept_default {$/;"	s
+_caller	inc/Module/Install.pm	/^sub _caller {$/;"	s
+_can_write	inc/Module/AutoInstall.pm	/^sub _can_write {$/;"	s
+_check_lock	inc/Module/AutoInstall.pm	/^sub _check_lock {$/;"	s
+_cmp	inc/Module/Install.pm	/^sub _cmp ($$) {$/;"	s
+_connected_to	inc/Module/AutoInstall.pm	/^sub _connected_to {$/;"	s
+_cpanplus_config	inc/Module/AutoInstall.pm	/^sub _cpanplus_config {$/;"	s
+_extract_bugtracker	inc/Module/Install/Metadata.pm	/^sub _extract_bugtracker {$/;"	s
+_extract_license	inc/Module/Install/Metadata.pm	/^sub _extract_license {$/;"	s
+_extract_perl_version	inc/Module/Install/Metadata.pm	/^sub _extract_perl_version {$/;"	s
+_has_cpanplus	inc/Module/AutoInstall.pm	/^sub _has_cpanplus {$/;"	s
+_init	inc/Module/AutoInstall.pm	/^sub _init {$/;"	s
+_install_cpan	inc/Module/AutoInstall.pm	/^sub _install_cpan {$/;"	s
+_install_cpanplus	inc/Module/AutoInstall.pm	/^sub _install_cpanplus {$/;"	s
+_load	inc/Module/AutoInstall.pm	/^sub _load {$/;"	s
+_load_cpan	inc/Module/AutoInstall.pm	/^sub _load_cpan {$/;"	s
+_make_args	inc/Module/AutoInstall.pm	/^sub _make_args {$/;"	s
+_perl_version	inc/Module/Install/Metadata.pm	/^sub _perl_version {$/;"	s
+_prompt	inc/Module/AutoInstall.pm	/^sub _prompt {$/;"	s
+_read	inc/Module/Install.pm	/^sub _read {$/;"	s
+_readperl	inc/Module/Install.pm	/^sub _readperl {$/;"	s
+_readpod	inc/Module/Install.pm	/^sub _readpod {$/;"	s
+_running_under	inc/Module/AutoInstall.pm	/^sub _running_under {$/;"	s
+_top	inc/Module/Install/Base.pm	/^sub _top {$/;"	s
+_under_cpan	inc/Module/AutoInstall.pm	/^sub _under_cpan {$/;"	s
+_update_to	inc/Module/AutoInstall.pm	/^sub _update_to {$/;"	s
+_version	inc/Module/Install.pm	/^sub _version ($) {$/;"	s
+_version_cmp	inc/Module/AutoInstall.pm	/^sub _version_cmp {$/;"	s
+_wanted_t	inc/Module/Install/Makefile.pm	/^sub _wanted_t {$/;"	s
+_write	inc/Module/Install.pm	/^sub _write {$/;"	s
+_write_mymeta_data	inc/Module/Install/Metadata.pm	/^sub _write_mymeta_data {$/;"	s
+abstract_from	inc/Module/Install/Metadata.pm	/^sub abstract_from {$/;"	s
+add_additional_parent	README.html	/^<dt><strong><a name="add_additional_parent" class="item">add_additional_parent<\/a><\/strong><\/dt>$/;"	a
+add_additional_parents	README.html	/^<dt><strong><a name="add_additional_parents" class="item">add_additional_parents<\/a><\/strong><\/dt>$/;"	a
+add_metadata	inc/Module/Install/Metadata.pm	/^sub add_metadata {$/;"	s
+admin	inc/Module/Install/Base.pm	/^sub admin {$/;"	s
+all_from	inc/Module/Install/Metadata.pm	/^sub all_from {$/;"	s
+attach_additional_sources	README.html	/^<dt><strong><a name="attach_additional_sources" class="item">attach_additional_sources<\/a><\/strong><\/dt>$/;"	a
+author	README.html	/^<h1><a name="author">AUTHOR<\/a><\/h1>$/;"	a
+author_from	inc/Module/Install/Metadata.pm	/^sub author_from {$/;"	s
+auto_include	inc/Module/Install/Include.pm	/^sub auto_include {$/;"	s
+auto_include_dependent_dists	inc/Module/Install/Include.pm	/^sub auto_include_dependent_dists {$/;"	s
+auto_include_deps	inc/Module/Install/Include.pm	/^sub auto_include_deps {$/;"	s
+auto_install	inc/Module/Install/AutoInstall.pm	/^sub auto_install {$/;"	s
+auto_install_now	inc/Module/Install/AutoInstall.pm	/^sub auto_install_now {$/;"	s
+auto_provides	inc/Module/Install/Metadata.pm	/^sub auto_provides {$/;"	s
+autoload	inc/Module/Install.pm	/^sub autoload {$/;"	s
+bugtracker_from	inc/Module/Install/Metadata.pm	/^sub bugtracker_from {$/;"	s
+build_subdirs	inc/Module/Install/Makefile.pm	/^sub build_subdirs {$/;"	s
+call	inc/Module/Install.pm	/^sub call {$/;"	s
+can_cc	inc/Module/Install/Can.pm	/^sub can_cc {$/;"	s
+can_run	inc/Module/Install/Can.pm	/^sub can_run {$/;"	s
+can_use	inc/Module/Install/Can.pm	/^sub can_use {$/;"	s
+check_nmake	inc/Module/Install/Win32.pm	/^sub check_nmake {$/;"	s
+clean_files	inc/Module/Install/Makefile.pm	/^sub clean_files {$/;"	s
+contributors	README.html	/^<h2><a name="contributors">CONTRIBUTORS<\/a><\/h2>$/;"	a
+copyright	README.html	/^<h1><a name="copyright">COPYRIGHT<\/a><\/h1>$/;"	a
+do_install	inc/Module/AutoInstall.pm	/^sub do_install {$/;"	s
+dynamic_config	inc/Module/Install/Metadata.pm	/^sub dynamic_config {$/;"	s
+feature	inc/Module/Install/Metadata.pm	/^sub feature {$/;"	s
+features	inc/Module/Install/Metadata.pm	/^sub features {$/;"	s
+find_extensions	inc/Module/Install.pm	/^sub find_extensions {$/;"	s
+fix_up_makefile	inc/Module/Install/Makefile.pm	/^sub fix_up_makefile {$/;"	s
+ftp	inc/Module/Install/Win32.pm	/^  ftp:\/\/ftp.microsoft.com\/Softlib\/MSLFILES\/Nmake15.exe$/;"	l
+get_file	inc/Module/Install/Fetch.pm	/^sub get_file {$/;"	s
+how	README.html	/^<h1><a name="how">HOW?<\/a><\/h1>$/;"	a
+http	inc/Module/Install/Win32.pm	/^  http:\/\/download.microsoft.com\/download\/vc15\/Patch\/1.52\/W95\/EN-US\/Nmake15.exe$/;"	l
+import	inc/Module/AutoInstall.pm	/^sub import {$/;"	s
+import	inc/Module/Install.pm	/^sub import {$/;"	s
+inc	inc/Module/Install/Makefile.pm	/^sub inc {$/;"	s
+include	inc/Module/Install/Include.pm	/^sub include {$/;"	s
+include_deps	inc/Module/Install/Include.pm	/^sub include_deps {$/;"	s
+install	inc/Module/AutoInstall.pm	/^sub install {$/;"	s
+install_as_core	inc/Module/Install/Metadata.pm	/^sub install_as_core   { $_[0]->installdirs('perl')   }$/;"	s
+install_as_cpan	inc/Module/Install/Metadata.pm	/^sub install_as_cpan   { $_[0]->installdirs('site')   }$/;"	s
+install_as_site	inc/Module/Install/Metadata.pm	/^sub install_as_site   { $_[0]->installdirs('site')   }$/;"	s
+install_as_vendor	inc/Module/Install/Metadata.pm	/^sub install_as_vendor { $_[0]->installdirs('vendor') }$/;"	s
+install_requires	inc/Module/Install/Metadata.pm	/^sub install_requires  { shift->build_requires(@_) }$/;"	s
+is_admin	inc/Module/Install/Base.pm	/^sub is_admin {$/;"	s
+libs	inc/Module/Install/Makefile.pm	/^sub libs {$/;"	s
+license	README.html	/^<h1><a name="license">LICENSE<\/a><\/h1>$/;"	a
+license	inc/Module/Install/Metadata.pm	/^sub license {$/;"	s
+license_from	inc/Module/Install/Metadata.pm	/^sub license_from {$/;"	s
+load	inc/Module/Install.pm	/^sub load {$/;"	s
+load_extensions	inc/Module/Install.pm	/^sub load_extensions {$/;"	s
+main	inc/Module/AutoInstall.pm	/^sub main::PREREQ_PM { return {}; }$/;"	s
+makemaker	inc/Module/Install/Makefile.pm	/^sub makemaker {$/;"	s
+makemaker_append	inc/Module/Install/Makefile.pm	/^sub makemaker_append {$/;"	s
+makemaker_args	inc/Module/Install/Makefile.pm	/^sub makemaker_args {$/;"	s
+methods	README.html	/^<h1><a name="methods">METHODS<\/a><\/h1>$/;"	a
+missing_modules	inc/Module/AutoInstall.pm	/^sub missing_modules {$/;"	s
+name	README.html	/^<h1><a name="name">NAME<\/a><\/h1>$/;"	a
+name_from	inc/Module/Install/Metadata.pm	/^sub name_from {$/;"	s
+new	README.html	/^<dt><strong><a name="new" class="item">new<\/a><\/strong><\/dt>$/;"	a
+new	inc/Module/Install.pm	/^sub new {$/;"	s
+new	inc/Module/Install/Base.pm	/^sub new {$/;"	s
+no_index	inc/Module/Install/Metadata.pm	/^sub no_index {$/;"	s
+not	inc/Module/Install.pm	/^not:$/;"	l
+notice	README.html	/^<h1><a name="notice">NOTICE<\/a><\/h1>$/;"	a
+perl_version	inc/Module/Install/Metadata.pm	/^sub perl_version {$/;"	s
+perl_version_from	inc/Module/Install/Metadata.pm	/^sub perl_version_from {$/;"	s
+postamble	inc/Module/AutoInstall.pm	/^sub postamble {$/;"	s
+postamble	inc/Module/Install/Makefile.pm	/^sub postamble {$/;"	s
+preamble	inc/Module/Install/Makefile.pm	/^sub preamble {$/;"	s
+preload	inc/Module/Install.pm	/^sub preload {$/;"	s
+prompt	inc/Module/Install/Makefile.pm	/^sub prompt {$/;"	s
+provides	inc/Module/Install/Metadata.pm	/^sub provides {$/;"	s
+read	inc/Module/Install/Metadata.pm	/^sub read {$/;"	s
+realclean_files	inc/Module/Install/Makefile.pm	/^sub realclean_files {$/;"	s
+requires_from	inc/Module/Install/Metadata.pm	/^sub requires_from {$/;"	s
+resources	inc/Module/Install/Metadata.pm	/^sub resources {$/;"	s
+run	inc/Module/Install/AutoInstall.pm	/^sub run {$/;"	s
+see_also	README.html	/^<h1><a name="see_also">SEE ALSO<\/a><\/h1>$/;"	a
+sqlt_deploy_hook	t/lib/CafeInsertion.pm	/^sub sqlt_deploy_hook {$/;"	s
+sqlt_deploy_hook	t/lib/LoadTest.pm	/^sub sqlt_deploy_hook {$/;"	s
+sqlt_deploy_hook	t/lib/NoSequenceSalad.pm	/^sub sqlt_deploy_hook {$/;"	s
+synopsis	README.html	/^<h1><a name="synopsis">SYNOPSIS<\/a><\/h1>$/;"	a
+test_requires	inc/Module/Install/Metadata.pm	/^sub test_requires     { shift->build_requires(@_) }$/;"	s
+test_requires_from	inc/Module/Install/Metadata.pm	/^sub test_requires_from {$/;"	s
+tests_recursive	inc/Module/Install/Makefile.pm	/^sub tests_recursive {$/;"	s
+version_from	inc/Module/Install/Metadata.pm	/^sub version_from {$/;"	s
+view_definition	README.html	/^<dt><strong><a name="view_definition" class="item">view_definition<\/a><\/strong><\/dt>$/;"	a
+why	README.html	/^<h1><a name="why">WHY?<\/a><\/h1>$/;"	a
+write	inc/Module/Install/AutoInstall.pm	/^sub write {$/;"	s
+write	inc/Module/Install/Makefile.pm	/^sub write {$/;"	s
+write	inc/Module/Install/Metadata.pm	/^sub write {$/;"	s
+write_mymeta_json	inc/Module/Install/Metadata.pm	/^sub write_mymeta_json {$/;"	s
+write_mymeta_yaml	inc/Module/Install/Metadata.pm	/^sub write_mymeta_yaml {$/;"	s

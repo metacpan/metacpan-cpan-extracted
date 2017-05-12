@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 762f060574f3e5ae573bf28ae4e21e71542561a1 Build.PL
+SHA1 13ccf84bca75bf1663bcb428c5df111b4e8f1e90 Changes
+SHA1 148357f3dc544db2d23bcc3a04e90efac7dc94e4 MANIFEST
+SHA1 53bdb7441dbf19c3db8f36ff9bfcb65400592193 MANIFEST.SKIP
+SHA1 0bbbd76ac426cbd21278a09ad4c91238e0bf1acc META.yml
+SHA1 d6ca491c94854ea4803e59e7bd483b615e0a2651 Makefile.PL
+SHA1 3699be0b4d9d4ed4fdc5b1b37011be2db8df056b README
+SHA1 8f19f264e8991b278fcd92ca256bceb8d4e723f2 lib/DateTime/Event/Klingon.pm
+SHA1 8ceb1ca44b8309475006457bc2ed1eb44f844c37 t/00-signature.t
+SHA1 a7e91c09af64a46fc46e0adbfd6a066111b4f928 t/01-load.t
+SHA1 a6b5f6dfb70912a6aed6f5e3f3370b154e397fb3 t/gdtd.t
+SHA1 1d2a7163831b141e3047ff0fa9ca5fa6e4f3aa4b t/perl-critic.t
+SHA1 23fd2d8287e484ce0ab63bb2ddb2a29381ca2f27 t/perlcriticrc
+SHA1 fae7ba48ac81ed7eb52ac99197b8086c1e7df295 t/pod-coverage.t
+SHA1 b1a48ecf57a444b7832068690c24a731af4b8283 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iD8DBQFH9VOsIN9eM6kfjroRApfuAKCY+fxDvcrHk8slde/7p/1EZwYULACeP+ZB
+CjbiOMjuxCNEZAXWLRFO0VE=
+=hlPF
+-----END PGP SIGNATURE-----

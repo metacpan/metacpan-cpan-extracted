@@ -1,0 +1,12 @@
+Revision history for {{$dist->name}}
+{{
+	@wkdy = qw(Sun Mon Tue Wed Thu Fri Sat);
+	@mon = qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec);
+	@lt = localtime;
+    $date = join q{ }, $wkdy[$lt[6]], $lt[3], $mon[$lt[4]], $lt[5] + 1900;
+    '';
+}}
+0.001  {{$date}}
+       - Initial release.
+
+

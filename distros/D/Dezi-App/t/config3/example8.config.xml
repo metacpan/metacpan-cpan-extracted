@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with Dezi::Indexer::Config ver2_to_ver3()  -->
+<swish>
+ <!-- WARNING: BeginCharacters ignored by Swish3 -->
+ <BeginCharacters>abcdefghijklmnopqrstuvwxyz0123456789</BeginCharacters>
+ <!-- WARNING: BumpPositionCounterCharacters ignored by Swish3 -->
+ <BumpPositionCounterCharacters>|.</BumpPositionCounterCharacters>
+ <!-- WARNING: EndCharacters ignored by Swish3 -->
+ <EndCharacters>abcdefghijklmnopqrstuvwxyz0123456789</EndCharacters>
+ <!-- WARNING: FileFilter ignored by Swish3 -->
+ <FileFilter>.pdf ../filter-bin/_pdf2html.pl</FileFilter>
+ <!-- WARNING: IgnoreFirstChar ignored by Swish3 -->
+ <IgnoreFirstChar>.-</IgnoreFirstChar>
+ <!-- WARNING: IgnoreLastChar ignored by Swish3 -->
+ <IgnoreLastChar>.-</IgnoreLastChar>
+ <!-- WARNING: IgnoreWords ignored by Swish3 -->
+ <IgnoreWords>file: stopwords/my_stopwords.txt</IgnoreWords>
+ <!-- WARNING: SourceDir ignored by Swish3 -->
+ <SourceDir>.</SourceDir>
+ <!-- WARNING: SourceOnly ignored by Swish3 -->
+ <SourceOnly>.config .pdf</SourceOnly>
+ <!-- WARNING: TranslateCharacters ignored by Swish3 -->
+ <TranslateCharacters>:ascii7:</TranslateCharacters>
+ <!-- WARNING: Verbosity ignored by Swish3 -->
+ <Verbosity>2</Verbosity>
+ <!-- WARNING: WordCharacters ignored by Swish3 -->
+ <WordCharacters>abcdefghijklmnopqrstuvwxyz0123456789.-</WordCharacters>
+ <Index>
+  <Format>Native</Format>
+ </Index>
+</swish>

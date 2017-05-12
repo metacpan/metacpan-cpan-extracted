@@ -1,0 +1,27 @@
+#!/usr/local/bin/perl -w
+
+use 5.01;
+use strict;
+use utf8;
+use warnings;
+
+use Device::Inverter::KOSTAL::PIKO;
+
+die "USAGE: $0 <file>+\n" unless @ARGV;
+
+my $piko = Device::Inverter::KOSTAL::PIKO->new;
+
+my $last_timestamp;
+for (@ARGV) {
+    my $file = $piko->load( $_ eq '-' ? \*STDIN : $_ );
+    for ( $file->logdata_records ) {
+        my $timestamp = $_->timestamp;
+        if ( defined $last_timestamp && $last_timestamp >= $timestamp ) {
+            warn <<_ . $_->logdata->joined('');
+Records disordered at line $. of "$_": $last_timestamp >= $timestamp
+_
+        }
+        $last_timestamp = $timestamp;
+        say $timestamp->datetime;
+    }
+}

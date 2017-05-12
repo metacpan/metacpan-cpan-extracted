@@ -1,0 +1,26 @@
+Revision history for Dancer2::Plugin::Chain
+
+0.08  Sat Sep 17 07:25:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.07  Tue Sep 06 11:35:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.06  Tue Mar 22 10:45:00 2016
+      - Merged in GitHub PR #2, thanks to SysPete.
+      - Updated copyright year information in the pod document.
+
+0.05  Sat Jan 23 08:00:00 2016
+      - Fixed inconsistent version issue (CPANTS).
+
+0.04  Fri Jan 22 12:00:00 2016
+      - Merged in GitHub PR #1, thanks to SysPete.
+
+0.03  Sun Apr 05 03:10:00 2015
+      - Made the minimum requirement of Dancer2 and Dancer2::Plugin to be v0.159002.
+
+0.02  Sat Apr 04 12:50:00 2015
+      - Added section "ACKNOWLEDGEMENTS" to the pod document.
+
+0.01  Sat Apr 04 02:05:00 2015
+      - First draft created.

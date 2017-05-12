@@ -1,0 +1,24 @@
+Revision history for Dist::Zilla::PluginBundle::BESSARABV
+
+0.01    2013-03-29
+        * First public release
+
+0.02    2013-04-02
+        * CheckChangesHasContent is done before asking for CPAN login/pass
+
+0.03    2013-04-30
+        * Added all needed dependencies
+        * Fixing heder level in main pm file
+
+0.04    2013-06-21
+        * After `dzil release` creating tag without 'v'
+
+1.0.0   2013-07-29
+        [Major]
+        * Using SemVer for version numbers
+        * Added Dist::Zilla::Plugin::Test::CPAN::Changes
+
+1.0.1   2013-08-22
+        [Patch]
+        * Fixing plugin specification
+        * Added file .travis.yml

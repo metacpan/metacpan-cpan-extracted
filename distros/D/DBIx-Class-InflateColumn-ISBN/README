@@ -1,0 +1,93 @@
+NAME
+    DBIx::Class::InflateColumn::ISBN - Auto-create Business::ISBN objects
+    from columns.
+
+VERSION
+    Version 0.04000
+
+SYNOPSIS
+    Load this component and declare columns as ISBNs with the appropriate
+    format.
+
+        package Library;
+        __PACKAGE__->load_components(qw/InflateColumn::ISBN Core/);
+        __PACKAGE__->add_columns(
+            isbn => {
+                data_type => 'varchar',
+                size => 13,
+                is_nullable => 0,
+                is_isbn => 1,
+                as_string => 0,
+            }
+        );
+
+    It has to be a varchar rather than a simple integer given that it is
+    possible for ISBNs to contain the character X. Old style ISBNs are 10
+    characters, not including hyphens, but new style ones are 13 characters.
+
+    The "as_string" attribute is optional, and if set to 1 then values will
+    be stored in the database with hyphens in the appopriate places. In this
+    case, an extra 3 characters will be required.
+
+    Then you can treat the specified column as a Business::ISBN object.
+
+        print 'ISBN: ', $book->isbn->as_string;
+        print 'Publisher code: ', $book->isbn->publisher_code;
+
+METHODS
+  isbn_class
+    Arguments: $class
+
+    Gets/sets the address class that the columns should be inflated into.
+    The default class is Business::ISBN and only that is currently
+    supported.
+
+  register_column
+    Chains with "register_column" in DBIx::Class::Row, and sets up ISBN
+    columns appropriately. This would not normally be called directly by end
+    users.
+
+AUTHOR
+    K. J. Cheetham "<jamie @ shadowcatsystems.co.uk>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-inflatecolumn-ISBN at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-InflateColumn
+    -ISBN>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::InflateColumn::ISBN
+
+    You can also look for information at:
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/DBIx-Class-InflateColumn-ISBN>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/DBIx-Class-InflateColumn-ISBN>
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-InflateColumn-I
+        SBN>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/DBIx-Class-InflateColumn-ISBN>
+
+SEE ALSO
+    Business::ISBN
+
+    DBIx::Class::InflateColumn
+
+    WWW::Scraper::ISBN
+
+COPYRIGHT & LICENSE
+    Copyright 2007 K. J. Cheetham, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

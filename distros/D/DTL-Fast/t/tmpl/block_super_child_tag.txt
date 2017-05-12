@@ -1,0 +1,1 @@
+{% extends "block_super_parent.txt" %}{% block test_block %}incapsulated {% block_super %} in child{% endblock %}

@@ -1,0 +1,20 @@
+Revision history for Date-Piece
+
+v0.0.3 2009-06-25
+
+  * allow iterator() and thru() to handle 1-element date range
+
+v0.0.2 2008-02-20
+
+  * inclusion of bin/day frontend
+
+  * allow input to thru() to be a string
+
+v0.0.1 2007-12-30
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/Date-Piece/trunk
+
+vim:ts=2:sw=2:et:sta

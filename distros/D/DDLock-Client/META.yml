@@ -1,0 +1,36 @@
+---
+abstract: 'Client library for distributed lock daemon'
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DDLock-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: 0
+  ExtUtils::MakeMaker: 0
+  Fcntl: 0
+  File::Path: 0
+  File::Spec: 0
+  IO::File: 0
+  IO::Socket::INET: 0
+  Socket: 0
+  Test: 0
+  Test::More: 0
+  constant: 0
+  fields: 0
+  lib: 0
+  strict: 0
+  warnings: 0
+version: 0.50

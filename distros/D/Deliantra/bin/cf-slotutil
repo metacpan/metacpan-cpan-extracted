@@ -1,0 +1,192 @@
+#!/opt/bin/perl
+
+use utf8;
+use strict qw(vars subs);
+
+use Deliantra;
+use IO::AIO;
+use List::Util;
+
+sub scan_files($$) {
+   my ($path, $cb) = @_;
+
+   aio_scandir $path, 3, sub {
+      my ($dirs, $nondirs) = @_;
+
+      scan_files("$path/$_", $cb) for @$dirs;
+
+      for my $file (@$nondirs) {
+         next unless $file =~ /\.arc$/;
+
+         my $data;
+         aio_load "$path/$file", $data, sub {
+            $cb->("$path/$file", read_arch \$data);
+         };
+      }
+   };
+}
+
+sub for_all_arc($) {
+   scan_files $ENV{DELIANTRA_ARCHDIR} || ".", $_[0];
+
+   IO::AIO::flush;
+}
+
+sub extract {
+   my (undef, $filter, @slots) = @ARGV;
+
+   $filter =~ s/%(\w+)/\$_{$1}/g;
+   $filter = eval "sub { $filter }"
+      or die $@;
+
+   my @res;
+
+   unshift @slots, "_name";
+
+   my @sort   = grep /^\d+$/, @slots;
+   my @widths = map s/\=(\d+)$// && $1, grep !/^\d+$/, @slots;
+   my @align  = map s/>$// ? "" : "-", @slots;
+   my @big;
+
+   local *_;
+   for (sort keys %ARCH) {
+      *_ = $ARCH{$_};
+      next unless &$filter;
+      push @res, [@_{@slots}];
+   };
+
+   @res = sort {
+             "$a->[$_]$b->[$_]" =~ /^\d+$/
+                ? $a->[$_] <=> $b->[$_]
+                : $a->[$_] cmp $b->[$_]
+          } @res
+      for @sort;
+
+   for my $row (@res) {
+      for (0 .. $#$row) {
+         $big[$_] =1 if $row->[$_] =~ /\n/;
+      }
+   }
+   for my $i (0 .. $#widths) {
+      $widths[$i] ||= List::Util::max map length $_->[$i], \@slots, @res;
+   }
+
+   for (0 .. $#big) {
+      $widths[$_] = length $slots[$_] if $big[$_];
+   }
+
+   my $format = join " ", map "%$align[$_]$widths[$_]s", 0..$#widths;
+
+   printf "$format\n", map "A$_", map $_ + 1, @widths;
+   printf "$format\n", @slots;
+   for my $row (@res) {
+      print "\n" if @big;
+
+      printf "$format\n", map $big[$_] ? "\x{fffc}" : $row->[$_], 0 .. $#$row;
+
+      for (grep $big[$_], 0 .. $#big) {
+         print "$row->[$_]%%\n";
+      }
+   }
+}
+
+sub insert {
+   my ($apply) = @_;
+
+   shift @ARGV;
+   my $format = <STDIN>;
+   my @slots = unpack $format, <STDIN>;
+   s/^\s+// for @slots;
+   
+   my %res;
+
+   while (<STDIN>) {
+      next unless /\S/;
+
+      my @row = unpack $format, $_;
+      s/^\s+// for @row;
+
+      for (0 .. $#row) {
+         next unless $row[$_] eq "\x{fffc}";
+
+         local $/ = "%%\n";
+         chomp ($row[$_] = <STDIN>);
+      }
+
+      $res{$row[0]} = \@row;
+   }
+
+   for_all_arc sub {
+      my ($path, $arch) = @_;
+
+      my $chg;
+
+      for (keys %$arch) {
+         my $data = $res{$_}
+            or next;
+
+         my $arch = $arch->{$_};
+
+         for (0 .. $#$data) {
+            next if $data->[$_] eq $arch->{$slots[$_]};
+            $chg = 1;
+            $arch->{$slots[$_]} = $data->[$_];
+         }
+      }
+
+      if ($chg) {
+         open my $fh, ">:raw:utf8", "$path~"
+           or die "$path~: $!";
+         print $fh Deliantra::archlist_to_string [
+            map $arch->{$_},
+               sort keys %$arch
+         ];
+         close $fh;
+
+         if ($apply) {
+            rename "$path~", $path;
+         } else {
+            system "diff", "-u", $path, "$path~";
+            unlink "$path~";
+         }
+      }
+   };
+}
+
+binmode STDIN, ":utf8";
+binmode STDOUT, ":utf8";
+
+if ($ARGV[0] eq "extract") {
+   Deliantra::load_archetypes;
+   extract;
+} elsif ($ARGV[0] eq "diff") {
+   Deliantra::load_archetypes;
+   insert 0;
+} elsif ($ARGV[0] eq "patch") {
+   Deliantra::load_archetypes;
+   insert 1;
+} else {
+   die <<EOF;
+Usage:
+
+    $0 extract 'filter' slot...
+
+        extract slots from server archetypes file (NOT the .arc files!)
+        Example: $0 extract '%type == 101' level
+
+    $0 diff
+
+        generates a diff against the .arc files found
+        in \$DELIANTRA_ARCHDIR or ".".
+
+        Example: $0 diff <file
+
+    $0 patch
+
+        like diff, but applies it in-place
+
+EOF
+}
+
+
+

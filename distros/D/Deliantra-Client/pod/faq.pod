@@ -1,0 +1,767 @@
+=head1 FAQ, Tips and Tricks
+
+Here are some questions you might asked yourself over time.
+Also some nice tips and tricks are listed here, which you may find informative.
+
+=head2 Meta - About the Game and the Client
+
+=head3 What is the relation between Deliantra and Crossfire?
+
+Deliantra was originally a Crossfire server, but by now most of the code
+has been rewritten. Still, most maps are very similar or identical to
+Crossfire maps, so the games share a lot.
+
+The major differences are a better client, better graphics, a stable
+server (i.e. no crashes every few hours with players and maps getting
+reset) and the ability to let more players play, by using less resources
+and having a fully asynchronous design, and full support for sound effects
+and background music.
+
+=head3 I found a bug, how can I report it/what do I do?
+
+Mail us at support@deliantra.net , which is best, unless it is a small,
+temporary, or urgent issue. If it is, then tell schmorp, elmex, or Asarth.
+
+=head3 The client is very sluggish and slow, what can I do about this?
+
+Most likely, you don't have accelerated OpenGL support. Try to find a
+newer driver, or a driver from your hardware vendor, that features OpenGL
+support.
+
+If this is not an option, the following Setup options reduce the load and
+will likely make the client playable with software rendering (it will
+still be slow, though):
+
+=over 4
+
+=item * B<Video Mode> should be set as low as possible (e.g. 640x480)
+
+=item * Enable B<Fast & Ugly> mode
+
+=item * Disable B<Fog of War> and C<Map Smoothing>
+
+=item * Increase B<Map Scale>
+
+=back
+
+=head3 The client doesn't correctly react to keypresses or mouseclicks.
+
+=over 4
+
+=item Make sure Numlock is off.
+
+Some Microsoft Windows versions/keyboard layouts do not report modifiers for the
+numerical keypad keys while Numlock is active.
+
+=item Make sure no other Modifier is "pressed".
+
+Mircosoft Windows versions have some accessability features that could
+interfere with games like Deliantra. You might want to switch these off in
+the keyboard settings. Sometimes modifiers can be "unstuck" by pressing
+them down once.
+
+=item Fullscreen switches confuse the keyboard modifiers.
+
+Fullscreen switches on Microsoft Windows sometimes confuse which keys are
+pressed and which aren't. Doing another switch to/from fullscreen might
+help.
+
+=back
+
+=head3 My client doesn't start anymore/graphics are corrupted!
+
+Sometimes you hit a bug in the client. To reset the state of your client
+you can delete your client database directory (your client will have to
+re-download music and images and you will lose your minimap contents).
+
+=over 4
+
+To do that, on Unix:
+
+   rm -rf ~/.deliantra/client-*
+
+On windows:
+
+Do C<< Start => Run >>, enter F<%APPDATA%>, press return, and in the
+window that will open, first open F<deliantra>, then delete the directory
+starting with F<client->.
+
+=back
+
+Alternatively you can delete the F<.deliantra> or F<deliantra> directory
+itself, but this will also delete your settings and keybindings.
+
+
+=head2 Game Mechanics
+
+=head3 What is this place I go to when I die?
+
+When you die, you go to a place called the nimbus. In the nimbus, you are
+able to play minesweeper for your experience. If you win and have applied
+all the spaces except for bombs, you will automatically be teleported to
+a hallway you can walk down to be teleported back to life, with your
+experience intact.
+
+If you lose by applying a bomb, you are teleported to a hallway
+with a flower, and you can walk down to be teleported back to life,
+without your experience you lost when you died. There are rumors
+that the Key to Life can let the losers walk in the winner's
+hallway, however...
+
+=head3 I lose health, but I can't see why! Or how do I cure diseases/depletion/poison?
+
+Here are the typical reasons why you lose health:
+
+=over 4
+
+=item * You are being attacked.
+
+Sounds obvious, but sometimes you can't see the monster attacking
+you. Check the C<Log> tab, as you usually get a message when this happens.
+
+=item * You are out of food.
+
+When your food reaches C<0> you will start to lose health. Eating (good)
+food will replenish your food level.
+
+=item * You are poisoned.
+
+Poison will reduce your health. When your body heals fast enough it will
+eventually get over the poison, otherwise you should seek professional
+help such as the House of Healing in Scorn, or a player with the C<cure
+poison> spell.  It is rumored that neko san might sometimes cure poison.
+
+=item * You have a disease.
+
+Some diseases have such drastic effects on your organism that you can lose
+health. Get help in the House of Healing in Scorn, or ask a player who can
+cast C<cure disease> on you.
+
+=item * Your stats change.
+
+Switching items or being restored from depletion can affect your stats,
+which in turn can affect your healthpoints. While this is not a regular
+effect (it only happens when you change items or are restored from
+depletion), it can sometimes look as if you are losing health. You can
+restore depletion by drinking a potion of life.
+
+=back
+
+=head3 How do diseases work?
+
+Diseases are obtained by things like traps or spells. Usually, they
+will reduce some of your attributes, like strength. They might also
+cause damage to you, or slow you down. Some of them infect monsters
+and players around you, spreading the disease.
+
+If your disease can be cured naturally, and if you do wait until
+it is cured naturally, you develop immunity for that level of
+disease. Higher level forms of that disease will still infect
+you, but you can wait it out to get better immunity.
+
+Some diseases, like rabies, cannot be cured by waiting.
+Instead, you will have to cure it magically. For information on how
+to do that, see the above entry.
+
+=head3 I lost an item! How?
+
+Well, we don't know. If you don't know, either, here is a partial list of
+ways people typically lose stuff:
+
+=over 4
+
+=item You accidentally dropped it in a shop (or elswehere).
+
+If in a shop, if it was money, you can just go there and pick it up again:
+shops do not "buy" money. For other items you will have to buy it back.
+
+=item Thieves or monsters stole your items.
+
+Yes, thieves and many other monsters (such as demons) can actually steal
+stuff. They can steal about anything that you don't currently wield, and
+if they are good, you don't even notice it. Your only chance of getting
+the item back is to kill the thief or steal the item back with the steal
+skill before the map he is in resets.
+
+Many adventurers find that the old road to Navar harbours a lot of thieves
+and is best avoided by the beginning adventurers.
+
+=back
+
+=head3 How do I uncurse/undamn items?
+
+You need a spell to uncurse or undamn items, but luckily, magic shops
+commonly have scrolls of remove curse or remove damnation. In addition,
+all of the gods except the Devourers can remove curses, and Gnarg,
+Lythander, Mostrai, Gaea, and Valriel can remove damnation. Gaea also
+grants the remove damnation spell at 300 grace.
+
+To actually remove the curse or damnation with a scroll, you need to
+L<mark> the item, and then L<apply> the scroll.
+
+=head3 When I log-in, I keep dying! Why is this?
+
+What happened is that you died of a cave-in. Cave-ins kill you when you
+unsafely log out. An unsafe log out is when you disconnect without using a
+bed to reality, or when you time out (after 10-20 seconds without reply,
+the server automatically kicks players). Safe log outs are when you log
+out using a bed to realtiy, or when you are disconnected when the server
+crashes or restarts.
+
+If the disconnection was safe, then you will appear where you were before
+you got logged out. If it was unsafe, and more than one hour has passed, you
+will die of a cave-in. If the map you were in reset, but one hour has not
+passed, then you will be recalled to your bed to reality.
+
+=head3 Where do I find beds to reality?
+
+Inns usually have them, and apartments almost always have beds to
+reality. Almost every city has an inn. Taverns sometimes have them, and
+they might be in surprising places. Scorn has an inn that is located in
+the southern area.
+
+=head3 How does the I<identify> spell work?
+
+The I<identify> spell identifies your items, making it give it's full
+description. The spell goes through your inventory in a psuedo-random
+order, skipping past identified items. If it identifies all the items
+in your inventory, or they are already identified, it then checks for
+identified items on the ground, again in a psuedo-random order. If it
+identifies all the items on the ground, then the remaining power is
+wasted.
+
+The I<identify> spell counts stacks of items, such as arrows or gems, as
+one 'item'. It can only identify a certain amount of items. Therefore, the
+only way to choose what it identifies is by dropping what you don't want
+identified on the ground.
+
+=head3 What do altars do?
+
+There are different types of altars. Altars found in churches and
+chapels are aligned to gods; they usually have decoration based
+on the god they are aligned to. You can pray at these altars to 
+start worshipping the god the altar is aligned to, or pray to
+get over your normal grace limit, get grace faster, or any
+other effects the altar might have.
+
+Pink altars usually require a sacrifice, which can be seen by
+rolling your mouse over it at the bottom of the screen. If you
+drop the sacrifiice, it will activate something, like a gate, or
+maybe it will teleport something.
+
+=head3 How come I don't get any change from an altar?
+
+Altars do not give change. This means that you might drop a platinum piece
+on a table that identifies for 2 gold, or equivalent, and get only one
+identify. The equivalent means that you can make the price up in smaller
+currency, like 200 silver, but higher currency won't get you any more
+identifies.
+
+=head3 What diseases cannot be cured naturally?
+
+Tapeworms, leprosy, and arthritis are all unable to be cured naturally,
+and thus you cannot have an immunity against them.
+
+=head3 Where can I use building materials?
+
+You can only use them in tiles that are buildable. These tiles are found in
+guild storages, and in some apartments.
+
+=head3 How can I Prepare/Improve/Enchant Weapons?
+
+This is done in two steps: first you have to I<prepare> your weapon
+for the desired number of enchantments, then you apply the enchanments
+(weapons remember how many times they can be enchanted further).
+
+To prepare a weapon, wield it and L<mark> (e.g. using the popup menu in
+the inventory) it. Then, as a sacrifice, drop some diamonds on the floor
+then read the I<Prepare Weapon> scroll. The square root of the total 
+number of diamonds sacrificed this way determines the number of 
+enchantments the weapon accepts: one diamond for one enchanment, nine 
+diamonds for three enchantments, 100 diamonds for ten enchantments, 
+and so on.
+
+Remember, once you prepare the weapon, it can only be wielded by you.
+
+After that, you can apply improvement and enchantnment scrolls:
+
+=over 4
+
+=item Improve Damage
+
+Each scroll read will increase the damage by five points, and likewise the
+weight by five kilograms.
+
+=item Lower Weight
+
+This "improves" the weight of your weapon: each scroll reduces the weight
+by one fifth (20%). It will not, however, create weightless weapons.
+
+=item Enchant Weapon
+
+Each scroll read increases the magic by one point.
+
+=item Improve Stat
+
+This scroll improves one of the basic stat improvements (Strength,
+Dexterity and so on). For this it needs a further sacrifice in form of
+stat potions. The stat potions must be of the same type and will determine
+which stat gets improved.
+
+The number of stat potions you need to improve it is twice the number of
+stat points the weapon currently gives, plus one (the minimum is two stat
+potions, however). That is, a weapon which gives no stat bonus needs two
+(C<0 × 2 + 1 = 1> which is less than two, so two) stat potion, one that
+already gives I<Str +2> and I<Int +1> will need seven (C<3 × 2 + 1>) stat
+potions. Negative stats are summed normally, so I<Str +4> and I<Int -2>
+will result in needing five stat potions only (C<2 × 2 + 1>).
+
+=back
+
+Keep in mind, however, that your character can only handle a limited
+number of weapon improvements, see the L<skills> command. Item power will
+also increase.
+
+=head3 How can I enchant Armour?
+
+Enchanting armour is easy: each time you read an I<Enchant Armour> scroll,
+the magic value will be increased by one, the speed, armour (physical
+resistance) and weight are increased by some amount, as well as the item
+power.
+
+=head3 What is this item power business?
+
+In general, the more interesting/powerful items have higher item power
+values. Your character can handle only handle only a limited amount of
+power - for each overall level you can handle C<1.25> item power points,
+so if you are level 16 you can handle a total of 20 item power points (see
+the L<skills> command for your current limit and remaining item power
+points).
+
+All the equipment you wear adds to this limit, so if you wield a weapon of
+item power 30 plus two rings of item power 14 each you will need 58 item
+power (and a level of 47).
+
+
+=head2 Generic how do I...
+
+=head3 How do I uncurse/undamn items or unwear cursed/damned items?
+
+You need a spell to uncurse or undamn items, but luckily, magic shops
+commonly have scrolls of remove curse or remove damnation. In addition,
+all of the gods except the Devourers can remove curses, and Gnarg,
+Lythander, Mostrai, Gaea, and Valriel can remove damnation. Gaea also
+grants the remove damnation spell at 300 grace.
+
+To actually remove the curse or damnation with a scroll, you need to
+L<mark> the item, and then L<apply> the scroll. Once the curse or
+damnation is removed, you can unwear the item.
+
+=head3 How do I use range weapons such as bows?
+
+First, you have to L<apply> the bow, then it will show up in the lower
+right corner in the C<Range:> slot. If it is already shown as C<(applied)>
+but not in the C<Range:> slot you have to unapply and reaply it.
+
+When you have a bow (or similar weapons like guns or crossbows) applied,
+you just shoot as with spells or other range attacks - C<Shift>+direction
+key.
+
+You need to have arrows (shells, bolts etc.) in your inventory or an
+active container for this to work.
+
+You can influence how you shoot via the L<Bow Mode|bowmode> in the C<<
+Playerbook => Settings >> tab.
+
+=head3 X<faq_igniteandthaw>How do I thaw icecubes? Or: How do I ignite a torch?
+
+The right-click context menu in the playerbook inventory has an entry
+B<ignite/thaw>, which will ignite something or thaw icecubes.  You will
+need a B<flint & steel> L<$ARCH/flint_and_steel.x11> for
+this to work!
+
+An alternative would be to use the L<mark|command/mark> and
+L<apply|command/apply> commands like this:
+
+   mark icecube
+   apply flint and steel
+
+You can bind these commands to a key and invoke them repeatedly.
+
+=head3 How do I cast a cone spell all around me (burning hands, holy word etc.)?
+
+Use the C<5>-key on your keypad. This will cats spells "onto yourself"
+which has the desired effect with cone spells.
+
+=head3 How do I pay for items from a shop?
+
+You need to have the unpaid item in your inventory, and then walk out of
+the store with the shop mat. It will automatically pay for the item, if
+you have enough money. If you don't, you will be prevented from leaving,
+until you drop the unpaid item, or if you obtain enough money.
+
+=head3 How do I sell items to a shop?
+
+Just drop the item in a shop. Some tiles in a shop might not be shop
+tiles; usually, shop tiles are white brick floors. Try going over one of
+them and dropping the item. If the shop is not interested, the item will
+not leave your inventory.
+
+=head3 How do I increase my attributes?
+
+To increase your attributes (strength, dexterity, etc.) you can wear items
+that can increase them as long as you have them worn. You can get your
+attributes up to 30 like this. To increase them permanently, you can
+drink a stat potion, which have special colors and a letter on the potion
+named 'potion of <attribute>'. These potions can increase your attributes
+up to the natural maximum of your race; which can be viewd with the
+statistics command. It increases your 'natural' attribute, up to the
+'maximum' attribute.
+
+=head3 How do I get my literacy experience up?
+
+You need to read books and scrolls to get literacy experience. You can
+also use the literacy skill to identify scrolls and books. Identifying
+them gives you literacy experience, and you are still able to read them
+once you identify them.
+
+=head3 How do I rent and maintain an apartment?
+
+Payment for an apartment is done in 3 steps. First, there is an entry fee
+in the apartment map that you need to pay only once. Then, the apartment
+rental fee depends on the apartment model, not you. The taxes depend on
+your character level, and need to be paid, even while you are offline (the
+rental fee is only paid while you are online.)
+
+You can rent apartments in Scorn's Apartment Shop, and the hourly fees are
+deducted from your bank account.
+
+=head3 How do I use passes/keys?
+
+Whatever looks at your pass or key opens automatically, if you have it in
+your inventory or in an applied container. Some keys might just open a
+locked door, not a gate, and can be used by moving into the locked door.
+
+=head3 How do I find out where the key is to a locked door?
+
+Usually, bumping into the locked door will tell you what kind of key
+you need. This key is probably hidden somewhere in the same or close maps.
+Some of the characters near by might give you hints or explain something.
+
+=head3 How do I see how much an altar or table costs to use?
+
+You can move your mouse over it, and it will tell you how much currency it
+needs.
+
+=head3 How do I join a guild?
+
+To join a player guild, such as the Black Shield or Laughing Skull (not
+the Adventurer's Guild, the Guild of Freedom, or anything else like
+them), you need to be given a key by one of its current members.
+The players might have special tasks and requirements for you, but all that
+is needed is to have the key to enter the guild building and use its features.
+
+=head3 How do I drop items?
+
+To drop items, you can right click on the item in your inventory screen in
+the playerbook, which you can get by pressing F5 or the Playerbook tab,
+and selecting drop. You can also shift + left click an item to drop it, or
+enter the command
+
+   drop <item>
+
+This command drops items with the names that have <item> in it. If you are
+unable to drop an item, this will probably be because it is locked. You
+can unlock it by right clicking the item in your inventory, and selecting
+unlock.
+
+=head3 How do I pick up items?
+
+You can pick up items by pressing the comma key (,) or by right clicking
+the item on the floor, and selecting 'take'. You can also type the
+
+   take <item>
+
+command.
+
+=head3 How do I make money, fast?!
+
+You should identify the items you sell. Unidentified items sell MUCH
+lower. Make sure you have the bargaining skill. It lets you save lots of
+money when you buy stuff, and gain more money when you sell stuff. You can
+level it up by buying items or selling expensive items. The higher it is
+priced, the more experience. You can get a scroll of bargaining in Scorn's
+gem shop.
+
+Quests also might give you something valuable as a reward.
+
+=head2 Playing Together
+
+=head3 How can I communicate with other players?
+
+There are five commands you can use to talk to others. All of them can
+be entered by just typing them in, followed by the message, followed by
+C<Return>, e.g. C<chat hey guys, what's up?>. If you have a I<tab> open
+in your message window you can also just type a text in there followed
+by C<Return> (this is especially handy as C<Return> also activates the
+current chat tab as well).
+
+=over 4
+
+=item chat <message> (short: C<c>)
+
+The most-used communications command. Whatever you I<chat> will end up
+in the I<Chat> tab of everybody else who is currently logged in.
+
+Example:
+
+   c uh, that anchovis almost killed me
+
+=item shout <message>
+
+This is like C<chat>, but "louder". Everybody will get your message in red
+in their C<Chat> tabs.  You should not use C<shout> unless you are in an
+emergency or there is something really important to be said, otherwise you
+risk being ignored by people.
+
+Example:
+
+   sh I am stuck! can anybody let me out?
+
+=item say <message> (short: C<s>)
+
+This command can be used to talk to NPCs (without going through the NPC
+dialogue window), but all players anywhere on the same map can hear you as
+well.
+
+Example:
+
+   s good that schmorp cnanot hera us here!
+
+=item tell <playername> <message> (short: C<te>)
+
+This is your prototypical two-way, private, chat channel. You can talk to
+any other player that is currently logged in, and only he can hear you.
+
+=item gsay <message> (short: C<gs>)
+
+The group say command sends a message to every member of the party/group
+you are in. This is useful when playing in a team, to avoid cluttering the
+chat channel.
+
+=back
+
+In addition to these, there are a large number of emotes you can use, use
+the L<help> command to get a list.
+
+=head3 Can I form parties? Which benefits does party-play have?
+
+You can form I<new> parties using the C<< party form <name> >> name
+command, and you can join I<existing> parties using the C<< party join
+<name> >> command. There are other party commands, use C<help party> to
+find out more.
+
+The main benefit of party-play is sharing experience: All experience you
+gain is distributed to all party members accoridng to their level (people
+with twice the level as you gain twice as much experience).
+
+This is great for training skills you are bad in, but somebody else is
+good in, and of course vice versa!
+
+
+=head2 Magic
+
+=head3 How does an improvement potion work?
+
+An improvement potion increases your hitpoints, spellpoints, or your grace, 
+permanently. It does this by rerolling the rolls for your hitpoints, spellpoints,
+or grace, and increasing it. This way, if you drink enough improvement
+potions, your hitpoints, spellpoints, or grace would be as if you rolled perfectly.
+
+However, only lower levels roll for hitpoints, spellpoints, or grace. After level 
+10, skills increase hitpoints, spellpoints, or grace by a certain fixed amount.
+
+=head3 How do I control golems I summon?
+
+You can control golems by holding down shift + a direction key. It moves in the
+direction you are holding.
+
+=head3 How can I summon a specific monster with C<summon pet monster>?
+
+Higher (effective) casting levels of L<skill_description/summoning> give
+you access to higher level monsters, but not all monsters have equal
+abilities. Instead of summoning the highest level monster allowed by your
+level you can also summon any other monster you had before by adding its
+I<archetype name> after the command, i.e. to summon bees you would use the
+C<cast summon pet monster bee> (short: C<cspm bee>) command.
+
+   Level  Monster
+       1  bat
+       3  bird
+       4  spider
+       6  killer_bee
+       7  pixie
+       8  skeleton
+       9  stalker
+      11  devil
+      13  beholder
+      15  dark_elf
+      17  skull
+      20  angel
+      25  vampire
+      30  spectre
+      35  lich
+      40  demilich
+      50  hellhound
+      60  unusual_kobold
+      70  chicken
+      80  gr_hellhound
+      90  dave
+     100  laoch
+     105  snitchangel
+
+=head3 How does being attuned/repelled/denied affect casting level?
+
+Some spells are attuned to one or more spell classes (such as wounding,
+summoning, fire and so on). The player can likewise be attuned to some of
+these classes, giving a bonus, or repelled to them, giving a malus, or
+denied to them, making her unable to cast the spell at all.
+
+The skill level is the level of the skill that the spell uses (e.g.
+summoning or sorcery).
+
+When attuned, the bonus is up to 16 levels, but never higher than the
+skill level itself, i.e. at level 2, the bonus is 2 also, resulting in an
+attuned casting level of 4, at level 5, the bonus is 5, yielding a casting
+level of 10, and at level 50, the bonus is 16, yielding 66.
+
+When repelled, the malus is 16 levels always. If you are both attuned and
+repelled at the same time, the effects will add.
+
+These are added (or subtracted) to the skill level when checking whether
+the player can cast the spell and when calculating the effective casting
+level.
+
+The effect on strength is as if the minimum spell level is lower (when
+attuned) or higher (when repelled), and the strength will increase the
+same as without any attunement.
+
+=head3 What is the "effective" casting level?
+
+Effective casting levels start at 1 (lowest spell strength) and go up to
+100 (highest nominal spell strength). Higher levels are also possible and
+make the spell correspondingly stronger.
+
+The effective casting level is calculated from the skill level, after
+adding/subtracting any bonus from attunements.
+
+If the skill level plus bonus is lower than 100, then the minimum spell
+level comes into play: the minimum level is not only the minimum level
+a caster is required to have, it is also the level where the effective
+casting level equals 1. From there it grows till it reaches casting level
+100, where the effective level will also be 100.
+
+If the skill level plus bonus is 100 or higher, then this is the effective
+spell level.
+
+That means, when you have a spell with a minimum level of 90, then it's
+effective range will be spread evenly over the 90..100 range, e.g. when
+you cast this spell at skill level 90, the effective casting level will
+be 1 (lowest). Casting at level 91 gives casting level 11, skill level
+98 gives effective level 80, up to skill level 100, which then gives
+effective level 100.
+
+
+=head2 Praying, Gods and Cults
+
+=head3 X<how_to_pray>How do I pray or get the praying skill?
+
+First enter the "praying mode" by readying your L<skill_description/praying> skill
+(by default bound to C<Alt-P>, or by typing C<rspraying>), then hold and keep holding
+C<Shift> and a direction key (e.g. C<Shift-Up>).
+
+You will now pray as long as you keep pressing the keys.
+
+However, if you do not have the praying skill, you can obtain it by
+reading a scroll of praying. This will let you learn the praying skill
+depending on your intelligence. You can also use a holy symbol to use the
+praying skill, as long as you have the holy symbol in your inventory. Holy
+symbols can be found in shops and random dungeons.
+
+=head3 How can I summon a specific monster with C<summon cult monster>?
+
+You can't, your god selects the monsters for you.
+
+=head3 How do I join a cult/become a follower of a god?
+
+That is simple, just find an altar of a god of your choice and start
+L<skill_description/praying>. Eventually, the god will recognize
+you.
+
+=head3 How do I change gods?
+
+That is far more difficult: gods really hate it when you defect
+them. Expect to lose a lot of L<skill_description/praying> experience in
+the process.
+
+First you should pray long enough to your god, until you gain 95%
+resistance to god power. Then quickly go to the altar of your newly-chosen
+god and pray on her/his altar. Your old god won't make it easy, but if you
+are persistent your old god will let you go at one point.
+
+
+=head2 Exploring / Quests
+
+=head3 What areas are there to explore?
+
+First, you should explore Scorn and find the port pass (and maybe also the
+gate pass). Make sure you don't miss out the old city of scorn, many
+a dangers, but also many treasures, can be found there.
+
+When you finished most of the quests in Scorn you should investigate how
+the pirates escape from the prison. This will lead to a number of nice
+quests in and around Port Joseph.
+
+Another nice series of quests, from low to medium level, can be found in
+the King's Palace in Scorn. Who wouldn't want to meet the princess in
+person?
+
+The areas you can reach through the various transportation modes in Scorn
+are Pupland (which has a lot of puzzles and quests from very low to very
+high level), Stoneville and Santo Dominion (low and medium level quests,
+also nice shops), and the Aldwulf Archipelago (which is more dangerous).
+
+Through the gate you can reach Euthville and Santo Dominion to the north,
+Brest (medium level) and Lake Country (medium to high level) to the south,
+and Navar (medium level quests) in the east (a long travel).
+
+From Navar you can travel to Darcap in the far north (medium level
+quests), near the mystical country of Azumauindo, to Wolfsburg somewhere
+on the ocean, a rather dangerous area with many thieves and pirates
+(medium level quests) and Valleynoy to the south, with medium and high
+level quests (did you find the southpole yet?).
+
+Also, it is said that Navar somehow has access to the mystical City
+de Clouds, the biggest city ever seen (high level and very high level
+quests). There are rumors about lands beyond (St. Bartholemew and other
+cities) and other even more mystical places, but little is known about
+that.
+
+=head3 Where is that damn Goblin Chief?
+
+In his cave to the north-east of the Scorn Gate. It is the one that starts
+with a random maze (yes, there are multiple caves). Keep in mind that the
+Goblin Chief's Head is fastened to his body, so you have to find and kill
+him first.
+
+=head3 Where can I find the I<comet> spell?
+
+In the tower of stars, which is almost directly south of Scorn (but not
+too near to it). You have to talk to people to solve this quest, and it
+does not involve a random maze.
+
+
+=head1 Authors
+
+The following people contributed to this document: Robin Redeker, John O'Donnell
+and Marc Lehmann.

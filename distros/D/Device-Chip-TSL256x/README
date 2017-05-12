@@ -1,0 +1,106 @@
+NAME
+
+    Device::Chip::TSL256x - chip driver for TSL256x
+
+SYNOPSIS
+
+     use Device::Chip::TSL256x;
+    
+     my $chip = Device::Chip::TSL256x->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     $chip->power(1)->get;
+    
+     sleep 1; # Wait for one integration cycle
+    
+     printf "Current ambient light level is %.2f lux\n",
+        scalar $chip->read_lux->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a TAOS
+    TSL2560 or TSL2561 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+ACCESSORS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Returns a HASH reference of the contents of timing control register,
+    using fields named from the data sheet.
+
+       GAIN  => 1 | 16
+       INTEG => 13ms | 101ms | 420ms
+
+ change_config
+
+       $chip->change_config( %changes )->get
+
+    Writes updates to the timing control register.
+
+    Note that these two methods use a cache of configuration bytes to make
+    subsequent modifications more efficient. This cache will not respect
+    the "one-shot" nature of the Manual bit.
+
+ read_id
+
+       $id = $chip->read_id->get
+
+    Returns the chip's ID register value.
+
+ read_data0
+
+ read_data1
+
+       $data0 = $chip->read_data0->get
+    
+       $data1 = $chip->read_data1->get
+
+    Reads the current values of the ADC channels.
+
+ read_data
+
+       ( $data0, $data1 ) = $chip->read_data->get
+
+    Read the current values of both ADC channels in a single I²C
+    transaction.
+
+METHODS
+
+ power
+
+       $chip->power( $on )->get
+
+    Enables or disables the main power control bits in the CONTROL
+    register.
+
+ read_lux
+
+       $lux = $chip->read_lux->get
+    
+       ( $lux, $data0, $data1 ) = $chip->read_lux->get
+
+    Reads the two data registers then performs the appropriate scaling
+    calculations to return a floating-point number that approximates the
+    light level in Lux.
+
+    Currently this conversion code presumes the contants for the T, FN and
+    CL chip types.
+
+    In list context, also returns the raw $data0 and $data1 channel values.
+    The controlling code may wish to use these to adjust the gain if
+    required.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

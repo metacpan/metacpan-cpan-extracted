@@ -1,0 +1,27 @@
+---
+name: Devel-Modlist
+version: 0.801
+author:
+  - 'Randy J. Ray <rjray@blackperl.com>'
+abstract: Collect a list of modules loaded at compile-time
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  perl: 5.006
+build_requires:
+  Test::More: 0
+recommends:
+  Module::Signature: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  Devel::Modlist:
+    file: lib/Devel/Modlist.pm
+    version: 0.801
+  Devel::Modlist::QuietCPAN:
+    file: lib/Devel/Modlist.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

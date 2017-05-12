@@ -1,0 +1,31 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-InsertExample-FromMojoTemplates
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Moose: 2.0000
+      - Dist::Zilla: 5.000
+      - Dist::Zilla::File::InMemory
+      - Dist::Zilla::Role::FileMunger
+      - Dist::Zilla::Role::FileGatherer
+      - Dist::Zilla::Role::FileFinderUser
+      - File::Find::Rule: 0.33
+      - namespace::autoclean: 0.18
+      - Path::Tiny: 0.050
+      - MojoX::CustomTemplateFileParser: 0.09
+
+plugins:
+  - +config: Author::CSSON
+
+  - +plugin: Deprecated
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

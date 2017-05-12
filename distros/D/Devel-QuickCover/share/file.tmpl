@@ -1,0 +1,40 @@
+?  my %variables = %{$_[0]};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="quickcover.css">
+    <title>QuickCover: <?= $variables{display_name} ?></title>
+  </head>
+  <body>
+?= $variables{include}->('header', $_[0])
+    <div id="body-content">
+      <table>
+        <caption>File source code</caption>
+        <tr>
+          <th>Line</th>
+          <th>Covered</th>
+          <th>Code</th>
+        </tr>
+<? my ($lines, $coverage, $color_code) = @variables{qw(lines line_coverage color_code)};
+
+   for my $line (1 .. $#$lines) {
+ ?>
+        <tr>
+          <td class="line-number"><a name="L<?= $line ?>"><?= $line ?></td>
+?    if (exists $coverage->{$line}) {
+          <td class="coverage-number <?= $coverage->{$line} ? 'coverage-green' : 'coverage-red' ?>"><?= $coverage->{$line} ?></td>
+?    } else {
+          <td></td>
+?    }
+          <td>
+            <span class="code"><?= $lines->[$line] ?></span>
+          </td>
+        </tr>
+?  }
+      </table>
+    </div>
+  </body>
+</html>
+

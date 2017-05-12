@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d937bca0b1015126b89daa72560c454ac6b75318 AUTHOR_PLEDGE
+SHA1 663b9635398f23d625f1d9721409f58d1fc35fa9 CONTRIBUTORS
+SHA1 906f1303edef70430187c8bb35bf04d502afd8b6 Changes
+SHA1 7c4f5766aaba53b6564fc3bf605a60a3f612986e INSTALL
+SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
+SHA1 4429c7076bd3e94425921d72450fba5e589540d5 MANIFEST
+SHA1 9f86cf6dd1295b2dc873871fce1169d862255b34 META.json
+SHA1 b5b2ef5226d93de5960833aea9154cf2e970c29e META.yml
+SHA1 20af470576d948700f7fc8c8d19f7baf333ed18f Makefile.PL
+SHA1 1e8c7dd45f8f726c6633ae1d5b67eeb0b7c2a23d README.mkdn
+SHA1 89a84c34316dae876e91c63a811c4cec2b59abe0 cpanfile
+SHA1 6bcc2ec89abd9ded58fd844b480e24474b36eeb6 doap.xml
+SHA1 1f1b707155f1dabf04c8f6624218b80ec0052b41 lib/Dist/Zilla/Plugin/ChangeStats/Git.pm
+SHA1 c8a39f453b0d4019b2a602dbfa75c612cae6d31a lib/Dist/Zilla/Role/Author/YANICK/Changelog.pm
+SHA1 67b54d72c8f089614b160ddf0981e8ce0adc0177 lib/Dist/Zilla/Role/Author/YANICK/RequireZillaRole.pm
+SHA1 e5bb7222669b2cb8674c94b92b7d33e816a9e938 t/00-compile.t
+SHA1 063cb48cba4935173a4cf7a0ebdcd52df51e6408 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 4ca888685337fd02d4d2e777168283e758ca173f t/basic.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAljw/HgACgkQ34Hwf+GwC4y2OACgxcSkNiuJo4CZyJs9V+vRtMQe
+YxAAnjdfGrJIi8zSVgPeDrYAJB0r4+eN
+=EYgn
+-----END PGP SIGNATURE-----

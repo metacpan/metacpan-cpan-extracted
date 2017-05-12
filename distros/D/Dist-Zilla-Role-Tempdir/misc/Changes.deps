@@ -1,0 +1,157 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001003
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001002 2016-05-01T00:22:36Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - Dist::Zilla::Role::Plugin
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.001001 2014-08-15T21:39:24Z
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+1.001000 2014-07-29T09:21:17Z
+
+1.000001 2014-07-29T06:22:12Z
+ [Added / test requires]
+ - Dist::Zilla::File::FromCode
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+1.000000 2014-05-16T19:09:54Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - MooseX::LazyRequire
+ - Path::Iterator::Rule
+ - Path::Tiny
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Dist::Zilla 0 → 2.0
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4004
+
+ [Removed / configure requires]
+ - Module::Build 0.4004
+
+ [Removed / runtime requires]
+ - File::Find::Rule 0.30
+ - File::Slurp 9999.13
+ - File::Tempdir 0.02
+ - Path::Class 0.17
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01053722 2013-04-08T08:04:30Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01053721 2012-02-02T19:54:07Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / runtime requires]
+ - Digest::base 1.16
+
+ [Removed / test requires]
+ - English
+
+0.01053720 2011-04-05T19:34:41Z
+ [Added / test requires]
+ - English
+
+ [Removed / test requires]
+ - Test::Perl::Critic
+
+0.01027622 2010-07-23T21:29:14Z
+ [Added / runtime requires]
+ - Carp
+ - Scalar::Util
+
+ [Added / test requires]
+ - Dist::Zilla
+ - Dist::Zilla::Role::FileInjector
+ - Dist::Zilla::Role::InstallTool
+ - Dist::Zilla::Tester
+ - File::Find
+ - File::Temp
+ - Test::More 0.88
+ - Test::Perl::Critic
+
+ [Removed / build requires]
+ - Dist::Zilla
+ - Dist::Zilla::Role::FileInjector
+ - Dist::Zilla::Role::InstallTool
+ - Dist::Zilla::Tester
+ - File::Find
+ - Moose
+ - Test::Kwalitee
+ - Test::More
+ - Test::Perl::Critic
+
+0.01021401 2010-05-23T00:16:50Z
+ [Added / build requires]
+ - Dist::Zilla
+ - Dist::Zilla::Role::FileInjector
+ - Dist::Zilla::Role::InstallTool
+ - Dist::Zilla::Tester
+ - File::Find
+ - Module::Build 0.3601
+ - Moose
+ - Test::Kwalitee
+ - Test::More
+ - Test::Perl::Critic
+
+ [Added / configure requires]
+ - Module::Build 0.3601
+
+ [Added / runtime requires]
+ - Dist::Zilla::File::InMemory
+ - Moose::Role
+
+ [Changed / runtime requires]
+ - Dist::Zilla 1.092930 → 2.0

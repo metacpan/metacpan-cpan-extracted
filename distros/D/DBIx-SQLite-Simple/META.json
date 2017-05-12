@@ -1,0 +1,46 @@
+{
+   "abstract" : "easy access to SQLite databases using objects",
+   "author" : [
+      "GomoR <gomor_at_cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-SQLite-Simple",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Gomor" : "0",
+            "DBI" : "0",
+            "perl" : "v5.6.1"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::SQLite::Simple" : {
+         "file" : "lib/DBIx/SQLite/Simple.pm",
+         "version" : "0.35"
+      },
+      "DBIx::SQLite::Simple::Table" : {
+         "file" : "lib/DBIx/SQLite/Simple/Table.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/artistic-license.php"
+      ]
+   },
+   "version" : "0.35"
+}

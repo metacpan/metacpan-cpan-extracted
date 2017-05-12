@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+lib/DBIx/InsertHash.pm
+t/00-load.t
+t/01-insert.t
+t/02-update.t
+t/DBIx/InsertHash/DBI.pm

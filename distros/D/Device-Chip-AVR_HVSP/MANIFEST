@@ -1,0 +1,18 @@
+bin/avr_hvsp
+Build.PL
+Changes
+examples/tinyfuse.pl
+lib/Device/BusPirate/Chip/AVR_HVSP.pm
+lib/Device/Chip/AVR_HVSP.pm
+lib/Device/Chip/AVR_HVSP/FuseInfo.pm
+MANIFEST			This list of files
+t/00use.t
+t/01hvsp.t
+t/99pod.t
+update-fuseinfo.pl
+update-partinfo.pl
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

@@ -1,0 +1,6 @@
+row 1: CHAR=''           VARCHAR=''           LONGVARCHAR=''          
+row 2: CHAR=''           VARCHAR='          ' LONGVARCHAR='          '
+row 3: CHAR='0123456789' VARCHAR='0123456789' LONGVARCHAR='0123456789'
+row 4: CHAR='1no pad'    VARCHAR='1no pad'    LONGVARCHAR='1no pad'   
+row 5: CHAR='2pad'       VARCHAR='2pad      ' LONGVARCHAR='2pad      '
+row 6: CHAR=undef        VARCHAR=undef        LONGVARCHAR=undef       

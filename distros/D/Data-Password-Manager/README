@@ -1,0 +1,145 @@
+NAME
+    Data::Password::Manager - generate, check, manage crypt - des passwords
+
+SYNOPSIS
+      use Data::Password::Manager qw(
+            pw_gen
+            pw_valid
+            pw_obscure
+            pw_clean
+            pw_get
+      );
+
+      $password = pw_gen($cleartext);
+      $ok = pw_valid($cleartxt,$password);
+      $clean_text = pw_clean($dirty_text);
+      ($code,$text) = $pw_obscure($newpass,$oldpass,$min_len);
+      $passwd = pw_get($user,$passwd_file,\$error);
+
+DESCRIPTION
+    * $password = pw_gen($cleartext);
+      Generate a 13 character DES password string from clear text
+
+        input:        string <= 128 characters
+        output:       password
+
+    * $ok = pw_valid($cleartxt,$password);
+      Return true if clear text is password match
+
+        input:        string <= 128 characters,
+                      password
+        output:       true on match, else false
+
+    * $clean_text = pw_clean($dirty_text);
+        Clean a text string to only include
+        / . 0..9 a..z A..Z
+
+        Useful for restricted password sets 
+        i.e. http applications
+
+        Returns a string of 128 characters or less
+
+    * ($code,$text) = $pw_obscure($newpass,$oldpass);
+      Check for a usable password. Returns ok if there is no old password.
+      i.e. any new password will do.
+
+        input:        string <= 128 characters
+
+        return (0, 'OK') if no old password or new is good
+        return ( 1, 'too short' ) if length < $MIN_LEN (default 5)
+        return ( 2, 'no change' ) if old eq new
+        return ( 3, 'a palindrome' ) if new is a palindrome
+        return ( 4, 'case change only' ) if old =~ /$new$/i
+        return ( 5, 'to similar' ) see code
+        return ( 6, 'to simple' ) if not a good character mix
+        return ( 7, 'rotated' ) if new is rotated version of old
+        return ( 8, 'flipped' ) if new is old flipped around
+
+    * $passwd=pw_get($user,$passwd_file,\$error);
+      Check a password file for the presence of $user:$password.
+
+        input:        $user
+        return:       $password
+
+      Returns undef on error and places a descriptive error message in the
+      scalar $error. Since a valid password can be empty, the caller must
+      check that the return value is defined, not just false.
+
+      FILE is of the form:
+
+              user1:DESpassword1
+              user2:DESpassword2
+              etc...
+              # in-line comments are OK
+
+EXPORTS_OK
+            pw_gen
+            pw_valid
+            pw_clean
+            pw_obscure
+            pw_get
+
+ACKNOWLEDGEMENTS
+    Code for the subroutine to check for obscure passwords is based on and
+    taken in part from a port to perl of the functions found in the shadow
+    suite by Julianne Frances Haugh. Thank you for your contribution to
+    public domain software Julianne.
+
+    Copyright 1989 - 1994, Julianne Frances Haugh All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+    * 1
+      Redistributions of source code must retain the above copyright notice,
+      this list of conditions and the following disclaimer.
+
+    * 2.
+      Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+    * 3.
+      Neither the name of Julianne F. Haugh nor the names of its
+      contributors may be used to endorse or promote products derived from
+      this software without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY JULIE HAUGH AND CONTRIBUTORS `AS IS'' AND
+    ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+    IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+    PURPOSE ARE DISCLAIMED.IN NO EVENT SHALL JULIE HAUGH OR CONTRIBUTORS BE
+    LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+    CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+    SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+    INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+    CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+    THE POSSIBILITY OF SUCH DAMAGE.
+
+    RCSID("$Id: obscure.c,v 1.7 1998/04/16 19:57:44 marekm Exp $")
+
+    This version of obscure.c contains modifications to support "cracklib"
+    by Alec Muffet (alec.muffett@uk.sun.com).You must obtain the Cracklib
+    library source code for this function to operate.
+
+COPYRIGHT
+    Copyright 2003 - 2014, Michael Robinton <michael@bizsystems.com>
+
+    The non-(Julianne Haugh) portion of the program is free software; you
+    can redistribute it and/or modify it under the terms of the GNU General
+    Public License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the GNU General
+    Public License for more details.
+
+    You should have received a copy of the GNU General Public License along
+    with this program; if not, write to the Free Software Foundation, Inc.,
+    59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+
+AUTHOR
+    Michael Robinton, BizSystems <michael@bizsystems.com>
+

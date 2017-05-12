@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 11d78a4f5daa84ee76e49181ffe287421150a1e6 AUTHOR_PLEDGE
+SHA1 73ae7003f2df5e5bd9a900a9605f6907d0155052 Build.PL
+SHA1 62fb00883dcfc00943e77c3394bf4737b28cae5d Changes
+SHA1 df6284a878a7ba481fab245bbdda82ef7683f301 INSTALL
+SHA1 cf5dc9c929415cfa7133eed863def866ade9774d LICENSE
+SHA1 787fa4f88be43cbdfa4ab415160a34dfe60d3c96 MANIFEST
+SHA1 371bc299bb5cb056ee75f5bc9dfcf9eeb1117410 META.json
+SHA1 8bccb30d717a9ef55e7760264d389a31a4c631c9 META.yml
+SHA1 32f9d747b9fe8623bd9bfd2f9c949a1d5d2e10f5 README
+SHA1 555b9d192b2bd36e9d744f7634ab7f0eef454849 README.mkdn
+SHA1 a043a263d33f24303e3835d8ae72a199cd4ffe69 lib/Dancer/Plugin/Auth/Extensible/Provider/DBIC.pm
+SHA1 4f6c71c874ae945168acc84bcda21a90b9e540c3 t/000-report-versions-tiny.t
+SHA1 94221915334ab89213f8d517565bf93c43835697 t/dbic.t
+SHA1 6819cb722203a6bad94b27991391790cf5366600 t/dbic/My/Schema.pm
+SHA1 8624f8ac9d38bd07be0b9a78fa548831594b710a t/dbic/My/Schema/Result/Roles.pm
+SHA1 e2fdbea3b7bb6d031ef22083e1435e4378ca0a35 t/dbic/My/Schema/Result/UserRoles.pm
+SHA1 928a3e5afa77b0d26f7da7c78c8f04229b74cdb3 t/dbic/My/Schema/Result/Users.pm
+SHA1 5d3c896b1303d0b636b10cae1e06db50d877e496 t/dbic/MyApp.pm
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlIYKj0ACgkQ34Hwf+GwC4w7GQCg1O+Y/SrcRPPIDW4r8dE7iPU6
+YtIAn1WIsl4G/U+4aM9vxLJ7/v5UIvH1
+=vU6j
+-----END PGP SIGNATURE-----

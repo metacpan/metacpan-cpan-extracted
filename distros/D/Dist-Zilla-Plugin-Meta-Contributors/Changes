@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Plugin-Meta-Contributors
+
+0.003     2016-02-25 15:37:53-05:00 America/New_York
+
+    [Fixed]
+
+    - Make Dist::Zilla::Tester prereq explicit
+
+0.002     2015-04-10 21:44:22-04:00 America/New_York
+
+    [Documented]
+
+    - Added to SEE ALSO
+
+    [Tests]
+
+    - Test Unicode characters
+
+    [Meta]
+
+    - Updated repo layout and meta files
+
+0.001     2013-02-27 11:39:29 America/New_York
+
+    - First release
+

@@ -1,0 +1,23 @@
+1.1.1    2007 July 7
+         - Added a note in the pod that this module is deprecated in favor
+           of Digest::SHA
+
+1.1.0    2003 December 5
+         - tweaked test scripts
+         - added more examples
+         - added rounds() method to be consistent with Digest::Haval256
+         - added clone() method
+         - module Digest::base is now required
+         - now becomes a subclass of Digest::base
+         - defines SHA2_USE_INTTYPES_H for compilation, by default,
+           but please read either INSTALL or CAVEAT for a warning
+
+         - deleted addfile() method, as Digest::base already
+           implements it
+
+         - base64digest() is deprecated; it will be removed in
+           future releases
+         
+1.0.0    2003 July 30
+         - initial release
+

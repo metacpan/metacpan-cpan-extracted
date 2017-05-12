@@ -1,0 +1,53 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 28df0e9dadeff73ed70d06dbd6062002d94d9631 Changes
+SHA1 7a48237021900339fcfa832b0eaeef438c3aec9d INSTALL
+SHA1 2530564676cebc0c12951301a6e6393a5cea5390 LICENSE
+SHA1 89bd9e36213f0a99df6dfd38982344648474f952 MANIFEST
+SHA1 3c896921f9efbc21d2421a90d3faec4a8d6b1273 META.json
+SHA1 1211ef8a132e0345b917917e0209b72a03813869 META.yml
+SHA1 fbb549a6cfd1636d564442fc5e84b2af2836f573 Makefile.PL
+SHA1 ad69f4c3ce416d8054bf7be9ad1213267053a585 README
+SHA1 004bcb5485033c482a891b1566c5bc1dc5cf67bd README.md
+SHA1 edf8fea690a9bc978c7c45b7094ace8848a78329 cpanfile
+SHA1 8cf16bdd8e5d2136a21eec5078c9201cf9efbf6a dist.ini
+SHA1 bee2ae0e18f6985bc7282385e316e19572c5edb2 lib/DBIx/TransactionManager/Distributed.pm
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 ab9d7af745b44e8f2c4c79ec564083cf599f31e0 t/00-compile.t
+SHA1 24660e5803c34d2024d6b810c57f39c5bde8fb06 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 34df5c747946d864109c898c9c9a3ade23aa3250 t/01-distributed.t
+SHA1 5bc8981a0fb2185ba14b87c99f69a279370fdf6f xt/author/eol.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 a6d8370909ec0e0755d4bd691eb81d722cf94430 xt/author/pod-coverage.t
+SHA1 f0c18c75922a1516ae7a5ec5d391b31fd757f0bd xt/author/pod-syntax.t
+SHA1 34513f89a70b96f6412fe2ef0ad4d475e8cac66c xt/author/synopsis.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 198d1665317c3d91e3bb81f0a3b8dad8d4d66f20 xt/release/common_spelling.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJYBxrxAAoJEJ1vYhkbG7hKPz8H/jjE/KcFCR49t1F/FQdqPDuJ
+VkheL/7KmpQ9Mx/ZdFBnX1QpvH+K5iCL1U/F88MDtInmDrpA7UXbh0Jhsp8PkioQ
+DX8sf8kwURKmnIf6dUt0vcQtajxoMRdS73CAJ0rxnAlf+/A0SPQZ+KAdkn4yyD41
+cGOT6FJxuEhnNUdOySBEPDNWGgl8uCMEpb0edXeYQrQF33q+dK32x6XrIb68UXXR
+AakbG0IUo3stQHBXIPLd4TSLOYUJY9C7PlWcH2Oy37IEzQld1DGpuZYLeu02r+HP
+uQZMVzZ3YR/QRQV9B3cG3lmle2zhGYvUpGCE9XMeiO4G4b9VawP7lnNO4L7NtrI=
+=ffGi
+-----END PGP SIGNATURE-----

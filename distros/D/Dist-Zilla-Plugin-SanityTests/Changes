@@ -1,0 +1,9 @@
+0.03  Sat, 29 May 2010 17:15:40 +0200
+  * Deprecate in favour of Dist::Zilla::Plugin::NoTabsTests and
+    Dist::Zilla::Plugin::EOLTests.
+
+0.02  Sun, 16 May 2010 22:53:14 +0200
+  * Add compilation tests, mostly to avoid shitloads of UNKNOWN reports.
+
+0.01  Sat, 15 May 2010 13:03:59 +0200
+  * Initial release.

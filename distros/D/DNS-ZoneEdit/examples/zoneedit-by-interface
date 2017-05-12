@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+
+#==============================================================================#
+
+use strict;
+use warnings;
+use DNS::ZoneEdit;
+use IO::Socket;
+use IO::Interface;
+use File::Spec::Functions qw(tmpdir catfile);
+
+#==============================================================================#
+
+die "Usage: $0 <username> <password> <interface> <hostname>\n" unless @ARGV == 4;
+
+my ($user,$pass,$if,$host) = @ARGV;
+
+print "Host:  $host\n";
+print "Iface: $if\n";
+
+my $cache = catfile(tmpdir,"$if.ip");
+print "Cache: $cache\n";
+
+my $s  = IO::Socket::INET->new(Proto => 'udp') || die "Can't open socket: $!";
+my $ip =  $s->if_addr($if) || die "Can't get address of [$if]: $!";
+print "IP:    $ip\n";
+
+my $same = 0;
+if (-e $cache) {
+	open(my $inp, "< $cache") || die "Can't read $cache: $!";
+	chomp(my $old_ip = <$inp>);
+	$same = $old_ip eq $ip;
+	close($inp);
+}
+
+if ($same) {
+	print "IP Unchanged\n";
+	exit 0;
+} else {
+	if (DNS::ZoneEdit->new->update(
+		username => $user,
+		password => $pass,
+		hostname => $host,
+		myip     => $ip,
+	)) {
+		if (open(my $outp, "> $cache")) {
+			print $outp "$ip\n";
+			close($outp);
+			print "IP Update succeeded\n";
+			exit 0;
+		} else {
+			print "IP Update succeeded but cache write failed: $!\n";
+			exit 255;
+		}
+	} else {
+		print "IP Update failed: [$@]\n";
+		exit 255;
+	}
+}
+
+#==============================================================================#
+
+__END__
+
+=head1 NAME
+
+zoneedit-by-interface - Update ZoneEdit when an interface changes IP
+
+=head1 SYNOPSIS
+
+zoneedit-simple <username> <password> <interface> <hostname>
+
+=head1 DESCRIPTION
+
+This script is designed to be run out of crontab. It will check against a
+cache file and if the interface IP has changed, it will update your dynamic
+ZoneEdit entry.
+
+=head1 OPTIONS
+
+=over 4
+
+username - Your ZoneEdit username
+
+password - The corresponding password
+
+interface - The name of the interface to watch (e.g. ppp0)
+
+hostname - The name of the host record to be updated
+
+=back
+
+=head1 AUTHOR
+
+This script is Copyright (c) 2002 Gavin Brock gbrock@cpan.org. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+#==============================================================================#

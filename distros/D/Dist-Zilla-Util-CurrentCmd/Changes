@@ -1,0 +1,66 @@
+Release history for Dist-Zilla-Util-CurrentCmd
+
+0.002003 2017-03-03T10:43:24Z 7164a42
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Util-CurrentCmd/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +8 ↑3 -1 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: ↓1 (recommends: ↓2)
+
+0.002002 2014-12-25T12:35:22Z bfb3c3f
+ [Bugfix]
+ - Avoid Module::Runtime quirk on a few bad moose by requiring a newer version.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑3 -2 (recommends: +1, suggests: ↑2)
+ - runtime: ↑1 ↓1 -1
+ - test: +2 (recommends: ↑2)
+
+0.002001 2014-08-15T21:58:42Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+0.002000 2014-08-03T03:42:00Z
+ [00 Minor]
+ - new function: as_cmd();
+ - is_build and is_install no longer spew about undefined if outside a command.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+0.001001 2014-07-23T06:27:22Z
+ [00 Trivial]
+ - Misc packaging cleanups
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: +2 ↑1 (recommends: +1)
+
+0.001000 2014-05-25T18:47:46Z
+ - First version.
+
+ [Dependencies::Aggregate]
+ - 5.008009 : 52
+ - 5.010001 : 46
+ - 5.018002 : 29
+ - 5.019009 : 29

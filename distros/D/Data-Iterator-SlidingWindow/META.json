@@ -1,0 +1,80 @@
+{
+   "abstract" : "Iteration data with Sliding Window Algorithm",
+   "author" : [
+      "Hideaki Ohno <hide.o.j55{at}gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v1.1.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Iterator-SlidingWindow",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Fatal" : "0.008",
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Iterator::SlidingWindow" : {
+         "file" : "lib/Data/Iterator/SlidingWindow.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hideo55/Data-Iterator-SlidingWindow/issues"
+      },
+      "homepage" : "https://github.com/hideo55/Data-Iterator-SlidingWindow",
+      "repository" : {
+         "url" : "git://github.com/hideo55/Data-Iterator-SlidingWindow.git",
+         "web" : "https://github.com/hideo55/Data-Iterator-SlidingWindow"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "hideo55 <hide.o.j55@gmail.com>"
+   ]
+}

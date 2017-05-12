@@ -1,0 +1,500 @@
+
+
+Directory Digests - Version 0.90 - README
+=========================================
+
+CONTENTS
+
+    OVERVIEW
+    FEATURES
+    EXAMPLES
+    INSTALLATION
+    DEPENDENCIES
+    ISSUES
+    HISTORY
+    FUTURE
+    AUTHOR
+    RIGHTS
+
+OVERVIEW
+
+Dirgest is a compact suite of development modules and operational 
+scripts that provide a comprehensive ability to work with digests 
+of file and directory sets. The modules provide building blocks for
+developers, while the scripts are directly useful for local host 
+and web site administration. 
+
+Two modules are supplied: Digest::Directory::{BASE,API}.pm
+Two scripts are supplied: dirgest.{pl,cgi}
+
+Primary applications are security and integrity.
+
+The author uses this suite to verify correct replication of data 
+from local host to non-CLI access remote web site, and then ongoing 
+verification that web site content is consistent. The suite is 
+also used to ensure integrity of local host (OpenBSD) installation.
+
+The most recent version is always available on CPAN or from the 
+author (matthew.gream@pobox.com).
+
+
+FEATURES
+
+Primary features of the package are:
+
+    - developer BASE and API modules to provide low and high 
+      level perl access to dirgests. 
+
+    - operational CLI and CGI scripts to provide command line 
+      and common-gateway-interface access to dirgests.
+
+    - uses Digest::MD5.
+
+    - computes a 'dirgest' (ternary of 'digest', 'size', 'name' 
+      for given file), and also computes master dirgest across
+      all consitituent dirgests.
+
+    - allows file/directory sets to be specified as 'include'
+      or 'exclude' entries, either from command line, config
+      file, CGI parameters or method calls.
+
+    - allows file/directory sets to have leading name
+      components trimmed in compute, fetch and load 
+      operations to support cross-host activities.
+
+    - uses LWP::UserAgent to access files and CGI resources,
+      allowing media transparency (support HTTP basic
+      authentication, and secure mode on cgi resources).
+
+    - object oriented modules, code level trace information
+      about activities, comprehensive unit tests and
+      documentation.
+
+
+EXAMPLES
+
+Example 1: save and verify contents of directories (CLI scripts).
+
+    Various examples of usage, from the command line:
+
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ dirgest.pl --version
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ dirgest.pl --filename /tmp/dirgests.txt create +/etc
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | including /etc
+    | CREATING
+    | computing from /etc
+    | Can't opendir(/etc/ssl/private): Permission denied
+    | Can't opendir(/etc/isakmpd/private): Permission denied
+    | writing to /tmp/dirgests.txt
+    | napa:tmp $ wc -l /tmp/dirgests.txt
+    |      138 /tmp/dirgests.txt
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ dirgest.pl --quiet show +/etc > /tmp/dirgests2.txt
+    | Can't opendir(/etc/ssl/private): Permission denied
+    | Can't opendir(/etc/isakmpd/private): Permission denied
+    | napa:tmp $ diff /tmp/dirgests2.txt /tmp/dirgests.txt
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ echo '+/etc' >dirgest.conf
+    | napa:tmp $ cat dirgest.conf
+    | +/etc
+    | napa:tmp $ dirgest.pl --quiet --configure=dirgest.conf show \
+    |            >/tmp/dirgests3.txt
+    | Can't opendir(/etc/ssl/private): Permission denied
+    | Can't opendir(/etc/isakmpd/private): Permission denied
+    | napa:tmp $ diff /tmp/dirgests.txt /tmp/dirgests3.txt
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ ls /usr/local/share/gnupg
+    | options.skel
+    | napa:tmp $ dirgest.pl --quiet show +/usr/local/share/gnupg
+    | = FEy7kEGM+dOntCi0Z/0KRg== 000000004492 /usr/local/share/gnupg/options.skel
+    | # jicFVzLgkWo8E9CCmQwX2g==
+    | napa:tmp $ dirgest.pl --quiet --trim=3 show +/usr/local/share/gnupg
+    | = FEy7kEGM+dOntCi0Z/0KRg== 000000004492 share/gnupg/options.skel
+    | # KnnYjjTVmGImyBUxLdWmBg==
+    | napa:tmp $ dirgest.pl --quiet --trim=4 show +/usr/local/share/gnupg
+    | = FEy7kEGM+dOntCi0Z/0KRg== 000000004492 gnupg/options.skel
+    | # ZEJoUs+1ZIxgsosL+xR1rg==
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ dirgest.pl --quiet show +/usr/local/bin | wc -l
+    |      247 
+    | napa:tmp $ dirgest.pl --quiet --nodetails show +/usr/local/bin | wc -l
+    |        1 
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ dirgest.pl --filename=dirgests_bin.txt create \
+    |            +/usr/local/bin
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | including /usr/local/bin
+    | CREATING
+    | computing from /usr/local/bin
+    | writing to dirgests_bin.txt
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+    | 
+    | napa:tmp $ mkdir temp
+    | napa:tmp $ echo 'foo' > temp/a
+    | napa:tmp $ echo 'bar' > temp/b
+    | napa:tmp $ echo 'soa' > temp/c
+    | napa:tmp $ echo '+temp' > dirgest.conf
+    | napa:tmp $ cat dirgest.conf
+    | +temp
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ dirgest.pl --configure=dirgest.conf --filename=dirgest.txt \
+    |            create
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | configuring from dirgest.conf
+    | including temp
+    | CREATING
+    | computing from temp
+    | writing to dirgest.txt
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ cat dirgest.txt
+    | = 07BzhNET7exJ6qYjitX/AA== 000000000004 temp/a
+    | = wVenkDHhxA+FkxgpvF/FUg== 000000000004 temp/b
+    | = VByjna3FKqRpCn/pBcTNBA== 000000000004 temp/c
+    | # eDwrWidm1bqhudQSNugM1A==
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ ls -lagt temp
+    | total 10
+    | drwxrwxrwt  6 root  wheel  512 Oct 21 20:36 ..
+    | drwxr-xr-x  2 matt  wheel  512 Oct 21 20:35 .
+    | -rw-r--r--  1 matt  wheel    4 Oct 21 20:35 c
+    | -rw-r--r--  1 matt  wheel    4 Oct 21 20:35 b
+    | -rw-r--r--  1 matt  wheel    4 Oct 21 20:35 a
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ echo 'woa' >temp/c
+    | napa:tmp $ dirgest.pl --configure=dirgest.conf --filename=dirgest.txt \
+    |            compare
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | configuring from dirgest.conf
+    | including temp
+    | COMPARING
+    | computing from temp
+    | reading from dirgest.txt
+    | comparing digests
+    | ! Pou4+9WzglcSZ/1fIE4SZA== 000000000004 temp/c
+    | comparing summaries
+    | ? eDwrWidm1bqhudQSNugM1A==
+    | comparing differences: 2
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ dirgest.pl --quiet --configure=dirgest.conf \
+    |            --filename=dirgest.txt compare
+    | ! Pou4+9WzglcSZ/1fIE4SZA== 000000000004 temp/c
+    | ? eDwrWidm1bqhudQSNugM1A==
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ dirgest.pl --quiet --show_equal --configure=dirgest.conf \
+    |            --filename=dirgest.txt compare
+    | = 07BzhNET7exJ6qYjitX/AA== 000000000004 temp/a
+    | = wVenkDHhxA+FkxgpvF/FUg== 000000000004 temp/b
+    | ! Pou4+9WzglcSZ/1fIE4SZA== 000000000004 temp/c
+    | ? eDwrWidm1bqhudQSNugM1A==
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ dirgest.pl --quiet --nodetails --configure=dirgest.conf \
+    |            --filename=dirgest.txt update
+    | ? eDwrWidm1bqhudQSNugM1A==
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ dirgest.pl --quiet --nodetails --configure=dirgest.conf \
+    |            --filename=dirgest.txt update
+    | napa:tmp $ 
+    | 
+    | napa:tmp $ cat dirgest.txt
+    | = 07BzhNET7exJ6qYjitX/AA== 000000000004 temp/a
+    | = wVenkDHhxA+FkxgpvF/FUg== 000000000004 temp/b
+    | = Pou4+9WzglcSZ/1fIE4SZA== 000000000004 temp/c
+    | # RG0xlEsyo9W4xLArAbSLlg==
+    | napa:tmp $ 
+    | 
+    | ------------------------------------------------
+
+
+Example 2: cron-based periodic verification of configuration
+    files on local OpenBSD host (CLI scripts).
+
+    a. a trusted host is used to mount the host drive, the
+    trusted host has console access only, and contains dirgest
+    and configuration in CVS repository.
+
+    b. weekly cron job executes the following:
+        - extract DIRGEST from CVS repository
+        - run dirgest.pl in update mode with show option to
+          update DIRGEST - pipe the output to mail and send
+          to administrator + summary to syslog;
+        - checkin DIRGEST to the CVS repository
+
+    c. manual script allows operator to update DIRGEST from
+    the console.
+
+    (hypothetical example)
+
+Example 3: pre-replication verification of web-site upload, and 
+    ongoing cron-based verification, similar to pre/post remote 
+    copy verification (CLI and CGI script interaction).
+
+    a. a build script generates the website using Template Toolkit,
+    which involves creating content in 'build' from a 'source' 
+    directory.
+
+    | ------------------------------------------------
+    | napa:www $ ./b
+    | BUILDING
+    | updating ...
+    | building ...
+    | ------------------------------------------------
+
+    b. an update script first updates the dirgests and then uses
+    a replication script to transfer the updated contents of the
+    web site, and then verifies the contents of the web site by
+    fetching from the cgi interface.
+
+    | ------------------------------------------------
+    | napa:www $ cat u
+    | #!/bin/sh
+    | 
+    | echo UPDATING
+    | 
+    | EXE_DIRGEST="/usr/local/bin/dirgest.pl"
+    | EXE_REPLICATE="/usr/local/bin/replicate.pl"
+    | 
+    | [...]
+    | 
+    | echo updating dirgest ...
+    | rm -f build/cgi-bin/dirgest/dirgest.txt
+    | $EXE_DIRGEST \
+    | 	--filename=build/cgi-bin/dirgest/dirgest.txt --trim=1 \
+    | 	create \
+    | 	-CVS `sed 's,/.*public_html,build,g' < build/cgi-bin/dirgest/dirgest.conf`
+    | 
+    | [...]
+    | 
+    | echo uploading ...
+    | $EXE_REPLICATE \
+    | 	--root=public_html \
+    | 	--source=/home/www/build \
+    | 	--not=CVS \
+    | 	...
+    | 
+    | [...]
+    | 
+    | echo verifying ...
+    | $EXE_DIRGEST \
+    | 	--fetch=http://$HOSTNAME/cgi-bin/dirgest/dirgest.cgi \
+    | 	--login=$USERNAME:$PASSWORD \
+    | 	--trim=4 \
+    | 	--filename=build/cgi-bin/dirgest/dirgest.txt \
+    | 	compare
+    | 
+    | [...]
+    | 
+    | ------------------------------------------------
+
+    c. the update process results in the following output:
+
+    | ------------------------------------------------
+    | napa:www $ ./u
+    | UPDATING
+    | updating dirgest ...
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | including build
+    | excluding CVS
+    | excluding build/cgi-bin/dirgest/dirgest.txt
+    | excluding build/cgi-bin/perlfect/search/data/sizes
+    | excluding build/cgi-bin/perlfect/search/data/content
+    | excluding build/cgi-bin/perlfect/search/data/terms
+    | excluding build/cgi-bin/perlfect/search/data/titles
+    | excluding build/cgi-bin/perlfect/search/data/docs
+    | excluding build/cgi-bin/perlfect/search/data/desc
+    | excluding build/cgi-bin/perlfect/search/data/urls
+    | excluding build/cgi-bin/perlfect/search/data/dates
+    | excluding build/cgi-bin/perlfect/search/data/inv_index
+    | excluding build/cgi-bin/perlfect/subscribe/mailing_list.txt
+    | CREATING
+    | computing from build
+    | writing to build/cgi-bin/dirgest/dirgest.txt
+    | uploading ...
+    | [...]
+    | scanning remote directory: public_html
+    | [...]
+    | verifying ...
+    | Directory Digest CLI v0.90 -- Matthew Gream <matthew.gream@pobox.com>
+    |     Copyright 2002 Matthew Gream. All Rights Reserved.
+    | COMPARING
+    | reading from build/cgi-bin/dirgest/dirgest.txt
+    | fetching from http://matthewgream.net/cgi-bin/dirgest/dirgest.cgi
+    | comparing digests
+    | comparing summaries
+    | comparing differences: 0
+    | napa:www $ wc -l build/cgi-bin/dirgest/dirgest.txt
+    |      197 build/cgi-bin/dirgest/dirgest.txt
+    | napa:www $ head -3 build/cgi-bin/dirgest/dirgest.txt
+    | = sxNqlix47RIWoX9sDjC5wA== 000000000002 .cvsignore
+    | = tft3saNku+rCpgI0jnht9w== 000000000041 .htaccess
+    | = ym+NbPCKfVB2zv1UT/AhCw== 000000000146 cgi-bin/accesslog/.htaccess
+    | napa:www $ 
+    | ------------------------------------------------
+     
+    d. a periodic cron job runs to call dirgest.pl against dirgest.cgi
+    (on the server) to verify that the website content has not 
+    changed. the output is used in a report to the administrator to 
+    check for changed site content.
+
+    | ------------------------------------------------
+    | napa:www $ cat /usr/local/share/site/site_check
+    | #!/bin/ksh
+    | #################################################################
+    | # $Id: README,v 0.90 2002/10/21 20:24:06 matt Exp matt $
+    | #################################################################
+    | 
+    | [...]
+    | 
+    | EXE_DIRGEST="/usr/local/bin/dirgest.pl"
+    | _DIRGEST_OPTS="--quiet"
+    | 
+    | [...]
+    | 
+    | $EXE_DIRGEST $_DIRGEST_OPTS \
+    | 	--fetch=http://$HOSTNAME/cgi-bin/dirgest/dirgest.cgi \
+    | 	--login=$USERNAME:$PASSWORD \
+    | 	--trim=4 \
+    | 	--filename=$WWW_BUILD/cgi-bin/dirgest/dirgest.txt \
+    | 	compare 
+    | 
+    | [...]
+    | 
+    | napa:www $ 
+    | ------------------------------------------------
+
+
+Example 4: verification of tar/zip/archive contents, such as
+    with backup, or distribution, or transfer (CLI scripts). a
+    wrapper script used to provide the operation. Note that this
+    is not cryptographically strong and requires use of some
+    form of digital signature for more robust authentication.
+
+    a. archive_create script does the following:
+        - stores archive name + files
+        - uses dirgest.pl across files to create a DIRGEST
+        - uses tar with DIRGEST and files to form archive
+    b. archive_extract script does the following:
+        - uses tar to extract files and DIRGEST
+        - uses dirgest.pl to verify DIGEST against files
+        - removes DIRGEST now that operation is complete
+
+    (hypothetical example)
+
+
+Example 5: use of Digest::Directory::BASE.pm as part of packaging 
+    script for software distribution.
+
+    (hypothetical example)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+The following modules will be created:
+
+   Digest::Directory::BASE.pm (low level mechanisms)
+   Digest::Directory::API.pm (higher level interface)
+
+The following scripts will be created:
+
+   dirgest.pl (Command Line Interface)
+   dirgest.cgi (Common Gateway Interface)
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Perl 5.004
+   LWP::UserAgent (for Digest::Directory::BASE.pm)
+   Digest::MD5 (for Digest::Directory::BASE.pm)
+   File::Find (for Digest::Directory::BASE.pm)
+   CGI (for dirgest.cgi)
+   Getopt::Long (for dirgest.pl)
+
+
+ISSUES
+
+No known issues are outstanding. 
+
+
+HISTORY
+
+Version 0.10 - 20 Sep 2002 - Alpha release (internal).
+Version 0.90 - 20 Oct 2002 - Beta release (CPAN).
+
+
+FUTURE
+
+Candidate improvements are:
+
+1. increased configuration file flexibility.
+2. use hash for method arguments.
+3. include/exclude does better regexp style matching.
+4. integrate 'load' and 'fetch' via. LWP to be seamless.
+5. remove static's in compute method (is this possible?).
+6. allow per-directory dirgest files (e.g. '.dirgest').
+7. include contrib/example scripts.
+8. support file acl to better support ids style operation.
+
+Suggestions (& patches) warmly welcomed.
+
+
+AUTHOR
+
+Matthew Gream (MGREAM) <matthew.gream@pobox.com>
+
+
+RIGHTS
+
+Copyright 2002 Matthew Gream. All Rights Reserved.
+
+This distribution is made available under the same terms and
+conditions as the perl distribution. The author offers no
+express or implied warranties as to fitness for use. Your
+use of this software implies acceptance of these terms and 
+conditions.
+

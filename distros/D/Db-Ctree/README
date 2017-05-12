@@ -1,0 +1,99 @@
+Release 1.1
+
+This is the second non-beta release of Db::Ctree, a module to access Faircom's
+Ctree database from Perl 5.  The 1.1 release adds a few changes to make the 
+module compile easier on Windows and work with the Perl Develper Kit's PerlApp
+utility. (This utility creates self-standing executables)
+
+I created this module because I wanted to use Perl to generate reports from
+data stored in a Ctree database.  The bulk of the code at our site is written
+in C using the Faircom C library, so I didn't need to create files
+and resource records.
+
+I still don't create them, but I do transaction, non-transaction and even batch
+changes.
+
+I have even used Perl to access the IOPERF function to monitor the server.
+
+This library is not mean to replace Faircom's development license. That license is still required legally (I think... I'm not a lawyer, nor play one on TV),
+morally and without a doubt documentation wise.  If you can use this 
+module without that documentation, that's pretty impressive.
+
+In order to do the port, I took the function list and parameters from the
+quick reference list and converted the data types.  I needed to remove a few
+functions that dealt with some file structures, but most of the routines 
+are available.  I have not tested each one, but have yet to find one that
+didn't work from perl.
+
+All low level and most ISAM routines seem to work fine.  Functions that need
+a C structure are not currently supported.  I'm still trying to figure out
+how I want to implement them.  Even though they're not supported, I have 
+gotten some of them to work, you just use PACK to manually build a SCALER with 
+the structure. 
+
+If you use the ISAM routines, you need to either have a C program create 
+resource records so you can use OpenFileWithResource or open it with a 
+parameter file.  My Method access routines use the OpenFileWithResource
+function.
+
+If your files have DODA information stored in them (again, by a C program),
+a Method is available to split a record into a hash!!
+
+As examples, I've included the following utilities that I use all 
+the time (They'll probably need some modifications for other sites.)
+
+	ctdump - dumps a table (splits those with DODAs)
+	ctload - loads a table with data in the ctdump output format
+	ctmod  - allows SUBST changes to a table
+	ctcount- counts records based on keys
+
+
+Install Instructions:
+     This module should build similar to most Perl extensions...
+        NOTE: If perl was not built on this system, you may have problems.
+              The perl installer stores info about the installation.
+              If you copy the binary to a new system, the previous assumptions
+              may not be true!!!  Build a new perl on each system...
+              it's not hard.
+
+              Step 1.  Edit Makefile.PL and put in your Ctree library path
+              Step 1.  perl Makefile.PL   # builds makefile
+              Step 2.  make               # builds module 
+              Step 3.  make test          # tests module
+              Step 4.  make install       # installs module for use
+              Step 5.  make clean	  # clean up directory
+ 
+        Windows Note
+	     I *HAVE* gotten this version to build with Perl 5.6! ( Both the
+             source distribution and ActivePerl binaries!)  The only change
+             I needed to make was to remove the following from the CCLFLAGS
+             line in Makefile ( after step 1 )
+                    -DPERL_IMPLICIT_CONTEXT -DPERL_IMPLICIT_SYS
+
+             For those without compilers, I've created a ZIP with all the 
+             files in the tree. Unzip WIN-SITE.ZIP and move the tree to your
+             Perl Site directory.
+
+
+
+If you give this module a shot, please drop me an email so I can let you know
+of new versions or just get a warm fuzzy!
+
+
+Robert Eden
+CommTech Corporation
+rmeden@yahoo.com          (comments and suggestions always welcome!)
+
+# Copyright 1998,2000 Robert Eden
+# All rights reserved.
+#
+# Automatic licensing for this software is available.  This software
+# can be copied and used under the terms of the GNU Public License,
+# version 1 or (at your option) any later version, or under the
+# terms of the Artistic license.  Both of these can be found with
+# the Perl distribution, which this software is intended to augment.
+#
+# THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+# IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+# WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

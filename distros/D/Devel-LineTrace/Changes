@@ -1,0 +1,18 @@
+0.1.9   2014-01-27
+    - Minimal version of perl in module and META.yml.
+         - For CPANTS Kwalitee.
+    - Add t/style-trailing-space.t and t/cpan-changes.t.
+    - Add a LICENSE file (For CPANTS Kwalitee).
+    - Refactored/modernised the code in the main module.
+
+0.1.8   2011-07-21
+    - Convert the t/*.t files to use $^X, -Mblib, Test::More::is() and
+    "use warnings;" instead of "-w".
+        - http://www.cpantesters.org/cpan/report/86ddf582-b16c-11e0-a3fe-07d50acc717f
+
+0.1.6   2006-10-08
+    - converted the build system to Build.PL with a traditional Makefile.PL.
+    - added a BSD license meta-data.
+    - added the examples directory with an example.
+    - added pod.t and pod-coverage.t
+    - added use strict and use warnings

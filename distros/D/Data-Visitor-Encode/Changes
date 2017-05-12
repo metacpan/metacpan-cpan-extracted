@@ -1,0 +1,79 @@
+Changes
+=======
+
+0.10007 - 07 Jul 2011
+    - This module is now DEPRECATED. Use Data::Recursive::Encode instead.
+        * This module will not be maintained, and will be removed from
+          CPAN by the end of 2011
+    - Fix to check defined-ness in visit_scalar (rt #69306)
+
+0.10006 - 22 Jan 2009
+    - Deprecation warning. Use Data::Recursive::Encode instead
+
+0.10005 - 18 Jan 2009
+    - fix tests
+    - upstream module Data::Visitor is now Moose, so use Moose
+
+0.10004 - 20 Feb 2009
+    - s/Squirrel/Any::Moose/g;
+
+0.10003 - 17 Feb 2009
+    - Removed check for "do_$method". They should exist!
+    - Opt to use Encode::Encoding object rather than calling encode()/decode()
+      all the time. Suggested by tokuhirom.
+
+      Below is the result of benchmarking legacy (no find_encnoding) and
+      current version:
+
+                        Rate        legacy find_encoding
+        legacy        6321/s            --          -20%
+        find_encoding 7899/s           25%            --
+
+                             Rate        legacy_z2h find_encoding_z2h
+        legacy_z2h        14164/s                --              -25%
+        find_encoding_z2h 18939/s               34%                --
+
+
+0.10002 - 06 Nov 2008
+  - Somewhere along the way, we lost the ability to change the actual
+    structure that was passed in (or was it broken to begin with?).
+    In any case, this has been restored.
+  - Aggressively refactored tests.
+  - Make the class immutable
+
+0.10001 - 24 Jul 2008
+  - Use Squirrel instead of Mouse. Sheesh, all the animals...
+
+0.10000 - 24 Jul 2008
+  - Update for Data::Visitor 0.18.
+
+0.09000 - 11 Nov 2007
+  - Allow calling methods without instantiating a Data::Visitor::Encode
+    object. Now you can do Data::Visitor::Encode->encode(...) directly
+
+0.08 - 07 May 2007
+  - Add h2z() and z2h()
+
+0.07 - 03 May 2007
+  - Add decode_utf8() and encode_utf8()
+  - chmod a-x Makefile.PL for kwalitee
+
+0.06 - 17 Apr 2007
+  - No code change, just kwalitee related fixes
+
+0.05 - 16 Apr 2007
+  - Properly handle blessed scalar refs (like URI)
+
+0.04 - 28 Mar 2007
+  - Return globs as-is
+
+0.03 - 28 Mar 2007
+  - Visit objects properly, too. Requires Scalar::Util.
+
+0.02 - 01 Feb 2007
+  - Fixed stupid bug where Data::Visitor::Encode wasn't actually
+    visiting child nodes. 
+  - Fixed tests accordingly
+
+0.01 - 13 Dec 2006
+  - Initial release.

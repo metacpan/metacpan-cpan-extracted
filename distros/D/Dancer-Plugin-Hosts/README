@@ -1,0 +1,150 @@
+NAME
+    Dancer::Plugin::Hosts - Config trigger for virtual sites
+
+NOTES BEFORE
+    After this module has been written i found other way to make virtual
+    hosts without this module. Please to see "OTHER WAY" section below
+
+SYNOPSIS
+    This plugin doesn't have syntax commands. It has only configurable
+    options in Dancer config file. It changes appdir & application settings
+    by seeing in "Host:" HTTP header. For every site you can use different
+    directories and application settings in one Dancer process (author
+    tested from Starman + Dancer bundle). Also you can use your own signle
+    'App' module for some sites. Additional you can set any your own
+    settings as Dancer::setting command does.
+
+        use Dancer;
+        use Dancer::Plugin::Hosts;
+
+        get '/' => sub {
+            template 'foo';
+        };
+
+        dance;
+
+CONFIGURATION
+  Example
+        plugins:
+            Hosts:
+                http://app1.foo.com:
+                    alias: http://www.app1.foo.com
+                    appdir: /foo-2/dir
+                    application: My::App1
+
+                http://app1.foo2.com:
+                    alias: http://www.app1.foo2.com
+                    appdir: /foo-2/dir
+                    public: /where/public/dir
+
+                    # 'confdir' will be as "$appdir" setting
+                    # 'views' will be as "$appdir/veiws"
+                    # 'public' will be as "/where/public/dir"
+
+                    # Here we use same module of application as in previous example
+                    application: My::App1
+
+                http://app2.foo.com:
+                    alias: http://www.app2.foo.com
+                    appdir: /foo-3/dir
+
+                    # Here no 'application'
+                    # so will be used 'main' App of Dancer
+
+                # Here site is located at 81th port
+                http://app3.foo.com:81:
+                    appdir: /foo-4/dir
+                    application: My::App3
+
+PLUGIN OPTIONS
+  appdir
+    *This option is required*. If you have only one "appdir" setting for
+    directory settings of one host site then other directory settings will
+    be set to following values (as Dancer does itself):
+
+        confdir     -> appdir
+        public      -> appdir/public
+        views       -> appdir/views
+
+  application
+    *This option is optional*. If you will define it then the module after
+    it will be loaded if need through Dancer::load_app command and all
+    settings for this host will be set for this App settings. Otherwise
+    application will be 'main' (Dancer no App default)
+
+OTHER WAY
+  Example without using this module
+    Here the example: one module (App) for some sites.
+
+    *Your lib/YourApp.pm should be as:*
+
+        package YourApp;
+
+        use strict;
+        use warnings;
+
+        use Dancer ':syntax';
+
+        setting apphandler => 'PSGI';
+
+        Dancer::App->set_running_app('YourApp');
+
+        # This and other routes ...
+        get '/' => sub {
+            # Static and template files will be from different directories are
+            # based by host http header
+            template 'index';
+        };
+
+        1;
+
+    *Your bin/app.psgi should be as:*
+
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+
+        use Dancer;
+
+        # The next line can miss but need for quickly loading in L<Starman> server
+        use YourApp;
+
+        use Plack::Builder;
+
+        # Please notice that here no need ports in url
+        # So for http://app1.foo.com:3000/ will work
+        # http://app1.foo.com/
+        my $hosts = {
+          'http://app1.foo.com/' => '/appdir/1',
+          'http://app2.foo.com/' => '/appdir/2'
+        };
+
+        builder {
+            my $last;
+            foreach my $host (keys %$hosts) {
+                $last = mount $host => sub {
+                    my $env = shift;
+                    local $ENV{DANCER_APPDIR} = $hosts->{$host};
+                    load_app "YourApp";
+                    Dancer::App->set_running_app('YourApp');
+                    setting appdir => $hosts->{$host};
+                    Dancer::Config->load;
+                    my $request = Dancer::Request->new( env => $env );
+                    Dancer->dance($request);
+                };
+             }
+            $last;
+        };
+
+AUTHOR
+    This module has been written by Perlover <perlover@perlover.com>
+
+LICENSE
+    This module is free software and is published under the same terms as
+    Perl itself.
+
+SOURCE CODE
+    The source code for this module is hosted on GitHub
+    <http://github.com/Perlover/Dancer-Plugin-Hosts>. Feel free to fork the
+    repository and submit pull requests!
+

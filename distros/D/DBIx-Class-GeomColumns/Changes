@@ -1,0 +1,9 @@
+Revision history for DBIx-Class-GeomColumns
+
+0.0.2  Wed Aug 27 2008
+       Handling geometry fragment of KML format.
+       Fix some bugs cooperating with DBIx::Class::Row::insert.
+
+0.0.1  Sun Aug 24 21:12:15 2008
+       Initial release.
+

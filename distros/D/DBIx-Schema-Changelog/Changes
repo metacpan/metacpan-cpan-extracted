@@ -1,0 +1,179 @@
+Revision history for DBIx-Schema-Changelog
+
+#========================================================================
+# Version 0.9.0
+  Date: 2015/09/15 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* changed lib requirements
+	* some fixes
+
+== ENHANCEMENT:
+
+	* writing changeset from db to file
+
+== TODO:
+
+	* more tests
+	* add trigger
+	* add functions
+	* add stored procedures
+
+#========================================================================
+# Version 0.0.8
+  Date: 2015/03/15 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* Entry.pm random cols fixed
+
+== ENHANCEMENT:
+
+	* add EXE_FILES to Makefile.PL
+
+#========================================================================
+# Version 0.7.1  Date: 2015/03/15 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* test failed
+
+#========================================================================
+# Version 0.7.0  Date: 2015/03/15 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* bugfix default 0 ne NULL
+
+== ENHANCEMENT:
+
+	* add entries into db table
+	* debuging for create table
+	* if driver supports add funtcions
+	* dies if template name is unknown
+	* add, alter and drop functions is implemented
+
+#========================================================================
+# Version 0.6.2 Date: 2015/03/07 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* sequence tests planned 9
+	
+
+#========================================================================
+# Version 0.6.1  Date: 2015/03/07 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* hash validate bugfix
+
+#========================================================================
+# Version 0.6.0  Date: 2015/03/06 (Mario Zieschang)
+#========================================================================
+
+== DOCUMENTATION:
+
+	* add spellcheck for PODs 
+
+== BUG FIXES:
+
+	* SKIP block for Pg tests
+
+== ENHANCEMENT:
+
+	* add indices while create table
+	* constraints while creating table
+	* running constraint tests
+	* die if add column action is not supported
+	* print version number in command line tool
+
+#========================================================================
+# Version 0.5.0  Date: 2015/03/04 (Mario Zieschang)
+#========================================================================
+
+== DOCUMENTATION:
+
+	* Cookbooks
+
+== ENHANCEMENT:
+
+	* extract create sequence for optinal driver
+	* add test for default action
+	* add unique constraint
+	* add constraint for single entry 
+
+#========================================================================
+# Version 0.4.0  Date: 2015/03/03 (Mario Zieschang)
+#========================================================================
+
+== DOCUMENTATION:
+
+	* DBIx::Schema::Changelog::Cookbook
+
+== BUG FIXES:
+
+	* drop column
+
+#========================================================================
+# Version 0.3.2  Date: 2015/03/03 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* fixes for windows test
+
+#========================================================================
+# Version 0.3.0  Date: 2015/03/01 (Mario Zieschang)
+#========================================================================
+
+== DOCUMENTATION:
+
+	* Manual for changelog files
+
+== ENHANCEMENT:
+
+	* Configurable postfix and prefix for table names
+
+#========================================================================
+# Version 0.2.1  Date: 2015/02/26 (Mario Zieschang)
+#========================================================================
+
+== BUG FIXES:
+
+	* Can't locate object method "type" via package "DBIx::Schema::Changelog::Command::Changeset" at .. /Command/Changeset.pm line 32.
+
+#========================================================================
+# Version 0.2.0  Date: 2015/02/25 (Mario Zieschang)
+#========================================================================
+
+== DOCUMENTATION:
+
+	* Running pod tests
+
+	* Add documentation pods
+
+== BUG FIXES:
+
+	* file module maker
+
+	* driver module maker
+
+	* create indizes for driver Pg
+
+== ENHANCEMENT:
+
+	* downgrade min perl version to 5.10
+
+#========================================================================
+# Version 0.1.0  Date: 2015/02/24 (Mario Zieschang, Thomas Mueller)
+#========================================================================
+
+* First version, released on an unsuspecting world.

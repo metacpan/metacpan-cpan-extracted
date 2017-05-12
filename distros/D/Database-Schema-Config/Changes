@@ -1,0 +1,8 @@
+Revision history for Perl extension Database::Schema::Config.
+
+.02  Tue May 16 18:15:00 2006
+ 	- holy friggin overhaul batman, cleaned it up a bit
+	- added contrib/config.pl to interact with the database
+
+.01  Mon May 08 12:00:00 2006
+	- Docs cleaned and preped for initial release

@@ -1,0 +1,141 @@
+#!/usr/bin/perl -w
+#========================================================================
+#
+# repo_get
+#
+# DESCRIPTION
+#
+#   Administrative tool for retrieving a document from the repository
+#   managed by Document::Repository.
+#
+# AUTHOR
+#   Bryce W. Harrington <bryce at bryceharrington dot com>
+#
+# COPYRIGHT
+#   Copyright (C) 2004 Bryce W. Harrington  
+#   All Rights Reserved.
+#
+#   This module is free software; you can redistribute it and/or
+#   modify it under the same terms as Perl itself.
+#
+#------------------------------------------------------------------------
+#
+# Last Modified:  $Date: 2005/06/11 05:36:59 $
+#
+# $Id: repo_get,v 1.1.1.1 2005/06/11 05:36:59 bryce Exp $
+#
+# $Log: repo_get,v $
+# Revision 1.1.1.1  2005/06/11 05:36:59  bryce
+# Initial import
+#
+# Revision 1.2  2005/02/06 07:06:14  bryce
+# Address change
+#
+# Revision 1.1  2004/08/15 07:49:50  bryce
+# Adding script for getting files in a document
+# Testing and fixing up repo_add and Document::Repository to do add and get
+#
+# Revision 1.1  2004/08/15 05:57:51  bryce
+# Implementing add document functionality
+#
+#========================================================================
+
+use strict;                             # Forces variable decl's
+use Carp;                               # Improved error/warning prints
+use Pod::Usage;                         # To report program usage
+use Getopt::Long;                       # Basic cmdline arg handling
+use Document::Repository;
+
+#------------------------------------------------------------------------
+# Commandline option processing
+#------------------------------------------------------------------------
+
+our $opt_help            = 0;    # Prints a brief help message
+our $opt_debug           = 0;    # Prints debug messages
+our $opt_repository_dir  = '';   # Location of the repository
+our $opt_revision        = '';
+our $opt_destination     = '.';
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");  
+GetOptions(
+           "help|h",             # Prints a brief help message
+           "debug|D=i",          # Prints debug messages
+	   "repository_dir|R=s", # Location of the repository
+	   "destination|d=s",    # Directory to put the files
+	   "revision|v=s",       # Revision number
+            ) || pod2usage(1);
+
+pod2usage(-verbose => 1, -exitstatus => 0) if $opt_help;
+
+my $repo = new Document::Repository( repository_dir => $opt_repository_dir,
+				     debug          => $opt_debug );
+
+my $copy_f = undef;
+my $select_f = undef;
+my $doc_id = shift @ARGV;
+
+if ($doc_id =~ /^\d+$/) {
+    if (! $repo->get($doc_id, $opt_revision, $opt_destination, $copy_f, $select_f) ) {
+	warn "Error:  ".$repo->get_error()."\n";
+	exit -1;
+    } elsif ($opt_debug>0) {
+	print "Retrieved '$doc_id' to $opt_destination\n";
+	exit 0;
+    }
+} else {
+    warn "Error:  '$doc_id' is not a valid document id\n";
+    exit -1;
+}
+
+
+__END__
+
+=head1 NAME
+
+repo_add - Administrative tool to directly add a document to a document
+repository.
+
+=head1 SYNOPSIS
+
+repo_get [options] doc_id
+
+ Options:
+   -h, --help                    Prints a brief help message
+   -D, --debug=integer           Prints debug messages
+   -R, --repository_dir          Location of the repository
+   -d, --destination             Directory to put the files
+   -r, --revision=integer        Revision number
+
+=head1 DESCRIPTION
+
+B<repo_get> - This retrieves the document specified by doc_id from the
+repository.  Only one document can be retrieved at a time.
+
+To retrieve a particular past revision of the document, use the
+--revision parameter.
+
+The user executing this script must have direct read/write/execute
+permisison into the document repository.
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce at bryceharrington dot comE<gt>
+
+L<http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce W. Harrington.
+All Rights Reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.1.1.1 $
+
+=cut
+
+
+

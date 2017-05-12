@@ -1,0 +1,10 @@
+Revision history for Dancer2-Plugin-reCAPTCHA
+
+0.3       2015-08-21
+          Updated documentation
+
+0.2       2015-08-21
+          Switched to reCAPTCHA version 2
+
+0.1       2015-07-17
+          First version, released on an unsuspecting world.

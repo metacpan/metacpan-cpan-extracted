@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+      <!DOCTYPE phrasebook [
+                    <!ELEMENT phrasebook (dictionary)*>
+                    <!ELEMENT dictionary (phrase)*>
+                    <!ATTLIST dictionary name CDATA #REQUIRED>
+                    <!ELEMENT phrase (#PCDATA)>
+                    <!ATTLIST phrase name CDATA #REQUIRED>
+      ]>
+      <phrasebook>
+<dictionary name="exampledictionary">
+
+      <phrase name="test.query">
+             select now() as currenttime
+      </phrase>
+      <phrase name="hosts.all.count">
+             select count(*) as count from hosts
+      </phrase>
+      <phrase name="dhcpdomains.loadall">
+        select dhcpDomainName from dhcpDomains
+      </phrase>
+      <phrase name="dhcpdomains.update.eid">
+        update hosts
+        set ipaddress=inet_aton(?)
+        where id = ?
+      </phrase>
+      <phrase name="host.insert">
+insert into hosts (ipaddress,macaddress)
+values (inet_ntoa(?),?)
+      </phrase>
+      <phrase name="hosts.bysubnet">
+select  h.macaddress ,s.subnet,s.netmask
+from    hosts h,
+        subnets s
+where   inet_aton(s.subnet) &amp; inet_aton(s.netmask) = inet_aton(h.ipaddress) &amp; inet_aton(s.netmask)
+</phrase>
+
+</dictionary>
+</phrasebook>

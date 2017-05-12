@@ -1,0 +1,50 @@
+---
+abstract: 'I2C interface to ADV7611 using Device::I2C'
+author:
+  - 'Slava Volkov <sv99@inbox.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-I2C-ADV7611
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Device::I2C::ADV7611:
+    file: lib/Device/I2C/ADV7611.pm
+    version: '0.11'
+requires:
+  Carp: '0'
+  Device::I2C: '0'
+  Exporter: '0'
+  Fcntl: '0'
+  constant: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sv99/perl-device-i2c-adv7611/issues
+  homepage: https://metacpan.org/release/Device-I2C-ADV7611
+  repository: git://github.com/sv99/perl-device-i2c-adv7611.git
+version: '0.11'

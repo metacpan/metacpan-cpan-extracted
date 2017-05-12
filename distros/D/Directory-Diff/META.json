@@ -1,0 +1,56 @@
+{
+   "abstract" : "recursively find differences between similar directories",
+   "author" : [
+      "Ben Bullock <bkb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Directory-Diff",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Compare" : "0",
+            "File::Copy" : "0",
+            "File::Path" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/benkasminbullock/Directory-Diff/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/benkasminbullock/Directory-Diff.git",
+         "web" : "https://github.com/benkasminbullock/Directory-Diff"
+      }
+   },
+   "version" : "0.05",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

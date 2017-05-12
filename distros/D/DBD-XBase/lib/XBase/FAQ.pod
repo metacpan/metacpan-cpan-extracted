@@ -1,0 +1,225 @@
+
+=head1 NAME
+
+XBase::FAQ - Frequently asked questions about the XBase.pm/DBD::XBase
+modules
+
+=head1 DESCRIPTION
+
+This is a list of questions people asked since the module has been
+announced in fall 1997, and my answers to them.
+
+=head1 AUTHOR
+
+Jan Pazdziora
+
+=head1 Questions and answers
+
+=over 2
+
+=item What Perl version do I need? What other modules?
+
+You need perl 5.10 or newer. You need B<DBI> module version 1.00
+or higher, if you want to use the DBD driver (which you should).
+
+=item Can I use B<XBase.pm> under Windows 95/NT?
+
+Yes. It's a standard Perl module so there is no reason it shouldn't.
+Or, actually, there are a lot of reasons why standard thing do not
+work on systems that are broken, but I'm trying hard to workaround
+these bugs. If you find a problem on these platform, send me
+a description and I'll try to find yet another workaround.
+
+=item Is there a choice of the format of the date?
+
+The only possible format in which you can get the date and that the
+module expect for inserts and updates is a 8 char string 'YYYYMMDD'.
+It is not possible to change this format. I prefer to do the formating
+myself since you have more control over it.
+
+=item The C<get_record> also returns deleted records. Why?
+
+Because. You get the _DELETED flag as the first value of the array.
+This gives you a possibility to decide what to do -- undelete,
+ignore... It's a feature -- you say you want a record of given
+number, you get it and get additional information, if the record is or
+isn't marked deleted.
+
+=item But with B<DBD::XBase>, I do not see the deleted records.
+
+That's correct: B<DBD::XBase> only gives you records that are positively
+in the file and not deleted. Which shows that B<XBase.pm> is a lower
+level tool because you can touch records that are marked deleted, while
+B<DBD::XBase> is higher level -- it gives you SQL interface and let's you
+work with the file more naturaly (what is deleted should stay
+deleted).
+
+=item B<XBase.pm> cannot read files created with [your favorite tool].
+
+Describe exactly, what you expect and what you get. Send me the file
+(I understand attachments, uuencode, tar, gzip and zip) so that
+I can check what it going on and make B<XBase.pm> undestand your file.
+A small sample (three rows, or so) are generally enough but you can
+send the whole file if it doesn't have megabytes. Please understand
+
+=item How to install the module when I do not have B<make>?
+
+On Win* platform and with ActiveState port, use ppm to install
+B<DBD::XBase> from ActiveState's site. You can also just copy the files
+from the lib directory of the distribution to where perl can find
+them. Also check whether your make doesn't hide under different names
+(nmake, gmake). See C<README>.
+
+=item I have make but I cannot install into default directory.
+
+Ask your sysadmin to do it for your. If he refuses, fire the
+sysadmin. See C<README> for how to install into and use nonstandard
+place for the module.
+
+=item Can I access one dbf file both from Perl and (say) Clipper?
+
+For reading -- yes. For writing -- B<XBase.pm> has a locksh and lockex
+method to lock the file. The question is to what extend Clipper (or
+Fox* or whatever) uses the same system calls, documentation of native
+XBase applications doesn't tell this. So the answer is that for
+multiple updates you should probably consider real RDBMS system
+(PostgreSQL, MySQL, Oracle, to name a few).
+
+=item B<XBase.pm/DBD::XBase> breaks my accented characters.
+
+No, it doesn't. The character data is returned exactly as it appears
+in the dbf/dbt file. You probably brought the file from different
+system that uses differend character encodings. So some bytes in the
+strings have different meaning on that system. You also probably have
+fonts in different encoding on that system. In the Czech language, we
+have about 6 different encoding that affect possition at which
+accented characters appear.
+
+So what you really want to do is to use some external utility to
+convert the strings to encoding you need -- for example, when I bring
+the dbf from Win*, it often is in the Windows-1250 or PC-Latin-2
+encoding, while the standard is ISO-8859-2. I use my utility
+B<Cz::Cstocs> to do the conversion, you maight also try GNU program
+B<recode> or use B<Text::Iconv> Perl module.
+
+=item How do I access the fields in the memo file?
+
+Just read the memo field, it will fetch the data from the memo file
+for you transparently.
+
+=item Matching with C<field = '%str%'> doesn't work.
+
+If you want to match wildcards with B<DBD::XBase>, you have to use C<like>:
+
+	select * from table where field like '%str%'
+
+=item Can I sue you if B<XBase.pm/DBD::XBase> corrupts my data?
+
+No. At least, I hope no. The software is provided without any
+warranty, in a hope you might find is usefull. Which is by the way
+the same as with most other software, even if you pay for that. What
+is different with B<XBase.pm/DBD::XBase> is the fact that if you find out
+that the results are different from those expected, you are welcome to
+contact me, describe the problem and send me the files that give troubles
+to the module, and I'll try to find fix the module.
+
+=item What dbf/other files standard does the module support?
+
+I try to support any file that looks reasonably as
+dbf/dbt/fpt/smt/ndx/ntx/mdx/idx/cdx. There are many clones of
+XBase-like software, each adding its own extension. The module tries
+to accept all different variations. To do that, I need your
+cooperation however -- usually good description of the problem, file
+sample and expected results lead to rather fast patch.
+
+=item What SQL standard does the B<DBD::XBase> support?
+
+If supports a reasonable subset of the SQL syntax, IMHO. So you can do
+select, delete, insert and update, create and drop table. If there is
+something that should be added, let me know and I will consider it.
+Having said that, I do not expect to ever support joins, for example.
+This module is more a parser to read files from your legacy
+applications that a RDBMS -- you can find plenty of them around -- use
+them.
+
+=item I downloaded you module I do not know how to install it.
+
+Did you follow the steps in the C<README> and C<INSTALL> files? Where
+did it fail? This module uses a standard way modules in Perl are
+installed. If you've never installed a module on your system and your
+system is so non-standard that the general instruction do not help,
+you should contact your system administrator or the support for your
+system.
+
+=item C<select max(field) from table> does not work.
+
+Aggregate functions are not supported. It would probably be very
+slow, since the DBD doesn't make use of indexes at the moment. I do
+not have plans to add this support in some near future.
+
+=item C<DBI-E<gt>connect> says that the directory doesn't exist ...
+
+... but it's there. Is B<DBD::XBase> mad or what?
+
+The third part of the first parameter to the connect is the directory
+where B<DBD::XBase> will look for the dbf files. During connect, the
+module checks C<if -d $directory>. So if it says it's not there, it's not
+there and the only thing B<DBD::XBase> can do about it is to report it to
+you. It might be that the directory is not mounted, you do not have
+permissions to it, the script is running under different UID than when
+you try it from command line, or you use relative patch and run the
+script from a different directory (pwd) than you expect. Anyway, add
+
+	die "Error reading $dir: $!\n" unless -d $dir;
+
+to your script and you will see that it's not B<DBD::XBase> problem.
+
+=item The B<XBase.pm/dbfdump> stops after reading I<n> records ...
+
+... why doesn't it read all I<10 x n> records?
+
+Check if the file isn't truncated. C<dbfdump -i file.dbf> will tell
+you the expected number of records and length of one record, like
+
+	Filename:       file.dbf
+	Version:        0x03 (ver. 3)
+	Num of records: 65
+	Header length:  1313
+	Record length:  1117
+	Last change:    1998/12/18
+	Num fields:     40
+
+So the expected length of the file is at least I<1313 + 65 * 1117>. If
+it's shorter, you've got damaged file and B<XBase.pm/dbfdump> only
+reads as much rows as it can find in the dbf.
+
+=item How is this B<DBD::XBase> related to B<DBD::ODBC>?
+
+B<DBD::XBase> reads the dbf files directly, using the (included)
+B<XBase.pm> module. So it will run on any platform with reasonable new
+perl. With B<DBD::ODBC>, you need an ODBC server, or some program, that
+B<DBD::ODBC> could talk to. Many proprietary software can serve as ODBC
+source for dbf files, it just doesn't seem to run on Un*x systems. And
+is also much more resource intensive, if you just need to read the
+file record by record and convert it to HTML page or do similary
+simple operation with it.
+
+=item How do I pack the dbf file, after the records were deleted?
+
+B<XBase.pm> doesn't support this directly. You'd probably want to
+create new table, copy the data and rename back. Patches are always
+welcome.
+
+=item Foxpro doesn't see all fields in dbf created with B<XBase.pm>.
+
+Put 'version' => 3 options in to the create call -- that way we say
+that the dbf file is dBaseIII style.
+
+=back
+
+=cut
+
+=head1 AVAILABLE FROM
+
+http://www.adelton.com/perl/DBD-XBase/
+

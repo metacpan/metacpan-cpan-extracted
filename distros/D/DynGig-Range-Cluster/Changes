@@ -1,0 +1,8 @@
+Revision history for DynGig-Range-Cluster
+
+0.03    2013-01-03
+        support plugin and reload cluster changes without restart
+
+0.01    2012-06-29
+        First version. Deprecating DynGig::Cluster.
+

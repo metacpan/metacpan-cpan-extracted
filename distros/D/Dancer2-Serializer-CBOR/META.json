@@ -1,0 +1,69 @@
+{
+   "abstract" : "CBOR serializer for Dancer2",
+   "author" : [
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Serializer-CBOR",
+   "no_index" : {
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CBOR::XS" : "0",
+            "Dancer2" : "0.154000",
+            "Dancer2::Core::Role::Serializer" : "0",
+            "Moo" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0.154000",
+            "Dancer2::Logger::Console" : "0",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/PerlDancer/dancer2-serializer-cbor/issues"
+      },
+      "repository" : {
+         "url" : "http://github.com/PerlDancer/dancer2-serializer-cbor"
+      }
+   },
+   "version" : "0.000002",
+   "x_serialization_backend" : "JSON::XS version 3.01"
+}
+

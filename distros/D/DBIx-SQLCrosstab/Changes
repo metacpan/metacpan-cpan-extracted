@@ -1,0 +1,80 @@
+Revision history for Perl extension DBIx::SQLCrosstab.
+
+1.17 11-Jan-2004
+
+    New features
+    ------------
+    - Now the {op} parameter is an array
+      reference, containing pairs of operator/column, so that
+      now it is possible to perform 
+      [ ['COUNT', 'id'], ['SUM', 'salary'], ['AVG', 'expenses'] ]
+      in one query.
+
+    Deprecations
+    ------------
+    - usage of {col_op} and {add_op} (and {op} as a scalar) are now
+      DEPRECATED.
+
+    Bugs fixed
+    ----------
+    - operator names may cause a syntax error when they become 
+      column headers. Fixed.
+    
+    Changed functionality
+    ---------------------
+    - changed operator names (when they become column headers)
+      to "x"operator (xcount, xsum, xavg, etc.) to avoid a name
+      conflict with some DBMS engines. Thanks to Cyril Dréno for
+      reporting this bug.
+      
+    - changed crosstab column names from "fldXXX" to "xfldXXX"
+      to avoid possible clashes with some other SQL generators.
+
+    - the main example (sqlcrosstab_example.pl) now
+      creates multi-operation tables to test and demonstrate 
+      the above change.    
+    
+    Examples and Documentation
+    --------------------------
+        - Changed example create_crosstab.sqlite to create_crosstab.sql92
+      (it should work on any ANSI-SQL92 compliant DBMS)
+      
+    - Changed example table names to "xtab_*", so that
+      users allowed to a single database can easily add these
+      tables without affecting existing ones.
+      
+    - Added drop_crosstab.sql to remove the example tables easily.
+      (Thanks to Mark Stosberg for all these ideas on the SQL examples)
+      
+    - New documentation available:
+      an article at OnLamp http://www.onlamp.com/pub/a/onlamp/2003/12/04/crosstabs.html
+      and one at PerlMonks http://www.perlmonks.org/index.pl?node_id=313934
+ 
+1.16 12-Dec-2003 (Experimental - Not released)
+    - Raised pre-requisite. DBIx::SQLCrosstab::Format won't
+      work with Perl versions earlier than 5.6.1. 
+      Notice that due to this limitation the installation test will
+      fail under Perl 5.6.0.
+      Actually, the minimum requirement was like that from the 
+      beginning, but I failed to notice it. Thanks
+      to Cyril Dréno for reporting this bug.
+
+1.15 12-Oct-2003
+    - Added new methods:
+          set_param()   to add or modify parameters after creation
+          get_params()  to get the current parameters into a string
+          save_params() to save the parameters to a file
+          load_params() to load the parameters from a file
+    - Added new examples and database diagram
+    - Added new sample schemas
+    - Fixed some documentation issues
+    
+1.14 08-Oct-2003
+    First distributed version
+    
+1.00-1.13
+    Building features and fixing bugs
+
+1.00 12-Sep-2003
+	- original version
+

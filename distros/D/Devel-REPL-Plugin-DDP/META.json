@@ -1,0 +1,69 @@
+{
+   "abstract" : "Format return values with Data::Printer",
+   "author" : [
+      "Thomas Sibley <tsibley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-REPL-Plugin-DDP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.8",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0.17",
+            "Devel::REPL::Plugin" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsibley/Devel-REPL-Plugin-DDP/issues"
+      },
+      "homepage" : "https://github.com/tsibley/Devel-REPL-Plugin-DDP",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tsibley/Devel-REPL-Plugin-DDP.git",
+         "web" : "https://github.com/tsibley/Devel-REPL-Plugin-DDP"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Andreas Voegele <andreas@andreasvoegele.com>",
+      "Thomas Sibley <tsibley@cpan.org>"
+   ]
+}
+

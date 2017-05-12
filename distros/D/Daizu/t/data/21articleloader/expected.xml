@@ -1,0 +1,4 @@
+<body xmlns="http://www.w3.org/1999/xhtml" xmlns:xi="http://www.w3.org/2001/XInclude" xmlns:daizu="http://www.daizucms.org/ns/html-extension/" xml:base="daizu:///foo.com/_index.html"><p>This is the homepage of <em>foo.com</em></p>
+
+<p>Foo.com has <a href="blog/">a blog</a>.</p>
+</body>

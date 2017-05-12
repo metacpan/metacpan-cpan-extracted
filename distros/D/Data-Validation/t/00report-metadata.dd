@@ -1,0 +1,47 @@
+do { my $x = {
+       'build' => {
+                    'requires' => {
+                                    'Module::Build' => '0.4004',
+                                    'version' => '0.88'
+                                  }
+                  },
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build' => '0.4004',
+                                        'version' => '0.88'
+                                      }
+                      },
+       'runtime' => {
+                      'recommends' => {
+                                        'Class::Usul' => 'v0.63.0'
+                                      },
+                      'requires' => {
+                                      'Email::Valid' => '1.196',
+                                      'Exporter::Tiny' => '0.042',
+                                      'HTTP::Tiny' => '0.056',
+                                      'List::Util' => '1.42',
+                                      'Module::Runtime' => '0.014',
+                                      'Moo' => '2.000001',
+                                      'Try::Tiny' => '0.22',
+                                      'Type::Tiny' => '1.000005',
+                                      'Unexpected' => 'v0.43.0',
+                                      'namespace::autoclean' => '0.26',
+                                      'perl' => '5.010001'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Class::Null' => '1.09',
+                                   'File::Spec' => '0',
+                                   'Module::Build' => '0.4004',
+                                   'Module::Metadata' => '0',
+                                   'Sys::Hostname' => '0',
+                                   'version' => '0.88'
+                                 }
+                 }
+     };
+  $x;
+ }

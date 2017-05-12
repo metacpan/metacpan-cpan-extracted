@@ -1,0 +1,226 @@
+{
+   "abstract" : "Build your distributions like RBUELS does",
+   "author" : [
+      "Robert Buels <rbuels@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102340, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-RBUELS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::NextRelease" : 0,
+            "Dist::Zilla::PluginBundle::FLORA" : 0,
+            "Moose" : 0,
+            "namespace::autoclean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-PluginBundle-RBUELS@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-RBUELS"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-PluginBundle-RBUELS",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rbuels/dist-zilla-pluginbundle-rbuels.git",
+         "web" : "http://github.com/rbuels/dist-zilla-pluginbundle-rbuels"
+      }
+   },
+   "version" : "0.1",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@FLORA/@Basic/GatherDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@FLORA/@Basic/PruneCruft",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@FLORA/@Basic/ManifestSkip",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@FLORA/@Basic/MetaYAML",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@FLORA/@Basic/License",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@FLORA/@Basic/Readme",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@FLORA/@Basic/ExtraTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@FLORA/@Basic/ExecDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@FLORA/@Basic/ShareDir",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@FLORA/@Basic/MakeMaker",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@FLORA/@Basic/Manifest",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@FLORA/@Basic/TestRelease",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@FLORA/@Basic/ConfirmRelease",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@FLORA/@Basic/UploadToCPAN",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@FLORA/MetaConfig",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@FLORA/MetaJSON",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@FLORA/PkgVersion",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@FLORA/PodSyntaxTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@FLORA/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@FLORA/PodCoverageTests",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@FLORA/MetaResources",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@FLORA/Authority",
+            "version" : "1.000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@FLORA/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@FLORA/PodWeaver",
+            "version" : "3.101640"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereq",
+            "name" : "@FLORA/AutoPrereq",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereq",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereq",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "CompileTests",
+            "version" : "1.101800"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.102340"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.102340"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.102340"
+      }
+   },
+   "x_authority" : "cpan:RBUELS"
+}
+

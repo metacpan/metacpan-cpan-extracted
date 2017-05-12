@@ -1,0 +1,30 @@
+---
+abstract: 'Command line interface for deployment handler'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-DeploymentHandler-CLI
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class::DeploymentHandler: '0'
+  Moo: '2'
+  Type::Tiny: '0.038'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/DBIx-Class-DeploymentHandler-CLI/issues
+  repository: https://github.com/interchange/DBIx-Class-DeploymentHandler-CLI.git
+version: '0.002'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

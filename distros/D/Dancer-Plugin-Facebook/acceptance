@@ -1,0 +1,22 @@
+#!/bin/sh -e
+
+# Be quiet by default
+verbose=0
+
+while getopts ":n" option; do
+    case $option in
+        n)
+            export FORCE_FAIL=1
+            ;;
+        v)
+            verbose=1
+            ;;
+        *)
+            echo "Unknown option $option"
+            exit 1;
+            ;;
+    esac
+done
+
+rm -rf .build
+dzil test verbose=$verbose $@

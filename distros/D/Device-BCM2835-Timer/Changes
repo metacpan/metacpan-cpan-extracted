@@ -1,0 +1,7 @@
+Revision history for Device::BCM2835::Timer
+
+1.01	01 July 2014
+	Minor POD and Makefile fixes.
+	
+1.0	30 June 2014
+	First version.

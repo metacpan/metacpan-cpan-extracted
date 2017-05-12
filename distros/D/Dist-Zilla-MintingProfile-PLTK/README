@@ -1,0 +1,32 @@
+NAME
+    Dist::Zilla::MintingProfile::PLTK - A minting profile for Modules
+    written with MooseX::Declare
+
+VERSION
+    version 0.2.0
+
+SYNOPSIS
+         dzil new -P PLTK -p Class   New::ClassName
+
+    or
+
+         dzil new -P PLTK -p Command New::CommandName
+
+    This is specific minting profile for the PLTK project.
+
+    It comes in two flavors: one for Classes and one for Commands.
+
+MORE
+    There is, on purpose, no `default` profile, so that you have to choose
+    `Class` or `Command`
+
+BUGS AND LIMITATIONS
+AUTHOR
+    Daniel B <dbr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Daniel B.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

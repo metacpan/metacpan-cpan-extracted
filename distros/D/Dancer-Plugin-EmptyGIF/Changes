@@ -1,0 +1,13 @@
+Revision history for Perl extension Dancer::Plugin::EmptyGIF.
+
+0.3  Thu Sep  6 13:51:48 CEST 2012
+	- Added missing Dancer dependency.
+
+0.2  Mon Aug 27 10:20:26 CEST 2012
+	- Moved away from Module::Install
+	- Cleaned up the directory.
+
+0.1  Mon Mar 12 11:04:49 2012
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Dancer::Plugin::EmptyGIF
+

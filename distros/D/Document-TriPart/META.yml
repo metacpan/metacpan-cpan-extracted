@@ -1,0 +1,24 @@
+---
+abstract: 'Read, write & edit a tri-part document (preamble, YAML::Tiny header, and body)'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Document-TriPart
+requires:
+  Any::Moose: 0
+  Carp::Clan: 0
+  File::AtomicWrite: 0
+  File::Temp: 0
+  IO::Scalar: 0
+  Path::Class: 0
+  YAML::Tiny: 0
+version: 0.024

@@ -1,0 +1,53 @@
+*** Check.pm	Sun Oct  9 17:57:03 2005
+--- /tmp/Check.pm	Tue Jul 10 15:08:09 2007
+***************
+*** 242,247 ****
+--- 242,289 ----
+      }
+  }
+  
++ =head2 diverse_characters
++ 
++ Make sure the password is contains a diversity of character group types
++ (uppercase, lower case, digits, symbols). By default, at least one character
++ group must be present in the password (which any password will satisfy -
++ override this to invoke the test). If B<diversity_required> was passed
++ as an option to check(), this value will be used instead.
++ 
++ =cut
++ sub _check_diverse_characters($) {
++     my ($self) = @_;
++     my $diversity_required = 1;
++     # does the user want a different diversity?
++     if (exists $self->{'options'}{'diversity_required'} and not defined $self->{'options'}{'diversity_required'}) {
++         # issue a warning
++         Carp::cluck("diversity_required argument must be a defined value");
++         return undef;
++     }
++     elsif (exists $self->{'options'}{'diversity_required'} and defined $self->{'options'}{'diversity_required'}) {
++         # is it in range?
++         if ($self->{'options'}{'diversity_required'} =~ /^[1-4]\d*$/) {
++             $diversity_required = $self->{'options'}{'diversity_required'};
++         }
++         else {
++             # issue a warning
++             Carp::cluck("diversity_required argument [$self->{'options'}{'diversity_required'} isn't in the range 1-4");
++             return undef;
++         }
++     }
++     
++     my $group_count = 0;
++     foreach my $pattern (qw([A-Z] [a-z] [0-9] [^A-Za-z0-9]))
++     {
++     	$group_count++ if $self->{'password'} =~ /$pattern/;
++     }
++     
++     # Are enough character groups used to satisfy diversity requirements?
++     unless ($group_count >= $diversity_required) {
++         $self->_add_error("Your password must contain a good mix of character types, from at least $diversity_required of the following categories: Uppercase letters, lowercase letters, numeral, symbols.");
++     }
++ }
++ 
+  =head2 silly
+  
+  Make sure the password isn't a known silly word (e.g 'password' is a bad choice

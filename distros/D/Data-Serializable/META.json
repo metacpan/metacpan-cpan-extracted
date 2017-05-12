@@ -1,0 +1,63 @@
+{
+   "abstract" : "Moose role that adds serialization support to any class",
+   "author" : [
+      "Robin Smidsr\u00c3\u00b8d <robin@smidsrod.no>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300031, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Serializable",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "Moose::Role" : "0",
+            "Storable" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Moose" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/robinsmidsrod/Data-Serializable.git",
+         "web" : "http://github.com/robinsmidsrod/Data-Serializable"
+      }
+   },
+   "version" : "0.41.0"
+}
+

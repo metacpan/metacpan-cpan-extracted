@@ -1,0 +1,10 @@
+DESCRIPTION
+    Devel::CCompat::C99::ScopedVariables - tests support for C99
+    scoped variables
+
+    A module to highlight platforms which do and do not support scoped
+    variables.
+
+VERSION
+    Version 0.001
+

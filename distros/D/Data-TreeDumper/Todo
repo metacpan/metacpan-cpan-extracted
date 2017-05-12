@@ -1,0 +1,208 @@
+[12:03] <kent\n> nadim: $("ul").click(function(){ $(this).find("li").show() });  # theres a start
+
+options to show addresses and links only when references exist
+	needs two passes
+	could filter the output with a s/// to avoid two passes
+
+DTD::Flare instead for jquery
+
+the filter is called three times, it could be cached
+	search for $filter_sub->
+	
+move all the examples to documentation and tests
+
+DTD::Diff
+	show only diff + some (settable) context
+	DHTML rendered that synchronizes collapse between trees
+
+Add example usind Data::DPath
+
+color by type
+sort by type
+#filter by type done in D::TD::Utils
+
+DHTML
+	colorize 
+	let user set links (? in a filter specific to the dhtml renderer ?)
+	
+check Test Builder unoverload
+
+possibility to replace element by scalar
+
+Check is Data::Visitor can be used as a base iterator
+
+separate glyph generation from data dumping (to be reuse in D::TD::Diff
+
+have sub modules handle the different types eg: D::TD::Type::Array; ..
+	Load them dynamically or at start if explicitely named
+		let's user define his own module
+	Refactor DTD and use the type filters way of handling all types including HASHES, ARRAYS, ...
+	
+warp output after generation
+
+give an example for a type filter (example from pbs2 is cool)
+
+it should be possible to scope filter
+	a filter for a type sets more filters for the data below the type;
+	when the typed object is finished diplaying, revert to normal filters
+	
+iterator don't get to the leaves, document it
+
+Add more visual examples for the options
+
+Dumper in debugger gives more information about subs
+	SUB = CODE(0x8417ed0)  [C15]
+
+	 'SUB' => CODE(0x848b3bc)
+	    -> &main::__ANON__[debug_test.pl:52] in debug_test.pl:49-52
+	    => uses Dumpvalue and debuger data!
+
+	this is because it can extract the data from DB::, maybe possible throug B::
+	
+	Also look at Self module
+	
+Automatically generate DTD::OO
+
+What about a tie::TreeDumper and a tie::TreeDumper::Diff?
+
+Talk with Devel::Size module author to make size dumping faster
+
+Add option name verification so we stop passing the wrong names!
+	=> optional
+	=> dump a list of the available names
+		=> soundex the closes
+			=> take the closest and display only a warning?
+
+------------------------------
+# below are done -
+------------------------------
+
+#Reduce the amount of times a variable is accessed
+
+#GetElement is called twice per element this could be optiimized away
+
+#Display when sub levels are not displayed anymore because of MAX_LEVEL
+	=> use DISPLAY_NUMBER_OF_ELEMENTS_OVER_MAX_DEPTH
+	
+#Handle operator overloading. 
+#support Scalar::Cycle type
+
+#hash key sorting is alphanumeric giving the list '1, 2, 21, 22, 3, ...)
+	=> use Sort::Naturally
+	
+#wrap error 
+	test with: [nadim@nadim config]$ pbs -p parent.pl parent -save_config xyz -display_depend_start  -cw2 'bold yellow' -no_silent_override
+	test with try_it.pl
+	=> dump was extra incdented at caller
+	
+!Add the possibility to prune self not only children
+	why? 
+		objects should be able to remove themselves only their parents should be able to do that
+		
+	this is difficult as the name of self (including glyphs) is already
+		displayed when this is renderer. Eveni if self was to render its
+		own name, self prvious sibling name renderend would be wrong if
+		self decided it was not to be displayed. This means that glyph rendering
+		has to wait till all nodes are rendered.
+		
+	What do we do when a node removed itself and a we encounter a reference to the node?
+
+# Add DISPLAY_NUMBER_OF_ELEMENTS
+
+#when dumping a node of type Regexp, print the regexp
+
+#make it possible to register a dumper per type
+
+#Accept non reference input
+
+# display caller location
+
+# add a PrintTree function
+
+!address label containing a reference could be displayed in another color
+	when generating ansi codes
+
+#display tie for other types than arrays and hashes
+
+#DISPLAY_PATH
+
+#show if a node has more sublevel but those will not be displayed because of MAX_DEPTH
+	=> with option
+
+
+#NO_WRAP option
+
+#RESET => NO_PACKAGE_SETTINGS
+
+#Document
+	#Copyright year is wrong
+	#dependency to module giving the console size
+	#\n not documented
+	#(no elements)
+
+#option for what \r \n are replaced with
+#	should give the possibility to replace any non printing character
+
+#make it visible when a node has sub levels but MAX_DEPTH stops its display
+
+Handle data that contains "\n" and make the output look bad.
+
+#Hash keys quoting
+
+#More control over the glyphs and their color/numbering
+
+#Tree simple munging example
+
+#visualization plug-ins
+
+#DHTML support
+
+#DISPLAY_OBJECT_TYPE
+
+#Dodcument the iterator/search capability added by no output
+
+#NO output
+
+#windows support
+
+#perl address
+#perl size
+
+#pass path to filters
+
+#Filters setting perl level + some global if needed
+	
+coloring the title
+coloring the tree
+example of coloring an array index
+
+#typo: missing ':' in documentation (fixed but not released
+
+#dump of multiple structures
+
+#level numbering / tagging / coloring
+
+#coloring examples
+
+#fix and release without the spurious \n in the title when using the DumpTreeFunction
+
+#Root adress option
+
+#no address option
+
+#filter chaining
+
+#tree substitution
+
+#wrap should be made optional and/or passed a screen size for the times where
+	the module is used without a tty
+
+#Documentation
+
+#? pass the title of the data structure as an argument
+
+#? pass indentation to TreeDumper
+
+#? Pass override args to DumpTree
+
+#export sub names

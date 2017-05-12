@@ -1,0 +1,37 @@
+---
+abstract: 'Lets you write DBIC add_column() definitions as attribute options'
+author:
+  - 'Norbert Buchmuller, C<< <norbi at nix.hu> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  FindBin: 0
+  IO::All: 0.41
+  MooseX::NonMoose: 0.17
+  Path::Class: 0.16
+  Test::Aggregate: 0.363
+  Test::DBIx::Class: 0.10
+  Test::Deep: 0.103
+  Test::Differences: 0.4801
+  Test::More: 0.92
+  Test::Most: 0.21
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-MooseColumns
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Moose: 1.19
+  namespace::autoclean: 0.09
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/mendel/DBIx-Class-MooseColumns.git
+version: 0.22

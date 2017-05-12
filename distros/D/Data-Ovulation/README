@@ -1,0 +1,21 @@
+DESCRIPTION
+
+This module tries to predict if and when an ovulation has occurred within the female menstrual cycle
+based on basal body temperature values. Taking the temperature values after the ovulation into account
+it is possible to predict if an impregnation has occured. This data is often used as the basis for 
+basal temperature curves.
+
+WARNING: THE INFORMATION DRAWN FROM THE CALCULATIONS THAT THIS MODULE PROVIDES SHOULD NOT BE USED
+AS A MEANS OF CONTRACEPTION!
+
+
+INSTALLATION
+
+To install this module type the following in the distribution
+directory:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

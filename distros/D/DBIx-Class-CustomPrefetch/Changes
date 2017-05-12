@@ -1,0 +1,23 @@
+Revision history for DBIx-Class-CustomPrefetch
+
+0.09    вторник, 24 ноября 2009 г. 19:23:08 (MSK)
+        fixed f*cking bug. do not use 0.08
+0.08    четверг, 19 ноября 2009 г. 15:54:13 (MSK)
+        better support for costom resultsets
+0.07    понедельник,  9 ноября 2009 г. 21:16:36 (MSK)
+        prefetch for single item
+0.06    среда, 21 октября 2009 г. 14:36:01 (MSD)
+        really fixed a bug
+0.05    среда, 21 октября 2009 г. 14:21:06 (MSD)
+        fix bug for custom resultsets
+0.04    понедельник, 19 октября 2009 г. 19:50:21 (MSD)
+        Updated deps
+0.03    воскресенье, 11 октября 2009 г. 19:03:17 (MSD)
+        Updated deps
+        Created live tests
+        Small fixes
+0.02    среда, 12 августа 2009 г. 17:24:38 (MSD)
+        removed warning
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

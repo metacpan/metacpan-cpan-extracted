@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:                Dotiac-addon-importloop
+version:             0.2
+abstract: |-
+  A loop that imports the loop variables.
+license:             mit
+generated_by:        hand
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL: 0.5
+build_requires:
+    Test::More: 0
+    Test::Pod:  0
+provides:
+   Dotiac::DTL::Addon::importloop:
+     file: lib/Dotiac/DTL/Addon/importloop.pm
+     version: 0.2
+   Dotiac::DTL::Tag::importloop:
+     file: lib/Dotiac/DTL/Tag/importloop.pm
+     version: 0.2
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

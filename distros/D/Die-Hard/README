@@ -1,0 +1,67 @@
+NAME
+    Die::Hard - objects as resistant to dying as John Maclane
+
+SYNOPSIS
+     my $fragile = Fragile::Object->new;
+     my $diehard = Die::Hard->new($fragile);
+ 
+     $diehard->isa('Fragile::Object'); # true
+     $diehard->method_that_will_die;   # lives!
+     $fragile->method_that_will_die;   # dies!
+
+DESCRIPTION
+    Die::Hard allows you to create fairly transparent wrapper object that
+    delegates all method calls through to the wrapped object, but does so
+    within an `eval { ... }` block. If the wrapped method call dies, then it
+    sets a `last_error` attribute.
+
+  Constructor
+    `new(%attributes)`
+        Standard Moose-style constructor.
+
+    `new($object)`
+        Shortcut for setting the `proxy_for` attribute.
+
+  Attributes
+    `proxy_for`
+        The object being wrapped. Read-only; required.
+
+    `last_error`
+        If the last proxied method call died, then this attribute will contain
+        the error. Otherwise will be undef.
+
+  Methods
+    `isa`
+        Tells lies; claims to be the object it's proxying.
+
+    `DOES`
+        Tells the truth; claims to do the object it's proxying.
+
+    `can`
+        Tells the truth; claims it can do anything the object it's proxying
+        can do.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Die-Hard>.
+
+SEE ALSO
+    No::Die.
+
+    The $_try function from Object::Util is a different way to achieve a
+    similar effect.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

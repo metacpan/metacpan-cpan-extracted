@@ -1,0 +1,11 @@
+0.004 2017-03-19 00:06:25-0500
+  - List all the PluginBundle's dependencies.
+
+0.003 2017-03-18 20:57:20-0500
+  - Make sure all the PluginBundle roles are listed as dependencies.
+
+0.002 2017-03-18 18:39:30-0500
+  - Add PodWeaver plugin bundle for Project Renard.
+
+0.001 2017-03-18 15:54:35-0500
+  - Initial upload.

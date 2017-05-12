@@ -1,0 +1,30 @@
+[%- 
+    # wrap_box - create these nice wrap boxes with a header cell
+    # ARGS: title, content
+-%]
+
+    <table border="0" cellspacing="0" cellpadding="0" width="150" align="center">
+        <tr>
+            <td class="menu-border" width="1" height="1"><small class="nbr"><br class="smallbr"></small></td>
+            <td class="menu-border" width="148"><small class="nbr"><br class="smallbr"></small></td>
+            <td class="menu-border" width="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+
+   [%- IF title -%]
+
+        <tr>
+            <td class="menu-border"><br></td>
+            <td align="center" class="menu-title-bg">
+                <div class="menu-title">[%- title -%]</div>
+            </td>
+            <td class="menu-border"><br></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+
+   [%- END -%]
+   [%- content -%]
+
+    </table>

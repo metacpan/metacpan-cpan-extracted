@@ -1,0 +1,107 @@
+Release history for Dist-Zilla-Util-ExpandINI
+
+0.003003 2017-03-04T05:26:19Z d66d358
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Util-ExpandINI/issues/3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003002, see misc/*.deps* for details
+ - configure: ↑1 -2 (recommends: -1)
+ - develop: +1 ↑1 -1 (suggests: ↑1)
+ - test: ↓1
+
+ [Misc]
+ - Use newer EUMM w/ ranged versions instead of DynamicPrereqs magic
+
+0.003002 2015-10-19T10:20:25Z 5d62f99
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - configure: +2
+ - develop: +5 ↑2 -1 (suggests: ↑2)
+
+ [Packaging]
+ - Use a simpler DynamicPrereqs invocation, thanks @ether
+ - closes #2
+
+0.003001 2015-04-11T05:39:59Z 818763d
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - develop: +4 ↑3 -1 (recommends: ↓1, suggests: ↑2)
+ - runtime: +1
+ - test: (recommends: ↓1)
+
+ [Minor]
+ - Packaging and Dependency changes to try avoiding defects w/ Mixin::Linewise 0.107
+
+0.003000 2014-11-08T12:17:58Z 6a88090
+ [API]
+ - Can now pass `comments => ` with any of the following values to control comment handling.
+ - `all`, all comments are copied.
+ - `authordeps`, only comments that look like Dist::Zilla AuthorDeps are copied.
+ - `none`, no comments are copied.
+ - Default is `all`.
+ - Thanks to Alan Young ( AYOUNG ) for the contributions ( Github #1 ).
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - develop: +1
+
+0.002000 2014-11-08T01:53:39Z da7e0e7
+ [API]
+ - Now properly instantiable with ->new()
+ - Can pass "include_does" and "exclude_does" which take arrays of roles to include/exclude from the results.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +7 ↑2 -1 (recommends: +1, suggests: ↑2)
+ - runtime: +2 ↓1 -1
+ - test: +2 (recommends: ↑2)
+
+ [Features]
+ - Comments are preserved in some way, though they may move around a bit.
+ - This is mostly to support transferral of authordeps. ( kentnl/Dist-Zilla-App-Command-bakeini#1 )
+
+ [Metadata]
+ - author = kentnl
+
+0.001003 2014-08-15T22:30:33Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.001002 2014-07-23T17:44:44Z
+ [00 Trivial]
+ - Misc packaging cleanups
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑2)
+ - test: +2 ↑1 (recommends: +1)
+
+0.001001 2014-06-03T05:43:02Z
+ [Bugfix]
+ - use a version of Config::INI with is_valid_property_name
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: -1 (suggests: +2 -1)
+ - runtime: ↑1
+
+0.001000 2014-06-02T21:24:12Z
+ - First version.

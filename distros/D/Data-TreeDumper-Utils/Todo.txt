@@ -1,0 +1,7 @@
+#------------------#
+# This is Todo.txt #
+#------------------#
+
+choose between
+	FILTER + FILTER_ARGUMENTS and FILTER => factory(ARGUMENTS)
+	

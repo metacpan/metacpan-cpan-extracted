@@ -1,0 +1,25 @@
+Revision history for Perl extension Data::Section::Simple
+
+0.07  2014-04-23 21:19:23 PDT
+        - revert the change in 0.06
+
+0.06  2014-04-12 06:10:47 CST
+        - Fix race condition in a forked environment (hirose31) #4
+
+0.05  2013-06-06 14:13:22 PDT
+        - use MakeMaker
+
+0.04  2013-03-28 17:50:48 PDT
+        - Do not throw exceptions when there's no template (tokuhirom) #2
+
+0.03  Sun Sep 18 12:35:54 PDT 2011
+        - Noted the use of utf8 pragma
+        - Doc typo fixes (Util)
+
+0.02  Thu Mar 18 15:14:44 PDT 2010
+        - Added a warning document about __DATA__ appearing elsewhere (rjbs)
+        - Fixed a bug installing via cpanm often fails because fileno $d
+          could be 0 when STDIN is closed (reported by rjbs)
+
+0.01  Thu Mar 18 01:06:44 2010
+        - original version

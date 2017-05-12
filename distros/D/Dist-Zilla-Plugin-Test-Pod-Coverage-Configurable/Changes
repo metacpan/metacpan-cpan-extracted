@@ -1,0 +1,34 @@
+0.06     2016-05-08
+
+- The added test is not added in xt/author instead of xt/release.
+
+
+0.05     2015-03-25
+
+- Added an "also_private" config parameter, which is passed on to
+  Pod::Coverage. Implemented by David Golden.
+
+
+0.04     2015-02-26
+
+- If you specify a class other than Pod::Coverage::TrustPod as the coverage
+  class, then the specified class will be added to the "develop requires"
+  prereqs.
+
+
+0.03     2015-01-10
+
+- Removed some unused imports.
+
+
+0.02     2014-11-05
+
+- Make the generated test file skip all on Perl 5.8.8 or
+  lower. Pod::Coverage::TrustPod only installs with 5.8.9+. This is probably
+  not relevant to most people, but it's useful if you're testing with ancient
+  Perls on Travis using https://github.com/haarg/perl-travis-helper.
+
+
+0.01     2014-08-03
+
+- First release upon an unsuspecting world.

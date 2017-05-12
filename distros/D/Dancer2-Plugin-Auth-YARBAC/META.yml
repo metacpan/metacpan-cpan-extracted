@@ -1,0 +1,38 @@
+---
+abstract: 'Yet Another Role Based Access Control Framework'
+author:
+  - 'Sarah Fuller <sarah@averna.id.au>'
+build_requires:
+  DBD::SQLite: '0'
+  Dancer2::Session::Cookie: '0'
+  ExtUtils::MakeMaker: '0'
+  Find::Lib: '0'
+  FindBin: '0'
+  HTTP::Request::Common: '0'
+  Plack::Handler::FCGI: '0'
+  Plack::Runner: '0'
+  Plack::Test: '0'
+  Template: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-YARBAC
+requires:
+  Carp: '0'
+  Crypt::PBKDF2: '0'
+  Dancer2: '0'
+  Dancer2::Plugin: '0'
+  Dancer2::Plugin::Database: '0'
+  Data::Dumper: '0'
+  Module::Load: '0'
+  Moo: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+version: '0.011'

@@ -1,0 +1,31 @@
+#!/usr/bin/perl -w
+
+#
+# This is an example how to create new table, if you have field
+# specification.
+#
+
+use strict;
+use XBase;
+
+my @fieldnames = ( 'ID', 'NAME', 'ACTIVE' );
+my @fieldtypes = ( 'N', 'C', 'L' );
+my @fieldlengths = ( '6', '30', '1' );
+my @fielddecimals = ( '0', '0', '0' );
+
+my $krtek;
+$krtek = create XBase('name' => 'krtek',
+	'field_names' => \@fieldnames,
+	'field_types' => \@fieldtypes,
+	'field_lengths' => \@fieldlengths,
+	'field_decimals' => \@fielddecimals) or die XBase->errstr();
+
+print STDERR $krtek->get_header_info();
+
+$krtek->set_record(0, 1, 'Alexis', 1) or die $krtek->errstr();
+$krtek->set_record(1, 51, 'Bob', 0) or die $krtek->errstr();
+
+$krtek->dump_records();
+
+$krtek->close();
+

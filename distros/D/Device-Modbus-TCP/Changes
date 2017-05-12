@@ -1,0 +1,11 @@
+Revision history for Perl extension Device::Modbus::TCP.
+
+0.01  14 juillet 2015
+	- original version
+0.02  3 october 2015
+    - undocumented, undertested simple working version
+0.024 2017-04-28
+    - Bug fixes thanks to Manuel Krenzke and Carlos Mendioroz.
+      Responses were not treated properly when messages arrived in
+      different packages. Client disconnection or time out were not
+      caught by server.

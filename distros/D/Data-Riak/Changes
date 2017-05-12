@@ -1,0 +1,69 @@
+2.0  2013-04-03
+
+  - Remove leftovers of Data::Riak::Result::WithVClock. It's been replaced by
+    Data::Riak::Result::MaybeWithVClock in an earlier release. This makes this
+    distribution installable again if you didn't have an older version of
+    Data-Riak that still contained ::WithVClock installed before.
+
+1.9  2013-02-21
+
+  - Allow passing extra arguments to AnyEvent::HTTP when using the
+    Async::HTTP transport
+
+1.8  2013-02-21
+
+  - Add an experimental and undocumented asynchronous API
+
+1.7  2013-02-06
+
+  - Bump dependency on Throwable::Error to fix warnings that showed
+    up when using older versions
+
+1.6  2013-02-06
+
+  - Allow HTTP request header generation to depend on other request
+    instance attributes
+
+1.5  2013-02-05
+
+  - Make HTTP request construction more pluggable
+
+1.4  2013-02-05
+
+  - Fix Test::Data::Riak's import method to allow both overriding of
+    transport defaults and using all Sub::Exporter features.
+
+1.3  2013-02-05
+
+  - Fix flaking tests by giving Riak more time to finish processing the
+    requests sent
+  - Deal gracefully with RemoveObject requests returning results without
+    a VClock
+
+1.2  2013-02-04
+
+  - This release contains a lot of new features and various refactorings that
+    make it not fully backward compatible with earlier versions of Data::Riak.
+    Sorry!
+
+  - Cache LWP connections
+  - Allow LWP to handle responses with very long header lines
+  - Add a status method
+  - Make tests pass on storage backends other than leveldb
+  - Improve error reporting
+  - Refactor the Transport API to be less tied to HTTP
+  - Refactor the Result API to provide only methods that make sense for a
+    given result
+  - Add an abstraction over the various Riak requests
+  - Stop retrieving bucket props in list_keys
+  - Add structured exceptions
+  - Add set_props to set bucket properties
+  - Remove Bucket->indexing as it never actually worked
+  - Handle vector clocks
+  - Deprecate $result->sync in void context
+  - Make ResultSets and Results immutable
+  - Add experimental HTTPS support
+  - Deprecate default host and port
+  - Add save_unless_modified allowing conflict handling
+  - Add a helper to wrap Riak exceptions into HTTP::Throwables
+  - Make it safe to run tests in parallel

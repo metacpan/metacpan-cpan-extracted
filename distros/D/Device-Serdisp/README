@@ -1,0 +1,40 @@
+Serdisp version 0.01
+=======================
+
+This module got one main purpose. Communicate with a display
+on the other side of the serdisplib.
+
+This module is very alpha but patches are welcome.
+
+See t/01-Serdisp.t for a very basic example!
+
+This module was mainly build for the ct-maeusekino (inclu.de display).
+But this library should run with other too.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Gd (C library AND(!) perl module)
+  serdisplib (C library)
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2006 by Erik Wasser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

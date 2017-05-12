@@ -1,0 +1,13 @@
+Revision history for Perl extension DB-Pluggable-StackTraceAsHTML
+
+1.111750  2011-06-24 23:07:14 Europe/Vienna
+    - adapted to the new Brickyard style used in DB::Pluggable
+
+1.100850  2010-03-26 21:11:01 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.02  Fri 2009.12.04 14:02:14 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - added missing DB::Pluggable requirement
+
+0.01  Tue 2009.10.20 10:52:27 UTC (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

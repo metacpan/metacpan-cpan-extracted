@@ -1,0 +1,33 @@
+Revision history for Perl module Devel::LeakGuard::Object
+
+0.01  2009-06-14
+      - Initial version.
+
+0.02  2009-06-14
+      - Fix MyBuilder.pm so blib doesn't get bundled in dist.
+
+0.03  2009-06-23
+      - Rename state as leakstate to avoid clashes under use 5.010.
+
+0.04  2009-06-23
+      - Update this file.
+
+0.05  2009-06-23
+      - Use latest instead of strict + warn.
+
+0.06  2009-06-24
+      - Fix import problems caused by circular relationship between
+        DLO and DLOS.
+
+0.07  2015-09-04
+      - Fix t/guard.t test failures on some versions of perl and Carp.pm
+        due to an extra full stop (".").
+      - Replace Module::Build with ExtUtils::MakeMaker
+      - Basic code and distribution cleanup
+
+0.08  Unknown
+      - Specify minimum perl version
+      - Some perlcritic-related cleanup
+      - Relax ExtUtils::MakeMaker minimum version requirement
+      - Add kwalitee tests
+      - Fix installation instructions in README

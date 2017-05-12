@@ -1,0 +1,185 @@
+#!/usr/bin/env perl
+# vim:set ft=perl ai si et ts=4 sts=4 sw=4 tw=0:
+use strict;
+use warnings;
+use IPC::Open2;
+use IO::File;
+use File::Copy ();
+use File::Temp qw(tempfile);
+use DBI;
+use DBomb::Generator;
+use Getopt::Long;
+
+my ($host,$port,$user,$pass);
+my ($do_has_a, $do_has_many, $do_split, $do_modules, $split_dir, $module_prefix, $do_pod, $data_source, $db_name, @table_names);
+
+GetOptions( 
+           'host|h=s'=> \$host,
+           'port|P=i'=> \$port,
+           'user|u=s'=> \$user,
+           'pass|p=s'=> \$pass,
+           'has-a|has_a'  => \$do_has_a,
+           'has-many|has_many'  => \$do_has_many,
+           'all|a'   => sub {$do_has_a = $do_has_many = 1 },
+           'gen-modules' => \$do_modules,
+           'module-prefix=s' => \$module_prefix,
+           'split-dir=s'  => \$split_dir,
+           'data-source=s' => \$data_source,
+           'database|d=s' => \$db_name,
+           'table|t=s' => \@table_names,
+           'pod' => \$do_pod,
+) && @ARGV or print(<<ENDUSAGE) and exit;
+Usage: $0 [OPTIONS]  FILES...
+
+dbomb regenerate
+
+Modifies FILES in place by replacing dbomb-gen sections with newly generated
+sections. FILES must have been created by dbomb-gen.
+
+OPTIONS are the same as for dbomb-gen, and override options found in FILES.
+
+See the manual page for dbomb-regen for more details.
+
+ENDUSAGE
+
+my @files = @ARGV;
+
+## Validate args.
+foreach (@files){
+    -r   || fail("File not readable: '$_'");
+    -w _ || fail("File not readable: '$_'");
+}
+
+foreach my $f (@files){
+    print "$f\n";
+    my $outbuf = '';
+    my $lines = slurplines($f);
+    my %args;
+
+    while (defined(my $x = shift @$lines)){
+        $x =~ /^\s*##-#\s*dbomb-gen:args\s*(.*)$/ && do {
+                    %args = parse_args($1);
+                    next;
+                    };
+        $x =~ /^\s*##-#\s*dbomb-gen:begin-decls\b/ && do { 
+                    gen_decl(\$outbuf, %args);
+                    
+                    if(not defined skip_until($lines, qr/^\s*##-#\s*dbomb-gen:end-decls\b/)){
+                        fail($f,"begin-decls with no end-decls. Aborting.");
+                    }
+                    next;
+                    };
+        $outbuf .= $x;
+    }
+
+    ## now make a backup of the original.
+    my $b = "$f.bak";
+    for (my $i=1; -f $b ; ++$i){
+        $b = "$f.bak$i";
+    }
+    if (!File::Copy::copy($f, $b)){
+        fail("could not create backup file", $!, "aborting.");
+    }
+
+    ## Overwrite original file.
+    open OUT, "> $f" or fail("Could open file for writing", $!, $f);
+    print OUT $outbuf;
+    close OUT;
+}
+
+sub gen_decl {
+    my ($outbufref, %args) = @_;
+
+    ## remove unwanted args
+    for (qw(pod gen-modules split-dir)){
+        delete $args{$_}
+    }
+    
+    my @cmd = ('dbomb-gen');
+    push @cmd, map {"--$_"} grep { not defined $args{$_} } keys %args; ## The 'bool' keys have undef as value.
+    push @cmd, map {("--$_", $args{$_})} grep { defined $args{$_}} keys %args; ## string keys
+    
+    my $pid = open2 (\*RD, \*WR, @cmd) or fail("failed to ipc open2 '$cmd[0]'", $!);
+    close WR;
+    while (<RD>){ $$outbufref .= $_ }
+    close RD;
+    waitpid $pid, 0;
+}
+
+sub parse_args {
+    my $s = shift;
+    my %args;
+    my %strs = ( host => $host,  port => $port, user => $user, 'module-prefix' => $module_prefix, 
+                pass => $pass,
+                'data-source' => $data_source, 'database' => $db_name, 'table' => undef);
+    my %bools = ( 'has-a' => $do_has_a, 'has-many' => $do_has_many, 'pod' => $do_pod);
+
+    if (defined($s) && $s =~ /\S/){
+        $s =~ s/^\s+//;
+        $s =~ s/\s+$//;
+        foreach (map{s/^--//;$_} split /\s+/, $s){
+            if (exists $bools{$_}){
+                $args{$_} = undef;
+            }
+            elsif (/^([\w-]+)=(.*)$/ && exists $strs{$1}){
+                $args{$1} = $2;
+            }
+            else{
+                fail("Unrecognized option in input file",$_);
+            }
+        }
+    }
+
+    ## Now merge the existing values to override the args in the file.
+    foreach (keys %strs){ $args{$_} = $strs{$_} if defined $strs{$_}; }
+    foreach (keys %bools){ $args{$_} = $bools{$_} if defined $bools{$_}; }
+    return %args;
+}
+
+sub skip_until {
+    my ($lines, $regexp) = @_;
+    while (defined(my $x = shift @$lines)){
+        $x =~ /$regexp/ && return $x;
+    }
+    return undef
+}
+
+
+sub slurplines {
+    open FD, "< $_[0]" or fail("Could not open file for reading", $!, $_[0]);
+    my $lines = [];
+    while (<FD>){
+        push @$lines, $_
+    }
+    close FD;
+    return $lines;
+}
+
+sub fail {
+    my @s = grep {defined} @_;
+    @s = ('Unknown error') unless @s;
+    local $" = ':';
+    print STDERR "dbomb-regen: @s\n";
+    exit 1;
+}
+
+=head1 NAME
+
+dbomb-regen - Regenerates dbomb code created by dbomb-gen
+
+=head1 DESCRIPTION
+
+C<dbomb-regen> Modifies dbomb files in place by replacing dbomb-gen sections with
+newly generated sections. Files must have been created by dbomb-gen.
+
+=head1 SYNOPSYS
+
+  dbomb-regen -u john -p xxx *.pm
+
+=head1 OPTIONS
+
+OPTIONS are the same as for dbomb-gen.
+
+See the manual page for dbomb-regen for more details.
+
+=cut

@@ -1,0 +1,3 @@
+0.1.0 2014-11-11
+  - Added is_currency method
+  - Added documentation

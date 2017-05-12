@@ -1,0 +1,31 @@
+Revision history for Dist-Zilla-Plugin-Test-LocalBrew
+
+0.08 January 08 2015
+     - Fix bug involving standard I/O handles
+     - Fix perlbrew usage from a perlbrew lib (GH #6, thanks Karen Etheridge!)
+     - Fix EOL warnings in generated tests (GH #7, thanks Karen Etheridge!)
+
+0.07 March 08 2014
+     - Don't index faux modules (PAUSE got mad =( )
+
+0.06 March 08 2014
+     - Make sure that the environment doesn't cause things to fail (bug fixes)
+
+0.05 February 02 2013
+     - Keep log files from brewing, and direct user to them on failure
+
+0.04 November 18 2012
+     - Fix bug that causes perlbrew PATH to be incorrectly set.
+     - Fix bug that prevented generated tests from working with the ExtraTests plugin.
+     - Add ability to test against system perl.
+     - Add ability to ignore tests for dependencies while still running tests for the
+       target distribution.
+
+0.03 October 20 2011
+     Switch to test generation, instead of pre-release checking.
+
+0.02 May 18 2011
+     Documentation fixes.
+
+0.01 May 18 2011
+     Initial release.

@@ -1,0 +1,39 @@
+{% block "block1" %}
+This is a test {{ var1|add:var2|upper }}
+
+{% endblock %}
+
+{% block "block2" %}
+This is a test {{ var2|add:var3|lower }}
+{% endblock %}
+
+{% block "block3" %}
+This is a test {{ var3|add:var4|title }}
+{% endblock %}
+
+{% if 3 > 2 and not 1 < 2 %}
+hehe
+{% endif %}
+{% block "block4" %}
+This is a test {{ var4|add:var5|rjust:10 }}
+{% endblock %}
+
+{% block "block5" %}
+This is a test {{ var5|add:var1|ljust:10 }}
+{% endblock %}
+
+{% for v in array1 %}
+	<li>{{ v|upper|lower|title|ljust:10|rjust:20 }}</li>
+{% endfor %}
+
+    {% block "block6" %}
+
+        Parent block 6
+    
+        {% block "block7" %}
+        
+            Parent Block 7
+
+        {% endblock %}
+
+    {% endblock %}

@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/dcq-rdf-xml/
+ -->
+
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:dc="http://purl.org/dc/elements/1.1/">  
+  <rdf:Description>
+    <dc:creator>a</dc:creator>
+    <dc:contributor>b</dc:contributor>
+    <dc:publisher>c</dc:publisher>
+    <dc:subject>d</dc:subject>
+    <dc:description>e</dc:description>
+    <dc:identifier>f</dc:identifier>
+    <dc:relation>g</dc:relation>
+    <dc:source>h</dc:source>
+    <dc:rights>i</dc:rights>
+    <dc:format>j</dc:format>
+    <dc:type>k</dc:type>
+    <dc:title>l</dc:title>
+    <dc:date>m</dc:date>
+    <dc:coverage>n</dc:coverage>
+    <dc:language>o</dc:language>
+  </rdf:Description>
+</rdf:RDF>

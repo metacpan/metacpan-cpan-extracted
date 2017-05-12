@@ -1,0 +1,9 @@
+[%  # button: a bar 
+    #
+    #  ARGS: content
+    #  OPT ARGS: navstyle, linebrake
+-%]
+[% IF navstyle %]<div class='[%- navstyle  -%]'>[% END -%]
+[%- content.length ? content : '&nbsp;' -%]
+[%- IF navstyle %]</div>[% END -%]
+[%- IF linebrake %]<br>[% END -%]

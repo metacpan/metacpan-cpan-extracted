@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               Devel-Events
+version:            0.08
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Moose:                0.33
+    MooseX::AttributeHelpers:  0.03
+    Set::Object:          0
+    Sub::Uplevel:         0
+    Test::use::ok:        0
+    Time::HiRes:          0
+    Try::Tiny:            0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

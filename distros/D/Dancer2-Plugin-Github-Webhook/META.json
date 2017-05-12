@@ -1,0 +1,51 @@
+{
+   "abstract" : "Check Github Webhook secret",
+   "author" : [
+      "Dominic Sonntag <dominic@s5g.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Github-Webhook",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "JSON" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "Digest::SHA" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Pod::Coverage" : "0.18",
+            "Test::CheckManifest" : "0",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

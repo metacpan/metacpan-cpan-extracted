@@ -1,0 +1,20 @@
+0.0023   2014-11-09
+
+* Fixes repo meta info to point to
+  https://github.com/autarch/Dist-Zilla-Plugin-SurgicalPodWeaver. RT #94476.
+
+    
+0.0022   2014-11-08
+
+* Add dependency on Dist::Zilla::Plugin::PodWeaver. RT #87624.
+
+
+0.0021   2013-08-21
+
+* Remove inadvertent dependency on Dist::Zilla::PluginBundle::ROKR. Partially
+  addresses RT #87624.
+
+
+0.0020   2013-07-26
+
+* Initial release (split out from Dist::Zilla::PluginBundle::ROKR). RT #87355.

@@ -1,0 +1,64 @@
+PACKAGE Data::Generate
+
+Data::Generate - Create various types of synthetic data by parsing 
+"regex-like" data creation rules. 
+
+VERSION  
+
+Version 0.01
+
+INSTALLATION
+
+Prerequisites:
+Before installing, please check that you have installed following libraries:
+-Test::More
+-Parse::RecDescent   v1.94
+-Date::Parse
+-Date::DayOfWeek
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+    
+Note: 'make test' generates a lot of warnings, please ignore them.
+Check however that you get the message 'All tests successful' at the end.
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Note: './Build test' generates a lot of warnings, please ignore them.
+Check however that you get the message 'All tests successful' at the end.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Data::Generate
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Generate
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Generate
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Data-Generate
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Data-Generate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Davide Conti
+
+This program is released under the following license: artistic

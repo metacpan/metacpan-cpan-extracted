@@ -1,0 +1,1218 @@
+Working Versions of DBD::Informix
+=================================
+
+@(#)$Id: Working.Versions,v 2015.1 2015/08/26 06:14:49 jleffler Exp $
+
+This file documents combinations of machine, operating system, Perl, DBI,
+DBD::Informix and Informix-ESQL/C which have been reported as working,
+along with the date, name and email address of the person notifying me of
+the successful installation.  That means that the lines are longer than 80
+characters (more like 140) -- sorry.  Any known non-working configurations
+(which might otherwise be expected to work) will be documented too...
+There will always be eccentric combinations of extremely old DBI and new
+DBD::Informix (or vice versa) which won't work.
+
+Obsolete (Unsupported) Versions of DBD::Informix
+
+                Version     Release Date        Obsolete
+DBD::Informix   v0.23       1996-09-10          1996-12-09
+DBD::Informix   v0.24       1996-09-26          1997-01-24
+DBD::Informix   v0.25       1996-12-09          1997-06-09
+DBD::Informix   v0.26       1997-01-06          1997-01-24  Never on CPAN
+DBD::Informix   v0.50       1997-01-24          1997-07-06
+DBD::Informix   v0.51       1997-02-26          1997-02-28  Buggy
+DBD::Informix   v0.52       1997-02-28          1997-07-12
+DBD::Informix   v0.53       1997-03-12          1997-07-12
+DBD::Informix   v0.54       1997-05-14          1997-07-12
+DBD::Informix   v0.55       1997-05-20          2002-02-01
+DBD::Informix   v0.56       1997-07-12          1998-07-30
+DBD::Informix   v0.57       1997-11-14          1998-07-30
+DBD::Informix   v0.58       1998-01-15          2002-02-01
+DBD::Informix   v0.59       1998-07-15          1999-09-19
+DBD::Informix   v0.60       1998-07-30          2002-02-01
+DBD::Informix   v0.61_01    1998-12-07          Experimental - Never on CPAN
+DBD::Informix   v0.61_02    1998-12-14          Experimental - On CPAN in JOHNL directory only
+DBD::Informix   v0.62       1999-09-19          2002-02-01
+DBD::Informix   v0.95       1999-12-30          2002-02-01
+DBD::Informix   v1.00.PC1   2000-03-30          2005-01-01 (outdated contact information)
+DBD::Informix   v1.00.PC2   2002-02-01          2005-01-01 (outdated contact information)
+DBD::Informix   v2003.0x    2003-0x-xx          Experimental - should not be in use.
+DBD::Informix   v2003.04    2003-03-04          2006-01-01 (outdated contact information)
+DBD::Informix   v2004.01    2004-12-02          Current
+
+NB: Perl Unix  Resource Kit contains DBD::Informix v0.55.
+    Perl Win32 Resource Kit contains DBD::Informix v0.58.
+
+===========================================================================
+
+The format of the Working Versions section has been completely
+rewritten.  It now uses a pseudo-XML layout.  This ties in with the
+ItWorks script which produces that format.  There is a fairly complete
+list of known working versions from a large number of people who
+responded to the census conducted in November 1999 -- many thanks to all
+of you.
+
+Working Versions of DBD::Informix
+=================================
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.56                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.23.UC1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-07-10                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.56                                            </DBD_INFORMIX>
+    <DBI>             0.90                                            </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.22.UC1                  </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                         </INFORMIX_SERVER>
+    <PERL>            5.004_01                                        </PERL>
+    <SYSTEM>          HP HP-UX 10.01                                  </SYSTEM>
+    <SYS_COMPILER>    Unknown                                         </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                         </SYS_LOADER>
+    <WHEN>            1997-10-03                                      </WHEN>
+    <WHO>             Nuno Carneiro de Moura <ncmoura@net.mailcom.pt> </WHO>
+    <Z_NOTES>         Optional Notes                                  </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.56                           </DBD_INFORMIX>
+    <DBI>             0.85                           </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.13.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                        </INFORMIX_SERVER>
+    <PERL>            5.004_02                       </PERL>
+    <SYSTEM>          I486/33 SCO Unixware 2.03      </SYSTEM>
+    <SYS_COMPILER>    Unknown                        </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                        </SYS_LOADER>
+    <WHEN>            1997-10-07                     </WHEN>
+    <WHO>             Curtis K Wong <curtis@crl.com> </WHO>
+    <Z_NOTES>         Optional Notes                 </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.56                           </DBD_INFORMIX>
+    <DBI>             0.90                           </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.13.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                        </INFORMIX_SERVER>
+    <PERL>            5.004_02                       </PERL>
+    <SYSTEM>          I486/33 SCO Unixware 2.03      </SYSTEM>
+    <SYS_COMPILER>    Unknown                        </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                        </SYS_LOADER>
+    <WHEN>            1997-10-07                     </WHEN>
+    <WHO>             Curtis K Wong <curtis@crl.com> </WHO>
+    <Z_NOTES>         Optional Notes                 </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 5.08.UD1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-11-17                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 6.00.UE1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-11-17                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.23.UC1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-11-17                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-11-17                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57                                  </DBD_INFORMIX>
+    <DBI>             0.90                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.12.UC2        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_03                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1997-11-17                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                  </DBD_INFORMIX>
+    <DBI>             0.91                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 5.08.UD1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_04                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1998-01-15                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                  </DBD_INFORMIX>
+    <DBI>             0.91                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 6.00.UE1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_04                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1998-01-15                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                  </DBD_INFORMIX>
+    <DBI>             0.91                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC1        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_04                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1998-01-15                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                  </DBD_INFORMIX>
+    <DBI>             0.91                                  </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.12.UC2        </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                               </INFORMIX_SERVER>
+    <PERL>            5.004_04                              </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1               </SYSTEM>
+    <SYS_COMPILER>    Unknown                               </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                               </SYS_LOADER>
+    <WHEN>            1998-01-15                            </WHEN>
+    <WHO>             Jonathan Leffler <johnl@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                        </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.59                                 </DBD_INFORMIX>
+    <DBI>             0.93                                 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.23.UC4       </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                              </INFORMIX_SERVER>
+    <PERL>            5.004_04                             </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.5.1              </SYSTEM>
+    <SYS_COMPILER>    Unknown                              </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                              </SYS_LOADER>
+    <WHEN>            1998-03-11                           </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@visa.com> </WHO>
+    <Z_NOTES>         Optional Notes                       </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                                         </DBD_INFORMIX>
+    <DBI>             0.93                                                         </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.23                                   </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                                      </INFORMIX_SERVER>
+    <PERL>            5.004                                                        </PERL>
+    <SYSTEM>          IBM RS6000 AIX 4.1.5                                         </SYSTEM>
+    <SYS_COMPILER>    Unknown                                                      </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                                      </SYS_LOADER>
+    <WHEN>            1998-03-12                                                   </WHEN>
+    <WHO>             Christian Reithmaier <reithmaier@04.blf01.telekom400.dbp.de> </WHO>
+    <Z_NOTES>         -lgcc fix needed                                             </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                                </DBD_INFORMIX>
+    <DBI>             0.93                                </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.22.UC2      </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                             </INFORMIX_SERVER>
+    <PERL>            5.004_04                            </PERL>
+    <SYSTEM>          IBM RS6000 AIX 4.2.1                </SYSTEM>
+    <SYS_COMPILER>    Unknown                             </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                             </SYS_LOADER>
+    <WHEN>            1998-06-18                          </WHEN>
+    <WHO>             Geoffrey Rommel <grommel@sears.com> </WHO>
+    <Z_NOTES>         AIX C compiler                      </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58                           </DBD_INFORMIX>
+    <DBI>             0.93                           </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.12.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                        </INFORMIX_SERVER>
+    <PERL>            5.004_04                       </PERL>
+    <SYSTEM>          HP HP-UX **unknown**           </SYSTEM>
+    <SYS_COMPILER>    Unknown                        </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                        </SYS_LOADER>
+    <WHEN>            1998-07-01                     </WHEN>
+    <WHO>             Paul Falbe <paul@cassens.com>  </WHO>
+    <Z_NOTES>         HP ANSI C Compiler             </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60                                     </DBD_INFORMIX>
+    <DBI>             0.93                                     </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC1           </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                  </INFORMIX_SERVER>
+    <PERL>            5.004_04                                 </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.6                    </SYSTEM>
+    <SYS_COMPILER>    Unknown                                  </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                  </SYS_LOADER>
+    <WHEN>            1998-07-30                               </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                           </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60                                     </DBD_INFORMIX>
+    <DBI>             0.93                                     </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.30.UC1           </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                  </INFORMIX_SERVER>
+    <PERL>            5.005_01                                 </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.6                    </SYSTEM>
+    <SYS_COMPILER>    Unknown                                  </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                  </SYS_LOADER>
+    <WHEN>            1998-07-30                               </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                           </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62                                     </DBD_INFORMIX>
+    <DBI>             1.13                                     </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.21.UC1           </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                  </INFORMIX_SERVER>
+    <PERL>            5.005_03                                 </PERL>
+    <SYSTEM>          Sun Sparc Solaris 2.6                    </SYSTEM>
+    <SYS_COMPILER>    Unknown                                  </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                  </SYS_LOADER>
+    <WHEN>            1999-09-19                               </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                           </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62                                     </DBD_INFORMIX>
+    <DBI>             1.13                                     </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.16.UC1           </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                  </INFORMIX_SERVER>
+    <PERL>            5.005_03                                 </PERL>
+    <SYSTEM>          IBM RS600 AIX 4.2                        </SYSTEM>
+    <SYS_COMPILER>    Unknown                                  </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                  </SYS_LOADER>
+    <WHEN>            1999-09-19                               </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                           </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62                                     </DBD_INFORMIX>
+    <DBI>             1.13                                     </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.21.UC1           </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown                                  </INFORMIX_SERVER>
+    <PERL>            5.005_03                                 </PERL>
+    <SYSTEM>          Linux RedHat 6.0                         </SYSTEM>
+    <SYS_COMPILER>    Unknown                                  </SYS_COMPILER>
+    <SYS_LOADER>      Unknown                                  </SYS_LOADER>
+    <WHEN>            1999-09-19                               </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes                           </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.95                                                                 </DBD_INFORMIX>
+    <DBI>             1.13                                                                 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.21.UC1                                       </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 7.31 (OnLine)                                                        </INFORMIX_SERVER>
+    <PERL>            5.00503 sun4-solaris dl_dlopen.xs                                    </PERL>
+    <SYSTEM>          sunos osiris 5.6 generic_105181-05 sun4m sparc sunw,sparcstation-20  </SYSTEM>
+    <SYS_COMPILER>    gcc egcs-2.91.66 19990314 (egcs-1.1.2 release)                       </SYS_COMPILER>
+    <SYS_LOADER>      gcc                                                                  </SYS_LOADER>
+    <WHEN>            1999-12-31                                                           </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@osiris.informix.com>                      </WHO>
+    <Z_NOTES>         Optional Notes                                                       </Z_NOTES>
+</WORKING_VERSION>
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  Informix ESQL/C 9.21.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          Sun, Solaris, 2.5.1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Flemming Mahler Larsen <mahler@DK.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             DBI-1.13 </DBI>
+    <INFORMIX_ESQLC>  Client-SDK 2.30 / ESQL/C 9.21UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            perl5 (5.0 patchlevel 5 subversion 3) </PERL>
+    <SYSTEM>          Solaris 2.6 Sparc </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Thomas Vogt <t.vogt@drgueldener.de> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.55 and 0.62, just in the process of upgrading </DBD_INFORMIX>
+    <DBI>             0.81 and 1.13, just in the process of upgrading </DBI>
+    <INFORMIX_ESQLC>  7.14, 7.24 (hmm, this ought to be csdk 2.20. Isn't that 9.something?) and 9.12.UC1 (IUS). Hope to eliminate 7.14 RSN. </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04 and 5.005_03, just in the process of upgrading </PERL>
+    <SYSTEM>          HP, HP-UX, 10.20 and 11.0 Linux (Red Hat 5.1, SuSe 6.3) at home, but nothing serious. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             =?iso-8859-1?Q?=D8yvind?= Gjerstad <ogj@tollpost.no> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  7.24.UC7 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          SUN Solaris 2.6/2.7, SGI IRIX 6.2/6.5 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Jan Iven <j.iven@rz.uni-sb.de> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  9.21.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          Intel Linux 2.2.x (Red Hat 6.0) </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Nick Osborn <nick@bibliotech.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  7.11.UC5 and 9.16.UC3 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            isqlperl (legacy Solaris), 5.005_03 </PERL>
+    <SYSTEM>          Sun, Solaris 7, 8/99 Redhat, Linux, 2.2.5-22 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "David M. Davisson" <davisson@emuni.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58 / 0.60 </DBD_INFORMIX>
+    <DBD_INFORMIX>    DBI::Informix 0.62 </DBD_INFORMIX>
+    <DBD_INFORMIX>    DBI::Informix 0.60 </DBD_INFORMIX>
+    <DBD_INFORMIX>    DBI::Informix 0.62 </DBD_INFORMIX>
+    <DBI>             DBI 1.13 </DBI>
+    <DBI>             DBI 1.03 </DBI>
+    <DBI>             DBI 1.13 </DBI>
+    <DBI>             0.93 / 1.13 </DBI>
+    <INFORMIX_ESQLC>  7.12.UC1 / 9.16.UC3 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>             5.004_04 / 5.005_03 </PERL>
+    <SYSTEM>          SCO Openserver 5.0.4 / RH Linux 6.0 ( 2.2.5-15) </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Carrie Coy" <carriec@doc.state.vt.us> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.13.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.00503 </PERL>
+    <SYSTEM>          SCO Unixware 2.03 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Curtis K. Wong" <curtis@crl.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.20.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.00502 </PERL>
+    <SYSTEM>          SCO Openserver 5.0.2 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Curtis K. Wong" <curtis@crl.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.16.UC </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.00503 </PERL>
+    <SYSTEM>          Redhat 6.0 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Curtis K. Wong" <curtis@crl.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    dbd-informix-0_60 </DBD_INFORMIX>
+    <DBI>             dbi-1_13 have not been able to get this installed as of yet. </DBI>
+    <INFORMIX_ESQLC>  7.24 UC 8 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          This is on Sun Solaris v 2.6 . Also have SGI Irix 6.4 which we would like to use. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Jonathan Leffler" <jleffler@earthlink.net> AT TIME_INC </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.02 </DBI>
+    <INFORMIX_ESQLC>  6.04.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          Sun, Solaris 2.5.1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Clay Irving <clay@skechers.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 </DBD_INFORMIX>
+    <DBI>             Unknown </DBI>
+    <INFORMIX_ESQLC>  ESQL/C 7.14.UD6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Unknown </PERL>
+    <SYSTEM>          HP-UX 10.20 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Oscar Vazquez <ovazquez@edesur.com.ar> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.59 </DBD_INFORMIX>
+    <DBI>             0.93 </DBI>
+    <INFORMIX_ESQLC>  ESQL/C 7.23.TC9 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.004-02 </PERL>
+    <SYSTEM>          Platform: Windows NT server, v4.0, sp 4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Thoerle Lisa Ms JMLFDC-Ft Detrick <Lisa.Thoerle@DET.AMEDD.ARMY.MIL> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    1) 0.58 2) 0.62 </DBD_INFORMIX>
+    <DBI>             1) $DBI::VERSION = '0.93' 2) $DBI::VERSION = "1.13" </DBI>
+    <INFORMIX_ESQLC>  1) Informix ESQL/C 7.23 UC 6 2) INFORMIX-ESQL Version 9.21.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.004_04 </PERL>
+    <SYSTEM>          1) SunOS 5.6 Generic sun4m sparc SUNW,SPARCstation-4 2) SunOS 5.6 Generic_105181-14 sun4u sparc SUNW,Ultra-4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Wehling <Edmund.Wehling@FernUni-Hagen.de> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58 </DBD_INFORMIX>
+    <DBI>             0.93 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.20.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04  </PERL>
+    <SYSTEM>          SunOS dbdevweb 5.7 Generic_106541-07 sun4u sparc SUNW,Ultra-2 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             John Davis <jsd@cscsun3.larc.nasa.gov> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC8A </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.0 patchlevel 5 subversion 3 </PERL>
+    <SYSTEM>          HP-UX B.10.20 A 9000/859 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Robert.Lopez@abq.sc.philips.com </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             DBI version 1.11 </DBI>
+    <INFORMIX_ESQLC>  Unknown </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04 </PERL>
+    <SYSTEM>          SunOS 5.6 sun4u sparc SUNW,Ultra-4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             Peter Ai <peter@quanta.co.nz> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    DBD::Informix version 0.61 </DBD_INFORMIX>
+    <DBI>             DBI version 1.13 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04 </PERL>
+    <SYSTEM>          SunOS 5.6, Sun SPARC Ultra-4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "John Warriner" <john_warriner@choicehotels.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    Informix Dynamic Server Version 7.30.UC7 </DBD_INFORMIX>
+    <DBI>             1.05 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.16.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004-4, 5.005 </PERL>
+    <SYSTEM>          Intel, Redhat 5.3 and 6.1 Linux. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-08 </WHEN>
+    <WHO>             "José Santos Reyes de la Garza" <ambar@mpsnet.com.mx> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  9.16.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            perl 5.004, patch 04 </PERL>
+    <SYSTEM>          IBM Aptiva Pentium PC, Redhat Linux, 2.0.35 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             Sujit Pal <sujitpl@ibm.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.57 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  7.x </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          linux 2-0-36 egcs-2.91.60 , solaris 2.5.1 gcc 2.7.2.1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@earthlink.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    DBD::Informix 0.60. </DBD_INFORMIX>
+    <DBI>             DBI 1.02 </DBI>
+    <INFORMIX_ESQLC>  I'm not positive, but I think it's 7.24.UC8. (I didn't set the server up, I only develop on it) </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.004 </PERL>
+    <SYSTEM>          Sun Solaris 2.5.1. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Gilbert, Mark" <MGilbert@gsite.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.14.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          System = SCO_SV Node = pigment Release = 3.2v5.0.5 KernelID = 98/07/02 Machine = PentII BusType = ISA Serial = 5FL004460 Users = 5-user OEM# = 0 Origin# = 1 NumCPU = 1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Jonathan Stowe <tdcjs@fatmog.dircon.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    Not sure, I go with whatever is the latest at the time. </DBD_INFORMIX>
+    <DBI>             Not sure. </DBI>
+    <INFORMIX_ESQLC>  2.01.UC1 SDK (9.14.UC1 ESQL) 2.20.FC3 SDK (9.20.FC3 ESQL) </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Not sure, whatever the latest 5 release is. </PERL>
+    <SYSTEM>          HP-UX 10.20 HP-UX 11.00 (64-bit) DEC OSF/1 4.0 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             "Chuck Renaud" <crenaud@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60. I upgrade when I do major Perl maintenance, or major Informix maintenance (as we're planning on IDS2000, this will be an issue.) </DBD_INFORMIX>
+    <DBI>             1.06. </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC7 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          HP-UX 10.20, upgrading to 11 soon (new hardware). </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Kevin White <kwhite@redroof.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 9.21.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.005_03 built for sun4-solaris </PERL>
+    <SYSTEM>          Sun Solaris 2.6 on sparc SUNW, Ultra-4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-09 </WHEN>
+    <WHO>             Harry Nguyen <harryn@securebuy1.san.cerf.net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>             Date: Wed, 10 Nov 1999 10:54:51 +0000 From: "Paul watson" <watsop@russelleurope.com> To: jleffler@informix.com Subject: Re: Who is using DBD::Informix? </DBD_INFORMIX>
+    <DBI>             We regularly download the latest and maintain our software against that </DBI>
+    <INFORMIX_ESQLC>             7.24.UC8 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER>             Unknown </INFORMIX_SERVER>
+    <PERL>             We regularly download the latest and maintain our software against that </PERL>
+    <SYSTEM>             IBM/AIX 4.3.2/ Sun/Solaris2.6/ Intel/Linux (Redhat) 5.2 </SYSTEM>
+    <SYS_COMPILER>             Unknown </SYS_COMPILER>
+    <SYS_LOADER>             Unknown </SYS_LOADER>
+    <WHEN>             1999-11-10 </WHEN>
+    <WHO>             Valter Cravero <valter@informix.com> </WHO>
+    <Z_NOTES>             Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  9.15.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.00503 </PERL>
+    <SYSTEM>          Sun Solaris 2.5.1 + 2.6 I hope to begin using it under Win-NT Server 4.0 w/IIS very soon. I've been put off by not wanting to be bothered with the build. If someone submitted the package to ActiveState I'd jump on it. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             Bob Colombo <BColombo@MediaOne.Net> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 </DBD_INFORMIX>
+    <DBI>             1.06 and 1.13 </DBI>
+    <INFORMIX_ESQLC>  9.21.UC1 and 9.16.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            perl5 (5.0 patchlevel 5 subversion 2) and perl5 (5.0 patchlevel 5 subversion 3) </PERL>
+    <SYSTEM>          IBM, AIX, 4.2.1 and 4.3.3 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             "Priest, Darryl - BALTO" <darryl.priest@piperrudnick.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.58, 0.60 </DBD_INFORMIX>
+    <DBI>             0.93, 1.06 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.23.UC6 INFORMIX-Client SDK Version 2.20.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            perl 5.00404 perl 5.00502 </PERL>
+    <SYSTEM>          IBM RS6000 AIX 4.3.2 NT 4.0 SP5 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             Andreas Zeugswetter <andreas.zeugswetter@telecom.at> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    DBD::Informix 0.61 (soon to be 0.62 across all systems, already on some) </DBD_INFORMIX>
+    <PERL>            Latest Perl -- really looking for Perl 5.6 to use with Perl Compiler We consider Perl Compiler functional only when programs with DBD::INFORMIX and DBI work with what we have created. </PERL>
+    <DBI>             DBI 1.0 (always at latest) </DBI>
+    <INFORMIX_ESQLC>  ONLINE ESQL/C 5.03, 5.07, 5.08, 5.10 (Alpha, Digital UNIX v4.0D) IDS ESQL/C (Intel, Linux, Red Hat 6.0, 6.1) 7.3.x </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <SYSTEM>          3a. primary systems=20 Compaq AlphaServer 1000A, 1200 and 1000 pedastal systems, RAID 5, 512MB+ Digital UNIX Version 4.0D, 4.0F and soon Compaq Tru64 V5.0 Unix (post = takeover) </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-10 </WHEN>
+    <WHO>             Larry Timmins <ltimmins@ibs.clickcharge.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  9.16.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          HP-UX 10.20 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-11 </WHEN>
+    <WHO>             dougw@safeguard.net </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.08 </DBI>
+    <INFORMIX_ESQLC>  9.15.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04 </PERL>
+    <SYSTEM>          SUN Solaris 2.5 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-11 </WHEN>
+    <WHO>             "Cory, Mark" <Mark.Cory@nike.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  SDK 2.30 ESQL 9.21 Going soon to SDK 2.40 to solve a problem with varchars on AIX. </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.005_02 </PERL>
+    <SYSTEM>          IBM, RS6000, AIX 4.3 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-12 </WHEN>
+    <WHO>             "Tino Cremidis" <ccremid@saa.noaa.gov> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.08 </DBI>
+    <INFORMIX_ESQLC>  9.15.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.005.x </PERL>
+    <SYSTEM>          Sun Solaris 2.6 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-15 </WHEN>
+    <WHO>             Radu Dumitriu <radu@informix.ro> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.08 </DBI>
+    <INFORMIX_ESQLC>  7.11.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          Motorola seriesmp, AIX 4.1, Informix Online 7.12.UC1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-15 </WHEN>
+    <WHO>             "Kenneth R. Culp" <krc@netcom.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  ESQL/C 9.16.UC3 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Perl 5.005_03 </PERL>
+    <SYSTEM>          RedHat 6.0, VA Research 686 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-15 </WHEN>
+    <WHO>             "Nedim Cholich" <nedim@nschool.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             0.95 </DBI>
+    <INFORMIX_ESQLC>  ESQL/C 7.23.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_05 </PERL>
+    <SYSTEM>          Hewlett Packard, HP-UX 10.20/11.0; Sun Microsystems, Solaris 2.7 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-15 </WHEN>
+    <WHO>             Gorlovetsky Vadim <vadimg@pelephone.co.il> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  9.20 mostly, some with 7.30 and 7.31 (don't have those version numbers around) </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02, 5.005_03 </PERL>
+    <SYSTEM>          Sun Solaris 2.5.1, AIX 2.4, NT 4.0 SP4 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-16 </WHEN>
+    <WHO>             Rob Wilson <rwilson@informix.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  9.16 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005 </PERL>
+    <SYSTEM>          Linux 2.2 (Rhat 6.0) </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-16 </WHEN>
+    <WHO>             Anton Prakash [mailto:aprakash@raytel.com] </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.02 </DBI>
+    <INFORMIX_ESQLC>  9.14.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.004_04 </PERL>
+    <SYSTEM>          Sun Solaris 5.5.1 Sun Solaris 5.6 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-17 </WHEN>
+    <WHO>             Eric Wimer <eric.wimer@cimedia.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    I don't use today, so I can't say (maybe the latest). </DBD_INFORMIX>
+    <DBI>             [JL: Presumably 1.13] </DBI>
+    <INFORMIX_ESQLC>  7.24.UC6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          HP-UX10.20, HP-UX11.x, IDS 7.30UC2 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-17 </WHEN>
+    <WHO>             =?iso-8859-2?Q?Piotr_Wr=F3blewski?= <Piotr.Wroblewski@zeksa.koszalin.pl> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60. </DBD_INFORMIX>
+    <DBI>             1.06. </DBI>
+    <INFORMIX_ESQLC>  7.24.UC8A. </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            Version 5.00502. </PERL>
+    <SYSTEM>          HP-UX B.10.20. </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-16 </WHEN>
+    <WHO>             G L Sicherman <sicherman@lucent.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 </DBD_INFORMIX>
+    <DBI>             1.06 </DBI>
+    <INFORMIX_ESQLC>  INFORMIX-ESQL Version 7.24.UC6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          Sun, Solaris 2.6 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-17 </WHEN>
+    <WHO>             Stephen Faehn <sfaehn@havatampa.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 everywhere </DBD_INFORMIX>
+    <DBI>             1.11 </DBI>
+    <INFORMIX_ESQLC>  9.16 7.24; i think, those machines are down at this time :-( </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_3 </PERL>
+    <SYSTEM>          HP, HPUX, 10.20 (production) Intel, Linux, SuSE 6.2/2.2 kernel (development) </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-18 </WHEN>
+    <WHO>             Kevin Brannen <kbrannen@physiciansdata.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  9.16.UC3 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_03 </PERL>
+    <SYSTEM>          Linux 2.2.13 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-17 </WHEN>
+    <WHO>             Peter Eckhardt <Peter.Eckhardt@transcom.de> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.61_02 with patches for hold cursors </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  9.20UC3 (SDK 2.20UC3) </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          HP-UX 10.20 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-11-18 </WHEN>
+    <WHO>             Bill Rothanburg <brothanb@fll-ro.dhl.com> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62 </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  ESQL/C 7.24.UC6. </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            v5.005.03 </PERL>
+    <SYSTEM>          Siemens RM400 under SINIX-N v5.43 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-12-08 </WHEN>
+    <WHO>             Aglef Stüwe <a.stuewe@gmx.de> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 </DBD_INFORMIX>
+    <DBI>             1.12 </DBI>
+    <INFORMIX_ESQLC>  Hmm, the one that comes with IDS 7.31 for HP-UX? </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005.something </PERL>
+    <SYSTEM>          HP K480 (could be 380?) three CPU's, HP-UX 10.20 Pentium something, SuSe Linux 6.2 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-12-09 </WHEN>
+    <WHO>             Thomas Parsli <thomas.parsli@startsiden.no> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.60 (looking for 0.62!) </DBD_INFORMIX>
+    <DBI>             1.13 </DBI>
+    <INFORMIX_ESQLC>  9.16.UC3 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005._03 </PERL>
+    <SYSTEM>          Dual Xenon 450, RedHat Linux 6.1 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-12-09 </WHEN>
+    <WHO>             Thomas Parsli <thomas.parsli@startsiden.no> </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    0.62. </DBD_INFORMIX>
+    <DBI>             1.13 both. </DBI>
+    <INFORMIX_ESQLC>  ESQL v. 9.14.UC1 on Solaris 2.6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> Unknown </INFORMIX_SERVER>
+    <PERL>            5.005_02 </PERL>
+    <SYSTEM>          Solaris 2.6 & Linux 2.2.5 </SYSTEM>
+    <SYS_COMPILER>    Unknown </SYS_COMPILER>
+    <SYS_LOADER>      Unknown </SYS_LOADER>
+    <WHEN>            1999-12-14 </WHEN>
+    <WHO>             tslusser@ck6.uscourts.gov </WHO>
+    <Z_NOTES>         Optional Notes</Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2004.01                                                            </DBD_INFORMIX>
+    <DBI>             1.46                                                               </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 2.81, IBM Informix-ESQL Version 9.53.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 9.40 (OnLine)                                                      </INFORMIX_SERVER>
+    <PERL>            5.008005 sun4-solaris dl_dlopen.xs                                 </PERL>
+    <SYSTEM>          sunos anubis 5.8 generic_117000-01 sun4u sparc                     </SYSTEM>
+    <SYS_COMPILER>    gcc 3.4.0                                                          </SYS_COMPILER>
+    <SYS_LOADER>      gcc                                                                </SYS_LOADER>
+    <WHEN>            2004-12-02                                                         </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@anubis.menlo.ibm.com>                   </WHO>
+    <Z_NOTES>         Optional Notes                                                     </Z_NOTES>
+</WORKING_VERSION>
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2004.01                                                              </DBD_INFORMIX>
+    <DBI>             1.46                                                                 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 2.90, IBM Informix-ESQL Version 2.90.UC1B4 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 7.31 (OnLine)                                                        </INFORMIX_SERVER>
+    <PERL>            5.008006 sun4-solaris dl_dlopen.xs                                   </PERL>
+    <SYSTEM>          sunos anubis 5.8 generic_117000-01 sun4u sparc                       </SYSTEM>
+    <SYS_COMPILER>    gcc 3.4.3                                                            </SYS_COMPILER>
+    <SYS_LOADER>      gcc                                                                  </SYS_LOADER>
+    <WHEN>            2004-12-02                                                           </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@anubis.menlo.ibm.com>                     </WHO>
+    <Z_NOTES>         Optional Notes                                                       </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2007.0904 </DBD_INFORMIX>
+    <DBI>             1.59 </DBI>
+    <INFORMIX_ESQLC>  IBM INFORMIX-ESQL Version 5.20.UC1 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 5.10 (OnLine) </INFORMIX_SERVER>
+    <PERL>            5.008008 sun4-solaris dl_dlopen.xs </PERL>
+    <SYSTEM>          sunos black 5.10 generic sun4u sparc sunw,ultra-4 solaris  </SYSTEM>
+    <SYS_COMPILER>    cc  </SYS_COMPILER>
+    <SYS_LOADER>      cc </SYS_LOADER>
+    <WHEN>            2007-09-04 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@black.menlo.ibm.com> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2007.0904 </DBD_INFORMIX>
+    <DBI>             1.59 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 2.81, IBM Informix-ESQL Version 9.53.UC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 7.31 (IDS) </INFORMIX_SERVER>
+    <PERL>            5.008008 sun4-solaris dl_dlopen.xs </PERL>
+    <SYSTEM>          sunos black 5.10 generic sun4u sparc sunw,ultra-4 solaris  </SYSTEM>
+    <SYS_COMPILER>    cc  </SYS_COMPILER>
+    <SYS_LOADER>      cc </SYS_LOADER>
+    <WHEN>            2007-09-04 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@black.menlo.ibm.com> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2007.0904 </DBD_INFORMIX>
+    <DBI>             1.59 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 3.00, IBM Informix-ESQL Version 3.00.FC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 11.10 (IDS) </INFORMIX_SERVER>
+    <PERL>            5.008008 sun4-solaris-thread-multi-64 dl_dlopen.xs </PERL>
+    <SYSTEM>          sunos anubis 5.8 generic_117350-16 sun4u sparc sunw,ultra-5_10 solaris  </SYSTEM>
+    <SYS_COMPILER>    gcc -m64 4.0.2 </SYS_COMPILER>
+    <SYS_LOADER>      gcc -m64 </SYS_LOADER>
+    <WHEN>            2007-09-04 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@anubis.menlo.ibm.com> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2008.0513 </DBD_INFORMIX>
+    <DBI>             1.614 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 3.50, IBM Informix-ESQL Version 3.50.FC6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 11.70 (IDS) </INFORMIX_SERVER>
+    <PERL>            5.012001 darwin-2level dl_dlopen.xs </PERL>
+    <SYSTEM>          darwin dyn744040.sanjose.ibm.com 10.3.0 darwin kernel version 10.3.0: fri feb 26 11:58:09 pst 2010; root:xnu-1504.3.12~1release_i386 i386  </SYSTEM>
+    <SYS_COMPILER>    cc 4.2.1 (Apple Inc. build 5659) </SYS_COMPILER>
+    <SYS_LOADER>      env MACOSX_DEPLOYMENT_TARGET=10.3 cc </SYS_LOADER>
+    <WHEN>            2011-06-12 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@dyn744040.sanjose.ibm.com> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2011.0612 </DBD_INFORMIX>
+    <DBI>             1.616 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 3.70, IBM Informix-ESQL Version 3.70.FC2 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 11.70 (IDS) </INFORMIX_SERVER>
+    <PERL>            5.014001 darwin-2level dl_dlopen.xs </PERL>
+    <SYSTEM>          darwin osiris-9.sanjose.ibm.com 10.7.0 darwin kernel version 10.7.0: sat jan 29 15:17:16 pst 2011; root:xnu-1504.9.37~1release_i386 i386  </SYSTEM>
+    <SYS_COMPILER>    gcc -m64 4.6.0 </SYS_COMPILER>
+    <SYS_LOADER>      env MACOSX_DEPLOYMENT_TARGET=10.3 cc </SYS_LOADER>
+    <WHEN>            2011-06-24 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@osiris-9.sanjose.ibm.com> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+
+
+<WORKING_VERSION VERSION="1.00">
+    <DBD_INFORMIX>    2015.0826 </DBD_INFORMIX>
+    <DBI>             1.634 </DBI>
+    <INFORMIX_ESQLC>  IBM Informix CSDK Version 3.70, IBM Informix-ESQL Version 3.70.FC6 </INFORMIX_ESQLC>
+    <INFORMIX_SERVER> 11.70 (IDS) </INFORMIX_SERVER>
+    <PERL>            5.022000 darwin-2level dl_dlopen.xs </PERL>
+    <SYSTEM>          darwin osiris-2 14.3.0 darwin kernel version 14.3.0: mon mar 23 11:59:05 pdt 2015; root:xnu-2782.20.48~5release_x86_64 x86_64  </SYSTEM>
+    <SYS_COMPILER>    gcc 5.1.0 </SYS_COMPILER>
+    <SYS_LOADER>      env MACOSX_DEPLOYMENT_TARGET=10.3 cc </SYS_LOADER>
+    <WHEN>            2015-08-26 </WHEN>
+    <WHO>             Jonathan Leffler <jleffler@osiris-2.local> </WHO>
+    <Z_NOTES>         Optional Notes </Z_NOTES>
+</WORKING_VERSION>
+

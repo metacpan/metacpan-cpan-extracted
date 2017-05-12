@@ -1,0 +1,169 @@
+DBD::PrimeBase -- DBD module interfacing the PrimeBase database.
+
+   This module is based on the DBD::ODBC, DBD::Oracle and
+   DBD::mysql modules. 
+
+   README for Primebase Perl DBD version 1.1 2001/08/27
+
+   Copyright (c) 1994,1995,1996,1997,1998  Tim Bunce
+   portions Copyright (c) 1997,1998 Jeff Urlwin
+   portions Copyright (c) 1997  Thomas K. Wenrich
+   portions Copyright (c) 2001  Snap Innovation
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+DESCRIPTION
+
+       The PrimeBase Driver for DBI was created by taking the
+       ODBC driver and converting it so that it used the
+       PrimeBase API instead of ODBC. The Oracle and mysql DBDs
+       were also used as a reference while doing this.
+
+       This is a first pass at the PrimeBase DBD and it is hoped
+       that it will be enough to introduce PrimeBase to the Perl
+       community. If you find bugs or missing features please
+       report them to support@PrimeBase.com or mention them in
+       the PrimeBase talk mail list where they will be looked at
+       and fixed. To subscribe to the PrimeBase talk mail list
+       send mail to : PrimeBase-Talk-on@lists.imd.net
+
+
+PREREQUISITES
+
+       Perl
+           Preferably a version of Perl, that comes pre
+           configured with your system. For example, all Linux
+           and FreeBSD distributions come with Perl. For Windows,
+           ActivePerl is recommended, see
+           http://www.activestate.com for details.
+
+       PrimeBase
+           The PrimeBase database server and SDK are available
+           for download from http://www.PrimeBase.com
+
+           You need not install the actual PrimeBase database
+           server, the PrimeBase SDK is sufficient if you have a
+           PrimeBase database server running on a separate
+           machine.
+
+           Follow the instructions for installing the PrimeBase
+           software. The default installation is recommended.
+
+       DBI 
+           DBD::PrimeBase is a DBI driver, hence you need DBI. It
+           is available from the same source where you got the
+           DBD::PrimeBase distribution from.
+
+INSTALLATION
+
+       For installation you need to fetch the DBD::PrimeBase source 
+       distribution. The latest version is always available from
+
+         http://www.cpan.org/modules/by-module/DBD/
+
+       The name is typically something like
+
+         DBD-PrimeBase-1.4001.tar.gz
+
+         gzip -cd DBD-PrimeBase-1.4001.tar.gz | tar xf -
+
+
+
+       This will create a sub directory DBD-PrimeBase-1.4001.
+       Enter this sub directory and type
+
+         perl Makefile.PL
+         make
+         make test
+
+       If the tests seem to look fine, you may continue with
+
+         make install (You will need to be root to do this.)
+
+       If the tests fail, you might need to configure some
+       settings.
+
+       Configuration
+
+       If you have installed the PrimeBase database server on the
+       current machine and have not changed it's default
+       published name 'PrimeServer' or the administrator user's
+       password, then the default configuration will work. If you
+       have altered the default PrimeBase database server
+       settings or if the PrimeBase database server is running on
+       a different machine then you will have to alter the
+       default settings.
+
+       The install script "Makefile.PL" can be configured via a
+       lot of switches. All switches can be used on the command
+       line. For example, the test database:
+
+         perl Makefile.PL --testdb=<db>
+
+       Available switches are:
+
+       testdb
+           Name of the test database, defaults to Perl_test.
+
+           If the database doesn't exist the test scripts will
+           create it automatically.
+
+       testuser
+           Name of the test user, defaults to Administrator.
+
+       testpassword
+           Password of the test user, defaults to empty.
+
+       testhost
+           Host name or IP number of the test database server;
+           defaults to localhost.
+
+       testserver
+           The published name of the PrimeBase database server,
+           defaults to PrimeServer.
+
+       The configuration process will create a PrimeBase.env file
+
+       in the test directory 't' and the bench mark directory
+       'benchmarks'.
+
+       You can change the PrimeBase database server connection
+       settings by editing this file.
+
+
+Benchmarks
+
+       The PrimeBase DBD includes a selection of the MySQL
+       Benchmarks in the directory 'benchmarks'. These benchmarks
+       remain true to the originals that are available with the
+       MySQL database server with only slight modifications made
+       to ensure correct execution using PrimeBase.  Any changes
+       made have been documented in the files them selves.
+
+       After building, testing and installing the PrimeBase DBD
+       you will be able to run the benchmarks by changing
+       directory to 'benchmarks' and executing the benchmarks
+       such as:
+
+       perl test-wisconsin
+
+SUPPORT
+
+       For support you should join the PrimeBase Talk mail list.
+       To subscribe to the PrimeBase mail list send mail to :
+       PrimeBase-Talk-on@lists.imd.net. Once you have joined you
+       will have access to the search able PrimeBase Talk
+       archive, http://PrimeBase-Talk.imd.net, where you can
+       search for postings related to your problem or question.
+
+       If you don't find what you are looking for in the archive
+       then post a question to the mail list. The mail list is
+       monitored by the developers at SNAP Innovation and you can
+       be sure of a quick response if not from someone in the
+       PrimeBase development community, then from one of SNAP
+       Innovation's developers personally.
+
+
+

@@ -1,0 +1,75 @@
+{
+   "abstract" : "Exception handling with Monad",
+   "author" : [
+      "aereal <aereal@aereal.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Monad-Control",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Monad" : "0.08",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Devel::Cover::Report::Coveralls" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Monad::Control" : {
+         "file" : "lib/Data/Monad/Control.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/aereal/Data-Monad-Control/issues"
+      },
+      "homepage" : "https://github.com/aereal/Data-Monad-Control",
+      "repository" : {
+         "url" : "git://github.com/aereal/Data-Monad-Control.git",
+         "web" : "https://github.com/aereal/Data-Monad-Control"
+      }
+   },
+   "version" : "0.01"
+}

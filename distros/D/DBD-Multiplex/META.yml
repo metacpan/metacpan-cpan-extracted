@@ -1,0 +1,12 @@
+name: DBD-Multiplex
+version: 2.11
+version_from: lib/DBD/Multiplex.pm
+author: 'Thomas Kishel <tkishel+perl@gmail.com>'
+abstract: A multiplexing driver for the DBI.
+installdirs: site
+requires:
+    DBI:		0
+
+distribution_type: module
+license: perl
+generated_by: ExtUtils::MakeMaker version 6.17

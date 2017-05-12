@@ -1,0 +1,73 @@
+#!/bin/bash -x
+
+RRD_FILE=mod_status.rrd
+
+if [ "$1" ]; then
+    RRD_FILE=$1
+fi
+
+MAX_CLIENTS=""
+if [ "$2" ]; then
+    MAX_CLIENTS="CDEF:max_clients=$2,0,+ AREA:max_clients#BBFFFF:MaxClients"
+fi
+
+BASE_FILE=`basename $RRD_FILE`
+
+NOW=`date +%s`
+WIDTH=1000
+HEIGHT=600
+
+rrdtool graph \
+    "${BASE_FILE}-req-day.png" \
+    --start '-1d' \
+    --end $NOW \
+    --width $WIDTH \
+    --height $HEIGHT \
+    --lower-limit 0 \
+    DEF:total_accesses=$RRD_FILE:total_accesses:AVERAGE \
+    'LINE:total_accesses#FF0000:Total Accesses' \
+    DEF:requests=$RRD_FILE:current_requests:MAX \
+    'LINE:requests#A22222:Max Requests' \
+
+rrdtool graph \
+    "${BASE_FILE}-workers-day.png" \
+    --start '-1d' \
+    --end $NOW \
+    --width $WIDTH \
+    --height $HEIGHT \
+    --lower-limit 0 \
+    DEF:waiting=$RRD_FILE:waiting:AVERAGE \
+    DEF:waiting_min=$RRD_FILE:waiting:MIN \
+    DEF:starting=$RRD_FILE:starting:AVERAGE \
+    DEF:reading=$RRD_FILE:reading:AVERAGE \
+    DEF:sending=$RRD_FILE:sending:AVERAGE \
+    DEF:keepalive=$RRD_FILE:keepalive:AVERAGE \
+    DEF:dns_lookup=$RRD_FILE:dns_lookup:AVERAGE \
+    DEF:closing=$RRD_FILE:closing:AVERAGE \
+    DEF:logging=$RRD_FILE:logging:AVERAGE \
+    DEF:finishing=$RRD_FILE:finishing:AVERAGE \
+    DEF:idle_cleanup=$RRD_FILE:idle_cleanup:AVERAGE \
+    DEF:requests=$RRD_FILE:current_requests:AVERAGE \
+    DEF:open_slot=$RRD_FILE:open_slot:AVERAGE \
+    DEF:max_clients=$RRD_FILE:max_clients:AVERAGE \
+    \
+    DEF:current_requests=$RRD_FILE:current_requests:AVERAGE \
+    DEF:current_requests_max=$RRD_FILE:current_requests:MAX \
+    \
+    $MAX_CLIENTS \
+    \
+    'AREA:max_clients#FFFFAA:Max clients' \
+    'AREA:waiting#FFd2aa:Waiting' \
+    'AREA:waiting_min#fee3cc:Min Waiting' \
+    'AREA:current_requests_max#D8DFFF:Max occupied' \
+    'AREA:current_requests#AABBFF:Occupied' \
+    'LINE2:reading#22A222:Reading' \
+    'LINE2:sending#2222A2:Sending' \
+    'LINE1:keepalive#50eae8:Keep-Alive' \
+    'LINE:starting#02F222:Starting' \
+    'LINE:dns_lookup#225222:DNS Lookup' \
+    'LINE:closing#222252:Closing' \
+    'LINE:logging#022222:Logging' \
+    'LINE:finishing#220222:Gracefully Finishing' \
+    'LINE:idle_cleanup#222202:Idle Cleanup' \
+

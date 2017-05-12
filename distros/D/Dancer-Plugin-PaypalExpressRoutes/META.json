@@ -1,0 +1,43 @@
+{
+   "abstract" : "Dancer wrapper for Business::PayPal::API::ExpressCheckout",
+   "author" : [
+      "Lyn St George <lyn@zolotek.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-PaypalExpressRoutes",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::PayPal::API::ExpressCheckout" : "0.14",
+            "Dancer" : "1.3098",
+            "Dancer::Plugin::Database" : "2.08"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.12"
+}

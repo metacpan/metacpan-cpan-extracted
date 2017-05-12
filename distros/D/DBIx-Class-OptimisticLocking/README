@@ -1,0 +1,152 @@
+NAME
+    DBIx::Class::OptimisticLocking - Optimistic locking support for
+    DBIx::Class
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+    This module allows the user to utilize optimistic locking when updating
+    a row.
+
+    Example usage:
+
+            package DB::Main::Orders;
+
+            use base qw/DBIx::Class/;
+
+            __PACKAGE__->load_components(qw/OptimisticLocking Core/);
+
+            __PACKAGE__->optimistic_locking_strategy('dirty'); # this is the default behavior
+
+PURPOSE
+    Optimistic locking is an alternative to using exclusive locks when you
+    have the possibility of concurrent, conflicting updates in your
+    database. The basic principle is you allow any and all clients to issue
+    updates and rather than preemptively synchronizing all data
+    modifications (which is what happens with exclusive locks) you are
+    "optimistic" that updates won't interfere with one another and the
+    updates will only fail when they do in fact interfere with one another.
+
+    Consider the following scenario (in timeline order, not in the same
+    block of code):
+
+            my $order = $schema->resultset('Orders')->find(1);
+
+            # some other different, concurrent process loads the same object
+            my $other_order = $schema->resultset('Orders')->find(1);
+
+            $order->status('fraud review');
+            $other_order->status('processed');
+
+            $order->update; # this succeeds
+            $other_order->update; # this fails when using optimistic locking
+
+    Without locking (optimistic or exclusive ), the example order would have
+    two sequential updates issued with the second essentially erasing the
+    results of the first. With optimistic locking, the second update (on
+    $other_order) would fail.
+
+    This optimistic locking is typically done by adding additional
+    restrictions to the "WHERE" clause of the "UPDATE" statement. These
+    additional restrictions ensure the data is still in the expected state
+    before applying the update. This DBIx::Class::OptimisticLocking
+    component provides a few different strategies for providing this
+    functionality.
+
+CONFIGURATION
+  optimistic_locking_strategy
+    This configuration controls the main functionality of this component.
+    The current recognized optimistic locking modes supported are:
+
+    *   dirty
+
+        When issuing an update, the "WHERE" clause of the update will
+        include all of the original values of the columns that are being
+        updated. Any columns that are not being updated will be ignored.
+
+    *   version
+
+        When issuing an update, the "WHERE" clause of the update will
+        include a check of the "version" column (or otherwise configured
+        column using optimistic_locking_version_column). The "version"
+        column will also be incremented on each update as well. The
+        exception is if all of the updated columns are in the
+        optimistic_locking_ignore_columns configuration.
+
+    *   all
+
+        When issuing an update, the "WHERE" clause of the update will
+        include a check on each column in the object regardless of whether
+        they were updated or not.
+
+    *   none (or any other value)
+
+        This turns off the functionality of this component. But why would
+        you load it if you don't need it? :-)
+
+  optimistic_locking_ignore_columns
+    Occassionally you may elect to ignore certain columns that are not
+    significant enough to detect colisions and cause the update to fail. For
+    instance, if you have a timestamp column, you may want to add that to
+    this list so that it is ignored when generating the "UPDATE" where
+    clause for the update.
+
+  optimistic_locking_version_column
+    If you are using 'version' as your optimistic_locking_strategy, you can
+    optionally specify a different name for the column used for version
+    tracking. If an alternate name is not passed, the component will look
+    for a column named "version" in your model.
+
+EXTENDED METHODS
+  update
+    See DBIx::Class::Row::update for basic usage.
+
+    Before issuing the actual update, this component injects additional
+    criteria that will be used in the "WHERE" clause in the "UPDATE". The
+    criteria that is used depends on the CONFIGURATION defined in the model
+    class.
+
+  _track_storage_value
+    This is a method internal to DBIx::Class::Row that basically serves as a
+    predicate method that indicates whether or not the orginal value of the
+    row (as loaded from storage) should be recorded when it is updated.
+
+    Typically, only primary key values are persisted but for
+    DBIx::Class::OptimisticLocking, this list is augmented to include other
+    columns based on the optimistic locking strategy that is configured for
+    this DBIx::Class::ResultSource. For instance, if the chosen strategy is
+    '"dirty"' (the default), every column's original value will be tracked
+    in order to generate the appropriate "WHERE" clause in any subsequent
+    "UPDATE" operations.
+
+  _storage_ident_condition
+    This is an internal method to DBIx::Class::PK that generates the "WHERE"
+    clause for update and delete operations.
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-optimisticlocking at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-OptimisticLoc
+    king>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::OptimisticLocking
+
+ACKNOWLEDGEMENTS
+    Credit goes to the Java ORM package <Hibernate> for inspiring me to
+    write this for DBIx::Class.
+
+AUTHOR
+      Brian Phillips <bphillips@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Brian Phillips.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

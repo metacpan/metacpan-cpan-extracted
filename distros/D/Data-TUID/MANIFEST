@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Data/TUID.pm
+lib/Data/TUID/BestUUID.pm
+t/01-basic.t
+t/02-best.t
+t/03-skip-LibUUID.t
+t/04-skip-DataUUID.t

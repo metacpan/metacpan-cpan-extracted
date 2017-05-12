@@ -1,0 +1,304 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Date::Tolkien::Shire::Data qw{ :all };
+use Getopt::Long 2.25;
+use Pod::Usage;
+use Term::ANSIColor qw{ colored };
+
+our $VERSION = '0.003';
+
+my %opt = (
+    color	=> -t STDOUT,
+    color_today	=> 'underline',
+);
+
+if ( defined( my $home = get_home() ) ) {
+    my $path = "$home/.scalrc";
+    local $! = undef;
+    if ( open my $fh, '<', $path ) {
+	my @config;
+	while ( <$fh> ) {
+	    s/ \s+ \z //smx;
+	    m/ \A \s* (?: \z | [#] ) /smx
+		and next;
+	    s/ \A \s+ //smx;
+	    push @config, $_;
+	}
+	close $fh;
+	splice @ARGV, 0, 0, @config;
+    }
+}
+
+GetOptions( \%opt,
+    qw{ color! color_today|color-today=s j! y! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV <= ( $opt{y} ? 1 : 2 ) or pod2usage( { -verbose => 0 } );
+
+if ( my $code = Term::ANSIColor->can( 'colorvalid' ) ) {
+    $code->( $opt{color_today} )
+	or die "Invalid color '$opt{color_today}'\n";
+}
+
+my ( $column_width, $weekday_name, $day_text ) = $opt{j} ?
+    ( 3, \&__weekday_abbr, sub {
+	    my ( $year, $day_of_year ) = @_;
+	    return $day_of_year;
+	} ) :
+    ( 2, \&__weekday_narrow, sub {
+	    my ( $year, $day_of_year ) = @_;
+	    my ( $m, $d ) = __day_of_year_to_date( $year, $day_of_year );
+	    return $m ? $d : __holiday_narrow( $d );
+	} );
+
+my $column_format = "%${column_width}s";
+my $month_width = $column_width * 7 + 6;
+
+my ( $current_sy, $today ) = do {
+    my ( $y, $yd ) = ( localtime )[ 5, 7 ];
+    $yd += 1;	# Conversion to RD uses 1-based day of year
+    $y += 1900;
+    __rata_die_to_year_day(
+	__year_day_to_rata_die( $y, $yd ) + GREGORIAN_RATA_DIE_TO_SHIRE );
+};
+my ( $current_sm, $sd ) = __day_of_year_to_date( $current_sy, $today );
+$current_sm ||= ( 1, 6, 6, 6, 6, 12 )[$sd];
+
+my ( $year, $month ) = reverse @ARGV;
+
+$year ||= $current_sy;
+$month ||= $current_sm;
+$year == $current_sy
+    or $today = 0;
+
+if ( $opt{y} ) {
+    my $number = $opt{j} ? 2 : 3;
+    my $max = 12 / $number;
+    foreach my $inx ( 1 .. $max ) {
+	foreach ( period( $year, $inx, $number ) ) {
+	    s/ \s* \z /\n/smx;
+	    print;
+	}
+	$inx == $max
+	    or print "\n";
+    }
+} else {
+    foreach ( month( $year, $month ) ) {
+	s/ \s* \z /\n/smx;
+	print;
+    }
+}
+
+sub get_home {
+    defined $ENV{HOME}
+	and return $ENV{HOME};
+    my $home;
+    local $@ = undef;
+    eval {
+	$home = ( getpwuid $< )[7];
+	1;
+    } and return $home;
+    foreach my $env ( qw{ USERPROFILE SYS$LOGIN } ) {
+	defined $ENV{$env}
+	    and return $ENV{$env};
+    }
+    return;
+}
+
+# Highlight the given $text if -color is asserted and the $day_of_year
+# is equal to global variable $today.
+sub highlight {
+    my ( $text, $day_of_year ) = @_;
+    $opt{color}
+	and $day_of_year == $today
+	or return $text;
+    return colored( $text, $opt{color_today} );
+}
+
+# Make the calendar for one month. The arguments are Shire Year and
+# Shire month number (1-12). The return is an array of lines.
+sub month {
+    my ( $year, $month ) = @_;
+    my @rslt;
+
+    {	# Title
+	my $name = join ' ', __month_name( $month ), $year;
+	my $space = ' ' x int( ( $month_width - length $name ) / 2 );
+	push @rslt, sprintf "%-${month_width}s", "$space$name";
+    }
+
+    push @rslt, join ' ', map { $weekday_name->( $_ ) } 1 .. 7;
+
+    my $start = __date_to_day_of_year( $year, $month, 1 );
+
+    my $moh = $month % 6;	# Month of half, sort of.
+    1 == $moh
+	and --$start;
+    my $finish = __date_to_day_of_year( $year, $month, 30 );
+    0 == $moh
+	and ++$finish;
+    my @week;
+
+    push @week, ( ' ' x $column_width ) x (
+	__day_of_week( __day_of_year_to_date( $year, $start ) ) - 1 );
+
+    foreach my $day_of_year ( $start .. $finish ) {
+	my $d = $day_text->( $year, $day_of_year );
+	push @week, highlight( sprintf( $column_format, $d ), $day_of_year );
+	@week % 7
+	    and next;
+	push @rslt, join ' ', @week;
+	@week = ();
+    }
+
+    if ( @week ) {
+	push @week, ( ' ' x $column_width ) x ( 7 - @week );
+	push @rslt, join ' ', map { sprintf $column_format, $_ } @week;
+    }
+
+    # Midyear's day and Overlithe are honorary members of month 6.
+    if ( 6 == $month ) {
+	push @rslt, '',
+	    highlight( __holiday_name( HOLIDAY_MIDYEARS_DAY ),
+		DAY_OF_YEAR_MIDYEARS_DAY );
+	__is_leap_year( $year )
+	    and push @rslt, '', highlight( __holiday_name(
+		HOLIDAY_OVERLITHE ), DAY_OF_YEAR_OVERLITHE );
+    }
+
+    return @rslt;
+}
+
+# Make the calendar for one quarter. The arguments are Shire Year and
+# quarter number (1-4). The return is an array of lines.
+sub period {
+    my ( $year, $inx, $number ) = @_;
+
+    $number ||= 3;
+    my @rslt;
+    my $start = ( $inx - 1 ) * $number;
+    foreach my $month ( $start + 1 .. $start + $number ) {
+	my $inx = 0;
+	foreach my $line ( month( $year, $month ) ) {
+	    push @{ $rslt[$inx++] ||= [] }, $line;
+	}
+    }
+    return ( map { join '  ', @{ $_ } } @rslt );
+}
+
+__END__
+
+=head1 TITLE
+
+scal - Displays a Shire calendar
+
+=head1 SYNOPSIS
+
+ scal
+ scal 7482
+ scal 6 7482
+ scal -y
+ scal -y 7482
+ scal -help
+ scal -version
+
+=head1 OPTIONS
+
+=head2 -color
+
+If this Boolean option is asserted, the current day is emphasized.
+
+The default is true if STDOUT is a terminal, and false if not.
+
+=head2 -color-today
+
+ -color-today 'magenta on_black'
+
+This option specifies how to emphasize the current day. The value must
+be acceptable to L<Term::ANSIColor|Term::ANSIColor>. The default is
+C<'underline'>.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -j
+
+If this Boolean option is asserted, Julian days are displayed, with 2
+Yule being day 1.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head2 -y
+
+If this Boolean option is asserted, a whole year is displayed, including
+Midyear's Day, and the Overlithe if any. If it is not asserted, only a
+month is displayed.
+
+The default is C<-noy>.
+
+=head1 DETAILS
+
+This Perl script displays the Shire calendar for the Shire Reckoning
+month and year specified on the command line. The default is to display
+the current month and year.
+
+For the purpose of selecting dates to display, the holidays are
+lumped in with months as follows.
+
+ 2 Yule -------- Afteryule (month 1)
+ 1 Lithe ------- Forelithe (month 6)
+ Midyear's day - Forelithe (month 6)
+ Overlithe ----- Forelithe (month 6)
+ 2 Lithe ------- Afterlithe (month 7)
+ 1 Yule -------- Foreyule (month 12)
+
+This script is intended to be the Shire analog of the C<cal (1)>.
+command.
+
+=head1 FILES
+
+You can specify default options in a file named F<.scalrc> in your home
+directory. Each line of this file is trimmed front and back, and becomes
+a command line argument inserted before anything specified explicitly.
+For example, to make the current day bold red, you could specify
+
+ -color-today=bold red
+
+or, alternatively,
+
+ -color-today
+ bold red
+
+You can still override anything here by specifying command arguments,
+but anything you place in this file must parse correctly.
+
+The code to find the home directory is home-grown, but mimics that in
+C<File::Glob::bsd_glob()>.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,0 +1,30 @@
+Revision history for Perl extension DBQuery.
+
+1.20  Sun Dec 28 11:24:25 2014 
+    - change compile method;
+	- add some function.
+1.10  Thu Jul 07 11:18:13 2011 
+    - Add compatibility about oracle and mysql;
+    - Update documents and examples.
+1.00  Fri Apr 02 02:58:16 2010
+    - Add function reconnect;
+    - Add function autocommit;
+    - Add function charset store.
+0.08  Wed Mar 31 12:55:00 2010
+    - Add Charset for connection.  
+0.07  Thu Dec 03 11:00:35 2009
+    - Add a method about reference of array;
+    - Add pod document for method.
+0.06  Wed Dec 02 11:41:50 2009 
+    - Replace perldoc DBQuery with pod document.
+0.05  Tue Jul 07 10:19:28 2009
+	- Repair and pass test.
+0.04  Tue Jun 30 17:31:44 2009
+	- Modify the test case.
+0.03  Mon Jun 29 16:53:04 2009
+	- Can miss out the arg: db_host, and optimize the test
+0.02  Mon Jun 29 10:22:35 2009
+	- Modify name: DB to DBQuery.
+0.01  Wed Jun 24 17:08:43 2009
+	- Original version created by cnangel.
+

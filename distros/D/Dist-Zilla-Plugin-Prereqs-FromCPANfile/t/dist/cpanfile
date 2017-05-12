@@ -1,0 +1,17 @@
+requires 'Plack', '>= 1.0000';
+requires 'DBI', '>= 1, < 2';
+
+on test => sub {
+    requires 'Test::More', '0.90';
+    recommends 'Test::TCP', '0.2';
+};
+
+feature 'sqlite', 'SQLite support' => sub {
+    requires 'DBD::SQLite';
+};
+
+feature 'fastcgi' => sub {
+    on test => sub {
+        recommends 'Test::FastCGI', '1';
+    };
+};

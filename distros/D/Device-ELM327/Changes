@@ -1,0 +1,72 @@
+Revision history for Device-ELM327
+
+0.01  27 March 2012
+      First version, released on an unsuspecting world.
+    
+0.02	28 March 2012
+      Improved POD formatting. Replaced UTF-8 characters with ASCII.
+    
+0.03  29 March 2012
+      Fixed typos in POD.
+      Renamed ShowReadbleParameters to ShowReadableValues.
+      Fixed problem in Makefile.PL with underscore character in
+      $ExtUtils::MakeMaker::VERSION. Used regex to strip it.
+
+0.04  7 May 2012
+      Added support for command 02 (freeze frame data).
+      Fixed bugs in command 05, but more work is required.
+      Added support for command 06 for CAN systems.
+      Tidied up FindAvailableCommands.
+      
+0.05  13 May 2012
+      Added low level support for commands 03, 07 and 0A.
+      Command 05 now displays the correct result and limit values.
+
+0.06  18 May 2012
+      Improved error handling for GetResult.
+      Fixed a bug in the command 06 code.
+      Removed obsolete commands.
+
+0.07  20 May 2012
+      Added conditional serial module name to PREREQ_PM in Makefile.PL.
+      Added text to explain boolean results.
+
+0.08  27 May 2012
+      Increased $max_ports_to_search to 64.
+		Revised the error values returned.
+		Removed obsolete DisplayTroubleCodes function.
+		Added POD for undocumented functions and reordered functions.
+
+0.09  16 October 2013
+      Investigated bug #89287. Have not managed to replicate, but added
+      extra diagnostic text to ShowTroubleCodes.
+      Fixed a bug in the handling of results for commands 03, 07 & 0A.
+      Added checking for and reporting of negative response codes and
+      handling for 78 (Request Correctly Received - Response Pending).
+
+0.10	3 April 2014
+		Changed $port_name in the constructor to $port_details and added
+		code to the OpenPort function to split out and use baud rate, 
+		parity, data bit, stop bit and handshake values if supplied.
+		Previous functionality is still supported (port name or "") and
+		it is possible to just pass a baud rate value if that is the only
+		parameter that needs to change from the default values.
+		This fixes bug #93551 which asks for a way to set the baud rate.
+
+0.11	7 April 2014
+		Fixed bug #89287. Debug data allowed me to trace the problem to 
+		the code that handles packets in SAE J1979 format.
+		Also fixed a problem with processing the sensor 13/1D commands.
+
+0.12	28 April 2014
+		Fixed bug #95030. This was caused by a semantic change to qw() 
+		that was made in Perl 5.18.
+
+0.13  4 January 2015
+      Implemented the code in the patch supplied by Jason McCarver to 
+      make the ReadResponse function more robust (bug 96006).
+
+0.14  5 January 2015
+      Fixed bug #101289. Rebuilt the module using my old development
+      machine with Perl 5.10.1 and MakeMaker 6.55_02, rather than 
+      Perl 5.18.2 and MakeMaker 6.66 which are on my current machine.

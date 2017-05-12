@@ -1,0 +1,35 @@
+---
+abstract: 'PBKDF2 support for DBIx::Class::EncodedColumn'
+author:
+  - 'Charlie Garrison <garrison@zeta.org.au>'
+build_requires:
+  DBIx::Class: '0'
+  DBIx::Class::Schema: '0'
+  Dir::Self: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  base: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-EncodedColumn-Crypt-PBKDF2
+requires:
+  Carp: '0'
+  Crypt::PBKDF2: '0.142390'
+  DBIx::Class::EncodedColumn: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/cngarrison/DBIx-Class-EncodedColumn-Crypt-PBKDF2/issues
+  homepage: https://github.com/cngarrison/DBIx-Class-EncodedColumn-Crypt-PBKDF2
+  repository: https://github.com/cngarrison/DBIx-Class-EncodedColumn-Crypt-PBKDF2.git
+version: '0.000002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

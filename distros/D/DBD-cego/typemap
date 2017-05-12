@@ -1,0 +1,2 @@
+TYPEMAP
+DummyClass *         O_OBJECT

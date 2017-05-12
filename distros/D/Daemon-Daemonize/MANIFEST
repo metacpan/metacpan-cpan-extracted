@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Daemon/Daemonize.pm
+t/01-daemonize.t
+t/02-daemonize-stdout-stderr.t
+t/03-daemonize-stdout-stderr-via-env.t
+t/04-read-write-delete-check-pidfile.t
+t/9-basic.t
+t/Test.pm

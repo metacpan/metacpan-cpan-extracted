@@ -1,0 +1,147 @@
+<html>
+<head><title>Using Fastexport with DBD::Teradata</title></head>
+<body>
+<center><h2>Using Fastexport with DBD::Teradata</h2></center>
+<p>
+DBD::Teradata 2.2.0 provides improved support for Fastexport.
+Using Fastexport with DBD::Teradata requires some special considerations.
+<p>
+<b>DBD::Teradata does not support recovery logging of utilities; i.e.,
+you cannot PAUSE and then restart DBD::Teradata-based utility applications.</b>
+<p>
+
+The attributes hash provided to tdat_UtilitySetup includes the following
+keys:<p>
+<table border=1>
+<tr bgcolor=orange><th>Attribute</th><th>Required ?</th><th width="70%">Description</th></tr>
+<tr>
+	<td align=center valign=top><b>Utility</b></td>
+	<td align=center valign=top>Yes</td>
+	<td valign=top>set to 'EXPORT'</td></tr>
+<tr>
+	<td align=center valign=top><b>SQL</b></td>
+	<td align=center valign=top>Yes</td>
+	<td valign=top>
+	A SELECT statement to be used for the export. Note that parameterized SELECTs, and multi-statement
+	SELECTs have not yet been tested.</td></tr>
+<tr>
+	<td align=center valign=top><b>Target</b></td>
+	<td align=center valign=top>Yes</td>
+	<td valign=top>can be set to either a subroutine reference, a file description.<p>
+
+A file description is specified as<p>
+<code>&lt; VARTEXT 'c' | INDICDATA | DATA &gt; <i>filename</i></code><p>
+where 'c' is the separator character. Use '|' for compatibility with
+the default Teradata VARTEXT file format. INDICDATA indicates a fastload
+formatted file with indicator bytes, and DATA indicates a fastload
+formatted file without indicator bytes.</td></tr>
+<tr>
+	<td align=center valign=top><b>Report</b></td>
+	<td align=center valign=top>No</td>
+	<td valign=top>a subroutine reference which is called with a status message as the Fastexport progresses.</td></tr>
+<tr>
+	<td align=center valign=top><b>Sessions</b></td>
+	<td align=center valign=top>Yes</td>
+	<td valign=top>the number of export sessions to use</td></tr>
+<tr>
+	<td align=center valign=top><b>Context</b></td>
+	<td align=center valign=top>No</td>
+	<td valign=top>a hashref that can contain anything the application
+	desires; it will be passed to the Source subroutine reference each time
+	records are to be collected</td></tr>
+<tr>
+	<td align=center valign=top><b>MP</b></td>
+	<td align=center valign=top>No</td>
+	<td valign=top>when set to a nonzero numeric value, or the string 'nothreads',
+	causes multiple processes to be fork()'d, 1 per export session.
+	When set to the string 'threads', causes multiple threads to be spawned, 1 per export session.
+	This attribute may provide performance improvement
+	on certain platforms (esp. multiprocessor platforms).</td></tr>
+<tr>
+	<td align=center valign=top><b>Retry</b></td>
+	<td align=center valign=top>No</td>
+	<td valign=top>either a scalar or arrayref; if scalar, indicates the number of seconds
+	to wait between retrying to start the fastexport in the event the prior attempt failed due to
+	no remaining utility job slots available on the database. If an arrayref, the first
+	element is the number of seconds between retries, and the second element is the maximum
+	number of retry attempts. The scalar form will retry indefinitely.</td></tr>
+
+</table><p>
+
+<h3>Examples</h3>
+<h4>Multijob MP Export with subroutine source</h4>
+<pre><code>
+    my $ctldbh = DBI-&gt;connect('dbi:Teradata:dbc', $username, $password,
+        { RaiseError =&gt; 0, PrintError =&gt; 0, tdat_lsn =&gt; 0 });
+
+    my $total = $ctldbh-&gt;tdat_UtilitySetup(
+        {
+        Utility =&gt; 'EXPORT',
+        Sessions =&gt; $sesscount,
+        SQL =&gt; 'SELECT * FROM alltypetst',
+        Report =&gt; \&report_cb,
+        Target =&gt; \&save_data,
+        Context =&gt; {
+            Count =&gt; \$count,
+            Runtime =&gt; \$mlstarted,
+            Base =&gt; [ 0, 1000000 ]
+            },
+        MP => 1,
+        Retry => [ 120, 3]	# retry every 2 minutes up to 3 times
+        });
+
+    print $ctldbh-&gt;errstr
+        unless ($total && ($total &gt; 0));
+
+sub report_cb {
+    my ($msg) = @_;
+    print $msg, "\n";
+}
+
+</code>
+</pre>
+<h4>Multithreaded MP Export with INDICDATA source</h4>
+<pre>
+<code>
+    my $ctldbh = DBI-&gt;connect('dbi:Teradata:dbc', $username, $password,
+        { RaiseError =&gt; 0, PrintError =&gt; 0, tdat_lsn =&gt; 0 });
+
+    my $total = $ctldbh-&gt;tdat_UtilitySetup(
+        {
+        Utility =&gt; 'EXPORT',
+        Sessions =&gt; $sesscount,
+        SQL =&gt; 'SELECT * FROM alltypetst',
+        Report =&gt; \&report_cb,
+        Source =&gt; 'INDICDATA rawdata.dat',
+        MP => 'threads'
+        });
+
+    print $ctldbh-&gt;errstr
+        unless ($total && ($total &gt; 0));
+</code>
+</pre>
+
+<h4>Multijob MP Export with VARTEXT source</h4>
+<pre>
+<code>
+    my $ctldbh = DBI-&gt;connect('dbi:Teradata:dbc', $username, $password,
+        { RaiseError =&gt; 0, PrintError =&gt; 0, tdat_lsn =&gt; 0 });
+
+    my $total = $ctldbh-&gt;tdat_UtilitySetup(
+        {
+        Utility =&gt; 'EXPORT',
+        Sessions =&gt; $sesscount,
+        SQL =&gt; 'SELECT * FROM alltypetst',
+        Report =&gt; \&report_cb,
+        Source =&gt; "VARTEXT '|' vardata.txt",
+        MP => 1
+        });
+
+    print $ctldbh-&gt;errstr
+        unless ($total && ($total &gt; 0));
+
+</code>
+</pre>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+Revision history for Dao-Map-Helper
+
+0.01    2011-01-19
+        First version, Works for mysql database only.
+
+0.02    2011-01-20
+        Fixed the database name issue.
+
+0.03    2011-01-21
+        Fixed the database table access issue.
+        
+0.04    2011-02-12
+        Added package name to parameter list.                        

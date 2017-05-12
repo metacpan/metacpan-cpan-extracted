@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+#==============================================================================#
+# Hard coded settings
+
+# The hostname we are updating
+use constant HOSTNAME       => 'puerto.brock-family.org';
+
+# The web page with the data, and the pattern to extract it
+use constant ROUTER_PAGE    => 'http://admin:XXXXXXX@192.168.0.1/info_main.html';
+use constant ROUTER_PATTERN => qr/(\d+\.\d+\.\d+\.\d+)/; # First IP address
+
+# ZoneEdit details
+use constant ZONEEDIT_USER   => 'userfoo';
+use constant ZONEEDIT_PASS   => 'XXXXXX';
+ 
+#
+#==============================================================================#
+
+use strict;
+use warnings;
+use LWP::Simple;
+use DNS::ZoneEdit;
+use File::Spec::Functions qw(catfile tmpdir);
+
+#==============================================================================#
+
+my $cache_file = catfile(tmpdir,"zoneedit.ip");
+
+my $old_ip = '';
+if (open(my $inp,"< $cache_file")) {
+	chomp($old_ip = <$inp>); 
+} else {
+	warn "Can't read $cache_file: $!\n";
+}
+
+if (get(ROUTER_PAGE) =~ ROUTER_PATTERN) {
+	my $ip = $1;
+	if ($ip ne $old_ip) {
+		print "IP address changed: $old_ip -> $ip\n";
+		if (DNS::ZoneEdit->new->update(
+			username => ZONEEDIT_USER,
+			password => ZONEEDIT_PASS,
+			hostname => HOSTNAME,
+		)) {
+			print "Update succeeded\n";
+			if (open(my $outp,"> $cache_file")) {
+				print $outp "$ip\n";
+			} else {
+				warn "Can't write $cache_file: $!\n";
+			}
+		} else {
+			print "Update failed: [$@]\n";
+		}
+
+	} else {
+		print "IP still $ip\n";
+	}
+} else {
+	warn "Could not get IP";
+}
+
+#==============================================================================#

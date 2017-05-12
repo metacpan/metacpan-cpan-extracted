@@ -1,0 +1,21 @@
+Revision history for Perl extension DBIx::ObjectMapper
+
+0.3013 Mon Dec 20 19:39:42 JST 2010
+    - fixed pod. (thanks nekokak)
+    - fixed many_to_many oparations.
+    - support nested begin_session().
+
+0.3012 Wed Oct 13 16:00:45 JST 2010
+    - fixed failing tests.
+
+0.3011 Thu Oct 12 11:05:38 JST 2010
+    - fixed bug in checking sqlite_version
+
+0.3010 Mon Jul 26 10:17:00 JST 2010
+    - fix a minor bug.
+
+0.3006 Thu Jul 22 11:21:00 JST 2010
+    - fixed failing tests in case of not installed recommend modules.
+
+0.3005 Wed Jul 21 21:02:51 JST 2010
+    - original version

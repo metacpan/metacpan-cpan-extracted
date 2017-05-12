@@ -1,0 +1,168 @@
+# NAME
+
+Dancer::Plugin::Auth::Twitter - Authenticate with Twitter
+
+# VERSION
+
+version 0.07
+
+# SYNOPSIS
+
+    package SomeDancerApp;
+    use Dancer ':syntax';
+    use Dancer::Plugin::Auth::Twitter;
+
+    auth_twitter_init();
+
+    before sub {
+        if (not session('twitter_user')) {
+            redirect auth_twitter_authenticate_url;
+        }
+    };
+
+    get '/' => sub {
+        "welcome, ".session('twitter_user')->{'screen_name'};
+    };
+
+    get '/fail' => sub { "FAIL" };
+
+    ...
+
+# CONCEPT
+
+This plugin provides a simple way to authenticate your users through Twitter's
+OAuth API. It provides you with a helper to build easily a redirect to the
+authentication URI, defines automatically a callback route handler and saves the
+authenticated user to your session when done.
+
+# PREREQUESITES
+
+In order for this plugin to work, you need the following:
+
+- Twitter application
+
+    Anyone can register a Twitter application at [http://dev.twitter.com/](http://dev.twitter.com/). When
+    done, make sure to configure the application as a _Web_ application.
+
+- Configuration
+
+    You need to configure the plugin first: copy your `consumer_key` and `consumer_secret` 
+    (provided by Twitter) to your Dancer's configuration under
+    `plugins/Auth::Twitter`:
+
+        # config.yml
+        ...
+        plugins:
+          "Auth::Twitter":
+            consumer_key:     "1234"
+            consumer_secret:  "abcd"
+            callback_url:     "http://localhost:3000/auth/twitter/callback"
+            callback_success: "/"
+            callback_fail:    "/fail"
+            engine:           Net::Twitter::Lite::WithAPIv1_1
+
+    `callback_success` and `callback_fail` are optional and default to 
+    '/' and '/fail', respectively.
+
+    The engine is optional as well. The supported engines are
+    `Net::Twitter` and `Net::Twitter::Lite::WithAPIv1_1` (`Net::Twitter::Lite` can also 
+    be used as a synonym for the latter).
+    By default the plugin will use [Net::Twitter::Lite::WithAPIv1\_1](https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1).
+
+    Note that you also need to provide your callback url, whose route handler is automatically
+    created by the plugin.
+
+- Session backend
+
+    For the authentication process to work, you need a session backend, in order for
+    the plugin to store the authenticated user's information.
+
+    Use the session backend of your choice, it doesn't make a difference, see
+    [Dancer::Session](https://metacpan.org/pod/Dancer::Session) for details about supported session engines, or
+    [search the CPAN for new ones](http://search.cpan.org/search?query=Dancer-Session).
+
+# EXPORT
+
+The plugin exports the following symbols to your application's namespace:
+
+## twitter
+
+The plugin uses a [Net::Twitter](https://metacpan.org/pod/Net::Twitter) or [Net::Twitter::Lite::WithAPIv1\_1](https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1) 
+object to do its job. You can access this
+object with the `twitter` symbol, exported by the plugin.
+
+## auth\_twitter\_init
+
+This function should be called before your route handlers, in order to
+initialize the underlying [Net::Twitter](https://metacpan.org/pod/Net::Twitter) or [Net::Twitter::Lite::WithAPIv1\_1](https://metacpan.org/pod/Net::Twitter::Lite::WithAPIv1_1) 
+object. 
+
+## auth\_twitter\_authorize\_url
+
+This function returns an authorize URI for redirecting unauthenticated users.
+You should use this in a before filter like the following:
+
+    before sub {
+        # we don't want to bounce for ever!
+        return if request->path =~ m{/auth/twitter/callback};
+    
+        if (not session('twitter_user')) {
+            redirect auth_twitter_authorize_url();
+        }
+    };
+
+When the user authenticate with Twitter's OAuth interface, she's going to be
+bounced back to `/auth/twitter/callback`.
+
+## auth\_twitter\_authenticate\_url
+
+Similar to auth\_twitter\_authorize\_url, but this function instead returns an
+authenticate instead of authorize URI for redirecting unauthenticated users,
+which results in a slightly different behaviour.
+
+See [https://dev.twitter.com/pages/sign\_in\_with\_twitter|here](https://dev.twitter.com/pages/sign_in_with_twitter|here) to learn about
+the differences.
+
+# ROUTE HANDLERS
+
+The plugin defines the following route handler automatically
+
+## /auth/twitter/callback
+
+This route handler is responsible for catching back a user that has just
+authenticated herself with Twitter's OAuth. The route handler saves tokens and
+user information in the session and then redirects the user to the URI
+specified by `callback_success`.  
+
+If the validation of the token returned by Twitter failed or was denied,
+the user will be redirect to the URI specified by `callback_fail`.
+
+# TIPS AND TRICKS
+
+If you get the error
+
+    Net::Twitter::Role::OAuth::get_authorization_url(): 
+        GET https://api.twitter.com/oauth/request_token failed: 500 
+        Can't verify SSL peers without knowing which Certificate Authorities to trust
+
+you can silence it by setting the environment variable `PERL_LWP_SSL_VERIFY_HOSTNAME` to `0`.
+
+# ACKNOWLEDGEMENTS
+
+This plugin has been written as a port of
+[Catalyst::Authentication::Credential::Twitter](https://metacpan.org/pod/Catalyst::Authentication::Credential::Twitter) written by 
+Jesse Stay.
+
+This plugin was part of the Perl Dancer Advent Calendar 2010.
+
+# AUTHORS
+
+- Alexis Sukrieh <sukria@sukria.net>
+- Dancer Core Developers
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alexis Sukrieh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

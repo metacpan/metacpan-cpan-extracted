@@ -1,0 +1,17 @@
+Utils
+=====
+
+'A selection of utilities to use with Data::TreeDumper'
+
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

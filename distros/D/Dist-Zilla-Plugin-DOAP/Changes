@@ -1,0 +1,13 @@
+Changelog for Dist-Zilla-Plugin-DOAP
+
+0.001	2014-03-13
+
+	- initial version
+
+0.002	2014-03-14
+
+	- add "process_changes" option, which is off by default
+
+0.003	2014-10-12
+
+	- add missing deps

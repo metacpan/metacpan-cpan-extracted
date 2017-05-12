@@ -1,0 +1,92 @@
+NAME
+
+    Dist::Zilla::Stash::GitHub - The great new Dist::Zilla::Stash::GitHub!
+
+VERSION
+
+    This document describes version 0.001 of Dist::Zilla::Stash::GitHub -
+    released May 10, 2015 as part of Dist-Zilla-Stash-GitHub.
+
+SYNOPSIS
+
+        # in your ~/.dzil/config.ini
+        [%GitHub]
+        username = RsrchBoy
+        password = la la la la la
+
+DESCRIPTION
+
+    Right now, a bog-standard, simple little stash to keep one github token
+    in a central location... As everything seems to be looking for one in
+    different places, or keeping their own somewhere.
+
+    Ideally, this will be less zombie-like in the not-too-distant future,
+    and if the id/token information is not embedded in one's
+    ~/.dzil/config.ini it will be looked for in the usual suspect
+    locations.
+
+ATTRIBUTES
+
+ username
+
+    String, read-write-private, required.
+
+    The GitHub username. 'user' or 'id' will be accepted as aliases.
+
+ password
+
+    String, read-write-private, required.
+
+    The user's password. Or, preferably, a distinct identity token.
+    Seriously.
+
+    'token' will be accepted as an alias.
+
+TODO
+
+    * "Get smarter" about looking up our github id/token.
+
+    * Keep our id/token in a distinct config file (optionally?)
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Dist::Zilla::Role::Stash::Login
+
+      * https://github.com/settings/tokens
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-stash-github/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-stash-github&title=RsrchBoy's%20CPAN%20Dist-Zilla-Stash-GitHub&tags=%22RsrchBoy's%20Dist-Zilla-Stash-GitHub%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

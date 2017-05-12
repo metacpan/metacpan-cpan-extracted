@@ -1,0 +1,443 @@
+Revision history for Dist::Zilla::Plugin::Git
+
+2.041     2016-11-16 03:36:23Z
+ - log the git version *properly* into metadata (thanks so much to Dan Book
+   for noticing so quickly!)
+
+2.040     2016-11-16 03:23:50Z
+ - fix tests to no longer rely on . being in @INC
+ - update tests to remove all uses of Test::Fatal::lives_ok
+ - the git version used during the packaging is now logged into the metadata
+   for the built distribution
+
+2.039     2016-05-25 04:17:42Z
+ - no changes since last release
+
+2.038     2016-04-28 04:15:25Z (TRIAL RELEASE)
+ - fix Makefile.PL for when git is not installed or too old
+
+2.037     2016-04-24 23:14:59Z (TRIAL RELEASE)
+ - remove remaining uses of List::MoreUtils (Karen Etheridge)
+ - remove last vestiges of Path::Class, for Dist::Zilla v6 compatibility
+
+2.036     2015-07-04 19:11:06+0200 Europe/Paris
+ - keep dumped configs consistent between builds (Karen Etheridge - github#25)
+ - use MooseX::Types in all modules (Karen Etheridge - github#25)
+
+2.035     2015-06-06 21:50:20+0200 Europe/Paris
+ - handle push.default=nothing by specifying current branch explicitly
+   (christopher madsen, reported by Alastair McGowan-Douglas - github#24)
+
+2.034     2015-05-23 17:41:32+0200 Europe/Paris
+ - replace List::AllUtils with List::MoreUtils (christopher madsen)
+ - don't "use List::MoreUtils" in tests (Karen Etheridge - github#23)
+
+2.033     2015-04-04 21:05:13+0200 Europe/Paris
+ - no functional changes (but note Git::GatherDir change in 2.032-TRIAL)
+ - rewrite documentation to make it clear which plugins are part of @Git
+   (christopher madsen, reported by Kent Fredric - RT#101911)
+
+2.032     2015-03-28 21:38:59+0100 Europe/Paris (TRIAL RELEASE)
+ - rewrite Git::GatherDir to handle non-default root properly.
+   It now supports "~user/" as well as "~/".
+   (christopher madsen, reported by Karen Etheridge - RT#101851)
+ - clear GPG_* environment variables to make tests more robust
+   (christopher madsen)
+
+2.031     2015-03-21 21:56:38+0100 Europe/Paris
+ - no functional changes
+ - tests that check Git version parse versions like 1.9.5.msysgit.0 correctly
+
+2.030     2015-02-28 20:43:24+0100 Europe/Paris
+ - no functional changes
+ - make tests more robust by setting GIT_CONFIG_NOSYSTEM
+   (christopher madsen, reported by Dylan Cali - RT#102287)
+
+2.029     2014-12-21 22:23:24+0100 Europe/Paris
+ - don't "use Moose::Autobox" (Dist::Zilla doesn't use it anymore)
+   (Karen Etheridge - github#22)
+
+2.028     2014-11-30 05:48:59+0100 Europe/Paris
+ - no functional changes
+ - make tests more robust when GIT_* environment variables are set
+   (christopher madsen)
+
+2.027     2014-11-29 21:09:02+0100 Europe/Paris
+ - unify string formatting code into Dist::Zilla::Role::Git::StringFormatter
+   This allows you to use %c (the changelog entry) with Git::Tag.
+   (christopher madsen, suggested by Doug Bell - RT#99990)
+
+2.026     2014-11-22 17:35:45+0100 Europe/Paris
+ - don't "use MooseX::AttributeShortcuts" (wasn't actually using its features)
+   (christopher madsen, suggested by Karen Etheridge - RT#100498)
+
+2.025     2014-10-11 19:05:56 Europe/Paris
+ - add build_warnings option to Git::Check
+   (christopher madsen, suggested by Karen Etheridge - RT#91057)
+
+2.024     2014-09-13 21:21:42 Europe/Paris
+ - add branch option to Git::Init (tuomas jormola - github#21)
+ - Git::Init now logs when it makes the initial commit
+
+2.023     2014-06-14 18:32:30 Europe/Paris
+ - no functional changes
+ - warn that Dist::Zilla::App::CommandHelper::ChainSmoking <= 1.04 is broken
+   (Karen Etheridge - github#20)
+
+2.022     2014-04-19 20:29:22 Europe/Paris
+ - use MX:Path::Tiny Paths type to catch config issues at startup
+   (Kent fredric - github#18 & christopher madsen)
+ - prune files using the prune_file method (Karen Etheridge - github#19)
+
+2.021     2014-04-12 06:01:53 Europe/Paris
+ - add support for MetaConfig (Karen Etheridge - github#17)
+ - fix tests to work on Windows (christopher madsen)
+
+2.020     2014-02-15 20:22:29 Europe/Paris
+ - convert from Path::Class to Path::Tiny (Kent fredric - github#16)
+ - better documentation for allow_dirty_match (christopher madsen,
+   requested by Karen Etheridge)
+
+2.019     2013-11-23 20:49:27 Europe/Paris
+ - fix #90537: wide character in print with ::Commit
+   With Dist::Zilla 5, Git::Commit now writes the commit message in UTF-8
+   (christopher madsen, reported by Kent fredric)
+
+2.018     2013-11-02 23:24:33 Europe/Paris (TRIAL RELEASE)
+ - use the Config::Git plugin for shared configuration (brendan byrd)
+   You don't have to use Dist::Zilla::Plugin::Config::Git unless you want to,
+   but you do have to install it.
+
+2.017     2013-10-26 19:57:59 Europe/Paris
+ - remove use of deprecated Class::MOP function (Karen Etheridge)
+ - make Git::CommitBuild compatible with Dist::Zilla 5
+   (Kent fredric, Karen Etheridge, & christopher madsen)
+
+2.016     2013-10-19 18:27:32 Europe/Paris
+ - fix exclude_filename to not match partial paths (Karen Etheridge)
+   If you really intended to match a partial path, use exclude_match instead.
+ - documentation typo fixed in Git::NextVersion (David Steinbrunner)
+
+2.015     2013-07-06 21:14:09 Europe/Paris
+ - bail out of Build.PL unless git 1.5.4 or later is found (christopher madsen)
+ - prevent warnings about chdir(undef) in tests (christopher madsen)
+
+2.014     2013-06-22 17:50:26 Europe/Paris
+ - fix RT#86251 - version-by-branch.t fails with Git 1.8.3
+   The output of "git rev-list" changed slightly, and this broke
+   Git::NextVersion when using version_by_branch=1.
+   (christopher madsen, reported by zak elep)
+
+2.013     2013-04-13 20:25:39 Europe/Paris
+ - fix RT#84491 - Git::GatherDir does not handle symlinks
+   Symlinks to directories used to make it crash with a cryptic error.
+   It now skips them with a warning, and this is documented.
+   (christopher madsen, reported by Karen Etheridge)
+ - mention Git::GatherDir in Git (christopher madsen, reported by kevin dawson)
+
+2.012     2013-03-27 00:41:08 Europe/Paris
+ - add commit option to Git::Init (tatsuhiko miyagawa)
+
+2.011     2013-03-23 16:19:52 Europe/Paris
+ - fix compatibility with Git::Wrapper 0.028_96 (Don't pass Path::Class
+   objects to Git::Wrapper) (christopher madsen)
+
+2.010     2013-03-16 16:34:22 Europe/Paris
+ - fix RT#83891 - Git::CommitBuild commits non-build files
+   Git::CommitBuild now writes a fresh copy of the built tree to commit,
+   instead of using one that may have been modified by other plugins
+   (Kent fredric & christopher madsen)
+
+2.009     2013-02-08 06:03:33 Europe/Paris
+ - add allow_dirty_match option to Git::Check and Git::Commit (Graham Knop)
+ - change version-by-branch.t to use HEAD~1 instead of HEAD^
+   Should fix test failure on Windows. (christopher madsen)
+ - Test::Fatal 0.006 or better has been required since 2.007,
+   but that wasn't explicit (christopher madsen, reported by Jonathan Leto)
+
+2.008     2013-01-31 04:06:00 Europe/Paris
+ - fix bug introduced in Git::Push 2.007 that broke remotes with
+   additional parameters (christopher madsen)
+
+2.007     2013-01-26 18:51:24 Europe/Paris
+ - fix RT#82873 - Git::Push should check the remote exists
+   New remotes_must_exist option defaults to true. (christopher madsen,
+   suggested by Olivier Mengué)
+ - switch from Test::Exception to Test::Fatal (christopher madsen)
+ - load some dependencies only when needed (RT#82956) (christopher madsen,
+   suggested by Olivier Mengué)
+
+2.006     2012-12-29 23:17:39 Europe/Paris
+ - document that the include_untracked option of Git::GatherDir
+   requires Git 1.5.4, but has certain issues before Git 1.6.5.2.
+   Adjust tests to skip when necessary. (christopher madsen)
+ - set push.default matching in test config (christopher madsen)
+   Otherwise Git for Windows 1.8.0 hangs in push-multi.t
+   (thanks to christian walde for reporting the issue)
+
+2.005     2012-12-08 22:03:15 Europe/Paris
+ - avoid creating named type constraints (Chris Weyl & christopher madsen)
+
+2.004     2012-12-01 19:58:59 Europe/Paris
+ - improve Git::Commit's parsing of the Changes file (christopher madsen)
+   Blank lines following the version line are no longer included in the commit
+   message.  It can now find the current version even if followed by a -TRIAL
+   indicator.  It now reads the Changes file that was shipped with the dist,
+   not the one currently on disk.
+ - fix include_untracked option of Git::GatherDir to work with Git 1.5.4.3
+   (christopher madsen)
+
+2.003     2012-11-19 01:30:29 Europe/Paris
+ - add multiple_inheritance option to Git::CommitBuild (Yanick Champoux)
+ - change version-extraction.t to catch the bug in RT#81061
+   (christopher madsen with help from Matthew Horsfall)
+
+2.002     2012-11-09 20:59:37 Europe/Paris
+ - fix RT#81061 - Git::NextVersion parsing all versions as 0
+   (christopher madsen)
+ - add debug-level logging to Git::NextVersion (christopher madsen)
+
+2.001     2012-10-07 23:03:42 Europe/Paris
+ - fix tests to work on Perl 5.12 and older (christopher madsen)
+
+2.000     2012-10-07 06:33:29 Europe/Paris
+ - Despite the version number, this is *not* a major release, just a new
+   numbering scheme.  Git::NextVersion now generates the version number.
+ - fix tests to work on windows (christopher madsen)
+ - add t::Util to consolidate common test functions (christopher madsen)
+
+1.122770  2012-10-03 04:28:36 Europe/Paris
+ - fix RT#76703 - add version_by_branch option to Git::NextVersion
+   (christopher madsen)
+ - Git::NextVersion now aborts release if version is duplicated
+   (christopher madsen)
+ - add include_untracked option to Git::GatherDir (christopher madsen)
+ - add untracked_files option to Git::Check (christopher madsen)
+ - Dist::Zilla::Role::Git::Repo now provides the git method (christopher madsen)
+
+1.122530  2012-09-09 03:56:01 Europe/Paris
+ - Git::CommitBuild requires Path::Class 0.22 to get dir->basename
+   (christopher madsen)
+ - Git::GatherDir requires Dist::Zilla 4.200016 to get
+   exclude_filename and exclude_match in GatherDir (christopher madsen)
+ - fix tests to use "git add -f" instead of "git add --force" for
+   compatibility with older versions of Git (christopher madsen)
+ - add 000-report-git-version.t for debugging (christopher madsen)
+
+1.122460  2012-09-02 02:35:25 Europe/Paris
+ - fix RT#78898 - allow_dirty should not be a regex (christopher madsen)
+   This was an unintended side-effect of the fix for gh#19 in 1.113220
+   add tests to check.t so it doesn't recur
+
+1.121820  2012-06-30 05:36:52 Europe/Paris
+ - require File::Path 2.07 to get make_path (thanks for failing reports, CPAN
+   Testers!)
+
+1.121811  2012-06-29 17:25:42 Europe/Paris
+ - fix an interpolation error that broke CommitBuild
+
+1.121810  2012-06-29 03:01:01 Europe/Paris
+ - uniq the list of files returned by `git ls-files`
+
+1.121800  2012-06-28 04:03:06 Europe/Paris
+ - Require a newer Git::Wrapper for better portability
+
+1.121770  2012-06-25 16:47:30 Europe/Paris
+ - CommitBuild: add missing module
+
+1.121750  2012-06-23 19:03:47 Europe/Paris
+ - CommitBuild: Add build to git directly, bypassing the index (chris weyl)
+
+1.121010  2012-04-10 16:47:39 Europe/Paris
+ - updated Git::GatherDir plugin to support everything DZ's own GatherDir does
+
+1.120970  2012-04-06 08:56:03 Europe/Paris
+ - new plugin GatherDir (geoffrey broadwell, ricardo signes)
+
+1.120860  2012-03-26 12:18:38 Europe/Paris
+ - fix tag-signed.t test on windows (Olivier Mengué)
+
+1.120370  2012-02-06 09:32:58 Europe/Paris
+ - split version-tags finding logic into own attribute (chris weyl)
+
+1.113560  2011-12-22 09:47:39 Europe/Paris
+ - make test pass with Archive::Tar:Wrapper (Randy Stauner)
+ - clean up commit message (Randy Stauner)
+
+1.113220  2011-11-18 09:12:51 Europe/Paris
+ - fix gh#19 - allow to specify alternate repository root (Mike Friedman)
+
+1.112510  2011-09-08 13:45:01 Europe/Paris
+ - fix RT#70805 - remove unneeded tmp directory in tarball
+
+1.112500  2011-09-07 08:49:06 Europe/Paris
+ - fix RT#70742 - tests fail if gpg isn't installed (Mike Doherty)
+
+1.112440  2011-09-01 13:26:02 Europe/Paris
+ - fix gh#16 - unset git env variables for tag_signed.t
+
+1.112380  2011-08-26 10:41:50 Europe/Paris
+ - fix RT##55647 - support signed tags (Mike Doherty)
+ - moved all test corpus to corpus/
+ - renamed tests to remove leading number
+
+1.112070  2011-07-26 08:46:42 Europe/Paris
+ - fix gh#13 - supplying default git config
+
+1.112060  2011-07-25 10:25:29 Europe/Paris
+ - fix RT#66705 - localization of HOME in tests
+ - fix RT#69616 & RT#69701 - make dzp-git work with Git::Wrapper 0.015
+
+1.111590  2011-06-08 09:43:35 Europe/Paris
+ - mocks HOME to avoid test failures (David Golden)
+
+1.111460  2011-05-26 14:37:08 Europe/Paris
+ - fix RT#68474 - Git::NextVersion assumes all tags are version-related (rob@hoelz.ro)
+
+1.110500  2011-02-19 12:43:19 Europe/Paris
+ - add 'add_files_in' to Commit so you can commit an entire dir (Apocalypse)
+   If you need the same concept for Check please let us know!
+
+1.110480  2011-02-17 18:03:06 Europe/Paris
+ - CommitBuild support for release_message (nigel metheringham)
+ - Also supports %v & %t format tags, more appropriate for message on
+   commit build of the released package (nigel metheringham)
+
+1.110330  2011-02-02 10:36:33 Europe/Paris
+ - fix RT#62484 - add a link to Git::NextVersion in main documentation
+
+1.103520  2010-12-18 09:45:57 Europe/Paris
+ - fix Commit so %t actually works (christopher madsen)
+
+1.103500  2010-12-16 11:44:32 Europe/Paris
+ - add config & remote options to Init (christopher madsen)
+
+1.103470  2010-12-13 17:32:36 Europe/Paris
+ - add time_zone option to Tag & Commit (christopher madsen)
+   It now defaults to your local time.  Previous versions always used UTC.
+ - Tag & Commit accept %t to indicate trial release status (christopher madsen)
+ - NextVersion resets $/ to guard against misbehaving plugins (alan young)
+
+1.102810  2010-10-08 18:01:32 Europe/Paris
+ - add Git::NextVersion adapted from BumpVersionFromGit (daGolden)
+
+1.102430  2010-08-31 17:12:24 Europe/Paris
+ - fix RT#60740 - allow retrieval of applied tag in git (Matt Follett)
+
+1.102380  2010-08-26 09:39:33 Europe/Paris
+ - fix hang on windows (alexandr ciornii)
+
+1.102090  2010-07-28 14:12:20 Europe/Paris
+ - initialize a working git config in all tests
+
+1.102040  2010-07-23 10:45:23 Europe/Paris
+ - fix RT#59587 - cache buildroot to commit on master, not release
+   branch (yanick champoux)
+
+1.102020  2010-07-21 09:00:46 Europe/Paris
+ - fix RT#59586 - there should be no release branch by default for Git::CommitBuild
+   warning: this changes behaviour of Git::CommitBuild
+
+1.102010  2010-07-20 11:00:36 Europe/Paris
+ - fix RT#59505 - support for unstable git versions in push test skips
+
+1.101801  2010-06-29 19:00:13 Europe/Paris
+ - fix RT#56485 - skip push tests for old git versions
+
+1.101800  2010-06-29 18:36:17 Europe/Paris
+ - Git::CommitBuild - new release_branch option to commit result after a
+   release (yanick champoux)
+ - Git::Tag - tag can be applied to a different branch (yanick champoux)
+ - fix RT#58876 - pod description out of date
+
+1.101680  2010-06-17 17:17:07 Europe/Paris
+ - fix RT#58431 - remove Git.pm prereq, use Git::Wrapper (yanick champoux)
+
+1.101650  2010-06-14 16:08:41 Europe/Paris
+ - basic aftermint plugin to git init while dzil new (jesse luehrs)
+ - build commits have their original branch as parent (yanick champoux)
+
+1.101330  2010-05-13 19:27:39 Europe/Paris
+ - Git::Commit recognizes another changelog format (David Golden)
+
+1.101270  2010-05-07 16:56:27 Europe/Paris
+ - fix Brian's name in this file (sorry Brian!)
+ - make CommitBuild log error when build commit fails (michael schout)
+
+1.101230  2010-05-03 17:10:17 Europe/Paris
+ - support for committing results of build in a separate branch (Brian Phillips)
+ - fix test error appearing in weird git configs / setups
+
+1.100970  2010-04-07 08:54:46 Europe/Paris
+ - simplify multi-value args for @Git (christopher madsen)
+ - Require Dist::Zilla 2 (1.100900 needed DZ2, but didn't say so)
+
+1.100960  2010-04-06 16:59:50 Europe/Paris
+ - allow pushing to a different branch (Graham Barr)
+ - allow multi-value args for @git (Graham Barr)
+ - switch to dist-zilla-tester framework for tests (Ricardo Signes)
+
+1.100900  2010-03-31 10:04:49 Europe/Paris
+ - use a method modifier to set mvp_multivalue_args in Role::Git::DirtyFiles
+   (This is required by Dist::Zilla 2.) (christopher madsen)
+
+1.100760  2010-03-17 10:16:56 Europe/Paris
+ - add a BeforeRelease check in Tag to prevent re-releases (christopher madsen)
+ - Commit and Push now pass Git's output to log_debug (christopher madsen)
+
+1.100750  2010-03-16 16:25:56 Europe/Paris
+ - actually use commit_msg (christopher madsen)
+ - Push now logs before pushing (christopher madsen)
+
+1.100741  2010-03-15 18:48:31 Europe/Paris
+ - documentation fix for new push_to param
+
+1.100740  2010-03-15 17:28:12 Europe/Paris
+ - WARNING: parameter "filename" renamed to "changelog"
+ - let commit message include whitespace to next unindented line (David Golden)
+ - set up remote tracking branch during push testing (David Golden)
+ - remove unnecessary 'filename' arg from Push (David Golden)
+ - add 'push_to' argument to Push for multi-repo pushes (David Golden)
+ - give back user possibility to create lightweight tag, default remains
+   annotated tags (christopher madsen)
+ - allow user to change commit message (christopher madsen)
+ - allow user to specify files allowed to be dirty for check & commit (christopher madsen)
+ - refactored allow_dirty in DZ:Role:Git:DirtyFiles (christopher madsen)
+
+1.100690  2010-03-10 13:20:37 Europe/Paris
+ - fix tests to work even when no global git config exists
+ - refactored commit message generation (christopher madsen)
+
+1.100681  2010-03-09 17:26:14 Europe/Paris
+ - bumping minimum dzil version requirement
+
+1.100680  2010-03-09 17:07:45 Europe/Paris
+ - using annotated tags instead of lightweight tags (RT#55352)
+ - minor pod update
+
+1.100660  2010-03-07 13:41:39 Europe/Paris
+ - fix tests to work with git 1.7.0
+ - fix tests to work with current Dist::Zilla (Ricardo Signes)
+ - provide shorter plugin names to bundle contents (Ricardo Signes)
+
+1.100430  2010-02-12 13:11:39 Europe/Paris
+ - WARNING: no more Makefile.PL supplied, only a Build.PL
+ - using Path::Class in the tests
+
+1.093410  2009-12-07 09:13:07 Europe/Paris
+ - require File::Path 2.07 for remove_tree
+
+1.093300  2009-11-26 11:02:22 Europe/Paris
+ - new param tag_format for DZP:Git:Tag (Ricardo Signes)
+
+1.093260  2009-11-22 11:35:00 Europe/Paris
+ - using internal release command instead of spawning external dzil
+
+1.093250  2009-11-21 18:35:55 Europe/Paris
+ - split plugin in DZP::Git::* (Check, Commit, Tag, Push)
+ - providing a plugin bundle for all git plugins
+
+1.093240  2009-11-20 18:36:28 Europe/Paris
+ - original release
+ - git checks before release: index clean, working copy too, no untracked files
+ - git actions after release: commit changelog, tag, push

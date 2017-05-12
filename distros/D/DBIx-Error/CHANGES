@@ -1,0 +1,8 @@
+1.0.1	2013-03-04
+
+	Add test dependency upon DBIx::Class::Schema
+
+1.0	2013-03-01
+
+	First released version
+

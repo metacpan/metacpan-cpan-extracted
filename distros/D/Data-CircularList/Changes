@@ -1,0 +1,9 @@
+Revision history for Data-CircularList
+
+0.03    2015-01-14/21:40:00
+        Fix a documentation(pod) misstake on CircularList.pm .
+0.02    2014-12-27/22:53:00
+        Fix pod-coverage error on ./Build test.
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

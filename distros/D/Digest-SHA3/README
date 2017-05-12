@@ -1,0 +1,49 @@
+Digest::SHA3 version 0.25
+=========================
+
+Digest::SHA3 is a complete implementation of the NIST SHA-3 cryptographic
+hash function, known originally as Keccak.  It gives Perl programmers a
+convenient way to calculate SHA3-224, SHA3-256, SHA3-384, and SHA3-512
+message digests, as well as variable-length hashes using SHAKE128
+and SHAKE256.  The module can handle all types of input, including
+partial-byte data.
+
+Digest::SHA3 is written in C for speed.  If your platform lacks a C
+compiler, perhaps you can find the module in a binary form compatible
+with your particular processor and operating system.
+
+The initial version of Digest::SHA3 was written to emphasize simplicity
+and correctness.  It passed all known-answer-tests for short and long
+messages.  No particular emphasis was placed on performance.  However,
+as the SHA-3 standard matures, versions of this module will endeavor to
+perform on a par with optimized portable implementations.
+
+The module omits all HMAC-SHA-3 functions until such time as official
+test vectors become available.
+
+The tests subdirectory (t/*.t) contains a set of test vectors compiled
+from both official and informal sources.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+	None
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2016 Mark Shelor
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Please refer to the Perl Artistic License for details:
+
+http://search.cpan.org/perldoc?perlartistic

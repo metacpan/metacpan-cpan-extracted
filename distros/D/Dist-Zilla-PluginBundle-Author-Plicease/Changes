@@ -1,0 +1,501 @@
+Revision history for Dist-Zilla-PluginBundle-Author-Plicease
+
+2.12      2017-03-22 12:00:32 -0400
+  - Require plicease plugin 2.12
+  - Do not try to use Git plugins on windows
+
+2.11      2017-01-23 14:01:04 -0500
+  - Require plicease plugin 2.11
+
+2.10      2016-10-04 12:44:17 -0400
+  - Require plicease plugin 2.10
+
+2.09      2016-07-12 08:40:39 -0400
+  - Require plicease plugins 2.09
+
+2.08      2016-07-12 08:36:33 -0400
+  - Warn when travis is not testing 5.24
+
+2.07      2016-06-23 08:43:39 -0400
+  - Fixed bug where minting profile was failing on fresh install
+
+2.06      2016-05-10 21:25:31 -0400
+  - Require [Author::Plicease] 2.06
+
+2.05      2016-05-10 10:17:15 -0400
+  - Require [Author::Plicease] 2.05
+
+2.04      2016-05-03 06:10:01 -0400
+  - Require [Author::Plicease] 2.04
+
+2.03      2016-04-24 19:08:40 -0400
+  - Dist::Zilla 6.x compatability
+
+2.02      2016-03-08 09:52:18 -0500
+  - Move the mint mechanisms into the non bundle dist
+
+2.01      2016-03-08 09:19:07 -0500
+  - Spun off most of the Author::Plicease::* plugins (except Init2.pm)
+    into Dist::Zilla::Plugin::Author::Plicease
+
+2.00      2016-02-11 04:00:00 -0500
+  - Require Dist::Zilla::App::Command::aliendeps
+
+1.99      2016-02-04 11:02:04 -0500
+  - Bump [Alien] prereq to 0.023
+
+1.98      2016-01-29 09:58:40 -0500
+  - Add alien_bin_requires as diagnostic
+
+1.97      2016-01-28 12:08:31 -0500
+  - Add [Alien] as a prereq
+  - Add [PkgVersion::Block] as a prereq where available
+  - Add dictionary for additional correct words
+
+1.96      2016-01-16 16:28:30 -0500
+  - Fixes for generated .appveyor.yml
+
+1.95      2016-01-06 14:47:45 -0500
+  - Support for appveyor
+
+1.94      2015-12-20 15:15:03 -0700
+  - skip xt/release/pod_coverage.t on 5.8
+    I've been getting false positives on Alien::Base
+    based distros from this test on 5.8 only
+
+1.93      2015-12-13 04:38:01 -0500
+  - require Test::Exit 0.11 if used
+  - new dists default to travis_status
+  - new dists require at least the same version of [@Author::Plicease]
+
+1.92      2015-12-11 13:02:36 -0500
+  - rework t/00_diag.t
+
+1.91      2015-12-09 11:41:11 -0500
+  - added travis_user option to [@Author::Plicease] and [Author::Plicease::MarkDownCleanup]
+
+1.90      2015-11-24 21:07:35 -0500
+  - Created [Author::Plicease::MakeMaker] in attempt to deal
+    with File::ShareDir madness.
+  - Created [Author::Plicease::DevShare] also to help deal
+    with File::ShareDir madness.
+
+1.89      2015-11-22 14:28:47 -0500
+  - Minting profile creates t/01_use.t instead of t/use.t which is almost
+    always what I move it to anyway.
+  - Better default for xt/release/release.yml
+
+1.88      2015-11-18 07:03:59 -0500
+  - Allow override of [MinimumPerl]
+
+1.87      2015-11-18 06:28:32 -0500
+  - When we see JSON::MaybeXS we will recommend Cpanel::JSON::XS
+  - When we see JSON::MaybeXS we will diag on JSON::XS and JSON::PP as well
+
+1.86      2015-11-14 20:31:32 -0500
+  - Added undocumented preamble to
+    [@Author::Plicease]
+    and
+    [Author::Plicease::SpecialPrereqs]
+
+1.85      2015-11-03 07:22:39 -0500
+  - Add no_readme
+
+1.84      2015-07-30 15:56:35 -0400
+  - Added version_plugin option
+
+1.83      2015-07-21 09:08:33 -0400
+  - Added upgrade option to [Author::Plicease::SpecialPrereqs]
+  - Added upgrade option to [@Author::Plicease]
+
+1.82      2015-07-14 16:20:25 -0400
+  - Skip t/mint.t when certain modules aren't available.
+
+1.81      2015-07-13 13:40:13 -0400
+  - Use travis CI newer (faster) container based infrastructure by default
+    in new dists
+
+1.80      2015-07-02 09:10:06 -0400
+  - Allow for [Alien] and inc/My/ModuleBuild.pm
+
+1.79      2015-06-19 10:16:08 -0400
+  - Add irc option that sets x_IRC meta
+
+1.78      2015-06-11 11:04:52 -0600
+  - Support for Perl 5.10.0
+    [@Git] does no longer supports the .0 release of 5.10 but we need
+    (as with 5.8.x) so make this one work for everything except for
+    releases like 5.8.x and MSWin32.
+
+1.77      2015-05-31 15:28:39 -0400
+  - Fix bug introduced in 1.75 for Perls as old as 5.20.2
+    I was testing this with a 5.22.0 rc
+
+1.76      2015-05-31 14:55:21 -0400
+  - When minting a new project, include a .gitattributes file that will make
+    sure that GitHub does not misidentify .t files as being Perl 6.
+
+1.75      2015-05-31 14:42:48 -0400
+  - Devel::Hide is a true develop only prereq.
+    A bug introduced in 1.71 was that Devel::Hide was needed for all
+    of the tests to pass.
+
+1.74      2015-05-28 10:37:17 -0400
+  - Fix test broken in last version when installed (not upgraded)
+
+1.73      2015-05-28 09:08:00 -0400
+  - Remove [Author::Plicease::PrePodWeaver]
+  - Explicitly require Perl 5.8.1
+
+1.72      2015-05-27 17:26:27 -0400
+  - Remove [Author::Plicease::Resources]
+  - Remove [Author::Plicease::PrePodWeaver] from bundle
+  - Merge [Author::Plicease::InstallerPerlVersion] into [Author::Plicease::SpecialPrereqs]
+  - The optional behavior inside [Author::Plicease::InstallerPerlVersion] is
+    now on by default via [Author::Plicease::SpecialPrereqs]
+  - Merge [Author::Plicease::Recommend] into [Author::Plicease::SpecialPrereqs]
+  - Merge [Author::Plicease::FiveEight] into [Author::Plicease::SpecialPrereqs]
+
+1.71      2015-05-27 15:23:38 -0400
+  - Added scp_dest and url options to [Author::Plicease::Upload]
+  - Added example/unbundle.pl for unbundling
+  - Removed Dist::Zilla::Plugin::Author::Plicease::OSPrereqsNot
+  - Removed Dist::Zilla::Plugin::Author::Plicease::TransformTravis
+  - Added test for minting profile
+  - Removed Dist::Zilla::Plugin::Author::Plicease::Init as it had been quitely deprecated for a long time
+
+1.70      2015-05-07 09:08:31 -0400
+  - Remove xt/release/build_environment.t in favor of :version in dist.ini
+  - Use filename_match in Test::Version 2.00 to skip ConfigData.pm
+
+1.69      2015-03-03 21:33:50 -0500
+  - Modules that require Moo shall require 2.0
+
+1.68      2015-03-03 21:11:22 -0500
+  - Remove base as a prereq
+
+1.67      2015-02-21 14:57:13 -0500
+  - Remove Test::Vars based release test.  It seemed like good idea at
+    the time, but in practice it has produced too many false postiives.
+
+1.66      2015-01-26 09:40:46 -0500
+  - [Author::Plicease::Thanks] now uses capitalization
+    Trent Reznor is a fadad memory...
+
+1.65      2015-01-23 07:43:56 -0500
+  - default minting profile removes base as explicit prereq
+
+1.64      2015-01-15 06:44:26 -0500
+  - update prereqs for consistent builds
+
+1.63      2015-01-09 15:41:46 -0500
+  - [@Author::Plicease] allow_dirty is passed on to [@Git]
+
+1.62      2015-01-07 14:47:05 -0500
+  - escape < and > in AUTHOR / thanks section
+
+1.61      2014-12-30 13:56:48 -0500
+  - Make CPANFile part of the default [@Author::Plicease]
+  - added copy_mb option
+  - simplified prereqs
+
+1.60      2014-12-19 16:40:12 -0500
+  - option for skipping common spelling release test
+
+1.59      2014-10-29 08:00:04 -0400
+  - added [Author::Plicease::InstallerPerlVersion]
+
+1.58      2014-10-14 07:35:02 -0400
+  - release tests update
+
+1.57      2014-10-08 08:32:09 -0400
+  - upped the requirements on several Dist::Zilla::Plugin::* and Test::* modules
+  - silenced an annoying warning generated by some dists during diagnostic
+  - use Test::Fixme 0.14 and warn option
+
+1.56      2014-09-20 07:29:30 -0400
+  - update default .travis.yml to use verbose testing
+
+1.55      2014-09-20 07:25:48 -0400
+  - update default .travis.yml to use 5.20, and dzil instead of prove
+
+1.54      2014-07-31 09:30:24 -0400
+  - check .travis.yml for Perl 5.19 or 5.20 as appropriate
+
+1.53      2014-07-06 09:25:17 -0400
+  - require more recent Role::Tiny where used
+
+1.52      2014-06-13 11:21:43 -0400
+  - added [Author::Plicease::SpecialPrereqs]
+
+1.51      2014-06-13 08:10:39 -0400
+  - add prereq Test::More 0.94 to all dists
+    I use subtest a lot
+
+1.50      2014-06-10 07:53:11 -0400
+  - added [Author::Plicease::Resources] and am
+    using it for [@Author::Plicease] now.  This was
+    needed to allow the repo for Alien-Libarchive be
+    named Alien-Libarchive2
+  - fixed .travis.yml template
+
+1.49      2014-05-22 07:45:40 -0400
+  - make this distribution properly dynamic
+  - include [ACPS::RPM] in bundle, if it is there
+  - turn off (by default) unused_vars.t for old dists
+
+1.48      2014-04-30 13:23:38 -0400
+  - don't include developer prereqs in diagnostic
+
+1.47      2014-04-16 02:26:37 -0400
+  - update .travis.yml template to reflect my current usage
+  - fixed tempalte release.yml
+
+1.46      2014-04-10 13:27:07 -0400
+  - add to standard diagnostic
+  - assume installer = ModuleBuild and mb_class = My::ModuleBuild if inc/My/ModuleBuild.pm is found
+  - whitelist some commonly used tech spellings to pod system spelling test
+  - add unused_vars.t release test
+  - ability to skip some release tests from xt/release/release.yml
+
+1.45      2014-04-08 11:04:49 -0400
+  - allow override of diagnostic reporter with [Test] diag = +/-module or [@ACPS] diag = +/-module
+
+1.44      2014-02-21 16:02:07 -0500
+  - diagnostic doesn't preload EV unless it is a suggested prereq
+
+1.43      2013-12-31 12:28:13 -0500
+  - look for inc/run for scripted phase hooks
+
+1.42      2013-12-21 17:09:01 -0500
+  - slim down the prereqs.
+
+1.41      2013-12-14 06:15:47 -0500
+  - Don't allow release on MSWin32
+  - Don't allow release on Perl 5.8 (implemented, but not documented in 1.40)
+
+1.40      2013-12-13 22:16:55 -0500
+  - Support Perl 5.8
+
+1.39      2013-12-12 17:53:49 -0500
+  - new dists use ModuleBuild
+
+1.38      2013-12-05 18:29:39 -0500
+  - added undocumented non_native_release option for [@Author::Plicease]
+
+1.37      2013-11-27 12:37:59 -0500
+  - added release_tests_skip option for [@Author::Plicease]
+
+1.36      2013-11-19 10:27:13 -0500
+  - mb_class option on [@Author::Plicease] passes to [ModuleBuild]
+
+1.35      2013-11-18 07:55:09 -0500
+  - rm dep on [Alien]
+
+1.34      2013-11-11 17:49:01 -0500
+  - [@Author::Plicease] alien_build_command and alien_install_command be mvp
+
+1.33      2013-11-07 12:03:21 -0500
+  - update version test
+
+1.32      2013-11-07 11:28:33 -0500
+  - support for [Alien] as the builder
+
+1.31      2013-10-16 03:34:17 -0400
+  - use [Bootstrap::lib] and relatives for release more consistent
+    with my other distros
+
+1.30      2013-10-15 11:54:55 -0400
+  - make xt/release/version.t less strict, so that test versions
+    (eg. 0.01_01) are allowed
+  - fix for the regex removing the version from README.md so that
+    it works for test versions (eg. 0.01_01)
+
+1.29      2013-10-14 14:57:46 -0400
+  - add xt/release/version.t to skel and distro
+
+1.28      2013-10-12 14:31:26 -0400
+  - use require instead of use in diagnostic
+
+1.27      2013-10-09 14:44:12 -0400
+  - add readme_from option to [@Author::Plicease]
+  - documentation
+
+1.26      2013-09-27 18:17:16 -0400
+  - rm dep on use bytes (that was bad)
+  - create t/00_diag.t and t/00_diag.txt as part of build
+  - add [Author::Plicease::Recommend] and use it by default
+
+1.25      2013-09-18 15:56:41 -0400
+  - add dep on [TextTabs]
+
+1.24      2013-09-10 06:41:12 -0400
+  - tweak the MarkDownCleanup module
+
+1.23      2013-09-09 20:20:02 -0400
+  - silence annoying warning
+
+1.22      2013-09-07 11:02:39 -0400
+  - remove extra space in markdown verbatim blocks
+
+1.21      2013-09-07 04:26:43 -0400
+  - strip the version out of the README.md
+
+1.20      2013-09-06 15:24:02 -0400
+  - add [Author::Plicease::MarkDownCleanup] to [@Author::Plicease]
+
+1.19      2013-09-06 15:08:16 -0400
+  - renamed [Author::Plicease::TravisStatus] [Author::Plicease::MarkDownCleanup]
+
+1.18      2013-09-06 14:56:09 -0400
+  - add [Author::Plicease::TravisStatus]
+
+1.17      2013-08-27 12:33:01 -0400
+  - update prereq plugins to latest versions
+
+1.16      2013-08-11 16:42:31 -0400
+  - tweak date format
+
+1.15      2013-08-08 16:01:30 -0400
+  - use CPAN::Changes::Spec format for new entries in Changes
+
+1.14      2013-07-18 13:30:51 America/New_York
+  - add cpan option for [Author::Plicease::Upload]
+  - update init2 to reflect previous upload merge
+
+1.12      2013-07-18 09:11:35 America/New_York
+  - merge [Author::Plicease::UploadToCPAN] and [Author::Plicease::UploadToMatrix] into [Author::Plicease::Upload]
+
+1.11      2013-07-10 07:03:39 EST5EDT
+  - fix author section header in [Author::Plicease::Thanks]
+
+1.10      2013-07-10 06:48:50 EST5EDT
+  - add [Author::Plicease::Thanks]
+
+1.09      2013-06-22 09:47:47 EST5EDT
+  - add an installer option for [@Author::Plicease]
+
+1.08      2013-06-21 21:54:48 EST5EDT
+  - updated dep versions
+
+1.07      2013-06-19 18:12:53 EST5EDT
+  - added [Author::Plicease::PrePodWeaver]
+
+1.06      2013-06-19 09:27:36 EST5EDT
+  - require specific version of some plugins
+
+1.05      2013-06-16 12:56:21 America/New_York
+  - Fixed typo in Changes template
+
+1.04      2013-06-14 17:42:07 EST5EDT
+  - documentation
+
+1.03      2013-06-12 09:41:04 EST5EDT
+  - set release_tests = 0 if user says so during mint
+  - include the .travis.yml file in the dist
+
+1.02      2013-06-11 06:38:33 EST5EDT
+  - generate a .travis.yml when minting a new dist
+  - use the right version of [Auth::Plicease::UploadTo{CPAN,Matrix}]
+
+1.01      2013-06-08 08:38:32 America/New_York
+  - fixed use.t wheen More::Than::One::Double::Colen::Used
+
+1.00      2013-06-07 14:52:43 EST5EDT
+  - added [Author::Plicease::UloadToMatrix]
+
+0.99      2013-06-05 14:55:56 EST5EDT
+  - fix syntax error in generated file
+
+0.98      2013-05-30 14:19:23 America/New_York
+  - fix typo in blank release.yml
+
+0.97      2013-05-30 05:51:27 EST5EDT
+  - rm [Author::Plicease::Inc] as it was a mistake anyway
+  - provide a basic release.yml if doesn't already exist
+  - run release tests when releasing this dist
+
+0.96      2013-05-30 04:58:00 America/New_York
+  - use prove -b instead of prove -l for release tests
+
+0.95      2013-05-29 16:54:54 America/New_York
+  - revamped minting process
+  - rm [MakeMaker::Awesome]
+  - rm [MakeMaker::Custom]
+  - rm prereq Test::CPAN::Changes
+
+0.94      2013-05-07 14:55:01 EST5EDT
+  - minor diagnostic fix (Test::Fixme instead of Test::EOL)
+
+0.93      2013-05-02 23:00:55 EST5EDT
+  - rename D::Z::MP::Plicease to D::Z::MP::Author::Plicease
+
+0.92      2013-05-02 13:07:08 EST5EDT
+  - add [ACPS::RPM]
+
+0.91      2013-03-20 22:16:10 America/New_York
+
+0.90      2013-03-01 11:15:12 America/New_York
+  - fix spacing problem in minted Changes
+  - added prereq Dist::Zilla::MintingProfile::Clustericious
+
+0.89      2013-02-22 15:19:59 America/New_York
+  - added [ModuleBuildDatabase]
+
+0.88      2013-01-18 20:52:38 America/New_York
+  - fixed test use.t to not use removed .pm files
+
+0.87      2013-01-15 17:12:36 America/New_York
+  - moved a couple of plugins from template into bundle
+
+0.86      2013-01-15 17:04:05 America/New_York
+  - remove scripts that aren't used anymore
+
+0.85      2012-12-26 14:25:33 America/New_York
+  - added [Author::Plicease::Inc]
+  - added [Author::Plicease::OSPrereqsNot]
+  - added [Run::BeforeBuild]
+
+0.84      2012-12-26 11:50:13 America/New_York
+  - added [CSS::Compressor]
+  - added [JavaScript::Minifier]
+  - added [Template::Tiny]
+
+0.83      2012-10-26 15:39:02 EST5EDT
+
+0.82      2012-10-26 07:59:20 EST5EDT
+  - modified default plugins to match what I am using now
+  - added [MinimumPerl] as prereq
+  - added [MakeMaker::Custom] as prereq
+  - added Test::CPAN::Changes as prereq
+
+0.81      2012-10-18 00:08:03 EST5EDT
+  - use Shell::Guess instead of System::Shell::Detect
+
+0.8       2012-10-10 08:54:47 EST5EDT
+  - include META.json
+
+0.7       2012-10-03 17:51:16 America/New_York
+
+0.6       2012-10-02 15:12:10 America/New_York
+  - use OurPkgVersion when [@Author::Plicease] is used
+
+0.5       2012-10-02 15:07:25 America/New_York
+  - use OurPkgVersion for Dist::Zilla
+
+0.4       2012-08-29 08:01:22 America/New_York
+  - add xt/release tests to skel
+  - update xt/release tests from profile
+  - Removed use test for devdoc
+  - Don't use [ExtraTests]
+
+0.3       2012-08-12 15:36:35 America/New_York
+  - Remove dep on IO::File::Closure.  Use Path::Class instead.
+  - Remove devdoc (it wasn't really working right anyway)
+
+0.2       2012-08-11 13:13:39 America/New_York
+  - Fix deps on [GitHub]
+  - Allow dirty README.pod
+
+0.1       2012-07-30 22:51:14 EST5EDT
+  - initial version

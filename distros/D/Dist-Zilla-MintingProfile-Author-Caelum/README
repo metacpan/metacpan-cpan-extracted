@@ -1,0 +1,42 @@
+NAME
+    Dist::Zilla::MintingProfile::Author::Caelum - Basic Minting Profile for
+    @AVAR
+
+SYNOPSIS
+        dzil setup
+
+        git config --global github.user GitHubLoginName
+        git config --global github.password GitHubPassword
+
+        dzil new -P Author::Caelum Your::Dist::Name
+
+        cd Your-Dist-Name
+
+        # edit stuff and commit
+
+        dzil release
+
+DESCRIPTION
+    This is a general purpose minting profile for
+    Dist::Zilla::PluginBundle::AVAR.
+
+    It will set up a git repo for you with some boilerplate and prompt you
+    if you want to create a new GitHub repo for it.
+
+    It creates a basic module for you. It does not use any Pod::Weaver
+    stuff.
+
+    It sets up dzil to do all the tagging/versioning/pushing for you (see
+    @AVAR for more details.)
+
+    When you do a "dzil release", your module will also be installed with
+    "cpanm ." by default.
+
+SEE ALSO
+    *   Dist::Zilla::PluginBundle::AVAR
+
+    *   Dist::Zilla::Plugin::GitHub::Create
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+

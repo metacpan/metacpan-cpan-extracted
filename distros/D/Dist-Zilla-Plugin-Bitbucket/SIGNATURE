@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 10995b954ac65ec42e2d31c209f81eb7e5a8d393 AUTHOR_PLEDGE
+SHA1 7dad6422d59a08470d7bbe86d079e24d48373ad6 Build.PL
+SHA1 f2f59859450f6c18b3360256f2f90aacd0e844d9 Changes
+SHA1 bd68984c69b18fe5e29023782442dd2b49c3f550 CommitLog
+SHA1 cc74d9b717f90cc40c96828364afd1b7c8ad2431 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 83a252eefaa30e9e5484bf349b6e55557f0f0083 MANIFEST
+SHA1 69b8a0accb85effa4bd5f4ea93e4f2386d10ac8b MANIFEST.SKIP
+SHA1 12b1325628213a5c17ecae9a4ee93b468e6cb562 META.json
+SHA1 a2b629d5ea936ff79828fe01303cbca0fd1aa0e2 META.yml
+SHA1 0a2b918b1d96eaf57bfd40c54c5b64681d32c36d Makefile.PL
+SHA1 081b055e5db40982bf87b2644d1dde902278b85a README
+SHA1 0fb5b9b866c98e2cdf488fd2a1fa1ba9840ca35e cpanfile
+SHA1 0425cb623039bc724cf68092e9ab3985be18f524 dist.ini
+SHA1 a23fa544f65e03c766222227530cde1ea9dcb44f doap.xml
+SHA1 c4604a3ba2bc64ca714ab4b8db99a605c6245516 examples/dist.ini
+SHA1 2e9197d6f66b61d6dd7472ab45024d37a63dfad0 lib/Config/Identity/Bitbucket.pm
+SHA1 b7d7ad968a580c997e31f703d0176c2cd509eec1 lib/Dist/Zilla/Plugin/Bitbucket.pm
+SHA1 630e222c3e1b064f602aaf919f5ff353c15e5961 lib/Dist/Zilla/Plugin/Bitbucket/Create.pm
+SHA1 503f5852a4342d359e7dbea066d3c10759ea22fa lib/Dist/Zilla/Plugin/Bitbucket/Meta.pm
+SHA1 5847a83186ec2e6a5666e91783c551e445521c2f lib/Dist/Zilla/Plugin/Bitbucket/Update.pm
+SHA1 d0a5a2c4336d29802fb8e0a94c3a5998320789f8 t/00-compile.t
+SHA1 7c2b09e328b9fd1acee2ffb0da284d00dd4172c2 t/00-report-prereqs.dd
+SHA1 f171c39042e9633bb85cbf8c3cab97e3f8733d45 t/00-report-prereqs.t
+SHA1 3bef9f667799a7da5b011a0d081e40a89b0e05dc t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRYLDYACgkQGfr7vsGKgxzuHQCgsCQL4P8uLMnewVoF/WqLkR/J
+5RgAoPP2gVjsew1LZIRHVN2J8aQlY2GI
+=3G5E
+-----END PGP SIGNATURE-----

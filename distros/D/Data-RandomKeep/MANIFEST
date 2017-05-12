@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/test.t
+lib/Data/RandomKeep.pm
+lib/Data/RandomKeep_T.pm
+META.yml                                 Module meta-data (added by MakeMaker)

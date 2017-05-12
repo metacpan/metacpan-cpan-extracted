@@ -1,0 +1,79 @@
+==================================================
+Changes from 2006-10-12 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0100 at 2016-10-09 04:13:59 +0000
+-------------------------------------------
+
+  Change: 1a805013fbef23417d4911ad2dae6b88d30df82a
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-10-09 00:10:17 +0000
+
+    v0.0100 
+
+  Change: 365201e343fe133a78c22e7977a6c66524d3d6e1
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-10-08 23:48:50 +0000
+
+    Merge pull request #3 from hvoers/master
+
+    Add functions 'get_config' and 'add_schema_to_config' 
+
+  Change: fcabbc9f2ffc171062a428e6e4d6a1d5adccf9f3
+  Author: Henk van Oers <hvo.pm@xs4all.nl>
+  Date : 2016-08-20 15:12:40 +0000
+
+    Add function 'add_schema_to_config'
+
+    add_schema_to_config
+
+    This function does not touch the existing config. It can be used if
+    some
+
+    other part of your app has configured DBICx::Sugar but did not know
+    about
+
+    the part that uses an extra schema.
+
+    add_schema_to_config('schema_name', { dsn => ... }); 
+
+  Change: 587923ac6bae4a7c3044286859741bd4d794d0e7
+  Author: Henk van Oers <hvo.pm@xs4all.nl>
+  Date : 2016-08-20 13:40:33 +0000
+
+    Remove 'use Memoize', add function 'get_config'
+
+    Memoize is not used, so remove.
+
+    For introspection add function get_config. 
+
+  Change: e58f1936ccec6275aa000dd969d6ef3e9f790596
+  Author: Henk van Oers <hvo.pm@xs4all.nl>
+  Date : 2016-08-20 13:12:17 +0000
+
+    Save the found config
+
+    Save the found config like
+    DBICx::Sugar::config(LoadFile($config_path)->{dbicx_sugar}); would
+    do. 
+
+  Change: 48b48aac50969e76645e3c8960576bddad36097f
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-29 06:01:49 +0000
+
+    updated synopsis 
+
+-------------------------------------------
+version 0.0001 at 2015-03-29 09:08:21 +0000
+-------------------------------------------
+
+  Change: ab63e49d6cf396abf1fad6354f8abfcee5991d25
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-03-29 05:08:21 +0000
+
+    first commit 
+
+================
+End of releases.
+================

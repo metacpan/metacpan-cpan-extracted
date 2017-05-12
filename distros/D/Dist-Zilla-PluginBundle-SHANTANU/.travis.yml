@@ -1,0 +1,23 @@
+sudo: true 
+language: perl
+perl:
+   - '5.20'
+matrix:
+   allow_failures:
+      - perl: 'blead'
+      - perl: '5.8'
+   fast_finish: true
+branches:
+   only: /^build\/.*/
+before_install:
+   - rm .travis.yml
+   - export AUTHOR_TESTING=0
+   - sudo apt-get -qq update
+   - sudo apt-get install -y libarchive-zip-perl
+   - cpanm Archive::Any::Lite
+   - cpanm Module::CPANTS::Analyse
+   - cpanm Test::Kwalitee
+   - cpanm Dist::Zilla::Plugin::MetaProvides::Package
+   - cpanm Dist::Zilla::Plugin::Test::Kwalitee::Extra
+install:
+   - cpanm --installdeps --verbose  .

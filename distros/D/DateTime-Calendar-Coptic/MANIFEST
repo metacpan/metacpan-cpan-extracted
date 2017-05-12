@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DateTime/Language.pm
+lib/DateTime/Calendar/Coptic.pm
+lib/DateTime/Calendar/CopticEthiopic.pm  
+lib/DateTime/Calendar/Coptic/Language.pm
+lib/DateTime/Calendar/Coptic/Language/Arabic.pm  
+lib/DateTime/Calendar/Coptic/Language/Coptic.pm  
+lib/DateTime/Calendar/Coptic/Language/English.pm
+t/01dates.t
+examples/dates.pl

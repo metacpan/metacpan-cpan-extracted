@@ -1,0 +1,55 @@
+=head1 NAME
+
+Content Handler Example
+
+=head1 Creating a content handler with mod_perl 1.0
+
+Handlers are simply perl subroutines called by the server at various
+stages of the HTTP request cycle.  A content handler is a subroutine
+that is called by the response phase.  Handlers, are typically created
+as a perl modules, separate files store in a library, and accessable
+via perl's C<@INC> array.
+
+For example, here's an example that returns a greeting and the current
+local time.
+
+  file:My/Greeting.pm
+  -------------------
+  package My::Greeting;
+  use strict;
+  
+  use Apache::Constants qw(OK);
+  
+  sub handler {
+      my $r = shift;
+      my $now = scalar localtime;
+      my $server_name = $r->server->server_hostname;
+  
+      $r->send_http_header('text/plain');
+  
+      print <<EOT;
+  Thanks for visiting $server_name.
+  The local time is $now.
+  EOT
+  
+      return OK;
+  }
+  1; # modules must return true
+
+
+Save the above as a file file in your perl library
+(e.g. I<My/Greeting.pm>).  Now, to return the above greeting when the
+URL I</hello> is visited on your server:
+
+  <Location /hello>
+      SetHandler perl-script
+      PerlHandler My::Greeting
+  </Location>
+
+For a more in-depth explanation of creating mod_perl handlers,
+and mod_perl in general, see the L<mod_perl Guide|guide::index>.
+
+=for html
+<a class="more" href="../index.html#handler">&#171&nbsp;back</a>
+
+

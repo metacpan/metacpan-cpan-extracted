@@ -1,0 +1,10 @@
+
+Thanx go to:
+
+* Mark Fowler, whose Perl Advent Calendar pages told me about Devel::Size.
+* Dan Sugalski, the author of Devel::Size.
+* SADAHIRO Tomoyuki for explaining the \\0 trick.
+* Yves (demerphq) for the trick recording only nec. things in %SEEN:
+  http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2005-02/msg00403.html
+* Jim Cromie for spotting "indend" - Ouch! :)
+

@@ -1,0 +1,47 @@
+NAME
+    DBIx::Class::InflateColumn::DateTime::Duration - Auto create
+    DateTime::Duration objects from columns
+
+SYNOPSIS
+    Load this component and then declare one or more columns as duration
+    columns.
+
+      package Holiday;
+      __PACKAGE__->load_components(qw/InflateColumn::DateTime::Duration Core/);
+      __PACKAGE__->add_columns(
+          length => {
+              datatype      => 'varchar',
+              size          => 255,
+              is_nullable   => 1,
+              is_duration   => 1,
+          },
+      );
+
+    Then you can treat the specified column as a DateTime::Duration object.
+
+      print 'days: ', $holiday->length->delta_days, "\n";
+      print 'hours: ', $holiday->length->delta_hours, "\n";
+
+DESCRIPTION
+    This module inflates/deflates designated columns into DateTime::Duration
+    objects.
+
+METHODS
+  register_column
+    Chains with the "register_column" in DBIx::Class::Row method, and sets
+    up duration columns appropriately. This would not normally be directly
+    called by end users.
+
+SEE ALSO
+    DateTime::Duration, DBIx::Class::InflateColumn, DBIx::Class.
+
+AUTHOR
+    Pete Smith, <pete@cubabit.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2010 by Pete Smith
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.1 or, at
+    your option, any later version of Perl 5 you may have available.
+

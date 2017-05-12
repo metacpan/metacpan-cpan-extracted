@@ -1,0 +1,432 @@
+NAME
+    Formatter - Module to perform report generation via query DBI
+
+SYNOPSIS
+        use Formatter;
+
+        format FMT_HEADER=
+        **************************************************
+        *             FIRST PAGE OF REPORT               *
+        **************************************************
+    .
+
+        format FMT_TTITLE=
+        **************************************************
+        * SOC : @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< *
+                $DEAZIEND
+        **************************************************
+        PROG    CDAZIEND CDDIPEND
+        ----    -------- --------
+    .
+
+        format FMT_BODY=
+        @<<<    @<<<     @<<<<<
+        $FMT->line,     $CDAZIEND,$CDDIPEND
+    .
+
+        format FMT_CD1LVSTR=
+        TOT]--> @<<<<<<< @<<<<<<< @<<<<<<<
+           111,     111,     111
+    .
+        format FMT_BTITLE=
+        --------------------------------------------------
+        @</@</@<                                    P.@<<<
+        $DAY,$MONTH,$YEAR,                      $FMT->page
+    .
+
+            $BREAKS[0]="CDAZIEND";
+            $BREAKS[1]="CDDIPEND";
+
+            $FMT=new Formatter(
+            'DBI_DRIVER'           => 'Oracle',
+            'DBI_DATABASE'         => 'database',
+            'DBI_USERNAME'         => 'dbusername',
+            'DBI_PASSWORD'         => 'dbpassword',
+            'DBD_QUERY'            => 'SELECT * FROM ANAGRA WHERE CLPERRIF=199901 ORDER BY CDAZIEND',
+            'BREAKS'               => \@BREAKS,
+            'BREAKS_SKIP_PAGE'     =>  {
+                CD1LVSTR => 1,
+                CDCCOSTO => 0
+            },
+            'FORMAT_PAGESIZE'      => 40,
+            'FORMAT_LINESIZE'      => 50,
+            'FORMAT_FORMFEED'      => "\f",
+            'FORMAT_HEADER'        => *FMT_HEADER,
+            'FORMAT_TTITLE'        => *FMT_TTITLE,
+            'FORMAT_BTITLE'        => *FMT_BTITLE,
+            'FORMAT_BTITLE_HEIGHT' => 2,
+            'FORMAT_BODY'          => *FMT_BODY,
+            'FORMAT_BREAKS'        =>  {
+                CD1LVSTR => *FMT_CD1LVSTR,
+            },
+            'EVENT_PREHEADER'      => \&PREHEADER,
+            'EVENT_POSTHEADER'     => \&POSTHEADER,
+            'EVENT_PRETTITLE'      => \&PRETTITLE,
+            'EVENT_POSTTTITLE'     => \&POSTTTITLE,
+            'EVENT_PREBODY'        => \&PREBODY,
+            'EVENT_POSTBODY'       => \&POSTBODY,
+            'EVENT_PREBTITLE'      => \&PREBTITLE,
+            'EVENT_POSTBTITLE'     => \&POSTBTITLE,
+            'EVENT_ALLBREAKS'      => \&BREAKALL,
+            'EVENT_BREAKS'         =>  {
+                CDAZIEND => \&CDAZIEND,
+                CDDIPEND => \&CDDIPEND
+            }
+        );
+
+        $FMT->generate();
+
+        sub PREHEADER    {do something before header print out}
+        sub POSTHEADER   {do something after header print out}
+        sub PRETTITLE    {do something before top title print out}
+        sub POSTTTITLE   {do something after top title print out}
+        sub PREBTITLE    {do something before bottom title print out}
+        sub POSTBTITLE   {do something after bottom title print out}
+        sub PREBODY      {do something before body print out}
+        sub POSTBODY     {do something after body print out}
+
+        $FMT->ofmt("Print out a line during report generation",">");
+
+DESCRIPTION
+        Formatter module perform report generation based on DBI query.
+
+DEFINITION
+  Function new
+
+    The <new> function create the Formatter object and configure it
+    for all parameters required for report generation. One by one
+    parameter definition:
+
+        * DBI_DRIVER        => Specify wath driver you would use
+                               for connect to your database.
+                               (See DBD drivers for specific)
+        * DBI_DATABASE      => Specify database name (or instance).
+                               In union of last parameter it create
+                               connection string : dbi:DBI_DRIVER:DBI_DATABASE
+        * DBI_USERNAME      => Specify database username
+        * DBI_PASSWORD      => Specify database DBI_USERNAME password
+        * DBD_QUERY         => Point to a string where Sql Query are located
+        * BREAKS            => Point to an array containing fields that cause a
+                               break in the report
+        * BREAKS_SKIP_PAGE  => Point to an hash that specify if a new page are
+                               performed when the break FORMAT ar printed
+        * FORMAT_PAGESIZE   => Specify page height in character
+        * FORMAT_LINESIZE   => Specify line width in character (only for outf use)
+        * FORMAT_FORMFEED   => Specify formfeed sequence when a formfeed or newpage
+                               are requested
+        * FORMAT_HEADER     => Point to filehandle of the header definition for the
+                               report
+        * FORMAT_TTITLE     => Point to filehandle of the top title definition for
+                               the report
+        * FORMAT_BODY       => Point to filehandle of the body definition for the
+                               report
+        * FORMAT_BTITLE     => Point to filehandle of the bottom title definition for
+                               the report
+        * FORMAT_BTITLE_HEIGHT => Height in lines of BTITLE
+        * FORMAT_BREAKS     => Point to an hash containig break fields related to its
+                               format filehandle definition
+        * EVENT_PREHEDER    => Point to the subroutine that is called before header
+                               generation
+        * EVENT_POSTHEDER   => Point to the subroutine that is called after header
+                               generation
+        * EVENT_PRETTITLE   => Point to the subroutine that is called before top title
+                               generation
+        * EVENT_POSTTTITLE  => Point to the subroutine that is called after top title
+                               generation
+        * EVENT_PREBODY     => Point to the subroutine that is called before body
+                               generation
+        * EVENT_POSTBODY    => Point to the subroutine that is called after body
+                               generation
+        * EVENT_PREBTITLE   => Point to the subroutine that is called before bottom title
+                               generation
+        * EVENT_POSTBTITLE  => Point to the subroutine that is called after bottom title
+                               generation
+        * EVENT_BREAKS      => Point to structure that contains break fields related to
+                               subroutine to execute when the break is berformed
+
+  DBI_DRIVER
+
+    DBI_DRIVER specify driver to use for connection within Database
+    via DBI::DBD module.
+
+    Ex.
+
+        * Oracle  (Oracle database)
+        * CSV     (Comma separated database)
+        * Pg      (PostgreSQL database)
+        ... ecc.
+
+    For specific look at DBD::<Driver>
+
+  DBI_DATABASE
+
+    The clause DBI_DATABASE can change from db to db , look at
+    DBD::Driver for your specific. Example parameter are:
+
+        * ORACLE_SID            for Oracle database
+        * f_dir=/csv/data       for CSV file specify directory location of text-file-table
+        * dbname=your db name   for PostgreSQL database
+        * DSN                   for ADO db connection
+
+  DBI_USERNAME DBI_PASSWORD
+
+    Specify in order username and password of the user granted to
+    use database
+
+  DBD_QUERY
+
+    Here you can pass your query (SQL) , that is fetched for report
+    generation. Example to pass query are:
+
+        * Example 1 (Direct via parameters)
+                $FMT=new Formatter(
+                'DBI_DRIVER'           => 'Oracle',
+                'DBI_DATABASE'         => 'database',
+                'DBI_USERNAME'         => 'dbusername',
+                'DBI_PASSWORD'         => 'dbpassword',
+                'DBD_QUERY'            => 'SELECT * FROM ANAGRA WHERE CLPERRIF=199901 ORDER BY CDAZIEND',
+                 ...
+
+        * Example 2 (Via variable)
+                $query = qq {
+                    SELECT
+                        *
+                    FROM
+                        ANAGRA
+                    WHERE
+                            CLPERRIF=199901
+                        AND
+                            CDAZIEND=345
+                    ORDER BY
+                        CDAZIEND
+                };
+
+                $FMT=new Formatter(
+                'DBI_DRIVER'           => 'Oracle',
+                'DBI_DATABASE'         => 'database',
+                'DBI_USERNAME'         => 'dbusername',
+                'DBI_PASSWORD'         => 'dbpassword',
+                'DBD_QUERY'            => $query,
+                ...
+
+  BREAKS
+
+    Specify an array containing fields that cause a break in the
+    report. When a breaks is performed 2 step are executed, first an
+    EVENT_BREAKS is called if defined , second a FORMAT_BREAKS is
+    printed out if defined. For convenience if you would like to
+    generate a new format when a field change you can use first
+    statement because is called after FORMAT_BREAKS (and if they are
+    subtotal are printed before), using the putformat function in
+    the event routine, for example:
+
+        format FMT_DEPARTEMENT=
+        TOTALS FOR DEPARTEMENT ARE ]--> @<<<<<<< @<<<<<<< @<<<<<<<
+                                        111,     111,     111
+    .
+
+       format FMT_SUBDEPARTEMENT
+       *********************************
+       * @|||||||||||||||||||||||||||| *
+         $SUBDEPARTEMENT
+       *********************************
+    .
+
+            $BREAKS[0]="DEPARTEMENT";
+            $BREAKS[1]="SUBDEPARTEMENT";
+
+            $FMT=Formatter->new (
+                    ...
+                    'BREAKS'               => \@BREAKS,
+                    'BREAKS_SKIP_PAGE'     =>  {
+                    DEPARTEMENT => 1,
+                    SUBDEPARTEMENT => 0
+                    },
+                    'FORMAT_BREAKS'        =>  {
+                    DEPARTEMENT => *FMT_DEPARTEMENT
+                    },
+                    'EVENT_BREAKS'         =>  {
+                    SUBDEPARTEMENT => \&MySubDepartement
+                    },
+                    ...
+            );
+
+    sub MySubDepartement {$FMT->putformat(*FMT_SUBDEPARTEMENT)};
+
+    In this way a possible output is :
+    ******************************************************* * REPORT
+    BY SUBDEPARTMENT *
+    *******************************************************
+    ********************************* * CHEMICALS *
+    ********************************* 10 20 40 10 20 40 10 20 40
+    ********************************* * PHARMACIA *
+    ********************************* 10 20 40 10 20 40 10 20 40
+
+    TOTALS FOR DEPARTEMENT ARE ]--> 111 111 111
+
+  BREAKS_SKIP_PAGE
+
+    This parameter specify only if a new page is called after a
+    break FORMAT is writed.
+
+  FORMAT_PAGESIZE
+
+    (Optional-Deafult=60)
+
+    Specify how many lines are printed for each piece of paper.
+
+  FORMAT_LINESIZE
+
+    (Optional-Default=130)
+
+    Specify how many character are counted by an outf function to
+    perform alignement of text.
+
+  FORMAT_FORMFEED
+
+    (Optional-Deafult=\f)
+
+    Specify the form feed sequence that are called whem a newpage or
+    a formfeed function are called ( and alse a new page of report
+    is required) Default value are CTRL-L (\f)
+
+  FORMAT_HEADER
+
+    (Optional)
+
+    This parameter point to the format fileheader for HEADER page.
+    Definition of format specific can be found in Perl
+    documentation. Header page is printed only one time at beginning
+    of the report and normally include general specification or
+    purpose of report.
+
+    Example:
+
+        format MY_HEADER=
+        ******************************************
+        * DATE    : @</@</@<<<                   *
+                    $dd,$mm,$yyyy
+        * PURPOSE : Statistique about user login *
+        ******************************************
+    .
+
+  FORMAT_TTITLE
+
+    (Optional)
+
+    Identical to HEADER definition. TTITLE is printed on every
+    change of page in the top of the report page
+
+  FORMAT_BODY
+
+    (Optional)
+
+    Identical to HEADER definition. BODY is printed on every change
+    of value in fetch of query statament, values of query are passed
+    and traslated to real variable in the main caller program.
+
+    Example : if query is SELECT NAME,SURNAME,ADDRESS FROM
+    ADDRESSBOOK in yours format values $NAME,$SURNAME,$ADDRESS are
+    created and updated on every fetch.
+
+        format MYBODY=
+        @<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<< @<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+        $NAME,             $SURNAME            $ADDRESS
+    .
+
+  FORMAT_BTITLE
+
+    (Optional)
+
+    Identical to HEADER definition. BTITLE is printed on every
+    change of page in the bottom of the report page
+
+  FORMAT_BTITLE_HEIGHT
+
+    (Option if FORMAT_BTITLE not specified)
+
+    This parameter specify how many lines are printed by the
+    FORMAT_BTITLE definition. I have put this parameter beacuse i
+    don't know how to inform automatically my package in what lines
+    is used by a format definition. If anyone know how to make it
+    possible please contact me.
+
+  FORMAT_BREAKS
+
+    This parameter point to a structure where are located by fields
+    format filehandle definitions. For use see the BREAKS specifics.
+
+  EVENT_PRE...
+
+    All EVENT_PRE... (EVENT_PREHEADER,EVENT_PRETTITLE ...)
+    parameters points to a routine defined by the user that is
+    called before the event handle is performed. For example if you
+    would like to change a value in the top title before is print
+    out you need to create a sub for example named MyBeforeTopTitle
+    in which you change a value , and then you pass this reference
+    to the EVENT_PRETTITLE parameter :
+
+            'EVENT_PRETTITLE' => \&MyBeforeTopTitle
+
+    Remember that all values created by the fetch statement are
+    already updated when all events are generated
+
+  EVENT_POST...
+
+    Is identical to the last but is applied after the event handle
+    occurs.
+
+  EVENT_BREAKS
+
+    This parameter point to a structure that specify by fields
+    events that can be generated when a break is performed after a
+    FORMAT_BREAKS is printed out.
+
+FUNCTIONS
+  Function generate
+
+    This function call all parameters and build the report.
+
+  Function ofmt
+
+    This function place a text in the report over formatting
+    definition , is only for special case in which is impossible to
+    place text on format definition (if you found when please
+    contact me). Formatter->ofmt ("Text to print out",position
+    flag,position character); * Position flag The position flag
+    specify where text are printed , possible values are: < Text are
+    aligned to left of the line > Text are aligned to right of the
+    line | Text are aligned in the middle of the line C Enable
+    Position
+
+    * Position character The position character specify the position
+    in the line where the text are printed
+
+  Function page
+
+    The page function return number of page in this moment
+
+  Function line
+
+    The line function return the line position in the moment
+
+  Function newpage
+
+    The new page function send a complete new page to the report
+    this is the next sequence :
+
+        * Print the bottom title in the current page
+        * Send the form feed sequence
+        * Print the top title in the new page
+
+  Function formfeed
+
+    The formfeed function send only the form feed sequence to the
+    report and not perform the title generation.
+
+AUTHOR
+                  Vecchio Fabrizio <jacote@tiscalinet.it>
+
+SEE ALSO
+    the DBI manpage
+

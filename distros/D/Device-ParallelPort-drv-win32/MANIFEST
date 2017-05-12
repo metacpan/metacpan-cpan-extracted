@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+win32.pm
+README
+LICENSE
+test.pl
+inpout32.dll
+META.yml                                 Module meta-data (added by MakeMaker)

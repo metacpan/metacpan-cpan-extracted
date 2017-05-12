@@ -1,0 +1,100 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+
+
+
+DNS::BL
+=======
+
+Modules and  scripts that  ease the maintenance  and operation  of DNS
+blacklists. See  perldoc for more information. The  blacklist might be
+stored in  a Berkeley DB or  in a DBI-supported  database. Scripts and
+instructions are included for installation with MySQL.
+
+The blacklists can be exported  to various formats, to load into name
+servers.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI		(for storing rules in a DBI-supported database)
+  Test::More	(for improved testing)
+  BerkeleyDB	(for storing rules in a Berkeley DB)
+  NetAddr::IP
+
+Some  particular  features  require  one  or  more  of  the  following
+modules. If  you do not  have those modules installed,  these features
+won't be available.
+
+  Test::POD	(recommended for testing the documentation)
+
+SECURITY CONSIDERATIONS
+
+I  have  no control  on  the machanisms  involved  in  the storage  or
+transport  of this distribution.  This means  that I  cannot guarantee
+that  the distribution  you have  in your  hands is  indeed,  the same
+distribution I packed and uploaded.
+
+Along the distribution file, you should have a file with the extension
+".asc".   This  contains a  GPG  "detached  signature"  that makes  it
+impossible for anybody to alter  this distribution.  If security is of
+any concern to you, by all means verify the signature of this file and
+contact the author if any discrepancy is detected.
+
+You can find more information about this at the following URL
+
+             http://mipagina.cantv.net/lem/gpg/
+
+This information  includes the  correct keys, fingerprints,  etc. Note
+that this README file should also be signed.
+
+DNS BLOCK LIST MANAGEMENT
+
+Managing your  own DNS  Block List (DNSBL)  is not something  you must
+undertake lightly.  This software  is provided with  the hope  that it
+makes this task easier. However, understand that the management of the
+DNSBL data is actually the easiest part.
+
+A  succesful DNSBL,  specially one  protecting public  email,  must be
+supported by a  clear listing and delisting policy.  This is something
+you must provide by yourself.
+
+At this  time, the  Berkeley DB backend  is somewhat stable  and quite
+usable, up  to a few thousand  entries. This shouls allow  you to "get
+your  feet  wet" in  setting  up  the  script environment  that  often
+surrounds the maintenance of private DNSBLs.
+
+At some point, you must transition from the Berkeley DB backend to the
+DBI  backend, so  that  you can  store  your DNSBL  information in  an
+external database.
+
+This  two-step  approach  eases  the  learning  curve  and  the  usual
+difficulty that is usually  associated with setting up and maintaining
+your DNSBL.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 Luis Muñoz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (Darwin)
+
+iD8DBQFBzGwpQyDWGRI/hhARAndcAJ9z1BLXCfBkYYSZNEtnTHcxilZTIwCgl8jD
+B+Iy5BISTvOdZWjRWIg8kpI=
+=JXMy
+-----END PGP SIGNATURE-----

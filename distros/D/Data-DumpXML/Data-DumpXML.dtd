@@ -1,0 +1,30 @@
+<!-- DTD for Data::DumpXML $Date: 2002/12/28 00:56:09 $ -->
+
+<!ENTITY % scalar "undef | str | ref | alias">
+
+<!ELEMENT data (%scalar;)*>
+<!ELEMENT undef EMPTY>
+<!ELEMENT str (#PCDATA)>
+<!ELEMENT ref (%scalar; | array | hash | glob | code)>
+<!ELEMENT alias EMPTY>
+<!ELEMENT array (%scalar;)*>
+<!ELEMENT hash  (key, (%scalar;))*>
+<!ELEMENT key (#PCDATA)>
+<!ELEMENT glob EMPTY>
+<!ELEMENT code EMPTY>
+
+<!ENTITY % stdattlist 'id       ID             #IMPLIED
+                       class    CDATA          #IMPLIED'>
+<!ENTITY % encoding   'encoding (plain|base64) "plain"'>
+
+<!ATTLIST undef %stdattlist;>
+<!ATTLIST ref   %stdattlist;>
+<!ATTLIST array %stdattlist;>
+<!ATTLIST hash  %stdattlist;>
+<!ATTLIST glob  %stdattlist;>
+<!ATTLIST code  %stdattlist;>
+
+<!ATTLIST str   %stdattlist; %encoding;>
+<!ATTLIST key   %encoding;>
+
+<!ATTLIST alias ref IDREF #IMPLIED>

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Devel/AssertC99.pm
+lib/Devel/CheckCompiler.pm
+t/00_compile.t
+t/assert-c99.t
+t/check_c99.t
+t/check_c99_or_exit.t
+t/executable.t
+xt/02_perlcritic.t
+META.yml
+MANIFEST

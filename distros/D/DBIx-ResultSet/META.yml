@@ -1,0 +1,34 @@
+---
+abstract: 'Lightweight SQL query building and execution.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  DBD::SQLite: 1.29
+  DateTime: 0.55
+  DateTime::Format::SQLite: 0.11
+  Test::Exception: 0.29
+  Test::Simple: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-ResultSet
+requires:
+  Clone: 0.31
+  DBIx::Connector: 0.33
+  Data::Page: 2.02
+  List::MoreUtils: 0.22
+  Module::Load: 0.18
+  Moose: 1.01
+  MooseX::Types: 0.21
+  SQL::Abstract: 1.65
+  SQL::Abstract::Limit: 0.141
+  namespace::autoclean: 0.09
+resources:
+  bugtracker: https://github.com/bluefeet/DBIx-ResultSet/issues
+  repository: git://github.com/bluefeet/DBIx-ResultSet.git
+version: 0.17

@@ -1,0 +1,53 @@
+---
+abstract: 'Insert copyright statement into source code files'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  File::pushd: '1.00'
+  List::Util: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::More: '0.92'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-InsertCopyright
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::InsertCopyright:
+    file: lib/Dist/Zilla/Plugin/InsertCopyright.pm
+    version: '0.005'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::PPI: '0'
+  Moose: '0'
+  PPI::Document: '0'
+  perl: '5.008001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-InsertCopyright/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-InsertCopyright
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-InsertCopyright.git
+version: '0.005'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+  - 'Keedi Kim <keedi.k@gmail.com>'

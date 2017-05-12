@@ -1,0 +1,182 @@
+Revision history for Dist-Zilla-Plugin-CheckExtraTests
+
+0.029     2016-05-23 18:53:31-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed tmpdir removal with Dist::Zilla 6+
+
+0.028     2015-08-10 10:52:35-04:00 America/New_York
+
+    [Fixed]
+
+    - non-perl files in xt/* are not executed
+
+0.027     2015-05-02 15:41:56-04:00 America/New_York
+
+    [Documented]
+
+    - Changed order of 'xt' commands in help text for clarity
+
+0.026     2015-03-24 23:35:49-04:00 America/New_York
+
+    [Fixed]
+
+    - Fixed test corpuses (corpii?) to protect against META validation
+      errors
+
+0.025     2014-11-21 11:29:50-05:00 America/New_York
+
+    [Changed]
+
+    - Respects dzil verbose flag
+
+0.024     2014-11-04 05:30:13-05:00 America/New_York
+
+    [Added]
+
+    - RunExtraTests now also runs miscellaneous xt/ tests
+
+0.023     2014-10-30 16:25:03-04:00 America/New_York
+
+    [Changed]
+
+    - Removed unused Moose::Autobox
+
+0.022     2014-07-14 17:36:05-04:00 America/New_York
+
+    - [RunExtraTests] now accepts the --jobs flag passed to 'dzil test' and
+      'dzil release'
+
+0.021     2014-03-25 14:34:02-04:00 America/New_York
+
+    [Fixed]
+
+    - specifies Path::Tiny prerequisite of 0.013 or better
+
+0.020     2014-03-22 23:12:58-04:00 America/New_York
+
+    [Fixed]
+
+    - default jobs support was buggy in the last version
+
+0.019     2014-03-22 22:48:04-04:00 America/New_York
+
+    [Changed]
+
+    - Added 'jobs' argument for 'dzil xtest' for parallel testing
+
+    - passing new 'default_jobs' option (added to Dist::Zilla 5.014) through
+      to test runner for parallel testing
+
+0.018     2014-02-18 17:20:58-05:00 America/New_York
+
+    [Fixed]
+
+    - CheckExtraTest now force removes temp directory, the way
+      Path::Class used to do.
+
+0.017     2014-02-13 15:03:55-05:00 America/New_York
+
+    [Changed]
+
+    - Removed dependency on Path::Class in favor of Path::Tiny
+
+0.016     2013-11-15 11:33:06 America/New_York
+
+    [Changed]
+
+    - the 'xtest' command now accepts the same options as 'test' does
+
+0.015     2013-10-31 15:03:13 America/New_York
+
+    - Shipping as a stable release
+
+0.014     2013-10-23 19:52:43 America/New_York
+
+    [Fixed]
+
+    - [CheckExtraTest] tests in a .build directory instead of the build
+      directory
+
+    - the 'xtest' command now uses Dist::Zilla methods to build a temporary
+      directory, which also sets the .build/latest symlink correctly
+
+0.013     2013-10-17 17:26:26 America/New_York
+
+    [Changed]
+
+    - [RunExtraTests] now runs xt/author ahead of xt/smoke and xt/release
+      (Karen Etheridge)
+
+0.012     2013-10-15 23:15:02 America/New_York
+
+    [Changed]
+
+    - 'dzil xtest' arguments now match as regex patterns for more
+      flexibility
+
+    [Fixed]
+
+    - use all builders to build, not just the first (Karen Etheridge)
+
+0.011     2013-02-09 20:53:59 America/New_York
+
+    - Doc fixes (ETHER)
+
+    - Path::Tiny fix (ETHER)
+
+0.010     2013-02-07 23:09:15 America/New_York
+
+    - Bump Dist::Zilla prereq to something modernish
+
+0.009     2013-02-06 16:15:30 America/New_York
+
+    - Swap Path::Class for Path::Tiny and Path::Class::Rule
+      for Path::Iterator::Rule
+
+0.008     2013-01-25 15:23:15 America/New_York
+
+    - lazy loading of some dependencies (DOLMEN)
+
+0.007     2012-05-31 12:00:29 America/New_York
+
+    - change RunExtraTests plugin to avoid rebuilding the dist when
+      it's not necessary (e.g. MakeMaker already ran the normal tests)
+      (thanks, Christopher J. Madsen)
+
+0.006     2012-05-10 23:08:11 America/New_York
+
+    - run tests on the built dist, so that things like XS will work
+
+    - add RunExtraTests plugin, which runs the appropriate xt tests when "dzil
+      test" is run (but only with the appropriate flags).
+
+0.005     2012-05-03 17:30:08 America/New_York
+
+    - add 'xt' as command alias for 'xtest'
+
+    - 'dzil xtest' now takes optional arguments that are
+      treated as xt test filenames to run.  These will
+      be found however deeply they are nested in xt.
+
+0.004     2010-04-08 14:51:28 EST5EDT
+
+    - manually set prereqs instead of using
+      auto-detection to avoid a Dist::Zilla
+      BUILD_REQUIRES bug
+
+0.003     2010-04-07 14:02:34 EST5EDT
+
+    - updated tests for Dist::Zilla 2.000+
+
+    - switched from File::chdir to File::pushd
+
+0.002     2010-03-23 19:28:48 EST5EDT
+
+    - fixed problem in release check
+
+0.001     2010-03-22 01:10:12 EST5EDT
+
+
+    - first draft

@@ -1,0 +1,36 @@
+---
+abstract: 'Pass through DBD'
+author:
+  - 'Tokuhiro Matsuno E<lt>tokuhirom AAJKLFJEF@ GMAIL COME<gt>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-PassThrough
+no_index:
+  directory:
+    - inc
+provides:
+  DBD::PassThrough:
+    file: lib/DBD/PassThrough.pm
+    version: 0.02
+  DBD::PassThrough::db:
+    file: lib/DBD/PassThrough.pm
+    version: 0
+  DBD::PassThrough::dr:
+    file: lib/DBD/PassThrough.pm
+    version: 0
+requires:
+  DBI: 1.0201
+  parent: 0
+  perl: 5.008005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

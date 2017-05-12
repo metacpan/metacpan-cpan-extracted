@@ -1,0 +1,30 @@
+NAME
+====
+
+Devel::Quick - Write single-step debugger one-liners easily (DB::DB)
+
+
+SYNOPSIS
+========
+
+Devel::Trace in one line:
+
+  perl -d:Quick='print ">> $filename:$line $code"' prog.pl
+
+The above, with strict checking enabled (not default):
+
+  perl -d:Quick=-strict,'print ">> $filename:$line $code"' prog.pl
+
+Or shortened:
+
+  perl -d:Quick=-s,'print ">> $filename:$line $code"' prog.pl
+
+
+DESCRIPTION
+===========
+
+This module allows you to write simple on-the-fly DB::DB line debuggers 
+easily. It injects the following code around the code passed to its import 
+method and eval's it in.
+
+See lib/Devel/Quick.pm for more information.

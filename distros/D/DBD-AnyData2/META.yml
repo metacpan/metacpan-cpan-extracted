@@ -1,0 +1,34 @@
+---
+abstract: 'a DBI driver for AnyData2'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>'
+build_requires:
+  Test::More: '0.9'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-AnyData2
+no_index:
+  directory:
+    - t
+    - inc
+recommends: {}
+requires:
+  AnyData2: '0.002'
+  Carp: '0'
+  DBD::File: '0.44'
+  DBI: '1.633'
+  Module::Runtime: '0'
+  SQL::Statement: '1.405'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-AnyData2
+  homepage: https://metacpan.org/release/DBD-AnyData2
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-dbi/DBD-AnyData2
+version: '0.001'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

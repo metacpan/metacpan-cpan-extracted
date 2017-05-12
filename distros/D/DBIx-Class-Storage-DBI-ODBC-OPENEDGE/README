@@ -1,0 +1,46 @@
+DBIx-Class-Storage-DBI-ODBC-OPENEDGE
+
+This module provides an interface for Progress Softwares OpenEdge
+Advance Server when using ODBC access.  
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Class::Storage::DBI::ODBC::OPENEDGE
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-Storage-DBI-ODBC-OPENEDGE
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Class-Storage-DBI-ODBC-OPENEDGE
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Class-Storage-DBI-ODBC-OPENEDGE
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-Class-Storage-DBI-ODBC-OPENEDGE/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Kevin L. Esteb
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.
+

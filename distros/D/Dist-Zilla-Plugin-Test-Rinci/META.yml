@@ -1,0 +1,356 @@
+---
+abstract: 'A release test for Rinci metadata'
+author:
+  - 'perlancar <perlancar@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-Rinci
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Role::Rinci::CheckDefinesMeta: '0'
+  Test::Rinci: '0.01'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-Rinci
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Test-Rinci
+  repository: git://github.com/perlancar/perl-Dist-Zilla-Plugin-Test-Rinci.git
+version: '0.03'
+x_Dist_Zilla:
+  perl:
+    version: '5.022000'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      config:
+        Dist::Zilla::Plugin::GatherDir:
+          exclude_filename: []
+          exclude_match: []
+          follow_symlinks: '0'
+          include_dotfiles: '0'
+          prefix: ''
+          prune_directory: []
+          root: .
+      name: '@Filter/@Filter/GatherDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/@Filter/PruneCruft'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/@Filter/ManifestSkip'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/@Filter/MetaYAML'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/@Filter/License'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Filter/@Filter/PodCoverageTests'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Filter/@Filter/PodSyntaxTests'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/@Filter/ExtraTests'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/@Filter/ExecDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/@Filter/ShareDir'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      config:
+        Dist::Zilla::Role::TestRunner:
+          default_jobs: 1
+      name: '@Filter/@Filter/MakeMaker'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/@Filter/Manifest'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/@Filter/ConfirmRelease'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/@Filter/UploadToCPAN'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Rinci::AbstractFromMeta
+      name: '@Filter/Rinci::AbstractFromMeta'
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::PodnameFromFilename
+      name: '@Filter/PodnameFromFilename'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::CheckDepDists
+      name: '@Filter/PERLANCAR::CheckDepDists'
+      version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::MetaResources
+      name: '@Filter/PERLANCAR::MetaResources'
+      version: '0.03'
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: '@Filter/CheckChangeLog'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::CheckMetaResources
+      name: '@Filter/CheckMetaResources'
+      version: '0.001'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Filter/MetaJSON'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Filter/MetaConfig'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::GenShellCompletion
+      name: '@Filter/GenShellCompletion'
+      version: '0.09'
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Filter/Authority'
+      version: '1.009'
+    -
+      class: Dist::Zilla::Plugin::OurDate
+      name: '@Filter/OurDate'
+      version: '0.03'
+    -
+      class: Dist::Zilla::Plugin::OurDist
+      name: '@Filter/OurDist'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::PERLANCAR::OurPkgVersion
+      name: '@Filter/PERLANCAR::OurPkgVersion'
+      version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+          plugins:
+            -
+              class: Pod::Weaver::Plugin::EnsurePod5
+              name: '@CorePrep/EnsurePod5'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Plugin::H1Nester
+              name: '@CorePrep/H1Nester'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Name
+              name: '@Author::PERLANCAR/Name'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Version
+              name: '@Author::PERLANCAR/Version'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::PERLANCAR/prelude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: SYNOPSIS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: DESCRIPTION
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Generic
+              name: OVERVIEW
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: ATTRIBUTES
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: METHODS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Collect
+              name: FUNCTIONS
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Leftovers
+              name: '@Author::PERLANCAR/Leftovers'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Region
+              name: '@Author::PERLANCAR/postlude'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Completion::GetoptLongComplete
+              name: '@Author::PERLANCAR/Completion::GetoptLongComplete'
+              version: '0.07'
+            -
+              class: Pod::Weaver::Section::Completion::GetoptLongSubcommand
+              name: '@Author::PERLANCAR/Completion::GetoptLongSubcommand'
+              version: '0.03'
+            -
+              class: Pod::Weaver::Section::Completion::PerinciCmdLine
+              name: '@Author::PERLANCAR/Completion::PerinciCmdLine'
+              version: '0.13'
+            -
+              class: Pod::Weaver::Section::Homepage::DefaultCPAN
+              name: '@Author::PERLANCAR/Homepage::DefaultCPAN'
+              version: '0.05'
+            -
+              class: Pod::Weaver::Section::Source::DefaultGitHub
+              name: '@Author::PERLANCAR/Source::DefaultGitHub'
+              version: '0.07'
+            -
+              class: Pod::Weaver::Section::Bugs::DefaultRT
+              name: '@Author::PERLANCAR/Bugs::DefaultRT'
+              version: '0.05'
+            -
+              class: Pod::Weaver::Section::Authors
+              name: '@Author::PERLANCAR/Authors'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Section::Legal
+              name: '@Author::PERLANCAR/Legal'
+              version: '4.012'
+            -
+              class: Pod::Weaver::Plugin::Rinci
+              name: '@Author::PERLANCAR/Rinci'
+              version: '0.43'
+            -
+              class: Pod::Weaver::Plugin::AppendPrepend
+              name: '@Author::PERLANCAR/AppendPrepend'
+              version: '0.01'
+            -
+              class: Pod::Weaver::Plugin::EnsureUniqueSections
+              name: '@Author::PERLANCAR/EnsureUniqueSections'
+              version: '0.121550'
+            -
+              class: Pod::Weaver::Plugin::SingleEncoding
+              name: '@Author::PERLANCAR/SingleEncoding'
+              version: '4.012'
+      name: '@Filter/PodWeaver'
+      version: '4.006'
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Filter/PruneFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@Filter/ReadmeFromPod'
+      version: '0.32'
+    -
+      class: Dist::Zilla::Plugin::Rinci::AddPrereqs
+      name: '@Filter/Rinci::AddPrereqs'
+      version: '0.06'
+    -
+      class: Dist::Zilla::Plugin::Rinci::Validate
+      name: '@Filter/Rinci::Validate'
+      version: '0.20'
+    -
+      class: Dist::Zilla::Plugin::SetScriptShebang
+      name: '@Filter/SetScriptShebang'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          bail_out_on_fail: '0'
+          fail_on_warning: author
+          fake_home: '0'
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          needs_display: '0'
+          phase: test
+          script_finder:
+            - ':ExecFiles'
+          skips: []
+      name: '@Filter/Test::Compile'
+      version: '2.053'
+    -
+      class: Dist::Zilla::Plugin::Test::Rinci
+      name: '@Filter/Test::Rinci'
+      version: '0.02'
+    -
+      class: Dist::Zilla::Plugin::EnsureSQLSchemaVersionedTest
+      name: '@Filter/EnsureSQLSchemaVersionedTest'
+      version: '0.01'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::Extras
+      name: 'lint-prereqs / assume-provided'
+      version: '0.03'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.037'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.037'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.037'
+x_authority: cpan:PERLANCAR

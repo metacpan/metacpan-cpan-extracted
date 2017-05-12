@@ -1,0 +1,43 @@
+Revision history for perl module Device::WebIO
+
+0.010 2015-03-22
+
+- Fix adc_max_int() being required for ADC classes when it doesn't need to be
+- Fix bad default code in MockSPI
+
+0.009 2015-01-03
+
+- SPI implemented
+
+0.008 2014-11-30
+
+- VideoCallback implemented
+
+0.007 2014-11-27
+
+- DigitalInputCallback implemented
+
+0.006 2014-11-12
+
+- Add img_quality() and img_set_quality() for StillImage
+- Correct 001_load to check for right I2C modules
+
+0.005 2014-10-10
+
+- Add docs for I2CProvider, I2CUser, and TempSensor
+
+0.004 2014-10-09
+
+- Implement temperature sensor interface
+
+0.003 2014-10-04
+
+- Still Image API defined
+
+0.002 2014-09-20
+
+- all_desc() and pin_desc() added as required GPIO methods
+
+0.001 2014-08-28
+
+- Basic API defined

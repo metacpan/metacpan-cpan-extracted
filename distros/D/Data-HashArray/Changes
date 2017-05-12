@@ -1,0 +1,21 @@
+Revision history for Perl extension Data::HashArray 
+
+1.03 Sun Jul 13 2014
+	- Adjusted DISTNAME to not include "dist/" prefix (somehow, some of the files were not getting indexed by PAUSE. Could it be because of the "dist/" prefix?)
+	
+1.02 Sun Jul 13 2014
+	- Improved maintainability. No change in code or functionality.
+	-   * Enhanced MANIFEST.SKIP (taking into account git, Eclipse, Mac OS X)
+	-   * Put the module under version control (git) 
+	
+1.01 2013
+	- Supressed "unitialized" warnings
+
+1.0	 Sat Jul 05 2008
+	- Changed the documentation to reflect the name change.
+	- Created test cases.
+	- First distribution on CPAN
+	
+0.20 Sat Jul 05 2008
+	- Created by copying from XML::Pastor::NodeArray (refactoring)
+

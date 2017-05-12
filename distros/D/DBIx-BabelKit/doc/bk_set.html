@@ -1,0 +1,114 @@
+<html>
+<head>
+<title>BabelKit HTML Select Methods</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="bk_select.html">HTML Select</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_update.html">Code Table Updates</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Code Set Methods</h2></center>
+
+Sometimes we need access to a full code data set.
+
+
+<h4>lang_set()</h4>
+
+<pre>
+$rows = $babelkit-&gt;lang_set($code_set, $code_lang);
+</pre>
+
+<p>
+The lang_set() method returns an array of code row arrays
+for the code and language specified.  Missing language
+translations for the language requested will result in
+missing rows.
+
+<p>
+Each row consists of the code_code, code_desc, code_order
+and code_flag fields sorted by code_order and code_code.
+
+<p>
+The code_order and code_flag values for each code are
+stored in the native language code rows only.  So if
+you ask lang_set() for a non-native language the rows
+will not be sorted by the code_order field or include the
+'d' deprecated flags in the code_flag field.
+
+
+<h4>full_set()</h4>
+
+<pre>
+$rows = $babelkit-&gt;full_set($code_set, $code_lang);
+</pre>
+
+<p>
+The full_set() method is exactly like the lang_set() method
+except that any missing translations are filled in with the
+native language descriptions, the sort is by code_order,
+code_code and code_flag will include the 'd' deprecated flags.
+
+<p>
+Here are some examples that print out the non-deprecated
+month codes and their descriptions:
+
+<pre>
+<b># PHP</b>
+print "&lt;pre&gt;\n";
+$set_list = $babelkit-&gt;full_set('month', $lang);
+foreach ( $set_list as $row ) {
+    list( $code_code, $code_desc, $code_order, $code_flag ) = $row;
+    if ($code_flag == 'd') continue;
+    printf("%2d - %s\n", $code_code, $code_desc);
+}
+print "&lt;/pre&gt;\n";
+</pre>
+
+<pre>
+<b># Perl</b>
+print "&lt;pre&gt;\n";
+my $set_list = $babelkit-&gt;full_set('month', $lang);
+for my $row ( @$set_list ) {
+    my ( $code_code, $code_desc, $code_order, $code_flag ) = @$row;
+    next if $code_flag eq 'd';
+    printf("%2d - %s\n", $code_code, $code_desc);
+}
+print "&lt;/pre&gt;\n";
+</pre>
+
+
+<p>
+<div align="right">
+[<a href="bk_select.html">HTML Select</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_update.html">Code Table Updates</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

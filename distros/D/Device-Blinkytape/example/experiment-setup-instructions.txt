@@ -1,0 +1,10 @@
+
+On Mac OS X:
+
+1) Install http://perlbrew.pl/
+2) Install latest stable perl with it
+3) Install cpanm with it
+4) run: cpanm Device::BlinkyTape
+5) run: cpanm Time::HiRes
+6) run: cd example
+7) run: ./experiment.pl

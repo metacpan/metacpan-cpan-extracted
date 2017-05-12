@@ -1,0 +1,14 @@
+Revision history for Dist-Zilla-Plugin-Breaks
+
+0.004     2016-08-19 00:46:59Z
+          - clarify wording in abstract
+
+0.003     2014-08-16 23:34:49Z
+          - drop some unneeded prereqs and update metadata
+
+0.002     2014-02-12 04:54:27Z
+          - remove warning when a bare version number (without ">=") is
+            provided in configs, as this is perfectly legal
+
+0.001     2014-02-10 00:51:24Z
+          - Initial release.

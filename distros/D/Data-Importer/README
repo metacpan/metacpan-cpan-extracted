@@ -1,0 +1,154 @@
+DESCRIPTION
+    Base class for handling the import of the spreadsheet file
+
+    Subclass this.
+
+SYNOPSIS
+    # Your Importer class package My::Importer;
+
+    use Moose;
+
+    extends 'Data::Importer';
+
+    sub mandatory_columns { return [qw/name description price/]; }
+
+    sub validate_row { my ($self, $row, $lineno) = @_; # XXX validation #
+    return $self->add_error("Some error at $lineno") if some condition; #
+    return $self->add_warning("Some warning at $lineno") if some condition;
+    $self->add_row($row); }
+
+    sub import_row { my ($self, $row) = @_;
+    $schema->resultset('Table')->create($row) or die; }
+
+    # Import the file like this
+
+    my $import = My::Importer->new( schema => $schema, file_name =>
+    $file_name, ); $import->do_work;
+
+ATTTRIBUTES
+  schema
+    Yes, we use DBIx::Class. Send your schema.
+
+  dry_run
+    Set to true if this is only a test
+
+  file_name
+    The name of the spreadsheet
+
+  encoding
+    The encoding of the spreadsheet
+
+  import_type
+    Three formats are supported, csv, xls, ods
+
+  mandatory
+    Required input columns
+
+  optional
+    Required input columns
+
+"PRIVATE" ATTRIBUTES
+  import_iterator
+    An iterator for reading the import file
+
+  rows
+    An arrayref w/ the rows to be inserted / updated
+
+  warnings
+    An arrayref w/ all the warnings picked up during processing
+
+    These methods are associated with warnings:
+
+   all_warnings
+    Returns all elements
+
+   add_warning
+    Add a warning
+
+   join_warnings
+    Join all warnings
+
+   count_warnings
+    Returns the number of warnings
+
+   has_warnings
+    Returns true if there are warnings
+
+   has_no_warnings
+    Returns true if there isn't any warning
+
+   clear_warnings
+    Clear out all warnings
+
+  errors
+    An arrayref w/ all the errors picked up during processing
+
+    These methods are associated with errors:
+
+   all_errors
+    Returns all elements
+
+   add_error
+    Add a error
+
+   join_errors
+    Join all errors
+
+   count_errors
+    Returns the number of errors
+
+   has_errors
+    Returns true if there are errors
+
+   has_no_errors
+    Returns true if there isn't any error
+
+   clear_errors
+    Clear out all errors
+
+  timestamp
+    Time of the import run.
+
+METHODS
+  mandatory_columns
+    Builds the mandatory attribute, which gives an arrayref with the
+    required columns.
+
+  optional_columns
+    Builds the optional attribute, which gives an arrayref with the optional
+    columns.
+
+  do_work
+    Import a file
+
+  validate
+    Validates the import file
+
+  validate_row
+    Handle each individual row.
+
+    This has to be written in the subclass
+
+  import_run
+    Imports the nodes after validate has been run
+
+  import_transaction
+    Called inside the transaction block.
+
+    This is the method to add method modifiers to if processing before or
+    after the row import loop is necessary.
+
+  import_row
+    Handle each individual row.
+
+    This has to be written in the subclass
+
+  import_failed
+    Called if the import failed for some reason
+
+  import_succeeded
+    Called after the import has finished succesfully
+
+  report
+    Make a report of what happened
+

@@ -1,0 +1,22 @@
+---
+abstract: 'Automatically set column default values on insert'
+author:
+  - 'Graham Barr'
+build_requires:
+  DBICx::TestDatabase: 0
+  DateTime::Format::SQLite: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-ColumnDefault
+requires:
+  DBIx::Class: 0
+  DateTime: 0
+resources:
+  repository: git://github.com/gbarr/DBIx-Class-ColumnDefault.git
+version: 0.122200

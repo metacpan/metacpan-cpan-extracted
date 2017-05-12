@@ -1,0 +1,15 @@
+CHANGES
+MANIFEST
+Makefile.PL
+README
+Sorting.pm
+t/benchmark.pl
+t/calling.t
+t/coderefs.t
+t/methods.t
+t/misc.t
+t/numeric.t
+t/profile.pl
+t/sort_tests.pl
+t/structures.t
+t/substrs.t

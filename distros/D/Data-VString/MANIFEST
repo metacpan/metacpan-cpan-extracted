@@ -1,0 +1,15 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+
+t/001parse.t
+t/002format.t
+t/003satisfy.t
+t/004cmp.t
+t/098pod-coverage.t                      Tests for POD coverage
+t/099pod.t                               Tests POD for errors
+
+lib/Data/VString.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

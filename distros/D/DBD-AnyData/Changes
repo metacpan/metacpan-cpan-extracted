@@ -1,0 +1,133 @@
+DBD::AnyData - DBI access to XML,CSV and other data
+
+Revision history for Perl extension DBD::AnyData.
+
+version 0.110 release 17th July 2010
+
+* new maintainer Jens Rehsack
+* fixes to run with DBI-1.612
+
+version 0.09 released 15 June 2007
+
+* finally fixed the "cleared while still active" bug
+
+version 0.08, released 18 April 2004
+
+ * now sets $dbh->{Active} on with $dbh->connect and off
+   with $dbh->disconnect; this allows it to work with
+   Ima::DBI, Class::DBI and other environments that cache
+   a database handle
+
+version 0.07, released 15 March 2004
+
+ * fixed problem with DBD::File-0.03 STORE
+   (thanks to Dan Wright for bug report)
+
+ * fixed ad_import with DBI and keep_connection flag to operate according
+   to the docs (when set, allows you to keep a connection)
+   (thanks to Dan Wright for bug report)
+
+ * fixed func() calls so they can optionally be called without func()
+   if you have DBI version 1.37 or higher, for example these are the same:
+
+     $dbh->ad_dump('SELECT * FROM old');
+     $dbh->func('SELECT * FROM old','ad_dump');
+
+   this also applies to ad_import(), ad_convert(), ad_catalog(),
+   ad_export() and ad_clear()
+
+version 0.06, released 25 August 2003
+
+ prepare()   : added caching of parser
+ Makefile.PL : added prereqs, (thx Scott Godin and Intrepid)
+ test.pl     : changes $sth->{NAME} to $th->{NAME_lc}, omitted XML & HTML tests
+
+version 0.05, released 17 July, 2001
+
+ There are major changes in the way the tied hash interface
+ does deletions and exporting and in the XML and Weblog format
+ parsers.  If you use the tied hash interface or XML or Weblog
+ (in either interface), please update to this version.
+
+ The Big Stuff:
+
+   * XML now accepts user-supplied tag-to-column mappings.
+
+   * Import now supports cross and outer joins by importing more than
+     one table into the same in-memory table.
+
+ Many minor fixes:
+
+ * fixed adExport to allow flags as documented
+   (thx Matthew Wickline)
+
+ * greatly improved and speeded up deletions from tied hashes
+   and documented how they work (thx *alot* Matthew Wickline)
+
+ * fixed weblog to handle embedded double quotes
+   (thx Bob O'Neill)
+
+ * added documentation to DBD::AnyData on cross joins and full
+   outer joins as part of the import statement
+
+ * fixed tests so they skip XML and HTMLtable if the
+   required extra modules (e.g. XML::Twig) aren't available
+   (thx Malcolm Cook)
+
+ * fixed XML to be able to work with XML::Twig 3.00 as well
+   as earlier versions (meant to do that earlier)
+
+ * fixed README to mention that DBD::AnyData replaces
+   DBD::RAM (thx Mark Whittiker)
+
+ * fixed weblog README to use current method and column names
+   (thx Bob O'Neill)
+
+ * fixed HTMLtable so that it can be used to export even if
+   HTML::TableExtract and HTML::Parser aren't installed
+   (thx Matthew Wickline)
+
+ * fixed bad version number on DBD::AnyData - it reported 0.03
+   instead of 0.04 (hey I caught this one all by myself)
+
+ * added version numbers to all of the submodules and standardized
+   the docs
+
+Version 0.04, 26th June, 2001
+
+ * Beta release
+
+Version 0.03, 17th April, 2001
+
+ * second Alpha release
+
+Version 0.02, 4th February, 2001
+
+ * first Alpha release
+
+Version 0.01, 17th January, 2001
+
+ * pre Alpha release
+
+Changes from DBD::RAM to DBD::AnyData
+
+  * streamlined interface, faster operations
+
+  * now supports new formats: HTMLtable, Passwd, Weblog, Paragraph
+
+  * import() now supports SELECT (import only the columns and rows
+    you specify) and joining multiple tables into a single table
+
+  * a new convert() method allows one-step conversion between any
+    of the supported formats
+
+  * additional support for remote files including authentication
+
+  * additional support for XML including greatly improved export()
+    and use of the document's DTD for both importing and exporting
+
+Gotchas in moving from DBD::RAM to DBD::AnyData
+
+  * the func() methods now all start with ad_, thus ad_catalog instead
+    of catalog
+

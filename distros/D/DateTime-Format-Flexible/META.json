@@ -1,0 +1,51 @@
+{
+   "abstract" : "DateTime::Format::Flexible - Flexibly parse strings and turn them into DateTime objects.",
+   "author" : [
+      "Tom Heady (cpan@punch.net)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-Flexible",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::Builder" : "0.74",
+            "DateTime::TimeZone" : "0",
+            "List::MoreUtils" : "0",
+            "Module::Pluggable" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::MockTime" : "0",
+            "Test::Simple" : "0.44"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.28"
+}

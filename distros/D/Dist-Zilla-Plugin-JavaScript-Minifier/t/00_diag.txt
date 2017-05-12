@@ -1,0 +1,9 @@
+Dist::Zilla::File::FromCode
+Dist::Zilla::Role::FileGatherer
+Dist::Zilla::Role::FileInjector
+ExtUtils::MakeMaker
+JavaScript::Minifier::XS
+Moose
+Test::DZil
+Test::More
+namespace::autoclean

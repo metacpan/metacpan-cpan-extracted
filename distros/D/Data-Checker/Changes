@@ -1,0 +1,43 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+1.00  2014-01-30
+  - Initial release.
+
+1.01  2014-09-08
+  - Add examples to docs
+  - Fixed a DNS test (RT 98598)
+  - Added Data::Checker::IP
+  - Modified Data::Checker::DNS to support IPs
+  - Modified check_value method to support non-negatable tests
+
+1.02  2014-09-09
+  - The DNS test had 2 problems.  The 1.01 release only fixed one
+    of them.  This adds a workaround for some broken versions of
+    Net::DNS.  (RT 98598)
+
+1.03  2014-09-11
+  - Minor changes to some tests
+  - Put distro on GitHub.  Gabor Szabo
+
+1.04  2014-09-15
+  - Fixed a problem related to the new .git directory that prevented
+    it from installing correctly.
+
+1.05  2014-11-24
+  - Fixed dns.t file.  Thanks to two CPAN testers (Nigel Horne and
+    Chris Williams) for assisting me in finding the offending test.
+
+1.06  2015-04-16
+  - Improved POD formatting.
+
+1.07  2016-11-02
+  - Disabled PING tests during installation (they are too unstable)
+    RT 118541
+  - Added date checks.
+  - Fixed parallel tests.
+
+1.08
+  - Cleaned up some tests.
+

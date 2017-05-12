@@ -1,0 +1,20 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+DIXS.xs
+DirectoryIterator.hh
+DirectoryIterator.cc
+perl_error.hh
+perl_error.cc
+lib/Directory/Iterator/XS.pm
+t/Directory-Iterator-back.t
+t/BackendModule.pm
+t/data/n/1
+t/data/n/2
+t/data/n/3
+t/data/n/n2/4
+t/data/n/.dot
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

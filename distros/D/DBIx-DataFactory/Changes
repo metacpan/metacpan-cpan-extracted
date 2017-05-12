@@ -1,0 +1,20 @@
+Revision history for DBIx::DataFactory
+
+0.0.1    Tue Oct 18 08:56:04 2011
+        - Initial release
+
+0.0.2    Fri Oct 28 09:29:13 2011
+        - Notice: change interface!
+        - not export factory_method
+        - reuse dbh and SQL::Maker instance
+        - no use DBIx::Simple
+
+0.0.3    Mon Nov 28 21:46:41 2011
+        - set value of auto increment column into return value
+
+0.0.4    Wed Nov 30 14:55:58 2011
+        - refetch when create for setting database default value to return value
+        - add parameter named creator for using original method for creating data
+
+0.0.5    Fri Feb 17 16:35:26 2012
+        - add dbh and connect_attr parameters

@@ -1,0 +1,92 @@
+NAME
+    DBIx::Pager - SQL paging helper.
+
+SYNOPSIS
+      use DBIx::Pager;
+
+      my $pager = DBIx::Pager->new(
+           dsn => 'dbi:mysql:test',
+           user => 'root',
+           table => 'table',
+           offset => 0,
+           limit => 20
+      );
+
+      if($pager->has_next) {
+          # ...
+      }
+
+DESCRIPTION
+    DBIx::Pager supports calculation about paging when SELECT a lot of data.
+    this module is suitable for Web application using MySQL and Template-
+    Toolkit.
+
+METHODS
+    $pager = DBIx::Pager->new(%args)
+        construct DBIx::Pager object. the optios are below.
+
+    dsn      DBI datasource.
+
+    user     DBI username
+
+    password DBI password
+
+    dbh      connected database handle.
+
+    table    setup table name. (require)
+
+    limit    limit of data per page. (require)
+
+    offset   offset of page. (default 0)
+
+    where_clause
+             SQL where clause.
+
+               
+               my $pager = DBIx::Pager->new(
+                    dbh => $dbh
+                    table => 'table',
+                    offset => 0,
+                    limit => 20,
+                    where_clause => 'WHERE id < 1000'
+               );
+               
+               # with place holder.
+               my $pager = DBIx::Pager->new(
+                    dbh => $dbh
+                    table => 'table',
+                    offset => 0,
+                    limit => 20,
+                    where_clause => [ 'WHERE id < ?', $id ]
+               );
+
+    $total = $pager->total
+        total count of rows.
+
+    $pager->has_next
+        return true when pager has next pages.
+
+    $pager->has_prev
+        return true when pager has previous pages.
+
+    $pager->next_offset
+        return next offset.
+
+    $pager->prev_offset
+        return previous offset.
+
+    $pager->page_count
+        return total "page" count.
+
+    $page->current_page
+        reutrn current page number. first is 1.
+
+AUTHOR
+    IKEBE Tomohiro <ikebe@edge.co.jp>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Data::Page manpage the DBI manpage
+

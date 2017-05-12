@@ -1,0 +1,20 @@
+---
+abstract: 'Simple interface for calling PostgreSQL functions from Perl'
+author:
+  - 'Joel Jacobson <joel@trustly.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+test_requires:
+  Test::Exception: 0.32
+generated_by: 'Dist::Zilla version 1.100660'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Pg-CallFunction
+requires:
+  DBI: 1.605
+resources:
+  repository: git://github.com/joelonsql/dbix-pg-callfunction.git
+version: 0.019

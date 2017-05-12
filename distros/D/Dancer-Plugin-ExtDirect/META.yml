@@ -1,0 +1,21 @@
+---
+abstract: 'ExtDirect plugin for Dancer'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-ExtDirect
+requires:
+  Dancer: 1.3072
+  JSON: 2.53
+resources:
+  bugtracker: https://github.com/alexrj/Dancer-Plugin-ExtDirect/issues
+  repository: git://github.com/alexrj/Dancer-Plugin-ExtDirect.git
+version: 1.03

@@ -1,0 +1,15 @@
+Revision history for Data-HexDump-XXD
+
+0.1.1  Sun Jul 21 14:47:00 2013
+       Fixed problem with POD encoding.
+       Removed POD tests for non-authors.
+
+0.1.0  Mon Nov 12 11:03:00 2007
+       Added example xxd replacement.
+       Fixed a bug.
+
+0.0.2  Tue Jul 31 18:18:18 2007
+       Added tests in MANIFEST.
+
+0.0.1  Tue Jul 31 10:22:35 2007
+       Initial release.

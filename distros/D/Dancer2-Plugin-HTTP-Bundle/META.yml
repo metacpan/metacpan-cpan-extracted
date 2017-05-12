@@ -1,0 +1,25 @@
+---
+abstract: 'The missing HTTP bits of Dancer2 Bundled'
+author:
+  - 'Theo van Hoesel <Th.J.v.Hoesel@THEMA-MEDIA.nl>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-HTTP-Bundle
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2::Plugin::HTTP::Caching: '0'
+  Dancer2::Plugin::HTTP::ConditionalRequest: '0'
+  Dancer2::Plugin::HTTP::ContentNegotiation: '0'
+  perl: '5.006'
+version: '0.02'

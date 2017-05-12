@@ -1,0 +1,49 @@
+NAME
+    Dist::Zilla::Plugin::ConvertYAMLChanges - Convert Changes from YAML to
+    CPAN::Changes format
+
+VERSION
+    This document describes version 0.02 of
+    Dist::Zilla::Plugin::ConvertYAMLChanges (from Perl distribution
+    Dist-Zilla-Plugin-ConvertYAMLChanges), released on 2014-05-17.
+
+SYNOPSIS
+    In dist.ini:
+
+     [ConvertYAMLChanges]
+
+DESCRIPTION
+    This plugin converts Changes from YAML format (like that found in "Mo"
+    or other INGY's distributions) to CPAN::Changes format. First written to
+    aid Neil Bowers' quest[1].
+
+    [1]
+    http://blogs.perl.org/users/neilb/2013/10/fancy-writing-a-distzilla-plug
+    in.html
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-ConvertYAMLChanges>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Dist-Zilla-Plugin-ConvertYAMLChanges>
+    .
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Con
+    vertYAMLChanges>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

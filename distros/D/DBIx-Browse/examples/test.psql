@@ -1,0 +1,13 @@
+--
+-- SQL comand to create the tables need by the test scripts
+-- 
+CREATE TABLE Class (
+	Id SERIAL PRIMARY KEY,
+	Name VARCHAR(25)
+);
+CREATE TABLE Item (
+	Id	SERIAL PRIMARY KEY,
+	Name	VARCHAR(25),
+	Class	INTEGER,
+	FOREIGN KEY(Class) REFERENCES Class
+);

@@ -1,0 +1,50 @@
+{
+   "abstract" : "translates constants back to named symbols",
+   "author" : [
+      "chromatic <chromatic@wgz.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Constants",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "constant" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "subs" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/Devel-Constants",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/Devel-Constants.git",
+         "web" : "https://github.com/neilb/Devel-Constants"
+      }
+   },
+   "version" : "1.04"
+}
+

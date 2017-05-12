@@ -1,0 +1,21 @@
+sudo: true 
+language: perl
+perl:
+   - 'blead'
+   - '5.20'
+   - '5.18'
+   - '5.16'
+   - '5.10'
+matrix:
+   allow_failures:
+      - perl: 'blead'
+   fast_finish: true
+branches:
+   only: /^build\/.*/
+before_install:
+   - rm .travis.yml
+   - export AUTHOR_TESTING=0
+   - sudo apt-get -qq update
+   - sudo apt-get install -y libi2c-dev
+install:
+   - cpanm --installdeps --verbose  .

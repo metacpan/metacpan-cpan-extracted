@@ -1,0 +1,12 @@
+This directory contains the sample DataPanel database linux.DTB that implemts
+a simple muic player interface.
+
+This is how we made the Tux bitmap in the 'linux' DataDesigner database
+
+Max height for DataPanel 160 bitmaps is 48, so we rescale the big GIF
+
+giftopnm tux-sw.gif| pamscale -ysize=48 |pamditherbw|pamtopnm|ppmtobmp>tux-sw.bmp       
+
+then load and save tux-sw.bmp using Windows Paint, otherwise you get a file
+format error from DataDesigner. Sigh.
+

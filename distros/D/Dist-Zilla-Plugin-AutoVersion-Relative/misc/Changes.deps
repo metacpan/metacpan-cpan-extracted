@@ -1,0 +1,178 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper 0.003002
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Tester
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+1.001000 2014-08-29T15:43:44Z
+ [Added / runtime requires]
+ - Const::Fast
+ - Dist::Zilla::Util::ConfigDumper 0.003002
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+ - Test::DZil
+
+ [Removed / runtime requires]
+ - Readonly
+
+1.000001 2014-08-15T21:15:21Z
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+1.000000 2014-07-31T05:37:28Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Dist::Zilla 0 → 2.10131
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4004
+
+ [Removed / configure requires]
+ - Module::Build 0.4004
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.03000002 2013-04-09T02:50:19Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.03000001 2012-02-03T02:19:44Z
+
+0.03000000 2012-02-02T10:42:53Z
+
+0.02000000 2012-02-02T10:23:49Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01060309 2011-04-05T21:49:08Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::TextTemplate
+ - Dist::Zilla::Role::VersionProvider
+
+0.01037118 2010-08-22T06:25:19Z
+ [Added / test requires]
+ - English
+
+ [Changed / runtime requires]
+ - namespace::autoclean 0.08 → 0.09
+
+0.01035617 2010-08-07T05:42:35Z
+ [Changed / runtime requires]
+ - Moose 0.89 → 1.09
+ - MooseX::StrictConstructor 0.08 → 0.10
+
+ [Removed / runtime requires]
+ - Test::More
+
+0.01034313 2010-07-25T01:17:26Z
+ [Added / test requires]
+ - Dist::Zilla
+ - Dist::Zilla::Plugin::GatherDir
+ - Dist::Zilla::Tester
+ - File::Find
+ - File::Temp
+ - Test::More 0.88
+
+ [Removed / build requires]
+ - Dist::Zilla
+ - Dist::Zilla::Plugin::GatherDir
+ - Dist::Zilla::Tester
+ - File::Find
+ - Test::Kwalitee
+ - Test::More
+ - Test::Perl::Critic
+
+ [Removed / runtime requires]
+ - MooseX::Has::Sugar 0.0404
+
+0.01027903 2010-05-22T15:24:03Z
+ [Added / build requires]
+ - Dist::Zilla
+ - Dist::Zilla::Plugin::GatherDir
+ - Dist::Zilla::Tester
+ - File::Find
+ - Test::Kwalitee
+ - Test::More
+ - Test::Perl::Critic
+
+ [Changed / build requires]
+ - Module::Build 0.35 → 0.3601
+
+ [Changed / configure requires]
+ - Module::Build 0.35 → 0.3601
+
+ [Changed / runtime requires]
+ - Dist::Zilla 1.092310 → 2.10131
+
+0.01010513 2009-12-04T01:46:57Z
+ [Added / runtime requires]
+ - MooseX::Types::DateTime 0.05
+
+ [Removed / runtime requires]
+ - MooseX::Types::DateTime::ButMaintained 0.08
+
+0.01010014 2009-11-30T02:44:26Z
+ [Added / runtime requires]
+ - Readonly
+
+0.01010003 2009-11-29T15:50:13Z
+ [Added / build requires]
+ - Module::Build 0.35
+
+ [Added / configure requires]
+ - Module::Build 0.35
+
+0.01006104 2009-10-21T16:56:39Z
+ [Added / runtime requires]
+ - MooseX::StrictConstructor 0.08
+
+0.01000119 2009-08-24T07:05:45Z

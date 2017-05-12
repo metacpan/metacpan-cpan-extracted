@@ -1,0 +1,668 @@
+NAME
+    DBIx::MoCo - Light & Fast Model Component
+
+SYNOPSIS
+      # First, set up your db.
+      package Blog::DataBase;
+      use base qw(DBIx::MoCo::DataBase);
+
+      __PACKAGE__->dsn('dbi:mysql:dbname=blog');
+      __PACKAGE__->username('test');
+      __PACKAGE__->password('test');
+
+      1;
+
+      # Second, create a base class for all models.
+      package Blog::MoCo;
+      use base qw 'DBIx::MoCo'; # Inherit DBIx::MoCo
+      use Blog::DataBase;
+
+      __PACKAGE__->db_object('Blog::DataBase');
+
+      # If you want to use caching feature, you must explicitly set a
+      # cache object via cache_object() method.
+
+      use Cache::Memcached;
+      my $cache = Cache::Memcached->new;
+      $cache->set_servers([ ... ])
+      __PACKAGE__->cache_object($cache); # Enables caching by memcached
+
+      1;
+
+      # Third, create your models.
+      package Blog::User;
+      use base qw 'Blog::MoCo';
+
+      __PACKAGE__->table('user');
+      __PACKAGE__->has_many(
+          entries => 'Blog::Entry',
+          { key => 'user_id' }
+      );
+      __PACKAGE__->has_many(
+          bookmarks => 'Blog::Bookmark',
+          { key => 'user_id' }
+      );
+
+      1;
+
+      package Blog::Entry;
+      use base qw 'Blog::MoCo';
+
+      __PACKAGE__->table('entry');
+      __PACKAGE__->has_a(
+          user => 'Blog::User',
+          { key => 'user_id' }
+      );
+      __PACKAGE__->has_many(
+          bookmarks => 'Blog::Bookmark',
+          { key => 'entry_id' }
+      );
+
+      1;
+
+      package Blog::Bookmark;
+      use base qw 'Blog::MoCo';
+
+      __PACKAGE__->table('bookmark');
+      __PACKAGE__->has_a(
+          user => 'Blog::User',
+          { key => 'user_id' }
+      );
+      __PACKAGE__->has_a(
+          entry => 'Blog::Entry',
+          { key => 'entry_id' }
+      );
+
+      1;
+
+      # Now, You can use some methods same as Class::DBI.
+      # And, all objects are stored in cache automatically.
+      my $user = Blog::User->retrieve(user_id => 123);
+      print $user->name;
+      $user->name('jkontan'); # update db immediately
+      print $user->name; # jkontan
+
+      my $user2 = Blog::User->retrieve(user_id => 123);
+      # $user is same as $user2
+
+      # You can easily get has_many objects array.
+      my $entries = $user->entries;
+      my $entries2 = $user->entries;
+      # $entries is same reference as $entries2
+      my $entry = $entries->first; # isa Blog::Entry
+      print $entry->title; # you can use methods in Entry class.
+
+      Blog::Entry->create(
+        user_id => 123,
+        title => 'new entry!',
+      );
+      # $user->entries will be flushed automatically.
+      my $entries3 = $user->entries;
+      # $entries3 isnt $entries
+
+      print ($entries->last eq $entries2->last); # 1
+      print ($entries->last eq $entries3->last); # 1
+      # same instance
+
+      # You can delay update/create query to database using session.
+      DBIx::MoCo->start_session;
+      $user->name('jkondo'); # not saved now. changed in cache.
+      print $user->name; # 'jkondo'
+      $user->save; # update db
+      print Blog::User->retrieve(123)->name; # 'jkondo'
+
+      # Or, update queries will be thrown automatically after ending session.
+      $user->name('jkontan');
+      DBIx::MoCo->end_session;
+      print Blog::User->retrieve(123)->name; # 'jkontan'
+
+DESCRIPTION
+    Light & Fast Model Component
+
+CLASS DEFINITION METHODS
+    Here are common methods related with class definitions.
+
+    add_trigger
+        Adds triggers. Here are the types which called from DBIx::MoCo.
+
+          before_create
+          after_create
+          before_update
+          after_update
+          before_delete
+
+        You can add your trigger like this.
+
+          package Blog::User;
+          __PACKAGE__->add_trigger(before_create => sub
+            my ($class, $args) = @_;
+            $args->{name} .= '-san';
+          });
+
+          # in your scripts
+          my $u = Blog::User->create(name => 'ishizaki');
+          is ($u->name, 'ishizaki-san'); # ok.
+
+        "before_create" passes a hash reference of new object data as the
+        second argument, and all other triggers pass the instance $self.
+
+    has_a
+        Defines has_a relationship between 2 models.
+
+    has_many
+        Defines has_many relationship between 2 models. You can define
+        additional conditions as below.
+
+          Blog::User->has_many(
+            root_messages => 'Blog::Message', {
+              key => {name => 'to_name'},
+              condition => 'reference_id is null',
+              order => 'modified desc',
+            },
+          );
+
+        "condition" is additional sql statement will be used in where
+        statement. "order" is used for specifying order statement.
+
+        In above case, SQL statement will be
+
+          SELECT message_id FROM message
+          WHERE to_name = 'myname' AND reference_id is null
+          ORDER BY modified desc
+
+        And, all each results will be inflated as Blog::Message by
+        retrieving all records again (with using cache).
+
+    retrieve_keys
+        Defines keys for retrieving by retrieve_all etc.
+
+        If there aren't any unique keys in your table, please specify these
+        keys.
+
+          package Blog::Bookmark;
+
+          __PACKAGE__->retrieve_keys(['user_id', 'entry_id']);
+          # When user can add multiple bookmarks onto same entry.
+
+    primary_keys
+        Returns primary keys. Usually it returns them automatically by
+        retrieving schema data from database.
+
+        But you can also redefine this parameter by overriding this method.
+        It's useful when MoCo cannot get schema data from your dsn.
+
+          sub primary_keys {['user_id']}
+
+    unique_keys
+        Returns unique keys including primary keys. You can override this as
+        same as "primary_keys".
+
+          sub unique_keys {['user_id','name']}
+
+    schema
+        Returns DBIx::MoCo::Schema object reference related with your model
+        class. You can set/get any parameters using Schema's "param" method.
+        See DBIx::MoCo::Schema for details.
+
+    columns
+        Returns array reference of column names.
+
+    has_column(col_name)
+        Returns which the table has the column or not.
+
+    utf8_columns
+        Receives array reference and defines utf8 columns.
+
+        When you call utf8 column method, you'll get string with utf8 flag
+        on. But you can get raw string when you call param('colname')
+        method.
+
+          __PACKAGE__->utf8_columns([qw(title body)]);
+
+          my $e = Blog::Entry->retrieve(1);
+          print Encode::is_utf8($e->title); # true
+          print Encode::is_utf8($e->param('title')); # false
+          print Encode::is_utf8($e->uri); # false
+
+    list_class
+        By default, retrieve_all(), search(), etc. return results as a
+        DBIx::MoCo::List object when in scalar context. If you want to add
+        some features into the list class, you can make a subclass of
+        DBIx::MoCo::List and tell your model class to use your own class
+        instead by specifying the class via list_class() method.
+
+          # In Blog::Entry
+          __PACKAGE__->list_class('Blog::Entry::List');
+
+          # In Blog::Entry::List
+          package Blog::Entry::List;
+          use base qw/DBIx::MoCo::List/;
+
+          sub to_rss {
+              processing rss from entries ...
+          }
+
+          1;
+
+          # The return value now has to_rss() method.
+          my $entries = Blog::Entry->search( ... ); # is a Blog::Entry::List
+          $entries->to_rss;
+
+CACHING FEATURE
+  Setup
+    If you want to use caching feature provided by DBIx::MoCo, you must
+    explicitly set the object via cache_object() method explained below,
+    which sets an object to be used when caching data from database. The
+    object can be, for example, a Cache::* modules such as Cache::Memory,
+    Cache::Memecached, etc.
+
+      # In your Moco.pm
+      package Blog::MoCo;
+      use base qw 'DBIx::MoCo';
+
+      ...
+
+      use Cache::Memcached;
+      my $cache = Cache::Memcached->new;
+      $cache->set_servers([ ... ])
+
+      __PACKAGE__->cache_object($cache); # Enables caching by memcached
+
+  Cache Algorithm
+    MoCo caches objects effectively.
+
+    There are 3 functions to control MoCo's cache. Their functions are
+    called appropriately when some operations are called to a particular
+    object.
+
+    Here are the 3 functions.
+
+    store_self_cache
+        Stores self instance for all own possible object ids.
+
+    flush_self_cache
+        Flushes all caches for all own possible object ids.
+
+    flush_belongs_to
+        Flushes all caches whose have has_many arrays including the object.
+
+    And, here are the triggers which call their functions.
+
+    _after_create
+        Calls "store_self_cache" and "flush_belongs_to".
+
+    _before_update
+        Calls "flush_self_cache".
+
+    _after_update
+        Calls "store_self_cache".
+
+    _before_delete
+        Calls "flush_self_cache" and "flush_belongs_to".
+
+SESSION & CACHE METHODS
+    Here are common methods related with session.
+
+    start_session
+        Starts session.
+
+    end_session
+        Ends session.
+
+    is_in_session
+        Returns DBIx::MoCo is in session or not.
+
+    cache_object
+        Sets an object to be used when caching data from database. For
+        example, the object can be a Cache::* modules such as Cache::Memory,
+        Cache::Memecached, etc.
+
+    cache_status
+        Returns cache status of the current session as a hash reference.
+        cache_status provides retrieve_count, retrieve_cache_count,
+        retrieved_oids retrieve_all_count, has_many_count,
+        has_many_cache_count,
+
+    flush
+        Delete attribute from given attr. name.
+
+    save
+        Saves changed columns in the current session.
+
+    icache_expiration
+        Specifies instance cache expiration time in seconds. MoCo store
+        has_a, has_many instances in instance variable if this value is set.
+
+          __PACKAGE__->icache_expiration(30);
+
+        It's not necessary to setup icache if you are runnnig MoCo with
+        DBIx::MoCo::Cache object because it is more powerful and as fast as
+        icache.
+
+        You'd better to consider this option when you are running MoCo with
+        centralized cache mechanism such as memcached.
+
+    cache_null_object
+        Specifies which MoCo will store null object when retrieve will fail.
+
+    object_id_prefix
+        This prefix is used for generating object ids and the ids are used
+        as cache keys. Default value of this prefix is the name of class.
+
+        This option is effective when you use some classes which have parent
+        -child relationships and they represent same table.
+
+          package Blog::Entry;
+
+          sub object_id_prefix { 'Blog::Entry' }
+
+          1;
+
+          package Blog::Entry::Video;
+          use base qw(Blog::Entry);
+
+          1;
+
+        MUID value is used for object_id when the class has muid field even
+        if this prefix is specified.
+
+DATA OPERATIONAL METHODS
+    Here are common methods related with operating data.
+
+    retrieve
+        Retrieves an object and returns that using cache (if possible).
+
+          my $u1 = Blog::User->retrieve(123); # retrieve by primary_key
+          my $u2 = Blog::User->retrieve(user_id => 123); # same as above
+          my $u3 = Blog::User->retrieve(name => 'jkondo'); # retrieve by name
+
+    restore_from_db
+        Restores self attributes from db.
+
+    retrieve_by_db
+        Retrieves an object from db.
+
+    retrieve_multi
+        Returns results of given array of conditions.
+
+          my $users = Blog::User->retrieve_multi(
+            {user_id => 123},
+            {user_id => 234},
+          );
+
+    retrieve_all
+        Returns results of given conditions as "DBIx::MoCo::List" instance.
+
+          my $users = Blog::User->retrieve_all(birthday => '2001-07-15');
+
+    retrieve_or_create
+        Retrieves a object or creates new record with given data and returns
+        that.
+
+          my $user = Blog::User->retrieve_or_create(name => 'jkondo');
+
+    create
+        Creates new object and returns that.
+
+          my $user = Blog::User->create(
+            name => 'jkondo',
+            birthday => '2001-07-15',
+          );
+
+    delete
+        Deletes a object. You can call "delete" as both of class and
+        instance method.
+
+          $user->delete;
+          Blog::User->delete($user);
+
+    delete_all
+        Deletes all records with given conditions. You should specify the
+        conditions as a hash reference.
+
+          Blog::User->delete_all(where => {birthday => '2001-07-15'});
+
+    search
+        Returns results of given conditions as "DBIx::MoCo::List" instance.
+        You can specify search conditions in 3 diferrent ways. "Hash
+        reference style", "Array reference style" and "Scalar style".
+
+        Hash reference style is same as SQL::Abstract style and like this.
+
+          Blog::User->search(where => {name => 'jkondo'});
+
+        Array style is the most flexible. You can use placeholder.
+
+          Blog::User->search(
+            where => ['name = ?', 'jkondo'],
+          );
+          Blog::User->search(
+            where => ['name in (?,?)', 'jkondo', 'cinnamon'],
+          );
+          Blog::Entry->search(
+            where => ['name = :name and date like :date'],
+                     name => 'jkondo', date => '2007-04%'],
+          );
+
+        Scalar style is the simplest one, and most flexible in other word.
+
+          Blog::Entry->search(
+            where => "name = 'jkondo' and DATE_ADD(date, INTERVAL 1 DAY) > NOW()',
+          );
+
+        You can also specify "field", "order", "offset", "limit", "group",
+        "with" too. Full spec search statement will be like the following.
+
+          Blog::Entry->search(
+            field => 'entry_id',
+            where => ['name = ?', 'jkondo'],
+            order => 'created desc',
+            offset => 0,
+            limit => 1,
+            group => 'title',
+            with  => [qw(user)], # for prefetching users related to each entry
+          );
+
+        Search results will not be cached because MoCo expects that the
+        conditions for "search" will be complicated and should not be
+        cached. You should use "retrieve" or "retrieve_all" method instead
+        of "search" if you'll use simple conditions.
+
+        See Prefetching section below for details of "with" option in
+        "search()" method.
+
+    count
+        Returns the count of results matched with given conditions. You can
+        specify the conditions in same way as "search"'s where spec.
+
+          Blog::User->count({name => 'jkondo'}); # Hash reference style
+          Blog::User->count(['name => ?', 'jkondo']); # Array reference style
+          Blog::User->count("name => 'jkondo'"); # Scalar style
+
+    find
+        Similar to search, but returns only the first item as a reference
+        (not as an array).
+
+    retrieve_by_column(_and_column2)
+        Auto generated method which returns an object by using key defined
+        is method and given value.
+
+          my $user = Blog::User->retrieve_by_name('jkondo');
+
+    retrieve_by_column(_and_column2)_or_create
+        Similar to retrieve_or_create.
+
+          my $user = Blog::User->retrieve_by_name_or_create('jkondo');
+
+    retrieve_by_column_or_column2
+        Returns an object matched with given column names.
+
+          my $user = Blog::User->retrieve_by_user_id_or_name('jkondo');
+
+    param
+        Set or get attribute from given attr. name.
+
+    set Set attribute which is not related with DB schema or set temporary.
+
+    column_as_something
+        Inflate column value by using DBIx::MoCo::Column::* plugins. If you
+        set up your plugin like this,
+
+          package DBIx::MoCo::Column::URI;
+
+          sub URI {
+            my $self = shift;
+            return URI->new($$self);
+          }
+
+          sub URI_as_string {
+            my $class = shift;
+            my $uri = shift or return;
+            return $uri->as_string;
+          }
+
+          1;
+
+        Then, you can use column_as_URI method as following,
+
+          my $e = MyEntry->retrieve(..);
+          print $e->uri; # 'http://test.com/test'
+          print $e->uri_as_URI->host; # 'test.com';
+
+          my $uri = URI->new('http://www.test.com/test');
+          $e->uri_as_URI($uri); # set uri by using URI instance
+
+        The name of infrate method which will be imported must be same as
+        the package name.
+
+        If you don't define "as string" method (such as "URI_as_string"),
+        scalar evaluated value of given argument will be used for new value
+        instead.
+
+    has_a, has_many auto generated methods
+        If you define has_a, has_many relationships,
+
+          package Blog::Entry;
+          use base qw 'Blog::MoCo';
+
+          __PACKAGE__->table('entry');
+          __PACKAGE__->has_a(
+              user => 'Blog::User',
+              { key => 'user_id' }
+          );
+          __PACKAGE__->has_many(
+              bookmarks => 'Blog::Bookmark',
+              { key => 'entry_id' }
+          );
+
+        You can use those keys as methods.
+
+          my $e = Blog::Entry->retrieve(..);
+          print $e->user; # isa Blog::User
+          print $e->bookmarks; # isa ARRAY of Blog::Bookmark
+
+    quote
+        Quotes given string using DBI's quote method.
+
+HINTS FOR PERFORMANCE
+  Prefetching
+    By default, DBIx::MoCo can issue too many queries in such case as below:
+
+      my $user = Blog::User->retrieve(name => $name);
+      for my $entry ( $user->entries ) {
+          ## Entry has a user
+          $entry->user->name;
+      }
+
+    The code above executes more than twice as many queries as the count
+    "$user-"entries->size> method returns, which can cause problems on
+    performance when the count is large. DBIx::MoCo provides prefetching
+    feature to solve the problem.
+
+    You can specify the target to be prefetched by *with* option in model
+    class definitions as below:
+
+      package Blog::User;
+      use base qw 'Blog::MoCo';
+
+      __PACKAGE__->table('user');
+      __PACKAGE__->has_many(
+          entries => 'Blog::Entry',
+          {
+              key  => 'user_id',
+              with => [qw(user)],  # Added
+          }
+      );
+      1;
+
+      package Blog::Entry;
+      use base qw 'Blog::MoCo';
+
+      __PACKAGE__->table('entry');
+      __PACKAGE__->has_a(
+          user => 'Blog::User',
+          { key => 'user_id' }
+      );
+      1;
+
+    As a result, "$user-"entry> prefetches users of all entries, and you'll
+    see the performance is drastically improved.
+
+      my $user = Blog::User->retrieve(name => $name);
+      for my $entry ( $user->entries ) {              # Does prefetching
+          ## Entry has a user
+          $entry->user->name;
+      }
+
+    In case that you temporally don't want the method to prefetch, you can
+    inhibit prefetching as below:
+
+      $user->entries({ without => 'user' });
+
+    "with" option described above can appear not only in has_many() method,
+    but also in search() method.
+
+      my $entries = Blog::Entry->search(
+          ...
+          with => [qw(user)],
+      );
+
+      for my $entry ( @$entries ) {
+          $entry->user->name;       # $entry->user is already prefetched
+      }
+
+FORM VALIDATION
+    You can validate user parameters using moco's schema. For example you
+    can define your validation profile using param like this,
+
+      package Blog::User;
+
+      __PACKAGE__->schema->param([
+        name => ['NOT_BLANK', 'ASCII', ['DBIC_UNIQUE', 'Blog::User', 'name']],
+        mail => ['NOT_BLANK', 'EMAIL_LOOSE'],
+      ]);
+
+    And then,
+
+      # In your scripts
+      sub validate {
+        my $self = shift;
+        my $q = $self->query;
+        my $prof = Blog::User->schema->param('validation');
+        my $result = FormValidator::Simple->check($q => $prof);
+        # handle errors ...
+      }
+
+SEE ALSO
+    DBIx::MoCo::DataBase, SQL::Abstract, Class::DBI, Cache,
+
+AUTHOR
+    Junya Kondo, <jkondo@hatena.com>, Naoya Ito, <naoya@hatena.ne.jp>,
+    Kentaro Kuribayashi, <kentarok@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) Hatena Inc. All Rights Reserved.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+

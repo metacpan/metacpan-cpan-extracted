@@ -1,0 +1,72 @@
+{
+   "abstract" : "gather distribution metadata in local",
+   "author" : [
+      "Shoichi Kaji"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Distribution-Metadata",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::DistnameInfo" : "0",
+            "CPAN::Meta" : "0",
+            "ExtUtils::Packlist" : "0",
+            "JSON" : "0",
+            "Module::Metadata" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::pushd" : "0",
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shoichikaji/Distribution-Metadata/issues"
+      },
+      "homepage" : "https://github.com/shoichikaji/Distribution-Metadata",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/shoichikaji/Distribution-Metadata.git",
+         "web" : "https://github.com/shoichikaji/Distribution-Metadata"
+      }
+   },
+   "version" : "0.05",
+   "x_contributors" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ]
+}
+

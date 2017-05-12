@@ -1,0 +1,10 @@
+Changes
+DE.pm
+MANIFEST
+Makefile.PL
+README
+test.pl
+example/feiertage.pl
+example/werktage-diff.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,49 @@
+Dist-Inkt-Profile-TOBYINK
+=========================
+
+Created:      2014-05-26
+Home page:    <https://metacpan.org/release/Dist-Inkt-Profile-TOBYINK>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Profile-TOBYINK>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.024	2017-05-05
+
+ [ Packaging ]
+ - Require a more recent version of Dist::Inkt.
+
+ [ Other ]
+ - Updated: Use Dist::Inkt::Role::StaticInstall.
+
+0.023	2014-09-17
+
+ [ Packaging ]
+ - Require a more recent version of Dist::Inkt.
+ - Require a more recent version of Dist::Inkt::Role::Hg.
+
+0.022	2014-09-17
+
+ [ Packaging ]
+ - Add missing dependency on Dist::Inkt::Role::Hg.
+
+0.021	2014-09-14
+
+ - Install distribution before releasing it.
+
+0.020	2014-09-14
+
+ - use Dist::Inkt::Role::Test::Changes
+ - use Test::EOL
+
+0.019	2014-09-14
+
+ - use Dist::Inkt::Role::Release
+
+0.018	2014-09-14
+
+ - Include build-time testing of distribution kwalitee.
+
+0.017	2014-09-14
+
+ - Start of build-time testing.
+
+0.016	2014-05-26	Initial release

@@ -1,0 +1,26 @@
+plugins:
+    Auth::Extensible:
+        login_without_redirect: 1
+        realms:
+            config1:
+                provider: Config
+                users:
+                    - user: dave
+                      pass: supersecret
+                      roles:
+                            - Developer
+                            - Manager
+                            - BeerDrinker
+                    - user: bob
+                      pass: alsosecret
+                      roles:
+                            - Tester
+    Auth::Extensible::Rights:
+        rights:
+            createitem:
+                - BeerDrinker
+                - Tester
+                - Manager
+            deleteitem:
+                - [ Manager, Developer ]
+            deleteall: Manager

@@ -1,0 +1,50 @@
+Revision history for Devel-FindPerl
+
+0.014     2015-06-15 23:53:25+02:00 Europe/Amsterdam
+          Properly quote exe_ext in regexp
+
+0.013     2015-06-14 19:50:03+02:00 Europe/Amsterdam
+          Skip taint test on portable perl
+          Various minor changes
+
+0.012     2013-11-20 14:57:15 Europe/Amsterdam
+          Minor fixes in tests
+
+0.011     2013-11-19 14:50:51 Europe/Amsterdam
+          Fix other environmental variables in tainted mode.
+
+0.010     2013-11-13 23:13:15 Europe/Amsterdam
+          Add a non-empty PATH, to make *bsd happy
+          Compare configuration case-insensitively, to make Windows happy
+
+0.009     2013-11-07 23:00:55 Europe/Amsterdam
+          find_perl_interpreter now return an array
+
+0.008     2013-11-01 17:48:53 Europe/Amsterdam
+          Always empty $ENV{PATH} before open2
+          Append executable extension to expected tainted path
+
+0.007     2013-10-24 14:32:54 Europe/Amsterdam
+          Soften dependency on ExtUtils::Config
+          Rewrite tests not to depend on Capture::Tiny
+          Export perl_is_same
+          Handle tainting better
+
+0.006     2012-10-21 15:32:06 Europe/Amsterdam
+          Cache the results of find_perl_interpreter
+          Don't try absolute path twice
+
+0.005     2012-10-06 00:14:49 Europe/Amsterdam
+          Explicitly load File::Basename
+
+0.004     2012-07-26 00:40:10 Europe/Bucharest
+          Make sure myconfig is read in text-mode on Windows
+
+0.003     2012-07-23 12:02:13 Europe/Bucharest
+          Convert from pipe open to IPC::Open2
+
+0.002     2012-07-12 18:46:33 Europe/Bucharest
+          Get rid of Capture::Tiny dependency
+
+0.001     2012-06-20 20:37:18 Europe/Amsterdam
+          Initial release

@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/DBIx/Class/FilterColumn/ByType.pm
+t/00-compile.t
+t/000-report-versions.t
+t/basic.t
+t/lib/A/Schema.pm
+t/lib/A/Schema/Result.pm
+t/lib/A/Schema/Result/Artist.pm
+t/lib/A/Schema/Result/Zeta.pm

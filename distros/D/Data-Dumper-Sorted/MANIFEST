@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+Sorted.pm
+t/bmethods.t
+t/functions.t
+t/smethods.t
+META.yml                                 Module meta-data (added by MakeMaker)

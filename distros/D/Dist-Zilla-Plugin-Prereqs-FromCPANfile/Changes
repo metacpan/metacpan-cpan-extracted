@@ -1,0 +1,27 @@
+Revision history for Perl extension Dist::Zilla::Plugin::Prereqs::FromCPANfile
+
+0.08  2014-12-14 12:36:40 PST
+        - Fixed test (ether) #3
+
+0.07  2014-10-22 09:10:09 PDT
+        - Do not attempt to parse cpanfile multiple times. #2
+
+0.06  2013-04-14 17:11:55 JST
+        - Support converting 'feature' to optional_features in META
+
+0.05  2013-04-06 21:50:44 PDT
+        - Bump Dist::Zilla requirement for better version requirement support
+          http://www.cpantesters.org/cpan/report/38e34ade-945b-11e2-acd0-a47bb3d0f147
+
+0.04  2013-03-23 21:38:56 PDT
+        - Bump Dist::Zilla requirement to 4.2
+        - Convert to Milla
+
+0.03      2013-03-19 21:15:12 America/Los_Angeles
+        - dzilifying this as a dogfood experiment
+
+0.02  Tue Mar 19 16:30:43 PDT 2013
+        - Silent log when there's no cpanfile
+
+0.01  Tue Mar 19 14:27:58 2013
+        - original version

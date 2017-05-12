@@ -1,0 +1,25 @@
+0.003		2017-04-02	T. R. Wyant
+    Correct __on_date() text for 8 Astron from 'fields of Cormallen' to
+    'Field of Cormallen.'
+
+0.002		2017-03-23	T. R. Wyant
+    Fix current day calculation in eg/scal.
+
+    Update README for publication of front ends, to direct the reader to
+    Date::Tolkien::Shire or DateTime::Fiction::JRRTolkien::Shire.
+
+    Add __holiday_narrow(), __weekday_narrow() and
+    __trad_weekday_narroe() for 2-character names.
+
+    Add eg/scal, Shire analog of cal (1).
+
+    Export manifest constants for holidays: DAY_OF_YEAR_MIDYEARS_DAY
+    (183) and DAY_OF_YEAR_OVERLITHE (184), plus HOLIDAY_2_YULE (1),
+    HOLIDAY_1_LITHE (2), HOLIDAY_MIDYEARS_DAY (3), HOLIDAY_OVERLITHE
+    (4), HOLIDAY_2_LITHE (5), and HOLIDAY_1_YULE (6).
+
+    Add export tags :consts and :subs to specify all manifest constants and
+    all subroutines respectively.
+
+0.001		2017-03-07	T. R. Wyant
+    First production release.

@@ -1,0 +1,82 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Result::Base - Result Objects Base class
+
+=head1 SYNOPSIS
+
+  package SomeClass;
+
+  use base qw(Data::Range::Compare::Stream::Result::Base);
+  use overload
+    'bool'=>\&boolean,
+      '""'=>\&to_string,
+        Fallback=>1;
+
+
+=head1 DESCRIPTION
+
+This package is the Base class for all Result classes.  Result classes are defined as any objects returned by an iterator object instance while has_next is true.
+
+=head1 OO Methods
+
+=over 3
+
+=item * my $obj=new Data::Range::Compare::Stream::Result::Base;
+
+=item * my $obj=new Data::Range::Compare::Stream::Result::Base(0,1);
+
+=item * my $obj=Data::Range::Compare::Stream::Result::Base->new;
+
+=item * my $obj=Data::Range::Compare::Stream::Result::Base->new(0,1);
+
+Object Constructor.  Returns blessed anonymous array containing all arguments passed to the constructor
+
+=item * $obj->get_common
+
+Returns the common range object.
+
+=item * $obj->to_string
+
+Returns a string defined by:
+
+  join ' - ',$obj->[0],$obj->[1];
+
+=item * print $obj;
+
+Returns the value of $obj->to_string
+
+=item * if($obj->boolean) { ... }
+
+Returns True
+
+=item * if($obj) { ... }
+
+When called in boolean context returns the value of $obj->boolean.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

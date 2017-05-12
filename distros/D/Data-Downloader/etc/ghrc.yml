@@ -1,0 +1,16 @@
+name: ghrc
+storage_root: /tmp/dado/ghrc/store
+file_url_template: ''
+cache_strategy: Keep
+
+feeds:
+  name: ghrc
+  feed_template: 'http//ghrc.nasa.gov/<idunno>'
+  file_source:
+    filename_xpath: atom:title
+    url_xpath: atom:id
+
+linktrees:
+    - root: /tmp/ghrc
+      path_template: ''
+

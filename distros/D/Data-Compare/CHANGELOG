@@ -1,0 +1,78 @@
+1.25    2013-04-15  DCANTRELL  Add Gianni Ceccarelli's tests and patch
+				 to Use refaddr & reftype to "do the right
+				 thing" when comparing objects that overload
+				 numification and stringification
+
+1.24    2014-04-05  DCANTRELL  Bump the required JSON.pm version for
+                                 tests - something's a bit broken around
+                                 about v 2.53
+
+1.23    2013-09-26  DCANTRELL  Add David Muir Sharnoff's tests for
+                                 really big data structures (but not yet
+                                 working);
+                               Check for taint-mode less insanely, thanks
+                                 to Ilmari;
+                               Don't delay loading File::Find::Rule (see
+                                 RT 87554)
+
+1.22    2010-02-12  DCANTRELL  Previous release was in error.  Instead, fix
+                                 the problem, circular structures now
+                                 compare equal, no matter what the starting
+                                 point (see RT 52836)
+
+1.2102  2010-02-01  DCANTRELL  Add doco about structural vs data equivalence
+                                 (see RT 52836)
+
+1.2101  2009-05-05  DCANTRELL  Add full licence text; -I fix in taint tests
+                                 to cope with paths with a space in 'em
+                                 (thanks to MATISSE, see RT 45676)
+
+1.21    2008-08-21  DCANTRELL  Extra tests added in 1.20 now skip with
+                                 really old JSON
+
+1.20    2008-08-21  DCANTRELL  Added test for bug reported by Saritha
+                                 Nalagandla (no bug found, but you can never
+                                 have too many tests!)
+                               Fixed bug in PERL5LIB splitting in taint test
+                                 (thanks to ADAMK, see RT 38319)
+
+1.19    2008-05-12  DCANTRELL  Can now compare structures with repeats in 'em
+                                 like [\$z, \$z] (bug reported by Todd Hepler)
+                               Minor code tidying
+
+1.18    2008-01-15  DCANTRELL  Got rid of prototypes;
+                               File::Find::Rule now only loads when needed;
+                               Plugins can be ignored with a null import() list;
+                               Explicitly documented the auto-export;
+                               Got rid of diagnostics pragma
+
+0.17    2007-08-07  DCANTRELL  Added POD test
+                               Fixed buggy POD :-)
+                               Fixed problem with taint testing when PERL5LIB
+                                 is set (thanks to Andreas Koenig for finding
+                                 the bug)
+                               Minor doco fiddling
+0.16    2007-02-27  DCANTRELL  Taint test and detection made less stupid
+0.15    2007-02-25  DCANTRELL  Skip taint tests on perl 5.6 and earlier
+0.14    2006-11-01  DCANTRELL  Fixed deeply nested objects (see rt.cpan #6966)
+0.13    2004-11-09  DCANTRELL  Oops, left in some debugging output
+0.12    2004-11-09  DCANTRELL  Fixed recursion detection bug - wasn't decrementing
+                               counter properly!  (thanks to Jenda for the bug
+                               report)
+0.11    2004-06-02  DCANTRELL  Now taint-safe - in taint mode there's no plugins
+                               (thanks Gabor Szabo for reporting the bug)
+0.10    2004-03-13  DCANTRELL  Replaced recursion detection with Rusty Conover's
+                               much better implementation.
+0.09    2004-02-23  DCANTRELL  Added deep recursion detection.
+0.08    2004-01-20  DCANTRELL  Added options, and ignore_hash_keys
+0.07    2004-01-07  DCANTRELL  Bugfix to avoid loading same plugin more than
+                               once.  S::P plugin renamed so it would work with
+                               this bugfix.  Clean-up of code.  Fix minor doc-bug
+                               in lib/Data/Compare/Plugins.pod.
+0.06    2004-01-06  DCANTRELL  Added plugins, moved Scalar::Properties support
+                               into a plugin (plugins were Jim Cromie's idea)
+0.05    2003-12-30  DCANTRELL  Applied mike@very.puzzling.org's patch for
+                               comparing compiled regexps
+0.04    2003-12-24  DCANTRELL  Applied aef's patch to correctly compare refs to
+                               refs to stuff
+0.03    2003-12-23  DCANTRELL  Added special-case handling for Scalar::Properties

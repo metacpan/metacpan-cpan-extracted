@@ -1,0 +1,82 @@
+Revision history for Perl extension DBIx::Admin::CreateTable.
+
+2.10  Mon Mar 10 13:27:00 2014
+	- Add Test::Version to the pre-reqs.
+
+2.09  Thu Mar  6 09:45:07 2014
+	- Adopt Moo. But not Moops - I don't need that level of complexity.
+	- Move t/pod.t to xt/author/.
+	- Add t/version.t.
+	- Add use strict and use warnings to Build.PL and Makefile.PL.
+	- Newsflash: DBIx::Admin::CreateTable and DBIx::Admin::DSNManager are now used for the author's testing of
+		DBIx::Admin::TableInfo.
+
+2.08  Thu Jan 30 09:09:00 2014
+	- Fix serious bug in create_table(), which did not allow digits in table and sequence names.
+		Many thanx to Mario Zieschang for reporting this. See RT#92560.
+	- Replace /usr/bin/perl with /usr/bin/env perl in the scripts.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Rename test files from \d.*.t to *.t.
+	- Rename CHANGES to Changes as per CPAN::Changes::Spec.
+
+2.07  Mon May 21 16:51:00 2010
+	- Spelling: MySQL uses auto_increment; SQLite uses autoincrement.
+		This should have been done for V 2.04.
+	- Remove references to Moose and namespace::autoclean from 2.06 below.
+
+2.06  Sun Feb 21 12:54:54 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+
+2.05  Wed Feb 10 13:52:44 2010
+	- Add META.yml. Update MANIFEST.SKIP. Add MANIFEST and MYMETA.yml.
+
+2.04  Wed Sep 16 14:12:00 2009
+	  - Change auto_increment to autoincrement for SQLite.
+	  - Rename Changes.txt to CHANGES.
+
+2.03  Thu Dec  4 15:54:00 2008
+	- Change licence text in preparation for Debian packaging
+
+2.02  Sun Nov 23 10:08:00 2008
+	- Add DBI to Build.PL and Makefile.PL since:
+		o t/2.syntax.error.t uses it
+		o CPAN testers were getting errors
+		o Callers must create a $dbh, but this module doesn't actually use DBI
+	- Fix typo in Changes.txt on the line 2.01...
+	- Generate Changelog.ini as I should have with the last version
+
+2.01  Tue Nov 18 10:34:00 2008
+	- Add support for SQLite. Note: My code for SQLite uses 'integer primary key auto_increment'
+	  as the definition of the primary key's type. To get the autoincrement part of that to work,
+	  you must provide a NULL - i.e. a Perl undef - for your primary key column when inserting a
+	  new record into the database
+
+2.00  Sun Nov 16 12:06:00 2008
+	- Convert various files from DOS to Unix format
+	- Reformat the source of CreateTable.pm, Build.PL and Makefile.PL, a bit
+	- Rename the test files (pod.t => 0.pod.t, test.t => 1.test.t)
+	- Add t/2.syntax.error.t
+	- Only run tests in t/2.syntax.error.t if $DBI_DSN, $DBI_USER and $DBI_PASS are defined
+	- Remove eval
+	- Localize RaiseError in drop_table(), so as to not error when table does not exist
+	- Make create_table return DBI's errstr() on fail or '' on success, so result can be tested
+	- Make drop_table return '' on success, so result can be tested (in t/2.syntax.error.t)
+	- Remove FindBin::Real from list of required modules
+
+1.04  Thu Aug 23 15:31:00 2007
+	- Expand docs even more
+	- Rename generate_sequence_name() to generate_primary_sequence_name()
+
+1.03  Wed Aug 15 13:58:00 2007
+	- Expand docs per method with tables documenting behaviour per database vendor
+
+1.02  Fri Jun 09 14:54:00 2006
+	- Patch sequence handling code to work with Oracle
+
+1.01  Tue May 16 14:09:00 2006
+	- Add methods reset_all_sequences and reset_sequence
+
+1.00  Thu May  8 14:50:00 2006
+	- Original version

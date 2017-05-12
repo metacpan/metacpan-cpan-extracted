@@ -1,0 +1,36 @@
+     	-*- mode: text -*-
+
+It might be a bug that I don't look to see if there is an opening '('
+following a token in resolve(). I need to find out if you can have
+both a simple macro and a macro with args with the same name.
+
+Come up with a better way to resolve macros from #include'd system
+header files, <stdio.h>, and user header files,
+"mystring.h". Currently we're restricted to the functionality that
+C::Scan provides, but maybe it can be augmented.
+
+From: Stephen McCamant <alias@mcs.com> 
+Subject: announcing Devel::DebugInit::GDB 
+To: "Jason Stewart" <jasons@cs.unm.edu> 
+Date: Thu, 28 Aug 1997 15:27:56 -0500 (CDT) 
+ 
+Jason Stewart writes: 
+
+ [stuff deleted by me ...]
+
+And, finally, something that you have no control over, but that 
+bothers me anyway: 
+ 
+* For perl, at least, a .gdbinit file of macros is made much less useful 
+than it could be by the limitation that GDB can only define macros for 
+top-level debugger commands, not parts of expressions. For instance, 
+while it's very convenient that I can write `GvSV(sv)' instead of 
+`print ((((XPVGV*)(sv)->sv_any)->xgv_gp)->gp_sv)', and admire that 
+pointer in all its hexidecimal glory, I'd rather `print *GvSV(sv)', or 
+more likely `call Perl_sv_dump(GvSV(sv))'. 
+ 
+Actually, it might be possible to work around this by generating 
+several versions of each macro (a `print $arg' version, a `print *($arg)' 
+version, and so on), but that seems like it would get out of hand 
+pretty quick. 
+ 

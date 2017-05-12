@@ -1,0 +1,49 @@
+{
+   "abstract" : "Device::WebIO implementation for the Rapsberry Pi",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-WebIO-RaspberryPi",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7.07",
+            "Device::WebIO" : "0.009",
+            "GStreamer1" : "0.002",
+            "HiPi" : "0",
+            "Moo" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/Device-WebIO-RaspberryPi.git",
+         "web" : "https://github.com/frezik/Device-WebIO-RaspberryPi"
+      }
+   },
+   "version" : "0.009"
+}
+

@@ -1,0 +1,36 @@
+Revision history for Dancer2-Template-Caribou
+
+1.0.0 2017-02-25
+  [ API CHANGES ]
+    - Support Template::Caribou v1.2.0+
+
+  [ STATISTICS ]
+    - code churn: 16 files changed, 97 insertions(+), 69 deletions(-)
+
+0.2.1 2013-06-05
+  [ BUG FIXES ]
+    - Adding the role to the class might help. 
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 27 insertions(+), 5 deletions(-)
+
+0.2.0 2013-06-05
+  [ ENHANCEMENTS ]
+    - New D::T::C::DancerVariables role, to give access to dancer
+      environment from within template.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 149 insertions(+), 2 deletions(-)
+
+0.1.1 2013-05-22
+  [ BUG FIXES ]
+    - Set the version number for the T::C requirement
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 21 insertions(+), 1 deletion(-)
+
+0.1.0 2013-05-20
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 11 files changed, 444 insertions(+), 1 deletion(-)

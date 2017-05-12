@@ -1,0 +1,41 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        branch: 
+          caption: Branch
+          class: src
+          f: "%s"
+          fs: "%s"
+        c_false: 
+          caption: 'False'
+          f: "%s"
+          fs: "%.1f"
+        c_true: 
+          caption: 'True'
+          f: "%s"
+          fs: "%.1f"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        percent: 
+          caption: "%"
+          f: "%d"
+          fs: "%.1f"
+      headers_order: 
+        - line
+        - percent
+        - c_true
+        - c_false
+        - branch
+      label: Branch coverage
+      rows: []
+
+      summary: []
+
+metadata: 
+  title: "Branch coverage: t/Baz-a.t"
+  version: 0.05

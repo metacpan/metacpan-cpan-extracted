@@ -1,0 +1,35 @@
+==================================================
+Changes from 2014-02-14 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.0.0 at 2015-02-14 06:41:41 +0000
+------------------------------------------
+
+  Change: de64dbd8f2109b04b170cabc20cc69a2ef8e45c0
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-02-13 23:41:41 +0000
+
+    Add minimum Perl version 
+
+  Change: ee905b3b9001d38c96de98b1984103feb1de259d
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-02-13 23:38:26 +0000
+
+    Fix pod typo 
+
+  Change: 2380cc437277fffaf3175c72d223aab7b3faa7d8
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-02-13 23:33:25 +0000
+
+    Add CHANGES file 
+
+  Change: 494434ed042565ad1e0656f9c773dc7dd95282a7
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-02-13 23:29:08 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

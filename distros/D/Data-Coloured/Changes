@@ -1,0 +1,49 @@
+==================================================
+Changes from 1741-05-24 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.003 at 2015-03-08 06:09:12 +0000
+------------------------------------------
+
+  Change: 9f63cc4989f69c599f0364a99a0c9a17b832b8a4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:51:00 +0000
+
+    Added new .travis.yml 
+
+  Change: 0a1b18bd80322c8c200f03f623491b272fee16a4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-03-08 04:50:40 +0000
+
+    Added ddc CLI client 
+
+------------------------------------------
+version 0.002 at 2014-12-07 18:35:46 +0000
+------------------------------------------
+
+  Change: 8b0d3ecb533cfef4b923f704c9f982d57f0858f6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-07 19:35:46 +0000
+
+    Fixed alias class 
+
+------------------------------------------
+version 0.001 at 2014-12-07 17:52:12 +0000
+------------------------------------------
+
+  Change: 82b264578ed6ac9ff3297bd3ce6eaf573fdff099
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-07 18:52:12 +0000
+
+    First release 
+
+  Change: 88fe4974475b8eb86ab8892e056346a2990c6a47
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-12-07 18:19:15 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

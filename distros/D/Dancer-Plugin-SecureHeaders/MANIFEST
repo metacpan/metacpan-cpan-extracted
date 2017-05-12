@@ -1,0 +1,23 @@
+Changes
+ignore.txt
+lib/Dancer/Plugin/SecureHeaders.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+README.md
+t/00-load.t
+t/01-basic.t
+t/boilerplate.t
+t/lib/config.yml
+t/lib/lib/.placeholder
+t/lib/logs/development.log
+t/lib/public/.placeholder
+t/lib/TestApp.pm
+t/lib/views/.placeholder
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,97 @@
+Revision history for Data-Hive
+
+1.013     2015-12-08 17:52:33-05:00 America/New_York
+        - add Data::Hive::Test assertions that SET returns new value
+
+1.012     2014-10-30 18:33:12-04:00 America/New_York
+        - extend Data::Hive::Test to cover DELETE, not just DELETE_ALL
+
+1.011     2013-12-13 08:24:44 America/New_York
+          update bugtracker and repo links
+
+1.010     2013-07-05 21:34:32 America/New_York
+          repackage, update bugtracker
+
+1.009     2013-03-04 16:36:28 America/New_York
+          add ->GET(sub{...}) for lazily computed default
+
+          remove GETNUM, GETSTR
+
+1.008     2010-10-21 16:51:16 America/New_York
+          add a warning when an autoloaded hive descender is given an arg
+
+1.007     2010-09-07 21:34:43 America/New_York
+          require Test::More 0.96 so that we don't need plans in subtests
+
+1.006     2010-09-01 15:47:44 America/New_York
+          Data::Hive::Test test suite can now be run against existing hives
+
+1.005     2010-09-01 11:52:32 America/New_York
+
+1.004     2010-09-01 10:48:48 America/New_York
+          automatically upgrade old-style nested hashes
+
+1.003     2010-09-01 09:12:27 America/New_York
+          add COPY_ONTO
+
+1.002     2010-08-31 22:48:54 America/New_York
+
+          allow ->HIVE to take multiple keys
+
+1.001     2010-08-31 08:27:03 America/New_York
+
+          added ROOT, SAVE, SAVE_ALL, DELETE_ALL
+
+          old Hash store is now Hash::Nested; added new, flat Hash store
+
+          new Hash store and Param both rely on Data::Hive::PathPacker
+
+          bugfixes in cleaning up after deletion in nested hashes
+
+          deprecate overload and GETNUM and GETSTR behaviors
+
+          added Data::Hive::Test for testing Store implementations
+
+          documentation and test improvements
+
+1.000     2010-08-27 21:48:58 America/New_York
+          significant documentation overhaul
+
+          add the ->KEYS method to Data::Hive and the core stores
+
+          allow the Hash store to have a value and subhives per path name
+          (this break backcompat with existing hash structure)
+
+0.054     2010-08-26 14:58:29 America/New_York
+          minor tweaks, mostly to enable use of Dist::Zilla
+
+0.053     2008-09-12
+          ->GET($default) added
+
+0.052     2007-11-19
+          Fix bug where Store::Hash was inadvertently destroying state
+          information it shouldn't have in some cases
+
+0.051     2007-11-15
+          Guard eval with local $SIG{__DIE__} in case someone else has been
+          careless with theirs
+
+          Remove useless t/boilerplate.t
+
+0.050     2007-04-02
+          Add GETSTR to avoid stupid SEGVs
+          Add DELETE
+
+0.040     2006-08-28
+
+          Freshen Module::Install
+
+0.03      2006-07-03
+          Add missing dep for Test::MockObject.
+
+0.02      2006-06-08
+          Add EXISTS.
+
+0.01      2006-06-05
+          First version, released on an unsuspecting world.
+

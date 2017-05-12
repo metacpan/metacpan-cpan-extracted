@@ -1,0 +1,57 @@
+Summary of important user-visible changes for dist-zilla-pluginbundle-Bioperl
+-----------------------------------------------------------------------------
+
+0.25      2017-02-18 19:06:59+00:00 Europe/London
+  * Update broken link on Feedback section to a page about the mailing lists.
+
+0.24      2017-02-02 18:54:51+00:00 Europe/London
+  * Replace use of deprecated [EOLTests] with [Test::EOL]
+  * Replace use of bugtracker.web from [MetaResources] with bugtracker.github
+    from [AutoMetaResources].  Note that [MetaResources] was not expand
+    %{dist} on bugtracker.web and therefore previous versions had incorrect
+    links to the bugtracker.
+  * Removed use of Authority plugin as it is now obsolete in perl5.
+  * Removed [RunExtraTests].  Use `dzil test -all'.  See also `dzil smoke'.
+  * Added a test unit to the pluginbundle.
+
+0.23      2014-09-05 09:46:02-05:00 America/Chicago
+  * Add [RunExtraTests] in cases where we want to only run tests for release
+
+0.22      2014-08-30 01:12:04-05:00 America/Chicago
+  * Version bump to deal with failed submission, no code changes
+
+0.21      2014-08-28 09:14:19-05:00 America/Chicago
+  * Updated list of dependencies (plugins from the BioPerl bundle which
+    are implicit dependencies).
+  * Add roles to remove unwanted plugins if requested.
+  * Add proper dependencies if they are picked up, and bootstrap.
+  * Redirect URL to MetaCPAN instead of search.cpan.org.
+  * Point to GitHub as main bug tracker
+
+0.20      2013-04-02 06:09:17 Europe/Dublin
+  * The default authority for the distribution is now cpan:BIOPERLML.
+  * Included the [MojibakeTests] plugin to check for correct encoding.
+  * The Git will commit changes to the Changes and dist.ini file as part of the
+    release, and the created tag mentions the distribution name.
+  * Created a new Pod::Weaver plugin bundle for BioPerl which is used as default
+    by Bioperl's Dist::Zilla pluginbundle.
+  * [Readme] is now filtered from [@Basic] since most bioperl distributions
+    already have a README or README.md file and if teh first already exists, it
+    conflicts with [Readme].
+  * Removed the option disable_pod_coverage_tests. The use of [@Filter]
+    is recommended instead.
+  * Removed disable_trailing_whitespace_tests. Set `trailing_whitespace = 0`
+  * Removed the repository, repository_type, repository_web, github_user,
+    repository_at, and homepage_url options. Replaced with github.user and
+    homepage from the [AutoMetaResources] plugin.
+  * Removed the bugtracker_email and bugtracker_url. Replaced by [MetaResources]
+    bugtracker.mailto and bugtracker.web
+  * Include [Git::Check] and [Git::Commit].
+  * Option dist is no longer required.
+  * Fix default bugtracker.email and bugtracker.web values.
+
+0.02      2012-03-21 22:41:54 America/Chicago
+  * Fix default git repo user (apologies to rafl)
+
+0.01      2012-03-21 14:45:16 America/Chicago
+  * Initial release.

@@ -1,0 +1,79 @@
+NAME
+    DBIx::Class::Schema::ResultSetAccessors - Short hand ResultSet Accessors
+
+SYNOPSIS
+      # in your schema class
+      __PACKAGE__->load_components(qw/
+          Schema::ResultSetAccessors
+      /);
+      __PACKAGE__->load_namespaces;
+
+      # in your program
+      use MyApp::Schema;
+      my $schema = MyApp::Schema->connect(...);
+      @artists = $schema->artists->all; # same as $schema->resultset('Artist')->all;
+
+DESCRIPTION
+    Creates short hand accessor methods for each ResultSet. Accessor names
+    are properly converted into lowercase and pluralized. E.g.
+
+     LinerNote -> liner_notes
+     Artist    -> artists
+     CD        -> cds
+
+METHODS
+  resultset_accessor_map
+    Sometimes you will not want to, or will not be able to use an
+    auto-generated accessor name. A common case would be when the accessor
+    name conflicts with a built in DBIx::Class::Schema method. E.g. if you
+    name your Result class "Source", a pluralized version of this would be
+    "sources", which is a built in method.
+
+    This method allows you to redefine the names as you wish. Overload this
+    method in your schema class and return a hashref map of Source =>
+    accessor names. E.g.:
+
+     # in your MyApp::Schema class
+     sub resultset_accessor_map {
+        {
+            Source => 'my_sources',
+            Artist => 'my_artists',
+        }
+     }
+
+     # later in your code
+     $schema->my_sources->all;
+
+  resultset_accessor_name($moniker)
+    This method is used to generate the accessor names. If you wish to
+    create your own logic for generating the name, you can overload this
+    method. The method takes a moniker (aka Source name) as a parameter and
+    returns the accessor name.
+
+    Internally it simply uses String::CamelCase to decamelize the name and
+    pass it to "pluralize_resultset_accessor_name" method.
+
+  pluralize_resultset_accessor_name($decamelized_name)
+    If you only wish to overload the pluralization of the accessor name, in
+    case you want to add support for a language other than English, then you
+    might only want to overload this method. The method accepts decamelized
+    name (e.g. liner_note) and returns properly pluralized version of it.
+
+SEE ALSO
+    DBIx::Class
+    String::CamelCase
+    Lingua::EN::Inflect::Phrase
+
+AUTHOR
+     Roman F.
+     romanf@cpan.org
+
+COPYRIGHT
+    Copyright (c) 2011 Roman F.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

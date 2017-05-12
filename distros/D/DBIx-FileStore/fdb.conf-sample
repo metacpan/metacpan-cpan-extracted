@@ -1,0 +1,17 @@
+################################################################
+# Sample configuration file for DBIx::FileStore utilities.
+#
+# Intended to be copied to /etc/fdb.conf or ~/.fdbrc
+#
+# Understands three params: dbuser, dbpasswd and dbname.
+#
+# Uses simple name=value<newline> format, Comments are after #'s 
+#
+
+dbuser=root
+dbpasswd=password
+dbname=fdb
+
+# and optionally, a dbhost. Defaults to 127.0.0.1
+# dbhost=hostname.example.com
+

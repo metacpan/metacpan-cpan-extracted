@@ -1,0 +1,109 @@
+NAME
+    Dancer::Session::Redis - Redis backend for Dancer Session Engine
+
+VERSION
+    version 0.22
+
+SYNOPSIS
+        # in the Dancer config.yml:
+        session: 'Redis'
+        redis_session:
+            sock: '/var/run/redis.sock'
+            password: 'QmG_kZECJAvAcDaWqqSqoNLUka5v3unMe_8sqYMh6ST'
+            database: 1
+            expire: 3600
+            debug: 0
+
+        # or in the Dancer application:
+        setting redis_session => {
+            server   => 'redi.example.com:6379',
+            password => 'QmG_kZECJAvAcDaWqqSqoNLUka5v3unMe_8sqYMh6ST',
+            database => 1,
+            expire   => 3600,
+            debug    => 0,
+        };
+        setting session => 'Redis';
+
+DESCRIPTION
+    This module is a Redis backend for the session engine of Dancer
+    application. This module is a descendant of Dancer::Session::Abstract. A
+    simple demo apllication might be found in the "eg/" directory of this
+    distribution.
+
+CONFIGURATION
+    In order to use this session engine, you have to set up a few settings
+    (in the app or app's configuration file).
+
+  session
+    Set the vaue Redis. Required parameter.
+
+  redis_session
+    Settings for backend.
+
+   server
+    Hostname and port of the redis-server instance which will be used to
+    store session data. This one is required unless *sock* is defined.
+
+   sock
+    unix socket path of the redis-server instance which will be used to
+    store session data.
+
+   password
+    Password string for redis-server's AUTH command to processing any other
+    commands. Optional. Check the redis-server manual for directive
+    *requirepass* if you would to use redis internal authentication.
+
+   database
+    Database # to store session data. Optional. Default value is 0.
+
+   expire
+    Session TTL. Optional. Default value is 900 (seconds).
+
+   debug
+    Enables debug information to STDERR, including all interactions with the
+    redis-server. Optional. Default value is 0.
+
+METHODS
+  init
+    Validate settings and creates the initial connection to redis-server.
+
+  redis
+    Returns connection handle to the redis instance. Also establish new
+    connection in case of "dead" handle.
+
+  create
+    Creates a new object, runs "flush" and returns the object.
+
+  flush
+    Writes the session information to the Redis database.
+
+  retrieve
+    Retrieves session information from the Redis database.
+
+  destroy
+    Deletes session information from the Redis database.
+
+BUGS
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/Wu-Wu/Dancer-Session-Redis/issues>
+
+SEE ALSO
+    Dancer
+
+    Dancer::Session
+
+    Storable
+
+    Redis
+
+    redis.io <http://redis.io>
+
+AUTHOR
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,60 @@
+{
+   "abstract" : "Validates user input (usually from an HTML form) based on input profile.",
+   "author" : [
+      "David Farrell <dfarrell@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-FormValidator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "Data::FormValidator::Constraints::RegexpCommon"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "5",
+            "Email::Valid" : "0",
+            "File::MMagic" : "1.17",
+            "Image::Size" : "0",
+            "MIME::Types" : "1.005",
+            "Regexp::Common" : "0.03",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dnmfarrell/Data-FormValidator",
+         "web" : "https://github.com/dnmfarrell/Data-FormValidator"
+      }
+   },
+   "version" : 4.86,
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

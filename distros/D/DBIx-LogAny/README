@@ -1,0 +1,63 @@
+DBIx-LogAny version 0.01
+====================
+
+This module was created from DBIx::Log4perl but uses Log::Any instead.
+I'll try to keep them in synch for a while but eventually I may drop
+DBIx::Log4Perl (unless someone complains).
+
+DBIx-LogAny is an extension for DBI to selectively log SQL, parameters,
+result-sets, transactions etc with Log::Any.
+
+You will need the DBI, Log::Any, Log::Any::Adapter and a logging
+module like Log::Log4perl.
+
+Please see the NOTES section in the pod for incompatibilities.
+
+Please make sure you have an up to date Test::More before running the
+tests. You will need at least 0.62.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTE: To to a full test you need a working DBI and DBD with access to
+a database where you can create a table. Once you have this set up
+you should run perl Makefile.PL like this:
+
+perl Makefile.PL --dsn=dsn --user=dbuser --password=dbpassword --table=table
+
+where:
+
+  dsn is a valid DBI connection dsn e.g. dbd::mysql::database
+  dbuser is a valid user to access database
+  dbpassword is the password for dbuser
+    (may be omitted if not password required)
+  table is the name of a table to create for testing
+    (NOTE: this table will be dropped if it already exists)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI 1.50
+  Log::LogAny 0.14
+  Log::Any::Adapter
+  Test::More 0.62
+  File::Spec
+  Module::Loaded
+  Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Martin J. Evans
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,406 @@
+NAME
+    Devel::Declare - Adding keywords to perl, in perl
+
+SYNOPSIS
+      use Method::Signatures;
+      # or ...
+      use MooseX::Declare;
+      # etc.
+
+      # Use some new and exciting syntax like:
+      method hello (Str :$who, Int :$age where { $_ > 0 }) {
+        $self->say("Hello ${who}, I am ${age} years old!");
+      }
+
+DESCRIPTION
+    Devel::Declare can install subroutines called declarators which locally
+    take over Perl's parser, allowing the creation of new syntax.
+
+    This document describes how to create a simple declarator.
+
+WARNING
+    Warning: Devel::Declare is a giant bag of crack originally implemented
+    by mst with the goal of upsetting the perl core developers so much by
+    its very existence that they implemented proper keyword handling in the
+    core.
+
+    As of perl5 version 14, this goal has been achieved, and modules such as
+    Devel::CallParser, Function::Parameters, and Keyword::Simple provide
+    mechanisms to mangle perl syntax that don't require hallucinogenic drugs
+    to interpret the error messages they produce.
+
+    If you are using something that uses Devel::Declare, please for the love
+    of kittens use something else:
+
+    *   Instead of TryCatch, use Try::Tiny
+
+    *   Instead of Method::Signatures, use real subroutine signatures
+        (requires perl 5.22) or Moops
+
+USAGE
+    We'll demonstrate the usage of "Devel::Declare" with a motivating
+    example: a new "method" keyword, which acts like the builtin "sub", but
+    automatically unpacks $self and the other arguments.
+
+      package My::Methods;
+      use Devel::Declare;
+
+  Creating a declarator with "setup_for"
+    You will typically create
+
+      sub import {
+        my $class = shift;
+        my $caller = caller;
+
+        Devel::Declare->setup_for(
+            $caller,
+            { method => { const => \&parser } }
+        );
+        no strict 'refs';
+        *{$caller.'::method'} = sub (&) {};
+      }
+
+    Starting from the end of this import routine, you'll see that we're
+    creating a subroutine called "method" in the caller's namespace. Yes,
+    that's just a normal subroutine, and it does nothing at all (yet!) Note
+    the prototype "(&)" which means that the caller would call it like so:
+
+        method {
+            my ($self, $arg1, $arg2) = @_;
+            ...
+        }
+
+    However we want to be able to call it like this
+
+        method foo ($arg1, $arg2) {
+            ...
+        }
+
+    That's why we call "setup_for" above, to register the declarator
+    'method' with a custom parser, as per the next section. It acts on an
+    optype, usually 'const' as above. (Other valid values are 'check' and
+    'rv2cv').
+
+    For a simpler way to install new methods, see also
+    Devel::Declare::MethodInstaller::Simple
+
+  Writing a parser subroutine
+    This subroutine is called at *compilation* time, and allows you to read
+    the custom syntaxes that we want (in a syntax that may or may not be
+    valid core Perl 5) and munge it so that the result will be parsed by the
+    "perl" compiler.
+
+    For this example, we're defining some globals for convenience:
+
+        our ($Declarator, $Offset);
+
+    Then we define a parser subroutine to handle our declarator. We'll look
+    at this in a few chunks.
+
+        sub parser {
+          local ($Declarator, $Offset) = @_;
+
+    "Devel::Declare" provides some very low level utility methods to parse
+    character strings. We'll define some useful higher level routines below
+    for convenience, and we can use these to parse the various elements in
+    our new syntax.
+
+    Notice how our parser subroutine is invoked at compile time, when the
+    "perl" parser is pointed just *before* the declarator name.
+
+          skip_declarator;          # step past 'method'
+          my $name = strip_name;    # strip out the name 'foo', if present
+          my $proto = strip_proto;  # strip out the prototype '($arg1, $arg2)', if present
+
+    Now we can prepare some code to 'inject' into the new subroutine. For
+    example we might want the method as above to have "my ($self, $arg1,
+    $arg2) = @_" injected at the beginning of it. We also do some clever
+    stuff with scopes that we'll look at shortly.
+
+          my $inject = make_proto_unwrap($proto);
+          if (defined $name) {
+            $inject = scope_injector_call().$inject;
+          }
+          inject_if_block($inject);
+
+    We've now managed to change "method ($arg1, $arg2) { ... }" into "method
+    { injected_code; ... }". This will compile... but we've lost the name of
+    the method!
+
+    In a cute (or horrifying, depending on your perspective) trick, we
+    temporarily change the definition of the subroutine "method" itself, to
+    specialise it with the $name we stripped, so that it assigns the code
+    block to that name.
+
+    Even though the *next* time "method" is compiled, it will be redefined
+    again, "perl" caches these definitions in its parse tree, so we'll
+    always get the right one!
+
+    Note that we also handle the case where there was no name, allowing an
+    anonymous method analogous to an anonymous subroutine.
+
+          if (defined $name) {
+            $name = join('::', Devel::Declare::get_curstash_name(), $name)
+              unless ($name =~ /::/);
+            shadow(sub (&) { no strict 'refs'; *{$name} = shift; });
+          } else {
+            shadow(sub (&) { shift });
+          }
+        }
+
+  Parser utilities in detail
+    For simplicity, we're using global variables like $Offset in these
+    examples. You may prefer to look at Devel::Declare::Context::Simple,
+    which encapsulates the context much more cleanly.
+
+   "skip_declarator"
+    This simple parser just moves across a 'token'. The common case is to
+    skip the declarator, i.e. to move to the end of the string 'method' and
+    before the prototype and code block.
+
+        sub skip_declarator {
+          $Offset += Devel::Declare::toke_move_past_token($Offset);
+        }
+
+   "toke_move_past_token"
+    This builtin parser simply moves past a 'token' (matching
+    "/[a-zA-Z_]\w*/") It takes an offset into the source document, and skips
+    past the token. It returns the number of characters skipped.
+
+   "strip_name"
+    This parser skips any whitespace, then scans the next word (again
+    matching a 'token'). We can then analyse the current line, and
+    manipulate it (using pure Perl). In this case we take the name of the
+    method out, and return it.
+
+        sub strip_name {
+          skipspace;
+          if (my $len = Devel::Declare::toke_scan_word($Offset, 1)) {
+            my $linestr = Devel::Declare::get_linestr();
+            my $name = substr($linestr, $Offset, $len);
+            substr($linestr, $Offset, $len) = '';
+            Devel::Declare::set_linestr($linestr);
+            return $name;
+          }
+          return;
+        }
+
+   "toke_scan_word"
+    This builtin parser, given an offset into the source document, matches a
+    'token' as above but does not skip. It returns the length of the token
+    matched, if any.
+
+   "get_linestr"
+    This builtin returns the full text of the current line of the source
+    document.
+
+   "set_linestr"
+    This builtin sets the full text of the current line of the source
+    document. Beware that injecting a newline into the middle of the line is
+    likely to fail in surprising ways. Generally, Perl's parser can rely on
+    the `current line' actually being only a single line. Use other kinds of
+    whitespace instead, in the code that you inject.
+
+   "skipspace"
+    This parser skips whitsepace.
+
+        sub skipspace {
+          $Offset += Devel::Declare::toke_skipspace($Offset);
+        }
+
+   "toke_skipspace"
+    This builtin parser, given an offset into the source document, skips
+    over any whitespace, and returns the number of characters skipped.
+
+   "strip_proto"
+    This is a more complex parser that checks if it's found something that
+    starts with '(' and returns everything till the matching ')'.
+
+        sub strip_proto {
+          skipspace;
+
+          my $linestr = Devel::Declare::get_linestr();
+          if (substr($linestr, $Offset, 1) eq '(') {
+            my $length = Devel::Declare::toke_scan_str($Offset);
+            my $proto = Devel::Declare::get_lex_stuff();
+            Devel::Declare::clear_lex_stuff();
+            $linestr = Devel::Declare::get_linestr();
+            substr($linestr, $Offset, $length) = '';
+            Devel::Declare::set_linestr($linestr);
+            return $proto;
+          }
+          return;
+        }
+
+   "toke_scan_str"
+    This builtin parser uses Perl's own parsing routines to match a
+    "stringlike" expression. Handily, this includes bracketed expressions
+    (just think about things like "q(this is a quote)").
+
+    Also it Does The Right Thing with nested delimiters (like "q(this (is
+    (a) quote))").
+
+    It returns the effective length of the expression matched. Really, what
+    it returns is the difference in position between where the string
+    started, within the buffer, and where it finished. If the string
+    extended across multiple lines then the contents of the buffer may have
+    been completely replaced by the new lines, so this position difference
+    is not the same thing as the actual length of the expression matched.
+    However, because moving backward in the buffer causes problems, the
+    function arranges for the effective length to always be positive,
+    padding the start of the buffer if necessary.
+
+    Use "get_lex_stuff" to get the actual matched text, the content of the
+    string. Because of the behaviour around multiline strings, you can't
+    reliably get this from the buffer. In fact, after the function returns,
+    you can't rely on any content of the buffer preceding the end of the
+    string.
+
+    If the string being scanned is not well formed (has no closing
+    delimiter), "toke_scan_str" returns "undef". In this case you cannot
+    rely on the contents of the buffer.
+
+   "get_lex_stuff"
+    This builtin returns what was matched by "toke_scan_str". To avoid
+    segfaults, you should call "clear_lex_stuff" immediately afterwards.
+
+  Munging the subroutine
+    Let's look at what we need to do in detail.
+
+   "make_proto_unwrap"
+    We may have defined our method in different ways, which will result in a
+    different value for our prototype, as parsed above. For example:
+
+        method foo         {  # undefined
+        method foo ()      {  # ''
+        method foo ($arg1) {  # '$arg1'
+
+    We deal with them as follows, and return the appropriate "my ($self,
+    ...) = @_;" string.
+
+        sub make_proto_unwrap {
+          my ($proto) = @_;
+          my $inject = 'my ($self';
+          if (defined $proto) {
+            $inject .= ", $proto" if length($proto);
+            $inject .= ') = @_; ';
+          } else {
+            $inject .= ') = shift;';
+          }
+          return $inject;
+        }
+
+   "inject_if_block"
+    Now we need to inject it after the opening '{' of the method body. We
+    can do this with the building blocks we defined above like "skipspace"
+    and "get_linestr".
+
+        sub inject_if_block {
+          my $inject = shift;
+          skipspace;
+          my $linestr = Devel::Declare::get_linestr;
+          if (substr($linestr, $Offset, 1) eq '{') {
+            substr($linestr, $Offset+1, 0) = $inject;
+            Devel::Declare::set_linestr($linestr);
+          }
+        }
+
+   "scope_injector_call"
+    We want to be able to handle both named and anonymous methods. i.e.
+
+        method foo () { ... }
+        my $meth = method () { ... };
+
+    These will then get rewritten as
+
+        method { ... }
+        my $meth = method { ... };
+
+    where 'method' is a subroutine that takes a code block. Spot the
+    problem? The first one doesn't have a semicolon at the end of it! Unlike
+    'sub' which is a builtin, this is just a normal statement, so we need to
+    terminate it. Luckily, using "B::Hooks::EndOfScope", we can do this!
+
+      use B::Hooks::EndOfScope;
+
+    We'll add this to what gets 'injected' at the beginning of the method
+    source.
+
+      sub scope_injector_call {
+        return ' BEGIN { MethodHandlers::inject_scope }; ';
+      }
+
+    So at the beginning of every method, we are passing a callback that will
+    get invoked at the *end* of the method's compilation... i.e. exactly
+    then the closing '}' is compiled.
+
+      sub inject_scope {
+        on_scope_end {
+          my $linestr = Devel::Declare::get_linestr;
+          my $offset = Devel::Declare::get_linestr_offset;
+          substr($linestr, $offset, 0) = ';';
+          Devel::Declare::set_linestr($linestr);
+        };
+      }
+
+  Shadowing each method.
+   "shadow"
+    We override the current definition of 'method' using "shadow".
+
+        sub shadow {
+          my $pack = Devel::Declare::get_curstash_name;
+          Devel::Declare::shadow_sub("${pack}::${Declarator}", $_[0]);
+        }
+
+    For a named method we invoked like this:
+
+        shadow(sub (&) { no strict 'refs'; *{$name} = shift; });
+
+    So in the case of a "method foo { ... }", this call would redefine
+    "method" to be a subroutine that exports 'sub foo' as the (munged)
+    contents of "{...}".
+
+    The case of an anonymous method is also cute:
+
+        shadow(sub (&) { shift });
+
+    This means that
+
+        my $meth = method () { ... };
+
+    is rewritten with "method" taking the codeblock, and returning it as is
+    to become the value of $meth.
+
+   "get_curstash_name"
+    This returns the package name *currently being compiled*.
+
+   "shadow_sub"
+    Handles the details of redefining the subroutine.
+
+SEE ALSO
+    One of the best ways to learn "Devel::Declare" is still to look at
+    modules that use it:
+
+    <http://cpants.perl.org/dist/used_by/Devel-Declare>.
+
+AUTHORS
+    Matt S Trout - <mst@shadowcat.co.uk> - original author
+
+    Company: http://www.shadowcat.co.uk/ Blog: http://chainsawblues.vox.com/
+
+    Florian Ragwitz <rafl@debian.org> - maintainer
+
+    osfameron <osfameron@cpan.org> - first draft of documentation
+
+COPYRIGHT AND LICENSE
+    This library is free software under the same terms as perl itself
+
+    Copyright (c) 2007, 2008, 2009 Matt S Trout
+
+    Copyright (c) 2008, 2009 Florian Ragwitz
+
+    stolen_chunk_of_toke.c based on toke.c from the perl core, which is
+
+    Copyright (C) 1991, 1992, 1993, 1994, 1995, 1996, 1997, 1998, 1999,
+    2000, 2001, 2002, 2003, 2004, 2005, 2006, by Larry Wall and others
+

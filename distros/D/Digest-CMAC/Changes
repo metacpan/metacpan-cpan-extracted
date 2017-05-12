@@ -1,0 +1,25 @@
+Revision history for Perl extension Digest::CMAC.
+
+0.04
+	- The block splitting used a 5.8 feature (unpack groups). Added a slower
+	  regex fallback for older perls.
+	- Various other minor fixes means we're compat down to 5.004. Ancient deps
+	  must be installed thougj, virtually all of them require 5.6 nowadays.
+
+0.03
+	- Added OMAC2 support and made OMAC1 into an alias for CMAC
+	- Significant speed improvements (about 130x faster)
+	- Cipher parameter can be an object, too
+	- <forgot to changelog this in 0.03>: fixed 64bit blocksize constants to
+	  match the spec and changed the test accordingly
+
+0.02  Mon Jul 17 04:11:48 JST 2006
+	- add 64bit block cipher tests.
+	- fixed blocksize check.
+	- add methods: addfile, add_bits
+	- fixed b64digest result string.
+
+0.01  Sat Jul 15 20:57:12 JST 2006
+	- original version; created by h2xs 1.23 with options
+		-n Digest::OMAC -X
+

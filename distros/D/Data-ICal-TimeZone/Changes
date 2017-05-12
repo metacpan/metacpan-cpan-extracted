@@ -1,0 +1,9 @@
+1.23 23rd August, 2007
+    Updated to tzdata2007g
+
+1.22  12th June, 2007
+    Fixed a bug with timezones with hyphens in the name (spotted by Duncan Forsyth)
+    Updated to tzdata2007f
+
+1.21  22nd March, 2007
+    Initial CPAN release

@@ -1,0 +1,90 @@
+NAME
+    Dancer::Plugin::Auth::RBAC::Credentials::DBIC -
+    Dancer::Plugin::Auth::RBAC authentication via DBIx::Class
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+        # in your app code
+        my $auth = auth($login, $password);
+        if ($auth) {
+            # login successful
+        }
+
+DESCRIPTION
+    Dancer::Plugin::Auth::RBAC::Credentials::DBIC uses your DBIx::Class
+    schema as the application's user management system.
+
+METHODS
+  authorize
+    Validates a user against the defined DBIx::Class schema using the
+    supplied arguments and configuration file options.
+
+CONFIGURATION
+    Minimal example:
+
+        plugins:
+          DBIC:
+            Auth:
+              dsn: "dbi:SQLite:dbname=./foo.db"
+          Auth::RBAC:
+            credentials:
+              class: DBIC
+
+    The following config options are avaialable:
+
+    handle
+        The handle of the Dancer::Plugin::DBIC schema to use. Only needed if
+        you have more than one schema defined.
+
+    user_moniker
+        The moniker for the result source which holds your users. Default
+        "User".
+
+    login_field
+        The name of the field that the login name is stored in. Default
+        "login".
+
+    password_field
+        The name of the field that the password is stored in. Default
+        "password".
+
+    password_type
+        This sets the password type. In order for the password module to
+        verify the plaintext password passed in, it must be told what format
+        the password will be in when it is retreived from the user object.
+        The supported options are:
+
+        clear
+            The password is stored in clear text and will be compared
+            directly. This is the default.
+
+        self_check
+            The password will be passed to the "check_password()" method of
+            the user object.
+
+    id_field
+        The name of the field that the user id is stored in. Default "id".
+
+    name_field
+        The name of the field that the user's name is stored in. Default
+        "name".
+
+    role_relation
+        The name of the relationship to get the roles of a user. Default
+        "roles". Set to "undef" if you're not using roles.
+
+    role_name_field
+        The name of the field on the role object that the role name is
+        stored in. Default "name".
+
+AUTHOR
+    Dagfinn Ilmari Mannsåker <ilmari@photobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Photobox Limited.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,32 @@
+Revision history for Perl extension Digest-FP56x1xor.
+
+0.15  Thu May 20 15:34:39 CEST 2010
+	- cleaned of unused code, released to cpan.
+
+0.14  Thu Jun 26 22:58:05 CEST 2008
+	- bugfix: signextension lead to large ints, segfault in gen() 
+
+0.13  Thu Jun 26 02:15:17 2008
+	- added optional substring cutting to gen() and cooked().
+
+0.12  Thu Jun 26 01:45:03 2008
+	- added a simplified version of cooked().
+	- removed the horrible one from Text::Fracture, 
+	  it is more a digest than cracker.
+
+0.11  Wed Jun 25 00:54:03 2008
+	- modulo 56 overflow bug fixed.
+
+0.10  Tue Jun 24 19:33:03 2008
+	- switched completly to hex, using uint64 in perl is ugly;
+	  writing uint64 in SQL needs decimal or 
+	  hex representation anyway, hex is shorter.
+
+0.09  Mon Jun 23 22:35:03 2008
+	- introduced uint64_t, used LL suffix.
+
+0.01  Thu Oct  4 21:21:35 2007
+	- original version; created by h2xs 1.23 with options
+		-A -n Digest-FP56x1xor
+        - modeled after Digest-FP5x12ds
+

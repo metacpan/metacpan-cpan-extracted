@@ -1,0 +1,66 @@
+Revision history for Domain-PublicSuffix
+
+0.14    2016-08-08 16:02 GMT
+  - Release
+
+0.13    2016-08-07 16:02 GMT
+  - Test fixes
+
+0.12    2016-08-05 16:02 GMT
+  - Fix unicode parsing bug
+
+0.11    2016-08-04 17:10 GMT
+  - Remove Data::Validate::Domain dependency by simplifying the domain validity
+    check to very basic sanity checks, with the assumption that egregious errors
+    are either caught upstream, or result in a validity failure after checking
+    the PublicSuffix match.
+  - Update upstream PublicSuffix list
+
+0.10    2014-10-15 01:35 GMT
+  - Update upstream PublicSuffix list
+
+0.09    2013-03-18 03:35 GMT
+  - Include patch from Gavin Carr (GAVINC) to fix domains that evaluate to false
+
+0.08    2013-01-31 15:00 GMT
+  - Update upstream PublicSuffix list
+
+0.07    2012-08-05 21:25 GMT
+  - Typo fix.
+
+0.06    2012-08-05 18:00 GMT
+  - Minor documentation changes in Domain::PublicSuffix and get_root_domain
+  - Switched to new upstream PublicSuffix list
+  - Included patches from Daniel Kahn Gillmor (DKG):
+    - Additional path to support Debian publicsuffix package
+    - Non-zero exit from get_root_domain
+
+0.05    2012-07-17 00:00 GMT
+  - Ridiculously long wait, but at least we have Dist::Zilla and GitHub.
+  - Updated default public suffix file
+  - Included patches from Gavin Carr (GAVINC):
+    - File::Spec fixes
+    - Test file for problematic domains
+    - non-TLD roots (like .co.im) are not getting flagged as RootEnable when
+      they should be
+    - Optionally allow underscores in domain
+
+0.04    2008-10-09 11:30 GMT
+  - Normalized code style
+  - Updated default public suffix file to latest from Mozilla
+  - Bug fixes, thanks to Jason Wieland --
+    - Documentation fixed to show that new requires a hashref
+    - Path searching for the tld data file now searches from root
+    - Improper code flow after finding a file causes module to break when a data
+      file is defined.
+
+0.03    2008-07-12 19:30 GMT
+  Repackaging with MakeMaker, added basic test suite, updated Mozilla
+  effective_tld data file.
+
+0.02    2008-04-03 22:00 GMT
+  Documentation and namespace fixes, so viewing in CPAN isn't a nightmare.
+
+0.01    2008-03-31 20:00
+  First release, likely prone to bugs I haven't even thought of.
+

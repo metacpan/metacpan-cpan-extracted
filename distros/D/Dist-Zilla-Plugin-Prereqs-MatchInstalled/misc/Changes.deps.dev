@@ -1,0 +1,198 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+1.001003
+ [Added / develop recommends]
+ - Test::More 0.99
+
+ [Added / develop requires]
+ - Dist::Zilla 5
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001002
+ - Dist::Zilla::Plugin::Bootstrap::lib
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+ - Dist::Zilla::Plugin::Test::EOL
+ - English
+ - Software::License::Perl_5
+ - Test::EOL
+ - Test::MinimumVersion
+ - Test::More 0.96
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::Git::NextRelease 0 → 0.004000
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 0 → 1.004000
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001002 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020001 → 2.025020
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::ReadmeFromPod
+
+1.001002 2014-09-07T08:54:48Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.020000 → 2.020001
+
+1.001001 2014-09-05T03:26:01Z
+
+1.001000 2014-09-04T21:06:03Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001
+
+ [Changed / develop requires]
+ - Test::Kwalitee 1.12 → 1.21
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001001 → 0.001002
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.017002 → 2.020000
+
+1.000002 2014-08-15T21:18:20Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Git::Contributors 0.006
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.016004 → 2.017002
+
+1.000001 2014-07-18T15:14:08Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease
+ - Dist::Zilla::Plugin::CopyFilesFromBuild
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized
+
+ [Added / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001001
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.016004
+
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.27 → 0.19
+ - Test::CPAN::Meta 0.23 → 0
+ - Test::Pod 1.48 → 1.41
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Git::NextVersion::Sanitized
+ - Dist::Zilla::Plugin::PkgVersion
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.013003
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+1.000000 2014-04-30T22:34:56Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Git::NextRelease
+ - Dist::Zilla::Plugin::Git::NextVersion::Sanitized
+ - Dist::Zilla::Plugin::MakeMaker
+ - Dist::Zilla::Plugin::MinimumPerl
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled
+ - Dist::Zilla::Plugin::RunExtraTests
+ - Dist::Zilla::Plugin::Test::ReportPrereqs
+
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.004001 → 2.013003
+ - Test::CPAN::Changes 0.26 → 0.27
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl
+ - Dist::Zilla::Plugin::CheckExtraTests
+ - Dist::Zilla::Plugin::Git::NextVersion
+ - Dist::Zilla::Plugin::ModuleBuild
+ - Dist::Zilla::Plugin::NextRelease
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled
+ - Dist::Zilla::Plugin::PruneCruft
+ - Dist::Zilla::Plugin::ReportVersions::Tiny
+ - version 0.9904
+
+0.1.6 2013-11-29T14:52:26Z
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.004000 → 2.004001
+
+0.1.5 2013-11-22T08:56:22Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl
+ - Dist::Zilla::Plugin::Authority 1.006
+ - Dist::Zilla::Plugin::AutoPrereqs
+ - Dist::Zilla::Plugin::CheckExtraTests
+ - Dist::Zilla::Plugin::ConfirmRelease
+ - Dist::Zilla::Plugin::EOLTests
+ - Dist::Zilla::Plugin::Git::Check
+ - Dist::Zilla::Plugin::Git::Commit
+ - Dist::Zilla::Plugin::Git::CommitBuild
+ - Dist::Zilla::Plugin::Git::GatherDir
+ - Dist::Zilla::Plugin::Git::NextVersion
+ - Dist::Zilla::Plugin::Git::Tag
+ - Dist::Zilla::Plugin::GithubMeta
+ - Dist::Zilla::Plugin::License
+ - Dist::Zilla::Plugin::Manifest
+ - Dist::Zilla::Plugin::ManifestSkip
+ - Dist::Zilla::Plugin::MetaConfig
+ - Dist::Zilla::Plugin::MetaData::BuiltWith
+ - Dist::Zilla::Plugin::MetaJSON
+ - Dist::Zilla::Plugin::MetaProvides::Package 1.14000001
+ - Dist::Zilla::Plugin::MetaTests
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::ModuleBuild
+ - Dist::Zilla::Plugin::NextRelease
+ - Dist::Zilla::Plugin::PkgVersion
+ - Dist::Zilla::Plugin::PodCoverageTests
+ - Dist::Zilla::Plugin::PodSyntaxTests
+ - Dist::Zilla::Plugin::PodWeaver
+ - Dist::Zilla::Plugin::Prereqs
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled
+ - Dist::Zilla::Plugin::PruneCruft
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod
+ - Dist::Zilla::Plugin::ReadmeFromPod
+ - Dist::Zilla::Plugin::ReportVersions::Tiny
+ - Dist::Zilla::Plugin::Test::CPAN::Changes
+ - Dist::Zilla::Plugin::Test::Compile::PerFile
+ - Dist::Zilla::Plugin::Test::Kwalitee
+ - Dist::Zilla::Plugin::Test::MinimumVersion
+ - Dist::Zilla::Plugin::Test::Perl::Critic
+ - Dist::Zilla::Plugin::TestRelease
+ - Dist::Zilla::Plugin::Twitter
+ - Dist::Zilla::Plugin::UploadToCPAN
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.004000
+
+ [Added / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.23 → 0.26
+ - Test::Kwalitee 1.08 → 1.12
+
+ [Removed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0
+
+ [Removed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.3
+
+0.1.4 2013-09-25T22:27:11Z
+
+0.1.3 2013-09-25T10:32:16Z
+ [Changed / develop requires]
+ - version 0.9903 → 0.9904
+
+0.1.2 2013-08-31T02:47:34Z
+ [Added / develop requires]
+ - Test::Kwalitee 1.08
+
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.22 → 0.23
+ - version 0.9902 → 0.9903
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.5 → v1.8.3
+
+0.1.1 2013-08-07T22:34:28Z
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.20 → 0.22
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.4 → v1.7.5

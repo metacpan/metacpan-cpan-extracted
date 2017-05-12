@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+
+# Some tools might want to draw pretty graphs with line drawing / similar
+STDOUT->binmode( ":encoding(UTF-8)" );
+STDOUT->autoflush(1);
+
+my $file = shift @ARGV or die "Need dumpfile\n";
+
+my $pmat = Devel::MAT->load( $file,
+   progress => ( -t STDOUT ? sub {
+      print "\r\e[K" . shift;
+   } : undef ),
+);
+
+print "\r\e[K" if -t;
+
+my $df = $pmat->dumpfile;
+
+print "Perl memory dumpfile from perl ", $df->perlversion, "\n";
+print "Heap contains ", scalar $df->heap, " objects\n";
+
+sub Devel::MAT::Cmd::printf
+{
+   shift;
+   my ( $fmt, @args ) = @_;
+
+   printf $fmt, @args;
+}
+
+if( @ARGV ) {
+   my $cmd = shift @ARGV;
+
+   $pmat->load_tool_for_command( $cmd )->run_cmd( @ARGV );
+   exit
+}
+
+require Term::ReadLine;
+require Text::ParseWords;
+
+my $rl = Term::ReadLine->new( 'pmat' );
+while( defined( my $line = $rl->readline( 'pmat> ') ) ) {
+   my ( $cmd, @args ) = Text::ParseWords::shellwords( $line );
+   next unless defined $cmd; # blank line
+
+   last if $cmd eq "exit";
+
+   eval {
+      $pmat->load_tool_for_command( $cmd )->run_cmd( @args );
+      1;
+   } or
+      print STDERR "$@";
+
+   print "\n";
+}

@@ -1,0 +1,56 @@
+---
+abstract: 'DEPRECATED -- use Dist::Zilla::Plugin::Git::NextVersion instead'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Copy::Recursive: '0'
+  File::Spec: '0'
+  File::pushd: '0'
+  Path::Class: '0'
+  Test::More: '0.88'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-BumpVersionFromGit
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::BumpVersionFromGit:
+    file: lib/Dist/Zilla/Plugin/BumpVersionFromGit.pm
+    version: '0.010'
+requires:
+  Dist::Zilla: '4'
+  Dist::Zilla::Role::VersionProvider: '0'
+  Git::Wrapper: '0'
+  Moose: '0'
+  Version::Next: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  version: '0.80'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit.git
+version: '0.010'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+x_deprecated: 1

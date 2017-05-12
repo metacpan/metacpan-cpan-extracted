@@ -1,0 +1,8 @@
+README
+Changes
+lib/Device/Regulator/Plasmatronic.pm
+data/plasmatronic.dat
+LICENSE
+MANIFEST
+Makefile.PL
+test/pl

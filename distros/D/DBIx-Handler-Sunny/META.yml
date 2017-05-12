@@ -1,0 +1,46 @@
+---
+abstract: 'DBIx::Handler meets Sunny'
+author:
+  - 'INA Lintaro <tarao.gnn@gmail.com>'
+build_requires:
+  Class::Accessor::Lite: '0'
+  Test::Base: '0'
+  Test::Class: '0'
+  Test::Deep: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Handler-Sunny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Handler::Sunny:
+    file: lib/DBIx/Handler/Sunny.pm
+    version: '0.02'
+requires:
+  DBIx::Handler: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/tarao/perl5-DBIx-Handler-Sunny/issues
+  homepage: https://github.com/tarao/perl5-DBIx-Handler-Sunny
+  repository: git://github.com/tarao/perl5-DBIx-Handler-Sunny.git
+version: '0.02'
+x_contributors:
+  - 'pokutuna <popopopopokutuna@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

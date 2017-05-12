@@ -1,0 +1,33 @@
+---
+name: Data-Report
+version: 0.10
+author:
+  - 'Johan Vromans <jvromans@squirrel.nl>'
+abstract: Framework for flexible reporting
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+  Text::CSV: 1
+recommends:
+  HTML::Entities: 0
+provides:
+  Data::Report:
+    file: lib/Data/Report.pm
+    version: 0.10
+  Data::Report::Base:
+    file: lib/Data/Report/Base.pm
+  Data::Report::Plugin::Csv:
+    file: lib/Data/Report/Plugin/Csv.pm
+  Data::Report::Plugin::Html:
+    file: lib/Data/Report/Plugin/Html.pm
+  Data::Report::Plugin::Text:
+    file: lib/Data/Report/Plugin/Text.pm
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+no_index:
+  package:
+    - DB

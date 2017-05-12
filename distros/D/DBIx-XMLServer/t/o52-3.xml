@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="3">
+    <name>Ann Other</name>
+    <department>Widget Manufacturing</department>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="2">
+    <name>Fred Bloggs</name>
+    <department>Widget Manufacturing</department>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="1">
+    <name>John Smith</name>
+    <department>Widget Manufacturing</department>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="5">
+    <name>Mickey Mouse</name>
+    <department>Widget Marketing</department>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="4">
+    <name>Minnie Mouse</name>
+    <department>Widget Marketing</department>
+  </employee>
+</employees>

@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Plugin-CopyFilesFromRelease
+
+0.006     2015-06-16 01:26:52Z
+    - now with unit tests! :)
+    - sort data in dumped configs, for consistency between builds
+
+0.005     2015-01-05 19:42:27Z
+    - iterator now once again works properly when skipping some files
+      (error introduced in 0.004)
+
+0.004     2014-12-22 02:15:06Z
+    - use Path::Tiny rather than relying on Dist::Zilla giving us
+      Path::Class objects (PR#3 Karen Etheridge)
+    - stop loading (unused) Moose::Autobox (PR#4 Karen Etheridge)
+
+0.003     2014-10-19 07:28:43Z
+    - dump configs into metadata (Karen Etheridge)
+
+0.002     2014-08-16 00:39:39Z
+    - include additional metadata
+    - test that module can compile properly
+    - specify minimum perl version number
+    - include README file
+
+0.001     2013-02-12 02:10:05Z
+    - Initial CPAN release

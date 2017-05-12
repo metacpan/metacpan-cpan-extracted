@@ -1,0 +1,31 @@
+Date-Korean
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+  DateTime
+  DateTime::Calendar::Julian
+  Date::ISO8601
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, C.H. Kang
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

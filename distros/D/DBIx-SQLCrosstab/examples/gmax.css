@@ -1,0 +1,57 @@
+<!-- CSS Stylesheet -->
+
+body 
+.table1 {
+        font-family:"Verdana"; 
+        border:"1"; 
+        padding:"4"; 
+        }
+.table2 {
+        font-family:"Verdana"; 
+        border:"1"; 
+        padding:"4"; 
+        }
+.tableheader1 {
+        font-family:"Verdana"; 
+        font-size:"10pt"; 
+        font-weight:bold; 
+        color:Blue; 
+        }
+.tableheader2 {
+        font-family:"Verdana"; 
+        font-size:"10pt"; 
+        font-weight:bold; 
+        color:Green;  
+        }
+.tabledata1 {
+        font-family:"Verdana"; 
+        font-size:"8pt"; 
+        color:Red; 
+        border:"1"; 
+        padding:"1px"; }
+.tabledata2 {
+        font-family:"Verdana"; 
+        font-size:"8pt"; 
+        color:Black; 
+        border:"1"; 
+        padding:"1px"; }
+.header1 {
+        font-family:"Verdana"; 
+        font-size:"10pt"; 
+        font-weight:bold; 
+        color:Black; 
+        border:"Black"; 
+        padding:"0px"; }
+.header2 {
+        font-family:"Verdana"; 
+        font-size:"11pt"; 
+        font-weight:bold; 
+        color:Black; 
+        border:"1"; 
+        padding:"2px"; }
+.normaltext {
+        font-family:"Verdana"; 
+        font-size:"10pt"; 
+        color:Black; 
+        border:"1"; 
+        padding:"0px"; }

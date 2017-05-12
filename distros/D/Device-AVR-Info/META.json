@@ -1,0 +1,46 @@
+{
+   "abstract" : "load data from F<Atmel> F<AVR Studio> device files",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-AVR-Info",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Struct::Dumb" : "0",
+            "XML::Smart" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::AVR::Info" : {
+         "file" : "lib/Device/AVR/Info.pm",
+         "version" : "0.01"
+      },
+      "Device::AVR::Info::Module" : {
+         "file" : "lib/Device/AVR/Info/Module.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01"
+}

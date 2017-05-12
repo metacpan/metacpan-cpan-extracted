@@ -1,0 +1,26 @@
+Die-Hard
+========
+
+Created:      2012-07-02
+Home page:    <https://metacpan.org/release/Die-Hard>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Die-Hard>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-15	Zeus! You got a problem with that?
+
+ [ Documentation ]
+ - Mention $_try from Object::Util.
+
+ [ Packaging ]
+ - Add repo link.
+
+0.003	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.002	2013-03-19	No one kills him but me!
+
+ - Updated: Move from (deprecated) Any::Moose to Moo.
+
+0.001	2012-07-11	You don't like flying, do you?

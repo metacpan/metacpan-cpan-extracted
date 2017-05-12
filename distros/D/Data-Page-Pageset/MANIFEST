@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Data/Page/Pageset.pm
+lib/Data/Page/Pageset/Chunk.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00.load.t
+t/01.main.t
+t/pod-coverage.t
+t/pod.t

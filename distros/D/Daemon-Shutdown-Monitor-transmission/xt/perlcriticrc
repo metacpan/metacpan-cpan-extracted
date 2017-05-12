@@ -1,0 +1,9 @@
+severity = brutal
+color = 1
+theme = 
+
+[-Miscellanea::RequireRcsKeywords]
+
+[InputOutput::RequireCheckedSyscalls]
+functions = :builtins
+exclude_functions = print say

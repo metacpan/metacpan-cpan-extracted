@@ -1,0 +1,38 @@
+---
+abstract: 'Converting dates to or from the French Revolutionary calendar'
+author:
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  List::Util: '1.33'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Calendar-FrenchRevolutionary
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DateTime::Calendar::FrenchRevolutionary:
+    file: lib/DateTime/Calendar/FrenchRevolutionary.pm
+    version: '0.14'
+requires:
+  DateTime: '0.14'
+  Params::Validate: '0'
+  Roman: '1.22'
+  Test::More: '0'
+  perl: v5.8.5
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary.git
+version: '0.14'

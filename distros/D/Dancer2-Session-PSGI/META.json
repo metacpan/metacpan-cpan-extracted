@@ -1,0 +1,80 @@
+{
+   "abstract" : "Dancer2 session storage via Plack::Middleware::Session",
+   "author" : [
+      "Russell Jenkins <russellj@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Session-PSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.152000",
+            "Dancer2::Core::Role::SessionFactory" : "0",
+            "Moo" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0.152000",
+            "File::Spec" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack" : "1.0029",
+            "Plack::Builder" : "0",
+            "Plack::Middleware::Session" : "0.23",
+            "Plack::Session::Store" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/veryrusty/dancer2-session-psgi/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dancer2-Session-PSGI",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/veryrusty/dancer2-session-psgi.git",
+         "web" : "https://github.com/veryrusty/dancer2-session-psgi"
+      }
+   },
+   "version" : "0.009"
+}
+

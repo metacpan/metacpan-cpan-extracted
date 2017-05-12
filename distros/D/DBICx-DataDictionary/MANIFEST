@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/DBICx/DataDictionary.pm
+t/00-compile.t
+t/05-basic.t
+t/10-column-types.t
+t/release-meta-yaml.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/tlib/My/Schema.pm
+t/tlib/My/Schema/DataDictionary.pm
+t/tlib/My/Schema/Result/Table.pm

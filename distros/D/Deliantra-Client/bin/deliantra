@@ -1,0 +1,2966 @@
+#!/opt/bin/perl
+
+if ($ENV{DELIANTRA_CORO_DEBUG}) {
+   eval '
+      use Coro;
+      use Coro::EV;
+      use Coro::Debug;
+      our $debug = new_unix_server Coro::Debug "/tmp/dc";
+   ';
+}
+
+# do splash-screen thingy on win32
+my $startup_done = sub { };
+BEGIN {
+   if (%PAR::LibCache && $^O eq "MSWin32") {
+      while (my ($filename, $zip) = each %PAR::LibCache) {
+         $zip->extractMember ("SPLASH.bmp", "$ENV{PAR_TEMP}/SPLASH.bmp");
+      }
+
+      require Win32::GUI::SplashScreen;
+
+      Win32::GUI::SplashScreen::Show (
+         -file => "$ENV{PAR_TEMP}/SPLASH.bmp",
+      );
+
+      # initialise the resolver now, as vista forces us back to the desktop
+      # when doing this later.
+      require AnyEvent::DNS;
+      AnyEvent::DNS::resolver ();
+
+      $startup_done = sub {
+         Win32::GUI::SplashScreen::Done (1);
+      };
+   }
+}
+
+use common::sense;
+
+use Carp 'verbose';
+
+# do things only needed for single-binary version (par)
+BEGIN {
+   if (%PAR::LibCache) {
+      @INC = grep ref, @INC; # weed out all paths except pars loader refs
+
+      my $root = $ENV{PAR_TEMP};
+
+      while (my ($filename, $zip) = each %PAR::LibCache) {
+         for ($zip->memberNames) {
+            next unless /^root\/(.*)/;
+            $zip->extractMember ($_, "$root/$1")
+               unless -e "$root/$1";
+         }
+      }
+
+      if ($^O eq "MSWin32") {
+         # pango is relocatable on win32
+      } else {
+         # OS X
+         $ENV{PANGO_RC_FILE} = "$root/pango.rc";
+         $ENV{DYLD_LIBRARY_PATH} = $root;
+         chdir $root; # for pango modules, maybe other things
+      }
+
+      unshift @INC, $root;
+   }
+}
+
+# prepend private library directory and prepare env
+BEGIN {
+   for (grep !ref, @INC) {
+      my $path = "$_/Deliantra/Client/private";
+      if (-d $path) {
+         unshift @INC, $path;
+         last;
+      }
+   }
+}
+
+# need to do it again because that pile of garbage called PAR nukes it before main
+unshift @INC, $ENV{PAR_TEMP}
+   if %PAR::LibCache;
+
+use EV;
+BEGIN { *time = \&EV::time }
+
+use List::Util qw(max min);
+
+use Deliantra;
+use Deliantra::Protocol::Constants;
+
+use AnyEvent::Util ();
+use AnyEvent::Socket ();
+use AnyEvent::DNS ();
+
+use Compress::LZF;
+use JSON::XS;
+
+use DC;
+
+sub crash($;$) {
+   # nop during compiletime
+}
+
+BEGIN {
+   $SIG{__DIE__} = sub {
+      return if $^S;
+      crash "CRASH/DIE: $_[0]" => 1;
+      DC::fatal Carp::longmess "$_[0]";
+   }
+}
+
+use DC::OpenGL ();
+use DC::Protocol;
+use DC::DB;
+use DC::UI;
+use DC::UI::Canvas;
+use DC::UI::Inventory;
+use DC::UI::SpellList;
+use DC::UI::Dockable;
+use DC::UI::Dockbar;
+use DC::UI::ChatView;
+use DC::MessageDistributor;
+use DC::Pod;
+use DC::MapWidget;
+use DC::Macro;
+
+$SIG{QUIT} = sub { Carp::cluck "QUIT" };
+$SIG{PIPE} = 'IGNORE';
+
+$EV::DIED = sub {
+   crash "CRASH/EV::DIED: $@" => 0;
+   DC::fatal Carp::longmess $@;
+};
+
+my $MAX_FPS = 60;
+
+our $DEFAULT_SERVER = "gameserver.deliantra.net";
+
+our $META_SERVER = "http://metaserver.schmorp.de/current.json";
+
+our $LAST_REFRESH;
+our $NOW;
+
+our $CFG;
+our $PROFILE; # current profile
+our $FAST; # fast, low-quality mode, possibly useful for software-rendering
+our $DELIANTRA_DEBUG = $ENV{DELIANTRA_DEBUG} * 1;
+
+our $WANT_REFRESH;
+
+our $MODE_SLIDER;
+our $CAVEAT_LABEL;
+
+our @SDL_MODES;
+our $SDL_REINIT = 1;
+our $WIDTH;
+our $HEIGHT;
+our $FULLSCREEN;
+our $FONTSIZE;
+
+our $FONT_PROP;
+our $FONT_FIXED;
+
+our $CONN;
+
+our $MAP;
+our $MAPMAP;
+our $MAPWIDGET;
+our $COMPLETER;
+our $MENUFRAME;   # the rectangle at the top
+our $MENUBAR;     # the hbox at the top
+our $MENUPOPUP;
+our $BUTTONBAR;   # the menu buttons
+our $METASERVER;
+our $LOGIN_BUTTON;
+our $QUIT_DIALOG;
+our $HOST_ENTRY;
+our $FULLSCREEN_ENABLE;
+our $PICKUP_ENABLE;
+our $SERVER_INFO;
+
+our $SETUP_DIALOG;
+our $SETUP_NOTEBOOK;
+our $SETUP_SERVER;
+our $SETUP_LOGIN;
+our $SETUP_KEYBOARD;
+
+our $PL_NOTEBOOK;
+our $PL_WINDOW;
+
+our $MUSIC_PLAYING_WIDGET;
+our $LICENSE_WIDGET;
+
+our $PICKUP_PAGE;
+our $INVENTORY_PAGE;
+our $STATS_PAGE;
+our $SKILL_PAGE;
+our $SPELL_PAGE;
+our $SPELL_LIST;
+
+our $HELP_WINDOW;
+our $MESSAGE_WINDOW;
+our $MESSAGE_DIST;
+our $FLOORBOX;
+our $GAUGES;
+our $STATWIDS;
+
+our $SDL_ACTIVE;
+our @SDL_CB;
+
+our $ALT_ENTER_MESSAGE;
+our $STATUSBOX;
+our $MODBOX;
+our $DEBUG_STATUS;
+
+our $INV;
+our $INVR;
+our $INVR_HB;
+
+#############################################################################
+
+# write a crash message blockingly to the socket, if possible
+# this is a bit too complicated for my tastes, but it was easy.
+*crash = sub($;$) {
+   my ($msg, $backtrace) = @_;
+
+   warn $msg;
+
+   return unless $CONN;
+
+   my $fh = $CONN->{fh}
+      or return;
+
+   my $buf = delete $CONN->{wbuf};
+
+   $buf .= pack "n/a*", "exti " . JSON::XS::encode_json [clientlog => undef, substr $msg, 0, 8000];
+
+   AnyEvent::Util::fh_nonblocking $fh, 0;
+   syswrite $fh, $buf;
+   AnyEvent::Util::fh_nonblocking $fh, 1;
+
+   $msg =~ s/\s+$//;
+
+   # backtrace as second step, in case it crashes, too
+   crash Carp::longmess "$msg\nbacktrace, for client version $DC::VERSION, generated"
+      if $backtrace;
+};
+
+sub clienterror($;$) {
+   my ($msg, $backtrace) = @_;
+
+   warn $msg;
+
+   return unless $CONN;
+
+   $CONN->send_exti_msg (clientlog => $msg);
+   $CONN->send_exti_msg (clientlog => Carp::longmess "$msg\nbacktrace, for client version $DC::VERSION, generated") if $backtrace;
+}
+
+#############################################################################
+
+sub status {
+   $STATUSBOX->add (DC::asxml $_[0], pri => -10, group => "status", timeout => 10, fg => [1, 1, 0, 1]);
+}
+
+sub debug {
+   $DEBUG_STATUS->set_text ($_[0]);
+}
+
+sub message {
+   $MESSAGE_DIST->message (@_);
+}
+
+sub update_modbox {
+   my $mod = DC::SDL_GetModState;
+
+   my $markup;
+
+   $markup .= $mod & DC::KMOD_CTRL
+              ? ($MAPWIDGET->{ctrl} ? "[REPEAT]" : "[<span foreground='#888'>REPEAT</span>]")
+              : "[<span foreground='#888'> once </span>]";
+
+   $markup .= $mod & DC::KMOD_SHIFT
+              ? ($MAPWIDGET->{shft} ? "[FIRE]" : "[<span foreground='#888'>FIRE</span>]")
+              : "[<span foreground='#888'>move</span>]";
+
+   $markup .= $mod & (DC::KMOD_ALT | DC::KMOD_META)
+              ? "[ALT]"
+              : "[<span foreground='#888'>alt</span>]";
+
+   $markup .= $mod & DC::KMOD_NUM
+              ? "[NUM]"
+              : "[<span foreground='#888'>num</span>]";
+
+   # <tt> around next statement works around some bug that keeps the
+   # "font =>" from being used on windows
+   $MODBOX->set_markup ("<tt>$markup</tt>");
+}
+
+#############################################################################
+#TODO: maybe move into own audio module...
+
+our $SDL_MIXER;
+
+our $MUSIC_DEFAULT = "in_a_heartbeat.ogg";
+our $MUSIC_WANT; # arryref of ambient music we want to play
+our @MUSIC_HAVE; # ambient music we have on disk
+our $MUSIC_START;
+our @MUSIC_JINGLE; # which jingles to play next
+our $MUSIC_PLAYING_DATA;
+our $MUSIC_PLAYING_META;
+our $MUSIC_PLAYER;
+our $MUSIC_RESUME = 30; # resume music when played less than these many seconds before
+
+our %AUDIO_CHUNK;  # audio "files"
+our %AUDIO_PLAY;   # which audio faces should be played
+
+sub audio_channel_finished {
+   my ($channel) = @_;
+
+#   warn "channel $channel finished\n";#d#
+}
+
+sub audio_sound_push($) {
+   my ($face) = @_;
+
+   $CFG->{effects_enable}
+      or return;
+
+   $AUDIO_PLAY{$face}
+      or return;
+
+   if (my $chunk = $AUDIO_CHUNK{$face}) {
+      for (grep $_->[0] >= EV::now, @{(delete $AUDIO_PLAY{$face}) || []}) {
+         my (undef, $dx, $dy, $vol) = @$_;
+
+         my $channel = DC::Channel::find;
+         $channel->volume ($vol * $CFG->{effects_volume} * 128 / 255);
+         $channel->set_position_r ($dx, $dy, 20);
+         $chunk->play ($channel);
+      }
+   } else {
+      # sound_meta not set means data is in flight either way
+      my $meta = $CONN->{face}[$face]
+         or return;
+
+      $meta->{data}
+         or return;
+
+      # if it's a jingle, play it as ambient music
+      if ($meta->{data}{jingle}) {
+         if (delete $AUDIO_PLAY{$face}) { # take the jingle out of the sound queue
+            push @MUSIC_JINGLE, $meta; # push it unto the music/jingle queue
+            &audio_music_push ($face);
+         }
+      } else {
+         # fetch from database
+         DC::DB::get res_data => $meta->{name}, sub {
+            my $rwops = new DC::RW $_[0];
+            my $chunk = new DC::MixChunk $rwops
+               or Carp::confess "sound face " . (JSON::XS::encode_json $meta) . " (" . (unpack "H64", $_[0]) . ") unloadable: " . DC::Mix_GetError;
+            $chunk->volume (($meta->{data}{volume} || 1) * 128);
+            $AUDIO_CHUNK{$face} = $chunk;
+
+            audio_sound_push ($face);
+         };
+      }
+   }
+}
+
+sub audio_sound_play {
+   my ($face, $dx, $dy, $vol) = @_;
+
+   $SDL_MIXER
+      or return;
+   $CFG->{effects_enable}
+      or return;
+
+   my $queue = $AUDIO_PLAY{$face} ||= [];
+   push @$queue, [EV::now + 0.6, $dx, $dy, $vol]; # do not play sound for outdated events
+   audio_sound_push $face
+      unless @$queue > 1;
+}
+
+sub audio_music_set_meta {
+   my ($meta) = @_;
+
+   $MUSIC_PLAYING_META = $meta;
+   $MUSIC_PLAYING_WIDGET->set_markup (
+      "<b>Name</b>:	" . (DC::asxml $meta->{data}{name}) . "\n"
+    . "<b>Author</b>:	" . (DC::asxml $meta->{data}{author}) . "\n"
+    . "<b>Source</b>:	" . (DC::asxml $meta->{data}{source}) . "\n"
+    . "<b>License</b>:	" . (DC::asxml $meta->{data}{license})
+   );
+}
+
+sub audio_music_update_volume {
+   return unless $MUSIC_PLAYING_META;
+   my $volume = $MUSIC_PLAYING_META->{data}{volume} || 1;
+   my $base   = $MUSIC_PLAYING_META->{data}{jingle} ? 1 : $CFG->{bgm_volume};
+   DC::MixMusic::volume $base * $volume * 128;
+}
+
+sub audio_music_start {
+   my $meta = $MUSIC_PLAYING_META;
+
+   DC::DB::get res_data => $meta->{name}, sub {
+      return unless $SDL_MIXER;
+
+      # music might have changed...
+      $meta eq $MUSIC_PLAYING_META
+         or return &audio_music_start ();
+
+      audio_music_update_volume;
+
+      $MUSIC_PLAYING_DATA = \$_[0];
+
+      $meta->{path} or length $_[0]
+         or return clienterror "empty music face from res_data ($meta->{face})";#d#
+
+      my $rwops = $meta->{path}
+         ? (new_from_file DC::RW $meta->{path} or return clienterror "unable to load music face $meta->{path}: $!")#d#clienterror
+         : new DC::RW $$MUSIC_PLAYING_DATA;
+
+      $MUSIC_PLAYER = new DC::MixMusic $rwops
+         or return clienterror "music face $meta->{face} unloadable: " . DC::Mix_GetError => 1;
+
+      my $NOW = time;
+
+      if ($MUSIC_PLAYING_META->{stop_time} > $NOW - $MUSIC_RESUME) {
+         my $pos = $MUSIC_PLAYING_META->{stop_pos};
+         $MUSIC_PLAYER->fade_in_pos (0, 700, $pos);
+         $MUSIC_START = time - $pos;
+      } else {
+         $MUSIC_PLAYER->play (0);
+         $MUSIC_START = time;
+      }
+
+      delete $meta->{stop_time};
+      delete $meta->{stop_pos};
+   }
+}
+
+sub audio_music_push {
+   return unless $SDL_MIXER;
+
+   my $fade_out;
+
+   if (@MUSIC_JINGLE) {
+      $fade_out = 333;
+      @MUSIC_HAVE = $MUSIC_JINGLE[0];
+
+   } else {
+      return unless $CFG->{bgm_enable};
+
+      $fade_out = 700;
+
+      @MUSIC_HAVE =
+         grep $_ && $_->{data},
+            map $CONN->{face}[$_],
+               @$MUSIC_WANT;
+
+      # randomize music a bit so that the order is not always the same
+      $_->{stop_time} ||= rand for @MUSIC_HAVE;
+
+      # default MUSIC_HAVE == MUSIC_DEFAULT
+      @MUSIC_HAVE = { path => DC::find_rcfile "music/$MUSIC_DEFAULT" }
+         unless @MUSIC_HAVE;
+   }
+   
+   # if the currently playing song is acceptable, let it continue
+   return if grep $MUSIC_PLAYING_META == $_, @MUSIC_HAVE;
+
+   my $NOW = time;
+
+   if ($MUSIC_PLAYING_META) {
+      $MUSIC_PLAYING_META->{stop_time} = $NOW;
+      $MUSIC_PLAYING_META->{stop_pos}  = $NOW - $MUSIC_START;
+      DC::MixMusic::fade_out $fade_out;
+   } else {
+      # sort by stop time, oldest first
+      @MUSIC_HAVE = sort { $a->{stop_time} <=> $b->{stop_time} } @MUSIC_HAVE;
+
+      # if the most recently-played piece played very recently,
+      # resume it, else choose the oldest piece for rotation.
+      audio_music_set_meta
+         $MUSIC_HAVE[-1]{stop_pos} && $MUSIC_HAVE[-1]{stop_time} > $NOW - $MUSIC_RESUME
+            ? $MUSIC_HAVE[-1]
+            : $MUSIC_HAVE[0];
+
+      audio_music_start;
+   }
+}
+
+sub audio_music_set_ambient {
+   my ($songs) = @_;
+
+   $MUSIC_WANT = $songs;
+   audio_music_push;
+}
+
+sub audio_music_finished {
+   if ($MUSIC_PLAYING_META) {
+      $MUSIC_PLAYING_META->{stop_time} = time;
+   }
+
+   # we compress multiple jingles of the same type
+   shift @MUSIC_JINGLE
+      while @MUSIC_JINGLE && $MUSIC_PLAYING_META == $MUSIC_JINGLE[0];
+
+   $MUSIC_PLAYING_WIDGET->clear;
+
+   undef $MUSIC_PLAYER;
+   undef $MUSIC_PLAYING_META;
+   undef $MUSIC_PLAYING_DATA;
+
+   audio_music_push;
+}
+
+sub audio_init {
+   if ($CFG->{audio_enable}) {
+      if (length $CFG->{audio_driver}) {
+         local $ENV{SDL_AUDIODRIVER} = $CFG->{audio_driver};
+         DC::SDL_Init DC::SDL_INIT_AUDIO
+            and die "SDL::Init failed!\n";
+      } else {
+         DC::SDL_Init DC::SDL_INIT_AUDIO
+            and die "SDL::Init failed!\n";
+      }
+
+      $ENV{MIX_EFFECTSMAXSPEED} = 1;
+      $SDL_MIXER = !DC::Mix_OpenAudio
+         $CFG->{audio_hw_frequency},
+         DC::MIX_DEFAULT_FORMAT,
+         $CFG->{audio_hw_channels},
+         $CFG->{audio_hw_chunksize};
+
+      if ($SDL_MIXER) {
+         DC::Mix_AllocateChannels $CFG->{audio_mix_channels};
+
+         audio_music_finished;
+      } else {
+         status "Unable to open sound device: there will be no sound";
+      }
+   } else {
+      undef $SDL_MIXER;
+   }
+
+   sub audio_tab_update;
+   audio_tab_update;
+}
+
+sub audio_shutdown {
+   if ($SDL_MIXER) {
+      DC::MixMusic::halt;
+      DC::Mix_AllocateChannels 0;
+   }
+
+   undef $MUSIC_PLAYER;
+   undef $MUSIC_PLAYING_META;
+   undef $MUSIC_PLAYING_DATA;
+
+   $MUSIC_WANT   = [];
+   @MUSIC_JINGLE = ();
+   %AUDIO_PLAY   = ();
+   %AUDIO_CHUNK  = ();
+
+   DC::Mix_CloseAudio if $SDL_MIXER;
+   undef $SDL_MIXER;
+
+   DC::SDL_QuitSubSystem DC::SDL_INIT_AUDIO;
+}
+
+#############################################################################
+
+sub destroy_query_dialog {
+   (delete $_[0]{query_dialog})->destroy
+      if $_[0]{query_dialog};
+}
+
+# FIXME: a very ugly hack to wait for stat update look below! #d#
+our $QUERY_TIMER; #d#
+
+# server query dialog
+sub server_query {
+   my ($conn, $flags, $prompt) = @_;
+
+   # FIXME: a very ugly hack to wait for stat update #d#
+   if ($prompt =~ /roll new stats/ and not $conn->{stat_change_with}) {
+      unless ($QUERY_TIMER) {
+         $QUERY_TIMER = EV::timer 1, 0, sub {
+            server_query ($conn, $flags, $prompt, 1);
+            $QUERY_TIMER = undef
+         };
+
+         return;
+      }
+   }
+
+   $conn->{query_dialog} = my $dialog = new DC::UI::Toplevel
+      x     => "center",
+      y     => "center",
+      title => "Server Query",
+      child => my $vbox = new DC::UI::VBox,
+   ;
+
+   my @dialog = my $label = new DC::UI::Label
+      max_w     => $::WIDTH * 0.8,
+      ellipsise => 0,
+      text      => $prompt;
+
+   if ($flags & CS_QUERY_YESNO) {
+      push @dialog, my $hbox = new DC::UI::HBox;
+
+      $hbox->add (new DC::UI::Button
+         text => "No",
+         on_activate => sub {
+            $conn->send ("reply n");
+            $dialog->destroy;
+            0
+         }
+      );
+      $hbox->add (new DC::UI::Button
+         text => "Yes",
+         on_activate => sub {
+            $conn->send ("reply y");
+            destroy_query_dialog $conn;
+            0
+         },
+      );
+
+      $dialog->grab_focus;
+
+   } elsif ($flags & CS_QUERY_SINGLECHAR) {
+      if ($prompt =~ /Now choose a character|Press any key for the next race/i) {
+         $dialog->{tooltip} = "#charcreation_focus";
+
+         unshift @dialog, new DC::UI::Label
+            max_w     => $::WIDTH * 0.8,
+            ellipsise => 0,
+            markup    => "\nOr use your keyboard and the text entry below:\n";
+
+         unshift @dialog, my $table = new DC::UI::Table;
+
+         $table->add_at (0, 0, new DC::UI::Button
+             text => "Next Race",
+             on_activate => sub {
+                $conn->send ("reply n");
+                destroy_query_dialog $conn;
+                0
+             },
+         );
+         $table->add_at (2, 0, new DC::UI::Button
+             text => "Accept",
+             on_activate => sub {
+                $conn->send ("reply d");
+                destroy_query_dialog $conn;
+                0
+             },
+         );
+
+         if ($conn->{chargen_race_description}) {
+            unshift @dialog, new DC::UI::Label
+               max_w     => $::WIDTH * 0.8,
+               ellipsise => 0,
+               markup    => "<span foreground='#ccccff'>$conn->{chargen_race_description}</span>",
+            ;
+         }
+
+         unshift @dialog, new DC::UI::Face
+            face  => $conn->{player}{face},
+            bg    => [.2, .2, .2, 1],
+            min_w => 64,
+            min_h => 64,
+         ;
+
+         if ($conn->{chargen_race_title}) {
+            unshift @dialog, new DC::UI::Label
+               allign => 1,
+               ellipsise => 0,
+               markup    => "<span foreground='#ccccff' size='large'>Race: $conn->{chargen_race_title}</span>",
+            ;
+         }
+
+         unshift @dialog, new DC::UI::Label
+            max_w     => $::WIDTH * 0.4,
+            ellipsise => 0,
+            markup    => (DC::Pod::section_label ui => "chargen_race"),
+         ;
+
+      } elsif ($prompt =~ /roll new stats/) {
+         if (my $stat = delete $conn->{stat_change_with}) {
+            $conn->send ("reply $stat");
+            destroy_query_dialog $conn;
+            return;
+         }
+
+         unshift @dialog, new DC::UI::Label
+            max_w     => $::WIDTH * 0.4,
+            ellipsise => 0,
+            markup    => "\nOr use your keyboard and the text entry below:\n";
+
+         unshift @dialog, my $table = new DC::UI::Table;
+
+         # left: re-roll
+         $table->add_at (0, 0, new DC::UI::Button
+            text => "Roll Again",
+            on_activate => sub {
+               $conn->send ("reply y");
+               destroy_query_dialog $conn;
+               0
+            },
+         );
+
+         # center: swap stats
+         my ($sw1, $sw2) = map +(new DC::UI::Selector
+               expand  => 1,
+               value   => $_,
+               options => [
+                  [1 => "Str", "Strength ($conn->{stat}{+CS_STAT_STR})"],
+                  [2 => "Dex", "Dexterity ($conn->{stat}{+CS_STAT_DEX})"],
+                  [3 => "Con", "Constitution ($conn->{stat}{+CS_STAT_CON})"],
+                  [4 => "Int", "Intelligence ($conn->{stat}{+CS_STAT_INT})"],
+                  [5 => "Wis", "Wisdom ($conn->{stat}{+CS_STAT_WIS})"],
+                  [6 => "Pow", "Power ($conn->{stat}{+CS_STAT_POW})"],
+                  [7 => "Cha", "Charisma ($conn->{stat}{+CS_STAT_CHA})"],
+               ],
+            ), 1 .. 2;
+
+         $table->add_at (2, 0, new DC::UI::Button
+            text => "Swap Stats",
+            on_activate => sub {
+               $conn->{stat_change_with} = $sw2->{value};
+               $conn->send ("reply $sw1->{value}");
+               destroy_query_dialog $conn;
+               0
+            },
+         );
+         $table->add_at (2, 1, new DC::UI::HBox children => [$sw1, $sw2]);
+
+         # right: accept
+         $table->add_at (4, 0, new DC::UI::Button
+            text => "Accept",
+            on_activate => sub {
+               $conn->send ("reply n");
+               destroy_query_dialog $conn;
+               0
+            },
+         );
+
+         unshift @dialog, my $hbox = new DC::UI::HBox;
+         for (
+            [Str => CS_STAT_STR],
+            [Dex => CS_STAT_DEX],
+            [Con => CS_STAT_CON],
+            [Int => CS_STAT_INT],
+            [Wis => CS_STAT_WIS],
+            [Pow => CS_STAT_POW],
+            [Cha => CS_STAT_CHA],
+         ) {
+            my ($name, $id) = @$_;
+            $hbox->add (new DC::UI::Label
+               markup     => "$conn->{stat}{$id} <span foreground='yellow'>$name</span>",
+               expand     => 1,
+               can_events => 1,
+               can_hover  => 1,
+               tooltip    => "#stat_$name",
+            );
+         }
+
+         unshift @dialog, new DC::UI::Label
+            max_w     => $::WIDTH * 0.4,
+            ellipsise => 0,
+            markup    => (DC::Pod::section_label ui => "chargen_stats"),
+         ;
+      }
+
+      push @dialog, my $entry = new DC::UI::Entry
+         on_changed => sub {
+            $conn->send ("reply $_[1]");
+            destroy_query_dialog $conn;
+            0
+         },
+      ;
+
+      $entry->grab_focus;
+
+   } else {
+      $dialog->{tooltip} = "Enter the reply and press return (click on the entry to make sure it has keyboard focus)";
+
+      push @dialog, my $entry = new DC::UI::Entry
+         $flags & CS_QUERY_HIDEINPUT ? (hidden => "*") : (),
+         on_activate => sub {
+            $conn->send ("reply $_[1]");
+            destroy_query_dialog $conn;
+            0
+         },
+      ;
+
+      $entry->grab_focus;
+   }
+
+   $vbox->add (@dialog);
+   $dialog->show;
+}
+
+sub dc_connect {
+   my ($host, $port) = @_;
+
+   my $mapw = List::Util::min 48, List::Util::max 11, int 1.5 + $WIDTH  * $CFG->{mapsize} * 0.01 / 32;
+   my $maph = List::Util::min 48, List::Util::max 11, int 1.5 + $HEIGHT * $CFG->{mapsize} * 0.01 / 32;
+
+   $CONN = 
+      new DC::Protocol
+         host => $host,
+         port => $port,
+         user => $PROFILE->{user},
+         pass => $PROFILE->{password},
+         mapw => $mapw,
+         maph => $maph,
+
+         c_version => {
+            client     => "deliantra",
+            clientver  => $DC::VERSION,
+            gl_vendor  => DC::OpenGL::gl_vendor,
+            gl_version => DC::OpenGL::gl_version,
+         },
+
+         map_widget => $MAPWIDGET,
+         statusbox  => $STATUSBOX,
+         map        => $MAP,
+         mapmap     => $MAPMAP,
+         query      => \&server_query,
+
+         setup_req  => {
+            smoothing => $CFG->{map_smoothing}*1,
+         },
+
+         on_connect => sub {
+            if ($_[0]) {
+               DC::lowdelay fileno $CONN->{fh};
+
+               status "successfully connected to the server";
+            } else {
+               undef $CONN;
+               status "unable to connect: $!";
+               stop_game();
+            }
+         },
+   ;
+}
+
+sub start_game {
+   status "logging in...";
+   
+   my $server = $PROFILE->{host} || $DEFAULT_SERVER;
+   my ($host, $port) = AnyEvent::Socket::parse_hostport $server, "deliantra=13327"
+      or return status "$server: unable to parse server address, try an empty field.";
+
+   $LOGIN_BUTTON->set_text ("Logout");
+   $SETUP_DIALOG->hide;
+
+   $MAP = new DC::Map;
+
+   # hack to make SURE we find the IP address all right
+   # can be removed once AnyEvent::DNS is proven stable.
+   if ($host eq "gameserver.deliantra.net") {
+      AnyEvent::DNS::a "dnstest.deliantra.net", sub {
+         if ($_[0] ne "80.101.114.108") { # P-e-r-l
+            status "dns failure, trying differently";
+            $host = eval { Socket::inet_ntoa Socket::inet_aton "gameserver.deliantra.net" };
+            unless (defined $host) {
+               status "dns failure, using hardcoded address";
+               $host = "194.126.175.154";
+            }
+         }
+
+         dc_connect $host, $port;
+      };
+   } else {
+      dc_connect $host, $port;
+   }
+}
+
+sub stop_game {
+   crash "stop_game";
+
+   $LOGIN_BUTTON->set_text ("Login / Register");
+   $SETUP_NOTEBOOK->set_current_page ($SETUP_LOGIN);
+   $SETUP_DIALOG->show;
+   $PL_WINDOW->hide;
+   $SPELL_LIST->clear_spells;
+   $DC::UI::ROOT->emit (stop_game => ! ! $CONN);
+
+   &audio_music_set_ambient ([]);
+
+   return unless $CONN;
+
+   status "connection closed";
+
+   destroy_query_dialog $CONN;
+   $CONN->destroy;
+   $CONN = 0; # false, does not autovivify
+
+   undef $MAP;
+}
+
+sub graphics_setup {
+   my $vbox = new DC::UI::VBox;
+
+   {
+      $vbox->add (my $frame = new DC::UI::FancyFrame expand => 1, label => "Video Mode");
+
+      $frame->add (my $table = new DC::UI::Table expand => 1, col_expand => [0, 1]);
+
+      my $row = 0;
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "OpenGL Info");
+      $table->add_at (1, $row++, new DC::UI::Label fontsize => 0.8, text => DC::OpenGL::gl_vendor . ", " . DC::OpenGL::gl_version,
+                                                   can_events => 1,
+                                                   tooltip => "<tt><span size='8192'>" . (DC::OpenGL::gl_extensions) . "</span></tt>");
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Caveats");
+      $table->add_at (1, $row++, $CAVEAT_LABEL = new DC::UI::Label fontsize => 0.8,
+         can_events => 1,
+         tooltip => "This field shows any known issues with your config or driver, such as "
+                  . "a non-accelerated display format. You can try to work around these issues "
+                  . "by selecting a different video mode, changing the settings below or "
+                  . "by installing the right driver for your graphics card.");
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "UI Theme");
+      $table->add_at (1, $row++, $FULLSCREEN_ENABLE = new DC::UI::Selector
+         value   => $CFG->{uitheme},
+         options => [
+            [wood   => "Wood (the default)"],
+            [plain  => "Plain (very)"],
+            [blue   => "Blue (dark)"],
+            [metal  => "Metal (light)"],
+         ],
+         tooltip => "Choose the User Interface theme that you like most :)",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{uitheme} = $value; 0 }
+      );
+
+      my $vidmode_tooltip =
+         "<b>Video Mode.</b> The video mode to use for fullscreen (and the window size for windowed operation). "
+       . "The format is <i>width</i> x <i>height</i> \@ <i>depth-per-channel</i> + <i>alpha-channel</i>.";
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Video Mode");
+      $table->add_at (1, $row++, my $hbox = new DC::UI::HBox);
+
+      $hbox->add ($MODE_SLIDER = new DC::UI::Slider
+         c_rescale => 1,
+         force_w => $WIDTH * 0.1, expand => 1,
+         range => [ ($CFG->{sdl_mode}) x 3 ],
+         tooltip => $vidmode_tooltip);
+      $hbox->add (my $mode_label = new DC::UI::Label
+         height => 0.8, template => "9999x9999@9+9",
+         can_events => 1, tooltip => $vidmode_tooltip);
+
+      $MODE_SLIDER->connect (changed => sub {
+         my ($self, $value) = @_;
+
+         $CFG->{sdl_mode} = $self->{range}[0] = $value = int $value;
+         $mode_label->set_text (sprintf '%dx%d@%d+%d', @{$SDL_MODES[$value]});
+      });
+      $MODE_SLIDER->emit (changed => $MODE_SLIDER->{range}[0]);
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Fullscreen");
+      $table->add_at (1, $row++, $FULLSCREEN_ENABLE = new DC::UI::CheckBox
+         state => $CFG->{fullscreen},
+         tooltip => "Bring the client into fullscreen mode.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{fullscreen} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Force OpenGL 1.1");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{force_opengl11},
+         tooltip => "Limit Deliantra to use OpenGL 1.1 features only. This will normally result in "
+                  . "higher memory usage and slower performance. It will, however, help tremendously on "
+                  . "cards that claim to support a feature but fall back to software rendering. "
+                  . "Nvidia Geforce FX cards are known to claim features the hardware doesn't support, "
+                  . "but cards and drivers from other vendors (ATI) are often just as bad. "
+                  . "<b>If you experience extremely low framerates and your card should do better, try this option.</b>",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{force_opengl11} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Forbid Alpha");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{disable_alpha},
+         tooltip => "Forbid the use of the alpha channel. This makes Deliantra look a lot worse "
+                  . "by disabling a number of textures and transparency effects. Normally, these "
+                  . "effects do not cost a lot of resources, but some graphics cards might fall "
+                  . "back to extremely slow rendering if this is enabled. If disabling this option "
+                  . "noticably improves the framerate of the client please report this! "
+                  . "<b>If you experience extremely low framerates and your card should do better, try this option.</b>",
+         on_changed => sub {
+            my ($self, $value) = @_;
+            $CFG->{disable_alpha} = $value;
+            $SDL_REINIT = 1; # SDL_SetVideoMode ignores GL attr changes
+            0
+         }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Compress Textures");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{texture_compression},
+         tooltip => "Use texture compression. Normally this will not reduce visual quality noticable but "
+                  . "will save a lot of memory and increase performance (and also fall prey to the ever-buggy Mac OS X software renderer). "
+                  . "The compression algorithm can differ form card to card, so your mileage may vary. This setting is ignored in "
+                  . "forced OpenGL 1.1 mode and when using the Apple renderer.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{texture_compression} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Fast & Ugly");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{fast},
+         tooltip => "Lower the visual quality considerably to speed up rendering.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{fast} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "GUI Fontsize");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range => [$CFG->{gui_fontsize}, 0.5, 2, 0, 0.1],
+         tooltip => "The base font size used by most GUI elements that do not have their own setting.",
+         on_changed => sub { $CFG->{gui_fontsize} = $_[1]; 0 },
+      );
+
+      $table->add_at (1, $row++, new DC::UI::Button
+         expand => 1, text => "Apply",
+         tooltip => "Apply the video settings above.",
+         on_activate => sub {
+            video_shutdown ();
+            video_init ();
+            0
+         }
+      );
+   }
+
+   {
+      $vbox->add (my $frame = new DC::UI::FancyFrame expand => 1, label => "Other Settings");
+
+      $frame->add (my $table = new DC::UI::Table expand => 1, col_expand => [0, 1]);
+
+      my $row = 0;
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Smooth Movement");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{smooth_movement},
+         tooltip => "<b>Smooth Movement</b> tries to make movement, well, smoother, but also increases the framerate. "
+                  . "If you have a very slow system, non-accelerated drivers or plain dislike smooth scrolling, "
+                  . "then disable this option. Changes take effect immdiately.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{smooth_movement} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Smooth Transitions");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{smooth_transitions},
+         tooltip => "<b>Smooth Transitions</b> tries to blend the fog of war and lighting smoothly between updates. "
+                  . "If you have a very slow system, non-accelerated drivers or plain dislike smooth scrolling, "
+                  . "then disable this option. Requires Smooth Movement and OpenGL Multitexturing. Changes take effect immdiately.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{smooth_transitions} = $value; 0 }
+      );
+
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Map Scale");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range      => [(log $CFG->{map_scale}) / (log 2), -3, 1, 0, 1],
+         tooltip    => "Enlarge or shrink the displayed map. Changes are instant.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{map_scale} = 2 ** $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Map Smoothing");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{map_smoothing},
+         tooltip => "<b>Map Smoothing</b> tries to make tile borders less square. "
+                  . "This increases load on the graphics subsystem and works only with TRT servers. "
+                  . "Changes take effect at next login only.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{map_smoothing} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Fog of War");
+      $table->add_at (1, $row++, new DC::UI::CheckBox
+         state => $CFG->{fow_enable},
+         tooltip => "<b>Fog-of-War</b> marks areas that cannot be seen by the player. Changes are instant.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{fow_enable} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "FoW Pattern");
+      $table->add_at (1, $row++, new DC::UI::ImageButton
+         tex => $DC::MapWidget::TEX_HIDDEN[$CFG->{fow_texture}],
+         bg  => [0.3, 0.3, 0.2],
+         force_w => 64,
+         force_h => 64,
+         tooltip => "<b>Fog of War Pattern.</b> The pattern that is overlaid over areas hidden from view. Click to cycle through various alternatives. Changes are instant.",
+         on_activate => sub {
+            my ($self) = @_;
+            $CFG->{fow_texture} = ($CFG->{fow_texture} + 1) % @DC::MapWidget::TEX_HIDDEN;
+            $self->set_texture ($DC::MapWidget::TEX_HIDDEN[$CFG->{fow_texture}]);
+            $MAPWIDGET->update;
+         }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "FoW Intensity");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range => [$CFG->{fow_intensity}, 0, 1, 0, 1 / 256],
+         tooltip => "<b>Fog of War Lightness.</b> The higher the intensity, the lighter the Fog-of-War color. Changes are instant.",
+         on_changed => sub { my ($self, $value) = @_; $CFG->{fow_intensity} = $value; 0 }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Message Fontsize");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range => [$CFG->{log_fontsize}, 0.5, 2, 0, 0.1],
+         tooltip => "The font size used by the <b>message/server log</b> window only. Changes are instant, "
+                  . "but you still need to press apply to correctly re-layout the widget.",
+         on_changed => sub { $MESSAGE_DIST->set_fontsize ($CFG->{log_fontsize} = $_[1]); 0 },
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Gauge fontsize");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range => [$CFG->{gauge_fontsize}, 0.5, 2, 0, 0.1],
+         tooltip => "Adjusts the fontsize of the gauges at the bottom right. Changes are instant.",
+         on_changed => sub {
+            $CFG->{gauge_fontsize} = $_[1];
+            &set_gauge_window_fontsize;
+            0
+         }
+      );
+
+      $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Gauge size");
+      $table->add_at (1, $row++, new DC::UI::Slider
+         range      => [$CFG->{gauge_size}, 0.2, 0.8],
+         tooltip    => "Adjust the size of the stats gauges at the bottom right. Changes are instant.",
+         on_changed => sub {
+            $CFG->{gauge_size} = $_[1];
+            $GAUGES->{win}->set_size ($WIDTH, int $HEIGHT * $CFG->{gauge_size});
+            0
+         }
+      );
+   }
+
+   $vbox
+}
+
+our $AUDIO_HW_CHUNKSIZE;
+our $AUDIO_INFO;
+
+sub audio_tab_update {
+   my ($freq, $format, $chans) = DC::Mix_QuerySpec;
+
+   $AUDIO_HW_CHUNKSIZE->set_options ([
+      [0, "default", "Use System Default"],
+      map {
+         my $ms = sprintf "%dms", 1000 * $_ / ($CFG->{audio_hw_frequency} || 22050);
+         [$_, $ms, "$ms ($_ samples)"],
+      } 256, 512, 1024, 2048, 4096, 8192, 16384, 32768
+   ]);
+
+   my $text = !$freq
+      ? "audio is off"
+      : "audio is enabled\n"
+         . "driver: " . DC::SDL_AudioDriverName . "\n"
+         . "frequency (Hz): $freq\n"
+         . "channels: $chans\n"
+         . "chunk decoders available: " . (join ", ", DC::MixChunk::decoders) . "\n"
+         . "music decoders available: " . (join ", ", DC::MixMusic::decoders);
+
+   $AUDIO_INFO->set_text ($text);
+}
+
+sub audio_setup {
+   my $vbox = new DC::UI::VBox;
+
+   $vbox->add (my $table = new DC::UI::Table expand => 1, col_expand => [0, 0, 1]);
+
+   my $row = 0;
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Audio Enable");
+   $table->add_at (1, $row, new DC::UI::CheckBox
+      state => $CFG->{audio_enable},
+      tooltip => "<b>Master Audio Enable.</b> If enabled, sound effects and music will be played. If disabled, no audio will be used and the soundcard will not be opened.",
+      on_changed => sub { $CFG->{audio_enable} = $_[1]; 1 }
+   );
+   $table->add_at (2, $row++, my $driver = new DC::UI::HBox expand => 1);
+      
+   $driver->add (new DC::UI::Label align => 1, text => "     Audio driver override");
+   $driver->add (new DC::UI::Entry
+      text => $CFG->{audio_driver},
+      template => "dsound1234",
+      tooltip => "You can override the audio driver to use here. Leaving it empty will result "
+               . "in Deliantra picking one automatically. GNU/Linux users often prefer specific "
+               . "drivers though, and can experiment with <b>alsa</b>, <b>dsp</b>, <b>esd</b>, <b>pulse</b>, <b>arts</b>, <b>nas</b> "
+               . "or other system-specific drivers. Selecting the wrong driver here will simply result"
+               . "in no sound.",
+      on_changed => sub { my ($self, $value) = @_; $CFG->{audio_driver} = $value; 1 }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Sound Effects");
+   $table->add_at (1, $row, new DC::UI::CheckBox
+      expand => 1, state => $CFG->{effects_enable},
+      tooltip => "If enabled, sound effects are enabled. If disabled, no sound effects will be played.",
+      on_changed => sub {
+         $CFG->{effects_enable} = $_[1];
+         $CONN->update_fx_want if $CONN;
+         1
+      }
+   );
+   $table->add_at (2, $row++, new DC::UI::Slider
+      expand => 1, range => [$CFG->{effects_volume}, 0, 1, 0, 1/128],
+      tooltip => "The relative volume of sound effects. Best audio quality is achieved if this "
+                 . "is set highest (rightmost) and you use your operating system volume setting. Changes are instant.",
+      on_changed => sub { $CFG->{effects_volume} = $_[1]; 1 }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Background Music");
+   $table->add_at (1, $row, new DC::UI::CheckBox
+      expand => 1, state => $CFG->{bgm_enable},
+      tooltip => "If enabled, playing of background music is enabled. If disabled, no background music will be played. Needs server reconnect to take effect.",
+      on_changed => sub {
+         $CFG->{bgm_enable} = $_[1];
+         $CONN->update_fx_want if $CONN;
+         audio_music_push;
+         1
+      }
+   );
+   $table->add_at (2, $row++, new DC::UI::Slider
+      expand => 1, range => [$CFG->{bgm_volume}, 0, 1, 0, 1/128],
+      tooltip => "The volume of the background music. Changes are instant.",
+      on_changed => sub { $CFG->{bgm_volume} = $_[1]; audio_music_update_volume; 0 }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Frequency");
+   $table->add_at (1, $row++, new DC::UI::Selector
+      c_colspan => 2, expand => 1,
+      value => $CFG->{audio_hw_frequency},
+      options => [
+         [    0, "default" , "Use System Default"],
+         [11025, "11 kHz"  , "11kHz (low quality)"],
+         [22050, "22 kHz"  , "22kHz (reduced quality, recommended)"],
+         [44100, "44.1 kHz", "44.1kHz (cd quality)"],
+         [48000, "48 kHz"  , "48kHz (studio quality, not recommended)"],
+      ],
+      tooltip => "The sampling frequency to use. Higher sounds better, but also more cpu-intensive and might cause stuttering.",
+      on_changed => sub {
+         $CFG->{audio_hw_frequency} = $_[1];
+         audio_tab_update;
+         1
+      }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Channels");
+   $table->add_at (1, $row++, new DC::UI::Selector
+      c_colspan => 2, expand => 1,
+      value => $CFG->{audio_hw_channels},
+      options => [
+         [0, "default"      , "Use System Default"],
+         [1, "Mono"         , "Mono (single channel, low quality)"],
+         [2, "Stereo"       , "Stereo (dual channel, standard quality)"],
+         [4, "4 Ch Surround", "4 Channel Surround Sound (3d sound, high quality)"],
+         [6, "6 Ch Surround", "6 Channel Surround Sound (3d sound + center + lfe)"],
+      ],
+      tooltip => "The number of independent sound channels to use. Higher sounds better, but also more cpu-intensive and might cause stuttering.",
+      on_changed => sub {
+         $CFG->{audio_hw_channels} = $_[1];
+         audio_tab_update;
+         1
+      }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Latency");
+   $table->add_at (1, $row++, $AUDIO_HW_CHUNKSIZE = new DC::UI::Selector
+      c_colspan => 2, expand => 1,
+      value => $CFG->{audio_hw_chunksize},
+      tooltip => "The guarenteed latency. Lower is better, but also more cpu-intensive and might cause stuttering. If music playback "
+                 . "is stuttering, increase this value. Values of 50-150ms are optimal.",
+      on_changed => sub {
+         $CFG->{audio_hw_chunksize} = $_[1];
+         audio_tab_update;
+         1
+      }
+   );
+
+   # should really be a slider
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Mixer Voices");
+   $table->add_at (1, $row++, new DC::UI::ValSlider
+      c_colspan => 2, expand => 1,
+      tooltip => "The number of simultaneous sound effects possible. Higher is better, but also more cpu-intensive and might cause stuttering.",
+      range => [$::CFG->{audio_mix_channels}, 4, 32, 0, 1],
+      template => ">= 99",
+      on_changed => sub {
+         my ($slider, $value) = @_;
+
+         $CFG->{audio_mix_channels} = $value
+            if $value;
+         1;
+      }
+   );
+
+   $table->add_at (1, $row++, new DC::UI::Button
+      c_colspan => 2, expand => 1, text => "Apply",
+      tooltip => "Apply the audio settings",
+      on_activate => sub {
+         audio_shutdown ();
+         audio_init ();
+         0
+      }
+   );
+
+   $vbox->add (new DC::UI::FancyFrame
+      expand => 1,
+      label => "Audio Info",
+      child => ($AUDIO_INFO = new DC::UI::Label ellipsise => 0),
+   );
+
+   audio_tab_update;
+
+   $vbox
+}
+
+sub set_gauge_window_fontsize {
+   for (map { $GAUGES->{$_} } grep { $_ ne 'win' } keys %{$GAUGES}) {
+      $_->set_fontsize ($::CFG->{gauge_fontsize});
+   }
+}
+
+sub make_gauge_window {
+   my $gh = int $HEIGHT * $CFG->{gauge_size};
+
+   $GAUGES->{win} = my $win = new DC::UI::Frame (
+      force_x => 0,
+      force_y => "max",
+      force_w => $WIDTH,
+      force_h => $gh,
+   );
+
+   $win->add (my $hbox = new DC::UI::HBox
+      children => [
+         (new DC::UI::HBox expand => 1),
+         (new DC::UI::VBox children => [
+            (new DC::UI::Empty expand => 1),
+            (new DC::UI::Frame bg => [0, 0, 0, 0.4], child => ($FLOORBOX = new DC::UI::Table)),
+         ]),
+         (my $vbox = new DC::UI::VBox),
+      ],
+   );
+
+   $vbox->add (new DC::UI::HBox
+      expand => 1,
+      children => [
+         (new DC::UI::Empty expand => 1),
+         (my $hb = new DC::UI::HBox),
+      ],
+   );
+
+   $hb->add ($GAUGES->{hp}    = new DC::UI::Gauge type => 'hp', tooltip => "#stat_health");
+   $hb->add ($GAUGES->{mana}  = new DC::UI::Gauge type => 'mana', tooltip => "#stat_mana");
+   $hb->add ($GAUGES->{grace} = new DC::UI::Gauge type => 'grace', tooltip => "#stat_grace");
+   $hb->add ($GAUGES->{food}  = new DC::UI::Gauge type => 'food', tooltip => "#stat_food");
+
+   &set_gauge_window_fontsize;
+
+   $win
+}
+
+our $BW_WATCHER;
+
+sub debug_toggle($) {
+   $DELIANTRA_DEBUG ^= $_[0];
+
+   if ($DELIANTRA_DEBUG & 16) {
+      $BW_WATCHER = EV::periodic 0, 1, 0, sub {
+         return unless $CONN;
+         debug sprintf "%8.2gKB/s", $CONN->{octets_in} / 1e3;
+         $CONN->{octets_in} = 0;
+      };
+   } else {
+      undef $BW_WATCHER;
+   }
+
+}
+
+sub debug_setup {
+   my $table = new DC::UI::Table;
+
+   $table->add_at (0, 0, new DC::UI::Label text => "Widget Borders");
+   $table->add_at (1, 0, new DC::UI::CheckBox on_changed => sub { debug_toggle  1; 0 });
+   $table->add_at (0, 1, new DC::UI::Label text => "Tooltip Widget Info");
+   $table->add_at (1, 1, new DC::UI::CheckBox on_changed => sub { debug_toggle  2; 0 });
+   $table->add_at (0, 2, new DC::UI::Label text => "Show FPS");
+   $table->add_at (1, 2, new DC::UI::CheckBox on_changed => sub { debug_toggle  4; 0 });
+   $table->add_at (0, 3, new DC::UI::Label text => "Suppress Tooltips");
+   $table->add_at (1, 3, new DC::UI::CheckBox on_changed => sub { debug_toggle  8; 0 });
+   $table->add_at (0, 4, new DC::UI::Label text => "Show Bandwidth");
+   $table->add_at (1, 4, new DC::UI::CheckBox on_changed => sub { debug_toggle 16; 0 });
+
+   $table->add_at (0, 6, new DC::UI::Button text => "die on click(tm)", on_activate => sub { &DC::debug() } );
+   $table->add_at (0, 7, new DC::UI::TextEdit text => "line1\0152\0153\nµikachu\nづx゙つ゛");#d#
+
+   $table->add_at (7,7, my $t = new DC::UI::Table expand => 0);
+   $t->add_at (0,0, new DC::UI::Label text => "a a", c_rowspan => 1, c_colspan => 2);
+   $t->add_at (2,0, new DC::UI::Label text => "b\nb", c_rowspan => 2, c_colspan => 1, ellipsise => 0 );
+   $t->add_at (1,2, new DC::UI::Label text => "c c", c_rowspan => 1, c_colspan => 2);
+   $t->add_at (0,1, new DC::UI::Label text => "d\nd", c_rowspan => 2, c_colspan => 1, ellipsise => 0 );
+   $t->add_at (1,1, new DC::UI::Label text => "e");
+
+   $table->add_at (7, 6, my $c = new DC::UI::Canvas);
+
+   $c->add_items ({
+      type  => "line_loop",
+      color => [0, 1, 0],
+      width => 9,
+      coord_mode => "abs",
+      coord => [[10, 5], [5, 50], [20, 5], [5, 60]],
+   });
+
+   $c->add_items ({
+      type  => "lines",
+      color => [1, 1, 0],
+      width => 2,
+      coord_mode => "rel",
+      coord => [[0,0], [1,1], [1,0], [0,1]],
+   });
+
+   $c->add_items ({
+      type  => "polygon",
+      color => [0, 0.43, 0],
+      width => 2,
+      coord_mode => "rel",
+      coord => [[0,0.2], [1,.4], [1,.6], [0,.8]],
+   });
+
+   $table
+}
+
+sub stats_window {
+   my $r = new DC::UI::ScrolledWindow (
+      expand => 1,
+      scroll_y => 1
+   );
+   $r->add (my $vb = new DC::UI::VBox);
+
+   $vb->add (new DC::UI::FancyFrame
+      label => "Player",
+      child => (my $pi = new DC::UI::VBox),
+   );
+
+   $pi->add ($STATWIDS->{title} = new DC::UI::Label text => "Title:", expand => 1, align => 0,
+      can_hover => 1, can_events => 1,
+      tooltip => "Your name and title. You can change your title by using the <b>title</b> command, if supported by the server.");
+   $pi->add ($STATWIDS->{map} = new DC::UI::Label align => 0, text => "Map:", expand => 1,
+      can_hover => 1, can_events => 1,
+      tooltip => "The map you are currently on (if supported by the server).");
+
+   $pi->add (my $hb0 = new DC::UI::HBox);
+   $hb0->add ($STATWIDS->{weight} = new DC::UI::Label text => "Weight:", expand => 1, align => 0,
+      can_hover => 1, can_events => 1,
+      tooltip => "The weight of the player including all inventory items.");
+   $hb0->add ($STATWIDS->{m_weight} = new DC::UI::Label align => 0, text => "Max weight:", expand => 1,
+      can_hover => 1, can_events => 1,
+      tooltip => "The weight limit: you cannot carry more than this.");
+
+   $vb->add (new DC::UI::FancyFrame
+      label => "Primary/Secondary Statistics",
+      child => (my $hb = new DC::UI::HBox expand => 1),
+   );
+   $hb->add (my $tbl = new DC::UI::Table expand => 1);
+
+   my $color2 = [1, 1, 0];
+
+   for (
+      [0, 0, st_str => "Str", 30],
+      [0, 1, st_dex => "Dex", 30],
+      [0, 2, st_con => "Con", 30],
+      [0, 3, st_int => "Int", 30],
+      [0, 4, st_wis => "Wis", 30],
+      [0, 5, st_pow => "Pow", 30],
+      [0, 6, st_cha => "Cha", 30],
+
+      [2, 0, st_wc   => "Wc", -120],
+      [2, 1, st_ac   => "Ac", -120],
+      [2, 2, st_dam  => "Dam", 120],
+      [2, 3, st_arm  => "Arm", 120],
+      [2, 4, st_spd  => "Spd", 10.54],
+      [2, 5, st_wspd => "WSp", 10.54],
+   ) {
+      my ($col, $row, $id, $label, $template) = @$_;
+
+      $tbl->add_at ($col    , $row, $STATWIDS->{$id} = new DC::UI::Label
+         font => $FONT_FIXED, can_hover => 1, can_events => 1,
+         align => 1, template => $template, tooltip => "#stat_$label");
+      $tbl->add_at ($col + 1, $row, $STATWIDS->{"$id\_lbl"} = new DC::UI::Label
+         font => $FONT_FIXED, can_hover => 1, can_events => 1, fg => $color2,
+         align => 0, text => $label, tooltip => "#stat_$label");
+   }
+
+   $vb->add (new DC::UI::FancyFrame
+      label => "Resistancies",
+      child => (my $tbl2 = new DC::UI::Table expand => 1, col_expand => [1, 1, 0, 1, 1, 1, 0, 1, 1, 1, 0]),
+   );
+
+   my $row = 0;
+   my $col = 0;
+
+   my %resist_names = (
+      slow  => ["Slow",
+         "<b>Slow</b> (slows you down when you are hit by the spell. Monsters will have an opportunity to come near you faster and hit you more often.)"],
+      holyw => ["Holy Word",
+         "<b>Holy Word</b> (resistance you against getting the fear when someone whose god doesn't like you spells the holy word on you.)"],
+      conf  => ["Confusion",
+         "<b>Confusion</b> (If you are hit by confusion you will move into random directions, and likely into monsters.)"],
+      fire  => ["Fire",
+         "<b>Fire</b> (just your resistance to fire spells like burning hands, dragonbreath, meteor swarm fire, ...)"],
+      depl  => ["Depletion",
+         "<b>Depletion</b> (some monsters and other effects can cause stats depletion)"],
+      magic => ["Magic",
+         "<b>Magic</b> (resistance to magic spells like magic missile or similar)"],
+      drain => ["Draining",
+         "<b>Draining</b> (some monsters (e.g. vampires) and other effects can steal experience)"],
+      acid  => ["Acid",
+         "<b>Acid</b> (resistance to acid, acid hurts pretty much and also corrodes your weapons)"],
+      pois  => ["Poison",
+         "<b>Poison</b> (resistance to getting poisoned)"],
+      para  => ["Paralysation",
+         "<b>Paralysation</b> (this resistance affects the chance you get paralysed)"],
+      deat  => ["Death",
+         "<b>Death</b> (resistance against death spells)"],
+      phys  => ["Physical",
+         "<b>Physical</b> (this is the resistance against physical attacks, like when a monster hit you in melee combat. The value displayed here is also displayed in the 'Arm' field on the left.)"],
+      blind => ["Blind",
+         "<b>Blind</b> (blind resistance affects the chance of a successful blinding attack)"],
+      fear  => ["Fear",
+         "<b>Fear</b> (this attack will drive you away from monsters who cast this and hit you successfully, being resistant to this helps a lot when fighting those monsters)"],
+      tund  => ["Turn undead",
+         "<b>Turn undead</b> (affects your resistancy to various forms of 'turn undead' spells. Only relevant when you are, in fact, undead..."],
+      elec  => ["Electricity",
+         "<b>Electricity</b> (resistance against electricity, spells like large lightning, small lightning, ...)"],
+      cold  => ["Cold",
+         "<b>Cold</b> (this is your resistance against cold spells like icestorm, snowstorm, ...)"],
+      ghit  => ["Ghost hit",
+         "<b>Ghost hit</b> (special attack used by ghosts and ghost-like beings)"],
+   );
+
+   for (qw/slow holyw conf fire depl magic
+           drain acid pois para deat phys
+           blind fear tund elec cold ghit/)
+   {
+      $tbl2->add_at ($col + 2, $row,
+         $STATWIDS->{"res_$_"} =
+            new DC::UI::Label
+               font       => $FONT_FIXED,
+               template   => "-100%",
+               align      => 1,
+               can_events => 1,
+               can_hover  => 1,
+               tooltip    => $resist_names{$_}->[1],
+      );
+      $tbl2->add_at ($col + 1, $row, new DC::UI::Image
+         font       => $FONT_FIXED,
+         can_hover  => 1,
+         can_events => 1,
+         path       => "ui/resist/resist_$_.png",
+         tooltip    => $resist_names{$_}->[1],
+      );
+      $tbl2->add_at ($col + 0, $row, new DC::UI::Label
+         text       => $resist_names{$_}->[0],
+         font       => $FONT_FIXED,
+         align      => 1,
+         can_hover  => 1,
+         can_events => 1,
+         tooltip    => $resist_names{$_}->[1],
+      );
+
+      $row++;
+      if ($row % 6 == 0) {
+         $col += 4;
+         $row = 0;
+      }
+   }
+
+   #update_stats_window ({});
+
+   $r
+}
+
+sub skill_window {
+   my $sw = new DC::UI::ScrolledWindow (expand => 1);
+
+   $sw->add ($STATWIDS->{skill_tbl} = new DC::UI::Table expand => 1, col_expand => [0, 0, 1, .1,  0, 0, 1, .1]);
+
+   $sw
+}
+
+sub formsep($) {
+   scalar reverse join ",", unpack "(A3)*", reverse $_[0] * 1
+}
+
+my $METASERVER_ATIME;
+
+sub update_metaserver {
+   my ($metaserver_dialog) = @_;
+
+   $METASERVER = $metaserver_dialog
+      if defined $metaserver_dialog;
+
+   return if $METASERVER_ATIME > time;
+   $METASERVER_ATIME = time + 60;
+
+   my $table = $METASERVER->{table};
+   $table->clear;
+   $table->add_at (0, 0, my $label = new DC::UI::Label max_w => $WIDTH * 0.8, text => "fetching server list...");
+
+   my $ok = 0;
+
+   DC::background {
+      my $ua = DC::lwp_useragent;
+
+      DC::background_msg DC::decode_json +(DC::lwp_check $ua->get ($META_SERVER))->decoded_content;
+   } sub {
+      my ($msg) = @_;
+      if ($msg) {
+         $table->clear;
+
+         my @tip = (
+            "The current number of users logged in on the server.",
+            "The hostname of the server.",
+            "The time this server has been running without being restarted.",
+            "Short information about this server provided by its admins.",
+         );
+         my @col = qw(#Users Host Uptime Version Description);
+         $table->add_at ($_, 0, new DC::UI::Label
+            can_hover => 1, can_events => 1, fg => [1, 1, 0],
+            text => $col[$_], tooltip => $tip[$_])
+               for 0 .. $#col;
+
+         my @align = qw(1 0.5 1 1 0);
+
+         my $y = 0;
+         for my $m (@{ $msg->{servers} }) {
+            my ($ip, $last, $host, $users, $version, $desc, $ibytes, $obytes, $uptime, $highlight) = 
+               @$m{qw(ip age hostname users version description ibytes obytes uptime highlight)};
+
+            for ($desc) {
+               s/<br>/\n/gi;
+               s/<li>/\n· /gi;
+               s/<.*?>//sgi;
+               s/&amp;/&/g;
+               s/&lt;/</g;
+               s/&gt;/>/g;
+            }
+
+            $uptime = sprintf "%dd %02d:%02d:%02d",
+               (int $uptime / 86400),
+               (int $uptime / 3600) % 24,
+               (int $uptime / 60) % 60,
+               $uptime % 60;
+
+            $m = [$users, $host, $uptime, $version, $desc];
+
+            $y++;
+
+            $table->add_at (scalar @$m, $y, new DC::UI::VBox children => [
+               (new DC::UI::Button
+                  text        => "Use",
+                  tooltip     => "Put this server into the <b>Host:Port</b> field",
+                  on_activate => sub {
+                     $HOST_ENTRY->set_text ($CFG->{profile}{default}{host} = $host);
+                     $METASERVER->hide;
+                     0
+                  },
+               ),
+               (new DC::UI::Empty expand => 1),
+            ]);
+            
+            $table->add_at ($_, $y, new DC::UI::Label
+                  max_w      => $::WIDTH * 0.4,
+                  ellipsise  => 0,
+                  align      => $align[$_],
+                  text       => $m->[$_],
+                  tooltip    => $tip[$_],
+                  fg         => ($highlight ? [1, 1, 1] : [.7, .7, .7]),
+                  can_hover  => 1,
+                  can_events => 1,
+                  fontsize   => 0.8)
+               for 0 .. $#$m;
+         }
+      } else {
+         $ok or $label->set_text ("error while contacting metaserver");
+      }
+   };
+
+}
+
+sub metaserver_dialog {
+   my $vbox  = new DC::UI::VBox;
+   my $table = new DC::UI::Table;
+   $vbox->add (new DC::UI::ScrolledWindow expand => 1, child => $table);
+
+   my $dialog = new DC::UI::Toplevel
+      title   => "Server List",
+      name    => 'metaserver_dialog',
+      x       => 'center',
+      y       => 'center',
+      z       => 3,
+      force_w => $::WIDTH  * 0.9,
+      force_h => $::HEIGHT * 0.7,
+      child   => $vbox,
+      has_close_button => 1,
+      table   => $table,
+      on_visibility_change => sub {
+         update_metaserver ($_[0]) if $_[1];
+         0
+      },
+   ;
+
+   $dialog
+}
+
+sub login_setup {
+   my $vbox = new DC::UI::VBox;
+
+   $vbox->add (new DC::UI::FancyFrame
+      label => "Login Settings",
+      child => (my $table = new DC::UI::Table expand => 1, col_expand => [0, 1]),
+   );
+
+   $table->add_at (0, 4, new DC::UI::Label align => 1, text => "Username");
+   $table->add_at (1, 4, new DC::UI::Entry
+      text => $PROFILE->{user},
+      tooltip => "The name of your character on the server. The name is case-sensitive!",
+      on_changed => sub { my ($self, $value) = @_; $PROFILE->{user} = $value; 1 }
+   );
+
+   $table->add_at (0, 5, new DC::UI::Label align => 1, text => "Password");
+   $table->add_at (1, 5, new DC::UI::Entry
+      text => $PROFILE->{password},
+      hidden => 1,
+      tooltip => "The password for your character.",
+      on_changed => sub { my ($self, $value) = @_; $PROFILE->{password} = $value; 1 }
+   );
+
+   $table->add_at (1, 11, $LOGIN_BUTTON = new DC::UI::Button
+      expand => 1,
+      text => "Login / Register",
+      tooltip => "This button will either login to the account configured above or register a new account.",
+      on_activate => sub {
+         $CONN ? stop_game
+               : start_game;
+         1
+      },
+   );
+
+   $vbox->add (new DC::UI::FancyFrame
+      label => "How to Play",
+      min_h => 240,
+      child => (new DC::UI::Label valign => 0, ellipsise => 0,
+                    markup =>
+                       "First select a suitable video resolution in the <b>Graphics</b> tab, above.\n\n"
+                     . "Then register a new account (or use an existing one if you have one). "
+                     . "To register an account, choose a username that hasn't been taken yet (just guess) and "
+                     . "try to log-in. Follow the instructions in the Log tab in the message window.",
+               ),
+   );
+
+   $vbox
+}
+
+sub server_setup {
+   my $vbox = new DC::UI::VBox;
+
+   $vbox->add (new DC::UI::FancyFrame
+      label => "Connection Settings",
+      child => (my $table = new DC::UI::Table expand => 1, col_expand => [0, 1]),
+   );
+
+   my $row = 0;
+
+   $table->add_at (0, ++$row, new DC::UI::Label align => 1, text => "Host:Port");
+   {
+      $table->add_at (1, $row, my $vbox = new DC::UI::VBox);
+
+      $vbox->add (
+         $HOST_ENTRY = new DC::UI::Entry
+            expand => 1,
+            text => $PROFILE->{host},
+            tooltip => "The hostname or ip address of the Deliantra server to connect to (e.g. <b>gameserver.deliantra.net</b>)",
+            on_changed => sub {
+               my ($self, $value) = @_;
+               $PROFILE->{host} = $value;
+               1
+            }
+      );
+
+      if (0) { #d# disabled
+      $vbox->add (new DC::UI::Button
+         expand  => 1,
+         text    => "Server List",
+         other   => $METASERVER,
+         tooltip => "Show a list of available Deliantra servers",
+         on_activate => sub { $METASERVER->toggle_visibility; 0 },
+         on_visibility_change => sub { $METASERVER->hide unless $_[1]; 1 },
+      );
+      }#d#
+   }
+
+   $table->add_at (0, ++$row, new DC::UI::Label align => 1, text => "Map Size");
+   $table->add_at (1, $row, new DC::UI::Slider
+      force_w => 100,
+      range => [$CFG->{mapsize}, 10, 100, 0, 1],
+      tooltip => "This is the size of the portion of the map update the server sends you. "
+               . "If you set this to a high value you will be able to see further, "
+               . "but you also increase bandwidth requirements and latency. "
+               . "This option is only used once at log-in.",
+      on_changed => sub { my ($self, $value) = @_; $CFG->{mapsize} = $self->{range}[0] = $value = int $value; 1 },
+   );
+
+   $table->add_at (0, ++$row, new DC::UI::Label align => 1, text => "Output-Rate");
+   $table->add_at (1, $row, new DC::UI::Entry
+      text => $CFG->{output_rate},
+      tooltip => "The maximum bandwidth in bytes per second that the server should not exceed "
+               . "when sending data. When 0 or unset, the server "
+               . "default will be used, which is usually around 100kb/s. Most servers will "
+               . "dynamically find an optimal rate, so adjust this only when necessary.",
+      on_changed => sub { $CFG->{output_rate} = $_[1]; 1 },
+   );
+
+   $vbox->add (new DC::UI::FancyFrame
+      label => "Server Info",
+      child => ($SERVER_INFO = new DC::UI::Label ellipsise => 0),
+   );
+
+   $vbox
+}
+
+sub client_setup {
+   my $table = new DC::UI::Table expand => 1, col_expand => [0, 1];
+
+   my $row = 0;
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Tip of the day");
+   $table->add_at (1, $row++, new DC::UI::CheckBox
+      c_colspan => 2,
+      state   => $CFG->{show_tips},
+      tooltip => "Show the <b>Tip of the day</b> window at startup?",
+      on_changed => sub {
+         my ($self, $value) = @_;
+         $CFG->{show_tips} = $value;
+         0
+      }
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Message Window Size");
+   $table->add_at (1, $row++, my $saycmd = new DC::UI::Entry
+      c_colspan => 2,
+      text    => $CFG->{logview_max_par},
+      tooltip => "This is maximum number of messages remembered in the <b>Message</b> window. If the server "
+               . "sends more messages than this number, older messages get removed to save memory and "
+               . "computing time. A value of <b>0</b> disables this feature, but that is not recommended.",
+      on_changed => sub {
+         my ($self, $value) = @_;
+         $MESSAGE_DIST->set_max_par ($CFG->{logview_max_par} = $value*1);
+         0
+      },
+   );
+
+   $table->add_at (0, $row, new DC::UI::Label align => 1, text => "Config Autosave");
+   $table->add_at (1, $row, new DC::UI::CheckBox
+      state   => $CFG->{config_autosave},
+      tooltip => "Normally, configuration settings and the user interface layout  "
+               . "are saved on client exit. You can disable this behaviour by "
+               . "unchecking this checkbox.",
+      on_changed => sub {
+         my ($self, $value) = @_;
+         $CFG->{config_autosave} = $value;
+         0
+      }
+   );
+   $table->add_at (2, $row++, new DC::UI::Button
+      text    => "Save Now",
+      tooltip => "Use this to manually save configuration and UI layout when "
+               . "autosave is disabled.",
+      on_activate => sub {
+         DC::write_cfg;
+         0
+      }
+   );
+
+   $table
+}
+
+sub autopickup_setup {
+   my $r = new DC::UI::ScrolledWindow (
+      expand   => 1,
+      scroll_y => 1
+   );
+   $r->add (my $table = new DC::UI::Table
+      row_expand => [0],
+      col_expand => [0, 1, 0, 1],
+   );
+
+   for (
+         ["General", 0, 0,
+#            ["Inhibit autopickup"      => PICKUP_INHIBIT],
+            ["Stop before pickup"      => PICKUP_STOP],
+            ["Debug autopickup"        => PICKUP_DEBUG],
+         ],
+         ["Weapons", 0, 6,
+            ["All weapons"             => PICKUP_ALLWEAPON],
+            ["Missile weapons"         => PICKUP_MISSILEWEAPON],
+            ["Bows"                    => PICKUP_BOW],
+            ["Arrows"                  => PICKUP_ARROW],
+         ],
+         ["Armour", 0, 12,
+            ["Helmets"                 => PICKUP_HELMET],
+            ["Shields"                 => PICKUP_SHIELD],
+            ["Body Armour"             => PICKUP_ARMOUR],
+            ["Boots"                   => PICKUP_BOOTS],
+            ["Gloves"                  => PICKUP_GLOVES],
+            ["Cloaks"                  => PICKUP_CLOAK],
+         ],
+
+         ["Readables", 2, 0,
+            ["Spellbooks"              => PICKUP_SPELLBOOK],
+            ["Skillscrolls"            => PICKUP_SKILLSCROLL],
+            ["Normal Books/Scrolls"    => PICKUP_READABLES],
+         ],
+         ["Misc", 2, 5,
+            ["Food"                    => PICKUP_FOOD],
+            ["Drinks"                  => PICKUP_DRINK],
+            ["Valuables (Money, Gems)" => PICKUP_VALUABLES],
+            ["Keys"                    => PICKUP_KEY],
+            ["Magical Items"           => PICKUP_MAGICAL],
+            ["Potions"                 => PICKUP_POTION],
+            ["Magic Devices"           => PICKUP_MAGIC_DEVICE],
+            ["Ignore cursed"           => PICKUP_NOT_CURSED],
+            ["Jewelery"                => PICKUP_JEWELS],
+            ["Flesh"                   => PICKUP_FLESH],
+         ],
+         ["Value/Weight ratio", 2, 17]
+       )
+   {
+      my ($title, $x, $y, @bits) = @$_;
+      $table->add_at ($x, $y, new DC::UI::Label text => $title, align => 1, fg => [1, 1, 0]);
+
+      for (@bits) {
+         ++$y;
+
+         my $mask = $_->[1];
+         $table->add_at ($x  , $y, new DC::UI::Label text => $_->[0], align => 1, expand => 1);
+         $table->add_at ($x+1, $y, my $checkbox = new DC::UI::CheckBox
+            state => $::CFG->{pickup} & $mask,
+            on_changed => sub {
+               my ($box, $value) = @_;
+
+               if ($value) {
+                  $::CFG->{pickup} |= $mask;
+               } else {
+                  $::CFG->{pickup} &= ~$mask;
+               }
+
+               $::CONN->send_pickup ($::CFG->{pickup})
+                  if defined $::CONN;
+
+               0
+            });
+
+         ${$_->[2]} = $checkbox if $_->[2];
+      }
+   }
+
+   $table->add_at (2, 18, new DC::UI::ValSlider
+      range => [$::CFG->{pickup} & 0xF, 0, 16, 1, 1],
+      template => ">= 99",
+      tooltip => "Pick up items whose value/weight (silver/kg) ratio is equal or higher than this setting (which is specified in gold coins).",
+      to_value => sub { ">= " . 5 * $_[0] },
+      on_changed => sub {
+         my ($slider, $value) = @_;
+
+         $::CFG->{pickup} &= ~0xF;
+         $::CFG->{pickup} |= int $value
+            if $value;
+         1;
+      });
+
+   $table->add_at (3, 18, new DC::UI::Button 
+      text => "set",
+      on_activate => sub {
+         $::CONN->send_pickup ($::CFG->{pickup})
+            if defined $::CONN;
+         0
+      });
+
+   $r
+}
+
+my %SORT_ORDER = (
+   type   => sub {
+      use sort 'stable';
+      sort { $a->{type} <=> $b->{type} or $a->{name} cmp $b->{name} } @_
+   },
+   mtime  => sub {
+      use sort 'stable';
+      my $NOW = time;
+      sort {
+         my $atime = $a->{mtime} - $NOW; $atime = $atime < 5 * 60 ? int $atime / 60 : 6;
+         my $btime = $b->{mtime} - $NOW; $btime = $btime < 5 * 60 ? int $btime / 60 : 6;
+
+         ($a->{flags} & F_LOCKED) <=> ($b->{flags} & F_LOCKED)
+            or $btime <=> $atime
+            or $a->{type} <=> $b->{type}
+      } @_
+   },
+   weight => sub {
+      use sort 'stable';
+      sort {
+         $a->{weight} * ($a->{nrof} || 1) <=> $b->{weight} * ($b->{nrof} || 1)
+            or $a->{type} <=> $b->{type}
+      } @_
+   },
+);
+
+sub inventory_widget {
+   my $hb = new DC::UI::HBox homogeneous => 1;
+
+   $hb->add (my $vb1 = new DC::UI::VBox);
+   $vb1->add (new DC::UI::Label text => "Player");
+
+   $vb1->add (my $hb1 = new DC::UI::HBox);
+
+   use sort 'stable';
+
+   $hb1->add (new DC::UI::Selector
+      value   => $::CFG->{inv_sort},
+      options => [
+         [type   => "Type/Name"],
+         [mtime  => "Recent/Normal/Locked"],
+         [weight => "Weight/Type"],
+      ],
+      on_changed => sub {
+         $::CFG->{inv_sort} = $_[1];
+         $INV->set_sort_order ($SORT_ORDER{$_[1]});
+      },
+   );
+   $hb1->add (new DC::UI::Label text => "Weight: ", align => 1, expand => 1);
+   #TODO# update to weight/maxweight
+   $hb1->add ($STATWIDS->{i_weight} = new DC::UI::Label align => 0);
+
+   $vb1->add (my $sw1 = new DC::UI::ScrolledWindow expand => 1, scroll_y => 1);
+   $sw1->add ($INV = new DC::UI::Inventory);
+   $INV->set_sort_order ($SORT_ORDER{$::CFG->{inv_sort}});
+
+   $hb->add (my $vb2 = new DC::UI::VBox);
+
+   $vb2->add ($INVR_HB = new DC::UI::HBox);
+
+   $vb2->add (my $sw2 = new DC::UI::ScrolledWindow expand => 1, scroll_y => 1);
+   $sw2->add ($INVR = new DC::UI::Inventory);
+
+   # XXX: Call after $INVR = ... because set_opencont sets the items
+   DC::Protocol::set_opencont ($::CONN, 0, "Floor");
+
+   $hb
+}
+
+sub media_window {
+   my $vb = new DC::UI::VBox;
+
+   $vb->add (new DC::UI::FancyFrame
+      label => "Currently playing music",
+      child => new DC::UI::ScrolledWindow scroll_x => 1, scroll_y => 0,
+                  child => ($MUSIC_PLAYING_WIDGET = new DC::UI::Label ellipsise => 0, fontsize => 0.8),
+   );
+
+   $vb->add (new DC::UI::FancyFrame
+      label  => "Other media used in this session",
+      expand => 1,
+      child  => ($LICENSE_WIDGET = new DC::UI::TextScroller
+                expand => 1, fontsize => 0.8, padding_x => 4, padding_y => 4),
+   );
+
+   $vb
+}
+
+sub add_license {
+   my ($meta) = @_;
+
+   $meta = $meta->{data}
+      or return;
+
+   $meta->{license} || $meta->{author} || $meta->{source}
+      or return;
+
+   $LICENSE_WIDGET->add_paragraph ({
+      fg     => [1, 1, 1, 1],
+      markup => "<small>"
+              . "<b>Name:</b>	" . (DC::asxml $meta->{name}) . "\n"
+              . "<b>Author:</b>	" . (DC::asxml $meta->{author}) . "\n"
+              . "<b>Source:</b>	" . (DC::asxml $meta->{source}) . "\n"
+              . "<b>License:</b>	" . (DC::asxml $meta->{license}) . "\n"
+              . "</small>",
+   });
+   $LICENSE_WIDGET->scroll_to_bottom;
+}
+
+sub toggle_player_page {
+   my ($widget) = @_;
+
+   if ($PL_WINDOW->{visible} && $PL_NOTEBOOK->get_current_page == $widget) {
+      $PL_WINDOW->hide;
+   } else {
+      $PL_NOTEBOOK->set_current_page ($widget);
+      $PL_WINDOW->show;
+   }
+}
+
+sub make_playerbook {
+   my $plwin = $PL_WINDOW = new DC::UI::Toplevel
+      x       => "center",
+      y       => "center",
+      force_w => $WIDTH  * 9/10,
+      force_h => $HEIGHT * 9/10,
+      title   => "Player",
+      name    => "playerbook",
+      has_close_button => 1
+   ;
+
+   my $ntb =
+      $PL_NOTEBOOK =
+         new DC::UI::Notebook expand => 1;
+
+   $ntb->add_tab (
+      "Statistics (F2)" => $STATS_PAGE = stats_window,
+      "Shows statistics, where all your Stats and Resistances are shown."
+   );
+   $ntb->add_tab (
+      "Skills (F3)" => $SKILL_PAGE = skill_window,
+      "Shows all your Skills."
+   );
+
+   my $spellsw = $SPELL_PAGE = new DC::UI::ScrolledWindow (expand => 1, scroll_y => 1);
+   $spellsw->add ($SPELL_LIST = new DC::UI::SpellList);
+   $ntb->add_tab (
+      "Spellbook (F4)" => $spellsw,
+      "Displays all spells you have and lets you edit keyboard shortcuts for them."
+   );
+   $ntb->add_tab (
+      "Inventory (F5)" => $INVENTORY_PAGE = inventory_widget,
+      "Toggles the inventory window, where you can manage your loot (or treasures :). "
+      . "You can also hit the <b>Tab</b>-key to show/hide the Inventory."
+   );
+   $ntb->add_tab (Pickup => $PICKUP_PAGE = autopickup_setup,
+      "Configure autopickup settings, i.e. which items you will pick up automatically when walking (or running) over them.");
+
+   $ntb->add_tab (Media => media_window,
+      "License, Author and Source info for media sent by the server.");
+
+   $ntb->set_current_page ($INVENTORY_PAGE);
+
+   $plwin->add ($ntb);
+}
+
+sub keyboard_setup {
+   DC::Macro::keyboard_setup
+}
+
+sub make_help_window {
+   my $win = new DC::UI::Toplevel
+      x       => 'center',
+      y       => 'center',
+      z       => 4,
+      name    => 'doc_browser',
+      force_w => int $WIDTH  * 7/8,
+      force_h => int $HEIGHT * 7/8,
+      title   => "Help Browser",
+      has_close_button => 1;
+
+   $win->add (my $vbox = new DC::UI::VBox);
+
+   $vbox->add (new DC::UI::FancyFrame
+      label => "Navigation",
+      child => (my $buttons = new DC::UI::HBox),
+   );
+   $vbox->add (my $viewer  = new DC::UI::TextScroller
+                   expand => 1, fontsize => 0.8, padding_x => 4, padding_y => 4);
+
+   my @history;
+   my @future;
+   my $curnode;
+
+   my $load_node; $load_node = sub {
+      my ($node, $para) = @_;
+
+      $buttons->clear;
+
+      $buttons->add (new DC::UI::Button
+         text        => "⇤",
+         tooltip     => "back to the starting page",
+         on_activate => sub {
+            unshift @future, [$curnode, $viewer->current_paragraph] if $curnode;
+            unshift @future, @history;
+            @history = ();
+            $load_node->(@{shift @future});
+         },
+      );
+
+      if (@history) {
+         $buttons->add (new DC::UI::Button
+            text        => "⋘",
+            tooltip     => "back to <i>" . (DC::asxml DC::Pod::full_path $history[-1][0]) . "</i>",
+            on_activate => sub {
+               unshift @future, [$curnode, $viewer->current_paragraph] if $curnode;
+               $load_node->(@{pop @history});
+            },
+         );
+      }
+
+      if (@future) {
+         $buttons->add (new DC::UI::Button
+            text        => "⋙",
+            tooltip     => "forward to <i>" . (DC::asxml DC::Pod::full_path $future[0][0]) . "</i>",
+            on_activate => sub {
+               push @history, [$curnode, $viewer->current_paragraph];
+               $load_node->(@{shift @future});
+            },
+         );
+      }
+
+      $buttons->add (new DC::UI::Label text => " ");
+
+      my @path = DC::Pod::full_path_of $node;
+      pop @path; # drop current node
+
+      for my $node (@path) {
+         $buttons->add (new DC::UI::Button
+            text        => $node->[DC::Pod::N_KW][0],
+            tooltip     => "go to <i>" . (DC::asxml DC::Pod::full_path $node) . "</i>",
+            on_activate => sub {
+               push @history, [$curnode, $viewer->current_paragraph] if $curnode; @future = ();
+               $load_node->($node);
+            },
+         );
+         $buttons->add (new DC::UI::Label text => "/");
+      }
+
+      $buttons->add (new DC::UI::Label text => $node->[DC::Pod::N_KW][0], padding_x => 4, padding_y => 4);
+
+      $curnode = $node;
+
+      $viewer->clear;
+      $viewer->add_paragraph (DC::Pod::as_paragraphs DC::Pod::section_of $curnode);
+      $viewer->scroll_to ($para);
+   };
+
+   $load_node->(DC::Pod::find pod => "mainpage");
+
+   $DC::Pod::goto_document = sub {
+      my (@path) = @_;
+
+      push @history, [$curnode, $viewer->current_paragraph] if $curnode; @future = ();
+
+      $load_node->((DC::Pod::find @path)[0]);
+      $win->show;
+   };
+
+   $HELP_WINDOW = $win;
+}
+
+sub open_quit_dialog {
+   unless ($QUIT_DIALOG) {
+      $QUIT_DIALOG = new DC::UI::Toplevel
+         x     => "center",
+         y     => "center",
+         z     => 50,
+         title => "Really Quit?",
+         on_key_down => sub {
+            my ($dialog, $ev) = @_;
+            $ev->{sym} == 27 and $dialog->hide;
+         }
+      ;
+
+      $QUIT_DIALOG->add (my $vb = new DC::UI::VBox expand => 1);
+
+      $vb->add (new DC::UI::Label
+         text      => "You should find a savebed and apply it first!",
+         max_w     => $WIDTH * 0.25,
+         ellipsize => 0,
+      );
+      $vb->add (my $hb = new DC::UI::HBox expand => 1);
+      $hb->add (new DC::UI::Button
+         text => "Ok",
+         expand => 1,
+         on_activate => sub { $QUIT_DIALOG->hide; 0 },
+      );
+      $hb->add (new DC::UI::Button
+         text => "Quit anyway",
+         expand => 1,
+         on_activate => sub {
+            crash "Quit anyway";
+            EV::unloop EV::UNLOOP_ALL;
+         },
+      );
+   }
+
+   $QUIT_DIALOG->show;
+   $QUIT_DIALOG->grab_focus;
+}
+
+sub make_menubar {
+   $MENUFRAME = new DC::UI::Toplevel
+      border  => 0,
+      force_x => 0,
+      force_y => 0,
+      force_w => $::WIDTH,
+      child   => ($MENUBAR = new DC::UI::HBox),
+   ;
+
+   $MENUBAR->add ($BUTTONBAR = new DC::UI::Buttonbar);
+
+   # XXX: this has to be done before make_stats_window as make_stats_window calls update_stats_window which updated the gauges also X-D
+   make_gauge_window->show;
+
+#      $BUTTONBAR->add (new DC::UI::Flopper text => "Message Window", other => $MESSAGE_WINDOW,
+#         tooltip => "Toggles the server message log, where the client collects <i>all</i> messages from the server.");
+
+   make_playerbook;
+
+   $MENUPOPUP = DC::UI::Menu->new (items => [
+      ["Setup…\tF9"        , sub { $SETUP_DIALOG->toggle_visibility }],
+      ["Playerbook…\tTab"  , sub { $PL_WINDOW   ->toggle_visibility }],
+      ["…Statistics\tF2"    , sub { toggle_player_page ($::STATS_PAGE) }],
+      ["…Skills\tF3"        , sub { toggle_player_page ($::SKILL_PAGE) }],
+      ["…Spells\tF4"       , sub { toggle_player_page ($::SPELL_PAGE) }],
+      ["…Inventory\tF5"    , sub { toggle_player_page ($::INVENTORY_PAGE) }],
+      ["Help Browser…\tF1" , sub { $HELP_WINDOW ->toggle_visibility }],
+      ["Quit…"             , sub {
+         if ($CONN) {
+            open_quit_dialog;
+         } else {
+            EV::unloop EV::UNLOOP_ALL;
+         }
+      }],
+   ]);
+
+   $BUTTONBAR->add (new DC::UI::Button text => "Menu…",
+      tooltip => "Shows the main menu",
+      on_button_down => sub {
+         my ($self, $ev) = @_;
+         local $ev->{x} = 0;
+         local $ev->{y} = 0;
+         $MENUPOPUP->popup ($ev);
+      },
+   );
+
+   $MENUBAR->add ($GAUGES->{exp} = new DC::UI::ExperienceProgress
+      padding_x => 6,
+      padding_y => 3,
+      tooltip   => "This progress bar shows your overall experience and your progress towards the next character level.",
+      template  => " Exp: 888,888,888,888 (lvl 188) ",
+   );
+
+   $MENUBAR->add ($PICKUP_ENABLE = new DC::UI::CheckBox # checkbox bad, button better?
+      tooltip => "Automatic Pickup Enable - when this checkbox is enabled, then your character "
+               . "will automatically pick up items as defined by your item pickup settings "
+               . "in the playerbook. Often (e.g. in apartments) you want to temporarily "
+               . "disable autopickup by disabling this checkbox.",
+      state   => $CFG->{pickup} & PICKUP_INHIBIT ? 0 : 1,
+      on_changed => sub {
+         my ($self, $value) = @_;
+         $CFG->{pickup} &= ~PICKUP_INHIBIT;
+         $CFG->{pickup} |= PICKUP_INHIBIT unless $_[1];
+         $CONN->send_pickup ($CFG->{pickup})
+            if $CONN;
+      },
+   );
+
+   $MENUBAR->add ($GAUGES->{skillexp} = new DC::UI::ExperienceProgress
+      c_rescale => 1,
+      padding_x => 6,
+      padding_y => 3,
+      force_w   => $::WIDTH * 0.2,
+      tooltip   => "This progress bar shows the currently used skill and your progress towards the next skill level of that skill.",
+      template  => "two handed weapons 99%",
+   );
+
+   $MENUBAR->add ($GAUGES->{range} = new DC::UI::Label
+      expand => 1,
+      align => 1, can_hover => 1, can_events => 1,
+      text => "Range and Combat Slots",
+      tooltip => "#stat_ranged",
+   );
+
+   $MENUFRAME->show;
+}
+
+sub open_string_query {
+   my ($title, $cb, $txt, $tooltip) = @_;
+   my $dialog = new DC::UI::Toplevel
+      x => "center",
+      y => "center",
+      z => 50,
+      force_w => $WIDTH * 4/5,
+      title => $title;
+
+   $dialog->add (
+      my $e = new DC::UI::Entry
+         on_activate => sub { $cb->(@_); $dialog->hide; 0 },
+         on_key_down => sub { $_[1]->{sym} == 27 and $dialog->hide; 0 },
+         tooltip => $tooltip
+   );
+
+   $e->grab_focus;
+   $e->set_text ($txt) if $txt;
+   $dialog->show;
+}
+
+sub show_tip_of_the_day {
+   # find all tips
+   my @tod = DC::Pod::find tip_of_the_day => "*";
+
+   DC::DB::get state => "tip_of_the_day", sub {
+      my ($todindex) = @_;
+      $todindex = 0 if $todindex >= @tod;
+      DC::DB::put state => tip_of_the_day => $todindex + 1, sub { };
+
+      # create dialog
+      my $dialog;
+
+      my $close = sub {
+         $dialog->destroy;
+      };
+
+      $dialog = new DC::UI::Toplevel
+         x => "center",
+         y => "center",
+         z => 3,
+         name    => 'tip_of_the_day',
+         force_w => int $WIDTH  * 4/9,
+         force_h => int $WIDTH  * 2/9,
+         title   => "Tip of the day #" . (1 + $todindex),
+         child   => my $vbox = new DC::UI::VBox,
+         has_close_button => 1,
+         on_delete => $close,
+      ;
+
+      $vbox->add (my $viewer  = new DC::UI::TextScroller
+                      expand => 1, fontsize => 0.8, padding_x => 4, padding_y => 4);
+      $viewer->add_paragraph (DC::Pod::as_paragraphs DC::Pod::section_of $tod[$todindex]);
+
+      $vbox->add (my $table = new DC::UI::Table col_expand => [0, 1]);
+
+      $table->add_at (0, 0, new DC::UI::Button
+         text    => "Close",
+         tooltip => "Close the tip of the day window. To never see it again, disable the tip of the day in the <b>Server Setup</b>.",
+         on_activate => $close,
+      );
+
+      $table->add_at (2, 0, new DC::UI::Button
+         text    => "Next",
+         tooltip => "Show the next <b>Tip of the day</b>.",
+         on_activate => sub {
+            $close->();
+            &show_tip_of_the_day;
+         },
+      );
+
+      $dialog->show;
+   };
+}
+
+sub video_init {
+   DC::set_theme $CFG->{uitheme};
+
+   DC::SDL_InitSubSystem DC::SDL_INIT_VIDEO if $SDL_REINIT;
+   $SDL_REINIT = 0;
+
+   @SDL_MODES = DC::SDL_ListModes 8, $CFG->{disable_alpha} ? 0 : 8;
+   @SDL_MODES = DC::SDL_ListModes 8, 8 unless @SDL_MODES;
+   @SDL_MODES = DC::SDL_ListModes 5, 0 unless @SDL_MODES;
+   @SDL_MODES or DC::fatal "Unable to find a usable video mode\n(hardware accelerated opengl fullscreen)";
+
+   @SDL_MODES = sort { $a->[0] * $a->[1] <=> $b->[0] * $b->[1] } @SDL_MODES;
+
+   if (!defined $CFG->{sdl_mode} or $CFG->{sdl_mode} > $#SDL_MODES) {
+      $CFG->{sdl_mode} = 0; # lowest resolution by default
+
+      # now choose biggest mode <= 1024x768
+      for (0 .. $#SDL_MODES) {
+         if ($SDL_MODES[$_][0] * $SDL_MODES[$_][1] <= 1024 * 768) {
+            $CFG->{sdl_mode} = $_;
+         }
+      }
+   }
+
+   my ($old_w, $old_h) = ($WIDTH, $HEIGHT);
+
+   ($WIDTH, $HEIGHT, my ($rgb, $alpha)) = @{ $SDL_MODES[$CFG->{sdl_mode}] };
+   $FULLSCREEN = $CFG->{fullscreen};
+   $FAST       = $CFG->{fast};
+
+   # due to mac os x braindamage, we simply retry with !fullscreen in case of an error
+   DC::SDL_SetVideoMode $WIDTH, $HEIGHT, $rgb, $alpha, $FULLSCREEN
+      or DC::SDL_SetVideoMode $WIDTH, $HEIGHT, $rgb, $alpha, !$FULLSCREEN
+      or die "SDL_SetVideoMode failed: " . (DC::SDL_GetError) . "\n";
+
+   $SDL_ACTIVE = 1;
+   $LAST_REFRESH = time - 0.01;
+
+   DC::OpenGL::init;
+   DC::Macro::init;
+
+   $FONTSIZE = int $HEIGHT / 40 * $CFG->{gui_fontsize};
+
+   $DC::UI::ROOT->configure (0, 0, $WIDTH, $HEIGHT);#d#
+
+   #############################################################################
+
+   if ($DEBUG_STATUS) {
+      DC::UI::rescale_widgets $WIDTH / $old_w, $HEIGHT / $old_h;
+   } else {
+      # create/configure the widgets
+
+      $DC::UI::ROOT->connect (key_down => sub {
+         my (undef, $ev) = @_;
+
+         if (my @macros = DC::Macro::find $ev) {
+            DC::Macro::execute $_ for @macros;
+
+            return 1;
+         }
+
+         0
+      });
+
+      $DEBUG_STATUS = new DC::UI::Label
+         padding => 0,
+         z       => 100,
+         force_x => "max",
+         force_y => 20;
+      $DEBUG_STATUS->show;
+
+      $STATUSBOX = new DC::UI::Statusbox;
+
+      $MODBOX = new DC::UI::Label
+         can_events => 1,
+         can_hover  => 1,
+         markup     => "",
+         align      => 0,
+         font       => $FONT_FIXED,
+         tooltip    => "#modifier_box",
+         tooltip_width => 0.67,
+      ;
+
+      update_modbox;
+
+      (new DC::UI::Frame
+         bg      => [0, 0, 0, 0.4],
+         force_x => 0,
+         force_y => "max",
+         child   => (my $LL = new DC::UI::VBox),
+      )->show;
+
+      $LL->add ($STATUSBOX);
+      $LL->add ($MODBOX);
+      $LL->add (new DC::UI::Label
+         align    => 0,
+         markup   => "Use <b>Alt-Enter</b> to toggle fullscreen mode",
+         fontsize => 0.5,
+         fg       => [1, 1, 0, 0.7],
+      );
+
+      DC::UI::Toplevel->new (
+         title     => "Minimap",
+         name      => "mapmap",
+         x         => 0,
+         y         => $::FONTSIZE + 8,#d# hack to move messages window below the menubar
+         border_bg => [1, 1, 1, 192/255],
+         bg        => [1, 1, 1, 0],
+         child     => ($MAPMAP = new DC::MapWidget::MapMap
+            tooltip => "<b>Minimap</b>. This will display an overview of the surrounding areas.",
+         ),
+      )->show;
+
+      $MAPWIDGET = new DC::MapWidget;
+      $MAPWIDGET->connect (activate_console => sub {
+         my ($mapwidget, $preset) = @_;
+
+         $MESSAGE_DIST->activate_console ($preset)
+            if $MESSAGE_DIST;
+      });
+      $MAPWIDGET->show;
+      $MAPWIDGET->grab_focus;
+
+      $COMPLETER = new DC::MapWidget::Command::
+         command   => { },
+         tooltip   => "#completer_help",
+      ;
+
+      $SETUP_DIALOG = new DC::UI::Toplevel
+         title   => "Setup",
+         name    => "setup_dialog",
+         x       => 'center',
+         y       => 'center',
+         z       => 2,
+         force_w => $::WIDTH  * 0.6,
+         force_h => $::HEIGHT * 0.6,
+         has_close_button => 1,
+      ;
+
+      $METASERVER = metaserver_dialog;
+      # the name is changed to not conflict with the older name as users could have hidden it
+      $MESSAGE_WINDOW = new DC::UI::Dockbar 
+         name    => "message_window2",
+         title   => 'Messages',
+         y       => $::FONTSIZE + 8,#d# hack to move messages window below the menubar
+         force_w => $::WIDTH  * 0.6,
+         force_h => $::HEIGHT * 0.25,
+      ;
+
+      $MESSAGE_DIST   = new DC::MessageDistributor dockbar => $MESSAGE_WINDOW;
+
+      $SETUP_DIALOG->add ($SETUP_NOTEBOOK = new DC::UI::Notebook expand => 1,
+         filter => new DC::UI::ScrolledWindow expand => 1, scroll_y => 1);
+
+      $SETUP_NOTEBOOK->add_tab (Login    => $SETUP_LOGIN = login_setup,
+         "Configure the server to play on, your username and password.");
+      $SETUP_NOTEBOOK->add_tab (Server   => $SETUP_SERVER = server_setup,
+         "Configure other server related options.");
+      $SETUP_NOTEBOOK->add_tab (Client   => client_setup,
+         "Configure various client-specific settings.");
+      $SETUP_NOTEBOOK->add_tab (Graphics => graphics_setup,
+         "Configure the video mode, performance, fonts and other graphical aspects of the game.");
+      $SETUP_NOTEBOOK->add_tab (Audio    => audio_setup,
+         "Configure the use of audio, sound effects and background music.");
+      $SETUP_NOTEBOOK->add_tab (Keyboard => $SETUP_KEYBOARD = keyboard_setup,
+         "Lets you define, edit and delete key bindings."
+       . "There is a shortcut for making bindings: <b>Control-Insert</b> opens the binding editor "
+       . "with nothing set and the recording started. After doing the actions you "
+       . "want to record press <b>Insert</b> and you will be asked to press a key-combo. "
+       . "After pressing the combo the binding will be saved automatically and the "
+       . "binding editor closes");
+      $SETUP_NOTEBOOK->add_tab (Debug    => debug_setup,
+         "Some debuggin' options. Do not ask.");
+
+      make_help_window;
+      make_menubar;
+
+      $SETUP_DIALOG->show;
+      $MESSAGE_WINDOW->show;
+   }
+
+   $MODE_SLIDER->set_range ([$CFG->{sdl_mode}, 0, scalar @SDL_MODES, 1, 1]);
+   $MODE_SLIDER->emit (changed => $CFG->{sdl_mode});
+
+   $CAVEAT_LABEL->set_text ("None :)");
+   $CAVEAT_LABEL->set_text ("Apple/NVIDIA Texture bug (slow)")
+      if $DC::OpenGL::APPLE_NVIDIA_BUG;
+   $CAVEAT_LABEL->set_text ("Software Rendering (very slow)")
+      unless DC::SDL_GL_GetAttribute DC::SDL_GL_ACCELERATED_VISUAL;
+
+   $STATUSBOX->add ("Set video mode $WIDTH×$HEIGHT", timeout => 10, fg => [1, 1, 1, 0.5]);
+}
+
+sub video_shutdown {
+   DC::OpenGL::shutdown;
+   DC::SDL_QuitSubSystem DC::SDL_INIT_VIDEO if $SDL_REINIT;
+   
+   undef $SDL_ACTIVE;
+}
+
+my %animate_object;
+my $animate_timer;
+
+my $fps = 9;
+
+sub force_refresh {
+   if ($DELIANTRA_DEBUG & 4) {
+      $fps = $fps * 0.98 + 1 / (($NOW - $LAST_REFRESH) || 0.1) * 0.02;
+      debug sprintf "%3.2f", $fps;
+   }
+
+   undef $WANT_REFRESH;
+   $_[0]->stop;
+
+   $DC::UI::ROOT->draw;
+   DC::SDL_GL_SwapBuffers;
+   $LAST_REFRESH = $NOW;
+}
+
+my $want_refresh = EV::prepare_ns \&force_refresh;
+
+my $input = EV::periodic 0, 1 / $MAX_FPS, undef, sub {
+   $NOW = EV::now;
+
+   ($SDL_CB[$_->{type}] || sub { warn "unhandled event $_->{type}" })->($_)
+      for DC::poll_events;
+
+   if (%animate_object) {
+      $_->animate ($LAST_REFRESH - $NOW) for values %animate_object;
+      $WANT_REFRESH = 1;
+   }
+
+   $want_refresh->start
+      if $WANT_REFRESH;
+};
+
+sub animation_start {
+   my ($widget) = @_;
+   $animate_object{$widget} = $widget;
+}
+
+sub animation_stop {
+   my ($widget) = @_;
+   delete $animate_object{$widget};
+}
+
+$SDL_CB[DC::SDL_QUIT] = sub {
+   crash "SDL_QUIT";
+   EV::unloop EV::UNLOOP_ALL;
+};
+$SDL_CB[DC::SDL_VIDEORESIZE] = sub { };
+$SDL_CB[DC::SDL_VIDEOEXPOSE] = sub {
+   DC::UI::full_refresh;
+};
+$SDL_CB[DC::SDL_ACTIVEEVENT] = sub {
+#  not useful, as APPACTIVE includes only iconified state, not unmapped
+#  printf "active %x %x %x\n", $_[0]{gain}, $_[0]{state}, DC::SDL_GetAppState;#d#
+#  printf "a %x\n", DC::SDL_GetAppState & DC::SDL_APPACTIVE;#d#
+#  printf "A\n" if $_[0]{state} & DC::SDL_APPACTIVE;
+#  printf "K\n" if $_[0]{state} & DC::SDL_APPINPUTFOCUS;
+#  printf "M\n" if $_[0]{state} & DC::SDL_APPMOUSEFOCUS;
+};
+$SDL_CB[DC::SDL_KEYDOWN] = sub {
+   if ($_[0]{mod} & DC::KMOD_ALT && $_[0]{sym} == 13) {
+      # alt-enter
+      video_shutdown;
+      $FULLSCREEN_ENABLE->toggle;
+      video_init;
+   } else {
+      &DC::UI::feed_sdl_key_down_event;
+   }
+   update_modbox;
+};
+$SDL_CB[DC::SDL_KEYUP]           = sub {
+   &DC::UI::feed_sdl_key_up_event;
+   update_modbox;
+};
+$SDL_CB[DC::SDL_MOUSEMOTION]     = \&DC::UI::feed_sdl_motion_event,
+$SDL_CB[DC::SDL_MOUSEBUTTONDOWN] = \&DC::UI::feed_sdl_button_down_event,
+$SDL_CB[DC::SDL_MOUSEBUTTONUP]   = \&DC::UI::feed_sdl_button_up_event,
+$SDL_CB[DC::SDL_USEREVENT]       = sub {
+   if ($_[0]{code} == 1) {
+      audio_channel_finished $_[0]{data1};
+   } elsif ($_[0]{code} == 0) {
+      audio_music_finished;
+   }
+};
+
+#############################################################################
+
+$SIG{INT} = $SIG{TERM} = sub {
+   EV::unloop;
+   #d# TODO calling exit here hangs the process in some futex
+};
+
+# due to mac os x + sdl combined braindamage, we need this contortion
+sub main {
+   {
+      DC::Pod::load_docwiki DC::find_rcfile "docwiki.pst";
+
+      if (-e "$Deliantra::VARDIR/client.cf") {
+         DC::read_cfg "$Deliantra::VARDIR/client.cf";
+      } else {
+         #TODO: compatibility cruft
+         DC::read_cfg "$Deliantra::OLDDIR/cfplusrc";
+         print STDERR "INFO: used old configuration file\n";
+      }
+
+      DC::DB::Server::run;
+
+      if ($CFG->{db_schema} < 1) {
+         warn "INFO: upgrading database schema from 0 to 1, mapcache and tilecache will be lost\n";
+         DC::DB::nuke_db;
+         $CFG->{db_schema} = 1;
+         DC::write_cfg;
+      }
+
+      DC::DB::open_db;
+
+      DC::UI::set_layout ($::CFG->{layout});
+
+      my %DEF_CFG = (
+         config_autosave     => 1,
+         sdl_mode            => undef,
+         fullscreen          => 1,
+         fast                => 0,
+         force_opengl11      => undef,
+         disable_alpha       => 0,
+         smooth_movement     => 1,
+         smooth_transitions  => 1,
+         texture_compression => 1,
+         map_scale           => 1,
+         fow_enable          => 1,
+         fow_intensity       => 0,
+         fow_texture         => 0,
+         map_smoothing       => 1,
+         gui_fontsize        => 1,
+         log_fontsize        => 0.7,
+         gauge_fontsize      => 1,
+         gauge_size          => 0.35,
+         stat_fontsize       => 0.7,
+         mapsize             => 100,
+         audio_enable        => 1,
+         audio_hw_channels   => 0,
+         audio_hw_frequency  => 0,
+         audio_hw_chunksize  => 0,
+         audio_mix_channels  => 8,
+         effects_enable      => 1,
+         effects_volume      => 1,
+         bgm_enable          => 1,
+         bgm_volume          => 0.5,
+         output_rate         => "",
+         pickup              => PICKUP_SPELLBOOK | PICKUP_SKILLSCROLL | PICKUP_VALUABLES,
+         inv_sort            => "mtime",
+         default             => "profile", # default profile
+         show_tips           => 1,
+         logview_max_par     => 1000,
+         shift_fire_stop     => 0,
+         uitheme             => "wood",
+         map_shift_x         => -24, # arbitrary
+         map_shift_y         => +24, # arbitrary
+      );
+
+      while (my ($k, $v) = each %DEF_CFG) {
+         $CFG->{$k} = $v unless exists $CFG->{$k};
+      }
+
+      my @args = @ARGV;
+
+      my $profile = 'default';
+
+      for (my $i = 0; $i < @args; $i++) {
+         if ($args[$i] =~ /^--?profile$/) {
+            $profile = $args[$i + 1];
+            splice @args, $i, 2, ();
+            $i = 0;
+         } elsif ($args[$i] =~ /^--?h/) {
+            print STDERR "Usage: $0 [--profile name] [host [user [password]]]\n";
+            exit 0;
+         }
+      }
+
+      $CFG->{profile}{$profile} ||= {};
+      $PROFILE = $CFG->{profile}{$profile};
+      $PROFILE->{host} ||= "gameserver.deliantra.net";
+
+      $PROFILE->{host}     = $args[0] if @args > 0;
+      $PROFILE->{user}     = $args[1] if @args > 1;
+      $PROFILE->{password} = $args[2] if @args > 2;
+
+      # convert old bindings (only default profile matters)
+      if (my $bindings = delete $PROFILE->{bindings}) {
+         while (my ($mod, $syms) = each %$bindings) {
+            while (my ($sym, $cmds) = each %$syms) {
+               push @{ $PROFILE->{macro} }, {
+                  accelkey => [$mod*1, $sym*1],
+                  action   => $cmds,
+               };
+            }
+         }
+      }
+
+      $ENV{FONTCONFIG_FILE} = DC::find_rcfile "fonts/fonts.conf";
+      $ENV{FONTCONFIG_DIR} = DC::find_rcfile "fonts";
+
+      {
+         my @fonts = map DC::find_rcfile "fonts/$_", qw(
+            DejaVuSans.ttf
+            DejaVuSansMono.ttf
+            DejaVuSans-Bold.ttf
+            DejaVuSansMono-Bold.ttf
+            DejaVuSans-Oblique.ttf
+            DejaVuSansMono-Oblique.ttf
+            DejaVuSans-BoldOblique.ttf
+            DejaVuSansMono-BoldOblique.ttf
+            mona.ttf
+         );
+
+         DC::add_font $_ for @fonts;
+
+         $FONT_PROP  = new_from_file DC::Font $fonts[0];
+         $FONT_FIXED = new_from_file DC::Font $fonts[1];
+
+         $FONT_PROP->make_default;
+
+         DC::pango_init;
+      }
+
+#   compare mono (ft) vs. rgba (cairo)
+#   ft - 1.8s, cairo 3s, even in alpha-only mode
+#   for my $rgba (0..1) {
+#      my $t1 = Time::HiRes::time;
+#      for (1..1000) {
+#         my $layout = DC::Layout->new ($rgba);
+#         $layout->set_text ("hallo" x 100);
+#         $layout->render;
+#      }
+#      my $t2 = Time::HiRes::time;
+#      warn $t2-$t1;
+#   }
+
+      video_init;
+      audio_init;
+   }
+
+   show_tip_of_the_day if $CFG->{show_tips};
+
+   our $STARTUP_CANCEL = EV::idle sub {
+      undef $::STARTUP_CANCEL;
+      $startup_done->();
+   };
+
+   debug_toggle 0;
+
+   delete $SIG{__DIE__};
+   EV::loop;
+
+   DC::write_cfg if $CFG->{config_autosave};
+
+   #video_shutdown;
+   #audio_shutdown;
+
+   DC::OpenGL::quit;
+   DC::SDL_Quit;
+   DC::DB::Server::stop;
+}
+
+DC::SDL_braino; # see sub above
+
+=head1 NAME
+
+deliantra - A Deliantra MORPG game client
+
+=head1 SYNOPSIS
+
+   deliantra [--profile name] [host [user [password]]]
+   deliantra --help
+
+=head1 USAGE
+
+The deliantra client utilises OpenGL for all UI elements and the game. It
+is supposed to be used in fullscreen mode and interactively.
+
+=head1 DEBUGGING
+
+DELIANTRA_DEBUG - environment variable
+
+   1   draw borders around widgets
+   2   add low-level widget info to tooltips
+   4   show fps
+   8   suppress tooltips
+  16   show bandwidth downstream
+
+=head1 AUTHOR
+
+Marc Lehmann <deliantra@schmorp.de>, Robin Redeker <elmex@ta-sa.org>
+
+
+

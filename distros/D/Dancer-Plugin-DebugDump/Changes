@@ -1,0 +1,15 @@
+Revision history for Dancer-Plugin-DebugDump
+
+0.03    2011-11-14
+        Deprecating.
+        Dancer's built-in debug() keyword automatically serialises these days,
+        so there's no reason for this plugin to exist.  I'll leave it on CPAN
+        for the time being for anyone who is already using it, but will withdraw
+        it at some point in the future.
+
+0.02    2010-11-08
+        Just a typo fix.
+
+0.01    2010-11-05
+        Initial version.
+

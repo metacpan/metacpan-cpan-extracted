@@ -1,0 +1,245 @@
+==================================================
+Changes from 2013-07-05 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.0.8 at 2014-07-05 04:14:48 +0000
+------------------------------------------
+
+  Change: 74303db702baf671dd23c89ff9122d06f1dd9ec1
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-07-04 21:12:58 +0000
+
+    manually list prereqs for development 
+
+  Change: 728b3c419571f00807dad53119b950deab7f938f
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-07-04 21:01:12 +0000
+
+    resolve POD error
+
+    Resolving an error showing up on CPANTS:
+
+    Around line 190: Non-ASCII character seen before =encoding in
+
+    'ElectronicsÂ©'. Assuming UTF-8 
+
+------------------------------------------
+version 0.0.7 at 2014-06-29 21:39:05 +0000
+------------------------------------------
+
+  Change: 12794d29956afa908c5c3d76c233f8b300ff0553
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-06-29 14:39:05 +0000
+
+    handle error returned from I2C Device
+
+    Also read temperature directly from I2CDeviceAddress. Apparently the
+    rest of this code isn't really necessary and sometimes breaks things. 
+
+------------------------------------------
+version 0.0.6 at 2014-02-03 08:37:30 +0000
+------------------------------------------
+
+  Change: 9c2dffb6fe6260dbcdd1607e44c0cb868b1cfe72
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-03 00:37:30 +0000
+
+    fix default perl path in shebang 
+
+  Change: 4c4dc7c3d0d210b58a038074c4000c58254e352c
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-03 00:37:21 +0000
+
+    fix some variable names 
+
+  Change: e3184859f26678c15b04199d529b6fa07cc600b3
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-03 00:37:07 +0000
+
+    set I2CBusDevicePath in test cases 
+
+  Change: a9086889448d5e24213f6fe4d1b9db3e386b8d1f
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-02 23:27:52 +0000
+
+    die if no temperature data received from sensor
+
+    - created a separate method to set pointer register
+
+    - added some more author test cases 
+
+  Change: dd76a44b342f3bd54981ca78a8ae5887c203523a
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-02 23:26:21 +0000
+
+    update pod docs, add SYNOPSIS 
+
+  Change: 935f0cfc577154719910ba669499f0d9f785c325
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-02 23:19:15 +0000
+
+    update copyright year to 2014 
+
+  Change: 05bd6a1bc406a929aa40b2838cb201c7bfcbc0fb
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-02 23:18:21 +0000
+
+    switch deprecated CriticTests to Test::Perl::Critic 
+
+  Change: a4e40d525c3300c0ee5bdce2aad5a9e160bd2935
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2014-02-02 23:17:49 +0000
+
+    add VERSION comment to bin/tmp102 
+
+------------------------------------------
+version 0.0.5 at 2013-12-10 07:23:43 +0000
+------------------------------------------
+
+  Change: 43af8a7464fd1f77bcaa872253d3df270738e40d
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-09 23:23:43 +0000
+
+    bug fix to Device::TMP102
+
+    Removing references to PCA9685, which was used as a model to create
+    Device::TMP102. 
+
+------------------------------------------
+version 0.0.4 at 2013-12-10 06:16:09 +0000
+------------------------------------------
+
+  Change: 0fe71e2beac968fac31f8218dd7b9b8749ecd51d
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-09 22:16:09 +0000
+
+    v0.0.4 
+
+  Change: 05a2037e0eaad96539f851eb13b8f7782a832b59
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-09 21:56:50 +0000
+
+    doc updates 
+
+  Change: 557cc906305c5dbe42150930185788a0ec8b4fda
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-09 20:38:28 +0000
+
+    docs link to Device::Temperature::TMP102 
+
+------------------------------------------
+version 0.0.3 at 2013-12-10 01:58:46 +0000
+------------------------------------------
+
+  Change: 9bd6c81cfe93be5c35eb345bd490a9fa9e449330
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-09 17:58:46 +0000
+
+    install tmp102 script
+
+    - renamed script
+
+    - moved to 'bin/' directory
+
+    - add ExecDir to dist.ini 
+
+  Change: e4cb0c2bae77e0a5b932cfae0b468da525d9b1fb
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 21:29:37 +0000
+
+    update links in docs
+
+    - sparkfun item 11931 replaces 9418
+
+    - add link to github page 
+
+------------------------------------------
+version 0.0.2 at 2013-12-09 05:16:01 +0000
+------------------------------------------
+
+  Change: 87ec1cb7a30cab8c148fea32fcf26ddf45eb5918
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 21:16:01 +0000
+
+    v0.0.2 
+
+  Change: 03fe8b7d6026d2254f8940f9986dbb9355c7c709
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 21:14:56 +0000
+
+    switch to Dist::Zilla::Plugin::ChangelogFromGit 
+
+  Change: 25fe1af8ee120f1c97b97628a52c3313f3a043a3
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 21:10:08 +0000
+
+    remove duplicate link 
+
+  Change: 4ee28f5d832bba084e5959cc6ab428e3a7d9288b
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 21:09:49 +0000
+
+    eliminate temporary variable 
+
+  Change: 5dd4380586b91b73547ada8a34bdbd32ed569c57
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:41:55 +0000
+
+    update from sample TMP102 test code 
+
+  Change: 55a622eefc3011a061a35c8a63a0e956690c7b5a
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:40:53 +0000
+
+    update pod docs 
+
+------------------------------------------
+version 0.0.1 at 2013-12-09 04:10:24 +0000
+------------------------------------------
+
+  Change: 38961246e4b03cf729d0dd65daeea3800340696a
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:10:24 +0000
+
+    fix another pod typo 
+
+  Change: fccb3c80b231994d105ee446365cef03e85072f1
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:09:11 +0000
+
+    add stopwords for pod spelling test 
+
+  Change: 2413f5f81318442b153b3a5f7870a2ef216643c5
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:08:45 +0000
+
+    fix typo in pod 
+
+  Change: f1bf54392408ef88bcd13fb1e9e9eef84fdd1094
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:02:07 +0000
+
+    adding Changes file for initial release 
+
+  Change: 89da742e38d9670c118aab9a269ab204252b81fc
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 20:01:37 +0000
+
+    add .gitignore 
+
+  Change: 501e35f23b17ce911c5ea47c49c6fb3d48e15a47
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 19:59:00 +0000
+
+    make command line script executable 
+
+  Change: 1369d96a0824b8bc4b66fe4a8b1af3c0284b24ec
+  Author: Alex White <VVu@geekfarm.org>
+  Date : 2013-12-08 19:38:27 +0000
+
+    first draft 
+
+================
+End of releases.
+================

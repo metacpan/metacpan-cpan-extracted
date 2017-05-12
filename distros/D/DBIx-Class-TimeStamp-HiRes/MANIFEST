@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/DBIx/Class/TimeStamp/HiRes.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00.load.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t

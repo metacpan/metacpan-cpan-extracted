@@ -1,0 +1,33 @@
+0.11  2012-02-13
+        - needs to actually depend on Path::Class
+
+0.10  2012-02-12
+        - Fix ::FileHandle on pre-5.14 perls
+
+0.09  2012-02-12
+        - oops, missed rafl's upload, rerelease with the correct version number
+
+0.08 (DOY)  2012-02-12
+        - Convert to dzil
+        - Add ::Chunked for combining incoming blocks into larger blocks
+        - Add ::FileHandle for iterating over lines in a text file
+
+0.08 (FLORA)
+        - Fix new warnings in Moose
+
+0.07
+	- Fix new warnings in Moose about overwriting methods
+
+0.06
+    - Fix several pod errors (Closes RT#43490) (Ryan Niebur)
+    - Add pod tests
+    - Update version control notice
+
+0.05
+	- Silence some new warnings from Moose
+
+0.04
+	- add exclusions to role composition to avoid the new warning
+
+0.03
+	- add Path::Class iterator

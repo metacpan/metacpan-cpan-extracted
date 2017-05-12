@@ -1,0 +1,1190 @@
+<HTML>
+<HEAD>
+<TITLE>DBD::DBMaker - DBD driver to access DBMaker database</TITLE>
+<LINK REV="made" HREF="mailto:phu@sqlpc.syscom.com.tw">
+</HEAD>
+
+<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#NAME">NAME</A>
+	<LI><A HREF="#SYNOPSIS">SYNOPSIS</A>
+	<LI><A HREF="#DESCRIPTION">DESCRIPTION</A>
+	<LI><A HREF="#The_DBI_Interface">The DBI Interface</A>
+	<UL>
+
+		<LI><A HREF="#The_DBI_Class_Methods">The DBI Class Methods</A>
+		<LI><A HREF="#The_DBI_database_handle_Methods">The DBI database handle Methods</A>
+		<LI><A HREF="#The_Statement_Handle_Methods">The Statement Handle Methods</A>
+		<LI><A HREF="#Method_common_to_all_handles">Method common to all handles</A>
+		<LI><A HREF="#The_DBI_Dynamic_Attributes">The DBI Dynamic Attributes</A>
+		<LI><A HREF="#Attributes_common_to_all_handles">Attributes common to all handles</A>
+		<LI><A HREF="#Database_Handle_Attributes">Database Handle Attributes</A>
+		<LI><A HREF="#Statement_Handle_Attributes">Statement Handle Attributes</A>
+		<LI><A HREF="#Handling_BLOB_Fields_with_DBMake">Handling BLOB Fields with DBMaker</A>
+		<LI><A HREF="#Private_functions_for_DBMaker_AP">Private functions for DBMaker API access</A>
+	</UL>
+
+	<LI><A HREF="#Recent_Updates">Recent Updates</A>
+	<LI><A HREF="#Relative_Links">Relative Links</A>
+	<LI><A HREF="#AUTHOR">AUTHOR</A>
+	<LI><A HREF="#SEE_ALSO">SEE ALSO</A>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="NAME">NAME</A></H1>
+<P>
+DBD::DBMaker - DBD driver to access DBMaker database
+
+<P>
+<HR>
+<H1><A NAME="SYNOPSIS">SYNOPSIS</A></H1>
+<P>
+<PRE>  require DBI;
+</PRE>
+<P>
+<PRE>  $dbh = DBI-&gt;connect('DBI:DBMaker:' . $database, $user, $pass);
+  $dbh = DBI-&gt;connect($database, $user, $pass, 'DBMaker');
+</PRE>
+<P>
+See the DBI module documentation for more information.
+
+<P>
+<HR>
+<H1><A NAME="DESCRIPTION">DESCRIPTION</A></H1>
+<P>
+This module is the low-level driver to access the DBMaker database using
+the DBI interface. Please refer to the DBI documentation for using it.
+
+<P>
+<HR>
+<H1><A NAME="The_DBI_Interface">The DBI Interface</A></H1>
+<P>
+This documentation describes driver specific behavior and restrictions, and
+a brief description of each method and attribute. It is not supposed to be
+used as the only reference for the user. In any case consult the DBI
+documentation first !
+
+<P>
+<HR>
+<H2><A NAME="The_DBI_Class_Methods">The DBI Class Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_connect">connect</A></STRONG><DD>
+<P>
+Establishes a connection to a database server
+
+<P>
+To connect to a database with a minimum of parameters, use the following
+syntax: 
+
+<P>
+<PRE>  $dbh = DBI-&gt;connect('DBI:DBMaker:$dbname', $user, $pass);
+  $dbh = DBI-&gt;connect($dbname, $user, $pass, 'DBMaker');
+</PRE>
+<P>
+Or you can set environment variable DBI_DSN, DBI_USER, DBI_PASS and use the
+following syntax:
+
+<P>
+The DBI environment variable:
+
+<P>
+<PRE>  In CSH,TCSH
+  setenv DBI_DSN 'dbi:DBMaker:DBNAME'
+  setenv DBI_USER 'SYSADM'
+  setenv DBI_PASS ''
+ 
+  In SH, BASH
+  export DBI_DSN='dbi:DBMaker:DBNAME'
+  export DBI_USER='SYSADM'
+  export DBI_PASS=''
+ 
+  $dbh = DBI-&gt;connect();
+</PRE>
+<P>
+If you cannot connect to the specified $dbname, please check if related
+database config is located at the following path or not. For detail setting
+for DBMaker's database config please reference DBMaker's DBA manual. 
+
+<P>
+The search order for DBMaker's config file (dmconfig.ini) is listed as
+follows:
+
+<P>
+<PRE>  (1) Your local directory which you run your perl program.
+  (2) DBMAKER environment variable for indicating where your 
+      dmconfig.ini located.
+  (3) ~dbmaker/data
+</PRE>
+<P>
+If you want your database to be able to be accessed by others, you can
+append your database section to ~dbmaker/data/dmconfig.ini by editor. Or
+you can tell user to append the database section in their local
+dmconfig.ini.
+
+<DT><STRONG><A NAME="item_disconnect">disconnect</A></STRONG><DD>
+<P>
+Disconnects from the database server.
+
+<P>
+<PRE>  Usage:
+  $rc = $dbh-&gt;disconnect();  
+</PRE>
+<DT><STRONG><A NAME="item_data_sources">data_sources</A></STRONG><DD>
+<P>
+Returns a list of all data sources (databases) available via the DBMaker
+driver. The search order is same as the search for DBMaker's dmconfig.ini
+file.
+
+<P>
+<PRE>  Example:  For list all database avaiable for DBMaker
+  my @ary =DBI-&gt;data_sources(&quot;DBMaker&quot;);
+  my $i=0;
+  print &quot;Show a list of all data sources availabled via the DBMaker:\n&quot;;
+  while($ary[$i]){
+    print &quot;$ary[$i]\n&quot;;
+    $i=$i+1;
+  }
+</PRE>
+<P>
+The following DBI class method are handled by the DBI, no driver-specific
+impact.
+
+<DT><STRONG><A NAME="item_available_drivers">available_drivers</A></STRONG><DD>
+<P>
+Returns a list of all available drivers by searching for DBD::* modules
+through the directories in @INC.
+
+<P>
+<PRE>  Usage:
+  @ary = DBI-&gt;available_drivers;
+</PRE>
+<DT><STRONG><A NAME="item_trace">trace</A></STRONG><DD>
+<P>
+Perform tracing for debugging.
+
+<P>
+<PRE>  Usage:
+  DBI-&gt;trace($trace_level)
+  DBI-&gt;trace($trace_level, $trace_filename)
+</PRE>
+<DT><STRONG><A NAME="item_connect_cached">connect_cached</A></STRONG><DD>
+<P>
+Database handle returned will be stored in a hash associated with the given
+parameters.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="The_DBI_database_handle_Methods">The DBI database handle Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_prepare">prepare</A></STRONG><DD>
+<P>
+Prepares a SQL statement for execution.
+
+<P>
+<PRE>  Usage:
+  $sth = $dbh-&gt;prepare($statement)        
+  $sth = $dbh-&gt;prepare($statement, \%attr);
+</PRE>
+<P>
+<PRE>  DBD::DBMaker note: As the DBD driver looks for placeholders within
+  the statement, additional to the ANSI style '?' placeholders
+  the DBMaker driver can parse :1, :2 and :foo style placeholders
+  (like Oracle).
+</PRE>
+<P>
+<PRE>  Example:
+  my $sth1=$dbh-&gt;prepare(&quot;SELECT id,name,title,phone FROM employees1 where id = ?&quot;);
+  or
+  my $sql=qq{INSERT INTO employees1 values(:c1,:c2,:c3,:c4)};
+  my $sth = $dbh-&gt;prepare($sql);
+</PRE>
+<DT><STRONG><A NAME="item_do">do</A></STRONG><DD>
+<P>
+Prepares and executes a SQL statement.
+
+<P>
+<PRE>  Usage:
+  $rv  = $dbh-&gt;do($statement);
+</PRE>
+<DT><STRONG><A NAME="item_commit">commit</A></STRONG><DD>
+<P>
+Commit the most recent series of database changes if the database support
+transaction.
+
+<P>
+<PRE>  Usage:
+  $rc  = $dbh-&gt;commit;
+</PRE>
+<DT><STRONG><A NAME="item_rollback">rollback</A></STRONG><DD>
+<P>
+Rollback the most recent series of uncommitted database changes if the
+database support transaction. The default commit mode is on.
+
+<P>
+<PRE>  Usage:
+  $rc  = $dbh-&gt;rollback;
+</PRE>
+<DT><STRONG><A NAME="item_ping">ping</A></STRONG><DD>
+<P>
+Attempts to determine, if the database server is still running and the
+connection still working.
+
+<P>
+<PRE>  Usage:
+  $rc = $dbh-&gt;ping;
+</PRE>
+<DT><STRONG><A NAME="item_table_info">table_info</A></STRONG><DD>
+<P>
+Returns an active statement handle that can be used to fetch information
+about tables and views that exist in the database.
+
+<P>
+<PRE>  Example:
+  $sth = $dbh-&gt;table_info();
+  while (my @ary=$sth-&gt;fetchrow_array)
+  {
+  print &quot;$ary[0],$ary[1],$ary[2],$ary[3],$ary[4]\n&quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_type_info_all">type_info_all</A></STRONG><DD>
+<P>
+Returns a reference to an array which holds information about each data
+variant supported by the database and driver.
+
+<P>
+<PRE>  Example:
+  my $type_info_all = $dbh-&gt;type_info_all;
+  my $iname = $type_info_all-&gt;[0]{TYPE_NAME};
+  my $itype = $type_info_all-&gt;[0]{DATA_TYPE};
+  my $icolsize = $type_info_all-&gt;[0]{COLUMN_SIZE};
+</PRE>
+<P>
+<PRE>  shift @$type_info_all;
+  foreach $rtype ( @$type_info_all ) {
+     print &quot;$$rtype[$iname],$$rtype[$itype],$$rtype[$icolsize]\n&quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_The">The following Database handle methods are handled by DBI.</A></STRONG><DD>
+<DT><STRONG><A NAME="item_prepare_cached">prepare_cached</A></STRONG><DD>
+<P>
+Like the prepare except that the statement handled returned will be stored
+in a hash associated with the $dbh.
+
+<DT><STRONG><A NAME="item_selectrow_array">selectrow_array</A></STRONG><DD>
+<P>
+Combines prepare, execute and fetchrow_array into a single call. Fetch
+first row's result into an array.
+
+<P>
+<PRE>  Example:
+  my @ary = $dbh-&gt;selectrow_array(&quot;select * from t1&quot;);
+  foreach my $i (@ary) {
+  print &quot;$i, &quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_selectall_arrayref">selectall_arrayref</A></STRONG><DD>
+<P>
+Combines prepare, execute and fetchall_arrayref into a single call.
+
+<P>
+<PRE>  Example:
+  my $aryref = $dbh-&gt;selectall_arrayref(&quot;select * from employees1&quot;);
+ 
+  my $i = 0;
+  while (defined($aryref-&gt;[$i][0])) {
+        printf(&quot;%s,%s,%s,%s\n&quot;, $aryref-&gt;[$i][0], $aryref-&gt;[$i][1],
+                                $aryref-&gt;[$i][2], $aryref-&gt;[$i][3]);
+        $i++;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_selectcol_arrayref">selectcol_arrayref</A></STRONG><DD>
+<P>
+Combines prepare,execute and fetch one column from all the rows into single
+call. It returns a reference to an array contain the values of the first
+column from each row.
+
+<P>
+<PRE>  Example:
+  my $aryref = $dbh-&gt;selectcol_arrayref(&quot;select * from employees1&quot;);
+</PRE>
+<P>
+<PRE>  my $i = 0;
+  while (defined($aryref-&gt;[$i])) {
+         print &quot;$aryref-&gt;[$i]\n&quot;;  
+         $i++;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_quote">quote</A></STRONG><DD>
+<P>
+Quote a string literal for use as a literal value in an SQL statement.
+
+<P>
+<PRE>  Usage:
+  $sql = $dbh-&gt;quote($string);
+</PRE>
+<DT><STRONG><A NAME="item_tables">tables</A></STRONG><DD>
+<P>
+Returns a list of table and view names (see table_info).
+
+<P>
+<PRE>  Example:
+  @rowdata = $dbh-&gt;tables();
+  my $table;
+  foreach $table (@rowdata)
+  {
+  print &quot;table = $table\n&quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_type_info">type_info</A></STRONG><DD>
+<P>
+Returns a list of hash references holding information about one or more
+variant of <CODE>$data_type</CODE> (see type_info_all).
+
+<P>
+<PRE>  Example:
+  my $typref = $dbh-&gt;type_info(4);
+  print  $typref-&gt;{&quot;TYPE_NAME&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;DATA_TYPE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;COLUMN_SIZE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;LITERAL_PREFIX&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;LITERAL_SUFFIX&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;CREATE_PARAMS&quot;}.&quot;,&quot;; 
+  print  $typref-&gt;{&quot;NULLABLE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;CASE_SENSITIVE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;SEARCHABLE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;UNSIGNED_ATTRIBUTE&quot;}.&quot;,&quot;;
+  print  $typref-&gt;{&quot;FIXED_PREC_SCALE&quot;}.&quot;,&quot;;  
+  print  $typref-&gt;{&quot;AUTO_UNIQUE_VALUE&quot;}.&quot;,&quot;; 
+  print  $typref-&gt;{&quot;LOCAL_TYPE_NAME&quot;}.&quot;,&quot;;   
+  print  $typref-&gt;{&quot;MINIMUM_SCALE&quot;}.&quot;,&quot;;     
+  print  $typref-&gt;{&quot;MAXIMUM_SCALE&quot;}.&quot;,&quot;;     
+  print  $typref-&gt;{&quot;NUM_PREC_RADIX&quot;}.&quot;,&quot;;    
+</PRE>
+</DL>
+<P>
+<HR>
+<H2><A NAME="The_Statement_Handle_Methods">The Statement Handle Methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_bind_param">bind_param</A></STRONG><DD>
+<P>
+Bind a value with a placeholder embedded in the prepared statement.
+
+<P>
+<PRE>  Example:
+</PRE>
+<P>
+<PRE>  . To bind a parameter and specify the SQL type:
+</PRE>
+<P>
+<PRE>  $rc = $sth-&gt;bind_param($p_num,$bind_var, {TYPE =&gt; DBI::SQL_INTEGER});
+  $rc = $sth-&gt;bind_param($p_num,$bind_var, DBI::SQL_INTEGER);
+</PRE>
+<P>
+<PRE>  . To bind a parameter without specifying the SQL type:
+</PRE>
+<P>
+<PRE>  $rc = $sth-&gt;bind_param($p_num,$bind_var);
+</PRE>
+<DT><STRONG><A NAME="item_bind_param_inout">bind_param_inout</A></STRONG><DD>
+<P>
+Like bind_param but also enables values to be output from the statement.
+
+<P>
+<PRE>  Example:
+  my $sql=qq{call sp1(?)};
+  my $sth = $dbh-&gt;prepare($sql);
+  my $outparm;
+  $sth-&gt;bind_param_inout(1, \$outparm, 20);
+  $sth-&gt;execute()||die &quot;$DBI::errstr&quot;;
+  print &quot;OutParam = $outparm\n&quot;;
+  $sth-&gt;finish();
+</PRE>
+<DT><STRONG><A NAME="item_execute">execute</A></STRONG><DD>
+<P>
+Execute the prepared statement.
+
+<P>
+<PRE>  Usage:
+  $rv = $sth-&gt;execute;
+  $rv = $sth-&gt;execute(@bind_values);
+</PRE>
+<P>
+<PRE>  Example:
+  $sth-&gt;execute(1,&quot;aaa&quot;,&quot;bbb&quot;,&quot;02-1234567&quot;);
+</PRE>
+<DT><STRONG><A NAME="item_finish">finish</A></STRONG><DD>
+<P>
+Finishes a statement and let the system free resources (SQL_CLOSE).
+
+<P>
+<PRE>  Usage:
+  $rc  = $sth-&gt;finish;
+</PRE>
+<DT><STRONG><A NAME="item_rows">rows</A></STRONG><DD>
+<P>
+Returns the number of rows affected.
+
+<DT><STRONG><A NAME="item_fetch">fetch</A></STRONG><DD>
+<P>
+Fetch a row into bound variable.
+
+<P>
+<PRE>  Example:
+  $sth-&gt;bind_col( 1, \$c1);
+  while( $sth-&gt;fetch() ) {  
+      print &quot;c1 = $c1\n&quot;;   
+  }
+</PRE>
+<DT><STRONG><A NAME="item_bind_col">bind_col</A></STRONG><DD>
+<P>
+Binds an output column of select statement to a perl var. You don't need to
+do this but it can be useful for some application.
+
+<P>
+<PRE>  Usage:
+  $rc = $sth-&gt;bind_col($col_num, \$col_variable);
+</PRE>
+<P>
+<PRE>  Example:
+  $sth-&gt;bind_col(1, \$c1);
+</PRE>
+<DT><STRONG>The following Statement handle methods are handled by DBI:</STRONG><DD>
+<DT><STRONG><A NAME="item_bind_columns">bind_columns</A></STRONG><DD>
+<P>
+Calls bind_col for each column of the select statement.
+
+<P>
+<PRE>  Usage:
+  $rc = $sth-&gt;bind_columns(@list_of_refs_to_vars_to_bind);
+</PRE>
+<P>
+<PRE>  Example:
+  $sql = qq{ SELECT Id,Name,Title,Phone FROM Employees };
+  my $sth = $dbh-&gt;prepare( $sql );
+  $sth-&gt;execute()||die &quot;$DBI::errstr&quot;;
+  my( $Id, $Name, $Title, $Phone );
+  $sth-&gt;bind_columns( undef, \$Id, \$Name, \$Title, \$Phone );
+</PRE>
+<DT><STRONG><A NAME="item_fetchrow_array">fetchrow_array</A></STRONG><DD>
+<P>
+Fetches the next row as an array of fields.
+
+<P>
+<PRE>  Example:
+  my $sth=$dbh-&gt;prepare(&quot;SELECT id,name,title,phone FROM employees1&quot;);
+  $sth-&gt;execute();
+  while(my @ary=$sth-&gt;fetchrow_array){
+  print &quot;$ary[0],$ary[1],$ary[2],$ary[3]\n&quot;;
+  }
+  $sth-&gt;finish();
+</PRE>
+<DT><STRONG><A NAME="item_fetchrow_arrayref">fetchrow_arrayref</A></STRONG><DD>
+<P>
+Fetches next row as a reference array of fields.
+
+<P>
+<PRE>  Example: (prepare,execute same as above example)
+  while (my $ary_ref=$sth-&gt;fetchrow_arrayref){
+  print &quot;$ary_ref-&gt;[0],$ary_ref-&gt;[1],$ary_ref-&gt;[2]\n&quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_fetchrow_hashref">fetchrow_hashref</A></STRONG><DD>
+<P>
+Fetches next row as a reference to a hash table.
+
+<P>
+<PRE>  Example:
+  while (my $hash_ref=$sth-&gt;fetchrow_hashref){
+        print $hash_ref-&gt;{&quot;id&quot;},&quot;,&quot;, $hash_ref-&gt;{&quot;name&quot;},
+        &quot;,&quot;,$hash_ref-&gt;{&quot;title&quot;},&quot;,&quot;,$hash_ref-&gt;{&quot;phone&quot;},&quot;\n&quot;;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_fetchall_arrayref">fetchall_arrayref</A></STRONG><DD>
+<P>
+Fetches all data as an array of arrays.
+
+<P>
+<PRE>  Example:
+  my $i=0;
+  while($tb1_ary_ref-&gt;[$i][0]){
+       print $tb1_ary_ref-&gt;[$i][0],&quot;,&quot;,$tb1_ary_ref-&gt;[$i][1],&quot;,&quot;,
+             $tb1_ary_ref-&gt;[$i][2],&quot;,&quot;,$tb1_ary_ref-&gt;[$i][3],&quot;\n&quot;;
+       $i++;
+  }
+</PRE>
+<DT><STRONG><A NAME="item_dump_results">dump_results</A></STRONG><DD>
+<P>
+Fetches all the rows from <CODE>$sth</CODE> and prints the result to
+<CODE>$fh</CODE> or STDOUT.
+
+<P>
+<PRE>  Example:
+  my $sql=qq{SELECT id,name,title,phone FROM employees1 };
+  my $sth=$dbh-&gt;prepare($sql); 
+  $sth-&gt;execute(); 
+  $dbh-&gt;dump_results();
+</PRE>
+</DL>
+<P>
+<HR>
+<H2><A NAME="Method_common_to_all_handles">Method common to all handles</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_err">err</A></STRONG><DD>
+<P>
+Returns the native database engine error code from the last driver function
+called.
+
+<DT><STRONG><A NAME="item_errstr">errstr</A></STRONG><DD>
+<P>
+Returns the native database engine error message from the last driver
+function called.
+
+<DT><STRONG><A NAME="item_state">state</A></STRONG><DD>
+<P>
+Returns an error code in the standard SQLSTATE five character format.
+
+<DT><STRONG>trace</STRONG><DD>
+<P>
+DBI trace information can be enabled for a specific handle (and any future
+children of that handle) by setting the trace level using the trace method.
+
+<DT><STRONG><A NAME="item_trace_msg">trace_msg</A></STRONG><DD>
+<P>
+Writes <CODE>$message_text</CODE> to trace file if trace is enabled for
+<CODE>$h</CODE> or for the DBI as a whole.
+
+<DT><STRONG><A NAME="item_func">func</A></STRONG><DD>
+<P>
+The func method can be used to call private non-standard and non-portable
+methods implemented by the driver. This is not related to calling Stored
+procedure nor is DBI support stored procedure.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="The_DBI_Dynamic_Attributes">The DBI Dynamic Attributes</A></H2>
+<P>
+These attributes are always associated with the last handle used. They
+should be used immediately after calling the method which 'sets' them.
+
+<DL>
+<DT><STRONG><A NAME="item__DBI_err">$DBI::err</A></STRONG><DD>
+<P>
+Equivalent to $dbh-&gt;err
+
+<DT><STRONG><A NAME="item__DBI_errstr">$DBI::errstr</A></STRONG><DD>
+<P>
+Equivalent to $dbh-&gt;errstr
+
+<DT><STRONG><A NAME="item__DBI_state">$DBI::state</A></STRONG><DD>
+<P>
+Equivalent to $dbh-&gt;state
+
+<DT><STRONG><A NAME="item__DBI_rows">$DBI::rows</A></STRONG><DD>
+<P>
+Equivalent to $dbh-&gt;rows
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="Attributes_common_to_all_handles">Attributes common to all handles</A></H2>
+<P>
+These attributes are common to all types of DBI handles.
+
+<P>
+Example: $h-&gt;{AttributeName} = ...; # set/write ... =
+$h-&gt;{AttributeName}; # get/read 
+
+<DL>
+<DT><STRONG><A NAME="item_Warn">Warn(boolean) default: enabled</A></STRONG><DD>
+<P>
+Enables useful warnings for certain bad practices.
+
+<DT><STRONG><A NAME="item_Active">Active (read-only)</A></STRONG><DD>
+<P>
+True if the handle object is 'active'.
+
+<DT><STRONG><A NAME="item_Kids">Kids (read-only)</A></STRONG><DD>
+<P>
+For a driver handle, Kids is the number of current existing database
+handle. For a database handle, Kids is the number of current existing
+statement handle.  
+
+<DT><STRONG><A NAME="item_ActiveKids">ActiveKids (read-only)</A></STRONG><DD>
+<P>
+Like Kids (above), but only count those that are Active.
+
+<DT><STRONG><A NAME="item_CachedKids">CachedKids (hash ref)</A></STRONG><DD>
+<P>
+For a database/driver handle, returns a reference to the cache (hash) of
+statement handles created by the prepare_cached/connect_cached method.
+
+<DT><STRONG><A NAME="item_CompatMode">CompatMode (boolean)   default: off and no effect with DBMaker.</A></STRONG><DD>
+<P>
+Used by emulation layers (such as Oraperl) to enable compatible behaviour
+in the underlying driver (e.g., DBD::Oracle) for this handle. Not normally
+set by application code.
+
+<DT><STRONG><A NAME="item_InactiveDestroy">InactiveDestroy (boolean) default: off</A></STRONG><DD>
+<P>
+The attribute can be used to disable the database related effect of
+DESTROY'ing a handle.
+
+<DT><STRONG><A NAME="item_PrintError">PrintError (boolean)   default: on</A></STRONG><DD>
+<P>
+This attribute can be used to force errors to generate warnings (using
+warn) in addition to returning error codes in the normal way.
+
+<DT><STRONG><A NAME="item_RaiseError">RaiseError (boolean)   default: off</A></STRONG><DD>
+<P>
+This attribute can be used to force errors to raise exceptions rather than
+simply return error codes in the normal way. 
+
+<DT><STRONG><A NAME="item_ChopBlanks">ChopBlanks (boolean)   default: false</A></STRONG><DD>
+<P>
+This attribute can be used to control the trimming of trailing space
+characters from <CODE>*fixed</CODE> width* character (CHAR) fields. No
+other field types are affected.
+
+<DT><STRONG><A NAME="item_LongReadLen">LongReadLen (unsigned integer) default: 80</A></STRONG><DD>
+<P>
+This attribute may be used to control the maximum length of LONG VARCHAR,
+LONG VARBINARY ('blob', 'memo' etc.) fields which the driver will *read*
+from the database automatically when it fetches each row of data. The
+LongReadLen attribute only relates to fetching/reading long values it is
+*not* involved in inserting/updating them.
+
+<P>
+<PRE>  Example:
+  $sth = $dbh-&gt;prepare(&quot;select * from foo&quot;,
+                     { 'LongReadLen' =&gt; 4096, }
+                      );
+</PRE>
+<P>
+A value of 0 means don't automatically fetch any long data. You may use
+blob_read to read the whole long data after fetch.
+
+<P>
+<PRE>  Example:
+  $sth = $dbh-&gt;prepare(&quot;SELECT memo FROM tab1 WHERE id = 12345&quot;,
+                     { 'LongReadLen' =&gt; 0 });
+  $sth-&gt;execute();
+  @row=$sth-&gt;fetchrow();
+  my $offset = 100;
+  my $blob = &quot;&quot;;
+  # Read 100 bytes and concate the data to $blob
+  while ($frag = $sth-&gt;blob_read(1, $offset, 100)) {
+      $offset += length($frag);
+      $blob .= $frag;
+  }
+  $sth-&gt;finish();
+</PRE>
+<DT><STRONG><A NAME="item_LongTruncOk">LongTruncOk (boolean)   default: false</A></STRONG><DD>
+<P>
+This attribute may be used to control the effect of fetching a long field
+value which has been truncated (typically because it's longer than the
+value of the LongReadLen attribute). By default LongTruncOk is false and
+fetching a truncated long value will cause the fetch to fail.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="Database_Handle_Attributes">Database Handle Attributes</A></H2>
+<P>
+This section describes attributes specific to database handles.
+
+<DL>
+<DT><STRONG><A NAME="item_AutoCommit">AutoCommit (boolean)    default: on</A></STRONG><DD>
+<P>
+If true then database changes cannot be rolled-back (undone). If false then
+database changes automatically occur within a 'transaction' which must
+either be committed or rolled-back using the commit or rollback methods.
+
+<DT><STRONG><A NAME="item_Driver">Driver (handle)</A></STRONG><DD>
+<P>
+Holds the handle of the parent Driver. The only recommended use for this is
+to find the name of the driver using:
+
+<P>
+<PRE>  $dbh-&gt;{Driver}-&gt;{Name}
+</PRE>
+<DT><STRONG><A NAME="item_Name">Name (string)</A></STRONG><DD>
+<P>
+Holds the 'name' of the database. Usually (and recommended to be) the same
+as the ``dbi:DriverName:...'' string used to connect to the database but
+with the leading ``dbi:DriverName:'' removed.
+
+<DT><STRONG><A NAME="item_RowCacheSize">RowCacheSize (integer) undef</A></STRONG><DD>
+<P>
+A hint to the driver indicating the size of local row cache the application
+would like the driver to use for future select statements. This value is
+undef because currently DBMaker does not allow setting for the prefetched
+row size.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="Statement_Handle_Attributes">Statement Handle Attributes</A></H2>
+<P>
+This section describes attributes specific to statement handles. Most of
+these attributes are read-only. Example: ... = $h-&gt;{NUM_OF_FIELDS}; #
+get/read
+
+<DL>
+<DT><STRONG><A NAME="item_NUM_OF_FIELDS">NUM_OF_FIELDS (integer)  read-only</A></STRONG><DD>
+<P>
+Number of fields (columns) the prepared statement will return. Non-select
+statements will have NUM_OF_FIELDS = 0.
+
+<DT><STRONG><A NAME="item_NUM_OF_PARAMS">NUM_OF_PARAMS (integer)  read-only</A></STRONG><DD>
+<P>
+The number of parameters (placeholders) in the prepared statement.
+
+<DT><STRONG><A NAME="item_NAME">NAME (array-ref)         read-only</A></STRONG><DD>
+<P>
+Returns a *reference* to an array of field names for each column.
+
+<P>
+<PRE>  Example: 
+  print &quot;First column name: $sth-&gt;{NAME}-&gt;[0]\n&quot;;
+</PRE>
+<DT><STRONG><A NAME="item_NAME_lc">NAME_lc (array-ref)      read-only</A></STRONG><DD>
+<P>
+Like the NAME entry elsewhere in this document but always returns lowercase
+names.
+
+<DT><STRONG><A NAME="item_NAME_uc">NAME_uc (array-ref)      read-only</A></STRONG><DD>
+<P>
+Like the NAME entry elsewhere in this document but always returns uppercase
+names.
+
+<DT><STRONG><A NAME="item_TYPE">TYPE (array-ref)         read-only</A></STRONG><DD>
+<P>
+Returns a *reference* to an array of integer values for each column. The
+value indicates the data type of the corresponding column.
+
+<DT><STRONG><A NAME="item_PRECISION">PRECISION (array-ref)    read-only</A></STRONG><DD>
+<P>
+Returns a *reference* to an array of integer values for each column. For
+nonnumeric columns the value generally refers to either the maximum length
+or the defined length of the column. For numeric columns the value refers
+to the maximum number of significant digits used by the data type (without
+considering a sign character or decimal point). 
+
+<DT><STRONG><A NAME="item_SCALE">SCALE (array-ref)        read-only</A></STRONG><DD>
+<P>
+Returns a *reference* to an array of integer values for each column. NULL
+(undef) values indicate columns where scale is not applicable. 
+
+<DT><STRONG><A NAME="item_NULLABLE">NULLABLE (array-ref)     read-only</A></STRONG><DD>
+<P>
+Returns a *reference* to an array indicating the possibility of each column
+returning a null: 0 = no, 1 = yes.
+
+<P>
+<PRE>  Example: 
+  print &quot;First column may return NULL\n&quot; if $sth-&gt;{NULLABLE}-&gt;[0];
+</PRE>
+<DT><STRONG><A NAME="item_CursorName">CursorName (string)      read-only</A></STRONG><DD>
+<P>
+Returns the name of the cursor associated with the statement handle if
+available.
+
+<DT><STRONG><A NAME="item_Statement">Statement (string)       read-only</A></STRONG><DD>
+<P>
+Returns the statement string passed to the the prepare entry elsewhere in
+this document method.
+
+<DT><STRONG><A NAME="item_RowsInCache">RowsInCache (integer)    read-only, currently return undef.</A></STRONG><DD>
+<P>
+If the driver supports a local row cache for select statements then this
+attribute holds the number of un-fetched rows in the cache. Currently
+DBMaker will return undef for this value, while DBMaker will prefetch about
+8K size's data into client side.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="Handling_BLOB_Fields_with_DBMake">Handling BLOB Fields with DBMaker</A></H2>
+<P>
+DBMaker support LONG VARCHAR, LONG VARBINARY and FILE data type for user to
+store BLOB in the database. For easier handling with blob input/output,
+DBMaker support the following method for user to store their blob file into
+the database or retrieve their blob data to a user local file.
+
+<DL>
+<DT><STRONG><A NAME="item_Use">Use file as input parameter to a BLOB column</A></STRONG><DD>
+<P>
+Statement Attribute: dbmaker_file_input (default is 1)
+
+<P>
+a. Store file content for BLOB field
+
+<P>
+When this attribute value is 1 and user add quote for a file name as input
+parameter value, and the parameter's SQL type is SQL_LONGVARCHAR/
+SQL_LONGVARBINARY/SQL_FILE, DBMaker will store the file's content into
+database.
+
+<P>
+<PRE>  Example:
+  $dbh-&gt;do(&quot;create table blobt1 (c1 long varchar)&quot;);
+  my $sql=qq{INSERT INTO blobt1 values(?)};
+  my $sth = $dbh-&gt;prepare($sql);
+ 
+  # By default, DBMaker will try to open a blob file name (for example: test.gif), 
+  # read the file and then store into the database
+  $sth-&gt;bind_param(1,&quot;'test.gif'&quot;);
+  $sth-&gt;execute();
+</PRE>
+<P>
+<PRE>  # If you want to store a blob file name (for example: test.gif) with string quote 
+  # into database
+  $sth-&gt;{dbmaker_file_input} = 0;
+  $sth-&gt;bind_param(1,&quot;'test.gif'&quot;);
+  $sth-&gt;execute();
+</PRE>
+<P>
+You can select c1 from this table and see what's the difference between
+these two insert.
+
+<P>
+b. Store file name only for FILE column
+
+<P>
+When dbmaker_file_input statement attribute sets on, there are difference
+when you input file name with or without single quote for DBMaker's
+SQL_FILE type. When you do not add single quote with the input string,
+DBMaker will check if the file name is accessible by DBMaker server, and
+store the file name into the database. For detail description for DBMaker's
+SQL_FILE type, please reference DBMaker's manual.
+
+<P>
+NOTE: In order to tell DBMaker to store file name, you should make sure you
+have set DB_USRFO=1 in dmconfig.ini, and the input file name must be full
+path with file name.
+
+<P>
+<PRE>  Example:
+  $dbh-&gt;do(&quot;create table filet1 (c1 file)&quot;);
+  my $sql=qq{INSERT INTO filet1 values(?)};
+  my $sth = $dbh-&gt;prepare($sql);
+ 
+  # Test input file name with single quote
+  # You can test with a file in current directory
+  $sth-&gt;bind_param(1,&quot;'test.gif'&quot;);
+  $sth-&gt;execute();
+</PRE>
+<P>
+<PRE>  # Test input file name without single quote
+  # Although test.gif is in current directory, you must specify 
+  # full path with file name.
+  $sth-&gt;bind_param(1,&quot;/full_path/test.gif&quot;);
+  $sth-&gt;execute();
+    
+  # If you want to store a data with or without single quote 
+  # into database's FILE column, you should set 
+  # the attribute dbmaker_file_input = 0
+  $sth-&gt;{dbmaker_file_input} = 0;
+  $sth-&gt;bind_param(1,&quot;test.gif&quot;);
+  $sth-&gt;execute();
+</PRE>
+<P>
+<PRE>  $sth-&gt;bind_param(1,&quot;'test.gif'&quot;);
+  $sth-&gt;execute();
+</PRE>
+<P>
+You can select c1 or select <CODE>filename(c1)</CODE> from this table to
+see what's the difference with these inserts.
+
+<DT><STRONG><A NAME="item_Output">Output BLOB to user's file</A></STRONG><DD>
+<P>
+In DBI, you can set LongReadLen to set the buffer length for getting your
+blob data. However, BLOB field's data maybe too large to malloc buffer for
+storing it, and it may be a little troublesome to call blob_read many
+times. By BindColToFile, you can redirect the column's output to a file,
+and you can continue to access the blob on the local file. Because this
+function will create many files when you try to fetch result from a table
+which holds many rows, you should remember to clean up the files when you
+finish your program.
+
+<P>
+$sth-&gt;func($colno, $prefix_filename, $fgOverwrite, 'BindColToFile')
+
+<P>
+NOTE: set fgOverwrite 1 or 0 to specify whether your local file with same
+name be overwritten or not.
+
+<P>
+<PRE>  Example:
+  $sql = qq{ SELECT c1 FROM blobt1};
+  $sth = $dbh-&gt;prepare( $sql );
+ 
+  $sth-&gt;func(1, &quot;perl_outfile.txt&quot;, 1, 'BindColToFile');
+ 
+  $sth-&gt;execute()||die &quot;$DBI::errstr&quot;;
+ 
+  my $c1;
+ 
+  $sth-&gt;bind_columns( undef, \$c1);
+  while( $sth-&gt;fetch() ) {  
+      print &quot;c1 = $c1\n&quot;; 
+  }
+</PRE>
+<P>
+After running this program, you will notice there's many file called
+perl_outfile.txt, perl_outfile1.txt,...perl_outfilen.txt in your local
+directory. You need to remember to delete these files if they are no longer
+necessary.
+
+</DL>
+<P>
+<HR>
+<H2><A NAME="Private_functions_for_DBMaker_AP">Private functions for DBMaker API access</A></H2>
+<P>
+The following catalog functions are based on the DBD::ODBC. Please check
+ODBC API document for detailed function specification.
+
+<DL>
+<DT><STRONG><A NAME="item_GetInfo">GetInfo</A></STRONG><DD>
+<P>
+This function maps to the ODBC SQLGetInfo call. This is a Level 1 ODBC
+function. An example of this is:
+
+<P>
+<PRE>  $value = $dbh-&gt;func(6, 'GetInfo');
+</PRE>
+<P>
+This function returns a scalar value, which can be a numeric or string
+value. This depends upon the argument passed to GetInfo. 
+
+<DT><STRONG><A NAME="item_GetTypeInfo">GetTypeInfo</A></STRONG><DD>
+<P>
+This function maps to the ODBC SQLGetTypeInfo call. This is a Level 1 ODBC
+function. An example of this is:
+
+<P>
+<PRE>  use DBI qw(:sql_types);
+  use strict;
+</PRE>
+<P>
+<PRE>  $sth = $dbh-&gt;func(SQL_ALL_TYPES, 'GetInfo');
+  while (@row = $sth-&gt;fetch_row) {
+    ...
+  }
+</PRE>
+<P>
+This function returns a DBI statement handle, which represents a result set
+containing type names which are compatible with the requested type.
+SQL_ALL_TYPES can be used for obtaining all the types the ODBC driver
+supports. NOTE: It is VERY important that the use DBI includes the
+<CODE>qw(:sql_types)</CODE> so that values like SQL_VARCHAR are correctly
+interpreted. This ``imports'' the SQL type names into the program's name
+space. A very common mistake is to forget the <CODE>qw(:sql_types)</CODE>
+and obtain strange results.
+
+<DT><STRONG><A NAME="item_GetFunctions">GetFunctions</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLGetFunctions. This is a Level 1 API
+call which returns supported driver functions. Depending upon how this is
+called, it will either return a 100 element array of true/false values or a
+single true false value. If it's called with SQL_API_ALL_FUNCTIONS (0), it
+will return the 100 element array. Otherwise, pass the number referring to
+the function. (See your ODBC docs for help with this).
+
+<P>
+<PRE>  Example:
+  print &quot;\nGetfunctions: &quot;, join(&quot;,&quot;, $dbh-&gt;func(0, 'GetFunctions')), &quot;\n\n&quot;;
+</PRE>
+<DT><STRONG><A NAME="item_columns">columns</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLColumns.
+
+<P>
+<PRE>  Usage:
+  $dbh-&gt;($catalog, $schema, $table, $column, columns);
+</PRE>
+<P>
+<PRE>  Example:
+  # dump all column information for table employees1 by columns
+  my $sth = $dbh-&gt;func('','SYSADM', 'employees1','', 'columns');
+  while (@row = $sth-&gt;fetchrow()) {
+     print &quot;\t&quot;, join(', ', @row), &quot;\n&quot;;
+  }
+  $sth-&gt;finish;
+</PRE>
+<DT><STRONG><A NAME="item_ColAttributes">ColAttributes</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLColAttributes. 
+
+<P>
+<PRE>  Usage:
+  $sth-&gt;func($colno, $desctype, 'ColAttributes'); 
+</PRE>
+<P>
+<PRE>  Example:
+  my $colcount = $sth-&gt;func(1, 0, 'ColAttributes');
+  # 1 for col (unused) 0 for SQL_COLUMN_COUNT
+  print &quot;Column count is $colcount\n&quot;;
+</PRE>
+<DT><STRONG><A NAME="item_GetPrimaryKeys">GetPrimaryKeys</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLPrimaryKeys.
+
+<P>
+<PRE>  Usage:
+  $sth = $dbh-&gt;func($catalog, $schema, $table, 'GetPrimaryKeys');
+</PRE>
+<P>
+<PRE>  Example:
+  $dbh-&gt;do(&quot;create table pkt1 (c1 int, c2 float,c3 char(5), primary key (c1, c2))&quot;);
+  $dbh-&gt;do(&quot;create unique index ix1 on pkt1 (c1)&quot;);
+  print &quot;Check Primary Key\n&quot;;
+  my $sth = $dbh-&gt;func('','SYSADM','pkt1', 'GetPrimaryKeys');
+  my @row;
+  while (@row = $sth-&gt;fetchrow()) {
+     print &quot;$row[0], $row[1] , $row[2] , $row[3] , $row[4] , $row[5]\n&quot;;
+  }
+  $sth-&gt;finish();
+</PRE>
+<DT><STRONG><A NAME="item_GetStatistics">GetStatistics</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLStatistics.
+
+<P>
+<PRE>  Usage:
+  $sth = $dbh-&gt;func($catalog, $schema, $table, $unique, 'GetStatistics');
+</PRE>
+<P>
+<PRE>  Example:
+  print &quot;\nCheck Index by SQLStatistics\n&quot;;
+  $sth = $dbh-&gt;func('','SYSADM','pkt1',SQL_INDEX_UNIQUE, 'GetStatistics');
+  while (@row = $sth-&gt;fetchrow()) {
+     foreach $i (0..12) {
+        print &quot;$row[$i] &quot;;
+     }
+     print &quot;\n&quot;;
+  }
+  $sth-&gt;finish();
+</PRE>
+<DT><STRONG><A NAME="item_GetForeignKeys">GetForeignKeys</A></STRONG><DD>
+<P>
+This function maps to the ODBC API SQLForeignKeys.
+
+<P>
+<PRE>  Usage:
+  $sth = $dbh-&gt;func($pkcatalog, $pkschema, $pktable,
+                 $fkcatalog, $fkschema, $fktable, 'GetForeignKeys');
+</PRE>
+<P>
+<PRE>  Example:
+  $dbh-&gt;do(&quot;create table fkt1 (flt float, i int, foreign key fk1(i, flt) references pkt1(c1, c2))&quot;);
+  print &quot;\nCheck Foreign Key\n&quot;;
+  $sth = $dbh-&gt;func('','SYSADM','pkt1','','SYSADM','fkt1', 'GetForeignKeys');
+  while (@row = $sth-&gt;fetchrow()) {
+    foreach $i (0..13) {
+      print &quot;$row[$i] &quot;;
+  }
+  print &quot;\n&quot;; 
+  }
+  $sth-&gt;finish();
+</PRE>
+</DL>
+<P>
+<HR>
+<H1><A NAME="Recent_Updates">Recent Updates</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_DBD">DBD::DBMaker 0.13</A></STRONG><DD>
+<P>
+This version is based on DBD::DBMaker 0.12a, and DBD::ODBC 0.2x:
+
+<P>
+<PRE>  . Add support file name in bind_param for blob column, user
+    can specify 'file name' as input parameter, and DBMaker will
+    store the file's content into blob column.  User can use 
+    $sth-&gt;{dbmaker_file_input}= 0 to turn off this option. Default is on.
+</PRE>
+<P>
+<PRE>  . Add $sth-&gt;func($colno, $prefix_filename, 'BindColToFile')
+    for user to specify output column to a file, the output 
+    file will be named starting by $prefix_filename and the following file
+    will append a sequential number starting from 1.  The existing file with
+    same file name will not be overwritten.
+</PRE>
+<P>
+<PRE>  . Rename dbh-&gt;tables() to dbh-&gt;table_info().
+</PRE>
+<P>
+<PRE>  . Fix return error when fetch boundary float/double value.
+</PRE>
+<P>
+<PRE>  . Ignore warning return in sth-&gt;execute() will close statement
+    which result in next execute fail.
+</PRE>
+<P>
+<PRE>  . Add warning for commit() when AutoCommit on.
+</PRE>
+<P>
+<PRE>  . Add support bind_param_inout.
+</PRE>
+<P>
+<PRE>  . Add ODBC catalog functions based on DBD-ODBC 0.20, 0.21
+    SQLGetInfo,SQLGetTypeInfo,SQLColAttributes,
+    SQLGetFunctions,SQLColumns,SQLStatistics,SQLPrimaryKeys,
+    SQLForeignKeys.
+</PRE>
+<DT><STRONG>DBD::DBMaker 0.07 and above:</STRONG><DD>
+<P>
+<PRE>  . the attribute 'blob_size' triggers a 'depreciated feature' warning 
+    when warnings are enabled.
+</PRE>
+<DT><STRONG>DBD::DBMaker 0.08 and above:</STRONG><DD>
+<P>
+<PRE>  . the attribute 'dbmaker_blob_size' triggers a depreciated feature' 
+    warning when warnings are enabled (because DBI 0.86+ specifies a 
+    LongReadLen attribute).
+</PRE>
+</DL>
+<P>
+<HR>
+<H1><A NAME="Relative_Links">Relative Links</A></H1>
+<P>
+For more information on the Perl5 DBI, please visit the following related
+web page:
+
+<P>
+DBI web site: <A
+HREF="http://www.symbolstone.org/technology/perl/DBI/index.html">http://www.symbolstone.org/technology/perl/DBI/index.html</A>
+
+
+<P>
+DBMaker web site: <A
+HREF="http://www.dbmaker.com">http://www.dbmaker.com</A>
+
+<P>
+Microsoft ODBC: <A
+HREF="http://www.microsoft.com/odbc">http://www.microsoft.com/odbc</A>
+
+<P>
+<HR>
+<H1><A NAME="AUTHOR">AUTHOR</A></H1>
+<P>
+DBMaker Team: <A
+HREF="mailto:dbmaker@lion.syscom.com.tw">dbmaker@lion.syscom.com.tw</A>
+
+<P>
+<HR>
+<H1><A NAME="SEE_ALSO">SEE ALSO</A></H1>
+<P>
+<CODE>perl(1),</CODE> <CODE>DBI(perldoc),</CODE> DBMaker documentation
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,30 @@
+0.007 2016-05-01
+ - Upload archive to GitHub after release
+
+0.006 2016-05-01
+ - fix dependencies
+
+0.005 2016-05-01
+ - more tests
+ - fix typos
+ - sign and annotate tags
+ - minting profile
+
+0.004 2015-10-18
+ [ENHANCEMENTS]
+ - strictures
+ - CPANFile
+ - dependencies
+
+0.003 2015-03-04
+
+0.002 2014-11-30
+ - no automatic git-push
+ - runtime requirements
+ - avoid network access
+ - add Perl::Tidy
+
+0.001 2014-11-29
+ - Initial release
+
+0.000 0000-00-00

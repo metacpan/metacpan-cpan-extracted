@@ -1,0 +1,27 @@
+Revision history for Perl extension Data::Paginate.
+
+0.0.6 Fri Apr 11 10:02:35 2008
+    - mis-setting of default pp_param
+    - phantom no more records at end of row on data_html_config->items_per_row > 1
+    - fixed up setup mode output of row on data_html_config->items_per_row > 1
+    - minor POD tweak
+    
+0.0.5
+    - reset pp_param instead of deleting it so everything can pass it consistently under all conditions
+    
+0.0.4
+	- fixed one off bug in idx_handler
+	
+0.0.3
+    - carp && return instead of croak
+	- pp=0 fix
+	- added data_na CSS class
+	- 0.0.4 will have POD for 0.0.2 and 0.0.3
+	
+0.0.2  Sat Oct 21 15:34:56 2006
+	- misc additions, 0.0.3 will have updated POD and more detailed changelog
+	
+0.0.1  Wed Jan 26 15:56:01 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Data::Paginate
+

@@ -1,0 +1,78 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Sort - Low level sort functions
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Sort;
+
+  my @ranges;
+  push @ranges,Data::Range::Compare::Stream->new(0,0);
+  push @ranges,Data::Range::Compare::Stream->new(6,7);
+  push @ranges,Data::Range::Compare::Stream->new(1,2);
+
+  # low level sort functions 
+  my @sorted_in_consolidate_asc_order=sort sort_in_consolidate_order_asc @ranges;
+  my @sorted_in_consolidate_order_desc=sort sort_in_consolidate_order_desc @ranges;
+  my @sorted_largest_range_end_first=sort sort_largest_range_end_first @ranges;
+  my @sorted_smallest_range_start_first=sort sort_smallest_range_start_first @ranges;
+  my @sorted_smallest_range_end_first=sort sort_smallest_range_end_first @ranges;
+  my @sorted_largest_range_start_first=sort sort_largest_range_start_first @ranges;
+
+
+=head1 DESCRIPTION
+
+This module defines the sort functions usable by by a list of objects that implement or extend L<Data::Range::Compare::Stream>.
+
+=Exports
+
+The following sort functions are exported by default
+
+    sort_in_presentation_order
+      Function for sorting ranges in a very human readable fashion
+
+    sort_in_consolidate_order_asc
+      Function for sorting ranges in asc order for consolidation
+
+    sort_in_consolidate_order_desc
+      Function for sorting ranges in desc order for consolidation
+
+    sort_largest_range_end_first
+      Function for sorting ranges by smallest range end first
+
+    sort_smallest_range_start_first
+      Function for sorting ranges by smallest range start first
+
+    sort_smallest_range_end_first
+      Function for sorting ranges by smallest range end first
+
+    sort_largest_range_start_first
+       Function for sorting ranges by largest range end first
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

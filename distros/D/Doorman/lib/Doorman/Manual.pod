@@ -1,0 +1,99 @@
+package Doorman::Manual;
+
+=head1 Doorman::Manual
+
+Doorman is a collection of PSGI middlewares that are designed to perform authentication jobs.
+It stores authentication info in the session or env, you just configure it properly.
+
+=head2 Quick Start
+
+=head2 Kitchen sink
+
+    builder {
+        enable "DoormanOpenID";
+        enable "DoormanTwitter";
+        enable "DoormanAuthentication", authenticator => \&auth;
+        sub {
+             my $env = shift;
+             my $doorman = Doorman->new($env);
+
+             # "user" and "admin" are scope names
+             # current_<scope> are dynamic methods.
+             # return undef value when the scope is not authenticated.
+             my $user  = $doorman->current_user;
+             my $admin = $doorman->current_admin;
+
+             $doorman->is_user_sign_in;
+        }
+    }
+
+=head2 Stuff in the $env
+
+Doorman put a lot of objects to C<$env> in the request life cycle. They
+are named like this:
+
+    - doorman.${scope}
+    - doorman.${scope}.${middleware}
+    - doorman.${scope}.${middleware}.${name}
+
+C<${scope}> is, by default, C<"users"> if not specified. Mulptile
+scopes can exist in the same time. For example, C<"users"> and
+C<"admin"> scopes will take C<$env->{"doorman.users"}> and
+C<$env->{"doorman.admin"}>, respectively. They are objects of
+L<Doorman::Scope> class. These C<Doorman::Scope> objects are
+responsible to provide URI paths that are responsive by middleware
+objects.
+
+Scope objects have 3 methods:
+
+    sign_up_path
+    sign_in_path
+    sign_out_path
+
+These paths are named after the scope name. The scope name "users"
+will provide these paths
+
+    /users/sign_up
+    /users/sign_in
+    /users/sign_out
+
+And for the scope "admins", they will be
+
+    /admins/sign_up
+    /admins/sign_in
+    /admins/sign_out
+
+=head2 Chaining multiple Doorman middlewares
+
+Your PSGI app can enable multiple doorman authentication middlewares
+to allow your app visitor to sign in with one of them.
+
+    enable "DoormanAuthentication", authenticator => \&my_authenticator;
+    enable "DoormanOpenID";
+
+When it is about to authenticae the session, Doorman middlewares are
+all implemented following these policies:
+
+    1. If all the required parameters are missing, skip.
+    2. Otherwise, perform the real authentication event though it is likely to fail
+    3. If it does fail, store the error status and message in C<$env>
+
+The authentication chain is iterated in the same order you specify in
+the code.
+
+Depending on your sign-in form design, you may choose to have multiple forms
+for each authentication method, or you may design to have one big form with
+all credential fields, say, username, password, and openid. Visitors
+either fill openid, or username and password, or maybe all of them.
+
+If so, it is recommended that you put C<DoormanOpenID> at the end,
+for the response of POSTing a openid URL, is to perform a redirect to
+openid server. The original username and password will be missing by the time
+it is redirected back from the openid server.
+
+For example code that facilitate chaining, see C<examples/openid-with-local.psgi>
+in the distribution tarball.
+
+=cut
+
+1;

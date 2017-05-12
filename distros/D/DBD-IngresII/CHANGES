@@ -1,0 +1,540 @@
+v0.96     2014.01.01
+ - Now when ing_empty_isnull is set to 1, PV containing valid number will be
+   treated as IV (bug reported by Dennis Roesler)
+v0.95     2013.07.17
+ - Docs fixes
+v0.94     2013.07.13
+ - Now it is possible to specify LONG read chunk size, and suggest whether 
+   chunks should be stored in stack or heap (VERY EXPERIMENTAL FEATURE)
+ - Defined Newx() and friends for older perl versions
+ - Now minimum supported perl version is 5.8.4 (it is bundled with Solaris 10)
+v0.93     2013.07.10
+ - Now we're using Newxz() instead of deprecated Newz()
+ - Fixed potential buffer overflow in dbd_st_FETCH_attrib()
+ - Simplified dbd_get_handler()
+ - Updated docs
+ - Removed unused variable
+v0.92     2013.03.20
+ - ->get_info provides more information
+ - I have forgot to include Dennis Roesler's patch to ->table_info (it was meant to be
+   included in v0.90)
+v0.91     2013.02.05
+ - Prepare won't crash with ing_empty_isnull enabled (thanks to Dennis Roesler 
+   for code)
+ - null.t now DROPs table which it creates.
+v0.90     2013.01.06
+ - ->column_info and ->table_info now will work with single character wildcards 
+   (thanks to Dennis Roesler for code)
+ - Much better NCHAR/NVARCHAR handling
+v0.89     2013.01.05
+ - ing_empty_isnull is now honoured for integers and floats (thanks to Dennis Roesler 
+   for code)
+ - ->table_info and ->column_info was rewritten (thanks to Dennis Roesler 
+   for code)
+v0.88     2013.01.02
+ - Code that generates statement names was rewritten (thanks to Dennis Roesler
+   for bug report)
+ - There is new attribute, ing_empty_isnull (thanks to Dennis Roesler for code)
+v0.87     2012.10.26
+ - Style fixes (explicit return)
+v0.86     2012.10.25
+ - Deleted unsafe (and unused) code for statement name generation
+ - Now DBD::IngresII will compile with Ingres 9.2 (added dummy definition
+   for IISQ_BOO_TYPE)
+ - Cleaned-up ->get_info() a bit
+ - Added method ->ing_is_vectorwise
+ - Now tests will pass under Vectorwise
+v0.85     2012.09.21
+ - Fixed two buffer overflow errors
+ - Makefile.PL is rewritten from scratch
+v0.84     2012.09.13
+ - Added casting, so SetConsoleCtrlHandler() won't complain
+ - Tests for BOOLEAN type are now optional
+ - Added information about PPM repository to documentation
+v0.83     2012.08.21
+ - Just POD fixes
+v0.82     2012.08.20
+ - Added workaround to Ingres bug which disables ^C under certain
+   circumstances. Problem existed only on Windows.
+ - Cleaned-up code a little bit
+ - With DBI_TRACE=3, it prints NCHAR UTF-16 string converted to hex
+ - Added support for dynamic vnodes (thanks to Geraint Jones)
+v0.81     2012.08.11
+ - Fixed memory allocation for NCHAR/NVARCHAR
+ - There was one typo which was breaking POD
+v0.80     2012.07.20
+ - sql_check() has bigger buffer
+ - No more malloc() and free()
+v0.79     2012.06.25
+ - PerlCritic is a little bit more happy
+ - Some MSVC warnings were silenced, some fixed
+ - NULL indicator address is printed correctly when debugging
+ - bool.t does not show warning
+v0.78     2012.06.21
+ - NCHAR/NVARCHAR uses less memory
+v0.77     2012.06.21
+ - Fixed memory leak
+v0.76     2012.06.21
+ - Fixed formatting
+ - Added "ing_enable_utf8" dbh attribute
+ - Big update of docs, README is now deprecated
+ - Now NCHAR will work on platforms with 32-bit wchar_t
+v0.75     2012.06.12
+ - Fixed docs
+ - ->ing_utf8_quote uses carp instead of warn
+ - ->ing_utf8_quote works with ASCII strings
+ - ->ing_utf8_quote escapes backslashes
+v0.74     2012.05.15
+ - Created ->ing_bool_to_str method
+ - Created ->ing_norm_bool method
+v0.73     2012.05.13
+ - Fixed useless interpolation
+ - get_info() now knows about Ingres 10.x
+ - Updated documentation
+ - Added (experimental) BOOLEAN support
+v0.72     2012.05.11
+ - Now IngresII.pm requires Perl 5.8.8
+ - Updated README
+ - Added support for C type
+v0.71     2012.04.29
+ - Added =encoding utf8 to POD
+v0.70     2012.04.29
+ - Fixed scalar allocation for NCHAR/NVARCHAR
+ - Test are now more modern, no more ok() subs created by hand
+ - Updated docs
+v0.69     2012.04.28
+ - Small tests fix
+ - Unicode example is now explained little bit better
+v0.68     2012.04.26
+ - Forgot to add nchar.t
+v0.67     2012.04.25
+ - Added support for NCHAR and NVARCHAR
+v0.66     2012.04.23
+ - More type checking
+v0.65     2012.04.23
+ - Now ->ing_utf8_quote behave properly when empty string is supplied.
+ - Updated docs
+ - Added more types into type_info_all()
+ - Changed libingres.a download URL
+v0.64     2012.04.19
+ - Added support for more date/time types
+ - Fixed quote.t
+v0.61 v0.62 v0.63 2012.04.18
+ - Cosmetic docs fixes
+v0.60     2012.04.18
+ - Added PL_ prefix to Perl API functions so now DBD::IngresII can work under
+   new Perls.
+ - Added support for ANSIDATE
+ - Fixed Makefile.PL so it works under Windows (Strawberry Perl + MinGW,
+   ActivePerl + MSVC and ActivePerl + MinGW)
+ - Changed useless fallthrough in dbdimp.sc in switch() to if-else.
+ - Cleaned-up tests
+ - Deleted RCS tags
+ - Added BIGINT support (thanks to Remy Chibois)
+ - Created ->ing_utf8_quote method
+v0.53     2009.09.30
+ - changed behavior of ing_rollback - see perldoc
+ - fix outdated internal connect routines to work when using password
+v0.52     2008.08.28
+ - add missing timestamp types
+ - add support for placeholders in INSERT, DELETE, UPDATE with do statements
+ - add preliminary support for table_info, column_info, get_info
+ - updated type_info fields to new DBI standard
+ - add ing_ph_inglengths, ing_ph_ingtypes fields for infos about placeholder
+   columns after PREPARE on INSERT, DELETE, UPDATE
+ - ... and documented it in the POD *g*
+ - fixed problem on 64bit architectures
+v0.51     2004.01.12
+ Added an errorcheck on the rollback when disconnecting with open transaction.
+ Corrected spelling of $dbh->{PrintError} in Ingperl.pm
+ Added AutoCommit=>0 to connect call.
+ Added ing_rollback to change the behaviour of setting AutoCommit=>1 with
+  an open transaction. The DBI docs state that the transaction is commited,
+  with $dbh->{ing_rollback}=1 the transaction is rolled back instead.
+v0.50     2003.09.15
+ All changes due to Mike Battersby <mib@unimelb.edu.au>
+ - add missing long datatype info into the attribute fetching.
+ - add missing BYTE and BYTE VARYING type details to the POD.
+ - fix another small memory leak of imp_sth->name when destroying a
+   statement handle.
+ - implement support for LONG VARCHAR and LONG BYTE data types, including
+   dynamically allocating the memory for them.
+ - add tests for long and binary behavior into t/dbi.t.
+ - add t/datatypes.t for more thorough testing of support for each
+   datatype in type_info_all.
+ - fix memory leak in attribute fetch by decrementing the ref count on
+   the created SV.
+ - increment the ref count when we put an SV into the dbh cache so we
+   don't access freed memory later (never hit because we don't cache
+   our only attribute, AutoCommit, anyway).
+ - don't allocate 1 extra imp_fbh_t in dbd_describe for no reason.
+ - use perl SVs for buffer management in dbd_describe and remove
+   the var_ptr field in the imp_sth_t.
+ - vastly simplify the memory management in bind_ph by using Renew
+   all the time instead of the home-brew memory manager.
+ - use IISQ_VCH_TYPE for all character types
+ - support BYTE and BYTE VARYING data types now that strings use
+   IISQL_VCH_TYPE and don't rely on nul termination.
+ - actually free the allocated statement data in dbd_st_destroy and
+   stop leaking memory like a sieve.
+ - don't access undef bind values (used for binding nulls), so we
+   protect against invalid memory access and stop perl from warning
+   us about referencing them.
+ - fix up some formatting in the POD documentation, re-work a couple
+   of sections and examples, and add some info about binary data types.
+v0.38       2003.07.03
+ -Tim Bunce <Tim.Bunce@pobox.com> came with the correct solution to the
+  $dbh->do and $dbh->{Statement} problem.
+v0.37       2003.07.03
+ -removed the saving of statement text in $dbh->do as an interim solution
+  to avoid errors. Pointed out by David Coulthart <davec@columbia.edu>.
+v0.36       2002.11.22
+ -bind_param didn't accept type SQL_DATE. I should have been a stringish
+  type. Pointed out by Mark Buckle <mark.buckle@intechsolutions.co.uk>
+v0.35       2002.05.31
+ -The test in dbi.t on column name must be case insensitive. Pointed
+  out by Lenio Eric <elenio@mct.rochester.edu>.
+ -Further refinements in the AutoCommit area: failed when setting
+  $dbh->{AutoCommit} to 1 when it already was 1. Pointed out by
+  Preben Srensen <pso001@foa.dk>. Perhaps someday I'll get it right :-P
+v0.34       2002.05.18
+ -Setting $dbh->{AutoCommit}=1 trigers a commit as per the DBI specs.
+v0.33       2002.05.13
+ -Bug in AutoCommit handling fixed. Previously Setting AutoCommit caused
+  a $dbh->Commit to be executed causing all kinds of grief. Eg setting
+  AutoCommit to  in the middle of a transaction triggered an absolutely
+  unwanted commit.
+v0.32       2002.03.06
+ -Changes for perl5.7.3: all fprintf calls replaces by PerlIO_printf.
+ -Bug in $sth->execute fixed. Sometimes errors were not detected.
+  Added a test for this. Thanks to Dirk Kraemer <kraemer@rz.uni-kiel.de>.
+ -Fixed Ingperl versionnumber so that CPAN is happier.
+v0.31       2001.09.17
+ -To aid errorhandling dbh->{Statement} will contain the text of the SQL
+  statement being executed during $dbh->do calls. This is an extension to
+  the normal DBI spec due to the special handling of $dbh->do in DBD::Ingres.
+ -Minor improvents in the tests.
+
+v0.30       2001.04.03
+  Version 0.29 withdrawn. The changes cause too many problems
+  with "normal" VARCHAR types. The testsuite didn't catch the bugs
+  VARCHARS with embedded NULL characters will have to wait for Ingres6.4
+  support in DBD::Ingres to die out (or for some more tuits).
+  Sorry.
+
+v0.29       2001.03.20
+  Fetch of binary data (ie CHAR or VARCHAR containing '\0' chars) didn't
+  work. The fields were truncated at the \0-char. Pointed out by
+  Mike Yudaken <miyu@icon.co.za>.
+
+v0.28	    2001.02.26
+  The error handling did'nt call the DBIh_EVENT2 macro that properly
+  registers the error int the DBI.
+  Ingperl.pm had a bug in the $Revision string, which caused cpan.pm to
+  complain
+
+v0.27       2001.01.12
+ $sth->{Statement} was not implemented. DBIx::XML_RDB needs it.
+
+v0.26       2000.11.20
+  $dbh->table_info raised an Ingres error because of the null. This
+  has been worked around (Thanks to Dirk Kraemer <kraemer@rz.uni-kiel.de>).
+  Minor changes due to change from CVS to Perforce.
+  Changed my old (now disfunctional) mail adress to the new (and hopefully
+  permanent one: htoug@cpan.org).
+  Removed some (2) occurences of \r in the code.
+
+v0.25       2000.01.31
+  Included patches for autodetect of OpenIngres on VMS, thanks to Sebastian
+  Bazley <Sebastian.BAZLEY@sema.co.uk>
+  Added RaiseError=>1 to the connect in t/dbi.t as per current
+  recomendation.
+  Changed the error return value of execute to 0 (not 0E0 which is the OK
+  with 0 rows), not -1, or -2 as it was. Wonder why though?
+
+v0.24       1999.10.29
+  The "OF column..." part of the "FOR UPDATE" clause is optional.
+  Clarified the pod (or tried to at least).
+
+  This changes the behaviour of the updateable cursor patch added by
+  Dirk Koopman <djk@tobit.co.uk> in version 0.19_1.  I hope nothing is
+  seriously broken by this change.
+  It does seem the best to let cursors be readonly by default and
+  explicitly change that if you want to update. The update of a cursor
+  without a "FOR UPDATE OF..." clause is not documented and could
+  go away at any time. 
+
+v0.23       1999.10.28
+  Now tries to discover whether a select-cursor should be opened READONLY
+  or not.
+  A select is opened READONLY unless there is a FOR UPDATE clause in the
+  select statement. This is done by a regexp in Ingres.pm, which might in
+  some cases (I just can't imagine which :-) could possibly give a false
+  positive - which will cause the select to take exclusive locks.
+  To allow the user to override the automatic readonly discovery is it
+  possible to write:
+      $sth = $dbh->prepare("Select....", {ing_readonly => $value});
+
+v0.22       1999.10.26
+  The 'minor tweaks' to Makefile.PL for building on NT are added, thanks to 
+  Bernard.ROYET@sncf.fr.
+  This release should build cleanly on NT.
+  
+v0.21       1999.09.16
+  It seems that a statement name can only be 23 characters long in Ingres 6.4
+  Fixed, thanks to Bruce W. Hoylman <bhoylma@advtech.uswest.com>.
+
+v0.20       1999.09.01
+  This has been running without problems on several machines here for some
+  months now. Time to release it and see what (if anything) breaks.
+  Still to be done:
+  - linking on VMS (waiting for DBI to link w.o. problems on VMS).
+  - compiling without tweeking on NT (ran out of tuits).
+  - tracking the latest chenges in the DBI spec (meta data and cached
+    statements to name the most obvious).
+ 
+V0.19_3     1999.05.25
+  - Cleanup of the code. Removal of some/all (?!!) of the core dumps.
+    No longer 'unaligned access'.
+  - Redo the check for re-preparation (still croak if a commit/rollback
+    has invalidated the statement).
+
+    Possibly fit for human comsumption. ;-}
+
+V0.19_2     1999.02.06
+  - Added support for threaded perls, thanks to Alan Murray <murray@email.exide.com>
+
+V0.19_1     1998.10.14
+  This is the first test of the forthcoming release 0.20. This is not
+  for public consumption - please use with care.
+
+  Do please report any problem to me <ht@datani.dk>.
+  
+  - Don't export $sql_dbh etc as default. (Ingperl.pm)
+    Warning:
+       This may break code that uses one or more of:
+          $sql_drh $sql_dbh $sql_sth $sql_debug $sql_rowcount
+       Change:
+          use Ingperl;
+       to:
+          use Ingperl( qw[ $sql_dbh $sql_sth ] );
+  - Added support for updateable cursors (experimental), Thanks to
+    Dirk Koopman <djk@tobit.co.uk>.
+  - Upgrade to support DBI 1.00 (experimental):
+     . re-prepare statement, that have gone out of scope (eq. after a
+       commit/rollback etc). Just first bash at it :-(, ie. for now just
+       keep tabs on whether the statement is invalidated by commit.
+     . add the new meta-data fields (TYPE, SCALE, PRECISION)
+       Ingres doesn't return the SCALE information so that is undef untill
+       further notice!
+     . first bash at type_info_all
+     . added $dbh->table_info (so $dbh->tables also works thanks to DBI)
+     . added $dbh->ping
+  - Changed statement name from stmnt<12-digit-number> to
+    st<number>_<a-bit-of-the-select>, so that it maybe is possible to
+    see which statement is executing from eg. ipm.
+    This may have the adverse effect that Ingres runs out of buffer space,
+    because it leaves all prepared statements in the ???-buffer untill a
+    commit. This will only be a problem if you execute many different
+    statements in a transaction.
+    If this does become a problem please let me know. One solution is to
+    allow the user to define the statement name if neccessary (eg. though
+    the %attribs argument to prepare).
+  - Cleaned up some code here and there.
+  - OpenIngres 1.0 now requires patch 5301 (or later) as this fixes the
+    unfortunate problem with nullability and outerjoins. The code to work
+    around this problem is removed (it had strange sideeffects at times).
+    This should not be a problem for OpenIngres 2.0 or later.
+    It if definitely not a problem for Ingres 6.4; as outerjoins were
+    introduced in OpenIngres.
+####  - Now builds cleanly on NT without changes to the makefile.
+####  - Now builds cleanly on VMS (again)
+  - Now commits after inquiring for autocommit-state after connect. This
+    removes the nedd for the commit in:
+        $dbh = DBI->connect...
+        $dbh->commit;
+        $dbh->do("set lockmode....");
+
+(Note #### = Not Yet Implemented)
+
+
+V0.16     1998.02.05
+  - Ulrich Pfeifer found and fixed another couple of memory leaks.
+  - Called dbd_st_finish when dbd_st_fetch returns undef. This avoid the bug
+    reported by  JD Laub <jdl@iasi.com> where the sequence 
+       prepare - execute - fetch - execute 
+    results in an error.
+
+v0.15     1998.01.16
+  - Added '-lm -lc' to the lib list for SCO reported by Alexander Slinkin
+    <sas@arstel.ru>).
+  - Fixed some minor warnings from dbdimp.psc - Digital Unix 4.0b has a
+    good lint in it's C-compiler (Gary W Chapman <gwc1@acf3.nyu.edu>)
+  - Fixed bug that causes DBD::Ingres code to break when used with DBI-0.91s
+    (where Tim Bunce has fixed an autocommit bug). The error occurs when you
+    issue a statement that cannot be in a multi-statement-transaction just
+    after a commit - the test for autocommit has started a transaction.
+
+v0.14     1997.12.16
+    Added ChopBlanks test to t/dbi.t
+    Ulrich Pfeifer found (and fixed) yet another memory leak in bind_params.
+    Reworked the code so that it also works on machines wheres ints are
+    not 4 bytes long.
+    Truncated some long lines (so they fit in an 80 char windows).
+    Documented lack of procedure call.
+    Fixed the VMS build problem - nobody needed it. Am I the only one that
+    uses Ingres, Perl and VMS??
+    
+v0.13     1997.11.28
+    Found (one of the) AutoCommit bug(s)! Needs an update to DBI to work
+    properly. (Autocommit state is not initialized).
+    Fixed serious memory leak in binding core (Thanks to Ulrich Pfeifer).
+
+v0.12     1997.11.14
+    Remove the trailing "\n" from Ingres error messages, so that
+    $dbh->{RaiseError} and $dbh->{PrintError} can return a stack-traceback.
+    Add tests to dbi.t for {AutoCommit}, and get autocommitstate at connect-
+    time. (Ulrich Pfeifer).
+    Return UNDEF from $dbh->execute when errors occur. (Ulrich Pfeifer).
+    Fixed Ingperl.pm so that ingtest.pl runs without errors.
+
+v0.11     1997.10.30
+    Bug in Ingperl.pm &sql_fetch used $sth instead of $sql_sth - funny
+    that nobody noticed before now.
+
+v0.10     1997.10.07
+    Release version - VMS does'nt work quite right, but it can muddle through.
+    DBD::Test tests passed.
+
+v0.05_96  1997.09.24
+    Added get_event func. Thanks to Ulrich Pfeifer.
+    Removed $dbh->rows. It was used by the ingperl emulation layer, and
+    could be avoided.
+    Updated the search strategy for DBIXS.h. Thanks to Jochen Wiedmann <wiedmann@Neckar-Alb.DE>
+    Switched to using the DBI-0.89 Driver.xs prototype.
+
+v0.05_95  1997.09.19
+    Tried to parse selects and discover if they are outerjoins.
+    Added $attribs{"ing_outerjoin"} to $dbh->prepare.
+    Documented it a bit more.
+
+v0.05_94  1997.09.18
+    Ulrich's patch for nullability added. Now I just need to check if there
+    is an outerjoin in the statement before deciding that all fields are
+    NULLABLE.
+
+v0.05_93  1997.09.15
+    Ulrich's patch for locating DBD::Ingres somewhere else than DBI added to
+    Makefile.PL.
+
+v0.05_92  1997.09.12 (early morning)
+    Ulrich Pfeifer <Ulrich.Pfeifer@de.uu.net> has come up with a solution to my
+    Makefile.PL problems with 'old' Ingres-versions. Thanks.
+
+    Ifdef'fed around Ingres6.4 (and earlier) non-awareness of DBMS_PASSWORD
+
+    $dbh->rows works again.
+
+    This version builds and tests cleanly for me.
+
+    Note that dbdimp.psc now is processed by a chain of 3 links:
+    perl (Makefile.PL), Esql/C, C-compiler!
+    Cross your fingers and hope nothing breaks.
+
+v0.05_91  1997.09.11
+    I just got the binding to work. I hope :)
+    Now only $dbh->rows is mucked up.
+
+v0.05_90  1997.09.10
+    Major rehaul
+    - added bind params - NOTE It doesn't work yet
+    - added password support
+    - HPUX must link statically
+    - RCS Revision bumped to 2.100 so CPAN can find its way around
+    - tried to adjust to the DBI-spec (as pr. DBI-0.90) with all Tim's new
+      ideas, $sth->{TYPE} now returns SQL_-values from DBI
+    - expanded pod
+    This is released as a "release early and often" version - respects to Eric
+    S. Raymond - for the not faint at heart.
+
+V0.0504   1997.06.16
+    Dropped { ing_trim_blanks } again as Tim Bunce has added it to DBI.
+    Now needs  DBI-0.82. (for this reason)
+    Expanded the pod (and adjusted it to reflect the new DBI-specs.
+    Tried to conform better to the DBI-spec.
+
+V0.05_03  1997.04.30
+    Added attribs on connect and prepare.
+       { ing_trim_blanks => 1 }
+    to cause trimming of trailing blanks.
+    The former change (from 0.05_01) is now reverted.
+
+V0.05_02 1997.04.29
+    No changes. Just a number change as I can't upload the d... thing to
+    PAUSE.
+
+V0.05_01 1997.04.16
+
+    Check on II_SYSTEM moved to connect (was at compile-time).
+
+    Improved library dectection for OpenIngres without installed ABF
+    component.
+    
+    Improved Ingperl emulation (Ronald B. Irvin <rbirvin@usgs.gov>):
+        - &sql_fetch into scalar now returns first column of output
+          and warns if $sql_sth->{Warn} is true.
+        - Warnings from &sql_close without open cursor are now only
+          output if requested (uses $sql_sth->{Warn}).
+        - &sql_eval_col1 fixed.
+
+    Now known to work on DG-UX (Ronald B. Irvin <rbirvin@usgs.gov>).
+    
+    Fetch(row) truncates trailing blanks from text-columns. This feature
+    can be disabled by setting $sth->{CompatMode} true. I was tired of
+    writing C<VARCHAR(column)> or C<$col=~S/\+$//;> all over the place!
+    WARNING: this may change old (DBD) code!!!
+    Ingperl sets CompatMode so Ingperl scripts are not affected.
+
+    Many other cleanups and buglet fixes.
+
+V0.05	1997.03.20
+	Makefile.PL changed so that it can link OpenIngres.
+
+	Support for HP-UX added (thanks to Gil Hirsch <gilh@cpm.telrad.co.il>
+	and Tim Bunce <Tim.Bunce@ig.co.uk>)
+
+	Added support for DBI 0.77
+	
+V0.04	1997.01.17
+	The function DBD::Ingres::st:fetch has now been reinstated
+	(thanks to Tim Bunce <Tim.Bunce@ig.co.uk> who showed the way to
+	let case insentive linker handle case sensitivity)
+
+V0.03	1997.01.09
+	Restriction on number of simultaniously open cursors removed
+	 - inspiration from Dirk Kraemer (kraemer@rz.uni-kiel.de)
+
+	Multiple database connects possible
+
+	Must reuse statement numbers as the number of different
+	statement names between commits is limited by the available
+	parser memory. You get error:
+		E_PS0F02_MEMORY_FULL
+		  There is no more available memory. Try again later.
+	when this happens.
+
+	DBD::rows does not change the session - will have to discover
+	whether this is a dbh or a sth to get the session number.
+	Tried (unsuccessfully) to use $dbh->{Database} in Ingres.pm
+	- any better ideas?
+
+V0.0201  1996.12.18
+	Can now link dynamically on Unix
+	 - thanks to Paul Lindner <lindner@itu.int>
+
+	Solaris fixes to Makefile.PL
+	 - thanks to Dirk Kraemer (kraemer@rz.uni-kiel.de)
+
+	The bug in VMS MakeMaker has been fixed - require a
+	version that includes the fix!
+	Still need to improve the ingres.opt handling.

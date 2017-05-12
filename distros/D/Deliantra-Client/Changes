@@ -1,0 +1,394 @@
+Revision history for Perl extension Deliantra::Client
+
+TODO: add help to completer, add close tab to completer, do stuff to complete
+TODO: warn about sofwtare renderers
+TODO: [num] indicator malfunctioning
+TODO: cfplus_ext => 2 is sometimes not beign negotiated! (hack in place, need better protocol)
+
+TODO: multi-line paragraphs get indented strangely (book: collection of strange glyphs).
+TODO: the ex command is always sent twice, as changing text causes a new descritpino to be querird.
+
+TODO: crash on switching bg music off?
+TODO: server restarts reorderign face numbers will disturb music faces played in client? caching?
+
+TODO: ex will be sent multiple times (animation effect)
+TODO: attuned/repelled spells in different colours?
+TODO: grace/sp spells in different colour?
+
+2.11 Sat Apr 24 10:08:34 CEST 2010
+	- support overriding the audio driver at runtime, for folks who know
+          what they are doing.
+	- upgrade to libSDL 1.2.14/SDL_mixer 1.2.11 for the GNU/Linux and
+          windows binaries, and also compile in multiple drivers (pulseaudio
+          disabled currently because it's too sucky and crashes on probe).
+	- replace level by minimum level, and damage by effective casting level
+          (for servers > 2.93).
+	- added some commandline arguments: <host> <user> <password>,
+          for the developers mostly.
+	- try a different method of avoiding music-related crashes.
+        - cfplus editor support protocol fixes.
+        - apply some common::sense 3.1 :)
+        - implement bandwidth-usage debug option.
+        - renamed env variable CFPLUS_DEBUG to DELIANTRA_DEBUG.
+        - display audio driver name that is in use.
+        - try to show splashscreen earlier.
+
+2.10 Fri Jan 15 16:14:02 CET 2010
+	- fix blending factors to avoid white-out when fow_intensity > 0.
+
+2.09 Tue Dec 22 01:40:24 CET 2009
+	- implement smooth fow/lighting transitions by blending.
+        - make fow texture configurable and add stipple/transparent versions.
+	- empty "Host" field will now default to gameserver.deliantra.net.
+        - do not crash when the user enters an invalid value into "Host".
+	- fix positional rounding on (pre-c99) windows.
+        - use a pack/unpack alignment of 1 by default everywhere, drop alignment
+          code in fow_texture.
+
+2.06 Fri Dec  4 15:35:33 CET 2009
+	- work around the Apple/NVIDIA font problem (a bug in glTexSubImage2D that
+          apple has no intention to fix, so we do the slow read/update/write way).
+        - work around various ATI/Mesa driver bugs in glTexImage2D by always
+          providing initialisation data for textures. Do they ever test their drivers
+          with, say, some newbie opengl code?
+	- stat change messages did not differentiate between attuned, repelled etc.
+        - work around a bug in the nvidia driver which mishandles alpha textures
+          with env mode REPLACE, causing all magic maps to be white only.
+        - do not use mipmapping for tiles - the trade-off was not worth it.
+        - fix packaging the pango modules twice in the linux and windows binaries.
+
+(2.05) Tue Sep 29 11:21:00 CEST 2009
+	- intermediate os x binary release only.
+	- linking against the opengl library works everywhere, except on Mac OS X 10.6,
+          which some people even spent money on (this seems to break a great number
+          of opengl apps actually).
+        - (os x binary) update libsdl to 1.2.14.
+
+2.05 Tue Sep 15 20:31:15 CEST 2009
+	- changed completer algorithm, thanks go to marcmagus!
+	- try to work around crashes in SDL_Mixer when reinitialising it.
+
+2.04 Sun Apr 26 21:03:40 CEST 2009
+	- work around incompatible ABI change between 1.22 and 1.24 by using a runtime check,
+          this really is a bug that needs fixing inside pango.
+        - include a japanese font (Mona, selected for license and size) with the distribution.
+        - include our own fonts.conf file, to speed up startup and to be able to control
+          font selection.
+	- change confusing login successful message to "connect to server successful".
+        - update BDB and EV in win32 builds to work around the event loop creation bug.
+        - fall back to blocking dns resolve before using a hardcoded address.
+
+2.03 Tue Jan 20 14:54:30 CET 2009
+	- move experience label, progress bars and slot info to the menubar.
+        - move toplevel menu into a menu popup.
+        - use fontsize for chekcbox size requests to get a better layout.
+        - autopickup spellbooks, skillscrolls and valuables by default.
+	- automatically save config/layout on exit and add config options
+          to Setup=>Client to control this.
+        - fix positioning of popup windows.
+        - move autopickup enable (formerly inhibit) to menubar.
+        - correctly display face changes for inventory objects.
+   	- verify databases if we are the first process to register, to
+          detect corruption as is common on windows (but not limited to
+          windows, unfortunately).
+        - fall back to backup config file if main config file cannot be parsed.
+        - reduce shimmering during smooth scrolls.
+        - rely on AnyEvent to work around totally broken windows vista
+          tcp/ip subsystem once more (where getpeername returns fantasy
+          ports).
+        - use newer BDB version that works around windows vista tcp/ip
+          breakage.
+        - initialise the default resolver during startup, as windows vista
+          forces us back to the desktop when doing this later(!).
+
+2.02 Wed Dec 24 06:02:53 CET 2008
+   	- mark hidden mapspaces visually with a question mark.
+        - make hidden spaces as light as the darkest normal spaces.
+	- don't lie about the window size anymore in fear of crashing
+          the server (as we are dealing with deliantra servers only these days).
+        - correctly draw the speech bubbles and other overlays even when the
+          topmost face isn't visible.
+	- fix swirly tile draw offset.
+        - fix a crash when the user clicks on the map during log-in.
+        - incorporate tips of the day by botz (former madness).
+        - handle failure to load a music face more gracefully (still
+          log the error, but do not crash, instead, ignore the failure).
+        - try to log, instead of crash, on the "cannot call update method"
+          problem.
+
+2.01 - (Mon Dec 15 00:41:33 CET 2008)
+        - rewrote the client tutorial which can be found via the 'Help!' button.
+        - fixed the mostly random switching of message window tabs when
+          new tabs were added.
+        - small typo fix in tooltip on the Skills page in the playerbook.
+        - avoid accessing potentially undefined memory when drawing the map.
+        - fixed speech bubbles which were drawn below some objects sometimes.
+
+2.0  Fri Dec  5 15:42:51 CET 2008
+        - the Log window can't be close anymore by alt+x
+        - pressing return or alt+x directly after start won't crash the client
+          anymore.
+        - the Log window is displayed correctly now after start.
+        - darken the invisible/cached parts of the map further.
+
+0.9978 Sun Nov  9 14:35:41 CET 2008
+	- correctly smooth-move the healthbar as well.
+        - own text is emphasized in the NPC dialogues now.
+        - fixed a crash bug in the macro dialogue.
+        - fixed updating of tooltips of the tabs in the message window.
+        - closing tabs with Alt-x won't let them disappear for every anymore.
+
+0.9977 Tue Sep 30 09:27:29 CEST 2008
+	- require newer BDB version to avoid possible database corruption or crashes
+          on login.
+	- fixed the often choppy smooth movement.
+	- switch to proportional font in log view.
+        - improve the paragraph indent hack to align characters better.
+        - tweak server message output.
+        - optimise visibility handing in multiplexers (only put the current tab
+          into visible state).
+        - reduce the number of unnecessary refreshes.
+        - allow empty multiplexers.
+        - fixed clearing issue in the inventory upon logout.
+        - use the same workarounds for pango for gnu/linux binaries as we use for osx,
+          but additionally patch the pango library because stupid braindead idiotic
+          debian maintainers of course apply custom patches that completely break it.
+
+0.9976 Fri Sep  5 17:28:30 CEST 2008
+	- use keysym not unicode symbol, maybe that helps with some of those keyboard
+          issues on OS X.
+        - treat meta like alt for built-ins, for OS X.
+        - fix tab tooltip listing key shortcut off by one.
+        - disable texture compression with apple software renderer. if you want to get
+          something that works, apple is for you. not.
+        - fix text encoding for item description tooltips.
+        - enlarge window borders considerably.
+        - support lzf-compressed packets.
+        - support fragmented packets.
+        - send crash and opengl vendor information to server for better debugging.
+        - fix crash when displaying the tutorial with the precompiled os x
+          binary: libjpeg collided with libJPEG - long live case-insensitivity :/
+        - cater for the incompatible changes in berkeley db 4.7.
+        - enable highest-resolution video mode again.
+        - add some preliminary theme support and two demo themes, "plain" and "blue".
+        - avoid a crash when the minimap is reduced to zero size.
+        - work around a bug in perl 5.8 perls (Bareword "Socket::AF_UNIX"...).
+
+0.9975 Wed Aug 27 22:16:27 CEST 2008
+	- use biggest video mode <= 1024x768 by default now (previous releases had a bug
+          that caused them to select the smallest vdieo mode available).
+	- ported to the rather horridly broken apple os x platform,
+          using macports (the only non-broken part of the whole thing).
+	- clarify/fix weight/value autopickup option with a tooltip and a server change.
+
+0.9974 Fri Aug  1 15:45:59 CEST 2008
+	- implement smooth scrolling for the player.
+	- try a different workaround to maybe register Deliantra::Client.
+        - support switching off of alpha framebuffers, to work around
+          possible fallback-to-software-renderer problems.
+        - allow video modes <800x600 to be selectable.
+        - decode player from map1ax.
+	- made libsdl1.2.10+ a requirement.
+        - improve the slider widget.
+	- use AnyEvent::Socket::parse_hostport.
+        - upgrade to BDB 1.7.
+        - properly clear mapcells in all cases, also try a heuristic to avoid
+          player ghost images.
+
+0.9973 Mon Jul  7 09:27:59 CEST 2008
+	- added a dummy "package Deliantra::Client" to bin/deliantra, as
+          cpan stupidly cannot install distributions by name.
+	- convert to new non-blocking API.
+        - support IPv6 server connections.
+        - the chat tabs now have tooltips again.
+
+0.9972 Thu May 22 22:45:01 CEST 2008
+	- save all map changes in map cache, not just the current map (this fixes
+          the problem of map border "black out" in the minimap).
+        - use an even more compact format for minimap data.
+        - use an uncompressed cache for minimap data, increases memory requirements
+          (~1mb) but saves compression.
+	- close container, clear inventory, floorbox etc. to avoid a crash when
+          clicking on them after logging out.
+	- support xml formatting in ex replies (item tooltips, requires server
+          2.54+).
+	- try to ignore repeated keypress-events for movement, as
+          these are usually keyrepeats.
+	- added default (0) for the shift_fire_stop setting
+	- write client.cf in pretty-printed-json.
+        - avoid crashes if map cache is corrupted.
+
+0.9971 Mon May  5 21:37:33 CEST 2008
+	- reverse order of items in floorbox.
+	- sort right side of inventory by floor order.
+        - make messages window always visible.
+	- fix stat tooltips by not lowercasing keywords in pod2wiki.
+	- fix longstanding bug where the stats tab would be removed during chargen.
+        - fix menu alignment.
+	- change podwiki format to be slightly more generic.
+	- ignore pseudo-items in floorbox, only show in inventory.
+
+0.9970 Sun Mar 30 13:30:47 CEST 2008
+	- fix a bug in tile id allocation, the effect of this bug
+          was effectively disabling the tile cache, upgrade is highly
+          recommended.
+        - fix npc dialog.
+	- upgrade the database schema (i.e. nuke it...).
+	- only open the database before forking the bg server.
+        - PRECOMPILED BINARY: use packaged libdb4.6 instead of libdb4.4.
+        - use newer BDB module (might fix the filename encoding issue under win32).
+        - use a real bdb sequence for the faceid, for better performance.
+
+0.9968 Tue Mar 25 20:28:16 CET 2008
+	- reduce documentation memory usage.
+        - fix the stat gauge tooltips that have gone missing since 0.9966.
+
+0.9967 Mon Mar 24 01:24:07 CET 2008
+	- implement keyboard modifier display (mostly because of the numlock
+          problems under windows).
+        - work around a bug on windows where the layout font is being ignored.
+
+0.9966 Sat Mar 22 14:26:05 CET 2008
+	- when the message window is hidden and the input is activated, it will
+          become visible again.
+	- the max number of paragraphs in the chattabs were not limited,
+          leading to a naughty memory leak
+	- the highlighting of the chattabs were deep blue where they should have been
+          deep red :-)
+	- fixed a small inconvenience in the history handling of chat tab entries
+          (hitting cursor-up or cursor-down won't erase what you typed by accident
+          anymore).
+
+0.9965 Sat Jan 19 05:51:39 CET 2008
+	- work around a database race condition by using single-threaded
+          database access.
+
+0.9964 Fri Jan 18 06:30:13 CET 2008
+        - fixed a bug where the message fontsize wasn't set correctly
+        - do not call glTexSubimage2D on 0x0 bitmaps, as this
+          crashes newer nvidia drivers.
+        - fix chatbox label padding.
+	- further rename database directory.
+	- further "branding" of cfplus => deliantra.
+
+0.9963 Sun Jan  6 18:27:02 CET 2008
+	- rework of the messsage window to support 'undocked' windows.
+	- ignore keyboard modifiers we are never interested in.
+	- improve interactivity by using a prepare, not an idle watcher,
+          for screen refreshes.
+        - limit the time spent in database handling, so we refresh the screen
+          even during ongoing heavy texture loading.
+        - load tile map at startup, not at connect time.
+        - tweak database accesses.
+        - widget protocol version 2, supports ui templates.
+        - increase horizontal padding for buttons a bit.
+        - preallocate texture name when switching video modes and the
+          texture can only be loaded in the background to avoid
+          something else taking over.
+        - increase padding for all text entries.
+        - work around a bugfix in pango that no longer is necessary
+          (but causes a bug with new pango versions, argh.)
+	- use supposedly faster readonly pango functions wherever possible.
+        - Canvas widget properly restores line and point widths.
+        - fix padding calculation.
+        - change semantics for align/valign in labels to behave like other
+          alignment values.
+
+0.9962 Thu Dec 27 14:29:02 CET 2007 (download.com only)
+	- changed minimum required resolution to 800x640.
+	- renamed perl module to Deliantra::Client.
+	- fixed unneccessary repetition when firing in a direction
+          when 'only shift-up stops fire' is off.
+	- do not render some glyphs twice. doh.
+        - fix two problems that would cause endless
+          refreshes even when idle (up to 60Hz).
+        - optimise refresh strategy to not refresh more often than 60hz,
+          even if it means to delay updates up to 1/60th of a second.
+        - updated the dejavu fonts to version 2.22.
+        - switch from Crossfire to Deliantra module.
+        - switch from ~/.crossfire to ~/.deliantra,
+          move database from cf to deliantra at startup.
+        - fix some opengl races that could freeze deliantra during shutdowns.
+        - moved client-specific modules into a private subdirectory.
+        - moved client-specific resources into a private subdirectory.
+
+0.9961 Tue Dec 25 20:22:51 CET 2007
+	- fix texture-reload problems when changing resolutions
+          by forcing the reuse of the same texture name.
+        - save and restore glyph cache textures when changing resolutions.
+
+0.9960 Tue Dec 25 10:38:17 CET 2007
+	- fixed item animation by taking advantage of ev_periodic.
+	- document KP+ better.
+        - update to EV 2.0.
+        - do not crash when an invisible widget wants its global
+          coordinate or vice versa.
+        - further optimise face loading from database.
+
+0.9959 Sat Dec  8 20:16:45 CET 2007
+	- grr, really update for EV-1.72.
+
+0.9958 Sat Dec  8 19:37:33 CET 2007
+	- fix a longstanding bug where a jingle would be played
+          repeatedly if no server-provided music was available.
+        - update for EV-1.72 API.
+
+0.9957 Wed Dec  5 20:06:05 CET 2007
+	- switch to new JSON::XS 2.01 API.
+        - add some debugging hooks.
+
+0.9956 Tue Nov 27 10:45:35 CET 2007
+	- convert to the high-performance EV event loop, expecting
+          higher performance and compatibility under windows.
+	- the serverlist feature has been disabled due to problems
+          with activestate perl.
+
+0.9955 Sat Nov  3 13:07:57 CET 2007
+	- enable fullscreen by default.
+        - use a minimum mode of 800x600.
+        - enable the widget extension officially.
+
+0.995 Sat Oct 20 23:48:20 CEST 2007
+	- experimental widgets extension is now enabled in the release.
+        - enable tabs by default now.
+
+0.99  Sun Sep  2 10:48:08 CEST 2007
+	- much better compatibility to gl drivers that claim
+          opengl 2.0 but then providing some features in software.
+        - better face caching.
+        - background music and spatial sound effects.
+        - more default keymappings.
+        - item descriptions in tooltips.
+
+0.98  Wed May  9 13:46:13 CEST 2007
+	- 64x64 faceset support.
+        - better message support.
+        - asynchonrous database accesses.
+
+0.97  Thu Jan 25 06:16:08 CET 2007
+	- rewritten keybinding system.
+        - many, many bugfixes.
+
+0.95
+	- fix off-by-one-bug click and map ghosting.
+        - many minor bugfixes.
+
+0.53  Wed Oct 18 14:35:28 CEST 2006
+	- add win32 splashscreen.
+        - moved crossfire data directory to %APPDATA% on win32.
+
+0.52  Wed Sep 20 18:00:39 CEST 2006
+	- fix most map ghosting
+        - include npc speech bubble indication
+        - work around some crash
+
+0.5   Tue Sep 12 22:29:28 CEST 2006
+	- many fetaures and bugfixes.
+	- improve portability by making sdl-1.2.10 features optional.
+
+0.2   Mon Jul 31 13:15:40 CEST 2006
+	- fix missing CFPlus/Pod.pm.
+ 
+0.01  Thu Apr  6 16:30:28 CEST 2006
+	- original version; cloned from PLIB::PUI
+

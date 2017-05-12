@@ -1,0 +1,10 @@
+Revision history for Dancer2-Session-CGISession
+
+0.04  2016-08-16 14:57:58 SGT
+        - Add support for Dancer2's upcoming change_session_id app method
+
+0.03  2016-05-20 14:32:16 SGT
+        - Fix an issue with CGI default variable
+
+0.02  2015-04-26 23:26:34 CST
+        - Fix a deep recursion issue when CGI Session was deleted from outside dancer

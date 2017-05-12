@@ -1,0 +1,47 @@
+Revision history for Perl extension DateTime::Calendar::Pataphysical.
+
+0.06  2015-10-13  the "Fête du Haha" release
+    - properly list Eugene van der Pijll as the author,
+      and Philippe Bruhat as the maintainer
+
+    - fix warnings in test output (Dave Rolsky)
+
+    - fix locale tests so they pass with the next release of DateTime-Locale
+      (Dave Rolsky)
+
+0.05  2014-05-01  the "Reprobation of Labour" release
+    - new maintainer: Philippe Bruhat (BooK)
+
+    - suppress the warning about the deprecated "day_names" method
+      in DateTime::Locale
+
+    - fixed a few mistakes in the feast names and classifications
+
+    - test round trip on random dates
+
+    - package using Dist::Zilla
+
+0.04  2004-07-29  the "Transfiguration of Saint V. van Gogh" release
+    - added classification of holidays
+
+    - changed year count for years before the Pataphysical Era (1873):
+      there is no year 0 in the Pataphysical Calendar
+
+    - added t/pod.t
+
+0.03  2003-09-02  the "Saint Lazare (station)" release
+    - move to the "Locale" system
+
+    - store rd_seconds and rd_nanoseconds in the object in from_object;
+      return this value if object is converted back to another calendar
+
+0.02  2003-04-04  the "Nativity of Maldoror" release
+    - corrected utc_rd_as_seconds()
+
+    - added language parameter to from_epoch, from_object,
+      last_day_of_month
+
+    - corrected from_object to remove time zone problems
+
+0.01  2003-03-29  the "Hand of Glory" release
+	- original version

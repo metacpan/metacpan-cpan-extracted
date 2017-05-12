@@ -1,0 +1,65 @@
+{
+   "abstract" : "convert JSON columns to Perl objects",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-InflateColumn-JSON2Object",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Encode" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Runtime" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBI" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Schema" : "0",
+            "Moose" : "0",
+            "Test::More" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "5.010",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/domm/DBIx-Class-InflateColumn-JSON2Object.git",
+         "web" : "https://github.com/domm/DBIx-Class-InflateColumn-JSON2Object"
+      }
+   },
+   "version" : "0.900",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

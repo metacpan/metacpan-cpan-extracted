@@ -1,0 +1,27 @@
+---
+abstract: 'show module information automatically'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-ModuleDumper
+provides:
+  Devel::ModuleDumper:
+    file: lib/Devel/ModuleDumper.pm
+    version: 0.03
+requires:
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Devel-ModuleDumper/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Devel-ModuleDumper
+version: 0.03

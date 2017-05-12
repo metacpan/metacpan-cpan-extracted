@@ -1,0 +1,13 @@
+\.svn\b
+^MANIFEST\.
+^Makefile$
+~$
+\.html$
+\.old$
+^blib/
+^DBD\-TimesTen\-
+^tags$
+\.rej$
+\.orig$
+\.exists
+\.obj$

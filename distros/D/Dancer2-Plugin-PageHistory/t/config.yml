@@ -1,0 +1,14 @@
+log: debug
+logger: capture
+show_errors: 1
+template: simple
+
+plugins:
+  PageHistory:
+    add_all_pages: 1
+    ignore_ajax: 1
+    PageSet:
+      max_items: 3
+      methods:
+        - default
+        - product

@@ -1,0 +1,133 @@
+{
+   "abstract" : "UML-based Object-Relational Mapping (ORM) framework",
+   "author" : [
+      "Laurent Dami <laurent.dami AT etat.ge.ch>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-DataModel",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Task::Weaken" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::Mock" : "0",
+            "Lingua::EN::Inflect::Phrase" : "0"
+         },
+         "requires" : {
+            "Acme::Damn" : "0",
+            "Carp" : "0",
+            "DBI" : "0",
+            "MRO::Compat" : "0",
+            "Module::Build" : "0",
+            "Module::Load" : "0",
+            "Params::Validate" : "0",
+            "SQL::Abstract::More" : "1.21",
+            "Scalar::Does" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::DataModel" : {
+         "file" : "lib/DBIx/DataModel.pm",
+         "version" : "2.46"
+      },
+      "DBIx::DataModel::Compatibility::V0" : {
+         "file" : "lib/DBIx/DataModel/Compatibility/V0.pm"
+      },
+      "DBIx::DataModel::Compatibility::V1" : {
+         "file" : "lib/DBIx/DataModel/Compatibility/V1.pm"
+      },
+      "DBIx::DataModel::ConnectedSource" : {
+         "file" : "lib/DBIx/DataModel/ConnectedSource.pm"
+      },
+      "DBIx::DataModel::Meta" : {
+         "file" : "lib/DBIx/DataModel/Meta.pm"
+      },
+      "DBIx::DataModel::Meta::Association" : {
+         "file" : "lib/DBIx/DataModel/Meta/Association.pm"
+      },
+      "DBIx::DataModel::Meta::Path" : {
+         "file" : "lib/DBIx/DataModel/Meta/Path.pm"
+      },
+      "DBIx::DataModel::Meta::Schema" : {
+         "file" : "lib/DBIx/DataModel/Meta/Schema.pm"
+      },
+      "DBIx::DataModel::Meta::Source" : {
+         "file" : "lib/DBIx/DataModel/Meta/Source.pm"
+      },
+      "DBIx::DataModel::Meta::Source::Join" : {
+         "file" : "lib/DBIx/DataModel/Meta/Source/Join.pm"
+      },
+      "DBIx::DataModel::Meta::Source::Table" : {
+         "file" : "lib/DBIx/DataModel/Meta/Source/Table.pm"
+      },
+      "DBIx::DataModel::Meta::Type" : {
+         "file" : "lib/DBIx/DataModel/Meta/Type.pm"
+      },
+      "DBIx::DataModel::Meta::Utils" : {
+         "file" : "lib/DBIx/DataModel/Meta/Utils.pm"
+      },
+      "DBIx::DataModel::Schema" : {
+         "file" : "lib/DBIx/DataModel/Schema.pm"
+      },
+      "DBIx::DataModel::Schema::Generator" : {
+         "file" : "lib/DBIx/DataModel/Schema/Generator.pm"
+      },
+      "DBIx::DataModel::Source" : {
+         "file" : "lib/DBIx/DataModel/Source.pm"
+      },
+      "DBIx::DataModel::Source::Join" : {
+         "file" : "lib/DBIx/DataModel/Source/Join.pm"
+      },
+      "DBIx::DataModel::Source::Table" : {
+         "file" : "lib/DBIx/DataModel/Source/Table.pm"
+      },
+      "DBIx::DataModel::Statement" : {
+         "file" : "lib/DBIx/DataModel/Statement.pm"
+      },
+      "DBIx::DataModel::Statement::JDBC" : {
+         "file" : "lib/DBIx/DataModel/Statement/JDBC.pm"
+      },
+      "DBIx::DataModel::Statement::Oracle" : {
+         "file" : "lib/DBIx/DataModel/Statement/Oracle.pm"
+      },
+      "DBIx::DataModel::Table" : {
+         "file" : "lib/DBIx/DataModel/Compatibility/V1.pm"
+      },
+      "DBIx::DataModel::View" : {
+         "file" : "lib/DBIx/DataModel/Compatibility/V1.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/damil/DBIx-DataModel"
+      }
+   },
+   "version" : "2.46"
+}

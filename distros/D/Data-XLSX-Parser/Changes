@@ -1,0 +1,27 @@
+Revision history for Perl extension Data-XLSX-Parser
+
+0.14 2015-12-21T12:19:11Z
+
+    - bug fix: revised implements for 0.13_01
+    - notice:  Data::XLSX::Parser->sheet is now obsolete.
+
+0.13_01 2015-12-21T11:13:05Z
+
+    - bug fix: Google spreadsheet exports unexpected filename (workaround release) 
+
+0.13 2015-01-16T11:50:44Z
+
+    - improvement: determine value type more accurately
+
+0.12 2015-01-16T10:47:30Z
+
+    - bug fix for custom number format including ";" (must not to parse as date)
+
+0.11 2014-12-18T01:55:21Z
+
+    - change cpanfile (perl >= 5.010)
+
+0.10 2014-12-15T17:31:05Z
+
+    - initial version
+

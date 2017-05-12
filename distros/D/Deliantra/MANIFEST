@@ -1,0 +1,27 @@
+COPYING
+MANIFEST
+Changes
+Makefile.PL
+Deliantra.pm
+Deliantra/Data.pm
+Deliantra/Map.pm
+Deliantra/MapWidget.pm
+Deliantra/MoveType.pm
+Deliantra/Protocol/Constants.pm
+Deliantra/Protocol/Base.pm
+Deliantra/Protocol.pm
+bin/cfarch-normalize
+bin/cfmap-normalize
+bin/cfmap-plushify
+bin/cfmap-tagify
+bin/cfmap-cavehify
+bin/cfxmlrender
+bin/cf-slotutil
+res2pm
+res/README
+res/autojoin.txt
+res/spells.xml
+res/typenumbers.xml
+res/types.xml
+eg/mapread
+META.yml                                 Module meta-data (added by MakeMaker)

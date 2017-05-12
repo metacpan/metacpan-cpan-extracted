@@ -1,0 +1,31 @@
+Revision history for Dist::Zilla::Plugin::DualBuilders
+
+1.002	2014-10-28 18:20:31 UTC
+
+	***DEPRECATED***
+
+		This module had a nice run, but modern Perls with newer toolchains are able to handle this in a saner way :)
+		If you need to support older Perls, please use Dist::Zilla::Plugin::MakeMaker::Fallback instead ( thanks ETHER! )
+
+	***DEPRECATED***
+
+1.001	2010-12-15 18:54:27 UTC
+
+	Add the ability to block both builders from running the testsuite twice
+
+1.000	2010-12-14 03:27:05 UTC
+
+	Converted to Dist::Zilla for the release process!
+	Tweaked some POD/error messages for clarity
+
+0.03	0000-00-00 00:00:00 UTC
+
+	Update the prereq logic to work with Dist::Zilla's migration to CPAN META v2
+
+0.02	0000-00-00 00:00:00 UTC
+
+	Ah, I forgot to munge the Makefile.PL/Build.PL to contain the proper builder...
+
+0.01	0000-00-00 00:00:00 UTC
+
+	initial release

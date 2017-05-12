@@ -1,0 +1,50 @@
+{
+   "abstract" : "Generate Dpkg files for your perl module",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Dpkg",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::File::InMemory" : 0,
+            "Dist::Zilla::Role::InstallTool" : 0,
+            "Moose" : 0,
+            "Text::Template" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tripside/dist-zilla-plugin-dpkg/issues"
+      },
+      "homepage" : "https://github.com/tripside/dist-zilla-plugin-dpkg",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tripside/dist-zilla-plugin-dpkg.git",
+         "web" : "https://github.com/tripside/dist-zilla-plugin-dpkg"
+      }
+   },
+   "version" : "0.05"
+}
+

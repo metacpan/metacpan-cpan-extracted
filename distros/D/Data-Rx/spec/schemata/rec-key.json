@@ -1,0 +1,47 @@
+{
+  "schema": {
+    "type": "//rec",
+    "required": {
+      "key": { "type": "//int" }
+    }
+  },
+
+  "pass": {
+    "obj": [ "key-0", "key-1" ]
+  },
+
+  "fail": {
+    "arr" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "num" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : {
+      "empty": {
+        "data": [ ],
+        "check": [ ],
+        "error": [ "missing" ]
+      },
+      "key-pants": {
+        "data": [ "key" ],
+        "check": [ "required", "key" ],
+        "error": [ "type" ]
+      },
+      "key-1-unknown": {
+        "data": [ ],
+        "check": [ ],
+        "error": [ "unexpected" ]
+      },
+      "key-0-opt-1": {
+        "data": [ ],
+        "check": [ ],
+        "error": [ "unexpected" ]
+      },
+      "key-0-opt-T": {
+        "data": [ ],
+        "check": [ ],
+        "error": [ "unexpected" ]
+      }
+    },
+    "str" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } }
+  }
+}

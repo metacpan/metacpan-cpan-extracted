@@ -1,0 +1,154 @@
+#!/opt/perl/bin/perl
+#
+# Program to dump Db::Ctree ISAM flies
+#
+# ctdump filename {pattern} {-option} {-option=arg}
+#
+# Options:
+#   -mode=0 (default) bar separated format
+#   -mode=1           by record (shown padding)
+#   -mode=2           hex dump
+#
+#   -c                count keys
+#   -count            count keys
+#
+#  start = key 0 start field (default first record)
+#
+# Author:
+#        Robert Eden - rmeden@yahoo.com
+#
+
+use Db::Ctree qw(:ALL);
+
+#
+# load options
+#
+foreach (@ARGV)
+{
+    if ( /^-(.+)=(.+)/)
+    {
+      $opt{uc($1)}=$2;
+    }
+    elsif (/^-(.+)/)
+    {
+     $opt{uc($1)}=1;
+    }
+    else
+    {
+      next if $_ eq "0"; # hack to avoid problems with previous version
+      push @PARAMS,$_;
+    }
+}
+
+$filename = shift @PARAMS;
+$start    = shift @PARAMS;
+
+die "ctdump <filename> {pattern} {-mode=0|1|2} {-c{ount}}\n" unless $filename;
+
+#
+# handle interrupts so we can clean up without Perl crashing
+#
+#$QUIT=0;
+#$SIG{QUIT} = sub{$QUIT++};
+#$SIG{TERM} = sub{$QUIT++};
+#$SIG{INT}  = 'IGNORE';
+
+#
+# the following statement is pretty much site specific... sorry
+#
+$filename .= ".dat" unless $filename =~ /\.dat$/;
+$filename = "/appl/plexar/master/$filename" unless $filename =~ /\//;
+
+die "$filename not found "     unless -e $filename;
+
+#
+# open database
+#
+InitISAM(10,2,4);
+$dbptr = Db::Ctree -> new (0, $filename, &Db::Ctree::SHARED);
+
+#
+# schema available?
+#
+$dbptr -> build_schema();
+$opt{MODE} = 1 unless ($opt{MODE} or $dbptr -> {FTYPE});
+
+@fname = @{$dbptr -> {FNAME}};
+@ftype = @{$dbptr -> {FTYPE}};
+$fmask = $dbptr -> {FMASK};
+
+#
+# print number of records
+#
+if ($opt{C} or $opt{COUNT})
+{
+     $numrec = NbrOfKeyEntries($dbptr -> {DBNO} + 1);
+     die &isam_err." on NbrOfKeyEntries" if &isam_err;
+     print "$numrec records\n";
+}
+exit 0 if $opt{C};
+
+print join("|",@fname) . "\n" unless $opt{MODE};
+print join("|",@ftype) . "\n" unless $opt{MODE};
+
+if ( $start )
+{
+   $record = $dbptr -> fetch_gte($start);
+}  
+else
+{
+   $record = $dbptr -> fetch_first();
+}
+
+while ($record)
+{
+   die "SIGNAL received! ($QUIT)" if $QUIT;
+
+#
+# Mode 0, process fields
+#
+   if ($opt{MODE} == 0)
+   {
+      %rec = $dbptr ->unpack_record($record);
+      foreach $col (@{$dbptr -> {FNAME}})
+      {
+         $_ = $rec{$col};
+         tr [\000-\037][.];
+         print $_,"|";
+      }  
+      print "\n";
+   } # mode0
+
+#
+# Mode 1, line dump
+#
+   elsif ($opt{MODE} == 1)
+   {
+         $record =~ tr [\000-\037][.];
+         print "$record\n";
+   }
+
+#
+# Mode 2, hex dump
+#
+   elsif ($opt{MODE} == 2)
+   {
+     @c     = unpack('a' x length($record) ,$record);
+     foreach (0...$#c)
+     {
+       die "SIGNAL received! ($QUIT)" if $QUIT;
+       printf "[%03d] %s = %3d\n",$_,
+                                  ord($c[$_])<32 ? '.' : $c[$_],
+                                  ord($c[$_]);
+     }
+
+     last; # only display first record in hex
+   }
+
+   $record = $dbptr -> fetch_next;
+   last if ( $start and $record !~ /$start/);
+} # record loop
+
+die &isam_err." Error on Read" if (&isam_err and
+                                   &isam_err != &Db::Ctree::INOT_ERR);
+

@@ -1,0 +1,50 @@
+---
+abstract: 'Data validator and form processor'
+author:
+  - 'Gerda Shank'
+build_requires:
+  Test::Differences: 0
+  Test::Exception: 0
+  Test::Memory::Cycle: 1.04
+  Test::More: 0.94
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-MuForm
+requires:
+  Carp: 0
+  Class::Load: 0.06
+  Class::XSAccessor: 0
+  Crypt::CBC: 0
+  Data::Clone: 0
+  Data::Dump: 0
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  Email::Valid: 0
+  File::ShareDir: 0
+  File::Spec: 0
+  HTML::Entities: 0
+  HTML::TreeBuilder: 3.23
+  JSON: 0
+  List::Util: 1.33
+  Moo: 2.000
+  MooX::Aliases: 0
+  Regexp::Common: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  Sub::Name: 0
+  Test::Builder::Module: 0
+  Try::Tiny: 0
+  Type::Tiny: 0
+  aliased: 0
+resources:
+  bugtracker: http://github.com/gshank/data-muform/issues
+  repository: git://github.com/gshank/data-muform.git
+version: 0.04
+x_serialization_backend: 'YAML::Tiny version 1.56'

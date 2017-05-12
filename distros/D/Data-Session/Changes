@@ -1,0 +1,136 @@
+Revision history for Perl extension Data::Session.
+
+1.17  2015-02-14T09:38:00
+	- Fix a bug in Data::Session.get_my_drivers(). See RT#111844. Many thanx to Slaven Rezic
+		for the report, diagnosis and patch.
+	- Add github repo https://github.com/ronsavage/Data-Session.git.
+	- Reformat the dates in this file, and hence in Changelog.ini from - e.g. -
+		'Mon Feb  8 08:45:00 2015' to what you see above.
+	- Reformat lines in this file, and in the docs, to be no more that 100 chars long.
+	- Move t/pod.t into xt/authors.
+
+1.16  2014-04-03T17:53:00
+	- Rewrite a bit of code which used 'each', to not update the hash being processed, because
+		'each' gets confused. See http://blogs.perl.org/users/rurban/2014/04/do-not-use-each.html.
+		Thanx to Reini Urban for that article.
+
+1.15  2013-06-21T11:43:00
+	- Update pre-reqs thus: Pragmas shipped with Perl are now version 0 only. This means they are
+		expected to be present, but a specific version # is not important. As per advice by
+		Father C. (for a different module). Pragmas affected: autovivification, overload, parent,
+		strict, vars and warnings.
+	- Update various other module version pre-reqs, including CGI to V 3.63. The test for equality
+		in t/basic.t for CGI cookies and HTTP header failed on CGI V 3.53, and work has been done
+		in CGI V 3.63 in that area. Hopefully this pre-req change fixes that problem (which was
+		detected on 1 CPAN Tester machine).
+
+1.14  2013-06-19T17:07:00
+	- No code changes.
+	- Rename CHANGES to Changes as per CPAN::Changes::SPEC.
+	- Update pre-reqs.
+
+1.13  2012-05-03T11:23:00
+	- In parse_options(), the result of parsing the 'type' (driver:Pg;id:MD5;serialize:DataDumper)
+		was printed both for verbose == 1 and verbose > 1. Now it's only printed if verbose > 1.
+	- Apart from the above, no other code changes. Just additions to the docs, as follows...
+	- Add important section to the docs, under FAQ: Guidelines re Sources of Confusion.
+		(a) Firstly, explain (with examples) the difference (for CGI::Snapp-derived scripts)
+		between:
+		$self -> param(a_key => 'a_value');
+		and
+		$self -> param('session') -> param(a_key => 'a_value');
+		(b) Explain at what stage in a CGI script flush() should be called.
+		(c) Then, explain (with examples) that:
+		$self -> param('session') -> param(a_hash => %a_hash);
+		will fail, and you must use a hashref:
+		$self -> param('session') -> param(a_hash => {%a_hash});
+		Likewise for arrays 'v' arrayrefs.
+
+1.12  2012-04-24T15:13:00
+	- After prompting by William Bulley (many thanx!) I found a range of issues which have been
+		addressed:
+	- Some combinations of options to new() triggered an unjustifiable die, so code in
+		validate_options() has been simplified.
+	- Add new demos in scripts/: cgi.demo.cgi (CGI script), cgi.sha1.pl (command line script),
+		and file.sha1.pl.
+	- Copy scripts/cgi.demo.cgi into the Synopsis, since such a self-contained CGI demo was lacking.
+	- Copy scripts/file.sha1.pl into the Synopsis, to go with scripts/file.autoincrement.pl. These
+		demonstrate the different uses of file_name and id_file as options to new().
+	- Clean up some typos within the other demo code in the Synopsis.
+	- Clean up similar typos in scripts/file.autoincrement.pl.
+	- Expand the discussion of how certain options to new() interact. See Combinations of Options.
+	- Fix various typos throughout the PODs.
+	- Switch from Module::Load to Class::Load.
+	- Change the versions of the pre-reqs to correspond to what was available with Perl V 5.10.1.
+
+1.11  2011-07-08T11:17:00
+	- Replace DBIx::Admin::DSNManager with Config::Tiny, to make it easier to put Data::Session into
+		Debian.
+	- In Build.PL, shift DBIx::Admin::CreateTable from requires to build_requires. Config::Tiny goes
+		there too.
+	- In the test code, change both sleeps from 2 to 3 seconds, to see if that solves rare test
+		failures.
+	- In the test code, use File::Basename's fileparse rather than a regexp to see if the SQLite
+		directory exists. This should fix some test failures under Windows.
+
+1.10  2011-06-21T16:42:00
+	- After some marvellous debugging by Jeff Lavallee, one of the CPAN testers, I've changed
+		O_RDONLY to O_RDWR in Data::Session::Driver::File, to deal with a flock problem. This code
+		was copied from CGI::Session, which may therefore still have the same problem.
+	- Also, $! is now included in error messages, both in Data::Session::Driver::File and
+		Data::Session::ID::AutoIncrement. Because this reveals directories in paths, $! is only
+		displayed when new(debug => 1) is used in Data::Session.
+
+1.09  2011-06-17T14:22:00
+	- Revert change in 1.08, which produces errors during global destruction.
+	  This means, to save a session, you must store something in it, to force the session to be
+		modified.
+	- Duplicate, briefly, the explanation of sessions and flushing, as the new first point in the
+		FAQ.
+	- Changes some debug messages (relating to session and parameter expiry) which were ambiguous.
+
+1.08  2011-06-17T13:07:00
+	- Ensure new sessions, and not just modified ones, are written during flush().
+
+1.07  Mon May 16  9:23:00 2011
+	- Remove redundant declaration of id() in Data::Session::ID::Static, which was producing the
+		message: field "id" redefined or overridden at ... line 10.
+
+1.06  2011-05-12T12:01:00
+	- No code changes.
+	- Patch the tests to parse the DSN more closely, to skip tests if the SQLite directory /tmp
+		does not exist. This directory is present in t/basic.ini and t/bulk.ini.
+
+1.05  2011-04-12T13:11:00
+	- Eliminate references to /tmp by using File::Temp::newdir. This applies to docs and various
+		scripts/*.pl.
+	- Patch t/Test.pm to use DBI.
+	- Patch t/basic.t to avoid a used once error on $BerkeleyDB::Error.
+	- Add configure_requires => { 'Module::Build' => 0.38 } to Build.PL.
+	- Reformat Build.PL and Makefile.PL now that we've reverted from Padre to Emacs (due to install
+		issues).
+	- Add META.json to files tracked by git.
+
+1.04  2011-02-16T11:55:00
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+1.03  2010-12-24T17:36:00
+	- Add DBD::SQLite to the list of pre-reqs.
+	- Patch POD warning users to avoid Storable due to this bug:
+		http://rt.cpan.org/Public/Bug/Display.html?id=36087
+
+1.02  2010-12-14T11:16:00
+	- Change handling of parameters passed to cookie(), so that the caller may pass extra parameters
+		to the query object's cookie() method.
+	- Document the $atime parameter to the atime() method.
+	- Change the POD structure, so that all methods are assigned a level of head2 under a head1 of
+		Methods.
+	- Various small corrections to the POD.
+
+1.01  2010-12-01T16:35:00
+	- In t/basic.t, use Module::Load to load BerkeleyDB and Cache::Memcache conditionally, and exit
+		cleanly if they are not installed.
+
+1.00  2010-11-30T14:08:00
+	- Original version.

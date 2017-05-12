@@ -1,0 +1,110 @@
+Changelog for Data::Stag
+
+Version 0.01
+============
+
+2002-12-07	- Initial Release
+
+Version 0.02
+============
+
+2002-12-20	- Added Data::Stag::Writer and tidied up writer classes
+		- added stag-splitter.pl script
+		- fixed Makefile.PL
+
+Version 0.03
+============
+
+2003-04-29	- Fixed bug with empty XML tags being treated as nulls
+                - Fixed bug with XML parsing/export where zero-valued
+                  pcdata was treated as empty string
+                  (new test emptytag.t added for these)
+                - Modified behaviour of BaseHandler - now the whole
+                  stag object is passed. This can be manipulated by
+                  the intercepting code directly
+                - Added makehandler() to Data::Stag
+
+                - BIG CHANGE: behaviour of 'get' now different;
+                  if the value 'got' is a terminal, will return
+                  the node data; if it is non-terminal, it will
+                  return the node itself (like getnode()).
+                  there is a new method 'getdata' for explicitly
+                  getting the data value in all cases
+
+                - added ChainHandler
+		- added various stag-* scripts
+
+Version 0.04
+============
+
+2004-01-28      - Mucho new documentation on handlers/parsers
+                - errorhandlers added
+
+2003-12-04	- Fixed empty tag bug with free (was exported as <></>)
+		- Fixed qmatch documentation
+		- Added HashDB
+		- methods ->sxpr() ->itext() now return strings rather
+		  than printing to stdout be default
+		  (you can still pass in a filename)
+
+Version 0.05
+============
+
+2004-02-04      - Incremented version (v4 CPAN release messed up)    
+
+Version 0.06
+============
+
+2004-07-15      - Changed how attributes and mixed content is dealt with
+                  Conforms to SXML
+                  Attributes placed under '@' node
+                  PCDATA placed under '.' when attributes or mixed content
+
+                - stag-flatten.pl now works
+Version 0.07
+============
+
+2004-10-29      - Added DTDWriter
+                - Efficiency improvements
+
+Version 0.08
+============
+
+2004-12-20      - Removed dependency on PerlSAX, now optional
+
+Version 0.09
+============
+
+2005-01-30      - new format: 'indent'
+                  Added IndentParser and IndentWriter
+
+2005-02-10      - setting @ will always place @ node at start of subnode list
+
+Version 0.10
+============
+
+2005-10-22      - fixed typo in XSLTHandler - applied patch from
+                  https://rt.cpan.org/Ticket/Display.html?id=15154
+
+2005-11-01      - changed xslt method behaviour, returns string
+
+2007-07-11      - added maptree
+
+Version 0.11
+============
+
+2007-10-11      - modified maptree; return arrays
+
+2008-04-28      - removed gif from distribution
+
+2008-06-03      - removed warnings from ITextWriter (thanks Heikki!)
+
+Version 0.12
+============
+
+2009-12-14	- miration to github
+
+Version 0.13
+============
+
+2013-08-08      - Added JSONWriter

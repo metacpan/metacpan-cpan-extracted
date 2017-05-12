@@ -1,0 +1,12 @@
+1.05  Wed, 15 Dec 2010 20:25:23 +0100
+  * Install to the right part of @INC on old perls.
+
+1.04  Sat, 11 Dec 2010 15:27:23 +0100
+  * Depend on SelfLoader 1.0903, which is the first version that ensures text
+    after __END__ survives, which we need for our tests to pass. This
+    effectively makes us 5.8-only, as recent enough versions of SelfLoader
+    aren't available for 5.6.
+
+1.03  Thu, 09 Dec 2010 21:13:12 +0100
+  * First upload to cpan. Identical with version 1.03 in the perl core. Upstream
+    for this module is still blead perl.

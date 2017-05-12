@@ -1,0 +1,52 @@
+=head1 NAME
+
+Log Handler Example
+
+=head1 Creating a PerlLogHandler
+
+Every request phase can be controlled using mod_perl.  Here's an
+example of a C<PerlLogHandler>.  The C<PerlLogHandler> is one of the
+last phases of the request cycle.
+
+This example sends mail when a request is made to the I</private> section
+of your web space.  A more common use of a C<PerlLogHandler> might be
+to track hits on a specific set of URLs, or to write logging data to a
+relational database.
+
+  file:My/Notify.pm
+  ------------------------
+  package My::Notify;
+  use strict;
+  use Apache::Constants qw(:common);
+
+  use Mail::Send;
+
+  sub handler {
+      my $r = shift;
+
+      my $email = $r->server->server_admin || return DECLINED;
+
+      my $mail = Mail::Send->new(
+          To      => $email,
+          Subject => "mod_perl Notification",
+      );
+      my $file = $r->filename;
+      my $fh = $mail->open;
+      $fh->print("File '$file' was accessed");
+      $fh->close;
+
+      return DECLINED; # let apache write to the lot
+  }
+  1; # modules must return true
+
+The I<httpd.conf> setup:
+
+  <Location /private>
+      SetHandler perl-script
+      PerlLogHandler My::Notify
+  </Location>
+
+=for html
+<a class="more" href="../index.html#logging">&#171&nbsp;back</a>
+
+

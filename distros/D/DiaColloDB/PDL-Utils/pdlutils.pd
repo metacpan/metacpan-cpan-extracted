@@ -1,0 +1,1043 @@
+##-*- Mode: CPerl -*-
+
+##======================================================================
+## Header Administrivia
+##======================================================================
+use PDL::VectorValued::Dev;
+use PDL::CCS::Config;
+use PDL;
+use Config;
+use strict;
+
+our $VERSION = '0.12.004';
+pp_setversion($VERSION);
+
+#$::PP_VERBOSE=1; ##-- PDL::PP debugging
+
+my %ccsConfig = %PDL::CCS::Config::ccsConfig;
+
+my @INT_TYPES     = map {PDL->can($_) ? PDL->can($_)->() : qw()} qw(ushort long indx); #longlong
+my @INT_TYPE_CHRS = map {$_->ppsym} @INT_TYPES;
+my $INT_TYPE_CHRS = join('',@INT_TYPE_CHRS);
+
+my @VAL_TYPES     = map {PDL->can($_) ? PDL->can($_)->() : qw()} qw(float double);
+my @VAL_TYPE_CHRS = map {$_->ppsym} @VAL_TYPES;
+my $VAL_TYPE_CHRS = join('',@VAL_TYPE_CHRS);
+
+my $CDEBUG = 0;
+my $PPDEBUG = $CDEBUG;
+pp_addhdr(($CDEBUG ? '' : "/*")."#define DIACOLLO_DEBUG 1".($CDEBUG ? '': "*/")."\n");
+
+##------------------------------------------------------
+## pm additions
+pp_addpm({At=>'Top'},<<'EOPM');
+
+use strict;
+
+=pod
+
+=head1 NAME
+
+DiaColloDB::PDL::Utils - low-level PDL utilities for DiaColloDB
+
+=head1 SYNOPSIS
+
+ use PDL;
+ use DiaColloDB::PDL::Utils;
+
+ ##---------------------------------------------------------------------
+ ## ... stuff happens
+
+=cut
+
+EOPM
+## /pm additions
+##------------------------------------------------------
+
+##------------------------------------------------------
+## Exports: None
+#pp_export_nothing();
+
+##------------------------------------------------------
+## Includes / defines
+pp_addhdr("\n$ccsConfig{INDX_TYPEDEF}\n");
+pp_addhdr(<<'EOH');
+
+#include <stdio.h>  /*-- for debugging and IO --*/
+#include <string.h> /*-- for memcpy() --*/
+#include <stdlib.h> /*-- for qsort(), realloc() --*/
+
+#ifdef DIACOLLO_DEBUG
+# define DCDEBUG(x) x
+#else
+# define DCDEBUG(x)
+#endif
+
+EOH
+
+
+##======================================================================
+## C Utilities
+##======================================================================
+# (none)
+
+##======================================================================
+## local subs: utils
+
+## undef = vmsg(@msg)
+##  + prints deubbing message if $PPDEBUG is set
+sub vmsg {
+  return if (!$PPDEBUG);
+  print STDERR "$0 \[PPDEBUG]: ", @_, "\n";
+}
+
+## %typeinfo = typeinfo($pdl_type_or_name)
+sub typeinfo {
+  my $type = shift;
+  my $thash = (ref($type)
+	       ? $PDL::Types::typehash{ $type->symbol }
+	       : (grep {$_->{ioname} eq $type} values %PDL::Types::typehash)[0]);
+  die("$0: couldn't find type hash for '$type'") if (!$thash);
+  #my $name = $hash->{ioname};
+  #my $ctype = $vhash->{ctype};
+  #my $stype = $vhash->{ppforcetype};
+  return $thash;
+}
+
+## $str = define_local(%defs)
+sub define_local {
+  my %defs = @_;
+  return "\n".join('', map {defined($defs{$_}) ? "#define $_ $defs{$_}\n" : "#undef $_\n"} sort keys %defs)."\n";
+}
+## $str = undef_local(%defs)
+sub undef_local {
+  my %defs = @_;
+  return "\n".join('', map {s/\(.*$//; "#undef $_\n"} sort keys %defs)."\n";
+}
+
+
+##======================================================================
+## PDL::PP Wrappers
+##======================================================================
+
+##--------------------------------------------------------------
+## tupleIds : binary search with on-the-fly indexing: TODO
+if (0) {
+pp_def('diacollo_tupleids',
+       Pars => join("\n    ",
+		    '',
+		    "items(A,N);",    ##-- item-tuples (A:#/attributes, N:#/items)
+		    "isort(N,A);",    ##-- sort-indices for items() along dimension N for attribute A
+		    "apos();",        ##-- selected attribute (A) index
+		    "avals(NV);",     ##-- target values for attribute (A)
+		    "[o] ivals(NV);", ##-- all item-indices $ii:N with items($apos,$ii) \in $avals(), -1 for none
+		    "[o] nivals();",  ##-- number of returned ivals() -- HARD: we don't know this in advance!
+		   ),
+      );
+}
+
+##--------------------------------------------------------------
+## tym creation
+
+##------------------------------------------------------
+## tym construction: record sorting
+sub tym_qsort_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       #DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	      );
+
+  my $code = define_local(%defs).qq{
+
+static inline
+int diacollo_compare_${itype}(const void *a, const void *b)
+{
+  const DIACOLLO_ITYPE *aval = (const DIACOLLO_ITYPE *)a;
+  const DIACOLLO_ITYPE *bval = (const DIACOLLO_ITYPE *)b;
+  return (*aval > *bval) - (*aval < *bval);
+}
+
+static inline
+void diacollo_qsort2_${itype}(DIACOLLO_ITYPE *vals, size_t count) {
+  qsort(vals, count, 2*sizeof(DIACOLLO_ITYPE), diacollo_compare_${itype});
+}
+
+}.undef_local(%defs);
+
+  pp_addhdr($code);
+}
+foreach my $itype (@INT_TYPES) {
+  tym_qsort_def($itype);
+}
+
+##------------------------------------------------------
+## tym_create_${ITYPE}
+##  + creates tym matrix file(s)
+sub tym_create_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	       DIACOLLO_QSORT2 => "diacollo_qsort2_${itype}",
+	       DIACOLLO_YBUFLEN => "1024",
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## tym_create : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE ti,di,ci,cy, nzi0,nzi1, nout=0, ty_prev,ty,tnzi;
+  $GENERIC() tyf;
+  size_t tballoc = DIACOLLO_YBUFLEN, tbn,tbi;
+  DIACOLLO_ITYPE *tbuf = (DIACOLLO_ITYPE*)malloc(2*tballoc*sizeof(DIACOLLO_ITYPE));
+  FILE *ixfh, *nzfh;
+
+  DCDEBUG(fprintf(stderr,"tym_create_%s()~%s: Nnz=%d, ND=%d, NC=%d, ixfile=\"%s\", nzfile=\"%s\"\n", DIACOLLO_INAME, "$GENERIC()", $SIZE(Nnz), $SIZE(ND), $SIZE(NC), $COMP(ixfile), $COMP(nzfile)); fflush(stderr);)
+
+  //-- open output file(s)
+  if (!(ixfh=fopen($COMP(ixfile), "wb")))
+    croak("tym_create_%s(): open failed for ix-file '%s'", DIACOLLO_INAME, $COMP(ixfile));
+  if (!(nzfh=fopen($COMP(nzfile), "wb")))
+    croak("tym_create_%s(): open failed for nz-file '%s'", DIACOLLO_INAME, $COMP(nzfile));
+
+  //-- ye olde loope
+  for (nzi0=0; nzi0 < $SIZE(Nnz); nzi0=nzi1) {
+    ti = $tdmix(Ndims=>0,Nnz=>nzi0);
+
+    tbn = 0;
+    for (nzi1=nzi0; nzi1 < $SIZE(Nnz) && $tdmix(Ndims=>0,Nnz=>nzi1)==ti; ++nzi1) {
+      di = $tdmix(Ndims=>1,Nnz=>nzi1);
+      ci = $d2c(ND=>di);
+      cy = $c2date(NC=>ci);
+
+      //-- maybe re-alloc term-local buffer
+      if (tbn==tballoc) {
+         DCDEBUG(fprintf(stderr, "tym_create_%s [ti=%d,nzi=%d,tbn=%d]: realloc %zd -> %zd\n", DIACOLLO_INAME, ti, nzi, tbn, tballoc, 2*tballoc); fflush(stderr);)
+         tballoc *= 2;
+         tbuf     = (DIACOLLO_ITYPE*)realloc(tbuf, 2*tballoc*sizeof(DIACOLLO_ITYPE));
+      }
+
+      //-- append to term-local buffer
+      tbuf[2*tbn]   = cy;
+      tbuf[2*tbn+1] = nzi1;
+      ++tbn;
+    }
+
+    //-- sort term-buffer & sum over each year
+    DIACOLLO_QSORT2(tbuf, tbn);
+    ty_prev = (DIACOLLO_ITYPE)-1;
+    tyf     = 0;
+    for (tbi=0; tbi < tbn; ++tbi) {
+      ty   = tbuf[2*tbi];
+      tnzi = tbuf[2*tbi+1];
+      if (ty != ty_prev) {
+         if (tyf != 0) {
+           //-- dump current record
+           fwrite(&ti,      1, sizeof(DIACOLLO_ITYPE), ixfh);
+	   fwrite(&ty_prev, 1, sizeof(DIACOLLO_ITYPE), ixfh);
+	   fwrite(&tyf,     1, sizeof($GENERIC()),     nzfh);
+	   ++nout;
+         }
+         ty_prev = ty;
+         tyf     = 0;
+      }
+      tyf += $tdmnz(Nnz1=>tnzi);
+    }
+    if (tyf != 0) {
+      //-- dump final record for term
+      fwrite(&ti,      1, sizeof(DIACOLLO_ITYPE), ixfh);
+      fwrite(&ty_prev, 1, sizeof(DIACOLLO_ITYPE), ixfh);
+      fwrite(&tyf,     1, sizeof($GENERIC()),     nzfh);
+      ++nout;
+    }
+  }
+
+  //-- dump final "missing" value to nzfh
+  tyf = 0;
+  fwrite(&tyf,     1, sizeof($GENERIC()),     nzfh);
+
+  //-- save output nnz
+  $nnzOut() = nout;
+
+  //-- close output file(s)
+  if (fclose(ixfh)!=0)
+    croak("tym_create_%s(): close failed for ix-file '%s'", DIACOLLO_INAME, $COMP(ixfile));
+  if (fclose(nzfh)!=0)
+    croak("tym_create_%s(): open failed for nz-file '%s'", DIACOLLO_INAME, $COMP(nzfile));
+
+  //-- cleanup
+  if (tbuf) free(tbuf);
+
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## tym_create : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_tym_create_${itype}");
+  vvpp_def("diacollo_tym_create_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"$INDX tdmix(Ndims,Nnz);",	##-- tdm: logical (T,D) with ptr(1) : $vs->{tdm}->_whichND
+			"      tdmnz(Nnz1);",           ##-- tdm: nonzeroes+missing : $vs->{tdm}->_vals
+			##
+			"$INDX  d2c(ND);",             	##-- d2c(): doc->cat map : $vs->{d2c}
+			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
+			##
+			"$INDX \[o] nnzOut();",		##-- number of output nonzeroes
+			''
+		       ),
+	   OtherPars => join("\n    ",
+			     'char *ixfile;',		##-- output filename
+			     'char *nzfile;',		##-- output filename
+			     '',
+			    ),
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for term-year matrix construction from term-document matrix,
+used by DiaColloDB::Relation::TDF::create().
+},
+	);
+}
+if (1) {
+  foreach my $itype (@INT_TYPES) {
+    tym_create_def($itype);
+  }
+}
+
+
+
+##--------------------------------------------------------------
+## cof_${TC}_${ITYPE} : coo+ptr(1)-matrix vs. ptr-vector, output=HASH-ref
+##  + ${TC} is one of 't':terms, 'c':cats
+##  + ${ITYPE} is a PDL type for integer indices
+##  + supports groupby independent TC-attributes only (no term+doc dependence)
+##  + from lda/ftdm-kbest.perl inline test _cof3d_pzh()
+
+## undef = cof_x_def($tcinfix, $itype)
+##  + $tcinfix is one of 't':terms, 'c':cats
+##  + $itype is a PDL integer-type or string name
+sub cof_x_def {
+  my ($tcinfix,$itype) = @_;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_TCINFIX => "\"$tcinfix\"",
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	       (map {(("DIACOLLO_COF_".uc($_)) => ($tcinfix eq $_ ? 1 : undef))} qw(t c)),
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## cof_X : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE qd,qd1,qc,qval, adnzlo,adnzhi,adnzi,anzi, at,ga,gh;
+  PDL_Ushort sliceby,qdate;
+  I32 keylen1 = sizeof(DIACOLLO_ITYPE);
+  I32 keylen  = ($SIZE(NG)+1)*sizeof(DIACOLLO_ITYPE);
+  DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
+  HV *f1hv  = INT2PTR(HV*, $COMP(f1Hash));
+  HV *f12hv = INT2PTR(HV*, $COMP(f12Hash));
+  SV **svpp;
+  UV fval0,fval;
+#ifdef DIACOLLO_COF_T
+  //-- temporary hash for doc-local group-counts
+  HV   *dochv = newHV();
+  char *gkey;
+  I32   gkeylen;
+  SV   *gvalsv;
+#endif /* DIACOLLO_COF_T */
+
+  DCDEBUG(fprintf(stderr,"cof_%s_%s()~%s: NnzA=%d, NnzQ=%d, NA=%d, ND=%d, NC=%d, NG=%d, NHaving=%d, slice=%d, mindate=%d, maxdate=%d, keylen=%d\n", DIACOLLO_TCINFIX, DIACOLLO_INAME, "$GENERIC()", $SIZE(NnzA), $SIZE(NnzQ), $SIZE(NA), $SIZE(ND), $SIZE(NC), $SIZE(NG), $SIZE(NHaving), $dateslice(), $mindate(), $maxdate(), keylen); fflush(stderr);)
+
+  hv_clear(f12hv);
+
+  threadloop %{
+    sliceby           = $dateslice();
+    keybuf[$SIZE(NG)] = sliceby;
+
+    /*-- guts: compute co-frequencies cofreq(w,v|d) = min{f(w,d),f(v,d)} in f12hv --*/
+    //DCDEBUG(fprintf(stderr,"cof_x(): loop\n"); fflush(stderr);)
+    loop (NnzQ) %{
+      qval = $qvals();
+      qd   = $qdocs();
+      qd1  = qd+1;
+
+      //-- setup output date component, checking target range
+      qc    = $d2c(ND=>qd);
+      qdate = $c2date(NC=>qc);
+      if (qdate < $mindate() || qdate > $maxdate()) continue;
+      if (sliceby != 0) {
+        keybuf[$SIZE(NG)] = sliceby * (qdate/sliceby);
+      }
+
+      //-- track f1 frequency (by slice)
+      svpp = hv_fetch(f1hv, (char*)(keybuf+$SIZE(NG)), keylen1, TRUE);
+      if (SvOK(*svpp)) {
+        fval0 = SvUV(*svpp);
+	sv_setuv(*svpp, fval0+(UV)qval);
+      } else {
+        sv_setuv(*svpp, (UV)qval);
+      }
+
+#ifdef DIACOLLO_COF_C
+      //-- check HAVING restrictions (groupby-cats mode)
+      if ($SIZE(NHaving) > 0) {
+        $LB('qc', '$ghaving(NHaving=>$_)', 0,'$SIZE(NHaving)', 'gh');
+        if (gh >= $SIZE(NHaving) || $ghaving(NHaving=>gh) != qc) continue;
+      }
+
+      //-- setup output output hash key (groupby-cats mode)
+      loop (NG) %{
+        ga = $groupby();
+	keybuf[NG] = $xattrs(NA=>ga,NX=>qc);
+      %}
+
+      //-- setup item2 count (groupby-cats mode)
+      svpp = hv_fetch(f12hv, (char*)keybuf, keylen, TRUE);
+      if (SvOK(*svpp)) {
+        fval = SvUV(*svpp);
+      } else {
+        fval = 0;
+      }
+#endif
+
+      //-- collect co-occurence frequencies by document
+      adnzlo = $aptr1(NDplus1=>qd);
+      adnzhi = $aptr1(NDplus1=>qd1);
+      for (adnzi=adnzlo; adnzi < adnzhi; ++adnzi) {
+        anzi   = $apix1(NnzA=>adnzi);
+ 	at     = $awhich(Ndims=>0,NnzA=>anzi);
+
+#ifdef DIACOLLO_COF_T
+        //-- check HAVING restrictions (groupby-terms mode)
+        if ($SIZE(NHaving) > 0) {
+	  $LB('at', '$ghaving(NHaving=>$_)', 0,'$SIZE(NHaving)', 'gh');
+          if (gh >= $SIZE(NHaving) || $ghaving(NHaving=>gh) != at) continue;
+        }
+
+	//-- setup output output hash key (groupby-terms mode)
+	loop (NG) %{
+	  ga = $groupby();
+	  keybuf[NG] = $xattrs(NA=>ga,NX=>at);
+	%}
+
+        //-- update doc-local f12 value in temporary dochv (avoid over-counting joint frequencies for nontrivial groupby aggregation)
+        fval = (UV)($avals(NnzA1=>anzi));
+        svpp = hv_fetch(dochv, (char*)keybuf, keylen, TRUE);
+        if (SvOK(*svpp)) {
+	  fval += SvUV(*svpp);
+        }
+        sv_setuv(*svpp, fval);
+
+        //DCDEBUG(fprintf(stderr, "cof_x(): iter[qd=%d,anzi=%d,at=%d]: qval=%d, aval=%d, dochv.f2=%u\n", qd, anzi, at, qval, $avals(NnzA1=>anzi), SvUV(*svpp)); fflush(stderr));
+#endif /* DIACOLLO_COF_T */
+
+#ifdef DIACOLLO_COF_C
+        fval += (UV)(qval < $avals(NnzA1=>anzi) ? qval : $avals(NnzA1=>anzi));
+#endif  /* DIACOLLO_COF_C */
+      }
+
+#ifdef DIACOLLO_COF_T
+      //-- propagate doc-local f12 values to f12Hash
+      hv_iterinit(dochv);
+      while ( (gvalsv = hv_iternextsv(dochv, &gkey, &gkeylen)) ) {
+        fval = SvUV(gvalsv);
+        if (fval > qval) fval = qval;
+
+        svpp = hv_fetch(f12hv, gkey, gkeylen, TRUE);
+        if (SvOK(*svpp))
+          fval += SvUV(*svpp);
+        sv_setuv(*svpp, fval);
+      }
+      hv_clear(dochv);
+#endif /* DIACOLLO_COF_T */
+
+#ifdef DIACOLLO_COF_C
+      sv_setuv(*svpp, fval);
+#endif   /* DIACOLLO_COF_C */
+
+    %}
+  %}
+
+#ifdef DIACOLLO_COF_T
+  SvREFCNT_dec(dochv);
+#endif /* DIACOLLO_COF_T */
+
+  if (keybuf) free(keybuf);
+
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## cof_x : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_cof_${tcinfix}_${itype}");
+  vvpp_def("diacollo_cof_${tcinfix}_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"$INDX awhich(Ndims,NnzA);",	##-- a() ~ tdm: logical (T,D) with ptr(1) : $vs->{tdm}->_whichND
+			"$INDX aptr1(NDplus1);",		##-- a(): ptr(1) : $vs->{ptr1}
+			"$INDX apix1(NnzA);",		##-- a(): sort-indices over NNzA for ptr(1) : $vs->{pix1}
+			"      avals(NnzA1);",		##-- a(): nonzeroes : $vs->{tdm}->_vals
+			##
+			"$INDX xattrs(NA,NX);",		##-- attrs() ~ (term|cat) attributes
+			"$INDX d2c(ND);",               	##-- d2c(): doc->cat map : $vs->{d2c}
+			##
+			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
+			"ushort dateslice();",          ##-- slice value
+			"ushort mindate();",            ##-- minimum date (inlusive)
+			"ushort maxdate();",		##-- maximum date (inclusive)
+			##
+			"$INDX qdocs(NnzQ);",		##-- query vector: nz doc-indices (item1)
+			"      qvals(NnzQ);",		##-- query vector: nz doc-frequencies (item1)
+			##
+			"$INDX groupby(NG);",		##-- attribute indices over NA for groupby()
+			"$INDX ghaving(NHaving);",	##-- admissible item2 (term|cat)-ids, or empty for all
+			''
+		       ),
+	   OtherPars => join("\n    ",
+			   'IV f1Hash;',		##-- output hash, ( pack($pack_ix, $slice) => $f1, ... )
+			   'IV f12Hash;',		##-- output hash, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+			    ),
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for term-document matrix co-frequency acquisition.
+Collects co-frequency counts in the HASH-ref $f12Hash and indpendent item1 counts by slice in $f1Hash,
+suitable for use with groupby-aggregation over only TERM (cof_t_ITYPE) or CATEGORY (cof_c_ITYPE) attributes.
+ITYPE is the index-type used by the underlying tdm model, which see for details.
+},
+	);
+}
+foreach my $tcinfix (qw(t c)) {
+  foreach my $itype (@INT_TYPES) {
+    cof_x_def($tcinfix,$itype);
+  }
+}
+
+##--------------------------------------------------------------
+## cof_tc_${ITYPE} : coo+ptr(1)-matrix vs. ptr-vector, output=HASH-ref
+##  + ${ITYPE} is a piddle type for integer indices
+##  + supports both term- and doc-attributes in groupby groups
+
+## undef = cof_tc_def($itype)
+sub cof_tc_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## cof_tc : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE qd,qd1,qc,qval, adnzlo,adnzhi,adnzi,anzi, at,ga,gh;
+  PDL_Ushort sliceby,qdate;
+  I32 keylen1 = sizeof(DIACOLLO_ITYPE);
+  I32 keylen  = ($SIZE(NG)+1)*sizeof(DIACOLLO_ITYPE);
+  DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
+  HV *f1hv  = INT2PTR(HV*, $COMP(f1Hash));
+  HV *f12hv = INT2PTR(HV*, $COMP(f12Hash));
+  SV **svpp;
+  UV fval0,fval;
+
+  DCDEBUG(fprintf(stderr,"cof_tc_%s()~%s: NnzA=%d, NnzQ=%d, NA=%d, NM=%d, ND=%d, NC=%d, NG=%d, NHavingT=%d, NHavingC=%d, slice=%d, mindate=%d, maxdate=%d, keylen=%d\n", DIACOLLO_INAME, "$GENERIC()", $SIZE(NnzA), $SIZE(NnzQ), $SIZE(NA), $SIZE(NM), $SIZE(ND), $SIZE(NC), $SIZE(NG), $SIZE(NHavingT), $SIZE(NHavingC), $dateslice(), $mindate(), $maxdate(), keylen); fflush(stderr);)
+
+  hv_clear(f12hv);
+
+  threadloop %{
+    sliceby           = $dateslice();
+    keybuf[$SIZE(NG)] = sliceby;
+
+    /*-- guts: compute co-frequencies cofreq(w,v|d) = min{f(w,d),f(v,d)} in f12hv --*/
+    //DCDEBUG(fprintf(stderr,"cof_tc(): loop\n"); fflush(stderr);)
+    loop (NnzQ) %{
+      qval = $qvals();
+      qd   = $qdocs();
+      qd1  = qd+1;
+
+      //-- setup output date component, checking target range
+      qc    = $d2c(ND=>qd);
+      qdate = $c2date(NC=>qc);
+      if (qdate < $mindate() || qdate > $maxdate()) continue;
+      if (sliceby != 0) {
+        keybuf[$SIZE(NG)] = sliceby * (qdate/sliceby);
+      }
+
+      //-- track f1 frequency (by slice)
+      svpp = hv_fetch(f1hv, (char*)(keybuf+$SIZE(NG)), keylen1, TRUE);
+      if (SvOK(*svpp)) {
+        fval0 = SvUV(*svpp);
+	sv_setuv(*svpp, fval0+(UV)qval);
+      } else {
+        sv_setuv(*svpp, (UV)qval);
+      }
+
+      //-- check HAVING restrictions (groupby-cats mode)
+      if ($SIZE(NHavingC) > 0) {
+        $LB('qc', '$ghavingc(NHavingC=>$_)', 0,'$SIZE(NHavingC)', 'gh');
+        if (gh >= $SIZE(NHavingC) || $ghavingc(NHavingC=>gh) != qc) continue;
+      }
+
+      //-- collect co-occurence frequencies by document
+      adnzlo = $aptr1(NDplus1=>qd);
+      adnzhi = $aptr1(NDplus1=>qd1);
+      for (adnzi=adnzlo; adnzi < adnzhi; ++adnzi) {
+        anzi   = $apix1(NnzA=>adnzi);
+ 	at     = $awhich(Ndims=>0,NnzA=>anzi);
+
+        //-- check HAVING restrictions (groupby-terms mode)
+        if ($SIZE(NHavingT) > 0) {
+	  $LB('at', '$ghavingt(NHavingT=>$_)', 0,'$SIZE(NHavingT)', 'gh');
+          if (gh >= $SIZE(NHavingT) || $ghavingt(NHavingT=>gh) != at) continue;
+        }
+
+	//-- setup output output hash key (groupby-(doc+terms) mode)
+	loop (NG) %{
+	  ga = $groupby();
+	  keybuf[NG] = $groupas()==0 ? $tattrs(NA=>ga,NT=>at) : $mattrs(NM=>ga,NC=>qc);
+	%}
+
+        //-- set or update f12 hash value
+        fval = (UV)(qval < $avals(NnzA1=>anzi) ? qval : $avals(NnzA1=>anzi));
+	svpp = hv_fetch(f12hv, (char*)keybuf, keylen, TRUE);
+        if (SvOK(*svpp)) {
+	  fval0 = SvUV(*svpp);
+	  sv_setuv(*svpp, fval0+fval);
+        } else {
+          sv_setuv(*svpp, fval);
+        }
+      }
+    %}
+  %}
+  if (keybuf) free(keybuf);
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## cof_tc : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_cof_tc_${itype}");
+  vvpp_def("diacollo_cof_tc_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"$INDX awhich(Ndims,NnzA);",	##-- a() ~ tdm: logical (T,D) with ptr(1) : $vs->{tdm}->_whichND
+			"$INDX aptr1(NDplus1);",	##-- a(): ptr(1) : $vs->{ptr1}
+			"$INDX apix1(NnzA);",		##-- a(): sort-indices over NNzA for ptr(1) : $vs->{pix1}
+			"      avals(NnzA1);",		##-- a(): nonzeroes : $vs->{tdm}->_vals
+			##
+			"$INDX tattrs(NA,NT);",		##-- tattrs() ~ term attributes
+			"$INDX mattrs(NM,NC);",		##-- mattrs() ~ meta (cat-)attributes
+			"$INDX d2c(ND);",		##-- d2c(): doc->cat map : $vs->{d2c}
+			##
+			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
+			"ushort dateslice();",          ##-- slice value
+			"ushort mindate();",            ##-- minimum date (inlusive)
+			"ushort maxdate();",		##-- maximum date (inclusive)
+			##
+			"$INDX qdocs(NnzQ);",		##-- query vector: nz doc-indices (item1)
+			"      qvals(NnzQ);",		##-- query vector: nz doc-frequencies (item1)
+			##
+			"byte  groupas(NG);",           ##-- group-as 0:term, 1:meta
+			"$INDX groupby(NG);",		##-- attribute indices over NA or NM for groupby()
+			##
+			"$INDX ghavingt(NHavingT);",	##-- admissible item2 term-ids, or empty for all
+			"$INDX ghavingc(NHavingC);",	##-- admissible item2 cat-ids, or empty for all
+		      ''
+		       ),
+	   OtherPars => join("\n    ",
+			     'IV f1Hash;',		##-- output hash, ( pack($pack_ix, $slice) => $f1, ... )
+			     'IV f12Hash;',		##-- output hash, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+			    ),
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for term-document matrix co-frequency acquisition.
+Collects co-frequency counts in the HASH-ref $f12Hash and indpendent item1 counts by slice in $f1Hash,
+suitable for use with groupby-aggregation over both TERM and CATEGORY attributes.
+},
+	);
+}
+foreach my $itype (@INT_TYPES) {
+  cof_tc_def($itype);
+}
+
+
+##--------------------------------------------------------------
+## tym_gf_t_${ITYPE} : item2 freqs, tym=coo, output=HASH-ref (groupby terms only)
+##  + ${ITYPE} is a piddle type for integer indices
+##  + from lda/ftdm-kbest.perl inline test _f2_scan()
+
+sub tym_gf_t_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## tym_gf_t : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE t2,t2nxt, anzi_min=0,anzi_max=$SIZE(NnzA),anzi, ga;
+  PDL_Ushort sliceby,adate;
+  I32 keylen = ($SIZE(NG)+1)*sizeof(DIACOLLO_ITYPE);
+  DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
+  HV *f12hv = $COMP(f12Hash) ? INT2PTR(HV*, $COMP(f12Hash)) : NULL;
+  HV *f2hv  = INT2PTR(HV*, $COMP(f2Hash));
+  SV **svpp;
+  UV f2val0, f2val;
+
+  DCDEBUG(fprintf(stderr,"tym_gf_t_%s()~%s: NnzA=%d, NT2=%d, NA=%d, NG=%d, slice=%d, mindate=%d, maxdate=%d, keylen=%d, f12hv=%p, f2hv=%p\n", DIACOLLO_INAME, "$GENERIC()", $SIZE(NnzA), $SIZE(NT2), $SIZE(NA), $SIZE(NG), $dateslice(), $mindate(), $maxdate(), keylen, f12hv, f2hv); fflush(stderr);)
+
+  hv_clear(f2hv);
+
+  sliceby           = $dateslice();
+  keybuf[$SIZE(NG)] = sliceby;
+
+  /*-- guts: compute independent item2 frequencies in f2hv --*/
+  //DCDEBUG(fprintf(stderr,"tym_gf_%s(): loop(NT2)\n", DIACOLLO_VTYPE); fflush(stderr);)
+  loop (NT2) %{
+    t2    = $terms2();
+    t2nxt = t2+1;
+
+    //-- setup output hash key
+    loop (NG) %{
+      ga = $groupby();
+      keybuf[NG] = $tattrs(NA=>ga,NT=>t2);
+    %}
+
+    $LB('t2', '$awhich(Ndims=>0,NnzA=>$_)', 'anzi_min','anzi_max', 'anzi');
+    for ( ; anzi < $SIZE(NnzA) && $awhich(Ndims=>0,NnzA=>anzi) == t2; ++anzi) {
+
+      //-- setup output date component, checking date-range
+      adate = $awhich(Ndims=>1,NnzA=>anzi);
+      if (adate < $mindate() || adate > $maxdate()) continue;
+      if (sliceby != 0) {
+        keybuf[$SIZE(NG)] = sliceby * (adate/sliceby);
+      }
+
+      //-- ignore possible keys not in f12hv
+      if (f12hv && !hv_exists(f12hv, (char*)keybuf, keylen))
+        continue;
+
+      //-- set or update output hash value
+      f2val = $avals(NnzA1=>anzi);
+      svpp  = hv_fetch(f2hv, (char*)keybuf, keylen, TRUE);
+      if (SvOK(*svpp)) {
+        f2val0 = SvUV(*svpp);
+	sv_setuv(*svpp, f2val0+f2val);
+      }
+      else {
+        sv_setuv(*svpp, f2val);
+      }
+    }
+    anzi_min = anzi;
+  %}
+  if (keybuf) free(keybuf);
+
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## tym_gf_t : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_tym_t_${itype}");
+  vvpp_def("diacollo_tym_gf_t_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"$INDX awhich(Ndims,NnzA);",	##-- a() ~ tym: logical (T,Y) with ptr(0) : $vs->{tym}->_whichND
+			"      avals(NnzA1);",		##-- a(): nonzeroes : $vs->{tym}->_vals
+			##
+			"$INDX tattrs(NA,NT);",		##-- tattrs() ~ term attributes
+			##
+			"ushort dateslice();",		##-- slice value
+			"ushort mindate();",		##-- minimum date (inlusive)
+			"ushort maxdate();",		##-- maximum date (inclusive)
+			##
+			"$INDX terms2(NT2);",		##-- item2 keys: term IDs (sorted)
+			"$INDX groupby(NG);",		##-- attribute indices over NA for groupby()
+			''
+		       ),
+	   OtherPars => 'IV f12Hash; IV f2Hash;',	##-- in,out hashes, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for independent group-frequency acquisition from a sparse term-year matrix.
+Collects independent group-frequency counts in the HASH-ref f2Hash for any group corresponding to a term-id in $terms2()
+whose packed group-key exists in $f12Hash.
+Suitable for use with groupby-aggregation over TERM attributes only.
+},
+	);
+}
+foreach my $itype (@INT_TYPES) {
+  tym_gf_t_def($itype);
+}
+
+##--------------------------------------------------------------
+## gf_c_${ITYPE} : item2 freqs, cf=dense, output=HASH-ref (groupby cats only)
+##  + ${ITYPE} is a piddle type for integer indices
+
+sub gf_c_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## gf_c : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE c2, ga;
+  PDL_Ushort sliceby,cdate;
+  I32 keylen = ($SIZE(NG)+1)*sizeof(DIACOLLO_ITYPE);
+  DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
+  HV *f12hv = $COMP(f12Hash) ? INT2PTR(HV*, $COMP(f12Hash)) : NULL;
+  HV *f2hv  = INT2PTR(HV*, $COMP(f2Hash));
+  SV **svpp;
+  UV f2val0, f2val;
+
+  DCDEBUG(fprintf(stderr,"gf_c_%s()~%s: NC=%d, NC2=%d, NA=%d, NG=%d, slice=%d, keylen=%d, f12hv=%p, f2hv=%p\n", DIACOLLO_INAME, "$GENERIC()", $SIZE(NC), $SIZE(NC2), $SIZE(NA), $SIZE(NG), $dateslice(), keylen, f12hv, f2hv); fflush(stderr);)
+
+  hv_clear(f2hv);
+
+  sliceby           = $dateslice();
+  keybuf[$SIZE(NG)] = sliceby;
+
+  /*-- guts: compute independent item2 frequencies in f2hv --*/
+  //DCDEBUG(fprintf(stderr,"gf_c_%s(): loop(NC2)\n", DIACOLLO_VTYPE); fflush(stderr);)
+  loop (NC2) %{
+    c2 = $cats2();
+
+    //-- setup output hash key
+    loop (NG) %{
+      ga = $groupby();
+      keybuf[NG] = $cattrs(NA=>ga,NC=>c2);
+    %}
+
+    //-- setup output date component
+    cdate = $c2date(NC=>c2);
+    if (sliceby != 0) {
+      keybuf[$SIZE(NG)] = sliceby * (cdate/sliceby);
+    }
+
+    //-- ignore possible keys not in f12hv
+    if (f12hv && !hv_exists(f12hv, (char*)keybuf, keylen))
+      continue;
+
+    //-- set or update output hash value
+    f2val = $cf(NC=>c2);
+    svpp  = hv_fetch(f2hv, (char*)keybuf, keylen, TRUE);
+    if (SvOK(*svpp)) {
+      f2val0 = SvUV(*svpp);
+      sv_setuv(*svpp, f2val0+f2val);
+    } else {
+      sv_setuv(*svpp, f2val);
+    }
+  %}
+  if (keybuf) free(keybuf);
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## gf_c : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_gf_c_${itype}");
+  vvpp_def("diacollo_gf_c_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"cf(NC);",			##-- cf() ~ total cat frequencies
+			##
+			"$INDX cattrs(NA,NC);",		##-- tattrs() ~ cat attributes
+			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
+			"ushort dateslice();",          ##-- slice value
+			##
+			"$INDX cats2(NC2);",		##-- item2 keys: cats-IDs (sorted)
+			"$INDX groupby(NG);",		##-- meta-attribute indices over NA for groupby()
+			''
+		       ),
+	   OtherPars => 'IV f12Hash; IV f2Hash;',	##-- in,out hashes, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for independent group-frequency acquisition from a dense category-frequency vector $cf().
+Collects independent group-frequency counts in the HASH-ref $f2Hash for any group corresponding to a cat-id $cats2()
+whose packed group-key exists in $f12Hash.
+Suitable for use with groupby-aggregation over CATEGORY attributes only.
+},
+	);
+}
+foreach my $itype (@INT_TYPES) {
+  gf_c_def($itype);
+}
+
+##--------------------------------------------------------------
+## gf_tc_${ITYPE} : item2 freqs, tdm=coo, output=HASH-ref (groupby terms+cats), slow O(Nnz) linear tdm-scan
+##  + ${ITYPE} is a piddle type for integer indices
+
+sub gf_tc_def {
+  my $itype = shift;
+  my $iinfo = typeinfo($itype);
+  my %defs  = (
+	       DIACOLLO_INAME => "\"$itype\"",
+	       DIACOLLO_ITYPE => $iinfo->{ctype},
+	      );
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## gf_tc : code
+  my $code = define_local(%defs).q{
+
+  DIACOLLO_ITYPE at,ad,ac, ga;
+  PDL_Ushort sliceby,adate;
+  I32 keylen = ($SIZE(NG)+1)*sizeof(DIACOLLO_ITYPE);
+  DIACOLLO_ITYPE *keybuf = (DIACOLLO_ITYPE*)malloc(keylen);
+  HV *f12hv = $COMP(f12Hash) ? INT2PTR(HV*, $COMP(f12Hash)) : NULL;
+  HV *f2hv  = INT2PTR(HV*, $COMP(f2Hash));
+  SV **svpp;
+  UV f2val0, f2val;
+
+  DCDEBUG(fprintf(stderr,"gf_tc_%s()~%s: NnzA=%d, NA=%d, NM=%d, ND=%d, NC=%d, NG=%d, slice=%d, mindate=%d, maxdate=%d, keylen=%d\n", DIACOLLO_INAME, "$GENERIC()", $SIZE(NnzA), $SIZE(NA), $SIZE(NM), $SIZE(ND), $SIZE(NC), $SIZE(NG), $dateslice(), $mindate(), $maxdate(), keylen); fflush(stderr);)
+
+  hv_clear(f2hv);
+
+  sliceby           = $dateslice();
+  keybuf[$SIZE(NG)] = sliceby;
+
+  /*-- guts: compute independent item2 frequencies in f2hv --*/
+  loop (NnzA) %{
+    at = $awhich(Ndims=>0);
+    ad = $awhich(Ndims=>1);
+    ac = $d2c(ND=>ad);
+    adate = $c2date(NC=>ac);
+
+    //-- check date restrictions
+    if (adate < $mindate() || adate > $maxdate()) continue;
+
+    //-- setup output hash key
+    loop (NG) %{
+      ga = $groupby();
+      keybuf[NG] = $groupas()==0 ? $tattrs(NA=>ga,NT=>at) : $mattrs(NM=>ga,NC=>ac);
+    %}
+    //-- setup output date component
+    if (sliceby != 0) {
+      keybuf[$SIZE(NG)] = sliceby * (adate/sliceby);
+    }
+
+    //-- ignore possible keys not in f12hv
+    if (f12hv && !hv_exists(f12hv, (char*)keybuf, keylen))
+      continue;
+
+    //-- set or update output hash value
+    f2val = $avals(NnzA1=>NnzA);
+    svpp  = hv_fetch(f2hv, (char*)keybuf, keylen, TRUE);
+    if (SvOK(*svpp)) {
+      f2val0 = SvUV(*svpp);
+      sv_setuv(*svpp, f2val0+f2val);
+    } else {
+      sv_setuv(*svpp, f2val);
+    }
+  %}
+  if (keybuf) free(keybuf);
+}.undef_local(%defs);
+
+  ##~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  ## gf_tc : ppdef
+  my $INDX = $iinfo->{ppforcetype};
+  vmsg("defining diacollo_gf_tc_${itype}");
+  vvpp_def("diacollo_gf_tc_${itype}",
+	   Pars => join("\n    ",
+			'',
+			"$INDX awhich(Ndims,NnzA);",	##-- a() ~ tdm: logical (T,D) $vs->{tdm}->_whichND
+			"      avals(NnzA1);",		##-- a(): nonzeroes : $vs->{tdm}->_vals
+			##
+			"$INDX tattrs(NA,NT);",		##-- tattrs() ~ term attributes
+			"$INDX mattrs(NM,NC);",		##-- mattrs() ~ meta (cat-)attributes
+			"$INDX d2c(ND);",               ##-- d2c(): doc->cat map : $vs->{d2c}
+			##
+			"ushort c2date(NC);",           ##-- c2date(): cat->date map : $vs->{c2date}
+			"ushort dateslice();",          ##-- slice value
+			"ushort mindate();",            ##-- minimum date (inlusive)
+			"ushort maxdate();",		##-- maximum date (inclusive)
+			##
+			"byte  groupas(NG);",           ##-- group-as 0:term, 1:meta
+			"$INDX groupby(NG);",		##-- attribute indices over NA or NM for groupby()
+			''
+		       ),
+	   OtherPars => 'IV f12Hash; IV f2Hash;',	##-- in,out hashes, ( pack($pack_ix, $tvals($groupby(),($ti2)), $slice) => $f12, ... )
+	   GenericTypes => \@VAL_TYPE_CHRS,
+	   Code => $code,
+	   Doc => q{
+Guts for independent group-frequency acquisition from a sparse term-document matrix.
+Collects independent group-frequency counts in the HASH-ref $f2Hash for any group whose packed group-key exists in $f12Hash.
+Suitable for use with groupby-aggregation over both TERM and CATEGORY attributes,
+but uses a slow linear O(NnzA) scan over the tdm matrix, so avoid it if you can.
+},
+
+	);
+}
+foreach my $itype (@INT_TYPES) {
+  gf_tc_def($itype);
+}
+
+##======================================================================
+## Footer Administrivia
+##======================================================================
+
+##------------------------------------------------------
+## pm additions: footer
+pp_addpm(<<'EOPM');
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+PDL by Karl Glazebrook, Tuomas J. Lukka, Christian Soeller, and others.
+
+=cut
+
+##----------------------------------------------------------------------
+=pod
+
+=head1 KNOWN BUGS
+
+Probably many.
+
+=cut
+
+
+##---------------------------------------------------------------------
+=pod
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head2 Copyright Policy
+
+Copyright (C) 2016, Bryan Jurish. All rights reserved.
+
+This package is free software, and entirely without warranty.
+You may redistribute it and/or modify it under the same terms
+as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), PDL(3perl)
+
+=cut
+
+EOPM
+
+
+# Always make sure that you finish your PP declarations with
+# pp_done
+pp_done();
+##----------------------------------------------------------------------

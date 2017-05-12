@@ -1,0 +1,78 @@
+{
+   "abstract" : "manage Debian copyright files",
+   "author" : [
+      "Nicholas Bamber <nicholas@periapt.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4001, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Debian-Copyright",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Perl6::Slurp" : 0,
+            "Test::Deep" : 0,
+            "Test::Exception" : 0,
+            "Test::LongString" : 0,
+            "Test::More" : 0,
+            "Test::NoWarnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Unique" : 0,
+            "Class::Accessor" : 0,
+            "Parse::DebControl" : 0,
+            "Tie::IxHash" : 0,
+            "perl" : "v5.10.1"
+         }
+      }
+   },
+   "provides" : {
+      "Debian::Copyright" : {
+         "file" : "lib/Debian/Copyright.pm",
+         "version" : "0.2"
+      },
+      "Debian::Copyright::Stanza" : {
+         "file" : "lib/Debian/Copyright/Stanza.pm",
+         "version" : "0.2"
+      },
+      "Debian::Copyright::Stanza::Files" : {
+         "file" : "lib/Debian/Copyright/Stanza/Files.pm",
+         "version" : "0.2"
+      },
+      "Debian::Copyright::Stanza::Header" : {
+         "file" : "lib/Debian/Copyright/Stanza/Header.pm",
+         "version" : "0.2"
+      },
+      "Debian::Copyright::Stanza::License" : {
+         "file" : "lib/Debian/Copyright/Stanza/License.pm",
+         "version" : "0.2"
+      },
+      "Debian::Copyright::Stanza::OrSeparated" : {
+         "file" : "lib/Debian/Copyright/Stanza/OrSeparated.pm",
+         "version" : "0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "http://github.com/periapt/Debian-Copyright/tree"
+      }
+   },
+   "version" : "0.2"
+}

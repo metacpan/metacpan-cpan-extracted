@@ -1,0 +1,42 @@
+Decl
+
+Depending how you look at it, Decl is either a programming language or a really
+complicated framework for Perl that allows complex data structures to be declared
+instead of being built step-by-step in an initialization phase.
+
+I first started using it in the context of WxPerl, a GUI library for Perl; construction
+of the user interface for a Wx program can be a lengthy process.  My idea was
+simply to write a pseudocode interpreter that could do it for me.  The definition
+of an entire GUI program for temperature conversion (80 lines of Perl in the
+old WxPerl distribution) thus reduces to this:
+
+  dialog (xsize=250, ysize=110) "Wx::Declarative dialog sample"
+    field celsius (size=100, x=20, y=20) "0"
+    button celsius (x=130, y=20) "Celsius" {
+        $^fahrenheit = ($^celsius / 100.0) * 180 + 32; 
+    }
+    field fahrenheit (size=100, x=20, y=50) "32"
+    button fahrenheit (x=130, y=50) "Fahrenheit" {
+        $^celsius = (($^fahrenheit - 32) / 180.0) * 100;
+    }
+
+Decl has significant indentation, with all the problems that entails for large
+nested structure, but the idea is to keep things concise.  There are two ameliorating
+influences: first, there is a mechanism to flatten complex structure to permit saner
+presentation, and second, embedded code (e.g. Perl) is not significantly indented,
+and I expect most of the heavy lifting to happen there anyway.
+
+In addition to declaration of complex structure, Decl also provides a macro system
+that can target any language (my current obsession).  I'm in the process of
+building a Web publishing system on top of the macro engine.
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010-2011 Michael Roberts
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

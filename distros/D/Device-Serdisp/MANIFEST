@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Serdisp.xs
+t/01-Serdisp.t
+lib/Device/Serdisp.pm
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

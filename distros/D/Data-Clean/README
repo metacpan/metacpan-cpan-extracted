@@ -1,0 +1,179 @@
+SYNOPSIS
+
+     use Data::Clean;
+    
+     my $cleanser = Data::Clean->new(
+         # specify how to deal with specific classes
+         'DateTime'     => [call_method => 'epoch'], # replace object with its epoch
+         'Time::Moment' => [call_method => 'epoch'], # replace object with its epoch
+         'Regexp'       => ['stringify'], # replace $obj with "$obj"
+    
+         # specify how to deal with all scalar refs
+         SCALAR         => ['deref_scalar'], # replace \1 with 1
+    
+         # specify how to deal with circular reference
+         -circular      => ['clone'],
+    
+         # specify how to deal with all other kinds of objects
+         -obj           => ['unbless'],
+     );
+    
+     # to get cleansed data
+     my $cleansed_data = $cleanser->clone_and_clean($data);
+    
+     # to replace original data with cleansed one
+     $cleanser->clean_in_place($data);
+
+DESCRIPTION
+
+    This class can be used to process a data structure by replacing some
+    forms of data items with other forms. One of the main uses is to clean
+    "unsafe" data, e.g. clean a data structure so it can be encoded to JSON
+    (see Data::Clean::JSON, which is a thin wrapper over this class).
+
+    As can be seen from the example, you specify a list of transformations
+    to be done, and then this class will generate an appropriate Perl code
+    to do the cleansing. This class is faster than the other ways of
+    processing, e.g. Data::Rmap (see Bencher::Scenarios::DataCleansing for
+    some benchmarks).
+
+METHODS
+
+ new(%opts) => $obj
+
+    Create a new instance.
+
+    Options specify what to do with certain category of data. Option keys
+    are either reference types (like HASH, ARRAY, SCALAR) or class names
+    (like Foo::Bar), or -obj (to match all kinds of objects, a.k.a. blessed
+    references), -circular (to match circular references), -ref (to refer
+    to any kind of references, used to process references not handled by
+    other options). Option values are arrayrefs, the first element of the
+    array is command name, to specify what to do with the reference/class.
+    The rest are command arguments.
+
+    Note that arrayrefs and hashrefs are always walked into, so it's not
+    trapped by -ref.
+
+    Default for %opts: -ref => 'stringify'.
+
+    Option keys that start with ! are special:
+
+      * !recurse_obj (bool)
+
+      Can be set to true to to recurse into objects if they are hash- or
+      array-based. By default objects are not recursed into. Note that if
+      you enable this option, object options (like Foo::Bar or -obj) won't
+      work for hash- and array-based objects because they will be recursed
+      instead.
+
+      * !clone_func (str)
+
+      Set fully qualified name of clone function to use. The default is to
+      use Data::Clone::clone if available, or fallback to Clone::PP::clone.
+
+    Available commands:
+
+      * ['stringify']
+
+      This will stringify a reference like {} to something like
+      HASH(0x135f998).
+
+      * ['replace_with_ref']
+
+      This will replace a reference like {} with HASH.
+
+      * ['replace_with_str', STR]
+
+      This will replace a reference like {} with STR.
+
+      * ['call_method' => STR]
+
+      This will call a method named STR and use its return as the
+      replacement. For example: DateTime->from_epoch(epoch=>1000) when
+      processed with [call_method => 'epoch'] will become 1000.
+
+      * ['call_func', STR]
+
+      This will call a function named STR with value as argument and use
+      its return as the replacement.
+
+      * ['one_or_zero']
+
+      This will perform $val ? 1:0.
+
+      * ['deref_scalar']
+
+      This will replace a scalar reference like \1 with 1.
+
+      * ['unbless']
+
+      This will perform unblessing using
+      Function::Fallback::CoreOrPP::unbless(). Should be done only for
+      objects (-obj).
+
+      * ['code', STR]
+
+      This will replace with STR treated as Perl code.
+
+      * ['clone', INT]
+
+      This command is useful if you have circular references and want to
+      expand/copy them. For example:
+
+       my $def_opts = { opt1 => 'default', opt2 => 0 };
+       my $users    = { alice => $def_opts, bob => $def_opts, charlie => $def_opts };
+
+      $users contains three references to the same data structure. With the
+      default behaviour of -circular => [replace_with_str => 'CIRCULAR']
+      the cleaned data structure will be:
+
+       { alice   => { opt1 => 'default', opt2 => 0 },
+         bob     => 'CIRCULAR',
+         charlie => 'CIRCULAR' }
+
+      But with -circular => ['clone'] option, the data structure will be
+      cleaned to become (the $def_opts is cloned):
+
+       { alice   => { opt1 => 'default', opt2 => 0 },
+         bob     => { opt1 => 'default', opt2 => 0 },
+         charlie => { opt1 => 'default', opt2 => 0 }, }
+
+      The command argument specifies the number of references to clone as a
+      limit (the default is 50), since a cyclical structure can lead to
+      infinite cloning. Above this limit, the circular references will be
+      replaced with a string "CIRCULAR". For example:
+
+       my $a = [1]; push @$a, $a;
+
+      With -circular => ['clone', 2] the data will be cleaned as:
+
+       [1, [1, [1, "CIRCULAR"]]]
+
+      With -circular => ['clone', 3] the data will be cleaned as:
+
+       [1, [1, [1, [1, "CIRCULAR"]]]]
+
+ $obj->clean_in_place($data) => $cleaned
+
+    Clean $data. Modify data in-place.
+
+ $obj->clone_and_clean($data) => $cleaned
+
+    Clean $data. Clone $data first.
+
+ENVIRONMENT
+
+      * LOG_CLEANSER_CODE => BOOL (default: 0)
+
+      Can be enabled if you want to see the generated cleanser code. It is
+      logged at level trace.
+
+      * LINENUM => BOOL (default: 1)
+
+      When logging cleanser code, whether to give line numbers.
+
+SEE ALSO
+
+    Related modules: Data::Rmap, Hash::Sanitize, Data::Walk.
+

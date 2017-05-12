@@ -1,0 +1,46 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'File::Find::Rule' => '0',
+                                      'JSON' => '2',
+                                      'List::Util' => '0',
+                                      'Number::Tolerant' => '0',
+                                      'Scalar::Util' => '0',
+                                      'Test::More' => '0.96',
+                                      'autodie' => '0',
+                                      'overload' => '0',
+                                      'parent' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Find::Rule' => '0',
+                                   'File::Spec' => '0',
+                                   'JSON' => '2',
+                                   'Test::Deep::NoTest' => '0',
+                                   'Test::More' => '0.96',
+                                   'Try::Tiny' => '0',
+                                   'autodie' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

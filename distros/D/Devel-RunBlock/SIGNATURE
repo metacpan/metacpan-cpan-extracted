@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.53.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dad4139a4bdb26a75e67da84ea77f5ce8b7c2af9 Changes
+SHA1 3d03b94592ca44ebdcb9cf1d36da3d9120b946b5 MANIFEST
+SHA1 4fe916ae0313909be7f5f5047569de2cc45b0b43 META.yml
+SHA1 b89917adae3244a8459144977395ddd91092e40a Makefile.PL
+SHA1 57d4705f807884e6361338f298e9850f3b516bc2 README
+SHA1 86aae108d15ee96519fb750c0be3b0f4ca746537 RunBlock.xs
+SHA1 3aca1cdbbdc13088fd636531f0d885560b64cd61 inc/ExtUtils/MY_Metafile.pm
+SHA1 dfcf48508293cf22dc5e44fe5f74eaa4511b48a5 lib/Devel/RunBlock.mlpod
+SHA1 2ae4162411ce7be620ff3f575c240aa501460cfc lib/Devel/RunBlock.pm
+SHA1 3e4a6bc190e4d26f4892fb2ad62da5480da18d81 t/00-load.t
+SHA1 6c2a7c7b83fac31f9ce3b4a7932c350a496c65a5 t/01-runblock.t
+SHA1 397ab0d0571cbfb32f354c7b1cf5a9fc259cae33 t/02-long-wantarray.t
+SHA1 9eeb152f23755dc79096e2c73f7f009cbef02ae9 t/03-long-return.t
+SHA1 099490aa729e7b1d12614d2ec5429ff80fa337da t/boilerplate.t
+SHA1 6da39b48ce64b584e4c3274bff96fc76ff484820 t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iD8DBQFFeCD8ewjCT38k4dkRAgnSAKCEFBOZnYW7fP/iVIoRm3RFVcutSACeOjX5
+Nozc0SX2b6NBJtQljVgUe14=
+=cXIc
+-----END PGP SIGNATURE-----

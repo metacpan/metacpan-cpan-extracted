@@ -1,0 +1,106 @@
+Device::MatrixOrbital::GLK
+==========================
+
+Device::MatrixOrbital::GLK is an object oriented perl module for controlling 
+the GLK serial of LCD screens made by Matrix Orbital.
+
+For more information about GLK series MatrixOrbital displays, please visit:
+http://www.matrixorbital.ca/products/glk_Series/
+
+Please note that I am not an employee and have nothing to do with MatrixOrbital,
+other than being a happy customer.
+
+
+
+INSTALLATION
+
+	I use Module::Build to build and install this module.
+	To install this module type the following:
+	
+		perl Build.PL
+		./Build
+		./Build test
+		
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the debian package:
+
+		libmodule-build-perl
+
+
+
+IMPLEMENTED OPERATIONS
+
+There is only a limit number of operations implemented in this release of the 
+perl module.  Additional operations will be implemented in future releases.
+
+
+  No    0x21   Wipe Filesystem
+  No    0x24   Upload a Font File
+  No    0x26   Poll Key Press
+  No    0x31   Set the Current Font
+  No    0x32   Font Metrics
+  No    0x33   Change the I2C Slave Address
+  Yes   0x36   Read Version Number
+  Yes   0x37   Read Module Type
+  No    0x39   Change the Baud Rate
+  No    0x3A   Turn Flow Control On
+  No    0x3B   Turn Flow Control Off
+  No    0x41   Auto Transmit Key Presses On
+  Yes   0x42   Backlight On
+  No    0x45   Clear Key Buffer
+  Yes   0x46   Backlight Off
+  No    0x47   Set the Cursor Position
+  Yes   0x48   Move Cursor Home
+  No    0x4F   Auto Transmit Key Presses Off
+  Yes   0x50   Set Contrast
+  Yes   0x51   Auto Scroll On
+  Yes   0x52   Auto Scroll Off
+  No    0x55   Set Debounce Time
+  Yes   0x58   Clear Screen
+  No    0x5E   Upload a Bitmap File
+  No    0x60   Auto Repeat Mode Off
+  Yes   0x62   Draw a Bitmap from Memory
+  Yes   0x63   Set Drawing Color
+  No    0x64   Draw a Bitmap Directly
+  Yes   0x65   Continue a Line
+  No    0x67   Initialize a Bar Graph
+  No    0x69   Draw a Bar Graph
+  No    0x6A   Initialize a Strip Chart
+  No    0x6B   Shift a Strip Chart
+  Yes   0x6C   Draw a Line
+  Yes   0x70   Draw Pixel
+  Yes   0x72   Draw a Rectangle
+  Yes   0x78   Draw a Solid Rectangle
+  No    0x79   Set the Cursor Coordinate
+  No    0x7E   Set Auto Repeat Mode
+  Yes   0x91   Set and Save Contrast
+  No    0x93   Set Remember
+  Yes   0x98   Set and Save Backlight Brightness
+  Yes   0x99   Set Backlight Brightness
+  No    0xA4   Set a Non-Standard Baud Rate
+  No    0xAC   Set Box Space Mode
+  No    0xAD   Delete a File
+  No    0xAF   Get Filesystem Space
+  No    0xB2   Download a File
+  No    0xB3   Get Filesystem Directory
+  No    0xB4   Move a File
+  No    0xCA   Data Lock
+
+
+
+AUTHOR
+
+	Nicholas J Humfrey, njh@cpan.org
+
+
+COPYRIGHT AND LICENSE
+
+	Copyright (C) 2007 Nicholas J Humfrey
+
+	This library is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself, either Perl version 5.005 or, at
+	your option, any later version of Perl 5 you may have available.
+

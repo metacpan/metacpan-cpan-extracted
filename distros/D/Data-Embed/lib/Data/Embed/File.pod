@@ -1,0 +1,97 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Embed::File - embed arbitrary data in a file
+
+=head1 DESCRIPTION
+
+Accessor class for representing an embedded file (for reading).
+
+=head1 METHODS
+
+=head2 B<< contents >>
+
+   my $string = $def->contents();
+
+Convenience method to slurp the whole contents of the embedded file in
+one single shot. It always provides the full contents, independently of
+whether data had been read before, although it restores the filehandle
+to the previous position.
+
+=head2 B<< fh >>
+
+   my $fh = $def->fh();
+
+Get a filehandle suitable for accessing the embedded file. It provides
+back a filehandle through L<IO::Slice>, providing the illusion of
+working on a file per-se instead of a slice inside a bigger file.
+
+=head2 B<< is_same_as >>
+
+   $def->is_same_as($other_def);
+
+Test whether the specific Data::Embed::File is the same as some
+C<$other_def>.
+
+=head2 B<< name >>
+
+   my $name = $def->name();
+
+Get the name associated to the file, whatever it is.
+L<Data::Embed::Reader> sets it from what is read in the index file
+
+=head2 B<< new >>
+
+   my $def = Data::Embed::File->new(%args); # OR
+   my $def = Data::Embed::File->new(\%args);
+
+Constructor. It will act lazily, just storing the input data for later
+usage by other methods, providing validation.
+
+Input data can be provided as key-value pairs of through a reference to
+a hash.
+
+For proper functioning of the object, the following keys should be
+provided:
+
+=over
+
+=item C<< fh >>
+
+a filehandle for the stream where the data are contained
+
+=item C<< filename >>
+
+the name of the file where the data are. This parameter is optional if
+C<fh> above is already provided.
+
+=item C<< offset >>
+
+the offset within the stream where the real data for this file begins.
+C<0> means the very beginning of the file.
+
+=item C<< length >>
+
+the length of the data belonging to this C<File>.
+
+=back
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

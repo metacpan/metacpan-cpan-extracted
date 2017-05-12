@@ -1,0 +1,74 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.003002
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+
+0.003001 2015-02-04T09:48:39Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+0.003000 2014-09-11T04:07:09Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+ - Test::DZil
+
+0.002001 2014-08-16T20:14:31Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+
+0.002000 2014-06-03T06:53:36Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4007
+
+ [Removed / configure requires]
+ - Module::Build 0.4007
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.001001 2013-10-12T07:07:17Z

@@ -1,0 +1,25 @@
+Revision history for Data::Money::Converter::WebserviceX
+
+0.07  2016-08-01 MANWAR
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.06  2016-03-20 MANWAR
+      - Added LICENSE file.
+
+0.05  2016-03-14 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+
+0.04  2016-03-12 MANWAR
+      - Added MANIFEST.SKIP file.
+      - Added standard test scripts (t/pod.t and t/manifest.t).
+
+0.03  2016-03-06 MANWAR
+      - Downgraded to use Moo.
+      - Tweaked test script t/simple.t.
+      - Tidied up pod document.
+
+0.02  2010-04-14 GPHAT
+      - Fix POD.
+
+0.01  2010-03-28 GPHAT
+      - First version, released on an unsuspecting world.

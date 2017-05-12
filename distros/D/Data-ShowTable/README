@@ -1,0 +1,63 @@
+ShowTable.pm, version 4.4, is a Perl 5 module which defines subroutines
+to print arrays of data in a nicely formatted listing, using one of
+four possible formats: simple table, boxed table, list style, and
+HTML-formatting (for World-Wide-Web output).  See the documentation on
+ShowTable.pm for details on the formatting.
+
+The program "showtable" reads data in a variety of formats from a file
+or STDIN, optimally columnizes the data, and then feeds the array of
+data to the ShowTable module for display.  Showtable can parse its own
+output as input (except for HTML).  Individual or ranges of columns may
+be selected for display, either by name or by index.
+
+In other words, showtable is a data formatting program.  Using the
+'-html' option, showtable can accept ASCII tablular data and format it
+appropriately for display through a Web-browser.
+
+Both the the ShowTable.pm module and the showtable program have
+embedded POD text with which man or HTML pages can be created.
+
+For detailed usage information, you can do:
+
+    pod2man ShowTable.pm | nroff -man 
+    pod2man showtable    | nroff -man
+
+The program and module are accompanied with a perl Makefile.PL, this
+README, test programs (do "make test") and reference test output files, 
+and the GNU License, under which this software is freely available.
+
+The archive is available in the Comprehensive Perl Archive Network (CPAN).
+
+INSTALLATION:
+
+1. Unpack the archive
+
+    sh Data-ShowTable-4.4.shar
+
+   or:
+
+    gnutar xvfz Data-ShowTable-4.4.tar.gz
+
+2. Generate the "Makefile":
+
+    perl Makefile.PL
+
+   Be sure that you are using perl 5.002 or later.
+
+3. Make the installable files:
+
+    make
+
+4. Test the new files:
+
+    make test
+
+5. Install the modules and "showtable" program into the configured
+   Perl library and binary directories.
+
+    make install
+
+Contributions or improvements are welcome.
+
+_________________________________
+Alan Stebbens <aks@stebbens.org>      

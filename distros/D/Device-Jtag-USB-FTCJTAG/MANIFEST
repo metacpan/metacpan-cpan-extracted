@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Device-Jtag-USB-FTCJTAG.t
+lib/Device/Jtag/USB/FTCJTAG.pm

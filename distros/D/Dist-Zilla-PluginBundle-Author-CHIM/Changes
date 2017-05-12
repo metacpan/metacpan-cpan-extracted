@@ -1,0 +1,103 @@
+Revision history for Perl extension Dist::Zilla::PluginBundle::Author::CHIM
+
+0.052005 Mon Jan 5 17:28:00 2015 +0000
+
+    [ FIXES ]
+    - missed prerequisites
+
+0.052004 Sun Jan 4 13:21:26 2015 +0000
+
+    [ FEATURES ]
+    - added new option "no_git"
+
+    [ FIXES ]
+    - support for git-less environment (e.g. cpantesters)
+
+0.052003 Sat Jan 3 18:41:45 2015 +0000
+
+    [ FEATURES ]
+    - removed MintingProfile::CHIM
+    - extra tests located at xt/ dir now
+    - added plugin to run extra tests
+    - start using Bootstrap::lib
+
+    [ TESTS ]
+    - added basic tests
+
+    [ FIXES ]
+    - fixed github's repo/user parameters
+
+0.052002 Sat Jan 3 12:25:53 2015 +0000
+
+    [ FEATURES ]
+    - PodWeaver default config added
+
+0.052001 Sat Dec 27 17:40:03 2014 +0000
+
+    [ FEATURES ]
+    - update TravisCI::StatusBadge to 0.005
+    - replace ReadmeFromPod with ReadmeAnyFromPod
+
+0.051003 Sun Jul 20 18:51:30 2014 +0000
+
+    [ FEATURES ]
+    - added remove plugins functionality (via PluginRemover)
+    - MetaResources replaced with GithubMeta
+    - faking release with environment variable FAKE
+
+0.051002 Fri Jul 18 06:33:43 2014 +0000
+
+    [ FIXES ]
+    - tagging release after changes have been commited
+
+0.051001 Fri Jul 18 06:22:27 2014 +0000
+
+    [ FEATURES ]
+    - added plugins Git::NextVersion, Git::Tag, Git::Commit, Git::Check
+
+0.050002 Mon Jul 14 16:17:36 2014 +0000
+
+    [ FEATURES ]
+    - added tuning for NextRelease
+    - added tuning for GatherDir
+
+    [ FIXES ]
+    - update scheme in github repo link (git to https)
+
+0.050001 Mon Jul 14 07:15:13 2014 +0000
+
+    [ FEATURES ]
+    - use v5
+    - added TravisCI::StatusBadge plugin
+    - added tuning options for MetaNoIndex
+    - switch version to x.yyyyyy
+
+0.04    Sun Oct 6 13:20:29 2013 +0000
+
+    [ FEATURES ]
+    - added plugin FakeRelease
+    - more files to exclude via .gitignore
+    - added a few versions of the perl to the .tavis.yml
+    - in root directory README.pod replaced by README.md
+    - added plugins Test::EOL and Test::NoTabs
+
+    [ META ]
+    - minimum perl version set to 5.8.9
+
+0.03    Mon Mar 25 10:10:54 2013 +0000
+
+    [ FEATURES ]
+    - added basic minting profile
+
+0.02    Wed Mar 20 15:56:30 2013 +0000
+
+    [ META ]
+    - updated prerequisites
+
+    [ FEATURES ]
+    - added plugins NextRelease, ConfirmRelease, UploadToCPAN
+    - added .travis.yml
+
+0.01    Sun Mar 17 08:22:52 2013 +0000
+
+    - initial release

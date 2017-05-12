@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Role-RepoFileInjector
+
+0.007     2016-06-01 03:58:33Z
+          - backwards compatibility fixes for Dist::Zilla 4.x
+
+0.006     2016-04-23 16:21:10Z
+          - remove implicit use of Path::Class which broke under Dist::Zilla
+            v6, simplifying the code in the process
+
+0.005     2015-11-11 03:53:52Z
+          - fall back to an alternative mechanism when a method is not
+            available (Dist::Zilla older than 5.000)
+
+0.004     2015-11-09 04:39:06Z
+          - normalize remaining paths in tests, to resolve remaining issues
+            with testing on MSWin32
+
+0.003     2015-11-07 08:39:24Z
+          - normalize repository root directory in tests, to allow for
+            consistent comparisons on MSWin32
+
+0.002     2015-10-30 03:33:01Z
+          - improved documentation
+
+0.001     2015-10-29 03:32:19Z
+          - Initial release.

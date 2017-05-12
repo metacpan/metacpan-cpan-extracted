@@ -1,0 +1,41 @@
+0.10      2016-10-24 11:44:26-05:00 America/Chicago
+    * Fixes tests in bleadperl - pp_split is now a PMOP
+
+0.09      2016-09-10 11:59:03-05:00 America/Chicago
+    * Documented decompiling support - besides getting entire optrees,
+        you can use the next_statement() and next_fragment() methods
+
+0.08      2016-08-23 16:09:57-05:00 America/Chicago
+    * Require at least Perl 5.8.9
+
+0.07      15 Aug 2016
+    * Fix for running tests on Windows (thanks, nanis)
+    * Preliminary support for decompiling.  Currently undocumented, but see
+        Devel::Chitin::OpTree->build_from_location() and t/20-optree.t
+
+0.07      21 Jan 2016
+    * When Devel::Callsite is available, Location objects have a 'callsite'
+        value indicating the address of the next opcode to execute
+    * notify_trace_resume() is called before the debugged program regains
+        control for clients that have turned on the trace flag.
+
+0.05      11 Dec 2014
+    * New feature: watch expressions - send notification when an expression
+        changes
+    * Fix a bug when get_var_at_level() is called with a package-global hash
+
+0.04      16 Aug 2014
+    * Normalize stack frame 'hasargs' between different Perl versions
+    * Stack frame instances get unique serial numbers
+    * Breakpoint/Action 'code' is now mutable
+
+0.03      24 Jun 2014
+    * get_var_at_level() works properly with vstrings
+    * Typo fixes from David Steinbrunner <dsteinbrunner@pobox.com>
+
+0.02      8 Mar 2014
+    * Fixed a packaging error.  Functionally the same as v0.01
+
+0.01      3 Mar 2014
+    * First release
+

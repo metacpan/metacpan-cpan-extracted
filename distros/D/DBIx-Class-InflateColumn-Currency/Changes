@@ -1,0 +1,24 @@
+Revision history for DBIx::Class::InflateColumn::Currency
+
+0.02005 Wed Jun 4 21:32:44 2008
+    - Fix decimal tests when Sqlite/64bit something returns a real
+
+0.02004 Mon Apr 22 21:22:44 2008
+    - Fix test failure under SQL::Translator <= 0.07
+    - Removed Build.PL now that Module::Install no longer supports it
+    - Removed bogus tests entry in Makefile.PL
+
+0.02002 Fri Mar 7 19:12:33 2008
+    - Fixed CPANTS bogus META
+
+0.02001 Fri May 04 21:49:24 2007
+    - Removed MANIFEST from source control
+    - Updated to Module::Install 0.65
+
+0.02000 Fri May 04 21:22:54 2007
+    - Converted to Module::Install
+    - Converted version to 3 part harmony for FBSD ports happiness
+    - Added more cargo cult tests. SLowly making all of my dists the same.
+
+0.01 Mon Mar 05 19:22:06 2007
+    - First version, released on an unsuspecting world.

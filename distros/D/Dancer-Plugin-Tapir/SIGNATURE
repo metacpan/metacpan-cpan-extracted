@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e00ce3af1f1479e049dc59d26d94ed030a8e8377 Build.PL
+SHA1 1add7c528d28d46e27a8bc810ff4ad0039296b78 Changes
+SHA1 a43b101d06be77e7c0f3d0b348215979a772804b MANIFEST
+SHA1 a2cb788769af253218e954f8414ff91effb6785b META.json
+SHA1 b07238dd2ad0869267a4f2f58a747c530a8f43b7 META.yml
+SHA1 e938023d3dfe207aa60bded6a30ffb6c3da7a6de Makefile.PL
+SHA1 ace8926e129955d3e738f4cfe452fa553ca805d0 README
+SHA1 e50fe8fee806ad703e3972c1ac59ea3dff372d02 lib/Dancer/Plugin/Tapir.pm
+SHA1 61b0ca32ac8dce9def0627f5437126dc9a39262c t/001_setup.t
+SHA1 b17d6776731fc529a91bb87db906671ddaa762af t/002_setup_args.t
+SHA1 b379c300b81418c8b4a81e1db8cb4e30d87ba788 t/003_handler.t
+SHA1 1d3edf8f8f530cde8d08ef743a999509a4df9396 t/004_docs.t
+SHA1 166bf993a00bd5c5d5a8ae5f8a3713cb86ada082 t/thrift/bad.thrift
+SHA1 6a9cd8e3f9c438aa5cca185440d245c7a98f2bdd t/thrift/example.thrift
+SHA1 de3f425f81cb6baaaada02e4c1a4f16cc5639884 t/thrift/invalid.thrift
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlFVsvIACgkQHHIpFH/pKkIxWACghWHzkp44T8K8VFm+zOBK0Gvi
+Ko4AniwmBTvlOQ9nQG7BH6SAq8zh8z2I
+=Bi7H
+-----END PGP SIGNATURE-----

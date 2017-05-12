@@ -1,0 +1,20 @@
+Revision history for Perl extension Devel::Optrace
+
+0.05 2013-09-12 00:04:07+0900
+    - Fix segvs
+
+0.04 Tue May 19 14:52:34 2009
+	- no Perl_find_run_cv() for Active Perls (RT#46149)
+	- make thread safe
+
+0.03 Mon May 18 14:28:36 2009
+	- implement remaining private flags (OPpXXX)
+	- fix some bugs
+
+0.02 Sat May 16 12:01:55 2009
+	- add "-count" option that counts opcodes like -DP
+	- improve performance
+	- fix many bugs
+
+0.01 Tue May 12 22:27:26 2009
+        - original version; created by Module::Setup

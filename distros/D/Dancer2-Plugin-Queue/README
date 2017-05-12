@@ -1,0 +1,114 @@
+NAME
+    Dancer2::Plugin::Queue - Dancer2 plugin for message queue abstractions
+
+VERSION
+    version 0.006
+
+SYNOPSIS
+      # in config.yml
+
+      plugins:
+        Queue:
+          default:
+            class: Array
+            options:
+              name: not_a_real_queue
+
+      # in your app
+
+      use Dancer2::Plugin::Queue;
+
+      post '/add_fortune' => sub {
+        # assume a 'fortune' parameter submitted
+        queue->add_msg( params->{fortune} );
+        # ...
+      };
+
+      get '/tell_fortune' => sub {
+        my ($msg, $body) = queue->get_msg;
+        queue->remove_msg( $msg );
+        return "Your fortune: $body";
+      };
+
+DESCRIPTION
+    This module provides a generic interface to a message queue. Message
+    queue implementations must implement the
+    Dancer2::Plugin::Queue::Role::Queue role, which defines the interface to
+    abstract the specifics of the backend.
+
+USAGE
+  queue
+      queue;
+      queue($name);
+
+    This function returns a "Dancer2::Plugin::Queue::*" object. If no $name
+    is provided, it attempts to return a default object. If there is only a
+    single queue defined, it will be used as the default. If there is more
+    than one, a queue called 'default' will be the default. If there are
+    more than one and none are named 'default', an error will be thrown.
+
+  queue->add_msg
+      queue->add_msg( $data );
+
+    Adds $data to the queue. It is up to the plugin implementation (or
+    backend) to serialize or otherwise modify $data.
+
+  queue->get_msg
+      ( $msg, $data ) = queue->get_msg;
+
+    Dequeues a message from the queue. $msg will be either a 'raw' message
+    object from the backend or else an identifier that can be used with
+    "remove_msg". $data should ideally be the same as the enqueued $data,
+    subject to any round-trip limitations of the backend.
+
+  queue->remove_msg
+      queue->remove_msg( $msg );
+
+    Removes a message permanently from the queue (if not already done by
+    "get_msg").
+
+    Some message queue implementations require handled messages to be
+    manually removed from the queue or else the message will time-out and be
+    available again.
+
+    This method should always be called after a message has been handled in
+    case the backend requires such cleanup. For implementations that do not
+    have message durability, this method may do nothing.
+
+CONFIGURATION
+    Queue objects are defined by a "NAME => HASHREF" pair. The hash
+    reference must contain a 'class' key, whose value is a class name suffix
+    that will be appended to "Dancer2::Plugin::Queue::". The resulting class
+    will be loaded on demand. If the hash reference contains an 'options'
+    key, its value will be passed to the constructor when the queue object
+    is created.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/PerlDancer/dancer2-plugin-queue/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/PerlDancer/dancer2-plugin-queue>
+
+      git clone https://github.com/PerlDancer/dancer2-plugin-queue.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Jason A. Crome <jason@crome-plated.com>
+
+    *   Peter Mottram <peter@sysnix.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

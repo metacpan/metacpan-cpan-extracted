@@ -1,0 +1,33 @@
+Revision history for Devel-REPL-Plugin-DataPrinter
+
+0.007     2013-03-17
+
+    - fix syntax of hash keys to support older Perls (Zaki Mughal)
+
+0.006     2013-03-07
+
+    - minor pod fixes and updates
+
+0.005     2013-03-07
+
+    - new custom option: 'stringify' to control
+      object stringification (Zaki Mughal)
+
+0.004     2012-08-14
+
+    - new feature: custom configuration (Rob Hoelz)
+    - other: updated development plugins for dzil
+
+0.003     2011-07-20
+
+    - fixed autocoloring issue (stanislaw)
+
+0.002     2011-04-11
+
+    - updating version dependency
+    - improving documentation
+
+
+0.001     2011-02-14
+
+    - releasing on an unsuspecting world

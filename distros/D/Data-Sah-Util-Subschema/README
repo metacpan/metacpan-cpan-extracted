@@ -1,0 +1,31 @@
+SYNOPSIS
+
+     use Data::Sah::Util::Subschema qw(extract_subschemas)
+    
+     my $subschemas = extract_subschemas([array => of=>"int*"]);
+     # => ("int*")
+    
+     $subschemas = extract_subschemas([any => of=>["int*", [array => of=>"int"]]]);
+     # => ("int*", [array => of=>"int"], "int")
+
+DESCRIPTION
+
+FUNCTIONS
+
+ extract_subschemas([ \%opts, ] $sch) => list
+
+    Extract all subschemas found inside Sah schema $sch. Schema will be
+    normalized first, then schemas from all clauses which contains
+    subschemas will be collected recursively.
+
+    Known options:
+
+      * schema_is_normalized => bool (default: 0)
+
+      When set to true, function will skip normalizing schema and assume
+      input schema is normalized.
+
+SEE ALSO
+
+    Sah, Data::Sah
+

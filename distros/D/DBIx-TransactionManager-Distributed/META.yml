@@ -1,0 +1,36 @@
+---
+abstract: 'it will not be used for any further transaction requests via L</txn>.'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  DBD::Mock: '1.45'
+  DBI: '1.634'
+  Devel::Refcount: '0.10'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Deep: '1.120'
+  Test::Fatal: '0.014'
+  Test::More: '0.98'
+  Test::Refcount: '0.08'
+  Test::Warnings: '0.026'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-TransactionManager-Distributed
+requires:
+  Exporter: '0'
+  List::UtilsBy: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-DBIx-TransactionManager-Distributed/issues
+  repository: git://github.com/binary-com/perl-DBIx-TransactionManager-Distributed.git
+version: '0.02'

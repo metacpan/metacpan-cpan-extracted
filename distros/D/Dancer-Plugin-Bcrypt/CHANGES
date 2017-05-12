@@ -1,0 +1,34 @@
+0.4.1   2011-11-26
+
+    [DOCUMENTATION]
+    * Clarification of deprecation notice
+
+0.4.0   2011-10-18
+
+    [DOCUMENTATION]
+    * Deprecated this module in favour of Dancer::Plugin::Passphrase
+
+0.3.0   2011-07-25
+
+    [ENHANCEMENTS]
+    * Added $VERSION so we don't get warnings
+
+0.2.0   2011-07-04
+
+    [ENHANCEMENTS]
+    * Added bcrypt_validate_password keyword (David Precious)
+    * Added extra tests
+    * Restored perl 5.8 compatibility by removing use of smart match operator
+
+
+0.1.0   2011-07-02
+
+    ** First Public Release **
+
+    [DOCUMENTATION]
+    * Added Documentation
+
+
+0.0.1   2011-06-30
+
+    ** Initial Preview Release **

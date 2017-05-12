@@ -1,0 +1,53 @@
+{
+   "abstract" : "Calculate ED2K digests",
+   "author" : [
+      "Benjamin Herweyer <benjamin.herweyer@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4002, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Digest-ED2K",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40",
+            "version" : "0.77"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD4" : "0",
+            "Digest::base" : "1.03",
+            "common::sense" : "0",
+            "perl" : "v5.8.0"
+         }
+      }
+   },
+   "provides" : {
+      "Digest::ED2K" : {
+         "file" : "lib/Digest/ED2K.pm",
+         "version" : "v1.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Kulag/Digest-ED2K"
+      }
+   },
+   "version" : "v1.1.0"
+}

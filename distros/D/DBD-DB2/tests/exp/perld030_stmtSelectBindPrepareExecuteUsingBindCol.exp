@@ -1,0 +1,9 @@
+1 Char 10  1998-09-11 12:01:01 1998-09-11 12:11:01.000000 1 varchar 3000 1 longvarchar
+2 Char 10  1998-09-12 12:02:02 1998-09-11 12:12:02.000000 NULL           2 longvarchar
+3 Char 10  1998-09-13 NULL     1998-09-11 12:13:03.000000 3 varchar 3000 3 longvarchar
+4 Char 10  1998-09-14 12:04:04 1998-09-11 12:14:04.000000 4 varchar 3000 4 longvarchar
+6 Char 10  1998-09-16 12:06:06 1998-09-11 12:16:06.000000 6 varchar 3000 NULL        
+7 Char 10  1998-09-17 12:07:07 NULL                       7 varchar 3000 7 longvarchar
+8 Char 10  1998-09-18 12:08:08 1998-09-11 12:18:08.000000 8 varchar 3000 8 longvarchar
+9 Char 10  NULL       12:09:09 1998-09-11 12:19:09.000000 9 varchar 3000 9 longvarchar
+NULL       1998-09-15 12:05:05 1998-09-11 12:15:05.000000 5 varchar 3000 5 longvarchar

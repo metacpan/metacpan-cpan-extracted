@@ -1,0 +1,66 @@
+Data-iRealPro
+
+iRealPro is a songwriting tool / electronic backup band for
+iPhone/iPad, Mac OSX and Android that lets you experiment with
+advanced chord progressions and arrangements quickly and easily. You
+can use iRealPro for songwriting experiments, as accompaniment when
+learning new songs or for making backing tracks for your guitar /
+saxophone / theremin solos.
+
+iRealPro can import songs in one of two textual formats in the form of
+URLs. The 'irealbook' format starts with "irealbook://" and, after
+URLdecoding, is easily readable and straightforward to understand. It
+is superseded by the 'irealb pro' format, which is proprietary and
+uses obfuscation to hide the contents. These URLs start with
+"irealb://". iRealPro has stated that although irealb is the official
+data format, they will continue supporting irealbook format for import
+since there are many, many songs out there on forums that are still in
+irealbook format.
+
+Data::iRealPro provides a set of modules that can be used to read and
+analyse iRealPro songs in URL format and convert them into something
+readable, like PDF or PNG, or raw JSON data. A ready-to-use program
+irealcvt program is provided to perform conversions on the command line.
+
+I have hesitated a long time to release this module, since it contains
+code to reverse the obfuscation iRealPro uses to hide the file
+details. However, recently I encountered some more open source tools
+that handle the obfuscation in a similar way, so now I feel free to
+consider the obfuscation algorithm public anyway.
+
+iRealPro web site: http://www.irealpro.com .
+
+A NOTE ABOUT FONTS
+
+Module Data::iRealPro::Imager requires a number of fonts that are
+included in the kit. When the program is run, you can specify the
+location of the fonts with environment variable FONTDIR.
+
+To the best of my knowledge all supplied fonts are free to use for
+this purpose.
+
+The condensed variants for Bravura and Myriad-CnSemibold are
+programmatically generated from the original fonts.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::iRealPro
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-iRealPro
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-iRealPro
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013,2016 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

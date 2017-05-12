@@ -1,0 +1,21 @@
+---
+abstract: 'A Dancer plugin for messaging using STOMP based message queues.'
+author:
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Stomp
+requires:
+  Dancer: 0
+  Net::Stomp: 0
+resources:
+  bugtracker: http://github.com/ironcamel/Dancer-Plugin-Stomp/issues
+  repository: git://github.com/ironcamel/Dancer-Plugin-Stomp.git
+version: 1.0302

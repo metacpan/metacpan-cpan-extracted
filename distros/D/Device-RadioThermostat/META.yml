@@ -1,0 +1,37 @@
+---
+abstract: 'Access Radio Thermostat Co of America (3M-Filtrete) WiFi thermostats'
+author:
+  - 'Mike Greb <michael@thegrebs.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.021, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-RadioThermostat
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  JSON: '2'
+  LWP::UserAgent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/mikegrb/Device-RadioThermostat/issues
+  homepage: https://github.com/mikegrb/Device-RadioThermostat
+  repository: https://github.com/mikegrb/Device-RadioThermostat.git
+version: '0.04'
+x_contributors:
+  - 'Mike Greb <mikegrb@cpan.org>'
+  - 'Philip Gladstone <philip@gladstonefamily.net>'
+  - 'Rev Michael Greb <michael@thegrebs.com>'
+  - 'Timo Kokkonen <tjko@iki.fi>'

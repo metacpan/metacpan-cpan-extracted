@@ -1,0 +1,16 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                                   #                   3rd party file built by ModuleBuildTiny
+COPYING                                    # Dist-Zilla-Plugin-Templates file built by GenerateFile
+Changes                                    # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+GPLv3                                      # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+MANIFEST                                   #                    metainfo file built by Manifest::Write
+META.json                                  #                    metainfo file built by MetaJSON
+META.yml                                   #                    metainfo file built by MetaYAML
+README                                     # Dist-Zilla-Plugin-Templates file built by GenerateFile
+VERSION                                    # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Templates.pm         # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Templates/File.pm    # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Templates/Manual.pod # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+t/00-compile.t                             #                   3rd party file built by Test::Compile
+t/lib/TemplatesTester.pm                   # Dist-Zilla-Plugin-Templates file added by Manifest::Read
+t/templates.t                              # Dist-Zilla-Plugin-Templates file added by Manifest::Read

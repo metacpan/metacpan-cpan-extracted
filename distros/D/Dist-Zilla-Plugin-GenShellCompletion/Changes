@@ -1,0 +1,73 @@
+Revision history for Dist-Zilla-Plugin-GenShellCompletion
+
+0.11    2016-04-20 (PERLANCAR)
+
+	- Remove dependency to Perl::osnames in the generated Makefile.PL
+	  code snippet.
+
+
+0.10    2016-02-29 (PERLANCAR)
+
+	- Use shcompgen generate's remove option (but check that only
+	  App::shcompgen 0.15+ supports this). Also note that $ in Makefile
+	  needs to be escaped into double dollars.
+
+
+0.09    2015-03-25 (PERLANCAR)
+
+	- [Bugfix] Should've used PrereqSource role to register prereq, not
+	  BeforeBuild.
+
+
+0.08    2015-03-25 (PERLANCAR)
+
+	- [Bugfix] Don't add prereq to Perl::osnames if there are no
+	  scripts in the dist and we are not adding stuffs to Makefile.PL
+	  [CT#103072].
+
+
+0.07    2014-12-18 (PERLANCAR)
+
+	- [Bugfix] apparently we need to register prereq Perl::osnames for
+	  phase configure, not build.
+
+
+0.06    2014-12-18 (PERLANCAR)
+
+	- Skip non-POSIX OS for now (ref:
+	  https://github.com/perlancar/perl-Complete-Util/pull/1).
+
+
+0.05    2014-12-13 (PERLANCAR)
+
+	- Forgot to add --replace option to shcompgen during install phase.
+
+
+0.04    2014-12-13 (PERLANCAR)
+
+	- Rename module/dist from DZP-Rinci-InstallCompletion to
+          DZP-GenShellCompletion because this plugin is actually not
+          Rinci-specific.
+
+        - Replace the use of bash-completion-prog with shcompgen (which supports
+          multiple shells and make it possible to activate completion in the
+          current shell instead of waiting to start a new shell).
+
+
+0.03    2014-11-13 (PERLANCAR)
+
+	- Increase perl minver to 5.10.1 [CT].
+
+
+0.02    2014-11-09 (PERLANCAR)
+
+	- Skip adding code to Makefile.PL if there are no scripts/execfiles
+	  in the dist.
+
+	- Revise doc (mention Getopt::Long::Complete,
+	  DZP::GenBashCompletion::GetoptLong).
+
+
+0.01     2014-11-08 (PERLANCAR)
+
+         - First release.

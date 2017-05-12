@@ -1,0 +1,29 @@
+#!/bin/sh
+
+(
+   <MANIFEST grep -v ^resources/ | grep -v ^pod/
+   echo
+   for theme in "" "/theme-plain" "/theme-blue" "/theme-metal"; do
+      base="resources$theme"
+      for file in \
+         $base/theme.json		\
+         $base/*.png			\
+         $base/fonts/*.ttf		\
+         $base/fonts/fonts.conf		\
+         $base/music/*.ogg		\
+         $base/ui/resist/*.png		\
+         $base/pod/*.png		\
+         $base/pod/*.jpg		\
+         $base/arch/*.png
+      do
+         [ -e "$file" ] && echo "$file"
+      done
+   done
+   for file in		\
+      pod/*.pod
+   do
+      echo "$file"
+   done
+) | uniq >MANIFEST~ && mv MANIFEST~ MANIFEST
+
+

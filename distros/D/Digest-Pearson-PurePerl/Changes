@@ -1,0 +1,6 @@
+Revision history for Perl extension Digest::Pearson.
+
+0.01  Wed Mar 23 14:29:36 2005
+	- original version; created by h2xs 1.21 with options
+		-A -n Digest::Pearson
+

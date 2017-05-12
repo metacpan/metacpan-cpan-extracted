@@ -1,0 +1,16 @@
+---
+name: Date-Holidays-CN
+version: 0.01
+author:
+  - Fayland Lam <fayland@gmail.com>
+abstract: Determine Chinese public holidays
+license: perl
+build_requires:
+  DateTime: 0
+  DateTime::Calendar::Chinese: 0
+  Test::More: 0
+provides:
+  Date::Holidays::CN:
+    file: lib/Date/Holidays/CN.pm
+    version: 0.01
+generated_by: Module::Build version 0.2611

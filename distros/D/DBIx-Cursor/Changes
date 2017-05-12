@@ -1,0 +1,20 @@
+Revision history for Perl extension DBIx::Cursor.
+
+0.14  Mon Sep 09 2002
+    - use DBD::ExampleP for tests unless DBI_DS is set to a real datasource
+      for automated testing (thanks to David Wheeler)
+    - cache of insert- and select-statement-handles
+
+0.13  Wed Nov 30 2001
+	- added some test-scripts
+	- caching of table-metadata
+
+0.12  Wed Nov 29 2001
+	- 'update' updates only non primary keys by default
+
+0.11  Wed Nov 28 23:30:00 2001
+	- some bugfixes
+
+0.10  Wed Nov 28 09:42:47 2001
+	- original version; created by h2xs 1.21
+

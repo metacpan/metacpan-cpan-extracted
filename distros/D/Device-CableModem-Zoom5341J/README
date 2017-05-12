@@ -1,0 +1,26 @@
+Device::CableModem::Zoom5341J
+=============================
+
+This is a module for grabbing info from a Zoom 5341J cable modem (only J,
+not the "plain" 5341 G or H).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libwww-perl
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Matthew Fuller
+
+See the LICENSE file for details.

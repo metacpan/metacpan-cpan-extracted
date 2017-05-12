@@ -1,0 +1,153 @@
+# vim: ft=perl
+{ use vars q{$dumper} }
+
+control: control_file
+
+control_file: options_spec(?) export data 
+	append_replace(?) into_file(?) fields_spec(?) with_header(?) 
+	from select_statement | <error>
+
+export: /export/i
+
+data: /data/i
+
+from: /from/i
+
+options_spec: options '(' option_spec(s /,/) ')'
+
+options: /options/i
+
+option_spec: /(\w+)\s*=\s*(\w+)/ {
+	$dumper->{lc $1} = $2;
+	1;
+}
+
+append_replace: replace | append {
+	$dumper->action(uc $item[1]);
+	1;
+}
+
+replace: /replace/i
+
+append: /append/i
+
+into_file: into file filename 
+
+into: /into/i
+
+file: /file/i
+
+filename: string {
+	$dumper->output($item[1]);
+	1;
+}
+
+string: /^(X?)'(.*?)'/ {
+	my $string = $2;
+	$string =~ s/([A-Fa-f\d]{2})/chr hex $1/eg if $1;
+	$item[1] = $string;
+}
+
+fields_spec: fields term_spec(?) enclosed_spec(?) escaped_spec(?)
+
+fields: /fields/i
+
+term_spec: terminated by(?) terminator {
+	$dumper->terminator(uc $item[3] eq 'TAB' ? "\t" : $item[3]);
+	1;
+}
+
+terminated: /terminated/i
+
+by: /by/i
+
+terminator: tab | string
+
+tab: /tab/i
+
+enclosed_spec: enclosed by(?) enclosure and(?) enclosure(?) {
+	$dumper->left_delim($item[3]);
+	$dumper->right_delim($item[5] && $item[5]->[0] ? $item[5]->[0] : $item[3]);
+	1;
+}
+
+enclosed: /enclosed/i
+
+and: /and/i
+
+enclosure: string
+
+escaped_spec: escaped by(?) escape_string {
+	$dumper->escape($item[3]);
+}
+
+escaped: /escaped/i
+
+escape_string: string
+
+with_header: with header {
+	$dumper->header(1);
+	1;
+}
+
+with: /with/i
+
+header: /header/i
+
+select_statement: /.*/s { 
+	my $query = $item[1];
+	# strip trailing semicolon
+	$query =~ s/(.*);/$1/;
+	$dumper->query($query);
+	1;
+}
+
+
+# PL/SQL preprocessor that strips comments and normalizes strings
+#  'hexstrings' are not accounted for, but "" are changed to ''
+
+preprocess: pp_part(s) { 
+	my $code = $thisparser->{code}; 
+	delete $thisparser->{code};  # necessary to make preprocess reentrant
+	$code 
+}
+
+pp_part: pp_comment { $thisparser->{code} .= " "; }
+	| pp_clause  { $thisparser->{code} .= $item[1]; }
+	| pp_string  { $thisparser->{code} .= $item[1]; }
+
+pp_clause: 
+	m{
+		(
+			[^"'-]+	# char that's not a delimiter ( or start of comment)
+			(
+				-   # and are followed by comment delimiter
+				[^-]
+			)?
+		)+
+	}x
+
+pp_string: 
+	m{
+		\s*
+		' 			# delimiter
+			[^']*	# anything that's not a delimiter
+		'			# delimiter
+		\s*
+	}xi
+	| m{
+		\s*
+		"
+			[^"]*
+		"
+		\s*
+	}xi
+
+
+pp_comment: m{
+	--
+	[^\n]*
+	\n
+}x
+
+

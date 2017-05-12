@@ -1,0 +1,314 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+use Plack::Runner;
+use Module::Load;
+use Data::Dump qw( dump );
+use Dezi;
+
+our $VERSION = $Dezi::VERSION;
+
+sub version {
+    print "$VERSION\n";
+}
+
+my $preload_app;
+my $dezi_config_file;
+my $server_class = 'Dezi::Server';
+my $debug;
+my $use_ui;
+my $use_admin;
+my $ui_class;
+my $admin_class;
+my $elastic_mode;
+my $use_auto_commit = undef;
+
+require Getopt::Long;
+Getopt::Long::Configure( "no_ignore_case", "no_auto_abbrev", "pass_through" );
+Getopt::Long::GetOptions(
+    "preload-app"      => \$preload_app,
+    "dezi-config|dc=s" => \$dezi_config_file,
+    "ui"               => \$use_ui,
+    "ui-class=s"       => \$ui_class,
+    "admin-class=s"    => \$admin_class,
+    "admin"            => \$use_admin,
+    "server-class=s"   => \$server_class,
+    "debug"            => \$debug,
+    "elastic"          => \$elastic_mode,
+    "auto_commit|ac!"  => \$use_auto_commit,
+);
+
+my @args = (
+
+    #env        => 'deployment',
+    version_cb => \&version
+);
+if ( !$preload_app ) {
+    push @args, 'loader' => 'Delayed';
+}
+
+my $config = {};
+if ($dezi_config_file) {
+    require Config::Any;
+    $config = Config::Any->load_files(
+        {   files   => [$dezi_config_file],
+            use_ext => 1,
+        }
+    )->[0]->{$dezi_config_file};
+}
+
+$config->{debug} = $debug;
+if ($use_ui) {
+    $ui_class ||= 'Dezi::UI';
+}
+if ($use_admin) {
+    $admin_class ||= 'Dezi::Admin';
+}
+$config->{ui_class}    ||= $ui_class;
+$config->{admin_class} ||= $admin_class;
+
+if ($elastic_mode) {
+
+    $config->{engine_config}->{indexer_config}->{config}->{UndefinedMetaTags}
+        = 'autoall',
+
+}
+
+$config->{engine_config}->{auto_commit} = $use_auto_commit
+    if defined $use_auto_commit;
+
+my @argv = @ARGV;
+
+#dump \@argv;
+
+my $runner = Plack::Runner->new(@args);
+$runner->parse_options(@argv);
+$runner->set_options( argv => \@argv );
+$runner->setup();    # pull in -I includes, etc for load() below
+
+eval { load $server_class };
+die $@ if $@;
+
+if ( $config->{ui_class} ) {
+    eval { load $config->{ui_class} };
+    die $@ if $@;
+}
+if ( $config->{admin_class} ) {
+    eval { load $config->{admin_class} };
+    die $@ if $@;
+}
+
+my $app = $server_class->app($config);
+
+# final step
+$runner->run($app);
+
+__END__
+
+=head1 NAME
+
+dezi - Dezi server app
+
+=head1 SYNOPSIS
+
+Start the Dezi server, listening on port 5000:
+
+ % dezi -p 5000
+
+Add a document B<foo> to the index:
+
+ % curl http://localhost:5000/index/foo -XPOST \
+   -d '<doc><title>bar</title>hello world</doc>' \
+   -H 'Content-Type: application/xml'
+   
+Search the index:
+
+ % curl 'http://localhost:5000/search?q=bar'
+
+=head1 DESCRIPTION
+
+Dezi is a search platform based on Apache L<Lucy>, Swish3, L<Plack>,
+L<Search::OpenSearch> and L<Search::Query>. 
+
+Dezi integrates several CPAN search libraries into one
+easy-to-use interface.
+
+If you haven't yet read it, the L<Dezi::Tutorial> is a good
+place to start.
+
+=head1 OPTIONS
+
+The dezi app supports all the options that L<Plack::Runner> supports.
+See the L<plackup> perldoc for a description. The following
+options are specific to dezi.
+
+=head2 debug
+
+Turns on verbosity in stderr Plack logging.
+
+=head2 dezi-config I<file>
+
+I<file> can be in any format supported by Config::Any.
+The structure expected contains a key called C<engine_config>
+which is passed directly to L<Search::OpenSearch::Server::Plack>,
+which in turn passes through to L<Search::OpenSearch::Engine>.
+
+See L<Dezi::Config>.
+
+Example (in native Perl format):
+
+ use CHI;
+ my $c = {
+  engine_config => {
+    index       => [qw( path/to/index1 path/to/index2 )],
+    facets      => {
+        names       => [qw( color size flavor )],
+        sample_size => 10_000,
+    },
+    fields      => [qw( color size flavor )],   # result attributes in response
+    indexer_config  => {
+        somekey => somevalue,
+    },
+    searcher_config => {
+        anotherkey => anothervalue,
+    },
+    cache           => CHI->new(
+        driver           => 'File',
+        dir_create_mode  => 0770,
+        file_create_mode => 0660,
+        root_dir         => "/tmp/opensearch_cache",
+    ),
+    cache_ttl       => 3600,
+    do_not_hilite   => [qw( color )],
+    snipper_config  => { as_sentences => 1 },        # see Search::Tools::Snipper
+    hiliter_config  => { class => 'h', tag => 'b' }, # see Search::Tools::HiLiter
+    parser_config   => {},                           # see Search::Query::Parser
+    auto_commit     => 1,                            # see Search::OpenSearch::Engine::Lucy
+  }
+ };
+ 
+Other config key options include:
+
+=over 
+
+=item search_path I<path>
+
+The /-prefixed URI path where the Dezi server should accept
+incoming searcher requests. Defaults to '/search'.
+
+=item index_path I<path>
+
+The /-prefixed URI path where the Dezi server should accept
+incoming indexer requests. Defaults to '/index'.
+
+=back
+
+=head2 server-class I<class_name>
+
+Use I<class_name> instead of the default 'Dezi::Server'. Useful
+if you want to create your own server subclass of Dezi::Server.
+
+=head2 ui-class I<class_name>
+
+Use I<class_name> as a Plack app mounted under C</ui>.
+Try L<Dezi::UI> as an example.
+
+=head2 ui
+
+Use Dezi::UI. Shortcut for --ui-class=Dezi::UI
+
+=head2 admin-class I<class_name>
+
+The I<class_name> as a Plack app mounted under C</admin>.
+Try L<Dezi::Admin> as an example.
+
+=head2 admin
+
+Use Dezi::Admin. Shortcut for --admin-class=Dezi::Admin
+
+=head2 elastic
+
+If set, UndefinedMetaTags is set to 'auto' in the indexer_config.
+
+=head2 auto_commit
+
+C<engine_config> I<auto_commit> flag is explicitly set. Use --no-auto_commit to disable.
+
+Alias is C<--ac> (C<--no-ac>).
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc dezi
+
+You can also look for information at:
+
+=over 4
+
+=item * Website
+
+L<http://dezi.org/>
+
+=item * IRC
+
+#dezisearch at freenode
+
+=item * Mailing list
+
+L<https://groups.google.com/forum/#!forum/dezi-search>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dezi/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Marvin Humphrey for a great library in Apache Lucy.
+
+The Plack community.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 SEE ALSO
+
+L<Search::OpenSearch>, L<SWISH::3>, L<SWISH::Prog::Lucy>,
+L<Plack>, L<Lucy>, L<http://dezi.org>
+
+=cut
+

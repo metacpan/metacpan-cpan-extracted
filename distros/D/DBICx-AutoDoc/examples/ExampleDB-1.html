@@ -1,0 +1,579 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+    <title>ExampleDB version 1</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style type="text/css">
+body {
+    color:  #000000;
+    background-color: #FFFFFF;
+    font-family: Helvetica, sans-serif;
+}
+
+p {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+ol {
+    list-style-type: upper-alpha;
+}
+
+hr {
+    color: #00FF00;
+    background-color: #808080;
+}
+
+table {
+    border-width: medium;
+    padding: 3px;
+    background-color: #000000;
+    margin: 5px;
+}
+
+caption {
+    font-weight : bold;
+    font-size: 14pt;
+}
+
+th {
+    color: #FFFFFF;
+    background-color: #000000;
+    text-align: left;
+}
+
+tr {
+    color: #000000;
+    background-color: #000000;
+    vertical-align: top;
+}
+
+tr.even { background-color: #F0F0F0 }
+tr.odd { background-color: #D8D8D8 }
+td { font-size: 12pt }
+
+div.comment {
+    font-style: italic;
+    padding:    3px;
+}
+
+#tabs {
+    position:           relative;
+    float:              left;
+    width:              100%;
+    padding:            0;
+    margin:             0;
+    list-style:         none;
+    line-height:        1em;
+}
+
+#tabs li {
+    float:              left;
+    margin:             0;
+    padding:            0;
+}
+
+#tabs a {
+    display:            block;
+    color:              #444;
+    text-decoration:    none;
+    font-weight:        bold;
+    background:         #ddd;
+    margin:             0;
+    padding:            0.25em 1em;
+    border-left:        1px solid #fff;
+    border-top:         1px solid #fff;
+    border-right:       1px solid #aaa;
+}
+
+#tabs a:hover, #tabs a:active, #tabs a.here:link, #tabs a.here:visited {
+    background:#bbb;
+}
+
+#tabs a.here:link, #tabs a.here:visited {
+    position:relative;
+    z-index:102;
+}
+
+</style>
+    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+</head>
+<body>
+<h1><a name="index">ExampleDB version 1</a></h1>
+
+
+
+<ul>
+
+<li><a href="#Address">Address</a></li>
+
+<li><a href="#EmailAddress">EmailAddress</a></li>
+
+<li><a href="#Person">Person</a></li>
+
+<li><a href="#PhoneNumber">PhoneNumber</a></li>
+
+</ul>
+<hr />
+
+
+    <h2>
+        <a name="Address">Address</a>
+        (table addresses)
+    </h2>
+
+    <h3 name="Address-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>id </td> <td>integer </td> <td>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </td>
+
+    
+        <tr class="even"> <td>person_id </td> <td>integer </td> <td>NOT NULL, FOREIGN KEY </td>
+
+    
+        <tr class="odd"> <td>name </td> <td>varchar(64) </td> <td>NOT NULL </td> <tr class="odd"> <td>&nbsp;</td> <tdcolspan="2"> <div class="comment">Home, work, etc</div> </td> </tr>
+
+    
+        <tr class="even"> <td>address1 </td> <td>varchar(128) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>address2 </td> <td>varchar(128) </td> <td> </td>
+
+    
+        <tr class="even"> <td>city </td> <td>varchar(64) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>state </td> <td>varchar(2) </td> <td>NOT NULL </td>
+
+    
+        <tr class="even"> <td>zip_code </td> <td>varchar(10) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Address-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Address-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Address-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>person</td> <td><a href="#Person">Person</a></td> <td> foreign.id =&gt; self.person_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="EmailAddress">EmailAddress</a>
+        (table email_addresses)
+    </h2>
+
+    <h3 name="EmailAddress-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>id </td> <td>integer </td> <td>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </td>
+
+    
+        <tr class="even"> <td>person_id </td> <td>integer </td> <td>NOT NULL, FOREIGN KEY </td>
+
+    
+        <tr class="odd"> <td>name </td> <td>varchar(64) </td> <td>NOT NULL </td> <tr class="odd"> <td>&nbsp;</td> <tdcolspan="2"> <div class="comment">Home, work, etc</div> </td> </tr>
+
+    
+        <tr class="even"> <td>email </td> <td>varchar(128) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="EmailAddress-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="EmailAddress-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="EmailAddress-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>person</td> <td><a href="#Person">Person</a></td> <td> foreign.id =&gt; self.person_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="Person">Person</a>
+        (table people)
+    </h2>
+
+    <h3 name="Person-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>id </td> <td>integer </td> <td>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </td>
+
+    
+        <tr class="even"> <td>name </td> <td>varchar(64) </td> <td>NOT NULL </td>
+
+    
+        <tr class="odd"> <td>username </td> <td>varchar(16) </td> <td> </td>
+
+    
+        <tr class="even"> <td>birthdate </td> <td>date </td> <td>NOT NULL, INFLATED </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="Person-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>id</td> </tr>
+    
+        
+        <tr class="even"> <td>people_username</td> <td>username</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+    
+        
+    
+        
+    
+    
+    
+    
+        
+            
+        
+    
+        
+            
+        
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="Person-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="Person-relationships-has_many" style="float: left">
+    <caption>has_many</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>addresses</td> <td><a href="#Address">Address</a></td> <td> foreign.person_id =&gt; self.id </td> </tr>
+    
+        
+        <tr class="even"> <td>emails</td> <td><a href="#EmailAddress">EmailAddress</a></td> <td> foreign.person_id =&gt; self.id </td> </tr>
+    
+        
+        <tr class="odd"> <td>phone_numbers</td> <td><a href="#PhoneNumber">PhoneNumber</a></td> <td> foreign.person_id =&gt; self.id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+        
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+    <h2>
+        <a name="PhoneNumber">PhoneNumber</a>
+        (table phone_numbers)
+    </h2>
+
+    <h3 name="PhoneNumber-columns">Columns</h3>
+<table width="100%" cellspacing="0" cellpadding="3">
+    <tr>
+    <th width="25%">Name</th>
+    <th width="35%">Type</th>
+    <th width="40%">Info</th>
+    </tr>
+    
+        <tr class="odd"> <td>id </td> <td>integer </td> <td>NOT NULL, PRIMARY KEY, AUTO_INCREMENT </td>
+
+    
+        <tr class="even"> <td>person_id </td> <td>integer </td> <td>NOT NULL, FOREIGN KEY </td>
+
+    
+        <tr class="odd"> <td>name </td> <td>varchar(64) </td> <td>NOT NULL </td> <tr class="odd"> <td>&nbsp;</td> <tdcolspan="2"> <div class="comment">Home, work, etc</div> </td> </tr>
+
+    
+        <tr class="even"> <td>phone_number </td> <td>varchar(32) </td> <td>NOT NULL </td>
+
+    
+</table>
+
+
+
+    
+        <h3 name="PhoneNumber-unique_constraints">Unique Constraints</h3>
+
+<table cellspacing="0" cellpadding="3">
+    <tr><th width="20%">Name</th><th width="80%">Columns</th> </tr>
+    
+        
+        <tr class="odd"> <td>primary</td> <td>id</td> </tr>
+    
+</table>
+
+
+    
+    
+        <br />
+        
+
+    
+    
+        
+            
+        
+    
+    
+    
+        <h3 name="PhoneNumber-relationships">Relationships</h3>
+        
+    
+
+    <table cellspacing="0" cellpadding="3" name="PhoneNumber-relationships-belongs_to" style="float: left">
+    <caption>belongs_to</caption>
+    <tr>
+    <th>Name</th>
+    
+        <th>Foreign Class</th>
+        <th>Join Condition</th>
+    
+    </tr>
+    
+        
+        <tr class="odd"> <td>person</td> <td><a href="#Person">Person</a></td> <td> foreign.id =&gt; self.person_id </td> </tr>
+    
+    </table>
+
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+    
+    
+        
+    
+    
+<br clear="both" />
+
+
+    
+
+    <hr />
+
+
+
+
+    <p>
+        Generated Wed Nov 21 10:14:48 2007
+        by <a href="http://www.jasonkohles.com/projects/DBICx-AutoDoc/">DBICx::AutoDoc</a>
+        version 0.03
+    </p>
+</body>
+</html>
+
+
+

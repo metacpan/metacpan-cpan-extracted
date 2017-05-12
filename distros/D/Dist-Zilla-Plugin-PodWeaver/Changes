@@ -1,0 +1,88 @@
+Revision history for Dist-Zilla-Plugin-PodWeaver
+
+4.008     2016-04-24 09:48:22+01:00 Europe/London
+        - remove an unneeded dependency on List::MoreUtils
+
+4.007     2016-04-23 18:35:29+01:00 Europe/London
+        - cope with both Dist::Zilla v5 and v6
+
+4.006     2014-08-16 08:29:38-04:00 America/New_York
+        - correctly pass logger to weaver (thanks, Yasutaka ATARASHI)
+
+4.005     2014-01-07 20:06:10-05:00 America/New_York
+          require a newer PerlMunger to deal with non-ASCII input
+
+4.004     2014-01-04 13:55:59 America/New_York
+          fix the breakage of [PodWeaver] with weaver.ini
+
+4.003     2014-01-04 08:17:17 America/New_York
+          allow config_plugin to be given more than once
+
+4.002     2013-11-12 13:15:37 America/New_York
+          add weaver config to plugin config dump
+
+4.001     2013-11-02 11:40:33 America/New_York
+          stable release of v4
+
+4.000     2013-10-20 08:15:20 America/New_York (TRIAL RELEASE)
+          update to Pod::Weaver 4!
+
+3.102000  2013-09-25 20:56:36 America/New_York
+          include the plugin configuration details in x_Dist_Zilla metadata
+          (thanks, Karen Etheridge!)
+
+3.101642  2013-07-25 14:05:58 America/Los_Angeles
+          pass the DZ logger to Pod::Weaver along correctly if weaver.ini exists
+
+          document use of FileFinderUser and the finder attribute
+
+          remove unused module loading, defer other loading until runtime
+
+3.101641  2010-10-14 22:55:42 America/New_York
+          pass the DZ distmeta to the weaver as input (thanks, David Golden)
+
+3.101640  2010-06-13 08:07:17 America/New_York
+          fix a missing prereq and improve tests to show more information on
+          failure to compile
+
+3.101620  2010-06-11 20:30:13 America/New_York
+          also weave ExecFiles; use FileFinderUser (rt #55870)
+
+3.101530  2010-06-02 07:46:49 America/New_York
+          don't assume that cwd is the right directory for dist root (Florian
+          Ragwitz)
+
+3.100710  2010-03-12 10:07:39 America/New_York
+
+3.100680  2010-03-09 23:34:17 America/New_York
+          improve how we pass extra config to Pod::Weaver; fixes logger
+
+3.100650  2010-03-06 23:25:07 America/New_York
+
+3.093321  2009-11-28 22:24:14 America/New_York
+          make the ->weaver method public for subclassing
+
+3.093320  2009-11-28 22:10:59 America/New_York
+          pass the zilla into the weaver
+
+3.093170  2009-11-13
+          fix a bug that caused config files to sometimes be ignored
+          (reported by Jerome Quelin)
+
+3.093020  2009-10-29
+          refactor much of the guts to Pod::Elemental::PerlMunger
+
+3.093001  2009-10-27
+          config_plugin to allow '@Whatever' to configure your weaver
+
+3.093000  2009-10-27
+          much of the generic prep work has been moved to the core @CorePrep
+
+3.092990  2009-10-26
+          if a ./weaver.* file exists, try to use Pod::Weaver->new_from_config
+
+3.092971  2009-10-24
+          major rewrite to use Pod::Weaver 3
+
+2.000     2009-02-12
+          first release, split out of the Dist-Zilla distribution

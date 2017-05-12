@@ -1,0 +1,17 @@
+Data::Fallback is a very generous version 0.01.  I have great vision for it, but for now, I am just starting.  Here is a list of
+at least a bit of my vision.
+
+- write a better perldoc for Data::Fallback
+- write perldocs for each Data::Fallback:: package
+- allow use of Cache::Cache
+- get a good last used algorithm going
+- get a better protocol for Data::Fallback::Daemon
+- allow XML interface for Data::Fallback::Daemon
+- get some Soap::Lite going
+- help speed up Net::Server stuff, to say a thousand local requests a second on a say dual ghz+ machine
+- write Data::Fallback::Skel, which outlines how to write a general Data::Fallback package
+
+With the above, you would be able to cache pretty well any data, from pretty well any source, get it locally very fast and 
+use any language you like.
+
+And there, is my Data::Fallback vision.

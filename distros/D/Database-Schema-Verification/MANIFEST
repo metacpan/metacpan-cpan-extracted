@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+contrib/verification.cgi
+contrib/verification.mysql
+contrib/config.ini
+t/Database-Schema-Verification.t
+lib/Database/Schema/Verification.pm
+META.yml                                 Module meta-data (added by MakeMaker)

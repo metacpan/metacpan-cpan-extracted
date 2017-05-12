@@ -1,0 +1,21 @@
+This modules allows you to use the private-storage feature of jabber with djabberd.
+
+This is often used to bookmark MUC room, or store annotation about your contact. This 
+can also be used by bots, to store various data, or by jabber client, to store their
+settings.
+
+The module is using the same model as other plugins. A base class called 
+DJabberd::Plugin::PrivateStorage take care of the detail, and must be subclassed, 
+and two method must be overloaded, in order to provides a real backend. 
+
+Currently, 3 backends are shipped :
+- DJabberd::Plugin::PrivateStorage::InMemoryOnly
+  This module is here for testing and to serve as example. 
+  Everything is stored in memory, and do not survive to the reboot.
+ 
+- DJabberd::Plugin::PrivateStorage::SpoolDirectory
+  This module use a simple directory system, to store the private storage
+  content.
+
+- DJabberd::Plugin::PrivateStorage::DBI
+  This module use DBI to access to a supported database.

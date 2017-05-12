@@ -1,0 +1,86 @@
+NAME
+    DBIx::Class::Indexer::WebService::Solr - Automatic indexing of
+    DBIx::Class objects via WebService::Solr
+
+SYNOPSIS
+        package MySchema::Foo;
+    
+        use base qw( DBIx::Class );
+    
+        __PACKAGE__->load_components( qw( Indexed Core ) );
+        __PACKAGE__->table('foo');
+        __PACKAGE__->set_indexer('WebService::Solr');
+        __PACKAGE__->add_columns(
+            foo_id => { # automatically indexed as "id"
+                data_type         => 'integer',
+                is_auto_increment => 1
+            },
+            name => {
+                data_type => 'varchar',
+                size      => 10,
+                indexed   => {
+                    boost => '2.0',
+                }
+            },
+            location => {
+                data_type => 'varchar',
+                size      => 50,
+                indexed   => 1
+            }
+        );
+    
+        __PACKAGE__->has_many( widgets => 'widget' );
+        __PACKAGE__->add_index_fields(
+            widget => {
+                source => 'widgets.name'
+            },
+        );
+
+DESCRIPTION
+    Connects a DBIx::Class-based class to a Solr index.
+
+METHODS
+  new( \%connect_info, $source_class )
+    Creates a new WebSevice::Solr object and normalizes the fields to be
+    indexed.
+
+  setup_fields( $source )
+    Normalizes the index fields so they all have hashref members with an
+    optional boost key.
+
+  value_for_field( $object, $key )
+    Uses the indexed fields information to determine how to get the values
+    for $key out of $object.
+
+  as_document( $object )
+    Constructs a new WebService::Solr::Document object, populates it with
+    data from $object, and returns it.
+
+  insert( $object )
+    Calls "update_or_create_document".
+
+  update( $object )
+    Calls "update_or_create_document".
+
+  delete( $object )
+    Deletes document from the index.
+
+  update_or_create_document( $object )
+    Will either update or add a document to the index.
+
+SEE ALSO
+    *   DBIx::Class
+
+    *   DBIx::Class::Indexed
+
+    *   WebService::Solr
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2008-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

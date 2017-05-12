@@ -1,0 +1,36 @@
+                             DBD::Ovrimos
+
+                      A DBD driver for Ovrimos
+                      -----------------------
+
+                           Release 0.12
+                           ------------
+
+ To install, execute the following commands:
+
+     perl Makefile.PL
+     make
+     make install
+
+ This will take care of installing the driver at the correct place in the
+ perl directory tree.
+
+ The driver is a single perl module; there is no XS, no compilation involved,
+ so there is nothing that can go wrong with the installation. After completing
+ the installation, you should read the POD (run 'perldoc DBD::Ovrimos') to
+ familiarize yourself with the peculiarities of this driver. A good working
+ knowledge of DBI is indispensable, because no tutorial or other help is
+ included. Visit the DBI homepage at 
+       http://www.symbolstone.org/technology/perl/DBI/index.html 
+ to find out more.
+
+ This is the fourth release of the driver. It could misbehave in various ways.
+ (That's why it's not 1.00; because it may lack a final touch).
+ The main difference from the first release, is that it now contains the
+ functionality needed to write stored procedures for Ovrimos using the AGI 
+ protocol.
+ Please visit the primary download site at http://www.altera.gr/download.html
+ to know about consequent releases. Email any problems to dsouflis@altera.gr .
+
+ This software is covered by the GNU Library Public License (see 
+ http://www.gnu.org for the text).

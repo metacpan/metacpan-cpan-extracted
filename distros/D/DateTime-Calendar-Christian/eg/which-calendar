@@ -1,0 +1,115 @@
+#!/usr/bin/env perl
+
+use 5.008004;
+
+use strict;
+use warnings;
+
+use DateTime::Calendar::Christian;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.06';
+
+my %opt = (
+    method	=> 'calendar_name',
+);
+
+GetOptions( \%opt,
+    qw{ method=s reform_date|reform-date=s },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+)
+    and @ARGV
+    and DateTime::Calendar::Christian->can( $opt{method} )
+    or pod2usage( { -verbose => 0 } );
+
+my @names = qw{ year month day hour minute second };
+my $method = $opt{method};
+foreach my $date ( @ARGV ) {
+    my @values = split qr{ [^0-9]+ }smx, $date;
+    @values > @names
+	and die "Invalid time '$date'\n";
+    my %arg;
+    defined $opt{reform_date}
+	and $arg{reform_date} = $opt{reform_date};
+    @arg{ @names[0 .. $#values ] } = @values;
+    my $dt = DateTime::Calendar::Christian->new( %arg );
+    local $\ = "\n";
+    print join ' ', $date, $dt->$method();
+}
+
+__END__
+
+=head1 TITLE
+
+which-calendar - Figure out which calendar a date is in
+
+=head1 SYNOPSIS
+
+ which-calendar 1732-2-11
+ which-calendar -reform-date uk 1732-2-11
+ which-calendar -help
+ which-calendar -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -method
+
+ -method ymd
+
+This option specifies the method to call to generate results. The
+default is C<'calendar_name'>.
+
+=head2 -reform-date
+
+ -reform-date uk
+
+This option specifies a reform date to use for the determination. The
+default is the default for
+L<DateTime::Calendar::Christian|DateTime::Calendar::Christian>, which is
+C<'italy'>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script takes as command arguments one or more ISO-8601-ish
+dates, and displays each date and the calendar the date is in
+(C<'Gregorian'> or C<'Julian'>).
+
+The date is a string containing year, month, day, hour, minute and
+second, punctuated by non-numeric characters. Only the year is required.
+
+The calendar name is obtained by instantiating a
+L<Date::Time::Christian|Date::Time::Christian> object with each
+specified date, and then calling its C<calendar_name()> method. The
+logic actually works with any method that takes no arguments and returns
+a string, so the L<-method|/-method> option is provided for those who
+want to play around with the functionality.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III (F<wyant at cpan dot org>)
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c4b7c4ee6214f37e85c08cc03bfa9b08b6d884cb Build.PL
+SHA1 d00a33f8ff824d2d31a70f69b260b4661395eb20 Changes
+SHA1 7293e276711ec3ffb1a41f6b57387720d1cf3d24 LICENSE
+SHA1 1b9c64eff7710c972570ac073a18c47de772bdb2 MANIFEST
+SHA1 c3b0bfef2e5a19e4fcd60c63554466f9e397b867 META.json
+SHA1 31de7580cedfb95731a087ee3b33c02eb5306582 META.yml
+SHA1 49bb24ece53b74c20e58e207324ef0ad5db38a3f README
+SHA1 b14ec81bc8feb6fbe5279903745e8dd3bcc79737 lib/Devel/Cover/Report/OwnServer.pm
+SHA1 dd9f44c663285f4360ecd6ecbfdd76b37c3aa8ae t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
+SHA1 926c888b9e4149a0e1a85c018cf2de866d244d93 t/07podspelling.t
+SHA1 fb5fc937043945560bbaf19a6190521a939cae8a t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYXuY1AAoJEK492j4Im1BpWm8IAMxjzHRwUxkQvC/psQdwH5Li
+spLB2K5kQjqTu7R3oIylxpID+R4PJy9nKnMz1RHsMW2nRArIo7BG1Vy0T6M4X6D+
+SJ4dPWbpQTX+lVl+yeEHPp0Tb9WJ1FmBwFJ0Zt+G9eO7DtwAP8S7ff2uUE272M6r
+DbXvpHnWtD6CAnL1qZ/hKoN36Bqs+IoGrqLfHYnndf+xbR893IdG7+0i6evyPYE/
+f9EAPHqMnqUE300UakUxmgunJs89ZYf+kGWrXHidASbSNaYGHek8MVw/NTLKMt0k
+68jmXWcPoJhBIz1s2G+zffDhLak5U5Smh/HmpTLCkasHNsW5tj5XmcaBpMJjiIw=
+=6V61
+-----END PGP SIGNATURE-----

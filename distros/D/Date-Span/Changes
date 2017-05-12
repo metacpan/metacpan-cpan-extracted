@@ -1,0 +1,31 @@
+Revision history for Date::Span
+
+1.127     2013-10-21 22:17:53 America/New_York
+          update github URLs to match actual repo
+
+1.126     2013-06-18 17:10:36 America/New_York
+          repackage
+
+1.124     2008-03-05
+          fix broken META.yml
+
+1.123     2007-09-17
+          cope with new Test::More *properly*
+
+1.122     2007-09-17
+          cope with new Test::More
+
+1.121     2006-11-10
+          simplify some code
+          perl::criticism
+
+1.12      2004-01-10 13:45
+          added range_from_unit
+          100% coverage (again?)
+
+1.10      2004-08-23 09:00
+          added standard tests
+          adopt internal standards
+
+1.004     2004-06-30 13:33
+          fixed some pod whitespace problems

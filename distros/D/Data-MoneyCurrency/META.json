@@ -1,0 +1,58 @@
+{
+   "abstract" : "Get currency information for different currencies",
+   "author" : [
+      "David D Lowe <daviddlowe.flimm@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-MoneyCurrency",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::ShareDir" : "0",
+            "JSON" : "0",
+            "Types::Serialiser" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Flimm/perl5-Data-MoneyCurrency.git",
+         "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency"
+      }
+   },
+   "version" : "0.02",
+   "x_bugtracker" : {
+      "web" : "https://github.com/Flimm/perl5-Data-MoneyCurrency/issues"
+   },
+   "x_homepage" : "https://github.com/Flimm/perl5-Data-MoneyCurrency",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

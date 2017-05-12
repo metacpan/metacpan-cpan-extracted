@@ -1,0 +1,27 @@
+#!perl
+{
+    options => {
+        stripwhite => 1,
+        collapse_whitespace => 1,
+        requireall => 1,
+        unknown => "fail",
+    },
+    prepare => {
+        email => {
+            validator => "String",
+        },
+        foo => {
+            validator => "String",
+        },
+        password => {
+            validator => {
+                class => "PasswordPolicy",
+                options => {
+                    disabled => {
+                        username => 1,
+                    },
+                },
+            },
+        },
+    }
+}

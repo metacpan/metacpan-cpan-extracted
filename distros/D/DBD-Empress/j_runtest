@@ -1,0 +1,28 @@
+#!/bin/sh
+
+case $MSPATH in
+ "")	echo "MSPATH not set; The test needs Empress RDBMS." ; exit 1 ;;
+esac
+
+case $MSHYPERPATH in
+ "")	echo "MSHYPERPATH not set" ; exit 1 ;;
+esac
+
+case $1 in
+  "")	echo "*** Usage *** $0 perl_installation_directory" ; exit 1 ;;
+esac
+
+PERLDIR=$1
+
+if test ! -f $PERLDIR/bin/perl
+then
+	echo "'$PERLDIR' is not a perl installation directory. Abort ..."
+	exit 1
+fi
+
+PATH=$PERLDIR/bin:$PATH
+export PATH
+
+rm -fr j_test_db
+perl j_test.pl
+rm -fr j_test_db

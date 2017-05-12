@@ -1,0 +1,899 @@
+=head1 NAME
+
+DBIx::ORM::Declarative - Perl extension for object-oriented database access
+
+=head1 SYNOPSIS
+
+  # In, e.g., MyModel.pm
+  package MyModel;
+  use DBIx::ORM::Declarative
+  (
+    {
+      schema => $name,
+      limit_clause => 'LIMIT %count% OFFSET %offset%',
+      tables =>
+      [
+        {
+          table => $tabname,
+          primary => [ $key, ... ],
+          unique => [ [ $key, ...], ... ],
+          columns =>
+          [
+            {
+              name => $key,
+              type => $type,
+              matches => $re,
+              constraint => $sub,
+            }, ...
+          ],
+        }, ...
+      ],
+      joins =>
+      [
+        {
+            name => $joinname,
+            primary => $tab1,
+            tables =>
+            [
+                {
+                    table => $tab2,
+                    columns =>
+                    {
+                        col1 => 'col1',
+                        col2 => 'col2',
+                    },
+                }, ...
+            ],
+        }, ...
+      ],
+    }, ...
+  );
+  
+  1;
+  
+  # In the application class
+  my $db = MyModel->new(handle => $dbh);
+  
+  # Add a table on the fly
+  $db->table(table => $name, primary => [ $key, ... ], ...);
+  
+  # Use a table
+  my $tab = $db->table_name;
+  my @res = $tab->search([$key, $op, $data, ...], ... );
+  my $ent = $tab->create($key => $value, ...);
+  $ent->column_name($value);
+  $ent->commit;
+  $ent->delete;
+  $tab->delete([$key, $op, $data, ...], ...);
+  my $len = $tab->size;
+  print "Table $name now has $len rows\n";
+
+=head1 ABSTRACT
+
+B<DBIx::ORM::Declarative> encapsulates the creation of database table
+classes at compile time.  You declare the properties of table and row
+classes with data structures passed to the B<DBIx::ORM::Declarative>
+module when the module is used.  You can also add table classes on the
+fly.  Best of all, you don't need to know a thing about SQL to create or
+use the classes.
+
+=head1 DESCRIPTION
+
+The B<DBIx::ORM::Declarative> class encapsulates common database operations
+on tables and provides an object-oriented interface to them.  It provides a
+simple way of constructing an object-oriented database framework.  In
+particular, the user doesn't need to create base classes and subclasses -
+the B<DBIx::ORM::Declarative> class takes care of all that for you.
+No SQL knowledge is needed for most databases, not even for joins.
+
+The class is customized at compile time by presenting a list of schema
+declarations in the B<use> declaration for the module.  This is accomplished
+by creating a family of new, related classes on the fly.  The base class
+of this family is called the schema class.  As a convenience, this schema
+class is added as a base class of the class where B<DBIx::ORM::Declarative>
+was used; thus, you don't need create B<DBIx::ORM::Declarative> objects
+directly, and you can create subclasses that extend B<DBIx::ORM::Declarative>
+without having to know the intimate details of how the classes work.
+
+The schema declarations are hash references, each of which must have the keys
+C<schema> (which declares the name to be used to bind a particular database
+declaration to an object) and C<tables> (which declares the details of the
+tables themselves).  The key C<limit_clause>, if present, declares a
+substitution pattern for use with limiting searches.  By default, it's
+C<LIMIT %offset%,%count%>, which is suitable for MySQL.  The example above
+is suitable for PostgreSQL.  The key C<joins>, if present, declares relations
+between tables.  More on it later.
+
+The value corresponding to the C<tables> key is a reference to an array
+of hash references, each of which describes the particulars of a single
+table.  The value corresponding to the C<table_aliases> key is a hash
+reference, where each key is a table's alias, and the corresponding value
+is the name of the base table.  The value corresponding to the C<joins> key
+is a reference to an array of hash references, each of which describes the
+particulars of a constructed equijoin.
+
+The table hashes each support the keys C<table> (which declares
+the name of the table, as used by SQL), C<alias> (which declares the
+name of the table as used by Perl, if needed), C<primary> (which declares
+the components of the primary key), C<unique> (which declares the components
+of other unique keys), and C<columns> (which declares the name and
+constraints of columns).  Additionally, if your table has a primary key
+consisting of a single column, you can provide a stand-in for the primary
+key in the case where you provide a null value for the primary key on
+creation.  The table hash keys C<for_null_primary> and C<select_null_primary>
+control this.  You can also create a virtual table as join between
+two or more tables using the C<join_clause> hash key, and you can search
+on aggregates by providing a C<group_by> hash key.
+
+If the table name is not a valid Perl identifier, an alias should be given.
+This will let you use derived methods to access the table.  You can provide
+an alias for table name even if the SQL table name is a valid Perl identifier.
+If an alias is provided, the table will be accessed with that name.
+
+The primary key declaration is a reference to an array of strings, each
+of which is the SQL name of a column that makes up part of the primary key.
+This portion of the table declaration is optional.
+
+The unique keys declaration is a reference to an array of array refs, each
+of which contains a list of strings that declare the SQL names of the columns
+that make up the unique key.  It is not necessary to replicate the primary
+key declaration in the unique keys declaration - it will be copied over as
+needed.
+
+The C<for_null_primary> and C<select_null_primary> allow you to use somewhat
+arcane features of various databases to derive primary key values.  The
+value corresponding to the C<for_null_primary> key is the literal expression
+to be used in place of a NULL for a missing or undefined primary key column.
+For example, if you are using an Oracle database, and using the sequence
+I<SEQKEY> for your primary key value, you would use C<SEQKEY.NEXTVAL>.  If
+this key is not present, NULL primary key values won't be included in affected
+INSERT statements.
+
+The value of the C<select_null_primary> key provides a literal SQL SELECT
+command to fetch the primary key value generated by the C<for_null_primary>.
+For the Oracle example, the appropriate value would be:
+
+  SELECT SEQKEY.CURRVAL FROM DUAL
+
+If you are using MySQL with an auto increment primary key, you would not need
+to set a value for C<for_null_primary>, and you would use the following
+for C<select_null_primary>:
+
+  SELECT LAST_INSERT_ID()
+
+The C<join_clause> key lets you define derived tables by performing a
+join.  The value is a literal string that pastes two or more tables together.
+For example, if you have tables named C<EMPLOYEE>, C<ADDRESS>, and C<PAYROLL>,
+where C<EMPLOYEE> has an C<ADDRESS_ID> column corresponding to C<ADDRESS>'s
+primary key, and C<PAYROLL> has an C<EMPLOYEE_ID> column, the appropriate join
+clause, table clause, and alias clause would be something like this:
+
+  table => 'PAYROLL',
+  alias => 'PAYROLL_EMPLOYEE_ADDRESS',
+  join_clause => 'JOIN EMPLOYEE USING (EMPLOYEE_ID) JOIN ADDRESS ' .
+                 'USING (ADDRESS_ID)',
+
+This construction requires the use of aliases for table and column names.
+For a more flexible alternative, see NEW JOIN SYNTAX, below.
+
+The columns declaration is a reference to an array of hash refs, each of
+which declares a single column.  The valid keys are C<name> (which provides
+the SQL name for the column), C<alias> (which provides the Perl name for
+the column, if necessary), C<type> (which is one of I<number>, I<string>,
+I<nullablenumber>, or I<nullablestring>), C<matches> (which is a regular
+expression that should match whatever is in the column), and C<constraint>
+(which is a reference to a function or the name of a method used to validate
+the value of the column).
+
+If the column name is not a valid Perl identifier, an alias should be given,
+so that derived methods can be used on returned row objects.
+
+Type checking upon setting a column's value will be done in the order
+constraint, matches, type - if the C<constraint> key is present, the
+corresponding code reference or method will be called to validate any new
+column value, or else if the C<matches> key is present, the corresponding
+regular expression will be used to vallidate any new column value, or else
+if the C<type> key is present, the type will be validated.  Note that a
+type of C<nullablestring> implies no validation at all.
+
+The C<constraint> function is called as a method on the table or row object,
+and it's given the proposed new value and column names as arguments.  For
+example, if you're attempting to set the C<col1> column on a row to the
+value C<no surrender>, the validation code would be run as:
+
+  $ent->$validate('no surrender', 'col1');
+
+Any columns in a primary key declaration that aren't in a columns declaration
+are added to the end of the columns declaration in the order found in the
+primary key declaration, with a type of C<string>.  Any columns in a unique
+key declaration that aren't in a columns or primary key declaration are
+added after that, with a type of C<nullablestring>.
+
+The C<group_by> key lets you define searches on tables using aggregated
+results.  For example, if you have a PAYROLL table with an EMPLOYEE_ID,
+CHECK_DT, and CHECK_AMT table, and you want to be able to get the total
+amount an employee has been paid in a given period of time, you'd need a
+table declaration like this:
+
+  table => 'PAYROLL',
+  alias => 'payroll_total_pay',
+  group_by => 'EMPLOYEE_ID',
+  columns =>
+  [
+    { name => 'EMPLOYEE_ID', alias => 'employee_id', },
+    { name => 'SUM(CHECK_AMT)', alias => 'total_pay', },
+    { name => 'CHECK_DT', alias => 'check_dt', },
+  ],
+
+=head1 NEW JOIN SYNTAX
+
+In addition to declaring tables, the schema declaration can also declare
+meta-table objects.  These are based on database equijoins.  Any found
+row objects can be written/updated just like regular row objects, and 
+if the table relations satisfy certain basic constraints, the join
+object can also be used to create database records.
+
+This syntax lets you perform equijoins on databases that don't support the
+JOIN operator (such as early Oracle servers).
+
+The C<join> section consists of an array of hash references, and each of
+them should look like this:
+
+  name => 'join_name',  # This is the name of the join
+  primary => 'tab1',    # Name or alias of primary table in the joins
+  tables =>             # Declares the tables to use
+  [
+    {
+      table => 'tab2',  # The name or alias of the secondary table
+      columns =>        # Declare how the tables are joined
+      {
+        col1 => 'col2'  # tab1.col1 = tab2.col2
+        col3 => 'col4'  # tab1.col3 = tab2.col4
+      },
+    },
+    {
+      table => 'tab3',  # It's okay to join more than two tables
+      columns =>        # Declare how the tables are joined
+      {
+        col3 => 'col4'  # tab1.col3 = tab3.col4
+      },
+    },
+  ],
+
+This declaration would declare a method named C<join_name> that will return an
+object that can be used to search all of the associated tables at once.  The
+table names or aliases given in the C<tables> array B<must> be defined in the
+C<tables> section of the schema declaration, or the join object won't work.
+
+If the secondary tables are all joined to the primary table via their
+respective primary keys, and the secondary tables are all set up to provide
+primary keys automatically, the join object can also be used to create records
+in the database.
+
+=head2 Join column names
+
+If there is no column name conflict, you can use the declared column (or
+alias) name given in the table definitions underlying your join object.  For
+example, with these declarations:
+
+ tables =>
+ [
+   {
+     table   => 'table1',
+     columns =>
+     [
+       { name => 'col_a', },
+       { name => 'col_b', },
+       { name => 'col_c', },
+     ],
+   },
+   {
+     table   => 'table2',
+     columns =>
+     [
+       { name => 'col_d', },
+       { name => 'col_e', },
+     ],
+   },
+ ],
+ joins =>
+ [
+   {
+     name    => 'join1',
+     primary => 'table1',
+     tables =>
+     [
+       {
+         table   => 'table2',
+         columns =>
+         {
+           col_c => 'col_d',
+         },
+       },
+     ],
+   },
+ ],
+
+you can refer to all five of the columns in the join by their respective
+names.  In the case where there is name overlap, you would need to use
+a long or fully qualified name.  The fully qualified name consists of the
+table name or alias, an underscore character, and the column name.  The
+fully qualified names for the example above would be:
+
+ table1_col_a
+ table1_col_b
+ table1_col_c
+ table2_col_d
+ table2_col_e
+
+=head2 Extensive JOINs
+
+It's possible to set up a collection of tables that you'd like to perform
+an equijoin on, but that don't happen to have a common "primary" table.
+For example, with the following table declarations:
+
+  CREATE TABLE tab1
+  (
+    tab1_id INT PRIMARY KEY,
+    tab1_string TEXT,
+    UNIQUE KEY (tab1_string)
+  ) ;
+
+  CREATE TABLE tab2
+  (
+    tab2_id INT PRIMARY KEY,
+    tab2_string TEXT,
+    UNIQUE KEY (tab2_string)
+  ) ;
+
+  CREATE TABLE tab3
+  (
+    tab3_id INT PRIMARY KEY,
+    tab1_ref INT NOT NULL REFERENCES tab1(tab1_id)
+  ) ;
+
+  CREATE TABLE tab4
+  (
+    tab4_id INT PRIMARY KEY,
+    tab3_ref INT NOT NULL REFERENCES tab3(tab3_id)
+    tab2_ref INT NOT NULL REFERENCES tab2(tab2_id)
+  ) ;
+
+This set of tables has no single table that all of the the other three
+can join on.  C<tab4> comes closest, but it doesn't reach C<tab1> on its own.
+The solution is to use the C<on_secondary> key to declare a secondary table
+to extend the join, like this:
+
+  name    => 'join_name',
+  primary => 'tab4',
+  tables  =>
+  [
+    {
+        table   => 'tab3',
+        columns => { tab3_ref => 'tab3_id' },
+    },
+    {
+        table   => 'tab2',
+        columns => { tab2_ref => 'tab2_id' },
+    },
+    {
+        table        => 'tab1',
+        on_secondary => 'tab3',
+        columns      => { tab1_ref => 'tab1_id' },
+    },
+  ],
+
+For the scope of the table declaration containing the C<on_secondary> key,
+the table named by it is considered to be the primary table.  Note that this
+table must have been previously declared/used in the join.
+
+=head2 Table aliases
+
+In addition to creating an alias for a table in its definition (which actually
+only changes the name of the definition), you can create a table alias
+using the C<table_aliases> key in your tables declaration.  This is explained
+in the NEW JOIN SYNTAX section because it's most useful in the case where
+you are joining the same table more than once.  See the test in C<t/Join.t>
+for an example.
+
+The C<table_aliases> declaration lets you essentially duplicate an entire
+table declaration under a different name, without writing a duplicate
+declarative section.  Note that any aliases declared this way B<must> occur
+before any C<joins> declaration that would use them.  Also, be careful with
+multiple joins to the same table; if the multiply joined table has unique
+keys, and the join object is initially created with all of the data for
+more than one instance of the multiply joined table the same, it may prove
+impossible to reliably update the database with that join object later.
+Again, see C<t/Join.t> for an example of the problem case - updating either
+the C<work_addr> or C<home_addr> fields could wind up updating the other
+field in the database, or getting lost, when the changes are committed.
+
+=head1 METHODS
+
+=head2 DBIx::ORM::Declarative->import(@schemadefs)
+
+The import() method is called implicitly by the
+C<use B<DBIx::ORM::Declarative>> clause.  It creates the classes and
+methods to support the declared schema, tables, joins, and rows.  It
+will also insert the generated schema class into the I<use>ing class,
+so you can do this:
+
+  package Model;
+  use DBIx::ORM::Declarative # ... schema def
+  ;
+
+And then later, you just do:
+
+  my $model = new Model %args;
+
+Then you can use C<$model> as a schema object directly.
+
+=head2 DBIx::ORM::Declarative->new
+
+The new() method creates a new B<DBIx::ORM::Declarative> object.  It takes a
+hash of arguments, and expects values for the key C<handle> (which must be a
+DBI-compatible object capable of at least performing the selectall_arrayref(),
+do(), and commit() methods).
+
+If the new() method is passed a value for the key C<dsn>, but not C<handle>,
+I<and> B<DBI> has been loaded, it will call B<DBI>->connect(), using the
+result as a handle.  The username and password are taken from the keys
+C<username> and C<password>, respectively.
+
+If called as an object method, it will return a copy of the current object,
+with suitable overrides depending on its arguments.  Calling new() with an
+undefined handle (that is, C<handle => undef> in the args, not with no handle
+declaration at all) could be used to create an object factory that uses
+database handles that are created as needed.
+
+=head2 DBIx::ORM::Declarative->schema
+
+The schema() method can be used to add a new schema at runtime.  It can
+be called as either a class or object method.  If called as a class method,
+it returns a new object bound to the new schema.  If called as an object
+method, it returns a new object bound to the new schema, and using the handle
+from the object (if available).  The arguments to the schema() method
+are a hash similar to a schema stanza from the B<use DBIx::ORM::Declarative>
+method.
+
+=head2 $db->handle()
+
+The handle() method is an accessor/mutator to get or set the database handle.
+The accessor variant takes no arguments, and returns the database handle
+associated with the schema.  The mutator method takes a single argument,
+and returns the schema object itself.  This will let you add/change the
+database handle and then immediately create and use a table object.  For
+example:
+
+  my @ents = $schema->handle($dbh)->table1->search($searchspec);
+
+For the mutator variant, if the argument is defined, it must be compatible
+with a DBI handle.  If the argument is undefined, the current handle is
+deleted.
+
+=head1 AUTOGENERATED METHODS
+
+Every schema, table, and column definition corresponds to an autogenerated
+method.  The schema methods are valid on any object, the table methods are
+valid on associated schema, table and row objects, the column methods are
+valid on row objects.  Using a schema method will return a
+B<DBIx::ORM::Declarative> subclass object bound to the schema (a "schema
+object").  Using a table method will return a B<DBIx::ORM::Declarative>
+subclass object bound to the table (a "table object").  Searching or adding
+data via a table object returns a list of B<DBIx::ORM::Declarative> subclass
+objects bound to a particular row of the corresponding table (the "row
+objects").
+
+For example, if you have a schema named "schema1" with a table named "table1"
+that has a column named "column1", the following are all legal (based on
+a properly created B<DBIx::ORM::Declarative> object in C<$db>):
+
+  my $schema = $db->schema1;
+  my $table = $schema->table1;
+  my $row = $table->create(column1 => $value);
+  $row->column1($newvalue);
+
+If any definition provides an alias, only the alias is used for the method
+name.  For example, if you have an table named C<table1> with an alias
+of C<alias1>, B<DBIx::ORM::Declarative> will only create an alias1() method
+(not a table1() method).
+
+=head1 SCHEMA OBJECT METHODS
+
+Schema object methods are also valid for table and row objects.
+
+=head2 $schema->schema()
+
+The schema() method is an accessor/mutator to get or set the schema for
+the object.  The accessor method takes no argument and returns the current
+schema name.  The mutator method takes a single argument, which is the name
+of a schema, and returns the schema object.  Note that the object may need
+to be re-bless'ed.
+
+If schema() is passed more than one argument, or the argument is a hash
+reference, the class method version is called.  If the argument is undefined,
+the current schema name is returned, if available.
+
+=head2 $schema->table()
+
+The table() method lets you add a table definition to a schema at run time.
+It takes a hash of arguments, which is similar to a table definition in the
+B<use DBIx::ORM::Declarative> stanza.  It returns a table object bound to the
+newly defined table type.  The schema object is not changed.
+
+If the table() method is passed a single argument, a new table object bound
+to the specified table is returned (if possible).  If the table() method is
+passed no arguments, the table bound to the object (if any) is returned.
+
+=head2 $schema->join()
+
+The join() method lets you add a join definition to a schema at run time.
+It takes a hash of arguments, which is similar to a join definition in the
+B<use DBIx::ORM::Declarative> statement.  It returns the apropriately
+initialized join object.  The schema object is not changed.
+
+If the join() method is passed as signle argument, a new join object
+bound to the specified join is returned, if possible.  If no such join
+exists, but a table of the same name does exist, the table object is
+returned instead.
+
+If the join() method is passed no arguments, the name used by the join
+is returned, if it's a join object.
+
+=head1 TABLE OBJECT METHODS
+
+Table methods may also be used on row objects, but not schema objects.  These
+methods are also available to join objects.
+
+=head2 $table->search()
+
+The search() method allows you to search for data in a table.  The method
+takes as its arguments a list of references to arrays, where each array
+contains a series of search criteria.  The criteria consist of a column name
+or alias, an operation, and possibly a parameter.  The criteria are put in
+the list one after the other.  The conditions in a single criteria array must
+all be met for a given row to be returned.  However, if the conditions of any
+single set of criteria are met, the row will be returned.  In other words, the
+conditions are ANDed within a single array, but ORed between arrays.
+
+Single-value parameters can either be scalars (which are taken to be the
+literal value in question) or scalar references (where the referenced scalar
+is taken to be an SQL expression).  For example, if you want to look for
+a record where the value of C<col1> is twice the value of C<col2>, your
+criteria would be:
+
+  col1 => eq => \'2*col2'
+
+The operations are:
+
+=over 4
+
+=item eq
+
+The column must match the value of the parameter (a single value).
+
+=item ne
+
+The column must not match the value of the parameter (a single value).
+
+=item gt
+
+The column must be greater than the value of the parameter (a single value).
+
+=item lt
+
+The column must be less than the value of the parameter (a single value).
+
+=item ge
+
+The column must be greater than or equal to the value of the parameter (a
+single value).
+
+=item le
+
+The column must be less than or equal to the value of the parameter (a
+single value).
+
+=item isnull
+
+The column must be null.  There is no parameter.
+
+=item notnull
+
+The column must not be null.  There is no parameter.
+
+=item in
+
+The column must have a value that is one of those in the array pointed to
+by the reference which is provided as the parameter.
+
+=item notin
+
+The column must have a value that is not one of those in the array pointed to
+by the reference which is provided as the parameter.
+
+=item like
+
+The column must have a value that matches the SQL wildcard pattern provided
+by the parameter (which can only be a scalar, not a reference).
+
+=item notlike
+
+The column must not have a value that matches the SQL wildcard pattern provided
+by the parameter (which can only be a scalar, not a reference).
+
+=back
+
+In addition to search criteria, you can also pass limits for the search by
+using the pseudo column name C<limit by>.  The next two items in the list are
+the offset and row count for the limit.
+
+In addition to limiting your search to a subset of the results, you can also
+fetch the results in a sorted order by using the pseudo column name
+C<order by>.  It expects an array reference of column or alias names.
+
+The search() method returns an array of row objects (one per matching row).
+
+=head2 $table->size()
+
+The size() method returns the number of rows in the table (or join).
+It accepts most of the same criteria as the search() method, except for
+grouping and limit criteria (which are ignored).
+
+=head2 delete()
+
+The delete() method searches for and deletes records from the database based
+on the provided search criteria.  The syntax and format is identical to the
+search() method.  B<WARNING> - this method autocommits changes; be careful.
+
+This method cannot be used on join objects.
+
+=head2 create()
+
+The create() method creates a new database entry, and returns a row object
+on success (or nothing on failure).  The method expects a list of column
+name - value pairs.  B<WARNING> - this method autocommits changes; be careful.
+
+=head2 create_only()
+
+The create_only() method creates one or more database methods, without
+validating its input against the row constraints for the table, and without
+returning row objects.  It expects a list of hash references, where the keys
+are column names or aliases and the values are the values to be inserted into
+the database.  It returns a list of flags, where a true value indicates that
+the corresponding hash reference was successfully inserted into the table.
+
+B<WARNING> - this method autocommits changes, and it bypasses row constraint
+checking.
+
+This method cannot be used on join objects.
+
+=head2 bulk_create()
+
+The bulk_create() method is a faster, less error-prone alternative to
+create_only.  It requires that your database support the SELECT ... FROM DUAL
+syntax (all Oracle versions, MySQL from 4.1.0 on).  It takes an array
+reference with strings that are column names, and a list of array references
+of data, which are the values being inserted.  It returns the number of rows
+successfully inserted (usually; see L<DBI> for what its do() method returns).
+
+B<WARNING> - this method autocommits changes; be careful.
+
+B<WARNING> - this method also bypasses row constraint checking, and there's
+no way to know which rows were successfully inserted in the event that fewer
+rows made it in than were specified.  A search is likely to return all of the
+rows provided, as the most likely cause for missing an insert would be that
+a conflicting row already exists.
+
+B<WARNING> - this method generates a single SQL statement to insert all of
+the data requested - a big array of stuff to insert might overflow transfer
+buffers in either the DBD client libraries or the server itself.  Try to stay
+under a few thousand rows at once.  On a RHEL 4 system, using MySQL 4.1.20,
+I was able to get up to about 1,000 rows, when the data contained primary
+keys.  Without the primary keys, it's about 5,300 rows.
+
+This method cannot be used on join objects.
+
+=head1 ROW OBJECT METHODS
+
+=head2 delete()
+
+The delete() method marks this entry as to be deleted.  It doesn't immediately
+delete the entry from the database.
+
+=head2 commit()
+
+The commit() method writes any changes on the object to the database.  If the
+object has been marked for deletion, it will be promoted to an associated
+table object by this method.  There is no corresponding rollback() method -
+just let the object go out of scope if you don't want to write the changes
+out to the database.
+
+
+=head1 EXAMPLES
+
+First example:  loading B<DBIx::ORM::Declarative> and create a schema:
+
+  use DBIx::ORM::Declarative
+  (
+    {
+      schema => 'Example1',
+      tables =>
+      [
+        {
+          table => 'table1',
+          primary => [ qw(id) ],
+          unique => [ [ qw(val) ] ],
+          columns =>
+          [
+            {
+              name => 'id',
+              type => 'number',
+            },
+            {
+              name => 'val',
+              type => 'string',
+            },
+          ],
+        },
+        {
+          table => 'table2',
+          primary => [ qw(id) ],
+          unique => [ [ qw(val) ] ],
+          columns =>
+          [
+            {
+              name => 'id',
+              type => 'number',
+            },
+            {
+              name => 'val',
+              type => 'string',
+            },
+          ],
+        },
+        {
+          table => 'table1',
+          alias => 'table1_table2',
+          join_clause => 'JOIN table2 USING (id)',
+          columns =>
+          [
+            { name => 'table1.val', alias => 'table1_val' },
+            { name => 'table2.val', alias => 'table2_val' },
+          ]
+        },
+      ],
+    },
+  );
+
+Second example:  create a table object
+
+  my $db = new DBIx::ORM::Declarative schema => 'Example1', handle => $dbh;
+  my $table = $db->table1;
+
+Third example:  search for rows with an C<id> between 17 and 24, and where the
+C<val> starts with the string C<closure>:
+
+  my @rows = $table->search([ id => ge => 17, id => le => 24,
+                              val => like => 'closure%' ]);
+
+Fourth example:  change the string on the first returned item to "closure is
+a myth" and commit the change:
+
+  $rows[0]->val("Closure is a myth")->commit;
+
+=head1 HOW DO I...
+
+=head2 How do I use a view?
+
+A view appears identical to a table from the point of view of a client.
+Just describe the columns as usual.
+
+=head2 How do I perform a join?
+
+If your database supports the B<JOIN> operator, you can add a virtual table
+with a C<join_clause> to  your schema.  The restrictions on this are that
+the table name must correspond to the first table in the join (so you'll
+need to use an alias if you want to access that table by itself - either in
+the virtual table definition, or in the definition for the table), and
+the join can't be implemented via a C<WHERE> clause.  You also can't update,
+insert, or delete into or from a join.
+
+Remember that the C<name> keys for the column definitions must be what
+SQL expects, so if you have columns with the same name in multiple
+different tables, you'll need to provide a complete column specification
+(something like C<table.column>), and you'll need to provide an alias if
+you want to access it.
+
+A more flexible alternative for performing equijoins is to create a join
+meta-table.  See NEW JOIN SYNTAX above for that.
+
+=head1 CLASSES
+
+There is one main subclasses of B<DBIx::ORM::Declarative> -
+B<DBIx::ORM::Declarative::Schema>.  Subclasses of that class encapsulate
+the individual schemas.
+
+Furthermore, the B<DBIx::ORM::Declarative::Schema> class has several
+subclasses that encapsulate various database objects:
+B<DBIx::ORM::Declarative::Row> and B<DBIx::ORM::Declarative::JRow> encapsulate
+an individual row from a database table or join, and
+B<DBIx::ORM::Declarative::Table> and B<DBIx::ORM::Declarative::Join>
+encapsulate the tables and joins themselves.
+
+=head1 CAVEATS
+
+Schema names must be valid Perl identifiers.
+
+The B<DBIx::ORM::Declarative::Schema> namespace and all of its dependent name
+spaces can be used by this module.  The rules are that each schema gets a new
+namespace dependent on B<DBIx::ORM::Declarative::Schema>, and each table gets
+b<two> name spaces dependent on the schema's namespace.
+
+Both commit() and rollback() methods can be called on the handle passed
+to a B<DBIx::ORM::Declarative> constructor.  This may disrupt transactions
+if you use the handle outside of this class.
+
+The B<DBIx::ORM::Declarative> class will fetch and return ALL of the results
+for a search, unless you use a limit clause - queries that return large data
+sets will take a long time, and may run you out of memory.
+
+You can't insert, update, or delete using a virtual table created with
+a C<join_clause> declaration.  Use the new joins object type for inserts
+and updates.  Use the individual tables for deletes.
+
+The new join objects can be used to update tables, and support equijoins to
+the same table multiple times (see the C<t/Join.t> test for an example of
+how to do this).  However, updating an equijoin that uses the same table
+multiple times can have undesirable results - the underlying objects don't
+consider that separate, aliased tables may in fact be the same table.  This
+can result in updates being "lost" or "duplicated", and it can also result
+in row objects being in an inconsistent state with respect to the database.
+
+C<order by> clauses to searches, and the ability to pass in an arbitrary
+SQL expression in a search by using a scalar reference, could leave your
+application vulnerable to SQL injection attacks - make sure your application
+checks external parameters B<before> you pass them to the search() method.
+
+The new bulk_create() method and the create() method of the new join class
+generate SQL that performs SELECT ... FROM DUAL.  This is an Oraclism that
+may or may not be supported by your database.  This restriction may be lifted
+in the future.  As a workaround, you can add this:
+
+ CREATE TABLE DUAL (DUMMY VARCHAR(1));
+ INSERT INTO DUAL VALUES ('X');
+
+to your schema.  A more serious restriction is that they both use subselects,
+which are not supported on earlier versions of MySQL.  There is probably no
+way to get around this.
+
+The bulk_create() and create_only() methods don't work with the new join
+class.  You'll need to use the underlying table classes.
+
+=head1 TESTING
+
+I'm in the process of cleaning up and enhancing the test suites I use on
+this module.  They will be released as they become ready.
+
+To date, the class has only been tested against a MySQL 4.1.20 and a MySQL
+5.0.17 database.  The generated SQL is fairly generic, however, and I have
+no reason to suspect the class won't work with any other SQL database (but
+see the note for the bulk_create() method and the new join class).
+
+=head1 SEE ALSO
+
+L<DBI(3)>
+
+=head1 AUTHOR
+
+Jim Schneider, E<lt>perl@jrcsdevelopment.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2006,2007 by Jim Schneider
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.6.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

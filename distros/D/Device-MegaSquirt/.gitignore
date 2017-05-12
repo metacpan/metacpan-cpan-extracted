@@ -1,0 +1,12 @@
+Makefile
+Makefile.old
+blib
+pm_to_blib
+.todo
+.R*
+*.swp
+build-stamp
+install-stamp
+inc
+debian/files
+debian/libdevice-megasquirt-perl*

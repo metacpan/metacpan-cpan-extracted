@@ -1,0 +1,21 @@
+---
+name: DBIx-Class-FormatColumns
+version: 0.02
+author:
+  - 'Sascha Kiefer <esskar@cpan.org>'
+abstract: Creates format accessors for you
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class: 0
+  DateTime::Format::DBI: 0.031
+  HTML::Entities: 1.35
+provides:
+  DBIx::Class::FormatColumns:
+    file: lib/DBIx/Class/FormatColumns.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

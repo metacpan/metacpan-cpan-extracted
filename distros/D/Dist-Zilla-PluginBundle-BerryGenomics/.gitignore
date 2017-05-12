@@ -1,0 +1,7 @@
+# Dzil build directorys
+/Dist-Zilla-PluginBundle-BerryGenomics*
+[._][Bb]uild/
+release*
+*.bak
+*.swp
+.gitnxtver_cache

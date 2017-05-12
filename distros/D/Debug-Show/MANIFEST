@@ -1,0 +1,14 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Debug/Show.pm
+t/hide.t
+t/pod_cvg.t
+t/pod_syn.t
+t/show.t
+SIGNATURE    Added here by Module::Build

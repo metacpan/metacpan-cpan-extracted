@@ -1,0 +1,79 @@
+/* vim:syntax=dot */
+digraph inheritance {
+    graph [splines=true,model=subset,ratio=auto];
+    node [shape=ellipse];
+    edge [];
+
+    
+        DBIx_Class_ResultSourceProxy_Table [ label="DBIx::Class::ResultSourceProxy::Table" ];
+        DBIx_Class_Relationship_ManyToMany [ label="DBIx::Class::Relationship::ManyToMany" ];
+        DBIx_Class_PK [ label="DBIx::Class::PK" ];
+        DBIx_Class_Relationship_Base [ label="DBIx::Class::Relationship::Base" ];
+        DBIx_Class_Componentised [ label="DBIx::Class::Componentised" ];
+        DBIx_Class_PK_Auto [ label="DBIx::Class::PK::Auto" ];
+        DBIx_Class_Relationship_Helpers [ label="DBIx::Class::Relationship::Helpers" ];
+        DBIx_Class_Relationship [ label="DBIx::Class::Relationship" ];
+        DBIx_Class_Relationship_Accessor [ label="DBIx::Class::Relationship::Accessor" ];
+        DBIx_Class_Relationship_ProxyMethods [ label="DBIx::Class::Relationship::ProxyMethods" ];
+        DBIx_Class [ label="DBIx::Class" ];
+        ExampleDB_Result_PhoneNumber [ label="ExampleDB::Result::PhoneNumber" ];
+        Class_Accessor_Grouped [ label="Class::Accessor::Grouped" ];
+        DBIx_Class_Relationship_CascadeActions [ label="DBIx::Class::Relationship::CascadeActions" ];
+        DBIx_Class_Relationship_BelongsTo [ label="DBIx::Class::Relationship::BelongsTo" ];
+        DBIx_Class_ResultSourceProxy [ label="DBIx::Class::ResultSourceProxy" ];
+        DBIx_Class_Core [ label="DBIx::Class::Core" ];
+        ExampleDB_Result_Person [ label="ExampleDB::Result::Person" ];
+        DBIx_Class_Relationship_HasMany [ label="DBIx::Class::Relationship::HasMany" ];
+        ExampleDB_Result_Address [ label="ExampleDB::Result::Address" ];
+        DBIx_Class_InflateColumn [ label="DBIx::Class::InflateColumn" ];
+        DBIx_Class_Row [ label="DBIx::Class::Row" ];
+        Class_C3_Componentised [ label="Class::C3::Componentised" ];
+        DBIx_Class_InflateColumn_DateTime [ label="DBIx::Class::InflateColumn::DateTime" ];
+        DBICx_AutoDoc_Magic [ label="DBICx::AutoDoc::Magic" ];
+        ExampleDB_Result_EmailAddress [ label="ExampleDB::Result::EmailAddress" ];
+        DBIx_Class_Relationship_HasOne [ label="DBIx::Class::Relationship::HasOne" ];
+            DBIx_Class_ResultSourceProxy_Table -> DBIx_Class_ResultSourceProxy;
+                        DBIx_Class_PK -> DBIx_Class_Row;
+                DBIx_Class_Relationship_Base -> DBIx_Class;
+                DBIx_Class_Componentised -> Class_C3_Componentised;
+                DBIx_Class_PK_Auto -> DBIx_Class;
+                DBIx_Class_Relationship_Helpers -> DBICx_AutoDoc_Magic;
+        DBIx_Class_Relationship_Helpers -> DBIx_Class_Relationship_HasMany;
+        DBIx_Class_Relationship_Helpers -> DBIx_Class_Relationship_HasOne;
+        DBIx_Class_Relationship_Helpers -> DBIx_Class_Relationship_BelongsTo;
+        DBIx_Class_Relationship_Helpers -> DBIx_Class_Relationship_ManyToMany;
+        DBIx_Class_Relationship_Helpers -> DBIx_Class;
+                DBIx_Class_Relationship -> DBIx_Class_Relationship_Helpers;
+        DBIx_Class_Relationship -> DBIx_Class_Relationship_Accessor;
+        DBIx_Class_Relationship -> DBIx_Class_Relationship_CascadeActions;
+        DBIx_Class_Relationship -> DBIx_Class_Relationship_ProxyMethods;
+        DBIx_Class_Relationship -> DBIx_Class_Relationship_Base;
+        DBIx_Class_Relationship -> DBIx_Class;
+                        DBIx_Class_Relationship_ProxyMethods -> DBIx_Class;
+                DBIx_Class -> DBIx_Class_Componentised;
+        DBIx_Class -> Class_Accessor_Grouped;
+                ExampleDB_Result_PhoneNumber -> DBIx_Class_Core;
+        ExampleDB_Result_PhoneNumber -> DBIx_Class;
+                                        DBIx_Class_ResultSourceProxy -> DBIx_Class;
+                DBIx_Class_Core -> DBIx_Class_Relationship;
+        DBIx_Class_Core -> DBIx_Class_InflateColumn;
+        DBIx_Class_Core -> DBIx_Class_PK_Auto;
+        DBIx_Class_Core -> DBIx_Class_PK;
+        DBIx_Class_Core -> DBIx_Class_Row;
+        DBIx_Class_Core -> DBIx_Class_ResultSourceProxy_Table;
+        DBIx_Class_Core -> DBIx_Class;
+                ExampleDB_Result_Person -> DBIx_Class_InflateColumn_DateTime;
+        ExampleDB_Result_Person -> DBIx_Class_Core;
+        ExampleDB_Result_Person -> DBIx_Class;
+                        ExampleDB_Result_Address -> DBIx_Class_Core;
+        ExampleDB_Result_Address -> DBIx_Class;
+                DBIx_Class_InflateColumn -> DBIx_Class_Row;
+                DBIx_Class_Row -> DBIx_Class;
+                        DBIx_Class_InflateColumn_DateTime -> DBIx_Class_InflateColumn;
+        DBIx_Class_InflateColumn_DateTime -> DBIx_Class;
+                DBICx_AutoDoc_Magic -> DBIx_Class;
+                ExampleDB_Result_EmailAddress -> DBIx_Class_Core;
+        ExampleDB_Result_EmailAddress -> DBIx_Class;
+                
+}
+

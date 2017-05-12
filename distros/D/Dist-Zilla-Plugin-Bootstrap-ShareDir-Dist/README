@@ -1,0 +1,40 @@
+Dist::Zilla::Plugin::Bootstrap::ShareDir::Dist
+
+This module allows one to load a "Dist" styled "ShareDir" using a
+"Bootstrap" mechanism so a distribution can use files in its own source
+tree when building with itself.
+
+This is very much like the "Bootstrap::lib" plugin in that it injects
+libraries into @INC based on your existing source tree, or a previous
+build you ran.
+
+And it is syntactically like the "ShareDir" plugin.
+
+Note that this is really only useful for self consuming *plugins* and
+will have no effect on the "test" or "run" phases of your dist. ( For
+that, you'll need "Test::File::ShareDir" ).
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

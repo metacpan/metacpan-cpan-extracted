@@ -1,0 +1,8 @@
+Leak.pm				The perl part (with the docs as pod)
+Leak.xs				C code
+MANIFEST			This file
+MANIFEST.SKIP			Things to to list here
+Makefile.PL			How to build it
+README				Description of package 
+t/basic.t			A Basic test
+typemap				How our C structures get stored as perl

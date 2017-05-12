@@ -1,0 +1,13 @@
+datapanel.pl
+Makefile.PL
+META.yml
+Device/SNP.pm
+MANIFEST
+README
+Changes
+t/t1.t
+datadesigner/README
+datadesigner/linux.DTB
+datadesigner/tux-sw.gif
+datadesigner/tux-sw.bmp 
+META.json                                Module JSON meta-data (added by MakeMaker)

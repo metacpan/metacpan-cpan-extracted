@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.78.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 c2103811e17ca6cdda00e20f796adca367a0fd75 Changes
+SHA1 c17b37abdd6dd5616aeb57569d1d6b0cd949861a LICENSE
+SHA1 440afd66e0162a19235dbecbf97cfbeff807a5a0 MANIFEST
+SHA1 08862f351a306c36708a6b1a8721b92faa909829 META.json
+SHA1 c241ee7ad1c9bd2151d8db8ec022371f5cdaf440 META.yml
+SHA1 8f24208754eb55020149e0a8df0811640e5a85c9 Makefile.PL
+SHA1 66f3188d966701f24ed4514a39ef3f26b9e458e6 README
+SHA1 a17e126afbcad2ba7d38caf964a1e7dba72b9638 cpanfile
+SHA1 a9cb11ff83acf6c5fa55edc29cbf2013567e526c dist.ini
+SHA1 6ade9fdd5b6fedea2b51c8a52dd823797b5904b4 lib/Dist/Zilla/Stash/GitHub.pm
+SHA1 c522c3928158e64bd97d34d20cbfe0b5305a7eb2 t/00-check-deps.t
+SHA1 6b10c85350decaf0dc4bf4bf2d7a432918db0e6c t/00-compile.t
+SHA1 c485ceff651db27aed54e9c00f6d0b8ae51073fc t/000-report-versions-tiny.t
+SHA1 e49442b398856d1d406c79aec59b17a93a8e0f4a t/basic.t
+SHA1 89526c1e5be4967e61584d38ab6a9de4199c5911 xt/author/eol.t
+SHA1 5c4c2cfb3d883ff4bc29ed93cc9e41d7f8cad246 xt/author/no-tabs.t
+SHA1 162d85b24a3b77c981eb193cf52809b888e973ef xt/author/pod-spell.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 a7434f536e46adef4aa8cbb314c4efea51f868b4 xt/release/has-version.t
+SHA1 c70a85aac678c1061b33222f43d75b66448d83fe xt/release/minimum-version.t
+SHA1 b399076126d5ab2d0cd2d41f748e3e93fa4220d5 xt/release/no-smart-comments.t
+SHA1 2134a84d6dad529ccf113714b49fb5c5392a02c1 xt/release/pod-coverage.t
+SHA1 b52135b29e597584cffcaf4ac7daf71816940144 xt/release/pod-linkcheck.t
+SHA1 a6088f6034cc02e2dabe002353499c47fe31bdda xt/release/pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJVT8uzAAoJEJ/Rlq0N/NXWj7oP/ApsuUgPeVsOrst0dMUCQ+3g
+J6cPF+WPNvmOtGrBpIRBAWBl0eYoL7iSOG2HUG7WccH1TseMhFSNd8LqlkYRDy/E
+zXzXB203zEfeNoqiKK34754xCQnJ09ZMQHrpVqEFumD8JZ/lIDxWf05T5wxoY8yi
+eG79n3e0gbD2i242tmpPHkAqwHnKbP3gegkmPVdG9ZNcV4QSAxFGwSNcXa2OrIdx
+HTYirzg7nDsT5JPlFKFYE5hNLI3jVZ2a4SKr8fNI0rHxN6jx3oQ+aiv9S+DFmFQx
+RA7ocWFYubesiXqV4fSAJ78uTexlUFpkND4vwa3Ktvs76FYZa3P0+KZF03DHl6JP
+ZxwxzT33zjSJWbByC0y1vt4v3urvecW/BPf6byKZ4WxsYAOrGdbheTp3FfPG+Eg4
+7B9cCSMAPlaOWdEXncdcY+y13Cm+W+8qO73RZr/hndQROd+YCrBpjKJq+fElzVlC
+/olbkwmHAHHgG2/Gi2d09WTCvrqmITLeP4hSXffvB5uCZeoE5QNVmo2sN6y7IPTq
+xO/FsW/8yhDETDc9rgw7UCd6XS3mKFSJOX8nDpNlcCh3PWuT+08A8jmyNOD5RUa8
+EY+vAfI1LScf1/dSZ3HNUmGfAi+PbecptRpTtI8gQVmu++p0Si56NnuF7AE0YS9I
+sSD4uaqojJgGc1WSzSKA
+=cVvs
+-----END PGP SIGNATURE-----

@@ -1,0 +1,37 @@
+---
+abstract: 'BeLike::BINGOS when you build your dists'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-BINGOS
+requires:
+  Dist::Zilla: '4.200006'
+  Dist::Zilla::Plugin::ChangelogFromGit: '0.006'
+  Dist::Zilla::Plugin::Clean: '0.02'
+  Dist::Zilla::Plugin::GithubMeta: '0.10'
+  Dist::Zilla::Plugin::MetaJSON: '4.200006'
+  Dist::Zilla::Plugin::PkgVersion: '4.200006'
+  Dist::Zilla::Plugin::PodCoverageTests: '4.200006'
+  Dist::Zilla::Plugin::PodSyntaxTests: '4.200006'
+  Dist::Zilla::Plugin::PodWeaver: '3.101641'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.14'
+  Dist::Zilla::Plugin::Test::Compile: '1.112400'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0.102'
+  Moose: '1.08'
+  perl: '5.008005'
+resources:
+  homepage: https://github.com/bingos/dist-zilla-pluginbundle-bingos
+  repository: https://github.com/bingos/dist-zilla-pluginbundle-bingos.git
+version: '0.20'

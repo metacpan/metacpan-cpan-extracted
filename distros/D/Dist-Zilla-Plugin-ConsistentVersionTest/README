@@ -1,0 +1,73 @@
+NAME
+
+    Dist::Zilla::Plugin::ConsistentVersionTest - Adds a release test to
+    ensure that all modules have the same $VERSION
+
+VERSION
+
+    This document describes version 0.03 of
+    Dist::Zilla::Plugin::ConsistentVersionTest - released April 01, 2017 as
+    part of Dist-Zilla-Plugin-ConsistentVersionTest.
+
+SYNOPSIS
+
+    In your dist.ini:
+
+      [ConsistentVersionTest]
+
+DESCRIPTION
+
+    This is an extension of Dist::Zilla::Plugin::InlineFiles, providing the
+    following files
+
+      xt/release/consistent-version.t
+
+METHODS
+
+ register_prereqs
+
+    Registers a 'develop' phase requirement for Test::ConsistentVersion
+    with the Dist::Zilla object.
+
+DONATIONS
+
+    If you'd like to thank me (the author, Dave Rolsky) for the work I've
+    done on this module, please consider making a "donation" to me via
+    PayPal. I spend a lot of free time creating free software, and would
+    appreciate any support you'd care to offer.
+
+    Please note that I am not suggesting that you must do this in order for
+    me to continue working on this particular software. I will continue to
+    do so, inasmuch as I have in the past, for as long as it interests me.
+
+    Similarly, a donation made in this way will probably not make me work
+    on this software much more, unless I get so many donations that I can
+    consider working on free software full time, which seems unlikely at
+    best.
+
+    To donate, log into PayPal and send money to autarch@urth.org or use
+    the button on this page: http://www.urth.org/~autarch/fs-donation.html
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/Dist-Zilla-Plugin-ConsistentVersionTest/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Dave Rolsky <autarch@urth.org>
+
+CONTRIBUTOR
+
+    Chris Weyl <rsrchboy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2010 by Dave Rolsky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

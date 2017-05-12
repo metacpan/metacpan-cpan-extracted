@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Data-Validate
+version:            0.09
+abstract:           ~
+author:
+    - Richard Sonnen (sonnen@richardsonnen.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Math::BigInt:  1.77
+    POSIX:         0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

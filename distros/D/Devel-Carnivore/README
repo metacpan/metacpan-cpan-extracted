@@ -1,0 +1,46 @@
+Devel/Carnivore version 0.08
+============================
+
+This module allows you to debug your hashes and, in particular, your objects 
+based on hashes without using the perl debugger. There are several good reasons
+to do this. Among them:
+1) You're too stupid to use the perl debugger (This is true for me)
+2) You're building web applications and the perl debugger doesn't work very
+well in that environment
+
+Obviously, this module does not provide you with a complete debugger. All it does
+is keeping track of the state changes which occur to your objects. You will get
+a series of lines which look similar to this:
+
+ProgLang: "cool" changed from "Java" to "Perl"  at devel.pl line 30
+
+So what does this tell you?
+
+You have a Perl file named devel.pl. On line 30 your code changed the value of the 
+key "cool" from "Java" to "Perl". In order, to identify this hash you optionally
+named it "ProgLang".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+	
+	Attribute::Handlers
+	Test::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002 by Malte Ubl E<lt>malteubl@gmx.deE<gt>.
+
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as Perl itself.
+
+See F<http://www.perl.com/perl/misc/Artistic.html>

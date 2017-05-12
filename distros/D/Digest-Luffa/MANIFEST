@@ -1,0 +1,30 @@
+Changes
+ex/benchmark.pl
+lib/Digest/Luffa.pm
+Luffa.xs
+Makefile.PL
+MANIFEST			This list of files
+ppport.h
+README
+src/luffa.c
+src/sha3nist.c
+src/sha3nist.h
+src/sph_luffa.h
+src/sph_types.h
+t/00_load.t
+t/01_new.t
+t/224.t
+t/256.t
+t/384.t
+t/512.t
+typemap
+xt/kwalitee.t
+xt/leaktrace.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod.t
+xt/pod_coverage.t
+xt/portability_filenames.t
+xt/valgrind.t
+xt/vars.t
+META.yml                                 Module meta-data (added by MakeMaker)

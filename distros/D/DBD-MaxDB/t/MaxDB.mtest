@@ -1,0 +1,21 @@
+{ local $opt = {
+         'testpassword' => $ENV{'DBI_PASS'}, #'',
+         'testhost' => '',
+         'nofoundrows' => 0,
+         'ssl' => 0,
+         'testuser' => $ENV{'DBI_USER'}, #'',
+         'nocatchstderr' => 0,
+         'libs' => '', #'-L/usr/local/mysql/lib -lmysqlclient -lz -lgz',
+         'cflags' => '', #'-I./t', #'-I/usr/local/mysql/include',
+         'testdb' => 'test'
+       };
+$::test_host = $opt->{'testhost'};
+$::test_port = $opt->{'testport'};
+$::test_user = $opt->{'testuser'};
+$::test_password = $opt->{'testpassword'};
+$::test_db = $opt->{'testdb'};
+$::test_dsn = $ENV{'DBI_DSN'};
+#$::test_dsn = "DBI:MaxDB:$::test_db";
+#$::test_dsn .= ":$::test_host" if $::test_host;
+#$::test_dsn .= ":$::test_port" if $::test_port;
+} 1;

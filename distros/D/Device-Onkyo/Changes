@@ -1,0 +1,28 @@
+Revision history for Perl extension Device::Onkyo.
+
+1.143640  2014-12-30 09:00:48+00:00 Europe/London
+    - Fix META.yml to remove Device::SerialPort from required section to
+      really fix #2 properly.
+
+1.143260  2014-11-22 18:57:56+00:00 Europe/London
+    - Fix authordeps.
+
+1.143250  2014-11-21 23:00:56+00:00 Europe/London
+    - Make Device::SerialPort module optional - fixes #2.
+
+1.142220  2014-08-10 22:32:10+01:00 Europe/London
+
+1.130211  2013-01-21 22:27:32 Europe/London
+    - Fix another discovery bug.
+
+1.130210  2013-01-21 21:39:36 Europe/London
+    - Fix stupid bug in discovery - thanks CPAN Testers!
+
+1.120811  2012-03-21 21:42:54 Europe/London
+    - Fix example script.
+
+1.120810  2012-03-21 21:19:52 Europe/London
+    - Make discovery more flexible and fix test portability on FreeBSD.
+
+1.120800  2012-03-20 20:58:38 Europe/London
+    - Initial release.

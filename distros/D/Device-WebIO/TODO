@@ -1,0 +1,24 @@
+EXTENDED TODO
+* PCDuino:
+    * I2C
+    * PWM
+    * ADC
+* Firmata
+    * ADC
+    * I2C
+* GStreamer
+    * all_desc()/pin_desc()
+    * Docs
+    * Release
+* OneWire
+* Serial
+* Servos (part of PWM in REST interface, but different role)
+* Sensors
+    * Pressure
+    * Luminosity
+    * Distance
+    * Gyro
+    * Accelerometer
+    * Moisture
+* Wireless communication
+    * NRF24L01

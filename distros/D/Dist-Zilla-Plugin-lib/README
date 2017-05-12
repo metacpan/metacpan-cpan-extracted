@@ -1,0 +1,54 @@
+Dist::Zilla::Plugin::lib
+
+Dist::Zilla::Plugin::lib serves as a relatively straight-forward and
+uncomplicated way to wire certain local paths in your distributions
+source tree into Perl's @INC library load path.
+
+Its primary audiences are twofold.
+
+Self-Building Dist::Zilla Plugins
+    Many recent Dist::Zilla plugin workflows champion a state of "lib/"
+    which are usable "as is" without needing to cycle through a "dzil
+    build" phase first, and this plugin offers a simple way to stash
+    "lib/" in @INC without needing to pass "-Ilib" every time you run
+    "dzil".
+
+    Workflows that require a build cycle to self-build should use
+    "[Bootstrap::lib]" instead.
+
+Bundled Dist::Zilla Plugins
+    Many heavy "CPAN" distributions have bundled within them custom
+    "Dist::Zilla" plugins stashed in "inc/"
+
+    Traditionally, these are loaded via "[=inc::Foo::Package]"
+    exploiting the long held assumption that "." ( $CWD ) is contained
+    in @INC
+
+    However, that is becoming a less safe assumption, and this plugin
+    aims to make such equivalent behaviour practical without needing to
+    rely on that assumption.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

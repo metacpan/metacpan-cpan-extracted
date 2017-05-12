@@ -1,0 +1,21 @@
+Revision history for Data-OFAC
+0.80 2014-09-15/07:25:00 PDT
+  - Apparently the US Government has no idea what a unique key is.
+0.67 2014-02-18/12:00 PST
+0.66
+  - Solving for multiple temp directory issues.
+  
+0.58 2013-11-18/15:34 PST
+  - Add missing prereq.
+
+0.56 2013-11-18/07:33 PST
+  - Add missing prereq.
+
+0.54 2013-11-14/12:33 PST
+  - Comply with my CPANTS masters.
+
+0.51 2013-11-11/21:17 PST
+  - Correct wildly innacurate documentation.
+
+0.50 2013-11-11/18:30 PST
+  - Initial release to CPAN.

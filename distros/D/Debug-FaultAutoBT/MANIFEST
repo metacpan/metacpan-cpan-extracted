@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/TEST
+t/sig_abrt.t
+t/sig_segv.t
+DumpCore.pm
+DumpCore.xs
+FaultAutoBT.pm
+FaultAutoBT.xs
+ppport.h

@@ -1,0 +1,33 @@
+Digest/JHash version 0.03
+=========================
+
+INSTALLATION
+
+To install this module type the following (nmake on Win32):
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+MORE DETAILS
+
+Read the POD in JHash.xs or the HTML version of that POD in html/JHash.html
+
+COPYLEFT AND UN-LICENCE
+
+This module is free software and is provided in the hope that it may prove useful.
+All care but no responsibility or liability. Use at own risk.
+
+May cause cancer if used excessively. Then again it may not.
+
+R&D (Rip-off and Duplicate) as desired.
+
+Feel free to remove this copyright and call it your own if that makes you happy.
+
+Copyright (C) 2003-2008 Andrew Towers and James Freeman.
+

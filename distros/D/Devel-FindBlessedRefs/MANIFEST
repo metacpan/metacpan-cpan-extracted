@@ -1,0 +1,11 @@
+Changes
+FindBlessedRefs.pm
+FindBlessedRefs.pod
+FindBlessedRefs.xs
+MANIFEST
+Makefile.PL
+README
+t/01_load.t
+t/05_test.t
+t/07_test_codref.t
+META.yml                                 Module meta-data (added by MakeMaker)

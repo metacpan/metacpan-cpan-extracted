@@ -1,0 +1,56 @@
+NAME
+    Dist::Zilla::Role::ContributorSource - Something that finds and provides
+    contributors.
+
+VERSION
+    This document describes version 0.001 of
+    Dist::Zilla::Role::ContributorSource - released April 25, 2014 as part
+    of Dist-Zilla-Role-ContributorSource.
+
+SYNOPSIS
+        # in your Dist::Zilla thing...
+        with 'Dist::Zilla::Role::ContributorSource';
+
+        sub contributors { ... }
+
+DESCRIPTION
+    A simple interface role to define what plugins provide information about
+    the contributors to the distribution, much as
+    Dist::Zilla::Role::PrereqSource does for distribution prerequisites.
+
+REQUIRED METHODS
+  contributors
+    Returns a list of the contributors sourced by this... thing. The list
+    should be comprised of Dist::Zilla::Stash::Contributors::Contributor
+    objects.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Dist::Zilla::Stash::Contributors
+
+SOURCE
+    The development version is on github at
+    <http://https://github.com/RsrchBoy/dist-zilla-role-contributorsource>
+    and may be cloned from
+    <git://https://github.com/RsrchBoy/dist-zilla-role-contributorsource.git
+    >
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-role-contributorsource/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,38 @@
+---
+abstract: 'Dezi server administration UI'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.08'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dezi-Admin
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Dezi: 0.004
+  Plack: 0
+  Plack::Middleware::Auth::Basic: 0
+  Plack::Middleware::REST: 0
+  Plack::Middleware::ReverseProxy: 0
+  Search::OpenSearch::Engine::Lucy: 0.3
+  Search::QueryParser::SQL: 0
+  Sort::SQL: 0
+  Test::More: 0
+  Try::Tiny: 0
+  perl: 5.8.9
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-Admin
+  homepage: https://github.com/karpet/dezi-admin
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: http://github.com/karpet/dezi-admin
+version: '0.006'

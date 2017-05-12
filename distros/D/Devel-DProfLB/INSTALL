@@ -1,0 +1,14 @@
+Installing:
+
+ 1. unbundle the tarball
+
+ 2. run 'perl Makefile.PL'
+
+ 3. run 'make'
+
+ 4. run 'make install'
+
+ 5. run 'perldoc Devel::DProfLB'
+
+ 6. you are finished, sing a happy song, or, optionally, send in a bug report
+

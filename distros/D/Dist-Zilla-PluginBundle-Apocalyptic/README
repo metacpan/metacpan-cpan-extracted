@@ -1,0 +1,457 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Apocalyptic - Let the apocalypse build your
+    dist!
+
+VERSION
+
+      This document describes v0.005 of Dist::Zilla::PluginBundle::Apocalyptic - released October 28, 2014 as part of Dist-Zilla-PluginBundle-Apocalyptic.
+
+DESCRIPTION
+
+    This plugin bundle attempts to automate as much as sanely possible the
+    job of building your dist. It builds upon Dist::Zilla and utilizes
+    numerous plugins to reduce the burden on the programmer.
+
+            # In your dist.ini:
+            name = My-Super-Cool-Dist
+            [@Apocalyptic]
+
+    Don't forget the new global config.ini file added in Dist::Zilla v4!
+
+            apoc@blackhole:~$ cat .dzil/config.ini
+            [%User]
+            name  = Apocalypse
+            email = APOCAL@cpan.org
+    
+            [%Rights]
+            license_class    = Perl_5
+            copyright_holder = Apocalypse
+    
+            [%PAUSE]
+            username = APOCAL
+            password = myawesomepassword
+
+ dist.ini
+
+    This is equivalent to setting this in your dist.ini:
+
+            # Skipping the usual name/author/license/copyright stuff
+    
+            [ReportPhase / ENTER]   ; reports the dzil build phases
+    
+            ; -- start off by bumping the version
+            [Git::NextVersion]              ; find the last tag, and bump to next version via Version::Next
+            version_regexp = ^release-(.+)$
+    
+            ; -- start the basic dist skeleton
+            [Git::GatherDir]                        ; we start with everything in the root dir, ignoring our auto-generated README.pod
+            exclude_filename = README.pod
+            [PruneCruft]                    ; automatically prune cruft defined by RJBS :)
+            [AutoPrereqs]                   ; automatically find our prereqs
+            [GenerateFile / MANIFEST.SKIP]  ; make our default MANIFEST.SKIP
+            [ManifestSkip]                  ; skip files that matches MANIFEST.SKIP
+            skipfile = MANIFEST.SKIP
+    
+            ; -- Generate our tests
+            [Test::Compile]                 ; Create a t/00-compile.t file that auto-compiles every module in the dist
+            fake_home = 1                   ; fakes $ENV{HOME} just in case
+            [ApocalypseTests]               ; Create a t/apocalypse.t file that runs Test::Apocalypse
+            [ReportVersions::Tiny]          ; Report the versions of our prereqs
+    
+            ; -- munge files
+            [Prepender]                     ; automatically add lines following the shebang in modules
+            copyright = 1
+            line = use strict; use warnings;
+            [Authority]                     ; put the $AUTHORITY line in modules and the metadata
+            [Git::Describe]          ; make a note of the git commit description used in building this release
+            [PkgVersion]                    ; put the "our $VERSION = ...;" line in modules
+            [PodWeaver]                     ; weave our POD and add useful boilerplate
+            config_plugin = @Apocalyptic
+            replacer = replace_with_comment
+            post_code_replacer = replace_with_nothing
+            [LocaleMsgfmt]                  ; compile .po files to .mo files in share/locale
+            locale = share/locale
+    
+            ; -- update the Changelog
+            [NextRelease]
+            time_zone = UTC
+            filename = Changes
+            format = %v%n%tReleased: %{yyyy-MM-dd HH:mm:ss VVVV}d
+            [ChangelogFromGit]              ; generate CommitLog from git history
+            tag_regexp = ^release-(.+)$
+            file_name = CommitLog
+    
+            ; -- generate/process meta-information
+            [ExecDir]                       ; automatically install files from bin/ directory as executables ( if it exists )
+            dir = bin
+            [ShareDir]                      ; automatically install File::ShareDir files from share/ ( if it exists )
+            dir = share
+            [MinimumPerl]                   ; automatically find the minimum perl version required and add it to prereqs
+            [Bugtracker]                    ; set bugtracker to http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Apocalyptic
+            [Homepage]                      ; set homepage to http://search.cpan.org/dist/Dist-Zilla-PluginBundle-Apocalyptic/
+            [MetaConfig]                    ; dump dzil config into metadata
+            [Git::Contributors]     ; generate our CONTRIBUTORS section by looking at the git history
+            [MetaData::BuiltWith]           ; dump entire perl modules we used to build into metadata
+            [Repository]                    ; set git repository path by looking at git configs
+            git_remote = origin
+            [MetaResources]                 ; add arbitrary resources to metadata
+            license = http://dev.perl.org/licenses/
+    
+            ; -- generate meta files
+            [MetaNoIndex]                   ; tell PAUSE to not index those directories
+            directory = inc t xt examples share eg mylib
+            [MetaProvides::Package]         ; get provides from package definitions in files
+            meta_noindex = 1
+            [License]                       ; create LICENSE file
+            [ModuleBuildTiny]               ; create Build.PL file
+            [MakeMaker::Fallback]   ; create Makefile.PL file for older Perls
+            [MetaYAML]                      ; create META.yml file
+            [MetaJSON]                      ; create META.json file
+            [ReadmeAnyFromPod]                      ; create README file
+            [ReadmeAnyFromPod / PodRoot]    ; create README.pod file in repository root ( useful for github! )
+            [InstallGuide]                  ; create INSTALL file
+            [DOAP]                          ; create doap.xml describing the module
+            [Covenant]                      ; create AUTHOR_PLEDGE describing how PAUSE admins can grant co-maint
+            [CPANFile]                      ; create a 'cpanfile' file describing prereqs
+            [Signature]                     ; create SIGNATURE file when we are releasing ( annoying to enter password during test builds... )
+            sign = archive
+            [Manifest]                      ; finally, create the MANIFEST file
+    
+            ; -- pre-release
+            [CheckChangesHasContent]        ; make sure you explained your changes :)
+            changelog = Changes
+            [Git::Check]                    ; check working path for any uncommitted stuff ( exempt Changes because it will be committed after release )
+            changelog = Changes
+            allow_dirty = README.pod
+            [PromptIfStale]         ; check our installed dependencies to make sure that we don't have stale modules and prevent release if so
+            check_authordeps = 1
+            check_all_plugins = 1
+            check_all_prereqs = 1
+            phase = release
+            fatal = 1
+            [TestRelease]                   ; make sure that we won't release a FAIL distro :)
+            [@Git::CheckFor]                ; prevent common git errors ( wrong branch, forgotten squash/fixups! )
+            [CheckPrereqsIndexed]           ; make sure that our prereqs actually exist on CPAN
+            [CheckSelfDependency]           ; make sure we didn't create a recursive dependency situation!
+            [CheckIssues]           ; Looks on RT and github for issues that we can review
+            [ConfirmRelease]                ; double-check that we ACTUALLY want a release, ha!
+    
+            ; -- release
+            [UploadToCPAN]                  ; upload your dist to CPAN using CPAN::Uploader
+    
+            ; -- post-release
+            [ArchiveRelease]                ; archive our tarballs under releases/
+            directory = releases
+            [Git::Commit]                   ; commit the dzil-generated stuff
+            changelog = Changes
+            commit_msg = New CPAN release of %N - v%v%n%n%c
+            time_zone = UTC
+            add_files_in = releases         ; add our release tarballs to the repo
+            allow_dirty = README.pod
+            [Git::Tag]                      ; tag our new release
+            tag_format = release-%v
+            tag_message = Tagged release-%v
+            [Git::Push]                     ; automatically push to the "origin" defined in .git/config
+            push_to = origin
+            [Clean]                         ; run dzil clean so we have no cruft :)
+            [SchwartzRatio]         ; informs us of old distributions lingering on CPAN
+    
+            [ReportPhase / LEAVE]   ; reports the dzil build phases
+
+Setting options
+
+    However, this plugin bundle does A LOT of things, so you would need to
+    read the config carefully to see if it does anything you don't want to
+    do. You can override the options simply by removing the offending
+    plugin from the bundle by using the Dist::Zilla::PluginBundle::Filter
+    package. By doing that you are free to specify alternate plugins, or
+    the desired plugin configuration manually.
+
+            # In your dist.ini:
+            name                    = My-Super-Cool-Dist
+            author                  = A. U. Thor
+            license                 = Perl_5
+            copyright_holder        = A. U. Thor
+    
+            ; we don't want to archive our releases
+            ; we want to push to gitorious instead
+            [@Filter]
+            bundle = @Apocalyptic
+            remove = ArchiveRelease
+            remove = Git::Push
+            [Git::Push]
+            push_to = gitorious
+
+ Newer method to manipulate this bundle
+
+    This PluginBundle now supports Dist::Zilla::PluginBundle::ConfigSlicer,
+    so you can pass in options to the plugins used like this:
+
+            [@Apocalyptic]
+            Git::Push.push_to = gitorious
+
+    This PluginBundle also supports
+    Dist::Zilla::Role::PluginBundle::PluginRemover, so dropping a plugin is
+    as easy as this:
+
+            [@Apocalyptic]
+            -remove = ArchiveRelease
+
+Future Plans
+
+ use XDG's Twitter plugin
+
+    I want to tweet and be a web2.0 dude! :)
+
+ use GETTY's cool Dist::Zilla::Plugin::Run::AfterRelease
+
+    I want to use that to automatically install the generated tarball
+
+            sudo cpanp i --force file:///home/apoc/mygit/perl-dist-zilla-pluginbundle-apocalyptic/Dist-Zilla-PluginBundle-Apocalyptic-0.001.tar.gz
+
+    However, how do I get the full tarball path?
+
+ Work with Task::* dists
+
+    From Dist::Zilla::PluginBundle::FLORA
+
+            ; Not sure if it supports config_plugin = @Bundle like PodWeaver does...
+            [TaskWeaver]    ; weave our POD for a Task::* module ( enabled only if it's a Task-* dist )
+    
+            has is_task => (
+                is      => 'ro',
+                isa     => Bool,
+                lazy    => 1,
+                builder => '_build_is_task',
+            );
+    
+            method _build_is_task {
+                return $self->dist =~ /^Task-/ ? 1 : 0;
+            }
+    
+            ...
+    
+            $self->is_task
+            ? $self->add_plugins('TaskWeaver')
+            : $self->add_plugins([ 'PodWeaver' => { config_plugin => '@FLORA' } ]);
+
+ I would like to start digging into the dzil new command and see how to
+ automate stuff in it.
+
+  Changes creation
+
+    create a Changes file with the boilerplate text in it
+
+            Revision history for Dist::Zilla::PluginBundle::Apocalyptic
+    
+            {{$NEXT}}
+    
+                    initial release
+
+  github integration
+
+    automatically create github repo + set description/homepage via
+    Dist::Zilla::Plugin::UpdateGitHub and App::GitHub::create or
+    App::GitHub
+
+  gitorious integration
+
+    unfortunately there's no perl API for gitorious?
+    http://www.mail-archive.com/gitorious@googlegroups.com/msg01016.html
+
+  .gitignore creation
+
+    it should contain only one line - the damned dist build dir
+    "/Foo-Dist-*" also, it needs the "/.build/" line?
+
+  Eclipse files creation
+
+    create the .project/.includepath/.settings stuff
+
+  submit project to ohloh
+
+    we need more perl projects on ohloh! there's WWW::Ohloh::API
+
+ DZP::PkgDist
+
+    Do we need the $DIST variable? What software uses it? I already provide
+    that info in the POD of the file...
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Dist::Zilla
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Dist::Zilla::PluginBundle::Apocalyptic
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Dist-Zilla-PluginBundle-Apocalyptic
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Dist-Zilla-PluginBundle-Apocalyptic
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-PluginBundle-Apoc
+      alyptic
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Dist-Zilla-PluginBundle-Apocalyptic
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Dist-Zilla-PluginBundle-Apocalyptic
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Dist-Zilla-PluginBundle-Apocalyptic
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/overview/Dist-Zilla-PluginBundle-A
+      pocalyptic
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/D/Dist-Zilla-PluginBundle-Apocalypt
+      ic
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Dist-Zilla-PluginBundle-Apocalypt
+      ic
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Dist::Zilla::PluginBundle::Apocal
+      yptic
+
+ Email
+
+    You can email the author of this module at APOCAL at cpan.org asking
+    for help with any problems you have.
+
+ Internet Relay Chat
+
+    You can get live help by using IRC ( Internet Relay Chat ). If you
+    don't know what IRC is, please read this excellent guide:
+    http://en.wikipedia.org/wiki/Internet_Relay_Chat. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You
+    can join those networks/channels and get help:
+
+      * irc.perl.org
+
+      You can connect to the server at 'irc.perl.org' and join this
+      channel: #perl-help then talk to this person for help: Apocalypse.
+
+      * irc.freenode.net
+
+      You can connect to the server at 'irc.freenode.net' and join this
+      channel: #perl then talk to this person for help: Apocal.
+
+      * irc.efnet.org
+
+      You can connect to the server at 'irc.efnet.org' and join this
+      channel: #perl then talk to this person for help: Ap0cal.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-dist-zilla-pluginbundle-apocalyptic at rt.cpan.org, or through the
+    web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-Zilla-PluginBundle-
+    Apocalyptic. You will be automatically notified of any progress on the
+    request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/apocalypse/perl-dist-zilla-pluginbundle-apocalyptic
+
+      git clone git://github.com/apocalypse/perl-dist-zilla-pluginbundle-apocalyptic.git
+
+AUTHOR
+
+    Apocalypse <APOCAL@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Apocalypse.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this distribution.
+
+DISCLAIMER OF WARRANTY
+
+    THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
+    APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT
+    HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT
+    WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+    PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE
+    OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE DEFECTIVE, YOU
+    ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES AND/OR
+    CONVEYS THE PROGRAM AS PERMITTED ABOVE, BE LIABLE TO YOU FOR DAMAGES,
+    INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES
+    ARISING OUT OF THE USE OR INABILITY TO USE THE PROGRAM (INCLUDING BUT
+    NOT LIMITED TO LOSS OF DATA OR DATA BEING RENDERED INACCURATE OR LOSSES
+    SUSTAINED BY YOU OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO
+    OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY
+    HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+

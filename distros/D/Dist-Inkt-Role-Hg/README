@@ -1,0 +1,27 @@
+NAME
+    Dist::Inkt::Role::Hg - Mercurial-related behaviour for Dist::Inkt
+
+DESCRIPTION
+    *   Prevents a release from being built if there are uncommitted changes.
+
+    *   Does an << hg tag >> and `hg push` after release.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Hg>.
+
+SEE ALSO
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

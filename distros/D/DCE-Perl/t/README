@@ -1,0 +1,13 @@
+This is the test-suite for DCE-Perl
+
+certain tests require that you have a valid login context
+certain tests also require the caller's password, such as
+sec_rgy_acct_add
+
+It's recommended that you dce_login as cell_admin, then to 
+run tests that require a password, you may:
+
+1) set the environment variable DCE_PERL_TEST_PW
+2) edit the scripts
+3) do nothing, the tests will simply be skipped
+

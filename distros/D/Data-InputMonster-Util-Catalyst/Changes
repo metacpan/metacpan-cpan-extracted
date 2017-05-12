@@ -1,0 +1,16 @@
+Revision history for Data-InputMonster-Util-Catalyst
+
+0.005     2013-12-13 08:28:10 America/New_York
+          update repo and bugtracker links
+
+0.004     2013-07-05 21:40:00 America/New_York
+          update packaging, bugtracker
+
+0.003     2008-09-19
+          improved testedness
+
+0.002     2008-09-19
+          form names may be defaulted in
+
+0.001     2008-09-11
+          first release

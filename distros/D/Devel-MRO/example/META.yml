@@ -1,0 +1,25 @@
+---
+abstract: ~
+author:
+  - 'Goro Fuji'
+build_requires:
+  Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.44
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: MyMRO
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  ExtUtils::Depends: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01_01

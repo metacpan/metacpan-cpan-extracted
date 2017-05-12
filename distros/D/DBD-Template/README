@@ -1,0 +1,30 @@
+NAME
+    DBD::Template -  A template/sample class for DBI driver.
+
+DESCRIPTION
+    This module is still ALPHA VERSION!
+
+    The DBD::Template module is a DBI driver.
+
+REQUIREMENT
+    This module requires these modules:
+        DBI
+        (SQL::Statement (only for DBD::TemplateSS))
+
+INSTALLATION
+    The module can be installed using the standard Perl procedure:
+
+        perl Makefile.PL
+        make
+        make test
+        make install    # You may need to be root
+        make clean      # or make realclean
+
+    Windows users without a working "make" can get nmake from:
+        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+VERSION
+    This document refers to version 0.01 of DBD::Template.
+
+AUTHOR
+    KAWAI,Takanori (kwitknr@cpan.org)

@@ -1,0 +1,16 @@
+cpanfile
+lib/Dancer/Plugin/Documentation.pm
+lib/Dancer/Plugin/Documentation/Base.pm
+lib/Dancer/Plugin/Documentation/Route.pm
+lib/Dancer/Plugin/Documentation/Section.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README.pod
+t/basics.t
+t/invalid.t
+t/keyword.t
+t/lib/BadApp.pm
+t/lib/TestApp.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,38 @@
+---
+store:
+  oai:
+    package: ElasticSearch
+    options:
+      index_name: oai
+      bags:
+        data:
+          cql_mapping:
+            default_index: basic
+            indexes:
+              _id:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: '_id'
+              datestamp:
+                op:
+                  '=': true
+                  '<': true
+                  '<=': true
+                  '>=': true
+                  '>': true
+                  'exact': true
+                field: 'datestamp'
+              set:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: 'setSpec'
+      index_mappings:
+        publication:
+          properties:
+            datestamp: {type: date, format: date_time_no_millis}

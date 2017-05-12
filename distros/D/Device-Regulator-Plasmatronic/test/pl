@@ -1,0 +1,17 @@
+#!/usr/bin/perl -w
+use Test;
+BEGIN { plan tests => 1 };
+use strict;
+use blib;
+use Device::Regulator::Plasmatronic;
+
+ok(1);
+
+# XXX - Think of a way of testing the library
+# by opening up a daemon instead of a serial port and interacting with that.
+# In other words, writting a daemon that ACTS like a Plasmatronic Regulator,
+# this should not be too hard, I could just add demonstration values to the
+# data file, and it would be useful for other applications.
+
+# my $r = Device::Regulator::Plasmatronic->new();
+

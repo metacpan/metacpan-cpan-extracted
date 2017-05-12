@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+README
+LICENSE
+Makefile.PL
+lib/Dancer/Plugin/PasswordRequirements.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,27 @@
+TODO
+    - long-term: implement more functions from IEEE754-2007, especially
+      + IEEE754 5.4.2 => 5.12
+        <format>-convertFormat
+        <format>-convertFromDecimalCharacter
+        <format>-convertToDecimalCharacter
+            # alias for to_dec_floatingpoint()
+            # conversionSpecification is supposed to indicate formatting
+            #       might want to use an optional integer which indicates how many places
+            #       after the fractional-point to display (default to 16 => %16.16s for to_dec_floatingpoint)
+      + IEEE754 5.4.3 => 5.12
+        <format>-convertFromHexCharacter
+        <format>-convertToHexCharacter(source, conversionSpecification)
+            # alias for to_hex_floatingpoint()
+            #       I originally thought these were aliases for my rawhex754 functions... but no
+            # conversionSpecification is supposed to indicate formatting
+            #       might want to use an optional integer which indicates how many places
+            #       after the fractional-point to display (default to 16 => %16.16s for to_dec_floatingpoint)
+
+    - long-term: add in _32bit and _128bit versions
+      - what's official name of 128bit long-double?  quad?  something else?  check IEEE754
+        doesn't give a name (mentions, but never defines, single and double)
+      - 128b = [1 sign][15 exp][112 frac], e=exp-16383
+
+    - ALWAYS: look for new bug reports:
+      <https://rt.cpan.org/Dist/Display.html?Queue=Data-IEEE754-Tools>
+      <https://github.com/pryrt/Data-IEEE754-Tools/issues>

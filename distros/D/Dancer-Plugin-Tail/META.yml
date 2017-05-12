@@ -1,0 +1,29 @@
+---
+abstract: 'Tail a file from Dancer'
+author:
+  - 'Hagop "Jack" Bilemjian <jck000@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Tail
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: '1.3099'
+  File::Temp: '0.22'
+  String::Random: '0.26'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/jck000/Dancer-Plugin-Tail/issues
+  homepage: https://github.com/jck000/Dancer-Plugin-Tail/
+  repository: https://github.com/jck000/Dancer-Plugin-Tail
+version: '0.0003'

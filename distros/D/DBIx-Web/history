@@ -1,0 +1,655 @@
+# 2013-10-28 new -PlainGroupFile/-PlainUserFile
+# 2013-10-22 syntax corrections:
+#		$#{@$v} -> $#$v	; $#{@$u} -> $#$u
+#		if ($^O ne 'MSWin32') -> if (0 && ($^O ne 'MSWin32')) {CORE::glob(@_)
+#		Win32::LoginName -> Win32::LoginName()
+# 2013-08-23 corrected ugf_w32ldap(); improved ugf_w32()
+# 2012-09-21 corrected udisp(), udispq()
+# 2009-06-09 htmlMenu() changed: 'recNew' moved towards 'RecEdit', before 'recIns' and 'recDel'.
+# 2009-06-09 misc corrections & improvements
+# 2009-05-25 starting 0.80 version
+# 2009-05-03 htmlStart() changed, conditional -expires=>'now'
+# 2009-04-30 corrected cgiAction() switching to recKey() for 'recRead' and '-edit'
+# 2009-04-02 changed -frmLsc in cgiQuery() to accept unmentioned fieldnames
+# 2009-04-02 new -ovw option of htmlMQH()
+# 2009-03-03 recWikn() may get table name as '-wikq'
+# 2009-03-03 recWikn() corrected for deleted records
+# 2009-03-02 cgiForm() corrected field hyperlink -form array with -version =>'-'
+# 2009-03-02 cgiForm() extended  field hyperlink -form array with -wikn field name
+# 2009-02-25 cgiList() corrected limiting ddlb width
+# 2009-02-20 cmdb: -wikq corrected - used recRead(-version=>'-')
+# 2009-02-20 recRead() corrected, -version=>'-' implemented
+# 2009-02-03 htmlRFD() changed - checkbox moved from hyperlink
+# 2009-01-10 starting 0.79 version
+# 2008-12-10 ugroups() - $CACHE->{-ugroups}
+# 2008-12-10 cmdb: cache a_hdesk_stbar()
+# 2008-12-03 mistake: key:// hyperlinks valid only when -cgibus or table//key syntax
+# 2008-12-01 cgiDDLB() changed: added 'option ... selected' for arrays and hashes
+# 2008-12-01 cgiDDLB() changed: l.options.item(i).innerText !='' ? l.options.item(i).innerText.toLowerCase().indexOf(k)
+# 2008-12-01 cmdb: reversed 'application' choice list
+# 2008-12-01 new hreverse()
+# 2008-11-28 cgiHelp(): added 'urlh',.. '#ftext'...
+# 2008-11-26 cmdb-s: soft translation of 'object' and 'application' choices
+# 2008-11-26 cmdb-s: update 'vtime/-rvcVerWhen', 'recprc' in old records
+#		not useful because of old cgi available
+# 2008-11-25 'sub{' -> 'sub {'
+# 2008-11-18 cgiRun() changing, new -diero eval{} option for plex to DESTROY()
+# 2008-11-18 #urole(role,name) substitution to SQL WHERE
+# 2008-11-16 new dbiWsubst()/dbiWSft(): #ftext('str') substitution to SQL WHERE
+# 2008-11-10 new diags() inspector - destructor count check and some data
+# 2008-11-09 new htmlSubmitSpl(): '&hellip;'
+# 2008-11-09 not needed '&mdash;', '&Chi;'
+# 2008-11-09 PLEX 'DisableImpersonate': w32ufswtr() for tvdFTQuery() # w32IISdpsn()
+# 2008-11-09 w32umail() slow - replace with umail()
+# 2008-11-07 code inspection - recurse refs in 'sub{'/'sub {'
+# 2008-11-05 constructor changed reusing object: new(class, self,-opt=>val)
+# 2008-11-02 end() and DESTROY() edited
+# 2008-11-02 ugfile() changed using Win32::Process::Create()
+# 2008-10-30 cmdb: solutions association within tfvReferences()
+# 2008-10-27 tfvReferences() changed: splicekeys() used; opts considered in hyperlink
+# 2008-10-06 htmlMenu(): 'recNew'  excluded when record editing
+# 2008-10-05 htmlStart(): -target=>'_blank' for $s->cgiHook('recFormRWQ') && $s->{-pcmd}->{-edit}
+# 2008-10-04 recWikn(): new '-wikq'
+# 2008-10-04 cgiDDLB($self,{field},'eqp' mode,{record}) became as documented, was cgiDDLB($s, $f, $em, $qm, $d)
+# 2008-10-04 new w32ufswtr()
+# 2008-10-03 cmdb: corrected '*subject' hyperlink
+# 2008-10-03 cmdb: rename 'Process' -> 'Operation'; does not filled by default
+# 2008-10-03 cmdb: classifier 'cmdbm'+'definition' options commented for 'Application', 'Location', 'Operation'
+# 2008-10-03 cmdb: new 'definition' record type
+# 2008-09-30 osCmd() corrections for 'xcacls','cacls', !win32
+# 2008-09-30 osCmd('cacls') may buzz sometimes somewhy - 'xcacls' may be used
+# 2008-09-21 starting 0.77 version
+# 2008-09-17 new '-w32xcacls' switch
+# 2008-09-05 corrected pthMk()
+# 2008-09-01 redesig of pthCp()/pthStamp() - osCmd(xcopy) replace
+# 2008-08-27 cgiRun() fix: if !defined($s->{-c}->{-search})
+# 2008-06-23 starting 0.76 version
+# 2008-06-04 recUpd(), recIns(): before rec read triggers: local $a->{-edit} =undef;
+# 2008-06-04 cmdb.cgi - 'incident' states reduced
+# 2008-06-04 cmdb.cgi - 'mrole' assign moved to -recFlim0R from -recEdt0R
+# 2008-05-07 cmdb.cgi - 'mailto' editable
+# 2008-05-01 corrected utf8enc(), utf8dec(); used 'Encode' module if $] >=5.008
+# 2008-04-24 extended cptran() for $] >=5.008
+# 2008-04-07 using '_search' frame / '-search' url
+# 2008-04-07 chg cmdb hesdk 'mailto' =~/^(?:new|draft|appr-do|scheduled|do|delay|progress|rollback|ok-appr|no-appr|ok|no|deleted)$/
+# 2008-04-07 chg dbiACLike(): replaced '\b' with '(?:^|,|;)\s*' and '(^|,|;)[:blank:]*'
+# 2008-04-07 chg dbmSeek(): replaced '\b' with '(?:^|,|;)\s*'
+# 2008-04-07 chg ugrexp(): replaced "=~/\\b('"  with "=~/(?:^|,|;)\\s*('"
+# 2008-04-06 new {-c}->{-search}: -frame=>RIGHT distinguished
+# 2008-03-28 new particular command {-cmd=>frmCall, -form=>'*.psp'} to run unregistered .psp
+# 2008-03-26 new -search url param
+# 2008-03-26 chg cgiHelp(): decorated <code> cgiHelp()
+# 2008-03-25 new -search slot
+# 2008-03-25 new -htmlMQH value in -pcmd by htmlMQH()
+# 2008-03-25 display of future or periodical records - using -frmLsoAdd=>'Nowdays'
+# 2008-03-25 ext webus: new 'Nowdays' view
+# 2008-03-25 changed udispq() using $CACHE
+# 2008-03-20 'Managers' -> 'Manager'; replace -frmLso with -urole
+# 2008-03-20 chg cmdb.cgi: adding new -frmLso=>'Nowdays', deleting 'Today'
+# 2008-03-20 chg cmdb.cgi: replace -frmLso with -urole
+# 2008-03-20 chg cgiQuery(): new my $qq =$c->{-qwhere} && (($c->{-qwhere} =~/^(\[\[.*?\]\])/) || ($c->{-qwhere} =~/^(\/\*.*?\*\/)/)) && $1;
+# 2008-03-20 chg cgiParse(): split 'frmLso' if ','
+# 2008-03-17 testing htmlML() for _frmName.disabled
+# 2008-03-17 improved htmlMB('back') for Mozilla
+# 2008-03-17 corrected htmlML() switching on frameset
+# 2008-03-17 new $LNG->{-die} and $LNG->{-warn} fixing \&CORE::die and \&CORE::warn undefined subroutine behaviour
+# 2008-03-04 cgiHelp/htmlMenu/cgiParse improved
+# 2008-03-03 starting 0.74 version
+# 2008-02-29 extnd -help using html
+# 2008-02-20 chgd cgiRun(), htmlML() restoring '_frame' lost needed for Mozilla
+# 2008-02-20 chgd htmlML(), cgiParse() name postfixes: [+&.] -> [+&.^]
+#		htmlML():	_frmName.value.match(/\\+\$/) -> (/[+^]\$/)
+#		htmlML():	disabled auto '++' gen under 'frmCallNew'
+#		htmlMChs():	disabled auto '++' gen under 'frmCallNew'
+# 2008-02-19 new 'frmLsoff'
+# 2008-02-19 new -dbistart, changed dbi(), dbiConnect()
+# 2008-01-14 htmlMenu() changed considering '[[]]' -qwhere
+# 2008-01-14 uglist('-u',groupname) corrected, may return empty [].
+#		uglist('-u',groupname,[]) reads users file to distinguish users from groups
+# 2008-01-13 cmdb example development
+# 2007-12-29 cgiSel() correction: empty '[[]]' exam: /^\[\[(.*?)\]\]/ instead of /^\[\[(.+?)\]\]/
+# 2007-12-27 starting 0.73 version
+# 2007-12-21 *fatalsToBrowser -> *fatalsToBrowser{CODE} - globbing variables, perlref, perlmod
+# 2007-12-18 set() error handler redesign using values of ($SIG{__DIE__}, $SIG{__WARN__})
+# 2007-12-18 set() error handler redesign using $SELF ||$DB::args[0]; instead of $s
+# 2007-12-18 cgiRun() error handler redesign using $SIG{__DIE__} =\&CGI::Carp::die;
+# 2007-12-18 PerlEx: -serial=>0 to prevent locking buzz
+# 2007-12-10 mdeQuote() corrected: (?:.[\d]+) -> (?:\.[\d]+)
+# 2007-11-24 new '-dbiexpl'
+# 2007-11-07 starting 0.72 version
+# 2007-11-02 err processing correction for PerlEx and improvement for '-ermu'
+#	PerlEx - not works: $SIG{__DIE__}, CGI::Carp::set_message, CGI::Carp::ineval
+#	new ineval()
+#	cgiRun() changed
+#	new '-ermu' internal
+#	goto cgiRunEND
+# 2007-11-02 cgiParse(): collision of form buttons with window.document.DBIx_Web._cmd.value=&quot;...&quot;
+# 2007-10-26 use / comment / debug 'use PerlEx::DBI'
+# 2007-10-22 cgi() improved: CGI::Q ||CGI->new(); error diagnostics
+# 2007-10-22 logRec() improved: $s->{-c}->{-user} used instead of $s->user()
+# 2007-10-03 cmdb: managed record may be rejected when draft
+# 2007-10-03 error/tracing markup to display, new '-ermd' internal
+# 2007-10-03 query length limit increased from 100 - 200 to 800
+# 2007-10-02 htmlMQH()/cgiSel() cnd cat; '[[]]/**/' syntax starting -query
+# 2007-09-29 cmdb: changing record status flow:
+#	old:         draft                   do (progress,rollback,delay,edit) (ok,no) (ok-appr,no-appr) (deleted)
+#	new: new draft appr-do scheduled do (progress,rollback,delay,edit) (appr-ok,appr-no) (ok,no) (deleted)
+#	usr: new
+#	mgr: draft	scheduled do				(ok,no)
+#	act: 	appr-do	(progress,rollback,delay,edit) (appr-ok,appr-no)
+# 2007-09-29 recActLim() corrects unlisted value in restricted field
+# 2007-09-07 starting 0.71 version
+# 2007-09-04 corrected '-rfdName' for '-cgibus'
+# 2007-08-28 corrected cgi-bus url translation
+# 2007-08-22 new -banner
+# 2007-08-20 corrected 'osCmd' for 'xcopy' under 'PerlEx'
+# 2007-08-07 fixed '_frame=set' with new '_all' option of urlOptl()
+# 2006-06-28 commented 'use PerlEx::DBI'
+# 2007-06-27 recActLim() corrected, cleaning '-editable' by '-racWriter'
+# 2007-06-27 recActLim() corrected, removed restrict read of deleted record
+# 2007-06-26 w32umail() optimised using '-smtpdomain'
+# 2007-06-26 for perl58: 'Algorithm::Diff' added to Active Perl
+# 2007-06-26 ugfile()/ugf_xxx() corrected:
+#	(Warn 'print() on unopened filehandle FL')
+#	from:	my ($s, $tm, $df); local (*FG, *FL); ($s, *FG, *FL, $tm, $df) =@_; print FL...
+#	to:	my ($s, $FG, $FL, $tm, $df) =@_; print $FL...
+# 2007-06-25 for perl58/CGI: $CGI::Q =$_[0]->{-cgi} - default CGI object
+# 2007-06-25 for perl58: using CGI 3.29
+# 2007-06-25 CGI 3.20 - 3.29 bug traced:
+#	sub _style { ... push(@result,style({'type'=>$type},"$cdata_start\n$_\n$cdata_end")) foreach @c;
+#	autoloads new CGI - damages existed CGI / ?PerlIS / ?PerlEx
+#	may be something like:
+#	push(@result,style($self,{'type'=>$type},"$cdata_start\n$_\n$cdata_end")) foreach @c;
+# 2007-06-25 for perl58: cgiFooter trace using CGI->{'dbix_web'}
+# 2007-06-25 for perl58: "400 Bad request (malformed multipart POST)" traced within 'sub read_multipart'
+# 2007-06-25 new {-c}->{-startitit} for initialize()/start() transition
+# 2007-06-25 for perl58: deleted 'site/lib/CGI.pm' & 'site/lib/CGI/...' parts
+# 2007-06-22 for perl58: use CGI qw(-nph); start_html(-style=>{-code=>...};
+# 2007-06-22 for perl58: sub url{...}
+# 2007-06-20 destructor
+# 2007-06-13 corrected -serial: start(), varLoad(), varLock(), update operation
+# 2007-06-10 for perl58: use CGI qw(-no_xhtml);... start_html(-encoding=>charset)
+# 2007-06-03 publishing 0.68 version
+# 2007-06-03 cmdb-e: start page view
+# 2007-05-22 new htfrDiff(), changed htmlField()
+# 2007-05-17 htmlML() corrected for frameset switching
+# 2007-05-17 '_qurole' ddlb fix in cgiParse(), cgiForm(), cgiDDLB()
+# 2007-05-07 cmdb: service graph view, notes table
+# 2007-05-07 cgiRun() fixed assigning -form for -cgcCall
+# 2007-05-07 htmlML() implemented _frmName revert when submit
+# 2007-05-07 '-menuchs' item may be scalar, changed htmlML(), htmlMenu(), tvdIndex()
+# 2007-05-04 psEval() fixed
+# 2007-05-02 htmlHidden(), htmlMenu() fixed to use object name & meta form -pcmd
+# 2007-04-28 cmdb-s: oTk users
+# 2007-04-27 cmdb: a_hdesk_stbar() extended with totals by 'severity'
+# 2007-04-27 new '-ugflt1'
+# 2007-04-27 cmdb: added groupings of objects, applications, processes...
+# 2007-04-26 cmdb: new 'cause' field
+# 2007-04-26 fixed htmlRFD(): '%' translation in <a href="...$/..%252B..."
+# 2007-04-26 cmdb: new 'rollback' status
+# 2007-04-25 cgiList() '-lsthtml' not escaped for XML too
+# 2007-04-25 cmdb: unavailability color
+# 2007-04-24 cmdb: instruction finder for 'subject'
+# 2007-04-24 cmdb: color for 'severity' in form
+# 2007-04-24 cmdb: new 'rectype'
+# 2007-04-24 cgiForm() replaced "elsif ($f eq '') {$lr =0 unless $hide && ($hide ==2);...
+# 2007-04-22 '-loop'/'-ddlbloop' may be sub{}
+# 2007-04-22 fixed timestr(), timeadd() for dst
+# 2007-04-20 cmdb: urgency/impact -> severity
+# 2007-04-16 cmdb-s users filter
+# 2007-04-15 fixed 'all versions' filter option deleting state key
+# 2007-04-13 cmdb 'tvfReferences'/'vsubjectx' long under any rec but for 'works'/'tasks' only
+# 2007-04-12 corr recUtr({old}{new}) repaired
+# 2007-04-12 corr recForm: -editable
+# 2007-04-12 cmdb 'recprc' used
+# 2007-04-11 changed recIns(), recUpd - added record read triggers
+# 2007-04-10 cmdb 'record' new -loop, -recFlim0R
+# 2007-04-10 cmdb  new -a_cmdbh_lmrole, -a_cmdbh_vmrole
+# 2007-04-09 cmdb new fields 'mrole', 'recprc'
+# 2007-04-09 mdeRoles() changed reflecting single and multiple role fields
+# 2007-04-09 new -racManager (alike -racPrincipals), 'manager', 'managers', 'muser', 'mrole'
+# 2007-04-09 recActLim() corrected
+# 2007-04-09 cmtpSend() corrected using only addresses for 'to' and 'mail' as RFC
+# 2007-04-08 cgiForm() hidden fields generated on -flg =~/[aeu]/
+# 2007-04-08 cmdb sync: 'vauser', 'vsubject', 'vsubjectx', -query & tfvReferences(), -recFlim0R
+# 2007-04-08 documented -help, -recFlim0R, recActor(), recActLim(), udispq()
+# 2007-04-05 cmdb.cgi: changed 'vauser', 'vsubject', hdesk & tfvReferences() query display lists
+# 2007-04-05 new udispq()
+# 2007-03-30 cgiForm() creates hidden fields for readonly values when recActLim().
+# 2007-03-29 uncommented recActor() #return(1) if $_[0]->uadmin();
+# 2007-03-28 recDel() changed: rmiTrigger($s, $a, undef -> $d
+# 2007-03-28 cgiForm() changed to accept recActLim()
+# 2007-03-28 introducing recActLim()
+# 2007-03-27 ugmember() and '-editable' changed to boolean from username
+# 2007-03-27 '-recFlim0R' - new trigger after '-recForm0R' to specify operation
+# 2007-03-27 recRead_() - new - used in recNew, recForm, recIns, recRead
+# 2007-03-27 recDel() - added '-recForm0R' call
+# 2007-03-26 introducing recActor()
+#		,-recFlim0R	=>sub{	# twin recForm/recRead, rvw recRead use
+#			$_[0]->logRec('***',$_[1]->{-cmd},$_[0]->recActor($_[1],$_[3],'-owner'))
+#			}
+# 2007-03-21 introducing 'frmHelp', cgiHelp(), -help
+# 2007-03-09 publishing 0.67 version
+# 2007-02-28 itroducing -qjoin/-join2
+# 2007-02-28 cmdb.cgi - fix final datetime greater now
+# 2007-02-28 cmdb.cgi - fix priority inheritance
+# 2007-02-28 cmdb.cgi - 'vsubjectx', 'tvfReferences'
+# 2007-02-28 fixed xmlEscape(), xmlTagEscape() to $v =~s/([\\"<>])/sprintf('\\x%02x',ord($1))/ge;
+# 2007-02-28 fixed cgiList() XML to &{$_->[1]}($s, $cargo, undef, $i, $r)
+# 2007-02-08 fixing frames: tvdIndex, htmlMB including separate -OnClick and -href
+# 2007-02-07 fixing frames: htmlMQH, cgiRun including _frame considering non-MSIE
+# 2007-02-06 fixing: remove _frame name from URLs, wrong open in new window
+#   changes:
+#+	htmlMenu:	+ local $c->{-frame} =undef;
+#+	htmlMB:		+ ||document.getElementsByName('_frame').length
+#+	htmlMQH:	+  && ($s->{-pcmd}->{-frame} !~/^(?:TOP|BOTTOM)$/)
+#+	htmlML		+ (self.name=='TOP') || document.getElementsByName('_frame').length
+#+	htmlEnd		+ conditional base.target
+#+	tvdIndex	+ self/self, self/new; excuded top/new
+#+	cgiRun		- off _frame
+#   frame, _frame, -frame: ('i'gnoring, 'c'hanging):
+#i	smtpSend	# undef
+#c	cgiRun:		# Frameset creation
+#c	htmlStart	(-target=>$s->{-pcmd}->{-frame}) || (-target=>'_self')
+#i	htmlHidden	# hidden field
+#c	htmlMenu	!$c->{-frame} || ($c->{-frame} =~/^(?:top|bottom)$/i) ? '-frame=set'
+#i	  urlOptl (& urlOpt) # may be excluded
+#c	htmlML		js match (TOP|BOTTOM): ($_[0]->{-pcmd}->{-frame} && ($_[0]->{-pcmd}->{-cmd} eq 'recList')
+#			js match (TOP|BOTTOM): ($_[0]->{-pcmd}->{-frame} && ($_[0]->{-pcmd}->{-cmd} eq 'recList')
+#c	htmlMQH		$s->{-pcmd}->{-frame} ? (-frame=>$s->{-pcmd}->{-frame})
+#???	tvdIndex	list: self | TOP
+#			new:  self | new
+#		chg htmlEnd
+#k	htmlEnd		e[0].target=(self.name=='BOTTOM' ?
+# 2007-02-06 fixed -cgibus calculation: new cgibus() changed init(), set(), cgiRun()
+# 2007-02-05 fixing -cgibus condition sub{} for key:// and wikn:// hyperlinks
+#	$RISM2		ok	changed in set()
+#	-rfdName	ok	default encoded in rfdName(); changed in set()
+#	-recInsID	chg	remove set(){ if !$s->{-recInsID}
+#	-url		?	set by -cgibus(){}
+#	-urf		?	set by -cgibus(){}
+#   total:
+#	init defined:	$RISM2
+#	init undef:	-urf, -rfdName
+#	init if!:	-url, -recInsID
+#	set -cgibus:	-rfdName, $RISM2
+#	set cnd:	-urf
+#	set app:	-urf = -path / sub{} ; -url = '/cgi-bus' (webus)
+#   init():
+#	$opt{-cgibus}	=&{$opt{-cgibus}}($s) if ref($opt{-cgibus});
+#	$opt{-url}	=$opt{-cgibus} ? '/cgi-bus' : '/dbix-web' if !$opt{-url};
+#	$s->set(%opt);
+#   set():
+#	if ($opt{-cgibus}) {
+#		$s->{-recInsID} =sub{ ...	if !$s->{-recInsID};
+#		$s->{-rfdName}  =sub{ ...;
+#		$RISM2 = '$';
+#	}
+#	$s->{-urf} = ... $opt{-urf} ne '-path' ? ... : $s->{-cgibus} ? ...
+#   init():
+#	$s->set(-recInsID=>sub{ ... if !$s->{-recInsID}
+#   rfdPath():
+#	-url, -urf, -rfdName
+#   use -cgibus:
+#	pthForm(), rfdName(), rfdPath(), trURLtxt(), trURLhtm()
+# 2007-02-02 changed current table row indication using 'tr.onclick'
+# 2007-02-02 html restyling for scaling
+# 2007-02-02 new 'Body' and 'Input' HTML classes for scaling, class defs changed
+# 2007-02-01 key:// hyperlink fixed in cmdb-cgibus.cgi condition: 
+# 2007-01-18 new target=new from some frameset actions # target=NEW
+# 2007-01-18 new target=TOP1 from BOTTOM frame
+# 2007-01-18 changed tfvVersions() using shiftkeys()
+# 2007-01-18 changed tfvReferences() using shiftkeys()
+# 2007-01-18 new splicekeys(), shiftkeys()
+# 2007-01-18 new htmlFVUT(), htmlFVUH()
+# 2007-01-17 cgiQuery()/cgiLst() changed - '-qdatainc'/'-datainc' added
+# ... see 'history' file
+# 2003-09-16 started
+# 2007-01-08 trURLtxt(): new BracketName [[url]] and [[url|label]] notations
+# 2007-01-08 trURLtxt(), trURLhtm(): new 'key://' special URL protocol
+# 2007-01-08 recHist() file attachments arrangement corrected using mtime
+# 2007-01-07 tfdRFD()  corr: rfdPath(-xxx=>$s->{-pout}->{-file}) # rfdPath(-xxx=>$s->{-pcmd}, $s->{-pout})
+# 2007-01-07 htmlRFD() corr: rfdPath(-xxx=>$c, $d) -> rfdPath(-xxx=>$d->{-file})
+# 2007-01-07 recIns(), recUpd(): rfdStamp() applies utime(last editable) to directory
+# 2007-01-07 osCmd() corrested: 'problematic programs' for perlis.dll only
+# 2007-01-07 recUpd() corrected: rfdStamp('+') added for prev ver backup
+# 2006-12-27 changed xmlTagEscape() - '&' escaped
+# 2006-12-22 new htmlRFDimg() - to display icons for file attachments
+# 2006-12-22 changed htmlRFD() - sorted files list
+# 2006-12-22 new pthGlobns()
+# 2006-12-22 chaged cgi(): no warnings; $_[0]->{-cgi} =eval('CGI->new')
+# 	# Use of uninitialized value in hash element at C:/B/Perl/lib/CGI.pm line 547.
+#	#	# sub parse_params {
+#	# 547	# push (@{$self->{$param}}, $value);
+#	#	# == $param undefined ==
+#	#	# $SIG{__WARN__} =sub {print $_[0], ' ', join(' ',caller(0))};
+#	#	# ------ sub new { ... sub init { ... $self->parse_params($query_string);
+# 2006-12-21 pending -wikn: URL parsing
+# 2006-12-21 removed urlCGBtr(), new trURLtxt(), trURLhtm(), trURLhref()
+# 2006-12-19 pending -wikn: code experimenting
+# 2006-12-19 addition cgiAction(): $oc->{-key} =$s->recKey($oc->{-table}, $s->{-pout}) if $oa =~/^rec(?:Read)/
+# 2006-12-19 changed htmlRFD(): href file names not escaped
+# 2006-12-19 <html xmlns="http://www.w3.org/1999/xhtml" lang="ru-RU">
+# 2006-12-19 <html xmlns="http://www.w3.org/1999/xhtml" lang="lang()">
+# 2006-12-19 new lang() based on application's language, instead of lng() on user's
+# 2006-12-16 'local' not needed for '$a->{-cmd}...' within recNew, recForm, recIns, recUpd, recDel, recSel, recRead, recHist
+# 2006-12-14 cgiForm/recQBF/URL: empty only one of qw(qkey qwhere qurole)
+# 2006-12-14 cgiDDLB() patched to obtain field label from form/table current
+# 2006-12-13 cgiForm/recQBF: added -frmLso, -frmLsc confitions
+# 2006-12-12 -qkey visited empty alike -qwhere and -qurole, changed:
+#		cgiParse()	# delete $c->{-qkey} if !%{$c->{-qkey}};
+#		htmlHid()	# ($_ !~/^(?:qwhere|qurole)$/))
+#		htmlMenu()	# $c->{-qkey} ||($om->{-query} && $om->{-query}->{-qkey})
+#		cgiQDflt()	# unless ($c->{-qkey}; $c->{-qkey} ? $c->{-qkey}
+# 2006-12-12 doc -print, -mail, -hist, -xml, -ui, -cmd, -cmg, -style, -frame, -login
+# 2006-12-11 provided recQBF(-qdisplay) experimental
+# 2006-12-09 htmlMenu() button urls expanded: frmCall, recXML
+# 2006-12-09 htmlMenu() button urls changed: recPrint, recXML, recHist
+# 2006-12-09 dbmSeek() corrected for array keys
+# 2006-12-09 new -rvcVerWhen, conditionally for ttoRVC() compatibility
+# 2006-12-05 ui: changes display implemented
+# 2006-12-05 new recHist(), strHTML(), strDiff()
+# 2006-12-03 started recHist(), strHTML(), strDiff()
+# 2006-11-29 new dbiConnect() with local DBI::ProxyServer autostart
+# 2006-11-28 collecting all "<script for=window event=onload>" with -jswload
+# 2006-11-22 new  -recChg0W, immediate before 'w'rite, after -recInsID, for smtpSend()
+# 2006-11-21 targeting bottom -> top frame
+# 2006-11-17 targeting header, form, menu, instead of individual hyperlinks
+# 2006-11-17 listing current hyperlink mark
+# 2006-11-03 rfdStamp() - TakeOwnership added
+# 2006-10-31 ugf_w32() correction in domain controller case
+# 2006-10-30 -usernt vals changed to undef, 0, 1, to translate '@' or '\\'
+# 2006-10-24 ugf_w32ldap() local groups usage on non-DC
+# 2006-10-18 corrected utf8enc(), utf8dec()
+# 2006-10-17 changed 'ualist' - group members excluded, not needed
+# 2006-10-17 new experimental -w32ldap
+# 2006-10-16 new 'email' field in 'ualist', rebuild 'ualist' file!
+# 2006-10-15 ugf_ldap() implementation, untested
+# 2006-10-13 start of ugfile() fields restruct, uglist() need to continue
+# 2006-10-12 new ugfile() architecture, w32agf() restructed to ugf_w32()
+# 2006-10-11 created ldap methods, untested
+# 2006-10-08 javascript for Mozilla: cgiDDLB(): 'ondblclick' - '.nextSibling.nextSibling' replaced with button name
+# 2006-10-08 javascript for Mozilla: cgiDDLB(): 'onload' - 'return' removed
+# 2006-10-07 javascript for Mozilla: getElementById('_FooterArea')
+# 2006-10-07 javascript: window.document.DBIx_Web. -> window.document.forms[0].
+# 2006-10-07 javascript for Mozilla: window.document.DBIx_Web.submit() -> submit()
+# 2006-10-07 javascript for Mozilla: window.document.DBIx_Web._cmd.value -> _cmd.value
+# 2006-10-07 form named: DBIx_Web; note: 'DBIx_Web.' or 'forms[0].' syntax inflexible
+# 2006-10-06 osCmd() corrections, xcopy output exclusion
+# 2006-10-06 tfvReferences() changed: removed -order, -keyord for table query
+# 2006-10-04 some user_agent conditions for style and javascript decorations
+# 2006-10-04 development of experimental -frame,-frame=set, TOP, BOTTOM options
+# 2006-10-03 new experimental -frame,-frame=set, TOP, BOTTOM options
+# 2006-10-03 cgiRun() error display handler embellished
+# 2006-10-03 htmlStart() corrected, start_multipart_form(-action=>$s->cgi->url...
+# 2006-09-30 dbiSel() corrected -expr usage searching -ftext
+# 2006-09-30 dbiACLike() changed, added 'table alias off' switch
+# 2006-09-30 dbiKeyWhr() corrected -expr usage, added 'tbl alias off' switch
+# 2006-09-30 development of cgi-bus remake seems done
+# 2006-09-22 develop of 'webus' application
+# 2006-09-22 changed tfvReferences(), added '<where></where>' starting for 'comment's
+# 2006-09-22 new 'urlCGBtr' to translate -cgibus special urls
+# 2006-09-22 non MSIE backwarding omission implemented + commented, 'backf' experiment removed
+# 2006-09-10 removed/cleaned 'recQBFl', '-fwidth', 'appOp'
+# 2006-09-10 added query hyperlinks to 'tfvVersions' and 'tfvReferences'
+# 2006-09-08 new recNew(-proto), htmlMenu changed to create record via hyperlink with minimal inheritance
+# 2006-09-07 new -datainc clause for -query
+# 2006-09-07 cgiQInherit corrected, dbiSel/-ftext corrected
+# 2006-09-02 dbiACLike() and dbiKeyWhr(), added table qualification, see $t
+# 2006-09-02 changed dbiSel: added generation of default fields aliaces
+# 2006-09-02 changed -flg unchanged mdeTable
+# 2006-09-02 changed -flg new '-', 'f'; 'f' may be needed to add for cgiQInherit
+# 2006-09-02 changed -flg cgiQInherit: 'f', !def
+# 2006-09-02 changed -flg cgiForm: '-', !def
+# 2006-09-02 changed -flg cgiDBData: !def ->!, [aeu]->[au]
+# 2006-08-31 changed cgiQKey() paired with cgiForm() in -qkey=>{[{}]} syntax
+# 2006-08-31 changed cgiQuery(), -qkey=>{[{}]} partial case excluded to cgiQKey()
+# 2006-08-30 new dsdQuot()
+# 2006-08-30 changed dbiSel()/dbiKeyWhr()/htmlMenu() to nest hashes within arrays recursivelly
+# 2006-08-30 fixed ugnames(name) using local -userln undef
+# 2006-08-24 changed htmlMQH() - added -xpar, -xkey
+# 2006-08-24 fixed ugnames(username)
+# 2006-08-24 changed and corrected -frmLso1C, -frmLso2C specifications
+# 2006-08-24 new htmlMQH() for -frmLso1C
+# 2006-08-23 added htmlMenu() 'recNew' for 'recList'
+# 2006-08-23 new cgiQDflt(); 'cgiQuery', 'cgiForm' optimized; 'htmlHidden' changed
+# 2006-08-15 new cgiQInherit(), called before query formulas
+# 2006-08-15 new recUnion()
+# 2006-08-14 changed cgiForm, cgiQuery, cgiList: local $c->{-cmdt}, $c->{-cmdf} added for formulas
+# 2006-08-14 tfvReferences() fixed, 'l' flag not needed when -data/-display in table query
+# 2006-08-14 changed field spec sub{$_}({self},{field},?edit,?query...) -> ({self},{field},'eqp',...)
+# 2006-08-12 changed field spec sub{$_}({self},{field},?edit,?query,value) -> (...{record})
+# 2006-08-12 changed -fdclass, -fdstyle, -fhclass, -fhstyle subs to sub{$_}({self},{field},?edit,?query,value)
+# 2006-08-12 changed -ldclass, -ldstyle, -lsthtml subs to sub{$_}($self,, ?hyperlink,, cursor, [record])
+# 2006-08-12 changed -ddlb to sub{$_}(fld,edit,query,$_=value)
+# 2006-08-12 new -fnhtml, -fnhref, -fvhref
+# 2006-08-11 changed 'htmlHidden' QBF: 'frmLso' and 'frmLsc' added
+# 2006-08-11 changed 'cgiQuery' defaults and parameters joint usage: 'frmLso', 'qkey', 'qwhere', 'qurole'
+# 2006-08-10 new -cgiRun0A, -udisp
+# 2006-08-04 added -dbiACLike slot for -table definition
+# 2006-08-04 new -limlb slot
+# 2006-08-04 corrected -ldprop usage, it will be used without -ldstyle too now
+# 2006-08-04 recommended -display -query option usage with -frmLsc
+# 2006-08-04 added -frmLsc default -cmd behaviour, minimal arg set is -val only now
+# 2006-08-04 new w32umail
+# 2006-05-25 fixed dbiKeyWhr: empty values in key lists alike key scalars 
+# 2006-05-22 changed recUtr: -excl added
+# 2006-05-17 new cgiQueryFv
+# 2006-05-15 new recUtr
+# 2006-05-15 changed -lsthtml
+# 2006-05-15 new cgiLst
+# 2006-05-15 new urlCmd
+# 2006-05-15 extended -form field desc
+# 2006-05-04 improved -hidel
+# 2006-03-23 dbmTableFlush, dbmTableClose
+# 2006-03-22 recNew '-recNew0C' become filler again, other triggers as usual
+# 2006-03-21 rename '-recChg0A', 'recChg1A' -> '-recEdt0A', '-recEdt1A'
+# 2006-03-21 new '-recEdt0R' to translate values when record editing
+# 2006-03-20 webus triggers order: -recNew0R > -recChg0A > -recChg0R > -recUpd0R
+# 2006-03-17 '-ddlbloop' ddlb reopen hint (for hierarchical choise) + listbox
+# 2006-03-15 cgiList: !"</select>\n" - better ddlb
+# 2006-03-15 '-ddlbmsab' - 'ddlbMSvbsAddrBook'
+# 2006-03-14 '-lblhtbr'
+# 2006-03-14 tfvReferences(), tfvVersions(): my $v -> sub{}
+# 2006-03-10 {-tn}->{-ridSubject}
+# 2006-03-10 'smtpSend' documented
+# 2006-03-10 sub{} may be -ldclass,-ldstyle,-fhclass,-fhstyle,-fdclassm,-fdstyle
+# 2006-02-18 sub{} for -ldstyle, record state colorisation
+# 2006-02-14 reposition of '-recNew0C' before cmd, use '-recNew0R' with sample
+# 2006-02-14 reposition of '-recForm1C' before any cmd, new '-recForm0R'
+# 2006-02-12 periodical trigger and chk-out state and file store
+# 2006-02-11 triggers redesign (nv,pv)
+# 2006-02-05 recUpd - update by row
+# 2006-02-04 recPrint rID refs exclude
+# 2006-01-19 improved 'rmiIndex' alike 'recUpd'/'dbiUpd'
+# 2006-01-19 new -chk field desc
+# 2006-01-17 new -recChg0R, -recForm1A, -recForm0A; redisposed -recForm0C, -recForm1C
+# 2006-01-15 mandatory fields: 'cgiDBData' and '-flg' extended
+# 2006-01-14 new -w32IISdpsn; "$0 -call w32agf 0 q"; -ugadd
+# 2005-11-27 file store improvement: late truncation and autoflush.
+# 2005-11-22 New 'dbiLikesc' and 'dbiQuote' methods; considering SQL LIKE escaping.
+# 2005-08-29 html styles/classes improved, default stylesheet implemented
+# 2005-06-18 cgiQuery: -query respecification
+# 2005-06-18 cgiQuery: reoganized -qfrmLso -> -frmLso
+# 2005-06-18 cgiParse: recQBF -qlist -> recList -form
+# 2005-06-18 recSel: new -query, removed -display, -data, -field
+# 2005-06-18 reoganized -qlist -> -recQBFl, it is in doubt at all
+# 2005-06-18 reoganized -qform -> -recQBF
+# 2005-06-16 cgiForm: new -qform form description
+# 2005-06-15 rfdPath '/rfa' usage correctn
+# 2005-06-14 rfdStamp considering usernames from missed local domains
+# 2005-06-12 webus gwo testing
+# 2005-06-12 webus gwo 'period'
+# 2005-06-10 message translation into russian
+# 2005-06-10 htmlMenu recNew/recIns decoration alike recEdit/recUpd
+# 2005-06-10 new -labels_LL for 'popup_menu' localization within htmlField
+# 2005-06-10 changed lng() and -lng, new lngslot(), lnghash()
+# 2005-06-07 cgiQuery: $qo ||'-aeq'
+# 2005-06-07 new -env
+# 2005-06-07 lnglbl: htmlMChs
+# 2005-06-06 lnglbl: tfdRFD tvmVersions tvmHistory tvmReferences tvdIndex tvdFTQuery
+# 2005-06-05 lnglbl() & lngsmt(), for htmlMenu, cgiForm, cgiList
+# 2005-06-03 hash item variants for -frmLso and -frmLsc
+# 2005-05-31 new -frmLsc
+# 2005-05-30 cgiForm field list obtain order changed; use of -mdefld
+# 2005-05-30 dbiSel field descriptions obtain using -mdefld
+# 2005-05-29 new -racUser
+# 2005-05-27 partitioned -frmLso
+# 2005-05-24 datastr/strdata changing
+# 2005-05-24 new -frmLsoAdd
+# 2005-05-16 new urlOpt
+# 2005-05-16 new -frmLso2C
+# 2005-05-14 changed htmlMenu, cgiQuery
+# 2005-05-14 new -frmLso0A, -frmLso0C, -frmLso1C
+# 2005-05-04 uglist(user|group)
+# 2005-05-03 new -userln, -usernt
+# 2005-05-02 cgibus default usergroups implementation
+# 2005-05-02 local -pcmd, -pdta, -pout to consider within triggers
+# 2005-05-02 reordered -recForm0C to run after command-specific trigger
+# 2005-05-02 new -recChg0A, -recChg1A, removed -recForm0A, -recForm1A
+# 2005-05-01 new 'recLast', problem '-recForm0A'
+# 2005-04-29 new -recForm1A
+# 2005-04-28 renamed -recNew0R -> -recNew0C
+# 2005-04-28 removed -recRead0R, -recRead1R, -recIns0C, -recIns1C, -recTrim0C
+# 2005-04-28 new -recTrim0A, -recForm0A
+# 2005-04-27 renamed -recJoint1R -> -recForm1C
+# 2005-04-27 renamed -recForm1R -> -recForm0C
+# 2005-04-26 development -recTrim0C
+# 2005-04-24 examples settings commented
+# 2005-04-24 dbiLsLike -> dbiACLike, new -dbiACLike slot.
+# 2005-04-21 dbiLsLike filter sub{} // field list should be good
+# 2005-04-16 htmlMenu for Mozilla
+# 2005-04-16 dbiLsLike postgresql rlike
+# 2005-04-10 cgiQuery -frmLso: developments & corrections
+# 2005-04-10 cgiQuery -frmLso: -rvcFinState, -rvcAllState
+# 2005-04-09 datastr correction
+# 2005-04-09 some cgiQuery -frmLso and -qfrmLso development
+# 2005-04-09 principal(s) excluding actor(s)
+# 2005-04-08 htmlRFD correction, -fupd record attr
+# 2005-04-08 sub{} as -frmLso
+# 2005-04-05 -qwhere default query condition
+# 2005-04-05 check-out '-frmLso' options
+# 2005-04-04 development of '-frmLso' and 'mdeRole'.
+# 2005-04-03 -frmLso field and option replaces -qurole field and switch
+# 2005-03-31 gwo -racPrincipal, -racActor
+# 2005-03-30 qurole language strings, -qurole table switch.
+# 2005-03-30 lng improvement.
+# 2005-03-28 htmlML: window.document.open
+# 2005-03-27 'uadmin' -renamed-> 'uadmwtr'
+# 2005-03-26 'udisp' with 'cgiForm'
+# 2005-03-25 debug 'dbiLsLike'
+# 2005-03-24 fields hyperlinking with '-ddlb' or '-form'
+# 2005-03-22 '-version' meanings/use case; deletion check-in; recDel triggers
+# 2005-03-17 again 'recUpd', checkouts
+# 2005-03-15 some debug
+# 2005-03-14 rename '-rvcFinState' -> '-rvcChgState'
+# 2005-03-12 '-rvcFinState' / mkdir 'c:/srv/apache/htdocs/cgi-bus/gwo/ver/olmikh_2F/2003/02/06/09/5131$';
+# 2005-03-11 cgiParse '-key' -> '-qkey' translation for 'recList'
+# 2005-03-10 field cell html properties: -lhprop, -ldprop, -fhprop, -fdprop
+# 2005-03-09 dbi placeholders dialect flag '-dbiph'
+# 2005-03-08 using mdeQuote() for quoting field values
+# 2005-03-07 mdeTable() new '-mdefld' slot
+# 2005-03-06 tfvVersions() sql branch improved
+# 2005-03-06 cgiList() defaults inheritance from form or table
+# 2005-03-02 'cgiList' rewritten, -display query clause,...
+# 2005-03-03 inheriting field '-null' from form or table
+# 2005-02-26 field class/styles: -lhclass, -lhstyle, -ldclass, -ldstyle, -fdclass, -fdstyle, -fhclass, -fhstyle
+# 2005-02-22 ui new -qkeyord option
+# 2005-02-22 dbm -keyqn option implemented
+# 2005-02-21 sql -keyqn option implemented: undef and '' treat the same in '-key'
+# 2005-02-19 sql data engine testing
+# 2005-02-19 sql insert, update, delete, select redesigned to embed values in statements
+# 2005-02-03 '-cgibus' compatibillity option
+# 2005-01-27 '-expr' for tables
+# 2005-01-24 redesign of form layout hints; new '</table>' hint
+# 2005-01-23 '-refresh' option
+# 2005-01-23 form focusing
+# 2005-01-23 ddlb default selection, doubleclick, search prompt and field
+# 2005-01-22 sql experiments
+# 2005-01-07 ugroups(?user) variant in addition to ugnames(?user)
+# 2005-01-07 xml 'encoding' corrected
+# 2005-01-07 styles without '_', for page or each special tag
+# 2004-10-17 joined label+widget sub{} not needed because of free-form layout possible
+# 2004-10-17 'htmlField' - improved cgi attributes processing
+# 2004-10-13 '-urm' introduced.
+# 2004-10-10 check naming unification of lng messages, images, commands.
+# 2004-10-09 '-udflt' slot to filter domains in 'w32agf'
+# 2004-10-09 redesign of 'Default Data Definitions' to 'Templates' routines.
+# 2004-09-21 '-unflt' and '-ugflt' slots to filter user and group names.
+# 2004-09-14 '-racAdmRdr' slot added.
+# 2004-09-14 '-racAdmWtr' can read only permitted records, but update all can read.
+# 2004-09-14 edit mode switched off when record save.
+# 2004-09-14 new 'w32user', 'w32udisp'.
+# 2004-09-13 'w32ugrps' added for optional usage, good legacy example.
+# 2004-09-13 'w32agf' rewrite with 'ugroups' and 'uglist', using ADSI
+# 2004-09-13 '-end0', '-endh', '-end1' slots
+# 2004-08-31 dhtml for bottom screen messages
+# 2004-08-15 file attachments UNC path displayed to copy
+# 2004-08-15 MSHTML Control
+# 2004-06-26 review '!!!' (categorization, primary todos implementation)
+# 2004-06-23 default query conditions display
+# 2004-06-23 temporary files environment variables redesigned
+# 2004-06-22 using 'DHTML Editing Component'
+# 2004-06-21 'dbmSeek' string condition parser improved
+# 2004-06-21 XML record lists
+# 2004-06-19 XML record form
+# 2004-06-18 menu listboxes behaviour improved
+# 2004-06-13 log file more readable
+#		+ input / operation / rezult	- operation only
+#		+ '-name'=>value forms
+#		+ quoting and terminating SQL
+# 2004-06-11 full-text search in file attachments
+# 2004-06-08 corrected 'nfopens', 'nfclose', 'w32domain'
+# 2004-06-06 'ddvIndex'; 'logRec' analisys
+# 2004-06-01 ui: html styles - using classes
+# 2004-05-15 '-urole' & '-uname' query keywords
+# 2004-03-16 paused
+# 2004-03-12 table factory triggers and documentation
+# 2004-03-03 ui: printable html
+# 2004-02-29 'mdeTable', 'mdlTable': table factory base
+# 2004-02-27 not needed: restrict 'recIns' and 'recUpd' values to described '-field's?
+# 2004-02-27 '-keyord' & '-filter': query conditions unification: order option, key, joint, filter codeblock, while codeblock
+# 2004-02-26 'ns' naming set
+# 2004-02-22 default indexes (versions, news, references,...) review
+# 2004-02-17 table/ID rec IDs in 'History' view
+# 2004-02-17 embedded versions view definition
+# 2004-02-08 'setup' sub, '-setup' & '-reindex' command line options.
+# 2004-02-06 drop file sessions to attachments: 'nfopens', 'nfclose', 'htmlRFD'
+# 2004-02-03 problem documented: optimizing dbm cursor looping in 'rec'/'dbi' code
+# 2004-02-02 necessary: duplicate fields&valies copying in 'recXXX' for triggers and in 'dbiXXX' for SQL or cleanup special fields for dbi
+# 2004-02-01 optional html convertors of fields 'cgiList'ed - 'lsthtml'
+# 2004-01-29 documentation spell and check
+# 2004-01-26 document size analisys
+# 2004-01-25 document concepts
+# 2004-01-11 'cgiParse':  '-key' split into table/form and rec ID, if needed
+# 2004-01-10 'recNew' all field values inheritance problem: -recNew0R trigger should inherit
+# 2004-01-09 dbm -key search interpretation, -order options metastructure
+# 2004-01-09 dbm -where search condition interpretation
+# 2004-01-06 indexing trigger '-recIndex0R'
+# 2004-01-04 record form is alike table in 'recType' and 'rmiTrigger'.
+# 2004-01-04 reformed '-joint' idea to '-recJoint1R' trigger and '-qfilter' sub{}
+# 2004-01-03 file attachments database API
+# 2003-12-28 CGI user interface initial implementation
+# 2003-12-28 perl script pages implemented
+# 2003-12-27 documentation started
+# 2003-12-25 record ID splitting problem: $RISM[012], -idsplit, -recInsID, -rfdName
+# 2003-12-21 user authentication
+# 2003-12-21 message constants
+# 2003-12-18 user group file usage; also generation in windows
+# 2003-12-15 'w32IISdpsn' to escape IIS impersonation
+# 2003-12-14 acls (see '!!!' about 'LIKE')
+# 2003-12-14 attachments acls
+# 2003-12-07 '-joint' codeblock problem resolved by incapsulated hash ref binding
+# 2003-12-07 incapsulated hash ref binding
+# 2003-11-19 implement '-affect' db interface
+# 2003-11-18 generate alphanumeric incremental record IDs instead long numeric
+# 2003-11-17 cgiDDLB
+# 2003-11-10 form vs table problem - 'recRead' loads record only, not join, '-read' option like '-query'
+# 2003-11-09 sql full-text search
+# 2003-11-09 consider old versions in 'dbiUpd'
+# 2003-11-08 version display switching for 'recSel'/'dbiSel'/'cgiXXX'
+# 2003-11-07 cgi file attachments
+# 2003-11-02 commit/rollback/finish
+# 2003-10-11 first cgi script for testing
+# 2003-10-07 begin of smallest database API testing
+# 2003-09-16 started

@@ -1,0 +1,226 @@
+=head1	NAME
+
+DBIx::YAWM - (Yet Annother Wrapper Module) Provides a simplified interface to DBI
+
+This module provides annother layer of abstraction for talking to databases via DBI.
+YAWM.pm can theoretically talk to any database which has a DBD:: driver, however it's
+only been tested against MySQL, Sybase and Oracle. This module provides support for querying and
+inserting records (but not updating yet). 
+	
+I guess the value of this module is that it provides a central place where all the SELECT's and
+INSERT's in your code occur, leaving only the SQL to keep track of in your main program. This handier
+than you would think.
+
+=head1	To Do:
+
+write test scripts
+
+=head1	New (constructor)
+
+=head2	Notes
+
+This is the object contructor. Upon object creation, this will connect to the specified database.
+So if you want to connect to more than one database, you would use more than one object. Be sure to use
+Destroy on the object to disconnect from the datbaase. In all other methods, if the method failes, an
+error is written to $Object->{errstr}, but becuase we don't have an object if this method fails, we write
+the error to $DBIx::YAWM:errstr. 
+
+=head2	Synopsis
+
+ $Object = DBIx::YAWM::new([options]) || die $DBIx::YAWM::errstr, "\n";
+
+=head2	Required Options
+
+=over
+
+=item DBType
+
+This is the type of database you are connecting to. Specifically, this is the name of the DBD driver
+for that database. For example "Oracle" for DBD::Oracle, and "Sybase" for DBD::Sybase.
+
+=item Server
+
+This is the name of the database you are trying to connect to. What this is exactly is slightly dependant
+on the DBType. For instance, Oracle expects the hostname of the server containing the database. However,
+Sybase uses an interfaces file which handles hostname resolution, so Sybase expects the alias from the 
+interfaces file here.
+
+=item User
+
+This is the username to connect to the target database
+
+=item Pass
+
+This is the password associated with User
+
+=item SID
+
+This is only required when connecting to DBType=>"Oracle". This is the oracle SID, or the name of the
+database.
+
+=back
+
+
+=head2	Additional Options
+
+=over
+
+=item Debug
+
+Setting this option to a nonzero value causes debug messages to be printed
+
+=back
+
+
+=head1	Query
+
+=head2 Notes
+
+This method handles querying the database. Data is returned as a reference to an array of anonymous hashes. 
+Each nested hash represents a record returned from the query, and contains field value pairs
+for each selected field. So it looks like this:
+
+ \@data = (
+	{ 'field' => $value, 'field2' => $value2, etc ... },
+	{ 'field' => $value, 'field2' => $value2, etc ... }
+);
+
+Upon failure, the undef value is returned, and an error is written to $Object->{errstr}
+
+=head2 Synopsis
+
+ $data = $Object->Query([options]) || die $Object->{errstr}, "\n";
+
+
+=head2 Required Options
+
+=over
+
+=item Select
+
+This is an array refrence to a list of field names to select. You may find it convinient to buid the
+array reference inline with the function call like this:
+ Select	=> ["field1", "field2", "field3"]
+
+=item From
+
+The name of the table, view or object to select from.
+
+=back
+
+=head2 Additional Options
+
+=over
+
+=item Where
+
+The 'where clause' of your SQL query.
+
+=back
+
+
+
+
+=head1	Insert
+
+=head2 Notes
+
+Insert a record into the given table of the database
+
+=head2 Synopsis
+
+ $Object->Insert([options]) || die $Object->{errstr}, "\n";
+
+=head2 Required Options
+
+=over
+
+=item Into
+
+The name of the table or view to insert data into
+
+=item Insert
+
+The data you wish to insert. This should be a hash reference containing field/value pairs. 
+You may find that it is helpfull to build the hash reference inline with the function call like so:
+
+ Insert => { 'field1' => $value1, 'field2' => $value2 }
+
+=item NoQuote
+
+This is an ugly hack. Some databases have funny rules about quoting certain values (such as integers).
+By default, YAWM quotes all values with the quote charachter defined by the DBD driver for the 
+database. You can specify a hash reference here, each key in the hash is a field name, the value for
+the key is ignored. If a field is defined in the hash reference, it's value won't be quoted in the
+SQL, here's an example:
+
+$obj->Insert(
+	Into	=> "Stuff",
+	Insert	=> { 'integer'	=> 23, 'string' => "the integer won't be quoted" },
+	NoQuote => { 'integer'	=> 1 }
+);
+
+like I said it's an ugly hack. What would be better of course, would be to pull a table description
+first, and then to match the datatype, and quoting rules. I'd bet that the DBD drivers may do
+something like this already ... but this a "Yet Annother *" module and in keeping in with that spirit
+... ;-)
+
+=back
+
+
+=head1	Login
+
+This logs into the database. This method is called internally by the DBTools::New method. 
+This is not intended for public use.
+
+
+
+=head1	Do
+
+=head2	Synopsis
+
+Prepare and execute an arbitrary SQL statement. Return undef if error, else return whatever
+comes back from dbi->execute.
+
+=head2	Options
+
+=over
+
+=item	SQL
+
+the SQL statement to be prepared and executed
+
+=back
+
+
+=head1	Update
+
+head2	Synopsis
+
+changes data in a preexisting record
+ 
+$Object->Update([options]) || die $Object->{errstr}, "\n";
+
+=head2	Options
+
+=over
+
+=item	Table
+
+name of table which contains record(s) matching 'Where' to update with 'Fields'
+
+=item	Where
+
+where clause that identifies which record(s) to update in 'Table'
+
+=item	Fields
+
+a hash reference containing data to be changed in the matching record(s). Each key is a field name
+each value is the data for the corresponding key.
+
+=back
+
+=head1	Author: 
+
+    Andrew N. Hicox	<ahicox@hicox.com>
+    http://www.hicox.com

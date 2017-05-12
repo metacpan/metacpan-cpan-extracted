@@ -1,0 +1,4 @@
+This module is designed to be installed from CPAN:
+
+  perl -MCPAN -e 'install Devel::Pillbug'
+

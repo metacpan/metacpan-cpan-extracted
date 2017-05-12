@@ -1,0 +1,169 @@
+//-*- Mode: C++ -*-
+// Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' QueryFilter.h.in '-vt=^[mb]_' -o QueryFilter '-dn=free' '-dt=Node|Compiler|Options|FilterWithBounds' '-dm=::json|::arg|[vV]alueString|SortBounds|ResolveAttr|Compile'
+//
+// + edited
+
+%module{DDC::XS};
+
+//======================================================================
+// CQFilter
+%name{DDC::XS::CQFilter} class CQFilter : public %name{DDC::XS::Object} ddcObject
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+};
+
+//======================================================================
+// CQFSort
+%name{DDC::XS::CQFSort} class CQFSort : public %name{DDC::XS::CQFilter} CQFilter
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{arg0} string m_arg0 %get %set;
+	%name{arg1} string m_arg1 %get %set;
+	%name{arg2} string m_arg2 %get %set;
+
+  //-- filter type pseudo-accessor hacks
+  HitSortEnum getType() %code %{ RETVAL = THIS->m_Filter.m_FilterType; %};
+  void        setType(HitSortEnum ftype) %code %{ THIS->m_Filter.m_FilterType = ftype; %};
+
+  public:
+	%name{new} CQFSort(HitSortEnum ftype=NoSort, string arg0="", string arg1="", string arg2="");
+	%name{new_i} CQFSort(HitSortEnum ftype, string arg0, int arg1i, int arg2i);
+};
+
+//======================================================================
+// CQFRankSort
+%name{DDC::XS::CQFRankSort} class CQFRankSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFRankSort(HitSortEnum ftype=GreaterByRank);
+};
+
+//======================================================================
+// CQFDateSort
+%name{DDC::XS::CQFDateSort} class CQFDateSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFDateSort(HitSortEnum ftype=LessByDate, string lb="", string ub="");
+	%name{Str2Date} int Str2Date(string datestr, int onEmpty=0);
+};
+
+//======================================================================
+// CQFSizeSort
+%name{DDC::XS::CQFSizeSort} class CQFSizeSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFSizeSort(HitSortEnum ftype=LessBySize, string lb="", string ub="");
+	%name{new_i} CQFSizeSort(HitSortEnum ftype=LessBySize, int lb=INT_MIN, int ub=INT_MAX);
+};
+
+//======================================================================
+// CQFRandomSort
+%name{DDC::XS::CQFRandomSort} class CQFRandomSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFRandomSort(string seed0="");
+	%name{new_i} CQFRandomSort(int seed0);
+};
+
+//======================================================================
+// CQFBiblSort
+%name{DDC::XS::CQFBiblSort} class CQFBiblSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFBiblSort(HitSortEnum ftype=LessByFreeBiblField, string field="", string lb="", string ub="");
+};
+
+//======================================================================
+// CQFContextSort
+%name{DDC::XS::CQFContextSort} class CQFContextSort : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  //-- manual hacks
+  int  getMatchId() %code %{ RETVAL = THIS->m_Filter.m_ContextMatchId; %};
+  void setMatchId(int matchid) %code %{ THIS->m_Filter.m_ContextMatchId = matchid; %};
+
+  int  getOffset() %code %{ RETVAL = THIS->m_Filter.m_ContextOffset; %};
+  void setOffset(int offset) %code %{ THIS->m_Filter.m_ContextOffset = offset; %};
+    
+  public:
+	%name{new} CQFContextSort(HitSortEnum ftype=LessByMiddleContext, string field="", int matchid=0, int offset=0, string lb="", string ub="");
+};
+
+//======================================================================
+// CQFHasField
+%name{DDC::XS::CQFHasField} class CQFHasField : public %name{DDC::XS::CQFSort} CQFSort
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Negated} bool m_Negated %get %set;
+  public:
+	%name{new} CQFHasField(string field="", string val="", bool isNegated=false);
+	%name{Negate} void Negate();
+};
+
+//======================================================================
+// CQFHasFieldValue
+%name{DDC::XS::CQFHasFieldValue} class CQFHasFieldValue : public %name{DDC::XS::CQFHasField} CQFHasField
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFHasFieldValue(string field="", string val="", bool isNegated=false);
+};
+
+//======================================================================
+// CQFHasFieldRegex
+%name{DDC::XS::CQFHasFieldRegex} class CQFHasFieldRegex : public %name{DDC::XS::CQFHasField} CQFHasField
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Regex} string m_Regex %get %set;
+  public:
+	%name{new} CQFHasFieldRegex(string field="", string val="", bool isNegated=false);
+};
+
+//======================================================================
+// CQFHasFieldPrefix
+%name{DDC::XS::CQFHasFieldPrefix} class CQFHasFieldPrefix : public %name{DDC::XS::CQFHasFieldRegex} CQFHasFieldRegex
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFHasFieldPrefix(string field="", string val="", bool isNegated=false);
+};
+
+//======================================================================
+// CQFHasFieldSuffix
+%name{DDC::XS::CQFHasFieldSuffix} class CQFHasFieldSuffix : public %name{DDC::XS::CQFHasFieldRegex} CQFHasFieldRegex
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFHasFieldSuffix(string field="", string val="", bool isNegated=false);
+};
+
+//======================================================================
+// CQFHasFieldInfix
+%name{DDC::XS::CQFHasFieldInfix} class CQFHasFieldInfix : public %name{DDC::XS::CQFHasFieldRegex} CQFHasFieldRegex
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQFHasFieldInfix(string field="", string val="", bool isNegated=false);
+};
+
+//======================================================================
+// CQFHasFieldSet
+%name{DDC::XS::CQFHasFieldSet} class CQFHasFieldSet : public %name{DDC::XS::CQFHasField} CQFHasField
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Values} set_string m_Values %get %set;
+  public:
+	%name{new} CQFHasFieldSet(string field="", set_string vals=set_string(), bool isNegated=false);
+};
+

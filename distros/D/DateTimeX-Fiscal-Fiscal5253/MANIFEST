@@ -1,0 +1,15 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/10_constructors.t
+t/20_accessors.t
+t/30_methods.t
+t/80_sanity.t
+t/90_pod.t
+t/91_coverage.t
+lib/DateTimeX/Fiscal/Fiscal5253.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

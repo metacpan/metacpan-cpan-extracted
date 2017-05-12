@@ -1,0 +1,50 @@
+{
+   "abstract" : "A Doc Creation API Wrapper for DocRaptor",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DocRaptor",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "HTTP::Request::Common" : "6.10",
+            "LWP::Protocol::https" : "6.06",
+            "LWP::UserAgent" : "6.13",
+            "Moose" : "2.1405",
+            "Path::Class" : "0.35",
+            "perl" : "v5.18.2"
+         }
+      }
+   },
+   "provides" : {
+      "DocRaptor" : {
+         "file" : "lib/DocRaptor.pm",
+         "version" : "0.002000"
+      },
+      "DocRaptor::DocOptions" : {
+         "file" : "lib/DocRaptor/DocOptions.pm",
+         "version" : "0.002000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://opensource.org/licenses/mit-license.php"
+      ]
+   },
+   "version" : "0.002001"
+}

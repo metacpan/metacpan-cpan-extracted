@@ -1,0 +1,40 @@
+#!/usr/bin/perl
+#
+#  Sample code to turn all devices on
+#
+# Usage:
+#
+#   all_on --hub=192.168.10.11
+#
+# Steve
+# --
+#
+
+use strict;
+use warnings;
+
+use Device::Osram::Lightify::Hub;
+use Getopt::Long;
+
+my %CONFIG;
+
+# Default
+$CONFIG{ 'hub' } = "192.168.10.136";
+
+
+#
+# Parse options
+#
+exit
+  unless ( Getopt::Long::GetOptions( "hub=s", \$CONFIG{ 'hub' }, ) );
+
+
+#
+#  Create the object.
+#
+my $x = Device::Osram::Lightify::Hub->new( host => $CONFIG{ 'hub' } );
+
+#
+#  All on.
+#
+$x->all_on();

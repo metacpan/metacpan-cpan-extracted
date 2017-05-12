@@ -1,0 +1,19 @@
+Revision history for Dist-Zilla-Plugin-InsertCodeOutput
+
+0.03    2015-05-05 (PERLANCAR)
+
+	- [Incompatible change] Rename option 'verbatim' to 'make_verbatim'
+	  to make it less ambiguous and consistent with the other plugins
+	  (DZP:InsertCommandOutput, DZP:InsertCommandResult,
+	  DZP:InsertCodeResult).
+
+
+0.02    2015-01-25 (PERLANCAR)
+
+	- Add option: verbatim, to allow inserting code output as-is (e.g.
+	  raw POD) when set to 0.
+
+
+0.01     2014-12-12 (PERLANCAR)
+
+         - First release.

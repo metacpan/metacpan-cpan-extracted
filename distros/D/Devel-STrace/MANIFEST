@@ -1,0 +1,9 @@
+Changes.txt
+MANIFEST
+Makefile.PL
+lib/Devel/STrace.pm
+lib/Devel/STrace/Monitor.pm
+t/01monitor.t
+t/tracetest.pl
+t/tracetestnt.pl
+plstrace.source

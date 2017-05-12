@@ -1,0 +1,29 @@
+GENERAL
+=======
+
+dh-make-perl helps create Debian packages out of CPAN distributions.
+
+It does that by creating the files under the debian/ directory that are needed
+by Debian tools to create the .deb file.
+
+dh-make-perl can also help keep the packaging information current when upstream
+dependencies etc change without re-creating the debian/ content from scratch.
+
+
+INSTALLATION
+============
+
+Since dh-make-perl is only useful on Debian systems, you would probably prefer
+to simply install the 'dh-make-perl' package.
+
+
+BUGS ETC.
+=========
+
+Running 'reportbug dh-make-perl' (on a Debian system) is the preferred way of
+sending bug reports. Failing that, you are free to use the queue on
+rt.cpan.org, the mailing list or the IRC channel for bug reports.
+
+For support, try the #debian-perl IRC channel (irc.debian.org, a.k.a. OFTC) or
+the debian-perl@lists.debian.org mailing list (no subscription required, but
+please mention if you want to be CC-ed on replies).

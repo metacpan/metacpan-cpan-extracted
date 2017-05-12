@@ -1,0 +1,23 @@
+Revision history for Perl extension Devel-Cover-Report-Kritika
+
+0.05 2017-05-03T10:43:12Z
+
+    - retry on internal exceptions
+
+0.04 2017-01-18T18:43:11Z
+
+    - require minimum version of Devel::Cover
+
+0.03 2017-01-14T12:26:49Z
+
+    - do not use // to support older perls
+
+0.02 2017-01-13T09:14:48Z
+
+    - make sure tests are passing on travis ci
+    - fix test dependency
+
+0.01 2017-01-12T18:30:50Z
+
+    - original version
+

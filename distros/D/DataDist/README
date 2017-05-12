@@ -1,0 +1,10 @@
+DESCRIPTION
+
+    CURRENTLY EMPTY, NAME GRAB
+
+    DataDist:: is a namespace meant for Perl distributions that mainly
+    contain/share data instead of code. This module, DataDist, provides
+    convention for such distributions.
+
+SEE ALSO
+

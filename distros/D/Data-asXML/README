@@ -1,0 +1,158 @@
+NAME
+    Data::asXML - convert data structures to/from XML
+
+SYNOPSIS
+        use Data::asXML;
+        my $dxml = Data::asXML->new();
+        my $dom = $dxml->encode({
+            'some' => 'value',
+            'in'   => [ qw(a data structure) ],
+        });
+
+        my $data = $dxml->decode(q{
+            <HASH>
+                <KEY name="some"><VALUE>value</VALUE></KEY>
+                <KEY name="in">
+                    <ARRAY>
+                        <VALUE>a</VALUE>
+                        <VALUE>data</VALUE>
+                        <VALUE>structure</VALUE>
+                    </ARRAY>
+                </KEY>
+            </HASH>
+        });
+
+        my (%hash1, %hash2);
+        $hash1{other}=\%hash2;
+        $hash2{other}=\%hash1;
+        print Data::asXML->new->encode([1, \%hash1, \%hash2])->toString;
+    
+        <ARRAY>
+            <VALUE>1</VALUE>
+            <HASH>
+                        <KEY name="other">
+                                <HASH>
+                                        <KEY name="other">
+                                                <HASH href="../../../../*[2]"/>
+                                    </KEY>
+                            </HASH>
+                        </KEY>
+            </HASH>
+            <HASH href="*[2]/*[1]/*[1]"/>
+        </ARRAY>
+
+    For more examples see t/01_Data-asXML.t.
+
+WARNING
+    experimental, use at your own risk :-)
+
+DESCRIPTION
+    There are couple of modules mapping XML to data structures.
+    (XML::Compile, XML::TreePP, XML::Simple, ...) but they aim at making
+    data structures adapt to XML structure. This one defines couple of
+    simple XML tags to represent data structures. It makes the serialization
+    to and from XML possible.
+
+    For the moment it is an experiment. I plan to use it for passing data
+    structures as DOM to XSLT for transformations, so that I can match them
+    with XPATH similar way how I access them in Perl.
+
+        /HASH/KEY[@name="key"]/VALUE
+        /HASH/KEY[@name="key2"]/ARRAY/*[3]/VALUE
+        /ARRAY/*[1]/VALUE
+        /ARRAY/*[2]/HASH/KEY[@name="key3"]/VALUE
+
+    If you are looking for a module to serialize your data, without
+    requirement to do so in XML, you should probably better have a look at
+    JSON::XS or Storable.
+
+PROPERTIES
+    pretty
+        (default 1 - true) will insert text nodes to the XML to make the
+        output indented.
+
+    safe_mode
+        (default undef - false)
+
+        in case of `encode()' perform the xml string decoding back and will
+        compare the two data structures to be sure the data can be
+        reconstructed back without errors.
+
+        in case of a `decode()' it will decode to data then encode to xml
+        string and from xml string decode back to data. this two data values
+        are then compared.
+
+        Both compares is done using Test::Deep::NoTest::eq_deeply.
+
+    namespace
+        (default undef - false)
+
+        adds xml:ns attribute to the root element. if `namespace' is set to
+        1 the xml:ns will be http://search.cpan.org/perldoc?Data::asXML
+        otherwise it will be the value of `namespace'.
+
+METHODS
+  new()
+    Object constructor.
+
+  encode($what)
+    From structure `$what' generates XML::LibXML::Document DOM. Call
+    `->toString' to get XML string. For more actions see XML::LibXML.
+
+  decode($xmlstring)
+    Takes `$xmlstring' and converts to data structure.
+
+AUTHOR
+    Jozef Kutej, `<jkutej at cpan.org>'
+
+CONTRIBUTORS
+    The following people have contributed to the Sys::Path by committing
+    their code, sending patches, reporting bugs, asking questions,
+    suggesting useful advice, nitpicking, chatting on IRC or commenting on
+    my blog (in no particular order):
+
+        Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯
+        Emmanuel Rodriguez
+
+TODO
+        * int, float encoding ? (string enough?)
+        * XSD
+        * anyone else has an idea?
+        * what to do with blessed? do the same as JSON::XS does?
+
+BUGS
+    Please report any bugs or feature requests to `bug-data-asxml at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-asXML. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::asXML
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-asXML
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Data-asXML
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Data-asXML
+
+    * Search CPAN
+        http://search.cpan.org/dist/Data-asXML/
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Jozef Kutej.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

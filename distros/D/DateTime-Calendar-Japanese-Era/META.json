@@ -1,0 +1,87 @@
+{
+   "abstract" : "DateTime Extension for Japanese Eras",
+   "author" : [
+      "Copyright (c) 2004-2007 Daisuke Maki <daisuke@endeworks.jp>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Calendar-Japanese-Era",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Class::Data::Inheritable" : "0",
+            "DateTime" : "0",
+            "DateTime::Infinite" : "0",
+            "Encode" : "0",
+            "Exporter" : "0",
+            "File::ShareDir" : "1.00",
+            "Params::Validate" : "0",
+            "YAML" : "0.71",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Calendar::Japanese::Era" : {
+         "file" : "lib/DateTime/Calendar/Japanese/Era.pm",
+         "version" : "0.08003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lestrrat/p5-DateTime-Calendar-Japanese-Era/issues"
+      },
+      "homepage" : "https://github.com/lestrrat/p5-DateTime-Calendar-Japanese-Era",
+      "repository" : {
+         "url" : "git://github.com/lestrrat/p5-DateTime-Calendar-Japanese-Era.git",
+         "web" : "https://github.com/lestrrat/p5-DateTime-Calendar-Japanese-Era"
+      }
+   },
+   "version" : "0.08003",
+   "x_authority" : "cpan:DMAKI",
+   "x_contributors" : [
+      "lestrrat <lestrrat+github@gmail.com>",
+      "Syohei YOSHIDA <syohex@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

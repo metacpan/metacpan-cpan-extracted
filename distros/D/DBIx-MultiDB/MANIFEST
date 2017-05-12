@@ -1,0 +1,19 @@
+.cvsignore
+Changes
+lib/DBIx/MultiDB.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-load.t
+t/01-dataset.t
+t/dbh.t
+t/fetchrow_hashref-2.t
+t/fetchrow_hashref.t
+t/init_db.sh
+t/join.t
+t/pod-coverage.t
+t/pod.t
+t/prepare.t
+t/references.t
+t/sample.t

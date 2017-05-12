@@ -1,0 +1,18 @@
+Revision history for Perl extension Data::Apple::PriceTier
+
+0.05 2012-10-26T08:28:19+09:00
+     - Added new currencies support that added today's iTunes maintenance.
+
+0.04 2012-07-03T14:09:07+09:00
+     - Fixed invalid result for price_for_tier(0).
+     - Added new class methods: prices and proceeds.
+
+0.03 2012-06-22T11:06:28+09:00
+     - Added Singapore, Hong Kong, Taiwan
+
+0.02 2012-05-07T10:22:48+09:00
+     - no code is changed
+     - fixed doc and build problems
+
+0.01 2012-05-02T16:33:22+09:00
+     - initial version

@@ -1,0 +1,61 @@
+NAME
+    DBIx::Class::TopoSort - The addition of topological sorting to
+    DBIx::Class
+
+SYNOPSIS
+      my $schema = Your::App::Schema->connect(...);
+      my @toposorted_sourcenames = $schema->toposort();
+
+DESCRIPTION
+    This adds a method to DBIx::Class::Schema which returns the full list of
+    sources (similar to "sources" in DBIx::Class::Schema) in
+    topological-sorted order.
+
+  TOPOLOGICAL SORT
+    A topological sort of the tables returns the list of tables such that
+    any table with a foreign key relationship appears after any table it has
+    a foreign key relationship to.
+
+METHODS
+    This class is not instantiable nor does it provide any methods of its
+    own. All methods are added to the DBIx::Class::Schema class and are
+    callable on objects instantiated of that class.
+
+  toposort
+    This is sugar for:
+
+      $self->toposort_graph(@_)->toposort();
+
+    Calling this method multiple times may return the list of source names
+    in different order. Each order will conform to the gurantee described in
+    the section on TOPOLOGICAL SORT.
+
+    This method will throw an error if there are any cycles in your tables.
+    You will need to specify the skip parameter (described below) to break
+    those cycles.
+
+  toposort_graph
+    This returns a Graph object with a vertex for every source and an edge
+    for every foreign key relationship.
+
+    It takes the following parameters.
+
+    skip
+        This describes the list of relationships that should be ignored by
+        the toposort algorithm. This is generally used if you have cycles in
+        your schema (though it could possibly be useful in other ways, I
+        guess). The value is a hashref. The keys of this hashref are source
+        names and the values are arrays of relationship names.
+
+          skip => {
+              Artist => [ qw/ first_album / ],
+          }
+
+SEE ALSO
+    "toposort" in Graph
+
+LICENSE
+    Copyright (c) 2013 Rob Kinyon. All Rights Reserved. This is free
+    software, you may use it and distribute it under the same terms as Perl
+    itself.
+

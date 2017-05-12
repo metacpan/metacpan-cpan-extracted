@@ -1,0 +1,98 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Db::Documentum::Tools - Support functions for Db::Documentum.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Db::Documentum::Tools - Support functions for Db::Documentum.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    use Db::Documentum::Tools qw(:all);</pre>
+<pre>
+    $session_id = dm_Connect($docbase,$user,$password);
+    $session_id = dm_Connect($docbase,$user,$password,
+                             $user_arg_1,$user_arg_2);</pre>
+<pre>
+    $error_msg = dm_LastError();
+    $error_msg = dm_LastError($session_id);
+    $error_msg = dm_LastError($session_id,1);
+    $error_msg = dm_LastError($session_id,$level,$number);</pre>
+<pre>
+    $object_id = dm_CreateObject(&quot;dm_document&quot;,%ATTRS);
+    $object_id = dm_CreateObject(&quot;dm_document&quot;);</pre>
+<pre>
+    $api_stat = dm_CreateType(&quot;my_document&quot;,&quot;dm_document&quot;,%field_defs);
+    $api_stat = dm_CreateType(&quot;my_document&quot;,&quot;dm_document&quot;);</pre>
+<pre>
+    $obj_id = dm_CreatePath('/Temp/Test/Unit-1');</pre>
+<pre>
+    $hostname = dm_LocateServer($docbase);</pre>
+<pre>
+    $child = dm_Locate_Child($session,$object_id,$relation);</pre>
+<pre>
+    $object_id = dm_Copy($orig_obj_id, $to_folder);
+    $object_id = dm_Copy($orig_obj_id, '/Temp/Test/Unit-1');</pre>
+<pre>
+    $rv = dm_Move($object_id, $to_folder);
+    $rv = dm_Move($object_id, '/Temp/Test/Unit-2');
+    $rv = dm_Move($object_id, $to_folder, $from_folder);
+    $rv = dm_Move($object_id, $to_folder, '/Temp/Test/Unit-1');
+    $rv = dm_Move($object_id, '/Temp/Test/Unit-2', $from_folder);
+    $rv = dm_Move($object_id, '/Temp/Test/Unit-2', '/Temp/Test/Unit-1');</pre>
+<pre>
+    $rv = dm_Delete($obj_id, $all);
+    $rv = dm_Delete($obj_id, 1);</pre>
+<pre>
+    See scripts in /etc for more examples.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Db::Documentum::Tools is a collection of frequently used Documentum procedures
+encapsulated by Perl.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>The Documentum perl extension may be redistributed under the same terms as Perl.
+The Documentum EDMS is a commercial product.  The product name, concepts,
+and even the mere thought of the product are the sole property of
+Documentum, Inc. and its shareholders.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>M. Scott Roth, <code>scott@dm-book.com</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>Db::Documentum.</p>
+
+</body>
+
+</html>

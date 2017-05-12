@@ -1,0 +1,29 @@
+Date/Jalali version 0.04
+========================
+
+Date::Jalali
+
+   Gregorian<->Jalali Date Convetor
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+ None!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Ehsan Golpayegani
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

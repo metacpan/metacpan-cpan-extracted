@@ -1,0 +1,7 @@
+\.git
+db.sqlite
+ignore.txt
+.project
+.includepath
+Makefile.old
+.travis.yml

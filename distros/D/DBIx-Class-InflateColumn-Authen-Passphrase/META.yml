@@ -1,0 +1,154 @@
+---
+abstract: 'Inflate/deflate columns to Authen::Passphrase instances'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  Authen::Passphrase::BlowfishCrypt: 0
+  Authen::Passphrase::SaltedDigest: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  FindBin: 0
+  SQL::Translator: 0
+  Test::More: 0.89
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-InflateColumn-Authen-Passphrase
+requires:
+  Authen::Passphrase: 0
+  DBIx::Class: 0
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class-InflateColumn-Authen-Passphrase
+  homepage: http://search.cpan.org/dist/DBIx-Class-InflateColumn-Authen-Passphrase
+  repository: git://github.com/rafl/dbix-class-inflatecolumn-authen-passphrase.git
+version: 0.01
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@FLORA/@Basic/GatherDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@FLORA/@Basic/PruneCruft'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@FLORA/@Basic/ManifestSkip'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@FLORA/@Basic/MetaYAML'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@FLORA/@Basic/License'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@FLORA/@Basic/Readme'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@FLORA/@Basic/ExtraTests'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@FLORA/@Basic/ExecDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@FLORA/@Basic/ShareDir'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@FLORA/@Basic/MakeMaker'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@FLORA/@Basic/Manifest'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@FLORA/@Basic/TestRelease'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@FLORA/@Basic/ConfirmRelease'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@FLORA/@Basic/UploadToCPAN'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@FLORA/MetaConfig'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@FLORA/MetaJSON'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@FLORA/PkgVersion'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@FLORA/PodSyntaxTests'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@FLORA/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@FLORA/PodCoverageTests'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@FLORA/MetaResources'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@FLORA/Authority'
+      version: 1.000
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@FLORA/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@FLORA/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@FLORA/AutoPrereqs'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102345
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102345
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102345
+x_authority: cpan:FLORA

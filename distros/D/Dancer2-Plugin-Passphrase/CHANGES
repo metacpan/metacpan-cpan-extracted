@@ -1,0 +1,71 @@
+3.3.0   2016-10-04
+
+    [ D2P2 ]
+
+No longer compatible with Dancer2 prior to plugin2 release.
+
+3.2.2	2015-12-30
+    [ D2P2 ]
+Compatible with the new Dancer2::Plugin2
+
+3.0.2	2015-03-10
+    [ NICE! ]
+Move plugin_setting to on_plugin_import.
+This makes $dsl->passphrase callable from other plugins!
+
+3.0.1	2015-03-09
+    [ MISC ]
+Removed some leftovers.
+
+3.0.0	2015-03-09
+
+    [ Remove AUTO STRINGIFICATION ]
+This version looks like 2.0.5 :)
+
+2.0.6   2014-12-16
+
+    [ AUTO STRINGIFICATION IS DEPRECATED ]
+This version brings back the overloading but it will carp!
+You must use $phrase->rfc2307() to get a text string.
+
+2.0.5   2014-12-12
+
+    [ Sawyer X ]
+ Major cleanup: it works now:
+
+The original structure was awkward. This is fixed and working with
+the original tests.
+
+There are now three decoupled parts:
+
+* Dancer2::Plugin::Passphrase:
+
+Provide the 'generate' keyword for generating passphrases.
+
+* Dancer2::Plugin::Passphrase::Core:
+
+The majority of the actual implementation.
+
+When you call the 'generate' keyword it creates an object of
+Dancer2::Plugin::Passphrase::Core. The original design would actually
+create an object of the plugin itself, which is risky and confusing.
+
+When you call methods, it's actually called on this object.
+
+* Dancer2::Plugin::Passphrase::Hashed:
+
+This is a data object representing the hashed passphrase.
+
+2.0.4   2014-11-22
+
+    [ MISC ]
+    * New Makfile
+
+2.0.3	2014-11-10
+
+   [ MISC ]
+   * D2 version
+
+0.0.1   2011-09-06
+
+    ** First Draft **

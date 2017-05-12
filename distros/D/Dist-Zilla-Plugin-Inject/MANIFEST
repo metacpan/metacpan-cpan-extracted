@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/Plugin/Inject.pm
+t/00-compile.t
+t/01-local.t
+t/02-remote.t
+t/release-pod-spell.t
+t/release-pod-syntax.t

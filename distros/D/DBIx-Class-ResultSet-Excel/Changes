@@ -1,0 +1,5 @@
+Revision history for DBIx-Class-ResultSet-Excel
+
+0.01  2013-09-11 00:43:03 CDT
+        - Initial release
+        - Basic Excel Export function implemented

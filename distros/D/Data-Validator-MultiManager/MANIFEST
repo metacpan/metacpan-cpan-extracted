@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+example/synopsis.pl
+lib/Data/Validator/MultiManager.pm
+t/00_compile.t
+t/01_validator.t
+t/02_common.t
+t/03_extra_validator.t
+t/04_errors.t
+META.yml
+MANIFEST

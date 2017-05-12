@@ -1,0 +1,63 @@
+Revision history for Data-Validate-Type
+
+v1.6.0  2017-03-21
+        - Relicensed under Perl 5 terms.
+        - Cleaned up dependencies. Thank you, Justin Cook!
+
+v1.5.1  2014-06-13
+        - Fixed typo in documentation.
+
+v1.5.0  2014-04-29
+        - Added is_regex(), assert_regex(), and filter_regex().
+
+v1.4.3  2014-04-20
+        - Fixed "package version matches dist version" for CPANTS.
+        - Fixed license declared in meta files.
+        - Switched README to Markdown.
+        - General cleanup.
+
+v1.4.2  2013-05-01
+        - Fixed missing prerequisite.
+
+v1.4.1  2013-05-01
+        - Moved release tests to xt/, added new release tests.
+        - Added Test::FailWarnings to all tests.
+        - Moved request tracker from RT to GitHub.
+        - Changed links from Search CPAN to MetaCPAN.
+        - Updated no_index meta information.
+        - Added information on how to contribute examples.
+
+v1.4.0  2012-11-24
+        - Refactored uses of Params::Util, which didn't work with Devel::Cover
+          in taint mode.
+
+v1.3.1  2012-09-22
+        - Moved repository to GitHub.
+
+v1.3.0  2012-09-08
+        - Re-licensed as GPLv3, to allow inclusion in Fedora.
+
+v1.2.0  2012-07-27
+        - Added ability to validate individual elements in arrayrefs
+          (element_validate_type).
+
+v1.1.2  2012-05-15
+        - Excluded non-core PerlCritic policies for tests.
+
+v1.1.1  2012-04-02
+        - Fixed issue in Perl 5.10 with strings passed to assert_number() in
+          specific contexts.
+
+v1.1.0  2012-03-29
+        - Added is_instance(), assert_instance() and filter_instance().
+
+v1.0.2  2012-03-09
+        - Fixed issue in Perl 5.8 with strings passed to assert_number() in
+          specific contexts.
+
+v1.0.1  2012-03-07
+        - Refactored to use Data::Dump.
+        - Fixed synopsis.
+
+v1.0.0  2012-03-06
+        - First public release.

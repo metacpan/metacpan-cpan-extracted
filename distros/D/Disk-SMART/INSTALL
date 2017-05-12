@@ -1,0 +1,39 @@
+Disk-SMART
+
+This module requires that smartctl be accessed as root. If you do not wish to install the module as root then you will need to make smartctl SETUID as root with "chmod u+s <path/to/smartctl>"
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	sudo make test
+	sudo make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Disk::SMART
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Disk-SMART
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Disk-SMART
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Disk-SMART
+
+    Search CPAN
+        http://search.cpan.org/dist/Disk-SMART/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright 2015 Paul Trost
+This script is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License v2, or at your option any later version.
+<http://gnu.org/licenses/gpl.html>
+

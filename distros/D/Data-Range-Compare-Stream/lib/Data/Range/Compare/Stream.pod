@@ -1,0 +1,583 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream - Compute intersections of Ranges with Iterators
+
+=head1 SYNOPSIS A
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream::Iterator::Consolidate;
+  use Data::Range::Compare::Stream::Iterator::Compare::Asc;
+
+  # create the iterator for column_a's Consolidation iterator
+  my $column_a=Data::Range::Compare::Stream::Iterator::Array->new();
+  $column_a->create_range(3,11);
+  $column_a->create_range(17,19);
+
+  # create the iterator for column_b's Consolidation iterator
+  my $column_b=Data::Range::Compare::Stream::Iterator::Array->new();
+  $column_b->create_range(0,0);
+  $column_b->create_range(1,3);
+  $column_b->create_range(5,7);
+  $column_b->create_range(6,9);
+  $column_b->create_range(11,15);
+  $column_b->create_range(17,33);
+
+  # sort columns a and be in consolidate order
+  $column_a->prepare_for_consolidate_asc;
+  $column_b->prepare_for_consolidate_asc;
+
+  # create the consolidator object for column_a our iterator to it
+  my $column_a_consolidator=Data::Range::Compare::Stream::Iterator::Consolidate->new($column_a);
+
+  # create the consolidator object for column_b our iterator to it
+  my $column_b_consolidator=Data::Range::Compare::Stream::Iterator::Consolidate->new($column_b);
+
+  # create the object that will compare columns a and b
+  my $compare=new Data::Range::Compare::Stream::Iterator::Compare::Asc;
+
+  # add column a for processing
+  $compare->add_consolidator($column_a_consolidator);
+
+  # add column b for processing
+  $compare->add_consolidator($column_b_consolidator);
+
+
+  # now we can compute the intersections of our objects
+
+  while($compare->has_next) {
+     # fetch our current result object
+    my $row=$compare->get_next;
+  
+    # if no ranges overlap with this row move on
+    next if $row->is_empty;
+  
+    # now we can output the current range
+    my $common_range=$row->get_common;
+    my $overlap_count=$row->get_overlap_count;
+  
+    print "A total of: [$overlap_count] Ranges intersected with Common range: $common_range\n";
+  
+    my $overlap_ids=$row->get_overlap_ids;
+    for each my $consolidator_id (@{$overlap_ids}) {
+  
+      if($consolidator_id==0) {
+  
+        my $result=$row->get_consolidator_result_by_id($consolidator_id);
+        print "  Column a contained the following overlaps $result\n";
+  
+      } elsif($consolidator_id==1) {
+  
+        my $result=$row->get_consolidator_result_by_id$consolidator_id);
+        print "  Column b contained the following overlaps $result\n";
+  
+      }
+  
+    }
+  
+    print "\n";
+ 
+  }
+
+=head1 DESCRIPTION
+
+This library implements an algorithm that can be used to compute gaps, differences, and intersections across multiple sets of 2 dimensional ranges from both a vertical and horizontal perspective.  The algorithm itself generates missing data creating contiguous ranges allowing for parallel comparisons.  Once missing ranges have been generated what was once despondent sets of ranges can now be aligned and compared for intersections.
+
+Figures 1 through 5 represent aspects of the comparison process:  Although these steps are explained individually each operation is completed in parallel.
+
+=head2 Figure 1 ( Example Data )
+
+Given 3 complex sets of data we will outline the process used to compute the horizontal intersections and vertical gaps in these sets of ranges.  See Figure 1 for the example sets of data.
+
+  Numeric Range set: A
+  +----------+
+  | 1 - 11   |
+  | 13 - 44  |
+  | 17 - 23  |
+  | 55 - 66  |
+  +----------+
+
+  Numeric Range set: B
+  +----------+
+  | 0  - 1   |
+  | 2  - 29  |
+  | 88 - 133 |
+  +----------+
+
+  Numeric Range set: C
+  +-----------+
+  | 17  - 29  |
+  | 220 - 240 |
+  | 241 - 250 |
+  +-----------+
+
+
+=head2 Figure 2 ( Numeric range set: A, post consolidation )
+
+Looking over data sets A,B, and C we can see several problems: Set A contains ranges that overlap with each other, and sets A through C do not align on consistent boundaries.
+
+Part of the process of comparing sets of data involves making sure there are no duplicates or overlaps in each individual source of data.  The first action taken is the removal of duplicates and consolidation of overlapping ranges:  This process can be seen by looking at the resulting conversion for "Numeric Range Set: A" seen in Figure 2. The overlapping range "17 - 23" is contained by a larger range in the set "13 - 44" thus "17 - 33" needs to be removed.  Data Sets B and C do not contain any duplicated or overlapping ranges and thus require no changes.
+
+  Consolidated Numeric Range set: A
+  +----------+
+  | 1 - 11   |
+  | 13 - 44  |
+  | 55 - 66  |
+  +----------+
+
+=head2 Figure 3 ( Numeric Ranges, gaps filled )
+
+The next step in the comparison process is iterating through our data and figuring out where the gaps are in each data set.  Each set of data contains gaps between ranges, and those gaps need be calculated in order for a proper comparison of the data to begin.
+
+
+  Numeric Range set: A
+  +----------+
+  | 1 - 11   |
+    12 - 12 -- No Data
+  | 13 - 44  |
+    45 - 54 -- No Data
+  | 55 - 66  |
+  +----------+
+
+  Numeric Range set: B
+  +----------+
+  | 0  - 1   |
+  | 2  - 29  |
+    30 - 87 -- No Data
+  | 88 - 133 |
+  +----------+
+
+  Numeric Range set: C
+  +-----------+
+  | 17  - 29  |
+    30  - 219 -- No Data
+  | 220 - 240 |
+  | 241 - 250 |
+  +-----------+
+
+=head2 Figure 4 ( Results )
+
+The intersecting range represents overlapping points between ranges or the "Common Range".  The concept is not just limited to missing columns, the algorithm itself will also compute missing rows.  In Figure 4 Row 0 the Common Range is defined as  "0 - 0".  This is because the only column with overlapping data is in "Numeric Range B" 0 - 1.  0 - 1 also overlaps with "Numeric Column A: 1 - 11".  This means the first common range is "0 - 0", and the second common range is defined as "1 - 1".  The relationship of the common range is defined not just by the current ranges being compared but also by the next common range to be computed as well.
+
+Three result rows stand out because they contain no data in sets A,B or C: "45 - 54","67 - 87","134 - 219".  These 3 rows represent a horizontal gap in our 3 sources of data and can be excluded from the result set to make the data more consistent for someone reviewing just the intersections of the data from sets A,B, and C  see: Figure 5.
+
+  +--------------------------------------------------------------------+
+  | Common Range | Numeric Range A | Numeric Range B | Numeric Range C |
+  +--------------------------------------------------------------------+
+  | 0 - 0        |   No Data       |   0 - 1         |   No Data       |
+  | 1 - 1        |   1 - 11        |   0 - 1         |   No Data       |
+  | 2 - 11       |   1 - 11        |   2 - 29        |   No Data       |
+  | 12 - 12      |   No Data       |   2 - 29        |   No Data       |
+  | 13 - 16      |   13 - 44       |   2 - 29        |   No Data       |
+  | 17 - 29      |   13 - 44       |   2 - 29        |   17 - 29       |
+  | 30 - 44      |   13 - 44       |   No Data       |   No Data       |
+  | 45 - 54      |   No Data       |   No Data       |   No Data       |
+  | 55 - 66      |   55 - 66       |   No Data       |   No Data       |
+  | 67 - 87      |   No Data       |   No Data       |   No Data       |
+  | 88 - 133     |   No Data       |   88 - 133      |   No Data       |
+  | 134 - 219    |   No Data       |   No Data       |   No Data       |
+  | 220 - 240    |   No Data       |   No Data       |   220 - 240     |
+  | 241 - 250    |   No Data       |   No Data       |   241 - 250     |
+  +--------------------------------------------------------------------+
+
+=head2 Figure 5 ( Filtered results )
+
+Looking at the results form the compare process we can see the "Common Range" explains the overlap.  Figure 4 shows not only sets of data we have, but it also shows sets of data that we don't have: these additional ranges are a bi-product of the comparison process and have been filtered out of the result set in Figure 5.
+
+  +--------------------------------------------------------------------+
+  | Common Range | Numeric Range A | Numeric Range B | Numeric Range C |
+  +--------------------------------------------------------------------+
+  | 0 - 0        |   No Data       |   0 - 1         |   No Data       |
+  | 1 - 1        |   1 - 11        |   0 - 1         |   No Data       |
+  | 2 - 11       |   1 - 11        |   2 - 29        |   No Data       |
+  | 12 - 12      |   No Data       |   2 - 29        |   No Data       |
+  | 13 - 16      |   13 - 44       |   2 - 29        |   No Data       |
+  | 17 - 29      |   13 - 44       |   2 - 29        |   17 - 29       |
+  | 30 - 44      |   13 - 44       |   No Data       |   No Data       |
+  | 55 - 66      |   55 - 66       |   No Data       |   No Data       |
+  | 88 - 133     |   No Data       |   88 - 133      |   No Data       |
+  | 220 - 240    |   No Data       |   No Data       |   220 - 240     |
+  | 241 - 250    |   No Data       |   No Data       |   241 - 250     |
+  +--------------------------------------------------------------------+
+
+The final stage, only ranges derived from our original source data is presented and we have excluded any rows that contain none of our original data.
+
+=head1 SYNOPSIS B 
+
+  use Data::Range::Compare::Stream::Iterator::File;
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn;
+  use Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  
+  my $compare=new  Data::Range::Compare::Stream::Iterator::Compare::Asc();
+  
+  foreach my $file (qw(source_a.src source_b.src source_d.src source_c.src source_d.src)) {
+    my $src=Data::Range::Compare::Stream::Iterator::File->new(filename=>$file);
+    my $con=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn($src,$compare);
+    $compare->add_consolidator($con);
+  }
+  
+  my $format='  | %-12s | %-26s |  %-26s|  %-26s|  %-26s|'."\n";
+  my $break="  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+\n";
+  printf "$break$format$break","Intersection","Set A",'Set B','Set C','Set D';
+  
+  while($compare->has_next) {
+  
+    my $result=$compare->get_next;
+    next if $result->is_empty;
+  
+    my $columns=$result->get_root_results($result);
+    my @row=($result->get_common);
+    foreach my $id (@{$result->get_root_ids}) {
+      if($#{$columns->[$id]}!=-1) {
+      push @row, join ', ',map { $_->get_common } @{$columns->[$id]};
+      } else {
+        push @row,"No Data";
+      }
+    }
+  
+    printf $format,@row;
+    print $break;
+  }
+
+
+=head1 Going Beyond Simple Consolidation
+
+SYNOPSIS A and Figures 1 through 5 provide a very basic concept for consolidation and comparison:  But an alternate way to deal with duplicates and overlaps is to copy the duplicates and overlaps to additional columns:  For every duplicate and overlap found that data is then moved over to an additional column.
+
+SYNOPSES B and Figures 6 through 8 represent aspects of the extended comparison process:  Although these steps are explained individually each operation is completed in parallel.
+
+=head2 Figure 6 ( Example Data )
+
+Given 4 sets of data we will look at the extended consolidation process.
+
+  +-----------+
+  | Set A     |
+  +-----------+
+  | 1 - 11    |
+  +-----------+
+  | 13 - 44   |
+  +-----------+
+  | 17 - 24   |
+  +-----------+
+  | 55 - 66   |
+  +-----------+
+
+  +-----------+
+  | Set B     |
+  +-----------+
+  | 0 - 1     |
+  +-----------+
+  | 2 - 29    |
+  +-----------+
+  | 88 - 133  |
+  +-----------+
+
+  +-----------+
+  | Set C     |
+  +-----------+
+  | 17 - 29   |
+  +-----------+
+  | 220 - 240 |
+  +-----------+
+  | 241 - 250 |
+  +-----------+
+
+  +-----------+
+  | Set D     |
+  +-----------+
+  | 0 - 1     |
+  +-----------+
+  | 0 - 0     |
+  +-----------+
+  | 1 - 1     |
+  +-----------+
+  | 5 - 7     |
+  +-----------+
+  | 7 - 9     |
+  +-----------+
+  | 11 - 19   |
+  +-----------+
+  | 12 - 18   |
+  +-----------+
+  | 17 - 29   |
+  +-----------+
+  | 220 - 240 |
+  +-----------+
+  | 241 - 250 |
+  +-----------+
+
+=head2 Figure 7 ( Moving duplicates and overlaps to new columns )
+
+Duplicates and overlaps are moved to additional columns and compared for a common range:  Columns A becomes 2 columns, Column D Becomes 3 Columns.   Once the additional columns are created each set of data can be compared for the common range.
+
+  +---------------------+----------------------------+
+  | Set A Common Ranges | Duplicates and Overlaps    |
+  +---------------------+----------------------------+
+  | 1 - 11              | 1 - 11                     |
+  | 13 - 16             | 13 - 44                    |
+  | 17 - 24             | 13 - 44, 17 - 24           |
+  | 25 - 44             | 13 - 44                    |
+  | 55 - 66             | 55 - 66                    |
+  +---------------------+----------------------------+
+
+  +---------------------+----------------------------+
+  | Set B Common Ranges | Duplicates and Overlaps    |
+  +---------------------+----------------------------+
+  | 0 - 1               | 0 - 1                      |
+  | 2 - 29              | 2 - 29                     |
+  | 88 - 133            | 88 - 133                   |
+  +---------------------+----------------------------+
+
+  +---------------------+----------------------------+
+  | Set C Common Ranges | Duplicates and Overlaps    |
+  +---------------------+----------------------------+
+  | 17 - 29             | 17 - 29                    |
+  | 220 - 240           | 220 - 240                  |
+  | 241 - 250           | 241 - 250                  |
+  +---------------------+----------------------------+
+
+  +---------------------+----------------------------+
+  | Set D Common Ranges | Duplicates and Overlaps    |
+  +---------------------+----------------------------+
+  | 0 - 0               | 0 - 1, 0 - 0               |
+  | 1 - 1               | 0 - 1, 1 - 1               |
+  | 5 - 6               | 5 - 7                      |
+  | 7 - 7               | 5 - 7, 7 - 9               |
+  | 8 - 9               | 7 - 9                      |
+  | 11 - 11             | 11 - 19                    |
+  | 12 - 16             | 11 - 19, 12 - 18           |
+  | 17 - 18             | 11 - 19, 12 - 18, 17 - 29  |
+  | 19 - 19             | 11 - 19, 17 - 29           |
+  | 20 - 29             | 17 - 29                    |
+  | 220 - 240           | 220 - 240                  |
+  | 241 - 250           | 241 - 250                  |
+  +---------------------+----------------------------+
+
+=head2 Figure 8
+
+Once the duplicates and overlaps have been moved into additional columns the sets of data can be compared in parallel.
+
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | Intersection | Set A                      |  Set B                     |  Set C                     |  Set D                     |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 0 - 0        | No Data                    |  0 - 1                     |  No Data                   |  0 - 1, 0 - 0              |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 1 - 1        | 1 - 11                     |  0 - 1                     |  No Data                   |  0 - 1, 1 - 1              |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 2 - 4        | 1 - 11                     |  2 - 29                    |  No Data                   |  No Data                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 5 - 6        | 1 - 11                     |  2 - 29                    |  No Data                   |  5 - 7                     |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 7 - 7        | 1 - 11                     |  2 - 29                    |  No Data                   |  5 - 7, 7 - 9              |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 8 - 9        | 1 - 11                     |  2 - 29                    |  No Data                   |  7 - 9                     |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 10 - 10      | 1 - 11                     |  2 - 29                    |  No Data                   |  No Data                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 11 - 11      | 1 - 11                     |  2 - 29                    |  No Data                   |  11 - 19                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 12 - 12      | No Data                    |  2 - 29                    |  No Data                   |  11 - 19, 12 - 18          |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 13 - 16      | 13 - 44                    |  2 - 29                    |  No Data                   |  11 - 19, 12 - 18          |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 17 - 18      | 13 - 44, 17 - 24           |  2 - 29                    |  17 - 29                   |  11 - 19, 12 - 18, 17 - 29 |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 19 - 19      | 13 - 44, 17 - 24           |  2 - 29                    |  17 - 29                   |  11 - 19, 17 - 29          |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 20 - 24      | 13 - 44, 17 - 24           |  2 - 29                    |  17 - 29                   |  17 - 29                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 25 - 29      | 13 - 44                    |  2 - 29                    |  17 - 29                   |  17 - 29                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 30 - 44      | 13 - 44                    |  No Data                   |  No Data                   |  No Data                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 55 - 66      | 55 - 66                    |  No Data                   |  No Data                   |  No Data                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 88 - 133     | No Data                    |  88 - 133                  |  No Data                   |  No Data                   |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 220 - 240    | No Data                    |  No Data                   |  220 - 240                 |  220 - 240                 |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+  | 241 - 250    | No Data                    |  No Data                   |  241 - 250                 |  241 - 250                 |
+  +--------------+----------------------------+----------------------------+----------------------------+----------------------------+
+
+
+=head2 Getting Started
+
+The internals of Data::Range::Compare::Stream only support dealing with integers by default: This section 
+covers how to Extend Data::Range::Compare::Stream to support your data types. 
+
+=head2 Creating IPV4 Range Support See:
+
+L<Data::Range::Compare::Stream::Cookbook::COMPARE_IPV4|Data::Range::Compare::Stream::Cookbook::COMPARE_IPV4>
+
+=head3 Creating DateTime Range Support See:
+
+L<Data::Range::Compare::Stream::Cookbook::COMPARE_DateTime|Data::Range::Compare::Stream::Cookbook::COMPARE_DateTime>
+
+=head1 OO Methods
+
+This section covers the OO Methods in the package.
+
+=over 3
+
+=item * my $range=new Data::Range::Compare::Stream($range_start,$range_end);
+
+=item * my $range=new Data::Range::Compare::Stream($range_start,$range_end,$data);
+
+=item * my $instance_factory=new Data::Range::Compare::Stream;
+
+Object constructor: Creates a new instance of Data::Range::Compare::Stream.
+
+Arguments an their meanings:
+
+  $range_start -- Required
+    Represents the start of this given range
+
+  $range_end -- Required
+    Represents the end of this range.
+
+  $data -- Optional
+    Used to tag this range with your data
+
+In the context of no arguments the object can be used as an instance factory.
+
+=item * my $range=$range->factory($range_start,$range_end);
+
+=item * my $range=$instance_factory->factory($range_start,$range_end,$data);
+
+Once an instance of Data::Range::Compare::Stream has been created all child objects can be generated from the factory interface.  This interface is used by all classes that create Range objects to manufacture new instances.  
+
+When subclassing Data::Range::Compare::Stream make sure you overload this interface when appropriate.
+
+=item * my $value=$range->range_start
+
+Returns the object that represents the start of this range.
+
+=item * my $string=$range->range_start_to_string
+
+Returns a string that represents the start of the range.
+
+=item * my $value=$range->range_end
+
+Returns the object that represents the end of the rage.
+
+=item * my $string=$range->range_end_to_string;
+
+Returns a string that represents the end of the range.
+
+=item * my $new_value=$range->sub_one($value);
+
+Computes and returns the object that came before this $value
+
+=item * my $new_value=$range->add_one($value)
+
+Computes and returns the object that comes after this $value
+
+=item * my $cmp=$range->cmp_values($value_a,$value_b)
+
+Returns -1,0,1 similar to <=> or cmp.
+
+=item * my $next_range_start_value=$range->next_range_start
+
+Returns the starting value of the range that will come after this range.
+
+=item * my $previous_range_end_value=$range->previous_range_end
+
+Returns a value that represents the end of the range that precedes this one.
+
+=item * my $data=$range->data($optional_value);
+
+Used to get and set the data value for this range.
+
+Sets when called with an argument
+
+Example:
+
+  $range->data('some value');
+
+Gets the current data value when called without any arguments
+
+Example:
+
+  my $value=$range->data;
+
+=item * my $class=$range->NEW_FROM_CLASS;
+
+Returns the name of the class new objects will be constructed from.
+
+=item *  my $new_range=$range->get_common_range([$range_a,$range_b,$range_c]);
+
+Given an array reference of ranges that overlap $new_range will be the smallest intersecting range.  If the ranges do not overlap $new_range will be invalid.
+
+=item * my $range=$range->get_common;
+
+Result class support interface.
+
+=item * my $new_range=$range->get_overlapping_range([$range_a,$range_b,$range_c]);
+
+Given an array reference of ranges: $new_range will contain all of the ranges listed in the array reference
+
+=item * my $cmp=$range_a->cmp_range_start($range_b);
+
+Compares the starting values of $range_a and $range_b. Returns: -1 0 1,see perlop: <=> or cmp.
+
+=item * my $cmp=$range_a->cmp_range_end($range_b);
+
+Compares the ending values of $range_a and $range_b returns: -1 0 1, see perlop: <=> or cmp
+
+=item * my $cmp=$range_a->cmp_range_start_to_range_end($range_b);
+
+Compares the start of $range_a to the end of $range_b.  Returns: -1 0 1, see perlop: <=> or cmp
+
+=item * if($range->contains_value($value)) { do something }
+
+Returns true if $range contains $value.
+
+=item * if($range_a->contiguous_check($range_b)) { do something }
+
+Returns true if $range_a is immediately followed by $range_b.
+
+=item * my $cmp=$range_a->cmp_ranges($range_b);
+
+Compares $range_a to $range_b in Ascending order.  Returns: -1 0 1, see perlop: <=> or cmp
+
+=item * if($range_a->overlap($range_b) { do something }
+
+Returns true if $range_a overlaps with $range_b
+
+=item * my ($start,$end)=Data::Range::Compare::Stream->find_smallest_outer_ranges($array_ref_ranges);
+
+Returns the smallest outer most ranges as $start and $end
+
+=item * if($range->boolean) { ... }
+
+This function is used for validation of a range object. Returns false if the range start or end values are undef also returns false if range start is before the range end other wise returns true.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

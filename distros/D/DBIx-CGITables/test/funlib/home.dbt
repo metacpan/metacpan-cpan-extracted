@@ -1,0 +1,106 @@
+<head>
+<title>funlib - search for books and stuff</title>
+<link rel="STYLESHEET" type="text/css" href="funlib.css">
+</head>
+
+<body bgcolor="#FFFFFF">
+
+<h2>Funcom library system (funlib)</h2>
+
+<p>to find the book/DVD/whatever you want to borrow, use the search form below, or 
+<a href="home.dbt?%3Bsubmit=1&max=800">click here to browse all the stuff in the library at once</a></p>
+
+<form action="home.dbt">
+<table width="80%" border="0" cellspacing="0" cellpadding="5" align="center" bgcolor="#CCFFCC">
+  <tr align="center"> 
+    <td colspan="4"> 
+      <h3>search for object : </h3>
+    </td>
+  </tr>
+  <tr> 
+    <td align="right" width="15%">title</td>
+    <td width="46%"> 
+      <input type="text" name="title" value="<TMPL_VAR title>">
+    </td>
+    <td width="8%" align="right">type :</td>
+    <td width="31%"> 
+      <select name="type">
+        <option value="">all</option>
+        <option>book</option>
+        <option>DVD</option>
+        <option>CD</option>
+        <option>VHS</option>
+      </select>
+    </td>
+  </tr>
+  <tr> 
+    <td height="27" align="right" width="15%">author</td>
+    <td height="27" width="46%"> 
+      <input type="text" name="author" value="<TMPL_VAR author>">
+    </td>
+    <td height="27" width="8%" align="right">existing or requested?</td>
+    <td height="27" width="31%"> 
+      <select name="existing">
+        <option value="1">existing books</option>
+        <option value="0">requested books</option>
+      </select>
+    </td>
+  </tr>
+  <tr> 
+    <td align="right" width="15%">keywords</td>
+    <td width="46%"> 
+      <input type="text" name="keywords" value="<TMPL_VAR keywords>">
+    </td>
+    <td width="8%" align="right">&nbsp;</td>
+    <td width="31%">&nbsp;</td>
+  </tr>
+  <tr align="center"> 
+    <td colspan="4"><b>sort on :</b><br>
+      | title 
+      <input type="radio" name="#sort" value="title">
+      | author 
+      <input type="radio" name="#sort" value="author">
+      | type 
+      <input type="radio" name="#sort" value="type">
+      | genre 
+      <input type="radio" name="#sort" value="keywords">
+      | </td>
+  </tr>
+  <tr align="center"> 
+    <td colspan="4"> 
+      <input type="submit" name=";submit" value=" search " >
+      <input type="reset" name="Submit2" value="reset">
+    </td>
+  </tr>
+</table>
+</form>
+
+<TMPL_IF ;submit>
+<TMPL_IF name="?count">
+<p>&nbsp;</p>
+<table width="90%" border="0" cellspacing="0" cellpadding="5" align="center">
+  <tr> 
+    <th align="left" width="44%">Title</th>
+    <th align="left" width="44%">Author</th>
+    <th align="left" width="12%">type</th >
+    <th align="left" width="12%">ISBN #</th>
+  </tr>
+<TMPL_LOOP default>
+  <tr <TMPL_IF name="?mod2">class="mod2"</TMPL_IF>> 
+    <td width="44%"><a href="home.found_one.dbt?id=<TMPL_VAR id>"><TMPL_VAR title></a></a></td>
+    <td width="44%"><TMPL_VAR author></td>
+    <td width="12%"><TMPL_IF type><TMPL_VAR type><TMPL_ELSE>&nbsp;</TMPL_IF></td>
+    <td width="12%"><TMPL_IF isbn><TMPL_VAR isbn><TMPL_ELSE>&nbsp;</TMPL_IF></td>
+  </tr>
+</TMPL_LOOP>  
+</table>
+<TMPL_ELSE>
+<br>
+<h3>No matches were returned..please try again (or try the <a href="#">external 
+  search</a> to order new books for the library)</h3>
+</TMPL_IF>
+<TMPL_ELSE>
+<p>Feel free to make a search for objects in the library..</p>
+</TMPL_IF>
+<p>&nbsp; </p>
+</body></html>

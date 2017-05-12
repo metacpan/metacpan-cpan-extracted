@@ -1,0 +1,21 @@
+---
+abstract: 'Provide results as a list in the order'
+author:
+  - unknown
+build_requires: {}
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112150'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validator-Role-Ordered
+provides:
+  Data::Validator::Role::Ordered:
+    file: lib/Data/Validator/Role/Ordered.pm
+    version: 0
+requires:
+  Data::Validator: 0
+version: 0.03

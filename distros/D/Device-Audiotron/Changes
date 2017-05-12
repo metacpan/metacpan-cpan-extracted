@@ -1,0 +1,8 @@
+Revision history for Perl module Device::Audiotron.
+
+1.02  Mon June 10 21:14:00 2002
+	- Updated test.pl to alleviate false failures when an Audiotron is not present
+
+1.01  Wed May 20 23:01:49 2002
+	- original CPAN version (see http://www.dcrawford.com/audiotron/module.html)
+

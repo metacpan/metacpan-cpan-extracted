@@ -1,0 +1,123 @@
+
+=head1 NAME
+
+Date::Lectionary
+
+=head1 SYNOPSIS
+
+    use Time::Piece;
+    use Date::Lectionary;
+
+    my $epiphany = Date::Lectionary->new('date'=>Time::Piece->strptime("2017-01-06", "%Y-%m-%d"));
+    say $epiphany->day->name; #String representation of the name of the day in the liturgical calendar; e.g. 'The Epiphany'
+    say $epiphany->year->name; #String representation of the name of the liturgical year; e.g. 'A'
+    say ${$epiphany->readings}[0] #String representation of the first reading for the day.
+
+=head1 DESCRIPTION
+
+Date::Lectionary takes a Time::Piece date and returns the liturgical day and associated readings for the day.
+
+=head2 ATTRIBUTES
+
+=head3 date
+
+The Time::Piece object date given at object construction.
+
+=head3 lectionary
+
+An optional attribute given at object creation time.  Valid values are 'acna' for the Anglican Church of North America lectionary and 'rcl' for the Revised Common Lectionary with complementary readings in ordinary time.  This attribute defaults to 'acna' if no value is given.
+
+=head3 day
+
+A Date::Lectionary::Day object containing attributes related to the liturgical day.
+
+C<type>: Stores the type of liturgical day. 'fixedFeast' is returned for non-moveable feast days such as Christmas Day. 'moveableFeast' is returned for moveable feast days.  Moveable feasts move to a Monday when they occure on a Sunday. 'Sunday' is returned for non-fixed feast Sundays of the liturgical year.  'noLect' is returned for days with no feast day or Sunday readings.
+
+C<name>: The name of the day in the lectionary.  For noLect days a String representation of the day is returned as the name.
+
+C<alt>: The alternative name --- if one is given --- of the day in the lectionary.  If there is no alternative name for the day, then the empty string will be returned.
+
+C<multiLect>: Returns 'yes' if the day has multiple services with readings associated with it.  (E.g. Christmas Day, Easter, etc.)  Returns 'no' if the day is a normal lectioanry day with only one service and one set of readings.
+
+=head3 year
+
+A Date::Lectionary::Year object containing attributes related to the liturgical year the date given at object construction resides in.
+
+C<name>: Returns 'A', 'B', or 'C' depending on the liturgical year the date given at object construction resides in.
+
+=head3 year
+
+A Date::Lectionary::Year object containing attributes related to the liturgical year the date given at object construction resides in.
+
+name: Returns 'A', 'B', or 'C' depending on the liturgical year the date given at object construction resides in.
+
+=head3 readings
+
+Return an ArrayRef of the String representation of the day's readings if there are any.  Readings in the ArrayRef are ordered in the array according to the order the readings are given in the lectionary.
+
+  my $singleReading = Date::Lectionary->new(
+      'date'       => Time::Piece->strptime( "2016-11-13", "%Y-%m-%d" ),
+      'lectionary' => 'acna'
+  );
+
+  say ${ $testReading->readings }[1]; #Will print 'Ps 98', the second reading for the Sunday closest to November 16 in the default ACNA lectionary for year C.
+  say $testReading->day->multiLect; #Will print 'no' because this day does not have multiple services in the lectionary.
+
+  my $multiReading = Date::Lectionary->new(
+      'date'       => Time::Piece->strptime( "2016-12-25", "%Y-%m-%d" ),
+      'lectionary' => 'rcl'
+  );
+
+  say $multiReading->day->multiLect; #Will print 'yes' because this day does have multiple services in the lectionary.
+  say ${ $multiReading->readings }[0]{name}; #Will print 'Christmas, Proper I', the first services of Christmas Day in the RCL
+  say ${ $multiReading->readings }[1]{readings}[0]; #Will print 'Isaiah 62:6-12', the first reading of the second service 'Christmas, Proper II' on Christmas Day in the RCL.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary> -- and tested via TravisCI.
+
+=for html <a href='https://travis-ci.org/marmanold/Date-Lectionary'><img src='https://travis-ci.org/marmanold/Date-Lectionary.svg?branch=master' /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Date::Lectionary
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Date-Lectionary
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Date-Lectionary
+
+    Search CPAN
+        http://search.cpan.org/dist/Date-Lectionary
+
+=head1 ACKNOWLEDGEMENTS
+
+Many thanks to my beautiful wife, Jennifer, and my amazing daughter, Rosemary.  But, above all, SOLI DEO GLORIA!
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Michael Wayne Arnold
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

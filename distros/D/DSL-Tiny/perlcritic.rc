@@ -1,0 +1,77 @@
+# Globals
+severity = 3
+verbose = 2
+theme = bugs || complexity || core || performance || tests || bangs || dangerous || risky
+
+[-Modules::RequireExplicitPackage]
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+
+# prohibit multiline maps, not multistatement maps
+[-BuiltinFunctions::ProhibitComplexMappings]
+[Lax::ProhibitComplexMappings::LinesNotStatements]
+
+# actually, don't use base either, use parent.
+[Tics::ProhibitUseBase]
+
+# Write `open $handle, $path' instead of `open($handle, $path)'.
+# I disagree, prefer visual consistency rather than
+# differentiating between user and built-in functions.
+# Should probably write [CodeLayout::RequireParensWithBuiltins]
+[-CodeLayout::ProhibitParensWithBuiltins]
+
+# Must run code through perltidy.
+# TODO disable for now, no tidy at hand.
+[-CodeLayout::RequireTidyCode]
+
+# All POD should be after `__END__'.
+# Pod::Weaver takes care of this.
+[-Documentation::RequirePodAtEnd]
+
+# Use functions from Carp instead of `warn' or `die'.
+# TODO think about this....
+[ErrorHandling::RequireCarping]
+
+# Put packages (especially subclasses) in separate files.
+# TODO Think about test harness code, other neatness....
+[Modules::ProhibitMultiplePackages]
+
+# Write `oct(755)' instead of `0755', allows for chmod et al.
+[ValuesAndExpressions::ProhibitLeadingZeros]
+
+# from Perl-Critic-Nits
+[ValuesAndExpressions::ProhibitAccessOfPrivateData]
+
+[Variables::ProhibitPunctuationVars]
+allow = $@ $!
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = Moo::Role
+
+# Thought about
+# [CodeLayout::ProhibitHashBarewords]
+# from Perl-Critic-Itch but decided against it.
+
+
+################################################################
+# some things from Jeff Thalhammer's config to think about
+#thaljef#; This tends to run afoul of Moose classes
+#thaljef#[-Subroutines::ProhibitUnusedPrivateSubroutines]
+#thaljef#
+#thaljef#; But this makes my POD so ugly!
+#thaljef#[-Documentation::RequirePodLinksIncludeText]
+#thaljef#
+#thaljef#; Moose::Autobox tends to create long chains
+#thaljef#[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+#thaljef#
+#thaljef#; This Policy is incorrectly listed as part of 'core'
+#thaljef#[-Bangs::ProhibitBitwiseOperators]
+#thaljef#
+#thaljef#[Subroutines::RequireFinalReturn]
+#thaljef#terminal_funcs = pod2usage throw_error throw_fatal
+#thaljef#
+#thaljef#[Modules::RequireExplicitPackage]
+#thaljef#allow_import_of = utf8
+
+# Think about 
+# RegularExpressions::RequireExtendedFormattingExceptForSplit
+# from Perl::Critic::RENEEB

@@ -1,0 +1,212 @@
+DBD::Solid -- DBD module interfacing the SOLID database.
+
+   Copyright (c) 1997, 1998  Thomas K. Wenrich
+   portions Copyright (c) 1994,1995,1996  Tim Bunce
+   very small portions Copyright (c) 2000,2001 Joe Slagel & Max Struma
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+   PLEASE READ THE ENTIRE README FILE CAREFULLY !
+
+*  WARNING: THIS IS MOSTLY ALPHA SOFTWARE. Your mileage may vary.       *
+
+*  Most of the code (and some parts of this README) were stolen from the 
+*  DBD-Oracle distribution. 
+*  However, any bugs and errors herein are most likely my fault, not 
+*  those of Tim Bunce.
+
+IMPORTANT NOTICE:
+This is a new DBD-Solid for Solid 3.5.  To all changes that I've made I've 
+appended my initials (mms) so that all blame may be laid before the appropriate
+feet and so that a search for the string 'mms' will take one directly to the
+modifications I've found necessary to support solid 3.5.  Questions/problems 
+can be directed to slagel@geospiza.com (or possibly to max@geospiza.com).
+
+Also, note that this version of DBD-Solid supports only Solid 3.52.  If you wish
+to modify it for use with 3.51, READ the notes for the function dbd_st_fetch in
+dbdimp.c. 
+
+Lastly, support for platforms other than Linux/Solaris has been removed, until 
+we can get some time to put it back in correctly.  Your welcome to try to build
+on other platforms...your mileage may vary.  Please forward on any patches.
+
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (at least 5.005).
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module.
+    It is very important to TEST it and INSTALL it!
+    
+    Remember to *read* the DBI README file!
+
+    Install the SOLID 3.52 RDBMS software.
+
+	Makefile.PL searches those files below the directory pointed to by the 
+        SOLIDDIR environment
+
+BUILDING:
+On UNIX:
+
+	SOLIDDIR=myhome/solid; perl Makefile.PL
+	make
+
+Just in case the dynloaded DBD::Solid doesn't behave like expected
+(I still don't feel real good about loading binaries made without -fpic
+dynamically, although there was no error report at all about this issue), 
+you may want to build a static binary (either remove the link you created 
+so Makefile.PL doesn't find a libxxxxxx.a and make, make test as usual
+OR run `perl Makefile.PL LINKTYPE=static' and make, make test).
+
+When you build static, don't forget that all the DBD::Solid code
+lives inside the perl binary created during 'make test'. You will
+need to copy the new perl binary somewhere in /usr/bin or simply 
+do what you are told during 'make': 
+	make -f makefile.aperl install_perl
+
+If you have problems see the 'IF YOU HAVE PROBLEMS' section below
+and the "OPERATING SYSTEM NOTES" section at the end of this file.
+
+If it builds without error you can then run the tests. For the
+main test to work it must be able to connect to a SOLID database.
+
+Don't worry about most warnings, specifically "end-of-loop code not
+reached", "ANSI C forbids braced-groups within expressions", "cast
+increases required alignment of target type".
+
+Also, don't worry about 'SQL_NO_DATA_FOUND' redefined warnings.  That's
+a clash between DBI and Solid's ODBC, and it doesn't affect anything. --mms
+
+TESTING
+	
+    The tests kinda work with the 'new style' environment variables
+    DBI_DSN, DBI_USER, DBI_PASS introduced with DBI 0.86.
+    See the DBI documentation for details.
+
+    'new style' examples:
+    setenv SOLID_HOME /usr/local/soliddb
+    setenv SOLID_DSN "tcp localhost 1313"
+    setenv DBI_USER dba
+    setenv DBI_PASS dba
+
+    The supplied test will connect to the database using the value of the
+    DBI_USER  environment variable so you should set that to the correct
+    value before starting the test. Don't forget to CREATE the user (see
+    SOLID Server documentation) when you aren't using an existing 
+    database user.
+
+    When you want to use a remote SOLID server or have more than one
+    SOLID Server running then you must set the SOLID_DSN environment
+    variable to connect to the database. 
+
+    UNIX (bourne shell) example:
+	prompt> SOLID_USER="perltest perltest"
+	prompt> SOLID_DSN="TCP/IP myhost.mydomain 1313"
+	prompt> export SOLID_USER SOLID_DSN
+
+    Test your settings by connecting to the database using the solsql
+    tool supplied with SOLID:
+
+	prompt> solsql $SOLID_DSN $DBI_USER $DBI_PASS
+
+    This should connect you to the SOLID server. Once you can do
+    that then you can test DBD::Solid knowing that it should work.
+
+	make test
+	make test TEST_VERBOSE=1   (if any of the t/* tests fail)
+
+	make install 		   (if the tests look okay)
+
+    TEST NOTES:
+	1. Most of the test scripts use a common subroutine (in
+	   t/testenv.pm) to obtain information about the database 
+	   connection. To start the tests _without_ running 'make', you 
+	   may either imitate the way a 'make test' calls t/*.t (e.g. 
+	   perl t/02base.t) or modify the scripts so that testenv() 
+	   is not longer used or within the scripts.
+	2. The tests aren't self contained; instead, they rely on the
+	   existance of tables created while running t/02base.t.
+	   Because these test tables are removed by t/99drop.t,
+	   they must be recreated by running t/02base.t before
+	   trying one of the later test scripts.
+
+IF YOU HAVE PROBLEMS:
+
+Do not hand edit the generated Makefile unless you are completely sure
+you understand the implications! Always try to make changes via the
+Makefile.PL command line and/or editing the Makefile.PL.
+
+You should not need to make any changes. If you do *please* let me
+know so that I can try to make it automatic in a later release.
+
+Please don't post problems to comp.lang.perl.misc or perl5-porters.
+This software is supported via the dbi-users mailing list.  For more
+information and to keep informed about progress you can join the a
+mailing list via http:www.fugue.com/dbi (if you are unable to use the
+web you can subscribe by sending a message to dbi-request@fugue.com, it
+may take a few days to be processed).
+
+Please post details of any problems (or changes you needed to make) to
+dbi-users@fugue.com and CC them now to slagel@geospiza.com.  But note...
+
+** IT IS IMPORTANT TO INCLUDE THE FOLLOWING INFORMATION:
+
+1. A complete log of a all steps of the build, e.g.:
+
+	perl Makefile.PL           (do a make realclean first)
+	make
+	make test
+	make test TEST_VERBOSE=1   (if any tests fail)
+
+2. Full details of which software you are using:
+
+	* Version of the operating system 
+	   (on Linux: Kernel and library versions)
+	* Solid versions (of server and development system)
+	* Perl version (the output of perl -V)
+
+It is important to check that you are using the latest version before
+posting. If you're not then I'm *very* likely to simply say "upgrade to
+the latest". You would do yourself a favour by upgrading beforehand.
+
+
+===============================================================================
+OPERATING SYSTEM NOTES:
+
+It's quite possible that Makefile.PL misses something for the
+special system/perl/solid version combination you use. The
+most common problems are:
+
+Linker problems:
+ (1) The linker barfs at you, saying something about 'unresolved
+     symbols'. 
+       Try to compile and link the examples coming with the
+       client library from Solid.
+       When you can't manage to build Solid's examples, Solid tech 
+       support should be able to help you.
+       When Solid's examples are working fine, you may try to
+       modify Makefile.pl, adding the libraries/switches/defines
+       you found while building the examples.
+
+ (2) Perl's Dynloader tells you it "Can't load .../Solid.so", 
+     followed [possible] by messages about unresolved symbols 
+     called 'SQLAllocEnv' and other 'SQLxxxx' symbols.
+       This is also a linker problem. You may try to build a
+       static perl binary; if this also fails, try (1).
+
+
+SOLID NOTES:
+
+
+===============================================================================
+Examples and other info:
+
+All the tests in the t/ subdirectory ARE examples of DBI usage.
+
+SOLID 'home page': http://www.solidtech.com
+
+DBI 'home page': http://www.hermetica.com/technologia/DBI
+
+End.

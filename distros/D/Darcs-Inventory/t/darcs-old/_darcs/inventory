@@ -1,0 +1,11 @@
+[[blah/blahc] Original blah blah c blah.
+David Caldwell <david@example.com>**20071028080935] 
+[[lib/blah.c] Eat trailing space as well as tabs on the end of a line since blah loves to give them to us.
+David Caldwell <david@example.com>*-20071028082936] 
+[[lib/blah.c] Make BLAH name mismatches non-fatal since blah can't seem to give us BLAHs that match.
+David Caldwell <david@example.com>**20071028085156] [[position] replace dangerous while loop normalization (previously hung threads on NaN with -ffast-math!)
+David Caldwell <david@example.com>**20071028114343] 
+[[blah/blah.c] Move label toggles into drawers.
+David Caldwell <david@example.com>**20071021003818
+ So you can find them, so they're colored, and so you can use them in drawer sets.
+] 

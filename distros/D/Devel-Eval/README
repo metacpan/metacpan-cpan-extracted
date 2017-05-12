@@ -1,0 +1,53 @@
+NAME
+    Devel::Eval - Allows you to debug string evals
+
+SYNOPSIS
+      use Devel::Eval 'dval';
+      
+  dval "print 'Hello World!';";
+
+DESCRIPTION
+    In the Perl debugger, code created via a string eval is effectively
+    invisible. You can run it, but the debugger will not be able to display
+    the code as it runs.
+
+    For modules that make heavy use of code generation, this can make
+    debugging almost impossible.
+
+    Devel::Eval provides an alternative to string eval that will do a
+    string-eval equivalent, except that it will run the code via a temp
+    file.
+
+    Because the eval is being done though a physical file, the debugger will
+    be able to see this code and you can happily debug your generated code
+    as you do all the rest of your code.
+
+FUNCTIONS
+  dval
+    The "dval" function takes a single parameter that should be the string
+    you want to eval, and executes it.
+
+    Because this is intended for code generation testing, your code is
+    expected to be safe to run via a 'require' (that is, it should return
+    true).
+
+SUPPORT
+    Bugs should be always be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-Eval>
+
+    For other issues, or commercial enhancement or support, contact the
+    author.
+
+AUTHORS
+    Adam Kennedy <cpan@ali.as>
+
+COPYRIGHT
+    Copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

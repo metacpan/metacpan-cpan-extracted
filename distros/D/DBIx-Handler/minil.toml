@@ -1,0 +1,6 @@
+name = "DBIx-Handler"
+# badges = ["travis"]
+authority="cpan:XAICRON"
+
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,41 @@
+Data/Binder version 1.00
+========================
+
+A Binder is a special map of keys to potential values; it supports
+non-conflicting unification against other Binders or terms.  Each key
+term in the Binder may be unbound (associated with an undef value), or
+bound to a defined scalar value.  Unbound keys may be bound to anything,
+and bound keys may only be bound to identical values.  Attempts to bind a
+new set of values succeeds completely or fails without changes.
+
+Binders are useful in unifying a simple set of arguments to values, such
+as in languages like Prolog.  Bind any lowercase arguments to themselves,
+and uppercase "variable" arguments to the caller's values.  If binding
+not successful, then the rule is inappropriate.
+
+They are also useful when a number of multi-faceted objects or strategies
+need to be tested against a single opportunity, but the available facets
+for each object or strategy are not always the same.  Describe the facets
+with a hash, and the opportunity with a binder; inappropriate facet
+values will fail the unification.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only stock modules such as warnings, strict and Carp.
+
+COPYRIGHT AND LICENCE
+
+Copyright 1998-2003 by Ed Halley
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

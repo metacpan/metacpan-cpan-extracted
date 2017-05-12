@@ -1,0 +1,135 @@
+How to do LOAD and UNLOAD in DBD::Informix
+==========================================
+
+Contrary to popular misconceptions, the LOAD and UNLOAD statements are
+not a part of ESQL/C.  The programs that provide the commands (ISQL,
+DB-Access, I4GL, etc) first have to identify that the statement is a
+LOAD or UNLOAD statement, and then arrange to call a function of their
+own choosing or devising that implements the requested operation.
+
+Consequently, there is no built-in LOAD or UNLOAD command in
+DBD::Informix.  However, Perl and DBD::Informix provide all the
+facilities necessary to implement these functions.  It would be possible
+to put this code in a module such as DBD::Informix:Load and
+DBD::Informix::Unload.  However, there are striking differences in the
+performance of different options, so it may be better to allow people to
+choose between safety (completeness) and performance.
+
+------------------------------------------------------------------------
+
+UNLOAD:
+
+As always, the hardest part is dealing with nulls and blobs!  The
+optional code segments below deal with varying amounts of complexity.
+If your data is sufficiently simple, option 3 is a decent working
+UNLOAD.  Option 4 is good if you don't have BYTE blobs; option 5 is
+necessary if you do have BYTE blobs.
+
+    # Common code prefix for all options.
+    use DBI;
+    $dbdelim = $ENV{DBDELIMITER} ? $ENV{DBDELIMITER} : "|";
+    $dbh = DBI->connect('dbi:Informix:dbase@server', $username, $password, {RaiseError=>1});
+    $dbh->{ChopBlanks} = 1;
+    $sth = $dbh->prepare("SELECT * FROM Customers");
+    $sth->execute;
+
+    # Option 1: more or less Informix UNLOAD format but:
+    # -- all fields enclosed in single quotes
+    # -- no escapes of $dbdelim in data
+    # -- no escapes of embedded newlines
+    # -- byte blobs are not hex-encoded
+    $sth->dump_results(32767,"\n",$dbdelim);    # See 'perldoc DBI' for 4 optional arguments
+
+    # Option 2: works with no nulls in data; noisy if -w flag set
+    # -- no escapes of $dbdelim in data
+    # -- no escapes of embedded newlines
+    # -- byte blobs are not hex-encoded
+    $, = $dbdelim;
+    while ($ref = $sth->fetchrow_arrayref)
+    {
+        print @$ref, "\n";
+    }
+
+    # Option 3: maps nulls to empty strings; quiet if -w flag set
+    # -- no escapes of $dbdelim in data
+    # -- no escapes of embedded newlines
+    # -- byte blobs are not hex-encoded
+    $, = $dbdelim;
+    while ($ref = $sth->fetchrow_arrayref)
+    {
+        my(@row) = map { defined $_ ? $_ : "" } @$ref;
+        print @row, "\n";
+    }
+
+    # Option 4: UNLOAD format except for BYTE blobs
+    # -- escapes backslashes, newlines and $dbdelim in data
+    # -- byte blobs are not hex-encoded
+    $, = $dbdelim;
+    while ($ref = $sth->fetchrow_arrayref)
+    {
+        my(@row) = map { defined $_ ? $_ : "" } @$ref;
+        s/[\\$dbdelim\n]/\\$&/gm for @row;
+        print @row, "\n";
+    }
+
+If there are BYTE blobs in the data, then you need to use the 'unpack'
+command with the H format for the BYTE blobs (only - TEXT blobs are
+treated the same as large CHAR fields).  Using unpack is both messy and
+counter-intuitive.  The code for that should be:
+
+    # Option 5: UNLOAD format with BYTE blobs hex-encoded
+    # -- escapes backslashes, newlines and $dbdelim in data
+    $, = $dbdelim;
+    # Generate list of column numbers of BYTE columns.
+    my(@byte);
+    my($nbyte) = 0;
+    my(@types) = (@{$sth->{ix_NativeTypeName}});
+    for (my($i) = 0; $i <= $#types; $i++)
+    {
+        $byte[$nbyte++] = $i if ($types[$i] eq "BYTE");
+    }
+    while ($ref = $sth->fetchrow_arrayref)
+    {
+        my(@row) = map { defined $_ ? $_ : "" } @$ref;
+        s/[\\$dbdelim\n]/\\$&/gm for @row;
+        for (my($i) = 0; $i < $nbyte; $i++)
+        {
+            $row[$byte[$i]] = unpack('H*', $row[$byte[$i]]);
+        }
+        print @row, "\n";
+    }
+
+I'd hope that the longhand loops could be shortened, but haven't spent
+the time working out how to do it.  Note the counter-intuitive use of
+unpack for the UNLOAD operation; we'll need to use pack to convert from
+the hex-string to the binary data.
+
+Note that any of these fragments could be wrapped into a suitable
+function that takes an opened statement handle (on which $sth->execute
+has been executed), a file handle, and the field delimiter.  A more
+general version could include the record delimiter (newline) and escape
+character (backslash) as arguments too.  It would be possible to decide
+semi-automatically which of the unload fragments should be used based on
+the types of the fields.
+
+------------------------------------------------------------------------
+
+LOAD:
+
+The equivalent LOAD examples still need to be written.
+
+------------------------------------------------------------------------
+
+Material prepared by the following in July 2001:
+    Andrew Hamm <AHamm@sanderson.net.au>
+    Jack Parker <jack.parker4@verizon.net>
+    Jonathan Leffler <Jonathan.Leffler@informix.com>
+    David Williams <djw@smooth1.demon.co.uk>
+
+Copyright 2001 Andrew Hamm
+Copyright 2001 Jonathan Leffler
+Copyright 2001 Jack Parker
+Copyright 2001 David Williams
+Copyright 2002 IBM
+
+@(#)$Id: load.unload,v 100.3 2002/02/13 22:21:58 jleffler Exp $

@@ -1,0 +1,12 @@
+<?xml version='1.0'?>
+<input>
+  <title>Bad News which has a title which is way too long for this validation to work.</title>
+  <content>Too Short</content>
+  <editor>token1</editor>
+  <editor>token2</editor>
+  <edited>2007-11-01 20:23:12</edited>
+  <edited>2007-11-02 20:23:12</edited>
+  <edited>2007-11-03 20:23:12</edited>
+  <edited>2007-11-04 20:23:12</edited>
+  <created>2008-11-05 20:23:12</created>
+</input>

@@ -1,0 +1,70 @@
+---
+abstract: 'Get information from $dbh'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: 0.98
+  Test::Requires: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.5.5, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Inspector
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  DBIx::Inspector:
+    file: lib/DBIx/Inspector.pm
+    version: 0.12
+  DBIx::Inspector::Column:
+    file: lib/DBIx/Inspector/Column.pm
+  DBIx::Inspector::Column::Pg:
+    file: lib/DBIx/Inspector/Column/Pg.pm
+  DBIx::Inspector::Driver::Base:
+    file: lib/DBIx/Inspector/Driver/Base.pm
+  DBIx::Inspector::Driver::Pg:
+    file: lib/DBIx/Inspector/Driver/Pg.pm
+  DBIx::Inspector::Driver::SQLite:
+    file: lib/DBIx/Inspector/Driver/SQLite.pm
+  DBIx::Inspector::Driver::mysql:
+    file: lib/DBIx/Inspector/Driver/mysql.pm
+  DBIx::Inspector::ForeignKey:
+    file: lib/DBIx/Inspector/ForeignKey.pm
+  DBIx::Inspector::ForeignKey::Pg:
+    file: lib/DBIx/Inspector/ForeignKey/Pg.pm
+  DBIx::Inspector::Iterator:
+    file: lib/DBIx/Inspector/Iterator.pm
+  DBIx::Inspector::Iterator::Null:
+    file: lib/DBIx/Inspector/Iterator/Null.pm
+  DBIx::Inspector::Table:
+    file: lib/DBIx/Inspector/Table.pm
+  DBIx::Inspector::Table::Pg:
+    file: lib/DBIx/Inspector/Table/Pg.pm
+requires:
+  Class::Accessor::Lite: 0.05
+  DBI: 0
+  Module::Load: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/tokuhirom/DBIx-Inspector/issues
+  homepage: https://github.com/tokuhirom/DBIx-Inspector
+  repository: git://github.com/tokuhirom/DBIx-Inspector.git
+version: 0.12
+x_contributors:
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Masahiro Chiba <chiba@everqueue.com>'
+  - 'hatyuki29 <hatyuki29@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

@@ -1,0 +1,37 @@
+---
+abstract: 'Kit for Solitaire Medici'
+author:
+  - 'gugo <gugo@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dreamhack-Solitaire-Medici
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dreamhack::Solitaire::Medici:
+    file: lib/Dreamhack/Solitaire/Medici.pm
+    version: '0.01'
+requires:
+  Dreamhack::Solitaire: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici/issues
+  homepage: https://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici
+  repository: git://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici.git
+version: '0.01'

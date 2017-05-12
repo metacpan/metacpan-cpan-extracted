@@ -1,0 +1,28 @@
+Data::Dumper::Concise::Aligned - like Data::Dumper and cohorts but with
+even less indentation for stupidly compact display.
+
+To install this module, use CPAN, for example:
+
+  cpan Data::Dumper::Concise::Aligned
+
+The source tree is available at:
+
+http://github.com/thrig/Data-Dumper-Concise-Aligned
+
+This can be built and installed by running:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+The documentation can then be read via:
+
+  perldoc Data::Dumper::Concise::Aligned
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013,2015 Jeremy Mates
+
+This module is free software; you can redistribute it and/or modify it
+under the Artistic License (2.0).

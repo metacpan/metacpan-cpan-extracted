@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Device-ScanShare
+version:            1.014
+abstract:           manage USERDIRTS.TXT ecopy file to manage scanner device options
+author:
+    - Leo Charre leocharre at cpan dot org
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:             1
+    Cwd:              3
+    File::Path:       2.07
+    Getopt::Std:      1.05
+    LEOCHARRE::CLI:   1.19
+    Smart::Comments:  1
+    Test::Simple:     0
+    YAML:             0.66
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

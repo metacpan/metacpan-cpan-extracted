@@ -1,0 +1,137 @@
+{
+   "abstract" : "Filter and validate data values",
+   "author" : [
+      "Peter Flanigan, C<< <pjfl@cpan.org> >>"
+   ],
+   "dynamic_config" : "1",
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Validation",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "inc",
+         "share",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004",
+            "version" : "0.88"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Class::Usul" : "v0.63.0"
+         },
+         "requires" : {
+            "Email::Valid" : "1.196",
+            "Exporter::Tiny" : "0.042",
+            "HTTP::Tiny" : "0.056",
+            "List::Util" : "1.42",
+            "Module::Runtime" : "0.014",
+            "Moo" : "2.000001",
+            "Try::Tiny" : "0.22",
+            "Type::Tiny" : "1.000005",
+            "Unexpected" : "v0.43.0",
+            "namespace::autoclean" : "0.26",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Class::Null" : "1.09",
+            "File::Spec" : "0",
+            "Module::Build" : "0.4004",
+            "Module::Metadata" : "0",
+            "Sys::Hostname" : "0",
+            "version" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validation" : {
+         "file" : "lib/Data/Validation.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constants" : {
+         "file" : "lib/Data/Validation/Constants.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints" : {
+         "file" : "lib/Data/Validation/Constraints.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::Date" : {
+         "file" : "lib/Data/Validation/Constraints/Date.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::Email" : {
+         "file" : "lib/Data/Validation/Constraints/Email.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::Password" : {
+         "file" : "lib/Data/Validation/Constraints/Password.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::Path" : {
+         "file" : "lib/Data/Validation/Constraints/Path.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::Postcode" : {
+         "file" : "lib/Data/Validation/Constraints/Postcode.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Constraints::URL" : {
+         "file" : "lib/Data/Validation/Constraints/URL.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Exception" : {
+         "file" : "lib/Data/Validation/Exception.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Filters" : {
+         "file" : "lib/Data/Validation/Filters.pm",
+         "version" : "v0.28.1"
+      },
+      "Data::Validation::Utils" : {
+         "file" : "lib/Data/Validation/Utils.pm",
+         "version" : "v0.28.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Validation@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Validation"
+      },
+      "homepage" : "https://metacpan.org/author/PJFL",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/pjfl/p5-data-validation.git",
+         "web" : "http://github.com/pjfl/p5-data-validation"
+      }
+   },
+   "version" : "0.28.1"
+}
+

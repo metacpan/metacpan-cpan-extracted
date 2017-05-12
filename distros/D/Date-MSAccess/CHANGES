@@ -1,0 +1,22 @@
+Revision history for Perl extension Date::MSAccess.
+
+1.05  Sun Feb 21 12:55:11 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.04  Wed Feb 10 14:02:04 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.03  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.02  Mon Feb 14 09:47:00 2005
+	- Fix bug in adding '0' to the start of days in 1 .. 9
+
+1.01  Mon Jul 19 14:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Add t/pod.t to test all PODs
+
+1.00  Tue Jan 20 12:37:29 2004
+	- Original version

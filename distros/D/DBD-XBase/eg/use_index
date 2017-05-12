@@ -1,0 +1,93 @@
+
+	#!/usr/bin/perl -w
+
+	use strict;
+	use XBase;
+
+	my $table = new XBase "ndx-num.dbf";
+	my $cur = $table->prepare_select_with_index("ndx-num.ndx");
+	$cur->find_eq(1097);
+
+	while (my @data = $cur->fetch())
+		{ print "@data\n"; }
+	__END__
+
+Since the 0.063 version of the XBase module, there is a new support
+for ndx index files, since 0.0693 we have support for ntx, since 0.13*
+we more or less supprot mdx, idx and cdx.
+
+The first example shows how to find all rows equal or greater than
+1097. The order is taken from the index file ndx-num.ndx. Note that at
+the moment there is not check made that the index really belongs to
+the dbf (and the check is impossible, so there will be none in the
+future). If you have different index format, just specify different
+file name -- the index format is derived from the file extension.
+
+The values in the index (AFAIK) can be character strings, numeric and
+dates.  There is probably no problem when using strings and numeric,
+but when you want to do find_eq for date, you have to convert it to
+Julian format first:
+
+	#!/usr/bin/perl -w
+
+	use strict;
+	use XBase;
+	use Time::JulianDay;
+
+	my $table = new XBase "ndx-date.dbf" or die XBase->errstr;
+	my $cur = $table->prepare_select_with_index("ndx-date.ndx")
+						or die $table->errstr;
+						
+	$cur->find_eq(julian_day(1997, 12, 12));
+	while (my @data = $cur->fetch)
+		{ print "@data\n"; }
+	__END__
+
+If you want to test if the XBase::Index part works fine on your data,
+you can call it directly:
+
+	#!/usr/bin/perl -w 
+
+	use strict;
+	use XBase::Index;
+
+	my $index = new XBase::Index "klantnum.ndx";
+	$index->prepare_select;
+
+	while (my @data = $index->fetch())
+		{ print "@data\n"; }
+	__END__
+
+Note that we explicitely create object XBase::Index, not XBase, and
+call methods of this object, not of cursor object.
+
+This will list the keys from the ndx file, together with their
+corresponding values, which are the record numbers in the dbf file.
+If the results are not those you would expect, email me.
+
+If you have an index format that can hold more index structures in one
+file (mdx, cdx), you have to specify the tag in the file:
+
+	my $index = new XBase::Index "cust.cdx", 'tag' => 'addr';
+
+With the XBase and prepare_select_with_index, you would specify an
+arrayref instead of the index file name, holding file name and tag
+name:
+
+	my $cur = $table->prepare_select_with_index(
+		[ "cust.cdx", 'addr' ], 'field1', 'field2');
+
+There is a script indexdump that does the dump for you.
+
+If you have an compound index, with an expression instead of just
+plain field name, chances are that XBase.pm won't be able to recognize
+the type of the index. You can specify the type of the index as the
+third parameter in the first anonymous array, like
+
+	my $cur = $table->prepare_select_with_index(
+		[ "cust.cdx", 'addr+zip', 'char' ], 'field1', 'field2');
+
+--
+
+Jan Pazdziora
+

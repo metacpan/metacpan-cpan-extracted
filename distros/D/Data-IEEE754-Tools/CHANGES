@@ -1,0 +1,66 @@
+Revision history for Perl module Data::IEEE754::Tools.
+
+v0.016 2016-Aug-29
+    - had a bug in v0.014 Makefile which caused CPAN to not
+      index; tried a couple of submissions, none of which
+      really did what I wanted.  Will try to move up to next
+      public release version number (v0.016), and ask PAUSE
+      to forget the incorrect v0.14001.0 release, and hopefully
+      re-index to this release.
+
+v0.014 2016-Aug-29
+    - feature request <https://rt.cpan.org/Ticket/Display.html?id=116155>
+      + add many functions
+        :ulp => ulp, nextUp, nextDown, nextAfter
+        :info => isSignMinus, isNormal, isFinite, isNaN, isSignaling,
+            isSignalingConvertedToQuiet, isCanonical, class, radix, totalOrder,
+            totalOrderMag, compareFloatingValue, compareFloatingMag
+        :signbit => copy, negate, abs, copySign, isSignMinus
+    - feature request <https://rt.cpan.org/Ticket/Display.html?id=116154>
+      + add :constants
+    - feature request <https://rt.cpan.org/Ticket/Display.html?id=116153>
+      + update ulp() with new, faster method
+
+v0.013
+    - Odd versions are development versions, used for developing and verifying
+      new features and bug fixes.  There may have been one or more alpha
+      subversions (v0.013_001, etc).
+
+v0.012 2016-Jul-14
+    - test coverage: Devel::Cover showed two conditionals which can only ever
+        trigger one of the two (impossible to hit the opposite); remove the
+        unnecessary conditional
+    - bugfix <https://rt.cpan.org/Public/Bug/Display.html?id=116005>: get SNAN,
+        expect QNAN
+      - original code always expected QNAN, because all of the developer's
+        machines automatically quiet SNAN to QNAN
+      - v0.011_001: Test suite for :floatingpoint now converts SNAN to expect
+        /[SQ]NAN/, because it doesn't really matter that much whether Perl
+        silences a signaling NAN
+    - bugfix <https://rt.cpan.org/Public/Bug/Display.html?id=116006>
+      - getting NAN instead of expected value on nextup(NEGATIVE NORMAL) or
+        nextdown(POSITIVE NORMAL)
+      - v0.011_001: when LSB underflows (goes to -1), the hexification is too
+          many F's; misinterpreted when the two were being recombined, so masked
+          the MSB and LSB before merging
+    - bugfix <https://rt.cpan.org/Public/Bug/Display.html?id=116004>
+      - test suite getting -0.160000000000000003 when expecting -0.16
+      - caused by systems with $Config{nvsize} > 8: code expected 64bit NV (some
+        CPAN Testers have 128bit NV)
+      - v0.011_002: change test suite to only compare enough significant figures
+        for a 64bit double, so that even 128bit floats (quad?) will pass
+      - v0.011_004: added documentation to explain that the module expects
+        64bit NV, rounds off more-precise NV floats to 64bit, and will fail
+        tests on 32bit NV (but might coerce to 64bit floats and might still
+        "work" if the installation is forced)
+
+v0.011
+    - Odd versions are development versions, used for developing and verifying
+      new features and bug fixes.  There may have been one or more alpha
+      subversions (v0.011_001, etc).
+
+v0.010 Fri Jul 08 16:50:00 PDT 2016
+    - Initial release
+
+v0.001 - v0.008
+    - Initial development; no public releases

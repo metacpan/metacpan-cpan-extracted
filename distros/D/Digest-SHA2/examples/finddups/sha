@@ -1,0 +1,22 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2003 Julius C. Duque
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::SHA2;
+
+while (<>) {
+    chomp;
+    if (-f) {
+        open INFILE, $_;
+        binmode INFILE;
+        my $context = new Digest::SHA2;  # defaults to SHA-256
+        $context->addfile(*INFILE);
+        my $digest = $context->hexdigest;
+        close INFILE;
+        print "$digest  $_\n";
+    }
+}
+

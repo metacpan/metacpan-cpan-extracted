@@ -1,0 +1,40 @@
+MySperql version 1.00
+=====================
+
+MySperql enables sql statement execution (through DBI to MySQL) 
+with one line of perl code.
+
+Note: The test script has been reduced to non-dependent tests. 
+You can edit the variables at the top of the script once installed.
+  
+  t/MySperql.t
+
+You must also have an active MySQL account.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MySQL Server
+
+  DBI
+  DBD::mysql
+
+COPYRIGHT AND LICENCE
+
+Copyleft (C) 2007 by Roger Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

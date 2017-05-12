@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+README
+Makefile.PL
+lib/Data/Reconciliation.pm
+t/reconc.t
+lib/Data/Reconciliation/Rule.pm
+t/rule.t
+example/test1.pl

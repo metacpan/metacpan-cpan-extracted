@@ -1,0 +1,30 @@
+---
+abstract: 'an easy implementation of Data::Visitor::Callback'
+author:
+  - 'Daichi Hiroki <hirokidaichi {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+dynamic_config: 0
+generated_by: 'Module::Install version 1.04, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Visitor-Lite
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Data::Util: 0
+  List::MoreUtils: 0
+  Scalar::Util: 0
+resources:
+  homepage: https://github.com/hirokidaichi/p5-Data-Visitor-Lite/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/hirokidaichi/p5-Data-Visitor-Lite.git
+version: 0.03

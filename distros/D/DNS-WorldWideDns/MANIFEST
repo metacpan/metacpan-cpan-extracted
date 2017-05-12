@@ -1,0 +1,8 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/DNS/WorldWideDns.pm
+scripts/userTest.pl
+t/001_basic.t

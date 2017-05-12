@@ -1,0 +1,39 @@
+Revision history for Dist-Zilla-Plugin-ShareDir-Clean
+
+0.05    2016-06-08 (PERLANCAR)
+
+	- No functional changes.
+
+	- Remove unused prereq IPC::System::Options.
+
+
+0.04    2015-11-07 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump version of IPC::System::Options to fixed 0.22
+	  version.
+
+
+0.03    2015-04-06 (PERLANCAR)
+
+	- Do rm -rf & add warning [GH#1]
+	      
+	      Instead of searching for old share files from 'git log',
+	  simply nuke the
+	      target's per-dist share dir before installation. This is
+	  simpler, can clean
+	      newer files when user downgrade to an older version, and
+	  doesn't require git.
+
+
+0.02     2015-04-05 (PERLANCAR)
+
+         - No functional changes.
+
+         - [doc] Tweak docs.
+
+
+0.01     2015-04-05 (PERLANCAR)
+
+         - First release.

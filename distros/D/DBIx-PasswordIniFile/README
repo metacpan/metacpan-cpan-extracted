@@ -1,0 +1,88 @@
+DBIx::PasswordIniFile
+=====================
+
+WHAT IS THIS ?
+--------------
+
+DBIx::PasswordIniFile allows you to configure DBI database connections,
+storing them in .ini configuration files, with password encription.
+
+I've written this module as part of a Perl application where properties of 
+only one database connection (DBI dsn, user and password) has to
+be maintained, and I don't like the solution provided by DBIx::Password
+where properties of connections are part of the Perl code itself.
+
+Note that this module is not a replacement of DBIx::Password. The main
+difference between both modules is that DBIx::Password is oriented to store
+a lot of virtual users inside the module source code itself. On the opposite,
+DBIx::PasswordIniFile is oriented to store one virtual user per section in a 
+.ini configuration file.
+
+If you have a lot of virtual users, I recommend you to use DBIx::Password,
+because probably it will be much fast than this module.
+
+This module uses one section of a .ini file and ignores the rest of its content.
+This .ini file may be a configuration file that you already use with other
+purposes, or a new .ini file dedicated to store database conection
+properties.
+Below is a sample:
+
+  # Sample fragment of a .ini file used by this module.
+  [connection]
+  dsn=dbi:mysql:database=databasename;host=www.freesql.org
+  user=your_username
+  pass=52616e646f6d4956e162a17a197ce0a09fa35ff471cf9f7a2ccddaca1c857bdd
+  
+The password is stored encrypted (note the list of alphanumeric digits).
+Accompaning the module there is an utility called encryptpassw.pl, that lets
+you write your password in clear form and rewrites it encrypted. This utility
+ignore all the file contents except password property / value. See its
+POD documentation.
+
+
+HOW TO INSTALL
+-------------
+
+Installation is as any ordinary module:
+
+make Makefile.PL (answer some questions)
+make
+make test
+make install
+
+Windows users may use nmake or gmake instead of make.
+
+PREREQUISITES
+----------
+
+Perl v5.8.6 or above has to be installed. If not, an error
+
+   Free to wrong pool XXX not YYY during global destruction
+
+is displayed, and Perl crashes.
+
+This module depend on these:
+
+  Config::IniFiles
+  Crypt::CBC
+  Crypt::Blowfish
+  DBI
+  File::HomeDir
+  
+An encription module has to be installed. Default is to use Crypt::Blowfish for 
+encription and decryption. Or you may specify your preferred without Crypt:: 
+prefix.
+
+
+COPYRIGHT AND LICENSE
+---------------------
+
+Copyright 2010-2020 Enrique Castilla.
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. 
+
+This program is distributed in the hope that it will be useful, but without any 
+warranty; without even the implied warranty of merchantability or fitness for a 
+particular purpose. 
+

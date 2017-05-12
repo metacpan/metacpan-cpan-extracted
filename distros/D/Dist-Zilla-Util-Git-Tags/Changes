@@ -1,0 +1,48 @@
+Release history for Dist-Zilla-Util-Git-Tags
+
+0.004000 2013-12-20T14:00:44Z
+ [00 Major]
+ - Some Attributes provided by DZUR:MG
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see Changes.deps{,.all,.dev} for
+   details
+ - runtime: +1 -2
+ - test: +2
+
+ [Tests]
+ - Fix tests to work on Git 1.4
+
+0.003000 2013-12-10T01:03:02Z
+ [00 Major]
+ - Reimplemented in terms of Git::Refs
+ - This should mean the code now works on Git 1.0
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see Changes.deps{,.all,.dev} for
+   details
+ - runtime: +2
+
+0.002000 2013-12-09T05:36:42Z
+ [Dependencies::Noteworthy]
+ - Use Test::Fatal
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see Changes.deps{,.all,.dev} for
+   details
+ - test: +1
+
+ [Internals]
+ - reimplent many internals in terms of for-each-ref
+ - new function get_tag
+
+ [Tests]
+ - Tests made more safe
+ - Report Git version during install
+
+0.001001 2013-12-06T22:36:19Z
+ - Make tests more resilient to ENV indifference
+
+0.001000 2013-12-06T20:46:27Z
+ - First version.
+

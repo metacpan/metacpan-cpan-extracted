@@ -1,0 +1,49 @@
+---
+abstract: 'Declarative DSL(domain specific language) for writing HTML'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Fennec: 2.010
+  Fennec::Declare: 1.001
+  Mock::Quick: 1.106
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DSL-HTML
+provides:
+  DSL::HTML:
+    file: lib/DSL/HTML.pm
+    version: 0.006
+  DSL::HTML::Compiler:
+    file: lib/DSL/HTML/Compiler.pm
+  DSL::HTML::Parser:
+    file: lib/DSL/HTML/Parser.pm
+  DSL::HTML::Rendering:
+    file: lib/DSL/HTML/Rendering.pm
+  DSL::HTML::STL:
+    file: lib/DSL/HTML/STL.pm
+  DSL::HTML::Tag:
+    file: lib/DSL/HTML/Tag.pm
+  DSL::HTML::Template:
+    file: lib/DSL/HTML/Template.pm
+  DSL::HTML::Text:
+    file: lib/DSL/HTML/Text.pm
+requires:
+  Carp: 0
+  Devel::Declare::Parser: 0.017
+  Exporter::Declare: 0.113
+  Exporter::Declare::Magic: 0.107
+  HTML::Tree: 5.00
+  Scalar::Util: 0
+  perl: v5.10.0
+resources:
+  bugtracker: http://github.com/exodist/DSL-HTML/issues
+  homepage: http://github.com/exodist/DSL-HTML
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/DSL-HTML
+version: 0.006

@@ -1,0 +1,81 @@
+{
+   "abstract" : "Use L<Dist::Zilla> like AVAR does",
+   "author" : [
+      "Ævar Arnfjörð Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-AVAR",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.300028",
+            "Dist::Zilla::App" : "0",
+            "Dist::Zilla::Chrome::Term" : "0",
+            "Dist::Zilla::Dist::Builder" : "0",
+            "Dist::Zilla::Plugin::Authority" : "0",
+            "Dist::Zilla::Plugin::InstallRelease" : "0",
+            "Dist::Zilla::Plugin::MakeMaker::Awesome" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::ReadmeFromPod" : "0.06",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::PluginBundle::Filter" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "1.102810",
+            "Dist::Zilla::Role::PluginBundle" : "0",
+            "Git::Wrapper" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Try::Tiny" : "0",
+            "experimental" : "0",
+            "perl" : "v5.10.0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-PluginBundle-AVAR@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-AVAR"
+      },
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-PluginBundle-AVAR",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avar/dist-zilla-pluginbundle-avar.git",
+         "web" : "http://github.com/avar/dist-zilla-pluginbundle-avar"
+      }
+   },
+   "version" : "0.32",
+   "x_authority" : "cpan:AVAR"
+}
+

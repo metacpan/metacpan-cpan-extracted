@@ -1,0 +1,31 @@
+Revision history for perl module Dist::Zilla::Plugin::RequiresExternal
+
+1.006     2015-12-26 23:40:29-05:00 America/New_York
+  - use "#!/usr/bin/env perl" in test scripts for those who need them
+1.005     2015-06-09 10:51:55-06:00 America/Denver
+  - Reduce CPAN dependencies by using Pod::Weaver::Plugin::SingleEncoding
+    rather than ::Encoding (thanks AWSWENSON)
+  - Ensure portability and synopsis tests are called/not called correctly
+    (thanks SROMANOV)
+  - Reduce cognitive load of switching between Moose and Moo by using
+    MooseX::AttributeShortcuts rather than MooseX::Has::Sugar
+  - Explicitly declare more developer and version dependencies where needed
+  - Reduce perlbrew release testing time by turning off dependency tests
+1.004     2011-08-28 23:35:54 America/New_York
+  - Hopefully fix a longstanding testing bug where some smokers didn't have
+    perl in their PATHs
+1.003     2011-08-26 14:39:08 America/New_York
+  - Changes to dist.ini to set MetaCPAN home page and automatically test
+    against a selection of brewed perls
+1.002     2011-08-26 14:22:56 America/New_York
+  - Allow attributes to be undef
+  - Reorganize code so Dist::Zilla and Pod::Weaver don't scramble it
+    too badly
+1.001     2011-05-23 12:25:26 America/New_York
+  - Update POD and copyright.  No code changes.
+1.000     2011-02-18 13:39:38 America/New_York
+  - New "fatal" attribute to make all tests fail if requires_external fails
+0.1091005 2011-02-17 00:41:15 America/New_York
+  - Better documentation and examples
+0.001091  2011-02-16 19:54:20 America/New_York
+  - Initial release

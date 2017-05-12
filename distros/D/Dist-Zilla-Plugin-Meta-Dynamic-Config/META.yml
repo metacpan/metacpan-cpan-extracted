@@ -1,0 +1,22 @@
+---
+abstract: 'set dynamic_config in resultant META files'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Meta-Dynamic-Config
+requires:
+  Dist::Zilla: 4.101582
+  Dist::Zilla::Role::MetaProvider: 4.101582
+  perl: 5.008005
+resources:
+  homepage: https://github.com/bingos/dist-zilla-plugin-meta-dynamic-config
+  repository: https://github.com/bingos/dist-zilla-plugin-meta-dynamic-config.git
+version: 0.04

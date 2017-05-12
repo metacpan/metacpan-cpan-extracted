@@ -1,0 +1,96 @@
+<script>	# cmdb.cgi ext rpt: Start Page
+		# Page Header
+	my $s =$_; exit(0) if !$s;
+	my $form  =$s->{-pcmd}->{-form} ||'';
+	my $class ="Form $form List ${form}__List ListTable";
+	local $s->{-htmlstart} =$s->{-htmlstart};
+	$s->{-htmlstart} ={} if !$s->{-htmlstart};
+	# $s->{-htmlstart}->{background} ='/icons/small/rainbow.gif';
+	$s->output($s->htmlStart()	# HTTP/HTML/Form headers
+		,$s->htmlHidden()	# common hidden fields
+		,$s->htmlMenu()		# Menu bar
+		);
+	# form url target:	_self : _blank:
+	$s->htmlOnLoad("{var e=document.getElementsByTagName('BASE'); if(e && e[0] && (self.name.match(/^(?:TOP|BOTTOM)\$/) || document.getElementsByName('_frame').length)){e[0].target='_blank'}}");
+	# list url onclick="<<$jecl>>", +_self:	top>_self, bottom>top:
+	my $jecl ="this.target = self.name=='TOP' ? '_self' : self.name=='BOTTOM' ? 'TOP' : '_self'; return(true)";
+	my $jecf ="if (self.name.match(/^(?:TOP|BOTTOM)\$/) || document.getElementsByName('_frame').length) {this.target='_blank'}; return(true)";
+	my $utfn =$s->{-pcmd}->{-frame} ? ";_frame=BOTTOM" : '';
+	my $ntlm =$s->uguest() ? '' : '/ntlm';
+	my $ih   =$s->cgiQuery('hdesk'
+		,{-table=>'hdesk'
+		 ,-query=>{-data=>[
+				 {-fld=>'mseverity',-expr=>"MIN(IF(severity=4 AND record='unavlbl', 3.5, severity))"}
+				,{-fld=>'mutime'=>,-expr=>'MAX(utime)'}
+				,{-fld=>'mcount'=>,-expr=>"COUNT(IF(status IN('do','progress','rollback','delay','edit'),1,NULL))"}]
+			 ,-display=>[] # 'severity'
+			 ,-order=>"severity desc"
+			 ,-group=>'severity'
+			 ,-where=>"record NOT IN('work','task') AND (status IN('do','progress','rollback','delay','edit') OR (TO_DAYS(etime)=TO_DAYS(CURRENT_DATE())))"
+				}},{});
+	   $ih   =$ih->fetchall_arrayref() if $ih;
+	my $ic   =$s->{-a_cmdbh_fsvrclr};
+	my $it   =$s->lngslot($s->{-table}->{hdesk}->{-mdefld}->{severity}->{-inp},'-labels');
+</script>
+<table>
+<tr><td valign="middle" nowrap=true>
+<script>
+	print join(' ', map {
+		$_->[0] =$` if $_->[0] =~/\.0+$/;
+		$s->cgi->a({-href=>$s->urlCmd(''
+				,-form=>'hdesk'
+				,-cmd=>'frmCall'
+				,$_->[0] !~/\.\d/
+				? (-qkey=>{'severity'=>$_->[0]}
+					, -qwhere=>"record NOT IN('work','task')")
+				: (-qkey=>{'record'=>'unavlbl'})
+				,-urm=>$_->[1]
+				,$utfn ? ('-frame' => 'BOTTOM') : ())
+			,-title=>$it->{$_->[0]} ||$_->[0] ||'???'
+			,-target=>"_self"
+			,-onclick=>$jecl
+			,-style=>"background-color: " .($ic->{$_->[0]} ||'buttonface')
+			}, '&nbsp;' .$_->[2] .'&nbsp;')
+		} @$ih) if $ih;
+</script>
+</td>
+<td align="right" valign="top"><i>
+<a href="http://www.itil.co.uk" onclick="<%$jecf%>" title="www.itil.co.uk"><img src="/icons/small/doc.gif" border=0>www.itil.co.uk</a>
+<a href="http://www.itlibrary.org" onclick="<%$jecf%>" title="www.itlibrary.org">www.itlibrary.org</a>
+<a href="http://www.itil.org/en/" onclick="<%$jecf%>" title="www.itil.org">www.itil.org</a>
+<a href="http://krylov.lib.ru/itil.html" onclick="<%$jecf%>" title="krylov.lib.ru/itil.html">krylov.lib.ru/itil</a>
+</i>
+</td>
+</tr>
+<tr>
+
+<th align="left" valign="top" nowrap=true><a href="?_form=index;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="Content">Service Desk & CMDB</a></th>
+<td>This is a sample Service Support application.
+</td>
+</tr>
+<tr><td valign="top"><a href="?_form=notes;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="Notes">Notes</a>
+</td><td>Notes store for toplevel documentation.
+</td></tr>
+<tr><td valign="top"><a href="?_form=hdesk;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="Service Desk">Service Desk</a>
+</td><td>Service Desk for Incident, Problem, Change Management.
+</td></tr>
+<tr><td valign="top"><a href="?_form=cmdbm;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="Configuration Management Database">CMDB</a>
+</td><td>Configuration Management Database for Configuration Management.
+See:
+</td></tr>
+<tr><td></td><td>
+<a href="?_form=cmdbmh;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="Hierarchy of records">Hierarchical view</a>,
+<a href="?_form=cmdbmn;_cmd=frmCall<%$utfn%>" target="_self" onclick="<%$jecl%>" title="CMDB - Named elements">Named items view</a>
+</td></tr>
+<tr><td valign="top" colspan=2>
+Choose form in the list at the top of this screen.
+</td></tr>
+</table>
+<script>	# Page Footer
+	$s->{-fetched}	=undef;
+	$s->{-affected}	=undef;
+	$s->cgiFooter() if !$s->{-pcmd}->{-print};
+	$s->output($s->htmlEnd());
+	$s->end();
+</script>
+

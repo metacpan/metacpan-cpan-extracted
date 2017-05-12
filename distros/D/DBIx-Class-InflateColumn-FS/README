@@ -1,0 +1,107 @@
+NAME
+    DBIx::Class::InflateColumn::FS - Inflate/deflate columns to
+    Path::Class::File objects
+
+SYNOPSIS
+      __PACKAGE__->load_components(qw/InflateColumn::FS Core/);
+      __PACKAGE__->add_columns(
+          id => {
+              data_type         => 'INT',
+              is_auto_increment => 1,
+          },
+          file => {
+              data_type => 'TEXT',
+              is_fs_column => 1,
+              fs_column_path => '/var/lib/myapp/myfiles',
+          },
+          file_2 => {
+              data_type => 'TEXT',
+              is_fs_column => 1,
+              fs_column_path => '/var/lib/myapp/myfiles',
+              fs_new_on_update => 1
+          },
+      );
+      __PACKAGE__->set_primary_key('id');
+
+      # in application code
+      $rs->create({ file => $file_handle });
+
+      $row = $rs->find({ id => $id });
+      my $fh = $row->file->open('r');
+
+DESCRIPTION
+    Provides inflation to a Path::Class::File object allowing file system
+    storage of BLOBS.
+
+    The storage path is specified with "fs_column_path". Each file receives
+    a unique name, so the storage for all FS columns can share the same
+    path.
+
+    Within the path specified by "fs_column_path", files are stored in
+    sub-directories based on the first 2 characters of the unique file
+    names. Up to 256 sub-directories will be created, as needed. Override
+    "_fs_column_dirs" in a derived class to change this behavior.
+
+    "fs_new_on_update" will create a new file name if the file has been
+    updated.
+
+METHODS
+  inflate_result
+  register_column
+  fs_file_name
+    Provides the file naming algorithm. Override this method to change it.
+
+    This method is called with two parameters: The name of the column and
+    the "column_info" object.
+
+  _fs_column_dirs
+    Returns the sub-directory components for a given file name. Override it
+    to provide a deeper directory tree or change the algorithm.
+
+  copy
+    Copies a row object, duplicating the files backing fs columns.
+
+  delete
+    Deletes the associated file system storage when a row is deleted.
+
+  set_column
+    Deletes file storage when an fs_column is set to undef.
+
+  set_inflated_column
+    Re-inflates after setting an fs_column.
+
+  _inflate_fs_column
+    Inflates a file column to a Path::Class::File object.
+
+  _deflate_fs_column
+    Deflates a file column to its storage path name, relative to
+    "fs_column_path". In the database, a file column is just a place holder
+    for inflation/deflation. The actual file lives in the file system.
+
+  table
+    Overridden to provide a hook for specifying the resultset_class. If you
+    provide your own resultset_class, inherit from
+    InflateColumn::FS::ResultSet.
+
+SUPPORT
+    Community support can be found via:
+
+      Mailing list: http://lists.scsys.co.uk/mailman/listinfo/dbix-class/
+
+      IRC: irc.perl.org#dbix-class
+
+    The author is "semifor" on IRC and a member of the mailing list.
+
+AUTHOR
+    semifor: Marc Mims <marc@questright.com>
+
+CONTRIBUTORS
+    mst: Matt S. Trout <mst@shadowcatsystems.co.uk>
+
+    mo: Moritz Onken <onken@netcubed.de>
+
+    norbi: Norbert Buchmuller <norbi@nix.hu>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

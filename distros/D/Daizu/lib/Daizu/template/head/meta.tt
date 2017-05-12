@@ -1,0 +1,12 @@
+[% IF head_links %][% FOR link = head_links -%]
+ <link rel="[% link.rel |html %]" href="[% link.href.rel(url.url) |html %]"
+       type="[% link.type |html %]"[% IF link.title
+    %] title="[% link.title |encode |html %]"[% END %]>
+[% END %][% END -%]
+
+[%- IF head_meta %][% FOR meta = head_meta -%]
+  <meta [%
+   IF meta.http_equiv %]http-equiv="[% meta.http_equiv |html %]" [%-
+   ELSE %]name="[% meta.name |html %]" [%-
+   END %] content="[% meta.content |encode |html %]">
+[% END %][% END %]

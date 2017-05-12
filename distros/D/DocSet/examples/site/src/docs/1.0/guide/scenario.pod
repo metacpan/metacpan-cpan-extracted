@@ -1,0 +1,284 @@
+=head1 NAME
+
+Real World Scenarios
+
+=head1 Description
+
+This chapter provides step by step installation guide for the various
+setups discussed in L<Choosing the Right Strategy|guide::strategy>.
+
+=head1 Assumptions 
+
+I will assume for this section that you are familiar with plain (not
+mod_perl enabled) Apache, its compilation and configuration. In all
+configuration and code examples I will use I<localhost> or
+I<www.example.com> as a hostname. For the testing on a local machine,
+I<localhost> would be just fine. If you are using the real name of
+your machine make sure to replace I<www.example.com> with the name of
+your machine.
+
+=head1 Standalone mod_perl Enabled Apache Server
+
+=head2 Installation in 10 lines
+
+The Installation is very simple.  This example shows installation
+on the Linux operating system.
+
+  % cd /usr/src
+  % lwp-download http://www.apache.org/dist/apache_x.x.x.tar.gz
+  % lwp-download http://perl.apache.org/dist/mod_perl-x.xx.tar.gz
+  % tar xzvf apache_x.x.x.tar.gz
+  % tar xzvf mod_perl-x.xx.tar.gz
+  % cd mod_perl-x.xx
+  % perl Makefile.PL APACHE_SRC=../apache_x.x.x/src \
+    DO_HTTPD=1 USE_APACI=1 EVERYTHING=1
+  % make && make test && make install
+  % cd ../apache_x.x.x
+  % make install
+
+That's all!
+
+Notes: Replace x.xx and x.x.x with the real version numbers of
+mod_perl and Apache respectively.  The C<z> flag tells Gnu C<tar> to
+uncompress the archive as well as extract the files.  You might need
+superuser permissions to do the make install steps.
+
+=head2 Installation in 10 paragraphs
+
+If you have the C<lwp-download> utility installed, you can use it to
+download the sources of both packages:
+
+  % lwp-download http://www.apache.org/dist/apache_x.x.x.tar.gz
+  % lwp-download http://perl.apache.org/dist/mod_perl-x.xx.tar.gz
+
+C<lwp-download> is a part of the LWP module (from the C<libwww> package),
+and you will need to have it installed in order for mod_perl's C<make
+test> step to pass.
+
+Extract both sources.  Usually I open all the sources in I</usr/src/>,
+but your mileage may vary.  So move the sources and C<chdir> to the
+directory that you want to put the sources in.  If you have a non-GNU
+C<tar> utility it will be unable to decompress so you will have to unpack in
+two steps: first uncompress the packages with:
+
+  gzip -d apache_x.x.x.tar.gz
+  gzip -d mod_perl-x.xx.tar.gz
+
+then un-tar them with:
+
+  tar xvf apache_x.x.x.tar 
+  tar xvf mod_perl-x.xx.tar
+
+You can probably use gunzip instead of gzip -d if you prefer.
+
+  % cd /usr/src
+  % tar xzvf apache_x.x.x.tar.gz
+  % tar xzvf mod_perl-x.xx.tar.gz
+
+C<chdir> to the mod_perl source directory:
+
+  % cd mod_perl-x.xx
+
+Now build the Makefile. For your first installation and most basic
+work the parameters in the example below are the only ones you will
+need.  C<APACHE_SRC> tells the Makefile.PL where to find the Apache
+I<src> directory.  If you have followed my suggestion and have
+extracted both sources under the directory I</usr/src>, then issue
+the command:
+
+  % perl Makefile.PL APACHE_SRC=../apache_x.x.x/src \
+    DO_HTTPD=1 USE_APACI=1 EVERYTHING=1
+
+There are many additional optional parameters.  You can find some of
+them later in this section and in the L<Server
+Configuration|guide::config/mod_perl_Configuration> section.
+
+While running C<perl Makefile.PL ...> the process will check for
+prerequisites and tell you if something is missing.  If you are
+missing some of the perl packages or other software, you will have to
+install them before you proceed.
+
+Next C<make> the project.  The command C<make> builds the mod_perl
+extension and also calls C<make> in the Apache source directory to
+build C<httpd>.  Then we run the I<test> suite, and finally I<install>
+the mod_perl modules in their proper places.
+
+  % make && make test && make install
+
+Note that if C<make> fails, neither C<make test> nor C<make install>
+will be executed.  If C<make test> fails, C<make install> will be not
+executed.
+
+Now change to the Apache source directory and run C<make install>.
+This will install Apache's headers, default configuration files, build
+the Apache directory tree and put C<httpd> in it.
+
+  % cd ../apache_x.x.x
+  % make install
+
+When you execute the above command, the Apache installation process
+will tell you how to start a freshly built webserver (you need to know
+the path of C<apachectl>, more about that later) and where to find the
+configuration files.  Write down both, since you will need this
+information very soon.  On my machine the two important paths are:
+
+  /usr/local/apache/bin/apachectl
+  /usr/local/apache/conf/httpd.conf
+
+Now the build and installation processes are complete.
+
+=head2 Configuration
+
+First, a simple configuration.  Configure Apache as you usually would
+(set C<Port>, C<User>, C<Group>, C<ErrorLog>, other file paths etc).
+
+Start the server and make sure it works, then shut it down.  The
+C<apachectl> utility can be used to start and stop the server:
+
+  % /usr/local/apache/bin/apachectl start
+  % /usr/local/apache/bin/apachectl stop
+
+Now we will configure Apache to run perl CGI scripts under the
+C<Apache::Registry> handler.
+
+You can put configuration directives in a separate file and tell
+I<httpd.conf> to include it, but for now we will simply add them to
+the main configuration file.  We will add the mod_perl configuration
+directives to the end of I<httpd.conf>.  In fact you can place them
+anywhere in the file, but they are easier to find at the end.
+
+For the moment we will assume that you will put all the scripts which
+you want to be executed by the mod_perl enabled server under the
+directory I</home/httpd/perl>.  We will alias this directory to the
+URI I</perl>
+
+Add the following configuration directives to I<httpd.conf>:
+
+  Alias /perl/ /home/httpd/perl/
+  
+  PerlModule Apache::Registry
+  <Location /perl>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options ExecCGI
+    PerlSendHeader On
+    allow from all
+  </Location>
+
+Now create a four-line test script in I</home/httpd/perl/>:
+
+  test.pl
+  -------
+  #!/usr/bin/perl -w
+  use strict;
+  print "Content-type: text/html\r\n\r\n";
+  print "It worked!!!\n";
+
+Note that the server is probably running as a user with a restricted
+set of privileges, perhaps as user C<nobody> or C<www>.  Look for the
+C<User> directive in I<httpd.conf> to find the userid of the server.
+
+Make sure that you have read and execute permissions for I<test.pl>.
+
+  % chmod u+rx /home/httpd/perl/test.pl
+
+Test that the script works from the command line, by executing it:
+
+  % /home/httpd/perl/test.pl
+
+You should see:
+
+  Content-type: text/html
+  
+  It worked!!!
+
+Assuming that the server's userid is C<nobody>, make the script owned
+by this user. We already made it executable and readable by user.
+
+  % chown nobody /home/httpd/perl/test.pl
+
+Now it is time to test that mod_perl enabled Apache can execute the
+script.
+
+Start the server ('C<apachectl start>').  Check in I<logs/error_log>
+to see that the server has indeed started--verify the correct date and
+time of the log entry.
+
+To get Apache to execute the script we simply fetch its URI.  Assuming
+that your I<httpd.conf> has been configured with the directive C<Port
+80>, start your favorite browser and fetch the following URI:
+
+  http://www.example.com/perl/test.pl
+
+If you have the loop-back device (127.0.0.1) configured, you can use
+the URI:
+
+  http://localhost/perl/test.pl
+
+In either case, you should see:
+
+  It worked!!!
+
+If your server is listening on a port other than 80, for example 8000,
+then fetch the URI:
+
+  http://www.example.com:8000/perl/test.pl
+
+or whatever is appropriate.
+
+If something went wrong, go through the installation process again,
+and make sure you didn't make a mistake.  If that doesn't help, read
+the C<INSTALL> pod document (C<perlpod INSTALL>) in the mod_perl
+distribution directory.
+
+Now that your mod_perl server is working, copy some of your Perl CGI
+scripts into the directory I</home/httpd/perl/> or below it.
+
+If your programming techniques are good, chances are that your scripts
+will work with no modifications at all.  With the mod_perl enabled
+server you will see them working very much faster.
+
+If your programming techniques are sloppy, some of your scripts will
+not work and they may exhibit strange behaviour.  Depending on the
+degree of sloppiness they may need anything from minor tweaking to a
+major rewrite to make them work properly.  (See L<Sometimes My Script
+Works, Sometimes It Does 
+Not|guide::debug/Sometimes_My_Script_Works__Sometimes_It_Does_Not> )
+
+The above setup is very basic, but as with Perl, you can start to
+benefit from mod_perl from the very first moment you try it.  As you
+become more familiar with mod_perl you will want to start writing
+Apache handlers and make more use of its power.
+
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut
+

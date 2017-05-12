@@ -1,0 +1,15 @@
+0.05
+	- add no warnings 'recursion'
+
+0.04
+	- The test requires perl with open my $fh, ">", \$ref
+
+0.03
+	- The substitution now has the /m flag so that it indents multi line
+	  warnings.
+
+0.02
+	- add the $STRING variable
+
+0.01
+	- First release

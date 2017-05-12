@@ -1,0 +1,34 @@
+Revision history for DBD::MVS_FTPSQL.
+
+0.01      Code generated with module-starter.
+          
+0.10      First draft based on the DBI::DBD pod and DBD::Template.
+          Basic functionality implemented (connect / prepare / execute 
+          / fetchrow_arrayref).
+          
+0.15      Minimal documentation added.
+          
+0.20      Added row count.
+          Error handling rewritten.
+          Documentation improved.
+          
+0.30      Rewrite of the module.
+          Documentation improved.
+          
+0.31      Minor fixes.
+          Added todo list.
+          
+0.32      Added remote_directory dns parameter.
+          
+0.3[3-8]  Various improvements / corrections.
+          
+0.38.xx   Documentation improvements.
+          
+0.38.12   First public release. 
+
+0.38.13   Commented the require 5.004; directive
+          it will cause Use of reserved word "our" is deprecated errors
+
+0.38.14   Need to change version due to an error during pause upload
+          (the mingw gzip seems to cause problems with pause)
+          

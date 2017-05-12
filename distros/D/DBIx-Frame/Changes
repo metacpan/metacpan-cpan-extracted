@@ -1,0 +1,86 @@
+Revision history for Perl extension DBIx::Frame.
+
+1.06	Wed May 26 09:11:40 CDT 2004 
+
+	Minor changes in DBIx::Frame::CGI, mostly bug fixes and HTML changes.
+
+	Documentation fixes all around.
+
+	dbixframe.cgi and dbixframe_create.pl fixes to match what we've
+	done elsewhere (mostly added documentation).
+
+1.05	Tue Oct 21 13:32:09 CDT 2003 
+	
+	Renamed everything from 'DBI::Frame' to 'DBIx::Frame', so it's
+	more capable of going into CPAN.
+
+	DBIx::Frame
+	  More documentation
+	  Added new fields - REQUIRED, ADMIN, and ORDER, all of which 
+	    are essentially optional but can be quite handy.  
+          select() now works differently - if the old MATCH entry is 
+	    a hash, we'll assume there's a lot of data in there and 
+	    use it.  This lets us do more sophisticated queries and,
+	    most importantly, use the ORDER stuff.
+          Now using SelfLoader to improve load times.
+          Various bugfixes.
+
+        DBIx:Frame::CGI
+          Added a 'quiet' option, for use with html_create() to not 
+	    print "optional" information.  
+          Now using SelfLoader to improve load times.
+	  Various fairly minor bugfixes.
+         
+
+1.04	Wed Aug 14 16:21:06 CDT 2002
+
+	Updated dbiframe.cgi to be more modular.
+
+	DBI::Frame
+          Split off set_html(), set_list(), etc.
+          Added select_multi and _make_select_multi().
+          Updated _replace() to work right, documented its full behaviour.
+          Added the Helper Functions list of functions - select_fieldlist(),
+            select_fieldlist_id(), and select_list_id().
+    
+	DBI::Frame::CGI 
+          html_list_nosearch() split off to let other functions use it.
+ 	  Added 'tdopts' as an option.  
+          Updated _firstentry() to use whole forms instead of links; this 
+            looks much better, and works better too.
+
+1.03	Fri Mar 22 13:42:07 CST 2002
+
+	Internal bugfixes in DBI::Frame and dbiframe_create.pl.
+
+1.02	Thu Feb 21 11:21:43 CST 2002
+
+	Fixed some bugs with the "Next 25" search option.
+
+	Slight change in tables(), returns a null string instead of 'undef'.
+
+	Set better defaults for init().
+
+	Changed license to the UIUC/NCSA Open Source License.
+
+1.0	Thu Aug 16 12:48:56 CDT 2001
+	Added better managability to DBI::Frame::CGI, including the 
+	  'userdefs' option for html_list and the 'action()' function.
+
+	Standardized a lot of things in DBI::Frame::CGI.
+
+	Gave up on waiting for the proper license.
+
+0.999	Mon Jul 16 14:57:10 CDT 2001
+
+	Added DBI::Frame::CGI, which requires HTML::FormRemove, but also
+	  gives a good web interface.  
+	
+	Added dbiframe.cgi
+	
+	Added dbiframe_create.pl
+
+0.99  	Thu Apr 12 16:49:16 CDT 2001
+
+	Original released version - uses the NAMD license (we'll change
+	  this whenever possible).

@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::Properties.
+
+0.02  Tue Nov 27 09:10:31 2001
+        - use $| instead of flush to avoid loading IO::Handle
+
+0.01  Mon Nov 26 10:03:02 2001
+	- a perl version of java.util.Properties. loads and stores
+	property lists. supports defaults. doesnt handle escape sequences
+	or one or two other tricky things.
+	

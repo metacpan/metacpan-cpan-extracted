@@ -1,0 +1,22 @@
+---
+abstract: 'Serialize data using JSON::MaybeXS.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  Test::Simple: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Serializer-JSON-MaybeXS
+requires:
+  Data::Serializer: '0.6'
+  JSON::MaybeXS: '1.003003'
+resources:
+  bugtracker: https://github.com/bluefeet/Data-Serializer-JSON-MaybeXS/issues
+  repository: git://github.com/bluefeet/Data-Serializer-JSON-MaybeXS.git
+version: '0.01'

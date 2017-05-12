@@ -1,0 +1,22 @@
+Revision history for Devel-TraceDeps
+
+v0.0.3 2009-01-31
+
+  * initial version of pdt-depcheck tool
+
+  * added tree-path 'trace' attribute to collected data 
+
+  * better support for do()
+
+  * documentation for the Scan API
+
+  * fixed nit for modules returning lists
+
+v0.0.2 2008-09-14
+
+  * first public release
+
+See the source code repository for more detail.
+  http://svn.scratchcomputing.com/Devel-TraceDeps/trunk
+
+vim:ts=2:sw=2:et:sta

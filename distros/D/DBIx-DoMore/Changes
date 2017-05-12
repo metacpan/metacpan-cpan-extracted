@@ -1,0 +1,18 @@
+Revision history for DBIx-DoMore
+
+0.01003 2010-05-22 03:55 CET
+
+   * DEPRECATED in favor of DBIx::MultiStatementDo.
+
+0.01002 2010-05-20 17:20 CET
+
+   * Error in MANIFEST.SKIP which prevented inc/ from being bundled.
+   * Version fix in POD.
+
+0.01001 2010-05-20 09:00 CET
+
+   * POD and Changes fixes.
+
+0.01000 2010-05-19 23:00 CET
+
+   * First version, released on an unsuspecting world.

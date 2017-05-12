@@ -1,0 +1,17 @@
+# Our search data providers:
+elastic_search:
+    index: dancer-searchapp
+imap:
+    username: corion
+    password: "Horse Staple Battery"
+    server: example.com
+    port: 993
+    debug: 0
+    folders:
+        - "App-Blog"
+        - recurse:
+              prefix: ""
+              exclude:
+                  - "x"
+
+# end of file

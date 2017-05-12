@@ -1,0 +1,14 @@
+1998-11-19  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Release 0.04.
+
+	* Added $MaxRecursion level.
+
+1998-11-17  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Fixed silly mistakes in blur.t.  (Thanks Sarathy.)
+
+1998-11-16  Joshua Pritikin  <joshua.pritikin@db.com>
+
+	* Rearranged <> quoting for better error text.
+

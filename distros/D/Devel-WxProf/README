@@ -1,0 +1,37 @@
+Devel::WxProf - heavy-weight subroutine profiler and graphical profile analyzer
+-------------------------------------------------------------------------------
+
+ABOUT
+-----
+
+Devel::WxProf is a heavy-weight perl subroutine profiler and graphical profile
+analyzer. In contrast to tools like Devel::DProf, which are more suitable
+for profiling repeated runs, it is designed for one-shot profiling sessions.
+
+Devel::WxProf uses a stopwatch approach, so profiling data is inaccurate on
+systems with competing processes.
+
+INSTALL
+-------
+
+To install, use the following mantra:
+
+ perl Build.PL
+ perl Build
+ perl Build test
+ perl Build install
+
+LICENSE AND COPYRIGHT
+---------------------
+This library is free software, you may distribute/modify it under the same
+terms as perl itself.
+
+This license grant does not include the font files included in this
+distribution - see below.
+
+FONTS LICENSE
+--------------
+This distribution contains font files from the Bitstream Vera font family.
+To these files, the copyright and license notes in the file COPYRIGHT.TXT
+from the same directory apply.
+

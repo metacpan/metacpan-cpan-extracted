@@ -1,0 +1,10 @@
+lib/Dancer/Plugin/Captcha/SecurityImage.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/01-use.t
+t/02-pod.t
+t/03-podcoverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

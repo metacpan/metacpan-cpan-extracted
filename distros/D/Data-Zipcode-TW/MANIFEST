@@ -1,0 +1,16 @@
+Build.PL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+doc/Taiwan-3-Digit-Zipcodes.txt
+doc/twzip.pl
+doc/twzip.txt
+lib/Data/Zipcode/TW.pm
+t/class-method.t
+t/instance-method.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

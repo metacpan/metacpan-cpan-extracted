@@ -1,0 +1,40 @@
+DBIx-TNDBO version 0.02
+=======================
+
+This module is designed to be used as the base class for your own DBI wrapper
+module. The database schema data is then used to create a schema aware OO
+interface with abbreviated syntax for generating lists, iterators, and record
+objects.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Data::Dumper
+    Readonly      
+    DBI           
+    SQL::Abstract 
+    Storable      
+    File::Spec    
+    Filter::Simple
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

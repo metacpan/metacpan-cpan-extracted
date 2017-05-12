@@ -1,0 +1,167 @@
+NAME
+
+    Dist::Zilla::Plugin::ContributorsFromGit - Populate your 'CONTRIBUTORS'
+    POD from the list of git authors
+
+VERSION
+
+    This document describes version 0.017 of
+    Dist::Zilla::Plugin::ContributorsFromGit - released April 09, 2015 as
+    part of Dist-Zilla-Plugin-ContributorsFromGit.
+
+SYNOPSIS
+
+        ; in your dist.ini
+        [ContributorsFromGit]
+    
+        ; in your weaver.ini
+        [Contributors]
+
+DESCRIPTION
+
+    This plugin makes it easy to acknowledge the contributions of others by
+    populating a %PodWeaver stash with the unique list of all git commit
+    authors reachable from the current HEAD.
+
+OVERVIEW
+
+    On collecting the unique list of reachable commit authors from git, we
+    search and remove any git authors from the list of authors Dist::Zilla
+    knows about. We then look for a stash named %PodWeaver; if we don't
+    find one then we create an instance of Dist::Zilla::Stash::PodWeaver
+    and register it with our zilla instance. Then we add the list of
+    contributors (the filtered git authors list) to the stash in such a way
+    that Pod::Weaver::Section::Contributors can find them.
+
+    Note that you do not need to have the %PodWeaver stash created; it will
+    be added if it is not found. However, your Pod::Weaver config (aka
+    c<weaver.ini>) must include the Contributors section plugin.
+
+ Dist::Zilla Phase
+
+    This plugin runs during the BeforeBuild phase.
+
+ Metadata Keys
+
+    The list of contributors is also added to distribution metadata under
+    the custom x_contributors key. (e.g. in META.yml, META.json, etc)
+
+    If you have duplicate contributors because of differences in committer
+    name or email you can use a .mailmap file to canonicalize contributor
+    names and emails. See git help shortlog for details.
+
+ Pod::Weaver::Section::Contributors is OPTIONAL
+
+    Note that using the Pod::Weaver::Section::Contributors section is in no
+    way mandated or necessitated by this package; if you wish to use it you
+    must include the Contributors section in your Pod::Weaver configuration
+    in the traditional fashion.
+
+METACPAN CONTRIBUTOR MATCHING
+
+    MetaCPAN <http://metacpan.org> will attempt to match a contributor
+    address back to a PAUSE account. However, it (currently) can only do
+    that if the contributor's email address is their PAUSEID@cpan.org
+    address. There are two mechanisms for helping to resolve this, if your
+    commits are not using this address.
+
+    Both of these approaches have pros and cons that have been discussed at
+    levels nearing the heat brought to any discussion of religion,
+    homosexuality, or Chief O'Brien's actual rank at any ST:TNG convention.
+    However, they both have the advantage of *working*, and through
+    different modes of action. You are free to use one, both or neither.
+    These are only important if you're not committing with your @cpan.org
+    email address and want the MetaCPAN to link to your author page from
+    the page of the package you contributed to.
+
+ Using a .mailmap file
+
+    See git help shortlog for help on how to use this. A .mailmap file must
+    be maintained in each repository using it.
+
+ Globally, via the authors mapping
+
+    This package contains a YAML file containing a mapping of @cpan.org
+    author addresses; this list is consulted while building the
+    contributors list, and can be used to replace a non-cpan.org address
+    with one.
+
+    To add to or modify this mapping, please feel free to fork, add your
+    alternate email addresses to share/author-emails.yaml, and submit a
+    pull-request for inclusion. It'll be merged and released; as various
+    authors update their set of installed modules and cut new releases, the
+    mapping will appear.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Pod::Weaver::Section::Contributors
+
+      * Dist::Zilla::Stash::PodWeaver
+
+      *
+      http://www.dagolden.com/index.php/1921/how-im-using-distzilla-to-give
+      -credit-to-contributors/
+
+SOURCE
+
+    The development version is on github at
+    http://https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGi
+    t and may be cloned from
+    git://https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit
+    .git
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/Dist-Zilla-Plugin-ContributorsFromGit/issue
+    s
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr this
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgith
+    ub.com%2FRsrchBoy%2FDist-Zilla-Plugin-ContributorsFromGit&title=RsrchBo
+    y's%20CPAN%20Dist-Zilla-Plugin-ContributorsFromGit&tags=%22RsrchBoy's%2
+    0Dist-Zilla-Plugin-ContributorsFromGit%20in%20the%20CPAN%22>, gittip me
+    <https://www.gittip.com/RsrchBoy/>, or indulge my Amazon Wishlist
+    <http://bit.ly/rsrchboys-wishlist>... If you so desire.
+
+CONTRIBUTORS
+
+      * Brendan Byrd <Perl@ResonatorSoft.org>
+
+      * David Golden <dagolden@cpan.org>
+
+      * Graham Knop <haarg@haarg.org>
+
+      * Mike Greb <mikegrb@cpan.org>
+
+      * Randy Stauner <randy@magnificent-tears.com>
+
+      * Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+      * Yanick Champoux <yanick@babyl.dyndns.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

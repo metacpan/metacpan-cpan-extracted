@@ -1,0 +1,10 @@
+29fef1807fb700
+
+master x10security 29.fef1807fb700:
+  security/x10sec7f/normal
+  sensor/x10sec7f[battery]=90%
+
+
+
+
+

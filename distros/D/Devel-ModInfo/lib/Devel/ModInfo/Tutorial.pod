@@ -1,0 +1,142 @@
+# This code is a part of ModInfo, and is released under the Perl Artistic 
+#  License.
+# Copyright 2002 by James Tillman and Todd Cushard. See README and COPYING
+# for more information, or see 
+#  http://www.perl.com/pub/a/language/misc/Artistic.html.
+# $Id: Tutorial.pod,v 1.2 2002/08/17 23:24:17 jtillman Exp $
+
+=head1 ModInfo - A Perl Interface Definition System
+
+=head2 Purpose
+
+ModInfo was developed to fulfill a lack of introspective
+metadata for modules in the current Perl language.  When 
+creating a complex system of inter-related object-oriented 
+packages in Perl (or any language), it is useful to be able 
+to not only document the interfaces (i.e., the methods, 
+constructors, and functions) you are creating as you go along.
+
+ModInfo was designed to be simple to use, easy to maintain, and flexible enough to be applied in other ways.  The developer simply adds comment lines to the Perl module code which conform to a predefined syntax, and ModInfo utilities 
+use these comments to create persist the interface  definition metadata to XML.  A Perl object model is used  to present the metadata to the developer.
+
+The XML files are named the same as the modules they describe and are given the .mfo extension.  They are  intended to reside in the @INC path alongside the modules.   ModInfo uses the @INC path to locate the .mfo files and  parses them as XML to generate the in-memory objects that  describe the interface.
+
+=head2 Usage
+
+To use ModInfo in your own code, you should comment your code using the special ModInfo directives (see below).  These will define the methods, properties, etc that you want to be made visible through ModInfo.  To get a head start, you can run your module through the pl2modinfo.pl processing script.  This will automatically "stub out" your code with some preliminary ModInfo code.  On the command line, you might do it like this:
+
+	perl pl2modinfo.pl -wi MyModule.pm
+
+This will overwrite your current MyModule.pm with a new version that has the ModInfo directives in it.  You might want to make a backup of your original module before doing this, just in case something goes wrong.  Once your module is stubbed out, you can remove the ModInfo directives for things you don't want to be made visible, and change the things that the stubber got wrong.  (For more information on pl2modinfo.pl, enter "perldoc pl2modinfo.pl" or "pl2modinfo.pl -h" on the command line)
+
+Once you've commented your code, you need to run your module through the modinfo2xml.pl processor.  This will create a .mfo file for your module that distills the ModInfo directives into XML.  The .mfo file is what ModInfo itself uses when queried about your module's interface.
+
+On the command line, it might look like this:
+
+	perl modinfo2xml.pl -i MyModule.pm
+
+This will create a file named MyModule.mfo in the same directory as MyModule.pm.  It is important that the .mfo file stay alongside the .pm file.  In fact, you should consider making the file part of your Module's distribution if you upload it to CPAN.  (For more information on modinfo2xml.pl, enter "perldoc modinfo2xml.pl" or "modinfo2xml.pl -h" on the command line)
+
+One example of how ModInfo can be used is included in the distribution.  It is a simple script that uses the Template Toolkit to convert the ModInfo object model into HTML documentation.  It can operate on a single module, or on an entire directory structure.  If you were to run it on our previous example module, the command line would look like this:
+
+	perl modinfo2html.pl -m MyModule
+
+Note that this script only takes the package name, not the file name.  The module (.pm file) must be in your @INC path, and the .mfo file must be in the same location.  By default the HTML will go to STDOUT.  If you want to simply create a file of the same basename as the .pm file, but with a .html extension, you can supply the -f parameter as well.
+
+(For more information on modinfo2html.pl, enter "perldoc modinfo2html.pl" or "modinfo2html.pl -h" on the command line)
+
+=head2 ModInfo Directives
+
+ModInfo directives are simple Perl comments embedded in Perl code, which the modinfo2xml.pl processor can interpret. 
+
+Each directive begins with the standard Perl comment character and the word MODINFO in all caps.  The directive then follows, like so:
+
+# MODINFO directive parameter parameter
+
+Some directives are "delimiting," meaning they mark the
+beginning of a new scope, such as the scope of an entire
+module, or the scope of a single function.  Delimiters are
+considered to be in effect until the next delimiter of same
+or higher scope is encountered.
+
+The following directives are currently recognized by the
+processor:
+
+=over 4
+
+=item * module [name] [short description]
+
+A delimiting directive that defines a Perl package.  The
+package may or may not be object-oriented.  The package
+directive is considered to be in effect until another
+package directive is encountered.
+
+=item * icon [file_path]
+(valid within: package)
+
+A directive used to define the path for an icon that can be
+used to represent the module.  Path should be relative to
+the module itself.
+
+=item * constructor [name] [short description]
+(valid within: package)
+
+A delimiting directive that defines an object-oriented
+constructor for an object-oriented package.
+
+=item * method [name] [short description]
+(valid within: package)
+
+=item * function [name] [short description]
+(valid within: package)
+
+=item * param [name] [datatype] [short description]
+(valid within: function/method/constructor)
+
+=item * paramarray [name] [short description]
+(valid within: function/method/constructor)
+
+=item * paramhash [name] [short description]
+(valid within: function/method/constructor)
+
+=item * key [name] [datatype] [short description]
+(valid within: paramhash)
+
+=item * retval [datatype] or: retval
+(valid within: function/method/constructor)
+
+The second option indicates that the function does not
+return a value
+
+=item * property [name] [datatype] [short description]
+(valid within: function/method/constructor)
+
+=item * read [name] [short description]
+(valid within: property)
+
+=item * write [name] [short description]
+(valid within: property)
+
+=back
+
+=head2 AUTHOR
+
+=over 4
+
+jtillman@bigfoot.com
+
+tcushard@bigfoot.com
+
+=back
+
+=head2 SEE ALSO
+
+ModInfo
+
+pl2modinfo.pl
+
+modinfo2xml.pl
+
+modinfo2html.pl
+
+perl(1)

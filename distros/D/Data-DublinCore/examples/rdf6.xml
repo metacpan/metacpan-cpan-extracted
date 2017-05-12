@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/dcq-rdf-xml/
+ -->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+            xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+            xmlns:dc="http://purl.org/dc/elements/1.1/"
+            xmlns:dcterms="http://purl.org/dc/terms/">   
+<rdf:Description>
+ <dc:subject>
+   <dcterms:MESH>
+     <rdf:value>D08.586.682.075.400</rdf:value>
+     <rdfs:label>Formate Dehydrogenase</rdfs:label>
+   </dcterms:MESH>
+ </dc:subject>
+</rdf:Description>
+</rdf:RDF>
+

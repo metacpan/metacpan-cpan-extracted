@@ -1,0 +1,17 @@
+
+The tree of test data created by test_create_test_tree() found in
+the testlib looks as follows:
+
+                1
+      __________|__________
+     |          |          |
+    1.1 "a"    1.2 "b"    1.3 "c"
+                      _____|_____
+                     |           |
+                   1.3.1 "d"   1.3.2 "e"
+                     |
+                  1.3.1.1 "f"
+
+Changing that tree will likely require tweaks to the tests that
+make assumptions about its structure.
+

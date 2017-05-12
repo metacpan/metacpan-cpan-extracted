@@ -1,0 +1,34 @@
+Revision history for Data-Sah-Coerce-perl-date-str_natural
+
+0.005   2016-07-01 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Fix copy-paste mistake [CT].
+
+
+0.004   2016-06-30 (PERLANCAR)
+
+	- Die on parse failure.
+
+	- Make DateTime::Format::Natural a RuntimeRequires prereq for
+	  convenience of user.
+
+	- [doc] Fix/simplify example.
+
+
+0.003   2016-06-14 (PERLANCAR)
+
+	- Don't require coerce_to=DateTime when using this rule, default to
+	  UTC for time zone instead of floating for ease of converting to
+	  Time::Moment/epoch.
+
+
+0.002   2016-05-27 (PERLANCAR)
+
+	- Impart default coerce_to knowledge to each rule, for convenience.
+
+
+0.001   2016-05-24 (PERLANCAR)
+
+        - First release.

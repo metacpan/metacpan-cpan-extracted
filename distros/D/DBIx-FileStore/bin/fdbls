@@ -1,0 +1,189 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long; 
+
+use DBIx::FileStore;
+use DBIx::FileStore::UtilityFunctions qw( convert_bytes_to_human_size );
+#use Data::Dumper;
+
+my $long = 0;
+my $human = 0;	# like du's -h
+my $md5  = 0;
+my $debug  = 0;
+my $all = 0;
+
+main();
+
+sub Usage {
+    "fdbls [--long] [--human] [--md5] [-all] [--debug] [files/dirs]:\n" .
+    "  Shows files in FileDB.  Note that if you have files like\n" . 
+    "  /a/b/c.txt and /a/b/d.txt in the db, then\n" .
+    "    % fdbls /a/b/\n" .
+    "  will show both files.\n";
+}
+
+sub main {
+    # fdbls: shows files in FileDB
+    GetOptions(
+        "long!" => \$long,
+        "human!" => \$human,
+        "all!" => \$all,
+        "md5!" =>  \$md5,
+        "debug!" =>  \$debug,
+    ) || die Usage();
+
+    my $filestore = new DBIx::FileStore();
+
+    @ARGV = ( "" ) unless @ARGV;
+
+    my %shown;
+    for my $name (@ARGV) {
+        my $files;
+
+        # $level iis used to support directory-like viewing
+        my $level = $all ? 0 : countslashes($name);    # so we don't show things that appear
+                                                       # as if they're in SUB-folders
+        print "Level of $name is $level\n" if ($debug);
+
+        # fetch all files with b_num = 0-- either all of them, or the ones
+        # matching $name
+        if ($name eq "") {
+            $files = $filestore->get_all_filenames();
+        } else {
+            $files = $filestore->get_filenames_matching_prefix( $name );
+        }
+
+        #print Dumper($files);
+        print( "fdbls: got " . scalar(@$files) . " rows back for '$name'\n") if $debug;
+
+        for my $f (@$files) {
+            # each row is (name, c_len, c_md5, lasttimeasint)
+            #
+            # $toshow becomes the 'folder' to show, 
+            # or the full filename from $f
+            my $toshow = $level ? filename_to_show($f->[0], $level) : $f->[0];
+            $toshow =~ s/ 0+//;
+
+            next if $shown{$toshow}++;
+
+            # build up a line to show in $line, then show it 
+            my $line = "";
+            if ($long || $human) {
+                if ($human) {
+                    $line .= sprintf("%-7s ", convert_bytes_to_human_size( $f->[1] ) );
+                } else {
+                    $line .= sprintf("%9d ",  $f->[1]);		# c_len
+                }
+                my $date = $f->[3];
+                $line .= sprintf("%08d %02d:%02d ", 
+                    substr($date, 0, 8), substr($date, 8, 2), substr($date, 10, 2) );
+                    # date and time: first 8, and last four chars of date (split into hours:minutes)
+            }
+            $line .= sprintf("%s ", $f->[2]) if $md5;
+            $line .= $toshow;
+            print  "$line\n";
+        }
+    }
+}
+
+sub filename_to_show { 
+    my ($f, $level) = @_;
+
+    #$f = "/" . $f unless (substr($f, 0, 1) eq "/");    
+    # This was to pretend that all incoming names started with /
+    #  (as if / were the working directory, since there are no 
+    #  directories in the filestore.)  We decided against this,
+    #  so the above code is commented out.
+
+    my $cnt = 0;
+    for(my $i=0; $i<length($f); $i++) {
+        $cnt++ if substr($f, $i, 1) eq "/";
+        if ($cnt == $level + 1) {
+            return substr($f, 0, $i + 1);	# show the '/' too
+        }
+    }
+    $f =~ s/ 0+$//; # remove trailing 0's
+    return $f;
+}
+
+sub countslashes {
+    my $f = shift;
+    my $cnt = 0;
+    for(my $i=0; $i<length($f); $i++) {
+        $cnt++ if substr($f, $i, 1) eq "/";
+    }
+    return $cnt;
+}
+
+=pod
+
+=head1 NAME     
+            
+fdbls - Lists filenames in DBIx::FileStore
+                    
+=head1 SYNOPSIS     
+                
+    % fdbls
+
+lists all filenames in filestore
+
+    % fdbls /home/
+
+lists all filenames in filestore beginning with string /home/
+
+See options below for more details.
+
+=head1 DESCRIPTION 
+
+Lists files in DBIx::Filestore 
+
+=head1 OPTIONS
+
+=head2 --long or -l
+
+Somewhat like 'ls -l'.  Shows size and datestamp for files listed.
+                
+=head2 --human or -h
+
+Somewhat like 'ls -hl'.  Shows size and datestamp for files listed, 
+and show sizes as K, M, or G.
+                
+=head2 --all or -a
+
+Show all files, or all that share the passed file prefix.
+Without -all, if you pass a prefix, fdbls will only show files
+that have filenames as if they're in the same directory as
+the prefix. 
+
+For example, if we have /home/a.txt and /home/b/c.txt
+in the filestore, then 
+
+  % fdbls /home/ -a
+
+will show:
+
+/home/a.txt
+/home/b/c.txt
+
+but 
+
+  % fdbls /home/
+
+will show only:
+
+/home/a.txt
+
+=head2 --debug
+
+Show some debug info. For testing only.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbls>, L<fdbmv>,  L<fdbput>,  L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+    
+=cut   

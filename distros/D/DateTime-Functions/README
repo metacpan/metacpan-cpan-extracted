@@ -1,0 +1,69 @@
+NAME
+    DateTime::Functions - Procedural interface to DateTime functions
+
+VERSION
+    This document describes version 0.10 of DateTime::Functions, released
+    December 9, 2010
+
+SYNOPSIS
+        use DateTime::Functions;
+        print today->year;
+        print now->strftime("%Y-%m-%d %H:%M:%S");
+
+DESCRIPTION
+    This module simply exports all class methods of DateTime into the
+    caller's namespace.
+
+METHODS
+    Unless otherwise noted, all methods correspond to the same-named class
+    method in DateTime. Please see DateTime for which parameters are
+    supported.
+
+  Constructors
+    All constructors can die when invalid parameters are given. They all
+    return "DateTime" objects, except for "duration()" which returns a
+    "DateTime::Duration" object.
+
+    *   datetime( ... )
+
+        Equivalent to "DateTime->new( ... )".
+
+    *   duration( ... )
+
+        Equivalent to "DateTime::Duration->new( ... )".
+
+    *   from_epoch( epoch => $epoch, ... )
+
+    *   now( ... )
+
+    *   today( ... )
+
+    *   from_object( object => $object, ... )
+
+    *   last_day_of_month( ... )
+
+    *   from_day_of_year( ... )
+
+  Utility Functions
+    *   default_locale( $locale )
+
+        Equivalent to "DateTime->DefaultLocale( $locale )".
+
+    *   compare
+
+    *   compare_ignore_floating
+
+SEE ALSO
+    DateTime
+
+AUTHORS
+    唐鳳 <cpan@audreyt.org>
+
+CC0 1.0 Universal
+    To the extent possible under law, 唐鳳 has waived all copyright and
+    related or neighboring rights to DateTime-Functions.
+
+    This work is published from Taiwan.
+
+    <http://creativecommons.org/publicdomain/zero/1.0>
+

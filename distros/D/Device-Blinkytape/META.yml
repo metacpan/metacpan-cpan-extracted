@@ -1,0 +1,29 @@
+---
+abstract: 'Control a BlinkyTape led strip'
+author:
+  - 'Oskari Okko Ojala <okko@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-Blinkytape
+optional_features:
+  simulation:
+    description: 'Simulation of a BlinkyTape with Tk'
+    requires:
+      Tk: 0
+requires:
+  Device::SerialPort: 0
+  ExtUtils::MakeMaker: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Time::HiRes: 0
+resources:
+  repository: git://github.com:okko/perl-Device-BlinkyTape.git
+version: 0.004
+x_authority: cpan:OKKO

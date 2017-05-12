@@ -1,0 +1,8 @@
+cpan2rpm
+
+--or--
+
+perl Makefile.PL
+make
+make test
+make install

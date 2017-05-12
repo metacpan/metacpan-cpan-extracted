@@ -1,0 +1,101 @@
+*** OLE.orig	Fri Aug 01 07:34:14 2003
+--- OLE.xs	Wed Nov 05 22:32:20 2003
+***************
+*** 6584,6589 ****
+--- 6584,6679 ----
+      XSRETURN_EMPTY;
+  }
+  
++ void
++ Enums(self)
++     SV *self
++ PPCODE:
++ {
++     HRESULT hr;
++     UINT cp = cpDefault;
++     HV *stash = gv_stashpv(szWINOLE, TRUE);
++     HV *hv;
++     unsigned int count;
++ 
++     WINOLETYPELIBOBJECT *pObj = GetOleTypeLibObject(aTHX_ self);
++     if (!pObj)
++ 	XSRETURN_EMPTY;
++ 
++     hv = newHV();
++     ST(0) = sv_2mortal(newRV_noinc((SV*)hv));
++ 
++     /* loop through all objects in type lib */
++     count = pObj->pTypeLib->GetTypeInfoCount();
++     for (unsigned int index=0; index < count; ++index) {
++ 	ITypeInfo *pTypeInfo;
++ 	TYPEATTR  *pTypeAttr;
++ 
++ 	hr = pObj->pTypeLib->GetTypeInfo(index, &pTypeInfo);
++ 	if (CheckOleError(aTHX_ stash, hr))
++ 	    continue;
++ 
++ 	hr = pTypeInfo->GetTypeAttr(&pTypeAttr);
++ 	if (FAILED(hr)) {
++ 	    pTypeInfo->Release();
++ 	    ReportOleError(aTHX_ stash, hr);
++ 	    continue;
++ 	}
++ 
++ 	if ( pTypeAttr->typekind == TKIND_ENUM ) {
++ 	    unsigned int cName;
++ 	    BSTR bstr;
++ 	    char szName[64];
++ 
++ 	    hr = pTypeInfo->GetDocumentation(MEMBERID_NIL, &bstr, NULL, NULL, NULL);
++ 	    if (CheckOleError(aTHX_ stash, hr) || !bstr)
++ 	        continue;
++ 
++ 	    char *pszName = GetMultiByte(aTHX_ bstr, szName, sizeof(szName), cp);
++ 	    HV *hv2 = newHV();
++ 	    hv_store(hv, pszName, strlen(pszName), newRV_noinc((SV*)hv2), 0);
++ 	    SysFreeString(bstr);
++ 	    ReleaseBuffer(aTHX_ pszName, szName);
++ 
++ 	    for (int iVar=0; iVar < pTypeAttr->cVars; ++iVar) {
++ 		VARDESC *pVarDesc;
++ 
++ 		hr = pTypeInfo->GetVarDesc(iVar, &pVarDesc);
++ 		/* XXX LEAK alert */
++ 		if (CheckOleError(aTHX_ stash, hr))
++ 		    continue;
++ 
++ 		if (!(pVarDesc->wVarFlags & (VARFLAG_FHIDDEN |
++ 					     VARFLAG_FRESTRICTED |
++ 					     VARFLAG_FNONBROWSABLE)))
++ 		{
++ 		    unsigned int cName;
++ 		    BSTR bstr;
++ 		    char szName[64];
++ 
++ 		    hr = pTypeInfo->GetNames(pVarDesc->memid, &bstr, 1, &cName);
++ 		    if (CheckOleError(aTHX_ stash, hr) || cName == 0 || !bstr)
++ 			continue;
++ 
++ 		    char *pszName = GetMultiByte(aTHX_ bstr,
++ 						 szName, sizeof(szName), cp);
++ 		    SV *sv = newSV(0);
++ 		    /* XXX LEAK alert */
++ 		    hr = SetSVFromVariantEx(aTHX_ pVarDesc->lpvarValue, sv, stash);
++ 		    if (!CheckOleError(aTHX_ stash, hr)) {
++ 			hv_store(hv2, pszName, strlen(pszName), sv, 0);
++ 		    }
++ 		    SysFreeString(bstr);
++ 		    ReleaseBuffer(aTHX_ pszName, szName);
++ 		}
++ 		pTypeInfo->ReleaseVarDesc(pVarDesc);
++ 	    }
++ 	}
++ 	pTypeInfo->ReleaseTypeAttr(pTypeAttr);
++ 	pTypeInfo->Release();
++     }
++     XSRETURN(1);
++ }
++ 
+  ##############################################################################
+  
+  MODULE = Win32::OLE		PACKAGE = Win32::OLE::TypeInfo

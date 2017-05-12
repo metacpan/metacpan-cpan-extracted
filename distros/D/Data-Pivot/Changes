@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::Pivot.
+
+0.01  Thu Feb 21 09:57:03 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Data::Pivot
+

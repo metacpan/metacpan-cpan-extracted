@@ -1,0 +1,27 @@
+---
+abstract: 'Log to multiple QueryLogs at a time'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  Test::Deep: '0.112'
+  Test::Fatal: '0.013'
+  Test::More: '1.001002'
+  aliased: '0.31'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-QueryLog-Tee
+requires:
+  Moo: '1.004002'
+  Sub::Name: '0.05'
+  namespace::clean: '0.24'
+resources:
+  bugtracker: https://github.com/frioux/DBIx-Class-QueryLog-Tee/issues
+  homepage: https://github.com/frioux/DBIx-Class-QueryLog-Tee
+  repository: https://github.com/frioux/DBIx-Class-QueryLog-Tee.git
+version: '0.001001'

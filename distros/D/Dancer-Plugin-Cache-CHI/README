@@ -1,0 +1,162 @@
+NAME
+    Dancer::Plugin::Cache::CHI - Dancer plugin to cache response content
+    (and anything else)
+
+VERSION
+    version 1.4.0
+
+SYNOPSIS
+    In your configuration:
+
+        plugins:
+            'Cache::CHI':
+                driver: Memory
+                global: 1
+
+    In your application:
+
+        use Dancer ':syntax';
+        use Dancer::Plugin::Cache::CHI;
+
+        # caching pages' response
+
+        check_page_cache;
+
+        get '/cache_me' => sub {
+            cache_page template 'foo';
+        };
+
+        # using the helper functions
+
+        get '/clear' => sub {
+            cache_clear;
+        };
+
+        put '/stash' => sub {
+            cache_set secret_stash => request->body;
+        };
+
+        get '/stash' => sub {
+            return cache_get 'secret_stash';
+        };
+
+        del '/stash' => {
+            return cache_remove 'secret_stash';
+        };
+
+        # using the cache directly
+
+        get '/something' => sub {
+            my $thingy = cache->compute( 'thingy', sub { compute_thingy() } );
+
+            return template 'foo' => { thingy => $thingy };
+        };
+
+DESCRIPTION
+    This plugin provides Dancer with an interface to a CHI cache. Also, it
+    includes a mechanism to easily cache the response of routes.
+
+CONFIGURATION
+    Unrecognized configuration elements are passed directly to the CHI
+    object's constructor. For example, the configuration given in the
+    "SYNOPSIS" will create a cache object equivalent to
+
+        $cache = CHI->new( driver => 'Memory', global => 1, );
+
+  honor_no_cache
+    If the parameter '"honor_no_cache"' is set to true, a request with the
+    http header '"Cache-Control"' or '"Pragma"' set to '*no-cache*' will
+    ignore any content cached via '"cache_page"' and will have the page
+    regenerated anew.
+
+KEYWORDS
+  cache
+    Returns the CHI cache object.
+
+  cache $namespace, \%args
+    CHI only allows one namespace per object. But you can create more caches
+    by using *cache $namespace, \%args*. The new cache uses the arguments as
+    defined in the configuration, which values can be overriden by the
+    optional arguments (which are only used on the first invocation of the
+    namespace).
+
+        get '/memory' => sub {
+            cache('elephant')->get( 'stuff' );
+        };
+
+        get '/goldfish' => sub {
+            cache( 'goldfish' => { expires_in => 300 } )->get( 'stuff' );
+        };
+
+    Note that all the other keywords ("cache_page", "cache_set", etc) will
+    still use the main cache object.
+
+  check_page_cache
+    If invoked, returns the cached response of a route, if available.
+
+    The "path_info" attribute of the request is used as the key for the
+    route, so the same route requested with different parameters will yield
+    the same cached content. Caveat emptor.
+
+  cache_page($content, $expiration)
+    Caches the *$content* to be served to subsequent requests. The headers
+    and http status of the response are also cached.
+
+    The *$expiration* parameter is optional.
+
+  cache_page_key
+    Returns the cache key used by '"cache_page"'. Defaults to to the
+    request's *path_info*, but can be modified via
+    *cache_page_key_generator*.
+
+  cache_page_key_generator( \&sub )
+    Sets the function that generates the cache key for *cache_page*.
+
+    For example, to have the key contains both information about the
+    request's hostname and path_info (useful to deal with multi-machine
+    applications):
+
+        cache_page_key_generator sub {
+            return join ':', request()->host, request()->path_info;
+        };
+
+  cache_set, cache_get, cache_remove, cache_clear, cache_compute
+    Shortcut to the cache's object methods.
+
+        get '/cache/:attr/:value' => sub {
+            # equivalent to cache->set( ... );
+            cache_set $params->{attr} => $params->{value};
+        };
+
+    See the CHI documentation for further info on these methods.
+
+HOOKS
+  before_create_cache
+    Called before the creation of the cache, which is lazily done upon its
+    first use.
+
+    Useful, for example, to change the cache's configuration at run time:
+
+        use Sys::Hostname;
+
+        # set the namespace to the current hostname
+        hook before_create_cache => sub {
+            config->{plugins}{'Cache::CHI'}{namespace} = hostname;
+        };
+
+SEE ALSO
+    Dancer Web Framework - Dancer
+
+    CHI
+
+    Dancer::Plugin::Memcached - plugin that heavily inspired this one.
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

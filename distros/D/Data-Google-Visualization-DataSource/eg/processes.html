@@ -1,0 +1,43 @@
+<html>
+  <head>
+    <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+
+    // Load the Visualization API and the piechart package.
+    google.load('visualization', '1.0', {'packages':['table']});
+
+    function drawVisualization() {
+      var url = document.getElementById("urlbar").value;
+      var query = new google.visualization.Query(url);
+
+      // Send the query with a callback function.
+      query.send(handleQueryResponse);
+
+      return false;
+    }
+
+  function handleQueryResponse(response) {
+    if (response.isError()) {
+      alert('Error in query: ' + response.getMessage() + ' ' + response.getDetailedMessage());
+      return;
+    }
+
+    var data = response.getDataTable();
+    var table = new google.visualization.Table(document.getElementById('table_div'));
+    table.draw(data, {showRowNumber: true});
+
+  }
+    </script>
+  </head>
+
+  <body>
+    <form onsubmit="return drawVisualization()">
+        DataSource URL:
+        <input id="urlbar" type="text" value="http://localhost:5000">
+        <input type="submit" value="Fetch">
+    </form>
+    <!--Div that will hold the pie chart-->
+    <div id="table_div"></div>
+  </body>
+</html>

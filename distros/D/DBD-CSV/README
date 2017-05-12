@@ -1,0 +1,74 @@
+Module
+    DBD::CSV - DBI driver for CSV files
+
+Description
+    The DBD::CSV module is yet another driver for the DBI (Database
+    independent interface for Perl). This one is based on the SQL
+    "engine" SQL::Statement and the abstract DBI driver DBD::File
+    and implements access to so-called CSV files (Comma separated
+    values).
+
+Copying
+    Copyright (C) 2009-2016 by H.Merijn Brand
+    Copyright (C) 2004-2009 by Jeff Zucker
+    Copyright (C) 1998-2004 by Jochen Wiedmann
+ 
+    You may distribute this module under the terms of either the GNU
+    General Public License or the Artistic License, as specified in
+    the Perl README file.
+
+    Recent changes can be (re)viewed in the public GIT repository at
+    https://github.com/perl5-dbi/DBD-CSV.git
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/perl5-dbi/DBD-CSV.git DBD-CSV
+
+    or get it as a tgz:
+
+     $ wget --output-document=DBD-CSV-git.tgz \
+	'https://github.com/perl5-dbi/DBD-CSV/archive/master.tar.gz
+
+    which will unpack to DBD-CSV-master
+
+Prerequisites:
+    DBI - the DBI (Database independent interface for Perl).
+
+    SQL::Statement - a simple SQL engine.
+
+    Text::CSV_XS - this module is used for writing rows to or reading
+	rows from CSV files.
+
+Build/Installation:
+    Use CPAN:
+      cpan DBD::CSV
+
+    Or standard build/installation:
+      gzip -cd DBD-CSV-0.43.tar.gz | tar xf -
+      cd DBD-CSV-0.43
+      perl Makefile.PL
+      make test
+      make install
+
+    (this is for Unix users, Windows users would prefer PowerArchiver,
+    WinZip or something similar).
+
+    The test suite contains extensive tests for all features provided
+    by DBD::CSV. Some of them include the use of what is set to be the
+    default temporary directory on the system. Even though the tests
+    do not use the folder to read or modify data, using the folder will
+    imply the scanning of that folder to see if files would qualify for
+    use in DBD::CSV. When the folder contains many files, the scanning
+    will seriously slow down the testing duration. The configure phase
+    therefor asks the user if using the folder is allowed. The default
+    answer is yes unless $AUTOMATED_TESTING is set.
+    As File::Spec->tmpdir () honors the environment, you can enable
+    these tests using another folder by setting $TMPDIR or whatever
+    controls tmpdir () or your OS.
+
+Author:
+    This module is currently maintained by
+
+	H.Merijn Brand < h.m.brand at xs4all.nl >
+
+    The original author is Jochen Wiedmann.
+    Previous maintainer was Jeff Zucker

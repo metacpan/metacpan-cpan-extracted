@@ -1,0 +1,346 @@
+package DefHash; # just to make PodWeaver happy
+
+# VERSION
+
+1;
+# ABSTRACT: Define things according to a specification, using hashes
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+DefHash - Define things according to a specification, using hashes
+
+=head1 VERSION
+
+This document describes version 1.0.11 of DefHash (from Perl distribution DefHash), released on 2015-09-03.
+
+=head1 SPECIFICATION VERSION
+
+ 1
+
+=head1 ABSTRACT
+
+This document describes DefHash, a specification for using hashes to define
+things. DefHash was born out of several other projects/specifications like
+L<Sah>, L<Rinci>, L<Riap>, L<Module::Patch>.
+
+=head1 SPECIFICATION
+
+In this document, hashes are written in JSON or pseudo-JSON (e.g. contains
+ellipsis C<...> or JavaScript-style comments C<// ...>).
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL "NOT", "SHOULD",
+"SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this document are to be
+interpreted as described in RFC 2119.
+
+=head2 Definitions
+
+=over 4
+
+=item * B<defhash>
+
+A regular hash, or dictionary (as it is called in Python), or associative array
+(as it is called in PHP), or object (as it is called in JavaScript). A defhash
+has B<properties>, which translates to the hash key/value pairs. B<Property
+names> translates to hash keys, while B<property values> translates to hash
+values. The same hash key/value pairs are used to store B<property attributes>:
+
+ {
+     "v": 1,                         // set value for property 'v'
+     "prop1": "value1",              // set value for property 'prop1'
+     "prop2": ["value2", ...],       // set value for property 'prop2'
+     "prop1.attr1": ...,             // set value for prop1's attribute
+     "prop1.attr1.subattr1": ...,    // set value for prop1's attribute
+     "_extra1": ...,                 // ignored property, starts with _
+     "prop1._extra_attr": ...,       // ignored attribute, starts with _
+
+     "prop(en)",                     // equivalent/normalizable to prop.alt.lang.en
+ }
+
+The above defhash defines two properties: C<prop1> and C<prop2>. C<prop1> has
+two attributes, C<attr1> and C<attr1.subattr1>. Properties with names starting
+with underscore (C<_>) are ignored; this can be used to put extra information.
+Likewise for attribute names which start with underscore.
+
+Property names must follow this regex '\A[a-z][a-z0-9_]*\z' (an
+Lowercase-alphanumeric-only word). Property attributes must follow this regex:
+'\A[a-z][a-z0-9_]*(\.[a-z][a-z0-9_]*)*\z' (a dotted lowercase-alphanumeric
+word). An exception is some shortcuts which will be normalized during further
+processing: "foo(LANG)" is a shortcut for "foo.alt.lang.LANG".
+
+Property value can be anything. It can contain another defhash for defining
+subentities, for example. In Rinci, a function metadata has a property called
+C<args> to define function arguments; its value is a hash of argument names and
+argument specification. Each argument specification is a defhash.
+
+Property attributes can be used to store extra data into a property.
+
+The hash itself can have attributes, stored in .<attr> keys:
+
+ {
+     ".attr1": ...,
+     ".attr2.subattr": ...,
+     "._ignored": ...
+ }
+
+=item * B<specification>
+
+A set of recognized properties and property attributes, including whether the
+properties are required, expected values (schema) for properties and attributes,
+and default values.
+
+For example, Rinci is a specification for function metadata (among others). One
+writes a defhash (metadata) for a function, it contains properties to describe
+the function. Rinci specifies what properties are available and the meaning and
+expected values for each of those properties. An example of a Rinci function
+metadata:
+
+ // metadata for function 'sum'
+ {
+     "v": 2, // version of Rinci specification
+     "summary": "Sum all the elements of array numerically",
+     "description":
+         "Non-numeric elements in array will be skipped. Empty array
+          or no numeric elements in array will result in 0 for the
+          sum.",
+     "args": {
+         "array": {
+             "summary": "The array to sum",
+             "schema": "array*",
+         },
+     },
+ }
+
+=back
+
+=head2 Why write definitions in a defhash?
+
+Hash is a basic data structure that is supported by all high-level languages,
+including Perl, Python, PHP, Ruby, and JavaScript. It is particularly easy to
+merge. It makes checking the existence of value of property very easy, by just
+accessing the hash's key.
+
+B<... instead of text (like POD)?> Putting definition in a data structure makes
+it easier to manipulate the definition (merge, parse, normalize, convert, etc).
+
+B<... instead of array?> Hash allows us to evolve more easily. If we deprecate a
+property or add new ones, elements don't have to shift like in array.
+
+B<... instead of a regular or nested hash?> Well, defhash is a regular hash. It
+is just a convention to limit the range of valid keys (only alphanumeric
+characters) in exchange for additional metadata for each key (which is stored as
+regular keys in the same hash). Plus it establishes convention for some
+predefined properties and attributes.
+
+=head2 Common properties
+
+These are the list of properties that all specifications must recognize:
+
+=over 4
+
+=item * B<v> => FLOAT (default: 1)
+
+This specifies the version of specification that the defhash is following.
+
+A specification can change over time. The C<v> property specifies the
+specification version which the hash follows. Specification version is a
+non-negative real number, but integer is recommended. If unspecified, it is
+assumed to be 1. It can also be 0.
+
+=item * B<defhash_v> => INT (default: 1)
+
+This specifies the version of DefHash specification itself. It is hoped that
+this should never change, so normally a defhash need not specify this.
+
+=item * B<name> => TEXT
+
+A short (usually single-word) name for the thing that is described. For example,
+in Rinci function metadata, it is the function's name. In Sah, it is a name of
+the schema that can be used by the human compiler.
+
+ // metadata for function 'sum'
+ {
+     "name": "sum",
+     ...
+ }
+
+ // schema for describing positive integer
+ ["int", {
+     "name": "pos_int",
+     "min": 0,
+ }]
+
+=item * B<caption> => text
+
+Like C<name>, but for display purposes.
+
+=item * B<summary> => TEXT
+
+A short (< 72 character), one-line summary about the thing that is described.
+For example, in Rinci function metadata, the C<summary> describes what the
+function does:
+
+ // metadata for function 'sum'
+ {
+     "summary": "Sum all the elements of an array numerically",
+     ...
+ }
+
+=item * B<description> => TEXT
+
+A longer description. Normally a paragraph or longer of text. The text is
+assumed to be marked up in Markdown.
+
+=item * B<tags> => ARRAY[TEXT | DEFHASH]
+
+A list of one or more tags, can be used to categorize the thing that is
+described. Example:
+
+ "tags": ["important", "category:filtering", "category:filtering-for-foo"],
+
+Each tag can also be a defhash for more detailed specification:
+
+ "tags": ["important",
+          {"name":"category:filtering", "summary":"filtering field"},
+          {"name":"category:filtering-for-foo", "summary":"filtering for field 'foo'"}]
+
+=item * B<default_lang> => TEXT
+
+Default language. Defaults to parent's value, or if parent does not exist, from
+environment LANG, or if undefined or C<C>, C<en_US>.
+
+=item * B<x> => ANY
+
+This property is used to store extended (application-specific) attributes, much
+like the C<X-> prefix in HTTP or email headers. This property can be used as an
+alternative to using underscore prefix (e.g. C<_foo>). Some processing tools
+strip properties/attributes that begin with underscores, so to pass extended
+metadata around, it might be more convenient to use the C<x> property.
+
+Example:
+
+ {
+     "x.myapp.foo" => 1,
+     "x.myapp.bar" => "some value",
+ }
+
+=back
+
+=head2 Property attributes
+
+Below is the list of property attributes that must be supported.
+
+=over
+
+=item * alt
+
+This attribute can be used to store alternate property values. The most common
+is alternative language (C<alt.lang.LANG_CODE>), where you want to provide
+translations. Example:
+
+ {
+     "summary": "An English summary",
+     "summary.alt.lang.id_ID": "Ringkasan dalam bahasa Indonesia",
+ }
+
+There is a shortcut form for C<alt.lang>, which should be normalized to
+C<alt.lang> when processing:
+
+ {
+     "summary": "An English summary",
+     "summary(id_ID)": "Ringkasan dalam bahasa Indonesia",
+ }
+
+Another kind of alternate is environment (C<alt.env.NAME>), for example we might
+want to use different summary when displayed in a CLI program vs web
+application. Example (in a Rinci function argument's specification):
+
+ {
+     "summary.alt.env.cmdline": "Like --foo, do something foobar-ish",
+     "summary.alt.env.web": "Like the `foo` field, do something foobar-ish",
+ }
+
+Another kind of alternate is boolean logic (C<alt.bool.WHICH>, where C<WHICH>
+can be C<not>), when you want to specify the negative sense/sentence instead of
+the regular positive one. Example (in a Rinci function argument's
+specification):
+
+ "tcp": {
+     "schema": "bool",
+     "default": true,
+     "summary": "Parse TCP connections",
+     "summary.alt.bool.not": "Do not parse TCP connections",
+ }
+
+Another kind of alternate is grammatical variance based on noun plurality
+(C<alt.plurality.WHICH> where C<WHICH> can be C<singular> or C<plural>). Example
+(in a Rinci function argument's specification, where an array argument like
+C<files> translates in a CLI environment to multiple C<--file> option
+specification):
+
+ "files": {
+     "schema": ["array*", {"of":"str*"}],
+     "summary": "Specify one or more files to check",
+     "summary.alt.plurality.singular": "Add a file to check (can be specified multiple times)",
+ }
+
+Combination of alternates. When two or more alternates is combined, they must be
+ordered asciibetically and separated with an underscore C<_>. For example:
+
+ {
+     "default_lang": "en_US",
+     "summary": "An English summary",
+     "summary.alt.env_lang.web.id_ID":"(Summary in Indonesian, for web)",
+     "summary.alt.env_lang.cmdline.id_ID":"(Summary in Indonesian, for cmdline)"
+ }
+
+=back
+
+=head2 When should specification version be increased?
+
+When a backward-incompatible change is introduced. This is defined to be removal
+of a recognized property, or the semantic change of an existing property, or
+other incompatible change. For example,
+
+ XXX (modp 1->2, 2->3; ri ->2, not using defhash but that is not the real reason, removal of features property)
+ XXX riap also bumped to 2 just because it uses hash
+
+=head1 SEE ALSO
+
+Semantic Versioning, L<http://semver.org>
+
+Markdown specification
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/DefHash>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-DefHash>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=DefHash>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

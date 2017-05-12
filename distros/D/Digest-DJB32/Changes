@@ -1,0 +1,33 @@
+==================================================
+Changes from 1741-04-23 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-02-05 19:46:28 +0000
+------------------------------------------
+
+  Change: 7802a71fe30bb4204cf21f9c0d4c13f1f6225a23
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-02-05 20:46:21 +0000
+
+    Win32 fix 
+
+------------------------------------------
+version 0.001 at 2015-02-05 03:28:12 +0000
+------------------------------------------
+
+  Change: 1b2b8e71b00e97a3a63244e303ef57644176012b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-02-05 04:28:12 +0000
+
+    First release, looks good ;) 
+
+  Change: 5eaa3a2f5fe0a605c99601752a914169427dc725
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-02-05 03:13:59 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

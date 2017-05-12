@@ -1,0 +1,228 @@
+NAME
+    Dancer::Plugin::I18N - Intenationalization for Dancer
+
+SYNOPSIS
+       # MyApp/I18N/de.po
+       msgid "Hello Dancer"
+       msgstr "Hallo Tänzerin"
+   
+       # MyApp/I18N/i_default.po
+       msgid "messages.hello.dancer"
+       msgstr "Hello Dancer - fallback translation"
+   
+       # MyApp/I18N/fr.pm
+       package myapp::I18N::fr;
+       use base 'myapp::I18N';
+       our %Lexicon = ( hello => 'bonjour' );
+       1;
+
+       package myapp;
+       use Dancer;
+       use Dancer::Plugin::I18N;
+       get '/' => sub {
+            my $lang = languages ;
+            print @$lang . "\n";
+            languages( ['de'] );
+            print STDERR localize('Hello Dancer');
+
+            template 'index' 
+        };
+
+        # index.tt
+        hello in <% languages %> => <% l('hello') %>
+        # or
+        <% languages('fr') %>This is an <% l('hello') %>
+        # or
+        <% l('Hello Dancer') %>
+        <% l('Hello [_1]', 'Dancer') %>
+        <% l('lalala[_1]lalala[_2]', ['test', 'foo']) %>
+        <% l('messages.hello.dancer') %>
+        # or for big texts
+        <% IF language_tag('fr') %>
+        ...
+        <% ELSE %>
+        ...
+        <% ENDIF %>
+
+DESCRIPTION
+    Supports mo/po files and Maketext classes under your application's I18N
+    namespace.
+
+    Dancer::Plugin::I18N add Locale::Maketext::Simple to your Dancer
+    application
+
+CONFIGURATION
+    You can override any parameter sent to Locale::Maketext::Simple by
+    specifying a "maketext_options" hashref to the "Plugin::I18N" in you
+    Dancer application config file section. For example, the following
+    configuration will override the "Decode" parameter which normally
+    defaults to 1:
+
+        plugins:
+           I18N:
+              directory: I18N
+              lang_default: en
+              maketext_options:
+                   Decode: 0
+
+    All languages fallback to MyApp::I18N which is mapped onto the i-default
+    language tag or change this via options 'language_default'. If you use
+    arbitrary message keys, use i_default.po to translate into English,
+    otherwise the message key itself is returned.
+
+    Standart directory is in "I18N". In this directory are stored every lang
+    files (*.pm|po|mo).
+
+    You can defined own function for call locale via settings name "func".
+
+        plugins:
+           I18N:
+              func: "N_"
+
+    Or defined as array:
+
+        plugins:
+           I18N:
+              func: ["N_", "_"]
+
+    Now you can call this function in template or in libs.
+
+        # index.tt
+        hello in <% languages %> => <% N_('hello') %>
+
+    Automaticaly change language via param 'lang', can be change in setting
+    via 'name_param' and will be stored in session in tag 'language' or can
+    be changed via 'name_session'. When you use this settings, this plugin
+    automaticaly setting language when you call param 'name_param'. Now if
+    you call every page with param 'lang=en' now plugin automatically set
+    new locale.
+
+        plugins:
+           I18N:
+              name_param: lang
+              name_session: language
+
+    Automaticaly settings locales must installed libintl-perl in version
+    1.17 or newer.
+
+        plugins:
+           I18N:
+              setlocale: "LC_TIME"
+
+    Or defined as array:
+
+        plugins:
+           I18N:
+              setlocale: ["LC_TIME","LC_NUMERIC"]
+
+    When you set LC_TIME and use time function for print day name or month
+    name, then will be printed in localed name.
+
+METHODS
+  languages
+    Contains languages.
+
+       languages(['de_DE']);
+       my $lang = languages;
+       print join '', @$lang;
+
+   1. Putting new language as first in finded
+       languages('de_DE');
+
+   2. Erase all and putting new languages as in arrayref
+       languages(['de_DE',....,'en']);
+
+   3. Return putted languages
+       languages();
+
+  language
+    return selected locale in your locales list or check if given locale is
+    used(same as language_tag).
+
+  language_tag
+    return language tag for current locale. The most notable difference from
+    this method in comparison to "language()" is typically that languages
+    and regions are joined with a dash and not an underscore.
+
+        language(); # en_us
+        language_tag(); # en-us
+
+   1. Returning selected locale
+            print language_tag();
+
+   2. Test if given locale used
+            if (language_tag('en')) {}
+
+  installed_languages
+    Returns a hash of { langtag => "descriptive name for language" } based
+    on language files in your application's I18N directory. The descriptive
+    name is based on I18N::LangTags::List information. If the descriptive
+    name is not available, will be undef.
+
+   1. Returning hashref installed language files
+            my $l = installed_language();
+
+   2. Test if given locale is installed in hashref
+            my $t = installed_language('en');
+
+  localize | l
+    Localize text.
+
+        print localize( 'Welcome to Dancer, [_1]', 'sri' );
+
+    is same as
+
+        print l( 'Welcome to Dancer, [_1]', 'sri' );
+
+    or in template
+
+        <% l('Welcome to Dancer, [_1]', 'sri' ) %>
+
+OUTLINE
+        $ dancer -a MyAPP
+        $ cd MyAPP
+        $ mkdir I18N
+        $ xgettext.pl --output=I18N/messages.pot --directory=lib/
+        $ ls I18N/
+        messages.pot
+
+        $ msginit --input=messages.pot --output=sv.po --locale=sv.utf8
+        Created I18N/sv.po.
+
+        $ vim I18N/sv.po
+
+        "Content-Type: text/plain; charset=utf-8\n"
+
+        #: lib/MyApp.pm:50
+        msgid "Guest"
+        msgstr "Gäst"
+    
+        #. ($name)
+        #: lib/MyApp.pm:54
+        msgid "Welcome %1!"
+        msgstr "Välkommen %1!"
+
+        $ xgettext.pl --output=I18N/messages.pot --directory=view/
+        $ msgmerge --update I18N/sv.po I18N/messages.pot
+        . done.
+
+        # compile message catalog to binary format
+        $ msgfmt --output-file=I18N/sv.mo I18N/sv.po
+
+SEE ALSO
+    Dancer
+
+    Catalyst::Plugin::I18N
+
+AUTHOR
+    Igor Bujna <igor.bujna@post.cz>
+
+ACKNOWLEDGEMENTS
+    Thanks for authors of Catalyst::Plugin::I18N with idea how make it.
+
+    franck cuny <franck@lumberjaph.net> for Dancer::Plugin:i18n
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

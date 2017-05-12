@@ -1,0 +1,9 @@
+#!/usr/bin/env perl
+
+use v5.22;
+
+use lib './lib', 'tools/lib';
+
+use ModuleGenerator;
+
+exit ModuleGenerator->new_with_options->run;

@@ -1,0 +1,96 @@
+=head1 NAME
+
+Binary mod_perl distributions
+
+=head1 Description
+
+This document includes links to various binary mod_perl distributions.
+
+If you know about a distribution that isn't listed here, please tell
+us (by announcing it at the L<mod_perl list|maillist::modperl>).
+
+See also L<the source distributions|download::source> and the
+L<bundles|download::bundles>.
+
+=head1 How to get pre-compiled mod_perl
+
+=head2 Win32 mod_perl 1.0
+
+Win32 mod_perl Binaries (made by Randy Kobes) -
+ftp://theoryx5.uwinnipeg.ca/pub/other/. Grab the perl-win32-bin.exe
+self-extracting file. There's accompanying readme files with more details
+on the particular versions of packages included. These all include Perl
+and some common modules, so are largish.
+
+For more information please read the L<Win32
+Documentation|docs::1.0::os::win32::index>.
+
+=head2 Win32 mod_perl 2.0 (BETA)
+
+An experimental mod_perl-2.0 win32 binary package is available at
+ftp://theoryx5.uwinnipeg.ca/pub/other/Apache2.tar.gz for those Win32
+users who want a preview of things to come.
+
+This archive will unpack into an "Apache2" directory, underneath which
+is a "blib" subdirectory containing the necessary perl files. These
+are included when starting Apache by a modperl directive found near
+the end of I<conf/httpd.conf>, where a sample "Hello World" modperl
+handler is also found. Some editing of I<httpd.conf> will be necessary
+if this package is installed in a location other than
+I<"\Apache2">. 
+
+The package was compiled with the recent cvs sources, using
+VC++ 6 and an ActivePerl based on perl-5.6.1. The F<mod_perl.so>
+library in the Apache I<modules/> directory will most probably not
+work with other Apache-2 binary packages.
+
+Being under development, there are most likely bugs present.
+For questions/problems on Apache-2, see the
+docs at http://httpd.apache.org/docs-2.0/, and for modperl-2, see the
+information on L<subscribing to the "dev" mailing list|maillist::dev>.
+
+Also available at ftp://theoryx5.uwinnipeg.ca/pub/other/
+is a package F<perl-5.8-win32-bin.tar.gz> containing
+a binary distribution of perl-5.8/apache-2/mod_perl-2, also
+compiled with recent cvs sources. This will unpack into
+two directories - I<Perl> and I<Apache2> - as well as an
+F<INSTALL.txt> file containing installation instructions.
+
+=head2 Win32 Active Perl
+
+Win32 ActivePerl mod_perl ppms - suitable for builds 6xx.  You can install
+this by, within the ppm shell, setting the repository to
+I<http://theoryx5.uwinnipeg.ca/cgi-bin/ppmserver?urn:/PPMServer> and
+typing C<install mod_perl> (or C<install mod_perl-eapi> if you're
+running a mod_ssl-enabled Apache). This will also run a post-install 
+script to
+install the required mod_perl.so to your Apache modules/ directory - if this
+does not work, grab the F<mod_perl.tar.gz> file under
+http://theoryx5.uwinnipeg.ca/ppmpackages/x86/ and extract
+F<mod_perl.so> from there. This
+mod_perl package is built against the current stable Apache release.
+Some ppms of other Apache modules are also available
+in this repository.
+
+Also available in this repository is a mod_perl-2 ppm package,
+which you can install within the ppm shell as C<install mod_perl-2>.
+
+=head2 RedHat Linux
+
+Static mod_perl and libapreq (Apache::Request) RPMs and SRPMs (made by
+David Harris ) http://www.davideous.com/modperlrpm/distrib/. Mirrored at
+http://perl.apache.org/rpm/.
+
+=head2 RedHat Linux (including php3)
+
+i386 RPMs + SRPM (RedHat) of Apache with mod_perl and php3 built
+staticaly. (made by Vladimir Ivaschenko)
+http://www.hazard.maks.net/apache/
+
+=head2 other OS
+
+OS vendors may supply their own pre-compiled version of mod_perl.
+Refer to your OS vendor to figure out if they provide a binary version
+of mod_perl.
+
+=cut

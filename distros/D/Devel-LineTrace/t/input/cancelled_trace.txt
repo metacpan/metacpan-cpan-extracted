@@ -1,0 +1,6 @@
+t/scripts/script1.pl:8
+    print "\$i=$i\n";
+# t/scripts/script1.pl:10
+    print "Hello there!\n";
+t/scripts/script1.pl:12
+    print "\$j=$j\n";

@@ -1,0 +1,289 @@
+Revision history for Dist-Zilla-PluginBundle-Author-RWSTAUNER
+
+6.001     2016-06-17T04:00:37Z
+
+  - Require dzil v6 so that tests work with Path::Tiny.
+
+4.213     2016-06-17T03:22:00Z
+
+  - Change tests to not expect Path::Class for compatibility with dzil v6.
+
+4.212     2016-03-06T02:36:26Z
+
+  - Keep the 'for test_synopsis' portion.
+
+4.211     2016-03-05T14:56:26Z
+
+  - Weave 'test_synopsis' region before Synopsis for Test::Synopsis.
+
+4.210     2015-10-17T17:16:14Z
+
+  - Add GitHubREADME::Badge
+  - Allow overriding readme building phase from ENV.
+
+4.209     2015-07-19T02:13:42Z
+
+  - Replace ContributorsFromGit with Git::Contributors.
+    Thanks to Karen Etheridge for the pull req! (gh-2)
+
+4.208     2015-05-26T01:30:53Z
+
+  - Remove 'builder' option and just use MakeMaker.
+    Any dist can '-remove = MakeMaker' and add ModuleBuild/DualBuilders.
+    This also removes this dist's dependency on MB and DB.
+    Thanks to Karen Etheridge for prompting me to clean the cruft! [rt-104634]
+  - Remove DZP Test::PodSpelling from prereqs (recommends only).
+  - Add cover_db to generated manifest skip file.
+
+4.207     2015-04-01T05:14:25Z
+
+  - Add /x to skip_plugins regexp.
+  - Make skip_plugins work on bundles, too.
+  - Add basic LICENSE file when minting.
+
+4.206     2015-03-01T03:58:20Z
+
+  - Remove Test::ChangesHasContent so that xt doesn't fail in CI.
+    (Before Release CheckChangeHasContent remains.)
+
+4.205     2015-02-28T18:12:15Z
+
+  - Don't Gather files copied from release.
+
+4.204     2015-02-28T03:54:45Z
+
+  - Set authority to 'cpan:RWSTAUNER' by default so that the bundle
+    operates on computers without a ~/.pause file.
+  - Copy LICENSE from build to root and automatically commit it on release.
+  - Add 'copy_files' attribute to specify additional files to copy from build.
+  - Bump ReadmeAnyFromPod prereq and set 'phase' to 'release'.
+
+4.203     2014-12-11T23:47:53Z
+
+  - Trade Bugtracker and Repository for AutoMetaResources.
+  - Put PkgVersion before other FileMunger plugins
+  - Add local, perl5, and fatlib as no_index directories
+
+4.202     2014-05-05T03:31:07Z
+
+  - Bump prereq on @TestingMania to use Test::NoTabs instead of NoTabsTest.
+  - Change README minter template from pod to markdown.
+
+4.201     2014-02-01T16:40:02Z
+
+  - Bump Dist::Zilla and Pod::Weaver prereqs for Encoding updates.
+
+4.200     2014-02-01T16:19:23Z
+
+  - Change Pod::Weaver::Plugin '-Encoding' for the new core '-SingleEncoding'.
+    Thanks, Sergey Romanov!
+  - Change generated README in repo root back to markdown to get metacpan urls.
+
+4.102     2013-07-09T23:28:02Z
+
+  - Add 'open_source' option which can be disabled for darkpan projects
+    to exclude various cpan/meta/repo/xt/change log plugins.
+
+4.101     2013-04-10T05:42:18Z
+
+  [Test Fixes]
+  - Fix unintentional failure to stringify dir arg to Git::Wrapper in tests
+    to avoid test report failures with Git::Wrapper 0.028_96 dev release
+
+4.100     2013-04-06T03:22:21Z
+
+  - Add MintingProfile and use PluginBundle::Easy to generate mint files
+  - Bump Pod::Weaver::Section::Support prereq to 1.005 and configure it
+    to only link to metacpan (since that links to everything else).
+
+4.000     2013-03-24T05:25:29Z
+
+  - Use BundleInspector plugin to determine prereq info and generate
+    "roughly equivalent" ini configs in pod.
+  - Include plugin version requirements in plugin specs as ':version'
+    instead of 'use' statements (and get rid of the use statements).
+  - Revert to basic Readme in dist
+  - Generate README.pod (instead of markdown) in repo root for github
+    (ReadmeAnyFromPod instead of ReadmeMarkdownFromPod + CopyReadmeFromBuild)
+  - Remove 'disable_tests' and 'skip_prereqs' in favor of role-based
+    '-remove' and 'AutoPrereqs.skip'
+  - Add Tests::ChangesHasContent, CheckMetaResources, CheckPrereqsIndexed
+  - Collect contributors from git and list in meta and pod
+  - Collect =class_method pod commands
+
+3.203     2011-12-10T00:02:58Z
+
+  - Consume PluginRemover role to get '-remove' magically
+
+3.202     2011-11-19T18:25:57Z
+
+  - Put 'Changes' back into @Git's allow_dirty
+  - Reorder plugins so ConfirmRelease is last BeforeRelease
+
+3.201     2011-11-18T04:20:13Z
+
+  - Use ReadmeMarkdownFromPod and CopyReadmeFromBuild to automate
+    a more useful github readme
+  - Load @Git bundle earlier (before releaser)
+
+3.200     2011-10-19T23:49:56Z
+
+  - Move some logic out into Config::MVP::Slicer
+    and consume Dist::Zilla::Role::PluginBundle::Config::Slicer
+  - Update tests
+
+3.108     2011-10-03T13:59:32Z
+
+  [Prereqs]
+  - Pod::Weaver::Plugin::Encoding
+  - By default just use MakeMaker; set 'builder' to 'mb' or 'both'
+    for ModuleBuild and/or DualBuilders
+  - Bump @TestingMania required version to 0.14
+  - Don't require OurPkgVersion
+
+  [Fixes]
+  - s/CompileTests/Test::Compile/g
+  - Stop pruning dist.ini; it should be a familiar file for people
+  - Fix regexp to actually prune cover_db/
+
+3.107     2011-08-16T23:01:28Z
+
+  [Changes]
+  - Use 'placeholder_comments' config attribute to decide how
+    $VERSION and $AUTHORITY should work (default to false).
+
+  [Prereqs]
+  - Require Prepender 1.112280 to skip prepending to tests
+  - Require rather than recommend DZP::Run
+
+3.106     2011-08-10T02:55:03Z
+
+  [Changes]
+  - use place holder comments for VERSION and AUTHORITY
+  - Place Acknowledgements above Authors pod (and add stop word)
+
+  [Prereqs]
+  - Trade PkgVersion for OurPkgVersion
+  - Require latest version of Authority
+  - Use DZP Test::PodSpelling instead of DZP PodSpellingTests
+  - Recommend Dist::Zilla::Plugin::Run (used by some projects)
+
+3.105     2011-07-14T23:41:38Z
+
+  - Update metadata
+
+3.104     2011-07-05T23:36:30Z
+
+  - Don't automatically require Test::More 0.96
+  - Don't include Devel::Cover's cover_db/ in dist
+  - Dump plugins to log if $ENV{DZIL_BUNDLE_DEBUG}
+  - Fix regexp to match class by "Plugin" or "PluginBundle"
+
+3.103     2011-06-22T03:07:14Z
+
+  - Fix name of recommended plugin (PodSpellingTests not SpellingTests)
+
+3.102     2011-06-22T03:01:05Z
+
+  [Prereqs]
+  - Dist::Zilla::Plugin::PodSpellingTests no longer a hard requirement
+
+  [Fixes]
+  - Don't overwrite CompileTests.fake_home with default if it's set in config
+  - Ignore any number of Bundle prefixes from plugin names
+    (to allow dynamic configuration of plugins added by bundles)
+  - Improvements to tests
+
+3.101     2011-06-16T02:52:05Z
+
+  - Require Bootstrap::lib plugin so that it's available
+  - Allow cpanm to choose best place to install (install_command)
+  - Remove qw(anno forum kwalitee) from SUPPORT websites
+  - Remove Test::Pod::No404s since most links are generated
+
+3.100     2011-05-10T03:16:24Z
+
+  - Use CheckExtraTests instead of ExtraTests to keep xt/ directory
+  - Change date format (in Changes file) to W3CDTF for unambiguous dates
+  - Match skip_plugins against full name or package (rather than suffix)
+  - Allow blank 'releaser' attribute to skip default releaser plugin
+
+  [Prereqs]
+  - Bump required Dist::Zilla to 4.200005
+  - Bump required @TestingMania to 0.010 (bug fix)
+
+3.000     2011-04-14T05:24:45Z
+
+  - Rework configure() to modify actual 'plugins' attribute
+    so that add_plugins() and add_bundle() can be used
+
+  [Add Dist::Zilla Plugins]
+  - use InstallRelease with 'install_command' attribute
+  - use @TestingMania bundle
+  - use @Git bundle (instead of individual plugins)
+
+  - Explicitly prune some non-release files
+  - Generate a MANIFEST.SKIP file to satisfy tests/historical expectations
+
+2.001     2011-04-13T02:25:30Z
+
+  - "use" recently required modules (*::Test::Pod::*)
+  - test script fix
+
+2.000     2011-04-12T15:32:00Z
+
+  - Rename module into Author:: namespace
+
+  - Use the @Git bundle by default
+
+  - Replace deprecated Dist::Zilla::Plugin::PodLinkTests with
+    Dist::Zilla::Plugin::Test::Pod::LinkCheck and
+    Dist::Zilla::Plugin::Test::Pod::No404s
+
+1.002     2011-04-11T21:27:00Z
+
+  [Deprecations]
+  - The current namespace is deprecated.
+    This always was/should have been an Author bundle.
+
+  [Add Dist::Zilla Plugins]
+  - Prepender
+  - Git::NextVersion (instead of Git::DescribeVersion)
+
+1.001     2011-02-10T16:02:06Z
+
+  - Manage Changes respectably by replacing GitFmtChanges plugin
+  with NextRelease, CheckChangesHasContent, and CPANChangesTests
+
+1.000007  2011-01-19T22:07:00Z
+
+  - remove Moose::Autobox dependency
+  - allow attributes to be overridden in dist.ini for any included plugin
+  - add 'skip_plugins' option
+
+0.009007  2010-12-30T15:39:00Z
+
+  - Use Pod::Weaver::Plugin::WikiDoc
+
+0.008004  2010-12-16T20:16:00Z
+
+  - Require Dist::Zilla::Stash::PodWeaver
+
+  [Add Dist::Zilla Plugins]
+  - Authority
+  - DualBuilders (prefer 'build')
+  - PodLinkTests if available
+  - PodSpellingTests
+  - ReportVersions::Tiny
+
+  [Add Pod::Weaver Plugins]
+  - StopWords
+
+0.004001  2010-11-17T07:48:00Z
+
+  - Use Dist::Zilla::Plugin::GithubMeta
+  - Lower required version of Pod::Weaver::Section::Support
+
+0.003011  2010-11-15T14:50:00Z
+
+  - Initial Release to CPAN

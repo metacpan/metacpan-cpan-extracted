@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Dist/Zilla/Plugin/Version/Git/Flowish.pm
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/simple.t

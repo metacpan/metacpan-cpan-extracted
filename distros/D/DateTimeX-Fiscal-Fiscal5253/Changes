@@ -1,0 +1,184 @@
+Revision history for Perl extension DateTimeX::Fiscal::Fiscal5253
+
+2014-06-29 15:30  jim
+    Version 2.01
+    * Changed to Moo
+    * Changed to Test::Exception in some tests
+
+2014-06-29 15:30  jim
+    Version 1.06
+    * Set minimum Perl version to 5.8.8 in Makefile.PL
+    * Removed unwanted accessor for "date" from automatic generation code.
+    * "contains" now returns "undef" instead of "0" if the date isn't in
+      the specified calendar.
+    * Changed from using "lc()" to "tr/A-Z/a-z/" for case conversion.
+    * Cleaned up code to generate week attributes.
+    * Corrected spelling mistakes, updated POD for "containers".
+    * Updated Makefile.PL to use more modern conventions.
+
+2014-06-10 23:30  jim
+    Version 1.05
+    * Added code to deal with what seems to be a bug in gmtime() in
+      Perl 5.10.0 built on a Win32 v5.x platform.
+
+2014-06-08 17:00  jim
+
+    Version 1.04
+    * Changed to automatic accessor generation
+    * Changed to automatic generation of period and week attribute methods
+    * Changed to FATAL warnings
+    * Made calling of code refs consistent with OO module style
+    * Better regex patterns for param validation
+    * Added more paramter edge testing for the contructor
+    * All test scripts have a plan now
+    * Added/imporved comments where needed
+    * Changed abstract in POD
+    * perltidy pass on all files
+
+2013-09-21 22:30  jim
+
+    * Corrected error that prevented proper parsing of mm/dd/yyyy format,
+      added test to confirm fix.
+
+2012-08-11 05:46  jim
+
+	* lib/DateTimeX/Fiscal/Fiscal5253.pm, t/30_methods.t,
+	  t/80_sanity.t: Changed contains to return week number by default.
+
+2012-08-10 10:18  jim
+
+	* lib/DateTimeX/Fiscal/Fiscal5253.pm: Spelling corrections, etc. to
+	  POD
+
+2012-08-10 03:30  jim
+
+	* Changes: Updated notes for release 1.01
+
+2012-08-10 03:24  jim
+
+	* lib/DateTimeX/Fiscal/Fiscal5253.pm, t/20_accessors.t,
+	  t/30_methods.t, t/80_sanity.t: Numerous changes to implement week
+	  numbers.
+	  Changes to API to standardize parameters.
+	  Updates to documentaton and tests for above.
+
+2012-08-09 20:57  jim
+
+	* README: corrected spelling errors
+
+2012-08-09 20:53  jim
+
+	* MANIFEST: Added missing LICENSE file
+
+2012-08-09 20:52  jim
+
+	* LICENSE: Added missing LICENSE file
+
+2012-07-30 05:57  jim
+
+	* README, lib/DateTimeX/Fiscal/Fiscal5253.pm, t/10_constructors.t,
+	  t/30_methods.t: Changed error handling to croak on error.
+
+2012-07-22 19:46  jim
+
+	* lib/DateTimeX/Fiscal/Fiscal5253.pm: Changed version number for
+	  release
+
+2012-07-22 02:12  jim
+
+	* README: Corrected wrong number of days for a 52 week year.
+
+2012-07-22 02:09  jim
+
+	* lib/DateTimeX/Fiscal/Fiscal5253.pm: Eliminated unitialized
+	  variable $style at line 55
+
+2012-07-21 21:40  jim
+
+	* Changes: Updates to Changes
+
+2012-07-21 21:31  jim
+
+	* README: Edited for namespace change
+
+2012-07-21 21:29  jim
+
+	* MANIFEST: Edited for namespace change
+
+2012-07-21 21:27  jim
+
+	* lib/DateTime, lib/DateTimeX, lib/DateTimeX/Calendar,
+	  lib/DateTimeX/Fiscal: Renamed directory lib/DateTime to
+	  lib/DateTimeX
+
+2012-07-21 21:25  jim
+
+	* lib/DateTime/Calendar, lib/DateTime/Fiscal,
+	  lib/DateTime/Fiscal/Fiscal5253.pm: Renamed directory Calendar to
+	  Fiscal
+
+2012-07-21 21:23  jim
+
+	* Makefile.PL, lib/DateTime/Calendar/Fiscal5253.pm, t/00_load.t,
+	  t/10_constructors.t, t/20_accessors.t, t/30_methods.t,
+	  t/80_sanity.t: Made edits to move package from DateTime::Calendar
+	  to DateTimeX::Fiscal namespace.
+
+2012-07-21 20:53  jim
+
+	* Makefile.PL: Corrected author's email address.
+
+2012-07-21 07:16  jim
+
+	* MANIFEST: Removed script dir items
+
+2012-07-21 06:42  jim
+
+	* Changes: Updated Changelog
+
+2012-07-21 05:46  jim
+
+	* lib/DateTime/Calendar/Fiscal5253.pm: Final edit of documentation
+	  and code prior to release.
+
+2012-07-21 05:08  jim
+
+	* Makefile.PL: Added module dependencies
+
+2012-07-21 05:07  jim
+
+	* t/10_constructors.t, t/20_accessors.t, t/30_methods.t,
+	  t/80_sanity.t, t/90_pod.t, t/91_coverage.t: Test suite for
+	  initial release
+
+2012-07-21 05:06  jim
+
+	* MANIFEST: Added additional test scripts
+
+2012-07-20 08:32  jim
+
+	* t/90_pod.t: checking in, again
+
+2012-07-20 08:27  jim
+
+	* t/90_pod.t: Cleaning up cruft in output
+
+2012-07-20 08:24  jim
+
+	* t/90_pod.t, t/99_pod.t: Renaming so there is room in the
+	  namespace for POD coverage tests
+
+2012-07-16 23:59  jim
+
+	* t/99_pod.t: Initial checkin
+
+2012-07-14 03:01  jim
+
+	* Changes, MANIFEST, Makefile.PL, README, lib, lib/DateTime,
+	  lib/DateTime/Calendar, lib/DateTime/Calendar/Fiscal5253.pm, t,
+	  t/00_load.t: Initial import
+
+2012-07-14 02:55  jim
+
+	* .: Creating project repository structure.
+

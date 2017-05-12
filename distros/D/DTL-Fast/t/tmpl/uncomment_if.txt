@@ -1,0 +1,23 @@
+This block has
+{% comment been commented %}
+{% if condition1 %}
+line 1
+{% uncomment breaks logick %}
+line 2
+{% enduncomment %}
+line 3
+{% elif condition2 %}
+{% uncomment breaks logick %}
+line 4
+line 5
+{% enduncomment %}
+line 6
+{% else %}
+{% uncomment breaks logick %}
+line 7
+line 8
+line 9
+{% enduncomment %}
+{% endif %}
+{% endcomment %}
+some logick

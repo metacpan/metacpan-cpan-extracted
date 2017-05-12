@@ -1,0 +1,254 @@
+#!/usr/bin/perl -w
+# project_bin - Run a program in the project bin directory
+# See copyright, etc in below POD section.
+######################################################################
+
+use Pod::Usage;
+
+use Dir::Project;
+use strict;
+use vars qw ($Debug $VERSION);
+
+######################################################################
+# configuration
+
+$VERSION = '3.026';
+
+######################################################################
+# main
+
+my @Orig_ARGV = @ARGV;
+
+my $opt_run = $0;
+$opt_run =~ s/^.*[\\\/]//g;  # Strip path
+my $opt_which;
+
+my @params = ();
+# read command line
+while(defined($_ = shift)) {
+    if (/^--?project_bin-debug/) {
+	debug(9);
+    }
+    elsif (/^--?project_bin-help/) {
+	usage();
+    }
+    elsif (/^--?project_bin-run(=(.*))?$/) {
+	if ($1) { $opt_run = $2; }
+	else { $opt_run = shift; }
+    }
+    elsif (/^--?project_bin-version/) {
+	print "Version $VERSION\n";
+    }
+    elsif (/^--?project_bin-which/) {
+	$opt_which = 1;
+    }
+    elsif (/^--?debug/) {
+	# Turn on our debug and pass to application too
+	debug();
+	push @params, $_;
+    }
+    else {
+	push @params, $_;
+    }
+}
+
+$ENV{DIRPROJECT_PREFIX} or die "%Error: project_bin: DIRPROJECT_PREFIX not in environment\n";
+$ENV{DIRPROJECT_PATH}   or die "%Error: project_bin: DIRPROJECT_PATH not in environment\n";
+
+if ($opt_run eq "project_which"
+    || ($opt_run eq "project_bin" && $opt_which)) {
+    $opt_which = 1;
+    $params[0] or die "%Error: Bad usage, need program name to resolve\n";
+    $opt_run = shift @params;
+}
+elsif ($opt_run eq "project_bin") {
+    print STDERR "%Error: project_bin should be symlinked to a program name, not called directly\n";
+    die "%Error: Bad usage, try 'project_bin --project_bin-help'\n";
+}
+
+Dir::Project::get_set_all();
+my @paths = Dir::Project::program_paths(program=>$opt_run);
+my $program_wdir = Dir::Project::program_bin(paths=>\@paths);
+
+if (!defined $program_wdir) {
+    if (!defined $Project) {
+	# If there's no default program, we MUST have a project link!
+	print STDERR "project_bin: %Error: Can't determine DIRPROJECT\n";
+	print STDERR "\tPerhaps you intended to be inside a checkout,\n\tor in a directory with project link?\n";
+	exit (10);
+    }
+    else {
+	print STDERR "%Error: Can't find \"".join(':',@paths),"\": No such file\n";
+	print STDERR "(Accessed via project_bin with \$DIRPROJECT='$Project')\n";
+	exit (10);
+    } # else already found
+}
+
+print "project_bin: exec $program_wdir\n" if $Debug;
+$ENV{DIRPROJECT_EXE} = $program_wdir;
+if ($opt_which) {
+    print "$program_wdir\n";
+    exit(0);
+} else {
+    exec $program_wdir, @params;
+    # Above should never return, unless error
+    exit (20);
+}
+
+######################################################################
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub debug {
+    my $level = shift || 1;
+    $Debug = $level;
+    $Dir::Project::Debug = $level;
+    $ENV{DIRPROJECT_DEBUG} = $level;
+    print "project_bin: $0 ", join(' ',@Orig_ARGV), "\n";
+}
+
+######################################################################
+######################################################################
+######################################################################
+
+__END__
+
+=pod
+
+=head1 NAME
+
+project_bin - Call a Dir::Project specific program
+
+=head1 SYNOPSIS
+
+  [program] [program_arguments]
+  [program] --project_bin-help
+  [program] --project_bin-which
+  project_which [program]
+
+  # Example script dispatching
+  cd ~/project1
+  project_dir --project
+     /path/to/project1
+  my_tool my_args....   # Executes project1/.../my_tool
+
+  cd ~/project2
+  project_dir --project
+     /path/to/project2
+  my_tool my_args....   # Executes project2/.../my_tool
+
+=head1 DESCRIPTION
+
+L<project_bin> is used to call another project specific program under the
+current project as determined with L<project_dir>.
+
+This program is not usually called directly.  Instead project_bin is
+symlinked as the name of the program to be executed.  project_bin then uses
+that name to determine the program to be called.  Alternatively the
+--project_bin-run option may be used to specify what to execute directly.
+
+This process enables multiple versions of a program to exist in different
+project directories.  The global path only contains a simple non-changing
+symlink which everyone can share.
+
+=head1 EXAMPLE
+
+Assume C<prog> is to be executed.  The shell uses the standard PATH
+environment variable and finds C<prog> under $DIRPROJECT_PREFIX/bin/prog.
+$DIRPROJECT_PREFIX/bin/prog is installed as a simple symlink to
+L<project_bin>.  Thus the shell executes project_bin.
+
+Project_bin then determines the current project and sets the DIRPROJECT
+environment variable, which has the link to the current project area.  See
+L<Dir::Project> program_bin() for more details.
+
+Project_bin then uses the DIRPROJECT directory in combination with the
+DIRPROJECT_PATH to search for C<prog>, the name project_bin was invoked
+under.  C<prog> is then executed with all of the arguments passed through
+project_bin.
+
+If project_bin couldn't determine the project or find the binary using
+DIRPROJECT_PATH, it tries to execute
+$DIRPROJECT_PREFIX/bin/C<prog>__notfound which is generally a link to a
+version of C<prog> that is the default for when outside a project.
+
+Instead of symlinking, you can make a script to call project_bin.  This
+allows the name of the script to differ from the name of the linked
+program, and also allows it to work on systems without symlinks.
+
+  #!/usr/bin/perl -w
+  exec 'project_bin', '--project_bin-run', 'name_of_script', @ARGV;
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --debug
+
+The debug flag is passed to the application, and also enables debugging
+messages from project_bin itself.
+
+=item --project_bin-debug
+
+Strip this flag before passing to the application, and enable debugging.
+
+=item --project_bin-help
+
+Show this help message and exit.
+
+=item --project_bin-run I<program>
+
+Specify the program name to be executed.  If not specified, presumes
+project_bin is symlinked, and $0 contains the name of the program to
+execute.  See the example above.
+
+=item --project_bin-version
+
+Show program version and exit.
+
+=item --project_bin-which
+
+Instead of running the program, print the resolved path, similar to the
+"which" program.  If you symlink project_bin to project_which, this will be
+the default action.
+
+=item I<...>
+
+All other arguments are passed through to the application.
+
+=back
+
+=head1 ENVIRONMENT
+
+See L<Dir::Project> for the list of relevant environment variables.
+
+=head1 DISTRIBUTION
+
+Dir-Project is part of the L<http://www.veripool.org/> free EDA software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/>.
+
+Copyright 2001-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Dir::Project>, L<project_dir>
+
+=cut
+
+######################################################################

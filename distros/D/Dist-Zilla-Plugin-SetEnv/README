@@ -1,0 +1,94 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [SetEnv]
+
+DESCRIPTION
+
+    This plugin sets various environment variables so when one of your
+    plugins runs another program or script, the program can get various
+    information about Dist::Zilla or the building process through the
+    environment variables.
+
+    Plugin ordering is important. Generally you should put this SetEnv
+    plugin before any other plugin that you might want to run programs
+    from, so SetEnv already has the chance to set e.g. DZIL_PHASE.
+
+ENVIRONMENT
+
+ DZIL => bool
+
+    Can be used by programs/scripts to tell that they are running under
+    Dist::Zilla.
+
+    This is set to 1 at the "before build" phase.
+
+ DZIL_NAME => set
+
+    Can be used by programs/scripts to tell what distribution is being
+    built.
+
+    This is set to $zilla->name at the "before build" phase.
+
+    Example: App-YourApp
+
+ DZIL_PHASE => str
+
+    Can be used by programs/scripts to tell what phase they are in.
+
+    This is set to before_build at the "before build" phase.
+
+    Set to before_mint at the "before mint" phase.
+
+    Set to before_release at the "before release" phase.
+
+    Set to make_module at the "make module" (ModuleMaker) phase.
+
+    Set to gather_files at the "file gathering" phase.
+
+    Set to set_file_encodings at the "set file encodings" phase.
+
+    Set to prune_files at the "file pruning" phase.
+
+    Set to provide_version at the "provide version" phase.
+
+    Set to munge_files at the "file munging" phase.
+
+    Set to register_prereqs at the "register prereqs" phase.
+
+    Set to provide_meta at the "meta provider" phase.
+
+    Set to setup_installer at the "setup installer" phase.
+
+    Set to before_archive at the "before archive" phase.
+
+    Set to after_build at the "after build" phase.
+
+    Set to after_mint at the "after mint" phase.
+
+    Set to after_release at the "after release" phase.
+
+ DZIL_NAME => str
+
+    This is set to 1 at the "before build" phase.
+
+ DZIL_RELEASING => bool
+
+    Included for completeness. This is not set by this plugin, but by
+    Dist::Zilla itself at the beginning of the release process.
+
+    Can be used by programs/scripts to tell that they are in a release
+    process.
+
+ DZIL_TESTING => bool
+
+    Can be used by programs/scripts to tell that they are in a test
+    process.
+
+    Conditionally set to 1 at the "before build" phase.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::ReportPhase
+

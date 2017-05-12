@@ -1,0 +1,20 @@
+Food                001       NULL
+Beans and Nuts      002       001
+Beans               003       002
+Nuts                004       002
+Black Beans         005       003
+Pecans              006       004
+Kidney Beans        007       003
+Red Kidney Beans    008       007
+Black Kidney Beans  009       007
+Dairy               010       001
+Beverages           011       010
+Whole Milk          012       011
+Skim Milk           013       011
+Cheeses             014       010
+Cheddar             015       014
+Stilton             016       014
+Swiss               017       014
+Gouda               018       014
+Muenster            019       014
+Coffee Milk         020       011

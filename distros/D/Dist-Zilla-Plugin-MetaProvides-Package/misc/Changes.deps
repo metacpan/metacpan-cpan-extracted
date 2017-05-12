@@ -1,0 +1,290 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+2.004003
+
+2.004002 2016-08-03T16:41:52Z
+
+2.004001 2016-07-08T03:22:43Z
+ [Added / runtime requires]
+ - Carp
+
+ [Added / test requires]
+ - Dist::Zilla::Role::FileFinder
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper 0.003000
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+2.004000 2016-04-27T02:37:23Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::ModuleMetadata
+
+ [Removed / runtime requires]
+ - Module::Metadata 1.000022
+
+2.003002 2016-04-15T06:21:44Z
+
+2.003001 2015-01-15T18:39:26Z
+ [Added / runtime requires]
+ - PPI::Document
+
+2.003000 2015-01-11T04:57:16Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::PPI
+
+2.002000 2014-12-29T17:46:59Z
+
+2.001003 2014-12-10T10:50:56Z
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / runtime requires]
+ - Safe::Isa
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / runtime requires]
+ - perl 5.010 → 5.008
+
+ [Removed / runtime requires]
+ - Moose::Autobox
+ - utf8
+
+2.001002 2014-09-04T19:04:06Z
+
+2.001001 2014-08-29T12:00:46Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.002 → 1.003001
+
+2.001000 2014-08-24T20:33:44Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper 0.003000
+
+ [Added / test requires]
+ - Module::Metadata 1.000022
+ - Test::DZil
+
+ [Changed / runtime requires]
+ - Module::Metadata 1.000005 → 1.000022
+
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000011 → 1.002
+
+2.000004 2014-08-15T21:17:41Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+2.000003 2014-07-28T23:48:39Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+2.000002 2014-07-13T19:42:09Z
+
+2.000001 2014-02-06T17:13:11Z
+ [Added / runtime requires]
+ - Dist::Zilla 5.000
+
+2.000000 2014-02-02T06:25:35Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4204
+
+ [Removed / configure requires]
+ - Module::Build 0.4204
+
+ [Removed / runtime requires]
+ - IO::String
+
+1.15000003 2014-01-13T06:37:51Z
+ [Added / runtime requires]
+ - utf8
+
+ [Changed / build requires]
+ - Module::Build 0.4203 → 0.4204
+
+ [Changed / configure requires]
+ - Module::Build 0.4203 → 0.4204
+
+1.15000002 2014-01-08T08:12:21Z
+ [Changed / build requires]
+ - Module::Build 0.4202 → 0.4203
+
+ [Changed / configure requires]
+ - Module::Build 0.4202 → 0.4203
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.010
+
+1.15000001 2013-11-22T04:02:12Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+1.15000000 2013-09-21T07:43:15Z
+ [Added / runtime requires]
+ - Dist::Zilla::Plugin::FinderCode
+ - MooseX::LazyRequire
+
+ [Added / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / runtime requires]
+ - Dist::Zilla::Plugin::MetaProvides 1.14000000 → 1.15000000
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+1.14000003 2013-07-09T01:30:35Z
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4005
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4005
+
+ [Changed / runtime requires]
+ - Data::Dump 0 → 1.16
+
+1.14000002 2013-04-09T03:09:31Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+1.14000001 2012-02-26T20:46:35Z
+ [Changed / runtime requires]
+ - Module::Metadata 0 → 1.000005
+
+1.14000000 2012-02-07T14:46:46Z
+ [Added / runtime requires]
+ - IO::String
+ - Module::Metadata
+ - MooseX::Types::Moose
+
+ [Added / test requires]
+ - File::Temp
+
+ [Changed / runtime requires]
+ - Dist::Zilla::MetaProvides::ProvideRecord 0 → 1.14000000
+ - Dist::Zilla::Plugin::MetaProvides 1.12044806 → 1.14000000
+
+ [Removed / runtime requires]
+ - File::Temp
+ - Module::Extract::Namespaces 0.14
+ - Module::Extract::VERSION 0.13
+
+1.12060502 2012-02-04T03:50:41Z
+ [Added / runtime requires]
+ - Data::Dump
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+1.12060501 2011-04-08T13:49:06Z
+ [Changed / test requires]
+ - Test::More 0.88 → 0.96
+
+1.12060213 2011-04-06T01:20:11Z
+
+1.12044908 2010-11-07T20:08:27Z
+ [Added / build requires]
+ - Module::Build 0.3601
+
+ [Added / configure requires]
+ - Module::Build 0.3601
+
+ [Added / runtime requires]
+ - Dist::Zilla::MetaProvides::ProvideRecord
+ - Dist::Zilla::Plugin::MetaProvides 1.12044806
+ - Dist::Zilla::Role::MetaProvider::Provider
+ - File::Temp
+ - Module::Extract::Namespaces 0.14
+ - Module::Extract::VERSION 0.13
+ - Moose
+ - Moose::Autobox
+ - namespace::autoclean
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000011
+ - English
+ - File::Find
+ - Test::Fatal
+ - Test::Moose
+ - Test::More 0.88
+
+1.11044404 2010-11-02T16:58:53Z
+ [Removed / build requires]
+ - Module::Build 0.3601
+
+ [Removed / configure requires]
+ - Module::Build 0.3601
+
+ [Removed / runtime requires]
+ - Dist::Zilla::MetaProvides::ProvideRecord
+ - Dist::Zilla::Plugin::MetaProvides 1.11034201
+ - Dist::Zilla::Role::MetaProvider::Provider
+ - Module::Extract::Namespaces 0.14
+ - Module::Extract::VERSION 0.13
+ - Moose
+ - Moose::Autobox
+ - namespace::autoclean
+
+ [Removed / test requires]
+ - Dist::Zilla::App::Tester
+ - File::Find
+ - File::Temp
+ - Test::More 0.88
+
+1.11034304 2010-07-25T16:18:01Z
+ [Removed / runtime requires]
+ - aliased

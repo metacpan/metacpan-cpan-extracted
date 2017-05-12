@@ -1,0 +1,62 @@
+
+		------------------------------------
+			DB_File::DB_Database 0.031
+		------------------------------------
+
+This is the README file for the DB_File::DB_Database packages. Please read it 
+if you install this module for the first time or if there are
+some problems with the module.
+
+This module can handle DB_File database(DB_HASH, key/value pairs) as a table. 
+It also can create index files(DB_BTREE) to faster the searching speed. It is 
+an Beta version, use it at your own risk.
+
+Installation:
+        Perl 5.004 is required.	DB_File is required.
+        To verify the DB_File is installed and work well first is better.
+        
+	Download the tar.gz, unpack it, change to the DB_File::DB_Database
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make install
+
+	instead of just perl Makefile.PL, and in your scripts do
+				   
+		use lib '/your/directory';
+		use DB_File::DB_Database;
+
+	You are free to just copy the 'lib' directory where you want it to
+	have. This should work.
+
+Problems and bug reports:
+	run the flowering to test the package.
+
+	t/1_open_close.t
+	t/2_read_write.t
+	
+	If you found any bugs or make any patches, I would be appriciate 
+	to hear from you.
+
+If it works for you:
+	I'd appreciate any message if you use the module and find it
+	usefull -- I'm just curious what tasks people use the module
+	for and what they expect from it. You can of course also
+	send something more valuable.
+
+
+Copyright: (c) 2001 Ran Ningyu, 
+	rny@yahoo.com.cn http://perl.yesky.net/ at SouthEast University, Nanjing, China.
+	All rights reserved. This package is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.
+
+History:
+
+0.031  2001.10.22: Fix test fail bug, thanks to Jörgen<jorgen@elfi.org>
+
+0.03   2001.05.14: Fix some tiny bugs, Perl -w could run
+
+0.02   2001.05.02: Fixed some tiny bugs.
+
+0.013  2001.04.22: First Released Privately

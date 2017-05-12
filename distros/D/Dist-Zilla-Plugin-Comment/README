@@ -1,0 +1,71 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Comment]
+
+    In lib/Foo.pm:
+
+     ...
+    
+     do_something(); # COMMENT
+    
+     # BEGIN_COMMENT
+     one();
+     two();
+     three();
+     # END_COMMENT
+    
+     =pod
+    
+     =for BEGIN_COMMENT
+    
+     blah
+     blah
+     blah
+    
+     =for END_COMMENT
+    
+     ...
+
+    After build, lib/Foo.pm will become:
+
+     ...
+    
+     ## do_something(); # COMMENT
+    
+     # BEGIN_COMMENT
+     ## one();
+     ## two();
+     ## three();
+     # END_COMMENT
+    
+     =pod
+    
+     =for BEGIN_COMMENT
+    
+     ## blah
+     ## blah
+     ## blah
+    
+     =for END_COMMENT
+    
+     ...
+
+DESCRIPTION
+
+    This plugin finds lines that end with # COMMENT, or blocks of lines
+    delimited by # BEGIN COMMENT ... # END_COMMENT or =for BEGIN_COMMENT
+    ... =end END_COMMENT and comment them out.
+
+    This can be used, e.g. to do stuffs only when the source file is not
+    the dzil-built version, usually for testing.
+
+SEE ALSO
+
+    You can use this plugin in conjunction with
+    Dist::Zilla::Plugin::InsertBlock. DZP:InsertBlock can insert lines that
+    will only be available in the dzil-built version. While for the raw
+    version, you can use DZP:Comment plugin to make lines that will be
+    commented-out in the dzil-built version.
+

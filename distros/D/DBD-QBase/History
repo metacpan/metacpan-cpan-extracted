@@ -1,0 +1,27 @@
+** Version .03 		Public Alpha **
+
+No solution for dynamic loading problems.  Fetch works now with a limit of
+20 columns per row. - GJ
+
+$dbh->do now is executed to do memory management correct -GJ
+
+Added test.pl from DBI...It gives out a lot of information (errors? =),  but
+currently there is not debugging within the DBD so it's not as usefull.
+
+Updated qb.pl with more tests and corrected it to say "test" and not
+"ben" for use name. =)
+
+Hacked Makefile.PL to setup everything correctly. (nearly. =)  You can
+ignore the errors, hopefully, Makefile.PL spits out.
+
+** Version .02 		First Public Alpha **
+
+Can't resolve the ObjC and Perl dynamic loading problems, so I've moved to
+a staticly linked DBI+DBD+Perl5 for my testing.  So far most things work
+excluding anything returning data from the database and anything doing with
+blobs.
+
+** Version .01		First Semi-working alpha code  **
+
+[No comments, internal alpha..Just getting the system to work =) ]
+

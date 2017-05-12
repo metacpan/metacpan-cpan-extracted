@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<config xmlns="http://www.daizucms.org/ns/config/">
+
+ <!-- How to connect to the database.  Attributes:
+         dsn - DBI data source name
+         user - (optional) database username
+         password - (optional) database password
+   -->
+ <database @TEST_DATABASE_CONFIG@ />
+
+ <!-- How to connect to the Subversion repository.  Attributes:
+         url - repository URL
+      Only 'file' URLs have been tested so far, but other schemes,
+      for accessing remote repositories, should work in theory.
+   -->
+ <repository url="@TEST_REPOS_URL@" />
+
+ <!-- Which working copy should the live sites be generated from? -->
+ <live-working-copy id="1" />
+
+ <guid-entity entity="example1.com,2006" />
+
+ <output url="http://www.example.com/" path="@TEST_OUTPUT_DIR@/example.com"
+         redirect-map="@TEST_OUTPUT_DIR@/example.com-redirect.map"
+         gone-map="@TEST_OUTPUT_DIR@/example.com-gone.map"
+         index-filename="index.shtml" />
+ <config path="example.com">
+  <guid-entity entity="example2.com,2006" />
+ </config>
+
+ <config path="example.com/dir">
+  <guid-entity entity="example3.com,2006" />
+ </config>
+
+ <output url="http://foo.com/" path="@TEST_OUTPUT_DIR@/foo.com" />
+ <config path="foo.com">
+  <guid-entity entity="foo.com,2006" />
+  <generator class="Daizu::Gen">
+   <xml-sitemap />
+  </generator>
+ </config>
+ <config path="foo.com/blog">
+  <generator class="Daizu::Gen::Blog">
+   <homepage num-articles="5" />
+  </generator>
+ </config>
+
+ <plugin class="Daizu::Plugin::SyntaxHighlight" />
+ <plugin class="Daizu::Plugin::HeaderAnchor" />
+ <plugin class="Daizu::Plugin::XHTMLArticle" />
+ <plugin class="Daizu::Plugin::PodArticle" />
+ <plugin class="Daizu::Plugin::PictureArticle">
+  <thumbnail max-width="300" />
+ </plugin>
+ <plugin class="Daizu::Plugin::DisplayPicture">
+  <thumbnail max-width="300" />
+ </plugin>
+ <plugin class="Daizu::Plugin::ImageMetadata" />
+ <plugin class="Daizu::Plugin::RelatedLinks" />
+
+</config>
+
+<!-- vim:set ts=4 sw=4 expandtab ft=xml: -->

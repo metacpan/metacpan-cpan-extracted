@@ -1,0 +1,69 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'Module::Build::Tiny' => '0.034'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Dist::Zilla::PluginBundle::Author::IOANR' => '0.004',
+                                      'Test::CPAN::Meta::JSON' => '0.16',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::Mojibake' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::Pod::LinkCheck' => '0',
+                                      'Test::Pod::No404s' => '0',
+                                      'Test::Version' => '1',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Proc::InvokeEditor' => '0'
+                                      },
+                      'requires' => {
+                                      'CPAN::Changes' => '0.400002',
+                                      'CPAN::Changes::Release' => '0',
+                                      'Class::Load' => '0',
+                                      'DateTime' => '0',
+                                      'Dist::Zilla' => '6.005',
+                                      'Dist::Zilla::Role::AfterBuild' => '0',
+                                      'Dist::Zilla::Role::FileGatherer' => '0',
+                                      'Dist::Zilla::Role::Git::Repo' => '0',
+                                      'Encode' => '0',
+                                      'Git::Wrapper' => '0',
+                                      'Moose' => '0',
+                                      'Moose::Util::TypeConstraints' => '0',
+                                      'perl' => 'v5.10.1'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Archive::Tar' => '0',
+                                   'Dist::Zilla::File::InMemory' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::chdir' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Path::Tiny' => '0',
+                                   'Test::CPAN::Changes' => '0',
+                                   'Test::CheckDeps' => '0.010',
+                                   'Test::DZil' => '0',
+                                   'Test::More' => '0.94',
+                                   'Test::Roo' => '0',
+                                   'Test::Roo::Role' => '0',
+                                   'blib' => '1.01',
+                                   'lib' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,34 @@
+---
+abstract: "TSIBLEY's personal Devel::REPL profile"
+author:
+  - 'Thomas Sibley <tsibley@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.017
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.1, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-REPL-Profile-TSIBLEY
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Data::Printer: 0
+  Devel::REPL::Plugin::DDP: 0
+  Devel::REPL::Plugin::ReadLineHistory::WithoutExpansion: 0
+  Devel::REPL::Profile::Default: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY/issues
+  homepage: https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY
+  repository: https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY.git
+version: 0.02

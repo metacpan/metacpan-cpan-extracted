@@ -1,0 +1,27 @@
+---
+abstract: 'store history of patches applied in database schema'
+author:
+  - 'Jason Tang <tang.jason.ch@gmail.com>'
+build_requires:
+  Path::Class::File: 0
+  Test::More: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Patcher
+requires:
+  Carp: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::ResultSet: 0
+  DBIx::Class::Schema: 0
+  Data::Dump: 0
+  Digest::MD5: 0
+  FindBin::libs: 0
+  Getopt::Long: 0
+  IO::File: 0
+  Path::Class: 0
+  parent: 0
+version: 0.04

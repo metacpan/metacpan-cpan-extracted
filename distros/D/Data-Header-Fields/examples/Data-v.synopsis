@@ -1,0 +1,24 @@
+	use Data::v;
+
+	my $vdata = Data::v->new->decode([ '..', 't', 'vcf', 'aldo.vcf' ]);
+	my $vcard = $vdata->get_value('vcard');
+	
+	print 'version:   ', $vcard->get_value('version'), "\n";
+	print 'full name: ', $vcard->get_value('fn'), "\n";
+	print 'email:     ', $vcard->get_value('email'), "\n";
+	
+	my @cell_phones = $vcard->get_fields('tel');
+	
+	use List::MoreUtils 'any';
+	my @cell_phones =
+		map { $_->value->as_string }
+		$vcard->get_fields('tel', 'type' => 'cell')
+	;
+	print 'cell:      ', join(', ', @cell_phones), "\n";
+	
+	print "\n";
+	
+	$vcard->set_value('email' => 'dada@internet');
+	$vcard->rm_fields('rev', 'photo', 'adr', 'X-MS-OL-DEFAULT-POSTAL-ADDRESS', 'label');
+	
+	print $vdata->encode, "\n";

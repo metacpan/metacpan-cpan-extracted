@@ -1,0 +1,47 @@
+
+BabelKit Universal Multilingual Database Code Table
+---------------------------------------------------
+
+BabelKit Version 1.07 released 2003.05.12.
+
+BabelKit is an interface to a universal multilingual
+database code table. BabelKit takes all of the
+programming work out of maintaining multiple database
+code definition sets in multiple languages.
+
+The code administration and translation page lets you define
+new virtual code tables, new languages, enter all codes
+and their descriptions and then translate them into all
+languages of interest.
+
+Perl and PHP classes retrieve the code descriptions
+and automatically generate HTML code selection elements
+in the user's language.  This makes internationalization
+and localization of web sites and database interfaces
+much easier.  The home page contains live multilanguage
+demos.
+
+For news and updates visit the BabelKit home page:
+
+http://www.webbysoft.com/babelkit
+
+For a simpler unilingual universal code table visit
+the CodeKit home page:
+
+http://www.webbysoft.com/codekit
+
+Setup:
+
+1. Read doc/bk_overview.html and doc/bk_schema.html first.
+   Get your universal code table schema and sample data loaded.
+
+2. See doc/bk_setup_perl.html and doc/bk_setup_php.html
+   for Perl and PHP source code setup instructions.
+
+Contact John Gorman at http://www.webbysoft.com
+to report bugs, request features, or for database
+design and programming assistance.
+
+Copyright (C) 2003 John Gorman.  All rights reserved.
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl or the LGPL.

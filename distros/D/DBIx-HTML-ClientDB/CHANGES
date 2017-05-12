@@ -1,0 +1,42 @@
+Revision history for Perl extension DBIx::HTML::ClientDB.
+
+1.08  Sun Feb 21 12:54:57 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.07  Wed Feb 10 14:01:45 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.06  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.05  Thu Oct 27 19:40:00 2005
+	- Simplify code in new() to no longer check if caller is an object
+		as per the new standard on such matters
+	- Regenerate META.yml with Module::Build V 0.2611 to correct a faulty
+		META.yml output by V 0.24 which falsely said 'provides: {}',
+		which in turn stopped the PAUSE indexer from finding the module file,
+		which in turn meant this module might be omitted from the master index:
+		ftp://pause.perl.org/pub/PAUSE/modules/01modules.index.html
+
+1.04  Mon Jul 19 14:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
+1.03  Sun Mar 23 11:29:00 2003
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.02  Wed Dec 11 14:29:00
+	- Minor documentation changes. No need to upgrade
+
+1.01  Sat Oct 26 14:29:00
+	- Minor documentation changes. No need to upgrade
+
+1.00  Tue Oct 15 12:37:29 2002
+	- original version

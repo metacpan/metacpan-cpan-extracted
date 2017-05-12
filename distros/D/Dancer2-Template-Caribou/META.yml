@@ -1,0 +1,52 @@
+---
+abstract: 'Template::Caribou wrapper for Dancer2'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Dancer2: '0'
+  Dancer2::Test: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Template::Caribou: v1.2.0
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-Caribou
+provides:
+  Dancer2::Template::Caribou:
+    file: lib/Dancer2/Template/Caribou.pm
+    version: v1.0.0
+  Dancer2::Template::Caribou::DancerVariables:
+    file: lib/Dancer2/Template/Caribou/DancerVariables.pm
+    version: v1.0.0
+requires:
+  Dancer2::Core::Role::Template: '0'
+  Moo: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  Path::Iterator::Rule: '0'
+  Path::Tiny: '0'
+  Template::Caribou: v1.2.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer2-Template-Caribou/issues
+  homepage: https://github.com/yanick/Dancer2-Template-Caribou
+  repository: https://github.com/yanick/Dancer2-Template-Caribou.git
+version: 1.0.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Franck Cuny <franck@lumberjaph.net>'
+  - 'Yanick Champoux <yanick@cpan.org>'

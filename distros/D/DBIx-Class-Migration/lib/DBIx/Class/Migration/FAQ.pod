@@ -1,0 +1,327 @@
+=head1 NAME
+
+DBIx::Class::Migration::FAQ - Answers to Frequently Asked Questions
+
+=head1 When I run the commandline, I see a lot of debugging output
+
+    SV = IV(0x7fb4e24dc858) at 0x7fb4e24dc868
+      REFCNT = 1
+      FLAGS = (ROK,READONLY)
+      RV = 0x7fb4e0b0ddf8
+        SV = PVHV(0x7fb4e24c48a0) at 0x7fb4e0b0ddf8
+          REFCNT = 1
+          FLAGS = (OBJECT,SHAREKEYS)
+          STASH = 0x7fb4e2174a80	"DBI::db"
+          ARRAY = 0x0
+          KEYS = 0
+          FILL = 0
+          MAX = 7
+          RITER = -1
+
+There's some debugging code somewhere in the L<DBIx::Class::DeploymentHandler>
+dependency chain.  We've looked and can't find it :(  A case of beer at the
+next YAPC we meet at to whoever can figure it out.
+
+Although if you see this, there's nothing wrong.  The command will work as in
+the documentation.  The only issue is that if there's a lot of debugging scroll
+by, you might need to page up in your terminal to catch any real error
+messages.
+
+B<UPDATE>:  I recieved an email from a contributor who has code dived a bit
+and possibly narrowed down the issue.  I thought to report that stuff here.
+When L<SQLT::Parser::DBIx::Class> attempts to serialize schemas that are connected
+it trys to serialize the connect object information.  This doesn't play so nice
+with the way the YAML serializer works, since it does try hard to serialize
+objects.
+
+B<UPDATE>: This may be fixed in recent updates to the DBIC ecosystem.  If you
+are seeing this try upgraded DBIC and SQLT and see if it goes away.
+
+B<UPDATE>:  You really should not be seeing this anymore, if you are, and you're
+on the lastest DBIC and related, please let me know.
+
+=head1 Contributing
+
+Contributing to the project is easy.  First you'd fork the project over at
+Github (L<https://github.com/jjn1056/DBIx-Class-Migration>), clone the repo
+down to your work environment and install project dependencies:
+
+    cpanm Dist::Zilla
+    dzil authordeps | cpanm
+    dzil listdeps | cpanm
+
+You should first have a Modern Perl setup, including L<local::lib>.  If you
+need help installing Perl and getting started, please take a look at the
+Learning Perl website: L<http://learn.perl.org/installing/>
+
+=head1 Dist::Zilla?
+
+I realize L<Dist::Zilla> seems to invoke feelings on nearly religious vigor
+(both for and against).  After considering the options I felt using it, but
+carefully constraining the use of plugins to the default set was a better
+option than what I've done on other projects, which is to have a custom wrapper
+on top of L<Module::Install> (you can peek at that if you want over here:
+L<https://github.com/jjn1056/Maker>).  I've decided I'd rather not
+continue to spend my limited time dealing with dependency and installation
+management tools, when there's a rational solution that many people already
+embrace available. The only other option is to continue to build and maintain
+code for this purpose that nobody else uses, and possibly nobody else
+understands.
+
+If a better option with equal or greater maturity and community acceptance
+emerges, I'll entertain changing.
+
+If the requirement of typing C<cpanm Dist::Zilla> and using the C<dzil> command
+line tool for a limited number of build jobs prevents you from contributing,
+I think you are unreasonably stubborn.
+
+If you do contribute to the project, please be aware that I'm not likely to
+accept patches that include significant changes to the way I'm using
+L<Dist::Zilla>, including using plugins to weave pod, automagically guess
+dependencies and generate tests.  I'd prefer to stick to the most simple and
+standard Perl practices for building and installing code for the present.
+
+=head1 I don't want my database sandbox files in my source control repository
+
+Having the database sandboxes automatically created in the C<share> directory
+is a nice feature, but can clutter your repository history.  You really don't
+need that in the source control, since installing and controlling your database
+is something each developer who checks out the project should do.
+
+If you are using C<git> you can modify your C<.gitignore>.  If you sandbox is
+C<share/myapp-schema.db> or (if you are using the mysql or postgresql sandboxes)
+C<share/myapp-schema/> you can add these lines to your C<.gitignore>
+
+    share/musicbase-schema/*
+    share/musicbase-schema.db
+
+Other source control systems have similiar approaches (recipies welcome for 
+sharing).
+
+=head1 What's the command to run migrations on an existing database?
+
+    dbic-migration -Ilib status \
+      --dsn="DBI:mysql:database=test;host=127.0.0.1;port=5142" \
+      --user msandbox \
+      --password msandbox
+
+Would be the general approach.
+
+=head1 Error: Trouble creating a MySQL Sandbox when running AppArmor
+
+Its been reported that the developer database sandboxing feature doens't
+work properly when using AppArmor.  I guess AppArmor considers this a 
+security violation.  Currently I don't have a reported workaround other than
+to just disable AppArmor, which for developer level machines may or may not
+be a problem.
+
+Here's some symptoms of this problem, if you think you may be having it:
+
+In C</var/log/syslog> something like:
+
+    kernel: [18593519.090601] type=1503 audit(1281847667.413:22):
+    operation="inode_permission" requested_mask="::r" denied_mask="::r"
+    fsuid=0 name="/etc/mysql0/my.cnf" pid=4884 profile="/usr/sbin/mysqld"
+
+If you need AppArmor, you'll have to setup and install MySQL the 'old school
+way.'
+
+=head1 Error: "Failed to find share dir for dist..."
+
+You didn't specify a custom C<--target_dir> but forgot to make the C</share>
+directory in your project application root.
+
+By default we expect to find a C</share> directory in your primary project root
+directory (contains your C<Makefile.PL> or C<dist.ini>, and the C<lib> and C<t>
+directories for example) where we will create migrations.  At this time we can't
+automatically create this C</share> directory in the same way we can create all
+the migration files and directory for you.  You need to create that directory
+yourself:
+
+    mkdir share
+
+Patches to fix this, or suggestions welcomed.
+
+=head1 Can I use this even if I don't want to use DBIx::Class?
+
+Not everyone loves using an ORM.  Personally I've found L<DBIx::Class> to be
+the only ORM that gets enough out of my way that I prefer it over plain SQL,
+and I highly recommend you give it a go.  However if you don't want to, or can
+not convince your fellow programers (yet :) ), here's one way to still use this
+migrations and fixtures system.  Strictly speaking, we are stilling using
+L<DBIx::Class> behind the scenes, just you don't have to know about it or
+use it.
+
+You use a subclass of L<DBIx::Class::Schema::Loader> in a namespace for your
+application, like:
+
+    package MyApp::Schema;
+
+    use strict;
+    use warnings;
+
+    use base 'DBIx::Class::Schema::Loader';
+
+    our $VERSION = 1;
+
+    __PACKAGE__->naming('current');
+    __PACKAGE__->use_namespaces(1);
+    __PACKAGE__->loader_options( );
+
+    1;
+
+You'd put that in C<lib/MyApp/Schema.pm> along with your other application code.
+then just use C<MyApp::Schema> as is discussed in the documentation.  This will
+dynamically build a schema for you, as long as you set the schema arguments to
+connect to your actual database.  Then everytime someone changes the database
+you just up the C<$VERSION> and take it from there.  Obviously this is a bit
+more manual effort, but at least you can have the ability to populate to any
+given version, manage fixtures, do some sane testing, etc.  Maybe you'll even
+be able to convince people to try out L<DBIx::Class>!
+
+By the way, if you wanted, you can always dump the generated version of your
+classes using C<make_schema> (see L<DBIx::Class::Migrations/make_schema> and
+L<DBIx::Class::Migrations::Script/make_schema>).
+
+=head1 I am using MySQL and when the migration fails, it doesn't ROLLBACK
+
+That's because MySQL does not support transaction DDL.  Even if you have a
+transaction, MySQL will silently COMMIT when it bumps into some DDL.
+
+=head1 I need to dump fixtures from a existing database
+
+You don't always have the luxury of building a new database from the start.
+For example, you may have an existing database that you want to start to
+create migrations for.  In this case you probably want to dump some data
+directly from that existing database in order to create fixtures for testing
+or for seeding a new database.
+
+L<DBIx::Class::Migration> will let you run the C<dump_all_sets> and C<dump_named_sets>
+commands against an unversioned database.  For example:
+
+    dbic-migration -Ilib -SMyApp::Schema dump_all_sets /
+      --dsn="dbi:mysql:database=myapp;host=10.0.88.98;port=3306" /
+      --username johnn /
+      --password $PASSWORD
+
+In this case let's say "dbi:mysql:database=myapp;host=10.0.88.98;port=3306" is
+a database that you've been managing manually and it has some data that is useful
+for creating your fixture sets.
+
+When you run these commands against an unversioned database you will be warned
+because we have no way of being sure what version of the fixture sets you should
+be dumping.  We will just assume that whatever the Schema version is, is correct.
+This can of course lead to bad or undumpable fixtures should your Schema and the
+unversioned DB not match properly.  Buyer beware!
+
+=head1 Error: "`' is not a module name"
+
+Sorry this error is vague and I am working on a fix.  You will get this if you
+have failed to provide a C<schema_class>, either by setting it with the -S or
+-schema_class commandline option flag:
+
+    dbic-migration -Ilib -SMyApp::Schema
+    dbic-migration -Ilib --schema_class MyApp::Schema
+
+or by exporting the %ENV:
+
+    export DBIC_MIGRATION_SCHEMA_CLASS=MyApp::Schema
+
+Or, if you have a custom version of L<DBIx::Class::Migration::Script> as
+discussed in the tutorial, you are not providing a good C<schema_class> value.
+
+=head1 Error: "Attribute (schema_class) does not pass the type constraint"
+
+You probably forgot to include your project C<lib> directory in the Perl search
+path.  The easiest way to fix this is to use the C<I> or C<lib> command line:
+option flag:
+
+    dbic-migration -Ilib -SMyApp::Schema [command]
+
+=head1 When using the Postgresql Sandbox, I get "FATAL: could not create shared memory segment"
+
+There will be more like this:
+
+    FATAL:  could not create shared memory segment: Cannot allocate memory
+    DETAIL:  Failed system call was shmget(key=1, size=2138112, 03600).
+    HINT:  This error usually means that PostgreSQL's request for a shared memory
+    segment exceeded available memory or swap space, or exceeded your kernel's 
+    SHMALL parameter.  You can either reduce the request size or reconfigure 
+    the kernel with larger SHMALL.  To reduce the request size (currently 2138112
+    bytes), reduce PostgreSQL's shared memory usage, perhaps by reducing 
+    shared_buffers or max_connections.
+
+The solution is as presented.  Since I prefer not to change my system settings
+permanently, just add the following to a little bash script in my application
+
+    sudo sysctl -w kern.sysv.shmall=65536
+    sudo sysctl -w kern.sysv.shmmax=16777216
+
+I don't know enough about Postgresql to know if the above settings are good,
+but they work for my testing.  Corrections very welcome!  Ideally I'd try to
+find a way to offer a patch to L<Test::postgresql>, although this seems to be
+limited to people using Macs.
+
+=head1 How to Release
+
+Here's the release steps I currently use, should I eventually find willing
+comainters:
+
+=over 4
+
+=item Update Version
+
+You need to increment the version in C<dist.ini> and in L<DBIx::Class::Migration>
+
+=item Prepare Changes file
+
+Update the C<Changes> file.  It would be ideal to have been adding to this as
+you've gone along, but you should double check.
+
+=item Update Author's list
+
+If there have been new contributors, be sure to give credit
+
+=item Rebuild the README
+
+    pod2markdown < lib/DBIx/Class/Migration.pm > README.mkdn
+
+This will make sure the C<README.mkdn> file in the project root matches the most
+recent updates.
+
+=item Check your tests
+
+    AUTHOR_MODE=1 prove -lvr t
+
+=item Update the repository
+
+    git add @stuff_to_add
+    git commit -m $message
+    git push
+
+=item Make the Distribution
+
+    dzil build
+    dzil release
+    dzil clean
+
+=item Update the git version tag
+
+I usually don't update and push the tag until we are on CPAN.
+
+    git tag $VERSION -m 'cpan release'
+    git push --tags
+
+=back
+
+=head1 AUTHOR
+
+See L<DBIx::Class::Migration> for author information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<DBIx::Class::Migration> for copyright and license information
+
+=cut
+
+

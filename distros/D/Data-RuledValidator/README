@@ -1,0 +1,29 @@
+Data-RuledValidator
+
+Data::RuledValidator is validator of data.
+This needs rule which is readable by not programmer,
+which is like a specification.
+Data::RuledValidator parse the rule and check validation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module plugins requires these other modules and libraries:
+
+ Email::Valid
+ Email::Valid::Loose
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2007 by Ktat
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

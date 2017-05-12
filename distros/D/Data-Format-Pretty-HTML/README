@@ -1,0 +1,126 @@
+SYNOPSIS
+
+    In your program:
+
+     use Data::Format::Pretty::HTML qw(format_pretty);
+     ...
+     print format_pretty($result);
+
+    Some example output:
+
+    Scalar, format_pretty("foo & bar"):
+
+     foo &amp; bar
+
+    Scalar multiline, format_pretty("foo\nbar\nbaz"):
+
+     <pre>foo
+     bar
+     baz</pre>
+
+    List, format_pretty([qw/foo bar baz qux/]):
+
+     <table>
+       <tr><td>foo</td></tr>
+       <tr><td>bar</td></tr>
+       <tr><td>baz</td></tr>
+       <tr><td>qux</td></tr>
+     </table>
+
+    Hash,
+    format_pretty({foo=>"data",bar=>"format",baz=>"pretty",qux=>"html"}):
+
+     <table>
+       <tr><th>key</th><th>value</th></tr>
+       <tr><td>bar</td><td>format</td></tr>
+       <tr><td>baz</td><td>pretty</td></tr>
+       <tr><td>foo</td><td>data</td></tr>
+       <tr><td>qux</td><td>html</td></tr>
+     </table>
+
+    2-dimensional array, format_pretty([ [1, 2, ""], [28, "bar", 3],
+    ["foo", 3, undef] ]):
+
+     <table>
+       <tr><th>column0</th><th>column1</th><th>column2</th></tr>
+       <tr><td class="number">1</td><td class="number">2</td><td></td></tr>
+       <tr><td class="number">28</td><td>bar</td><td class="number">3</td></tr>
+       <tr><td>foo</td><td class="number">3</td><td></td></tr>
+     </table>
+
+    An array of hashrefs, such as commonly found if you use DBI's
+    fetchrow_hashref() and friends, format_pretty([ {a=>1, b=>2}, {b=>2,
+    c=>3}, {c=>4} ]):
+
+     <table>
+       <tr><th>a</th><th>b</th><th>c</th></tr>
+       <tr><td class="number">1</td><td class="number">2</td><td></td></tr>
+       <tr><td></td><td class="number">2</td><td class="number">3</td></tr>
+       <tr><td></td><td></td><td class="number">4</td></tr>
+     </table>
+
+    Some more complex data, format_pretty({summary => "Blah...", users =>
+    [{name=>"budi", domains=>["f.com", "b.com"], quota=>"1000"},
+    {name=>"arif", domains=>["baz.com"], quota=>"2000"}], verified => 0}):
+
+     <table>
+    
+       <tr>
+         <td>summary</td>
+         <td>Blah...</td>
+       </tr>
+    
+       <tr>
+         <td>users</td>
+         <td>
+           <table>
+             <tr><th>domains</th><th>name</th><th>quota</th></tr>
+             <tr><td>f.com, b.com</td><td>budi</td><td class="number">1000</td></tr>
+             <tr><td>baz.com</td><td>arif</td><td class="number">2000</td></tr>
+         </td>
+       </tr>
+    
+       <tr>
+         <td>verified</td>
+         <td class="number">0</td>
+       </tr>
+    
+     </table>
+
+    Structures which can't be handled yet will simply be output as YAML,
+    format_pretty({a => {b=>1}}):
+
+     <pre>a:
+       b: 1
+     </pre>
+
+DESCRIPTION
+
+    This module has the same spirit as Data::Format::Pretty::Console (and
+    currently implemented as its subclass). The idea is to throw it some
+    data structure and let it figure out how to best display the data in a
+    pretty HTML format.
+
+    Differences with Data::Format::Pretty::Console:
+
+      * hot (hash of table) structure is rendered as table of inner tables
+
+FUNCTIONS
+
+ format_pretty($data, \%opts)
+
+    Return formatted data structure as HTML. Options:
+
+      * table_column_orders => [[colname, colname], ...]
+
+      See Data::Format::Pretty::Console for more details.
+
+      * linkify_urls_in_text => BOOL
+
+      Whether to convert 'http://foo' in text into '<a
+      href="http://foo">http://foo</a>'. Default is true.
+
+SEE ALSO
+
+    Data::Format::Pretty
+

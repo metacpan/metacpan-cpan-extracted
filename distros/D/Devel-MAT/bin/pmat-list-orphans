@@ -1,0 +1,21 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature qw( say );
+
+use Devel::MAT;
+
+my $pmat = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" );
+$pmat->load_tool( "Inrefs" );
+
+my $df = $pmat->dumpfile;
+
+my %orphans;
+foreach my $sv ( $df->heap ) {
+   $orphans{$sv->addr} = $sv unless $sv->inrefs;
+}
+
+foreach my $addr ( sort keys %orphans ) {
+   say $orphans{$addr}->desc_addr;
+}

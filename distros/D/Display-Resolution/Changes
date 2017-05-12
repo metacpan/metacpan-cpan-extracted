@@ -1,0 +1,11 @@
+Revision history for Display-Resolution
+
+0.002   2016-10-07 (PERLANCAR)
+
+        - Some Rinci metadata tweaks: CLI hints (completion for 'name', shortcut
+          -a for --all), result schema (for nicer POD).
+
+
+0.001   2016-10-07 (PERLANCAR)
+
+        - First release.

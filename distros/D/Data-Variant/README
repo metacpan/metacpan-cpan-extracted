@@ -1,0 +1,40 @@
+Data::Variant
+-------------
+
+This module implements Variant datatypes for perl. This is something
+akin to the Haskell/O'Caml datatypes. The module also offers pattern
+matching against the variant constructors.
+
+For more information see for instance:
+http://foldoc.doc.ic.ac.uk/foldoc/foldoc.cgi?algebraic+data+type
+
+A typical example:
+
+    use Data::Variant;
+    use vars qw(&Empty &Leaf &Node);
+
+    register_variant("Tree","Empty","Leaf <INT>","Node Tree Tree");
+    my $tree = Node((Node ((Leaf 3), (Leaf 4))), Leaf 5);
+
+    sub printTree {
+	my $tree = shift;
+	my ($data, $left, $right);
+
+	print "Data $data\n" 
+	    if (match $tree,"Leaf", $data);
+	printTree($left), printTree($right) 
+	    if (match $tree,"Node",$left,$right);
+    }
+
+There is a bigger example included as lambda.pl.
+
+NOTE: If you are used to Haskell, these variants will behave slightly
+different. The documentation spells out the differences in detail.
+
+Please report errors or ideas to the author, but you might want to take
+a look at the TODO list first.
+
+
+Copyright (c) 2004 Viktor Leijon (leijon@ludd.ltu.se) All rights
+reserved.  This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.

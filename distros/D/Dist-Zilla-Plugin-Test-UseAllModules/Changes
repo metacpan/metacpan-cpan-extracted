@@ -1,0 +1,19 @@
+Revision History for Dist-Zilla-Plugin-Test-UseAllModules
+=========================================================
+
+0.002
+-----
+
+commit a7c59a270f3262ca7645171272a4c50f67579f16
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using gitnext version scheme and making tests happy
+
+commit 96218855b0ab595be58fe41a69d0a93bdec6085d
+Author: Chisel <chisel@chizography.net>
+
+    Make plugin register its prereqs
+
+===================================
+End of changes in the last 365 days
+===================================

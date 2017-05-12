@@ -1,0 +1,38 @@
+Revision history for Dancer-Plugin-SiteMap
+
+0.14    22/05/2014 15:00:00
+        Added feature inspired by patch by XAV.
+        - Add configurable optional HTML template for the HTML sitemap.
+        - Have the manifest test ignore .git directories.
+
+0.13    23/04/2014 08:53:33
+        Added features and tests submitted by SPUDSOUP and GARU.
+        - Configurable route paths
+        - Configurable route omission by robots.txt
+        Updated POD to include CONTRIBUTORS
+
+0.12    05/12/2013 14:41:00
+        Bugfix for RT #91176.
+        The SiteMap was duplicating entries when the AJAX plugin was in use
+        and ajax and get routes were declared for the same path. Which while
+        technically not a bug, as it was doing what it was supposed to, it's
+        undesirable, and as such has been patched out.
+
+0.10    06/07/2012 22:38:00
+        Added support for Dancer 2 - Official the first Dancer plugin
+        to seemlessly support both versions of the framework! :-)
+
+
+0.04-0.09 Wow, I was lazy and didn't update this... Bug fixes mostly :-)
+
+
+0.03    19/04/2010 19:50:00
+        Ammended the change log, the README and added META.yml
+
+0.02    19/04/2010 19:15:00
+        Taken on board comments about being v5.0100 and removed the
+        version limitation.
+
+0.01    18/04/2010 19:30:00
+        First version, released on an unsuspecting world.
+

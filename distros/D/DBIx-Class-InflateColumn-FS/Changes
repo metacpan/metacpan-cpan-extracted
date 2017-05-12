@@ -1,0 +1,45 @@
+0.01007 2010-06-22
+    - Bug fix: ensure fs columns are marked dirty when set via accessors
+
+0.01006 2010-05-28
+    - Added DESTROY to delete file backing for un-inserted rows
+    - Added TODO tests for multi-create failure pending DBIx::Class::Row patch
+
+0.01005 2009-08-10
+    - bug fix: aliased column names (Moritz Onken)
+    - skip test to accommodate older DBIC releases without make_column_dirty
+
+0.01004 2009-05-14
+    - don't rely on {_column_data} for deflate values
+
+0.01003 2009-04-17
+    - use DBIx::Class::UUIDColumns for get_uuid rather than inheriting from it
+    - fixed infinite recursion on create with fs_new_on_update column(s)
+    - added copy method
+
+0.01002 2009-03-17
+    - fs_new_on_update: new file name on update (Moritz Onken)
+    - fix: ->delete with multiple fs_columns (Moritz Onken)
+    - fs_file_name: factored out file name creation (Moritz Onken)
+
+0.01001 2008-12-02 11:32:00
+    - added SUPPORT section to POD
+    - use ->result_source->column_info (mst)
+
+0.01000 2008-10-07 13:18:00
+    - release
+
+0.00000_04 2008-10-06 16:10:00
+    - used base class DBIx::Class::UUIDColumns for it's multiple UUID
+          provider support
+    - added POD tests
+
+0.00000_03 2008-10-04 15:20:00
+    - store only the path name below fs_column_path
+
+0.00000_02 2008-10-04 11:25:00
+    - reimplemnted with UUID based filenames
+    - dropped ::SHA1
+
+0.00000_01 2008-09-30 08:45:00
+    - First development release

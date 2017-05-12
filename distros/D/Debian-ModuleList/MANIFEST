@@ -1,0 +1,15 @@
+.gitignore
+bin/list-debian-modules.pl
+Build.PL
+Changes
+Debian-ModuleList-0.01/Changes
+Debian-ModuleList-0.01/META.yml
+lib/Debian/ModuleList.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/pod.t

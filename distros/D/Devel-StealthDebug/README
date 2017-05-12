@@ -1,0 +1,58 @@
+Devel::StealthDebug 
+===================
+
+This module was designed to assist you in the debugging process.
+
+It will provide several functions to track/observe data changes. 
+
+The interface curently used (filter) allow you to turn debugging features on/off
+only through the 'use Devel::StealthDebug' line.
+
+All debugging statements are put in comments.
+This means that when there's no 'use Devel::StealthDebug', no debug INSTRUCTIONS are
+present (I really mean 'present', not only 'enabled')
+This make it really easy to send a version from the test environment to the prod 
+environment (and vice versa)
+
+This module is currently in alpha state.
+
+INSTALLATION
+
+Nothing really original here.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+One last thing : Comments are REALLY welcome.
+
+If you use this module, (dis)like it, don't hesitate to drop me
+a mail to tell me what you think about it and how this module could be enhanced.
+All points of view are worthy even if you feel like a newbie
+(ESPECIALLY if you're a newbie !)
+
+And, thank you to all those who contributed by their comments :
+Tim BUNCE, Jean-michel VILOMET, Yann KEHERVE, Adam FOXSON, Daniel GARDNER, 
+Gerald RICHTER, Eric CHOLET, Philippe BRUHAT.
+(Full credits in the 'Changes' file)
+
+DEPENDENCIES
+
+This module requires :
+
+	Test::More
+	Filter::Simple
+	Carp
+
+also recommended :
+
+	Data::Dumper
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2001,2002 Arnaud (Arhuman) ASSAD <arhuman@hotmail.com>
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

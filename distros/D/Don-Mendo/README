@@ -1,0 +1,30 @@
+Don-Mendo version 0.0.5
+
+This is a Perl-lization of an Spanish play called "La Venganza de Don
+Mendo". Main intention was to use it to teach POE, but who knows what
+other fate might await it.
+
+Check out the examples also at
+http://github.com/JJ/la-venganza-de-don-mendo/tree/master/poe-examples 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, JJ Merelo
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

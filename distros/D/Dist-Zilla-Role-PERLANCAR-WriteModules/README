@@ -1,0 +1,55 @@
+DESCRIPTION
+
+    Rationale: in the middle of a build process, sometimes we want to write
+    the built version of modules to disk (as actual files). The problem is,
+    Dist::Zilla writes the dist to disk at the end of build.
+
+    An example of this is with Dist::Zilla::Plugin::GenPericmdScript which
+    generates scripts in the file gathering step. Or,
+    Dist::Zilla::Plugin::Depak which replaces scripts with packed version
+    in the file munging step. These generated scripts might embed modules
+    inside them, including from the current dist we're building, and we
+    need the built version of these modules instead of the raw version.
+
+    So this role can be used to write the built modules (so far, at that
+    point) to a temporary directory.
+
+ATTRIBUTES
+
+ written_modules_dir => str
+
+    If already written modules to dir, will contain the directory name.
+    Otherwise, undef.
+
+ has_written_modules_to_dir => bool
+
+METHODS
+
+ $obj->write_modules_to_dir([ $dir[, $force ] ])
+
+    Write built modules to disk at the specified directory (or, to a
+    temporary directory if $dir is not specified).
+
+    To find out the directory being used, use the written_modules_dir
+    attribute.
+
+    If a temporary directory is automatically selected, it will
+    automatically be cleaned up at the end of build (created using
+    File::Temp's tempdir with CLEANUP set to 1) unless the environment
+    DEBUG is set to true, in which case the temporary directory will not be
+    automatically cleaned up.
+
+    By default will only do this once during build, and subsequent call to
+    write_modules_to_dir() will be a no-op. But if you set $force to 1,
+    will write modules to disk even if it has been done previously during
+    the same build.
+
+ENVIRONMENT
+
+ DEBUG_KEEP_TEMPDIR => bool
+
+SEE ALSO
+
+    Dist::Zilla::Dist::Builder the module which dzil uses to write the dist
+    and archive to disk, usually at the end of build.
+

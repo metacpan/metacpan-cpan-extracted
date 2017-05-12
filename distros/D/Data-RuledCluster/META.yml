@@ -1,0 +1,55 @@
+---
+abstract: 'clustering data resolver'
+author:
+  - 'Atsushi Kobayashi <nekokak@gmail.com>'
+build_requires:
+  DBI: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.5, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-RuledCluster
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::RuledCluster:
+    file: lib/Data/RuledCluster.pm
+    version: '0.06'
+  Data::RuledCluster::Strategy:
+    file: lib/Data/RuledCluster/Strategy.pm
+  Data::RuledCluster::Strategy::Formatted:
+    file: lib/Data/RuledCluster/Strategy/Formatted.pm
+  Data::RuledCluster::Strategy::Key:
+    file: lib/Data/RuledCluster/Strategy/Key.pm
+  Data::RuledCluster::Strategy::List:
+    file: lib/Data/RuledCluster/Strategy/List.pm
+requires:
+  Class::Load: '0'
+  Data::Util: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/nekokak/p5-Data-RuledCluster/issues
+  homepage: https://github.com/nekokak/p5-Data-RuledCluster
+  repository: git://github.com/nekokak/p5-Data-RuledCluster.git
+version: '0.06'
+x_contributors:
+  - 'punytan <punytan@gmail.com>'
+  - 'xaicron <xaicron@gmail.com>'
+  - 'Hiroyoshi HOUCHI <info@hixi-hyi.com>'
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'
+  - 'karupanerura <karupa@cpan.org>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

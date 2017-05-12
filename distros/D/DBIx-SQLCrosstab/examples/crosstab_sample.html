@@ -1,0 +1,766 @@
+<HTML>
+<head>
+  <meta http-equiv="Content-Type" content="text/html"; charset="iso-8859-1">
+  <meta name="keywords" content="DEZIGNFORDBREPORT">
+  <meta name="author" content="Datanamic - DeZign for Databases - www.datanamic.com">
+  <title>DeZign for Databases - HTML Report</title>
+  <link rel="stylesheet" type="text/css" media="screen" href="gmax.css" title="report">
+</head>
+<BODY>
+<table class="table2">
+<tr>
+<td class="tableheader2">
+Project Name
+</td>
+<td class="tabledata2">
+Crosstab sample db
+</td>
+</tr>
+<tr>
+<td class="tableheader2">
+Project Description
+</td>
+<td class="tabledata2">
+Sample database to use with DBIx::SQLCrosstab
+</td>
+</tr>
+<tr>
+<td class="tableheader2">
+Author
+</td>
+<td class="tabledata2">
+Giuseppe Maxia
+</td>
+</tr>
+<tr>
+<td class="tableheader2">
+Copyright
+</td>
+<td class="tabledata2">
+Giuseppe Maxia 2003
+</td>
+</tr>
+<tr>
+<td class="tableheader2">
+Target DBMS
+</td>
+<td class="tabledata2">
+MySQL 4
+</td>
+</tr>
+<tr>
+<td class="tableheader2">
+Generated On
+</td>
+<td class="tabledata2">
+10/9/2003 1:26:35 PM
+</td>
+</tr>
+</table>
+<P>
+<CENTER><table class="header1"><tr><td>Entities with attributes</td></tr></table></CENTER>
+<BR>
+<CENTER><IMAGE SRC="crosstab.jpg" WIDTH="760" HEIGHT="480" BORDER=1ISMAP usemap="#DEZIGN_MAP"></CENTER>
+<map name="DEZIGN_MAP"><area shape="rect" coords="207,132,315,288" href="#person"><area shape="rect" coords="424,86,547,155" href="#departments"><area shape="rect" coords="472,182,555,268" href="#locations"><area shape="rect" coords="0,254,75,323" href="#categories"><area shape="rect" coords="684,165,774,234" href="#countries"><area shape="rect" coords="74,361,151,429" href="#class"><area shape="rect" coords="564,335,667,404" href="#customers"><area shape="rect" coords="296,367,398,488" href="#sales"><area shape="rect" coords="365,119,423,123" href="#departments_person"><area shape="rect" coords="363,121,367,185" href="#departments_person"><area shape="rect" coords="315,183,365,187" href="#departments_person"><area shape="rect" coords="384,223,471,227" href="#locations_person"><area shape="rect" coords="382,225,386,266" href="#locations_person"><area shape="rect" coords="315,264,384,268" href="#locations_person"><area shape="rect" coords="75,287,119,291" href="#categories_person"><area shape="rect" coords="117,250,121,289" href="#categories_person"><area shape="rect" coords="119,248,206,252" href="#categories_person"><area shape="rect" coords="622,198,683,202" href="#countries_locations"><area shape="rect" coords="620,200,624,225" href="#countries_locations"><area shape="rect" coords="555,223,622,227" href="#countries_locations"><area shape="rect" coords="259,288,263,310" href="#person_sales"><area shape="rect" coords="261,308,347,312" href="#person_sales"><area shape="rect" coords="345,310,349,366" href="#person_sales"><area shape="rect" coords="479,368,563,372" href="#customers_sales"><area shape="rect" coords="477,370,481,427" href="#customers_sales"><area shape="rect" coords="398,425,479,429" href="#customers_sales"><area shape="rect" coords="151,393,220,397" href="#class_sales"><area shape="rect" coords="218,395,222,427" href="#class_sales"><area shape="rect" coords="220,425,295,429" href="#class_sales"></map>
+<BR>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="categories"><CENTER>categories</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Personnel categories</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">cat_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">category</td>
+<td class="tabledata1">CHAR(30)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">categories_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">categories</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="class"><CENTER>class</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Sales categories</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">class_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">class</td>
+<td class="tabledata1">CHAR(20)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">class_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">class</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="countries"><CENTER>countries</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Countries where locations belong </td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">country_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">country</td>
+<td class="tabledata1">CHAR(30)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">countries_locations</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">countries</td>
+<td class="tabledata1">locations</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="customers"><CENTER>customers</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Customers who are buying company products</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">customer_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">customer</td>
+<td class="tabledata1">CHAR(40)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">customers_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">customers</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="departments"><CENTER>departments</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Company departments</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">dept_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">dept</td>
+<td class="tabledata1">CHAR(30)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">departments_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">departments</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="locations"><CENTER>locations</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Locations where the employees work</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">loc_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">loc</td>
+<td class="tabledata1">CHAR(30)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">country_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">locations_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">locations</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">countries_locations</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">countries</td>
+<td class="tabledata1">locations</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="person"><CENTER>person</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Table containing company employees</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">person_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">name</td>
+<td class="tabledata1">CHAR(20)</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">salary</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">gender</td>
+<td class="tabledata1">CHAR(1)</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">dept_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">cat_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">loc_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">person_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">departments_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">departments</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">locations_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">locations</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">categories_person</td>
+<td class="tabledata1">Non Identifying</td>
+<td class="tabledata1">categories</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="tableheader2" width=100%><tr><td><A NAME="sales"><CENTER>sales</CENTER></A></td></tr></table>
+<P>
+<table class="header1"><tr><td>Description</td></tr></table>
+<table class="normaltext"><tr><td>Sales logs</td></tr></table>
+<P>
+<table class="header1"><tr><td>Attributes</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+PK
+</td>
+<td>
+Attribute Name
+</td>
+<td>
+Data Type
+</td>
+<td>
+Not Null
+</td>
+<td>
+Unique
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">person_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">class_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">sale_date</td>
+<td class="tabledata1">DATE</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">customer_id</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">No</td>
+<td class="tabledata1">sale_amount</td>
+<td class="tabledata1">INTEGER</td>
+<td class="tabledata1">Yes</td>
+<td class="tabledata1">No</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+<table class="header1"><tr><td>Relationships</td></tr></table>
+<table width="100%" class="table1">
+<tr class="tableheader1">
+<td>
+Relationship Name
+</td>
+<td>
+Type
+</td>
+<td>
+Parent
+</td>
+<td>
+Child
+</td>
+<td>
+Description
+</td>
+</tr>
+<tr>
+<td class="tabledata1">person_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">person</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">customers_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">customers</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+<tr>
+<td class="tabledata1">class_sales</td>
+<td class="tabledata1">Identifying</td>
+<td class="tabledata1">class</td>
+<td class="tabledata1">sales</td>
+<td class="tabledata1"></td>
+</tr>
+</table>
+<P>
+</BODY>
+</HTML>

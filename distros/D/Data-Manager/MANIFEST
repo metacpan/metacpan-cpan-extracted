@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+ignore.txt
+lib/Data/Manager.pm
+t/00-load.t
+t/release-pod-syntax.t
+t/release-synopsis.t
+t/serialize.t
+t/simple.t

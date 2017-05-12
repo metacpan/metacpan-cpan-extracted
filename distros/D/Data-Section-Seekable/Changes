@@ -1,0 +1,67 @@
+Revision history for Data-Section-Seekable
+
+0.09    2016-02-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add test: binary.
+
+
+0.08    2015-11-27 (PERLANCAR)
+
+	- Allow writing DSS with no parts.
+
+
+0.07    2015-10-21 (PERLANCAR)
+
+	- Allow header line to not be the first line of data section.
+
+
+0.06    2015-06-18 (PERLANCAR)
+
+        - [Incompatible change] Replace separator() with header() as the latter
+          makes more sense when adding multiple parts. header() can be a string
+          or a coderef.
+
+        - [ux] The default header() now prints "### <name> ###" so for normal
+          cases user does not change the default.
+
+
+0.05    2015-06-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak tests and examples in POD.
+
+
+0.04    2015-06-12 (PERLANCAR)
+
+        - Writer: add separator() accessor.
+
+        - Writer: add empty().
+
+        - Writer: now builds data section as you add_part(), this allows
+          changing separator in the middle (e.g. if you want to mark each part
+          with a separator that indicates its name).
+
+
+0.03    2015-06-12 (PERLANCAR)
+
+        - Format tweak: allow adding extra information (metadata/whatever) to
+          each part in TOC (the fourth field).
+
+        - Writer: add_part() accepts optional extra information as 3rd argument.
+
+        - Reader: Add read_extra() method.
+
+
+0.02    2015-06-12 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add more tests.
+
+
+0.01    2015-06-12 (PERLANCAR)
+
+	- First release.

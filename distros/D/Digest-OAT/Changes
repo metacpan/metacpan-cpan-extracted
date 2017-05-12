@@ -1,0 +1,8 @@
+Revision history for Perl extension Digest::OAT.
+
+0.04  - Now 64-bit friendly.  A C99 compiler is now necessary for the uint32_t type.
+
+0.01  Tue Jul  1 13:41:54 2008
+	- original version; created by h2xs 1.23 with options
+		-n Digest::OAT
+

@@ -1,0 +1,133 @@
+NAME
+    Data::Dump::Color - Like Data::Dump, but with color
+
+VERSION
+    This document describes version 0.23 of Data::Dump::Color (from Perl
+    distribution Data-Dump-Color), released on 2014-10-29.
+
+SYNOPSIS
+    Use it like you would Data::Dump, e.g.:
+
+     use Data::Dump::Color; dd localtime;
+
+DESCRIPTION
+    This module aims to be a drop-in replacement for Data::Dump. It adds
+    colors to dumps. It also adds various visual aids in the comments, e.g.
+    array/hash index, depth indicator, and so on.
+
+    For more information, see Data::Dump. This documentation explains what's
+    different between this module and Data::Dump.
+
+RESULTS
+    By default Data::Dump::Color shows array index or hash pair sequence in
+    comments for visual aid, e.g.:
+
+     [
+       "this",      # [0]
+       "is",        # [1]
+       "a",         # [2]
+       "5-element", # [3]
+       "array",     # [4]
+       {
+         0  => "with",  # .{0}
+         1  => "an",    # .{1}
+         2  => "extra", # .{2}
+         3  => "hash",  # .{3}
+         4  => "at",    # .{4}
+         5  => "the",   # .{5}
+         16 => "end",   # .{6}
+       },           # [5]
+     ]
+
+    "[]" and "{}" brackets will indicate whether they are indexes to an
+    array or a hash. The dot prefixes will mark depth level.
+
+    To turn this off, set $INDEX to 0:
+
+     [
+       "this",
+       "is",
+       "a",
+       "5-element",
+       "array",
+       {
+         0  => "with",
+         1  => "an",
+         2  => "extra",
+         3  => "hash",
+         4  => "at",
+         5  => "the",
+         16 => "end",
+       },
+     ]
+
+VARIABLES
+    "$Data::Dump::*" package variables from Data::Dump, like
+    $Data::Dump::TRY_BASE64, etc are now in the "Data::Dump::Color"
+    namespace, e.g. $Data::Dump::Color::TRY_BASE64, etc.
+
+    Additional variables include:
+
+    $COLOR => BOOL (default: undef)
+        Whether to force-enable or disable color. If unset, color output
+        will be determined from $ENV{COLOR} or when in interactive terminal
+        (when "-t STDOUT" is true).
+
+    %COLORS => HASH (default: default colors)
+        Define colors.
+
+    $INDEX => BOOL (default: 1)
+        Whether to add array/hash index visual aid.
+
+    $LENTHRESHOLD => int (default: 500)
+        Add string length visual aid for hash key/hash value/array element
+        if length is at least this value.
+
+ENVIRONMENT
+    *   COLOR
+
+        If set, then will force color output on or off. By default, will
+        only output color when in interactive terminal. This is consulted
+        when $COLOR is not set.
+
+FAQ
+  How do I turn off index comments?
+    Set $Data::Dump::Color::INDEX to 0.
+
+  How do I turn off colors?
+    Well, colors is sort of the point of this module. But if you want to
+    turn it off, you can set environment COLOR to 0, or
+    $Data::Dump::Color::COLOR to 0.
+
+  How do I customize colors?
+    Fiddle the colors in %Data::Dump::Color::COLORS. There will probably be
+    proper color theme support in the future (based on
+    SHARYANTO::Role::ColorTheme.
+
+SEE ALSO
+    Data::Dump, JSON::Color, YAML::Tiny::Color
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-Color>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Data-Dump-Color>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-Color>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

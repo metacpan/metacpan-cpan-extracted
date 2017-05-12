@@ -1,0 +1,9 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Danga/Socket/Redis.pm
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

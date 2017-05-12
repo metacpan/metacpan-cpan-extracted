@@ -1,0 +1,212 @@
+package DBIx::Class::DeploymentHandler::Manual::Intro
+
+# ABSTRACT: Introduction to DBIx::Class::DeploymentHandler
+
+__END__
+
+=pod
+
+=head1 NAME
+
+DBIx::Class::DeploymentHandler::Manual::Intro - Introduction to DBIx::Class::DeploymentHandler
+
+=head1 Why is DBIx::Class::DeploymentHandler worth using?
+
+The most obvious reasons for using DBIx::Class::DeploymentHandler are
+that it can run multiple SQL scripts as well as Perl scripts, unlike
+DBIx::Class::Schema::Versioned, which only allows for a single SQL script.
+It is also extremely extensible, and is an opportunity for a break from
+backwards compatibility, so some regrettable decisions are avoided.
+
+=head1 Sample database
+
+Follow L<DBIx::Class::Manual::Intro> except for the parts setting up the
+database.  After you are done, You should have the following files.
+
+ MyDatabase/
+ |-- Main
+ |   |-- Result
+ |   |   |-- Artist.pm
+ |   |   |-- Cd.pm
+ |   |   `-- Track.pm
+ |   `-- ResultSet
+ `-- Main.pm
+
+Add a line like the following in your MyDatabase::Main file:
+
+ our $VERSION = 1;
+
+or if you are using a newer Perl you can use the prettier syntax:
+
+ package MyDatabase::Main 1;
+
+By default DBIx::Class::DeploymentHandler only uses integers for versions,
+this makes versioning much simpler for figuring out what version is next
+(or previous.) However, if you are using decimal numbers for versioning,
+you will need to create a separate DeploymentHandler class, as per
+L<DBIx::Class::DeploymentHandler::Cookbook::CustomResultSource>, and
+set the VersionHandler class_name from Monotonic to ExplicitVersions or
+DatabaseToSchemaVersions, as these handle version numbers as strings instead
+of integers.
+
+=head1 install.pl
+
+Our first script, C<install.pl> reads our schema file and creates the tables
+in the database.
+
+ #!/usr/bin/env perl
+
+ use strict;
+ use warnings;
+ use aliased 'DBIx::Class::DeploymentHandler' => 'DH';
+ use Getopt::Long;
+ use FindBin;
+ use lib "$FindBin::Bin/../lib";
+ use MyDatabase::Main;
+
+ my $force_overwrite = 0;
+
+ unless ( GetOptions( 'force_overwrite!' => \$force_overwrite ) ) {
+     die "Invalid options";
+ }
+
+ my $schema = MyDatabase::Main->connect('dbi:SQLite:mydb.db');
+
+ my $dh = DH->new(
+     {
+         schema              => $schema,
+         script_directory    => "$FindBin::Bin/../dbicdh",
+         databases           => 'SQLite',
+         sql_translator_args => { add_drop_table => 0 },
+         force_overwrite     => $force_overwrite,
+     }
+ );
+
+ $dh->prepare_install;
+ $dh->install;
+
+=head2 dbicdh - Our migration scripts
+
+Running C<install.pl> should create the following:
+
+ dbicdh/
+ |-- SQLite
+ |   `-- deploy
+ |       `-- 1
+ |           `-- 001-auto.sql
+ `-- _source
+     `-- deploy
+         `-- 1
+             `-- 001-auto.yml
+
+You may wish to turn on L<debug logging|DBIx::Class::DeploymentHandler/"LOGGING"> 
+before running this script by setting the environment variable C<DBICDH_TRACE> to
+C<1>.
+
+=head3 001-auto.sql
+
+DBIx::Class::DeploymentHandler automatically generates SQL from our schema
+that is suitable for SQLite
+
+=head3 001-auto.yml
+
+This contains all of the raw information about our schema that is then
+translated into the sql.
+
+=head3 Population
+
+To truly take advantage of all DBIx::Class::DeploymentHandler offers, you
+should probably be using it for population.  To do that all you need to do
+is create a file called C<dbicdh/_common/deploy/1/create_artists.pl>:
+
+  sub {
+     my $schema = shift;
+     $schema->resultset('Artist')->populate([
+        ['artistid', 'name'],
+        [1,          'Marillion'],
+        [2,          'The Moutain Goats'],
+        [3,          'Ladyhawke'],
+     ]);
+  };
+
+=head1 Upgrading
+
+Add a line to MyDatabase/Main/Result/Cd.pm below
+
+ __PACKAGE__->add_columns(qw/ cdid artist title /);
+
+with
+
+ __PACKAGE__->add_column(isbn => { is_nullable => 1 });
+
+Aside: It must be nullable or have a default - otherwise the upgrade will
+fail for logical reasons.  To be clear, if you add a column to a database and
+it is not nullable and has no default, what will the existing rows contain
+for that column?
+
+Now you need to modify the schema version in your MyDatabase::Main file to
+tell DBIx::Class::DeploymentHandler the new schema version number. You will
+want to remember the earlier advice about integer version numbers.
+
+ our $VERSION = 2;
+
+So here is our next script, C<upgrade.pl>:
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ use aliased 'DBIx::Class::DeploymentHandler' => 'DH';
+ use FindBin;
+ use lib "$FindBin::Bin/../lib";
+ use MyDatabase::Main;
+ my $schema = MyDatabase::Main->connect('dbi:SQLite:mydb');
+
+ my $dh = DH->new({
+    schema              => $schema,
+    script_directory    => "$FindBin::Bin/../dbicdh",
+    databases           => 'SQLite',
+    sql_translator_args => { add_drop_table => 0 },
+ });
+
+ $dh->prepare_deploy;
+ $dh->prepare_upgrade({ from_version => 1, to_version => 2});
+ $dh->upgrade;
+
+Our script directory now looks like:
+
+  dbicdh/
+  |-- SQLite
+  |   |-- deploy
+  |   |   |-- 1
+  |   |   |   `-- 001-auto.sql
+  |   |   `-- 2
+  |   |       `-- 001-auto.sql
+  |   `-- upgrade
+  |       `-- 1-2
+  |           `-- 001-auto.sql
+  `-- _source
+      `-- deploy
+          |-- 1
+          |   `-- 001-auto.yml
+          `-- 2
+              `-- 001-auto.yml
+
+The new C<deploy/001-auto.sql> and C<deploy/001-auto.yml> files are the
+state of the db as at that version.  The C<upgrade/1-2/001-auto.sql> file
+is the most interesting one; it is what gets your database from version 1 to 2.
+
+And again, you can create a Perl file like we did previously with the
+deploy stage.
+
+=head1 AUTHOR
+
+Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Arthur Axel "fREW" Schmidt.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

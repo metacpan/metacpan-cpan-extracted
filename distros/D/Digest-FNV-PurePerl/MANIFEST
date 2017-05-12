@@ -1,0 +1,12 @@
+Changes
+ignore.txt
+lib/Digest/FNV/PurePerl.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/fnv32.t
+t/fnv64.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

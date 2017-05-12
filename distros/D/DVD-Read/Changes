@@ -1,0 +1,25 @@
+Revision history for Perl extension DVD::Read.
+
+0.04
+    - add DVD::Read::Title::extract to extract the whole
+      title.
+    - extract* functions can give read progression using
+      code ref
+
+0.03 Sun Nov 16 11:52:08 2008
+    - No changes, fix broken upload to CPAN
+
+0.02 Sun Nov 16 05:00:00 2008
+    - inverting VGM/VTS Ifo module cause fatal error
+    - value passed to C are checked, avoid to index non
+      existing elemens (such negatives or over limits)
+    - fix: calling non existing function with autoload
+      cause a fatal error
+    - split IFO modules into Vmg and Vts modules, avoiding
+      functions misusage
+    - Add DVD::Read::Dvd::File object to read file from DVD
+
+0.01  Thu Nov  6 06:11:26 2008
+	- original version; created by h2xs 1.23 with options
+		-n DVD::Read
+

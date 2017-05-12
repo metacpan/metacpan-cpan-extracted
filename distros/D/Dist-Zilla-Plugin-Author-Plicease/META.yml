@@ -1,0 +1,44 @@
+---
+abstract: 'Dist::Zilla plugins used by Plicease'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Author-Plicease
+no_index:
+  directory:
+    - corpus
+    - lib/Dist/Zilla/MintingProfile
+    - profiles
+  file:
+    - lib/Dist/Zilla/Plugin/Author/Plicease/Init2.pm
+requires:
+  Data::Section: '0'
+  Dist::Zilla: '5.039'
+  File::Path: '0'
+  File::ShareDir: '0'
+  File::chdir: '0'
+  IPC::System::Simple: '1.25'
+  Moose: '0'
+  Path::Class: '0.26'
+  Sub::Exporter::ForMethods: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease/issues
+  homepage: https://metacpan.org/pod/Dist::Zilla::Plugin::Author::Plicease
+  repository: git://github.com/plicease/Dist-Zilla-Plugin-Author-Plicease.git
+version: '2.12'
+x_serialization_backend: 'YAML::Tiny version 1.70'

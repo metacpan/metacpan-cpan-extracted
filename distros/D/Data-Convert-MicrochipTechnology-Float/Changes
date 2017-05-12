@@ -1,0 +1,12 @@
+Revision history for Perl module Data::Convert::MicrochipTechnology::Float
+
+0.03 15 Apr 2007
+    - Updated PREREQ_PM
+0.02 14 Apr 2007
+    - changed convert interface a little
+    - added tests
+    - updated documentation
+0.01 Fri Apr 13 23:59:09 2007
+    - original version; created by ExtUtils::ModuleMaker 0.49
+
+

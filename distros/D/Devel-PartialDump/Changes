@@ -1,0 +1,72 @@
+Revision history for Devel-PartialDump
+
+0.18      2015-08-16 04:35:35Z
+    - update some distribution tooling
+
+0.17      2013-11-30 20:47:47Z
+    - many fixes (thanks, Steven Lee!)
+      - attribute list_delim is now being used in list dumps
+      - setting attribute max_length to 0 now shortens more, to '...'
+      - fixed use of = in array/hash ref objects
+      - extra test coverage
+
+0.16      2013-11-24 00:43:48Z
+    - Moose dependency removed, resolving circular dependency in Moose's
+      recommended prereqs (thanks, David Golden!)
+    - converted packaging to Dist::Zilla
+
+0.15      2011-05-05
+    - Bump dependency on namespace::clean to 0.20, as requested by doy++.
+
+0.14      2011-04-25
+    - Don't go into an infinite loop when dumping references to references.
+      Also, dump LVALUE references properly. (doy)
+
+0.13      2010-01-08
+    - Merge NUFFIN/Devel-PartialDump-0.12.tar.gz and
+      FLORA/Devel-PartialDump-0.12.tar.gz.
+    - Add Test::Warn to PREREQ_PM - patch by Ranguard
+
+0.12      2009-12-21 (NUFFIN)
+    - no more Any::Moose
+
+0.12      2009-11-08 (FLORA)
+    - Update example output in the docs with the JSON-like format
+
+0.11      2009-11-06
+    - unbreak tests
+
+0.10      2009-11-05
+    - Make formatting configurable, and change to resemble JSON by default
+
+0.09      2009-06-30
+    - Add some example output to the documentation
+    - Update version control notice
+
+0.08      2009-05-16
+    - Switch to Any::Moose (rafl)
+
+0.07      2008-09-29
+    - Skip tests if Test::Warn is not installed
+
+0.06      2008-07-30
+    - add override_carp import option, which replaces Carp's argument
+      formatting with Devel::PartialDump::dump
+
+0.05      2008-07-24
+    - Ugh... another dep fix
+
+0.04      2008-07-24
+    - Fix bad deps
+
+0.03      2008-07-24
+    - use Mouse & Sub::Exporter
+    - optional Carp replacement exports
+
+0.02      2008-03-30
+    - fixed DESCRIPTION, which just trailed off mid sentance
+    - Add the C<warn> method
+    - Add optional exports
+
+0.01      2008-03-19
+    - Initial release

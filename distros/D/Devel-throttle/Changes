@@ -1,0 +1,53 @@
+commit c713ff5344862bf6e3dac775424716df2aaeec0b
+Author: Guido Flohr <guido@imperia.net>
+Date:   Wed Oct 14 14:46:32 2009 +0300
+
+    Pre-release stuff.
+
+commit d50f151935f5b2f53c51fa91104e04b604f2ceae
+Author: Guido Flohr <guido@imperia.net>
+Date:   Wed Oct 14 14:44:38 2009 +0300
+
+    Added documentation.
+
+commit e4cd2fe4fd91f5b5565a87808236009361eaea0b
+Author: Guido Flohr <guido@imperia.net>
+Date:   Mon Oct 12 14:06:12 2009 +0300
+
+    Allow definition of custom throttling function.
+
+commit 6b729adc0d465d1db449c65f59b9624169116eee
+Author: Guido Flohr <guido@imperia.net>
+Date:   Mon Oct 12 10:55:07 2009 +0300
+
+    Use $DB::throttle instead of $Devel::throttle::throttle for rate.
+
+commit 052a74ea55ad9753803359d1673d061b5005c5eb
+Author: Guido Flohr <guido@imperia.net>
+Date:   Mon Oct 12 10:52:55 2009 +0300
+
+    Arguments to use now determine throttling rate.
+
+commit 17c2bf65bf85f4d8cf4de35096448b3f6d802287
+Author: Guido Flohr <guido@imperia.net>
+Date:   Fri Oct 9 15:33:01 2009 +0300
+
+    Very basic version without configuration.
+
+commit dccbba9f653baf85a99a3a260cd737241ccb1472
+Author: Guido Flohr <guido@imperia.net>
+Date:   Fri Oct 9 15:25:58 2009 +0300
+
+    More infrastructure.
+
+commit 2aed5a7f869c6a3d89944b3a3feac5f48b3ae5e2
+Author: Guido Flohr <guido@imperia.net>
+Date:   Fri Oct 9 15:10:30 2009 +0300
+
+    Minimum infrastructure for CPAN and git.
+
+commit 79db56aad1dbb4c5fbe6fac3c7c87578b20c15d7
+Author: Guido Flohr <guido@imperia.net>
+Date:   Fri Oct 9 14:55:46 2009 +0300
+
+    Initial version.

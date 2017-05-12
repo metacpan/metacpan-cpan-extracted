@@ -1,0 +1,19 @@
+:#$Id: INSTALL.SKIP 33 2007-08-22 22:00:26Z demerphq $id
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+
+# Avoid Devel::Cover files.
+\bcover_db\b

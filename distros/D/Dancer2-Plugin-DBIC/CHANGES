@@ -1,0 +1,281 @@
+==================================================
+Changes from 2006-05-28 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0013 at 2016-05-25 16:41:33 +0000
+-------------------------------------------
+
+  Change: bcd2928bb6f114eb24272224ad6594b67757265f
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-05-25 12:27:57 +0000
+
+    v0.0013 
+
+  Change: f96a3438bf85b25f2c43d86f16fd1761e0b23849
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-05-25 12:03:37 +0000
+
+    Merge pull request #16 from SysPete/plugin2
+
+    split multiple-schemas tests into two 
+
+  Change: a5293666d05c6d1445ede9137962e21c85dbc31e
+  Author: Peter Mottram (SysPete) <peter@sysnix.com>
+  Date : 2016-04-09 15:57:59 +0000
+
+    split multiple-schemas tests into two
+
+    Plugin2's config attribute is immutable and so config cannot be
+    changed after using plugin during runtime. 
+
+-------------------------------------------
+version 0.0012 at 2016-03-29 17:16:30 +0000
+-------------------------------------------
+
+  Change: 4b99a19b087db5041337a053ccb79f5b1b46202b
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-03-29 13:16:30 +0000
+
+    v0.0012 
+
+  Change: 4adc171733beddd14f0b13c602b712ffe3a4226f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-03-29 13:10:12 +0000
+
+    Merge pull request #14 from SysPete/plugin2
+
+    use $dsl->config instead of plugin_settings for plugin2 
+
+  Change: 721e3b036ef205bd02b13aa6f94f76053e71ead1
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-03-29 18:40:34 +0000
+
+    syspete-- plugin2 check should use $dsl->app->can 
+
+  Change: 1cd6d2b78a1d085384aedf6e0cbbb1bf9976f229
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-03-29 18:07:21 +0000
+
+    use $dsl->config instead of plugin_settings for plugin2
+
+    Any plugins which use this plugin will not work when plugin1's
+    plugin_config keyword is used and so if we smell plugin2 we get
+    config via $dsl->config instead. This is needed by
+    Dancer2::Plugin::Auth::Extensible::Provider::DBIC (and probably some
+    other plugins - still some work to do).
+
+    Thanks to yanick for the pointer. 
+
+-------------------------------------------
+version 0.0011 at 2015-12-30 09:51:53 +0000
+-------------------------------------------
+
+  Change: e2aa28c2062c9baaf1f0ff9e1c92795ce0a9f5ab
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-12-30 04:51:53 +0000
+
+    v0.0011 
+
+  Change: 979132049c2ec78fc950e01f6b33b64d2502f449
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-12-28 17:03:49 +0000
+
+    Merge pull request #13 from SysPete/master
+
+    Remove subroutine import list from test 04 
+
+  Change: 3fa9925905a0065686c50d927892a285923d7a25
+  Author: Peter Mottram (SysPete) <peter@sysnix.com>
+  Date : 2015-12-28 18:11:16 +0000
+
+    Remove subroutine import list from test 04
+
+    The new (soon to be released) Dancer2::Plugin code no longer allows
+    subroutine import list to be supplied when plugin is used. 
+
+-------------------------------------------
+version 0.0010 at 2015-11-09 12:34:23 +0000
+-------------------------------------------
+
+  Change: ccead0ddd829074c93f5f5794ad9d1f4c6b510c6
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-11-09 07:34:23 +0000
+
+    v0.0010 
+
+  Change: 3082f077826b0e3fb71cabed7d93352da3f45c23
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-06-26 13:10:27 +0000
+
+    Merge pull request #10 from hvoers/master
+
+    remove return after return 
+
+  Change: ddb20ba013f1d88f3b63b778ad3bf96ac3dc7b6c
+  Author: Henk van Oers <hvo.pm@xs4all.nl>
+  Date : 2015-06-26 09:39:33 +0000
+
+    remove return after return 
+
+-------------------------------------------
+version 0.0009 at 2015-04-22 04:59:36 +0000
+-------------------------------------------
+
+  Change: 39cae7c595858373397368701fc23fa90b359ed0
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-04-22 00:59:36 +0000
+
+    use DBICx::Sugar 
+
+-------------------------------------------
+version 0.0008 at 2014-11-04 02:35:36 +0000
+-------------------------------------------
+
+  Change: 49591c136640f529d9c88395eff80f482f048329
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-03 21:35:36 +0000
+
+    v0.0008 require recent version of Dancer2
+
+    Some cpantester tests were failing because they were running against
+    a too old version of Dancer2. 
+
+-------------------------------------------
+version 0.0007 at 2014-11-02 19:03:52 +0000
+-------------------------------------------
+
+  Change: d8ee5bf271afaaa740771984c7e528c98c2563da
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-02 14:03:52 +0000
+
+    v0.0007 
+
+  Change: c8840c4ad890aa1b1631058916e0697e293b688d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-02 12:16:50 +0000
+
+    Merge pull request #7 from stefansbv/pr/testupd
+
+    Switch to 'Plack::Test' ('Dancer2::Test' is deprecated). 
+
+  Change: a5b31bddd2a7f1bd538bc63b08175e5015149ad9
+  Author: Stefan Suciu <stefbv70@gmail.com>
+  Date : 2014-11-02 17:37:52 +0000
+
+    Switch to 'Plack::Test' ('Dancer2::Test' is deprecated). 
+
+  Change: 4e2ed1e5f02cb746b13db5044d07e2f67bc29e21
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-07 02:11:58 +0000
+
+    releasing v0.0006 
+
+  Change: 894045d93cf00516dab32cd9057ff7e725f20fde
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-07 00:05:44 +0000
+
+    :no_dsl 
+
+  Change: 3e180bc86d854f04011e372a0f05c500966c56c8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-08-06 23:54:14 +0000
+
+    deprecated the pass option in favor of password 
+
+  Change: fa406b1b82fb5eaf4a7aef3f13d5d144b1b005d8
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-03-20 12:53:00 +0000
+
+    Merge pull request #4 from dsteinbrunner/patch-1
+
+    typo fix 
+
+  Change: 2bcad86f540318db9593a1a22df6c7f6bff396bb
+  Author: David Steinbrunner <dsteinbrunner@pobox.com>
+  Date : 2014-03-20 12:42:39 +0000
+
+    typo fix 
+
+  Change: 925dbd84b1770b0e8374361f87f47c6a08f47188
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-10-29 13:01:45 +0000
+
+    Releasing version 0.0005 
+
+  Change: d3b0a1c072c0d27e02d96bffa7b2e64302eec60d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-10-08 00:28:21 +0000
+
+    Merge pull request #2 from scriplit/master
+
+    Removed :tests in import 
+
+  Change: 48084c2945d8cf2dd96c484dc5927da3b6f5fa9e
+  Author: scriplit <scriplit@yahoo.com>
+  Date : 2013-10-08 08:34:00 +0000
+
+    Removed :tests in import (Dancer2 issue GH#417) 
+
+  Change: 556bc1a53648365cd26eb844a6fec526764c2dd7
+  Author: scriplit <scriplit@yahoo.com>
+  Date : 2013-10-08 08:33:05 +0000
+
+    Removed :tests in import (Dancer2 issue GH#417) 
+
+  Change: 475abcd24b29965e843512a49f350d3ed1e8d775
+  Author: scriplit <scriplit@yahoo.com>
+  Date : 2013-10-08 08:32:32 +0000
+
+    Removed :tests in import (Dancer2 issue GH#417) 
+
+  Change: a93cb019f9253b2a538dd6f9dd683c95815ff8e2
+  Author: scriplit <scriplit@yahoo.com>
+  Date : 2013-10-08 08:31:22 +0000
+
+    Removed :tests in import (Dancer2 issue GH#417) 
+
+  Change: 9dd1ee861c42a978f959d0420676ef6480885ecc
+  Author: scriplit <scriplit@yahoo.com>
+  Date : 2013-10-08 08:29:52 +0000
+
+    Update 01-single-schema.t
+
+    https://github.com/PerlDancer/Dancer2/issues/417 
+
+  Change: a4a054c219ee3c1b99541618e13b867ccfe3387f
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-09-12 02:32:49 +0000
+
+    v0.0004 Fixed tests again. Seems like Dancer2 removed the :syntax
+    import option. 
+
+  Change: 1274ed4e71e25390a3937d768d7bda3ef3b94ebf
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-07-25 03:23:01 +0000
+
+    Fixed tests. Version 0.0003 
+
+  Change: 9ca1529eb019c378bfbdc43ea26d7e65c56909da
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-05-16 06:13:58 +0000
+
+    Merge pull request #1 from ironcamel/fix-dancer2-req
+
+    No longer require a specific version of Dancer2 
+
+  Change: c55624cfdffffe10f9b7088cce53dd3f69ec2ee9
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-05-16 09:12:37 +0000
+
+    No longer require a specific version of Dancer2. 
+
+  Change: c8d7d42b8fbc2a31c099f33c043c0c7938f75344
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2013-03-05 15:19:36 +0000
+
+    First commit 
+
+================
+End of releases.
+================

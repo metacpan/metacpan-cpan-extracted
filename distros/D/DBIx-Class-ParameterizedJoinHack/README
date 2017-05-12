@@ -1,0 +1,152 @@
+NAME
+    DBIx::Class::ParameterizedJoinHack - Parameterized Relationship Joins
+
+SYNOPSIS
+        #
+        #   The Result class we want to allow to join with a dynamic
+        #   condition.
+        #
+        package MySchema::Result::Person;
+        use base qw(DBIx::Class::Core);
+
+        __PACKAGE__->load_components(qw(ParameterizedJoinHack));
+        __PACKAGE__->table('person');
+        __PACKAGE__->add_columns(
+            id => {
+                data_type => 'integer',
+                is_nullable => 0,
+                is_auto_increment => 1,
+            },
+            name => {
+                data_type => 'text',
+                is_nullable => 0,
+            }
+        );
+
+        ...
+
+        __PACKAGE__->parameterized_has_many(
+            priority_tasks => 'MySchema::Result::Task',
+            [['min_priority'] => sub {
+                my $args = shift;
+                return +{
+                    "$args->{foreign_alias}.owner_id" => {
+                        -ident => "$args->{self_alias}.id",
+                    },
+                    "$args->{foreign_alias}.priority" => {
+                        '>=' => $_{min_priority},
+                    },
+                };
+            }],
+        );
+
+        1;
+
+        #
+        #   The ResultSet class belonging to your Result
+        #
+        package MySchema::ResultSet::Person;
+        use base qw(DBIx::Class::ResultSet);
+
+        __PACKAGE__->load_components(qw(ResultSet::ParameterizedJoinHack));
+
+        1;
+
+        #
+        #   A Result class to join against.
+        #
+        package MySchema::Result::Task;
+        use base qw(DBIx::Class::Core);
+    
+        __PACKAGE__->table('task');
+        __PACKAGE__->add_columns(
+            id => {
+                data_type => 'integer',
+                is_nullable => 0,
+                is_auto_increment => 1,
+            },
+            owner_id => {
+                data_type => 'integer',
+                is_nullable => 0,
+            },
+            priority => {
+                data_type => 'integer',
+                is_nullable => 0,
+            },
+        );
+
+        ...
+
+        1;
+
+        #
+        #   Using the parameterized join.
+        #
+        my @urgent = MySchema
+            ->connect(...)
+            ->resultset('Person')
+            ->with_parameterized_join(
+                priority_tasks => {
+                    min_priority => 300,
+                },
+            )
+            ->all;
+
+WARNING
+    This module uses DBIx::Class internals and may break at any time.
+
+DESCRIPTION
+    This DBIx::Class component allows to declare dynamically parameterized
+    has-many relationships.
+
+    Add the component to your Result class as usual:
+
+        __PACKAGE__->load_components(qw( ParameterizedJoinHack ));
+
+    See "parameterized_has_many" for details on declaring relations.
+
+    See DBIx::Class::ResultSet::ParameterizedJoinHack for ResultSet usage.
+
+    Note: Currently only "parameterized_has_many" is implemented, since it
+    is the most requested use-case. However, adding support for other
+    relationship types is possible if a use-case is found.
+
+METHODS
+  parameterized_has_many
+        __PACKAGE__->parameterized_has_many(
+            $relation_name,
+            $foreign_source,
+            [\@join_arg_names, \&join_builder],
+            $attrs,
+        );
+
+    The $relation_name, $foreign_source, and $attrs are passed through to
+    "has_many" as usual. The third argument is an array reference containing
+    an (array reference) list of argument names and a code reference used to
+    build the join conditions.
+
+    The code reference will be called with the same arguments as if it had
+    been passed to "has_many" directly, but the global %_ hash will contain
+    the named arguments for the join.
+
+    See the "SYNOPSIS" for an example of a definition.
+
+SPONSORS
+    Development of this module was sponsored by
+
+    *   Ctrl O <http://ctrlo.com>
+
+AUTHOR
+     Matt S. Trout <mst@shadowcat.co.uk>
+
+CONTRIBUTORS
+     Robert Sedlacek <r.sedlacek@shadowcat.co.uk>
+
+COPYRIGHT
+    Copyright (c) 2015 the DBIx::Class::ParameterizedJoinHack "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

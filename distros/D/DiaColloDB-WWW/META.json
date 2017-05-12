@@ -1,0 +1,58 @@
+{
+   "abstract" : "Diachronic collocation index: www wrappers",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DiaColloDB-WWW",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "0",
+            "Cwd" : "0",
+            "DiaColloDB" : "v0.12.4",
+            "Encode" : "0",
+            "File::Copy::Recursive" : "0",
+            "File::ShareDir" : "0",
+            "File::chmod::Recursive" : "0",
+            "HTTP::Daemon" : "0",
+            "HTTP::Message" : "0",
+            "MIME::Types" : "0",
+            "POSIX" : "0",
+            "Socket" : "0",
+            "Template" : "0",
+            "Template::Plugin::JSON::Escape" : "0",
+            "Time::HiRes" : "0",
+            "URI" : "0",
+            "URI::Escape" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.02.001"
+}

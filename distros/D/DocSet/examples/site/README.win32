@@ -1,0 +1,32 @@
+First read the generic README file.
+
+...
+
+To be able to run bin/build, bin/docset_build and bin/makeindex under Win32,
+you'll have to go through the following steps (while you are in the
+site directory):
+
+  ..\site>cd bin
+  ..\site\bin>pl2bat build
+  ..\site\bin>pl2bat docset_build
+  ..\site\bin>pl2bat makeindex
+
+Now, being placed in your base directory, you can execute "bin\build" with
+any normal options. Note that you need some extra prereuisites to be able to
+run makeindex (swish-e for instance).
+
+To generate the PDF version of the site, you will also need the 'ps2pdf'
+utility, which is included with the GhostScript distribution:
+http://www.ghostscript.com/doc/AFPL/index.htm . Once you install it, you
+will need to add the lib\ and bin\ directories to your PATH (the
+directories depend on where you installed the Ghostscript distribution):
+
+ * Under Win9x, add the line
+  set PATH=C:\gs\gs7.04\bin;C:\gs\gs7.04\lib;%PATH%
+ to your C:\autoexec.bat file.
+ * Under WinNT, go to Control Panel -> System -> Advanced -> Environment
+ variables, and edit the PATH variable accordingly.
+
+If these files change in CVS, you will need to redo the above steps, or you
+won't see the changes.
+

@@ -1,0 +1,16 @@
+Revision history for Perl extension Data::Digest
+
+1.04 Wed  9 Jul 2008
+	- No functional changes
+	- Adding a minimum Perl version
+	- Upgrading to Module::Install 0.76
+
+0.03 Thu 29 Jun 2007
+	- No functional changes
+	- Upgrading to Module::Install 0.65
+
+0.02 Mon 13 Mar 2006
+	- Adding as_string method
+
+0.01 Sun 12 Mar 2006
+	- Created the initial version of the file

@@ -1,0 +1,74 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 359678b07f7b2404443017a22a156d36d4e46866 AUTHOR_PLEDGE
+SHA1 f5e7d51bc639e82987670fbbf99015849c25a82e CONTRIBUTORS
+SHA1 6b5c58c522da297cd230f5ee225d2f13b0134729 Changes
+SHA1 482e4f3db547f078b79db067ec06882bc67497f0 INSTALL
+SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
+SHA1 b83d42e19b3e32b573011d3be29057f46102eb49 MANIFEST
+SHA1 f1f57576caba93333aed2546b7b053fd35776c15 META.json
+SHA1 d47561e8bc9069664198f01e046fdbfd349c3ac6 META.yml
+SHA1 f578c8d30b88f894c95a988e3d4a94745eb89c51 Makefile.PL
+SHA1 d9e353c43312eee91b022e1239dd40ce3f241dbe README
+SHA1 efdf1e69843b38120204d8e4945ef8bb480944fa README.mkdn
+SHA1 c85f7b9480c29c480fcb985b935427a0948254e2 cpanfile
+SHA1 cdd06c83d68addbde03e515f9f54f97f47b485b5 doap.xml
+SHA1 e821f67300ebf367e60aa46d72576d77fd5f1629 lib/Dist/Zilla/Plugin/ShareDir/Tarball.pm
+SHA1 fe23a5fcc8f6e019cb4668fd21808c62faa25932 t/00-compile.t
+SHA1 01affbd15eba9a19a8c13f93f852924b2d171947 t/000-report-versions-tiny.t
+SHA1 b2864b7c27eb9c03edf29318c875d931af04e7fd t/Test-DZST-2/Changes
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/Test-DZST-2/abc/xyz/dir1/blank.txt
+SHA1 9d058710a53a69b014b746bdfa68889b1a2bbdbb t/Test-DZST-2/dist.ini
+SHA1 8b110853a4881be018078a1effff51adf8a3fcfb t/Test-DZST-2/lib/Test/DZST.pm
+SHA1 b2864b7c27eb9c03edf29318c875d931af04e7fd t/Test-DZST/Changes
+SHA1 9ba615680ae492362a33aebc776a03135e952e0a t/Test-DZST/abc/xyz/dir1/foo.txt
+SHA1 e1487a0d73328a29f6130fdfe03f01ef1764b9b8 t/Test-DZST/dist.ini
+SHA1 85fdd8aab0eac8e2c9bd394aa1992687f08d8057 t/Test-DZST/lib/Test/DZST.pm
+SHA1 3ef6b1311c62973e256c39f2f01d808f6be0da76 t/basic.t
+SHA1 9959ed6b17ba19e24e54cd748ebbcdeb80237fce t/corpus-dir/Changes
+SHA1 e242ed3bffccdf271b7fbaf34ed72d089537b42f t/corpus-dir/custom/bar
+SHA1 f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 t/corpus-dir/custom/foo
+SHA1 d58f8ec03759f6473793c9370919c67cba0e7c2a t/corpus-dir/dist.ini
+SHA1 a770e486c9add632d55d0fe7b9bd0afa6b93cf60 t/corpus-dir/lib/DZT/Sample.pm
+SHA1 9959ed6b17ba19e24e54cd748ebbcdeb80237fce t/corpus-module-build/Changes
+SHA1 12d40c3844c9126dd681b391f5499a67612fb3fc t/corpus-module-build/DZT-Sample-1.0.tar.gz
+SHA1 76c10b200ffe4b982dccbaea9a7d109867904a21 t/corpus-module-build/DZT-Sample-1.0/Build.PL
+SHA1 9959ed6b17ba19e24e54cd748ebbcdeb80237fce t/corpus-module-build/DZT-Sample-1.0/Changes
+SHA1 38aec38d2c8b90e64eb33f338b0d2e8a83241447 t/corpus-module-build/DZT-Sample-1.0/dist.ini
+SHA1 a770e486c9add632d55d0fe7b9bd0afa6b93cf60 t/corpus-module-build/DZT-Sample-1.0/lib/DZT/Sample.pm
+SHA1 3e4a1ad50c80a1b0a62cb2bf21605f52e9121687 t/corpus-module-build/DZT-Sample-1.0/share/shared-files.tar.gz
+SHA1 38aec38d2c8b90e64eb33f338b0d2e8a83241447 t/corpus-module-build/dist.ini
+SHA1 a770e486c9add632d55d0fe7b9bd0afa6b93cf60 t/corpus-module-build/lib/DZT/Sample.pm
+SHA1 e242ed3bffccdf271b7fbaf34ed72d089537b42f t/corpus-module-build/share/bar
+SHA1 f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 t/corpus-module-build/share/foo
+SHA1 9959ed6b17ba19e24e54cd748ebbcdeb80237fce t/corpus/Changes
+SHA1 6984a7dd12fcaf2bc4de3828d4e3a110197bd325 t/corpus/dist.ini
+SHA1 a770e486c9add632d55d0fe7b9bd0afa6b93cf60 t/corpus/lib/DZT/Sample.pm
+SHA1 e242ed3bffccdf271b7fbaf34ed72d089537b42f t/corpus/share/bar
+SHA1 f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 t/corpus/share/foo
+SHA1 fce9111b8137ab2782b97ff8261b8b13366bdb4b t/module-build.t
+SHA1 3375695d6ff181c1273baeebe4d55ef180a056ec t/pod-weaver-interaction.t
+SHA1 d4de238e4adf89f5fd7ad3faf45229f8cad6a18e t/test-dzst-2.t
+SHA1 45213a4c234744e1740efb80c0498a3c35e2c151 xt/db-single.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlUcLk0ACgkQ34Hwf+GwC4wyHgCgirKPGCfQ0EuP2jo7+eAYrksx
+KtoAoPU7IaRDmGzyLMES61moneUfxVBE
+=XPeJ
+-----END PGP SIGNATURE-----

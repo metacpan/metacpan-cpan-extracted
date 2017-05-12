@@ -1,0 +1,47 @@
+NAME
+
+    Dist::Zilla::Plugin::CheckDeploymentHandlerFiles - Check you've created
+    the DH files for this version
+
+SYNOPSIS
+
+        [CheckDeploymentHandlerFiles]
+
+DESCRIPTION
+
+    If you have a schema that uses DBIx::Class::DeploymentHandler then your
+    deployment will bail if you don't have a directory for migrating to the
+    current version. If your schema is part of a wider module it's fairly
+    likely that you'll forget to create these files because you didn't do
+    any work on the schema.
+
+    This plugin simply bails if there's no x-y directory where DH would
+    normally put them.
+
+TODO
+
+    Configuration so that the user can replicate any customisation of
+    DeploymentHandler, thus searching for the correct directory.
+
+BUGS
+
+    Report any issues on the github bugtracker.
+
+AUTHOR
+
+    Alastair McGowan-Douglas <altreus@altre.us>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Alastair McGowan-Douglas.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+
+SEE ALSO
+
+    DBIx::Class
+
+    DBIx::Class::DeploymentHandler
+

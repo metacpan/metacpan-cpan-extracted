@@ -1,0 +1,38 @@
+---
+abstract: 'A minting profile for Modules written for Project OSM'
+author:
+  - 'DBR <dbr@cpan.org>, AHERNIT <tech@tool.de>'
+build_requires:
+  Carp: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec::Functions: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::CheckDeps: 0.002
+  Test::More: 0.94
+  Test::UseAllModules: 0
+  perl: 5.004
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-MintingProfile-Project-OSM
+provides:
+  Dist::Zilla::MintingProfile::Project::OSM:
+    file: lib/Dist/Zilla/MintingProfile/Project/OSM.pm
+    version: v0.2.0
+requires:
+  Dist::Zilla::Role::MintingProfile::ShareDir: 0
+  Moose: 0
+  namespace::autoclean: 0
+version: 0.2.0
+x_authority: cpan:DBR

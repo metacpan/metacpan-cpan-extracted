@@ -1,0 +1,172 @@
+NAME
+
+    Device::Chip::BV4243 - chip driver for a BV4243
+
+SYNOPSIS
+
+     use Device::Chip::BV4243;
+    
+     my $chip = Device::Chip::BV4243->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     $chip->lcd_reset->get;
+     $chip->lcd_string( "Hello, world!" )->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a ByVac
+    BV4243 LCD/touchpad display module attached to a computer via an I²C
+    adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this module; the documention here will not attempt to explain or define
+    module-specific concpets or features, only the use of this module to
+    access them.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ clear_keys
+
+       $chip->clear_keys->get
+
+    Clears the keypad buffer.
+
+ get_keycount
+
+       $count = $chip->get_keycount->get
+
+    Returns the number of keys waiting in the keypad buffer.
+
+ get_key
+
+       $key = $chip->get_key->get
+
+    Returns the next key from the keypad buffer, or 0 if there are none.
+
+ find_key
+
+       $pos = $chip->find_key( $key )->get
+
+    Returns the position in the key buffer of the given key, or 0 if is not
+    there.
+
+ get_scancode
+
+       $code = $chip->get_scancode->get
+
+    Returns the scan value from the keypad scanning matrix. This will be 0
+    if no key is being touched, or an integer value with at least two bits
+    set if a key is being held.
+
+ beep
+
+       $chip->beep( $msec )->get
+
+    Turns on the BELL output line for the specified number of miliseconds.
+
+ read_chan
+
+       @channels = $chip->read_chan->get
+
+    Returns the raw touchpad sensor values as 8 16bit integers.
+
+ read_delta
+
+       @deltas = $chip->read_delta->get
+
+    Returns the touchpad sensor values minus the trigger value.
+
+ sleep
+
+       $chip->sleep->get
+
+    Puts the device into sleep mode. It stops scanning the keypad, but will
+    still respond to another command which will wake it up again.
+
+ lcd_reset
+
+       $chip->lcd_reset->get
+
+    Resets the LCD.
+
+ lcd_command
+
+       $chip->lcd_command( $cmd )->get;
+
+    Sends a numeric command to the LCD controller.
+
+ lcd_data
+
+       $chip->lcd_data( $data )->get
+
+    Sends a byte of numerical data to the LCD controller.
+
+ lcd_string
+
+       $chip->lcd_string( $str )->get
+
+    Sends a string of data to the LCD controller. This is a more efficient
+    version of sending each byte of the string individually using
+    "lcd_data".
+
+ lcd_signon
+
+       $chip->lcd_signon->get
+
+    Displays the signon string stored the in EEPROM.
+
+ lcd_backlight
+
+       $chip->lcd_backlight( $red, $green, $blue )->get
+
+    Sets the level of each of the three backlight channels. Each must be a
+    numeric value between 0 and 10 (inclusive). For single-backlight
+    displays, use the $red channel.
+
+ reset
+
+       $chip->reset
+
+    Resets the device.
+
+ device_id
+
+       $id = $chip->device_id->get
+
+    Returns the device ID value as a 16 bit integer
+
+ version
+
+       $id = $chip->version->get
+
+    Returns the device firmware version as a 16 bit integer
+
+ eeprom_reset
+
+       $chip->eeprom_reset->get
+
+    Resets the configuration EEPROM back to default values.
+
+ eeprom_read
+
+       $val = $chip->eeprom_read( $addr )->get
+
+    Reads a byte from the configuration EEPROM.
+
+ eeprom_write
+
+       $chip->eeprom_write( $addr, $val )->get
+
+    Writes a byte to the configuration EEPROM.
+
+SEE ALSO
+
+    http://www.pichips.co.uk/index.php/BV4243
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

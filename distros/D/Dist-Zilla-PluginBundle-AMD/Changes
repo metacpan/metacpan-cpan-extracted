@@ -1,0 +1,31 @@
+Revision history for Dist-Zilla-PluginBundle-AMD
+
+0.011     2012-08-06
+        - +Dist::Zilla::Plugin::AssertOS
+
+0.010     2012-07-05
+        - new option "disable_tab_tests"
+
+0.009     2012-07-03
+        - more deps declared
+
+0.008     2012-06-18
+        - recover from version bummer, *sigh*
+
+0.007     2012-06-08
+        - add [Git::Describe]
+        - fix a 'Odd number of elements in anonymous hash' in eol tests
+
+0.006     2012-05-25
+        - Version Bummer! arghh.
+
+4.0.3     2012-05-25
+        - even more explicit Prereqs
+        - (bogus version number bummer)
+
+0.005     2012-05-23
+        - more explicit Prereqs
+
+0.004     2012-05-23
+        - big Dist::Zilla roundhouse kick
+        - fix add_bundle('Git')

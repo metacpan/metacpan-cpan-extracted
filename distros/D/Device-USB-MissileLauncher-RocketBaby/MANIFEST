@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Device-USB-MissileLauncher-RocketBaby.t
+lib/Device/USB/MissileLauncher/RocketBaby.pm
+META.yml                                 Module meta-data (added by MakeMaker)

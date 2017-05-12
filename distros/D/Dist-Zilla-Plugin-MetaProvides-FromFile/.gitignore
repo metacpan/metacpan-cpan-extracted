@@ -1,0 +1,4 @@
+/.build
+/Dist-Zilla-Plugin-MetaProvides-FromFile-*
+*.swp
+/tmp/

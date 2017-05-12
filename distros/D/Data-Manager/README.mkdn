@@ -1,0 +1,141 @@
+# NAME
+
+Data::Manager - The Marriage of Message::Stack & Data::Verifier
+
+# VERSION
+
+version 0.10
+
+# SYNOPSIS
+
+    use Data::Manager;
+    use Data::Verifier;
+
+    my $dm = Data::Manager->new;
+
+    # Create a verifier for the 'billing_address'
+    my $verifier = Data::Verifier->new(
+        profile => {
+            address1 => {
+                required=> 1,
+                type    => 'Str'
+            }
+            # ... more fields
+        }
+    );
+    $dm->set_verifier('billing_address', $verifier);
+
+    # Addresses are the same, reuse the verifier
+    $dm->set_verifier('shipping_address', $verifier);
+
+    my $ship_data = {
+        address1 => { '123 Test Street' },
+        # ... more
+    };
+    my $bill_data => {
+        address1 => { '123 Test Street' }
+        # ... more
+    };
+
+    $dm->verify('billing_address', $bill_data);
+    $dm->verify('shipping_address', $ship_data);
+    
+
+    # Later...
+    
+
+    my $bill_results = $dm->get_results('billing_address');
+    my $bill_stack = $dm->messages_for_scope('billing_address');
+    
+
+    my $ship_results = $dm->get_results('shipping_address');
+    my $ship_stack = $dm->messages_for_scope('shipping_address');
+
+# DESCRIPTION
+
+Data::Manager provides a convenient mechanism for managing multiple
+[Data::Verifier](http://search.cpan.org/perldoc?Data::Verifier) inputs with a single [Message::Stack](http://search.cpan.org/perldoc?Message::Stack), as well as
+convenient retrieval of the results of verification.
+
+This module is useful if you have complex forms and you'd prefer to create
+separate [Data::Verifier](http://search.cpan.org/perldoc?Data::Verifier) objects, but want to avoid creating a complex
+hashref of your own creation to manage things.
+
+It should also be noted that if married with [MooseX::Storage](http://search.cpan.org/perldoc?MooseX::Storage), this entire
+object and it's contents can be serialized.  This maybe be useful with
+[Catalyst](http://search.cpan.org/perldoc?Catalyst)'s `flash` for storing the results of verification between
+redirects.
+
+# SERIALIZATION
+
+The Data::Manager object may be serialized thusly:
+
+  my $ser = $dm->freeze({ format => 'JSON' });
+  # later
+  my $dm = Data::Manager->thaw($ser, { format => 'JSON' });
+
+This is possible thanks to the magic of [MooseX::Storage](http://search.cpan.org/perldoc?MooseX::Storage).  All attributes
+__except__ `verifiers` are stored.  __Serialization causes the verifiers
+attribute to be set to undefined, as those objects are not serializable__.
+
+# ATTRIBUTES
+
+## messages
+
+The [Message::Stack](http://search.cpan.org/perldoc?Message::Stack) object for this manager.  This attribute is lazily
+populated, parsing the [Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) objects.  After fetching
+this attribute any changes to the results __will not be reflected in the
+message stack__.
+
+## results
+
+HashRef of [Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) objects, keyed by scope.
+
+## verifiers
+
+HashRef of [Data::Verifier](http://search.cpan.org/perldoc?Data::Verifier) objects, keyed by scope.
+
+# METHODS
+
+## messages_for_scope ($scope)
+
+Returns a [Message::Stack](http://search.cpan.org/perldoc?Message::Stack) object containing messages for the specified
+scope.
+
+## get_results ($scope)
+
+Gets the [Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) object for the specified scope.
+
+## set_results ($scope, $results)
+
+Sets the [Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) object for the specified scope.
+
+## success
+
+Convenience method that checks `success` on each of the results in this
+manager.  Returns false if any are false.
+
+## verify ($scope, $data);
+
+Verify the data against the specified scope.  After verification the results
+and messages will be automatically created and stored.  The
+[Data::Verifier::Results](http://search.cpan.org/perldoc?Data::Verifier::Results) class will be returned.
+
+# ACKNOWLEDGEMENTS
+
+Justin Hunter
+
+Jay Shirley
+
+Brian Cassidy
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Cory G Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

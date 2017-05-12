@@ -1,0 +1,4 @@
+severity = 3
+verbose  = 9
+exclude  = ValuesAndExpressions::ProhibitVersionStrings RegularExpressions::RequireExtendedFormatting Subroutines::ProhibitUnusedPrivateSubroutines
+include  = Variables::ProhibitPackageVars

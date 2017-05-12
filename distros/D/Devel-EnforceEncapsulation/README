@@ -1,0 +1,38 @@
+Devel::EnforceEncapsulation - Find access violations to blessed objects
+
+
+LICENSE
+
+Copyright 2014 Chris Dolan, <cpan@chrisdolan.net>
+Copyright 2006 Clotho Advanced Media, Inc., <cpan@clotho.com>
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+
+ABOUT CLOTHO
+
+"CAM" stands for Clotho Advanced Media Inc. (www.clotho.com) which
+developed this module. I (Chris Dolan) was the original developer, and
+I now lightly maintain this module in my spare time.
+
+
+INSTALLATION
+
+Install via one of the following:
+
+  cpan install Devel::EnforceEncapsulation
+
+or
+
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+or
+
+  perl Makefile.PL
+  make
+  make test
+  make install

@@ -1,0 +1,6 @@
+[%- IF doc.meta.title.defined -%]
+
+<div align="center" class="headline">[%- doc.meta.title -%]</div>
+<div align="right">[%- INCLUDE download_link -%]</div>
+
+[%- END -%]

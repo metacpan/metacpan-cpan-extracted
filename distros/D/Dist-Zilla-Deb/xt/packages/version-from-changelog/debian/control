@@ -1,0 +1,11 @@
+Source: libx-perl
+Section: unknown
+Priority: optional
+Maintainer: Vyacheslav Matyukhin <mmcleric@yandex-team.ru>
+Build-Depends: debhelper (>= 5), perl
+
+Package: libx-perl
+Architecture: all
+Depends: ${perl:Depends}
+Description: X.pm module
+ Description? Nobody cares.

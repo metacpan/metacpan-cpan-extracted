@@ -1,0 +1,74 @@
+Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: Dist-Inkt
+Upstream-Contact: Toby Inkster (TOBYINK) <tobyink@cpan.org>
+Source: https://metacpan.org/release/Dist-Inkt
+
+Files: Changes
+ META.json
+ META.yml
+ doap.ttl
+ lib/Dist/Inkt/Profile/Simple.pm
+ lib/Dist/Inkt/Role/CPANfile.pm
+ lib/Dist/Inkt/Role/CopyFiles.pm
+ lib/Dist/Inkt/Role/CopyStandardDocuments.pm
+ lib/Dist/Inkt/Role/MetaProvides.pm
+ lib/Dist/Inkt/Role/MetaProvidesScripts.pm
+ lib/Dist/Inkt/Role/SignDistribution.pm
+ lib/Dist/Inkt/Role/StaticInstall.pm
+ lib/Dist/Inkt/Role/WriteDOAPLite.pm
+ lib/Dist/Inkt/Role/WriteINSTALL.pm
+ lib/Dist/Inkt/Role/WriteLICENSE.pm
+ lib/Dist/Inkt/Role/WriteMakefilePL.pm
+ lib/Dist/Inkt/Role/WriteMetaJSON.pm
+ lib/Dist/Inkt/Role/WriteMetaYML.pm
+ lib/Dist/Inkt/Role/WriteREADME.pm
+Copyright: Copyright 2017 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: INSTALL
+ LICENSE
+ examples/p5-acme-example-dist/cpanfile
+ examples/p5-acme-example-dist/dist.ini
+ script/distinkt-dist
+ script/distinkt-travisyml
+Copyright: Unknown
+License: Unknown
+
+Files: COPYRIGHT
+ CREDITS
+ SIGNATURE
+Copyright: None
+License: public-domain
+
+Files: README
+ lib/Dist/Inkt.pm
+Copyright: This software is copyright (c) 2013-2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: Makefile.PL
+ dist.ini
+Copyright: Copyright 2013 Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: examples/p5-acme-example-dist/lib/Acme/Example/Dist.pm
+ examples/p5-acme-example-dist/t/01basic.t
+Copyright: This software is copyright (c) 2014 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+Files: t/01basic.t
+Copyright: This software is copyright (c) 2013 by Toby Inkster.
+License: GPL-1.0+ or Artistic-1.0
+
+License: Artistic-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The Artistic License 1.0
+
+License: GPL-1.0
+ This software is Copyright (c) 2017 by the copyright holder(s).
+ 
+ This is free software, licensed under:
+ 
+   The GNU General Public License, Version 1, February 1989

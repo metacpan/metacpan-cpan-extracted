@@ -1,0 +1,9 @@
+plugins:
+    ElasticModel:
+        model:          Foo
+        es:
+            transport:  httptiny
+        views:
+            user:
+                domain: foo
+                type:   user

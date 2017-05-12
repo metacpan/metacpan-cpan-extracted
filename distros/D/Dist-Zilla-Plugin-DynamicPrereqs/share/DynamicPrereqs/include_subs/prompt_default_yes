@@ -1,0 +1,3 @@
+sub prompt_default_yes {
+  prompt("$_[0] [Y/n]", 'Y') =~ /^y/i ? 1 : 0;
+}

@@ -1,0 +1,14 @@
+Revision history for Perl module Dancer::Plugin::DynamicConfig
+
+0.07 2013-11-01
+   - More unit test fixes to work on systems lacking futimes(2), and on older perls
+
+0.06 2013-10-30
+   - Fixed unit tests to work on systems lacking futimes(2), and on older perls
+
+0.05 2013-10-29
+   - Added Changes file
+
+0.04 2013-10-29
+    - First version released to CPAN
+

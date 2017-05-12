@@ -1,0 +1,37 @@
+Revision history for Data-Morph: 1.140400
+
+1.140400  2014-02-09 13:58:27CET+0100 Europe/Amsterdam
+        Fix heisenbug around failing CPAN Testers reports. See 73e0ec0
+        for more details.
+
+1.113280  2011-11-24 13:51:27 Europe/Amsterdam
+        Add support for alternations on read directives for the Raw backend
+
+1.113270  2011-11-23 15:20:25 Europe/Amsterdam
+        Add support for array substrate building and the tests for it
+
+1.112770  2011-10-04 10:30:35 Europe/Amsterdam
+        Bug/Doc fix regarding the map constraint. It should have been:
+            union([Str, Tuple[Maybe[Str], CodeRef]])
+
+1.112760  2011-10-03 19:06:52 Europe/Amsterdam
+        Relax the constraint on the store method defined in Role::Backend from
+        Defined to Any
+
+        Allow for one-way transformations by not providing a write within the
+        map for that particular element
+
+        Read elements can now use a tuple of undef+coderef as a special case
+        for supplying OOB data
+
+1.112730  2011-09-30 14:19:35 Europe/Amsterdam
+        Tweak generate_instance to receive the raw input to allow for dynamic
+        building of instances.
+
+        Move the default value for new_instance in Backend::DBIC out to a
+        builder method
+
+        Update deps to include SQL::Translator so we can test with DBD::SQLite
+
+1.110540  2011-02-23 05:50:32 America/Chicago
+        Initial Release

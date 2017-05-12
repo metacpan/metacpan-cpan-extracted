@@ -1,0 +1,76 @@
+NAME
+    Dist::Zilla::Plugin::FileKeywords - expand $$Keywords$$ in your files.
+
+VERSION
+    version 1.0
+
+DESCRIPTION
+    This plugin is a file_munger. It processes a list of files (by default
+    all files in the distribution) and replaces all occurances of known
+    keywords with their expansions.
+
+    It does this is in a manner similar to how Subversion manages keywords.
+    In particular it looks for keywords in the forms:
+
+      $$KEYWORD$$
+      $$KEYWORD: Stuff $$
+      $$KEYWORD::    Stuff $$
+
+      $$:KEYWORD$$
+      $$:KEYWORD: Stuff $$
+      $$:KEYWORD::    Stuff $$
+
+    Keywords are matched in a case-sensitive manner and only constructs
+    containing defined keywords are modified. If no colon follows the
+    opening '$$' delimeters then the text between the two '$$' delimeters
+    are replaced with the Keyword, one or more colons (:) and the expansion
+    of the keyword, with a space on either side.
+
+    In the first two cases a single colon and space follows the keyword and
+    the full expansion appears, however long, followed by a space and the
+    closing '$$' delimeter. If the expansion should contain '$$' by any
+    chance, it will be expanded as '\$\$'.
+
+    In the third case a pair of colons and a space follows the keyword and
+    the expansion is truncated, if necessary, so the final construct is no
+    bigger (in characters) than what it replaces. If it is necessary to
+    truncate the expansion, then the final character before the closing
+    delimeter will be a hatch (#) rather than a space.
+
+    When a colon follows the opening delimeter, then the entire text of the
+    keyword form, including the delimeters, is replaced by the keyword
+    expansion. In the final version, where there are two colons, the keyword
+    expansion is padded with spaces, or truncated, to occupy the exact same
+    number of characters as the form that is being replaced. Note that in
+    the case of truncation, no '#' will be provided.
+
+    Actual keywords are defined in plugins in the
+    Dist::Zilla::Plugin::FileKeywords:: namespace. Currently the only plugin
+    is Dist::Zilla::Plugin::FileKeywords::Standard and the only two keywords
+    it defines are Version (equal to dzil's idea of the current version
+    number) and Distribution (always equal to 'unknown' for now).
+
+    plugins need to be loaded with one or more 'plugin' arguments that list
+    a plugin name, optionally followed by a list of keywords in parens.
+
+      plugins = Standard(Version Distribution) Weird(Chicken)
+      plugins = Weirder
+
+    Currently all keywords in all mentioned plugins are made active. In the
+    future more plugins will appear and some of the stubs for dealing with
+    which sets of plugins/keywords are active will be made to actually do
+    something.
+
+    One can also control which files get processed by using the 'include'
+    and 'exclude' file regular expressions. All files are processed that
+    match an include regex and do not match any exclude regexes.
+
+AUTHOR
+    Stirling Westrup <swestrup@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Stirling Westrup.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,128 @@
+DBIx::Simple::Class - Advanced object construction for DBIx::Simple!
+
+INSTALLATION
+
+You can install this module via CPAN:
+
+    cpan DBIx::Simple::Class
+
+To install manually, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+DBIx::Simple, DBI, DBD::SQLite (for running tests only)
+
+DESCRIPTION
+
+DBIx::Simple::Class is a database table/row abstraction. At the same
+time it is not just a fancy representation of a table row like
+L<DBIx::Simple::Result::RowObject>. Using this module will make your
+code more organized, clean and reliable
+(separation of concerns + input-validation).
+You will even get some more performance over plain DBIx::Simple
+while keeping its' sexy features when you need them. Last but not
+least, this module has no other non-CORE dependencies besides
+L<DBIx::Simple> and L<DBI>.
+
+SYNOPSIS
+
+  
+  #1. In your class representing a template for a row in a database table or view
+  package My::Model::AdminUser;
+  use base qw(DBIx::Simple::Class);#this is your base class or a class that extends it
+
+  #sql to be used as table
+  sub TABLE { 'users' }  #or: use constant TABLE =>'users';
+  
+  sub COLUMNS {[qw(id group_id login_name login_password first_name last_name)]}
+
+  #used to validate params to field-setters
+  sub CHECKS{{
+    id => { allow => qr/^\d+$/x },
+    group_id => { allow => qr/^1$/x, default=>1 },#admin group_id
+    login_name => {required => 1, allow => qr/^\p{IsAlnum}{4,12}$/x},
+    first_name =>{required => 1, allow => \&avery_complex_check},
+    last_name =>{ allow => sub {
+        #less complex inline check that modifies the input value
+        #see Params::Check::allow and Params::Check::check
+      }
+    }
+    #...
+  }}
+  
+  sub WHERE { group_id=> 1} #select only users from admin group
+  
+  1;#end of My::Model::AdminUser
+
+  #2. In a start-up script or subroutine
+  DBIx::Simple::Class->dbix( DBIx::Simple->connect(...) );
+
+  #3. usage 
+  use My::Model::AdminUser;
+  my $user = $dbix->select(
+    My::Model::AdminUser->TABLE, '*', {login_name => 'fred'}
+  )->object('My::Model::AdminUser')
+  
+  #or better (if SQL::Abstract is installed)
+  my $user = My::Model::AdminUser->select(login_name => 'fred'); #this is cleaner
+  
+  $user->first_name('Fred')->last_name('Flintstone'); #chainable setters
+  $user->save; #update row
+  #....
+  my $user = My::Model::AdminUser->new(
+    login_name => 'fred',
+    first_name => 'Fred',
+    last_name =>'Flintstone'
+  );
+  $user->save();#insert new user
+  print "new user has id:".$user->id;
+  #...
+  #select many
+  my $class = 'My::Model::AdminUser';
+  my @admins = $dbix->select(
+    $class->TABLE,
+    $class->COLUMNS,
+    $class->WHERE
+  )->objects($class);
+  #or
+  my @admins = $dbix->query(
+    $VERY_COMPLEX_SQL, @bind_variables
+  )->objects($class);
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Simple::Class
+
+You can also look for information at:
+
+    The project wiki
+        https://github.com/kberov/DBIx--Simple--Class/wiki
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Simple-Class
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Simple-Class
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-Simple-Class/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Красимир Беров
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

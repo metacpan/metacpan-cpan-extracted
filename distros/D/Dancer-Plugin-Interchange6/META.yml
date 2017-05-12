@@ -1,0 +1,46 @@
+---
+abstract: 'Dancer Plugin for Interchange6 Open Source Shop Machine (DEPRECATED)'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  DBICx::TestDatabase: '0'
+  Test::Database: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::Roo: '1.004'
+  Test::WWW::Mechanize::PSGI: '0.35'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Interchange6
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::OnlinePayment: '3.02'
+  Dancer: '1.3098'
+  Dancer::Plugin::Auth::Extensible: '0'
+  Dancer::Plugin::Auth::Extensible::Provider::DBIC: '0'
+  Dancer::Plugin::DBIC: '0'
+  Dancer::Session::DBIC: '0.004'
+  Interchange6: '0.120'
+  Interchange6::Schema: '0.110'
+  Module::Runtime: '0'
+  MooseX::CoverableModifiers: '0'
+  Net::HTTPS::Any: '0.11'
+  YAML: '0'
+  namespace::clean: '0'
+  perl: '5.010000'
+resources:
+  IRC: irc://irc.freenode.net/#interchange
+  bugtracker: https://github.com/interchange/Dancer-Plugin-Interchange6/issues
+  repository: https://github.com/interchange/Dancer-Plugin-Interchange6.git
+version: '0.121'
+x_deprecated: 1

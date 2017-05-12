@@ -1,0 +1,10 @@
+Revision history for Perl extension DBIx-TransactionManager-Extended
+
+0.02 2016-04-08T13:09:49Z
+
+    - fixed bug (occur infinit recursion in rare case)
+
+0.01 2016-04-08T10:51:55Z
+
+    - original version
+

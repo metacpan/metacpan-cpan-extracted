@@ -1,0 +1,163 @@
+NAME
+    Devel::SearchINC - Loading Perl modules from their development
+    directories
+
+VERSION
+    version 2.103460
+
+SYNOPSIS
+      # export PERL5OPT=-MDevel::SearchINC=/my/dev/dir
+      # now use your new modules
+
+DESCRIPTION
+    When developing a new module, I always start with a standard skeleton
+    distribution directory. The directory structure is such, however, that
+    you have to install the module first (with "make install") before you
+    can use it in another program or module. For example, bringing in a
+    module like so:
+
+        use My::Module;
+
+    requires the module to be somewhere in a path listed in @INC, and the
+    relative path is expected to be "My/Module.pm". However, "h2xs" creates
+    a structure where the module ends up in "My/Module/Module.pm".
+
+    This module tries to compensate for that. The idea is that you "use()"
+    it right at the beginning of your program so it can modify @INC to look
+    for modules in relative paths of the special structure mentioned above,
+    starting with directories specified along with the "use()" statement
+    (i.e. the arguments passed to this module's "import()").
+
+    This is useful because with this module you can test your programs using
+    your newly developed modules without having to install them just so you
+    can use them. This is especially advantageous when you consider working
+    on many new modules at the same time.
+
+    To automatically make your development modules available to all your
+    scripts, you can place the following in your ".bashrc" (or your shell
+    initialization file of choice):
+
+      export PERL5OPT=-MDevel::SearchINC=/my/dev/dir
+
+    Tilde expansion is also performed.
+
+    When this module is first run, that is, when perl first consults @INC,
+    all candidate files are remembered in a cache (see "build_cache()"). A
+    candidate file is one whose name ends in ".pm", is not within a
+    directory called "t", "CVS", ".svn", ".git", "skel" or "_build", and is
+    within a directory called "lib", "blib/lib" or "blib/arch". This is a
+    long-winded way of saying that it tries to find your perl module files
+    within standard development directories.
+
+    If a directory contains a file named "INC.SKIP", this directory will be
+    skipped.
+
+    Note that there is a small limitation for the "PERL5OPT" approach:
+    development modules can't be loaded via "-M" on the perl command line.
+    So the following won't work:
+
+      $ export PERL5OPT=-MDevel::SearchINC=/my/dev/dir
+      $ perl -MMy::Brand::New::Module -e'print "hello world\n"'
+
+    This is because "PERL5OPT" options are processed after the actual
+    command line options.
+
+    Also, the "PERL5OPT" variable is ignored when Taint checks are enabled.
+
+FUNCTIONS
+  build_cache
+    Called during "import()", this subroutine builds a cache of the modules
+    it finds. This way every time a module is "use()"d, we can just look at
+    the cache. This does mean that if you add, change or delete a module
+    during the run-time of a script that uses "Devel::SearchINC", that
+    script won't notice these changes. If necessary, you could re-run
+    "build_cache()".
+
+MULTIPLE DEVELOPMENT DIRECTORIES
+    You can have multiple development directories. Just list them when using
+    this module:
+
+      use Devel::SearchINC qw(/my/first/dir my/second/dir);
+
+    or
+
+      perl -MDevel::SearchINC=/my/first/dir,/my/second/dir
+
+    You can also use semicolons or colons instead of commas as delimiters
+    for directories.
+
+    "perlrun" details the syntax for specifying multiple arguments for
+    modules brought in with the "-M" switch.
+
+SPECIAL OPTIONS
+    In addition to development directories, there are special options that
+    can be passed to this module:
+
+    "-debug"
+        This turns on debugging; see below.
+
+    "-clear"
+        This option clears all paths that were previously set. This is
+        useful when you have a "PERL5OPT" environment variable but want to
+        use this module from within your code as well and want to override
+        the environment setting. For example:
+
+            export PERL5OPT=-MDevel::SearchINC=/path/to/dev
+
+        then:
+
+            #!/usr/bin/env perl
+
+            use warnings;
+            use strict;
+            use Devel::SearchINC qw(-clear /path/to/other/dir);
+            ...
+
+DEBUGGING THIS MODULE
+    By using "-debug" as one of the development directories, you can turn on
+    debugging. Note that despite the leading colon, this has nothing to do
+    with "Exporter" semantics. With debugging activated, this module will
+    print detailed information while trying to find the requested file.
+
+    For example
+
+      use Devel::SearchINC qw(/my/first/dir my/second/dir -debug);
+
+    or
+
+      perl -MDevel::SearchINC=/my/first/dir,-debug,/my/second/dir
+
+    The "-debug" option can be specified anywhere in the list of development
+    directories.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-SearchINC>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Devel-SearchINC/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Devel-SearchINC.git> and may be cloned from
+    <git://github.com/hanekomu/Devel-SearchINC.git>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

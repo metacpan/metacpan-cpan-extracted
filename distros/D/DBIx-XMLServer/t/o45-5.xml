@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="4">
+    <name>Minnie Mouse</name>
+    <manager xmlns:ns1="http://www.w3.org/2001/XMLSchema-instance" ns1:nil="true"/>
+    <department>Widget Marketing</department>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="5">
+    <name>Mickey Mouse</name>
+    <manager>Minnie Mouse</manager>
+    <department>Widget Marketing</department>
+  </employee>
+</employees>

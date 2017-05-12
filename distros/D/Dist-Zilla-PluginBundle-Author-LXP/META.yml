@@ -1,0 +1,47 @@
+---
+abstract: 'configure Dist::Zilla like LXP'
+author:
+  - 'Alex Peters <lxp@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Author-LXP
+no_index:
+  directory:
+    - t
+provides:
+  Dist::Zilla::PluginBundle::Author::LXP:
+    file: lib/Dist/Zilla/PluginBundle/Author/LXP.pm
+    version: v1.0.1
+requires:
+  Dist::Zilla::Plugin::CheckChangesHasContent: 0
+  Dist::Zilla::Plugin::Git: 0
+  Dist::Zilla::Plugin::InstallGuide: 0
+  Dist::Zilla::Plugin::MetaProvides::Package: 0
+  Dist::Zilla::Plugin::MinimumPerl: 0
+  Dist::Zilla::Plugin::NoTabsTests: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::PrereqsClean: 0
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: 0
+  Dist::Zilla::Plugin::Test::Compile: 0
+  Dist::Zilla::Plugin::Test::EOL: 0
+  Dist::Zilla::Plugin::Test::Kwalitee: 0
+  Dist::Zilla::Plugin::Test::PodSpelling: 0
+  Dist::Zilla::Plugin::Test::Version: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+  Pod::Weaver::PluginBundle::Author::LXP: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-LXP
+  homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-LXP
+  repository: git://github.com/lx/perl5-Dist-Zilla-PluginBundle-Author-LXP
+version: 1.0.1

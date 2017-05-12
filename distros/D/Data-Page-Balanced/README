@@ -1,0 +1,153 @@
+# $Id: README 2 2007-10-27 22:08:58Z kim $
+
+Data-Page-Balanced version 1.0.0
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+NAME
+    Data::Page::Balanced - A data pager that will balance the number of
+    entries per page.
+
+VERSION
+    This document describes Data::Page::Balanced version 1.0.0
+
+SYNOPSIS
+        use Data::Page::Balanced;
+
+        my $pager = Data::Page::Balanced->new({
+            total_entries => 67,
+            entries_per_page => 25
+        });
+        
+    print $pager->last_page() # 2
+        print $pager->entries_per_page() # 34
+
+DESCRIPTION
+    This module behaves like Data::Page except that it balances the number
+    of entries per page so there is no last page with only a few entries.
+    If, for example, you have 26 entries and want 25 entries per page, a
+    normal pager would give you two pages with 25 entries on the first and 1
+    on the last. Data::Page::Balanced will instead give you one page with 26
+    entries.
+
+    The benefit of a balanced number of entries per page is greater when the
+    number of pages is small, with the ideal case being when there are two
+    pages with only one entry on the last, in which case
+    Data::Page::Balanced will fold it over to the first page. This saves the
+    user from having to navigate to a page with only one entry, making it
+    easier for him or her to see all the entries at once.
+
+    The default flexibility is "floor(entries_per_page/2)", which means that
+    in the example with 25 entries per page, the calculated entries per page
+    can go up to 37 (25 + 12). The flexibility can be changed both at
+    initialization and later on.
+
+SUBROUTINES/METHODS
+  new
+        my $pager = Data::Page::Balanced->new({
+            total_entries => 67,
+            entries_per_page => 25,
+            current_page => 1,
+            flexibility => 12
+        });
+
+    This constructs a new pager object. The "total_entries" and
+    "entries_per_page" arguments are mandatory, since they are used to
+    calculate the actual number of entries per page.
+
+    The "current_page" and "flexibility" arguments are optional.
+
+    All arguments are given as name-value pairs in an anonymous hash.
+
+  total_entries
+        $pager->total_entries(100); # Sets the total entries to 100
+        $pager->total_entries();    # Returns the current total entries
+
+    This will get or set the total entries. *Changing this will re-calculate
+    the number of entries per page.*
+
+  entries_per_page
+        $pager->entries_per_page(23); # Sets the entries per page to 23
+        $pager->entries_per_page();   # Returns the current entries per page
+
+    This will get or set the entries per page. *Since changing this will
+    re-calculate the number of entries per page according to the
+    flexibility, in most cases what you set is not what you later will get.*
+
+  flexibility
+        $pager->flexibility(12); # Sets the flexibility to 12
+        $pager->flexibility();   # Returns the current flexibility
+
+    This will get or set the flexibility value. *Changing this will
+    re-calculate the number of entries per page.*
+
+DIAGNOSTICS
+    "total_entries and entries_per_page must be supplied."
+        The "total_entries" and "entries_per_page" arguments has to be
+        supplied when initializing a new object.
+
+    "There must be at least one entry per page. %d is too small."
+        The number of entries per page is not allowed to be smaller than 1.
+
+CONFIGURATION AND ENVIRONMENT
+    Data::Page::Balanced requires no configuration files or environment
+    variables.
+
+DEPENDENCIES
+    Data::Page Class::Accessor::Chained::Fast
+
+INCOMPATIBILITIES
+    None reported.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests to
+    "bug-data-page-balanced@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>.
+
+AUTHOR
+    Kim Ahlström "<kim.ahlstrom@gmail.com>"
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2007, Kim Ahlström "<kim.ahlstrom@gmail.com>". All rights
+    reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.

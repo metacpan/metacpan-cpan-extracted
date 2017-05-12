@@ -1,0 +1,12 @@
+Revision history for Data-Foswiki
+
+0.03   Dec 14, 2012
+        correctness fixes - it seems that Foswiki and TWiki do parse every line of a topic looking for META
+        this is now much slower ~200 topic loads per second will re-profile in a later release.
+
+0.02   Sep 10, 2012
+        significant speed improvement - ~4000 topic loads per second using some representative topics
+
+0.01    Sep 06, 2012
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,6 @@
+0.02 Wed 3 Aug 08:52:59 CEST 2016
+         - skip tests without postgres
+         
+0.01 Fri 8 Jul 12:03:42 CEST 2016
+         - first release
+

@@ -1,0 +1,20 @@
+This authentication plugin uses Dovecot's SASL mechanism
+to validate user's credentials. By default it tries to
+connect to /var/run/dovecot/auth-client socket and sub-
+mits authentication challenge using Dovecot's protocol.
+
+Only PLAIN mechanism works so far, should not be a prob-
+lem over encrypted TLS channel which is already de-facto
+standard in modern communications.
+
+Example configuration section:
+
+  <Plugin DJabberd::Authen::Dovecot>
+    Realm djabberd
+    Socket /var/lib/djabber/dovecot-sasl
+  </Plugin>
+
+Note: Dovecot by default sets restrictive permissions on
+the socket so if you need to run djabberd as an unprivi-
+leged user (good idea after all) you need to configure
+the socket in dovecot and Authen section.

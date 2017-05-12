@@ -1,0 +1,146 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "fandetails": {
+        "fan_filter_status": "NotSupported",
+        "TABLE_faninfo": {
+          "ROW_faninfo": [
+            {
+              "fanname": "Fan1(sys_fan1)",
+              "fanmodel": "NXA-FAN-30CFM-F",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "Ok",
+              "failfanlet": {}
+            },
+            {
+              "fanname": "Fan2(sys_fan2)",
+              "fanmodel": "NXA-FAN-30CFM-F",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "Ok",
+              "failfanlet": {}
+            },
+            {
+              "fanname": "Fan3(sys_fan3)",
+              "fanmodel": "NXA-FAN-30CFM-F",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "Ok",
+              "failfanlet": {}
+            },
+            {
+              "fanname": "Fan4(sys_fan4)",
+              "fanmodel": "NXA-FAN-30CFM-F",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "Ok",
+              "failfanlet": {}
+            },
+            {
+              "fanname": "Fan_in_PS1",
+              "fanmodel": "--",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "None"
+            },
+            {
+              "fanname": "Fan_in_PS2",
+              "fanmodel": "--",
+              "fanhwver": "--",
+              "fandir": "back-to-front",
+              "fanstatus": "Ok"
+            }
+          ]
+        },
+        "TABLE_fan_zone_speed": {
+          "ROW_fan_zone_speed": {
+            "zone": "1",
+            "speed": "0x80"
+          }
+        }
+      },
+      "TABLE_tempinfo": {
+        "ROW_tempinfo": [
+          {
+            "tempmod": "1        ",
+            "sensor": "FRONT",
+            "majthres": "80  ",
+            "minthres": "70  ",
+            "curtemp": "23",
+            "alarmstatus": "Ok"
+          },
+          {
+            "tempmod": "1        ",
+            "sensor": "BACK",
+            "majthres": "70  ",
+            "minthres": "42  ",
+            "curtemp": "25",
+            "alarmstatus": "Ok"
+          },
+          {
+            "tempmod": "1        ",
+            "sensor": "CPU",
+            "majthres": "90  ",
+            "minthres": "80  ",
+            "curtemp": "37",
+            "alarmstatus": "Ok"
+          },
+          {
+            "tempmod": "1        ",
+            "sensor": "TD2",
+            "majthres": "105 ",
+            "minthres": "90  ",
+            "curtemp": "46",
+            "alarmstatus": "Ok"
+          },
+          {
+            "tempmod": "1        ",
+            "sensor": "DONNER",
+            "majthres": "105 ",
+            "minthres": "90  ",
+            "curtemp": "36",
+            "alarmstatus": "Ok"
+          }
+        ]
+      },
+      "powersup": {
+        "voltage_level": 12,
+        "power_summary": {
+          "ps_redun_mode": "PS-Redundant",
+          "ps_oper_mode": "Non-Redundant",
+          "tot_pow_capacity": " 650.00 W",
+          "tot_gridA_capacity": "   0.00 W",
+          "tot_gridB_capacity": " 650.00 W",
+          "cumulative_power": " 650.00 W",
+          "tot_pow_out_actual_draw": " 128.00 W",
+          "tot_pow_input_actual_draw": " 150.00 W",
+          "tot_pow_alloc_budgeted": "   N/A   ",
+          "available_pow": "   N/A   "
+        },
+        "TABLE_psinfo": {
+          "ROW_psinfo": [
+            {
+              "psnum": 1,
+              "psmodel": "N9K-PAC-650W-B",
+              "actual_out": "    0 W",
+              "actual_input": "    0 W",
+              "tot_capa": "    0 W",
+              "ps_status": "Shutdown"
+            },
+            {
+              "psnum": 2,
+              "psmodel": "N9K-PAC-650W-B",
+              "actual_out": "  128 W",
+              "actual_input": "  150 W",
+              "tot_capa": "  650 W",
+              "ps_status": "Ok"
+            }
+          ]
+        }
+      }
+    }
+  },
+  "id": 1
+}

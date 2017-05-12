@@ -1,0 +1,40 @@
+DBIx::DataSource
+
+Copyright (c) 2000 Ivan Kohler
+Copyright (c) 2000 Mail Abuse Prevention System LLC
+All rights reserved.
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+This module implements create and drop functions for databases.  It aims to
+provide a common interface to database creation and deletion regardless
+of the actual database being used.
+
+Currently supported databases are MySQL and PostgreSQL.  Assistance adding
+support for other databases is welcomed and relatively simple - see the
+DBIx::DataSource::Driver documentation.
+
+To install:
+	perl Makefile.PL
+	make
+	make test # nothing substantial yet
+	make install
+
+Documentation will then be available via `man DBIx::DataSource' or
+`perldoc DBIx::DataSource'.
+
+Anonymous CVS access is available:
+  $ export CVSROOT=":pserver:anonymous@cleanwhisker.420.am:/home/cvs/cvsroot"
+  $ cvs login
+  (Logging in to anonymous@cleanwhisker.420.am)
+  CVS password: anonymous
+  $ cvs checkout DBIx-DataSource
+as well as <http://www.420.am/cgi-bin/cvsweb/DBIx-DataSource>.
+
+A mailing list is available.  Send a blank message to
+<ivan-dbix-datasource-users-subscribe@420.am>.
+
+Homepage: <http://www.420.am/dbix-datasource>
+
+$Id: README,v 1.1.1.1 2000/09/25 12:44:09 ivan Exp $
+

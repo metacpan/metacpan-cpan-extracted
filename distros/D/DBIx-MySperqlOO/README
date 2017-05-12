@@ -1,0 +1,35 @@
+DBIx-MySperqlOO version 1.0.0
+=====================
+
+MySperqlOO enables sql statement execution (through DBI to MySQL) 
+with one line of perl code. Enhanced for OO from DBIx-MySperql.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  MySQL Server
+
+  DBI
+  DBD::mysql
+  Class::Std
+  Class::Std::Utils
+
+COPYRIGHT AND LICENSE
+
+Copyleft (C) 2007 by Roger Hall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

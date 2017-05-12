@@ -1,0 +1,63 @@
+{
+   "abstract" : "Build an RPM from your Dist::Zilla release",
+   "author" : [
+      "Vincent Lequertier <vi.le@autistici.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-RPM",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::App" : "0",
+            "File::Temp" : "0",
+            "IPC::Run" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Path::Class" : "0",
+            "Text::Template" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Test::DZil" : "0",
+            "Test::Differences" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-rpm@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-RPM"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/SkySymbol/perl-dist-zilla-plugin-rpm.git",
+         "web" : "https://github.com/SkySymbol/perl-dist-zilla-plugin-rpm"
+      }
+   },
+   "version" : "0.014",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

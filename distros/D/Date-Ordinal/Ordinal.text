@@ -1,0 +1,100 @@
+NAME
+    Date::Ordinal - Conversion of dates to ordinal numbers and vice versa
+
+SYNOPSIS
+        use Date::Ordinal;
+        
+        $ord     = month2ord('January');           # $ord gets 1
+        $mon     = ord2month('1');                 # $mon gets 'January'
+        $mon     = ord2month(1);                   # $mon gets 'January'
+        $mon     = ord2month('01');                # $mon gets 'January'
+        $arryref = all_month_ordinations
+        @arry    = all_month_names
+        $arryref = all_month_names_ref
+        $arryref = all_short_month_names_ref
+        $arryref = all_day_ordinations
+
+        $arryref = all_hour_ordinations
+        $arryref = all_minute_ordinations
+
+        $hashref = ordination_month_pair # {'01' => 'January', ... }
+        @day     = days
+
+        
+    =cut
+
+    #-----------------------------------------------------------------------
+
+    package Date::Ordinal; #use strict;
+
+    #-----------------------------------------------------------------------
+
+DESCRIPTION
+    This module is designed to aid in creation of CGI popup_menus and also
+    interaction with SQL databases.
+
+CONVERSION ROUTINES
+    There are two conversion routines: `ord2month()' and `month2ord()'.
+
+    ord2month()
+            This function takes a month number [1..12] and returns a string
+            which contains the name of the month identified. If the number
+            is not a valid number, then `undef' will be returned:
+
+                $mon = ord2month('3');
+
+    `month2ord()'
+            This function takes a month name and returns the integer
+            corresponding to the month name, if such exists.
+
+            The match is a regexp match, so both 'Mar' and 'March' will
+            return 3.
+
+            If the argument could not be identified as a month name, then
+            `undef' will be returned:
+
+                $ord = month2ord('March');
+
+            The case of the month name is not important. See the section the
+            section on "KNOWN BUGS AND LIMITATIONS" below.
+
+QUERY ROUTINES
+    There is one function (and a reference variant) which can be used to
+    obtain a list of all month names:
+
+    `all_month_names()'
+                Returns a list of all month names;
+
+    `all_month_names_ref()'
+                Returns a reference to a list of all month names;
+
+    `all_short_month_names_ref()'
+                Returns a reference to a list of all month names in 3-letter form
+
+    `ordination_month_pair()'
+                returns a reference to a hash of the ordination of a month name
+                and the month name
+
+    `all_month_ordinations()'
+                returns a reference  a hash of the ordination of a month name
+                and the month name
+
+PRETTY-PRINTING ROUTINES
+    `prezero()'
+                if the current number is single-diit, prefix it with a '0'
+
+KNOWN BUGS AND LIMITATIONS
+    none
+
+SEE ALSO
+    Locale::US
+    Date::Manip
+AUTHOR
+    Terrence Brannon <tbrannon@end70.com>
+
+COPYRIGHT
+    Copyright (c) 2000 End70 Corporation
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

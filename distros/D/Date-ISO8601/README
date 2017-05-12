@@ -1,0 +1,77 @@
+NAME
+
+Date::ISO8601 - the three ISO 8601 numerical calendars
+
+DESCRIPTION
+
+The international standard ISO 8601 "Data elements and interchange formats
+- Information interchange - Representation of dates and times" defines
+three distinct calendars by which days can be labelled.  It also defines
+textual formats for the representation of dates in these calendars.
+This module provides functions to convert dates between these three
+calendars and Chronological Julian Day Numbers, which is a suitable
+format to do arithmetic with.  It also supplies functions that describe
+the shape of these calendars, to assist in calendrical calculations.
+It also supplies functions to represent dates textually in the ISO
+8601 formats.  ISO 8601 also covers time of day and time periods, but
+this module does nothing relating to those parts of the standard; this
+is only about labelling days.
+
+The first ISO 8601 calendar divides time up into years, months, and days.
+It corresponds exactly to the Gregorian calendar, invented by Aloysius
+Lilius and promulgated by Pope Gregory XIII in the late sixteenth century,
+with AD (CE) year numbering.  This calendar is applied to all time,
+not just to dates after its invention nor just to years 1 and later.
+Thus for ancient dates it is the proleptic Gregorian calendar with
+astronomical year numbering.
+
+The second ISO 8601 calendar divides time up into the same years as
+the first, but divides the year directly into days, with no months.
+The standard calls this "ordinal dates".  Ordinal dates are commonly
+referred to as "Julian dates", a mistake apparently deriving from true
+Julian Day Numbers, which divide time up solely into linearly counted
+days.
+
+The third ISO 8601 calendar divides time up into years, weeks, and days.
+The years approximate the years of the first two calendars, so they stay
+in step in the long term, but the boundaries differ.  This week-based
+calendar is sometimes called "the ISO calendar", apparently in the belief
+that ISO 8601 does not define any other.  It is also referred to as
+"business dates", because it is most used by certain businesses to whom
+the week is the most important temporal cycle.
+
+The Chronological Julian Day Number is an integral number labelling each
+day, where the day extends from midnight to midnight in whatever time zone
+is of interest.  It is a linear count of days, where each day's number
+is one greater than the previous day's number.  It is directly related to
+the Julian Date system: in the time zone of the prime meridian, the CJDN
+equals the JD at noon.  By way of epoch, the day on which the Convention
+of the Metre was signed, which ISO 8601 defines to be 1875-05-20 (and
+1875-140 and 1875-W20-4), is CJDN 2406029.
+
+This module places no limit on the range of dates to which it may be
+applied.  All function arguments are permitted to be "Math::BigInt" or
+"Math::BigRat" objects in order to achieve arbitrary range.  Native Perl
+integers are also permitted, as a convenience when the range of dates
+being handled is known to be sufficiently small.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,80 @@
+Revision history for Perl extension Data::BitStream::XS.
+
+0.08    16 August 2014
+  - Switch to New/Safefree from malloc/free.
+  - Removed unused primality functions.  No more primes(), for example.
+    See the Math::Prime::Util module for these functions.
+  - Merged functions in XS.xs for memory savings.
+  - Speedups for Goldbach codes -- 2-5x faster for big values.
+
+0.07    02 Jun 2012
+  - Cleanup C code using pedantic and extra warnings.
+  - Create a few primes on startup.
+  - Transition Goldbach codes from a big list to using the mod 30 sieve.
+    Huge memory savings, but slower (_much_ slower for huge num decode).
+    However, it's all based on the speed of prime_count and nth_prime, so
+    we can speed those up to get back some of our performance.
+  - Better near-limit behavior for Goldbach / primes, but still needs testing.
+  - Add nth_prime function.
+  - Add a rudimentary segment siever.
+  - Default primes method tries to be smart about what method is used, and keep
+    memory use reasonable.
+
+0.06    28 May 2012
+  - Fix compile issue on some strict C platforms.
+  - More allocation croaks.
+  - Make a number of methods private.
+  - Pod coverage.
+  - Add prime_count functions, including tight upper/lower bounds.
+  - Add prime sieving.  Currently faster than anything else on CPAN.
+
+0.05    17 May 2012
+  - include guard for .h files
+  - infrastructure updates (pod/perlcritic/kwalitee tests, Makefile.PL, LICENSE)
+
+0.04    17 May 2012
+  - get sub was using POPul -- should use either POPu or POPul/POPuq.  Changed
+    to POPu and added a simple test.  Data::BitStream has more extensive tests
+    that found this when testing the 'xs' implementation (this module) on LLP64
+    systems (generally 64-bit Perl on 32-bit O/S).  This did not effect LP64
+    systems (generally 64-bit Perl on 64-bit O/S).
+  - Use Inline C when possible for image compression example.
+  - Add put_raw implementation.
+  - Unified internal stack code.  A little faster.
+  - Add Generalized Fibonacci, Goldbach G1/G2, Comma, and Block Taboo codes.
+  - is_prime and next_prime are available for export if you want them for some
+    reason.  They're quite fast, though other packages have some advantages
+    (e.g. Math::Primality is very slow for small numbers but can work with
+    GMP arbitrary size numbers, Math::Prime::XS is faster for generating a
+    range of primes, and Math::Prime::FastSieve should be better if you're
+    doing many operations over a finite range and have some memory).
+
+0.03    23 Nov 2011
+  - Tracked down the LLP64 (32-bit long, 64-bit long long) issue down to using
+    an unsigned long in the .xs get_* macro.  Fixed.  After v0.02, pure 32-bit
+    and pure 64-bit systems would work, but 64-bit Perl on 32-bit O/S didn't.
+    It should work now.
+  - Allow Omega to encode 0 - ~0 instead of 0 - ~0-1.  All codes are full range.
+  - Better use of const pointers.
+  - Code run through valgrind.
+  - More consistent error status.
+  - On code errors or reading off end of stream, position should remain
+    unchanged (if they trap the croak).  Many codes have changes to make this
+    happen, and a new test is added to find a lot of these issues.  It is not
+    complete.
+  - Added examples, mainly copied from Data::BitStream.
+  - New fheader() and new(fheader => ...) methods added to finish off the
+    compatibility with Data::BitStream in file I/O.
+
+
+0.02     9 Nov 2011
+  - Fix tests on 5.6/5.8 that broke things at the last minute.
+  - Change // comments and mixed declarations to allow compilation with
+    old C compilers (--std=c89 --ansi -pedantic).
+    Variadic macros still being used however.
+  - Try to match word size with Perl word size.  Hopefully will fix
+    issues with LLP64 model machines using 64-bit Perl.
+
+
+0.01  Mon Nov  7 06:00:00 2011
+  - Initial version

@@ -1,0 +1,5 @@
+Revision history for Perl extension Data::Favorites.
+
+1.00  Sun Mar 30 18:56:00 2003
+	- original version; h2xs -AX -n Data::Favorites
+

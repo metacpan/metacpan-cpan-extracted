@@ -1,0 +1,8 @@
+Revision history for Devel-REPL-Profile-TSIBLEY
+
+0.02  2013-07-22 22:27:21 PDT
+        - Lots more history by default
+        - Actually force off history expansion
+
+0.01  2013-07-22 21:55:18 PDT
+        - Initial release

@@ -1,0 +1,120 @@
+NAME
+    Data::BinaryBuffer - The module to work with binary data effectively
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+        use Data::BinaryBuffer;
+
+        my $buf = Data::BinaryBuffer->new;
+
+        $buf->write($some_data); # PSD file for ex
+
+        my $sig = $buf->read(4);
+        die "This is not PSD file" if $sig ne '8BPS';
+
+        my $version = $buf->read_uint16be;
+
+        # etc...
+
+DESCRIPTION
+    NOTE: This module is in very alpha state. API may change without any
+    notice until version 0.1.
+
+    Perl is good for strings, bug not very nice to binary data. This class
+    exactly for that.
+
+    Data::BinaryBuffer is a data structure similar to the queue, but
+    optimized to work with blocks of arbitrary size. You can write data to
+    one end of buffer and read from another. Data can be written or read in
+    various formats.
+
+METHODS
+  new
+      my $buf = Data::BinaryBuffer->new;
+
+    Creates empty buffer object.
+
+  size
+      my $size = $buf->size;
+
+    Returns current amount of bytes stored in buffer.
+
+  write
+      $buf->write($data);
+
+    Write scalar to the buffer.
+
+  write_uint8
+  write_uint16be
+  write_uint16le
+  write_uint32be
+  write_uint32le
+  write_int8
+  write_int16be
+  write_int16le
+  write_int32be
+  write_int32le
+      $buf->write_uint8(255);
+      $buf->write_int32be($value);
+
+    Write one integer to the buffer.
+
+  read
+      my $data = $read($size);
+
+    Read $size bytes to Perl scalar.
+
+  read_uint8
+  read_uint16be
+  read_uint16le
+  read_uint32be
+  read_uint32le
+  read_int8
+  read_int16be
+  read_int16le
+  read_int32be
+  read_int32le
+      my $num1 = $buf->read_uint32be;
+
+    Read integer from buffer.
+
+  read_buffer
+      my $buf2 = $buf->read_buffer($size);
+
+    Same as "read", but return another buffer. This method is very fast for
+    big data.
+
+SEE ALSO
+    *   pack/unpack functions in perldoc
+
+    *   File::Binary
+
+    *   Parse::Binary
+
+    *   Convert::Binary::C
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/vovkasm/data-binarybuffer/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/vovkasm/data-binarybuffer>
+
+      git clone git://github.com/vovkasm/data-binarybuffer.git
+
+AUTHOR
+    Vladimir Timofeev <vovkasm@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Vladimir Timofeev.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

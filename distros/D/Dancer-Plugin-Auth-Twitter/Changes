@@ -1,0 +1,52 @@
+Revision history for Dancer-Plugin-Auth-Twitter
+
+0.07 2015-02-03
+ [DOCUMENTATION]
+ - Add note about 'can't verify ssl peer'. (GH#16)
+
+ [ENHANCEMENTS]
+ - Replace default engine to be Net::Twitter::Lite. (GH#15, odyniec)
+
+ [MISC]
+ - Add tests. (GH#17, odyniec)
+
+ [STATISTICS]
+ - code churn: 9 files changed, 190 insertions(+), 53 deletions(-)
+
+0.06 2014-02-15
+ [BUG FIXES]
+ - Net::Twitter now needs to have 'SSL => 1'.  (GH#10, reported by berekuk)
+
+0.05 2013-06-06
+ [MISC]
+ - Add 'Net::Twitter >= 4.0001' to the dependency list (for v1.1 of the
+   REST API). (Yanick Champoux)
+
+0.04 2013-06-06
+ [BUG FIXES]
+ - Was using 'core()', which is not exported. GH#8 (Vyacheslav Matyukhin)
+
+ [ENHANCEMENTS]
+ - Use v1.1 of the Twitter API REST (v1 is phased out by Twitter  on June
+   11th). GH#7 (Vyacheslav Matyukhin)
+
+0.03 2013-05-14
+ [BUG FIXES]
+ - fix L<> markup in POD. GH#5 (Andreas Koenig, Yanick Champoux)
+
+ [ENHANCEMENTS]
+ - Auth denied by user now redirects to $callback_fail. GH#2 (Will Orr) *
+   support for both authentication and authorization method. GH#3 (Simon
+   Elsbrock)
+ - Change 'warn' for 'debug'. GH#4 (berekuk)
+
+0.02 2011-01-17
+ [ENHANCEMENTS]
+ - allow customization of callback redirection URIs. (Yanick Champoux)
+
+ [MISC]
+ - Some release tweaks. (Alexis Sukrieh)
+
+0.01 2010-12-20
+ - First version, release as part of the Perl Dancer Advent Calendar 2010
+

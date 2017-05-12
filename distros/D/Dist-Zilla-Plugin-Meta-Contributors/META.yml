@@ -1,0 +1,49 @@
+---
+abstract: 'Generate an x_contributors section in distribution metadata'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  perl: '5.008001'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Meta-Contributors
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::Meta::Contributors:
+    file: lib/Dist/Zilla/Plugin/Meta/Contributors.pm
+    version: '0.003'
+requires:
+  Dist::Zilla::Role::MetaProvider: '0'
+  Moose: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-Meta-Contributors/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-Meta-Contributors
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-Meta-Contributors.git
+version: '0.003'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+  - 'Karen Etheridge <ether@cpan.org>'

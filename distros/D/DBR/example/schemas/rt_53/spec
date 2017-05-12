@@ -1,0 +1,1 @@
+schema=rt_53	table=a	field=b_id	cmd=RELATION	reltable=b	relfield=id	relname=b	reverse_name=as	type=CHILDOF

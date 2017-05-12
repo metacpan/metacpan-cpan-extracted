@@ -1,0 +1,28 @@
+SYNOPSIS
+
+    in dist.ini:
+
+     [OurDist]
+
+    in your modules/scripts:
+
+     # DIST
+
+    or
+
+     our $DIST = 'Some-Dist'; # DIST
+
+DESCRIPTION
+
+    This module is like Dist::Zilla::Plugin::PkgDist except that it looks
+    for comments # DIST and put the $DIST assignment there instead of
+    adding another line. The principle is the same as in
+    Dist::Zilla::Plugin::OurVersion (instead of
+    Dist::Zilla::Plugin::PkgVersion).
+
+    Comment/directive below __DATA__ or __END__ will not be replaced.
+
+SEE ALSO
+
+    Dist::Zilla
+

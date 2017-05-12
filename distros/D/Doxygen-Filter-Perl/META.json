@@ -1,0 +1,45 @@
+{
+   "abstract" : "Methods for pre-filtering Perl code for Doxygen",
+   "author" : [
+      "Bret Jordan"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Doxygen-Filter-Perl",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Log::Log4perl" : "1.46",
+            "Pod::POM" : "0.29",
+            "Pod::POM::View::HTML" : "1.06",
+            "Test::More" : "0.98",
+            "Test::Output" : "1.03"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.72"
+}

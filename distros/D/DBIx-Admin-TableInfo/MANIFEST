@@ -1,0 +1,22 @@
+Changelog.ini
+Changes
+docs/contacts.pg.log
+docs/contacts.sqlite.log
+lib/DBIx/Admin/TableInfo.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+scripts/foreign.keys.pl
+scripts/output2github.pl
+scripts/pod2html.sh
+scripts/synopsis.pl
+t/load.t
+xt/author/dsn.ini
+xt/author/fk.t
+xt/author/mysql.fk.pl
+xt/author/person.spouse.t
+xt/author/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

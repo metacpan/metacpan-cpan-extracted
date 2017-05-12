@@ -1,0 +1,31 @@
+---
+abstract: 'A mostly class-based ORM for Perl'
+author:
+  - 'Julio Fraire <julio.fraire@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.39'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Mint
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Clone: '0.38'
+  DBI: '0'
+  DBIx::Connector: '0.53'
+  List::MoreUtils: '0'
+  Moo: '1'
+  MooX::Singleton: '1.2'
+  SQL::Abstract::More: '1.26'
+resources:
+  repository: https://github.com/jfraire/DBIx-Mint
+version: '0.071'

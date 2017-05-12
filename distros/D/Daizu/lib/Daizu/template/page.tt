@@ -1,0 +1,13 @@
+[% INCLUDE head/html_decl.tt -%]
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>[% INCLUDE head/page_title.tt %]</title>
+  [% INCLUDE head/styles.tt %]
+  [% INCLUDE head/meta.tt %]
+ </head>
+ <body>
+  [% INCLUDE page_layout.tt %]
+  [% INCLUDE body_bottom.tt %]
+ </body>
+</html>

@@ -1,0 +1,104 @@
+Dist::Zilla::Plugin::Beam::Connector
+
+This module aims to allow "Dist::Zilla" to use plugins using
+"Beam::Event" and "Beam::Emitter", and perhaps reduce the need for
+massive amounts of composition and role application proliferating
+"CPAN".
+
+This is in lieu of a decent dependency injection system, and is
+presently relying on "Dist::Zilla" to load and construct the plugins
+itself, and then you just connect the plugins together informally,
+without necessitating each plugin be specifically tailored to the
+recipient.
+
+Hopefully, this may also give scope for non-"dzil" plugins being
+loadable into memory some day, and allowing message passing of events to
+those plugins. ( Hence, the "plugin:" prefix )
+
+A Real World Example of what a future could look like?
+
+  [GatherDir]
+
+  [Test::Compile]
+
+  [Beam::Connector]
+  on = plugin:GatherDir#collect => plugin:Test::Compile#generate_test
+
+"GatherDir" in this example would build a mutable tree of files, attach
+them to an event "::GatherDir::Tree", and pass that event to
+"Test::Compile#generate_test", which would then add ( or remove, or
+mutate ) any files in that tree.
+
+Tree state mutation then happens in order of prescription, in the order
+given by the various "on" declarations.
+
+Thus, a single plugin can be in 2 places in the same logical stage.
+
+  [Beam::Connector]
+  on = plugin:GatherDir#collect => plugin:Test::Compile#generate_test
+  ; lots more collectors here
+  on = plugin:GatherDir#collect => plugin:Test::Compile#finalize_test
+
+Whereas presently, order of affect is either governed by:
+
+*   phase - where you can add but not remove or mutate, mutate but not
+    add or remove, remove, but not add or mutate
+
+*   plugin order - where a single plugin cant be both early in a single
+    phase and late
+
+If that example is not convincing enough for you, consider all the
+different ways there are presently for implementing "[MakeMaker]". If
+you're following the standard logic its fine, but as soon as you set out
+of the box, you have a few things you're going to have to do instead:
+
+*   Subclass "MakeMaker" in some way
+
+*   Re-implement "MakeMaker" in some way
+
+*   Fuss a lot with phase ordering and then inject code in the "File"
+    that "MakeMaker" generates.
+
+These approaches all work, but they're an open door to everyone
+re-implementing the same thing thousands of times over.
+
+  [MakeMaker]
+
+  [DynamicPrereqs]
+  -phases = none
+
+  [Beam::Connector]
+  on = plugin:MakeMaker#collect_augments => plugin:DynamicPrereqs#inject_augments
+
+"MakeMaker" here can just create an "event", pass it to
+"DynamicPrereqs", "DynamicPrereqs" can inject its desired content into
+the "event", and then "MakeMaker" can integrate the injected events at
+"wherever" the right place for them is.
+
+This is much superior to scraping the generated text file and injecting
+events at a given place based on a "RegEx" match.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

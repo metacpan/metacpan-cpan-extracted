@@ -1,0 +1,28 @@
+
+Installing:
+
+ 1. verify that you have the prerequisites installed
+
+      + perl
+	perl is required for both this module and the perl program you wish
+	to profile. the software has been tested with 5.6.1 and should work
+	with anything more recent, and maybe less recent, as well.
+        Find perl at www.perl.org
+
+      + Time::HiRes
+	is required in order to perform timing calculations.
+	it ships with recent versions of perl, or can be
+	downloaded from CPAN
+
+ 2. unbundle the tarball
+
+ 3. run 'perl Makefile.PL'
+
+ 4. run 'make'
+
+ 5. run 'make install'
+
+ 6. run 'perldoc Devel::Profile'
+
+ 7. you are finished, sing a happy song, or, optionally, send in a bug report
+

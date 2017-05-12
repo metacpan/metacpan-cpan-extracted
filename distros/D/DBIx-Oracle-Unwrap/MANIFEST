@@ -1,0 +1,15 @@
+Changes
+ignore.txt
+lib/DBIx/Oracle/Unwrap.pm
+Makefile.PL
+MANIFEST			This list of files
+MYMETA.json
+MYMETA.yml
+README
+script/unwrap
+t/00-load.t
+t/01-unwrap.t
+t/02-unwrap_script.t
+t/t1_enc.plb
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

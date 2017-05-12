@@ -1,0 +1,8 @@
+^\.
+^CVS
+^\.svn
+^\.git
+^pod2
+^makedoc\.sh
+^contrib
+blib

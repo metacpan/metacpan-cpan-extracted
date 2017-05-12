@@ -1,0 +1,21 @@
+Release history of Data::PatternCompare
+
+0.04 2013-08-13
+
+  * Add "empty" entity
+  * Add export "empty" and "any"
+
+0.03 2013-08-08
+
+  * Add float comparison functionality
+  * Add strict pattern comparison (eq_pattern)
+  * Fix bugs
+
+0.02 2013-08-04
+
+  * Add Changes file
+  * Fix version variable
+
+0.01 2013-07-29
+
+  * First Release to CPAN

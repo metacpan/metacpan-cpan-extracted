@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data>
+  <request class="Web::App::Request::ModPerl2">
+    <headers_sent>1</headers_sent>
+    <base_uri/>
+    <screen_matches>
+      <empty-array/>
+    </screen_matches>
+    <file_name>index</file_name>
+    <processors>
+      <empty-array/>
+    </processors>
+    <presenter>
+      <empty-hash/>
+    </presenter>
+    <unparsed_uri>/</unparsed_uri>
+    <presentation>
+      <type>xslt</type>
+    </presentation>
+    <file_extension>html</file_extension>
+    <path>/index.html</path>
+    <path_info>index.html</path_info>
+    <uri>/index.html</uri>
+    <host>deep.local</host>
+    <dir_info>
+      <undef/>
+    </dir_info>
+    <params class="CGI::Minimal">
+        <field_names>
+          <empty-array/>
+        </field_names>
+        <form_truncated>
+          <undef/>
+        </form_truncated>
+        <max_buffer>10240</max_buffer>
+        <field>
+          <empty-hash/>
+        </field>
+    </params>
+    <screen class="Web::App::Config::Screen">
+      <process_calls>
+        <item>
+          <sub>DA::UI::News-&gt;root_page</sub>
+          <limit>30</limit>
+        </item>
+      </process_calls>
+      <presentation>
+        <type>xslt</type>
+      </presentation>
+      <request>
+        <max-size>10240</max-size>
+      </request>
+      <auth>
+        <undef/>
+      </auth>
+      <params>
+        <empty-array/>
+      </params>
+      <id/>
+      <init_calls>
+        <item>
+          <sub>DA::UI::News-&gt;root_page</sub>
+          <limit>30</limit>
+        </item>
+      </init_calls>
+    </screen>
+    <type>CGI</type>
+  </request>
+  <articles>
+    <version>1</version>
+    <total_count>454</total_count>
+    <items>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/seminar060309.jpg</teaser>
+        <time>09:09</time>
+        <date>08.04</date>
+        <title>Весенние тезисы для начинающих Мак-пользователей. Часть 1.</title>
+        <id>25334</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/iphone31_180.jpg</teaser>
+        <time>12:24</time>
+        <date>18.03</date>
+        <title>iPhone 3.0: Все ключевые функции в скриншотах</title>
+        <id>25333</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/bessemer_032009/17th-March-news350v2.jpg</teaser>
+        <time>05:50</time>
+        <date>18.03</date>
+        <title>iPhone OS 3.0 в картинках</title>
+        <id>25332</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/iphone170309.jpg</teaser>
+        <time>13:17</time>
+        <date>17.03</date>
+        <title>15 функций, которые мы бы хотели увидеть в iPhone 3.0</title>
+        <id>25330</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/bessemer_022009/BashOr-announce-II-news350.jpg</teaser>
+        <time>08:25</time>
+        <date>18.02</date>
+        <title>Долгий путь в App...</title>
+        <id>25329</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/bessemer_012009/New-white-news350.jpg</teaser>
+        <time>11:28</time>
+        <date>28.01</date>
+        <title>Белый MacBook. Apple продолжает игру.</title>
+        <id>25328</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/mwsf200109.jpg</teaser>
+        <time>07:26</time>
+        <date>20.01</date>
+        <title>Последний(?) Macworld</title>
+        <id>25327</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/top130109.jpg</teaser>
+        <time>08:30</time>
+        <date>13.01</date>
+        <title>Десять самых яркий событий года</title>
+        <id>25326</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/top-10-ver2-news350.jpg</teaser>
+        <time>11:07</time>
+        <date>25.12</date>
+        <title>Десять разочарований года</title>
+        <id>25322</id>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::Article">
+        <teaser>/i/news/082008/jobs150908</teaser>
+        <time>06:10</time>
+        <date>24.12</date>
+        <title>Но почему Фил Шиллер или Последний MacWorld</title>
+        <id>25319</id>
+        <display_mode/>
+      </item>
+    </items>
+  </articles>
+  <today>06.06</today>
+  <week>
+    <version>1</version>
+    <total_count>677</total_count>
+    <items>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/mayseminar040509.jpg</teaser>
+        <time>13:11</time>
+        <date>04.05</date>
+        <id>34025</id>
+        <title>Приглашаем всех желающих на майские семинары и мастер-классы DeepArtment! </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/applecpu040509.jpg</teaser>
+        <time>12:55</time>
+        <date>04.05</date>
+        <id>34024</id>
+        <title>Wall Street Journal: Apple создает собственную команду для разработки микропроцессоров </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/myst040509.jpg</teaser>
+        <time>11:09</time>
+        <date>04.05</date>
+        <id>34021</id>
+        <title>В App Store появился легендарный Myst. Все 730 мегабайт.</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/images/news/082008/deepartmentlogo281108.jpg</teaser>
+        <time>15:45</time>
+        <date>30.04</date>
+        <id>34016</id>
+        <title>График работы офисов и магазинов DeepArtment на время первомайских праздников! </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/deepstore2008_350.jpg</teaser>
+        <time>14:39</time>
+        <date>30.04</date>
+        <id>34013</id>
+        <title>Последние свободные места на семинар «Цифровая фотография и ее обработка»!</title>
+        <display_mode/>
+      </item>
+    </items>
+  </week>
+  <form>
+    <errors>
+      <empty-hash/>
+    </errors>
+    <values>
+      <empty-hash/>
+    </values>
+  </form>
+  <hot>
+    <version>1</version>
+    <total_count>0</total_count>
+    <items>
+      <empty-array/>
+    </items>
+  </hot>
+  <list>
+    <version>1</version>
+    <total_count>21646</total_count>
+    <items>
+      <item class="DA::Entity::News">
+        <teaser/>
+        <time>07:02</time>
+        <date>06.05</date>
+        <id>34037</id>
+        <title>qwrgqergergv</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/nvidia230409.jpg</teaser>
+        <time>08:35</time>
+        <date>05.05</date>
+        <id>34036</id>
+        <title>Nvidia готовит для компьютеров Mac Pro видеокарту GeForce GTX 285</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/ms050509.jpg</teaser>
+        <time>07:29</time>
+        <date>05.05</date>
+        <id>34035</id>
+        <title>Apple нанимает на работу директора подразделения Xbox</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/tweetie210409.jpg</teaser>
+        <time>06:58</time>
+        <date>05.05</date>
+        <id>34034</id>
+        <title>Tweetie 1.1 предлагает поддержку Growl</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/recycle040509.jpg</teaser>
+        <time>17:14</time>
+        <date>04.05</date>
+        <id>34032</id>
+        <title>Купи iPod nano и... не забудь избавиться от старой краски! </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://deepapple.com/i/news/082008/daisy180309.jpg</teaser>
+        <time>16:51</time>
+        <date>04.05</date>
+        <id>34031</id>
+        <title>В DaisyDisk 1.2 повышена точность сканирования </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/macbook040509.jpg</teaser>
+        <time>16:20</time>
+        <date>04.05</date>
+        <id>34030</id>
+        <title>&lt;b&gt;DeepArtment Store&lt;/b&gt;: На склад поступили бюджетные «макбуки»! </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/leopard160409.jpg</teaser>
+        <time>16:12</time>
+        <date>04.05</date>
+        <id>34029</id>
+        <title>И все же обновлению Mac OS X 10.5.7 на этой неделе быть?</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/eclipse040509.jpg</teaser>
+        <time>15:13</time>
+        <date>04.05</date>
+        <id>34028</id>
+        <title>Впереди время поездок: подбираем для ноутбука сумку или рюкзак Brenthaven</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/toonboom040509.jpg</teaser>
+        <time>14:43</time>
+        <date>04.05</date>
+        <id>34027</id>
+        <title>В пятой версии пакета Toon Boom Studio добавлена поддержка stop-motion анимации</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/imacmoney040509.jpg</teaser>
+        <time>14:02</time>
+        <date>04.05</date>
+        <id>34026</id>
+        <title>Apple все же снизит цены на некоторые модели своих компьютеров?</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/mayseminar040509.jpg</teaser>
+        <time>13:11</time>
+        <date>04.05</date>
+        <id>34025</id>
+        <title>&lt;b&gt;Приглашаем всех желающих на майские семинары и мастер-классы DeepArtment!&lt;/b&gt; </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/applecpu040509.jpg</teaser>
+        <time>12:55</time>
+        <date>04.05</date>
+        <id>34024</id>
+        <title>Wall Street Journal: Apple создает собственную команду для разработки микропроцессоров </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/032008/macos11_040508.jpg</teaser>
+        <time>11:59</time>
+        <date>04.05</date>
+        <id>34023</id>
+        <title>&lt;b&gt;DeepHistory&lt;/b&gt;: Первое обновление Mac OS </title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/smartscroll040509.jpg</teaser>
+        <time>11:48</time>
+        <date>04.05</date>
+        <id>34022</id>
+        <title>Выпущена свежая версия утилиты настройки прокрутки Smart Scroll</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/myst040509.jpg</teaser>
+        <time>11:09</time>
+        <date>04.05</date>
+        <id>34021</id>
+        <title>В App Store появился легендарный Myst. Все 730 мегабайт.</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/webstat040509.jpg</teaser>
+        <time>10:46</time>
+        <date>04.05</date>
+        <id>34020</id>
+        <title>Net Applications публикует Web-статистику за апрель</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://deepapple.com/i/news/082008/songgenie140109.jpg</teaser>
+        <time>07:53</time>
+        <date>04.05</date>
+        <id>34019</id>
+        <title>Технический апдейт утилиты SongGenie</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/imacupdate040509.jpg</teaser>
+        <time>07:20</time>
+        <date>04.05</date>
+        <id>34018</id>
+        <title>Обновление прошивки решает проблемы компьютеров iMac с видеокартой ATI Radeon HD 4850</title>
+        <display_mode/>
+      </item>
+      <item class="DA::Entity::News">
+        <teaser>http://www.deepapple.com/i/news/082008/laptop040509.jpg</teaser>
+        <time>07:04</time>
+        <date>04.05</date>
+        <id>34017</id>
+        <title>Microsoft довела свою рекламу «Охотники за ноутбуками» до абсурда</title>
+        <display_mode/>
+      </item>
+    </items>
+  </list>
+  <session_user class="DA::Entity::Account">
+    <key name="+fetched">1</key>
+    <status>1</status>
+    <login>apla</login>
+    <created>0000-00-00 00:00:00</created>
+    <comment>
+      <undef/>
+    </comment>
+    <updated>0000-00-00 00:00:00</updated>
+    <id>1</id>
+  </session_user>
+  <debug-mode>immediately</debug-mode>
+</data>

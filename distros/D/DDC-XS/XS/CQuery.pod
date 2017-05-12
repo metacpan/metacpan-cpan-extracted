@@ -1,0 +1,351 @@
+##-*- Mode: CPerl -*-
+## Auto-generated from C++ header file(s) by h2xspp.perl;
+##  + command-line: h2xspp.perl -prefix 'DDC::XS::' Query.h.in '-vt=^[mb]_' -o out '-dn=free' '-dt=Node|Compiler|Options'
+## ... and edited!
+
+=pod
+
+=head1 NAME
+
+DDC::XS::CQuery - XS interface to DDC C++ CQuery objects
+
+=head1 SYNOPSIS
+
+ #----------------------------------------------------------------------
+ # Perliminaries
+ use DDC::XS;
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQuery : @ISA=qw(DDC::XS::Object);
+ 
+ # Constructors etc.
+ $CQuery = DDC::XS::CQuery->new($label);
+ 
+ # Accessors
+ $string    = $CQuery->getLabel();
+ undef      = $CQuery->setLabel($Label);
+ $CQOptions = $CQuery->getLabel();
+ undef      = $CQuery->setOptions($CQOptions);
+ 
+ # Methods
+ undef   = $CQuery->Evaluate();
+ $bool   = $CQuery->Negated();
+ $bool   = $CQuery->Negate();
+ $BYTE   = $CQuery->GetMatchId();		#-- returns "rightmost" nonzero match-id dominated by $CQuery
+ $BYTE   = $CQuery->SetMatchId($matchId);	#-- sets $CQuery match-id, possibly clobbering descendant match-ids
+ $bool   = $CQuery->HasMatchId();		#-- returns true iff any nontrivial match-id is dominated by $CQuery
+ $bool   = $CQuery->RootOK();
+ $string = $CQuery->toJson();
+ $string = $CQuery->toString();
+ $string = $CQuery->optionsToString();          #-- like $CQuery->getOptions->toString()
+ $string = $CQuery->toStringFull();             #-- like $CQuery->toString() . $CQuery->optionsToString()
+ undef   = $CQuery->ClearNode();
+ undef   = $CQuery->ClearOptions();
+ undef   = $CQuery->Clear($deep);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQNegatable : @ISA=qw(DDC::XS::CQuery);
+ 
+ # Constructors etc.
+ $CQNegatable = DDC::XS::CQNegatable->new($label, $negated);
+ 
+ # Accessors
+ $bool = $CQNegatable->getNegated();
+ undef = $CQNegatable->setNegated($Negated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQAtomic : @ISA=qw(DDC::XS::CQNegatable);
+ 
+ # Constructors etc.
+ $CQAtomic = DDC::XS::CQAtomic->new($label, $negated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQBinOp : @ISA=qw(DDC::XS::CQNegatable);
+ 
+ # Constructors etc.
+ $CQBinOp = DDC::XS::CQBinOp->new($dtr1, $dtr2, $opName, $negated);
+ 
+ # Accessors
+ $CQuery = $CQBinOp->getDtr1();
+ undef   = $CQBinOp->setDtr1($dtr1);
+ $CQuery = $CQBinOp->getDtr2();
+ undef   = $CQBinOp->setDtr2($dtr2);
+ $string = $CQBinOp->getOpName();
+ undef   = $CQBinOp->setOpName($OpName);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQAnd : @ISA=qw(DDC::XS::CQBinOp);
+ 
+ # Constructors etc.
+ $CQAnd = DDC::XS::CQAnd->new($dtr1, $dtr2);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQOr : @ISA=qw(DDC::XS::CQBinOp);
+ 
+ # Constructors etc.
+ $CQOr = DDC::XS::CQOr->new($dtr1, $dtr2);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQWith : @ISA=qw(DDC::XS::CQBinOp);
+ 
+ # Constructors etc.
+ $CQWith = DDC::XS::CQWith->new($dtr1=undef, $dtr2=undef, $matchid=0);
+ 
+ # Accessors
+ $BYTE   = $CQWith->getMatchId();
+ undef   = $CQWith->setMatchId($MatchId);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQWithout : @ISA=qw(DDC::XS::CQWith);
+ 
+ # Constructors etc.
+ $CQWithout = DDC::XS::CQWithout->new($dtr1=undef, $dtr2=undef, $matchid=0);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQWithor : @ISA=qw(DDC::XS::CQWith);
+ 
+ # Constructors etc.
+ $CQWithor = DDC::XS::CQWithor->new($dtr1=undef, $dtr2=undef, $matchid=0);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQToken : @ISA=qw(DDC::XS::CQAtomic);
+ 
+ # Constructors etc.
+ $CQToken = DDC::XS::CQToken->new($indexName='', $value='', $matchId=0);
+ 
+ # Accessors
+ $string = $CQToken->getIndexName();
+ undef   = $CQToken->setIndexName($IndexName);
+ $string = $CQToken->getValue();
+ undef   = $CQToken->setValue($Value);
+ $BYTE   = $CQToken->getMatchId();
+ undef   = $CQToken->setMatchId($MatchId);
+ 
+ # Methods
+ $char   = $CQToken->OperatorKey();
+ $string = $CQToken->IndexName($DefaultIndexName);
+ $string = $CQToken->BreakName($DefaultBreakName);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokExact : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokExact = DDC::XS::CQTokExact->new($indexName, $value);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokAny : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokAny = DDC::XS::CQTokAny->new($indexName, $value);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokAnchor : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokAnchor = DDC::XS::CQTokAnchor->new($indexName, $value);
+ 
+ # Accessors
+ $int  = $CQTokAnchor->getValueInt();
+ undef = $CQTokAnchor->setValueInt($ValueInt);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokRegex : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokRegex = DDC::XS::CQTokRegex->new($indexName, $regex, $negated);
+ 
+ # Accessors
+ $bool = $CQTokRegex->getRegexNegated();
+ undef = $CQTokRegex->setRegexNegated($RegexNegated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokSet : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokSet = DDC::XS::CQTokSet->new($indexName, $rawValue, $values);
+ 
+ # Accessors
+ \@strings = $CQTokSet->getValues();
+ undef     = $CQTokSet->setValues($Values);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokInfl : @ISA=qw(DDC::XS::CQTokSet);
+ 
+ # Constructors etc.
+ $CQTokInfl = DDC::XS::CQTokInfl->new($indexName, $value, \@expanders);
+ $CQTokInfl = DDC::XS::CQTokInfl->newSet($indexName, \@values, \@expanders);
+ 
+ # Accessors
+ \@strings = $CQTokInfl->getExpanders();
+ undef     = $CQTokInfl->setExpanders(\@Expanders);
+ #$TxChain  = $CQTokInfl->getTxc();			#-- TODO
+ #undef     = $CQTokInfl->setTxc($Txc);			#-- TODO
+ #$TxChain  = $CQTokInfl->GetChain();			#-- TODO
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokSetInfl : @ISA=qw(DDC::XS::CQTokInfl);
+ 
+ # Constructors etc.
+ $CQTokSetInfl = DDC::XS::CQTokSetInfl->new($indexName, \@values, \@expanders);
+ 
+ # Accessors
+ \@strings = $CQTokSetInfl->getRawValues();
+ undef     = $CQTokSetInfl->setRawValues($RawValues);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokPrefix : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokPrefix = DDC::XS::CQTokPrefix->new($indexName, $prefix);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokSuffix : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokSuffix = DDC::XS::CQTokSuffix->new($indexName, $suffix);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokInfix : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokInfix = DDC::XS::CQTokInfix->new($indexName, $infix);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokPrefixSet : @ISA=qw(DDC::XS::CQTokSet);
+ 
+ # Constructors etc.
+ $CQTokPrefixSet = DDC::XS::CQTokPrefixSet->new($indexName, \@prefixes);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokSuffixSet : @ISA=qw(DDC::XS::CQTokSet);
+ 
+ # Constructors etc.
+ $CQTokSuffixSet = DDC::XS::CQTokSuffixSet->new($indexName, \@suffixes);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokInfixSet : @ISA=qw(DDC::XS::CQTokSet);
+ 
+ # Constructors etc.
+ $CQTokInfixSet = DDC::XS::CQTokInfixSet->new($indexName, \@infixes);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokMorph : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokMorph = DDC::XS::CQTokMorph->new($indexName, \@Items);
+ 
+ # Accessors
+ \@strings = $CQTokMorph->getItems();
+ undef     = $CQTokMorph->setItems(\@Items);
+ 
+ # Methods
+ undef = $CQTokMorph->Append($item);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokLemma : @ISA=qw(DDC::XS::CQTokMorph);
+ 
+ # Constructors etc.
+ $CQTokLemma = DDC::XS::CQTokLemma->new($indexName, $value);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokThes : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokThes = DDC::XS::CQTokThes->new($indexName, $value);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokChunk : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokChunk = DDC::XS::CQTokChunk->new($indexName, $value);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQTokFile : @ISA=qw(DDC::XS::CQToken);
+ 
+ # Constructors etc.
+ $CQTokFile = DDC::XS::CQTokFile->new($indexName, $fileName);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQNear : @ISA=qw(DDC::XS::CQNegatable);
+ 
+ # Constructors etc.
+ $CQNear = DDC::XS::CQNear->new($dist, $dtr1, $dtr2, $dtr3);
+ 
+ # Accessors
+ $CQuery = $CQNear->getDtr1();
+ undef   = $CQNear->setDtr1($dtr1);
+ $CQuery = $CQNear->getDtr2();
+ undef   = $CQNear->setDtr2($dtr2);
+ $CQuery = $CQNear->getDtr3();
+ undef   = $CQNear->setDtr3($dtr3);
+ $BYTE   = $CQNear->getDist();
+ undef   = $CQNear->setDist($Dist);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQSeq : @ISA=qw(DDC::XS::CQAtomic);
+ 
+ # Constructors etc.
+ $CQSeq = DDC::XS::CQSeq->new1     ($item);
+ $CQSeq = DDC::XS::CQSeq->new      (\@items, \@dists, \@distops);
+ 
+ # Accessors
+ \@CQTokens = $CQSeq->getItems();
+ undef      = $CQSeq->setItems(\@Items);
+ \@Dists    = $CQSeq->getDists();
+ undef      = $CQSeq->setDists(\@Dists);
+ \@DistOps  = $CQSeq->getDistOps();
+ undef      = $CQSeq->setDistOps(\@DistOps);
+ 
+ # Methods
+ undef = $CQSeq->Append($nextItem, $nextDist, $nextDistOp);
+
+
+=cut
+
+##======================================================================
+
+=pod
+
+=head1 DESCRIPTION
+
+The DDC::XS::CQuery hierarchy provides perl wrappers for  the DDC C++ CQuery classes.
+DDC parsed query objects can be created either manually from perl using
+the constructors above, or parsed from a query string using
+the L<DDC::XS::CQueryCompiler|DDC::XS::CQueryCompiler> interface.
+In either case, DDC::XS::CQuery and all other DDC::XS::Object descendants
+use an internal reference counting strategy in addition to perl's reference counts;
+see L<DDC::XS::Object> for details.
+The L<DDC::XS::Object|DDC::XS::Object> methods toHash() and newFromHash()
+may be useful for mapping back and forth between the "opaque" objects
+in the DDC::XS hierarchy and perl representations of these encoded as
+HASH-refs, since perl's internal reference-counting strategy applies
+to the latter.
+
+
+=head1 KNOWN BUGS
+
+Objects should be transparently encoded/decoded to and from perl hash representations.
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::XS(3perl),
+DDC::XS::Object(3perl),
+DDC::XS::CQCount(3perl),
+DDC::XS::CQFilter(3perl),
+DDC::XS::CQueryOptions(3perl),
+DDC::XS::CQueryCompiler(3perl).
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

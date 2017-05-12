@@ -1,0 +1,20 @@
+Hebrew.pm
+Makefile.PL
+README
+Changes
+MANIFEST
+LICENSE
+eg/sunset.pl
+t/new.t
+t/today.t
+t/sunset.t
+t/now.t
+t/utc_rd_values.t
+t/clone.t
+t/accessors.t
+t/from_object.t
+t/set.t
+t/strftime.t
+t/overload.t
+t/durations.t
+META.yml                                 Module meta-data (added by MakeMaker)

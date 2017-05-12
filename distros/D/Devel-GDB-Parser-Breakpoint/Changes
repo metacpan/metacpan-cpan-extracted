@@ -1,0 +1,8 @@
+Revision history for Perl extension Devel::GDB::Parser::Breakpoint.
+
+0.02  Mon Sep 30 07:42:33 2013
+    - Update minimum Perl version
+    - Update docs to include alternatives
+
+0.01  Thu Sep 26 09:20:18 2013
+    - Original version

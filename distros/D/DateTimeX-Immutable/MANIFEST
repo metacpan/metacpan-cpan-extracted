@@ -1,0 +1,24 @@
+Build.PL
+Changes
+lib/DateTimeX/Immutable.pm
+lib/DateTimeX/Role/Immutable.pm
+MANIFEST			This list of files
+t/00-load.t
+t/10-basic.t
+t/20-today.t
+t/30-duration.t
+TODO
+xt/check-changes.t
+xt/critic.t
+xt/fixme.t
+xt/hasversion.t
+xt/kwalitee.t
+xt/manifest.t
+xt/meta.t
+xt/minimumversion.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+README
+META.yml
+META.json

@@ -1,0 +1,30 @@
+NAME
+    DateTime::Stringify - DateTime objects (no longer needed)
+
+SYNOPSIS
+      use DateTime;
+
+      my $dt = DateTime->now;
+      print "The time is now $dt...\n";
+      # The time is now 2004-02-13T16:12:47...
+
+DESCRIPTION
+    The DateTime suite of modules are a comprehensive way of representing
+    and manipulating dates and times. This module used to be needed as
+    interpolating a DateTime object in a string results in the not-so-useful
+    "DateTime=HASH(0x800368)" or similar. However, DateTime has now
+    incorporated the functionality of this module (as of DateTime 0.21).
+    Thus, this module is no longer needed.
+
+    This module is just a placeholder now. Just use DateTime instead.
+
+AUTHOR
+    Leon Brocard <acme@astray.com>
+
+COPYRIGHT
+    Copyright (C) 2004, Leon Brocard
+
+LICENSE
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

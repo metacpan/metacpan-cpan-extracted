@@ -1,0 +1,110 @@
+NAME
+
+    Dist::Zilla::Plugin::AssertOS - Require that our distribution is
+    running on a particular OS
+
+VERSION
+
+    version 0.08
+
+SYNOPSIS
+
+      # In dist.ini - It is important that AssertOS follows MakeMaker or
+      # ModuleBuild
+    
+      [MakeMaker]
+    
+      [AssertOS]
+      os = Linux
+      os = FreeBSD
+      os = cygwin
+
+    The resultant distribution will die at Makefile.PL unless the platform
+    the code is running on is Linux, FreeBSD or Cygwin.
+
+DESCRIPTION
+
+    Dist::Zilla::Plugin::AssertOS is a Dist::Zilla plugin that integrates
+    Devel::AssertOS so that CPAN authors may easily stipulate which
+    particular OS environments their distributions may be built and
+    installed on.
+
+    The author specifies which OS or OS families are supported. The
+    necessary Devel::AssertOS files are copied to the inc/ directory and
+    Makefile.PL or Build.PL is mungled to include the necessary
+    incantation.
+
+    On the module user side, the bundled inc/ Devel::AssertOS determines
+    whether the current environment is supported or not and will die
+    accordingly.
+
+    As this plugin mungles the Makefile.PL/Build.PL it is imperative that
+    it is specified in dist.ini AFTER [MakeMaker] or [ModuleBuild].
+
+    This plugin also automagically adds the no_index metadata so that inc/
+    is excluded from PAUSE indexing. If you use
+    Dist::Zilla::Plugin::MetaNoIndex, there may be conflicts.
+
+ ATTRIBUTES
+
+    os
+
+      Specify as many times as wanted the OS that you wish your
+      distribution to work with. See Devel::AssertOS and Devel::CheckOS for
+      what may be given.
+
+    bundle
+
+      If set to c<0> Devel::AssertOS will not be bundled in the
+      distribution. It will instead be added to configure_requires in the
+      META files so CPAN clients can install it before running Makefile.PL.
+      The default is 1, so Devel::AssertOS is bundled in inc.
+
+ METHODS
+
+    These are required by the roles that this plugin uses.
+
+    mvp_multivalue_args
+
+    gather_files
+
+      Required by Dist::Zilla::Role::FileGatherer.
+
+    setup_installer
+
+      Required by Dist::Zilla::Role::InstallTool.
+
+    metadata
+
+      Required by Dist::Zilla::Role::MetaProvider.
+
+KUDOS
+
+    Based on use-devel-assertos by David Cantrell
+
+    Build.PL support contributed by Yanick Champoux
+
+    Thanks to Ricardo Signes, not only for Dist::Zilla, but for explaining
+    Dist::Zilla::Role::InstallTool's place in the build process. This made
+    this plugin possible.
+
+SEE ALSO
+
+    Dist::Zilla
+
+    Devel::AssertOS
+
+    Devel::CheckOS
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams and David
+    Cantrell.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

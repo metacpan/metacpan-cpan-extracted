@@ -1,0 +1,4 @@
+deny all to testrep on all in all
+allow now 20 to testrep on testbranch in YES/Way.pm
+allow now 21 to testrep on testbranch 
+deny 21 to testrep on testbranch in NO/Way.pm

@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-PERLANCAR-MetaResources
+
+0.03     2014-08-26 (PERLANCAR)
+
+         - Rename dist again (drop the Author- part).
+
+
+0.02     2014-08-26 (PERLANCAR)
+
+         - Rename dist.
+
+
+0.01     2013-11-05 (SHARYANTO)
+
+         - First release.

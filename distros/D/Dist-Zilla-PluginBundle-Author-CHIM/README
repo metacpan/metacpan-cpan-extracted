@@ -1,0 +1,352 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::CHIM - Dist::Zilla configuration the
+    way CHIM does it
+
+VERSION
+
+    version 0.052005
+
+DESCRIPTION
+
+    This is a Dist::Zilla PluginBundle. It is roughly equivalent to the
+    following dist.ini:
+
+        [Git::NextVersion]
+        version_regexp = ^([\d._]+)(-TRIAL)?$
+    
+        [GatherDir]
+        [PruneCruft]
+    
+        ;; modified files
+        [OurPkgVersion]
+    
+        [PodWeaver]
+        config_plugin = @CHIM
+    
+        [NextRelease]
+        time_zone = UTC
+        format    = %-7v %{EEE MMM d HH:mm:ss yyyy ZZZ}d
+        [Authority]
+        authority      = %{authority}
+        do_metadata    = 1
+        locate_comment = 1
+    
+        ;; generated files
+        [License]
+    
+        [ReadmeAnyFromPod / ReadmeInBuild]
+        type     = text
+        filename = README
+        location = build
+    
+        [ReadmeAnyFromPod / ReadmeMdInRoot]
+        type     = markdown
+        filename = README.md
+        location = root
+    
+        [TravisCI::StatusBadge]
+        vector = 1
+    
+        [MetaNoIndex]
+        directory = t
+        directory = xt
+        directory = eg
+        directory = examples
+        directory = corpus
+        package   = DB
+        namespace = t::lib
+    
+        [GithubMeta]
+        homepage = https://metacpan.org/release/%{dist}
+        remote = origin
+        remote = github
+        remote = gh
+        issues = 1
+    
+        ;; add 'provides' to META
+        [MetaProvides::Package]
+        meta_noindex = 1
+    
+        ;; META files
+        [MetaYAML]
+        [MetaJSON]
+    
+        ;; t tests
+        [Test::Compile]
+        fake_home = 1
+    
+        ;; xt tests
+        [MetaTests]
+        [PodSyntaxTests]
+        [PodCoverageTests]
+        [Test::Version]
+        [Test::Kwalitee]
+        [Test::EOL]
+        [Test::NoTabs]
+    
+        ;; build
+        [MakeMaker]
+        [Manifest]
+    
+        ;; run tests at xt/ on dzil test
+        [RunExtraTests]
+        default_jobs = 7
+    
+        [Git::Check]
+        allow_dirty = dist.ini
+        allow_dirty = Changes
+        untracked_files = die
+    
+        ;; release
+        [ConfirmRelease]
+        [UploadToCPAN]
+    
+        [Git::Commit]
+        commit_msg = bump Changes v%v%t [ci skip]
+    
+        [Git::Tag]
+        tag_format = %v%t
+        tag_message = release v%v%t
+
+SYNOPSYS
+
+        # in dist.ini
+        [@Author::CHIM]
+        dist            = My-Very-Cool-Module
+        authority       = cpan:CHIM
+        github.user     = Wu-Wu
+
+OPTIONS
+
+ -remove
+
+    Removes a plugin. Might be used multiple times.
+
+        [@Author::CHIM]
+        -remove = PodCoverageTests
+        -remove = Test::Kwalitee
+
+ dist
+
+    The name of the distribution. Required.
+
+ no_git
+
+    Boolean. When true - all git-related plugins will be skipped. Default
+    value is false.
+
+ authority
+
+    This one is used to set name the CPAN author of the distibution. It
+    should be something like cpan:PAUSEID. Default value is cpan:CHIM.
+
+ github.user
+
+    Indicates github.com's account name. Default value is Wu-Wu. Used by
+    Dist::Zilla::Plugin::GithubMeta and
+    Dist::Zilla::Plugin::TravisCI::StatusBadge.
+
+ github.repo
+
+    Indicates github.com's repository name. Default value is set to value
+    of the "dist" option. Used by Dist::Zilla::Plugin::GithubMeta and
+    Dist::Zilla::Plugin::TravisCI::StatusBadge.
+
+ NextRelease.time_zone
+
+    Timezone for entries in Changes file. Default value is UTC.
+
+    See more at Dist::Zilla::Plugin::NextRelease.
+
+ NextRelease.format
+
+    Format of entry in Changes file. Default value is %-7v %{EEE MMM d
+    HH:mm:ss yyyy ZZZ}d.
+
+    See more at Dist::Zilla::Plugin::NextRelease.
+
+ MetaNoIndex.directory
+
+    Exclude directories (recursively with files) from indexing by
+    PAUSE/CPAN. Default values: t, xt, eg, examples, corpus. Allowed
+    multiple values, e.g.
+
+        MetaNoIndex.directory = foo/bar
+        MetaNoIndex.directory = quux/bar/foo
+
+    See more at Dist::Zilla::Plugin::MetaNoIndex.
+
+ MetaNoIndex.namespace
+
+    Exclude stuff under the namespace from indexing by PAUSE/CPAN. Default
+    values: t::lib. Allowed multiple values, e.g.
+
+        MetaNoIndex.namespace = Foo::Bar
+        MetaNoIndex.namespace = Quux::Foo
+
+    See more at Dist::Zilla::Plugin::MetaNoIndex.
+
+ MetaNoIndex.package
+
+    Exclude the package name from indexing by PAUSE/CPAN. Default values:
+    DB. Allowed multiple values, e.g.
+
+        MetaNoIndex.package = Foo::Bar
+
+    See more at Dist::Zilla::Plugin::MetaNoIndex.
+
+ MetaNoIndex.file
+
+    Exclude specific filename from indexing by PAUSE/CPAN. No defaults.
+    Allowed multiple values, e.g.
+
+        MetaNoIndex.file = lib/Foo/Bar.pm
+
+    See more at Dist::Zilla::Plugin::MetaNoIndex.
+
+ GatherDir.exclude_match
+
+    Regular expression pattern which causes not to gather matched files. No
+    defaults. Allowed multiple values, e.g.
+
+        GatherDir.exclude_match = ^foo.*
+        GatherDir.exclude_match = ^ba(r|z)\/qux.*
+
+    See more at Dist::Zilla::Plugin::GatherDir.
+
+ GitNextVersion.version_regexp
+
+    Regular expression that matches a tag containing a version. Default
+    value is ^([\d._]+)(-TRIAL)?$.
+
+    See more at Dist::Zilla::Plugin::Git::NextVersion.
+
+ GitTag.tag_format
+
+    Format of the tag to apply. Default value is %v%t.
+
+    See more at Dist::Zilla::Plugin::Git::Tag.
+
+ GitTag.tag_message
+
+    Format of the tag annotation. Default value is release v%v%t.
+
+    See more at Dist::Zilla::Plugin::Git::Tag.
+
+ GitCommit.commit_msg
+
+    The commit message to use in commit after release. Default value is
+    bump Changes v%v%t [ci skip].
+
+    See more at Dist::Zilla::Plugin::Git::Commit.
+
+ GitCheck.allow_dirty
+
+    File that is allowed to have local modifications. This option may
+    appear multiple times. The default list is dist.ini and Changes.
+
+    See more at Dist::Zilla::Plugin::Git::Check.
+
+ GitCheck.untracked_files
+
+    The commit message to use in commit after release. Default value is
+    die.
+
+    See more at Dist::Zilla::Plugin::Git::Check.
+
+ GithubMeta.homepage
+
+    Homepage of the distribution. Default value is
+    https://metacpan.org/release/%{dist}.
+
+    See more at Dist::Zilla::Plugin::GithubMeta.
+
+ GithubMeta.remote
+
+    Remote names to inspect for github repository. Default values are
+    origin, github, gh. You can provide multiple remote names
+
+        [@Author::CHIM]
+        GithubMeta.remote = foo
+        GithubMeta.remote = bar
+
+    See more at Dist::Zilla::Plugin::GithubMeta.
+
+ GithubMeta.issues
+
+    Inserts a bugtracker url to metadata. Default value is 1.
+
+    See more at Dist::Zilla::Plugin::GithubMeta.
+
+ PodWeaver.config_plugin
+
+    Configuration of Pod::Weaver. This option may appear multiple times.
+    Default value is @CHIM.
+
+    See more at Dist::Zilla::Plugin::PodWeaver and
+    Pod::Weaver::PluginBundle::CHIM.
+
+METHODS
+
+ configure
+
+    Bundle's configuration for role Dist::Zilla::Role::PluginBundle::Easy.
+
+FAKE RELEASE
+
+    Use option fake_release in bundle configuration:
+
+        [@Author::CHIM]
+        ...
+        fake_release = 1
+
+    or environment variable FAKE:
+
+        FAKE=1 dzil release
+
+    The distribution won't actually uploaded to the CPAN if option or
+    variable will found.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Dist::Zilla
+
+      * Dist::Zilla::Role::PluginBundle::Easy
+
+      * Dist::Zilla::Plugin::Authority
+
+      * Dist::Zilla::Plugin::MetaNoIndex
+
+      * Dist::Zilla::Plugin::NextRelease
+
+      * Dist::Zilla::Plugin::GatherDir
+
+      * Dist::Zilla::Plugin::Git
+
+      * Dist::Zilla::Plugin::TravisCI::StatusBadge
+
+      * Dist::Zilla::Plugin::GithubMeta
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/Wu-Wu/Dist-Zilla-PluginBundle-Author-CHIM/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Anton Gerasimov <chim@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2013 by Anton Gerasimov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

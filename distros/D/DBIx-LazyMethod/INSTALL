@@ -1,0 +1,12 @@
+DBIx::LazyMethod
+
+$Id: INSTALL,v 1.1.1.1 2003/08/05 18:29:11 cwg Exp $
+
+INSTALLATION
+
+To install this module:
+
+	perl Makefile.PL
+	make
+	make test
+	make install

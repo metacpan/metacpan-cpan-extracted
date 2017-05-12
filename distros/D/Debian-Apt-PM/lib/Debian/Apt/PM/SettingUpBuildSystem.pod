@@ -1,0 +1,209 @@
+=head1 NAME
+
+SettingUpBuildSystem - How to set-up a chrooted build system
+
+=head1 create lenny base
+
+	debootstrap lenny /var/tmp/let32 http://ftp.at.debian.org/debian/
+	mount -o bind /proc /var/tmp/let32/proc
+	chroot /var/tmp/let32 su -
+	echo let32 > /etc/debian_chroot
+	apt-get update
+	apt-get install sudo
+	adduser b &&echo 'b ALL=(ALL)NOPASSWD: ALL' >> /etc/sudoers
+	exit
+	chroot /var/tmp/let32 su - b
+	sudo apt-get install libapt-pkg-perl
+	sudo apt-get install libyaml-perl libyaml-syck-perl libtext-diff-perl liblist-moreutils-perl
+	sudo apt-get install libfile-slurp-perl libtest-exception-perl libtest-differences-perl
+	sudo apt-get install libjson-xs-perl libmoose-perl libfile-chdir-perl
+	sudo apt-get install libpath-class-perl libtest-deep-perl libreadonly-perl
+	sudo apt-get install libfile-find-rule-perl libfile-homedir-perl libio-compress-bzip2-perl
+		
+	sudo cpan
+	# o conf connect_to_internet_ok yes
+	# o conf commit
+	
+	sudo cpan -i CPAN::Patches::Plugin::Debian Debian::Apt::PM
+	
+	sudo apt-get install debootstrap
+
+	sudo chown b /var/cache/apt/apt-pm/*
+	sudo bash -c 'echo "deb http://pkg-perl.alioth.debian.org/~jozef-guest/pmindex/ lenny main contrib non-free" >> /etc/apt/sources.list'
+	apt-pm update
+
+	sudo chown b /var/lib/dh-make-pm /var/lib/cpan-patches/
+	
+	cd /var/lib/cpan-patches/
+	rmdir debian-set
+	sudo git clone git://github.com/jozef/CPAN-Patches-Debian-Set.git debian-set
+	rmdir set
+	sudo git clone git://github.com/jozef/CPAN-Patches-Example-Set.git set
+
+	sudo bash -c 'echo "deb     http://ftp.at.debian.org/debian testing main contrib" >> /etc/apt/sources.list'
+	sudo bash -c 'echo "deb-src http://ftp.at.debian.org/debian testing main contrib" >> /etc/apt/sources.list'
+	sudo bash -c 'echo -e "Package: *\nPin: release a=stable\nPin-Priority: 700\n\nPackage: *\nPin: release a=testing\nPin-Priority: 600\n" >> /etc/apt/preferences'
+	sudo apt-get update
+	sudo apt-get install -t testing dh-make-perl debhelper
+	sudo apt-get install -t testing xvfb po4a quilt dpatch cdbs build-essential cowdancer dpkg-dev
+	
+	######
+	# probably not, backport those
+	cd /tmp
+	svn co svn://cvs.alioth.debian.org/svn/pkg-perl/trunk/dh-make-perl
+	cd dh-make-perl
+	perl Build.PL && ./Build manifest && ./Build distmeta
+	sudo apt-get install libmodule-depends-perl libwww-mechanize-perl libfile-touch-perl
+	sudo cpan -i Array::Unique Email::Date::Format autodie Module::CoreList File::DirCompare Text::Diff
+	perl Build.PL && ./Build test && sudo ./Build install
+
+=head2 create cowbuilder for lenny
+
+	sudo debootstrap lenny /var/cache/pbuilder/base.cow
+	sudo bash -c 'echo "127.0.0.1"' > /var/cache/pbuilder/base.cow/etc/hosts'
+	sudo bash -c 'echo "deb file:///var/cache/pbuilder/result/ unstable/" >> /var/cache/pbuilder/base.cow/etc/apt/sources.list'
+	sudo bash -c 'echo "deb file:///var/cache/pbuilder/result/ unstable/" >> /etc/apt/sources.list'
+	cd /var/cache/pbuilder/result/
+	sudo chown b .
+	wget http://github.com/jozef/Debian-Apt-PM/raw/master/examples/repo/Makefile
+	wget http://github.com/jozef/Debian-Apt-PM/raw/master/examples/repo/Release.conf
+	mkdir -p unstable/unsorted
+	vim Release.conf
+	# generate a key without passphrase
+	gpg --gen-key
+	gpg --export --armor | sudo apt-key add -
+	gpg --export --armor | sudo chroot /var/cache/pbuilder/base.cow/ apt-key add -
+	make
+	sudo apt-get update
+	
+	sudo chroot /var/cache/pbuilder/base.cow su -
+	echo build > /etc/debian_choot
+	apt-get update
+	apt-get install cowdancer
+	exit
+	
+	sudo bash -c 'echo "BINDMOUNTS=/var/cache/pbuilder/result" >> /etc/pbuilderrc'
+	sudo bash -c 'echo "PDEBUILD_PBUILDER=cowbuilder" >> /etc/pbuilderrc'
+	sudo cowbuilder --update
+
+=head2 backport for packaging
+
+	sudo chroot /var/cache/pbuilder/base.cow/
+	bash -c 'echo "deb     http://ftp.at.debian.org/debian testing main contrib" >> /etc/apt/sources.list'
+	bash -c 'echo -e "Package: *\nPin: release a=stable\nPin-Priority: 700\n\nPackage: *\nPin: release a=testing\nPin-Priority: 600\n" >> /etc/apt/preferences'
+	apt-get update
+	exit
+
+	cd /tmp
+	apt-get source dpkg
+	cd dpkg-*
+	pdebuild
+	cd /var/cache/pbuilder/result/; make new-package all
+	
+	cd /tmp
+	cd apt-get source debhelper
+	cd dh-make-perl-*
+	pdebuild
+	cd /var/cache/pbuilder/result/; make new-package all
+	
+	libtool
+	gettext
+	autoconf
+	m4
+	libdb4.7-dev
+	
+	cd /tmp
+	cd apt-get source xz-utils
+	cd xz-utils-*
+	# needs autoconf >= 2.64
+	vim debian/control
+	pdebuild
+	cd /var/cache/pbuilder/result/; make new-package all
+	
+	cd /var/cache/pbuilder/result/
+	mv unstable/unsorted unstable/for-build
+	mkdir unstable/unsorted
+	make all
+	
+	base-files
+	
+	# remove testing
+	vim /var/cache/pbuilder/base.cow/etc/apt/sources.list
+	mv /var/cache/pbuilder/base.cow/etc/apt/preferences /var/cache/pbuilder/base.cow/etc/apt/preferences.old
+	
+	sudo cowbuilder --update
+	
+	
+=head2 backport perl
+
+	coreutils
+	libdb4.7-dev    # Build-Depends: coreutils (>= 8.5)
+	perl
+
+=head2 backport libs/utilites
+
+	quilt
+	libxml2
+	libxslt1.1     # vim debian/control and add ^^^ version of libxml2
+	libxml-libxml-perl
+	libxml-libxslt-perl
+	
+	# apache
+	apr
+	libdb4.8
+	apr-util
+	openssl
+	apache2
+	libapache2-mod-perl2
+	libwww-perl
+	libxml-sax-perl      # has a update-perl-sax-parsers script in debian/
+
+=head2 dh-make-pm
+
+	# not needed?  sudo apt-get install apt-file
+	#              sudo apt-file update
+	
+	cd && mkdir src && cd src
+	svn co svn://cvs.alioth.debian.org/svn/pkg-perl/trunk/dh-make-perl
+	cd dh-make-perl
+	wget http://github.com/jozef/Debian-Apt-PM/raw/master/patches/FromCPAN.pm.patch
+	patch -p1 < FromCPAN.pm.patch
+	perl Build.PL && ./Build test && sudo ./Build install
+
+=head2 start building
+
+=head3 build first
+
+	Test::Simple
+	Module::Build
+	Module::CoreList
+
+	# for Class::MOP
+	Test::Output
+	Test::LeakTrace
+	SUPER
+	
+	# for Moose
+	FileHandle::Fmode
+	DBM::Deep
+	
+	# for Mouse
+	Class::Method::Modifiers
+	ExtUtils::ParseXS
+	Test::Exception
+	
+	# for POE
+	POE::Test::Loops
+
+	# misc
+	Test::Kwalitee
+	Test::Portability::Files
+	LWP
+
+=head3 then mass build
+
+	Tatsumaki
+	Dancer
+	Silki
+
+=cut

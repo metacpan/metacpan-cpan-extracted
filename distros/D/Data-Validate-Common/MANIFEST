@@ -1,0 +1,17 @@
+Changes
+lib/Data/Validate/Common.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+ignore.txt
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/is_domain.t
+t/is_email.t
+t/is_hostname.t
+t/is_username.t
+docs/Common.html
+docs/docco.css

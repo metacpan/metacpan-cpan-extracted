@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Devel-Unplug
+version:             0.03
+abstract:            Simulate the non-availability of modules
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Devel::TraceLoad::Hook:        1.0.1
+    File::Spec:                    0
+    IPC::Run:                      0.80
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Armstrong <andy@hexten.net>

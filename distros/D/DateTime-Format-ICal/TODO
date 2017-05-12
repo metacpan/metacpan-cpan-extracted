@@ -1,0 +1,10 @@
+TODO for DateTime::Format::ICal
+
+- When given an EXRULE: or RRULE: part, parse_recurrence should
+  be able to fix this:
+
+"The iCal spec requires that "dtstart" always be included in the
+recurrence set, unless this is an "exrule" statement.  Since we don't
+know what kind of statement is being parsed, we do not include
+C<dtstart> in the recurrence set."
+

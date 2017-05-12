@@ -1,0 +1,211 @@
+version 1.20; 2015-10-21
+
+  * bugfix: avoid some C undefined behaviour from unsequenced side effects
+    that in practice bit when using a newer gcc (4.9 rather than 4.7)
+    with the parser token stack change in Perl 5.21.9
+
+  * add doc note advising users to prefer the core aliasing facility on
+    Perl 5.22
+
+version 1.19; 2015-10-21
+
+  * update for new stricture on op_last in Perl 5.21.2
+
+  * update for the parser's PL_expect changes in Perl 5.21.4
+
+  * update for op_private stricture in Perl 5.21.4
+
+  * update for sub references directly in stash in Perl 5.21.4
+
+  * update for IS_PADGV()'s limited visibility in Perl 5.21.4
+
+  * update for increased specialness of OP_PUSHMARK in Perl 5.21.6
+
+  * update for distinct PADNAMELIST type in Perl 5.21.7
+
+  * update for multideref optimisation in Perl 5.21.7, by a disgusting
+    hack that depends on a flaw in the optimisation (which may disappear
+    in the future) and which disables the optimisation entirely
+
+  * add MYMETA.json to .gitignore
+
+version 1.18; 2013-09-21
+
+  * bugfix: store peep chain link reliably under threads
+
+  * update tests for Perl 5.19.4's removal of the special treatment of
+    aliased undef in arrays
+
+  * in doc, switch to consistent use of British English spellings
+
+  * doc typo fix
+
+version 1.17; 2013-08-04
+
+  * bugfix: correct the dtrace-related macro squashing for Perls prior
+    to 5.13.8, where the macros had the wrong number of parameters and
+    prevented compilation
+
+  * bugfix: use core's PL_no_localize_ref string constant as data string
+    rather than format string
+
+  * update to handle the new padrange op type in Perl 5.17.6
+
+  * update to handle the new op allocation mechanism in Perl 5.17.2
+
+  * clarify and expand documentation around list-like assignments
+
+  * clarify documentation of deref() regarding lvalueness
+
+  * remove the bulk of the documentation from the README file
+
+version 1.16; 2011-11-17
+
+  * bugfix: use supported API to put destructor calls on the save stack
+    (the unsupported way used before was wrong for 64-bit systems on
+    perl 5.13.1 and later)
+
+  * document the behaviour of "alias return" in more detail
+
+  * convert .cvsignore to .gitignore
+
+version 1.15; 2011-06-21
+
+  * port to Perl 5.15.0, where the op type aelemfast has been split into
+    aelemfast and aelemfast_lex
+
+  * test compatibility with Devel::CallParser
+
+version 1.14; 2011-04-27
+
+  * bugfix: never unhook peephole optimiser, because unhooking is liable
+    to fail if anything else hooked it
+
+  * bugfix: revise check for dorassign opcode to cope with FreeBSD's
+    mutant Perl 5.8 that has it
+
+  * test POD syntax and coverage
+
+version 1.13; 2011-04-25
+
+  * bugfix: prevent the lexer getting confused if the first thing inside
+    an alias{} block is an open paren
+
+  * bugfix: don't crash if an rv2cv op is built with PL_parser null
+
+  * bugfix: handle variant structure of entersub op which lacks (ex-)list
+    op as direct child
+
+  * bugfix: squash bogus dtrace-related macro definitions that are picked
+    up due to defining PERL_CORE
+
+  * switch all pp functions to internal linkage
+
+  * avoid some compiler warnings
+
+  * include .cvsignore file in distribution
+
+1.12  Tue Feb 22 20:47 GMT 2011
+	- Updated to work with Perl version 5.13.10, where GvGP() and
+	  GvCV() are not directly-assignable lvalues
+
+1.11  Thu Jan 13 20:23 GMT 2011
+	- Don't rely on details of core's pp_* functions to determine
+	  whether an opcode exists, because they can change unpredictably
+	  (and do change in Perl 5.13.9)
+
+1.10  Sun Nov 21 09:04 GMT 2010
+	- Updated to work with Perl version 5.13.7, where lex_end()
+	  has disappeared and mod() is now in the public API under the
+	  name op_lvalue()
+
+1.09  Mon Nov 15 21:36 GMT 2010
+	- Modify source filter test to use Filter::Util::Call directly
+	  instead of the deprecated Switch, and to not fail if it is not
+	  available, thus allowing tests to pass on Perl versions 5.13.1
+	  and above where Switch is no longer in the core distribution
+	- Updated to work with Perl version 5.13.6, where global variables
+	  are managed in a different way from before
+
+1.08  Fri Oct 22 09:39 BST 2010
+	- Updated to work with Perl versions 5.11.0 up to 5.13.0,
+	  including particularly the major change in when rv2cv ops get
+	  built in 5.11.2
+
+1.07  Mon Sep 10 22:25 CEST 2007
+	- Fixed reference miscounting for 'my VAR' inside alias
+
+1.06  Thu Jun 28 22:29 CEST 2007
+	- Fixed crash when conditionally aliasing whole aggregate
+
+1.05  Sun May  6 16:36 CEST 2007
+	- Updated to work with recent bleadperl (5.9.5 patch 31154)
+
+1.04  Thu May  3 16:17 CEST 2007
+	- Avoid directly calling pp_* functions
+	- Fixed copy() of empty list in scalar context
+	- Updated to work with recent bleadperl (5.9.5 patch 31058)
+	- Switched to using Module::Install
+	- Added perl version compatibility test on Win32 and AIX
+
+1.03  Fri Mar 16 15:38 CET 2007
+	- Updated to work with recent bleadperl (5.9.5 patch 29836)
+
+1.02  Tue Jan  9 16:59 CET 2007
+	- Updated to work with recent bleadperl (5.9.5 patch 29570)
+
+1.01  Fri Sep 29 23:39 CEST 2006
+	- Worked around perl bug (wrong context of refgen due to prototype)
+	- Updated to work with recent bleadperl
+	- Warn on aliasing a lexical where the effect is limited in scope
+	  (category "closure")
+
+1.0   Mon Jul 12 23:17 CEST 2006
+	- Further enhanced performance of alias-assign
+	- Fixed compile errors on non-gcc compilers
+	- Fixed aliasing a constant expression
+	- Don't export "copy" by default anymore
+	- Properly reallocate ops (bug exposed by perl 5.9.4 patch 27773)
+	- Enhanced performance of copy in void context
+	- Alias-refgen properly makes stuff read-only that ought to be
+	- Support defined-or-assign (//=) in perl 5.9.x
+
+0.10  Sat Jun  3 17:44 CEST 2006
+	- Enhanced performance of alias-assign
+	- Made a note about 'local' in the docs
+
+0.09  Mon May 22 17:12 CEST 2006
+	- Suppress warnings when using 64-bit integers on 32-bit arch
+	- 'local' now doesn't act differently on tied vars than on normal ones
+	- Added "Useless use of alias" warning (category 'void')
+
+0.08  Wed Feb  8 20:19 CET 2006
+	- Avoid giving the "tied array/hash" error when inappropriate, such
+	  as when the array/hash is merely the target of weakrefs
+
+0.07  Mon Feb  6 16:43 CET 2006
+	- Removed outer lexical support, since it can't be made to work in
+	  any consistent way
+
+0.06  Mon Feb  6 00:35 CET 2006
+	- Fixed memory mismanagement bug (crash)
+	- Fixed parse failure of 'alias' or 'copy' at EOF
+
+0.05  Wed Jan 25 15:48 CET 2006
+	- Split off Data::Swap again
+	- Perl 5.9.3 support
+	- Fixed alias-returning from within a nested block
+
+0.04  Sun Aug 29 21:01 CEST 2004
+	- Minor fix because PAUSE complained about missing version in Data::Swap
+
+0.03  Sun Aug 29 00:36 CEST 2004
+	- Initial version of Data::Alias  (incorporates Data::Swap)
+	- Fixed swapping objects with weakrefs
+
+0.02  Thu Jul  3 11:34 CEST 2003
+	- Added Changes file
+	- Disallow swapping an overloaded object with a non-overloaded one
+
+0.01  Mon Jun 30 20:08 CEST 2003
+	- Initial version

@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-Plugin-PodPurler
+
+0.093401  2013-07-06 07:54:47 America/New_York
+          update bug tracker, just in case
+
+0.093400  2009-12-06 19:34:41 America/New_York
+          formal "it's dead, jim" notice
+
+0.093020  2009-10-29
+          refactor out a lot of common code to Pod::Elemental::PerlMunger
+
+0.092930  2009-10-20
+          rebuild using Pod::Elemental
+
+0.091440  2009-05-24
+          cope with new Pod::Eventual "blank" events
+
+0.091411  2009-05-20
+          fix code to correct skip pre-existing blocks like AUTHOR
+
+0.002     2009-04-21
+          we no longer choke on / reject here-docs

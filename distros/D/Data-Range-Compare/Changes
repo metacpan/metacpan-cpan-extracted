@@ -1,0 +1,39 @@
+Change log file for data-range-comp
+
+1.026
+  Moved the repository to SourceForge
+
+1.027
+  bug fix for cmp_ranges
+  bug fix for compare_row
+
+1.028
+   Beefed up the documentation
+     Added many sections to the documentation in hopes of better explaining
+     how to use this package.
+     Will also update the meta data for this package
+
+   Fixed Exporter declarations
+     Only really affects perl 5.6.xx and below
+
+   added contains_value
+     unit test t/contains.t
+
+   added grep_overlap
+     unit test t/grep_overlap.t
+
+   added grep_nonoverlap
+     unit test t/grep_overlap.t
+
+   added more example files in the examples folder
+ 
+1.029
+  Pod and meta data updates
+
+1.030
+  More Pod clean ups
+    Corrected documentation in Compare.pod
+
+1.031 
+  Hid example module from PAUS indexing
+  	Fix for bug number: https://rt.cpan.org/Ticket/Display.html?id=99945

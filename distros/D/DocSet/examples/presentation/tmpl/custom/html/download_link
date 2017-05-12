@@ -1,0 +1,37 @@
+[% IF doc.meta.link == 'search/searchresults.html' %]
+    <br>
+    [% RETURN %]
+[% END %]
+
+[%- # link to the pdf, source and other variants of the doc
+
+    links = [];
+
+
+    IF doc.pdf_doc.link;
+        pdf = PROCESS pdf_doc;
+        links.push( pdf );
+    END;
+
+
+    IF doc.src_doc.link;
+        src = PROCESS src_doc;
+        links.push( src );
+    END;
+
+
+    IF links.join;
+        links.join(' | ');
+    ELSE;
+        "<br>";
+    END;
+    
+-%]
+
+[%- BLOCK src_doc -%]
+<a class="pdfsrc" href="[%- doc.src_doc.link -%]">src</a>
+[%- END -%]
+
+[%- BLOCK pdf_doc -%]
+<a class="pdfsrc" href="[%- doc.pdf_doc.link -%]">pdf</a>
+[%- END -%]

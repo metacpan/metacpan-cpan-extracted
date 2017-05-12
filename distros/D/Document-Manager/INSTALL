@@ -1,0 +1,81 @@
+Pre-Installation
+----------------
+
+First install these perl modules:
+
+ $ cpan
+
+And from the span prompt:
+
+ install Config::Simple
+ install WebService::TicketAuth::DBI
+ 
+ # You might have to do: force install RDF::Simple to skip tests on mysql db
+ install RDF::Simple
+
+
+
+Installation
+------------
+
+To install the script and man pages in the standard areas,
+give the sequence of commands
+
+
+ $ perl Makefile.PL
+ $ make
+ $ make test         # this is not currently configured (failure will happen)
+ $ make install      # you probably need to do this step as superuser
+
+If you want to install the script in your own private space, use
+
+ $ perl Makefile.PL PREFIX=/home/joeuser DESTDIR=/home/joeuser \
+        INSTALLMAN1DIR=/home/joeuser/man/man1 \
+        INSTALLMAN3DIR=/home/joeuser/man/man3      
+ $ make
+ $ make test
+ $ make install      # can do this step as joeuser
+
+Note that `make test` does nothing interesting.
+
+
+
+Running with DMS
+----------------
+
+To test the system with the dms daemon. Do the following as super-user:
+
+    cp etc/dms.conf /etc/dms.conf
+    mkdir /var/dms
+   
+    use SOAP::Transport::HTTP;
+    use SVG::Metadata;
+    use Document::Manager;
+    use Getopt::Long;
+   
+Now run scripts/dmsd
+
+To check output, then run scripts/dmsd, but to run in the background:
+
+    scripts/dmsd &
+
+
+Uninstallation
+--------------
+
+Under a user with sufficient permissions and from the program
+distribution directory, execute
+
+  perl Makefile.PL
+
+if there isn't a file called Makefile.  Then execute
+
+  make uninstall
+
+This sometimes works, and sometimes it does not.  If it refuses to work,
+you can simply remove all files by hand.  Look for the .packlist file
+which perl created when installing the software and remove all files you
+find in there.
+
+
+

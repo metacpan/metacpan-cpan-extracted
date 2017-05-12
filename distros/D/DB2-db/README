@@ -1,0 +1,20 @@
+DB2::db - A Framework for developing DBD::DB2 applications by
+          Darin McBride
+
+Copyright 2005 Darin McBride
+
+QUICK START:
+
+    Finish reading this README.  Install by doing:
+        perl Build.PL
+        ./Build.PL
+        ./Build.PL test
+        ./Build.PL install
+    
+    At this point, the source tree is no longer needed - you can delete
+    it if you wish.  Note, however, that there is a sample provided in
+    the samples directory that you may want to look at before deleting.
+
+
+
+

@@ -1,0 +1,243 @@
+#!/usr/bin/perl
+#
+# SixApart's Jabber Server
+#
+
+BEGIN {
+    $^P |= 0x01 if $ENV{TRACE_DJABBERD};
+}
+
+use strict;
+use lib 'lib';
+use FindBin qw($Bin);
+use Getopt::Long;
+
+use DJabberd;
+use DJabberd::Delivery::Local;
+use DJabberd::Delivery::S2S;
+use DJabberd::PresenceChecker::Local;
+use DJabberd::RosterStorage::SQLite;
+use DJabberd::Plugin::MUC;
+use DJabberd::Plugin::VCard::SQLite;
+my $daemonize;
+Getopt::Long::GetOptions(
+                         'd|daemon'       => \$daemonize,
+                         );
+
+$SixApart::LDAP_SERVER = "auth2.sfo.sixapart.com";
+
+my $rs = DJabberd::RosterStorage::SixApart->new;
+$rs->set_config_database("$Bin/roster.sqlite");
+$rs->finalize;
+
+my $vcard = DJabberd::Plugin::VCard::SQLite->new;
+$vcard->set_config_storage("$Bin/roster.sqlite");
+$vcard->finalize;
+
+my $muc = DJabberd::Plugin::MUC->new;
+$muc->set_config_subdomain("conference");
+$muc->finalize;
+
+my $vhost = DJabberd::VHost->new(
+                                 server_name => 'sixapart.com',
+                                 require_ssl => 1,
+                                 s2s       => 1,
+                                 plugins   => [
+                                               DJabberd::Authen::SixApart->new,
+                                               $rs,
+                                               $vcard,
+                                               $muc,
+                                               DJabberd::Delivery::Local->new,
+                                               DJabberd::Delivery::S2S->new,
+                                               ],
+                                 );
+
+my $server = DJabberd->new(
+                           daemonize => $daemonize,
+                           old_ssl   => 1,
+                           );
+
+$server->add_vhost($vhost);
+$server->run;
+
+
+package DJabberd::Authen::SixApart;
+use strict;
+use base 'DJabberd::Authen';
+use Net::LDAP;
+
+sub can_retrieve_cleartext { 0 }
+
+sub check_cleartext {
+    my ($self, $cb, %args) = @_;
+    my $user = $args{username};
+    my $pass = $args{password};
+    my $conn = $args{conn};
+
+    unless ($user =~ /^\w+$/) {
+        $cb->reject;
+        return;
+    }
+
+    my $ldap = Net::LDAP->new( $SixApart::LDAP_SERVER ) or die "$@";
+    my $dn   = "uid=$user,ou=People,dc=sixapart,dc=com";
+    my $msg  = $ldap->bind($dn, password => $pass, version => 3);
+    if ($msg && !$msg->is_error) {
+        $cb->accept;
+    } else {
+        $cb->reject;
+    }
+}
+
+
+package DJabberd::RosterStorage::SixApart;
+use strict;
+use base 'DJabberd::RosterStorage::SQLite';
+
+sub get_roster {
+    my ($self, $cb, $jid) = @_;
+    # cb can '->set_roster(Roster)' or decline
+
+    my $myself = lc $jid->node;
+    warn "SixApart loading roster for $myself ...\n";
+
+    my $on_load_roster = sub {
+        my (undef, $roster) = @_;
+
+        my $pre_ct = $roster->items;
+        warn "  $pre_ct roster items prior to population...\n";
+
+        # see which employees already in roster
+        my %has;
+        foreach my $it ($roster->items) {
+            my $jid = $it->jid;
+            next unless $jid->as_bare_string =~ /^(\w+)\@sixapart\.com$/;
+            $has{lc $1} = $it;
+        }
+
+        # add missing employees to the roster
+        my $emps = _employees();
+        foreach my $uid (keys %$emps) {
+            $uid = lc $uid;
+            next if $uid eq $myself;
+
+            my $emp = $emps->{$uid};
+            my $ri = $has{$uid} || DJabberd::RosterItem->new(jid  => "$uid\@sixapart.com",
+                                                             name => ($emp->{displayName} || $emp->{cn}),
+                                                             groups => ["SixApart"]);
+
+
+            $ri->subscription->set_from;
+            $ri->subscription->set_to;
+            $roster->add($ri);
+        }
+
+        my $post_ct = $roster->items;
+        warn "  $post_ct roster items post population...\n";
+
+        $cb->set_roster($roster);
+    };
+
+    my $cb2 = DJabberd::Callback->new({set_roster => $on_load_roster,
+                                      decline    => sub { $cb->decline }});
+    $self->SUPER::get_roster($cb2, $jid);
+}
+
+my $last_emp;
+my $last_emp_time = 0;  # unixtime of last ldap suck (ldap server is slow sometimes, so don't always poll)
+sub _employees {
+    my $now = time();
+
+    # don't get new employees more often than once an hour.... :-)
+    if ($last_emp && $last_emp_time > $now - 3600) {
+        return $last_emp;
+    }
+
+    my $opts = "cn mailLocalAddress mail displayName";
+    my @lines = `ldapsearch -H ldap://$SixApart::LDAP_SERVER -x -b ou=People,dc=SixApart,dc=com $opts`;
+    my $line_ct = @lines;
+    warn "Got employee lines from LDAP: $line_ct\n";
+    if ($line_ct == 0) {
+        warn "zero employees: error=$?\n";
+        if ($last_emp) {
+            warn " ... returning cached copy\n";
+            return $last_emp;
+        }
+    }
+
+    my %info;  # uid -> key -> value
+    my $curuid = undef;
+    foreach my $line (@lines) {
+        $line =~ s/^\#.*//;
+        if ($line =~ /^\s*$/) {
+            $curuid = undef;
+            next;
+        }
+        if ($line =~ /uid=(\w+)/) {
+            $curuid = $1;
+        }
+        next unless $curuid;
+
+        if ($line =~ /^(\w+): (.+)/) {
+            $info{$curuid}{$1} = $2;
+        }
+    }
+
+    delete $info{'tempaccount'};
+    delete $info{'usability'};
+
+    foreach my $uid (keys %info) {
+        delete $info{$uid} unless $info{$uid}{mailLocalAddress} || $info{$uid}{mail};
+    }
+
+    $last_emp_time = $now;
+    return $last_emp = \%info;
+}
+
+sub load_roster_item {
+    my ($self, $jid, $contact_jid, $cb) = @_;
+
+    my $is_employee = sub {
+        my $jid = shift;
+        return $jid->domain eq "sixapart.com";
+    };
+
+    if ($is_employee->($jid) && $is_employee->($contact_jid)) {
+        my $both = DJabberd::Subscription->new;
+        $both->set_from;
+        $both->set_to;
+        my $rit = DJabberd::RosterItem->new(jid  => $contact_jid,
+                                            subscription => $both);
+        $cb->set($rit);
+        return;
+    }
+
+    $self->SUPER::load_roster_item($jid, $contact_jid, $cb);
+}
+
+package DB;
+no strict 'refs';
+no utf8;
+
+sub DB{};
+sub sub {
+    # localize CALL_DEPTH so that we don't need to decrement it after the sub
+    # is called
+    local $DB::CALL_DEPTH = $DB::CALL_DEPTH+1;
+    #my @foo = @_;
+    my $fileline = "";
+    if (ref $DB::sub eq "CODE") {
+        my @caller = caller;
+        my $pkg = $caller[0];
+        my $line = $caller[2];
+        $fileline = " called from $pkg, line $line";
+    }
+    warn ("." x $DB::CALL_DEPTH . " ($DB::CALL_DEPTH) $DB::sub$fileline\n");
+
+    # Call our subroutine. @_ gets passed on for us.
+    # by calling it last, we don't need to worry about "wantarray", etc
+    # by returning it like this, the caller's expectations are conveyed to
+    # the called routine
+    &{$DB::sub};
+}
+1;

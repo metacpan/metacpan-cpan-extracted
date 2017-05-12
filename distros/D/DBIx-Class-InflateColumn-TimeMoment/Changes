@@ -1,0 +1,13 @@
+0.050     2017-03-27 22:30:45+01:00 Europe/London
+    - Timestamp parser made more lenient and allows missing
+      timezone (assumes Z - ie GMT).  Hence works for Pg
+    - Implemented datetime_undef_if_invalid
+    - Rework dzil & travis config to improve build
+
+0.02      2015-05-14 10:59:29+01:00 Europe/London
+    - Removed DBIx::Class::Carp as not used and causes dep issues
+
+0.01      2015-05-12 16:55:43+01:00 Europe/London
+    - Initial implementation
+    - Very basic tests
+    - Added travis integration after much fiddling

@@ -1,0 +1,287 @@
+#!/usr/bin/perl
+
+use warnings;
+use strict;
+
+our $VERSION = '0.08';
+
+use Devel::FastProf::Reader;
+use Sort::Key qw(rikeysort rnkeysort);
+
+use Getopt::Std;
+$Getopt::Std::STANDARD_HELP_VERSION = 1;
+
+our ($opt_f, $opt_r, $opt_t, $opt_g, $opt_e, $opt_p, $opt_H);
+getopts("f:t:rgepH");
+
+my $fpfn = defined $opt_f ? $opt_f : "fastprof.out";
+
+read_fastprof($fpfn);
+
+# we make it look always as if forking info was there:
+%FPIDMAP = map { ("0:$_" => $_) } (1..$#FN) unless %FPIDMAP;
+
+my (@pid, @ofid, @pfn, @rfpidmap, %rpfn);
+
+for (keys %FPIDMAP) {
+    my $fid = $FPIDMAP{$_};
+    $rfpidmap[$fid] = $_;
+    ($pid[$fid], $ofid[$fid]) = split(/:/)
+}
+
+sub fill_data_for_fid {
+    my $fid = shift;
+    # print "filling data for $fid\n";
+    my $pid = $pid[$fid];
+    my $fn = $FN[$fid];
+    if (defined $fn) {
+	my $pfn =  "${pid}:$fn";
+	$pfn[$fid] = $pfn;
+	$rpfn{$pfn} = $fid;
+
+	if ($fn =~ /^\((?:re_)?eval \d+\)/) {
+	}
+	else {
+	    if ( $fn ne '-e'
+		 and open SRC, "<", $fn) {
+		# load the source file
+		my @lines = ('', <SRC>);
+		close SRC;
+		$SRC[$fid] = \@lines;
+	    }
+	}
+    }
+    else {
+	# them look for the file definition on the ancestor processes
+	my $ppid = $pid;
+	while (defined ($ppid = $PPID{$ppid})) {
+	    # printf "ppid = $ppid\n";
+	    my $pfid = $FPIDMAP{"${ppid}:$ofid[$fid]"};
+	    $fn = $FN[$pfid];
+	    if (defined $fn) {
+		$fn = $FN[$fid] = $fn;
+		$SRC[$fid] = $SRC[$pfid];
+		$pfn[$fid] = $pfn[$pfid];
+		$rpfn{"${pid}:$fn"} = $fid;
+		# print "${pid}:$fn => $fid\n";
+		last;
+	    }
+	}
+    }
+}
+
+fill_data_for_fid $_ for (1..$#FN);
+
+my (@efid, @eline);
+my $fid;
+for ($fid = 1; $fid < @FN; ++$fid) {
+    # print "indirecting evals for $fid\n";
+    my $fn = $FN[$fid];
+    if (my ($efn, $el) = $fn =~ /^\((?:re_)?eval \d+\)\[(.*):(\d+)\]$/) {
+	my $pid = $pid[$fid];
+	my $ppid = $pid;
+	while (defined $ppid) {
+	    # printf "ppid = $ppid\n";
+	    my $pfn = "${ppid}:$efn";
+	    if (defined (my $efid = $rpfn{$pfn})) {
+		if ($ppid != $pid) {
+		    push @FN, undef;
+		    $FPIDMAP{"${pid}:$ofid[$efid]"} = $efid;
+		    fill_data_for_fid $#FN;
+		}
+		$efid[$fid] = $efid;
+		$eline[$fid] = $el;
+		last;
+	    }
+	    $ppid = $PPID{$ppid};
+
+	}
+    }
+}
+
+# print "here1\n";
+
+if ($opt_e) {
+    for ((keys %COUNT)) {
+	my ($fid, $line) = split /:/;
+	if (defined $efid[$fid]) {
+	    my $efid;
+	    while (defined($efid = $efid[$fid])) {
+		$line = $eline[$fid];
+		$fid = $efid;
+	    }
+	    my $key = "${fid}:$line";
+	    $COUNT{$key} += delete $COUNT{$_};
+	    $TICKS{$key} += delete $TICKS{$_};
+	}
+    }
+}
+
+if ($opt_g) {
+    for ((keys %COUNT)) {
+	my ($fid, $line) = split /:/;
+	my $pid = $pid[$fid];
+	my $pfn = $pfn[$fid];
+	my $ffid = $rpfn{$pfn};
+	if ($ffid != $fid) {
+	    my $key = "${ffid}:$line";
+	    $COUNT{$key} += delete $COUNT{$_};
+	    $TICKS{$key} += delete $TICKS{$_};
+	}
+    }
+}
+
+# print "here2\n";
+
+my @keys = ( $opt_r
+	     ? (rikeysort { $COUNT{$_} } keys %COUNT)
+	     : (rnkeysort { $TICKS{$_} } keys %COUNT) );
+
+if (!$opt_H) {
+    print "# fprofpp output format is:\n";
+    print($opt_p
+	  ? "# filename:line [pid parent] time count: source\n" 
+	  : "# filename:line time count: source\n" );
+}
+
+my $n = 0;
+for my $key (@keys) {
+    $n++;
+    last if (defined $opt_t and $n > $opt_t);
+    my ($fid, $line) = split /:/, $key;
+
+    my $lines = $SRC[$fid];
+    my $src = $lines ? $lines->[$line] : '???';
+    $src =~ s/^\s+//;
+    chomp $src;
+
+    my @path;
+    my $efid;
+    while (defined($efid = $efid[$fid])) {
+	# print "$fid, $efid: at line $line inside eval\n";
+	push @path, "at line $line inside eval";
+	$line = $eline[$fid];
+	$fid = $efid;
+    }
+    if (@path) {
+	$src = '['.join(' ', @path).'] '. $src;
+    }
+    my $fn = $FN[$fid];
+
+    my $spid = "";
+    if ($opt_p) {
+	my $pid = $pid[$fid];
+	my $ppid = $PPID{$pid};
+	$spid = defined $ppid ? " [$pid $ppid]" : " [$pid]"
+    }
+
+    printf("%s:%d%s %.5f %d: %s\n",
+	   # $fid,
+	   $fn,
+	   $line,
+	   $spid,
+	   $TICKS{$key},
+	   $COUNT{$key},
+	   $src);
+}
+
+__END__
+
+=head1 NAME
+
+fprofpp - Devel::FastProf post processor
+
+=head1 SYNOPSIS
+
+  $ fprofpp [-f filename] [-r] [-e] [-g] [-p] [-t num]
+
+=head1 DESCRIPTION
+
+C<fprofpp> reads the profile information generated when using
+L<Devel::FastProf> (usually saved on a file named C<fastprof.out>) and
+prints a "human friendly" report.
+
+=head2 OPTIONS
+
+Those are the flags that can be used with C<fprofpp>:
+
+=over 4
+
+=item -f filename
+
+instead of the default C<fastprof.out> reads the file given as an
+argument.
+
+=item -r
+
+sorts the lines on the output by the number of times they have been
+called instead of by the time spent on them (that is the default).
+
+=item -t num
+
+only outputs the first C<num> lines
+
+=item -e
+
+account the time spent on code inside C<eval "..."> constructions on
+the line where the eval starts.
+
+Time spent on subroutines defined inside an eval will also be
+accounted on that line even when the subs are latter called outside
+the eval.
+
+By default, every time an eval is executed its code is considered to
+be a different source file and accounted independently of the rest of
+the calls to the same eval.
+
+On the report, it points to the place (file and line) where the eval
+sits, but the line source is the code actually executed.
+
+=item -g
+
+by default, on forking code, the time spent on every line by every
+process is accounted separately.
+
+when this option is set, instead, the time reported is the sum of the
+time spent by all the processes on every line.
+
+=item -p
+
+include process information on the report.
+
+=item -H
+
+Do not print the report header.
+
+=back
+
+=head1 THE EMACS/XEMACS HACK
+
+The format of the report generated by C<Devel::SmallProf> is similar
+to that generated by C<gcc> or C<grep -n> and so, easily parseable by
+C<Emacs> (and I suppose it shouldn't be too difficult to do the same
+from C<vi> and other editors).
+
+For instance, one way to do it from XEmacs is, starting from a buffer
+on the same directory where C<fastprof.out> sits:
+
+  M-! fprofpp -t 30
+  M-x compilation-mode
+
+then, going to the hot spots of the profiled program would be as easy
+as clicking the mouse over the lines on the C<fprofpp> output buffer.
+
+=head1 SEE ALSO
+
+L<Devel::FastProf>, L<perlrun>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2005 by Salvador FandiE<ntilde>o
+E<lt>sfandino@yahoo.comE<gt>.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

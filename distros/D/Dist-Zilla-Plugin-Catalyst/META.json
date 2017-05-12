@@ -1,0 +1,68 @@
+{
+   "abstract" : "set of plugins for working with Catalyst",
+   "author" : [
+      "Caleb Cushing <xenoterracide@gmail.com>",
+      "Tomas Doran <bobtfish@bobtfish.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Catalyst",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Catalyst::Helper" : "1.30",
+            "Dist::Zilla::File::FromCode" : 0,
+            "Dist::Zilla::File::InMemory" : 0,
+            "Dist::Zilla::Role::MintingProfile::ShareDir" : 0,
+            "Dist::Zilla::Role::ModuleMaker" : 0,
+            "Moose" : 0,
+            "Path::Class" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "Dist::Zilla::Tester" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "FindBin" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/xenoterracide/Dist-Zilla-Plugin-Catalyst/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/xenoterracide/Dist-Zilla-Plugin-Catalyst.git",
+         "web" : "http://github.com/xenoterracide/Dist-Zilla-Plugin-Catalyst"
+      }
+   },
+   "version" : "0.15"
+}
+

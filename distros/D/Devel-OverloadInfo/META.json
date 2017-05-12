@@ -1,0 +1,66 @@
+{
+   "abstract" : "introspect overloaded operators",
+   "author" : [
+      "Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-OverloadInfo",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "5.57",
+            "MRO::Compat" : "0",
+            "Package::Stash" : "0.14",
+            "Scalar::Util" : "0",
+            "Sub::Identify" : "0",
+            "overload" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "base" : "0",
+            "parent" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-devel-overloadinfo at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-OverloadInfo"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ilmari/Devel-OverloadInfo.git",
+         "web" : "https://github.com/ilmari/Devel-OverloadInfo"
+      }
+   },
+   "version" : "0.004"
+}
+

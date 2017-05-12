@@ -1,0 +1,4 @@
+{% load importloop %}
+{% importloop loop contextvars %}{{ __first__ }}<{{ __inner__ }}>{{ __last__ }}={{ __counter__ }}:{{ __odd__ }}a{{ Title }}a{{ Text }}{{ Foo }}a
+{% endimportloop %}{% importloop loop reversed contextvars %}{{ __first__ }}<{{ __inner__ }}>{{ __last__ }}={{ __counter__ }}:{{ __odd__ }}a{{ Title }}a{{ Text }}a{{ Foo }}
+{% empty %}XXX{% endimportloop %}

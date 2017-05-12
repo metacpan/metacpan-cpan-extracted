@@ -1,0 +1,29 @@
+---
+abstract: 'Read & edit a document with YAML-ish meta-data'
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+build_requires:
+  Test::Most: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Document-Stembolt
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  IO::AtomicFile: 0
+  IO::Scalar: 0
+  Moose: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  YAML::Tiny: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/robertkrimen/document-stembolt/tree/master
+version: 0.012

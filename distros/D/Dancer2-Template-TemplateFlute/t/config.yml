@@ -1,0 +1,4 @@
+template: template_flute
+views: t/views
+log: debug
+logger: capture

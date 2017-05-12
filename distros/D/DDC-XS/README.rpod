@@ -1,0 +1,49 @@
+=pod
+
+README for DDC::XS
+
+=head1 ABSTRACT
+
+DDC::XS - Query parsing and manipulation for DDC concordance seach engine
+
+=head1 REQUIREMENTS
+
+=over 4
+
+=item ddc
+
+You must have compiled and installed a current version of the DDC search engine sources e.g. from
+L<http://sourceforge.net/projects/ddc-concordance/files/ddc-concordance/>
+
+Tested version(s) v2.0.43.
+
+=item ExtUtils::XSpp
+
+For compiling C++ wrapper classes.
+Tested version v0.18.
+
+=back
+
+
+=head1 DESCRIPTION
+
+The DDC::XS package provides perl wrappers for selected functionality from the DDC C++ libraries.
+Currently, query parsing and object-oriented manipulation of CQuery objects are supported.
+
+=head2 Current Version
+
+Current sources for this module should be available from CPAN (L<http://metacpan.org/release/DDC-XS>)
+or via sourceforge (L<https://sourceforge.net/projects/ddc-concordance/files/ddc-perl-xs/>).
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+Alien::DDC::Concordance(3pm),
+DDC::Concordance(3pm).
+
+
+=cut

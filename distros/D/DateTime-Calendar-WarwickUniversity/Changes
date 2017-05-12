@@ -1,0 +1,11 @@
+Revision history for Perl extension DateTime::Calendar::WarwickUniversity.
+
+0.02  Thu Nov 22 23:27:07 2007
+	- Move to Module::Build
+	- Add tests for pod and pod coverage.
+	- Tweak copyright notice so that dh-make-perl understands it.
+
+0.01  Fri Nov 10 16:44:42 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn DateTime::Calendar::WarwickUniversity
+

@@ -1,0 +1,24 @@
+Build.PL
+Changes
+config/beerdb.simple.yaml
+lib/Devel/Maypole.pm
+lib/Devel/Maypole/Tests.pm
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+sql/data/beerdb.default.sql
+sql/data/beerdb.simple.sql
+sql/ddl/beerdb.default.sql
+sql/ddl/beerdb.simple.sql
+t/00-load.t
+t/01.test.t
+t/02.install.t
+t/03.find.t
+t/pod-coverage.t
+t/pod.t
+t/templates/custom/classdata
+t/templates/custom/frontpage
+t/templates/custom/list
+t/templates/custom/view
+
+Makefile.PL

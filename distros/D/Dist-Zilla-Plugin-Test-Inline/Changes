@@ -1,0 +1,47 @@
+Revision history for perl module Dist::Zilla::Plugin::Test::Inline
+
+0.011005 2015-02-03
+ [BUG FIXES]
+ - Removed some obsolete requirements
+
+ [REVISION]
+ - Register Test::More as a test prerequisite in the dist that uses this
+   plugin
+ - "Lazy loading" of use()d modules to speed up Dist::Zilla (credits to
+   Olivier Mengué for
+   https://speakerdeck.com/dolmen/dist-zilla-plugins-best-practices)
+ - Build package by using the plugin itself!
+
+0.011004 2015-02-03
+ [+ENHANCEMENTS]
+ - Now only files collected by file gatherer plugins are scanned for inline
+   tests
+
+ [REVISION]
+ - Added test to checks if files excluded by Dist::Zilla file gatherers are
+   processed
+ - Logging now tells about modules where inline tests were found
+
+0.011003 2015-02-03
+ [REVISION]
+ - Added t/10-basic.t which checks inline test extraction / Dist::Zilla
+   file creation
+
+0.011002 2015-01-21
+ [REVISION]
+ - Removed dependency on (late) versions of prereq modules (thanks to ETHER
+   for pointing out that this causes grief to users). As I don't know which
+   version are needed, no versions are specified right now.
+
+0.011001 2013-11-26
+ [DOCUMENTATION]
+ - Corrected POD in code example
+
+0.011000 2013-11-26
+ - Updated documentation
+ - Added this Changes file
+ - Shortened version number
+
+0.0100000 2013-11-26
+ - Initial release
+

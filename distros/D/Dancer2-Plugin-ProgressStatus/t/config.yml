@@ -1,0 +1,3 @@
+plugins:
+    ProgressStatus:
+        dir: /tmp/dancer_progress

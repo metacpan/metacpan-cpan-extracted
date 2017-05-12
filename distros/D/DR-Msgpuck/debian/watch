@@ -1,0 +1,2 @@
+version=3
+https://metacpan.org/release/DR-Msgpuck   .*/DR-Msgpuck-v?(\d[\d.-]*)\.(?:tar(?:\.gz|\.bz2)?|tgz|zip)$

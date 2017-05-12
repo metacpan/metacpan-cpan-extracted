@@ -1,0 +1,11 @@
+0.04	Thu Aug 08 14:00:00 CET 2015
+    * Add commands qscan, qstat and jscan
+
+0.03	Tue Jul 22 18:15:00 CET 2015
+    * Fix in 'examples/consumer.pl' don't do unnecessary foreach
+
+0.02	Tue Jun 30 21:50:00 CET 2015
+    * Just update doc
+
+0.01	Thu May 19 22:00:00 CET 2015
+    * First version, tracking git://github.com/antirez/disque

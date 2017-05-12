@@ -1,0 +1,29 @@
+---
+abstract: unknown
+author:
+  - 'Nicolas Oudard <nicolas@oudard.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-SporeDefinitionControl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: '1.3002'
+  Dancer::Plugin: '0'
+  Dancer::Plugin::REST: '0.04'
+  Dancer::Test: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  YAML: '0'
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

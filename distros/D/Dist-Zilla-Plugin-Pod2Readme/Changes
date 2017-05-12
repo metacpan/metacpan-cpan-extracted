@@ -1,0 +1,16 @@
+Revision history for Dist-Zilla-Plugin-Pod2Readme
+
+0.004     2017-04-02 13:32:28-04:00 America/New_York
+
+    - No changes from 0.003-TRIAL
+
+0.003     2017-02-27 11:05:35-05:00 America/New_York (TRIAL RELEASE)
+
+    [Additions]
+
+    - Add 'source_filename' attribute
+
+0.001     2014-12-10 16:29:47-05:00 America/New_York
+
+    - First release
+

@@ -1,0 +1,43 @@
+{
+   "abstract" : "This module is using RDBMS as KVS.",
+   "author" : [
+      "Kazunori Minoda <kazunori@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DB-AsKVS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cache::Memcached::Fast" : "0.21",
+            "DBI" : "1.627",
+            "String::CRC32" : "1.4"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

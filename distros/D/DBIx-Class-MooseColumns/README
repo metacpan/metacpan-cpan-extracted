@@ -1,0 +1,125 @@
+NAME
+    DBIx::Class::MooseColumns - Lets you write DBIC add_column() definitions
+    as attribute options
+
+VERSION
+    Version 0.22
+
+SYNOPSIS
+      package MyApp::Schema::Result::Artist;
+
+      use Moose;
+      use DBIx::Class::MooseColumns;
+      use namespace::autoclean;
+
+      extends 'DBIx::Class::Core';
+
+      __PACKAGE__->table('artist');
+
+      has id => (
+        isa => 'Int',
+        is  => 'rw',
+        add_column => {
+          is_auto_increment => 1,
+        },
+      );
+
+      has foo => (
+        isa => 'Str',
+        is  => 'rw',
+        add_column => {
+          data_type => 'datetime'
+        },
+      );
+
+      has bar => (        # will call __PACKAGE__->add_column({})
+        isa => 'Str',
+        is  => 'rw',
+        add_column => {
+        },
+      );
+
+      has quux => (       # no __PACKAGE__->add_column() call
+        isa => 'Str',
+        is  => 'rw',
+      );
+
+      __PACKAGE__->set_primary_key('id');
+
+      __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
+
+      1;
+
+DISCLAIMER
+    This is ALPHA SOFTWARE. Use at your own risk. Features may change.
+
+DESCRIPTION
+    This module allows you to put the arguments to "add_column" in
+    DBIx::Class::ResultSource right into your attribute definitions and will
+    automatically call it when it finds an "add_column" attribute option. It
+    also replaces the DBIx::Class-generated accessor methods (these are
+    Class::Accessor::Grouped-generated accessor methods under the hood) with
+    the Moose-generated accessor methods so that you can use more of the
+    wonderful powers of Moose (eg. type constraints, triggers, ...).
+
+    *Note:* "__PACKAGE__->table(...)" must go before the "has" stanzas (the
+    "table" in DBIx::Class::ResultSource is magic and does much more than
+    setting the table name, thus the "__PACKAGE__->add_column(...)" calls
+    that the "has" triggers won't work before that).
+
+    *Note:* "__PACKAGE__->set_primary_key(...)" and
+    "__PACKAGE__->add_unique_constraint(...)" calls must go after the "has"
+    stanzas (since they depend on the referred columns being registered via
+    "__PACKAGE__->add_column(...)" and that call is done when the "has"
+    runs).
+
+TODO
+    *   convert the test harness to something sane - consider Fennec?
+
+    *   delay ->add_column() calls until right after the ->table() call
+        (collect the args and run them in an after method modifier of
+        'table', possibly batched in a single ->add_columns() call)
+
+SEE ALSO
+    DBIx::Class, Moose
+
+AUTHOR
+    Norbert Buchmuller, "<norbi at nix.hu>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-moosecolumns at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-MooseColumns>
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::MooseColumns
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-MooseColumns>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-Class-MooseColumns>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-Class-MooseColumns>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-Class-MooseColumns/>
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Norbert Buchmuller, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

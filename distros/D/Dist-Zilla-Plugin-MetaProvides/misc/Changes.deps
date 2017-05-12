@@ -1,0 +1,361 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+2.002004
+
+2.002003 2016-07-29T22:25:40Z
+
+2.002002 2016-07-07T11:55:30Z
+ [Added / test requires]
+ - Dist::Zilla::Role::Plugin
+
+2.002001 2016-06-29T06:09:34Z
+ [Added / test requires]
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper 0.002001
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+2.002000 2016-04-22T14:20:31Z
+
+2.001011 2016-01-24T11:24:45Z
+ [Added / runtime requires]
+ - Carp
+
+2.001010 2015-10-09T07:02:08Z
+
+2.001002 2014-12-10T10:16:51Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+2.001001 2014-08-29T10:07:27Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.001 → 1.003001
+
+2.001000 2014-08-22T18:50:50Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper 0.002001
+
+2.000010 2014-08-19T01:26:37Z
+ [Added / test requires]
+ - Test::DZil
+
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000004 → 1.001
+
+ [Removed / runtime requires]
+ - Readonly
+
+2.000003 2014-08-16T00:11:28Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+2.000002 2014-07-13T12:27:14Z
+
+2.000001 2014-07-12T19:31:53Z
+
+2.000000 2014-02-02T05:17:53Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4203
+
+ [Removed / configure requires]
+ - Module::Build 0.4203
+
+1.15000200 2013-12-29T08:37:43Z
+ [Changed / build requires]
+ - Module::Build 0.4202 → 0.4203
+
+ [Changed / configure requires]
+ - Module::Build 0.4202 → 0.4203
+
+1.15000100 2013-11-21T09:24:45Z
+ [Added / runtime requires]
+ - Hash::Merge::Simple
+
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::EmulatePhase 0.01000101
+
+ [Removed / test requires]
+ - Carp
+ - File::Temp
+ - IO::Handle
+
+1.15000000 2013-09-21T07:07:03Z
+ [Added / test requires]
+ - Carp
+ - IO::Handle
+ - lib
+
+ [Changed / build requires]
+ - Module::Build 0.4001 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4001 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+
+1.14000001 2012-07-26T16:24:41Z
+ [Added / runtime requires]
+ - Readonly
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+1.14000000 2012-02-07T08:45:13Z
+
+1.13000001 2012-02-04T09:04:53Z
+
+1.13000000 2012-02-04T07:35:05Z
+
+1.12060502 2012-02-04T00:39:26Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+1.12060501 2011-04-08T13:44:56Z
+ [Changed / test requires]
+ - Test::More 0.88 → 0.96
+
+1.12060212 2011-04-06T00:17:21Z
+
+1.12044806 2010-11-06T18:20:55Z
+ [Added / test requires]
+ - Scalar::Util
+
+1.12044803 2010-11-06T15:26:58Z
+
+1.12044518 2010-11-04T06:32:54Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::EmulatePhase 0.01000101
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000004
+
+ [Removed / runtime requires]
+ - Carp
+ - Hash::Merge::Simple
+
+ [Removed / test requires]
+ - Dist::Zilla::Tester
+ - Params::Util
+ - Sub::Exporter
+ - Try::Tiny
+
+1.11044405 2010-11-02T17:04:51Z
+ [Removed / test requires]
+ - Config::INI::Reader
+ - Data::Dump
+ - Moose::Autobox
+
+1.11044404 2010-11-02T16:25:56Z
+ [Added / runtime requires]
+ - Carp
+ - Hash::Merge::Simple
+
+ [Added / test requires]
+ - Config::INI::Reader
+ - Data::Dump
+ - Dist::Zilla::Tester
+ - English
+ - Moose::Autobox
+ - Params::Util
+ - Sub::Exporter
+ - Test::Fatal
+ - Try::Tiny
+
+1.11034201 2010-07-24T13:35:56Z
+ [Changed / runtime requires]
+ - Moose 0.89 → 0
+ - MooseX::Types 0.19 → 0
+ - MooseX::Types::Moose 0.19 → 0
+ - namespace::autoclean 0.08 → 0
+
+ [Changed / test requires]
+ - Test::More 0.92 → 0.88
+
+ [Removed / runtime requires]
+ - Carp
+ - Class::Discover 1.000001
+ - Config::INI::Reader
+ - Dist::Zilla 2.101310
+ - List::MoreUtils 0.22
+ - Module::Extract::Namespaces 0.14
+ - Module::Extract::VERSION 0.13
+ - Moose::Autobox 0.09
+ - MooseX::Has::Sugar 0.0404
+ - aliased 0.30
+
+ [Removed / test requires]
+ - Data::Dumper
+ - Dist::Zilla::App::Tester
+ - File::Find::Rule 0.30
+ - File::Find::Rule::Perl 1.09
+ - FindBin
+ - MooseX::Declare
+ - Path::Class::Dir 0.17
+ - Path::Class::File 0.17
+ - Test::Builder::Module
+ - Test::Perl::Critic
+
+1.10034117 2010-07-24T05:37:49Z
+ [Added / test requires]
+ - Data::Dumper
+ - Dist::Zilla::App::Tester
+ - File::Find
+ - File::Find::Rule 0.30
+ - File::Find::Rule::Perl 1.09
+ - File::Temp
+ - FindBin
+ - MooseX::Declare
+ - Path::Class::Dir 0.17
+ - Path::Class::File 0.17
+ - Test::Builder::Module
+ - Test::More 0.92
+ - Test::Perl::Critic
+
+ [Removed / build requires]
+ - Data::Dumper
+ - Dist::Zilla::App::Tester
+ - File::Find
+ - File::Find::Rule 0.30
+ - File::Find::Rule::Perl 1.09
+ - FindBin
+ - MooseX::Declare
+ - Path::Class::Dir 0.17
+ - Path::Class::File 0.17
+ - Test::Builder::Module
+ - Test::Kwalitee
+ - Test::More 0.92
+ - Test::Perl::Critic
+
+1.10027802 2010-05-22T13:08:02Z
+ [Added / build requires]
+ - Data::Dumper
+ - Dist::Zilla::App::Tester
+ - File::Find
+ - File::Find::Rule 0.30
+ - File::Find::Rule::Perl 1.09
+ - FindBin
+ - MooseX::Declare
+ - Path::Class::Dir 0.17
+ - Path::Class::File 0.17
+ - Test::Builder::Module
+ - Test::Kwalitee
+ - Test::More 0.92
+ - Test::Perl::Critic
+
+ [Added / runtime requires]
+ - Carp
+ - Config::INI::Reader
+ - Dist::Zilla::Role::MetaProvider
+ - Moose::Role
+
+ [Removed / configure requires]
+ - ExtUtils::MakeMaker 6.31
+
+ [Removed / runtime requires]
+ - File::Find::Rule 0.30
+ - File::Find::Rule::Perl 1.09
+ - FindBin
+ - Path::Class::Dir 0.17
+ - Path::Class::File 0.17
+ - Test::More 0.92
+
+1.10027518 2010-05-20T05:33:10Z
+ [Added / build requires]
+ - Module::Build 0.3601
+
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.31
+ - Module::Build 0.3601
+
+ [Changed / runtime requires]
+ - Dist::Zilla 0.092310 → 2.101310
+
+1.10001919 2009-09-12T06:17:57Z
+ [Changed / runtime requires]
+ - FindBin 1.50 → 0
+
+1.10000417 2009-08-28T04:52:32Z
+ [Added / runtime requires]
+ - MooseX::Types 0.19
+
+ [Changed / runtime requires]
+ - Class::Discover 1.000000 → 1.000001
+ - Dist::Zilla 0.091840 → 0.092310
+ - File::Find::Rule 0 → 0.30
+ - File::Find::Rule::Perl 0 → 1.09
+ - FindBin 0 → 1.50
+ - List::MoreUtils 0 → 0.22
+ - Module::Extract::Namespaces 0 → 0.14
+ - Module::Extract::VERSION 0 → 0.13
+ - Moose 0.65 → 0.89
+ - Moose::Autobox 0 → 0.09
+ - MooseX::Has::Sugar 0.0300 → 0.0404
+ - MooseX::Types::Moose 0 → 0.19
+ - Path::Class::Dir 0 → 0.17
+ - Path::Class::File 0 → 0.17
+ - Test::More 0 → 0.92
+ - aliased 0 → 0.30
+ - namespace::autoclean 0 → 0.08
+
+1.0920022 2009-07-19T22:52:48Z
+
+1.0920015 2009-07-19T15:31:07Z

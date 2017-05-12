@@ -1,0 +1,168 @@
+0.021   2017-03-14 (PERLANCAR)
+
+	- Add coerce rules: {int,float}::str_percent.
+
+
+0.020   2016-09-29 (PERLANCAR)
+
+        - [build] Rebuild to remove dependencies on
+          Data::Sah::Compiler::perl::TH::* (which was accidentally added by a
+          dzil plugin). [RT#118115]
+
+
+0.019   2016-09-26 (PERLANCAR)
+
+	- Revert from using JSON::MaybeXS to JSON because JSON::MaybeXS is
+          currently not depakable (hard dependency to XS module
+          Cpanel::JSON::XS).
+
+
+0.018   2016-06-29 (PERLANCAR)
+
+	- Include nanoseconds when coercing from DateTime::Duration object
+	  to float(secs).
+
+
+0.017   2016-06-13 (PERLANCAR)
+
+	- Load required modules in the generated code, not in
+	  Data::Sah::Coerce.
+
+
+0.016   2016-06-12 (PERLANCAR)
+
+	- Tweak js-bool test to be more flexible of JSON decode result.
+
+	- Adjust to IPC::System::Options 0.27+ (backtick() renamed to
+	  readpipe()).
+
+	- [doc] Wording/typo/fmt.
+
+
+0.015   2016-06-04 (PERLANCAR)
+
+	- Use IPC::System::Options 0.25's backtick() to properly
+	  shell-quote on win32.
+
+	- [doc] Mention App::SahUtils & coerce-with-sah.
+
+
+0.014   2016-05-27 (PERLANCAR)
+
+	- Impart default coerce_to knowledge to each rule, for convenience.
+
+
+0.013   2016-05-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Forgot to add test_needs(Time::Duration::Parse::AsHash) to
+	  some tests [CT].
+
+
+0.012   2016-05-24 (PERLANCAR)
+
+	- [Bugfix] Precludes should be checked to all rules, not just rules
+	  after the precluding rule.
+
+
+0.011   2016-05-23 (PERLANCAR)
+
+        - [Incompatible change] Replace 'dont_coerce_from' and 'coerce_from'
+          options to 'coerce_rules' which are more flexible.
+
+        - Interpret rule metadata property 'precludes'.
+
+        - [test] Forgot to add test_needs() to a subtest [CT].
+
+
+0.010   2016-05-22 (PERLANCAR)
+
+        - Introduce rule metadata: v & precludes.
+
+        - [Incompatible change] Bump metadata version from 1 -> 2 to exclude old
+          rule modules (i.e. date::int_epoch from 0.005, which generate
+          CPANTesters failures).
+
+        - [Internal] Refactor routine: get_coerce_rules() to avoid code
+          duplication between Data::Sah::Coerce and Data::Sah::CoerceJS (and
+          Data::Sah::Compiler::Prog).
+
+
+0.009   2016-05-22 (PERLANCAR)
+
+	- [Incompatible change] Replace return_type=bool+val with str+val.
+
+
+0.008   2016-05-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Skip js tests when node.js is not available [CT].
+
+
+0.007   2016-05-20 (PERLANCAR)
+
+        - Add option: return_type. The default is 'val' which is the same as
+          before, but another return type 'bool+val' makes the coercer return a
+          2-element array instead: the first element is a bool value indicating
+          whether value has been coerced, and the second is the (possibly)
+          coerced value. This is useful e.g. for testing/debugging.
+
+
+0.006   2016-05-19 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - Rename js rules: date::int_epoch -> date::float_epoch. Rename perl
+          rules: date::int_epoch -> date::float_epoch. This means when
+          upgrading, you must first uninstall the old version to remove the old
+          module names. Sorry for this.
+
+        [ENHANCEMENTS]
+
+        - Introduce ordering ('prio' key in rule metadata). prio is a number
+          between 0-100 and the lower the number, the higher the priority is.
+          Rules will be sorted using their priority.
+
+        - Add coercion rules for type 'bool'.
+
+        [TESTS]
+
+        - Complete the rest of the test suite (js compiler, duration and bool
+          types).
+
+
+0.005   2016-05-18 (PERLANCAR)
+
+	- No functional changes.
+
+	- Add test suite (so far only for compiler=perl, type=date).
+
+
+0.004   2016-05-18 (PERLANCAR)
+
+	- js: Add coercion rule for duration from float/float-string.
+
+
+0.003   2016-05-17 (PERLANCAR)
+
+        - Add coercion rules for type 'duration'.
+
+
+0.002   2016-05-17 (PERLANCAR)
+
+        - Add js rules for type 'date'.
+
+        - Introduce rule metadata 'might_die'.
+
+        - Add module: Data::Sah::CoerceJS.
+
+        - perl: Tweak error messages to make it more helpfule.
+
+        - Documentationf fixes and addition.
+
+
+0.001   2016-05-16 (PERLANCAR)
+
+        - First release, incomplete (no JS implementation & test suite yet).

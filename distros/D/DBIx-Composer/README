@@ -1,0 +1,402 @@
+NAME
+    DBIx::Composer - Composes and runs SQL statement.
+
+SYNOPSIS
+      use DBIx::Composer
+      $cmd = new DBIx::Composer();
+      $cmd->{table} = 'table1';
+      $cmd->{fields} = 'name, email';
+      $cmd->{where} = "where login = 'peter'";
+      print $cmd->compose_select;
+    # Prints "select name, surname from table1 where login = 'peter'"
+
+      $dbh = open_database();       # Open database yourself
+      use DBIx::Composer
+      $cmd = new DBIx::Composer(dbh=>$dbh, debug=> 1);
+      $cmd->{table} = 'table1';
+      $cmd->{fields} = 'login, name, email';
+      $cmd->{values} = "'john', 'John Smith', 'john@smith.com'";
+      $cmd->insert();
+    # Executes command "insert into table1 (login, name, email) values 
+    #    ('john', 'John Smith', 'john@smith.com')"
+    # Prints this command on STDERR before execution.
+
+DESCRIPTION
+    This module helps you to compose and run SQL statements. First you
+    create new object and fill its hash for common parts of SQL statements.
+    Then you may either compose SQL statement from these parts or both
+    compose and execute it.
+
+USAGE
+    You connect to database using your favorite method of connection and
+    supply DBIx::Composer object with standard database handler $dbh. If you
+    don't plan to execute statements, you may omit connection to database.
+
+    So, after creating new object you set its parameters, or SQL command
+    parts. Modifiers for command, such as "where ...", "order ...", "limit
+    ..." must be full modifiers like "where a=b", not only "a=b".
+
+    You don't need to prepare() SQL fetch statements - they are prepared
+    internally. You cant execute statements right after setting their parts
+    - the module checks whether command has been composed, prepared and
+    executed. Because of such behaviour don't try to reset command parts
+    after executing, but better create new DBIx::Composer object.
+
+  Command parts
+
+    Valid command parts are:
+
+      table - table name.
+      Examples:
+      $cmd->{table} = 'table1'
+      $cmd->{table} = 'db left join user using (host)';
+
+      fields - fields to select, insert, update, etc.
+      Examples:
+      $cmd->{fields} = 'login, email, tries + 5';
+      $cmd->{fields} = 'curdate(), now()';
+      $cmd->{fields} = 'ip, traf_in+thaf_out as sum';
+
+      where
+      Examples:
+      $cmd->{where} = 'login = peter';
+      $cmd->{where} = 'tries > limit + 2';
+
+      order
+      Examples:
+      $cmd->{order} = "order by ip desc";
+
+      limit
+      Examples:
+      $cmd->{limit} = "limit 20";
+      $cmd->{limit} = "limit 100, 20";
+
+  Opening database
+
+    DBIx::Composer doesn't touch opening database. You should open it
+    yourself somewhere else in your program. As for me, I use special
+    function open_database() like this:
+
+      #====================
+      sub open_database {
+      #====================
+  
+      # Read config from some file
+        my ($db_db, $db_login, $db_passwd, $debug) = read_config();
+        $driver_name = "dbi:mysql:$db_db";
+    
+      # Connect to database
+        $dbh = DBI->connect
+          ($driver_name, $db_login, $db_passwd)||
+          die $DBI::errstr;
+        
+      # Initialize DBIx::Composer
+        $DBIx::Composer::DBH = $dbh;
+        $DBIx::Composer::DEBUG = $debug;
+
+        return $dbh;        # returns true on success
+      }
+
+    Then in your program you don't need to set $dbh anymore, so you can
+    simply write:
+
+      $cmd = new $DBIx::Composer;
+
+    and $cmd knows yet about dbh handler and debug level.
+
+    You have to set $dbh in new() explicitly only if you want to make two or
+    more database connections in one program, e.g. on migrating from old
+    database to new one.
+
+  Debug levels
+
+    If debug level is set to 1 or more, the module prints SQL commands to
+    STDERR (for cgi scripts it's error_log of web server).
+
+    If debug level >= 1, it prints executed statements before executing
+    them.
+
+    If debug level >= 2, it prints composed statements after composing them.
+    So usually (not always) on level 2 you have 2 lines in STDERR - of
+    composing and of executing.
+
+    Debug line starts from prefix ("SQL run" or "SQL debug") and program
+    name (it's convenient for cgi-bin's).
+
+  Things you must pay attention to
+
+    *
+    In order to avoid confusing, don't reuse DBIx::Composer objects after
+    executing them, but simply create new object. It's because the module
+    remembers its state and don't composes statement again. Probably such
+    behaviour will change partially in future.
+
+    *
+    Command parts 'where', 'limit', 'order' must be started from these
+    words, that is, 'where a=b', not 'a=b'; 'order by c desc', not 'c desc'
+    or 'by c desc'. You may have in your mind the string "select $fields
+    from $table $where".
+
+REQUIRES
+      Perl 5.6.1 (for lvalue functions)
+      ExtUtils::MakeMaker   - for installation
+      Test::More    - for installation tests
+      DBI etc.      - if you want to execute statements
+
+BUGS
+    I have tested it only in environment with MySQL database and localhost
+    as database host.
+
+    Installation tests doesn't check that it works on real database - they
+    only check that the module composes statements.
+
+AUTHOR
+            Igor Plisco
+            igor at plisco dot ru
+            http://plisco.ru/soft
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+
+FUNCTION DESCRIPTIONS
+  new
+
+     Purpose   : Creates new DBIx::Object object.
+     Usage     : DBIx::Composer->new()
+     Returns   : Object handler.
+     Argument  : Nothing or dbh handler or config.
+     Throws    : None.
+     Comments  : No.
+
+    See Also : N/A
+
+  debug_level
+
+     Usage     : DBIx::Composer->debug_level()
+     Purpose   : Sets default debug level for all newly created objects.
+     Returns   : current value of debug level
+     Argument  : Debug level as integer.
+     Throws    : None.
+     Comments  : Warning: now returns global $dbh, not local for object.
+
+    See Also :
+
+  dbh
+
+     Usage     : DBIx::Composer->dbh()
+     Purpose   : Sets default database handler for all newly created objects.
+     Returns   : current value of $dbh
+     Argument  : database handler
+     Throws    : None.
+     Comments  : Warning: now returns global $dbh, not local for object.
+
+    See Also :
+
+  quote
+
+     Usage     : DBIx::Composer->quote()
+     Purpose   : Quotes its value by calling $dbh->quote.
+     Returns   : Quoted string
+     Argument  : String or number to quote
+     Throws    : None.
+     Comments  : None.
+
+    See Also :
+
+  compose_select
+
+     Usage     : $cmd->compose_select()
+     Purpose   : Composes select statement for given object.
+     Returns   : Composed statement
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Composes "select $fields from $table $where $order $limit"
+      statement where $fields stands for $cmd->fields and so on.
+      $where, $group, $order and $limit are optional.
+
+    See Also :
+
+  compose_insert
+
+     Usage     : $cmd->compose_insert()
+     Purpose   : Composes insert statement for given object.
+     Returns   : Composed statement
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Composes "insert into $table ($fields) values ($values)"
+      or "insert into $table values ($values)" if $fields omitted.
+
+    See Also :
+
+  compose_replace
+
+     Usage     : $cmd->compose_replace()
+     Purpose   : Composes replace statement for given object.
+     Returns   : Composed statement
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Composes "replace into $table ($fields) values ($values)"
+      or "replace into $table values ($values)" if $fields omitted.
+
+    See Also :
+
+  compose_delete
+
+     Usage     : $cmd->compose_delete()
+     Purpose   : Composes delete statement for given object.
+     Returns   : Composed statement
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Composes "delete from $table $where"
+      or "delete from $table" if $where omitted.
+
+    See Also :
+
+  compose_update
+
+     Usage     : $cmd->compose_update()
+     Purpose   : Composes update statement for given object.
+     Returns   : Composed statement
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Composes "update $table $set $where"
+      or "update $table $set" if $where omitted.
+
+    See Also :
+
+  selectrow_array
+
+     Usage     : $cmd->selectrow_array()
+     Purpose   : Makes DBI call of selectrow_array
+     Returns   : Array or scalar
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : 
+
+    See Also :
+
+  fetch
+
+     Usage     : $cmd->fetch()
+     Purpose   : Makes DBI call of fetch
+     Returns   : Array of data
+     Argument  : None.
+     Throws    : Returns undef, if error occured. See $dbh->errstr for errors. 
+     Comments  : After last row returns undef too.
+
+    See Also :
+
+  fetchrow_hashref
+
+     Usage     : $cmd->fetchrow_hashref()
+     Purpose   : Makes DBI call of fetchrow_hashref
+     Returns   : Array of data
+     Argument  : None.
+     Throws    : Returns undef, if error occured. See $dbh->errstr for errors. 
+     Comments  : After last row returns undef too.
+
+    See Also :
+
+  insert
+
+     Usage     : $cmd->insert()
+     Purpose   : Makes DBI call of insert
+     Returns   : ID of inserted row (as "last insert id").
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : 
+
+    See Also :
+
+  replace
+
+     Usage     : $cmd->replace()
+     Purpose   : Makes DBI call of replace
+     Returns   : ID of replaced row (as "last insert id").
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : 
+
+    See Also :
+
+  delete
+
+     Usage     : $cmd->delete()
+     Purpose   : Makes DBI call of delete
+     Returns   : 1 if OK, false otherwise.
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : 
+
+    See Also :
+
+  update
+
+     Usage     : $cmd->update()
+     Purpose   : Makes DBI call of update
+     Returns   : 1 if OK, false otherwise.
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : 
+
+    See Also :
+
+  log_cmd
+
+     Usage     : $cmd->log_cmd()
+     Purpose   : Logs SQL command to STDERR.
+     Returns   : Nothing.
+     Argument  : 1 - output format
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Should't be called directly. Set flag debug
+                    instead when called new().
+
+    See Also :
+
+  debug
+
+     Usage     : $cmd->debug()
+     Purpose   : Logs SQL command to STDERR.
+     Returns   : Nothing.
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Should't be called directly. Set flag debug > 0
+                    instead when called new().
+
+    See Also :
+
+  log
+
+     Usage     : $cmd->log()
+     Purpose   : Logs SQL command to STDERR.
+     Returns   : Nothing.
+     Argument  : None.
+     Throws    : Returns undef, if required fields are missed.
+     Comments  : Should't be called directly. Set flag debug > 1
+                    instead when called new().
+
+    See Also :
+
+  Functions for access to inner object data as lvalue
+
+     Usage     : $cmd->table = "users"; or: $table_sav = $cmd->table;
+     Purpose   : Make access to inner variables without hash curlies.
+     Comments  : Warning: don't work in Perl < 5.6. Use form $cmd->{table} instead.
+
+     Currently supported functions:
+            table()
+            fields()
+            values()
+            where()
+            set()
+            order()
+            group()
+            limit()
+

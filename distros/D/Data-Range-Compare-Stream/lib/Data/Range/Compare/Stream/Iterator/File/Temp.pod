@@ -1,0 +1,64 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::File::Temp - Shared temp file interface
+
+=head1 SYNOPSIS
+
+  package MyPacakge;
+
+  use strict;
+  use warnings;
+
+  use base(Data::Range::Compare::Stream::Iterator::File::Temp);
+
+  1;
+
+=head1 DESCRIPTION
+
+This module provides a shared temp file generating interface.
+
+=head2 extending this class
+
+All classes that extend this class gain 1 additional argument to the constructor interface.  
+
+Optional argument list extension:
+
+  tmpdir=>undef|'/some/folder'
+    # tmpdir is defined its value is passed to to File::Temp->new(DIR=>$self->{tmpdir});
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $tmp_file=$instance->get_temp(key=>value);
+
+For a full list of valid arguments see L<File::Temp>.  All arguments are passed to File::Temp->new(key=>value).
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

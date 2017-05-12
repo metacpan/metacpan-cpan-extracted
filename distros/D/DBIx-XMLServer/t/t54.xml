@@ -1,0 +1,34 @@
+<sql:spec xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+
+  <sql:type name="text">
+    <sql:module>DBIx::XMLServer::TextField</sql:module>
+  </sql:type>
+
+  <sql:type name="number">
+    <sql:module>DBIx::XMLServer::NumberField</sql:module>
+  </sql:type>
+
+  <sql:table name="employees" sqlname="dbixtest1"/>
+ 
+  <sql:template table="employees" 
+      xmlns:m="http://my.name.space/"
+      xmlns:y="http://your.name.space/"
+      default-namespace="http://my.name.space/">
+    <employees xmlns="http://my.name.space/">
+      <sql:meta type="page" attribute="total" 
+                            namespace="http://your.name.space/"/>
+      <sql:record>
+	<employee id="foo">
+	  <sql:field type="number" attribute="id" expr="employees.id"/>
+	  <name>
+	    <sql:field type="text" expr="employees.name"/>
+	  </name>
+          <y:login>
+	    <sql:field type="text" expr="employees.login"/>
+          </y:login>
+	</employee>
+      </sql:record>
+    </employees>
+  </sql:template>
+	
+</sql:spec>

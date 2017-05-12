@@ -1,0 +1,13 @@
+DBIx::Procedure::Oracle
+
+
+DBIx::Procedure::Oracle - Call Oracle PL/SQL stored procedures and functions
+without writing SQL or worrying about data types or bindings. See the perldoc 
+page of the module for more information.
+
+To install the module:
+
+	perl Makefile.PL;
+	make;
+	make test;
+    make install;

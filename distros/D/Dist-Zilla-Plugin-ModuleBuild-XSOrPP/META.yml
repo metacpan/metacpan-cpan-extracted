@@ -1,0 +1,26 @@
+---
+abstract: 'Add a --pp option to your Build.PL to force an XS-less build'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-ModuleBuild-XSOrPP
+requires:
+  Dist::Zilla: 4.0
+  Dist::Zilla::Plugin::InlineFiles: 0
+  Dist::Zilla::Plugin::ModuleBuild: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-ModuleBuild-XSOrPP
+  repository: git://git.urth.org/Dist-Zilla-Plugin-ModuleBuild-XSOrPP.git
+version: 0.04

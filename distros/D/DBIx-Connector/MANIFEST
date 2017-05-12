@@ -1,0 +1,27 @@
+Build.PL
+Changes
+lib/DBIx/Connector.pm
+lib/DBIx/Connector/Driver.pm
+lib/DBIx/Connector/Driver/Firebird.pm
+lib/DBIx/Connector/Driver/MSSQL.pm
+lib/DBIx/Connector/Driver/mysql.pm
+lib/DBIx/Connector/Driver/Oracle.pm
+lib/DBIx/Connector/Driver/Pg.pm
+lib/DBIx/Connector/Driver/SQLite.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.md
+t/base.t
+t/driver.t
+t/load.t
+t/run.t
+t/run_fixup.t
+t/run_ping.t
+t/svp.t
+t/svp_fixup.t
+t/svp_live.t
+t/svp_ping.t
+t/txn.t
+t/txn_fixup.t
+t/txn_ping.t

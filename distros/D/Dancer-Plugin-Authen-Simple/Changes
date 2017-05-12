@@ -1,0 +1,15 @@
+0.130500  2013-02-18 22:44:20 America/Los_Angeles
+    Tested and fixed code in SYNOPSIS
+
+0.130490  2013-02-18 12:00:50 America/Los_Angeles
+    Memoize authen so we aren't rebuilding it every time
+
+0.130482  2013-02-17 10:52:40 America/Los_Angeles
+    expands documentation with SEE ALSO section
+    fixes Changes file generation
+
+0.130480 at 2013-02-17 18:36:00 +0000
+    initial cpan release
+    Preparing for cpan release
+    merged example test from Yanick.  Thanks Yanick!
+    added documentation

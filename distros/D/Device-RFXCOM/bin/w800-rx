@@ -1,0 +1,72 @@
+#!/usr/bin/perl
+
+# ABSTRACT: simple example script to read from a W800 receiver
+# PODNAME: w800-rx
+
+
+use warnings;
+use strict;
+use Device::W800;
+
+my $device = shift or die "Usage: $0 [device] [key=value] ...\n";
+
+my $rx = Device::W800->new(device => $device, map{split/=/}@ARGV);
+
+$|=1; # don't buffer output
+
+while (1) {
+  my $data = $rx->read() or next;
+  print $data->summary,"\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+w800-rx - simple example script to read from a W800 receiver
+
+=head1 VERSION
+
+version 1.163170
+
+=head1 SYNOPSIS
+
+  # read from USB tty device
+  w800-rx /dev/ttyUSB0
+
+  # read from USB device with nicer name see Device::W800(3)
+  w800-rx /dev/w800-rx
+
+  # read from network/wireless device
+  w800-rx 10.0.0.1:10001
+
+=head1 DESCRIPTION
+
+This script is an example of the usage of the L<Device::W800> API.  It
+simply initializes the receiver and writes a summary of the received
+RF messages to stdout.  The keys and values given on the command line
+become the parameter hash for the L<Device::W800> constructor and are
+documented in that module.
+
+=head1 SEE ALSO
+
+L<Device::W800>
+
+W800 website: http://www.wgldesigns.com/w800.html
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

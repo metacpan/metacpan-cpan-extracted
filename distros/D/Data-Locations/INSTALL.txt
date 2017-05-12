@@ -1,0 +1,163 @@
+                  =========================================
+                    Package "Data::Locations" Version 5.5
+                  =========================================
+
+
+                 Copyright (c) 1997 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Prerequisites:
+--------------
+
+Perl version 5.004 or higher, and an ANSI C compiler. (!)
+                                     ^^^^^^
+Note that in order to compile Perl modules which contain
+C (and/or XS) code (such as this one), you always HAVE
+to use the very same compiler your Perl itself was compiled
+with.
+
+Many vendors nowadays ship their operating system already
+comprising a precompiled version of Perl. Many times the
+compilers used to compile this version of Perl are not
+available to or not usually used by the users of these
+operating systems.
+
+In such cases building this module (or any other Perl
+module containing C and/or XS code) will not work. You
+will either have to get the compiler which was used to
+compile Perl itself (see for example the section "Compiler:"
+in the output of the command "perl -V"), or to build
+your own Perl with the compiler of your choice (which
+also allows you to take advantage of the various compile-
+time switches Perl offers).
+
+Note that Sun Solaris and Red Hat Linux frequently were
+reported to suffer from this kind of problem.
+
+Moreover, you usually cannot build any modules under
+Windows 95/98 since the Win 95/98 command shell doesn't
+support the "&&" operator. You will need the Windows NT
+command shell ("cmd.exe") or the "4DOS" shell to be
+installed on your Windows 95/98 system first. Note that
+Windows NT, Windows 2000 and Windows XP are not affected
+and just work fine. I don't know about Windows Vista and
+Windows 7, however.
+
+Note that ActiveState provides precompiled binaries of
+this module for their Win32 port of Perl ("ActivePerl")
+on their web site, which you should be able to install
+simply by typing "ppm install Data-Locations" in your
+MS-DOS command shell (but note the "-" instead of "::"
+in the package name!).
+
+This also works under Windows 95/98 (!).
+
+If your firewall prevents "ppm" from downloading
+this package, you can also download it manually from
+http://www.activestate.com/ppmpackages/5.005/zips/ or
+http://www.activestate.com/ppmpackages/5.6/zips/.
+Follow the installation instructions included in
+the "zip" archive.
+
+
+Installation:
+-------------
+
+=============================================================================
+ALWAYS unpack and build Perl modules OUTSIDE the Perl source and installation
+tree! (You might otherwise inadvertently corrupt your Perl installation!)
+=============================================================================
+
+Quick installation guide for experienced users:
+-----------------------------------------------
+
+    UNIX:                 Win32/Borland C++:      Win32/MS Visual C++:
+    =====                 ==================      ====================
+
+    % perl Makefile.PL    % perl Makefile.PL      % perl Makefile.PL
+    % make                % dmake                 % nmake
+    % make test           % dmake test            % nmake test
+    % make install        % dmake install         % nmake install
+
+Detailed installation guide:
+----------------------------
+
+ 1) Change directory to the directory that has been created by unpacking this
+    package ("cd Data-Locations-5.5").
+
+ 2) Type "perl Makefile.PL" (or whatever the name and path of your Perl 5
+    binary is).
+
+    This will create a "Makefile" with the appropriate parameters for your
+    system (for instance, where the install directories are, and so on).
+
+    See "man ExtUtils::MakeMaker" or "perldoc ExtUtils::MakeMaker" for
+    other useful options to this command, like setting a different
+    installation PREFIX.
+
+ 3) Type "make".
+
+    (For installation under Windows NT/95, use "dmake" (Borland C++) or
+    "nmake" (MS Visual C++) instead!)
+
+    This will create a dynamically linkable library file that will be linked
+    to Perl later, at runtime, provided your system supports dynamic linking.
+
+    Please refer to the MakeMaker documentation for instructions on how
+    to build a new Perl with statically linked libraries (invoke "perldoc
+    ExtUtils::MakeMaker" for this), if your system does NOT support dynamic
+    linking!
+
+    Should you encounter any compiler warnings or errors (like the redefi-
+    nition of certain types already defined by your system), please contact
+    me via e-mail at <STBEY@cpan.org>, sending me your compiler output
+    (both STDOUT and STDERR). Thank you!
+
+    ======================================================================
+       BEWARE that you need an ANSI C compiler in order to successfully
+       compile this package!
+    ======================================================================
+
+    Also note that problems may arise with the c89 compiler of HP, although
+    it allegedly supports ANSI C!
+
+    I recommend the GNU C compiler ("gcc"), which is freely available on
+    the Internet (see ftp://ftp.gnu.org/pub/gnu/ and mirror sites thereof).
+
+    (HP users are strongly recommended to install the GNU assembler "gas"
+    first before installing the GNU C compiler "gcc", according to GNU.)
+
+ 4) Now issue "make test" (or "dmake test" or "nmake test", respectively).
+
+    The output should look somewhat like this:
+
+    PERL_DL_NONLAZY=1 /v/guest/sw/bin/perl "-MExtUtils::Command::MM"
+    "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+    t/00____version.t .. ok
+    t/01________new.t .. ok
+    t/02___refcount.t .. ok
+    t/03___filename.t .. ok
+    t/04______print.t .. ok
+    t/05______loops.t .. ok
+    t/06_____printf.t .. ok
+    t/07____println.t .. ok
+    t/08_______read.t .. ok
+    t/09______reset.t .. ok
+    t/10___traverse.t .. ok
+    t/11_______dump.t .. ok
+    t/12_____delete.t .. ok
+    t/13___toplevel.t .. ok
+    t/14________tie.t .. ok
+    t/15__example_1.t .. ok
+    t/16__example_2.t .. ok
+    t/17__example_3.t .. ok
+    t/18__example_4.t .. ok
+    All tests successful.
+    Files=19, Tests=796,  1 wallclock secs ( 0.22 usr  0.09 sys +  0.41 cusr  0.55 csys =  1.28 CPU)
+    Result: PASS
+
+ 5) At last, type "make install" (or "dmake install", "nmake install").
+
+ 6) Share and enjoy!
+

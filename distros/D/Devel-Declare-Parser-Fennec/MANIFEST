@@ -1,0 +1,7 @@
+Build.PL
+lib/Devel/Declare/Parser/Fennec.pm
+MANIFEST			This list of files
+t/Parser.t
+README
+META.yml
+META.json

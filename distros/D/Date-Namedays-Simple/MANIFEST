@@ -1,0 +1,12 @@
+MANIFEST
+LICENSE
+README
+Todo
+Changes
+lib/Date/Namedays/Simple.pm
+lib/Date/Namedays/Simple/Hungarian.pm
+t/1_load.t
+t/2_die.t
+t/3_hun.t
+Makefile.PL
+

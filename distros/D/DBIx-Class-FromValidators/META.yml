@@ -1,0 +1,24 @@
+abstract: Update or Insert DBIx::Class data from Validators
+author: woremacx <woremacx at cpan dot org>
+build_requires: 
+  Catalyst: 0
+  Catalyst::Model::DBIC::Schema: 0
+  Catalyst::Plugin::FormValidator::Simple: 0
+  Catalyst::Test: 0
+  DBD::SQLite: 0
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  HTTP::Request::Common: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: DBIx-Class-FromValidators
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp::Clan: 0
+  DBIx::Class: 0
+version: 0.02

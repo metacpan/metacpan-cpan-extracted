@@ -1,0 +1,71 @@
+DESCRIPTION
+
+    This module implements a session engine based on JSON files. Session
+    are stored in a session_dir as JSON files. The idea behind this module
+    was to provide a transparent session storage for the developer.
+
+    This backend is intended to be used in development environments, when
+    looking inside a session can be useful.
+
+    It's not recommended to use this session engine in production
+    environments.
+
+    Typically you would want to use Dancer::Session::YAML for this, which
+    comes in core, but a demand for a faster-but-still-file-based session
+    backend arose, and thus you now have JSON. :)
+
+CONFIGURATION
+
+    The setting session should be set to JSON in order to use this session
+    engine in a Dancer application.
+
+    Files will be stored to the value of the setting session_dir, whose
+    default value is appdir/sessions.
+
+    Here is an example configuration that use this session engine and
+    stores session files in /tmp/dancer-sessions
+
+        session:     "JSON"
+        session_dir: "/tmp/dancer-sessions"
+
+SUBROUTINES/METHODS
+
+ init
+
+    Initializes the session backend.
+
+ create
+
+    Creates a new object, runs flush and returns the object.
+
+ flush
+
+    Writes the session information to the session dir.
+
+ retrieve
+
+    Retrieves session information from the session dir.
+
+ destroy
+
+    Deletes session information from the session dir.
+
+ reset
+
+    Wipes the sessions directory, forcing a test for existence of the
+    sessions directory next time a session is created. It takes no
+    argument.
+
+    This is particulary useful if you want to remove the sessions directory
+    on the system where your app is running, but you want this session
+    engine to continue to work without having to restart your application.
+
+SEE ALSO
+
+    Dancer::Session::YAML - the original core development session backend.
+
+    Dancer::Session::Simple - a faster in-memory core session backend.
+
+    Dancer::Session::Cookie - an encrypted cookie session backend, suitable
+    for production.
+

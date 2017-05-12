@@ -1,0 +1,343 @@
+Revision history for Perl extension DBD::Mock.
+
+{{NEXT}}
+    - Add git-repo url to meta-data
+
+1.43
+    - Segregated into different packages
+    - Removed code coverage from POD
+    - Fixed bug rt49537 Basic support for named parameters
+    - Fixed bug rt70421 Build.PL now contains Test::Exception
+
+1.42
+    - Fixed bug rt66815 DBD::Mock::Session error clobbered
+    - Fixed bug rt69460 Info on META.yml is outdated
+    - Fixed bug rt69055 Spelling mistakes in POD
+    - RaiseError now works
+
+1.41 June 22, 2011
+    - Changed incorrect verion number
+
+1.40 June 19, 2011
+    - Fixed bug rt44591 second preapre giving an error
+    - Fixed bug rt57981 warnings during clone
+    - Fixed bug rt63191 Synopsis errors
+    - Fixed bug rt66813 Google's group link in the POD
+
+1.39 November 9, 2008
+    - If a statement handle had bound columns, then the fetch() and
+      fetchrow_arrayref() methods never returned false. After they
+      exhausted their data, they kept returning empty array
+      references.
+    - Hid all packaged but DBD::Mock from PAUSE.
+
+1.38 November 8, 2008
+    - Bumped minimum Perl to 5.8.1, since that's what DBI requires.
+    - Fixed incorrect use of no_plan in t/025_mock_last_insert_id.t.
+    - The handling of attributes passed to the constructor was not
+      correct. The major symptom was that attributes (such as
+      RaiseError) which were passed to the constructor could not be
+      overridden in the database handle which was returned from
+      connect(). As a result, some attributes set to a false value may
+      return '' instead of 0.
+
+1.37 June 12, 2008
+    - New co-maintainer (aka sucker), Dave Rolsky
+    - Added support for $sth->bind_col() and $sth->bind_cols()
+    - Fixed and clarified docs for the mock_last_insert_id and
+      mock_start_insert_id attributes. The previous docs were both
+      wrong and confusing
+    - Applied patch from RT #35145 to add support for the Column
+      attribute with selectcol_arrayref
+      - patch by Matt Lawrence
+
+1.36 October 18, 2007
+    - $dbh->last_insert_id() now works as documented
+    - Added a "use 5.006;" in order to put a safeguard on the "use warnings;"
+      statement a little further down.
+
+1.35 July 9, 2007
+    - Applying path from RT #16951 to return 
+      new result set for repeated calls to 
+      $sth->execute(). Thanks to Marc Beyer for this.
+        - added tests for this
+    - Fixing RT #25892 to make mock_records method 
+      work correctly.
+        - added test for this
+    - applying patch from RT #26604 to fix AutoCommit 
+      behavior. Thanks to Ryan Gerry for this.
+
+1.34 July, 29 2006 
+    - Fixed how AutoCommit is handled to avoid $dbh caching (RobK) 
+    - Thanks to Chas Owens for patch and test 
+      for the mock_can_prepare, mock_can_execute, 
+      and mock_can_fetch features.
+
+1.32 Wed Dec 14, 2005
+    - Fixed RT Bug #15599
+    - Fixed RT Bug #15602
+    
+    - converted to Module::Build
+        - removed the VERSION file, and adjusted the numbers
+          in all places needed    
+
+    - added patch from Andrew W. Gibbs to allow the ARRAY 
+      version of 'mock_last_insert_id' attribute
+        - added test file as well
+        - added docs on it too
+        
+    - $sth->execute now returns the number of rows as per the 
+      DBI docs
+        - added some tests for this
+    
+    >> DBD::Mock::Session
+        - now allows regexp's in the bound_params list
+          so that you can check your params are 'like' 
+          something, and not exactly something
+        - Improved error messages
+
+0.28 Wen July 13, 2005
+    - update to patch from Andrew McHarg <amcharg@acm.org>
+      to fix behavior in selectcol_arrayref() methods and tests
+    - fix version in META.yml
+    - some refactoring of fetchall_hashref(), fetchrow_hashref()
+      to incorporate DBD-Mock error handling.
+
+0.27 Mon July 11, 2005
+    - added NULL_RESULTSET constant
+    - now allowing errors to be set with mock_add_resultset.
+      Support is currently experimental, see the file
+      't/023_statement_failure.t' and the EXPERIMENTAL section
+      of the docs for more information.
+    - added patch from Collin Winter to fix a bug in 
+      the begin_work(), commit() and rollback() methods
+    - added patch from Andrew McHarg <amcharg@acm.org> for 
+      the fetchall_hashref(), fetchrow_hashref() and
+      selectcol_arrayref() methods and tests
+
+0.26 Fri Apr 08 2005
+    - added Rob Kinyon to the AUTHORS list 
+    - added get_info() and set_info() 
+        - added tests for this
+    - added bind_param_inout() for DBD::Mock::st 
+      code from Thilo Planz (Thanks Thilo)
+        - added tests for this
+    - added mock_data_sources and mock_add_data_sources 
+      properties for the Driver and Database handles
+        - added tests and docs for this
+    - added begin_work(), commit() and rollback() method
+      implementations which wrap the prepare() method and
+      deal with the AutoCommit value per the DBI spec.
+        - added tests and docs for this
+
+0.25 Sat Feb 26 2005
+    - removed the DBD::Mock::_error_handler routine
+      since it was actually redundant with the DBI::set_err
+      method. This was actually the source of the RT Bug #11515
+      which was found by Shlomi Fish (thanks Shlomi)
+        - adjusted some tests for this fix
+
+0.24 Fri Jan 28 2005
+    - added the reset() method to the DBD::Mock::Session
+      object so that a session can be used more than once.
+        - added tests for this
+        - added docs for this
+    - fixed a bug where the HASH version of 'mock_add_resultset'
+      would consume the result sets and they would not be 
+      reusable. We now copy the result sets so that every time
+      the statement is called the same results are returned
+        - did not need to add docs for this, they already 
+          documented this as the behavior (hence calling this
+          a bug)
+        - added tests for this
+
+0.23 Tues Jan 25 2005
+    - removed the trace log tests from t/10_db_handle.t
+      since they seemed to be a source of issues on Win32.
+      My rationale is that it is a DBI thing, and therefore
+      does not need to be tested by DBD::Mock. 
+
+    - added a few more tests to t/11_dr_handle.t to test the
+      'mock_connect_fail' feature
+      
+    - added some clarification in the docs about the 
+      'mock_connect_fail' feature as well.
+
+0.22 Mon Jan 24 2005
+    - added the 'mock_connect_fail' boolean attribute 
+      for the DBD::Mock driver handle, this will prevent
+      DBI from connecting. It can be used to simulate a
+      bad DSN or something like that. 
+        - added tests and documentation for this.
+        - Thanks to Justin DeVuyst for this idea.
+
+0.21 Sun Jan 16 2005
+    > DBD::Mock::Session
+    
+    - added the optional 'bound_params' slot for the 
+      DBD::Mock::Session object
+        - added tests for this
+        - added documentation for this
+        
+    - added error to handle cases where there are not 
+      enough states in a DBD::Mock::Session object.
+        - added tests for this
+        - added documentation for this
+        
+    - added the ability to remove a session (by setting
+      it to a false value)
+        - added tests for this
+        - added documenation for this
+
+    > DBD::Mock
+
+    - added test to check about overwriting hash-based 
+      result sets with 'mock_add_resultset' attribute
+        - added documentation for this
+
+0.20 Fri Jan 14 2005
+    - Modified a set of tests in t/10_db_handle.t to pass on Cygwin.
+      Thanks to Rob Kinyon for this code. This code now uses File::Temp
+      to make the temp log file in a cross platform manner. If File::Temp
+      is not found on the system, then the tests are skipped.
+      
+0.19 Fri Jan 7 2005
+    - changed the VERSION in lib/DBD/Mock.pm to be 1.23, allow me to explain...
+      
+      Chris Winters (the original author ) used the CVS derived 
+      VERSION, which when I took over the module (8 versions ago) 
+      was at 1.15. Since I was not using Chris's CVS repo to store this
+      I decided to give Mock.pm the VERSION number found in the VERSION
+      file. 
+    
+      Well,... PAUSE's indexer doesn't like it since it is a lower
+      number and would complain every time I uploaded a new version.
+      I ignored these complaints (at my own peril) until now. 
+    
+      I found out recently that if you had version 0.11 or below installed 
+      (where the Mock.pm was version 1.15 or below), then installing through  
+      the CPAN shell would tell you DBD::Mock was up to date, even though it 
+      wasn't. So in order to fix this issue, and make sure that all those who
+      want to install and update DBD::Mock easily, I changed the version
+      number of DBD::Mock to be 1.23 to reflect the number of updates
+      I have done since Chris handed it over to me. 
+    
+      *sigh*
+    
+      Okay good, thats off my chest now.
+
+0.18 Wed Jan 5 2005
+    - added reset() method to the 
+      DBD::Mock::StatementTrack::Iterator object
+        - added test and docs for this
+        
+    - added the DBD::Mock::Session object and added
+      the support for it in the DBD::Mock driver
+        - added tests and docs for this
+        - Thanks to Rob Kinyon and Chris Winters for 
+          their feedback on this feature
+
+    - some general POD cleanup and formatting
+
+0.17 Thurs Nov 4 2004
+    - added the following items:
+        - a 'mock_num_rows' attribute which will give you 
+          the number of records affected/returned by the
+          last statement
+        - a num_rows method in the DBD::Mock::StatementTrack 
+          object, which is where the above attribute gets it's
+          value
+    - added the 'rows' method for statement handles (which didnt
+      work before)
+
+0.16 Sat Oct 30 2004
+    - minor change to the DBD::Mock::StatementTrack::Iterator
+      behavior. It no longer derefs the history array, so it
+      maintains a reference to it and therefore can be used like
+      this:
+          get-statement-iterator
+          run-query
+          check-next-statement-in-iterator
+          run-query          
+          check-next-statement-in-iterator
+          ...
+      This prevents the need to re-fetch the iterator after 
+      each query. 
+
+0.15 Fri Oct 29 2004
+    - added the DBD::Mock::StatementTrack::Iterator
+      object which can be accessed from the 
+      'mock_all_history_iterator' attribute. 
+        - write the docs and test for it
+
+0.14 Fri Oct 29 2004
+    - added the mock_last_insert_id attribute
+      which will get incremented upon each INSERT
+      query run. 
+        - added tests and docs for this
+    - added the mock_start_insert_id attirbute
+      so that you can both reset and set the start
+      number for mock_last_insert_id
+        - added tests and docs for this
+        
+    ** EXPERIMENTAL FEATURE (use caution) **
+    - added a feature to alias attributes. Basically it
+      allows you to alias an expected attribute like 
+      'mysql_insertid' to something DBD::Mock already has
+      like 'mock_last_insert_id'. 
+      Right now this feature is highly experimental, and 
+      has been added as a first attempt automatically handle
+      some of the DBD specific attributes which are commonly
+      used/accessed in DBI programming. 
+
+0.13 Thurs Oct 28 2004
+    - added prepare_cached as suggested by Rob Kinyon 
+      in RT bug #7331. Also added his test script in
+      15_prepare_cached.t
+
+0.12 Thurs Sept 2 2004
+** First version maintained by Stevan Little <stevan@iinteractive.com> **
+    - built up the test suite to 89.7% coverage
+    - removed the undocumented 'mock_auto_commit' since it really
+      was not very useful at this point.
+    - added the DBD::Mock::Pool functionality
+        - added tests for this
+        - added documentation for this
+    - added pod.t to test suite
+    - removed AUTOLOAD in DBD::Mock::StatementTrack and replaced it with
+      hand coded methods (sorry I really dislike AUTOLOAD)
+    - centralized error handling in DBD::Mock::_error_handler
+
+0.11  Fri Jul 23 10:35:13 EDT 2004
+
+      - Fix CPAN Bug #7057: add a no-op 'disconnect_all()' to
+      DBD::Mock::dr to support DBI versions earlier than 1.34.
+
+      - Add the ability to create SQL parsers that get fired on a
+      prepare(). This way you can ensure your application generates
+      correct SQL and have the system fail at the right time. Thanks
+      to Rob Kinyon <Rob.Kinyon@progressive-medical.com> for the idea.
+
+0.10  Sat May  8 14:12:39 EDT 2004
+
+      - Incorporate number of patches from Stevan Little to implement
+      'mock_can_connect', which allows you to simulate a downed
+      database. Add supporting tests for database and statement usage.
+
+      - Add the ability for 'mock_add_resultset' to associate a
+      resultset with a particular SQL statement. Thanks to Stevan for
+      the idea.
+
+      - Add documentation for database handle property
+      'mock_add_resultset'
+
+0.02  Tue Mar  9 12:56:54 EST 2004
+
+      Add 'VERSION' to MANIFEST, thanks to Mike Castle for the note.
+
+0.01  Sun Mar  7 23:24:24 EST 2004
+
+      Initial version spawned from DBD::NullP shipped with the
+      DBI. Many thanks much to Tim Bunce for the pointer and the
+      original code.
+

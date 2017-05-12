@@ -1,0 +1,13 @@
+Revision history for Devel-RemoteTrace
+
+0.3	2009-04-20
+	Bug: Any tracing would clear $!. Localize it.	
+    Rewrote documentation in 'perldebguts by example'-style
+
+0.2	2009-04-15
+	Added compilation tracing
+	Added :trace argument to enable tracing from the start
+	Code improvements
+
+0.1	2009-04-08
+	Initial release

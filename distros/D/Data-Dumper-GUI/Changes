@@ -1,0 +1,53 @@
+Data-Dumper-GUI
+===============
+
+Created:      2013-07-09
+Home page:    <https://metacpan.org/release/Data-Dumper-GUI>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Data-Dumper-GUI>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.006	2013-09-30
+
+ [ Documentation ]
+ - Include image in documentation.
+
+ [ Packaging ]
+ - Use Dist::Inkt.
+
+ [ Other ]
+ - Updated: Use Exporter::Tiny instead of Exporter::TypeTiny.
+
+0.005	2013-07-12
+
+ - Switch off index section in PodView.
+   Dmitry Karasik++
+   <https://github.com/dk/Prima/commit/ba12aa0ba61d8f8b11f2c0834447cfed5288
+   9309>
+
+0.004	2013-07-11
+
+ - Make window resizable, and allow the split between the two panels to be
+   dragged across.
+   Dmitry Karasik++
+   <https://github.com/tobyink/p5-data-dumper-gui/pull/1>
+ - Remove useless [-] icons from leaf nodes in outline.
+   Dmitry Karasik++
+   <https://github.com/tobyink/p5-data-dumper-gui/pull/1>
+
+0.003	2013-07-10
+
+ [ Bug Fixes ]
+ - Array indices count from $[, not 1.
+ - Quote hash keys when necessary.
+
+ [ Other ]
+ - Added: Include size of references using Devel::Size.
+ - Added: Show key count for hashes, and bucket count.
+ - Added: Show length of arrays.
+ - Dereference SCALAR refs in outline.
+
+0.002	2013-07-09
+
+ - Added: Reply::Plugin::ddGUI
+
+0.001	2013-07-09	Initial release

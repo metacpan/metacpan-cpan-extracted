@@ -1,0 +1,31 @@
+Revision history for Dancer-Template-Handlebars
+
+0.2.2 2016-02-27
+  - Use Module::Runtime for less bare-bone namespace juggling.
+
+  [ BUG FIXES ]
+    - Fixing pod error as reported by CPANTS. (GH#3, Mohammad S Anwar)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 42 insertions(+), 24 deletions(-)
+
+0.2.1 2014-03-25
+  [ BUG FIXES ]
+    - deleting the config key was causing problem when the template object
+      was re-created (GH#2, reported by mtths).
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 30 insertions(+), 18 deletions(-)
+
+0.2.0 2014-03-15
+  [ ENHANCEMENTS ]
+    - Now support layouts!
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 103 insertions(+), 1 deletion(-)
+
+0.1.0 2014-03-14
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 335 insertions(+), 1 deletion(-)

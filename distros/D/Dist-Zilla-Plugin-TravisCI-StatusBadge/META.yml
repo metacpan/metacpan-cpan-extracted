@@ -1,0 +1,51 @@
+---
+abstract: 'Get Travis CI status badge for your markdown README'
+author:
+  - 'Anton Gerasimov <chim@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Exception: '0.32'
+  Test::More: '0'
+  Test::Pod: '1.41'
+  Test::Spec: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-TravisCI-StatusBadge
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::TravisCI::StatusBadge:
+    file: lib/Dist/Zilla/Plugin/TravisCI/StatusBadge.pm
+    version: '0.006'
+requires:
+  Dist::Zilla: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.008009'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-TravisCI-StatusBadge
+  repository: https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge.git
+version: '0.006'
+x_authority: cpan:CHIM

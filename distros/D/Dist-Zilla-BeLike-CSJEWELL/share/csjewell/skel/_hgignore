@@ -1,0 +1,14 @@
+{{$dist->name}}*
+blib
+.build
+_build
+Build.bat
+glob:Build
+LICENSE
+README
+glob:MANIFEST
+Makefile.PL
+META.yml
+MYMETA.yml
+glob:*.bak
+

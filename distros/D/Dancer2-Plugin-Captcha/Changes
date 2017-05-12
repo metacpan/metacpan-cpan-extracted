@@ -1,0 +1,42 @@
+Revision history for Dancer2::Plugin::Captcha
+
+0.11  Mon Apr 24 14:50:00 2017
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.10  Sat Apr 22 12:40:00 2017
+      - Added key 'provides' to the Makefile.PL script.
+
+0.09  Fri Apr 21 11:00:00 2017
+      - Fixed error "Can't call method "cookies" on an undefined value".
+      - Updated copyright year information.
+
+0.08  Sat Jan 23 00:50:00 2016
+      - Merged in GitHub PR #1, thanks to SysPete.
+      - Added test script t/captcha.t to the MANIFEST file.
+
+0.07  Mon Apr 06 11:55:00 2015
+      - Fixed (hopefully) the bizarre error reported by CPAN Tester as below:
+        # Failed test 'use Dancer2::Plugin::Captcha;'
+        # at t/00-load.t line 8.
+        # Tried to use 'Dancer2::Plugin::Captcha'.
+        # Error:  Bad name after heck_captcha' at /usr/home/eserte/.cpan/build/Dancer2-Plugin-Captcha-0.06-oXYDGf/blib/lib/Dancer2/Plugin/Captcha.pm line 224.
+
+0.06  Sun Apr 05 02:50:00 2015
+      - Added sample template to the section "SYNOPSIS".
+
+0.05  Sat Apr 04 12:40:00 2015
+      - Added section "ACKNOWLEDGEMENTS" to the pod document.
+
+0.04  Sat Apr 04 12:25:00 2015
+      - Some cpantester tests were failing because they were running against a
+        too old version of Dancer2.
+
+0.03  Fri Apr 03 11:50:00 2015
+      - Updated pod document with regards to requirement of session engine.
+      - Added description for key 'density' and 'maximum_dots' of method 'particle'.
+
+0.02  Thu Apr 02 22:20:00 2015
+      - Tidied up pod document.
+
+0.01  Thu Apr 02 19:00:00 2015
+      - Module Created.

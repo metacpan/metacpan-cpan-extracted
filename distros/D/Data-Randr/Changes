@@ -1,0 +1,15 @@
+Revision history for Perl extension Data::Randr
+
+0.04    Fri Jan  8 14:20:28 JST 2016
+        - fix misspelling
+
+0.03    Fri Jan  8 13:59:08 JST 2016
+        - fix POD
+
+0.02    Fri Jan  8 13:28:56 JST 2016
+        - set the default rate number(no more required)
+        - fix POD
+        - fix test(omit default number)
+
+0.01    Thu Jan 7 19:0:51 JST 2016
+        - original version

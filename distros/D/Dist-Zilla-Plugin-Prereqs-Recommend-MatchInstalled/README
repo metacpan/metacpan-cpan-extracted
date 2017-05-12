@@ -1,0 +1,39 @@
+Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled
+
+The "[Prereqs::Recommend::MatchInstalled]" is a tool for authors who
+wish to keep end users informed of which versions of critical
+dependencies the author has themselves used, as an encouragement for the
+users to consume at least that version, but without making it a hard
+requirement.
+
+In practice this can be used for anything, but this modules author
+currently recommends you restrict this approach only to development
+dependencies, *mostly* because even a system of auto-recommendation is
+still too aggressive for most modules, or if you insist this concept on
+"CPAN", use something with "but not larger than" mechanics like
+"[Prereqs::Upgrade]"
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

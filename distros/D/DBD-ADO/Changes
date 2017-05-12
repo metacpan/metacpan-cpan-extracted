@@ -1,0 +1,408 @@
+2011-03-22  2.99
+
+  Patch to remove annoying warnings during global destruction,
+  with tests, from Rafael Kitover.
+
+  Implemented more_results().
+  Added tests (t/26more.t).
+
+  Small change to table_info(): no need for client-side cursors.
+
+2011-02-04  2.98
+
+  Fixed a 'Missing argument in sprintf at DBD/ADO/GetInfo.pm line 13'.
+
+  Patch for supporting cygwin in Makefile.PL from Rafael Kitover.
+
+  Added a workaround for ADO Providers that don't accept a parameter size 0,
+  spotted by Jeff Picklyk.
+  Added test (12bind.t).
+
+  Added the CLONE special subroutine, spotted by Jeff Picklyk.
+
+2009-03-22  2.97
+
+  Added tests for bind_param_inout() (t/28sp.t).
+
+  Patch for supporting bind_param_inout() from Peter Mei.
+
+2006-12-17  2.96
+
+  Implemented statistics_info().
+  Added tests (t/45ddst.t).
+
+  Fixed bug: Application uses a value of the wrong type for the current
+  operation, reported by amonotod.
+
+  Fixed bug: Can't use string ("3") as a HASH ref while "strict refs"
+  in use at ADO.pm line 1022, reported by John Derrick.
+
+  Added support for the adExecuteStream option thanks to Luke Bakken.
+
+2005-12-04  2.95
+
+  Changed bind_param() to use an optional ado_size attribute.
+  This is a workaround for the SQLOLEDB bug documented earlier.
+
+  Replaced global error variables with handle attributes.
+
+2005-01-30  2.94
+
+  Reworked db/st handle attributes:
+  - fetching all the data of a SELECT sets Active off
+  - dropped the RowsInCache attribute (ADO doesn't provide this
+    information and it was confused with RowCacheSize anyway)
+  - added support for the RowCacheSize attribute
+  - dropped the User attribute
+  - deprecated CursorType, Filter, ADO_Columns, Trim_Catalog
+    (use the corresponding ado_* attributes)
+  - added ado_ConnectionTimeout and ado_Mode to avoid the abuse of the
+    ConnectionString
+
+  Renamed ADOTEST to DBD_TEST.
+
+2004-10-17  2.93
+
+  Implemented do().
+
+  Changed $sth->DESTROY to call finish( $sth ) instead of $sth->finish.
+  The old call caused clearing of errors e.g. in $dbh->do().
+
+  Replaced duplicated code in disconnect() with a call to rollback().
+
+  Minor changes to db/st handle attributes.
+
+  Minor changes to table_info()'s parameter handling.
+
+  Modified tests (t/19misc.t, t/25curs.t) to use bind_param().
+
+  Added INSERT tests (t/12ins_b.t, t/12ins_q.t).
+
+  Documented a SQLOLEDB bug, reported by Vahe Sarkissian.
+
+2004-09-19  2.92
+
+  Enabled and reimplemented LOB tests (t/27lob.t, t/19misc.t).
+
+  Added support for LongReadLen/LongTruncOk.
+
+  Minor changes to the STORE() methods.
+
+  Moved more datatype related stuff into DBD::ADO::TypeInfo.
+
+  Implemented some timeout tests (t/29timeout.t).
+
+  Changed a test in t/14rows.t due to an API change in
+  Test::More 0.34 (is()'s undef/'' handling).
+
+  Removed the $sth->{BadAttributeHere} test from t/21sth.t,
+  because getting/setting an invalid attribute no longer is
+  a fatal error in DBI 1.43.
+
+2004-05-02  2.91
+
+  Adjusted the trace levels in trace_msg().
+
+  Removed disconnect_all().
+
+2004-03-21  2.90
+
+  Changed default for $dbh->{ado_ti_ver} to 2.
+
+2004-02-15  2.89
+
+  Added an alternative implementation for type_info_all(), which is
+  enabled if $dbh->{ado_ti_ver} == 2.
+
+2004-02-08  2.88
+
+  Removed $dbh->{ado_provider_auto_commit_comments} and renamed
+  $dbh->{ado_provider_support_auto_commit} to $dbh->{ado_txn_capable}.
+
+  Changed $dbh->FETCH to handle only 'ado_'-attributes.
+
+  Replaced duplicated code in DESTROY() with a call to finish().
+
+2004-02-01  2.87
+
+  Fixed a bug when fetching data from a result set with non-unique
+  column names, reported by Ed Belisle.
+
+  Removed DBD::ADO::dr::DESTROY.
+
+2004-01-25  2.86
+
+  Added support for $sth->{ParamValues}.
+
+  Added attribute $h->{ado_max_errors} to avoid time-consuming processing
+  of huge error collections, suggested by Peter Hircock.
+
+  Removed private attributes from database and statement handles.
+
+2004-01-18  2.85
+
+  Improved error handling to avoid problems with success/informational
+  messages, reported by Ed Belisle and Peter Hircock.
+  These 'success with information' conditions no longer trigger the normal
+  DBI error handling mechanisms.
+
+2004-01-11  2.84
+
+  Reimplemented NULL tests (t/23null.t).
+
+  Fixed a DBD::Proxy related bug, reported by Peter Hircock.
+  The execute() method returned a Win32::OLE::Variant object which
+  couldn't be restored at the client w/o Win32::OLE.
+
+2003-12-14  2.83
+
+  Added notes about Unicode support thanks to Stefan Ram and Jan Dubois.
+
+  Rearranged some tests.
+
+  Installed ADO-specific method ado_open_schema().
+
+2003-12-07  2.82
+
+  Replaced duplicated code in DESTROY() with a call to disconnect().
+
+  Removed the deprecated Enums() method from DBD::ADO::TypeInfo.
+
+  Added t/02ads.t to test data_sources() (and removed a similar test
+  from t/02simple.t).
+
+  Removed type_info() tests from t/17conn.t.
+
+2003-11-30  2.81
+
+  Fixed Makefile.PL to work with strict 1.03 (perl 5.8.1.),
+  reported by Eric Thinnes.
+
+  Added ping().
+  Added tests for ping() to t/02cxn.t.
+  Removed ping() tests from t/15func.t.
+
+  Fixed connect() to set 'Active' on.
+  Added a test for the 'Active' flag to t/02cxn.t
+
+  Moved OpenSchema() tests from t/11curs.t into t/04os.t.
+
+2003-11-23  2.80
+
+  Fixed a bug affecting OpenSchema (first row was fetched twice).
+
+  Improved the type handling of bind_param().
+
+2003-11-16  2.79
+
+  Added t/51qi.t to test quoted identifiers (and removed similar
+  tests from t/15func.t).
+
+  Added t/07q.t to test quoted values (and removed similar tests
+  from t/15func.t).
+
+  Completed the Win32::OLE::Const to DBD::ADO::Const transition.
+
+2003-11-09  2.78
+
+  Modified t/09bind.t to use Test::More.
+
+  Added data_sources().
+
+  Moved some datatype related stuff into DBD::ADO::TypeInfo.
+
+  Win32::OLE::Const is no longer being used (in favor of DBD::ADO::Const).
+
+2003-11-02  2.77
+
+  Added DBD::ADO::Const.
+
+  Moved metadata tests into t/4?dd*.t.
+
+  Fixed significant bug (missing first row after reexecute) and
+  added t/12count.t to test row counts.
+
+  Fixed return code of commit(), rollback() and disconnect().
+
+  Fixed warning 'Use of uninitialized value in hash element' at
+  DBI.pm line 1799.
+
+2003-10-26  2.76
+
+  Dropped auto-commit emulation (relying on ADO's default behavior
+  instead).
+  Fixed errors like 'Command cannot be issued within a transaction'.
+  Improved transaction handling (begin_work).
+
+  Added t/31txn.t to test transactions / auto-commit.
+
+  Added t/02cxn.t to test a connection.
+
+2003-10-19  2.75
+
+  Improved error handling.
+
+  Moved get_info() tests from t/15func.t into t/05gi.t and
+  added diagnosis output.
+
+2003-10-12  2.74
+
+  Improved prepare/bind_param/execute for providers which
+  fail to parse placeholders correctly.
+
+  Modified t/05meth.t to use Test::More.
+
+  Rearranged some tests.
+
+2003-10-05  2.73
+
+  Modified t/17conn.t to avoid an error message on stderr.
+
+  Fixed an error in the creation of the $sth->{TYPE} array.
+
+  Fixed the error ' does not exist in hash', reported by Michael
+  Blackmore.
+  The regexp didn't take into account that FoxPro type names
+  consist of only one letter.
+
+  Dropped a test in t/23warn.t (and added it to the TODO list).
+
+  Fixed warning 'Use of uninitialized value in numeric ne (!=)' at
+  t/15func.t line 233 and 275.
+
+  Fixed warning 'Use of uninitialized value in concatenation (.)
+  or string' at t/15func.t line 102, 110 and 121.
+
+  Fixed warning 'Use of uninitialized value in join or string' at
+  t/15func.t line 242.
+
+  Modified t/01base.t to use Test::More.
+
+  Fixed warning 'unexpected =item directive in paragraph 292' at
+  lib/DBD/ADO.pm line 2301.
+
+2003-09-03  2.72
+
+  Moved DBD::ADO::TypeInfo from DBD/ADO.pm to DBD/ADO/TypeInfo.pm.
+
+  Fixed number of tests at t/15func.t.
+
+  Fixed warning 'Use of uninitialized value in string eq' at
+  t/02simple.t line 54.
+
+2003-08-31  2.71
+
+  New maintainer: Steffen Goeldner <sgoeldner@cpan.org>.
+
+2003-08-22  2.70
+
+  Bug fix from Yimin Zheng regarding undef/null values passed as
+  parameters to bind_param and/or execute. Thanks Yimin.
+
+  Enhancement to Meta Data support from Steffen Goeldner.
+
+  Modified all tests to skip if DBI_DSN is not defined. This should
+  allow the automatic CPAN build at ActiveState to create a PPM for
+  DBD::ADO.
+
+  Did minor clean up in the test and warning messages for uninitialized
+  values.
+
+2002-11-09  2.60
+
+  So what happened to the notes for 2.6?
+
+2002-04-14  2.50
+
+  Bug fix from Jacqui Caren <jacqui.caren@ig.co.uk>, apply to bind image.
+
+  Meta Data support from Steffen Goeldner, includes:
+    get_info
+    table_info (improved)
+    column_info
+    primary_key_info
+    foreign_key_info
+    ADO to ODBC type conversions (improved).
+
+  Package DBD::ADO::TypeInfo from Steffen Goeldner, however
+  none of the current code is using this package, yet.
+
+  Remove temp constants needed until DBI support SQL_* values.
+
+  Added more tests.
+
+2001-10-24  2.40
+
+  Patch for supporting primary_key_info from Steffen Goeldner.
+
+  Fixed bug in function call to openschema thanks to Steffen Goeldner.
+
+  Added support for CursorType.
+
+  Fixed error messages to return more meaningful numbers.
+
+  Fixed Nullable attribute.
+
+  Added more documentation.
+
+  Modified most of the tests to use Test::More.
+
+2001-05-29  2.10
+
+  First CPAN release apart from DBI.
+
+  Version number correction.
+
+  Patch from Simon Oliver: Warning messages from undefined values.
+
+  New maintainer: Thomas Lowery
+
+-------------------------------------------------------------------------------
+
+2001-08-24  1.20
+
+  Removed (unbundled) DBD::ADO from the DBI distribution.
+
+2001-05-29  1.16
+
+  Improvements in error handling from Thomas Lowery.
+
+2001-03-30  1.15
+
+  Many enhancements thanks to Thomas Lowery.
+
+2000-06-11  1.14
+
+  Added table_info() thanks to Thomas Lowery.
+
+  Improved type_info_all() thanks to Thomas Lowery.
+
+1999-07-12  1.13
+
+  Improved data fetch performance.
+
+  Added GetTypeInfo() thanks to Thomas Lowery.
+
+1999-06-29  1.12
+
+  Fixed significant bug (fetch skipped first row).
+
+1999-06-17  1.11
+
+  Fixed missing namespace (qualified Variant() with Win32::OLE).
+
+1999-05-26  1.09
+
+  Added variable to precompute VT_I4 | VT_BYREF.
+
+1999-05-13  1.08
+
+  Many enhancements thanks to Phlip and others.
+
+1999-01-04  1.05
+
+  Improved connect() thanks to Phlip.
+
+1999-01-01  1.03
+
+  First (very experimental) public release as part of DBI.

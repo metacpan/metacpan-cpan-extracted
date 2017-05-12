@@ -1,0 +1,23 @@
+Changes
+lib/Date/PeriodParser.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01now.t
+t/02recent.t
+t/03sometime.t
+t/04leeway.t
+t/05point.t
+t/06ago.t
+t/07junk.t
+t/08now.t
+t/09vague.t
+t/10zones.t
+t/helpers.pl
+t/month-year.t
+t/pod-coverage.t
+t/pod.t
+t/this-month.t
+t/this-week.t
+META.json                                Module JSON meta-data (added by MakeMaker)

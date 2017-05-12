@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '2',
+                                      'Dist::Zilla::Plugin::PodWeaver' => '0',
+                                      'Dist::Zilla::Role::FileGatherer' => '0',
+                                      'Dist::Zilla::Role::PrereqSource' => '0',
+                                      'Moose' => '0',
+                                      'Pod::Elemental' => '0',
+                                      'Pod::Elemental::Selectors' => '0',
+                                      'Pod::Elemental::Transformer::Nester' => '0',
+                                      'Pod::Weaver' => '3',
+                                      'Pod::Weaver::Role::Dialect' => '0',
+                                      'Pod::Weaver::Role::Section' => '0',
+                                      'Test::More' => '0.96',
+                                      'namespace::autoclean' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

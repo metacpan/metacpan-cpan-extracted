@@ -1,0 +1,116 @@
+Revision history for Dancer2-Plugin-REST
+
+1.01 2016-08-25
+  - use the HTTP codes from Dancer2::Core::HTTP
+  - add numerical status_XXX helpers.
+
+  [ STATISTICS ]
+    - code churn: 7 files changed, 243 insertions(+), 128 deletions(-)
+
+1.00 2016-08-24
+  [ API CHANGES ]
+    - Refactor code to use the new Dancer2::Plugin system.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 64 insertions(+), 54 deletions(-)
+
+0.27 2015-12-29
+  - Make changes to the module so that it's compatible with the upcoming
+    backward-compatible release. (GH#12, Peter Mottram)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 75 insertions(+), 67 deletions(-)
+
+0.26 2015-10-15
+  [ BUG FIXES ]
+    - Set serializer to 'undef' if no format is provided.  (GH#9, Marco
+      Masetti, Emil Nicolaie Perhinschi )
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 154 insertions(+), 15 deletions(-)
+
+0.25 2014-11-01
+  [ BUG FIXES ]
+    - Change tests to use Pack::Test instead of the deprecated
+      Dancer2::Test. (GH#3, Davs)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 62 insertions(+), 41 deletions(-)
+
+0.24 2014-09-01
+  [ MISC ]
+    - D2 v1.150000 is out, turn v0.23_00 into general availability release.
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 9 insertions(+), 3 deletions(-)
+
+0.23_00 2014-08-13
+  [ MISC ]
+    - Compatibility with Dancer2's v0.149000_01 changes.
+
+  [ STATISTICS ]
+    - code churn: 2 files changed, 61 insertions(+), 62 deletions(-)
+
+0.22 2014-06-05
+  [ BUG FIXES ]
+    - Fix tests (and code itself) to work with Dancer2 v0.140001. (GH#2,
+      veryrusty, Yanick Champoux)
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 272 insertions(+), 302 deletions(-)
+
+0.21 2013-12-07
+  [ BUG FIXES ]
+    - Auto-serialization was done on the *next* request.
+
+0.20 2013-10-03
+  [ BUG FIXES ]
+    - Make the plugin Dancer2 v0.10 compatible. (GH#4, jbolila)
+
+0.12 2013-07-06
+  [ BUG FIXES ]
+    - Still a few issues with the versions in test.
+
+0.11 2013-07-03
+  [ BUG FIXES ]
+    - Test was checking for wrong version of Dancer2.
+
+0.10 2013-07-03
+  - Support routes that use named-captures.
+  - Documented serializers configuration.
+
+0.09 2013-02-25
+  - Fix to work with Moo v1.000007
+
+0.08 2013-02-24
+  - Fork for Dancer2
+
+0.07 2011-11-01
+  - Minor updates to fix warnings with Dancer 1.3080
+  - Fix POD
+  - (Alexis Sukrieh)
+
+0.06 2011-05-28
+  [ TEST SUITE ]
+    - Skip test t/03_resource.t if Dancer is not >= 1.3059_01 A bug in
+      Dancer::Test in previous versions prevent the test from passing.
+
+0.05 2011-03-04
+  [ Alexis Sukrieh ]
+    - Add all HTTP response status
+    - Version 0.03
+
+  [ BUG FIXES ]
+    - Fix the test suite with dancer_response
+    - Fix dependencies: Dancer 1.3014
+    - Version 0.04
+
+  [ Franck Cuny ]
+    - New keywords for ReST response status  (status_ok, status_created,
+      ...)
+    - Version 0.02 * 100% coverage * fix a bug in 'resource' (order of
+      route hander definition)
+    - Version 0.0001_01 * Support for prepare_serializer_for_format keyword
+      automatically set a serializer according to params->{format} *
+      Support for resource definition When a resource is defined a set of
+      routes are defined in a RESTful manner.

@@ -1,0 +1,47 @@
+Data is of the form;
+
+[
+  {
+    column => value,
+  },
+  {
+    column => value,
+  },
+]
+
+A filter is of the form;
+
+[
+  op,
+  column,
+  value,
+  ( value2, value3, ... ),
+]
+
+or, more complex;
+
+[
+  OP_AND,
+  [
+    (see above),
+  ],
+  [
+  ],
+],
+
+or, possibly;
+
+[
+  OP_AND,
+  [
+    OP_NOT,
+    [
+      OP_EQ,
+      column,
+      value,
+    ],
+  ],
+  [
+    # ...
+  ],
+]

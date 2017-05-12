@@ -1,0 +1,43 @@
+DBIx-Class-InflateColumn-Markup-Unified
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Class::InflateColumn::Markup::Unified
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-InflateColumn-Markup-Unified
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Class-InflateColumn-Markup-Unified
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Class-InflateColumn-Markup-Unified
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-Class-InflateColumn-Markup-Unified/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Ido Perlmuter
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

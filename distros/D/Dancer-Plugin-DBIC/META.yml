@@ -1,0 +1,45 @@
+---
+abstract: 'DBIx::Class interface for Dancer applications'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+  - 'Naveed Massjouni <naveed@vt.edu>'
+build_requires:
+  DBD::SQLite: 0
+  DBI: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  Dancer: 1.3098
+  Dancer::Test: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Load::Conditional: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Requires: 0
+  base: 0
+  lib: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-DBIC
+recommends:
+  DBIx::Class::Schema::Loader: 0.07002
+requires:
+  DBICx::Sugar: 0
+  Dancer: 1.3098
+  Dancer::Plugin: 0
+  strict: 0
+  utf8: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/ironcamel/Dancer-Plugin-DBIC/issues
+  repository: git://github.com/ironcamel/Dancer-Plugin-DBIC.git
+version: 0.2104

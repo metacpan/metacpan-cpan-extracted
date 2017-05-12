@@ -1,0 +1,71 @@
+# NAME
+
+Dist::Zilla::Plugin::ChangelogFromGit::Debian - Debian formatter for Changelogs
+
+# VERSION
+
+version 0.10
+
+# SYNOPSIS
+
+    #    [ChangelogFromGit::Debian]
+    #    max_age = 365
+    #    tag_regexp = ^\d+\.\d+$
+    #    file_name = debian/changelog
+    #    wrap_column = 72
+    #    dist_name = squeeze # defaults to stable
+    #    package_name = my-package # defaults to lc($self->zilla->name)
+
+# DESCRIPTION
+
+Dist::Zilla::Plugin::ChangelogFromGit::Debian extends
+[Dist::Zilla::Plugin::ChangelogFromGit](https://metacpan.org/pod/Dist::Zilla::Plugin::ChangelogFromGit) to create changelogs acceptable
+for Debian packages.
+
+## \_build\_id
+
+Build identifier for this package.
+
+Default value: $ENV{'BUILD\_ID'} // 0.
+
+# ATTRIBUTES
+
+## allow\_empty\_head
+
+If true then an empty head is allowed. Since this module converts head to
+the current dzil version, this might be useful to you for some reason.
+
+Default value: TRUE.
+
+## dist\_name
+
+The distribution name for this package.
+
+Default value: 'stable'.
+
+## maintainer\_email
+
+The maintainer email for this package.
+
+Default value: $ENV{'DEBEMAIL'} // 'cpan@example.com'.
+
+## maintainer\_name
+
+The maintainer name for this package.
+
+Default value: $ENV{'DEBFULLNAME'} // 'CPAN Author'.
+
+## package\_name
+
+The package name for this package.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

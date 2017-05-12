@@ -1,0 +1,50 @@
+---
+abstract: 'Release tests for unused variables'
+author:
+  - 'Marcel Grünauer <marcel@cpan.org>'
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  List::Util: '0'
+  Module::Build: '0.28'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+  autodie: '0'
+  perl: '5.008'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-UnusedVars
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Data::Section: '0'
+  Dist::Zilla: '4'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Test::More: '0.96'
+  Test::Vars: '0.005'
+  namespace::autoclean: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-Test-UnusedVars/
+  repository: git://github.com/doherty/Dist-Zilla-Plugin-Test-UnusedVars.git
+version: '2.000007'

@@ -1,0 +1,35 @@
+<script>	# cmdb.cgi ext rpt: Start Page
+		# Page Header
+	my $s =$_; exit(0) if !$s;
+	my $form  =$s->{-pcmd}->{-form} ||'';
+	my $class ="Form $form List ${form}__List ListTable";
+	local $s->{-htmlstart} =$s->{-htmlstart};
+	$s->{-htmlstart} ={} if !$s->{-htmlstart};
+	# $s->{-htmlstart}->{-background} ='/icons/cgi-bus/VPO-pale2.gif';
+	$s->output($s->htmlStart());
+	my $ntlm =$s->uguest() ? '' : '/ntlm';
+</script>
+<script>if(0 && ($ENV{HTTP_USER_AGENT}||'') =~/MSIE/){</script>
+<nobr><a href="http://ie.search.msn.com/ru/srchasst/sites.html" target="_self" title="Microsoft Search"><img src="/icons/small/index.gif" border=0>Search</a><nobr></nobr><br />
+<br />
+<script>}else{</script>
+<script>}</script>
+
+<a href="<%$s->urlCmd('',-form=>'start',-cmd=>'frmCall')%>"><img src="/icons/small/comp1.gif" border=0>Start Page</a><br />
+&nbsp;&nbsp;&nbsp;<a href="?_form=notes;_cmd=frmCall" title="Notes datastore">Notes</a><br />
+&nbsp;&nbsp;&nbsp;<a href="?_form=cmdbm;_cmd=frmCall" title="Configuration Management Database"><nobr>CMDB</nobr></a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="?_form=cmdbmh;_cmd=frmCall" title="Configuration Management Database - Hierarchy of items">Hierarchy</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="?_form=cmdbmn;_cmd=frmCall" title="Configuration Management Database - Named items">Names</a><br />
+&nbsp;&nbsp;&nbsp;<a href="?_form=hdesk;_cmd=frmCall" title="Service Desk">Service Desk</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="?_form=hdesk;_cmd=frmCall;_frame=set" title="Service Desk - Frameset View">Frameset View</a><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href="?_form=hdeskc;_cmd=frmCall" title="Service Desk - Classifications">Classifications</a><br />
+<br />
+
+<script>	# Page Footer
+	$s->{-fetched}	=undef;
+	$s->{-affected}	=undef;
+	$s->cgiFooter() if !$s->{-pcmd}->{-print};
+	$s->output($s->htmlEnd());
+	$s->end();
+</script>
+

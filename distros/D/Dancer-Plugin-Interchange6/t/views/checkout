@@ -1,0 +1,3 @@
+cart_subtotal="<% cart_subtotal %>"
+cart_total="<% cart_total %>"
+cart="<% cart %>"

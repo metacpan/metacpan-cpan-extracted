@@ -1,0 +1,192 @@
+=pod
+
+=head1 NAME
+
+Dancer::Plugin::Params::Normalization - A plugin for normalizing query parameters in Dancer.
+
+=head1 SYNOPSYS
+
+In configuration file :
+
+  plugins:
+    Params::Normalization:
+      method: lowercase
+
+In your Dancer App :
+
+  package MyWebService;
+
+  use Dancer;
+  use Dancer::Plugin::Params::Normalization;
+
+  get '/hello' => sub {
+      'Hello ' . params->{name};
+  };
+
+Requests 
+
+  # This will work, as NAME will be lowercased to name
+  curl http://mywebservice/test?NAME=John
+
+=head1 DESCRIPTION
+
+This plugin helps you normalize the query parameters in Dancer.
+
+=head1 CONFIGURATION
+
+The behaviour of this plugin is primarily setup in the configuration file, in
+your main config.yml or environment config file.
+
+  # Example 1 : always lowercase all parameters
+  plugins:
+    Params::Normalization:
+      method: lowercase
+
+  # Example 2 : always uppercase all parameters
+  plugins:
+    Params::Normalization:
+      method: uppercase
+
+  # Example 3 : on-demand uppercase parameters that starts with 'a'
+  plugins:
+    Params::Normalization:
+      general_rule: ondemand
+      method: uppercase
+      params_filter: ^[aA]
+
+Here is a list of configuration fields:
+
+=head2 general_rule
+
+This field specifies if the normalization should always happen, or on demand.
+
+Value can be of:
+
+=over
+
+=item always
+
+Parameters will be normalized behind the scene, automatically.
+
+=item ondemand
+
+Parameters are not normalized by default. The code in the route definition
+needs to call normalize_params to have the parameters normalized
+
+=back
+
+B<Default value>: C<always>
+
+=head2 method
+
+This field specifies what kind of normalization to do.
+
+Value can be of:
+
+=over
+
+=item lowercase
+
+parameters names are lowercased
+
+=item uppercase
+
+parameters names are uppercased
+
+=item ucfirst
+
+parameters names are ucfirst'ed
+
+=item Custom::Class::Name
+
+Used to execute a custom normalization method.
+
+The given class should inherit
+L<Dancer::Plugin::Params::Normalization::Abstract> and implement the method
+C<normalize>. this method takes in argument a hashref of the parameters, and
+returns a hashrefs of the normalized parameters. It can have an C<init> method
+if it requires initialization.
+
+Using a custom normalization is incompatible with C<params_filter> (see below).
+
+=item passthrough
+
+Doesn't do any normalization. Useful to disable the normalization without to
+change the code
+
+=back
+
+B<Default value>: C<passthrough>
+
+=head2 params_types
+
+Optional, used to specify on which parameters types the normalization should
+apply. The value is an array, that can contain any combination of these
+strings:
+
+=over
+
+=item query
+
+If present in the array, the parameters from the query string will be normalized
+
+=item body
+
+If present in the array, the parameters from the request's body will be normalized
+
+=item route
+
+If present in the array, the parameters from the route definition will be normalized
+
+=back
+
+B<Default value>: [ 'query', 'body']
+ 
+=head2 params_filter
+
+Optional, used to filters which parameters the normalization should apply to.
+
+The value is a regexp string that will be evaluated against the parameter names.
+
+=head2 no_conflict_warn
+
+Optional, if set to a true value, the plugin won't issue a warning when parameters name
+conflict happens. See L<PARAMETERS NAMES CONFLICT>.
+
+=head1 KEYWORDS
+
+=head2 normalize
+
+The general usage of this plugin is to enable normalization automatically in the configuration.
+
+However, If the configuration field C<general_rule> is set to C<ondemand>, then
+the normalization doesn't happen automatically. The C<normalize> keyword can
+then be used to normalize the parameters on demand.
+
+All you have to do is add 
+
+  normalize;
+
+to your route code
+
+=head1 PARAMETERS NAMES CONFLICT
+
+if two normalized parameters names clash, a warning is issued. Example, if
+while lowercasing parameters the route receives two params : C<param> and
+C<Param>, they will be both normalized to C<param>, which leads to a conflict.
+You can avoid the warning being issued by adding the configuration key
+C<no_conflict_warn> to a true value.
+
+=head1 LICENCE
+
+This module is released under the same terms as Perl itself.
+
+=head1 AUTHORS
+
+This module has been written by Damien Krotkine <dams@cpan.org>.
+
+=head1 SEE ALSO
+
+L<Dancer>
+
+=cut

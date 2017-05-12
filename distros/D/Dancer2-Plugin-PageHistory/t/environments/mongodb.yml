@@ -1,0 +1,7 @@
+session: MongoDB
+engines:
+    session:
+        MongoDB:
+            database_name: test_dancer2_plugin_page_history
+            client_options:
+                host: mongodb://localhost:27017

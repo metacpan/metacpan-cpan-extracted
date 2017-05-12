@@ -1,0 +1,10 @@
+package Foo;
+
+our %VARS = (
+  dzil_name    => '[% dzil.name    %]',
+  dzil_version => '[% dzil.version %]',
+  foo          => '[% foo %]',
+  bar          => '[% bar %]',
+);
+
+1;

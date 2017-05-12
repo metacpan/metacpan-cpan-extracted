@@ -1,0 +1,42 @@
+Revision history for Perl extension DBIx::Class::DateTime::Epoch.
+
+0.10 2012-10-22
+ - Repackage to fix Module::Install 1.04 issue
+
+0.09 2012-02-01
+ - added a test dependency on DateTime::Format::SQLite (RT #74576)
+ - added some documentation about the installation requirement of an 
+   appropriate DateTime::Format::* module for your RDBMS of choice
+
+0.08 2011-11-21
+ - remove warning in case of datetime column without inflate_datetime
+   (Alexandr Ciornii)
+
+0.07 2011-01-19
+ - fix inflation/deflation routines so that non-epoch datetime columns are
+   handled correctly (woosley)
+
+0.06 2009-01-28
+ - make sure regex for "int" is case insensitive (RT #54053)
+
+0.05 2009-06-01
+ [THING THAT WILL NO LONGER BREAK YOUR CODE]
+ - added back-compat for the "epoch => 1", etc syntax
+
+0.04 2009-05-26
+ [ENHANCEMENTS]
+ - switch to Module::Install
+
+ [THINGS THAT WILL BREAK YOUR CODE]
+ - refactor module to itegrate with InflateColumn::DateTime and TimeStamp.
+   Requires DBIx::Class 0.08103 and DBIx::Class::TimeStamp 0.07. Please
+   read the new documentation.
+
+0.03 2007-04-25
+ - don't override user-supplied values for update()
+
+0.02 2006-07-17
+ - Re-release onto CPAN
+
+0.01 2006-03-22
+ - original version;

@@ -1,0 +1,51 @@
+
+Why the test suite doesn't work.
+--------------------------------
+
+DBD::pNET is in an alpha stage, but the least supported part is definitely
+the test suite. This has two reasons:
+
+  - DBI is still too incomplete. A true test suite would need features
+    which are (from the current view of DBI) not portable, for example
+    finding a nonexisting table where one can work, an abstract table
+    definition or the possibility to retrieve column types. The result
+    is the lack of a true DBI test suite and this is exactly what a
+    portable test suite for DBD::pNET would requite.
+
+  - I do not have the possibility nor the time to try DBD::pNET versus
+    other drivers, sorry.
+
+Thus I'll be glad about anyone who adapts the test suite to work with
+other remote drivers than mysql. To do this you have to know, how the
+test suite works:
+
+  1.) First of all you need a client configuration file. You get one
+      by executing the test "t/00base.t". Try the command
+
+	perl -Iblib/lib -Iblib/arch t/00base.t
+
+      You should modify the variables $test_dsn, $test_user and
+      $test_password in "t/lib.pl" and rerun "t/00base.t" until you
+      think that the file "t/clients" is ok now.
+
+  2.) Next you need a running pNETagent. I have tried to use the concept
+      of the pRPC test suite and start a server from within lib.pl, but
+      it turned out that repeatedly starting and shutting down the server
+      resulted in a lack of stability. So you have to start the server
+      manually. You do this with the command
+
+	./pNETagent --debug --port 3334 --configFile t/clients
+
+  3.) Now you must modify "t/lib.pl" so that it enables all tests, not
+      only "t/00base.t". Look for the "DBI->connect" in "t/lib.pl"
+      where the test suite checks for a running mysql server and
+      change this to a check for your server.
+
+That's all I can help so far. I am ready to assist in case of problems.
+In either case, please modify "t/lib.pl" only (whereever possible) and
+let me know about the results.
+
+
+Thanks,
+
+Jochen

@@ -1,0 +1,117 @@
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+DBIx::EAV::Manual - Users Manual
+
+=head1 WHAT'S EAV?
+
+EAV is a data model where instead of representing each entity using a physical
+table with columns representing its attributes, everything is stored as rows of
+the eav tables. Each entity is stored as a row of the 'entities' table, and each
+of its attributes values are stored as a row of one of the values table. There is
+one value table for each data type.
+
+For a better explanation of what an Entity-Attribute-Value data model is, check
+this L<Wikipedia article|https://en.wikipedia.org/wiki/Entity%E2%80%93attribute%E2%80%93value_model>.
+The specific tables used by this implementation are described in
+L<DBIx::EAV::Schema/TABLES>.
+
+=head1 EAV USE CASES
+
+=head2 When the number of possible attributes is huge
+
+EAV modeling has been used by health and clinical software by decades because the
+number of possible attributes like tests results and diagnostics are huge and
+just a few of those attributes are acctualy filled (non-NULL).
+
+=head2 When you dont't know your schema in advance
+
+E-commerce solutions use EAV modeling to allow the definition of any kind of product
+and still be able to do filtering/sorting of results based of product attributes.
+For example, the entity 'HardDrive' would have atrributes 'capacity' and 'rpm',
+while entity 'Monitor' would have attributes 'resolution' and 'contrast_ratio'.
+
+=head2 To abstract the physical database layer
+
+Many SaaS platforms use EAV modeling to offer database services to its custormers,
+without exposing the physical database system.
+
+=head2 When you need frequent changes to your schema
+
+An open-schema data model can be useful for app prototyping.
+
+=head1 DBIx::EAV CONCEPTS
+
+=head2 EntityType
+
+An L<EntityType|DBIx::EAV::EntityType> is the blueprint of an entity. Like a
+Class in OOP. Each type has  a unique name, one or more attributes and zero or
+more relationships. See L<DBIx::EAV::EntityType>.
+
+=head2 Entity
+
+An actual entity record (of some type) that has its own id and attribute values.
+See L<DBIx::EAV::Entity>.
+
+=head2 Attribute
+
+Attributes are analogous to columns in traditional database modeling. Its the
+actual named properties that describes an entity type. Every attribute has a
+unique name and a data type. Unlike traditional table columns, adding/removing
+attributes to an existing entity type is very easy and cheap.
+
+=head2 Value
+
+The actual attribute data stored in one of the value tables. There is one value
+table for each data type.
+See L</data_types>, L<DBIx::EAV::Schema>.
+
+=head2 ResultSet
+
+Concept borrowed from L<DBIx::Class>, a ResultSet represents a query used for
+fetching a set of entities of a type, as well as other CRUD operations on
+multiple entities.
+
+=head2 Relationships
+
+=head2 Physical Schema
+
+This is the actual database tables used by the EAV system. Its represented by
+L<DBIx::EAV::Schema>.
+
+=head2 EAV Schema
+
+Its the total set of Entity Types registered on the system, which form the
+actual application business model.
+See L</register_types>.
+
+=head2 Cursor
+
+A Cursor is used internally by the ResultSet to prepare, execute and traverse
+through SELECT queries.
+
+
+=head1 RELATIONSHIPS
+
+=head2 has_one
+
+=head2 has_many
+
+=head2 many_to_many
+
+=head1 LICENSE
+
+Copyright (C) Carlos Fernando Avila Gratz.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Carlos Fernando Avila Gratz E<lt>cafe@kreato.com.brE<gt>
+
+=cut

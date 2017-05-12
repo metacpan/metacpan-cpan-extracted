@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 74dc74ac912dec112b7ede6e7951f1978e91f97e AUTHOR_PLEDGE
+SHA1 d6881b9995de25419061db2f230ca46db1aaaf34 Build.PL
+SHA1 c44340c4261113ca19bc948eb72f7e307c907b59 Changes
+SHA1 159ae1cfc51f2025c15fdb1284978b2efa9cfe72 INSTALL
+SHA1 33260abc93b43a44581b0b6263d7e4318f4122bb LICENSE
+SHA1 6334d209a70c93407c52a365191d5737589bf104 MANIFEST
+SHA1 c500f75cd7606c1da7125a232f1f11102619a15c META.json
+SHA1 97a832b059a5aa66f0f1a3854f7bcddfed21828c META.yml
+SHA1 d01c92cc273c6b58847af32f51f57b490ed4ba99 README
+SHA1 e9773784020b28ba33e31a24bcbe0569482c61a4 README.mkdn
+SHA1 97984b4c4e3f6f6154d27853b38ce229f8acf768 lib/Dancer/Template/TemplateDeclare.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 2b9492ed89cb60a1979dc5ccf473df17f2186d1f t/00-load.t
+SHA1 78a1c34fbeb13632b27e84225ad67b9161a070c3 t/01-basic.t
+SHA1 adbeaa54ad26cbe2f2b8c9de6b4383fc1abbe830 t/apps/Foo/Makefile.PL
+SHA1 48bc96d7f0f92280af20542294089a9eee7589cc t/apps/Foo/bin/app.pl
+SHA1 353bd13412142fc1625491f27495214cb5b68305 t/apps/Foo/lib/Foo.pm
+SHA1 a3ac78b6e02abc6b61cc6ff26bc3258b91f96961 t/apps/Foo/lib/TD.pm
+SHA1 65a3587fd665bf5063dd22b35c4ac44610a9ddd1 t/apps/Foo/public/404.html
+SHA1 75e50e254bce4d608656d831d493d93c50b187cf t/apps/Foo/public/500.html
+SHA1 36b2401eb7cad2fb4c394205563ae973243480c4 t/apps/Foo/public/css/error.css
+SHA1 1fddd8bf080c4e51e08fe6e5115c13e58f388699 t/apps/Foo/public/css/style.css
+SHA1 0ab12e8a2cb6caa6a96890f921202296a4228305 t/apps/Foo/public/dispatch.cgi
+SHA1 ee989b7cc5adf812098091213cf982cb37daa7b8 t/apps/Foo/public/dispatch.fcgi
+SHA1 4a33a888ddee8c80739d44a0000be7273e6ae341 t/apps/Foo/public/favicon.ico
+SHA1 6b8e8e4e625e8172c8b9636ce5ec9e219559f987 t/apps/Foo/public/images/perldancer-bg.jpg
+SHA1 bb05c1554e2e5aff4a8ae8b37ea0109f5960cdf3 t/apps/Foo/public/images/perldancer.jpg
+SHA1 65cbff4e9d95d47a6f31d96ab4ea361c1f538a7b t/apps/Foo/public/javascripts/jquery.js
+SHA1 b6721bb8d1ab661336bf4c95b10400df7465f49b t/apps/Foo/views/index.m
+SHA1 32d77a4bd3216bb1423b83d1f18a5229a4490908 t/basic_app.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlAPLMIACgkQ34Hwf+GwC4yKDQCeLlIag5qcgJ68WiFMMyPLVb3/
+Cs0AnAqeElMaIyAU7iUP344qvIXKgRoV
+=6x5w
+-----END PGP SIGNATURE-----

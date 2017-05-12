@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-PluginBundle-Author-XENO
+
+0.001007  2015-02-11
+	- use Dist::Zilla::Plugin::ReadmeAnyFromPod GH #1 (ETHER)
+
+0.001006  2015-02-10
+	- add Test::EOL
+
+0.001005  2015-02-10
+	- use Dist::Zilla::Plugin::Git::Contributors fix deps
+
+0.001004  2015-02-08
+	- use Dist::Zilla::Plugin::Git::Contributors
+
+0.001003  2014-03-05
+	- add InstallRelease as prereq
+
+0.001002  2014-03-05
+	- NextRelease
+	- MetaNoIndex
+	- AutoMetaResources
+
+0.001001  2014-03-04
+	- don't use RELEASE_TESTING, dzil is inconsistent with application timing
+	- add Git::NextVersion
+
+0.001000  2014-02-28
+	- initial release

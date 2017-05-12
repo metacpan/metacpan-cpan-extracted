@@ -1,0 +1,83 @@
+{
+   "abstract" : "extensible authentication framework for Dancer2 apps",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Auth-Extensible",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime" : "0",
+            "File::ShareDir::Install" : "0.06",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "Path::Tiny" : "0.016",
+            "Plack::Test" : "0",
+            "Test::Deep" : "0.114",
+            "Test::Exception" : "0",
+            "Test::MockDateTime" : "0",
+            "Test::More" : "0",
+            "Test::Warnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Crypt::SaltedHash" : "0",
+            "Dancer2" : "0.204000",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::FileUtils" : "0",
+            "Dancer2::Plugin" : "0",
+            "Dancer2::Template::Tiny" : "0",
+            "File::Share" : "0",
+            "HTTP::BrowserDetect" : "0",
+            "List::Util" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2.000000",
+            "Moo::Role" : "0",
+            "Plack" : "1.0029",
+            "Scalar::Util" : "0",
+            "Session::Token" : "0",
+            "Try::Tiny" : "0",
+            "URI::Escape" : "0",
+            "YAML" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible/",
+      "repository" : {
+         "url" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.704",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

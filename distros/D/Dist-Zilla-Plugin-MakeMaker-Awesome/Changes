@@ -1,0 +1,161 @@
+Revision history for Dist-Zilla-Plugin-MakeMaker-Awesome
+
+0.38      2016-03-25 02:25:51Z
+  - revert some unhelpful whitespace changes that hinder other plugins from
+    munging the Makefile.PL template
+
+0.37      2016-03-22 03:11:04Z
+  - now rejecting version ranges in prereqs if eumm_version is not specified
+    to be high enough (7.1101) to guarantee it can be handled
+
+0.36      2016-03-13 00:05:01Z
+  - fix tests that fail on perl 5.8.x due to the buggy handling of qr/...$/m
+
+0.35      2015-09-19 21:51:21Z
+  - sort EXE_FILES list in MakeMaker arguments
+  - a more helpful error is given when something else pruned Makefile.PL after
+    it was gathered
+  - new 'header_file', 'footer_file' configuration options
+
+0.34      2015-05-21 02:46:56Z
+  - issue a warning when version ranges are passed through to
+    ExtUtils::MakeMaker, which cannot parse them and treats them as '0'
+    (see https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/215)
+  - omit EXE_FILES argument to WriteMakefile() if there are no such files
+
+0.33      2015-01-03 20:55:21Z
+  - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.32      2014-12-10 02:19:22Z
+   - eliminated all uses of Moose::Autobox
+   - avoid ever requiring v0 of ExtUtils::MakeMaker
+
+0.31      2014-10-10 05:25:42Z
+   - fix failing tests on 5.8.x
+
+0.30      2014-10-09 02:53:56Z
+   - use a listref for AUTHOR argument to WriteMakefile(), but only when the
+     EUMM version available is already high enough to accomodate it
+
+0.29      2014-10-08 04:26:08Z
+   - retain MIN_PERL_VERSION argument to WriteMakefile()
+   - extract the minimum perl requirement from all prereq phases, not just
+     runtime
+
+0.28      2014-10-02 04:31:44Z
+   - fix test failure caused by unstated assumption that
+     Dist::Zilla::Role::TestRunner is a very recent version
+   - fix uninitialized warning on 5.10.x and earlier
+
+0.27      2014-09-17 03:22:49Z
+    - fix test failures (since 0.25) with older versions of [MakeMaker]
+    - new 'delimiter' option, which allows the use of leading whitespace in
+      'header', 'footer' and 'WriteMakefile_args' strings
+
+0.26      2014-09-16 02:20:28Z
+    - new 'preamble' and 'postamble' options renamed to 'header' and 'footer',
+      to avoid confusion with MY::preamble and MY::postamble
+
+0.25      2014-09-13 21:17:40Z
+    - add new 'preamble' and 'postamble' options, as well as overridable
+      builder subs, for inserting code at the top and bottom of Makefile.PL
+
+0.24      2014-08-14 02:07:13Z
+    - add x_breaks metadata, and a test that checks it, for
+      [MakeMaker::Fallback] versions that we broke with our changes to
+      eumm_version handling
+
+0.23      2014-07-30 02:37:52Z
+    - create Makefile.PL at filegatherer phase, to allow other plugins to see
+      the file earlier
+
+0.22      2014-07-29 04:51:13Z
+    - fix for Dist::Zilla::Plugin::MakeMaker 5.020 dropping a default required
+      version for ExtUtils::MakeMaker
+    - now omitting BUILD_REQUIRES, TEST_REQUIRES in Makefile.PL when empty
+
+0.21      2014-07-28 04:00:35Z
+    - *INCOMPATIBLE CHANGE*: the 'test_dirs' sub and '_build_test_dirs' method
+      have been renamed to 'test_files' and '_build_test_files' respectively,
+      and deal with arrayrefs rather than hashrefs, to more properly reflect
+      the format of their values
+    - add new 'WriteMakefile_arg', 'test_file', 'exe_file' options, to allow
+      for simple use without needing to subclass this plugin
+
+0.20      2014-02-05 05:05:05Z
+    - fixed outdated prereq on Dist::Zilla::Plugin::MakeMaker (now requiring
+      Dist::Zilla 5 for better prereq merging)
+
+0.19      2014-01-11 18:44:50Z
+    - also include the version of ourselves in generated headers
+    - synchronized prereqs are used as a fallback in Makefile.PL, as done in
+      [MakeMaker] v5.001
+
+0.18      2013-10-20 18:29:23Z
+    - re-release with encoding fixes in metadata
+
+0.17      2013-09-27 05:31:27Z
+    - fix undef string appearing in place of dist name in generated
+      Makefile.PL comment
+
+0.16      2013-09-22 19:48:15Z
+    - allow bootstrapping users of this module by using a default $VERSION if
+      the real one is not available
+
+0.15      2013-09-08 20:11:17Z
+    - re-release with properly encoded META.yml
+
+0.14   2013-05-26 15:12:26
+    - test_requires support, as done in Dist::Zilla 4.300032 by Tatsuhiko
+      Miyagawa
+
+0.13   2013-05-15 17:11:35
+    - fix load issue with Data::Dumper (Karen Etheridge)
+
+0.12   2011-01-29 11:58:27
+    - Remove a trailing space in Awesome.pm, patch by Jesse Luehrs at
+      https://github.com/avar/dist-zilla-plugin-makemaker-awesome/pull/2
+
+0.11   2010-09-30 10:36:44
+    - Remove a trailing space in Awesome.pm, spotted and patched by
+      Robin Smidsrød, see
+      http://github.com/avar/dist-zilla-plugin-makemaker-awesome/pull/1
+
+0.10   2010-07-02 23:30:25
+    - Fixed share_dir breakage caused by Dist::Zilla not being awesome
+
+0.09   2010-07-02 21:51:19
+    - Add a DIAGNOSTICS section that notes a common error
+
+0.08   2010-05-30 12:10:40
+    - Installing EXE_FILES was broken due to some missed merges in
+      0.07.
+
+0.07   2010-05-26 12:17:04
+    - Upgrade to depend on Dist::Zilla v3. The required changes to
+      Awesome.pm were backported from upstream's MakeMaker.pm.
+
+0.06   2010-05-01 21:18:14
+    - Merge changes to the Makefile.PL template from
+      Dist::Zilla::Plugin::MakeMaker
+
+0.05   2010-04-09 12:58:41
+    - Upgrade to support Dist::Zilla v2
+    - Remove copy/paste code we can inherit from
+      Dist::Zilla::Plugin::MakeMaker.
+    - remove obsolete chainloading support that was never used,
+      subclassing is now preferred.
+
+0.04   2010-04-03 12:58:01
+    - More documentation proofreading.
+
+0.03   2010-03-31 15:19:08
+    - Example from re::engine::Plan9 + more docs
+
+0.02   2010-03-31 14:20:26
+    - Added more awesome and renamed to
+      Dist::Zilla::Plugin::MakeMaker::Awesome from
+      Dist::Zilla::Plugin::OverridableMakeMaker.
+
+0.01   2010-03-13 07:40:07
+    - Initial CPAN release

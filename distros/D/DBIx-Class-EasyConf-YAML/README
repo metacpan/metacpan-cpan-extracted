@@ -1,0 +1,77 @@
+NAME
+    DBIx::Class::EasyConf::YAML - DBIx::Class Component for text based
+    schema configuration
+
+SYNOPSIS
+      package MyApp::Schema::Result::SomeTable;
+      use parent qw[ DBIx::Class::Core ];
+      __PACKAGE__->load_components(qw[ EasyConf::YAML ]);
+      our $DDL ||= __PACKAGE__->configure();
+
+      1;
+
+      __DATA__
+      --->
+      =head1 NAME
+      
+  MyAPP::Schema::Result::SomeTable - Random Schema File
+      
+  =head1 DESCRIPTION
+      ---
+        table: some_table
+        primary_key: id
+        columns:
+          id:
+            type: int
+            nullable: 0
+            is_auto_increment: 1
+          name:
+            type: VARCHAR
+            size: 16
+            is_nullable: 0
+          description:
+            type: VARCHAR
+            size: 128
+            is_nullable: 1
+        relationships:
+          - other_relation:
+              - belongs_to
+              - MyApp::Schema::Result::SomeOtherTable
+              - id
+        unique:
+          name_uniq: id
+          desc_uniq: 
+            - name
+            - description
+      # EndOfYAML
+
+DESCRIPTION
+    Generates a DBIx::Class::ResultSource from a YAML description. If the
+    YAML is presented as shown in the SYNOPSIS the ResultSource class will
+    be self POD documenting. If the class is executed with 'configuration'
+    in @ARGV, a summary of the ResultSource is printed to standard out.
+
+GOTCHA
+    Note that relationships sometimes need to be created in a particular
+    order (such is the case when defining many_to_many relationships). Given
+    that, the relationships key takes an array of hashes; watch the
+    indentation carefully (it's correct above). It'd be possible to
+    optionally allow a hash here, but I think that might lead to hard to
+    find errors. Drop me a line if you have a strong opinion.
+
+RATIONALE
+    The "self-documenting" bit mentioned above. Also, there's a boatload of
+    punctuation and quoting that is required to do this the usual way; it's
+    less error prone, in my opinion, to use YAML as good text editors will
+    do the right thing by it.
+
+AUTHOR
+    kevin montuori <montuori@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Kevin Montuori & mconsultancy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

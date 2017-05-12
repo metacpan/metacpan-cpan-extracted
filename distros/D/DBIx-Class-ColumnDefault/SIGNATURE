@@ -1,0 +1,35 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.64.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c484ac30671cd6233ef00f35f6976f7c1f75254d Changes
+SHA1 0433bbff935245e9752d7633fe7caea3ef6c8187 LICENSE
+SHA1 d35b06e85bdd6f4b65294fee84ea1a932da64c52 MANIFEST
+SHA1 a702a77a65fc8295d51ab53a6162e30787ea2656 META.json
+SHA1 95d5a98a5239b26f2ea281770f649bcd9715bba9 META.yml
+SHA1 576a5ec357b4eb560de115652dbfb8ae077a41ef Makefile.PL
+SHA1 4d6a8787e0fa687cfc96d806cab0a22ac838976e README.md
+SHA1 39e7b9ddd5f47c47c3de5f141e1bf492b1a9a249 dist.ini
+SHA1 9eddf66fde5de82c16e151ebae8578cf0d5264fe lib/DBIx/Class/ColumnDefault.pm
+SHA1 4b44e948889a84d5070b99d2700365a6ab43448e t/basic.t
+SHA1 7a8399941248bdf27a926d08e28225308dcf07c1 t/lib/TestSchema.pm
+SHA1 07ccc626250ea38d283abfe4380d083b2b3026e1 t/lib/TestSchema/Table.pm
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (Darwin)
+
+iEYEARECAAYFAlAhV/AACgkQR0BL4gbYw3RtHACfYjhpXcbyCgeRiDB2wrUWSZso
+n60An2/68w4+jtkM5h3NOf2sGgvS39YJ
+=oPFV
+-----END PGP SIGNATURE-----

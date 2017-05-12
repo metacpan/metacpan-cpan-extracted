@@ -1,0 +1,87 @@
+{
+   "abstract" : "Yet another approach to modernistic Perl",
+   "author" : [
+      "Jon Portnoy <avenj@cobaltirc.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Defaults-Modern",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "MooX::TypeTiny" : "0",
+            "PerlX::Maybe::XS" : "1",
+            "match::simple::XS" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Exporter::Tiny" : "0.04",
+            "Function::Parameters" : "1.07",
+            "Import::Into" : "1",
+            "Keyword::Simple" : "0",
+            "List::Objects::Types" : "1.003",
+            "List::Objects::WithUtils" : "2.028",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Path::Tiny" : "0.091",
+            "PerlX::Maybe" : "1",
+            "Quote::Code" : "1.01",
+            "Scalar::Util" : "0",
+            "Switch::Plain" : "0.05",
+            "Try::Tiny" : "0.24",
+            "Type::Tiny" : "1",
+            "Types::LoadableClass" : "0.002",
+            "Types::Path::Tiny" : "0.005",
+            "bareword::filehandles" : "0",
+            "indirect" : "0.30",
+            "match::simple" : "0.004",
+            "perl" : "5.014001",
+            "strictures" : "2",
+            "true" : "0.18"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/avenj/defaults-modern.git",
+         "web" : "git://github.com/avenj/defaults-modern"
+      }
+   },
+   "version" : "0.011001"
+}
+

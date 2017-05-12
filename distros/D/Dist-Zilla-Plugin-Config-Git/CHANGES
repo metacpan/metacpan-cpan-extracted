@@ -1,0 +1,38 @@
+Revision History for Dist-Zilla-Plugin-Config-Git
+=================================================
+
+v0.92 2013-12-03
+----------------
+
+[73a528e]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-11-26 19:02:24 -0500 (7 days ago)
+
+Fix typo
+
+[cc3c352]
+* Author: Graham Knop <haarg@haarg.org>
+* Date:   2013-11-23 22:25:59 -0500 (10 days ago)
+
+use reasonable prereqs
+
+
+v0.91 2013-10-29
+----------------
+
+[d2ef4a4]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-29 20:27:04 -0400 (5 weeks ago)
+
+Release v0.91
+
+[7d3c5c1]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-10-29 20:20:36 -0400 (5 weeks ago)
+
+Various fixes after testing with @Git
+
+
+===================================
+End of changes in the last 365 days
+===================================

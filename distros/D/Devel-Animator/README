@@ -1,0 +1,21 @@
+NAME
+    Devel::Animator - Watch program flow like a movie
+
+SYNOPSIS
+      perl -d:Animator program
+
+
+DESCRIPTION
+     Animator lets you run a program and watch program flow. 
+
+DETAILS
+    Animation doesn't start until meta-data has been completely 
+  generated. The Animator should be used with small data sets.
+
+
+TODO
+
+Author
+    Dennis Spera -- asaag@cpan.org
+
+

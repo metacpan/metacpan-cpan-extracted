@@ -1,0 +1,9 @@
+[Unit]
+Description = Daemon which shuts down box after certain triggers
+
+[Service]
+ExecStart = /usr/bin/sdd
+
+[Install]
+WantedBy = multi-user.target
+

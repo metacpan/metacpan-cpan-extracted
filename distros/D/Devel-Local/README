@@ -1,0 +1,153 @@
+NAME
+    Devel::Local - Use Development Code in Place
+
+SYNOPSIS
+    Devel::Local sets up your Perl development environment with the PERL5LIB
+    and PATH variables that you want. This lets you write and test code in
+    several interdependent repositories at once, without needing to install
+    anything after changing it. It is similar to local::lib but easier to
+    use, and simlar to ylib but more complete.
+
+    There are several ways to use Devel::Local. In your Perl code you can do
+    just that:
+
+        use Devel::Local;
+
+    Or when you run a Perl program you can do this:
+
+        > perl -MDevel::Local program.pl
+
+    To use it with many Perl programs:
+
+        > export PERL5OPT='-MDevel::Local'
+        > perl program1.pl
+        > perl program2.pl
+
+    To set up your environment with Devel::Local:
+
+        > export PERL5LIB=`perl -MDevel::Local::PERL5LIB`
+        > export PATH=`perl -MDevel::Local::PATH`
+
+    The handiest way to use Devel::Local is to add this line to your
+    .bashrc:
+
+        source `which devel-local.sh`
+
+    Then you'll have the "devel-local" Bash function to set up your
+    environment whenever you need to:
+
+        > devel-local [optional-arguments]
+
+    See USAGE below from more details.
+
+DESCRIPTION
+    Sometimes when you are developing Perl software there can several Perl
+    module code repositories involved. This module lets you specify which
+    repositories you want to load Perl modules from, and formats them into a
+    PERL5LIB environment variable format.
+
+    Devel::Local takes a list of Perl module repositories that you specify
+    in your current directory or your home directory. It adds the lib/
+    subdirectories to the current value of PERL5LIB, and it also adds the
+    bin/ subdirectories to your PATH environment variable. You can use
+    absolute paths, relative paths and even type-globs.
+
+    In addition to keeping a list of paths in specially named files, you can
+    name a specific list file or name specific paths containing lib and bin
+    dirs.
+
+    Devel::Local always converts the paths to absolute forms, so switching
+    directories should not break the behavior.
+
+USAGE
+    As was pointed out in the SYNOPSIS above, there are several ways to
+    invoke Devel::Local. In each of those forms, you have several ways to
+    indicate your paths of interest:
+
+    "$HOME/.perl-devel-local"
+        Create a file called "~/.perl-devel-local" that has lines like this:
+
+            # Use the GitHub versions of these:
+            .
+            ~/src/yaml-libyaml-pm/
+            ~/src/catalyst-*
+
+    "./devel-local"
+        Create a file called "./devel-local" that looks like this:
+
+            # Use the GitHub versions of these:
+            .
+            ../yaml-libyaml-pm/
+            ../catalyst-*
+
+    $PERL_DEVEL_LOCAL
+        You may also use any other config file path you wish, by setting the
+        "PERL_DEVEL_LOCAL" environment variable.
+
+        NOTE: Devel::Local will ignore all the lines in these config files
+        after the first blank line. This way, you can put several groupings
+        of devel libraries in one file. Just make sure that the grouping you
+        want to use is at the top of the file.
+
+    "Specify Config File"
+        You can specify the config file directly:
+
+            use Devel::Local /path/to/devel-local-conf
+
+        or:
+
+            > devel-local /path/to/devel-local-conf
+
+    "List of Paths"
+        You can list paths directly:
+
+            use Devel::Local qw(.  ../yaml-libyaml-pm/ ../catalyst-*);
+
+        or:
+
+            > devel-local .  ../yaml-libyaml-pm/ ../catalyst-*
+
+XS AND "BLIB"
+    You can use Devel::Local with modules that are not pure Perl. In other
+    words, modules that get compiled before installing.
+
+    If Devel::Local sees a ".xs" file anywhere in the dist, it will add
+    "blib/" to the "PERL5LIB" after <lib/>.
+
+    It is up to you to run "make" after changing your .xs code, so that the
+    changes get added to your "blib/".
+
+DISPLAY $PATH AND $PERL5LIB
+    Whenever you use the "devel-local" bash function, it will pretty print
+    the values. If you just want to see the values listed without modifying
+    them, do this:
+
+        > devel-local ?
+
+TURNING "DEVEL::LOCAL" OFF
+    Devel::Local puts a special delimiter, '|', in the PATH variables, so
+    that it can later remove the things it added. You can trigger this by
+    passing it a single argument of '!'.
+
+        > devel::local      # Add stuff to $PATH and $PERL5LIB
+        > devel::local path/foo path/bar-*  # Add more stuff
+        > devel::local !    # Reset to original values
+
+SEE ALSO
+    *   File::Share
+
+    *   ylib
+
+    *   local::lib
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT
+    Copyright 2011-2014. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

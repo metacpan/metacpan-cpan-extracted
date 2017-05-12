@@ -1,0 +1,42 @@
+#!/opt/bin/perl
+
+use Deliantra;
+
+load_archetypes;
+
+for my $path (@ARGV) {
+   eval {
+      {
+         open my $fh, "<:raw:perlio:utf8", $path
+            or die "$path: $!\n";
+
+         sysread $fh, my $buf, 8192;
+         $buf =~ /^Object \S+\s*\n.*^end\s*$/ism
+            or die "$path: not a deliantra arch file\n";
+      }
+
+      my $arch = read_arch ($path);
+
+      $arch = [
+         map $arch->{$_},
+            sort keys %$arch
+      ];
+
+      if (0) {
+         for my $o (@$arch) {
+            for ($o->{face}, @{ $o->{anim} || [] }) {
+               s/\.1(\d\d)$/.x$1/;
+            }
+         }
+      }
+
+      open my $fh, ">:raw:utf8", "$path~" or Carp::croak "$path~: $!";
+      print $fh Deliantra::archlist_to_string ($arch)
+                                          or Carp::croak "$path~: $!";
+      close $fh                           or Carp::croak "$path~: $!";
+      rename "$path~", $path;
+
+      1
+   } or warn $@;
+}
+

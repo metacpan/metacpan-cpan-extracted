@@ -1,0 +1,28 @@
+---
+abstract: 'Dancer::Plugin::Auth::RBAC authentication via DBIx::Class'
+author:
+  - 'Dagfinn Ilmari Mannsåker <ilmari@photobox.com>'
+build_requires:
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  File::Temp: 0
+  SQL::Translator: 0.11006
+  Test::More: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Auth-RBAC-Credentials-DBIC
+requires:
+  Dancer::Plugin::Auth::RBAC::Credentials: 0
+  Dancer::Plugin::DBIC: 0.15
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Auth-RBAC-Credentials-DBIC
+  repository: git://github.com/ilmari/Dancer-Plugin-Auth-RBAC-Credentials-DBIC.git
+version: 0.003

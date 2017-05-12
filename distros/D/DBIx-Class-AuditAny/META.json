@@ -1,0 +1,103 @@
+{
+   "abstract" : "Flexible change tracking framework for DBIx::Class",
+   "author" : [
+      "Henry Van Styn <vanstyn@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-AuditAny",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Archive::Tar::Wrapper" : "0.21",
+            "Devel::Confess" : "0.007006",
+            "Dist::Zilla" : "5.031",
+            "Test::Kwalitee" : "1.22",
+            "Test::Pod" : "1.14",
+            "Test::Pod::Coverage" : "1.04",
+            "Test::Spelling" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::MOP" : "0",
+            "Class::MOP::Class" : "0",
+            "DBD::SQLite" : "1.46",
+            "DBIx::Class" : "0.082820",
+            "Data::Dumper" : "0",
+            "Data::Dumper::Concise" : "0",
+            "DateTime" : "0",
+            "Digest::MD5" : "0",
+            "Exporter" : "0",
+            "JSON" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2.000000",
+            "Moo::Role" : "0",
+            "MooX::Types::MooseLike::Base" : "0.19",
+            "Path::Class" : "0.35",
+            "SQL::Abstract" : "1.81",
+            "SQL::Translator" : "0.11020",
+            "String::CamelCase" : "0",
+            "Term::ANSIColor" : "0",
+            "Text::TabularDisplay" : "0",
+            "Text::Wrap" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "1.000005",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0.04",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::Schema" : "0",
+            "FindBin" : "0",
+            "Moose" : "0",
+            "Path::Class" : "0.35",
+            "SQL::Translator" : "0.11020",
+            "String::Random" : "0",
+            "Test::More" : "1.001002",
+            "Test::Routine" : "0.020",
+            "Test::Routine::Util" : "0",
+            "base" : "0",
+            "inc::Module::Install" : "1.08",
+            "lib" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vanstyn/DBIx-Class-AuditAny/issues"
+      },
+      "homepage" : "https://github.com/vanstyn/DBIx-Class-AuditAny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/vanstyn/DBIx-Class-AuditAny.git",
+         "web" : "https://github.com/vanstyn/DBIx-Class-AuditAny"
+      }
+   },
+   "version" : "0.200100",
+   "x_contributors" : [
+      "Peter Rabbitson <ribasushi@cpan.org>",
+      "Tom Bloor <tom.bloor@googlemail.com>",
+      "Jess Robinson <castaway@desert-island.me.uk>"
+   ]
+}
+

@@ -1,0 +1,4 @@
+? Automatic type detection in bind_param/execute.
+? Support for blob type.
+? Implement CreateDatabase as a C/XS function and make it available
+  to the DtfSQLmac driver via func.

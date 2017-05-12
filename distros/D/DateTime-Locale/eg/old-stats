@@ -1,0 +1,58 @@
+use v5.22;
+use strict;
+use warnings;
+
+use Memory::Stats;
+
+my $stats = Memory::Stats->new;
+$stats->start;
+require DateTime::Locale;
+
+$stats->checkpoint('after load');
+
+for my $code (qw( en-US zh-Hant-TW fr-FR pt-BR af yo zu-ZA )) {
+    my $locale = DateTime::Locale->load($code);
+
+    $stats->checkpoint("after getting data for $code");
+}
+
+$stats->checkpoint('after say');
+
+$stats->stop;
+$stats->report;
+
+=pod
+
+=head1 With Data::Section
+
+--- Memory Usage ---
+start: 8777728
+after load: 10313728 - delta: 1536000 - total: 1536000
+after getting data for en: 22544384 - delta: 12230656 - total: 13766656
+after getting data for zh: 22544384 - delta: 0 - total: 13766656
+after getting data for fr: 22544384 - delta: 0 - total: 13766656
+after getting data for pt: 22544384 - delta: 0 - total: 13766656
+after say: 22544384 - delta: 0 - total: 13766656
+stop: 22,544,384 - delta: 0 - total: 13766656
+--- Memory Usage ---
+
+real	0m2.643s
+user	0m2.578s
+sys	0m0.064s
+
+=head1 With all data in memory
+
+--- Memory Usage ---
+start: 8802304
+after load: 118583296 - delta: 109780992 - total: 109780992
+after getting data for en: 118583296 - delta: 0 - total: 109780992
+after getting data for zh: 118583296 - delta: 0 - total: 109780992
+after getting data for fr: 118583296 - delta: 0 - total: 109780992
+after getting data for pt: 118583296 - delta: 0 - total: 109780992
+after say: 118583296 - delta: 0 - total: 109780992
+stop: 118,583,296 - delta: 0 - total: 109780992
+--- Memory Usage ---
+
+real	0m0.712s
+user	0m0.623s
+sys	0m0.088s

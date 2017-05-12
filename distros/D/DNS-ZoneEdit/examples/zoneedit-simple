@@ -1,0 +1,62 @@
+#!/usr/bin/perl
+
+#==============================================================================#
+
+use strict;
+use warnings;
+use DNS::ZoneEdit;
+
+#==============================================================================#
+
+die "Usage: $0 <username> <password> <hostname>\n" unless @ARGV == 3;
+
+if (DNS::ZoneEdit->new->update(
+	username => $ARGV[0],
+	password => $ARGV[1],
+	hostname => $ARGV[2],
+)) {
+	print "Update succeeded\n";
+	exit 0;
+} else {
+	print "Update failed: [$@]\n";
+	exit 255;
+}
+
+#==============================================================================#
+
+__END__
+
+=head1 NAME
+
+zoneedit-simple - Simplest zoneedit updater
+
+=head1 SYNOPSIS
+
+zoneedit-simple <username> <password> <hostname>
+
+=head1 DESCRIPTION
+
+Simplest possible ZoneEdit update. It will set the specified hostname to the IP address that is
+the source of the request (as seen by ZoneEdit).
+
+=head1 OPTIONS
+
+=over 4
+
+username - Your ZoneEdit username
+
+password - The corresponding password
+
+hostname - The name of the host record to be updated
+
+=back
+
+=head1 AUTHOR
+
+This script is Copyright (c) 2002 Gavin Brock gbrock@cpan.org. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+
+#==============================================================================#

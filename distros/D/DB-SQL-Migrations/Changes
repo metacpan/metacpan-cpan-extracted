@@ -1,0 +1,15 @@
+Revision history for Perl module DB::SQL::Migrations
+
+0.06
+    - Added github repo to metadata and doc (bugtracker kept as RT)
+    - Added min perl version as 5.10.0 in metadata
+    - Added license type as 'perl_5' in metadata (via Makefile.PL)
+    - Fixed abstract and tweaked wording
+    - Added this file
+
+0.05 2013-01-09
+    - most recent release
+
+0.01 2012-12-31
+    - First release to CPAN
+

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Digest/Adler32.pm
+ref/adler32.c
+t/adler32.t

@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ebug-client - Debugger client for remote debugging Perl script
+
+=head1 SYNOPSIS
+
+ebug-client -key <secret> -port <port>
+
+=head1 DESCRIPTION
+
+ebug-client is an debugger front end for attaching to
+remotely executing perl script, running on ebug-server.
+
+To invoke ebug-client, you must first invoke ebug-server to
+run debuggee and generate "key" and "port" needed for connection.
+When ebug-server is invoked, it will show exact command-line to
+invoke ebug-client.
+
+=head1 EXAMPLE
+
+ # Attach to ebug-server running on port 4023, with key "begripra"
+ $ ebug-client -key begripra -port 4023
+
+=head1 NOTE
+
+Currently, you cannot "restart" debuggee. You'll need to
+restart one manually by re-invoking both ebug-server and
+ebug-client.
+
+Since Devel::ebug::Backend listens to "localhost" socket,
+you will need to relay I/O using tool like socat for true
+remote debugging.
+
+Internally, thanks for it being free software, it is almost
+a complete ripoff of Devel::ebug source.
+
+=head1 SEE ALSO
+
+L<Devel::debug>, L<ebug>, L<ebug-server>
+
+=head1 AUTHOR
+
+Taisuke Yamada, <tyamadajp!list!rakugaki!org>
+
+=cut
+
+package Devel::ebug;
+
+use Devel::ebug;
+use IO::Socket::INET;
+use strict;
+use warnings;
+
+our $VERSION = $Devel::ebug::VERSION;
+our $ARG     = {};
+
+# Replace 'load' with one that just attaches
+sub load {
+    my $self    = shift;
+    $self->attach($ARG->{port}, $ARG->{key});
+}
+
+package main;
+
+use Devel::ebug::Console;
+use Getopt::Long;
+use strict;
+use warnings;
+
+GetOptions( my $OPT = {}, 'help', 'port=i', 'key=s' ) || help();
+help() if $OPT->{help};
+
+$Devel::ebug::ARG = $OPT;
+my $console = Devel::ebug::Console->new();
+$console->run();
+exit(0);
+
+sub help {
+    print STDERR <<EOF;
+Usage: $0 -key <secret> -port <port> -- debuggee args...
+EOF
+    exit(1);
+}
+

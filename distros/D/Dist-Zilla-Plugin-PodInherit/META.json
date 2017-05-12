@@ -1,0 +1,55 @@
+{
+   "abstract" : "autogenerate inherited POD sections for Dist::Zilla distributions",
+   "author" : [
+      "Tom Molesworth <cpan@entitymodel.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-PodInherit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.200010",
+            "Pod::Inherit" : "0.90",
+            "Pod::POM" : "0.28",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Test::More" : "0.98",
+            "blib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-podinherit at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PodInherit"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-PodInherit/"
+   },
+   "version" : "0.007"
+}
+

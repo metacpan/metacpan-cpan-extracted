@@ -1,0 +1,11 @@
+Revision history for Perl extension Date::Range::Birth.
+
+0.02  Sat Dec  8 19:52:42 JST 2001
+	- Added more tests
+	- Added EXAMPLE in pod
+	- Workaround for broken base.pm
+	  (Thanks to William R. Ward <bill@wards.net>)
+
+0.01  Sat Dec  8 00:24:49 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,9 @@
+Changes
+lib/Data/HashArray.pm
+Makefile.PL
+MANIFEST
+README
+t/00.5.load.t
+t/01.5.usage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

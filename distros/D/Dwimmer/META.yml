@@ -1,0 +1,62 @@
+---
+abstract: 'A platform to develop things'
+author:
+  - 'Gabor Szabo <szabgab@dwimmer.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::Deep: 0
+  Test::Differences: 0
+  Test::More: 0
+  Test::WWW::Mechanize: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  File::Copy::Recursive: 0
+  File::Find::Rule: 0
+  File::Spec: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.12'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dwimmer
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  DBIx::Class::Schema::Loader: 0
+  DBIx::RunSQL: 0
+  Dancer: 1.306
+  Data::Dumper: 0
+  DateTime: 0
+  Email::Valid: 0
+  Encode: 0
+  Fcntl: 0
+  File::ShareDir: '1.00'
+  File::Slurp: 0
+  Getopt::Long: 0
+  JSON: 0
+  LWP::Protocol::https: 0
+  List::Util: 0
+  MIME::Lite: 0
+  Moose: 0
+  Pod::Usage: 0
+  String::Random: 0
+  Template: 0
+  XML::Feed: 0
+  XML::RSS: 0
+  XML::Simple: 0
+  YAML: 0
+  autodie: 0
+  perl: '5.012000'
+resources:
+  bugtracker: http://github.com/szabgab/dwimmer
+  homepage: http://dwimmer.org/
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/szabgab/dwimmer
+version: '0.32'

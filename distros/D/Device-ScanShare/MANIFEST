@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+bin/scanshare
+lib/Device/ScanShare.pm
+lib/Device/ScanShare.pod
+t/0.t
+t/2_cli.t
+t/99_cleanup.t
+META.yml                                 Module meta-data (added by MakeMaker)

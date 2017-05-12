@@ -1,0 +1,29 @@
+Revision history for Defaults-Mauke
+
+0.10    2014-12-06
+        * upgrade to Function::Parameters 1.06
+        * depend on perl 5.16 and load all of its features (except switch)
+
+0.09    2012-06-25
+        * use Function::Parameters in strict mode if possible
+
+0.08    2012-06-19
+        * upgrade to Function::Parameters 0.06
+        * use indirect ':fatal'
+
+0.071   2011-08-08
+        * skip failing tests on 5.8
+
+0.07    2011-08-02
+        * add Function::Parameters back in
+
+0.06    2010-06-06
+        * remove Function::Parameters
+
+0.05    2010-03-08
+        * use import_into from Function::Parameters 0.04
+        * add a a basic compile/load test
+        
+0.04    2009-12-14
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,61 @@
+=head1 NAME
+
+mod_perl 1.0 Win32 Installation Instructions
+
+=head1 Description
+
+This document discusses how to install mod_perl 1.0 under Win32, both
+in building from sources and in installing pre-compiled binary
+packages.
+
+=head1 Building from sources
+
+You will need
+
+=over
+
+=item *
+
+patience - mod_perl is considered alpha under Win32.
+
+=item *
+
+MSVC++ 5.0+, Apache version 1.3-dev or higher and Perl 5.004_02 or higher.
+
+=item *
+
+As of version 1.24_01, mod_perl will build on Win32 ActivePerls
+based on Perl-5.6.x (builds 6xx). For binary compatibility you 
+should use the same compiler in building mod_perl that was used 
+to compile your Perl binary; for ActivePerl, this means using VC++ 6.
+
+=back
+
+Obtain the mod_perl sources from CPAN:
+
+  http://www.cpan.org/authors/id/D/DO/DOUGM/mod_perl-1.xx.tar.gz
+
+When unpacked, using Winzip or similar tools, a subdirectory
+F<mod_perl-1.xx> will be created.
+
+There are two ways to build mod_perl - with MS Developer Studio,
+and through command-line arguments to 'perl Makefile.PL'. In both
+cases Apache should previously have been built and installed - if
+you are using a binary build of Apache, make sure that you obtain
+a binary build that includes the Apache libraries and header files.
+
+=head1 Authors
+
+=over
+
+=item *
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

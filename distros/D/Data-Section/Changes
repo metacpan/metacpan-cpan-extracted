@@ -1,0 +1,76 @@
+Revision history for Data-Section
+
+0.200006  2014-03-10 10:14:45-04:00 America/New_York
+        - skip tests on Win32 pre-5.14 related to line endings; perl munges the
+          data before we're able to get at it (thanks, Christian Walde!)
+
+0.200005  2013-12-11 08:03:08 America/New_York
+        - open DATA handles both :raw and :bytes to avoid content munging on
+          Win32 (thanks, Kenichi Ishigaki!)
+        - This is not yet a perfect solution for Win32.
+
+0.200004  2013-12-01 21:31:02 America/New_York
+        - avoid confusion between \n, \x0d\x0a, and Win32 (thanks, Kenichi
+          Ishigaki!)
+
+0.200003  2013-11-02 07:57:52 America/New_York
+          [THIS MIGHT BREAK STUFF]
+        - stable release of 0.200002, no functional changes
+
+0.200002  2013-10-19 22:11:32 America/New_York (TRIAL RELEASE)
+          [THIS MIGHT BREAK STUFF]
+        - add an "encoding" parameter to set encoding of data section contents;
+          this defaults to UTF-8 (thanks, David Golden!)
+
+0.101622  2013-06-19 21:48:02 America/New_York
+          add a link to an Advent article about Data-Section
+
+          update bugtracker, repo, etc.
+
+0.101621  2011-04-29 07:26:31 America/New_York
+          document the \-escaping behavior of sections
+
+0.101620  2010-06-11 08:14:32 America/New_York
+          We now attempt to work with files with Win32 line endings, thanks to
+          Christian Walde.
+
+0.100770  2010-03-18 08:05:46 America/New_York
+          this release's changes courtesy of Tatsuhiko Miyagawa:
+          __END__ now ends the whole data section; ignore_end may come someday
+          empty data lines between __DATA__ and first section are ignored
+
+0.100270  2010-01-27 22:43:33 America/New_York
+          switch from Class::ISA to MRO::Compat
+          added *_section_names
+          eliminate some duplicated code
+
+0.093410  2009-12-07 18:45:56 America/New_York
+          allow data before first marker if default_name given
+          (thanks, Uwe Voelker)
+
+0.093330  2009-11-29 17:45:10 America/New_York
+          re-release to include a META.yml for cpandeps
+
+0.091820  2009-07-01 18:25:50 UTC
+          add docs on using ForMethod to avoid autocleaning (thanks, Kent
+          Fredric)
+
+0.006     2008-11-23
+          remove smoke tests that did nothing useful; thanks Florian
+
+0.005     2008-08-07
+          rebuild to ensure directory entries in archive
+
+0.004     2008-06-07
+          fix regex to exclude whitespace after name
+
+0.003     2008-06-07
+          fix non-5.8-friendly syntax in tests
+          swap mro out for Class::ISA; it shouldn't matter
+
+0.002     2008-06-07
+          improve documentation
+          handle valid classes with no __DATA__ section
+
+0.001     2008-06-07
+          first release

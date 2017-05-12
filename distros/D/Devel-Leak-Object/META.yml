@@ -1,0 +1,30 @@
+---
+abstract: 'Detect leaks of objects '
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.99'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Devel::Leak::Object
+name: Devel-Leak-Object
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Scalar::Util: 1.19
+  perl: 5.005
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Devel-Leak-Object
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Devel-Leak-Object
+version: 1.01

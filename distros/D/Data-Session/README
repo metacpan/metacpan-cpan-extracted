@@ -1,0 +1,49 @@
+README file for Data::Session.
+
+See also: Changes.txt.
+
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
+
+1 Installing from a Unix-like distro
+------------------------------------
+shell>gunzip Data-Session-0.01.tgz
+shell>tar mxvf Data-Session-0.01.tar
+
+On Unix-like systems, assuming you have installed Module::Build V 0.25+:
+
+shell>perl Build.PL
+shell>./Build
+shell>./Build test
+shell>./Build install
+
+On MS Windows-like systems, assuming you have installed Module::Build V 0.25+:
+
+shell>perl Build.PL
+shell>perl Build
+shell>perl Build test
+shell>perl Build install
+
+Alternately, without Module::Build, you do this:
+
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
+
+shell>perl Makefile.PL
+shell>make
+shell>make test
+shell>su              (for Unix-like systems)
+shell>make install
+shell>exit            (for Unix-like systems)
+
+On all systems:
+
+Run Session.pm through you favourite pod2html translator.
+
+2 Installing from an ActiveState distro
+---------------------------------------
+shell>unzip Data-Session-0.01.zip
+shell>ppm install --location=. Data-Session
+shell>del Data-Session-0.01.ppd
+shell>del PPM-Data-Session-0.01.tar.gz

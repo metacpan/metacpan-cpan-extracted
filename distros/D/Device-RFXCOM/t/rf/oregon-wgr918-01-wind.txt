@@ -1,0 +1,11 @@
+583a0d002d10243420033233
+
+master oregon 58.3a0d002d10243420033233:
+  sensor/wgr918.2d[speed]=3.4mps
+  sensor/wgr918.2d[direction]=241degrees
+  sensor/wgr918.2d[battery]=100%
+
+
+
+
+

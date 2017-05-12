@@ -1,0 +1,13 @@
+Build.PL
+Changes
+cpanfile
+lib/Data/STUID.pm
+lib/Data/STUID/Client.pm
+lib/Data/STUID/Generator.pm
+lib/Data/STUID/Server.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README.mkdn
+script/stuid-client
+script/stuid-server

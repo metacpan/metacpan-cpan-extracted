@@ -1,0 +1,280 @@
+SYNOPSIS
+
+    For English:
+
+     use DateTime::Format::Alami::EN;
+     my $parser = DateTime::Format::Alami::EN->new();
+     my $dt = $parser->parse_datetime("2 hours 13 minutes from now");
+
+    Or you can also call as class method:
+
+     my $dt = DateTime::Format::Alami::EN->parse_datetime("yesterday");
+
+    To parse duration:
+
+     my $dtdur = DateTime::Format::Alami::EN->parse_datetime_duration("2h"); # 2 hours
+
+    For Indonesian:
+
+     use DateTime::Format::Alami::ID;
+     my $parser = DateTime::Format::Alami::ID->new();
+     my $dt = $parser->parse_datetime("5 jam lagi");
+
+    Or you can also call as class method:
+
+     my $dt = DateTime::Format::Alami::ID->parse_datetime("hari ini");
+
+    To parse duration:
+
+     my $dtdur = DateTime::Format::Alami::ID->parse_datetime_duration("2h"); # 2 days
+
+DESCRIPTION
+
+    This class parses human/natural date/time/duration string and returns
+    DateTime (or DateTime::Duration) object. Currently it supports English
+    and Indonesian. The goal of this module is to make it easier to add
+    support for other human languages.
+
+    To actually use this class, you must use one of its subclasses for each
+    human language that you want to parse.
+
+    There are already some other DateTime human language parsers on CPAN
+    and elsewhere, see "SEE ALSO".
+
+HOW IT WORKS
+
+    DateTime::Format::Alami is base class. Each human language is
+    implemented in a separate DateTime::Format::Alami::<ISO_CODE> module
+    (e.g. DateTime::Format::Alami::EN and DateTime::Format::Alami::EN)
+    which is a subclass.
+
+    Parsing is done using a single recursive regex (i.e. containing
+    (?&NAME) and (?(DEFINE)) patterns, see perlre). This regex is composed
+    from pieces of pattern strings in the p_* and o_* methods, to make it
+    easier to override in an OO-fashion.
+
+    A pattern string that is returned by the p_* method is a normal regex
+    pattern string that will be compiled using the /x and /i regex
+    modifier. The pattern string can also refer to pattern in other o_* or
+    p_* method using syntax <o_foo> or <p_foo>. Example, o_today for
+    English might be something like:
+
+     sub p_today { "(?: today | this \s+ day )" }
+
+    Other examples:
+
+     sub p_yesterday { "(?: yesterday )" }
+    
+     sub p_dateymd { join(
+         "",
+        '(?: <o_dayint> \\s* ?<o_monthname> | <o_monthname> \\s* <o_dayint>\\b|<o_monthint>[ /-]<o_dayint>\\b )',
+        '(?: \\s*[,/-]?\\s* <o_yearint>)?'
+     )}
+    
+     sub o_date { "(?: <p_today>|<p_yesterday>|<p_dateymd>)" }
+    
+     sub p_time { "(?: <o_hour>:<o_minute>(?:<o_second>)? \s* <o_ampm> )" }
+    
+     sub p_date_time { "(?: <o_date> (?:\s+ at)? <o_time> )" }
+
+    When a pattern from p_* matches, a corresponding action method a_* will
+    be invoked. Usually the method will set or modify a DateTime object in
+    $self->{_dt}. For example, this is code for a_today:
+
+     sub a_today {
+         my $self = shift;
+         $self->{_dt} = DateTime->today;
+     }
+
+    The patterns from all p_* methods will be combined in an alternation to
+    form the final pattern.
+
+    An o_* pattern is just like p_*, but they will not be combined into the
+    final pattern and matching it won't execute a corresponding a_* method.
+
+    And there are also w_* methods which return array of strings.
+
+    Parsing duration is similar, except the method names are pdur_*, odur_*
+    and adur_*.
+
+ADDING A NEW HUMAN LANGUAGE
+
+    See an example in existing DateTime::Format::Alami::* module. Basically
+    you just need to supply the necessary patterns in the p_* methods. If
+    you want to introduce new p_* method, don't forget to supply the action
+    too in the a_* method.
+
+METHODS
+
+ new => obj
+
+    Constructor. You actually must instantiate subclass instead.
+
+ parse_datetime($str[ , \%opts ]) => obj
+
+    Parse/extract date/time expression in $str. Die if expression cannot be
+    parsed. Otherwise return DateTime object (or string/number if format
+    option is verbatim/epoch, or hash if format option is combined) or
+    array of objects/strings/numbers (if returns option is all/all_cron).
+
+    Known options:
+
+      * time_zone => str
+
+      Will be passed to DateTime constructor.
+
+      * format => str (DateTime|verbatim|epoch|combined)
+
+      The default is DateTime, which will return DateTime object. Other
+      choices include verbatim (returns the original text), epoch (returns
+      Unix timestamp), combined (returns a hash containing keys like
+      DateTime, verbatim, epoch, and other extra information: pos [position
+      of pattern in the string], pattern [pattern name], m [raw named
+      capture groups], uses_time [whether the date involves time of day]).
+
+      You might think that choosing epoch or verbatim could avoid the
+      overhead of DateTime, but actually you can't since DateTime is used
+      as the primary format during parsing. The epoch is retrieved from the
+      DateTime object using the epoch method.
+
+      * prefers => str (nearest|future|past)
+
+      NOT YET IMPLEMENTED.
+
+      This option decides what happens when an ambiguous date appears in
+      the input. For example, "Friday" may refer to any number of Fridays.
+      Possible choices are: nearest (prefer the nearest date, the default),
+      future (prefer the closest future date), past (prefer the closest
+      past date).
+
+      * returns => str (first|last|earliest|latest|all|all_cron)
+
+      If the text has multiple possible dates, then this argument
+      determines which date will be returned. Possible choices are: first
+      (return the first date found in the string, the default), last
+      (return the final date found in the string), earliest (return the
+      date found in the string that chronologically precedes any other date
+      in the string), latest (return the date found in the string that
+      chronologically follows any other date in the string), all (return
+      all dates found in the string, in the order they were found in the
+      string), all_cron (return all dates found in the string, in
+      chronological order).
+
+      When all or all_cron is chosen, function will return array(ref) of
+      results instead of a single result, even if there is only a single
+      actual result.
+
+ parse_datetime_duration($str[ , \%opts ]) => obj
+
+    Parse/extract duration expression in $str. Die if expression cannot be
+    parsed. Otherwise return DateTime::Duration object (or string/number if
+    format option is verbatim/seconds, or hash if format option is
+    combined) or array of objects/strings/numbers (if returns option is
+    all/all_sorted).
+
+    Known options:
+
+      * format => str (Duration|verbatim|seconds|combined)
+
+      The default is Duration, which will return DateTime::Duration object.
+      Other choices include verbatim (returns the original text), seconds
+      (returns number of seconds, approximated), combined (returns a hash
+      containing keys like Duration, verbatim, seconds, and other extra
+      information: pos [position of pattern in the string], pattern
+      [pattern name], m [raw named capture groups]).
+
+      You might think that choosing seconds or verbatim could avoid the
+      overhead of DateTime::Duration, but actually you can't since
+      DateTime::Duration is used as the primary format during parsing. The
+      number of seconds is calculated from the DateTime::Duration object
+      using an approximation (for example, "1 month" does not convert
+      exactly to seconds).
+
+      * returns => str (first|last|smallest|largest|all|all_sorted)
+
+      If the text has multiple possible durations, then this argument
+      determines which date will be returned. Possible choices are: first
+      (return the first duration found in the string, the default), last
+      (return the final duration found in the string), smallest (return the
+      smallest duration), largest (return the largest duration), all
+      (return all durations found in the string, in the order they were
+      found in the string), all_sorted (return all durations found in the
+      string, in smallest-to-largest order).
+
+      When all or all_sorted is chosen, function will return array(ref) of
+      results instead of a single result, even if there is only a single
+      actual result.
+
+FAQ
+
+ What does "alami" mean?
+
+    It is an Indonesian word, meaning "natural".
+
+ How does it compare to similar modules?
+
+    DateTime::Format::Natural (DF:Natural) is a more established module
+    (first released on 2006) and can understand a bit more English
+    expression like 'last day of Sep'. Aside from English, it does not yet
+    support other languages.
+
+    DFA:EN's parse_datetime_duration() produces a DateTime::Duration object
+    while DF:Natural's parse_datetime_duration() returns two DateTime
+    objects instead. In other words, DF:Natural can parse "from 23 Jun to
+    29 Jun" in addition to "for 2 weeks".
+
+    DF:Natural in general is slightly more strict about the formats it
+    accepts, e.g. it rejects Jun 23st (the error message even gives hints
+    that the suffix must be 'rd'). DF:Natural can give a detailed error
+    message on why parsing has failed (see its error() method).
+
+    DateTime::Format::Flexible (DF:Flexible) is another established module
+    (first released in 2007) that, aside from parsing human expression
+    (like 'tomorrow', 'sep 1st') can also parse date/time in several other
+    formats like RFC 822, making it a convenient module to use as a
+    'one-stop' solution to parse date. Compared to DF:Natural, it has
+    better support for timezone but cannot parse some English expressions.
+    Aside from English, it currently supports German and Spanish. It does
+    not support parsing duration expression.
+
+    This module itself: DateTime::Format::Alami (DF:Alami) is yet another
+    implementation. Internally, it uses recursive regex to make parsing
+    simpler and adding more languages easier. It requires perl 5.14.0 or
+    newer due to the use of (?{ ... }) code blocks inside regular
+    expression (while DF:Natural and DF:Flexible can run on perl 5.8+). It
+    currently supports English and Indonesian. It supports parsing duration
+    expression and returns DateTime::Duration object. It has the smallest
+    startup time (see see Bencher::Scenario::DateTimeFormatAlami::Startup).
+
+    Performance-wise, all the modules are within the same order of
+    magnitude (see Bencher::Scenario::DateTimeFormatAlami::Parsing).
+
+SEE ALSO
+
+ Similar modules on CPAN
+
+    Date::Extract. DateTime::Format::Alami has some features of
+    Date::Extract so it can be used to replace Date::Extract.
+
+    DateTime::Format::Flexible. See "FAQ".
+
+    For Indonesian: DateTime::Format::Indonesian, Date::Extract::ID
+    (currently this module uses DateTime::Format::Alami::ID as its
+    backend).
+
+    For English: DateTime::Format::Natural. See "FAQ".
+
+ Other modules on CPAN
+
+    DateTime::Format::Human deals with formatting and not parsing.
+
+ Similar non-Perl libraries
+
+    Natt Java library, which the last time I tried sometimes gives weird
+    answer, e.g. "32 Oct" becomes 1 Oct in the far future.
+    http://natty.joestelmach.com/
+
+    Duckling Clojure library, which can parse date/time as well as numbers
+    with some other units like temperature.
+    https://github.com/wit-ai/duckling
+

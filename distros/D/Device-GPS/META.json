@@ -1,0 +1,46 @@
+{
+   "abstract" : "Read GPS (NMEA) data over a wire",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-GPS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::SerialPort" : "1.04",
+            "Moose" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/Device-GPS.git",
+         "web" : "https://github.com/frezik/Device-GPS"
+      }
+   },
+   "version" : "0.714874475569562"
+}
+

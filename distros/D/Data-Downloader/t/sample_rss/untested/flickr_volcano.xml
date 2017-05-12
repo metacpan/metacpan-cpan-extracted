@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0"
+        xmlns:media="http://search.yahoo.com/mrss/"
+	    xmlns:dc="http://purl.org/dc/elements/1.1/"
+	    	    xmlns:flickr="urn:flickr:" >
+	<channel>
+
+
+		<title>Recent Uploads tagged volcano</title>
+		<link>http://www.flickr.com/photos/tags/volcano/</link>
+ 		<description></description>
+		<pubDate>Mon, 20 Apr 2009 06:16:48 -0800</pubDate>
+		<lastBuildDate>Mon, 20 Apr 2009 06:16:48 -0800</lastBuildDate>
+		<generator>http://www.flickr.com/</generator>
+		<image>
+			<url>http://l.yimg.com/g/images/buddyicon.jpg</url>
+			<title>Recent Uploads tagged volcano</title>
+			<link>http://www.flickr.com/photos/tags/volcano/</link>
+		</image>
+
+		<item>
+			<title>Mt Bromo &amp; Mr. Diff</title>
+			<link>http://www.flickr.com/photos/difflim/3458666305/</link>
+			<description>&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/people/difflim/&quot;&gt;Diff Lim&lt;/a&gt; posted a photo:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/difflim/3458666305/&quot; title=&quot;Mt Bromo &amp;amp; Mr. Diff&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3663/3458666305_aa409d9b0f_m.jpg&quot; width=&quot;240&quot; height=&quot;240&quot; alt=&quot;Mt Bromo &amp;amp; Mr. Diff&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;用新币三元租了这件寒衣。&lt;br /&gt;
+其实还好，不太冷。&lt;br /&gt;
+不过看出租的小伙子那么努力招生意，就帮一帮他。&lt;/p&gt;</description>
+			<pubDate>Mon, 20 Apr 2009 06:16:48 -0800</pubDate>
+			                        <dc:date.Taken>2009-04-20T21:16:48-08:00</dc:date.Taken>
+            			<author flickr:profile="http://www.flickr.com/people/difflim/">nobody@flickr.com (Diff Lim)</author>
+			<guid isPermaLink="false">tag:flickr.com,2004:/photo/3458666305</guid>
+                            			<media:content url="http://farm4.static.flickr.com/3663/3458666305_7f13b1647a_o.jpg" 
+				       type="image/jpeg"
+				       height="604"
+				       width="604"/>
+            <media:title>Mt Bromo &amp; Mr. Diff</media:title>
+        <media:description type="html">&lt;p&gt;用新币三元租了这件寒衣。&lt;br /&gt;
+其实还好，不太冷。&lt;br /&gt;
+不过看出租的小伙子那么努力招生意，就帮一帮他。&lt;/p&gt;</media:description>
+        <media:thumbnail url="http://farm4.static.flickr.com/3663/3458666305_aa409d9b0f_s.jpg" height="75" width="75" />
+        <media:credit role="photographer">Diff Lim</media:credit>
+		<media:category scheme="urn:flickr:tags">indonesia volcano surabaya bromo diff mtbromo difflim</media:category>
+
+
+		</item>
+		<item>
+			<title>La nube e il pescatore</title>
+			<link>http://www.flickr.com/photos/stedim79/3459477430/</link>
+			<description>&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/people/stedim79/&quot;&gt;stedimion&lt;/a&gt; posted a photo:&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://www.flickr.com/photos/stedim79/3459477430/&quot; title=&quot;La nube e il pescatore&quot;&gt;&lt;img src=&quot;http://farm4.static.flickr.com/3510/3459477430_ea79fa4f79_m.jpg&quot; width=&quot;240&quot; height=&quot;159&quot; alt=&quot;La nube e il pescatore&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+
+</description>
+			<pubDate>Mon, 20 Apr 2009 06:15:35 -0800</pubDate>
+			                        <dc:date.Taken>2009-04-20T13:47:25-08:00</dc:date.Taken>
+            			<author flickr:profile="http://www.flickr.com/people/stedim79/">nobody@flickr.com (stedimion)</author>
+			<guid isPermaLink="false">tag:flickr.com,2004:/photo/3459477430</guid>
+                            			<media:content url="http://farm4.static.flickr.com/3510/3459477430_ea79fa4f79_m.jpg" 
+				       type="image/jpeg"
+				       height="159"
+				       width="240"/>
+            <media:title>La nube e il pescatore</media:title>
+        <media:thumbnail url="http://farm4.static.flickr.com/3510/3459477430_ea79fa4f79_s.jpg" height="75" width="75" />
+        <media:credit role="photographer">stedimion</media:credit>
+		<media:category scheme="urn:flickr:tags">blue sea sky italy volcano mediterraneo italia mare campania blu wideangle ciel cielo napoli vesuvio azzurro grandangolo italie vulcano castellammaredistabia tirreno d80 nikon1224f4</media:category>
+
+
+		</item>
+	</channel>
+</rss>

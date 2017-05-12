@@ -1,0 +1,44 @@
+---
+abstract: 'A plugin for normalizing query parameters in Dancer'
+author:
+  - "Damien \"dams\" Krotkine"
+build_requires:
+  Dancer::Test: 0
+  File::Spec: 0
+  FindBin: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Params-Normalization
+provides:
+  Dancer::Plugin::Params::Normalization:
+    file: lib/Dancer/Plugin/Params/Normalization.pm
+    version: 0.52
+  Dancer::Plugin::Params::Normalization::Abstract:
+    file: lib/Dancer/Plugin/Params/Normalization/Abstract.pm
+    version: 0.52
+  Dancer::Plugin::Params::Normalization::Trim:
+    file: lib/Dancer/Plugin/Params/Normalization/Trim.pm
+    version: 0.52
+requires:
+  Dancer: 1.3001
+  Dancer::Engine: 0
+  Dancer::Plugin: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-Params-Normalization
+  repository: http://github.com/dams/Dancer-Plugin-Params-Normalization
+version: 0.52

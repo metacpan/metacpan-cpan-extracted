@@ -1,0 +1,94 @@
+NAME
+    Dancer::Plugin::Auth::RBAC::Permissions::DBIC - Auth::RBAC Permissions
+    via DBIx::Class
+
+SYNOPSIS
+      if ( auth->asa('guest') ) {
+        ...
+      }
+      if ( auth->can('manage_accounts', 'create') ) {
+        ...
+      }
+
+DESCRIPTION
+    Uses your DBIx::Class schema to provide the authorisation part of the
+    RBAC user management system.
+
+    Note that you do not use this module directly. Use
+    Dancer::Plugin::Auth::RBAC and configure it to use the DBIC class in
+    your Dancer configuration (see below).
+
+    See Dancer::Plugin::Auth::RBAC::Credentials::DBIC for authentication and
+    role management via DBIC.
+
+METHODS
+    There are no public methods directly from this module. Use asa and can
+    from Dancer::Plugin::Auth::RBAC
+
+CONFIGURATION
+    Minimal example:
+
+        plugins:
+          DBIC:
+            Auth:
+              dsn: "dbi:SQLite:dbname=./foo.db"
+            Auth::RBAC:
+              credentials:
+                class: DBIC
+              permissions:
+                class: DBIC
+
+    The following config options are avaialable:
+
+    handle
+        The handle of the Dancer::Plugin::DBIC schema to use. Only needed if
+        you have more than one schema defined.
+
+    user_moniker
+        The moniker for the result source which holds your users. Default
+        "User".
+
+    role_relation
+        The name of the relationship to get the roles of a user. Default
+        "roles".
+
+    role_name_field
+        The name of the field on the role object that the role name is
+        stored in. Default "name".
+
+    perm_relation
+        The name of the relationship to get the permissions for a role.
+        Default "permissions".
+
+    perm_name_field
+        The name of the field on the permissions object that the permission
+        name is stored in. Default "name".
+
+    ops_relation
+        The name of the relationship to get the operations for a permission.
+        Default "operations".
+
+    ops_name_field
+        The name of the field on the operations object that the operation
+        name is stored in. Default "name".
+
+  DBIx::Class RELATIONSHIPS
+    The RBAC relationships are as follows:
+
+    user has_many roles has_many permissions has_many operations
+
+SEE ALSO
+    Dancer::Plugin::DBIC Dancer::Plugin::Auth::RBAC
+    Dancer::Plugin::Auth::RBAC::Credentials::DBIC DBIx::Class
+
+AUTHOR
+    Jason Clifford, <jason@ukfsn.org>
+    Enormously inspired by Dancer::Plugin::Auth::RBAC::Credentials::DBIC
+                      from Dagfinn Ilmari Mannsåker <ilmari@photobox.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Jason Clifford
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

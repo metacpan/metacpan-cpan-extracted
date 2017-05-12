@@ -1,0 +1,47 @@
+=head1 NAME
+
+DBIx::Cookbook::README -- structure of the lib/DBIx/Cookbook directory
+
+=head1 DESCRIPTION
+
+In the F<lib/DBIx/Cookbook>, there are several types of
+files/directories: 
+
+=head2 Command classes
+
+These classes leverage L<MooseX::App::Cmd> and serve as the command
+class for the scripts in F<$DISTRO/scripts> to run actual
+commands. Let's make that concrete.
+
+The file L<dbic_cmd
+script|http://github.com/metaperl/dbix-cookbook/blob/master/scripts/dbic_cmd>
+invokes F<lib/DBIx/Cookbook/DBIC.pm> which then invokes one of the
+"scripts" in F<lib/DBIx/Cookbook/*.pm> to run a particular command.
+
+A similar execution flow exists for Rose::DB::Object through
+F<rdbo_cmd>, F<lib/DBIx/Cookbook/RDBO.pm> and
+F<lib/DBIx/Cookbook/RDBO/*.pm> as well as 
+F<skinny_cmd>, F<lib/DBIx/Cookbook/Skinny.pm> and
+F<lib/DBIx/Cookbook/Skinny/*.pm>
+
+
+=head2 Database connectivity files
+
+F<lib/DBIx/Cookbook/DBH.(tt|pm)> are files which hold database
+connection info. When C<make sakila> is run during package
+installation, the F<.tt> file is turned into the F<.pm> file via the
+L<install sakila
+script|http://github.com/metaperl/dbix-cookbook/blob/master/etc/install_sakila.pl> 
+
+
+=head2 Recipe directories
+
+F<RecipeTT> and F<Recipe> are the directories for templates and
+generated pod for the recipes. 
+
+=head1 That's all folks
+
+So now you know about all the files in the
+L<lib/DBIx/Cookbook|http://github.com/metaperl/dbix-cookbook/tree/master/lib/DBIx/Cookbook/>
+directory
+

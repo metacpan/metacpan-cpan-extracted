@@ -1,0 +1,71 @@
+DBD::JDBC tasks
+
+
+Finish implementing DBI interface methods
+    * DBI->data_sources('JDBC')
+
+      I actually don't think this can be implemented in any
+      sensible fashion. It might make sense to add a
+      driver-specific method to return available JDBC drivers
+      (from jdbc.drivers).
+
+    * The metadata methods $dbh->table_info, $dbh->tables,
+      $dbh->type_info_all, and $dbh->type_info.
+
+      These seem to map reasonably well to the JDBC
+      DatabaseMetaData methods getTables() and
+      getTypeInfo(). They're currently unimplemented due to time
+      constraints. 
+
+    * $sth->cancel
+     
+      What seems to make sense here is to have a separate
+      listener thread in the server which can respond to cancel
+      messages, since client threads will presumably be blocked
+      at this point. The listener can keep a table of
+      client threads and call the appropriate statement's cancel
+      method. 
+
+    * $sth->bind_param_inout
+
+    * A client row cache.
+
+
+
+Extend the $h->jdbc_func implementation to support arbitrary
+objects. My current idea is to return an object handle type to
+Perl and maintain an object pool on the server, but this isn't
+fully thought through. 
+
+
+Add support to the server for JDBC 2.0. It might make sense to
+allow the user to switch between a JDBC 1.2 and a JDBC 2.0
+connection implementation; I don't know their driver, but surely
+they do.
+
+
+Write an Oracle test suite, on the theory that testing this
+beyond the "hello world" stage with a more mainstream driver
+can't be all bad.
+
+
+Add some sort of streaming behavior for long fields.
+
+
+It might be worth moving the test code which starts and stops a
+server into the driver module as a utility, in case you want to
+use this driver but don't want to run a server constantly. The
+JDK 1.1 -classpath option bug is a pain here, since it makes it
+difficult to start a Java application without setting the
+CLASSPATH environment variable.
+
+
+Possible server extensions: 
+  add a thread pool to minimize connection time 
+  add the ability to specify username/password
+    values in the server configuration 
+  per-client tracing
+  inetd support (add a main to Connection)
+
+
+

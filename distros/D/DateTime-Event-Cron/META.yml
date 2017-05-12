@@ -1,0 +1,24 @@
+---
+abstract: 'DateTime extension for generating recurrence'
+author:
+  - 'Matthew P. Sisk  <sisk@mojotoad.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Event-Cron
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DateTime: 0.21
+  DateTime::Set: 0.1406
+  Set::Crontab: 0
+version: 0.09

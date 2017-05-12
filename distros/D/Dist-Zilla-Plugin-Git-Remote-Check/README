@@ -1,0 +1,134 @@
+NAME
+    Dist::Zilla::Plugin::Git::Remote::Check - Ensure no pending commits on a
+    remote branch before release
+
+VERSION
+    version 0.1.2
+
+SYNOPSIS
+      [Git::Remote::Check]
+       ; Provided by Dist::Zilla::Role::Git::Remote
+      ; String
+      ; The name of the remote to update.
+      ; Must exist in Git.
+      ; default is 'origin'
+      remote_name = origin
+
+      ; Provided by Dist::Zilla::Role::Git::Remote::Update
+      ; Boolean
+      ; turn updating on/off
+      ; default is 'on' ( 1 / true )
+      do_update = 1
+
+      ; Provided by Dist::Zilla::Role::Git::Remote::Branch
+      ; String
+      ; the name of the branch on the remote side to check against
+      ; default is the same value us 'branch'
+      remote_branch = master
+
+      ; String
+      ; the name of the branch on the local side to check.
+      ; default is 'master'
+      branch = master
+
+      ; Provided by Dist::Zilla::Role::Git::Remote::Check;
+      ; Int
+      ; How many of the most recent commits to dump when we're behind upstream.
+      ; default = 5
+      report_commits = 5
+
+PARAMETERS
+  "remote_name"
+    The name of the repository to use as specified in ".git/config".
+
+    Defaults to "origin", which is usually what you want.
+
+  "remote_branch"
+    The branch name on the remote.
+
+    e.g.: For "origin/master" use "master" with "remote_name = origin"
+
+    Defaults to the same value as "branch"
+
+  "do_update"
+    A boolean value that specifies whether or not to execute the update.
+
+    Default value is 1 / true.
+
+  "branch"
+    The local branch to check against the remote one. Defaults to 'master'
+
+  "report_commits"
+    In the event the remote is ahead, this "Int" dictates the maximum number
+    of commits to print to output.
+
+    Defaults to 5
+
+METHODS
+  "before_release"
+    Executes code before releasing.
+
+    1.  Updates the "remote" via "remote_update" in
+        Dist::Zilla::Role::Git::Remote::Update
+
+    2.  Checks the "remote" via "check_remote" in
+        Dist::Zilla::Role::Git::Remote::Check
+
+  "git"
+    Returns a Git::Wrapper instance for the current Dist::Zilla projects
+    "git" Repository.
+
+  "remote"
+    Returns a validated remote name. Configured via "remote_name" parameter.
+
+  "remote_branch"
+    Returns a fully qualified branch name for the parameter specified as
+    "remote_branch" by combining it with "remote", and defaulting to the
+    value of "branch" if not assigned explicitly.
+
+  "remote_update"
+    Performs "git remote update $remote_name" on "git" for the remote
+    "remote"
+
+  "branch"
+    The local branch to check against the remote one. Defaults to 'master'
+
+  "check_remote"
+    Compare "branch" and "remote_branch" making sure that "branch" is the
+    more recent of the 2.
+
+ROLES
+  "Dist::Zilla::Role::BeforeRelease"
+    Causes this plugin to be executed during Dist::Zilla's "Before Re,ease"
+    phase. ( "before_release" )
+
+  "Dist::Zilla::Role::Git::LocalRepository"
+    Provides a "git" method that returns a "Git::Wrapper" instance for the
+    current "Dist::Zilla" project.
+
+  "Dist::Zilla::Role::Git::Remote"
+    Provides a "remote" method which always returns a validated "remote"
+    name, optionally accepting it being specified manually to something
+    other than "origin" via the parameter "remote_name"
+
+  "Dist::Zilla::Role::Git::Remote::Branch"
+    Provides a "remote_branch" method which combines the value returned by
+    "remote" with a user specified branch name and returns a fully qualified
+    remote branch name.
+
+  "Dist::Zilla::Role::Git::Remote::Update"
+    Provides a "remote_update" method which updates a "remote" in "git"
+
+  "Dist::Zilla::Role::Git::Remote::Check"
+    Provides "check_remote" which compares "branch" and "remote_branch" and
+    asserts "remote_branch" is not ahead of "branch"
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

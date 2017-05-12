@@ -1,0 +1,101 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Device::Onkyo;
+use Getopt::Long;
+use Pod::Usage;
+
+
+# ABSTRACT: Perl script to control an Onkyo/Integra AV Receiver
+# PODNAME: onkyo
+
+
+$|=1; # don't buffer output
+
+my $man;
+my $help;
+my $device = $ENV{DEVICE_ONKYO} || 'discover';
+my $broadcast_source_ip = $ENV{DEVICE_ONKYO_BROADCAST_SOURCE_IP} || '0.0.0.0';
+my $broadcast_dest_ip =
+  $ENV{DEVICE_ONKYO_BROADCAST_DEST_IP} || '255.255.255.255';
+GetOptions('device=s' => \$device,
+           'broadcast_source_ip' => \$broadcast_source_ip,
+           'help|?' => \$help, man => \$man) or pod2usage(2);
+pod2usage(1) if $help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $man;
+
+my $onkyo = Device::Onkyo->new(device => $device,
+                               broadcast_dest_ip => $broadcast_dest_ip,
+                               broadcast_source_ip => $broadcast_source_ip);
+if (@ARGV) {
+  $onkyo->command(join ' ', @ARGV);
+  resp($onkyo);
+  exit;
+}
+
+while (<>) {
+  chomp;
+  $onkyo->command($_);
+  resp($onkyo);
+}
+
+sub resp {
+  my $onkyo = shift;
+  my $cmd = $onkyo->read;
+  if ($cmd =~ /^NLS/) {
+    $cmd = $onkyo->read;
+  }
+  print "$cmd\n";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+onkyo - Perl script to control an Onkyo/Integra AV Receiver
+
+=head1 VERSION
+
+version 1.143640
+
+=head1 SYNOPSIS
+
+  # increase volume (using discovery)
+  onkyo volume up
+
+  # decrease volume with "raw" command (using discovery)
+  onkyo MVLDOWN
+
+  # send multiple commands (using named device)
+  (echo power on ; echo volume- ) | onkyo --device amp.example.com
+
+  # request source input id from device specified with environment variable
+  DEVICE_ONKYO=amp.example.com onkyo SLIQSTN
+
+  # set source input id with discovery broadcast address set in env variable
+  onkyo --broadcast_source_ip 192.168.1.1 SLI00
+
+  # set source input id with discovery broadcast address set in env variable
+  DEVICE_ONKYO_BROADCAST_SOURCE_IP=192.168.1.1 onkyo SLI00
+
+=head1 DESCRIPTION
+
+This script is an example script to control an Onkyo receiver using the
+L<Device::Onkyo> Perl module.
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

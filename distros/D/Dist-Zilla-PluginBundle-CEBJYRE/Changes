@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-PluginBundle-CEBJYRE
+
+0.4.0     2012-12-09 21:24:03 Australia/Sydney
+    Generate JSON instead of YAML for the META file
+
+0.3.0     2012-11-19 18:29:20 Australia/Sydney
+    Pass skip options through to AutoPrereqs
+    Repo metadata update
+
+0.2.0     2011-08-15 21:29:45 Australia/Sydney
+    Pass configuration options through to the Git pluginbundle
+
+0.1.1     2011-02-15 11:45:14 Australia/Sydney
+    Added prereqs
+
+0.1.0     2011-02-14 20:58:31 Australia/Sydney
+    Fixed massive breakage (didn't work at all)
+    Added some tests
+
+0.0.1     2011-02-11 20:39:05 Australia/Sydney
+    First version

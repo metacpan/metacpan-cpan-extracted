@@ -1,0 +1,6 @@
+#!/bin/ksh
+
+export INFORMIXDIR=/app/info50c
+PATH=/usr/local/bin:$INFORMIXDIR/bin:$PATH
+# 9001 is Port number
+./dbagent 9001

@@ -1,0 +1,17 @@
+0.23 (05.05.2010) - John Ingram <john@funnycow.com>
+  * Added Data::Maker 0.23 as a dependency 
+
+0.22 (05.03.2010) - John Ingram <john@funnycow.com>
+  * But of course, what I was trying to do in 0.21 will
+    only work if I *commit the change*.  Bah! 
+
+0.21 (05.03.2010) - John Ingram <john@funnycow.com>
+  * Trying to fix this version problem.   Data::Maker used to have this
+    class in it, and at the time it had version 0.20.  So I'll start
+    this distribution out at 0.21
+
+0.02 (05.03.2010) - John Ingram <john@funnycow.com>
+  * Added some POD
+
+0.01 (05.02.2010) - John Ingram <john@funnycow.com>
+  * Initial version of Data::Maker::Field::Currency

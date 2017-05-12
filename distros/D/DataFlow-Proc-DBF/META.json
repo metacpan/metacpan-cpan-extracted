@@ -1,0 +1,60 @@
+{
+   "abstract" : "A dBase DBF converting processor",
+   "author" : [
+      "Breno G. de Oliveira <garu@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DataFlow-Proc-DBF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DataFlow" : "1.11148",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Moose" : "1.09",
+            "MooseX::Aliases" : "0",
+            "Test::More" : "0",
+            "XBase" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=DataFlow-Proc-DBF"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/garu/DataFlow-Proc-DBF"
+      }
+   },
+   "version" : "0.03"
+}

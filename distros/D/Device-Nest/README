@@ -1,0 +1,43 @@
+Device-Nest version 0.09
+========================
+
+This module is designed to allow interaction with the Nest API via Perl.
+
+In order to use this module, you will require a Nest thermostat installed in 
+your home as well.  You will also need your ClientID and ClientSecret provided
+by Nest when you register as a developer at https://developer.nest.com.
+
+You will also need an PIN token which can be obtained at 
+https://home.nest.com/login/oauth2?client_id=CLIENT_ID&state=FOO
+
+Your authorization code can be displayed by calling the fetch_Auth_Token()
+method in this module.  You can only call this function once per PIN token
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   LWP::UserAgent v 6.05
+   JSON           v 2.90
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2014 by Kedar Warriner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

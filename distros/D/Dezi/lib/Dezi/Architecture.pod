@@ -1,0 +1,240 @@
+=pod
+
+=head1 NAME
+
+Dezi::Architecture - all about the Dezi innards
+
+=head1 SYNOPSIS
+
+ Dezi::Server 
+   ->isa Search::OpenSearch::Server::Plack 
+     ->isa Search::OpenSearch::Server 
+       ->hasa Search::OpenSearch::Engine::Lucy 
+         ->hasa Dezi::Lucy::Indexer 
+           ->hasa Lucy::Index::Indexer
+         ->hasa Dezi::Lucy::Searcher 
+           ->hasa Lucy::Search::PolySearcher
+   ->returns Search::OpenSearch::Response
+
+ Search::OpenSearch::Engine::Lucy
+  ->uses Search::Tools::QueryParser
+  ->uses Search::Tools::Snipper
+  ->uses Search::Tools::HiLiter
+  ->uses Search::Query::Parser
+  ->uses Search::Query::Dialect::Lucy
+
+=head1 DESCRIPTION
+
+This document describes the Dezi architecture. 
+
+The chief assumption in this document is
+that you are using the Apache L<Lucy> library (L<http://lucy.apache.org/>) 
+backend via L<Search::OpenSearch::Engine::Lucy>. 
+Lucy is the default engine type for Dezi. 
+In theory, any L<Search::OpenSearch::Engine> subclass could work,
+though not all have full REST support.
+
+The other assumptions are that you have some understanding
+of the HTTP/1.1 protocol, and some understanding of object-oriented
+software design, particularly in Perl.
+
+=head1 BACKGROUND
+
+Dezi is a L<Search::OpenSearch::Server::Plack> application 
+designed first for ease-of-use
+and extensibility, through a centralized configuration file.
+Dezi implements a HTTP-based search server with a REST
+orientation. 
+
+The name C<Dezi> was chosen because it is short and easy to pronounce.
+L<Search::OpenSearch::Server::Plack> is a mouthful. I was inspired
+by the L<Starman> naming rationale, and I used to watch a lot
+of black-and-white TV re-runs as a kid.
+
+=head1 THE STACK
+
+Dezi is a short name with a long list of dependencies.
+
+Dezi integrates the L<Search::OpenSearch> set of modules
+with Swish3 and Apache L<Lucy>.
+
+The primary dependency is L<Search::OpenSearch::Server::Plack>,
+which L<Dezi::Server> subclasses directly.
+
+L<Search::OpenSearch::Server::Plack> is a L<Plack::Component> that
+implements some basic HTTP request handling and delegates
+most of the hard work to a L<Search::OpenSearch::Engine>,
+in our case L<Search::OpenSearch::Engine::Lucy>.
+
+L<Search::OpenSearch::Engine::Lucy>, like all L<Search::OpenSearch::Engine>
+subclasses, delegates to one or more task-specific classes:
+for searching, L<Dezi::Lucy::Searcher>; for indexing,
+L<Dezi::Lucy::Indexer>. 
+
+All the L<Dezi::App> components rely on B<Swish3>.
+Swish3 is the third major version of Swish-e (L<http://swish3.dezi.org/>).
+The L<SWISH::3> module is a Perl binding to the libswish3 C library,
+which is primarily a document parser built on top of libxml2.
+
+Apache L<Lucy> (L<http://lucy.apache.org/>) is the underlying 
+information retrieval library. It
+does all the hard work. Everything else is built on top of or extends Lucy
+with the intent of making the out-of-the-box experience as
+painless as possible, and filling in some of the usability gaps.
+
+Keep one thing in mind: the only web-specific pieces of Dezi
+are the Plack components. Everything else is transport-agnostic.
+For example, the B<deziapp> command (mentioned in the L<Dezi::Tutorial>)
+comes with L<Dezi::App>, and uses the same L<Dezi::App> modules
+to index and search that Dezi does. Dezi is a REST server version
+of the B<deziapp> command-line tool.
+
+If that didn't make things any clearer, go back and read this
+section again. Even if it doesn't get clearer, the module
+names will at least start to become more familiar.
+
+=head1 CONFIGURATION
+
+First, read L<Dezi::Config>. Then come back here.
+
+The heart of Dezi is the configuration file. Dezi is designed
+so that you don't have to write any code, unless you want to.
+Nearly every dependency component can be configured via
+the L<Dezi::Config> file.
+
+Because there are so many components, please consult
+the documentation specific to each component for
+particular options. Those components should be
+noted in the L<Dezi::Config> SYNOPSIS.
+
+=head1 REST
+
+Dezi's architecture is oriented toward the
+REpresentational State Transfer (REST) model. See
+L<http://en.wikipedia.org/wiki/Representational_state_transfer>.
+
+You should interpret "oriented toward" as a subtle caveat that
+Dezi doesn't claim to be purely RESTful in its implementation.
+While most REST constraints are respected and supported, there are certain
+optional optimizations that violate one or more
+of the REST constraints. 
+
+For example, the C<auto_commit> Engine feature,
+which gives the ability to COMMIT or
+ROLLBACK one or more POST requests, could be said to violate
+the Stateless REST constraint. In its transaction implementation,
+Dezi follows a more RPC-style
+model with REST-like semantics (i.e., you can use the
+COMMIT or ROLLBACK HTTP method, which is neither part of the
+HTTP spec nor RESTful, but which does emphasize the noun/verb
+separation of HTTP method and URI).
+
+Strong emphasis is put on exercising the full HTTP/1.1 specification, 
+including the use of HTTP methods to indicate server actions
+and proper (we hope!) HTTP response codes.
+ 
+=head1 REQUEST
+
+An incoming HTTP request is parsed and routed according to its method.
+GET requests are always idempotent. POST, PUT and DELETE requests are not:
+they can alter the state of resources on the server.
+
+The following examples show how Dezi interprets requests:
+
+ GET      /search?q=foo    # return search results for 'foo'
+ POST     /index/foo       # add or update document 'foo'
+ PUT      /index/foo       # add (only) document 'foo'
+ GET      /index/foo       # return document 'foo'
+ DELETE   /index/foo       # remove document 'foo'
+ COMMIT   /index           # write pending changes
+ POST     /commit          # same as COMMIT /index
+ ROLLBACK /index           # abort pending changes
+ POST     /rollback        # same as ROLLBACK /index
+ GET      /ui              # return Dezi::UI HTML
+
+The actual paths are configurable. See L<Dezi::Config>.
+
+=head1 RESPONSE
+
+Dezi delegates all search responses to L<Search::OpenSearch::Response> objects.
+The default response type is JSON. You can use the C<t> GET param
+to change that type per-request, or use the C<default_response_format>
+engine configuration option to set the default. See L<Dezi::Config>,
+L<Search::OpenSearch::Engine> and L<Search::OpenSearch::Response>.
+
+All non-idempotent responses use the JSON format, and indicate
+both the C<success> boolean and C<code> HTTP status as part of the
+JSON string.
+
+=head1 FEEDBACK
+
+The evolution of the Dezi application is ongoing and I welcome your
+feedback. See the SUPPORT section below for how to get involved.
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find this documentation with the perldoc command.
+
+    perldoc Dezi::Architecture
+
+You can also look for information at:
+
+=over 4
+
+=item * Website
+
+L<http://dezi.org/>
+
+=item * IRC
+
+#dezisearch at freenode
+
+=item * Mailing list
+
+L<https://groups.google.com/forum/#!forum/dezi-search>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dezi/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2012 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 SEE ALSO
+
+L<Dezi::Server>, L<Dezi::Config>, L<Search::OpenSearch>, 
+L<SWISH::3>, L<Dezi::App>, L<Plack>, L<Lucy>
+
+=cut
+

@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-Plugin-Keywords
+
+0.007     2016-04-24 20:49:42Z
+          - do not decode the already-decoded strings from PPI, now that
+            Dist::Zilla::Role::PPI is fixed (in 6.003)
+
+0.006     2014-08-16 02:49:06Z
+          - soften the diagnostic string from always bleating it to only when
+            --verbose is set
+
+0.005     2014-05-04 03:56:25Z
+          - no longer adding an empty arrayref to metadata if there is no
+            data to add
+          - properly handle utf8 (or other)-encoded keyword strings
+
+0.004     2014-03-16 09:04:34Z
+          - bump dependency on Dist::Zilla to get a minor fix in the PPI role
+
+0.003     2014-03-14 15:35:22Z
+          - properly extract keywords from other comments than the first one
+            in the module
+
+0.002     2014-03-13 12:33:31Z
+          - now also adds keywods from a "KEYWORDS:" comment in the main
+            module
+
+0.001     2014-03-12 15:14:03Z
+          - Initial release.

@@ -1,0 +1,80 @@
+NAME
+     DBIx::Wrapper::Config -  Config Module for DBIx::Wrapper
+
+SYNOPSIS
+     use DBIx::Wrapper::Config;
+
+     my $dbh = DBIx::Wrapper::Config->connect($db_key, $conf_path, \%dbix_wrapper_attrs);
+
+DESCRIPTION
+     This module allows you to create a configuration file in XML
+     specifying information required to connect to databases using
+     DBIx::Wrapper.  This way you can keep your database connection
+     specifications in one place.  Each "db" element specifies a
+     key/name for the database connection, which should be passed as
+     the $db_key argument to connect() in order to connect to that
+     database.  The "db" element's children specify the dsn,
+     authentication, and attribute information.
+
+        <?xml version="1.0" encoding="iso-8859-1"?>
+        <config>
+          <db name="test_db_key">
+            <dsn>dbi:mysql:database=test_db;host=example.com;port=3306</dsn>
+
+            <!-- You can also use attributes to specify each part of the
+                 dsn separately.
+             -->
+            <!-- <dsn driver="mysql" database="test_db" host="example.com" port="3306"/> -->
+
+            <user>test_user</user>
+            <password>test_pwd</password>
+
+            <!-- attributes to pass to DBIx::Wrapper (and ultimately to DBI) -->
+            <attribute name="RaiseError" value="0"/>
+            <attribute name="PrintError" value="1"/>
+          </db>
+
+          <db name="test_db_key2">
+            <dsn driver="mysql" database="test_db" host="test.example.com" port="3306"/>
+
+            <user>test_user</user>
+            <password>test_pwd</password>
+
+            <attribute name="RaiseError" value="0"/>
+            <attribute name="PrintError" value="1"/>
+          </db>
+
+        </config>
+
+  connect($db_key, $conf_path, \%dbix_wrapper_attrs)
+     Return a DBIx::Wrapper object connected to the database
+     specified by $db_key in the file at $conf_path.
+     %dbix_wrapper_attrs is the optional 5th argument to
+     DBIx::Wrapper's connect() method, specifying handlers, etc.
+
+     The file specified by $conf_path should be in the format
+     specified in the DESCRIPTION section of this document.
+
+EXAMPLES
+DEPENDENCIES
+    DBIx::Wrapper, XML::Parser::Wrapper
+
+AUTHOR
+    Don Owens <don@regexguy.com>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2005 Don Owens <don@regexguy.com>. All rights reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+     DBIx::Wrapper, DBI
+
+VERSION
+     0.02
+

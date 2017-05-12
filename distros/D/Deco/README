@@ -1,0 +1,40 @@
+Deco version 0.11
+=================
+
+The Deco package can be used to simulate tissue behaviour during scuba diving.
+
+This is very much work in progress. Results are by far not stable yet.
+
+WARNING !!!
+
+Do not base your actual dives on the values obtained from this software. It has been written for educational and fun purposes only and has NOT BEEN BACKED by any dives made.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   Test::More
+   Test::Exception
+   GD::Graph
+   Config::General
+
+You can force install the package without the Test::* modules available. The GD::Graph module is only needed when you want to use the Dive::plot package.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jaap Voets
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

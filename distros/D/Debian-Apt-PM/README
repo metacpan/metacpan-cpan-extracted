@@ -1,0 +1,197 @@
+NAME
+    Debian::Apt::PM - locate Perl Modules in Debian repositories
+
+NOTE
+    Needs following extra Debian packages `libdpkg-perl' and
+    `libapt-pkg-perl'.
+
+SYNOPSIS
+    command line:
+
+            apt-pm update
+            apt-pm find Moose
+            dpkg-scanpmpackages /path/to/debian/repository
+        
+            # print out all dependencies of an unpacked distribution that are packaged for Debian
+            perl -MDebian::Apt::PM -MModule::Depends -le \
+                    '$apm=Debian::Apt::PM->new();$md=Module::Depends->new->dist_dir(".")->find_modules; %r=(%{$md->requires},%{$md->build_requires}); while (($m, $v) = each %r) { $f=$apm->find($m, $v); print $f->{"min"}->{"package"} if $f->{"min"}  }' \
+                    | sort \
+                    | uniq \
+                    | xargs echo apt-get install
+            # print out all dependencies of an unpacked distribution that are not packaged for Debian
+            perl -MDebian::Apt::PM -MModule::Depends -le \
+                    '$apm=Debian::Apt::PM->new();$md=Module::Depends->new->dist_dir(".")->find_modules; %r=(%{$md->requires},%{$md->build_requires}); while (($m, $v) = each %r) { $f=$apm->find($m, $v); print $m, " ", $v if not $f->{"min"}  }'
+
+    Module:
+
+            my $aptpm = Debian::Apt::PM->new(sources => [ 'PerlPackages.bz2' ])
+            $aptpm->update;
+            my %moose_locations = $aptpm->find('Moose');
+
+USAGE
+  COMMAND-LINE USAGE
+    Add sources for Debian releases and components. Here is the complete
+    list that can be reduced just to the wanted ones:
+
+            cat >> /etc/apt/sources.list << __END__
+            # for apt-pm
+            deb http://alioth.debian.org/~jozef-guest/pmindex/     lenny   main contrib non-free
+            deb http://alioth.debian.org/~jozef-guest/pmindex/     squeeze main contrib non-free
+            deb http://alioth.debian.org/~jozef-guest/pmindex/     wheezy  main contrib non-free
+            deb http://alioth.debian.org/~jozef-guest/pmindex/     sid     main contrib non-free
+
+            __END__
+
+    Fetch the indexes:
+
+            apt-pm update
+
+    Look for the CPAN modules:
+
+            apt-pm find Moose
+            # libmoose-perl_0.17-1_all: Moose 0.17
+            # libmoose-perl_0.94-1_i386: Moose 0.94
+            # libmoose-perl_0.97-1_i386: Moose 0.97
+            # libmoose-perl_0.54-1_all: Moose 0.54
+
+    Look for the non-CPAN modules:
+
+            apt-pm find Purple        
+            # libpurple0_2.4.3-4lenny5_i386: Purple 0.01
+        
+            apt-pm find Dpkg::Version
+            # dpkg-dev_1.14.28_all: Dpkg::Version 0
+
+METHODS
+  new()
+    Object constructor.
+
+    PROPERTIES
+    sources
+        `isa => 'ArrayRef'' of files that will be read to construct the
+        lookup. By default it is filled with files from
+        /var/cache/apt/apt-pm/.
+
+    cachedir
+        Is the folder where indexes cache files will be stored. Default is
+        /var/cache/apt/apt-pm/deb/.
+
+    repo_type
+        `deb|deb-src'
+
+    packages_dependencies
+        Path to `02packages.dependencies.txt(.gz)?' file.
+
+  find($module_name, [$min_version])
+    Returns hash with Perl versions as key and hash value having Debian
+    version and package name. Example:
+
+            {
+                    '0.94' => {
+                            'version' => '0.94-1',
+                            'package' => 'libmoose-perl'
+                            'arch'    => 'i386'
+                    },
+                    '0.97' => {
+                            'version' => '0.97-1',
+                            'package' => 'libmoose-perl'
+                            'arch'    => 'i386'
+                    },
+                    '0.54' => {
+                            'version' => '0.54-1',
+                            'package' => 'libmoose-perl'
+                            'arch'    => 'i386'
+                    },
+            };
+
+    If `$min_version' is set, returns `min' and `max' keys. `max' has always
+    the highest version:
+
+            'max' => {
+                    'version' => '0.97-1',
+                    'package' => 'libmoose-perl'
+                    'arch'    => 'i386'
+            },
+
+    `min' is changing depending on `$min_version'. Examples:
+
+            $min_version = '0.01';
+            'min' => {
+                    'version' => '0.54-1',
+                    'package' => 'libmoose-perl'
+                    'arch'    => 'i386'
+            },
+            $min_version = '0.93';
+            'min' => {
+                    'version' => '0.94-1',
+                    'package' => 'libmoose-perl'
+                    'arch'    => 'i386'
+            },
+            $min_version = '1.00';
+            'min' => undef,
+
+  update
+    Scans the /etc/apt/sources.list and /etc/apt/sources.list.d/*.list
+    repositories for PerlPackages.bz2 and prepares them to be used for find.
+    All PerlPackages.bz2 are stored to /var/cache/apt/apt-pm/.
+
+    It also fetches
+    http://pkg-perl.alioth.debian.org/cpan2deb/CPAN/02packages.dependencies.
+    txt.gz to be used by `apt-cpan'.
+
+  clean
+    Remove all files from cache folder.
+
+  resolve_install_depends($force_all, @modules)
+    Returns two array references one with Debian packages, the other with
+    CPAN packages that needs to be installed on current system for the given
+    list of `@modules'.
+
+    Option `$force_all' (true/false) choose to include all dependencies not
+    just the ones that needs to be installed.
+
+  module_depends($module)
+    Return all Perl modules and Debian packages `$module' has as dependency.
+
+SEE ALSO
+    http://pkg-perl.alioth.debian.org/cpan2deb/
+
+AUTHOR
+    jozef@kutej.net, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-debian-apt-pm at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Debian-Apt-PM. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Debian::Apt::PM
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debian-Apt-PM
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Debian-Apt-PM
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Debian-Apt-PM
+
+    * Search CPAN
+        http://search.cpan.org/dist/Debian-Apt-PM/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 jkutej@cpan.org.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

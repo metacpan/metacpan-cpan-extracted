@@ -1,0 +1,75 @@
+Data-Phrasebook-Loader-Ini
+==========================
+
+DESCRIPTION
+
+  Abstract your queries ... with ini files!
+
+This distribution enables the framework for abstracting common or locale data
+out of your code into a datastore. The default is within a plain text file,
+however this distribution extends that to use ini files.
+
+DEPENDENCIES
+
+The distribution requires the following modules:
+
+  Data::Phrasebook    >= 0.18
+  Config::IniFiles
+
+For testing purposes, the following modules are required:
+
+  Test::More          >= 0.47
+
+For testing purposes, the following modules are desireable, but not essential:
+
+  Test::Pod           >= 1.00
+  Test::Pod::Coverage >= 0.08
+  Pod::Coverage
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+For more detailed installation instructions, see INSTALL.
+
+USAGE
+
+Read the pod documentation in the distrubtion files.
+
+CHANGES
+
+For a complete list of changes, see the Changes file.
+
+SUPPORT
+
+If you spot a bug or are experiencing difficulties that are not explained 
+within the POD documentation, please send an email to barbie@cpan.org or 
+submit a bug to the RT system (http://rt.cpan.org/). It would help greatly 
+if you are able to pinpoint problems or even supply a patch. 
+
+Fixes are dependent upon their severity and my availability. Should a fix not
+be forthcoming, please feel free to (politely) remind me.
+
+AUTHOR
+
+  Barbie, <barbie@cpan.org>
+  for Miss Barbell Productions <http://www.missbarbell.co.uk>.
+
+CREDITS
+
+This distribution was made with a lot of help from
+
+  * Iain Campbell Truskett (16.07.1979 - 29.12.2003).
+
+COPYRIGHT AND LICENSE
+
+  Copyright (C) 2004-2014 Barbie for Miss Barbell Productions
+
+  This distribution is free software; you can redistribute it and/or
+  modify it under the Artistic License 2.0.
+

@@ -1,0 +1,52 @@
+NAME
+    Device::DSE::Q1573 - Read data from DSE Q1573 Digital Multimeter
+
+SYNOPSIS
+      use Device::DSE::Q1573;
+      my $meter = Device::DSE::Q1573->new("/dev/ttyS0");
+      my $reading = $meter->rawread();
+
+DESCRIPTION
+    Sets up a connection to a DSE Q1573 or Metex ME-22 Digital Multimeter,
+    and allows you to read measurements from it. The data return is 14 bytes
+    of the format:
+
+    Type:Data:Units eg reading when temperatur is selected on the meter will
+    return
+
+    "TE 0019 C "
+
+USAGE
+  new(serialport)
+     Usage     : my $meter=Device::DSE::Q1573->new("/dev/ttyS0")
+     Purpose   : Opens the meter on the specified serial port
+     Returns   : object of type Device::DSE::Q1573
+     Argument  : serial port
+
+  rawread();
+     Usage     : my $meter->rawread()
+     Purpose   : Returns the 14 byte string from the meter.
+
+EXAMPLE
+    use Device::DSE::Q1573;
+
+    my $meter = Device::DSE::Q1573->new( "/dev/ttyS0" );
+
+    while(1) { my $data = $meter->read(); print $data . "\n"; sleep(1); }
+
+AUTHOR
+        David Peters
+        CPAN ID: DAVIDP
+        davidp@electronf.com
+        http://www.electronf.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

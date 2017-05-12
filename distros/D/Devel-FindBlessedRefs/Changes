@@ -1,0 +1,67 @@
+1.253: Fri May 06 2011
+   - fixed a couple typos.  renamed find_refs_with_coderef
+
+1.252: Wed Mar 25 16:22:38 EDT 2009
+   - added chorny's META.yml stuff
+
+1.251: Sun Oct  5 09:38:38 EDT 2008
+   - removed the other SvTYPE() since it's probably also wrong
+
+1.25: Wed Sep 10 07:01:39 EDT 2008
+   - woops: http://perlmonks.org/index.pl?node_id=709036 --
+     applies to this code also
+
+1.2: Thu Aug  7 16:13:58 EDT 2008
+   - removed version.pm and Module::Build
+
+1.1.3: Wed Jul 30 07:26:31 EDT 2008
+   - just noticed my email address was wrong in the pod
+   - removed the Makefile.PL, it causes problems
+
+1.1.2: Wed Jul 23 16:11:58 EDT 2008
+   - Module::Build needs ExtUtils::CBuilder to build XS
+     (lame)
+
+1.1.1: Tue Jul 22 07:06:54 EDT 2008
+   - moving to Build.PL so version.pm will work correctly with
+     XS.  Sad.
+
+1.1.0: Fri Jul 18 07:29:44 EDT 2008
+   - added a by_coderef version of find_refs
+
+1.0.6: Mon Jun 16 19:56:37 EDT 2008
+   - That was a stupid idea and I can't believe I posted it to
+     CPAN.  After I thought about it more, the error: "object
+     version undef does not match bootstrap parameter" --
+     indicates that the .so has "undef" as the version string,
+     not the other way around.  So the MakeMaker is screwing this
+     up, not the XSLoader.
+   - Hehe, rigged.  I set the 01_load.t to spew interesting
+     details from the Makefile on failure.
+
+1.0.5: Mon Jun 16 17:58:45 EDT 2008
+   - I brainstormed that I can eliminated the qv() problems on
+     some platforms by interpolating the $VERSION... probably
+     won't work.  Worth a shot.
+
+1.0.4: Tue May 27 12:12:28 EDT 2008
+   - (wow, use version has to be on the same line as our $VERSION
+      for older EUMM)
+
+1.0.3: Mon May 26 15:46:29 EDT 2008
+   - I might as well do a new version of everything using
+     version.pm while I wait for all my CPAN deletes to go
+     through.  I just discovered that version.pm doesn't/didn't
+     go core until perl 5.9...  I really wish I'd have prereqed
+     it everywhere I used it, but I didn't.  *sigh*
+
+1.0.1: Sat May 24 09:45:24 EDT 2008
+   - using version.pm as suggested by Andreas Koenig
+
+1.0.1:  Fri Aug 18 16:21:57 EDT 2006
+   - I've been told by two respectable coders that my standard
+     old GPL+comments license is silly.  It is.  I'm switching to
+     the LGPL.  :(
+
+1.0.0:  Fri Aug 18 16:21:57 EDT 2006
+   - I got this working

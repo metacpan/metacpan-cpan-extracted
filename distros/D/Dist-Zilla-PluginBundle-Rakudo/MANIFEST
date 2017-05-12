@@ -1,0 +1,7 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/PluginBundle/Rakudo.pm

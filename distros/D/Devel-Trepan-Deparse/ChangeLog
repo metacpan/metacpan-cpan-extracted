@@ -1,0 +1,146 @@
+2015-11-20  rocky <rocky@cpan.org>
+
+	* MANIFEST,
+	lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Auto_Subcmd/Depars
+	e.pm,
+	lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Auto_Subcmd/Depar
+	se.pm: Add set/show auto deparse
+
+2015-11-20  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/Deparse.pm: Beef up description.
+
+2015-11-20  rocky <rb@dustyfeet.com>
+
+	* t/data/deparse.cmd, t/data/deparse.right: Try the test another way
+
+2015-11-20  rocky <rb@dustyfeet.com>
+
+	* t/20test-deparse.t, t/data/deparse.cmd, t/data/deparse.right: More
+	stringent deparse test
+
+2015-11-20  rocky <rb@dustyfeet.com>
+
+	* README.md: Note that B::DeparseTree works for 5.18
+
+2015-11-20  rocky <rb@dustyfeet.com>
+
+	* Build.PL, lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Fix
+	deparse by explicit address; allow @prefix and change working
+	slightly on showing result depending on whether we are deparsing the
+	current address
+
+2015-11-19  rocky <rb@dustyfeet.com>
+
+	* : commit b1add236b8b182be6de4b95ae3b5a20b93109bcb Author: rocky
+	<rb@dustyfeet.com> Date:   Thu Nov 19 15:36:36 2015 -0500
+
+2015-11-19  rocky <rb@dustyfeet.com>
+
+	* Changes, MANIFEST, NEWS, lib/Devel/Trepan/Deparse.pm: Get ready
+	for release 2.1.0
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* README.md: Use CircleCI shield
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* .travis.yml, circle.yml,
+	lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: CI fixes and
+	misfeatures caught by CI
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* circle.yml: install cpanm
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* circle.yml: Try cpanm instead of cpan
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* circle.yml: Try minimal CircleCI
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* Build.PL, README.md: Update DeparseTree version. Get ready to
+	cutover from Travis to CirclCI
+
+2015-11-19  rocky <rocky@cpan.org>
+
+	* Build.PL, lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/CmdProcessor/Command/Deval.pm: Be able to deparse
+	main. Needs DeparseTree 2.1 though.
+
+2015-11-17  rocky <rocky@cpan.org>
+
+	* .gitignore, MANIFEST,
+	lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	lib/Devel/Trepan/CmdProcessor/Command/Deval.pm: Deval: a more
+	reliable "eval"  via deparse
+
+2015-11-15  rocky <rocky@cpan.org>
+
+	* MANIFEST, README.md: Get ready for release 2.0.0
+
+2015-11-15  rocky <rocky@cpan.org>
+
+	* README.md: Update README for more info and add Travis badge
+
+2015-11-15  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm,
+	t/10test-opflags.t, t/Helper.pm: Fix up test
+
+2015-11-15  rocky <rocky@cpan.org>
+
+	* t/10test-opflags.t: Stray use of disassemble
+
+2015-11-15  rocky <rocky@cpan.org>
+
+	* : commit 48f0c45cf71699031cde153fb66e404cea3a2fa2 Author: rocky
+	<rocky@cpan.org> Date:   Sun Nov 15 17:59:40 2015 -0500
+
+2015-11-15  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Misc bugs
+
+2015-11-15  rocky <rb@dustyfeet.com>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Misc bugs
+
+2015-11-12  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: Small
+	improvements
+
+2015-11-12  rocky <rb@dustyfeet.com>
+
+	* MANIFEST, lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm: 
+	Deparse.pm: shorten text on demand MANIFEST: administrivia
+
+2015-11-12  rocky <rb@dustyfeet.com>
+
+	* example/five.pl, t/data/deparse.cmd: Some test should have been
+	added in last commit
+
+2015-11-12  rocky <rocky@cpan.org>
+
+	* example/five.pm,
+	lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm, t/00load.t,
+	t/20test-deparse.t, t/data/deparse.right, t/data/deparse2.cmd,
+	t/data/disasm2.right: Tests now working.
+
+2015-11-11  rocky <rocky@cpan.org>
+
+	* README.md: Small README correction
+
+2015-11-11  rocky <rocky@cpan.org>
+
+	* README.md: Tweak README.md
+
+2015-11-09  rocky <rocky@cpan.org>
+
+	* Split off from Devel::Trepan
+

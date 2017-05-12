@@ -1,0 +1,33 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Prereqs::EnsureCoreOrPP]
+
+DESCRIPTION
+
+    This plugin will check that all RuntimeRequires prereqs (and all their
+    recursive RuntimeRequires deps) are all core/PP modules. To do this
+    checking, all prereqs must be installed during build time and they all
+    must be indexed by CPAN. Also, a reasonably fresh local CPAN mirror
+    indexed (produced by App::lcpan) is required.
+
+    I need this when building a dist that needs to be included in a
+    fatpacked script.
+
+    Note: I put this plugin in setup_installer phase instead of
+    before_release because I don't always use "dzil release" (i.e. during
+    offline deployment, I "dzil build" and "pause upload" separately.)
+
+SEE ALSO
+
+    App::FatPacker, App::depak
+
+    Dist::Zilla::Plugin::Prereqs::EnsurePP
+
+    Related plugins: Dist::Zilla::Plugin::CheckPrereqsIndexed,
+    Dist::Zilla::Plugin::EnsurePrereqsInstalled,
+    Dist::Zilla::Plugin::OnlyCorePrereqs
+
+    App::lcpan, lcpan
+

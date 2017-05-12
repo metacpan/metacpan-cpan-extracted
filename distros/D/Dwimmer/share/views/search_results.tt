@@ -1,0 +1,7 @@
+<h2>Search Results</h2>
+
+<ul>
+<% FOR r IN results %>
+  <li><a href="<% r.filename %>"><% r.title %></a></li>
+<% END %>
+</ul>

@@ -1,0 +1,20 @@
+Changes
+lib/Dancer/Plugin/PageHistory.pm
+lib/Dancer/Plugin/PageHistory/Page.pm
+lib/Dancer/Plugin/PageHistory/PageSet.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/page.t
+t/pageset.t
+t/plugin.t
+t/pod.t
+t/pod-coverage.t
+t/pod-spelling.t
+t/TestApp/lib/TestApp/Schema/Result/Session.pm
+t/TestApp/lib/TestApp/Schema.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

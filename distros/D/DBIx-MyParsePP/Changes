@@ -1,0 +1,22 @@
+Revision history for Perl extension DBIx::MyParsePP.
+
+0.50	
+	myconvpp.pl script removed because compiling the parser requires a patched Parse::Yapp
+	getFields() and getTables() methods added
+	asString() renamed to toString() to conform to Java
+	DBIx::MyParsePP::Rule::getArguments() was renamed to getChildren();
+	All options of the Lexer are now user-controllable.
+	shrink() and extract() methods provided for handling the parse tree
+	shrink() has flags specifying how to shrink the tree.
+
+0.40
+	Better error handling -- the parser now provides the expected and the actual token on error.
+
+0.20 Sat Aug  4 09:48:43 EDT 2007
+
+	More documentation, code tree cleanup
+
+0.01  Sun Jul 15 09:27:44 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n DBIx::MyParsePP
+

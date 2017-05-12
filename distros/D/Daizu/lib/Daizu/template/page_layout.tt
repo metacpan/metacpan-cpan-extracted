@@ -1,0 +1,21 @@
+<div id="header">[% INCLUDE header.tt %]</div>
+
+<div id="all-cols">
+
+<div id="content-col">
+[% INCLUDE page_content.tt %]
+<div id="footer">[% INCLUDE footer.tt %]</div>
+</div>
+
+[% WRAPPER extras_col %][% INCLUDE extras_col.tt |trim %][% END %]
+[% BLOCK extras_col -%]
+ [%- IF content -%]
+  <div id="extras-col">
+   [% content %]
+  </div>
+ [%- END -%]
+[%- END %]
+
+<div id="navigation-col">[% INCLUDE navigation_col.tt %]</div>
+
+</div>

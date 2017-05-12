@@ -1,0 +1,23 @@
+Digest::Elf version 1.42
+=======================
+
+Digest::Elf provides an XS based implementation of the ElfHash algorithm.
+What's that get ya? ElfHash generates reasonably unique 32 bit integer value 
+from a string in a reasonably short period of time. The actual algorithm
+was culled from a Dr. Dobbs Journal article and they culled it, I think,
+from the source for the GNU c complier. If you know better, please let
+me know.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires a fully operational battle station, and a working
+install of the gnu c compiler.

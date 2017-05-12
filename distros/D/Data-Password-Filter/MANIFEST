@@ -1,0 +1,22 @@
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Data/Password/Filter.pm
+lib/Data/Password/Filter/Params.pm
+share/dictionary.txt
+t/00-load.t
+t/01-new.t
+t/02-strength.t
+t/03-score.t
+t/04-check_variation.t
+t/manifest.t
+t/pod.t
+t/meta-json.t
+t/meta-yml.t
+t/DictionaryWithNoWord.txt
+t/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

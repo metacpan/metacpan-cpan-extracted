@@ -1,0 +1,1 @@
+A{% for x in scalar|dictsortreversed %}{{ x }}{% endfor %}A{% for x in number|dictsortreversed %}{{ x }}{% endfor %}A{% for x in array|dictsortreversed:"1" %}{{ x.0 }}{% endfor %}{% for x in hash|dictsortreversed:"name" %}{{ x.val }}{% endfor %}A{% for x in hash|dictsortreversed:"val" %}{{ x.val }}{% endfor %}A

@@ -1,0 +1,58 @@
+{
+   "abstract" : "list a directory using Path::Class",
+   "author" : [
+      "Henk van Oers <hvo.pm@xs4all.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Path-Class",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Path::Tiny" : "0",
+            "Plack" : "1.0029",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.2",
+            "Format::Human::Bytes" : "0",
+            "MIME::Types" : "0",
+            "Path::Class" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hvoers/Dancer2-Plugin-Path-Class/issues"
+      },
+      "homepage" : "https://github.com/hvoers/Dancer2-Plugin-Path-Class/",
+      "repository" : {
+         "url" : "https://github.com/hvoers/Dancer2-Plugin-Path-Class"
+      }
+   },
+   "version" : 0.08,
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

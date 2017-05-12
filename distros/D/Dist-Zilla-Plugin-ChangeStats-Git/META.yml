@@ -1,0 +1,60 @@
+---
+abstract: 'add code churn statistics to the changelog'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ChangeStats-Git
+provides:
+  Dist::Zilla::Plugin::ChangeStats::Git:
+    file: lib/Dist/Zilla/Plugin/ChangeStats/Git.pm
+    version: v0.6.0
+  Dist::Zilla::Role::Author::YANICK::Changelog:
+    file: lib/Dist/Zilla/Role/Author/YANICK/Changelog.pm
+    version: v0.6.0
+  Dist::Zilla::Role::Author::YANICK::RequireZillaRole:
+    file: lib/Dist/Zilla/Role/Author/YANICK/RequireZillaRole.pm
+    version: v0.6.0
+requires:
+  CPAN::Changes: '0.17'
+  Dist::Zilla::Role::AfterRelease: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Git::Repository: '0'
+  List::Util: '0'
+  Module::Load: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::Role::Parameterized: '0'
+  Path::Tiny: '0'
+  Perl::Version: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-ChangeStats-Git/issues
+  homepage: https://github.com/yanick/Dist-Zilla-Plugin-ChangeStats-Git
+  repository: https://github.com/yanick/Dist-Zilla-Plugin-ChangeStats-Git.git
+version: 0.6.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Apocalypse <APOCAL@cpan.org>'
+  - 'Erik Carlsson <info@code301.com>'
+  - 'Shlomi Fish <shlomif@shlomifish.org>'

@@ -1,0 +1,7 @@
+appname: "example"
+layout: "main"
+charset: "UTF-8"
+template: "simple"
+plugins:
+    ProgressStatus:
+        dir: /tmp/dancer_progress

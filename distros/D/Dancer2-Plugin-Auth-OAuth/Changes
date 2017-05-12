@@ -1,0 +1,37 @@
+Revision history for Dancer2-Plugin-Auth-OAuth
+
+0.11  2017-01-14 01:42:58 CET
+        - documentation fix as reported by biafra
+        - LinkedIn added
+
+0.10  2016-10-13 09:03:25 CEST
+        - merged github PR #10 (thanks biafra!)
+
+0.09  2015-12-30 11:44:44 CET
+        - merged github PR #6 and #7
+        - Removal of DSL, cause 'Using DSL in plugins is deprecated'
+
+0.08  2015-12-22 08:49:28 CET
+        - fixed missing prereqs as reported by Manwar and biafra
+
+0.07  2015-12-13 12:31:43 CET
+        - merged changes from keithbro/github-and-stackexchange
+
+0.06  2015-03-18 08:41:33 CET
+        - moved from File::Slurp to Path::Tiny
+
+0.05  2015-03-03 22:00:58 CET
+        - moved from JSON::Any to JSON::MaybeXS
+
+0.04  2014-12-29 19:02:52 CET
+        - fixed undef `base' setting
+
+0.03  2014-10-20 08:58:46 CEST
+        - Test-only changes
+
+0.02  2014-10-10 22:37:45 CEST
+        - Stringifying JSON booleans now as to not upset the session storage
+        - Added Twitter user_info support
+
+0.01  2014-10-09 08:53:07 CEST
+        - Initial release

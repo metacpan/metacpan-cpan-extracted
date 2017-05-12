@@ -1,0 +1,442 @@
+package DBIx::DBObj;
+
+use strict; 
+no  strict 'refs'; 
+use Error qw (:try); 
+use Error::Better; 
+use DBIx::SimpleDBI;
+#use DBIx::DBObj::Date;
+#use DBIx::DBObj::DateTime;
+#use DBIx::DBObj::Money;
+
+our $VERSION    = 1.00; 
+
+sub new {
+  my ($class)   = @_;
+  my $objTable  = ${$class  . "::DBObjTable"}; 
+  my $objThrow  = ${$class  . "::DBObjThrow"}; 
+  my $objTypes  = \%{$class . "::DBObjTypes"};
+  my $objPKeys  = \@{$class . "::DBObjPKeys"};
+  my $objFields = \@{$class . "::DBObjFields"};
+
+  ## Subclasses must have a DBObjFields && PKeys list
+  ##
+  if (! defined( @{$objFields} )) {
+    throw Error::Better::OperationFailed("DBObjFields is not defined!")
+      if (! defined @{$objFields});
+    return(undef); 
+  }
+  if (! defined( @{$objPKeys} )) {
+    throw Error::Better::OperationFailed("DBObjPKeys is not defined!")
+      if (! defined @{$objFields});
+    return(undef); 
+  }
+
+  throw Error::Better::OperationFailed("$class::DBObjPKeys is not defined.")
+    if (! defined @{$objPKeys});
+
+  my %ocore    = ();
+  my %fields   = ();
+  my %defaults = ();
+
+  %defaults = ('_Value'    => undef,
+               '_ChangedP' => 0);
+  %ocore    = ('_Table'    => $objTable,
+               '_Throw'    => $objThrow,
+               '_Types'    => $objTypes,
+               '_PKeys'    => $objPKeys,
+               '_Fields'   => \%fields);
+
+  ## Populate the Fields hash from the DBObjFields list.
+  %fields   = map { ("_$_" => { %defaults }) } @{$objFields};
+
+  ## Create some methods ... but only do that if the method in question
+  ## has not already been created.  There is no need to be wasteful! or
+  ## to override an explicitly defined method.
+  ##
+  foreach my $field (@{$objFields}) {
+    if (!defined *{$class . "::get$field"}) {
+      *{$class . "::get$field"} = sub {
+        return($_[0]->{"_Fields"}{"_$field"}{"_Value"});
+      };
+    }
+
+    if (!defined *{$class . "::set$field"}) {
+      if (defined $objTypes->{$field}) { 
+        my $dtclass = $objTypes->{$field};
+        &{$dtclass . "::addSymbols"}($class, $field); 
+      }
+      else {
+        ## Default mutator
+        *{$class . "::set$field"} = sub {
+          return(1) if ($_[1] eq $_[0]->{"_Fields"}{"_$field"}{"_Value"}); 
+          $_[0]->{"_Fields"}{"_$field"}{"_Value"}    = $_[1];
+          $_[0]->{"_Fields"}{"_$field"}{"_ChangedP"} = 1 if ($_[2] != 1);
+          return(1);
+        };
+      }
+    }
+  }
+  return(bless(\%ocore, $class));
+}
+
+
+
+sub find {
+  my ($class, @args) = @_; 
+  my %newSearchPairs = (); 
+  my @pkeys          = @{$class . "::DBObjPKeys"}; 
+  my $throw          = ${$class . "::DBObjThrow"}; 
+  my $results        = undef;  
+
+  for(my $i=0; $i<scalar(@pkeys); $i++) {
+    $newSearchPairs{$pkeys[$i]}=$args[$i]; 
+  }
+
+  ## First I need to make sure I have the right number of keys!
+  if(scalar(@{$class."::DBObjPKeys"}) != scalar(keys(%newSearchPairs))) {
+    throw Error::Better::InvalidArguments ('Invalid arguments.') 
+      if ($throw == 1);
+    return(undef); 
+  }
+
+  ## Call search() to perfrom the SELECT query
+  try { 
+    $results = $class->search(\%newSearchPairs); 
+  } otherwise {};
+
+  ## Return the first (only) entry in the result set. 
+  return($results->[0]) if (ref($results->[0])); 
+
+  ## If there was an Error!
+  throw Error::Better::ObjectNotFound ("No matching Object.")
+    if ($throw == 1);
+  return(undef); 
+}
+
+sub search {
+  my ($class, $searchPairs) = @_; 
+  my $table    = ${$class . "::DBObjTable"};
+  my $throw    = ${$class . "::DBObjThrow"};
+  my $queryStr = "";
+  my $whereStr = "";
+  my $fieldStr = join(",", @{$class . "::DBObjFields"});
+  my $bindp    = 1; 
+  my $results  = undef; 
+  my @objects  = (); 
+  my @fields   = (); 
+  my @values   = (); 
+
+  if($searchPairs =~ m/where/i) {
+    $bindp    =  0; 
+    $whereStr =  $searchPairs;
+  } 
+  else {
+    foreach my $field (@{$class . "::DBObjFields"}) {
+      if (defined $searchPairs->{$field}) {
+        push(@fields, join('=', $field, '?'));
+        push(@values, $searchPairs->{"$field"});
+      }
+    }
+    $bindp    = 1; 
+    $whereStr = 'WHERE ' . join(' AND ', @fields) if (scalar(@fields)); 
+  }
+
+  $queryStr  =  "SELECT $fieldStr FROM $table $whereStr"; 
+  $results   =  query($queryStr,\@values) if ($bindp == 1); 
+  $results   =  query($queryStr,)         if ($bindp == 0); 
+
+  ## The new age way to give up. 
+  return([])    if (! ref($results) && $throw == 1); 
+
+  ## The old school way to give up. 
+  return(undef) if (! ref($results)); 
+
+  ## Finally transform the SQL result set into a set db objects
+  foreach my $row (@{$results}) {
+    my $count = 0; 
+    my $dbobj = $class->new(); 
+    foreach my $field (@{$class . "::DBObjFields"}) {
+      &{$class . "::set$field"}($dbobj, $row->[$count], 1);
+      $count++; 
+    }
+    push (@objects, $dbobj); 
+  }
+  return(\@objects);
+}
+
+
+## Throws SQL Exception
+sub create { 
+  my ($class, $createPairs, $returnObject) = @_; 
+  return(undef) unless ($createPairs); 
+  my $objTypes = \%{$class . "::DBObjTypes"}; 
+  my $table    = ${$class  . "::DBObjTable"};
+  my $throw    = ${$class  . "::DBObjThrow"};
+  my $queryStr = ""; 
+  my $fields   = ""; 
+  my $values   = ""; 
+  my @values   = (); 
+
+  foreach my $field (@{$class . "::DBObjFields"}) {
+    if (defined($createPairs->{$field})) {
+      $fields .= "$field,";
+      $values .= "?,"; 
+      if (defined $objTypes->{$field}) { 
+        my $dtclass = $objTypes->{$field}; 
+        my $v = &{$dtclass . "::sqlValue"}($class, $createPairs->{$field}); 
+        push (@values, $v); 
+      }
+      else { 
+        push (@values, $createPairs->{$field});
+      }
+    }
+  }
+
+  ## FTSO Perl
+  {
+    local $/ = ',' and chomp($fields) and chomp($values); 
+  }
+
+  $queryStr  = join(' ', 
+    'INSERT','INTO',$table,'(',$fields,')','VALUES','(',$values,')'); 
+
+  if(query($queryStr, \@values)) {
+ 
+    ## Life is easy when you have the Insert ID!  
+    ##
+    if (${$class . "::DBObjIID"} == 1) {
+      ## We either return the instert id, or we find and return an object.
+      my $iid = getLastInsertID(); 
+      return($class->find($iid)) if ($returnObject);
+      return($iid); 
+    }
+    
+    ## Its not as easy, but we have the PKey(s) so hey!
+    ##
+    if($returnObject == 1) {
+      my @find_args = (); 
+      foreach my $key (@{$class . "::DBObjPKeys"}) {
+	push(@find_args, $createPairs->{$key}); 
+      }
+      return($class->find(@find_args));
+    }
+
+    ## If we don't want an object, and we don't have a IID.
+    return(1);
+  }	
+
+  ## 
+  ## If the query failed
+  throw Error::Better::OperationFailed ("SQL: Insert failed.")
+    if ($throw == 1); 
+  return(0); 
+}
+
+
+
+sub delete {
+  my ($this) = @_; 
+  return(undef) unless (ref $this); 
+
+  my $queryStr  = "DELETE FROM " . $this->{'_Table'} . " WHERE "; 
+  foreach my $pkey (@{ref($this) . "::DBObjPKeys"}) {
+    my $pkeyValue = $this->{"_Fields"}{"_$pkey"}{'_Value'}; 
+    $queryStr .= " $pkey='$pkeyValue' AND"; 
+  }
+  $queryStr =~ s/AND$//; 
+  return(query($queryStr));
+}
+
+
+
+sub update { 
+  my ($this)   = @_; 
+  my $queryStr = ""; 
+  my $fieldStr = ""; 
+  my $whereStr = ""; 
+
+  my @updated_fields = (); 
+  my $changed_ctr    = 0; 
+  ## Setup the fieldStr
+  foreach my $field (keys %{$this->{"_Fields"}}) {
+    $field =~ s/\_//; 
+    if ($this->{"_Fields"}{"_$field"}{"_ChangedP"} == 1) { 
+      $changed_ctr++; 
+      my $fieldValue  = $this->{"_Fields"}{"_$field"}{"_Value"};
+      $fieldStr      .= "$field='" . $fieldValue . "',"; 
+      push(@updated_fields, $field); 
+    }
+  }
+  $fieldStr =~ s/\,$//; 
+
+  ## Return true if update() was called without anything to update!
+  return(1) if ($changed_ctr == 0); 
+
+  ## Build our WHERE clause. 
+  ##
+  $whereStr = join(' AND ', 
+    map { 
+      join('', $_, '=', "'", $this->{"_Fields"}{"_$_"}{"_Value"}, "'")
+    }
+    @{$this->{'_PKeys'}}); 
+
+  ## Build the rest of the QUERY.
+  ##
+  $queryStr =  join(' ', 
+    'UPDATE',$this->{'_Table'},'SET',$fieldStr,'WHERE','(',$whereStr,')'); 
+
+  if (query($queryStr)) {
+    ## Now return the update-flage for the updated fields to '0'. 
+    foreach my $field (@updated_fields) {
+      $this->{_Fields}{"_$field"}{_ChangedP} = 0; 
+    }
+    return(1); 
+  }
+  return(0);  
+}
+
+sub commit { 
+  print STDERR "Depricated use of dbobj->commit()\n"; 
+  return($_[0]->dbobj_query("commit")); 
+}
+
+sub rollback {
+  print STDERR "Depricated use of dbobj->rollback()\n"; 
+  return($_[0]->dbobj_query("rollback")); 
+}
+
+sub dbobj_query { 
+  print STDERR "Depricated use of dbobj->dbobj_query()\n"; 
+  my $class = shift; 
+  return(DBIx::SimpleDBI::query(@_)); 
+}
+
+sub get_table_name { 
+  my ($class)  = @_; 
+  my $tbl_name = ${$class . "::DBObjTable"};
+  return($tbl_name); 
+}
+
+sub get_field_string { 
+  my ($class)  = @_; 
+  my $fieldStr = join(",", @{$class . "::DBObjFields"});
+  return($fieldStr); 
+}
+
+sub res_to_objects { 
+  my ($class, $results) = @_; 
+  my @objects = ();
+
+  foreach my $row (@{$results}) {
+    my $count = 0;
+    my $dbObj = $class->new();
+    foreach my $field (@{$class . "::DBObjFields"}) {
+      &{$class . "::set$field"}($dbObj, $row->[$count], 1);
+      $count++;
+    }
+    push (@objects, $dbObj);
+  }
+  return(\@objects);
+}
+
+
+##
+1;
+
+__END__
+
+=head1 NAME
+
+DBIx::DBObj 
+
+=head2 DESCRIPTION
+
+DBIx::DBObj provides a lightweight OO interface to interact with records in 
+a SQL database. DBIx::DBObj has some functional overlap with a another Perl
+module DBIx::SearchBuilder. The major difference between the two is that 
+DBObj does not try to provide a OO API for costructing complex SQL queries. 
+
+
+=head2 CLASS VARIABLES
+
+=head1 DBObjTable
+
+Required, defines the table this DBObj maps to. 
+
+=head1 DBObjPKeys
+
+Required, defines the primary keys for the table this DBObj maps to. 
+
+=head1 DBObjFields
+
+Required, defines the fields available to this DBObj.
+
+=head1 DBObjThrow 
+
+Optional, causes DBObj to throw exceptions. In the future this will not 
+be an option. It's only here because I have some software that predates
+DBObj exceptions. 
+
+=head1 METHODS
+
+=head2 create
+
+class/public
+  (DBObj $obj) create (\%create_args)
+
+throws 
+  Error::Better::OperationFailed
+
+DESCRIPTION:
+Provided a hash references of field names and values, a new row will be
+inserted into the database. An Error::Better::OperationFailed exception 
+will be thrown if the insert fails for any reason. 
+
+=head2 search 
+
+class/public
+  (Arrayref DBObj) search (\%search_args | $where)
+
+DESCRIPTION: 
+Provided a hash references of field names and values search will create 
+a SELECT query with all the key/value pairs ANDed together. If a empty 
+hash reference is provided search will perform an unbounded SELECT. The
+caller may also define their own WHERE clause and pass that to search 
+in place of the hash reference. If there are no matching records, search
+will simply return an empty array reference.
+
+=head2 find
+
+class/public
+  (DBObj $obj) find ($value1, ...)
+
+throws 
+  Error::Better::ObjectNotFound
+
+DESCRIPTION:
+The arguments to find will always match the definition of @DBObjPKeys. 
+They must be passed in the same order as the are defined. The generated
+SELECT query's WHERE clause will use the tables primary keys. Unlike 
+search, an exception will be thrown if there are no matching records.
+
+=head2 delete 
+ 
+instance/public 
+  (boolean) delete (void)
+
+DESCRIPTION: 
+Will delete a row from the database that matching the instance of this 
+object. Deletes are done using the fields defined as primary keys. 
+
+=head2 update
+
+instance/public 
+  (boolean) update (void)
+
+DESCRIPTION: 
+Will serialize any changes between the DBObj and the Database. A UPDATE
+query is generated using DBObj defined primary keys.
+
+
+

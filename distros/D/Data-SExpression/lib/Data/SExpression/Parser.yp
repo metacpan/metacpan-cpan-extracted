@@ -1,0 +1,119 @@
+# -*- mode: perl -*-
+#
+# Parser.yp
+#
+# Grammar to parse SExpressions for Data::SExpression
+#
+#
+
+%{
+use Data::SExpression::Cons;
+use Scalar::Util qw(weaken);
+%}
+
+%%
+
+sexpression: expression			 { $_[0]->YYAccept; return $_[1]; }
+;
+
+expression:   NUMBER
+            | SYMBOL                     { $_[0]->handler->new_symbol($_[1]) }
+            | STRING                     { $_[0]->handler->new_string($_[1]) }
+            | list
+            | quoted
+
+;
+
+list:       '(' list_interior ')'        { $_[2] }
+;
+
+
+list_interior:
+              expression '.' expression  { $_[0]->handler->new_cons($_[1], $_[3]) }
+            | expression list_interior   { $_[0]->handler->new_cons($_[1], $_[2]) }
+            | expression                 { $_[0]->handler->new_cons($_[1], undef) }
+            |                            { undef }
+
+;
+
+quoted:
+              QUOTE expression           { $_[0]->handler->new_cons($_[0]->handler->new_symbol($_[1]),
+                                                                    $_[0]->handler->new_cons($_[2], undef))}
+;              
+
+%%
+
+sub set_input {
+    my $self = shift;
+    my $input = shift;
+    die(__PACKAGE__ . "::set_input called with 0 arguments") unless defined($input);
+    $self->YYData->{INPUT} = $input;
+}
+
+sub set_handler {
+    my $self = shift;
+    my $handler = shift or die(__PACKAGE__ . "::set_handler called with 0 arguments");
+    $self->YYData->{HANDLER} = $handler;
+    weaken $self->YYData->{HANDLER};
+}
+
+sub handler {
+    my $self = shift;
+    return $self->YYData->{HANDLER};
+}
+
+sub unparsed_input {
+    my $self = shift;
+    return substr($self->YYData->{INPUT}, pos($self->YYData->{INPUT}));
+}
+
+
+my %quotes = (q{'} => 'quote',
+              q{`} => 'quasiquote',
+              q{,} => 'unquote');
+
+
+sub lexer {
+    my $self = shift;
+
+    defined($self->YYData->{INPUT}) or return ('', undef);
+
+    my $symbol_char = qr{[*!\$[:alpha:]\?<>=/+:_{}-]};
+
+    for($self->YYData->{INPUT}) {
+        $_ =~ /\G \s* (?: ; .* \s* )* /gcx;
+
+        /\G ([+-]? \d+ (?:[.]\d*)?) /gcx
+        || /\G ([+-]? [.] \d+) /gcx
+          and return ('NUMBER', $1);
+
+        /\G ($symbol_char ($symbol_char | \d | [.] )*)/gcx
+          and return ('SYMBOL', $1);
+
+        /\G (\| [^|]* \|) /gcx
+          and return ('SYMBOL', $1);
+
+        /\G " ([^"\\]* (?: \\. [^"\\]*)*) "/gcx
+          and return ('STRING', defined($1) ? $1 : "");
+
+        /\G ([().])/gcx
+          and return ($1, $1);
+
+        /\G ([`',]) /gcx
+          and return ('QUOTE', $quotes{$1});
+
+        return ('', undef);
+    }
+}
+
+sub error {
+    my $self = shift;
+    my ($tok, $val) = $self->YYLexer->($self);
+    die("Parse error near: '" . $self->unparsed_input . "'");
+    return undef;
+}
+
+sub parse {
+    my $self = shift;
+    return $self->YYParse(yylex => \&lexer, yyerror => \&error);
+}

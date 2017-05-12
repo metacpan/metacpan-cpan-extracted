@@ -1,0 +1,46 @@
+DBIx/XMLServer version 0.02
+===========================
+
+This module implements the whole process of generating an XML document
+from a database query, in response to an HTTP request.  The mapping
+from the DBI database to an XML structure is defined in a template
+file, also in XML; this template is used not only to turn the data
+into XML, but also to parse the query string.  To the user, the format
+of the query string is very natural in relation to the XML data which
+they will receive.
+
+New in version 0.02:
+  - Mechanism for including meta-data about search in result
+  - Two ways of counting total number of matching rows
+  - Alternative way of parsing XPaths; no more Parse::RecDescent
+  - Named-parameter interface to functions
+  - Ordering of results
+  - User selection of templates
+  - Many more tests
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::LibXML version 1.54 or later
+  XML::LibXSLT version 1.53 or later
+
+If you wish to use the built-in date or date-and-time field types, you
+will also need Date::Manip.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-5 Martin Bright
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,10 @@
+language: perl
+perl:
+  - "5.8"
+  - "5.20"
+install:
+   - cpanm --quiet --notest --skip-satisfied .
+   - cpanm --quiet --notest Test::CPAN::Changes
+   - export RELEASE_TESTING=1 AUTOMATED_TESTING=1 AUTHOR_TESTING=1 HARNESS_OPTIONS=j10:c HARNESS_TIMER=1
+script:
+   - prove -lr t

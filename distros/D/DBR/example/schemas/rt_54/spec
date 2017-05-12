@@ -1,0 +1,4 @@
+schema=rt_54	table=abc	field=status	cmd=TRANSLATOR	translator=ENUM
+schema=rt_54	table=abc	field=status	cmd=ENUMOPT	handle=one	enum_id=1	override_id=NULL	name=One
+schema=rt_54	table=abc	field=status	cmd=ENUMOPT	handle=two	enum_id=2	override_id=NULL	name=Two
+schema=rt_54	table=abc	field=status	cmd=ENUMOPT	handle=three	enum_id=3	override_id=NULL	name=Three

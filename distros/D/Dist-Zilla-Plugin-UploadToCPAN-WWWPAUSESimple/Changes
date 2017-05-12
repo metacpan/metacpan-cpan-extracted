@@ -1,0 +1,25 @@
+0.04    2017-01-12 (PERLANCAR)
+
+	- Adjust to WWW::PAUSE::Simple 0.34 (old function name upload_file
+	  removed).
+
+	- [ux] Log on success.
+
+
+0.03    2016-07-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Forgot to specify minimum version of WWW::PAUSE::Simple
+	  (0.31+ which has retries and retry_delay options).
+
+
+0.02     2016-07-13 (PERLANCAR)
+
+         - Rename dist from Dist-Zilla-Plugin-PERLANCAR-UploadToCPAN to
+           Dist-Zilla-Plugin-UploadToCPAN-WWWPAUSESimple.
+
+
+0.01     2015-04-21 (PERLANCAR)
+
+         - First release.

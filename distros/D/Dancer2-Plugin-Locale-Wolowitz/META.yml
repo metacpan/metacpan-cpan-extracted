@@ -1,0 +1,40 @@
+---
+abstract: "Dancer2's plugin for Locale::Wolowitz"
+author:
+  - 'Menno Blom, C<< <blom at cpan.org> >>'
+build_requires:
+  Test::More: '0.96'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Locale-Wolowitz
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Dancer2: '0.166'
+  I18N::AcceptLanguage: '0'
+  Locale::Wolowitz: '0'
+  perl: '5.001'
+resources:
+  bugtracker: https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz/issues
+  homepage: https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz
+  repository: https://github.com/b10m/p5-Dancer2-Plugin-Locale-Wolowitz.git
+version: '0.05'
+x_contributors:
+  - 'B10m <menno@b10m.net>'
+  - 'Bas Bloemsaat <bas@bloemsaat.com>'
+  - 'Evan Brown <evan@bottlenose-wine.com>'
+  - 'Menno Blom <blom@cpan.org>'
+  - 'Menno Blom <menno.blom@booking.com>'

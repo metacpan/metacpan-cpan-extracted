@@ -1,0 +1,15 @@
+Revision history for DBIx-Oracle-Unwrap
+
+0.06    13-Dec-2012
+        Minor spelling correction
+0.05    20-Nov-2012
+        Corrected the connect statement in the synopsis
+0.04    20-Nov-2012
+        Whoops. Bumped the version numbers
+0.03    20-Nov-2012
+        Updated README
+0.02    19-Nov-2012
+        Minor documentation update
+0.01    16-Nov-2012
+        Initial version
+

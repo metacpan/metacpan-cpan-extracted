@@ -1,0 +1,55 @@
+Revision history for Dist-Zilla-Plugin-GenerateFile-FromShareDir
+
+0.013     2016-12-23 01:10:31Z
+          - When building the a dist that matches the name of the dist which
+            has the share dir, we look in the source of the sharedir for the
+            file rather than in an installed sharedir. This fixes an issue
+            where a bundle that uses this plugin cannot be built until the
+            bundle is installed, but you can't install it because you can't
+            build it. (Dave Rolsky, PR#2, RT#119340)
+
+0.012     2016-06-22 03:38:43Z
+          - declare missing test prereq
+
+0.011     2016-06-21 05:23:55Z
+          - require a more recent RepoFileInjector, for compatibility with
+            Dist::Zilla 6
+
+0.010     2016-06-21 00:40:32Z
+          - fixed the default value for "-phase" option, and added a check for
+            invalid config combinations
+
+0.009     2015-11-14 02:15:03Z
+          - added missing test prerequisite that was introduced in 0.008
+
+0.008     2015-11-12 03:36:14Z
+          - renamed this plugin and distribution; [GenerateFile::ShareDir]
+            will live on for now in deprecated form
+
+0.007     2015-10-30 03:11:38Z
+          - some logic abstracted out to Dist::Zilla::Role::RepoFileInjector
+
+0.006     2015-07-05 05:26:56Z
+          - fix pod errors
+          - add new configuration options "-location" and "-phase", for
+            allowing file generation to the repository rather than the build
+            (Kent Fredric, PR#1)
+
+0.005     2014-01-14 05:38:04Z
+          - remove code in test templates that required perl 5.16
+
+0.004     2014-01-12 21:10:11Z
+          - specify minimum Path::Tiny version needed for slurp_raw
+          - fix test that broke with Dist::Zilla 5.010, where internal testing
+            zillas have no $VERSION
+
+0.003     2013-12-08 17:34:21Z
+          - bump prereq for MooseX::SlurpyConstructor to bypass old metaclass
+            issues
+
+0.002     2013-10-20 23:35:59Z
+          - new "-encoding" option - works with versions of Dist::Zilla both
+            before and after 5.000
+
+0.001     2013-10-12 18:05:08Z
+          - Initial release.

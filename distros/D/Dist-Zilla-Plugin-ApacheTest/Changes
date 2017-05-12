@@ -1,0 +1,20 @@
+Revision history for Dist::Zilla::Plugin::ApacheTest
+
+0.03  2016-07-03
+    - add Plugin::ApacheTest for compatibility with previous releases. This is
+      marked deprecated in docs and is equivalent to [MakeMaker::ApacheTest]
+      currently.
+    - update compile tests
+    - fix possible signature test if generated files are not ignored
+
+0.02  2016-07-01
+  *** INCOMPATIBLE CHANGE - This module now is a plugin bundle which includes a
+      MakeMaker plugin as well as a DynamicPrereq plugin.  Your dist.ini needs to
+      change from [ApacheTest] to [@ApacheTest]
+    - Reimplement using Dist::Zilla::Plugin::MakeMaker::Awesome. This avoids
+      replacing the MakeMaker plugin and greatly simplifies things.
+    - use Dist::Zilla::Plugin::DynamicPrereqs to require either mod_perl v1 if
+      it is installed, otherwise mod_perl2.
+
+0.01  2010-04-01
+    - initial release

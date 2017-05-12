@@ -1,0 +1,12 @@
+<specification>
+<form name="giftinfo" link="name">
+<field name="first_name"/>
+<field name="last_name"/>
+<field name="day" iterator="days"/>
+</form>
+<form name="giftdetails" link="name">
+<field name="gender"/>
+<field name="address"/>
+<field name="year" iterator="years"/>
+</form>
+</specification>

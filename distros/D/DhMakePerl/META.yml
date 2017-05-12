@@ -1,0 +1,82 @@
+---
+abstract: 'create Debian source package from CPAN dist'
+author:
+  - unknown
+build_requires:
+  File::DirCompare: '0'
+  File::Touch: '0'
+  IPC::Run: '0'
+  Test::Compile: '0'
+  Test::Deep: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - debian
+  - package
+  - helper
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DhMakePerl
+no_index:
+  directory:
+    - privinc
+    - t
+    - xt
+    - share
+recommends:
+  DPKG::Parse: '0.02'
+  Git: '0'
+  IO::Dir: '0'
+requires:
+  AptPkg::Cache: '0'
+  AptPkg::Config: '0'
+  Array::Unique: '0'
+  CPAN: '0'
+  CPAN::Meta: '0'
+  Carp: '0'
+  Config::INI::Reader: '0'
+  Cwd: '0'
+  Dpkg: '0'
+  Dpkg::Source::Package: '0'
+  Email::Address: '0'
+  Email::Date::Format: '0'
+  File::Basename: '0'
+  File::Copy: '0'
+  File::Find::Rule: '0'
+  File::Spec: '0'
+  File::Spec::Functions: '0'
+  File::Which: '0'
+  FindBin: '0'
+  Getopt::Long: '0'
+  IO::File: '0'
+  IO::Uncompress::Gunzip: '0'
+  List::MoreUtils: '0'
+  Module::Build: '0'
+  Module::CoreList: '0'
+  Module::Depends: '0'
+  Module::Depends::Intrusive: '0'
+  Parse::DebControl: '0'
+  Parse::DebianChangelog: '0'
+  Software::License::Artistic_2_0: '0'
+  Storable: '0'
+  Text::Diff: '0'
+  Text::Wrap: '0'
+  Tie::File: '0'
+  Tie::IxHash: '0'
+  User::pwent: '0'
+  WWW::Mechanize: '0'
+  YAML: '0'
+  perl: '5.010'
+  version: '0'
+resources:
+  license: http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt
+  repository: https://anonscm.debian.org/cgit/pkg-perl/packages/dh-make-perl.git
+version: '0.89'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

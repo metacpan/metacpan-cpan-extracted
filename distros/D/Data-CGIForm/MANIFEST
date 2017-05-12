@@ -1,0 +1,21 @@
+CGIForm.pm
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+README
+t/FakeRequest.pm
+t/00-load.t
+t/00-pod.t
+t/01-spec.t
+t/02-methods.t
+t/03-errors.t
+t/04-autoload.t
+t/05-multiple.t
+t/06-filter.t
+t/07-options.t
+t/08-set-val.t
+t/09-extra-test.t
+t/10-equal-to.t
+t/11-length.t
+META.yml                                 Module meta-data (added by MakeMaker)

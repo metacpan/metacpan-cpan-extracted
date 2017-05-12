@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Dunce/time.pm
+lib/Dunce/time/Zerofill.pm
+t/00_arithmetic.t
+t/01_die.t
+t/02_warn.t
+t/03_fix.t
+t/04_zerofill.t
+t/05_zerofill_length.t

@@ -1,0 +1,33 @@
+---
+abstract: 'Boostrap layout for Dancer'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  Carp: '0'
+  Exporter: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Layout-Bootstrap
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: '0'
+  Dancer::Plugin::FlashMessage: '0'
+  Template: '2'
+  Test::More: '0'
+  YAML: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Layout-Bootstrap
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_static_install: 1

@@ -1,0 +1,52 @@
+Revision history for Perl extension DBIx::Class::Graph.
+
+1.05 2011-12-27
+  - bump Graph prereq
+
+1.04 2011-12-24
+  - Don't delegate to methods that already exist in ::ResultSet
+
+1.03 2010-11-10
+  - Don't call update on DBIC object when constructing Graph
+
+1.02 2010-10-26
+  - Compatible with MooseX::DBIC
+
+1.01 2010-09-11
+  - Ship with DDL file
+
+1.00 2010-09-01
+  - rewrote a lot of the code.
+  - Handles a foreign table for parent/child connection now
+    this allows for multiple parents and childs on one object
+  - faster, removed some unnecessary prefetches and database roundtrips
+  - moosification
+  - get_graph is deprecated and no longer needed
+  - Graph methods can be called directly on the ResultSet, no need to call graph anymore
+  - call ->result_source->has_column instead of has_column on rows
+
+0.05 2009-03-15
+  - We will not attempt to set a new resultset if it ->isa() already
+
+0.04 2009-03-10
+  - Bug with all_successors in Graph (see http://rt.cpan.org/Ticket/Display.html?id=43969)
+  - added test for that
+  - reverted to own implementation if all_successors and all_predecessors
+
+0.03  2009-03-07
+  - uses all_successors/all_predecessors from Graph (since 0.85)
+
+0.02  2008-08-01
+  - first release
+  - applied pod fixes
+  - added tests
+  - removed relationship feature
+
+0.01_02 2008-07-27
+  - removed perl 5.8.8 dependency
+  - added dependency sql-t
+
+0.01_01  Mon Mar  3 12:46:31 2008
+	- original version; created by h2xs 1.23 with options
+		-XAn DBIx::Class::Graph
+

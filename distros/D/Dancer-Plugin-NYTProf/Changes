@@ -1,0 +1,97 @@
+Revision history for Dancer-Plugin-NYTProf
+
+0.50    2014-11-12
+        [ ENHANCEMENTS ]
+        * New profiling_enabled setting, to allow disabling profile runs whilst
+          still serving up results of previous runs
+        * Improvments to how the enabled setting works.
+
+0.40    2014-10-28
+        [ ENHANCEMENTS]
+        * New enabled option (thanks to garu)
+        * Clarified usage, doc tweaks (thanks to garu)
+        * Added GitHub repo/bugtracker info (thanks to garu)
+        * Option to disable showing execution times of profiles
+
+        [ BUG FIXES ]
+        * Avoid output from Devel::NYTProf::Data sometimes being sent
+          to the browser sometimes (Issue #14)
+        * Catch errors using Devel::NYTProf::Data (e.g. if a profiling
+          session was incomplete or corrupt and handle them rather than
+          crashing when generating the list
+
+0.31    2013-03-06
+        [ ENHANCEMENTS ]
+        * Use uri_for() when assembling links so it works if the app isn't at
+          the root (e.g. proxied / mounted) - (thanks to mopi)
+
+0.30    2013-02-21
+        [ ENHANCEMENTS ]
+        * Show request execution time for each profiled request in list.
+          (May need to make this configurable; could be too slow if there are a
+          lot of profiled requests to list.)
+
+0.23    2012-09-24
+        [ ENHANCEMENTS ]
+        * Sort profile runs by most recent first (thanks to leejo)
+
+0.22    2012-09-22
+        [ BUGFIXES ]
+        * Handle nytprofhtml_path option correctly.  (Giving a full file path to
+          File::Which::which() doesn't work; it's a pointless thing to do
+          anyway.  Should fix GH #8, thanks to jbobbylopez for a helpful and
+          detailed bug report!
+
+
+0.21    2012-02-02
+        [ BUGFIXES ]
+        * Fix comedy bug where we'd crash regardless of the return value of
+          `nytprofhtml` when first trying to generate HTML output.  That was
+          pretty muppetactular.
+
+0.20    2012-01-31
+        [ BUGFIXES ]
+        * Load Devel::NYTProf at runtime, after setting the env vars to stop it
+          beginning profiling immediately and giving it a temporary filename (as
+          it insists on opening a file to write to /anyway/).
+          This should solve problems where the plugin was unusable because
+          Devel::NYTProf wanted to write a file to the appdir, even when the
+          profdir setting was used.  Thanks to angel on IRC (#dancer) for
+          reporting this problem.
+
+0.10    2011-11-26
+        [ BUGFIXES ]
+        * Check for presence of nytprofhtml, and check for errors executing it
+          and produce helpful error messages 
+          (PR-4 from Neil Hooey (nhooey) - thanks!)
+        
+        * Allow path to nytprofhtml to be configurable, default to finding it
+          within the $PATH using File::Which
+
+        * Don't crash if first request after starting app is to /nytprof and no
+          profdir is set in config.
+
+        [ SECURITY ]
+        * Sanitise filenames from user properly.  Previously, it would have been
+          possible to cause the module to send files outside the profdir with
+          cleverly-crafted requests (hence the warnings in the documentation).
+          Be careful that the filename received doesn't contain anything
+          nefarious.
+
+
+0.04    2011-11-13
+        Remove taint from test to avoid insecure dependency failures further
+        down the line.
+
+0.03    2011-11-03
+        Use hook instead of before/after, which cause deprecation warnings now.
+        (Stefan Hornburg (racke))
+
+0.02    2011-07-25
+        Require Dancer >=  1.3060.
+        (param() wasn't available before then, thanks to sukria for pointing
+        this out)
+
+0.01    2011-07-23
+        Initial version.  Working, but plenty of room for improvement.
+

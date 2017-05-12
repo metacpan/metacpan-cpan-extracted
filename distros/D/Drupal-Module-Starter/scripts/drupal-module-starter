@@ -1,0 +1,129 @@
+#!/usr/bin/perl -w
+use strict;
+use Drupal::Module::Starter;
+use YAML;
+use Getopt::Long;
+use Pod::Usage;
+use POSIX qw/tmpnam/;
+
+=head1 NAME
+
+drupal-module-starter - creates a skeleton Drupal module distribution
+
+=cut
+
+
+
+print "Starting module starter $Drupal::Module::Starter::VERSION\n\n";
+
+my $config;
+
+pod2usage(2) unless @ARGV;
+
+=head1 SYNOPSIS
+
+drupal-module-starter [options]
+
+Options:
+
+    --module=your_module_name  Module name (required, repeatable)
+    --dir            Directory name to create new module in (optional)
+    --author=name    Author's name (required)
+    --email=email    Author's email (required)
+    --hooks=list,of,hooks,here Which hooks you wish to generate stubs for
+    --verbose     Print progress messages while working
+    --force=1          Delete pre-existing files if needed
+	--table=database_table_name
+
+    --help           Show this message
+
+Example: 
+
+drupal-module-starter --module=Recording,Artist,Track,Discography,Review,PodCastGenerator,Pony \
+  --author="Steve McNabb" --email="smcnabb@cpan.org" \
+  --dir=/tmp/someone/projects/drupal/dev --hooks=xmlrpc,form,help,info,init,insert,delete,update \
+--table=my_new_table
+
+ This would create the 7 listed modules, each in its own directory under --dir, with stubs installed for
+ the listed --hooks (if any).  Note that the table name is just used for generating code -- no tables are
+ actually created.  You have to do that part manually.
+  
+  
+by default perm, access, menu, load, insert, update, delete, node_info and form hooks are created
+
+=cut
+
+GetOptions(
+	"module=s" 	=> ($config->{modules} ||= []),
+	"dir=s" 			=> \$config->{dir},
+	"email=s" 		=> \$config->{email},
+	"author=s" 		=> \$config->{author},
+	"hooks=s" 		=> ($config->{hooks} ||= []) ,
+	"verbose=s" 	=> \$config->{verbose},
+	"force=s" 		=> \$config->{force},
+	"table=s"			=> \$config->{table}
+	
+);
+
+
+# set defaults
+if(!$config->{dir}) { $config->{dir} = '.' }
+if(!$config->{modules}[0]) { die "No --module(s) passed to $0"; }
+if(!$config->{author}) { die "No --author set - the --author option is required" }
+if(!$config->{email}) { die "No --email set - the --email option is required" }
+if(!$config->{hooks}) { 
+	warn "No hooks defined - reverting to default hooks"; 
+	$config->{hooks}[0] = 'perm,access,menu,load,insert,update,delete,node_info,form';	
+}
+
+
+# run file generation
+my @modules = split /,/, $config->{modules}[0];
+
+foreach my $module (@modules) {
+	print "make module $module in $config->{dir}\n";
+	no warnings 'uninitialized';
+
+	# write a YAML file to pass to Drupal::Module::Starter
+	my $tmpfile = POSIX::tmpnam();
+	my $yaml = Drupal::Module::Starter::sample_yaml();
+    $yaml .= "module:  $module\n";
+    $yaml .= "author: $config->{author}\n";
+    $yaml .= "email: $config->{email}\n";
+    $yaml .= "dir: $config->{dir}\n";
+	$yaml .= "force: $config->{force}\n" if $config->{force};    
+	$yaml .= "table: $config->{table}\n" if $config->{table};
+	
+    # set up hooks
+    my @hooks = split /,/, $config->{hooks}[0];
+    for my $hook (@hooks) {
+   
+    	$yaml =~ s/hook_$hook:\s+\d+?/hook_$hook: 1/;
+    }
+	
+	open(TMPFILE, ">$tmpfile") or die "Couldn't open $tmpfile for write..";
+	print TMPFILE $yaml;
+	close TMPFILE;
+	
+	print "Wrote yaml to $tmpfile\n";
+		
+	# create a Starter object
+	my $module = Drupal::Module::Starter->new($tmpfile);
+	
+	# run the generation
+	$module->generate;	
+	
+	# clean up the tempfile
+	#unlink($tmpfile);
+}
+
+
+=head1 AUTHOR
+
+Steve McNabb, C<< <smcnabb@cpan.org> >>
+IT Director, F5 Site Design - http://www.f5sitedesign.com
+Open Source Internet Application Development
+
+1;
+
+

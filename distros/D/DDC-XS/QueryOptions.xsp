@@ -1,0 +1,33 @@
+//-*- Mode: C++ -*-
+// Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' QueryOptions.h.in '-vt=^[mb]_' -o QueryOptions '-dn=free' '-dt=FilterWithBounds' '-dm=Compile'
+
+%module{DDC::XS};
+
+//typedef vector<CQFilter*> 	CQFilterList;
+//typedef vector<string>    	CQSubcorpusList;
+
+//======================================================================
+// CQueryOptions
+%name{DDC::XS::CQueryOptions} class CQueryOptions : public %name{DDC::XS::Object} ddcObject
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{ContextSentencesCount} size_t m_ContextSentencesCount %get %set;
+	%name{EnableBibliography} bool m_bEnableBibliography %get %set;
+	%name{DebugRank} bool m_bDebugRank %get %set;
+	%name{SeparateHits} bool m_bSeparateHits %get %set;
+  //%name{TextAreaNo} int m_TextAreaNo %get %set; //-- only valid after Compile(), which we don't support (yet)
+	%name{Within} vector_string m_Within %get %set;
+  //%name{HitTypeStr} string m_HitTypeStr %get %set; //-- only valid after Compile(), which we don't support (yet)
+
+  	%name{Filters} CQFilterList m_QFilters %get; //%set;
+  	void setFilters(CQFilterList val) %code %{ ddcxs_obj_setvec(CQFilterList, m_QFilters, val); %};
+
+	%name{Subcorpora} CQSubcorpusList m_Subcorpora %get %set;
+  public:
+	%name{new} CQueryOptions();
+	%name{swap} void swap(CQueryOptions& x);
+  public:
+	%name{Clear} void Clear();
+	%name{CanFilterByFile} bool CanFilterByFile();
+};

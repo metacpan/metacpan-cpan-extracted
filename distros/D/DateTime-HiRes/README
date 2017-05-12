@@ -1,0 +1,13 @@
+DateTime::HiRes
+========================
+ 
+This is a companion module to DateTime.pm.  It enables you to generate DateTime objects that represent the current time with sub-second resolution.
+
+INSTALLATION
+ 
+To install this module type the following:
+ 
+perl Build.PL
+./Build
+./Build test
+./Build install

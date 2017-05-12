@@ -1,0 +1,5 @@
+Changes for DBIx::AnyDBD
+
+2.01
+    - Only change @ISA if we have to (pdcawley)
+    

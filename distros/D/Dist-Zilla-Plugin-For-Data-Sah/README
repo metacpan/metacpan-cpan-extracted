@@ -1,0 +1,21 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [For::Data::Sah]
+
+DESCRIPTION
+
+    This plugin is to be used when building Data-Sah distribution (see
+    Data::Sah). Currently it does the following:
+
+      * For lib/Data/Sah/Type/*.pm, check that schema specified in each
+      clause's schema is normalized
+
+      * TODO: For lib/Data/Sah/Type/*.pm, check that schema specified in
+      each clause attribute's schema is normalized
+
+SEE ALSO
+
+    Data::Sah
+

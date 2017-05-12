@@ -1,0 +1,63 @@
+Revision history for Dist-Zilla-Plugin-Dpkg-PerlbrewStarman
+
+0.16 Apr 10 2013
+
+0.16 Apr 10 2013
+  - Changed hard links to symbolic links (Jakob Voss)
+  - Added new configuration attributes (Jakob Voss)
+     - starman_workers - number of Starman workers (default: 5)
+     - psgi_script - location of the PSGI (default: script/$PACKAGE.psgi)
+  - Add the selection of web server to the list of package dependencies
+  - Documentation overhaul
+
+0.15 Dec 19 2012
+  - Added support for specifying additional Apache modules to enable
+
+0.14 Aug 23 2012
+  - Fix another instance of rm being called without the -f flag.  This prevents
+    dpkg from failing due to non-existant files.
+
+0.13 Jun 21 2012
+  - Always use the -f flag when invoking rm.  This prevents dpkg from failing
+    due to non-existant files.
+
+0.12 May 30 2012
+  - Allow UIDs to be provided for created users
+  - Remove the apache/nginx hard link before making a new one so that updates
+    work properly.
+
+0.11 Apr 27 2012
+  - Allow "all" as a webserver option (which will setup nginx and apache)
+
+0.10 Apr 16 2012
+  - Add Apache support
+
+0.09 Feb 17 2012
+  - Syntax check fix, which makes things restart properly.
+  - Override control file attribute to add a dependency on adduser
+
+0.08 Feb 10 2012
+  - Remove sourcing of debconf, which is evidently code for "stop working"
+  - Remove --background from start-stop-daemon
+  - Add restart of nginx
+  - Check for the nginx symlink with -h since that's really what we want
+
+0.07 Jan 20 2012
+
+0.06 Jan 9 2012
+  - Define APPLIB in defaults so restart works. (thanks Mike Eldridge)
+
+0.05 Jan 4 2012
+  - Fix bits of the postrm that weren't removing correctly
+
+0.04 Dec 28 2011
+  - Fix typo in path name
+
+0.03 Dec 21 2011
+  - Add starman_port
+
+0.02 Dec 21 2011
+
+0.01
+  - First version, released on an unsuspecting world.
+

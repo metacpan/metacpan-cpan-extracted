@@ -1,0 +1,132 @@
+NAME
+    Dist::Zilla::Plugin::UploadToSFTP - Upload tarball to my own site
+
+VERSION
+    version 0.002
+
+DESCRIPTION
+        ; in dzil.ini
+        [UploadToSFTP]
+        site        = sftp.geocities.invalid
+        directory   = /Heartland/Meadows/3044
+        debug       = 0
+
+        # in $HOME/.netrc
+        machine sftp.geocities.invalid login mjgardner password drowssap
+
+    This is a Dist::Zilla::Role::Releaser plugin that uploads a distribution
+    tarball to an SFTP site. It can be used in addition to
+    Dist::Zilla::Plugin::UploadToCPAN or in its place. In fact I wrote it
+    for the latter case so that I could release proprietary distributions
+    inhouse.
+
+  .netrc file
+    The .netrc file is described in Net::Netrc and should have an entry in
+    it matching the site given in the dzil.ini file and specifying the
+    username and password.
+
+ATTRIBUTES
+  site
+    The SFTP site to upload to.
+
+  directory
+    The directory on the SFTP site to upload the tarball to.
+
+  debug
+    Tells "ssh" to run in verbose mode. Defaults to 0.
+
+METHODS
+  release
+    Uploads the tarball to the specified site and directory.
+
+SEE ALSO
+    Dist::Zilla
+    Dist::Zilla::Plugin::CSJEWELL::FTPUploadToOwnSite
+        The original inspiration for this module.
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Dist::Zilla::Plugin::UploadToSFTP
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annonations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Dist-Zilla-Plugin-UploadToSFTP>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/Dist-Zilla-Plugin-UploadToSFTP
+        >
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-UploadToSFTP>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual way to
+        determine what Perls/platforms PASSed for a distribution.
+
+        <http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-UploadToSFTP>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::UploadToSF
+        TP>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the web interface at
+    <https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP/issues>.
+    You will be automatically notified of any progress on the request by the
+    system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP>
+
+      git clone git://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP.git
+
+AUTHOR
+    Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by GSI Commerce.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,19 @@
+---
+abstract: 'Dancer Authentication, Security and Role-Based Access Control Framework!'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Auth-RBAC
+requires:
+  Dancer: 0
+  Dancer::Plugin::Database: 0
+  YAML: 0
+version: 1.110720

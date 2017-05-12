@@ -1,0 +1,56 @@
+---
+abstract: 'A plugin for writing RESTful apps with Dancer2'
+author:
+  - 'Dancer Core Developers'
+build_requires:
+  Dancer2: '0.203000'
+  Dancer2::Core::Request: '0'
+  Data::Dumper: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON: '0'
+  Module::Runtime: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-REST
+provides:
+  Dancer2::Plugin::REST:
+    file: lib/Dancer2/Plugin/REST.pm
+    version: '1.01'
+requires:
+  Carp: '0'
+  Dancer2: '0.203000'
+  Dancer2::Core::HTTP: '0.203000'
+  Dancer2::Plugin: '0'
+  List::Util: '0'
+  perl: v5.12.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perldancer/Dancer2-Plugin-REST/issues
+  homepage: https://github.com/perldancer/Dancer2-Plugin-REST
+  repository: https://github.com/perldancer/Dancer2-Plugin-REST.git
+version: '1.01'
+x_authority: cpan:SUKRIA
+x_contributors:
+  - 'Alexis Sukrieh <alexis@weborama.com>'
+  - 'Davs <kovdavid@gmail.com>'
+  - 'Franck Cuny <franck@lumberjaph.net>'
+  - 'James Aitken <loonypandora@gmail.com>'
+  - 'João Bolila <joao@bolila.com>'
+  - 'Joshua Keroes <joshua.keroes@integratelecom.com>'
+  - 'Peter Mottram <peter@sysnix.com>'
+  - 'Russell Jenkins <veryrusty@gmail.com>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

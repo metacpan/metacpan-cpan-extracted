@@ -1,0 +1,8 @@
+{
+  "invalid": true,
+
+  "schema" : {
+    "type"    : "//int",
+    "unknown" : "this will cause to things explode"
+  }
+}

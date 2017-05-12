@@ -1,0 +1,17 @@
+Build.PL
+Changes
+lib/Dancer/Plugin/Fake/Response.pm
+MANIFEST			This list of files
+MANIFEST.BAK
+META.json
+META.yml
+README
+t/00-load.t
+t/01-catch_fake_exception.t
+t/02-dynamic_params.t
+t/boilerplate.t
+t/lib/logs/development.log
+t/lib/WebService.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

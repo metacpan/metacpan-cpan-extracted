@@ -1,0 +1,24 @@
+# until ($i < 10) { if ($a++) { $i++ } else { $u++ } } continue { $i++; }
+# EXPECT: as_txt
+
+graph { flow: down; }
+node.end { border: bold; }
+node.joint { shape: point; }
+node.start { border: bold; }
+
+[ 0 ] { label: start; class: start; }
+[ 1 ] { label: until ($i < 10); class: until; }
+[ 11 ] { label: $i++%3b; class: block; }
+[ 13 ] { label: $u++; class: block; }
+[ 25 ] { label: end; class: end; }
+[ 3 ] { label: if ($a++); offset: -2,0; origin: 1; class: if; }
+[ 7 ] { label: $i++; class: block; }
+
+[ 0 ] --> [ 1 ]
+[ 1 ] -- false --> { start: right; } [ 3 ]
+[ 1 ] -- true --> { flow: forward; } [ 25 ]
+[ 3 ] -- false --> [ 13 ]
+[ 3 ] -- true --> [ 7 ]
+[ 13 ] --> [ 11 ]
+[ 7 ] --> [ 11 ]
+[ 11 ] --> { end: right,1; } [ 1 ]

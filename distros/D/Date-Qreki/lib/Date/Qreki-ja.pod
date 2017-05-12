@@ -1,0 +1,133 @@
+=encoding UTF-8
+
+=head1 名前
+
+Date::Qreki - 新旧暦変換
+
+=head1 書式
+
+    
+    use utf8;
+    use Date::Qreki ':all';
+    my @qreki = calc_kyureki (2017, 1, 31);
+    print "Old calendar $qreki[0] $qreki[2] $qreki[3]\n";
+    
+
+
+はこういう出力を作る：
+
+    Old calendar 2017 1 4
+
+
+(この例はL<F<synopsis.pl>|https://api.metacpan.org/source/BKB/Date-Qreki-0.07/examples/synopsis.pl>としてディストロにある。)
+
+
+=head1 バーション
+
+当説明はDate::Qrekiの0.07バーションに応じる。当バーションはgitのTue Jan 31 12:11:14 2017 +0900のL<c07982b5dc1b3e61c395505faa297f717276a4e3|https://github.com/benkasminbullock/Date-Qreki/commit/c07982b5dc1b3e61c395505faa297f717276a4e3>コミットに応じる。
+
+=head1 解説
+
+新暦を旧暦に変関する。
+
+=head1 関数
+
+=head2 calc_kyureki
+
+	@kyureki = calc_kyureki ($year,$mon,$day);
+
+新暦に対応する、旧暦を求める。
+
+呼び出し時にセットする変数 引数$year、$mon、$day: 計算する日付
+
+戻り値　kyureki : 答えの格納先（配列に答えをかえす）
+
+=over
+
+=item kyureki[0] : 旧暦年
+
+=item kyureki[1] : 平月／閏月 flag .... 平月:0 閏月:1
+
+=item kyureki[2] : 旧暦月
+
+=item kyureki[3] : 旧暦日
+
+=back
+
+=head2 get_rokuyou
+
+	$rokuyou = get_rokuyou ($year,$mon,$day);
+
+六曜算出関数
+
+引数：新暦年月日
+
+戻値：0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅
+
+=head2 rokuyou_unicode
+
+    my $rokuyou = rokuyou_unicode (2017, 1, 30);
+
+六曜を漢字として求める。
+
+この関数は0.07バーションから。
+
+=head2 check_24sekki
+
+    my $sekki = check_24sekki ($year, $month, $day);
+
+今日がL<２４節気|https://ja.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E7%AF%80%E6%B0%97>かどうか調べる
+ 
+引数　 .... 計算対象となる年月日　$year $mon $day
+
+戻り値 .... ２４節気の名称または空のストリング（''）
+
+=head1 配布規定
+
+   19.  配布規定について
+
+    本当は、「一般常識の許す範囲で...」としたい所ですが、世の中には色々な人
+  がいますので、ある程度の枠組みが必要なのは仕方の無いことなのでしょう。 と
+  もあれ拙者が希望するのは以下のようなものです。
+
+     i   本スクリプト・説明書を再配布する場合はオリジナルのアーカイブファイ
+       ルに含まれるファイルを全て含み、オリジナルのスクリプト・説明書を改変
+       しないで下さい。 また、 頒布の都合でアーカイブ形式（.arc  .zip  .zoo
+       等）を変更する場合も同様に扱って下さい。
+
+    ii   再配布する際の媒体に要するコストを除いて一切の金銭等の授受は禁止い
+       たします。    （他の言語に移植したものを配布する場合にも適用いたしま
+       す。）
+
+   iii   他の言語に移植したり、  本スクリプトの一部または全部を引用して作成
+       し、これを配布する場合には、オリジナルのスクリプトと本説明書を必ず同
+       梱して下さい。
+       その場合の著作権につきましては、引用した部分のみ著者に帰属し、その外
+       は製作者に帰属します。
+
+    iv   配布によって著作者が一切の制限を受ける可能性がないようにして下さ
+       い。
+
+  なお、 いづれの場合におきましても、承諾・転載の報告など一切不要といたしま
+  す。
+
+=head2 オリジナルのスクリプトと説明書
+
+
+
+配布規定にしたがって、オリジナルのスクリプトはL<F<qreki.awk>|https://api.metacpan.org/source/BKB/Date-Qreki-0.07/originals/qreki.awk>、説明書はL<F<qreki.doc>|https://api.metacpan.org/source/BKB/Date-Qreki-0.07/originals/qreki.doc>としてディストロのサブダイレクトリF<originals>にある。Shift-JISのファイルが読めない場合は
+
+    iconv -f CP932 -t UTF-8  originals/qreki.doc
+
+    perl -MEncode -n -e "print encode_utf8 (decode ('CP932', \$_));" < originals/qreki.doc
+
+などでUTF-8に変換してください。
+
+=head1 作者
+
+元々のスクリプトはH. Takanoさんが作った。 N. UenoさんがPerl conversionを作った。
+このCPANヴァーションはベン・ブロックによる。
+
+このCPANヴァーションの問合せなどはベン・ブロック（<bkb@cpan.org>）へお願いします。
+
+=cut

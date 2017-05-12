@@ -1,0 +1,36 @@
+---
+abstract: 'Displays stack trace in HTML'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-StackTrace-AsHTML
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Devel::StackTrace: '0'
+resources:
+  bugtracker: https://github.com/miyagawa/Devel-StackTrace-AsHTML/issues
+  homepage: https://github.com/miyagawa/Devel-StackTrace-AsHTML
+  repository: https://github.com/miyagawa/Devel-StackTrace-AsHTML.git
+version: '0.15'
+x_authority: cpan:MIYAGAWA
+x_contributors:
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'RickFord <ford.rick@gmail.com>'
+  - 'Shawn M Moore <sartak@gmail.com>'
+  - 'tokuhirom <tokuhirom@gmail.com>'

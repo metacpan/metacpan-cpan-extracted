@@ -1,0 +1,47 @@
+use warnings;
+use strict;
+
+use IO::File 1.03;
+use Test::More;
+
+BEGIN {
+	eval "use Math::BigInt 1.16; 1" or
+		plan skip_all => "Math::BigInt unavailable";
+	plan tests => 35;
+	use_ok "Data::Entropy::Source";
+	use_ok "Data::Entropy", qw(with_entropy_source);
+	use_ok "Data::Entropy::Algorithms", qw(rand_int);
+}
+
+sub match($$) {
+	my($a, $b) = @_;
+	ok ref($a) eq ref($b) && $a == $b;
+}
+
+with_entropy_source +Data::Entropy::Source->new(
+		IO::File->new("t/test0.entropy", "r") || die($!), "getc"
+), sub {
+	my $limit = Math::BigInt->new("100000000000000000000");
+	while(<DATA>) {
+		while(/([0-9]+)/g) {
+			match rand_int($limit), Math::BigInt->new($1);
+		}
+	}
+	match rand_int(1), 0;
+	eval { rand_int(0); };
+	like $@, qr/\Aneed a positive upper limit for random variable/;
+};
+
+1;
+
+__DATA__
+68807314153453845935 44895925609758693014 91684367776668160563
+56108518278522687113 28217278430494290576 71738743512311479074
+74386544180255394792 39152281477817113805 90921893246479465065
+82620448454531421388 44674519163021046525 84527795945300210520
+34360252122495692115 38978214527762911353 79479987427485544715
+12061931143224927321 53948765087340844500 80659296157555878729
+78427179399174651950 91564990700810876914 61342958431468667976
+63611026805453161344 27646495397604287489 00034572888809883207
+85168650371487971070 90371971159857598709 88818527526349480067
+26775678824341118026 59032056402338073720 55462451824035966722

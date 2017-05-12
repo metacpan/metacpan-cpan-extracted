@@ -1,0 +1,20 @@
+---
+abstract: 'easily find the distribution home directory for code never intended to be installed via a package manager'
+author:
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-HomeDir
+requires:
+  Path::Tiny: '0'
+resources:
+  bugtracker: https://github.com/singingfish/perl5-dist-homedir/issues
+  repository: git://github.com/singingfish/perl5-dist-homedir.git
+version: '0.006'

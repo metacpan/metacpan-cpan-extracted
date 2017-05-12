@@ -1,0 +1,3 @@
+# if $a == 1 { $b++; } else { $c = 123; }
+# EXPECT: error
+

@@ -1,0 +1,39 @@
+Revision history for Perl extension Devel::ptkdb.
+
+
+1.1  Mon Dec  7 14:36:17 1998
+	- original version; created by h2xs 1.18
+
+1.101 Tue Dec 15 16:00 1998
+
+       Corrected POD document to change -d:ptkdb1048 to -d:ptkdb
+
+       Removed Dead code for font specifications and tag configuration
+       that is no longer used
+
+       Broke up a chained call to Data::Dumper->Terse->Ident into 
+       two separate calls to make it compatible with older versions
+       of Data::Dumper
+
+1.102
+
+	Updated install_ptkdb.pl to changes above
+
+1.104
+
+	Fixed a conflict with 'qw' and perl 5.004.
+
+        Fixed a warning issued with perl 5.004
+
+        Corrected a problem with where using ptkdb for 
+        debugging other ptk apps would cause 'grab' problems.
+
+1.105   Fixed incorrect evaluation of $@ in expressions.
+        Corrected some formatting issues with the POD section.
+
+1.1052  Added a configuration option that allows users to change
+        the packing arrangement of the code and notebook panes.  
+        See POD section item:  PTKDB_CODE_SIDE
+
+1.1059  Corrected a bug where vars in the dbval subroutine could eclipse
+        vars that were in targe code

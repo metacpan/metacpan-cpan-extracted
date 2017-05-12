@@ -1,0 +1,7 @@
+This module dumps binary data in a variety of formats, allowing control
+over endianness and word length.  To install, do the usual:
+
+	perl Makefile.PL
+	make
+	make test
+	make install

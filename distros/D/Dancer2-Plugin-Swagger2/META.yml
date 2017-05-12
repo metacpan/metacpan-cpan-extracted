@@ -1,0 +1,44 @@
+---
+abstract: 'A Dancer2 plugin for creating routes from a Swagger2 spec'
+author:
+  - 'Daniel Böhmer <dboehmer@cpan.org>'
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  Hash::MultiValue: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Test: '0'
+  Test::MockObject: '0'
+  Test::More: '0.94'
+  Test::Most: '0'
+  blib: '1.01'
+  perl: v5.8.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Swagger2
+provides:
+  Dancer2::Plugin::Swagger2:
+    file: lib/Dancer2/Plugin/Swagger2.pm
+    version: '0.003'
+requires:
+  Dancer2: 0.162000_01
+  Dancer2::Plugin: '0'
+  Module::Load: '0'
+  Swagger2: '0.63'
+  Swagger2::SchemaValidator: '0'
+  perl: v5.8.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dboehmer/Dancer2-Plugin-Swagger2/issues
+  homepage: https://metacpan.org/pod/Dancer2::Plugin::Swagger2
+  repository: git://github.com/dboehmer/Dancer2-Plugin-Swagger2.git
+version: '0.003'

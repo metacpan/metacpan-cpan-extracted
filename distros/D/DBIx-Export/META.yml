@@ -1,0 +1,34 @@
+---
+abstract: 'Export data from DBI as a SQLite database'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::Remove: 1.42
+  File::Spec: 0.80
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.85'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: DBIx::Export
+name: DBIx-Export
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBD::SQLite: 1.21
+  DBI: 1.57
+  Object::Tiny: 1.06
+  Params::Util: 0.33
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/DBIx-Export
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/DBIx-Export
+version: 0.01

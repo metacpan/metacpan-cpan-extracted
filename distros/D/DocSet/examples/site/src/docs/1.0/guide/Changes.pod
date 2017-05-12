@@ -1,0 +1,47 @@
+=head1 NAME
+
+Changes
+
+=head1 Description
+
+Refer to this document to learn what changes were made to the
+documents, since you've read these last time. 
+
+The most recent changes are listed first.
+
+=head1 Ongoing
+
+* coding.pod:
+
+ o clarify the issue with END blocks in packages loaded from the
+   registry scripts [Jim Schueler]
+
+=head1 Jul 14 2002 ver 1.32
+
+* snippets.pod:
+
+  o new recipe: File Upload with Apache::Request [Rich Bowen]
+
+* cookbook.pod:
+
+  o ported "Passing Arguments to a SSI script" from the modperl faq
+
+* method_handlers.pod
+
+  o moved here from the faqs
+
+=head1 12.03.1998 ver 1.00
+
+
+* First Release
+
+=cut
+
+
+
+
+
+
+
+
+

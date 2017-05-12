@@ -1,0 +1,143 @@
+# Copyright (c) 2009-2017 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Date::Manip::Migration5to6 - how to upgrade from 5.xx to 6.00
+
+=head1 SYNOPSIS
+
+When upgrading from Date::Manip 5.xx to 6.00, a few changes may be
+necessary to your scripts.
+
+The L<Date::Manip::Changes5to6> document lists in more detail the ways in
+which Date::Manip changed, but very few of these actually entail
+changes to your script.
+
+It should be noted that once the changes are made to your script,
+it will no longer run correctly in 5.xx.
+
+=head1 NECESSARY AND SUGGESTED CHANGES
+
+The following changes are necessary, or strongly suggested:
+
+=over 4
+
+=item B<Reading config files with Date_Init>
+
+If you use Date_Init to read any config files (if you do business mode
+calculations, you probably do), you should remove all of the following
+config variables from your call to Date_Init:
+
+   GlobalCnf=FILE
+   PersonalCnf=FILE
+   PathSep=*
+   IgnoreGlobalCnf=*
+   PersonalCnfPath=*
+
+and replace them with:
+
+   ConfigFile=FILE
+
+where FILE is now the full path to a config file. Also, the ConfigFile
+argument should be the first argument in Date_Init.
+
+=item B<Date_ConvTZ>
+
+The Date_ConvTZ function has changed. It should now take 3 arguments:
+
+   $date = Date_ConvTZ($date,$from,$to);
+
+If C<$from> is not given, it defaults to the local time zone. If C<$to> is
+not given, it defaults to the local time zone.
+
+The date is converted from the C<$from> time zone into the C<$to>
+time zone. Both should be any time zone (or alias) supported by
+Date::Manip.
+
+The old C<$errlevel> argument is no longer handled.
+
+=item B<ConvTZ and TZ config variables>
+
+If you use either the ConvTZ or TZ config variables, you should
+replace them with either SetDate or ForceDate. See the
+L<Date::Manip::Config> document for information.
+
+The TZ variable will continue to work until Dec 2015 at which point
+it will be removed.
+
+=item B<Other deprecated config variables>
+
+The following config variables have been deprecated, but will continue
+to function (though they will be removed at a future date):
+
+   TZ           (removed Mar 2016)
+
+The following variables have been removed. If you use any of them,
+you may need to modify your scripts:
+
+   IntCharSet
+   GlobalCnf
+   PersonalCnf
+   PathSep
+   IgnoreGlobalCnf
+   PersonalCnfPath
+   ConvTZ
+   Internal
+   TodayIsMidnight
+   DeltaSigns
+   UpdateCurrTZ
+   ResetWorkdDay
+
+=item B<today, yesterday, tomorrow>
+
+If you parse the strings "today", "yesterday", or "tomorrow" in order
+to get the time now, or 24 hours in the past/future, this will no
+longer work.  These strings now refer strictly to the date (so "today"
+is the current day at midnight, "yesterday" is the previous day at
+midnight, etc.).
+
+To get the time now, 24 hours ago, or 24 hours in the future, you
+would need to parse the strings "now", "-24:00:00", or "+24:00:00"
+respectively.
+
+=item B<Do not use Memoize>
+
+In 5.xx, it was documented that you could use the module Memoize to
+speed up Date::Manip, especially when sorting dates.
+
+This information is no longer accurate. Using Memoize in conjunction
+with Date::Manip should have little impact on performance, and may
+lead to incorrect results, especially if you change config variables.
+
+Please refer to L<Date::Manip::Changes5to6/"GENERAL CHANGES"> for
+more information.
+
+=back
+
+If you find other instances where it is necessary to modify your
+script, please email me so that I can add that information to this
+document.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the L<Date::Manip::Problems> documentation for
+information on submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+L<Date::Manip>        - main module documentation
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

@@ -1,0 +1,394 @@
+Revision history for Dist-Zilla-Plugin-MetaData-BuiltWith
+
+1.004005 2017-03-02T03:06:51Z 15987f6
+ [BugFix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-MetaData-BuiltWith/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004004, see misc/*.deps* for details
+ - develop: +1 ↑1
+ - test: ↓1
+
+1.004004 2016-09-10T10:08:39Z d8d12b1
+ [Bugfix]
+ - Don't die when uname call fails.
+ - To be honest, I'm still not sure why I was doing this in the first place.
+ - Patch Patched (with thanks) by Roy Ivy II ( #1 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004003, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+1.004003 2016-05-01T21:35:06Z e12fda1
+ - Removed DZTest stuff.
+ - Removed use of Util::ConfigDumper
+ - Removed use of Module::Data & Path::ScanINC from the depgraph.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004002, see misc/*.deps* for details
+ - develop: +5 ↑1 -1 (suggests: ↑2)
+ - runtime: +2 -2 (recommends: +1)
+ - test: -2 (recommends: -1)
+
+1.004002 2015-03-06T23:08:04Z 81ea208
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004001, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +3 ↑2 -1 (recommends: ↓1, suggests: ↑1)
+ - runtime: (recommends: +1)
+ - test: (recommends: +1 ↓2)
+
+ [Internals]
+ - Cleanup some residual cruft from de-autoboxing.
+
+1.004001 2014-12-29T14:33:59Z 8a275b9
+ [Bugfix]
+ - Fix emitting 'null' for version in external file format.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.004000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 ↑1 (recommends: ↑1, suggests: ↑1)
+ - runtime: ↓1 -1
+ - test: ↓1 (recommends: ↑1)
+
+ [Internals]
+ - Slightly better code refactory in main loop.
+
+1.004000 2014-12-14T08:34:41Z 24fbb48
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑1 -2 (recommends: +1, suggests: ↑2)
+ - runtime: +3
+ - test: +1 (recommends: ↑2)
+
+ [Feature]
+ - Can now remove the data from META.* and export into a single file on its own using 'use_external_file = only'.
+ - File will be a name of user choice but defaults to 'misc/built_with.json'
+
+1.003001 2014-09-24T06:28:04Z
+ [Bugfix]
+ - Don't call unname on devices where there is no uname.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003000, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +1
+ - test: (recommends: ↑1)
+
+1.003000 2014-09-03T22:13:41Z
+ [00 Minor]
+ - Internals.
+ - Tests.
+
+ [Bugfix]
+ - BuiltWith::All could crash trying to load some invalid module names it erroneously thought existed by traversing the
+   global stash.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.002000, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +2
+ - test: +2
+
+ [Internals]
+ - dump_config impemented with config_dumper
+
+ [Tests]
+ - Tests reimplented in dztest
+
+1.002000 2014-08-18T03:26:39Z
+ [00 Minor]
+ - use JSON::MaybeXS instead of JSON
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1 -1
+
+1.001001 2014-08-15T21:17:00Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - test: -3
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update reportprereqs test
+
+1.001000 2014-07-30T13:22:16Z
+ [00 Major]
+ - Added tests
+ - Prereqs retrieved directly from Dist::Zilla now *WITHOUT* using EmulatePhase.
+ - x_BuiltWith keys now added during META.* write out, which happens after prereqs finalization, by currying the
+   FromCode coderef and injecting the data raw and de/reserializing.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: (suggests: ↑1)
+ - runtime: +4 -4
+ - test: +2 -1 (recommends: ↑1 -2)
+
+1.000001 2014-07-19T02:16:32Z
+ [00 Trivial]
+ - Misc packaging cleanups
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: +2 ↑1 (recommends: +1)
+
+1.000000 2014-05-20T05:33:17Z
+ [00 Major]
+ - Moderately sized packaging changes, a few small code changes.
+
+ [01 Tooling]
+ - Now uses ExtUtils::MakeMaker for installer.
+ - "Latest" dependency logic now only added to /recommends/
+
+ [02 Versioning]
+ - Version scheme is now x.yyyyyy ( mantissa = 6 )
+ - This is the primary reason for the 1.x on the box.
+
+ [Bugfix]
+ - BuiltWith::All ocasionally messed up when it found certain modules in %INC which had names such that it was
+   impossible to load them ( Anon classes, Mx Types ), and these needlessly caused failures. Fixed.
+
+ [Dependencies::Aggregate]
+ - 5.008009 : 202 → 206
+ - 5.010001 : 180 → 185
+ - 5.018002 : ? → 172
+ - 5.019000 : 166 → ?
+ - 5.019009 : ? → 166
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.04000002, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 ↑1 -9
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+0.04000002 2013-11-25T08:35:49Z
+ [00 Bugfix]
+ - Don't try to test if it was a file or not if its undefined.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.04000001, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: +1
+
+0.04000001 2013-11-22T04:23:48Z
+ [00 Maint]
+ - Changes retroactively cleaned. Next time, you will be forced to wear a clown shoes and ride a unicycle.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.04000000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - test: ↑1 -3
+
+ [Documentation]
+ - Readme.mkdn → MetaCPAN
+
+ [Packaging]
+ - Build.PL updated by Dzil to have new Fallback Mechanics.
+
+ [Tests]
+ - Use Test::Compile::PerFile
+ - Newer ReportVersions::Tiny to avoid develop-deps showing.
+
+0.04000000 2013-09-26T00:25:33Z
+ [00 Major]
+ - Not really a major, just fixing my failure to increment majorly instead of patch-ly.
+ - Also, The changelog has been updated. Retroactively. Pray I do not alter it further.
+   https://www.youtube.com/watch?v=WpE_xMRiCLE
+
+0.03000101 2013-09-26T00:14:19Z
+ [00 Major]
+ - Guts reworked to use Module::Metadata.
+ - ::All reworked to be less !@#$ insane.
+ - Dep failures no longer say "NA()" and instead get their own hash entry.
+
+ [Dependencies]
+ - use Module::Data
+ - upgrade Module::Build
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.03000100, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +7 (suggests: ↑1)
+ - runtime: +1
+ - test: +3 -2
+
+ [Documentation]
+ - Add README.mkdn
+
+ [Meta]
+ - Bug tracker to github issues.
+
+ [Tests]
+ - Regenerated to shit
+
+0.03000100 2012-07-28T18:27:33Z
+ [00_Note]
+ - Accidentally lost the source code entirely for 0.03xxxyyy, so had to sort of reconstruct that history. Also
+   accidentally released it as 0.02000101 due to not having said code and not realising it.
+
+ [Bugfixes]
+ - Defer module version checks to later to help bootstrap.
+
+ [Dependencies]
+ - use newer Module::Build and Test::More
+ - use Readonly
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02000100, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +1
+ - test: ↑1
+
+0.03000000 2012-03-12T15:06:44Z
+ [Features]
+ - new 'show_config' option which extracts selected interesting data from Config.pm ( such as the git ID ), which
+   should prove useful for showing exactly what perl a dist was built on
+ - greatly improved option documentation.
+
+0.02000100 2012-02-27T04:05:24Z
+ [Bugfixes]
+ - More attempts at fixing rt#63930 and the $_ aliasing bug
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02000000, see misc/*.deps* for details
+ - runtime: +1
+
+ [Internals]
+ - Eliminated the dangerous stringy evals in favour of Class::Load;
+
+0.02000000 2012-02-27T03:48:01Z
+ [Bugfixes]
+ - This release should hopefully neuter the occasional glitch that occured due to $_ being clobbered in a few places
+   yeilding a package of 'undef', which emits broken META.yml. Hopefully this should resolve rt#63930
+
+ [Dependencies]
+ - use MooseX::Types::Moose
+ - use Moose 2.0
+ - Stop using Hash::Merge::Simple and Moose::Autobox
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01018205, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +2 ↑1 -2
+
+ [Internals]
+ - Ripped out the Autobox stuff as it was adding errors.
+ - Used MooseX::Types instead of simple stringy ones.
+ - Used Recent Moose traits to provide flattening instead of Autobox.
+ - include and exclude are now _include and _exclude with init_args to keep construction the same. new methods include
+   and exclude are 'elements' accessors.
+ - _uname_args now produces _all_uname_args 'elements' trait-accessor.
+
+ [Packaging]
+ - Update LICENSE ( Address, Indent, Year )
+
+ [Tests]
+ - added minimum-version test.
+
+0.01018205 2011-10-22T12:24:24Z
+ - Package Maintenance Release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01018204, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+ - runtime: +2
+ - test: -1
+
+ [Internals]
+ - Version no longer set during BEGIN
+ - Now declares $AUTHORITY in all packages.
+ - Use log( [ $format ) instead of log( sprintf $format notation.
+ - Replace an autoboxed map{} with a plain map{}
+
+ [Packaging]
+ - Changelog moved to CPAN::Changes form.
+ - Ship .perltidyrc
+ - Update Copyright notice ( Year, Indentation, Address )
+ - Move perlcriticrc to perlcritic.rc
+ - Author/Release tests no longer in t/
+ - Use @Author::KENTNL instead of @KENTNT
+ - Gituhub URLS now all https://
+ - Stop using Autoversion for versioning, use Git instead.
+ - Declare x_authority
+ - set Encoding in POD
+
+ [Tests]
+ - 00-compile.t regenerated
+
+0.01018204 2010-12-07T17:05:34Z
+ - Finally fixed that pesky \n in the uname string.
+ - Moral of the story: $/ is actually evil. ( Thanks to Apocalypse for prodding me into finally fixing this )
+
+0.01016607 2010-11-21T20:30:38Z
+ - Replaced $] with { %{$^V} } to see the native version object instead of this deprecated string.
+
+0.01014716 2010-11-04T05:26:16Z
+ - Clean source code/Update toolchain.
+ - Fixed issue with Prereqs not being discoverable.
+ - Minor refactor with More Autobox
+
+ [Dependencies]
+ - require Moose::Autobox
+ - require Hash::Merge::Simple
+ - require Dist::Zilla::Util::EmulatePhase 0.01000101
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01005122, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: +3 -1
+ - test: +1
+
+0.01005122 2010-07-31T11:43:00Z
+ - Dep on version 4.101540 of Dist::Zilla::Role::ConfigDumper. ( This should reduce some test failures due to 'around
+   dump_config' )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01005020, see misc/*.deps* for details
+ - runtime: +1
+
+0.01005020 2010-07-30T09:06:26Z
+ - Skip 'perl' automatically when found in modules list. Can't depend on perl.pm.
+ - Added 'uname' reporting feature. This should mostly work still, and only warn when its run on a machine with no
+   uname support and not publish uname data.
+ - Added dump_config reporting support for MetaConfig
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000216, see misc/*.deps* for details
+ - runtime: +1
+
+0.01000216 2010-06-13T05:07:31Z
+ - Added a very overkill MetaData::BuiltWith::All module for those with suicidal tendencies.
+
+ [Dependencies::Added / runtime requires]
+ - namespace::autoclean
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000022, see misc/*.deps* for details
+ - runtime: +1
+
+0.01000022 2010-06-11T11:48:14Z
+ - First version.

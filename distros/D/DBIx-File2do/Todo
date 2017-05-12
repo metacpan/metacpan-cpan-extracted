@@ -1,0 +1,8 @@
+TODO list for Perl module DBIx::File2do
+
+- Do better job of cleanup on sql script
+  - Ignore comments
+- Make comment tags variable
+- Make command delimiters variable
+
+

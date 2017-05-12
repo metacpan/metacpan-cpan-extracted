@@ -1,0 +1,26 @@
+1.1:
+
+X Test Cases
+X  v1 Delete
+X  v2 Delete
+X  v1 Select
+X Fix count
+X Make ->parse work for all fields
+X Remove rowcache from Maker/Helper, and put it in the "buddy object"
+X Record object caching
+X Review code
+Review test cases
+Merge (sans admin code)
+
+
+1.3:
+Designate a proper way to convey primary table to a query object without having to resort to $tables[0]
+Clean up / dramatically trim ::Record::Helper
+Clean up ::Record::Maker
+Make ->create method that returns a record object
+ISH Error handling
+X Cross DB queries
+Mini query interface for internal use
+Admin overhaul
+Speed up test script setup
+Attributes

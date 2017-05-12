@@ -1,0 +1,49 @@
+Revision history for DBIx-Class-Validation-Structure
+
+0.15  2015-08-10 10:59:51 CDT
+        - _val_text, _val_password & _val_number should not set default value to a blank string
+
+          *Note:* This may cause breakage in some uses of this module because end users
+          may have relied on this default value for their databases. Instead
+          those users should set the `default_value` for those columns.
+
+0.14  2015-08-06 14:01:17 CDT
+        - Use utf8 to include all letter characters in _val_text * _val_password
+        - Refactor validator tests to use subtests
+        - Support []s in _val_text * _val_password
+
+0.13  2015-01-27 20:52:19 CST
+        - Allow '0' and other numbers as a valid input for _val_text
+
+0.12  2014-09-25 00:02:43 CDT
+        - Fixed tests for newer versions of perl ( < 5.18.0 )
+        - Combined unique error messages are consistently generated
+
+0.11  2014-08-13 10:48:56 CDT
+        - Check Column custom selection applies to unique constraints now
+        - Fix for using values with older versions of perl
+
+0.10  2014-08-05 13:14:35 CDT
+        - Made exception for primary keys from unique constraints test when validating result from storage.
+
+0.09  2014-08-04 14:50:40 CDT
+        - Changed Uniqueness validation to follow combined unique constraints
+
+0.08  2013-09-27 13:22:43 CDT
+        - Passes $self to Custom Validation Methods, so Validation can be based on relationships
+
+0.07  2013-09-17 11:32:41 CDT
+        - Fixed Minor bugs
+
+0.06  2013-09-16 13:30:10 CDT
+        - Added SEE ALSO section Links
+
+0.05  2013-09-15 22:14:45 CDT
+        - Fixed SYNOPSIS
+
+0.04  2013-09-15 22:10:27 CDT
+        - Added Validation subroutines into Module
+        - Wrote tests for validation subroutines
+
+0.03  2013-09-15 19:44:47 CDT
+        - Initial release

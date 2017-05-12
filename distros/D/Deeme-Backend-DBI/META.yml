@@ -1,0 +1,37 @@
+---
+abstract: 'DBI Backend for Deeme'
+author:
+  - 'mudler <mudler@dark-lab.net>'
+build_requires:
+  Carp::Always: '0'
+  DBD::SQLite: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.037'
+  perl: '5.008005'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.5, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Deeme-Backend-DBI
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  DBI: '0'
+  Deeme: '0'
+  Deeme::Obj: '0'
+  Deeme::Utils: '0'
+  feature: '0'
+resources:
+  bugtracker: https://github.com/mudler/p5-Deeme-Backend-DBI/issues
+  homepage: https://github.com/mudler/p5-Deeme-Backend-DBI
+  repository: https://github.com/mudler/p5-Deeme-Backend-DBI.git
+version: '0.04'

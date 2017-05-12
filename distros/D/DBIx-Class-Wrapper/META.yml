@@ -1,0 +1,27 @@
+---
+abstract: 'Wrap your business code around your DBIx::Class Schema.'
+author:
+  - 'Jerome Eteve <jerome.eteve@gmail.com>'
+build_requires:
+  DBIx::Class::Schema::Loader: '0.07039'
+  Lingua::EN::Number::IsOrdinal: '0.05'
+  Test::Fatal: '0.014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Wrapper
+requires:
+  Class::Load: '0.20'
+  DBI: '1.63'
+  DBIx::Class: '0.08250'
+  Module::Pluggable: '4.0'
+  Moose: '2.1205'
+resources:
+  homepage: https://github.com/jeteve/DBIx-Class-Wrapper
+  repository: https://github.com/jeteve/DBIx-Class-Wrapper.git
+version: '0.008'

@@ -1,0 +1,59 @@
+{
+   "abstract" : "Compress CSS files",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-CSS-Compressor",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CSS::Compressor" : "0",
+            "Dist::Zilla::File::FromCode" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FileInjector" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DZil" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/dist-zilla-plugin-css-compressor/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Dist-Zilla-Plugin-CSS-Compressor/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/dist-zilla-plugin-css-compressor.git",
+         "web" : "https://github.com/plicease/dist-zilla-plugin-css-compressor"
+      }
+   },
+   "version" : "0.02"
+}
+

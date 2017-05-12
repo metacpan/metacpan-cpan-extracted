@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                Devel-Profit
+version:             0.34
+abstract:            A Perl profiler
+license:             perl
+author:              
+    - Leon Brocard <acme@astray.com>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Moose:                         0
+    MooseX::App::Cmd:              0
+    PPI:                           0
+    PPIx::LineToSub:               0
+    Term::Size:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

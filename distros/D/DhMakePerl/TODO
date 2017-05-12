@@ -1,0 +1,50 @@
+* when ITP for the package is found, try to deduce short/long description from
+  the bug report
+* --refresh: add --only <file> option: done, but "--only control" also
+  touches d/rules if quilt is used
+* versioned dependencies should add the epochs too (found in
+  libpoex-role-sessioninstantiation-perl, where META.yml and Build.PL
+  request 'POE 1.005' which should translate to "libpoe-perl (>= 2:1.0050)")
+  Can be solved if the next item is solved:
+* META.yml should not be used to extract information: it may contains data that are 
+  relevant for other systems (e.g. Windows, Mac...). Running Makefile.PL (or 
+  equivalent) will create a MYMETA.yml which contains more accurate information. 
+  (e.g. will not list dependencies valid only for windows)
+  See #668638
+* #536838: Incorrect assumptions about perl module version -> debian package
+  version. Some way of figuring out that libfoo-perl 3.42 contains Bar::Baz
+  4.23 is needed. while not common, version discrepacy is very annoying.
+  TODO: investigate usage of UDD. (1) can the info "package version module
+  module-version" be imported and (2) would it be possible to query that from
+  the web somehow, i.e. "which package+version contain at least
+  module+module-version?".
+  Two problems:
+  (a) dh-make-perl querying the web about each dependency seems not quite
+      right. Requests should be batched. One request per dh-make-perl run
+      is better. Is it good enough?
+  (b) will all this be enough? Given that perl module versions compare
+      differently to debian package versions, the result can still be wrong.
+      The same question holds with core packages, but perhaps they behave beter
+      wrt (not) changing versioning scheme.
+* Add a test case for finding (build) dependencies with META.yml.
+* Really minor issue. The AptContents.t test can be thrown off if the contents
+  directory has stuff lying around from a failed run. ~periapt
+* Add a switch for "app" (foo-bar) vs. "lib" (libfoo-bar-perl) packages?
+* upstream git: add remote and git fetch/merge
+* At the end, rename the extracted directory from Perl Distribution
+  style (Foo-Bar-$VERSION) to Debian Package style (libfoo-bar-perl),
+  otherwise debuild barfs:
+
+  debuild: found debian/changelog for package libfoo-bar-perl in the directory
+    /home/…/pkg-perl/Foo-Bar-$VERSION
+  but this directory name does not match the package name according to the
+  regex  PACKAGE(-.+)?.
+
+  To run debuild on this package, see the --check-dirname-level and
+  --check-dirname-regex options; run debuild --help for more info.
+* quilt support looks like a candidate for dropping
+* make/refresh: add "Multi-Arch: same" header to arch-dep packages
+* clean up after #774862.
+  currently we use YAML and YAML::XS. one should be enough, probably
+  YAML::XS or YAML::Tiny or ... additionally YAML::XS is nowhere in the
+  metadata, and the tests didn't catch the ommission either.

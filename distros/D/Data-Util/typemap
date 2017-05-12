@@ -1,0 +1,19 @@
+###
+
+AV* T_AVREF
+HV* T_HVREF
+CV* T_CVREF
+
+###
+INPUT
+
+T_AVREF
+	$var = deref_av($arg);
+
+T_HVREF
+	$var = deref_hv($arg);
+
+T_CVREF
+	$var = deref_cv($arg);
+
+

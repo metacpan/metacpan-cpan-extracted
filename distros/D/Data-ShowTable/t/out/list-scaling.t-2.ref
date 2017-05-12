@@ -1,0 +1,31 @@
+*** STDOUT ***
+Index   : 1
+Name    : Alan Stebbens
+Phone   : 555-1234
+Address : 1234 Something St., CA
+Date    : 1998-10-22
+
+Index   : 2
+Name    : Bob Frankel
+Phone   : 555-1235
+Address : 9234 Nowhere Way, WA
+Date    : 2001-01-02
+
+Index   : 3
+Name    : Mr. Goodwrench
+Phone   : 555-9432
+Address : 1238 Car Lane Pl., NY
+Date    : 2004-04-20
+
+Index   : 4
+Name    : Mr. Ed
+Phone   : 555-3215
+Address : 9876 Cowbarn Home, VA
+Date    : 2008-09-12
+
+Index   : 5
+Name    : Gunther Sveborg
+Phone   : 44-55-555-5555
+Address : Kartophelhause 345, Munich, Germany
+Date    : 2013.10.22
+

@@ -1,0 +1,19 @@
+1.0.2     2011-04-21 09:18:39 Europe/Rome
+   - added documentation to explain how to write a custom license
+     file, it has disappeared from Software::License::CustomLicense
+     after the handover
+
+1.0.1     2011-04-03 19:15:50 Europe/Rome
+   - fixed version in dependency of Software::License
+
+1.0.0     2011-04-02 00:47:52 Europe/Rome
+   - removed Software::License::Custom, integrated in Software::License
+
+0.9.0     2011-01-25 01:06:53 Europe/Rome
+   - first release of the module
+
+0.1.0_02  2010-12-04 18:02:12 Europe/Rome
+   - added stuff to this Changes file
+
+0.1.0_01   2010-11-22 07:35:39 Europe/Rome
+   - initial release

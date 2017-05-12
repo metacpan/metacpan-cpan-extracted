@@ -1,0 +1,57 @@
+Revision history for Perl extension Date-Formatter.
+
+0.10.1 Wed. Septmember 4, 2013
+   - fix versioning in dist.ini
+
+0.10 Wed. Septmember 4, 2013
+   - update DateTime::Locale method calls to quiet down warnings.
+   - convert to dist zilla
+
+0.09 Thurs. May 17, 2007
+    - get rid of some annoying test failures which 
+      are caused by Test::More upgrades, they were
+      totally harmless, but I am getting sick of 
+      typing `force install ...` in the CPAN prompt
+      all the time ;)
+
+0.08 Fri  Aug 26 2005
+    - Added localization support via DateTime::Locale
+
+0.07 Tues Nov 30 2004
+    - forgot to add the new test to the MANIFEST
+    - forgot to add the date to the Changes file
+
+0.06 Tues Nov 30 2004
+    - added the options to set a date from the 
+      constructor which uses Time::Local::timelocal() 
+      to construct the new date
+    - added Time::Local as a dependency
+    - added requirement of minimum of perl 5.6.0
+
+0.05 Thurs Nov 18 2004
+    - now using Scalar::Util::blessed() instead of 
+      the convoluted UNIVERSAL::isa() stuff. 
+      - added Scalar::Util as a dependency
+    - added pod.t and pod_coverage.t
+
+0.04  Sun May 2 2004
+    - Tests for time based modules are touchy. Another test was
+      failing because I again made an assumption that did not
+      pan out. Hopefully this will fix it now. 
+
+0.03  Tues April 14, 2004
+    - The first test was failing, it was not due to an error
+	  in the module, but instead an error in the tests. I was
+	  calculating the number of hours till a certain time, so
+	  I would maniplate certain blocks of code and test them. 
+	  My test calculations were flawed, so it was not correctly 
+	  setting the hours for the test.
+
+0.02  Tues April 13, 2004
+    - the documentation was a little wonky, so I cleaned it up
+	  nothing much else was changed though.
+
+0.01  Mon Apr 12 23:59:09 2004
+	- original version; created by h2xs 1.22 with options
+		-X -n Date-Formatter
+

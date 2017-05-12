@@ -1,0 +1,16 @@
+<HTML>
+<HEAD>
+<TITLE>[% title %]</TITLE>
+<STYLE>
+H1 {color: blue; text-align: center}
+.function {font-weight: bold; color: blue}
+</STYLE>
+</HEAD>
+<BODY>
+<h1>[% title %]</h1>
+
+<UL>
+[% FOREACH classname = classes %]
+<LI><a href="[% class2file.$classname %]">[% classname %]</a></LI>
+[% END %]
+</UL>

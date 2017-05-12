@@ -1,0 +1,203 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2009-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+
+require 5.010000;
+use Date::Manip::Date;
+use IO::File;
+use strict;
+use warnings;
+
+###############################################################################
+# HELP
+###############################################################################
+
+our($usage);
+my $COM = $0;
+$COM =~ s/^.*\///;
+
+$usage=
+  "usage: $COM OPTIONS [ZONE ZONE ...]
+      -h/--help        : Print help.
+
+      -v/--vebose      : Prints a full description of each
+                         timezone.
+
+      -c/--cutoff YEAR : Cut off verbose output near the
+                         start of YEAR.
+
+";
+
+=pod
+
+=head1 NAME
+
+dm_zdump - timezone dumper
+
+=head1 SYNOPSIS
+
+This performs the same operation as the unix 'zdump' command, but using
+the Date::Manip module.
+
+   dm_zdump [-v] [-c YEAR] [ZONE ZONE ...]
+
+=head1 DESCRIPTION
+
+This displays the current time in each ZONE named on the command line
+unless the -v option is given.
+
+=over 4
+
+=item -h, --help
+
+Print online help.
+
+=item -v, --verbose
+
+This displays all critical dates (i.e. the times when a time change
+occurs due to the timezone description) for each of the timezones
+listed (or the local timezone if none are listed).
+
+Each critical date is printed as two lines of output: the last second
+before the change occurs, and the first second of the new time.
+
+By default, all critical dates from Jan 1, 0001 until the year 20 years
+in the future are printed, but this can be changed with the -c option.
+
+=item -c, --cutoff YEAR
+
+This specifies the cutoff year. All critical dates up to the start of
+YEAR are given. The GMT time Jan 01, YEAR at 00:00:00 is the cutoff
+time.
+
+=back
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the Date::Manip::Problems documentation for
+information on submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+Date::Manip::Date
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+our($date,$dmt,$dmb,$verbose,$cutoff,@zone);
+
+$date    = new Date::Manip::Date "now";
+$dmt     = $date->tz();
+$dmb     = $date->base();
+$cutoff  = $date->printf('%Y') + 21;
+$verbose = 0;
+
+while ($_ = shift) {
+
+   (print $usage),   exit  if ($_ eq "-h"   ||  $_ eq "--help");
+
+   $verbose = 1,     next  if ($_ eq "-v"   ||  $_ eq "--verbose");
+   $cutoff = shift,  next  if ($_ eq "-c"   ||  $_ eq "--cutoff");
+
+   @zone = ($_,@ARGV);
+   last;
+}
+
+if (@zone) {
+   foreach my $z (@zone) {
+      my $tmp = $dmt->zone($z);
+      if (! $tmp) {
+         die "ERROR: invalid timezone: $z\n";
+      }
+      $z = $tmp;
+   }
+
+} else {
+   @zone = $dmt->curr_zone();
+}
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+if ($verbose) {
+   foreach my $z (@zone) {
+      my @per        = $dmt->periods($z,undef,$cutoff);
+      foreach my $per (@per) {
+         my($startUT,$startLT,$offsetstr,$offset,$abbrev,$isdst,$endUT,$endLT)
+           = @$per;
+
+         $startUT   = datestr($startUT);
+         $startLT   = datestr($startLT);
+         $endUT     = datestr($endUT);
+         $endLT     = datestr($endLT);
+         my $gmtoff = $$offset[0]*3600 + $$offset[1]*60 + $$offset[2];
+
+         print "$z  $startUT UT = $startLT $abbrev isdst=$isdst gmtoff=$gmtoff\n";
+         print "$z  $endUT UT = $endLT $abbrev isdst=$isdst gmtoff=$gmtoff\n";
+      }
+      print "\n"  if ($#zone != 0);
+   }
+
+} else {
+   my $wid = 0;
+   foreach my $z (@zone) {
+      $wid = length($z)  if (length($z) > $wid);
+   }
+
+   foreach my $z (@zone) {
+      $date->convert($z);
+      print $z," "x($wid-length($z)),"  ",$date->printf('%a %b %e %H:%M:%S %Y %Z'),"\n";
+   }
+}
+
+sub datestr {
+   my($date) = @_;
+
+   my %mon = qw(1 Jan 2 Feb 3 Mar 4 Apr 5 May 6 Jun
+                7 Jul 8 Aug 9 Sep 10 Oct 11 Nov 12 Dec);
+   my %dow = qw(1 Mon 2 Tue 3 Wed 4 Thu 5 Fri 6 Sat 7 Sun);
+
+   my($y,$m,$d,$h,$mn,$s) = @$date;
+   my $dow = $dmb->day_of_week($date);
+   $dow    = $dow{$dow};
+   my $mon = $mon{$m+0};
+   $y="0$y"    while (length($y) < 4);
+   $d=" $d"    if (length($d) < 2);
+   $h="0$h"    if (length($h) < 2);
+   $mn="0$mn"  if (length($mn) < 2);
+   $s="0$s"    if (length($s) < 2);
+
+   return "$dow $mon $d $h:$mn:$s $y";
+}
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

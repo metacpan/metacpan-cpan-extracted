@@ -1,0 +1,63 @@
+NAME
+    DataFax - an DataFax object
+
+SYNOPSIS
+      use DataFax;
+
+      my $cg = DataFax->new('ifn', 'my_init.cfg', 'opt', 'vhS:a:');
+
+DESCRIPTION
+    This is the base object for DataFax.
+
+   new (ifn => 'file.cfg', opt => 'hvS:')
+    Input variables:
+
+      ifn  - input/initial file name. 
+      opt  - options for Getopt::Std
+      datafax_dir  - full path to where DataFax system is installled
+                     If not specified, it will try to get it from
+                     $ENV{DATAFAX_DIR}.
+      datafax_host - DataFax server name or IP address
+                     If not specified, it will try to get it from
+                     $ENV{DATAFAX_HOST} or `hostname` on UNIX system.
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+       my $df = new DataFax;      # or
+       my $df = DataFax->new;     # or
+       my $df = DataFax->new(ifn=>'file.cfg',opt=>'hvS:'); # or
+       my $df = DataFax->new('ifn', 'file.cfg','opt','hvS:'); 
+
+    Return: new empty or initialized DataFax object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      ifn          = ""
+      opt          = 'hvS:' 
+      datafax_dir  = $ENV{DATAFAX_DIR}
+      datafax_host = $ENV{DATAFAX_HOST} | `hostname`
+      unix_os      = 'linux|solaris'
+
+HISTORY
+    * Version 0.10
+        This version is to set base for other DataFax classes.
+
+    * Version 0.20
+
+SEE ALSO (some of docs that I check often)
+        Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy, DataFax,
+        CGI::AppBuilder, etc.
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

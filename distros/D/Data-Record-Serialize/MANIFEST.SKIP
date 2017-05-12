@@ -1,0 +1,17 @@
+^.hg
+.old$
+.bak$
+Makefile$
+blib/
+~$
+pm_to_blib
+t/.*.stdout
+t/.*.stderr
+blibdirs
+^MYMETA
+^cover_db
+^Build$
+^_build
+\.gz$
+^\#
+^\.#

@@ -1,0 +1,40 @@
+Open TODO items:
+
+* It would be nice to have a warning facility, which could complain
+when, for example, you define sub-regions larger than their parent
+regions (though it may be a legitimate thing to do).
+
+* A way to specify the orientation of the coordinate system would be
+nice, and would make dealing with Postscript a lot easier...
+
+* There are a few conditions which should result in complaints or
+failures, and which currently do not (eg, split_vertical() consuming
+more area than is available should be a warning).
+
+
+Contributing:
+
+Suggestions (and patches) are very welcome.  You may (or may not!)
+wish to know about some of my Generic Design Ideals for modules:
+
+ #1 - Simple interface
+
+The module should remain simple to use, and easy to figure out how to
+use.  For example, I have a desire to keep the number of functions and
+configuration possibilities to a useful minimum.  This should not,
+however, impede the module's usefulness or usability.
+
+ #2 - Efficient, and preferrably simple, implementation
+
+Someone considering this module shouldn't have to worry much about
+whether using it will entail performance or resource overhead.  Ease
+of comprehension and maintenence of the code is critical, except where
+it significantly interferes with efficiency or ideal #1.
+
+ #3 - Restrained problem space
+
+This module has a relatively modest purpose, and does not attempt to
+be needlessly general.  In particular, features which provide better
+applicability to a broader problem space at the expense of ideals #1
+and #2 will probably be greeted with skepticism.
+

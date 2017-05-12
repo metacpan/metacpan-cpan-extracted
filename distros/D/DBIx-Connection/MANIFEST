@@ -1,0 +1,23 @@
+Changes
+examples/sql.pl
+lib/DBIx/Connection.pm
+lib/DBIx/Connection/MySQL/PLSQL.pm
+lib/DBIx/Connection/MySQL/SQL.pm
+lib/DBIx/Connection/Oracle/PLSQL.pm
+lib/DBIx/Connection/Oracle/SQL.pm
+lib/DBIx/Connection/PostgreSQL/PLSQL.pm
+lib/DBIx/Connection/PostgreSQL/SQL.pm
+lib/DBIx/PLSQLHandler.pm
+lib/DBIx/QueryCursor.pm
+lib/DBIx/SQLHandler.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/connection.t
+t/lob.t
+t/plsql_handler.t
+t/pod.t
+t/pod_coverage.t
+t/query_cursor.t
+t/sql_handler.t

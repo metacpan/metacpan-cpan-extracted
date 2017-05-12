@@ -1,0 +1,16 @@
+---
+default:
+    age:
+        type: optional
+        datatype: positive_int
+        message: Age must be of type positive_int
+        max: 150
+    sum:
+        type: required
+        datatype: num
+        message: Sum must be of type num
+    index:
+        type: required
+        datatype: int
+        message: Index must be of type int
+

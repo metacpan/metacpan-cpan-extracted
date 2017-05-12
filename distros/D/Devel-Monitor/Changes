@@ -1,0 +1,6 @@
+Revision history for Perl extension Devel::Monitor.
+
+0.01  Thu Apr  7 18:19:04 2005
+	- original version; created by h2xs 1.23 with options
+		-X -n Devel::Monitor
+

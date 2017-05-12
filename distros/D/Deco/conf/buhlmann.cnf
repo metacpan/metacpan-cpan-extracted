@@ -1,0 +1,109 @@
+model = Haldane
+name  = Buhlmann ZH-L16
+
+# tissue are specified by
+# halftime in minutes
+# m0 in bar
+# deltaM (bar/m)
+
+ <tissue 1>
+   halftime = 4
+   m0       = 3.24
+   deltaM   = 0.19802
+ </tissue>
+
+ <tissue 2>
+   halftime = 5
+   m0       = 2.96
+   deltaM   = 0.17928
+ </tissue>
+ 
+ <tissue 3>
+   halftime = 8
+   m0       = 2.54
+   deltaM   = 0.15352
+ </tissue>
+ 
+ <tissue 4>
+   halftime = 12.5
+   m0       = 2.25
+   deltaM   = 0.13847
+ </tissue>
+ 
+  <tissue 5>
+   halftime = 18.5
+   m0       = 2.03
+   deltaM   = 0.12780
+  </tissue>
+ 
+ <tissue 6>
+   halftime = 27
+   m0       = 1.90
+   deltaM   = 0.12306
+ </tissue>
+
+  <tissue 7>
+   halftime = 38.3
+   m0       = 1.78
+   deltaM   = 0.11857
+  </tissue>
+ 
+  <tissue 8>
+   halftime = 54.3
+   m0       = 1.68
+   deltaM   = 0.1504
+ </tissue>
+ 
+ <tissue 9>
+   halftime = 77
+   m0       = 1.59
+   deltaM   = 0.1223
+ </tissue>
+ 
+ <tissue 10>
+   halftime = 109
+   m0       = 1.52
+   deltaM   = 0.10999
+ </tissue>
+
+ <tissue 11>
+   halftime = 146
+   m0       = 1.46
+   deltaM   = 0.10844
+ </tissue>
+
+ <tissue 12>
+   halftime = 187
+   m0       = 1.42
+   deltaM   = 0.10731
+ </tissue>
+
+ <tissue 13>
+   halftime = 239
+   m0       = 1.39
+   deltaM   = 0.10635
+ </tissue>
+
+ <tissue 14>
+   halftime = 305
+   m0       = 1.35
+   deltaM   = 0.10552
+ </tissue>
+
+ <tissue 15>
+   halftime = 390
+   m0       = 1.32
+   deltaM   = 0.10552
+ </tissue>
+
+ <tissue 16>
+   halftime = 498
+   m0       = 1.29
+   deltaM   = 0.10414
+ </tissue>
+
+ <tissue 17>
+   halftime = 635
+   m0       = 1.27
+   deltaM   = 0.10359
+ </tissue>

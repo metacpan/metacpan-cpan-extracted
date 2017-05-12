@@ -1,0 +1,106 @@
+NAME
+
+    DBIx::RetryConnect - automatically retry DBI connect() with exponential
+    backoff
+
+SYNOPSIS
+
+        use DBIx::RetryConnect qw(Pg);    # use default settings for all Pg connections
+    
+        use DBIx::RetryConnect Pg => sub { {} }; # same as above
+    
+        use DBIx::RetryConnect Pg => sub {   # set these options for all Pg connections
+            return { total_delay => 300, verbose => 1, ... }
+        };
+    
+        use DBIx::RetryConnect Pg => sub { # set options dynamically for Pg connections
+            my ($drh, $dsn, $user, $password, $attrib) = @_;
+    
+            # return undef to not retry for this connection
+    
+            # don't retry unless we're connecting to a specific database
+            return undef if $dsn !~ /foo/;
+    
+            # don't retry for errors that don't include "server" in the message
+            return undef if $drh->errstr !~ /server/i;
+    
+            # or return a hash ref containing the retry options to use
+            return { ... };
+        };
+
+DESCRIPTION
+
+    The DBIx::RetryConnect module arranges for failed DBI connection
+    attempts to be automatically and transparently retried for a period of
+    time, with a growing delay between each retry.
+
+    As far as the application is concerned there's no change in behaviour.
+    Either the connection succeeds at once, succeeds sometime later after
+    one or more retries, or fails after one or more retries. It isn't aware
+    of the retries.
+
+    The DBIx::RetryConnect module works by loading and monkey patching the
+    connect method of the specified driver module. This allows it to work
+    cleanly 'under the covers' and thus avoid dealing with the complexities
+    of connect_cached, dbi_connect_method, RaiseError etc. etc.
+
+ Multiple Usage
+
+    When DBIx::RetryConnect is used to configure a driver, the
+    configuration is added to a list of configurations for that driver.
+
+    When a connection fails for that driver the list of configuration code
+    refs is checked to find the first code ref that returns a hash
+    reference. That hash is then used to configure the retry behaviour for
+    that connection retry.
+
+ Randomization
+
+    Wherever the documentation talks about the duration of a delay the
+    actual delay is a random value between 75% and 100% of this value. This
+    randomization helps avoid a "thundering herd" where many systems might
+    attempt to reconnect at the same time.
+
+ Options
+
+  total_delay
+
+    The total time in seconds to spend retrying the connection before
+    giving up (default 30 seconds).
+
+    This time is an approximation. The actual time spent may overshoot by
+    at least the value of "max_delay", plus whatever time the connection
+    attempts themselves may take.
+
+  start_delay
+
+    The duration in seconds of the initial delay after the initial
+    connection attempt failed (default 0.1).
+
+  backoff_factor
+
+    For each subsequent attempt while retrying a connection the delay
+    duration, which started with "start_delay", is multiplied by
+    "backoff_factor".
+
+    The default is 2, which provides the common "exponential backoff"
+    behaviour. See also "max_delay".
+
+  max_delay
+
+    The maximum duration, in seconds, for any individual retry delay. The
+    default is the value of "total_delay" divided by 4. See also
+    "backoff_factor".
+
+  verbose
+
+    Enable extra logging.
+
+     1 - log each use of DBIx::RetryConnect module
+     2 - also log each connect failure
+     3 - also log each connect retry
+     4 - also log each connect retry with more timing details
+
+    The default is the value of the DBIX_RETRYCONNECT_VERBOSE environment
+    variable if set, else 0.
+

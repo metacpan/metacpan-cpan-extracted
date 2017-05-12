@@ -1,0 +1,6 @@
+Revision history for Perl extension Directory::Iterator.
+
+0.01  Mon Oct  1 19:00:54 2012
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.2 -X Directory::Iterator
+

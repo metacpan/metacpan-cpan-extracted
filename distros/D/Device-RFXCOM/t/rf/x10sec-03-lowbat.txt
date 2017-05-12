@@ -1,0 +1,10 @@
+20010e45ba
+
+master x10security 20.010e45ba:
+  security/x10sec80/alert/tamper/min
+  sensor/x10sec80[battery]=10%
+
+
+
+
+

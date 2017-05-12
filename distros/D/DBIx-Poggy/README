@@ -1,0 +1,99 @@
+NAME
+    DBIx::Poggy - async Pg with AnyEvent and Promises
+
+SYNOPSIS
+        use strict;
+        use warnings;
+
+        use DBIx::Poggy;
+        my $pool = DBIx::Poggy->new( pool_size => 5 );
+        $pool->connect('dbi:Pg:db=test', 'root', 'password');
+
+        use AnyEvent;
+        my $cv = AnyEvent->condvar;
+
+        my $res;
+        $pool->take->selectrow_arrayref(
+            'SELECT * FROM users WHERE name = ?', {}, 'ruz'
+        )
+        ->then(sub {
+            my $user = $res->{user} = shift;
+
+            return $pool->take->selectall_arrayref(
+                'SELECT * FROM friends WHERE user_id = ?', undef, $user->{id}
+            );
+        })
+        ->then(sub {
+            my $friends = $res->{friends} = shift;
+            ...
+        })
+        ->catch(sub {
+            my $error = shift;
+            die $error;
+        })
+        ->finally(sub {
+            $cv->send( $res );
+        });
+
+        $cv->recv;
+
+DESCRIPTION
+    "Async" postgres as much as DBD::Pg allows with Promises instead of
+    callbacks.
+
+    You get DBI interface you used to that returns promises, connections
+    pool, queries queuing and support of transactions.
+
+  Why pool?
+    DBD::Pg is not async, it's non blocking. Every connection can execute
+    only one query at a moment, so to execute several queries in parallel
+    you need several connections. What you get is you can do something in
+    Perl side while postgres crunches data for you.
+
+  Queue
+    Usually if you attempt to run two queries on the same connection then
+    DBI throws an error about active query. Poggy takes care of that by
+    queuing up queries you run on one connection. Handy for transactions and
+    pool doesn't grow too much.
+
+  What is async here then?
+    Only a queries on multiple connections, so if you need to execute many
+    parallel queries then you need many connections. pg_bouncer and haproxy
+    are your friends.
+
+METHODS
+  new
+    Named arguments:
+
+    pool_size
+        number of connections to create, creates one more in case all are
+        busy
+
+    Returns a new pool object.
+
+  connect
+    Takes the same arguments as "connect" in DBI, opens "pool_size"
+    connections.
+
+  take
+    Gives one connection from the pool. Takes arguments:
+
+    auto
+        Connection will be released to the pool after transaction or as soon
+        as query queue becomes empty. True by default.
+
+    Returns DBIx::Poggy::DBI handle. When "auto" is turned off then in list
+    context returns also guard object that will "release" handle to the pool
+    on destruction.
+
+  release
+    Takes a handle as argument and puts it back into the pool. At the
+    moment, no protection against double putting or active queries on the
+    handle.
+
+  AUTHOR
+    Ruslan U. Zakirov <Ruslan.Zakirov@gmail.com>
+
+  LICENSE
+    Under the same terms as perl itself.
+

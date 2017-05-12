@@ -1,0 +1,17 @@
+DateTime::Format::Mail
+
+    Convert between DateTime and RFC2822/822 formats
+
+To install, run the following commands after untarring the
+distribution:
+
+  perl Build.PL
+  ./Build test
+  ./Build install
+
+For usage, see the doco. Either use perldoc or view it
+on the web at:
+    <http://search.cpan.org/dist/DateTime-Format-Mail/>
+
+
+For a complete list of changes, see the Changes file.

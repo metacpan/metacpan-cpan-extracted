@@ -1,0 +1,63 @@
+---
+abstract: '(DEPRECATED) A Minimal Build-Only replacement for @Author::KENTNL for contributors.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-KENTNL-Lite
+provides:
+  Dist::Zilla::PluginBundle::Author::KENTNL::Lite:
+    file: lib/Dist/Zilla/PluginBundle/Author/KENTNL/Lite.pm
+    version: '2.001001'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::EOLTests: '0'
+  Dist::Zilla::Plugin::ExtraTests: '0'
+  Dist::Zilla::Plugin::FakeRelease: '0'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::License: '0'
+  Dist::Zilla::Plugin::Manifest: '0'
+  Dist::Zilla::Plugin::ManifestSkip: '0'
+  Dist::Zilla::Plugin::MetaConfig: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaTests: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Plugin::ModuleBuild: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::PkgVersion: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::Prereqs: '0'
+  Dist::Zilla::Plugin::PruneCruft: '0'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::TestRelease: '0'
+  Dist::Zilla::Role::PluginBundle: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-PluginBundle-Author-KENTNL-Lite/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-PluginBundle-Author-KENTNL-Lite
+  repository: https://github.com/kentnl/Dist-Zilla-PluginBundle-Author-KENTNL-Lite.git
+version: '2.001001'

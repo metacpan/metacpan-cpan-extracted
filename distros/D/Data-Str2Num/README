@@ -1,0 +1,656 @@
+NAME
+    Data::Str2Num - int str to int; float str to float, else undef. No
+    warnings.
+
+SYNOPSIS
+     #####
+     # Subroutine interface
+     #  
+     use Data::Str2Num qw(config str2float str2int str2integer);
+
+     $float = str2float($string, [@options]);
+     (\@strings, @floats) = str2float(@strings, [@options]);
+
+     $integer = $secspack->str2int($string);
+
+     $integer = str2integer($string, [@options]);
+     (\@strings, @integers) = str2int(@strings, [@options]);
+
+     #####
+     # Class, Object interface
+     #
+     # For class interface, use Data::SecsPack instead of $self
+     #
+     use Data::Str2Num;
+
+     $str2num = 'Data::Str2Num';
+     $str2num = new Data::Str2Num;
+
+     $float = $secspack->str2float($string, [@options]);
+     (\@strings, @floats) = $secspack->str2float(@strings, [@options]);
+
+     $integer = $secspack->str2int($string);
+
+     $integer = $secspack->str2integer($string, [@options])
+     (\@strings, @integers) = $secspack->str2int(@strings, [@options]);
+
+    Generally, if a subroutine will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}". If a
+    subroutine will process an array reference, "\@options", "[@options]",
+    that subroutine will also process a hash reference, "\%options",
+    "{@options}". See the description for a subroutine for details and
+    exceptions.
+
+DESCRIPTION
+    The "Data::Str2Num" program module provides subroutines that parse
+    numeric strings from the beginning of alphanumeric strings.
+
+  str2float
+
+     $float = str2float($string);
+     $float = str2float($string, [@options]);
+     $float = str2float($string, {@options});
+
+     (\@strings, @floats) = str2float(@strings);
+     (\@strings, @floats) = str2float(@strings, [@options]);
+     (\@strings, @floats) = str2float(@strings, {@options});
+
+    The "str2float" subroutine, in an array context, supports converting
+    multiple run of integers, decimals or floats in an array of strings
+    "@strings" to an array of integers, decimals or floats, "@floats". It
+    keeps converting the strings, starting with the first string in
+    "@strings", continuing to the next and next until it fails an
+    conversion. The "str2int" returns the stripped string data, naked of all
+    integers, in "@strings" and the array of floats "@floats". For the
+    "ascii_float" option, the members of the "@floats" are scalar strings of
+    the float numbers; otherwise, the members are a reference to an array of
+    "[$decimal_magnitude, $decimal_exponent]" where the decimal point is set
+    so that there is one decimal digit to the left of the decimal point for
+    $decimal_magnitude.
+
+    In a scalar context, it parse out any type of $number in the leading
+    "$string". This is especially useful for "$string" that is certain to
+    have a single number.
+
+  str2int
+
+     $integer = $secspack->str2int($string);
+
+    The "str2int" subroutine is the same as the "str2integer" subroutine
+    except that that the subroutine always returns the scalar processing
+    "str2integer" subroutine.
+
+  str2integer
+
+     $integer = str2int($string);
+     $integer = str2int($string, [@options]);
+     $integer = str2int($string, {@options});
+
+     (\@strings, @integers) = str2int(@strings); 
+     (\@strings, @integers) = str2int(@strings, [@options]); 
+     (\@strings, @integers) = str2int(@strings, {@options}); 
+
+    In a scalar context, the "Data::SecsPack" program module translates an
+    scalar string to a scalar integer. Perl itself has a documented
+    function, '0+$x', that converts a scalar to so that its internal storage
+    is an integer (See p.351, 3rd Edition of Programming Perl). If it cannot
+    perform the conversion, it leaves the integer 0. Surprising not all
+    Perls, some Microsoft Perls in particular, may leave the internal
+    storage as a scalar string.
+
+    What is "$x" for the following:
+
+      my $x = 0 + '0x100';  # $x is 0 with a warning
+
+    Instead use "str2int" uses a few simple Perl lines, without any "evals"
+    starting up whatevers or firing up the regular expression engine with
+    its interpretative overhead, to provide a slightly different response as
+    follows:>.
+
+     $x = str2int('033');   # $x is 27
+     $x = str2int('0xFF');  # $x is 255
+     $x = str2int('255');   # $x is 255
+     $x = str2int('hello'); # $x is undef no warning
+     $x = str2int(0.5);     # $x is undef no warning
+     $x = str2int(1E0);     # $x is 1 
+     $x = str2int(0xf);     # $x is 15
+     $x = str2int(1E30);    # $x is undef no warning
+
+    The scalar "str2int" subroutine performs the conversion to an integer
+    for strings that look like integers and actual integers without
+    generating warnings. A non-numeric string, decimal or floating string
+    returns an "undef" instead of the 0 and a warning that "0+'hello'"
+    produces. This makes it not only useful for forcing an integer
+    conversion but also for testing a scalar to see if it is in fact an
+    integer scalar. The scalar "str2int" is the same and supercedes
+    C&<Data::StrInt::str2int>. The "Data::SecsPack" program module superceds
+    the "Data::StrInt" program module.
+
+    The "str2int" subroutine, in an array context, supports converting
+    multiple run of integers in an array of strings "@strings" to an array
+    of integers, "@integers". It keeps converting the strings, starting with
+    the first string in "@strings", continuing to the next and next until it
+    fails a conversion. The "str2int" returns the remaining string data in
+    "@strings" and the array of integers "@integers".
+
+DEMONSTRATION
+     #########
+     # perl Str2Num.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+         my $fp = 'File::Package';
+
+         my $uut = 'Data::Str2Num';
+         my $loaded;
+         my ($result,@result); # force a context
+
+     ##################
+     # Load UUT
+     # 
+
+     my $errors = $fp->load_package($uut, 'str2float','str2int','str2integer',)
+     $errors
+
+     # ''
+     #
+
+     ##################
+     # str2int('033')
+     # 
+
+     $uut->str2int('033')
+
+     # '27'
+     #
+
+     ##################
+     # str2int('0xFF')
+     # 
+
+     $uut->str2int('0xFF')
+
+     # '255'
+     #
+
+     ##################
+     # str2int('0b1010')
+     # 
+
+     $uut->str2int('0b1010')
+
+     # '10'
+     #
+
+     ##################
+     # str2int('255')
+     # 
+
+     $uut->str2int('255')
+
+     # '255'
+     #
+
+     ##################
+     # str2int('hello')
+     # 
+
+     $uut->str2int('hello')
+
+     # undef
+     #
+
+     ##################
+     # str2integer(1E20)
+     # 
+
+     $result = $uut->str2integer(1E20)
+
+     # undef
+     #
+
+     ##################
+     # str2integer(' 78 45 25', ' 512E4 1024 hello world') @numbers
+     # 
+
+     my ($strings, @numbers) = str2integer(' 78 45 25', ' 512E4 1024 hello world')
+     [@numbers]
+
+     # [
+     #          '78',
+     #          '45',
+     #          '25'
+     #        ]
+     #
+
+     ##################
+     # str2integer(' 78 45 25', ' 512E4 1024 hello world') @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # '512E4 1024 hello world'
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers
+     # 
+
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')
+     [@numbers]
+
+     # [
+     #          [
+     #            '78',
+     #            '1'
+     #          ],
+     #          [
+     #            '-24',
+     #            '-6'
+     #          ],
+     #          [
+     #            '25',
+     #            -3
+     #          ],
+     #          [
+     #            '0',
+     #            -1
+     #          ],
+     #          [
+     #            '512',
+     #            '6'
+     #          ]
+     #        ]
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # 'hello world'
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers
+     # 
+
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})
+     [@numbers]
+
+     # [
+     #          '78',
+     #          '-2.4E-6',
+     #          '0.0025',
+     #          '255',
+     #          '63',
+     #          '0',
+     #          '512E4'
+     #        ]
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # 'hello world'
+     #
+
+QUALITY ASSURANCE
+    Running the test script "Str2Num.t" verifies the requirements for this
+    module. The "tmake.pl" cover script for "Test::STDmaker|Test::STDmaker"
+    automatically generated the "Str2Num.t" test script, the "Str2Num.d"
+    demo script, and the "t::Data::Str2Num" STD program module PODs, from
+    the "t::Data::Str2Num" program module's content. The "t::Data::Str2Num"
+    program modules are in the distribution file
+    Data-Str2Num-$VERSION.tar.gz.
+
+NOTES
+  AUTHOR
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  COPYRIGHT NOTICE
+
+    Copyrighted (c) 2002 2004 Software Diamonds
+
+    All Rights Reserved
+
+  BINDING REQUIREMENTS NOTICE
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  LICENSE
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE_ALSO:
+    Data::Startup
+NAME
+    Docs::Site_SVD::Data_Str2Num - int str to int; float str to float; else
+    undef. No warnings.
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::Data_Str2Num - int str to int; float str to float; else undef. No warnings.
+
+     Revision: D
+
+     Version: 0.07
+
+     Date: 2004/05/22
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "Data::Str2Num" module extends the Perl language (the system).
+
+    The "Data::Str2Num" package translates an scalar string to a scalar
+    integer. The package handles parser out of wide range of integers and
+    floats from an alphanumeric string in different formats.
+
+    Perl itself has a documented function, '0+$x', that converts a scalar to
+    so that its internal storage is an integer (See p.351, 3rd Edition of
+    Programming Perl). If it cannot perform the conversion, it leaves the
+    integer 0. Surprising not all Perls, some Microsoft Perls in particular,
+    may leave the internal storage as a scalar string.
+
+    The "str2int" function is basically the same except if it cannot perform
+    the conversion to an integer, it returns an "undef" instead of a 0.
+    Also, if the string is a decimal or floating point, it will return an
+    undef. This makes it not only useful for forcing an integer conversion
+    but also for testing a scalar to see if it is in fact an integer scalar.
+
+  1.3 Document overview.
+
+    This document releases Data::Str2Num version 0.07 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Data-Str2Num-0.07.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   The installation of the binary or source must visually present
+            to the installer the above copyright notice, this list of
+            conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Data_Str2Num.pm                            0.07    2004/05/22 revised 0.06
+     MANIFEST                                                     0.07    2004/05/22 generated, replaces 0.06
+     Makefile.PL                                                  0.07    2004/05/22 generated, replaces 0.06
+     README                                                       0.07    2004/05/22 generated, replaces 0.06
+     lib/Data/Str2Num.pm                                          0.08    2004/05/22 revised 0.05
+     t/Data/Str2Num.d                                             0.03    2004/05/19 unchanged
+     t/Data/Str2Num.pm                                            0.04    2004/05/19 unchanged
+     t/Data/Str2Num.t                                             0.04    2004/05/19 unchanged
+     t/Data/File/Package.pm                                       1.17    2004/05/22 unchanged
+     t/Data/Test/Tech.pm                                          1.26    2004/05/22 unchanged
+     t/Data/Data/Secs2.pm                                         1.26    2004/05/22 revised 1.23
+     t/Data/Data/Startup.pm                                       0.07    2004/05/22 revised 0.06
+
+  3.3 Changes
+
+    Changes are as follows:
+
+    Data::Str2Num 0.01
+        Originated
+
+    Data::Str2Num 0.02
+        Added 1 to end of the code section. Unix Perls very strict about
+        this one.
+
+    Data::Str2Num 0.03
+        Change the test so that test support program modules resides in
+        distribution directory tlib directory instead of the lib directory.
+        Because they are no longer in the lib directory, test support files
+        will not be installed as a pre-condition for the test of this
+        module. The test of this module will precede immediately. The test
+        support files in the tlib directory will vanish after the
+        installtion.
+
+    Data::Str2Num 0.04
+        The lastest build of Test::STDmaker expects the test library in the
+        same directory as the test script. Coordiated with the lastest
+        Test::STDmaker by moving the test library from tlib to t/Data, the
+        same directory as the test script and deleting the test library
+        File::TestPath program module.
+
+        The "Data::Str2Num" module is now obsolete and superceded by the
+        "Data::SecsPack" module. Replace all subroutines to call the
+        compatible subroutines in the "Data:SecsPack" module and make any
+        necessary manipulates to provide exact equivalent of the old
+        "Data::Str2Num" subroutines.
+
+    Data::Str2Num 0.05
+        Changed the abstract to 'obsoleted by Data::Secs2'
+
+    Data::Str2Num 0.06
+        It was a mistake to merge "Data::Str2Num" subroutines with the
+        "Data::Secs2" and "Data::SecsPack" modules. These are specialized
+        modules. There are many cases where do not need nor want all that
+        SEMI E5 support. Keep these separate means one does not have to deal
+        with all that SEMI business if one just needs the functionality of
+        these subroutines.
+
+    Data::Str2Num 0.07
+        In "str2integer" and "str2float" subroutine, skip empty and undef
+        strings. Processing produces all kinds of uninitialize errors.
+
+        Add documentation for the "str2int" subroutine.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Data-Str2Num-0.07.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip Data-Str2Num-0.07.tar.gz
+         tar -xf Data-Str2Num-0.07.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         None.
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Data/Str2Num.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+    *   All the tests are GO path tests. Should add NOGO tests.
+
+    *   Add the requirements addressed as *# R: * comment to the tests
+
+    *   Write a program to build a matrix to trace test step to the
+        requirements and vice versa by parsing the *# R: * comments.
+        Automatically insert the matrix in the Test::TestUtil POD.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    Docs::US_DOD::SVD

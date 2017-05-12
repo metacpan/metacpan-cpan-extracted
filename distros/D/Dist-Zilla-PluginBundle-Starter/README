@@ -1,0 +1,311 @@
+NAME
+    Dist::Zilla::PluginBundle::Starter - A minimal Dist::Zilla plugin bundle
+
+SYNOPSIS
+      ; dist.ini
+      name    = My-Cool-Distribution
+      author  = Example Jones <jones@example.com>
+      license = Perl_5
+      copyright_holder = Example Jones
+      copyright_year   = 2017
+      version = 0.001
+  
+      [@Starter]           ; all that is needed to start
+      revision = 2         ; always defaults to revision 1
+  
+      ; configuring examples
+      -remove = GatherDir  ; to use [Git::GatherDir] instead, for example
+      ExecDir.dir = script ; change the directory used by [ExecDir]
+
+DESCRIPTION
+    The "[@Starter]" plugin bundle for Dist::Zilla is designed to do the
+    minimal amount of work to release a complete distribution reliably. It
+    is similar in purpose to [@Basic], but with additional features to stay
+    up to date and allow greater customization. The selection of included
+    plugins is intended to be unopinionated and unobtrusive, so that it is
+    usable for any well-formed CPAN distribution. If you're just getting
+    started with Dist::Zilla, check out the tutorials at <http://dzil.org>.
+
+    Migrating from "[@Basic]" is easy for most cases. Most of the bundle is
+    the same, so just make sure to remove any extra plugins that
+    "[@Starter]" already includes, and configure the included plugins if
+    needed (see "CONFIGURING"). Migrating a more complex set of plugins,
+    including some that interact with the additional generated files, may
+    require more careful consideration.
+
+    "[@Starter]" composes the PluginRemover and Config::Slicer roles to make
+    it easier to customize and extend. Also, it supports bundle revisions
+    specified as an option, in order to incorporate future changes to
+    distribution packaging and releasing practices. Existing revisions will
+    not be changed to preserve backwards compatibility.
+
+    The "FAKE_RELEASE" environment variable is supported as in Dist::Milla
+    and Minilla. It replaces the [UploadToCPAN] plugin with [FakeRelease],
+    to test the release process (including any version bumping and commits!)
+    without actually uploading to CPAN.
+
+      $ FAKE_RELEASE=1 dzil release
+
+    For one-line initialization of a new "[@Starter]"-based distribution,
+    try Dist::Zilla::MintingProfile::Starter.
+
+    Another simple way to use Dist::Zilla is with Dist::Milla, an
+    opinionated bundle that requires no configuration and performs all of
+    the tasks in "EXTENDING" by default.
+
+OPTIONS
+    "[@Starter]" currently only has a few direct options; it can be further
+    configured by the composed roles, as in "CONFIGURING".
+
+  revision
+      [@Starter]
+      revision = 2
+
+    Selects the revision to use, from "REVISIONS". Defaults to revision 1.
+
+  installer
+    Requires revision 2 or higher.
+
+      [@Starter]
+      revision = 2
+      installer = ModuleBuildTiny
+
+      [@Starter]
+      revision = 2
+      installer = MakeMaker::Awesome
+      MakeMaker::Awesome.WriteMakefile_arg[0] = (clean => { FILES => 't/generated/*' })
+
+    The default installer is [MakeMaker], which works with no extra
+    configuration for most cases. The "installer" option can be used to
+    replace it with one of the following supported installers, which can
+    then be configured in the same way as shown in "CONFIGURING".
+
+    [MakeMaker::Awesome] is useful if you need to customize the generated
+    Makefile.PL.
+
+    [ModuleBuildTiny] will generate a simple Build.PL using
+    Module::Build::Tiny, but this may not work correctly with old versions
+    of the CPAN.pm installer or if you use features incompatible with
+    Module::Build::Tiny.
+
+    [ModuleBuildTiny::Fallback] generates a more complex Build.PL that uses
+    Module::Build::Tiny by default, but falls back to Module::Build on old
+    versions of the CPAN.pm installer that don't understand configure
+    dependencies.
+
+    When using a Module::Build::Tiny-based installer, the [ExecDir] plugin
+    will be set to mark the script/ directory for executables instead of the
+    default bin/.
+
+REVISIONS
+    The "[@Starter]" plugin bundle supports the following revisions.
+
+  Revision 1
+    Revision 1 is the default and is equivalent to using the following
+    plugins:
+
+    [GatherDir]
+    [PruneCruft]
+    [ManifestSkip]
+    [MetaConfig]
+    [MetaProvides::Package]
+    [MetaNoIndex]
+        directory = t
+        directory = xt
+        directory = inc
+        directory = share
+        directory = eg
+        directory = examples
+
+    [MetaYAML]
+    [MetaJSON]
+    [License]
+    [ReadmeAnyFromPod]
+    [ExecDir]
+    [ShareDir]
+    [PodSyntaxTests]
+    [Test::ReportPrereqs]
+    [Test::Compile]
+        xt_mode = 1
+
+    [MakeMaker]
+    [Manifest]
+    [TestRelease]
+    [RunExtraTests]
+    [ConfirmRelease]
+    [UploadToCPAN]
+
+    This revision differs from [@Basic] as follows:
+
+    * Uses [ReadmeAnyFromPod] instead of [Readme].
+
+    * Uses [RunExtraTests] instead of [ExtraTests].
+
+    * Includes the following additional plugins: [MetaJSON], [MetaConfig],
+      [MetaProvides::Package], [MetaNoIndex], [PodSyntaxTests],
+      [Test::ReportPrereqs], [Test::Compile].
+
+  Revision 2
+    Revision 2 is similar to Revision 1, with these differences:
+
+    * Sets the option "inherit_version" in [MetaProvides::Package] to 0 by
+      default, so that "provides" metadata will use individual module
+      versions if they differ from the distribution version.
+
+    * [Pod2Readme] is used instead of [ReadmeAnyFromPod] to generate the
+      plaintext README, as it is a simpler plugin for this purpose. It takes
+      the same "filename" and "source_filename" options, but does not allow
+      further configuration, and does not automatically use a ".pod" file as
+      the source.
+
+    * The "installer" option is now supported to change the installer
+      plugin.
+
+CONFIGURING
+    By using the PluginRemover or Config::Slicer role options, the
+    "[@Starter]" bundle's included plugins can be customized as desired.
+    Here are some examples:
+
+  GatherDir
+    If the distribution is using git source control, it is often helpful to
+    replace the default [GatherDir] plugin with [Git::GatherDir].
+
+      [Git::GatherDir]
+      [@Starter]
+      -remove = GatherDir
+
+    The included [GatherDir] plugin can alternatively be configured
+    directly. (See "CONFIGURATION SYNTAX" in Config::MVP::Slicer for an
+    explanation of the subscripts for slicing array attributes.)
+
+      [@Starter]
+      GatherDir.include_dotfiles = 1
+      GatherDir.exclude_filename[0] = foo_bar.txt
+      GatherDir.prune_directory[] = ^temp
+
+  Readme
+    The [Pod2Readme] or [ReadmeAnyFromPod] plugin (depending on bundle
+    revision) generates a plaintext README from the POD text in the
+    distribution's "main_module" in Dist::Zilla by default, but can be
+    configured to look elsewhere. The standard README should always be
+    plaintext, but in order to generate a non-plaintext README in addition,
+    [ReadmeAnyFromPod] can simply be used separately. Note that POD-format
+    READMEs should not be included in the distribution build because they
+    will get indexed and installed due to an oddity in CPAN installation
+    tools.
+
+      [@Starter]
+      revision = 2
+      Pod2Readme.source_filename = bin/foobar
+  
+      [ReadmeAnyFromPod / Markdown_Readme]
+      type = markdown
+      filename = README.md
+  
+      [ReadmeAnyFromPod / Pod_Readme]
+      type = pod
+      location = root ; do not include pod readmes in the build!
+
+  ExecDir
+    Some distributions use the script/ directory instead of bin/ (the
+    [ExecDir] default) for executable scripts.
+
+      [@Starter]
+      ExecDir.dir = script
+
+  MetaNoIndex
+    The distribution may include additional files or directories that should
+    not have their contents indexed as CPAN modules. (See "CONFIGURATION
+    SYNTAX" in Config::MVP::Slicer for an explanation of the subscripts for
+    slicing array attributes.)
+
+      [@Starter]
+      MetaNoIndex.file[0] = eggs/FooBar.pm
+      MetaNoIndex.directory[a] = eggs
+      MetaNoIndex.directory[b] = bacon
+
+  MetaProvides
+    The [MetaProvides::Package] plugin will use the distribution's version
+    (as set in dist.ini or by a plugin) as the version of each module when
+    populating the "provides" metadata by default. If the distribution does
+    not have uniform module versions, the plugin can be configured to
+    reflect each module's hardcoded version where available, by setting the
+    "inherit_version" option to 0 (the default in bundle "Revision 2").
+
+      [@Starter]
+      MetaProvides::Package.inherit_version = 0 ; default in revision 2
+
+    With this option set to 0, it will use the main distribution version as
+    a fallback for any module where a version is not found. This can also be
+    overridden, so that if no version is found for a module, no version will
+    be specified for it in metadata, by setting "inherit_missing" to 0 as
+    well.
+
+      [@Starter]
+      MetaProvides::Package.inherit_version = 0
+      MetaProvides::Package.inherit_missing = 0
+
+EXTENDING
+    This bundle includes a basic set of plugins for releasing a
+    distribution, but there are many more common non-intrusive tasks that
+    Dist::Zilla can help with simply by using additional plugins in the
+    dist.ini.
+
+  Name
+    To automatically set the distribution name from the current directory,
+    use [NameFromDirectory].
+
+  License and Copyright
+    To extract the license and copyright information from the main module,
+    and optionally set the author as well, use [LicenseFromModule].
+
+  Versions
+    A common approach to maintaining versions in Dist::Zilla-managed
+    distributions is to automatically extract the distribution's version
+    from the main module, maintain uniform module versions, and bump the
+    version during or after each release. To extract the main module
+    version, use [RewriteVersion] (which also rewrites your module versions
+    to match the main module version when building) or
+    [VersionFromMainModule]. To automatically increment module versions in
+    the repository after each release, use [BumpVersionAfterRelease].
+    Alternatively, you can use [ReversionOnRelease] to automatically
+    increment your versions in the release build, then copy the updated
+    modules back to the repository with [CopyFilesFromRelease]. Don't mix
+    these two version increment methods!
+
+  Changelog
+    To automatically add the new release version to the distribution
+    changelog, use [NextRelease]. To ensure the release has changelog
+    entries, use [CheckChangesHasContent].
+
+  Git
+    To better integrate with a git workflow, use the plugins from [@Git]. To
+    automatically add contributors to metadata from git commits, use
+    [Git::Contributors].
+
+  Resources
+    To automatically set resource metadata from an associated GitHub
+    repository, use [GithubMeta]. To set resource metadata manually, use
+    [MetaResources].
+
+  Prereqs
+    To automatically set distribution prereqs from a cpanfile, use
+    [Prereqs::FromCPANfile]. To specify prereqs manually, use [Prereqs].
+
+BUGS
+    Report any issues on the public bugtracker.
+
+AUTHOR
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+    Dist::Zilla, Dist::Zilla::PluginBundle::Basic, Dist::Milla,
+    Dist::Zilla::MintingProfile::Starter
+

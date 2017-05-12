@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<employees page="0" pagesize="3">
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="2">
+    <name>Fred Bloggs</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="3">
+    <name>Ann Other</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="4">
+    <name>Minnie Mouse</name>
+  </employee>
+</employees>

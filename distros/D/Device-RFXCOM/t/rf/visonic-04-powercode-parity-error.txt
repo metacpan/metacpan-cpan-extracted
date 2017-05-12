@@ -1,0 +1,9 @@
+a4c5ec581440
+
+slave unknown a4.c5ec581440
+
+Possible Visonic powercode with parity error 3 != 4
+
+
+
+

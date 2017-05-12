@@ -1,0 +1,23 @@
+---
+name: Devel-NoGlobalSig
+version: v0.0.1
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: croak when a global %SIG is installed
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-NoGlobalSig
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://scratchcomputing.com/svn/Devel-NoGlobalSig/trunk
+build_requires:
+  Module::Build: 0.26
+  Test::More: 0
+provides:
+  Devel::NoGlobalSig:
+    file: lib/Devel/NoGlobalSig.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

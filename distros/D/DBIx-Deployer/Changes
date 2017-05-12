@@ -1,0 +1,11 @@
+1.1.1 - Fix SQL placeholders bug
+1.1.0 - ANSI colored output and verification failure dumps
+1.0.8 - Capture patch errors in narrower scope
+1.0.7 - More useful diagnostic message for undefined patches++
+1.0.6 - Travis config and a more useful diagnostic message for undefined patches
+1.0.5 - Fix typos in synopsis and deployer_db_file
+1.0.4 - Missed a few InstanceOf opportunities
+1.0.3 - Correct $VERSION scope and favor InstanceOf over classnames for types
+1.0.2 - Set File::Temp EXLOCK option to false for BSD systems
+1.0.1 - Typos, Dist::Zilla support
+1.0.0 - Initial release

@@ -1,0 +1,31 @@
+This version only support Informix.  To access other DBMS, you need to
+write a DB access interface in dbagent.
+
+Install dbagent:
+	- Edit Makefile, Select OS type
+		(Default is 'HPUX',  Leave it as blank for other OSes ???
+	- make
+	- Modify INFORMIXDIR & INFORMIXSERVER variables in 'run' script.
+	- If you want to login as different users, execute 'run' as root ; otherwise
+	  you can execute 'run' as normal user.
+
+Install dbdnet: (Install it on client site: ( e.g. Web server)
+	     You must install DBI:: first
+
+	- Execute
+		perl Makefile.PL
+	- make
+	- make install
+
+
+BUGS & TODO :
+	- A wanring message is displayed when using '$dbh->do("insert ...") '.
+		I hope someone can fix it.
+	- Blob Read/Write is not supported.
+
+Note:
+		DBD::NET is based on Alligator Descartes's work.
+
+Author:
+	Edward Liu, Taiwan
+	dhliu@solar.csie.ntu.edu.tw

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Auditing for tables managed by DBIx::Class",
+   "author" : [
+      "Jess Robinson <castaway@desert-island.me.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Journal",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.29",
+            "ExtUtils::MakeMaker" : "6.59",
+            "SQL::Translator" : "0.11003",
+            "Test::More" : "0.94"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::C3::Componentised" : "1.0006",
+            "DBIx::Class" : "0.08115",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.900201"
+}

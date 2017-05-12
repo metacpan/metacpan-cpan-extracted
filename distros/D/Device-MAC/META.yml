@@ -1,0 +1,26 @@
+---
+abstract: 'Handle hardware MAC Addresses (EUI-48 and EUI-64)'
+author:
+  - 'Jason Kohles C<< <email@jasonkohles.com> >>'
+build_requires:
+  Test::Most: 0
+  ok: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-MAC
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Device::OUI: 0
+  Moose: 0
+  Sub::Exporter: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

@@ -1,0 +1,69 @@
+NAME
+    Dancer::Plugin::Tapir - Associate a Tapir handler with Dancer routes
+
+SYNOPSIS
+      use Dancer;
+      use Dancer::Plugin::Tapir;
+
+      setup_tapir_handler
+        thrift_idl    => 'thrift/service.thrift',
+        handler_class => 'MyAPI::Service';
+
+DESCRIPTION
+    The goal of this package is to quickly and without fuss expose a Tapir
+    service via Dancer via a RESTful API. Doing so requires no additional
+    coding, and only requires a simple comment added to your Thrift methods.
+
+    This plugin exports the method "setup_tapir_handler" into the caller.
+    Call it with either a list of arguments or using your Dancer
+    configuration (see below).
+
+    The handler class must be a subclass of Tapir::Server::Handler::Class
+    and have registered methods for each Thrift method of the Thrift
+    service.
+
+    The Dancer routes that will be exposed match up with the @rest Thrift
+    documentation tag. For example:
+
+      /*
+        Create a new account
+        @rest POST /accounts
+      */
+      account createAccount (
+        1: username username,
+        2: string   password
+      )
+
+    This will create a route "POST /accounts" which will call the method
+    "createAccount" in the handler class. The Dancer method "params" will be
+    used to extract both query string and payload parameters, and will be
+    used to compose the thrift message passed to the Tapir::Server::Handler.
+
+    Control over the HTTP status code returned to the user is still being
+    worked out, as are being able to set headers in the HTTP response. At
+    the moment, the result is serialized via JSON but will in the future be
+    serialized according to the Accept headers of the request.
+
+CONFIGURATION
+    Add something like this to your YAML config:
+
+      plugins:
+        Tapir:
+          thrift_idl: thrift/service.thrift
+          handler_class: MyAPI::Service
+
+SEE ALSO
+    Tapir, Dancer
+
+LICENSE
+    This library is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself
+
+COPYRIGHT
+    Copyright (c) 2012 Eric Waters. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    Eric Waters <ewaters@gmail.com>
+

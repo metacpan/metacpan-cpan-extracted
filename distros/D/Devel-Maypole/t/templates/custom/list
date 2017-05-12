@@ -1,0 +1,5 @@
+# Begin object list
+[% FOR obj = objects %]
+[%obj.id%]: [% obj.name %]
+[% END %]
+# End object list

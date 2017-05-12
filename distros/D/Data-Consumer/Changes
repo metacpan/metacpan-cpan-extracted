@@ -1,0 +1,53 @@
+Revision history for Data-Consumer
+
+0.16    Fri Jun 24 2016
+        The deprecated warning behavior of Data::Consumer::MySQL was
+        a major blocker to upgrading Data::Consumer, so it has been
+        changed to be opt in. See the docs for Data::Consumer::MySQL.
+
+0.15    Fri May  8 2015
+        Fork Data::Consumer::MySQL into Data::Consumer::MySQL2. There
+        were and are subtle issues with the implementation of DC::MySQL.
+        As we have a lot of code using it the easiest way is to fork
+        the module and fix it in the new version. *Most* old code should
+        be unaffected. However if you are processing very quickly, with
+        many workers, on a newer MySQL especially, then it is possible
+        that two workers might process the same record twice due to a subtle
+        race condition in MySQL query plan evaluation. The new version in
+        MySQL2 should be robust to this problem.
+
+0.14    Sun Oct 12 2014
+        Reset the 'fail' flag before processing any new item
+
+0.13    Mon Jul 18 2011
+        Fixed bug in leave() implementation: The status for 'unprocessed'
+        could previously not be '0'.
+
+0.12    Fri Mar 27 2011
+        Note in documentation that an explicit lock_prefix should almost
+        always be specified.
+
+0.11    Fri Mar 27 2011
+        Fix SELECT GET_LOCK order-of-evaluation issue.
+        This is an important bug fix if you're running Data::Consumer in
+        a pipeline-fashion with multiple consumers working on items in
+        various stages. If in doubt, upgrade.
+
+0.10 
+        Lots of changes. Fixed an important bug and disabled the broken sweep
+        functionality for now. Also silence some warnings on older perls.
+
+0.09
+        Added support for 'leave', 'ignore', 'fail' and 'halt'. They probably
+        could be better documented and tested.
+
+0.08
+        Pretty close to ready for release. Cleaned up pod and perltidied
+        the code (my current parameters of choice are in comments in .pm 
+        files). Spent some time on the make process to have configurable
+        mysql arguments, which default to off for automated processed.
+
+0.01    2008-02-10
+        Initial creation. Support Mysql and File based data resources.
+
+

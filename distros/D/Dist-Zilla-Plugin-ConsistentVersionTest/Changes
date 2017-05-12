@@ -1,0 +1,13 @@
+Revision history for Dist-Zilla-Plugin-ConsistentVersionTest
+
+0.03      2017-04-01 22:46:29 CDT-0500
+	* Add develop dep
+	* Switch maintainer from ROLSKY to RSRCHBOY; update dist.ini
+	* Refactor Changes into format maintainer's dzil bundle expects
+	* Make the "DONATIONS" section clear as to whom the donatee would be
+
+0.02    2010-05-18
+	* Add missing prereq on Dist::Zilla
+
+0.01    2010-05-17
+	* Initial release

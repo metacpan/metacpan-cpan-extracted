@@ -1,0 +1,30 @@
+---
+abstract: 'Module for using a TLS barcode printer'
+author:
+  - 'Sebastien Aperghis-Tramoni <sebastien@aperghis.net>'
+build_requires:
+  Module::Build: 0.38
+  Test::More: 0.70
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4002, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-TLSPrinter
+provides:
+  Device::TLSPrinter:
+    file: lib/Device/TLSPrinter.pm
+    version: 0.51
+  Device::TLSPrinter::Network:
+    file: lib/Device/TLSPrinter/Network.pm
+    version: 0
+requires:
+  Class::Accessor: 0.31
+  IO: 1.23
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/maddingue/Device-TLSPrinter.git
+version: 0.51

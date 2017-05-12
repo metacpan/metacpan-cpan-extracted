@@ -1,0 +1,32 @@
+NAME
+    DBIx::Class::EncodeColumns - Handle column encodings
+
+SYNOPSIS
+        package Artist;
+        __PACKAGE__->load_components(qw/EncodeColumns Core/);
+        __PACKAGE__->decode_columns('latin-1');
+        __PACKAGE__->encode_columns('utf-8');
+
+DESCRIPTION
+    This module allows you to handle column encodings
+
+METHODS
+  decode_columns($encoding)
+    Use this function to set the default encoding of all your columns. The
+    data of all columns will be decoded to internal encoding of perl.
+
+  encode_columns($encoding)
+    Before returning the data form a column, it will be encoded using this
+    encoding type.
+
+EXTENDED METHODS
+  get_column
+  get_columns
+  store_column
+AUTHOR
+    Sascha Kiefer <esskar@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,10 @@
+
+( <<perl, <<perl, <<perl, <<perl )
+print "Hello World!\n"          # english
+perl
+print "Hallo Welt!\n"           # german
+perl
+print "Bonjour le monde!\n"     # french
+perl
+print "Olá mundo!\n"            # spanish
+perl

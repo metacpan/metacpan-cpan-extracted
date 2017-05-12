@@ -1,0 +1,218 @@
+0.15 2017-04-19T01:21:41Z
+
+    - Fix failed tests with Perl 5.25.11 (miniuchi) #24
+
+0.14 2016-01-14T03:03:02Z
+
+    - Fix test for SQLite 3.10 compatibility (ziguzagu) #21
+
+0.13 2015-05-20T02:26:46Z
+
+    - Fix 0.12 changes with braking inserting new records (masiuchi) #20
+
+0.12 2015-05-18T05:33:33Z
+
+    - Fix broken $sth at inserting new records (masiuchi) #19
+
+0.11 2015-03-28T10:04:24Z
+
+    - Fix test (ambs) #16
+    - Migrate to Minilla (ziguzagu) #17
+    - Pass the whole args to fallback driver. (Akira Sawada) #18
+    - Remove a joined table from the "FROM" phrase for fix error on MySQL. (usualoma) #7
+
+0.10 2015.01.14
+    - Document spelling corrections (dsteinbrunner) #8 #9 #10 #11 #12 #13 #14
+
+0.10_1 2015.01.14
+    - Fix test (ambs) #16
+
+0.09 2011.03.17
+    - Fix reuse_dbh behaviour when ping fails on driver->dbh (RT 65448)
+
+0.08 2010.12.06
+    - Fixed issue where a profiler cannot be returned if $@ is set
+      https://github.com/sixapart/data-objectdriver/pull/1 (Akira Sawada)
+    - Adds a new restricted IO operation mode controlled by the
+      $Data::ObjectDriver::RESTRICT_IO flag (Brad Whitaker)
+
+0.07 2010.03.22
+    - When an object is changed, delete the cache instead of updating it.
+      It is a bit more expensive, but should safer.
+    - Fixed a uuv warning thanks to Kazuhiro Shibuya
+    - Fixed a issue in the test suite for newer version of SQLite
+      reported by Emmanuel Seyman
+      http://rt.cpan.org/Ticket/Display.html?id=45186
+    - Fixed boggus bulk_insert() in the MySQL driver
+    - Fixed a perl5.11 warning
+    - In case you haven't noticed DOD is now on github, bye svn.
+
+0.06  2009.01.28
+    - Added peek_next() method to ResultSet, q.v.
+    - Localized creation of D::OD::Iterator object. Thanks to Hirotaka Ogawa
+      for the patch.
+    - Fixed compilation error with Perl 5.10. Thanks to smpeters for the patch.
+    - Added a new $object->uncache_object as a mirror of cache_object(), which
+      purge one object from the cache layer, for the cases where you want a
+      manual control over it.
+    - Added a "distinct" method to D::OD::SQL that forces the DISTINCT keyword
+      in the generated SQL statement. Thanks to John Berthels for the patch.
+    - Added a "window_size" argument for the search() method of the caching
+      layer to constrain the number of objects loaded from the database for
+      large or unbounded searches. 
+    - Added a "comment" argument to search parameter allowing the SQL
+      queries to be watermarked with SQL comments.
+    - Added a "object_is_stored" method on DOD objects, which returns true until
+      the object has been saved in the persistent store.
+    - Added a "pk_str" method on base objects has a nice shortcut for printing
+      the primary key of an object. 
+    - Added a "reuse_dbh" option to D::OD::D::DBI, if enabled it caches and reuses
+      $dbh using the dsn as the key.
+    - Exposed the transaction mechanism built in the drivers at the object levels:
+      D::OD::BO->begin_work now starts a global transaction across all drivers
+      ending with a rollback or a commit on the same class.
+    - Fix problem with prepare_cache in DBD::SQLite
+    - Fix PerlCritic tests
+      http://rt.cpan.org/Ticket/Display.html?id=37197
+    - Fix problems under 5.10
+      http://rt.cpan.org/Ticket/Display.html?id=30941
+    - Fix test failures under Win32
+      http://rt.cpan.org/Ticket/Display.html?id=24480
+    - Pg *can't* handle REPLACE
+      https://rt.cpan.org/Ticket/Display.html?id=38840
+    - Fixed an issue where Pg would look into the wrong sequence if DBI has a
+      'prefix' configured (used in a undocumented TheSchwartz feature)
+      https://rt.cpan.org/Ticket/Display.html?id=41880
+    - Added Oracle support, courtesy of Xiaoou Wu (Oracle)
+      https://rt.cpan.org/Ticket/Display.html?id=41929
+    - Added an "add_index_hint" method to D::OD::SQL to allow specifying
+      a "USE INDEX" hint.
+    - Added an experimental GearmanDBI driver that provides query coalescing
+      using Gearman workers (to sit in front of a direct DBI driver).
+
+0.05  2008.02.24
+    - Added a new Data::ObjectDriver::ResultSet abstraction for building
+      result sets with lazy-loading of the actual results. This allows for
+      passing around a representation of a full result set (no limit, no
+      offset, etc), and allowing callers to modify the set as needed.
+    - search() now returns a subref blessed into the new D::OD::Iterator class.
+      It's backwards-compatible (you can still call $iter->()), but it now
+      supports $iter->next() as well.
+    - Added a D::OD::SQL::add_complex_where method, for creating more complex
+      WHERE clauses with boolean operations.
+    - Added instrumentation/profiling for the memcached, Apache, and RAM
+      caching drivers.
+    - Improved "remove" support in the experimental Multiplexer driver.
+    - Fixed an ordering bug with BaseCache->update: the cache is now updated
+      after the fallback (a persistent store, usually) is updated, to prevent
+      the cache being updated but the backend erroring out.
+    - Let DSNs start with "DBI:" instead of only "dbi:"
+    - Fix a bug where the iterator version of search() (search() called
+      in scalar context) wasn't calling finish() on $sth. It was generating
+      warnings on certain circumstances.
+    - Fixed a circular reference when using has_a.
+
+0.04  2007.05.02
+    - Fixed a bug where single-PK classes were not returning the
+      objects correctly sorted during a lookup_multi.
+    - Added support for MySQL 'REPLACE INTO' syntax with a new
+      $obj->replace() method.
+    - Added a new trigger 'post_inflate'.
+    - Fixed a minor issue (warning) with no_changed_flags in column_func()
+    - Added has_a() construct to build linking methods between classes.
+    - remove() returns number of affected rows, with DBI semantics.
+    - Bulk inserting of data can now be done with the new bulk_insert()
+      Class method.  It uses Postgres' COPY command or MySQL's 
+      multi-value inserts to load data quickly.
+    - The new() constructor for objects now accepts column name/value
+      pairs which are passed to a new init() method.
+    - The new init() method can be called on any object to set
+      many parameters in one call.
+    - This init() method can also be overridden, allowing for custom
+      initialization code.
+    - Added parens around terms within complex SQL conditionals, to allow
+      even more complex conditions to be created.
+    - Made the second argument to D::OD::SQL::add_select optional. It defaults
+      to the value of the first argument (the column name).
+    - Pass along $orig_obj (original object) when calling post_save/post_update
+      triggers, even when the object hasn't changed.
+    - A non-numeric value in a LIMIT now causes an exception.
+    - Fixed a bug where calling SQL->add_join twice would create an invalid
+      SQL statement.
+    - More documentation!
+    - Added more DOD::DBD::* options: sql_for_unixtime, can_delete_with_limit,
+      is_case_insensitive, can_replace, sql_class.
+    - Added an experimental Multiplexer class to direct writes to multiple
+      backend drivers.
+    - Added a generic end_query method, analogous to start_query, which is
+      called after each query. Useful for profiling etc.
+    - Text::SimpleTable is now loaded dynamically so that it's no longer
+      a requirement for D::OD.
+
+0.03  2006.08.05
+    - Added an inflate and deflate mechanism to memcached caching. When objects
+      are stored in memcached, they are now deflated to a hash reference
+      containing only the column values; retrieving the object from memcached
+      automatically inflates the object to the full representation. Classes
+      can override inflate and deflate to store additional information in the
+      memcached representation that's kept automatically up-to-date.
+    - Added a SimplePartition driver, which helps to make partitioning, well,
+      simpler. Still to come: documentation and a tutorial on partitioning.
+    - Many, many bug fixes and improvements to the caching drivers.
+    - Added detection of changed columns, such that only columns that have
+      been changed are updated in an UPDATE statement.
+    - Added a clear_cache method to the D::O::D::Cache::RAM class.
+    - Added cross-DBD error handling, which maps local error codes to error
+      constants in Data::ObjectDriver::Errors. The list of supported errors
+      is pretty miniscule thus far (just one), but will be expanded as needed.
+    - Added support for query profiling (Data::ObjectDriver::Profiler), which
+      counts queries, calculates frequent queries, and can produce reports.
+    - Added support for optional table prefixes, which simplifies setting up
+      identical schemas in the same database.
+    - Added an optional $terms argument to D::O::D::DBI->update, which can
+      add additional terms to the UPDATE statement besides just the PK.
+    - Added a D::O::D::DBI->begin_work method, and improved the commit and
+      rollback methods.
+    - Added a D::O::D::DBI->last_error method.
+    - Added support for multiple JOIN clauses with a new D::O::D::SQL->add_join
+      method.
+    - Multiple OR values are now contained in an IN (...) clause rather than
+      many joined OR clauses.
+    - Added a for_update option to search, which allows constructing a
+      SELECT ... FOR UPDATE query.
+    - D::O::D::BaseObject->column is now removed and replaced with a
+      column_func method, which returns a subroutine reference used to
+      initialize the dynamically-created methods for each column. This allows
+      some optimizations.
+
+0.02  2006.02.21
+    - Added Data::ObjectDriver::BaseView, a base class for creating "views"
+      across multiple tables, or involving more complex aggregate queries.
+    - Added trigger/callback support for common operations. See the
+      Data::ObjectDriver documentation for more details.
+    - Added GROUP BY support in Data::ObjectDriver::SQL.
+    - Data::ObjectDriver::BaseCache->search now uses lookup_multi to do a
+      very fast PK lookup, which will hit the cache first before the
+      backend DB.
+    - Fixed bugs with BLOB columns in SQLite driver.
+    - Added connect_options option to Data::ObjectDriver::Driver::DBI, for
+      passing in custom options for a DBI->connect call.
+    - Data::ObjectDriver::BaseObject->remove now works as a class method.
+    - Added Data::ObjectDriver::BaseObject->primary_key_tuple for retrieving
+      the primary key value(s) for an object.
+    - Added Data::ObjectDriver::BaseObject->refresh to reload an object from
+      the database.
+    - Added support for HAVING clauses in Data::ObjectDriver::SQL. For views
+      that are not attached to a particular datasource, any terms passed in
+      to the query will automatically be turned into HAVING clauses.
+    - Improved the lookup_multi method for all BaseCache subclasses: we now
+      allow the subclass to look up multiple values in the cache and return
+      any already-cached items, then make a list of the remaining IDs and
+      send them to fallback->lookup_multi.
+    - Driver::DBI->lookup_multi will now use an OR clause to look up
+      multiple values in one query.
+    - Added lots of test cases.
+    - Pod fix (Thanks to Koichi Taniguchi)
+
+0.01  2005.09.23
+    - Initial distribution.

@@ -1,0 +1,185 @@
+NAME
+
+    Device::Chip::MPL3115A2 - chip driver for a MPL3115A2
+
+SYNOPSIS
+
+     use Device::Chip::MPL3115A2;
+    
+     my $chip = Device::Chip::MPL3115A2->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     printf "Current pressure is %.2f kPa\n",
+        $chip->read_pressure->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a
+    Freescale Semiconductor MPL3115A2 attached to a computer via an I²C
+    adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+ACCESSORS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Returns a HASH reference of the contents of control registers CTRL_REG1
+    to CTRL_REG3, using fields named from the data sheet.
+
+ change_config
+
+       $chip->change_config( %changes )->get
+
+    Writes updates to the control registers CTRL_REG1 to CTRL_REG3. This
+    will be performed as a read-modify-write operation, so any fields not
+    given as arguments to this method will retain their current values.
+
+    Note that these two methods use a cache of configuration bytes to make
+    subsequent modifications more efficient. This cache will not respect
+    the "one-shot" nature of the OST and RST bits.
+
+ get_sealevel_pressure
+
+ set_sealevel_pressure
+
+       $pressure = $chip->get_sealevel_pressure->get
+    
+       $chip->set_sealevel_pressure->get( $pressure )
+
+    Read or write the barometric pressure calibration register which is
+    used to convert pressure to altitude when the chip is in altimeter
+    mode, in Pascals. The default value is 101,326 Pa.
+
+ read_pressure
+
+       $pressure = $chip->read_pressure->get
+
+    Returns the value of the OUT_P_* registers, suitably converted into
+    Pascals. (The chip must be in barometer mode and must not be in RAW
+    mode for the conversion to work).
+
+ read_altitude
+
+       $altitude = $chip->read_altitude->get
+
+    Returns the value of the OUT_P_* registers, suitably converted into
+    metres. (The chip must be in altimeter mode and must not be in RAW mode
+    for the conversion to work).
+
+ read_temperature
+
+       $temperature = $chip->read_temperature->get
+
+    Returns the value of the OUT_T_* registers, suitable converted into
+    degrees C. (The chip must not be in RAW mode for the conversion to
+    work).
+
+ read_min_pressure
+
+ read_max_pressure
+
+       $pressure = $chip->read_min_pressure->get
+    
+       $pressure = $chip->read_max_pressure->get
+
+    Returns the values of the P_MIN and P_MAX registers, suitably converted
+    into Pascals.
+
+ clear_min_pressure
+
+ clear_max_pressure
+
+       $chip->clear_min_pressure->get
+    
+       $chip->clear_max_pressure->get
+
+    Clear the P_MIN or P_MAX registers, resetting them to start again from
+    the next measurement.
+
+ read_min_altitude
+
+ read_max_altitude
+
+       $altitude = $chip->read_min_altitude->get
+    
+       $altitude = $chip->read_max_altitude->get
+
+    Returns the values of the P_MIN and P_MAX registers, suitably converted
+    into metres.
+
+ clear_min_altitude
+
+ clear_max_altitude
+
+       $chip->clear_min_altitude->get
+    
+       $chip->clear_max_altitude->get
+
+    Clear the P_MIN or P_MAX registers, resetting them to start again from
+    the next measurement.
+
+ read_min_temperature
+
+ read_max_temperature
+
+       $temperature = $chip->read_min_temperature->get
+    
+       $temperature = $chip->read_max_temperature->get
+
+    Returns the values of the T_MIN and T_MAX registers, suitably converted
+    into metres.
+
+ clear_min_temperature
+
+ clear_max_temperature
+
+       $chip->clear_min_temperature->get
+    
+       $chip->clear_max_temperature->get
+
+    Clear the T_MIN or T_MAX registers, resetting them to start again from
+    the next measurement.
+
+METHODS
+
+ check_id
+
+       $chip->check_id->get
+
+    Reads the WHO_AM_I register and checks for a valid ID result. The
+    returned future fails if the expected result is not received.
+
+ start_oneshot
+
+       $chip->start_oneshot->get
+
+    Sets the OST bit of CTRL_REG1 to start a one-shot measurement when in
+    standby mode. After calling this method you will need to use
+    busywait_oneshot to wait for the measurement to finish, or rely somehow
+    on the interrupts.
+
+ busywait_oneshot
+
+       $chip->busywait_oneshot->get
+
+    Repeatedly reads the OST bit of CTRL_REG1 until it becomes clear.
+
+ oneshot
+
+       $chip->oneshot->get
+
+    A convenient wrapper around start_oneshot and busywait_oneshot.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

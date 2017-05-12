@@ -1,0 +1,208 @@
+NAME
+    DBICx::MaterializedPath - DBIx::Class plugin for automatically tracking
+    lineage paths in simple data trees.
+
+PREFER
+    Please see DBIx::Class::Tree::Mobius, DBIx::Class::Graph, and
+    DBIx::Class::Tree instead of this experimental package.
+
+SYNOPSIS
+    We need a table, or tables, which represents a tree.
+
+     CREATE TABLE tree_data (
+        id INTEGER PRIMARY KEY NOT NULL,
+        parent INT(10),
+        content TEXT NOT NULL,
+        path VARCHAR(255),
+        created DATETIME(19) NOT NULL
+     );
+ 
+     CREATE INDEX tree_data_idx_parent ON tree_data (parent);
+
+    In your DBIx::Class add this to your components–
+
+     use warnings;
+     use strict;
+     use parent qw( DBIx::Class );
+ 
+     __PACKAGE__->load_components(qw(
+                                     +DBICx::MaterializedPath
+                                     Core
+                                     ));
+     # Et cetera.
+     __PACKAGE__->parent_column("parent"); # default "parent"
+     __PACKAGE__->path_column("path");     # default "materialized_path"
+     __PACKAGE__->path_separator(".");     # default "/"
+     __PACKAGE__->max_depth(10);           # default "500"
+
+DESCRIPTION
+    Note, this is an experimental package and not sanctioned by the DBIC
+    core devs.
+
+    Uses a column of a table with a tree structure to keep track of lineage.
+    An example lineage showing primary key ids–
+
+     #  1 -> 2 -> 3 -> 10 -> 999 -> 8 -> 42
+
+     my $rec = $result_source->find(999);
+     say $rec->parent->id; # prints "10"
+
+    It's trivial to find the parent and easy to recurse on the parent to
+    find all ancestors. With a deep tree it becomes somewhat expensive. Take
+    the example above, for example. If you want to get the entire lineage
+    for the record with id "42" you have to do six queries against the
+    database. If you maintain a materialized path you only have to do one.
+
+    Consider our record "42" again. With its path 1/2/3/10/999/8/42 we can
+    easily find all its parents–
+
+     my $path = "1/2/3/10/999/8/42";
+     my @ancestor_ids = split '/', $path;
+     pop @ancestor_ids; # Remove the self id.
+     my @ancestors = $result_source
+                          ->search({ parent => { -in => \@ancestor_ids },
+                                   { order_by => \"LENGTH(path)" });
+
+    We can thank the great and powerful Ovid's co-worker Mark
+    Morgan—<http://use.perl.org/~Ovid/journal/39460>—for the sorting
+    solution for ensuring the proper order of ancestors is returned.
+
+    See also *Trees in SQL: Nested Sets and Materialized Path*, Vadim
+    Tropashko, <http://www.dbazine.com/oracle/or-articles/tropashko4>.
+
+  CAVEAT
+    This package requires your table has a single primary key and a method
+    to look up a parent record by its single primary key.
+
+METHODS
+    [path method]
+        Whatever column you set for your materialized path. In the
+        "SYNOPSIS" code it is set to "path" to match the sample table
+        definition. The default if you don't set one is "materialized_path".
+        This will, of course, cause errors if there is no such column in the
+        table.
+
+    ancestors
+        Searches on the materialized path ids excepting the object's own.
+        This is generally cheap because it uses the path instead of
+        recursion.
+
+    get_root
+        Returns the root object for a given record.
+
+    grandchildren
+        Return all children and grandchildren.
+
+    node_depth
+        Returns 1 for a record with no parent.
+
+    root_node
+    siblings
+    max_depth
+        Set this to assert a maximum tree depth. Default is 500.
+
+    set_materialized_path
+        Probably shouldn't mess with this. It's used by "insert" and
+        "delete".
+
+  OVERRIDDEN METHODS
+    insert
+        Sets the materialized path.
+
+    update
+        Updates which change the parent of a record necessarily cascade
+        through all their children and grandchildren to recompute and set
+        their new materialized paths. E.g., given this tree–
+
+                          1
+                          |
+                          3
+                         / \
+                       12   8
+                      /\    /\
+                     5 13  7  4
+
+        You get paths including 1/3/12/13 and 1/3/4. Let's say we change
+        record 3's parent from 1 to 2–
+
+                          2
+                          |
+                          3
+                         / \
+                       12   8
+                      /\    /\
+                     5 13  7  4
+
+        The change is simple and it's obvious you have to update record 3
+        but you just broke the materialized path for records 4, 5, 7, 8, 12,
+        and 13. In a big tree you may have broken hundreds or even thousands
+        of paths with a single parent change. So we have to process all
+        descendants. Our example paths become 2/3/12/13 and 2/3/4. Again, it
+        may seem trivial but it may be expensive depending on the tree's
+        depth and breadth. This simplistic example will require three
+        database reads—children of 3, children of 12, children of 8—and six
+        updates—each of 4, 5, 7, 8, 12, and 13. This doesn't even count the
+        original expense of finding and updating 3 itself. But the point
+        here is that we should have a write seldom, read often situation and
+        this up front expense may save exponentially with regards to ongoing
+        query costs.
+
+CAVEATS
+    If your materialized path column is insufficiently large you're going to
+    have problems. A "VARCHAR(255)" is only wide enough to support a tree
+    which is 35 nodes deep if the average PK values are integers in the
+    millions. This might be fine for your usage. Just be aware path tracking
+    is not arbitrary, it's limited to the column's width.
+
+TO DO
+    Better documents; obviously.
+    More tests; what else is new?
+        One set with nothing changed: use default column names.
+
+        One set with everything changed.
+
+CODE REPOSITORY
+    <http://github.com/pangyre/p5-dbicx-materializedpath>.
+
+SEE ALSO
+    DBIx::Class::Ordered, DBIx::Class.
+
+  WHY NOT DBIx::Class::Ordered?
+    There are data sets which have implicit, or even tacit,
+    ordering—”position“ in DBIx::Class::Ordered parlance– in the data
+    already. Published articles, for example, will be naturally ordered
+    chronologically. Additional position tracking becomes complex and
+    redundant in this kind of case. You can even run into cases where both
+    types of ordering are necessary like a collection of dictionaries. Each
+    dictionary's terms are ordered alphabetically while each term's
+    definitions would be ordered by a position set at editorial discretion.
+
+AUTHOR
+    Ashley Pond V � ashley.pond.v@gmail.com � <http://pangyresoft.com>.
+
+LICENSE
+    You may redistribute and modify this software under the same terms as
+    Perl itself.
+
+DISCLAIMER OF WARRANTY
+    Because this software is licensed free of charge, there is no warranty
+    for the software, to the extent permitted by applicable law. Except when
+    otherwise stated in writing the copyright holders and other parties
+    provide the software "as is" without warranty of any kind, either
+    expressed or implied, including, but not limited to, the implied
+    warranties of merchantability and fitness for a particular purpose. The
+    entire risk as to the quality and performance of the software is with
+    you. Should the software prove defective, you assume the cost of all
+    necessary servicing, repair, or correction.
+
+    In no event unless required by applicable law or agreed to in writing
+    will any copyright holder, or any other party who may modify or
+    redistribute the software as permitted by the above license, be liable
+    to you for damages, including any general, special, incidental, or
+    consequential damages arising out of the use or inability to use the
+    software (including but not limited to loss of data or data being
+    rendered inaccurate or losses sustained by you or third parties or a
+    failure of the software to operate with any other software), even if
+    such holder or other party has been advised of the possibility of such
+    damages.
+

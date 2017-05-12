@@ -1,0 +1,87 @@
+=head1 NAME
+
+DBIx::SQLEngine::Docs::ToDo - Tasks, ideas, and bugs
+
+
+=head1 TO DO
+
+There are a number of things that could be done to improve this module.
+
+
+=head2 Tests
+
+The test scripts are incomplete and ought to exercise much more of the public interface. Specific things to add to the test include:
+
+Test for inserting, updating and selecting nulls, including "is null" test.
+
+Tests for new transaction code.
+
+Tests for null-value/empty-string distinction.
+
+Find people to test drivers for Informix, Sybase, MS SQL.
+
+
+=head2 Object Mapping
+
+The handling of primary keys in Schema::Table and Schema::Column is not yet correct. The Record classes could also use a review to ensure primary keys are handled correctly throughout.
+
+
+=head2 Driver Interface
+
+There sure are a lot of fetch methods... But it's not clear how to
+usefully simplify and combine them:
+
+    			x_method()		x_rows()
+     fetch_select	hashes			arrays
+     visit_select	hashes => \&sub		arrays => \&sub
+     fetchsub_select	hash_sub		array_sub
+     fetch_one	 	one_hash		one_array
+     fetch_one_value	one_value		one_list
+
+
+=head2 Driver-Specific Features
+
+Review DBIx::Compat; it seems like this information should map 
+fairly directly to candidate methods and subclasses.
+
+Consider interface for handling BLOBs on drivers where they need to be retrieved separately.
+
+Consider interface for handling multiple simultaneous statement handles on drivers where this needs special treatement, such as Sybase.
+
+Determine which features, if any, should be handled by an ODBC driver subclass.
+
+
+=head2 Driver Internals
+
+Determine the right way to handle the multiplexing drivers, DBD::Multiplex,
+DBIx::DBCluster, and DBIx::HA, given that they may reconnect to a different
+server in mid-stream. In practice, all of the servers in a pool are
+typically of the same type so this may not be a major issue.
+
+The column-information retrieve in DBIx::SQLEngine::Default should be using DBI's type_info methods.
+
+Consider centralizing logging interface by making 'DBI', 'SQL' arguments to general function, or using a callback that could be hooked to log4perl.
+
+
+=head2 Additional Criteria
+
+The Criteria subclasses are incomplete. Candidates include: Inequality, SubString, CaseInsensitiveSubString.
+
+Consider enabling pure-Perl interpretation of criteria to allow post-fetch processing by RecordSet objects:
+
+  package DBIx::SQLEngine::Criteria::Equality;
+  
+  sub inverse { 'DBO::Criteria::Inequality' }
+  
+  # $flag = $crit->matches( $record );
+  sub matches {
+    my ($crit, $record) = @_;
+    return ($crit->value( $record ) eq $crit->{'value'}) ? 1 : 0;
+  }
+
+
+=head1 SEE ALSO 
+
+L<DBIx::SQLEngine::Docs::ReadMe>
+
+=cut

@@ -1,0 +1,18 @@
+---
+abstract: 'Copy README after building (for SCM inclusion, etc.)'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CopyReadmeFromBuild
+requires:
+  Dist::Zilla: 0
+version: 0.0019

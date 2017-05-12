@@ -1,0 +1,6 @@
+name = "DBD-BlackHole"
+badges = ["travis", "codecov", "metacpan"]
+authority = "cpan:KARUPA"
+module_maker = "ModuleBuildTiny"
+markdown_maker = "Pod::Markdown::Github"
+

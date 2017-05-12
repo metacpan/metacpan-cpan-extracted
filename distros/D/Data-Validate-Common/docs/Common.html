@@ -1,0 +1,234 @@
+<!DOCTYPE html>  <html> <head>   <title>Common.pm</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Common.pm             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>                            </td>             <td class="code">               <div class="highlight"><pre><span class="nb">package</span> <span class="nn">Data::Validate::</span><span class="n">Common</span><span class="p">;</span>
+
+<span class="k">use</span> <span class="mf">5.8.0</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">Any::</span><span class="n">Moose</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">Data::Validate::</span><span class="n">Domain</span> <span class="sx">qw//</span><span class="p">;</span>
+
+<span class="cm">=head1 NAME</span>
+
+<span class="cm">Data::Validate::Common - Some common validator methods</span>
+
+<span class="cm">=head1 VERSION</span>
+
+<span class="cm">Version 0.2.1.1.1.1.1</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">our</span> <span class="nv">$VERSION</span> <span class="o">=</span> <span class="s">&#39;0.2&#39;</span><span class="p">;</span>
+
+<span class="cm">=head1 SYNOPSIS</span>
+
+<span class="cm">Adding one more validator to the vast list of existing ones. I could</span>
+<span class="cm">have named it Validator::DWIW but went with the Common module as it</span>
+<span class="cm">should be pretty standard stuff and is normally just one/two regex</span>
+<span class="cm">changes to the existing ones that mekt it a bit more &quot;real life&quot;.</span>
+
+
+<span class="cm">=head1 SUBROUTINES/METHODS</span>
+
+<span class="cm">=head2 is_email</span>
+
+<span class="cm">Validates a email address (in a sloppy way, but accepts gmail &#39;+&#39; style</span>
+<span class="cm">addresses). Does not do any validation of the existence.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_email</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$value</span><span class="p">;</span>
+
+    <span class="k">my</span> <span class="nv">@parts</span> <span class="o">=</span> <span class="nb">split</span><span class="p">(</span><span class="sr"> /\@/</span><span class="p">,</span> <span class="nv">$value</span> <span class="p">);</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">scalar</span><span class="p">(</span><span class="nv">@parts</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">;</span>
+
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$user</span><span class="p">)</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_username</span><span class="p">(</span> <span class="nv">$parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">);</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$user</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="nv">$user</span> <span class="ow">eq</span> <span class="nv">$parts</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+
+    <span class="k">my</span> <span class="nv">$domain</span> <span class="o">=</span> <span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_domain</span><span class="p">(</span> <span class="nv">$parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="p">);</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$domain</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">unless</span> <span class="nv">$domain</span> <span class="ow">eq</span> <span class="nv">$parts</span><span class="p">[</span><span class="mi">1</span><span class="p">];</span>
+
+    <span class="k">return</span> <span class="nv">$user</span> <span class="o">.</span> <span class="s">&#39;@&#39;</span> <span class="o">.</span> <span class="nv">$domain</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_valid_email</span>
+
+<span class="cm">Calls `is_email` and returns true or false and not the string itself.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_valid_email</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$email</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_email</span><span class="p">(</span><span class="nv">$email</span><span class="p">)</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_domain</span>
+
+<span class="cm">Just calles L&lt;Data::Validate::Domain&gt; for the moment but leaves room for</span>
+<span class="cm">further modifiers (maybe via a plugin).</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_domain</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nn">Data::Validate::Domain::</span><span class="n">is_domain</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_valid_domain</span>
+
+<span class="cm">Calls `is_domain` and returns true or false and not the string itself.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_valid_domain</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$domain</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_domain</span><span class="p">(</span><span class="nv">$domain</span><span class="p">)</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_hostname</span>
+
+<span class="cm">Just calles L&lt;Data::Validate::Domain&gt; for the moment but leaves room for</span>
+<span class="cm">further modifiers (maybe via a plugin).</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_hostname</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$value</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$value</span><span class="p">;</span>
+    <span class="k">return</span> <span class="nn">Data::Validate::Domain::</span><span class="n">is_hostname</span><span class="p">(</span><span class="nv">$value</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_valid_hostname</span>
+
+<span class="cm">Calls `is_hostname` and returns true or false and not the string itself.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_valid_hostname</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$hostname</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_hostname</span><span class="p">(</span><span class="nv">$hostname</span><span class="p">)</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_username</span>
+
+<span class="cm">Does the username checking for the is_email function. Very basic regex</span>
+<span class="cm">checking in the moment.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_username</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span> <span class="nv">$self</span><span class="p">,</span> <span class="nv">$value</span> <span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$value</span><span class="p">;</span>
+
+    <span class="k">if</span><span class="p">(</span><span class="nv">$value</span> <span class="o">=~</span> <span class="sr">m/^([a-z0-9_\+\-\.]+)$/i</span><span class="p">){</span>
+        <span class="k">return</span> <span class="nv">$value</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_valid_username</span>
+
+<span class="cm">Calls `is_username` and returns true or false and not the string itself.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_valid_username</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$username</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_username</span><span class="p">(</span><span class="nv">$username</span><span class="p">)</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="cm">=head2 is_phone</span>
+
+<span class="cm">Tests for a valid phone number - needs more work done to it though</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_phone</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$phone</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+
+    <span class="k">return</span> <span class="k">unless</span> <span class="nb">defined</span> <span class="nv">$phone</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nv">$phone</span> <span class="o">=~</span> <span class="sr">m/^[\w\s+\(\).-]{3,50}$/</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="nv">$phone</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>   
+
+<span class="cm">=head2 is_valid_phone</span>
+
+<span class="cm">Calls `is_phone` and returns true or false and not the string itself.</span>
+
+<span class="cm">=cut</span>
+
+<span class="k">sub </span><span class="nf">is_valid_phone</span> <span class="p">{</span>
+    <span class="k">my</span> <span class="p">(</span><span class="nv">$self</span><span class="p">,</span> <span class="nv">$phone</span><span class="p">)</span> <span class="o">=</span> <span class="nv">@_</span><span class="p">;</span>
+    <span class="k">return</span> <span class="p">(</span><span class="nv">$self</span><span class="o">-&gt;</span><span class="n">is_phone</span><span class="p">(</span><span class="nv">$phone</span><span class="p">)</span> <span class="p">?</span> <span class="mi">1</span> <span class="p">:</span> <span class="mi">0</span><span class="p">);</span>
+<span class="p">}</span>
+
+
+<span class="cm">=head1 AUTHOR</span>
+
+<span class="cm">Lenz Gschwendtner, C&lt;&lt; &lt;norbu09 at cpan.org&gt; &gt;&gt;</span>
+
+<span class="cm">=head1 BUGS</span>
+
+<span class="cm">Please report any bugs or feature requests to C&lt;bug-data-validate-common at rt.cpan.org&gt;, or through</span>
+<span class="cm">the web interface at L&lt;http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Validate-Common&gt;.  I will be notified, and then you&#39;ll</span>
+<span class="cm">automatically be notified of progress on your bug as I make changes.</span>
+
+
+
+
+<span class="cm">=head1 SUPPORT</span>
+
+<span class="cm">You can find documentation for this module with the perldoc command.</span>
+
+<span class="cm">    perldoc Data::Validate::Common</span>
+
+
+<span class="cm">You can also look for information at:</span>
+
+<span class="cm">=over 4</span>
+
+<span class="cm">=item * RT: CPAN&#39;s request tracker (report bugs here)</span>
+
+<span class="cm">L&lt;http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Validate-Common&gt;</span>
+
+<span class="cm">=item * AnnoCPAN: Annotated CPAN documentation</span>
+
+<span class="cm">L&lt;http://annocpan.org/dist/Data-Validate-Common&gt;</span>
+
+<span class="cm">=item * CPAN Ratings</span>
+
+<span class="cm">L&lt;http://cpanratings.perl.org/d/Data-Validate-Common&gt;</span>
+
+<span class="cm">=item * Search CPAN</span>
+
+<span class="cm">L&lt;http://search.cpan.org/dist/Data-Validate-Common/&gt;</span>
+
+<span class="cm">=back</span>
+
+
+<span class="cm">=head1 ACKNOWLEDGEMENTS</span>
+
+
+<span class="cm">=head1 LICENSE AND COPYRIGHT</span>
+
+<span class="cm">Copyright 2011 Lenz Gschwendtner.</span>
+
+<span class="cm">This program is free software; you can redistribute it and/or modify it</span>
+<span class="cm">under the terms of either: the GNU General Public License as published</span>
+<span class="cm">by the Free Software Foundation; or the Artistic License.</span>
+
+<span class="cm">See http://dev.perl.org/licenses/ for more information.</span>
+
+
+<span class="cm">=cut</span>
+
+<span class="mi">1</span><span class="p">;</span>    <span class="c1"># End of Data::Validate::Common</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 

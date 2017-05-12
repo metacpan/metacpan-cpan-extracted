@@ -1,0 +1,744 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+data-freq - a text frequency analysis tool
+
+=cut
+
+use strict;
+use warnings;
+
+use Data::Freq;
+use Getopt::Long;
+use Pod::Usage qw(pod2usage);
+
+=head1 SYNOPSIS
+
+    data-freq [options] [--] [files..]
+
+=head1 OPTIONS
+
+=over 4
+
+=item * Field Type
+
+    -t | --text           -y | --year
+    -u | --number         -m | --month
+    -d | --date | --day   --hour --minute --second
+    
+    +%m-%d +%H +%H:%M etc. | --strftime=FMT
+
+For multiple fields, each C<Field Type Option> begins new field specification.
+
+=item * Field Selector
+
+    -p NUM | --pos=NUM
+
+C<NUM> can be zero, positive, negative, multiple separated by commas (C<,>),
+and/or a range with a C<..> operator.
+
+=item * Field Output
+
+    -n NUM | --limit=NUM    -z | --zero
+    -o NUM | --offset=NUM
+
+C<NUM> can be zero, positive, or negative.
+
+=item * Field Aggregation
+
+    -U | --unique   -M | --max   -N | --min   -Y | --average
+
+=item * Field Sorting
+
+    -V | --value   -F | --first   -A | --asc
+    -S | --score   -L | --last    -D | --desc
+
+=item * Input Format
+
+    -b STR | --split=STR
+
+=item * Output Format
+
+    -I STR | --indent=STR      -R | --root
+    -P STR | --prefix=STR      -T | --transpose
+    -B STR | --separator=STR   -O | --nopadding
+
+=item * Help
+
+    -v | --version   -h | --help   -a | --man   -c | --check
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item * Monthly view counts
+
+    Long:  data-freq --month < access_log
+    Short: data-freq -m < access_log
+
+=item * Monthly + Daily
+
+    Long:  data-freq --month --day < access_log
+    Short: data-freq -md < access_log
+
+=item * Monthly + Top 3 users per month
+
+    Long:  data-freq --month \
+                     --text --pos=2 --limit=3 \
+                     access_log
+    Short: data-freq -m -tp2 -n3 access_log
+
+=item * Top 5 days in the number of distinct users
+
+    Long:  data-freq --day --score --limit=5 \
+                     --text --pos=2 --unique --zero \
+                     access_log
+    Short: data-freq -dS -n5 -tp2 -Uz access_log
+
+=item * Hourly aggregation
+
+    Long:  data-freq --strftime %H
+    Short: data-freq +%H
+
+=back
+
+=head1 DESCRIPTION
+
+=head2 Overview
+
+C<data-freq> is a command line tool to analyze frequency of particular types of text data.
+It is based on the corresponding Perl module L<Data::Freq>.
+
+For example, consider an input file:
+
+    Abc Def
+    Def Ghi
+    Ghi Jkl
+    Abc Def
+    Def Ghi
+    Abc Def
+
+The command can be executed as below:
+
+    data-freq filename
+    (or)
+    data-freq < filename
+
+Then the output will be
+
+    3: Abc Def
+    2: Def Ghi
+    1: Ghi Jkl
+
+where the number on the left indicates how many times each line of text appears in the input.
+
+=head2 Log file analysis
+
+This tool is designed especially in favor of log file analysis.
+
+A typical log file for the Apache web server consists of lines like this:
+
+    1.2.3.4 - user1 [01/Jan/2012:01:02:03 +0000] "GET / HTTP/1.1" 200 12
+
+One of the simplest examples for such a log file is
+
+    data-freq --month /var/log/httpd/access_log
+
+which will yield something like this:
+
+    12300: 2012-01
+    23400: 2012-02
+    34500: 2012-03
+
+Note the date/time information is automatically extracted from the first chunk of text
+that is enclosed by a pair of brackets C<[...]>.
+
+If the access log file is very large, it is recommended to do some experiment for a part of the log
+until satisfactory options are determined. E.g.
+
+    tail -1000 /var/log/httpd/access_log | \
+        data-freq --[several different options]
+
+In order to select a specific field from the log line, use the C<--pos> option:
+
+    # Count IP addresses
+    data-freq --pos=0 < access_log
+    (or)
+    data-freq -p0 < access_log
+    
+    # Count remote usernames
+    data-freq --pos=2 < access_log
+    (or)
+    data-freq -p2 < access_log
+
+If the C<--pos> option is used, it is regarded as the 0-based index
+for the array of words in each input line.
+
+=head2 Multi-level analysis
+
+C<data-freq> is capable of aggregating frequency data at multiple levels.
+
+E.g.
+
+    data-freq --month --day < access_log
+    (or)
+    data-freq -md < access_log
+
+where C<--month> is for the first level, and C<--day> is for the second level.
+
+The output will look something like this:
+
+    12300: 2012-01
+          210: 2012-01-01
+          321: 2012-01-02
+          432: 2012-01-03
+          ...
+    23400: 2012-02
+          321: 2012-02-01
+          432: 2012-02-02
+          543: 2012-02-03
+          ...
+    34500: 2012-03
+          543: 2012-02-01
+          654: 2012-02-02
+          765: 2012-02-03
+          ...
+
+Below is another example to list top 3 users per month:
+
+    data-freq --month --text --pos=2 --limit=3 < access_log
+    (or)
+    data-freq -m -tp2 -n3 < access_log
+
+Output:
+
+    12300: 2012-01
+         1200: user1
+          230: user2
+          135: user3
+    23400: 2012-02
+         2400: user1
+         1122: user4
+          765: user3
+    34500: 2012-03
+         3600: user2
+         2100: user3
+         1350: user1
+
+Note: the dates are sorted by the time-line order,
+while the users are sorted by the count.
+
+=head2 Field types
+
+There are three basic field types as below:
+
+=over 4
+
+=item * --text
+
+Each line in the input is added as a text entry
+so that its frequency is counted.
+
+If the C<--pos> option is given, each line is split into chunks,
+and only the selected chunk(s) at the position are counted.
+
+=item * --number
+
+The input is interpreted as numbers,
+which affects the sorting order in the output.
+
+C<--pos> option should usually be given, but if it is omitted,
+the first chunk is used as the input number.
+
+=item * --date
+
+The input is parsed as date/time and formatted
+based on the C<POSIX::strftime()> format. (See L<POSIX>.)
+The default format is C<%Y-%m-%d> which looks like C<2001-02-03>.
+
+Unless C<--pos> option is explicitly given,
+the first field enclosed by a pair of brackets C<[...]>
+in the input line is automatically parsed.
+
+The date/time format can be specified with the C<--strftime> option,
+or a plus sign C<+> followed by the format is interpreted as the C<--strftime> option.
+E.g.
+
+    --strftime=%m-%d
+    (or)
+    +%m-%d
+
+The options below can be used as shortcuts for the date/time format:
+
+    --year  : '%Y'
+    --month : '%Y-%m'
+    --day   : '%Y-%m-%d'
+    --hour  : '%Y-%m-%d %H'
+    --minute: '%Y-%m-%d %H:%M'
+    --second: '%Y-%m-%d %H:%M:%S'
+
+=back
+
+In order to place multiple field specifications,
+each of the C<field type> option indicates the beginning of the group of options
+that belong to the same field.
+
+The default type is C<--text> and it can be omitted for the first field,
+but cannot be omitted from the second field on.
+
+    data-freq --text --pos=2 # correct
+    data-freq --pos=2        # ok
+    
+    data-freq --text --pos=2 --text --pos=0 # correct
+    data-freq --pos=2 --text --pos=0        # ok
+    data-freq --pos=2 --pos=0               # incorrect
+
+=head2 Selecting fields
+
+=over 4
+
+=item * --pos
+
+Selects a field at the given position in each input line.
+The position is a 0-based index (i.e. the first chunk is the position 0).
+
+Multiple positions can be specified with comma-separated numbers
+or a range described by a C<..> operator.
+
+    data-freq --pos=2
+    data-freq --pos=1,2,5
+    data-freq --pos=0..3
+
+=back
+
+For a field with the C<--pos> option, the input line is split into chunks
+by whitespaces (unless the C<--split> option is explicitly given), 
+while any chunk enclosed by a pair of parentheses C<(...)>, brackets C<[...]>, braces C<{...}>,
+double quotes C<"...">, or single quotes C<'...'> is grouped as one field,
+even if it contains whitespaces.
+
+Nested parentheses, brackets, and braces are not supported.
+
+For the field of the C<--date> type, even if the C<--pos> option is not set,
+the first chunk enclosed by a pair of brackets C<[...]> is automatically selected.
+
+Some log formats do not enclose the date/time by brackets.
+In that case, the C<--pos> option with a range operator is useful.
+
+For example, if the log line looks like this:
+
+    01 Jan 2012 01:02:03,456 INFO - test log
+
+then the C<--pos> option can be used as below:
+
+    data-freq --pos=0..3
+
+=head2 Limiting output
+
+In the output, the number of records to display under each category can be limited by the options below:
+
+=over 4
+
+=item * --limit
+
+Limits the records to the given number.
+If a negative number is specified, the number is counted from the end.
+
+=item * --offset
+
+Skips as many records as the given number.
+If a negative number is specified, the number is counted from the end.
+
+=item * --zero
+
+Short for C<--limit=0>.
+
+=back
+
+=head2 Sorting results
+
+The output can be sorted on the per-field basis by the attributes below:
+
+=over 4
+
+=item * --score
+
+Sorts by the score (left-hand side numbers).
+
+=item * --value
+
+Sorts by the value (right-hand side texts).
+
+=item * --first
+
+Sorts by the first occurrence in the input.
+
+=item * --last
+
+Sorts by the last occurrence in the input.
+
+=back
+
+The direction of the order can be controlled by these respective options:
+
+=over 4
+
+=item * --asc
+
+Sorts in the ascending order
+
+=item * --desc
+
+Sorts in the descending order
+
+=back
+
+If the sorting and/or ordering options above are omitted,
+the default sorting method will be determined as follows:
+
+1. If the field type is C<--text>, the output will be sorted by C<--score> by default
+(i.e. the most frequent text first).
+Otherwise (if the field type is either C<--number> or any kind of C<--date>),
+the output will be sorted by C<--value> by default
+(i.e. the number-line or time-line order).
+
+2. If the sorting type is either C<--score> or C<--last>,
+the output will be sorted in the descending order by default.
+Otherwise, the default is the ascending order.
+
+=head2 Aggregating subcategory
+
+If one of the aggregation options below is given to a field,
+it alters the meaning of what is displayed as the score of its parent field.
+
+Without the aggregation, the frequency of each field is counted independently,
+where the parent field count is usually equal to the sum of the child field counts.
+The aggregation options use the alternative method instead of scoring the sum.
+
+=over 4
+
+=item * --unique
+
+Scores the number of distinct values.
+
+=item * --max
+
+Scores the maximum count.
+
+=item * --min
+
+Scores the minimum count.
+
+=item * --average
+
+Scores the average count.
+
+=back
+
+Below is an example to show top 5 days in the number of distinct users:
+
+    data-freq --day --score --limit=5 \
+              --text --pos=2 --unique --zero \
+              access_log
+    (or)
+    data-freq -dS -n5 -tp2 -Uz access_log
+
+where C<--day> is the daily aggregate for the first level,
+and C<--text --pos=2> is for the usernames per day.
+
+The C<--score> option is to sort the first field by the score (unique usernames)
+rather than by the date itself, and then the top 5 days will be printed out
+with C<--limit=5>.
+
+The C<--unique> option makes the first field count the number of
+unique usernames instead of the total number of occurrences,
+while the C<--zero> option for the second field hides all the individual usernames,
+since the only purpose here is to list the dates.
+
+As a result, the output will look like
+
+    1100: 2012-03-05
+     860: 2012-02-20
+     789: 2012-02-13
+     641: 2012-03-12
+     580: 2012-02-27
+
+where each number on the left is the number of unique users on each day,
+and the listed dates are the top 5 among others.
+
+=head2 Input format
+
+=over 4
+
+=item * --split
+
+Specifies the field separator for each of the input lines.
+
+For example, in order to analyze a CSV file,
+
+    data-freq --split=, --pos=2 < input.csv
+
+will count the third field in each line.
+
+=back
+
+=head2 Output format
+
+There are a number of ways to control the output format.
+
+=over 4
+
+=item * --indent
+
+Alters the indent spaces (or any other characters) that repeat as many times as
+the depth (minus 1) at each field level. E.g.
+
+    data-freq --indent=++
+
+will output something like this:
+
+    21: AAA
+    ++12: BBB
+    ++++10: CCC
+    ++++ 2: DDD
+    ++ 9: EEE
+    ++++ 6: FFF
+    ++++ 3: GGG
+
+=item * --prefix
+
+Prepends a prefix between the indent and the score value.
+
+Example:
+
+   data-freq --prefix='* '
+
+Output:
+
+    * 21: AAA
+        * 12: BBB
+            * 10: CCC
+            *  2: DDD
+        *  9: EEE
+            *  6: FFF
+            *  3: GGG
+
+=item * --separator
+
+Sets the separator between the score and the counted text.
+
+Example:
+
+    data-freq --separator=' => '
+
+Output:
+
+    21 => AAA
+        12 => BBB
+            10 => CCC
+             2 => DDD
+         9 => EEE
+             6 => FFF
+             3 => GGG
+
+=item * --root
+
+Also displays the grand total at the level 0.
+All the subsequent levels are shifted to the right.
+
+    34: Total
+        21: AAA
+            12: BBB
+                10: CCC
+                 2: DDD
+             9: EEE
+                 6: FFF
+                 3: GGG
+        13: HHH
+            13: III
+                12: JJJ
+                 1: KKK
+
+=item * --transpose
+
+Swaps the position of the score and the counted text.
+
+    AAA: 21
+        BBB: 12
+            CCC: 10
+            DDD: 2
+        EEE: 9
+            FFF: 6
+            GGG: 3
+
+=item * --nopadding
+
+Suppresses the space padding to the left,
+which is by default for the alignment of the counted texts.
+
+    21: AAA
+        12: BBB
+            10: CCC
+            2: DDD
+        9: EEE
+            6: FFF
+            3: GGG
+
+Note: the indent space above is strictly fixed as multiple of 4 spaces,
+while the texts at the same level may not be aligned.
+
+=back
+
+=cut
+
+sub parse_pos {
+    my ($pos) = @_;
+    die "Invalid pos: $pos\n" if $pos =~ /[^\d\-\.\,\s]/;
+    
+    my $result = eval "[$pos]";
+    die "Invalid pos: $pos\n" if $@;
+    
+    return $result;
+}
+
+sub parse_args {
+    for my $arg (@ARGV) {
+        last if $arg eq '--';
+        $arg =~ s/^\+(.*)/--strftime=$1/;
+    }
+    
+    my $normalize_spec = sub {
+        my $spec = $_[0];
+        my $name = $spec;
+        $name =~ s/\|.*//;
+        $name =~ s/-/_/g;
+        return ($spec, $name);
+    };
+    
+    Getopt::Long::Configure('bundling');
+    
+    my $field  = {};
+    my $fields = [$field];
+    my $input  = {};
+    my $output = {};
+    my $check;
+    
+    GetOptions(
+        # Field types
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {
+                push @$fields, ($field = {}) if defined $field->{type};
+                $field->{type} = $name;
+            }
+        } qw(
+            text|t number|u date|d
+            year|y month|m day hour minute second
+        )),
+        'strftime=s' => sub {
+            push @$fields, ($field = {}) if defined $field->{type};
+            $field->{type} = $_[1];
+        },
+        
+        # Field options
+        'pos|p=s' => sub {$field->{pos} = parse_pos($_[1])},
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {$field->{$name} = $_[1]}
+        } qw(limit|n=i offset|o=i)),
+        'zero|z' => sub {$field->{limit} = 0},
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {$field->{method} = $name}
+        } qw(unique|uniq|U max|maximum|M min|minimum|N average|avg|Y)),
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {$field->{sort} = $name}
+        } qw(value|V score|S first|F last|L)),
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {$field->{order} = $name}
+        } qw(asc|ascending|A desc|descending|D)),
+        
+        # Other options
+        'split|b=s' => sub {$input->{split} = $_[1]},
+        (map {
+            my ($spec, $name) = $normalize_spec->($_);
+            $spec => sub {$output->{$name} = $_[1]}
+        } qw(
+            index|I=s prefix|P=s separator|B=s
+            with-root|root|R transpose|T no-padding|nopadding|O
+        )),
+        'check|c'   => \$check,
+        'version|v' => sub {
+            print "Data::Freq version $Data::Freq::VERSION\n";
+            exit 2;
+        },
+        'help|h|?'  => sub {pod2usage(-verbose => 1, -exitstatus => 0)},
+        'man|a'     => sub {pod2usage(-verbose => 2, -exitstatus => 0)},
+    ) or exit 1;
+    
+    if ($check) {
+        my $data = Data::Freq->new(@$fields);
+        my $n = 0;
+        
+        for my $field (@{$data->fields}) {
+            print 'Field ', ++$n, ":\n";
+            
+            for my $name (reverse sort keys %$field) {
+                my $value = $field->{$name};
+                
+                if (ref $value eq 'CODE') {
+                    $value = 'sub {...}';
+                } elsif (ref $value eq 'ARRAY') {
+                    $value = '['.join(', ', @$value).']';
+                }
+                
+                print "  $name: $value\n";
+            }
+        }
+        
+        exit 0;
+    }
+    
+    return ($fields, $input, $output);
+}
+
+sub main {
+    my ($fields, $input, $output) = parse_args();
+    
+    my $data = Data::Freq->new(@$fields);
+    
+    while (<>) {
+        if (defined $input->{split}) {
+            $data->add([split /$input->{split}/o]);
+        } else {
+            $data->add($_);
+        }
+    }
+    
+    $data->output($output);
+}
+
+main();
+
+__END__
+
+=head1 AUTHOR
+
+Mahiro Ando, C<< <mahiro at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Mahiro Ando.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

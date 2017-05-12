@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::ConveyorBelt
+
+0.02  2011.01.31
+    - Cleaned up Makefile.PL.
+    - Removed magic svn keywords.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.01  Wed Aug  1 16:57:32 2007
+        - original version

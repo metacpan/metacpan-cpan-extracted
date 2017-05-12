@@ -1,0 +1,5 @@
+Version 0.020 - 2015-06-06
+
+    - Start maintaining a Changes file :-)
+    - Drop undocumented 'begin' parser
+    - Drop Devel::BeginLift requirement

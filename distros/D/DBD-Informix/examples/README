@@ -1,0 +1,22 @@
+DBD::Informix Examples Directory
+================================
+
+The scripts in this directory illustrate the use of Perl DBI with the
+DBD::Informix driver.  The scripts generally assume that there's either a
+stores or a stores7 database available, that you have DBA privileges on
+that database, and that additions to both the set of tables and the data in
+the standard tables are permitted.  The scripts do not drop or alter tables
+they do not create, nor do they delete or update data they did not insert.
+
+Note that the scripts assume /usr/bin/perl is your Perl interpreter.  If
+this is not correct, either run the scripts with 'perl xNNexample.pl' or
+use the fixin.pl script from the 1st Edition of the Camel book (there's a
+version as amended by me in this directory).
+
+Extra examples will be welcomed; please use one of the existing examples
+as a template, and ensure that your name and email address are included in
+the comments (rather than, or as well as, mine).
+
+Jonathan Leffler (jleffler@us.ibm.com)
+
+@(#)$Id: README,v 100.1 2002/02/08 22:50:06 jleffler Exp $

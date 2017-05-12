@@ -1,0 +1,115 @@
+{# Base file for every blog template, any change in here will result in all pages be changed #}
+<html> 
+	<head>
+		<title>My blog</title>
+		<style type="text/css"> {# better put the style sheet external, but for this example it is easier in here #}
+			<!--
+			body {
+				background-color:#D4D4D4;
+			}
+			#page {
+				background-color:#E8E8E8;
+				color:black;
+				width:770px;
+				padding-top:25px;
+				margin-left:auto;
+				margin-right:auto;
+				padding-bottom:25px;
+			}
+			#header {
+				margin-left:auto;
+				margin-right:auto;
+				text-align:center;
+				padding-top:100px;
+				padding-bottom:100px;
+				font-size:40px;
+				width:720px;
+				background-color:#1F20AF;
+			}
+			#content {
+				float:left;
+				width:600px;
+				background-color:white;
+				margin-top:0px;
+				margin-left:25px;
+				margin-bottom:0px;
+				
+			}
+			#block {
+				margin-bottom:25px;
+				margin-left:10px;
+				margin-right:10px;
+			}
+			#footer {
+				background-color:#1F20AF;
+				text-align:right;
+				margin-left:25px;
+				margin-right:25px;
+				clear:left;
+			}
+			#sidebar {
+				margin-left:620px;
+				width:100px;
+			}
+			#sidebar a {
+				font-size:0.8em;
+				
+				display:block;
+			}
+			#header a:active {
+				color:white;
+				text-decoration:underline;
+			}
+			#header a:link {
+				color:white;
+				text-decoration:none;
+			}
+			#header a:hover {
+				color:white;
+				text-decoration:underline;
+			}
+			#header a:visited {
+				color:white;
+				text-decoration:none;
+			}
+			#footer a:active {
+				color:white;
+			}
+			#footer a:link {
+				color:white;
+			}
+			#footer a:hover {
+				color:white;
+			}
+			#footer a:visited {
+				color:white;
+			}
+			a:active {
+				color:#1F20AF;
+			}
+			a:link {
+				color:#1F20AF;
+			}
+			a:hover {
+				color:#1F20AF;
+			}
+			a:visited {
+				color:#1F20AF;
+			}
+{% block morecss %}{% endblock %} {# Extending templates can add more CSS data here #}
+			-->
+		</style>
+	</head>
+	<body>
+		<div id="page">
+			<div id="header"><a href="{% url base_url %}">My Blog</a></div> {# use the {% url %} tag for urls, which is very easy it even escapes when needed #}
+			<div id="content"><div id="block">{% block content %}{# This block is overwritten with the content of the extending templates #}{% endblock content %}</div></div>
+			<div id="sidebar"><ul>
+					<li><a href="{% url base_url %}">Overview</a></li>
+					<li><a href="{% url base_url "action"="post" %}">New Post</a></li>
+			</ul></div>
+			
+			<div id="footer">Powered by <a href="http://www.dotiac.com">Dotiac::DTL</a>
+		</div>
+	</body>
+</html>

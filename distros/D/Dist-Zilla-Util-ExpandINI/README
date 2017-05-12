@@ -1,0 +1,49 @@
+Dist::Zilla::Util::ExpandINI
+
+This module builds upon the previous work ":Util::BundleInfo" ( Which
+can extract configuration from a bundle in a manner similar to how
+"dzil" does it ) and integrates it with some *very* minimal "INI"
+handling to provide a tool capable of generating bundle-free "dist.ini"
+files from bundle-using "dist.ini" files!
+
+At present its very naïve and only keeps semantic ordering, and I've
+probably gotten something wrong due to cutting the complexity of
+Config::MVP out of the loop.
+
+But at this stage, bundles are the *only* thing modified in transit.
+
+Every thing else is practically a token-level copy-paste.
+
+POD ERRORS
+
+Hey! The above document had some coding errors, which are explained
+below:
+
+Around line 8:
+    Non-ASCII character seen before =encoding in 'naïve'. Assuming
+    CP1252
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

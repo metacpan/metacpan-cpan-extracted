@@ -1,0 +1,1518 @@
+Revision history for Dist-Zilla
+
+6.009     2017-03-04 11:16:37-05:00 America/New_York
+        - update DateTime::TimeZone prereq on Win32 to improve workingness
+          (thanks, Schwern!)
+        - add --recommends and --requires and --suggests to listdeps
+        - improve testing of listdeps (thanks, Mickey Nasriachi!)
+        - Module::Runtime is now considered 'internal' for the purpose of
+          carping (thanks, Karen Etheridge!)
+        - ./tmp is now pruned by PruneCruft (thanks, Karent Etheridge!)
+        - authordeps now picks up :version for the root section (thanks,
+          Karen!)
+        - the config loading of the "perl" config loader is more reliable, but
+          still please don't use it (thanks, Karen!)
+        - introducing a new plugin, [GatherFile], to support adding individual
+          files to the distribution (thanks, Karen!)
+
+6.008     2016-10-05 21:35:23-04:00 America/New_York
+        - fix the skip message from ExtraTests (thanks, Roy Ivy Ⅲ!)
+        - cope with error changes in latest Moose (thanks, Karen Etheridge and
+          Dave Rolsky)
+        - always stringify $] in MetaConfig to avoid losing trailing zeroes
+          through numification (thanks, Karen Etheridge!)
+
+6.007     2016-08-06 14:04:39-04:00 America/New_York
+        - restrict [MetaYAML] to metaspec v1.4, [MetaJSON] to v2.0+, as other
+          version combinations are not well-supported by the toolchain
+
+6.006     2016-07-04 10:56:36-04:00 America/New_York
+        - add some documentation to Dist::Zilla::App::Tester (thanks, Alberto
+          Simões!)
+        - optimizations to regex munging (thanks, Olivier Mengué!)
+        - add x_serialization_backend to META.* files (thanks, Karen
+          Etheridge!)
+        - metadata plugins are called before metadata defaults are built
+          (thanks, Karen Etheridge!)
+        - don't use ExtraTests plugin, but if you do, its generated test files
+          are a bit faster when unused
+
+6.005     2016-05-23 08:08:15-04:00 America/New_York
+        - NextRelease now dies if there's no changelog file found
+          (thanks, Karen Etheridge)
+        - Module::Runtime replaces Class::Load (thanks Olivier Mengué)
+
+6.004     2016-05-14 09:14:19-04:00 America/New_York (TRIAL RELEASE)
+        - stop listing Path::Class as a prereq (thanks, Karen Etheridge)
+        - update docs on path types (thanks, Graham Ollis)
+
+6.003     2016-04-24 19:23:46+01:00 Europe/London (TRIAL RELEASE)
+        - leading BOM (FEFF) is stripped on UTF-8 content
+        - PPI now handles characters, not bytes, fixing non-ASCII
+          non-comments in your source
+
+6.002     2016-04-23 17:50:26+01:00 Europe/London (TRIAL RELEASE)
+        - tweaks to Dist::Zilla::Path to keep plugins from v5 era working
+
+6.001     2016-04-23 13:21:56+01:00 Europe/London
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - Using a Dist::Zilla::Path like a Path::Class object now issues a
+          deprecation warning ("this will be removed") once per call site.
+
+6.000     2016-04-23 11:35:28+01:00 Europe/London (TRIAL RELEASE)
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - Path::Class has been excised in favor of Path::Tiny, exposed as
+          Dist::Zilla::Path; it will still respond to ->subdir and ->file, but
+          only until Dist::Zilla v7 -- fix your plugins by then!
+
+        - The --verbose switch to dzil is now strictly on/off.  To set
+          verbosity on a per-plugin basis, use the -V switch.  Unfortunately,
+          per-plugin verbosity seems to have been broken for some time, anyway.
+
+        - The plugins [Prereq] and [AutoPrereq] and [BumpVersion] have been
+          removed.  These were long deprecated.  (Don't confuse Prereq, for
+          example, with the plural Prereqs, which is the correct plugin.)
+
+        - [PkgVersion] now supports a use_package argument which will put the
+          version in the package statement.  (Remember that this syntax was
+          introduced in perl v5.12.0.)
+
+        - Dist::Zilla now requires perl v5.14.0.  It will still happily build
+          dists that run on whatever version of perl you like.
+
+5.047     2016-04-23 16:20:13+01:00 Europe/London
+        - cast things to Path::Class as needed, for now, for v6 backcompat
+          (don't expect more commits like this)
+
+5.046     2016-04-22 15:50:27+01:00 Europe/London
+        - avoid using syntax that is called ambiguous on older perls
+
+5.045     2016-04-22 11:37:13+01:00 Europe/London
+        - add 'relationship' option to AutoPrereqs plugin (Karen Etheridge)
+        - PrereqScanner role abstracts much of the AutoPrereqs behavior
+          (thanks, Olivier Mengué!)
+        - remove duplicates from the results of the :ExecFiles filefinder
+        - [MakeMaker] now rejects version ranges in prereqs if eumm_version is
+          not specified to be high enough (7.1101) to guarantee it can be
+          handled (Karen Etheridge)
+        - allow comments in an authordep specification with a version
+        - make FakeReleaser a bit more of a drop-in for UploadToCPAN
+          (Erik Carlsson)
+        - make PkgDist preserve blank line after 'package' for PkgVersion
+          (Chisel Wright)
+        - add rename option to [GatherDir::Template] (Alastair McGowan-Douglas)
+        - META.json is now emitted in ASCII (using \u... for non-ASCII
+          characters) to avoid a bug in older versions of JSON::PP on older
+          versions of perl
+        - "dzil build --in ." no longer allows you to blow away your cwd
+
+5.044     2016-04-06 20:32:14-04:00 America/New_York
+        - require a newer List::Util to avoid a dumb bug caused by relying on
+          side effects of loading Moose (thanks, Karen Etheridge!)
+
+5.043     2016-01-04 22:54:56-05:00 America/New_York
+        - dzil test now supports --extended to set EXTENDED_TESTING (thanks,
+          Philippe Bruhat)
+
+5.042     2015-11-26 09:05:37-05:00 America/New_York
+        - try to avoid testing errors when the local time zone can't be
+          determined (https://github.com/rjbs/Dist-Zilla/issues/497)
+
+5.041     2015-10-27 22:07:54-04:00 America/New_York
+        - add 'static_attribution' attribution to MakeMaker plugin
+        - fix prereqs for App::Cmd and Config::MVP::Reader::INI
+
+5.040     2015-10-13 11:42:25-04:00 America/New_York
+        - the distribution tarball name no longer includes -TRIAL if the
+          version contains an underscore
+
+        - [PkgVersion] adds "$VERSION = $VERSION_SANS_UNDERSCORES" when
+          version contains an underscore
+
+        - made the PodCoverageTests and PodSyntaxTests plugins generate author
+          tests, not release tests. These are tests you want passing on every
+          commit, not just before a release (Dave Rolsky)
+
+5.039     2015-08-10 09:03:08-04:00 America/New_York
+        - update required version of MooseX::Role::Parameterized; older
+          versions work, but can cause a bunch of unwanted warnings
+
+5.038     2015-08-07 22:16:50-04:00 America/New_York
+        - [License] can be given a filename option to use instead of LICENSE
+        - dzil listdeps --develop now exists as an alias for dzil listdeps
+          --author (Karen Etheridge)
+        - dzil authordeps now lists the Software::License class needed
+          (thanks, David Zurborg)
+        - PkgVersion now skips .pod files (thanks, David Golden)
+        - build_element support added for [ModuleBuild] (thanks, David
+          Wheeler!)
+        - new native filefinder :ExtraTestFiles (thanks, Karen Etheridge)
+        - [AutoPrereqs] now looks for develop prerequisites in xt/ (thanks,
+          Karen Etheridge)
+        - new file finder ':PerlExecFiles' (thanks, Karen Etheridge)
+        - try harder to notice failure to set up build root, especially on
+          Win32 (thanks, Christian Walde)
+        - better errors when a global config package isn't available (thanks,
+          Karen Etheridge)
+        - added the "ignore" option to [Encoding] (thanks, Yanick Champoux)
+        - allow ; authordep specifications to contain version ranges (thanks,
+          Karen Etheridge)
+        - better error when PAUSE credentials can't be loaded (thanks, David
+          Golden)
+        - fix documentation for the LicenseProvider role
+        - improve errors when PPI failes to parse (thanks, Nick Tonkin)
+        - sort list of executable files in Makefile.PL, for deterministic
+          builds (thanks, Karen Etheridge)
+        - omit configure-requires prerequisites from [MakeMaker]'s fallback
+          prerequisites (used by older ExtUtils::MakeMaker)
+
+5.037     2015-06-04 21:46:38-04:00 America/New_York
+        - issue a warning when version ranges are passed through to
+          ExtUtils::MakeMaker, which cannot parse them and treats them as '0'
+          https://github.com/Perl-Toolchain-Gang/ExtUtils-MakeMaker/issues/215
+
+        - added %P formatter code to [NextRelease] for the releaser's PAUSE id
+
+5.036     2015-05-02 11:08:51-04:00 America/New_York
+        - BUGFIX: detection of trial status via underscore in version was
+          accidentally lost in v5.035; restored now!
+
+5.035     2015-04-16 15:43:26+02:00 Europe/Berlin
+        - BREAKING CHANGE: is_trial is now read-only
+        - release_status is a new Dist::Zilla attribute and
+          ReleaseStatusProvider plugin role
+
+5.034     2015-03-20 10:57:07-04:00 America/New_York
+        - require new Config::MVP for better exceptions (that we rely on)
+        - point to IRC in dist metadata
+
+5.033     2015-03-17 07:45:36-04:00 America/New_York
+        - NextRelease now bases the new file on disk on the original file on
+          disk, skipping any munging that happened in between
+        - improve error message when a plugin can't be loaded
+        - added "use_begin" option to PkgVersion
+
+5.032     2015-02-21 09:36:00-05:00 America/New_York
+        - when :version is in plugin config, it's now enforced as soon as it's
+          seen
+        - add more documentation about bytes/text files
+        - PruneCruft also prunes _eumm/* now
+
+5.031     2015-01-08 22:04:30-05:00 America/New_York
+        - correct a test to avoid testing symlinks on Win32
+
+5.030     2015-01-04 22:31:38-05:00 America/New_York
+        - fixed [GatherDir]'s handling of symlinks to directories
+        - [AutoPrereqs] now filters out all namespaces found in contained
+          modules, not just the one corresponding to the module filename
+
+5.029     2014-12-14 14:44:44-05:00 America/New_York
+        - fix new error in [PkgVersion] when a module had no package
+          statements
+        - further rip out use of JSON.pm
+
+5.028     2014-12-12 19:06:23-05:00 America/New_York
+        - fix regression in [PkgVersion] that made false-positive
+          identifications for pre-existing assignments to $VERSION
+        - try avoid cases in which plugin code directly modifies file list
+        - switch, tentatively, to JSON::MaybeXS
+
+5.027     2014-12-09 09:30:30-05:00 America/New_York
+        - fix regression in Plugin->plugin_from_config which started passing a
+          list of pairs rather than a hashref
+
+5.026     2014-12-08 21:33:55-05:00 America/New_York
+        - eliminate use of Moose::Autobox
+        - various small performance optimizations
+        - add "use_our" option to PkgVersion
+
+5.025     2014-11-10 21:12:14-05:00 America/New_York
+        - fix file.t failures with perl v5.14 and v5.16's Carp
+
+5.024     2014-11-05 23:08:07-05:00 America/New_York
+        - add the %Mint stash for minting defaults
+        - quiet down some low-priority log lines
+        - teeny tiny optimization by building dist prereqs structure lazily
+        - avoid ever requiring v0 of ExtUtils::MakeMaker
+        - fix a module-loading ordering issue in `dzil setup`
+
+5.023     2014-10-30 22:56:42-04:00 America/New_York
+        - optimizations to loading of heavyweight libraries in cmd line app
+        - some tests are now skipped on Win32 to avoid filename insanity
+        - files' added_by data should be more informative
+        - conflicts with installed code is now detected and/or advertised
+
+5.022     2014-10-27 22:55:53-04:00 America/New_York
+        - several optimizations to how PPI is used
+        - handle an empty ABSTRACT better
+        - now properly merging distmeta fragments together without loss, using
+          new CPAN::Meta::Merge
+        - create Makefile.PL and Build.PL files earlier, so they're in the file
+          list "the whole time"
+
+5.021     2014-10-20 22:43:52-04:00 America/New_York
+        - improve authordeps' ability to cope with version requirements and
+          non-default plugin names
+        - a few improvements to help given by "dzil help COMMAND"
+        - fixes a situation where exclusion-regexp-building in GatherDir
+          could mangle the given regexps
+        - now properly merging distmeta fragments together without loss, using
+          new CPAN::Meta::Merge (Karen Etheridge)
+        - [PkgVersion] now properly skips over $VERSION assignments in
+          comments (Karen Etheridge, github #322)
+        - the building of manpages is supressed in [MakeMaker]-driven builds
+        - lazily load quite a few more modules
+        - avoid using user's ~/.dzil even more
+        - while building dists for testing, don't bother building man pages
+        - try harder to notice minimum required perl version
+        - try harder to delete temporarily directory at the end of testing
+        - don't treat $VERSION assignments in comments as $VERSION assignments
+        - listdeps now takes --omit-core to skip core modules
+        - don't try to use terminal encoding on locale-free systems
+        - suggest the use of PPI::XS
+        - speed up and debug behavior of GatherDir
+
+5.020     2014-07-28 20:56:25-04:00 America/New_York
+        - the default required version for ExtUtils::MakeMaker in [MakeMaker]
+          has been removed
+        - load DateTime lazily
+        - the default required version for Module::Build in [ModuleBuild] has
+          been lowered
+
+5.019     2014-05-20 21:11:47-04:00 America/New_York
+        - remove a very brief-lived attempt to double-decode
+
+5.018     2014-05-20 21:07:04-04:00 America/New_York
+        - attempt to return abstract-from-file as a string, rather than
+          bytes, which can lead to weirdness (github issue #303)
+
+5.017     2014-05-17 08:35:33-04:00 America/New_York
+        - dotfiles and dot-directories are now included in sharedirs
+        - ModuleBuild and MakeMake should not re-build if it isn't needed
+        - authordeps now better understands "perl" dep
+        - munging of README is delayed to prevent unneeded work and
+          complication
+        - MANIFEST is now treated as a binary file
+        - 'dzil setup' now warns that credentials are stored in the clear
+        - MakeMaker should include fewer empty and useless hashrefs
+        - Makefile.old is now pruned as cruft
+
+5.016     2014-05-05 22:27:06-04:00 America/New_York
+        - hint about [Encoding] plugin in encoding error message (David
+          Golden)
+
+5.015     2014-03-30 21:55:36-04:00 America/New_York
+        - make it easier to have multiple PAUSE configs using UploadToCPAN's
+          pause_cfg_dir option (thanks, David Golden)
+
+5.014     2014-03-16 16:47:07+01:00 Europe/Paris
+        - Added 'jobs' argument for 'dzil test' for parallel testing (thanks,
+          David Golden!)
+        - add default_jobs attribute to TestRunner role
+        - fix the behavior of 'dzil add' with more than one file
+          (thanks, Leon Timmermans!)
+
+5.013     2014-02-08 17:08:16-05:00 America/New_York
+        - META.json is now a UTF-8 file, rather than ASCII
+        - document the use of filefinders in [PkgVersion], and remove
+          filtering out of .t, .pod files; do skip non-text files, though
+        - always load modules in "extra tests" like pod-coverage.t
+        - PruneCruft also prunes ./fatlib
+        - avoid being tricked by statements in __END__ section when looking for
+          variable assignments
+        - if "dzil install" fails due to exception, it is now propagated
+        - provide a better error when terminal encoding can't be determined
+
+5.012     2014-01-15 09:58:00-05:00 America/New_York
+        - when handling a multi-line abstract, fold the lines on whitespace;
+          previously, the newlines had been left in, which caused downstream
+          warnings
+
+5.011     2014-01-12 16:09:29-05:00 America/New_York
+        - ->VERSION is again defined in the tester forms of Builder and Minter
+        - remove a small obsolete code path from PkgVersion
+
+5.010     2014-01-11 22:06:04-05:00 America/New_York
+        - stop sharing a reference to cached PPI docs, which led to spooky
+          action at a distance
+        - PkgVersion no longer surrounds the new $VERSION assignment with a
+          bare block
+        - if there's a blank line after the package statement (and any number
+          of comment-only lines), PkgVersion will use that for a $VERSION
+          assignment, rather than insert a new line; this can be made mandatory
+          with die_on_line_insertion
+
+5.009     2014-01-07 20:21:17-05:00 America/New_York
+        - include time offset by default in NextRelease
+        - always pass PPI octets, not text
+
+5.008     2013-12-27 21:57:02 America/New_York
+        - fix utterly broken `dzil run`
+
+5.007     2013-12-27 20:50:45-05:00 America/New_York
+        - add the ability to say "dzil run --no-build" to run a command without
+          building inside the dist dir
+          (in other words, no `perl Makefile.PL && make`)
+        - Archive::Tar::Wrapper added as a recommended prereq
+        - fix :ShareFiles (thanks, Christopher J. Madsen and Karen Etheridge)
+        - new :AllFiles and :NoFiles filefinders (thanks, Karen Etheridge)
+        - most files generated by dzil plugins now self-identify with comments
+
+5.006     2013-11-06 09:21:12 America/New_York
+        - add ->is_bytes to files; shortcut for ->encoding eq 'bytes'
+          (thanks, David Golden)
+        - AutoPrereqs will not try scanning binary files (thanks, David Golden)
+
+5.005     2013-11-02 16:32:04 America/New_York
+        - add --keep-build-dir to "dzil test" and "dzil install"
+
+5.004     2013-11-02 09:59:18 America/New_York
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - stable release of all the v5 changes below; READ THEM!
+        - by default, NextRelease now adds a trial release marker on trial
+          releases
+        - dzil setup will not echo password during setup
+
+5.003     2013-10-30 08:02:59 America/New_York
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - add "dzil --version" support (thanks, Upasana Shukla)
+        - fix boneheaded mistake that broke listdeps in 5.002 (thanks, Karen
+          Etheridge)
+
+5.002     2013-10-29 10:35:54 America/New_York
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - perform encoding steps during listdeps
+
+5.001     2013-10-23 17:40:09 America/New_York
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - typo fixes (thanks, David Steinbrunner)
+
+5.000     2013-10-20 08:10:02 America/New_York
+        [THIS RELEASE MIGHT BREAK YOUR BUILD]
+        - all files now have content, encoded_content, and encoding attributes
+        - the Encoding plugin and EncodingProvider role have been added to
+          allow you to set the encoding on files; the default is UTF-8
+        - config.ini is assumed to be in UTF-8
+        - Data::Section sections are assumed to be UTF-8
+        - the Term chrome should encode input and output
+
+4.300039  2013-09-20 06:05:10 Asia/Tokyo
+        - tweak metafile generator to keep CPAN::Meta validator happy (thanks,
+          David Golden)
+
+4.300038  2013-09-08 09:18:34 America/New_York
+        - add horrible hack to avoid generating non-UTF-8 META.yml; seriously,
+          don't look at the code!  Thanks, David Golden, whose code was simple
+          and probably much, much saner, but didn't cover as many cases as rjbs
+          wanted to cover.
+
+4.300037  2013-08-28 21:43:36 America/New_York
+        - update repo and bugtacker URLs
+
+4.300036  2013-08-25 21:41:21 America/New_York
+        - read CPAN::Uploader config with CPAN::Uploader, to work with new
+          trial releases supporting encrypted credential (thanks, Mike Doherty)
+
+        - improve tester tests (thanks, Dave O'Neill!)
+
+        - use Class::Load instead of Class::MOP
+
+        - better error messages when a bundle can't be loaded by @Filter
+
+        - make dynamic_config distmeta sticky; once one plugin sets it, it
+          stays stuck
+
+        - add a die_on_existing_version option to PkgVersion
+
+        - switch (for now?) "dzil install" to use cpanm
+
+        - PkgVersion won't rewrite file contents if nothing was changed
+          (thanks, Mike Doherty!)
+
+4.300035  2013-06-19 21:37:28 America/New_York
+        - update for new Perl::PrereqScanner, which will find "lib"
+
+        - update AutoPrereqs to skip Config and Errno
+
+        - fix docs to not suggest obsolete "Prereq" name (thanks, Ivan
+          Bessarabov!)
+
+4.300034  2013-04-13 16:56:48 Europe/London
+        - delay loading of CPAN::Uploader, and require a newer version to
+          require HTTPS (thanks, Olivier Mengué!)
+
+4.300033  2013-04-05 15:00:37 America/New_York
+        - fix .build/latest (thanks, Karen Etheridge!)
+
+        - doc fixes (thanks, Randy Stauner!)
+
+4.300032  2013-03-29 16:41:11 America/New_York
+        - test_requires support for ModuleBuild and MakeMaker (thanks,
+          Tatsuhiko Miyagawa!)
+
+4.300031  2013-03-17 21:47:31 America/New_York
+        - stacktrace removed from exception when a plugin's minimum version
+          check fails (thanks, Karen Etheridge!)
+
+        - add 'dzil listdeps --json', which lists all prerequisites broken up
+          by phase and type, in readable JSON format (thanks, Karen Etheridge!)
+
+        - improve errors when there's not enough configuration and no global
+          config file can be found (thanks, Dimitar Petrov)
+
+        - delay loading yet more libraries until needed (thanks, Olivier
+          Mengué!)
+
+4.300030  2013-01-30 22:25:27 America/New_York
+        - listdeps --versions now sorts properly (thanks, Karen Etheridge!)
+
+        - delay loading more libraries until needed (thanks, Olivier Mengué!)
+
+        - excluded filenames in GatherDir were sometimes matched too fuzzily
+          (thanks, Mike Doherty)
+
+4.300029  2013-01-14 20:03:15 America/New_York
+        - allow :version directive in root section to require a given version
+          of Dist::Zilla
+
+        - simply and speedify some of GatherDir (Thanks, Olivier Mengué!)
+
+4.300028  2012-10-19 10:50:42 America/New_York
+        - when picking modules to treat as "part of the dist," be more lax in
+          understanding libraries under ./t:  ./t/lib/Foo.pm is now treated as
+          providing t::lib::Foo, lib::Foo, and Foo
+
+4.300027  2012-10-16 21:07:06 America/New_York
+        - the "latest" symlink code broke Dist::Zilla on win32; fixed now!
+          (thanks, Brendan Byrd!)
+
+4.300026  2012-10-13 22:21:17 America/New_York
+        - PodSyntaxTests, PodCoverageTests and MetaTests now add the right
+          develop/requires prereqs (thanks, Olivier Mengué and Ricardo Signes!)
+
+        - ModuleBuild now takes an mb_lib argument that can override the
+          default of "inc" (thanks, ben hengst)
+
+        - create .build/latest symlink when a build in .build is built (thanks,
+          Alexei Znamensky!)
+
+        - allow "-version" arg to [@Filter] to specify the version of the
+          bundle required (thanks, Rob Hoelz)
+
+4.300025  2012-10-07 23:02:33 America/New_York
+        - add the LicenseProvider and NameProvider roles (thanks, Vyacheslav
+          Matjukhin!)
+
+        - make Dist::Zilla::App::Tester be a CaptureExternal App::Cmd::Tester
+
+4.300024  2012-09-26 12:01:45 America/New_York
+        - include $] in MetaConfig data
+
+4.300023  2012-09-06 09:01:12 America/New_York
+        - do not use ">" in a filename; fixes the build on Win32 (thanks,
+          djgoku!)
+
+4.300022  2012-09-05 08:35:27 America/New_York
+        - do not detect an escaped "\$VERSION =" as an assignment to a variable
+          (this is sort of a half-measure)
+
+        - 'dzil run' also edits $PATH to include ExecDir directories (Karen
+          Etheridge)
+
+4.300021  2012-07-31 23:20:50 America/New_York
+        - plugins can now provide a MANIFEST.SKIP that can be processed by
+          ManifestSkip. Previously generated content was just ignored.
+          (thanks, Olivier Mengué!)
+
+        - GenerateFile can now also template its filename, with the
+          name_is_template option (Thanks, Karen Etheridge!)
+
+4.300020  2012-06-21 11:17:40 America/New_York
+        - properly set the working directory when testing (thanks, Jesse
+          Luehrs!)
+
+4.300019  2012-06-20 15:36:01 America/New_York
+        - avoid looking outside the dist during testing (thanks, Jesse Luehrs!)
+
+4.300018  2012-06-07 22:25:03 America/New_York
+        - format codes %E, %T, %U, & %V added to NextRelease (thanks,
+          Karen Etheridge & Christopher J. Madsen!)
+
+4.300017  2012-05-31 12:17:45 America/New_York
+        - also check plugin version requirements in dzil authordeps --missing
+          (Karen Etheridge)
+
+        - add 'dzil add' to add new modules to an existing dist (thanks, David
+          Golden!)
+
+        - misc. bugfixes (thanks, Karen Etheridge and Olivier Mengué!)
+
+4.300016  2012-05-04 22:09:10 America/New_York
+        - make AutoPrereqs treat .psgi files as scannable (thanks, Jakob Voss!)
+
+        - add yet more links in plugins documentation to help discoverability
+          of other plugins.  (thanks, Olivier Mengué!)
+
+        - AutoPrereqs: skip author and release tests when scanning (RT#76305).
+          (thanks, Olivier Mengué!)
+
+4.300015  2012-04-23 21:38:21 America/New_York
+        - require a CPAN::Meta::Requirements 2.121 to get the
+          requirements_for_module (thanks, Olivier Mengué!)
+
+        - 'dzil run' with no arguments will now invoke a new shell.  (thanks,
+          Karen Etheridge!)
+
+        - dzil clean now has has a "dry run" option.  (thanks, Karen
+          Etheridge!)
+
+        - add more links in plugins documentation to help discoverability
+          of other plugins.  (thanks, Olivier Mengué!)
+
+        - support :version requirement for bundles (thanks, Randy Stauner!)
+
+4.300014  2012-04-05 12:46:33 America/New_York
+        - added the CPANFile plugin to create "cpanfile" prereq format
+
+        - stop emitting an empty line in authordeps output (thanks, Olivier
+          Mengué!)
+
+4.300013  2012-03-31 15:55:47 Europe/Paris
+        - dzil test has a new option, --all, which is the equivalent of
+          --release --automated --author.
+
+4.300012  2012-03-30 14:31:56 Europe/Paris
+        - add 0 and never <undef> to the prereqs (thanks, David Golden)
+
+4.300011  2012-03-30 11:42:44 Europe/Paris
+        - do not claim that a dep is missing in "listdeps" when it is present
+          with an undef $VERSION and we only require version 0 (reported by
+          Matthew Horsfall)
+
+4.300010  2012-03-15 21:38:58 America/New_York
+        - The GatherDir::Template documentation has been improved
+          (Thanks, Christopher J. Madsen!)
+
+        - Depend on a more recent version of Config::MVP, which requires a fix
+          in Class::Load to fix detection of plugin compilation errors on
+          perl5.8.8 (see Class::Load Changes file for details.)  (Karen
+          Etheridge)
+
+        - Add --versions support to listdeps and authordeps (Cory G Watson)
+
+        - Documentation fixes
+
+4.300009  2012-02-21 19:38:29 America/New_York
+        - PruneCruft also excludes the _Inline/ directory and MYMETA.json
+
+        - MakeMaker has been refactored to make it easier to subclass
+          (Thanks, Christopher J. Madsen!)
+
+4.300008  2012-02-16 17:28:34 America/New_York
+        - work around qr//m bug in 5.8.8 and earlier (thanks, Randy Stauner!)
+
+        - Fix to MakeMaker plugin: use separate scope for code that changes
+          namespace, when inserting ShareDir code. (RT#74788) (Karen Etheridge)
+
+4.300007  2012-02-02 22:23:05 America/New_York
+        - Remove configs beginning with ':' from argument list before
+          constructing that config; fixes issue where :version was
+          being passed to a plugin that had a strict constructor. (Karen
+          Etheridge)
+
+4.300006  2011-12-30 15:28:34 America/New_York
+        - New methods dist_basename & archive_filename allow plugins
+          to reliably get that information.  This makes TestRelease
+          testable. (Thanks, Kent Fredric & Christopher J. Madsen!)
+
+        - Your PAUSE password will now no be echoed if entered at the
+          prompt, on most operating systems (Thanks, Mike Doherty!)
+
+        - replace use of Version::Requirements with CPAN::Meta::Requirements,
+          its replacement
+
+4.300005  2011-12-13 08:49:19 America/New_York
+        - Prereqs now actually understands -relationship as documented
+          in 4.300004.  Also, it throws an error if you give it a
+          plugin name that does not specify a relationship (Thanks,
+          Christopher J. Madsen!)
+
+4.300004  2011-12-12 23:34:30 America/New_York
+        - a new FileFinder plugin has been added, FileFinder::Filter
+          (Thanks, Christopher J. Madsen!)
+
+        - AutoPrereqs can now be told to determine configure_requires
+          (Thanks, Christopher J. Madsen!)
+
+        - the (lack of) order of check of authordeps is now a bit more
+          predictible:
+          - plugins declared with "; authordep" lines are loaded before others
+          - inc:: plugins are checked first and in ASCII order
+          (Thanks, Olivier Mengué!)
+
+        - Many slow-to-load modules are now loaded opportunistically to improve
+          startup time.  (Thanks Olivier Mengué and rjbs)
+
+        - ShareDir documentation has been improved (thanks, Karen
+          Etheridge)
+
+        - Prereqs documentation has been improved
+
+4.300003  2011-10-31 23:58:19 America/New_York
+        - If no credentials are found on disk, UploadToCPAN will now prompt for
+          credentials during the BeforeRelease phase, not during release
+          (Thanks, Christopher J. Madsen!)
+
+        - AutoPrereqs can now be told what scanners or extra_scanners args to
+          pass to Perl::PrereqScanner (Thanks, Christopher J. Madsen!)
+
+        - Prune perl prereqs out of BUILD_REQUIRES for EU::MM, and pick the
+          highest required perl of either runtime or built requires.  (Thanks,
+          Christopher J. Madsen!)
+
+        - Test routines should now properly report the calling line for
+          failures ($Test::Builder::Level is being set) (Thanks, Christopher J.
+          Madsen!)
+
+        - the is_filelist test assertion now works with objects that do the
+          Dist::Zilla::Role::File role (Thanks, Christopher J. Madsen!)
+
+        - a new FileFinder plugin has been added, FileFinder::ByName
+          (Thanks, Christopher J. Madsen!)
+
+4.300002  2011-09-22 09:43:45 America/New_York
+        - fix a bug that does Weird Stuff when a 0b file exists (thanks,
+          Christian Walde!)
+
+4.300001  2011-09-19 15:46:18 America/New_York
+        - Several improvements to how PPI is used should speed up the
+          performance of Perl file munging and scanning.  The PPI role was
+          added.  (Thanks, Dave Rolsky!)
+
+        - We now use Archive::Tar::Wrapper if available, to speed up archive
+          building.  (Thanks, Dave Rolsky!)
+
+4.300000  2011-08-19 10:12:36 America/New_York
+        - turn on Useqq option for Dumper, to get unicode string literals set
+          properly in Makefile.PL and Build.PL without using utf8.pm
+
+        - decode user input from Chrome::Term as UTF-8
+
+        - during `dzil setup`, the config.ini file is now created with an added
+          umask of 077 to avoid other users reading your PAUSE credentials
+
+        - update almost all Moose code to use make_immutable and
+          namespace::autoclean
+
+4.200018  2011-08-18 11:13:03 America/New_York
+        - correct Perl::PrereqScanner version requirement, which was too low
+
+4.200017  2011-08-17 18:54:07 America/New_York
+        - require and adapt to the new Perl::PrereqScanner, which does not
+          prune out prereqs just because they're core and common
+
+4.200016  2011-08-17 18:07:21 America/New_York
+        - add options to exclude files from GatherDir (David Golden)
+
+4.200015  2011-08-12 13:45:42 America/New_York
+        - don't build the dist in a directory with -TRIAL in the name; this
+          should fix bugs in "dzil release --trial" and probably other related
+          bugs
+
+4.200014  2011-08-07 18:18:01 America/New_York
+        - add documentation for TemplateModule (thanks, Kent Fredric)
+
+        - fixes to tester.t for Win32 (thanks, Christian Walde)
+
+4.200013  2011-08-05 09:30:01 America/New_York
+        - "dzil listdeps --missing" no longer dies if it encounters an invalid
+          $VERSION (Jesse Luehrs)
+
+        - PkgVersion and PkgDist no longer use BEGIN blocks
+
+4.200012  2011-07-18 09:02:09 America/New_York
+        - allow abstracts of more than one line, or with more than one word
+          before the dash, to be properly extracted (Florian Ragwitz)
+
+        - stringify tarball name to work with older Archive::Tar (Jan Tore
+          Morken)
+
+4.200011  2011-07-14 22:53:34 America/New_York
+          move the file mode setting into the tar creation, not a fixup step
+
+4.200010  2011-07-14 22:27:46 America/New_York
+          fix [rt.cpan.org #68223] -- Test::Dzil built tarballs with bad root
+          dirs;  test and code mostly provided by Rob Hoelz
+
+4.200009  2011-07-06 23:26:09 America/New_York
+          the "skip" argument to AutoPrereqs can now be given multiple times
+
+          authordeps now makes a rough attempt to deal with [@Filter]
+
+          catch and simplify "no dist.ini" errors from MVP
+
+          UploadToCPAN now takes a "upload_uri" option
+
+          UploadToCPAN will now prompt for credentials if needed
+
+          add follow_symlinks to GatherDir (thanks, Luc St-Louis)
+
+4.200008  2011-06-23 11:53:56 America/New_York
+          PodVersion no longer drops the file's last newline
+
+          listdeps now includes recommended prereqs as well as required
+
+4.200007  2011-06-01 21:52:00 America/New_York
+
+          always numify the version use in "use VERSION" in Makefile.PL
+
+4.200006  2011-04-28 21:14:04 America/New_York
+
+          MakeMaker-generated Makefile.PL now only has configure_requires of
+          6.30 so dists can be installed on RHEL5
+
+          improve consistency and options of *_TESTING env vars (Apocalypse)
+
+          improve FileFinder-related documentation (thanks, Apocalypse)
+
+          add a default file finder called :IncModules (thanks, Apocalypse)
+
+          add a default file finder called :MainModule (thanks, Mateu X.
+          Hunter)
+
+          phase for named Prereqs defaults to Runtime if omitted (Jonathan Yu)
+
+          extract the *Runner role implementations from ModuleBuild to
+          Role::BuildPL (Leon Timmermans)
+
+4.200005  2011-04-25 12:20:59 America/New_York
+
+          provide actual name of releaser(s) in ConfirmRelease
+
+          error message if "dzil run" is run without a command to run
+
+          some minor refactoring in listdeps (Jon Rockway)
+
+          listdeps can now skip already-met prereqs (Jesse Luehrs)
+
+          authordeps now skips plugins under inc:: (Jesse Luehrs)
+
+          authordeps now scans for "; authordep" comments
+
+4.200004  2011-02-11 16:17:37 America/New_York
+
+          Add Tests for Config::MVP 2.200 changes. ( Kent Fredric )
+
+          MetaNoIndex, originally by J.T. Smith and Mark Gardner, is now
+          included
+
+4.200003  2011-02-06 21:37:45 America/New_York
+          avoid test failures on systems where time zone can't be determined
+
+4.200002  2011-02-04 18:02:16 America/New_York
+          Test::DZil is now installed and available to other dist
+
+4.200001  2011-01-19 21:59:18 America/New_York
+          add --author to listdeps (Jesse Luehrs)
+
+          better logging and error messages (Dave Rolsky, Jesse Luehrs)
+
+          get abstract from main module more reliably (David Golden)
+
+4.200000  2010-12-13 12:25:38 America/New_York
+          bump version to be easier to skim, until v5
+
+4.102346  2010-12-11 13:19:08 America/New_York
+          make errors during TextTemplate rendering fatal (thanks, Dave Rolsky)
+
+          provide MakeMaker::Runner if you want to provide your own Makefile.PL
+          (thanks, Florian Ragwitz)
+
+4.102345  2010-11-20 21:28:01 America/New_York
+          add somewhat obscure missing prereq
+
+4.102344  2010-11-19 19:34:21 America/New_York
+          PruneCruft now prunes XS-related and build files:
+          blib, pm_to_blib, .o, .bs, and .c files generated from .xs files
+
+          PkgVersion now include a "TRIAL" comment for trial dists
+
+          :InstallModules finder will now include main_modules, even if it was
+          not otherwise found as a .pm in ./lib
+
+4.102343  2010-11-09 07:49:50 America/New_York
+          private packages in PkgVersion can have comments after 'package'
+          before a newline (David Golden)
+
+          PruneFiles now accepts regex via the "match" parameter (thanks,
+          Nickolay Platonov)
+
+          Test chrome can be given canned responses to expected prompts
+          (thanks, Christopher J. Madsen)
+
+          version strings now checked against LaxVersionStr type in
+          PkgVersion, rather than our own regex
+
+4.102342  2010-10-14 23:28:20 America/New_York
+          Improved diagnostics for various 'main_module could not be found'
+          conditions. ( Kent Fredric )
+
+          Improved diagnostics for apparently missing plugins (thanks, David
+          Golden)
+
+          add --missing to authordeps (thanks, Danijel Tasov)
+
+4.102341  2010-09-17 19:14:41 America/New_York
+          ANNOYANCES: [AutoPrereq] and [Prereq] will now complain that you
+          should be using [AutoPrereqs] and [Prereqs];  the irregularly named
+          plugins will be removed in Dist-Zilla v5
+
+          add the "authordeps" command
+
+          avoid clobbering PERL5LIB env var when building
+
+          add "append_file" parameter to DistINI plugin
+
+          add "except" parameter to PruneCruft
+
+4.102340  2010-08-22 15:47:51 America/New_York
+          add files to archive in name-length order (thanks, Jonathan Scott
+          Duff)
+
+          improve permissions of created files on Win32 (thanks, Curtis Jewell)
+
+          do not clobber PERL5LIB during build (thanks, John Napiorkowski)
+
+4.102221  2010-08-10 11:35:00 America/New_York
+          use the new "mute" feature of Log::Dispatchouli to simplify listdeps
+          make TextTemplate rendering errors fatal
+          document the changes made in 4.102220
+
+4.102220  2010-08-10 07:46:27 America/New_York
+          pass a $dist var to TemplateModule templates
+
+4.101900  2010-07-09 09:05:25 America/New_York
+          add a "subdir" directory to UploadToCPAN
+
+4.101880  2010-07-07 09:25:41 America/New_York
+          stop being so pushy about running dzil setup (reported by AVAR)
+
+          dzil setup will not die if ~/.dzil does not exist (reported by David
+          Golden)
+
+4.101831  2010-07-02 18:33:58 America/New_York
+          correctly apply another patch from LA.pm that had been misapplied
+          earlier
+
+4.101830  2010-07-02 10:27:24 America/New_York
+          remove the internal-only VersionBootstrap plugin; no longer needed
+
+          fix a bad logging call in global config setup (LA.pm)
+
+          tweak to allow tests to pass on 5.8.7 and earlier
+
+4.101812  2010-06-30 23:02:15 America/New_York
+          correctly set local global config root variable (Dave Rolsky)
+
+4.101811  2010-06-30 09:51:43 America/New_York
+          load File::pushd in Minter, where it is needed
+
+4.101810  2010-06-30 09:41:59 America/New_York
+          internal reorganization of test data
+
+          tests should no longer fail if you have personal config in $HOME
+
+4.101801  2010-06-29 21:17:15 America/New_York
+          rename ClearPrereqs to RemovePrereqs
+
+          the Zilla assembler no longer provides a default zilla_class
+          (because doing so had lost any meaning)
+
+          update minter.t to work when *not* logged in as rjbs to his laptop
+
+4.101800  2010-06-29 10:29:38 America/New_York
+          during dist minting, ModuleMaker occurs before FileGatherer
+
+          ModuleBuild's module_build argument generation is now a method
+
+          Dist::Zilla is now an abstract base class, basically
+
+          * Dist::Zilla::Dist::Builder and ::Minter perform the real work
+
+          * Dist::Zilla::Tester has been updated to work with these
+
+          a very basic test for minting, now possible, has been added
+
+          added prune_file method to Dist::Zilla to eliminate the need for
+          altering the ->files arrayref directly
+
+          added the ClearPrereqs plugin
+
+          [Prereq] is now called [Prereqs], but [Prereq] will continue to work
+          until v6 or v7 or so
+
+4.101780  2010-06-27 14:30:55 America/New_York
+          the Chrome role now requires three input methods: prompt_any_key,
+          prompt_yn, and prompt_str
+
+          Term and Test chrome now implement the required input methods
+
+          ConfirmRelease now uses Chrome to prompt for input
+
+          `dzil setup` added to create a starting config.ini
+
+4.101740  2010-06-23 22:56:51 America/New_York
+          fix assembly of local stashes (Jesse Luehrs)
+
+          fix PkgVersion and PodVersion to work on scripts (M. Gardner)
+
+          add PkgDist plugin for questionable reasons
+
+          add MintingProfile, `dzil new -P` (rjbs and SamuraiJack)
+
+          add ModuleShareDirs for per-module ShareDir (David Golden)
+
+          add the User stash and make author use it by default
+
+          ManifestSkip no longer falls back to default MANIFEST.SKIP
+
+          minor improvements to documentation and consistency of code layout
+
+4.101612  2010-06-10 12:12:00 America/New_York
+          The PAUSE indexer will not be pleased. The 4.101610 PkgVersion
+          changes are entirely reverted.
+
+4.101611  2010-06-10 11:37:52 America/New_York
+          added nonsensical $VERSION = $VERSION to appease the PAUSE indexer
+          and other garbage code that evals a single line to guess at the
+          version's value
+
+4.101610  2010-06-10 10:01:37 America/New_York
+          Fix Win32 \r\n emission. \r\n is only emitted now if its there in
+          the original code. Tests included to make sure DZil doesn't sufer
+          the problem under itself on windows. (Kent Fredric)
+
+          Fix Tar permissions. (Kent Fredric, stolen from Module::Build)
+
+          @Filter can now pass arguments along to the filter if you use a new
+          dash-prefix config convention.  Consult its documentation for more
+          information.  (Florian Ragwitz)
+
+          PkgVersion now adds the version assignment to the same line as the
+          package declaration to avoid altering line numbering.  (David
+          Golden)
+
+4.101582  2010-06-07 18:23:04 America/New_York
+          improve tests to work with new CPAN::Meta
+
+          fix incorrect type constraint in UploadToCPAN
+
+4.101580  2010-06-07 10:21:51 America/New_York
+          make UploadToCPAN look at the right stash by default
+
+4.101570  2010-06-06 23:36:58 America/New_York
+          validate distmeta before writing to disk
+
+          changes to Dist-Zilla's distribution metadata to validate
+
+4.101550  2010-06-04 11:16:13 America/New_York
+          a number of minor changes to documentation
+
+          a few improvements to use of type constraints in Zilla.pm
+
+          some methods that were undocumented have been _-prefixed
+
+          ModuleBuild now turns on recursive_test_files unconditionally
+
+          the install_command argument to $zilla->install should now be an
+          arrayref
+
+          suppressed a stringifying-undef warning when using UploadToCPAN
+
+          no longer try to compose an obsolete Dist::Zilla::Config role
+
+4.101540  2010-06-03 23:52:52 America/New_York
+          INCOMPATIBLE CHANGES:
+
+          New global config system!
+
+          Your ~/.dzil/config.ini is now broken.  Running `dzil` should tell
+          you how to fix it.  Probably just replace [!release] with [%PAUSE]
+          and delete everything else.  Hope that helps!
+
+          Major refactoring of our use of Config::MVP; this probably won't
+          break anything unless you wrote your own config readers, which I'm
+          pretty sure you haven't done!
+
+          config parameters beginning with a colon are not passed to plugins
+          (this should not really affect anyone)
+
+          OTHER CHANGES:
+
+          plugins are now registered as soon as their config section has been
+          read
+
+          Dist::Zilla::Role::Stash has been added
+
+          :version can now be passed as a config section value to require that
+          the config's package be of the specified version
+
+          reserved config property names (plugin_name, zilla) are now fatal
+          during config read rather than plugin instantiation
+
+          core license attrs will look in the %Rights stash for defaults
+
+          `dzil new` will work if you have no configured profiles
+
+          generated Makefile.PL no longer has trailing spaces (Florian Ragwitz)
+
+          Document 'user' parameter for :FakeRelease (Kent Fredric)
+
+          will probably work just fine on Win32 now!
+
+3.101520  2010-06-01 11:50:16 America/New_York
+          unixify all gathered filenames (Christian Walde)
+
+          ModuleBuild can use a custom M::B class (David Golden, Dave Rolsky)
+
+          set release_status distmeta based on is_trial (Apocalypse)
+
+          PkgVersion ignores packages which have a newline between the package
+          keyword and the package name (Dave Rolsky)
+
+          add version to :ExecFiles (scripts) as well as libraries with
+          PkgVersion and PodVersion
+
+          added --in option to the 'build' command (Marcel Gruenauer)
+
+3.101461  2010-05-26 22:34:18 America/New_York
+
+3.101460  2010-05-26 08:14:23 America/New_York
+          note required version of Config::MVP::Reader::INI
+
+          require a newer CPAN::Meta::Converter for laxer url validation
+
+3.101450  2010-05-25 18:18:09 America/New_York
+          compatibility with Config::MVP v1
+
+          merge test requires into build requires for MakeMaker
+
+          require a newer CPAN::Meta::Converter for custom key downgrades
+
+3.101421  2010-05-22 20:48:10 America/New_York
+          note the new version of CPAN::Meta::Converter required
+
+3.101410  2010-05-21 22:17:44 America/New_York
+          cope with newest Config::MVP
+
+3.101400  2010-05-20 11:30:41 America/New_York
+          ModuleBuild now uses $^X to run Build (Christian Walde)
+
+          MakeMaker now uses the "make" program found in Config (Christian
+          Walde)
+
+3.101390  2010-05-19 09:15:32 America/New_York
+          INCOMPATIBLE CHANGES:
+
+          the as_distmeta method of Prereqs is removed
+
+          the ->prereq method on Dist::Zilla is gone (only prereqs remains)
+
+          distmeta is managed by CPAN::Meta, which expects v2 spec data by
+          default
+
+          most Dist::Zilla::Types are gone, now in MooseX::Types::Perl
+
+          OTHER CHANGES:
+
+          META.json and META.yml are now produced by CPAN::Meta
+
+          Dist::Zilla::Prereqs now proxies for CPAN::Meta::Prereqs
+
+          MetaResources supports CPAN Meta Spec version 2, but still works
+            with old-style resources as well (Dave Rolsky)
+
+          quote filenames with spaces in MANIFEST (Dave Rolsky)
+
+          Manifest plugin is now a FileGatherer, not an InstallTool
+
+          attempted a fix for `dzil install` on Win32 (RT #57404)
+
+2.101310  2010-05-11 09:02:45 America/New_York
+          update_filename arg added to NextRelease
+          `dzil new` can now be given a module name instead of dist name
+          PkgVersion will only declare $VERSION once per package in a file
+
+2.101290  2010-05-09 18:43:02 America/New_York
+          added GatherDir::Template (for use in dzil new profiles)
+          GatherDir will skip dot-dirs when excluding dotfiles
+
+2.101241  2010-05-04 22:51:31 America/New_York
+          tests should now pass on Win32
+
+          (these changes all thanks to APOCAL)
+          add GenerateFile plugin
+          make PodSyntaxTests require a newer, less-broken Test::Pod
+          sort and indent keys of args written to Makefile.PL and Build.PL
+          add %n and %t for \n and \t to NextRelease
+
+2.101240  2010-05-04 07:46:47 America/New_York
+          remove a 5.12 specific hunk of syntax (...) (thanks, BRICAS)
+
+2.101230  2010-05-03 23:42:27 America/New_York
+          NextRelease now has a time_zone parameter (thanks, APOCAL)
+
+          add a `dzil listdeps` command based on MARCEL's work (thanks, Robin
+            Smidsrød)
+
+          the new `dzil new` does stuff, but is not documented
+
+          add a "user" parameter to FakeRelease (David Golden)
+
+          minor documentation improvements here and there
+
+2.101170  2010-04-27 09:59:11 America/New_York
+          fix a bug that broke dists with multiple - in their name
+
+2.101160  2010-04-26 19:51:52 America/New_York
+          `dzil new` now does nothing and says so
+
+          dzil commands will not create a zilla object just for logging
+
+          easy bundles will less often create names with @@ in them
+
+2.101151  2010-04-25 23:40:28 America/New_York
+          GatherDir and PruneCruft now both have verbose log output
+
+          the App config system has been moved and made non-public; it was
+          crazy and awful
+
+          version numbers are not validated by version.pm, not my own dumb
+          regex
+
+          `dzil clean` no longer removes backup~ files (sorry, jq)
+
+          TestRelease is better about picking a build location (Christopher J.
+          Madsen)
+
+          better BUILD_REQUIRES treatment on ancient installer-side EU:MM
+          (David Golden)
+
+2.101150  2010-04-25 11:52:11 America/New_York
+          when duplicate files are added, report plugin_names with pkg/line
+          add missing version on String::RewritePrefix usage (Andrew Rodland)
+          more tweaking to how Chrome works
+
+2.101040  2010-04-14 11:54:45 America/New_York
+          added PluginBundle::Easy role (from Christopher J. Madsen)
+          changed @Basic and @Classic to use PluginBundle::Easy
+
+2.100991  2010-04-09 22:42:49 America/New_York
+          correct the 2.100990 release, which was broken in all $VERSION nums
+          add debug output to many more plugins
+          improve the -v switch to allow substrings (\bNAME\b) to match
+
+2.100990  2010-04-09 10:12:06 America/New_York
+          fix Pod errors in @Classic (thanks Ævar)
+
+2.100960  2010-04-06 17:00:26 America/New_York
+          added @Basic, more suitable for basic use than @Classic
+          delegate logging to the Dist::Zilla::App object
+          the controller attribute is now called "chrome"; this should last
+          replace File::chdir with File::pushd (David Golden)
+
+2.100922  2010-04-02 18:53:55 America/New_York
+          BuildRunner and TestRunner routines now must die, not return errors
+
+          added TestRelease plugin (from Christopher J. Madsen)
+          refactored run_tests_in out of the test method
+
+2.100921  2010-04-02 16:04:57 America/New_York
+          add the missing ->ensure_built method
+
+2.100920  2010-04-02 10:45:45 America/New_York
+          BeforeArchive plugins introduced (thanks, Graham Barr)
+          PkgVersion now puts version declaration in a BEGIN block
+          fix required version of Config::MVP
+          include recommendations in distmeta
+
+2.100880  2010-03-29 10:00:20 America/New_York
+          first non-dev release of version 2
+
+2.100870  2010-03-28 17:07:24 America/New_York
+
+2.100862  2010-03-27 13:32:01 America/New_York
+
+2.100861  2010-03-27 13:17:23 America/New_York
+          INCOMPATIBLE CHANGES:
+
+          the AllFiles plugin is now known as GatherDir
+
+          the InstallDirs plugin has been replaced by ExecDir and ShareDir
+
+          the PodTests plugin has been replaced by PodCoverageTests and
+          PodSyntaxTests
+
+          the FixedPrereq role is replaced with PrereqSource
+
+          OTHER CHANGES:
+
+          numerous improvements to testing libraries
+          ...and numerous actual tests!
+
+          added include_dotfiles option to GatherDir
+          allow relative root directory for GatherDir
+
+          AutoPrereq is now distributed with Dist::Zilla
+
+          AutoPrereq will make requirements only found in ./t "build_requires"
+
+          ConfirmRelease plugin added and made part of @Classic (dagolden)
+
+          MakeMaker-produced Makefile.PL will produce warnings less often
+
+          MakeMaker-produced Makefile.PL will require v6.31 for INSTALL_BASE
+
+          Prereq plugin can target config_requires, build_requires, etc
+
+          dzil takes -v arg to enable debugging globally or per-plugin
+
+          PkgVersion now adds a fully-qualified $VERSION variables, not 'our'
+
+          PruneCruft prunes MYMETA.yml
+
+          add 'dzil nop' command to initialize zilla object and exit
+
+1.100711  2010-03-12 12:51:55 America/New_York
+          remove bogus attempt to load obsolete DZ::Logger::Global
+
+1.100710  2010-03-12 09:58:10 America/New_York
+          huge update to logging system; uses Log::Dispatchouli::Proxy
+
+          UploadToCPAN, FakeRelease now log via the standard logger
+          App::Cmd layer
+
+          Zilla is shared between commands
+
+          bump up some prereqs to avoid bugs fixed upstream
+
+          HIGHLY EXPERIMENTAL: first pass at testing systems
+
+1.100660  2010-03-07 07:56:30 America/New_York
+          Global logger handles log_fatal correctly
+
+1.100651  2010-03-06 23:18:54 America/New_York
+          improve how plugin and pluginbundle names are generated and reported
+          improve logging to make it clear what is logging what
+          add a -v switch to dzil to allow "verbose" logging
+
+1.100650  2010-03-06 11:46:23 America/New_York
+          add some missing prereqs
+          now configured with @RJBS rather than custom set of plugins
+
+1.100630  2010-03-03 22:23:21 America/New_York
+          the log method now uses a pluggable logger, defaulting to
+            Log::Dispatchouli
+          plugins now log with a useful prefix to indicate what is logging
+
+          prerequisites are now managed by Dist::Zilla::Prereq
+          complex prereqs (a la Version::Requirement) are possible
+
+1.100600  2010-03-01 08:19:06 America/New_York
+          the File role provides a mode attribute; files are chmodded on write
+          the mode attribute may not be world-writeable
+          files gathered by AllFiles will have their on-disk mode &= 0755
+
+1.100520  2010-02-21 15:53:39 America/New_York
+          MakeMaker plugin correctly requires the right version of perl again
+
+1.100160  2010-01-16 15:37:29 America/New_York
+          require File::Install::ShareDir if needed for Makefile.PL share
+
+1.100130  2010-01-13 08:18:29 America/New_York
+          the args used in generated Build.PL or Makefile.PL are now mostly
+          generated by Data::Dumper instead of interpolation and quotemeta
+
+1.100120  2010-01-12 18:40:00 America/New_York
+          add 'dzil run' and BuildRunner (Jérôme Quelin)
+          improve behavior of 'dzil clean' with backup files (Jérôme Quelin)
+          dzil takes an -I option (Jérôme Quelin)
+          InstallDirs can now provide File::ShareDir-style installs (rjbs,
+            Jérôme Quelin, nperez)
+          Role::File now requires a content method (rjbs)
+          eliminate stupid noise spewed during 'dzil new' (rjbs)
+
+1.093400  2009-12-06 13:56:09 America/New_York
+          declare dependency on PPI introduced by 1.093370
+
+1.093371  2009-12-03 18:45:11 America/New_York
+
+1.093370  2009-12-03 18:42:30 America/New_York
+          PruneFiles now works... for real; only "filenames" works
+
+1.093370  2009-12-03 18:17:16 America/New_York
+          PruneFiles now works; the documented args for PruneFiles were wrong
+          PkgVersion now uses PPI to insert $VERSION; avoids many false inserts
+          Fix regression where failing tests still cleaned up the build dir.
+            ( Kent Fredric )
+
+1.093290  2009-11-25 14:45:45 America/New_York
+          switch from String::Format to String::Formatter
+
+1.093280  2009-11-24 11:24:52 America/New_York
+          include META.yml again for now
+          look at ~/.pause for upload config if it isn't in ~/.dzil/config
+
+1.093250  2009-11-21 14:14:20 America/New_York
+          refactor !release
+
+1.093220  2009-11-18 08:15:20 America/New_York
+          Module::Build now injects version deps in build_requires and
+          configure_requires, hopefully solving issues with version-upgrades.
+          new role BeforeRelease (Jérôme Quelin)
+          new role AfterRelease  (Jérôme Quelin)
+          default format for AutoVersion plugin changed (Jérôme Quelin)
+          NextRelease plugin updates changelog after release
+          new plugin FakeRelease (Jérôme Quelin)
+
+1.093160  2009-11-12
+          make TextTemplate use fill_this_in to avoid
+            https://rt.cpan.org/Ticket/Display.html?id=51473
+
+1.093140  2009-11-10
+          add the FileFinder role
+          "dzil test" will exit non-zero if tests fail
+
+          Split Test into plugins and have a pluggable test system.
+            ( Kent Fredric )
+
+1.093000  2009-10-26
+          require a newer Moose to avoid a few composition errors in older
+          Moose versions
+
+1.092990  2009-10-26
+          most of Dist::Zilla::Config has been moved to Config::MVP::Reader
+
+          THIS WILL BREAK BUNDLES:  bundles are now passed a hashref describing
+          the contents of the Config::MVP::Sequence configuring them, not just
+          the payload
+
+1.092930  2009-10-20
+          rebuild documentation with new PodPurler
+
+1.092850  2009-10-11
+          correct logic that finds tests to run
+          improve detection and use of main_module name (C. Madsen)
+          stop adding versions to test files (doy)
+
+1.092680  2009-09-25
+          improve error when main_module isn't found (Christopher J. Madsen)
+          rework version generation to be as lazy as possible (C. Madsen)
+          add a ->distmeta attribute in which metadata is collected (C. Madsen)
+          recognize more kinds of version declaration (Nicholas Perez)
+          fix documentation refering to ~/.dzil/config,
+            now in ~/.dzil/config.ini ( Kent Fredric )
+
+1.092450  2009-09-02
+          fix a bug in config loading for 'dzil' command (melo)
+
+1.092400  2009-08-28
+          require App::Cmd 0.300 (currently in dev)
+          fix prereq for Config::MVP
+
+1.092390  2009-08-27
+          do not break on config sections for non-moosey (app) plugins
+
+1.092360  2009-08-24
+          all config readers must now produce MVP sequences
+          the AutoVersion plugin now allows you to specify a time zone
+
+1.092310  2009-08-18
+          documentation for the 'dzil' commands (Kent Fredric)
+          restore the workingness of ~/.dzil and ~/.dzil/config
+
+1.092200  2009-08-07
+          include ./xt files in shipped dist
+
+1.092070  2009-07-27
+          *** MIGHT VERY WELL BREAK YOUR BUNDLES ***
+          major revamp of configuration subsystem, including pluggable config
+          readers and the new, highly-experimental and probably-stupid Perl
+          config reader
+
+1.091940  2009-07-12
+          fix version number of EUMM required to use LICENSE param
+          ( https://rt.cpan.org/Public/Bug/Display.html?id=47817 )
+
+1.091610  2009-06-09
+          up the required Pod::Eventual
+          tweak detection of Perl files by content (Jérôme Quelin)
+
+1.091480  2009-05-28 13:59:35 UTC
+          fix abstract-guessing to work with new Pod::Eventual
+
+1.091440  2009-05-24 18:01:51 UTC
+          more quotemeta in generated code
+          add namespace::autoclean (Florian Ragwitz)
+          remove unnecessary dep on MX::ClassAttribute (Florian Ragwitz)
+          break type declarations into their own library (Florian Ragwitz)
+
+1.091430  2009-05-23 01:48:20 UTC
+          add meta-spec entry to metafiles (thanks, doy)
+          generate MetaYAML with YAML::Tiny
+
+1.091370  2009-05-17
+          MetaJSON added
+          MetaYaml is now MetaYAML
+
+1.091260  2009-05-06
+          correct naming of plugins brought in by @Classic
+
+1.091250  2009-05-05
+          add AutoVersion plugin
+          avoid some warnings when making immutable
+          improved some documentation
+
+1.007     2009-04-21
+          add MetaProvider role and MetaResources plugin
+            inspired by the work of Fayland Lam
+
+1.006     2009-04-18
+          fix a small context error that broke 'dzil install' in some cases
+
+1.005     2009-04-18
+          numerous documentation fixes and minor bug fixes
+          added 'dzil install'
+          thanks to: hdp, sartak, Florian Ragwitz, alexv, obra
+          TODO: proper credits file
+
+1.004     2008-10-14
+          do not barf if there's no dzil config (thanks, ILMARI)
+
+1.003     2008-10-13
+          add "dzil new" to create a new dist.ini, etc
+          add "dzil release" to upload to the CPAN
+          both of these commands are really sketchy right now
+
+          use String::Flogger for log output rewriting
+
+1.002     2008-10-07
+          add missing prereqs
+
+1.001     2008-10-07
+          add missing prereqs
+
+1.000     2008-10-06
+          alright, let's just release this thing, even if it's only half baked.
+          well... maybe more like unbaked
+
+0.005     ?
+          allow alternate configuration readers
+          begin the long, hateful process of testing LOTS of existing code
+          some changes to AllFiles to allow more rewriting; for Data-Rx
+
+0.004     2008-06-10
+          fairly complete documentation
+
+0.003     2008-06-06
+          going to use this to build a bunch of stuff!

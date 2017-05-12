@@ -1,0 +1,12 @@
+create table cart (
+ id integer primary key not null,
+ name varchar(32),
+ price int unsigned
+);
+
+insert into cart (id,name,price) values (1,'apple' ,111);
+insert into cart (id,name,price) values (2,'orange',222);
+insert into cart (id,name,price) values (3,'fudge' ,null);
+insert into cart (id,name,price) values (4,'pear'  ,333);
+
+-- devilishly priced

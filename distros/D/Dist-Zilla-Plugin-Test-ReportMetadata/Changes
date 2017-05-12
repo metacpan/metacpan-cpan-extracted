@@ -1,0 +1,22 @@
+Revision history for Dist::Zilla::Plugin::Test::ReportMetadata
+
+0.5.1     2016-12-08 19:00:05
+          - Toolchain update
+
+0.4.1     2015-10-01 15:54:53
+          - Fewer test dependencies in boilerplate
+          - Smarter changelog parsing in git hook
+
+0.3.0     2015-09-11 13:28:37
+          - Try without Travis helpers
+          - Get Travis to install Devel::Cover
+          - Added coverage statistics to Travis output
+          - Trying Travis CI containers
+          - Upstream toolchain update
+          - Better prereq data for build and test phases
+          - Added broken smoker to exception list
+
+0.2.0     2015-07-16 13:28:21
+          - Renamed to ReportMetadata
+          - Added project files to master branch
+

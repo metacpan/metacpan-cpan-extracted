@@ -1,0 +1,165 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<title>Example for DBIx::Recordset</title>
+</head>
+
+<body bgcolor="#FFFF80">
+
+<h1>DBIx::Recordset Example </h1>
+
+<p>[- use DBIx::Recordset ; -][$if !defined ($fdat{'!DataSource'}) || !defined
+($fdat{'!Table'})|| defined($fdat{'showdsn'}) $][- delete $fdat{'showdsn'}-]</p>
+
+<form method="GET" action="search.htm">
+  <div align="left"><table border="0">
+    <tr>
+      <td>[-@drvs = DBI-&gt;available_drivers ; -]Available DBD drivers<br>
+      <select name="driver" size="7">
+        <option value="[+ $drvs[$row] +]">[+ $drvs[$row] +]</option>
+      </select></td>
+      <td>First of all you have to specify which database and table you want to access and enter
+      the user and password (if required)<p>For the Datasource you have the following Options:<br>
+      1.) choose a DBD driver from the list on the left and hit the Show Datasources button,
+      then you can select a Datasource below (if your DBD driver supports the <em>data_sources</em>
+      method)<br>
+      2.) enter the Data Source directly in the text field below</td>
+    </tr>
+  </table>
+  </div><p>[- @dsns = DBI-&gt;data_sources ($fdat{driver}) if ($fdat{driver}) ; @dsns = ()
+  if ($dsns[0] =~ /HASH/ ) ;-]</p>
+  <div align="left"><table border="0">
+    <tr>
+      <td>Datasource:</td>
+      <td>[$if $#dsns &gt;= 0 $]<select name="!DataSource" size="1">
+        <option value="[+$dsns[$row] =~ s/^DBI/dbi/ ; $dsns[$row]+]">[+$dsns[$row]+]</option>
+      </select>[$else$]<input type="text" name="!DataSource" size="20"> Datasource list not
+      available, enter DSN manual [$endif$]</td>
+    </tr>
+    <tr>
+      <td>Table:</td>
+      <td><input type="text" name="!Table" size="20"></td>
+    </tr>
+    <tr>
+      <td>User:</td>
+      <td><input type="text" name="!User" size="20"></td>
+    </tr>
+    <tr>
+      <td>Password:</td>
+      <td><input type="password" name="!Password" size="20"></td>
+    </tr>
+    <tr>
+      <td>Rows Per Page:</td>
+      <td>[- $fdat{'$max'} ||= 5 -]<input type="text" name="$max" size="20"></td>
+    </tr>
+  </table>
+  </div><p><input type="submit" value="Show Datasources" name="showdsn"><input type="submit"
+  value="Show whole table" name="show"><input type="submit" value="Specify condition"
+  name="cond"><input type="reset" value="Reset" name="Reset"></p>
+</form>
+
+<p>[$elsif defined ($fdat{'cond'}) $][-delete $fdat{'cond'}; $set = DBIx::Recordset -&gt;
+SetupObject (\%fdat) ; $names = $set -&gt; AllNames () if ($set) ; -]</p>
+
+<p>[$if $DBI::errstr $] ERROR: [+ $DBI::errstr +][$else$]</p>
+<div align="left">
+
+<table border="0">
+  <tr>
+    <td>DataSource:</td>
+    <td>[+ $fdat{'!DataSource'} +]</td>
+  </tr>
+  <tr>
+    <td>Table:</td>
+    <td>[+ $fdat{'!Table'} +]</td>
+  </tr>
+  <tr>
+    <td>User:</td>
+    <td>[+ $fdat{'!User'} +]</td>
+  </tr>
+  <tr>
+    <td>Start Row:</td>
+    <td>[+ $set -&gt; StartRecordNo +]</td>
+  </tr>
+  <tr>
+    <td>SQL Statement:</td>
+    <td>[+ $set -&gt; LastSQLStatement +]</td>
+  </tr>
+</table>
+
+<p>&nbsp;</p>
+</div>
+
+<form method="GET" action="search.htm">
+  <div align="left"><table border="0">
+    <tr>
+      <th>Fieldname</th>
+      <th>Operator</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <td>[+ $$names[$row] +]</td>
+      <td><input type="text" name="[+ &quot;*$$names[$row]&quot; +]" size="5"></td>
+      <td><input type="text" name="[+ $$names[$row] +]" size="20"></td>
+    </tr>
+  </table>
+  </div><p>[$hidden$]<input type="submit" value="Start search" name="search"><input
+  type="submit" value="Change Datasource" name="showdsn"><input type="reset" value="Reset"
+  name="Reset"></p>
+</form>
+
+<p>[$endif$][$else$][- *set = DBIx::Recordset -&gt; Search (\%fdat) ; -] [- $names = $set
+-&gt; Names () if ($set) ; -]</p>
+
+<p>[$if $DBI::errstr $] ERROR: [+ $DBI::errstr +][$else$]</p>
+<div align="left">
+
+<table border="0">
+  <tr>
+    <td>DataSource:</td>
+    <td>[+ $fdat{'!DataSource'} +]</td>
+  </tr>
+  <tr>
+    <td>Table:</td>
+    <td>[+ $fdat{'!Table'} +]</td>
+  </tr>
+  <tr>
+    <td>User:</td>
+    <td>[+ $fdat{'!User'} +]</td>
+  </tr>
+  <tr>
+    <td>Start Row:</td>
+    <td>[+ $set -&gt; StartRecordNo +]</td>
+  </tr>
+  <tr>
+    <td>SQL Statement:</td>
+    <td>[+ $set -&gt; LastSQLStatement +]</td>
+  </tr>
+</table>
+</div><div align="left">
+
+<table border="1">
+  <tr>
+    <th>[+ $$names[$col] +]</th>
+  </tr>
+  <tr>
+    <td>[+ $set[$row]{lc($$names[$col])} +]</td>
+  </tr>
+</table>
+</div>
+
+<p>[+ $set -&gt; PrevNextForm ('&lt;&lt;Previous Records', 'Next Records&gt;&gt;', \%fdat)
++]</p>
+
+<form method="GET" action="search.htm">
+  <p>[$hidden$]<input type="submit" value="Refresh" name="refresh"><input type="submit"
+  value="Specify condition" name="cond"><input type="submit" value="Change Datasource"
+  name="showdsn"></p>
+</form>
+
+<p>[$endif$][$endif$]</p>
+
+<p>[- DBIx::Recordset::Undef ('set') ; -]</p>
+</body>
+</html>

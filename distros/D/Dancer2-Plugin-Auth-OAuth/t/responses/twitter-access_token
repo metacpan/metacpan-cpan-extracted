@@ -1,0 +1,3 @@
+HTTP/1.1 200 OK
+
+oauth_token=some_dummy_token&oauth_token_secret=some_dummy_s3kret&user_id=666&screen_name=b10m&

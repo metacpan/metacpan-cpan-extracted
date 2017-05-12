@@ -1,0 +1,16 @@
+Artistic				Perl Artistic license
+Callsite.pm				The perl part (with the docs as pod)
+Callsite.xs				C code
+Changes					What changed?
+MANIFEST				This file
+MANIFEST.SKIP				Things to to list here
+META.yml                                Module meta-data (added by MakeMaker)
+Makefile.PL				How to build it
+ppport.h				Portability
+README					Description of package
+gpl-2.0.txt				GNU General Public License 2.0
+t/00test-pod.t				Checks POD formatting
+t/01callsite.t				Simple tests of callsite
+t/02debugger.t				Tests of callsite and context and when $^P is set;
+t/Makefile				in case you start out in directory t
+META.json                                Module JSON meta-data (added by MakeMaker)

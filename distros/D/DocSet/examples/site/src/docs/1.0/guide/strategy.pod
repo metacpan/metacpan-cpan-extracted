@@ -1,0 +1,76 @@
+=head1 NAME
+
+Choosing the Right Strategy
+
+=head1 Description
+
+This document discusses various mod_perl setup strategies used to get
+the best performance and scalability of the services.
+
+=head1 Do it like I do it!?
+
+There is no such thing as the B<right> strategy in the web server
+business, although there are many wrong ones. Never believe a person
+who says: I<"Do it this way, this is the best!">. As the old saying
+goes: I<"Trust but verify">. There are too many technologies out there
+to choose from, and it would take an enormous investment of time and
+money to try to validate each one before deciding which is the best
+choice for your situation.
+
+With this in mind, I will present some ways of using standalone
+mod_perl, and some combinations of mod_perl and other technologies.
+I'll describe how these things work together, offer my opinions on the
+pros and cons of each, the relative degree of difficulty in installing
+and maintaining them, and some hints on approaches that should be used
+and things to avoid.
+
+To be clear, I will not address all technologies and tools, but limit
+this discussion to those complementing mod_perl.
+
+Please let me stress it again: B<do not> blindly copy someone's setup
+and hope for a good result. Choose what is best for your situation --
+it might take B<some> effort to find out what that is.
+
+In this chapter we will discuss
+
+=over
+
+=item * Deployment of mod_perl in Overview, with the pros and cons.
+
+=item * Alternative architectures for running one and two servers.
+
+=item * Proxy servers (Squid, and Apache's mod_proxy).
+
+=back
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut
+

@@ -1,0 +1,45 @@
+---
+abstract: 'Determine Korean public holidays'
+author:
+  - 'Jeen Lee <aiatejin {at} gmail.com>, Keedi Kim < keedi.kim {at} gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-KR
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Date::Holidays::KR:
+    file: lib/Date/Holidays/KR.pm
+    version: '0.06'
+requires:
+  Date::Korean: '0'
+  DateTime: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/JEEN/p5-Date-Holidays-KR/issues
+  homepage: https://github.com/JEEN/p5-Date-Holidays-KR
+  repository: git://github.com/JEEN/p5-Date-Holidays-KR.git
+version: '0.06'
+x_contributors:
+  - 'Keedi Kim <keedi.k@gmail.com>'
+  - 'Jeen Lee <aiatejin@gmail.com>'
+  - 'Hyungsuk Hong <aanoaa@gmail.com>'
+  - 'JEEN Lee <jeen@perl.kr>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,9 @@
+Revision history for Perl module Danga::Socket::Redis
+
+0.04 Thurs Jul 15 11:56:02 2010
+     - Added most commands
+
+0.01 Mon Jul 12 11:56:02 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

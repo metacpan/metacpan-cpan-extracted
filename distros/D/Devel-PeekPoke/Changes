@@ -1,0 +1,17 @@
+0.04  2014-09-01 rurban
+    - Extend support to 5.18, 5.20 and 5.21 (RT: 98462, 95143, 76444)
+
+0.03  2012-12-29 11:25 (UTC)
+    - Fix incorrect operation on some OSes (cygwin) when ptrsize < ivsize
+    - Extend support to 5.16.x (RT#76444)
+
+0.02  2012-03-20 09:45 (UTC)
+    - Fix crashes when used in a threaded environment
+    - Fix memory corruption issues by preempting perl garbage collection
+      of the artificial string PV
+    - Fix describe_bytestring to work correctly with large offsets on
+      32bit machines
+
+
+0.01  2011-08-31 11:10 (UTC)
+    - initial release

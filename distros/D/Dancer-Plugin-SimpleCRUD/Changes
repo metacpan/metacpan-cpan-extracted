@@ -1,0 +1,235 @@
+Revision history for Dancer-Plugin-SimpleCRUD 
+
+1.11    2016-11-17
+        [ ENHANCEMENTS ]
+        - Add column_class feature to specify CSS classes for custom_columns
+          (joshrabinowitz)
+
+1.10    2016-10-28
+        [ ENHANCEMENTS ]
+        - Add search options for Less Than, Less Than or Equal To, 
+          Greater Than, and Greater Than or Equal To (joshrabinowitz)
+        - Searches default to equality test of key_column (joshrabinowitz)
+        - /widgets/add?field=value sets field value in form (joshrabinowitz)
+        - Improved tests check html generated from sqlite (joshrabinowitz)
+        - Update dependency versions in Makefile.PL (joshrabinowitz)
+        - Allow records to be editable and not addable, and vice-versa 
+          (joshrabinowitz)
+        - New hooks: delete_row_pre_delete, delete_row_post_delete 
+          (joshrabinowitz)
+        - Allow display of any column to be customised, and allow customised
+          columns based on DB columns to be sortable (based on the raw value in
+          the DB)  (joshrabinowitz)
+
+        [ BUG FIXES ]
+        - EXLOCK => 0 when creating temp file for SQLite DB tests - to avoid
+          test failures on *BSD systems (Issue #80, thanks to eserte)
+
+1.00    2016-09-05
+        [ ENHANCEMENTS ]
+        - Allow where_filter to be a coderef, for runtime determination
+          of criteria
+        - Better document hook support & other doc improvements
+        - where_filter extended to cover other routes
+        - CSS classes on tables (jackson-tim)
+        - custom_columns can now be ordered
+        [ BUG FIXES ]
+        - avoid accidental URL injections (joshrabinowitz)
+        - Require CGI::FormBuilder 3.10 to avoid uninitialized
+          var warnings (joshrabinowitz)
+
+
+0.99    2016-08-11
+        [ ENHANCEMENTS ]
+        - Add where_filter option, for easy display and 
+        editing of subsets of tables.  (joshrabinowitz)
+
+0.98    2016-07-26
+        [ ENHANCEMENTS ]
+        - allow searching for 0 (joshrabinowitz)
+        - improve search descriptions (joshrabinowitz)
+        - make searchtype option menu stick (joshrabinowitz)
+        - basic tests (joshrabinowitz)
+
+0.97    2016-07-23
+        [ ENHANCEMENTS ]
+        - Allow for searching on non-alphanumerics (joshrabinowitz)
+        - Add support for Does Not Contain / Does Not Equal searches 
+          (joshrabinowitz)
+        - Show query in search box in search results (joshrabinowitz)
+        [ BUG FIXES ]
+        - More careful about url/html injections (joshrabinowitz)
+
+0.96    2016-07-22
+        [ BUG FIXES ]
+        - Fix uninitialized value errors when re-sorting and downloading
+          searches (joshrabinowitz)
+        - less cryptic error message when you specify a non-existent table
+          (msouth)
+        [ ENHANCEMENTS ]
+        - view route (/prefix/view/:id) (msouth)
+
+0.95    2016-07-21
+        [ BUG FIXES ]
+        - Fix uninitialized value errors when paginating searches
+          (joshrabinowitz)
+        - Fix issue with markup in POD (joshrabinowitz)
+        - Disallows expansion of sprintf format strings in urls.
+          (joshrabinowitz)
+
+0.94    2015-07-30
+        [ ENHANCEMENTS ]
+        - Note that you should provide your DB config to D::P::D - as a result
+          of confusion of a newbie on IRC - thanks for letting me see that the
+          instructions just assumed that point was obvious, when it wasn't
+
+0.93    2014-10-29
+        [ SECURITY ]
+        - Don't repeat search queries back to the browser without escaping, for
+          that way lies XSS.
+
+0.92    2014-03-06
+        [ BUG FIXES ]
+        - Make the key_column feature work properly.  Thanks to tobyink on IRC -
+          we referred to params->{$key_column} which worked by accident if your
+          key column was 'id' (default), but if you'd changed it, it wouldn't
+          match the 'id' param from the route.  Also, be more robust about
+          looking for params from the desired source.
+
+0.91    2013-07-25
+        [ ENHANCEMENTS ]
+        - New hooks: add_edit_row_pre_save, add_edit_row_post_save (msouth)
+
+        - Foreign keys can now point to a field in the same table (msouth) 
+        - Selects can now derive optgroups from acceptable_values  (msouth)
+        
+        [ BUG FIXES ]
+        - Added uri_for() around _construct_url() calls that go to browsers
+          (helps with Plack::Builder-mounting of apps at prefix).  Use
+          use_old_url_scheme: 1 in plugin config if you want the old 
+          behavior (msouth)
+        - Foreign key join is now left join (helps with nullable foreign keys) (msouth)
+
+0.90    2013-05-04
+        [ BUG FIXES ]
+        - A few places missed using the Dancer prefix that may have been in
+          force at time of route creation, thanks to chenlin rao for reporting
+          (chenryn)
+        - Let the user supply default values for fields (msouth)
+        - Fix bugs causing dependence on D::P::A::E even when not configured to
+          use auth (msouth)
+
+0.80    2012-12-12 - the Michael J South release
+        [ ENHANCEMENTS ]
+        - New custom_columns feature, allowing you to transform columns on the
+          fly using HTML::Table::Database transformations - thanks to Michael
+          (msouth) for contributing this, and sorry it took so long to merge!
+
+0.71   2012-12-06 - the Rahul Kotamaraju release
+        [ BUG FIXES ]
+        - Handle Dancer prefix setting changing after simple_crud() is called
+          (reported by Rahul Kotamaraju in RT #73620)
+        - Work properly with named database handle - previously, if you supplied
+          a named DB connection to use, it would be used in some places but not
+          everywhere - there were some naked database->... calls without the
+          connection name passed.  This was also reported by Rahul in RT #73620
+          - thanks to Rahul for the reports, and sorry the RT ticket sat unseen
+            for so long!
+
+0.70    2012-11-28
+        [ ENHANCEMENTS ]
+        - Add new add_edit_row hook which fires just before a row is
+          added/edited, so the data can be modified if desired.  Thanks to Rene
+          on IRC for the idea.  (More hooks planned in future versions.)
+
+0.61    2012-07-19
+        [ BUG FIXES ]
+        - Fix issue with UTF-8 in the POD
+
+0.60    2012-06-22
+        [ ENHANCEMENTS ]
+        - Update example app to demonstrate the new basic foreign key support
+          added in the last evrsion
+
+        [ BUG FIXES ]
+        - Bug fixes to prevent fiery explosions in certain circumstances when
+          the JOIN for foreign key values results in ambiguous column names
+
+0.50    2012-02-05
+        [ ENHANCEMENTS ]
+        - New basic foreign key support, allowing you to specify that certain
+          columns are foreign keys, and describe which table they refer to, and
+          which keys in the foreign table should be used as the key and the
+          label, respectively.
+        - Use new -auto_pretty_headers option added to HTML::Table::Database so
+          that headers in display are automatically made a little nicer (for
+          example, "first_name" -> "First Name")
+        - Don't throw a warning if DB isn't MySQL.  I've tested this with SQLite
+          fairly extensively and it works fine, and it tries to use standard SQL
+          which should work anywhere.
+
+0.40    2012-01-16
+        - New input_types option, to override the type of input used for some
+          fields, if the default choice isn't suitable.
+
+0.30    2011-10-18
+        New features all kindly contributed by Assaf Gordon - thanks!  :
+        - New 'sortable' option to make tables sortable
+        - New 'paginate' option to paginate data display table
+        - New 'downloadable' feature to allow data to be downloaded in various
+          formats
+        - New 'query_auto_focus' option, to automatically set focus to the
+          search field
+        Awesome contributions, thanks!
+
+0.20   2011-10-07
+        New 'editable' option, for display-only usage - requested a long time
+        ago by @saberworks in Issue 12.
+
+0.11
+
+        Documentation fix for editable_columns / display_columns)
+         - thanks mlbright (Martin-Louis Bright)
+        Allow coderefs to be passed to acceptable_values option (useful if
+        you're generating acceptable values on the fly, say, based on another DB
+        query)
+        Use uri_for() to construct URLs, fixes Issue 15 by jasonjayr
+
+0.10    20111-06-05
+        Fix documentation on editable_columns;
+        Implement not_editable_columns (was documented, not implemented)
+        (ambs)
+
+        Add display_columns setting, to display which columns are shown when
+        listing records.  (PR-9 from saberworks - thanks!)
+
+0.05    2011-05-25
+        Pay attention to the app's prefix setting.  Thanks to saberworks for
+        reporting this (GH-6)
+        Fix bug with calling database->quick_update wrongly, preventing rows
+        from being updated... silly :|
+
+0.04    2011-05-11
+        Avoid uninitialised var warnings if table is empty.
+        Thanks to Justin Case in RT #68120 for reporting this and providing a
+        patch to fix it - cheers!
+
+0.03    2011-05-09
+        Added support to search when in the listing page;
+        Code refactoring - thanks to ambs for both!
+
+        Remove dependency on SQL::Abstract, use the convenience methods now
+        provided by Dancer::Plugin::Database instead.  Thanks to Jonathan
+        Berber for prompting this via RT #68040, reporting that setting
+        SQL::Abstract's quote_char to a backtick causes the generated queries to
+        be invalid for PostgreSQL.
+
+
+0.02    2011-03-06
+        Discard render_with_layout bodgery in favour of using
+        engines('template')->apply_layout().  Thanks to ambs for this.
+        Various other bug fixes.
+
+0.01    2010-12-21
+        Initial beta-quality release.
+

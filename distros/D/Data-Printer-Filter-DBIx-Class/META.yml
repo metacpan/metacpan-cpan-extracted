@@ -1,0 +1,42 @@
+---
+abstract: 'Apply special Data::Printer filters to DBIx::Class objects'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Data::Printer: '0.38'
+  Module::Build: '0.28'
+  Test::More: '0'
+  feature: '0'
+  parent: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Printer-Filter-DBIx-Class
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+requires:
+  Data::Printer: '0.38'
+  Data::Printer::Filter: '0'
+  Scalar::Util: '0'
+  Term::ANSIColor: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/Data-Printer-Filter-DBIx-Class/issues
+  homepage: https://github.com/oalders/data-printer-filter-dbix-class
+  repository: https://github.com/oalders/data-printer-filter-dbix-class.git
+version: '0.000004'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'

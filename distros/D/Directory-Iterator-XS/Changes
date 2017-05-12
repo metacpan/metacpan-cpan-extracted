@@ -1,0 +1,27 @@
+Revision history for Perl extension Directory::Iterator::XS.
+
+0.01  Mon Oct  1 09:33:25 2012
+	- original version; created by h2xs 1.23 with options
+		-A -b 5.6.2 Directory::Iterator::XS
+
+1.0 2012-10-07
+  * Backport tp perl 5.6.2
+  * Use File::Spec for directory seperator
+  * Add show_dotfiles
+  * Add method overloads
+
+1.0.1 2012-10-08
+  * Update manifest
+  * Add license
+
+1.0.2  2012-10-23
+  * Clean code to compile with -pedantic
+
+1.1 2012-12-08
+  * Add new options:
+    - show_directories
+    - prune_directory
+    - recursive
+1.1.1 2013-03-31
+  * Fix bug in show_directories
+  * Improve test coverage

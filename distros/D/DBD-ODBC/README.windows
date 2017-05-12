@@ -1,0 +1,145 @@
+Building DBD::ODBC on Windows
+=============================
+
+Quick hints:
+
+1. Make sure when you run "perl Makefile.PL" that you specify which
+   make you are using (dmake, nmake). You do this with:
+
+   perl Makefile.PL MAKE=nmake
+
+   If you don't, ExtUtils::MakeMaker will generate the Makefile for
+   the default make which may not be the one you are going to use and
+   this will lead to make errors.
+
+2. I've had a number of reports that attempting to build with Borland's
+   make does not work. If that happens to you please don't tell me; get
+   nmake or dmake.
+
+3. If you are not interested in Unicode support disable it as Unicode
+   support is built in by default on Windows builds. You can disable it
+   with -nou as in:
+
+   perl Makefile.PL -nou
+
+4. If you are manually attempting to build DBD::ODBC for use with
+   ActiveState Perl (ActivePerl) don't. You can use cpan like this:
+
+   cpan M/MJ/MJEVANS/DBD-ODBC-1.23_4.tar.gz
+
+   If you don't have Microsoft VC on your PATH, then this will
+   download and install MinGW for you (inside the Perl tree) and use
+   that instead.
+
+   This should work for the latest builds of all major Perl versions,
+   5.8.9.827, 5.10.1.1007 and 5.12.0.1200.  On older versions you may
+   need to install MinGW with PPM "by-hand" first:
+
+   ppm install MinGW
+   cpan M/MJ/MJEVANS/DBD-ODBC-1.23_4.tar.gz
+
+   On ActivePerl 5.8.8 and earlier you will have to download, install
+   and configure MinGW and dmake manually though, so you may not want
+   to bother...
+
+5. With Strawberry Perl you can install DBD::ODBC from cpan as normal
+   - see below.
+
+64bit Windows
+=============
+
+I have built DBD::ODBC on win64 and the tests to SQL Server completed
+successfully. However, you will need at least version 1.15 if you want
+to run DBD::ODBC on win64 successfully.
+
+If you are running a 32bit Perl on a 64bit Windows machine you will
+need to be aware there are two ODBC administrators and you need to
+create your DSNs with the right one. The ODBC Administrator you get to
+from Control Panel, Administrative Tools, Data Sources is the 64bit
+one and data sources created here will not be visible or useable from
+32bit applications. The ODBC administrator you need to use for 32bit
+applications can be found at X:\windows\syswow64\odbcad32.exe.
+
+Strawberry Perl
+===============
+
+If you attempt to install DBD::ODBC with:
+
+cpan -i DBD::ODBC
+
+cpan in strawberry perl adds INC to the command line and that
+overrides what MakeMaker attempts to add to INC. As a result, the
+build will probably be missing the include path for the DBIXS.h
+module.
+
+See http://rt.cpan.org/Public/Bug/Display.html?id=32811.
+
+Since DBD::ODBC 1.17_2 I believe we have a workaround in the
+Makefile.PL that stops this happening and in later Strawberry Perl
+versions the problem is fixed.
+
+Reported issues and workarounds
+===============================
+
+Missing SQLLEN/SQLULEN definitions
+==================================
+
+MS changed the ODBC header files and introduced SQLLEN/SQLULEN types
+which are required to build on 64 bit platforms so DBD::ODBC now needs
+them.
+
+If you find you are missing definitions for SQLLEN/SQLULEN you need
+updated header files. See the DBD::ODBC FAQ for where you can find
+them.
+
+Visual Studio 6.0 and SDK Feb 2003
+==================================
+
+It has been reported to me that there are problems building DBD::ODBC
+with VS 6 on some setups (thanks to JHF Remmelzwaal for the following
+example and workaround).
+
+Initially an nmake failed with:
+
+C:\Program Files\Microsoft SDK\Include\.\windows.h(157) : fatal error
+C1083: Cannot open include file: 'excpt.h': No such file or directory
+
+This was solved by:
+
+set PASTHRU_INC=-I"c:\Program Files\Microsoft SDK\include" -I"c:\Program Files\Microsoft Visual Studio\VC98\include"
+
+which led to:
+
+ODBC.obj : error LNK2001: unresolved external symbol __fltused
+dbdimp.obj : error LNK2001: unresolved external symbol __fltused
+unicode_helper.obj : error LNK2001: unresolved external symbol __fltused
+ODBC.obj : error LNK2001: unresolved external symbol __imp__sprintf
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__sprintf
+ODBC.obj : error LNK2001: unresolved external symbol _strcpy
+dbdimp.obj : error LNK2001: unresolved external symbol _strcpy
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__strncmp
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__toupper
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__strncpy
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__strstr
+dbdimp.obj : error LNK2001: unresolved external symbol _memcpy
+dbdimp.obj : error LNK2001: unresolved external symbol _memset
+dbdimp.obj : error LNK2001: unresolved external symbol _strlen
+unicode_helper.obj : error LNK2001: unresolved external symbol _strlen
+dbdimp.obj : error LNK2001: unresolved external symbol _strcmp
+dbdimp.obj : error LNK2001: unresolved external symbol _strcat
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__atoi
+dbdimp.obj : error LNK2001: unresolved external symbol _abs
+dbdimp.obj : error LNK2001: unresolved external symbol __imp___pctype
+dbdimp.obj : error LNK2001: unresolved external symbol __imp___isctype
+dbdimp.obj : error LNK2001: unresolved external symbol __imp____mb_cur_max
+dbdimp.obj : error LNK2001: unresolved external symbol __imp__strchr
+unicode_helper.obj : error LNK2001: unresolved external symbol __imp__wcslen
+LINK : error LNK2001: unresolved external symbol __DllMainCRTStartup@12
+blib\arch\auto\DBD\ODBC\ODBC.dll : fatal error LNK1120: 20 unresolved externals
+NMAKE : fatal error U1077: 'link' : return code '0x460'
+
+which was resolved by adding
+
+c:\Program Files\Microsoft Visual Studio\VC98\Lib\MSVCRTD.LIB"
+
+to end of LDLOADLIBS in the Makefile.

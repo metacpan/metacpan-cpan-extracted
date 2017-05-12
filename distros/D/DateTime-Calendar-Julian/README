@@ -1,0 +1,15 @@
+DateTime/Calendar/Julian
+========================
+
+This is a companion module to DateTime.pm. It implements the Julian
+calendar. It supports everything that DateTime.pm supports and more:
+about one day per century more, to be precise.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

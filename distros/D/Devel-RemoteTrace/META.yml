@@ -1,0 +1,22 @@
+---
+name: Devel-RemoteTrace
+version: 0.3
+author: []
+abstract: |-
+  Attachable call trace of perl scripts
+  (a.k.a) L<perldebguts> by example
+license: mit
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+requires:
+  Socket: 0
+provides:
+  DB:
+    file: lib/Devel/RemoteTrace.pm
+  Devel::RemoteTrace:
+    file: lib/Devel/RemoteTrace.pm
+    version: 0.3
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

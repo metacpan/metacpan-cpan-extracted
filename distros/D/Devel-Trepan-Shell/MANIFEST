@@ -1,0 +1,24 @@
+Build.PL
+ChangeLog
+Changes
+GNUmakefile
+MANIFEST			This list of files
+META.json
+META.yml
+Makefile.PL
+README
+README.md
+bin/trepanpl.sh                To run trepan.pl without installing Devel::Trepan::Shell
+example/five.pm                A sample program for testing
+lib/Devel/REPL/Plugin/Perl5db.pm
+lib/Devel/REPL/Plugin/Trepan.pm
+lib/Devel/REPL/Plugin/TrepanShell.pm
+lib/Devel/Trepan/CmdProcessor/Command/Shell.pm
+lib/Devel/Trepan/Shell.pm
+t/00load.t
+t/00test-pod.t
+t/10test-cmd-complete.t
+t/Helper.pm
+t/data/shell.cmd
+t/data/shell.right
+SIGNATURE    Added here by Module::Build

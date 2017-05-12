@@ -1,0 +1,1576 @@
+Revision history for Perl extension DateTime::Format::Natural.
+
+1.05  2017-04-23  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.04_01  2017-03-03  <schubiger@cpan.org>
+
+ - New supported format: beginning/end of last month.
+   [rt #120436 - Shawn M. Moore]
+
+1.04  2016-07-24  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.03_02  2016-07-15  <schubiger@cpan.org>
+
+ - Document format: ISO 8601 <date>T<time>.
+
+ - Amend introduction text for examples section.
+
+ - List Ricardo Signes in credits.
+
+1.03_01  2016-07-09  <schubiger@cpan.org>
+
+ - New supported format: ISO 8601 <date>T<time>.
+   [rt #115737 - Ricardo Signes]
+
+1.03  2015-08-02  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.02_03  2015-07-21  <schubiger@cpan.org>
+
+ - Suggestions for simple documentation improvements.
+   [rt #98634 - Tim Bunce]
+
+1.02_02  2015-06-05  <schubiger@cpan.org>
+
+ - Add encoding directive to POD. [rt #105000 - Debian Perl Group]
+
+1.02_01  2014-02-09  <schubiger@cpan.org>
+
+ - Add metadata repository link. [David Steinbrunner]
+
+1.02  2013-04-30  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.01_05  2013-04-01  <schubiger@cpan.org>
+
+ - Parse and extract relative durations in reversed order.
+
+ - Document reversed relative durations under examples.
+
+ - Treat for <count> <unit> grammar expressions as durations.
+
+ - Refine gathering idents for from <count> to <count> durations.
+
+ - Use rightmost matching token on left side of duration as type.
+
+ - Split duration string only if accompanied by whitespace.
+
+ - Strengthen matching duration substrings against regexes.
+
+ - Extract regex captured punctuation marks in loop body.
+
+ - Undo some loop indentation in test files.
+
+ - Reorder version number variable in Calc class.
+
+1.01_04  2013-01-17  <schubiger@cpan.org>
+
+ - Concatenate duration expression chunks with separator.
+
+ - Merge calls for extracting duration expressions.
+
+ - Distinguish between expression types when finalizing.
+
+ - Simplify finalizing date/grammar duration expressions.
+
+ - Test that expressions do not overlap with duration ones.
+
+ - Strip timespan separators from extract string.
+
+ - Normalize whitespace of duration expressions.
+
+ - Keep duration extract methods private.
+
+ - Don't declare a plan for extract-expression tests.
+
+ - Enhance comment in extract-expression test file.
+
+1.01_03  2012-12-06  <schubiger@cpan.org>
+
+ - Fix fatal error from extract tests on 5.{8.9,10.0}.
+
+ - Display extracted strings for dateparse.
+
+1.01_02  2012-11-29  <schubiger@cpan.org>
+
+ - Extract relative and rewritten duration expressions.
+
+ - Check parsing of extracted expressions.
+
+1.01_01  2012-10-25  <schubiger@cpan.org>
+
+ - Narrow scope of variables in _extract_expressions().
+
+ - Improve finalizing duration expressions.
+
+1.01  2012-09-07  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+1.00_02  2012-09-01  <schubiger@cpan.org>
+
+ - Duplicate and extend types only for grammar expansion.
+
+ - Initialize subscript variable.
+
+ - Remove trailing semicolon in do block.
+
+1.00_01  2012-07-21  <schubiger@cpan.org>
+
+ - Extract expanded expressions and add a test.
+
+1.00  2012-05-30  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+ - Replace use of constant pragma with boolean.
+
+0.99_01  2012-05-20  <schubiger@cpan.org>
+
+ - Introduce ::Expand which handles expanding grammar.
+
+ - Enhance main grammar loop to enable grammar expansion.
+
+ - Include count of tokens for expanded grammar in lookup map.
+
+ - Add test file for expansions.
+
+ - Make the truncate_to grammar option an array reference.
+
+ - Truncate values after each worker method called.
+
+ - Move truncating code to a separate method.
+
+ - Require Clone as prerequisite.
+
+ - Mention expansion of grammar in docs.
+
+0.99  2012-04-26  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.98_03  2012-04-22  <schubiger@cpan.org>
+
+ - Check if daytime exists in _daytime_variant().
+
+ - Load modules in test files where missing.
+
+0.98_02  2012-04-22  <schubiger@cpan.org>
+
+ - Add validation rules to allow passing DateTime::TimeZone
+   objects. [Roman Filippov]
+
+ - Test providing a DateTime::TimeZone object.
+
+ - Load DateTime::TimeZone explicitly.
+
+ - Test validation of constructor arguments.
+
+ - List Roman Filippov in credits.
+
+0.98_01  2012-01-01  <schubiger@cpan.org>
+
+ - Mention and link to dateparse in the See also section.
+
+0.98  2011-10-29  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.97_02  2011-10-27  <schubiger@cpan.org>
+
+ - Strip leading and trailing spaces from input strings.
+
+0.97_01  2011-10-25  <schubiger@cpan.org>
+
+ - Support parsing timestamp. [Xiao Yafeng]
+
+0.97  2011-08-17  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.96_04  2011-08-16  <schubiger@cpan.org>
+
+ - Check that the datetime string for dateparse has at most
+   two chunks (date/time); also require DateTime.
+
+ - Elaborate on the format of dateparse's datetime string.
+
+0.96_03  2011-08-13  <schubiger@cpan.org>
+
+ - Add the datetime switch to dateparse and document it.
+
+ - Print dateparse's dates formatted according to ISO 8601.
+
+0.96_02  2011-08-10  <schubiger@cpan.org>
+
+ - Revert truncating of <count> <unit> ago formats.
+
+ - Add Xiao Yafeng to credits.
+
+0.96_01  2011-08-01  <schubiger@cpan.org>
+
+ - New supported format: today <count> <unit> ago. [Xiao Yafeng]
+
+ - Truncate for this and other ago formats to day if there is
+   no time component in order to produce more consistent results.
+
+ - Add new and adjust existing regular tests for these formats;
+   moreover, complete the list of parse failure tests.
+
+ - List the added grammar in the documentation.
+
+0.96  2011-06-01  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.95_03  2011-05-30  <schubiger@cpan.org>
+
+ - Add the extract switch to dateparse and document it.
+
+ - Change dateparse's prefer_future option to be not negatable.
+
+0.95_02  2011-05-28  <schubiger@cpan.org>
+
+ - Reorder the nested extract loop iterating through the grammar
+   entries to process only one subentry for all matching tokens.
+
+ - Move the check for a date when extracting expressions to a method.
+
+ - Add assert tests for extract_datetime(): one for the context
+   dependant return and another for the nested extract loop fix.
+
+ - Improve code visually of the parse success and failure test files.
+
+0.95_01  2011-05-19  <schubiger@cpan.org>
+
+ - Do no longer recommend Test::Pod and Test::Pod::Coverage.
+
+ - Use quantifier which matches 1 or more times when extracting
+   subroutine or method names.
+
+ - Assign a list instead of pushing a string for time entries.
+
+0.95  2011-05-14  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.94_04  2011-05-11  <schubiger@cpan.org>
+
+ - New supported format: <monthday> <month> <year> <time am/pm>.
+   [rt #67780 - Colm Dougan]
+
+ - Conditionally rewrite date strings, currently ones with an 'at'
+   followed by a time or daytime (e.g., noon).
+
+ - Place the rewrite data in the grammar class; add an accessor.
+
+ - Adapt the grammar by merging or removing now superfluous entries.
+
+ - Mention rewriting by use of a comment in the grammar class.
+
+ - Rewrite all patterns and refine handling punctuation marks
+   when extracting parsable expressions; add tests.
+
+ - Make generation of time entries for tests capable of processing
+   the {at} placeholder and use it within the test strings.
+
+ - Test parsing of date strings with rewritten time precision.
+
+0.94_03  2011-05-03  <schubiger@cpan.org>
+
+ - Rename the aliases class to the more generic name rewrite.
+
+ - Parse times with AM/PM at word boundary separated by a space
+   (through removing the space before parsing).
+   [rt #67561 - Dave Rolsky]
+
+ - Purge now unused grammar entries and consolidate tests.
+
+0.94_02  2011-04-14  <schubiger@cpan.org>
+
+ - Parse and document formatted dates with an abbreviated month name
+   in the middle; add a regular and a case related success test.
+   [rt #67395 - Rod Taylor]
+
+ - Extend the format regex accordingly and fix partly broken
+   checking for a formatted date boundary.
+
+ - Add assert tests for the fixed formatted date boundary check
+   and new month name validation.
+
+0.94_01  2011-04-07  <schubiger@cpan.org>
+
+ - Rewrite aliases when extracting parsable expressions; amend
+   an extract test. [Colm Dougan]
+
+ - Add, test and document another weekday alias for thursday.
+   [Colm Dougan]
+
+ - Remove commas from date string now before rewriting aliases.
+
+ - Test that commas are filtered for aliases.
+
+0.94  2011-04-02  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.93_02  2011-03-31  <schubiger@cpan.org>
+
+ - Set month and implicit day explicitly to avoid overlap parse
+   failures; add a regression test. [reported by Chifung Fan]
+
+ - Keep the minute or higher precision requirement when extracting
+   one token time expressions, but undo the grammar change.
+
+ - Test one token time expression with precision in hour.
+
+ - Use more descriptive variable names within the extract class.
+
+0.93_01  2011-03-21  <schubiger@cpan.org>
+
+ - Introduce a class to extract parsable expressions from strings.
+   [suggested by Colm Dougan]
+
+ - Add and document the extract_datetime() method.
+
+ - Test extracting parsable expressions.
+
+ - Require precision in hour or higher for one token time expressions,
+   otherwise extracting expressions would be impeded.
+
+ - Move the formatted string regex to the grammar class;
+   furthermore, move the according checks to the formatted class.
+
+0.93  2011-02-04  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.92_02  2011-01-25  <schubiger@cpan.org>
+
+ - New supported format: <month> <monthday>, <year> <time am/pm>.
+   [rt #65072 - Dave Rolsky]
+
+ - Sort weekdays and months metadata arrays in ascending order.
+
+ - Purge unused hour precisions from truncate_to grammar options.
+
+0.92_01  2011-01-23  <schubiger@cpan.org>
+
+ - Place the constant.pm segmentation fault workaround comment
+   at the top of the grammar class.
+
+0.92  2011-01-14  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.91_04  2011-01-12  <schubiger@cpan.org>
+
+ - Merge _daytime_in_the_variant() into _daytime().
+
+ - Document for times that precision in seconds may be applied.
+
+0.91_03  2011-01-09  <schubiger@cpan.org>
+
+ - Allow for time regexes to match times with precision in seconds.
+
+ - Handle these times in _at_time() and adjust the according
+   post-processed truncate_to options within the grammar entries.
+
+ - Remove _time_full() and call _at_time() instead.
+
+ - Conditionally truncate to units and remove unit assignments of zero.
+
+ - When advancing to future time, omit checking for modified minute.
+
+ - Insert and process placeholders for test entries with variable units.
+
+0.91_02  2010-12-07  <schubiger@cpan.org>
+
+ - New supported format: <weekday> <daytime>.
+   [rt #63438 - Tim Esselens]
+
+ - New supported format: <year> <month> <monthday>.
+   [rt #63429 - Rod Taylor]
+
+ - Rename the dayframe grammar keywords.
+
+0.91_01  2010-12-06  <schubiger@cpan.org>
+
+ - Enhance parsing <token(s)> <count> combined relative durations; add
+   some regular tests and others for durations expected to succeed.
+
+ - Document the new supported kind of durations.
+
+ - Move the duration patterns and other metadata to the grammar
+   class and add a nested duration class with the duration checks.
+
+ - Invoke the duration checks through a function wrapper.
+
+ - Don't parse ambiguous <time>, <monthday> and <month> expressions.
+
+ - Shrink date strings in parse_datetime_duration() and fail;
+   reword documentation accordingly.
+
+ - Skip documentation tests for non-release testing.
+
+ - Test that parse_datetime_duration() shrinks and fails.
+
+ - Find module files and names for tests where necessary.
+
+ - Bundle common exportable test routines/data with a tag.
+
+ - Save the missing trace for present durations.
+
+ - Check with anchored regexp tokens in _advance_future().
+
+0.91  2010-11-01  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.90_04  2010-10-30  <schubiger@cpan.org>
+
+ - New supported formats: <time> <month> <monthday> and
+   <time> AM/PM <month> <monthday>. [rt #62164 - Vladimir Marek]
+
+ - Add support for the <time am/pm> <month> <monthday> format.
+
+ - Test and document the new formats.
+
+0.90_03  2010-10-28  <schubiger@cpan.org>
+
+ - New supported formats: <monthday> <month> <time>,
+   <monthday> <month> <time> AM/PM and <month> <monthday>
+   <time> AM/PM. [rt #62164 - Vladimir Marek]
+
+ - Add support for the <monthday> <month> <time am/pm> format.
+
+ - Test and document the new formats.
+
+0.90_02  2010-10-22  <schubiger@cpan.org>
+
+ - New supported formats: <variant> <weekday> <time> AM/PM and
+   <time> AM/PM <variant> <weekday>. [rt #62164 - Vladimir Marek]
+
+ - Add support for the <variant> <weekday> <time am/pm> format.
+
+ - Test and document the new formats.
+
+ - Record the grammar keyword for each valid expression parsed.
+
+ - Describe trace()'s purpose and its inclusion of a grammar keyword.
+
+ - Insert expected grammar keywords in 14-trace.t.
+
+0.90_01  2010-10-13  <schubiger@cpan.org>
+
+ - Fix reference to the Calc class in the documentation of trace().
+
+ - Adjust phrasing of parse_datetime_duration()'s documentation.
+
+ - Correct spelling of the examples description.
+
+0.90  2010-10-04  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.89_02  2010-09-29  <schubiger@cpan.org>
+
+ - Create the metadata package name string through joining it.
+
+ - Provide a generated list of values to _Day_of_Week().
+
+0.89_01  2010-09-21  <schubiger@cpan.org>
+
+ - Reword dateparse's help screen to be more descriptive.
+
+ - List Getopt::Long as prerequisite.
+
+0.89  2010-08-05  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.88_02  2010-07-29  <schubiger@cpan.org>
+
+ - Replace calling of _valid_date() in _count_weekday_variant_month()
+   with _check_date(), because errors are handled separate.
+
+ - Use more descriptive variable names in _parse_formatted_ymd().
+
+ - Minor indentation and code tweaks.
+
+0.88_01  2010-07-18  <schubiger@cpan.org>
+
+ - Check if suffixes used for ordinal numbers are suitable.
+
+ - Test that invalid ordinal numbers fail and valid ones succeed.
+
+ - Add a test file for the tests expected to succeed.
+
+ - Verify for parse failures their errors emitted.
+
+ - While processing grammar expressions, save all captured values
+   in order to pass the extra ones to the extended checks.
+
+ - Improve whitespace of regular expressions handling durations.
+
+0.88  2010-06-16  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.87_03  2010-06-12  <schubiger@cpan.org>
+
+ - Fix broken use_ok() test for the Calc module.
+
+ - Insert some missing examples in the grammar documentation.
+
+0.87_02  2010-06-09  <schubiger@cpan.org>
+
+ - Strengthen the check for invalid units of prefixed dates.
+
+ - Add a test file for parse asserts.
+
+ - Rename Base.pm to Calc.pm and adjust trace tests.
+
+ - Reword the according abstract and description.
+
+ - Document where arguments to dateparse's switches are required.
+
+ - Allow dateparse to handle the language code in uppercase.
+
+0.87_01  2010-06-06  <schubiger@cpan.org>
+
+ - Match case-insensitively in the language option check.
+
+ - Require (and not use) the grammar class in runtime eval.
+
+ - Purge the remains of the formatted instance data member.
+
+ - Delete some instance data through hash slices.
+
+ - Convert a few non-option identifiers to lowercase.
+
+0.87  2010-05-29  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.86_02  2010-05-27  <schubiger@cpan.org>
+
+ - Emit an error for 0 AM/PM suggesting to use 12 as zero.
+
+ - Add tests for this extended check failure.
+
+ - Adjust related prefer_future tests to make them pass.
+
+ - When verifying that extended checks fail, call _get_error()
+   to see whether it returns an error as expected.
+
+ - Reset in _unset_error() with undef instead of empty string.
+
+0.86_01  2010-05-18  <schubiger@cpan.org>
+
+ - Introduce and use two flag handlers for AM/PM time values.
+   [rt #56955 - Andrew Sterling Hanenkamp]
+
+ - Assert that these values pass the extended meridiem check.
+
+ - Split implicit matching of time only from grammar entries
+   with an optional AM suffix.
+
+ - Add tests for 12 AM/PM and the splitted grammar entries
+   (including prefer_future ones).
+
+ - Test that invalid meridiem time values fail.
+
+ - Remove addition of 12 hours for PM time values in _at_time()
+   and _time_full().
+
+ - Dispatch to _at() for AM/PM time, to _time() for time only.
+
+ - Comment the purpose of the wrappers _at() and _time().
+
+0.86  2010-04-20  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.85_02  2010-04-11  <schubiger@cpan.org>
+
+ - Extract both caller and sub in ::Lang::Base's AUTOLOAD() at once.
+
+ - Correct the indentation of the same subroutine.
+
+0.85_01  2010-04-08  <schubiger@cpan.org>
+
+ - New supported format: <time full> AM/PM. [Wes Morgan]
+
+ - Make _time_full() capable of working with an hours option.
+
+ - Initialize the hours option in _at_time() after having processed
+   the arguments.
+
+0.85  2010-03-13  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.84_03  2010-03-11  <schubiger@cpan.org>
+
+ - Resolve short aliases only if preceded by a digit.
+
+ - Don't capture the date separator for matching with the format.
+
+0.84_02  2010-03-09  <schubiger@cpan.org>
+
+ - Guess the format of dates with a dot or hyphen as separator.
+
+ - Check for separator mismatch when not in lax mode.
+
+0.84_01  2010-02-24  <schubiger@cpan.org>
+
+ - Use the format parameter case-insensitively and test it.
+
+ - Don't bless into a reference within the metadata base constructor.
+
+ - Add some missing commas to the grammar description.
+
+0.84  2010-02-22  <schubiger@cpan.org>
+
+ - Merged development version to stable.
+
+0.83_04  2010-02-16  <schubiger@cpan.org>
+
+ - Enhance the regular expression matching a non-word alias.
+
+ - Correct the indentation of _Nth_Weekday_of_Month_Year().
+
+0.83_03  2010-02-14  <schubiger@cpan.org>
+
+ - Introduce short name aliases. [rt #53976 - Kevin Field]
+
+ - Support shortened relative dates with a +/- prefix.
+   [rt #53976 - Kevin Field]
+
+ - Add according tests for aliases and prefixed dates.
+
+ - Test for case-insensitive processing of input strings.
+
+ - Test compile-time loading of Aliases.pm.
+
+0.83_02 Wed Jan 27 10:42:41 CET 2010
+
+ - New supported formats: <time> <weekday> and <time> on <weekday>.
+   [rt #53979 - Kevin Field]
+
+0.83_01 Mon Jan 18 10:28:42 CET 2010
+
+ - Pass the time zone object instead of name to the final DateTime
+   constructor. [rt #53268 - Eric Wilhelm]
+
+0.83 Wed Jan 13 15:51:11 CET 2010
+
+ - Merged development version to stable.
+
+0.82_02 Wed Jan  6 10:57:43 CET 2010
+
+ - New supported format: M/D. [rt #53187 - Shawn M. Moore]
+
+ - Handle the new format with prefer-future semantics.
+
+ - Add tests for the new format and also for related durations.
+
+ - Document the new format and variations of it.
+
+ - Restrict counting of format separators to the formatted substring.
+
+ - Move the code processing formatted dates to a separate class.
+
+ - Fix the checking for an invalid format parameter.
+
+ - Complete <date> <time> to <time> type of durations.
+
+ - Split the duration string at word boundary of the separator.
+
+ - Restore the datetime object for each parse when running tests.
+
+ - Test compile-time loading of Formatted.pm.
+
+0.82_01 Thu Dec 31 12:10:30 CET 2009
+
+ - Save the trace of each parse while processing a duration.
+
+ - Call for formatted dates the wrapper _set() instead of set()
+   in order to alter the modified counters.
+
+ - dateparse: when printing traces, print a trace for each object
+   returned.
+
+ - Add tests for the trace method and improve its documentation.
+
+ - Document possible bugs and caveats.
+
+ - Rename some variables with method name strings to be more
+   descriptive and also interpolate their strings initially.
+
+ - Substitute an expression for a block as used by 'map'.
+
+0.82 Mon Dec 21 10:15:52 CET 2009
+
+ - Merged development version to stable.
+
+0.81_04 Wed Dec 16 13:32:35 CET 2009
+
+ - dateparse: use the same class instance for each parse run;
+   match case-insensitively for commands that quit.
+
+0.81_03 Fri Dec 11 10:32:08 CET 2009
+
+ - Use string interpolation instead of concatenation for symbolic
+   references in __new().
+
+0.81_02 Wed Dec  9 20:07:19 CET 2009
+
+ - Reduce the common logic of _valid_date() and _valid_time()
+   by moving most of it to a method.
+
+ - Store the daytime option internally with a less nested name.
+
+0.81_01 Mon Dec  7 11:14:19 CET 2009
+
+ - Place the common body of _add() and _subtract() in a single method.
+
+ - Comment the inverse use of _add() within _add_or_subtract().
+
+ - Set values at once within _check_time().
+
+ - Initialize tokens with an anonymous array reference.
+
+ - Purge last unneeded occurrence of 'scalar'.
+
+0.81 Sat Nov 21 12:59:17 CET 2009
+
+ - Merged development version to stable.
+
+0.80_02 Wed Nov 18 10:53:05 CET 2009
+
+ - Move utility and wrapper methods to separate classes.
+
+ - Test compile-time loading of Utils.pm and Wrappers.pm.
+
+ - Don't force explicit scalar context where an implicit one exists.
+
+0.80_01 Mon Nov  2 10:59:46 CET 2009
+
+ - Invoke _valid_date() in _day_month_year() to assert the
+   validity of the date before setting it.
+
+ - Separate fixed time data for testing purpose from code.
+
+0.80 Fri Oct 30 10:15:53 CET 2009
+
+ - Merged development version to stable.
+
+0.79_02 Mon Oct 26 10:11:09 CET 2009
+
+ - Improve wording and formatting of the documentation.
+
+ - Update broken license links.
+
+0.79_01 Mon Oct 19 13:30:14 CEST 2009
+
+ - Parse certain common variations of AM/PM or missing " at ".
+   [rt #50547 - Andrew Sterling Hanenkamp]
+
+ - Match case-insensitively for grammar regular expressions.
+
+ - Rename _at() to _at_time() and wrap it twice; dispatch to
+   _at() instead of _time() where suitable (and vice-versa).
+
+ - Sort the indexes metadata field in ascending order.
+
+0.79 Sat Sep 19 12:23:20 CEST 2009
+
+ - Merged development version to stable.
+
+0.78_03 Thu Sep 17 12:13:08 CEST 2009
+
+ - Relocate the formatted string printing of result strings
+   used within the tests to the Test class.
+
+0.78_02 Mon Sep 14 17:18:40 CEST 2009
+
+ - Add support for ranges representing the first and last day
+   of a month or year. [rt #44067 - Michael Reddick]
+
+ - Move the insertion code in parse_datetime_duration() to the
+   Duration class and the checks to the english metadata class.
+
+ - Quote for parsing failures with duration strings the entire
+   input string instead of a partial date string.
+
+ - Save and restore state for parse_datetime_duration().
+
+ - Test compile-time loading of Duration.pm.
+
+0.78_01 Tue Sep  1 15:51:59 CEST 2009
+
+ - Set units at once within _check_date() when Date::Calc is
+   not available and add a test. [rt #49326 - Clayton L. Scott]
+
+0.78 Fri Aug  7 11:32:31 CEST 2009
+
+ - Merged development version to stable.
+
+0.77_01 Thu Jun 25 16:00:27 CEST 2009
+
+ - Add a handful of new formats. [rt #43468 - Clayton L. Scott]
+
+ - Don't eventually try to guess the century.
+
+ - Introduce and use a class for common test routines.
+
+ - Test compile-time loading of Test.pm.
+
+ - Rename the misnamed 'hour' metadata option to 'hours'.
+
+ - _daytime() does not use the 'hours' metadata option when
+   it is set and hence remove such existing entries.
+
+ - For base methods which use the 'hours' metadata option,
+   assume a zero when no value is provided.
+
+0.77 Sun Jun 14 20:46:53 CEST 2009
+
+ - Merged development version to stable.
+
+0.76_04 Sat Jun 13 14:04:21 CEST 2009
+
+ - Remove comment in code about the legacy debug option.
+
+ - Use '\s+' instead of the ambiguous ' ' as token split pattern.
+
+ - Add some whitespace to the regexp which recognizes additional
+   tokens for formatted dates.
+
+0.76_03 Wed Jun 10 11:50:42 CEST 2009
+
+ - The current "now" can be overridden through the 'datetime'
+   option. [rt #45127 - Giovanni Pensa]
+
+ - parse_datetime_duration() handles durations where the second
+   part is relative to the first one. [rt #45127 - Giovanni Pensa]
+
+ - New supported relative duration: for <count> <unit>.
+   [rt #45127 - Giovanni Pensa]
+
+0.76_02 Sat Jun  6 13:24:58 CEST 2009
+
+ - When using prefer_future, also allow for weekdays combined with
+   the time of day to be parsed correctly. [rt #46689 - Jason May]
+
+ - New supported format: <weekday> <time>. [rt #46689 - Jason May]
+
+0.76_01 Mon Jun  1 21:34:06 CEST 2009
+
+ - Change in default behavior: Use DateTime's truncate method
+   to reset time components. Inspired by [rt #43468 - Clayton
+   L. Scott] and suggestions from others.
+
+0.76 Thu Apr  9 12:08:32 CEST 2009
+
+ - Merged development version to stable.
+
+0.75_05 Mon Apr  6 12:42:26 CEST 2009
+
+ - New supported format: final <weekday> in <month>.
+   [rt #44810 - Christian Brink]
+
+ - Wrap Days_in_Month() in Compat.pm.
+
+0.75_04 Fri Apr  3 15:13:36 CEST 2009
+
+ - New supported formats: some suggested by [rt #44067 - Michael
+   Reddick], while others have been independently added.
+
+ - Fix a regression [rt #44691 - Jason May].
+
+ - Shift common conversion logic within base calculation methods
+   to the grammar class.
+
+ - Introduce a helper class for handling actions related to
+   metadata flags and to serve as container for setter/checker
+   methods.
+
+ - Wrap Decode_Month() in Compat.pm.
+
+ - Test both implementations within each method in Compat.pm.
+
+ - Preserve order of tests.
+
+ - Add a test-file for regressions.
+
+ - Remove the obsoleted internal use of a total-modified counter.
+
+0.75_03 Wed Mar  4 13:39:08 CET 2009
+
+ - Enhance the extended checks mechanism further to have it set 
+   an error message when a check fails.
+
+ - Run tests without sorting the input strings first.
+
+ - Test compile-time loading of Compat.pm.  
+
+0.75_02 Thu Feb 26 11:01:11 CET 2009
+
+ - Date::Calc is no longer a prerequisite; use it when available 
+   for calculations, otherwise fall back to using DateTime.
+   [rt #43521 - Jesse Vincent <jesse@bestpractical.com>]
+
+0.75_01 Sun Feb 22 12:09:32 CET 2009
+
+ - When prefer_future is set: Advance the day if the time
+   specified is noticeable in the past. [rt #43417 - Jason May]
+
+ - New supported format: <month> <monthday> <year>.
+   [rt #43467 - Clayton L. Scott <clscott@cpan.org>]  
+
+0.75 Thu Feb 19 16:50:19 CET 2009
+ 
+ - Merged development version to stable.
+
+0.74_04 Son Feb 15 20:59:28 CET 2009
+
+ - Refrain from adding leading zeros to unit values via
+   sprintf() when constructing the final DateTime object.
+
+ - Do not import Date_to_Days(), it's no longer required.
+
+0.74_03 Fri Feb 13 13:15:11 CET 2009
+
+ - Guard against invalid expressions with a 's' suffix,
+   but no multiple unit count.  
+
+ - Work around the segmentation fault taking place in 0.74_02
+   on perl 5.8.9 and 5.10.0. 
+
+0.74_02 Sun Feb  8 11:47:50 CET 2009
+
+ - New supported format: <count> <weekday>(s) from now.
+   [rt #43088 - Anirvan Chatterjee]
+
+ - Add a new field to the language grammar entries to handle
+   extended checks of captured regex data.
+
+0.74_01 Thu Jan  8 16:06:17 CET 2009
+
+ - When a four digit year is found, also allow for mm/dd/yyyy
+   kind of formats. [Elliot Shank <perl@galumph.com>]
+
+0.74 Sat Dec 20 15:06:50 CET 2008
+
+ - Merged development version to stable.
+
+0.73_04 Sun Nov 30 12:27:26 CET 2008
+
+ - Be more exact with english time matching regular expressions,
+   which fixes [rt #41266 - Alex Bowley] partly.
+
+ - The date and time validation methods do now honor all their
+   arguments; this reduces the amount of false errors.
+
+ - Wrap the code calling Nth_Weekday_of_Month_Year() in eval
+   blocks to catch errors and add some code to act upon the results.
+
+ - Do not call the setter method multiple times if the values can
+   be set at once.
+
+0.73_03 Thu Nov 13 21:20:53 CET 2008
+
+ - Move some duplicated logic to helper methods.
+
+ - Do not save intermediate data when generating the trace output.
+
+ - Use the proper data structure name in parse_datetime_duration().
+
+0.73_02 Sun Nov  2 21:40:31 CET 2008
+
+ - The grammar parser now, for each run, only iterates through
+   entries with an according count of fields.
+
+0.73_01 Sat Oct 18 22:21:56 CEST 2008
+
+ - Corrected a few typos in the main documentation and also 
+   reworded some bits.
+
+0.73 Thu Sep  4 19:53:44 CEST 2008
+
+ - Fixed the 'prefer_future' parameter validation error by
+   extending its type definition.
+
+ - Merged development version to stable.
+
+0.72_02 Thu Sep  4 11:06:36 CEST 2008
+
+ - Use the "boolean" pragma for true/false values.
+
+0.72_01 Sun Aug 31 12:33:53 CEST 2008
+
+ - Adjusted the dispatch entries for exact non-formatted dates
+   and introduced an according method to avoid false errors.
+   [rt #38857 - Ankur Gupta <ankur655@gmail.com>]
+
+ - Call DateTime's set method for exact formatted dates once
+   instead of setting each unit separately.
+
+ - Changed the parser to handle internal value positions (i.e.,
+   data related to tokens) with more respect when encountering
+   lists with a sequence that differs from a truly ascending one.
+
+0.72 Sat Aug 16 13:39:27 CEST 2008
+
+ - When referring within classes to themselves, use the proper
+   term "class" instead of "module".
+
+ - Merged development version to stable.
+
+0.71_04 Thu Aug  7 11:28:36 CEST 2008
+
+ - Call validation_options() when DateTime::Format::Natural
+   gets loaded (instead of relying on it to be called from
+   within a method).
+
+0.71_03 Sun Aug  3 11:06:09 CEST 2008
+
+ - Declared some more expected types when validating arguments
+   with Params::Validate.
+
+0.71_02 Fri Aug  1 13:54:02 CEST 2008
+
+ - Moved some duplicated code fragments within the main base class
+   to separate methods.
+
+0.71_01 Wed Jul 30 22:15:49 CEST 2008
+
+ - Added time_zone parameter support to 'dateparse' and a shortcut
+   to leave it quickly.
+
+0.71 Thu Jun 12 11:17:22 CEST 2008
+
+ - When processing "date abbreviations" call Date::Calc's check_date()
+   instead of calling _valid_date() thrice, which could cause bogus
+   error messages. [Pat Kale <kale1@llnl.gov>]
+
+0.70 Mon Apr  7 20:29:39 CEST 2008
+
+ - Fixed 'dateparse' failures which were introduced along with
+   Params::Validate.
+
+ - Added missing trace calls to _day_today(), _day_yesterday()
+   and _day_tomorrow().
+
+0.69 Sat Mar 15 13:44:03 CET 2008
+
+ - Validation of arguments is now handled by Params::Validate.
+
+0.68_01 Thu Mar 13 22:13:26 CET 2008
+
+ - Undo for trailing newlines to be printed when initially
+   checking the arguments for validity and some invalid ones are
+   encountered. Furthermore, add quoting to the error message.
+
+0.68 Sun Feb 17 14:19:07 CET 2008
+
+ - Added 'prefer_future' test-file.
+
+ - Added Test::MockTime to the dependency list in Build.PL.
+
+ - Restructured documentation.
+
+0.67 Fri Feb  8 01:04:38 CET 2008
+
+ - Extended parser to accept a formatted date and time string.
+   [suggested by Shawn M. Moore <sartak@gmail.com>]
+
+0.66 Tue Jan 15 12:04:06 CET 2008
+
+ - Merged development version to stable.
+
+0.65_01 Tue Jan  8 14:13:18 CET 2008
+
+ - Convey less filename information for all test-files (removed
+   'en' suffixes), because they needlessly clutter the test output.
+   Considering that the grammar is pluggable, we could still move language
+   specific tests into subdirs, once multiple language grammars should be
+   implemented.
+
+0.65 Fri Dec 28 18:49:40 CET 2007
+
+ - Localized $_ while constructing the format separator.
+   [rt #31968 - Shawn M. Moore <sartak@gmail.com>]
+
+0.64 Mon Dec 24 16:19:37 CET 2007
+
+ - Improved the options parsing within scripts/dateparse (by
+   introducing a subroutine to set default values independently).
+
+0.63 Thu Dec 20 15:50:07 CET 2007
+
+ - Merged development version to stable.
+
+ - Renamed time_zone test-file (added 'en' suffix).
+
+0.62_03 Thu Dec 13 20:53:11 CET 2007
+
+ - Replaced remaining tabs within the entire source with
+   regular spaces (4).
+
+0.62_02 Thu Dec 13 12:12:06 CET 2007
+
+ - Localized $1 within the grammar parser (i.e., the method _process())
+   before examining whether a regular expression succeeded and if it did,
+   check whether it did capture some content and save it on the "regex-stack".
+
+ - Enhanced the diagnostic printed when faulty grammar types are encountered.
+
+ - Changed a type definition from 'SCALAR' to 'REGEXP' within EN.pm.
+
+0.62_01 Tue Dec 11 13:28:31 CET 2007
+
+ - No "functional" changes, merely "cosmetic" ones.
+
+0.62 Mon Dec  3 21:06:05 CET 2007
+
+ - Added support for abbreviated week-/monthnames when 'prefer_future'
+   option is enabled. [rt #31254 - Shawn M. Moore <sartak@gmail.com>]
+
+ - Deprecated export of subs within Lang/Base.pm to Lang/EN.pm
+   (the ISA relationship is sufficient).
+
+0.61 Sat Nov 24 10:32:31 CET 2007
+
+ - Improved code efficiency a bit & removed some dead code.
+
+0.60 Tue Nov 20 16:59:24 CET 2007
+
+ - Implemented better timezone handling and added according tests.
+   [rt #30765 - Shawn M. Moore <sartak@gmail.com>]
+
+0.59 Thu Nov 15 23:54:25 CET 2007
+
+ - Made the 'prefer_future' parameter a bit more context-sensitive
+   with regard to incremental of the current year.
+   [rt #30763 - Shawn M. Moore <sartak@gmail.com>]
+
+ - Updated the "SEE ALSO" sections within the documentation
+   to refer back to the main package.
+
+0.58 Thu Nov  1 19:54:41 CET 2007
+
+ - Deprecated broken 'debug' parameter to parse_datetime*().
+
+ - Fixed some parameters within scripts/dateparse which were
+   erroneously declarated.
+
+0.57 Thu Oct 25 21:21:56 CEST 2007
+
+ - Added tests for durations (i.e., the method parse_datetime_duration()).
+
+0.56 Sat Oct 20 20:02:24 CEST 2007
+
+ - Extended grammar to reflect some suggestions.
+   [rt #30147 - Jason May <jason.a.may@gmail.com>]
+
+0.55 Wed Oct 17 15:24:25 CEST 2007
+
+ - Changed behavior of the 'prefer_future' option concerning weekdays.
+   [rt #29068 - Jesse Vincent <jesse@bestpractical.com>]
+
+0.54 Fri Oct  5 23:30:28 CEST 2007
+
+ - Added Term::ReadLine support to 'dateparse'.
+
+ - Updated t/* to ensure that all results are being marked successful.
+
+ - Fixed formatted dates, which never succeeded previously.
+
+0.53 Sun Sep 30 13:55:11 CEST 2007
+
+ - Added grammar definitions & according tests for "[day] at [daytime]".
+
+ - Internally documented the grammar layout.
+
+ - Replaced %s with %d for sprintf() format-strings.
+   [Jonny Schulz <http://www.bloonix.de>]
+
+0.52 Sat Sep 29 17:02:40 CEST 2007
+
+ - Removed all mentions of german language support within the
+   documentation and the code.
+
+ - Extended documentation to explain the grammar a bit.
+
+0.51 Thu Sep 27 17:12:49 CEST 2007
+
+ - Removed no longer necessary 'use_ok()' test for the german language
+   metadata. [rt #29651 - Andreas J. König <andreas.koenig@anima.de>]
+
+0.50 Thu Sep 27 00:39:08 CEST 2007
+
+ - Major redo of flexible language metadata handling.
+
+0.40 Sun Sep 23 17:34:48 CEST 2007
+
+ - Empty the marked tokens list on each instance of parse_datetime()/
+   parse_datetime_duration().
+
+0.39 Sun Sep  9 00:41:30 CEST 2007
+
+ - Improved handling of dates when no format-string was provided
+   or was unsuitable. [rt #29227 - Shawn M. Moore <sartak@gmail.com>]
+
+ - Implemented mechanisms to mark tokens when processed and added
+   an according getter method for multiple tokens.
+
+0.38_01 Tue Sep  4 18:10:48 CEST 2007
+
+ - Undone use'ing constant with a hashref provided (breaks on
+   older versions of Perl [testers #598724 - David Cantrell <david@cantrell.co.uk>]).
+
+0.38 Wed Aug 29 22:07:00 CEST 2007
+
+ - Redone code formatting.
+
+0.37 Sun Aug 19 11:33:05 CEST 2007
+
+ - Fixed the parsing of unambigious dates such as "next [month]" &
+   "last [month]" while the 'prefer_future' option is enabled.
+
+ - Explicitly call methods within the superclass with 'SUPER::'.
+
+ - Documented the 'prefer_future' switch in scripts/dateparse.
+
+0.36 Thu Jun  7 13:42:35 CEST 2007
+
+ - Fixed version numbers which were treated as floating point numbers,
+   not as v-string. [rt #27350 - Andres J. König <andreas.koenig@anima.de>]
+
+ - Fixed _set_datetime() which failed whenever a 31st day didn't exist
+   in the current month. [rt #27360 - Chia-liang Kao <clkao@clkao.org>]
+
+ - Reversed the order of the day/month/year setter calls within
+   parse_datetime(). [mike <pulsation@gmail.com>]
+
+ - Added a 'prefer_future' option to turn ambigious weekdays/months
+   to their futuristic equivalents - implemented by counting how often
+   an unit was being modified by the appropriate setter call within the
+   Base class. [Shawn M. Moore <sartak@gmail.com>]
+
+ - Extended the test-suite to include more exhaustive tests and accordingly
+   updated the EXAMPLES in the language metadata classes.
+
+ - Introduced the public method trace() which will show which methods were
+   called within the Base class and how often certain units were modified
+   by according Datetime setter calls.
+
+0.35 Wed May 23 21:00:39 CEST 2007
+
+ - Implemented next [monthname] & last [monthname] parsing and
+   added according tests. [Shawn M. Moore <sartak@gmail.com>]
+
+ - Added tests for the constant daytime values.
+
+ - Albeit it's unlikely that someone will ever subclass Lang/Base.pm,
+   a bug in the statement involving bless() within the constructor has
+   been fixed (ref($class) 'check' must come first, otherwise subclassing
+   is impossible).
+
+ - scripts/dateparse is now being installed.
+
+0.34 Sun May 20 17:09:09 CEST 2007
+
+ - Hopefully fixed "Type of arg 1 to List::MoreUtils::any must be block
+   or sub {} (not list)" errors.
+
+ - Added _init_check() which is being called by _init() to validate
+   the options passed to the constructor new().
+
+0.33 Sat May 19 03:08:29 CEST 2007
+
+ - Got mostly rid of the "no warnings 'uninitialized'" statements and
+   ensured that no undefined values will be encountered by introducing
+   an according token accessor which will return either a reference to
+   an existing token or to a defined string (in case a token does not
+   yield any defined value).
+
+ - Disallowed 'am/pm' for german language metadata since they're
+   not known to a native german speaker assuming it is referred
+   to the german language itself. [Urs Stotz <stotz@gmx.ch]
+
+ - Introduced two methods, success() and error(). Former indicates
+   whether the parsing of a date/time string succeeded or not; latter
+   provides the error string if former one should fail. Furthermore,
+   the entire system is now reliant upon both of them and doesn't
+   croak any longer if parsing should fail.
+
+ - Added according getter/setter/unsetter accessors for the internal
+   error and failure attributes.
+
+0.32 Thu May 10 23:52:00 CEST 2007
+
+ - Replaced some conditional variables with early return statements.
+
+ - Introcuded Date::Calc's check_date() and check_time() to assure
+   for integrity of date/time values submitted to according setter
+   methods.
+
+ - Wrapped check_date() and check_time() in subs which croak upon
+   error and supply the type of value and the actual value in the
+   message delivered to the caller, otherwise return true.
+
+ - Separated datetime_parse_duration() logic from datetime_parse()
+   and added according documentation [Cory Watson <jheephat@gmail.com>]
+
+0.31 Sun May  6 02:57:13 CEST 2007
+
+ - Replaced undef on hash elements within Natural/Base.pm with delete.
+
+ - Changed 'time_zone' parameter's value in calls to DateTime->now()
+   with 'floating' instead of 'local'. This should function as fix
+   to failures reported on MSWin & Cygwin platforms according to
+   [Dave Rolsky <urth@autarch.org>].
+
+ - Due to an unlocalized signal warning handler, uninitialized
+   warnings in code which either required/use'd DateTime::Format::Natural
+   were being supressed. The handler has been commented out (and left in
+   for debugging/development purpose) and replaced by an according
+   'no warnings' statements in both Natural.pm & Natural/Base.pm.
+
+0.30 Sun Apr 29 02:33:16 CEST 2007
+
+ - Fixed some spurious date results assumptions in t/01-parse_en.t
+   and t/02-parse_de.t which were caused by a bug.
+
+ - Extended documentation to include options pertaining to method
+   calls within the documentation in listed form.
+
+ - Added functionality to change the default values for specific
+   daytimes. Furthermore, according testcases have been added.
+
+0.29 Mon Apr 16 22:00:27 CEST 2007
+
+ - Support for parsing seconds and minutes in ago stanzas
+   [Tuomas Jormola <tj@solitudo.net>]
+
+ - Added according testcases to the testsuite for parsing
+   seconds and minutes in ago stanzas.
+
+ - Modified scripts/dateparse.pl to return a absolute time
+   with precision in seconds.
+
+0.28 Wed Apr 11 01:44:49 CEST 2007
+
+ - Moved timespan separator definition to language metadata
+   base classes.
+
+ - scripts/dateparse.pl language chosen always defaulted
+   to 'en' irrespective whether another one has been chosen
+   or not. Changed it to only fallback to the default language
+   ('en') if no other one has been provided.
+
+ - Added t/03-parse_format.t to the testsuite which tests datestrings
+   with various differing format strings.
+ 
+0.27 Tue Apr 10 22:19:15 CEST 2007
+
+ - Mentioning Tatsuhiko Miyagawa as the inspiration source in
+   the documentation's Credits section.
+
+ - Implemented a simple timespan calculation, provided the natural
+   dates are separated by the literal token 'to' (case-insensitive).
+   [Mark Stosberg <mark@summersault.com>]
+
+0.26 Wed Mar 14 13:15:07 CET 2007
+
+ - The constructor accepts now an optional 'format' parameter specifying
+   in which format numeric dates should be parsed (either / or - may be
+   used to separate the units). [mike <pulsation@gmail.com>]
+
+0.25 Sun Mar 11 23:02:45 CET 2007
+
+ - Separated the logic within parse_datetime() to _process()
+   and according internal subroutines.
+
+ - Commented the majority of functions within Base.pm.
+
+ - Introduced List::MoreUtils' any() & none() functions;
+   deprecated use of 'no warnings' statement which need
+   arose by accessing indexes of @{$self->{tokens}} where
+   no members were present.
+
+ - Created TODO file with pending items.
+
+0.24 Wed Jan 17 22:51:51 CET 2007
+
+ - Introduced a warning handler to silence the warnings about
+   undefined values when pattern matching, subtracting and
+   performing string comparisons in Natural/Base.pm.
+
+ - Merged the "frontend" scripts to a single one taking
+   optionally a language argument indicating the country
+   code among other arguments.
+
+ - Made 01-parse_en.t's & 02-parse_de.t's code more readable
+   by adding some more separating lines.
+
+ - Moved 'our' declarations in DE.pm & EN.pm towards the top.
+
+0.23 Tue Jan 16 19:51:50 CET 2007
+
+ - The language metadata classes have an AUTOLOAD handler & __new
+   constructor automatically exported to their namespaces. Because
+   some local fiddling with AUTOLOAD and dynamic variable lookup is
+   done, a bunch of symbolic references are created on-the-fly.
+
+0.22 Tue Jan 16 02:58:15 CET 2007
+
+ - Previously four digits were occasionally interpreted as year
+   and as well as time based upon context. Disambiguated usage
+   as year (applies to all Lang:: classes) and fixed all test
+   cases were bogus return values from parse_datetime() have
+   been expected in order to have no tests fail.
+
+ - Bound the temporary disablement of strictness for references
+   to a tighter scope (applies to all Lang:: classes).
+
+0.21 Tue Nov 28 09:31:20 CET 2006
+
+ - Corrected the classes names provided to use_ok() in 00-load.t.
+   [SEKIMURA sekimura@gmail.com]
+
+0.20 Tue Nov 28 01:44:46 CET 2006
+
+ - Optimised the regular expressions used in the AUTOLOAD routine
+   in the language classes.
+
+0.19 Mon Nov 27 20:06:17 CET 2006
+
+ - Added to DE.pm & EN.pm an AUTOLOAD handler for each of them.
+   The subroutine called prefixed with two underscores will be
+   translated to an according variable name without underscores.
+   The parameter to the subroutine will function as variable
+   lookup key.
+
+0.18 Sun Nov 26 17:35:17 CET 2006
+
+ - Fixed all occurences of the global weekday hash by adding the
+   missing key "{data}" to the variable lookup.
+
+0.17 Sun Nov 26 16:50:14 CET 2006
+
+ - Encapsulated the metadata within the language packages in an
+   object which class gets subclassed from Natural.pm.
+   [Tatsuhiko Miyagawa <miyagawa@gmail.com>]
+
+0.16 Sat Nov 25 18:09:48 CET 2006
+
+ - Added missing '1;' to the documentation of Authoring.pod.
+
+ - Changed strings in Authoring.pod to be italic.
+
+ - The testsuite now contains a german aquivalent of the english
+   parsing test.
+
+0.15 Sam Nov 25 16:49:22 CET 2006
+
+ - Added DateTime::Format::Natural::Lang::Authoring documentation.
+
+0.14 Sat Nov 25 14:34:33 CET 2006
+
+ - Corrected broken package definition.
+
+0.13 Sat Nov 25 04:14:54 CET 2006
+
+ - Separated data from logic by keeping all regular expressions in
+   separate packages.
+
+ - Language support for german has been included.
+
+0.12 Fri Nov 24 20:36:37 CET 2006
+
+ - Added some basic tests to the testsuite which exercice
+   converting natural format strings to an according datetime object.
+
+ - Enhanced the collection of valid strings that are translated.
+
+0.11 Fri Nov 24 02:15:30 CET 2006
+
+ - Refactored the code where duplicated chunks were available.
+
+ - Evaluated whether the current listed expressions pass the parsing.
+
+0.10 Thu Nov 23 01:14:44 CET 2006
+
+ - Substituted additions/subtractions where possible with the
+   appropriate DateTime method calls.
+
+ - An Exception is thrown if no valid input has been given.
+   [Tatsuhiko Miyagawa <miyagawa@gmail.com>]
+
+0.09 Sun Nov 19 14:38:24 CET 2006
+
+ - Date strings with slashes are now being split and assigned
+   to the appropriate variables.
+
+ - Moved the initialization of object data into a sub.
+   Same procedure for the code chunk returning a datetime object.
+
+0.08 Sun Nov 19 12:30:24 CET 2006
+
+ - Code is now object-oriented.
+
+0.07 Sat Oct 28 17:16:53 CEST 2006
+
+ - Replaced all tabs in EN.pm with regular spaces (4).
+
+0.06 Wed Oct 25 20:24:38 CEST 2006
+
+ - Substituted exporting functions with an object-oriented constructor.
+   parse_datetime() is now called as a method.
+   [Dave Rolsky <urth@autarch.org>]
+
+ - parse_datetime() takes either a datestring or an options hash.
+   [Dave Rolsky <urth@autarch.org>]
+
+0.05 Wed Oct 25 11:27:26 CEST 2006
+
+ - Moved from namespace DateTime::Natural::Parse to DateTime::From::Natural::EN
+   [Dave Rolsky <urth@autarch.org>]
+
+ - Renamed natural_parse() to parse_datestring().
+
+0.04 Wed Oct 25 00:17:01 CEST 2006
+
+ - Updated the code to process some "complex" input.
+
+ - Actualized the documentation accordingly.
+
+0.03 Tue Oct 24 01:25:03 CEST 2006
+
+ - Appended the i(ncasesensitive) Modifier to a few regular expressions.
+
+ - Fixed the broken newlines for the example documentation.
+
+0.02 Mon Oct 23 23:22:41 CEST 2006
+
+ - DateTime has been added to the dependencies list.
+
+ - natural_parse() returns a DateTime object [Clayton L. Scott <clscott@cpan.org>]
+
+ - Extended documentation to include some example human readable time strings.
+
+0.01 Sun Oct 22 22:15:54 CEST 2006
+
+ - Initial version.

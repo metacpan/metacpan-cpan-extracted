@@ -1,0 +1,32 @@
+---
+abstract: 'Is a shop is open or closed at this moment?'
+author:
+  - 'Peter Stuifzand <peter@stuifzand.eu>'
+build_requires: {}
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v0.9.7, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-OpeningHours
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+resources:
+  bugtracker: https://github.com/pstuifzand/Data-OpeningHours/issues
+  homepage: https://github.com/pstuifzand/Data-OpeningHours
+  repository: https://github.com/pstuifzand/Data-OpeningHours.git
+version: 0.4.2
+x_contributors:
+  - 'Peter Stuifzand <peter.stuifzand@gmail.com>'

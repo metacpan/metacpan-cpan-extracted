@@ -1,0 +1,69 @@
+
+=head1 NAME
+
+Date::Advent
+
+=head1 SYNOPSIS
+
+    use Time::Piece;
+    use Date::Advent;
+
+    my $testAdvent = Date::Advent->new(date => Time::Piece->strptime("2016-01-01", "%Y-%m-%d"));
+    say $testAdvent->firstSunday; #Gives date for first Sunday of Advent
+    say $testAdvent->secondSunday; #Gives date for second Sunday of Advent
+    say $testAdvent->thirdSunday; #Gives date for third Sunday of Advent
+    say $testAdvent->fourthSunday; #Gives date for fourth Sunday of Advent
+    say $testAdvent->christmas; #Gives date of Christmas
+
+=head1 DESCRIPTION
+
+Date::Advent takes a Time::Piece date and calculates all four Sundays of Advent for the current Christian liturgical year.
+
+As Advent is the beginning of the Christian liturgical calendar, this usually results in the date for Advent in the current year being dates in the past.  E.g. The Sundays of Advent returned for 12. March 2016 would be 29. November 2015, 6. December 2015, 13. December 2015, and 20. December 2015.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Advent> -- and tested via TravisCI.
+
+=for html <a href="https://travis-ci.org/marmanold/Date-Advent"><img src="https://travis-ci.org/marmanold/Date-Advent.svg?branch=master" /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Advent?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Advent/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Date::Advent
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Advent
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Date-Advent
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Date-Advent
+
+    Search CPAN
+        http://search.cpan.org/dist/Date-Advent/
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Michael Wayne Arnold
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

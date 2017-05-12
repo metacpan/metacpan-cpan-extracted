@@ -1,0 +1,25 @@
+# PODNAME: Dallycot::Manual
+# ABSTRACT: Guide to using Dallycot
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+This is a guide to using Dallycot. Dallycot is an engine for running linked
+open code (algorithms expressed as linked open data) and exploring linked
+open data.
+
+This manual provides an overview of the engine along with examples,
+directions, etc. If you need implementation-specific information,
+please see the documentation for the appropriate module.
+
+The manual is broken down into:
+
+=over 4
+
+=item L<Dallycot::Manual::Intro|Dallycot::Manual::Intro>
+
+Introduction to Dallycot and a discussion of how all the pieces fit
+together.
+
+=back

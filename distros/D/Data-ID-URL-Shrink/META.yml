@@ -1,0 +1,27 @@
+---
+abstract: 'Shorten numeric IDs, for nicer URLs and more.'
+author:
+  - 'Rick Yakubowski <yakubori@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-ID-URL-Shrink
+provides:
+  Data::ID::URL::Shrink:
+    file: lib/Data/ID/URL/Shrink.pm
+    version: 0.02
+requires:
+  Exporter: v5.6.7
+  Module::Build: 0.4003
+  POSIX: 1.30
+  Test::More: 0.98
+  perl: v5.16.2
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02

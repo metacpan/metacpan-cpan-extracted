@@ -1,0 +1,9 @@
+Revision history for Dist-Zilla-Role-EnsureStash
+
+0.002     2012-12-30 09:31:58 CST6CDT
+	* req 1.24 of autobox::Core
+	* drop MXAS requirement
+	* no code changes, only updates to the test squite
+
+0.001     2012-12-22 16:19:39 CST6CDT
+	* initial release

@@ -1,0 +1,73 @@
+{
+   "abstract" : "Simple email sending for Dancer2 applications",
+   "author" : [
+      "Naveed Massjouni <naveed@vt.edu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-Email",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Authen::SASL" : "2.16",
+            "Dancer2" : "0.200000",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Plugin" : "0",
+            "Email::Date::Format" : "0",
+            "Email::Sender::Simple" : "0",
+            "File::Type" : "0",
+            "IO::Socket::SSL" : "2.000",
+            "MIME::Base64" : "3.14",
+            "MIME::Entity" : "0",
+            "Module::Runtime" : "0",
+            "Net::SMTP" : "1.30",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0.200000",
+            "File::Spec" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack" : "1.0029",
+            "Plack::Test" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ironcamel/Dancer2-Plugin-Email/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ironcamel/Dancer2-Plugin-Email.git",
+         "web" : "http://github.com/ironcamel/Dancer2-Plugin-Email"
+      }
+   },
+   "version" : "0.0202",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0210"
+}
+

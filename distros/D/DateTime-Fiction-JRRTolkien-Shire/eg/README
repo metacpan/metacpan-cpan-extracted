@@ -1,0 +1,9 @@
+This directory contains example scripts. Specifically:
+
+README - This file
+
+date-convert - This Perl script converts between calendars using the
+    appropriate DateTime modules. By default it converts from Gregorian
+    to Shire Reckoning, but any pair of DateTime modules can be used.
+
+# ex: set filetype=text textwidth=72 autoindent :

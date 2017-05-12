@@ -1,0 +1,8 @@
+Revision history for Data-ShortNameProvider
+
+1.001 Tue Apr 21 2015
+    - fix the code to work with Perl versions older than 5.010
+
+1.000 Fri Apr 17 2015
+    - first version, based on discussions with dbi-dev@ and TIMB
+    - released during the Perl QA Hackathon 2015 in Berlin

@@ -1,0 +1,50 @@
+#!/bin/bash
+
+RRD_FILE=mod_status.rrd
+
+if [ "$1" ]; then
+    RRD_FILE=$1
+fi
+
+if [ ! -e $RRD_FILE ]; then
+    # one day  1 minute measurements
+    # one week 5 minutes measurements
+    # one month hourly
+    # one year 8h intervals
+    rrdtool create \
+        $RRD_FILE \
+        --step 60 \
+        DS:total_accesses:COUNTER:180:0:99999999 \
+        DS:total_traffic:COUNTER:180:0:99999999 \
+        DS:current_requests:GAUGE:180:0:99999999 \
+        DS:idle_workers:GAUGE:180:0:99999999 \
+        DS:waiting:GAUGE:180:0:99999999 \
+        DS:starting:GAUGE:180:0:99999999 \
+        DS:reading:GAUGE:180:0:99999999 \
+        DS:sending:GAUGE:180:0:99999999 \
+        DS:keepalive:GAUGE:180:0:99999999 \
+        DS:dns_lookup:GAUGE:180:0:99999999 \
+        DS:closing:GAUGE:180:0:99999999 \
+        DS:logging:GAUGE:180:0:99999999 \
+        DS:finishing:GAUGE:180:0:99999999 \
+        DS:idle_cleanup:GAUGE:180:0:99999999 \
+        DS:open_slot:GAUGE:180:0:99999999 \
+        DS:max_clients:GAUGE:180:0:99999999 \
+        \
+        RRA:AVERAGE:0.5:1:1440 \
+        RRA:MAX:0.5:1:1440 \
+        RRA:MIN:0.5:1:1440 \
+        \
+        RRA:AVERAGE:0.5:5:2016 \
+        RRA:MAX:0.5:5:2016 \
+        RRA:MIN:0.5:5:2016 \
+        \
+        RRA:AVERAGE:0.5:60:4320 \
+        RRA:MAX:0.5:60:4320 \
+        RRA:MIN:0.5:60:4320 \
+        \
+        RRA:AVERAGE:0.5:480:1460 \
+        RRA:MAX:0.5:480:1460 \
+        RRA:MIN:0.5:480:1460 \
+
+fi;

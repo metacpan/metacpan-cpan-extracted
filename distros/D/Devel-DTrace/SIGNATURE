@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 27cb86d9d097925e86235b10dccf1c0aafa1b4d2 Changes
+SHA1 d514f33e77ab80e745a0a0b0804175bd5ee8e6fd DTrace.xs
+SHA1 6a724fcfa8764d08d867fb99901502ee274357df MANIFEST
+SHA1 68fc7bfb1c57ffbb800c92dd0b6a782ea188bf8b META.yml
+SHA1 f5d114e194753937797f2c8bf6e32bf880aab6dd Makefile.PL
+SHA1 9537e32075860bfd30d25b850e38abde3514ae95 README
+SHA1 b2f5809a83ea92c5e6cd7bb569d8443cd474d3da TODO
+SHA1 1d2b0eaee24049c5f44321300484d90e6ebd01ad dtperl.c
+SHA1 2bae70f589759f9a669ded418eeaa92093ef8821 examples/subs-tree.d
+SHA1 7e02a4ea89ade63fe45ee47d2afaaaa2f83f8344 lib/Devel/DTrace.pm
+SHA1 935c1865ea87c4e4fca48b55af338aca2926d82e plxsdtrace.d
+SHA1 81376d76d5f3bf15a8dbc6449a4980e551bc275f runops-loop.h
+SHA1 824502a22526633bea463dd07047f583733a06fe runops.c
+SHA1 ff865ff9de63d75121c83a5576a0aff7f0e602e7 runops.h
+SHA1 68c9a96a049c4adb117810ab1dbabac209f24106 t/000-load.t
+SHA1 dc5676715d6d962328102c93cf3f9bda1a1f0cdf t/devel-dtrace.t
+SHA1 c343e55a563d92cfcb02ddd8bfc499202ff53e6c t/scripts/dies.pl
+SHA1 e69223f00a6c72b9aab49740fdadbc190e0d90f9 t/scripts/eval.pl
+SHA1 fd219ed6feca3ed44cb5117d80d5cf0725cd4cac t/scripts/fib.pl
+SHA1 53aa38fbd0961d6b293ff696542e1e04865cda08 t/scripts/fump.pl
+SHA1 dbd5aaacfb155cf48523ad173d0f73d461978be0 t/scripts/xs.pl
+SHA1 56a729edd761387c12abadda78ed32b1cb0904fb xt/author/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 xt/author/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (Darwin)
+
+iEYEARECAAYFAkmy+XUACgkQwoknRJZQnCGjMACeK1BLTmJQP62EHQ7ZQbkZ7qm/
+0K4AoJjHrw+k20pwv3v9qfXcM+hYhniR
+=aQmn
+-----END PGP SIGNATURE-----

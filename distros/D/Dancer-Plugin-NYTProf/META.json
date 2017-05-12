@@ -1,0 +1,55 @@
+{
+   "abstract" : "easy Devel::NYTProf profiling for Dancer apps",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-NYTProf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Dancer" : "1.306",
+            "Devel::NYTProf" : "0",
+            "File::Temp" : "0",
+            "File::Which" : "0",
+            "File::stat" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/Dancer-Plugin-NYTProf/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bigpresh/Dancer-Plugin-NYTProf.git",
+         "web" : "https://github.com/bigpresh/Dancer-Plugin-NYTProf"
+      }
+   },
+   "version" : "0.50"
+}

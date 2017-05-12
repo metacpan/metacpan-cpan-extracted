@@ -1,0 +1,179 @@
+#!/usr/bin/perl -w
+
+#use lib "/projects/clipart/share/perl/5.8.3/";
+#use lib "/projects/clipart/lib/perl/5.8.3/";
+#use lib "/projects/clipart/share/perl/5.8.4/";
+#use lib "/projects/clipart/lib/perl/5.8.4/";
+
+use Pod::Usage;
+use Getopt::Long;
+use SOAP::Lite;
+use strict;
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_resource = ($ENV{'DMS_RESOURCE'} or
+                     'http://www.openclipart.org/Document/Manager');
+our $opt_server   = ($ENV{'DMS_SERVER'} or 'http://localhost:8012/');
+our $opt_debug    = 0;
+
+# Handle commandline options
+Getopt::Long::Configure ('bundling', 'no_ignore_case');
+GetOptions(
+           'version|V'    => \$opt_version,
+           'help|h'       => \$opt_help,
+           'man'          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+           );
+
+
+# Handle -V or --version
+if ($opt_version) {
+    print '$0: $Revision: 1.2 $', "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+exit main();
+
+
+sub main {
+    # Connect to the server
+    warn "Connecting to server...\n" if $opt_debug>1;
+    my $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the test service object
+    warn "Creating the DMS object\n" if $opt_debug>1;
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    my $dms = $response->result;
+
+    if (! $dms) {
+	die "Could not create dms object\n";
+    }
+
+    foreach my $doc_id (@ARGV) {
+	if ( $doc_id !~ /^\d+$/ ) {
+	    warn "Invalid document id '$doc_id' (must be numeric)\n";
+	    next;
+	}
+	$response = $soap->properties($dms, $doc_id);
+	soap_assert($response);
+
+	if (! $response->result) {
+	    warn "No results received\n" if $opt_debug>0;
+	    next;
+	}
+
+	my %property = %{$response->result};
+	print "Document $doc_id\n";
+	foreach my $key (sort keys %property) {
+	    printf("%-15s  %s\n", $key, $property{$key}||'');
+
+	}
+	print "\n";
+    }
+    return 0;
+}
+
+
+# Convenience function to create the soap instance
+sub create_soap_instance {
+    my $resource = shift || return undef;
+    my $server = shift || return undef;
+
+    my $soap = SOAP::Lite
+        -> uri($resource)
+        -> proxy($server,
+                 options => {compress_threshold => 10000});
+    return $soap;
+};
+
+# Convenience function to print out any errors encountered in a soap call
+# and exit.
+sub soap_assert {
+    my $response = shift;
+    if ($response->fault) {
+        print join ', ',
+        $response->faultcode,
+        $response->faultstring;
+        return undef;
+    }
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+stat_docs - displays metadata for one or more documents
+
+=head1 SYNOPSIS
+
+stat_docs
+
+=head1 DESCRIPTION
+
+This tool displays the metadata for one or more documents stored in a
+document management system (DMS).
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the Document::Manager server to connect to.  By default,
+it uses 'http://localhost:8012'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.openclipart.org/Document/Manager'.  Users should not typically
+need to alter this setting.
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce Harrington.com.  All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.2 $
+
+=cut
+
+
+

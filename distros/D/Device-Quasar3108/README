@@ -1,0 +1,47 @@
+Device-Quasar3108 version 0.01
+==============================
+
+Device::Quasar3108 is a perl module for controlling 
+Quasar Electronics Serial Isolated I/O module (kit number 3108).
+The kit has eight relays and four opto-isolated inputs.
+http://www.quasarelectronics.com/3108.htm
+
+It seems very similar (identical?) to Carl's Electronic Kits 
+number CK1610:
+http://www.electronickits.com/kit/complete/elec/ck1610.htm
+
+The perl module was tested on Debian Linux 3.1, but should work on 
+most POSIX systems.
+
+
+INSTALLATION
+
+	I use Module::Build to build and install the module.
+	To install this module type the following:
+
+		perl Build.PL
+		./Build
+		./Build test
+
+	And then as root:
+	
+		./Build install
+
+	Module::Build is available in the Debian package:
+
+		libmodule-build-perl
+
+
+AUTHOR
+
+	Nicholas J Humfrey, njh@ecs.soton.ac.uk
+	(I am a customer of Quasar of Electronics not an employee)
+
+COPYRIGHT AND LICENSE
+
+	Copyright (C) 2005 Nicholas J Humfrey
+
+	This library is free software; you can redistribute it and/or modify it
+	under the same terms as Perl itself, either Perl version 5.005 or, at
+	your option, any later version of Perl 5 you may have available.
+

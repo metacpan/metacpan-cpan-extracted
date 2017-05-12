@@ -1,0 +1,14 @@
+CHANGELOG
+MANIFEST
+Makefile.PL
+README
+lib/Data/Hexdumper.pm
+t/regression.t
+t/pod-coverage.t
+t/pod.t
+ARTISTIC.txt
+GPL2.txt
+t/endianspecifiers.t
+t/output_format.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,159 @@
+
+=pod
+
+=head1 NAME
+
+Devel::STrace - strace-like runtime call trace for Perl applications
+
+=head1 SYNOPSIS
+
+    #
+    #    setup environment variables to control
+    #    configuration of Devel::RingBuffer's mmap'ed
+    #    memory
+    #
+    export DEVEL_RINGBUF_SLOTS=10
+    export DEVEL_RINGBUF_BUFFERS=50
+    export DEVEL_RINGBUF_FILE='somescript.prof'
+    #
+    #    run the script under STrace
+    perl -d:STrace somescript
+    #
+    #    use another terminal to view the
+    #    contents of the ringbuffers
+    #
+    plstrace.pl -f $DEVEL_RINGBUF_FILE -s 10 -d 100
+
+=head1 DESCRIPTION
+
+Provides a strace/truss-like runtime call monitor for Perl applications.
+Note that, while strace/truss only dumps system calls, Devel::STrace
+dumps B<all> calls to Perl subs on the application's stack. Also note
+that Devel::STrace cannot trace non-Perl calls (e.g., calls inside
+XS/C modules), so an additional external strace/truss monitor may
+be needed to fully diagnose a misbehaving Perl script.
+
+Devel::STrace captures each subroutine call (via C<DB::sub()>)
+using ring buffers in a memory mapped file using
+L<Devel::RingBuffer> and L<IPC::Mmap>. Refer to L<Devel::RingBuffer>
+for configuration details.
+
+As each subroutine is entered (ie, when C<DB::sub()> is called),
+the next available ring buffer slot is allocated (possibly overwriting
+the oldest in-use slot) and C<$DB::sub> is written to the slot - possibly suffixed
+by the $AUTOLOAD value if the call is an AUTOLOAD - and the line number
+and timestamp (as returned by Time::HiRes) are set to -1, 0, respectively.
+The line number and timestamp are filled in by C<DB::DB()> as each
+Perl statement is executed.
+
+Note that no explicit locks are used during the slot updates,
+in order to minimize the profiling overhead,
+
+Also note that exit timings are not provided, as this tool is intended for
+debugging, rather than profiling, purposes.
+
+The L<Devel::STrace::Monitor> module provides a minimal
+set of functions for external applications to
+
+=over 4
+
+=item *
+
+open the mmap()'d ringbuffer file
+
+=item *
+
+monitor the runtime Perl call stack, including package, routine name,
+statement linenumber and timestamp of the monitored script
+
+=item *
+
+set or clear the single, trace, or signal flags
+
+=item *
+
+submit commands to either a single thread, all threads of a single
+process, or globally
+
+=item *
+
+wait for and collect responses to such commands
+
+=back
+
+The included plstrace.pl script implements a simple command line monitoring
+view using Devel::STrace::Monitor. More feature rich debugging applications
+(esp. GUI based) are planned.
+
+=head1 Application Notes
+
+Implements DB::DB and DB::sub. The ringbuffer is created
+by the Devel::RingBuffer class, which also acts as a factory
+for individual Devel::RingBuffer::Ring objects
+(representing a single ring buffer).
+
+On POSIX-based systems, a file must be physically created
+to be mmap()'ed and read by a separate monitoring process.
+While this possibly permits post-mortem
+analysis of the execution when things die (though not guaranteed
+due to file flushing issues), it is possible to accumulate trace
+files in the /tmp directory if a trace file is not explicitly
+defined via C<DEVEL_RINGBUF_FILE>, as Devel::STrace doesn't currently
+know when to safely unlink such files.
+
+=head1 TO DO
+
+=over 4
+
+=item *
+
+Rewrite in XS/C to further minimize its impact on the monitored
+application.
+
+=item *
+
+A better solution might work just like the real strace,
+i.e., open the /proc/<pid> pseudofile (or the Win32 equivalent),
+and chase pointers to find the the real stacks of the threads.
+I<But thats soooo haaarrrd...>.
+
+=item *
+
+Provide an interface to turn C<$DB::single> on/off, so that more general,
+lower overhead tracing can be performed (ie, just logs subroutine
+entry/exit, no per-statement logging).
+
+=item *
+
+Extend with a profiler capability I<ala> L<Devel::Dprof>.
+
+=item *
+
+Provide an area to map the ::{_<$file} hashes, so an external app
+can locate the files being used.
+
+=back
+
+=head1 SEE ALSO
+
+L<Devel::RingBuffer>
+
+L<Devel::STrace::Monitor>
+
+L<IPC::Mmap>
+
+L<perldebguts>
+
+strace(1) I<(or truss(1))>
+
+=head1 AUTHOR, COPYRIGHT, AND LICENSE
+
+Dean Arnold L<mailto:darnold@presicient.com>
+
+Copyright(C) 2006, Dean Arnold, Presicient Corp., USA.
+All rights reserved.
+
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the L<Perl Artistic License|perlartistic> for details.
+
+=cut

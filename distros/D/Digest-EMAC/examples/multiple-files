@@ -1,0 +1,21 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::EMAC qw(emac hexdigest base64digest);
+
+print "Enter key: ";
+my $key = <STDIN>;
+chomp $key;
+
+print "Enter cipher: ";
+my $cipher = <STDIN>;
+chomp $cipher;
+local $/ = undef;
+
+while (<>) {
+    my $mac = emac($key, $cipher, $_);
+    print hexdigest($mac), "\n";
+}
+

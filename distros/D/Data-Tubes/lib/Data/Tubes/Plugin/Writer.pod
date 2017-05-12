@@ -1,0 +1,347 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Writer
+
+=head1 DESCRIPTION
+
+This module contains functions to ease using tubes.
+
+=head1 FUNCTIONS
+
+Functions starting with C<write_> have an equivalent form without this
+prefix.
+
+=head2 B<< dispatch_to_files >>
+
+   my $tube = dispatch_to_files($filename, %args); # OR
+   my $tube = dispatch_to_files(%args); # OR
+   my $tube = dispatch_to_files(\%args);
+
+composition of C<dispatch> from L<Data::Tubes::Plugin::Plumbing> and
+L</to_files>, allows handling multiple output channels selected on the
+base of the contents of the input record. This is the most flexible
+mechanism available to relate the output channel to the input record,
+while at the same time taking advantage of automatic handling of output
+segmentation into multiple files (as provided by L</to_files>).
+
+Accepts the same arguments as L</to_files>, although it will always
+override parameter C<filename> (for obvious reasons!). This parameter
+can be set to either a sub reference that is supposed to generate a file
+name or a handle each time it is invoked (as C<filename_factory>) or a
+string holding a template filename (as C<filename_template>), so it is a
+handy shortcut for both. For this reason, it is also the default
+parameter when passed as the first, unnamed option.
+
+The function also accepts all options from C<dispatch> in
+L<Data::Tubes::Plugin::Plumbing>, plus the following ones:
+
+=over
+
+=item C<filename>
+
+handy shortcut for either C<filename_factory> or C<filename_template>,
+so this is I<NOT> passed over directly to L</to_files>;
+
+=item C<filename_factory>
+
+a sub reference that will emit anything valid for C<filename> in
+L</to_files>. It will be fed with the I<key> and the I<record>, see
+C<dispatch> in L<Data::Tubes::Plugin::Plumbing> for details;
+
+=item C<filename_template>
+
+a meta-template string, i.e. a L<Template::Perlish> template that will
+be expanded based on a hash with the following keys:
+
+=over
+
+=item C<key>
+
+whatever passed by C<dispatch> in L<Data::Tubes::Plugin::Plumbing>;
+
+=item C<record>
+
+the current record.
+
+=back
+
+This field is used only if a C<filename_factory> is not available.
+
+The expansion should return anything valid for L</to_files>.
+
+As an example, suppose you want to generate your filenames based on the
+key passed by C<dispatch>, and on one additional field C<foo> in the
+first record for that key. You might have a C<filename_template> like
+the following:
+
+   $template = 'output-[% key %]-[% record.foo %].%03d.txt';
+
+After the expansion, you can get the following templates:
+
+   output-bar-whatever.%03d.txt
+   output-baz-yuppie.%03d.txt
+   ...
+
+i.e. templates that can be further expanded according to a policy.
+
+=item C<tp_opts>
+
+options for L<Template::Perlish>, e.g. if you want to change the
+delimiters.
+
+=back
+
+An example is due at this point:
+
+   my %dtf_tube = dispatch_to_files(
+      # options for `dispatch_to_files` directly
+      filename_template => 'output-[% key %]-%02d.txt',
+
+      # options for `Data::Tubes::Plugin::Plumbing::dispatch`. This is
+      # used to automatically generate the "key" from the input record,
+      # i.e. the key will be $record->{structured}{class}
+      key => [qw< structured class >],
+
+      # options for `to_files`
+      policy => { records_threshold => 10 },
+      header => '{{{',
+      footer => '}}}',
+   );
+
+=head2 B<< to_files >>
+
+   my $tube = to_files($filename, %args); # OR
+   my $tube = to_files(%args); # OR
+   my $tube = to_files(\%args);
+
+generate a tube for writing to files.
+
+In this context, I<file> is something quite broad, ranging from one
+single file, to filehandles, to families of files that share a common
+way to derive their filename.
+
+This factory uses L<Data::Tubes::Util::Output>, so you might want to
+take a look there too.
+
+The central argument is C<filename>, that can also be set as an initial
+unnamed parameter in the arguments list. You can set it in different
+ways:
+
+=over
+
+=item I<filehandle>
+
+and this will be used. No operations will be performed on it, apart
+printing (so, no C<binmode>, no C<close>, etc.)
+
+=item I<< C<CORE::open>-compliant thingie >>
+
+i.e. a string with the name of a file or a reference to a string;
+
+=item I<filename template>
+
+i.e. a template that is ready for expansion (via C<sprintffy> in
+L<Data::Tubes::Util>. This is useful if your output should be segmented
+into multiple files based on a C<policy> (another argument to the
+factory>, where the name can contain C<sprintf>-like sequences (most
+notably, C<%n> represents the increasing id of the file, and C<%02n> is
+the same, but printed in at least two characters and zero-padded);
+
+=item I<sub reference>
+
+that is supposed to return either a filehandle or a filename at each
+call. This is how you can gain maximum flexibility at the expense of
+more coding on your side.
+
+=back
+
+Most of the times you'll probably be interested in the
+I<filename template>, so here's an example:
+
+   $template = 'my-output-%02d.txt
+
+expands to
+
+   my-output-00.txt
+   my-output-01.txt
+   ...
+
+The following expansions are available:
+
+=over
+
+=item C<%(\d*)n>
+
+expands to the current index for a file, always increasing and starting
+from C<0>. The optional digits are handled like an integer expansion in
+C<CORE::sprintf>;
+
+=item C<%Y>
+
+expands to the year (four digits);
+
+=item C<%m>
+
+expands to the month (two digits, zero-padded on the left, starting from
+1);
+
+=item C<%d>
+
+expands to the day (two digits, zero-padded on the left, starting from
+1);
+
+=item C<%H>
+
+expands to the hour (two digits, zero-padded on the left, starting from
+0);
+
+=item C<%M>
+
+expands to the minute (two digits, zero-padded on the left, starting from
+0);
+
+=item C<%S>
+
+expands to the second (two digits, zero-padded on the left, starting from
+0);
+
+=item C<%z>
+
+expands to the time zone (in the format C<[-+]\d\d:\d\d>);
+
+=item C<%D>
+
+expands to the date without separators, same as C<%Y%m%d>;
+
+=item C<%T>
+
+expands to the time without separators and including the time zone, same
+as C<%H%M%S%z>;
+
+=item C<%t>
+
+expands to the a full timestamp without separators and including the
+time zone, same as C<%Y%m%d%H%M%S%z>;
+
+=item C<%%>
+
+expands to a literal percent sign, in case you were wondering.
+
+=back
+
+I<NOTE>: if you want to put a timestamp, use C<%t> instead of C<%D> and
+C<%T>. The two expansions will rely on two different calls to
+C<CORE::localtime>, which means that there is the very slight chance
+that you might trip over the day change and get the date for the
+previous day, but the time of the next one, which makes you lose a day.
+Using C<%t> takes all the variables in one single call, so it always
+provides a consistent read.
+
+If you provide a string C<filename> field that has no expansion, but at
+the same time set a C<policy> that will lead to generating multiple
+files, the first file will be called exactly as specified in
+C<filename>, and the following one will have the name with appended an
+underscore character and the number (starting from 1) without padding.
+So, the following C<filename>:
+
+   $template = 'my-output.txt'
+
+expands to:
+
+   my-output.txt
+   my-output.txt_1
+   my-output.txt_2
+   ...
+
+If you don't set a C<policy>, or your thresholds are not hit, then only
+the first filename will be used of course.
+
+The following arguments are accepted:
+
+=over
+
+=item C<binmode>
+
+value to set via C<CORE::binmode> to opened filehandles (not to provided
+ones though). See L<Data::Tubes::Util::Output>;
+
+=item C<filename>
+
+see above. Defaults to standard output;
+
+=item C<footer>
+
+data to be inserted as footer when closing/releasing a file, eventually
+passed to L<Data::Tubes::Util::Output>. This parameter is initially
+passed to L<Data::Tubes::Util/read_file_maybe>, so it can either be a
+string (as required by L<Data::Tubes::Util::Output>, or an array
+reference that is expanded into a list passed to
+L<Data::Tubes::Util/read_file> for reading the text;
+
+
+=item C<header>
+
+data to be inserted as header when opening/starting to use a file,
+eventually passed to L<Data::Tubes::Util::Output>. This parameter is
+initially passed to L<Data::Tubes::Util/read_file_maybe>, so it can
+either be a string (as required by L<Data::Tubes::Util::Output>, or an
+array reference that is expanded into a list passed to
+L<Data::Tubes::Util/read_file> for reading the text;
+
+=item C<input>
+
+input field in the record. This is what will actually be printed.
+Defaults to C<rendered>, in compliance with the output of tubes from
+L<Data::Tubes::Plugin::Renderer>.
+
+=item C<interlude>
+
+data to be inserted between records printed out, eventually passed to
+L<Data::Tubes::Util::Output>. This parameter is initially passed to
+L<Data::Tubes::Util/read_file_maybe>, so it can either be a string (as
+required by L<Data::Tubes::Util::Output>, or an array reference that is
+expanded into a list passed to L<Data::Tubes::Util/read_file> for
+reading the text;
+
+=item C<name>
+
+name of the tube, useful when debugging;
+
+=item C<policy>
+
+a policy object where you can set thresholds for limiting the
+content/size of generated files. See L<Data::Tubes::Util::Output>.
+
+=back
+
+=head2 B<< write_to_files >>
+
+Alias for L</to_files>.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

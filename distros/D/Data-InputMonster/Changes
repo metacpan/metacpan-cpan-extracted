@@ -1,0 +1,29 @@
+Revision history for Data-InputMonster
+
+0.010     2013-12-13 08:26:13 America/New_York
+          fix bugtracker and repo metadata
+
+0.009     2013-07-05 21:37:09 America/New_York
+          update bugtracker, repackage
+
+0.008     2008-09-23
+          pass field name to store callbacks
+
+0.007     2008-09-19
+          allow dig to accept a non-ref arg
+
+0.005     2008-09-19
+          pass hashref of data (field_name) to sourcers
+
+0.004     2008-09-17
+          pass input to store callbacks
+
+0.003     2008-09-12
+          add no_default_for option to consume
+
+0.002     2008-09-12
+          add ::Util
+          improve tests
+
+0.001     2008-09-11
+          first release

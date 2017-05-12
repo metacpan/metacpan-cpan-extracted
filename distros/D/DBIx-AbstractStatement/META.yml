@@ -1,0 +1,17 @@
+---
+name: DBIx-AbstractStatement
+version: 0.09
+author:
+  - Roman Daniel <roman.daniel@gtsnovera.cz>
+abstract: SQL command kept together with the bindings
+license: perl
+requires:
+  Class::Accessor: 0
+provides:
+  DBIx::AbstractStatement:
+    file: lib/DBIx/AbstractStatement.pm
+    version: 0.09
+  DBIx::AbstractStatement::Binding:
+    file: lib/DBIx/AbstractStatement.pm
+    version: 0.09
+generated_by: Module::Build version 0.25

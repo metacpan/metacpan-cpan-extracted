@@ -1,0 +1,35 @@
+Revision history for Perl extension DBIx::Class::Tree::NestedSet.
+
+0.10  Thu Sep 22 15:50:00 2011
+    - got rid of namespace::autoclean and Moose dependencies
+      (both were only used for testing)
+    - implemented take_cutting method, which removes a subtree
+      from a tree
+    - implemented dissolve method, which disasembles a tree into single nodes.
+    - fixed [cpan #63346], Can't attach an independent root node
+    - fixed [cpan #59319], I can't add a root node!
+    - fixed [cpan #59020], typos in code examples
+    - got rid of perl-5.10 dependency - seems to work fine on 5.8 with minor
+      changes.
+
+0.09  Thu Sep 22 09:40:00 2011
+    - Fixed several document and code bugs reported on RT
+
+0.08  Thu Sep 22 09:02:00 2011
+    - added take_cutting method provided by Moritz Lenz
+
+0.07  Mon May 31 10:15:00 2010
+    - fixed another unexpected dependency
+
+0.06  Sat May 29 11:00:00 2010
+    - Replaced might_have relationship to root with belongs_to
+
+0.05  Sat May 29 07:57:00 2010
+    - fixed another dependency in test code
+
+0.04  Thu May 27 10:34:00 2010
+    - fixed dependencies issue
+
+0.01  Wed Jan  9 19:30:30 2010
+	- original version; created by h2xs 1.23 with options
+		-AX DBIx::Class::Tree::NestedSet

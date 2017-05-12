@@ -1,0 +1,23 @@
+Revision history for Perl extension DNS::TinyDNS.
+0.22  Thu Nov 25 09:50:34 2003
+        - Changed syntax to remove inverse dns, now ony ip is needed
+
+0.20  Mon Apr  8 01:24:48 2003
+        - Fixed some bug parsing reverse dns reported by Tom Arnold
+        - Added a method to add/delete reverse dns more easy
+        - Added type returned when you list the entrys so you can add/del
+          with that ref
+        - Some minnor code improvements
+
+0.14  Wed Feb 28 13:13:13 2003
+        - Fixed some bugs parsing the data file
+        - Some minor changes
+
+0.13  Wed Nov 26 09:59:55 2002
+        - Fixed tests to skip if theres no installed version of djbdns
+        - Fixed difference args between pod and method
+
+0.1   Sat Nov 23 12:39:04 2002
+        - original version; created by h2xs 1.22 with options
+                -AXO -n DNS::TinyDNS
+

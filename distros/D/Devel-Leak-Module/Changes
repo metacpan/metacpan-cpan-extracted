@@ -1,0 +1,18 @@
+Changes for Perl extension Devel-Leak-Module
+
+0.02 Fri 3 Feb 2012
+	- Updating to Module::Install 1.04
+	- Removing the use of defined @array
+	- Adding POD documentation for the script and module
+
+0.01_04 Sat  1 Mar 2008
+	- 5.10.0 loads less modules (breaking a test)
+
+0.01_03 Tue 11 Dec 2007
+	- Updating bundled modules (fixed non-5.10 failures)
+
+0.01_02 Thu 20 Sep 2007
+	- Estimated too high for minimum packages in the tests
+
+0.01_01 Thu 20 Sep 2007
+	- Creating initial test release

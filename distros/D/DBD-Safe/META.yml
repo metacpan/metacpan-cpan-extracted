@@ -1,0 +1,27 @@
+---
+abstract: 'keep safe connection to DB'
+author:
+  - 'Yury Zavarin <yury.zavarin@gmail.com>'
+build_requires:
+  Test::Class: 0
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-Safe
+requires:
+  DBD::File: 0
+  DBD::File::dr: 0
+  DBI: 0
+  Time::HiRes: 0
+  vars: 0
+resources:
+  homepage: http://github.com/tadam/Test-Mock-LWP-Dispatch
+  repository: git://github.com/tadam/Test-Mock-LWP-Dispatch.git
+version: 0.06

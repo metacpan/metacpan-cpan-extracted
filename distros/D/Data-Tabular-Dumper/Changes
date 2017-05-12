@@ -1,0 +1,26 @@
+Revision history for Perl extension Data::Tablular::Dumper.
+
+0.07 Apr 15 2008
+    - Kwalitee tweaks
+
+0.06  Mon Dec 4 2006
+    - Makefile.PL now prompts to see if CSV_XS or ExcelWriter should be
+        required
+    - Remove all use of Data::Denter
+
+0.05 Wed Apr 12 2006
+    - Tests now skip if a support module isn't installed
+
+0.0401 Thr Mar 23 2006
+    - Improved the documentation.
+    - Added master_key
+    - Added ->dump as a package method
+    - Added Dump
+
+0.04  Tue Mar 21 2006
+    - Provoked by Jerrad Pierce, I added the ->dump method and the
+      mind-bending ->analyse method.
+
+0.01  Tue Feb 13 20:19:57 2001
+	- original version; created by h2xs 1.19
+

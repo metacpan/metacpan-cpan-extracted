@@ -1,0 +1,34 @@
+0.006   2017-01-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Unmention lib::dzil::build, mention
+	  Require::Hook::DzilBuild.
+
+
+0.005   2017-01-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention lib::dzil::build.
+
+
+0.004   2017-01-09 (PERLANCAR)
+
+	- [Bugfix] Check and set entry in %INC, to behave more like
+	  require().
+
+
+0.003   2017-01-09 (PERLANCAR)
+
+	- [Bugfix] Forgot to dereference.
+
+
+0.002   2017-01-08 (PERLANCAR)
+
+        - Do away with temporary file, we can directly eval() the source code.
+
+
+0.001   2017-01-08 (PERLANCAR)
+
+        - First release.

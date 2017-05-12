@@ -1,0 +1,29 @@
+---
+abstract: 'Devel::StackTrace + PadWalker'
+author:
+  - 'Shawn M Moore, C<sartak@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-StackTrace-WithLexicals
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::StackTrace: 2.00
+  PadWalker: 1.98
+  perl: 5.8.1
+resources:
+  homepage: https://github.com/sartak/Devel-StackTrace-WithLexicals/tree
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/sartak/Devel-StackTrace-WithLexicals.git
+version: 2.01

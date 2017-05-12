@@ -1,0 +1,37 @@
+---
+abstract: 'Structured exceptions for DBI'
+author:
+  - 'Michael Brown <mbrown@fensystems.co.uk>'
+build_requires:
+  DBD::SQLite: 0
+  DBI: 0
+  DBIx::Class: 0
+  DBIx::Class::Schema: 0
+  ExtUtils::MakeMaker: 6.42
+  File::Spec::Functions: 0
+  FindBin: 0
+  Test::Exception: 0
+  Test::Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Error
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Moose: 0
+  MooseX::StrictConstructor: 0
+  Throwable::Error: 0
+  namespace::autoclean: 0
+  perl: 5.10.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.0.1

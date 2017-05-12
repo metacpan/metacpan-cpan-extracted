@@ -1,0 +1,17 @@
+CONTRIBUTING
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/Devel/StrictMode.pm
+t/01basic.t
+t/02lax.t

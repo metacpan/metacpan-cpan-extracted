@@ -1,0 +1,32 @@
+---
+store:
+  sru:
+    package: ElasticSearch
+    options:
+      index_name: sru
+      bags:
+        data:
+          cql_mapping:
+            default_index: basic
+            indexes:
+              _id:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: '_id'
+              creator:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: 'creator'
+              title:
+                op:
+                  'any': true
+                  'all': true
+                  '=': true
+                  'exact': true
+                field: 'title'

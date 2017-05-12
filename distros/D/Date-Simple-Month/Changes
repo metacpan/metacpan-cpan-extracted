@@ -1,0 +1,8 @@
+Revision history for Perl extension Date::Simple::Month
+0.02  Thu Jan 13 17:59:07 2005
+    - bug fix. I forgot use Date::Simple..
+    - add Date::Range and Date::Simple into PREREQ_PM.
+    - add simple test script.
+
+0.01  Fri Jul 23 09:28:35 2004
+	- original version

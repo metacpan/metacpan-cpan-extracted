@@ -1,0 +1,63 @@
+Revision history for Perl extension Date::Extract::P800Picture.
+
+0.108 Sat Apr 22 15:10:56 UTC 2017
+    - Fixed RT#121288
+
+0.107 Sun Aug  7 13:22:44 UTC 2016
+    - Fixed some author test failures
+
+0.106 Fri Aug 30 19:39:26 UTC 2013
+    - Added licenses
+
+0.105 Sat Aug 24 20:17:42 UTC 2013
+    - Fixed RT#84003
+
+0.104 Sun Oct 14 13:38:02 UTC 2012
+    - improved META data
+    - refactored to 5.12 package name version syntax
+
+0.103 Thu Sep  1 18:38:07 2012
+    - Added github repository to meta data
+
+0.102 Thu Aug 31 19:51:16 2012
+    - Added missing prerequisite Exception::Class
+
+0.101 Thu Aug 30 22:32:36 2012
+    - Included missing signature
+
+0.100 Wed Aug 29 21:19:54 2012
+    - Bumped minimal perl to 5.14 to get unicode right
+
+    - Refactored from Error to Exception::Class
+
+    - Refactored from ExtUtils::MakeMaker to Module::Build
+
+    - Refactored from Class::Meta::Express to Moose
+
+    - Switched version control from subversion to Github
+      <https://github.com/ipenburg/Date-Extract-P800Picture>
+
+0.04  Sat Jan 31 10:22:00 2009
+    - Adapt exception test for older DateTime (RT #42776)
+
+    - Skip bogus is_deeply test on 5.6.2 (RT #42843)
+
+0.03  Sun Jan 25 12:31:00 2009
+    - Split field tests in preserved and shifted entries
+
+    - Pre-stringified objects in tests
+
+    - Added timezone to DateTime object for deep testing
+
+    - Test::More prereq versioned to 0.81
+      (https://rt.cpan.org/Ticket/Display.html?id=42713)
+
+    - Added Perl license for meta
+      (https://rt.cpan.org/Ticket/Display.html?id=42704)
+
+0.02  Thu Jan 22 19:47:00 2009
+    - first release to CPAN
+
+0.01  Thu Dec  4 22:05:02 2008
+    - original version; created by h2xs 1.23 with options
+        -b 5.6.0 -AX Date::Extract::P800Picture

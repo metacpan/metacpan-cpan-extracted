@@ -1,0 +1,24 @@
+severity = 3
+theme = core
+
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+[-Miscellanea::RequireRcsKeywords]
+
+[-Documentation::RequirePodLinksIncludeText]
+
+[-ValuesAndExpressions::ProhibitLongChainsOfMethodCalls]
+
+[-Bangs::ProhibitBitwiseOperators]
+
+[Subroutines::RequireFinalReturn]
+terminal_funcs = pod2usage throw_error throw_fatal
+
+[Modules::RequireExplicitPackage]
+allow_import_of = utf8 strictures
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules = strictures
+
+[TestingAndDebugging::RequireUseWarnings]
+equivalent_modules = strictures

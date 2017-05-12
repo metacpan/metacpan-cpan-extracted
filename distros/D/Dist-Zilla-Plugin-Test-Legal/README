@@ -1,0 +1,178 @@
+NAME
+
+    Dist::Zilla::Plugin::Test::Legal - common tests to check for copyright
+    and license notices
+
+VERSION
+
+      This document describes v0.02 of Dist::Zilla::Plugin::Test::Legal
+      Released November 21, 2014 as part of Dist-Zilla-Plugin-Test-Legal.
+
+SYNOPSIS
+
+    in dist.ini
+
+      [Test::Legal]
+
+DESCRIPTION
+
+    This module will add a Test::Legal test as a release test to your
+    module
+
+REQUIRES
+
+      * Moose
+
+      * namespace::autoclean
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Dist::Zilla::Plugin::Test::Legal
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Dist-Zilla-Plugin-Test-Legal
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-T
+      est-Legal
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Dist-Zilla-Plugin-Test-Legal
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Dist-Zilla-Plugin-Test-Legal
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Dist-Zilla-Plugin-Test-Legal
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.cpanauthors.org/dist/Dist-Zilla-Plugin-Test-Legal
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-Test-Legal
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-Test-Legal
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::Test::Legal
+
+ Email
+
+    You can email the author of this module at AYOUNG at cpan.org asking
+    for help with any problems you have.
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through the web interface at
+    https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal/issues. You
+    will be automatically notified of any progress on the request by the
+    system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal
+
+      git clone git://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal.git
+
+INSTALLATION
+
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+CHANGES
+
+ Version 0.01 (2012-01-03T20:17:03Z)
+
+      * Initial Creation
+
+AUTHOR
+
+    Alan Young <ayoung@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

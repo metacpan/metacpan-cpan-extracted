@@ -1,0 +1,68 @@
+=head1 INSTALLATION
+
+=head2 Docker image
+
+There is a Dockerfile using which you can easily create a Docker container
+containing the search engine and Apache Tika. It needs an external
+Elasticsearch instance, for example the "elasticsearch" Docker image.
+
+=head3 Building from the Dockerimage
+
+  cpanm --look Dancer-SearchApp
+  docker build -t dancer-searchapp -f docker/Dockerfile .
+
+=head3 Docker image configuration
+
+You pass the IP address and port of the Elasticsearch instance to the
+search engine using the C<< --env >> parameter when starting the Docker
+image:
+
+  docker run --env SEARCHAPP_ES_NODES=192.168.99.1:9200 -P dsa
+
+=head2 Java
+
+Elasticsearch requires Java JRE 8, so you'll need to have that available.
+
+=head2 Elasticsearch
+
+We need Elasticsearch 5.x.
+
+Download Elasticsearch from L<https://www.elastic.co/downloads/elasticsearch>
+
+Install and launch Elasticsearch.
+
+=head2 Apache Tika
+
+Download the Tika server from L<https://tika.apache.org/download.html>
+
+Current version is
+
+  http://www.apache.org/dyn/closer.cgi/tika/tika-server-1.14.jar
+
+Copy the JAR file into the directory C< jar/> of the distribution.
+
+=head2 Thunderbird link-by-messageid
+
+Install the "Thunderlink" plug-in / add-on for Thunderbird and
+register the C<thunderlink://> URI. This allows your browser to directly
+display emails in Thunderbird.
+
+=head1 RUNNING THE APPLICATION
+
+=head2 Indexing a directory
+
+  perl -Ilib -w bin/index-filesystem.pl -f t/documents
+
+=head2 Indexing an IMAP account
+
+Copy the config file from C< config-examples/imap-import.yml >
+and edit the username, password, server and folders to index.
+
+  perl -Ilib -w bin/index-imap.pl -c my-imap-import.yml
+
+=head2 Indexing an ICAL calendar
+
+  perl -Ilib -w bin/index-ical.pl t/documents/timetable.yapce2016.ics \
+    -c config-examples/ical-import.yml
+
+=cut

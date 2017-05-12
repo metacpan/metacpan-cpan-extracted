@@ -1,0 +1,34 @@
+
+README for Data::Search 0.03
+============================
+
+Data::Search can search complex data structures.
+Please read the pod documentation embeded in Search.pm for details.
+Installing the module will provide the same documentation in a man page.
+
+You are encouraged you to submit comments, bug reports,
+suggestions, and patches to: alx@cpan.org
+
+INSTALLATION
+
+To install this module, type the following: 
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT
+
+Copyright 2004 Alex Manoussakis <alx@cpan.org>
+
+This library is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+THIS SOFTWARE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+USE IT AT YOUR OWN RISK.
+

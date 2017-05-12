@@ -1,0 +1,13 @@
+1.103620  2010-12-28 20:57:53 Europe/London
+
+  * Add repository.web link
+  * Add repository.type setting
+  * Change to use HTTPS in all GitHub links
+
+1.103610  2010-12-27 14:47:04 Europe/London
+
+  * Now extends MetaResources so supports arbitrary other resources
+
+1.103590  2010-12-25 00:50:56 Europe/London
+
+  * Initial release.

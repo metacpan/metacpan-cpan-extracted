@@ -1,0 +1,69 @@
+{
+   "abstract" : "Extract data about British vehicle registration marks",
+   "author" : [
+      "Nicholas Booker <nick.booker@opusvl.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-VRM-GB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Most" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::DBOOK" : "0.018"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Exporter::Easy" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::VRM::GB" : {
+         "file" : "lib/Data/VRM/GB.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/OpusVL/p5-Data-VRM-GB/issues"
+      },
+      "homepage" : "https://github.com/OpusVL/p5-Data-VRM-GB",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/OpusVL/p5-Data-VRM-GB.git",
+         "web" : "https://github.com/OpusVL/p5-Data-VRM-GB"
+      }
+   },
+   "version" : "0.03"
+}
+

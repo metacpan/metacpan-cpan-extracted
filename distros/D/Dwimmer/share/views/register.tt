@@ -1,0 +1,10 @@
+Registration form
+
+<form method="POST">
+Username: <input name="uname" /><br />
+Password: <input type="password" name="pw1" /><br />
+Password again: <input type="password" name="pw2" /><br />
+E-mail: <input name="email" /><br />
+I read and agree to the terms of service: <input type="checkbox" name="tos" /><br />
+<input type="submit" value="Register" />
+</form>

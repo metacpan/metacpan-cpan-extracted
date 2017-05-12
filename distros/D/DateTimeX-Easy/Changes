@@ -1,0 +1,87 @@
+TODO:
+    - Add some syntactic sugar to make timezone conversion easier
+    - Perform multiple conversions in one call (via [])
+
+0.089:
+    - Non-development release without DateManip dependency
+
+0.088_1:
+    - Remove DateTime::Format::DateManip from dependencies due to instability in that package and its dependencies (thanks jjn1056)
+
+0.088:
+    - Remove DateTime::Format::DateParse from dependencies as fails lots of tests and not used (thanks ranguard)
+
+0.087:
+    - TODO'd some tests that were breaking because of time zone weirdness
+    - The previous entry is an example of gooder english!
+
+0.086
+    - Treat a 4 digit number as a year... Format::Flexible changed on how it interpreted them
+
+0.085:
+    - Integrated a patch of some broken tests (thanks DPAVLIN)
+
+0.084:
+    - Formal release of .083+
+
+0.083_2 Monday September 22 13:48:22 PDT 2008:
+    - Added parsing and tests for http://rt.cpan.org/Public/Bug/Display.html?id=39373
+    - Made ::Flexible take precedence over ::DateParse (for tz handling)
+    - Added some Date::Parse tests
+
+0.083_1 Friday September 19 16:32:17 PDT 2008:
+    - Import into github: git://github.com/robertkrimen/datetimex-easy.git
+    - Now require ::ICal and ::DateManip
+    - Dropped Build.PL
+
+0.082 Wednesday November 21 00:12:42 PST 2007:
+    - Added "ambiguous" flag to disallow ambiguous input
+
+0.081 Sunday November 11 22:06:48 PST 2007:
+    - Added "this <period>" and "next <period>" compatibility
+
+0.080 Sunday November 11 18:15:39 PST 2007:
+    - Added "... first/last of <period> of <date/time> functionality
+
+0.076 Saturday November 10 22:27:39 PST 2007:
+    - Fixed some failing tests due to inability to determine local timezone
+
+0.075 Friday November 09 13:06:05 PST 2007:
+    - Fixed "unable to parse" bug in ::Format::DateManip and ::Format::Flexible parsing
+
+0.071 Friday November 09 11:48:25 PST 2007:
+    - Fixed some typos pointed out by NKUITSE
+
+0.070 Friday November 09 01:36:26 PST 2007:
+    - Slight interface change and code cleanup
+    - Can parse with ICal, DateParse, Flexible, Natural, and DateManip
+
+0.060 Wednesday November 07 18:55:16 PST 2007:
+    - Fixed a bug with ->convert and added tests
+    - Enhanced ->convert to allow timezone specification
+
+0.050 Wednesday November 07 11:48:08 PST 2007:
+    - Cleaned up some documentation
+    - Added covert flag for doing timezone conversion
+
+0.042 Wednesday November 07 03:38:32 PST 2007:
+    - Dependency update
+
+0.040 Wednesday November 07 03:18:06 PST 2007:
+    - Major changes to core processing. Dropped Date::Manip as its parsing is way to opaque.
+    - Using DateTime::Format::Flexible and DateTime::Format::Natural
+
+0.030 Tuesday November 06 22:15:52 PST 2007:
+    - Namespace change to DateTimeX, whee!
+
+0.021 Tuesday November 06 13:08:42 PST 2007:
+    - Added convenience exports: parse parse_date, parse_datetime, date, datetime, new_date, new_datetime
+
+0.020 Tuesday November 06 12:11:22 PST 2007:
+    - Name change to Date::DateTime::Easy from DateTime::Easy at the request of Dave Rolsky
+
+0.013 Tuesday November 06 02:51:05 PST 2007
+    - Minor documentation update
+
+0.010 Tuesday November 06 01:13:49 PST 2007:
+    - Initial version

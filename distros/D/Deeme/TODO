@@ -1,0 +1,1 @@
+* Emit queue mode,  when an app calls emit, it signals to a the master worker thru a database queue, the master dequeue the emit and execute the code.

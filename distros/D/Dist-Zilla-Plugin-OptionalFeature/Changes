@@ -1,0 +1,108 @@
+Revision history for Dist-Zilla-Plugin-OptionalFeature
+
+0.023     2016-03-16 18:45:08Z
+          - fix test failure with [DynamicPrereqs] version 0.020
+
+0.022     2016-02-10 04:58:42Z
+          - simplify the prompting code with new sugar in [DynamicPrereqs]
+          - new -always_suggest option (defaulting to true), to insert
+            optional prerequisites into the suggests prereqs for the
+            distribution
+          - -load_prereqs option has been renamed to -check_prereqs, now that
+            we use static analysis rather than loading the module to check if
+            it is available
+
+0.021     2015-03-05 04:41:16Z
+          - Incorporate some minor documentation improvements based on annocpan
+            notes
+          - before prompting the user regarding the feature(s), first ensure
+            the resulting prereqs are not already installed; toggled by the
+            -load_prereqs option, defaults to true (thanks for the idea,
+            Alberto Simões!)
+
+0.020     2014-11-29 04:53:50Z
+          - when setting up prompting in Makefile.PL for multiple optional
+            features, control all prompts from one master plugin to ensure the
+            prompt order remains as desired
+
+0.019     2014-11-22 07:35:51Z
+          - make the -description option mandatory, for more readable prompt
+            strings
+          - prompt with just the description, as the feature name is usually
+            very confusing for the user
+          - handle funky characters in the feature description and other
+            fields
+
+0.018     2014-11-01 03:21:38Z
+          - temporarily disable a test that relies on CPAN::Meta::Merge
+            behaviour that does not yet exist
+
+0.017     2014-09-19 06:16:11Z
+          - new -prompt feature (enabled by default for 'required' feature
+            prereqs), which interactively prompts the user about the feature
+
+0.016     2014-09-06 22:39:49Z
+          - now *properly* allowing unrecognized options (0.015)
+
+0.015     2014-09-06 07:46:34Z
+          - now allowing unrecognized options, with a warning, rather than
+            dying (allows proactively releasing distributions using
+            not-yet-implemented options)
+
+0.014     2014-05-18 05:04:39Z
+          - fix examples to use working code, that doesn't violate naming
+            constraints for features (RT#94130)
+
+0.013     2014-02-19 03:48:35Z
+          - bump the prereq on JSON::Any, to ensure we know how to handle
+            JSON::XS 3.x
+
+0.012     2014-01-29 04:09:38Z
+          - report more installed versions, as an attempt to debug some odd
+            cpantesters failures
+
+0.011     2014-01-21 04:10:42Z
+          - new -require_develop option (which has always defaulted to true)
+
+0.010     2014-01-18 22:01:56Z
+          - fix config section in generated metadata that was not
+            spec-compliant
+
+0.009     2014-01-18 20:41:13Z
+          - include our full config data in target dist's metadata
+
+0.008     2013-11-30 17:26:03Z
+          - re-release to fix compile test
+
+0.007     2013-09-11 05:03:52Z
+          - warnings tests bypassed during installation
+
+0.006     2013-09-08 17:53:53Z
+          - add test requirement on the minimal Config::MVP needed to handle
+            an edge case that we test our handling of
+          - new EXPERIMENTAL -default config option, instructing CPAN clients
+            to install the features when running non-interactively
+
+0.005     2013-09-02 23:53:12Z
+          - no longer setting dynamic_config => 1 -- it is generally the CPAN
+            client that interrogates the user, not Makefile.PL/Build.PL
+          - detect invalid syntax in feature name (e.g. spaces are not
+            permitted), in case the dist isn't validating its metadata syntax
+            itself
+
+0.004     2013-07-30 00:29:20Z
+          - now setting dynamic_config => 1 in metadata, as directed in
+            CPAN::Meta::Spec
+
+0.003     2013-07-18 17:35:20Z
+          - a use of $` has been replaced with ${^PREMATCH}, which requires perl
+            5.9.5 (RT#86989)
+
+0.002     2013-07-17 05:31:11Z
+          - name, description, and always_recommend options are now prefaced
+            with dashes, just like -phase and -relationship (to avoid naming
+            conflicts)
+
+0.001     2013-07-17 04:24:19Z
+          - Initial release.
+

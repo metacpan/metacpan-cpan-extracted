@@ -1,0 +1,20 @@
+# Revision history for Dist-Zilla-PluginBundle-INGY
+version: 0.0.4
+date:    Mon Oct 28 14:28:37 MYT 2013
+changes:
+- Use PluginBundle::Config::Slicer
+---
+version: 0.0.3
+date:    Mon Apr  8 20:22:37 PDT 2013
+changes:
+- Remove Pod::Weaver stuff
+---
+version: 0.0.2
+date:    Mon Apr  8 16:15:16 PDT 2013
+changes:
+- Remove 'github' as a git remote origin
+---
+version: 0.0.1
+date:    Mon Apr  8 12:05:40 PDT 2013
+changes:
+- Initial release

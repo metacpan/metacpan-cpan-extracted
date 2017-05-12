@@ -1,0 +1,37 @@
+NAME
+
+    Dancer2::Serializer::JSONMaybeXS - (DEPRECATED) Serializer for handling
+    JSON data
+
+SYNOPSIS
+
+     use Dancer2;
+     set serializer => 'JSONMaybeXS';
+
+DESCRIPTION
+
+    This is a DEPRECATED serializer engine for the Dancer2 web framework.
+    Dancer2 now uses JSON::MaybeXS natively in the default
+    Dancer2::Serializer::JSON (as of version 0.201000), so this module is
+    no longer needed.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Dan Book.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Dancer2::Serializer::JSON
+

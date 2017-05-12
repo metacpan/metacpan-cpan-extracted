@@ -1,0 +1,24 @@
+- Make it more clean (Hubris...)
+	
+- Make current features more cutomizable
+	(set messages format...)
+
+- Add (I mean find) new USEFUL features
+
+- Add FileHandle method handling (TIEHANDLE, READ,...EOF)
+
+_ Rethink the syntax (drop the surrounding ! ? prefix with DD_ ?)
+
+- Document the 'use Devel::StealthDebug SOURCE=>"/path/to/file"' feature 
+  (but first make it usable)
+
+_ Explicitly describe some pitfalls
+
+_ Add an unwatch() fonction ?
+
+_ Review(rewrite) dumpvalue which was rewritten 'a la va-vite' just before release.
+  I'm not too proud of this part...
+
+_ Make the code more robust (especially watch !)
+	my ($foo,%bar); #!watch(%bar)!
+  actually break...

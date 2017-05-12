@@ -1,0 +1,39 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Sah::Schemas]
+
+DESCRIPTION
+
+    This plugin is to be used when building Sah-Schemas-* distribution. It
+    currently does the following to lib/Sah/Schemas/* .pm files:
+
+      * 
+
+    It does the following to lib/Sah/Schema/* .pm files:
+
+      * Check that schema is already normalized
+
+      Otherwise, the build is aborted.
+
+      * Set module abstract from the schema's summary
+
+      * Add a prereq to other Sah::Schema::* module if schema depends on
+      those other schemas
+
+      * Produce pre-resolved editions of schemas into lib/Sah/SchemaR/*
+
+      These are useful if a client wants to lookup the base type of a
+      schema without having to do any extra resolving. Currently
+      Perinci::Sub::Complete uses this to reduce startup overhead when
+      doing tab completion.
+
+SEE ALSO
+
+    Pod::Weaver::Plugin::Sah::Schemas
+
+    Sah::Schemas
+
+    Sah and Data::Sah
+

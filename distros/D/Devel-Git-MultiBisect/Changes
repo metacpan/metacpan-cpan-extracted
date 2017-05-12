@@ -1,0 +1,28 @@
+Revision history for Perl module Devel::Git::MultiBisect
+
+0.01 Wed Oct 12 19:33:35 2016
+    - original version; created by ExtUtils::ModuleMaker 0.55
+    - first CPAN upload: Nov 01 2016
+
+0.02 Tue Nov  1 14:14:37 EDT 2016
+    - Correct POD formatting errors in Devel::Git::MultiBisect.
+
+0.03 Fri Nov  4 11:34:10 EDT 2016
+    - In examples/, add annotation for use of Transitions.pm.
+
+0.04 Wed Nov  9 10:09:08 EST 2016
+    - Comment out module import used only for debugging.
+
+0.05 Fri Nov 11 20:19:19 EST 2016
+    - Makefile.PL: use Devel::CheckBin to determine git's presence.
+
+0.06 Sat Nov 12 20:32:53 EST 2016
+    - Opts:  Use Perl 5 %Config's 'make' as starting point for 'make_command'.
+
+0.07 Wed Nov 16 10:03:57 EST 2016
+    - tests: Per discussion in http://perlmonks.org/?node_id=1175983, use \Q
+      and \E to better handle string interpolation within patterns. Eily++;
+      Monk::Thomas++.
+
+0.08 Sun Nov 20 09:11:55 EST 2016
+    - Exclude from Windows.

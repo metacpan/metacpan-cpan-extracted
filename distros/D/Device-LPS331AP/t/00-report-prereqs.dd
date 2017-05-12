@@ -1,0 +1,50 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.010'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'English' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Pod::Wordlist' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::Kwalitee::Extra' => '0',
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Device::SMBus' => '0',
+                                      'Moose' => '0',
+                                      'POSIX' => '0',
+                                      'constant' => '0',
+                                      'perl' => '5.010',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'blib' => '1.01',
+                                   'perl' => '5.010'
+                                 }
+                 }
+     };
+  $x;
+ }

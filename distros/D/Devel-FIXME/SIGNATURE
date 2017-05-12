@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.41.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0c6299cefa8b717063b025f098e4547e4872fb22 Build.PL
+SHA1 7c311f57e4adc920d4adbdfad8ae03e42dae3231 MANIFEST
+SHA1 117cd77d4afdeff0c986f0eb6ebf8528bdb46f52 META.yml
+SHA1 dd165a25fd98156fb5277a417bdc36117474cdb0 Makefile.PL
+SHA1 99ca8fcd667e77c915ca121c8926555ac5e24100 lib/Devel/FIXME.pm
+SHA1 340c48dab124c76face03ad1629fe4257951d3d7 lib/Devel/FIXME/Rules/PerlFile.pm
+SHA1 408da6014ad2fe3e06f2ba42e86fb391835d2fdb t/01-basic.t
+SHA1 7b3e5a6834611e339c8fbb7e5ccbd0e448cb6cbf t/02-api.t
+SHA1 b8a2cf26ca218a0d5b1917e6970479a40c4bf0b9 t/03-require.t
+SHA1 ca3eab14a46bfe7679c91dac1eaffc4917291e72 t/04-errors.t
+SHA1 c4f4c3cc42657f7cb294c609cede6622c28c13d5 t/lib/Devel/FIXME/Test/Error.pm
+SHA1 12104258226ca1e76b5a107f99fde1628832cb76 t/lib/Devel/FIXME/Test/Scalar.pm
+SHA1 da39a3ee5e6b4b0d3255bfef95601890afd80709 t/lib/cant_read
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.5 (Darwin)
+
+iD8DBQFBlRReVCwRwOvSdBgRAj2WAJ98MmeH8sdLvkDV0XAxXRDuaPTzogCdEA1f
+napx2kBD3klge8thH2c+Pt4=
+=sLD6
+-----END PGP SIGNATURE-----

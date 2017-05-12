@@ -1,0 +1,7 @@
+Revision history for Data-Validate-CAA
+
+0.02  2017-04-27
+    - change dist name to Data-Validate-DNS-CAA which matches what is inside
+
+0.01  2017-04-27
+    - Initial release

@@ -1,0 +1,71 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.2.5
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+ - perl 5.006
+
+ [Added / runtime requires]
+ - Module::Runtime
+ - Path::ScanINC
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - Test::DZil
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+ [Removed / runtime requires]
+ - Class::Load
+ - Moose::Autobox
+
+0.2.4 2013-11-22T09:51:44Z
+ [Changed / build requires]
+ - Module::Build 0.4201 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4201 → 0.4202
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+0.2.3 2013-11-19T05:31:25Z
+ [Changed / build requires]
+ - Module::Build 0.4001 → 0.4201
+
+ [Changed / configure requires]
+ - Module::Build 0.4001 → 0.4201
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.2.2 2012-07-07T10:27:26Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.2.1 2012-05-24T11:21:00Z
+
+0.2.0 2011-10-30T02:30:33Z
+ [Added / runtime requires]
+ - App::Cache
+ - Parse::CPAN::Packages
+ - URI

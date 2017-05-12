@@ -1,0 +1,18 @@
+Revision history for Perl extension Data::TxnBuffer
+
+0.05  2011-01-27T09:35:16+09:00
+      - fix wrong pod syntax
+
+0.04  2011-01-26T20:29:10+09:00
+      - disabled XS backend at win32 because no one can maintain at this point
+
+0.03  2011-01-25T14:34:54+09:00
+      - added missing dependency 'parent'
+      - specify minimal perl version
+      - removed a my debug code
+
+0.02  2011-01-25T14:29:36+09:00
+      - added length accessor
+
+0.01  2011-01-25T12:39:34+09:00
+      - original version

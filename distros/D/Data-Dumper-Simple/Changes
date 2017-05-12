@@ -1,0 +1,48 @@
+Revision history for Perl extension Data::Dumper::Simple.
+
+0.11  2005-11-15
+    - POD bug.  Changed "autodump" to "autowarn" in POD.
+
+0.10  2005-10-08
+    - Added POD tests.
+    - Converted to Module::Build
+    - Fixed tiny bug where import list error wasn't getting
+      reported correctly (because I was missing 'strict'.  Fancy
+      that).
+
+0.07  Thu May 19 2005
+    - Implemented patch from Tom Phoenix that makes parentheses
+      optional (and a doc fix, too).
+    - Fixed little-known bug that triggered indirect method call
+      syntax.  You can now do "diag Dumper($foo)" or
+      "diag Dumper $foo" if you wish.
+
+0.06  Monday Aug 2 2004
+    - Fixed variable with whitespace bug ($foo[   4   ]).
+      Added autowarning.
+      Added ability to choose own name for &Dumper (helps with
+      namespace collisions).
+
+0.05  Sun Aug 01 2004
+    - taking a reference to an array or hash now lists the data
+      structure as a reference in the output.  Shoulda done that
+      the first time.
+
+      Perl Barbie says "Source filtering is *hard*"
+
+0.04  Sun Aug 01 2004
+    - Commenting out a Dumper statement now works.
+
+0.03  Sat Jul 31 15:30:00 PDT 2004
+    - Changed the filter from "code" to "executable".  This
+      will sometimes mean that quoted data could be inappropriately
+      interpolated, but there appears to be an obscure bug in 
+      Filter::Simple.  Still, this is a debugging module and it
+      should not really be an issue.
+
+0.02  Sat Jul 31 12:30:00 PDT 2004
+    - fixed tiny bug with how scalars were represented when
+      a reference to one is taken.
+
+0.01  Fri Jul 30 16:29:14 PDT 2004
+    - original version; created by make_project 0.1

@@ -1,0 +1,23 @@
+Dancer2::Plugin::HTTP::Auth::Extensible
+=======================================
+
+A Plugin for doing simple Authentication for REST applications with Dancer2
+
+Synopsis
+========
+
+    use Dancer2;
+    use Dancer2::Plugin::HTTP::Auth::Extensible;
+    
+    get '/users' => http_require_authentication => sub { ... };
+    
+    get '/beer' => http_require_role 'BeerDrinker' => sub { ... };
+
+    get '/drink' => http_require_any_role [qw(BeerDrinker VodaDrinker)] => sub {
+        ...
+    };
+
+
+
+
+WATCH OUT .... THIS REQUIRES Dancer2::Plugin::Auth::Extensible

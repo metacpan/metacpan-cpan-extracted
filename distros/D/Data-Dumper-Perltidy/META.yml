@@ -1,0 +1,28 @@
+---
+abstract: 'Dump and pretty print Perl data structures.'
+author:
+  - 'John McNamara <jmcnamara@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Dumper-Perltidy
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dumper: 0
+  Perl::Tidy: 0
+  Test::More: 0
+resources:
+  bugtracker: http://github.com/jmcnamara/data-dumper-perltidy/issues
+  homepage: http://jmcnamara.github.com/data-dumper-perltidy/
+  repository: http://github.com/jmcnamara/data-dumper-perltidy
+version: 0.03

@@ -1,0 +1,22 @@
+The following table gives the relative speed of different one-way hash
+functions,  sorted  by throughput. The benchmark was done on an  Intel
+Pentium  4, 1.6 GHz, with 128 MB memory, running on Linux 2.4.21.  The
+Perl version used is 5.8.0, and the buffer size for file reads is 4096
+bytes.
+
+                  Size                            Throughput
+Hash Function    (bits) Implementation (version)    (MB/s)
+
+SHA-256            256  Digest::SHA2 (v1.1.0)      27.272695
+Haval (5 rounds)   256  Digest::Haval256 (v1.1.0)  19.486951
+SHA-256            256  Digest::SHA (v4.0.7)       16.288889
+
+SHA-384            384  Digest::SHA (v4.0.7)       11.173110
+SHA-384            384  Digest::SHA2 (v1.1.0)      10.032513
+
+SHA-512            512  Digest::SHA (v4.0.7)       11.201936
+SHA-512            512  Digest::SHA2 (v1.1.0)      10.177476
+Whirlpool          512  Digest::Whirlpool (v1.1.0)  4.962344
+
+NOTE: 1 MB = 1,000,000 bytes
+

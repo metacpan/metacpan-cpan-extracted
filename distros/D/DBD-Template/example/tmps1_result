@@ -1,0 +1,20 @@
+-->>Data Source
+dbi:TemplateSS:
+-->>Table Info
+::ANYFMT:TABLE:Some Format
+-- ALL Rows --
+Suzuka,Jiro:Chiba:Right:28
+Nakama,Nori:Osaka:First:32
+Hani,Hoheto:Kobe:Left:40
+Namo,Hudefo:Osaka:Pitcher:35
+Sazaki,Daima:Chiba:Pitcher:30
+---Where ----
+Suzuka,Jiro
+Hani,Hoheto
+Namo,Hudefo
+--ALL Rows(order by age)--
+Suzuka,Jiro:Chiba:Right:28
+Matui,Gojira:Tokyo:Right:28
+Sazaki,Daima:Chiba:Pitcher:30
+Nakama,Nori:Kyoto:First:32
+Namo,Hudefo:Osaka:Pitcher:35

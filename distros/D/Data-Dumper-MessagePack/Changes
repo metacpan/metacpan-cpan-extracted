@@ -1,0 +1,45 @@
+==================================================
+Changes from 1741-12-10 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.002 at 2015-09-24 06:21:02 +0000
+------------------------------------------
+
+  Change: bbea58363b4931619db5cc2ef1dbbb82a566e989
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-09-24 08:20:47 +0000
+
+    Added missing requirement 
+
+------------------------------------------
+version 0.001 at 2015-07-19 22:47:52 +0000
+------------------------------------------
+
+  Change: 0eba935fed778f0f70473d36297aa989d517ef2a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-07-20 00:47:52 +0000
+
+    Added travis, added ABSTRACT 
+
+  Change: a17b15ef21964c3d3dd132442b42767e846384d8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-07-20 00:45:40 +0000
+
+    Fixed rights 
+
+  Change: c9ecda1ddc7e1b894c54ff0a60e76b52919dd184
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-07-20 00:45:28 +0000
+
+    First working version 
+
+  Change: 10e7c3cb873fbecdb8e23ac0841f3b5140eec922
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-07-19 18:46:39 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

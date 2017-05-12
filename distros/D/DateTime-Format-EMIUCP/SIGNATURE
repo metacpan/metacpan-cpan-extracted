@@ -1,0 +1,69 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ec8317e8e467820aebb95cf06b7c244e62103b36 Build.PL
+SHA1 290ace17a48fabb0f489c69ba373ac641bbb54e5 Changes
+SHA1 39d4369e877ca8afd2c5736d89d21b67976f2d07 LICENSE
+SHA1 062179c3c054e1578274c6aabb27333611d79b97 MANIFEST
+SHA1 c3a34543c726b0d9c39e90592d1db5ae07b6f1b3 MANIFEST.SKIP
+SHA1 46467c4625a7cbcc930a6b857a442ef32e13b8ec META.json
+SHA1 74380316d15e6360a70de1e0b65efcaa3052c811 META.yml
+SHA1 3b40215ee449791858c504e5f7c5bf3be72da0c2 Makefile.PL
+SHA1 6d081c0418c2bd89f949c5f35f1a55569932735f README
+SHA1 5bef0bb67bce8c2a5eac683ecae8142d084dd0e3 README.md
+SHA1 4502f8466db596ce89b90cd5db19c4b6629ceb01 examples/dt2emiucp.pl
+SHA1 b440fcbe4924e2c00226193fb5871fea5ce6e070 examples/emiucp2dt.pl
+SHA1 b6f99d5933246e3a9e0e3a500ac655a75c031572 lib/DateTime/Format/EMIUCP.pm
+SHA1 93a4ea8744ab7e3c24c53e2ea618a92a55656be8 lib/DateTime/Format/EMIUCP/DDT.pm
+SHA1 2a61a033437747dc35d7e7ec47e228d862d42039 lib/DateTime/Format/EMIUCP/DSCTS.pm
+SHA1 6458c2c5b8ad9aacd3415decc0049a2eb9b16f17 lib/DateTime/Format/EMIUCP/SCTS.pm
+SHA1 a35d9b671a2305de18d06bf7eddde64b84f17123 lib/DateTime/Format/EMIUCP/VP.pm
+SHA1 d17447e9238f2bafa4eba6dc04d56cda522fac2c t/110_parse_emiucp.t
+SHA1 f65cb5707bf1aa7a042d29ede5705e361da3179c t/120_parse_error_emiucp.t
+SHA1 1ea9735656ecf155e4ce466becc86e075065ebc1 t/210_parse_scts.t
+SHA1 af825d5c2cd687fd9f303ad387a4a6736951da6e t/220_parse_error_scts.t
+SHA1 c7c969efe53cbcb3efc3ad1cc7a7cbadfff2ce75 t/230_format_scts.t
+SHA1 5bc720f93ea4053fb3fe7bbb695a7e53ef8af867 t/310_parse_ddt.t
+SHA1 fd98a5568af0c4ebe5c53e731acfcca3efce975c t/320_parse_error_ddt.t
+SHA1 76edf0ae334ba32dcd6b53223535f7bb24c5eaaa t/330_format_ddt.t
+SHA1 91f1e40a9ccc832e98ebc96473c22eb7f2926d23 t/410_parse_vp.t
+SHA1 835408d36b4e912ca0bab6132dfeb3efdfb6f61d t/420_parse_error_vp.t
+SHA1 56261d3cfb37208ddfd8ea311ef3d894b2f62bed t/430_format_vp.t
+SHA1 4555a4cd2584c927601cef1c085ca78a76691dfe t/510_parse_dscts.t
+SHA1 e66461ef65454bcccf509e5b9cfb7e2844adbd28 t/520_parse_error_dscts.t
+SHA1 bc59056a2ef34e8763eeb169c212a42b7b155f4d t/530_format_dscts.t
+SHA1 8259fd967411a9d13ee842b1adb8913153fc39f1 t/test.pl
+SHA1 90353a99ac0f719b6f3e58029804d8556cedc2ab xt/check_changes.t
+SHA1 1c27e5840b0154e44120bc2edc02fbb507c76819 xt/consistent_version_numbers.t
+SHA1 67bb4c141ea95809f3db2d526ce91d9e6d894756 xt/copyright.t
+SHA1 650dccfa9b6f5a98cf731c89041bea8935dbc623 xt/cover.pl
+SHA1 f5aac658ae1888964274e68d179413782082b7ad xt/distribution.t
+SHA1 44147122d52fef90ab3a2c65ebba4f89342174f8 xt/kwalitee.t
+SHA1 6e7f9dde7560793bcb40acc41561e07d163ad6d1 xt/minimumversion.t
+SHA1 e8daa0c73cfc304c240fad2d2c2b1b628175a89d xt/perlcritic.t
+SHA1 812a4f6e2d01d22de9f32fb69b1d446224ac6dfe xt/perlcriticrc
+SHA1 46aa111935ff192343c30b72d28da1a71ef4abf0 xt/pod_coverage.t
+SHA1 bef7d46eb5cbc3e67956d4e823ec199f41ab9268 xt/pod_spell.t
+SHA1 e0a12c594149e051d9f650194c32e3440c373bc6 xt/pod_spellrc
+SHA1 87cb53d4ad0162a872d5c70013fc41719e030555 xt/pod_syntax.t
+SHA1 a38994922fda6d64e2ee75198fadc464a221fea9 xt/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk+QbDEACgkQhMHHe8CxClsoxACeKl76xm5yLwWRlqWFRnZ4J8Fd
+7ZEAnRKf9srWlTz3Zf4rCPqZ1emROtkJ
+=wXVd
+-----END PGP SIGNATURE-----

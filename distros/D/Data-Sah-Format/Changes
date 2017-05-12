@@ -1,0 +1,13 @@
+Revision history for Data-Sah-Format
+
+0.002   2016-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [refactor] Extract test_format() to a module
+	  Test::Data::Sah::Format.
+
+
+0.001   2016-06-13 (PERLANCAR)
+
+        - First release.

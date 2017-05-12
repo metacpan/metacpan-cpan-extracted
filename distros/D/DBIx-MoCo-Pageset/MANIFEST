@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+META.yml
+README
+lib/DBIx/MoCo/Pageset.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+

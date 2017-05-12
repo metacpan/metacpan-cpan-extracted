@@ -1,0 +1,35 @@
+MANIFEST
+README
+CHANGELOG
+MAINTAINERS-NOTE
+Makefile.PL
+TODO
+lib/Data/Compare.pm
+lib/Data/Compare/Plugins.pod
+lib/Data/Compare/Plugins/Scalar/Properties.pm
+t/compare.t
+t/oo.t
+t/opts-ignore-hash-keys.t
+t/plugins.t
+t/scalar-properties.t
+t/taint.t
+t/deep-recursion.t
+t/deep-objects.t
+t/realtainttest
+t/pod.t
+NOTES
+t/noimport.t
+t/noimport-register_plugins.t
+t/duplicates.t
+t/saritha-nalagandla-bug.t
+t/saritha-nalagandla-bug/test082_updateevent_multipleinvitees.exp
+t/saritha-nalagandla-bug/test082_updateevent_multipleinvitees.out
+ARTISTIC.txt
+GPL2.txt
+t/coverage.sh
+t/FIXME-large-structures.t
+MANIFEST.SKIP
+t/overload.t
+t/lib/SpecialClass.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,15 @@
+Revision history for Date-Holidays-AT
+
+0.1.3   01-22-2009/11:30pm
+        Fix: Corrected spelling errors in other files :)
+
+0.1.2   01-22-2009/11:20pm
+        Fix: Corrected spelling error in POD
+        Fix: Added version.pm to required modules
+
+0.1.1   02-13-2007/10:30pm
+        Wrong reference in SEE ALSO section
+        Wrong META.yml file submitted
+
+0.1.0   02-12-2007/4:30pm
+        First public version, released on an unsuspecting world.

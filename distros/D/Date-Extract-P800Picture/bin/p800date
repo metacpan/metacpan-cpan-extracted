@@ -1,0 +1,245 @@
+#!/usr/bin/env perl -w    # -*- cperl; cperl-indent-level: 4 -*-
+# Copyright (C) 2008-2017, Roland van Ipenburg
+use strict;
+use warnings;
+
+use utf8;
+use 5.014000;
+
+BEGIN { our $VERSION = '0.108'; }
+
+use Date::Extract::P800Picture;
+
+use English qw(-no_match_vars);
+use Exception::Class;
+use File::Basename;
+use Getopt::Long;
+use Log::Log4perl qw(:easy get_logger);
+use Pod::Usage;
+use Pod::Usage::CommandLine;
+
+use Readonly;
+## no critic (ProhibitCallsToUnexportedSubs)
+Readonly::Scalar my $LOG_CONF    => q{p800date_log.conf};
+Readonly::Array my @DEBUG_LEVELS => ( $FATAL, $INFO, $WARN, $DEBUG );
+Readonly::Hash my %LOG           => (
+    'FILENAME' => q{Processing filename '%s'},
+    'NO_PRINT' => q{Could not print},
+);
+Readonly::Array my @GETOPT_CONFIG =>
+  qw(no_ignore_case bundling auto_version auto_help);
+Readonly::Array my @GETOPTIONS  => (q{verbose|v+});
+Readonly::Hash my %OPTS_DEFAULT => ();
+## use critic
+
+Getopt::Long::Configure(@GETOPT_CONFIG);
+my %opts = %OPTS_DEFAULT;
+Getopt::Long::GetOptions( \%opts, @GETOPTIONS ) or Pod::Usage::pod2usage(2);
+
+if ( -r $LOG_CONF ) {
+## no critic qw(ProhibitCallsToUnexportedSubs)
+    Log::Log4perl::init_and_watch($LOG_CONF);
+## use critic
+}
+else {
+## no critic qw(ProhibitCallsToUnexportedSubs)
+    Log::Log4perl::easy_init($ERROR);
+## use critic
+}
+my $log = Log::Log4perl->get_logger( File::Basename::basename $PROGRAM_NAME );
+$log->level(
+    $DEBUG_LEVELS[
+      (
+          ( $opts{'verbose'} || 0 ) > $#DEBUG_LEVELS
+          ? $#DEBUG_LEVELS
+          : $opts{'verbose'}
+      )
+      || 0
+    ],
+);
+
+my $p = Date::Extract::P800Picture->new();
+
+while ( my $filename = shift @ARGV ) {
+    $log->debug( sprintf $LOG{'FILENAME'}, $filename );
+
+    my $dt;
+    my $ret = eval { $dt = $p->extract( File::Basename::basename $filename); };
+    if ( my $e = Exception::Class->caught('DateExtractP800PictureException') ) {
+        $log->logdie($e);
+    }
+    if ( !print $dt->iso8601() . qq{\n} ) {
+        $log->logdie( $LOG{'NO_PRINT'} );
+    }
+
+}
+
+__END__
+
+=encoding utf8
+
+=for stopwords Ericsson Filename MERCHANTABILITY filename filenames timestamp manpage Ipenburg
+
+=head1 NAME
+
+p800date - show the date encoded in a P800 picture filename 
+
+=head1 USAGE
+
+B<p800date> [B<-v>] I<filename>...
+
+=head1 DESCRIPTION
+
+B<p800date> prints the timestamp encoded in the filenames of pictures created
+with a Sony Ericsson P800 camera phone. The timestamp is printed in ISO8601
+notation.
+
+=head1 REQUIRED ARGUMENTS
+
+A filename, which is allowed to include a path and doesn't have to be an
+existing file.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B< -?, -h, --help>
+
+Show help
+
+=item B< -m, --man>
+
+Show manpage
+
+=item B< -v, --verbose>
+
+Be more verbose
+
+=item B<--version>
+
+Show version and license
+
+=back
+
+=head1 FILES
+
+=over 4
+
+=item p800date_log.conf
+
+Configuration file for L<Log::Log4perl|Log::Log4perl>
+
+=back
+
+=head1 DIAGNOSTICS
+
+An error is thrown when a date can't be extracted from the filename:
+
+=over 4
+
+=item * Could not parse year character
+
+(E) The character encoding the year wasn't in the required range
+
+=item * Could not parse month character
+
+(E) The character encoding the month wasn't in the required range
+
+=item * Could not parse day character
+
+(E) The character encoding the day of the month wasn't in the required range
+
+=item * Could not parse hour character
+
+(E) The character encoding the hour of the day wasn't in the required range
+
+=item * No date found in filename
+
+(E) The filename doesn't contain a valid encoded date
+
+=item * Filename is not set, nothing to extract
+
+(E) No filename was passed to the program
+
+=item * Could not print
+
+(E) The output could not be printed
+
+=back
+
+=head1 EXAMPLES
+
+C<p800date 36LC0079.jpg         #prints 2003-07-22T12:00:00>
+
+=head1 DEPENDENCIES
+
+Perl 5.14.0, Date::Extract:P800Picture, File::Basename, Getopt::Long,
+Log::Log4perl, Pod::Usage::CommandLine
+
+=head1 EXIT STATUS
+
+=over 4
+
+=item 0Z<>
+
+Success.
+
+=item 2Z<>
+
+Unknown option specified.
+
+=item 255Z<>
+
+An error occurred.
+
+=back
+
+=head1 CONFIGURATION
+
+L<Log::Log4perl|Log::Log4perl> logging can be configured in p800date_log.conf.
+
+=head1 INCOMPATIBILITIES
+
+There are no known incompatibilities.
+
+=head1 BUGS AND LIMITATIONS
+
+Please report any bugs or feature requests at
+L<RT for rt.cpan.org|https://rt.cpan.org/Dist/Display.html?Queue=Date-Extract-P800Picture>.
+
+=head1 AUTHOR
+
+Roland van Ipenburg, E<lt>ipenburg@xs4all.nlE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 by Roland van Ipenburg
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENSE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

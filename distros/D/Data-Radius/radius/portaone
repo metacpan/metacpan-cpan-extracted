@@ -1,0 +1,38 @@
+#
+#   PortaOne vendor specific dictionary
+#   Copyright (C) 2003-2011 PortaOne, Inc
+
+VENDOR  PortaOne    37791
+
+# reserve 1-20 for PortaBilling basics
+
+ATTRIBUTE   PortaOne-Access-Info             1  string  PortaOne
+ATTRIBUTE   PortaOne-Service-Type            2  integer PortaOne
+ATTRIBUTE   PortaOne-Used-Resource           3  string  PortaOne
+
+# start with 21 for special purpose
+
+ATTRIBUTE   PortaOne-Calling-Party          21  string  PortaOne
+ATTRIBUTE   PortaOne-Redirecting-Party      22  string  PortaOne
+ATTRIBUTE   PortaOne-Media-Info             23  string  PortaOne
+ATTRIBUTE   PortaOne-Service-Features       24  string  PortaOne
+ATTRIBUTE   PortaOne-Service-Action         25  string  PortaOne
+ATTRIBUTE   PortaOne-Charge                 26  string  PortaOne
+ATTRIBUTE   PortaOne-Called-Party           27  string  PortaOne
+ATTRIBUTE   PortaOne-Transport-Protocol     28  string  PortaOne
+ATTRIBUTE   PortaOne-Leg-Type               29  integer PortaOne
+ATTRIBUTE   PortaOne-Leg-Origin             30  integer PortaOne
+ATTRIBUTE   PortaOne-Final-Called-Party     31  string  PortaOne
+
+
+VALUE   PortaOne-Service-Type   Session      2
+VALUE   PortaOne-Service-Type   Voice        3
+VALUE   PortaOne-Service-Type   Data         5
+VALUE   PortaOne-Service-Type   Netaccess    6
+VALUE   PortaOne-Service-Type   Quantity     7
+VALUE   PortaOne-Service-Type   WiFi         8
+VALUE   PortaOne-Service-Type   DialUp       9
+VALUE   PortaOne-Service-Type   Msg         10
+VALUE   PortaOne-Service-Type   Conference  14
+VALUE   PortaOne-Service-Type   Did         15
+VALUE   PortaOne-Service-Type   Iptv        16

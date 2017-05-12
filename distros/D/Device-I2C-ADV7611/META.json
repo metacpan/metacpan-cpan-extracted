@@ -1,0 +1,97 @@
+{
+   "abstract" : "I2C interface to ADV7611 using Device::I2C",
+   "author" : [
+      "Slava Volkov <sv99@inbox.ru>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-I2C-ADV7611",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee::Extra" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Device::I2C" : "0",
+            "Exporter" : "0",
+            "Fcntl" : "0",
+            "constant" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Device::I2C::ADV7611" : {
+         "file" : "lib/Device/I2C/ADV7611.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/sv99/perl-device-i2c-adv7611/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Device-I2C-ADV7611",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sv99/perl-device-i2c-adv7611.git",
+         "web" : "https://github.com/sv99/perl-device-i2c-adv7611"
+      }
+   },
+   "version" : "0.11"
+}
+

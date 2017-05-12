@@ -1,0 +1,6 @@
+msgid "Please select"
+msgstr "Välj"
+
+msgid "Select %s"
+msgstr "Välj %s"
+

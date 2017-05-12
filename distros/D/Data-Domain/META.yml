@@ -1,0 +1,61 @@
+---
+abstract: 'Data description and validation'
+author:
+  - 'Laurent Dami <laurent.dami@justice.ge.ch>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.42
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4204, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Domain
+provides:
+  Data::Domain:
+    file: lib/Data/Domain.pm
+    version: 1.06
+  Data::Domain::All_of:
+    file: lib/Data/Domain.pm
+  Data::Domain::Date:
+    file: lib/Data/Domain.pm
+  Data::Domain::Empty:
+    file: lib/Data/Domain.pm
+  Data::Domain::Enum:
+    file: lib/Data/Domain.pm
+  Data::Domain::Handle:
+    file: lib/Data/Domain.pm
+  Data::Domain::Int:
+    file: lib/Data/Domain.pm
+  Data::Domain::List:
+    file: lib/Data/Domain.pm
+  Data::Domain::Nat:
+    file: lib/Data/Domain.pm
+  Data::Domain::Num:
+    file: lib/Data/Domain.pm
+  Data::Domain::One_of:
+    file: lib/Data/Domain.pm
+  Data::Domain::String:
+    file: lib/Data/Domain.pm
+  Data::Domain::Struct:
+    file: lib/Data/Domain.pm
+  Data::Domain::Time:
+    file: lib/Data/Domain.pm
+  Data::Domain::Whatever:
+    file: lib/Data/Domain.pm
+requires:
+  Date::Calc: 0
+  List::MoreUtils: 0
+  Scalar::Does: 0.007
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  Try::Tiny: 0
+  autouse: 0
+  experimental: 0
+  perl: 5.010001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/damil/Data-Domain
+version: 1.06

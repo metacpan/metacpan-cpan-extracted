@@ -1,0 +1,332 @@
+Changes for Debug::Client
+
+0.29 2013-07-29
+ - ouch typo, tab v spaces (BOWTIE)
+
+0.28 2013-07-28
+ - bump version and release (BOWTIE)
+
+0.27_02 2013-07-10
+ - remove BEGIN block and force Win32 Term::ReadLine settings (BOWTIE)
+
+0.27_01 2013-07-10
+ - switch to Term::ReadLine::Gnu or nought (BOWTIE)
+
+0.26 2013-06-03
+ - bump version and release (BOWTIE)
+
+0.25_10 2013-05-20
+ - Change the running order of test (BOWTIE)
+ - check testing $ENV{PERL_RL} = ornaments=0
+ - as we only want to do this when necessary (BOWTIE)
+
+0.25_09 2013-05-15
+ - fix buffer call to $debugger->get_buffer
+
+0.25_08 2013-05-12
+ - fix dependency inconsistencies
+ - add new test 00-check-deps.t
+ - add test to see if we invoke $ENV{PERL_RL} (BOWTIE)
+
+0.25_07 2013-05-12
+ - use M::I to load Term::ReadLine::Gnu (BOWTIE)
+
+0.25_06 2013-05-10
+ - contradicting module definitions oops (BOWTIE)
+
+0.25_05 2013-05-09
+ - Tweak 06-term.t to show more info from cpan testers (BOWTIE)
+ - fix missing MANIFEST (BOWTIE)
+ - lower some dependency version dod++ (BOWTIE)
+
+0.25_04 2013-05-05
+ - Tweak for perl-5.17.11 compatibility (BOWTIE)
+ - test tweaks to hack #1494 (BOWTIE)
+ - Use a more appropriate Term::ReadLine::... (BOWTIE)
+
+0.25 2013-04-17
+ - bump version and release (BOWTIE)
+
+0.24_04 2013-04-16
+ - swap out some more localhost for 127.0.0.1 azawawi++ (BOWTIE)
+
+0.24_03 2013-04-16
+ - my $host = '127.0.0.1'; # instead of localhost (AZAWAWI)
+ - add some 'fudge' to t-lib-debugger for win32 azawawi++ (BOWTIE)
+
+0.24_02 2013-04-16
+ - lets remove Time-HiRes completely (BOWTIE)
+
+0.24_01 2013-04-16
+ - tweak t-lib-debugger, adjust sleep to 1 sec (BOWTIE)
+ - update Makefile requirements (BOWTIE)
+
+0.24 2013-02-19
+ - Tweak for production release to co-inside with Padre 0.98 (BOWTIE)
+
+0.23 2013-02-19
+ - Add perltidy.LOG to MANIFEST.SKIP (BOWTIE)
+
+0.22 2013-02-08
+ - Tweak for production release to co-inside with Padre 0.98 (BOWTIE)
+
+0.21_18 2013-01-28
+ - roll-back Makefile to 0.21_14 and test to complement, andk++ (BOWTIE)
+
+0.21_17 2013-01-27
+ - POD tweaks, missing # azawawi++ (BOWTIE)
+ - Add back a requirement to Makefile after being heavy handed (BOWTIE)
+
+0.21_16 2013-01-22
+ - Remove test for a no-longer required module, causing CPAN failures
+   (BOWTIE)
+
+0.21_15 2013-01-22
+ - add reset to buffer in show help (BOWTIE)
+ - fix bug in set breakpoint that was being confused by 'Already in file-x'
+   (BOWTIE)
+
+0.21_14 2013-01-04
+ - #This all relates to #1469
+ - fix Windows hangings (CHORNY) 
+ - split and sort out hack into each dev release
+ - the switch to time hiRes & win32::Precess (BOWTIE)
+ - add some tests back-in using Test::Class to see what CPAN::Reporter go
+   to say (BOWTIE)
+
+0.21_13 2013-01-04
+ - #not released
+ - #This all relates to perl 5.017006
+ - Crammer tweak rindolf++ (BOWTIE)
+ - y=o is now y=1 for >= 5.017006 (BOWTIE)
+ - https://github.com/shlomif/perl/commit/7a0fe8d157063a5d4017c60814c1ea577
+   f105a72 tweak to t/40-test_1415.t to better check if watches are working
+   in 5.017006 (BOWTIE)
+
+0.21_12 2012-11-06
+ - Update Changes to CPAN::Changes::Spec
+ - Tweak tests to handle perl5db version 1.39_04 (perl - 5.17.5) (BOWTIE)
+
+0.21_11 2012-09-09
+ - Removed Test::Pod and Test::Pod::Coverage dependencies (ADAMK)
+ - Removed the spookily magic strictures.pm dependency (ADAMK)
+ - Switching to #!/usr/bin/perl as the env version is recommended against
+   in tests for reasons I forget but I think were related to tainting
+   (ADAMK)
+ - Devolve v5.10 to 5.010 so older perl can parse far enough to understand
+   that they can't parse the file. (ADAMK)
+ - Slightly better separation of concerns in the early test scripts (ADAMK)
+
+0.21_10 2012-09-06
+ - Debug::Client's dependency on Test::Class is breaking Strawberry
+   Test::Class has Windows problems adamk++ 
+ - Remove Test::Class from Debug::Client (BOWTIE)
+
+0.21_09 2012-09-06
+ - skipped intentionally
+
+0.21_08 2012-08-20
+ - correction to parameters for IO::Socket::IP initialisation (BOWTIE)
+
+0.21_07 2012-08-18
+ - bump IO::Socket::IP to 0.17 (BOWTIE)
+
+0.21_06 2012-08-05
+ - silly dependency issue, my bad (BOWTIE)
+ - Info: perl5db v1.39_02 yes in perl 5.17.2, O what fun (BOWTIE)
+
+0.21_05 2012-07-26
+ - remove comments (BOWTIE)
+ - remove un-required dependants from Makefile (BOWTIE)
+ - tweak version requirements for IO::Socket::IP (BOWTIE)
+
+0.21_04 2012-06-23
+ - re-factor initialize plus test (BOWTIE)
+ - turn off test in io (BOWTIE)
+
+0.21_03 2012-06-09
+ - Fix displaying watches in ANON sub #1415 (BOWTIE)
+ - some method re-factoring (BOWTIE)
+ - keep test up-to-date (BOWTIE)
+
+0.21_02 2012-05-21
+ - remove _logger (BOWTIE)
+ - move listener to _init, hence now redundant (BOWTIE)
+ - use IO::Socket::IP (BOWTIE)
+ - tweak tests and Makefile accordingly (BOWTIE)
+
+0.21_01 2012-05-11
+ - Add Test-Pod to appease Kwalitee (BOWTIE)
+ - change to use $self->{debug} instead of $ENV{DEBUG_LOGGER} (BOWTIE) due
+   to bleeding of env causing tests to fail on win32 against 0.20 (BOWTIE)
+ - keep instep with Padre and use perl 5.10 (BOWTIE)
+
+0.20 2012-04-09
+ - change carp dependency to 1.20 in test (BOWTIE)
+
+0.19 2012-04-08
+ - fix for #1415 (WHUMANN, BOWTIE)
+ - drop Carp to 1.20, packaging request (VOEGELAS)
+ - add a README (BOWTIE)
+ - remove dead code (BOWTIE)
+ - re-factor some variables and tidy up (BOWTIE)
+ - fix p|x to display $tring refs x \$tring (BOWTIE)
+
+0.18 2012-03-07
+ - bumped to 0.18 (BOWTIE)
+ - tweaks to POD (BOWTIE)
+
+0.17_06 2012-02-09
+ - remove is for cmp_ok where values are numeric
+ - fix 'Free to wrong pool' in tests against win32
+ - looking to IO::Socket::IP and ipv6
+ - update Makefile to use M-I-DSL
+ - Tweaks to POD, remove unwanted comments (BOWTIE)
+
+0.17_05 2012-01-11
+ - Due to issues with perl5db v1.34-5 in Perl 5.15.3-5 very messy this
+   means list context is now naff Modify tests to cater for these anomaly's
+   add Method get_lineinfo so that we can ask where are we! Tweaks to POD
+   (BOWTIE)
+
+0.17_04 2011-12-29
+ - remove test code in 0.17_03 that was naffing up cpan testers (BOWTIE)
+
+0.17_03 2011-12-29
+ - vast changes to test files  see #1367/8 (BOWTIE)
+ - Patch for 09-io.t ticket #831 (MJGARDNER)
+
+0.17_02 2011-12-08
+ - vast changes to test files (BOWTIE)
+
+0.17_01 2011-12-06
+ - adjust required version for 'E' requires 5.8.6 (Note that threading
+   support was built into the debugger as of  Perl version 5.8.6 and
+   debugger version 1.2.8.)
+ - Oops requires 'IO::Socket' reset to '1.31'
+ - try some other testing modules Test::Class
+ - Tidy POD (BOWTIE)
+
+0.16 2011-11-30
+ - Add Methods list_subroutine_names, set_option, get_options, module
+ - tweak to return line & row from dot if all else fails
+ - tweak to Makefile dependence's
+ - Amend POD for above
+ - Amend test to support above (BOWTIE)
+
+0.15 2011-11-24
+ - removed Method listen
+ - comment out list_subroutine_names & _set_option
+ - Modify Method get_value to accept no values
+ - Modify get_p_exp
+ - Amend test to support above (BOWTIE)
+
+0.14 2011-11-24
+ - Released 0.13_10 as stable 0.14 (AZAWAWI)
+
+0.13_10 2011-11-20
+ - rename Method _show_help -> get_h_var rename Method get_p_ext ->
+   get_p_exp Add tests for above (BOWTIE)
+
+0.13_09 2011-11-17
+ - Add a Method get_p_ext (BOWTIE)
+
+0.13_08 2011-11-13
+ - No newer ExtUtils::MakeMaker dependency. Removed a couple of unneeded
+   test dependencies (AZAWAWI)
+
+0.13_07 2011-11-09
+ - Tweaks to tests for above (BOWTIE)
+
+0.13_06 2011-11-09
+ - Add Method show_view modify method show_line Add Method _show_help
+   Tweaks to tests for above spell check POD (BOWTIE)
+
+0.13_05 2011-11-07
+ - default port changed to 24642 as port 12345 registered to "Italk Chat
+   System" (BOWTIE)
+ - _process_line is where all the generated errors from cpantesters come
+   from $count = 0; and some tweaks to $line to suppress errors when buffer
+   is empty (BOWTIE)
+
+0.13_04 2011-11-05
+ - Perl::Critic Error Subroutine "listen" is a homonym for bulletin
+   function listen changed to listener (BOWTIE)
+ - using ReuseAddr as Reuse has bean deprecated (BOWTIE)
+ - Perl::Critic severity => 5, & severity => 4, pass now (BOWTIE)
+ - tweak to test t/02... (BOWTIE)
+
+0.13_03 2011-11-04
+ - Tweak some tests (BOWTIE)
+ - Updates to POD use $debugger throughout instead of $d (BOWTIE)
+ - Add a test for get_v_vars Add a test for get_y_zero Add a test for
+   list_subroutine_names (BOWTIE)
+
+0.13_02 2011-11-03
+ - re-factor eg/02-sub.pl, change sub f to sub func1 (BOWTIE)
+ - Add a test for get_y_zero
+ - Add a test for toggle_trace (BOWTIE)
+ - Updates to POD to complement new Methods (BOWTIE)
+
+0.13_01 2011-11-02
+ - POD add skip for perl -d c [line|sub] for perl5db.pl >= 1.34 (BOWTIE)
+ - skip some tests t/08.... skip some tests t/04.... (BOWTIE)
+ - development upgrade to 0.13_01 for P-P-Debug add several more methods,
+   and t/13.... (BOWTIE)
+
+0.12 2011-07-21
+ - skip some tests if ~/.perldb exists (GARU)
+ - add an example called debugger.pl
+
+0.11 2009-12-22
+ - Eliminate most of the list/scalar context separation from methods.
+
+0.10 2009-12-20
+ - Add some code to debug certain test failures
+ - Turn _prompt and _process_line into method calls
+ - Keep the current file-name and row number in the debugger object
+
+0.09 2009-12-18
+ - Add case when content of the line is shown on a separate line
+ - Mark when a call has terminated the debugger.
+
+0.08 2009-12-16
+ - Added more tests.
+ - Fixing some tests.
+ - set_breakpoint now returns true/false
+ - remove_breakpoint added
+ - list_break_watch_action added
+
+0.07 2009-12-15
+ - Added more test.
+
+0.06 2009-12-14
+ - Prompt is now the first return parameter
+ - Added more tests
+ - Added more documentation
+
+0.05 2009-12-13
+ - Try to eliminate infinite loop
+ - Try to make sure tests are not hung by calling quit at the end of each
+ - Put the STDOUT and STDERR files in temp directory
+ - Use Module::Install instead of Module::Build
+
+0.04 2008-09-16
+ - Add more methods
+ - Add more tests
+ - Rename to Debug::Client
+ - Remove the global $response variable and let users fetch the buffer
+   using $dbg->buffer
+
+0.03 2008-09-13
+ - Add debug output for tests to better understand test failures.
+ - More tests
+
+0.02 2008-09-13
+ - Replace step by step_in
+ - Add methods step_out, step_over, get_value
+ - Let those method return detailed data in LIST context
+
+0.01 2008-09-13
+ - Initial release
+

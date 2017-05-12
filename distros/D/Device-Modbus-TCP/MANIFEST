@@ -1,0 +1,18 @@
+Changes
+examples/client_tcp.pl
+examples/server_tcp.pl
+lib/Device/Modbus/TCP.pm
+lib/Device/Modbus/TCP/ADU.pm
+lib/Device/Modbus/TCP/Client.pm
+lib/Device/Modbus/TCP/Server.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/lib/Test/Unit.pm
+t/test_adu.t
+t/test_server_client.t
+t/test_server_client_broken_msg.t
+t/test_server_client_disconnect.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,58 @@
+=head1 FEATURES
+
+=head2 Pages
+
+=head3 Search page (C</>)
+
+* Simple search
+
+* Autocomplete/recommend
+
+L<http://twitter.github.io/typeahead.js/>
+
+=head3 Result page (C</q=foo>)
+
+Document excerpts, even highlighted
+
+Direct, local links to documents
+
+Links / redirects to external https? URLs
+
+Restrict results to mime_type
+
+Tabs with implicit restrictions/hidden queries
+
+Search mp3 files
+
+Search ICal calendars like Google calendar(?) and Davical
+
+=head2 Distribution
+
+=head3 Docker
+
+Docker container
+
+=head1 User Introduction
+
+=head2 First Start Experience
+
+The first start is as configuration-free as possible. This means
+choosing some defaults that might turn out to be too lenient in retrospect,
+but ...
+
+=head3 File system crawler
+
+The file system crawler crawls the complete user profile by default.
+This means that the search for the user might show results in folders
+that the user might not want to show in public. An interactive introduction
+might highlight this situation.
+
+=head4 Windows default folder
+
+Use C<$ENV{USERPROFILE}>
+
+=head4 Unixish default folder
+
+Use C<$ENV{HOME}>
+
+=cut

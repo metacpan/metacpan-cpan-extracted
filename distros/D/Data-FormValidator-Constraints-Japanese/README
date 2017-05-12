@@ -1,0 +1,49 @@
+NAME
+    Data::FormValidator::Constraints:Japanese - Japan-Specific Constraints
+    For Data::FormValidator
+
+SYNOPSIS
+      use Data::FormValidator::Constraints::Japanese qw(:all);
+
+      my $rv = Data::FormValidator->check(\%input, {
+         hiragana          => hiragana(),
+         katakana          => katakana(),
+         jp_mobile_email   => jp_mobile_email(),
+         jp_imode_email    => jp_imode_email(),
+         jp_ezweb_email    => jp_ezweb_email(),
+         jp_vodafone_email => jp_vodafone_email(),
+         jp_zip            => jp_zip(),
+         jp_length         => jp_length(1, 10),
+      }, 
+
+      # or, use the regular functions
+      my $rv = Data::FormValidator->check(\%input, {
+         nihongo => sub {
+            my($dfv, $value) = @_;
+            return match_hiragana($value) && ! match_katakana($value);
+         }
+      });
+
+DESCRIPTION
+    D::FM::C::Japanese provides you with contraint methods that makes it
+    easier to validate your Japanese input using Data::FormValidator.
+
+FUNCTIONS
+hiragana
+    Returns a closure that checks if the input is all in hiragana
+
+katakana
+    Returns a closure that checks if the input is all in katakana
+
+jp_mobile_email
+jp_imode_email
+jp_ezweb_email
+jp_vodafone_email
+jp_length
+TODO
+    I'm sure there are lots of other constraints. I'll release more upon
+    request, or when I encounter something new to validate. Patches welcome.
+
+AUTHOR
+    Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org> All rights reserved.
+

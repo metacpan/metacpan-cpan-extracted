@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                DBIx-Array-Connect
+version:             0.05
+abstract:            Database Connections from an INI Configuration File
+license:             ~
+author:              
+    - Michael R. Davis (mdavis@stopllc.com)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::IniFiles:              0
+    DBIx::Array:                   0.14
+    Package::New:                  0
+    Path::Class:                   0
+    Sys::Path:                     0
+    Test::Simple:                  0.44
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

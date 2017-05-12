@@ -1,0 +1,6 @@
+#
+#	Attributes and values defined in RFC 4372.
+#	http://tools.ietf.org/html/rfc4372
+#
+#
+ATTRIBUTE	Chargeable-User-Identity		89	string

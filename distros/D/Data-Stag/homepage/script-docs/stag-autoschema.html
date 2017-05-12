@@ -1,0 +1,92 @@
+<HTML>
+<HEAD>
+<TITLE>stag-autoschema</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+	<LI><A HREF="#limitations">LIMITATIONS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-autoschema.pl - writes the implicit stag-schema for a stag file</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-autoschema.pl -w sxpr sample-data.xml</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Takes a stag compatible file (xml, sxpr, itext), or a file in any
+format plus a parser, and writes out the implicit underlying stag-schema</P>
+<P>stag-schema should look relatively self-explanatory.</P>
+<P>Here is an example stag-schema, shown in sxpr syntax:</P>
+<PRE>
+  (db
+   (person*
+    (name &quot;s&quot;
+    (address+
+     (address_type &quot;s&quot;)
+     (street &quot;s&quot;)
+     (street2? &quot;s&quot;)
+     (city &quot;s&quot;)
+     (zip? &quot;s&quot;)))))</PRE>
+<P>The database db contains zero or more persons, each person has a
+mandatory name and at least one address.</P>
+<P>The cardinality mnemonics are as follows:</P>
+<DL>
+<DT><STRONG><A NAME="item_%2B">+</A></STRONG><BR>
+<DD>
+1 or more
+<P></P>
+<DT><STRONG><A NAME="item_%3F">?</A></STRONG><BR>
+<DD>
+0 or one
+<P></P>
+<LI>
+0 or more
+<P></P></DL>
+<P>The default cardinality is 1</P>
+<P>
+<HR>
+<H1><A NAME="arguments">ARGUMENTS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dp%7Cparser_FORMAT">-p|parser FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ddtd">-dtd</A></STRONG><BR>
+<DD>
+exports schema as DTD
+<P></P>
+<DT><STRONG><A NAME="item_%2Dw%7Cwriter_FORMAT">-w|writer FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module, OR DTD
+<P>The default is sxpr</P>
+<P>note that stag schemas exported as xml will be invalid xml, due to the
+use of symbols *, +, ? in the node names</P>
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="limitations">LIMITATIONS</A></H1>
+<P>not event based - memory usage becomes exhorbitant on large files;
+prepare a small sample beforehand</P>
+
+</BODY>
+
+</HTML>

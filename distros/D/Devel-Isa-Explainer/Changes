@@ -1,0 +1,33 @@
+Release history for Devel-Isa-Explainer
+
+0.002001 2016-05-19T14:07:12Z c167598
+ [Documentation]
+ - Reference updated screenshots.
+
+ [Internals]
+ - use namespace::clean in a few more places.
+
+0.002000 2016-05-19T12:30:00Z 6c368ff
+ - isa-splain now accepts -M parameter to explicitly specify modules to load. This is helpful in handling cases where
+   one module inlines others, ( B -> B::CV ) or a module can't be loaded on its own ( Class::MOP::Class )
+
+ [Bug #6]
+ - Poking MAX_WIDTH to a value smaller than 5 no longer triggers an infinite loop, instead, a minimum of one package
+   per line will be emitted, even if it exceeds MAX_WIDTH.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1
+ - runtime: +1
+
+ [Internals]
+ - factored out _class_subs function
+ - Method Resolution mechanics reworked to more closely reflect how perl-itself views methods. This will reduce certain
+   redundant duplicate coderefs and only show them at the lowest point in the heirachy where they are defined.
+ - Now fatals when inheritance lookup returns nothing and the package had a compile failure.
+
+0.001001 2016-04-01T09:31:35Z ab66fba
+ - Minor documentation fixes.
+
+0.001000 2016-03-31T13:55:56Z 3c0283f
+ - First version.

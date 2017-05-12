@@ -1,0 +1,26 @@
+---
+abstract: 'The parser for Fennec syntax.'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Declare-Parser-Fennec
+provides:
+  Devel::Declare::Parser::Fennec:
+    file: lib/Devel/Declare/Parser/Fennec.pm
+    version: 0.005
+requires:
+  Devel::Declare::Parser: 0.017
+  Exporter::Declare::Magic: 0.107
+resources:
+  bugtracker: http://github.com/exodist/Devel-Declare-Parser-Fennec/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/exodist/Devel-Declare-Parser-Fennec
+version: 0.005

@@ -1,0 +1,115 @@
+use strict;
+use warnings;
+package Pod::Weaver::PluginBundle::NRR;
+# VERSION
+
+use Pod::Weaver::Config::Assembler;
+
+# Dependencies
+use Pod::Weaver::Plugin::WikiDoc ();
+use Pod::Elemental::Transformer::List 0.101620 ();
+use Pod::Weaver::Section::Support 1.001 ();
+
+sub _exp { Pod::Weaver::Config::Assembler->expand_package($_[0]) }
+
+my $repo_intro = <<'END';
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+END
+
+my $bugtracker_content = <<'END';
+Please report any bugs or feature requests through the issue tracker
+at {WEB}.
+You will be notified automatically of any progress on your issue.
+END
+
+sub mvp_bundle_config {
+  my @plugins;
+  push @plugins, (
+    [ '@NRR/WikiDoc',     _exp('-WikiDoc'), {} ],
+    [ '@NRR/CorePrep',    _exp('@CorePrep'), {} ],
+    [ '@NRR/Name',        _exp('Name'),      {} ],
+    [ '@NRR/Version',     _exp('Version'),   {} ],
+
+    [ '@NRR/Prelude',     _exp('Region'),  { region_name => 'prelude'     } ],
+    [ '@NRR/Synopsis',    _exp('Generic'), { header      => 'SYNOPSIS'    } ],
+    [ '@NRR/Description', _exp('Generic'), { header      => 'DESCRIPTION' } ],
+    [ '@NRR/Overview',    _exp('Generic'), { header      => 'OVERVIEW'    } ],
+
+    [ '@NRR/Stability',   _exp('Generic'), { header      => 'STABILITY'   } ],
+  );
+
+  for my $plugin (
+    [ 'Attributes', _exp('Collect'), { command => 'attr'   } ],
+    [ 'Methods',    _exp('Collect'), { command => 'method' } ],
+    [ 'Functions',  _exp('Collect'), { command => 'func'   } ],
+  ) {
+    $plugin->[2]{header} = uc $plugin->[0];
+    push @plugins, $plugin;
+  }
+
+  push @plugins, (
+    [ '@NRR/Leftovers', _exp('Leftovers'), {} ],
+    [ '@NRR/postlude',  _exp('Region'),    { region_name => 'postlude' } ],
+    [ '@NRR/Support',   _exp('Support'),
+      {
+        perldoc => 0,
+        websites => 'none',
+        bugs => 'metadata',
+        bugs_content => $bugtracker_content,
+        repository_link => 'both',
+        repository_content => $repo_intro
+      }
+    ],
+    [ '@NRR/Authors',   _exp('Authors'),   {} ],
+    [ '@NRR/Legal',     _exp('Legal'),     {} ],
+    [ '@NRR/List',      _exp('-Transformer'), { 'transformer' => 'List' } ],
+  );
+
+  return @plugins;
+}
+
+# ABSTRACT: NRR's default Pod::Weaver config
+# COPYRIGHT
+
+1;
+
+=for Pod::Coverage mvp_bundle_config
+
+=begin wikidoc
+
+= DESCRIPTION
+
+This is a [Pod::Weaver] PluginBundle.  It is roughly equivalent to the
+following weaver.ini:
+
+  [-WikiDoc]
+
+  [@Default]
+
+  [Support]
+  perldoc = 0
+  websites = none
+  bugs = metadata
+  bugs_content = ... stuff (web only, email omitted) ...
+  repository_link = both
+  repository_content = ... stuff ...
+
+  [-Transformer]
+  transfomer = List
+
+= USAGE
+
+This PluginBundle is used automatically with the C<@NRR> [Dist::Zilla]
+plugin bundle.
+
+= SEE ALSO
+
+* [Pod::Weaver]
+* [Pod::Weaver::Plugin::WikiDoc]
+* [Pod::Elemental::Transformer::List]
+* [Dist::Zilla::Plugin::PodWeaver]
+
+=end wikidoc
+
+=cut

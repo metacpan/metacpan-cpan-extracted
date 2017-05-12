@@ -1,0 +1,14 @@
+Revision history for Perl extension Data::Grouper.
+
+0.01  Thu Jan 10 18:24:44 2002
+   - original version; created by h2xs 1.19
+   - Modified from stable production code, work on docs
+0.04  ?
+   - Clarified COLNAMES documentation
+   - Adding add_hash function
+   - Added data constructor param (Thanks to Mark Stosberg for idea)
+0.05
+   - Doc improvements
+0.06
+   - Fix doc bugs (Thanks Max)
+   - Add some warns() for common pitfals (Max,Mark)

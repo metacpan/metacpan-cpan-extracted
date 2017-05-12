@@ -1,0 +1,48 @@
+---
+abstract: 'helper functions for creating Dancer2 AppRole plugins'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-AppRole-Helper
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::AppRole::Helper:
+    file: lib/Dancer2/Plugin/AppRole/Helper.pm
+    version: '1.152121'
+requires:
+  Exporter: '0'
+  parent: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer2-Plugin-AppRole-Helper
+  homepage: https://github.com/wchristian/Dancer2-Plugin-AppRole-Helper
+  repository: https://github.com/wchristian/Dancer2-Plugin-AppRole-Helper.git
+version: '1.152121'

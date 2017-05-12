@@ -1,0 +1,14 @@
+Revision history for Perl extension D64::File::PRG.
+
+0.03  2013-01-19
+    - added new "set_data" and "set_file_data" methods enabling respectively
+      to update raw program data and to replace original program data of an
+      already initialized D64::File::PRG object instance
+
+0.02  2010-10-31
+    - error reported by CPAN Testers fixed: "Unknown discipline ':bytes' at
+      open.pm line 13" occuring for Perl version 5.6.2
+
+0.01  2010-01-28
+    - initial version (supports reading, writing, accessing data, and changing
+      loading address of C64's PRG files)

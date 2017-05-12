@@ -1,0 +1,19 @@
+Changes
+ignore.txt
+lib/Data/Predicate.pm
+lib/Data/Predicate/ClosurePredicate.pm
+lib/Data/Predicate/Predicates.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/basic-predicate.t
+t/can-predicate.t
+t/isa-predicate.t
+t/pod-coverage.t
+t/pod.t
+t/predicate-advanced-filters.t
+t/ref-predicate.t
+t/value-predicates.t
+META.yml                                 Module meta-data (added by MakeMaker)

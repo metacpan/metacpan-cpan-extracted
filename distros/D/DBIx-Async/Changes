@@ -1,0 +1,22 @@
+Revision history for DBIx-Async
+
+0.003     2015-02-01 15:28:01+00:00 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Futures returned are also retained locally, allowing things to work in void context
+	* Clean up some debugging output, use ->debug_printf to tie in with existing IO::Async debugging system
+
+	Dependencies:
+	* Uses Variable::Disposition for retain_future
+
+0.002     2014-01-13 09:34:38+00:00 Europe/London
+	No new features.
+
+	Bug fixes:
+	* Minimum Future version is 0.21, for ->is_done
+	* Don't assume DBD::SQLite is available (was being loaded in DBIx::Async::Worker::SQLite compilation tests)
+	* Don't special-case sqlite setup (WAL journal etc.)
+
+0.001     2014-01-12 19:09:03+00:00 Europe/London
+	Initial CPAN release

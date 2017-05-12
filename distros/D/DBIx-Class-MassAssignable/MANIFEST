@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-Class-MassAssignable.t
+lib/DBIx/Class/MassAssignable.pm

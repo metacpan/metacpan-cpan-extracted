@@ -1,0 +1,31 @@
+DBIx/Dump version 0.01
+======================
+
+DBIx::Dump provides the ability to dump DBI retrieved data to a variety of formats
+including Excel, CSV, etc...
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Depending on what you are planning to dump the results is, here are the required modules...
+
+  Excel -> Spreadsheet::WriteExcel
+  CSV -> Text::CSV_XS
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Ilya Sterin
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

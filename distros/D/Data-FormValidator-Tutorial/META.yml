@@ -1,0 +1,13 @@
+---
+name: Data-FormValidator-Tutorial
+version: 1.61
+author:
+  - William McKee <william@knowmad.com>
+  - Jason Purdy <jason@purdy.info>
+abstract: Data::FormValidator Tutorial
+license: perl
+provides:
+  Data::FormValidator::Tutorial:
+    file: lib/Data/FormValidator/Tutorial.pm
+    version: 1.61
+generated_by: Module::Build version 0.26

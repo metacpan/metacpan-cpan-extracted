@@ -1,0 +1,108 @@
+---
+name: Data-Serializer
+version: 0.60
+author:
+  - "Neil Neely (neil@neely.cx)"
+abstract: Modules that serialize data structures
+license: perl
+build_requires:
+  File::Spec: 0
+  IO::File: 0
+  Test::More: 0
+requires:
+  AutoLoader: 0
+  Data::Dumper: 2.08
+  Digest::SHA: 0
+  Exporter: 0
+  IO::File: 0
+recommends:
+  Bencode: 0
+  Compress::PPMd: 0
+  Compress::Zlib: 0
+  Config::General: 0
+  Convert::Bencode: 0
+  Convert::Bencode_XS: 0
+  Crypt::Blowfish: 0
+  Crypt::CBC: 0
+  Data::Denter: 0
+  Data::Taxi: 0
+  FreezeThaw: 0
+  JSON: 0
+  JSON::Syck: 0
+  JSON::XS: 0
+  MIME::Base64: 0
+  PHP::Serialization: 0
+  Storable: 0
+  XML::Dumper: 0
+  XML::Simple: 0
+  YAML: 0
+  YAML::Syck: 0
+configure_requires:
+  Module::Build: 0.35
+generated_by: Module::Build version 0.35
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+provides:
+  Data::Serializer:
+    file: lib/Data/Serializer.pm
+    version: 0.60
+  Data::Serializer::Bencode:
+    file: lib/Data/Serializer/Bencode.pm
+    version: 0.03
+  Data::Serializer::Config::General:
+    file: lib/Data/Serializer/Config/General.pm
+    version: 0.02
+  Data::Serializer::Convert::Bencode:
+    file: lib/Data/Serializer/Convert/Bencode.pm
+    version: 0.03
+  Data::Serializer::Convert::Bencode_XS:
+    file: lib/Data/Serializer/Convert/Bencode_XS.pm
+    version: 0.03
+  Data::Serializer::Cookbook:
+    file: lib/Data/Serializer/Cookbook.pm
+    version: 0.05
+  Data::Serializer::Data::Denter:
+    file: lib/Data/Serializer/Data/Denter.pm
+    version: 0.02
+  Data::Serializer::Data::Dumper:
+    file: lib/Data/Serializer/Data/Dumper.pm
+    version: 0.05
+  Data::Serializer::Data::Taxi:
+    file: lib/Data/Serializer/Data/Taxi.pm
+    version: 0.02
+  Data::Serializer::FreezeThaw:
+    file: lib/Data/Serializer/FreezeThaw.pm
+    version: 0.02
+  Data::Serializer::JSON:
+    file: lib/Data/Serializer/JSON.pm
+    version: 0.04
+  Data::Serializer::JSON::Syck:
+    file: lib/Data/Serializer/JSON/Syck.pm
+    version: 0.02
+  Data::Serializer::PHP::Serialization:
+    file: lib/Data/Serializer/PHP/Serialization.pm
+    version: 0.02
+  Data::Serializer::Persistent:
+    file: lib/Data/Serializer/Persistent.pm
+    version: 0.01
+  Data::Serializer::Raw:
+    file: lib/Data/Serializer/Raw.pm
+    version: 0.02
+  Data::Serializer::Storable:
+    file: lib/Data/Serializer/Storable.pm
+    version: 0.03
+  Data::Serializer::XML::Dumper:
+    file: lib/Data/Serializer/XML/Dumper.pm
+    version: 0.02
+  Data::Serializer::XML::Simple:
+    file: lib/Data/Serializer/XML/Simple.pm
+    version: 0.03
+  Data::Serializer::YAML:
+    file: lib/Data/Serializer/YAML.pm
+    version: 0.02
+  Data::Serializer::YAML::Syck:
+    file: lib/Data/Serializer/YAML/Syck.pm
+    version: 0.02
+resources:
+  license: http://dev.perl.org/licenses/

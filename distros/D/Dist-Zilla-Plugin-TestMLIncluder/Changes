@@ -1,0 +1,38 @@
+0.12 Sat Aug 16 14:58:57 PDT 2014
+ - Remove .gitignore
+
+0.11 Sat Aug 16 11:02:46 PDT 2014
+ - Meta 0.0.2
+
+0.10 Fri Aug 15 21:45:35 PDT 2014
+ - Don't bug
+
+0.09 Fri Aug 15 21:19:06 PDT 2014
+ - Remove t/use_ok.t
+
+0.08 Fri Aug 15 15:46:19 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.07 Fri Aug  8 19:04:24 PDT 2014
+ - Add Pegex::Optimizer to includes
+
+0.06 Sun Aug  3 22:47:18 PDT 2014
+ - Remove (c) from Copyright
+
+0.05 Wed Jul 16 22:58:54 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.04 Tue Jun 17 11:02:16 PDT 2014
+ - Remove ABSTRACT and add manual $VERSION
+
+0.03 Sat Jun 14 12:18:41 PDT 2014
+ - Add travis support
+ - Add badges to doc
+
+0.02 Sat May 24 06:03:51 PDT 2014
+ - Upgrade to Zilla::Dist
+
+0.01 Fri Feb  7 07:02:32 PST 2014
+ - first release
+

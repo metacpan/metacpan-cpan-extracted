@@ -1,0 +1,11 @@
+#!/usr/bin/perl
+
+use DBIx::Informix::Perform::DoTable 'generate_per';
+
+if (@ARGV != 2) {
+    print STDERR "Usage: $0 db_name table_name\n";
+    exit 1;
+}
+
+my $tbl = generate_per($ARGV[0], $ARGV[1]);
+print $tbl;

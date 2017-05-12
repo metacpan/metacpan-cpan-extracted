@@ -1,0 +1,30 @@
+Revision history for Perl extension Dist-Zilla-Plugin-CopyFilesFromBuild
+
+0.170880  2017-03-29 12:43:04-07:00 America/Los_Angeles
+    - Add a missing use statement to the main module
+
+0.163040  2016-10-30 09:49:27-07:00 America/Los_Angeles
+    - Fix handling of files in subdirectories. These are no longer
+      copied to the root, but rather the corresponding subdirectory of
+      the root.
+
+0.161350  2016-05-14 12:08:54-07:00 America/Los_Angeles
+    - Update for Dist::Zilla v6 compatibility, for real this time
+
+0.161150  2016-04-24 11:00:49-07:00 America/Los_Angeles
+    - Update for Dist::Zilla v6 compatibility.
+
+0.151680  2015-06-17 15:22:02-07:00 America/Los_Angeles
+    - use List::Util instead of List::AllUtils+List::MoreUtils
+
+0.150250  2015-01-25 12:41:57PST-0800 America/Los_Angeles
+    - Avoid using Moose::Autobox (kentnl, #1)
+
+0.142220  2014-08-10 16:48:00PDT-0700 America/Los_Angeles (TRIAL RELEASE)
+    - Skip file names that are empty strings 
+
+0.103510  2010-12-17 12:15:07 EST5EDT
+    - Removed unnecessary dependency on Perl 5.10
+
+0.103420  2010-12-08 13:33:09 PST8PDT
+    - Initial CPAN release

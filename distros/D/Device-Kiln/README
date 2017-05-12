@@ -1,0 +1,45 @@
+NAME
+    Device::Kiln - Graph kiln firing use Data logged from Device::DSE::Q1573
+
+SYNOPSIS
+      use Device::Kiln;
+      my $meter = Device::Kiln->new("/dev/ttyS0");
+
+DESCRIPTION
+    Sets up a connection to a DSE Q1573 or Metex ME-22 Digital Multimeter,
+    and allows then plots data to a png file at regular intervals. =head1
+    USAGE
+
+  new(serialport)
+     Usage     : my $meter=Device::Kiln->new("/dev/ttyS0")
+     Purpose   : Opens the meter on the specified serial port
+     Returns   : object of type Device::Kiln
+     Argument  : serial port
+
+  rawread();
+     Usage     : my $meter->rawread()
+     Purpose   : Returns the raw 14 byte string from the meter.
+
+EXAMPLE
+    use Device::DSE::Q1573;
+
+    my $meter = Device::Kiln->new( "/dev/ttyS0" );
+
+    while(1) { my $data = $meter->read(); print $data . "\n"; sleep(1); }
+
+AUTHOR
+        David Peters
+        CPAN ID: DAVIDP
+        davidp@electronf.com
+        http://www.electronf.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1).
+

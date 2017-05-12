@@ -1,0 +1,75 @@
+Revision history for Perl extension Data::Tools
+
+1.14 2016-11-30
+
+    - added Data::Tools::Time utilities
+    - added Data::Tools::Socket docs
+    - added Data::Tools::Time test t/t1-time-diff.pl
+
+1.12 2016-09-16
+
+    - fixed type in Data::Tools::Socket
+
+1.11 2016-09-05 CADE
+
+    - added Data::Tools::Socket utilities
+
+1.10 2016-01-27 CADE
+
+    - fixed non-obvious iterator behaviour of File::Glob inside glob_tree()
+
+1.09 2016-01-03 CADE
+
+    - added:
+        hash_keys_lock_recursive
+
+1.08 2015-09-30 CADE
+
+    - added:
+        file_mtime  
+        file_ctime  
+        file_atime  
+        file_size  
+
+1.07 2015-09-24 CADE
+
+    - added hash_lock_recursive()
+            hash_unlock_recursive()
+      to handle missing functionality until perl 5.22 etc.
+    - moved to cpan changelog syntax  
+    - added glob_tree()
+
+1.06 2013-07-03 CADE
+  
+    - added more features to hash_validate()
+    - changed version to reupload to CPAN
+
+1.05 2013-07-03 CADE
+  
+    - hash_validate()
+    - more docs, "required modules", "see also"
+
+1.04  2013-05-24 CADE
+
+    - changed github urls
+
+1.03  2013-05-04 CADE
+  
+    - added hash_uc()/hash_lc()
+
+1.02  2013-03-24 CADE
+
+    - added digest funcs
+    - fixed docs
+    - added github info
+
+1.01  2013-03-07 CADE
+
+    - fixed names in the docs
+
+1.00  2013-03-06 CADE
+
+    - history lost, initial CPAN release
+
+    
+    

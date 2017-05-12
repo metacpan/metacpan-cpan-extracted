@@ -1,0 +1,68 @@
+Revision history for Document-Writer
+
+0.13
+  - Remove debugging output
+
+0.12
+  - Lots of line-level fixes for textareas
+
+0.11
+  - POD fixes
+
+0.10
+  - Bump dependencies to current versions
+  - Rewrite text placement and pagination code
+  - POD fixes
+  
+0.09
+  - Rewrite to use TextLayout
+  - Switch to storing a simplified representation of the document, save
+    actual G:P emission until draw
+  - Make immutable
+  - Remove Text::Flow dependency
+
+0.08
+  - Keep up with Graphics::Primitive API changes
+
+0.07
+  - Init driver width & height early
+  - Fix driver usage in Writer
+  - Update POD
+  - Page: Remove default text from header/footer
+
+0.06
+  - use D:W:Page in Document::Writer
+  - Add classes to header, body and footer
+  - Take out component clearing in Page::prepare
+  - TextLayout: Add line_height and use font size by default
+  - Set font size in tests, don't depend on defaults
+
+0.05
+  - Add find to Document::Writer to emulate find of Graphics::Primitive
+  - POD updates
+  - Don't allow components to be added that are larger than the page
+  - Reset page header/footer/body on prepares
+
+0.04
+  - Add default_color to Writer
+  - Remove accidental random background inclusion.
+  - Fix busted text wrapping
+  - POD updates
+  - Test fixes
+
+0.03
+  - Forget to make manifest
+
+0.02
+  - Add MockDriver for testing
+  - Add TextLayout for turning arbitrary text into TextBoxes
+  - Page: Lazily build pieces
+  - Rename turn_page to next_page
+  - Add current_page attribute
+  - Add add_text_to_page
+  - Add add_to_age
+  - Add draw convenience method
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

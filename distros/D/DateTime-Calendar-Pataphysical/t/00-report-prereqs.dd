@@ -1,0 +1,42 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DateTime::Duration' => '0',
+                                      'DateTime::Locale' => '0',
+                                      'Params::Validate' => '0.52',
+                                      'constant' => '0',
+                                      'overload' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'utf8' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DateTime' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::MockTime' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

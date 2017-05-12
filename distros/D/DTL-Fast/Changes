@@ -1,0 +1,189 @@
+Revision history for Perl extension DTL::Fast.
+
+1.623 - Tue 23 Feb 2017
+    - Removed test with incorrect utf symbols, because they are not accepted by perl 5.26
+
+1.621 - Wed 09 Dec 2015
+    - Minor docs fixes
+    - Memory leaks fixes in _template key
+
+1.620 - Mon 13 Apr 2015
+    - Improvement
+        - Implemented `slice` filter working with scalars as substring, fixes #81
+        - Prettified expressions rendering error messages
+        - Prettified rendering error messages for `numberformat` and `stringformat` filters
+    - Bugfix
+        - Empty brackets now rendered as is, without throwing an exception, fixes #80
+        - Added `with` tag parameters validation, fixes #82
+        - Fixed bug with `-var` rendering, fixes #91
+
+1.619 - Mon 06 Apr 2015
+    - Bugfix
+        - Fixed bug with non-reference on context traversing, fixes #76
+    - Improvement
+        - Implemented pretty debug message for context traversing errors
+
+1.618 - Sun 05 Apr 2015
+    - Improvement
+        - Changed context variable traversing: context is not being passed to the code references or object methods anymore, fixes #69, thanks @cblake777
+        - `ssi` tag is now depricated, warning added
+        - `now` tag is now supports `.. as var_name` syntax from Django 1.8. Fixes #73
+        - parsing error messages in `autoescape`, `block` and `now` tags are now pretty
+        - expression parsing messages are now pretty
+    - Documentation
+        - Documented supported operators and some syntax features
+        - Documentation links to Django site now leads to the 1.8 version
+    - Bugfix
+        - forloop.last has a proper value on 1 item array, fixes #72
+
+1.617 - Sun 29 Mar 2015
+    - Implemented DTL::Fast::count_lines function in C, counts newline symbols in the string
+    - Implemented proper lines counting for multi-line syntax constructions, fixes #64
+    - for tag now dies with pretty message on duplicate empty tag
+    - Uknown filter and tag now shows error environment, fixes #63
+    - Undefined time value in date filter treated as 0, fixes #61
+    - Implemented dump, dump_html and dump_warn tags for dumping context variables in different ways, fixes #68
+    - warn tag removed in favor of dump_warn
+    - Added variable name validation and restrictions, fixes #62
+
+1.616 - Sun 22 Mar 2015
+    - Updated Escape::XS version requirement to 0.12
+
+1.615 - Sat 21 Mar 2015
+    - Improved error message on undisclosed/unknown tags, with source line numbers support
+    - Reverted Escape::XS mapping, not working on windows (no idea why)
+
+1.613 - Sat 21 Feb 2015 14:15 MSK
+    - implemented html_protect in C, test performance increased 17%, fixes #32
+    - internal context access optimisation, total performance increase 30%
+    - variable context access optimisation for simple variables, total increase 36%
+    - shortcuted escape/unescape functions to URI::Escape::XS
+    - DTL::Fast::Utils::as_bool method now works without additional functions calls
+    - Implemented and documented eval_sequence method
+    - Documented custom tags creation, fixes #12
+    - Documented custom filters creation, fixes #13
+
+1.612 - Sun 15 Feb 2015 18:40 MSK
+    - Fixed timeuntil test race condition, thanks to @eserte, fixes #59
+    - Implemented dynamic inheritance. You may now extend with context, fixes #9
+    - Redundant serialized cache removed from templating system. Only runtime and custom now.
+    - Added block_super tag and {{ block.super }} support, fixes #52
+
+1.611 - Sun 15 Feb 2015 11:44 MSK
+    - stringformat now treats undef values as empty strings
+    - fixed bug with crashing on error messging with "undef in sprintf" error, fixes #57
+    - logical operators now behaves properly. Second operand evaluated only if first is not enough, fixes #25
+    - upper and lower filters treats undef as an empty string
+    - implemented split filter (experimental)
+    - implemented sprintf tag (experimental)
+
+1.609 - Wed 11 Feb 2015 21:38 MSK
+    - Dynamic filters loading implemented, fixes #16
+    - Dynamic operators loading implemented, fixes #19
+    - Custom operators introduced
+    - Documented some additional filters 
+    - Fixed bug with locale-specific string operations: cmp, lt, gt, upper, lower, capfirst, dictsort
+
+1.608 - Tue 10 Feb 2015 19:09 MSK
+    - Removed unsafe map usage in complicated loops
+    - Fixed bug with spaceless closing tags `endcomment` and `endverbatim`
+
+1.606 - Mon 09 Feb 2015 16:23 MSK
+    - SSI tag behavior now is like in Django, fixes #26
+    - ifchanged tag is now rendered on the first pass
+    - ifchanged tag can now work without parameters (watching rendered content); not recommended, bad performance
+    - new tag - warn
+    - fixed bug with slicing indexes outside the array boundaries
+    - implemented dynamic tags loading and preloading registering with register_tag, fixes #18
+    - replaced some redundant methods with direct perl API calls
+    - documented numberformat filter, fixes #10
+
+1.605 - Wed 28 Jan 2015 18:27 MSK
+    - Fixed spaces between equals in 'with' tag. Now tags may be multiline, fixes #7
+    - Fixed filters behavior in with tag, if constant strings being used in assignment, fixes #8
+    - Blocks now can be multi-line
+
+1.604 - Tue 27 Jan 2015 20:18 MSK
+    - Fixed bug when expression fails if variable name contains operator
+    - Load tag is now accepts package names with or without quotes
+
+1.602 - Sun 25 Jan 2015 20:18 MSK
+    - Implemented and tested include .. with tag
+
+1.05.6 - 2015-01-22
+    - Removed changes from pod documentation
+    - Fixed lvalue test for perl 5.10
+
+1.05.5 - 2015-01-21
+    - Changes file cleanup
+    - Added filter numberformat, formats number like 12 345 678.9999999
+    - Added DTL::Fast::Utils::is_lvalue method to check if method is lvalue. 
+      Lvalue methods in context being invoked without context argument.
+    - Fixed bugs with spaces in variables and filters
+
+1.05.4 - 2015-01-20
+    - Unknown block warning now displays template filename
+    - Spaces in control blocks are not mandatory
+
+1.05.3 - 2015-01-20
+    - Context trying to traverse objects like hash if there is no method
+
+1.05.2 - 2015-01-19
+    - Fixed bug in C spaceless implementation for linux
+    - Moved inheritance part into Template constructor
+    - Fixed bug with inheritance + blocks extension
+    - Fixed bug with logic on arrays/hashes/scalars reference, object method 
+      as_bool support added. Tested.
+    - Fixed bug with setting value to undef using DTL::Fast::Context::set
+    - Fixed bug with inheritance path.
+    - Implemented cache validation. Speed now is comparable to Dotiac::DTL
+    - Made dirs parameter optional for Template constructor, but it's still 
+      mandatory for get_template/select_template
+    - Implemented cache classes: 
+    
+        DTL::Fast::Cache
+        DTL::Fast::Cache::Runtime
+        DTL::Fast::Cache::Serialized
+        DTL::Fast::Cache::Compressed
+        DTL::Fast::Cache::File
+        DTL::Fast::Cache::Memcached
+
+    - New dependencies added: Compress::Zlib, Digest::MD5
+    - Added Perl::Critic testing, complies level 4.
+    - Implemented C realization of spaceless tag.
+
+1.04 - 2015-01-14
+    - Taken date function from Dotiac::DTL to DTL::Fast::Utils::time2str_php
+    - `now` tag and `date` filter now works with time2str_php function (like Django itself)
+    - Implemented strftime filter, which works with Date::Format str2time.
+    - Added Russian version of pluralize filter:
+
+        use DTL::Fast;
+        use DTL::Fast::Filter::Ru::Pluralize; # this will override default pluralize with Russian version.
+        
+    - Refactored strings backup and parametrized filters.
+    - `block` and `extends` tags now works as tags.
+    - New dependency added: Storable
+
+1.03 - 2015-01-13
+    - Tested with CentOS & Perl 5.10
+    - Lowered Perl version requirement to 5.10
+    - Changed implicit split to explicit in wordcount filter (v5.10 considers it depricated).
+    - Added exception on missing parent template in extends tag.
+    - Added exception on missing included template in include tag.
+    - Added exception on recursive inheritance (extends tag).
+    - Added exception on recursive inclusion (include tag).
+
+1.02 - 2015-01-10
+    - changed some intermediate getters to direct access. Improved rendering performance by 10%.
+    - added tests for performance measuring and profiling (see timethese directory).
+
+1.01 - 2015-01-09
+    - fixed bug with add filter repeated usage.
+
+1.00 - 2015-01-09
+    - First release
+
+0.01  Sun Dec 28 18:36:48 2014
+    - original version; created by h2xs 1.23 with options
+        -AX DTL::Fast

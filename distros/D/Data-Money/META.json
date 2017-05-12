@@ -1,0 +1,84 @@
+{
+   "abstract" : "Money/currency with formatting and overloading.",
+   "author" : [
+      "Corey Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Money",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "1.001014",
+            "Test::utf8" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Locale::Currency" : "2.07",
+            "Locale::Currency::Format" : "1.22",
+            "Math::BigFloat" : "1.999704",
+            "Moo" : "2.000000",
+            "Moo::Role" : "2.000000",
+            "Throwable" : "0",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Money" : {
+         "file" : "lib/Data/Money.pm",
+         "version" : "0.17"
+      },
+      "Data::Money::BaseException" : {
+         "file" : "lib/Data/Money/BaseException.pm",
+         "version" : "0.17"
+      },
+      "Data::Money::BaseException::ExcessivePrecision" : {
+         "file" : "lib/Data/Money/BaseException/ExcessivePrecision.pm",
+         "version" : "0.17"
+      },
+      "Data::Money::BaseException::InvalidCurrencyCode" : {
+         "file" : "lib/Data/Money/BaseException/InvalidCurrencyCode.pm",
+         "version" : "0.17"
+      },
+      "Data::Money::BaseException::InvalidCurrencyFormat" : {
+         "file" : "lib/Data/Money/BaseException/InvalidCurrencyFormat.pm",
+         "version" : "0.17"
+      },
+      "Data::Money::BaseException::MismatchCurrencyType" : {
+         "file" : "lib/Data/Money/BaseException/MismatchCurrencyType.pm",
+         "version" : "0.17"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Data-Money.git",
+         "web" : "https://github.com/manwar/Data-Money"
+      }
+   },
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

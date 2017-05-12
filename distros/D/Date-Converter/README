@@ -1,0 +1,38 @@
+Date::Converter - Convert dates between calendar systems
+
+/*
+	Description
+*/
+
+Date::Converter provides a method for converting the date between calendars of
+different types. Current version includes converters for Alexandrian, Armenian,
+Bahai, Coptic, Ethiopian, Gregorian, Hebrew, Islamic, Julian, Macedonian,
+Persian, Roman, Republican, Saka, Syrian, Tamil and Zoroastrian calendars in any
+combination.
+
+/*
+	Installation
+*/
+
+perl Makefile.PL
+make
+make test
+make install
+
+/*
+	Author
+*/
+
+Andrew Shitov <andy@shitov.ru>
+
+Please feel free to contact me via e-mail.
+
+/*
+	Copyright
+*/
+
+Date::Converter and Date::Converter::* modules are free software. 
+You may redistribute and (or) modify it under the same terms as Perl.
+
+Note to follow GNU LGPL licence which was applicabale to initial Fortran library
+and part of test data which are located now in t/reper.t test file.

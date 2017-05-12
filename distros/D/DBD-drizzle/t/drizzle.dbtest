@@ -1,0 +1,44 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: drizzle.dbtest 11207 2008-05-07 11:22:16Z capttofu $
+#
+# database specific definitions for a 'drizzle' database
+
+my $have_transactions;
+
+
+#
+#   This function generates a list of tables associated to a
+#   given DSN.
+#
+sub ListTables(@) {
+    my($dbh) = shift;
+    my(@tables);
+
+    @tables = $dbh->func('_ListTables');
+    if ($dbh->errstr) {
+	die "Cannot create table list: " . $dbh->errstr;
+    }
+    @tables;
+}
+
+
+#
+#   This function is called by DBD::pNET; given a hostname and a
+#   dsn without hostname, return a dsn for connecting to dsn at
+#   host.
+sub HostDsn ($$) {
+    my($hostname, $dsn) = @_;
+    "$dsn:$hostname";
+}
+
+#
+#   Return TRUE, if database supports transactions
+#
+sub have_transactions () {
+    my ($dbh) = @_;
+    return 1;
+}
+
+
+1;

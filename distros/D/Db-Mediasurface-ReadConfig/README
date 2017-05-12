@@ -1,0 +1,23 @@
+Db::Mediasurface::ReadConfig - by Nigel Wetters.
+
+Copyright (c) 2001  Nigel Wetters.
+
+See COPYRIGHT section in ReadConfig.pm for usage and distribution rights.
+
+QUICK START GUIDE:
+
+    Build/test/install the module by doing
+	    perl Makefile.PL
+	    make
+	    make test
+	    make install
+    Then delete the source directory tree since it's no longer needed.
+    Use the 'perldoc Db::Mediasurface::ReadConfig' command to read the 
+    documentation.
+
+Regards,
+Nigel Wetters.
+
+=======================================================================
+End.
+

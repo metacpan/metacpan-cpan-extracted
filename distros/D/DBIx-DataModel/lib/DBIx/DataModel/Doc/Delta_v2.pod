@@ -1,0 +1,118 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Delta_v2 - Differences introduced in version 2.0
+
+=head1 DESCRIPTION
+
+The architecture and Application Programming Interface (API)
+of C<DBIx::DataModel> were deeply
+refactored in version 2.0. This document enumerates the main 
+differences introduced in that version.
+For older changes, see also L<DBIx::DataModel::Doc::Delta_v1>.
+
+=head1 NEW META LAYER
+
+All information about the schema is stored within meta-objects;
+such objects can be queried for retrieving 
+the list of tables, the list of associations, etc.
+
+=head1 SCHEMA MODES
+
+The C<$dbh> database connection, and various parameters about
+SQL generation, are no longer stored within the Schema B<class>; 
+instead, they are stored in B<instances> of
+L<DBIx::DataModel::Schema>. By default, there is only one such instance,
+and the class has a C<singleton()> method for reaching it : this is called
+I<single-schema mode>, which is compatible with previous versions
+of C<DBIx::DataModel>, and is also the most economical way to work with the 
+database. 
+
+Even in single-schema mode, it is possible to switch between several 
+C<$dbh>, through methods L<DBIx::DataModel::Schema/localize_state> 
+and L<DBIx::DataModel::Schema/do_transaction>. However, 
+there is of course only one connected C<$dbh> at any point in time.
+
+If the application needs to communicate with several C<$dbh> at the same
+time, then it is necessary to enter I<multi-schema> mode,
+simply by explicitly calling the L<DBIx::DataModel::Schema/new> method
+on the schema subclass :
+
+  my $schema1 = My::DB->new(dbh => $dbh1);
+  my $schema2 = My::DB->new(dbh => $dbh2);
+
+As soon as the C<new()> method is called, the system knows that 
+it should work in multi-schema mode, and the C<singleton()> method
+becomes prohibited. As a consequence, calls to C<fetch()> or C<select()>
+can no longer be invoked on a class name: the schema needs to be specified 
+
+  # this does NOT work in multi-schema mode
+  my $rows = My::DB::SomeTable->select(...)
+  
+  # but this does work
+  my $rows = $schema1->table('SomeTable')->select(...)
+
+Another consequence of multi-schema mode is that every data row
+will contain a reference to its schema, under name C<__schema>.
+This is necessary if we want to be able to follow paths from that row :
+
+  my $other_row = $row->some_associated_table();
+
+Therefore there is a small penalty for multi-schema mode, because
+the C<__schema> in every row needs some memory and some bookkeeping.
+
+=head1 API CHANGES
+
+=head2 Deprecation of camelCase methods
+
+All methods and parameters previously written in "camelCase" notation
+(à la Java, i.e "someMethodNameWithManyWords") are now
+written with underscores (à la Perl, i.e. "some_method_name_with_many_words").
+
+=head2 SQL::Abstract::More
+
+Code that used to be with C<DBIx_:DataModel>, for extending 
+the L<SQL::Abstract> API, and tuning SQL generation, is now 
+moved to a separate distribution called L<SQL::Abstract::More>.
+
+=head2 Introduction of Params::Validate
+
+Arguments to methods are now systematically checked
+through L<Params::Validate>.
+This is in accordance with the principle of "defensive programming", 
+and helps to discover errors sooner.
+
+=head2 Extended usage for C<update()> and C<delete()>
+
+It is now possible to perform bulk updates or deletes, just like in 
+straigt SQL :
+
+  My::DB::SomeTable->update(-set   => {foo => 123}
+                            -where => {bar => {"<" => 456}});
+
+  My::DB::SomeTable->delete(-where => {col => {-like => "foobar%"});
+
+
+=head2 Table inheritance
+
+If your database supports table inheritance (like for example PostgreSQL),
+you might define a corresponding inheritance structure
+between the Perl table classes.
+
+=head2 Reorganization of data sources
+
+The former class C<DBIx::DataModel::View> is deprecated; it is now
+treated exactly like a C<Table>.
+
+A new L<DBIx::DataModel::Source::Join> class has been introduced 
+(together with its meta L<DBIx::DataModel::Meta::Source::Join>) :
+this gives a cleaner structure for the specific needs of database joins.
+
+=head1 DEPRECATED FEATURES
+
+=head2 Autoload
+
+Autoload is deprecated. Reading or setting a column value
+is done through the usual Perl operations for working with
+hashrefs.

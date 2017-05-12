@@ -1,0 +1,2 @@
+foo=Ceci est français
+ook=tout vous avez besoin d'est un phrasebook

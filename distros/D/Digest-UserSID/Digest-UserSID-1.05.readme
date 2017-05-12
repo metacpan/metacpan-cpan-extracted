@@ -1,0 +1,264 @@
+
+
+
+User Contributed Perl Documentation                    UserSID(3)
+
+
+
+NNNNAAAAMMMMEEEE
+     UserSID - Managing of Session IDs for Users on CGI- and
+     console-scripts
+
+SSSSYYYYSSSSTTTTEEEEMMMM RRRREEEEQQQQUUUUIIIIRRRREEEEMMMMEEEENNNNTTTTSSSS
+     To use this modul you should have Digest::SHA1 installed.
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+     use Digest::UserSID;
+
+AAAABBBBSSSSTTTTRRRRAAAACCCCTTTT
+     The modul uses Digest:SHA1 to create and manage user
+     session-id's which are beeing created by sha1, sha1_hex or
+     sha1_base64 .
+
+     Session-id's are valid as long a time-range is used or
+     special environment-variables don't change, depending on the
+     used functions.  It's possible to use functions in object-
+     oriented style as well as in function-oriented style.
+
+     Session-id's can be generated via CGI as well as from
+     console.  Using Digest::UserSID to generate secure
+     CGI-session-id's adds the possibility to use environment-
+     variables for identification.
+
+     The current version of Digest::UserSID is available at CPAN
+     and at http://cgi.xwolf.com/ .
+
+DDDDSSSSLLLLIIII
+     Digest::UserSID  adph  Managing session-id's with
+     Digest::SHA1 XWOLF
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+     OOOObbbbjjjjeeeecccctttt----oooorrrriiiieeeennnntttteeeedddd
+
+     nnnneeeewwww
+
+     Creates a new reference for the session id's (SID). It also
+     reads in $UserSID::FILE if possible and saves existing
+     session id's into the hash  %UserSID::DATA.  Takes a
+     filename in replace for $UserSID::FILE as argument.
+     Example:
+
+
+
+
+
+
+
+
+
+
+
+
+
+21/Mar/101      Last change: perl 5.004, patch 02               1
+
+
+
+
+
+
+User Contributed Perl Documentation                    UserSID(3)
+
+
+
+             use Digest::UserSID;
+
+             my $sid = new Digest::UserSID;
+             my $res = $sid->create($user,$string);
+
+             print "key: $sid->{'sha'}\n";
+             print "time: $sid->{'time'}\n";
+             dbmopen(%hash,$UserSID::FILE,0644);
+             %test = %hash;
+             dbmclose(%hash);
+
+             print "Reading UserSID-Data:\n";
+             my $key;
+             foreach $key (keys %test) {
+               print "\t$key: $test{$key}\n";
+             }
+
+
+     ccccrrrreeeeaaaatttteeee
+
+     Gets a SID-reference and a string (e.g. a username) as
+     argument and returns a SHA1-string.  Additionally the SHA1-
+     string will be saved in the file given in $UserSID::FILE
+     together with the inputstring and the localtime.
+
+     rrrreeeemmmmoooovvvveeee
+
+     Removes all data of a SID from the $UserSID::FILE, making
+     the SID invalid.
+
+     rrrreeeeaaaadddd
+
+     $sid->_r_e_a_d($loginname), where $loginname is the string for
+     the username and $SID the reference, will return TRUE if
+     this SID was created with $sid-_c_r_e_a_t_e($loginname) before and
+     the delay between creation and reading is not longer as
+     $UserSID::MAXSECONDS seconds.  Also the fields
+          $sid->{'sha'},      $sid->{'time'} and
+          $sid->{'user'} will be filled, where $sid->{'user'}
+     equals $loginname.
+
+     uuuuppppddddaaaatttteeee
+
+     This function will update the field $sid->{'time'} to the
+     current localtime.
+
+     FFFFuuuunnnnccccttttiiiioooonnnn----oooorrrriiiieeeennnntttteeeedddd,,,, wwwwiiiitttthhhh uuuusssseeee ffffoooorrrr CCCCGGGGIIII
+
+
+
+
+
+
+
+
+21/Mar/101      Last change: perl 5.004, patch 02               2
+
+
+
+
+
+
+User Contributed Perl Documentation                    UserSID(3)
+
+
+
+     mmmmaaaakkkkeeeewwwweeeebbbbssssiiiidddd
+
+     Returns a session-string that can be used as a session-
+     variable for CGI-scripts.  Needs a string, e.g. a username
+     as argument.  Example:
+
+             my $pass = makewebsid($user);
+             print "User $user got SID $pass.....";
+
+
+     cccchhhheeeecccckkkkwwwweeeebbbbssssiiiidddd
+
+     Checks if the session-string is still valid and if the used
+     environment is still the same as at calling _m_a_k_e_w_e_b_s_i_d().
+     Example:
+
+             if (checkwebsid($user,$pass)) {
+               print "SID ok\n";
+             } else {
+               print "SID invalid.\n";
+             }
+
+     Please note, that _c_h_e_c_k_w_e_b_s_i_d() will automatically remove
+     the saved data of a requested $user, if it's not valid in
+     time anymore.
+
+     ggggeeeettttuuuusssseeeerrrrbbbbyyyyssssiiiidddd
+
+     Returns the username (the string used at _m_a_k_e_w_e_b_s_i_d()) by
+     using the session-string as argument.
+
+     rrrreeeemmmmoooovvvveeeewwwweeeebbbbssssiiiidddd
+
+     Removes all data for the session-id.
+
+AAAAUUUUTTTTHHHHOOOORRRR IIIINNNNFFFFOOOORRRRMMMMAAAATTTTIIIIOOOONNNN
+     Copyright 1999-2001, Wolfgang Wiese.  All rights reserved.
+
+     This library is free software; you can redistribute it
+     and/or modify it under the same terms as Perl itself.
+
+     Address bug reports and comments to: xwolf@xwolf.com.  When
+     sending bug reports, please provide the version of
+     UserSID.pm, the version of Perl and the name and version of
+     the operating system you are using.
+
+CCCCRRRREEEEDDDDIIIITTTTSSSS
+     Thanks very much to:
+
+     Gregor Longariva (gregor@softbaer.de)
+
+
+
+
+
+21/Mar/101      Last change: perl 5.004, patch 02               3
+
+
+
+
+
+
+User Contributed Perl Documentation                    UserSID(3)
+
+
+
+     Rolf Rost (info@i-netlab.de)
+
+SSSSEEEEEEEE AAAALLLLSSSSOOOO
+     the Digest::SHA1 manpage
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+21/Mar/101      Last change: perl 5.004, patch 02               4
+
+
+

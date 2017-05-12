@@ -1,0 +1,19 @@
+---
+abstract: 'Easily integrate reCAPTCHA into your Dancer applications'
+author:
+  - 'Jason A. Crome <cromedome@gmail.com>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-reCAPTCHA
+requires:
+  Captcha::reCAPTCHA: '0'
+  Dancer: '1.3110'
+version: '0.4'

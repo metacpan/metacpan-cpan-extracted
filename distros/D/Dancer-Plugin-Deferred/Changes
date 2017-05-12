@@ -1,0 +1,19 @@
+Revision history for Dancer-Plugin-Deferred
+
+0.003     2012-12-26 11:31:06 America/New_York
+
+  [FIXED]
+
+  - Tests fixed for changes in Dancer 2 alpha
+
+0.002     2012-12-20 12:31:41 America/New_York
+
+  [ADDED]
+
+  - Added abillity to preserve the message and attach message
+    parameters manually to an arbitrary URI.
+
+0.001     2012-12-19 21:56:38 America/New_York
+
+  - First release
+

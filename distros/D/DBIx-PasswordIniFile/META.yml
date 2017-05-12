@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                DBIx-PasswordIniFile
+version:             2.00
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Config::IniFiles:              0
+    Crypt::Blowfish:               0
+    Crypt::CBC:                    0
+    DBI:                           0
+    File::HomeDir:                 0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

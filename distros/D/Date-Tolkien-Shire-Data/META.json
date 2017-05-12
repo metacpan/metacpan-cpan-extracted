@@ -1,0 +1,60 @@
+{
+   "abstract" : "Data functionality for Shire calendars.",
+   "author" : [
+      "Thomas R. Wyant, III F<wyant at cpan dot org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4222",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Tolkien-Shire-Data",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "POSIX" : "0",
+            "Text::Abbrev" : "0",
+            "charnames" : "0",
+            "constant" : "0",
+            "perl" : "5.006002",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Tolkien::Shire::Data" : {
+         "file" : "lib/Date/Tolkien/Shire/Data.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

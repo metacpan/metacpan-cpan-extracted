@@ -1,0 +1,1086 @@
+=begin comment
+***
+*** WARNING: THIS IS A GENERATED FILE - CHANGES WILL BE LOST
+*** The source for this file is in CFPlus/pod/emote_help.pod
+*** Make any changes there and then run ./copy_doc
+***
+=end comment
+
+=head1 Emotions
+
+=head1 X<emote_description>Emotion Descriptions
+
+Below is a more detailed description of each emotion.
+
+=head2 bleed
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use bleed without arguments, and the effect would be:
+
+You hear:
+   You bleed all over your nice new armour.
+
+The others hear:
+   <self> is bleeding all over the carpet - got a spare tourniquet?
+
+You can also bleed with another player as argument, like 'bleed <playername>'. The effect would be this:
+
+You hear:
+   You slash your wrist and bleed all over <other>
+
+Your target hears:
+   <self> slashes his wrist and bleeds all over you.
+
+All the others hear:
+   <self> slashes his wrist and bleeds all over <other>.
+
+Or you can use bleed on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   Very impressive! You wipe your blood all over yourself.
+
+The others hear:
+   <self> performs some satanic ritual while wiping his blood on himself.
+
+
+=head2 blush
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use blush without arguments, and the effect would be:
+
+You hear:
+   Your cheeks are burning.
+
+The others hear:
+   <self> blushes.
+
+
+=head2 bounce
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use bounce without arguments, and the effect would be:
+
+You hear:
+   BOIINNNNNNGG!
+
+The others hear:
+   <self> bounces around.
+
+You can also bounce with another player as argument, like 'bounce <playername>'. The effect would be this:
+
+You hear:
+   You bounce around the room with <other>.
+
+Your target hears:
+   <self> bounces around the room with you.
+
+All the others hear:
+   <self> bounces around the room with <other>.
+
+
+=head2 bow
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use bow without arguments, and the effect would be:
+
+You hear:
+   You bow deeply.
+
+The others hear:
+   <self> bows deeply.
+
+You can also bow with another player as argument, like 'bow <playername>'. The effect would be this:
+
+You hear:
+   You bow before <other>.
+
+Your target hears:
+   <self> bows before you.
+
+All the others hear:
+   <self> bows before <other>.
+
+Or you can use bow on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You kiss your toes.
+
+The others hear:
+   <self> folds up like a jackknife and kisses his own toes.
+
+
+=head2 burp
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use burp without arguments, and the effect would be:
+
+You hear:
+   You burp loudly.
+
+The others hear:
+   <self> burps loudly.
+
+
+=head2 cackle
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use cackle without arguments, and the effect would be:
+
+You hear:
+   You cackle gleefully.
+
+The others hear:
+   <self> throws back his head and cackles with insane glee!
+
+
+=head2 chuckle
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use chuckle without arguments, and the effect would be:
+
+You hear:
+   You chuckle politely
+
+The others hear:
+   <self> chuckles politely.
+
+
+=head2 clap
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use clap without arguments, and the effect would be:
+
+You hear:
+   Clap, clap, clap.
+
+The others hear:
+   <self> gives a round of applause.
+
+
+=head2 cough
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use cough without arguments, and the effect would be:
+
+You hear:
+   Yuck, try to cover your mouth next time!
+
+The others hear:
+   <self> coughs loudly.
+
+
+=head2 cringe
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use cringe without arguments, and the effect would be:
+
+You hear:
+   You cringe in terror.
+
+The others hear:
+   <self> cringes in terror!
+
+You can also cringe with another player as argument, like 'cringe <playername>'. The effect would be this:
+
+You hear:
+   You cringe away from <other>.
+
+Your target hears:
+   <self> cringes away from <other> in mortal terror.
+
+All the others hear:
+   
+
+
+=head2 cry
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use cry without arguments, and the effect would be:
+
+You hear:
+   Waaaaaaahhh..
+
+The others hear:
+   <self> bursts into tears.
+
+You can also cry with another player as argument, like 'cry <playername>'. The effect would be this:
+
+You hear:
+   You cry on <other>'s shoulder.
+
+Your target hears:
+   <self> cries on your shoulder.
+
+All the others hear:
+   <self> cries on <other>'s shoulder.
+
+Or you can use cry on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You cry to yourself.
+
+The others hear:
+   <self> sobs quietly to himself.
+
+
+=head2 dance
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use dance without arguments, and the effect would be:
+
+You hear:
+   You dance with glee.
+
+The others hear:
+   <self> expresses himself through interpretive dance.
+
+You can also dance with another player as argument, like 'dance <playername>'. The effect would be this:
+
+You hear:
+   You grab <other> and begin doing the Cha-Cha!
+
+Your target hears:
+   <self> grabs you, and begins dancing!
+
+All the others hear:
+   Yipe! <self> and <other> are doing the Macarena!
+
+Or you can use dance on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You skip and dance around by yourself.
+
+The others hear:
+   <self> embraces himself and begins to dance!
+
+
+=head2 flip
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use flip without arguments, and the effect would be:
+
+You hear:
+   You flip head over heels.
+
+The others hear:
+   <self> flips head over heels.
+
+
+=head2 frown
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use frown without arguments, and the effect would be:
+
+You hear:
+   What's bothering you?
+
+The others hear:
+   <self> frowns.
+
+You can also frown with another player as argument, like 'frown <playername>'. The effect would be this:
+
+You hear:
+   You frown darkly at <other>.
+
+Your target hears:
+   <self> frowns darkly at you.
+
+All the others hear:
+   <self> frowns darkly at <other>.
+
+Or you can use frown on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You frown at yourself.
+
+The others hear:
+   <self> frowns at himself.
+
+
+=head2 gasp
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use gasp without arguments, and the effect would be:
+
+You hear:
+   You gasp in astonishment.
+
+The others hear:
+   <self> gasps in astonishment.
+
+
+=head2 giggle
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use giggle without arguments, and the effect would be:
+
+You hear:
+   You giggle.
+
+The others hear:
+   <self> giggles.
+
+
+=head2 glare
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use glare without arguments, and the effect would be:
+
+You hear:
+   You glare at nothing in particular.
+
+The others hear:
+   <self> glares around him.
+
+You can also glare with another player as argument, like 'glare <playername>'. The effect would be this:
+
+You hear:
+   You glare icily at <other>.
+
+Your target hears:
+   <self> glares icily at you, you feel cold to your bones.
+
+All the others hear:
+   <self> glares at <other>.
+
+Or you can use glare on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You glare icily at your feet, they are suddenly very cold.
+
+The others hear:
+   <self> glares at his feet, what is bothering him?
+
+
+=head2 grin
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use grin without arguments, and the effect would be:
+
+You hear:
+   You grin evilly.
+
+The others hear:
+   <self> grins evilly.
+
+You can also grin with another player as argument, like 'grin <playername>'. The effect would be this:
+
+You hear:
+   You grin at <other>.
+
+Your target hears:
+   <self> grins evilly at you.
+
+All the others hear:
+   <self> grins evilly at <other>.
+
+
+=head2 groan
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use groan without arguments, and the effect would be:
+
+You hear:
+   You groan loudly.
+
+The others hear:
+   <self> groans loudly.
+
+
+=head2 growl
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use growl without arguments, and the effect would be:
+
+You hear:
+   Grrrrrrrrr....
+
+The others hear:
+   <self> growls.
+
+
+=head2 hiccup
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use hiccup without arguments, and the effect would be:
+
+You hear:
+   *HIC*
+
+The others hear:
+   <self> hiccups.
+
+
+=head2 kiss
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use kiss without arguments, and the effect would be:
+
+You hear:
+   All the lonely people..
+
+The others hear:
+   <self> makes a weird facial contortion
+
+You can also kiss with another player as argument, like 'kiss <playername>'. The effect would be this:
+
+You hear:
+   You kiss <other>.
+
+Your target hears:
+   <self> kisses you.
+
+All the others hear:
+   <self> kisses <other>.
+
+
+=head2 laugh
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use laugh without arguments, and the effect would be:
+
+You hear:
+   You fall down laughing.
+
+The others hear:
+   <self> falls down laughing.
+
+You can also laugh with another player as argument, like 'laugh <playername>'. The effect would be this:
+
+You hear:
+   You take one look at <other> and fall down laughing.
+
+Your target hears:
+   <self> looks at you and falls down on the ground laughing.
+
+All the others hear:
+   <self> looks at <other> and falls down on the ground laughing.
+
+Or you can use laugh on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   Laugh at yourself all you want, the others won't understand.
+
+The others hear:
+   <self> is laughing at something.
+
+
+=head2 lick
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use lick without arguments, and the effect would be:
+
+You hear:
+   You lick your mouth and smile.
+
+The others hear:
+   <self> licks his mouth and smiles.
+
+You can also lick with another player as argument, like 'lick <playername>'. The effect would be this:
+
+You hear:
+   You lick <other>.
+
+Your target hears:
+   <self> licks you.
+
+All the others hear:
+   <self> licks <other>.
+
+Or you can use lick on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You lick yourself.
+
+The others hear:
+   <self> licks himself - YUCK.
+
+
+=head2 nod
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use nod without arguments, and the effect would be:
+
+You hear:
+   You nod solemnly.
+
+The others hear:
+   <self> nods solemnly.
+
+You can also nod with another player as argument, like 'nod <playername>'. The effect would be this:
+
+You hear:
+   You nod solemnly to <other>.
+
+Your target hears:
+   <self> nods solemnly to you.
+
+All the others hear:
+   <self> nods solemnly to <other>.
+
+
+=head2 pout
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use pout without arguments, and the effect would be:
+
+You hear:
+   Aww, don't take it so hard.
+
+The others hear:
+   <self> pouts.
+
+
+=head2 puke
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use puke without arguments, and the effect would be:
+
+You hear:
+   Bleaaaaaghhhhhhh!
+
+The others hear:
+   <self> pukes.
+
+You can also puke with another player as argument, like 'puke <playername>'. The effect would be this:
+
+You hear:
+   You puke on <other>.
+
+Your target hears:
+   <self> pukes on your clothes!
+
+All the others hear:
+   <self> pukes on <other>.
+
+Or you can use puke on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You puke on yourself.
+
+The others hear:
+   <self> pukes on his clothes.
+
+
+=head2 scream
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use scream without arguments, and the effect would be:
+
+You hear:
+   ARRRRRRRRRRGH!!!!!
+
+The others hear:
+   <self> screams at the top of his lungs!
+
+
+=head2 shake
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use shake without arguments, and the effect would be:
+
+You hear:
+   You shake your head.
+
+The others hear:
+   <self> shakes his head.
+
+You can also shake with another player as argument, like 'shake <playername>'. The effect would be this:
+
+You hear:
+   You shake <other>'s hand.
+
+Your target hears:
+   <self> shakes your hand.
+
+All the others hear:
+   <self> shakes <other>'s hand.
+
+Or you can use shake on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You are shaken by yourself.
+
+The others hear:
+   <self> shakes and quivers like a bowlful of jelly.
+
+
+=head2 shiver
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use shiver without arguments, and the effect would be:
+
+You hear:
+   Brrrrrrrrr.
+
+The others hear:
+   <self> shivers uncomfortably.
+
+
+=head2 shrug
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use shrug without arguments, and the effect would be:
+
+You hear:
+   You shrug.
+
+The others hear:
+   <self> shrugs helplessly.
+
+You can also shrug with another player as argument, like 'shrug <playername>'. The effect would be this:
+
+You hear:
+   You shrug at <other>.
+
+Your target hears:
+   <self> shrugs at you.
+
+All the others hear:
+   <self> shrugs at <other>.
+
+
+=head2 sigh
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use sigh without arguments, and the effect would be:
+
+You hear:
+   You sigh.
+
+The others hear:
+   <self> sighs loudly.
+
+
+=head2 smile
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use smile without arguments, and the effect would be:
+
+You hear:
+   You smile happily.
+
+The others hear:
+   <self> smiles happily.
+
+You can also smile with another player as argument, like 'smile <playername>'. The effect would be this:
+
+You hear:
+   You smile at <other>.
+
+Your target hears:
+   <self> smiles at you.
+
+All the others hear:
+   <self> beams a smile at <other>.
+
+
+=head2 smirk
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use smirk without arguments, and the effect would be:
+
+You hear:
+   You smirk.
+
+The others hear:
+   <self> smirks.
+
+
+=head2 snap
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use snap without arguments, and the effect would be:
+
+You hear:
+   PRONTO! you snap your fingers.
+
+The others hear:
+   <self> snaps his fingers.
+
+
+=head2 sneeze
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use sneeze without arguments, and the effect would be:
+
+You hear:
+   Gesundheit!
+
+The others hear:
+   <self> sneezes.
+
+You can also sneeze with another player as argument, like 'sneeze <playername>'. The effect would be this:
+
+You hear:
+   You sneeze at <other> and a film of snot shoots onto him.
+
+Your target hears:
+   <self> sneezes on you, you feel the snot cover you. EEEEEEW.
+
+All the others hear:
+   <self> sneezes on <other> and a film of snot covers him.
+
+Or you can use sneeze on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You sneeze on yourself, what a mess!
+
+The others hear:
+   <self> sneezes, and covers himself in a slimy substance.
+
+
+=head2 snicker
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use snicker without arguments, and the effect would be:
+
+You hear:
+   You snicker softly.
+
+The others hear:
+   <self> snickers softly.
+
+
+=head2 sniff
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use sniff without arguments, and the effect would be:
+
+You hear:
+   You sniff sadly. *SNIFF*
+
+The others hear:
+   <self> sniffs sadly.
+
+You can also sniff with another player as argument, like 'sniff <playername>'. The effect would be this:
+
+You hear:
+   You sniff <other>.
+
+Your target hears:
+   <self> sniffs you.
+
+All the others hear:
+   <self> sniffs <other>
+
+Or you can use sniff on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You sniff yourself.
+
+The others hear:
+   <self> sniffs himself.
+
+
+=head2 snore
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use snore without arguments, and the effect would be:
+
+You hear:
+   Zzzzzzzzzzzzzzz.
+
+The others hear:
+   <self> snores loudly.
+
+
+=head2 spit
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use spit without arguments, and the effect would be:
+
+You hear:
+   You spit over your left shoulder.
+
+The others hear:
+   <self> spits over his left shoulder.
+
+You can also spit with another player as argument, like 'spit <playername>'. The effect would be this:
+
+You hear:
+   You spit on <other>.
+
+Your target hears:
+   <self> spits in your face!
+
+All the others hear:
+   <self> spits in <other>'s face.
+
+Or you can use spit on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You drool all over yourself.
+
+The others hear:
+   <self> drools all over himself.
+
+
+=head2 strut
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use strut without arguments, and the effect would be:
+
+You hear:
+   Strut your stuff.
+
+The others hear:
+   <self> struts proudly.
+
+
+=head2 sulk
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use sulk without arguments, and the effect would be:
+
+You hear:
+   You sulk.
+
+The others hear:
+   <self> sulks in the corner.
+
+
+=head2 think
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use think without arguments, and the effect would be:
+
+You hear:
+   Anything in particular that you'd care to think about?
+
+The others hear:
+   <self> closes his eyes and thinks really hard.
+
+
+=head2 twiddle
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use twiddle without arguments, and the effect would be:
+
+You hear:
+   You patiently twiddle your thumbs.
+
+The others hear:
+   <self> patiently twiddles his thumbs.
+
+
+=head2 wave
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use wave without arguments, and the effect would be:
+
+You hear:
+   You wave.
+
+The others hear:
+   <self> waves happily.
+
+You can also wave with another player as argument, like 'wave <playername>'. The effect would be this:
+
+You hear:
+   You wave goodbye to <other>.
+
+Your target hears:
+   <self> waves goodbye to you. Have a good journey.
+
+All the others hear:
+   <self> waves goodbye to <other>.
+
+Or you can use wave on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   Are you going on adventures as well??
+
+The others hear:
+   <self> waves goodbye to himself.
+
+
+=head2 whistle
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use whistle without arguments, and the effect would be:
+
+You hear:
+   You whistle appreciatively.
+
+The others hear:
+   <self> whistles appreciatively.
+
+You can also whistle with another player as argument, like 'whistle <playername>'. The effect would be this:
+
+You hear:
+   You whistle at <other>.
+
+Your target hears:
+   <self> whistles at <other>.
+
+All the others hear:
+   
+
+Or you can use whistle on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You whistle while you work.
+
+The others hear:
+   <self> whistles to himself in boredom.
+
+
+=head2 wink
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use wink without arguments, and the effect would be:
+
+You hear:
+   Have you got something in your eye?
+
+The others hear:
+   <self> winks suggestively.
+
+You can also wink with another player as argument, like 'wink <playername>'. The effect would be this:
+
+You hear:
+   You wink suggestively at <other>.
+
+Your target hears:
+   <self> winks at you.
+
+All the others hear:
+   <self> winks at <other>.
+
+Or you can use wink on yourself, by entering the command with your own name
+ as argument. The result would look like the following:
+
+You hear:
+   You wink at yourself?? What are you up to?
+
+The others hear:
+   <self> winks at himself - something strange is going on...
+
+
+=head2 yawn
+
+<self> in this help means your name, <other> is the target's name. Emotions work like say
+and as such are heard only on the same map.
+
+You can use yawn without arguments, and the effect would be:
+
+You hear:
+   You open up your yap and let out a big breeze of stale air.
+
+The others hear:
+   <self> yawns sleepily.
+
+
+=head1 Authors
+
+This document was autogenerated from the emotions used in the game.

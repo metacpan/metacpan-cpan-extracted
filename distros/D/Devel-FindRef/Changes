@@ -1,0 +1,77 @@
+Revision history for Perl extension Devel::FindRef
+
+TODO: unwrap the save stack to find mortalised scalars (too version dependent).
+TODO: hash keys containing \x00 do not display properly.
+TODO: get the stack of non-running coroutines?
+
+1.44 Tue Jun  3 20:40:13 CEST 2014
+	- port to 5.20 (analyzed by Dave Mitchell).
+
+1.43  Fri May 16 09:43:01 CEST 2014
+	- port to 5.18.
+        - hopefully better treat anon subs that have been un-anonized
+          without adjusting the pad by Sub::Name (I forgot who sent
+          the testcase).
+	- fix ref2ptr/ptr2ref documentation.
+
+1.422 Sun Aug 30 16:33:24 CEST 2009
+	- more of the same changes as in 1.422.
+        - rely on common::sense.
+
+1.421 Fri Aug 28 22:25:57 CEST 2009
+	- tweaked lexical messages a bit (the HASH "is the lexical %var",
+          not "is in the lexical %var".
+
+1.42 Wed Jul  1 10:24:42 CEST 2009
+	- allow possible anonymous gv's without crashing in 5.10
+          (untested).
+
+1.41 Fri Jun 26 16:48:49 CEST 2009
+	- special-case immortal values (\undef etc.)
+	- fix a bug causing some GV references to be dropped.
+        - find and output lvalue target references.
+        - escape hash keys on output.
+        - avoid a crash when passing in a non-reference.
+
+1.4  Mon Dec  1 14:43:35 CET 2008
+	- show refcount for each scalar.
+        - indicate that scalars are mortalised (but not where).
+        - flatten the results slightly.
+
+1.31 Sun Jul 20 18:38:17 CEST 2008
+	- correctly identify the main program and function call
+          argument vectors (patch by Paul LeoNerd Evans).
+	- use ref2ptr instead of +0 to correctly get the address
+          of overloaded variables (reported by Paul LeoNerd Evans).
+	- use UV in ptr2ref, as perl seems to do the same internally.
+
+1.3  Sat Jul 12 00:17:03 CEST 2008
+	- ignore the new "our" PVMG sv's from perl 5.10.
+	- apply a lot of fixes by Chris Heath,
+          handling constant functions and WEAKOUTSIDE better.
+        - avoid following circular reference chains.
+        - add some visual clues to the output string.
+        - look into anonymous closures to see where they were cloned.
+        - introduce PERL_DEVEL_FINDREF_DEPTH env variable.
+
+1.2  Sat Apr 26 05:14:58 CEST 2008
+	- apply lots of fixes by Chris Heath.
+        - redo example in manpage, it's complete now.
+
+1.1  Sat Dec 29 22:04:14 CET 2007
+	- ignore weak references.
+        - weaken internal references, to avoid displaying
+          them and drowning important output.
+        - properly find magical references.
+
+1.0  Wed Nov 28 13:19:45 CET 2007
+	- correctly restore RMAGICAL flag (Ruslan Zakirov).
+
+0.2  Wed Feb  7 22:31:58 CET 2007
+	- "backport" to 5.8.8.
+
+0.1  Fri Jan 12 00:06:57 CET 2007
+	- initial release.
+
+0.0  Thu Jan 11 14:21:47 CET 2007
+	- copied from Convert-Scalar.

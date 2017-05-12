@@ -1,0 +1,22 @@
+Revision history for Device-Chip-SSD1306
+
+0.04    2017/01/09 00:21:52
+        [CHANGES]
+         * Support other sized modules:
+            + SSD1306 at 128x32
+            + SH1106 chips - often used on larger displays
+
+0.03    2016/06/08 14:45:05
+        [BUGFIXES]
+         * Fix t/00use.t for renamed module
+
+0.02    2016/06/07 23:52:07
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::SSD1306
+         * Changed to implement Device::Chip interface
+
+Previously, this distribution was called Device-BusPirate-Chip-SSD1306
+
+0.01    2015/04/15 00:41:50
+        First version, released on an unsuspecting world.
+

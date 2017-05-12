@@ -1,0 +1,1 @@
+{% load unparsed %}A{% unparsed %}{{ C }}{% endunparsed %}A{% unparsed %}B{% unparsed %}{{ C }}B{% endunparsed %}{% endunparsed %}A{% unparsed cut:"x"|upper|escape %}x<c>x{% endunparsed %}A{% unparsed cut:"x"|upper as var %}x<d>x{% endunparsed %}A{{ var }}A{{ var|safe }}A{% unparsed as var2 %}x<d>x{% endunparsed %}A{{ var2 }}A{{ var2|safe }}

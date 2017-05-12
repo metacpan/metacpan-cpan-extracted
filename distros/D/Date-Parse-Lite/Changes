@@ -1,0 +1,9 @@
+Revision history for Date-Parse-Lite
+
+0.01    2015-11-13
+        First version, released on an unsuspecting world.
+0.02    2015-11-15
+        Upgraded Makefile.PL (Alexandr Ciornii)
+0.03    2015-11-22
+        Increased minimum perl version to 5.8.2 to avoid UTF9 issues
+

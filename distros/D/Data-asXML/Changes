@@ -1,0 +1,30 @@
+Revision history for Data-asXML
+
+0.07    4 March 2015
+    - fix namespace implementation
+
+0.06    3 March 2015
+    - sorted hash keys for XML
+    - test fixes
+    - replace ~~ and given {}
+
+0.05    17 Nov 2009
+    - double, circular (HASH, ARRAY, VALUE) reference en/decoding
+    - SCALAR reference en/decoding
+    - added safe_mode option
+    - added namespace option
+    - REF reference en/decoding
+
+0.04    13 Nov 2009
+    - proper undef en/decoding
+    - binary en/decoding
+
+0.03    11 Nov 2009
+    - decode() functional
+
+0.02    20 Oct 2009
+    - allow undef and empty strings
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

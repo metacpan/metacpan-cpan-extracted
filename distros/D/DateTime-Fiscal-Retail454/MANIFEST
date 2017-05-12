@@ -1,0 +1,19 @@
+ChangeLog
+CREDITS
+lib/DateTime/Fiscal/Retail454.pm
+LICENSE
+Makefile.PL
+MANIFEST
+README
+t/00_load.t
+t/01_sanity.t
+t/10_constructors.t
+t/11_clone.t
+t/20_truncate.t
+t/30_periodmonths.t
+t/90_misc.t
+t/99_pod.t
+t/r454_testdata
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

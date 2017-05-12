@@ -1,0 +1,7 @@
+hostname: indigo
+domain: example.com
+location: microport
+ip:
+  FALLBACK: 10.2.0.200
+families:
+  - com.example.mx

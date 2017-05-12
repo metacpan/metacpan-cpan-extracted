@@ -1,0 +1,57 @@
+2012-09-12  Andreas J Koenig  <k@k83.linux.bogus>
+
+	* releasing 0.33
+
+	* address #79589: adjust to perl 5.17.4: result of sawampersand now is a U8
+
+2010-06-18  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* releasing 0.32
+
+	* received a doc patch from brian d foy talking about /p.
+
+2006-12-25  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* imported into SVN without previous history
+
+2002-10-07  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Released 0.30.
+
+	* Makefile.PL: README generation was buggy.
+
+	* Updated documentation to reflect -no_match_vars in the
+	English.pm module.
+
+	* Received a patch from Slaven Rezic that makes FindAmpersend work
+	with perl 5.6 and 5.8. Unfortunately not yet for threaded perl
+	5.8. Updated the tests.
+
+1999-01-01 Andreas J. Koenig <xxx>
+
+	* Released 0.20 January 1999: Updated to work with perl5.005_54
+	where sawampersand was renamed to PL_sawampersand
+
+1998-02-01 Andreas J. Koenig <xxx>
+
+	* I just received from Doug MacEachern a findampersand package
+	which is so cool that I can't wait including it immediately in the
+	distribution. Thanks, Doug!!
+
+1998-01-01 Andreas J. Koenig <xxx>
+
+	* Spotted that I had been inconsequent about the name of the
+	module. Was it Devel::SawAmpersand or Debug::SawAmpersand? 0.03
+	says Devel:: in *all* places.
+
+1997-12-01 Andreas J. Koenig <xxx>
+
+	* Improved documentation about the sawampersand variable
+
+	
+
+	Local Variables:
+	mode: change-log
+	tab-width: 2
+	left-margin: 2
+	End:

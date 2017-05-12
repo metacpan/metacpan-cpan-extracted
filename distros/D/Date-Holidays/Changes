@@ -1,0 +1,461 @@
+Changes file for Date-Holidays
+
+1.03 2015-08-10 bug fix release, update not required
+
+- Following up on some TODOs in the code, propably in relation to: RT:101366
+
+  https://rt.cpan.org/Ticket/Display.html?id=101366 
+
+
+1.02 2015-08-03 Maintenance release, update not required
+
+- Aligned version numbers in Perl components in lib/
+
+- Added missing version in Date::Holidays::Adapter::LOCAL
+
+- Added MetaProvides to Dist::Zilla build, this should assist in addressing 
+  the issue listed on CPANTS
+
+  Ref: http://cpants.cpanauthors.org/dist/Date-Holidays-1.01
+
+
+1.01 2015-01-31 Feature release, update not required
+
+- Added adapter for:
+    Date::Holidays::RU via patch from Alexander Nalobin
+
+
+1.00 2014-09-18 Major release, update recommended
+
+- License upgraded from Artistic License 1.0 to Artistic License 2.0
+
+- You can now overwrite calendars with a local file, see issue #6 
+ 
+  https://github.com/jonasbn/Date-Holidays/issues/6
+
+- Use of Error has been removed
+
+- Use of UNIVERSAL's can had been changed to more contemporary 
+  pattern
+
+- Adapter strategy has also been changed so adapters have precedence
+  over adapted implementations
+
+
+0.22 2014-09-15 bug fix release, update not required
+ 
+- Addressing issue #7
+ 
+  https://github.com/jonasbn/Date-Holidays/issues/7
+ 
+  This is bug in the tests suite generating reports on failures from
+  CPAN testers.
+
+0.21 2014.08.30 bug fix/feature release, update recommended
+
+- Added adapter for:
+    Date::Holidays::GB addressing Github issue #4
+
+    Date::Holidays::GB exposes new parameter: regions, for local countries under GB.
+    See: Date::Holidays::GB
+
+- Fixed bug in countries parameter handling
+
+
+0.20 2014.08.30 bug fix/feature release, update recommended
+
+- Fixed bug in Date::Holidays::Adapter::FR, which wrongfully reported
+  lack of implementation of is_holidays method when it was the holidays
+  method - error being thrown upon call to holidays methods
+
+- Added adapters for:
+    Date::Holidays::CN
+    Date::Holidays::KR
+    Date::Holidays::PL
+
+  Addressing Github issue #5
+
+- First shot at improvement of Date::Holidays::Adapter code, this needs
+  more work
+
+- Improvements to the test suite, this also needs additional work
+
+- Introducing use of Scalar::Util
+
+
+0.19 2014.08.27 bug fix release, update not required
+
+- This release addressed reports on failing tests for perl 5.21
+  The use in this distribution of UNIVERSAL is now deprecated,
+  see: Github issue [#3] and [RT:98337]
+
+
+0.18 2014.08.24 feature release, update not required
+
+- Added adapter class for Date::Holidays::BR [RT:63437]
+
+
+0.17 2014.08.22 maintenance release, update not required
+
+- Migrated from Module::Build to Dist::Zilla
+
+- Fixed issue in some test, which would break if Date::Holidays::DK
+  was not installed
+
+
+0.16 2014.08.18 maintenance release, update not required
+
+- Fixed POD error
+
+- Aligned all version numbers
+
+- Added t/kwalitee.t Test::Kwalitee test
+
+- Added t/changes.t Test::CPAN::Changes test
+
+
+0.15 2007.03.13 maintenance release, update not required
+
+- Added t/perlcriticrc
+
+- Updated t/critic.t to more contemporary version
+
+
+0.14 2007.03.12 maintenance release, update not required
+
+  Added the following (again) to MANIFEST as a result of the Kwalitee test:
+    t/pod.t
+    t/pod-coverage.t
+
+  These had been removed from the distribution, but the kwalitee
+  metrics likes them so, they are however not run as part of the
+  normal test suite unless $TEST_POD is set in your environment.
+
+
+0.13 2007.03.07 maintenance release, update not required
+
+- Fixed b0rken tests
+    t/new.t did not have a SKIP section
+    t/datetime.t did not have a SKIP section
+
+
+0.12 2007.03.05 maintenance release, update not required
+
+- Fixed a problem with pod.t
+
+- Increased the Perl::Critic severity to 5
+
+- Exchanged Readonly for good old constants, one less dependency,
+  should make the failing tests go away
+
+
+0.11 2007.02.25 maintenance release, update not required
+
+- Added missing requirement to Build.PL Readonly
+  Based on tests reports from CPAN testers
+
+  Thanks david at cantrell.org.uk
+
+  I thought Readonly was core, but according to Module::CoreList this
+  is not the case, so this has been corrected now
+
+- Updated to more contemporary versions of:
+    t/pod-coverage.t
+    t/pod.t
+
+  These should be there for the quality, but will not be run as a part
+  of the normal test run, unless the TEST_POD environment variable is
+  set.
+
+  This seem to be the defacto way of doing things. So they have been
+  removed from MANIFEST.SKIP so they are now a part of the distribution.
+
+
+0.10 2007.02.22 feature release, update not required
+
+- Updated and corrected POD in Date::Holidays
+
+- Updated and corrected POD in Date::Holidays::Adapter
+
+- Added $VERSION to all exception classes
+  (Date::Holidays::Exception::*), I and who just file an RT ticket on
+  the same issue for another distribution
+
+  oh the sweet nemesis :)
+
+- Updated POD in all exception classes (Date::Holidays::Exception::*)
+
+- Updated POD in Date::Holidays::Adapter::AU
+
+- Updated POD in Date::Holidays::Adapter::GB
+
+- Updated POD in Date::Holidays::Adapter::PT
+
+- Updated POD in Date::Holidays::Adapter::NO
+
+- Updated POD in Date::Holidays::Adapter::DK
+
+- Updated POD in Date::Holidays::Adapter::FR
+
+- Updated POD in Date::Holidays::Adapter::DE
+
+- Updated POD in Date::Holidays::Adapter::JP
+
+- Added new adapter for Date::Holidays::Adapter::ES
+  lib/Date/Holidays/Adapter/ES.pm
+
+- Added use of exceptions instead of carp in Date::Holidays::Adapter,
+  this however produces issues with adhering to Perl::Critics
+  recommendation on explicit returns. Be aware that return with in
+  Error's try-catch block returns from a sub, so you have to have a
+  return outside the block.
+
+  Perl::Critic is happy and I am happy
+
+  Updated version to 0.02 for Date::Holidays::Adapter
+
+
+0.09 2007.02.21 feature release update recommended
+
+- Added no_indexing of t/ directory to Build.PL
+
+- Updated README with pod2text appending of Date::Holidays POD
+
+- Code cleaned a bit, much work still to be done
+
+- Wrote some better DIAGNOSTICS and added 3 more Exceptions
+    lib/Date/Holidays/Exception/InvalidCountryCodep.pm
+    lib/Date/Holidays/Exception/NoCountrySpecified.pm
+    lib/Date/Holidays/Exception/UnsupportedMethod.pm
+
+- Added a few tests adapters for some of the tests dating before the
+  refactoring (all tests now pass):
+    t/lib/Date/Holidays/Adapter/NOPOLY.t
+    t/lib/Date/Holidays/Adapter/OOP.t
+
+- Renamed _loader in Date::Holidays to _fetch and _load, see also the
+  similar methods in Date::Holidays::Adapter
+
+    _loader.t obsolete and removed
+
+- Introduced use of Error (Exceptions) for better diagnostics:
+    Date/Holidays/Exception/AdapterInitialization.pm
+    Date/Holidays/Exception/AdapterLoad.pm
+    Date/Holidays/Exception/SuperAdapterLoad.pm
+
+- Refactored the whole thing to a variation of an object adapter
+  pattern, introduced:
+
+    lib/Date/Holidays/Adapter.pm
+    lib/Date/Holidays/Adapter/
+    lib/Date/Holidays/Adapter/AU.pm
+    lib/Date/Holidays/Adapter/DE.pm
+    lib/Date/Holidays/Adapter/DK.pm
+    lib/Date/Holidays/Adapter/FR.pm
+    lib/Date/Holidays/Adapter/GB.pm
+    lib/Date/Holidays/Adapter/JP.pm
+    lib/Date/Holidays/Adapter/NO.pm
+    lib/Date/Holidays/Adapter/PT.pm
+
+  tests are located in t/Adapter:
+    _fetch.t
+    _load.t
+    new.t
+
+- Set severity to 3 for Test::Perl::Critic test
+  ran code through perltidy to remove hard tabs
+
+- Set severity to 4 for Test::Perl::Critic test
+  added use warnings statement
+
+- Changed the constructor to no longer be able to initialize a shallow
+  object. If you want to make use of Date::Holidays ability to check
+  all countries for a given holiday please, use it using full namespace.
+  POD updated correspondingly.
+
+- Addressed issue with method calling problems, OOP vs. Procedural vs.
+  the weird mix I personally had boiled up, thanks to Florian Merges
+  for reporting this.
+
+  This has resulted in a minor cleanup and again I can see that the
+  current architecture is not optimal, I am planning a major rewrite,
+  to eliminate the problems of handling new classes introduced in the
+  Date::Holidays::* namespace.
+
+  I am not an authority of any kind, I just attempt to get things to
+  play along nicely.
+
+  New files introduced:
+    t/NOPOLY.t
+    t/OOP.t
+    t/SUPERED.t
+    t/ABSTRACTED.t
+    t/PRODUCERAL.t
+    t/new.t
+
+  and the test classes (in t/lib/Date/Holidays):
+    ABSTRACTED.pm
+    NOPOLY.pm
+    OOP.pm
+    PROCUDERAL.pm
+    SUPERED.pm
+
+- Updated MANIFEST.SKIP with more contemporary version
+
+- Added t/critic.t, Test::Perl::Critic test, currently at severity 5.
+  In addition to this I changed the 'return undef's scattered all over
+  the code to simple return statements.
+
+- Added t/kwalitee.t, Test::Kwalitee test, diabled check for symlinks
+  since it reacted on symlinked .releaserc in directory, which however
+  is NOT in the distribution even though it thinks so
+
+  Added the following as a result of the Kwalitee test:
+    t/pod.t
+    t/pod-coverage.t
+
+- Added use of Module::Load to Build.PL and to own _loader routine in
+  Date::Holidays. I also added:
+    t/_loader.t to isolate the actual test
+
+
+0.08 2006.09.06 Bug fix release, update recommended
+
+- Added RT request #21089, helper scripts not part of distribution, but
+  mentioned in the autogenerated Makefile.PL
+
+  Renamed bin/ directory to scripts/
+
+
+0.07 2006.08.02 bug fix release, update recommended
+
+- Removed bin/ directory from distribution (it is development purpose
+  only anyway)
+
+- Removed t/pod.t (and prerequisites in Build.PL) this test can be
+  performed by Module::Build
+
+- Removed t/pod-coverage.t (and prerequisites in Build.PL) this test
+  can be performed by Module::Build
+
+- Updated TODO with new point
+
+- Changed way Makefile.PL is generated from 'passthrough' to
+ 'traditional', I kind of like the way it is done in Workflow, so I
+  adapted this
+
+- Fixed a bug in program flow concerning Date::Holidays::DE
+
+- Fixed a test holding a wrong number of tests to be skipped
+
+- Updated POD, added Date::Holidays::CN to SEE ALSO section (no work
+  done to implement this at this time
+
+- Updated POD with TEST COVERAGE section, planning next release to be a
+  maintenance release focused on test coverage
+
+  Also in an attempt to address:
+  http://www.nntp.perl.org/group/perl.cpan.testers/276637
+
+
+0.06 2005.12.17 Feature release, update recommended
+
+- Moved build requirements to special section in Build.PL
+
+- Added AU and NZ to bin/test_date-holidays.t
+
+- Updated MANIFEST.SKIP with:
+    - Komodo project file
+    - Module::Build parameters mentioned in Module::Signature
+
+- Signed module using Module::Signature, added:
+    - t/0-signature.t
+    - SIGNATURE
+
+- Parameter 'state' also added for holidays method, have sent patch to
+  David Dick author of Date::Holidays::AU offering a more flexible API.
+
+- Added some more POD on developing in the Date::Holidays::* namespace
+
+- Date::Holidays::AU have been updated to 0.03, meaning that the exception
+  implemented in 0.05 could be removed, it was however changed to accomodate
+  the state parameter implemented in Date::Holidays::AU.
+
+- Exchanged manually built Makefile.PL for a Makefile.PL maintained by
+  Module::Build
+
+
+0.05 2005.12.09 bug fix release, update recommended
+
+- Addressing failing test
+	http://www.nntp.perl.org/group/perl.cpan.testers/262252
+
+	So we have added yet another exception, this time for Date::Holidays::AU.
+
+	The problem is that its method is_holiday, needs an additional parameter
+	indicating the state, the holidays method in the same module defaults
+	to VIC, so for know we are using this as our default state, this will need
+	readdressing.
+
+
+0.04 2005.10.22 maintenance release, update not required
+
+- Changes to unit-tests, it was assumed that some of the Date::Holidays
+  modules where installed, this is not always the case
+
+  This was pointed out to me by shild on use.perl.org:
+  http://use.perl.org/comments.pl?sid=28993&cid=43889
+
+
+0.03 2006.10.13 feature release, update recommended
+
+- Small refactoring added new sub _check_countries
+
+- Moved portuguese exception, Date::Holiday::PT has changed name to
+  Date::Holidays::PT, but it has turned OOP.
+
+- Implemented new parameter in is_holiday (countries). This method
+  returns a list of country codes having the holiday specified as a
+  holiday for the respective country (suggested by cog).
+
+  So it has to be used in conjunction with the data parameters: year,
+  month and day
+
+  if given a subset of countries only these countries are tested and a
+  hashref is returned pointing where the countries codes are the keys
+  and the values indicate true or false for the date specified.
+
+  The values are:
+
+  - undef if the country has no module or the data could not be obtained
+  - a name of the holiday if a holiday is present
+  - an empty string if the a module was located but the day is not a
+  holiday
+
+- Updated INSTALL
+
+- Removed Exporter from prerequisites
+
+- Replaced use of ExtUtils::Makemake with Module::Build
+
+- Added realnames to Changes file (this file)
+
+- Added suggestion on improvements from cog (Jose Castro) to TODO
+
+
+0.02 2004.05.31 feature release, update not required
+
+- Indented code in POD after tip from RJBS (Ricardo Signes)
+
+- 'jp' left out of the test suite for now
+
+- Date::Holidays::NO added to test suite, courtesy of MRAMBERG (Marcus
+  Ramberg)
+
+- Added experimental subs using DateTime objects as suggested by BORUP
+  (Christian Borup) (SEE: TODO)
+
+
+0.01 200405.22
+
+- Intial release

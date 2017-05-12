@@ -1,0 +1,133 @@
+NAME
+    Dancer2::Plugin::PageHistory - store recent page history for user into
+    session
+
+VERSION
+    Version 0.210
+
+SYNOPSIS
+        get '/product/:sku/:name' => sub {
+            add_to_history(
+                type       => 'product',
+                title      => param('name'),
+                attributes => { sku => param('sku') }
+            );
+        };
+
+        hook 'before_template_render' => sub {
+            my $tokens = shift;
+            $tokens->{previous_page} = history->previous_page->uri;
+        };
+
+DESCRIPTION
+    The "add_to_history" keyword which is exported by this plugin allows you
+    to add interesting items to the history lists which are returned using
+    the "history" keyword.
+
+KEYWORDS
+  add_to_history
+    Adds a page via "add" in Dancer2::Plugin::PageHistory::PageSet. Both of
+    path and query_string are optional arguments which will be set
+    automatically from the current request if they are not supplied.
+
+  history
+    Returns the current Dancer2::Plugin::PageHistory::PageSet object from
+    the user's session.
+
+SUPPORTED SESSION ENGINES
+    CGISession, Cookie, DBIC, JSON, Memcached, MongoDB, PSGI, Redis, Sereal,
+    Simple, YAML
+
+CONFIGURATION
+    No configuration is necessarily required.
+
+    If you wish to have arguments passed to "new" in
+    Dancer2::Plugin::PageHistory::PageSet these can be added to your
+    configuration along with configuration for the plugin itself, e.g.:
+
+        plugins:
+          PageHistory:
+            add_all_pages: 1
+            ingore_ajax: 1 
+            history_name: someothername
+            PageSet:
+              default_type: all
+              fallback_page:
+                path: "/"
+              max_items: 20
+              methods:
+                - default
+                - product
+                - navigation
+
+    Configuration options for the plugin itself:
+
+    *   add_all_pages
+
+        Defaults to 0. Set to 1 to have all pages added to the list
+        "default_type" in Dancer2::Plugin::PageHistory::PageSet in the
+        "before" hook.
+
+    *   ignore_ajax
+
+        If "add_all_pages" is true this controls whether ajax requests are
+        added to the list "default_type" in
+        Dancer2::Plugin::PageHistory::PageSet in the "before" hook.
+
+        Defaults to 0. Set to 1 to have ajax requests ignored.
+
+    *   history_name
+
+        This setting can be used to change the name of the key used to store
+        the history object in the session from the default "page_history" to
+        something else. This is also the key used for name of the token
+        containing the history object that is passed to templates.
+
+HOOKS
+    This plugin makes use of the following hooks:
+
+  before
+    Add current page to history. See "add_all_pages" and "ignore_ajax".
+
+  before_template_render
+    Puts history into the token "page_history".
+
+TODO
+    *   Add more tests
+
+AUTHOR
+    Peter Mottram (SysPete), "<peter@sysnix.com>"
+
+CONTRIBUTORS
+     Slaven Rezić (eserte) - GH issues #1, #2, #3
+     Andreas J. König (andk) - GH issue #4
+
+BUGS
+    Please report any bugs or feature requests via the project's GitHub
+    issue tracker:
+
+    <https://github.com/SysPete/Dancer2-Plugin-PageHistory/issues>
+
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes. PRs are always welcome.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer2::Plugin::PageHistory
+
+    You can also look for information at:
+
+    *   GitHub repository
+        <https://github.com/SysPete/Dancer2-Plugin-PageHistory>
+
+    *   meta::cpan <https://metacpan.org/pod/Dancer2::Plugin::PageHistory>
+
+LICENSE AND COPYRIGHT
+    Copyright 2015-2016 Peter Mottram (SysPete).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as the Perl 5 programming language system itself.
+
+    See http://dev.perl.org/licenses/ for more information.
+

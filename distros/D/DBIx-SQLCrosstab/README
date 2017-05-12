@@ -1,0 +1,72 @@
+DBIx::SQLCrosstab version 1.10
+==============================
+
+Creates a server-side cross tabulation from a database
+
+DESCRIPTION
+
+DBIx::SQLCrosstab produces a SQL query to interrogate a database 
+and generate a cross-tabulation report. 
+The amount of parameters needed to achieve the result is kept to 
+a minimum. You need to indicate which columns and rows to cross 
+and from which table(s) they should be taken.
+Acting on your info, DBIx::SQLCrosstab creates an appropriate 
+query to get the desired result.
+Compared to spreadsheet based cross-tabulations, DBIx::SQLCrosstab 
+has two distinct advantages, i.e. it keeps the query in the 
+database work space, fully exploiting the engine capabilities, and 
+does not limit the data extraction to one table.
+
+The companion module DBIx::SQLCrosstab::Format provides nicely 
+formatted output in HTML, XML, YAML, CSV, xls, and of course as
+several Perl structures (lol, loh, hoh). 
+
+VERSION
+
+This is the initial distribution. The module has been tested 
+extensively in private, but of course the public scrutiny is 
+different, so I expect to get some bug reports in a near future.
+You may consider this code as Beta.
+
+
+INSTALLATION
+
+To install DBIx::SQLCrosstab type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+EXAMPLES
+In the directory examples there are several files:
+    - crosstab.sqlite   is a database in SQLite format
+    - sqlcrosstab_example.pl is an example of how to set
+             the initial parameters and get the results
+             in several formats.
+    - create_crosstab_innodb.mysql and create_crosstab_myisam.mysql 
+         contain the sample database in MySQL format
+    - crosstab_sample.html contains the database structure and
+         description
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  one DBD driver module
+  Tree::DAG_Node
+
+Optionally, if you want to produce YAML output, the YAML module 
+should be installed.
+Similarly, for Excel spreadsheet output, you should install
+Spreadsheet::WriteExcel
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Giuseppe Maxia
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

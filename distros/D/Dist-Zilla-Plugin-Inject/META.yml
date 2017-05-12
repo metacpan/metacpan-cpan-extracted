@@ -1,0 +1,34 @@
+---
+abstract: 'Inject into a CPAN::Mini mirror'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  Directory::Scratch: 0
+  Dist::Zilla::Tester: 0
+  File::Find: 0
+  Path::Class: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Inject
+recommends:
+  CPAN::Mini::Inject: 0
+  CPAN::Mini::Inject::Remote: 0
+requires:
+  Class::Load: 0
+  Dist::Zilla::Role::Releaser: 0
+  File::Temp: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Try::Tiny: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Inject
+  homepage: http://github.com/pshangov/dist-zilla-plugin-inject/tree
+  repository: git://github.com/pshangov/dist-zilla-plugin-inject.git
+version: 0.001

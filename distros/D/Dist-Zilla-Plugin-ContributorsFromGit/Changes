@@ -1,0 +1,69 @@
+Revision history for Dist-Zilla-Plugin-ContributorsFromGit
+
+0.017     2015-04-09 22:14:03 PDT-0700
+	* Stop using Test::TempDir/Directory::Scratch; switch to
+	  Test::TempDir::Tiny
+
+0.016     2015-01-18 14:51:27 PST-0800
+	* use Moose vs Reindeer; no need for *all* the antlers right now.
+	  (issue #21)
+
+0.015     2015-01-18 14:37:50 PST-0800
+	* Use Test::File::SD instead of F::SD::ProjectDistDir (thanks yanick!)
+
+0.014     2014-07-05 15:28:48 PDT-0700
+	* merge pull request #20 (additional alternate author information)
+
+0.013     2014-04-17 19:21:09 PDT-0700
+	* properly *pass* our stopwords list to the PW StopWords **plugin**
+	* document with more vigor that the PW Contributors section is optional,
+	  and not required in any way by this plugin (issue #12)
+	* make Dist::Zilla 5.013 the minimum required, to help resolve
+	  META.{yml,json} problems (issue #9)
+	* make author matching case-insensitive (closes #6, closes #11)
+
+0.012     2014-04-17 14:45:19 PDT-0700
+	* properly generate our stopwords list
+
+0.011     2014-04-15 22:25:59 PDT-0700
+	* bump Reindeer prereq version to 0.017, to avoid Try::Tiny pitfalls
+
+0.010     2014-04-08 17:06:02 PDT-0700
+	* add public interface validation tests
+	* make all our attributes "private"
+	* refactor documentation around how MetaCPAN handles contributor => PAUSE
+	  ID matching
+	* prep to break out our config email override into its own package
+
+0.009     2014-04-08 00:45:48 PDT-0700
+	* Put the authors mapping into a ShareDir yaml file
+
+0.008     2014-04-07 14:15:05 PDT-0700
+	* NO CODE CHANGES
+	* Handle git identity crisis resulting in test failures a la
+	  http://www.cpantesters.org/cpan/report/b6c182c2-be62-11e3-add5-ed1d4a243164
+
+0.007     2014-04-03 22:00:00 PDT-0700
+	* add support for author email mapping
+	* Minimum supported Perl is now v5.10.1
+
+0.006     2013-04-03 12:46:33 PDT-0700
+	* add utf8 support (gh#4, thanks miyagawa)
+	* ...and some (hopefully accurate) tests for said utf8 support
+
+0.005     2013-02-28 06:00:00 PST-0800
+	* ...and don't add an empty list of contributors (gh#2, thanks dagolden!)
+
+0.004     2013-02-26 20:23:40 PST-0800
+	* Add the list of contributors to META.* (gh#1, thanks dagolden!)
+
+0.003     2012-12-27 21:42:43 CST6CDT
+	* don't ABEND on no git, just skip tests and return early from the plugin
+
+0.002     2012-12-02 13:52:34 PST8PDT
+	* pod update -- note we run in the BeforeBuild phase
+	* filter 'Your Name <you@example.com>' from the built list.  Really, we
+	  need functionality to filter / consolidate, but this will work for now.
+
+0.001     2012-11-25 01:41:41 PST8PDT
+	* initial release

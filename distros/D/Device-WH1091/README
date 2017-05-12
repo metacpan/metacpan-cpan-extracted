@@ -1,0 +1,6 @@
+pod2text Device::WH1091.pm > README
+
+make
+make test
+make install
+

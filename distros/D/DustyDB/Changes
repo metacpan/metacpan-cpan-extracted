@@ -1,0 +1,45 @@
+0.06    2008-11-09 4:23pm - Andrew Sterling Hanenkamp
+
+    * Added failing tests for loading record links in collections
+    * Added failing tests for multi-attribute keys in collections
+    * Added failing TODO tests for DBM file paths
+    * Fixed a bug where collections could not load objects that linked to other
+      objects stored as FKs
+    * Changed the DBM::Deep requirement since there's a bug in it that prevents
+      the tests from passing
+ 
+0.05    2008-11-08 10:35pm - Andrew Sterling Hanenkamp
+
+    * Just noticed that I failed to remove DustyDB::Filter with the changes to
+      the API in 0.03. This is now fixed. Thanks CPANTS.
+
+0.04    2008-11-08 10:26pm - Andrew Sterling Hanenkamp
+
+    * Links to other models are now loaded on demand
+    * Added a DustyDB::Meta::Instance class to help with deferred loading
+    * Added a DustyDB::FakeRecord class to help with deferred loading
+    * Added a graph.t test to test deferred loading
+    * Added a multikey.t test to test multi-attribute keys
+
+0.03    2008-11-06 1:03am - Andrew Sterling Hanenkamp
+
+    * INCOMPATIBLE API CHANGES THAT BREAK EXISTING CODE
+    * No longer use Moose; with 'DustyDB::Record' syntax
+    * Define models using "use DustyDB::Object" instead
+    * Added a DustyDB::Object model
+    * Complete rewrite of DustyDB::Record and DustyDB::Model
+    * Added DustyDB::Meta::Class and DustyDB::Meta::Attribute
+    * Removed DustyDB::Filter since DustyDB::Meta::Attribute includes these
+      features for all attributes
+    * Added a handy key() method that provides sugar for DustyDB::Key
+
+0.02    2008-10-31 11:42pm - Andrew Sterling Hanenkamp
+
+    * Added the stringify property to DustyDB::Key
+    * Added load_or_create() helper to DustyDB::Model
+    * Added load_and_update_or_create() helper to DustyDB::Model
+    * Added DustyDB::Filter
+
+0.01    2008-10-29 9:31pm - Andrew Sterling Hanenkamp
+
+    * Initial release of yet another object database

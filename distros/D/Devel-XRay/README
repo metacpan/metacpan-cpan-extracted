@@ -1,0 +1,126 @@
+NAME
+    Devel::XRay - See What a Perl Module Is Doing
+
+VERSION
+    Version 0.95
+
+SYNOPSIS
+    use Devel::XRay along with "ignore", "only", or "all",
+
+        use Devel::XRay;
+        use Devel::XRay 'all';    # same as saying 'use Devel::XRay;'
+        use Devel::XRay 'none';   # filter the source but don't inject anything
+        use Devel::XRay ignore => qw(man_behind_curtain private);
+        use Devel::XRay only   => qw(sex drugs rock_and_roll);
+
+DESCRIPTION
+    Devel::XRay is a handy source filter using Filter::Simple when used at
+    the top of perl code, will inject print statements to standard error to
+    show you what a module is doing.
+
+    This module is useful if...
+
+    *   You're a visual learner and want to "see" program execution
+
+    *   You're tracking an anomaly that leads you into unfamiliar code
+
+    *   You want to quickly see how a module _runs_
+
+    *   You've inherited code and need to grok it
+
+    *   You start a new job and want to get a fast track on how things work
+
+EXAMPLES
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+        use Devel::XRay;
+
+        use Example::Object;
+
+        init();
+        my $example = Example::Object->new();
+        my $name = $example->name();
+        my $result = $example->calc();
+        cleanup();
+
+        sub init    {}
+        sub cleanup {}
+
+        # In a another file, say Example/Object.pm
+        package Example::Object;
+        use Devel::XRay;
+        sub new { bless {}, shift }
+        sub name {}
+        sub calc {}
+
+    Produces the following output
+
+        # Hires seconds     # package::sub
+        [1092265261.834574] main::init
+        [1092265261.836732] Example::Object::new
+        [1092265261.837563] Example::Object::name
+        [1092265261.838245] Example::Object::calc
+        [1092265261.839443] main::cleanup
+
+ACKNOWLEDGEMENTS
+    This module was inspired by Damian Conway's Sufficently Advanced
+    Technology presentation at YAPC::NA 2004. I had initially attempted to
+    use Hook::LexWrap, but using Filter::Simple was just a lot cleaner and
+    seemed a bit more practical for debugging code. The first iteration was
+    only 2 lines of actual code.
+
+        package Devel::XRay;
+        use strict;
+        use warnings;
+        use Filter::Simple;
+
+        my $code = 'print STDERR (caller(0))[3] . "\n";';
+        FILTER { return unless $_; $_ =~ s/(sub.+?{)/$1 $code/sg; }
+
+    I'd also like to thank fellow SouthFlorida.pm member Rocco Caputo for
+    working out the import logic over Sub Etha Edit at OSCON. Rock on Rocco!
+
+AUTHOR
+    Jeff Bisbee, "<jbisbee at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-xray at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-XRay>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::XRay
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Devel-XRay>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Devel-XRay>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-XRay>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Devel-XRay>
+
+COPYRIGHT & LICENSE
+    Copyright 2006 Jeff Bisbee, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    JavaScript::XRay, Filter::Simple, Time::HiRes, Hook::LexWrap,
+    Devel::Trace
+

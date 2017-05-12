@@ -1,0 +1,61 @@
+#########################
+#options requiring integer
+[option integer]
+#arbitrary int
+opt_integer = 1
+ambiguous = 1
+
+#options requiring integers
+[option integers]
+#arbitrary ints
+opt_integers = 0 1 2
+
+#########################
+#options requiring float
+[option float]
+#arbitrary float
+opt_float = 3.14
+
+#options requiring floats
+[option floats]
+#arbitrary floats
+opt_floats = 3.14 -1.62
+
+#########################
+#options requiring string
+[option string]
+#arbitrary string
+opt_string = phi
+
+#options requiring strings
+[option strings]
+#arbitrary strings
+opt_strings = pi "psi phi"
+
+#########################
+#options requiring dir
+[option dir]
+#system dir
+opt_dir = /etc
+
+#options requiring dirs
+[option dirs]
+#system dirs
+opt_dirs = /etc /tmp
+
+#########################
+#options requiring file
+[option file]
+#path to a file
+opt_file = /etc/passwd
+
+#options requiring files
+[option files]
+#paths to files
+opt_files = /etc/passwd /etc/group
+
+#########################
+#executables
+[executable]
+#a h2xs drop-in for creating Package-Tools based distros
+#bin/pstub.PL = yes

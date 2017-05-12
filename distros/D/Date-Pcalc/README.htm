@@ -1,0 +1,141 @@
+<HTML>
+<HEAD>
+    <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+    <TITLE>Date::Pcalc Readme Page</TITLE>
+</HEAD>
+<BODY>
+
+<P>
+<HR NOSHADE SIZE="2">
+<P>
+
+<CENTER>
+If you are looking for information on <A HREF="CHANGES.txt">what is new</A> in this version, prerequisites and <A HREF="INSTALL.txt">installation instructions</A>, you will find it either in the <A HREF="README.txt">README</A> file included in this distribution, <A HREF="http://www.engelschall.com/~sb/download/pkg/Date-Pcalc-6.1.README">on my website</A> or <A HREF="http://cpansearch.perl.org/src/STBEY/Date-Pcalc-6.1/README.txt">on CPAN</A>.
+</CENTER>
+
+<P>
+<HR NOSHADE SIZE="2">
+<P>
+
+<H3>See</H3>
+<A HREF="http://search.cpan.org/search?module=Date::Pcalc"><IMG SRC="http://www.engelschall.com/u/sb/download/Date-Calc/img/cpan_banner.png" ALT="[search.cpan.org]" BORDER="0"></A>
+<H3>for the latest manual page.</H3>
+
+<P>
+
+<H1>Date::Pcalc</H1>
+<A HREF="http://www.engelschall.com/u/sb/demo/"><IMG SRC="http://www.engelschall.com/u/sb/download/img/Date-Calc.gif" ALT="[Date::Pcalc]" WIDTH="455" HEIGHT="230" BORDER="0"></A>
+
+<P>
+
+<H3>What is it for?</H3>
+
+Date calculations, e.g.
+
+<UL>
+    <LI>&quot;Basic stuff&quot; like leap year, &quot;Julian day&quot; (or &quot;date&quot;), day-of-week, days in month/year, etc.
+    <LI>Comparing dates
+    <LI>Conversion from a date (e.g. 01-Jun-2004) to the number of days (e.g. 731733) and vice-versa
+    <LI>Calculating a date (e.g. 01-Jun-2004) plus/minus a number of days (e.g. +35) yielding a new date (e.g. 06-Jul-2004)
+    <LI>Calculating the nth day-of-week of a month and year (e.g. the first Tuesday of July 2004 = 06-Jul-2004)
+    <LI>Calculating differences between dates (and/or times)
+    <LI>Calculating Easter Sunday and holidays depending on it
+    <LI>...
+
+</UL>
+
+based on
+
+<UL>
+    <LI>the Gregorian calendar (decreed in 1582 by pope Gregor I)
+    <LI><A HREF="http://www.engelschall.com/u/sb/download/Date-Calc/DIN1355/">DIN 1355</A>
+    <LI><A HREF="http://www.iso.ch/iso/en/prods-services/popstds/datesandtime.html">ISO 8601</A> (to some extent, where applicable)
+    <BR>(See also <A HREF="http://www.w3.org/TR/NOTE-datetime">W3C</A>, <A HREF="http://www.mcs.vuw.ac.nz/technical/software/SGML/doc/iso8601/ISO8601.html">Victoria University of Wellington</A> or <A HREF="http://en.wikipedia.org/wiki/ISO_8601">Wikipedia</A>)
+
+</UL>
+
+<H3>Philosophy</H3>
+
+<UL>
+    <LI>Toolbox, not a (heavy) ready-made application
+    <LI>Interoperable, &quot;LEGO system&quot;
+    <LI>Spirit of UNIX command-line tools (be small, do only one thing, and be good at it)
+    <LI>Be computationally complete, i.e., everything should be computable (even if it takes a little more than only one function call)
+</UL>
+
+<H3>What it is <B><U>NOT</U></B></H3>
+
+<UL>
+    <LI>A jack-of-all-trades (see e.g. <A HREF="http://search.cpan.org/search?module=Date::Manip">Date::Manip</A> instead)
+    <LI>A module specializing in date parsing (see e.g. <A HREF="http://search.cpan.org/search?module=Date::Parse">Date::Parse</A>, <A HREF="http://search.cpan.org/search?module=Time::ParseDate">Time::ParseDate</A> or <A HREF="http://search.cpan.org/search?module=Date::Manip">Date::Manip</A> instead)
+    <LI>A module specializing in date formatting (see e.g. <A HREF="http://search.cpan.org/search?module=Date::Format">Date::Format</A> or <A HREF="http://search.cpan.org/search?module=Date::Manip">Date::Manip</A> instead)
+    <LI>A module specializing in the handling of timezones (see e.g. <A HREF="http://search.cpan.org/search?module=Time::Timezone">Time::Timezone</A> or <A HREF="http://search.cpan.org/search?module=Time::Zone">Time::Zone</A> instead)
+
+</UL>
+
+<H3>What it <B><U>IS</U></B></H3>
+
+<UL>
+    <LI>A module <B><U>primarily</U></B> for performing <B><U>calculations</U></B> with dates (nomen est omen)
+    <LI>A module intended to be <B><U>small</B></U> (low memory footprint) and <B><U>fast</B></U> (for heavy-duty applications)
+</UL>
+
+<P>
+
+<H3>Features</H3>
+
+<UL>
+
+    <LI>Extrapolates the Gregorian calendar back beyond 1582 until 1 A.D.
+    <BR>(historically <B><U>not</B></U> meaningful, but may nevertheless be useful)
+    <LI>Numerical range extends as far as &quot;int&quot; data type permits, i.e., at least until the year 32767
+    <LI>Basic date parsing (input) and formatting (output)
+    <LI>Support for various languages (input and output)
+    <BR>(Currently 14 as of version 6.1; English, French, German, Spanish, Portuguese, Dutch, Italian, Norwegian, Swedish, Danish, Finnish, Hungarian, Polish and Romanian)
+    <LI>Calculations on dates, with and without time (including timezone offsets)
+    <LI>Interface to localtime(), gmtime(), mktime() plus own conversion routines (with more predictable results)
+    <LI><B>Internally written in C for smaller memory usage, faster execution and possibility to use in C applications</B>
+    <LI>The <A HREF="http://search.cpan.org/search?module=Date::Pcalc">documentation</A> of &quot;Date::Pcalc&quot; gives model solutions to common problems in its &quot;<A HREF="http://search.cpan.org/~stbey/Date-Pcalc-6.1/Pcalc.pod#RECIPES">RECIPES</A>&quot; section
+    <LI>Optionally provides date objects (i.e., an OO interface) for greater ease of use (Perl only) (<A HREF="http://search.cpan.org/search?module=Date::Pcalc::Object">Date::Pcalc::Object</A>)
+    <LI>Comprises a module for date calculations taking legal holidays into account (Perl only) (<A HREF="http://search.cpan.org/search?module=Date::Pcalendar">Date::Pcalendar</A>)
+    <LI>Provides a rich set of holiday profiles for numerous countries (Perl only) (<A HREF="http://search.cpan.org/search?module=Date::Pcalendar::Profiles">Date::Pcalendar::Profiles</A>)
+
+</UL>
+
+<H3>Limitations</H3>
+
+<UL>
+    <LI>The language setting in &quot;Date::Pcalc&quot; is a global variable (= BEWARE when using threads!)
+    <LI>The modules &quot;Date::Pcalendar&quot; and &quot;Date::Pcalendar::Year&quot; only operate on years between 1583 and 2299
+    <LI>Uses the ISO-Latin-1 character set, even for languages (such as Polish) not entirely representable in that character set (uses the &quot;plain&quot; characters instead in such cases)
+    <LI><FONT COLOR="#FF0000"><B>The calendar profiles included in this module usually do not take historical irregularities into account</B></FONT> (even though some do in order to show how this can be done),<BR>
+        <FONT COLOR="#FF0000"><B>they only provide means for calculating <U>regularly</U> recurring events (<U>the profiles should therefore not be relied upon for historical faithfulness</U>)</B></FONT>
+
+</UL>
+
+<P>
+
+<H3>See also</H3>
+
+<UL>
+    <LI>The <A HREF="http://www.engelschall.com/u/sb/calendar/">International Eternal Gregorian Calendar</A> showing a calendar with holidays in selectable languages and countries
+    <LI>The <A HREF="http://www.engelschall.com/u/sb/demo/">Sports Club Events Calendar</A> showing how this module can be used to manage people attending events in a calendar
+    <LI>The <A HREF="http://www.engelschall.com/u/sb/datecalc/">Simple Date Calculator</A> for determining the difference between two dates / a new date based on a date plus a difference
+    <LI>&quot;<A HREF="http://www.tondering.dk/claus/calendar.html">The Calendar FAQ</A>&quot; by <A HREF="mailto:claus@tondering.dk">Claus Tøndering</A>
+
+</UL>
+
+<P>
+<HR NOSHADE SIZE="2">
+<P>
+
+<CENTER>
+If you are looking for information on <A HREF="CHANGES.txt">what is new</A> in this version, prerequisites and <A HREF="INSTALL.txt">installation instructions</A>, you will find it either in the <A HREF="README.txt">README</A> file included in this distribution, <A HREF="http://www.engelschall.com/~sb/download/pkg/Date-Pcalc-6.1.README">on my website</A> or <A HREF="http://cpansearch.perl.org/src/STBEY/Date-Pcalc-6.1/README.txt">on CPAN</A>.
+</CENTER>
+
+<P>
+<HR NOSHADE SIZE="2">
+<P>
+
+</BODY>
+</HTML>

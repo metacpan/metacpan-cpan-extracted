@@ -1,0 +1,12 @@
+Changes
+Playground.pm
+Playground.tt
+Makefile.PL
+MANIFEST
+MANIFEST.sans-scripts
+README
+delete-whitespace.pl
+release.pl
+t/1.t
+tt.pl
+release.pl

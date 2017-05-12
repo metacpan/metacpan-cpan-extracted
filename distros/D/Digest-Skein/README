@@ -1,0 +1,35 @@
+Digest-Skein version 0.00_01
+============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Radoslaw Zielinski <radek@pld-linux.org> <http://radek.cc/>
+
+This library is based on code written by Niels Ferguson, Stefan Lucks,
+Bruce Schneier, Doug Whiting, Mihir Bellare, Tadayoshi Kohno, Jon Callas,
+Jesse Walker; see http://www.schneier.com/skein.html for details.
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License (GPL).
+
+
+While I would prefer to release it under LGPL, the brg_*.h files require
+GPL.  So, GPL it is for now.
+
+
+BUGS and PATCHES
+
+Please use the CPAN RT:
+   http://rt.cpan.org/NoAuth/Bugs.html?Dist=Digest-Skein
+
+The GIT repository is at:
+   http://github.com/radekz/digest-skein/

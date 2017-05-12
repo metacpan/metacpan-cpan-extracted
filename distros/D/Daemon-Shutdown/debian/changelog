@@ -1,0 +1,12 @@
+daemon-shutdown (0.09-1) unstable; urgency=low
+
+  * New upstream release
+  * Added new dependency to debian/control
+
+ -- Ioan Rogers <ioan.rogers@gmail.com>  Sun, 04 Dec 2011 02:03:57 -0800
+
+daemon-shutdown (0.07-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Ioan Rogers <ioan.rogers@gmail.com>  Sat, 22 Oct 2011 15:16:30 -0700

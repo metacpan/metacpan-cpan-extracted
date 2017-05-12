@@ -1,0 +1,1 @@
+{% cycle "A" "B" "C" as foo %}{% for X in L %}{% ifequal X "7" %}{% cycle "1" "2" "3" "4" "5" as foo %}{% else %}{% cycle foo %}{% endifequal %}{% endfor %}

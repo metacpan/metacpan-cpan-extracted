@@ -1,0 +1,30 @@
+# NAME
+
+Data::Object::Prototype - Data::Object Prototype-based Programming
+
+# VERSION
+
+version 0.06
+
+# SYNOPSIS
+
+    use Data::Object::Prototype;
+
+# DESCRIPTION
+
+Data::Object::Prototype implements a thin prototype-like layer on top of the
+[Data::Object](https://metacpan.org/pod/Data::Object) data-type object framework. This module allows you to develop
+using a prototype-based style in Perl, giving you the ability to create,
+mutate, extend, mixin, and destroy anonymous classes, ad hoc and with very
+little code.
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

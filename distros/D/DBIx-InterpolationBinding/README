@@ -1,0 +1,35 @@
+DBIx-InterpolationBinding version 1.01
+======================================
+
+This module is provides a method to prepare and execute SQL statements
+using DBI in a manner that means any interpolated variables are used
+as DBI bind parameters rather than being interpolated directly into
+the SQL. This module is written in pure Perl and does not require a C
+compiler.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Perl 5.005_03 or greater
+  DBI
+  DBD::DBM for some of the tests
+  Test::More for some of the tests
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2011 by Luke Ross
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.005 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,553 @@
+Revision history for DBM::Deep (ordered by revision number).
+
+2.0013 Jan 01 20:30:00 2016 EDT
+    - Updates to documentation by garu (Thanks!, GH#14, GH#15, GH#16)
+
+2.0012 Jun 17 20:30:00 2015 PDT
+    - Improved transaction validation and warnings (GH#12)
+
+2.0011 Jan 12 16:00:00 2013 PDT
+    - POD fixes by H. Merijn Brandt (The X<> tag - Thanks!)
+
+2.0009 Jun 30 13:00:00 2013 PDT
+    - Can push undefined values onto arrays.
+
+2.0008 Jun 17 13:00:00 2012 PDT
+    - Arrays and hashes retrieved from a database no longer create
+      circular references (RT#77746).
+
+2.0007 May 27 19:35:00 2012 PDT
+    - Include one-line descriptions of each POD page after the name.
+      Thanks to Yves Agostini for the patch and Gregor Herrmann for
+      submitting it (RT#76378).
+    - t/98_pod.t: Skip tests if Pod::Simple 3.21 is installed
+      (RT#77419).
+
+2.0006 Apr 1 17:15:00 2012 PDT
+    - Er, try harder to get t/27_filehandle.t to work under TB2. The
+      extra ‘TAP version 13’ line was causing a TAP parse error.
+
+2.0005 Mar 25 13:05:00 2012 PDT
+    - t/27_filehandle.t has been fixed again. It no longer violates
+      Test::Builder’s encapsulation.
+
+2.0004 Sep 12 18:38:00 2010 PDT
+    - t/27_filehandle.t has been fixed to work with Test::More 2.
+
+2.0003 Sep 12 12:02:00 2010 PDT
+    - t/43_transaction_maximum.t has been fixed. It was broken in the
+      previous release for systems that will only open so many files.
+
+2.0002 Sep 5 12:35:00 2010 PDT
+    - Error messages from DBM::Deep now use the caller’s file name.
+      They used incorrectly to use the name of the program ($0).
+    - begin_work now checks correctly to see whether the new transac-
+      tion exceeds the number the file was created to support. Some-
+      times it would allow a few more transactions, and then proceed
+      to corrupt the database (RT#60903).
+    - The description of the file header in DBM::Deep::Internals has
+      been brought up to date.
+
+2.0001 Aug 22 12:03:00 2010 PDT
+    - Simply reading a hash or array element no longer causes autoviv-
+      ification. (Dereferencing it does still.) This makes DBM::Deep
+      comply with Perl’s behaviour (RT#60391).
+
+2.0000 Jul 18 14:30:00 2010 PDT
+    - THIS VERSION IS NOT FULLY COMPATIBLE WITH 1.002x.
+    - This version is practically identical to the previous dev
+      release. See 1.9999_01, below, for all the hype. 
+    - Also, a memory leak caused by misuse of field hashes has
+      been fixed.
+    - perl 5.8.4 is now required.
+
+1.9999_02 Jul 11 13:02:00 2010 PDT
+    (This is the second developer release for 2.0000.)
+    - Fixed a broken test
+    - Fixed compilation and overloading under perl 5.8.x
+
+1.9999_01 Jun 27 14:22:00 2010 PDT
+    (This is the first developer release for 2.0000.)
+    - THIS VERSION CHANGES THE FILE FORMAT.
+        - Databases from DBM::Deep 1.0003 and higher can still
+          be opened.
+        - Newly-created databases automatically use the version 2.x
+          format (numbered 4 internally), which version 1.x
+          cannot open.
+        - The optimize method, since it copies everything to a new
+          database, upgrades it.
+        - There is a new db_version method.
+    - Support for perl 5.6 has been dropped. We now require 5.8. 5.6
+      users can still use version 1.0025. If anyone really needs 5.6
+      support in version 2.x, we can add it back again, but would pre-
+      fer not to. Bug fixes may be back-ported to 1.002x if requested.
+    - The File back end now supports Unicode. This is only supported
+      for new databases. Old databases in the DBM::Deep 1.0003 format
+      will have to be upgraded for this to work.
+    - New external_refs mode, which allows objects retrieved from the
+      database to hang on to the corresponding database entries, keep-
+      ing them alive, even after all references to them from the data-
+      base itself have been deleted.
+    - Numeric comparison of DBM::Deep objects now works. Different
+      objects used to compare equal. And there were uninitial-
+      ized warnings.
+    - Deletions now work properly in the DBI back end. Deleting an
+      array or hash referenced by two keys in the database used to
+      be a no-op.
+
+1.0025 Jun 6 12:46:00 2010 PDT
+    (This version is compatible with 1.0024)
+    - Fixed t/39_singletons.t to work on Windows.
+
+1.0024 May 30 14:25:00 2010 PDT
+    (This version is compatible with 1.0023)
+    - Stale references (objects blessed into DBM::Deep::Null), which
+      have always supposed to act like undef, now compare equal to
+      undef, "" and 0. $stale_ref eq "" used to return false, even
+      though "$stale_ref" was the empty string.
+    - If you assign a stale reference to a database location,
+      DBM::Deep now warns and assigns undef, instead of dying with
+      obscure error messages.
+    - Using a stale reference as a hash or array ref now causes an
+      error with a more helpful message.
+
+1.0023 May 9 14:33:00 2010 PDT
+    (This version is compatible with 1.0022)
+    - The DBI back end no longer dies with ‘Use of uninitialized value
+      $_ in lc’ in perl 5.12.0. Thanks to Ansgar Burchardt for finding
+      and fixing this problem.
+
+1.0022 Apr 25 18:40:00 2010 PDT
+    (This version is compatible with 1.0021)
+    - Singleton support has been re-enabled in the File back end.
+    - t/43_transaction_maximum.t was still failing on some systems
+      (see http://www.cpantesters.org/cpan/report/7151810), so now we
+      try to detect the maximum number of files we can open.
+
+1.0021 Apr 18 18:28:00 2010 PDT
+    (This version is compatible with 1.0020)
+    - Correct spelling mistakes in the documentation (thanks to Gregor
+      Herrmann for the corrections and to Ansgar Burchardt for passing
+      them on) (RT#56520)
+    - MANIFEST now lists the test libs so they get included in the
+      distribution (RT#56512)
+    - It no longer crashes in perl 5.6.2.
+
+1.0020 Apr 10 10:50:00 2010 EDT
+    (This version is compatible with 1.0016)
+	- Fixed t/43_transaction_maximum.t so that it doesn't error out on systems
+      which cannot open > 255 files at one time.
+    - Improved code coverage
+        - Added t/96_virtual_functions.t which helps describe what actually
+          needs to be overridden in a new plugin.
+    
+
+1.0019_003 Feb 16 22:00:00 2010 EST
+    (This is the third developer release for 1.0020.)
+    (This version is compatible with 1.0016)
+	- Fixed problem where "./Build test" wouldn't actually -do- anything.
+        - (No-one apparently tried to install this till Steven Lembark. Thanks!)
+    - Fixed speed regression with keys in the File backend.
+        - Introduced in 1.0019_002 to fix #50541
+        - Thanks, SPROUT!
+    - (RT #53575) Recursion failure in STORE (Thanks, SPROUT)
+    - Merged the rest of the fixes from 1.0015 and 1.0016
+        - Thanks to our new co-maintainer, SPROUT! :)
+    - Had to turn off singleton support in the File backend because the caching
+      was causing havoc with transactions. Turning on fatal warnings does give
+      apparently important information.
+    - Oh - forgot to mention that fatal warnings are now on in all files.
+
+1.0019_002 Jan 05 22:30:00 2010 EST
+    (This is the second developer release for 1.0020.)
+    (This version is compatible with 1.0014)
+	- Fixed bug where attempting to store a value tied to something other than
+      DBM::Deep would leave the file flocked.
+	- Added support for DBD::SQLite
+        - Build.PL has been extended to support sqlite vs. mysql
+        - Storage::DBI now detects between the two DBDs
+    - (RT #51888) Applied POD patch (Thanks, FWIE!)
+    - (RT #44981) Added VERSION to ::Array, ::Engine, and ::Hash
+    - Removed extraneous slashes from POD links (Thanks ilmari!)
+    - (RT #50541) Fixed bug in clear() for hashes in the File backend.
+        - This has caused a regression in speed for clear() when clearing
+          large hashes using running with the File backend. ->clear() (on my
+          machine) now takes ( N / 40 ) ** (1.66) seconds. So, clearing 4000
+          keys (as is the test in t/03_bighash.t) would take ~2070 seconds.
+    - (RT #40782) Fixed bug when handling a key of '0' (Thanks Sterling!)
+    - (RT #48031) Fixed bug with localized $, (Thanks, SPROUT!)
+
+1.0019_001 Dec 31 22:00:00 2009 EST
+    (This is the first developer release for 1.0020.)
+    (This version is compatible with 1.0014)
+	- DBM::Deep has been refactored to allow for multiple engines. There are two
+      engines built so far:
+        - File (the original engine)
+        - DBI (an engine based on DBI)
+    - The DBI engine has only been tested on MySQL and isn't transactional.
+        - InnoDB sucks horribly. When run in a sufficient isolation mode, it
+          creates deadlocks. 
+    - A custom Build.PL has been written to allow for running tests under
+      CPAN.pm against the various engines.
+        - This also allows running the long tests under CPAN.pm
+    - This has meant a ton of refactoring. Hopefullly, this refactoring will
+      allow finding some of the niggly bugs more easily. Those tests have not
+      been enabled yet. That's the next developer release.
+    - Hopefully, this multi-engine support will allow deprecation of the file
+      format in the future.
+
+1.0016 Feb 05 22:10:00 2010 PST
+    - (This version is compatible with 1.0015)
+    - New caveat in the docs explaining stale references (RT#42129)
+    - All included modules now have the same version in META.yml, so
+      the CPAN shell will no longer try to downgrade.
+    - Fixed bug in clear() for hashes (RT#50541)
+
+1.0015 Jan 25 22:05:00 2010 PST
+    - (This version is compatible with 1.0014)
+    - Fix deep recursion errors (RT#53575)
+    - Avoid leaving temp files lying around (RT#32462)
+    - (RT #48031) Fixed bug with localized $, (Thanks, SPROUT!)
+    - (RT #40782) Fixed bug when handling a key of '0' (Thanks Sterling!)
+
+1.0014 Jun 13 23:15:00 2008 EST
+    - (This version is compatible with 1.0013)
+    - Fix for RT#36781 (t/44 has an unrequired dependency)
+    - lock() has been aliased to lock_exclusive(). There is now
+      a lock_shared() method. The :flock constants are no longer
+      imported into the DBM::Deep namespace.
+      **** THIS IS AN API CHANGE ****
+
+1.0013 Jun 13 23:15:00 2008 EST
+    - (This version is compatible with 1.0012)
+    - Fix for RT#30144 (Optimization failure on Win32)
+    - Fixed a bug in reindex_entry (Thanks, Wulfram Humann!)
+
+1.0012 Jun 09 15:00:00 2008 EST
+    - (This version is compatible with 1.0011)
+    - Fix for RT#30085 (Remove dependency on XS module)
+        - Thank you very much tachyon-II@Perlmonks!!
+        - This also resolves RT#35424 (DBM::Deep breaks XML::Twig).
+    - Updated the POD with fixes that were made, but still on the TODO list.
+    - Bypass for RT#36419 (t/44_upgrade_db.t fails on *BSD)
+        - We're just going to skip that for now. It's a number-of-processes-open
+        issue. Best is to do a port to another module to do the heavy lifting.
+
+1.0011 May 27 15:00:00 2008 EST
+    - (This version is compatible with 1.0010)
+    - A test has the wrong plan.
+
+1.0010 May 27 12:00:00 2008 EST
+    - (This version is compatible with 1.0009)
+    - Fix for RT#35140 (invalid POD links)
+    - Fix for RT#34819 (Cannot assign the same value back to the same location)
+    - Fix for RT#29957 (Cannot assign the same value back to the same location)
+    - Fix for RT#33863 (Cannot shift an arrayref from an array)
+    - When something is deleted from a DB, the value is export()ed, allowing it
+      to be saved.
+      - This exporting is only done if the refcount == 0 after the deletion.
+
+1.0009 Mar 19 12:00:00 2008 EDT
+    - (This version is compatible with 1.0008)
+    - Internal refactorings to prepare for some optimizations.
+        - _fh() has been removed. It was marked as private, so don't complain.
+    - Skip a test that was spuriously failing on Win32 (Thanks, Alias!)
+
+1.0008 Mar 09 20:00:00 2008 EDT
+    - (This version is compatible with 1.0007)
+    - Fixed a number of Win32 issues (Reported by Steven Samelson - thank you!)
+        - Much thanks to Nigel Sandever and David Golden for their help
+          debugging the issues, particularly with DBM::Deep's usage of
+          File::Temp (which removes a number of warnings).
+        - Autovivification now works on Win32. It turns out that when a
+          process takes a shared flock on a file, it's not allowed to write to
+          it under Win32, unlike *nix. This is probably a good catch.
+            - Note: The fix is a hack. All locks are now exclusive until a
+              better fix is found.
+
+1.0007 Jan 10 00:00:00 2008 EDT
+    - (This version is compatible with 1.0006)
+    - Applied a patch+failing test submitted by sprout@cpan.org. Thanks!
+      - Turns out that the case of 17 keys with the same first character in the
+        MD5 hash wasn't being tested for. This was a crashbug.
+    - A fix has been made to upgrade_db.pl (RT# 30067)
+      - The version determinations were in the wrong order or evaluation. This
+        meant that upgrade_db.pl wouldn't work as expected (or at all).
+    - Added a minimum Pod::Usage requirement (RT# 29976)
+      - It's an optional item in Build.PL
+      - utils/upgrade_db.pl now checks for that version, as does the test.
+
+1.0006 Oct 01 23:15:00 2007 EDT
+    - (This version is compatible with 1.0005)
+    - Removed Clone and replaced it with a hand-written datastructure walker.
+      - This greatly reduces the footprint of a large import
+      - This bypasses a failure of Clone under Perl 5.9.5
+      - Moved t/37_delete_edge_cases.t to t_attic because it wasn't really used
+    - import() has a stricter API now. This is a potentially incompatible API
+      change. Only HASH and ARRAY refs are now allowed and they must match the type
+      of the object being imported into.
+
+1.0005 Oct 01 11:15:00 2007 EDT
+    - (This version is compatible with 1.0004)
+    - Added proper singleton support. This means that the following now works:
+        $db->{foo} = [ 1 .. 3];
+        my $x = $db->{foo};
+        my $y = $db->{foo};
+        is( $x, $y ); # Now passes
+      - This means that Data::Dumper now properly reports when $db->{foo} = $db->{bar}
+
+1.0004 Sep 28 12:15:00 2007 EDT
+    - (This version is compatible with 1.0003)
+    - Fixed the Changes file (wrong version was displayed for 1.0003)
+    - Added filter sugar methods to be more API-compatible with other DBMs
+      - This was added to support a patch provided to IO::All so it can
+        use DBM::Deep as a DBM provider.
+    - Implemented _dump_file in order to display the file structure. As a
+      result, the following bugs were fixed:
+      - Arrays and hashes now clean up after themselves better.
+      - Bucketlists now clean up after themselves better.
+      - Reindexing properly clears the old bucketlist before freeing it.
+
+1.0003 Sep 24 14:00:00 2007 EDT
+    - THIS VERSION IS INCOMPATIBLE WITH FILES FROM ALL OTHER PRIOR VERSIONS.
+    - Further fixes for unshift/shift/splice and references (RT# 29583)
+    - To fix that, I had to put support for real references in.
+      - the 16 and 22 tests are now re-enabled.
+      - Yes, this means that real references work. See t/45_references.t
+
+1.0002 Sep 20 22:00:00 2007 EDT
+    - (This version is compatible with 1.0001)
+    - Expanded _throw_error() so that it provides better information.
+      (Thanks brian d foy!)
+    - Fixed how shift, unshift, and splice work when there are references
+      being moved. It now no longer dies.
+    - Added diag in t/17_import.t to note that the failing tests on blead
+      are due to Clone being broken, not DBM::Deep. The tests will still
+      fail because I don't want users to install something that's broken
+      and deal with those bug reports.
+
+1.0001 Mar 12 16:15:00 2007 EDT
+    - (This version is compatible with 1.0000)
+    - Added a missing dependency on IO::Scalar (RT #25387)
+    - Fixed how t/44_upgrade_db.t and utils/upgrade_db.pl worked
+      - utils/upgrade_db.pl now uses #!perl, not #!/usr/bin/perl
+      - t/44_upgrade_db.t now explicitly calls $^X
+        (Thanks merlyn!)
+
+1.0000 Feb 26 22:30:00 2007 EST
+    - THIS VERSION IS INCOMPATIBLE WITH FILES FROM ALL OTHER PRIOR VERSIONS.
+      - To aid in this form of upgrades, DBM::Deep now checks the file format
+        version to make sure that it knows how to read it.
+      - db_upgrade.pl was added to utils/. This will -NOT- install onto
+        your system. This is deliberate.
+      - db_upgrade.pl will not handle developer release file formats. This
+        is due to the fact that all developer releases in preparation for a
+        given release share the same file version, even though the file
+        format may change. This is deliberate.
+    - Importing no longer takes place within a transaction
+    - The following parameters were added:
+      - data_sector_size - this determines the default size of a data sector.
+    - Correctly handle opening readonly files
+
+0.99_04 Jan 24 22:30:00 2007 EST
+    - Added the missing lib/DBM/Deep.pod file to the MANIFEST
+    - Fixed a poorly-designed test that was failing depending on what Clone::Any
+      was using.
+    - All "use 5.6.0;" lines are now "use 5.006_000;" to avoid warnings about
+      unsupported vstrings in 5.9.x
+
+0.99_03 Jan 23 22:30:00 2007 EST
+    - THIS VERSION IS INCOMPATIBLE WITH FILES FROM ALL OTHER PRIOR VERSIONS.
+      - The fileformat changed completely. I will be writing a converter, but
+        it's not there right now. Do NOT expect that this module will
+        correctly detect older versions and handle them sanely. Sanity will be
+        there for 1.00, but we're not there yet, are we?
+    - Converted to use FileHandle::Fmode to handle filehandle status checks
+    - Fixed bug with deleting already-deleted items on Win32 (reported by Nigel Sandever)
+    - The guts of how transactions work has been rewritten to better handle
+      some edgecases. This required a complete rewrite of the engine.
+    - Freespace management is now in place. It's not perfect, but it's there.
+    - The rewrite of the engine required a rewrite of how first_key/next_key
+      was implemented. This should result in significant speed improvements.
+    - Self-reference has been removed. This means you cannot do:
+          $db->{foo} = { x => 'y' };
+          $db->{bar} = $db->{foo};
+      I hope to be able to return this functionality by 1.00, but I cannot
+      promise anything. To do this properly, it requires refcounting in order
+      to correctly handle deletions and transactions. Once you move away from
+      a simple tree, everything becomes really hard.
+
+0.99_02 Apr 28 05:00:00 2006 Pacific
+    - Added missing file to the MANIFEST
+
+0.99_01 Apr 27 18:00:00 2006 Pacific
+    - Added explicit dependency on Perl 5.6.0
+      - Digest::MD5 requires 5.6.0
+      - Sub::Uplevel (dep of Test::Exception) requires 5.6.0
+    - Removed error()/clear_error()
+      - All error-handling is done with die()
+    - Broke out DBM::Deep's code into DBM::Deep::Engine
+    - Tied variables can no longer be assigned to a DBM::Deep object.
+      - This includes cross-file assignments.
+    - Autovivification now works
+      - This is a consequence of the fact that all assignments are tied.
+    - set_pack() and set_digest() have been removed.
+      - Instead, you will now pass the appropriate values into new()
+      - A pack_size parameter has been added to make 64-bit files easier
+    - Transactions now work
+
+0.983 Apr 10 20:00:00 2006 Pacific
+    - Added patch inspired by Jeff Janes (Thanks!)
+      - Autovivification now works correctly
+      - The following now works correctly
+        my %hash = ( a => 1 );
+        $db->{hash} = \%hash;
+        $hash{b} = 2;
+        cmp_ok( $db->{hash}{b}, '==', 2 );
+    - (RT#18530) - DBM::Deep now plays nicely with -l
+
+0.982 Mar 08 11:00:00 2006 Pacific
+    - Fixed smoketests that were failing on Win32
+    - Added restriction for Perl 5.6.0 or higher.
+      - Digest::MD5 and Sub::Uplevel (dep of Test::Exception) require 5.6+
+
+0.981 Mar 06 11:00:00 2006 Pacific
+    - (RT#17947) - Fixed test that was failing on older Perls
+
+0.98  Feb 28 11:00:00 2006 Pacific
+    - Added in patch by David Cantrell to allow use of DATA filehandle
+    - Fixed bug where attempting to export() a structure that used autobless would die
+    - Fixed arraytest slowness by localizing $SIG{__DIE__} to prevent Test::Builder's
+      $SIG{__DIE__} from being called. (q.v. http://perldoc.perl.org/functions/eval.html)
+    - More methods have been made private:
+        - root() is now _root()
+        - base_offset() is now _base_offset()
+        - fh() is now _fh()
+        - type() is now _type()
+        - precalc_sizes() is now _precalc_sizes()
+
+0.97  Feb 24 10:00:00 2006 Pacific
+    - Reorganization of distribution to a more standard layout
+    - Migration to Module::Build with EU::MM backwards compatibility
+    - Migration of all tests to use Test::More and Test::Exception
+    - Added Devel::Cover report to DBM::Deep POD
+      - Test coverage improved to 89.6% (and climbing)
+    - The following methods have been renamed to reflect their private nature:
+        - init() is now _init()
+        - open() is now _open()
+        - close() is now _close()
+        - load_tag() is now _load_tag()
+        - index_lookup() is now _index_lookup()
+        - add_bucket() is now _add_bucket()
+        - get_bucket_value() is now _get_bucket_value()
+        - delete_bucket() is now _delete_bucket()
+        - bucket_exists() is now _bucket_exists()
+        - find_bucket_list() is now _find_bucket_list()
+        - traverse_index() is now _traverse_index()
+        - get_next_key() is now _get_next_key()
+        - copy_node() is now _copy_node()
+        - throw_error() is now _throw_error()
+    - The various tied classes have been broken out. This means that testing
+        "ref( $obj ) eq 'DBM::Deep'" will now fail. The correct test is
+        "eval { $obj->isa( 'DBM::Deep' ) }".
+    - The various methods like push and delete now have the same return values as
+      the standard builtins.
+    - TIEARRAY and TIEHASH now check their parameters more thoroughly
+    - Negative indices for arrays works as expected, including throwing the appropriate
+      errors.
+    - RT #16877 is fixed (DBM::Deep broken with Perl 5.9.3+).
+    - RT #14893 is fixed (tie() and new() use different parameter lists).
+    - A bug with optimize and threading is fixed.
+    - autobless has received some attention, resulting in a number of bugs fixed.
+    - Removed mode option as it just caused confusion.
+    - Removed volatile option as it is pretty useless (use locking instead)
+    - Locking now implicitly enables autoflush
+
+0.96  Oct 14 09:55:00 2005 Pacific
+    - Fixed build (OS X hidden files killed it)
+    - You can now pass in an optional filehandle to the constructor
+
+0.95  Oct 12 13:58:00 2005 Pacific
+    - Added optional autobless flag to preserve and restore blessed hashes
+    - Fixed bug where 0 could not be fetched using get_next_key
+    - Fixed bug where tie() constructor didn't accept a hash ref for args
+    - optimize() now preserves user/group/permissions
+    - Errors are now FATAL (meaning it calls die()), unless you set debug flag
+
+0.94  Apr 13 19:00:26 2004 Pacific
+    - Fixed bug reported by John Cardenas (corruption at key level when
+         replace of less data was done on bucket)
+
+0.93  Feb 15 19:53:17 2004 Pacific
+    - Fixed optmize() on Win32 where orig file couldn't be overwritten unless
+         filehandle was closed first.  This change introduces a potential race
+         condition when using locking and optmize() on Win32, but it can be 
+         fixed in the future using a soft copy instead of Perl's rename().
+
+0.92  Feb 12 19:10:22 2004 Pacific
+    - Fixed bug where passing a reference to a different DBM::Deep object
+         would still result in an internal reference.
+    - Added export() method for recursively extracting hashes/arrays into
+         standard in-memory Perl structures.
+    - Added import() method for recursively importing existing Perl hash/
+         array structures
+    - Fixed bug where optimize() wouldn't work if base level of DB was
+         an array instead of a hash.
+
+0.91  Feb 12 02:30:22 2004 Pacific
+    - Fixed bug with splice() when length of removed section was 0
+    - Updated POD re: circular refs and optimize()
+    - Had to jump version numbers to 0.91 because in previous releases
+         I used only a single digit after the decimal which was confusing
+         the CPAN indexer.
+
+0.10  Feb 11 08:58:35 2004 Pacific
+    - Fixed bug where default file mode was CLEARING files (Thanks Rich!)
+    - Added experimental support for circular references
+    - Fixed bugs in shift(), unshift() and splice() where nested objects
+      	in array would be recursively re-stored as basic hashes/arrays
+    - Fixed typos in POD docs
+
+0.9   Feb 10 03:25:48 2004 Pacific
+    - Added Filters for storing/fetching keys/values
+    - Added hook for supplying own hashing algorithm
+    - FIxed some typos in POD docs, added new sections
+
+0.8   Feb 8 02:38:22 2004 Pacific
+    - Renamed to DBM::Deep for CPAN
+    - Added optimize() method for rekindling unused space
+    - Now returning hybrid tie()/OO object from new()
+    - Basic error handling introduced
+    - Added debug mode for printing errors to STDERR
+    - Added TYPE_HASH and TYPE_ARRAY constants for "type" param
+    - Added clone() method for safe copying of objects
+    - Wrote POD documentation
+    - Added set_pack() function for manipulating LONG_SIZE / LONG_PACK
+    - Added aliases for most tied functions for public use
+    - Now setting binmode() on FileHandle for Win32
+    - Added 45 unit tests
+
+0.7   Jan 4 11:31:50 2003 UTC
+    - Renamed to DeepDB
+    - Changed file signature to DPDB (not compatible with older versions)
+    - Converted array length to packed long instead of sprintf()ed string
+
+0.6   Dec 31 15:12:03 2002 UTC
+    - Some misc optimizations for speed
+
+0.5   Oct 18 08:55:29 2002 UTC
+    - support for force_return_next parameter in traverse_index() method for 
+      ultra-fast combined key search/removal
+
+0.4   Oct 15 20:07:47 2002 UTC
+    - now making sure filehandle is open for all DB calls
+
+0.3   Oct 3 19:04:13 2002 UTC
+    - fixed bug that could cause corrupted data when using locking
+
+0.2   Aug 6 16:37:32 2002 UTC
+    - Removed base index caching, as it can cause problems when two processes 
+      are populating the db at the same time (even with locking)
+
+0.1   Jun 3 08:06:26 2002 UTC
+    - initial release

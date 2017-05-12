@@ -1,0 +1,791 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:datacasting="http://datacasting.jpl.nasa.gov/datacasting" xmlns:georss="http://www.georss.org/georss" xmlns:gml="http://www.opengis.net/gml" version="2.0">
+  <channel>
+    <title>Datacasting Feed of the NESDIS GSICS THREDDS Data Server</title>
+    <link>http://gsics.nesdis.noaa.gov:8080/thredds</link>
+    <description>Global Space-based Inter-Calibration System (GSICS) near real-time and re-analysis correction coefficients for instruments aboard NOAA's environmental satellites. The coefficients are stored as time series in netCDF-CF files and hosted on the NOAA's GSICS THREDDS data server node. For more information about GSICS visit http://gsics.wmo.int .</description>
+    <datacasting:channelUID>gsics.nesdis.noaa.gov-datacasting-all</datacasting:channelUID>
+    <datacasting:dataSource>GSICS files on the NESDIS THREDDS data server</datacasting:dataSource>
+    <datacasting:customEltDef displayName="WMO International Data Subcategory" type="integer" name="wmo_data_subcategory"/>
+    <datacasting:customEltDef displayName="Local Data Subcategory" type="integer" name="local_data_subcategory"/>
+    <datacasting:customEltDef displayName="Monitored Instrument" type="string" name="mon_inst"/>
+    <datacasting:customEltDef displayName="Reference Instrument" type="string" name="ref_inst"/>
+    <datacasting:customEltDef units="1" displayName="Data Validity Start Time" type="date" name="validity_start_time"/>
+    <datacasting:customEltDef units="1" displayName="Data Validity End Time" type="date" name="validity_end_time"/>
+    <language>en-us</language>
+    <copyright>Information delivered as a GSICS product is generated in accordance with the GSICS principles and practices. GSICS products are public and may be used and redistributed freely. Any publication using GSICS products should acknowledge both GSICS and the relevant data creator's organization. Neither the data creator, nor the data publisher, nor any of their employees or contractors, makes any warranty, express or implied, including warranties of merchantability and fitness for a particular purpose, or assumes any legal liability for the accuracy, completeness, or usefulness, of this information.</copyright>
+    <managingEditor>nesdis.star.gprc@noaa.gov</managingEditor>
+    <webMaster>nesdis.star.gprc@noaa.gov</webMaster>
+    <pubDate>Wed, 14 Nov 2012 18:15:32 GMT</pubDate>
+    <generator>Datacasting Feed Publishing Tools</generator>
+    <docs>http://datacasting.jpl.nasa.gov/datacasting.html</docs>
+    <ttl>60</ttl>
+    <image>
+      <url>http://gsics.nesdis.noaa.gov/datacast/GSICS180px.png</url>
+      <title>NESDIS GSICS THREDDS Data Server Node</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds</link>
+      <width>180</width>
+      <height>73</height>
+      <description>Global Space-based Inter-Calibration System</description>
+    </image>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121017120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-15T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-17T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-17T12:00:00Z to 2012-11-15T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">b44fadc1d86216b7f32a0bcbbfa327acf30d5568</guid>
+      <pubDate>Wed, 14 Nov 2012 18:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121006120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-04T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-06T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-06T12:00:00Z to 2012-11-04T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">8589fcb85b130aecc1815a7a8a955c9829354e0e</guid>
+      <pubDate>Sat, 03 Nov 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120926120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-25T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-26T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-26T12:00:00Z to 2012-10-25T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">cb6115e4f3d61f71184b245b9d440ea6d74caea2</guid>
+      <pubDate>Wed, 24 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120929120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-28T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-29T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-29T12:00:00Z to 2012-10-28T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">a499ff935742674c001fc87c0610df1f8aa67258</guid>
+      <pubDate>Sat, 27 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121005120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-03T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-05T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-05T12:00:00Z to 2012-11-03T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">ec90e36beff6238925ae25cd5a00186c73cc4380</guid>
+      <pubDate>Fri, 02 Nov 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120917120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120917120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120917120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-16T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-17T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120917120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-17T12:00:00Z to 2012-10-16T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">e365b2cf53f7e8a83a85768804b6453c0bb601fb</guid>
+      <pubDate>Mon, 15 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120928120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-27T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-28T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-28T12:00:00Z to 2012-10-27T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">d6cb976fcb7fccd0aa472d8c70d1412d6c870b58</guid>
+      <pubDate>Fri, 26 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120919120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120919120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120919120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-18T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-19T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120919120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-19T12:00:00Z to 2012-10-18T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">3cc6292b8200d3a17ae39d7826d4662d8e02ef47</guid>
+      <pubDate>Wed, 17 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120923120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120923120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120923120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-22T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-23T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120923120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-23T12:00:00Z to 2012-10-22T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">9265558780d30eb17105952c05566f6653920512</guid>
+      <pubDate>Sun, 21 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120920120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120920120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120920120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-19T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-20T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120920120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-20T12:00:00Z to 2012-10-19T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">27dee133a50776cae5fdc613ca80b92dae74417f</guid>
+      <pubDate>Thu, 18 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120928120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-27T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-28T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120928120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-28T12:00:00Z to 2012-10-27T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">c53148e63185fee13688de973f82e2e2c52ec310</guid>
+      <pubDate>Fri, 26 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121004120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-02T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-04T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-04T12:00:00Z to 2012-11-02T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">b5fc5fadb9f6757be7e6cedd42d87dce7628236d</guid>
+      <pubDate>Thu, 01 Nov 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120925120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-24T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-25T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-25T12:00:00Z to 2012-10-24T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">c8f39ec8df3c389b85e527b997f4391b4634dcb4</guid>
+      <pubDate>Tue, 23 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121003120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-01T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-03T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-03T12:00:00Z to 2012-11-01T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">4661c1d96633830272916c01410565fbf06d07f5</guid>
+      <pubDate>Wed, 31 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121008120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-06T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-08T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-08T12:00:00Z to 2012-11-06T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">2b64caba05f94f6215fe34931a6400f2d67d7ad7</guid>
+      <pubDate>Mon, 05 Nov 2012 18:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120918120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120918120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120918120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-17T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-18T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120918120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-18T12:00:00Z to 2012-10-17T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">85e92de68a8ec9b777a80a3830aeb4245954be4a</guid>
+      <pubDate>Tue, 16 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120924120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-23T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-24T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-24T12:00:00Z to 2012-10-23T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">6e629c5d7415ca88dfc14374ea5d25b69eee5149</guid>
+      <pubDate>Mon, 22 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121009120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-07T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-09T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-09T12:00:00Z to 2012-11-07T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">3a16e0ddc093cb0c71fd774ad3c7e6137653b079</guid>
+      <pubDate>Tue, 06 Nov 2012 18:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120926120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-25T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-26T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120926120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-26T12:00:00Z to 2012-10-25T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">d43db69915e6345941659700ce67d401f1845cfe</guid>
+      <pubDate>Wed, 24 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121005120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-03T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-05T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121005120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-05T12:00:00Z to 2012-11-03T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">95d82551cdcb3e7b3b8af9da0d3148476340ecb4</guid>
+      <pubDate>Fri, 02 Nov 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121004120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-02T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-04T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121004120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-04T12:00:00Z to 2012-11-02T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">8debbe4f75e19c82d833fdc2af6493c0f8845604</guid>
+      <pubDate>Thu, 01 Nov 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121008120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-06T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-08T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121008120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-08T12:00:00Z to 2012-11-06T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">0036fa13e7740ea6ff0dc4ca35171800907a1bfd</guid>
+      <pubDate>Mon, 05 Nov 2012 18:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20121003120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-01T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-03T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20121003120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-03T12:00:00Z to 2012-11-01T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">89dd549b6def6fa528668aa0223fe109dd2edb3a</guid>
+      <pubDate>Wed, 31 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121017120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-15T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-17T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121017120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-17T12:00:00Z to 2012-11-15T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">bf63694dc90070e78430735262f3557fd9e3b0df</guid>
+      <pubDate>Wed, 14 Nov 2012 18:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120929120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-28T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-29T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120929120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-29T12:00:00Z to 2012-10-28T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">a80b12e4c7935ba49bedbbbb71222724124b1cf8</guid>
+      <pubDate>Sat, 27 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120925120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-24T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-25T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120925120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-25T12:00:00Z to 2012-10-24T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">e9ac50211c3e5dfdb2c6f4d5c5e71641d8941cfc</guid>
+      <pubDate>Tue, 23 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121009120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-07T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-09T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121009120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-09T12:00:00Z to 2012-11-07T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">0dc12db6bef16536a339500f5c29fe9e06435c4d</guid>
+      <pubDate>Tue, 06 Nov 2012 18:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120921120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120921120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120921120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-20T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-21T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120921120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-21T12:00:00Z to 2012-10-20T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">a1e3f332070e53595de2dc9df640bb9a9c8db195</guid>
+      <pubDate>Fri, 19 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20121006120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-11-04T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-10-06T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20121006120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-10-06T12:00:00Z to 2012-11-04T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">00c7e22f1656b36ce687c94c2622696804ba3879</guid>
+      <pubDate>Sat, 03 Nov 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes13-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES13%2BImager-MetopA%2BIASI_C_KNES_20120927120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -120.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -30.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes13-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-13 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-26T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-27T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES13+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc</datacasting:productName>
+      <description>GOES-13 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-27T12:00:00Z to 2012-10-26T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">8f54dda9b3bcae1cd1d08e6808fd782e82f6af90</guid>
+      <pubDate>Thu, 25 Oct 2012 17:15:31 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120924120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-23T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-24T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120924120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-24T12:00:00Z to 2012-10-23T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">5d247491edf2a8d66bdd1968123fa5e687733678</guid>
+      <pubDate>Mon, 22 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120922120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120922120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120922120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-21T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-22T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120922120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-22T12:00:00Z to 2012-10-21T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">d60dada9f66d5e81b16463ae5a08852fb6a166c0</guid>
+      <pubDate>Sat, 20 Oct 2012 17:15:32 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+    <item>
+      <title>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc</title>
+      <link>http://gsics.nesdis.noaa.gov:8080/thredds/catalog/nrtc-glr-goes15-imager-metopa-iasi-demo/catalog.xml?dataset=nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR%2CSATCAL%2BNRTC%2BGEOLEOIR%2CGOES15%2BImager-MetopA%2BIASI_C_KNES_20120927120000_demo_03.nc</link>
+      <georss:where>
+        <gml:Envelope>
+          <gml:lowerCorner>-60.000000 -180.000000</gml:lowerCorner>
+          <gml:upperCorner>60.000000 -90.000000</gml:upperCorner>
+        </gml:Envelope>
+      </georss:where>
+      <enclosure url="http://gsics.nesdis.noaa.gov:8080/thredds/fileServer/nrtc-glr-goes15-imager-metopa-iasi-demo/W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc" length="16380" type="application/x-netcdf"/>
+      <datacasting:customElement name="local_data_subcategory" value="1"/>
+      <datacasting:customElement name="mon_inst" value="GOES-15 Imager"/>
+      <datacasting:customElement name="ref_inst" value="Metop-A IASI"/>
+      <datacasting:customElement name="validity_end_time" value="2012-10-26T12:00:00Z"/>
+      <datacasting:customElement name="validity_start_time" value="2012-09-27T12:00:00Z"/>
+      <datacasting:customElement name="wmo_data_subcategory" value="4"/>
+      <datacasting:productName>W_US-NESDIS-STAR,SATCAL+NRTC+GEOLEOIR,GOES15+Imager-MetopA+IASI_C_KNES_20120927120000_demo_03.nc</datacasting:productName>
+      <description>GOES-15 Imager Infrared Near Real-Time Inter-Calibration Correction Coefficients using Metop-A IASI as Reference. Data validity period: from 2012-09-27T12:00:00Z to 2012-10-26T12:00:00Z.</description>
+      <author>nesdis.star.gprc@noaa.gov</author>
+      <guid isPermaLink="false">5bb184a2c00d7b4bdc559eea209a479b59238ae8</guid>
+      <pubDate>Thu, 25 Oct 2012 17:15:33 GMT</pubDate>
+      <source url="http://gsics.nesdis.noaa.gov/datacast/all.xml">NESDIS GSICS THREDDS Datacasting Feed</source>
+    </item>
+  </channel>
+</rss>

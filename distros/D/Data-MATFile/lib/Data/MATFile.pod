@@ -1,0 +1,218 @@
+
+=head1 NAME
+
+Data::MATFile - read MATLAB MAT-File data
+
+=head1 SYNOPSIS
+
+    use Data::MATFile qw/read_matfile/;
+    my $matfile = read_matfile ('some.mat');
+    # Get a matrix named "xyz":
+    my $matrix = $matfile->{data}->{xyz};
+    # Get values from it
+    my $value = $matrix->{array}->[0][1];
+
+=head1 VERSION
+
+This documents Data::MATFile version 0.04
+corresponding to git commit L<11e02bd58bd534675225c99b6ef15db86f03b846|https://github.com/benkasminbullock/Data-MATFile/commit/11e02bd58bd534675225c99b6ef15db86f03b846> released on Tue Feb 21 10:27:20 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module provides functions to access the MAT-File format used by
+MATLAB and Octave.
+
+=head1 FUNCTIONS
+
+=head2 read_matfile
+
+    my $matfile = read_matfile ('something.mat');
+
+This reads the entire file, converts it into Perl variables, and
+returns the result as a hash reference.
+
+=head3 Keys and values of returned hash
+
+This section lists the keys and the corresponding values of the
+returned hash.
+
+=over
+
+=item descriptive_text
+
+C<< $matfile->{descriptive_text} >> contains the "descriptive text" of
+the MAT-File. This is the information stored in the first 116 bytes of
+the file.
+
+=item subsys_data_offset
+
+C<< $matfile->{subsys_data_offset} >> contains the subsystem data
+offset of the file, if it exists. This data is completely ignored by
+this module.
+
+=item endian
+
+C<< $matfile->{endian} >> is set to 0 if the file has the same endian-ness
+as the local system, or 1 if the file has the opposite endian-ness.
+
+=item data
+
+C<< $matfile->{data} >> contains the data elements of the MAT-File. It
+is a hash reference keyed by the names of the data elements. The
+structure of each element is described in L</Structure of a data
+element> below.
+
+=back    
+
+=head3 Structure of a data element
+
+The hash reference which represents each data element of the MAT-File
+contains the following fields.
+
+=over
+
+=item name
+
+The name of the matrix. This may be undefined, for example for the
+elements of a structure.
+
+=item array
+
+The array data itself. For the case of numeric data, this is stored as
+a multidimensional matrix. For the case of structure data, this is
+stored as a hash reference, with the hash keys being the field names,
+and the corresponding hash values being the fields.
+
+The array is indexed Perl-style rather than MATLAB-style, so the
+indices run from I<0> to I<n - 1>, where I<n> is the dimension of the
+matrix.
+
+=item class
+
+The class of the array, as a number, which is equal to the MATLAB
+constant. This can be converted into a string using L</mx2word>.
+
+=item dimensions
+
+The dimensions of the array, as an array reference. This will always
+be of dimension at least two. For example, a two-dimensional matrix
+with a single cell will have dimensions
+
+    $item->{dimensions} = [1, 1]
+
+=back
+
+=head2 mx2word
+
+    my $class_name = mx2word ($class);
+
+Convert a numeric MATLAB class identifier C<$class> into its string
+equivalent. For example, "1" becomes "mxCELL_CLASS".
+
+=head2 mi2word
+
+    my $type_name = mi2word ($type);
+
+Convert a numeric MATLAB type identifier C<$type> into its string
+equivalent. For example, "1" becomes "miINT8".
+
+=head1 BUGS
+
+This section documents the known deficiencies of the module relative
+to a perfect MAT-File reader.
+
+=over
+
+=item No incremental parsing
+
+There is no incremental parsing of the MAT-File, all parsing is done
+in one shot.
+
+=item No subsystem data handling
+
+This module does not handle the subsystem data offset. The value is
+preserved as the field L</subsys_data_offset>, but not used in any
+way.
+
+=item No endian-ness reversing yet
+
+This module does not support reverse-endian file format.
+
+=item No writing
+
+This module does not support writing MAT-Files.
+
+=item Numeric only
+
+This module only supports numeric matrices.
+
+=item No complex
+
+This module does not support complex matrices.
+
+=item Version 5 only
+
+This module only supports the "version 5" MAT-File format described
+under L</REFERENCES>.
+
+=item Only matrices at top level
+
+This module only reads matrices at the top level. It's not clear from
+the reference whether things other than matrices can occur at the top
+level, but if one does occur, this module prints a warning message and
+discards the data.
+
+=back
+
+These problems partly exist because the creator of the module does not
+have examples of MAT-Files with these characteristics. Those wishing
+to see development of support for the above should contact the creator
+of the module and supply him with an example file demonstrating the
+correct binary format.
+
+=head1 SEE ALSO
+
+L<mat2json> - This script, provided with the distribution, converts a
+MAT-File into JSON format.
+
+L<PDL::IO::Matlab|https://github.com/jlapeyre/PDL-IO-Matlab> - This
+Perl module converts between the PDL (Perl Data Language) format and
+MATLAB files via the Matio C library (see below).
+
+L<http://matio.sourceforge.net/> - The MAT File I/O Library which is
+used by the above Perl module. This is a C library for reading and
+writing MAT-Files.
+
+=head1 REFERENCES
+
+The MATLAB MAT-File Format is described in
+L<http://www.mathworks.com/help/pdf_doc/matlab/matfile_format.pdf>.
+
+Octave is documented at
+L<http://www.gnu.org/software/octave/doc/interpreter/index.html>.
+
+=head1 ADOPTION
+
+Since I (Ben Bullock) don't use the MATFile format at the moment, this
+module is available for adoption. People who are interested in
+improving this module and taking over maintenance should email the
+current maintainer at the email address below.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+

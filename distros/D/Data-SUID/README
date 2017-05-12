@@ -1,0 +1,105 @@
+NAME
+    Data::SUID - Generates sequential unique ids
+
+VERSION
+    version 2.0.3
+
+SYNOPSIS
+        use Data::SUID 'suid';              # Or use ':all' tag
+        use Data::Dumper;
+
+        $Data::Dumper::Indent = 0;
+        $Data::Dumper::Terse  = 1;
+
+        my $suid = suid();                  # Old school, or ...
+        my $suid = Data::SUID->new();       # Do it OOP style
+
+        print $suid->dec                    # 26574773684474770905501261996
+        print $suid->hex                    # 55de233819d51b1a8a67e0ac
+        print $suid->uuencode               # ,5=XC.!G5&QJ*9^"L
+        print $suid->base64                 # Vyyx3wAAAAElgAAB
+        print $suid->binary                 # 12 bytes of unreadable gibberish
+        print $suid                         # 55de233819d51b1a8a67e0ac
+
+        # Use the hex, dec, uuencode and binary methods as fire-and-forget
+        # constructors, if you prefer:
+
+        my $suid_hex = suid->hex;           # If you just want the goodies
+
+DESCRIPTION
+    Use this package to generate 12-byte sequential unique ids modeled upon
+    Mongo's BSON ObjectId. Unlike traditional GUIDs, these are somewhat more
+    index-friendly and reasonably suited for use as primary keys within
+    database tables. They are guaranteed to have a high level of uniqueness,
+    given that they contain a timestamp, a host identifier and an
+    incremented sequence number.
+
+METHODS
+  new
+        $suid = Data::SUID->new();
+
+    Generates a new SUID object.
+
+  hex
+        $string = $suid->hex();
+        $string = Data::SUID->hex();
+        $string = suid->hex();
+
+    Returns the SUID value as a 24-character hexadecimal string.
+
+        $string = "$suid";
+
+    The SUID object's stringification operation has been overloaded to give
+    this value, too.
+
+  dec
+        $string = $suid->dec();
+        $string = Data::SUID->dec();
+        $string = suid->dec();
+
+    Returns the SUID value as a big integer.
+
+  uuencode
+        $string = $suid->uuencode();
+        $string = Data::SUID->uuencode();
+        $string = suid->uuencode();
+
+    Returns the SUID value as a UUENCODED string.
+
+  binary
+        $binstr = $suid->binary();
+        $binstr = Data::SUID->binary();
+        $binstr = suid->binary();
+
+    Returns the SUID value as 12 bytes of binary data.
+
+  base64
+        $base64 = $suid->base64();
+        $base64 = Data::SUID->base64();
+        $base64 = suid->base64();
+
+    Returns the SUID value as a 16-byte Base64 encoded string.
+
+EXPORTED FUNCTIONS
+  suid
+        my $suid = suid();
+
+    Generates a new SUID object.
+
+REPOSITORY
+    * <https://github.com/cpanic/Data-SUID>
+
+    * <http://search.cpan.org/dist/Data-SUID/lib/Data/SUID.pm>
+
+BUG REPORTS
+    Please report any bugs to <http://rt.cpan.org/>
+
+AUTHOR
+    Iain Campbell <cpanic@cpan.org>
+
+COPYRIGHT AND LICENCE
+    Copyright (C) 2014-2016 by Iain Campbell
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

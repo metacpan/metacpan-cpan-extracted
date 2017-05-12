@@ -1,0 +1,56 @@
+NAME
+    Dist::Zilla::Plugin::OSPrereqs::POSIX - List prereqs for POSIX-compliant
+    OSes
+
+VERSION
+    This document describes version 0.01 of
+    Dist::Zilla::Plugin::OSPrereqs::POSIX (from Perl distribution
+    Dist-Zilla-Plugin-OSPrereqs-POSIX), released on 2014-12-18.
+
+SYNOPSIS
+    In dist.ini:
+
+     [OSPrereqs::POSIX]
+     Some::Module::That::Runs::On::POSIX=0
+     Another::Module=1.23
+
+DESCRIPTION
+    This module is a subclass of Dist::Zilla::Plugin::OSPrereqs. It is a
+    shortcut for doing:
+
+     [OSPrereqs / ~^(linux|freebsd|darwin|...)$]
+     ...
+
+    The list of POSIX-compliant operating systems is retrieved from
+    Perl::osnames.
+
+SEE ALSO
+    Dist::Zilla::Plugin::OSPrereqs
+
+    Perl::osnames
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-OSPrereqs-POSIX>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-OSPrereqs-POSIX>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-OSP
+    rereqs-POSIX>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

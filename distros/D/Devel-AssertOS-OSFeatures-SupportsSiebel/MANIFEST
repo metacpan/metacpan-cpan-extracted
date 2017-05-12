@@ -1,0 +1,10 @@
+Changes
+gpl-3.0.txt
+lib/Devel/AssertOS/OSFeatures/SupportsSiebel.pm
+Makefile.PL
+MANIFEST
+README
+t/Devel-AssertOS-OSFeatures-SupportsSiebel.t
+t/POD.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

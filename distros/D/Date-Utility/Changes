@@ -1,0 +1,22 @@
+Revision history for Date-Utility
+
+1.07      2017-03-16 09:41:36+00:00 UTC
+
+1.06    13/12/2016
+        Fix version to be in sync with pause
+
+1.05    08/12/2015
+        Change quarter to quarter_of_year
+
+1.04    01/12/2015
+        include quarter sub
+
+1.03    25/10/2015
+        Added move_to_nth_dow method
+
+1.02	22/10/2015
+	Corrected a number of cases where tests failed
+	Bumping min perl version up to 5.10
+
+1.00    09/04/2015
+        First version, released on an unsuspecting world.

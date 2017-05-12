@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                DBIx-QueryByName
+version:             0.18
+abstract:            Execute SQL queries by name
+license:             ~
+author:              
+    - Joel Jacobson <joel@gluefinance.com, Erwan Lemonnier <erwan@gluefinance.com>, Claes Jakobsson <claes@gluefinance.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    accessors::chained:            1.01
+    XML::Parser:                   2.34
+    XML::SimpleObject:             0.53
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

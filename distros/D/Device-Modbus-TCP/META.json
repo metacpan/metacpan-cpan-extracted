@@ -1,0 +1,50 @@
+{
+   "abstract" : "Distribution for Modbus TCP communications",
+   "author" : [
+      "Julio Fraire <julio.fraire@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Modbus-TCP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Modbus" : "0.021",
+            "Net::Server" : "2.008",
+            "Role::Tiny" : "2",
+            "Try::Tiny" : "0.22"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jfraire/Device-Modbus-TCP.git",
+         "web" : "https://github.com/jfraire/Device-Modbus-TCP"
+      }
+   },
+   "version" : "0.024",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

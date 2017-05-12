@@ -1,0 +1,13 @@
+Changes
+INSTALL
+lib/Devel/Profiler/Plugins/Template.pm
+lib/Devel/Profiler/Plugins/Template/Context.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01template/01compile.t
+t/02context/01compile.t
+t/02context/10process.t
+t/02context/11include.t
+t/02context/13mixed.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'autogenerate inherited POD sections for Dist::Zilla distributions'
+author:
+  - 'Tom Molesworth <cpan@entitymodel.com>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.98
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-PodInherit
+requires:
+  Dist::Zilla: 4.200010
+  Pod::Inherit: 0.90
+  Pod::POM: 0.28
+  parent: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PodInherit
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-PodInherit/
+version: 0.007

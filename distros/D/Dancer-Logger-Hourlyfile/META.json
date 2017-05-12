@@ -1,0 +1,52 @@
+{
+   "abstract" : "Rotate writing to log files on an hourly basis",
+   "author" : [
+      "Hagop \"Jack\" Bilemjian <jck000@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Logger-Hourlyfile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3099",
+            "File::Temp" : "0.22",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jck000/Dancer-Logger-Hourlyfile/issues"
+      },
+      "homepage" : "https://github.com/jck000/Dancer-Logger-Hourlyfile/",
+      "repository" : {
+         "url" : "https://github.com/jck000/Dancer-Logger-Hourlyfile"
+      }
+   },
+   "version" : "0.07"
+}

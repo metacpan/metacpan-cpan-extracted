@@ -1,0 +1,38 @@
+=head1 Glossary
+
+=head2 skill scroll
+
+A B<skill scroll> L<$ARCH/scrollr.x11> is a special
+scroll that, when successfully read, teaches you the basics of a given
+L<Skill|pod/skill_help>. Wether you successfully read and learn the skill
+depends on your L<intelligence|stat_Int>.
+
+=head2 range slot
+
+Your character has different "weapon/item" slots, one of which is the
+ranged slot. It can contain a spell, a L<skill|pod/skill_help> or a
+ranged weapon. It will be used whenever you invoke your ranged attack
+(usually B<Shift+direction>).
+
+=head2 primary statistics
+
+These are the 7 main stats: L<Strength|stat_Str>, L<Dexterity|stat_Dex>,
+L<Constitution|stat_Con>, L<Intelligence|stat_Int>, L<Wisdom|stat_Wis>,
+L<Charisma|stat_Cha>.
+
+=head2 secondary statistics
+
+There are 6 secondary statistics:
+L<Weapon Class|stat_Wc> (Wc),
+L<Armor Class|stat_Ac> (Ac),
+L<Damage|stat_Dam> (Dam),
+L<Armor|stat_Arm> (Arm),
+L<Speed|stat_Spd> (Spd),
+and
+L<Weapon Speed|stat_WSp> (WSp).
+
+=head2 space
+
+A B<mapspace> is a square part of the world, that is just large enough to
+hold your character or a small monster.
+

@@ -1,0 +1,25 @@
+                     =====================================
+                       Package "Date::Pcalc" Version 6.1
+                     =====================================
+
+
+                  Copyright (c) 1995 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Credits:
+--------
+
+Many very special thanks for his tremendous work to J. David Eisenberg
+<david@catcode.com> for writing a plain Perl version of Date::Calc 4.3,
+available from his home page at http://catcode.com/date/pcalc.html!
+
+Many thanks to Marek Snowarski <Marek.Snowarski@grzyby.pl> for
+raising my attention to the fact that the Polish names for the
+months and days of week were written wrongly.
+
+Many thanks to Piotr Wierzejewski <nlexposure@gmail.com> for
+providing me with the correct spelling of the Polish names
+for the months and days of week in Unicode.
+
+

@@ -1,0 +1,41 @@
+Directory-Queue
+
+The goal of this module is to offer a queue system using the underlying
+filesystem for storage, security and to prevent race conditions via atomic
+operations. It focuses on simplicity, robustness and scalability.
+
+This module allows multiple concurrent readers and writers to interact with
+the same queue. A Python implementation of the same algorithm is available
+at https://github.com/cern-mig/python-dirq and a Java implementation at
+https://github.com/cern-mig/java-dirq so readers and writers can be
+written in different programming languages.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Directory::Queue
+    perldoc Directory::Queue::Normal
+    perldoc Directory::Queue::Simple
+    perldoc Directory::Queue::Null
+    perldoc Directory::Queue::Set
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) CERN 2010-2015
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,9 @@
+^\..*
+^blib/
+^pm_to_blib
+^t/(?:boilerplate|dependencies|pod(?:-coverage)?)\.t
+^t/perlcritic(?:rc|\.t)
+^Makefile$
+\.(?:old|bak|sw[a-z]|tmp|html)$
+\.(?:svn|git)
+

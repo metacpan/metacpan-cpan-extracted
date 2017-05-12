@@ -1,0 +1,52 @@
+{
+   "abstract" : "Tenjin wrapper for Dancer",
+   "author" : [
+      "Ido Perlmuter <ido@ido50.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-Tenjin",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Dancer::Config" : 0,
+            "Dancer::Template::Abstract" : 0,
+            "File::Basename" : 0,
+            "Tenjin" : "0.070001",
+            "Try::Tiny" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::FileUtils" : 0,
+            "Test::More" : 0,
+            "utf8" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/ido50/Dancer-Template-Tenjin/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ido50/Dancer-Template-Tenjin.git",
+         "web" : "http://github.com/ido50/Dancer-Template-Tenjin/tree"
+      }
+   },
+   "version" : "0.5"
+}
+

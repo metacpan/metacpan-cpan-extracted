@@ -1,0 +1,23 @@
+Revision history for Dist-Zilla-Plugin-TrialVersionComment
+
+0.007     2016-05-30 03:12:08Z
+          - actually fix tests for earlier [BumpVersionAfterRelease]
+
+0.006     2016-05-29 04:26:06Z
+          - fix tests for earlier [BumpVersionAfterRelease]
+
+0.005     2016-03-06 04:21:16Z
+          - fix tests for changes in [BumpVersionAfterRelease] 0.014
+
+0.004     2015-03-31 03:03:02Z
+          - fix tests to avoid setting a newly-immutable config variable
+            directly (David Golden, PR#1)
+
+0.003     2014-12-03 03:06:24Z
+          - make allowances in code for older Dist::Zilla
+
+0.002     2014-11-26 04:15:36Z
+          - clarify in docs when this plugin is useful
+
+0.001     2014-11-25 07:27:58Z
+          - Initial release.

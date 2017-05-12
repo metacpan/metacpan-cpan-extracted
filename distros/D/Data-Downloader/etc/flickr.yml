@@ -1,0 +1,34 @@
+#
+# download files from flickr
+#
+---
+name             : flickr
+storage_root     : /tmp/flickr_store
+disks            : [  root: disk1/, root: disk2/, root: disk3/ ]
+file_url_template: 'http://farm4.static.flickr.com/<url1>/<url2>_<size>.<format>'
+cache_strategy   : Keep
+feeds:
+  name           : flickr
+  feed_template  : 'http://api.flickr.com/services/feeds/photos_public.gne?tags=<tags>&lang=en-us&format=rss_200'
+  file_source:
+       filename_xpath : 'media:content/@url'
+       filename_regex : '/([^/]*)$'
+       url_xpath      : 'media:content/@url'
+  metadata_sources:
+      - name  : date_taken
+        xpath : 'dc:date.Taken'
+      - name  : 'tags'
+        xpath : 'media:category'
+metadata_transformations:
+    - input: tags
+      output: tag
+      function_name: split
+      order_key: 10
+linktrees: 
+  - root          : /tmp/flickr_by_date
+    condition     : ~
+    path_template : "<date_taken:%Y/%m/%d>"
+  - root          : /tmp/flickr_by_year_tag
+    condition     : ~
+    path_template : "<date_taken:%Y>/<tag>"
+

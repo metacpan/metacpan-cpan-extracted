@@ -1,0 +1,19 @@
+abstract: Female ovulation prediction based on basal body temperature values
+author: Tobias Kremer, C<< <cpan at funkreich dot de> >>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Data-Ovulation
+no_index: 
+  directory: 
+    - examples
+    - inc
+    - t
+requires: 
+  Carp: 1.00
+  Class::Accessor: 0.30
+  Exporter: 5.00
+  perl: 5.8.0
+version: 0.01

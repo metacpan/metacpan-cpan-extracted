@@ -1,0 +1,713 @@
+=head1 NAME
+
+DBIx::Struct - convenience SQL functions with Class::Struct-like row objects
+
+=head1 SYNOPSIS
+
+    use DBIx::Struct;
+
+    DBIx::Struct::connect($data_source, $username, $auth);
+
+    my $row = one_row("table", $idField);
+
+    print $row->field;
+
+    $row->field('new data');
+
+    $row->update;
+
+    my $rows = all_rows("table", {field => "some data"});
+
+    print $rows->[0]->field;
+
+=head1 DESCRIPTION
+
+Makes SQL queries from Perl data structures. It uses L<SQL::Abstract> module to 
+parse "where" and "order by" structures. It also supports "group by", "having", 
+"limit", "offset" and mapping function. To make actual queries subclass of 
+L<DBIx::Connector> is used. The main purpose of this module is to provide a very 
+easy, simple and efficient interface to database. Internally every row is just 
+an array of values and every accessor knows its offset in that array. This is 
+much more efficient as storing row in hash.
+
+=head2 IMPORT
+
+This module can be integrated into some framework that already uses
+L<DBIx::Connector>. Integration parameters should be passed on first use.
+These parameters are used for integration:
+
+=over
+
+=item connector_module
+
+ Connector's module name. By default used its own connector.
+
+=item connector_constructor
+
+ Connector's constructor function name. By default is 'new'.
+
+=item connector_args
+
+ Connector's arguments: ($dsn, $user, $password, $connect_attrs)
+
+=item connector_object
+
+ Connector's singleton object. By defaut its own object is used.
+
+=item connector_pool
+
+ Connector's pool object.
+
+=item connector_pool_method
+
+ Connector's pool object's method to retrieve a connector.
+
+=item table_classes_namespace
+
+ Namespace for table classes. By default is 'DBC'.
+
+=item query_classes_namespace
+
+ Namespace for query classes. By default is 'DBQ'.
+
+=item connect_timeout
+
+ Timeout to connect or reconnect to DB for default connector.
+
+=item error_class
+
+ Errors can be reported as strings or as hashes. By default errors 
+ reported as strings. To report error as string 'DBIx::Struct::Error::String'
+ is used. There's 'DBIx::Struct::Error::Hash' to receive a structured hash containg
+ keys:
+   result  => 'SQLERR',
+   message => $message
+ and probably some others.
+
+=back
+
+This module always exports three functions: C<one_row()>, C<all_rows()> and C<new_row()>.
+Optionally it can export C<connector()> - connector's singleton object and 
+C<hash_ref_slice()> function.
+
+Possible usage:
+
+ use DBIx::Struct (
+	connector_module => 'PEF::Front::Connector',
+	error_class      => 'DBIx::Struct::Error::Hash'
+ );
+ 
+ use DBIx::Struct qw(connector hash_ref_slice);
+ 
+ use DBIx::Struct;
+
+=head2 METHODS
+
+=head3 C<hash_ref_slice($hashref, @keys)>
+
+Simple hash slice function before perl-5.20 is widely distributred. It accepts
+hash reference and array of keys. Exportable. Returns array of key-value pairs. 
+
+ DBC::Article->delete({hash_ref_slice $req, 'id_article'});
+
+is the same as
+
+ DBC::Article->delete({id_article => $req->{id_article}});
+
+And
+
+ new_row(
+    article => hash_ref_slice $req,
+    qw(title content id_author)
+ );
+
+is the same as 
+
+  new_row('article', 
+     title     => $req->{title},
+     content   => $req->{content},
+     id_author => $req->{id_author}
+  );
+
+=head3 C<connect($data_source, $username, $auth)>
+
+This method connects to database or returns already connected connector object.
+For every table in database there's one corresponding class in DBC:: namespace 
+in CamelCase style after successful connect created. E.g. DBC::ClientData is 
+created for table "client_data". This namespace is configurable.
+
+=head3 C<one_row($table, $abstract_where, $order_by, $limit, $offset)>
+
+Selects one row from given table and returns its object. 
+
+C<$table> can be a simple table name, SQL query beginning with "select" and 
+ending with SQL-from clause or array reference to generate SQL from Perl data
+structures.
+
+For array reference following arguments can be specified:
+
+ $table_name
+ 
+Any scalar without leading '-' means table name
+
+ -columns => \@columns
+
+or
+
+ -columns => $columns_list
+
+\@columns is a reference to an array of SQL column specifications (i.e. column 
+names, * or table.*, functions, etc.). '*' is by default. 
+If column specification is a scalar reference it will be dereferenced and 
+quoted as a column identifier.
+ 
+ -column => $column
+
+ my $chat_name = one_row([chat => -column => "name"]);
+ my $ids_array_ref = all_rows([chat => -column => "id"]);
+
+This singular column specification means "direct value": 
+single scalar value for C<one_row> and array reference of 
+column values for <all_rows>. Example:
+
+count => optional column name or expression
+
+  my $chat_count = one_row([chat => "-count"]);
+  my $chat_count = one_row([chat => -count => "-distinct"]);
+  my $chat_count = one_row([chat => -count => "-all"]);
+  my $chat_count = one_row([chat => -count => "title"]);
+
+This counts rows. Can be used togeter with C<-distinct> or C<-all>. 
+It implicit assumes singular returned column.
+
+distinct => optional column list as for B<-columns>.
+
+ my $row_objects = one_row([chat => -distinct => "name,id"]);
+
+Without C<-count> selects only unique rows. 
+With C<-count> counts only unique rows.
+ 
+ -left => $table
+
+left [OUTER] join
+
+ -right => $table
+
+right [OUTER] join
+ 
+ -join => $table
+
+[INNER] join
+ 
+ -on => $join_condition_string or L<SQL::Abstract>-where search conditions
+
+on($join_condition_string)
+
+ -using => $join_condition_string or L<SQL::Abstract>-where search conditions
+
+using($join_field_string)
+ 
+ my $count = one_row([table => "-count"], 
+                      { date => {'>=', \"now() - interval '1 hour'"});
+
+This module is smart enough to determine automatically table connections.
+
+ my $name = one_row([client => session => -column => "name"],
+                      { session_key => $input->{session}});
+
+There are some named paramters can be used together with positional paramaters:
+
+=over
+
+=item -distinct
+
+Selects only unique rows. This is different from 
+"array reference table description": it takes no C<column> expression argument; 
+it can't be "off"; it is possible to return normal row object from table.
+
+ my $people = all_rows(people => "-distinct");
+
+This statement generates C<select distinct * from people>.
+
+=item -group_by
+
+Generates "GROUP BY" SQL-clause
+
+ my $row1 = one_row("table", -group_by => "field");
+
+Generates and executes "select * from table group by field" SQL-statement. 
+ 
+ my $row2 = one_row("table", -group_by => [qw|field field2|]);
+ 
+Generates and executes "select * from table group by field, field2" SQL-statement.
+Returns one row object.
+
+=item -having
+
+Adds "HAVING" conditions to "GROUP BY"
+ 
+ my $row1 = one_row("table", 
+                    -group_by => "field", 
+                    -having => {"length(field)" => {">", 5} }
+            );
+
+=item -order_by
+
+Generates "ORDER BY" SQL-clause as in L<SQL::Abstract>.
+
+=item -where
+
+Generates "WHERE" SQL-clause as in L<SQL::Abstract>. If $abstract_where is just a scalar
+then it is supposed to be a primary key value.
+
+=item -limit
+
+=item -offset
+
+Generates "LIMIT $X OFFSET $Y" SQL-clause.
+
+=item -sql
+
+Returns generated SQL statement. If value is code reference then it is called
+with two arguments: $sub->($statement, \@bind_variables); if value is scalar
+reference then $statement is assigned to referenced value.
+
+=item -dry_run
+
+Means don't fetch actual data. Useful with -sql when you only need to get 
+generated statement.  
+
+=back
+
+=head3 C<all_rows($table, $abstract_where, $order_by, $limit, $offset)>
+
+This is just like previous C<one_row> but returns array of row objects. 
+It has one more "floating" parameter: you can specify CODE reference in any 
+place and it will be used as "mapping function".
+
+    my $rows =  all_rows("table", 
+                     { date => {'>=', \"now() - interval '1 hour'"}, 
+                     sub {$_->filter_timestamp; $_->data});
+
+This anonymous function is called for every row clearing timestamps from microseconds part 
+and converting every row object into anonymous hash.
+
+It's possible to use C<all_rows()> and C<one_row()> not only for simple table 
+select but for queries also. 
+
+  my $count = one_row("select count(*) from table", 
+                      { date => {'>=', \"now() - interval '1 hour'"})
+                      ->count;
+
+  my $name = one_row("select name from client"
+                    ."  join session on (id = id_client)", 
+                      { session_key => $input->{session}})
+                      ->name;
+
+=head3 C<< new_row("table", column => $value, column2 => $value2, ...) >>
+
+Inserts new row into table. Returns row object with set primary columns and passed in 
+C<new_row> subroutine. If you need to set all columns from table then:
+
+    my $row = new_row("table", column => $value);
+    $row->fetch;
+
+=head2 Row object methods
+
+=head3 C<new>
+
+Creates new row in the table. This is the same as C<new_row()> except table name is already 
+known from class name. 
+
+    my $row = DBC::Table->new(email => 'a@bb.com', password => '12345');
+
+=head3 C<set>
+
+Sets values of table columns. Returns object's $self value. Has three forms:
+
+=over
+
+=item C<set([...])>
+
+ Sets internal row data.
+ 
+=item C<< set({column => $value, ... }) >>
+
+ Sets column(s) value(s)
+ 
+=item C<< set(column => $value, ... ) >>
+
+ Same as above but without anonymous hash.
+ 
+=back
+
+This method is useful when you can't use accessors. For example, when you 
+have column name 'new' in your table. Full list of reserved keywords:
+
+=over
+
+=item new
+
+=item set
+
+=item data
+
+=item delete
+
+=item fetch
+
+=item update
+
+=item markUpdated
+
+=item filter_timestamp
+
+=back
+
+=head3 C<data>
+
+Returns values of the row. Has four forms:
+
+=over
+
+=item C<data()>
+
+ No parameters means to return all columns in anonymous hash {column => "value", ... }.
+
+=item C<data([])>
+
+ Empty array reference means internal row data.
+ 
+=item C<data([qw|column column2|])>
+
+ Non-empty array means array of values for corresponding columns.
+ 
+=item C<< data({column => undef, columnt2 => undef}) >>
+
+ Returns given columns set in anonymous hash {column => "value", ... }.
+
+=back
+
+=head3 C<update>
+
+Updates its row or table
+
+=over
+
+=item C<update()>
+
+Updates changed (if any) columns of the row. Returns object's $self value.
+
+=item C<< update({column => "value"}, $where) >>
+
+Updates table. For example:
+
+ DBC::List->update({ref => 33}, {id => 1});
+ 
+Means 
+ 
+ update list ref = ?  WHERE ( id = ? )
+
+with bind values 33, 1
+
+=back
+
+=head3 markUpdated($column)
+
+Sets "updated" attribute for column. You don't need to use it usually.
+But sometimes you have to help Perl to understand that deeply located
+element of JSON hash or array was actually updated.
+
+=head3 C<delete>
+
+Deletes the row or rows from the table.
+
+=over
+
+=item C<delete()>
+
+Deletes the row if the row has primary key.
+
+=item C<delete($where)>
+
+deletes row(s) from table. For example:
+
+ DBC::List->delete({id => 1});
+ 
+Means 
+ 
+ delete from list WHERE ( id = ? )
+
+with bind value 1
+
+=back
+
+=head3 C<filter_timestamp>
+
+Removes microseconds from timestamp columns. Returns object's $self value.
+ 
+ 2010-05-19 23:30:01.737126 -> 2010-05-19 23:30:01
+
+=head3 C<fetch>
+
+Fetches the whole row data from table. Useful when primary key is known after
+insert but other columns are set by database. Returns object's $self value.
+
+=head3 B<Accessors>
+
+All column names from table except special keywords are accessible via accessors:
+
+ my $prim = one_row("prim", 1);
+ print "payload: " .  $prim->payload . "\n";
+ # new data
+ $prim->payload("pay never");
+ $prim->update;
+ 
+Here $prim->payload("pay never") sets new column value. To store it explicitly 
+call $prim->update. By default update is called on row object destruction. 
+To include a random snippet of SQL verbatim, you specify it as a scalar reference.
+
+ $client->bonus(\"bonus + 10");
+ 
+Or with parameters:
+
+ $client->bonus([\"bonus + ?", 10]);
+ 
+This literal SQL expressions can be used for insert values also.
+
+=head4 B<JSON> support
+
+Fields with datatype 'json' or 'jsonb' can be transparently used as perl-structures.
+
+ my $row = one_row(table => $id);
+ # table is like
+ #   id       | integer | not null default nextval('table_id_seq'::regclass)
+ #   settings | jsonb   | 
+ 
+ # row is like 
+ #   id |                            settings                             
+ #  ----+-----------------------------------------------------------------
+ #    1 | {"limits": {"low": 15, "max": 100}}
+ 
+ $row->settings->{current}{runner} = 100;
+ 
+ # now row is like this
+ #   id |                            settings                             
+ #  ----+-----------------------------------------------------------------
+ #    1 | {"limits": {"low": 15, "max": 100}, "current": {"runner": 100}}
+ 
+
+=head2 Syntax sugar
+
+=head3 find...By...
+
+This is inspired by Spring-Data for Java. This automatically generated function
+compiled on first call and selects row(s) or column value(s). 
+It should be called on table class:
+
+ my $authors_name = DBC::Article->findOneFirstNameById($id);
+ my $authors_names_array_ref = DBC::Article->findFirst10FirstNameByOrderByLastNameAsc;
+
+Format of this find-family is following:
+
+ find-func = find<what>By<search>
+ what = <plural><column><distinct>
+ plural = All|One|First[$limit] | ''
+ * One or First or First1 - selects only one row
+ column = one column name | ''
+ * returns direct value(s)
+ distinct = Distinct | ''
+ * select only distinct values
+ search = <where><order>
+ order = OrderBy<column-to-order-by>(Asc|Desc) | ''
+ where = <column>|<column>And<column>|<column>Or<column>
+ column = column name | column(LessThanEqual|LessThan|GreaterThanEqual|
+                        GreaterThan|IsNull|IsNotNull|IsNot|NotNull|
+                        NotEquals|NotIn|NotLike|IsEqualTo|IsTrue|
+                        IsFalse|Equals|True|False|Like|Is|Not|In)
+
+Column names are converted from CamelCase to underscore lowercase style: 
+FirstName -> first_name. More examples:
+
+ DBC::User->findAll;
+ DBC::User->findFirst10ByOrderByLastName;
+ DBC::User->findByAddressZipCode($zip);
+ DBC::User->findByLoginDateGreaterThan($date);
+ DBC::User->findByLoginDateGreaterThanAndReferralIsNull($date);
+
+=head3 Referenced tables
+
+Suppose you have two tables employer and employee:
+
+ employer:
+    id_employer,
+    name
+  
+ employee:
+    id_employee,
+    id_employer references employer (id_employer),
+    id_employee_invited_by
+    name
+
+ alter table employee add constraint fk_employee_employee 
+     foreign key (id_employee_invited_by) references employee (id_employee);
+
+ my $employee = one_row("employee", {name => 'John'});
+ my $employer = $employee->Employer;
+ 
+Actually, C<< $employee->Employer >> is just the same as 
+C<< one_row("employer", $employee->id_employer) >>.
+
+=head3 Referenced by table
+
+Now you want to find all people invited by one employee:
+
+ my $referenced_by = $employee->refEmployeeInvitedBys;
+ 
+Or only those with name 'Robert':
+
+ my $robert_associates = $employee->Employer->refEmployees(name => 'Robert');
+
+These names "refEmployees", "refEmployee" and alike are made up from:
+
+ "ref" . $TableName . $suffix . $plural
+ 
+C<$plural> is "s" for plural (C<all_rows>) and empty for singular (C<one_row>).
+C<$suffix> is used when foreign key column name contains something more then 
+just referenced table name and "_id" or "id_". 
+
+C<id_employer> of C<employee> makes methods C<refEmployee> and C<refEmployees> 
+in class C<DBC::Employer>. And C<id_employee_invited_by> makes methods
+C<refEmployeeInvitedBy> and C<refEmployeeInvitedBys>.
+
+=head2 Real-world usage scenarios 
+
+  sub get_articles {
+    my $req = $_[0];
+    my $articles = all_rows(
+      [  # tables are automatically joined by FK->PK
+         "article a" => -join => "author w",
+        -columns => ['a.*', 'w.name author']
+      ],
+      -order_by => {-desc => 'id_article'},
+      -limit    => $req->{limit},
+      -offset   => $req->{offset},
+      # strip miliseconds from timestamps and return anonymous hash for every row
+      sub { $_->filter_timestamp->data }
+    );
+    for my $article (@$articles) {
+      $article->{comment_count} =
+      # second unnamed argument is "where"
+        one_row([comment => -columns => 'count(*)'], {id_article => $article->{id_article}})->count;
+    }
+    return {
+      result   => "OK",
+      articles => $articles,
+      count    => one_row([article => -columns => 'count(*)'])->count
+    };
+  }
+
+  sub get_article_with_comments {
+    my $req = $_[0];
+    # second unnamed argument is "where" and plain scalar means it is primary key value
+    my $article = one_row(article => $req->{id_article});
+    return {
+      result => "NO_ARTICLE",
+      answer => "No such article"
+    } unless $article;
+    # transform object into hash
+    my $article_hash = $article->filter_timestamp->data;
+    # get author's name by executing one_row("author", { id_author => $article->id_author })->name
+    $article_hash->{author} = $article->Author->name;
+    return {
+      result   => "OK",
+      article  => $article_hash,
+      # execute complex recursive query
+      comments => connector->run(
+        sub {
+          $_->selectall_arrayref(
+            q{
+              with recursive article_comments(depth, path) as (
+                select 1 depth, array[id_comment] path, id_comment, 
+                  id_comment_parent, comment, author,
+                  date_trunc('seconds', pub_date) pub_date
+                from comment
+                where id_article = ? and id_comment_parent is null
+                union all
+                select depth + 1, path || array[c.id_comment] path, c.id_comment, 
+                  c.id_comment_parent, c.comment, c.author,
+                  date_trunc('seconds', c.pub_date) pub_date
+                from comment c, article_comments cs
+                where c.id_comment_parent = cs.id_comment
+              ) select * from article_comments order by path, id_comment
+            },
+            {Slice => {}},
+            $req->{id_article}
+          );
+        }
+      )
+    };
+  }
+
+=head1 Known issues
+
+This module is tested only with PostgreSQL database. If you need other database 
+support be prepared to help me to test and debug it.
+
+=head1 See also
+
+=over
+
+=item * L<DBIx::Connector>
+
+=item * L<SQL::Abstract>
+
+=back
+
+=head1 Authors
+
+This module was written and is maintained by:
+
+=over
+
+=item * Anton Petrusevich
+
+=back
+
+=head1 LICENSE
+ 
+This program  is  free software; you can redistribute it and / or modify it under
+the  terms  of the the Artistic License (2.0). You may obtain a  copy of the full
+license at:
+ 
+L<http://www.perlfoundation.org/artistic_license_2_0>
+ 
+Any  use,  modification, and distribution of the Standard or Modified Versions is
+governed by this Artistic License.By using, modifying or distributing the Package,
+you accept this license. Do not use, modify, or distribute the Package, if you do
+not accept this license.
+ 
+If your Modified Version has been derived from a Modified Version made by someone
+other than you,you are nevertheless required to ensure that your Modified Version
+ complies with the requirements of this license.
+ 
+This  license  does  not grant you the right to use any trademark,  service mark,
+tradename, or logo of the Copyright Holder.
+ 
+This license includes the non-exclusive, worldwide, free-of-charge patent license
+to make,  have made, use,  offer to sell, sell, import and otherwise transfer the
+Package with respect to any patent claims licensable by the Copyright Holder that
+are  necessarily  infringed  by  the  Package. If you institute patent litigation
+(including  a  cross-claim  or  counterclaim) against any party alleging that the
+Package constitutes direct or contributory patent infringement,then this Artistic
+License to you shall terminate on the date that such litigation is filed.
+ 
+Disclaimer  of  Warranty:  THE  PACKAGE  IS  PROVIDED BY THE COPYRIGHT HOLDER AND
+CONTRIBUTORS  "AS IS'  AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES. THE IMPLIED
+WARRANTIES    OF   MERCHANTABILITY,   FITNESS   FOR   A   PARTICULAR  PURPOSE, OR
+NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY YOUR LOCAL LAW. UNLESS
+REQUIRED BY LAW, NO COPYRIGHT HOLDER OR CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT,
+INDIRECT, INCIDENTAL,  OR CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE
+OF THE PACKAGE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+=cut

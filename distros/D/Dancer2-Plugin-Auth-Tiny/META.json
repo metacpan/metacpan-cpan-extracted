@@ -1,0 +1,114 @@
+{
+   "abstract" : "Require logged-in user for specified routes",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Sawyer X <xsawyerx@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Auth-Tiny",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.055",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2" : "0.154000",
+            "Dancer2::Plugin" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0.154000",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.19",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Request" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::Auth::Tiny" : {
+         "file" : "lib/Dancer2/Plugin/Auth/Tiny.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny.git",
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny"
+      }
+   },
+   "version" : "0.008",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Jason A. Crome <jason@crome-plated.com>",
+      "Jim Davis <revhippie@gmail.com>",
+      "Pedro Melo <melo@simplicidade.org>",
+      "Peter Mottram <peter@sysnix.com>"
+   ]
+}
+

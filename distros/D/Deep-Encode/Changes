@@ -1,0 +1,73 @@
+Revision history for Perl extension Deep::Encode.
+
+0.01  Thu Sep  2 16:17:05 2010
+	- original version; created by h2xs 1.23 with options
+		-AfO -n Deep::Encode
+0.02  Thu Sep  3 10:17:15 2010
+	- Added subs:
+	deep_utf8_decode
+	deep_utf8_encode
+	and
+	deep_str_process (experimental)
+
+
+0.03  Thu Sep  8 18:15 2010
+	- Added subs:
+	deep_fromto
+	deep_encode
+	deep_decode
+	- Apply some optimizations and lot of profiling
+
+0.04  Mon Sep 20 13:00:13 MSK 2010
+    - Added fastcall for deep_* so all functions performs faster
+    - Added some tests
+    - Added documentation for deep_encode deep_decode
+
+
+0.05  Mon Sep 20 14:54:13 MSK 2010
+    - Typos in code
+
+0.06  Mon Sep 27 23:59:59 MSK 2010
+    - Fix documentation
+
+0.07  Tue Oct 5 17:15 MSK 2010
+    - Added deep_utf8_off
+
+0.08  Wen Oct 6 20:50 MSK 2010
+    - Added deep_utf8_upgrade
+    - Added deep_utf8_downgrade
+    - Little more tests
+
+0.09  Wen Oct 7 10:31 MSK 2010
+    - deep_utf8_check
+    - test deep_utf8_check
+
+0.10  Wen Oct 7 11:47 MSK 2010
+    - test for some  magic in deep_utf8_check
+
+0.11  Wen Oct 7 13:27 MSK 2010
+    - Add Licence && requirement infomation 
+
+0.12  Mon Oct 11 10:30 MSK 2010
+    - more compiler support 
+
+0.13  Sun Oct 17 18:26 MSK 2010
+    - more old compiler support ( Thanks to JWRIGHT/James Wraight )
+
+0.14  Fri Oct 29 16:38 MSK 2010
+    - added deep_utf8_on 
+
+0.15  Jan 27 2010
+    - fixed minor bug in deep_utf8_encode 
+
+0.16  Jan 28 2010
+    - added deep_str_clone 
+    
+0.17  Jan 28 2010
+    - added deepc_encode, deepc_decode ... etc
+
+0.18  Feb 01 2010
+    - fixed bug introduced in 0.16
+
+0.19  Mar 28 2016
+    - Magic hash working

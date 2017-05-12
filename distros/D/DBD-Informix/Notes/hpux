@@ -1,0 +1,206 @@
+Building DBD::Informix on HP-UX 10.20
+=====================================
+
+From: REED_WHITE@HP-Corvallis-om1.om.hp.com
+Date: Wed, 10 Jun 98 10:49:49 -0700
+Subject: Steps to load DBD::Informix on HPUX 10.20
+
+I successfully installed the Informix DBD on HPUX 10.20, thanks to
+Jonathan and all.  The following steps worked for me.
+
+Steps to install Informix DBD on HPUX 10.20:
+
+.Lines that begin with dot are comments. # indicate cmnds from root.
+
+.Following may not work unless Perl compiled with ANSI C compiler.
+.Install Informix esql/c.
+.The following works with the ANSI C compiler.
+$ su2 root
+.Do the download from CPAN, www.perl.org to /opt/perl5.004.
+# cd /opt
+# gzip -d -c /opt/perl5.004/DBD-Informix-0.58.tar.gz | tar xvf -
+# cd DBD-Informix-0.58
+.Read README
+# ln -s /opt/informix7.24.UC4 /usr/informix
+# export PATH=/usr/informix/bin:$PATH
+# export INFORMIXDIR=/usr/informix
+# export INFORMIXSERVER=ffdb_soc
+# export DBD_INFORMIX_USERNAME=fastfab1
+# export DBD_INFORMIX_PASSWORD=tym4ff
+# export DBD_INFORMIX_SERVER=ffdb_soc
+# export DBD_INFORMIX_DATABASE=stores7
+.Verify database access is properly setup (on remote machine).
+.The remote user/db must be setup for RESOURCE level privileges.
+.Verify .rhosts includes entry for cpu/user, where test is being done.
+.Verify local /usr/informix/etc/sqlhosts has remote DB info in it.
+.From a CPU that has Informix running on it,
+.merge the Informix /etc/services entries into local /etc/services.
+# perl Makefile.PL
+# make
+# make test           .May see some errors.
+# make install        .Can use "make uninstall" to uninstall.
+
+______________________________________________________________
+
+[...snip example...]
+
+# JL 2000-01-28:
+There have been numerous changes to DBD::Informix (and ESQL/C) since
+this was written, but the core of the message remains valid.  Detailed
+changes include:
+*   Version numbers (Perl, DBI, DBD::Informix, ESQL/C).
+*   The DBD_INFORMIX_SERVER variable is obsolete.
+*   Access to the database is most critical.  Ideally, create an new, empty
+    database for testing DBD::Informix; that guarantees you DBA privileges.
+    If your database server is on a remote system, you must be trusted; at
+    minimum, the tests t05dbase.t, t07dblist.t, t50update.t, t60unlog.t
+    will fail if you are not able to connect to the database server without
+    specifying your username and password.
+
+One key point, though, is the use of the HP ANSI C compiler; this is the
+most reliable way of working.  You can build GCC with just the bundled C
+compiler, see below.  Note that if you get things set up right, then you
+can use the dynamic loading functions of Perl!
+
+---------------------------------------------------------------------------
+
+Building DBD::Informix on HP-UX 11.00
+=====================================
+
+Versions prior to DBD::Informix 1.00 may have problems because the ESQL/C
+script (9.21.UC1, 9.30.HC1) includes references to two libraries (libcl.sl
+and libV3.sl).  The first of these is damaging; it causes 'make test' to
+fail because of thread local storage.  The second is simply not needed.
+The Makefile.PL for version 1.00 removes the references to these libraries.
+The libraries are also referenced on HP-UX 10.20, and removing the
+references there does no obvious harm.
+
+---------------------------------------------------------------------------
+
+Fixing up Sys::Syslog
+=====================
+
+Note that installing Bundle::DBI requires Sys::Syslog to work.  Simply
+converting the headers in /usr/include and /usr/include/sys is not quite
+adequate; you also have to fix up the code in:
+
+    .../lib/site_perl/5.005/PA-RISC2.0/_h2ph_pre.ph
+
+so that the dots in the following functions are replaced with (for example)
+underscores:
+
+    unless (defined &A1.1) { sub A1.1() { 1 } }
+
+    unless (defined &S2.0) { sub S2.0() { 1 } }
+
+This is arguably a bug in the Perl tool h2ph, or in the header file which
+is converted.  It is also quite separate from DBD::Informix.  You can test
+whether you are OK with the command below.  If it says nothing, you're
+fine; if it witters, you've got problems to fix.
+
+    perl -MSys::Syslog /dev/null
+
+You may need to get syslog.ph installed.  The brute force and ignorance way
+to deal with this is:
+
+    cd /usr/include
+    h2ph *.h */*.h
+
+In an email dated Wed, 12 Aug 1998 21:18:26, Kurt D Starsinic
+<kstar@chapin.edu> recommended a more refined method:
+
+    I would recommend the following, executed from any directory:
+
+        h2ph -a syslog.h
+
+    This will convert all the files that syslog.h includes, and only those
+    files; and it will do a better job of finding include files in unusual
+    places (i.e., gcc's `fixinclude' directory).
+
+Note that installing syslog.ph is a routine requirement on all platforms.
+Fixing up converted headers is also something that has to be done on many
+platforms -- Solaris and DEC OSF Unix (Compaq Tru64 Unix) have also had
+problems at times.
+
+---------------------------------------------------------------------------
+
+Building GCC on HP-UX 10.20
+===========================
+
+The bundled C compiler on HP-UX is of very limited value.  If you cannot
+get hold of (ie purchase) the HP-UX ANSI C compiler, you need to use GCC.
+However, to build GCC with the bundled C compiler, you need the GNU Binary
+Utilities and GNU sed (or a patched version of the HP-UX sed).  And to
+build the GNU Binary Utilities, you need Flex.  And to build Flex, you need
+Bison.  And to build Bison, you need the GNU Gettext tools.  And ... no,
+actually, that's where the list stops, but you have your work cut out.  I'm
+assuming that you've got gunzip and tar since you're reading this.  The GCC
+build instructions recommend using GNU Make.  This does seem to be
+necessary on HP-UX.
+
+Choose where you are going to install the GNU software: I chose $HOME/hpux.
+I added $HOME/hpux/bin to the front of my PATH.  Since there was a broken
+GCC compiler on my PATH (and I needed /usr/local/bin for gunzip, etc), I
+wrote CC=cc before all the configure commands to set the environment
+variable CC for the duration of the configure command.
+
+So, I went to my chosen GNU mirror site and downloaded:
+    binutils-2.9.1.tar.gz
+    bison-1.28.tar.gz
+    flex-2.5.4a.tar.gz
+    gcc-2.95.2.tar.bz2
+    gettext-0.10.35.tar.gz
+    make-3.77.tar.gz
+    sed-3.02.tar.gz
+
+Without doing any inter-build cleanup, I needed 72 MB of disk space under
+$HOME/hpux and 314 MB of disk space in the build area (with no intermediate
+cleanup operations).
+
+The sequence of operations is in the script hpux-gcc-build.sh.
+
+Note that the bundled C compiler gives lots of warnings about
+unrecognized and ignored options -- these have to be ignored.
+
+If you do not install GNU sed (on HP-UX), then the tail end of the GCC
+configuration process fails:
+
+    creating Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating intl/Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating po/Makefile.in
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating fixinc/Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating cp/Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating f/Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating java/Makefile
+    sed: Function s%@out_file@%pa/pa.c%g cannot be parsed.
+    creating auto-host.h
+
+You need quite a lot of disk space (in kilobytes)...
+
+33934   tmp/binutils-2.9.1
+5576    tmp/binutils-2.9.1.tar.gz
+2825    tmp/bison-1.28
+424     tmp/bison-1.28.tar.gz
+2112    tmp/flex-2.5.4
+384     tmp/flex-2.5.4a.tar.gz
+55678   tmp/gcc-2.95.2
+193814  tmp/gcc-2.95.2-obj
+9568    tmp/gcc-2.95.2.tar.bz2
+4007    tmp/gettext-0.10.35
+712     tmp/gettext-0.10.35.tar.gz
+3071    tmp/make-3.77
+664     tmp/make-3.77.tar.gz
+1392    tmp/sed-3.02
+272     tmp/sed-3.02.tar.gz
+
+71728   hpux
+
+---------------------------------------------------------------------------
+
+@(#)$Id: hpux,v 100.2 2000/01/31 17:57:33 jleffler Exp $

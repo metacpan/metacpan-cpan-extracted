@@ -1,0 +1,21 @@
+------------------------------------------------------------------------
+0.0300 | Piotr Roszatycki <dexter@cpan.org> | 2012-04-19
+
+* New filter for DSCTS field for EMI-UCP protocol.
+
+------------------------------------------------------------------------
+0.0200 | Piotr Roszatycki <dexter@cpan.org> | 2012-04-15
+
+* Separate filters for SCTS, DDT and VP fields for EMI-UCP protocol.
+
+------------------------------------------------------------------------
+0.0101 | Piotr Roszatycki <dexter@cpan.org> | 2012-04-11
+
+* Documentation tells about parsing date with year before 2000.
+
+------------------------------------------------------------------------
+0.01 | Piotr Roszatycki <dexter@cpan.org> | 2012-04-10
+
+* First CPAN release.
+
+------------------------------------------------------------------------

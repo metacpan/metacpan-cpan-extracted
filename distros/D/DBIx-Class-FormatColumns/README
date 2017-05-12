@@ -1,0 +1,101 @@
+NAME
+    DBIx::Class::FormatColumns - Creates format accessors for you
+
+SYNOPSIS
+        package Artist;
+        __PACKAGE__->load_components(qw/FormatColumns Core/);
+
+        __PACKAGE__->add_columns(
+          message => {},
+          date_start => { accessor => 'start_date', data_type => 'datetime' }
+        );
+        __PACKAGE__->format_columns;
+
+        # accessing the data
+
+        print $rc->message_format_ashtml, "\n";
+        print $rc->date_start_format_full_datetime, "\n";
+        print $rc->start_date_format_long_date, "\n";
+
+DESCRIPTION
+    This modul creates format accessors for you. It tries to be smart and
+    uses the *data_type* property of the column to know which kind of format
+    accessors it should create.
+
+  DateTime, Date formats
+    If you did not use DBIx::Class::InflateColumns to *inflate* your
+    datetime/date column, it uses DateTime::Format::DBI to convert the value
+    to an DateTime object.
+
+   format_full_date
+    Calls DateTime->locale->full_date_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_long_date
+    Calls DateTime->locale->long_date_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_medium_date
+    Calls DateTime->locale->medium_date_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_short_date
+    Calls DateTime->locale->short_date_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_full_time
+    Calls DateTime->locale->full_time_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_long_time
+    Calls DateTime->locale->long_time_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_medium_time
+    Calls DateTime->locale->medium_time_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_short_time
+    Calls DateTime->locale->short_time_format to retrieve the format string
+    to put it into a DateTime->strftime call.
+
+   format_full_datetime
+    Calls DateTime->locale->full_datetime_format to retrieve the format
+    string to put it into a DateTime->strftime call.
+
+   format_long_datetime
+    Calls DateTime->locale->long_datetime_format to retrieve the format
+    string to put it into a DateTime->strftime call.
+
+   format_medium_datetime
+    Calls DateTime->locale->medium_datetime_format to retrieve the format
+    string to put it into a DateTime->strftime call.
+
+   format_short_datetime
+    Calls DateTime->locale->short_datetime_format to retrieve the format
+    string to put it into a DateTime->strftime call.
+
+  Data formats
+   format_ashtml
+    Uses HTML::Entities to encode all entities. But it also replaces all
+    linebreaks with * <br /* >.
+
+METHODS
+  format_columns( [ @columns ] )
+    Creates format accessors for every column in *@columns*. Uses
+    __PACKAGE__->columns if *@columns* is empty;
+
+  format_datatype_columns_only( $boolean )
+    If set to a true value, format_columns will only format columns that
+    have a *data_type* configured. The default value is 0.
+
+AUTHOR
+    Sascha Kiefer <esskar@cpan.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

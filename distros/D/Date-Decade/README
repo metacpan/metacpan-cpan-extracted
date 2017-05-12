@@ -1,0 +1,66 @@
+NAME
+    Date::Decade - Decade calculations
+
+SYNOPSIS
+      use Date::Decade qw(
+            Days_in_Decade
+            Decade_of_Year
+            Decade_of_Month
+      );
+
+      use Date::Decade qw(:all);
+
+     Days_in_Decade
+       $days_in_decade = Days_in_Decade($year,$decade);
+
+     Decade_of_Year
+       $decade_of_year = Decade_of_Year($year,$month,$day);
+
+     Decade_of_Month
+       $decade_of_month = Decade_of_Month($year,$month,$day);
+
+DESCRIPTION
+      $days_in_decade = Days_in_Decade($year,$decade);
+        This function returns how many days a given decade
+        have.
+
+      $decade_of_year = Decade_of_Year($year,$month,$day);
+        This function returns which decade it is on a
+        given date (from the 1. January).
+
+      $decade_of_month = Decade_of_Month($year,$month,$day);
+        This function returns which decade it is on a
+        given month.
+
+PREREQUISITES
+    This module requires perl 5.003_03 or later and:
+
+    Date:Calc 4.3 by Steffen Beyer <sb@engelschall.com>,
+    http://www.cpan.org/authors/id/STBEY/Date-Calc-4.3.tar.gz
+
+    or (with some changes)
+
+    Date:Pcalc 1.2 by J. David Eisenberg <nessus@best.com>,
+    http://www.cpan.org/authors/id/STBEY/Date-Pcalc-1.2.tar.gz
+
+BUGS
+    No Bugs known for now. ;)
+
+HISTORY
+    - 2001-08-22 / 0.33
+    Errors in the file Makefile.PL corrected.
+
+    - 2001-08-22 / 0.32
+    First beta-release
+
+AUTHOR
+    Michael Diekmann, <michael.diekmann@undef.de>
+
+COPYRIGHT
+    Copyright (c) 2001 Michael Diekmann <michael.diekmann@undef.de>. All
+    rights reserved. This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+SEE ALSO
+    Date::Calc or Date::Pcalc, perl(1).
+

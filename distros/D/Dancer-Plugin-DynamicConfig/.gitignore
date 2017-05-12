@@ -1,0 +1,7 @@
+Dancer-Plugin-DynamicConfig*
+MYMETA.*
+Makefile
+blib/
+local/
+logs/
+pm_to_blib

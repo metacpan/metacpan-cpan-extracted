@@ -1,0 +1,13 @@
+-l=78
+-i=4
+-ci=4
+-se
+-b
+-bar
+-boc
+-nolq
+-pt=2
+-it=2
+--blank-lines-before-packages=0
+--no-outdent-long-comments 
+-wbb="% + - * / x != == >= <= =~ !~ < > | & >= < = **= += *= &= <<= &&= -= /= |= >>= ||= .= %= ^= x="

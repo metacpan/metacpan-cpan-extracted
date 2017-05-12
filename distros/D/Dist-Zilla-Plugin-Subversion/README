@@ -1,0 +1,25 @@
+NAME
+    Dist::Zilla::Plugin::Subversion - update your Subversion repository
+    after release
+
+VERSION
+    version 1.101590
+
+DESCRIPTION
+    This set of plugins for Dist::Zilla can do interesting things for module
+    authors using Subversion <http://subversion.apache.org/> to track their
+    work. The following plugins are provided in this distribution:
+
+    *   Dist::Zilla::Plugin::Subversion::ReleaseDist
+
+    *   Dist::Zilla::Plugin::Subversion::Tag
+
+AUTHOR
+      Mark Gardner <mjgardner@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Mark Gardner.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

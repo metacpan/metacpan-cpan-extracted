@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Plugin-Test-CleanNamespaces
+
+0.006     2014-08-30 01:33:11Z
+          - default filename of generated test is now
+            xt/author/clean-namespaces.t, to allow the test to run on travis
+            when not doing release testing
+
+0.005     2014-08-16 00:24:16Z
+          - fix minimum version of Test::CleanNamespaces used by generated
+            test
+          -  munge the file properly even if [ExtraTests] has already moved it
+
+0.004     2014-06-26 23:34:32Z
+          - bump required version of Test::CleanNamespaces, to get fixes for
+            Mouse, overloads, constants
+
+0.003     2014-03-09 04:09:33Z
+          - fix 'skip' option, when used twice or more
+
+0.002     2014-03-02 07:06:52Z
+          - ensure we depend on a fixed version of Test::CleanNamespaces
+          - fix missing prereq caused by us running our generated test in
+            tests, where [AutoPrereqs] did not know about it
+
+0.001     2014-03-01 19:12:51Z
+          - Initial release.

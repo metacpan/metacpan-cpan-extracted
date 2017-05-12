@@ -1,0 +1,33 @@
+PerlDeBugger (Devel-PDB)
+=====================================
+
+(PerlDeBugger is still in development stage, not all of the planed
+functions have been implemented yet)
+
+PerlDeBugger is a Curses-based Perl debugger with most of the essential functions
+such as monitoring windows for paddlist, call stack, custom watch expressions, etc.
+Suitable for debugging or tracing complicated Perl applications on the spot.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Curses::UI >= 0.95
+
+Copyright (C) 2007 by Ivan Y.C. Wong
+Copyright (C) 2012 by Igor Bujna
+
+This debugger is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

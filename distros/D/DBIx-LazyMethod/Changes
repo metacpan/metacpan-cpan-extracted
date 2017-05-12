@@ -1,0 +1,20 @@
+Revision history for Perl extension DBIx::LazyMethod.
+$Id: Changes,v 1.1 2004/03/27 13:43:12 cwg Exp $
+
+1.03    Wed Mar 24 19:39:28 CET 2004
+
+	Fixes rt.cpan.org tickets:
+	#5752 - error message changed
+	#5767 - result set can now be empty/undef (ooups)
+	#5768 - added 'noprepare' and 'noquote' options to method declaration.
+	
+	Added t/Pg.t with postgresql (specific) tests.
+	Added t/pod.t with POD tests.
+	Added t/pod-coverage.t with POD::Coverage tests.
+
+	Added 'WANT_AUTO_INCREMENT' support for postgresql DBD.
+
+1.02    Wed Aug 05 13:29:28 CET 2003
+
+        First real version, released on an unsuspecting world.
+        Going forward, of course, I'll note any other API changes here.

@@ -1,0 +1,158 @@
+0.29 (02.23.2013) - John Ingram<john@funnycow.com>
+  * added relative date support, so you can define one DateTime field that is 
+    either a fixed or random duration away from another DateTime field.
+  * You can also make it relative to 'now' or 'today', instead of referring to another field.
+
+0.28 (07.18.2010) - Philip Garrett <philgarr@gmail.com>
+  * Fixed a bug in Data::Maker that caused the return value of in_progress to
+    be wrong when the field object it should have returned had a false value().
+
+0.27 (12.30.2010) - Philip Garrett <philgarr@gmail.com>
+  * improved efficiency of random() with large arrays
+  * removed obsolete formatter() method
+  * speed improvements for formats
+  * more caching
+
+0.26 (11.08.2010) - Philip Garrett <philgarr@gmail.com>
+  * Fixed a bug in Data::Maker::Field where fields were being cached
+    globally, causing independent maker objects to clobber each other.
+
+0.25 (05.17.2010) - John Ingram <john@funnycow.com>
+  * Updated `t/benchmark.pl` -- apparently Data::Maker::Field::DateTime does not work
+    without start and end dates anymore.  Maybe I'll look into that.
+  * Also found that Makefile.PL had the wrong version in 0.24.  Fixed that.
+
+0.24 (05.15.2010) - John Ingram <john@funnycow.com>
+  * Data::Maker::Field::Number did some pretty dumb things.   Much more straightforward now.
+  * Also changed the type of the `precision` attribute of Data::Maker::Field::Number to PositiveInt
+
+0.23 (05.05.2010) - John Ingram <john@funnycow.com>
+  * Fixed a bug in Data::Maker::Field in which a formatting atom of 0 was ignored...
+    in fact, I think everything after a zero would also be ignored.  (because returning 
+    zero is no better than returning nothing)
+  * Modified Data::Maker::Field::DateTime so that the `start` and `end` parameters can be
+    either a year (as it was originally written) or an actual DateTime object, as I should
+    have written it in the first place. 
+  * Added MooseX::Aliases as a dependency
+
+0.22 (05.03.2010) - John Ingram <john@funnycow.com>
+  * Once again, I neglected to update the version number
+    in Makefile.PL.   Added that to my checklist.
+
+0.21 (05.02.2010) - John Ingram <john@funnycow.com>
+  * Removed Data::Maker::Field::Currency from this distribution and created a standalone 
+    distribution for it.
+
+0.20 (05.02.2010) - John Ingram <john@funnycow.com>
+  * Significant (and mostly-accidental) performance improvement with Field object caching
+  * Removed everything having to do with the "object_cache", due to the above performance
+    improvement.  Object caching is now done using the Moose method modifier "around".
+  * Finally noticed that I have not updated the version field in Makefile.PL since version 0.01,
+    so I updated that.
+  * The header() method assumed that there was a `label` attribute.  Now it uses `name` if 
+    there is no `label`
+  * Added boolean attribute `allow_unknown` to the Gender class.  If false, a random 
+    selection between M and F will be made instead of returning a gender of U
+  * Updated the benchmarks in Maker.pm, due to performance improvement mentioned above
+  * Added benchmarking script to the distribution (t/benchmark.pl)
+  * Added Data::Maker::Field::Number (thanks to Adam Corum for giving me a much more efficient way to do numeric ranges)
+  * Added Data::Maker::Field::IP
+  * Added Data::Maker::Field::Password
+
+0.19 (04.04.2010) - John Ingram <john@funnycow.com>
+  * Didn't change the version in the code AGAIN.  Didn't follow the checklist.  Duh.
+
+0.18 (04.03.2010) - John Ingram <john@funnycow.com>
+  * Slightly-modified the first example in the Maker.pm POD, to match the same example in Tutorial.pod (thanks to David N. Blank-Edelman for pointing out the discrepancy)
+
+0.17 (03.14.2010) - John Ingram <john@funnycow.com>
+  * Added default delimiter of "\t", so that the delimited() method will return a tab-delimited record by default
+  * Added more detailed documentation to Data::Maker::Field::Initials, to point out the two different 
+    ways to use that class.
+  * There was already a "formatted" attribute defined for any field, which is a code reference that is to be applied to the 
+    value after it is generated but before it is returned.  But it was not being used in the code, so I fixed that.
+
+0.16 (03.07.2010) - John Ingram <john@funnycow.com>
+  * Fixed an oversight in the benchmarking documentation (forgot to change the 100 to 200)
+  * Modified the seeding code to make sure seeding never happens more than once
+  * Added Data::Maker::Field::MultiSet
+  * Added Data::Maker::Field::Initials
+
+0.15 (03.07.2010) - John Ingram <john@funnycow.com>
+  * This was a botched release.  I accidentally released a copy of trunk when my changes had been made to a feature branch
+
+0.14 (02.06.2010) - John Ingram <john@funnycow.com>
+  * Brought back SSN field, which is a good demonstration of creating a Format subclass
+  * Fixed some version numbers because I have not been paying enough attention to them lately
+
+0.13 (02.06.2010) - John Ingram <john@funnycow.com>
+  * Improved performance by more than 100% by changing the dynamic field methods to use
+    AUTOLOAD instead of using dynamic Moose attributes.  We'll see if there's a downside
+    to this.  
+
+0.12 (02.05.2010) - John Ingram <john@funnycow.com>
+  * Added some notes to the POD; one about performance and one acknowledging the 
+    existence of another module called Data::Faker
+  * Added reset() method to Data::Maker, which sets generated() to 0
+  * Added `from_name` attribute to Data::Maker::Field::Person::Gender, mainly for benchmarking
+    purposes so I could benchmark the Gender field by itself.  If provided, it will use that name
+    instead of getting the name from the field referenced by `from_field`.
+  * Tweaked the Maker.pm POD a little, adding a section on performance, including benchmark results.
+
+0.11 (02.05.2010) - John Ingram <john@funnycow.com>
+  * Two modules required by only one Field class each were not declared in Makefile.PL.  
+    I added them, though I need to consider making each Data::Maker::Field subclass
+    that requires other CPAN modules having its own distribution and not being required for
+    Data::Maker itself.
+  * Added the Set and Lorem classes to the Data::Maker man page, because all classes are 
+    listed there -- which I forgot.  I need a checklist! :)
+  * Got rid of all signs of Data::Maker::Field::Person::SSN.  I still want to have it 
+    as an example of how you can easily add your own Format subclass, but I obviously 
+    something since that original idea and I have to give it fresh thought.
+  * Added Data::Maker::Field::Person, which right now is nothing more than a way to 
+    import all of the Person classes.
+  * Added a `before` trigger to record_count to reset the `generated` to zero whenever
+    `record_count` is changed.  This might come back to bite me, but the only time it really
+    makes sense to change the `record_count` is when you want to start over.
+  * Added the Data::Maker->random class method for when you just need a really simple random 
+    pick.  I added this specifically for hierarchical data, so you can have a maker object called
+    in between `next_record` calls of another maker object that creates a random number of child
+    objects.  It made sense to use $maker2->record_count( Data::Maker->random ).
+
+0.10 (02.04.2010) - John Ingram <john@funnycow.com>
+  * Added Data::Maker::Field::Set
+
+0.09 (02.03.2010) - John Ingram <john@funnycow.com>
+  * Now requiring that a "code" attribute be sent to Data::Maker::Field::Code 
+  * Removed erroneous import of MooseX::AttributeHelpers -- thanks to Andreas Koenig (RT #54237)
+  * Removed lib/Maker.pm, which should have not been in the distribution.
+
+0.08 (01.31.2010) - John Ingram <john@funnycow.com>
+  * I keep forgetting to update $VERSION in the files when the version changes.  Just updated them
+
+0.07 (01.31.2010) - John Ingram <john@funnycow.com>
+  * Added $VERSION to all *.pm files
+  * Changed PROPERTIES to ATTRIBUTES in the POD for Data::Maker
+  * Fixed the code in the SYNOPSIS to make more sense (and added another example)
+  * Documented Data::Maker::Field::Code
+  * Documented Data::Maker::Field
+
+0.06 (01.31.2010) - John Ingram <john@funnycow.com>
+  * Accidentally released a version with no net changes... oops
+
+0.05 (01.31.2010) - John Ingram <john@funnycow.com>
+
+  * Changed $VERSION in the code to match the actual version (forgot to do that in 0.04)
+  * Modified the description in the POD
+  * Documented the individual Data::Maker::Field subclasses a little in the main Data::Maker page
+  * Removed some Data::Maker::Field subclasses that should never have been in the distribution
+  * Attributed my employer, ICA, for its support of the Perl community
+
+0.04 (01.31.2010) - John Ingram <john@funnycow.com>
+
+  * Cleaned up some documentation
+
+0.03 (01.31.2010) - John Ingram <john@funnycow.com>
+
+  * Added the "Changes" file (this file)
+  * Added essential POD to the main Data::Maker package

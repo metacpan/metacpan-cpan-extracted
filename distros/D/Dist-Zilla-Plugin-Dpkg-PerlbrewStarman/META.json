@@ -1,0 +1,49 @@
+{
+   "abstract" : "Generate dpkg files for your perlbrew-backed, starman-based perl app",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Dpkg-PerlbrewStarman",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::Dpkg" : "0.05",
+            "Moose" : 0,
+            "Moose::Util::TypeConstraints" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman/issues"
+      },
+      "homepage" : "https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman.git",
+         "web" : "https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman"
+      }
+   },
+   "version" : "0.16"
+}
+

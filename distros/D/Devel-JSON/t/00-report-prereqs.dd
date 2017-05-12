@@ -1,0 +1,43 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Encode' => '2.73',
+                                        'JSON::MaybeXS' => '1.003003'
+                                      },
+                      'requires' => {
+                                      'Encode' => '2.05',
+                                      'Filter::Simple' => '0',
+                                      'JSON::MaybeXS' => '0',
+                                      'encoding' => '0',
+                                      'perl' => '5.008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.008'
+                                 }
+                 }
+     };
+  $x;
+ }

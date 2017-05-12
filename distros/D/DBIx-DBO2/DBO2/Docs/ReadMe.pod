@@ -1,0 +1,141 @@
+=head1 NAME
+
+DBIx::DBO2::Docs::ReadMe - Getting Started with DBIx::DBO2
+
+
+=head1 SYNOPSIS
+
+  package MyRecord;
+  use DBIx::DBO2::Record '-isasubclass';
+  my $sql_engine = DBIx::SQLEngine->new( $dsn, $user, $pass );
+  
+  MyRecord->table(
+    DBIx::DBO2::Table->new(name=>'myrecords', datasource=>$sql_engine)
+  );
+  
+  package main;
+  my $results = MyRecord->fetch_all;
+  foreach my $record ( $results->records ) {
+    if ( $record->{age} > 20 ) {
+      $record->{status} = 'adult';
+      $record->save_row;
+    }
+  }
+
+
+=head1 DESCRIPTION
+
+DBIx::DBO2 is an object-relational mapping framework that facilitates the
+development of Perl classes whose objects are stored in a SQL database table.
+
+
+=head1 INSTALLING
+
+You should be able to install this module using the CPAN shell interface:
+
+  perl -MCPAN -e 'install DBIx::DBO2'
+
+If this module has not yet been posted to your local CPAN mirror, you may
+also retrieve the current distribution from the below address and follow the
+normal "gunzip", "tar xf", "cd", "perl Makefile.PL && make test && sudo make
+install" procedure or your local equivalent:
+
+  http://www.evoscript.org/DBIx-DBO2/
+
+=head2 Getting Started
+
+You may want to take a look at the test.pl and test-lib/ classes included
+with this distribution for a short example of how to use this framework to
+create your own classes.
+
+=head2 Prerequisites
+
+Requires DBIx::SQLEngine and Class::MakeMethods, both available on CPAN.
+
+=head2 Tested Platforms
+
+This release has been tested succesfully on the following platforms:
+
+  5.6.1 on darwin
+  5.005_03 on i386-freebsd
+
+
+=head1 VERSION
+
+This is version 0.006 of DBIx::DBO2. 
+
+=head2 Distribution Summary
+
+This module's summary in the CPAN DSLIP is intended to read:
+
+  Name            DSLIP  Description
+  --------------  -----  ---------------------------------------------
+  DBIx::
+  ::DBO2          bdpOp  Objects mapping to SQL relational structures
+
+=head2 Beta Release
+
+Although it based on earlier code that was extensively tested over several
+years of production use, this code has recently been majorly refactored, and
+has not yet been sufficiently tested in its new form.
+
+=head2 Discussion and Support
+
+There is not currently any offical discussion and support forum for this
+pacakage.
+
+Further information and support for this module is available at
+http://www.evoscript.org.
+
+If you have questions or feedback about this module, please feel free to
+contact the author at the below address.
+
+I would be particularly interested in any suggestions towards improving the
+documentation, correcting any Perl-version or platform dependencies, as well
+as general feedback and suggestions.
+
+
+=head1 SEE ALSO
+
+See L<DBIx::DBO2::Record>, L<DBIx::DBO2::Fields>, L<DBIx::DBO2::Table>, and
+L<DBIx::DBO2::TableSet> for key interfaces within this framework.
+
+See L<DBIx::SQLEngine> for information about the underlying database
+interface.
+
+See L<DBIx::DBO2::Comparison> for a a review of where this framework fits
+into the spectrum of numerous other modules on CPAN that provide alternative
+systems to map objects to and from SQL databases, including L<Class::DBI>,
+L<Alzabo>, and L<Tangram>.
+
+
+=head1 CREDITS AND COPYRIGHT
+
+=head2 Author
+
+Developed by Matthew Simon Cavalletto at Evolution Softworks.
+
+You may contact the author directly at C<evo@cpan.org> or
+C<simonm@cavalletto.org>. More free Perl software is available at
+C<www.evoscript.org>.
+
+=head2 Contributors 
+
+Many thanks to the kind people who have contributed code and other feedback:
+
+  Eric Schneider, Evolution Online Systems
+  E. J. Evans, Evolution Online Systems
+  Matthew Sheahan, Evolution Online Systems
+  Eduardo Iturrate, Evolution Online Systems
+
+=head2 Copyright
+
+Copyright 2002, 2003, 2004 Matthew Cavalletto. 
+
+Portions copyright 1997, 1998, 1999, 2000, 2001 Evolution Online Systems, Inc.
+
+=head2 License
+
+You may use, modify, and distribute this software under the same terms as Perl.
+
+=cut

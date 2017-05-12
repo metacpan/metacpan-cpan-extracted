@@ -1,0 +1,133 @@
+SYNOPSIS
+
+     use Data::Dmp; # exports dd() and dmp()
+     dd [1, 2, 3]; # prints "[1,2,3]"
+     $a = dmp({a => 1}); # -> "{a=>1}"
+
+DESCRIPTION
+
+    Data::Dmp is a Perl dumper like Data::Dumper. It's compact (only about
+    175 lines of code long), starts fast and does not use any non-core
+    modules except Regexp::Stringify when dumping regexes. It produces
+    compact single-line output (similar to Data::Dumper::Concise). It
+    roughly has the same speed as Data::Dumper (usually a bit faster for
+    smaller structures) and faster than Data::Dump, but does not offer the
+    various formatting options. It supports dumping objects, regexes,
+    circular structures, coderefs. Its code is first based on Data::Dump: I
+    removed all the parts that I don't need, particularly the pretty
+    formatting stuffs) and added some features that I need like proper
+    regex dumping and coderef deparsing.
+
+FUNCTIONS
+
+ dd($data, ...) => $data ...
+
+    Exported by default. Like Data::Dump's dd (a.k.a. dump), print one or
+    more data to STDOUT. Unlike Data::Dump's dd, it always prints and
+    return the original data (like XXX), making it convenient to insert
+    into expressions. This also removes ambiguity and saves one wantarray()
+    call.
+
+ dmp($data, ...) => $str
+
+    Exported by default. Return dump result as string. Unlike Data::Dump's
+    dd (a.k.a. dump), it never prints and only return the data.
+
+SETTINGS
+
+ $Data::Dmp::OPT_PERL_VERSION => str (default: 5.010)
+
+    Set target Perl version. If you set this to, say 5.010, then the dumped
+    code will keep compatibility with Perl 5.10.0. This is used in the
+    following ways:
+
+      * passed to Regexp::Stringify
+
+      * when dumping code references
+
+      For example, in perls earlier than 5.016, feature.pm does not
+      understand:
+
+       no feature ':all';
+
+      so we replace it with:
+
+       no feature;
+
+ $Data::Dmp::OPT_REMOVE_PRAGMAS => bool (default: 0)
+
+    If set to 1, then pragmas at the start of coderef dump will be removed.
+    Coderef dump is produced by B::Deparse and is of the form like:
+
+     sub { use feature 'current_sub', 'evalbytes', 'fc', 'say', 'state', 'switch', 'unicode_strings', 'unicode_eval'; $a <=> $b }
+
+    If you want to dump short coderefs, the pragmas might be distracting.
+    You can turn turn on this option which will make the above dump become:
+
+     sub { $a <=> $b }
+
+    Note that without the pragmas, the dump might be incorrect.
+
+ $Data::Dmp::OPT_DEPARSE => bool (default: 1)
+
+    Can be set to 0 to skip deparsing code. Coderefs will be dumped as
+    sub{"DUMMY"} instead, like in Data::Dump.
+
+ $Data::Dmp::OPT_STRINGIFY_NUMBERS => bool (default: 0)
+
+    If set to true, will dump numbers as quoted string, e.g. 123 as "123"
+    instead of 123. This might be helpful if you want to compute the hash
+    of or get a canonical representation of data structure.
+
+BENCHMARKS
+
+    # COMMAND: devscripts/bench
+
+FAQ
+
+ When to use Data::Dmp? How does it compare to other dumper modules?
+
+    Data::Dmp might be suitable for you if you want a relatively fast
+    pure-Perl data structure dumper to eval-able Perl code. It produces
+    compact, single-line Perl code but offers little/no formatting options.
+    Data::Dmp and Data::Dump module family usually produce Perl code that
+    is "more eval-able", e.g. it can recreate circular structure.
+
+    Data::Dump produces visually nicer output (some alignment, use of range
+    operator to shorten lists, use of base64 for binary data, etc) but no
+    built-in option to produce compact/single-line output. It's more
+    suitable for debugging. It's also relatively slow. I usually use its
+    variant, Data::Dump::Color, for console debugging.
+
+    Data::Dumper is a core module, offers a lot of formatting options (like
+    disabling hash key sorting, setting verboseness/indent level, and so
+    on) but you usually have to configure it quite a bit before it does
+    exactly like you want (that's why there are modules on CPAN that are
+    just wrapping Data::Dumper with some configuration, like
+    Data::Dumper::Concise et al). It does not support dumping Perl code
+    that can recreate circular structures.
+
+    Of course, dumping to eval-able Perl code is slow (not to mention the
+    cost of re-loading the code back to in-memory data, via eval-ing)
+    compared to dumping to JSON, YAML, Sereal, or other format. So you need
+    to decide first whether this is the appropriate route you want to take.
+    (But note that there is also Data::Dumper::Limited and Data::Undump
+    which uses a format similar to Data::Dumper but lets you load the
+    serialized data without eval-ing them, thus achieving the speed
+    comparable to JSON::XS).
+
+ Is the output guaranteed to be single line dump?
+
+    No. Some things can still produce multiline dump, e.g. newline in
+    regular expression.
+
+SEE ALSO
+
+    Data::Dump and other variations/derivate works in Data::Dump::*.
+
+    Data::Dumper and its variants.
+
+    Data::Printer.
+
+    YAML, JSON, Storable, Sereal, and other serialization formats.
+

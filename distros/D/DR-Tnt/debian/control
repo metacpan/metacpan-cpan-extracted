@@ -1,0 +1,26 @@
+Source: libdr-tnt-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/DR-Tnt/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs,
+ libanyevent-perl,
+ tarantool,
+ liblist-moreutils-perl,
+ libcoro-perl,
+ libanyevent-perl
+Standards-Version: 3.9.6
+Priority: extra
+VCS-Browser: https://github.com/dr-co/dr-tnt
+
+Package: libdr-tnt-perl
+Depends:
+ ${perl:Depends},
+ ${misc:Depends},
+ ${shlibs:Depends},
+ liblist-moreutils-perl
+Recommends: libcoro-perl, libanyevent-perl
+Architecture: any
+Suggests: tarantool
+Description: perl driver for Tarantool
+ The package contains sync and async drivers for tarantool database.
+

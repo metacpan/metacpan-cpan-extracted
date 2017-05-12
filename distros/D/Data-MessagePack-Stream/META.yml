@@ -1,0 +1,30 @@
+---
+abstract: 'yet another messagepack streaming deserializer'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Data::MessagePack: 0
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.36
+  ExtUtils::ParseXS: 3.18
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-MessagePack-Stream
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  XSLoader: 0.02
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/Data-MessagePack-Stream.git
+version: '1.01'

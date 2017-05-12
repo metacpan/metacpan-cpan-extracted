@@ -1,0 +1,68 @@
+Data::Default version 0.11
+=========================
+
+NAME
+    Data::Default -- Small utility for getting the default value of an
+    argument or variable.
+
+SYNOPSIS
+     use Data::Default ':all';
+
+     # variables
+     my ($var);
+
+     # later...
+
+     if (default $var, 1) {
+        # stuff if the $var is undef or set to a true value
+     }
+     else {
+        # stuff if the $var is defined and set to true
+     }
+
+DESCRIPTION
+    Just a little utility for getting the default value of an argument or
+    parameter. All it really does is accept an array of arguments, then
+    return the first argument that is defined.
+
+    This function is usually used in a subroutine to get the default value
+    of a parameter. A typical usage would be in a subroutine like this:
+
+     sub mysub {
+        my (%opts) = @_;
+
+        if (default $opts{'some-option'}, 1) {
+            # do stuff some-option was sent and was true or was not sent
+        }
+        else {
+            # do stuff some-option was sent and was false
+        }
+    }
+
+    You might prefer to use "Attribute::Default" by Stephen Nelson which
+    provides similar functionality.
+
+INSTALLATION
+    String::Util can be installed with the usual routine:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+TERMS AND CONDITIONS
+    Copyright (c) 2010 by Miko O'Sullivan. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself. This software comes with NO WARRANTY of any
+    kind.
+
+AUTHORS
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+    Version 0.10 November 7, 2010
+        Initial release
+
+    Version 0.11 November 8, 2010
+        Fixed bug: Exporter was not being loaded.
+

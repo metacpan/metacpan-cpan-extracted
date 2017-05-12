@@ -1,0 +1,51 @@
+---
+abstract: 'extremely simple DBI migrations'
+author:
+  - 'Cameron Daniel <cam.daniel@gmail.com>'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150010'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-SimpleMigration
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::SimpleMigration:
+    file: lib/DBIx/SimpleMigration.pm
+    version: v1.0.2
+  DBIx::SimpleMigration::Client:
+    file: lib/DBIx/SimpleMigration/Client.pm
+    version: v1.0.2
+  DBIx::SimpleMigration::Client::Pg:
+    file: lib/DBIx/SimpleMigration/Client/Pg.pm
+    version: v1.0.2
+  DBIx::SimpleMigration::Client::SQLite:
+    file: lib/DBIx/SimpleMigration/Client/SQLite.pm
+    version: v1.0.2
+  DBIx::SimpleMigration::Migration:
+    file: lib/DBIx/SimpleMigration/Migration.pm
+    version: v1.0.2
+requires:
+  SQL::SplitStatement: '0'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/ccakes/DBIx-SimpleMigration/issues
+  homepage: https://github.com/ccakes/DBIx-SimpleMigration
+  repository: git://github.com/ccakes/DBIx-SimpleMigration.git
+version: 1.0.2
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

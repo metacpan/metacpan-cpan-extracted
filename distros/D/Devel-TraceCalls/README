@@ -1,0 +1,359 @@
+NAME
+    Devel::TraceCalls - Track calls to subs, classes and object instances
+
+SYNOPSIS
+      ## From the command line
+        perl -d:TraceCalls=Subs,foo,bar script.pl
+
+      ## Quick & dirty via use
+        use Devel::TraceCalls { Package => "Foo" };
+
+      ## Procedural
+        use Devel::TraceCalls;
+
+        trace_calls qw( foo bar Foo::bar ); ## Explicitly named subs
+
+        trace_calls {
+             Subs => [qw( foo bar Foo::bar )],
+            ...options...
+        };
+
+        trace_calls {
+            Package => "Foo",        ## All subs in this package
+            ...options...
+        };
+
+        trace_calls {         ## Just these subs
+            Package => "Foo",        ## Optional
+            Subs    => qw( foo, bar ),
+            ...options...
+        };
+
+        trace_calls $object;  ## Just track this instance
+
+        trace_calls {
+            Objects => [ $obj1, $obj2 ];  ## Just track these instances
+            ...options...
+        };
+
+        ... time passes, sub calls happen ...
+
+        my @calls = $t1->calls;  ## retrieve what happned
+
+      ## Object orented
+        my $t = Devel::TraceCalls->new( ...parameters... );
+
+        undef $t;  ## disable tracing
+
+DESCRIPTION
+    ALPHA CODE ALERT. This module may change before "official" release".
+
+    Devel::TraceCalls allows subroutine calls to be tracked on a
+    per-subroutine, per-package, per-class, or per object instance basis.
+    This can be quite useful when trying to figure out how some poor thing
+    is being misused in a program you don't fully understand.
+
+    The default action is to log the calls to STDERR. Passing in any of the
+    Calls, PreCall, or PostCall options disables this default behavior (and
+    passing in an TraceOutput option reenables it).
+
+    Devel::TraceCalls works on subroutines and classes by installing wrapper
+    subroutines and on objects by temporarily reblessing the objects in to
+    specialized subclasses with "shim" methods. Such objects are reblessed
+    back when the tracker is DESTROYed.
+
+    There are 4 ways to specify what to trace.
+
+    1   By Explicit Sub Name
+
+            trace_calls "foo", "bar";   ## trace to STDOUT.
+    
+            trace_calls {
+                Subs => [ "foo", "bar" ],
+                ...options...
+            };
+
+        The first form enables tracking with all Capture options enabled
+        (other than CaptureSelf which has no effect when capturing plain
+        subs). The second allows you to control the options.
+
+    2   By Package Name
+
+            trace_calls {
+                Package => "My::Module",
+                ...options...
+            };
+
+            # Multiple package names
+            trace_calls {
+                Package => [ "My::Module", "Another::Module" ],
+                ...options...
+            };
+
+            trace_calls {
+                Package => "My::Module",
+                Subs    => [ "foo", "bar" ],
+                ...options...
+            };
+
+        This allows you to provide a package prefix for subroutine names to
+        be tracked. If no "Subs" option is provided, all subroutines in the
+        package will be tracked.
+
+        This does not examine @ISA like the "Class" and "Objects" (covered
+        next) techniques do.
+
+    3   By Class Name
+
+            trace_calls {
+                Class => "My::Class",
+                ...options...
+            };
+
+            trace_calls {
+                Class => "My::Class",
+                ...options...
+            };
+
+            trace_calls {
+                Class => "My::Class",
+                Subs  => [ "foo", "bar" ],
+                ...options...
+            };
+
+        This allows tracking of method calls (or things that look like
+        method calls) for a class and it's base classes. The $self ($_[0])
+        will not be captured in "Args" (see the Data Capture Format entry
+        elsewhere in this document), but may be captured in "Self" if
+        "CaptureSelf" is enabled.
+
+        "Devel::TraceCalls" can't differentiate between "$obj-"foo( ... )>
+        and "foo( $obj, ... )", which can lead to extra calls being tracked
+        if the latter form is used. The good news is that this means that
+        idioms like:
+
+            $meth = $obj->can( "foo" );
+            $meth->( $obj, ... ) if $meth;
+
+        are captured.
+
+        If a "Subs" parameter is provided, only the named methods will be
+        tracked. Otherwise all subs in the class and in all parent classes
+        are tracked.
+
+    3   By Object Instance
+
+            trace_calls $obj1, $obj2;
+
+            trace_calls {
+                Objects => [ $obj1, $obj2 ],
+                ...options...
+            };
+
+            trace_calls {
+                Objects => [ $obj1, $obj2 ],
+                Subs    => [ "foo", "bar" ],
+                ...options...
+            };
+
+        This allows tracking of method calls (or things that look like
+        method calls) for specific instances. The $self ($_[0]) will not be
+        captured in "Args", but may be captured in Self if CaptureSelf is
+        enabled.
+
+        The first form ("track $obj, ...") enables all capture options,
+        including CaptureSelf.
+
+OPTIONS
+    there are several options that may be passed in the HASH ref style
+    parameters in addition to the "Package", "Subs", "Objects" and "Class"
+    settings covered above.
+
+    LogTo
+            LogTo => \*FOO,
+            LogTo => \@array,
+            LogTo => undef,
+
+        Setting this to a filehandle causes tracing messages to be emitted
+        to that filehandle. This is set to STDERR by default if no PreCall
+        or PostCall intercepts are given. It may be set to undef to suppress
+        tracing if you need to.
+
+        Setting this to an ARRAY reference allows call data to be captured,
+        see below for more details.
+
+    LogFormatter
+        This is not supported yet, the API will be changing.
+
+        But, it allows you some small control over how the parameters list
+        gets traced when LogTo points to a filehandle.
+
+    PreCall
+            PreCall => \&sub_to_call_before_calling_the_target,
+
+        A reference to a subroutine to call before calling the target sub.
+        This will be passed a reference to the data captured before the call
+        and a reference to the options passed in when defining the trace
+        point (this does not contain the "Package", "Subs", "Objects" and
+        "Class" settings.
+
+    PostCall
+            PreCall => \&sub_to_call_after_calling_the_target,
+
+        A reference to a subroutine to call after calling the target sub.
+        This will be passed a reference to the data captured before and
+        after the call and a reference to the options passed in when
+        defining the trace point (this does not contain the "Package",
+        "Subs", "Objects" and "Class" settings.
+
+    Data Capture Options
+        These options affect the data captured in the "Calls" array (see the
+        The Calls ARRAY entry elsewhere in this document) and passed to the
+        "PreCall" and "PostCall" handlers.
+
+        Options may be added to the hash refs passed to "trace_calls". Here
+        are the options and their default values (all defaults chosen to
+        minimize overhead):
+
+            CaptureStack       => 0,
+            CaptureCallTimes   => 0,
+            CaptureReturnTimes => 0,
+            CaptureSelf        => 0,
+            CaptureArgs  => 0,
+            CaptureResult      => 0,
+
+            CaptureAll         => 0,  ## Shorthand for setting all of the others
+
+        Is CaptureStack is true, the
+
+            StackCaptureDepth => 1_000_000,
+
+        option controls the maximum number of stack frames that will be
+        captured. Set this to "1" to capture just a single stack frame
+        (equiv. to caller 0).
+
+OO API
+    The object oriented interface provides for more flexible than the other
+    APIs. A tracer will remove all of it's trace points when it is deleted
+    and you can add (and someday, remove) trace points from a running
+    tracer.
+
+    Someday you'll also be able to enable and disable tracers.
+
+    new
+            my $t = Devel::TraceCalls->new(
+                ... any params you might pass to trace_calls...
+            );
+
+    add_trace_points
+            $t->add_trace_points( 
+                ...any params you might pass to trace_calls...
+            );
+
+        Add trace points to an existing tracer. Trace points for subs that
+        already have trace points will be ignored (we can add an option to
+        enable this; send me a patch or contact me if need be).
+
+Captured Data Format
+    The LogTo option can be used to log all data to an array instead of to a
+    filehandle by passing it an array reference:
+
+        LogTo => \@data,
+
+    When passing in an array to capture call data (by using the "Calls"
+    option), the elements will look like:
+
+        {
+            Name       => "SubName",
+            Self       => "$obj",
+            CallTime   => $seconds,  ## A float if Time::HiRes installed
+            ReturnTime => $seconds,  ## A float if Time::HiRes installed
+            TraceDepth => $count,    ## How deeply nested the trace is.
+            WantArray  => $wantarray_result,
+            Result     => [ "c" ],   ## Dumped with Data::Dumper, if need be
+            Args       => [
+                "foo",               ## A scalar was passed
+                "{ a => 'b' }",      ## A HASH (dumped with Data::Dumper)
+                ...
+            ],
+            Stack      => [
+                [ ... ],             ## Results of caller(0).
+                ....                 ## More frames if requested
+            ],
+        }
+
+    NOTE: Many of these fields are optional and off by default. See the the
+    OPTIONS entry elsewhere in this document section for details. Tracing
+    (via the "LogTo" parameter) enables several Capture options regardless
+    of the passed-in settings.
+
+    "Result" is an array of 0 or more elements. It will always be empty if
+    the sub was called in void context ( WantArray => undef ).
+
+    Note that "Self", "Args" and "Result" are converted to strings to avoid
+    keeping references that might prevent things from being destroyed in a
+    timely manner. Data::Dumper is used for "Args" and Result, plain
+    stringification is used for Self.
+
+Using in other Devel:: modules
+    The main advantage of the Devel:: namespace is that the "perl -d:Foo
+    ..." syntax is pretty handy. Other modules which use this might want to
+    be in the Devel:: namespace. The only trick is avoiding calling
+    Devel::TraceCalls' import() routine when you do this (unless you want to
+    for some reason).
+
+    To do this, you can either carefully avoid placing "Devel::TraceCalls"
+    in your Devel::* module's "@ISA" hierarchy or make sure that your
+    module's "import()" method is called instead of "Devel::TraceCalls"'. If
+    you do this, you'll need to have a "sub DB::DB" defined, because
+    "Devel::TraceCalls"' wont be. See the source and the the Devel::TraceSAX
+    manpage module for details.
+
+LIMITATIONS
+    There are several minor limitations.
+
+    Exports a subroutine by default. Do a "use Devel::TraceCalls ();" to
+    suppress that.
+
+    If perl's optimized away constant functions, well, there is no call to
+    trace.
+
+    Does not get parameters from the call stack. This will change when I get
+    a chance. It will be optional, on by default, if it changes.
+
+    Because a wrapper subroutine gets installed in place of the original
+    subroutine, anything that has cached a reference (with code like $foo =
+    \&foo or $foo = Bar->can( "foo" )) will bypass the tracing.
+
+    If a subroutine reference is taken while tracing is enabled, then after
+    tracin,g is disabled it will refer to the wrapper subroutine that no
+    longer has something to wrap. We can't use closures to get around this
+    because closures can't be prototyped.
+
+    The import based "use Devel::TraceCalls { ... }" feature relies on a
+    "CHECK" subroutine, which is not present on older perls. See the perlmod
+    manpage for details.
+
+    Doesn't warn if you point it at an empty class, or if you pass no subs.
+    This is because you might be passing in a possibly empty list. Check the
+    return value's subs method to count up how many overrides occured.
+
+PRIOR ART
+    See Devel::TraceMethods and Aspect::Trace for similar functionality.
+
+    Merlyn also suggested using Class::Prototyped to implement the instance
+    subclassing, but it seems too simple to do without incurring a
+    prerequisite module.
+
+    A miscellany of tricky modules like Sub::Versive, Hook::LexWrap, and
+    Sub::Uplevel.
+
+AUTHOR
+        Barrie Slaymaker <barries@slaysys.com>
+
+COPYRIGHT
+        Copyright (c) 2002 Barrie Slaymaker, All Rights Reserved.
+
+    You may use this module under the terms of the Artistic License or the
+    GPL, any version.
+

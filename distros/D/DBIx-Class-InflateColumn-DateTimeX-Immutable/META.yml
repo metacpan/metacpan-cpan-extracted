@@ -1,0 +1,33 @@
+---
+abstract: 'Inflate/deflate DBIx::Class columns to DateTimeX::Immutable objects'
+author:
+  - 'Mark Grimes, E<lt>mgrimes@cpan.orgE<gt>'
+build_requires:
+  DBD::SQLite: '0'
+  DateTime::Format::SQLite: '0'
+  SQL::Translator: '0.11018'
+  Test::More: '0.87'
+configure_requires:
+  Module::Build: '0.4004'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-InflateColumn-DateTimeX-Immutable
+provides:
+  DBIx::Class::InflateColumn::DateTimeX::Immutable:
+    file: lib/DBIx/Class/InflateColumn/DateTimeX/Immutable.pm
+    version: '0.33'
+requires:
+  DBIx::Class: '0.000'
+  DateTimeX::Immutable: '0.30'
+  Try::Tiny: '0.000'
+  namespace::autoclean: '0.21'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mvgrimes/perl-dbic-inflate-datetimex-immutible/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mvgrimes/perl-dbic-inflate-datetimex-immutible
+version: '0.33'

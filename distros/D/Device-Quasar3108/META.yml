@@ -1,0 +1,19 @@
+---
+name: Device-Quasar3108
+version: 0.04
+author:
+  - 'Nicholas J Humfrey, njh@ecs.soton.ac.uk'
+abstract: Control Quasar Electronics Serial I/O Module
+license: perl
+requires:
+  Device::SerialPort: 0.20
+  Test: 1.00
+  Time::HiRes: 0
+  perl: 5.5.0
+build_requires:
+  Module::Build: 0.20
+provides:
+  Device::Quasar3108:
+    file: lib/Device/Quasar3108.pm
+    version: 0.04
+generated_by: Module::Build version 0.2611

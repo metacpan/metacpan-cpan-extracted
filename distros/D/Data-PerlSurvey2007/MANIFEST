@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+perlsurvey2007.csv
+PerlSurvey2007.pm
+questions.txt
+README
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/read.t
+t/split.t
+META.yml                                 Module meta-data (added by MakeMaker)

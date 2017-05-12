@@ -1,0 +1,6 @@
+Revision history for Perl extension Devel::SummarizedWarnings.
+
+0.01  Sun Oct 19 21:24:03 2003
+	- original version; created by h2xs 1.6 with options
+		-X -P -n Devel::SummarizedWarnings
+

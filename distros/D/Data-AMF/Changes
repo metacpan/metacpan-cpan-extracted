@@ -1,0 +1,47 @@
+Revision history for Perl extension Data::AMF
+
+0.09 2010-08-31T15:28:16+09:00
+     - fixed numeric string start with '0' encoded as number, it should be encoded as string.
+
+0.08 2010-08-04T09:15:06+09:00
+     - fixed bug that Data::AMF::Message didn't compiled at all (by Artem S Vybornov)
+     - on AMF3, some fractional numbers was serialized as integers (by Artem S Vybornov)
+
+0.07 2010-07-29T17:35:59+09:00
+     - added missing undefined check on io read functions
+
+0.06 2010-07-21T14:45:17+09:00
+     - minor changes for recent Moose
+
+0.05 2010-07-21T11:45:32+09:00
+     - use Any::Moose
+
+0.04 2010-05-20T15:08:31+09:00
+     - fixed AMF3 empty string handling (seagirl++)
+
+0.03 2009-12-24T21:39:01+09:00
+     - added AMF3 support (seagirl++)
+     - added Data::AMF::Remoting (seagirl++)
+
+0.02004 2008-08-19T11:08:14+09:00
+     - now serialize can handle multiple array data at once, same as deserialize
+
+0.02003 2008-08-14T12:47:20+09:00
+     - fixed buggy write_u24 on IO class.
+     - added parse/format test for empty object.
+
+0.02002 2008-08-13T15:52:17+09:00
+     - added support to read/write 24bit int in Data::AMF::IO
+
+0.02001 2008-08-08T10:59:42+09:00
+     - added YAML into test_require.
+       "use_test_base;" does not include this module...
+
+0.02 2008-08-07T14:35:14+09:00
+     - added support to parse reference data-type
+
+0.01001 2008-07-23T15:13:38+09:00
+     - added perl in prereqs, and fixed stupid typo 'use 0.008001' ><
+
+0.01 2008-07-22T23:31:35+09:00
+     - original version

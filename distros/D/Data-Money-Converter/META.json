@@ -1,0 +1,58 @@
+{
+   "abstract" : "Moo Role for Data::Money Converters.",
+   "author" : [
+      "Corey Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.052, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Money-Converter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Money" : "0.17",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Money::Converter" : {
+         "file" : "lib/Data/Money/Converter.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Data-Money-Converter.git",
+         "web" : "https://github.com/manwar/Data-Money-Converter"
+      }
+   },
+   "version" : "0.07"
+}
+

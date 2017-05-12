@@ -1,0 +1,78 @@
+Revision history for Data::Money
+
+0.17  2016-03-05 MANWAR
+      - Added key 'provides' to the Makefile.PL script.
+      - Added test script t/meta-json.t and t/meta-yml.t.
+
+0.16  2016-02-29 MANWAR
+      - Fixed the method clone() in the package Data::Money as it was breaking
+        Data::Money::Converter.
+
+0.15  2016-02-11 MANWAR
+      - Fixed error reported by CPANTESTER:
+        http://www.cpantesters.org/cpan/report/dfdbdb22-ce54-11e5-a096-cfe7ff3498d2
+        http://www.cpantesters.org/cpan/report/e68b303e-ce55-11e5-a096-cfe7ff3498d2
+
+0.14  2016-02-08 MANWAR
+      - Removed redundant import from test script t/subclass.t
+      - Fixed the error reported by CPANTTESTER:
+        http://www.cpantesters.org/cpan/report/71f95a70-cd6a-11e5-a125-fee1fbd2507e
+
+0.13  2016-02-07 MANWAR
+      - Fixed issue RT #111832 (raised by SREZIC).
+
+0.12  2016-02-06 MANWAR
+      - Merged PR #1 from DRAYLANG.
+
+0.11  2016-01-28 MANWAR
+      - Removed reference to 'Moose' from the pod document as it is no longer
+        dependent on it. It has been upgraded to use 'Moo' instead since v0.08
+        or above.
+
+0.10  2016-01-27 MANWAR
+      - Added prereqs Math::BigFloat v1.999704.
+      - Added missing 'use warnings;' statement  to some of the test scripts.
+      - Updated test scripts w.r.t the change in package name Data::Money::BaseException.
+
+0.09  2016-01-26 MANWAR
+      - Renamed Data::Money::Exception to Data::Money::BaseException to get around permission issue.
+      - Tidied up Changes file.
+
+0.08  2016-01-26 MANWAR
+      - Tweaked unit test (t/overload.t)
+      - Removed duplicate entry from the MANIFEST file.
+      - Added standard unit test scripts 00-load.t, pod.t and manifest.t.
+      - Added pod document to the package Data::Money::Exception.
+      - Added section "LICENSE AND COPYRIGHT".
+      - Updated README.
+      - Removed dependency on Check::ISA.
+      - Tidied up pod document.
+      - Downgrade dependency to Moo from Moose.
+      - Fixed failing unit tests.
+
+0.07  2014-01-11 GPHAT
+      - Update types to work with current Moose versions
+
+0.06  2012-06-28 ANELSON
+      - Remove a loose dependency in a test that was causing CPANtester failures.
+
+0.05  2012-06-21 ANELSON
+      - Changed croak() to Throwable exceptions
+      - Abandon rounding for enforced precision
+
+0.04  2010-10-15 ANELSON
+      - Added coercion from undef
+      - Fixed coercion from an empty string
+
+0.03  2010-10-05 GPHAT
+      - Added overloads for all basic arithmetic operations to disallow mismatched currency
+      - Add an overloaded three-way comparator and allow coercion from itself
+      - Add absolute value
+      - Add negation
+      - More unit tests
+
+0.02  2010-08-13 GPHAT
+      - Strip out formatting (holophrastic)
+
+0.01  2010-03-28 GPHAT
+      - First version, released on an unsuspecting world.

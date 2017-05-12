@@ -1,0 +1,31 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Date::Simple' => '0',
+                                      'Dist::Zilla::Role::FileGatherer' => '0',
+                                      'Git::Wrapper' => '0',
+                                      'Moose' => '0',
+                                      'POSIX' => '0',
+                                      'perl' => 'v5.6.0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

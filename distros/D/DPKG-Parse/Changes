@@ -1,0 +1,10 @@
+Revision history for DPKG-Parse
+
+0.03      2015-06-06 20:23:34Z
+          - stable release of 0.02
+
+0.02      2015-05-25 19:44:06Z (TRIAL RELEASE)
+          - fixes for current dpkg 'status' (RT#69920)
+
+0.01      2005-12-21 00:45:00Z
+          - initial release

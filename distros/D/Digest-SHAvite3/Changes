@@ -1,0 +1,8 @@
+Revision history for Digest-SHAvite3
+
+0.02  Mon Nov 29 11:04:26 UTC 2010
+    - Converted hex and base64 encoders to C.
+    - Added implicit reset upon call to digest method.
+
+0.01  Thu Nov 11 23:45:34 UTC 2010
+    - Initial distribution.

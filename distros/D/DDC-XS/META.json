@@ -1,0 +1,60 @@
+{
+   "abstract" : "Perl interface to libDDC* ddc concordance libraries",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DDC-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Alien::DDC::Concordance" : "0.001",
+            "ExtUtils::MakeMaker" : "6.52",
+            "ExtUtils::XSpp" : "0.18",
+            "JSON" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {},
+         "requires" : {
+            "Alien::DDC::Concordance" : "0.001",
+            "ExtUtils::MakeMaker" : "6.52",
+            "ExtUtils::XSpp" : "0.18",
+            "JSON" : "0",
+            "Test::More" : "0"
+         },
+         "suggests" : {
+            "DDC::Concordance" : "0.24"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "svn",
+         "url" : "svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl-xs/",
+         "web" : "https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl-xs/"
+      }
+   },
+   "version" : "0.18"
+}

@@ -1,0 +1,28 @@
+.perltidyrc
+.ship.conf
+.travis.yml
+Changes
+cpanfile
+lib/DBIx/TempDB.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/affiliate.mysql
+t/create-database.t
+t/database-name.t
+t/drop-from-child-1.t
+t/drop-from-child-2.t
+t/execute-file-mysql.t
+t/execute-file.t
+t/keep-database.t
+t/mysql-offline.t
+t/mysql-online.t
+t/parse-mysql.t
+t/pg-offline.t
+t/pg-online.t
+t/sqlite-offline.t
+t/sqlite-online.t
+t/users.sql
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

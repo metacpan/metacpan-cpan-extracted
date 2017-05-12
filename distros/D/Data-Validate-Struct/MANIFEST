@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+Struct.pm
+README
+Changelog
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,23 @@
+Revision history for Perl extension DBIx::Class::FromValidators
+
+0.02  Mon Nov 19 21:15:00 JST 2007
+        - no code changes
+        - dropped test: t/97_podspell.t
+        - add some build_requires for Catalyst
+        - includes inc/ directory
+
+0.01  Mon Nov 19 18:35:49 JST 2007
+        - change name from DBIx::Class::FromFormValidatorSimple
+
+        - previous logs
+          Sun Nov  4 19:58:03 JST 2007
+            remove validator class limitation (by cpanid:masaki)
+
+          Sat Nov  3 01:48:30 JST 2007
+            recieve first parameter should FormValidator::Simple::Results object
+            (thanks to cpanid:masaki)
+
+            add tests
+
+          Fri Nov  2 08:05:28 JST 2007
+            original version

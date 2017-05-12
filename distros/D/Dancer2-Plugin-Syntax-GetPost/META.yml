@@ -1,0 +1,44 @@
+---
+abstract: 'Syntactic sugar for GET+POST handlers'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dancer2: 0
+  Dancer2::Test: 0
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer2-Plugin-Syntax-GetPost
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::Syntax::GetPost:
+    file: lib/Dancer2/Plugin/Syntax/GetPost.pm
+    version: 0.002
+requires:
+  Dancer2::Plugin: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/dancer2-plugin-syntax-getpost/issues
+  homepage: https://metacpan.org/release/Dancer2-Plugin-Syntax-GetPost
+  repository: git://github.com/dagolden/dancer2-plugin-syntax-getpost.git
+version: 0.002

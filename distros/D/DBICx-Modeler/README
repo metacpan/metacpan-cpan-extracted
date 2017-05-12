@@ -1,0 +1,121 @@
+NAME
+    DBICx::Modeler - A Moose-based model layer over DBIx::Class
+
+VERSION
+    Version 0.005
+
+SYNOPSIS
+        # Given the following schema:
+
+        My::Schema::Artist
+        My::Schema::Cd
+        My::Schema::Track
+
+        # ... and the following model:
+
+        My::Model::Artist
+
+        use DBICx::Modeler::Model
+
+        My::Model::Cd ...
+        My::Model::Track ...
+
+        ...
+
+        my $modeler = DBICx::Modeler->new( schema => ..., namespace => My::Model );
+
+        my $artist = $modeler->create( Artist => { ... } ) # $artist is My::Model::Artist
+
+        my $cd = $artist->create_related( cds => { ... } ) # $cd is My::Model::Cd
+
+        ...
+
+        my $search = $artist->cds( { title => ... } ) # Start a search ...
+        $search->search( { ... } ) # Refine the search ...
+        my @cds = $search->slice( 0, 9 ) # Get the first 10     
+                                         # Each is of type My::Model::Cd
+
+DESCRIPTION
+    DBICx::Modeler is tool for making a thin, Moose-based model layer over a
+    DBIx::Class schema
+
+CAVEAT EMPTOR
+  Many-to-many is not handled
+    Many-to-many relationships are ignored, for now. You'll have to access
+    "_model__storage" (which is the DBIx::Class::Row) if you want to play
+    with them
+
+  The same storage object can be present in different model objects
+        # With the following example:
+        $artist->cds( ... )->slice( 0 )->artist # $artist and ->artist are different objects
+
+    This shouldn't be too difficult to fix.
+
+  The modeler will probably barf when trying to modify  immutable Model:: classes
+    This shouldn't be too difficult to fix, either.
+
+  Use "DBIC_MODELER" to trace modeler setup
+    Set "DBIC_MODELER" to 1 if you want to trace what is going on in the
+    modeler internally
+
+        $ENV{DBIC_MODELER} = 1
+
+METHODS
+    DBICx::Modeler->new( ... )
+
+        schema          The connected DBIx::Class schema to use/inspect
+
+        namespace       The package containing the Moose classes that will mimic the class structure of <schema>
+
+    $modeler->model( <moniker> )
+
+        Return the model source for <moniker>
+
+    $modeler->create( <moniker> => ... )
+
+        Create a new row for <moniker> and return the modeled object
+
+    $modeler->search( <moniker> => ... )
+
+        Make a search of <moniker> that will inflate into modeled objects
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dbicx-modeler at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBICx-Modeler>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBICx::Modeler
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBICx-Modeler>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBICx-Modeler>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBICx-Modeler>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBICx-Modeler/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

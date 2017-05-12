@@ -1,0 +1,60 @@
+Debug-Simple v0.10
+
+This module is just a very simple printf debugging library which integrates
+easily with Getopt::Long.
+
+This example shows how Debug::Simple code can be tied in with GetOpt::Long.
+
+    use Debug::Simple;
+    use Getopt::Long;
+
+    help() unless GetOptions( $opt = {},
+        qw(help debug:i quiet test verbose|v+) );
+    help() if $opt->{help};
+    Debug::Simple::debuglevels($opt);
+
+    warning("This is a warning\n");
+    debug(2, "Command line options ", OPT=>$opt);
+    verbose(1, "Now on with the show\n");
+
+    ...
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Debug::Simple
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Simple
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Debug-Simple
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Debug-Simple
+
+    Search CPAN
+        http://search.cpan.org/dist/Debug-Simple
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Behan Webster
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

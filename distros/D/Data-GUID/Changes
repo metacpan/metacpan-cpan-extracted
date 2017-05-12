@@ -1,0 +1,54 @@
+Revision history for Data-GUID
+
+0.049     2017-01-23 19:04:58-05:00 America/New_York
+        - Data::UUID can sometimes produce duplicate UUIDs when a single UUID
+          generator is used on both sides of a fork.  Data::GUID now silently
+          replaces its UUID generator when the pid changes.  (bug reported by
+          Matthew Horsfall)
+
+0.048     2013-12-13 08:23:33 America/New_York
+          update bugtracker and repo links
+
+0.047     2013-07-05 21:26:38 America/New_York
+          repackage, update bug tracker
+
+0.046     2011-01-18
+
+          match guid strings with no hyphens
+
+          make the guid-matching regexes public
+
+0.045     2009-01-16
+          add repo info to metadata
+
+0.044     2007-03-08
+          require newer Data::UUID to avoid broken Debian ersatz Data::UUID
+          included in libossp-uuid-perl
+
+0.043     2007-03-08
+          require newer Data::UUID to avoid broken Debian ersatz Data::UUID
+          included in libossp-uuid-perl
+
+0.042     2006-11-13
+          remove traces of old custom exporter
+          packaging improvements
+
+0.04      2006-03-12 12:00
+          replace custom exporter with Sub::Exporter
+
+0.03      2006-02-28 20:00
+          numerous little bugfixes in guid_*
+          best_guess and from_any_string
+          100% test coverage
+
+0.02      2006-02-27 20:00
+          validate from_X input and throw exceptions
+          first-draft _GUID routine to sate ADAMK
+          correct prereqs (thanks, DWHEELER!)
+
+0.01      2006-02-26 23:20
+          fixes to documentation (thanks, HDP!)
+          added guid_* methods/subs and import routine
+
+0.00      2006-02-25 17:25
+          first release, all skin and bones

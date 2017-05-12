@@ -1,0 +1,135 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001003
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001002 2014-09-07T08:54:48Z
+
+1.001001 2014-09-05T03:26:01Z
+ [Added / test requires]
+ - Module::Metadata
+
+1.001000 2014-09-04T21:06:03Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+ [Removed / test requires]
+ - File::Copy::Recursive
+ - FindBin
+ - Path::Tiny
+
+1.000002 2014-08-15T21:18:20Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+1.000001 2014-07-18T15:14:08Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0.9908 → 0.77
+
+1.000000 2014-04-30T22:34:56Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - FindBin
+ - List::Util
+ - version 0.9908
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4203
+
+ [Removed / configure requires]
+ - Module::Build 0.4203
+
+ [Removed / test requires]
+ - Cwd
+ - Path::FindDev
+
+0.1.6 2013-11-29T14:52:26Z
+ [Changed / build requires]
+ - Module::Build 0.4202 → 0.4203
+
+ [Changed / configure requires]
+ - Module::Build 0.4202 → 0.4203
+
+0.1.5 2013-11-22T08:56:22Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.1.4 2013-09-25T22:27:11Z
+
+0.1.3 2013-09-25T10:32:16Z
+ [Added / test requires]
+ - Cwd
+ - File::Copy::Recursive
+ - File::Spec
+ - Path::FindDev
+ - Path::Tiny
+ - Test::DZil
+ - Test::Fatal
+
+0.1.2 2013-08-31T02:47:34Z
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Removed / test requires]
+ - Capture::Tiny
+ - blib
+
+0.1.1 2013-08-07T22:34:28Z
+ [Added / test requires]
+ - Capture::Tiny
+ - blib
+
+ [Changed / build requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4005 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp

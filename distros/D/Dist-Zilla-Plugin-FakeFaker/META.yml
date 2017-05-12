@@ -1,0 +1,22 @@
+---
+abstract: 'Because sometimes you just have to fake it'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-FakeFaker
+requires:
+  Dist::Zilla: 4.101582
+  Dist::Zilla::Plugin::MakeMaker: 4.101582
+  perl: 5.008005
+resources:
+  homepage: http://github.com/bingos/dist-zilla-plugin-fakefaker
+  repository: http://github.com/bingos/dist-zilla-plugin-fakefaker
+version: 0.04

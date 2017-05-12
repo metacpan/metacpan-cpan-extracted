@@ -1,0 +1,42 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 e86f337ff1eec1dc1f81227c93f61b37d01baae9 Changes
+SHA1 750dd4d874e5e0030645ca4b90f3b2fa97995295 INSTALL
+SHA1 4fd10efcea7157e7d9c3a45e000c91119dcad1f7 LICENSE
+SHA1 2001765e92fb4eab3938af504e641a11df01d460 MANIFEST
+SHA1 048b3c3df2712d126f8c53d623ea41230b7b33b9 MANIFEST.SKIP
+SHA1 9f980eaaa9ffc0399d9acd504359211ff3cffb31 META.json
+SHA1 122901c48ba117c85a8c774e0ff545fb6d3e3a8c META.yml
+SHA1 2d678bf98686ff7088e4072f90a5bad3e5638db1 Makefile.PL
+SHA1 38500f17fb5171f5e29c37bc88936d7926ee3c83 README
+SHA1 89d8777391ee54b8345fb4a07f516465aacfbc67 dist.ini
+SHA1 c3bbd894680ff19fbb2028740dc561d6b83abb97 lib/Dancer/Template/Tenjin.pm
+SHA1 933c30dfab4d0ec50e2f3bf3c4ba68c134d504ef t/00-load.t
+SHA1 697ce38237fd0ae709c37b8427757f1356e043b3 t/01-basic.t
+SHA1 c0a896ed5236e7d41ec953928ae97d8ef99507be t/01-basic.tt
+SHA1 73c15ffed96c11a06ea5164b0ef31db7daf995cb t/01-encoding.tt
+SHA1 2add1e38a764a97e29e74a6433f54b798b89d00f t/01-encoding2.tt
+SHA1 87768d177f8c2e2df9c591cde869e7c8a245555e t/release-dist-manifest.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iF0EAREIAAYFAk2U1mkACgkQa4OHQAFM10eC5QD3TTvkAbS6A5m8hEGNMwCqBN/I
+1pM6TWa16Bj/bUo70wD9EJbKv0Aebus/rzYzHX9PMECJH8nvHNkX2CR6dxSW8JI=
+=F+ir
+-----END PGP SIGNATURE-----

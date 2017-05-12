@@ -1,0 +1,133 @@
+{
+   "abstract" : "A plugin bundle for distributions built by OALDERS",
+   "author" : [
+      "Olaf Alders <olaf@wundercounter.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-OALDERS",
+   "no_index" : {
+      "directory" : [
+         "examples",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::Code::TidyAll" : "0.50",
+            "Test::More" : "0.88",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::AutoPrereqs" : "0",
+            "Dist::Zilla::Plugin::CPANFile" : "0",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::ConfirmRelease" : "0",
+            "Dist::Zilla::Plugin::ContributorsFile" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::ExecDir" : "0",
+            "Dist::Zilla::Plugin::ExtraTests" : "0",
+            "Dist::Zilla::Plugin::Git::Check" : "0",
+            "Dist::Zilla::Plugin::Git::Commit" : "0",
+            "Dist::Zilla::Plugin::Git::Contributors" : "0",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "0",
+            "Dist::Zilla::Plugin::Git::Push" : "0",
+            "Dist::Zilla::Plugin::Git::Tag" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::InstallGuide" : "0",
+            "Dist::Zilla::Plugin::License" : "0",
+            "Dist::Zilla::Plugin::MAXMIND::TidyAll" : "0",
+            "Dist::Zilla::Plugin::MakeMaker" : "0",
+            "Dist::Zilla::Plugin::Manifest" : "0",
+            "Dist::Zilla::Plugin::ManifestSkip" : "0",
+            "Dist::Zilla::Plugin::MetaJSON" : "0",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaResources" : "0",
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::PkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodCoverageTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::PruneCruft" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::ShareDir" : "0",
+            "Dist::Zilla::Plugin::Test::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "0",
+            "Dist::Zilla::Plugin::Test::ReportPrereqs" : "0",
+            "Dist::Zilla::Plugin::Test::Synopsis" : "0",
+            "Dist::Zilla::Plugin::Test::TidyAll" : "0",
+            "Dist::Zilla::Plugin::TestRelease" : "0",
+            "Dist::Zilla::Plugin::TravisCI::StatusBadge" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PluginBundle::PluginRemover" : "0",
+            "List::AllUtils" : "0",
+            "Moose" : "0",
+            "Pod::Elemental::Transformer::List" : "0",
+            "Types::Path::Tiny" : "0",
+            "Types::Standard" : "0",
+            "feature" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Code::TidyAll" : "0.49",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders/issues"
+      },
+      "homepage" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders.git",
+         "web" : "https://github.com/oalders/dist-zilla-pluginbundle-author-oalders"
+      }
+   },
+   "version" : "0.000010",
+   "x_contributors" : [
+      "Karen Etheridge <ether@cpan.org>",
+      "Olaf Alders <olaf@wundersolutions.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0225"
+}
+

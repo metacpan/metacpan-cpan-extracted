@@ -1,0 +1,88 @@
+{
+   "abstract" : "Add a debian/control file to your distribution ",
+   "author" : [
+      "Shantanu Bhadoria <shantanu at cpan dott org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Control-Debian",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus",
+         "inc"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Software::Release" : "0",
+            "Software::Release::Change" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Control::Debian" : {
+         "file" : "lib/Dist/Zilla/Plugin/Control/Debian.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shantanubhadoria/dist-zilla-plugin-control-debian/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-Control-Debian",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/shantanubhadoria/dist-zilla-plugin-control-debian.git",
+         "web" : "https://github.com/shantanubhadoria/dist-zilla-plugin-control-debian"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Shantanu <shantanu@cpan.org>"
+   ]
+}
+

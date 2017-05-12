@@ -1,0 +1,14 @@
+0.05 Tuesday April 20 18:36:17 PDT 2010:
+    - Incorporated bdiff, bpatch from Simon Edwards (rt.cpan.org 56731)
+
+0.04 Wednesday October 14 14:44:05 PDT 2009:
+    - Added patch documentation
+
+0.03 Saturday May 16 00:45:42 PDT 2009:
+    - Added Test::Most dependency
+
+0.02 Thursday May 14 20:29:38 PDT 2009:
+    - Include Carp::Clan dependency in Makefile.PL
+
+0.01 Tuesday May 05 18:30:45 PDT 2009:
+    - Initial release onto The PAN

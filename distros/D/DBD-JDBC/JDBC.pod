@@ -1,0 +1,967 @@
+
+=head1 NAME
+
+DBD::JDBC - JDBC proxy driver for the DBI module
+
+=head1 SYNOPSIS
+
+    use DBI;
+  
+    $dbh = DBI->connect("dbi:JDBC:hostname=$hostname;port=$port;url=$url",
+                        $user, $password);
+
+    # See the DBI module documentation.
+
+
+=head1 REQUIRES
+
+  Perl 5.8.6 or higher
+  DBI 1.48 or higher
+  Convert::BER 1.31
+  Java Virtual Machine compatible with JDK 1.4
+  A JDBC driver
+  log4j 1.2.13
+
+=head1 DESCRIPTION
+
+DBD::JDBC is a Perl module which works in conjunction with a
+server written in Java to provide a DBI front end to a JDBC
+driver. The Perl module and Java server may be installed on
+different machines, as long as socket connections are
+allowed. The Java server portion is multi-threaded and supports
+multiple simultaneous connections.
+
+This driver currently supports JDBC drivers which implement the
+JDBC 1.22 interface.  JDBC 2.0-compatible drivers are expected to
+work, but no JDBC 2.0 functionality is explicitly exposed via
+DBD::JDBC. The C<$h-E<gt>jdbc_func> method exposes additional JDBC
+and driver-specific methods. Only Java methods with primitive or
+String parameters and return types are currently supported in
+this way.
+
+The expected use for this module is as a DBI interface to
+databases with JDBC drivers but no DBI drivers. The
+implementation of this module was originally done for a non-SQL
+database in order to take advantage of the existing SQL parser in
+the database's JDBC driver.
+
+The Java classes provided with this module also allow a Java
+application or servlet to create a JDBC connection and then
+execute a Perl script which can use that pre-existing JDBC
+connection via DBI. This particular functionality was implemented
+in order to allow Perl customizations to a Java servlet-based
+application. See the example in the C<example/> directory.
+
+
+
+=head1 CONNECTING
+
+Before using DBD::JDBC, you must start the DBD::JDBC server. 
+
+=head2 Starting the server
+
+The DBD::JDBC server is a Java application intended to be run
+from the command line. It may be installed, along with whatever
+JDBC driver you wish to use, on any host capable of accessing the
+database you wish to use via JDBC. Perl applications using
+DBD::JDBC will open a socket connection to this server. You will
+need to know the hostname and port where this server is running.
+
+To start the server,
+
+=over 4
+
+=item 1
+
+Place the dbd_jdbc.jar file, log4j-1.2.13.jar, and your
+database's JDBC driver on the machine where you wish to run the
+server.
+
+=item 2
+
+Add dbd_jdbc.jar, log4j-1.2.13.jar, a log4j.properties file, and
+your database's JDBC driver to your classpath. Follow any other
+instructions which came with your JDBC driver. For example, a
+type 2 JDBC driver may require that the database's native
+libraries be added to your path or library path.
+
+=item 3
+
+Start the server, providing at least the required system
+properties on the command line:
+
+=over 4
+
+=item jdbc.drivers I<(required)>
+
+This should be set to the complete class name of your JDBC
+driver. If you want to use more than one JDBC driver, use a
+colon-separated list of driver names. See the standard Javadoc
+documentation for C<java.sql.DriverManager> for an example.
+
+=item dbd.port I<(required)>
+
+This is the port to which this server will listen. Your Perl
+client applications will need to know this in order to connect.
+
+=back
+
+=back
+
+Example
+
+  java -Djdbc.drivers=foo.bar.Driver -Ddbd.port=12345 com.vizdom.dbd.jdbc.Server
+
+Here is a simple example shell script for running the server
+(written for bash).
+
+  export CLASSPATH=dbd_jdbc.jar:log4j-1.2.13.jar:.:/oracle/jdbc/classes111.zip:$CLASSPATH
+  DRIVERS=oracle.jdbc.driver.OracleDriver
+  java -Djdbc.drivers=$DRIVERS -Ddbd.port=9001 com.vizdom.dbd.jdbc.Server
+
+
+=head2 Setting up log4j
+
+As of DBD:JDBC 0.70, the server uses log4j for logging. log4j is
+a Java logging implementation from the Apache Logging
+project. More information is available at
+http://logging.apache.org/log4j/docs/. 
+
+A log4j jar file and sample configuration file are included with
+DBD::JDBC. The log4j jar file is in the t/hsqldb directory since
+it's also used by hsqldb. The properties file, log4j.properties,
+is in the unzipped module directory. The sample
+log4j.properties file has all logging disabled. To enable
+logging, change the value of OFF in the following line
+
+  log4j.logger.com.vizdom.dbd.jdbc = OFF
+
+to one of the following values: FATAL, ERROR, WARN, INFO, DEBUG,
+TRACE, ALL. Log messages will be written to stdout. You can
+configure log4j to log to files; see the log4j documentation for
+more information on how to configure log4j.
+
+Here's an example command line which starts the server from the
+unzipped module distribution (no JDBC driver is included in the
+classpath). Notice that "." is in the classpath in order to
+locate log4j.properties.
+
+java -Ddbd.port=9001 -classpath 'dbd_jdbc.jar;t/hsqldb/log4j-1.2.13.jar;.' com.vizdom.dbd.jdbc.Server 
+
+
+=head2 Connecting to the server
+
+A dsn for DBD::JDBC has the following form:
+
+    dbi:JDBC:hostname=$host;port=$port;url=$url;jdbc_character_set=$charset
+
+where 
+
+=over 4
+
+=item *
+
+C<$host> is the hostname on which the DBD::JDBC server is running
+(optionally followed by C<:$port>; if so, the port name/value
+pair is optional).
+
+=item *
+
+C<$port> is the port on which the DBD::JDBC server is running.
+
+=item *
+
+C<$url> is a complete JDBC url for your JDBC driver. You might
+want to test this URL in a Java application (in the same
+environment in which you intend to run the DBD::JDBC server)
+before attempting to connect from Perl. Your JDBC url may need to
+include your database host and port information; these values are
+distinct from those needed in the DBD::JDBC dsn, which are for
+the DBD::JDBC server, not the database.
+
+If the JDBC url contains the characters ';' or '=', those
+characters must be URL-encoded. For example,
+
+    $url =~ s/([=;])/uc sprintf("%%%02x",ord($1))/eg;
+
+The driver will unescape the url before sending it to the JDBC
+driver. [See the driver code if you really want to know why.]
+
+=item *
+
+C<$charset> is the character set used by your DBI application
+(i.e. the character set in use on whichever machine is running
+Perl, not the machine running the DBD::JDBC server, unless
+they're the same). This should be specified in the form of a
+valid Java character encoding name. If no character set is given,
+the driver defaults to ISO8859_1. See
+http://java.sun.com/products/jdk/1.1/docs/guide/intl/encoding.doc.html
+for a list of supported encodings. The character set name must be
+encoded in ASCII so that the server can appropriately decode it.
+
+Any strings sent to the DBD::JDBC server as parameter values will
+be converted from this encoding to Unicode (Java's native
+encoding). Use C<bind_param> and a type hint to avoid character
+set conversion of binary data. Data being returned as strings
+(everything other than binary columns) will be converted to this
+encoding.
+
+The character set in use will be available as the database handle
+attribute 'jdbc_character_set'. Changing this attribute will have
+no effect on character conversion; the character set is
+established at connection time.
+
+=back
+
+Example
+
+   $dsn = "dbi:JDBC:hostname=myhost;port=12345;url=jdbc:odbc:mydatasource";
+   $dsn = "dbi:JDBC:hostname=myhost:12345;url=jdbc:oracle:thin:\@mydbhost:1521:test;jdbc_character_set=ASCII";
+
+
+=head2 Specifying JDBC connection properties
+
+You can specify JDBC connection properties in the JDBC URL. You
+can also specify connection properties as follows: 
+
+   %properties = ('user' => 'user', 
+                  'password' => 'password', 
+                  'host.name' => 'dbhost', 
+                  'host.port' => '7000');
+
+   $dsn = "dbi:JDBC:hostname=host:9001;url=jdbc:opentext:db:";
+   $dbh = DBI->connect($dsn, undef, undef, 
+          { PrintError => 0, RaiseError => 1, jdbc_properties => \%properties })
+          or die "Failed to connect: ($DBI::err) $DBI::errstr\n";
+
+When specifying properties this way, use C<undef> for the user
+and password parameters in the C<DBI-E<gt>connect> method. The
+DBD::JDBC server will use the JDBC method
+C<DriverManager.getConnection(String, Properties)> when the
+username and password parameters are undefined. Otherwise, it
+will use the  JDBC method
+C<DriverManager.getConnection(String, String, String)> and ignore
+any other connection properties. 
+
+
+=head1 USAGE NOTES
+
+=head2 Reading long data
+
+As of DBD::JDBC 0.70, the default behavior of this driver is to
+read long fields in their entirety. This behavior is controlled
+by the driver attribute C<jdbc_longreadall>. When
+C<jdbc_longreadall> is true, the DBI attributes LongReadLen and
+LongTruncOk will be ignored and the entire contents of long
+fields will be returned. To return to the default DBI behavior,
+set C<jdbc_longreadall> to false. 
+
+
+=head2 Calling JDBC methods
+
+JDBC methods are exposed using the C<$h-E<gt>jdbc_func> method and Java
+reflection. This feature is not intended to replace any existing
+DBI methods, merely to provide access to JDBC-specific methods
+with no DBI equivalent. Reflection, rather than explicit methods
+corresponding to methods in the JDBC API, is used in order to
+allow access to driver-specific methods not in the JDBC API.
+
+The general syntax is
+
+  $h->jdbc_func(parameter, ..., <jdbc_method_name>);
+
+For example, 
+
+  $ret = $dbh->jdbc_func("getAutoCommit");
+  $ret = $sth->jdbc_func("mycursor", "Statement.setCursorName");
+
+The driver-specific method C<jdbc_func> replaces the previous use
+of the standard DBI method C<func> for calling JDBC
+methods. Since C<jdbc_func> is a driver-specific method, the
+C<jdbc_> prefix previously required on the method name argument
+is no longer required. Use of the C<jdbc_> prefix on the method
+name is still supported.
+
+The following limitations apply: 
+
+=over
+
+=item *
+
+Only public methods can be called.
+
+=item *
+
+In general, only methods whose parameters and return values are
+primitive types (C<int>, C<boolean>, C<void>, etc.) or Strings can be
+called. See below for more details.
+
+=item *
+
+DBD::JDBC doesn't know which methods are being called when
+reflection is used. This means that interleaving DBI methods and
+calls to JDBC methods using C<jdbc_func> may leave DBD::JDBC in an
+inconsistent state. One example of this is C<$sth-E<gt>rows>: if you've
+called C<ResultSet.next> directly, rather than using C<$sth-E<gt>fetch>,
+the row count will not accurately reflect the rows in the result
+set. 
+
+=item *
+
+Methods can only be called on the Connection, Statement,
+ResultSet, and ResultSetMetaData objects.
+
+=back
+
+The JDBC method name is used as the jdbc_func method name. Parameters
+are passed as strings by default. To pass parameters of other
+types, pass the parameter as reference to an array in which the
+first element is the parameter and the second is one of the DBI
+SQL_XXX typecodes. For example,
+
+    $h->jdbc_func("string parameter", [11 => SQL_INTEGER], 
+             [1 => SQL_BIT], "method_name");
+
+It is very important to use the correct typecodes for the actual
+parameter types of the Java method in order to enable Java
+reflection to locate the correct method. The method will be
+looked up using the C<java.lang.class.getMethod(String, Class[])>
+method, so if the parameter types don't match the actual method
+parameters, the method won't be found.
+
+SQL types are mapped to Java types by mapping the DBI constants
+to values from java.sql.Types, then mapping the C<java.sql.Types>
+values to Java types.
+
+    DBI constant           java.sql.Types constant    Java type
+    -----------------------------------------------------------
+    SQL_CHAR               CHAR                       String
+    SQL_VARCHAR            VARCHAR                    String
+    SQL_LONGVARCHAR        LONGVARCHAR                String
+    SQL_BINARY             BINARY                     byte[]
+    SQL_VARBINARY          VARBINARY                  byte[]
+    SQL_LONGVARBINARY      LONGVARBINARY              byte[]
+    SQL_BIT                BIT                        boolean
+    SQL_TINYINT            TINYINT                    byte
+    SQL_SMALLINT           SMALLINT                   short
+    SQL_INTEGER            INTEGER                    int
+    DBD::JDBC::SQL_BIGINT  BIGINT                     long
+    SQL_REAL               REAL                       float
+    SQL_FLOAT              FLOAT                      double
+    SQL_DOUBLE             DOUBLE                     double
+    SQL_NUMERIC            NUMERIC                    java.math.BigDecimal
+    SQL_DECIMAL            DECIMAL                    java.math.BigDecimal
+    SQL_DATE               DATE                       java.sql.Date
+    SQL_TIME               TIME                       java.sql.Time
+    SQL_TIMESTAMP          TIMESTAMP                  java.sql.Timestamp
+
+
+The mapping from C<java.sql.Types> to Java types is taken from Table
+21.6.1 in I<JDBC Data Access with Java>, by Hamilton, Cattell,
+and Fisher. See also Table 47.9.1 in I<JDBC API Tutorial and
+Reference, Second Edition>, by White, Fisher, Cattell, Hamilton,
+and Hapner.
+
+For C<SQL_DATE>, C<SQL_TIME>, and C<SQL_TIMESTAMP> parameters,
+the default JDBC string representations for these types must be
+used. 
+
+    SQL_DATE: yyyy-mm-dd
+    SQL_TIME: hh:mm:ss
+    SQL_TIMESTAMP: yyyy-mm-dd hh:mm:ss.f
+
+(The C<.f> portion of the timestamp format is in nanoseconds and
+is optional.)
+
+
+Possible return values from C<$h-E<gt>jdbc_func> are C<undef> if the
+Java method returned C<null> or had a C<void> return type, 1 or 0
+if the Java method had a C<boolean> return type, or a scalar for
+any other return type (the C<Object> returned by
+C<java.lang.reflect.Method.invoke> will be converted to a String
+by calling its C<toString> method).
+
+You are not limited to calling methods defined by the JDBC
+API. Any public method defined by your JDBC driver on the
+available objects, with parameters and return type as described
+above, may be called.
+
+C<jdbc_func> is made available using DBI's C<install_method>
+method. This means that errors are handled in the standard DBI
+manner, not the way they're handled for C<$h-E<gt>func>.
+
+
+B<Connection methods>
+
+To call JDBC methods on the JDBC Connection object, use the
+C<jdbc_func> method on the C<$dbh> handle. 
+
+Examples
+
+  
+    $ret = $dbh->jdbc_func("jdbc_getAutoCommit");
+    $dbh->jdbc_func([1 => SQL_BIT], "jdbc_setAutoCommit");
+    $ret = $dbh->jdbc_func("select * from client", "jdbc_nativeSQL");
+    $dbh->jdbc_func([4 => SQL_INTEGER], "jdbc_setTransactionIsolation");
+     
+
+B<Statement, ResultSet, and ResultSetMetaData methods>
+
+To call JDBC methods on the JDBC Statement, ResultSet, and
+ResultSetMetaData objects, use the C<jdbc_func> method on the C<$sth>
+handle and prefix the method name with one of the listed
+interface names. You may use either Statement or
+PreparedStatement to indicate the current PreparedStatement
+object, since DBD::JDBC uses PreparedStatements internally.
+
+ResultSet and ResultSetMetaData methods are not available until
+after C<$sth-E<gt>execute> has been called.
+
+Examples
+
+
+    $ret = $sth->jdbc_func("jdbc_Statement.getMaxFieldSize");
+    $sth1->jdbc_func("mycursor", "jdbc_Statement.setCursorName");
+    $sth1->jdbc_func([22 => SQL_INTEGER], "jdbc_Statement.setMaxFieldSize");
+
+    $ret = $sth1->jdbc_func("jdbc_ResultSet.next");
+    $ret = $sth1->jdbc_func("cname", "jdbc_ResultSet.getString");
+    $ret = $sth2->jdbc_func("eno", [5003 => SQL_INTEGER], "jdbc_ResultSet.updateInt");
+
+    $ret = $sth1->jdbc_func([1 => SQL_INTEGER], "jdbc_ResultSetMetaData.getSchemaName");
+
+
+B<Notes>
+
+If for some reason you reach the end of a ResultSet using
+C<$sth-E<gt>jdbc_func("ResultSet.next")> rather than one of the standard DBI
+methods (C<fetch>, etc.), the DBI statement handle will continue
+to think that it's active. You must call C<$sth-E<gt>finish> explicitly
+in this case.
+
+Be aware of which JDBC methods are called by the standard DBI
+methods. For example, C<$sth-E<gt>fetch> calls C<next> and reads all the
+columns in the current row. With some JDBC drivers, you will not
+be able to call $sth->fetch followed by C<$sth-E<gt>jdbc_func("column_name",
+"ResultSet.getString")> because all the data for the row has already been
+read. 
+
+
+If you are using a JDBC driver with scrollable result sets,
+please note that support for such is provided purely through
+C<jdbc_func>, not through any explicit DBD::JDBC support. This means
+that a loop over the set, such as
+
+    while ($row = $sth->fetch()) { 
+        # do something
+    }
+
+will cause DBD::JDBC to mark the statement handle as inactive at
+the end of the loop (C<$sth-E<gt>{Active}> will be false). You can still
+use C<jdbc_func> to operate on the underlying ResultSet, but you can't
+continue to use any DBI method which requires that the statement
+handle be active. The following sequence seems to work, though
+perhaps it shouldn't: 
+
+    while ($row = $sth->fetch()) { 
+        # do something
+    }
+    $sth->jdbc_func("ResultSet.beforeFirst");
+    while ($row = $sth->fetch()) { 
+        # do something else
+    }
+
+Some sort of explicit support for scrollable result sets will
+probably be implemented at a later date.
+
+
+
+=head2 Closing cursors
+
+When a statement handle goes out of scope, Perl will call its
+DESTROY method. This method will cause C<Statement.close> to be
+called on the associated Java C<Statement> object in the
+DBD::JDBC server. For many applications, this is
+sufficient. However, if you find that statement handles are not
+being destroyed quickly enough, or you are maintaining a
+collection of statements for repeated use, you may choose to
+close the ResultSet associated with the Statement explicitly
+using C<jdbc_func>. Closing the ResultSet will not prevent you from
+executing the statement again, but it will release any database
+resources held by the ResultSet.
+
+Typical usage: 
+
+    $sth = $dbh->prepare("select id from sched");
+    $sth->execute();
+    while ($row = $sth->fetch()) { 
+        # do something
+    }
+    # At this point, the statement handle is no longer active, but
+    # the ResultSet still exists on the server.
+    $sth->jdbc_func("ResultSet.close");
+
+
+DBD::JDBC does not close ResultSet objects when C<$sth-E<gt>finish> is
+called (whether it is called implicitly when the end of the
+result set is reached or explicitly in your program) in order to
+support scrollable result sets. With a scrollable result set,
+reaching the end of the data does not mean that the ResultSet
+is unusable, so calling C<close> would be unfortunate. 
+
+
+
+=head2 Character sets
+
+You can find out what character set Java thinks your platform
+uses by examining the value of the system property
+C<file.encoding>. 
+
+    System.out.println("This system uses: " + System.getProperty("file.encoding"));
+
+Local experimentation (in the US) indicates that Windows NT uses
+"Cp1252" (Windows Latin-1) and Unix variants (AIX, Solaris) use
+"ISO8859_1". 
+
+
+
+=head2 jdbc_error
+
+When a JDBC exception is thrown in the server, the exception and
+any exceptions chained to the original are returned and placed in
+the C<jdbc_error> attribute of the most-recently-used
+handle. This attribute will contain an array of hashrefs with
+keys C<err>, C<errstr>, and C<state>. The first error's values
+will also be available via C<$h-E<gt>err>, C<$h-E<gt>errstr>, and
+C<$h-E<gt>state>.
+
+    foreach $err (@{$sth->{jdbc_error}}) {
+        print "Error: ($err->{err}/$err->{state}) $err->{errstr}\n";
+    }
+
+
+=head2 DBI to JDBC method mappings
+
+What follows is a guide to the JDBC methods being called when a
+DBI method or property is accessed. See the source code for
+C<com.vizdom.dbd.jdbc.Connection> for details.
+
+=over 4
+
+=item DBI->connect
+
+        DriverManager.getConnection(url, username, password)
+        -or-
+        DriverManager.getConnection(url, properties)
+
+        Connection.setAutoCommit   [if AutoCommit was specified]
+
+=item $dbh->prepare
+
+        Connection.prepareStatement(statement)
+
+=item $dbh->commit
+
+        Connection.commit()
+
+=item $dbh->rollback
+
+        Connection.rollback()
+
+=item $dbh->disconnect
+
+        PreparedStatement.close()   [for each open statement]
+        Connection.close()
+
+=item $dbh->ping
+
+        Connection.isClosed()
+
+=item $dbh->{AutoCommit} 
+
+        Connection.getAutoCommit()
+        Connection.setAutoCommit()
+
+=item $sth->execute
+
+        PreparedStatement.setXXX(value)   [if there are any parameters]
+        PreparedStatement.execute()
+        PreparedStatement.getResultSet()
+        PreparedStatement.getUpdateCount()
+
+=item $sth->fetch
+
+        ResultSet.next()
+        ResultSet.getXXX
+
+=item $sth->{CursorName}
+
+        ResultSet.getCursorName()
+
+=item $sth->{NAME}
+
+        ResultSetMetaData.getColumnName()
+
+=item $sth->{TYPE}
+
+        ResultSetMetaData.getColumnType()
+
+=item $sth->{PRECISION}
+
+        ResultSetMetaData.getPrecision()
+
+=item $sth->{SCALE}
+
+        ResultSetMetaData.getScale()
+
+=item $sth->{NULLABLE}
+
+        ResultSetMetaData.isNullable()
+
+=item $sth->DESTROY
+
+        [This is called automatically when a statement handle
+        goes out of scope]
+
+        Statement.close()
+
+=back
+
+
+=head2 Statement parameters and column values
+
+Parameter values are sent to the DBD::JDBC server as a sequence
+of bytes. Numeric parameters are encoded as strings rather than
+numbers (so 11 is sent as the two characters '1' '1').
+
+When the DBD::JDBC server receives the parameter values, the
+bytes are converted to a Java String (using the character
+encoding specified at connection time by the jdbc_character_set
+value) and the PreparedStatement.setString() method is used to
+set the parameter value. 
+
+If a type hint (one of the SQL_XXX types you can import from the
+DBI module) is supplied along with a parameter in
+C<$sth-E<gt>bind_param()>, the type code will be mapped to the
+corresponding JDBC type code and passed along to the DBD::JDBC
+server. The JDBC type will be used to determine which
+PreparedStatement.setXXX method to call. The mapping from type
+hint to setXXX method is taken from Table 21.2, p. 394, in I<JDBC
+Data Access with Java>.
+
+        BINARY, VARBINARY, LONGVARBINARY: setBytes
+        TINYINT, SMALLINT: setShort
+        INTEGER: setInt
+        BIGINT: setLong
+        REAL: setFloat
+        FLOAT, DOUBLE: setDouble
+        DECIMAL, NUMERIC: setBigDecimal
+        BIT: setBoolean
+        CHAR, VARCHAR, LONGVARCHAR, DATE, TIME, TIMESTAMP: setString
+
+Type hints are required for binary data in order to avoid having
+binary parameter values passed through the default character
+conversion process. In other cases, they are generally optional
+and may in fact reduce performance by causing unneccessary data
+conversions. For example, if your database's JDBC driver passes
+all data to the database as strings, the JDBC driver will 
+have to convert numbers back to strings anyway. 
+
+A call to C<$sth-E<gt>fetch> will cause the DBD::JDBC server to
+use the column type information from ResultSetMetaData to
+determine how to retrieve column data.
+
+        Column type         Method used        
+        BINARY, VARBINARY   getBytes
+        LONGVARBINARY       getBinaryStream
+        BLOB                getBlob().getBinaryStream
+        CLOB                getClob().getCharacterStream
+        LONGVARCHAR         getCharacterStream
+        ARRAY               getString
+        all others          getString
+
+Once retrieved, the data is returned to Perl as a sequence of
+bytes. The caller may choose whether to treat the returned scalar
+as a character string, number, or byte string.
+
+
+=head2 NUM_OF_PARAMS implementation
+
+The statement attribute NUM_OF_PARAMS is set when C<$dbh-E<gt>prepare>
+is called. Since JDBC doesn't expose this information about
+PreparedStatements, DBD::JDBC uses a simple '?'  counting method
+which may fail to provide an accurate count if the parameter
+marker is not '?' or the syntax does not conform to standard SQL
+(and possibly even if it does, if I've interpreted the SQL
+grammar poorly). Depending on this value to be accurate is not
+recommended, although you may find that it is sufficient for your
+use.
+
+
+=head2 last_insert_id implementation
+
+The JDBC specification supports retrieval of generated keys after
+an insert statement as of Java 1.4. In some cases, it is possible
+for a JDBC driver to retrieve the generated keys without being
+provided any other information. In other cases, you must tell the
+driver the names of the columns representing the keys. According
+to the JDBC specification, this must be done when the statement
+is initially prepared or executed. The DBI specification for the
+C<last_insert_id> method allows you to ask for the generated
+keys, optionally by column name, after the statement has
+completed execution. In order to resolve this timing mismatch,
+DBD::JDBC can be given column names or indexes as optional
+parameters to the <$dbh-E<gt>prepare> method.
+
+    my @list = ('name', 'type'); 
+    $sth = $dbh->prepare("insert into document (name, author, type) " .
+         "values ('name','last_insert_id.t','memo')", 
+         { jdbc_columnnames => \@list });
+
+    @list = (1, 2); 
+    $sth = $dbh->prepare("insert into document (name, author, type) " .
+         "values ('name','last_insert_id.t','memo')", 
+         { jdbc_columnindexes => \@list });
+
+The column index values are intended to be indexes into the
+underlying table, not the corresponding elements of the insert
+list, so using them may require knowledge of your database
+table. 
+
+As suggested by the DBI specification, the last retrieved value
+for inserted key(s) will be cached by the connection until
+another value is retrieved.
+
+When the "table" or "field" parameters are provided in the call
+to C<last_insert_id>, the values must match the values provided
+in the ResultSetMetaData associated with the ResultSet returned
+by the JDBC C<getGeneratedKeys> method. If your JDBC driver
+doesn't set the metadata, you should avoid passing the parameters
+in the call to C<last_insert_id>. DBD::JDBC ignores the "catalog"
+and "schema" parameters since they're not used to determine the
+keys in JDBC.
+
+DBD::JDBC uses the JDBC method
+C<DatabaseMetaData.supportsGetGeneratedKeys> to determine whether
+to attempt to retrieve generated keys. If this method returns
+false, no keys will be retrieved.
+
+
+=head1 DIAGNOSTICS
+
+All errors generated by DBD::JDBC have IJDBC as the SQLSTATE. If
+a SQLException was thrown by the JDBC driver without a SQLSTATE,
+DBD::JDBC will set the SQLSTATE to IDRVR.
+
+=head2 Errors generated by the Perl driver
+
+=over 4
+
+=item Unsupported AutoCommit value  (no error number)
+
+If you attempt to set AutoCommit to anything other than 0 or 1,
+the driver will die with this error.
+
+=back
+
+=over 4
+
+=item Error code 100
+
+An error occurred while sending a request to the server.
+
+=item Error code 101
+
+An error occurred while receiving a response from the server.
+
+=item Error code 102
+
+There was a problem decoding a server response packet.
+
+=item Error code 103
+
+The dsn supplied to C<connect> is missing one or more required values.
+
+=item Error code 104
+
+A connection to the server could not be established. The server
+may not be running, or the host or port information may be
+incorrect. 
+
+=item Error code 105
+
+An C<$sth-E<gt>execute> call caused the server to return an invalid
+response. This is an internal error.
+
+=back
+
+=head2 Errors generated by the Java server
+
+=over 4
+
+=item Error code 1
+
+The client requested an operation on a statement object which does not
+exist on the serer. 
+
+=item Error code 2
+
+C<fetch> was called on a statement which has no data. For
+example, this error might result if C<fetch> is called before a
+statement is executed.
+
+=item Error code 3
+
+The server was asked to return the value of an unknown attribute.
+
+=item Error code 4
+
+This error code indicates that the client attempted to do
+something which requires a cursor (a ResultSet) on the server,
+but no cursor is present. 
+
+=item Error code 5
+
+No metadata is currently available. This error will result if a
+request is made for a statement attribute at a time when no
+ResultSet is associated with the statement. 
+
+=item Error code 6
+
+This error code indicates that the client sent a message to the
+server which the server does not understand.
+
+=item Error code 7
+
+The server was unable to respond
+to the client's request. This error would likely be sent as the
+result of another, undetected, error on the server.
+
+=item Error code 8
+
+This error code is used when the server wishes to send a random
+error string to the client. For example, arbitrary Java
+exceptions may be sent with this error code. 
+
+=item Error code 9
+
+An error occurred during C<fetch>. The error text will describe
+the actual error.
+
+=item Error code 10
+
+This error code indicates that the client's requested character
+encoding is not supported. 
+
+=item Error code 11
+
+An error occurred while setting a statement parameter.
+
+=item Error code 12
+
+A long field was truncated during C<fetch>.
+
+=item Error code 13
+
+A reflection request was made, but there's no object on which to
+call the indicated method. For example, trying to call
+C<ResultSet.next> before calling C<$sth-E<gt>execute> will cause this
+error to be reported, since no ResultSet exists.
+
+=item Error code 14
+
+An unknown class name was passed to C<$sth-E<gt>jdbc_func>.
+
+=item Error code 15
+
+A Java exception related to reflection was thrown. This may
+include, for example, C<NoSuchMethodException> if the requested
+method can't be located.
+
+=back
+
+
+
+=head1 TO DO
+
+See the ToDo file included with the distribution. Highlights include
+
+=over 4
+
+=item *
+
+Make the complete JDBC interface available from DBI.
+
+=item *
+
+DBI metadata methods, cancel, row cache.
+
+=item *
+
+Better handling of long fields via some sort of streaming interface.
+
+=item *
+
+JDBC 2.0 support.
+
+=back
+
+
+=head1 SEE ALSO
+
+perldoc DBI
+
+For general DBI information and questions, see the DBI home
+page at
+
+    http://dbi.perl.org/
+
+This site contains pointers to archives of the DBI mailing lists
+and list subscription information. DBI in general is primarily
+supported through the dbi-users mailing list.
+
+
+=head1 AUTHOR
+
+Gennis Emerson <gemerson@vizdom.com>
+
+
+=head1 COPYRIGHT
+
+Copyright 1999-2001,2005-2006 Vizdom Software, Inc. All Rights Reserved.
+  
+This program is free software; you can redistribute it and/or 
+modify it under the same terms as the Perl Kit, namely, under 
+the terms of either:
+  
+      a) the GNU General Public License as published 
+      by the Free Software Foundation; either version 1 
+      of the License, or (at your option) any later 
+      version, or
+  
+      b) the "Artistic License" that comes with the 
+      Perl Kit.
+
+This program is distributed in the hope that it will be seful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See
+either the GNU General Public License or the Artistic License
+for more details. 
+
+
+=head1 hsqldb COPYRIGHT
+
+The tests for this module make use of hsqldb. 
+
+  Copyright (c) 2001-2005, The HSQL Development Group
+  All rights reserved.
+
+  Copyright (c) 1995-2000, The Hypersonic SQL Group.
+  All rights reserved.
+
+See the full hsqldb copyright and license statements in the
+t/hsqldb directory or at http://hsqldb.org/. 
+
+=cut
+
+

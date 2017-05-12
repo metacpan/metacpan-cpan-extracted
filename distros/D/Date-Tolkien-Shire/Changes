@@ -1,0 +1,126 @@
+1.901		2017-04-01	T. R. Wyant
+    Require Date::Tolkien::Shire::Data 0.001.
+
+1.900		2017-03-16	T. R. Wyant
+    Add Boolean attributes 'accented' and 'traditional', which request
+    accented on_date() text and traditional weekday names respectively.
+    These have accessors accented() and traditional(), and mutators
+    set_accented() and set_traditional() respectively.
+
+    Ensure date is set (or return 0) in strftime().
+
+    Allow 0 as year argument to set_time().
+
+    Add accessors weekday_number(), month_number(), and
+    holiday_number().
+
+    Add mutator set_shire(), which sets a Shire date.
+
+    Add constructor, today(), from_shire().
+
+    Add strftime(), based on Date::Tolkien::Shire::Data::__format().
+
+    Factor code common to Date::Tolkien::Shire and
+    DateTime::Fiction::JRRTolkien::Shire into Date::Tolkien::Shire::Data
+
+    Add regression tools. This includes a copy of Date::Tolkien::Shire
+    1.13 (with back-ported on_date() fixes), the script
+    tools/make-regression to generate a test that compares the output of
+    the current Date::Tolkien::Shire to the copy of Date::Tolkien::Shire
+    that is in tools/lib, and xt/author/regression.t
+
+1.21		2017-02-06	T. R. Wyant
+    Fix broken link in POD. Thanks to Mohammad S Anwar for picking up on
+    this.
+
+    Minor correction to on_date() text.
+
+    Regularize POD, move to end of module.
+
+    Pull static data out of subroutines.
+
+    Rewrite tests using Test::More 0.47, which is the latest we can use
+    under Perl 5.6.2.
+
+    Add author tests.
+
+    Bring the code up to my usual level of Perl::Critic compliance.
+
+    Add 'provides' data to ExtUtils::MakeMaker output
+
+    Replace 'use vars' with 'our'.
+
+    use warnings;
+
+    Move Shire.pm to lib/Date/Tolkien/
+
+1.20		2017-01-21	T. R. Wyant
+    Correct typos in on_date() text.
+
+    Make Changes file CPAN::Changes::Spec-compliant
+
+    Rewrite README.
+
+    Bring metadata up to snuff.
+
+    Add Wyant as co-author. Minimal doc changes.
+
+1.13		2006-03-29	Tom Braun
+    Fixed the spelling of "tree" in the events for 6 Astron.  Thanks to
+    WYANT for this.
+
+1.12		2003-02-21	Tom Braun
+    The tireless folks of the cpan testers discovered that the test code
+    doesn't work on windows.  I forgot to allow for the differences in
+    epoch time between the two.   This again points to the need to use
+    something other than epoch time (hopefully the new DateTime.pm
+    stuff), but for now I've just adjusted the test code.
+
+1.11		2003-02-16	Tom Braun
+    A couple minor fixes here, one thanks to Robert Sim.  A couple of
+    events in the month of Solmath were being reported on incorrect
+    dates.
+
+1.10		2002-07-14	Tom Braun
+    Fixed 2 bugs in reporting, both from Rene Uittenbogaard.
+	- First, Shire years should always start on Sterday, a fact
+	  which I missed before.
+	- Secondly, holidays are reporting in the books as 2 Lithe or 1
+	  Yule, not as Yule 1 or Lithe 2.
+
+1.01		2001-11-05	Tom Braun
+    Fixed a minor bug in calculations, but it should have no if you're
+    using this on dates in the unix epoch time range.  Thanks to Rick
+    Osborne for spotting this.
+
+1.00		2001-05-16	Tom Braun
+    I have finally got around to making it work correctly (as I define
+    correct anyway) for any year, instead of just those near the year
+    2000.  While almost.  It's still limited by Epoch time to years
+    between 1902 and 2037 (on my system anyway).  I'm planning on making
+    this work with ICAL or Julian Days at some point -- which will
+    really fix this problem.  I have also had it in CPAN for a few
+    months without any bugs being reported.  Thus I am bumping up the
+    version to 1.00 to signify a stable, non-development release, though
+    for most things you wouln't notice any difference from version 0.11
+
+0.11		2001-03-22	Tom Braun
+    Added as_string and used it to overload the "" operator.  Thanks to
+    Michael Schwern for this idea.
+
+    Also, the code Michael sent me got me thinking about the order dates
+    were displayed in, and after some thought I decided to change it to
+    day then month. This is a really minor change, but it there.
+
+0.10		2001-02-26	Tom Braun
+    Year calculation has been redone to better match Tolkien's.  This
+    should only break compatibility if you were storing Shire dates to
+    disk somewhere.
+
+    Some minor changes to the POD to make it format prettier
+
+0.02		2001-02-19	Tom Braun
+    Changed my email in the pod docs
+
+0.01		2001-02-18	Tom Braun
+    First stable release

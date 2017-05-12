@@ -1,0 +1,11 @@
+581a99042f10c01200013980
+
+master oregon 58.1a99042f10c01200013980:
+  sensor/wtgr800.2f[speed]=1.2mps
+  sensor/wtgr800.2f[direction]=22.5
+  sensor/wtgr800.2f[battery]=100%
+
+
+
+
+

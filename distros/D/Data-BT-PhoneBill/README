@@ -1,0 +1,97 @@
+NAME
+    Data::BT::PhoneBill - Parse a BT Phone Bill from their web site
+
+SYNOPSIS
+      my $bill = Data::BT::PhoneBill->new($filename);
+
+      while (my $call = $bill->next_call) {
+        print $call->date, $call->time, $call->destination,
+              $call->number, $call->duration, $call->type, $call->cost;
+        }
+      }
+
+DESCRIPTION
+    This module provides an interface for querying your BT phone bill, as
+    produced from their "View My Bill" service at http://www.bt.com/
+
+    You should use their "Download Calls" option to save your bill as a CSV
+    file, and then feed it to this module.
+
+CONSTRUCTOR
+  new
+      my $bill = Data::BT::PhoneBill->new($filename);
+
+    Parses the bill stored in $filename.
+
+FETCHING DATA
+      while (my $call = $bill->next_call) {
+        print $call->date, $call->time, $call->destination,
+              $call->number, $call->duration, $call->type, $call->cost;
+        }
+      }
+
+    Each time you call $bill->next_call it will return a
+    Data::BT::PhoneBill::_Call object representing a telephone call (or
+    false when there are no more to read)
+
+    Each Call object has the following methods defined:
+
+  date
+    A Date::Simple object represeting the date of the call.
+
+  time
+    A string representing the time of the call in the 24-hr format 'hh:mm'.
+
+  destination
+    A string that for local and national calls will usually be the town.
+    However this can also contain things like "Premium Rate", "Local Rate"
+    etc for 'non-geographic' calls.
+
+  number
+    A string representing the telephone number dialled, formatted as it
+    appears on the bill.
+
+  duration
+    The length of the call in seconds.
+
+  type
+    The 'type' of call - e.g. "DD Local", "DD International".
+
+  cost
+    The cost of the call, before any discounts are applied, in pence.
+
+  chargecard
+    Any chargecard number used make the call.
+
+  installation
+    The phone number from which the call was placed.
+
+  line
+    The line from which the call was placed (if a secondary line with the
+    same number is installed).
+
+  rebate
+    Any rebates applied to the call.
+
+AUTHOR
+    Tony Bowden, with improvements from Simon Cozens
+
+BUGS and QUERIES
+    Please direct all correspondence regarding this module to:
+    bug-Data-BT-PhoneBill@rt.cpan.org
+
+COPYRIGHT AND LICENSE
+      Copyright (C) 2001-2005 Tony Bowden.
+
+      This program is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License; either version
+      2 of the License, or (at your option) any later version.
+
+      This program is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    The Perl.com article on Class::DBI is based around Data::BT::PhoneBill -
+    http://www.perl.com/pub/a/2002/11/27/classdbi.html
+

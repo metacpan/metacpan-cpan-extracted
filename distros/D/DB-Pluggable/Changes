@@ -1,0 +1,46 @@
+Revision history for Perl extension DB-Pluggable
+
+1.112001  2011-07-19 21:02:33 Europe/Vienna
+    - added VERSION numbers
+
+1.112000  2011-07-19 20:30:08 Europe/Vienna
+    - converted the distribution back to EU::MM style
+    - doc fix for the Data::Printer plugin (thanks garu)
+
+1.111751  2011-06-24 23:54:05 Europe/Vienna
+    - doc fix: don't mention nonexistent roles. :)
+
+1.111750  2011-06-24 23:04:34 Europe/Vienna
+    - complete rewrite to move from Hook::Modular to Brickyard - it's more
+      lightweight and easier to use
+
+1.101051  2010-04-15 18:01:53 Europe/Vienna
+    - fixed the db.eval hook handler
+
+1.101050  2010-04-15 00:15:37 Europe/Vienna
+    - added db.eval hook so you can define custom commands that take arguments
+    - removed unused variables and code
+
+1.100851  2010-03-26 20:56:57 Europe/Vienna
+    - DB::Pluggable::Plugin now returns a true value
+
+1.100850  2010-03-26 20:50:12 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS
+    - Added DB::Pluggable::Plugin base class for plugins
+
+0.03  Thu, 29 May 2008 12:04:18 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.03
+    - fixed first year, is 2008
+    - .shipit: fixed svk.tagpattern
+
+0.02  Thu, 17 Apr 2008 21:49:33 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - hiding the DB package from the PAUSE indexer
+    - set version to 0.02
+
+0.01  Thu, 17 Apr 2008 19:45:15 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

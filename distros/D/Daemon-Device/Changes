@@ -1,0 +1,25 @@
+Revision history for Daemon::Device
+
+1.07      2016-11-11 08:45:38-08:00 America/Los_Angeles
+        - Provided accessor to the Daemon::Control sub-object
+
+1.06      2016-08-08 14:35:10-07:00 America/Los_Angeles
+        - Fix for bug when installed not as root and a group named $user does not exist
+
+1.05      2015-04-29 11:28:19-07:00 America/Los_Angeles
+        - Improvements to internal/external subs/data
+
+1.04      2015-04-28 13:20:56-07:00 America/Los_Angeles
+        - Helper methods to data() values
+
+1.03      2015-04-25 17:20:35-07:00 America/Los_Angeles
+        - Added simple interprocess messaging methods
+
+1.02      2015-04-04 10:43:05-07:00 America/Los_Angeles
+        - Setup some test skipping so Travis can pass the tests.
+
+1.01      2015-04-03 23:15:47-07:00 America/Los_Angeles
+        - Extend timeout for unit tests so Travis can pass them; improve POD.
+
+1.00      2015-04-03 17:10:14-07:00 America/Los_Angeles
+        - First version, released on an unsuspecting world.

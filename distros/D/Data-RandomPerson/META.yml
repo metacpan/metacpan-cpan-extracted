@@ -1,0 +1,38 @@
+---
+abstract: 'Create random person data'
+author:
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  Time::Local: '1.18'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+  File::Share: '0.06'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-RandomPerson
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Random: '0.12'
+  File::Share: '0.06'
+  List::Util::WeightedChoice: '0.06'
+  Module::Find: '0'
+  perl: '5.008007'
+resources:
+  bugtracker: https://github.com/mbeijen/Data-RandomPerson/issues
+  repository: https://github.com/mbeijen/Data-RandomPerson
+version: '0.60'
+x_contributors:
+  - 'Michiel Beijen <michiel.beijen@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

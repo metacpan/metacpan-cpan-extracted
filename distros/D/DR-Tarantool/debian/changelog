@@ -1,0 +1,284 @@
+libdr-tarantool-perl (0.43-1) unstable; urgency=medium
+
+  * EINTR doesn't throw exception with RealSyncClient driver.
+  * Fix randomly test segfaults, closes: #727554,
+    thanks to Colin Watson <cjwatson@ubuntu.com>.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 04 May 2014 10:52:41 +0400
+
+libdr-tarantool-perl (0.42-2) nowtaxi; urgency=medium
+
+  * Rebuild for Nowtaxi repo.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 12 Apr 2014 15:30:16 +0400
+
+libdr-tarantool-perl (0.42-1) unstable; urgency=low
+
+  * Rebuild for Debian perl 5.18.
+  * Fix some cpan tests (that are run without tarantool).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 18 Sep 2013 01:37:52 +0400
+
+libdr-tarantool-perl (0.41-1) unstable; urgency=low
+
+  * Fix broken xs-test (by cpan testers reports).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 02 Sep 2013 15:37:11 +0400
+
+libdr-tarantool-perl (0.40-1) unstable; urgency=low
+
+  * Add RealSyncClient module.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 28 Aug 2013 17:00:13 +0400
+
+libdr-tarantool-perl (0.39-1) unstable; urgency=low
+
+  * Ping method works even connection isn't established.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 21 Aug 2013 17:33:08 +0400
+
+libdr-tarantool-perl (0.38-1) unstable; urgency=low
+
+  * Parser doesn't segfault if tarantool replies by broken package.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 01 Jun 2013 21:23:23 +0400
+
+libdr-tarantool-perl (0.37-1) unstable; urgency=low
+
+  * Update perldoc.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 29 Apr 2013 14:37:25 +0400
+
+libdr-tarantool-perl (0.36-1) unstable; urgency=low
+
+  * Update perldoc.
+  * Extends readahead buffer to fix FTBFS, closes: #704266.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 21 Apr 2013 12:23:43 +0400
+
+libdr-tarantool-perl (0.35-1) unstable; urgency=low
+
+  * Add stress test for tarantool, some additional test cases.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 30 Jan 2013 23:54:19 +0400
+
+libdr-tarantool-perl (0.34-1) unstable; urgency=low
+
+  * Fix some tests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 29 Jan 2013 10:12:56 +0400
+
+libdr-tarantool-perl (0.33-2) unstable; urgency=low
+
+  * All requests that are called between reconnects will wait connection
+    instead error returning.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 27 Jan 2013 16:48:26 +0400
+
+libdr-tarantool-perl (0.32-1) unstable; urgency=low
+
+  * Re-enable tests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 23 Jan 2013 14:56:43 +0400
+
+libdr-tarantool-perl (0.31-1) unstable; urgency=low
+
+  * Disable some tests (try to localize some problems with cpan testers).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 21 Jan 2013 21:56:14 +0400
+
+libdr-tarantool-perl (0.30-1) unstable; urgency=low
+
+  * Fixed empty tuple list in tp.h.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 19 Jan 2013 00:30:24 +0400
+
+libdr-tarantool-perl (0.29-1) unstable; urgency=low
+
+  * Fixed some warnings in tests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 15 Jan 2013 22:31:13 +0400
+
+libdr-tarantool-perl (0.28-1) unstable; urgency=low
+
+  * Fix disconnect async method.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 15 Jan 2013 22:17:35 +0400
+
+libdr-tarantool-perl (0.27-1) unstable; urgency=low
+
+  * Don't use libtarantool for depends/build-depends.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 10 Jan 2013 17:53:46 +0400
+
+libdr-tarantool-perl (0.26-1) unstable; urgency=low
+
+  * Update homepage/vcs information.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Jan 2013 03:01:47 +0400
+
+libdr-tarantool-perl (0.25-1) unstable; urgency=low
+
+  * Uses AE::io instead AE::Handle (benchmarks, benchmarks... :)).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 06 Jan 2013 19:18:46 +0400
+
+libdr-tarantool-perl (0.24-1) unstable; urgency=low
+
+  * Fix possibly memory leak, closes Debian FTBFS (fix tests),
+    closes: #695660.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 11 Dec 2012 23:28:06 +0400
+
+libdr-tarantool-perl (0.23-1) unstable; urgency=low
+
+  * LLClient can log requests/reposnses (and error responses).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 05 Sep 2012 13:35:43 +0400
+
+libdr-tarantool-perl (0.22-1) unstable; urgency=low
+
+  * Prebuild tuple packages (so it doesn't use AUTOLOAD anymore).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 20 Aug 2012 21:19:44 +0400
+
+libdr-tarantool-perl (0.21-1) unstable; urgency=low
+
+  * Add some functions to iterator (sort, grep, ...).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 15 Jul 2012 20:10:23 +0400
+
+libdr-tarantool-perl (0.20-1) unstable; urgency=low
+
+  * Some optimizations in iterators.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 10 Jul 2012 10:45:35 +0400
+
+libdr-tarantool-perl (0.19-1) unstable; urgency=low
+
+  * New upstream version: it is optimized for parallel requests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 05 Jul 2012 23:50:03 +0400
+
+libdr-tarantool-perl (0.18-1) unstable; urgency=low
+
+  * HVs are created like perlxs: trying to be compatible with libcoro-perl.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 02 Jul 2012 10:12:39 +0400
+
+libdr-tarantool-perl (0.17-2) unstable; urgency=low
+
+  * Rebuilt for perl 5.14.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 29 Jun 2012 07:20:46 +0400
+
+libdr-tarantool-perl (0.17-1) unstable; urgency=low
+
+  * New upstream version (perl 5.8.8 compatible).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 27 Jun 2012 10:38:57 +0400
+
+libdr-tarantool-perl (0.16-1) unstable; urgency=low
+
+  * New upstream version. Add some functions to iterators.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 23 Jun 2012 16:27:22 +0400
+
+libdr-tarantool-perl (0.15-1) unstable; urgency=low
+
+  * New upstream version.
+    Fix tuple destructor (it doesn't crashes in global destructor).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 07 Jun 2012 00:08:53 +0400
+
+libdr-tarantool-perl (0.14-1) unstable; urgency=low
+
+  * New version: Coro can be uninstalled: some tests will be skipped.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 04 Jun 2012 10:21:49 +0400
+
+libdr-tarantool-perl (0.12-1) unstable; urgency=low
+
+  * New version (provides new field types).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 02 Jun 2012 22:35:47 +0400
+
+libdr-tarantool-perl (0.11-1) unstable; urgency=low
+
+  * New version. You can use parts of indexes in 'select'.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 29 May 2012 21:21:05 +0400
+
+libdr-tarantool-perl (0.10-1) unstable; urgency=low
+
+  * New version. Add DR::Tarantool::CoroClient.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 28 May 2012 20:05:12 +0400
+
+libdr-tarantool-perl (0.09-2) unstable; urgency=low
+
+  * Fix homepage section in debian/control.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 28 May 2012 10:00:48 +0400
+
+libdr-tarantool-perl (0.09-1) unstable; urgency=low
+
+  * New version. Fix tuple iterator.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 26 May 2012 13:46:38 +0400
+
+libdr-tarantool-perl (0.08-2) unstable; urgency=low
+
+  * Add libjson-xs-perl into depends.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 25 May 2012 11:20:52 +0400
+
+libdr-tarantool-perl (0.08-1) unstable; urgency=low
+
+  * New version. Add 'JSON' to fields type list.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 25 May 2012 11:13:30 +0400
+
+libdr-tarantool-perl (0.07-1) unstable; urgency=low
+
+  * Iterators can construct objects. New version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 24 May 2012 18:06:52 +0400
+
+libdr-tarantool-perl (0.06-1) unstable; urgency=low
+
+  * New version (sync methods return tuple or undef).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 24 May 2012 13:51:52 +0400
+
+libdr-tarantool-perl (0.05-1) unstable; urgency=low
+
+  * New version (some fixes in call_lua).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 24 May 2012 11:52:34 +0400
+
+libdr-tarantool-perl (0.04-1) unstable; urgency=low
+
+  * New version (upstream upgrades library).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 22 May 2012 17:51:25 +0400
+
+libdr-tarantool-perl (0.03-1) unstable; urgency=low
+
+  * New version.
+  * Add depends on Devel::GlobalDestruction.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 20 May 2012 17:16:21 +0400
+
+libdr-tarantool-perl (0.02-1) unstable; urgency=low
+
+  * New version.
+  * Fixed documentation.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 20 May 2012 09:36:46 +0400
+
+libdr-tarantool-perl (0.01-1) unstable; urgency=low
+
+  * Initial release. (Closes: #673646)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sun, 20 May 2012 01:53:06 +0400

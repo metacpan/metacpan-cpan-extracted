@@ -1,0 +1,24 @@
+pristine:da39a3ee5e6b4b0d3255bfef95601890afd80709
+[First Patch.
+Test User <test@example.com>**20081230084739
+ Ignore-this: 641b65a02a01fa2faa182046d31a8ce8
+] 
+hash: 0000000136-4486a68d0c9735a71ad80b7e3befb1d2d0241bfd73077e481ebbd63e774f6713
+[This is a long patch name
+Test User <test@example.com>**20081230084813
+ Ignore-this: ff8f693150f7a12ea5808b7298274c92
+] 
+hash: 0000000140-848cebb47a3b405d0a5a3cb195e5f189ee964e7432d8fe6d369b95718d4b6245
+[Another patch name... With Funny Characters!!!@@@#$%^&*&()]]
+Test User <test@example.com>**20081230084838
+ Ignore-this: 450c4dcfde72cf1441cbdf19e6ca86b
+ And a big long comment.
+ :-)
+ ]
+] 
+hash: 0000000214-abcf98d78f5bd118d774936eafd07f98353a77940995767a833fa53f6d2069db
+[Rolling back something in darcs-2.
+David Caldwell <david@porkrind.org>**20081230084954
+ Ignore-this: a2101d6a4e6adf0ad7bd4036d4bf1b05
+] 
+hash: 0000000163-ca7553e679637f2f8728698496c0e8349e70d21b6a52d68d2b4f4df58c940939

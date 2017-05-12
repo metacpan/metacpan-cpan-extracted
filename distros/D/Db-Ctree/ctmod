@@ -1,0 +1,91 @@
+#!/usr/bin/perl
+#
+#
+# CTMOD 
+#
+# ctmod ctreefile pattern command param1 param2
+#                         <blank> = view
+#                         <test>  = subst/param1/param2/ + print
+#                         <subst> = subst/param1/param2/ + print + update
+#                         <del>   = delete record 
+#
+# Author: Robert Eden  rmeden@yahoo.com
+
+use Db::Ctree qw(:ALL);
+
+die"ctmod ctreefile pattern command param1 param2
+                         <blank> = view
+                         <test>  = subst/param1/param2/ + print
+                         <subst> = subst/param1/param2/ + print + update
+                         <del>   = delete record \n"
+     if $#ARGV < 1;
+$ABORT = 0;
+$SIG{INT}  = sub { $ABORT = 1 };
+$SIG{TERM} = sub { $ABORT = 1 };
+
+$filename = shift;
+$pattern  = shift;
+$command  = shift;
+$param1   = shift;
+$param2   = shift;
+
+#die "ctmod ctreefile action paramter\n";
+
+die "parameters of unequal length\n" if length($param1) != length($param2);
+
+$filename .= ".dat" unless $filename =~ /\.dat$/;
+unless (-e $filename)
+{
+   $filename = "/appl/plexar/master/$filename"
+}
+die "$filename not found "     unless -e $filename;
+
+#
+# open database
+#
+InitISAM(20,5,8);
+
+$dbptr = new Db::Ctree(0, $filename, &SHARED);
+
+$record = $dbptr -> fetch_first();
+#$record = $dbptr -> fetch_gte('O014KSCY1998070818192');
+while ($record)
+{
+#   last unless $record =~ /O014KSCY1998070818192/;
+   print "rec $reccnt\n" unless ++$reccnt % 1000;
+   if ( $record =~ m/$pattern/ )
+    {
+           print "old $record\n";
+
+           if ($command eq "test")
+           {
+              $record =~ s/$param1/$param2/;
+              print "new $record\n\n";
+           }
+           elsif ($command eq "subst")
+           {
+              $record =~ s/$param1/$param2/;
+              print "new $record\n\n";
+
+				Begin( &TRNLOG | & ENABLE );
+#        $status = &ReWriteVRecord($dbptr->{DBNO},$record,length($record));
+         $status = &ReWriteRecord($dbptr->{DBNO},$record);
+				Commit( &FREE);
+              die "stop $status" if $status;
+           }
+           elsif ($command eq "del")
+           {
+				Begin( &TRNLOG | & ENABLE );
+                 $status = &DeleteRecord($dbptr->{DBNO});
+                 die "stop $status" if $status;
+				Commit( &FREE);
+           }
+    }
+
+   last if $ABORT;
+   $record = $dbptr -> fetch_next();
+} # record loop
+
+die &isam_err." Error on Read" if (&isam_err and
+                                   &isam_err != &Db::Ctree::INOT_ERR);
+

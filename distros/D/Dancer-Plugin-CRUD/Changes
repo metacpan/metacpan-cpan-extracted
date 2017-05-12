@@ -1,0 +1,67 @@
+Revision history for Dancer-Plugin-CRUD
+
+1.031 2014-12-17
+ - improve chain behaviour
+ - enable Module::Signature
+ - dont make signatures anymore
+ - disable experimental warnings when using given/when
+ - on perl < 5.18 there is no 'experimental' warnings category
+ - remove experimental features like given
+ - fix typo
+ - tidy up code
+
+1.030 2014-12-01
+ - change version format
+
+1.03 2014-08-28
+ - added subname
+ - use $resname
+ - implement Validate::Tiny
+ - added README for github
+ - rename rules to validation
+ - updated validation tests
+ - ignore validation on index/create
+ - added documention for automatic validation
+ - register keyword 'inherit'
+ - added action 'patch'
+ - renamed inherit to wrap
+ - added tests to MANIFEST
+ - fixed behaviour when undef is returned
+ - updated documentation, fixed typo
+ - returns hash/list of created route-objects
+ - bump to v1.02
+ - fill curpath with splitted path of $route
+ - add Travis CI configuration
+ - add dependencies for Travis CI
+ - Validate::Tiny is now required for this package
+ - convert README to Markdown
+ - add feature chained action
+ - better support for alternative syntax
+ - add test to manifest
+ - ignore .travis.yml and README.md in manifest
+ - rewrite concept of chaining resources
+ - inherit validation rules for wrap keyword
+ - use regex to build routes
+ - update documentation
+ - new way of wrap validation
+ - fix test hash in t/12
+ - add documentation for chain feature
+ - bump to version 1.03
+
+1.01 2014-05-13
+ - added isc license
+ - added all tests to manifest
+ - fixed version
+ - changed license to perl
+ - completed documentation
+ - updated module dependencies
+ - removed useless DEBUG constant
+ - make suffix changable
+ - fixed documentation
+ - changed sample names to generic one
+ - added missing file to manifest
+ - added test for stacking
+ - reordered documentation
+ - added t/08-stacking.t to manifest
+ - bump to v1.01
+

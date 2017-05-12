@@ -1,0 +1,734 @@
+=head1 NAME
+
+Devel::NYTProf::Changes - History of significant changes in Devel::NYTProf
+
+=cut
+
+=head2 Changes in Devel::NYTProf 6.04 - 24th November 2016
+
+    Fixed build on perl 5.25+ due to OpSIBLING, thanks to Dan Collins #102
+    Fixed nytprofmerge on Windows thanks to andrey-starodubtsev #99
+    Fixed nytprofhtml invalid UTF-8 char and improved CSS #105
+    Fixed spelling mistake in nytprofcsv docs. Closes #95
+
+    Table headers now stay visible, thanks to Sebastian Rose #106
+    Assorted improvments to .travis.yml
+
+=head2 Changes in Devel::NYTProf 6.03 - 25th March 2016
+
+  Fix to account for the deep stack optimizations in perl 5.23.8
+    by Dave Mitchell, with my great gratitude!
+  Fix SIGUSR2 on MSWin32 and div by zero #78 PR#79
+    with thanks to Nicolas Georges.
+  Fix for perl 5.8.8 but adding definition for tTHX.
+  Unify 'Profile format error' messages.
+
+  Improve the TROUBLESHOOTING docs.
+  Added some more docs for the start=init option #85
+  Corrected URL of KCachegrind home page #87
+    with thanks to Denis Ibaev.
+  Corrected URL of sample report #80
+  Removed dead code.nytimes.com URL and redundant history #84
+
+=head2 Changes in Devel::NYTProf 6.02 - 2nd August 2015
+
+  FlameGraphs upgraded the latest version, which supports searching.
+  Use JSON::MaybeXS instead of JSON::Any (deprecated), thanks to Ether #73
+  Updated metacpan urls, thanks to Ether #74
+  Internal context optimizations, thanks to jandubois #75
+
+=head2 Changes in Devel::NYTProf 6.01 - 4th April 2015
+
+  Changed the clock used on Windows to high resolution QueryPerformanceCounter
+    which makes NYTProf useful on windows, at last, thanks to bulk88, #68
+
+  Fallback to checking PATH for nytprof scripts, #61 thanks to calid
+  Fix unused variable warnings thanks to zefram, RT#103107
+  Fix handling of PERL_DISABLE_PMC, thanks to bulk88, #67
+
+  Use larger buffer size when writing the data file, thanks to bulk88 #69
+
+  Clarified the docs re DB:: functions, #63 thanks to dbooth-boston
+  Documentation cleanup thanks to wollmers, #64
+  Clarify reason for loading Devel::NYTProf as early as possible.
+  Clarification of the RUN-TIME CONTROL OF PROFILING docs
+
+=head2 Changes in Devel::NYTProf 5.07 - 21st Feb 2015
+
+  Fixed use of nytprofcalls and flamegraph scripts to not require PATH #21
+  Fixed nytprofhtml --open for KDE4 thanks to HMBRAND RT#99080
+  Fixed for installs into directory path with spaces, mohawk2 #40
+  Fixed printf NV conversion compiler warnings thanks to zefram RT#91986
+  Disabled optimize in t/test25-strevalb.t if -DDEBUGGING and perl >= 5.20
+    as workaround for perl RT#70211, #38
+
+  Added 'addtimestamp' option to add a timestamp to the output filename
+    (similar to addpid option), PR#17 thanks to Naosuke Yokoe (zentooo)
+  Added nytprofpf script to generate reports in the plat_forms format
+    http://www.plat-forms.org PR#11 thanks to Holger Schmeisky.
+  Added ability to increase the maximum length of a subroutine name #44
+
+  Optimized output performance on threaded perl, thanks to bulk88. PR#27
+
+  Add docs re FCGI::Engine and open('-|') #20
+  Corrected typo in nytprofhtml thanks to wollmers #41
+  Fixed link to screencast, thanks to Herwin. #19
+  Added hint to use --no-flame for big reports. #28
+
+=head2 Changes in Devel::NYTProf 5.06 - 12th Sept 2013
+
+  Fixed for perl 5.19.4. RT#88288 thanks to sprout.
+  Fixed test for change in perl 5.18.x error message text.
+  Fixed to no longer open a file when start=no. RT#86497/RT#87404.
+  Fixed compiler warnings. RT#86728 thanks to Alexander Bluhm.
+
+  Document that Devel::NYTProf needs to be loaded as early as possible
+    even when using start=no. PR#10 thanks to moritz.
+  Removed unused keyword $Id$. PR#9 thanks to dsteinbrunner.
+  Removed old benchmark.pl files. RT#86704.
+  Corrected assorted typos. PR#8 thanks to dsteinbrunner.
+  Added meta-spec to META_MERGE. PR#12 thanks to dsteinbrunner.
+
+=head2 Changes in Devel::NYTProf 5.05 - 2nd July 2013
+
+  Fixed crash on "Can't use string as a subroutine ref" error,
+    and probably other die-at-pp_entersub cases,
+    with thanks to Zefram. RT#86638
+  Fixed crash with libcexit=1, thanks to Zefram. RT#86548
+
+=head2 Changes in Devel::NYTProf 5.04 - 20th June 2013
+
+  Allow negative times in tests for systems with unstable clocks
+    thanks to Gisle Aas, RT#85556.
+  Added libcexit=1 option thanks to Zefram, RT#75912.
+  Added documentation for endatexit and libcexit options.
+  Added documentation for nytprofhtml --minimal
+    thanks to Mike Doherty, RT#86039.
+
+=head2 Changes in Devel::NYTProf 5.03 - 20th May 2013
+
+  Fix windows to use flamegraph.bat [Christian Walde]
+  Generates META.yml which mentions github repo [Christian Walde]
+  Add meta robots noindex to html pages [Tokuhiro Matsuno]
+
+=head2 Changes in Devel::NYTProf 5.02 - 21st April 2013
+
+  Fix Windows build, properly RT#84738.
+
+=head2 Changes in Devel::NYTProf 5.01 - 19th April 2013
+
+  Fix Windows build RT#84738.
+
+  Can't rely on #!-line to always work, PR#3
+    thanks to Gisle Aas.
+
+  Avoid triggering "gcc internal compiler error" PR#4
+    thanks to Gisle Aas.
+
+=head2 Changes in Devel::NYTProf 5.00 - 8th April 2013
+
+  Added subroutine entry and return event stream,
+    controlled via the calls=N option. Default calls=1.
+
+  Added nytprofcalls command to process the call event stream to
+    generate timings for distinct call stacks (experimental).
+
+  Added Flame Graph visualization SVG using the call stack data.
+
+  Changed blocks=N option to be 0 (disabled) by default.
+
+  Fixed test for perl 5.17+ hash randomization.
+  Fixed nytprofhtml for Windows thanks to Jan Dubois. PR#2
+  Fixed assorted nits thanks to Steve Peters. PR#1
+  Deprecated nytprofcsv - speak up if you use it!
+  No longer warn about $&, $` and $' being slow if $] >= 5.017008.
+
+=head2 Changes in Devel::NYTProf 4.25 - 6th Feb 2013
+
+  Fix u2time clock (ie Time::HiRes, used by Windows)
+
+=head2 Changes in Devel::NYTProf 4.24 - 3rd Feb 2013
+
+  Clarify sigexit option docs.
+  Loosen test timing constraints (for slow cpantester VMs).
+
+=head2 Changes in Devel::NYTProf 4.23 - 31st Dec 2012
+
+  Significant improvement in the accuracy of the subroutine profiler,
+    especially for frequent calls to very short duration subs/ops,
+    and more so for POSIX and OSX systems with sub-microsecond clocks.
+
+  Fixed tests to work with perl 5.17.7+ (PL_sawampersand gone).
+  Fixed some doc typos thanks to Jesse Sheidlower.
+  Improved nytprofmerge behaviour with inconsistent attributes.
+  Removed the usecputime=1 option. Use clock=N instead if possible.
+  Moved main repo to git (and https://github.com/timbunce/devel-nytprof)
+
+=head2 Changes in Devel::NYTProf 4.12 - 28th Dec 2012
+
+  Fixed the perl v5.17+ fix to do-the-right-thing for 5.17.4.
+  Fixed pod encoding issues.
+
+=head2 Changes in Devel::NYTProf 4.11 (svn 1442) 26th Dec 2012
+
+  Fixed to work with perl v5.17+, specifically string eval
+    changes and hash randomization.
+  Fixed so tests ignore sitecustomize.pl, RT#79784
+    thanks to JACOB@cpan.org.
+  Fixed to sort tables with microsecond values in non-utf8
+    encodings, RT#77843
+
+  Deprecated the usecputime=1 option and documented that it
+    will be removed in a future version.
+
+  Corrected spelling thanks to Alessandro Ghedini @debian RT#80370
+
+=head2 Changes in Devel::NYTProf 4.09 (svn 1431) 15th Sep 2012
+
+  Fixed to work for perl v5.17.3+ thanks to David Mitchell.
+
+=head2 Changes in Devel::NYTProf 4.08 (svn 1427) 11th Aug 2012
+
+  Fixed version numbers in nytprofhtml and nytprofmerge.
+
+=head2 Changes in Devel::NYTProf 4.07 (svn 1419) 10th Aug 2012
+
+  Fixed html generation to be valid, RT#70207 (H.Merijn Brand).
+  nytprofmerge no longer dies on some errors, RT#75918.
+  nytprofmerge now sums cumulative_overhead_ticks, RT#75909.
+  nytprofmerge now gets in man page installed, RT#75911.
+
+  Enable file=/dev/null to work as fix for RT#74565.
+  Updated ::Apache docs including troubleshooting, RT#75912.
+  Note Devel::NYTProf::Data is undocumented and why, RT#75914.
+  Use Browser::Open if installed for nytprofhtml --open.
+
+  Added and clarified some notes in the troubleshooting docs.
+  Added warning for Apache2::SizeLimit in ::Apache, RT#75912.
+  Clarified docs re fork generating multiple files, RT#78873.
+
+=head2 Changes in Devel::NYTProf 4.06 (svn r1406) 30th Nov 2010
+
+  Fixed risk of nytprofhtml failure due to over-long filenames RT#62319
+
+  Improved handling of Class::MOP/Moose generated methods.
+  Improved handling of embedded filenames, e.g., "(eval N)[$path]"
+  Updated and clarified usecputime=1 docs.
+  Updated tests for (expected) new functionality in Sub::Name.
+  Updated tests for changes in perl 5.13.x.
+
+  Added special handling for the perl built-in accept()
+    Effectively the clock stops ticking while in accept().
+    This makes profiles of pure-perl web servers more useful.
+  Added --no-mergeevals option to nytprofhtml.
+  Added "If Statement and Subroutine Timings Don't Match" and
+    "If Headline Subroutine Timings Don't Match the Called Subs"
+    sections to the DATA COLLECTION AND INTERPRETATION docs.
+  Added note to the docs re profiling applications that use Coro.
+
+=head2 Changes in Devel::NYTProf 4.05 (svn 1359) 15th Sept 2010
+
+  Fixed tests to work with a new optimization in perl 5.13.4.
+  Fixed handling of negative values for subroutine line ranges
+    (that may be added to %DB::sub by buggy software). 
+  Fixed handling of negative times from unstable clocks
+    that caused spikes in statement times.
+  Fixed risk of bad line numbers hanging report generation.
+
+=head2 Changes in Devel::NYTProf 4.04 (svn 1332) 9th July 2010
+
+  Profile now reports presence of the slow regex match vars ($& $' $`).
+  The (cumulative inclusive) recursion time measured for subs that are involved
+    in recursion is now reported as 'recursion: ... sum of overlapping time'.
+  Trace log messages are now flushed immediately.
+  Reduced risk of crashes in embedded applications that don't handle PL_endav
+    carefully, like current versions of mod_perl.
+
+=head2 Changes in Devel::NYTProf 4.03 (svn 1316) 19th June 2010
+
+  Fixed another nytprofhtml performance problem for profiles with
+    many files/evals. Much faster merging of evals now.
+
+  For subs that recurse, show max depth and time in subroutine table.
+
+=head2 Changes in Devel::NYTProf 4.02 (svn 1309) 17th June 2010
+
+  Fixed nytprofhtml performance problem for profiles with
+    many files/evals.
+
+  Added progress reporting to nytprofhtml.
+
+=head2 Changes in Devel::NYTProf 4.01 (svn 1296) 10th June 2010
+
+  Fixed links from block/sub level report pages to string eval report
+    pages.  RT#58284
+
+  Restored ordering of line - block - sub links on index page.
+
+  Clarified that saving the source code of string evals requires perl
+    version 5.8.9+, 5.10.1+, 5.12 or later. RT#58283
+
+=head2 Changes in Devel::NYTProf 4.00 (svn 1291) 8th June 2010
+
+Major changes:
+
+  Added profile reporting of code executed in string evals.
+    Each string eval executed gets it's own report page.
+    You can 'see' the code that was executed, with profile info.
+    String evals may be collapsed/merged in some cases.
+
+  Improved many sub-optimal behaviours related to string evals.
+
+  Subroutine calls that couldn't be associated with a specific line,
+    such as calls made by perl to END blocks, are now shown in reports.
+
+  Subroutine definitions that couldn't be associated with a specific file,
+    such as xsubs in packages with no perl source, are now shown in reports.
+
+  Enabled savesrc=1 by default.
+
+  The data file format has changed so v3.x files can't be read.
+  The Devel::NYTProf::ReadStream interface has also changed.
+
+Other changes:
+
+  Fixed off-by-1 error in number of Files an xsub/opcode was called from.
+  Fixed Devel::NYTProf::Apache to work in more situations
+    and enable the addpid option by default.
+  Fixed that END blocks defined at runtime are included in the profile
+    thanks to Nicholas Clark.
+
+  Compilation-only checks (perl -c) can be profiled thanks to Nicholas Clark.
+  Improved behaviour for 'duplicate' anon-subs defined in separate
+    invocations of a particular string eval.
+  Multiple BEGINs (e.g., use) on the same line get distinct names.
+
+  Added --minimal option to nytprofhtml to disable generation of
+    graphviz .dot files and block/sub-level statement report files.
+  Added automatic detection of calls to POSIX::_exit() by the sub profiler
+    so finish_profile() gets called and a usable profile is produced.
+  Added posix_exit=1 option to do the same thing (in a different way)
+    when the sub profiler is not being used (i.e., subs=0).
+
+Documentation Changes:
+
+  Sequences of blank lines are skipped in generated reports.
+    Relevant for savesrc mode in which perl doesn't store pod sections.
+  Corrected typos in nytprofhtml docs thanks to chocolate@cpan.org.
+  Documented how to use Devel::NYTProf::Apache with virtual hosts that
+    use the PerlOptions +Parent or +Clone configuration.
+
+=head2 Changes in Devel::NYTProf 3.11 (svn 1171) 12th March 2010
+
+  Fixed assorted issues on Windows thanks to Jan Dubois.
+  Fixed assorted issues 64bit systems thanks to Jan Dubois.
+
+  Refactored I/O to create an API that encapsulates the data
+    file format, thanks to Nicholas Clark.
+  Updated and optimized nytprofmerge to use the new API
+    yielding a significant speed boost, thanks to Nicholas Clark.
+
+=head2 Changes in Devel::NYTProf 3.02 (svn 1094) 5th March 2010
+
+  Fixed handling of usecputime=1 option and updated
+    docs to note the significant limitations.
+  Fixed association of XS subs to source files
+    in some edge cases thanks to Nicholas Clark.
+  Fixed nytprofmerge edge cases thanks to Nicholas Clark.
+
+  Added high-resolution (100ns) timer for Mac OS X
+    many thanks to Markus Peter.
+  Added assorted optimizations thanks to Nicholas Clark.
+
+  Changed subroutine profiler to be slightly more efficient.
+  Changed some tests to be more informative on failure.
+  Changed nytprofhtml to be smarter when source isn't available.
+  Changed nytprofhtml to show sort arrow on sortable tables.
+
+  Removed Devel::NYTProf::PgPLPerl module. That's now a separate
+    PostgreSQL::PLPerl::NYTProf distribution.
+
+  Updated docs to include a note about timing on Windows.
+  Updated docs to include a section about making NYTProf faster.
+
+=head2 Changes in Devel::NYTProf 3.01 (svn r1005) 28th Dec 2009
+
+  Fixed (removed) use of vfscanf() which broke on Windows.
+  Fixed version number in nytprofmerge.
+
+  Added documentation to nytprofcg and nytprofmerge.
+
+  Updated NYTProf docs, including noting major contributors.
+  Updated docs to fix assorted typos, thanks to Jonathan Yu.
+  Updated nytprofcsv documentation.
+
+=head2 Changes in Devel::NYTProf 3.00 (svn r998) 24th Dec 2009
+
+  Note: The file format has changed. Old files can't be read.
+
+  Fixed (rare) overflow bug for 32bit perls.
+  Fixed discarding of (rare) negative intervals.
+  Fixed risk of infinite recursion if trace enabled and
+    $SIG{__WARN__} was set to a code reference.
+  Fixed subroutine recursion depth measurement.
+  Fixed missing embedded eval source code for some older perls.
+  Fixed assorted compiler warnings for various configurations.
+
+  Changed ReadStream SUB_LINE_RANGE tag to SUB_INFO.
+
+  Added log=F option to write trace log to a file.
+  Added warning when reading a file with a minor version higher
+    than expected.
+
+  Added slowops=N option which enables profiling of potentially slow
+    perl opcodes (e.g., system calls and regexs). They're treated like xsubs.
+    slowops=0 disables profiling of 'slowops'
+    slowops=1 puts timings into one package ("CORE::", eg CORE::sleep)
+    slowops=2 (the default) puts timings into into the package that made the
+    call, e.g., "Foo::CORE:sleep" (note the single colon).
+
+  Added sigexit=1 option to enable a useable profile when the process
+    exits due to a signals (catches INT HUP PIPE BUS SEGV by default)
+    Can also do sigexit=TRAP,ABRT,SYS,... to hook specific signals.
+    Thanks to Andrew Sterling Hanenkamp for the seed of this idea.
+
+  Added forkdepth=N option to enable profiling to be turned off after N
+    generations of fork().
+
+  Added nameevals=0 and nameanonsubs=0 options to make NYTProf less
+    visible to code that may assume the default perl naming behaviour.
+    Note that using these will limit the usefulness of reports.
+
+  Added initial support for profiling PostgreSQL PL/Perl code
+    via Devel::NYTProf::PgPLPerl module.
+
+  Added nytprofmerge utility:
+    Reads multiple nytprof data files and writes a new merged file.
+    Many thanks to Nicholas Clark!
+
+Changes to subroutine profiler:
+
+  Rewritten. Captures more data more accurately and robustly.
+  Added profiling of calls to xsubs that exit via an exception.
+  Added profiling of goto &sub;
+  Added recording the name of the calling subroutine to enable proper
+    linking of call trees. Previously only the calling file and line
+    were recorded. (This is more significant than it sounds :)
+  Added docs describing how the subroutine profiler works.
+  Multiple BEGIN blocks (including "use") within a package are now
+    distinguished by appending the number of the line they start on
+    (for perl 5.8.9+ and 5.10.1+)
+
+Changes to nytprofhtml:
+
+  Added interactive treemap view of package and subroutine times.
+    Left-click to zoom in (drill-down) one level, right-click to zoom out.
+
+  Added generation of GraphViz dot language files to visualize
+    the call graph. A top-level link on the index page provides an
+    inter-package graph, and per-source-file links provide a graph
+    of sub calls in to, out of, and between the subs in the file.
+    See http://en.wikipedia.org/wiki/Graphviz
+
+  Added columns to the main source code reports to show
+    a count of sub calls and time spent in those calls.
+
+  Assorted cosmetic improvements.
+  Changed colors on report pages to be less saturated.
+
+
+=head2 Changes in Devel::NYTProf 2.10 (svn r774) 18th June 2009
+
+  Fixed call count for XSubs that was one too high.
+  Fixed enable_profile() after fork thanks to delamonpansie
+    http://code.google.com/p/perl-devel-nytprof/issues/detail?id=15
+  Fixed to use correct scripts during test and so avoid permissions
+    issues, thanks to David Golden.
+  Fixed spurious "Unable to determine line number" warnings
+    when using options like -p, -n, -Mfoo.
+
+  Changed enable_profile() to discard the time spent since
+    profile was disabled.
+  Changed NYTPROF env var parsing to allow backslash to escape
+    colons, for Windows, thanks to Joshua ben Jore.
+
+  Added license, homepage, bugtracker, repository and MailingList
+    resources to META.yml thanks to Michael G Schwern.
+  Added nytprofcg utility to generate callgrind data for
+    viewing via Kcachegrind, thanks to Chia-liang Kao.
+
+=head2 Changes in Devel::NYTProf 2.09 (svn r733) 29th March 2009
+
+  Added support for modules using AutoLoader, e.g., POSIX & Storable,
+    to fix the "Unable to open '... (autosplit into ...)'" warnings.
+  Fixed report filename generation to remove colons,
+    for Windows, reported by Adam Kennedy in rt bug #43798.
+  Fixed report filename generation to remove dots, for VMS.
+  Fixed savesrc option which wasn't safe and reliable.
+  Added missing t/test22-strevala.t to MANIFEST.
+  Extended testing to exercise compress and savesrc options.
+
+Ported to VMS, thanks to Peter (Stig) Edwards:
+
+  Renamed t/\d\d.test.t    files to t/\d\d_test.t 
+          t/test*.pm.x     files to t/test*.pm_x 
+          t/test*fork.\d.* files to t/test*fork-\d.*
+          .js and .css     file to only have one period/dot
+    for greater portability.  VMS ODS-2 files can only have
+    one period/dot.
+  Added t/92-file_port.t as a developer-only and
+    request-using-ENV test, to help maintain portable files,
+    currently .indent.pro and .perltidyrc fall foul of portable
+    filename characters as defined by ANSI C and perlport.
+  NYTProf.xs's open_output_file use mode 'wb' and not 'wbx'
+    to avoid unsupported error when on VMS.
+
+=head2 Changes in Devel::NYTProf 2.08 (svn r685) 15th Feb 2009
+
+Core:
+
+  Added optimize=0 option to disable the perl optimizer
+    so you can see more accurate statement execution counts
+    for some kinds of constructs.
+
+  Added savesrc=1 option to copy source code into the profile
+    so reports are not affected by changes to the source files.
+
+  Added ability for DB::enable_profile() to specify a new file
+    for profile data to be written to.
+
+Reporting:
+
+  Time spent within nested string evals is accounted for.
+
+  Fixed searching @INC for source files for reports.
+
+  Dramatically increased performance of nytprofhtml
+    relative to the 2.07 version.
+
+  Many tables in html reports are sortable by clicking on header columns
+    (requires JavaScript, uses jQuery and tablesorter.js)
+
+  Statement timings are now shown as integers in appropriate
+    units: seconds, milliseconds, microseconds or nanoseconds.
+
+  Hovering over times in subroutine or file summary tables
+    now shows the percentage time.
+
+  Added tables showing timings rolled up per package name depth.
+
+  Improved HTML conformance thanks to Leland Johnson.
+
+=head2 Changes in Devel::NYTProf 2.07 (svn r583) 1st Nov 2008
+
+Core:
+
+  NOTE: The file format has changed. Files from 2.04 and 2.05
+  can still be read by this version.
+
+  Subroutine inclusive time no longer counts time
+    spent recursed into the same subroutine. That time is
+    now recorded separately, along with the max recursion depth.
+
+  Added stmts=0 option to disable the statement profiler
+    so just the subroutine profiler runs. That reduces the
+    profiler overhead and gives you much smaller data files.
+
+  Now builds on Windows, with thanks to Jan Dubois!
+
+  Removed use of vfscanf() to improve portability to Windows
+    and old unix systems, thanks to Jan Dubois.
+
+  The profiler takes more care to avoid changing $!.
+
+Reports:
+
+  Fixed significant error in time reported as spent in a subroutine,
+    which was showing the sum of the inclusive and exclusive time
+    instead of just the inclusive time.
+
+  Subroutine calls made within string evals are now shown in reports.
+  Subroutine caller details now includes calls from within string evals.
+
+  XS subs (xsubs) are now automatically associated with a source
+    file that defines normal subs in the same package.
+  Callers and timing information for xsubs are now shown at the
+    bottom of the corresponding source file.
+  References to xsubs in reports now include a working link
+    if the xsub is in a package that contains profiled perl code.
+
+  The html global subroutine index pages no longer list subs that
+    were never called.
+
+  Assorted report formating enhancements thanks to Gisle Aas.
+
+  Exclusive and Inclusive time column positions have been switched
+    to be consistent with how the times are presented elsewhere.
+
+  nytprofhtml includes a --open option to open the generated html
+
+Documentation:
+
+  Greatly expanded description of the clocks used for profiling
+    and their issues, especially on multi-processor systems.
+
+Other:
+
+  Added Devel::NYTProf::ReadStream module which provides a perl
+    interface for reading the raw profile data, thanks to Gisle Aas.
+
+
+=head2 Changes in Devel::NYTProf 2.05 (svn r498) 8th Oct 2008
+
+  Fixed alteration of $! during profiling thanks to Slaven Rezic.
+  Fixed clock_gettime() clock selection to fallback to CLOCK_REALTIME
+    if CLOCK_MONOTONIC is not available, e.g, on linux 2.4.
+  Fixed error when application ends after DB::disable_profile().
+
+  Added some docs to Devel::NYTProf::Apache
+  Added clock=N option to enable user to select the clock.
+
+=head2 Changes in Devel::NYTProf 2.04 (svn r483) 1st Oct 2008
+
+  Fixed rare divide-by-zero error in reporting code.
+  Fixed rare core dump in reporting code.
+  Fixed detection of #line directives to be more picky.
+  Fixed some compiler warnings thanks to Richard Foley.
+
+  Added on-the-fly ~90% zip compression thanks to Nicholas Clark.
+    Reduces data file size per million statements executed
+    from approx ~13MB to ~1MB (depends on code being profiled).
+
+  Added extra table of all subs sorted by inclusive time.
+
+  No longer warns about '/loader/0x800d8c/...' synthetic file
+    names perl assigns reading code from a CODE ref in @INC
+
+=head2 Changes in Devel::NYTProf 2.03 (svn r405) 15 Aug 2008
+
+  NOTES:
+  1. File format changed. Old profiles can't be read.
+  2. Perl 5.8.1 is the oldest perl version supported.
+
+  Fixed accounting for time spent executing subs that were
+    compiled in string evals.
+  Fixed risk of file corruption by names containing newlines.
+
+  Changed to also profile compile-time activity by default.
+  Improved formating of stats for subs called by a statement.
+
+  Added start=begin|init|end|no option to NYTPROF env var.
+  Added addpid=1 option to NYTPROF env var.
+  Added support for .pmc files.
+  Added detection of #line directives in source code
+    currently just warns that they are not handled.
+
+  Known issues:
+  Perl 5.8.8 can report garbage file names for XS subs.
+  (Perl 5.8.6 and 5.10 don't seem to have this problem.)
+  Where a subroutine is called from code compiled in a string
+  evals, the artificial "eval file names" are not yet merged.
+  (You're unlikely to notice this obscure case anyway.)
+
+=head2 Changes in Devel::NYTProf 2.02 (svn r361) 24 Jul 2008
+
+  Fixed colors to use the median (not average) deviation from the median value.
+  Fixed sub name resolution to work in more, perhaps all, unusual cases.
+
+  Improved accuracy of subroutine timing by deducting statement measurement overheads.
+  Improved readability of subroutine caller lists.
+  Replaced use of fpurge() with a more portable approach.
+
+  Added exclusive subroutine time (time in sub excluding subs it called).
+  Added recording of xsub filenames (i.e. DBI.c)
+  Added use of clock_gettime(), if available, for 100ns resolution.
+    Uses CLOCK_MONOTONIC or else CLOCK_REALTIME. Thanks to Steve Peters.
+
+=head2 Changes in Devel::NYTProf 2.01
+
+  Fixed and unified module version numbers.
+
+=head2 Changes in Devel::NYTProf 2.00
+
+  Major changes. Much extra functionality and performance.
+  See http://blog.timbunce.org/2008/07/15/nytprof-v2-a-major-advance-in-perl-profilers/
+
+=head2 Changes in and before 1.50
+
+  1.50  ? ? ? 0:00:00 2008
+    - Major revision to include Tim Bunce's call scope statistics features,
+        code/doc refactoring, optimizations and bug fixes.
+    - Fixes major issues with profiling code that forks.
+
+  1.13  Wed Mar 26 9:35:00 2008
+    - Fixed RedHat EL bug - %f isn't the C format for floating-point for RHEL
+        Changed Reader.pm to warn-and-continue instead of dieing when a source 
+        file cannot be found. (the file will be skipped). Feature by request.
+        Makefile.PL changes by tim.bunce - fix warning on LICENSE key when 
+        installed by older versions of MakeMaker. Added vim modeline.
+
+  1.12  Tue Mar 25 11:05:00 2008
+    - Fixed YET ANOTHER test failure caused by trivial differences between v5.6
+        and v5.8.x. Added test15 that only executes on <5.8 and test06 now only
+        runs on >5.8.0
+
+  1.11  Mon Mar 24 11:26:00 2008
+    - Rewrote test06 and test 13 only. No functionality changes. There is a Perl
+        debugger bug. In perl >5.6 closing "}" in empty loops get execution
+        counts for some reason. This caused 5.6 to fail 'make test' 
+        needlessly. (5.6 actually handles it better and 5.8 & 5.10). So I 
+        changed the code to avoid empty loop tests, which are no more useful 
+        than loops with code in them. 
+        *test06 now tests only loops - foreach, while and do-while loops. 
+        *test13 now tests only forms of eval, and eval failures - loops removed
+
+  1.10  Web Mar 19 21:02:00 2008
+    - Another CPAN versioning fix. Hopefully the last!!!
+    - Added Makefile.pl check to report unsupported OS on Win32
+
+  0.09  Wed Mar 19 13:05:00 2008
+    - Fixed broken CPAN version numbering
+    - Implemented malloc() fix by Tim Bunce (tim.bunce@gmail.[nospam]com
+    - Wrote a better eval test, now covers all uses ("", perlcode, {...})
+    - Fixed AutoSplit file source problem
+    - Wrote AutoSplit/AutoLoader tests (test14)
+    - Bugs fixed (hopefully)  33889, 34234, 33991, 33878
+
+  0.08  Mon Mar 10 17:35:00 2008
+    - Added #define to fix missing linkage for OutCopFile (Perl <5.8.0 fix)
+    - Added test12, basic do script test
+    - Moved min version to 5.6.0 again (another attempt)
+
+  0.05  Fri Mar 7 10:29:00 2008
+    - Changed XS code to compile clean with -ansi and -pedantic
+    - Removed `cont' on file argument to process due to XS error in Perl 5.6
+    - Added code to Makefile.PL so that header sources are run through the C 
+        pre-processor (if available) as a potential fix for some BSD systems.
+
+  0.03  Thu Mar 6 09:12:00 2008
+    - Fixed a VERY tricky bug some people had encountered. Scalar references to 
+        code that is evaled at runtime will cause divide-by-zero error IF the
+        reference was declared in a BEGIN {...} and used outside of a BEGIN. 
+        (The debugger/profiler can't see what happens in a BEGIN)
+    - Added test case for above issue as test11
+    - Fixed (i hope) the OSX segfault when using a re-malloc'd pointer that was 
+        once freed.
+    - Changed XS to compile cleanly with -Wall.
+    - Adopted versioning scheme: modules/files start at 1.0 and the distro will
+        continue from 0.0, thus making mixed versions less confusing.
+    - Enabled the debugging switch so that NYTProf can be used in the form
+        perl -MDevel::NYTProf code.pl (BUT this is ALPHA quality -- may bork)
+    - Minor cleanup to Makefile.PL
+
+  0.02  Wed Mar 5 14:20:00 2008
+    - fixed a bunch of minor problems with the distribution that caused cpan
+        warnings and also cause the exe scripts to not be installed
+    - now a working cpan distro
+
+  0.01  Tue Feb 12 10:34:03 2008
+    - original version; created by h2xs 1.23 with options
+        -A -n Devel::NYTProf
+
+=cut
+
+# vim: ts=8 sw=2 sts=2 expandtab:

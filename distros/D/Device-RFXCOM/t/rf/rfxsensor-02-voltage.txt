@@ -1,0 +1,8 @@
+2002f23ea1
+
+master rfxsensor 20.02f23ea1: sensor/rfxsensor02f2[voltage]=5.01
+
+
+
+
+

@@ -1,0 +1,6 @@
+t/message.t
+Debug/Message.pm
+MANIFEST
+Makefile.PL
+
+META.yml                                 Module meta-data (added by MakeMaker)

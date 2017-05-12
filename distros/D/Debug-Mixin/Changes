@@ -1,0 +1,24 @@
+commit 260ef70cd025e6c7ec8ea44fccfc557f6dfa5da0 (refs/heads/master)
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Jan 14 18:32:39 2009 +0100
+
+    FIXED: dependencies
+
+commit 683f1a46b175e431672c67be029f402111237d4e
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Jan 4 21:52:00 2009 +0100
+
+    ADDED: .gitignore
+
+commit 7557ed12f926270397de3babe4e68c0b81a177d2
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Dec 28 14:10:46 2008 +0100
+
+    CHANGED: removed some PBP errors
+    FIXED: perlcritic rc file location
+
+commit 786b2be01245574fa1ca36bf224192e24087e2a3
+Author: nadim khemir <nadim@naquadim.(none)>
+Date:   Sun Dec 28 13:55:46 2008 +0100
+
+    ADDED: Initial commit

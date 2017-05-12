@@ -1,0 +1,49 @@
+Reconciliation - Utility to compare tables & report differences
+
+DESCRIPTION
+     A reconciliation program is a program which tries to establish
+     connection between two data sources. The variant currently
+     implemented is actually a kind of diff which works on records and
+     fields, instead of lines. The implementation expects Data::Table
+     objects as sources.
+
+     This is only an Alpha version. The INTERFACE WILL CHANGE to allow
+     better reporting.
+
+DOWNLOAD
+     You can obtained the most recent version from 
+     http://www.perl.com/CPAN/
+
+PREREQUIISTE
+
+    Data::Table
+
+BUILDING
+    perl Makefile.PL
+    make
+    make test
+    make install (if the tests look okay)
+
+TODO
+
+	. The interface will be extended to allow a better reporting.
+
+	. Multi-step reconciliation is not yet implemented.
+
+	. Reconciliation algorithm to reconciliate 1..n sources must
+	  be implemented.
+
+	. Documentation.
+
+	. Examples.
+
+COPYRIGHT
+     Copyright (c) 2001, Siemens Financial Services. All rights
+     reserved.  This library is free software; you can
+     redistribute it and/or modify it under the same terms as
+     Perl itself.
+
+AUTHORS
+     Martial.Chateauvieux@sfs.siemens.de,
+     O.Capdevielle@cadextan.fr
+

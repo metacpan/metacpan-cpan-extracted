@@ -1,0 +1,9 @@
+0.13 2009-08-16
+  - get rid of SQL::Translator
+  - added DDL file for tests
+
+0.12 2009-08-16
+  - fixed bug where accessors where created in the wrong namespace (thanks harshal.shah@gmail.com)
+
+0.11 2009-08-10
+  - fixed test failure

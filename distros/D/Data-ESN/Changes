@@ -1,0 +1,14 @@
+Revision history for Data-ESN
+
+0.04    7.16.2015/09:00
+        Updated packaging
+
+0.03    7.11.2012/10:15
+        Updated documentation
+
+0.02    7.11.2012/00:11
+        Added Test::Carp build requrement
+
+0.01    7.10.2012/18:00
+        First version, released on an unsuspecting world.
+

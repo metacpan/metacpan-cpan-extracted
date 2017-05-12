@@ -1,0 +1,32 @@
+---
+abstract: 'Use Elastic::Model in your Dancer application'
+author:
+  - 'Clinton Gormley <drtech@cpan.org>'
+build_requires:
+  Dancer::Test: '0'
+  Elastic::Doc: '0'
+  Elastic::Model: '0.28'
+  Search::Elasticsearch::Compat: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  YAML: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-ElasticModel
+requires:
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Elastic::Model: '0.28'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/clintongormley/Dancer-Plugin-ElasticModel/issues
+  repository: git://github.com/clintongormley/Dancer-Plugin-ElasticModel.git
+version: '0.08'

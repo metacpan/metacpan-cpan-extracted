@@ -1,0 +1,562 @@
+GET /
+Return some basic data about the currently stopped program
+
+Returns 200 and JSON in the body
+{
+    program_name: String - What $0 was when the program started
+    perl_version: String - $^V
+    source: url - Where to get the source for $0 (/source/...)
+    loaded_files: url - Where to get the list of all loaded files (/source)
+    stack: url - where to get the whole stack (/stack)
+    breakpoints: url - where to the breakpoint info (/breakpoints)
+    watchpoints: url - where to the breakpoint info (/watchpoints)
+    actions: url - where to get action info (/actions)
+    stepin: url - URL to make the debugger step-in
+    stepover: url - URL to make the debugger step-over
+    stepout: url - URL to make the debugger step-out
+    continue: url - URL to make the debugger continue
+    eval: URL - where to make an eval request
+    getvar: URL - where to make a getvar request
+    packageinfo: URL - get info about packages
+    subinfo: URL - get info about subroutines
+    exit: URL - request the program terminate
+    debugger_gui: URL to load the debugger webapp (/debugger-gui)
+    status: URL to see the status of the program (/status)
+    loadconfig: URL to load a configuration file (/loadconfig)
+    saveconfig: URL to save a configuration file (/saveconfig)
+}
+
+----------------------------------------------------------
+
+GET /program_name
+Get what $0 was set to when the program started
+
+Returns 200 and JSON in the body
+{
+    program_name: String - $0 when the program was started
+}
+
+----------------------------------------------------------
+
+GET /perl_version
+$^V
+
+Returns 200 and text in the body
+
+-----------------------------------------------------------
+
+GET /source
+Get a list of all the source code files loaded by the application
+
+Returns 200 and JSON in the body
+[
+    { filename: String - File name
+      href: URL - Where to get the source for this file (/source/...)
+    },
+    { filename:
+      href:
+    },
+    ...
+]
+
+-----------------------------------------------------------
+
+GET /source/<pathname>
+Get the source code for one file
+
+Returns 200 if the file is loaded and exists, JSON in the body
+{
+    filename: String - file name
+    lines: Array of strings, one per line
+    breakable: Array of bools, one per line, indicating whether that line
+                is breakable
+}
+
+Return 404 if the file is not loaded
+
+---------------------------------------------------------------
+
+GET /stack
+GET /stack?exclude_sub_params=1
+HEAD /stack
+Get the current execution stack
+
+Returns 200 and JSON in the body
+[
+    { filename: String - File name
+      line: Integer - What line it's stopped on
+      href: URL - url for this stack frame
+      serial: String - Unique identifier for this frame
+      subname: String - Short name for this subroutine
+      subroutine: String - Fully qualified package::subroutine
+      args: [...] List of arguments to this sub, encoded
+      wantarray: 1, 0, undef - wantarray for this stack level
+      hasargs: boolean - if this sub call had arguments
+      package: String - Name of the package at this stack level
+      evaltext: String - the text of the "eval EXPR" statement
+      is_require: boolean - true if the frame is created by a "require" or "use"
+                              statement
+    },
+    ...
+]
+
+The header X-Stack-Depth will have the number of frames in the stack.  The
+caller may request the HEAD to omit the body/data and just get the headers.
+
+If the param exclude_sub_params is true, the 'args' key for each frame will
+be undef, useful to avoid serializing potentially deep data structures passed
+to functions.
+
+----------------------------------------------------------------
+
+GET /stack/<id>
+GET /stack/<id>?exclude_sub_params=1
+HEAD /stack/<id>
+
+Get info about one particular stack frame.  <id> is an integer representing
+the requested depth.  0 is the most recent stack frame.
+
+If the requested stack frame exists, returns 200 and JSON in the body.
+The header X-Stack-Serial will be the same as the 'serial' value for this
+frame.  The header X-Stack-Line will be the same as the 'line' value
+for this frame.
+
+The caller may request the HEAD to retrieve the header and avoid
+re-getting data it already knows.
+
+{   filename: String - File name
+    file_href: URL - url for this file
+    line: Integer - Line the debugger is stopped on
+    serial: String - Unique identifier for this frame
+    subname: String - Short name for this subroutine
+    subroutine: String - Fully qualified package::subroutine
+    args: [...] List of arguments to this sub, encoded
+    wantarray: 1, 0, undef - wantarray for this stack level
+    hasargs: boolean - if this sub call had arguments
+    package: String - Name of the package at this stack level
+    evaltext: String - the text of the "eval EXPR" statement
+    is_require: boolean - true if the frame is created by a "require" or "use"
+                            statement
+}
+
+If the param exclude_sub_params is true, the 'args' key for the frame will
+be undef, useful to avoid serializing potentially deep data structures passed
+to the function.
+
+Returns 404 if that stack frame does not exist
+
+------------------------------------------------------------------
+
+GET /breakpoints
+GET /actions
+
+Get the list of breakpoints/actions set in the program
+
+Returns 200 and JSON in the body
+[
+    { filename: String - File name
+      file_href: URL for this file
+      line: Integer
+      code: String - Condition for the breakpoint (1 if unconditional)
+      inactive: boolean - True if the breakpoint is inactive
+      href: URL for this breakpoint
+    },
+    ...
+]
+
+--------------------------------------------------------------------------
+
+GET /breakpoints/?key1=value1&key2=value...
+GET /actions/?key1=value&key2=value...
+
+Get a list of breakpoints/actions matching the query.  Recognized filters
+are: filename, line, code and inactive.
+
+Returns 200 if successful and JSON in the body
+[
+    { filename: String
+      line: Integer
+      code: String
+      inactive: boolean
+      href: URL (/breakpoints/...)
+    },
+    ...
+]
+
+Returns 404 if the file is not loaded.
+Returns 403 if the line is not breakable.
+
+----------------------------------------------------------------------
+
+POST /breakpoints
+POST /actions
+
+Set a breakpoint/action.  Params are JSON in the body:
+{
+  filename: String
+  line: Integer
+  code: String - Breakpoint perl code - set to "1" for unconditional bp
+  inactive: boolean
+}
+
+Returns 201 if successful, and JSON in the body
+{ filename: String
+  line: Integer
+  code: String
+  inactive: boolean
+  href: URL (/breakpoints/...)
+}
+Each href will contain a unique identifier
+
+Returns 404 if the file is not loaded.
+Returns 403 if the line is not breakable.
+
+-----------------------------------------------------------------------
+
+GET /breakpoints/<id>
+GET /actions/<id>
+
+Get a breakpoint/action by its unique identifier
+
+Returns 200 if successful and JSON in the body
+{ filename: String
+  line: Integer
+  code: String
+  inactive: boolean
+  href: URL (/breakpoints/...)
+}
+
+Returns 404 if there is no breakpoint/action with that id.
+
+-------------------------------------------------------------------------
+
+POST /breakpoints/<id>
+POST /actions/<id>
+
+Change a breakpoint/action.  Body contains JSON hash of which keys to change
+with their new values.
+
+Returns 200 if successful and JSON in the body
+{ filename: String
+  line: Integer
+  code: String
+  inactive: boolean
+  href: URL (/breakpoints/...)
+}
+
+Returns 404 if there is no breakpoint/action with that ID.
+Returns 403 if the requested property cannot be changed.  filename and line,
+    in particular, cannot be changed.
+
+-----------------------------------------------------------------------
+
+DELETE /breakpoints/<id>
+DELETE /actions/<id>
+
+Remove a breakpoint/action.
+
+Returns 204 is successful.
+Returns 404 if there is no breakpoint/action with that ID
+
+-------------------------------------------------------------------------
+
+POST /stepin
+
+Request the debugger step in to the next statement.
+
+Returns 200 if successful and JSON in the body.  The JSON returned is the
+same as reported by the GET /status URL
+
+-------------------------------------------------------------------------
+
+POST /stepover
+
+Request the debugger step over the next statement.
+
+Returns 200 if successful and JSON in the body.  The JSON returned is the
+same as reported by the GET /status URL
+
+-------------------------------------------------------------------------
+
+POST /stepout
+
+Request the debugger return from the current subroutine
+
+Returns 200 if successful and JSON in the body.  The JSON returned is the
+same as reported by the GET /status URL
+
+-------------------------------------------------------------------------
+
+POST /continue
+
+Request the debugger continue execution.
+
+Returns 200 if successful and JSON in the body.  The JSON returned is the
+same as reported by the GET /status URL
+
+-------------------------------------------------------------------------
+
+POST /continue?nostop=1
+
+Request the debugger continue execution.  The param nostop=1 instructs the
+debugger to run the program to completion and not stop at any breakpoints.
+
+Returns 204 if successful.
+
+-------------------------------------------------------------------------
+
+POST /eval
+
+Request the debugger evaluate some Perl code in the debugged program's most
+recent stack frame.  The request body contains JSON:
+{
+    wantarray: 0, 1 or undefined - scalar, list or void context
+    code: String - The string to eval
+}
+
+Returns 200 if successful and the result in the body.  The body contents
+should be decoded using Data::Transform::ExplicitMetadata
+Returns 409 if there was an exception.  The body contents should be decoded
+using Data::Transform::ExplicitMetadata
+
+-------------------------------------------------------------------------
+
+GET /getvar/<level>
+
+Get a list of all the lexical variables at the specified stack level.
+
+Returns 200 and JSON in the body
+[
+    {   name: String - Name of the variable, including the sigil
+        href: String - URL to get the value of this variable
+    },
+    ...
+]
+
+Returns 404 if the requested stack level does not exist
+
+-------------------------------------------------------------------------
+
+GET /getvar/<level>/<varname>
+
+Get the value of a Perl variable at the requested stack level.  The variable
+must include its sigil.
+
+Returns 200 and JSON in the body.  The returned JSON is an
+encoded version of whatever the Perl code evaluated to.
+
+-------------------------------------------------------------------------
+
+GET /packageinfo/
+GET /packageinfo/<Package::Name>
+
+Get information about the named package, or main:: if no package is given.
+
+Returns 200 and JSON in the body
+{
+    name: String - Package name
+    packages: [  // List of packages under this package
+                { 
+                   name: String - Package name
+                   href: URL (/packageinfo/<That::package::name>)
+                },
+                ...
+             ],
+    subroutines: [ // List of subroutine names in this package
+                {
+                    name: String - subroutine name including package
+                    href: URL (/subinfo/<That::package::subname>)
+                },
+                ...
+            ],
+}
+
+Returns 400 if the named package is not a valid package name
+Returns 404 if the named package is not present
+
+-------------------------------------------------------------------------
+
+GET /subinfo/subname
+GET /subinfo/Package::subpackage::subname
+
+Get information about the named subroutine.  If the subname has no package
+included, package main:: is assummed.
+
+Returns 200 and JSON in the body
+{
+    subroutine: String - subroutine name, not including package
+    package: String - Package the subroutine is in
+    filename: String - File the sub was defined
+    line: Integer - What line the sub is defined
+    end: Integer - Last line where the sub is defined
+    source: String - If the sub was created in an eval, this is the file
+                    the eval happened in
+    source_line: Integer - Line the eval happened in
+}
+
+--------------------------------------------------------------------------
+
+POST /exit
+
+Request the program exit completely.
+
+Returns 204
+
+---------------------------------------------------------------------------
+
+GET /debugger-gui
+
+Returns 200 and HTML that implements the debugger GUI
+
+--------------------------------------------------------------------------
+
+GET /status
+
+Returns 200 and JSON in the message body
+
+{
+    running: Boolean (1 if the program is running, 0 if terminated)
+    subroutine: String (What sub it's stopped in)
+    filename: String (What file we're currently stopped on)
+    line: Integer (What line we're stopped on)
+    stack_depth: Integer (How deep the program's stack is)
+    events: Array of hashes (only if events occurred)
+}
+
+Events are asynchronous events that happened since the last status report.
+They have a 'type' key.  Other keys are type-specific:
+    type: "fork"
+    pid: Integer - Child pid
+    href: String - URL to hit to debug the child process
+    gui_href: string - URL to hit to bring up the interactive debugger in the child
+    href_continue: String - URL to hit to run the child without stopping
+
+    type: "exception"
+    value: JSON-encoded perl value of the uncaught exception
+    package: String
+    line: Integer,
+    filename: String,
+    subroutine: String
+
+    type: "exit"
+    value: Integer - exit code
+
+    type: "hangup"
+
+    type: "trace_diff"
+    filename: String   # Where the program is stopped now
+    line: Integer
+    package: String
+    subroutine: String
+    sub_offset: Integer
+    expected_filename: String   # where the trace expected to be instead
+    expected_line: Integer
+    expected_package: String
+    expected_subroutine: String
+    expected_sub_offset: Integer
+
+-------------------------------------------------------------------------
+
+GET /source
+
+Get a list of all the files loaded by the current process
+
+Returns 200 and JSON in the message body
+
+[
+    { filename: String
+      href: URL to get the source/breakable data (/source/filename)
+    },
+    ...
+]
+
+--------------------------------------------------------------------------
+
+GET /source/filename
+
+Get a list of source code lines and which lines are breakable
+
+Returns 200 and JSON in the message body
+[
+    [ element 0: Perl source code line
+      element 1: Boolean, whether this line is breakable
+    ],
+    ...
+]
+
+Returns 404 if that filename is not loaded
+
+-----------------------------------------------------------------------
+
+POST /announce_child?pid=<pid>&uri=<uri>
+
+When the debugged process forks, the child hits this url to tell the parent
+its PID and url for debugging it.  That info is then relayed back to the
+user interface the next time it gets a status report.  This route should not
+be used by a regular client.
+
+Returns 204
+
+-----------------------------------------------------------------------
+
+POST /loadconfig/<filename>
+
+Load configuration from the named file.
+
+Returns 204 if successful.
+Returns 400 if there was some problem with the named file.
+Returns 404 if the named file is not found.
+
+-----------------------------------------------------------------------
+
+POST /saveconfig/<filename>
+
+Save configuration to the named file
+
+Returns 204 if successful.
+Returns 400 if there was a problem saving.
+
+---------------------------------------------------------------------
+
+PUT /watchpoints/<expr>
+
+Add a watchpoint expression.  The debugged program will stop when the value
+of the expression changes.
+
+Returns 201
+
+----------------------------------------------------------------------
+
+GET /watchpoints
+
+List all the currently set watchpoints
+Returns 200 and JSON in the message body
+[
+    { expr: String - Perl expression
+      href: URL for this expression
+    },
+    ...
+]
+
+------------------------------------------------------------------------
+
+GET /watchpoints/<expr>
+
+Get a single watchpoint expression
+
+Returns 200 and JSON in the message body
+{ expr: String - Perl expression
+  href: URL for this expression
+}
+
+Returns 404 if there is no matching watchpoint
+
+------------------------------------------------------------------------
+
+DELETE /watchpoints/<expr>
+
+Remove a previously set watchpoint
+Returns 204 on success
+Returns 404 if there was no matching watchpoint
+
+------------------------------------------------------------------------

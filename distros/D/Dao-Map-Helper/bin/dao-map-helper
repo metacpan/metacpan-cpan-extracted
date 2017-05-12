@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+dao-map-helper - Command line utility that simplifies the creation of Dao classes and the mapping between relational table and class. Kind of a low level ORM, where you can still use SQL and then map the result set to the class objects. Creates a skeleton of dao class with mapping to database table.
+
+=cut
+
+use warnings;
+use strict;
+use Dao::Map::Helper;
+Dao::Map::Helper->Main;
+
+=head1 SYNOPSIS
+
+dao-map-helper [options]
+
+Options:
+
+    --dsn=dsn         DSN(required)
+    --user=user       User Name for logging into database.(required)
+    --pwd=pwd         Password for logging into database.(required)
+    --package=package Package Name.(required)
+
+Example:
+
+    dao-map-helper --dsn=dbi:mysql:mydb:localhost:3306 --user=root --pwd=pwd --package=MyApp
+
+=head1 DESCRIPTION
+
+C<dao-map-helper> is a command-line interface to L<Dao::Map::Helper>, which it
+uses to perform all the work of creating distributions.
+
+=head1 CONFIGURATION
+
+NA
+
+=cut
+

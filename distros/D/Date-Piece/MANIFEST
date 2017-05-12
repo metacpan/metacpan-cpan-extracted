@@ -1,0 +1,11 @@
+bin/day
+Build.PL
+Changes
+lib/Date/Piece.pm
+MANIFEST
+MANIFEST.SKIP
+META.yml			# Will be created by "make dist"
+README
+t/00-load.t
+t/basic.t
+t/overload.t

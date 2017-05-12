@@ -1,0 +1,12 @@
+BOOTSTRAPPING
+
+    To start developing, Dist::Zilla and some dependecies have to be installed.
+    The best way to do that is via cpanminus (might take some minutes):
+
+        cpanm Dist::Zilla
+        dzil listdeps --author --develop --missing | cpanm
+
+    I am using Carton, so I usually do:
+
+        carton install
+        carton exec dzil listdeps --author --develop --missing | cpanm -L ./local --notest

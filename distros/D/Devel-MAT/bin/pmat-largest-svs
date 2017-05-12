@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use List::UtilsBy qw( max_by );
+
+use Devel::MAT;
+
+my $pmat = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" );
+$pmat->load_tool( "Sizes" );
+
+my $size = "owned_size";
+my $set  = "owned_set";
+
+my %seen;
+
+our $INDENT = "";
+sub list_largest_svs
+{
+   my ( $svlist, @counts ) = @_;
+
+   my $count = shift @counts;
+   while( $count-- ) {
+      my $largest = max_by { $_->$size } grep { !$seen{$_->addr} } @$svlist;
+      defined $largest or last;
+
+      $seen{$largest->addr}++;
+      printf "$INDENT%s: %d bytes%s\n",
+         $largest->desc_addr,
+         $largest->$size,
+         ( @counts ? ": of which" : "" );
+
+      my @set = $largest->$set;
+      shift @set; # SV itself is always first
+
+      if( @counts ) {
+         local $INDENT = "$INDENT    ";
+         list_largest_svs( \@set, @counts );
+      }
+
+      $seen{$_->addr}++ for @set;
+   }
+
+   my $others = 0;
+   $others += $_->size for grep { !$seen{$_->addr} } @$svlist;
+   printf "${INDENT}others: %d bytes\n", $others if $others;
+}
+
+list_largest_svs( [ $pmat->dumpfile->heap ], 5, 3, 2 );

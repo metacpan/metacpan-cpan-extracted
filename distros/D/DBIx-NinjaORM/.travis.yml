@@ -1,0 +1,23 @@
+language: perl
+perl:
+  - "5.24"
+  - "5.22"
+  - "5.16"
+  - "5.10"
+before_script:
+  - mysql -e 'CREATE DATABASE ninja_orm;'
+  - psql -c 'CREATE DATABASE ninja_orm;' -U postgres
+  - cpanm --notest DBI
+  - cpanm --notest DBD::Pg
+  - cpanm --notest DBD::mysql
+  - cpanm --notest Cache::Memcached::Fast
+services:
+  - memcache
+env:
+  - NINJAORM_DATABASE=''
+  - NINJAORM_DATABASE='DBI:mysql:database=ninja_orm;host=127.0.0.1|root|'
+  - NINJAORM_DATABASE='DBI:Pg:dbname=ninja_orm;host=127.0.0.1|postgres|'
+before_install:
+  cpanm -n Devel::Cover::Report::Coveralls
+script:
+  perl Build.PL && ./Build build && cover -test -report coveralls

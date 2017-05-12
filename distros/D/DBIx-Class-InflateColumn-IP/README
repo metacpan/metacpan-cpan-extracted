@@ -1,0 +1,105 @@
+NAME
+    DBIx::Class::InflateColumn::IP - Auto-create NetAddr::IP objects from
+    columns.
+
+SYNOPSIS
+    Load this component and declare columns as IP addresses with the
+    appropriate format.
+
+        package Host;
+        __PACKAGE__->load_components(qw/InflateColumn::IP Core/);
+        __PACKAGE__->add_columns(
+            ip_address => {
+                data_type => 'bigint',
+                is_nullable => 0,
+                is_ip => 1,
+                ip_format => 'numeric',
+            }
+        );
+
+        package Network;
+        __PACKAGE__->load_components(qw/InflateColumn::IP Core/);
+        __PACKAGE__->add_columns(
+            address => {
+                data_type => 'varchar',
+                size        => 18
+                is_nullable => 0,
+                is_ip => 1,
+                ip_format => 'cidr',
+            }
+        );
+
+    Then you can treat the specified column as a NetAddr::IP object.
+
+        print 'IP address: ', $host->ip_address->addr;
+        print 'Address type: ', $host->ip_address->iptype;
+
+    DBIx::Class::InflateColumn::IP supports a limited amount of
+    auto-detection of the format based on the column type. If the type
+    begins with "int" or "bigint", it's assumed to be numeric, while "inet"
+    and "cidr" (as used by e.g. PostgreSQL) are assumed to be "cidr" format.
+
+METHODS
+  ip_class
+    Arguments: $class
+
+    Gets/sets the address class that the columns should be inflated into.
+    The default class is NetAddr::IP.
+
+  ip_format
+    Arguments: $format
+
+    Gets/sets the name of the method used to deflate the address for the
+    database. This must return a value suitable for "$ip_class-"new(); The
+    default format is "addr", which returns the address in dotted-quad
+    notation. See "Methods" in NetAddr::IP for suitable values.
+
+  register_column
+    Chains with "register_column" in DBIx::Class::Row, and sets up IP
+    address columns appropriately. This would not normally be called
+    directly by end users.
+
+AUTHOR
+    Dagfinn Ilmari Mannsåker, "<ilmari at ilmari.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-inflatecolumn-ip at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-InflateColumn
+    -IP>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::InflateColumn::IP
+
+    You can also look for information at:
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-Class-InflateColumn-IP>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-Class-InflateColumn-IP>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-InflateColumn-I
+        P>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-Class-InflateColumn-IP>
+
+SEE ALSO
+    DBIx::Class, NetAddr::IP
+
+COPYRIGHT & LICENSE
+    Copyright 2007 Dagfinn Ilmari Mannsåker, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

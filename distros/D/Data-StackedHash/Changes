@@ -1,0 +1,11 @@
+Revision history for Perl extension StackedHash.
+
+0.99  Sat Aug 14 12:26:07 CEST 2004
+	- cleanup for CPAN upload
+
+0.97  Fri Oct 3 18:30:00 CEST 2003
+	- passed tests; wrote documentation; minor bugfixes
+
+0.01  Sun Sep  7 22:27:28 CEST 2003
+	- original version; created by h2xs 1.21 with options
+		-AX StackedHash

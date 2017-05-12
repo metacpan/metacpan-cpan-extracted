@@ -1,0 +1,20 @@
+0.06      2012-01-06 12:32:47 CST6CDT
+  - use OurPkgVersion instead (try to retain line numbering)
+
+0.05      2012-01-06 11:24:37 CST6CDT
+  - update for Test::Compile, CompileTests is deprecated in recent Dist::Zilla
+
+0.04      2011-05-16 12:43:05 America/Chicago
+  - get skip_build option working, uses Dist::Zilla::Plugin::ModuleBuild::Custom
+
+0.0301    2011-04-29 15:24:54 America/Chicago
+  - Bug-fix release for skipping README creation
+
+0.03      2011-04-29 15:00:15 America/Chicago
+
+0.02      2011-04-27 22:38:19 America/Chicago
+  - Add a few helper flags for defaults I want
+
+0.01
+  - initial checkin
+

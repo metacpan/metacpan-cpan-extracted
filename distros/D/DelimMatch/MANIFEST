@@ -1,0 +1,5 @@
+README
+MANIFEST
+Makefile.PL
+DelimMatch.pm
+test.pl

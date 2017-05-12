@@ -1,0 +1,1 @@
+requires 'DBIx::Class::DeploymentHandler';

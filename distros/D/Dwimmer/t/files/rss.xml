@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:content="http://purl.org/rss/1.0/modules/content/"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://szabgab.com">
+<title>Gabor Szabo Perl trainer and developer</title>
+<link>http://szabgab.com</link>
+<description>Gabor Szabo about programming in Perl, automated testing, dynamic languages and everyting else</description>
+<dc:language>en-us</dc:language>
+<dc:rights>Copyright 2002-2012, Gabor Szabo</dc:rights>
+<dc:publisher>szabgab@gmail.com</dc:publisher>
+<syn:updateBase>1901-01-01T00:00+00:00</syn:updateBase>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updatePeriod>hourly</syn:updatePeriod>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="http://szabgab.com/first.html" />
+ </rdf:Seq>
+</items>
+</channel>
+<item rdf:about="http://szabgab.com/first.html">
+<title>First title</title>
+<link>http://szabgab.com/first.html</link>
+<description>
+Description
+</description>
+<dc:creator>Gabor Szabo</dc:creator>
+<dc:date>2012-03-28T10:57:35+00:00</dc:date>
+<dc:subject>Perl</dc:subject>
+</item>
+</rdf:RDF>

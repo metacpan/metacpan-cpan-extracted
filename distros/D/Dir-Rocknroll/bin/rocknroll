@@ -1,0 +1,340 @@
+#!/usr/bin/perl
+
+####################################################
+#
+# rocknroll : Rsync fOr baCKup and Roll
+#
+# Jacquelin Charbonnel - CNRS/Mathrice/LAREMA - 2006-09-04
+#
+# $Id: rocknroll 487 2012-08-24 18:33:34Z jaclin $
+#
+####################################################
+
+use warnings ;
+use strict ;
+use Dir::Rocknroll 0.34 ;
+
+Dir::Rocknroll::_run() ;
+
+__END__
+
+
+
+
+=head1 NAME
+
+C<rocknroll> - Rsync fOr baCKup and Roll
+
+Light backup tool based on C<rsync>.
+
+=head1 SYNOPSIS
+
+  # rocknroll --init n tag dstdir           # initialization 
+
+  # rocknroll [options] tag srcdir dstdir   # backup
+
+  # rocknroll --help
+
+  # rocknroll --man
+
+=head1 DESCRIPTION
+
+C<rocknroll> backups a remote directories tree C<srcdir> in local directory C<dstdir>.  
+Using the C<link-dest> option of C<rsync>, it manages a set of differential archives, named
+C<tag.1>, C<tag.2>, etc.
+
+C<dstdir> can contain several set of differential archives. For example,
+C<dstdir> can contain 2 sets named C<daily.1 daily.2 daily.3
+daily.4 daily.5 daily.6 daily.7> and C<weekly.1 weekly.2 weekly.3 weekly.4>.
+
+Before a C<dstdir> can be able to store an archive set, it must be
+formatted with the C<--init> option.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item tag
+
+the name of the archive set.
+
+=item srcdir
+
+the topdir to backup, with the format of the srcdir of rsync : C<[[user@]hostname:]dir>
+
+=item dstdir
+
+the local destination directory for the backup.
+
+=back
+
+=head1 OPTIONS
+
+Almost command line options can be specified as well into the configuration file.
+
+=over 4
+
+=item -c C<config_file>
+
+use an alternate config file.
+
+By default, the config file C<rocknroll.conf> is
+searched in C<@/>, C<@/../etc/>, C</etc/>, C</etc/rocknroll.d/> (in this order)
+where C<@> is the directory containing the rocknroll script.
+
+=item --continue
+
+start again with an existing C<.tag.running> archive (useful after an
+abort)
+
+=item --debug
+
+debug mode
+
+=item --dry-run
+
+don't perfom any action, just say what it could be done
+
+=item --help
+
+print usage
+
+=item --man
+
+print the manual
+
+=item --no-links
+
+don't specify any C<--link-dest> option to C<rsync(1)>
+
+=item --no-roll
+
+don't roll the archives set
+
+=item --refresh
+
+only update the archive C<tag.1> (without deletion of any files on
+it).  Don't roll the archives set.
+
+=item --ro C<"--opt1 --opt2 --opt3">
+
+rsync option : pass some options to C<rsync(1)> (useful only as command line option)
+
+=item --update
+
+update archive C<tag.1> (with deletion of obsolete files).  Don't roll
+up archives set.
+
+=back
+
+=head1 CONFIGURATION FILE
+
+Options are also taken from directives specified into C<rocknroll.conf>, 
+a file located in C<@/>, C<@/../etc/>, C</etc/>, C</etc/rocknroll.d/>
+where C<@> is the directory contained the rocknroll script.
+
+The format of a line is :
+
+  option=value
+
+or
+
+  option value
+
+A C<#> starts a comment.
+
+
+=head2 Configuration file content
+
+Each following directive can be passed as well as an option on the command line.
+
+=over 4
+
+=item link-dest C<dir>
+
+by default the C<--link-dest> option of C<rsync(1)> is set to the C<tag.1> directory.
+This option is to bypass this default.
+
+=item mail_from C<email>
+
+set the email address of the sender for mail alerts
+
+=item mail_to C<email>
+
+set the email address of the recipient for mail alerts
+
+=item max_runtime C<time_in_second>
+
+set the max among of time that a backup can take. Older than this
+value, a C<.tag.running> temporary directory can be deleted.
+
+=item rsync_path C<path/to/rsync>
+
+specify the path of the C<rsync> command line (default C</usr/bin/rsync>)
+
+=item rsync_retcode_ok C<n,n,n,n...>
+
+specify a list of return codes of C<rsync> considered as OK codes.
+Each code not specified with C<--rsync_retcode_ok> or
+C<--rsync_retcode_warn> is considered as an error return code.
+
+=item rsync_retcode_warn C<n,n,n...>
+
+specify a list of return codes of C<rsync> considered as warning
+codes.  Each code not specified with C<--rsync_retcode_ok> or
+C<--rsync_retcode_warn> is considered as an error return code.
+
+=item ro_default C<"--opt1 --opt2">
+
+pass some options to C<rsync> (useful only in config file). 
+Default is C<"--hard-links --archive -e ssh">.
+
+=item send_warn C<0|1>
+
+send alert on warning (default is send alert only on error)
+
+=item smtp_server C<smtp_server>
+
+set the SMTP server
+
+=item use_syslog C<0|1>
+
+enable to talk to syslog
+
+=back
+
+=head1 ARCHIVE INITIALIZATION
+
+This operation is needed before a directory can be used as a backup destination.
+
+=over 4
+
+=item --init C<n>
+
+format a backup directory to receive C<n> archives.
+
+=back
+
+=head1 FILES AND DIRECTORIES
+
+=over 4
+
+=item rocknroll.conf
+
+the configuration file
+
+=item .C<tag>.ctl
+
+a control file located in the archive directory, related to the C<tag>
+archive set. 
+
+=over 4
+
+=item Note
+
+This file stores the number of archives declared at the initialization of the C<tag> archives set. 
+It is useful to recovery a normal state, in case of some archives disappear.
+Normaly, the number stored in this file must match the number of current archives in the set.
+If not, a warning is sent.
+If this file is not found, it is re-create according of the current state of the archive set, and a warning is sent.
+
+=back
+
+=item .C<tag>.running
+
+the temporary directory (located in the archive directory) for the
+running rsync.
+
+=back
+
+=head1 EXAMPLES
+
+  # rocknroll --init 7 daily /var/backup/myserver
+  # rocknroll --init 4 weekly /var/backup/myserver
+  # rocknroll --init 12 monthly /var/backup/myserver
+  
+prepare the directory C</var/backup/myserver> to receive 3 sets of respectively 7 archives named C<daily>, 
+4 archives named C<weekly> and 12 archives named monthly.
+
+  # rocknroll daily myhost.mydomain:/ /var/backup/myserver
+  
+perform a new backup of C<myhost.mydomain:/>, add it as C<daily.1> to the archive set into the local directory C</var/backup/myserver>,
+and roll the set C<daily>(forget the existing C<daily.7>)
+
+
+=head1 SEE ALSO
+
+C<rsnapshot>, <http://rsnapshot.org>. C<rsnapshot> and C<rocknroll> have similar
+functionalities, and C<rsnapshot> has been the first on the place. But
+when I began to think about C<rocknroll>, I've never heard of C<rnspashot>.
+
+=head1 AUTHOR
+
+Jacquelin Charbonnel, C<< <jacquelin.charbonnel at math.cnrs.fr> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-Dir-Rocknroll at rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dir-Rocknroll>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Dir-Rocknroll
+
+You can also look for information at:
+
+=over 4
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dir-Rocknroll>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dir-Rocknroll>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dir-Rocknroll>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dir-Rocknroll>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright Jacquelin Charbonnel E<lt> jacquelin.charbonnel at math.cnrs.fr E<gt>
+
+This software is governed by the CeCILL-C license under French law and
+abiding by the rules of distribution of free software.  You can  use, 
+modify and/ or redistribute the software under the terms of the CeCILL-C
+license as circulated by CEA, CNRS and INRIA at the following URL
+"http://www.cecill.info". 
+
+As a counterpart to the access to the source code and  rights to copy,
+modify and redistribute granted by the license, users are provided only
+with a limited warranty  and the software's author,  the holder of the
+economic rights,  and the successive licensors  have only  limited
+liability. 
+
+In this respect, the user's attention is drawn to the risks associated
+with loading,  using,  modifying and/or developing or reproducing the
+software by the user in light of its specific status of free software,
+that may mean  that it is complicated to manipulate,  and  that  also
+therefore means  that it is reserved for developers  and  experienced
+professionals having in-depth computer knowledge. Users are therefore
+encouraged to load and test the software's suitability as regards their
+requirements in conditions enabling the security of their systems and/or 
+data to be ensured and,  more generally, to use and operate it in the 
+same conditions as regards security. 
+
+The fact that you are presently reading this means that you have had
+knowledge of the CeCILL-C license and that you accept its terms.
+

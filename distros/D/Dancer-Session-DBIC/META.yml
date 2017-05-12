@@ -1,0 +1,32 @@
+---
+abstract: 'DBIx::Class based session engine for Dancer'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  DBICx::TestDatabase: '0'
+  DBIx::Class::TimeStamp: '0'
+  Test::Exception: '0'
+  Test::More: '0.63'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Session-DBIC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class: '0'
+  Dancer: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0.01'
+  parent: '0.215'
+resources:
+  bugtracker: https://github.com/interchange/Dancer-Session-DBIC/issues
+  repository: https://github.com/interchange/Dancer-Session-DBIC.git
+version: '0.006'

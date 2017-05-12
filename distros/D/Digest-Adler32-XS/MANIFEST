@@ -1,0 +1,10 @@
+lib/Digest/Adler32/XS.pm
+Makefile.PL
+MANIFEST			This list of files
+changes.txt
+readme.txt
+t/10-core-adler32.t
+t/20-digest-adler32.t
+t/30-benchmark.t
+XS.xs
+META.yml                                 Module meta-data (added by MakeMaker)

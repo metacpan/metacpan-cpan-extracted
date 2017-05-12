@@ -1,0 +1,29 @@
+diff -Naur dh-make-perl.orig//lib/Debian/Control/FromCPAN.pm dh-make-perl//lib/Debian/Control/FromCPAN.pm
+--- dh-make-perl.orig//lib/Debian/Control/FromCPAN.pm   2010-07-16 08:50:32.000000000 +0000
++++ dh-make-perl//lib/Debian/Control/FromCPAN.pm        2010-07-16 08:51:22.000000000 +0000
+@@ -22,6 +22,8 @@
+ use DhMakePerl::Utils qw( is_core_module find_cpan_module nice_perl_ver split_version_relation );
+ use File::Spec qw( catfile );
+ use Module::Depends ();
++use Debian::Apt::PM;
++our $aptpm = Debian::Apt::PM->new();
+ 
+ use constant oldstable_perl_version => '5.8.8';
+ 
+@@ -264,6 +266,16 @@
+ 
+         my $dep;
+ 
++       do {
++               my $info = $aptpm->find($module, $dep_hash->{$module});
++               if ($info and $info->{'min'}) {
++                       $dep = Debian::Dependency->new( $info->{'min'}->{'package'}, $info->{'min'}->{'version'} );
++               }
++       };
++
++       if ($dep) {
++               # found via Debian::Apt::PM
++       }
+         if ($apt_contents) {
+             $dep = $apt_contents->find_perl_module_package( $module, $version );
+         }

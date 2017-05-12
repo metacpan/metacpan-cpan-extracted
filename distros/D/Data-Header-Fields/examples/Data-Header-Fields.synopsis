@@ -1,0 +1,15 @@
+	use IO::Any;
+	my $email_msg = IO::Any->slurp([ 'path', 'to', 'email.eml' ]);
+	my ($email_header, $email_body) = split(/^\s*$/m, $email_msg, 2);
+
+	use Data::Header::Fields;
+	my $dhf = Data::Header::Fields->new->decode(\$email_header);
+	print 'From    - ', $dhf->get_value('From'), "\n";
+	print 'Subject - ', $dhf->get_value('Subject'), "\n";
+	print 'Date    - ', $dhf->get_value('Date'), "\n";
+	print '--- cut ---', "\n";
+
+	$dhf->set_value('To' => ' anyone@anywhere');
+	$dhf->rm_fields('Received');
+	
+	print $dhf->encode();

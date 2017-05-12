@@ -1,0 +1,206 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Delta_v1 - Differences introduced in version 1.0
+
+=head1 DESCRIPTION
+
+This document is a short enumeration of the main differences 
+introduced in version C<DBIx::DataModel> version 1.0.
+
+
+=head1 SCHEMA DECLARATION
+
+=head2 Chained declarations
+
+  DBIx::DataModel
+  ->Schema(qw/MySchema ..../)
+  ->Table(qw/Table1 .../)
+  ->Table(qw/Table2 .../)
+  ...
+  ->Association(...)
+  ->
+
+instead of 
+
+  DBIx::DataModel->Schema(qw/MySchema ..../);
+
+  MySchema->Table(qw/Table1 .../);
+  MySchema->Table(qw/Table2 .../);
+  ...
+  MySchema->Association(...);
+  MySchema->
+
+
+=head2 Implicit schema name in declarations
+
+  ->Table(qw/Table1 .../)
+  ...
+  ->Association([qw/Table1 .../],
+                [qw/Table2 .../])
+
+
+instead of 
+
+  ->Table(qw/MySchema::Table1 .../)
+  ...
+  ->Association([qw/MySchema::Table1 .../],
+                [qw/MySchema::Table2 .../])
+
+but explicit prefix is still possible
+
+  ->Table(qw/My::Other::Namespace::Table1 .../)
+  ...
+  ->Association([qw/My::Other::Namespace::Table1 .../],
+                [qw/My::Other::Namespace::Table2 .../])
+
+
+=head3 Automatic schema skeleton.
+
+  perl -MDBIx::DataModel::Schema::Generator      \
+       -e "fromDBI('dbi:connection:string')" --  \
+       -schema My::New::Schema > My/New/Schema.pm
+
+  perl -MDBIx::DataModel::Schema::Generator      \
+       -e "fromDBIxClass('Some::DBIC::Schema')" -- \
+       -schema My::New::Schema > My/New/Schema.pm
+
+  sqlt -f <parser> -t DBIx::DataModel::Schema::Generator <parser_input>
+
+See L<DBIx::DataModel::Schema::Generator>.
+
+
+
+=head1 SCHEMA USAGE
+
+=head2 Renamed classes
+
+For a global view of the class hierarchy, see 
+L<DBIx::DataModel::Doc::Design/"Classes">.
+
+
+=head3 AbstractBase => Source
+
+Classes C<Table> and C<View> both inherit from 
+L<Source|DBIx::DataModel::Source> instead
+of C<AbstractTable>. This internal change should be mostly invisible
+to users.
+
+=head3 Cursor => Statement
+
+The former C<Cursor> class is now called 
+L<Statement|DBIx::DataModel::Statement>, because
+it has several new methods for managing the lifecycle of a query statement
+to the database (C<bind>, C<sqlize>, C<prepare>, C<execute>, etc.).
+
+
+=head2 Renamed methods
+
+=head3 ViewFromRoles => join
+
+  my $view = MySchema->join(qw/Table role1 role2 .../)
+
+instead of 
+
+  my $view = MySchema->ViewFromRoles(qw/Table role1 role2 .../)
+
+
+=head3 selectFromRoles => join->select
+
+  my $list = $obj->join(qw/role1 role2 .../)
+                 ->select(-columns => ...
+                          -where   => ...);
+
+instead of 
+
+  my $list = $obj->selectFromRoles(qw/role1 role2 .../)
+                 ->(-columns => ...
+                    -where   => ...);
+
+=head3 MethodFromRoles => MethodFromJoin
+
+  My::Table->MethodFromJoin(method => qw/role1 role2 .../);
+
+instead of 
+
+  My::Table->MethodFromRoles(method => qw/role1 role2 .../);
+
+
+
+=head2 New methods
+
+=head3 Statement prepare, bind, execute
+
+See the 
+L<design doc|DBIx::DataModel::Doc::Design/"STATEMENT OBJECTS">
+and
+L<reference doc|DBIx::DataModel::Statement>
+(lifecycle, named placeholders, etc.).
+
+
+
+=head3 Table->join
+
+New class method C<join> in a table or view produces a statement
+that can be C<execute>d on instances of that table or view.
+
+
+  my $stmt = My::Table->join(qw/role1 role2 .../);
+  $stmt->prepare;                           
+
+  foreach my $obj (@instances_of_my_table) {
+    my $list = $stmt->execute($obj)->all;
+    ...
+    # or
+    $stmt->execute($obj);
+    while (my $row = $stmt->next) {
+      ...
+    }
+  }  
+
+=head3 fetch_cached
+
+  My::Table->fetch_cached(@primary_key);
+
+=head3 dbiPrepareMethod
+
+  MySchema->dbiPrepareMethod('prepareCached');
+
+
+=head1 ALIASING
+
+=head2 Table aliases
+
+  MySchema->join(qw/Table|a1 role1|a2 .../)
+          ->select(-columns => [qw/a1.c1 a1.c2 a2.c1 a2.c2 .../])
+
+=head2 Source prefixes in joins
+
+  ..->join(qw/FirstTable role1|r1 FirstTable.role2 r1.role3|r3 role2.role4/)
+
+=head2 Column handlers follow aliases
+
+  My::Table->ColumnType(Date => qw/date1 date2 .../);
+  ...
+  my $rows = My::Table->select(-columns => qw/date1|d1 date2|d2 .../);
+  
+
+
+=head1 MISC
+
+=head2 Fast statements
+
+  my $stmt = $source->select(-columns  => ...
+                             -where    => ...
+                             -resultAs => 'fast_statement');
+  while (my $row = $stmt->next) {
+    work_immedately_with($row);
+  }                   
+                   
+
+=head2 Result as flat arrayref
+
+  my $pairs = MySchema::People->select(-columns  => [qw/pers_id firstname/],
+                                       -resultAs => 'flat_arrayref');
+  my %hash = @$pairs;

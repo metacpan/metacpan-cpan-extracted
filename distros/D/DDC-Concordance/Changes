@@ -1,0 +1,214 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution DDC-Concordance
+
+v0.37 Thu, 02 Mar 2017 15:16:49 +0100 moocow
+	+ added forgotten check for DDC::XS support in t/18b_any_xs_qparse.t
+
+v0.36 Thu, 02 Mar 2017 15:06:49 +0100 moocow
+	+ DDC::PP compatibility changes for ddc-v2.1.1
+	+ added query-parsing tests t/*_qparse.t (parseme.pl, parseme.dat)
+
+v0.35 Mon, 23 Jan 2017 14:16:58 +0100 moocow
+	+ fixed DDC::PP::yyqlexer lexer bug with embedded quotes ('\'s')
+
+v0.34 Wed, 04 Jan 2017 11:01:29 +0100 moocow
+	+ fixed bogus '#(ASC|DESC)_CONTEXT' from CQFContextSort::toString()
+
+v0.33 Tue, 03 Jan 2017 14:20:07 +0100 moocow
+	+ fixed bogus reverse-ordering of sub-objects in DDC::PP::Object::Descendants()
+	  - partly due to stack vs. queue confusion in DDC::PP::Object::Descendants() itself
+	  - partly due to non-deterministic default DDC::PP::Object::Children() implementation
+	  - fix overrides Children() for order-dependent types (CQBinOp, CQCount)
+	  - added tests in t/*7*_traverse.t
+
+v0.32 Mon, 19 Dec 2016 13:04:46 +0100 moocow
+	+ added DDC::Client::Distributed::queryMulti()
+	+ added support for DDC::Client::Distributed::queryMulti() to ddc-query.perl (-multi, -M)
+
+v0.31 Wed, 02 Nov 2016 11:07:44 +0100 moocow
+	+ added DDC::PP support for /d DDC-regex modifier ("ignore diacritics", DDC >= v2.0.47)
+	+ DDC::PP::library_version() now returns earliest supported DDC query-language version
+	  (same as minimum DDC::XS::library_version() for the query language as parsed by DDC::PP)
+	+ added DDC::Client convenience methods request, requestJson, version, status, vstatus, info, expand
+	+ moved expand_terms method from DDC::Client::Distributed to generic implementation in DDC::Client
+	+ added DDC::Client::parseExpandTermsResponse
+
+v0.30 Tue, 01 Nov 2016 13:30:40 +0100 moocow
+	+ set SO_LINGER=[1,0] for DDC client sockets: immediate termination (avoid TCP TIME_WAIT)
+	  - see discussion at http://stackoverflow.com/questions/3757289/tcp-option-so-linger-zero-when-its-required
+
+v0.29 Fri, 30 Sep 2016 12:37:07 +0200 moocow
+	+ fix for DDC::PP::DisownChildren()
+
+v0.28 Thu, 18 Aug 2016 10:39:33 +0200 moocow
+	+ added ddc-query.perl -[no]bench-clear-cache and -bench-seconds options
+	+ added sanity checks for DDC::Any::import() method (+tests in 10d_any_import_multi.t)
+	  - avoid "Recursive inheritance detected in package 'Exporter'" errors on multiple import / use
+
+v0.27 Mon, 11 Jul 2016 10:42:28 +0200 moocow
+	+ set MIN_PERL_VERSION = v5.10.0 for yyqlexer regex /p modifier
+
+v0.26 Thu, 07 Jul 2016 15:47:04 +0200 moocow
+	+ better checking for minimum DDC::XS version in DDC::Any
+	+ ignore "identifier used only once" warnings in DDC::Any tests on some platforms
+
+v0.25 Thu, 07 Jul 2016 12:09:56 +0200 moocow
+	+ added CQKeys::SetMatchId()
+
+v0.24 Thu, 07 Jul 2016 10:43:36 +0200 moocow
+	+ minor pod warts fixed
+	+ DDC::PP::Object compatibility fixes for DDC::Any
+	+ added mapTraverse tests 07_pp_traverse.t, 17a_any_pp_traverse.t, 17b_any_xs_traverse.t
+	+ updated module metadata
+
+v0.23 Wed, 06 Jul 2016 15:24:54 +0200 moocow
+	+ added DDC::PP hierarchy: pure-perl simulation of DDC::XS classes (updated for DDC::XS v0.13 / ddc v2.0.43)
+	  - removed old DDC::Query subtree (deprecated since pre-v0.11/r159/2014-03-27, now superseded by DDC::XS, DDC::PP)
+	+ added DDC::Any package to wrap DDC::XS (if available) or DDC::PP (if requested or as fallback)
+
+v0.22 Wed, 15 Jun 2016 09:25:38 +0200 moocow
+	+ removed // operator (perl >= v5.10.0)
+	  - apparently the 'require' in DDC/Concordance.pm wasn't catching
+	  - caused cpantesters failures for perl v5.8.x, e.g. http://www.cpantesters.org/cpan/report/2ad78a32-31ff-11e6-aa87-16280081755b
+	  - also likely responsible for failed 4add1b26-3173-11e6-99be-4eefed1f9a26
+
+v0.21 Tue, 14 Jun 2016 08:52:30 +0200 moocow
+	+ added __END__ keyword before PODs in pm files
+	  - try to fix bizarre cpantesters failure http://www.cpantesters.org/cpan/report/4add1b26-3173-11e6-99be-4eefed1f9a26
+
+v0.20 Tue, 29 Sep 2015 09:09:10 +0200 moocow
+	+ require perl >= 5.10.0 (for // operator)
+
+v0.19 Mon, 28 Sep 2015 15:27:04 +0200 moocow
+	+ doc fixes
+
+v0.18 Mon, 28 Sep 2015 14:50:46 +0200 moocow
+	+ "official" release of cpan-compatible DDC::Concordance (devel release looks ok)
+
+v0.17_001 Fri, 25 Sep 2015 11:04:52 +0200 moocow
+	+ renamed distribution to DDC::Concordance for CPAN-compatibility
+	+ restructured directory (DDC/ -> lib/DDC/) to avoid confusing ExtUtils::MakeMaker
+
+v0.17 Thu, 24 Sep 2015 13:47:03 +0200 moocow
+	+ moved top-level module from 'DDC' to 'DDC::Concordance'
+	+ kept dummy top-level wrapper DDC.pm for backwards-compatibility
+	+ workaround for name conflict with Torsten Raudssus' "DDC" in the
+	  "Data-Coloured" distribution ( https://metacpan.org/pod/DDC )
+	  (see RT bug #107031, https://rt.cpan.org/Public/Bug/Display.html?id=107031)
+
+v0.16 Fri, 24 Apr 2015 14:13:09 +0200 moocow
+	+ parse deep-encoded context tokens in DDC:::Hit::expandFields() for ddc >= v2.0.38
+	+ fixed Text format to deal with deep-encoded context tokens if available
+
+v0.15 2015-01-20 moocow
+	+ fixed -output arg to ddc-dump2tj.perl
+	+ fixed no-hits error in ddc-query.perl
+
+v0.14 Thu, 04 Dec 2014 15:46:28 +0100 moocow
+	+ added count()-query handling to 'text' and 'kwic' formats
+
+v0.13 Tue, 07 Oct 2014 12:40:43 +0200 moocow
+	+ improved query benchmarking, allow reading query-list from a file
+
+v0.12 Fri, 27 Jun 2014 12:17:19 +0200 moocow
+	+ added scripts ddc-make-bibl.perl, ddc-dump2tj.perl
+
+v0.11 Tue, 27 May 2014 09:48:33 +0200 moocow
+	+ added Format/Kwic.pm to MANIFEST
+	+ added Changes
+
+2014-05-14  moocow
+	* [r241] DDC.pm, DDC/Client.pm, DDC/Client/Distributed.pm: + added
+	  DDC::Client::decodeJson() method and
+	  DDC::Client::Distributed::queryJson
+
+2014-05-07  moocow
+	* [r227] ddc-cgi.perl: + more request-mode stuff for ddc-cgi.perl
+
+2014-03-27  moocow
+	* [r159] DDC.pm, DDC/Query.pm, DDC/Query/yylexer.pm,
+	  DDC/Query/yyparser.output, DDC/Query/yyparser.pm,
+	  DDC/Query/yyparser.yp: + updated DDC-perl query lexer+parser for
+	  ddc-v2.0.21
+	  - TODO: chuck the pure-perl implementation and use the C++ parser
+	  directly somehow
+
+2014-03-07  moocow
+	* [r121] DDC/Format/Kwic.pm: + kwic formatter: output total number
+	  of hits
+
+2014-03-03  moocow
+	* [r112] ddc-query.perl: + parse port in ddc-query.perl (for less
+	  confusing error messages on failure)#
+
+2014-02-24  moocow
+	* [r111] ddc-query.perl: + ddc-query.perl: append newline to
+	  raw-data results if not already present
+	* [r106] DDC.pm: + load kwic format by default
+	* [r105] ddc-query.perl: + removed debugging code
+	* [r104] DDC.pm, DDC/Format/Kwic.pm, ddc-query.perl: + v0.09: added
+	  Kwic format
+
+2014-02-19  moocow
+	* [r101] ddc-query.perl: + ddc-query.perl: bench raw queries, not
+	  parsing
+
+2014-02-18  moocow
+	* [r99] DDC/Client.pm, DDC/Client/Distributed.pm, ddc-query.perl: +
+	  ddc-query.perl: added -request option: alias for -raw
+	  -mode=request (formerly -mode=raw)
+
+2014-02-17  moocow
+	* [r96] DDC/Client.pm, DDC/Client/Distributed.pm, ddc-query.perl: +
+	  v0.08: added -mode=raw queries to test and verify ddc_proto
+	  manpage
+
+2014-01-08  moocow
+	* [r86] DDC.pm: + updated to v0.08
+	* [r85] ., DDC/Format/JSON.pm: + added JSON formatter abs(level)>1
+	  check for canonical-json
+
+2012-01-17  moocow
+	* [r26] README.txt: + typo fix
+	* [r25] ., DDC.pm, DDC/Client.pm, DDC/Client/Distributed.pm,
+	  DDC/Filter.pm, DDC/Format.pm, DDC/Format/Dumper.pm,
+	  DDC/Format/JSON.pm, DDC/Format/Raw.pm, DDC/Format/Template.pm,
+	  DDC/Format/Text.pm, DDC/Format/YAML.pm, DDC/Hit.pm,
+	  DDC/HitList.pm, DDC/Query.pm, DDC/Query/Filter.pm,
+	  DDC/Query/Parser.pm, DDC/Query/yylexer.pm,
+	  DDC/Query/yyparser.output, DDC/Query/yyparser.pm,
+	  DDC/Query/yyparser.yp, DDC/Utils.pm, README.rpod, qparse.perl:
+	  v0.07: got DDC::Query::Parser up and running again
+	  - this is a real PITA to maintain parallel to the 'real' DDC
+	  query parser in C++
+	  - eventually, there should be an XS perl module which just calls
+	  the real parser
+
+2011-12-02  moocow
+	* [r21] DDC/Client.pm: + better error handling on client reads
+	* [r20] DDC/Client.pm: + fixed typo in error message
+	* [r19] DDC/Format/Raw.pm: + bugfix in DDC::Format::Raw (thanks to
+	  Konstantin Bairer)
+
+2011-11-15  moocow
+	* [r16] Makefile.PL: + renamed distribution to ddc-perl (all
+	  lowercase)
+	* [r15] .: + ignore some stuff
+	* [r14] DDC/Client.pm: + fixed $ilen initialization bug
+	* [r8] DDC.pm: + updated version comments
+	* [r7] ., DDC, DDC.pm, DDC/Client, DDC/Client.pm,
+	  DDC/Client/Distributed.pm, DDC/Filter.pm, DDC/Format,
+	  DDC/Format.pm, DDC/Format/Dumper.pm, DDC/Format/JSON.pm,
+	  DDC/Format/Raw.pm, DDC/Format/Template.pm, DDC/Format/Text.pm,
+	  DDC/Format/YAML.pm, DDC/Hit.pm, DDC/HitList.pm, DDC/Query,
+	  DDC/Query.pm, DDC/Query/Filter.pm, DDC/Query/Parser.pm,
+	  DDC/Query/yylexer.pm, DDC/Query/yyparser.output,
+	  DDC/Query/yyparser.pm, DDC/Query/yyparser.yp, DDC/Utils.pm,
+	  MANIFEST, MANIFEST.SKIP, Makefile.PL, README.rpod, README.txt,
+	  ddc-cgi.perl, ddc-cgi.rc, ddc-expand-lts-query.perl,
+	  ddc-lts-wrapper.perl, ddc-query.perl, dummylex.perl,
+	  qexpand.perl, qparse.perl, t, t/00_basic.t, t/common.plt,
+	  testme.perl: + initial import of ddc-perl bindings for ddc-2.x
+	  branch
+

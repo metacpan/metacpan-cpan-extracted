@@ -1,0 +1,38 @@
+Changes
+lib/Devel/Events.pm
+lib/Devel/Events/Filter.pm
+lib/Devel/Events/Filter/Callback.pm
+lib/Devel/Events/Filter/Drop.pm
+lib/Devel/Events/Filter/HandlerOptional.pm
+lib/Devel/Events/Filter/RemoveFields.pm
+lib/Devel/Events/Filter/Stamp.pm
+lib/Devel/Events/Filter/Stringify.pm
+lib/Devel/Events/Filter/Warn.pm
+lib/Devel/Events/Generator.pm
+lib/Devel/Events/Generator/LineTrace.pm
+lib/Devel/Events/Generator/Require.pm
+lib/Devel/Events/Generator/SubTrace.pm
+lib/Devel/Events/Handler.pm
+lib/Devel/Events/Handler/Callback.pm
+lib/Devel/Events/Handler/Log/Memory.pm
+lib/Devel/Events/Handler/Multiplex.pm
+lib/Devel/Events/Match.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/001_use.t
+t/002_filter_callback.t
+t/002_handler_callback.t
+t/003_handler_multiplex.t
+t/003_match.t
+t/004_handler_log_memory.t
+t/005_filter_warn.t
+t/011_generator_line_trace.t
+t/012_generator_sub_trace.t
+t/013_generator_require.t
+t/021_filter_stringify.t
+t/022_filter_stamp.t
+t/023_filter_remove.t
+t/025_filter_drop.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

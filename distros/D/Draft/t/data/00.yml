@@ -1,0 +1,16 @@
+--- #YAML:1.0
+copyright:
+  - Bruno Postle <bruno@postle.net>
+license: http://creativecommons.org/licenses/sa/1.0/
+points:
+  -
+    - 142.948700309612
+    - 302.199167378543
+    - 0
+  -
+    - 339.598589039623
+    - -37.7731808793675
+    - 0
+type: line
+units: mm
+version: draft1

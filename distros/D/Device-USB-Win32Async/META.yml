@@ -1,0 +1,24 @@
+---
+name: Device-USB-Win32Async
+version: 0.36
+author:
+  - Rajstennaj Barrabas
+abstract: Add async functions to Device::USB
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Device::USB: 0.31
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.35
+provides:
+  Device::USB::Device:
+    file: lib/Device/USB/Win32Async.pm
+  Device::USB::Win32Async:
+    file: lib/Device/USB/Win32Async.pm
+    version: 0.36
+generated_by: Module::Build version 0.350001
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

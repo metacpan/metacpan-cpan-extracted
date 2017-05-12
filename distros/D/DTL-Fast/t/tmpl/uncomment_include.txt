@@ -1,0 +1,7 @@
+commented {% comment Some comment %}
+This part
+should 
+{% uncomment Necessary block %}Bingo{% enduncomment %}
+not 
+be 
+rendered{% endcomment %} test

@@ -1,0 +1,646 @@
+
+#pod =pod
+#pod
+#pod =cut
+
+# PODNAME:  Data::Rx::Manual::CustomTypes
+# ABSTRACT: overview of making new checkers
+
+#pod =head1 OVERVIEW
+#pod
+#pod L<Data::Rx> ships with a variety of core validators --
+#pod I<L<single|http://rx.codesimply.com/coretypes.html#single>>,
+#pod I<L<collection|http://rx.codesimply.com/coretypes.html#collect>>, and
+#pod I<L<combination|http://rx.codesimply.com/coretypes.html#combo>> types, which
+#pod can be combined in surprisingly powerful ways.  However the core language is
+#pod deliberately limited to known cross-platform features, and there are things
+#pod that you simply cannot represent with it. However, you can create custom I<type
+#pod plugins> in any implementation, including L<Data::Rx> in Perl.
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod The easiest way to create a custom type plugin is to subclass
+#pod L<Data::Rx::CommonType::EasyNew>.
+#pod
+#pod   package My::Type::Foo;
+#pod   use parent 'Data::Rx::CommonType::EasyNew';
+#pod
+#pod   sub type_uri {
+#pod     'tag:example.com,EXAMPLE:rx/foo',
+#pod   }
+#pod
+#pod   sub guts_from_arg {
+#pod     my ($class, $arg, $rx) = @_;
+#pod
+#pod     # get and validate arguments from $arg
+#pod
+#pod     return {
+#pod         # the "guts" for this object
+#pod         # these might be validator objects using CPAN modules
+#pod         # or using $rx->make_schema() etc.
+#pod       },
+#pod   }
+#pod
+#pod   sub assert_valid {
+#pod     my ($self, $value) = @_;
+#pod
+#pod     # check the value, and either return 1 for success
+#pod     # or die on failure
+#pod   }
+#pod
+#pod   1;
+#pod
+#pod and later...
+#pod
+#pod   use Data::Rx;
+#pod   use My::Type::Foo;
+#pod
+#pod   my $rx = Data::Rx->new({
+#pod     sort_keys => 1,
+#pod     prefix => {
+#pod       example => 'tag:example.com,EXAMPLE:rx/',
+#pod     },
+#pod     type_plugins => [qw(
+#pod       My::Type::Foo
+#pod     )],
+#pod   });
+#pod
+#pod   my $schema = $rx->make_schema('/example/foo');
+#pod
+#pod   $schema->assert_valid( $some_value );
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod These examples are worked fully in the C<examples/> directory.  In this man
+#pod page, we will just look at interesting features of each type plugin, for clarity.
+#pod
+#pod =head2 W3C DateTime - using Perl and CPAN in checks
+#pod
+#pod We might want to validate dates in the W3CDTF format, which look like
+#pod C<2003-02-15T13:50:05-05:00>.  We could of course write this with a
+#pod regular expression, but let's take an even better approach and dash to the
+#pod CPAN, where we find an existing module, L<DateTime::Format::W3CDTF>.
+#pod
+#pod Our parser, then, will instantiate one of these objects, and return it
+#pod with C<guts_from_arg> to be stashed away.
+#pod
+#pod   use DateTime::Format::W3CDTF;
+#pod
+#pod   sub guts_from_arg {
+#pod     my ($class, $arg, $rx) = @_;
+#pod
+#pod     return {
+#pod       dt => DateTime::Format::W3CDTF->new,
+#pod     };
+#pod   }
+#pod
+#pod We can then test this in the C<assert_valid> routine by returning true
+#pod if the date format matches:
+#pod
+#pod   sub assert_valid {
+#pod     my ($self, $value) = @_;
+#pod
+#pod     return 1 if $value && eval {
+#pod       $self->{dt}->parse_datetime( $value  );
+#pod     };
+#pod
+#pod If it doesn't, then we should return an error, and to make sure that we
+#pod act like a good citizen in the Rx ecosystem, let's use
+#pod C<Data::Rx::CommonType::EasyNew>'s provided method C<fail>:
+#pod
+#pod     $self->fail({
+#pod       error => [ qw(type) ],
+#pod       message => "found value is not a w3 datetime",
+#pod       value => $value,
+#pod     })
+#pod   }
+#pod
+#pod Now we can use this checker like so:
+#pod
+#pod   $rx->make_schema('/example/datetime/w3')
+#pod      ->assert_valid( '2003-02-15T13:50:05-05:00' );
+#pod
+#pod =head2 Enum - delegate to another schema
+#pod
+#pod You'll often want to create data-types that match a set of values like
+#pod (C<open>, C<closed>) or (C<0>, C<15>, C<30>, C<40>).  L<Data::Rx> doesn't
+#pod have an Enum type, but it does have C<//any>:
+#pod
+#pod   {
+#pod     type => '//any',
+#pod     of => [
+#pod       { type => '//str', value => 'open' },
+#pod       { type => '//str', value => 'closed' },
+#pod     ]
+#pod   }
+#pod
+#pod This is a bit clumsy though, with the repetition of the type C<//str>.  Instead
+#pod we would like an Enum type which might be declared like:
+#pod
+#pod   {
+#pod     type => '/example/enum',
+#pod     contents => {
+#pod       type    => '//str',
+#pod       values  => [ qw/
+#pod         open
+#pod         closed
+#pod       /],
+#pod     },
+#pod   }
+#pod
+#pod Ignoring input checking (for this example), we can get this information from the
+#pod C<$arg> parameter:
+#pod
+#pod   sub guts_from_arg {
+#pod     my ($class, $arg, $rx) = @_;
+#pod
+#pod     my $type = $arg->{contents}{type};
+#pod     my @values = @{ $arg->{contents}{values} };
+#pod
+#pod We already saw how we would write the enum as an C<//any> schema.  And in fact
+#pod the easiest way to implement this type plugin is to do exactly that!  Let's
+#pod create a schema which is equivalent, and return it, to be stashed in the object:
+#pod
+#pod     my $schema = $rx->make_schema({
+#pod       type => '//any',
+#pod       of   => [
+#pod         map {;
+#pod           { type => $type, value => $_ }
+#pod         } @values,
+#pod       ],
+#pod     });
+#pod
+#pod     return { schema => $schema };
+#pod   }
+#pod
+#pod Now, checking the enum is as simple as delegating to this schema:
+#pod
+#pod   sub assert_valid {
+#pod     my ($self, $value) = @_;
+#pod
+#pod     $self->{schema}->assert_valid( $value );
+#pod   }
+#pod
+#pod As we are delegating to another schema's C<assert_valid> we know that
+#pod any exceptions will be in the correct format.  However, the error will
+#pod be the one that C<//any> provides:
+#pod
+#pod     Failed //any: matched none of the available alternatives
+#pod
+#pod This is probably clear enough for an enum.  But we could improve this message
+#pod by calling C<check> instead of C<assert_valid> and raising our own, nicely
+#pod formatted, exception using C<fail>.
+#pod
+#pod =head2 CSV - delegation, checking input
+#pod
+#pod Some APIs like to specify a list of IDs or statuses not as an array (which
+#pod of course Rx handles with C<//arr> but as a comma separated list.  Curses!
+#pod
+#pod We would like to write a type plugin that's defined something like:
+#pod
+#pod   {
+#pod     type => '/example/csv',
+#pod     contents => '/example/status',
+#pod   }
+#pod
+#pod Of course now that we are getting data as strings, we also have to worry
+#pod about spaces: e.g. in '123, 456', is the second ID ' 456' or just '456'?
+#pod So let's also accept an optional 3rd parameter C<trim>.
+#pod
+#pod Now that we're asking for a more complex input data structure, let's validate
+#pod it using Rx itself!
+#pod
+#pod   sub guts_from_arg {
+#pod     my ($class, $arg, $rx) = @_;
+#pod
+#pod     my $meta = $rx->make_schema({
+#pod       type => '//rec',
+#pod       required => {
+#pod         # contents => '/.meta/schema', # not yet implemented
+#pod         contents => '//any',
+#pod       },
+#pod       optional => {
+#pod         trim => {
+#pod           # we don't just accept //bool as this only includes 'boolean' objects,
+#pod           # let's also allow undef/0/1, as this is more Perlish!
+#pod           type => '//any',
+#pod           of => [ '//nil', '//bool', '//int' ]
+#pod         },
+#pod       },
+#pod     });
+#pod
+#pod     $meta->assert_valid( $arg );
+#pod
+#pod The C<contents> argument is required, and should be a valid schema.  We've had
+#pod to make a few trade-offs:
+#pod
+#pod =over 4
+#pod
+#pod =item *
+#pod
+#pod There isn't yet a convenient way to specify a schema, so we'll just accept
+#pod C<//any> for now.  As we will then pass this result to C<make_schema> shortly,
+#pod we will get a further validation of that in any case! (But see
+#pod L<http://rx.codesimply.com/moretypes.html> for the full definition of a schema,
+#pod if you prefer!)
+#pod
+#pod =item *
+#pod
+#pod Rx's type C<//bool> is deliberately targeted at JSON like boolean objects, so
+#pod we'll also accept undef and 1 as "truthy" values.
+#pod
+#pod =back
+#pod
+#pod As we are expecting a comma separated I<string>, the first check we'll want to
+#pod make is that the object we receive is in fact a string.  So the guts we'll
+#pod return are:
+#pod
+#pod     return {
+#pod         trim => $arg->{trim},
+#pod         str_schema => $rx->make_schema('//str'),
+#pod         item_schema => $rx->make_schema( $arg->{contents} ),
+#pod     };
+#pod
+#pod Now our C<assert_valid> routine will use all of these pieces:
+#pod
+#pod   use String::Trim;
+#pod
+#pod   sub assert_valid {
+#pod     my ($self, $value) = @_;
+#pod
+#pod First we check that we got a string:
+#pod
+#pod     $self->{str_schema}->assert_valid( $value );
+#pod
+#pod This means we can safely split the result:
+#pod
+#pod     my @values = split ',' => $value;
+#pod
+#pod     my $item_schema = $self->{item_schema};
+#pod     my $trim = $self->{trim};
+#pod
+#pod For each result we trim (if requested) and use the supplied checker on each
+#pod element.
+#pod
+#pod     for my $subvalue (@values) {
+#pod       trim($subvalue) if $trim;
+#pod
+#pod       $item_schema->assert_valid( $subvalue );
+#pod     }
+#pod
+#pod     return 1;
+#pod   }
+#pod
+#pod Putting together all the pieces, we can call this like so:
+#pod
+#pod   my $csv = $rx->make_schema({
+#pod     type => '/example/csv',
+#pod     contents => {
+#pod       type     => '/example/enum',
+#pod       contents => {
+#pod         type    => '//str',
+#pod         values  => [qw/ open closed /],
+#pod       }
+#pod     },
+#pod     trim => 1,
+#pod   });
+#pod
+#pod   $csv->assert_valid( 'open, closed' ); # OK!
+#pod
+#pod =head1 POD AUTHOR
+#pod
+#pod Hakim Cassimally <osfameron@cpan.org>
+#pod
+#pod =cut
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Rx::Manual::CustomTypes - overview of making new checkers
+
+=head1 VERSION
+
+version 0.200007
+
+=head1 SYNOPSIS
+
+The easiest way to create a custom type plugin is to subclass
+L<Data::Rx::CommonType::EasyNew>.
+
+  package My::Type::Foo;
+  use parent 'Data::Rx::CommonType::EasyNew';
+
+  sub type_uri {
+    'tag:example.com,EXAMPLE:rx/foo',
+  }
+
+  sub guts_from_arg {
+    my ($class, $arg, $rx) = @_;
+
+    # get and validate arguments from $arg
+
+    return {
+        # the "guts" for this object
+        # these might be validator objects using CPAN modules
+        # or using $rx->make_schema() etc.
+      },
+  }
+
+  sub assert_valid {
+    my ($self, $value) = @_;
+
+    # check the value, and either return 1 for success
+    # or die on failure
+  }
+
+  1;
+
+and later...
+
+  use Data::Rx;
+  use My::Type::Foo;
+
+  my $rx = Data::Rx->new({
+    sort_keys => 1,
+    prefix => {
+      example => 'tag:example.com,EXAMPLE:rx/',
+    },
+    type_plugins => [qw(
+      My::Type::Foo
+    )],
+  });
+
+  my $schema = $rx->make_schema('/example/foo');
+
+  $schema->assert_valid( $some_value );
+
+=head1 OVERVIEW
+
+L<Data::Rx> ships with a variety of core validators --
+I<L<single|http://rx.codesimply.com/coretypes.html#single>>,
+I<L<collection|http://rx.codesimply.com/coretypes.html#collect>>, and
+I<L<combination|http://rx.codesimply.com/coretypes.html#combo>> types, which
+can be combined in surprisingly powerful ways.  However the core language is
+deliberately limited to known cross-platform features, and there are things
+that you simply cannot represent with it. However, you can create custom I<type
+plugins> in any implementation, including L<Data::Rx> in Perl.
+
+=head1 EXAMPLES
+
+These examples are worked fully in the C<examples/> directory.  In this man
+page, we will just look at interesting features of each type plugin, for clarity.
+
+=head2 W3C DateTime - using Perl and CPAN in checks
+
+We might want to validate dates in the W3CDTF format, which look like
+C<2003-02-15T13:50:05-05:00>.  We could of course write this with a
+regular expression, but let's take an even better approach and dash to the
+CPAN, where we find an existing module, L<DateTime::Format::W3CDTF>.
+
+Our parser, then, will instantiate one of these objects, and return it
+with C<guts_from_arg> to be stashed away.
+
+  use DateTime::Format::W3CDTF;
+
+  sub guts_from_arg {
+    my ($class, $arg, $rx) = @_;
+
+    return {
+      dt => DateTime::Format::W3CDTF->new,
+    };
+  }
+
+We can then test this in the C<assert_valid> routine by returning true
+if the date format matches:
+
+  sub assert_valid {
+    my ($self, $value) = @_;
+
+    return 1 if $value && eval {
+      $self->{dt}->parse_datetime( $value  );
+    };
+
+If it doesn't, then we should return an error, and to make sure that we
+act like a good citizen in the Rx ecosystem, let's use
+C<Data::Rx::CommonType::EasyNew>'s provided method C<fail>:
+
+    $self->fail({
+      error => [ qw(type) ],
+      message => "found value is not a w3 datetime",
+      value => $value,
+    })
+  }
+
+Now we can use this checker like so:
+
+  $rx->make_schema('/example/datetime/w3')
+     ->assert_valid( '2003-02-15T13:50:05-05:00' );
+
+=head2 Enum - delegate to another schema
+
+You'll often want to create data-types that match a set of values like
+(C<open>, C<closed>) or (C<0>, C<15>, C<30>, C<40>).  L<Data::Rx> doesn't
+have an Enum type, but it does have C<//any>:
+
+  {
+    type => '//any',
+    of => [
+      { type => '//str', value => 'open' },
+      { type => '//str', value => 'closed' },
+    ]
+  }
+
+This is a bit clumsy though, with the repetition of the type C<//str>.  Instead
+we would like an Enum type which might be declared like:
+
+  {
+    type => '/example/enum',
+    contents => {
+      type    => '//str',
+      values  => [ qw/
+        open
+        closed
+      /],
+    },
+  }
+
+Ignoring input checking (for this example), we can get this information from the
+C<$arg> parameter:
+
+  sub guts_from_arg {
+    my ($class, $arg, $rx) = @_;
+
+    my $type = $arg->{contents}{type};
+    my @values = @{ $arg->{contents}{values} };
+
+We already saw how we would write the enum as an C<//any> schema.  And in fact
+the easiest way to implement this type plugin is to do exactly that!  Let's
+create a schema which is equivalent, and return it, to be stashed in the object:
+
+    my $schema = $rx->make_schema({
+      type => '//any',
+      of   => [
+        map {;
+          { type => $type, value => $_ }
+        } @values,
+      ],
+    });
+
+    return { schema => $schema };
+  }
+
+Now, checking the enum is as simple as delegating to this schema:
+
+  sub assert_valid {
+    my ($self, $value) = @_;
+
+    $self->{schema}->assert_valid( $value );
+  }
+
+As we are delegating to another schema's C<assert_valid> we know that
+any exceptions will be in the correct format.  However, the error will
+be the one that C<//any> provides:
+
+    Failed //any: matched none of the available alternatives
+
+This is probably clear enough for an enum.  But we could improve this message
+by calling C<check> instead of C<assert_valid> and raising our own, nicely
+formatted, exception using C<fail>.
+
+=head2 CSV - delegation, checking input
+
+Some APIs like to specify a list of IDs or statuses not as an array (which
+of course Rx handles with C<//arr> but as a comma separated list.  Curses!
+
+We would like to write a type plugin that's defined something like:
+
+  {
+    type => '/example/csv',
+    contents => '/example/status',
+  }
+
+Of course now that we are getting data as strings, we also have to worry
+about spaces: e.g. in '123, 456', is the second ID ' 456' or just '456'?
+So let's also accept an optional 3rd parameter C<trim>.
+
+Now that we're asking for a more complex input data structure, let's validate
+it using Rx itself!
+
+  sub guts_from_arg {
+    my ($class, $arg, $rx) = @_;
+
+    my $meta = $rx->make_schema({
+      type => '//rec',
+      required => {
+        # contents => '/.meta/schema', # not yet implemented
+        contents => '//any',
+      },
+      optional => {
+        trim => {
+          # we don't just accept //bool as this only includes 'boolean' objects,
+          # let's also allow undef/0/1, as this is more Perlish!
+          type => '//any',
+          of => [ '//nil', '//bool', '//int' ]
+        },
+      },
+    });
+
+    $meta->assert_valid( $arg );
+
+The C<contents> argument is required, and should be a valid schema.  We've had
+to make a few trade-offs:
+
+=over 4
+
+=item *
+
+There isn't yet a convenient way to specify a schema, so we'll just accept
+C<//any> for now.  As we will then pass this result to C<make_schema> shortly,
+we will get a further validation of that in any case! (But see
+L<http://rx.codesimply.com/moretypes.html> for the full definition of a schema,
+if you prefer!)
+
+=item *
+
+Rx's type C<//bool> is deliberately targeted at JSON like boolean objects, so
+we'll also accept undef and 1 as "truthy" values.
+
+=back
+
+As we are expecting a comma separated I<string>, the first check we'll want to
+make is that the object we receive is in fact a string.  So the guts we'll
+return are:
+
+    return {
+        trim => $arg->{trim},
+        str_schema => $rx->make_schema('//str'),
+        item_schema => $rx->make_schema( $arg->{contents} ),
+    };
+
+Now our C<assert_valid> routine will use all of these pieces:
+
+  use String::Trim;
+
+  sub assert_valid {
+    my ($self, $value) = @_;
+
+First we check that we got a string:
+
+    $self->{str_schema}->assert_valid( $value );
+
+This means we can safely split the result:
+
+    my @values = split ',' => $value;
+
+    my $item_schema = $self->{item_schema};
+    my $trim = $self->{trim};
+
+For each result we trim (if requested) and use the supplied checker on each
+element.
+
+    for my $subvalue (@values) {
+      trim($subvalue) if $trim;
+
+      $item_schema->assert_valid( $subvalue );
+    }
+
+    return 1;
+  }
+
+Putting together all the pieces, we can call this like so:
+
+  my $csv = $rx->make_schema({
+    type => '/example/csv',
+    contents => {
+      type     => '/example/enum',
+      contents => {
+        type    => '//str',
+        values  => [qw/ open closed /],
+      }
+    },
+    trim => 1,
+  });
+
+  $csv->assert_valid( 'open, closed' ); # OK!
+
+=head1 POD AUTHOR
+
+Hakim Cassimally <osfameron@cpan.org>
+
+=head1 AUTHOR
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

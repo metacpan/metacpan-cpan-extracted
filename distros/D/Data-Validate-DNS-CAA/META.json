@@ -1,0 +1,66 @@
+{
+   "abstract" : "Validate DNS Certification Authority Authorization (CAA) values",
+   "author" : [
+      "Michael Schout <mschout@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Validate-DNS-CAA",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validate::Email" : "0",
+            "Data::Validate::URI" : "0",
+            "Exporter" : "0",
+            "Syntax::Keyword::Junction" : "0",
+            "Taint::Util" : "0",
+            "base" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Scalar::Util" : "0",
+            "Test::More" : "0",
+            "Test::Signature" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-validate-dns-caa at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Validate-DNS-CAA"
+      },
+      "homepage" : "http://search.cpan.org/dist/Data-Validate-DNS-CAA/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mschout/perl-data-validate-dns-caa.git",
+         "web" : "https://github.com/mschout/perl-data-validate-dns-caa"
+      }
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

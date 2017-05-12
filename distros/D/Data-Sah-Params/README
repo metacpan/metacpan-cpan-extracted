@@ -1,0 +1,86 @@
+SYNOPSIS
+
+     use Data::Sah::Params qw(compile Optional Slurpy Named);
+    
+     # positional parameters, some optional
+     sub f1 {
+         state $check = compile(
+             ["str*"],
+             ["int*", min=>1, max=>10, default=>5],
+             Optional [array => of=>"int*"],
+         );
+         my ($foo, $bar, $baz) = $check->(@_);
+         ...
+     }
+     f1();                # dies, missing required argument $foo
+     f1(undef);           # dies, $foo must not be undef
+     f1("a");             # dies, missing required argument $bar
+     f1("a", undef);      # ok, $bar = 5, $baz = undef
+     f1("a", 1);          # ok, $bar = 1, $baz = undef
+     f1("a", "x");        # dies, $bar is not an int
+     f1("a", 3, [1,2,3]); # ok
+    
+     # positional parameters, slurpy last parameter
+     sub f2 {
+         state $check = compile(
+             ["str*"],
+             ["int*", min=>1, max=>10, default=>5],
+             Slurpy [array => of=>"int*"],
+         );
+         my ($foo, $bar, $baz) = $check->(@_);
+         ...
+     }
+     f1("a", 3, 1,2,3);   # ok, $foo="a", $bar=3, $baz=[1,2,3]
+     f1("a", 3, 1,2,"b"); # dies, third element of $baz not an integer
+    
+     # named parameters, some optional
+     sub f3 {
+         state $check = compile(Named
+             foo => ["str*"],
+             bar => ["int*", min=>1, max=>10, default=>5],
+             baz => Optional [array => of=>"int*"],
+         );
+         my $args = $check->(@_);
+         ...
+     }
+     f1(foo => "a");                 # dies, missing argument 'bar'
+     f1(foo => "a", bar=>1);         # ok
+     f1(foo => "a", bar=>1, baz=>2); # dies, baz not an array
+
+DESCRIPTION
+
+    Experimental.
+
+    Currently mixing positional and named parameters not yet supported.
+
+FUNCTIONS
+
+ compile([ \%opts, ] $schema, ...) => coderef
+
+    Create a validator. Accepts a list of schemas. Each schema can be
+    prefixed with Optional or Slurpy. Or, if your function will accept
+    named arguments (%args) you can use: Named(PARAM1=>$schema1,
+    PARAM2=>$schema2, ...) instead.
+
+    Known options:
+
+      * want_source => bool
+
+      If set to 1, will return validator source code string instead of
+      compiled code (coderef). Useful for debugging.
+
+SEE ALSO
+
+    Sah for the schema language.
+
+    Similar modules: Type::Params, Params::Validate, Params::CheckCompiler.
+
+    If you put your schemas in Rinci function metadata (I recommend it, for
+    the convenience of specifying other stuffs besides argument schemas),
+    take a look at Perinci::Sub::ValidateArgs.
+
+    Params::Sah. I've actually implemented something similar the year
+    before (albeit with a slightly different interface), before
+    absent-mindedly reimplemented later :-) We'll see which one will
+    thrive.
+

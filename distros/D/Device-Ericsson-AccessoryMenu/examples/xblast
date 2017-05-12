@@ -1,0 +1,51 @@
+#!/usr/local/bin/perl -w
+use lib qw(lib);
+use strict;
+use Device::Ericsson::AccessoryMenu;
+use Device::SerialPort;
+use X11::GUITest qw(PressKey ReleaseKey); # local modified version
+
+my $port = shift || '/dev/rfcomm0';
+
+my %player1 = ( '^' => 'up',  2 => 'up',       # up
+                'v' => 'dow', 8 => 'dow',      # down
+                '<' => 'lef', 4 => 'lef',      # left
+                '>' => 'rig', 6 => 'rig',      # right
+                              5 => 'KP_Begin', # stop
+                's' => 'ins', 0 => 'ins',      # bomb
+                '*' => 'ent',                  # special
+               );
+
+my %player2 = ( '^' => 't',      2 => 't',     # up
+                'v' => 'b',      8 => 'b',     # down
+                '<' => 'f',      4 => 'f',     # left
+                '>' => 'h',      6 => 'h',     # right
+                                 5 => 'g',     # stop
+                's' => 'space',  0 => 'space', # bomb
+                '*' => 'tab',                  # special
+               );
+
+
+sub translate_keys {
+    my $remote = shift;
+    my %keymap = @_;
+    $remote->mouse_mode( callback => sub {
+                             my ($key, $updown) = @_;
+                             return unless exists $keymap{$key};
+                             $updown ? PressKey($keymap{$key})
+                                     : ReleaseKey($keymap{$key});
+                         });
+}
+
+my $menu = Device::Ericsson::AccessoryMenu->new(
+    port => Device::SerialPort->new( $port ) || die,
+    menu => [ XBlast => [
+        Player1 => sub { translate_keys( shift, %player1 ) },
+        Player2 => sub { translate_keys( shift, %player2 ) },
+       ],
+    ],
+    debug => 1,
+   );
+
+$menu->register_menu;
+$menu->control while 1;

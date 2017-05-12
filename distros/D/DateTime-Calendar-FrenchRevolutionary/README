@@ -1,0 +1,67 @@
+DateTime::Calendar::FrenchRevolutionary version 0.14
+====================================================
+
+DateTime::Calendar::FrenchRevolutionary is copyright (c) 2003,
+2004, 2010, 2011, 2012, 2014, 2016 Jean Forget
+
+
+This is  a companion module  to DateTime.pm. It implements  the French
+Revolutionary calendar and decimal time.
+
+INSTALLATION
+
+The simplest  way, of course, is  using a CPAN  client: CPAN.pm, cpanp
+(from CPANPLUS.pm) or cpanm (from App::cpanminus).
+
+If you downloaded  the .tar.gz archive, or if you  cloned the git repo
+with
+
+  git clone https://github.com/jforget/DateTime-Calendar-FrenchRevolutionary.git
+
+then the preferred way, which requires Module::Build, is:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+Note to the users of old filesystems.
+
+All  filenames  except  one  (the  most  important)  respect  the  8.3
+convention  used by  MS-DOS.  If you  use  an old  filesystem such  as
+MS-DOS's filesystem or  the old Unix filesystem with  a 14-char limit,
+you should find how the name
+  lib/DateTime/Calendar/FrenchRevolutionary.pm
+has been mangled, rename it  to a name compatible with your filesystem
+and replace  all occurrences of the  string "FrenchRevolutionary" with
+the new name in all files, including MANIFEST.
+
+ALTERNATE INSTALL
+
+This module can be installed on a perl-less computer!
+
+All you need, on this computer, is:
+  - tar and gzip, or compatible software
+  - a table-aware HTML browser (no Internet connection required if you
+  downloaded the archive from a local network or a CD-ROM)
+  - a printer.
+
+The installation steps are:
+
+- Gunzip and untar the archive.
+- Go to the eg/result subdirectory.
+- Open the various files ending in "en.html" (or, if you are a
+French-speaker, ending in "fr.html") with the HTML browser.
+- Print them.
+That's all!
+
+
+LICENSE INFORMATION
+
+This module  is free software; you  can redistribute it  and modify it
+under the  same terms as Perl  5.16.3. For more details,  see the full
+text of the licenses in the directory LICENSE.
+
+This program is distributed in the hope that it will be useful, but it
+is provided “as is” and without any express or implied warranties. For
+details, see the full text of the license in the file LICENSE.

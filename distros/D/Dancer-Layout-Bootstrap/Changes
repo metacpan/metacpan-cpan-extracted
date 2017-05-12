@@ -1,0 +1,18 @@
+0.04 20170112
+    . Updated Bootstrap 3 template and CSS
+    . Now uses jQuery 3
+
+0.03 20160324
+    . Fixed broken link to icons
+    . Added Boostrap 3 template and CSS
+    . Also see L<http://getbootstrap.com/migration/> on what to change
+      in your HTML templates
+
+0.02 20130224
+    . Updated to Bootstrap 2.3.0
+    . Added Login template
+        Watch out for Dancer::Limbo, a complete set of templates
+        and logic, maybe coming soon.
+    . Released on CPAN
+
+0.01 never released on CPAN

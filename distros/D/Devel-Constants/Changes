@@ -1,0 +1,30 @@
+Revision history for Perl module Devel::Constants
+
+1.04 2015-10-21 NEILB
+    - Added [MetaJSON] to dist.ini so we'd get a META.json in the release
+    - Include a hand-rolled README
+    - Added link to github repo to doc
+
+1.03 2014-01-30
+
+    - We now "use warnings", and disable them in one small scope.
+    - Specify min Perl version as 5.6.0
+
+1.02 2013-11-03
+
+    - Switched to Dist::Zilla
+    - Added github repo to metadata
+
+1.01 2012-02-01
+
+    - Chromatic added me (NEILB) as a co-maintainer
+    - dropped SIGNATURE and test for it (with chromatic's ok)
+    - Added mention of Constant::Generate and my review of constant modules
+      to SEE ALSO in pod
+    - Changed leading tabs to spaces in code samples in pod
+    - Added this Changes file
+
+1.00 2005-07-14
+
+    - first release by Chromatic
+

@@ -1,0 +1,21 @@
+
+This is a driver I wrote for Informix SE 4.10,
+because DBD::Informix does not work with this
+ancient version.
+
+It is dirty hack!
+
+I am willing maintain this driver until we upgrade 
+the system running this old Informix version.
+This will hopefully happen RSN.
+
+Since this is in the works,
+0.23 will probably be the last version from me.
+
+Anyone willing to take over maintainence, just speak up.
+
+
+Göran Thyni
+goran@bildbasen.se
+
+

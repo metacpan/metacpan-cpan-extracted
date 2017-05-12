@@ -1,0 +1,58 @@
+Revision history for Dist-Zilla-Plugin-OSPrereqs
+
+0.008     2016-09-12 10:30:34-04:00 America/New_York
+
+  [ADDED]
+
+  - Can munge both Makefile.PL and Build.PL
+
+  [PREREQS]
+
+  - Now uses Test::Deep::JSON for json comparision tests;
+    drops direct support on JSON.pm
+
+0.007     2016-04-23 22:21:56-04:00 America/New_York
+
+  [PREREQS]
+
+  - Removed unused Path::Class prerequisite
+
+0.006     2016-02-25 17:00:14-05:00 America/New_York
+
+  [CHANGES]
+
+  - Requires List::Util 1.33 instead of List::AllUtils
+
+0.005     2014-07-15 17:43:22-04:00 America/New_York
+
+  [DOCUMENTED]
+
+  - Added DynamicPrereqs plugin to SEE ALSO
+
+0.004     2014-07-15 17:23:19-04:00 America/New_York
+
+  [ADDED]
+
+  - Supports negation and regex matching
+
+0.003     2012-09-20 22:31:53 America/New_York
+
+  [NEW FEATURES}
+
+  - Support added for [ModuleBuild] based distributions
+    (Ioan Rogers)
+
+0.002     2011-01-28 09:58:01 EST5EDT
+
+  [NEW FEATURES]
+
+  - The dynamic_config key in the generated META.* files will be true (Dave
+    Rolsky)
+
+0.001     2011-01-27 23:18:42 EST5EDT
+
+  [NEW FEATURES]
+
+  - First release, allowing specification of OS-specific prequisites
+
+# vim: ts=2 sts=2 sw=2 et:

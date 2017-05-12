@@ -1,0 +1,6 @@
+layout: "main"
+logger: "console"
+charset: "utf8"
+appname: "weborama_api"
+
+

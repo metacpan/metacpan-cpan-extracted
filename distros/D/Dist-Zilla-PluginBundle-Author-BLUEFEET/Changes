@@ -1,0 +1,10 @@
+Revision history for Perl extension Dist-Zilla-PluginBundle-Author-BLUEFEET.
+
+0.02 2016-01-04
+
+ - Fixup plugin load order, as that seems to mattter.
+
+0.01 2016-01-03
+
+ - First version.
+

@@ -1,0 +1,71 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dd0d6c36a6bbe0c8082a2ef6e3b1e17752f0274d Build.PL
+SHA1 a300e393917f60cfa88fa42fe2d0c7f60e69fe0e Changes
+SHA1 4e0d958865ba855d9da938f767b3e422bcd00222 MANIFEST
+SHA1 3069985f1f8fd18df636a760f0f45a6f6beb82f1 META.yml
+SHA1 216953b15e1a877e7e29f735472221ad5b259754 Makefile.PL
+SHA1 507ce0e60070b3aed73d1fded47ae45ae5bfaa6f README
+SHA1 0031b67202c57a402ca09d99062f98eafc480537 examples/table1.cgi
+SHA1 d0644227e9c88e25bdab69482f74ffebbc0b47f1 lib/Data/Tabular.pm
+SHA1 96a602fd9474e66996edf39a8cb1cf8edcfa17aa lib/Data/Tabular/Cell.pm
+SHA1 0730e9a9ddc85c206ef34783fb2db1952d2bac52 lib/Data/Tabular/Column.pm
+SHA1 c4d4863a14b24d334369b99f66a268cc8575507c lib/Data/Tabular/Config/Extra.pm
+SHA1 e93b141a7977550c8bff717923de9beed37dcf62 lib/Data/Tabular/Config/Output.pm
+SHA1 33593c0ec8839f193d14339e33737b1e2de1dd61 lib/Data/Tabular/Extra.pm
+SHA1 dc56042a9fe400b446993e6c08898c8fe9a52ac8 lib/Data/Tabular/Formula.pm
+SHA1 80636ce3ea3cbaabfcfa35d6c2f59d8ff710211f lib/Data/Tabular/Group.pm
+SHA1 d46e6eba39b93f50458dd3103ae2fe9b86a6ec01 lib/Data/Tabular/Group/Interface.pm
+SHA1 03ceb870b433d5ad29fe9d25ac83059ea3a73914 lib/Data/Tabular/Output.pm
+SHA1 3fa5bc493ca80cbf1b1b9dfde8adc6680d1137dd lib/Data/Tabular/Output/CSV.pm
+SHA1 15f24141ea5b456970d6695738e63a349491fdca lib/Data/Tabular/Output/HTML.pm
+SHA1 28335f226a9b9806c353bf80f7e6d099be4108d4 lib/Data/Tabular/Output/TXT.pm
+SHA1 ab5f5ff1d954281e3246388ff2f11f30731fd346 lib/Data/Tabular/Output/XLS.pm
+SHA1 4cfc8bcdcefc991fef6dab22114fd5b41ca1d3fb lib/Data/Tabular/Row.pm
+SHA1 b5c41fa17ce148a374e8f78faf27416963715314 lib/Data/Tabular/Row/Averages.pm
+SHA1 b6d371bae484c8de17bb27922f4954081a8318e3 lib/Data/Tabular/Row/Data.pm
+SHA1 1cfe9d8593fc51d50de38f9fbc0e882866f0bc5f lib/Data/Tabular/Row/Extra.pm
+SHA1 d2e4fa0f6d891cdf80d7881cbd6d37177687c855 lib/Data/Tabular/Row/Function.pm
+SHA1 54a7a1f18d73e40ddff26d4883d1af56b94cf06b lib/Data/Tabular/Row/General.pm
+SHA1 46d90372b0c117b121d75cf6a7578d0ba7686154 lib/Data/Tabular/Row/Group.pm
+SHA1 ab24c7ea6fbc750568a351ca11e71825fdf60660 lib/Data/Tabular/Row/Header.pm
+SHA1 a78030c02fe8096f16a0d898c090c84b7070586b lib/Data/Tabular/Row/Titles.pm
+SHA1 f605952b203b1af53e5707c1644d206ccabef231 lib/Data/Tabular/Row/Totals.pm
+SHA1 2cb1e0438b9ae2706eea4fa8536972023763f363 lib/Data/Tabular/Table.pm
+SHA1 766db29f420beff5d59905ffd50738025028056c lib/Data/Tabular/Table/Data.pm
+SHA1 2e91c1285dbb869a27e0cbc8c7c547eb27ff0629 lib/Data/Tabular/Table/Extra.pm
+SHA1 20e2ea0553a9f73f506d931581c25c9b11497264 lib/Data/Tabular/Table/Group.pm
+SHA1 c9abe8aeab9e0d7d1847b9cf39cbc87f7cc1ac57 lib/Data/Tabular/Type.pm
+SHA1 5d4db65f96775c098f5e49548d0c9681da487385 lib/Data/Tabular/Type/Formula.pm
+SHA1 152e27dd8b71c4187b58cfd2b9016705d7a14023 t/Data-Tabular.t
+SHA1 5b0fc9f539ab785cc3e379697847fd45058ec727 t/cgi.t
+SHA1 55c334f947db1948209ba44aeffd1198a6535efe t/coverage.t
+SHA1 fa84ec742f0a05eb725302edd2756697a107b648 t/csv.t
+SHA1 f1074a6d45f66edd653dd0f8bc56dc879728c965 t/perl.xls
+SHA1 f8bd63b0fb73e08a69aab235e1996c75e90a21c5 t/pod.t
+SHA1 3683838344139aefd3f337f4f9bd4b4e712e2aee t/spreadsheet.t
+SHA1 67a64d18a7e9096cf8b1815d54232c0a8ed8ad59 t/spreadsheets.t
+SHA1 08949e51031e473f9305a19251478071d90283f9 t/txt.t
+SHA1 af6ecee4024934b2d3f5be8ba46d70a807db4ddc t/txt_2.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iGcEARECACcFAkjM6tcgGmh0dHA6Ly93d3cuZ2FtMy5uZXQvcG9saWN5Lmh0bWwA
+CgkQliSr/X1H0FydMgCg2UoBrwpAMCh9p5mjLu+KuKOecPMAnAy74/C44CKYp0sb
+0RcafomgHWAb
+=AljK
+-----END PGP SIGNATURE-----

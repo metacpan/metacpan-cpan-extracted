@@ -1,0 +1,69 @@
+NAME
+    Dist::Dzpl - An alternative configuration format (.pl) and invoker for
+    Dist::Zilla
+
+VERSION
+    version 0.0020
+
+SYNOPSIS
+    Below is an example file that would exist in your distribution root,
+    called "dist.pl" or "dzpl":
+
+        #!/usr/bin/env perl
+        use Dzpl
+            name => 'Acme-Xyzzy',
+            version => '0.0001',
+            author => 'Ja P. Hacker <japh@example.com>',
+            license => 'Perl5',
+            copyright => 'Ja P. Hacker', # Will automaticaly fill in the current year
+
+            # Declare prerequisites for runtime and testing (building)
+            # Alternatively, you can specify 'recommend' or 'prefer'
+            require => q/
+                Moose
+
+                [Test]
+                Test::Most
+            /;
+        ;
+
+        # Declare some plugins to use. The regular expression following
+        # the @Basic bundle is a filter excluding Dist::Zilla::Plugin::Readme
+        plugin
+            '@Basic' => qr/Readme$/,
+            'PodWeaver',
+            'PkgVersion',
+            'ReadmeFromPod',
+            '=Dist::Dzpl::Plugin::DynamicManifest',
+            '=Dist::Dzpl::Plugin::CopyReadmeFromBuild',
+        ;
+
+        run;
+
+    Then, from the commandline:
+
+        dzpl build      # Build the distribution via $zilla->build
+        dzpl dzil help  # The usual Dist::Dzil::App help message
+
+DESCRIPTION
+    Dist::Dzpl is a wrapper around Dist::Zilla, allowing an alternative,
+    flexible configuration mechanism. Instead of describing your
+    distribution using an .ini file, you can use a Perl .pl script
+
+    Your configuation file can be named "dzpl", "dz.pl", or "dist.pl", and
+    will be picked in that order
+
+    Dist::Dzpl is dz*P*l is to .pl as Dist::Zilla is dz*I*l is to .ini
+
+SEE ALSO
+    Dist::Zilla
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

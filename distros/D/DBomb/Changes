@@ -1,0 +1,6 @@
+Revision history for Perl extension DBomb.
+
+0.01  Tue Sep 23 11:49:31 2003
+	- original version; created by h2xs 1.22 with options
+		--skip-exporter -APX --name=DBomb
+

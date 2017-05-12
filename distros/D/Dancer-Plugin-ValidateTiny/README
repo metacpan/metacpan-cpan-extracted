@@ -1,0 +1,30 @@
+Dancer-Plugin-ValidateTiny version 0.06
+=======================================
+
+Dancer::Plugin::ValidateTiny - Validate::Tiny dancer plugin.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Dancer
+  Dancer::Plugin
+  Validate::Tiny
+  Email::Valid
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2015 by Alexey Kolganov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.

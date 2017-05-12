@@ -1,0 +1,47 @@
+1.36
+<table>
+	<thead>
+	<tr>
+		<th>Foo</th>
+		<th>Bar</th>
+		<th>Baz</th>
+		<th>New</th>
+		<th>Qux</th>
+		<th>Quf</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td>a</td>
+		<td>1</td>
+		<td>5</td>
+		<td>10</td>
+		<td>nine</td>
+		<td>foo</td>
+	</tr>
+	<tr>
+		<td>a</td>
+		<td>2</td>
+		<td>6</td>
+		<td>20</td>
+		<td>ten</td>
+		<td>bar</td>
+	</tr>
+	<tr>
+		<td>b</td>
+		<td>3</td>
+		<td>7</td>
+		<td>30</td>
+		<td>11</td>
+		<td>baz</td>
+	</tr>
+	<tr>
+		<td>b</td>
+		<td>4</td>
+		<td>8</td>
+		<td>40</td>
+		<td>12</td>
+		<td>qux</td>
+	</tr>
+	</tbody>
+</table>

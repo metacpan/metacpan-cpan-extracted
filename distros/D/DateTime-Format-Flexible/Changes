@@ -1,0 +1,174 @@
+Revision history for Perl module DateTime::Format::Flexible
+
+0.28 Thu Mar 23 2016
+  - fix tests under perl 5.25.10+ with -Ddefault_inc_excludes_dot
+    - thanks Kent Fredric rt #120698
+
+0.27 Mon Mar 06 2017
+  - support a single lang as a string instead of requiring an arrayref (DWIM)
+    - example: lang => 'en'
+  - add support for:
+    - "next (weekday)" eg: next sunday
+    - "last (weekday)" eg: last sunday
+    - "next (month)" eg: next january
+    - "last (month)" eg: last january
+    - "(x unit) from now" eg: 3 years from now
+    - "(-x unit)" eg: -3 months
+    - "(+x unit)" eg: +3 months
+    - "YYMMDD HH:MM:SS" eg: 950404 00:22:12
+    - "YYMMDD HH:MM:SS.NS" eg: 950404 00:22:12.500
+    - "Mon D HH:MM:SS.NS TZ YYYY" eg: Fri Dec  2 22:56:03.500 GMT+0 1994
+      - thanks David White rt #105178, tests from Time::ParseDate
+  - when we have a leading month that is 0 (zero) and we have a year, assume it is supposed to be october (10)
+    - thanks Dave Musakhanyan
+
+
+0.26 Tue Apr 22 2014
+  - support "MM/DD/YYYY HH:MM" (missing seconds),
+  - support "EEE MMM dd HH:mm:ss z yyyy" (UTC timezone inside string)
+    - thanks David White rt #94911
+
+0.25 Mon Mar 04 2013
+   - support "HH:MM::SS timezone YYYY/MM/DD"
+     - thanks Kevin Zwack
+
+0.24 Mon Nov 26 2012
+   - fix removal of 'am' in the german language file when we already know what part is the time part
+   - fix removal of 'st' when not preceded by a digit
+     - thanks Andreas Koenig rt #81432
+   - support "YYYYMMDD timezone"
+
+0.23 Thu Jun 14 2012
+   - Fix for MM/YYYY (was always setting the base year)
+     - thanks John Marling
+   - Support MM/YY if MMYY is given as an option
+   - pod cleanup
+
+0.22 Mon Jun 11 2012
+   - update GPL in the LICENSE file (apparently the FSF has a new address)
+     - thanks ppisar rt #74363
+   - update POD to match the license file
+     - thanks ppisar rt #74358
+   - fix typo for saturday in the german language file
+     - thanks TMUELLER rt #77721
+   - don't check the language extensions if we don't have any non-digits in the string we are checking (excluding delimiters: \/-.:[space])
+   - fix typos in the pod documentation, add a link to the german translations
+   - add support and more tests for some time-first formats
+   - add support for GMT timezone anywhere in the date/time string
+
+0.21 Sun Jan 01 2012
+   - handle mm/yyyy and m/yyyy
+
+0.20 Sun Sep 18 2011
+   - case insensitive handling of st|nd|rd|th (3rd and 3RD now work)
+     - thanks Brett Carson
+
+0.19 Fri Jan 07 2011
+   - support for German (de)
+     - thanks Mark Trettin
+   - better support for DD MM
+   - support for natural dates in all languages (3 years ago)
+
+0.18 Sat Jan 01 2011
+   - move a test that was hardcoded to a year to the no_year tests.
+     - thanks cpantesters
+
+0.17 Tue Oct 26 2010
+   - more formats supported
+   - support timezone offsets that are not at the end of the datetime string.
+     - they must be 4 digits and begin with a plus or minus
+     - thanks snarkyboojum: http://use.perl.org/use.perl.org/_snarkyboojum/journal/40297.html
+   - better support for dates like 'December 1st'
+   - POD formatting fixes
+   - support 'Oct.26, 2010'.
+     - thanks Brian Knapp
+
+0.16 Thu Aug 25 2010
+   - make sure 'now' means now and not when the module loaded unless user has set a base
+     - thanks Ryan Voots rt #60731
+
+0.15 Mon Mar 10 2010
+   - fix tests for DateTime string overloading problem
+     - thanks Andreas Koenig and Michael Schwern
+
+0.14 Sun Feb 28 2010
+   - fix test: '1 month ago at 4pm' could be potentially less that 28 days ago.
+   - fix tests for infinity, -infinity, infinito, and -infinito
+
+0.13 Sat Feb 27 2010
+   - make parsing for infinity and -infinity more reliable
+
+0.12 Thu Feb 25 2010
+   - fix DateTime::Format::Builder import
+
+0.11 Wed Feb 24 2010
+   - remove Readonly dependency
+   - support some postgresql datetimes: epoch, infinity, -infinity, allballs
+     - see http://www.postgresql.org/docs/8.4/interactive/datatype-datetime.html section 8.5.1.4
+     - 'infinity' returns a DateTime::Infinite::Future object
+     - '-infinity' returns a DateTime::Infinite::Past object
+
+0.10 Wed Feb 24 18:45:00 2009
+   - support for single character am/pm strings '3p'
+   - support for days of the week (wednesday => the nearest future wednesday)
+     - thanks Shawn Moore, rt #53188
+     - note: this is quite limited, I need more test cases
+       - works: wednesday
+       - works: wed at 3p
+   - support for bare months (february)
+   - support for limited timezones that are not at the end of the string
+     - thanks Dave Faraldo
+     - 'Wed Nov 11 13:55:48 PST 2009' becomes
+       - 2009-11-11T13:55:48 America/Los_Angeles
+   - beginning multiple language support (contributions welcome)
+     - support english (en) and spanish (es)
+   - support dates like 'now, today, tomorrow'
+   - switch to strptime from regexes for some parsing for clarity
+   - now supports negative timezone offsets IF it is a 4 digit offset and there is a space before the offset
+     - works: 2007-05-06T04:44:44 -0800
+     - does not work: 2007-05-06T04:44:44-0800
+     - does not work: 2007-05-06T04:44:44-08
+     - does not work: 2007-05-06T04:44:44 -08
+   - now supports 2 digit years as the first number if the year is > 31
+     - works: 35-12-23 (2035-12-23T00:00:00)
+     - does not work: 11-12-13 (2013-11-12T00:00:00, or 2013-12-11T00:00:00 with european hinting)
+   - timezone parsing should now be more reliable
+   - you can now set a 'base' datetime object to help fill out partial datetimes
+
+0.09 Sun May 24 22:00:00 2009
+   - add a real copyright for Debian packaging
+   - fix parsing a bare 4 digit year.
+     - thanks Dominic Rose, rt #46278
+
+0.08 Wed Apr 22 14:00:00 2009
+    - fix some pod errors, give an example for european hinting
+
+0.07 Tue Apr 22 03:00:00 2009
+    - add ability to strip strings from the date string
+    - can now parse timezones
+    - rudimentary support for european dates (dd-mm-yyyy)
+    - can now parse epoch times
+
+0.06 Mon Apr 20 15:06:00 2009
+    - Fix parsing bug with dd-(oct|nov|dec)-yyyy
+      - thanks Phil Brass
+
+0.05 Fri Apr 4 14:00:00 2008
+    - fix some test helper libraries not being included.
+      - thanks GOOZBACH, rt #34683
+
+0.04 Fri Mar 14 21:00:00 2008
+    - fix broken 0.03 release
+    - split tests out for easier integration into other distributions
+
+0.03 Mon Mar 10 02:00:00 2008
+   - add method "parse_datetime" as an alias for "build".
+     - thanks Adriano Rodrigues Ferreira
+
+0.02 Tue Oct 02 01:50:00 2007
+   - fixed pod formatting
+   - added new parseable format: 2007-10-01 13:11:32.741804.
+     - thanks RKRIMEN
+
+0.01 Sun Jul 15 20:09:47 2007
+    - original version; created by ExtUtils::ModuleMaker 0.49

@@ -1,0 +1,239 @@
+Dump perl structures to JavaScript; think Data::Dumper.
+
+Example 1:
+
+use Data::JavaScript::LiteObject;
+
+while( @user = getpwent() ){
+    $users{$user[0]} = {
+	uid=>$user[2],
+	gid=>$user[3],
+	real=>$user[6],
+	home=>$user[7],
+	shell=>$user[8]};
+}
+
+Ouput 1:
+
+print jsodump(protoName=>"user",
+	      dataRef=>\%users);
+
+function user (gid, home, real, shell, uid) {
+	this.gid = gid; this.home = home; this.real = real; this.shell = shell; this.uid = uid; }
+adm = new user(4, '/var/adm', 'adm', '', 3 );
+bin = new user(1, '/bin', 'bin', '', 1 );
+daemon = new user(2, '/sbin', 'daemon', '', 2 );
+ftp = new user(50, '/home/ftp', 'FTP User', '', 14 );
+games = new user(100, '/usr/games', 'games', '', 12 );
+gopher = new user(30, '/usr/lib/gopher-data', 'gopher', '', 13 );
+halt = new user(0, '/sbin', 'halt', '/sbin/halt', 7 );
+lp = new user(7, '/var/spool/lpd', 'lp', '', 4 );
+mail = new user(12, '/var/spool/mail', 'mail', '', 8 );
+msql = new user(18, '/web/msql', 'SQL Guru', '/bin/tcsh', 18 );
+news = new user(13, '/var/spool/news', 'news', '', 9 );
+nobody = new user(99, '/', 'Nobody', '', 99 );
+operator = new user(0, '/root', 'operator', '', 11 );
+root = new user(0, '/root', 'BOFH', '/bin/bash', 0 );
+shutdown = new user(0, '/sbin', 'shutdown', '/sbin/shutdown', 6 );
+sync = new user(0, '/sbin', 'sync', '/bin/sync', 5 );
+uucp = new user(14, '/var/spool/uucp', 'uucp', '', 10 );
+www = new user(16, '/web', 'World Wide Web daemon', '', 16 );
+
+Example 2:
+
+print jsodump(protoName=>"user",
+	      explode=>1,
+	      lineIN=>4,
+	      listObjects=>"users",
+	      dataRef=>\%users);
+
+Output 2:
+
+// 5
+function user (gid, home, real, shell, uid) {
+	this.gid = gid;
+	this.home = home;
+	this.real = real;
+// 10
+	this.shell = shell;
+	this.uid = uid;
+	}
+adm = new user(
+// 15
+	4,
+	'/var/adm',
+	'adm',
+	'',
+// 20
+	3
+	);
+bin = new user(
+	1,
+/ 25
+	'/bin',
+	'bin',
+	'',
+	1
+// 30
+	);
+daemon = new user(
+	2,
+	'/sbin',
+// 35
+	'daemon',
+	'',
+	2
+	);
+ftp = new user(
+// 40
+	50,
+	'/home/ftp',
+	'FTP User',
+	'',
+	14
+// 45
+	);
+games = new user(
+	100,
+	'/usr/games',
+// 50
+	'games',
+	'',
+	12
+	);
+gopher = new user(
+// 55
+	30,
+	'/usr/lib/gopher-data',
+	'gopher',
+	'',
+	13
+// 60
+	);
+halt = new user(
+	0,
+	'/sbin',
+// 65
+	'halt',
+	'/sbin/halt',
+	7
+	);
+// 70
+lp = new user(
+	7,
+	'/var/spool/lpd',
+	'lp',
+// 75
+	'',
+	4
+	);
+mail = new user(
+// 80
+	12,
+	'/var/spool/mail',
+	'mail',
+	'',
+// 85
+	8
+	);
+msql = new user(
+	18,
+// 90
+	'/web/msql',
+	'SQL Guru',
+	'/bin/tcsh',
+	18
+// 95
+	);
+news = new user(
+	13,
+	'/var/spool/news',
+// 100
+	'news',
+	'',
+	9
+	);
+nobody = new user(
+// 105
+	99,
+	'/',
+	'Nobody',
+	'',
+	99
+// 110
+	);
+operator = new user(
+	0,
+	'/root',
+// 115
+	'operator',
+	'',
+	11
+	);
+// 120
+root = new user(
+	0,
+	'/root',
+	'BOFH',
+// 125
+	'/bin/bash',
+	0
+	);
+shutdown = new user(
+// 130
+	0,
+	'/sbin',
+	'shutdown',
+	'/sbin/shutdown',
+// 135
+	6
+	);
+sync = new user(
+	0,
+	'/sbin',
+// 140
+	'sync',
+	'/bin/sync',
+	5
+	);
+// 145
+uucp = new user(
+	14,
+	'/var/spool/uucp',
+	'uucp',
+// 150
+	'',
+	10
+	);
+www = new user(
+// 155
+	16,
+	'/web',
+	'World Wide Web daemon',
+	'',
+	16
+// 160
+	);
+users = new Array(
+	'adm',
+	'bin',
+// 165
+	'daemon',
+	'ftp',
+	'games',
+	'gopher',
+// 170
+	'halt',
+	'lp',
+	'mail',
+	'msql',
+// 175
+	'news',
+	'nobody',
+	'operator',
+	'root',
+// 180
+	'shutdown',
+	'sync',
+	'uucp',
+	'www');

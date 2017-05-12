@@ -1,0 +1,16 @@
+Build.PL
+Changes
+ignore.txt
+lib/Dancer/Plugin/ProxyPath.pm
+lib/Dancer/Plugin/ProxyPath/Proxy.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/00-load.t
+t/01-proxypath.t
+t/02-proxy.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

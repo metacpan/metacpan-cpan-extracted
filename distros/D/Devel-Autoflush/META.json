@@ -1,0 +1,91 @@
+{
+   "abstract" : "Set autoflush from the command line",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Autoflush",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5.013",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.060",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::CaptureOutput" : "1.08",
+            "List::Util" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Autoflush" : {
+         "file" : "lib/Devel/Autoflush.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Devel-Autoflush/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Devel-Autoflush",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Devel-Autoflush.git",
+         "web" : "https://github.com/dagolden/Devel-Autoflush"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:DAGOLDEN"
+}
+

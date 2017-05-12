@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-load.t
+t/02-parse.t
+t/03-build.t
+t/04-pictgram.t
+lib/Data/ToruCa.pm
+META.yml                                 Module meta-data (added by MakeMaker)

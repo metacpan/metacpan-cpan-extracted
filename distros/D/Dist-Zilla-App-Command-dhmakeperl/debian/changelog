@@ -1,0 +1,36 @@
+dist-zilla-app-command-dhmakeperl (0.007) stable; urgency=low
+  * dist.ini changes, added author website 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Mon, 23 Mar 2015 14:49:16 +0000
+
+dist-zilla-app-command-dhmakeperl (release-0.006) stable; urgency=low
+  * v0.006
+  - Added DhMakePerl to dependencies (Shantanu Bhadoria) 
+  * Added DhMakePerl to dependencies 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Sun, 15 Mar 2015 08:31:35 +0000
+
+dist-zilla-app-command-dhmakeperl (release-0.005) stable; urgency=low
+  * v0.005
+  - Fixed POD::wikidoc issues (Shantanu Bhadoria) 
+  * Fixed POD::wikidoc issues 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Mon,  8 Dec 2014 13:19:00 +0000
+
+dist-zilla-app-command-dhmakeperl (release-0.004) stable; urgency=low
+  * v0.004
+  - No changes found 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Mon,  8 Dec 2014 11:23:14 +0000
+
+dist-zilla-app-command-dhmakeperl (release-0.003) stable; urgency=low
+  * v0.003
+  - rebuilt pod and changes files (Shantanu Bhadoria)
+  - Fixed a spelling mistake in the pod (Shantanu Bhadoria)
+  - Added some more documentation (Shantanu Bhadoria) 
+  * rebuilt pod and changes files 
+  * Fixed a spelling mistake in the pod 
+  * Added some more documentation 
+
+ -- Shantanu Bhadoria <shantanu@cpan.org>  Fri,  5 Dec 2014 15:06:05 +0000
+

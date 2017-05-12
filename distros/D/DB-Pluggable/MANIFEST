@@ -1,0 +1,28 @@
+Changes
+etc/perldb
+lib/DB/Pluggable.pm
+lib/DB/Pluggable/Plugin/BreakOnTestNumber.pm
+lib/DB/Pluggable/Plugin/DataPrinter.pm
+lib/DB/Pluggable/Plugin/TypeAhead.pm
+lib/DB/Pluggable/Role/AfterInit.pm
+lib/DB/Pluggable/Role/Eval.pm
+lib/DB/Pluggable/Role/Initializer.pm
+lib/DB/Pluggable/Role/WatchFunction.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-compile.t
+t/000-report-versions.t
+t/01_misc.t
+xt/critic.t
+xt/eol.t
+xt/no-tabs.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod-syntax.t
+xt/synopsis.t
+xt/unused-vars.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

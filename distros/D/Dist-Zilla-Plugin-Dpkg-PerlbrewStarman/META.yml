@@ -1,0 +1,24 @@
+---
+abstract: 'Generate dpkg files for your perlbrew-backed, starman-based perl app'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Dpkg-PerlbrewStarman
+requires:
+  Dist::Zilla::Plugin::Dpkg: 0.05
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+resources:
+  bugtracker: https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman/issues
+  homepage: https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman
+  repository: https://github.com/tripside/dist-zilla-plugin-dpkg-perlbrewstarman.git
+version: 0.16

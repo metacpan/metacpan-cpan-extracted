@@ -1,0 +1,95 @@
+{
+    "name": "Data::Phrasebook",
+    "version": "0.35",
+    "abstract": "Access your data using the phrasebook design pattern",
+    "author": ["Barbie <barbie@cpan.org>"],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "Hand 1.0",
+    "keywords" : [
+        "abstract",
+        "data",
+        "design pattern",
+        "phrasebook"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Carp": "0",
+                "IO::File": "0",
+                "Module::Pluggable": "0"
+            }
+        },
+        "test" : {
+            "requires": {
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Data::Phrasebook": {
+            "file": "lib/Data/Phrasebook.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Debug": {
+            "file": "lib/Data/Phrasebook/Debug.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Generic": {
+            "file": "lib/Data/Phrasebook/Generic.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Loader": {
+            "file": "lib/Data/Phrasebook/Loader.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Loader::Base": {
+            "file": "lib/Data/Phrasebook/Loader/Base.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Loader::Text": {
+            "file": "lib/Data/Phrasebook/Loader/Text.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::Plain": {
+            "file": "lib/Data/Phrasebook/Plain.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::SQL": {
+            "file": "lib/Data/Phrasebook/SQL.pm",
+            "version": "0.35"
+        },
+        "Data::Phrasebook::SQL::Query": {
+            "file": "lib/Data/Phrasebook/SQL/Query.pm",
+            "version": "0.35"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://www.perlfoundation.org/artistic_license_2_0" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Phrasebook" },
+        "repository": {
+            "url": "git://github.com/barbie/data-phrasebook.git",
+            "web": "http://github.com/barbie/data-phrasebook",
+            "type": "git"
+        }
+    }
+}

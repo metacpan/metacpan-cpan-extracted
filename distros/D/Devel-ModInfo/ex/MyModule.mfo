@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+
+<modinfo>
+<modules>
+<module name="MyModule">
+<functions>
+<function name="new"/>
+<function name="method1"/>
+<function name="method2"/>
+</functions>
+<methods/>
+<constructors/>
+<properties/>
+<parent_classes>
+<parent_class name="NiceModule"/>
+</parent_classes>
+<dependencies>
+<dependency type="module" target="XML::DOM"/>
+<dependency type="module" target="CGI"/>
+<dependency type="module" target="IO::Handle"/>
+</dependencies>
+</module>
+</modules>
+</modinfo>
+

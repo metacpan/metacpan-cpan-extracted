@@ -1,0 +1,26 @@
+---
+abstract: 'Maintain DBM::Deep databases interactively'
+author:
+  - 'Thomas v.Dein <tlinden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBM-Deep-Manager
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBM::Deep: 2
+  Data::Interactive::Inspect: 0
+  YAML: 0
+resources:
+  repository: https://github.com/TLINDEN/dbmdeep
+version: 0.03

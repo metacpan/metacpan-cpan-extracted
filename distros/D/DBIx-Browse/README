@@ -1,0 +1,138 @@
+
+DBIx::Browse - Module to browse related tables.
+(c) Copyright 2000 Evilio José del Río Silván <edelrio@icm.csic.es>
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+
+Description
+-----------
+
+DBIx::Browse is a module to facilitate the browsing (INSERT,
+UPDATE and DELETE) of related database tables.
+
+Build and Install
+-----------------
+
+All you have to do to build, test and install this stuff, if your
+connected to the Internet, is:
+
+perl Makefile.PL
+make
+make test
+make install
+
+NOTE: To perform all tests, including inserting, updating and deleting
+some rows, you need to set two environment variables:
+
+DBI_DSN	: The DBI(3) default Data Source Name (see DBI(3)).
+
+DBIX_BROWSE_MAKE_TEST : If set to some true value, the tests will be performed.
+
+These tests expect to find in the databese pointed by DBI_DSN two
+tables as described by the examples/test.psql. This file is written in
+Postgres dialect but can be adapted easily to others (I also provide
+the examples/test.mysql for MySQL). Be careful since the operations
+performed by the tests could destroy some valuable information (that's
+why I require special environment variables to be set before
+connecting to DBI).
+
+For example, in a Unix box with Postgres installed locally you should do
+something like that:
+
+# Optionally, create a test database
+$ createdb --host localhost --user john test
+# ...
+# Create the tables
+$ psql --host localhost --user john -f examples/test.psql test
+# ...
+# Setup environment
+$ setenv DBI_DSN "dbi:Pg:database=test;host=localhost;user=john;password=doe"
+$ setenv DBIX_BROWSE_MAKE_TEST 1
+# ...
+# Make tests
+$ make test
+# ...
+#
+# Optionally, destroy the test database
+$ dropdb --host localhost --user john test
+
+
+Usage Overview
+--------------
+
+
+         use DBIx::Browse;
+         my ($dbh, $dbb, $q);
+         $dbh = DBI->connect("DBI:Pg:dbname=enterprise")
+           or croak "Can't connect to database: $@";
+        $dbb = new  DBIx::Browse({
+           dbh => $dbh,
+           table => 'employee',
+           proper_fields => [ qw ( name fname ) ],
+           linked_fields => [ qw ( department category office ) ],
+           linked_tables => [ qw ( department category office ) ],
+           linked_values => [ qw ( name       name     phone  ) ],
+           linked_refs   => [ qw ( id         id       id    ) ],
+           aliases       => [ qw ( name fname department category phone )],
+           primary_key   => 'id'
+       });
+
+
+       $my $sth = $db->prepare({
+	 where => "departament = 'Adminitstration' AND age < 35",
+         order => "name ASC, departament ASC"
+	}
+
+       
+       $dbb->insert({
+	 name => 'Doe',
+         fname => 'John',
+	 department => 'Sales',
+	 category   => 'Sales representatn',
+	 phone      => '1114'
+	});
+
+	$dbb->update({
+	   category => 'Sales manager',
+	   phone => '1113'
+	},
+	" id = 1 "
+	);
+
+
+       ...etc
+
+
+
+Examples
+--------
+
+See the directory examples and the test directory scripts of the
+distribution.
+
+
+Author
+------
+
+Evilio José del Río Silván <edelrio@icm.csic.es>
+
+
+
+
+
+

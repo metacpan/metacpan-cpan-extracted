@@ -1,0 +1,6 @@
+name = "DBIx-Fixture-Admin"
+# badges = ["travis"]
+authority="cpan:MERU"
+
+module_maker="ModuleBuildTiny"
+

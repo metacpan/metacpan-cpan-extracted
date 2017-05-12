@@ -1,0 +1,8 @@
+^Makefile$
+^blib/
+^pm_to_blib
+^blibdirs
+^Build$
+^_build/
+^testout/
+^MYMETA.yml$

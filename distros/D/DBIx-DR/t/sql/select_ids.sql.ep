@@ -1,0 +1,8 @@
+SELECT
+    *
+FROM
+    tbl
+WHERE
+    id IN (<% list @$ids %>)
+ORDER BY
+    id

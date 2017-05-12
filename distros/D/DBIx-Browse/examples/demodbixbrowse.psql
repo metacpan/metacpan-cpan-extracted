@@ -1,0 +1,74 @@
+--
+-- SQL commands for creating tables for DemoDBIxBrowse script
+--
+CREATE TABLE locale(
+	id      serial primary key,
+	lang	text not null,				-- Denominacio
+	name	text default 'Desconegut' not null,	-- Nom del llenguatge
+	icon	text default '/icons/unknown.gif'	-- URL icona.
+);
+
+create unique index lang on locale(lang);
+
+INSERT INTO locale(lang,name,icon) VALUES('ca','Català','/icons/ca.png');
+INSERT INTO locale(lang,name,icon) VALUES('es','Español','/icons/es.png');
+INSERT INTO locale(lang,name,icon) VALUES('en','English','/icons/en.png');
+
+CREATE TABLE resource (
+	id	serial  primary key,
+	name	text	not null,
+	tipus	text	default 'TXT' not null
+);
+
+CREATE UNIQUE INDEX res_name_tip on resource(name,tipus);
+
+INSERT into resource(name) VALUES( 'copyright');
+INSERT into resource(name) VALUES( 'maximcount');
+INSERT into resource(name) VALUES( 'next');
+INSERT into resource(name) VALUES( 'prev');
+INSERT into resource(name) VALUES( 'first');
+INSERT into resource(name) VALUES( 'last');
+
+CREATE TABLE message (
+	id		serial primary key,
+	resource	int,    -- Identificador (resource).
+	locale		int,	-- Locale.
+	msg		text,	-- Texte del message.
+	FOREIGN KEY (resource) REFERENCES resource,
+	FOREIGN KEY (locale)   REFERENCES locale
+);
+
+CREATE unique index resource_locale on message(resource,locale);
+
+-- Copyright --
+INSERT INTO message(msg,resource,locale)
+SELECT 'Tots els drets reservats',r.id,l.id
+FROM locale l,resource  r
+WHERE l.lang ='ca' AND
+      r.name  ='copyright';
+
+INSERT INTO message(msg,resource,locale)
+SELECT 'All rights reserved',r.id,l.id
+FROM locale l,resource  r
+WHERE l.lang ='en' AND
+      r.name  ='copyright';
+
+--- Prev ---
+INSERT INTO message(msg,resource,locale)
+SELECT 'Enrere',r.id,l.id
+FROM locale l,resource  r
+WHERE l.lang ='ca' AND
+      r.name  ='prev';
+
+INSERT INTO message(msg,resource,locale)
+SELECT 'Back',r.id,l.id
+FROM locale l,resource  r
+WHERE l.lang ='en' AND
+      r.name  ='prev';
+
+INSERT INTO message(msg,resource,locale)
+SELECT 'Atrás',r.id,l.id
+FROM locale l,resource  r
+WHERE l.lang ='es' AND
+      r.name  ='prev';
+

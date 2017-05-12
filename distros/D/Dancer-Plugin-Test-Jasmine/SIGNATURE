@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 7ce00050084f41202aa443f0aec8f47841fec444 AUTHOR_PLEDGE
+SHA1 21a8698dfd120b3a76fe70bb45c2d61671919aae CONTRIBUTORS
+SHA1 8ea6c5de1023327e6d40745a7873239c7c020914 Changes
+SHA1 e6f7ac181504431cc652b1255834dba0d5b8cd90 INSTALL
+SHA1 5b807b764a3d24ce4f99fc96878cfe82bcc03288 LICENSE
+SHA1 345aae5ac5678c9cdbe201f54eeffd789aef131d MANIFEST
+SHA1 44558a440c52fd911bf97a074ae65453b36a34a4 META.json
+SHA1 a2240ce4c9a5aa741893f05a867095ba3fd3088c META.yml
+SHA1 460948c725130f4016f34400ac2f864c49fc5ef4 Makefile.PL
+SHA1 f11d50ac5ed5d7782a8cc697055602940e10ebb3 README
+SHA1 0c0735f16a21eef907f13800999a560a445c7c01 README.mkdn
+SHA1 83eaf1b342a27101b494edd9e5c0e277449becd0 cpanfile
+SHA1 790fa123c80d8975c36681660059c13b4795d834 doap.xml
+SHA1 dd9605b3a5f65499a2b0c77582438caf6a011fd6 examples/phantom.js
+SHA1 7b995d52c42e2122d7bc644813f041214e97288e examples/specs/hello.js
+SHA1 4f8c0c371541adead674e26cee6e055c4e45ef45 lib/Dancer/Plugin/Test/Jasmine.pm
+SHA1 76eabda6550ad95c6c8636f11f51ef91450da597 lib/Dancer/Plugin/Test/Jasmine/Results.pm
+SHA1 c7a01d82e84f94e3fbd0f1afb1ae06263e11b54b share/shared-files.tar.gz
+SHA1 c6b42efeccf6b6ab61afbd2d63bf2c26c9d6c9ff t/00-compile.t
+SHA1 0db5cd57945729d707a2eab5e0538d13e1c06b3e t/000-report-versions-tiny.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlVKfrEACgkQ34Hwf+GwC4xSlwCg3+f8mCLMoxHsmqlHMYPfUrsx
+xpUAoNjKTSFBP/6LIyuQjE5Y5aay4Rxu
+=xFrG
+-----END PGP SIGNATURE-----

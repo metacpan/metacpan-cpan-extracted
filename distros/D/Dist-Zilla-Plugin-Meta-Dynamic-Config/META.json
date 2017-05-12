@@ -1,0 +1,41 @@
+{
+   "abstract" : "set dynamic_config in resultant META files",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Meta-Dynamic-Config",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.101582",
+            "Dist::Zilla::Role::MetaProvider" : "4.101582",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/dist-zilla-plugin-meta-dynamic-config",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/dist-zilla-plugin-meta-dynamic-config.git",
+         "web" : "https://github.com/bingos/dist-zilla-plugin-meta-dynamic-config"
+      }
+   },
+   "version" : "0.04"
+}
+

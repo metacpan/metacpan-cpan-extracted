@@ -1,0 +1,35 @@
+Revision history for Perl extension Devel::FastProf.
+
+0.08  9 Apr, 2007
+        - count last executed line (bug reported by Cory Bennett)
+        - optimize file format, dump file id only when changed
+        - optimization for older perls (suggested by Tim Bunce)
+        - clean up Makefile.PL
+        - use gettimeofday instead of Time::HiRes when available
+        
+0.07  8 Apr, 2007
+        - mayor bug in time accounting functions corrected
+        - add header with module version info to output file
+        - negative IVs were incorrectly serialized
+
+0.06  7 Apr, 2007
+        - make it work on older perls, from 5.6.x.
+
+0.05  11 Apr 2006
+        - fix bug on perl that made the module fail on 5.8.8.
+        - now perl 5.8.8 is required!!!
+        - measure time in microseconds
+
+0.04  22 Sep 2005
+	- add Devel::FastProf::Reader to MANIFEST
+
+0.03  22 Sep 2005
+	- add ABSTRACT section to docs.
+
+0.02  20 Sep 2005
+	- fprofpp added to MANIFEST
+
+0.01  Sat Sep 10 21:08:30 2005
+	- original version; created by h2xs 1.23 with options
+		-An Devel::FastProf
+

@@ -1,0 +1,119 @@
+Revision history for Date::Utils
+
+0.23  Sun Apr 02 16:40:00 2017
+      - Updated copyright year information.
+
+0.22  Sat Jan 14 19:10:00 2017
+      - Updated method validate_month() and validate_month_name().
+      - Added new test to respect the above changes.
+
+0.21  Tue Jul 26 10:15:00 2016
+      - Dropped method create_calendar() as it's no longer relevant here.
+
+0.20  Wed May 25 11:05:00 2016
+      - Updated method get_month_number(), method validate_month() and method validate_month_name() with
+        regard to handling month name.
+
+0.19  Mon May 16 11:00:00 2016
+      - Updated method get_month_number() to have parameter month_name optional.
+      - Added new test for method get_month_number().
+
+0.18  Wed May 11 10:50:00 2016
+      - Updated method get_month_name().
+      - Added new test for method get_month_name().
+
+0.17  Tue May 10 10:50:00 2016
+      - Updated to require 'months' and 'days'.
+      - Added method validate_month_name().
+      - Added method get_month_number().
+      - Added method get_month_name().
+      - Added unit test for method validate_month_name().
+      - Added unit test for method get_month_number().
+      - Added unit test for method get_month_name().
+      - Added section "SEE ALSO".
+
+0.16  Thu Apr 21 11:20:00 2016
+      - Fixed leaking of calendar color (more visible in Persian Calendar).
+
+0.15  Fri Mar 25 13:00:00 2016
+      - Added unit test t/meta-json.t and t/meta-yml.t.
+      - Updated copyright year information.
+
+0.14  Mon Dec 21 10:05:00 2015
+      - Fixed package version matches dist version in the Makefile.PL file.
+
+0.13  Sat Dec 19 13:10:00 2015
+      - Upgraded to use Date::Exception v0.03.
+
+0.12  Fri Nov 27 10:10:00 2015
+      - Added key 'provides' to the Makefile.PL script.
+
+0.11  Sun Aug 23 10:45:00 2015
+      - Used Date::Exception package to throw exception instead die() where applicable.
+
+0.10  Mon Jul 13 11:10:00 2015
+      - Added method create_calendar().
+
+0.09  Sun Jun 14 10:40:00 2015
+      - Updated the following methods to handle undef (day,month and year).
+        - validate_day()
+        - validate_month()
+        - validate_year()
+
+0.08  Sun Apr 26 13:20:00 2015
+      - Added unit test script t/01-date-utils.t file.
+
+0.07  Thu Apr 23 10:05:00 2015
+      - Re-structured as Moo Role.
+
+0.06  Sun Apr 19 18:50:00 2015
+      - Added the following methods to the package Date::Utils
+        - $SAKA_MONTHS
+        - $SAKA_DAYS
+        - $SAKA_YEAR
+        - $SAKA_MONTH
+        - $SAKA_DAY
+        - saka_to_gregorian
+        - saka_to_julian
+        - days_in_saka_month_year
+        - julian_to_saka
+        - gregorian_to_saka
+
+0.05  Sun Apr 19 03:10:00 2015
+      - Added the following methods to the package Date::Utils
+        - $HIJRI_EPOCH
+        - $HIJRI_DAYS
+        - $HIJRI_MONTHS
+        - $HIJRI_YEAR
+        - $HIJRI_MONTH
+        - $HIJRI_DAY
+        - hijri_to_gregorian()
+        - hijri_to_julian()
+        - days_in_hijri_year()
+        - days_in_hijri_month_year()
+        - gregorian_to_hijri()
+        - is_hijri_leap_year()
+
+0.04  Sat Apr 18 03:20:00 2015
+      - Exporting method days_in_persian_month_year().
+      - Added description to the pod of method days_in_persian_month_year().
+
+0.03  Sat Apr 18 02:45:00 2015
+      - Added the following methods:
+        - $PERSIAN_EPOCH
+        - $PERSIAN_DAYS
+        - $PERSIAN_MONTHS
+        - $PERSIAN_YEAR
+        - $PERSIAN_MONTH
+        - $PERSIAN_DAY
+        - persian_to_gregorian()
+        - persian_to_julian()
+        - julian_to_persian()
+        - gregorian_to_persian()
+        - is_persian_leap_year()
+
+0.02  Fri Apr 17 16:05:00 2015
+      - Corrected the copyright year in the README file.
+
+0.01  Fri Apr 17 15:45:00 2015
+      - First version, released.

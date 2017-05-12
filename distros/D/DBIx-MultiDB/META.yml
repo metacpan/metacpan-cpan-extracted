@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                DBIx-MultiDB
+version:             0.06
+abstract:            join data from multiple databases
+license:             perl
+author:              
+    - Nelson Ferraz <nferraz@gmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::SQLite:                   0
+    DBI:                           0
+    Test::Deep:                    0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

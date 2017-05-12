@@ -1,0 +1,22 @@
+Build.PL			Experimental build script
+ChangeLog			CVS log 
+COPYING.LESSER			GNU Library General Public License
+Credits                         Credits
+lib/Data/Walk.pm		Walk Perl data structures
+Makefile.PL			Makefile generator
+MANIFEST			This file
+META.yml                        META.yml
+NEWS				Release notes
+README				ASCII manpage
+ReleaseNotes			Release notes
+SIGNATURE                       Public-key signature (added by MakeMaker)
+THANKS                          Credits
+t/00basic.t			Basic test case
+t/01by_depth.t			Option 'bydepth'
+t/01follow.t                    Option 'follow'
+t/01post_process.t              Options 'postprocess' and 'postprocess_hash'
+t/01pre_process.t		Option 'preprocess'
+t/01index.t                     Test $Data::Walk::index
+t/03bugs-1.t			Test for old bugs
+t/04bug-container-type-by-depth.t Test that type and container are always set
+META.json                                Module JSON meta-data (added by MakeMaker)

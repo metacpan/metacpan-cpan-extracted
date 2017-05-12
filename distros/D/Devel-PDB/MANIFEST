@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Devel-PDB.t
+lib/Devel/PDB.pm
+lib/Devel/PDB/NamedListbox.pm
+lib/Devel/PDB/Source.pm
+lib/Devel/PDB/SourceView.pm
+lib/Devel/PDB/Dialog/FileBrowser.pm
+lib/Devel/PDB/Dialog/Message.pm
+META.yml                                 Module meta-data (added by MakeMaker)

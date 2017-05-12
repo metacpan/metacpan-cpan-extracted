@@ -1,0 +1,21 @@
+Build.PL
+Changes
+Debian_CPANTS.txt
+ignore.txt
+INSTALL
+lib/Data/Foswiki.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/boilerplate.t
+t/topic.t
+xt/benchmark.t
+xt/kwalitee.t
+xt/manifest.t
+xt/pod-coverage.t
+xt/pod.t
+xt/spelling.t

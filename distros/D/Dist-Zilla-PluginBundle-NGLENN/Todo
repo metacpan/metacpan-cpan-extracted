@@ -1,0 +1,14 @@
+- Write some tests
+- Replace boilerplate docs with real documentation
+- Figure out how to replace NGLENN bundle with real dependencies in output dependencies for this distribution (authordeps, etc.); then this could be tested with Travis, which would be useful for making sure all of those dependencies are still OK (or for MDVT).
+- See about patching Dist::Zilla::Plugin::ConfirmRelease to also include name of cpan account being uploaded to.
+- Perhaps find a way to upload releases to GitHub's releases API... Maybe not.
+
+Dependent on others:
+    - Put Git::CheckFor::CorrectBranch back in when the bug in File::NFSLock is fixed
+        - https://rt.cpan.org/Ticket/Display.html?id=99431
+    - Hopefully eventually put MinimumVersion::Fast back when Dave Golden considers it stable enough
+    - Git::Push always hangs, and Git::Commit sometimes as well.
+        - https://rt.cpan.org/Ticket/Display.html?id=88139
+    - Travis shouldn't bother testing perl versions below the minimum required version
+        - https://github.com/SineSwiper/Dist-Zilla-TravisCI/issues/22

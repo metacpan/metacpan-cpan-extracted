@@ -1,0 +1,18 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Repository.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DateTime/Event/Chinese.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/001_sanity.t
+xt/99_pod-coverage.t
+xt/99_pod.t

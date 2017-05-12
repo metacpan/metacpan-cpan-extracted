@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DoubleBlind.t
+lib/DoubleBlind.pm
+ex.pl
+META.yml                                 Module meta-data (added by MakeMaker)

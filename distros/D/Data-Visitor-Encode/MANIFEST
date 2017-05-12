@@ -1,0 +1,20 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Data/Visitor/Encode.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-sanity.t
+t/02-utf8_on_off.t
+t/03-encode_decode.t
+t/04-encode_decode_utf8.t
+t/05_h2z.t
+t/checkfunc.pl
+t/lib/Test/Data/Visitor/Encode.pm

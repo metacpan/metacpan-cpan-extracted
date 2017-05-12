@@ -1,0 +1,27 @@
+Revision History for DataFlow-Proc-MessagePack
+==============================================
+
+1.112100
+--------
+
+commit 55c18cb87feb59c93cf14ba4bfba7723f4cf80cf
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+commit 62412d3109373735081b193f2fa5479fa808ff2a
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+v1.111810 2011-06-29
+--------------------
+
+commit 4c6fbe1c2257d6577723bd8b955422a222c7f121
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose "builder" rather than "default" (almost everywhere)
+
+===================================
+End of changes in the last 365 days
+===================================

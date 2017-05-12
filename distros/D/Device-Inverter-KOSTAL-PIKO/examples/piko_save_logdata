@@ -1,0 +1,8 @@
+#!/bin/bash -e
+
+# Run this as daily cron job to collect all log data in one file.
+
+logfile=${1:-LogDaten.dat}
+piko_collect -host piko |
+piko_merge "$logfile" - >"$logfile.$$"
+mv "$logfile.$$" "$logfile"

@@ -1,0 +1,7 @@
+[top]
+var = <: $var :>
+before_layout_render = <: $before_layout_render :>
+---
+<: $content :>
+---
+[bottom]

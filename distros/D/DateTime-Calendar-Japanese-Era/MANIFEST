@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+devtools/generate.pl
+lib/DateTime/Calendar/Japanese/Era.pm
+minil.toml
+share/eras.yaml
+share/south-eras.yaml
+t/01-load.t
+t/02-sanity.t
+t/03-north_south.t
+xt/99-pod-coverage.t
+META.yml
+MANIFEST

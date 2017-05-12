@@ -1,0 +1,489 @@
+[![CPAN version](https://badge.fury.io/pl/Date-Holidays.svg)](http://badge.fury.io/pl/Date-Holidays)
+[![Build Status](https://travis-ci.org/jonasbn/Date-Holidays.svg?branch=master)](https://travis-ci.org/jonasbn/Date-Holidays)
+[![Coverage Status](https://coveralls.io/repos/jonasbn/Date-Holidays/badge.png?branch=master)](https://coveralls.io/r/jonasbn/Date-Holidays?branch=master)
+
+# NAME
+
+Date::Holidays - Date::Holidays::\* adapter and aggregator for all your holiday needs
+
+# VERSION
+
+This POD describes version 1.00 of Date::Holidays
+
+# FEATURES
+
+- Exposes a uniform interface towards modules in the Date::Holidays::\* namespace
+- Inquire whether a certain date is a holiday in a specific country or a set of countries
+- Inquire for a holidays for a given year for a specific country or a set of countries
+- Overwrite/rename/suppress national holidays with your own calendar 
+
+# SYNOPSIS
+
+    use Date::Holidays;
+
+    # Initialize a national holidays using the ISO 3361 country code
+    my $dh = Date::Holidays->new(
+        countrycode => 'dk'
+    );
+
+    # Inquire and get a local name for a holiday if it is a national holiday
+    my $holidayname = $dh->is_holiday(
+        year  => 2004,
+        month => 12,
+        day   => 25
+    );
+
+    # Inquire and get a set of local namenames for national holiday in a given country
+    my $hashref = $dh->holidays(
+        year => 2004
+    );
+
+    # Inquire and get local names for a set of countries, where the specific date is a
+    # national holiday
+    $holidays_hashref = Date::Holidays->is_holiday(
+        year      => 2004,
+        month     => 12,
+        day       => 25,
+        countries => ['se', 'dk', 'no'],
+    );
+
+    foreach my $country (keys %{$holidays_hashref}) {
+        print $holidays_hashref->{$country}."\n";
+    }
+
+    # Example of a module with additional parameters
+    # Australia is divided into states with local holidays
+    # using ISO-3166-2 codes
+    my $dh = Date::Holidays->new(
+        countrycode => 'au'
+    );
+
+    $holidayname = $dh->is_holiday(
+        year  => 2004,
+        month => 12,
+        day   => 25,
+        state => 'TAS',
+    );
+
+    $hashref = $dh->holidays(
+        year => 2004
+        state => 'TAS',
+    );
+
+    # Another example of a module with additional parameters
+    # Great Britain is divided into regions with local holidays
+    # using ISO-3166-2 codes
+    my $dh = Date::Holidays->new(
+        countrycode => 'gb'
+    );
+
+    $holidayname = $dh->is_holiday(
+        year    => 2014,
+        month   => 12,
+        day     => 25,
+        regions => ['EAW'],
+    );
+
+    $hashref = $dh->holidays(
+        year    => 2014
+        regions => ['EAW'],
+    );
+
+# DESCRIPTION
+
+Date::Holidays is an adapters exposing a uniform API to a set of dsitributions 
+in the Date::Holidays::\* namespace. All of these modules deliver methods and 
+information on national calendars, but no standardized API exist.
+
+The distributions more or less follow a _de_ _facto_ standard (see: also the generic
+adapter [Date::Holidays::Adapter](https://metacpan.org/pod/Date::Holidays::Adapter)), but the adapters are implemented to uniform
+this and Date::Holidays exposes a more readable API and at the same time it
+provides an OO interface, to these diverse implementations, which primarily 
+holds a are produceral.
+
+As described below it is recommended that a certain API is implemented (SEE:
+__holidays__ and __is\_holiday__ below), but taking the adapter strategy into
+consideration this does not matter, or we attempt to do what we can with what is
+available on CPAN.
+
+If you are an module author/CPAN contributor who wants to comply to the suggested, 
+either look at some of the other modules in the Date::Holidays::\* namespace to get an
+idea of the _de_ _facto_ standard or have a look at [Date::Holidays::Abstract](https://metacpan.org/pod/Date::Holidays::Abstract) and
+[Date::Holidays::Super](https://metacpan.org/pod/Date::Holidays::Super) - or write me.
+
+In addition to the adapter feature, Date::Holidays also do aggregation, so you 
+can combine calendars and you can overwrite and redefined existing calendars.
+
+## DEFINING YOUR OWN CALENDAR
+
+As mentioned in the FEATURES section it is possible to create your own local calendar.
+
+This can be done using a [JSON](https://metacpan.org/pod/JSON) file with your local definitions:
+
+    {
+        "1501" : "jonasbn's birthday"
+    }
+
+This also mean you can overwrite your national calendar:
+
+    {
+        "1225" : ""
+    }
+
+You can specify either month plus day for a recurring holiday. If you you want to define
+a holiday for a specific year, simply extend the date with year:
+
+    {
+        "20141225" : ""
+    }
+
+In order for the calendar to be picked up by Date::Holidays, set the environment variable:
+
+    $HOLIDAYS_FILE
+
+This should point to the JSON file.
+
+# SUBROUTINES/METHODS
+
+## new
+
+This is the constructor. It takes the following parameters:
+
+- countrycode (MANDATORY, see below), unique two letter code representing a
+country name.  Please refer to ISO3166 (or [Locale::Country](https://metacpan.org/pod/Locale::Country))
+- nocheck (optional), if set to true the countrycode specified will not be
+validated against a list of known country codes for existance, so you can build 
+fake holidays for fake countries, I currently use this for test. This parameter
+might disappear in the future.
+
+The constructor loads the module from Date::Holidays::\*, which matches the
+country code and returns a Date::Holidays module with the specified module
+loaded and ready to answer to any of the following methods described below, if
+these are implemented - of course.
+
+If no countrycode is provided or the class is not able to load a module, nothing
+is returned.
+
+    my $dh = Date::Holidays->new(countrycode => 'dk')
+        or die "No holidays this year, get back to work!\n";
+
+## holidays
+
+This is a wrapper around the loaded module's __holidays__ method if this is
+implemented. If this method is not implemented it tries <countrycode>\_holidays.
+
+Takes 3 optional named arguments:
+
+- year, four digit parameter representing year
+- state, ISO-3166-2 code for a state
+
+    Not all countries support this parameter
+
+- regions, pointing to a reference to an array of ISO-3166-2 code for regions
+
+    Not all countries support this parameter
+
+    $hashref = $dh->holidays(year => 2007);
+
+## holidays\_dt
+
+This method is similar to holidays. It takes one named argument b<year>.
+
+The result is a hashref just as for __holidays__, but instead the names
+of the holidays are used as keys and the values are DateTime objects.
+
+## is\_holiday
+
+This is yet another wrapper around the loaded module's __is\_holiday__
+method if this is implemented. Also if this method is not implemented
+it tries is\_<countrycode>\_holiday.
+
+Takes 6 optional named arguments:
+
+- year, four digit parameter representing year
+- month, 1-12, representing month
+- day, 1-31, representing day
+- countries (OPTIONAL), a list of ISO3166 country codes
+- state, ISO-3166-2 code for a state. Not all countries support this parameter
+- regions, pointing to a reference to an array of ISO-3166-2 code for regions. Not all countries support this parameter
+
+is\_holiday returns the name of a holiday is present in the country specified by
+the country code provided to the Date::Holidays constructor.
+
+    $name = $dh->is_holiday(year => 2007, day => 24, month => 12);
+
+If this method is called using the class name __Date::Holidays__, all known
+countries are tested for a holiday on the specified date, unless the countries
+parameter specifies a subset of countries to test.
+
+    $hashref = Date::Holidays->is_holiday(year => 2007, day => 24, month => 12);
+
+In the case where a set of countries are tested the return value from the method
+is a hashref with the country codes as keys and the values as the result.
+
+- `undef` if the country has no module or the data could not be obtained
+- a name of the holiday if a holiday is present
+- an empty string if the a module was located but the day is not a holiday
+
+## is\_holiday\_dt
+
+This method is similar to is\_holiday, but instead of 3 separate arguments it
+only takes a single argument, a DateTime object.
+
+Return 1 for true if the object is a holiday and 0 for false if not.
+
+# DEVELOPING A DATE::HOLIDAYS::\* MODULE
+
+There is no control of the Date::Holidays::\* namespace at all, so I am by no
+means an authority, but this is recommendations on order to make the modules
+in the Date::Holidays more uniform and thereby more usable.
+
+If you want to participate in the effort to make the Date::Holidays::\* namespace
+even more usable, feel free to do so, your feedback and suggestions will be
+more than welcome.
+
+If you want to add your country to the Date::Holidays::\* namespace, please feel
+free to do so. If a module for you country is already present, I am sure the
+author would not mind patches, suggestions or even help.
+
+If however you country does not seem to be represented in the namespace, you
+are more than welcome to become the author of the module in question.
+
+Please note that the country code is expected to be a two letter code based on
+ISO3166 (or [Locale::Country](https://metacpan.org/pod/Locale::Country)).
+
+As an experiment I have added two modules to the namespace,
+[Date::Holidays::Abstract](https://metacpan.org/pod/Date::Holidays::Abstract) and [Date::Holidays::Super](https://metacpan.org/pod/Date::Holidays::Super), abstract is attempt
+to make sure that the module implements some, by me, expected methods.
+
+So by using abstract your module will not work until it follows the the abstract
+layed out for a Date::Holidays::\* module. Unfortunately the module will only
+check for the presence of the methods not their prototypes.
+
+[Date::Holidays::Super](https://metacpan.org/pod/Date::Holidays::Super) is for the lazy programmer, it implements the necessary
+methods as stubs and there for do not have to implement anything, but your
+module will not return anything of value. So the methods need to be overwritten
+in order to comply with the expected output of a Date::Holidays::\* method.
+
+The methods which are currently interesting in a Date::Holidays::\* module are:
+
+- is\_holiday
+
+    Takes 3 arguments: year, month, day and returns the name of the holiday as a
+    scalar in the national language of the module context in question. Returns
+    undef if the requested day is not a holiday.
+
+        Modified example taken from: L<Date::Holidays::DK>
+
+        use Date::Holidays::DK;
+        my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
+
+        $year  += 1900;
+        $month += 1;
+        print "Woohoo" if is_holiday( $year, $month, $day );
+
+        #The actual method might not be implemented at this time in the
+        #example module.
+
+- is\_<countrycode>\_holiday
+
+    Same as above.
+
+    This method however should be a wrapper of the above method (or the other way
+    around).
+
+- holidays
+
+    Takes 1 argument: year and returns a hashref containing all of the holidays in
+    specied for the country, in the national language of the module context in
+    question.
+
+    The keys are the dates, month + day in two digits each concatenated.
+
+        Modified example taken from: L<Date::Holidays::PT>
+
+        my $h = holidays($year);
+        printf "Jan. 1st is named '%s'\n", $h->{'0101'};
+
+        #The actual method might not be implemented at this time in the
+        #example module.
+
+- <countrycode>\_holidays
+
+    This method however should be a wrapper of the above method (or the other way
+    around).
+
+__Only__ __is\_holiday__ and __holidays__ are implemented in
+[Date::Holidays::Super](https://metacpan.org/pod/Date::Holidays::Super) and are required by [Date::Holidays::Abstract](https://metacpan.org/pod/Date::Holidays::Abstract).
+
+## ADDITIONAL PARAMETERS
+
+Some countries are divided into regions or similar and might require additional
+parameters in order to give more exact holiday data.
+
+This is handled by adding additional parameters to __is\_holiday__ and
+__holidays__.
+
+These parameters are left to the module authors descretion and the actual
+Date::Holidays::\* module should be consulted.
+
+    Example Date::Holidays::AU
+
+    use Date::Holidays::AU qw( is_holiday );
+
+    my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
+    $year  += 1900;
+    $month += 1;
+
+    my ($state) = 'VIC';
+    print "Excellent\n" if is_holiday( $year, $month, $day, $state );
+
+# DEVELOPING A DATE::HOLIDAYS::ADAPTER CLASS
+
+If you want to contribute with an adapter, please refer to the documentation in
+[Date::Holidays::Adapter](https://metacpan.org/pod/Date::Holidays::Adapter).
+
+# DIAGNOSTICS
+
+- No country code specified
+
+    No country code has been specified.
+
+- Unable to initialize Date::Holidays for country: <countrycode>
+
+    This message is emitted if a given country code cannot be loaded.
+
+# CONFIGURATION AND ENVIRONMENT
+
+As mentioned in the section on defining your own calendar. You have to 
+set the environment variable:
+
+    $HOLIDAYS_FILE
+
+This environment variable should point to a JSON file containing holiday definitions
+to be used by [Date::Holidays::Adapter::Local](https://metacpan.org/pod/Date::Holidays::Adapter::Local).
+
+# DEPENDENCIES
+
+- [Carp](https://metacpan.org/pod/Carp)
+- [DateTime](https://metacpan.org/pod/DateTime)
+- [Locale::Country](https://metacpan.org/pod/Locale::Country)
+- [Module::Load](https://metacpan.org/pod/Module::Load)
+- [Date::Holidays::Adapter](https://metacpan.org/pod/Date::Holidays::Adapter)
+- [TryCatch](https://metacpan.org/pod/TryCatch)
+- [Scalar::Util](https://metacpan.org/pod/Scalar::Util)
+
+# INCOMPATIBILITIES
+
+None known at the moment, please refer to BUGS AND LIMITATIONS and or the
+specific adapter classes or their respective adaptees.
+
+# BUGS AND LIMITATIONS
+
+Currently we have an exception for the [Date::Holidays::AU](https://metacpan.org/pod/Date::Holidays::AU) module, so the
+additional parameter of state is defaulting to 'VIC', please refer to the POD
+for [Date::Holidays::AU](https://metacpan.org/pod/Date::Holidays::AU) for documentation on this.
+
+[Date::Holidays::DE](https://metacpan.org/pod/Date::Holidays::DE) and [Date::Holidays::UK](https://metacpan.org/pod/Date::Holidays::UK) does not implement the
+__holidays__ methods
+
+The adaptee module for [Date::Holidays::Adapter](https://metacpan.org/pod/Date::Holidays::Adapter) is named:
+[Date::Japanese::Holiday](https://metacpan.org/pod/Date::Japanese::Holiday), but the adapter class is following the general
+adapter naming of Date::Holidays::Adapter::<countrycode>.
+
+The adapter for [Date::Holidays::PT](https://metacpan.org/pod/Date::Holidays::PT), [Date::Holidays::Adapter::PT](https://metacpan.org/pod/Date::Holidays::Adapter::PT) does not
+implement the __is\_pt\_holiday__ method. The pattern used is an object adapter
+pattern and inheritance is therefor not used, it is my hope that I can
+make this work with some Perl magic.
+
+# BUG REPORTING
+
+Please report issues via CPAN RT:
+
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays
+
+or by sending mail to
+
+    bug-Date-Holidays@rt.cpan.org
+
+# TEST COVERAGE
+
+Test coverage in version 1.00
+
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    File                           stmt   bran   cond    sub    pod   time  total
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+    lib/Date/Holidays.pm           95.9   77.5   60.0  100.0  100.0   87.0   90.9
+    lib/Date/Holidays/Adapter.pm   84.2   64.7   44.4  100.0  100.0   12.0   79.2
+    ...te/Holidays/Adapter/AU.pm   93.1   62.5    n/a  100.0  100.0    0.0   89.1
+    ...te/Holidays/Adapter/BR.pm   72.7   25.0    n/a   83.3  100.0    0.0   70.5
+    ...te/Holidays/Adapter/CN.pm   70.8   25.0    n/a   83.3  100.0    0.0   69.4
+    ...te/Holidays/Adapter/DE.pm  100.0  100.0    n/a  100.0  100.0    0.0  100.0
+    ...te/Holidays/Adapter/DK.pm   91.6   50.0    n/a  100.0  100.0    0.0   88.8
+    ...te/Holidays/Adapter/ES.pm   72.7   25.0    n/a   83.3  100.0    0.0   70.5
+    ...te/Holidays/Adapter/FR.pm   90.9   50.0    n/a   85.7  100.0    0.0   87.8
+    ...te/Holidays/Adapter/GB.pm   92.3   50.0    n/a  100.0  100.0    0.0   89.4
+    ...te/Holidays/Adapter/JP.pm   73.5   37.5    n/a   77.7  100.0    0.0   69.8
+    ...te/Holidays/Adapter/KR.pm   86.3   50.0    n/a   85.7  100.0    0.0   84.8
+    ...Holidays/Adapter/LOCAL.pm   86.9   50.0   12.5  100.0  100.0    0.3   64.5
+    ...te/Holidays/Adapter/NO.pm   70.8   25.0    n/a   83.3  100.0    0.0   69.4
+    ...te/Holidays/Adapter/PL.pm   90.9   50.0    n/a   85.7  100.0    0.0   87.8
+    ...te/Holidays/Adapter/PT.pm   90.9   50.0    n/a  100.0  100.0    0.0   88.2
+    Total                          87.2   59.2   33.3   93.1  100.0  100.0   81.7
+    ---------------------------- ------ ------ ------ ------ ------ ------ ------
+
+# SEE ALSO
+
+- [Date::Holidays::AU](https://metacpan.org/pod/Date::Holidays::AU)
+- [Date::Holidays::Adapter::AU](https://metacpan.org/pod/Date::Holidays::Adapter::AU)
+- [Date::Holidays::DE](https://metacpan.org/pod/Date::Holidays::DE)
+- [Date::Holidays::Adapter::DE](https://metacpan.org/pod/Date::Holidays::Adapter::DE)
+- [Date::Holidays::DK](https://metacpan.org/pod/Date::Holidays::DK)
+- [Date::Holidays::Adapter::DK](https://metacpan.org/pod/Date::Holidays::Adapter::DK)
+- [Date::Holidays::CN](https://metacpan.org/pod/Date::Holidays::CN)
+- [Date::Holidays::Adapter::CN](https://metacpan.org/pod/Date::Holidays::Adapter::CN)
+- [Date::Holidays::FR](https://metacpan.org/pod/Date::Holidays::FR)
+- [Date::Holidays::Adapter::FR](https://metacpan.org/pod/Date::Holidays::Adapter::FR)
+- [Date::Holidays::NO](https://metacpan.org/pod/Date::Holidays::NO)
+- [Date::Holidays::Adapter::NO](https://metacpan.org/pod/Date::Holidays::Adapter::NO)
+- [Date::Holidays::NZ](https://metacpan.org/pod/Date::Holidays::NZ)
+- [Date::Holidays::Adapter::NZ](https://metacpan.org/pod/Date::Holidays::Adapter::NZ)
+- [Date::Holidays::PT](https://metacpan.org/pod/Date::Holidays::PT)
+- [Date::Holidays::Adapter::PT](https://metacpan.org/pod/Date::Holidays::Adapter::PT)
+- [Date::Holidays::UK](https://metacpan.org/pod/Date::Holidays::UK)
+- [Date::Holidays::Adapter::GB](https://metacpan.org/pod/Date::Holidays::Adapter::GB)
+- [Date::Holidays::ES](https://metacpan.org/pod/Date::Holidays::ES)
+- [Date::Holidays::Adapter::ES](https://metacpan.org/pod/Date::Holidays::Adapter::ES)
+- [Date::Japanese::Holiday](https://metacpan.org/pod/Date::Japanese::Holiday)
+- [Date::Holidays::Adapter::JP](https://metacpan.org/pod/Date::Holidays::Adapter::JP)
+- [Date::Holidays::Adapter](https://metacpan.org/pod/Date::Holidays::Adapter)
+- [Date::Holidays::Abstract](https://metacpan.org/pod/Date::Holidays::Abstract)
+- [Date::Holidays::Super](https://metacpan.org/pod/Date::Holidays::Super)
+- [Date::Holidays::AT](https://metacpan.org/pod/Date::Holidays::AT)
+- [Date::Holidays::CN](https://metacpan.org/pod/Date::Holidays::CN)
+- [Date::Holidays::RU](https://metacpan.org/pod/Date::Holidays::RU)
+
+# ACKNOWLEDGEMENTS
+
+- Florian Merges for feedback and pointing out a bug in Date::Holidays,
+author of Date::Holidays::ES
+- COG (Jose Castro), Date::Holidays::PT author
+- RJBS (Ricardo Signes), POD formatting
+- MRAMBERG (Marcus Ramberg), Date::Holidays::NO author
+- BORUP (Christian Borup), DateTime suggestions
+- LTHEGLER (Lars Thegler), Date::Holidays::DK author
+- shild on use.perl.org, CPAN tester
+http://use.perl.org/comments.pl?sid=28993&cid=43889
+- CPAN testers in general, their work is invaluable
+- All of the authors/contributors of Date::Holidays::\* modules
+
+# AUTHOR
+
+Jonas B. Nielsen, (jonasbn) - `<jonasbn@cpan.org>`
+
+# LICENSE AND COPYRIGHT
+
+Date-Holidays and related modules are (C) by Jonas B. Nielsen, (jonasbn)
+2004-2014
+
+Date-Holidays and related modules are released under the Artistic License 2.0

@@ -1,0 +1,37 @@
+{
+   "abstract" : "Build types from Data::Rx schema (experimental)",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Rx-TypeBundle-Rx",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Rx::TypeBundle" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Rx" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.103520"
+}
+

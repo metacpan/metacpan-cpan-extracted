@@ -1,0 +1,51 @@
+DBD::Mimer -- DBD module interfacing the Mimer SQL database.
+
+   Copyright (c) 2002  Upright Database Technology AB
+   Copyright (c) 1994,1995,1996,1997,1998  Tim Bunce
+   Copyright (c) 1997,1998,1999,2000,2001,2002 Jeff Urlwin
+   Copyright (c) 1997  Thomas K. Wenrich
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module (at least DBI 1.201).
+    It is very important to TEST it and INSTALL it!
+
+    Remember to *read* the DBI README file!
+
+    Remember to *read* the DBD::Mimer.pm POD documentation!!!
+BUILDING:
+
+  set-up these environment variables:
+    DBI_DSN   The dbi data source, e.g. 'dbi:Mimer:YOUR_DSN_HERE'
+    DBI_USER  The username to use to connect to the database
+    DBI_PASS  The password to use to connect to the database
+    MIMER_HOME (Unix only) The dir where your Mimer distribution is installed
+
+  perl Makefile.PL
+  make                (or nmake, if VC++ on Win32)
+  make test           (or nmake, if VC++ on Win32)
+
+TESTING
+  
+  make test
+  make test TEST_VERBOSE=1   (if any of the t/* tests fail)
+  make install               (if the tests look okay)
+
+===============================================================================
+Other info:
+
+Mimer SQL developer site:  http://developer.mimer.com
+
+perldoc DBI
+perldoc DBD::Mimer	(which will include the DBD::Mimer FAQ list)
+
+End.
+
+
+

@@ -1,0 +1,120 @@
+---
+abstract: 'Dist Zilla Plugin Bundle the way I like to use it'
+author:
+  - 'Shantanu Bhadoria <shantanu@cpan.org> L<https://www.shantanubhadoria.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-SHANTANU
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Badge::Depot::Plugin::Shantanutravis:
+    file: lib/Badge/Depot/Plugin/Shantanutravis.pm
+    version: '0.43'
+  Dist::Zilla::Plugin::AutoMetaResourcesPrefixed:
+    file: lib/Dist/Zilla/Plugin/AutoMetaResourcesPrefixed.pm
+    version: '0.43'
+  Dist::Zilla::PluginBundle::SHANTANU:
+    file: lib/Dist/Zilla/PluginBundle/SHANTANU.pm
+    version: '0.43'
+  Pod::Weaver::PluginBundle::SHANTANU:
+    file: lib/Pod/Weaver/PluginBundle/SHANTANU.pm
+    version: '0.43'
+requires:
+  Badge::Depot: '0'
+  Badge::Depot::Plugin::Cpantesters: '0'
+  Badge::Depot::Plugin::Gratipay: '0'
+  Badge::Depot::Plugin::Kwalitee: '0'
+  Badge::Depot::Plugin::Perl: '0'
+  Dist::Zilla: '4.3'
+  Dist::Zilla::Plugin::AutoMetaResources: '0'
+  Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes: '0.109'
+  Dist::Zilla::Plugin::ChangelogFromGit::Debian: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckExtraTests: '0'
+  Dist::Zilla::Plugin::CheckMetaResources: '0'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0'
+  Dist::Zilla::Plugin::Control::Debian: '0'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::Git::CommitBuild: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::InsertCopyright: '0'
+  Dist::Zilla::Plugin::License: '0'
+  Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
+  Dist::Zilla::Plugin::ManifestSkip: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaNoIndex: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaTests: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PerlTidy: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::PruneCruft: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::TaskWeaver: '0'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::Test::Kwalitee::Extra: '0'
+  Dist::Zilla::Plugin::Test::MinimumVersion: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::PodSpelling: '0'
+  Dist::Zilla::Plugin::Test::Portability: '0'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::Plugin::TravisYML: '0'
+  Dist::Zilla::PluginBundle::Git: '2.028'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  JSON::MaybeXS: '0'
+  Moose: '0.99'
+  Moose::Autobox: '0'
+  Path::Tiny: '0'
+  Pod::Elemental::Transformer::List: '0.101620'
+  Pod::Weaver: '3.101638'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::WikiDoc: '0'
+  Pod::Weaver::Section::Badges: '0.0402'
+  Pod::Weaver::Section::Contributors: '0.001'
+  Pod::Weaver::Section::Support: '1.001'
+  Test::Portability::Files: '0.06'
+  Types::Standard: '0'
+  autodie: '2.00'
+  namespace::autoclean: '0.09'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-dist-zilla-pluginbundle-shantanu/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-SHANTANU
+  repository: git://github.com/shantanubhadoria/perl-dist-zilla-pluginbundle-shantanu.git
+version: '0.43'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Shantanu Bhadoria <shantanu att cpan dott org>'

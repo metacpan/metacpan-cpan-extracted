@@ -1,0 +1,19 @@
+---
+abstract: 'Easy way do declare extra indices to your tables'
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-Indexing
+requires:
+  DBIx::Class: 0
+  SQL::Translator: 0
+  Test::Deep: 0
+  Test::Exception: 0
+  Test::More: 0.92
+resources:
+  repository: http://github.com/melo/dbicx-indexing/
+version: 0.002

@@ -1,0 +1,7 @@
+.git/
+.DS_Store
+.gitignore
+.travis.yml
+blib/
+.bak
+pm_to_blib

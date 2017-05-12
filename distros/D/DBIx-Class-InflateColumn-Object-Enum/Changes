@@ -1,0 +1,38 @@
+Revision history for DBIx-Class-InflateColumn-Object-Enum
+
+0.06 May 30th 2014
+	- bind is_nullable to Object::Enum unset and default value behavior
+	- fixes RT 95597
+0.05 Jan 27th 2014
+	- Updated dist build to distzilla
+	- fixed https://rt.cpan.org/Ticket/Display.html?id=93432
+	TODO: fix issue 74086
+	TODO: fix issue 80705
+0.04    Jan 27th 2009
+	- Removed self dependency 
+0.03    Nov 11th 2008
+	- Modified error verbage as per request from mst
+	- Changed ChangeLog sorting from latest -> oldest
+	- Migrated from internal svn repo to dbic-class svn repo
+
+0.02    Oct 25th 2008
+        - Expanded testing database and tap tests to test for varchar 
+          nullable and non-nullable and database native enum nullable 
+          and non-nullable 
+        - Fixed a implmentation for Object::Enum->new so that columns value
+          on inflation is set correctly. This could have been considered
+          a nasty bug. Discovered through new tests.
+        - Added sanity check for inflation value set for invalid values so 
+          that we don't get Object::Enum's die for invalid value as I don't
+          like that behavior. Maybe a column_info to control check would be 
+          more reasonable?
+        - Changed allowable values usages from values column_info property
+          to extra->list property to make this modules usage fall more 
+          inline with how SQL::Translator handles native enum database
+          types. As per suggestion from Bernhard Graf.
+	- Added to code to enable smarter default_value handling
+
+0.01    Oct 23rd 2008
+        - Register_column implemented
+        - Test database schema implemented
+        - Wrote base TAP tests

@@ -1,0 +1,722 @@
+/*======================================================================
+ * headerTable
+ */
+.headers {
+  min-height: 73px;
+}
+table.headerTable { 
+  margin-left: 10px;
+  margin-bottom: 5px;
+}
+
+.headerTable th, .headerTable label, .headerTable td:nth-child(1) {
+  padding: 0px;
+  margin: 0px;
+  text-align: right;
+}
+.headerTable label { 
+  display: inline-block;
+}
+.headerTable td, .headerTable th { 
+  white-space: nowrap;
+}
+td.disabled label {
+    color: #999;
+}
+
+.headerTable td:nth-child(3), .headerTable tr td:nth-child(4) {
+  /*border: 1px solid #ff00ff;*/
+}
+/*.headerTable td {  border: 1px solid red; }*/
+
+label.hl2 {
+  width: 45%;
+  display: inline-block;
+  text-align: right;
+  /*border: 1px solid red;*/
+}
+.hi1, .hi2 { 
+  display: inline-block;
+}
+.hi1 {
+  width: 99%;
+  /*border: 1px solid #00ffff;*/
+}
+.hi2 {
+  width: 50%;
+  /*border: 2px solid green;*/
+}
+
+.diffpar {
+  display:none;
+}
+
+/*======================================================================
+ * profile query: data area
+ */
+.rawURL {
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#rawLink {
+  font-family: monospace;
+}
+
+#statusRel.d3 {
+  width: 100%;
+  height: 0px;
+  position: relative;
+  top: 0px;
+  left: 0px;
+}
+#statusRel.d3 .status { 
+  position: absolute;
+  left: 55px;
+  top: 60px;
+}
+
+.status {
+  display: none;
+}
+.status.loading, .status.info, .status.warning, .status.error, .status.hint {
+  background: #ffffff;
+  display: block;
+}
+
+.status.hint {
+    background: #ccffcc;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.status .msg {
+  color: #0000ff;
+  font-style: italic;
+  vertical-align: middle;
+}
+.status.error .msg {
+  color: #ff0000;
+  font-weight: bold;
+}
+.status.warning .msg {
+  /*color: #ff0000;*/  /*red*/
+  color: #cc3300;  /*dark orange*/
+  /*font-weight: bold;*/
+}
+
+.status .icon, #errorDiv .icon {
+  display: none;
+  width: 0px;
+  height: 0px;
+  /*padding: 8px;*//*-- for 16x16 images --*/
+  padding: 16px;  /*-- for 32x32 images --*/
+  margin: 5px;
+  vertical-align: middle;
+}
+.loading .icon, .info .icon, .warning .icon, .error .icon {
+  display: inline-block !important;
+}
+.loading .icon {
+  background: url("../images/spinner-blue-32px.gif") !important;
+}
+.warning .icon {
+  background: url("../images/warning-32px.png") !important;
+}
+.warning.loading .icon {
+  background: url("../images/spinner-orange-32px.gif") !important;
+}
+.error .icon {
+  background: url("../images/error-32px.png") !important;
+}
+.info .icon {
+  background: url("../images/info-32px.png") !important;
+}
+
+
+#errorDiv h1, #errorDiv pre {
+  color: #990000;
+}
+#errorDiv pre { 
+  margin: 0px;
+  padding: 0px;
+  background-color: #ffffff;
+}
+
+#profileDataText, #errorDiv, .dcpTable { 
+  margin: 0px;
+  margin-top: .25em;
+  margin-bottom: .25em;
+  padding: 0px;
+  background-color: #ffffff;
+}
+#profileDataText { 
+  padding: .25em;
+  border: 1px solid grey;
+}
+#errorDiv { 
+  padding: .25em;
+  border: 1px solid #990000;
+}
+
+table.dcpTable { 
+/*
+  border-collapse: separate;
+  border-spacing: 1px 0px;
+*/
+}
+
+.dcpTable td, .dcpTable tr, .dcpTable th {
+  border: none;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+.dcpTable tr.newlabel {
+  border-top: 1px solid grey;
+}
+.dcpTable th {
+  text-align: center;
+}
+
+.dcpTable.prfTable td:nth-child(-n+6),
+.dcpTable.diffTable td:nth-child(-n+4)
+{
+  /* profile or diff table: numeric columns */
+  text-align: right;
+}
+.dcpTable.prfTable td:not(:nth-child(-n+6)), .dcpTable.prfTable th:not(:nth-child(-n+6)),
+.dcpTable.diffTable td:not(:nth-child(-n+4)), .dcpTable.diffTable th:not(:nth-child(-n+4))
+{
+   /* profile table: default (projected attribute value columns) */
+  text-align: left;
+}
+
+.dcpTable tr:nth-child(odd) {
+  /*background-color: #99ccff;*//*-- aliceblue-ish(safe) --*/
+  /*background-color: #ddeeff;*//*-- light blue (dstar) --*/
+  background-color: #e8e8e8;/*-- light grey --*/
+  /*background-color: #ccccff;*//*-- light purple --*/
+}
+
+td.diffColor, td.diffColor span {
+  background-color: #ffffff;
+  vertical-align: middle;
+}
+td.diffColor span {
+  display: inline-block;
+  width: 1.25em;
+}
+
+/*======================================================================
+ * profile data: google motion chart
+ */
+div.gmChart { 
+  width: 600px;
+  height: 480px;
+  padding: 5px;
+  margin-top: 5px;
+  border: 1px solid #cccccc;
+}
+
+/*======================================================================
+ * profile data: highcharts 2d plot
+ */
+div.hcParent {
+  border: 1px solid #cccccc
+  padding: 5px;
+}
+div.hcChart { 
+  min-width: 640px;
+  width: 95%;
+  height: 400px;
+  padding: 0px;
+  /*margin: 0 auto;*/ /*-- center in parent div --*/
+}
+table.dcslide th {
+  text-align: right;
+  font-weight: bold;
+  font-variant: small-caps;
+}
+table.dcslide .ddclink {
+  font-family: monospace;
+  font-size: small;
+}
+
+/*======================================================================
+ * profile data: d3: top-level
+ */
+div#profileDataD3 {
+   margin-top: 5px;
+   margin-bottom: 5px;
+   white-space: nowrap;
+   /*font-size: 0px;*/
+}
+
+#d3transport > div,
+#d3main > div {
+  display: inline-block;
+}
+#d3buttons {
+  width: 90px;
+}
+#d3legend {
+  width: 50px;
+}
+#proifileDataD3 div {
+  vertical-align: middle;
+}
+
+/*======================================================================
+ * profile data: d3: common
+ */
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: icons
+ */
+#d3icons {
+  display: none;
+  position: relative;
+  width: 100%;
+  height: 0px;
+  top: -45px;
+  right: 1px;
+}
+
+#d3icons img, #curspeed { 
+  /*height: 24px;*/
+  margin: 5px;
+}
+#d3icons > a {
+  line-height: 100%;
+  position: absolute;
+  right: 0px; top: 0px;
+}
+
+#exportBtn {
+  display: inherit;
+}
+#exportBtn:hover { 
+  background-color: #ffbb75; /*light orange */
+}
+
+#d3icons #kbicon {
+  right: 32px;
+}
+#d3icons #kbiconx {
+  display: none;
+  position: absolute;
+  /*height: 20px;*/
+  right: 8px; top: 2px;
+}
+
+#d3icons #curspeed {
+  right: 78px;
+  width: 48px;
+  padding: 2px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  border: 1px solid #aaa;
+  border-radius: 5px;
+  background: #fff;
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: bold;
+  text-align: center;
+  color: #aaa;
+  cursor: pointer;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3 common: export menu
+ */
+#exportMenu {
+    display:none;
+    position: absolute;
+    width: 200px;
+    top: 24px;
+    right: 10px;
+    float: right;
+    z-index: 1;
+}
+
+#exportMenu li a,
+#exportMenu li a :hover {
+    color: inherit;
+    background-color: inherit;
+    text-decoration: none;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: transport
+ */
+#d3transport > div { 
+  vertical-align: middle;
+}
+#d3buttons .btn .border {
+  stroke: #aaa;
+  fill: #fff;
+  stroke-width: 2px;
+}
+#d3buttons .btn.hovering {
+  cursor: pointer;
+}
+#d3buttons .btn.hovering .border {
+  stroke: #000099;
+  fill: #ffbb75; /*light orange (old)*/
+}
+#d3buttons .btn.hovering .border {
+  border: 2px solid #000099;
+  background-color: #ffbb75; /*light orange (old)*/
+  cursor: pointer;
+}
+#d3buttons .btn .symbol {
+  stroke: none;
+  fill: #aaa;
+}
+#d3buttons .btn.hovering .symbol {
+  fill: #000099;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: transport: playback speed
+ */
+#d3buttons .speeder {
+  cursor: move;
+}
+#d3buttons .speeder .wedge {
+  /*fill: #ccc;*/
+  stroke: #ccc;
+  stroke-width: 1px;
+}
+#d3buttons .speeder .handle {
+  fill: #fff;
+  stroke: #aaa;
+  stroke-width: 1px;
+}
+#d3buttons .speeder .background {
+    fill: none;
+}
+#d3buttons .speeder:hover .handle,
+#d3buttons .speeder.brushing .handle {
+  fill: #ffbb75; /*light orange (old)*/
+  stroke: #000099;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: brush-slider
+ */
+#d3slider .brush .axis {
+  font: 10px sans-serif;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+}
+#d3slider .brush .domain,
+#d3slider .brush .tick line {
+  stroke: #ccc;
+  stroke-width: 4px;
+  stroke-linecap: butt;
+  fill: none;
+}
+#d3slider .brush .tick.minor line {
+  stroke-width: 1px;
+}
+#d3slider .brush .tick.minor text {
+  display: none;
+}
+#d3slider .brush.hovering .domain,
+#d3slider .brush.hovering .tick line {
+  /*stroke: #000099;*/
+}
+#d3slider .brush .handle {
+  cursor: crosshair;
+}
+#d3slider .brush .handle text { 
+  text-anchor: middle;
+  dominant-baseline: bottom;
+  font-size: 10px;
+  fill: #999;
+}
+#d3slider .brush .handle circle {
+  fill: #fff;
+  opacity: 1;
+  stroke: #aaa;
+  stroke-width: 1.25px;
+}
+#d3slider .brush.hovering .handle circle,
+#d3slider .brush.brushing .handle circle {
+  stroke: #000099;
+  fill: #ffbb75; /* light orange (old) */
+  /*stroke-width: 2px;*/
+}
+#d3slider .brush.hovering .handle text,
+#d3slider .brush.brushing .handle text {
+  fill: #000099;
+}
+
+#d3slider .brush .axis .tick text {
+  font-size: 15px;
+  font-weight: normal;
+  color: #000;
+}
+#d3slider .brush .tick text.selected {
+  /*stroke: #000099;*/
+  font-weight: bold;
+}
+
+#d3slider .brush .domain,
+#d3slider .brush .slider .background {
+    opacity: 0%;
+    fill: none;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: legend (color axis)
+ */
+.d3legend {
+  border: none;
+  /*border: 1px solid #aaaaaa;*/
+  margin: 0px;
+}
+.d3legend .domain { 
+  fill: none;
+}
+.d3legend .tick line { 
+  stroke-width: 0px;
+  fill: none;
+}
+.d3legend text {
+  font-size: 10px;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: keyboard focus
+ */
+.content:focus { 
+  outline: none;
+}
+#d3body {
+  border: 1px solid #aaa;
+  /*border: 1px solid #fff;*/
+}
+.content:focus #d3body {
+  /*border: 1px solid #aaa;*/
+  box-shadow: 0px 0px 5px #aaa;
+}
+
+#d3frame {
+    fill: none;
+    stroke-width: 1px;
+    stroke: #ccc;
+}
+.content:focus #d3frame {
+    stroke: #808080;
+}
+#d3background {
+    fill: #fff;
+}
+
+/*--------------------------------------------------------------
+ * profile data: d3: common: details popup
+ */
+#profileDataPopup td.num {
+  text-align: right;
+}
+#profileDataPopup .details { 
+  vertical-align: middle;
+}
+#profileDataPopup .details table { 
+  margin-top: 2px;
+  border: 1px solid #aaa;
+  background: #eee;
+  border-radius: 5px;
+}
+#profileDataPopup .details th {
+  font-weight: normal;
+}
+#profileDataPopup .details.diff td:nth-child(2) {
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+
+/*======================================================================
+ * profile data: d3: bubble
+ */
+.d3bubble text {
+   font-size: 10px;
+}
+.d3chart {
+  border: 1px solid #aaaaaa;
+}
+.d3force .node {
+  cursor: pointer;
+}
+.d3force .node text { 
+  font-family: Bitstream Vera Sans, Arial Unicode MS, Arial, sans-serif;
+  font-size: 8pt;
+  /*fill: gray;*/
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+.d3force .node circle { 
+  stroke-width: 0px;
+}
+.d3force .node.selected circle {
+  stroke-width: 2px;
+  stroke: #000;
+}
+.d3force .node.selected text {
+  font-weight: bold;
+}
+
+/*======================================================================
+ * profile data: d3: cloud
+ */
+.d3cloud { 
+  /*background: #fff;*/
+}
+.d3cloud .node { 
+  cursor: help;
+}
+.d3cloud .node text {
+  text-anchor: middle;
+  font-family: "Impact"; /*-- must also be set in diacollo.js for cloud rendering --*/
+}
+.d3cloud .node.selected text {
+  text-decoration: underline;
+}
+
+
+/*======================================================================
+ * linkbar
+ */
+div.linkbar {
+  margin: 5px;
+  margin-left: 10px;
+}
+div.headers div.linkbar {
+  margin: 10px;
+  margin-left: 20px;
+}
+.sbsep { 
+  padding: 2px;
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+/*======================================================================
+ * help page
+ */
+.section ul, .headers ul {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.subsection {
+  margin-left: 0px;
+}
+
+.math, .qsyn {
+  background-color: #cee8ff;/*-- aliceblue --*/
+  /*background-color: #ccccff;*//*-- light purple --*/
+  font-family: monospace;
+  padding: 2px;
+}
+div.math {
+  margin-left: 10px;
+}
+.qsyn {
+  margin-left: 20px;
+  font-family: sans-serif;
+}
+.qsyn tr :nth-child(1), .qsyn tr :nth-child(2) {
+  text-align: right;
+}
+table.math, table.math td, table.math th {
+  white-space: nowrap;
+}
+table.math .restr {
+  text-align: left;
+  padding-left: 1em;
+}
+table.math .cmt {
+  text-align: left;
+  font-style: italic;
+  color: #000099;
+  padding-left: 1em;
+}
+table.math .cmt:before {
+  content: ": ";
+}
+
+.exlist .exlink {
+  display: block;
+  font-weight: bold;
+}
+.expar {
+  font-weight: bold;
+}
+.exval {
+  font-family: monospace;
+  font-size: 125%;
+  font-weight: normal;
+}
+.exlist li {
+  margin-bottom: 10px;
+}
+
+table.keysTable tr:nth-child(odd) {
+  background: #eee;
+}
+table.keysTable td, table.keysTable th {
+  border-top: none !important;
+  border-bottom: none !important;
+}
+table.keysTable td, table.keysTable th {
+  text-align: left !important;
+}
+table.keysTable td:first-child, table.keysTable th:first-child {
+  text-align: right !important;
+}
+
+table.funcHelp {
+  margin-left: 14px;
+  margin-right: 14px;
+  border-collapse: separate;
+  border-spacing: 0px .5em;
+}
+table.funcHelp th {
+  color: #000099;
+  font-weight: bold;
+  text-align: right;
+  padding-right: 10px;
+}
+table.funcHelp th:after {
+  /*content: ":";*/
+}
+table.funcHelp th, table.funcHelp td {
+  vertical-align: top;
+}
+
+
+img.funcPlot {
+  display: inline-block;
+  height: 50px;
+  vertical-align: bottom;
+  border: 1px solid #ccc;
+  padding: 2px;
+}
+img.funcPlot:hover {
+  border: 1px solid #000099;
+  background: inherit;
+}
+
+/*======================================================================
+ * footers
+ */
+#elapsed { 
+  float:right;
+  font-style:italic;
+  font-size:small;
+}

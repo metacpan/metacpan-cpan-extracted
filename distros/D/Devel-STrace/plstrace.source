@@ -1,0 +1,99 @@
+#
+#	open the mmap'ed file
+#
+use Devel::STrace::Monitor;
+#
+#	process args
+#
+my $interval = 0;
+my $duration = 0;
+my $file = $ENV{DEVEL_RINGBUF_FILE};
+
+while (@ARGV && (substr($ARGV[0], 0, 1) eq '-')) {
+	usage()
+		if ($ARGV[0] eq '-h');
+
+	shift @ARGV,
+	$interval = shift @ARGV,
+	next
+		if ($ARGV[0] eq '-s');
+
+	shift @ARGV,
+	$duration = shift @ARGV,
+	next
+		if ($ARGV[0] eq '-d');
+
+	shift @ARGV,
+	$file = shift @ARGV,
+	next
+		if ($ARGV[0] eq '-f');
+}
+
+die "No trace file specified."
+	unless $file;
+
+my $view = Devel::STrace::Monitor->open($file)
+	|| die $@;
+
+print STDERR "Started $file\n";
+my ($started, $lastrefresh) = (time(), time());
+while (1) {
+	print "
+***********************************************
+*** At ", scalar localtime(), "
+";
+	my $lastkey = '';
+#
+#	dump the current traces (for specified pid[:tid] if provided)
+#
+	$view->refresh();
+	$view->trace(
+		sub {
+			my ($key, $slot, $depth, $line, $time, $entry) = @_;
+			$lastkey = $key,
+			print "\n**************************************\n"
+				unless ($lastkey eq $key);
+			if ($time) {
+				my $frac = ($time - int($time)) * 1000000;
+				$frac=~s/\..*$//;
+				my @parts = split(/\s+/, scalar localtime($time));
+				pop @parts;	# get rid of year
+				print "$key($depth) : $slot : $entry:$line at ",
+					join(' ', @parts), '.', $frac, "\n";
+			}
+			else {
+				print "$key($depth) : $slot : $entry:$line (No timestamp)\n";
+			}
+		},
+		@ARGV
+	);
+
+	exit unless $interval && $duration && (time() - $started < $duration);
+#
+#	refresh the internal map every 5 secs
+#
+	$view->refresh(),
+	$lastrefresh = time()
+		if (time() - $lastrefresh > 5);
+
+	sleep $interval;
+}
+
+sub usage {
+	print "
+plstrace.pl [ -h ] [ -s <interval> ] [ -f filename ] [ pidlist... ]
+
+Displays the current runtime stack of a Perl application.
+pidlist is a list of either pid:tid (to trace a specific thread),
+or just pid (to trace all threads in the process) descriptors.
+
+Options:
+-h     : this usage text
+-s <interval> : sample interval; plstrace will sample the trace
+                file every <interval> seconds; 0 (the default) means sample once
+-d <duration> : number of secs to run; 0 (the default) means sample just once
+-f <filename> : name of trace file; if not specified, uses DEVEL_RINGBUF_FILE
+                environment variable
+";
+	exit;
+}

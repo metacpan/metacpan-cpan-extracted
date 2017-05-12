@@ -1,0 +1,9 @@
+[
+  {
+    "name":"insert into foo",
+    "deploy_sql":"INSERT INTO foo VALUES (1, 2)",
+    "verify_sql":"SELECT COUNT(*) FROM foo",
+    "verify_expects":[ [1] ],
+    "dependencies": [ "create table foo" ]
+ }
+]

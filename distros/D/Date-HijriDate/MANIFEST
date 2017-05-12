@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+README
+Date-HijriDate.cgi
+t/Date-HijriDate.t
+lib/Date/HijriDate.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

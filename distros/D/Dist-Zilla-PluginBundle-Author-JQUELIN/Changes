@@ -1,0 +1,91 @@
+Changelog for Dist-Zilla-PluginBundle-JQUELIN
+
+3.005     2015-11-23 14:43:52+01:00 Europe/Paris
+ - avoid forcibly loading modules (Kent Fredric)
+
+3.004     2015-11-23 14:33:23+01:00 Europe/Paris
+ - replace ReportVersion::Tiny by Test::ReportPrereqs
+
+3.003     2014-02-24 15:25:25+01:00 Europe/Paris
+ - no need to try to load plugin
+ - doc: refer to metacpan
+
+3.002     2012-10-09 11:23:57 Europe/Paris
+ - readme.mkdn should be committed in git
+
+3.001     2012-10-09 10:52:38 Europe/Paris
+ - readme.mkdn should be created in root dir
+
+3.000     2012-10-04 15:01:33 Europe/Paris
+ - using Git::NextVersion instead of AutoVersion
+ - removed the "releases" branch
+ - added: Covenant, HelpWanted, ReadmeMarkdownFromPod, TestRelease
+ - removed: HasVersionTests, Test::Kwalitee, Test::MinimumVersion
+
+**
+
+2.120971  2012-04-06 12:01:02 Europe/Paris
+ - example updated
+
+2.120970  2012-04-06 11:51:47 Europe/Paris
+ - renamed to Dist::Zilla::PluginBundle::Author::JQUELIN
+ - plugin options now passed as Plugin.option (only one pluginbundle
+   variable available: weaver)
+ - update renamed test plugins to their new names
+
+**
+
+1.111710  2011-06-20 15:37:36 Europe/Paris
+ - new skip_compile parameter
+
+1.110730  2011-03-14 11:13:14 Europe/Paris
+ - using Git::CommitBuild for releases
+
+1.110700  2011-03-11 16:03:58 Europe/Paris
+ - removed PortabilityTests
+
+1.110010  2011-01-01 14:42:27 Europe/Paris
+ - added PruneFiles to remove vim/emacs backup files
+ - using ReportVersions::Tiny for smaller footprint / better output
+ - using AutoPrereqs instead of AutoPrereq (to be deprecated)
+ - removed CriticTests that fail quite too often
+ - removed UnusedVarsTests that is not that useful
+ - removed MetaTests that is not that useful (dzil generates correct meta)
+
+1.101620  2010-06-11 17:55:23 Europe/Paris
+ - updated to match dzil v4
+ - nextrelease now forced to europe/paris timezone
+
+1.100972  2010-04-07 16:59:01 Europe/Paris
+ - remove testrelease
+ - pod update
+
+1.100971  2010-04-07 16:51:15 Europe/Paris
+ - added kwalitee tests
+
+1.100970  2010-04-07 16:47:21 Europe/Paris
+ - added some test plugins
+ - added meta information plugins
+
+1.100900  2010-03-31 10:01:46 Europe/Paris
+ - port to dzil v2
+
+1.100660  2010-03-07 10:41:56 Europe/Paris
+ - provide shorter names for included plugins
+ - provide dist.ini example
+
+1.100220  2010-01-22 16:36:06 Europe/Paris
+- new param fake_home for compiletests
+
+1.100130  2010-01-13 15:14:47 Europe/Paris
+ - adding prereqs on plugins used
+ - prepender plugin now defaults copyright to true
+
+1.100081  2010-01-08 17:59:21 Europe/Paris
+ - new param skip_prereq to feed autoprereq plugin
+
+1.100080  2010-01-08 11:12:49 Europe/Paris
+ - new param weaver to load taskweaver
+
+1.100060  2010-01-06 13:11:58 Europe/Paris
+ - initial release

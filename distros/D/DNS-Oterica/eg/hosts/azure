@@ -1,0 +1,10 @@
+hostname: azure
+domain: example.com
+location: microport
+ttl: 1234
+ip:
+  ALL: 10.99.88.77
+  microport: 10.2.0.2
+  FALLBACK: 10.20.0.100
+families:
+  - com.example.mx

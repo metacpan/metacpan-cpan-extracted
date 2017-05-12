@@ -1,0 +1,118 @@
+Revision history for Dist-Zilla-Plugin-ReadmeAnyFromPod
+
+0.163250  2016-11-20 00:19:38-08:00 America/Los_Angeles
+    - Add support for Github-flavored markdown, using type = "gfm"
+
+0.161170  2016-04-26 15:51:10-07:00 America/Los_Angeles
+    - do not decode the already-decoded strings from PPI, now that
+      Dist::Zilla::Role::PPI is fixed (in 6.003)
+
+0.161150  2016-04-24 10:10:10-07:00 America/Los_Angeles
+    - Update for Dist::Zilla v6 compatibility.
+
+0.160630  2016-03-02 17:17:25-08:00 America/Los_Angeles
+    - add provides section to META.yml (using
+      Dist::Zilla::Plugin::MetaProvides::Package)
+
+0.150250  2015-01-25 11:48:12PST-0800 America/Los_Angeles
+    - Merge a number of internal code cleanups and efficnency
+      improvements. No user-visible changes.
+
+0.142470  2014-09-04 16:14:01PDT-0700 America/Los_Angeles
+    - Use main module pod file by default if available. If your main
+      module has its POD in a separate file with the same basename and
+      ".pod" extension, then that file will be used automatically as
+      the default.
+
+0.142250  2014-08-13 08:34:36PDT-0700 America/Los_Angeles
+    - If you pruned away the README(.*) file before it could be populated with
+      content, you'd get a fatal error like " Can't call method "name" on an
+      undefined value at ...". Now we detect this and throw a more helpful
+      (but still fatal) error suggesting you check your PruneFiles
+      config. RT #97976. (Dave Rolsky)
+
+0.142180  2014-08-06 09:10:56PDT-0700 America/Los_Angeles
+    - add "phase" option, for the ability to generate the README file at
+      release time instead of build time (Karen Etheridge)
+
+0.141760  2014-06-25 01:13:06PDT-0700 America/Los_Angeles
+    - Load some modules dynamically only when they are used
+    - Eliminate implicit dependency on specific version of Path::Class
+    - Minor documentation updates
+
+0.141120  2014-04-22 15:35:30 America/Los_Angeles
+    - Adjust tests for change in Pod::Markdown output
+
+0.133360  2013-12-02 01:09:18 America/Los_Angeles
+    - Require the appropriate version of Path::Tiny
+
+0.133290  2013-11-24 22:12:39 America/Los_Angeles
+    - First real release compatible with dzil v5
+
+0.133060  2013-11-02 16:56:50 America/Los_Angeles
+    - Add a test for non-utf8 encoded input.
+
+0.133030  2013-10-30 00:53:24 America/Los_Angeles
+    - Require Pod::Simple version 3.23 for parse_characters
+
+0.133000  2013-10-27 14:12:47 America/Los_Angeles
+    - Fix handling of case where readme contents are regenerated after the
+      source .pm is altered after we initially looked at it
+
+0.132970  2013-10-24 12:11:46 America/Los_Angeles
+    - Module now works with both Dist::Zilla version 5.X and up (which
+      hanldes file encodings) and Dist::Zilla version 4.X and below
+      (with no special handling of file encodings at all). This is a
+      potential regression for users of Dist::Zilla 4.X, since
+      previously this module made some poor attempts at handling
+      encoding. If you need correct handling of file encodings, you
+      should upgrade Dist::Zilla to version 5.
+
+0.132973  2013-10-23 17:15:29 America/Los_Angeles
+    - now using FileGatherer, FileMunger and AfterBuild phases rather than
+      InstallerTool
+
+0.132962  2013-10-23 15:45:36 America/Los_Angeles
+    - Now compatible *only* with Dist::Zilla version 5 and up
+    - Add test for excluding root README files from build
+
+0.131500  2013-05-30 02:03:44 America/Los_Angeles
+    - Allow source POD to come from somewhere other than the main
+      module (contributed by Hercynium)
+
+0.120120  2012-01-11 22:41:25 PST8PDT
+    - Slight improvement to log messages for file overrides
+    - Added more tests
+
+0.120053  2012-01-05 13:42:35 PST8PDT
+    - Option autodetection now works better. In particular, it now
+      works when the plugin is used as part of a bundle.
+
+0.120052  2012-01-05 11:07:05 PST8PDT
+    - Added a test to make sure \r characters never appear in any
+      output.
+
+0.120051  2012-01-04 23:42:29 PST8PDT
+    - Prevent perl from adding \r characters on win32 by writing files
+      in binmode. This ensures that the same output is produced on all
+      platforms. (contributed by MITHALDU)
+    - Prevent modules in corpus directory from being indexed.
+
+0.120040  2012-01-04 11:12:47 PST8PDT
+    - Now supports parsing options from given plugin name
+    - Added tests, which should all pass
+
+0.103522  2010-12-18 12:44:44 EST5EDT
+    - Updated abstract to be more descriptive
+
+0.103521  2010-12-18 00:01:23 EST5EDT
+    - Added html format
+
+    - Prune files with location = root, so they don't sneak back into
+      the dist via GatherDir.
+
+0.103520  2010-12-17 22:51:34 EST5EDT
+    - Added the ability to sepcify file name and format. Support for
+      three formats included: plaintext, markdown, and pod.
+    - Initial release after forking from ReadmeFromPod. This module
+      remains backward-compatible.

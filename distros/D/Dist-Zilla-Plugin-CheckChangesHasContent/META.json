@@ -1,0 +1,125 @@
+{
+   "abstract" : "Ensure Changes has content before releasing",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Karen Etheridge <ether@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CheckChangesHasContent",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section" : "0.200002",
+            "Dist::Zilla" : "2.100950",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "File::pushd" : "0",
+            "Moose" : "0.99",
+            "Moose::Util::TypeConstraints" : "0",
+            "Sub::Exporter::ForMethods" : "0",
+            "autodie" : "2.00",
+            "namespace::autoclean" : "0.09",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Cwd" : "0",
+            "Dist::Zilla::Tester" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Path::Tiny" : "0",
+            "Test::Harness" : "0",
+            "Test::More" : "0.88",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CheckChangesHasContent" : {
+         "file" : "lib/Dist/Zilla/Plugin/CheckChangesHasContent.pm",
+         "version" : "0.010"
+      },
+      "Dist::Zilla::Plugin::Test::ChangesHasContent" : {
+         "file" : "lib/Dist/Zilla/Plugin/Test/ChangesHasContent.pm",
+         "version" : "0.010"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent.git",
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent"
+      }
+   },
+   "version" : "0.010",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Golden <xdg@xdg.me>",
+      "Randy Stauner <randy@magnificent-tears.com>"
+   ]
+}
+

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                DBIx-SimplePerl
+version:             1.95
+abstract:            Perlish access to DBI
+license:             ~
+author:              
+    - Joseph Landman <landman@scalableinformatics.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Accessor:               0.22
+    DBI:                           1.5
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

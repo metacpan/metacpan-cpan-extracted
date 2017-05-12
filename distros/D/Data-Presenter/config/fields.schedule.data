@@ -1,0 +1,32 @@
+# fields.schedule.data
+
+@fields = qw(
+	groupid
+	room
+	timeslot
+	groupname
+	ward_department
+	section
+	instructor
+	comment
+);
+
+%parameters = (
+    $fields[0]          => [11, 'U', 'a', 'GroupID'],
+    $fields[1]          => [ 4, 'U', 'n', 'Room'],
+    $fields[2]          => [ 2, 'U', 'n', 'Time Slot'],
+    $fields[3]          => [40, 'U', 'a', 'Group Name'],
+    $fields[4]          => [ 2, 'U', 'n', 'Ward'],
+    $fields[5]          => [ 1, 'U', 'n', 'Section'],
+    $fields[6]          => [12, 'U', 'a', 'Instructor'],
+    $fields[7]          => [15, 'U', 'a', 'Comment'],
+);
+
+#	                     ^   ^    ^
+#                            width of field in output
+#                                U:  sort ascending (up); D: sort descending (down)
+#                                     a:  alphabetical (case-insensitive)
+#                                     n:  numerical
+#                                     s:  ASCII-betical (case-sensitive)
+
+$index = 0;

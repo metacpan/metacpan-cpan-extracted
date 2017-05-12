@@ -1,0 +1,33 @@
+DNS/TinyDNS version 0.22
+========================
+
+
+This module will allow you to manipulate djbdns files. You can
+configure the options of dnscache, list, add, remove, or modify
+all the entrys of your dns server too.
+
+Please check the documentation of DNS::TinyDNS::dnscache or
+DNS::TinyDNS::dnsserver to see the details of each one.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires that you have installed djbdns from: http://cr.yp.to
+
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2002 Anarion <anarion@7a69ezine.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

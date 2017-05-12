@@ -1,0 +1,49 @@
+Changes
+Declare.xs
+lib/Devel/Declare.pm
+lib/Devel/Declare/Context/Simple.pm
+lib/Devel/Declare/MethodInstaller/Simple.pm
+maint/Makefile.include
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+stolen_chunk_of_toke.c
+t/00load.t
+t/block_size.t
+t/build_sub_installer.t
+t/combi.t
+t/ctx-simple-like-mxms.t
+t/ctx-simple.t
+t/debug.pl
+t/debug.t
+t/devel_callparser.t
+t/early0.t
+t/early1.t
+t/early1_x.pm
+t/early2.t
+t/eval.t
+t/fail.t
+t/filter0.t
+t/filter1.t
+t/lines.t
+t/load_module.t
+t/methinstaller-simple.t
+t/method-installer-redefine.t
+t/method-installer-runtime.t
+t/method-no-semi.t
+t/method.t
+t/multiline-proto.t
+t/new.t
+t/no-bareword.t
+t/pack.t
+t/padstuff.t
+t/proto.t
+t/quote.t
+t/scanstr.t
+t/scanstr_fail.t
+t/simple.t
+t/statement.t
+t/sugar.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

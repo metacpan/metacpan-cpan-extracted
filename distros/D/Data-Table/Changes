@@ -1,0 +1,474 @@
+Revision history for Perl extension Data::Table.
+
+1.75 Sat Apr 23 13:52:25 PDT 2016
+  Patch parseCSV(). It returns incorrect columns when delimiter is space and has empty fields
+  Thanks to Jeff Janes for the fix.
+
+1.74 Sun Mar 20 20:26:33 PDT 2016
+  Add wiki() and wiki2() return table in wikitable string
+  Suggested by Ruben Moretti
+
+  Modify html(), html2(), wiki(), wiki2() to support callback function,
+    which allows find control of tags within each individual cell
+  Passing color array ["","",""] will disable default color scheme.
+
+1.73 Thu Mar  3 20:34:46 PST 2016
+  Some mionor typos in the document fixed. No code change.
+  Thanks to Lucas Kanashiro
+
+1.72 Wed Apr 29 22:43:13 PDT 2015
+  No change to actual code Table.pm
+  Just comment out "Guess Windows file format" from t/test1.t, as Strawberry Perl swallows \r
+  and fails the test, however, this does not affect it to use the package
+
+1.71
+  Fixed a minor bug in rename(), where the old name was not complete deleted.
+  The bug was triggered in rowMerge(byName=>1) + a very special situations.
+  Also fixed several typos in the test code.
+
+  A special thank to Alexandr Ciornii for help prepare new Makefile.PL,
+  as well as create better test files.
+
+1.70 Sat Jan 25 06:44:12 PST 2014
+  Minor patch to 1.69, as encoding function is only reliably supported by Perl newer than v5.8.1.
+  Patch internal method openFileWithEncoding(), so that older Perl version will not give an error.
+
+  Fixed a warning in fromFileGuessOS, introduced in 1.69.
+
+1.69 Tue Jan 14 10:22:19 PST 2014
+
+  Fix a minor bug in pivot() related to colToSplitIsStringOrNumeric.
+
+  Integer column names are allowed. However, fromFile by default does not take numeric
+  column names, unless allowNumericHeader is set to 1.
+  Patch fromFile(), checkHeader(), colIndex(), fromFileIsHeader(), fromFileGetTopLines()
+  to support numeric column header.
+  An integer is first interpreted as a column name. Therefore, accessing a column by its
+  ordinal number may not be possible, if the number is used as a column name. In such case,
+  first fetch the corresponding column name and access by name.
+
+  Support file encoding methods in fromFile, fromCSV, fromTSV.
+  E.g., fromCSV("filename, 1, undef, {encoding=> 'UTF-8'})
+  UTF-8 is the default encoding, can be controlled by $Data::Table::DEFAULTS{ENCODING}.
+  Thanks to questions asked by Sergio Basto and Thomas Hofmann.
+
+  If an integer is passed to colIndex(), it is interpreted as string first for column lookup.
+  fromFile by default will allow numeric headers (but not all column headers can be numeric).
+
+  support skip_empty in melt();
+
+1.68 Mon Aug  6 22:22:22 PDT 2012
+
+  Patch fromFileGetTopLines() and fromFileIsHeader(), which are used by fromFile(). Impact: minor.
+  Improve performance of fromFileGuessOS()
+  Improve fromFile(), fromCSV(), csv() to support using \r, \n within a CSV field.
+  
+  join() now supports {matchNULL => 1, NULLasEmpty => 1}, if one would like to treat NULL as empty string, or
+  treat NULL as equal (however, not equal to empty string). Both are set to 0 by default.
+  Suggested by Kyle Horton & Wilson Dave.
+
+  Remove inheritance from AutoLoader and Exporter.
+  Thanks to Brian Wightman
+
+  Thanks to Nicholas Andonakis for sharing his code, quite a few ideas in his package inspired the improvements below!
+
+  Add new shortcut methods: lastRow(), lastCol(), colName($colNumericIndex)
+    One can now write
+      foreach my $i (0..$t->lastRow)
+    instead of
+      foreach my $i (0..$t->nofRow-1)
+
+  Add iterator(), so that one can now write
+    my $next = $t_product->iterator();
+    while (my $row = $next->()) {
+      # have access to a row as a hash reference, access row number by &$next(1);
+      $t_product->setElm($next->(1), 'ProductName', 'New! '.$row->{ProductName});
+    }
+
+  addCol() can take the default value for the new column (first argument)
+  addRow() supports {addNewCol => 1}
+  moveCol() can take a $newColName.
+
+  setElm() can set a value for multiple cells, specified by ref to row array and col array
+  match_string(), match_pattern(), match_pattern_hash() also produce $parentTable->{MATCH}
+
+    # match returns all matched row ids in $t_product->{MATCH} (ref to row ID array)
+    $t_product->match_pattern_hash('$_{UnitPrice} > 20');
+    # create a new column, with 'No' as the default value
+    $t_product->addCol('No', 'IsExpensive');
+    # use $t_product->{MATCH} to set values for multiple Elements
+    $t_product->setElm($t_product->{MATCH}, 'IsExpensive', 'Yes');
+
+1.67 Wed Jul 25 11:47:23 PDT 2012
+  Update Change.txt file to point out $keepRestCol defaults to 1 is only for group()
+  For pivot(), $keepRestCol is still default to 0 as before.
+
+1.66 Wed Jul 25 11:03:29 PDT 2012
+  Change the default value of keepRestCol in group() to 1, instead of 0 to be compatible with older versions
+  Thanks to Kyle Horton
+
+1.65 Mon Jul 23 20:16:08 PDT 2012
+  Finish the "Perl Data::Table Cookbook", should be a good learning material.
+  To download, visit https://sites.google.com/site/easydatabase/
+
+  Polish Data::Table::Excel for CPAN upload.
+
+  Minor patches to the code.
+
+1.64 Sun Jul  8 22:01:17 PDT 2012
+  Add $keepRestCols to Data::Table::group();
+  We introduce new constants for fromCSV/fromTSV/fromFile/csv/tsv.
+    Data::Table::OS_UNIX = 0;
+    Data::Table::OS_PC = 1;
+    Data::Table::OS_MAC = 2;
+  Add method reorder(), redefine column orders
+  Add method melt() and cast(), concept borrowed from Reshape package in R
+  Add method each_group(), so one can apply a custom method to rows sharing the same key
+
+  Made a seemingly backward incompatible change to pivot()
+    pivot($colToSplit, $colToSplitIsNumeric, ...) is changed to
+    pivot($colToSplit, $colToSplitIsStringOrNumber, ...)
+  What is now pivot($colToSplit, $Data::Table::STRING, ...), where Data::Table::STRING has a value of 1,
+  was equivalent to pivot($colToSplit, 0, ...) in <= 1.63. 
+  However, the $colToSplitIsStringOrNumber is now auto-guessed within the code, so the change is not very relevant.
+  Most existing code should run fine, without change.
+
+  Patch group(), piviot() to distinguish keys between empty string and undef.
+
+  Patch subTable() to take row mask array when {useRowMask=>1} is provided.
+
+1.63 Tue Jun 12 17:05:43 PDT 2012
+  In this release, we patch addCol, delCol, addRow, rowMerge, colMerge to for an empty table
+  We introduce new methods isEmpty(), hasCol(), moveCol($colID, $newColIdx)
+  We introduce new constants for Data::Table::new()
+    Data::Table::ROW_BASED
+    Data::Table::COL_BASED
+
+1.62 Fri May 25 11:40:09 PDT 2012
+  In this release, we address a few pain points
+
+  Data::Table::colMerge, update to support new options
+    { renameCol => 1}
+    If specified, duplicate column names in the second table is automatically renamed (by appending _2) to avoid conflict
+
+  We introduce some constants, so we have fewer numbers to remember.
+    Data::Table::NUMBER
+    Data::Table::STRING
+    Data::Table::ASC
+    Data::Table::DESC
+
+  for sort(), you can use $t->sort('col2', Data::Table::NUMBER, Data::Table::DESC); it is equivalent to $t->sort('col2', 0, 1);
+
+    Data::Table::INNER_JOIN
+    Data::Table::LEFT_JOIN
+    Data::Table::RIGHT_JOIN
+    Data::Table::FULL_JOIN
+
+  for join(), you may use $t->sort($t2, Data::Table::FULL_JOIN, ['col1'], ['col1']);
+  it is equivalent to $t->sort($t2, 3, ['col1'], ['col1']).
+
+  match_string, match_pattern have been generating @Data::Table::OK, which is a class-level array.
+  $t->match_pattern() will now also store the results (array ref) in $t->{OK}, that should be used in the future.
+  However, @Data::Table::OK is still supported for compatibility reasons.
+  This is not a pain point, but conceptually nicer to be localized.
+
+  match_pattern_hash() is added. The difference is each row is fed to the pattern as a hash %_.  In the case of
+  match_pattern, each row is fed as an array ref $_.  The pattern for match_pattern_hash() becomes much cleaner.
+  If a table has two columns: Col_A as the 1st column and Col_B as the 2nd column, a filter "Col_A>2 AND Col_B<2"
+  is written before as
+    $t->match_pattern('$_->[0] > 2 && $_->[1] <2');
+  where we need to figure out $t->colIndex('Col_A') is 0 and $t->colIndex('Col_B') is 1, in order to build the pattern.
+  Now you can use column name directly in the pattern:
+    $t->match_pattern_hash('$_{Col_A} >2 && $_{Col_B} <2');
+  This method creates $t->{OK}, as well as @Data::Table::OK, same as match_pattern().
+
+  Data::Table::rowMerge, update to support new options
+    { byName =>1, addNewCol => 1}
+    If byName is 1, rows in the second table are appended by matching their column names, so that the second table
+      can have columns in a different order.
+    If addNewCol is 1, columns not exist in the first table will be automatically added.
+      addNewCol is best used with byName. If used alone, addNewCol will just patch the two tables so that they have
+      the same number of columns.
+  Data::Table::subTable, update internal to remove side effect on column header array
+  Data::join add support for an option {renameCol => 1}.
+    If specified, duplicate column names in the second table is automatically renamed (by appending _2) to avoid conflict
+
+1.61 Mon Feb 27 21:07:55 PST 2012
+  Data::Table::fromSQL now can take DBI::st instead of a SQL string. This is introduced, so that
+  variable binding (such as CLOB/BLOB) can be done outside the method.
+
+1.60 Sat Feb 25 19:26:46 PST 2012
+  Data::Table::addRow now also can take a hash reference. Hash keys are column names,
+  undef will be the value, if a column name is not found in the hash.
+  Suggested by Federico
+
+1.59 Sun Feb  5 00:20:00 PST 2012
+  I have never checked those CPAN ticket, happened to discover them and address them in this version.
+  Update document, explain Data::Table::fromCSV(\*STDIN, 1) can be used to read table from STDIN.
+  Add tbody and thead to Data::Table::html, if it's portrait.
+  Suggested by Ken Rosenberry.
+  Modify Data::Table::html and Data::Table::html2, so that it can accept coloring via CSS
+  The color now can be either specified as an array as before, or as three CSS class names
+  Suggested by Xavier Robin
+
+1.58 Thu Feb  2 20:33:03 PST 2012
+  Patch join(), prior version of join considers two NULL keys to be equal
+  update document, clarify that rowMerge assumes table columns in the same order
+  Thanks to Ulrik Stervbo.
+
+1.57 Thu Apr 23 15:22:36 PDT 2009
+  Patch pivot(), it throws warning before, when colToFill is undef.
+
+1.56 Fri Aug 22 15:53:29 PDT 2008
+  When the first line in a TSV is not a header, but contains strings such as \t.
+  The program will not transform \t to a tab.
+  Modify fromTSV, so that \t, \N (etc) transformation is optional.
+  Add transform_element flag to fromTSV method to turn on/off the transformation.
+  Thanks to Bin Zhou.
+
+1.55 Mon May  5 10:29:44 PDT 2008
+  Patch parseCSV. fromFile guesses the wrong delimiter if some ending columns are empty.
+
+1.54 Sun Feb 10 21:35:02 PST 2008
+  Modify fromFileGetTopLines method, remove dependency on bytes
+  bytes::substr causes infinite loop in some older version of perl
+  Thanks to "eserte" for help in debugging.
+
+1.53 Thu Jan  3 21:13:40 PST 2008
+  add "use bytes" to Table.pm
+  Just patched test.pl, because some OS cannot open in-memory file.
+
+1.52 Fri Dec 14 11:48:42 PST 2007
+1.51 Wed Dec 12 15:36:22 PST 2007
+  1. Add a class methods Data::Table::fromFile(file_name), which can
+  guess the file format and call fromCSV/fromTSV internally.
+  
+  fromFile relies on the following new methods
+    fromFileGuessOS(file_name)
+    fromFileGetTopLines($file_name, $OS, $lineNumber)
+    fromFileIsHeader($string)
+    fromFileGuessDelimiter($arrayRefToLines)
+  to figure out if the input file is from UNIX/PC/MAC, whether its first
+  row contains column headers, and whether it uses ",", "\t" or ":" as
+  field delimiters.
+  It then calls either fromCSV or fromTSV to return the table object.
+
+  $t = Data::Table::fromFile("myFileName_CSVorTSV_HeaderOrNoHeader_UNIXorPCorMAC");
+    
+  Please refers to the updated document for details.
+
+  2. When fromFile/fromCSV/fromTSV reads from an empty file, it returns
+  an undef object, rather than quit.
+
+  3. Provide more informative error message, when invalid column header is found.
+
+  4. fixed a bug in 1.51 where fromFileGuessOS failed in Windows
+  Thanks to patches provided by "whitebell".
+
+1.50 Thu Sep 28 07:21:38 PDT 2006
+  Small modifications to sort subroutine example in the document, no bug.
+
+  join method, if $cols2 is undefined, defaults @$cols2 to @$cols1
+  Update fromCSV, fromTSV, csv methods to be able to deal with certain delimiters correctly.
+    (When the delimiter is a special symbol for regexp, it should be escaped, e.g., set delimiter to '\|' for pipe symbol).
+  Thanks to suggestions from Michael Slaven.
+
+  update fromCSV, fromTSV to take additional arguments: skip_lines and skip_pattern
+  skip_lines lets user skip several lines in the beginning of the input file
+  skip_pattern lets user skip all lines that match a regular expression
+  Please read documents under fromCSV and fromTSV for details.
+  Thanks to suggestions from Wenbin Ye.
+
+1.49 Wed Aug 30 09:29:51 PDT 2006
+  Add %Data::Table::DEFAULTS to store the default settings for OS, CSV_DELIMITER and CSV_QUALIFIER
+  Thanks to suggestions from Roman Filippov
+
+  Patch sort method to deal with undef table element. undef value is considered to be
+  larger than any other value, two undef values are considered equal during sorting.
+
+1.48 Thu Jun  8 13:25:54 PDT 2006
+  Update fromCSV, parseCSV to enable user-specified delimiter and qualifier,
+  see document and examples under fromCSV.
+  csvEscape is modified accordingly.
+  Thanks to help from Roman Filippov
+
+1.47 Sun May 21 15:03:14 PDT 2006
+  Upload the wrong code in 1.46, re-upload
+
+1.46 Sat May 13 05:44:09 PDT 2006
+  fromCSV, fromTSV, csv, tsv can all take either a file hander or a file name
+  Notice: to leave rooms for future development, file handler is not closed by Data::Table.
+          It's caller's responsibility to close it afterwards, if no longer used.
+  table::sort code is replaced, the old sort method is renamed to sort_v0 and is deprecated.
+  The new sort method allow user-defined sorting operators, please read manual on table::sort
+  The new sort method also runs faster in some benchmark tests.
+  A big thank to Wenbin Ye for suggestions, as well as contributing
+    both the new sort code and test examples
+
+1.45 Mon May  1 09:08:20 PDT 2006
+  Fix a bug in fromTSV
+  last column name is truncated by one character (introduced in 1.44)
+  Thanks to Albert V. Smith
+
+1.44 Sat Apr 15 04:27:28 PDT 2006
+  Fix a bug in join (type=2 and 3)
+  When right or full join, key fields are undef for right-only entries.
+
+  modify fromCSV, fromTSV, tsv, csv subroutines to support read/write PC, Mac and UNIX files.
+  csv and tsv can take a file name and directly writes to it.
+
+1.43 Tue Nov  9 10:23:44 PST 2004
+  Patch html so that valid XHTML code is generated
+  Several mispelled words were corrected
+  Thanks all to Wolfgang Dautermann
+
+1.42 Fri Oct  8 11:56:41 PDT 2004
+  Minor changes to group and pivot, not a bug
+
+1.41 Thu Oct  7 14:04:17 CDT 2004
+  Add two useful methods: group and pivot
+  group can make the records unique based on given key columns
+  pivot is handy to transfer database table into a more user readable format
+  group+pivot make accounting operations easy, please read the document for details.
+
+  Due to the spam, please use the following for email contact
+    easydatabase at gmail dot com
+
+1.40 Wed Oct 15 12:11:11 CDT 2003
+  Patch colMap, as suggested by Jeff Janes
+
+1.39 Wed Mar 26 09:33:01 CST 2003
+  Fix a bug in match_pattern, match_string and row_mask;
+  When a new table was created by these methods, deleting columns had a
+  side effect of the original parent table.
+
+1.38 Sun Jan 19 18:26:23 CST 2003
+  Change die to croak as suggested by Jeff Janes.
+
+1.37 Tue Sep 17 17:53:55 CDT 2002
+  Add $countOnly to match_string and match_pattern, thanks to Serge Batalov.
+
+1.36 Thu Sep 12 14:47:59 CDT 2002
+  Add close() to both fromTSV and fromCSV, thanks to Brian Coon.
+
+1.35 Mon Jul  1 13:04:43 PDT 2002
+  Optimization in parseCSV, thanks to Jeff Janes.
+
+1.34 Wed May  1 12:13:33 CDT 2002
+  Fix a bug in colMerge
+
+1.33 Wed Jan 16 17:55:34 CST 2002
+  Small patches to join method. Not a bug.
+  Thanks to Xiao-Jun Ma
+
+1.32 Sun Sep 30 16:21:02 CDT 2001
+  No change, just update Table.html (forgot in version 1.31)
+
+1.31 Wed Sep 20 21:22:22 PDT 2001
+  add colsMap($fun), which does more than colMap can;
+  Unlike colMap, $fun here have access to multiple columns.
+  Read document for details.
+
+1.30 Wed Sep 19 20:02:52 PDT 2001
+  Improve header method, which can now take a new header argument.
+  Improve fromTSV and fromCSV, which now can take the 3rd argument --
+  if header is supplied, it will always be used (despite the 2nd argument).
+  Read document for details.
+  Fix a bug in adding a new column to a empty table.
+  Thanks to Serge Batalov.
+
+1.29  Mon Sep 17 18:18:13 CDT 2001
+  a bug fixed in fromTSV
+  The first line was skipped when header==0 is specified in fromTSV.
+
+1.28  Wed Sep  5 17:59:36 CDT 2001
+  a bug fixed in fromCSV, where \c or \\ apears in the file.
+  Fix provided by Jeff Janes.
+
+1.27  Mon Jul  9 00:04:54 PDT 2001
+  accept more formatting parameters for html, combine html2 with html.
+
+1.26  Mon May 21 09:35:41 PDT 2001
+  A typo bug in swap fixed
+  Thanks to Jeff Janes
+
+1.25  Thu May  3 00:50:03 PDT 2001
+  add BEGIN, check perl version, update README.
+  We realize Table.pm requires 5.005 at least.
+  See README for the patch for older perl.
+  Thanks to Jeffery Cann
+
+1.24  Sat Apr 21 20:30:18 PDT 2001
+  a bug in match_pattern fixed (important!)
+  Thanks to Robson Francisco de Souza
+
+1.23  Thu Apr 12 14:36:45 PDT 2001
+  a bug in html, html2 fixed, where table element "" displayed ugly
+  introduced in version 1.21
+
+1.22  Sat Mar 25 14:30:06 PST 2001
+  join method added
+  support four join types: inner, left outer, right outer, and full outer.
+
+  a small bug in html2 fixed, thanks to Fred Lovine
+
+1.21  Fri Mar  9 21:04:30 PST 2001
+  rowMask method added
+
+  A bug in html, html2 fixed, where table element 0 is not displayed
+  Thanks to Sven Neuhaus
+
+1.20  Wed Feb 28 12:38:53 PST 2001
+  A bug in match_string is fixed.
+  This will affect results if you change your "string" value in the program;
+  Also add a caseIgnore control argument to match_string method.
+  Thanks to Bryan Coon.
+
+1.19  Sat Feb 24 23:23:37 PST 2001
+  A bug in fromSQL is fixed (caused by typo)
+    This happens when user use the third argument (a reference to an array).
+    The old package will show an error message in some cases.
+
+  Add $header option for csv and tsv, output header or not
+
+  Add the following instant methods
+    fromSQLi
+    fromCSVi
+    fromTSVi
+  so that these methods can be inherited.
+  Thanks to Michael Schlueter
+
+  Update new method, so that it can be used as an instant method as well.
+
+  Add method
+    rowHashRef
+  which returns a copy of a table row in hash reference.
+
+  Officially support TSV format via the following three methods
+    Data::Table::fromTSV
+    fromTSVi
+    tsv
+  Read "TSV FORMAT" section for details.
+
+1.18
+  Fix the problem in Data::Table::fromCSV caused by null trailing fields.
+  E.g., a line "a,b,," in a csv file was split into two fields before.
+  Thanks to Karsten
+
+  Fix the warning message in Data::Table::match_string, when table contains
+  an undef element.
+
+  Add Data::Table::fromTSV and Data::Table:tsv
+  TSV - tab-deliminated file format. TSV preserves NULL element and line-break
+  chars in a table.
+    \0, \\, \r, \b, \n, \t are slash-escaped.
+    undef is escaped into \N.
+  This is based on MySQL specification.
+
+1.16  Fri Sep 29 22:18:06 PDT 2000
+  Package name changed from Table to Data::Table, due to
+  name collision with PerlQt
+  first official release version
+
+1.15  Tue Sep 26 18:32:52 PDT 2000
+  submitted to CPAN

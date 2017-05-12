@@ -1,0 +1,29 @@
+---
+abstract: 'dumps encoded data structure for debugging'
+author:
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.88'
+  Test::UseAllModules: '0.10'
+configure_requires:
+  ExtUtils::MakeMaker::CPANfile: '0.06'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Dump-AutoEncode
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Dump: '0'
+  Encode: '0'
+  Term::Encoding: '0'
+  parent: '0'
+resources:
+  repository: https://github.com/charsbar/Data-Dump-AutoEncode
+version: '0.02'

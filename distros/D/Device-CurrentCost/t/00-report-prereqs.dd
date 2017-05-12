@@ -1,0 +1,51 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '6.30'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::Kwalitee' => '1.12',
+                                      'Test::More' => '0',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Carp' => '0',
+                                      'Device::SerialPort' => '0',
+                                      'Fcntl' => '0',
+                                      'Getopt::Long' => '0',
+                                      'IO::Handle' => '0',
+                                      'IO::Select' => '0',
+                                      'List::Util' => '0',
+                                      'Pod::Usage' => '0',
+                                      'Symbol' => '0',
+                                      'Time::HiRes' => '0',
+                                      'constant' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Pipe' => '0',
+                                   'Test::More' => '0',
+                                   'Test::Requires' => '0',
+                                   'Test::SharedFork' => '0',
+                                   'Test::Warn' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

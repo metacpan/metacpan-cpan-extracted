@@ -1,0 +1,35 @@
+
+        Decode::Source version 1.01
+        ---------------------------
+
+   This is a test version of Decode::Source. It is meant to be
+   included in a distribution named "Encode::Default".
+
+   Decodes the source code of your perl scripts. Use 
+
+      perldoc -F Source.pm
+
+   for more information.
+
+INSTALLATION
+
+   To install this module type the following:
+
+      perl Makefile.PL
+      make
+      make test
+      make install
+
+DEPENDENCIES
+
+   This module requires at least perl 5.8 or higher. It also needs
+   the modules "Encode" and "Filter::Util::Call", which both is
+   in the standard distribution.
+
+COPYRIGHT AND LICENCE
+
+   Copyright 2003 by Magnus Håkansson, <magnus@mbox604.swipnet.se>.
+
+   This library is free software; you can redistribute it and/or modify
+   it under the same terms as Perl itself. 
+

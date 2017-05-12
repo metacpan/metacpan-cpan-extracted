@@ -1,0 +1,25 @@
+This is some examples of usage of DBIx::CGITables.  Eventually those
+examples should be included in the test suite.  Things are still under
+development, so I can't guarantee it will just work out of the box.  It
+works here.  I'd love to receive patches, comments and even flames.
+
+The testtable directory contains the data description of a simple stupid
+table with some stupid data.  It should be possible to feed mysql with those
+data definitions at least - and probably most other DBMS as well.  The shell
+script "maketemplates.sh" should make some ugly templates that does it
+possible to view and manipulate the data in the tables.
+
+The funlib directory contains the data structure and the templates used for
+our internal library.  I've cutted some corners to get it up running here,
+but anyway I feel happy with it as it turned out anyway.  Of course it won't
+run straight out of the box, you should at least do a case insensitive
+search for "funcom" and change it :)  It seems to work now, but we still
+haven't set it into production.
+
+I'm running Apache, and I have those lines in my httpd.conf:
+
+ScriptAlias /cgi/ "/path/to/where/i/put/my/cgis/"
+AddHandler dbt   .dbt
+Action dbt /cgi/dbt.cgi
+
+...and the templates should be somewhere within the webservers document root.

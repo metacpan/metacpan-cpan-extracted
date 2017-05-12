@@ -1,0 +1,100 @@
+{
+   "abstract" : "encode and decode RFC822 header field lines",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "keywords" : [
+      "rfc822",
+      "rfc2822",
+      "header",
+      "parse",
+      "edit"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Header-Fields",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Deep" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "IO::Any" : "0",
+            "List::MoreUtils" : "0",
+            "MIME::Base64" : "0",
+            "MIME::QuotedPrint" : "0",
+            "Scalar::Util" : "0",
+            "String::Escape" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Header::Fields" : {
+         "file" : "lib/Data/Header/Fields.pm",
+         "version" : "0.05"
+      },
+      "Data::Header::Fields::Line" : {
+         "file" : "lib/Data/Header/Fields.pm"
+      },
+      "Data::Header::Fields::Value" : {
+         "file" : "lib/Data/Header/Fields.pm"
+      },
+      "Data::v" : {
+         "file" : "lib/Data/v.pm",
+         "version" : "0.03"
+      },
+      "Data::v::Calendar" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Card" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Card::Entry" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Card::Line" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Card::Value::Adr" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Card::Value::Name" : {
+         "file" : "lib/Data/v.pm"
+      },
+      "Data::v::Param" : {
+         "file" : "lib/Data/v.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Data-Header-Fields/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Data-Header-Fields.git"
+      }
+   },
+   "version" : "0.05"
+}

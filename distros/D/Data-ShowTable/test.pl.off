@@ -1,0 +1,229 @@
+#!/usr/bin/perl5
+#
+# Test program for ShowTable.pm
+#
+# test.pl [1 2 3 ...] [w] [o] [tT] [sS] [bB] [hH] [lL]
+#
+# w  = with titles
+# o  = without titles
+#
+# t  = ShowTable
+# s  = ShowSimpleTable
+# b  = ShowBoxTable
+# h  = ShowHTMLTable
+# l  = ShowListTable
+#
+# T  = no ShowTable
+# S  = no ShowSimpleTable
+# B  = no ShowBoxTable
+# H  = no ShowHTMLTable
+# L  = no ShowListTable
+
+use Data::ShowTable;
+use Sys::OutPut;
+
+unshift(@INC,"blib/lib") if -d "blib/lib";
+
+@Titles = ("Index", "Name", "Phone", "Address");
+@Types  = ("int",   "char", "char",  "char");
+@Data   = ( [ 1, "Alan Stebbens", "555-1234", "1234 Something St., CA" ],
+	    [ 2, "Bob Frankel",   "555-1235", "9234 Nowhere Way, WA" ],
+	    [ 3, "Mr. Goodwrench","555-9432", "1238 Car Lane Pl., NY" ],
+	    [ 4, "Mr. Ed",	  "555-3215", "9876 Cowbarn Home, VA" ],
+	  );
+
+@subs = qw( ShowTable ShowSimpleTable ShowListTable ShowHTMLTable ShowBoxTable );
+
+push(@ARGV,(1..20)) unless grep(/\d/,@ARGV);
+push(@ARGV,qw(w o)) unless grep(/[wo]/,@ARGV);
+push(@ARGV,qw(t s l h b)) unless grep(/[tslhb]/,@ARGV);
+
+$testout  = 'test.out';		# where this output goes
+$testref  = "$testout.ref";
+$testdiff = "$testout.diff";
+
+unlink $testout;
+
+open(savSTDOUT, ">&STDOUT");
+open(savSTDERR, ">&STDERR");
+
+open(STDOUT,">test.stdout"); open(STDERR,">test.stderr");
+select(STDOUT);
+
+&the_test;			# run the test
+
+close STDOUT; close STDERR;
+
+# Copy stdout & stderr to the test.out file
+open(TESTOUT,">$testout");
+select(TESTOUT);
+print "*** STDOUT ***\n";
+open(OUT,"<test.stdout"); while (<OUT>) { print; } close OUT;
+print "*** STDERR ***\n";
+open(ERR,"<test.stderr"); while (<ERR>) { print; } close ERR;
+close TESTOUT;
+unlink ('test.stdout', 'test.stderr');
+
+open(STDOUT, ">&savSTDOUT");
+open(STDERR, ">&savSTDERR");
+select(STDOUT); $|=1;
+
+if (! -f $testref) {			# any existing reference?
+    system("cp $testout $testref");	# no, copy
+}
+
+system("diff $testref $testout >$testdiff");
+
+if ($?>>8) {
+    print "Test failed: there are differences; see \"$testdiff\".\n";
+} else {
+    print "Test passed: no differences.\n";
+    unlink $testdiff;
+}
+
+exit;
+
+sub test {
+    my $title = shift;
+    local @titles = @Titles;
+    local $theRow;
+    my $with;
+    foreach $with (qw( with without )) {
+	if ($with eq 'with') {
+	    next unless grep(/w/,@ARGV);
+	    @titles = @Titles;
+	} else {
+	    next unless grep(/o/,@ARGV);
+	    @titles = ();
+	}
+	foreach $sub (@subs) {
+	    ($flag = $sub) =~ s/^Show(.).*$/\l$1/;
+	    next unless grep(/$flag/, @ARGV) && !grep(/\U$flag/,@ARGV);
+	    out;
+	    out "Testing %s %s titles", $sub, $with;
+	    out $title;
+	    out;
+	    &$sub( \@titles, \@Types, \@Widths, 
+		sub { &ShowRow( $_[0], \$theRow, \@Data ); });
+	}
+	@titles = ();
+    }
+}
+
+sub t2 {
+    print "% ",@_,"\n\n";
+    system(@_);
+    print "\n";
+}
+
+sub the_test {
+
+    @Widths = (  -5,     -20,     -10,      -30);
+    test "With negative widths" if grep(1 == $_, @ARGV);
+
+    @Widths = map { $_ < 0 ? -$_ : $_ } @Widths;
+    test "With positive widths" if grep(2 == $_, @ARGV);
+
+    @Data = ( [ "Alan", "This is a very long line of text which simulates a text ".
+			"string which is supposed to wrap in its field width." ],
+	      [ "Kevin", "This is another long line of text which will also wrap ".
+			"so I can see if this part of ShowTable really works as ".
+			"designed.  If not it's back to the drawing board." ],
+	      [ "Toad",  "This is a short line" ],
+	      [ "Monica", "This is another short line" ],
+	      [ "Stu",   "Finally, here is another long line which shold wrap but ".
+			"maybe not" ],
+	    );
+    @Types  = qw( char text );
+    @Titles = qw( Name Biography );
+
+    @Widths = ( -10, 40 );
+    test "With negative widths" if grep(3 == $_, @ARGV);
+
+    @Widths = ( 10, 40 );
+    test "With positive widths" if grep(4 == $_, @ARGV);
+
+    @Titles = ( "An Int", "A Float", "A Money", "A String" );
+    @Types  = ( "int",    "float",   "money",   "varchar"  );
+    @Data   = ( [ 1, 1.234, "123456.78", "Some money" ],
+		[ 2, 5.6,   "12.45",      "Less money" ],
+		[ 3, .1234, "1235",      "Modest money" ],
+		[ 4, 123.4568, "987654321.00", "Lotsa money" ],
+		[ 5, -34.2, -4321.98,     "Negative money"  ],
+	      );
+
+    @Widths = (  -5,         -8,         -8,          -16     );
+    test "With negative widths and default precision"	if grep(5 == $_, @ARGV);
+
+    @Widths = (  -5,         -8.2,       -8.2,        -16     );
+    test "With negative widths, and explicit precision"	if grep(6 == $_, @ARGV);
+
+    @Widths = (   5,          8,         8,           16     );
+    test "With positive widths, and default precision"	if grep(7 == $_, @ARGV);
+
+    @Widths = (   5,          8.2,       8.2,        16     );
+    test "With positive widths, and explicit precision"	if grep(8 == $_, @ARGV);
+
+    @Widths = (   '',          '',       '',        ''     );
+    test "With default widths, and default precision"	if grep(9 == $_, @ARGV);
+
+    @Widths = ();
+    test "With no widths" if grep(10 == $_, @ARGV);
+
+    # Now test "showtable" some
+
+    if (grep(11 == $_, @ARGV)) {
+	$| = 1;
+	print "\nTesting showtable..\n";
+	print "\tShowing tables..\n\n"
+	&t2("showtable -d: testfile");
+	&t2("showtable -break=: testfile");
+	&t2("showtable -d: -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile");
+	&t2("showtable -d: -titles=Login,PWD -f1,2 testfile");
+	&t2("showtable -d: -titles=Login,UID,GID,GCOS -f1,3-5 testfile");
+	&t2("showtable -d: -titles=HomeDir,GCOS,GID,UID,PWD,Login -f6,5,4,3,2,1 testfile");
+
+	print "\n\tShowing tables in pipes..\n\n";
+	&t2("showtable -d: testfile | showtable");
+	&t2("showtable -d: -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -t=1");
+	&t2("showtable -d: -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -t=1 -f1,3,4");
+
+	print "\n\tShowing lists ..\n\n";
+	&t2("showtable -d: -list testfile");
+	&t2("showtable -break=: -list testfile");
+	&t2("showtable -d: -list -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile");
+	&t2("showtable -d: -list -titles=Login,PWD -f1,2 testfile");
+	&t2("showtable -d: -list -titles=Login,UID,GID,GCOS -f1,3-5 testfile");
+	&t2("showtable -d: -list -titles=HomeDir,GCOS,GID,UID,PWD,Login -f6,5,4,3,2,1 testfile");
+
+	print "\n\tShowing lists in pipes..\n\n";
+	&t2("showtable -d: -list testfile | showtable -in=list");
+	&t2("showtable -d: -list -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -in=list -list -t=1");
+	&t2("showtable -d: -list -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -in=list -list -t=1 -f1,3,4");
+
+	print "\n\tShowing lists from tables..\n\n";
+	&t2("showtable -d: testfile | showtable -list");
+	&t2("showtable -d: -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -list -t=1");
+	&t2("showtable -d: -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -list -t=1 -f1,3,4");
+
+	print "\n\tShowing lists in pipes..\n\n";
+	&t2("showtable -d: -list testfile | showtable -in=list -box");
+	&t2("showtable -d: -list -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -in=list -box -t=1");
+	&t2("showtable -d: -list -titles=Login,PWD,UID,GID,GCOS,HomeDir,Shell testfile | showtable -in=list -box -t=1 -f1,3,4");
+
+	print "\n\tChecking showtable parsing for tabbed files..\n\n";
+	&t2("showtable testfile.tabs");
+	&t2("showtable -d'\t' testfile.tabs");
+	&t2("showtable -break='\t' testfile.tabs");
+	&t2("showtable testfile.tabs | showtable");
+
+	print "\n\tChecking column width specs..\n\n";
+	&t2("showtable -d: -cw=,,,10,10 testfile");
+	&t2("showtable -d: -w=80 testfile");
+	&t2("showtable -d: -f1,4,5 -cw=,10,10 testfile");
+
+	print "\n\tChecking showtable parsing list files..\n\n";
+	&t2("showtable -in=list tesfile.lst");
+
+    }
+}

@@ -1,0 +1,166 @@
+NAME
+    Data::PackageName - OO handling of package name transformations
+
+VERSION
+    0.01
+
+SYNOPSIS
+      use Data::PackageName;
+
+      my $foo = Data::PackageName->new('Foo');
+      print "$foo\n";               # prints 'Foo'
+
+      my $foo_bar = $foo->append('Bar');
+      print "$foo_bar\n";           # prints 'Foo::Bar'
+
+      my $quuxbaz_foo_bar = $foo_bar->prepend('QuuxBaz');
+      print "$quuxbaz_foo_bar\n";   # prints 'QuuxBaz::Foo::Bar'
+
+      my $bar = $quuxbaz_foo_bar->after_start(qw( QuuxBaz ));
+      print "$bar\n";               # prints 'Bar'
+
+      # prints QuuxBaz/Foo/Bar
+      print join('/', $quuxbaz_foo_bar->parts), "\n";
+
+      # prints quux_baz/foo/bar
+      print join('/', $quuxbaz_foo_bar->parts_lc), "\n";
+
+      # create a Path::Class::File and a Path::Class::Dir
+      my $file = $quuxbaz_foo_bar->filename('.yml');
+      my $dir  = $quuxbaz_foo_bar->dirname;
+      print "$file\n";              # prints quux_baz/foo/bar.yml
+      print "$dir\n";               # prints quux_baz/foo/bar
+
+DESCRIPTION
+    This module provides the mostly simple functionality of transforming
+    package names in common ways. I didn't write it because it is
+    complicated, but rather because I have done it once too often.
+
+    "Data::PackageName" is a Moose class.
+
+ATTRIBUTES
+  package
+    A "Str" representing the package name, e.g. "Foo::Bar". This attribute
+    is required and must be specified at creation time.
+
+METHODS
+  new
+    This method is inherited from Moose and only referenced here for
+    completeness. Please consult the Moose documentation for a complete
+    description of the object model.
+
+      my $foo_bar = Data::PackageName->new(package => 'Foo::Bar');
+
+    The "package" attribute is required.
+
+  meta
+    This method is imported from Moose and only referenced here for
+    completeness. Please consult the Moose documentation for a complete
+    description of the object model.
+
+    The "meta" method returns the Moose meta class.
+
+  append
+      # Foo::Bar::Baz
+      my $foo_bar_baz      = $foo_bar->append('Baz');
+
+      # Foo::Bar::Baz::Qux
+      my $foo_bar_baz_qux  = $foo_bar->append('Baz::Qux'); 
+
+      # same as above
+      my $foo_bar_baz_qux2 = $foo_bar->append(qw( Baz Qux ));
+
+    This method returns a new "Data::PackageName" instance with its
+    arguments appended as name parts. This means that "qw( Foo Bar )" is
+    equivalent to "Foo::Bar".
+
+  prepend
+    Does the same as "append", but rather than appending its arguments it
+    prepends the new package with them.
+
+  after_start
+    You often want to get to the part of a module name that is under a
+    specific namespace, for example to remove the project's root namespace
+    from the front.
+
+      my $p = Data::PackageName->new(package => 'MyProject::Foo::Bar');
+      print $p->after_start('MyProject'), "\n";     # prints 'Foo::Bar'
+
+    This method accepts values exactly as "append" and "prepend" do. The
+    argument list will be joined with "::" as separator, so it doesn't
+    matter how you pass the names in.
+
+  parts
+    This splits up the namespace in parts.
+
+      my $p = Data::PackageName->new(package => 'Foo::Bar::Baz');
+      print join(', ', $p->parts), "\n"; # prints 'Foo, Bar, Baz'
+
+  transform_to_lc
+    This module uses a simple algorithm to transform namespace parts into
+    their lowercase representations. For example, "Foo" would of course
+    become "foo", but "FooBar" would result in "foo_bar".
+
+      # prints 'foo'
+      print Data::PackageName->transform_to_lc('Foo'), "\n";
+
+      # prints 'foo_bar'
+      print Data::PackageName->transform_to_lc('FooBar'), "\n";
+
+  parts_lc
+    The same as "parts", but each part will be transformed to lowercase with
+    "transform_to_lc" first.
+
+  filename_lc
+    This returns a Path::Class::File object with a path containing the
+    lower-cased parts of the package name.
+
+      # prints 'foo/bar_baz'
+      my $p = Data::PackageName->new(package => 'Foo::BarBaz');
+      print $p->filename_lc, "\n";
+
+    You can optionally specify a file extension that will be appended to the
+    filename.
+
+      # prints 'foo/bar_baz.yml'
+      my $p = Data::PackageName->new(package => 'Foo::BarBaz');
+      print $p->filename_lc('.yml'), "\n";
+
+  dirname
+    Returns a Path::Class::Dir object containing the lower-cased parts of
+    the package name.
+
+      # prints 'foo/bar'
+      my $p = Data::PackageName->new(package => 'Foo::Bar');
+      print $p->dirname, "\n";
+
+  package_filename
+    This will return a "Path::Class::File" object containing the filename
+    the package corresponds to, e.g. "Foo::Bar" would be an object with the
+    value "Foo/Bar.pm".
+
+  require
+    This will try to load the package via Perl's "require" builtin. It will
+    return true if it loaded the file, false if it was already loaded.
+    Exceptions raised by "require" will not be intercepted.
+
+  is_loaded
+    Returns true if the package is already loaded, false if it's not.
+
+SEE ALSO
+    Moose (Underlying object system), Path::Class ("filename_lc" and
+    "dirname" methods)
+
+REQUIREMENTS
+    Moose (Underlying object system), Scalar::Util ("blessed" for object
+    recreation), Path::Class::File (Filenames), Path::Class::Dir (Dirnames),
+    Class::Inspector ("package_filename" transition and loaded-class
+    detection)
+
+AUTHOR AND COPYRIGHT
+    Robert 'phaylon' Sedlacek "<rs@474.at>"
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as perl itself.
+

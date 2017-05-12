@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Device/USB/Win32Async.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+Win32Async.pm
+t/00.load.t
+t/local_perlcritic.t
+t/methods.t
+t/pod-coverage.t
+t/pod.t
+META.yml

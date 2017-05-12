@@ -1,0 +1,44 @@
+---
+abstract: 'release tests for your META.json'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Moose::Autobox: '0'
+  Test::DZil: '0'
+  Test::More: '0.88'
+  autodie: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-CPAN-Meta-JSON
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Dist::Zilla::Plugin::InlineFiles: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  JSON::PP: '2.27103'
+  Moose: '0'
+  Test::CPAN::Meta::JSON: '0.16'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON/issues
+  homepage: http://p3rl.org/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+  repository: git://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON.git
+version: '0.004'

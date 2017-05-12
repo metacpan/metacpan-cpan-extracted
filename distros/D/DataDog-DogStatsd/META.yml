@@ -1,0 +1,33 @@
+---
+abstract: 'A Perl client for DogStatsd'
+author:
+  - 'Stefan Goethals <stefan@zipkid.eu>, Fayland Lam <fayland@binary.com>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DataDog-DogStatsd
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  IO::Socket::INET: '0'
+resources:
+  bugtracker: https://github.com/binary-com/dogstatsd-perl/issues
+  homepage: https://github.com/binary-com/dogstatsd-perl
+  repository: https://github.com/binary-com/dogstatsd-perl.git
+version: '0.04'
+x_contributors:
+  - 'Fayland Lam <fayland@gmail.com>'
+  - 'Stefan Goethals <stefan@zipkid.eu>'

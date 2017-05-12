@@ -1,0 +1,13 @@
+plugins:
+  DBIC:
+    default:
+      options:
+        mysql_enable_utf8: 1
+        on_connect_call: set_strict_mode
+        quote_names: 1
+session: DBIC
+engines:
+  session:
+    DBIC:
+      db_connection_name: default
+

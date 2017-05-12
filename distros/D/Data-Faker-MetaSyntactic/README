@@ -1,0 +1,37 @@
+Data-Faker-MetaSyntactic
+
+SYNOPSIS
+
+    use Data::Faker 'MetaSyntactic';
+
+    my $faker = Data::Faker->new();
+
+    # using themes from Acme-MetatSyntactic-Themes
+    say "First name        ", ucfirst $faker->meta_crypto;
+    say "Favorite colour:  ", $faker->meta_colours;
+    say "Favorite flavour: ", $faker->meta_ben_and_jerry;
+    say "Random stuff:     ", join " ", map $faker->meta, 1 .. 4;
+
+DESCRIPTION
+
+Data::Faker creates fake (but reasonable) data that can be used for things
+such as filling databases with fake information during development of
+database related applications.
+
+This module is a plugin that taps into the data provided by Acme::MetaSyntactic.
+
+See Data::Faker for details.
+
+AUTHOR
+
+Philippe Bruhat (BooK) <book@cpan.org>
+
+COPYRIGHT
+
+Copyright 2014 Philippe Bruhat (BooK), all rights reserved.
+
+LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

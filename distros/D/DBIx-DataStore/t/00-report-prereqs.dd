@@ -1,0 +1,40 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'File::HomeDir' => '0',
+                                        'YAML::Syck' => '0'
+                                      },
+                      'requires' => {
+                                      'DBI' => '0',
+                                      'Data::Page' => '0',
+                                      'base' => '0',
+                                      'constant' => '0',
+                                      'overload' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

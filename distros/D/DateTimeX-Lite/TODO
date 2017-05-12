@@ -1,0 +1,5 @@
+[TODO]
+
+- Get rid of _0 methods? (Perhaps require DateTimeX::Lite::ZeroBased)
+- Get rid of short hand aliases such as ->mon? (Perhaps require DateTime::Lite::ShortMethods)
+- [Maybe] Remove dependency on Moose from the tools

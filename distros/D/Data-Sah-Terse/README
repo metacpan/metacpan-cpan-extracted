@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Data::Sah::Terse qw(terse_schema);
+    
+     say terse_schema("int");                                      # int
+     say terse_schema(["int*", min=>0, max=>10]);                  # int
+     say terse_schema(["array", {of=>"int"}]);                     # array[int]
+     say terse_schema(["any*", of=>['int',['array'=>of=>"int"]]]); # int|array[int]
+
+DESCRIPTION
+
+FUNCTIONS
+
+    None exported by default, but they are exportable.
+
+ terse_schema($sch[, \%opts]) => str
+
+    Make a human-readable terse representation of Sah schema. Currently
+    only schema type is shown, all clauses are ignored. Special handling
+    for types array, any and all. This routine is suitable for showing type
+    in a function or CLI help message.
+
+    Options:
+
+      * schema_is_normalized => bool
+
+SEE ALSO
+
+    Data::Sah::Compiler::human
+

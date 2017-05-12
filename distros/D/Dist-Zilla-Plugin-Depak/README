@@ -1,0 +1,63 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Depak]
+     ;;; the default is to include all scripts, but use below to include only some
+     ;;; scripts
+     ;include_script=bin/script1
+     ;include_script=bin/script2
+
+    In depak.conf in dist top-level directory, put your depak
+    configuration.
+
+    During build, your scripts will be replaced with the packed version.
+
+    Also, you should also have a module named Something::Packed (i.e. whose
+    name ends in ::Packed), which contains:
+
+     # PACKED_MODULES
+     # PACKED_DISTS
+
+    During build, these will be replaced with:
+
+     our %PACKED_MODULES = (...); # PACKED_MODULES
+     our @PACKED_DISTS = (...); # PACKED_DISTS
+
+DESCRIPTION
+
+    This plugin will replace your scripts with the packed version (that is,
+    scripts that have their dependencies packed onto themselves). Packing
+    will be done using depak.
+
+    If depak.conf exists in your dist's top-level directory, it will be
+    used as the depak configuration.
+
+    In addition to replacing scripts with the packed version, it will also
+    search for directives # PACKED_MODULES and # PACKED_DISTS in module
+    files and replace them with %PACKED_MODULES and @PACKED_DISTS. The
+    %PACKED_MODULES hash lists all the modules that are included in the one
+    of the scripts. This can be useful for tools that might need it.
+    @PACKED_DISTS array lists all the dists that are included in one of the
+    scripts. This also can be useful for tools that might need it, like
+    Dist::Zilla::Plugin::PERLANCAR::CheckDepDists.
+
+    There is also # PACKED_CONTENTS_POD which you can put in your script.
+    It will be replaced with POD that list the packed modules/dists.
+
+CONFIGURATION
+
+ include_script = str+
+
+    Explicitly include only specified script. Can be specified multiple
+    times. The default, when no include_script configuration is specified,
+    is to include all scripts in the distribution.
+
+ exclude_script = str+
+
+    Exclude a script. Can be specified multiple times.
+
+SEE ALSO
+
+    depak
+

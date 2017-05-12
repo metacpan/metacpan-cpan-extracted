@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+
+	Cambridge Dictionaries Onlines
+	Application Programming Interface
+	XML Document Type Definition
+	
+	This DTD is copyright Cambridge University Press, 2012. 
+	
+	It may be downloaded and printed for personal reference, but not otherwise copied, altered in any way or transmitted to others (unless explicitly stated otherwise) without the written permission of Cambridge University Press.
+	
+	Hypertext links to other Web locations are for the convenience of users and do not constitute any endorsement or authorisation by Cambridge University Press.
+	
+-->
+
+<!-- 
+	Entity for common typographic elements, e.g. superscript, fractions, etc.
+-->
+
+<!ENTITY % typog "b|cl|lab|i|sub|sup|fr" >
+
+<!--
+	STRUCTURE ELEMENTS
+	
+	These elements divide up the senses/definitions. Which ones are present depend on the dataset. 
+	
+	The <di> is always the outermost element; some datasets have one <di> per <pos-block>, others have one <di> per <sense-block> or <idiom-block>.
+	
+	They follow the general pattern:
+	
+	- block
+		- header
+		- content
+		- supplementary elements
+	
+	BLOCK ELEMENTS
+	
+	- <di> is the container for the whole 'entry' or 'dictionary item'.
+	- <pos-block> groups all the definitions for a particular part of speech, e.g. the noun senses of 'light'.
+	- <pv-block> groups all the definitions for a particular phrasal verb, e.g. 'grow up'.
+	- <idiom-block> groups all the definitions for a particular idiom, e.g. 'cross your mind'.
+	- <sense-block> groups all the definitions for a particular sense group, e.g. the INCREASE sense of 'grow'.
+	- <phrase-block> groups all the definitions for a particular phrase, e.g. 'grow tired/old/calm, etc.'.
+	- <runon> groups all the definitions for a particular derived word, e.g. 'selflessly', derived from 'selfless'.
+	- <def-block> is the container material related to a single definition, including translations and examples. 
+	
+	OTHERS
+	
+	- <header> contains the title and information elements relating to its parent (functioning like HTML5's <header>)
+	- <info> contains grammar, pronunciation, variant spellings, inflections and other miscellaneous 'metadata' relating to its parent.
+	- <anc> information on the original 'ancestor', e.g. if the phrasal verb 'get up' is an entry in its own right, this will have the pronunciation etc. for 'get'.
+	
+-->
+
+<!ELEMENT root (di+) >
+<!ELEMENT di (header, ( pos-block|sense-block|def-block|pv-block|idiom-block|phrase-block|runon )+, (entry-xref|aside)*, footer?) > 
+<!ELEMENT pos-block (header, (sense-block|idiom-block|runon)+, (entry-xref|aside)*) >
+<!ELEMENT pv-block (header, (sense-block|idiom-block|runon)+, (entry-xref|aside)*) >
+<!ELEMENT idiom-block (header, (def-block)+, (entry-xref|aside)*) >
+<!ELEMENT phrase-block (header, (def-block)+, (entry-xref|aside)*) >
+<!ELEMENT sense-block (header?, (def-block|phrase-block)+, (entry-xref|aside)*) >
+<!ELEMENT runon (header, (def-block|phrase-block)*, (entry-xref|aside)*) >
+<!ELEMENT def-block (definition?, examp*, (entry-xref|aside)*) >
+
+<!ELEMENT header (#PCDATA|title|trans|pos|info|f|%typog;)* >
+<!ELEMENT info (#PCDATA|audio|gram|pron|lvl|posgram|lab|domain|var|gw|irreg-infls|spellvar|anc)* >
+<!ELEMENT anc (header, info?) >
+
+<!--
+	INFO/CONTENT ELEMENTS
+
+	- <b> bold text, normally found in supplementary information
+	- <cite> citation information for an example.
+	- <cl> collocations, which are associated words in examples which have been marked as important patterns for learners, e.g. 'She will always be remembered for her <cl>devotion to</cl> her family.'
+	- <def> the definition itself.
+	- <definition> container for a definition (<def>) and translations of definitions or translations of the word/phrase/etc. with the same meaning as that definition.
+	- <domain> information relating to the topic, category, etc. normally displayed to the user, e.g. 'Finance'
+	- <eg> the text of an example
+	- <examp> container for an example and supplementary info
+	- <f> The word 'form' that is the subject of the container, e.g.:
+		- As "/di/header/f" the <f> is the title of the whole dictionary item.
+		- As "//idiom-block/header/f" the <f> is an idiom. 
+		- As "//spellvar/f", the <f> is a spelling variant. 
+		- As "//irreg-infls/inf-group/f", the <f> is the inflection.
+		- As "//examp/header/f", the <f> is a lexical unit, like a pattern, collocation or phrase, which is demonstrated by the example.
+	- <fr> a fraction, e.g. <fr><sup>2</sup><sub>3</sub></fr> = two thirds.
+	- <gc> a single grammar code, such as C. See http://dictionary.cambridge.org/help/codes.html for labels and codes.
+	- <gcs> a set of grammar codes, including separators
+	- <gram> contains grammar codes, marked off with square brackets, e.g. <gram>[<gcs><gc>C</gc>, <gc>U</gc></gcs>]</gram>.
+	- <gw> contains a guideword, which is the title of a sense-block.
+	- <i> italic text, normally found in ipa and supplementary information. In IPA, indicates that the sound is only sometimes pronounced or only partially pronounced.
+	- <inf-group> Information relating to a particular type of inflection, e.g. the past participle. The inflection itself is the <f> element.
+	- <ipa> phonetic transcription of a pronunciation using the International Phonetic Alphabet.
+	- <irreg-infls> container for irregular inflections.
+	- <lab> is a label, such as 'also' or 'past tense'.
+	- <lvl> indicates the importance of the word. English Profile Levels range from A1 (beginner) to C2 (advanced). In datasets with the EP levels, senses without levels are usually words above C2.
+	- <pos> The part of speech, e.g. noun, verb, etc. 
+	- <posgram> Container for part of speech and associated grammar codes, e.g. verb [T].
+	- <pron> pronunciation information. 
+	- <region> describes what regions of the world the sense(s) are used in, e.g. 'US'.
+	- <spellvar> contains info relating to a variant spelling. The child <f> is the variant.
+	- <sub> is subscript text. It is also the denominator within a fraction <fr>.
+	- <sup> is superscript text. It is the numerator within a fraction <fr>. In IPA, indicates that the sound depends on dialect or context.
+	- <trans> is a translation. The lang attribute denotes the language. 
+	- <usage> is a label describing the contexts in which the word is used, e.g. 'informal'
+	- <var> contains info relating to a variant other than a purely spelling variant, i.e. it has a potentially different pronunciation. The child <f> is the variant. (Please note that this is not related to HTML <var>, which is an equation variable)
+	- <xc> occurs within cl, and indicates the text it contains is not part of the collocation. 
+-->
+
+<!ELEMENT b (#PCDATA|%typog;)* >
+<!ELEMENT cite (#PCDATA) >
+<!ELEMENT cl (#PCDATA|%typog;|xc)* >
+<!ELEMENT def (#PCDATA|%typog;|x)* >
+<!ELEMENT definition (info?, def?, trans*) >
+<!ELEMENT domain (#PCDATA) >
+<!ELEMENT eg (#PCDATA|%typog;)* >
+<!ELEMENT examp (header?, info?, (eg|xeg), cite?, trans*) >
+<!ELEMENT f (#PCDATA|%typog;)* >
+<!ELEMENT fr (#PCDATA|sup|sub)* >
+<!ELEMENT gc (#PCDATA) >
+<!ELEMENT gcs (#PCDATA|gc)* >
+<!ELEMENT gram (#PCDATA|gcs)* >
+<!ELEMENT gw (#PCDATA|%typog;)* >
+<!ELEMENT i (#PCDATA) >
+<!ELEMENT inf-group (#PCDATA|audio|pron|lab|f)* >
+<!ELEMENT ipa (#PCDATA|%typog;)* >
+<!ELEMENT irreg-infls (#PCDATA|inf-group)* >
+<!ELEMENT lab (#PCDATA|region|usage)* >
+<!ELEMENT lvl (#PCDATA) >
+<!ELEMENT pos (#PCDATA) >
+<!ELEMENT posgram (#PCDATA|pos|gram)* >
+<!ELEMENT pron (#PCDATA|ipa|%typog;)* >
+<!ELEMENT region (#PCDATA) >
+<!ELEMENT spellvar (#PCDATA|f|%typog;|gram|irreg-infls|audio|pron)* >
+<!ELEMENT sub (#PCDATA) >
+<!ELEMENT sup (#PCDATA) >
+<!ELEMENT trans (#PCDATA|%typog;)* >
+<!ATTLIST trans lang CDATA #IMPLIED >
+<!ELEMENT usage (#PCDATA) >
+<!ELEMENT var (#PCDATA|f|%typog;|gram|irreg-infls|audio|pron)* >
+<!ELEMENT xc (#PCDATA|%typog;)* > 
+
+<!--
+	SUPPLEMENTARY INFORMATION
+	
+	- <aside> Supplementary information, usually corresponding to a 'panel' in the printed dictionaries. 
+	- <entry-xref> is a container for cross-references to other entries in the dictionary. 
+	- <p> is a paragraph within an aside.
+	- <section> contains the content of the aside. 
+	- <title> is the title of an aside.
+	- <xeg> is an example of incorrect usage (e.g. to illustrate common mistakes), and should normally be displayed struck through.
+	- <x> is a cross-reference, suitable for being converted to an HTML <a> element, for instance. Use the dictionary and the entryId attributes to create a new API call. As a child of <footer>, it instead uses the href attribute to link to the page containing information about the source dictionary.
+-->
+
+<!ELEMENT aside (header?, section+) >
+<!ELEMENT entry-xref (#PCDATA|lab|x)* >
+<!ELEMENT p (#PCDATA|%typog;)* >
+<!ELEMENT section (p|examp)+ >
+<!ELEMENT title (#PCDATA|gw|f|%typog;)* > 
+<!ELEMENT x (#PCDATA|f|pos|%typog;)* >
+<!ATTLIST x 
+	dictionary CDATA #IMPLIED
+	entryId CDATA #IMPLIED 
+	href CDATA #IMPLIED 
+	title CDATA #IMPLIED 
+>
+<!ELEMENT xeg (#PCDATA|%typog;)* >
+
+<!-- 
+    <audio> is a reference to an audio pronunciation file. 
+    The region attribute indicates whether it is a UK or US pronunciation.
+    The file is in the source element, which has a type attribute indicating if it is mp3 (audio/mpeg) or ogg (audio/ogg).
+    The audio@caption attribute will specify exactly which word is being referred to, to avoid confusion where entries contain more than one pronunciation (e.g. for variants). It's not populated yet, we're working on that.
+-->
+<!ELEMENT audio (source*) >
+<!ATTLIST audio 
+    type (pronunciation|sound_effect) "pronunciation"
+    caption CDATA #IMPLIED
+    region CDATA #IMPLIED
+>
+<!ELEMENT source EMPTY >
+<!ATTLIST source 
+    type CDATA #IMPLIED
+    src CDATA #IMPLIED 
+>
+<!-- 
+	The footer contains citation and copyright information.
+-->
+<!ELEMENT footer (#PCDATA|copyright)* >
+<!ELEMENT copyright (#PCDATA|x)* >
+

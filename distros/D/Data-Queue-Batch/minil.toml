@@ -1,0 +1,4 @@
+name = "Data-Queue-Batch"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

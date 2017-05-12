@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+<TITLE>stag-handle</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#examples">EXAMPLES</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-handle.pl - streams a stag file through a handler into a writer</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-handle.pl -w itext -c my-handler.pl myfile.xml &gt; processed.itext
+  stag-handle.pl -w itext -p My::Parser -m My::Handler myfile.xml &gt; processed.itext</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>will take a Stag compatible format (xml, sxpr or itext), turn the data
+into an event stream passing it through my-handler.pl</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dhelp%7Ch">-help|h</A></STRONG><BR>
+<DD>
+shows this document
+<P></P>
+<DT><STRONG><A NAME="item_%2Dmodule%7Cm_PERLMODULE">-module|m PERLMODULE</A></STRONG><BR>
+<DD>
+A module that is used to transform the input events
+the module should inherit from <A HREF="./Data/Stag/BaseHandler.html">the Data::Stag::BaseHandler manpage</A>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dunit%7Cu_NODE_NAME">-unit|u NODE_NAME</A></STRONG><BR>
+<DD>
+(you should always use this option if you specify -m)
+<P>this is the unit that gets passed to the handler/transformer. this
+will get set automatically if you use the the -c, -s or -t options</P>
+<P>multiple units can be set</P>
+<PRE>
+  -u foo -u bar -u boz</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dwriter%7Cw_WRITER">-writer|w WRITER</A></STRONG><BR>
+<DD>
+writer for final transformed tree; can be xml, sxpr or itext
+<P></P>
+<DT><STRONG><A NAME="item_%2Dmodule%7Cm_MODULE">-module|m MODULE</A></STRONG><BR>
+<DD>
+perl modules for handling events
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcodefile%7Cc_FILE">-codefile|c FILE</A></STRONG><BR>
+<DD>
+a file containing a perlhashref containing event handlers - see below
+<P></P>
+<DT><STRONG><A NAME="item_%2Dsub%7Cs_PERL">-sub|s PERL</A></STRONG><BR>
+<DD>
+a perl hashref containing handlers
+<P></P>
+<DT><STRONG><A NAME="item_%2Dtrap%7Ct_ELEMENT%3DSUB">-trap|t ELEMENT=SUB</A></STRONG><BR>
+<DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="examples">EXAMPLES</A></H1>
+<PRE>
+  unix&gt; cat my-handler.pl
+  {
+    person =&gt; sub {
+        my ($self, $person) = @_;
+        $person-&gt;set_fullname($person-&gt;get_firstname . ' ' .
+                           $person-&gt;get_lastname);
+        $person;
+    },
+    address =&gt; sub {
+        my ($self, $address) = @_;
+        # remove addresses altogether from processed file
+        return;
+    },
+  }</PRE>
+
+</BODY>
+
+</HTML>

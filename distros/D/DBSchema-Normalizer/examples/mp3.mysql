@@ -1,0 +1,119 @@
+# MySQL dump 8.13
+#
+# Host: localhost    Database: music
+#--------------------------------------------------------
+# Server version	3.23.36-log
+
+#
+# Table structure for table 'MP3'
+#
+
+CREATE DATABASE IF NOT EXISTS music;
+USE music;
+
+#DROP TABLE IF EXISTS `MP3`;
+CREATE TABLE `MP3` (
+  `ID` int(11) NOT NULL auto_increment,
+  `title` varchar(40) NOT NULL default '',
+  `artist` varchar(20) NOT NULL default '',
+  `album` varchar(30) NOT NULL default '',
+  `duration` time NOT NULL default '00:00:00',
+  `size` int(11) NOT NULL default '0',
+  `genre` varchar(10) NOT NULL default '',
+  PRIMARY KEY  (`ID`),
+  KEY `title` (`title`),
+  KEY `artist` (`artist`),
+  KEY `album` (`album`),
+  KEY `genre` (`genre`)
+) TYPE=MyISAM;
+
+#
+# Dumping data for table 'MP3'
+#
+
+INSERT INTO `MP3` VALUES 
+(1,'Get out your lazy bed','Matt Bianco','Whose side are you on','00:03:30',3363735,'Funky'),
+(2,'Half a minute','Matt Bianco','Whose side are you on','00:03:51',3703954,'Funky'),
+(3,'It\'s getting late','Matt Bianco','Whose side are you on','00:03:25',3275128,'Funky'),
+(4,'Matt\'s Mood 2','Matt Bianco','Whose side are you on','00:05:16',5061601,'Funky'),
+(5,'Matts Mood','Matt Bianco','Whose side are you on','00:05:23',5162631,'Funky'),
+(6,'More than I can bear','Matt Bianco','Whose side are you on','00:04:18',4131944,'Funky'),
+(7,'No no never','Matt Bianco','Whose side are you on','00:03:47',3629139,'Funky'),
+(8,'Riding with the wind','Matt Bianco','Whose side are you on','00:03:25',3282233,'Funky'),
+(9,'Sneaking out the back door','Matt Bianco','Whose side are you on','00:03:51',3696013,'Funky'),
+(10,'Whose side are you on','Matt Bianco','Whose side are you on','00:04:38',4440398,'Funky'),
+(11,'(a)Speak To Me (b)Breathe In The Air','Pink Floyd','The Dark Side Of The Moon','00:03:57',3798597,'Rock'),
+(12,'Any Colour You Like','Pink Floyd','The Dark Side Of The Moon','00:03:26',3289386,'Rock'),
+(13,'Brain Damage','Pink Floyd','The Dark Side Of The Moon','00:03:50',3686866,'Rock'),
+(14,'Eclipse','Pink Floyd','The Dark Side Of The Moon','00:02:07',2026307,'Rock'),
+(15,'Money','Pink Floyd','The Dark Side Of The Moon','00:06:24',6136105,'Rock'),
+(16,'On The Run','Pink Floyd','The Dark Side Of The Moon','00:03:32',3390958,'Rock'),
+(17,'The Great Gig In The Sky','Pink Floyd','The Dark Side Of The Moon','00:04:47',4592584,'Rock'),
+(18,'Time','Pink Floyd','The Dark Side Of The Moon','00:07:05',6801911,'Rock'),
+(19,'Us And Them','Pink Floyd','The Dark Side Of The Moon','00:07:49',7501628,'Rock'),
+(20,'The Post War Dream','Pink Floyd','The Final Cut','00:03:01',2891908,'Rock'),
+(21,'Your Possible Pasts','Pink Floyd','The Final Cut','00:04:21',4178802,'Rock'),
+(22,'One of the Few','Pink Floyd','The Final Cut','00:01:26',1374305,'Rock'),
+(23,'The Hero\'s Return','Pink Floyd','The Final Cut','00:02:57',2839660,'Rock'),
+(24,'The Gunners Dream','Pink Floyd','The Final Cut','00:05:04',4866759,'Rock'),
+(25,'Paranoid Eyes','Pink Floyd','The Final Cut','00:03:49',3666381,'Rock'),
+(26,'Get Your Filthy Hands Off My Desert','Pink Floyd','The Final Cut','00:01:18',1250994,'Rock'),
+(27,'The Fletcher Memorial Home','Pink Floyd','The Final Cut','00:04:11',4012444,'Rock'),
+(28,'Southampton Dock','Pink Floyd','The Final Cut','00:02:05',2002074,'Rock'),
+(29,'The Final Cut','Pink Floyd','The Final Cut','00:04:52',4677845,'Rock'),
+(30,'Not Now John','Pink Floyd','The Final Cut','00:05:03',4843350,'Rock'),
+(31,'Two Suns in the Sunset','Pink Floyd','The Final Cut','00:05:17',5077838,'Rock'),
+(32,'Have A Cigar','Pink Floyd','Wish You Were Here','00:05:08',4927785,'Rock'),
+(33,'Shine On You Crazy Diamond (I)','Pink Floyd','Wish You Were Here','00:13:31',12972240,'Rock'),
+(34,'Shine On You Crazy Diamond (II)','Pink Floyd','Wish You Were Here','00:12:23',11885505,'Rock'),
+(35,'Welcome To The Machine','Pink Floyd','Wish You Were Here','00:07:27',7146731,'Rock'),
+(36,'Wish You Were Here','Pink Floyd','Wish You Were Here','00:05:40',5444803,'Rock'),
+(37,'A New Machine (Part 1)','Pink Floyd','A Momentary Lapse of Reason','00:01:46',1703228,'Rock'),
+(38,'A New Machine (Part 2)','Pink Floyd','A Momentary Lapse of Reason','00:00:39',619881,'Rock'),
+(39,'Learning to Fly','Pink Floyd','A Momentary Lapse of Reason','00:04:53',4692427,'Rock'),
+(40,'On the Turning Away','Pink Floyd','A Momentary Lapse of Reason','00:05:42',5476937,'Rock'),
+(41,'One Slip','Pink Floyd','A Momentary Lapse of Reason','00:05:10',4967444,'Rock'),
+(42,'Signs of Life','Pink Floyd','A Momentary Lapse of Reason','00:04:24',4228535,'Rock'),
+(43,'Sorrow','Pink Floyd','A Momentary Lapse of Reason','00:08:47',8429400,'Rock'),
+(44,'Terminal Frost','Pink Floyd','A Momentary Lapse of Reason','00:06:17',6033705,'Rock'),
+(45,'The Dogs of War','Pink Floyd','A Momentary Lapse of Reason','00:06:05',5846453,'Rock'),
+(46,'Yet Another Movie, Round and Round','Pink Floyd','A Momentary Lapse of Reason','00:07:28',7166328,'Rock'),
+(47,'A Kind Of Magic','Queen','Greatest Hits 2','00:04:22',4199235,'Rock'),
+(48,'Breakthru','Queen','Greatest Hits 2','00:04:09',3986546,'Rock'),
+(49,'Friends Will Be Friends','Queen','Greatest Hits 2','00:04:09',3981946,'Rock'),
+(50,'Hammer To Fall','Queen','Greatest Hits 2','00:03:40',3527611,'Rock'),
+(51,'Headlong','Queen','Greatest Hits 2','00:04:33',4371075,'Rock'),
+(52,'I Want It All','Queen','Greatest Hits 2','00:04:02',3869938,'Rock'),
+(53,'I Want To Break Free','Queen','Greatest Hits 2','00:04:19',4139049,'Rock'),
+(54,'I\'m Going Slightly Mad','Queen','Greatest Hits 2','00:04:08',3966894,'Rock'),
+(55,'Innuendo','Queen','Greatest Hits 2','00:06:28',6202514,'Rock'),
+(56,'It\'s A Hard Life','Queen','Greatest Hits 2','00:04:10',3993218,'Rock'),
+(57,'One Vision','Queen','Greatest Hits 2','00:04:03',3882422,'Rock'),
+(58,'Radio Ga Ga','Queen','Greatest Hits 2','00:05:43',5494073,'Rock'),
+(59,'The Invisible Man','Queen','Greatest Hits 2','00:03:59',3816803,'Rock'),
+(60,'The Miracle','Queen','Greatest Hits 2','00:04:55',4717999,'Rock'),
+(61,'The Show Must Go On','Queen','Greatest Hits 2','00:04:24',4217626,'Rock'),
+(62,'Under Pressure','Queen','Greatest Hits 2','00:03:57',3787656,'Rock'),
+(63,'Who Wants To Live Forever','Queen','Greatest Hits 2','00:04:57',4755539,'Rock'),
+(64,'Agnus dei','Mozart','Requiem','00:03:14',3107565,'Classical'),
+(65,'Benedictus','Mozart','Requiem','00:04:41',4498960,'Classical'),
+(66,'Confutatis','Mozart','Requiem','00:02:29',2384495,'Classical'),
+(67,'Dies Irae','Mozart','Requiem','00:01:49',1736673,'Classical'),
+(68,'Domine Jesu','Mozart','Requiem','00:03:50',3679267,'Classical'),
+(69,'Hostias','Mozart','Requiem','00:03:24',3266810,'Classical'),
+(70,'Kyrie','Mozart','Requiem','00:02:10',2072683,'Classical'),
+(71,'Lacrimosa','Mozart','Requiem','00:02:35',2478959,'Classical'),
+(72,'Lux Aeterna','Mozart','Requiem','00:04:47',4591744,'Classical'),
+(73,'Recordare','Mozart','Requiem','00:06:23',6124814,'Classical'),
+(74,'Requiem','Mozart','Requiem','00:04:10',3999081,'Classical'),
+(75,'Rex tremendae','Mozart','Requiem','00:01:38',1562792,'Classical'),
+(76,'Sanctus','Mozart','Requiem','00:01:16',1215882,'Classical'),
+(77,'Tuba Mirum','Mozart','Requiem','00:03:04',2950837,'Classical'),
+(78,'Adagio','Mozart','Serenade 361','00:06:15',6006951,'Classical'),
+(79,'Largo - Molto allegro','Mozart','Serenade 361','00:09:36',9210197,'Classical'),
+(80,'Minuetto - Allegretto - Adagio','Mozart','Serenade 361','00:04:54',4707522,'Classical'),
+(81,'Minuetto - Trio I','Mozart','Serenade 361','00:08:39',8309070,'Classical'),
+(82,'Romance - Adagio - Allegretto','Mozart','Serenade 361','00:06:55',6647684,'Classical');
+
+SELECT "If you see this message, everything is OK" as RESULT\G
+

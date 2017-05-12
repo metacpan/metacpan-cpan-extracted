@@ -1,0 +1,105 @@
+Revision history for Device-BusPirate
+
+0.13    2016/10/02 19:45:24
+        [CHANGES]
+         * Enable pullups when configuring Device::Chip::Adapter for I²C
+         * Implement ->sleep method for Device::Chip::Adapter
+
+        [BUGFIXES]
+         * Use Future::Mutex instead of custom logic; ensures correct
+           unlocking even on failure
+         * Ensure I²C sends STOP conditions after write/read failures
+
+0.12    2016/05/05 15:17:28
+        [CHANGES]
+         * Implement the ->read I2C method of Device::Chip::Adapter 0.07
+        
+        [BUGFIXES]
+         * Ensure that the GPIO protocol instance has a ->power method
+
+0.11    2015/11/29 01:17:38
+        [CHANGES]
+         * Have BB mode complain about unrecognised pin names
+         * Allow BB ->read method to set named pins as inputs first
+         * Implement GPIO protocol in Device::Chip::Adapter implementation
+
+        [BUGFIXES]
+         * Fix to make Device::Chip::Adapter I2C implementation actually work
+
+0.10    2015/11/12 12:17:10
+        [CHANGES]
+         * Updates for Device::Chip::Adapter 0.02:
+            + Provide ->new_from_description constructor
+            + Implement I2C protocol
+
+0.09    2015/11/10 00:18:14
+        [CHANGES]
+         * Longer startup timeout
+         * Handle I2C slave addressing failures
+         * Added a ->configure method to I2C mode to set clock speed
+         * Implement a Device::Chip::Adapter class
+         * Remark that Device::BusPirate::Chip is now deprecated in favour of
+           Device::Chip
+
+        [BUGFIXES]
+         * Ensure that PIRATE_DEBUG is always defined even if env. var. is
+           absent (RT108508)
+
+0.08    2015/03/03 18:48:02
+        [CHANGES]
+         * Apply timeouts to all Bus Pirate UART communications
+         * Use Struct::Dumb instead of 2-element ARRAYrefs
+
+        [BUGFIXES]
+         * Ensure that Future::Utils::repeat isn't used for repeating failed
+           Futures
+
+0.07    2015/01/15 22:34:27
+        [CHANGES]
+         * Added ->send_then_recv method to I2C mode, allowing the use of
+           registered devices which need a repeated START to operate
+
+0.06    2014/11/01 15:29:58
+        [CHANGES]
+         * Document and expose the $pirate->sleep method as user API
+         * Added synopsis documentation to each Mode class
+
+        [BUGFIXES]
+         * Fix for timer cancellation; avoids memory/CPU leak
+         * Fix for sleep-only await with no IO read pending
+         * Don't worry about Chip:: subclasses that don't define a CHIP
+           constant
+
+0.05    2014/10/20 22:04:21
+        [CHANGES]
+         * Support I2C mode
+         * Provide 'enter_mutex' method on main Device::BusPirate object;
+           document its use by the SPI and I2C modes
+         * Migrate power/pullup/aux peripheral methods to common Mode base
+
+0.04    2014/09/27 17:03:35
+        [CHANGES]
+         * Added a small Tickit-driven UI for interacting with BBIO mode
+         * Expanded Mode::BB - ability to write/read multiple pins at once
+         * Default the Bus Pirate location from $BUS_PIRATE env. var.
+
+0.03    2014/09/16 17:05:51
+        [CHANGES]
+         * Defined a model for attaching high-level 'Chip' interface modules
+         * Renamed 'SPI' mode config parameters to match Bus Pirate terminlogy
+         * Also support CPOL/CPHA and SPI mode numbers
+
+0.02    2014/08/12 10:50:07
+        [CHANGES]
+         * Support bit-bang mode directly
+         * Renamed SPI's pin_3v3 configuration to open_drain, as it's clearer
+           in meaning
+         * Better timeouts and non-blocking behaviour
+         * Allow setting SPI bus speed
+         * Allow SPI bulk transfers of more than 16 bytes
+         * Rename 'SCK' to 'CLK' to match Bus Pirate terminology
+         * Document that ->stop doesn't return a Future
+
+0.01    2014/08/11 16:05:39
+        First version, released on an unsuspecting world.
+

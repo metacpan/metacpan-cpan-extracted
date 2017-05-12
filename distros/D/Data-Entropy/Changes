@@ -1,0 +1,122 @@
+version 0.007; 2011-04-27
+
+  * update D::E::RS::RandomOrg to cope with fractional fill percentage
+    currently being returned by the website
+
+  * in D::E::RS::RandomOrg and D::E::RS::RandomnumbersInfo, use HTTP::Lite
+    instead of heavyweight LWP
+
+  * use full stricture in test suite
+
+  * in Build.PL, complete declaration of configure-time requirements
+
+  * explicitly state version required of Params::Classify
+
+  * include META.json in distribution
+
+  * add MYMETA.json and MYMETA.yml to .cvsignore
+
+version 0.006; 2009-11-21
+
+  * be more stringent in parsing responses from networked entropy sources
+
+  * in documentation, point more prominently to Data::Entropy::Algorithms
+
+  * in documentation of Data::Entropy::Algorithms, more discussion of
+    overriding CORE::rand, including how to override it globally
+
+  * abandon use of the "fields" module
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * in test suite, properly quote first argument to use_ok (lack of
+    quoting caused false test failures on Perl 5.11.2)
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.005; 2009-03-03
+
+  * bugfix: require bugfixed version of Data::Float (for $SIG{__DIE__}
+    handling)
+
+  * in D::E::RS::RandomOrg and D::E::RS::RandomnumbersInfo, be more
+    stringent in parsing the returned data, to avoid potentially
+    generating non-byte bytes
+
+  * test POD syntax and coverage, and rename some internal functions
+    and make a small style change in documentation to satisfy the
+    coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * in tests, avoid unreliable "\d" and "\w" regexp elements
+
+  * remove a stray "use Crypt::Rijndael" from one of the test scripts
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * express relationship with versions of Math::BigInt and Math::BigRat
+    as conflicts rather than dependencies
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.004; 2007-09-03
+
+  * in D::E::RS::CryptCounter, construct the SEEK_* constants explicitly
+    instead of importing from Fcntl, to avoid requiring a version of
+    Fcntl that is only supplied with perl v5.8
+
+  * test explicitly for correct class of results
+
+version 0.003; 2007-01-21
+
+  * avoid "my __PACKAGE__", for compatibility with perl v5.6
+
+  * markup fix in documentation for rand_flt()
+
+version 0.002; 2006-08-05
+
+  * bugfix: rand_flt() with subnormal limits was horribly inefficient
+
+  * in rand(), don't attempt to generate a 48-bit fraction on systems
+    where it can't be represented, fall back to the longest possible
+    fraction
+
+  * in rand_fix(), use low-level floating point code from Data::Float
+    instead of doing it here
+
+  * expand documentation of rand()
+
+version 0.001; 2006-08-03
+
+  * new function rand_flt() to generate a random floating point value
+    in a floating point way
+
+  * bugfix: in BigRat handling, use ->as_number instead of ->as_int
+    for BigRat->BigInt conversion, because ->as_int is faulty before
+    Math::BigRat version 0.14 but ->as_number is available in much earlier
+    versions (the version specified in Makefile.PL was one where ->as_int
+    was faulty)
+
+  * use standard interval notation in the Data::Entropy::Algorithms
+    documentation
+
+  * use "=> 0" instead of "=> undef" in unversioned dependencies in
+    Makefile.PL
+
+  * don't include underscore in string version of module version numbers
+    in Makefile.PL
+
+  * remove a redundant BigRat->BigInt conversion
+
+version 0.000; 2006-07-19
+
+  * initial released version

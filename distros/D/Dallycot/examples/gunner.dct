@@ -1,0 +1,197 @@
+(*
+ * Gunner
+ *
+ * Translated from the original BASIC version on page 77 of:
+ * Creative Computing. _Basic Computer Games_, Microcomputer
+ * Edition, Edited by David H. Ahl. Workman Publishing, NY, 1978.
+ *
+ *)
+
+ns:cli := "http://www.dallycot.net/ns/cli/1.0#";
+ns:math := "http://www.dallycot.net/ns/math/1.0#";
+ns:strings := "http://www.dallycot.net/ns/strings/1.0#";
+
+uses "http://www.dallycot.net/ns/core/1.0#";
+
+print-lines := Y(
+  (self, stream) :> (
+    (?stream) : (
+      cli:print(stream');
+      self(self, stream...);
+    )
+    (       ) : ( )
+  )
+);
+
+make-gun() :> math:random(<20000,60000>);
+
+(* for now, the gun is its range *)
+gun-range(gun) :> gun;
+
+make-target(gun) :> math:random(<gun div 10, 9 * gun div 10>);
+
+(* for now, the target is its distance *)
+target-distance(target) :> target;
+
+(* Prompts for an elevation until we have a number in the range
+   1..89. This uses the provided reader lambda, but the easiest
+   way to do this is to use the `cli:input` function which
+   evaluates its input in an empty context (no spill over to
+   this code).
+ *)
+get-elevation := Y(
+  (self, reader) :> (
+    elevation := reader();
+    (
+      (elevation > 89) : (
+        print-lines(["Maximum elevation is 89 degrees",""]);
+        self(self, reader)
+      )
+      (elevation < 1) : (
+        print-lines(["Minimum elevation is one degree",""]);
+        self(self, reader)
+      )
+      ( ) : elevation
+    )
+  )
+);
+
+(*
+ * Prompts for a (y)es or (n)o response until one is given.
+ *)
+try-again? := Y(
+  (self, reader) :> (
+    input := reader();
+    (
+      (input = "Y" or input = "y") : true
+      (input = "N" or input = "n") : false
+      ( ) : (
+        cli:print("I didn't catch that.");
+        self(self, reader)
+      )
+    )
+  )
+);
+
+go-boom(tries) :> (
+  print-lines(<
+    "",
+    "",
+    "BOOM !!!!   You have just been destroyed",
+    "by the enemy.",
+    "",
+    "",
+    "",
+    "Better go back to Fort Sill for refresher training!",
+    ""
+  >);
+  < tries', try-again?({ cli:input-string("Try again (y or n)? ")}/0) >
+);
+
+destroy-target(tries) :> (
+  print-lines(<
+    "*** TARGET DESTROYED ***  " ::>
+    strings:number-string(tries') ::>
+    " rounds of ammunition expended"
+  >);
+  < tries', try-again?({ cli:input-string("Try again (y or n)? ")}/0) >
+);
+
+under-shoot(gun, target, distance, tries, attack-target) :> (
+  print-lines(<
+    "Short of target by " ::> strings:number-string(distance) ::> " yards."
+  >);
+
+  attack-target(gun, target, tries...)
+);
+
+over-shoot(gun, target, distance, tries, attack-target) :> (
+  print-lines(<
+    "Over target by " ::> strings:number-string(distance) ::> " yards."
+  >);
+  attack-target(gun, target, tries...)
+);
+
+fire-gun(gun, target, elevation, tries, attack-target) :> (
+  hit-at := gun-range(gun) * math:sin(elevation);
+  distance := math:ceil(target-distance(target) - hit-at);
+  (
+    (math:abs(distance) < 100) : destroy-target(tries)
+    (         distance  < 100) : under-shoot(gun, target, -distance, tries, attack-target)
+    (                        ) :  over-shoot(gun, target,  distance, tries, attack-target)
+  )
+);
+
+attack-target := Y(
+  (self, gun, target, tries) :> (
+    elevation := get-elevation({
+      cli:print("");
+      cli:input("Elevation: ")
+    }/0);
+
+    (
+      (?(tries...))  : fire-gun(gun, target, elevation, tries, Y(self))
+      (           )  : go-boom(tries)
+    )
+  )
+);
+
+game-round(round, total-shells) :> (
+  gun    := make-gun();
+  target := make-target(gun);
+
+  update-stats() :> (
+    stats := attack-target(gun, target, 1..6);
+    < (stats[1] + total-shells), stats[2] >
+  );
+
+  print-lines(<
+    "Maximum range of your gun is " ::> strings:number-string(gun-range(gun)) ::> " yards.",
+    ""
+  >);
+
+  print-lines(<
+    "   Distance to the target is " ::>
+    strings:number-string(target-distance(target)) ::>
+    " yards.",
+    "",
+    ""
+  >);
+
+  update-stats();
+);
+
+run-game-rounds := Y(
+  (self, stats) :> (
+    (stats[1] < 18 and stats[2]) : self(self, game-round(0, stats[1]))
+    (stats[1] >= 18) : (
+      print-lines([
+        "Total rounds expended were: " ::> strings:number-string(stats[1]),
+        "Better go back to Fort Sill for refresher training!",
+        ""
+      ])
+    )
+    (     ) : (
+      print-lines([
+        "Total rounds expended were: " ::> strings:number-string(stats[1]),
+        "",
+        "Return to base camp."
+      ]);
+    )
+  )
+);
+
+print-lines(<
+  "                              Gunner",
+  "              (Creative Computing  Morristown, New Jersey)",
+  "",
+  "",
+  "",
+  "You are the office-in-charge, giving orders to a gun",
+  "crew, telling them the degrees of elevation you estimate",
+  "will place a projectile on target.  A hit within 100 yards",
+  "of the target will destroy it.",
+  ""
+>);
+
+run-game-rounds(game-round(0, 0));

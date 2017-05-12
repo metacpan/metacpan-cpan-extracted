@@ -1,0 +1,397 @@
+
+Revision history for Perl extension XBase and DBD::Xbase.
+
+0.130 Sat Feb 27 18:09:04 MET 1999
+	DBD::XBase: fixed handling of the rows method.
+
+	Added driver_characteristics.pod to list characteristics of
+	DBD::XBase according to the draft by Tim Bunce.
+
+0.129 Fri Feb 26 22:02:12 MET 1999
+	XBase.pm: Added support for datetime fields T, testing data
+	provided by William McKee. Fix for ignorememo.
+
+	XBase::SQL: added time and datetime names to the SQL parser.
+
+	XBase::Memo and XBase.pm: added support for Apollo SMT memo
+	files, code based on that provided by Dirk Tostmann.
+
+	O_BINARY is only loaded on evil systems now.
+	
+0.127 Mon Feb 22 10:56:23 MET 1999
+	XBase::Base: opening readonly files fixed, patch by Petr
+	Machacek.
+	
+	_unlockex fixed to _unlock. locksh, lockex and unlock now
+	return true/false based on result.
+
+	DBD::XBase::disconnect now closes the tables, patch by Martin
+	Treusch von Buttlar. Fixed typo in delete code.
+
+	t/2_write.t: added $table->close before size check, patch by
+	Ilya Chelpanov.
+
+0.121 Thu Jan 21 20:07:04 MET 1999
+	XBase::Memo: Fixed a typo in measuring the next_for_append,
+	pointed out by Dan Albertsson.
+
+	t/2_write.t: added afox5.dbf/FPT and a Fox* test.
+
+0.120 Wed Jan 13 13:24:15 MET 1999 
+	XBase.pm: added XBase::Cursor::rewind, names,
+	prepare_select_nf. Added readonly option. Added option 'table'
+	for dump -- using Data::ShowTable.
+
+	XBase.pm, XBase::Base.pm: open method now accepts hash of
+	options.
+
+	XBase::Memo: we now reset next_for_append to point behind the
+	end of the file, problem pointed out by Artem Belevich.
+
+	dbfdump: option --table, --fields now handles intervals.
+
+	t/2_read.t: fixed problem with order of fields in hash, patch
+	by Andreas J. Koenig.
+
+	t/4_dbfdump.t: added quotes for Win* systems, patch by Randy
+	Kobes.
+
+0.115 Wed Jan  6 17:02:28 MET 1999
+	XBase::Memo: tries to find out which format (\x1a versus
+	\x1a\x1a) to use for dBaseIII memo files. It also writes back
+	this separator.
+
+0.110 Sun Dec 20 21:29:05 MET 1998
+	XBase::SQL: added LIKE clause to WHERE part of SQL commands. 
+
+0.105 Sun Dec 20 17:09:43 MET 1998
+	XBase::Base: added workaround for systems that not only write
+	to files something else than they are told to, but also damage
+	the files by merely opening it (open).
+
+	XBase::Memo: fixed problem with fpt files -- thanks to Dan
+	Albertsson for providing many test files.
+
+	XBase::SQL: fix of handling of double quoted strings.
+
+	dbfdump: memosep and memofile options fixed.
+
+	t/4_dbfdump.t: avoided using cat.
+
+	t/*_dbd_*.t: forcing use of DBI version at least 1.0.
+
+0.100 Mon Dec  7 11:00:23 MET 1998
+	DBD::XBase: capitalized AND/OR in SQL commands now work,
+	method rows implemented, reported by cybertoast. Updated to
+	use _set_fbav. Unpolished support to *info* methods.
+
+	XBase::SQL: fixed the primary key/key parsing problem, patch
+	by Bill Brinkley & Joe Johnston. A quick fix to avoid bug in
+	Perl with long blobs.
+
+	XBase::Memo: appending record to dBaseIV memo used to corrupt
+	the data -- reported by Dan Albertsson.
+
+0.0696 Mon Oct 26 11:57:01 MET 1998
+
+	DBD::XBase: added bug reporting by INSERT command and fixed
+	example in man page, spotted by Dmitry Dorofeev. Added DESC
+	part of ORDER BY clause, requested by Dmitry Dorofeev. Fixed
+	number of fields returned with ORDER BY clause, patch by
+	Paul Lindner. If the directory is not specified in call to
+	connect, it now defaults to current directory, not to root.
+	Fixed the fetch method -- it doesn't deadlock anymore, problem
+	reported by Ken Yamaguchi.
+
+	XBase::Index: added some MDX code.
+
+	XBase::Memo: header_len is now set to block_size, not 512,
+	patch by Fergus Lee.
+
+	XBase.pm: The type B is Fox double, not memo, spotted by
+	George F. Frazier. Added support for Fox* 4 byte memo fields,
+	data provided by William McKee.
+
+	All of the reads/tells rewritten to allow stream-lined processing,
+	suggested by Sergey Lukashevich. Use with caution, however.
+
+	Added autoflush to each opened file, so it's safe to read the
+	table with other process before closing the table in the first
+	one, spotted by Thomas Hahn.
+
+0.0694 Tue Aug 25 23:24:35 MET DST 1998
+
+	XBase::Memo: Fixed error by 8 in dBaseIV reading/writing
+	code, bug reported by Kendal Van Dyke.
+
+	t/5_dbd_select.t changed to be non-unique-key in sort
+	independent, reported by Larry W. Virden.
+
+0.0693 Tue Aug 25 10:25:20 MET DST 1998
+
+	DBD::XBase: Fixed handling ORDER BY with WHERE clauses,
+	reported by Kendal Van Dyke.
+	
+	XBase: added nolongchars -- omitted from 0.068.
+
+	XBase::Index: added ro support for Clipper's ntx, the whole
+	module reworked. Thanks to Frans van Loon for providing
+	example ntx files and code that helped me to understand the
+	format. Also thanks to Robert Geer for his C code that also
+	helps me to check the expected results.
+
+	XBase::Base: last_record can be -1, meaning unknown --
+	disables checks.
+
+	Added t/3_ntx.t and added ORDER BY test to t/5_dbd_select.t.
+
+	Some documentation improvements.
+
+0.068 Thu Aug 20 18:43:17 MET DST 1998
+
+	DBD::XBase: added support for ORDER BY, defined using substh.
+
+	Fixed error by 1 in deleting all records.
+
+	Added support for NULLABLE, NUM_OF_PARAMS and TYPE in FETCH.
+
+	Defined data_sources to dbi:XBase:.; disconnect_all returns 1;
+	defined tables, disconnect and DESTROY; quote adds support for
+	NULL.
+
+	XBase: create now marks presence of a dbt file in dbf.
+
+	Added attribute nolongchars to disable character fields longer
+	than 255.
+
+	Erik Bachmann's homepage moved.
+
+	XBase::Memo: added suport for memosep attribute, default
+	\x1a\x1a. Correct header is now written for dBaseIV memo
+	files.
+
+	Fix of handling dBaseIV memo records, patch by Barry Fishman.
+
+	XBase::SQL: added ORDER BY support, recognizes VARCHAR.
+
+	In dbit/40blobs.t we only try blob size 64 -- fix for bug in
+	Perl regexp engine. Change in dbit/40bindparam.t, quick fix
+	for missing NULL chars. In dbit/50chopblanks.t swapped
+	$$ref[1] and $name.
+
+0.065 Sun Jun  7 15:18:57 MET DST 1998
+
+	Added table specific ChopBlanks. Added fetch_hashref to
+	XBase::Cursor.
+
+	Docs updated.
+
+0.064 Sun May 31 18:56:26 MET DST 1998		(*****)
+
+	Major rewrite of the DBD and SQL part. New features:
+	support for bind parameters in where, insert and update.
+	Support for NULL and IS NULL tests. The XBase::SQL is faster
+	and hopefully clearer. The DBD::XBase supports (among others)
+	bind_col. The DBD driver now passes 98.39 % of the standard
+	DBD tests.
+
+	Added support for data type 'I' for Fox* into XBase.pm.
+
+0.0632 Wed May 27 12:27:04 MET DST 1998
+
+	Added --nomemo option to dbfdump. The list of entires is made
+	longer in any non-leaf page in ndx. Added check for the magic
+	"FFFF0800" tag in dBaseIV dbt file when reading it.
+
+0.0631 Fri May 22 22:24:02 CEST 1998
+
+	Fixed handling big endian in numeric fields in ndx, fixe
+	problem with key/record	length.
+
+0.063 Sun May 17 21:46:08 CEST 1998
+
+	Added first support for ndx index files. From XBase module
+	it's available using prepare_select_with_index.	It's very
+	alpha but it seems to handle character and numeric (not date
+	yet) types. And yes, it's read only.
+
+	Added FETCH('NAME') and _ListTables to DBD::XBase, added drop
+	table, integer type and dummy not null to XBase::SQL. The
+	generic DBI test suite now goes well up until bind params, put
+	on ToDo list.
+
+0.062 Thu May 14 15:11:32 MET DST 1998
+
+	Field and table names in XBase::SQL now accept digits and
+	underscores, in XBase::Memo, we check for
+	($dbf_version & 15), patches by Jens Quade.
+
+	Fixed handling of Fox* fpt files and a problem with memo
+	files that have record length different than 512, patches
+	by Thomas Grueter.
+
+0.061 Tue Apr  7 21:52:07 MET DST 1998
+
+	Fixed writing undefined values in numeric fields.
+	Fixed dealing with uppercase extensions.
+
+	XBase::SQL fixed to support int, found by Chris Winters.
+
+	Offset in the record headers in dbf now set properly, patch by
+	Dave Frascone.
+
+	Added ignorememo option to new XBase call. Use this if you
+	have a memo field in dbt but do not have the memo file.
+	Otherwise you will get an error, request by Martin Jost.
+	Other fixes by Martin Jost included.
+
+0.060 Fri Mar 20 10:20:45 MET 1998
+
+	Added method prepare_select and XBase::Cursor to implement
+	long selects. Method dump_records now prints directly,
+	doesn't use get_all_records.
+
+	Added parameter --info into the script dbfdump to print the
+	header info.
+
+	Changed way of determining the type of the dbt file after
+	discussion with Sergey Lukashevich.
+	
+0.0599 Wed Mar 11 22:58:45 MET 1998
+
+	Option to specify the memo file in call to XBase::new added.
+
+	Dump_records made customizable.
+
+0.0598 Tue Mar 10 22:40:00 MET 1998
+
+	Fixed bug when finding a name for the memo file in XBase; in
+	dBaseIII memo field we will only check for one \x1a to allow
+	as many formats possible, we still write two of them; typo in
+	init_memo fixed -- patches by Martin Jost.
+
+0.0597 Tue Mar  3 23:40:56 MET 1998		(*****)
+
+	Major code revision and check:
+	
+	Error handling fixed, locking added. Rewritten process_* to
+	rproc and wproc arrays.
+	
+	Added read_all_records. Minor typos and bugs fixed.
+
+	Test suite extended.
+
+0.0584 Mon Mar  2 10:04:00 MET 1998
+
+	Fix of XBase::Memo::dBaseIV::read_record for memo fields
+	longer than record length by Jochen Friedrich.
+
+0.0583 Thu Feb 12 00:08:07 MET 1998
+
+	Bug fix for floating fields, patch by Carlos Augusto de
+	Almeida.
+
+0.058 Mon Feb  9 19:15:03 MET 1998		(*****)
+
+	XBase::SQL rewritten, DBD::XBase now supports select, delete,
+	insert, update and create table. Documentation for DBD::XBase
+	extended. DBD::XBase is still alpha but rther stable.
+
+	Added support for fpt memo files.
+
+	Fixed bug with dBase IV memo files, the block length is stored
+	somewhere else, patch by James LewisMoss. Fixed bug with field
+	names in newer dbf files, terminated by zero byte, patch by Petr
+	Olsak. Added binmode for the OSes that write to disk something
+	else that they are told to, reported by Robert Bauer. Removed
+	the test that caused read to fail on read-only files, reported
+	by Stewart Russell.
+
+	The error handling reviewed, most of the error messages are
+	now local to the object ($table->errstr()).
+
+0.039  Wed Dec 17 19:53:49 MET 1997		(*****)
+
+	DBD::XBase supports select where and delete where.	
+
+0.0352 Mon Dec 15 11:29:46 MET 1997
+	
+	Fixed bug with long memo fields, reported by Tejinderpal
+	Singh.
+
+0.0345 Mon Dec  8 13:02:46 MET 1997
+
+	Fixed bug with "\0" at the end of field names in header,
+	spotted by Roberto Congiu.
+
+0.0343 Thu Dec  4 10:52:41 MET 1997
+
+	Column names are converted to uppercase. SQL parsing moved to
+	XBase::SQL module. Added require XBase::Memo when creating new
+	Memo file. Added test for create and drop.
+	
+0.0342 Fri Nov 28 18:30:31 MET 1997
+
+	Fixed bug when creating new file, spotted by Roberto Congiu.
+	$XBase::errstr depreciated, using XBase->errstr instead. Minor
+	changes in the documentation.
+
+0.03301 Thu Nov 20 17:32:53 MET 1997
+
+	Handling null numeric fields (John D Groenveld). Changed
+	"look for error" test in header.t to be OS portable. Fixed bug
+	in decode_version_info (dbtflag). Fixed bug with field length
+	in XBase::create, spotted by Risto Wichman.
+
+0.032 Thu Nov  6 16:27:10 MET 1997
+
+	Fixed bugs: test on "\r" in read_header; check of record
+	number in delete and undelete (spotted by Frans van Loon).
+	Added methods field_lengths and field_decimals and changed
+	*_on_read in [NF] section (spotted by John D Groenveld).
+
+0.031 Thu Oct 30 19:47:37 MET 1997
+
+	Fixed bug in docs about write_record. Changed format of
+	get_field_info to include field number. Fixed bug with decimals.
+
+0.03 Mon Oct 27 23:23:17 MET 1997		(*****)
+
+	Minor bug fixes. XBase::create added. Tests extended. Module
+	released on CPAN.
+	
+0.029 Fri Oct 24 19:34:32 MET DST 1997
+
+	Bug fixes. Added methods for writing dbt files.
+
+	The writing methods are now set_record, set_record_hash and
+	update_record.
+
+0.024 Mon Oct 20 22:17:44 MET DST 1997
+
+	The original release. Includes XBase that reads dbf and dbt
+	and writes dbf (but not dbt ;-) Put on CPAN mainly for other
+	people to test and comment on it.
+
+
+Note: Versions tagged (*****) were major updates and code chnages.
+
+---
+
+I have been using the Xbase(3) module by Pratap Pereira for quite
+a time to read the dbf files, but it had no writing capabilities, it
+was not use strict clean and the author did not support the module
+behind the version 1.07. So I started to make my own patches and
+thought it would be nice if other people could make use of them.
+I thought about taking over the development of the original Xbase
+package, but the interface seemed rather complicated to me.
+
+So with the help of article XBase File Format Description by Erik
+Bachmann on URL
+
+	http://www.e-bachmann.dk/docs/xbase.htm
+
+I have written a new module. It doesn't use any code from Xbase-1.07
+and you are free to use and distribute it under the same terms as Perl
+itself.
+

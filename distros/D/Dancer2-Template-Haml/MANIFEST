@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Dancer2/Template/Haml.pm
+minil.toml
+t/00_compile.t
+t/01_response_content.t
+t/02_response_content_in_data_section.t
+t/03_pod.t
+t/04_pod_coverage.t
+t/views/layouts/main.haml
+t/views/myview.haml
+META.yml
+MANIFEST

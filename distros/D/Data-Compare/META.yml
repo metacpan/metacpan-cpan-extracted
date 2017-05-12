@@ -1,0 +1,26 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.120351'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Compare
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  File::Find::Rule: 0.1
+  Scalar::Util: 0
+resources:
+  bugtracker: https://github.com/DrHyde/perl-modules-Data-Compare/issues/new
+  repository: https://github.com/DrHyde/perl-modules-Data-Compare
+version: 1.25

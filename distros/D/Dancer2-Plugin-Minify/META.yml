@@ -1,0 +1,36 @@
+---
+abstract: 'Minify HTML, JavaScript and CSS'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  HTTP::Request::Common: '0'
+  Module::Build: '0.28'
+  Plack::Test: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Minify
+requires:
+  CSS::Packer: '0'
+  Dancer2::Plugin: '0'
+  HTML::Packer: '0'
+  JavaScript::Packer: '0'
+  perl: '5.010'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer2-plugin-minify-perl/issues
+  homepage: https://github.com/zurborg/libdancer2-plugin-minify-perl
+  repository: https://github.com/zurborg/libdancer2-plugin-minify-perl.git
+version: '0.002'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'
+  - 'Peter Mottram <peter@sysnix.com>'

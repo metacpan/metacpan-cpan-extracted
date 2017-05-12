@@ -1,0 +1,28 @@
+Revision history for Dancer-Template-Caribou
+
+1.0.1 2017-04-02
+  [ BUG FIXES ]
+    - fix discrepancies with the new Template::Caribou interface.
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 117 insertions(+), 242 deletions(-)
+
+1.0.0 2017-02-25
+  [ API CHANGES ]
+    - support Template::Caribou v1.2.0.
+
+  [ STATISTICS ]
+    - code churn: 9 files changed, 64 insertions(+), 44 deletions(-)
+
+0.1.1 2013-05-22
+  [ BUG FIXES ]
+    - Set the version number for the T::C requirement
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 21 insertions(+), 3 deletions(-)
+
+0.1.0 2013-05-20
+  - First version, unleashed on an unsuspecting world.
+
+  [ STATISTICS ]
+    - code churn: 16 files changed, 480 insertions(+), 17 deletions(-)

@@ -1,0 +1,56 @@
+NAME
+    DBIx::Class::InflateColumn::URI - Auto-create URI objects from columns
+
+SYNOPSIS
+    Load this component and then declare one or more columns as URI columns.
+
+      package Resources;
+      __PACKAGE__->load_components(qw/InflateColumn::URI Core/);
+      __PACKAGE__->add_columns(
+          url => {
+              datatype => 'varchar',
+              size => 255,
+              is_nullable => 1,
+              default_uri_scheme => 'http',
+              is_uri => 1,
+          },
+      );
+
+    Then you can treat the specified column as an URI object.
+
+      print 'stringified URI: ', $resource->url, "\n";
+      print 'scheme: ', $resource->url->scheme, "\n";
+      print 'domain: ', $resource->url->host, "\n";
+      print 'path:   ', $resource->url->path, "\n";
+
+DESCRIPTION
+    This module inflates/deflates designated columns into URI objects.
+
+  Methods
+    default_uri_scheme
+        Gets/sets the default scheme to use when no scheme is specified in
+        the URI.
+
+          __PACKAGE__->default_uri_scheme('http');
+
+        You can also set this on a per column basis, as shown in the
+        "SYNOPSIS".
+
+    register_column
+        Chains with the "register_column" in DBIx::Class::Row method, and
+        sets up currency columns appropriately. This would not normally be
+        directly called by end users.
+
+SEE ALSO
+    URI, DBIx::Class::InflateColumn, DBIx::Class.
+
+AUTHOR
+    Nathan Gray <kolibrie@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Nathan Gray
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

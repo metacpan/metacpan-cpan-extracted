@@ -1,0 +1,66 @@
+Revision history for Data-Report
+
+0.10	2008-08-18
+
+	Add column property 'class' for HTML plugin. Can be used to
+	supply a different class from the default h_XXX and c_XXX.
+
+	The special row for headings has been changed from "head" to
+	"_head" to avoid conlicts with ordinary row styles.
+
+0.09	2008-08-07 22:16
+
+	Add column property 'ignore'. Does what the name implies.
+	This change was suggested by Mário Silva.
+
+	Upgrade requirements for Text::CSV to 1.00.
+
+0.08	2008-08-07 14:27
+
+	Allow handling of Latin texts with CSV plugin and Text::CSV_XS.
+	This change was suggested by Mário Silva.
+
+0.07	2008-08-03 16:26
+
+	Add 'raw_html' style mod for HTML plugin. When a cell has this
+	property, the data will be placed in the cell unmodified. This
+	makes it possible to place pre-prepared HTML code in the cell.
+	This change was suggested by Cristina Nunes.
+
+0.05	2006-06-08 15:46
+
+	Better SYNOPSIS + doc fixes.
+
+0.04	2006-06-08 15:20
+
+	Under debian linux, Text::CSV seems to be a wrapper for
+	Text::CSV_XS which caused test t/03csv02.t to fail.
+
+	Under perl 5.6, output was written to a file '*main::STDOUT',
+        since in older perls refering to a filehandle glob needs an
+        additional \.
+
+0.03	2006-05-22 22:03
+
+	Integrate API docs into Data::Report.
+	Add get_type method.
+	Add topheading attribute. Eliminates most needs for
+	$rep->set_heading.
+	Row attribute 'ignore'.
+	Column attribute 'wrap_indent'.
+	Handle alignment < > | in HTML.
+	CSV plugin will use Text::CSV_XS or Text::CSV if installed.
+
+0.02	2006-05-01 23:08
+
+	Small documentation fixes.
+	Prevent DB from being attempted by the CPAN indexer.
+
+0.01    2006-05-01 16:05
+
+        First version, derived from actual working code of a big
+	application. I turned it into a generic CPAN module. During
+	the process, some features may have become unstable, but that
+	will be cured in time. Also, it is possible that revisions of
+	the API will be necessary when new functionality is added.
+

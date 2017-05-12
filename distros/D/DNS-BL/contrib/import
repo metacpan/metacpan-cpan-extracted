@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DNS::BL;
+use Getopt::Std;
+
+use vars qw/$opt_c $opt_q $opt_v $opt_h/;
+
+getopts('c:qvh');
+
+if ($opt_h)
+{ 
+    print <<EOF
+import - import a djdnsbl input file
+
+Usage:
+  import -c connect-string [-q] [-v] [-h] file file ...
+
+  -c connect-string
+    Argument to the 'connect' command.
+
+  -q
+    Be quiet.
+
+  -v
+    Be verbose about progress.
+
+  -h
+    Show this help text.
+
+EOF
+;
+    exit 0;
+}
+
+die "-c connect-string is required\n" unless $opt_c;
+
+my $bl = new DNS::BL;
+
+my @r = $bl->parse("connect $opt_c mode bulk");
+die "DNS::BL error in connect: [$r[0]] - $r[1]\n" 
+    if $r[0] != &DNS::BL::DNSBL_OK;
+
+$|++ if $opt_v;
+
+while (<>)
+{
+    chomp;
+    next unless m/^\d/;
+    my ($net, $rest) = split(/\s+/, $_, 2);
+    $rest =~ s!^\$ - !!;
+    
+    @r = $bl->parse
+	(
+	 qq{add ip $net text "$rest" code 127.0.0.2 without checking}
+	 );
+
+    warn "DNS::BL error in add of $net: [$r[0]] - $r[1]\n" 
+	if $r[0] != &DNS::BL::DNSBL_OK;
+    print "." if $opt_v;
+}
+
+@r = $bl->parse('commit');
+die "DNS::BL error in commit: [$r[0]] - $r[1]\n" 
+    if $r[0] != &DNS::BL::DNSBL_OK;

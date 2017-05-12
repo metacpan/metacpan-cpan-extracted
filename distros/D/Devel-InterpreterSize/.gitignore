@@ -1,0 +1,12 @@
+^Devel-InterpreterSize
+blib/
+MANIFEST
+MANIFEST.bak
+Makefile.old
+pm_to_blib
+META.yml
+MYMETA.json
+MYMETA.yml
+Makefile
+inc/
+

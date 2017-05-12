@@ -1,0 +1,26 @@
+---
+abstract: 'Dancer Plugin Fake Response'
+author:
+  - 'Nicolas Oudard'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.120351'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Fake-Response
+provides:
+  Dancer::Plugin::Fake::Response:
+    file: lib/Dancer/Plugin/Fake/Response.pm
+    version: 0.03
+requires:
+  Dancer: 1.302
+  Dancer::Plugin::REST: 0.04
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

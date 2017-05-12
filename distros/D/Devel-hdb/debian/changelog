@@ -1,0 +1,98 @@
+libdevel-hdb-perl (0.23-1) unstable; urgency=low
+  * Right-click on a variable in the Code Pane to add it to the Watch Pane
+  * Exit code is now displayed properly by the Program Terminated modal (Eli Lindsey)
+  * Child processes listen on the parent process's port + 1, if available
+  * Fix tests running with Devel::Chitin 0.06 which include 'callsite' in Location/stackframe objects
+  * POD fixes
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 26 Jan 2016 15:47:00 -0500
+
+libdevel-hdb-perl (0.21001-1) unstable; urgency=low
+    * Fix for running tests on machines with IPv6 enabled
+    * Typo fix that prevented the WatchPoint module for getting loaded
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 15 Dec 2014 15:47:00 -0500
+
+libdevel-hdb-perl (0.21-1) unstable; urgency=low
+  * New feature: Add a watchpoint by enabling the checkbox next to a watched
+      expression.  Execution will stop when its value changes.
+  * The whole expression is now hilited when mousing over an array or hash
+      element expression.
+  * The stack tab pane is now scrollable.
+
+ -- Anthony Brummett <brummett@cpan.org>  Fri, 12 Dec 2014 10:30:00 -0500
+
+libdevel-hdb-perl (0.20001-1) unstable; urgency=low
+  * Fix bug scrolling the current line into view
+  * fix bug that was discarding keystrokes
+
+ -- Anthony Brummett <brummett@cpan.org>  Mon, 18 Aug 2014 16:23:00 -0500
+
+libdevel-hdb-perl (0.20-1) unstable; urgency=low
+  * Back-end now uses a documented REST api
+  * Added module to communicate with the api - Devel::hdb::Client
+  * Rewritten GUI to use the REST api
+  * Faster page loading when the stack is deep
+
+ -- Anthony Brummett <brummett@cpan.org>  Sat, 16 Aug 2014 10:05:00 -0500
+
+libdevel-hdb-perl (0.13-1) unstable; urgency=low
+  * Extracted a module to transform a Perl data structure into a serializable
+    format: Data::Transform::ExplicitMetadata
+  * Fix a test that failed in Perl 5.21
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 1 Jul 2014 15:30:00 -0500
+
+libdevel-hdb-perl (0.12-1) unstable; urgency=low
+  * Extracted debugger infrastructure into a separate module: Devel::Chitin
+  * Fix a bug when a difference is found in follow mode
+
+ -- Anthony Brummett <brummett@cpan.org>  Tue, 4 Mar 2014 14:55:00 -0500
+
+libdevel-hdb-perl (0.11-1) unstable; urgency=low
+  * Documentation and typo fixes
+  * Stack now shows wantarray-ness
+  * Improved mouseover for hash keys
+  * Bug fixes for scrolling code windows, editing breakpoints, debugging child processes
+
+ -- Anthony Brummett <brummett@cpan.org>  Fri, 31 Dec 2013 14:55:00 -0500
+
+libdevel-hdb-perl (0.10-1) unstable; urgency=low
+  * Fix keybinding problems on multiple browsers
+  * Fix rendering of HTML-like strings in code and data
+  * Send tied values over the wire and render them on the web frontend
+  * Fix undeclared test dependancy on WWW::Mechanize
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 17 Oct 2013 15:25:00 -0500
+
+libdevel-hdb-perl (0.09-1) unstable; urgency=low
+  * After a fork(), the always stop the parent process
+  * Add key bindings similar to the command-line debugger
+  * Sending v-strings and self-referential data structures over the wire now works
+  * Improve test reliability
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 16 May 2013 14:45:00 -0500
+
+libdevel-hdb-perl (0.08-1) unstable; urgency=low
+  * Fix text overflow with the main program tab
+  * Fix bug in the open-file picker
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 16 May 2013 14:45:00 -0500
+
+libdevel-hdb-perl (0.07-1) unstable; urgency=low
+  * Perl value serializer can now handle typeglobs
+  * Opening additional code windows now works
+  * Untrapped exceptions are now caught and shown in the GUI
+  * Added trace/follow mode
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 16 May 2013 14:00:00 -0500
+
+libdevel-hdb-perl (0.06-1) unstable; urgency=low
+  * Hover-over-variable works for hash and array elements, and for (most)
+    Perl special variables.
+  * User is notified immediately after a fork(), rather than waiting until
+    after the next user interaction
+  * Fix for code pane rendering in Firefox
+  * First debian package
+
+ -- Anthony Brummett <brummett@cpan.org>  Thu, 04 Apr 2013 15:36:00 -0500

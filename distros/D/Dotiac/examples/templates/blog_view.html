@@ -1,0 +1,85 @@
+{% extends "blog_base.html" %}
+{% block content %} {# Overwrite the content block from blog_base.html #}
+<div class="blog_entry">
+	<div class="blog_entry_title">{{ entry.title|title }}</div>
+	{# Some more info about the post #}
+	<div class="blog_entry_small">
+		{{ entry.author }} at {{ entry.date|date:"r" }}
+	</div> 
+	<div class="blog_entry_text">
+		{{ entry.content|linebreaks }} {# print the full version here #}
+	</div>
+</div>
+<a name="comments"></a>
+{% for comment in comments %}
+	<div class="blog_comments">
+		<div class="blog_comment">
+			<div class="blog_comment_title">
+				{% if comment.mail %}
+					<a href="mailto:{{ comment.mail }}">{{ comment.author }}</a>
+				{% else %} 
+					{{ comment.author }} 
+				{% endif %} said 
+				{{ entry.date|timesince:comment.date }} later: {# Use timesince or timeuntil for relative timespans #}
+		</div> 
+		<div class="blog_comment_text">
+			{{ comment.content|linebreaks }}
+			<a class="morelink" href="{% url base_url "action"="delete_comment","id"=comment.id %}">Delete</a> 
+		</div>
+		</div>
+	</div>
+{% endfor %}
+
+<div class="post">
+	<form action="{% url base_url %}" method="post">
+		<p class="blog_entry_title">Add a comment</p>
+		{% if cgi.author or cgi.content %}
+		{# Print an error message if needed #} {# This can be done in the template and not in the script #}
+			<p style="border:1px solid red;color:red"><span style="color:black">Error, can't post the comment:</span><br />
+				{% if not cgi.content %}Field "Text" is missing or empty.<br />{% endif %}
+				{% if not cgi.author %}Field "Author" is missing or empty.<br />{% endif %}
+			</p>
+		{% endif %}
+		<p>Author:<br /><input style="width:100%" name="author" value="{{ cgi.author }}" /></p>
+		<p>Email (optional):<br /><input style="width:100%" name="mail" value="{{ cgi.mail }}" /></p>
+		<p>Text (no html allowed):<br /><textarea style="width:100%" rows="8" name="content">{{ cgi.content }}</textarea></p>
+		<input type="submit" value="Post Comment" />
+		<input type="hidden" name="id" value="{{ entry.id }}" />
+		<input type="hidden" name="action" value="{{ action }}" />
+	</form>
+</div>
+
+{% endblock %}
+
+{% block morecss %} {# Add some more stylesheets #}
+			.blog_entry_title {
+				color:#1F20AF;
+				font-weight:bold;
+				font-size:1.5em;
+				margin-top:25px;
+			}
+			.blog_entry_small {
+				font-size:0.8em;
+				color:grey;
+			}
+			.blog_entry_text {
+				padding-left:10px;
+			}
+			.morelink {
+				display:block;
+				text-align:right;
+				font-size:0.7em;
+			}
+			.blog_comment {
+				font-size:0.8em;
+				margin-top:25px;
+			}
+			.blog_comment_title {
+				color:#1F20AF;
+				font-weight:bold;
+			}
+			.blog_comment_text {
+				padding-left:10px;
+			}
+
+{% endblock %}

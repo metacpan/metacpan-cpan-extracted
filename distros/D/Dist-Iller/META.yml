@@ -1,0 +1,108 @@
+---
+abstract: 'A Dist::Zilla & Pod::Weaver preprocessor'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::chdir: '0.1010'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Syntax::Feature::Qi: '0'
+  Syntax::Feature::Qs: '0'
+  Test::Differences: '0'
+  Test::More: '0.96'
+  syntax: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1408, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Iller
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Iller:
+    file: lib/Dist/Iller.pm
+    version: '0.1408'
+  Dist::Iller::Config:
+    file: lib/Dist/Iller/Config.pm
+    version: '0.1408'
+  Dist::Iller::DocType:
+    file: lib/Dist/Iller/DocType.pm
+    version: '0.1408'
+  Dist::Iller::DocType::Cpanfile:
+    file: lib/Dist/Iller/DocType/Cpanfile.pm
+    version: '0.1408'
+  Dist::Iller::DocType::Dist:
+    file: lib/Dist/Iller/DocType/Dist.pm
+    version: '0.1408'
+  Dist::Iller::DocType::Gitignore:
+    file: lib/Dist/Iller/DocType/Gitignore.pm
+    version: '0.1408'
+  Dist::Iller::DocType::Weaver:
+    file: lib/Dist/Iller/DocType/Weaver.pm
+    version: '0.1408'
+  Dist::Iller::Elk:
+    file: lib/Dist/Iller/Elk.pm
+    version: '0.1408'
+  Dist::Iller::Plugin:
+    file: lib/Dist/Iller/Plugin.pm
+    version: '0.1408'
+  Dist::Iller::Prereq:
+    file: lib/Dist/Iller/Prereq.pm
+    version: '0.1408'
+  Dist::Iller::Role::HasPlugins:
+    file: lib/Dist/Iller/Role/HasPlugins.pm
+    version: '0.1408'
+  Dist::Iller::Role::HasPrereqs:
+    file: lib/Dist/Iller/Role/HasPrereqs.pm
+    version: '0.1408'
+  Dist::Zilla::MintingProfile::DistIller::Basic:
+    file: lib/Dist/Zilla/MintingProfile/DistIller/Basic.pm
+    version: '0.1408'
+  Dist::Zilla::Plugin::DistIller::MetaGeneratedBy:
+    file: lib/Dist/Zilla/Plugin/DistIller/MetaGeneratedBy.pm
+    version: '0.1408'
+requires:
+  Carp: '1.38'
+  DateTime: '1.05'
+  Dist::Zilla: '5.000'
+  File::ShareDir: '1.102'
+  File::chdir: '0.1010'
+  JSON::MaybeXS: '1.003003'
+  List::MoreUtils: '0.408'
+  List::Util: '1.42'
+  Module::Load: '0.26'
+  Moose: '2.1400'
+  MooseX::AttributeDocumented: '0.1003'
+  MooseX::AttributeShortcuts: '0.028'
+  MooseX::StrictConstructor: '0.19'
+  Path::Tiny: '0.072'
+  PerlX::Maybe: '1.001'
+  Safe::Isa: '1.000005'
+  String::CamelCase: '0.02'
+  Text::Diff: '1.43'
+  Try::Tiny: '0.24'
+  Types::Path::Tiny: '0.005'
+  Types::Standard: '1.000000'
+  YAML::Tiny: '1.67'
+  namespace::autoclean: '0.18'
+  perl: '5.010000'
+  version: '0.9913'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Iller/issues
+  homepage: https://metacpan.org/release/Dist-Iller
+  repository: https://github.com/Csson/p5-Dist-Iller.git
+version: '0.1408'
+x_authority: cpan:CSSON

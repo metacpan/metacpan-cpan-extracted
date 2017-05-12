@@ -1,0 +1,1 @@
+lib/systemd/system/daemon-shutdown.service etc/systemd/system/multi-user.target.wants/daemon-shutdown.service

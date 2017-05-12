@@ -1,0 +1,45 @@
+{
+   "abstract" : "Compiles a MOF file",
+   "author" : [
+      "Stephen James Hurd <shurd@broadcom.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DMTF-CIM-MOF",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DMTF::CIM" : "0",
+            "Exporter" : "5.57",
+            "Storable" : "0",
+            "Test::More" : "0",
+            "version" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "v0.5.0"
+}

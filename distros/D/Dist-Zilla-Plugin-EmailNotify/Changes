@@ -1,0 +1,20 @@
+0.004   02.01.15
+        * Use the correct way of retrieving distribution metadata.
+          (Thanks, Karen Etheridge!)
+        * Declare appropriate bugtracker.
+          (Thanks, Karen Etheridge!)
+        * Improved grammar.
+          (Thanks, Gregor Herrmann and Debian packagers!)
+        * Remove Module::Build as an installer.
+          (Thanks, Karen Etheridge!)
+        * Move license to MIT.
+
+0.003   07.02.15
+        * Provide more information (last log entry, authors, etc.)
+          (Dominique Dumont - great job!)
+
+0.002   13.07.11
+        * Some POD cleanups, no functional changes.
+
+0.001   12.07.11
+        * It works!

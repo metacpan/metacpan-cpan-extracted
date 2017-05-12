@@ -1,0 +1,25 @@
+Revision history for Dezi-Stats
+
+0.001006 1 Nov 2013
+ - pod tests only with RELEASE_TESTING=1
+
+0.001005 5 Feb 2013
+ - add schema() docs
+ - add DBI->table_name method
+
+0.001004 13 Nov 2012
+ - now supports remote_user() or user() method on the $request object,
+   preferring remote_user().
+
+0.001003 1 Nov 2012
+ - add 'total' to logged stats
+
+0.001002 20 Aug 2012
+ - add URI 'path' to logged stats
+
+0.001001 20 Aug 2012
+ - fix number of tests, and prereq tests
+
+0.001000 17 Aug 2012
+ - First version, released on an unsuspecting world.
+

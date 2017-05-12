@@ -1,0 +1,208 @@
+[% FILTER null %]
+[% SET root_dir = "../"; ##-- dstar root dir %]
+[%
+  #------------------------------------------------------------
+  # globals
+  PROCESS "dc-common.ttk"
+%]
+[% SET html_title = (diacollo_standalone ? ("DiaCollo: " _ root_title) : (root_title _ ": DiaCollo")) %]
+[% END FILTER null %]
+[% cdb.cgi('header','-type'=>'text/html') %]
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html lang="en-US" xml:lang="en-US" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+  <title>[% html_title %]</title>
+  [% PROCESS "dc-html-head.ttk" favicon_url=diacollo_icon %]
+  <script id="diacolloResponseData" type="text/javascript">
+    dcpData = null; //-- populated dynamically to enable GUI functionality when using browser "Save As" function
+  </script>
+  <script type="text/javascript">
+    \$(document).ready(dqReady);
+  </script>
+</head>
+  <body>
+    <div class="outer">
+      <div class="headers">
+	<a href="[% root_url %]" style="float: right;"><img class="dlogo" src="[% diacollo_logo | url %]"/></a>
+	<h1>[% html_title %]</h1>
+	<form id="dqForm" method="get">
+	  <table class="headerTable"><tbody>
+	    <!-- -->
+	    <tr title="Target token DDC query or space- or comma-separated list LEMMA or /REGEX/ or \$ATTR={VAL1,...,VALn} or \$ATTR=/REGEX/[gimsx]*">
+	      <td><label class="hl1" for="in_query">query:</label></td>
+	      <td colspan="3"><input class="hi1" id="in_query" type="text" name="query" size="82" value="[% qquery |html %]"/></td>
+	      <td title="Submit request"><input class="hi1" type="submit" name="_s" value="submit"/></td>
+	    </tr>
+	    <!-- -->
+	    <tr title="Compare vs. DDC query or space- or comma-separated list LEMMA or /REGEX/ or \$ATTR={VAL1,...,VALn} or \$ATTR=/REGEX/[gimsx]*" class="diffpar">
+	      <td><label class="hl1" for="in_bquery">~query:</label></td>
+	      <td colspan="3"><input class="hi1" id="in_bquery" type="text" name="bquery" size="82" value="[% qbquery |html %]"/></td>
+	      <td/>
+	    </tr>
+	    <!-- -->
+	    <tr title="Target date(s) as space-separated LIST or /REGEX/ or range MIN:MAX (inclusive)">
+	      <td><label class="hl1" for="in_date">date(s):</label></td>
+	      <td><input class="hi1" id="in_date" type="text" name="date" size="21" value="[% qdate |html %]"/></td>
+	      <!-- -->
+	      <td title="Aggregate dates into intervals of SLICE years; 0 (zero) requests a date-independent profile" >
+		<label class="hl2" for="in_slice">slice:</label>
+		<input class="hi2" id="in_slice" type="text" name="slice" size="8" value="[% qslice |html %]"/>
+	      </td>
+	      <td/>
+	      <td/>
+	    </tr>
+	    <!-- -->
+	    <tr title="Compare vs. date(s) as space-separated LIST or /REGEX/ or range MIN:MAX (inclusive)" class="diffpar">
+	      <td><label class="hl1" for="in_bdate">~date(s):</label></td>
+	      <td><input class="hi1" id="in_bdate" type="text" name="bdate" size="21" value="[% qbdate |html %]"/></td>
+	      <!-- -->
+	      <td title="Compare vs. dates aggregated into intervals of SLICE years (0: global)" >
+		<label class="hl2" for="in_bslice">~slice:</label>
+		<input class="hi2" id="in_bslice" type="text" name="bslice" size="8" value="[% qbslice |html %]"/>
+	      </td>
+	      <td/>
+	      <td/>
+	    </tr>
+	    <!-- -->
+	    <tr title="Profile scoring function">
+	      <td><label class="hl1" for="in_score">score:</label></td>
+	      <td>
+		<select id="in_score" class="hi1" name="score">
+		  <option value="f"  [% qscore == 'f' ? 'selected="1"' : '' %]>Frequency (f)</option>
+		  <option value="fm" [% qscore == 'fm' ? 'selected="1"' : '' %]>Frequency per Million (fm)</option>
+		  <option value="lf" [% qscore == 'lf' ? 'selected="1"' : '' %]>Log-Frequency (lf)</option>
+		  <option value="lfm" [% qscore == 'lfm' ? 'selected="1"' : '' %]>Log-Frequency per Million (lfm)</option>
+   		  <option value="mi1" [% qscore == 'mi1' ? 'selected="1"' : '' %]>Mutual Information (mi1)</option>
+ 		  <option value="mi3" [% qscore == 'mi3' ? 'selected="1"' : '' %]>Mutual Information&#xb3; (mi3)</option>
+		  <option value="milf" [% qscore == 'milf' ? 'selected="1"' : '' %]>Mutual Information * log f (milf)</option>
+		  <option value="ld" [% qscore == 'ld' ? 'selected="1"' : '' %]>log Dice (ld)</option>
+  		  <option value="ll" [% qscore == 'll' ? 'selected="1"' : '' %]>log likelihood (ll)</option>
+		</select>
+	      </td>
+	      <!-- -->
+	      <td title="Return at most KBEST items per date interval">
+		<label class="hl2" for="in_kbest">kbest:</label>
+		<input class="hi2" id="in_kbest" type="text" name="kbest" size="8" value="[% qkbest |html %]"/>
+	      </td>
+	      <!-- -->
+	      <td id="td_cutoff" class="jr" title="Return only items with score values &gt;= CUTOFF">
+		<label class="hl2" for="in_cutoff">cutoff:</label>
+		<input class="hi2" id="in_cutoff" type="text" name="cutoff" size="8" value="[% qcutoff |html %]"/>
+	      </td>
+	      <!-- -->
+	      <td id="td_diff" title="Low-level diff score selection operation">
+		<label  class="hl2" for="in_diff">diff:</label>
+		<select class="hi2" id="in_diff" name="diff">
+		  <option value="adiff" [% qdiff == 'adiff' ? 'selected="1"' : '' %]>adiff</option>
+		  <option value="diff" [% qdiff == 'diff' ? 'selected="1"' : '' %]>diff</option>
+		  <option value="sum" [% qdiff == 'sum' ? 'selected="1"' : '' %]>sum</option>
+		  <option value="min" [% qdiff == 'min' ? 'selected="1"' : '' %]>min</option>
+		  <option value="max" [% qdiff == 'max' ? 'selected="1"' : '' %]>max</option>
+		  <option value="avg" [% qdiff == 'avg' ? 'selected="1"' : '' %]>avg</option>
+		  <option value="havg" [% qdiff == 'havg' ? 'selected="1"' : '' %]>havg</option>
+		  <option value="gavg" [% qdiff == 'gavg' ? 'selected="1"' : '' %]>gavg</option>
+		  <option value="lavg" [% qdiff == 'lavg' ? 'selected="1"' : '' %]>lavg</option>
+		</select>
+	      </td>
+	      <td/>
+	    </tr>
+	    <!-- -->
+	    <tr title="Profile type">
+	      <td><label class="hl1" for="in_profile">profile:</label></td>
+	      <td>
+		<select class="hi1" id="in_profile" name="profile" onchange="profileSelectChange()">
+		  <option value="2" [% qprofile == "2"   ? 'selected="1"' : '' %]>collocations</option>
+		  <option value="1" [% qprofile == "1"   ? 'selected="1"' : '' %]>unigrams</option>
+		  [% IF tdf_enabled %]<option value="tdf" [% qprofile == "tdf" ? 'selected="1"' : '' %]>term-document matrix</option>[% END %]
+		  [% IF ddc_enabled %]<option value="ddc" [% qprofile == "ddc" ? 'selected="1"' : '' %]>ddc</option>[% END %]
+		  <option value="diff-2"  [% qprofile == "diff-2"  ? 'selected="1"' : '' %]>diff:collocations</option>
+		  <option value="diff-1"  [% qprofile == "diff-1"  ? 'selected="1"' : '' %]>diff:unigrams</option>
+ 		  [% IF tdf_enabled %]<option value="diff-tdf" [% qprofile == "diff-tdf" ? 'selected="1"' : '' %]>diff:term-document matrix</option>[% END %]
+		  [% IF ddc_enabled %]<option value="diff-ddc" [% qprofile == "diff-ddc" ? 'selected="1"' : '' %]>diff:ddc</option>[% END %]
+		</select>
+	      </td>
+	      <!-- -->
+	      <td title="Output format">
+		<label  class="hl2" for="in_format">format:</label>
+		<select class="hi2" id="in_format" name="format">
+		  <option value="gmotion"  [% qformat == 'gmotion' ? 'selected="1"' : '' %]>gMotion</option>
+		  <option value="hichart" [% qformat == 'hichart' ? 'selected="1"' : '' %]>Highchart</option>
+		  <option value="bubble" [% qformat == 'bubble' ? 'selected="1"' : '' %]>Bubble</option>
+		  <option value="cloud" [% qformat == 'cloud' ? 'selected="1"' : '' %]>Cloud</option>
+		  <option value="html" [% qformat == 'html' ? 'selected="1"' : '' %]>HTML</option>
+		  <option value="text" [% qformat == 'text'  ? 'selected="1"' : '' %]>Text</option>
+		  <option value="json" [% qformat == 'json' ? 'selected="1"' : '' %]>JSON</option>
+		  <option value="sto"  [% qformat == 'sto'  ? 'selected="1"' : '' %]>Storable</option>
+		</select>
+	      </td>
+	      <!-- -->
+	      <td class="jr" title="Trim globally (vs. locally for each date-slice)?">
+		<label class="hl2" for="in_global">global:</label>
+		<input class="hi2" id="in_global" type="checkbox" name="global" value="1" [% qglobal ? 'checked="1"' : '' %]/>
+	      </td>
+	      <td/>
+	    </tr>
+	    <!-- -->
+	    <tr title="Space- or comma-separated list of aggregation parameters \$ATTR or \$ATTR={VAL1,...,VALn} or \$ATTR=/REGEX/[gimsx]*">
+	      <td><label class="hl1" for="in_groupby">groupby:</label></td>
+	      <td colspan="1"><input class="hi1" id="in_groupby" type="text" name="groupby" size="42" value="[% qgroupby |html %]"/></td>
+	      <td id="td_onepass" class="jr" title="Use fast but incorrect f2 acquisition method (native collocations only)?">
+		<label class="hl2" for="in_onepass">1pass:</label>
+		<input class="hi2" id="in_onepass" type="checkbox" name="1pass" value="1" [% qonepass ? 'checked="1"' : '' %]/>
+	      </td>
+	      <td class="jr" title="Enable debugging mode?">
+		<label class="hl2" for="in_debug">debug:</label>
+		<input class="hi2" id="in_debug" type="checkbox" name="debug" value="1" [% qdebug ? 'checked="1"' : '' %]/>
+	      </td>
+	      <td/>
+	    </tr>
+	  </tbody></table>
+	  <input type="hidden" id="in_eps" name="eps" value="[% qeps %]"/>
+	</form>
+	<div class="linkbar">[% PROCESS "dc-links.ttk" %]</div>
+      </div>
+      <div class="content">
+	<div class="rawURL"><b>Raw URL:</b> <a id="rawLink" href="[% uprofile |html %]" style="display:none">[% uprofile |html %]</a></div>
+	<div id="statusRel">
+	  <div id="status" class="status" title="(click to dismiss)">
+	    <img class="icon"></img>
+	    <span class="msg">Loading...</span>
+	  </div>
+	</div>
+	<div id="errorDiv" style="display:none;"></div>
+	<pre id="profileDataText" style="display:none;"></pre>
+	<div id="profileDataHtml" style="display:none;"></div>
+	<div id="profileDataD3" style="display:none;">
+	  <div id="d3icons">
+	    <a id="exportBtn" title="Download SVG snapshot of current data display canvas." onclick="d3exportSvg()"><img src="[% root_dir %]images/download-24px.png"/></a>
+	    <a id="kbicon">
+	      <img src="[% root_dir %]images/keyboard-24px.png"/>
+	      <img id="kbiconx" src="[% root_dir %]images/redx-20px.png"/>
+	    </a>
+	    <a id="curspeed" title="Current playback speed (double-click to reset; (shift+)up/down arrow, (shift+)number key to change)">1x</a>
+	  </div>
+	  <!--
+	  <div id="d3transport"><div id="d3buttons"></div><div id="d3slider"></div></div>
+	  <div id="d3main"><div id="d3legend"></div><div id="d3body"></div></div>
+	  -->
+	  <!--<div id="d3content"></div>-->
+	</div>
+	<div id="profileDataChart" style="display:none;"></div>	
+	<div id="profileDataPopup" title="Popup dialog" style="display:none;"></div>
+      </div>
+      <!--/div.content-->
+      <span style="font-family:Impact; color:transparent;">t</span>
+      [% SET html_foot = root_dir _ "html-foot.ttk" %]
+      [% PROCESS $html_foot linkbar=0 linkttk="dc-links.ttk" %]
+      <script type="text/javascript">ttk_elapsed = [% cdb.t_elapsed.json %];</script>
+    </div>
+    <!--/div.outer-->
+  </body>
+</html>
+[%#--
+ ;; Local Variables:
+ ;; mode: nxml
+ ;; coding: utf-8
+ ;; End:
+%]

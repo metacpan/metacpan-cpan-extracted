@@ -1,0 +1,55 @@
+{
+   "abstract" : "Maintain control of SQL queries while still having a layer of abstraction above DBI",
+   "author" : [
+      "Adam Hopkins <srchulo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Raw",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "DBD::SQLite" : "0",
+            "Test::Carp" : "0",
+            "Test::More" : "0",
+            "YAML::XS" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Config::Any" : "0",
+            "Crypt::Blowfish" : "0",
+            "Crypt::CBC" : "0",
+            "Crypt::Mode::CBC::Easy" : "0",
+            "DBI" : "0",
+            "Digest::MD5" : "0",
+            "List::Util" : "0",
+            "MIME::Base64" : "0",
+            "Mouse" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.15"
+}

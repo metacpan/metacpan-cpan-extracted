@@ -1,0 +1,92 @@
+Revision history for Perl extension Db::Documentum.
+
+0.01  Mon Feb 16 11:56:16 1998 EST
+	- original version; created by h2xs 1.1.1.1
+0.9   Mon Feb 16 14:49:00 1998 EST
+	- Initial public release version; created by briansp.
+0.91  Thu Feb 19 13:00:00 1998 EST
+	- Renamed to Db::Documentum at request of PAUSE folks.
+0.92  Web Apr 01 15:30:00 1998 EST
+	- Added prototyping behavior to XSUB definitions.
+	  Added Db::Documentum::Tools.pm module.
+	  Included dm_check_password.pl with distribution.
+1.0   Mon Jan 25 14:54:55 EST 1999
+	- Some changes to the Tools.pm module.  Added username
+	  optional argument to dm_KrbConnect to satisfy my own
+	  needs for shared, anonymous accounts.
+	  Added corresponding code to dm_check_password.pl on server
+	  side to handle shared accounts.
+	  Releasing as version 1.0 just so it doesn't look so beta.
+1.01  (same day) :-)
+	- Made test.pl better.  Fixed MANIFEST problem (I renamed CHANGES).
+	  It helps to test BEFORE you upload. :-)
+1.1   Feb 18, 1999
+	- Added hooks and fixes for easy building under NT.  Added nicer
+	  non-Solaris OS handling in general to Makefile.PL.
+   	- Added dmAPIInit() and dmAPIDeinit() calls in module to automate
+   	  this.  This will require programs that have these functions in
+	  them to remove them, as they're not necessary.
+   	- Cleaned up test suite and simplified it.
+1.2   Oct 13, 1999
+	- Added dm_CreateType and dm_CreateObject functions to Tools.pm.
+	- Further improvements to Makefile.PL.
+	- Added tools_test.pl to test Tools.pm functionality.
+1.3   Feb 2000
+	- Added support for APIs with 4i -- no DFC support yet.
+	- Modified the test.pl script to include tests for the Tools.pm module.
+	- Changed the format of the %ATTRS hash from HoL to just a hash on the
+	  dm_CreateObject sub.
+1.4   September 2000
+  	- Improved makefile.pl
+   	- Included idql.pl in /etc.
+   	- Added dm_CreatePath to Tools.pm
+   	- Added dm_LocateServer to test.pl
+   	- Created HTML versions of POD
+1.5   February 2001
+	- Added "version" subroutine to Documentum.pm. Meant to be invoked at the
+	  command line with:  perl -MDb::Documentum -e Db::Documentum::version
+	- Added tickler.pl in /etc.
+	- Added intro-db-dctm-1-1.pdf in /etc.
+1.51  October 2001
+    - Updated test.pl to include version
+    - Updated idql.pl script
+    - Updated PPM instllation
+    - Included intro-db-dctm-1-2.pdf
+1.52  January 2002
+    - Fixed "bug" in dm_Connect function that produced warning: 'Use of
+      uninitialized value in concatenation (.) at...' on Solaris.  Thanks
+      Mark Faine for identifying it.
+1.53  February  2002
+    - Improved Makefile.PL to better handle windows directories containing
+      spaces (thanks Erik Mayo), verify the existence of key libraies, and
+      improved error checking.
+1.54  July 2003
+    - Corrected fatal logic error in dm_CreatePath sub that didn't create
+      cabinets when necessary.
+    - Added Perl version to "version" subroutine in Documentum.pm.
+    - Added installation data for HP-UX in Makefile.pl (thanks Jonas Linden
+      for providing this info).
+    - Tested with DMCL 5.2
+1.6   September 2004
+    - Added dm_Copy subroutine to Tools module.  dm_Copy will copy a single
+      object, a folder of objects, or deep copy a folder structure.
+    - Added dm_Move subroutine to Tools module.  dm_Move will move a single
+      object, a folder of objects, or deep move a folder structure.
+    - Added dm_Delete subroutine to Tools module. dm_Delete will delete a single
+      object, a folder of objects, or deep delete a folder structure.
+    - Updated test.pl script to include dm_Copy, dm_Move, dm_Delete.
+    - Tested with DMCL 5.2.5 SP2.
+1.61 - January 2006
+     - Recompiled for Documentum 5.3 and Perl 5.8.7
+1.62 - January 2006
+     - Update all occurrences of email to point dm-book.com
+1.63 - April 2006
+     - Corrected packaging error in 1.62 that prevented it from working!
+1.64 - January 2007
+     - Updated Makefile.pl to include Redhat Linux E3 (thanks to Craig Soucie
+       for providing this info)
+     - Updated Makefile.pl to include changes for UNIX to link against
+       dynamic libraries (thanks to Craig Soucie and John Kominetz for providing
+       this info)
+     - Removed dmcl32.lib and pre-5.0 release builds from Makefile.pl
+     - Recompiled for Documentum 5.3 SP3

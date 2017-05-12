@@ -1,0 +1,44 @@
+Revision history for DBIx::Class::Sims::REST (ordered by revision number).
+
+0.0000012 Dec 08 2015 07:00:00 PDT
+   - Remove MYMETA.yml (RT#108881)
+
+0.0000011 Aug 04 2015 07:00:00 PDT
+   - Move a test from t/ to xt/ to stop CPANTS failures I cannot diagnose.
+
+0.0000010 Jan 13 2014 12:30:00 PDT
+   - Even if get_defaults() is overridden, still provide base defaults so that
+     the user doesn't have to set all the defaults.
+
+0.0000009 Jan 12 2014 16:00:00 PDT
+   - Allow the following to be overridden by methods:
+      - get_defaults
+      - sims_options
+      - flatten_for_transport
+   - Fixed the location of the GitHub project.
+
+0.0000008 Jan 06 2014 07:30:00 PDT
+   - Don't use a database name when connecting via root to create it.
+
+0.0000007 Jan 03 2014 11:30:00 PDT
+   - Don't create if deploy isn't also true
+   - Fixed the grant commands for MySQL
+
+0.0.6 Dec 31 2013 08:30:00 PDT
+   - Added final missing dependencies.
+   - Fixed failing test when installing in Vagrant.
+
+0.0.5 Dec 30 2013 21:16:00 PDT
+   - Removed unneeded dependency on Test::Cmd
+
+0.0.4 Dec 30 2013 21:15:00 PDT
+   - Added missing dependency on Test::Cmd
+
+0.0.3 Dec 30 2013 21:00:00 PDT
+   - Added missing dependency on Web::Simple
+
+0.0.2 Dec 30 2013 20:45:00 PDT
+   - Added missing files to MANIFEST
+
+0.0.1 Dec 30 2013 20:00:00 PDT
+   - Initial version

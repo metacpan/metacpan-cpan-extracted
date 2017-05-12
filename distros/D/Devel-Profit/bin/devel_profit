@@ -1,0 +1,37 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Devel::Profit::Cmd;
+Devel::Profit::Cmd->new->run;
+
+__END__
+
+=head1 NAME
+
+devel_profit - A Perl profiler
+
+=head1 SYNOPSIS
+
+
+  % devel_profit help
+  % devel_profit profile sleep.pl
+  % devel_profit file
+  % devel_profit line
+  % devel_profit package
+  % devel_profit subroutine
+  % devel_profit subroutine_line
+
+=head1 DESCRIPTION
+
+L<devel_profit> is a Perl profiler which can profile by file, line,
+package, subroutine and subroutine and line together.
+
+It requires a C compiler and a POSIX monotonic clock.
+
+=head1 AUTHOR
+
+Leon Brocard, C<< <acme@astray.com> >>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2008, Leon Brocard

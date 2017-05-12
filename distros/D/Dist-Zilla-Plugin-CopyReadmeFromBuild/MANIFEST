@@ -1,0 +1,6 @@
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/Plugin/CopyReadmeFromBuild.pm
+t/01-basic.t

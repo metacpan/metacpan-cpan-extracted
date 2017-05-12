@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Dancer/Plugin/EscapeHTML.pm
+t/00-load.t
+t/01-basic.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/lib/TestApp.pm
+t/lib/lib/Foo.pm
+t/lib/views/index.tt
+t/lib/views/excluded.tt
+t/lib/views/object.tt
+META.yml                                 Module meta-data (added by MakeMaker)

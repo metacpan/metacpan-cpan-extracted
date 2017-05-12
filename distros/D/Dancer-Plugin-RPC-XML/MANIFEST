@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Dancer/Plugin/RPC/XML.pm
+t/00-load.t
+t/10-basic.t
+t/pod-coverage.t
+t/pod.t
+t/lib/TestApp.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

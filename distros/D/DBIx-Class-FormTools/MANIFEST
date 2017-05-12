@@ -1,0 +1,27 @@
+Build.PL
+Changes
+lib/DBIx/Class/FormTools.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00.load.t
+t/05.fieldname.t
+t/10.local_attributes.t
+t/20.one_to_many_fields.t
+t/21.one_to_many_fields.t
+t/22.one_to_many_fields.t
+t/30.many_to_many_fields.t
+t/31.many_to_many_fields.t
+t/32.many_to_many_fields.t
+t/40.form.t
+t/lib/Schema.pm
+t/lib/Schema/Actor.pm
+t/lib/Schema/Director.pm
+t/lib/Schema/Film.pm
+t/lib/Schema/Location.pm
+t/lib/Schema/Role.pm
+t/lib/Test.pm
+t/pod-coverage.t
+t/pod.t
+t/sql/sqlite.sql

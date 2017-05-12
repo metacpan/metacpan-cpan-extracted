@@ -1,0 +1,53 @@
+---
+abstract: 'debugger client side code for Padre, The Perl IDE.'
+author:
+  - 'Kevin Dawson <bowtie@cpan.org>'
+build_requires:
+  Exporter: 5.64
+  ExtUtils::MakeMaker: 6.59
+  File::HomeDir: 1
+  File::Spec: 3.4
+  File::Temp: 0.2301
+  Test::CheckDeps: 0.006
+  Test::Class: 0.39
+  Test::Deep: 0.11
+  Test::More: 0.98
+  Test::Requires: 0.07
+  parent: 0.225
+  version: 0.9902
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Debug-Client
+no_index:
+  directory:
+    - eg
+    - inc
+    - t
+    - xt
+recommends:
+  ExtUtils::MakeMaker: 6.66
+  File::Spec::Functions: 3.4
+  List::Util : 1.27
+  Test::Pod: 1.48
+  Test::Pod::Coverage: 1.08
+requires:
+  Carp: 1.20
+  IO::Socket::IP: 0.21
+  PadWalker: 1.96
+  Term::ReadLine: 1.1
+  Term::ReadLine::Gnu: 1.2
+  constant: 1.21
+  perl: 5.10.1
+resources:
+  bugtracker: http://padre.perlide.org/trac/wiki/Tickets
+  homepage: http://padre.perlide.org/trac/wiki/Features/Perl5Debugger
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.perlide.org/padre/trunk/Debug-Client/
+version: 0.29

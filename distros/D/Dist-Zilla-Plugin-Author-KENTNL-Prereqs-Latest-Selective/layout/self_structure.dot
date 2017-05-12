@@ -1,0 +1,10 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Dist::Zilla::Plugin::Author::KENTNL::Prereqs::Latest::Selective" [label="Dist::Zilla::Plugin::Author::KENTNL::Prereqs::Latest::Selective", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Dist::Zilla::Role::PrereqSource" [label="Dist::Zilla::Role::PrereqSource"];
+	"Moose::Object" [label="Moose::Object"];
+	"Moose::Object" -> "Dist::Zilla::Plugin::Author::KENTNL::Prereqs::Latest::Selective" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Dist::Zilla::Role::PrereqSource" -> "Dist::Zilla::Plugin::Author::KENTNL::Prereqs::Latest::Selective" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+}

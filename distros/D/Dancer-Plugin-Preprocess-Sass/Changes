@@ -1,0 +1,13 @@
+Revision history for Dancer-Plugin-Preprocess-Sass
+
+0.031     2014-04-20
+          Fixed a bug with checking if paths are writable.
+
+0.030     2014-04-19
+          Added better path handling.
+
+0.020     2014-04-16
+          Switched to using Dist::Zilla.
+
+0.01      2011-09-20
+          First version, released on an unsuspecting world.

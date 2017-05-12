@@ -1,0 +1,68 @@
+Revision history for Dist-Zilla-Plugin-ContributorsFile
+
+0.3.0 2014-10-25
+ [ENHANCEMENTS]
+ - Don't print out the emails in the CONTRIBUTORS file, as it seems spammer
+   harvest those. (GH#5)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 43 insertions(+), 6 deletions(-)
+
+0.2.6 2014-10-18
+ [DOCUMENTATION]
+ - Improve the SEE ALSO section. (GH#3, Karen Etheridge)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 20 insertions(+), 7 deletions(-)
+
+0.2.5 2014-10-18
+ [BUG FIXES]
+ - Improve wording. (GH#2, Olaf Alders)
+
+ [STATISTICS]
+ - code churn: 3 files changed, 12 insertions(+), 3 deletions(-)
+
+0.2.4 2014-08-31
+ [BUG FIXES]
+ - Wrong file comparison. Aargh.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 9 insertions(+), 2 deletions(-)
+
+0.2.3 2014-08-31
+ [BUG FIXES]
+ - Forgot the 'die' debug statements. Aaaugh.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 8 insertions(+), 3 deletions(-)
+
+0.2.2 2014-08-31
+ [BUG FIXES]
+ - Gracefully deal with a total lack of contributors.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 34 insertions(+), 13 deletions(-)
+
+0.2.1 2014-05-19
+ [BUG FIXES]
+ - Use 'x_contributors' instead of dumpster-diving in other peoples'
+   modules. (RT95626, reported by Slaven Rezic, lots of help from Karen
+   Etheridge).
+
+ [STATISTICS]
+ - code churn: 3 files changed, 42 insertions(+), 28 deletions(-)
+
+0.2.0 2013-03-20
+ [ENHANCEMENTS]
+ - Clarify the message if ContributorsFromGit is not present. [GH#1]
+   (reported by Olaf Alders)
+
+ [STATISTICS]
+ - code churn: 3 files changed, 26 insertions(+), 2 deletions(-)
+
+0.1.0 2013-03-18
+ - First version, unleashed on an unsuspecting world.
+
+ [STATISTICS]
+ - code churn: 4 files changed, 152 insertions(+), 7 deletions(-)
+

@@ -1,0 +1,11 @@
+name = "Data-Util"
+
+module_maker="ModuleBuild"
+allow_pureperl=1
+c_source=['xs-src']
+badges = ['circleci']
+
+[XSUtil]
+needs_compiler_c99 = 1
+generate_xshelper_h = "xs-src/xshelper.h"
+generate_ppport_h = "xs-src/ppport.h"

@@ -1,0 +1,19 @@
+abstract: Spanish holidays for Date::Holidays
+author: Florian Merges <fmerges@cpan.org>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Date-Holidays-ES
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Date::Easter: 0
+  Date::Holidays: 0
+  Date::Holidays::Super: 0
+  DateTime: 0
+  Time::JulianDay: 0
+version: 0.02

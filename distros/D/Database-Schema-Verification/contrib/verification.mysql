@@ -1,0 +1,16 @@
+-- 
+-- Table structure for table `verification`
+-- 
+
+CREATE TABLE `verification` (
+  `id` int(11) NOT NULL auto_increment,
+  `type_id` int(11) NOT NULL default '0',
+  `type` varchar(32) NOT NULL default '',
+  `verified` tinyint(1) default NULL,
+  `dt_added` int(11) NOT NULL default '0',
+  `dt_updated` int(11) NOT NULL default '0',
+  `verified_by` varchar(32) default NULL,
+  `verified_by_ip` int(10) unsigned default NULL,
+  `msg` text,
+  PRIMARY KEY  (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 AUTO_INCREMENT=565 ;

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Add plugin support for the Perl debugger",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.58, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DB-Pluggable",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.58"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Brickyard" : "1.111750",
+            "Brickyard::Accessor" : 0,
+            "Brickyard::Role::Plugin" : 0,
+            "Data::Printer" : 0,
+            "Hook::LexWrap" : 0,
+            "Role::Basic" : 0,
+            "Test::Builder" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "1.112001"
+}

@@ -1,0 +1,86 @@
+NAME
+    Dynamic::Loader - call a script without to know where is his location.
+
+SYNOPSIS
+        The Dynamic::Loader manage the dynamic location of scripts and bundles. 
+        Scripts and bundles are packaged in there own directory.
+        The bundles and scripts locations are discribed on a named configuration file. 
+        The prefix configuration directory can be specified by the $JAVAPERL environnement. 
+        The default directory is $HOME/.perljava/conf, but you can specify a custom
+        prefix with the $JAVAPERL/conf variable.
+    
+        A configuration is <name>.conf with this format:
+            prefix=<absolute path>
+            bin=<relative binary dir>
+            lib=<relative library dir>
+
+DEFAULT SCRIPT AND PARAMS
+    When "Dynamic::Loader" is used, you can specify the script name and his
+    options command: perl -S fromjar.pl scriptname.pl --a=... --b=...
+
+   init()
+    setup libs and bin directories
+
+    #fix lib and script path according to what's given
+
+   Dynamic::Loader::listScripts([patt])
+    Return a list of commands following a pattern listScripts(),
+    listScripts("*.pl"), listScripts("phe*")
+
+    The commands returned here are returned with a relative path to the
+    package they belong to
+
+   Dynamic::Loader::getScript(relative_path)
+    Return the complete path to the given scripts.
+
+    Contrary to listScripts(), this command must return exactly one script
+    and will die if not;
+
+   Dynamic::Loader::getLibs(relative_path)
+    Return the complete path to the given scripts + the complete perl prefix
+    with perl5libs.
+
+   Dynamic::Loader::getExecPrefix()
+    return an array to prepend to execution (perl, includes etc...)
+
+   Dynamic::Loader::whence([pat])
+    return a list of commands with the full path corresponding to a pattern.
+    Think of ls completion in bash
+
+AUTHOR
+    Olivier Evalet, "<olivier.evalet at genebio.com>" Alexandre Masselo
+    "<alex at genebio.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dynamic-loader at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dynamic-Loader>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dynamic::Loader
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dynamic-Loader>
+
+    * AnnoCPAN: Annotated CPAN documentation
+        <http://annocpan.org/dist/Dynamic-Loader>
+
+    * CPAN Ratings
+        <http://cpanratings.perl.org/d/Dynamic-Loader>
+
+    * Search CPAN
+        <http://search.cpan.org/dist/Dynamic-Loader>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2008 Olivier Evalet, Alexandre Masselot all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

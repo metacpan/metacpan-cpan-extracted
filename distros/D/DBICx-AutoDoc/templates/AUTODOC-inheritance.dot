@@ -1,0 +1,16 @@
+/* vim:syntax=dot */
+digraph inheritance {
+    graph [splines=true,model=subset,ratio=auto];
+    node [shape=ellipse];
+    edge [];
+
+    [% FOR class IN inheritance.keys %]
+        [% simplify( class ) %] [ label="[% class %]" ];
+    [%- END %]
+    [% FOR left IN inheritance.keys -%]
+        [%- SET child = simplify( left ) -%]
+        [% FOR parent IN inheritance.$left %]
+            [%- child %] -> [% simplify( parent ) %];
+        [% END %]
+    [%- END %]
+}

@@ -1,0 +1,23 @@
+Revision history for Dancer-Plugin-Catmandu-SRU
+
+0.0403  2016-05-26 15:07:17 CEST
+  - more pod and a demo application
+  - bugfixes
+
+0.0402  2016-02-09 16:33:08 CET
+    - support for default search parameters
+
+0.0401  2016-02-02 14:02:09 CET
+    - fix capping of limit
+    - return diagnostic if schema is missing
+
+0.04  2014-11-28 14:03:30 CET
+    - remove given/when
+
+0.03  2014-05-08 12:25:30 CEST
+    - build with Dist::Milla
+    - docs
+    - tests
+
+0.02    2012-12-04
+    - initial release

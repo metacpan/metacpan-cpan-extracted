@@ -1,0 +1,42 @@
+template: tiny
+layout: main
+plugins:
+    Auth::Extensible:
+        record_lastlogin: 1
+        login_without_redirect: 1
+        realms:
+            config1:
+                provider: Provider::ConfigExtended
+                password_expiry_days: 2
+                users:
+                    - user: dave
+                      pass: beer
+                      name: "David Precious"
+                      roles:
+                          - BeerDrinker
+                          - Motorcyclist
+                    - user: bob
+                      pass: cider
+                      name: "Bob Smith"
+                      roles:
+                          - CiderDrinker
+                    - user: mark
+                      pass: wantscider
+                      name: "Update here"
+            config2:
+                provider: Provider::ConfigExtended
+                priority: 10
+                users:
+                    - user: burt
+                      pass: bacharach
+                    - user: hashedpassword
+                      pass: "{SSHA}+2u1HpOU7ak6iBR6JlpICpAUvSpA/zBM"
+                    - user: mark
+                      pass: wantscider
+                      name: "Update here"
+            config3:
+                provider: Provider::ConfigExtended
+                priority: 2
+                users:
+                    - user: bananarepublic
+                      pass: whatever

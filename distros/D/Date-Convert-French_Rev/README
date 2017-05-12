@@ -1,0 +1,81 @@
+Date::Convert::French_Rev - Jean Forget <JFORGET@cpan.org>
+
+Date conversion using the French Revolutionary calendar.
+
+WHY A NEW VERSION AFTER TEN YEARS?
+
+I  released the  last version  of this  module (0.05)  the same  day I
+released DateTime::Calendar::FrenchRevolutionary  version 0.01. It was
+intended to be the final version of Date::Convert::French_Rev.  So why
+do I release another version ten years later?
+
+Between  2003 and  2013, the  world has  moved on  and CPAN  has moved
+on.  In  2003, UTF-8  was  a promising  technic,  but  not yet  widely
+used. In  2013, UTF-8 *is*  widely used. In  2003, there was a  set of
+CPAN  best  practices:  test   scripts  in  t/*.t  for  example.  Some
+recommanded practices appeared later: META.yml for example. And CPANTS
+was  created  to  provide   a  static  code  analysis  checking  these
+recommanded practices. So  this new version is also  meant to catch up
+with these  recommanded practices. In  other words, I play  the CPANTS
+game and I try to improve my rating by updating this module.
+
+PRESENTATION
+
+This   module  is   a  add-on   to  Mordechai   Abzug's  Date::Convert
+module.  Since  his  module  is  pre-alpha,  mine  is,  too.   Another
+consequence is that  this module allows you to convert  from or to any
+calendar implemented in  Date::Convert.  These calendars are currently
+Gregorian, Julian,  Hebrew and absolute  (which is Julian  Day Number,
+with midnight-to-midnight days instead of noon-to-noon).
+
+This module allows you to pretty-print French Revolutionary dates.
+
+You can use this module even if you do not have Perl on your computer.
+See the alternate install procedure below.
+
+REQUIREMENTS
+
+Roman, by Alexandr Ciornii (CHORNY)
+Date::Convert, by Mordechai Abzug (MORTY)
+Test::Exception, by Adrian Howard (ADIE)
+
+INSTALL
+
+First intall Test::Exception,  Roman.pm and Date::Convert.pm, and then
+install the normal way:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Note: if "make  test" give you a "dubious"  result, one possibility is
+that you  have forgotten to install  Roman.pm. I know,  it happened to
+me!
+
+Or use you favorite CPAN client: CPAN.pm, cpanp, cpanm, dzil, whatever.
+
+ALTERNATE INSTALL
+
+This module can be installed on a perl-less computer!
+
+All you need, on this computer, is:
+  - tar and gzip, or compatible software
+  - a table-aware HTML browser (no Internet connection required if you
+  downloaded the archive from a local network or a CD-ROM)
+  - a printer.
+
+The installation steps are:
+
+- Gunzip and untar the archive.
+- Go to the eg/result subdirectory.
+- Open the various files ending in "en.html" (or, if you are a
+French-speaker, ending in "fr.html") with the HTML browser.
+- Print them.
+That's all!
+
+
+Copyright (c) 2001-2003, 2013,  2015 Jean Forget. All rights reserved.
+This  program  is free  software.   You  can  distribute, modify,  and
+otherwise  mangle Date::Convert::French_Rev  under the  same  terms as
+perl.

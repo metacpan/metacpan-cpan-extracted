@@ -1,0 +1,72 @@
+NAME
+    DBIx::AutoReconnect - restart DBI calls after reconnecting on failure
+
+DESCRIPTION
+    The module wraps "DBI->connect" call with "DBIx::AutoReconnect->connect"
+    call so that any operation with DB connection handle that fails due to
+    connection break ( server shutdown, tcp reset etc etc), is automatically
+    reconnected.
+
+    The module is useful when a little more robustness is desired for a
+    cheap price; the proper DB failure resistance should of course be
+    inherent to the program logic.
+
+SYNOPSIS
+         use DBIx::AutoReconnect;
+
+         my $dbh = DBIx::AutoReconnect-> connect(
+               "dbi:Pg:dbname=template1",
+               "postgres",
+               "password",
+               {
+                    PrintError => 0,
+                    ReconnectTimeout => 5,
+                    ReconnectFailure => sub { warn "oops!" },
+               },
+         );
+
+USAGE
+    "DBIx::AutoReconnect" contains a single method "get_handle" that returns
+    underlying DBI handle, returned from "DBI->connect()".
+
+    The module-specific knobs that can be directly assigned to the object
+    handle, are described below
+
+    ReconnectFailure &SUB
+        Called when "DBI->connect" call fails.
+
+    ReconnectTimeout $SECONDS
+        Seconds to sleep after reconnection attempt fails.
+
+        Default: 60
+
+    ReconnectMaxTries $INTEGER
+        Max number of tries before giving up. The connections are tried
+        indefinitely if "undef".
+
+        Default: 5
+
+NOTES
+    Transactions are not restarted if connection breaks, moreover,
+    "begin_work", "rollback", and "commit" die when called, to protect from
+    unintentional use. To use transactions, operate with the original DBI
+    handle returned by "get_handle". "AutoCommit" is allowed though.
+
+    "RaiseError" is mostly useless with this module, because the DBI errors
+    that may raise the exception, are all wrapped in eval by the connection
+    detector code. The only place where it is useful, is when
+    "ReconnectMaxTries" tries are exhausted, and depending on "RaiseError",
+    the code dies or returns "undef" from the <connect> call.
+
+SEE ALSO
+    DBI, DBIx::Abstract.
+
+COPYRIGHT
+    Copyright (c) 2005 catpipe Systems ApS. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Dmitry Karasik <dk@catpipe.net>
+

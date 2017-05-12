@@ -1,0 +1,29 @@
+---
+abstract: "Dists like OLIVER's"
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200011, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Author-OLIVER
+requires:
+  Dist::Zilla::Plugin::MetaResourcesFromGit: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::ReadmeFromPod: 0
+  Dist::Zilla::PluginBundle::Basic: 0
+  Dist::Zilla::PluginBundle::Filter: 0
+  Dist::Zilla::PluginBundle::Git: 0
+  Dist::Zilla::Role::Plugin: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-OLIVER
+  homepage: https://github.com/ollyg/Dist-Zilla-PluginBundle-Author-OLIVER/wiki
+  repository: git://github.com/ollyg/Dist-Zilla-PluginBundle-Author-OLIVER.git
+version: 1.122720

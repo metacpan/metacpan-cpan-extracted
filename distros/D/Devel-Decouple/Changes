@@ -1,0 +1,13 @@
+Revision history for Devel-Decouple
+
+0.0.1  Mon Mar 12 18:47 2012
+       Initial release.
+
+0.0.2  Fri Mar 30 10:35 2012
+       Documentation clean-up and correction
+       Added tests for native method overrides
+       Added tests for method calls to an uninitialized object
+
+0.0.3  Wed Apr 04 14:55 2012
+       Added missing test dependencies to Makefile.PL
+       More Documentation clean-up

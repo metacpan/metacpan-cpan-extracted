@@ -1,0 +1,58 @@
+{
+   "abstract" : "All your bytes are belong to us",
+   "author" : [
+      "ribasushi: Peter Rabbitson <ribasushi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-PeekPoke",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59",
+            "Test::Exception" : "0.31",
+            "Test::More" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-PeekPoke"
+      },
+      "homepage" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-PeekPoke.git",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Devel-PeekPoke.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#pp"
+   },
+   "version" : "0.04",
+   "x_module_name" : "Devel::PeekPoke"
+}

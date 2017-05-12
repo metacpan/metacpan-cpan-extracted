@@ -1,0 +1,49 @@
+NAME
+    Dist::Zilla::Plugin::PERLANCAR::MetaResources - Set meta resources for
+    dists
+
+VERSION
+    This document describes version 0.03 of
+    Dist::Zilla::Plugin::PERLANCAR::MetaResources (from Perl distribution
+    Dist-Zilla-Plugin-PERLANCAR-MetaResources), released on 2014-08-26.
+
+SYNOPSIS
+    In dist.ini:
+
+     [PERLANCAR::MetaResources]
+
+DESCRIPTION
+    Code is based on Dist::Zilla::Plugin::MetaResourcesFromGit. The
+    difference is the defaults: in this plugin, homepage by default is set
+    to MetaCPAN release page instead of github wiki.
+
+SEE ALSO
+    Dist::Zilla::PluginBundle::Author::PERLANCAR
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-PERLANCAR-MetaResources>
+    .
+
+SOURCE
+    Source repository is at
+    <https://github.com/perlancar/perl-Dist-Zilla-Plugin-PERLANCAR-MetaResou
+    rces>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PER
+    LANCAR-MetaResources>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    perlancar <perlancar@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by perlancar@cpan.org.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,44 @@
+---
+abstract: 'Load a plugin only if a condition is true'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-if
+provides:
+  Dist::Zilla::Plugin::if:
+    file: lib/Dist/Zilla/Plugin/if.pm
+    version: '0.002002'
+  Dist::Zilla::Plugin::if::not:
+    file: lib/Dist/Zilla/Plugin/if/not.pm
+    version: '0.002002'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Role::PluginLoader::Configurable: '0'
+  Dist::Zilla::Util: '0'
+  Eval::Closure: '0'
+  Moose: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-if/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-if
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-if.git
+version: '0.002002'

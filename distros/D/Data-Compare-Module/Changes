@@ -1,0 +1,10 @@
+Revision history for Data-Compare-Module
+
+0.03  2013-05-03 22:35:00 JST
+        - Fixed modules dependency
+
+0.02  2013-05-01 08:43:35 JST
+        - made modules and tests
+
+0.01  2013-04-30 03:43:38 JST
+        - Initial release

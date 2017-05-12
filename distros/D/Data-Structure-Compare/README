@@ -1,0 +1,60 @@
+Data-Structure-Compare
+
+use Data::Structure::Compare qw(structure_compare);
+
+my $data1 = { 1 => { 2 => 3} };
+my $data2 = { 1 => { 2 => 4} };
+
+if (structure_compare($data1, $data2) == 1) {
+    print '$data1 and $data2 have same structure';
+}
+
+When we validate some data with same XSD rules, We need only compare the structure.
+
+When we compare two complex data structure, it is difficult to compare one
+by one key and value.
+
+Test::Deep only could compare same structure with same value.
+sometimes we only need compare structure.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Structure::Compare
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Structure-Compare
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Structure-Compare
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Structure-Compare
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Structure-Compare/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Micheal Song
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

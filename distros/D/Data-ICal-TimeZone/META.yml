@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-ICal-TimeZone
+version:      1.23
+version_from: lib/Data/ICal/TimeZone.pm
+installdirs:  site
+requires:
+    Class::Accessor:               0
+    Class::ReturnValue:            0
+    Class::Singleton:              0
+    Data::ICal:                    0
+    UNIVERSAL::require:            0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

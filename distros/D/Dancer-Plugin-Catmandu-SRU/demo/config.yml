@@ -1,0 +1,13 @@
+charset: "UTF-8"
+plugins:
+    'Catmandu::SRU':
+        store: sru
+        bag: data
+        default_record_schema: dc
+        limit: 200
+        maximum_limit: 500
+        record_schemas:
+            -
+                identifier: "info:srw/schema/1/dc-v1.1"
+                name: dc
+                template: dc.tt

@@ -1,0 +1,22 @@
+Revision history for DBIx::Class::Row::Delta
+
+0.0.5 -- 2014-10-11 20:25:46 UTC
+
+Fixed dist.ini config
+
+Fixed too strict test
+
+
+0.0.3     2012-04-20 15:29:05 Europe/London
+
+Add CONTRIBUTE POD section
+
+
+0.0.2     2012-04-20 15:16:43 Europe/London
+
+POD fix
+
+
+0.0.1     2012-04-20 15:07:29 Europe/London
+
+First release to CPAN.

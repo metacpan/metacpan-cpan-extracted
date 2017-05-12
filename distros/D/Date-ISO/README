@@ -1,0 +1,60 @@
+NAME
+    Date::ISO - Perl extension for converting dates between ISO and
+    Gregorian formats.
+
+SYNOPSIS
+      use Date::ISO;
+      $iso = Date::ISO->new( iso => $iso_date_string );
+      $iso = Date::ISO->new( epoch => $epoch_time );
+      $iso = Date::ISO->new( ical => $ical_string );
+      $iso = Date::ISO->new( year => $year, month => $month,
+                             day => $day );
+      $iso = Date::ISO->new( year => $year, week => $week,
+                             weekday => $weekday );
+
+      $year = $iso->year;
+
+      $iso_year = $iso->iso_year()
+      $iso_week = $iso->iso_week();
+      $week_day = $iso->iso_week_day();
+
+      $month = $iso->month();
+      $day = $iso->day();
+
+    And, for backward compatibility:
+
+      ($yearnumber, $weeknumber, $weekday) = iso($year, $month, $day);
+      ($yearnumber, $weeknumber, $weekday) = localiso(time);
+      ($year, $month, $day) = inverseiso($iso_year, $iso_week,
+                                         $iso_week_day);
+
+DESCRIPTION
+    Convert dates between ISO and Gregorian formats.
+
+  new
+        my $iso = Date::ISO->new( iso => $iso_date_string );
+        my $iso = Date::ISO->new( epoch = $epoch_time );
+
+    Set the time to 2:30:25 on the date specified in $iso_date_string my
+    $iso = Date::ISO->new( iso => $iso_date_string, hour => 2, min => 30,
+    sec => 25 );
+
+    And, since this is a Date::ICal subclass ...
+
+        my $iso = Date::ISO->new( ical => $ical_string );
+        $ical = $iso->ical;
+
+    Accepted ISO date string formats are:
+
+        1997-02-05 (Feb 5, 1997)
+        19970205 (Same)
+        199702 (February 1997)
+        1997-W06 (6th week, 1997)
+        1997W06 (Same)
+        1997-W06-2 (6th week, 2nd day)
+        1997W062 (Same as above)
+        1997-035 (35th day of 1997)
+        1997035 (Same as above)
+
+    2-digit representations of the year are not supported at this time.
+

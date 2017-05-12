@@ -1,0 +1,71 @@
+---
+abstract: 'Dist::Zilla configuration the way CHIM does it'
+author:
+  - 'Anton Gerasimov <chim@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-CHIM
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - examples
+    - corpus
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  Dist::Zilla::PluginBundle::Author::CHIM:
+    file: lib/Dist/Zilla/PluginBundle/Author/CHIM.pm
+    version: '0.052005'
+  Pod::Weaver::PluginBundle::CHIM:
+    file: lib/Pod/Weaver/PluginBundle/CHIM.pm
+    version: '0.052005'
+requires:
+  Dist::Zilla: '5.010'
+  Dist::Zilla::Plugin::Authority: '1.006'
+  Dist::Zilla::Plugin::Bootstrap::lib: '1.001000'
+  Dist::Zilla::Plugin::CheckExtraTests: '0.025'
+  Dist::Zilla::Plugin::Git: '2.023'
+  Dist::Zilla::Plugin::GithubMeta: '0.46'
+  Dist::Zilla::Plugin::MetaProvides::Package: '1.14000001'
+  Dist::Zilla::Plugin::OurPkgVersion: '0.004000'
+  Dist::Zilla::Plugin::PodWeaver: '3.101641'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.133290'
+  Dist::Zilla::Plugin::Test::Compile: '2.001'
+  Dist::Zilla::Plugin::Test::EOL: '0.08'
+  Dist::Zilla::Plugin::Test::Kwalitee: '2.03'
+  Dist::Zilla::Plugin::Test::NoTabs: '0.04'
+  Dist::Zilla::Plugin::Test::Version: '0.002004'
+  Dist::Zilla::Plugin::TravisCI::StatusBadge: '0.005'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0.102'
+  Moose: '2.0'
+  Path::Tiny: '0'
+  Pod::Coverage::TrustPod: '0'
+  Pod::Weaver: '4'
+  Pod::Weaver::Section::SeeAlso: '1.003'
+  Test::CPAN::Meta: '0'
+  namespace::autoclean: '0'
+  perl: '5.008009'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Wu-Wu/Dist-Zilla-PluginBundle-Author-CHIM/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-CHIM
+  repository: https://github.com/Wu-Wu/Dist-Zilla-PluginBundle-Author-CHIM.git
+version: '0.052005'
+x_authority: cpan:CHIM

@@ -1,0 +1,31 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0cc4bba1cbf2f9164db8bb7981dbfb216e9f4570 Build.PL
+SHA1 ff5bb7889fccb2e2298029fb0bf6a162519f1f29 Changes
+SHA1 aebbaf025b1084fe70d4615d7f90e718cf234f12 MANIFEST
+SHA1 55e505d8207947b53c5f4bf0a1765bc449eaba3e META.json
+SHA1 9c768f0ffdb44a9afc556a05a144059b952cfda2 META.yml
+SHA1 d4ce02141da2435db5cf10f6585e613afeea4301 README
+SHA1 cc3311d83f5167e83838b6d90858f2dd08e3ca9e lib/Debian/Dpkg/Version.pm
+SHA1 5deb5dcf616c45a00067cf6f82efeb4eb9dd9ca8 t/100_Dpkg_Version.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk559L0ACgkQC0OgUPgL2Sc8wgCghZDtQkLDh6++DCT43Wr3v5uc
+dN8AniRMKh2R05oCBpduAkSMK8/vW9Tj
+=i820
+-----END PGP SIGNATURE-----

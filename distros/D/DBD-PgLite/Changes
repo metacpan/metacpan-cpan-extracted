@@ -1,0 +1,42 @@
+Revision history for Perl module DBD::PgLite
+
+0.11 Fri Nov 21 15:32:55 2008
+  - Fixed bug in selectall_hashref (by Anton Berezin)
+
+0.10 Wed Nov 19 15:02:24 2008
+  - Fixed bug in sequence support (submitted by Anton Berezin)
+
+0.09 Thu Feb 16 13:45:22 2006
+  - Fixed bug in table aliasing and column disambiguation
+  - Better support for grouped tables in join clause
+
+0.08 Wed Feb 15 10:48:56 2006
+   - Much improved table aliasing support
+
+0.07 Tue Feb 14 14:33:10 2006
+   - prefilter/postfilter
+   - pod change
+
+0.06 Tue Feb 14 11:50:21 2006
+   - Support for implicit nextval() in INSERT statements
+
+0.05 Tue Feb 14 00:20:01 2006
+   - Support for sequences and sequence functions
+   - MirrorPgToSQLite: compatibility fix for PostgreSQL 8.1
+
+0.04 Wed Feb  1 14:25:02 2006
+   - better support for iconv on Solaris (convert function)
+   - slightly improved tests
+   - DBD::PgLite::MirrorPgToSQLite: changed page_limit handling
+   - updated README
+
+0.03 Mon Jan 30 16:50:00 2006
+   - avoid polluting DBI::db namespace
+   - small documentation fixes
+
+0.02 Mon Jan 30 13:59:29 2006
+   - prepared for distribution to CPAN
+
+0.01 Mon Jan 30 13:31:19 2006
+   - original version; created by ExtUtils::ModuleMaker 0.44
+

@@ -1,0 +1,25 @@
+Revision History for Dist-Zilla-PluginBundle-Prereqs
+====================================================
+
+v0.93 2014-05-01
+----------------
+
+[0fb30d4]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2014-05-01 22:05:48 -0400 (3 minutes ago)
+
+Add MinimumPerl to mv_plugins list
+
+Also, elevate Module::CoreList version (as usual)
+
+[9fadb58]
+* Author: Brendan Byrd <Perl@ResonatorSoft.org>
+* Date:   2013-02-28 08:20:05 -0500 (1 year, 2 months ago)
+
+Elevate Module::CoreList version
+Clean up whitespace
+
+
+===================================
+End of changes in the last 365 days
+===================================

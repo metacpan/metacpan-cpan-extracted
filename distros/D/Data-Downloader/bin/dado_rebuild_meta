@@ -1,0 +1,41 @@
+#!/bin/sh -xe
+
+DBFILE=`perl -MData::Downloader -e 'print Data::Downloader::DB->new()->database'`
+TABLE=file_metadata
+
+[ -e $DBFILE ]
+
+SQLITE="sqlite3 $DBFILE"
+TMP_PIVOT_DATA=/tmp/pivotted
+TMP_FIELDS=/tmp/pivotted_fields
+
+echo -e "
+.mode tabs
+select name from metadata_source order by id;
+select '';
+select file,name,value from metadatum order by file;
+" \
+ | $SQLITE \
+ | perl -alnF"\t" -e \
+     'BEGIN { $,="\t"; }
+         1../^$/                       and do { push @fields, $_ if length; next;    };
+         $file_id && $file_id != $F[0] and do { print $file_id,@a{@fields}; %a = (); };
+         ( $file_id, $a{ $F[1] } ) = @F[ 0, 2 ];
+         END { print $file_id,@a{@fields}; print STDERR join ",", @fields if @fields; }
+     ' \
+> $TMP_PIVOT_DATA 2> $TMP_FIELDS
+
+echo "drop table if exists $TABLE;" | $SQLITE
+
+if [ -s "$TMP_FIELDS" ]; then
+    echo "create table $TABLE (file key references file(id), `cat $TMP_FIELDS` ); " | $SQLITE
+else
+    echo "create table $TABLE (file key references file(id) ); " | $SQLITE
+fi
+
+cat <<EOT | $SQLITE
+.separator "\t"
+.import $TMP_PIVOT_DATA $TABLE
+EOT
+
+

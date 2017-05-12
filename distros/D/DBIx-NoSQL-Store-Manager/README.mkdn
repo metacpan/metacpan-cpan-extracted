@@ -1,0 +1,103 @@
+# NAME
+
+DBIx::NoSQL::Store::Manager - DBIx::NoSQL as a Moose object store 
+
+# VERSION
+
+version 0.2.2
+
+# SYNOPSIS
+
+    package MyStore;
+
+    use Moose;
+
+    extends 'DBIx::NoSQL::Store::Manager';
+
+    __PACKAGE__->meta->make_immutable;
+
+# DESCRIPTION
+
+Just like [DBIx::NoSQL](http://search.cpan.org/perldoc?DBIx::NoSQL) is a layer providing the
+flexibility of a NoSQL store on top of [DBIx::Class](http://search.cpan.org/perldoc?DBIx::Class), _DBIx::NoSQL::Store::Manager_
+provides a mechanism to drop and retrieve [Moose](http://search.cpan.org/perldoc?Moose) objects from that store.
+
+As can be seen in the ["SYNOPSIS"](#SYNOPSIS), the store class itself is typically fairly
+bare; most of the work is done by [DBIx::NoSQL::Store::Manager::Model](http://search.cpan.org/perldoc?DBIx::NoSQL::Store::Manager::Model), the
+role the models (i.e., the classes to be stored in the database) must consume.
+
+_DBIx::NoSQL::Store::Manager_ extends [DBIx::NoSQL](http://search.cpan.org/perldoc?DBIx::NoSQL) and inherits all its
+methods.
+
+# METHODS
+
+## new( models => \\@classes )
+
+Creates a new store manager.
+
+### Arguments
+
+- models => \\@classes
+- models => $class
+
+Classes to be imported as models for the store. Namespaces can also be given
+with a trailing `::`, in which case all modules found under that namespace
+will be imported.  If only one class is to be used, it can be passed as a
+single string.
+
+If not given, defaults
+to the `Model` sub-namespace under the store's (e.g., for store
+class `MyStore`, that would be `MyStore::Model::`). 
+
+    my $store = MyStore->new; 
+        # will import MyStore::Model::*
+    
+
+    my $store = MyStore->new( models => [ 'Foo::Bar', 'Something::Else' ] );
+        # imports specific classes
+        
+
+    my $store = MyStore->new( models => [ 'Foo::Bar', 'MyStore::Model::' ] );
+        # imports Foo::Bar and all classes under MyStore::Model::*
+
+## model\_names()
+
+Returns the name of all models known to the store.
+
+## model\_classes()
+
+Returns the full class name of all models known to the store.
+
+## model\_class( $name )
+
+Returns the full class name of the given model.
+
+## create( $model\_name, @args )
+
+## new\_model\_object( $model\_name, @args )
+
+Shortcut constructor for a model class of the store. Equivalent to
+
+    my $class = $store->model_class( $model_name );
+    my $thingy = $class->new( store_db => $store, @args );
+
+# SEE ALSO
+
+\* Original blog entry introducing the module: [http://babyl.dyndns.org/techblog/entry/shaving-the-white-whale](http://babyl.dyndns.org/techblog/entry/shaving-the-white-whale)
+
+## Similar Modules
+
+\* [KiokuDB](http://search.cpan.org/perldoc?KiokuDB)
+
+\* [Elastic::Model](http://search.cpan.org/perldoc?Elastic::Model)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

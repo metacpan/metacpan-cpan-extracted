@@ -1,0 +1,6 @@
+0.0002
+  -reuse coderefs from can
+  -fix restricted class existence check to work on perl 5.18
+
+0.0001
+  -initial release

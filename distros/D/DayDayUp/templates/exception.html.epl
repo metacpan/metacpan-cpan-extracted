@@ -1,0 +1,36 @@
+% use Data::Dumper ();
+% my $self = shift;
+% my $s = $self->stash;
+% my $e = $self->stash('exception');
+% delete $s->{inner_template};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head><title>Exception</title></head>
+    <body>
+        This page was generated from the template
+        "templates/exception.html.epl".
+        <pre><%= $e->message %></pre>
+        <pre>
+% for my $line (@{$e->lines_before}) {
+<%= $line->[0] %>: <%== $line->[1] %>
+% }
+% if ($e->line->[0]) {
+<b><%= $e->line->[0] %>: <%== $e->line->[1] %></b>
+% }
+% for my $line (@{$e->lines_after}) {
+<%= $line->[0] %>: <%== $line->[1] %>
+% }
+        </pre>
+        <pre>
+% for my $frame (@{$e->stack}) {
+<%== $frame->[1] %>: <%= $frame->[2] %>
+% }
+        </pre>
+        <pre>
+% delete $s->{exception};
+%== Data::Dumper->new([$s])->Maxdepth(2)->Indent(1)->Terse(1)->Dump
+% $s->{exception} = $e;
+        </pre>
+    </body>
+</html>

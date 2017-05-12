@@ -1,0 +1,30 @@
+Revision history for Perl extension Data::Faker.
+
+0.10
+    - No significant features, just small fixes.
+    - Turn off redefine warnings ONLY around the timestr definition.
+    - Specify the license ('perl') so it shows up in meta data.
+    - Minor changes to test structure.
+    - Fixed typo in Data::Faker::DateTime test (closes Bug #76209)
+    - Fixed Pod errors and added tests for Pod and Pod coverage (closes Bug #82172)
+
+0.09
+    - Fixed the name of the 'hostname' plugin so 'email' works consistently. (closes Bug #50707)
+    - Don't assume the name of the perl executable during tests (closes Bug #39937)
+    - Ignore warnings from redefining timestr (used in both Data::Faker::DateTime and Benchmark)
+
+0.08  Fri Jan 20 00:35:00 2012
+    - Implemented the 'city' method for Data::Faker::StreetAddress. (closes Bug #65311)
+    - Added a 'job_title' method for Data::Faker::Company.
+
+0.07  Thu Jul 14 08:22:31 2005
+    - Renamed to Data::Faker, probably a better choice in the first place.
+    - Removed unused dependency on Date::Calc
+    - Replaced 'our' with 'use vars', should work on just about any version
+      of Perl now.
+
+0.06  Wed Jul 13 15:19:00 2005
+	- Fixed some packaging problems
+
+0.05  Wed Jul 13 15:10:00 2005
+	- Initial public release (as Text::FakeData)

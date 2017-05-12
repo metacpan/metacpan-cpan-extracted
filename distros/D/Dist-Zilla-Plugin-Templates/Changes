@@ -1,0 +1,110 @@
+Release history for perl-Dist-Zilla-Plugin-Templates
+
+v0.6.4 @ 2016-12-28 20:24 UTC
+
+    -   No user-visible changes.
+
+v0.6.3 @ 2016-12-26 21:02 UTC
+
+    -   "KNOWN BUGS" section added to the manual. `include(…)->pod2text` may munge Unicode
+        characters due to a bug in `Pod::Simple` < 3.28.
+
+    -   Added test for checking Unicode characters. `Pod::Simple` 3.28 is *not* required, but test
+        fixed not to fail.
+
+v0.6.2 @ 2016-11-21 19:34 UTC
+
+    -   Manual improved: Description written, examples added.
+
+    -   `munge` method added to `Dist::Zilla::Plugin::Templates::File`.
+
+    -   `Pod::Simple` 3.32 provides `errata_seen` method. The method is utilized if available.
+
+v0.6.1 @ 2015-10-31 22:59 UTC
+
+    -   Dependency on internal module does not work well: `cpanm` successfully installs
+        `ErrorLogger` (in spite of the fact it is already installed), then fails because
+        `ErrorLogger::Exception::Abort` is not installed. Problem fixed by requiring `ErrorLogger`
+        v0.9.0, not `ErrorLogger::Exception::Abort`.
+
+v0.6.0 @ 2015-10-31 21:54 UTC
+
+    -   `trim` method added to `Dist::Zilla::Plugin::Templates::File`.
+
+    -   All test fail with `Dist::Zilla` 4.x due to lack of `Dist::Zilla::Role::MutableFile` and
+        `:AllFiles` default file finder. It will require noticeable effort to let test pass on old
+        and not supported `Dist::Zilla` version, so the test simply require modern `Dist::Zilla`
+        5.000 (it is released ~ 2 years ago).
+
+    -   Tests updated to work with `ErrorLogger` v0.9.0.
+
+    -   Short license notices used in POD.
+
+    -   Bad link found by `Test::Pod::LinkCheck`. Fixed.
+
+    -   `aspell.en.pws` renamed to `aspell-en.pws` to make Test::Portability happy.
+
+v0.5.3 @ 2015-10-05 19:26 UTC
+
+    -  `namespace::autoclean` 0.16 is explicitly required, because pre-0.16 wipes out overloads
+        (see <https://rt.cpan.org/Ticket/Display.html?id=50938>), it causes test failure.
+
+v0.5.2 @ 2015-09-24 20:14 UTC
+
+    -   Bug fixed: `fill_in` did not pass its arguments to underlying `fill_in_file`.
+
+    -   `use version` added to both modules.
+
+v0.5.1 @ 2015-09-23 11:54 UTC
+
+    -   Some tests fail in case of non-English locale because they expect error messages in
+        English. The test fixed to setup "C" locale at the beginning.
+
+v0.5.0 @ 2015-09-22 10:18 UTC
+
+    -   Before `include` always read a disk file. Now `include` tries to find a file in the
+        distribution first (e. g. in `files` attribute of `Dist::Zilla` object), and uses it if
+        found. If such file is not found in the distribution, disk file is read.
+
+    -   `include` now accepts `Dist::Zilla` files (e. g. objects of
+        `Dist::Zilla::File::InMemory` class).
+
+    -   `include` issues nice error messages if the file argument is not defined, is empty
+        string, or an object of not acceptable class.
+
+v0.4.1 @ 2015-09-19 18:06 UTC
+
+    -   Test fails on some machines because on some machines `pod2text` returns 5 lines, on some
+        others 6 lines, including the last empty line. The test fixed to accept both results to
+        avoid accidental test failure.
+
+v0.4.0 @ 2015-09-18 22:09 UTC
+
+    -   `chomp` method added to `File` class.
+
+    -   `pod2text` method added to `File` class.
+
+    -   Documentation fixed a bit.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.003 @ 2015-08-30 18:40 UTC
+
+    -   `ReadMe.pod` dropped.
+
+    -   Added supporting `Dist::Zilla::Templates::File` class with two methods: `fill_in` and
+        `indent`. Added function `include` to use in templates.
+
+    -   Documentation improved (but still requires more work).
+
+0.002 @ 2015-08-11 23:13 UTC
+
+    -   Test fails on many platforms due to missed `Hook` plugin. Added a hint for `AutoPrereqs`
+        to declare dependency explicitly.
+
+    -   Added an alias for `templates` option, `template`. It helps to avoid mistakes:
+        `Dist::Zilla` silently ignores unknown options.
+
+0.001 @ 2015-08-10 21:08 UTC
+
+    -   The first release. Functionality is implemented, but documentation is not yet completed.

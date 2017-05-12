@@ -1,0 +1,7 @@
+Revision history for Decaptcha-TextCaptcha
+
+0.02  Sun Mar 22 17:50:53 UTC 2015
+    - Used proper method to specify the minimum required perl version.
+
+0.01  Thu Dec 26 01:00:54 UTC 2013
+    - Initial distribution.

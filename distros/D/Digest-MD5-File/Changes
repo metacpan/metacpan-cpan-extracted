@@ -1,0 +1,32 @@
+Revision history for Perl extension Digest::MD5::File.
+
+0.08  Fri Apr  6 19:39:52 2012
+    - Address rt 76174
+    - Address rt 44106
+    - Address rt 39898
+
+0.07  Thu Jul 23 10:31:33 2008
+    - rt 34703
+    - argument logic before filehandle fetch so that they'll apply
+    - read small chunk of file handles instead if readline() to avoid various issues
+    
+0.06  Sat Nov 24 12:15:26 2007
+    - rt 30618
+    - rt 29653
+    - two more tests
+
+0.05  Wed Jun  7 18:35:42 2006
+	- made it still load under perl's without Encode (older than 5.7.3) (of course Encoding doesn't work...)
+
+0.04  Tue Jan  3 21:23:44 2006
+	- added dir_* funtions and adddir() method
+
+0.03  Tue Aug 30 20:06:12 2005
+	- fixed import() to resolve bug importing names into packages other than main:: (Thanks Mike MacKenzie for pointing that out)
+
+0.02  Fri Aug 26 18:35:00 2005 
+        - fixed issue with VERSION() that conflicted with UNIVERSAL's VERSION functionality
+
+0.01  Thu Mar 31 09:05:59 2005
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Digest::MD5::File

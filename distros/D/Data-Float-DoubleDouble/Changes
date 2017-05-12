@@ -1,0 +1,52 @@
+Revision history for Perl module Data::Float::DoubleDouble
+
+1.09
+   - Add get_doubles function.
+   - Fix croak() message in DD2HEX XSub. (Replace '%' with '%%' where required.)
+
+1.08
+   - Add dd_bytes function.
+   - Remove valid_hex, valid_bin, valid_unpack - silly ideas in the first place
+
+1.07
+   - Change template for NV2H() and H2NV() from "D<" to "F<", and provide LD2H() and
+     H2LD() - which use the "D<" template.
+   - Rewrite _calculate as an XSub. (I don't trust perl to be always capable of calculating
+     2 ** k correctly.)
+
+1.06
+   - Add NV2binary and express() functions.
+
+1.05
+   - Add DD2HEX and std_float_H functions.
+
+1.04
+    - Add some metadata to Makefile.PL.
+    - Small rewrite of float_B to avoid new warning scheduled for 5.22
+
+1.03
+    - Add some more tests.
+    - Add validate_hex, validate_unpack, validate_bin
+    - Add float_class, float_is_finite, float_is_zero, float_is_nzfinite, float_is_normal,
+      float_is_subnormal, nextafter, nextup, nextdown for compatibility with Data::Float.
+    - Add DD_* vars to reflect the float.h values for the various LDBL_* macros (and for
+      FLT_RADIX).
+    - Define PERL_NO_GET_CONTEXT
+
+1.02
+    - Update version number to the correct value (1.02) ... as opposed to what
+      happened wrt 1.01.
+
+1.01
+    - INCOMPATIBLE WITH EARLIER VERSIONS !!
+    - Refactor, including coverage of those double-doubles whose values require more
+      than 106 bits for accurate representation.
+
+0.03
+    - Alter float_H to, in list context, return (single) sign and (single) exponent, in
+      addition to the hex string and binary string it was already returning in list context.
+
+    - Add some more test files.
+
+0.01
+    - First release.

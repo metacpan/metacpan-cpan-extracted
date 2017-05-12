@@ -1,0 +1,406 @@
+# Copyright (c) 2013-2016 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Data::Checker - a framework for checking data validity
+
+=head1 SYNOPSIS
+
+   use Data::Checker;
+
+   $obj = new Data::Checker;
+
+=head1 DESCRIPTION
+
+A commonly performed task is to have a set of data that you want to
+validate.  Given a set of elements, you want to test each to make sure
+that it is valid, and then break the set into two groups: the group
+that is valid, and the group that is not.  With the group that is not
+valid, you usually want an error message associated with that element
+so you can see why it is not valid.
+
+Although this is an extremely common task, there isn't a convenient
+framework for expressing these tests in, which means that every time
+you want to do this kind of testing, you not only have to write the
+functions for doing the tests, you also have to write the entire
+framework as well.
+
+This module was written to provide the framework around the tests.  A
+number of common test functions are provided, or you can write your
+own, and the framework will take care of the rest.
+
+The framework includes the following commonly desired functionality:
+
+=over 4
+
+=item Automatic handling of the testing
+
+A list of elements is passed in to the framework, and it will
+automatically apply the tests and split the elements into sets of
+passing and failing elements.
+
+=item Running tests in parallel
+
+Many times, testing a piece of data may take a significant amount of
+time, and running them in parallel can greatly speed up the process.
+
+This framework allows you to run any number of the tests in parallel,
+or you can run them serially one at a time.
+
+=item Support for warnings and information messages
+
+Sometimes you want some tests to produce warnings or just
+informational messages for an element, but to still consider them as
+having passed the test.
+
+The level for each test can be specified so that a failure produces an
+informational notice, a warning, or an error.  Only an error means
+that the element fails the test.
+
+=back
+
+=head1 BASE METHODS
+
+=over 4
+
+=item B<new>
+
+   $obj = new Data::Checker;
+
+This creates a new data check framework.
+
+=item B<version>
+
+   $vers = $obj->version;
+
+This returns the version of this module.
+
+=item B<parallel>
+
+   $obj->parallel($n);
+
+In many cases, tests can be run in parallel to speed things up.  By
+default, all tests will be run serially (one at a time) but that
+behavior can be changed using this method.  C<$n> must be a positive
+integer (or zero):
+
+   $n=1  All tests are run serially. This is the default.
+
+   $n>1  $n tests will run at a time.  If there are more
+         elements than this, one will have to finish before
+         another will start.
+
+   $n=0  All of the elements will be tested at the same time.
+
+=item B<check>
+
+   ($pass,$fail,$warn,$info) = $obj->check($data,$check,$check_opts);
+
+This is the function which actually performs the checks.  It takes a
+set of elements (C<$data>) and verifies them using the checks specified
+by C<$check> and C<$check_opts>.  It returns a list of elements that pass
+the check and a list that fail the check.  In addition, informational
+notes and warnings about the elements may also be returned.
+
+The data is passed in as a single data structure (C<$data>) as described
+below in the L</"SPECIFYING DATA"> section.
+
+C<$check> specifies what function to use to perform a check.  It will
+be used to test an individual element to determine whether it passes
+or fails a check.  This is described below in the L</"CHECK FUNCTION"> section.
+
+C<$check_opts> is a hashref that contains options specifying exactly how
+the check is to be performed, and it will be passed to the check
+function.  This is described more fully below in the L</"CHECK OPTIONS">
+section.
+
+=back
+
+=head1 SPECIFYING DATA
+
+Data is passed in to the B<check> method in one of two forms.
+
+The simplest form is a listref.  For example:
+
+   $data = [ 'cow', 'horse', 'zebra', 'oak' ]
+
+Many tests do not require any more than this.  For these, elements
+that pass are returned also as a listref.  Order is NOT preserved
+in the output (C<$pass> and C<$fail>).
+
+Some tests however rely on a description of each element, and
+for these, the data is passed in as a hashref where each key is
+one data element and the value is a description of the elements
+(which will typically be a hashref, but might be a scalar, a listref,
+or some other type of description, and will be documented with the
+function doing the check).
+
+For example:
+
+   $data = { 'apple'  => { 'type'  => 'fruit',
+                           'color' => 'red' },
+             'pear'   => { 'type'  => 'fruit',
+                           'color' => 'yellow' },
+             'bean'   => { 'type'  => 'vegetable',
+                           'color' => 'green' }
+           }
+
+As mentioned, the exact form of the description will be documented with
+the function that is used to do the checks.
+
+When data is passed in as a hashref, the list of elements that pass
+is also a hashref with the description fully preserved.
+
+=head1 CHECK FUNCTION
+
+All checks are performed by a function which takes a single element and
+tests it to see if it passes.  It may perform only a single check on
+an element, or multiple checks.
+
+All check functions take the same set of arguments, and all return the
+same set of values.
+
+The C<$check> argument in the B<check> method provides a pointer to where
+the check function can be found.
+
+C<$check> can be a coderef, in which case you are passing the check
+function in directly.  Alternately, C<$check> can be a string naming the
+check function, or the namespace where it is found.
+
+If C<$check> is a string, the Data::Checker framework will look for a check
+function based on that string.  As an example, if C<$check> is B<Foo::Bar>,
+the following locations will be examined to see if they are a function:
+
+   Foo::Bar
+   Foo::Bar::check
+   CALLER::Foo::Bar
+   CALLER::Foo::Bar::check
+   Data::Checker::Foo::Bar
+   Data::Checker::Foo::Bar::check
+
+where B<CALLER> is the package of the calling routine.  The first one
+which refers to a function will be used.  The appropriate module will
+be loaded as necessary.
+
+A check function is always called as follows:
+
+   ($element,$err,$warn,$info) =
+     FUNCTION($obj,$element,$description,$check_opts);
+
+The arguments to the check function are:
+
+=over 4
+
+=item $obj
+
+C<$obj> is the Data::Checker object that was created, and is passed in to
+provide the check function some useful methods provided by the
+framework.  These functions are described below in the
+L</"CHECK FUNCTION METHODS">
+
+=item $element, $description
+
+C<$element> is the element being tested, and C<$description> is the description
+of that element.
+
+If the list of elements was specified as a listref, C<$element> will be one
+value from that listref and C<$description> will be undef.
+
+If the list of elements was specified as a hashref, C<$element> will be one
+of the keys from that hashref and C<$description> will be the value of that
+key.
+
+=item $check_opts
+
+C<$check_opts> is the hashref that was passed in to the B<check> method
+and is described in the L</"CHECK OPTIONS"> section.
+
+=back
+
+The check function always returns the following values:
+
+=over 4
+
+=item $element
+
+This is the element that was passed in as an argument.  It must be
+returned so that when parallel testing is done, the parent can easily
+determine which element was being checked by a finished thread.
+
+=item $err
+
+This is a listref of error messages.  If this is undefined or empty,
+then the element passed the test.
+
+=item $info, $warn
+
+These are listrefs of informational messages and warnings about this element.
+These are optional.
+
+=back
+
+=head1 CHECK OPTIONS
+
+Options may be passed in to the check function as a hashref.  The form
+of the hashref (what keys/values are allowed) is documented with the
+check function, but the general form is:
+
+   $check_opts = { GLOBAL_OPT_1 => GLOBAL_VAL_1,
+                   GLOBAL_OPT_2 => GLOBAL_VAL_2, ...
+
+                   CHECK_A      => { OPT_A1 => VAL_A1,
+                                     OPT_A2 => VAL_A2, ... }
+                   CHECK_B      => { OPT_A1 => VAL_A1,
+                                     OPT_A2 => VAL_A2, ... }
+                   ... }
+
+There are two types of keys in C<$check_opts>: ones which sets global
+options (which apply to all possible checks that could be done), and
+ones which define exactly what types of checks are performed and
+options that apply only to that check.
+
+All check specific options will override a global option.
+
+The following options are standard:
+
+=over 4
+
+=item level => err, warn, info
+
+The B<level> option (which defaults to 'err') can be set to 'warn' or
+'info'.  If it is, then any element which fails this check will produce
+the appropriate type of message.  It will only result in a failure if
+it is set to 'err'.
+
+=item negate => 1
+
+The B<negate> option can be set to negate the test (i.e. what would have
+been deemed a success it actually a failure and vice versa.
+
+=item message => [ STRING, STRING, ... ]
+
+The message to return if a check fails.  The string __ELEMENT__ will be
+replaced by the element being checked.
+
+=back
+
+For example, doing DNS checks, you might want to specify exactly
+what server to use, and you might want to check that a host is
+defined in DNS (and produce an error if it is not), and warn if it
+does not have a unique IP.  This might be done by passing in:
+
+   $check_opts = { 'nameservers'  => 'my.dns.server',
+                   'dns'          => undef,
+                   'unique'       => { 'level' => 'warn' } }
+
+=head1 CHECK FUNCTION METHODS
+
+In addition to the base methods listed above, the Data::Checker object also
+includes the following methods which are intended to be called inside a
+check function.
+
+=over 4
+
+=item check_performed
+
+   $flag = $obj->check_performed($check_opts,$label);
+
+This checks C<$check_opts> for the existance of a key named C<$label> indicating
+that that check should be performed.
+
+=item check_level
+
+   $level = $obj->check_level($check_opts [,$label]);
+
+Check to see what level ('err', 'info', or 'warn') the check is.  If a check
+is 'err' level, then if it fails, it produces an error.  If it is 'warn'
+level, it produces a warning, but the check is marked as a passing.  If it is
+'info', then if the check fails, it produces an informational message, but the
+check is marked as passing.
+
+=item check_option
+
+   $val = $obj->check_option($check_opts,$opt [,$default [,$label]]);
+
+This returns the value of the given option (C<$opt>) for this check (C<$label>).
+
+If the option is not found, C<$default> is returned (if it is given).
+
+=item check_message
+
+   $obj->check_message($check_opts,$label,$element,$default_message,
+                       $level,$err,$warn,$info);
+
+This produces a message indicating that the check failed and stores it
+in the appropriate listref.
+
+If the 'message' option is available, that message is used.  Otherwise,
+C<$default_message> will be used.
+
+The message can be a string or a listref (a multi-line message).  The
+string __ELEMENT__ will be replaced by the element being tested.
+
+=item check_value
+
+   $obj->check_value($check_opts,$label,$element,$value,
+                     $std_fail,$negate_fail,
+                     $err,$warn,$info);
+
+This will test to see if a check passed or failed.  It takes a value (C<$value>)
+and if it evaluates to true, then by default the check passes (unless the
+'negate' option is present in which case it fails).
+
+The C<$std_fail> is a message (either a string or a listref of strings) that
+will be given when the check fails and the 'negate' option is not set.
+C<$negate_fail> is a similar message that will be given when the check fails
+but the 'negate' option is set.
+
+C<$err>, C<$warn>, and C<$info> are listrefs containing the messages.
+
+If C<$err> is non-empty, an error has occurred.
+
+If the C<$negate_fail> empty is empty, the 'negate' option will be
+ignored.  This is typically used to test an element to see if it is
+the right type of data for this check.  If it isn't, other types of
+checks are typically not able to run.
+
+If C<$label> is empty, the test is always performed.
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+None known.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Data::Checker::DNS>
+
+Predefined DNS checks.
+
+=item L<Data::Checker::Ping>
+
+Predefined checks to see if a host reponds to pings.
+
+=item L<Data::Checker::IP>
+
+Predefined checks to see if an element is a valid IP.
+
+=back
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

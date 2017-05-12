@@ -1,0 +1,22 @@
+Revision history for Device-Chip-MAX7219
+
+0.04    2016/12/10 23:11:25
+        [CHANGES]
+         * Deleted legacy redirection from Device::BusPirate::Chip::MAX7219
+         * Updated for =head2 barename function doc style
+
+0.03    2015/11/12 00:35:58
+        [CHANGES]
+         * Updated for Device::Chip 0.02
+            + ->mount instead of ->connect
+            + Use Device::Chip::Adapter->new_from_description in script
+
+0.02    [CHANGES]
+         * Renamed from Device::BusPirate::Chip::MAX7219
+         * Changed to implement Device::Chip interface
+
+Previously, this distribution was called Device-BusPirate-Chip-MAX7219
+
+0.01    2014/11/01 17:02:03
+        First version, released on an unsuspecting world.
+

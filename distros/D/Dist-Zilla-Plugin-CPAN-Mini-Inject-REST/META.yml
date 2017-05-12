@@ -1,0 +1,36 @@
+---
+abstract: 'Uploads to a L<CPAN::Mini::Inject> mirror using L<CPAN::Mini::Inject::REST>'
+author:
+  - 'Alastair McGowan-Douglas <altreus@altre.us>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CPAN-Mini-Inject-REST
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Zilla::Plugin::CPAN::Mini::Inject::REST:
+    file: lib/Dist/Zilla/Plugin/CPAN/Mini/Inject/REST.pm
+    version: '0.004'
+requires:
+  CPAN::Mini::Inject::REST::Client::API: '0'
+resources:
+  bugtracker: https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST/issues
+  homepage: https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST
+  repository: https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST.git
+version: '0.004'
+x_contributors:
+  - 'Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>'
+  - 'Colin Newell <colin@opusvl.com>'

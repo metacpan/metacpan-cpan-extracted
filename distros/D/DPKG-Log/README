@@ -1,0 +1,34 @@
+DPKG::Log version 0.01
+======================================
+DPKG::Log is an object-oriented interface to parse and analyse
+logfiles as written by the dpkg package manager.
+
+It can be used to get objects of all entries in a logfile
+or to extract specific information such as packages
+installed in a given logfile, packages upgraded or
+removed packages.  
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+DateTime
+DateTime::Format::Strptime
+DateTime::TimeZone
+Params::Validate
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Patrick Schoenfeld <patrick.schoenfeld@credativ.de>
+
+This library is free software.
+You can redistribute it and/or modify it under the same terms as perl itself.

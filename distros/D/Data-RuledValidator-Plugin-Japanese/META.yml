@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-RuledValidator-Plugin-Japanese
+version:      0.04
+version_from: lib/Data/RuledValidator/Plugin/Japanese.pm
+installdirs:  site
+requires:
+    Data::FormValidator::Constraints::Japanese: 0.04
+    Data::RuledValidator:          0.1
+    Number::Phone::JP:             
+    Test::More:                    
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

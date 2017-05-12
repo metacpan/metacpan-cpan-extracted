@@ -1,0 +1,25 @@
+2015-09-23  Kingpin  <Martin@EV-9D9>
+
+	* lib/Devel/Todo/Find.pm (_gather_todos): ignore .git, .subversion, *.tar
+
+2015-04-29  Kingpin  <Martin@EV-9D9>
+
+	* MANIFEST.SKIP: reverted authoring environment to Module::Install
+
+2015-04-26  Kingpin  <Martin@EV-9D9>
+
+	* dist.ini: new file, converted authoring environment to Dist::Zilla
+
+2014-10-15  Kingpin  <Martin@EV-9D9>
+
+	* todos.t: better testing of tilde files
+
+2010-12-21  Kingpin  <Martin@BLUEMAX>
+
+	* Find.pm (todos): added wantarray mode
+
+2010-12-06  Kingpin  <Martin@BLUEMAX>
+
+	* Find.pm (ignore_dirs): new method
+	(add_files): new method
+	(ignore_files): new method

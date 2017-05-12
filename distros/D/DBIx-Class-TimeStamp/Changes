@@ -1,0 +1,51 @@
+Revision history for DBIx::Class::TimeStamp
+
+0.14 2010-09-05 15:00:00
+    - Release with fixed-up Module::Install/META.yml
+    - Bump run-time dependencies to minimal usable level
+
+0.13 2010-05-21 18:20:00
+    - Changing resolution of tests to not use seconds, RT #48385
+    - Changing comparison in tests to support Test::More 0.96, RT #57746
+
+0.12 2009-06-30 22:25:17
+    - Ship with a pregenerated sql schema for the tests to avoid the test
+      dependency on SQL-Translator.
+
+0.11 2009 07-32 14:43:00
+    - Make sure tests run at the 'top' of the second to reduce pointless
+      errors resulting when your test time crosses the second limit.
+
+0.10 2009 07-32 13:55:00
+    - Restored the MySQL formatter to the build requires to silence test
+      failures.
+
+0.09 2009 07-21 20:45:00
+    - Changed some dependencies in the Makefile.PL so that we find the correct
+      datetime formatter class for the SQLite testing
+
+0.08 2009-04-24 00:39:45
+    - Adds the missing description to the NAME section (Brian Cassidy).
+
+0.07 2009-01-20 07:31:00
+    - Removing the checks for timestamp, and only looking at
+      set_on_(create|update)
+
+0.06 2008-08-26 05:33:00
+    - Port to DBIx::Class::DynamicDefault (Florian Ragwitz)
+
+0.05 2007-10-30 00:00:00
+    - Some release
+
+0.04 2007-04-27 08:41:00
+    - Incorporating LTJake's patch to not clobber set values, LTJake++
+
+0.03 2007-04-03 19:09:00
+    - Making the data_type check to be case insensitive, fixing Ticket 26081
+
+0.02 2007-03-23 12:27:00
+    - Updated test suite
+
+0.01 2007-03-11 08:27:00
+    - Initial revision
+

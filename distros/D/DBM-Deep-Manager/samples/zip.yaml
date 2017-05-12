@@ -1,0 +1,20 @@
+---
+perl: |
+  use Compress::Zlib;
+  %params = (
+      filter_store_key => \&my_compress,
+      filter_store_value => \&my_compress,
+      filter_fetch_key => \&my_decompress,
+      filter_fetch_value => \&my_decompress,
+  );
+  sub my_compress {
+      my $s = shift;
+      utf8::encode($s);
+      return Compress::Zlib::memGzip( $s ) ;
+  }
+  sub my_decompress {
+      my $s = Compress::Zlib::memGunzip( shift ) ;
+      utf8::decode($s);
+      return $s;
+  }
+

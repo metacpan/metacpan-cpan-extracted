@@ -1,0 +1,5 @@
+cover_db
+_build
+blib
+^Build$
+MYMETA\..*

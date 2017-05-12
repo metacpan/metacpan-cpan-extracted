@@ -1,0 +1,75 @@
+Revision history for Date::Hijri::Simple
+
+0.18  Mon Jan 16 12:55:00 2017
+      - Updated the dependency on Date::Utils v0.22.
+
+0.17  Thu Dec 15 11:00:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.16  Fri Nov 04 05:35:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.15  Thu Aug 04 12:10:00 2016
+      - Updated the dependency on Date::Utils v0.21.
+
+0.14  Tue Jul 19 11:30:00 2016
+      - Dropped method get_calendar() as it's no longer relevant here.
+      - Updated copyright year information in README file.
+
+0.13  Thu May 26 10:35:00 2016
+      - Fixed missing pre-reqs as reported by CPANTS.
+      - Updated the dependency on Date::Utils v0.20.
+      - Removed commented lines of code.
+
+0.12  Tue May 17 10:35:00 2016
+      - Updated the dependency on Date::Utils v0.19.
+      - Updated method get_calendar() and method as_string() to use get_month_name().
+      - Renamed method hijri_months() to months().
+      - Renamed method hijri_days() to days().
+      - Updated method get_calendar() to respect the above changes.
+
+0.11  Sun Apr 24 11:20:00 2016
+      - Updated the dependency on Date::Utils v0.16.
+
+0.10  Thu Mar 17 16:25:00 2016
+      - Added $AUTHORITY.
+      - Added section "SEE ALSO".
+      - Fixed typo in the pod document.
+      - Updated copyright year information.
+
+0.09  Tue Aug 25 10:30:00 2015
+      - Added the dependency on Date::Utils v0.11.
+      - Updated method validate_day() to make use of Date::Exception package.
+
+0.08  Thu Jul 16 04:35:00 2015
+      - Added the dependency on Date::Utils v0.10.
+      - Added method get_calendar().
+
+0.07  Sat Jul 04 20:00:00 2015
+      - Added the dependency on Date::Utils v0.09.
+      - Updated sample code in the section "SYNOPSIS".
+
+0.06  Thu Jun 25 11:40:00 2015
+      - Updated method to_gregorian() to return (yyyy,mm,dd) to be consistent with other Date::* packages of mine.
+      - Updated unit test to respect the above changes.
+      - Tidied up POD document in general.
+
+0.05  Mon Jun 22 11:40:00 2015
+      - Added unit test method from_gregorian() and from_julian().
+      - Updated section "SYNOPSIS" and added example for the above two methods.
+
+0.04  Tue Jun 16 10:35:00 2015
+      - Updated the method validate_day() to handle undef appropriately.
+
+0.03  Mon May 25 02:30:00 2015
+      - Removed the dependency on Date::Utils::Hijri.
+      - Added the dependency on Date::Utils v0.08.
+      - Added the dependency on List::Util v1.41.
+      - Merged the code Date::Utils::Hijri into Date::Hijri::Simple.
+      - Updated code in the section "SYNOPSIS".
+
+0.02  Thu Apr 23 23:30:00 2015
+      - Re-structured and consumed Date::Utils::Hijri as Moo Role.
+
+0.01  Sun Apr 19 10:45:00 2015
+      - First version, released.

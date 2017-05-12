@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+
+# browse_test.pl
+# dumper a grab of a database schema in browse format
+# see docs in DBR::Config::Schema for browse() method.
+# sample usage: see examples/music/browse_test.sh
+# the 'query' class instance will be used unless specified
+# try: $info = $inst->schema->browse( with_ids => 1 ) at line 31
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+use DBR;
+use DBR::Util::Logger;
+
+my $logger = new DBR::Util::Logger(-logpath => '/tmp/dbr_browse_test.log', -logLevel => 'warn') or die "no logger!\n";
+
+my $conf = shift @ARGV or die "\nusage: $0 <path to DBR conf file> <schema handle> [ <class> ]\n\n";
+my $dbr  = new DBR( -logger => $logger, -conf => $conf ) or die "\nno dbr - check config file path\n\n";
+
+my $schema_handle = shift @ARGV
+  or die  "\nneed schema handle - one of: " . join( ', ', map { $_->{handle} } @{ DBR::Config::Schema->list_schemas } ) . "\n\n";
+my $class = shift @ARGV || 'query';
+my $inst  = $dbr->get_instance( $schema_handle, $class || 'query' )
+  or die "\nno instance for schema handle [$schema_handle] class [$class]\n" .
+  "check handle spelling or availability of [$class] class\n" .
+  "or specify a valid class.\n\n";
+
+my $info = $inst->schema->browse or die "\nfailed to get browse info!\n\n";
+die "\nlooks like an instance for this schema has not been scanned yet\n" .
+  "this might work you:  perl -I ../lib ./dbr-scan-db $conf $schema_handle\n\n" unless $info->{schema}->{tables};
+
+print "BROWSE INFO:\n", Dumper( $info );
+
+1;

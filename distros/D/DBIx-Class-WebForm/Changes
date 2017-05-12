@@ -1,0 +1,7 @@
+Tis file documents the revision history for Perl extension DBIx::Class::WebForm.
+
+0.02  2006-01-27 21:20:00
+        - Only insetr column values for which we have values
+
+0.01  2005-10-24 00:00:00
+        - first release

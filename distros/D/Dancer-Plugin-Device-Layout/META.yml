@@ -1,0 +1,35 @@
+---
+abstract: "Dancer v1 plugin Dancer::Plugin::Device::Layout dynamically changes layout to match user agent's best layout."
+author:
+  - 'BURNERSK <burnersk@cpan.org>'
+build_requires:
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 4.300033, CPAN::Meta::Converter version 2.130880'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Device-Layout
+provides:
+  Dancer::Plugin::Device::Layout:
+    file: lib/Dancer/Plugin/Device/Layout.pm
+    version: v0.1.0
+requires:
+  Dancer: 1.3111
+  Dancer::Plugin: 0
+  HTTP::BrowserDetect: 1.51
+  perl: 5.010000
+  strict: 0
+  utf8: 0
+  version: 0.77
+  warnings: 0
+resources:
+  bugtracker: https://github.com/burnersk/Dancer-Plugin-Device-Layout/issues
+  homepage: http://p3rl.org/Dancer::Plugin::Device::Layout
+  license: http://opensource.org/licenses/artistic-license-2.0
+  repository: git://github.com/burnersk/Dancer-Plugin-Device-Layout.git
+version: v0.1

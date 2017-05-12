@@ -1,0 +1,67 @@
+{
+   "abstract" : "PerlTidy in Dist::Zilla",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Mark Gardner <mjgardner@cpan.org>",
+      "Kent Fredric <kentfredric@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-PerlTidy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "5.0",
+            "File::Copy" : "0",
+            "Path::Iterator::Rule" : "0",
+            "Perl::Tidy" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fayland/dist-zilla-plugin-perltidy.git",
+         "web" : "https://github.com/fayland/dist-zilla-plugin-perltidy"
+      }
+   },
+   "version" : "0.21",
+   "x_contributors" : [
+      "Alexei Znamensky <russoz@cpan.org>",
+      "Mark Gardner <gardnerm@gsicommerce.com>",
+      "Michael Jemmeson <mjemmeson@cpan.org>",
+      "Robin Smidsrød <robin@smidsrod.no>",
+      "Steven Lee <stevenwh.lee@gmail.com>",
+      "fayland <fayland@gmail.com>",
+      "kentfredric <kentfredric+gravitar@gmail.com>"
+   ]
+}
+

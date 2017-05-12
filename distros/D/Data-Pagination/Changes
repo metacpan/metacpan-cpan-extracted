@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::Pagination
+
+0.44  Thu Mar 26 06:18:00 2010
+    - fixed a stupid mistake.
+
+0.43  Thu Mar 25 05:53:00 2010
+    - added array with set of pages.
+
+0.37  Mon Sep 21 23:52:00 2006
+    - the first working version.

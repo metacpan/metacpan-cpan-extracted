@@ -1,0 +1,46 @@
+Revision history for Dezi-Client
+
+0.003004 01 Dec 2015
+ - switch from namespace::sweep to namespace::autoclean
+
+0.003003 05 Nov 2015
+ - fix packaging error https://rt.cpan.org/Ticket/Display.html?id=108261
+
+0.003002 30 April 2015
+ - fix references to File::Slurp
+ - fix facet definition (HashRef not ArrayRef)
+ - added example dezi server config for running tests
+
+0.003001 13 April 2014
+ - add tests for reserved field mtime
+ - add _fields private attribute to preserve pre-0.3 get/set field feature
+
+0.003000 11 April 2014
+ - rewrite to use Moo, LWP::MediaTypes and Type::Tiny
+ - drop SWISH::Prog::Utils
+
+0.002002 02 March 2014
+ - change !$query to !defined $query in dezi-client bin
+ - die on !$response in dezi-client bin
+
+0.002001 17 Oct 2012
+ - add Response->suggestions
+
+0.002000 11 Sept 2012
+ - doc fixes
+ - add username/password support for Dezi 0.002000.
+
+0.001003 3 Sept 2012
+ - add commit() and rollback()
+
+0.001002 22 Aug 2012
+ - improve usage statement
+ - add server_params
+
+0.001001 22 Oct 2011
+ - add get_field and set_field to Dezi::Doc
+ - added bin/dezi-client example application
+
+0.001000 29 Sept 2011
+ - First version, released on an unsuspecting world.
+

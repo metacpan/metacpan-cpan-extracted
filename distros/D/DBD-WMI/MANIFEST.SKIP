@@ -1,0 +1,16 @@
+.cvsignore$
+^.lwpcookies
+^.releaserc$
+^blib/
+^DBD-WMI-.*
+CVS/
+^pm_to_blib
+.tar.gz$
+.old$
+^\.git/
+.*.bak$
+.*.ts$
+^MYMETA.*$
+^Makefile$
+^cvstest$
+^blibdirs$

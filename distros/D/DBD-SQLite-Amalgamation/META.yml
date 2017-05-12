@@ -1,0 +1,13 @@
+name:         DBD-SQLite-Amalgamation
+version:      3.6.1
+installdirs:  site
+no_index: 
+  package: 
+    - DBD::SQLite
+  file: 
+    - lib/DBD/SQLite.pm
+requires:
+    DBI: 1.21
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

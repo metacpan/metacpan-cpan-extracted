@@ -1,0 +1,6 @@
+Revision history for Perl extension DR::Money.
+
+0.01  Thu Mar 21 17:06:20 2013
+	- original version; created by h2xs 1.23 with options
+		-X DR::Money
+

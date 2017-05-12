@@ -1,0 +1,16 @@
+MANIFEST
+Build.PL
+Makefile.PL
+META.yml
+META.json
+Changes
+README
+lib/DBIx/Connect/FromConfig.pm
+t/00-load.t
+t/connect-db.t
+t/db/klortho
+eg/klortho.pl
+t/files/mock-custom.ini
+t/files/mock-default.ini
+t/pod-coverage.t
+t/pod.t

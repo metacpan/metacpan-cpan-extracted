@@ -1,0 +1,8 @@
+Revision history for Perl extension DBIx::Broker.
+
+0.01  Thu Nov 18 11:47:28 1999
+	- original version; created by h2xs 1.19
+
+0.02  Thu Nov 18 15:49:57 1999
+    - beefed up the test.pl
+

@@ -1,0 +1,9 @@
+name = "Devel-Cover-Report-Codecov"
+badges = ["travis"]
+module_maker = "ModuleBuildTiny"
+license = "mit"
+authority = "cpan:PINE"
+authors = ["Pine Mizune"]
+
+[ReleaseTest]
+MinimumVersion = false

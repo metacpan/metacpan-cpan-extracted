@@ -1,0 +1,18 @@
+
+README for perl module Devel::Fail::Make
+
+This module was created as a debugging aid for mechanized module
+installers such as CPAN and CPANPLUS.
+
+* `perl Makefile.PL` will run fine and create a good Makefile.
+
+* `make` will fail.  You should see a message like
+  "'deliberate_failure' is not recognized as an internal or external
+  command, operable program or batch file."
+
+* `make test` will succeed if you dare to try it.
+
+* `make install` will succeed (without actually installing anything).
+
+AUTHOR: Martin Thurn <mthurn@cpan.org>
+

@@ -1,0 +1,50 @@
+{
+   "abstract" : "ElasticSearch support for Data::SearchEngine",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-SearchEngine-ElasticSearch",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::SearchEngine" : "0.33",
+            "Data::SearchEngine::Item" : "0",
+            "Data::SearchEngine::Paginator" : "0",
+            "Data::SearchEngine::Results" : "0",
+            "ElasticSearch" : "0",
+            "Moose" : "0",
+            "Time::HiRes" : "0",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/holophrastic/data-searchengine-elasticsearch/issues"
+      },
+      "homepage" : "https://github.com/holophrastic/data-searchengine-elasticsearch",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/holophrastic/data-searchengine-elasticsearch.git",
+         "web" : "https://github.com/holophrastic/data-searchengine-elasticsearch"
+      }
+   },
+   "version" : "0.21"
+}
+

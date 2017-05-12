@@ -1,0 +1,29 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Test-UnusedVars
+
+2.000007  2015-01-22
+  - Remove requirement for Moose::Autobox in tests [kentnl, GH #6]
+
+2.000006  2014-04-29
+  - Allow specifying a list of files to test manually
+
+2.000005  2013-08-03
+  - Don't shoot yourself in the foot when testing [kentnl, GH #4]
+
+2.000004  2013-04-09
+  - Test only for our own deprecation warnings
+
+2.000003  2012-06-08
+  - Use a traditional decimal version [dolmen, GH #2]
+
+v2.0.2    2012-05-21
+  - Declare Dist::Zilla dependency
+  - Use a strict version number [dolmen, GH #2]
+
+2.0.1     2011-09-07
+  - Packaging updates
+
+v2.0.0    2011-09-07
+  - Rename to Dist::Zilla::Plugin::Test::UnusedVars
+
+1.100860  2010-03-27 23:36:51 Europe/Vienna
+  - original version

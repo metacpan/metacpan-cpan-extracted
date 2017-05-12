@@ -1,0 +1,54 @@
+{
+   "abstract" : "Check the strength of passwords",
+   "author" : [
+      "Nils Diewald"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Password-Meter",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "bytes" : "0",
+            "perl" : "5.010001",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.opensource.org/licenses/MIT"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Akron/Data-Password-Meter"
+      }
+   },
+   "version" : "0.08",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

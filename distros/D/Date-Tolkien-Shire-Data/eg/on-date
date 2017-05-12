@@ -1,0 +1,109 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Date::Tolkien::Shire::Data qw{ :all };
+use Getopt::Long 2.25;
+use Pod::Usage;
+
+our $VERSION = '0.003';
+
+my %opt;
+
+GetOptions( \%opt,
+    qw{ accented! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+    version	=> sub {
+	print <<"EOD";
+$0 version $VERSION
+perl version $]
+EOD
+	exit;
+    },
+) and @ARGV and 2 >= @ARGV or pod2usage( { -verbose => 0 } );
+
+1 == @ARGV
+    and unshift @ARGV, 0;
+
+my $tplt = '%Ex%n%En' . (
+    $opt{accented} ? '%ED' : '%Ed' );
+
+# Uncomment the following if you KNOW you will be running this script
+# under at least Perl 5.8, and you don't have to mess with 'perl -C'.
+# $opt{accented}
+#     and binmode STDOUT, ':encoding(utf-8)';
+
+print __format(
+    {
+	month	=> $ARGV[0],
+	day	=> $ARGV[1],
+    },
+    $tplt );
+
+__END__
+
+=head1 TITLE
+
+on-date - Display what happened on the given Shire date
+
+=head1 SYNOPSIS
+
+ on-date 3 25   # Rethe 25
+ on-date 3      # Midyear's day
+ on-date -help
+ on-date -version
+
+=head1 OPTIONS
+
+=head2 -accented
+
+If this Boolean option is asserted the accented forms of proper nouns
+(if any) will be used.
+
+If you assert this option you will need to run this script with C<perl
+-C eg/on-date>. It would be nice if the script could do
+
+ binmode STDOUT, ':encoding(utf-8)'
+
+if C<-accented> was asserted, but unfortunately that was not invented
+until Perl 5.8, and this package is targeted for Perls back to 5.6.2.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script displays the given date in the Shire calendar, and what
+(if anything) happened in and around the War of the Ring on that date.
+The date is specified as two command line arguments. Normal dates are
+specified by month and day numbers. Holidays are specified by holiday
+number.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

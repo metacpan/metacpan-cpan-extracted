@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-PluginBundle-PDONELAN
+
+1.201     2010-11-05 23:52:20 America/New_York
+    * Fixed PluginBundle::Git bug
+
+1.200     2010-11-05 23:39:06 America/New_York
+    * Now based on Dist::Zilla::Role::PluginBundle::Easy
+
+1.101750  2010-06-23 23:34:58 America/New_York
+    * Removed Repository plugin, which appears to cause problems in dzil v4
+
+1.101060  2010-04-16 17:29:47 EST5EDT
+	* Removed duplicate UploadToCPAN (already in classic bundle)
+	* Removed SynopsisTests (was annoying me)
+
+1.100970  2010-04-07 13:01:29 EST5EDT
+	* Updated with lots more plugins
+
+1.100830  2010-03-24 14:41:44 EST5EDT
+    * Initial version
+

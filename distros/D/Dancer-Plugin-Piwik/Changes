@@ -1,0 +1,14 @@
+Revision history for Dancer-Plugin-Piwik
+
+0.05 Mon Nov 21 11:44:56 2016 CET
+
+     * Add piwik_search keyword (Marco Pessotto).
+     * Track username if set in the session (Marco Pessotto).
+     * Do not spam the logs with the disabled warning (Marco Pessotto).
+     * Do not die if the order is 0 (Marco Pessotto).
+
+0.03 Thu Jun 18 20:04:53 2015 CEST
+
+	 * Initial release.
+
+

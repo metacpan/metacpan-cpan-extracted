@@ -1,0 +1,30 @@
+=head1 NAME
+
+DB::CouchDB::Result - a result object for DB::CouchDB
+
+=head1 DESCRIPTION
+
+Gives you some convenience functions for dealing with CouchDB results
+
+=head1 SYNOPSIS
+
+    my $rs = $db->get_doc($docname);
+
+    if ($rs->err) {
+        die $rs->errstr;
+    }
+
+    my $docid = $rs->{_id};
+    my %result = %$rs;
+
+=head1 Methods
+
+=head2 err
+
+Returns the error from couchdb if there was an error.
+
+=head2 errstr
+
+Returns the error string from couchdb if there was an error.
+
+=cut

@@ -1,0 +1,57 @@
+{
+   "abstract" : "Use the revision of the working directory",
+   "author" : [
+      "Olivier Mengu\u00c3\u00a9 <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Version-FromSubversion",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.3",
+            "Dist::Zilla::Role::TextTemplate" : 0,
+            "Dist::Zilla::Role::VersionProvider" : 0,
+            "Moose" : 0,
+            "SVN::Client" : 0,
+            "SVN::Core" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-version-fromsubversion at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Version-FromSubversion"
+      },
+      "repository" : {
+         "type" : "svn",
+         "url" : "https://dist-zilla-plugin-version-fromsubversion.googlecode.com/svn/trunk",
+         "web" : "http://code.google.com/p/dist-zilla-plugin-version-fromsubversion/source/list"
+      }
+   },
+   "version" : "1.000019"
+}
+

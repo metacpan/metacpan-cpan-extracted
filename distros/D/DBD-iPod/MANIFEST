@@ -1,0 +1,15 @@
+Changes
+lib/DBD/iPod.pm
+lib/DBD/iPod/db.pm
+lib/DBD/iPod/dr.pm
+lib/DBD/iPod/GetInfo.pm
+lib/DBD/iPod/parser.pm
+lib/DBD/iPod/row.pm
+lib/DBD/iPod/st.pm
+lib/SQL/Dialects/iPod.pm
+Makefile.PL
+MANIFEST
+pkg_config.in
+README
+t/DBD-iPod.t
+META.yml                                 Module meta-data (added by MakeMaker)

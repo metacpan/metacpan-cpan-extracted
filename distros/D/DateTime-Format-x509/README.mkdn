@@ -1,0 +1,52 @@
+# NAME
+
+DateTime::Format::x509 - parse and format x509 type dates
+
+# VERSION
+
+version 0.01
+
+# SYNOPSIS
+
+    use DateTime::Format::x509;
+
+    my $f = DateTime::Format::x509->new();
+    my $dt = $f->parse_datetime('Mar 11 03:05:34 2013 UTC');
+
+    # Mar 11 03:05:34 2013 UTC
+    print $f->format_datetime($dt);
+
+# DESCRIPTION
+
+This module parses and formats x509 style datetime strings, used in certificates.
+
+# NAME
+
+DateTime::Format::x509 - parse and format x509 type dates
+
+# VERSION
+
+Version 1.0.2
+
+# METHODS
+
+- `parse_datetime($string)`
+
+Given an x509 datetime string, this method will return a new [DateTime](http://search.cpan.org/perldoc?DateTime) object.
+
+If given an improperly formatted string, this method will die.
+
+- `format_datetime($datetime)`
+
+Given a [DateTime](http://search.cpan.org/perldoc?DateTime) object, this method returns an x509 timestamp string.
+
+# AUTHOR
+
+Andrew Nelson <anelson@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Nelson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,42 @@
+Debug::ShowStuff
+    Version 1.00 May 29, 2003
+
+      Initial public release.
+
+    Version 1.01 May 29, 2003
+
+      Setting sort order of hash keys to case insensitive.
+
+    Version 1.10 Nov 6, 2010
+
+      After seven years, decided to update the version on CPAN.
+
+    Version 1.11 Nov 13, 2010
+
+      Fixed prerequisite requirement for MemHandle and Taint. Added timer()
+      functions. Some minor documentation fixes and tidying up.
+
+    Version 1.12 Nov 29, 2010
+
+      Changing from using Taint module, which has had a lot of problems, to
+      Scalar::Util, which is more (but not completely) stable.
+
+    Version 1.13 Dec 1, 2010
+
+      Fixed bug in prerequisites for Scalar::Util.
+
+    Version 1.14 February 23, 2013
+
+      Added showsth, showsql, and explainsql. Added the separateprint
+      option to setoutput. Tidied up documentation. Fixed problems with
+      prerequisites. Probably added many other features since the last time
+      I uploaded this module, but can't remember tham all.
+
+Debug::ShowStuff::ShowVar
+    Version 0.10 March 17, 2013
+
+      Initial public release.
+
+    Version 0.11 March 19, 2013
+
+      Small but important fix to documentation.

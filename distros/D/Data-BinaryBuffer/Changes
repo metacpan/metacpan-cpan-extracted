@@ -1,0 +1,18 @@
+0.005     2013-08-24 03:25:01 Europe/Moscow
+  * Fix configure tests for C++ and STL
+  * Improve platform tests
+
+0.004     2013-08-22 04:29:30 Europe/Moscow
+  * Fix CCFLAGS leak from build environment
+  * Try support more platforms (Not Win32 while)
+  * Improve build system
+
+0.003     2013-08-17 05:28:14 Europe/Moscow
+  * Make it work on FreeBSD
+  * Fix bug with long writes
+
+0.002     2013-08-16 23:49:35 Europe/Moscow
+  * Fix source repository information in docs
+
+0.001     2013-08-16 23:40:12 Europe/Moscow
+  * Initial release to CPAN

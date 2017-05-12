@@ -1,0 +1,53 @@
+version 0.004; 2011-11-19
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.003; 2010-07-23
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * use full stricture in Build.PL
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2007-09-26
+
+  * use "base" pragma to import Exporter behaviour
+
+  * stricter test on form of results
+
+  * test POD syntax and coverage
+
+  * fix punctuation in README
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.001; 2004-10-18
+
+  * versioned dependencies in .pm
+
+  * declare module dependencies in Makefile.PL
+
+  * include Changes file
+
+version 0.000; 2004-04-02
+
+  * initial released version

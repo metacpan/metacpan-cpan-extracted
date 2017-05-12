@@ -1,0 +1,347 @@
+
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Cookbook::Recipe_DateTime - DateTime Range HOWTO
+
+=head1 SYNOPSIS
+
+  use DateTime;
+  use Data::Range::Compare;
+
+ my @vpn_a=
+ (
+   # start
+   DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute 01 second 59))
+   ,
+   # end
+   DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute 05 second 47))
+   ,
+
+   # start
+   DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 41 second 32))
+   ,
+   # end
+   DateTime->new(qw(year 2010 month 05 day 02 hour 08 minute 00 second 16))
+  );
+
+  my @vpn_b= ( 
+   # start
+   DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 41 second 32))
+   ,
+   # end
+   DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 58 second 13))
+   ,
+
+   # start
+   DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute 03 second 59))
+   ,
+   # end
+   DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute 04 second 37))
+  );
+
+  my @vpn_c=
+  (
+    DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute 03 second 59))
+    ,
+    DateTime->new(qw(year 2010 month 01 day 02 hour 10 minute  04 second 37))
+
+    ,
+    DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 41 second 32))
+    ,
+    DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 58 second 13))
+
+    ,
+    DateTime->new(qw(year 2010 month 05 day 02 hour 07 minute 59 second 07))
+    ,
+    DateTime->new(qw(year 2010 month 05 day 02 hour 08 minute 00 second 16))
+
+    ,
+    DateTime->new(qw(year 2010 month 06 day 18 hour 10 minute 58 second 21))
+    ,
+    DateTime->new(qw(year 2010 month 06 day 18 hour 22 minute 06 second 55))
+  );
+
+  my %helper;
+
+  # create a simple function to handle comparing dates
+  sub cmp_values { DateTime->compare( $_[0],$_[1] ) }
+
+  # Now set cmp_values in %helper
+  $helper{cmp_values}=\&cmp_values;
+
+  # create a simple function to calculate the next second
+  sub add_one { $_[0]->clone->add(seconds=>1) }
+
+  # Now set add_one in %helper
+  $helper{add_one}=\&add_one;
+
+  # create a simple function to calculate the previous second
+  sub sub_one { $_[0]->clone->subtract(seconds=>1) }
+
+  # quick and dirty formatting tool
+  sub format_range ($) {
+    my $s=$_[0];
+    join ' - '
+      ,$s->range_start->strftime('%F %T')
+      ,$s->range_end->strftime('%F %T')
+  }
+
+  # load the outage timestamps and output a little info
+  my @parsed;
+  my @vpn_name=qw(vpn_a vpn_b vpn_c);
+  foreach my $outages (\@vpn_a,\@vpn_b,\@vpn_c) {
+    my $id=shift @vpn_name;
+    my $row=[];
+    push @parsed,$row;
+    print "\nVPN_ID $id\n";
+    while(my ($dt_start,$dt_end)=splice(@$outages,0,2)) {
+      my $range=Data::Range::Compare->new(\%helper,$dt_start,$dt_end);
+      print format_range($range),"\n";
+      push @$row,$range;
+    }
+  }
+
+  # now compare our outages
+  my $sub=Data::Range::Compare->range_compare(\%helper,\@parsed);
+
+  while(my ($vpn_a,$vpn_b,$vpn_c)=$sub->()) {
+    next unless
+      !$vpn_a->missing
+       &&
+      !$vpn_b->missing
+       &&
+      !$vpn_c->missing;
+    my $common=Data::Range::Compare->get_common_range(
+      \%helper
+      ,[$vpn_a,$vpn_c,$vpn_b]
+    );
+
+    my $common=Data::Range::Compare->get_common_range(
+      \%helper
+      ,[$vpn_a,$vpn_c,$vpn_b]
+    );
+
+    print "\nCommon outage range: "
+      ,format_range($common)
+      ,"\n"
+      ,"Total Downtime: Months: $outage->{months}"
+      ," Days: $outage->{days} Minutes: $outage->{minutes}"
+      ," Seconds: $outage->{seconds}\n"
+      ,'vpn_a '
+      ,format_range($vpn_a)
+      ,' '
+      ,($vpn_a->missing ? 'up' : 'down')
+      ,"\n"
+      ,'vpn_b '
+      ,format_range($vpn_b)
+      ,' '
+      ,($vpn_b->missing ? 'up' : 'down')
+      ,"\n"
+
+      ,'vpn_c '
+      ,format_range($vpn_c)
+      ,' '
+      ,($vpn_c->missing ? 'up' : 'down')
+      ,"\n";
+  }
+
+Output
+
+  VPN_ID vpn_a
+  2010-01-02 10:01:59 - 2010-01-02 10:05:47
+  2010-05-02 07:41:32 - 2010-05-02 08:00:16
+
+  VPN_ID vpn_b
+  2010-05-02 07:41:32 - 2010-05-02 07:58:13
+  2010-01-02 10:03:59 - 2010-01-02 10:04:37
+
+  VPN_ID vpn_c
+  2010-01-02 10:03:59 - 2010-01-02 10:04:37
+  2010-05-02 07:41:32 - 2010-05-02 07:58:13
+  2010-05-02 07:59:07 - 2010-05-02 08:00:16
+  2010-06-18 10:58:21 - 2010-06-18 22:06:55
+
+ Common outage range: 2010-01-02 10:03:59 - 2010-01-02 10:04:37
+ Total Downtime: Months: 0 Days: 0 Minutes: 0 Seconds: 38
+ vpn_a 2010-01-02 10:01:59 - 2010-01-02 10:05:47 down
+ vpn_b 2010-01-02 10:03:59 - 2010-01-02 10:04:37 down
+ vpn_c 2010-01-02 10:03:59 - 2010-01-02 10:04:37 down
+
+ Common outage range: 2010-05-02 07:41:32 - 2010-05-02 07:58:13
+ Total Downtime: Months: 0 Days: 0 Minutes: 16 Seconds: 41
+ vpn_a 2010-05-02 07:41:32 - 2010-05-02 08:00:16 down
+ vpn_b 2010-05-02 07:41:32 - 2010-05-02 07:58:13 down
+ vpn_c 2010-05-02 07:41:32 - 2010-05-02 07:58:13 down
+
+=head1 DESCRIPTION
+
+This Recipe provides an example based on DateTime object manipulation.
+
+Lets say we have a bank with 3 vpns to its data center.  When all of the vpns are off line the bank itself is unable to process customer transactions.  This example shows how to calculate the exact time the bank is completely disconnected from the data center and when it comes back online.
+
+=head1 Ingredients
+
+This example relies on L<DateTime>.
+
+=head2 Creating %helper
+
+Data::Range::Compare relies on %helper to do its internal work.  This section explains how to populate %helper to work with DateTime.
+
+Create a hash %helper.
+
+Example
+
+  my %helper
+
+=over 4
+
+=item * Creating the "cmp_values" callback
+
+"cmp_values" represents comparing 2 objects in the standard cmp or <=> way; lucky for us DateTime provides a comparative interface.
+
+Example
+
+  # create a simple function to handle comparing dates
+  sub cmp_values { DateTime->compare( $_[0],$_[1] ) }
+
+  # Now set cmp_values in %helper
+  $helper{cmp_values}=\&cmp_values
+
+=item * Creating the "add_one" callback
+
+"add_one" represents the next value:  With that in mind we have to decide if our next increment is just adding 1 or moving to the next Year, Month, Day, Hour, Min, Sec etc.
+
+In our example we will be using the concept of next second.  This makes "add_one" a fairly simple function to implement.
+
+Example
+
+  # create a simple function to calculate the next second
+  sub add_one { $_[0]->clone->add(seconds=>1) }
+
+  # Now set add_one in %helper
+  $helper{add_one}=\&add_one
+
+
+=item * Creating the "sub_one" callback
+
+
+"add_one" represents the previous value.  With that in mind we have to decide if our next decrement is just removing 1 or moving to the previous Year, Month, Day, Hour, Min, Sec etc.
+
+In our example we will be using the concept of previous second.  This makes "sub_one" a fairly simple function to implement.
+
+Example
+
+  # create a simple function to calculate the previous second
+  sub sub_one { $_[0]->clone->subtract(seconds=>1) }
+
+  # Now set sub_one in our %helper
+  $helper{sub_one}=\&sub_one
+
+=back
+
+=head2 Creating our Objects to Compare
+
+The constructor call to "new Data::Range::Compare(\%helper,$start,$end)" represents the creation of a new instance.  Although this may be an over generalized concept, what $start and $end can contain is not.
+
+In this example we are creating our Date::Range::Compare Objects with a $start and $end value made from 2 DateTime objects.  Prior examples used letters of the alphabet, and the default values are integers, but in this case we are doing something special; we are creating an object that represents a range based on other objects: DateTime in particular.
+
+Lets examine the loop that pulls the vpn arrays apart.
+
+=over 4
+
+=item * my @parsed;
+
+Not to be overlooked, but this list will contain all of the data we intend to compare.  Once a range has been created in our loop we push our range onto the selective anonymous hash.
+
+  foreach my $outages (\@vpn_a,\@vpn_b,\@vpn_c) {
+    my $row=[];
+    push @parsed,$row;
+
+Since our input data sets are just flat lists, we just need to pull out our ranges in pairs.
+
+    while(my ($dt_start,$dt_end)=splice(@$outages,0,2)) {
+      my $range=Data::Range::Compare->new(\%helper,$dt_start,$dt_end);
+      push @$row,$range;
+
+=back
+
+=head2 Calculating our outages
+
+Now we really get down to the details of the outage.  So lets examine this code a little further.
+
+=over 4 
+
+=item * my $sub=Data::Range::Compare->range_compare(\%helper,\@parsed);
+
+This is where the process for comparison starts.  We created the object that will compare and iterate through our @parsed ranges.
+
+Ok, that said let's take a look at the logic of our while loop.
+
+  while(my ($vpn_a,$vpn_b,$vpn_c)=$sub->()) {
+
+If you look back at the foreach call we made, you will notice our iteration through each set of outage related data.  Each anonymous array @parsed represents in order: @vpn_a @vpn_b @vpn_c.
+
+Our call to $sub->() is only slightly different than the data in @parsed.  The variables in $vpn_a,$vpn_b,$vpn_c may not even exist in @parsed and that's because they represent ranges not found in a given list data source which brings us to the ->missing checks.
+
+  next unless
+    !$vpn_a->missing
+     &&
+    !$vpn_b->missing
+     &&
+    !$vpn_c->missing;
+
+This is a some what awkward way of looking at the data, but in reality it makes sense.  We want to skip rows when some vpns are online.  The reason for this is simple:  when ranges are missing they represent that vpn being online.
+
+=item * my $common=Data::Range::Compare->get_common_range( \%helper ,[$vpn_a,$vpn_c,$vpn_b] );
+
+We are using Data::Range::Compare->get_common_range to calculate the smallest common range given all of our current ranges.  We only care about the shared down time from every single range.
+
+=item * my $outage=$common->range_end->subtract_datetime( $common->range_start );
+This is a feature of DateTime itself and we used it to fetch the duration of the outage.
+
+The final operation in our loop simply outputs all the data we wanted to see.
+
+  print "\nCommon outage range: "
+    ,format_range($common)
+    ,"\n"
+    ,"Total Downtime: Months: $outage->{months}"
+    ," Days: $outage->{days} Minutes: $outage->{minutes}"
+    ," Seconds: $outage->{seconds}\n"
+    ,'vpn_a '
+    ,format_range($vpn_a)
+    ,' '
+    ,($vpn_a->missing ? 'up' : 'down')
+    ,"\n"
+    ,'vpn_b '
+    ,format_range($vpn_b)
+    ,' '
+    ,($vpn_b->missing ? 'up' : 'down')
+    ,"\n"
+
+    ,'vpn_c '
+    ,format_range($vpn_c)
+    ,' '
+    ,($vpn_c->missing ? 'up' : 'down')
+    ,"\n";
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 COPYRIGHT
+
+Copyright 2010 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Cookbook
+
+=cut
+

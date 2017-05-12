@@ -1,0 +1,102 @@
+=head1 NAME
+
+Devel::PerlySense::Cookbook -- simple solutions to common issues
+
+
+=head1 COMMON PROBLEMS
+
+=head2 Weird characters in the *compilation* buffer when running tests
+
+You probably use a recent version of Test::Harness or something. It
+has nice colorized output as default. Which doesn't look so good in
+the not-so-ansi-color-aware buffer.
+
+Change your Project Config for running files to
+
+  prove --nocolor
+
+
+
+=head1 CONVENIENT TRICKS
+
+=head2 Highlight Catalyst/DBIC setup code
+
+Add this
+
+  -
+    moniker: "Package method calls (Cat/DBIC)"
+    rex:
+      - qr/ __PACKAGE__ \s* -> \s* ( [\w]+ .* ) /x
+
+to the Bookmarks section in your Project Config.  It will highlight things like
+
+  __PACKAGE__->table("cust");
+
+These declarations are part of what defines the class, and so are very
+useful to see in the Class Overview.
+
+
+
+=head2 Configure Run to run your unusual test files
+
+If you look in the config file in .PerlySense/project.yml (run
+C<perly_sense create_project> to create one) you'll see that the
+action to take when running different sorts of files is entirely
+configurable.
+
+The default configuration for .t files look like this:
+
+    run_file:
+      -
+        command: "prove  --norc --nocolor -v ${INC} \"${SOURCE_FILE}\""
+        alternate_command: ""
+        moniker: Test
+        rex: \.t$
+        run_from: source_root_directory
+
+You can define what to do with tests specific to your project. Just
+put extra mappings in the list. First match is used.
+
+You can also use whatever you have configured in the
+"alternate_command" by doing calling Run File with a prefix argument,
+i.e. C<C-u C-o C-r>.
+
+You can do the same in the debug section to run the files through a
+debugged Perl with C<C-o r d> or C<C-u C-o r d>.
+
+
+=head3 Run Test::Class classes with C-o C-r
+
+Let's say you have L<Test::Class> test modules under
+C<t/classes/Test>.  When you type C<C-o C-r> you want to run them
+through prove, just like ordinary .t file.
+
+Before the normal .pm spec, add this:
+
+  -
+    command: "prove  --norc --nocolor -v ${INC} \"${SOURCE_FILE}\""
+    moniker: Test
+    rex: t/classes/Test/.*?\.pm$
+    run_from: source_root_directory
+
+
+=head3 Run yaml files through a custom test framework
+
+Let's say you have a custom test framework that uses yaml file
+configuration files to drive the tests. In the shell they are run like this:
+
+  prove -v t/acceptance.t :: "t/acceptance/user/user-can-log-in.yml"
+
+Add this:
+
+  -
+    command: "prove  --norc --nocolor -v ${INC} t/acceptance.t :: \"${SOURCE_FILE}\""
+    moniker: Test
+    rex: t/acceptance/.*?\.yml$
+    run_from: source_root_directory
+
+Now you can edit your yaml file and type C-o C-r to run the acceptance
+test, just like you normally do with .t files.
+
+
+=cut

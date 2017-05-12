@@ -1,0 +1,184 @@
+<html>
+<head>
+<title>BabelKit Translation Utility</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+<div align="right">
+[<a href="bk_setup_perl.html">Perl Setup</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_quick_php.html">PHP API</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Translation Utility</h2></center>
+
+<p>
+The BabelKit Translation Utility lets you enter codes
+and their translations into the universal code table.
+
+<h4>Main Translation Page</h4>
+
+The main translation page shows a grid with the code sets
+listed along the left margin and the languages to translate
+them into along the top.  Each position in the grid displays
+the count of codes in that code set and language:
+
+<pre>
+                    en    de    es    fr    it
+code_set             7     7     7     7     7
+code_lang            5     5     5     5     5
+country             87    87    87    87    87
+currency            12    12    12    12    12
+day                  7     7     7     7     7
+month               12    12    12    12    12
+                   130   130   130   130   130
+</pre>
+
+In this case, the native language is "en" for English.
+If any of the non-native languages are missing some
+translations, that count will be displayed in red
+to highlight where translation work is needed.
+
+<p>
+If you click on the counts under any of the non-native
+languages you will get a display of each of the codes
+for that code set showing both the native language descriptions
+and the selected translation language descriptions.
+Click on any code to add or amend a translation.
+
+<p>
+Click on any of the code sets along the left column
+to see a list of just the native language descriptions.
+From there click on any of the codes to see all of
+the language descriptions displayed together.
+
+<h4>Selecting Another Code Set or Language</h4>
+
+At any point you can click on the "Main Translation
+Page" link to return to the overview and then click
+on any of the translation counts to view another
+translation set.
+
+<p>
+The other navigation aid is always displayed at the top
+of every page:
+
+<pre>
+      Select a code set and language(s)
+    [Code Set?] [English] [(Other)] [View]
+</pre>
+
+The first select dropdown lets you specify the code set
+that you are interested in.  The second lets you specify
+the primary language and the third lets you specify
+an optional secondary language.  Then click [View]
+to see the selected set.
+
+
+<h4>Adding a New Code Set</h4>
+
+Click on "code_set" along the left margin of the
+Main Translation Page or select "Code set" from
+the navigation dropdown to see the current list
+of code sets.  Click the "Add new code set record"
+link at the bottom of the page.
+
+<p>
+Enter the new code set code and the native language
+description.  For example "city" and "city".
+Click the "Parameter Set", "Slave Set" and "Multiline Set"
+boxes if appropriate.  See the <a href="bk_overview.html">
+BabelKit Overview</a> page for an explanation of
+these options.  Click [Add] and start adding the
+codes for the new code set.
+
+
+<h4>Adding a New Translation Language</h4>
+
+Click on "code_lang" along the left margin of the
+Main Translation Page or select "Language" from
+the navigation dropdown to see the current list
+of translation languages.  Click the "Add new language record"
+link at the bottom of the page.
+
+<p>
+Enter the new language code and the language description.
+For example "es" and "Spanish".  Click [Add].  Happy translation!
+
+
+<h4>Code Display Order</h4>
+
+When adding or updating a code you can specify its
+display order by entering a number in the "Code Order"
+field.  Negative order numbers can be used to make
+a code sort early.
+
+<p>
+When a code is first added in the native language,
+if the order field is not specified and the code field
+value is numeric, the order field is set to the value
+of the code field. This provides numeric sorting
+of numeric codes by default.
+
+
+<h4>Obsolete Codes</h4>
+
+When the time comes to retire a code from active use
+there are two approaches:  deletion or deprecation.
+The problem with deletion is that the code value may
+still exist somewhere in the database.  When it comes
+time to display the code description for a deleted
+code value only the actual code value is available
+which can be rather cryptic.
+
+<p>
+The solution is to mark obsolete codes as deprecated
+without removing them from the code set. This leaves
+the obsolete code descriptions in the code set for
+display purposes, but does not allow new data entry
+selection of deprecated code choices.
+
+<p>
+To deprecate a code click the "Deprecated" checkbox
+and then click [Update].
+
+
+<h4>User Permissions</h4>
+
+The Translation Utility contains hooks to allow
+or disallow any combination of code addition,
+update, or deletion.  Combined with user authentication
+these hooks can be set up to give different users different
+privileges for different code sets and languages.
+
+
+<p>
+<div align="right">
+[<a href="bk_setup_perl.html">Perl Setup</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_quick_php.html">PHP API</a>]
+</div>
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,57 @@
+---
+abstract: 'Add Dist::Zilla authordeps to META files as develop prereqs'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  CPAN::Meta: '0'
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::Deep: '0'
+  Test::Deep::JSON: '0'
+  Test::More: '0.96'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Prereqs-AuthorDeps
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::Prereqs::AuthorDeps:
+    file: lib/Dist/Zilla/Plugin/Prereqs/AuthorDeps.pm
+    version: '0.006'
+requires:
+  Dist::Zilla: '4'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Util::AuthorDeps: '5.021'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  constant: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-AuthorDeps.git
+version: '0.006'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+  - 'Karen Etheridge <ether@cpan.org>'

@@ -1,0 +1,30 @@
+Revision history for Dancer-Plugin-Stomp
+
+1.0302  2012-11-12
+        Fixed POD formatting.
+
+1.0301  2012-11-11
+        Fixed a critical syntax error.
+
+1.0300  2012-11-11
+        Added support for Net::Stomp failover hosts.
+
+1.0200  2012-11-02
+        Switching back to Net::Stomp.
+
+1.0101  2012-03-04
+        Net::STOMP::Client does support calling connect more than once on
+        the same client, even if we have disconnected. So we're no longer
+        caching clients in memory.
+
+1.0100  2012-03-04
+        Added stomp_send keyword.
+
+1.0001  2012-02-22
+        Fixing a syntax error.
+
+1.0000  2012-02-22
+        Switched from Net::Stomp to Net::STOMP::Client.
+
+0.0001  2011-09-06
+        First version, released on an unsuspecting world.

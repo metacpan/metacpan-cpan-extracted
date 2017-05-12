@@ -1,0 +1,72 @@
+{
+   "abstract" : "Simple activity audit logging for DBIx::Class",
+   "author" : [
+      "Mark Jubenville <ioncache@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-AuditLog",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::C3::Componentised" : "0",
+            "DBIx::Class" : "0",
+            "DBIx::Class::Core" : "0",
+            "DBIx::Class::ResultSet" : "0",
+            "DBIx::Class::Schema" : "0",
+            "DBIx::Class::TimeStamp" : "0",
+            "Scalar::Util" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "DBIx::Class::ResultSet::RecursiveUpdate" : "0",
+            "Test::More" : "0",
+            "lib" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ioncache/DBIx-Class-AuditLog/issues"
+      },
+      "homepage" : "https://github.com/ioncache/DBIx-Class-AuditLog",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ioncache/DBIx-Class-AuditLog.git",
+         "web" : "https://github.com/ioncache/DBIx-Class-AuditLog"
+      }
+   },
+   "version" : "0.6.4",
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

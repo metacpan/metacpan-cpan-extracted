@@ -1,0 +1,205 @@
+NAME
+    Data::Mapper - An implementation of Data Mapper Pattern described in
+    PofEAA
+
+SYNOPSIS
+      # Your mapper class
+      package My::Mapper;
+      use parent qw(Data::Mapper);
+
+      # Your data class related to `user` table
+      package My::Mapper::Data::User;
+      use parent qw(Data::Mapper::Data);
+
+      # Then, use them
+      package main;
+      use Data::Mapper::Adapter::DBI;
+
+      my $dbh     = DBI->connect($dsn, $username, $password, ...);
+      my $adapter = Data::Mapper::Adapter::DBI->new({ driver => $dbh });
+
+      # You can pass coderef as a driver factory, instead:
+
+      my $handler = DBIx::Handler->new(...);
+      my $adapter = Data::Mapper::Adapter::DBI->new({
+          driver => sub { $handler->dbh }
+      });
+
+      my $mapper  = My::Mapper->new({ adapter => $adapter });
+
+      # Create
+      my $data = $mapper->create(user => { name => 'kentaro', age => 34 });
+      #=> is a My::Mapper::Data::User object
+
+      # Retrieve just one item
+      $data = $mapper->find(user => { name => 'kentaro' });
+      #=> is a My::Mapper::Data::User object
+
+      $data->param('name'); #=> kentaro
+      $data->param('age');  #=> 34
+
+      # Search with some conditions
+      $result = $mapper->search(user => { age => 34 }, { order_by => 'id DESC' });
+
+      for my $data (@$result) {
+          $data->param('name');
+          ...
+      }
+
+      # Update
+      $data->param(age => 35);
+      my $sth = $mapper->update($data);
+      $sth->rows; #=> 1
+
+      # Destroy
+      my $sth = $mapper->delete($data);
+      $sth->rows; #=> 1
+
+WARNING
+    This software is under the heavy development and considered ALPHA
+    quality now. Things might be broken, not all features have been
+    implemented, and APIs will be likely to change. YOU HAVE BEEN WARNED.
+
+DESCRIPTION
+    Data::Mapper is an implementation of Data Mapper Pattern described in
+    PofEAA, written by Martin Fowler, and is kind of a ORM, but not limited
+    only to it, that is, this module just relates some data to another; for
+    example, data from a database to Perl's objects.
+
+Data::Mapper Convention
+    This module, actually, merely defines a simple convention how to make
+    relations between some data to another, and now has only one adapter
+    implementation: Data::Mapper::Adapter::DBI.
+
+  Mapper
+    *Mapper* makes relations between data from a datasource, which is
+    typically a database, to Perl's objects, and vice versa, while keeping
+    them independent each other, and the mapper itself.
+
+    You can use Data::Mapper via your own mapper subclass by inheriting it.
+
+    *Mapper* provides the methods below:
+
+    *   create( *$name* => *\%values* )
+
+        Creates a new data, and returns it as a *Data* object described
+        later.
+
+    *   find( *$name* => *\%conditions* [, *\%options*] )
+
+        Searches data according to "\%conditions" and "\%options", and
+        returns the first one as a *Data* object described later.
+
+    *   search( *$name*, *\%conditions* [, *\%options*] )
+
+        Searches data according to "\%conditions" and "\%options", and
+        returns the all of them as an ArrayRef which contains each records
+        as a *Data* object described later.
+
+    *   update( *$data* )
+
+        Updates $data in the datasource.
+
+    *   delete( *$data* )
+
+        Deletes the $data from the datasource.
+
+  Adapter
+    *Adapter* does CRUD operations against a datasource (database,
+    memcached, external API, etc.). It must implement some methods according
+    to the convention.
+
+    *Adapter* must implements the methods below:
+
+    *   create( *$name*, *\%values* )
+
+        Creates a new data, and returns it as a specific form described
+        later.
+
+    *   find( *$name*, *\%conditions* [, *\%options*] )
+
+        Searches data according to "\%conditions" and "\%options", and
+        returns the first one as a specific form described later.
+
+    *   search( *$name*, *\%conditions* [, *\%options*] )
+
+        Searches data according to "\%conditions" and "\%options", and
+        returns the all of them as an ArrayRef which contains each records
+        as the specific form same as the one "find()" method returns.
+
+    *   update( *$name*, *\%values* [, *\%conditions*] )
+
+        Updates data in a datasource according to "\%values", and
+        "\%conditions".
+
+    *   delete( *$name*, *\%conditions* )
+
+        Deletes the data specified by "\%conditions" from a datasource.
+
+    The return value of "create()", "find()", "search()" must be either a
+    plain HashRef or a Hash-based object. If the object has
+    "as_serializable()", it'll be called before mapping to extract data as a
+    HashRef.
+
+    You can adapt any data-retrieving module to Data::Model convention if
+    only you implement the methods described above.
+
+  Data
+    *Data* represents a data model where you can define some business logic.
+    You must notice that *Data* layer has no idea about what *Mapper* and
+    *Adapter* are. It just holds the data passed by *Mapper*
+
+    *Data* can be either *Data::Mapper::Data*-based object or your own POPO.
+
+      # Data::Mapper::Data-based class
+      package My::Mapper::Data::User;
+      use parent qw(Data::Mapper::Data);
+
+      # Or, Hash-based POPO
+      package My::Mapper::Data::User;
+      sub new {
+          my ($class, %args) = @_;
+          bless \%args, $class;
+      }
+
+      package My::Mapper;
+      use parent qw(Data::Mapper);
+
+      package main;
+      My::Mapper;
+
+      my $mapper = My::Mapper->new(...);
+      $mapper->find(user => ...) #=> Now returns data as a My::Mapper::Data::User
+
+    What data class will be used is determined by "Data::Mapper#data_class"
+    method. In default, data class will be "Your::Mapper::Data::$table" as
+    shown above. You can customize the behaviour by overriding the method.
+
+AUTHOR
+    Kentaro Kuribayashi <kentarok@gmail.com>
+
+REPOSITORY
+    *   GitHub
+
+        <https://github.com/kentaro/data-mapper>
+
+SEE ALSO
+    *   Data Mapper Pattern
+
+        <http://www.martinfowler.com/eaaCatalog/dataMapper.html>
+
+    *   DBIx::ObjectMapper
+
+        An existing Perl implementation of the pattern above. You might want
+        to consult it if you want much more ORM-ish features.
+
+    *   DBI
+
+    *   SQL::Maker
+
+LICENSE
+    Copyright (C) Kentaro Kuribayashi
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

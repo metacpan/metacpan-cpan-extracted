@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBD-Salesforce
+version:      0.04
+version_from: 
+installdirs:  site
+requires:
+    DBI:                           1.39
+    HTML::Entities:                0
+    Salesforce:                    0.55
+    SQL::Parser:                   1.13
+    Symbol:                        0
+    Test::More:                    0
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

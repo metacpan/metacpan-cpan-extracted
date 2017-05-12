@@ -1,0 +1,37 @@
+NAME
+    DBD::PassThrough - Pass through DBD
+
+SYNOPSIS
+        use DBI;
+
+        my $orig_dbh = DBI->connect('dbi:SQLite::memory:', '', '', {RaiseError => 1});
+        my $dbh = DBI->connect('dbi:PassThrough:', '', '', {pass_through_source => $orig_dbh});
+
+DESCRIPTION
+    DBD::PassThrough is a proxy module betwen DSN to $dbh.
+
+    You can pass a existed $dbh as a new DBI connection's atribute.
+
+    THIS IS A DEVELOPMENT RELEASE. API MAY CHANGE WITHOUT NOTICE.
+
+WHY?
+    Some of the DBIx::* modules do not accepts $dbh as a argument, but
+    arguments for "DBI->connect". Then, it makes hard to use DBD::SQLite as
+    a mock DB.
+
+  SCENARIO
+    I want to use DBD::SQLite's on memory database.
+    I need to prepare on memory database(CREATE TABLEs, etc.)
+    But DBIx::FooBar module does not accepts $dbh.
+    Then, I need DBD::PassThrough.
+
+AUTHOR
+    Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>
+
+SEE ALSO
+LICENSE
+    Copyright (C) Tokuhiro Matsuno
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

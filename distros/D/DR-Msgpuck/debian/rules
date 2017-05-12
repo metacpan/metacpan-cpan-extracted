@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+MAIN_MODULE	:= lib/DR/Msgpuck.pm
+PERLVERSION := $(shell grep '^our[[:space:]]\+$$VERSION' $(MAIN_MODULE) \
+        |head -n 1 \
+                |awk '{print $$4}'|sed "s/[';']//g" )
+VERSION	:= $(shell dpkg-parsechangelog|grep ^Version|awk '{print $$2}'|sed 's/-.*$$//')
+DIRNAME	:= $(shell basename $(CURDIR))
+
+
+override_dh_clean:
+	dh_clean
+	rm -f Makefile.old
+	rm -fr .pc
+
+override_dh_testdir:
+	dh_testdir
+	test $(VERSION) = $(PERLVERSION)
+
+
+tarball: clean
+	cd .. && \
+		tar \
+			--exclude=debian \
+			--exclude=.git \
+			--transform='s,^[^/]\+,libdr-msgpuck-perl-$(VERSION),S' \
+			-czf libdr-msgpuck-perl_$(VERSION).orig.tar.gz \
+			$(DIRNAME)

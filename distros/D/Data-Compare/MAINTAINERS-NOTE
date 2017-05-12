@@ -1,0 +1,29 @@
+Hi, this is your friendly neighbourhood co-maintainer DCANTRELL speaking.
+
+I persuaded the nice modules@perl.org people to make me a co-maintainer of
+this module because I had patches to apply and the original author - Fabien
+Tassin - seems to have gone AWOL.
+
+You will notice if you look at my review of Fabien's last version that I
+have some criticism of his choice of interface.  It is *not* my intention
+to "fix" that.  For better or worse, that is the current interface, and
+that's the interface that plenty of existing code, mine included, is using.
+To change it now after the module has been stable for so long would be
+silly.
+
+I do not want to take Fabien's work away from him.  If he shows up again
+and would rather I didn't remain as a co-maintainer, then that's just fine
+by me.  The less code I have to maintain the better as far as I'm concerned!
+I only volunteered to maintain this because I use it a lot, and I got bit
+by bugs.  Well, not so much bugs, as unexpected happenings.  In particular,
+it didn't intelligently Do The Right Thing when comparing Scalar::Properties
+objects.
+
+If I'd thought about what an S::P object was I would have realised what was
+going to happen.  So anyway, when I was patching Data::Compare to be a bit
+more intelligent about S::Ps, I also spotted a potential bug to do with how
+Fabien had used /o on a regex match, so I fixed that too.  And then because
+I'd been talking about this on IRC, Anthony Fisher contributed a patch to
+fix some brokenness to do with how it handled references to refernces.
+
+Then I added features :-)

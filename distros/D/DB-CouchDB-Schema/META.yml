@@ -1,0 +1,26 @@
+---
+abstract: ~
+author: ~
+build_requires:
+  Test::MockObject: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DB-CouchDB-Schema
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Getopt::Long: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  Moose: 0.57
+  Pod::Usage: 0
+  Term::ReadLine: 0
+  URI: 0
+version: 0.3.04

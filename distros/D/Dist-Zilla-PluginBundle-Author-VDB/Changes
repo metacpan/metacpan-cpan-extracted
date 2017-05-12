@@ -1,0 +1,258 @@
+Release history for perl-Dist-Zilla-PluginBundle-Author-VDB
+
+v0.11.3 @ 2016-12-21 19:58 UTC
+
+    -   `exclude_files` option of `Manifest::Write` used to exclude extra tests from the
+        distribution. (`Manifest::Write` v0.9.7 is required.)
+
+    -   The bundle requires `Dist::Zilla` 5.038, because it needs `:ExtraTestFiles` file finder.
+
+    -   `CheckExtraTests` plugin dropped from the bundle because it does not work to me. It runs
+        extra test in the unpacked distribution (there are no extra tests there) and fails.
+        13-lines `Hook::BeforeRelease` added instead, it runs extra tests in the built
+        distribution.
+
+    -   Recently many `Dist::Zilla` plugins were changed: they started to generate author tests
+        instead of release tests. Every change caused `build.t` test failure. Before I required
+        specific versions of the test plugins to avoid test failures. Now `Manifest::Write`
+        excludes extra tests from the manifest, so `build.t` test now does not depend on extra
+        tests any more. Version requirement on many `Dist::Zilla` plugins dropped.
+
+    -   Tests are not skipped if `$ENV{ AUTHOR_TESTING }` is true.
+
+    -   Switch to `Dist::Zilla::Plugin::Manifest::Read` v0.5.0.
+
+    -   There is a bug in `Dist::Zilla::Plugin::Test::Version` < 1.07:  it calls
+        `Path::Class::File->new` without explicit `use` or `require` of the `Path::Class`. It was
+        not so important in `Dist::Zilla` 5.x, because `Path::Class` was loaded by `Dist::Zilla`.
+        However, `Dist::Zilla` 6.x does not use `Path::Class` any more, so
+        `Dist::Zilla::Plugin::Test::Version` < 1.07 fails and causes test failure. (Some FreeBSD
+        testers still use `Dist::Zilla::Plugin::Test::Version` 1.05 and `Dist::Zilla` 6.007.)
+        Workaround implemented to let test pass.
+
+    -   Some tests fail due to bug in `Pod::Simple` — it munges Unicode characters (see
+        `Dist::Zilla::Plugin::Templates::Manual`). `Pod::Simple` > 3.20 required to avoid test
+        failure (3.28 is known to be good, (3.20..3.28) not yet tested versions of `Pod::Simple`).
+
+v0.11.2 @ 2015-11-06 22:24 UTC
+
+    [Bugs]
+
+    -   #108517: Test suite may fail with non-English locale. Fixed.
+
+v0.11.1 @ 2015-11-06 08:22 UTC
+
+    -   All Mercurial-related tests skipped if there is no `hg` command is found in the `PATH`.
+
+v0.11.0 @ 2015-11-05 21:42 UTC
+
+    -   `installer` option introduced. It allows to replace default installer (`ModuleBuildTiny`).
+
+    -   Bug found: The bundle cannot be filtered by `@Filter`. Fixed.
+
+    -   Bunch of plugins prototyped with `Hook`s are independent plugins now. They are currently in
+        in `Dist::Zilla::Plugin::Author::VDB` namespace. It simplifies the bundle, and, especially,
+        testing. Every separated plugin has accompanying test. List of the plugins: `Hg::Tag::Add`,
+        `Hg::Tag::Check`, `Hg::Commit`, `Hg::Push`, `Hg::Status`, `Version::Bump`, `Version::Read`.
+
+    -   Short license notice used.
+
+    -   `Test::Version` now applied to the `Manifest::Read/InstallModules` files. This helps to
+        avoid problems with 3rd-party generated modules (for example, `Inline.pm`).
+
+    -   `Path::Tiny`'s `spew` replaced in two locations with `append( { truncate => 1 }, ... )`.
+        `append` is not atomic, but keeps file mode intact.
+
+v0.10.2 @ 2015-10-22 21:30 UTC
+
+    [Bugs]
+
+    -   The bundle unconditionally sets variables `$repo_type`, `$repo_host`, `$repo_url`, and
+        `$repo_web`. Fixed. Now these variables are set only if they are undefined. It allows
+        to set these variables in `dist.ini` to non-default value.
+
+    -   Fixed bug in defining `$repo_clone` variable.
+
+v0.10.1 @ 2015-10-22 15:21 UTC
+
+    [Tests]
+
+    -   Test fails with `Dist::Zilla` 5.040 because `PodCoverageTests` and `PodSyntaxTests`
+        generate author tests, not release tests as before. The test fixed to pass, `Dist::Zilla`
+        5.040 added as prerequisite.
+
+    -   Test uses `# REQUIRE` hints instead of direct `use`.
+
+v0.10.0 @ 2015-10-22 11:58 UTC
+
+    -   `Perl::PrereqScanner::Scanner::Hint` enabled. It allows to specify requirements directly in
+        code: `# REQUIRE: Module::Name Version`.
+
+v0.9.0 @ 2015-10-11 20:32 UTC
+
+    -   `Test::Version` forced to perform strict check in case of non-trial release.
+
+    -   Embedded doc files updated: mention of weaver.ini removed since this file is not used
+        anymore. v0.7.1 used as example of version instead of 0.007.
+
+    -   Extra tests added: `Test::Portability`, `Test::Pod::LinkCheck`, `Test::Synopsis`.
+
+    -   File `xt/aspell.en.pws` renamed to `xt/aspell-en.pws` to make `Test::Portability` happy.
+
+v0.8.7 @ 2015-10-03 13:38 UTC
+
+    -   `program` key forcibly set in the license object, to let `$dist->license->notice` use it.
+
+    -   POD is interpreted even after `__DATA__`. All POD directives after `__DATA__` are escaped by
+        backslash to avoid including all the sections to the module documentation.
+
+v0.8.6 @ 2015-10-03 10:53 UTC
+
+    -   `Manifest::Write` v0.9.0 required. The bundle fixed to work with this version as well as
+        with earlier versions, but tests will fail with pre-v0.9.0.
+
+    -   `MojibakeTests` 0.8 generates author test, not release as before. Older version will cause
+        test failure, so
+
+v0.8.5 @ 2015-09-27 13:43 UTC
+
+    -   One more `r` modifier dropped from search-and-replace operator in hooks used by the bundle.
+
+    -   Generating `README` file changed (again) a bit to avoid empty lines at the end of file.
+
+v0.8.4 @ 2015-09-27 08:14 UTC
+
+    -   test renamed from `t/author-vdb-build.t` to just `t/build.t` because `AutoPrereqs` treats
+        tests starting from `author-` (and `release-`) specially and do not include their
+        dependencies into test requirements.
+
+    -   Generating `README` file changed a bit to avoid empty lines at the end of file.
+
+v0.8.3 @ 2015-09-27 01:12 UTC
+
+    -   Starting from version 1.05, `Test::Version` generates author test, not release test as
+        before. Older version will cause test failure. The test requires `Test::Version` 1.05 to
+        avoid failure.
+
+    -   Generated `COPYING` file may have one or two empty lines at the end, it affects testing. I
+        do not know for sure what causes such a difference in behavior. However, let's try to
+        `chomp` empty lines to avoid test failure.
+
+    -   One of the bundle hooks used new package declaration syntax: `package Name {...}`. Such
+        code may fail in case of older Perl. Hook rewritten to use old syntax (`{ package Name; ...
+        }`).
+
+    -   For the same reason using `r` modifier of search-and-replace operator eliminated.
+
+v0.8.2 @ 2015-09-26 11:17 UTC
+
+    -   Another test-related problem: In one of earlier version I found that string constant like
+        `'Fixme'` in code causes `Test::Fixme` failure. I have rewritten it as expression `'Fix' .
+        'me'` to avoid test failure. Now I see this does not affect `Test::Fixme` result but hides
+        dependency on `Test::Fixme` from `tools::Prereqs`. Fixed.
+
+v0.8.1 @ 2015-09-25 20:00 UTC
+
+    -   All the tests on v0.8.0 fails — I forget to add `Test::DiagINC` to prerequisites. To avoid
+        such a mistake, hand-crafted list of used plugins retired. Instead, the list of used
+        plugins calculated by home brew module `tools::Prereqs`, which adds all the found plugins
+        to the bundle runtime requirements. The bundle rebuilt, `Test::DiagINC` appears in the
+        prereqs.
+
+v0.8.0 @ 2015-09-22 16:13 UTC
+
+    -   `Changes` file is spell-checked before release.
+
+    -   `spellcheck` option implemented. If option is empty, spell-checking is disabled.
+
+    -   Changed relative order of `Templates` and `OurPkgVersion`. `Templates` now is the first
+        file munger.
+
+    -   `Manifest::Read` is used instead of `GatherFromManifest`.
+
+    -   A test added on `dzil build`.
+
+    -   Minor bug fixed: `VERSION` file should be read from/written to the root directory, not to
+        the current directory.
+
+    -   `ReadMe.pod` dropped.
+
+    -   `copying` and `readme` options implemented. `COPYING` and `README` files are generated by
+        the bundle. `doc/generic/` directory is not required now, all the POD files should be in
+        `doc/`. If a POD file is missed, standard text taken from the bundle is used. Empty
+        `copying` option disables generating `COPYING` file, empty `readme` disables `README`.
+
+    -   `Test::DiagINC` plugin enabled.
+
+    -   Bug in `PodWeaver` found: <https://github.com/rjbs/Dist-Zilla-Plugin-PodWeaver/issues/9>
+        To workaround the bug, clients should keep `doc/copying.pod` file in source tree.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.007 @ 2015-08-15 10:54 UTC
+
+    -   Previous release introduced bug: `PodWeaver` plugin worked before implemented `Templates`.
+        Included POD sections (like `WHAT?` and `WHY?`) were not processed by `PodWeaver` and
+        appeared in the very beginning, before `NAME`. Plugin ordering fixed.
+
+    -   Within the bundle, `$dist->version` used instead of `$MY::version`, just in case — the
+        latter can be (too) easily changed in a template.
+
+    -   "Fake release" notion dropped, and `fake_release` option too. "Local release" notion
+        introduced. Local release avoids external operations: `UploadToCPAN` and `hg push` plugins
+        are skipped in case of local release, `hg tag` adds local tag.
+
+0.006 @ 2015-08-14 00:31 UTC
+
+    -   Released distribution is installed.
+
+    -   `templates` option implemented.
+
+    -   `unwanted_modules` option implemented.
+
+    -   `VERSION` file content is verified.
+
+    -   Release archiving is implemented without `Archive` plugin. `Archive` is a good plugin, but
+        it moves tarball while I want to copy it — probably I'll use it in future. (`Archive` also
+        prunes content of archive directory, but I do not need it since I gather files explicitly
+        listed in `MANIFEST`.)
+
+0.005 @ 2015-08-11 20:08 UTC
+
+    -   Minor problem found: next release version printed as "obj(0.007_01)". Version object
+        stringified to avoid it.
+
+    -   `Templates` plugin used to process `COPYING` and `README`.
+
+    -   `Prereqs::AuthorDeps` adds dependency on `tools::GenerateHooks` which is not indexed by
+        CPAN, it causes pre-release check failure. Added a workaround.
+
+0.004 @ 2015-08-09 22:12 UTC
+
+    -   All the implicitly used modules are explicitly used now to let `AutoPrereqs` detect them
+        and add to the distribution metadata as requirements.
+
+    -   `config_plugin` option added to `SurgicalPodWeaver` plugin, so all the `weaver.ini` files
+        can be dropped now.
+
+0.003 @ 2015-08-09 19:26 UTC
+
+    -   `CheckChangesHasContent` plugin enabled.
+
+    -   `fake_home` option added to `Test::Compile` configuration.
+
+    -   `Prereqs::AuthorDeps` plugin enabled.
+
+    -   `Perl::Version` module used to bump the version (instead of adding 0.000001).
+
+0.002 @ 2015-08-08 17:03 UTC
+
+    -   `fake_release` option introduced.
+
+    -   `minimum_perl` option introduced.
+
+    -   The bundle performs cleaning after release.
+
+0.001 @ 2015-08-07 15:42 UTC
+
+    -   Initial revision

@@ -1,0 +1,331 @@
+#!/usr/bin/perl
+
+# example usage:  perl -I../lib conf/dbr.conf car_dealer
+
+use lib qw'../lib ../../lib';
+use DBR::Util::Logger;
+use DBR::Config::Trans;
+use DBR::Config::Relation;
+
+use DBR;
+use strict;
+
+my ($conffile, $schemaname, $tablenames, $outfile) = @ARGV;
+
+usage() && exit unless $conffile;
+
+my $logger = new DBR::Util::Logger(-logpath => '/tmp/dbr_dumpspec.log', -logLevel => 'warn');
+my $dbr    = new DBR(
+		     -logger => $logger,
+		     -conf   => $conffile,
+		    )
+  or usage() and die "ERROR: failed to create DBR - check config file path or spec\n";
+
+schemas() unless $schemaname;
+exit unless $schemaname;
+
+my $confdb ||= 'dbrconf';
+
+my @tablenames = split(/,/,$tablenames);
+@tablenames = tables() unless @tablenames;
+exit unless @tablenames;
+
+my $trans_defs = DBR::Config::Trans->list_translators or die 'Failed to get translator list';
+my %trans_lookup; map {$trans_lookup{$_->{id}} = $_}  @$trans_defs;
+
+my $relationtype_defs = DBR::Config::Relation->list_types or die 'Failed to get relationship type list';
+my %relationtype_lookup; map {$relationtype_lookup{$_->{type_id}} = $_}  @$relationtype_defs;
+
+if ($outfile) {
+      open( OUTFILE, ">$outfile" ) or die "failed to open output file [$outfile]\n";
+}
+
+@tablenames = all_tables() if @tablenames == 1 && $tablenames[0] eq 'ALL';
+
+foreach my $tablename (uniq( @tablenames )){
+      dumptable($tablename);
+}
+
+print "Tables have been dumped to: $outfile\n" if $outfile;
+
+
+sub dumptable{
+      my $tablename = shift;
+      my $dbrh = $dbr->connect($confdb) or die "No config found for confdb $confdb";
+
+
+      # Translators
+      # Relationships
+      # Enums
+
+      my $schema = $dbrh->select(
+				 -table => 'dbr_schemas',
+				 -fields => 'schema_id handle display_name',
+				 -where  => { handle => $schemaname },
+				 -single => 1,
+				) or die('Schema not found');
+
+      my $table = $dbrh->select(
+				-table  => 'dbr_tables',
+				-fields => 'table_id schema_id name',
+				-where  => {
+					    schema_id => ['d', $schema->{schema_id} ],
+					    name      => $tablename
+					   },
+				-single => 1,
+			       ) or die('Table not found');
+
+      my $fields = $dbrh->select(
+				 -table => 'dbr_fields',
+				 -fields => 'field_id table_id name data_type is_nullable is_signed is_pkey trans_id max_value',
+				 -where  => { table_id => ['d',$table->{table_id} ] },
+				) or die('Failed to select fields');
+
+      die "No fields present" unless @$fields;
+
+      my @fieldids = map { $_->{field_id} } @$fields;
+
+      ##### Enums
+
+
+      my $enum_maps = $dbrh->select(
+				    -table => 'enum_map',
+				    -fields => 'row_id field_id enum_id sortval',
+				    -where  => { field_id => ['d in', @fieldids ] },
+				   ) or die('Failed to select enum_maps');
+
+
+      my @enumids = uniq( map { $_->{enum_id} } @$enum_maps );
+
+      my %enum_map_lookup;
+      map {push @{  $enum_map_lookup{$_->{field_id}}  }, $_ } @$enum_maps;
+
+      my $enum_lookup;
+      if (@enumids) {
+	    $enum_lookup = $dbrh->select(
+					 -table => 'enum',
+					 -fields => 'enum_id handle name override_id',
+					 -where  => { enum_id => ['d in',  @enumids] },
+					 -keycol => 'enum_id',
+					) or die('Failed to select enums');
+      }
+
+
+      ##### Relationships
+      my $relationships = $dbrh->select(
+					-table => 'dbr_relationships',
+					-fields => 'relationship_id from_name from_table_id from_field_id to_name to_table_id to_field_id type',
+					-where  => { from_field_id => ['d in', @fieldids ] },
+				       ) or die('Failed to select relationships');
+
+      my %relation_map;
+      map {push @{    $relation_map{ $_->{from_field_id} }    }, $_ } @$relationships;
+
+      my @rfield_ids = uniq( map { $_->{to_field_id} } @$relationships );
+
+      my $rfield_lookup;
+      if (@rfield_ids) {
+	    $rfield_lookup = $dbrh->select(
+					   -table => 'dbr_fields',
+					   -fields => 'field_id table_id name',
+					   -where  => { field_id => ['d in', @rfield_ids] },
+					   -keycol => 'field_id',
+					  ) or die('Failed to select related tables');
+      }
+
+
+      my @rtableids = uniq( map { $_->{table_id} } values %$rfield_lookup );
+
+      my $rtable_lookup;
+      if (@rtableids) {
+	    $rtable_lookup = $dbrh->select(
+					   -table => 'dbr_tables',
+					   -fields => 'table_id name schema_id',
+					   -where  => { table_id => ['d in', @rtableids] },
+					   -keycol => 'table_id',
+					  ) or die('Failed to select related tables');
+      }
+
+      my @rschema_ids = grep { $_ != $schema->{schema_id} } uniq( map { $_->{schema_id} } values %$rtable_lookup );
+
+      my $rschema_lookup;
+      if (@rschema_ids) {
+	    $rschema_lookup = $dbrh->select(
+					    -table => 'dbr_schemas',
+					    -fields => 'schema_id handle',
+					    -where  => { schema_id => ['d in', @rschema_ids] },
+					    -keycol => 'schema_id',
+					   ) or die('Failed to select related schemas');
+      }
+
+      #schema table field directive value1 value2...
+
+
+      foreach my $field (@$fields) {
+	    my @prefix = (
+			  table  => $schemaname . '.' . $tablename,
+			  field  => $field->{name}
+			 );
+
+
+	    if ($field->{trans_id}) {
+		  my $transtype = uc($trans_lookup{  $field->{trans_id}  }->{name} || "Unknown");
+		  line(
+		       @prefix,
+		       cmd        => 'TRANSLATOR',
+		       translator => $transtype
+		      );
+
+		  if ($transtype eq 'ENUM') {
+			my $mappings = $enum_map_lookup{ $field->{field_id} };
+			foreach my $mapping ( sort { $a->{sortval} <=> $b->{sortval} } @$mappings) {
+			      my $enum = $enum_lookup->{ $mapping->{enum_id} };
+
+			      line(
+				   @prefix,
+				   cmd     => 'ENUMOPT',
+				   handle  => $enum->{handle},
+				   enum_id =>$enum->{enum_id},
+				   override_id => defined($enum->{override_id})? $enum->{override_id} : 'NULL',
+				   name    => $enum->{name},
+				  );
+			}
+		  }
+	    }
+
+	    my $relations = $relation_map{ $field->{field_id} };
+	    if ($relations) {
+		  foreach my $relation (@$relations) {
+			my $rfield  = $rfield_lookup->{ $relation->{to_field_id} };
+			my $rtable = $rtable_lookup->{ $rfield->{table_id} };
+
+			my $rtablename;
+
+			if( $table->{schema_id} != $rtable->{schema_id} ){
+			      my $rschema = $rschema_lookup->{ $rtable->{schema_id} };
+			      $rtablename = $rschema->{handle} . '.' . $rtable->{name};
+			}else{
+			      $rtablename = $rtable->{name};
+			}
+
+			my $typename = uc($relationtype_lookup{ $relation->{type} }->{name} || 'Unknown');
+			line(
+			     @prefix,
+			     cmd      => 'RELATION',
+			     reltable => $rtablename,
+			     relfield => $rfield->{name},
+			     relname  => $relation->{to_name},
+			     reverse_name  => $relation->{from_name},
+			     type     => $typename,
+			    );
+		  }
+	    }
+
+      }
+}
+
+sub line{
+      my @pairs;
+      while (@_){
+	    my ($field,$value) = (shift,shift);
+	    die "Illegal character in fieldname" if $field =~ /\t/;
+	    die "Illegal character in value"     if $value =~ /\t/;
+	    push @pairs, $field . '=' . $value;
+      }
+      my $outline = join("\t",@pairs) . "\n";
+      $outfile ? print OUTFILE $outline : print $outline;
+}
+
+
+sub uniq{
+
+      my %uniq;
+
+      return grep {!$uniq{$_}++} @_;
+
+}
+
+sub tables {
+      print <<"EOF";
+Specify tables to dump:
+  Enter  to quit entry and perform dump,
+  QUIT   to exit without any dump,
+  ALL    to dump all schema tables,
+  *      in name to show matching table names (and add if '!' appended),
+         or full names separated by commas to add to the dump list.
+EOF
+
+      my @all = all_tables();
+      my %allmap = map { $_ => 1 } @all;
+
+      print "schema has " . scalar( @all ) . " tables...\n";
+
+      my @names = ();
+      while (1) {
+            print "\nTABLE> "; chomp( my $tspec = <STDIN> );
+            last unless $tspec;
+            if ($tspec eq 'QUIT') { @names = (); last; }
+            print "No spaces!\n" and next if $tspec =~ m!\s!;
+            @names = @all and last if $tspec eq 'ALL';
+            if ($tspec =~ m!\*!) {
+                  my ($addflag) = $tspec =~ s!(\!)$!!;
+                  $tspec = '^'.$tspec unless $tspec =~ m!^\*!;
+                  $tspec = $tspec.'$' unless $tspec =~ m!\*$!;
+                  $tspec =~ s!\*!.\*!g;
+                  my @matched = grep { $_ =~ m!$tspec!i } @all;
+                  print "MATCHES: " . (@matched ? join( ',', @matched ) : '(none)');
+                  push @names, @matched if $addflag;
+            }
+            else {
+                  my @entered = split( /\s*,\s*/, $tspec );
+                  push @names, grep { $allmap{$_} } @entered;  # prevent bad table names
+            }
+            print "\nDump: " . (@names ? join(',',@names) : '(empty list)' ) . "\n";
+      }
+      make_outfile();
+      return @names;
+}
+
+sub all_tables {
+      my $inst = $dbr->get_instance( $schemaname ) or die "failed to get instance!\n";
+      my $schema = $inst->schema or die "failed to get schema from instance!\n";
+      my $tables = $schema->tables or die "failed to get tables from schema!\n";
+      my @all = map { $_->name } @{$tables};
+      return @all;
+}
+
+sub schemas {
+      print "\nAvailable Schemas:\n   ";
+      print join( "\n   ", map { $_->{handle} } @{ DBR::Config::Schema->list_schemas } );
+      print "\n\nSCHEMA> "; chomp( $schemaname = <STDIN> );
+      make_outfile();
+      return 1;
+}
+
+# if we're interactive, we don't want to output to STDOUT anymore
+sub make_outfile {
+      $outfile ||= $$ . '_' . time . '.dbr';
+}
+
+sub usage {
+      print <<"EOF";
+
+usage:
+
+  $0 <conf-file> [ <schema-handle> [ <table-name>[,<table-name>...] <out-file-path> ] ]
+
+  If either schema-handle or table-name is omitted, enters interactive mode.
+  Interactive mode will output to a file in the current working directory.
+  If a single table name of "ALL" is specified, all tables are dumped.
+  Table names must be comma-separated without whitespace.
+
+  example:
+    $0 DBR.conf               (interactive mode)
+    $0 DBR.conf cars          (interactive mode)
+    $0 DBR.conf cars ALL
+    $0 DBR.conf cars car,model,make
+    $0 DBR.conf cars car,model,make ./metadata/cars.dbr
+
+EOF
+      return 1;
+}

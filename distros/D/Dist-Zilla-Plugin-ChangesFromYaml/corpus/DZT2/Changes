@@ -1,0 +1,17 @@
+---
+version: 0.37
+date:    Fri Oct 25 21:46:59 MYT 2013
+changes:
+- 'Bugfix: Run Test::Compile tests as xt as they require optional dependencies to be present (GH issue #22)'
+- 'Testing: Added Travis-CI integration'
+- 'Makefile: Added target to update version on all packages'
+---
+version: 0.36
+date:    Sun Oct 20 04:44:42 MYT 2013
+changes:
+- Move the distribution to Dist::Zilla
+---
+version: 0.35
+date:    Mon May 27 14:23:42 PDT 2013
+changes:
+- Forgot to merge doc changes from CarlosLima++

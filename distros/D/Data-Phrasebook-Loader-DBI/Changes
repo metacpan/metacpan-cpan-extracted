@@ -1,0 +1,80 @@
+Changes log for Data-Phrasebook-Loader-DBI
+==========================================
+
+0.16	2014-08-23
+        - fixed license fields in META.json to be lists.
+        - extended test suite.
+        - added cpanminus to installation instructions.
+        - added repository link to META.yml.
+
+0.15	2013-06-02
+        - change file dates changed to meet W3CDTF standards.
+        - clarified licensing text.
+        - fixed test warnings.
+
+0.14	2012-07-29
+        - added Carp as a prerequisite.
+        - implemented Perl::Critic suggestions.
+
+0.13    2012-07-28
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - removed DSLIP info.
+        - spelling fix. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated META.yml testing.
+        - added META.json.
+        - added Changes file tests.
+
+0.12    2007-03-01
+        - Added META.yml testing
+
+0.11    2007-03-01
+        - Fixed load testing bug that's been hanging a round for a while. 
+        - Added Test::MockObject to list of recommends in META.yml.
+        - Added some more validation to load().
+        - Rewrote get() to handle ordered dictionary searches.
+        - more tests.
+        - Devel::Cover = 99.2%
+
+0.10    2007-02-22
+        - Fixed typo in META.yml.
+
+0.09    2007-02-22
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE as *apparently*, to all
+          non-British users of this module, this a bug! I beg to differ -
+          http://dictionary.reference.com/search?q=licence
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+        - Minor fix suggested by Perl::Critic.
+
+0.08    2005-09-22
+        - Added keywords() support
+        - Added tests
+        - Upped prerequisite for Data::Phrasebook to 0.24.
+
+0.07    2005-06-16
+        - Updated dictionary support features
+
+0.06    2005-06-15
+        - Upped prerequisite for Data::Phrasebook to 0.22.
+
+0.05    2005-06-14
+        - Added dicts() support
+
+0.04    2005-03-25
+        - Added DSLIP information
+        - Rewrote tests scripts
+        - Devel::Cover - 97.3%
+
+0.03    2005-03-03
+        - POD updates.
+        - 01load.t test fixes
+
+0.02    2005-02-24
+        - revamped and renamed as part of the Data::Phrasebook framework
+
+0.01    2004-01-31
+        - Extracted from main Phrasebook distribution

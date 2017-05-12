@@ -1,0 +1,61 @@
+0.314     2011-11-06 11:07:45 Europe/Paris
+        . fixed hooks deprecation
+
+0.313     2011-02-07 10:11:55 Europe/Paris
+        . fixed operators priorities
+
+0.312     2011-02-06 13:09:54 Europe/Paris
+        . depends on Dancer 1.3001
+
+0.311     2011-02-05 21:27:23 Europe/Paris
+        . fix versioning issue
+        . check there is a session engine
+        . update documentation
+
+0.310     2011-02-05 18:50:27 Europe/Paris
+        . fix case where no flash has been defined
+        . thanks to ambs and sawyerX
+
+0.309     2011-02-05 13:24:13 Europe/Paris
+        . documentation fixed
+
+0.308     2011-02-05 13:14:07 Europe/Paris
+	. remove the persistence config
+	. get the module to be as simple as possible
+        . documentation fixed
+
+0.307     2011-01-30 13:15:30 Europe/Paris
+	. add Dancer dependancy
+	. get Makefile.PL properly generated
+
+0.306     2011-01-28 16:15:49 Europe/Paris
+	. Fix RT#65009 again
+	. flash messages are now smart enough to stay alive across multiple
+	  requests, until they are used in templates ( thanks to Flavio Poletti
+	  for the idea )
+
+0.305     2011-01-23 19:20:17 Europe/Paris
+	. Fix RT#65009
+	. 'persistence' configuration key added
+	. tests for (non) persistence added
+
+0.304     2011-01-16 14:25:58 Europe/Paris
+	. Fix tests
+
+0.303     2011-01-15 13:58:20 Europe/Paris
+	. Don't require Dancer::Plugin::TemplateToolkit (hence Template::Toolkit)
+	  for tests
+	. Add warning about Dist::Zilla in Makefile.PL
+
+0.302     2011-01-11 17:41:49 Europe/Paris
+
+0.301     2011-01-11 17:40:16 Europe/Paris
+
+0.300     2011-01-11 17:39:00 Europe/Paris
+	. Dist-Zillification
+
+0.2
+	. more Rails-like : flash is a hash of messages
+
+0.1
+	. first version

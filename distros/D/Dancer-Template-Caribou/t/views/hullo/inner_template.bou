@@ -1,0 +1,5 @@
+sub {
+    my $self = shift;
+
+    h1 { 'hullo ' . $self->name . '!' };
+}

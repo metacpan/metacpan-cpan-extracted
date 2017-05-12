@@ -1,0 +1,14 @@
+.gitignore
+Changes
+config.yml
+etc/example.json
+etc/scratch.json
+lib/Dancer/Plugin/DynamicConfig.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/unit/lib/Dancer/Plugin/DynamicConfig/basic.t
+t/unit/lib/Test/ValCaps.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

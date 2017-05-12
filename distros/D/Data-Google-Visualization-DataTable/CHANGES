@@ -1,0 +1,27 @@
+0.11  Tue Dec 23 14:35:00 2014
+	- Pass-through milliseconds if they exist in the DateTime object, with
+	  reference to a patch by torstein@visena.com,
+	  (https://rt.cpan.org/Ticket/Display.html?id=98775)
+0.10  Thu Nov 08 06:50:00 2012
+	- Allowed complete bypass of JSON::XS after response to use request
+0.09  Mon Sep 03 21:00:00 2012
+	- Date bug: https://rt.cpan.org/Ticket/Display.html?id=79374
+	- General date cleanup, including allowing timezones, + docs
+0.08  Fri May 06 10:45:00 2011
+	- Documentation patch to make it clear we're outputting Javascript, not JSON
+0.07  Fri Dec 21 10:30:00 2010
+	- Overhaul of how properties are handled (https://rt.cpan.org/Ticket/Display.html?id=64356) - thanks to Matthew Darwin
+	- Small documentation patch (https://rt.cpan.org/Ticket/Display.html?id=64355)
+0.06  Wed Nov 10 20:00:00 2010
+	- Added proper handling of nulls in response to https://rt.cpan.org/Ticket/Display.html?id=62899
+0.05  Sun Mar 28 15:00:00 2010
+	- Handled non-defined or blank-string zero values better as numbers
+0.04  Sun Mar 28 11:20:00 2010
+	- Now uses Dist::Zilla
+0.03  Sun Mar 28 10:22:00 2010
+	- Small bug when adding columns one by one
+0.02  Mon Mar 01 13:15:00 2010
+	- META.yml is now required by the indexer. Who knew?
+0.01	Mon Mar 01 12:50:00 2010
+	- Initial release
+

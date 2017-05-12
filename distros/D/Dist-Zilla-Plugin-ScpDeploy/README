@@ -1,0 +1,35 @@
+Dist::Zilla::Plugin::ScpDeploy
+------------------------------
+
+This plugin can automatically deploy a release when you run "dist
+release". It performs two actions for you:
+
+    * uses "scp" to copy the released tarball to one or more hosts
+
+    * uses "ssh" to run a deployment command on each of those hosts
+
+Configure this behavior in your dist.ini by setting three required
+arguments:
+
+  [ScpDeploy]
+  hosts      = huey, dewey, louie
+  command    = release_me
+  remote_dir = /home/cbarks/vault
+
+Note well that you may specify multiple hosts by separating them with
+commas and (optional) spaces.
+
+It is your responsibility to configure "ssh" and "scp" on your machine
+such that hostnames and passwordless logins work correctly *and* that
+this module can find the appropriate binaries in your path. It is also
+your responsibility to configure the remote hosts such that the remote
+directory and the remote command to run are available.
+
+The remote command receives one argument: the path to the release
+tarball in the give remote directory.
+
+Copyright and License
+---------------------
+
+Copyright (c) 2011, chromatic. This code is available for reuse, modification,
+and distribution under the terms of Perl 5.12 itself.

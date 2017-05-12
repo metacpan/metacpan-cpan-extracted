@@ -1,0 +1,29 @@
+Revision history for Perl extension Data::Validate.
+
+0.9   20140426
+	- Added fix for longdouble bug (RT 63213) provided by Mark Hedges
+
+0.8   20070310
+	- added version prereq for Math::BigInt
+
+0.7   20070309
+	- added missing prerequisite for Math::BigInt
+
+0.06  20060723
+	- started converting some numeric functions to handle very large integers.
+
+0.05  20060419
+	- Fixed a typo in the synopsis documentation.  Thanks to Peter Beckman for spotting it.
+
+0.04  20050509
+	- added is_hex and is_oct functions provided by Neil Neely (neil@frii.com)
+
+0.03  20041222
+	- fixed overflow bug in is_integer() that was causing it to fail on long (but valid) integers.
+
+0.02  20041213
+	- added OO interface and updated tests
+
+0.01  Fri Nov  5 15:48:26 2004
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,10 @@
+This module provides a nice interface to looking at $^O, and also lets
+you ask about OS "families" such as "Unix" (which encompasses Linux, *BSD,
+AIX, HPUX, Solaris etc).
+
+To install, do the usual dance:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

@@ -1,0 +1,230 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=<% settings.charset %>" />
+<title><% page.title %></title>
+<link rel="stylesheet" href="<% request.uri_base %>/css/style.css" />
+<link rel="stylesheet" href="<% request.uri_base %>/cleditor/jquery.cleditor.css" />
+
+<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery-1.6.3.min.js"></script>
+<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery.a-tools-1.5.2.min.js"></script>
+<script type="text/javascript" src="<% request.uri_base %>/javascripts/jquery-ui-1.8.16.custom.min.js"></script>
+<script type="text/javascript" src="<% request.uri_base %>/javascripts/dwimmer.js"></script>
+<script type="text/javascript" src="<% request.uri_base %>/javascripts/scriptbreaker-dropdownpanel-1.0.js"></script>
+
+<script type="text/javascript" src="<% request.uri_base %>/cleditor/jquery.cleditor.min.js"></script>
+<script type="text/javascript" src="<% request.uri_base %>/cleditor/jquery.cleditor.advancedtable.min.js"></script>
+
+
+</head>
+<body>
+<div id="admin">
+  <div id="logged_in_bar">
+    <ul class="topnav">
+      <li><a href="/" class="current">Home</a></li>
+      <li><a id="logged-in"></a></li>
+    <!--
+      <li><a href="">JavaScript</a>
+        <div class="submenu submenu_fancy">
+          <ul>
+            <li><a href="">Link title</a><br><span>Link description</span></li>
+          </ul>
+        </div>
+      </li>
+    -->
+      <li><a class="manage" href="">Manage</a>
+        <div class="submenu submenu_simple">
+          <ul>
+            <li><a class="change_my_password" href="">change my password</a></li>
+            <li><a class="list_users"   href="">list users</a></li>
+            <li><a class="add_user"     href="">add user</a></li>
+            <li><a class="list_pages"   href="">list pages</a></li>
+            <li><a class="add_page"     href="">add a new page</a></li>
+            <li><a class="show_history" href="">show history</a></li>
+            <li><a class="admin_site"   href="">admin site</a></li>
+            <div class="experimental_features">
+            <li><a class="list_sites" href="">list sites</a></li>
+            <li><a class="create_site" href="">create site</a></li>
+            <li><a class="create_mailing_list" href="">create mailing list</a></li>
+            <li><a class="list_feed_collectors" href="">list feed collectors</a></li>
+            <li><a class="create_feed_collector" href="">create feed collector</a></li>
+            </div>
+          </ul>
+        </div>
+      </li>
+      <li><a class="edit_this_page" href="">edit this page</a></li>
+      <li><a class="logout" href="">logout</a></li>
+    </ul>
+  </div>
+  <div id="guest_bar">
+    <form class="login">
+      <span class="login-label"> Username: </span><input name="username" />
+      <span class="login-label"> Password: </span><input type="password" name="password" />
+      <input type="submit" value="Login" />
+    </form>
+    <!--
+    Not yet implemented
+    <span><a class="lost_password" href="">Lost password</a></span>
+    <span><a class="register_form" href="">Register</a></span>
+    -->
+  </div>
+</div>
+
+<div id="manage-bar">
+  <div id="manage-close"><a class="close_manage_bar" href="" value="close">close</a><br></div>
+
+  <div id="manage-display">
+  <div id="manage-display-content">
+  </div>
+  <a href="" id="prev">prev</a>
+  <a href="" id="next">next</a>
+  </div>
+
+  <div id="admin-change-password">
+    Change password:
+    <form id="change_my_password_form" action="/_dwimmer/change_my_password.json" method="POST">
+    Old password: <input type="password" name="old_password"><br />
+    New password: <input type="password" name="new_password"><br />
+    <input type="submit" value="Change password"><br />
+    </form>
+  </div>
+
+  <div id="admin-add-feed">
+    <form id="add_feed_form" action="/_dwimmer/add_feed.json" method="POST">
+    <input type="hidden" id="collector" name="collector" value="42" />
+    Title: <input name="title"><br />
+    URL: <input name="url"><br />
+    Feed: <input name="feed"><br />
+    <input type="submit" value="Add"><br />
+    </form>
+  </div>
+
+  <div id="admin-site">
+  </div>
+
+  <div id="manage-add-user">
+    <form id="add_user_form" action="/_dwimmer/add_user_form.json" method="POST">
+    Username: <input name="uname" /><br />
+    First name: <input name="fname" /><br />
+    Last name: <input name="lname" /><br />
+    email: <input name="email" /><br />
+    You can leave the password fields empty and a password will be generated to the user
+    who will be able to reset it via the web form.<br />
+    password: <input name="pw1" type="password" /><br />
+    retypr password: <input name="pw2" type="password" /><br />
+    Send validation mail: <input name="verify" type="radio" value="send_email" CHECKED />
+    Set verified bit <input type="radio" name="verify" value="verified" />
+    <input type="submit" value="Add user" /><br />
+    </form>
+  </div>
+
+  <div id="admin-editor">
+    <form id="editor_form" action="/_dwimmer/save" method="POST">
+      <input type="button" id="save" value="Save" />
+      <input type="button" id="cancel" value="Cancel" />
+      <input type="button" id="preview" value="Preview" />
+<!--
+      <br />
+      <input type="button" id="editor-bold" title="bold" value="b" />
+      <input type="button" id="editor-italic" title="italic" value="i" />
+      <input type="button" id="editor-link" title="add link" value="Link" />
+-->
+      <div id="admin-editor-filename">
+        Filename: <input id="filename" name="filename" />
+      </div>
+      <input type="hidden" id="create" name="create" />
+      <br />
+      <input name="editor_title" id="editor_title" size="80" />
+      <br />
+      <textarea rows="10" cols="70" name="editor_body" id="editor_body"></textarea>
+      <!--  <br />
+       Comma separated tags: <input name="editor_tags" id="editor_tags" size="80" />
+      -->
+    </form>
+  </div>
+
+  <div id="admin-create-site">
+    <form id="create_site_form" action="/_dwimmer/create_site.json" method="POST">
+      Hostname: <input name="name" size="30" />
+      <input type="submit" id="create-site" value="Create Site" />
+    </form>
+  </div>
+
+  <div id="admin-create-mailing-list">
+    <form id="create_list_form" action="/_dwimmer/create_list.json" method="POST">
+      <table>
+      <tr><td>List name:<input name="name" size="40" /></td>
+          <td>List title:<input name="title" size="40" /></td></tr>
+      <tr><td>From address:</td><td><input name="from_address" size="40" /></td></tr>
+      <tr><td>Validate template:<br /><textarea rows="6" cols="70" name="validate_template"></textarea></td>
+          <td>Confirm template:<br /><textarea rows="6" cols="70" name="confirm_template"></textarea></td></tr>
+      <tr><td>Response page:<input name="response_page" size="20" /></td>
+          <td>Validation page:<input name="validation_page" size="20" /></td>
+      </tr>
+      <tr><td>Validation Response page:</td><td><input name="validation_response_page" size="20" /></td></tr>
+
+      <tr><td></td><td><input type="submit" id="create-mailing-list" value="Create Mailig list" /></td></tr>
+      </table>
+    </form>
+  </div>
+
+  <div id="admin-create-feed-collector">
+    <form id="create_feed_collector_form" action="/_dwimmer/create_feed_collector.json" method="POST">
+    Name: <input name="name" />
+    <input type="submit" />
+    </form>
+  </div>
+
+  <div id="admin_google_analytics">
+    <form id="google_analytics_form" action="/_dwimmer/save_site_config.json" method="POST">
+    <input type="hidden" class="siteid" name="siteid"  />
+    <input type="hidden" name="section" value="google_analytics" />
+    Google Analytics <input id="google_analytics" name="google_analytics" /><br />
+    Enable Google Analytics <input type="checkbox" id="enable_google_analytics" name="enable_google_analytics" /><br />
+    <input type="submit" value="Save" />
+    </form>
+  </div>
+
+  <div id="admin_getclicky">
+    <form id="getclicky_form" action="/_dwimmer/save_site_config.json" method="POST">
+    <input type="hidden" class="siteid" name="siteid"  />
+    <input type="hidden" name="section" value="getclicky" />
+    GetClicky ID <input id="getclicky" name="getclicky" /><br />
+    Enable GetClicky <input type="checkbox" id="enable_getclicky" name="enable_getclicky" /><br />
+    <input type="submit" value="Save" />
+    </form>
+  </div>
+
+  <div id="admin_general_site_config">
+    <form id="general_site_config_form" action="/_dwimmer/save_site_config.json" method="POST">
+    <input type="hidden" class="siteid" name="siteid"  />
+    <input type="hidden" name="section" value="general" />
+    Pagination page size: <input id="page_size" name="page_size" /><br />
+    Hide login form <input type="checkbox" name="no_guest_bar" id="no_guest_bar" /><br />
+    Show experimental features: <input type="checkbox" name="show_experimental_features" id="show_experimental_features" /><br />
+    <input type="submit" value="Save" />
+    </form>
+  </div>
+
+
+</div>
+
+<p>&nbsp;</p>
+<% INCLUDE layouts/search.tt %>
+<div id="content">
+<% content %>
+</div>
+
+
+<div id="footer">
+Powered by <a href="http://dwimmer.org/">Dwimmer</a> <% dwimmer_version %>
+</div>
+<% IF google_analytics %>
+<% INCLUDE layouts/google_analytics.tt %>
+<% END %>
+<% IF getclicky %>
+<% INCLUDE layouts/getclicky.tt %>
+<% END %>
+</body>
+</html>

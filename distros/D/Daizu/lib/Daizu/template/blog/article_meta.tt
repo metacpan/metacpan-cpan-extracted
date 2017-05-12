@@ -1,0 +1,9 @@
+[%# Displayed metadata on blog articles is different because:
+     * The date is usually more relevant than on a 'catalog' style site.
+     * The author should be included on the principle of 'visible metadata',
+       because the author is provided in the feeds already.
+-%]
+<div class="entry-meta">
+ [% INCLUDE 'article_meta/authors_pubdatetime.tt' %]
+ [% INCLUDE 'article_meta/description.tt' %]
+</div>

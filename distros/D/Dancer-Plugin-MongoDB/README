@@ -1,0 +1,21 @@
+
+
+This archive contains the distribution Dancer-Plugin-MongoDB,
+version 0.35:
+
+  Dancer plugin for MongoDB - Using Mango
+
+  Yes, this is a Mojolicious piece inside of Dancer. But when good
+  work is done, might as well use it. :-)
+
+  Also note that very valid, and very cool code is heavily borrowed
+  from Dancer::Plugin::Database. Maybe at some point in the future
+  they can be combined? :-)
+
+This software is copyright (c) 2014 by Tyler Hardison.
+
+Special thanks to Adam Taylor <adamt@cpan.org> for the original
+version using the older MongoDB driver.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

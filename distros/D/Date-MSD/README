@@ -1,0 +1,42 @@
+NAME
+
+Date::MSD - conversion between flavours of Mars Sol Date
+
+DESCRIPTION
+
+For date and time calculations it is convenient to represent dates by
+a simple linear count of days, rather than in a particular calendar.
+This module performs conversions between different flavours of linear
+count of Martian solar days ("sols").
+
+Among Martian day count systems there are also some non-trivial
+differences of concept.  There are systems that count only complete days,
+and those that count fractional days also.  There are some that are fixed
+to Airy Mean Time (time on the Martian prime meridian), and others that
+are interpreted according to a timezone.  The functions of this module
+appropriately handle the semantics of all the non-trivial conversions.
+
+The day count systems supported by this module are Mars Sol Date,
+Julian Sol, and Chronological Mars Solar Date, each in both integral
+and fractional forms.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2007, 2009, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

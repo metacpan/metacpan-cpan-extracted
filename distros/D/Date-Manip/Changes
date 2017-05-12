@@ -1,0 +1,11 @@
+Written by:
+   Sullivan Beck (sbeck@cpan.org)
+Any suggestions, bug reports, or donations :-) should be sent to me.
+
+6.00  2009-11-23
+  - The history has been moved into the following documents:
+       Date::Manip::Changes5
+       Date::Manip::Changes5to6
+       Date::Manip::Changes6
+    Please refer to them.
+

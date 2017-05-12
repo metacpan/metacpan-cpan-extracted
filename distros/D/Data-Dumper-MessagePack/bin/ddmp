@@ -1,0 +1,65 @@
+#!/usr/bin/env perl
+# PODNAME: ddmp
+# ABSTRACT: Dump MessagePack
+
+use strict;
+use warnings;
+use Data::Dumper::MessagePack;
+
+$|=1;
+
+my $data = "";
+
+while (<>) {
+  $data .= $_;
+  if (eof) {
+    ddmp($data);
+    $data = "";
+  }
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ddmp - Dump MessagePack
+
+=head1 VERSION
+
+version 0.002
+
+=head1 SYNOPSIS
+
+  ddmp somefile
+
+=head1 DESCRIPTION
+
+Display coloured dump of MessagePack
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-data-dumper-messagepack
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-data-dumper-messagepack/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

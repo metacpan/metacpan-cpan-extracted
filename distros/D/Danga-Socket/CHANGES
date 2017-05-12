@@ -1,0 +1,164 @@
+1.61 (2008-11-27)
+    -- IPv6 support.  At least enough to get Perlbal going.
+       Let me know if this is done incorrectly or non-portably!
+       (Brad Fitzpatrick; brad@danga.com).
+
+1.60
+    -- Keep watching for write after all writing is completed if user
+       specifically asked to watch_write (D. Leadbeater)
+
+1.59
+   -- Don't keep watching for write after all writing is completed OK
+      (Dave Leadbeater)
+   -- Reset() now closes the Epoll or KQueue socket (Radu Greab)
+
+1.58
+   -- Remove unnecessary bless() calls in tests (5.10 compatibility)
+      (msergeant)
+
+1.57
+   -- Make tcp_cork be a no-op (rather than exploding) when operating on
+      a fd that isn't a network socket (like a local pipe, which doesn't do
+      TCP).
+
+1.56
+   -- Reset method _still_ wasn't resetting enough.  had to reset the
+      EventLoop method as well, so _InitPoller would get called and reset
+      stuff.
+
+1.55
+   -- Reset method wasn't resetting enough.
+
+1.54 (2006-11-13)
+   -- cap sysreads at 1MB, not 5MB.  seems to crash perl less for
+      more people.  *sigh*
+
+1.53 (2006-08-24)
+   -- Don't allow ->read() if socket has been closed (msergeant).
+   -- Added local_ip_string() and local_addr_string() (msergeant).
+   -- Removed bogus 'ticker' code from KQueue event loop (msergeant).
+   -- Converted comment based docs to POD and fix some of those docs
+      to match reality (msergeant).
+
+1.52: (2006-07-09)
+   -- AddTimer now returns a Danga::Socket::Timer object which you can
+      call the 'cancel' method on.
+
+   -- A good catch by Whitaker. If an epoll_ctl problem occurs when
+      manipulatiing something that isn't an INET domain socket, the
+      unpacking of remote information will fail.
+
+1.51: (2006-04-27)
+   -- let subclasses overwrite the behavior on incomplete writes.
+      default, as always, is just to force watching of writability.
+      but during, say, SSL stuff, it's useful to disable that.
+
+1.50: (2006-04-17)
+   -- use bytes.  was affecting djabberd with unicode XML messages.
+      diagnosis by Artur Bergman and Tatsuhiko Miyagawa.
+
+1.49: (2006-03-02)
+   -- patch to allow pluggable writer functions per socket.  so you
+      can have SSL connections that do Net::SSLeay writes (or whatever)
+      instead of relying on tied handles.
+
+1.48: (2005-10-12)
+   -- patch from Eric Lambrecht <eml@guba.com> who noticed that calling
+      sysread in Perl w/ over ~5MB could cause Perl to just die and quit.
+      so limit reads to 5MB.
+
+1.47: (2005-08-29)
+   -- new $ENV{DS_DEBUG} to warn about weird conditions, which currently
+      means just peer_ip_string returning undef.  trying to trace that down
+      in perlbal occasionally, but DS_DEBUG might be useful in the future
+      for other things
+   -- account for PostEventLoop running with two items in %PushBackSet,
+      the first of which closes the second, so the second would crash
+      trying to deref undef when it can't find the previously evaluated
+      key in the now-empty hash.
+
+1.46: (2005-08-24)
+   -- warn about undef sockets in Danga::Socket's constructor, or overwriting
+      the descriptor map with a socket using the same fd as another in use.
+   -- change all print STDERR to warn (so we can trap 'em with $SIG{__WARN__})
+   -- delay the removal of fds from DescriptorMap to eliminate warnings
+      when one fds in the same epoll_wait/etc return set kills one of
+      the others which hasn't been processed yet.  new test t/12-closerace.t to
+      demonstrate the situation.
+
+1.45: (2005-08-23)
+   -- don't hang forever if there is a timer but no sockets
+      and looptimeout is -1.  the problem was we always picked the
+      lesser time of LoopTimeout and NextTimerTimeout, but if LoopTimeout
+      was -1 (which means infinity), we preferred that, wrongly.
+   -- in RunTimers, calculate the milliseconds in integer, and add 1
+      to remove some floating point weirdness which caused 20-30 extra
+      loops which accomplished nothing.  see comments.
+
+1.44: (2005-08-16)
+   -- fix another bug in push_back_read... ancient:  comma instead of
+      semi-colon (can you tell nobody used this function before?)
+   -- fix a bug in push_back_read ... apparently it never actually
+      worked when you asked for less bytes than were available.
+   -- adds code for when kqueue returns a fd we don't have a
+      mapping for (Matt Sergeant)
+   -- generic timer support (Matt Sergeant), use HiRes and rearrange
+      to share some code (Brad)
+   -- make tcp_cork a noop on non-linux (FIXME: port to bsd at least)
+
+1.43:
+   -- don't even try epoll if not on a known/tested arch
+   -- updated POD docs
+
+1.42:
+   -- use the right epoll system call numbers on non-x86
+      machines
+   -- start of a good test suite
+   -- 64-bit struct support (test suite passes on ia64, ppc)
+      (and presumably ppc64, but yet untested)
+
+
+1.41:
+   -- make the Poll mode behave like Epoll/Kqueue in that
+      fds returned w/ no corresponding Danga::Socket object
+      or OtherFds coderef just get ignored.  make it robust
+      against apps with races, perhaps?  patch from Justin Azoff
+      <JAzoff@uamail.albany.edu>
+
+1.40:
+
+   -- Kqueue support from Matt Sergeant
+
+1.39:
+
+   -- make BSD::Resource optional
+
+1.38:
+
+   -- added support for profiling (epoll only at the moment while this
+      feature is further fleshed out); user application is required to
+      enable profiling and actually process the resultant data
+
+   -- if epoll_wait returns an event we can't handle, delete it.
+      this means the application fucked up and lost its state somehow.
+      or maybe Danga::Socket did?  still debugging this in Perlbal.
+
+1.25: (2004-10-22)
+
+   -- move the syscall.ph require into "package main" rather than stealing
+      all its definitions into our namespace.  now other modules can
+      use syscall.ph and Danga::Socket at the same time (as long as they're
+      also polite and load it into main)  (NOTE: if you know a better way
+      to do this, let us know...)
+
+1.24: (2004-10-21)
+
+   -- ability to steal the underlying socket from the Danga::Socket
+      object.  this is useful if a caller wants to hold onto the socket
+      but destroy the Danga::Socket object (previously the Danga::Socket
+      close would close the underlying socket)
+
+1.22: (2004-10-21)
+
+   -- minimal POD docs
+   -- first public release

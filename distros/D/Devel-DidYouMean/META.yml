@@ -1,0 +1,27 @@
+---
+abstract: 'Intercepts failed function and method calls, suggesting the nearest matching alternative.'
+author:
+  - 'David Farrell <sillymoos@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-DidYouMean
+requires:
+  Perl::Builtins: '0'
+  Text::Levenshtein: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/sillymoose/Devel-DidYouMean
+  repository: https://github.com/sillymoose/Devel-DidYouMean.git
+version: '0.05'

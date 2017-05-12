@@ -1,0 +1,18 @@
+logger: "file"
+log: "debug"
+logger_format: "%t %h %m"
+show_errors: 1
+
+appname: "dancer-oo"
+appdir: './'
+session: "YAML"
+session_dir: "sessions"
+session_expires: 2592000
+charset: 'utf8'
+
+template: "template_toolkit"
+engines:
+  template_toolkit:
+    encoding:  'utf8'
+    start_tag: '[%'
+    end_tag:   '%]'

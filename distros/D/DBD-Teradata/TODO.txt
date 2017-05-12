@@ -1,0 +1,35 @@
+TO DO list for DBD::Teradata 1.50
+
+- support for async prepare()
+
+- add support for PREPINFOX, DATAINFOX, MULTIPARTREC, MULTIPART[INDIC]DATA
+
+- connection timeouts
+
+- quoted identifiers
+
+- reconnect
+
+- SSO
+
+- LOB support
+
+- UDF/XSP creation support
+
+- mod_perl testing
+
+- performance enhancements
+
+- scrollable cursors
+
+- more refactoring, esp. tdat_Unpack, io_fetch, Utility.pm
+
+- prebuild common requests (commit, rollback, continue, etc.)
+
+- better handling of BT/ET to track nested transactions
+
+- add support for per-handle tracing via the TraceLevel attribute
+
+V2R6.2 updates: VARDECIMAL, BIGINT support
+
+64 bit platform/Perl/DBI support

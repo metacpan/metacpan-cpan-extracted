@@ -1,0 +1,31 @@
+Revision history for Perl extension Data::Omap.
+
+0.06  Tue Jun 10 11:48:07 EDT 2008
+    - added exporting of non-oo aliases for methods
+    - added tests to MANIFEST
+
+0.05  Sat Jun  7 07:36:13 EDT 2008
+    - fixed typos in pod
+    - croak if pos too large in set() and add()
+
+0.04  Thu Jun  5 12:25:38 EDT 2008
+    - added use 5.008003; (from 5.8.0) based on cpan testing
+    - changed get_pos() to work with only one key
+    - added get_pos_hash() for handling multiple keys
+    - added SEE ALSO Tie::IxHash in pod (rt.cpan.org id=36484)
+
+0.03  Wed Jun  4 17:54:06 EDT 2008
+    - validate incoming structure in new()
+
+0.02  Wed Jun  4 17:54:06 EDT 2008
+    - added 'use Carp;'
+    - changed get_pos() to return a list of hashrefs
+
+0.01  Sun Jun  1 18:04:09 2008
+    - original version; created by h2xs 1.23 with options
+        -AX --skip-exporter --use-new-tests -n Data::Omap -b 5.8.0
+    - Added t/05-DO-pod.t
+    - Added POD, changed clone() to get_array()
+    - Split up test file
+    - New module
+

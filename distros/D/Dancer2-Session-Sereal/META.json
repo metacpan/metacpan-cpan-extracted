@@ -1,0 +1,87 @@
+{
+   "abstract" : "Dancer 2 session storage in files with Sereal",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Session-Sereal",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.15000",
+            "Dancer2::Core::Role::SessionFactory::File" : "0",
+            "Dancer2::Core::Types" : "0",
+            "Moo" : "0",
+            "Sereal::Decoder" : "0",
+            "Sereal::Encoder" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0.15000",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0.22",
+            "HTTP::Cookies" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Session::Sereal" : {
+         "file" : "lib/Dancer2/Session/Sereal.pm",
+         "version" : "0.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Session-Sereal/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Session-Sereal",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlDancer/Dancer2-Session-Sereal.git",
+         "web" : "https://github.com/PerlDancer/Dancer2-Session-Sereal"
+      }
+   },
+   "version" : "0.003",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Peter Mottram <peter@sysnix.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

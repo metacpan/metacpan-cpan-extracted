@@ -1,0 +1,235 @@
+#!/usr/bin/perl -w
+'di';
+'ig00';
+# See usage() for syntax
+
+use Getopt::Long;
+
+use DBI;
+
+use strict;
+
+# Default values for options
+my ( $trace, $inst, $cache, $delim, $format, $headers, $page_len, $null_str ) =
+   ( 0, $ENV{TWO_TASK} || $ENV{ORACLE_SID} || '', '', "\t", 0, 0, 60, '' );
+
+# Syntax description
+sub usage {
+    my ( $sOpt, $sVal, @sMsg ) = @_;
+
+    my $sHelpText = <<END_HELP_END;
+Execute a SQL statement
+syntax: $0 [options] name pass [stmt]
+Options:
+   -h          Write this help to STDOUT
+   -t trace    trace control string
+   -b base     database to use (default $inst)
+   -c cache    SQL fetch cache size in rows
+   -d delim    specifies the field delimiter (default TAB)
+   -F          format output, similar to sqlplus
+   -H          add headers, not allowed if formatting
+   -l page_len lines per page, only used by -f (default $page_len)
+   -n string   replace NULL fields by string
+Arguments:
+   name Oracle username
+   pass Password
+   stmt Oracle statement to be executed
+        it is read from STDIN if not given on command line
+END_HELP_END
+# Balance quotes in here document # ' # "
+
+    my $nRet = 'help' eq $sOpt ? 0 : 0 + $sVal;
+    my $fh   = $nRet ? *STDERR : *STDOUT;
+    foreach ( @sMsg, $sHelpText ) { s/\s+$//; print $fh "$_\n"; }
+    exit $nRet;
+}
+
+# Get options and arguments
+Getopt::Long::config( qw( no_ignore_case no_auto_abbrev require_order ) );
+GetOptions(
+    'help|h'    => \&usage,
+    'trace|t=i' => \$trace,
+    'base|b=s'  => \$inst,
+    'cache|c=i' => \$cache,
+    'delim|d=s' => \$delim,
+    'Format!'   => \$format,  'F!' => \$format,
+    'Headers!'  => \$headers, 'H!' => \$headers,
+    'len|len=i' => \$page_len,
+    'null|n=s'  => \$null_str,
+ ) or usage( 'die', 1 );
+usage( 'die', 1,  "Only one of -F and -H may be specified\n" )
+    if $format && $headers;
+
+usage( 'die', 1, 'Username and password are required' ) if 2 > @ARGV;
+my ( $user, $pass, @stmt ) = @ARGV;
+if ( ! @stmt ) {
+    print "Enter the statement to execute (^D to end):\n";
+    @stmt = <STDIN>;
+}
+usage( 'die', 1, "A statement is required" ) if ! @stmt;
+
+$\ = "\n";      # each record terminated with newline
+$, = $delim;    # set column delimiter
+$= = $page_len; # set page length
+
+# Set trace level
+DBI->trace( $trace );
+
+# Connect to database
+my $dbh = DBI->connect( "dbi:Oracle:$inst", $user, $pass,
+    { AutoCommit => 0, RaiseError => 1, PrintError => 0 } )
+    or die $DBI::errstr;
+$dbh->{RowCacheSize} = $cache if $cache; # set fetch cache
+
+# Start statement
+my $sth = $dbh->prepare( join "\n", @stmt );
+$sth->execute;
+my $nfields = $sth->{NUM_OF_FIELDS};
+
+# print out any information which comes back
+if ( $nfields ) {
+    # the statement has output columns
+    my ( @col, $col );
+    my @name = @{$sth->{NAME}};
+    if ( $format ) {
+        # build format statements for the data
+        my @size = @{$sth->{PRECISION}};
+
+        # First, the header - a list of field names, formatted
+        #    in columns of the appropriate width
+        my $fmt  = join '|', map { "%-${_}.${_}s" } @size;
+        $fmt     = sprintf $fmt, @name;
+        $format = "format STDOUT_TOP =\n" . $fmt . "\n";
+
+        # Then underlines for the field names
+        $fmt    =~ tr/|/-/c;
+        $fmt    =~ tr/|/+/;
+        $format .= $fmt . "\n.\n";
+
+        # Then for the data format, a @<<... field per column
+        $fmt =~ tr/-+/<|/;
+        $fmt =~ s/(^|\|)</$1@/g;
+        $format .= "format STDOUT =\n" . $fmt . "\n";
+
+        # Finally the variable associated with each column
+        # Why doesn't Perl let us specify an array here?
+        $format .= join ', ', map { "\$col[$_]" } 0 .. $#name;
+        $format .= "\n.\n";
+
+        eval($format);
+    }
+    elsif ( $headers ) {
+        # Simple headers with underlines
+        print map { s/\s+$//; $_ } @name;
+        print map { tr//-/c;  $_ } @name;
+    }
+
+    # Associate @col with output columns and fetch the rows
+    $sth->bind_columns( {}, \( @col[0 .. $#name] ) );
+    while ( $sth->fetch ) {
+        foreach $col ( @col ) { $col = $null_str if ! defined $col; }
+        $format ? write : print @col;
+    }
+}
+
+# finish off neatly
+$sth->finish;
+$dbh->disconnect;
+
+__END__     # no need for perl even to scan the rest
+
+##############################################################################
+
+    # These next few lines are legal in both Perl and nroff.
+
+.00;            # finish .ig
+
+'di         \" finish diversion--previous line must be blank
+.nr nl 0-1      \" fake up transition to first page again
+.nr % 0         \" start at page 1
+';<<'.ex'; ############## From here on it's a standard manual page ############
+.TH SQL L "5th July 1999"
+.ad
+.nh
+.SH NAME
+sql \- execute an Oracle SQL statement from the command line
+.SH SYNOPSIS
+\fBsql\fP
+[\fB\-b\fP\fIbase\fP]
+[\fB\-c\fP\fIcache\fP]
+[\fB\-d\fP\fIdelim\fP]
+[\fB\-F\fP|\fB\-H\fP]
+[\fB\-l\fP\fIpage_len\fP]
+[\fB\-n\fP\fIstring\fP]
+\fIname\fP \fIpassword\fP
+\fIstatement\fP
+.SH DESCRIPTION
+.I Sql
+connects to an Oracle database
+using the \fIname\fP and \fIpassword\fP supplied
+and executes the given SQL \fIstatement\fP
+displaying the result
+on its standard output.
+
+The \fB\-b\fP\fIbase\fP flag may be supplied to specify the database to be used.
+If it is not given, the database specified by the environment variable
+\fBTWO_TASK\fP or \fBORACLE_SID\fP is used.
+
+The \fB\-c\fP\fIcache\fP flag may be supplied to set the size of fetch cache
+to be used. If it is not given, the default is used.
+
+If the \fB\-n\fP\fIstring\fP flag is supplied,
+\fBNULL\fP fields (in the \fIOracle\fP sense)
+will replaced in the output by \fIstring\fP.
+Normally, they are left blank.
+
+The \fB\-F\fP and \fB\-H\fP flags may be used to modify the form of the output.
+Without either flag, no field headers are printed
+and fields are not padded.
+With the \fB\-H\fP flag,
+field headers are added to the top of the output,
+but the format is otherwise unchanged.
+With the \fB\-F\fP flag,
+the output is formatted in a tabular form similar to that used by \fIsqlplus\fP,
+except that all fields are left\-justified, regardless of their data type.
+Column headers are printed at the top of each page;
+a page is assumed to be 60 lines long,
+but this may be overridden with the \fB\-l\fP\fIpage_len\fP flag.
+
+Without the \fB\-F\fP flag, fields are separated with tabs;
+this may be changed to any desired string (\fIdelim\fP)
+using the \fB\-d\fP flag.
+.SH ENVIRONMENT
+The environment variable \fBTWO_TASK\fP or \fBORACLE_SID\fP
+determines the Oracle database to be used
+if the \fB\-b\fP\fIbase\fP flag is not supplied.
+.SH DIAGNOSTICS
+.in +5
+.ti -5
+\fBonly one of \-F and \-H may be specified\fP
+.br
+the \fB\-F\fP and \fB\-H\fP options are mutually exclusive,
+but both were specified
+
+.in -5
+The only other diagnostics generated by \fIsql\fP are usage messages,
+which should be self\-explanatory.
+However, you may also encounter
+error messages from DBI (unlikely) or from Oracle (more common).
+See the \fIOracle Error Messages and Codes Manual\fP for details.
+.SH NOTES
+This program is only intended for use from the command line.
+If you use it within a shell script
+then you should consider rewriting your script in DBI
+to use Perl's text manipulation and formatting commands.
+.SH "SEE ALSO"
+\fISQL Language Reference Manual\fP
+.br
+perl(1),
+oraperl(1)
+.SH AUTHOR
+Kevin Stock,
+.if t .ft C
+<kstock@encore.com>
+.if t .ft P
+.ex

@@ -1,0 +1,31 @@
+---
+abstract: 'Build your distributions like JAITKEN'
+author:
+  - 'James Aitken <jaitken@cpan.org>'
+build_requires:
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-JAITKEN
+requires:
+  Dist::Zilla::Plugin::GithubMeta: '0.28'
+  Dist::Zilla::Plugin::MinimumPerl: '1.003'
+  Dist::Zilla::Plugin::MinimumPrereqs: '0.91'
+  Dist::Zilla::Plugin::NameFromDirectory: '0.03'
+  Dist::Zilla::Plugin::PrereqsClean: '0.91'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0.120120'
+  Dist::Zilla::Plugin::VersionFromModule: '0.08'
+  Dist::Zilla::Role::PluginBundle::Easy: '2.101040'
+  Moose: '0.65'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/LoonyPandora/Dist-Zilla-PluginBundle-JAITKEN/issues
+  homepage: https://github.com/LoonyPandora/Dist-Zilla-PluginBundle-JAITKEN
+  repository: https://github.com/LoonyPandora/Dist-Zilla-PluginBundle-JAITKEN.git
+version: 0.1.6

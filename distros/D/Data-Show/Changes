@@ -1,0 +1,53 @@
+Revision history for Data-Show
+
+0.0.1  Fri Mar  5 06:38:03 2010
+       Initial release.
+
+
+
+0.001001  Tue Jun 22 06:14:58 2010
+          No changes logged
+
+
+0.001002  Sun Oct 10 19:04:25 2010
+
+    - Patched distribution to track changes in Data::Dump 1.17
+      (thanks Christopher)
+
+    - Improved recognition of hashes and arrays at the end of a block
+
+
+0.001_003  Sun Oct 31 07:36:19 2010
+
+    - Improved recognition of q/qq/qr/etc.
+
+
+0.001_004  Sat Feb 19 08:13:46 2011
+
+    - Fixed test suite to work correctly with long doubles
+      (thanks Andreas!)
+
+
+0.002001  Fri Jan 20 17:45:43 2012
+
+    - Fixed annoying flattening of show(%hash) construct
+      (thanks Salvatore!)
+
+
+0.002002  Tue Oct 22 10:20:04 2013
+
+    - Refixed annoying flattening
+
+    - Fixed problems with 5.18 (thanks John)
+
+
+0.002003  Sat Oct  3 12:55:01 2015
+
+    - Fixed handling of %+
+      (thanks Steve!)
+
+
+0.002004  Sun May 22 05:24:00 2016
+
+    - Escaped regex braces to comply with Perl 5.25+
+      (thanks Slaven!)

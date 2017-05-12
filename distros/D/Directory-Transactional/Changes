@@ -1,0 +1,44 @@
+0.09
+	- s/Any::Moose/Moose/;
+	- Data::GUID instead of Data::UUID/LibUUID. This solves the sporadic
+	  failures which were the result of pseudorandom UUID generation returning
+	  the same values across forks using libuuid on OSX/debian.
+
+0.08
+	- Depend on Any::Moose
+
+0.07
+	- s/Squirrel/Any::Moose/
+
+0.06
+	- timeouts
+	- documentation fixes
+	- correct skip count for stress test
+
+0.05
+	- Urgh, load Scope::Guard in the test as well
+
+0.04
+	- detect crashed transactions by checking for dirty state when accessing
+	  global data
+	- run recovery if detecting online state and shared lock can be upgraded to
+	  exclusive
+	- load Scope::Guard in AutoCommit.pm
+
+0.03
+	- add auto_commit
+	- refactored internals
+	- documented various limitations
+	- more error checking
+	- instances in different processes with global_lock set to different values
+	  now interact safely
+	- no longer depends on Data::UUID::LibUUID, but prefers it if it is
+	  available
+
+0.02
+	- Add missing dep
+	- Doc fixes
+	- add missing txn_do method
+
+0.01
+	- Initial release

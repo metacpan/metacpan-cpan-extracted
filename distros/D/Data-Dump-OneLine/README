@@ -1,0 +1,18 @@
+SYNOPSIS
+
+     use Data::Dump::OneLine; # exports dd and dmp
+     $str = dd(@list);
+
+DESCRIPTION
+
+    It now uses Data::Dmp. You should use Data::Dmp directly.
+
+SEE ALSO
+
+    JSON should also encode to a single-line string, but some data
+    structures (cyclical, contains globs or other special Perl data) cannot
+    be encoded out of the box to JSON.
+
+    Data::Dumper::OneLine strives to do the same for Data::Dumper, but last
+    time I tried it (at v0.05) it's still buggy.
+

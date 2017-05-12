@@ -1,0 +1,15 @@
+Revision history for Dancer-Plugin-WindowSession
+
+0.02    2012-10-15, agn
+        Back to old versioning scheme.
+
+0.2.1   2012-10-15, agn
+        Bumped version to workaround pause.perl.org bad upload.
+
+0.2.0   2012-10-15, agn
+        Removed debug messages.
+        bugfix: running 'window_session $key=>undef' didn't work.
+
+0.01    2012-09-27, agn
+        First version, based on Dancer-Plugin-EncodeID source files.
+

@@ -1,0 +1,8 @@
+html
+  body
+    span
+      | Hi #{name}!
+    script
+      :coffee
+        sum = ->
+          1 + 2 * 3 / 4

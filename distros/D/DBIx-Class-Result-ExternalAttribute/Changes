@@ -1,0 +1,16 @@
+Revision history for DBIx-Class-Result-ExternalAttribute
+
+0.06    2012-02-27, Nicolas Oudard
+        store also the external key which link the object with its external object
+
+0.03    2011-05-30, Nicolas Oudard
+        Add comment for pod coverage tests
+
+0.02    2011-05-30, Nicolas Oudard
+        Changes name of function from columns_data_with_attribute to
+          get_column_data_with_attribute
+        Keep deprecated function
+
+0.01    2011-03-15
+        First version.
+

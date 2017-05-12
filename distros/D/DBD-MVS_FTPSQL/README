@@ -1,0 +1,69 @@
+DBD::MVS_FTPSQL  - DBI  driver to  query IBM  DB2 mainframe  databases
+through an IBM FTP server.
+
+SYNOPSIS
+
+    require DBI;
+    
+    #DSN String that identifies the DB2 subsystem
+    my $DSN = "hostname=...;ssid=..." ;
+  
+    #A mainframe account able to perform SELECTs  
+    my ($username, $password) = ('...','...');
+    
+    my $dbh = DBI->connect(  
+      "dbi:MVS_FTPSQL:$DSN"
+     ,$username 
+     ,$password
+    ) or die "Cannot connect: " . $DBI::errstr;
+  
+  It  connects  to the  DB2  subsystem $ssid  of  the mainframe  whose
+  hostname  is $hostname.  Refer to  the DSN  string section  of this
+  document for details on matching the configuration of the  mainframe
+  you want to connect to (in particular the attributes hostname,  port
+  and ssid).  It could  be a  good idea  to take  also a  look at  the
+  EXAMPLES section below.
+
+DESCRIPTION
+  This module lets you submit SQL queries (that's it, only SELECTs) to
+  an IBM  mainframe of  the s/390  family provided  that the  IBM z/OS
+  Communications Server on the  mainframe side was installed  with the
+  (optional) SQL query function enabled  and you have a valid  account
+  for that  system (you  must have  a writable  home directory  on the
+  system and be able to submit queries via QMF).
+
+PREREQUISITES
+  This driver relies on the following other perl modules:
+    Carp
+    DBI
+    IO::File
+    Net::FTP
+  In order for this module to be of any use you need to have access to
+  a mainframe  that runs  an ftp  server  configured for executing SQL
+  query via FTP (see  the support  and documentation  section  of this
+  README).
+
+INSTALLATION
+  The recommended installation procedure is the automatic installation
+  via the CPAN module:
+    perl -MCPAN -e "install Bundle::DBD::MVS_FTPSQL"
+
+  To install this module manually, run the following commands:
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+  After installation, you can find  documentation for this module with
+  the perldoc command:
+    perldoc DBD::MVS_FTPSQL
+  
+  For information about installing the SQL query function on the s/390
+  mainframe,  refer  to  the  IBM  z/OS  Communications  Server  -  IP
+  Configuration Guide.
+
+COPYRIGHT AND LICENCE
+  Copyright (C) 2007 Clemente Biondo. All rights reserved.
+  This program is free software; you can redistribute it and/or modify
+  it under the same terms as Perl itself.

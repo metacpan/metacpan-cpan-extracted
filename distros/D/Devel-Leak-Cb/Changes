@@ -1,0 +1,14 @@
+Revision history for Devel-Leak-Cb
+
+0.04    2010-06-21
+        Fix tests, fix named callbacks with lexical vars
+
+0.03    2009-11-09
+        Fix COUNT for requre but not use
+
+0.02    2009-10-27
+        Support for named callbacks
+
+0.01    2009-10-24
+        First version
+

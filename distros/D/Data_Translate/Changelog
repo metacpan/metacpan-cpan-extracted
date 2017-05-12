@@ -1,0 +1,5 @@
+Versions:
+
+0.1: Initial release
+0.2: Little fix regarding to a problem converting data from Decimal to Hex - Thanks to Ethan John.
+0.3: Bugfix on h2d when h < 10. Thanks to Heiko for reporting it and Takefu for the fix!

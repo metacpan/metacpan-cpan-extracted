@@ -1,0 +1,4 @@
+name = "Dancer2-Template-Mason2"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

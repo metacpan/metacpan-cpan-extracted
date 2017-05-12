@@ -1,0 +1,5 @@
+AUTHORS				Who made this
+MANIFEST			This file
+Makefile.PL			The build system
+lib/Digest/combined.pm		The Digest::combined implementation
+META.yml                                 Module meta-data (added by MakeMaker)

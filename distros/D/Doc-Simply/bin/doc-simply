@@ -1,0 +1,23 @@
+#!/usr/bin/perl -w
+
+use strict;
+use warnings;
+
+use Doc::Simply::App;
+Doc::Simply::App->run( @ARGV );
+
+=head1 NAME
+
+doc-simply - Generate POD-like documentation from embedded comments in JavaScript, Java, C, C++ source
+
+=head1 SYNOPSIS
+
+    doc-simply < source.js > documentation.html
+
+    doc-simply --help
+
+=head1 DESCRIPTION
+
+See L<Doc::Simply> for more information
+
+=cut

@@ -1,0 +1,67 @@
+{
+   "abstract" : "Adds disassemble support via B::Concise to Devel::Trepan",
+   "author" : [
+      "Rocky Bernstein <rocky@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "gpl_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Trepan-Disassemble",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.32"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Pod::Text::Color" : "2.06"
+         },
+         "requires" : {
+            "B::Concise" : "0",
+            "Devel::Callsite" : "0.08",
+            "Devel::Trepan" : "0.71",
+            "Getopt::Long" : "0",
+            "perl" : "5.008008",
+            "rlib" : "0.02"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Syntax::Highlight::Perl::Improved" : "1.01",
+            "Test::Simple" : "0.81",
+            "rlib" : "0.02"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Trepan::CmdProcessor::Command::Disassemble" : {
+         "file" : "lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm"
+      },
+      "Devel::Trepan::Disassemble" : {
+         "file" : "lib/Devel/Trepan/Disassemble.pm",
+         "version" : "v2.0.2"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/rocky/Perl-Devel-Trepan-Disassemble/issues"
+      },
+      "license" : [
+         "http://opensource.org/licenses/gpl-license.php"
+      ],
+      "repository" : {
+         "url" : "http://github.com/rocky/Perl-Devel-Trepan-Disassemble"
+      }
+   },
+   "version" : "v2.0.2",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

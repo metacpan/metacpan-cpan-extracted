@@ -1,0 +1,4 @@
+name = "DBIx-Schema-DSL-Dumper"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

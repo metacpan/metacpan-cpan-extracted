@@ -1,0 +1,50 @@
+NAME
+
+    Dist::Zilla::App::Command::update - A Dist::Zilla (and hence
+    Dist::Milla) command to update generated files
+
+SYNOPSIS
+
+        $ dzil update [--trial]
+        $ milla update    # my use case
+
+DESCRIPTION
+
+    This command is approximated by
+
+        $ dzil build --no-tgz [--trial]
+        $ rm -rf Your-Package-x.yz/
+
+    but it builds inside a temporary directory. If you've ever used dzil
+    build && dzil clean to update generated files, now you can use dzil
+    update. That's all!
+
+OPTIONS
+
+ --trial
+
+    Build a trial release, as if dzil build was called with --trial.
+
+AUTHOR
+
+    Thomas Sibley <tsibley@cpan.org>
+
+COPYRIGHT
+
+    Copyright 2014- Thomas Sibley
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    dzil
+
+    Dist::Zilla
+
+    milla
+
+    Dist::Milla
+

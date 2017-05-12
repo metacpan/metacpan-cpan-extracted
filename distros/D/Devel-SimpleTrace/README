@@ -1,0 +1,42 @@
+NAME
+
+    Devel::SimpleTrace - See where you code warns and dies using stack traces
+
+
+DESCRIPTION
+
+    This module can be used to more easily spot the place where a program or
+    a module generates errors. Its use is extremely simple, you just need to
+    load it.
+
+    This is achieved by modifying the functions warn() and die() in order 
+    to replace the standard messages by complete stack traces that precisely
+    indicates how and where the error or warning occurred. Other than this, 
+    their use should stay unchanged, even when using die() inside eval().
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+        perl Build.PL
+        ./Build
+        ./Build test
+        ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2004-2011 Sébastien Aperghis-Tramoni <sebastien@aperghis.net>
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself.

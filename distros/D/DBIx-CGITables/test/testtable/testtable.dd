@@ -1,0 +1,23 @@
+# Database: test
+
+use test;
+
+#
+# Table structure for table 'testtable'
+#
+CREATE TABLE testtable (
+  id int(11) NOT NULL auto_increment,
+  test_string varchar(40),
+  this_is_a_comment varchar(160),
+  PRIMARY KEY (id)
+);
+
+# END
+
+# Data
+
+INSERT INTO testtable VALUES (30, 'gakk gakk gikk gokk', 'snipp snapp snute plutte plutti plopp');
+INSERT INTO testtable VALUES (31, 'pink ponk pulle pulti', 'sopp flein hasj koffein sjokolade tequilla');
+INSERT INTO testtable VALUES (32, 'hopp hupp hipp happ', 'fise fuse fosse fisse');
+
+grant all on testtable to testuser@localhost identified by 'testpass';

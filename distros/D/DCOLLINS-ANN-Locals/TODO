@@ -1,0 +1,4 @@
+Add additional parameters: Proximity +/- 90
+Add a simulation with larger population, some mutation, some crossover
+Add a simulation with gaussian mutation
+Add a simulation with backprop followed by gaussian mutation

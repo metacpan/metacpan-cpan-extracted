@@ -1,0 +1,52 @@
+0.00015 2016-06-01
+        - Build fixes
+0.00014 2016-05-31
+        - prevent warning in ::Bcrypt when password is undef
+        - Allow users to specify the Cipher used when encoding
+0.00013 2014-02-27
+        - Pod fixes (RT#88875)
+        - Fix deps (github#1)
+0.00012 2013-04-29
+        - Fixes reported bug #78091. (gbjk++) 
+0.00011 2011-04-11
+        - Docs fixes
+0.00010	       2010-08-27
+	- Support for crypt()
+0.00009        2010-05-17
+        - Rewritten test suite
+0.00008        2010-04-30
+        - Fix packaging bug.
+0.00007        2010-04-29
+        - Fix for inter-component leaks because of improper mk_classdata usage
+          (fixes RT #5099 by Kent Fredric) ( groditi )
+0.00006        2010-01-15
+        - Fix build_requires version number for SQLA ( Arthur Axel "fREW" Schmidt )
+        - Don't encode undef ( osfameron )
+
+0.00005        2009-10-11
+        - Fix hashing/validation with Whirlpool ( Kent Fredric )
+        - Add Repository META
+
+0.00004        2009-09-03
+        - correct option name typo in the docs (digest_class -> encode_class)
+        - put the .gpg files back into the test so tests pass (mst == fool)
+0.00003        2009-09-01
+        - fixup copyright and licensing info to the proposed new best
+          practice for /^DBIx::Class/ modules
+        - close dbh before unlinking so tests pass on win32
+
+0.00002        2008-07-27
+        - Support for Crypt::OpenPGP
+
+0.00001        2008-02-01
+        - No changes
+
+0.00001_03     2008-01-31
+        - Pod Changes and corrections
+        - Added common digest lengths table
+
+0.00001_02     2008-01-31
+        -salt additions & little fixes
+
+0.00001_01     2008-01-29
+	- Initial release

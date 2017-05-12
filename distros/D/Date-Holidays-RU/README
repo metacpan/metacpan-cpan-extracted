@@ -1,0 +1,43 @@
+Date-Holidays-RU
+
+Determine Russian Federation official holidays and business days.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Date::Holidays::RU
+
+You can also look for information at:
+
+    GitHub
+        https://github.com/nalobin/Date-Holidays-RU
+
+    Search CPAN
+        http://search.cpan.org/dist/Date-Holidays-RU
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-RU
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Date-Holidays-RU
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Date-Holidays-RU
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Alexander Nalobin <alexander@nalobin.ru>
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

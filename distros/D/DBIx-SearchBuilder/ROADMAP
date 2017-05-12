@@ -1,0 +1,59 @@
+Things should/could be done in 1.x releases:
+    * cover as much as possible code with tests
+    * IsLast is not consistent(see t/01records.t)
+    * LoadFromHash doesn't return any errors as other Load* methods do
+        ** it should report back missing PK fields
+    * Don't prevent DBI from die or reporting errors, now we have control
+      with RaiseErrors and PrintErrors in Handle.pm. We should just check
+      for $sth is defined and check $sth->err if fetch* methods returns undef.
+        ** partly fixed
+    * Count&CountAll:
+        ** Count should always return how much rows we can fetch with Next,
+           using pages affect this.
+        ** CountAll should always return how many records we can fetch with
+           applied conditions no matter use we pages or not to fetch it.
+        ** document differences of the methods
+    * More support for compound PKs.
+
+Known bugs:
+    * CountAll corner case:
+        * new collection
+        * CounAll returns 0
+        * Limit collection
+        * CountAll returns correct value
+        * UnLimit or apply other limit(only change must_redo_search)
+        * CountAll returns old value
+
+        Could be fixed in one line change in CountAll sub, but interfere with
+        Pages. When you call NextPage or other page walking methods
+        must_redo_search bcomes true also so CountAll after NextPage force
+        useless query.
+
+Things should be done in 2 release:
+    * switch to lover case API
+        ** patch capitalization.pm to support converting from lower case
+           to upper.
+    * Class::ReturnValue is prefered way to handle errors, should implement
+      it in all error paths.
+    * rework&review pages support, now I can't write next code:
+      while( $records->NextPage ) {
+        while( my $rec = $records->Next ) {
+          ...
+        }
+      }
+
+    * New methods: Prev, Current. Refactor collection walking:
+        ** $sb->{itemscount} can be undef, what means that we are in the begin
+           or end of the set.
+        ** Current, returns undef if $sb->{itemscount} is undef, in other case
+           returns record from array using $sb->{itemscount} as index.
+        ** IsLast and IsFirst return undef if Current is not defined, and
+           return 0 or 1 in other cases.
+        ** First and Last - work as before, return undef or object.
+        ** GotoItem supports undef as argument and returns undef or object.
+        ** Next walks forward, returns first object if Current is undef,
+           if there is no Next in set drops $sb->{itemscount} to undef and
+           returns undef.
+        ** Prev walks backward and works like Next, but if Current is undef
+           it starts from Last record.
+

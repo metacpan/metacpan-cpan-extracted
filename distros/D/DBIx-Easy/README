@@ -1,0 +1,204 @@
+DBIx::Easy - Easy to Use DBI Interface
+**************************************
+
+   * The homepage of `DBIx::Easy' is http://www.linuxia.de/DBIx/Easy/.
+   * The latest version (currently 0.15) is always available as 
+     http://www.linuxia.de/DBIx/Easy/DBIx-Easy.tar.gz.
+   * See the manual page for more informations.
+
+Requirements
+************
+
+   * DBI (URL: http://www.symbolstone.org/technology/perl/DBI/index.html)
+   * `DBD::Pg', `DBD::mysql', `DBD::mSQL', `DBD::ODBC' or `DBD::sybase'
+     (ask for other database drivers)
+
+Installation
+************
+
+
+tar -xzf DBIx-Easy.tar.gz
+cd DBIx-Easy-0.15
+perl Makefile.PL
+make
+make install
+
+
+Scripts
+*******
+
+The `DBIx::Easy' package contains the following scripts: 
+
+
+Name                Description                             Remarks     
+`dbs_dumptabdata'   creates file set with SQL table data                Manual page
+`dbs_dumptabstruct' creates file set with SQL table schemas             Manual page
+`dbs_empty'         erases all data from a SQL database                 Manual page
+`dbs_printtab'      prints data from SQL table              New in 0.07 Manual page
+`dbs_update'        update SQL database from text file                  Manual page
+
+
+Debian Package
+**************
+
+This software is also available as Debian package, maintained by Dennis Schön 
+<dennis@cobolt.net>. The download address is 
+http://www.linuxia.de/DBIx/Easy/libdbix-easy-perl_0.15-1_all.deb.
+
+Changes
+*******
+
+0.15
+****
+
+`Easy.pm'
+=========
+
+   * support for ODBC and Sybase added
+
+0.14
+****
+
+`Easy.pm'
+=========
+
+   * implemented the optional `map' parameter in the `random_row' method
+     which was already documented
+
+0.13
+****
+
+`Easy.pm'
+=========
+
+   * don't use password from `~/.my.cnf' for databases on other hosts
+   * database port is configurable now
+   * new method `is_auth_error'
+
+`dbs_dumptabdata'
+=================
+
+   * `--cleanse' failed in some case if one of the keys was '`0''
+
+`dbs_printtab'
+==============
+
+   * new option `--sort'
+
+`dbs_update'
+============
+
+   * `dbs_printtab' is emulated instead called as program
+   * `--headline' and `--format=CSV' weren't fully compatible
+
+0.12
+****
+
+`Easy.pm'
+=========
+
+   * new method `random_row'
+
+0.11
+****
+
+   * several warnings fixed (most introduced in conjunction with Perl 5.6)
+
+`Easy.pm'
+=========
+
+   * new method `delete'
+
+`dbs_update'
+============
+
+   * new option `--match-sql'
+
+0.10
+****
+
+`dbs_dumptabdata'
+=================
+
+   * pass the `user' parameter to `dbs_printtab'
+
+0.09
+****
+
+`Easy.pm'
+=========
+
+   * escape tabulator in `view' method
+   * caches table structures
+   * new methods `columns', `types', `sizes', `typemap', `sizemap'
+
+`dbs_dumptabdata', `dbs_dumptabstruct'
+======================================
+
+   * pass options first to `mysqldump', needed for compatibility with older
+     MySQL versions
+
+`dbs_update'
+============
+
+   * return values of user-defined filters indicate if record is valid
+   * inclusion mode of `--columns' fixed
+   * expand tabulators
+   * apply user-defined filter specified by `--routine' only once
+   * choosed comma as default field separator for CSV format
+   * insert an empty string instead of NULL for string columns
+   * new option `--rows'
+   * option `--keys' accepts key names too
+   * issue warning on missing type information
+
+0.08
+****
+
+`dbs_update'
+============
+
+   * brown paper bug fixed that kept --cleanse from working by growing the
+     SQL statement which each record to be cleansed
+   * bug fixed that may be triggered by the combination of `--headline' and `
+     --map'
+   * strip whitespace from column names found in the headline of the input
+   * field separator for CSV format can selected from the commandline now
+   * `--columns' can be used to exclude columns explicitly
+   * strip blanks from parameter list for `--columns'
+   * first field may contain table name and start column instead of table
+     name only
+   * example for `--routine' added to documentation
+
+0.07
+****
+
+   * new script `dbs_printtab'
+   * made more verbose if connection cannot be established
+   * method `view' fixed in respect to `limit' option, option `separator'
+     added, separator defaults to the tabulator now, escape newlines
+   * new option `--exclude-matching-tables' for `dbs_dumptabdata', `
+     dbs_dumptabstruct' and `dbs_empty'
+   * new option `--tables' for `dbs_empty', `dbs_dumptabstruct' and `
+     dbs_dumptabdata'
+   * new options `--cleanse', `--columns', `--format', `--keys', `--map', `
+     --skipbadlines' and `--update-only' for `dbs_update'
+   * new option `--use-printtab' for `dbs_dumptabdata'
+   * new option `--pipe' for `dbs_dumptabstruct'
+   * `dbs_dumptabstruct' dumps sequences too
+   * optional parameter CONDITION added to method `makemap'
+   * optional parameter COLUMNS added to method `view'
+   * made `dbs_update' more verbose on errors, ensure commit, newlines will
+     be regenerated, remembers table name if specified with `--table', carriage
+     returns are removed from input
+   * don't call `rollback' within error handler if `AutoCommit' is enabled
+   * new methods `is_table', `sequences'
+
+Authors
+*******
+
+Stefan Hornburg <racke@linuxia.de>
+
+Dennis Schön <dennis@cobolt.net>
+
+Support for Sybase and ODBC provided by David B. Bitton 
+<david@codenoevil.com>.

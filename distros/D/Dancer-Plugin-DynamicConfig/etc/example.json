@@ -1,0 +1,22 @@
+{
+  "this": "that",
+  "array": [
+    "these",
+    "are",
+    "some",
+    "items"
+  ],
+  "hash": {
+    "key1": "val1",
+    "key2": "val2"
+  },
+  "aofh": [
+    {
+      "k1a": "v1a",
+      "k1b": "v1b"
+    },
+    {
+      "k2a": "k2b"
+    }
+  ]
+}

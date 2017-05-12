@@ -1,0 +1,19 @@
+Revision history for Perl extension Data::Inspect.
+
+0.05  Wed Dec 21 2016
+        - Fix deprecated regexp in test (thanks Jim Keenan!)
+
+0.04  Sun Mar 14 2010
+        - Fixed test case 7 to work with Perl 5.11.5
+
+0.03  Mon Apr 11 2009 
+        - Fixed documentation and tests further.
+
+0.02  Sat Mar 21 2009
+        - added recursive inspection feature
+        - fixed some tests and perldoc
+
+0.01  Sat Mar 14 2009
+	- original version; created by h2xs 1.23 with options
+		-AX Data::Inspect
+

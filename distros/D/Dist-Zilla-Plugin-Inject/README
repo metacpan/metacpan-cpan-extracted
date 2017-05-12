@@ -1,0 +1,56 @@
+NAME
+    Dist::Zilla::Plugin::Inject - Inject into a CPAN::Mini mirror
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+      # in your dist.ini
+      [Inject]
+      author_id = EXAMPLE
+
+      # injection is triggered at the release stage
+      dzil release
+
+DESCRIPTION
+    "Dist::Zilla::Plugin::Inject" is a release-stage plugin that will inject
+    your distribution into a local or remote CPAN::Mini mirror.
+
+CONFIGURATION
+  Author ID
+    The only mandatory setting that "Dist::Zilla::Plugin::Inject" requires
+    is the author id that will be used when injecting the module
+    ("author_id").
+
+  Injecting into a local repository
+    "Dist::Zilla::Plugin::Inject" uses CPAN::Mini::Inject to inject your
+    distribution into a local CPAN::Mini mirror. Thus, you need to have
+    CPAN::Mini::Inject configured on your machine first. CPAN::Mini::Inject
+    looks for its configuration file in a number of predefined locations
+    (see its docs for details), or you can specify an explicit location via
+    the "config_file" setting in your "dist.ini", e.g.:
+
+      [Inject]
+      author_id = EXAMPLE
+      config_file = /home/example/.mcpani
+
+  Injecting into a remote repository
+    If you supply a "remote_server" setting in your "dist.ini",
+    "Dist::Zilla::Plugin::Inject" will try to inject your distribution into
+    a remote mirror via CPAN::Mini::Inject::Remote. A configured
+    CPAN::Mini::Inject::Server must respond to the address specified in
+    "remote_server", e.g.:
+
+      [Inject]
+      author_id = EXAMPLE
+      remote_server = http://mcpani.example.com/
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Peter Shangov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

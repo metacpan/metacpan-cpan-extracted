@@ -1,0 +1,4 @@
+---
+template: xslate
+plugins:
+  TagHelper:

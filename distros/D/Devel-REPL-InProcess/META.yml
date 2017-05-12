@@ -1,0 +1,43 @@
+---
+abstract: 'debugger-like in-process REPL'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  Test::Differences: '0'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-REPL-InProcess
+provides:
+  Devel::REPL::Client::AnyEvent:
+    file: lib/Devel/REPL/Client/AnyEvent.pm
+  Devel::REPL::Client::AnyEvent::Connection:
+    file: lib/Devel/REPL/Client/AnyEvent/Connection.pm
+  Devel::REPL::Client::Select:
+    file: lib/Devel/REPL/Client/Select.pm
+  Devel::REPL::InProcess:
+    file: lib/Devel/REPL/InProcess.pm
+    version: '0.05'
+  Devel::REPL::Plugin::InProcess:
+    file: lib/Devel/REPL/Plugin/InProcess.pm
+  Devel::REPL::Server::Select:
+    file: lib/Devel/REPL/Server/Select.pm
+requires:
+  AnyEvent: '1.0031'
+  Devel::REPL: '1.003012'
+  IO::Pty: '1.12'
+  PadWalker: '2.2'
+  Term::ReadKey: '2.30'
+  Term::ReadLine: '1.14'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/mbarbon/devel-repl-inprocess/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mbarbon/devel-repl-inprocess.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,56 @@
+---
+abstract: 'A selection of utilities for data and data types'
+author:
+  - 'Goro Fuji(gfx) <gfuji(at)cpan.org>.'
+build_requires:
+  Devel::PPPort: '3.19'
+  ExtUtils::MakeMaker: '6.59'
+  ExtUtils::ParseXS: '3.18'
+  Hash::Util::FieldHash::Compat: '0'
+  Scope::Guard: '0'
+  Test::Exception: '0.27'
+  Test::More: '0.62'
+configure_requires:
+  Module::Build: '0.4005'
+  Module::Build::XSUtil: '0.03'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Util
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Util:
+    file: lib/Data/Util.pm
+    version: '0.66'
+  Data::Util::Error:
+    file: lib/Data/Util/Error.pm
+  Data::Util::PurePerl:
+    file: lib/Data/Util/PurePerl.pm
+requires:
+  XSLoader: '0.02'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/gfx/Perl-Data-Util/issues
+  homepage: https://github.com/gfx/Perl-Data-Util
+  repository: git://github.com/gfx/Perl-Data-Util.git
+version: '0.66'
+x_contributors:
+  - 'Fuji Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+  - 'Patrice Clement <monsieurp@gentoo.org>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

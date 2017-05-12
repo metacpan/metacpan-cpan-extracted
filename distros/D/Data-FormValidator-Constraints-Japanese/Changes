@@ -1,0 +1,16 @@
+Changes
+=======
+
+0.04 - 05 Feb 2007
+    - Migrate to Module::Install
+    - Fix typo
+    - Add POD tests
+
+0.03 - 26 May 2006
+    - Allow dashes in hiragana/katakana
+
+0.02 - 16 May 2006
+    - Added jp_length.
+
+0.01 - 15 May 2006
+    - Initial release

@@ -1,0 +1,373 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xref>
+    <day name="The First Sunday in Advent">
+        <alt type="rcl">First Sunday of Advent</alt>
+        <alt type="acna">The First Sunday in Advent</alt>
+    </day>
+    <day name="The Second Sunday in Advent">
+        <alt type="rcl">Second Sunday of Advent</alt>
+        <alt type="acna">The Second Sunday in Advent</alt>
+    </day>
+    <day name="The Third Sunday in Advent">
+        <alt type="rcl">Third Sunday of Advent</alt>
+        <alt type="acna">The Third Sunday in Advent</alt>
+    </day>
+    <day name="The Fourth Sunday in Advent">
+        <alt type="rcl">Fourth Sunday of Advent</alt>
+        <alt type="acna">The Fourth Sunday in Advent</alt>
+    </day>
+    <day name="Christmas Day I" multi="Christmas Day">
+        <alt type="rcl">Christmas, Proper I</alt>
+        <alt type="acna">Christmas Day I</alt>
+    </day>
+    <day name="Christmas Day II" multi="Christmas Day">
+        <alt type="rcl">Christmas, Proper II</alt>
+        <alt type="acna">Christmas Day II</alt>
+    </day>
+    <day name="Christmas Day III" multi="Christmas Day">
+        <alt type="rcl">Christmas, Proper III</alt>
+        <alt type="acna">Christmas Day III</alt>
+    </day>
+    <day name="The First Sunday of Christmas">
+        <alt type="rcl">First Sunday after Christmas Day</alt>
+        <alt type="acna">The First Sunday of Christmas</alt>
+    </day>
+    <day name="Holy Name">
+        <alt type="rcl">Holy Name of Jesus</alt>
+        <alt type="acna">Holy Name</alt>
+    </day>
+    <day name="The Second Sunday of Christmas">
+        <alt type="rcl">Second Sunday after Christmas Day</alt>
+        <alt type="acna">The Second Sunday of Christmas</alt>
+    </day>
+    <day name="The Epiphany">
+        <alt type="rcl">Epiphany of the Lord</alt>
+        <alt type="acna">The Epiphany</alt>
+    </day>
+    <day name="The First Sunday of Epiphany">
+        <alt type="rcl">Baptism of the Lord</alt>
+        <alt type="acna">The First Sunday of Epiphany</alt>
+        <alt type="acna-alt">Baptism of our Lord</alt>
+        <alt type="rcl-alt">Ordinary/Lectionary 1</alt>
+    </day>
+    <day name="The Second Sunday of Epiphany">
+        <alt type="rcl">Second Sunday after the Epiphany</alt>
+        <alt type="acna">The Second Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Ordinary/Lectionary 2</alt>
+    </day>
+    <day name="The Third Sunday of Epiphany">
+        <alt type="rcl">Third Sunday after the Epiphany</alt>
+        <alt type="acna">The Third Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Ordinary/Lectionary 3</alt>
+    </day>
+    <day name="The Fourth Sunday of Epiphany">
+        <alt type="rcl">Fourth Sunday after the Epiphany</alt>
+        <alt type="acna">The Fourth Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Ordinary/Lectionary 4</alt>
+    </day>
+    <day name="The Presentation of Christ in the Temple">
+        <alt type="rcl">Presentation of the Lord</alt>
+        <alt type="acna">The Presentation of Christ in the Temple</alt>
+    </day>
+    <day name="The Fifth Sunday of Epiphany">
+        <alt type="rcl">Fifth Sunday after the Epiphany</alt>
+        <alt type="acna">The Fifth Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Ordinary/Lectionary 5</alt>
+    </day>
+    <day name="The Sixth Sunday of Epiphany">
+        <alt type="rcl">Sixth Sunday after the Epiphany</alt>
+        <alt type="acna">The Sixth Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Proper 1, Ordinary/Lectionary 6</alt>
+    </day>
+    <day name="The Seventh Sunday of Epiphany">
+        <alt type="rcl">Seventh Sunday after the Epiphany</alt>
+        <alt type="acna">The Seventh Sunday of Epiphany</alt>
+        <alt type="rcl-alt">Proper 2, Ordinary/Lectionary 7</alt>
+    </day>
+    <day name="The Second to Last Sunday after Epiphany">
+        <alt type="rcl">Eighth Sunday after the Epiphany</alt>
+        <alt type="acna">The Second to Last Sunday after Epiphany</alt>
+        <alt type="acna-alt">World Mission</alt>
+        <alt type="rcl-alt">Proper 3, Ordinary/Lectionary 8</alt>
+    </day>
+    <day name="The Last Sunday after Epiphany">
+        <alt type="rcl">Last Sunday after the Epiphany</alt>
+        <alt type="rcl-alt">Transfiguration Sunday</alt>
+        <alt type="acna">The Last Sunday after Epiphany</alt>
+        <alt type="acna-alt">Transfiguration</alt>
+    </day>
+    <day name="Ash Wednesday">
+        <alt type="rcl">Ash Wednesday</alt>
+        <alt type="acna">Ash Wednesday</alt>
+    </day>
+    <day name="The First Sunday in Lent">
+        <alt type="rcl">First Sunday in Lent</alt>
+        <alt type="acna">The First Sunday in Lent</alt>
+    </day>
+    <day name="The Second Sunday in Lent">
+        <alt type="rcl">Second Sunday in Lent</alt>
+        <alt type="acna">The Second Sunday in Lent</alt>
+    </day>
+    <day name="The Third Sunday in Lent">
+        <alt type="rcl">Third Sunday in Lent</alt>
+        <alt type="acna">The Third Sunday in Lent</alt>
+    </day>
+    <day name="The Fourth Sunday in Lent">
+        <alt type="rcl">Fourth Sunday in Lent</alt>
+        <alt type="acna">The Fourth Sunday in Lent</alt>
+    </day>
+    <day name="The Fifth Sunday in Lent">
+        <alt type="rcl">Fifth Sunday in Lent</alt>
+        <alt type="acna">The Fifth Sunday in Lent</alt>
+    </day>
+    <day name="Palm Sunday: Liturgy of the Palms" multi="Palm Sunday">
+        <alt type="rcl">Liturgy of the Palms</alt>
+        <alt type="acna">Palm Sunday: Liturgy of the Palms</alt>
+    </day>
+    <day name="Palm Sunday" multi="Palm Sunday">
+        <alt type="rcl">Liturgy of the Passion</alt>
+        <alt type="acna">Palm Sunday</alt>
+    </day>
+    <day name="Monday in Holy Week">
+        <alt type="rcl">Monday of Holy Week</alt>
+        <alt type="acna">Monday in Holy Week</alt>
+    </day>
+    <day name="Tuesday in Holy Week">
+        <alt type="rcl">Tuesday of Holy Week</alt>
+        <alt type="acna">Tuesday in Holy Week</alt>
+    </day>
+    <day name="Wednesday in Holy Week">
+        <alt type="rcl">Wednesday of Holy Week</alt>
+        <alt type="acna">Wednesday in Holy Week</alt>
+    </day>
+    <day name="Maundy Thursday">
+        <alt type="rcl">Holy Thursday</alt>
+        <alt type="acna">Maundy Thursday</alt>
+    </day>
+    <day name="Good Friday">
+        <alt type="rcl">Good Friday</alt>
+        <alt type="acna">Good Friday</alt>
+    </day>
+    <day name="Holy Saturday">
+        <alt type="rcl">Holy Saturday</alt>
+        <alt type="acna">Holy Saturday</alt>
+    </day>
+    <day name="The Great Vigil of Easter" multi="Easter Day">
+        <alt type="rcl">Easter Vigil</alt>
+        <alt type="acna">The Great Vigil of Easter</alt>
+    </day>
+    <day name="Easter Day: Early Service" multi="Easter Day">
+        <alt type="acna">Easter Day: Early Service</alt>
+    </day>
+    <day name="Easter Day: Principal Service" multi="Easter Day">
+        <alt type="rcl">Easter Day</alt>
+        <alt type="acna">Easter Day: Principal Service</alt>
+    </day>
+    <day name="Easter Day: Evening Service" multi="Easter Day">
+        <alt type="rcl">Easter Evening</alt>
+        <alt type="acna">Easter Day: Evening Service</alt>
+    </day>
+    <day name="Monday of Easter Week">
+        <alt type="acna">Monday of Easter Week</alt>
+    </day>
+    <day name="Tuesday of Easter Week">
+        <alt type="acna">Tuesday of Easter Week</alt>
+    </day>
+    <day name="Wednesday of Easter Week">
+        <alt type="acna">Wednesday of Easter Week</alt>
+    </day>
+    <day name="Thursday of Easter Week">
+        <alt type="acna">Thursday of Easter Week</alt>
+    </day>
+    <day name="Friday of Easter Week">
+        <alt type="acna">Friday of Easter Week</alt>
+    </day>
+    <day name="Saturday of Easter Week">
+        <alt type="acna">Saturday of Easter Week</alt>
+    </day>
+    <day name="The Second Sunday of Easter">
+        <alt type="rcl">Second Sunday of Easter</alt>
+        <alt type="acna">The Second Sunday of Easter</alt>
+    </day>
+    <day name="The Third Sunday of Easter">
+        <alt type="rcl">Third Sunday of Easter</alt>
+        <alt type="acna">The Third Sunday of Easter</alt>
+    </day>
+    <day name="The Fourth Sunday of Easter">
+        <alt type="rcl">Fourth Sunday of Easter</alt>
+        <alt type="acna">The Fourth Sunday of Easter</alt>
+        <alt type="acna-alt">Good Shepherd</alt>
+    </day>
+    <day name="The Fifth Sunday of Easter">
+        <alt type="rcl">Fifth Sunday of Easter</alt>
+        <alt type="acna">The Fifth Sunday of Easter</alt>
+    </day>
+    <day name="The Sixth Sunday of Easter">
+        <alt type="rcl">Sixth Sunday of Easter</alt>
+        <alt type="acna">The Sixth Sunday of Easter</alt>
+        <alt type="acna-alt">Rogation Sunday</alt>
+    </day>
+    <day name="Ascension Day">
+        <alt type="rcl">Ascension of the Lord</alt>
+        <alt type="acna">Ascension Day</alt>
+    </day>
+    <day name="The Sunday after Ascension Day">
+        <alt type="rcl">Seventh Sunday of Easter</alt>
+        <alt type="acna">The Sunday after Ascension Day</alt>
+    </day>
+    <day name="Pentecost">
+        <alt type="rcl">Day of Pentecost</alt>
+        <alt type="acna">Pentecost</alt>
+    </day>
+    <day name="Trinity Sunday">
+        <alt type="rcl">Trinity Sunday</alt>
+        <alt type="acna">Trinity Sunday</alt>
+        <alt type="rcl-alt">First Sunday after Pentecost</alt>
+    </day>
+    <day name="Weekdays following the Sunday Closest to May 11">
+        <alt type="acna">Weekdays following the Sunday Closest to May 11</alt>
+    </day>
+    <day name="Weekdays following the Sunday Closest to May 18">
+        <alt type="acna">Weekdays following the Sunday Closest to May 18</alt>
+    </day>
+    <day name="Ordinary 8">
+        <alt type="rcl">Sunday between May 24 and May 28 inclusive</alt>
+        <alt type="acna">Sunday Closest to May 25</alt>
+        <alt type="rcl-alt">Proper 3, Ordinary/Lectionary 8</alt>
+    </day>
+    <day name="Ordinary 9">
+        <alt type="rcl">Sunday between May 29 and June 4 inclusive</alt>
+        <alt type="acna">Sunday Closest to June 1</alt>
+        <alt type="rcl-alt">Proper 4, Ordinary/Lectionary 9</alt>
+    </day>
+    <day name="Ordinary 10">
+        <alt type="rcl">Sunday between June 5 and June 11 inclusive</alt>
+        <alt type="acna">Sunday Closest to June 8</alt>
+        <alt type="rcl-alt">Proper 5, Ordinary/Lectionary 10</alt>
+    </day>
+    <day name="Ordinary 11">
+        <alt type="rcl">Sunday between June 12 and June 18 inclusive</alt>
+        <alt type="acna">Sunday Closest to June 15</alt>
+        <alt type="rcl-alt">Proper 6, Ordinary/Lectionary 11</alt>
+    </day>
+    <day name="Ordinary 12">
+        <alt type="rcl">Sunday between June 19 and June 25 inclusive</alt>
+        <alt type="acna">Sunday Closest to June 22</alt>
+        <alt type="rcl-alt">Proper 7, Ordinary/Lectionary 12</alt>
+    </day>
+    <day name="Ordinary 13">
+        <alt type="rcl">Sunday between June 26 and July 2 inclusive</alt>
+        <alt type="acna">Sunday Closest to June 29</alt>
+        <alt type="rcl-alt">Proper 8, Ordinary/Lectionary 13</alt>
+    </day>
+    <day name="Ordinary 14">
+        <alt type="rcl">Sunday between July 3 and July 9 inclusive</alt>
+        <alt type="acna">Sunday Closest to July 6</alt>
+        <alt type="rcl-alt">Proper 9, Ordinary/Lectionary 14</alt>
+    </day>
+    <day name="Ordinary 15">
+        <alt type="rcl">Sunday between July 10 and July 16 inclusive</alt>
+        <alt type="acna">Sunday Closest to July 13</alt>
+        <alt type="rcl-alt">Proper 10, Ordinary/Lectionary 15</alt>
+    </day>
+    <day name="Ordinary 16">
+        <alt type="rcl">Sunday between July 17 and July 23 inclusive</alt>
+        <alt type="acna">Sunday Closest to July 20</alt>
+        <alt type="rcl-alt">Proper 11, Ordinary/Lectionary 16</alt>
+    </day>
+    <day name="Ordinary 17">
+        <alt type="rcl">Sunday between July 24 and July 30 inclusive</alt>
+        <alt type="acna">Sunday Closest to July 27</alt>
+        <alt type="rcl-alt">Proper 12, Ordinary/Lectionary 17</alt>
+    </day>
+    <day name="Ordinary 18">
+        <alt type="rcl">Sunday between July 31 and August 6 inclusive</alt>
+        <alt type="acna">Sunday Closest to August 3</alt>
+        <alt type="rcl-alt">Proper 13, Ordinary/Lectionary 18</alt>
+    </day>
+    <day name="Ordinary 19">
+        <alt type="rcl">Sunday between August 7 and August 13 inclusive</alt>
+        <alt type="acna">Sunday Closest to August 10</alt>
+        <alt type="rcl-alt">Proper 14, Ordinary/Lectionary 19</alt>
+    </day>
+    <day name="Ordinary 20">
+        <alt type="rcl">Sunday between August 14 and August 20 inclusive</alt>
+        <alt type="acna">Sunday Closest to August 17</alt>
+        <alt type="rcl-alt">Proper 15, Ordinary/Lectionary 20</alt>
+    </day>
+    <day name="Ordinary 21">
+        <alt type="rcl">Sunday between August 21 and August 27 inclusive</alt>
+        <alt type="acna">Sunday Closest to August 24</alt>
+        <alt type="rcl-alt">Proper 16, Ordinary/Lectionary 21</alt>
+    </day>
+    <day name="Ordinary 22">
+        <alt type="rcl">Sunday between August 28 and September 3 inclusive</alt>
+        <alt type="acna">Sunday Closest to August 31</alt>
+        <alt type="rcl-alt">Proper 17, Ordinary/Lectionary 22</alt>
+    </day>
+    <day name="Ordinary 23">
+        <alt type="rcl">Sunday between September 4 and September 10 inclusive</alt>
+        <alt type="acna">Sunday Closest to September 7</alt>
+        <alt type="rcl-alt">Proper 18, Ordinary/Lectionary 23</alt>
+    </day>
+    <day name="Ordinary 24">
+        <alt type="rcl">Sunday between September 11 and September 17 inclusive</alt>
+        <alt type="acna">Sunday Closest to September 14</alt>
+        <alt type="rcl-alt">Proper 19, Ordinary/Lectionary 24</alt>
+    </day>
+    <day name="Ordinary 25">
+        <alt type="rcl">Sunday between September 18 and September 24 inclusive</alt>
+        <alt type="acna">Sunday Closest to September 21</alt>
+        <alt type="rcl-alt">Proper 20, Ordinary/Lectionary 25</alt>
+    </day>
+    <day name="Ordinary 26">
+        <alt type="rcl">Sunday between September 25 and October 1 inclusive</alt>
+        <alt type="acna">Sunday Closest to September 28</alt>
+        <alt type="rcl-alt">Proper 21, Ordinary/Lectionary 26</alt>
+    </day>
+    <day name="Ordinary 27">
+        <alt type="rcl">Sunday between October 2 and October 8 inclusive</alt>
+        <alt type="acna">Sunday Closest to October 5</alt>
+        <alt type="rcl-alt">Proper 22, Ordinary/Lectionary 27</alt>
+    </day>
+    <day name="Ordinary 28">
+        <alt type="rcl">Sunday between October 9 and October 15 inclusive</alt>
+        <alt type="acna">Sunday Closest to October 12</alt>
+        <alt type="rcl-alt">Proper 23, Ordinary/Lectionary 28</alt>
+    </day>
+    <day name="Ordinary 29">
+        <alt type="rcl">Sunday between October 16 and October 22 inclusive</alt>
+        <alt type="acna">Sunday Closest to October 19</alt>
+        <alt type="rcl-alt">Proper 24, Ordinary/Lectionary 29</alt>
+    </day>
+    <day name="Ordinary 30">
+        <alt type="rcl">Sunday between October 23 and October 29 inclusive</alt>
+        <alt type="acna">Sunday Closest to October 26</alt>
+        <alt type="rcl-alt">Proper 25, Ordinary/Lectionary 30</alt>
+    </day>
+    <day name="All Saints&apos; Day">
+        <alt type="rcl">All Saints</alt>
+        <alt type="acna">All Saints&apos; Day</alt>
+    </day>
+    <day name="Ordinary 31">
+        <alt type="rcl">Sunday between October 30 and November 5 inclusive</alt>
+        <alt type="acna">Sunday Closest to November 2</alt>
+        <alt type="rcl-alt">Proper 26, Ordinary/Lectionary 31</alt>
+    </day>
+    <day name="Ordinary 32">
+        <alt type="rcl">Sunday between November 6 and November 12 inclusive</alt>
+        <alt type="acna">Sunday Closest to November 9</alt>
+        <alt type="rcl-alt">Proper 27, Ordinary/Lectionary 32</alt>
+    </day>
+    <day name="Ordinary 33">
+        <alt type="rcl">Sunday between November 13 and November 19 inclusive</alt>
+        <alt type="acna">Sunday Closest to November 16</alt>
+        <alt type="rcl-alt">Proper 28, Ordinary/Lectionary 33</alt>
+    </day>
+    <day name="Christ the King">
+        <alt type="rcl">Christ the King</alt>
+        <alt type="acna">Christ the King</alt>
+        <alt type="acna-alt">Sunday Closest to November 23</alt>
+        <alt type="rcl-alt">Proper 29, Ordinary/Lectionary 34</alt>
+    </day>
+</xref>

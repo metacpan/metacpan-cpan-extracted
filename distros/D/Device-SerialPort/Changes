@@ -1,0 +1,167 @@
+Revision history for Perl extension Device::SerialPort.
+
+1.04 2007-10-23 (Kees)
+	* Update autoconf files.
+	* Use standard Perl module versioning.
+
+1.3.1 2007-07-20 (Kees)
+	* Correct arbitrary baud setting.
+
+1.3.0 2007-07-20 (Kees)
+	* SerialPort.{pm,xs}, configure.ac: add arbitrary baud rate setting
+	  as suggested by Steven Michalske.
+	* Disabled default port tests, initial switch to Test::More.
+
+1.2.1 2007-06-16 (Kees)
+	* SerialPort.pm: correction to READ by Martin Hans
+	* SerialPort.pm: corrected "close" call noticed by David R. Wilson
+	* Added knowledge of FIONREAD noticed by Darrin Chandler
+	* Fixed up white-space issues.
+
+1.2.0 2004-11-09 (Kees)
+	* configure.ac: corrected version number here too.
+	* SerialPort.pm: added wait_modemlines, intr_count.
+	* SerialPort.xs, configure.ac: added TIOCMIWAIT, TIOCGICOUNT
+	* white space cleanups.
+
+1.0.2 2004-05-10 (Kees)
+	* Makefile.PL: added an OSX serial port default
+	* SerialPort.pm: patch for EOF handling by Arne Georg Gleditsch.
+	  On a read for more than 0 bytes, and "select" finishes, but
+	  we get a 0 back, then we assume EOF.
+	* corrected version in .spec file.
+
+1.0.1 2004-03-29 (Kees)
+	* small typo in bits processing for can_ioctl (thanks to
+	  Rick Ballard and John Eng for finding this!)
+
+1.0.0 2004-02-23 (Kees)
+	* fixed logic in READ tie function from Jaakko Yli-Luukko
+	* added RPM .spec packaging support
+	* adding debian packaging support
+	* updated version number to first stable release
+	* fixing up failure return codes in data,parity,flow functions
+	* cleaning up default settings for parmrk, istrip, etc
+	* split off stty_parmrk
+	* setting defaults of 9600, 8N1, no flow in "new"
+	* added MS_DTR_ON and MS_DSR_ON
+	* clearly documenting "carrier" bit
+	* added automatic system baud rate detection
+	* added modem line reporting to "modemtest"
+	* documented "modemtest"
+	* I think I finally found the parity problem that has been
+	  plauging this code since I took it over!
+
+0.22 2003-06-18 (Kees)
+	* added a notice about 4096 read limits on some machines
+	  noticed by Ed Morandi.
+	* built an rpm .spec file with the help of cpan2rpm.
+	* adding TESTPORT=... as a Makefile.PL option to not step on
+	  MakeMaker's feet.
+	* making "modemtest" an installable script (which adds #! to top).
+	* cleaning up "modemtest" args and output.
+	* reversing configure report so "best" case reports "yes" for all.
+	* handling ancient libcs with odd POSIX.pm _SC_CLK_TCK behavior
+	  with diagnostic help from David Dyck
+	* added test case explicitly for get_tick_count
+
+0.21 2003-06-12 (Kees)
+	* don't release files at midnight any more: forgot SerialPort.xs
+
+0.20 2003-06-12 (Kees)
+	* fixed some truth bugs found by David Dyck <david.dyck@fluke.com>
+	* totally rewrote serial bit detection code to use "normal"
+	  perl XS routines.  Had to even toss in a "configure" script
+	  to make it really robust.
+	* jumped up to version 0.20 just because it's just a big change
+	  to the build process.  Everything else appears undisturbed, but
+	  I want to give some time for testing it out on other
+	  architectures.
+
+0.13 2002-05-31 (Kees)
+	* added 'sys/modem.ph' for broken HPUX headers
+	* fixed *BSD tiocmget and tick counts, care of
+	  joerg_wunsch@interface-systems.de
+	* fixed the HPUX tioc* stuff, care of
+	  "Chang, Jerry" <Jerry.Chang@pyxis.com>
+
+0.12 2001-10-24 (Kees)
+	* found a place where HANDLE was staying open
+	* corrected FD-success test (0 *is* a valid fd number)
+
+0.11 Tue Jul 17 23:32:55 CDT 2001 (Kees)
+	* patch from James Mitchell <jmitchel@lucent.com> to allow TIEHANDLE
+	  to use a device port in addition to a config file
+	* updated documentation to reflect above patch
+	* added FILENO function, per James Mitchell's suggestion
+	* detecting vmin settings for broken Solaris tools.
+	* added "modemtest"
+
+0.10 Tue Feb 13 08:52:54 CST 2001 (Kees)
+	* fixed broken tests
+	* improved auto-detection of ioctl methods
+	* got Linux working 100% (even with tests)
+	* got Solaris working 100% (even with tests)
+
+0.09 Thu Jan 25 09:59:24 CST 2001 (Kees)
+	* added support for other OSes
+	* corrected DTR activation code
+
+0.07 Tue Sep 07 22:41:53 CDT 1999
+	* add status, write_done, modemlines methods
+	* add saved utility parameters and methods (hostname, et.al)
+	* save lockfile data in configuration_file
+
+0.06 Fri Aug 07 17:49:40 1999
+	* ported demos 5,6,7 from Win32
+	* rename GetTickCount method to get_tick_count
+	* add stty_xxx shortcut methods
+	* add lookfor, streamline, are_match, READLINE and related methods
+	* add output_record and output_field separator support
+	* add return values to purge_xx and write_drain
+
+0.055 Sat Aug 07 14:13:48 1999
+	* interim test release for configuration files, defaults, bug fixes
+	* added tests, demos, and examples
+
+0.051 Tue Aug 03 10:12:14 1999
+	* test?.t changes for Sun testing
+
+0.05  Wed Jul 28 23:53:38 1999
+	* now uses standard MakeMaker install sequence with make
+	* alternate port for "make test" not yet supported
+	* delete lib subdirectories, make copies SerialPort.pm to blib
+	* AltPort.pm moved to t, "use lib" paths revised
+	* Add can_ioctl and allow operation if "asm/termios.ph" not found
+	* Add error and sanity checking to xxx_active and pulse_xxx methods
+	* Document $quiet option for new method
+	* Add preliminary lockfile support
+0.04  Wed Jul 21 23:53:38 1999
+	* original version; created by h2xs 1.18
+	* MakeMaker templates merged with pre-existing code
+	* Add RTS, BREAK, DTR control
+	* Add GetTickCount method (clone of Win32::GetTickCount)
+	* Add read_const_time and read_char_time
+	* Add SHORTsize, LONGsize, test3.t and AltPort.pm for testing
+	* Add partial tied FileHandle support
+	* Documentation improvements
+	* Ported some of the Win32::SerialPort examples and demos
+
+0.03	* Test version for ioctl support.
+
+0.02	* Complete rewrite of the pod documentation.
+	* module now maintained by Bill Birthisel.
+	* Add PARAM: tags to %EXPORT_TAGS.
+	* Rename "tact" to "nocarp".
+	* Allow "parity_enable" and "set_test_mode_active" to accept FALSE.
+	* Add "defined" tests for POSIX tests which return "undef" on fail.
+	* Add the "can_xxx" methods with suitable return values.
+	* Initialize "user_msg", "error_msg", and "debug" to FALSE.
+	* Add "write_drain", "debug", and "reset_error" methods.
+	* Revise "baudrate", "parity", "databits", "stopbits", and "handshake"
+          to return current values in scalar context and permitted choices
+	  in list context. All values in same format as setting arguments.
+
+0.01	* This is a POSIX version of the Win32::Serialport module
+	  ported by Joe Doss for MisterHouse from Version 0.08.
+

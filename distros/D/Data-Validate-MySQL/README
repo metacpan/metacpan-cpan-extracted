@@ -1,0 +1,33 @@
+Data-Validate-MySQL version 0.03
+================================
+
+This module encapsulates functions that help validate data that will
+be inserted into a MySQL database (http://mysql.com/).  All current
+data types are supported.
+
+For example, if you have a date in ISO-ish format, and want to make
+sure it will insert properly, you can just call is_date() on it.
+
+This code covers a lot of different data types, some of which are better
+documented than others.  If you run into something that doesn't match
+up between this module and MySQL's current behavior, please let me know
+(sonnen@richardsonnen.com)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Richard Sonnen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

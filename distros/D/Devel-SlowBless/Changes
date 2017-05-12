@@ -1,0 +1,20 @@
+Revision history for Perl extension Devel::SlowBless.
+
+0.06  Wed Oct 03 02:09:00 2012
+    - fixes to test for 5.8.9 and 5.17+
+
+0.05  Mon Oct 01 09:35:00 2012
+    - Add support for Perl >= 5.17.1 where PL_amagic_generation has been
+      removed.
+
+0.04  Tue Feb 8
+    - Removed 5.8.9 requirement.
+    - Added () around Carp::cluck call.
+
+0.02  Thu Jan 13 10:26:00 2010
+    - Fixed unit test to work for 5.8 and 5.10.
+
+0.01  Mon Nov 29 10:51:46 2010
+	- original version; created by h2xs 1.23 with options
+		-A -e -f --use-xsloader -n Devel::SlowBless
+

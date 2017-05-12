@@ -1,0 +1,16 @@
+1.61  Fri Sep 23 11:51:26 EDT 2005  jason@purdy.info
+  * Improve Kwalitee release (README, POD tests, use strict)
+
+1.60  Fri Apr 29 10:35:35 EDT 2005  jason@purdy.info
+  * Incorporated new msgs help, using HTML::Template and
+	some copy that I'm using for ApacheCon 2005.
+  * Added a pitch for ApacheCon 2005 (will take out and
+	link to slides/paper after the event is over)
+
+1.50  Wed Dec  8 09:31:05 EST 2004  jason@purdy.info
+    We adopted TBONE's dfv-tutorial and did a complete re-write.
+    For fear of stagnation, we decided to release this with some
+    missing parts, namely moving into the more complex areas of
+    dfv and also the msgs part.  We promise to do that real soon
+    now!
+

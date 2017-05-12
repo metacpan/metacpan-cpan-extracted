@@ -1,0 +1,102 @@
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
+#
+#     Example script for DateTime::Event::Easter
+#     Copyright (C) 2015, Jean Forget
+#
+#     The executable part of this program is distributed under the same terms
+#     as Perl: GNU Public License version 1 or later and Perl Artistic License
+#     The text part of this program is distributed under the Creative Commons
+#     license Attribution-NoDerivs 2.0 Generic (CC BY-ND 2.0).
+#
+#     You can find the text of the licenses in the F<LICENSE> file or at
+#     L<http://www.perlfoundation.org/artistic_license_1_0>
+#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#     The Creative Commons License is available at
+#     L<https://creativecommons.org/licenses/by-nd/2.0/>.
+#
+#     Here is the summary of GPL:
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 1, or (at your option)
+#     any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software Foundation,
+#     Inc., <http://www.fsf.org/>.
+#
+
+use v5.10;
+use strict;
+use warnings;
+use DateTime;
+use DateTime::Event::Easter;
+
+my $anzio = DateTime->new(year  => 1944,
+                          month =>    1,
+                          day   =>   22);
+my $easter  = DateTime::Event::Easter->new();
+my $trinity = DateTime::Event::Easter->new(day => 'Trinity');
+
+my $easter_dt  = $easter ->following($anzio)->strftime("%A %d %B %Y");
+my $trinity_dt = $trinity->following($anzio)->strftime("%a %d %B %Y");
+
+say <<"EOF";
+
+In French, we have a phrase: "À Pâques ou à la Trinité" ("On Easter Sunday
+or on Trinity Sunday"), to designate a date which may shift for various
+reasons. The best example, maybe the origin of this phrase, is the
+song "Malbrouk s'en va en guerre" (Marlborough goes to war), based on
+Sir John Churchill, 1st Duke of Marlborough. The song contains the
+following verses:
+
+  Il reviendra à Pâques, mironton mironton mirontaine,
+  Il reviendra à Pâques
+  Ou à la Trinité.
+  Ou à la Trinité...
+
+  He'll come back on Easter, tweedledee, tweedledee, tweedledum,
+  He'll come back on Easter
+  Or on Trinity Sunday
+  Or on Trinity Sunday
+
+Another tradition is to pretend that on Good Friday, the bells leave
+the church steeples and fly to Rome, where the Pope bless them and
+they fly back on Easter Sunday.
+
+Now, about WWII. The American and Commonwealth forces invaded mainland
+Italy in September 1943. They made slow progress and they were stuck
+on the Gustav line in October 1943.  They executed another amphibious
+landing in January 1944 at Anzio and the landing elements were soon
+stuck in their beachhead. So the Germans, with their allies and their
+puppets, made fun of an invasion that was slower than a snail's pace.
+
+So on Easter, that is, $easter_dt, flyers shaped as bells
+were distributed in France by people friendly to the Vichy
+regime. These flyers were saying:
+
+  Je reviens de Rome... les Anglais n'y étaient pas encore...
+  Alors... à la Trinité ?
+
+  I am back from Rome... The English are not there yet...
+  Maybe on Trinity Sunday?
+
+And when did the recon elements of General Clark's army enter Rome? On
+$trinity_dt, that is, on Trinity Sunday.
+
+Sources:
+
+"La Dernière Guerre" (volume 8, page 161), by Eddy Bauer, published in
+1975 by "Grange Batelière", republished later by "Éditions Atlas".
+No ISBN found.
+
+"Éphémérides de quatre années tragiques" (volume 3, pages 1908 and 2034),
+by Pierre Limagne, published in 1987 by "Éditions de Candide".
+ISBN 2.904.877.25.8 (the three volumes)
+ISBN 2.904.877.28.2 (volume 3)
+EOF

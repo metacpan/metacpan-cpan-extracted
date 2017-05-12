@@ -1,0 +1,10 @@
+{
+  "en_gr": {
+    "color": {         
+      "trans" : "colour",
+    },                                                                          
+    "greeting": {
+      "trans": "good morning"
+    }
+  }
+}

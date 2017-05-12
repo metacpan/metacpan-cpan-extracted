@@ -1,0 +1,59 @@
+{
+   "abstract" : "Perl extension for event processing",
+   "author" : [
+      "Pavel Shaydo <zwon@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-EventStream",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "file" : [
+         "README.pod"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Test::FailWarnings" : "0",
+            "Test::More" : "0.94",
+            "Test::Most" : "0.22"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.64"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/trinitum/perl-Data-EventStream/issues"
+      },
+      "homepage" : "https://trinitum.github.io/perl-Data-EventStream/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/trinitum/perl-Data-EventStream"
+      }
+   },
+   "version" : "0.13"
+}

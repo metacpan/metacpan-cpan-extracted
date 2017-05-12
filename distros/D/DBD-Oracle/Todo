@@ -1,0 +1,109 @@
+[ In no particular order ]
+
+****************************  NOTE: ora_db_shutdown/ora_dv_startup/StrictlyType/DiscardString not documented
+
+User requested a document/link anywhere that details what Oracle client attributes
+are supported and which are not for Oracle 11g and interacting with a RAC
+and using things like TAF, FAN, etc... 
+
+
+Seems this file has been neglected for quite a while so I will try to keep it up to date for now
+
+For release 1.26 or later
+
+Add support for TAF
+Add support for New Lob Functions
+Add support for Statement Cacheing
+Add support for callbacks??
+Drop support for ProC connections
+
+For release 1.22 or later
+
+--> done 1.22Drop support for Oralce 8 and earlier
+
+add support for $dbh->trace('SQL');
+
+Replace OCIInitialize + OCIEnvInit, with OCIEnvCreate
+
+--> done 1.22 dbd_verbose ora_verbose Add in the DBD only debugging flag
+
+--> done 1.22 Add new method oci_exe_mode to get the Name of the Execution Modes
+
+Add support for OCIClientVersion(),OCIPing(),OCIServerVersion()
+
+-->done 1.22 Expand support for Data Interface for Persistent LOBs by setting up support 
+for Piecewise Fetch and Piecewise Fetch with Callback and perhaps  Array Fetch as well
+
+Add support for version 2 of lob functions
+
+Add support for OCIStmtPrepare2(), Statement caching
+
+The below might of been done but this list has not been maintained;
+
+Add column_info test
+
+Add info about getting help - mailing lists etc.
+
+Public Oracle docs:
+http://www.csis.gvsu.edu/GeneralInfo/Oracle/nav/docindex.htm
+LOBs
+http://www.csis.gvsu.edu/GeneralInfo/Oracle/appdev.920/a96595/dci06mlt.htm
+http://technet.oracle.com/tech/oci/htdocs/faq.html#1000425
+
+Convert most of test.pl into standard t/*.t tests.
+
+Record ORACLE_HOME when building (auto::DBD::Oracle::mk)
+Check emails from Oracle about that.
+
+Check fix for unassigned placeholder (alen==SvLEN) can't be
+triggered by a valid assignment that's exactly that long.
+
+Resolve imp_sth->stmt_type != OCI_STMT_SELECT issue - add an attribute for it?
+
+connect with $user = "/ as sysdba" etc as per SQL*Plus
+
+Move urls from README into Oracle.pm
+
+Change all uses of perl global na (SvPV & sv_2pv) to local variables
+for better thread safety.
+
+Test script for bind type / field type / length / null interactions
+of char/varchar types.
+
+add docs about OPS$ login
+
+Add hint about SQL*Plus commands if execute gets an ORA-0900 invalid SQL
+statement? Maybe just if common SQL*Plus command word is first word.
+
+Support SERVICE_NAME in new connect syntax (allow inplace of SID)
+
+warn (trace_msg?) if ORACLE_HOME changes after first connect
+relates to Apache::DBI scenario where changing ORACLE_HOME
+upsets existing connections.
+
+PRECISION for oci7 on VARCHAR etc
+
+Detect "Error while trying to retrieve text for error ORA-XXXX"
+and add "refer to oracle docs or use 'oerr ora XXXX'".
+
+blob_read for oci8 with LONGs
+
+$sth = $dbh->prepare("select ... for update");
+$dbh->commit;
+$sth->execute; # fails ? auto-re-prepare?
+
+ora_bind() failed err = ORA-01026: multiple buffers of size > 4000 in
+the bind list (DBD: oexec error)
+
+http://outside.organic.com/mail-archives/dbi-users/Nov1997/0116.html
+
+Handle PL/SQL arrays.
+
+Non-blocking
+
+Tests:
+RAW types at max length
+
+http://www.oracle-users.com/html/freeware.html
+
+http://freespace.virgin.net/j.hatcher/ociwrap.htm

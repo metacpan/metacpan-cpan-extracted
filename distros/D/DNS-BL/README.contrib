@@ -1,0 +1,32 @@
+The contrib directory in this distribution includes various tools
+that are useful. Currently, this includes:
+
+contrib/blmanager.cgi
+
+  A very simple CGI script that allows for the manipulation of DNSBLs
+  through a web interface. It is intended as the basis for your very
+  own and does not excercise all the features of DNS::BL. You must
+  edit it before testing.
+
+contrib/import
+
+  This script is expected to be useful to import existing dnsbl data
+  into your new DNS::BL based dnsbl. At our installation, we used it
+  to migrate the existing BL data in djdnsbld format.
+
+contrib/spamtrap
+
+  This script is meant to be used in a procmail recipe attending to
+  spamtraps. After some minor configuration, it should be able to
+  process messages passed by procmail and figure out the SMTP client
+  that delivered the spam. This script can archive the spam, produce
+  the commands required to add new rules to two DNS::BL dnsbls and
+  update an index. See its documentation for specific information
+  about its inner workings and functions.
+
+contrib/check
+
+  This script checks the integrity of the indexes, to look for the
+  development of branches with no leaves. This is being used for the
+  analysis of wether to implement full tree cleanup.
+

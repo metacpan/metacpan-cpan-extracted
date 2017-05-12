@@ -1,0 +1,22 @@
+---
+abstract: 'Daemon::Control plugin to bring up new processes before disposing of the old ones.'
+author:
+  - 'Kieren Diment <zarquon@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daemon-Control-Plugin-HotStandby
+requires:
+  Class::Method::Modifiers: '0'
+  Daemon::Control: '0.001007'
+  Role::Tiny: '0'
+resources:
+  bugtracker: https://github.com/singingfish/Daemon-Control-Plugin-HotStandby/issues
+  repository: git://github.com/singingfish/Daemon-Control-Plugin-HotStandby.git
+version: '0.0002'

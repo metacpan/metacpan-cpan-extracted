@@ -1,0 +1,8 @@
+Revision history for DBIx-Class-TimeStamp-HiRes
+
+1.0.0  Tue May  7 17:33:04 2013
+       Initial release.
+
+1.0.1  Wed Sep 17 10:53:13 2014
+       Updated perlcritic.t to skip all if TEST_AUTHER env is not set.
+       Tests were failing for some users who had Perl::Critic::OTRS rules installed.

@@ -1,0 +1,5 @@
+0.11    * Fix bug in array expansion in flat_to_complex
+        * Use foreach keys instead of while each to avoid non-reset on some data types.
+
+0.10   2006-10-23
+        * Initial release - from the URLEncode library of the YAR project.

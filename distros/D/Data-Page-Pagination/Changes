@@ -1,0 +1,24 @@
+Revision history for Perl extension Data::Page::Pagination.
+
+0.006  Mon Jul 13 20:00:46 2015
+- remove Build.PL from distribution
+- return a scalar and not a list at methods
+  - visible_first_page
+  - visible_last_page
+
+0.005  Tue Mar 13 20:46:48 2012
+- repaired Makefile.PL
+
+0.004  Sun Feb 26 07:07:00 2012
+- removed // to be less then v5.10 compatible
+
+0.003  Fri Feb 17 21:15:00 2012
+- using MooseX::StrictConstructor
+- using MooseX::Types::Moose
+- removed unneeded build dependency Syntax::Feature::Function in 01_basics.t
+
+0.002  Mon Feb 13 18:00:00 2012
+- added missing build requires Data::Page
+
+0.001  Sat Feb 11 08:00:00 2012
+- first release

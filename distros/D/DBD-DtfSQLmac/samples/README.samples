@@ -1,0 +1,10 @@
+Dear MacPerl user,
+
+to run the sample scripts, you first have to create a sample
+database. To create one, run the createSampleDB.pl script.
+This script creates the sample database 'SampleDB.dtf' in the 
+current folder (user 'dtfadm', password 'dtfadm'). Its size 
+will be approximately 780 KB. Four user tables will be created 
+and filled with some data for playing around.
+
+Enjoy.

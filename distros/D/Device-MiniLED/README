@@ -1,0 +1,69 @@
+Device-MiniLED
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Device::MiniLED
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-MiniLED
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Device-MiniLED
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Device-MiniLED
+
+    Search CPAN
+        http://search.cpan.org/dist/Device-MiniLED/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2013 Kerry Schwab
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Aggregation of this Package with a commercial distribution is always
+permitted provided that the use of this Package is embedded; that is,
+when no overt attempt is made to make this Package's interfaces visible
+to the end user of the commercial distribution. Such use shall not be
+construed as a distribution of this Package.
+
+The name of the Copyright Holder may not be used to endorse or promote
+products derived from this software without specific prior written
+permission.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

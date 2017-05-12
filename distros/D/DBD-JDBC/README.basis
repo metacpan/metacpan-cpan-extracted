@@ -1,0 +1,168 @@
+This is a hints file for using the DBD::JDBC driver with the
+Livelink Collections Server (formerly BASIS) JDBC driver.
+
+* Connecting
+
+You must use the BASIS JDBC URL format in which all connection
+properties (other than the database username and password) are
+specified as part of the URL. For example,
+
+  jdbc:opentext:basis://basishost/tour_all?host.user=user&host.password=pwd
+  jdbc:opentext:basis://user:pwd@basishost/tour_all
+
+
+If you need to specify connection properties (such as host.user)
+in the query-string portion of the URL after the database list,
+you must escape the "=" characters (and any ";" characters).
+
+Example
+    $url = "jdbc:opentext:basis://basishost/tour_all?host.user=user&host.password=pwd";
+    $url =~ s/([=;])/uc sprintf("%%%02x",ord($1))/eg;
+    $dsn = "dbi:JDBC:hostname=myhost;port=12345;url=$url";
+
+
+
+* Compound fields
+
+All subfields of compound fields will be returned by
+ResultSet.getString(). Using DBD::JDBC, $sth->fetch will return
+the same delimited string returned by the JDBC driver. The
+subfield delimiter is "\r\n".
+
+You may update a compound field by setting its value to a string
+of subfield values delimited by "\r\n".
+
+Example
+    $sth = $dbh->prepare("select destin from sched");
+    $sth->execute();
+    while ($row = $sth->fetch()) {
+        @subfields = split /\r\n/, $row->[0];
+        print "There are ", scalar(@subfields), " subfields\n";
+    }
+
+    $sth2 = $dbh->prepare(qq/update sched set destin = ?/);
+    $sth2->bind_param(1, "Galveston\r\nWashington, DC\r\nPhiladelphia");
+    $rows_affected = $sth2->execute();
+
+
+
+
+* bind_param
+
+The BASIS JDBC driver uses OpenAPI, which treats parameters as
+strings. For this reason, using the type hints for any types
+other than the binary types is not likely to increase
+performance. It will simply cause an extra set of data
+conversions to the hinted-at type and back to a string.  When no
+type hint is specified, the type sent to the DBD::JDBC server
+defaults to VARCHAR, which means the data will be treated as a
+string automatically.
+
+Note that using the type hint with binary data is required to
+avoid character set conversion.
+
+Also note that dates must be a string in one of the valid BASIS
+date formats. 
+
+Example
+    use DBI qw(:sql_types);   # To import SQL_LONGVARBINARY, etc. 
+    
+    # ...
+
+    $filedata = my_read_file("my_binary_file");
+    $q = qq/insert into my_table (DM_BLOB) values (?)/;
+    $sth = $dbh->prepare($q);
+    $sth->bind_param(1, $filedata, SQL_LONGVARBINARY);
+    $sth->execute();
+
+
+
+
+* rows
+
+The rows function behaves as described in the DBI
+specification. In particular, it does not return the number of
+rows in a result set until the entire result set has been read. 
+
+However, the number of rows in the result set is available after
+calling $sth->execute using $sth->jdbc_func("ResultSet.getRowCount").
+
+
+
+* BASIS-specific Connection methods
+
+The following BASIS-specific methods should now be available
+using $dbh->jdbc_func. The values used below are examples.
+
+$dbh->jdbc_func("tour_all", "setSchema");
+$schema = $dbh->jdbc_func("getSchema");
+
+$wait = $dbh->jdbc_func("getWait");
+$dbh->jdbc_func([1 => SQL_BIT], "setWait");
+
+$formatted = $dbh->jdbc_func("isOutputFormatted");
+$dbh->jdbc_func([1 => SQL_BIT], "setOutputFormatted");
+
+$presenter = $dbh->jdbc_func("getPresenter");
+$dbh->jdbc_func("sys_plain", "setPresenter");
+
+This functionality can be used for standard JDBC methods as
+well. For example, 
+
+$dbh->jdbc_func([1 => SQL_BIT], "setReadOnly");
+
+
+
+* BASIS-specific Statement methods
+
+The following BASIS-specific methods should now be available
+using $sth->jdbc_func. The values used below are examples.
+
+$presenter = $sth->jdbc_func("Statement.getConverter");
+$dbh->jdbc_func("sys_blob_hard_indirect", "Statement.setConverter");
+
+$history = $dbh->jdbc_func("Statement.isHistoryEnabled");
+$dbh->jdbc_func([1 => SQL_BIT], "Statement.setHistoryEnabled");
+
+
+
+* BASIS-specific ResultSet methods
+
+The following BASIS-specific methods should now be available
+using $sth->jdbc_func. The values used below are examples.
+
+$sth->jdbc_func("ResultSet.checkoutRow");
+$sth->jdbc_func("ResultSet.cancelRowCheckout");
+
+$tag = $sth->jdbc_func("ResultSet.getHitStartTag");
+$sth->jdbc_func("<strong>", "ResultSet.setHitStartTag");
+
+$tag = $sth->jdbc_func("ResultSet.getHitEndTag");
+$sth->jdbc_func("</strong>", "ResultSet.setHitEndTag");
+
+$highlighting = $sth->jdbc_func("ResultSet.isHitHighlighting");
+$sth->jdbc_func([1 => SQL_BIT], "ResultSet.setHitHighlighting");
+
+$size = $sth->jdbc_func("ResultSet.getRowCount");
+
+
+Most of the JDBC 2.0 positioning and update methods implemented
+by the BASIS JDBC driver should also be available this way. 
+
+
+See the "Calling JDBC methods" section of the DBD::JDBC
+documentation for more information on the use of $sth->jdbc_func,
+and the BASIS JDBC driver API documentation for a complete list
+of available methods.
+
+
+* last_insert_id
+
+By default, last_insert_id will return the value of the primary
+key for the updated field. If your primary key is an MFI, no data
+will be available.
+
+If you use the column index values when specifying columns for
+last_insert_id, be aware that the column numbers are indexes into
+the columns of the table being updated. 
+

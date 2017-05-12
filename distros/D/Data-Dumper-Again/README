@@ -1,0 +1,47 @@
+Data-Dumper-Again version 0.0002
+================================
+
+This is yet another OO interface to Data::Dumper. It is quite 
+clean and damn easy to use (or will be soon).
+
+    use Data::Dumper::Again;
+
+    $dumper = Data::Dumper::Again->new( purity => 1 );
+    $dumper->dump($scalar);
+    $dumper->dump(@list);
+
+    $dumper->dump_named( '$var' => $scalar, '*list' => \@list );
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Data::Dumper
+    Carp
+    Class::Accessor
+
+    Test::More
+    Test::Base
+
+and recommends
+
+    Test::Pod 1.18
+    Test::Pod::Coverage 1.04
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

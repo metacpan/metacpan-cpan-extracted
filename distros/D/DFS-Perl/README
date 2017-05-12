@@ -1,0 +1,153 @@
+
+Introduction
+------------
+
+DFS-Perl is a perl module interface to DFS internals. It includes both a
+simple API to manipulate DFS ACLs, and also methods for accessing DFS
+servers, such as the flserver and ftserver. Most aspects of DFS-Perl are
+read-only; however, DFS-Perl does allow you to change fileset quotas and
+create/delete mount points directly from perl.
+
+
+Installation
+------------
+
+Before installing DFS-Perl, you need to have DCE-Perl installed and
+configured on your system.
+
+DCE-Perl is available via CPAN, or via the URL:
+
+    http://www.csupomona.edu/~henson/www/projects/DCE-Perl/
+
+
+Once DCE-Perl has been successfully installed, you need to read the file
+README.LIBDCEDFS and verify that libdcedfs and the necessary header files
+are available on your system. If you are unable to acquire or build an
+appropriate libdcedfs, you can build an ACL only version of DFS-Perl by
+typing "rm DFS.xs; ln -s DFS-crippled.xs DFS.xs" in the distribution
+directory, and removing -ldcedfs from Makefile.PL before proceeding.
+
+
+Once these prerequisites are met, you can build and install DFS-Perl by
+running the following commands:
+
+     cd /path/to/DFS-Perl-0.50
+     perl Makefile.PL
+     make
+     make install
+
+
+Changes
+-------
+
+0.50 - Updated to work with the IBM/Transarc DFS API distribution.
+
+     - Updated for Perl v5.6.x
+
+     - Fixed bug in ACL code that confused users and groups with
+       the same name. Thanks to Larry Schnitzer <lps@buffalo.edu>
+       for reporting the bug and supplying the fix.
+
+
+0.35 - fileset, flserver and ftserver objects enhanced to include
+       information about RW, RO, and BK filesets in various locations,
+       and the following new methods:
+
+         $fileset->exists(fileset_type, ftserver_index)
+         $fileset->ftserver_count()
+         $fileset->ftserver_index(ftserver)
+         $fileset->type_bk
+         $fileset->type_ro
+         $fileset->type_rw
+         $fileset->usage(ftserver_index, fileset_type)
+         $flserver->fileset_mask_type(type)
+         $flserver->ftserver_by_name(name)
+         $flserver->status_endoflist
+         $flserver->type_bk
+         $flserver->type_ro
+         $flserver->type_rw
+         $ftserver->status_endoflist
+
+     - Minor updates to compile cleanly with threaded Perl.
+
+     - Added examples illustrating API usage.
+
+     - Enhanced dfs_usage.pl utility. There are still some bugs in
+       the read/write statistics reporting at the fileserver/cell
+       level, but I don't know when I'll get around to fixing them
+       and I didn't want to hold up the release any longer.
+
+
+0.30 - Updated for DFS 1.2.2 API (in particular, Transarc DCE/DFS 2.0 for
+       Solaris 2.6).
+
+     - Note: never released internal version.
+
+
+0.25 - Optimized internal ACL data representation to delay registry lookups
+       until needed, and cache all lookups to avoid redundant registry
+       access. Thanks to Reggie Hunt <rhunt@hunt.llnl.gov> for the
+       suggestion.
+
+     - The $acl->entry() method now returns an array of ($perms, $status).
+       Any existing code must be modified to take this change into
+       account. In particular, if you use aclmod, be sure to acquire and
+       install version 1.1 (or newer), which has been modified to conform
+       with the API change.
+
+     - Added support for foreign ACL types. Thanks much to Reggie Hunt
+       <rhunt@hunt.llnl.gov> for supplying the code upon which this support
+       is based.
+
+     - Ability to build an ACL-only version for those platforms unable to
+       acquire or compile libdcedfs.
+
+
+0.20 - Added ability to pass in an open registry handle to ACL bind method.
+       Useful when used in account creation scripts when a connection
+       to the master registry is needed. If no handle is supplied, the
+       default registry handle will be used.
+
+     - Added exception handling for DFS RPCs, and fault tolerance for
+       flserver calls.
+
+     - New methods:
+
+         -- DCE::DFS::crmount(), for creating mount points
+
+         -- DCE::DFS::delmount(), for deleting mount points
+
+         -- DCE::DFS::aggregate::ftserver(), to acquire an ftserver object
+            from an aggregate object
+
+         -- DCE::DFS::fileset::ftserver(), to acquire an ftserver object
+            from a fileset object
+
+         -- DCE::DFS::fileset::aggregate(), to acquire an aggregate object
+            from a fileset object
+
+     - Added skeleton of documentation.
+
+     - Minor updates to dfs_usage.pl
+
+
+0.15 - Beta release including new classes to interface to DFS flservers,
+       ftservers, aggregates, and filesets.
+
+
+0.10 - First publicly released version.
+
+
+Feedback/Availability
+---------------------
+
+Please report any bugs or feature requests to <henson@acm.org>.
+
+DFS-Perl and DCE-Perl have a mailing list available for discussion and
+announcements. To subscribe, send email to <majordomo@lists.csupomona.edu>
+with a body of "subscribe dce-perl".
+
+
+The latest version of DFS-Perl is currently available at
+
+    http://www.csupomona.edu/~henson/www/projects/DFS-Perl/

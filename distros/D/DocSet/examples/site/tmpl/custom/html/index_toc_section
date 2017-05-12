@@ -1,0 +1,17 @@
+[%-# render one level of toc and call recursively itself if there are
+   # nested levels.
+   # expected args:
+   # subs - an array with keys indentical to 'toc' from above.
+-%]
+
+[%- FOREACH sec = subs -%]
+
+        <dl class="toc">
+            <dt><a href="[%- sec.link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/arrow_right.gif" alt="-" align="bottom" border="0" height="10" width="18">[%- sec.title -%]</a></dt>
+
+    [%- IF sec.abstract -%]
+            <dd>[%- sec.abstract -%]</dd>
+
+    [%- END -%]
+        </dl>
+[%- END -%]

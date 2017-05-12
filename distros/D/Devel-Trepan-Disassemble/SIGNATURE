@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 2ac4182314de542e8988ba90c402a8bd12585ecc Build.PL
+SHA1 a71367c8d234fda7d0a3fae438df745f6905a2fe ChangeLog
+SHA1 7f0dbdc92079a0147d67cf7279a294145b2f13c1 Changes
+SHA1 47d7b6556fe25aa2d9171353b9a9f9e1a158c0bd GNUmakefile
+SHA1 53c1eff36daa4672f8ddba8419d6b06eefb2220c MANIFEST
+SHA1 ba919391a21e9a48327b79a07186be4aec1065ac META.json
+SHA1 5b60c84e312c48caf1036d33ce894a9f07a79dea META.yml
+SHA1 cc9c6be6aa067a4daa54f77fbb40aba665385256 Makefile.PL
+SHA1 e51c94255e554c4d4c24e77be8389ecf0e751546 README
+SHA1 d5d593b3d52c6e1f1d750b76b60ffb4ecaa9d34b README.md
+SHA1 fafb2ff3850ae8a532bb0e3ec1ba31ba01bc8ae9 example/five.pm
+SHA1 4cc77b90af91e615a64ae04893fdffa7939db84c gpl-2.0.txt
+SHA1 3c4d45c1bdc6a01467ce080ed1703f98dee5a6cb lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm
+SHA1 dcc407522a2b11e997e8657ba1d4bc11a90e7a35 lib/Devel/Trepan/Disassemble.pm
+SHA1 8e0e6bbfc0ccd8ee50ae075ba2ea867a00043e5c t/00load.t
+SHA1 0028fef9be7783d9eba29ae4d3940cc99cc8d14e t/00test-pod.t
+SHA1 909763ea48b9df2bbf549bf8f1fc9fcb9a3880f7 t/10test-cmd-complete.t
+SHA1 8fd87785af7925ea4a0502e4b3b536b24185b535 t/10test-opflags.t
+SHA1 ee5d40604c8408f5de5db8eb772f8f78b2523ec7 t/20test-disassemble.t
+SHA1 d5496ce82ba1a666b80106617adeed2a0156b57e t/Helper.pm
+SHA1 741718bb69697f67d0d0ff5f52f77f6a7f7752ae t/Makefile
+SHA1 1cc4df19aa0da0c4eefd724cba96bf8856031db0 t/data/disasm2.cmd
+SHA1 1ca1a946b3bf3aef3fe8d6fc1f9376699c2b9ef7 t/data/disasm2.right
+SHA1 5ac9ec0ad2faad91f7246eac52c8f44109ada65b t/data/disassemble.cmd
+SHA1 88c0918c1619971c148b993a160d2d7f24d02df8 t/data/disassemble.right
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlZUckoACgkQGo3lAIJ17CFacQCgjfIfYkqdWkmGzrXUQOD+0IUk
+wJAAmwYdGHEeGSQDWZ5WWyXGT5RKk6UU
+=6zSr
+-----END PGP SIGNATURE-----

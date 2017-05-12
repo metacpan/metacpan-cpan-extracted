@@ -1,0 +1,94 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "other_vrf",
+          "TABLE_addrf": {
+            "ROW_addrf": {
+              "addrf": "ipv4",
+              "TABLE_prefix": {
+                "ROW_prefix": [
+                  {
+                    "ipprefix": "1.1.1.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.1.1.1",
+                          "ifname": "Eth1/1",
+                          "uptime": "P28DT19H43M28S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "1.1.1.1/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.1.1.1",
+                          "ifname": "Eth1/1",
+                          "uptime": "P28DT19H43M28S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "8.8.8.0/24",
+                    "ucast-nhops": 2,
+                    "mcast-nhops": 0,
+                    "attached": "false",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ifname": "Null0",
+                          "uptime": "P28DT19H41M36S",
+                          "pref": 1,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "static",
+                          "ubest": "true"
+                        },
+                        {
+                          "ipnexthop": "1.1.1.2",
+                          "uptime": "PT1H14M41S",
+                          "pref": 1,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "static",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

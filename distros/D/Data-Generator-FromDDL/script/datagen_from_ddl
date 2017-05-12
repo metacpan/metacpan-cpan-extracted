@@ -1,0 +1,78 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Data::Generator::FromDDL::CLI;
+
+Data::Generator::FromDDL::CLI->new()->run(@ARGV);
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+datagen_from_ddl - Dummy data generator from DDL statements
+
+=head1 SYNOPSIS
+
+    $ datagen_from_ddl [options] your_ddl.sql
+    $ datagen_from_ddl --num=users:10,100 --include=users,blogs --format=sql --pretty your_ddl.sql
+
+=head1 DESCRIPTION
+
+B<datagen_from_ddl> generates dummy records and output them to STDOUT in default so that it can pipe to RDBMS client.
+
+    $ datagen_from_ddl --num=100 your_ddl.sql | mysql -u user -p DBNAME
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<-n|--num> (default: 10)
+
+Number of records generated.
+
+Example:
+
+    --num=20 (20 records for all tables)
+    --num=users:10,100 (10 records for users and 100 records for other tables)
+
+=item B<-p|--parser (default: MySQL)>
+
+Parser for DDL. Parser can be 'MySQL', 'SQLite', 'Oracle', or 'PostgreSQL'.
+
+=item B<-i|--include>
+
+Only tables specified by this option are processed.
+
+=item B<-e|--exclude>
+
+Tables which are specified this option are ignored(--include and --exclude options are exclusively specified).
+
+=item B<-o|--out>
+
+Output file.
+
+=item B<-f|--format (default: SQL)>
+
+Output format. Format can be 'SQL' or 'JSON'.
+
+=item B<--pretty>
+
+Pretty print.
+
+=item B<--bytes_per_sql> (default: 1MB)
+
+The maximum bytes of bulk insert statement.
+
+You can specify this option value like '64', '1MB', '10M'.
+
+This option is releated to the MySQL's B<'max_allowed_packet'> variable which stands for the maximum size of string. It's recommended to suit this option for your MySQL settings.
+
+cf. https://dev.mysql.com/doc/refman/5.1/en/server-system-variables.html#sysvar_max_allowed_packet
+
+=back
+
+=cut
+

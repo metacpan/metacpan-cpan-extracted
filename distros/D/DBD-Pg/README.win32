@@ -1,0 +1,104 @@
+
+How to get a working DBD::Pg on Windows
+
+Warning! This information is outdated. Please ask on the mailing list for help 
+if you encounter any problems, or use the files here:
+
+http://pgfoundry.org/frs/?group_id=1000199
+
+Also see the notes about Strawberry Perl in the README file.
+
+Start with:
+MS VC++.Net Standard Edition
+MS VC++ Toolkit 2003
+Latest PostgreSQL (e.g. postgresql-8.00.rc2.tar.gz)
+Latest Perl (e.g. perl-5.8.6.tar.gz)
+Latest DBI (e.g. DBI-1.46.tar.gz)
+Latest DBD::Pg (1.40 or higher)
+Custom "win32.mak" file (included with DBD::Pg)
+
+Unpack the .tar.gz files in c:\tmp
+
+Save win32.mak as src\bin\pg_config\win32.mak in postgres tree.
+
+1. In Windows command window, set up to compile:
+
+set PATH=C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\bin;%PATH%
+set PATH=C:\Program Files\Microsoft Visual C++ Toolkit 2003\bin;%PATH%
+vcvars32
+
+2. Run win32 make for postgresql:
+
+cd \tmp\postgresql-8.0.0rc2\src
+nmake -f win32.mak
+
+3. Make pg_config.exe (not part of standard MSVC build), and copy it out:
+
+cd bin\pg_config
+nmake -f win32.mak
+copy Release\pg_config.exe \tmp\DBD-Pg-1.42
+
+4. Install lib and include to some permanent location like this:
+
+mkdir c:\postgres
+mkdir c:\postgres\lib
+mkdir c:\postgres\include
+cd ..\..\interfaces\libpq\Release
+copy libpq* c:\postgres\lib
+cd ..\..\..
+xcopy /s include c:\postgres\include
+xcopy \tmp\postgresql-8.0.3\src\interfaces\libpq\libpg-fe.h c:\postgres\include
+
+
+5. Make a non-threaded perl, like this:
+
+cd \tmp\perl-5.8.6\win32
+
+in Makefile, 
+.. change the install location thus:
+      INST_TOP        = $(INST_DRV)\myperl
+.. comment out the following lines
+  USE_MULTI = define
+  USE_ITHREADS = define
+  USE_IMP_SYS = define
+.. change both instances of deprecated '-Gf' flag to '-GF'
+
+then just run:
+
+nmake
+nmake test
+nmake install
+  
+5. Add new perl to path:
+
+set PATH=c:\myperl\bin;%PATH%
+
+6. Make and install DBI:
+
+cd \tmp\DBI-1.46
+perl Makefile.PL
+nmake
+nmake test
+nmake install
+
+7. Set up environment for DBD::Pg:
+
+set POSTGRES_LIB=c:\postgres\lib
+set POSTGRES_INCLUDE=c:\postgres\include
+
+8. Build DBD::Pg:
+
+cd \tmp\DBD-Pg1.42
+perl Makefile.PL (when asked for pg_config path, say: .\pg_config.exe )
+nmake
+
+9. Test and install
+
+You should now be able to set things up for normal DBD::Pg testing, 
+which you can invoke via "nmake test"
+
+Then install using "nmake install"
+
+If you have any problems or questions, please email the DBD::Pg 
+mailing list: dbd-pg@perl.org
+

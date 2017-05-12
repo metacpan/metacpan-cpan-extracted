@@ -1,0 +1,36 @@
+---
+abstract: 'Powerful fast feature-rich Perl source code profiler'
+author:
+  - 'Tim Bunce <timb@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-NYTProf
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - SVG
+requires:
+  File::Which: '1.09'
+  Getopt::Long: '0'
+  JSON::MaybeXS: '0'
+  List::Util: '0'
+  Test::Differences: '0.60'
+  Test::More: '0.84'
+  XSLoader: '0'
+resources:
+  MailingList: http://groups.google.com/group/develnytprof-dev
+  bugtracker: https://github.com/timbunce/devel-nytprof/issues
+  homepage: https://code.google.com/p/perl-devel-nytprof/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/timbunce/devel-nytprof.git
+version: '6.04'

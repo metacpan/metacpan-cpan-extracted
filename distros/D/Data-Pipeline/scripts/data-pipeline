@@ -1,0 +1,77 @@
+#! /usr/bin/perl
+
+use Data::Pipeline::Parser;
+use Getopt::Long;
+use Carp 'verbose';
+use Pod::Usage;
+
+my(@libpaths, %vars, $help);
+
+GetOptions(
+    #"lib=s" => \@libfiles, # TODO: use for importing other machines/pipelines
+    "define=s" => \%vars,
+    "help|h" => \$help,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+
+my $parser = Data::Pipeline::Parser -> new();
+
+#$parser -> _DBLoad;
+
+my $e = { 
+    to => [ \*STDOUT ],
+    vars => \%vars
+};
+
+# after processing known/named options
+
+my $i=0;
+$vars{$i++} = $_ for @ARGV;
+
+my $p;
+
+{
+my $filename = $ARGV[0];
+local($/) = (undef);
+
+open my $fh, "<", $filename or die "Unable to open $filename\n";
+$p = $parser -> parse($e, <$fh>, {});
+}
+
+$p -> run( to => \*STDOUT );
+
+__END__
+
+=pod
+
+=head1 NAME
+
+data-pipeline - DSL for using Data::Pipeline
+
+=head1 SYNOPSIS
+
+ data-pipeline [--define name=value] filename
+
+=head1 BUGS
+
+There are bugs.  Bugs may be reported on rt.cpan.org or by e-mailing
+bug-Data-Pipeline at rt.cpan.org.
+
+=head1 SEE ALSO
+
+Digital Resources Workbench <http://dh.tamu.edu/drw/>, the parent project
+for Data::Pipeline.
+
+=head1 AUTHOR
+
+James Smith C<< <jsmith@cpan.org> >>
+
+=head1 LICENSE
+
+Copyright (c) 2008 Texas A&M University.
+
+This library is free software.  You can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

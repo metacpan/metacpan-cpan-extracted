@@ -1,0 +1,245 @@
+Building Informix Database Driver for Perl DBI on Microsoft Windows NT
+
+There are two ways of obtaining Perl for Windows NT, the easy way and
+the hard way.  The easy way uses the pre-built ActiveState version of
+Perl, ActivePerl.  The hard way uses the raw Perl source code and builds
+it on your machine.  We recommend using the ActiveState Perl because it
+is probably the most widely used system for Windows NT and you can
+purchase support for it if you wish.
+
+Regardless of whether you build your own Perl or use the ActiveState
+version, you will need MS Visual C++ on your machine, and you will need to
+set the command line environment to use it (for example, by running the
+batch file C:\Progra~1\DevStudio\VC\bin\vcvars32.bat on the command line;
+trying to type C:\Program Files\DevStudio\VC\bin\vcvars32.bat at the
+command line with the space in it does not work).
+
+You will need a copy of PKZip (http://www.pkzip.com) or WinZip
+(http://www.winzip.com) or InfoZip (http://www.cdrom.com/pub/infozip or
+ftp://ftp.cdrom.com/pub/infozip) on your machine to unpack the source code
+for DBD::Informix.
+
+You will also need a version of Informix Client SDK such as 2.40.TC1
+(ESQL/C 2.30.TC1) on your machine.  Your Informix environment should be
+configured so that a database server is available to you.  See the main
+README file for more information on the requirements.
+
+The build of DBD::Informix is done using an MS-DOS command window.
+
+Using ActiveState Perl
+======================
+
+1.  Get ActivePerl (APi522e.exe was current at 2000-03-01) from ActiveState
+    Tool Corporation at http://www.activestate.com and install it.  Accept
+    all the options install offers (adding bin to the path etc).
+
+2.  You should use the ActiveState PPM (Perl Package Manager) to download a
+    prebuilt version of DBI rather than build and install your own version.
+    Run PPM, and give the command 'install DBI'.  This will install the DBI
+    module.
+
+3.  Make sure you have Informix Client SDK installed (obtained, for
+    example, from the product downloads section of the Informix web site at
+    http://www.informix.com).
+
+4.  Verify that you can connect to a database with the ILogin demo.
+
+5.  Get the source code for DBD::Informix (DBD-Informix-2015.1101.tar.gz)
+    from http://www.cpan.org, unpack it into a temporary directory, and
+    then run:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+Build Your Own Perl
+===================
+
+Be brave!  Read everything!
+
+1.  Get the source code for Perl 5.005_03; extract it into a directory
+    somewhere, eg C:\tmp\perl5.005_03.
+
+2.  Change directory to C:\tmp\perl5.005_03.  Read README.win32.  Print it
+    and reread it.
+
+3.  Change directory to C:\tmp\perl5.005_03\win32.  Edit the Makefile as
+    instructed.  Set , and OBJECT = -DPERL_OBJECT.  I had problems building
+    with USE_PERLCRT = define, which is supposed to avoid the documented
+    failure in t/posix.t, despite downloading the PerlCRT library as
+    documented in the Makefile.
+
+4.  Run:
+
+        nmake
+        nmake test
+        nmake install
+
+    This completes the Perl install.  Ensure that your environment picks up
+    this version of Perl.
+
+5.  Get the source code for DBI 1.13, unpack it into a directory such as
+    C:\tmp\DBI-1.13, change to that directory, and run:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+6.  Get the source code for DBD::Informix 2015.1101, unpack it into a
+    directory such as C:\tmp\DBD-Informix-2015.1101, change to that
+    directory, and run:
+
+        perl Makefile.PL
+        nmake
+        nmake test
+        nmake install
+
+===========================================================================
+
+PTS Bug B83831 - Using SqlFreeMem() in dbdimp.ec
+
+This is a mildly reformatted version of the bug record for B83831
+along with the NOT-DOC assertion which states that the problem is
+a documentation issue rather than a bug in the product per se.
+
+---------------------------------------------------------------------------
+
+PTS BUG NUMBER 83831                            02/29/00
+
+Product: SDK           Date:       11/04/97   Dup. Bug ID:
+Type:    SW                                   Submitter:   kputnam
+
+---- Short Description ----
+RECEIVE SAP APPLICATION ERROR (DISP+WORK.EXE) WHEN STOPPING THE SAP SERVICE
+WHEN USING THE SDK I-CONNECT WITH A 7.X SERVER ON THE SAME NT BOX
+
+---- Long Description ----
+I installed the following on the same NT 4.0 system:
+
+. Informix ODS 7.20.TE1
+. SDK (All products installed but only using I-connect and run-time libs)
+. SAP 30F
+
+All products are installed on the same server in the same $INFORMIXDIR
+
+I have tried installing both the Server first and then the client and
+vice-versa.
+
+I can bring the Informix Engine up successfully and connect to the DB.  I
+start the SAP service manager and connect to the server.  However, if I
+attempt to run tests from a client or stop the SAP service (disp+work.exe)
+the SAP application, on the NT server, displays the following error to the
+screen and all current processing from the client is halted:
+
+"The instruction at '0x0.....' referenced memory at '0x0.....'. The
+memory could not be read."
+
+The SAP service manager is a 7.x compiled binary.
+
+The event viewer displays the following:
+
+Unable to write to pipe, pipe is broken. Error text: The pipe is being
+closed. (ErrorNo. 232)
+
+FAMILY 2 ENVIRONMENT NT FOR BUG NUMBER 83831
+
+ID     Effect      Severity   Fix Precedence   Work around
+209081 MALFUN      1          5                N
+
+Current Owner:                        nwiley
+Current Fixer:                        kputnam
+Last Critical Assertion:              OK [DOC]
+Earliest Verified Version:            2.00.TC1
+
+---------------------------------------------------------------------------
+
+ASSERTIONS FOR: BUG 83831 FAMILY 2 ENVIRONMENT NT
+
+ID     Assertion    Version       Asserter  Date
+504502 NOT-DOC      2.01.TC1      delb      1998-03-19 00:35:36
+
+Documentation Changes required:
+1) In the section of the ESQL/C Manual that we talk about Compiler
+Version Independence we need to add a new way to solve the problem:
+     function SqlFreeMem()
+The SqlFreeMem() function has been in the ESQL/C run-time
+(I-Connect) since 7.20.TD1, its prototype and defines are in the
+shipped include files also since 7.20.TD1. It has not been
+documented since it was there for backward compatibility with
+version 5.01.WC1 where it was documented.
+
+2) Once the section about Compiler Version Independence is updated
+it needs to be placed in the UNIX/Windows combined release notes (as
+Windows specific) and stay there since this problem is so hard to
+find we need to tell the customer as many times as possible.
+
+3) Pubs needs to search the Syntax, Tutorial, and ESQL/C manuals for
+"free". PD needs to check each of these to determine if the "free"
+is about the free() function and what is being freed by the customer
+is memory allocated by the Informix run-time. If it is then we need
+to add a note explaining that on Windows platforms free() can be
+used only in special circumstances and how to get it to always work.
+This would mostly be for $describe into.
+
+4) Pubs needs to search the Syntax, Tutorial, and ESQL/C manuals for
+"open". PD needs to check each of these to determine if the "open"
+is about the fopen() function and if the resulting file
+handle/control block is passed to the Informix run-time. If it is
+then we need to add a note explaining that on Windows platforms file
+handle/control blocks can be used only in special circumstances and
+how to get it to always work. This would mostly be for Blobs:
+LOC_FILE.
+
+While determining that the problem was caused by the SAP application
+freeing Informix allocated memory with the wrong C run-time the
+following Generic and Windows specific problem were discovered and
+fixed:
+
+1) Generic, The translation module that translates 7.2x calls to
+Client SDK 2.x calls has to convert 7.2x format sqlda to 9.x format
+sqlda. The sqld (count of sqlvar structures allocated) can be 0, a
+malloc() of zero bytes was performed (which returns a pointer to a
+zero byte array on Windows). The pointer was used as a sqlvar
+pointer and a flag was set to indicate the sqlvar was allocated by
+Informix. The problem was that this flag was a positive offset from
+a pointer to a ZERO byte array. This set a flag in memory that was
+not owned by that sqlvar and it corrupted a pointer in a previously
+allocated cursor.
+This problem was fixed by checking for sqlda->sqld of zero, if it is
+zero set the sqlvar pointer (sqlda->sqlvar) to NULL.
+This was the original 83831 error.
+
+2) Windows only, Windows DLLs work differently than UNIX shared
+objects. 7.2x user applications link to and load isqlt07c.dll. The
+current I-Connect run-time is named isqlt09a.dll (name changed since
+the interface changed). A new isqlt07c.dll was linked (the
+"translation module") that replaced the original DLL and did nothing
+more than translate the 7.2x format call to a 9.x (Client SDK 2.x)
+format call. To do this it need some utility routines. For ease of
+building we had duplicated these utility functions in isqlt07c.dll
+and isqlt09a.dll. This caused problems since it turned out that some
+of these utility functions had globals in them and were written
+expecting that only one version of the global existed. This problem
+was fixed by moving all utility functions into isqlt09a.dll and
+exporting those functions that the translation module needed.
+This problem was found in the PeopleSoft application as bug # 86733
+and 87146.
+
+3) Windows only, while the translation module was passing on the
+user's exported C run-time routines to isqlt09a.dll (the Client SDK
+2.x I-Connect run-time) it was not using these exported routines
+itself, therefore, any memory that it malloced might be from the
+wrong C run-time.
+This problem was found in the PeopleSoft application as bug # 86733
+and 87146.
+
+4) Generic, sqli_prep in sqli\iqdynam.c was not testing the return
+code from _iqprepare, if _iqprepare detects an error it removes the
+cursor, sqli_prep was returning the address of the freed cursor,
+should have returned NULL.
+This problem was found in the PeopleSoft application as bug # 86733
+and 87146.
+
+---------------------------------------------------------------------------

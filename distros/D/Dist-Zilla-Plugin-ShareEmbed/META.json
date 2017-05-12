@@ -1,0 +1,70 @@
+{
+   "abstract" : "Embed share files to .pm file",
+   "author" : [
+      "Shoichi Kaji <skaji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.16, Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-ShareEmbed",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.16",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "6.000",
+            "File::pushd" : "0",
+            "Moose" : "0",
+            "Path::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed/issues"
+      },
+      "homepage" : "https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed.git",
+         "web" : "https://github.com/skaji/Dist-Zilla-Plugin-ShareEmbed"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217",
+   "x_static_install" : "1"
+}
+

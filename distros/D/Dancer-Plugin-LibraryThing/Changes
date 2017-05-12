@@ -1,0 +1,18 @@
+Revision history for Dancer-Plugin-LibraryThing
+
+0.0003 Mon Apr  9 08:43:54 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Allow to override config settings (uwe).
+
+0.0002 Sat Oct 29 09:21:29 2011 CEST
+
+    [BUG FIXES]
+
+    * Add Dancer to prerequisites.
+
+0.0001 Thu Sep  8 20:10:43 2011 CEST
+
+    * Initial release.
+

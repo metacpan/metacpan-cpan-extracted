@@ -1,0 +1,12 @@
+Revision history for Perl extension Device::CableModem::Motorola::SB4200.
+
+0.12 Tue Jul  5 00:52:53 2016
+   => Update the repo url.
+
+0.11 Mon Aug 27 01:51:15 2012
+   => Distro fixes.
+   => Perl::Critic refactoring.
+   => Internal cleanup.
+
+0.10 Fri May 15 02:39:57 2009
+   => First release.

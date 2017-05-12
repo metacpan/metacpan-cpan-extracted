@@ -1,0 +1,101 @@
+Revision history for Perl extension Dir::Project.
+
+The contributors that suggested a given feature are shown in [].  [by ...]
+indicates the contributor was also the author of the fix; Thanks!
+
+* Dir::Project 3.026 2017-04-25
+
+****	Fix tests '.' for Perl 5.26.0, rt121025.  [Dan Collins]
+
+* Dir::Project 3.025 2014-04-12
+
+****	Fix test failure with Pod::Usage 1.63.
+
+* Dir::Project 3.024 2012-03-16
+
+****	Allow symlinked-tool --project_bin-which.  [Brad Dobbie]
+
+****	Fix cpan-testers' tests on systems without perldoc.
+
+* Dir::Project 3.023 2011-02-09
+
+****	Fix project_bin --project_bin-which documentation.
+
+* Dir::Project 3.022 2011-01-02
+
+***	If symlinked to project_which, resolve paths.  [Brad Dobbie]
+
+* Dir::Project 3.021 2010-08-04
+
+****	Give obvious error message when MS-Windows unsupported.
+
+* Dir::Project 3.020 2010-04-22
+
+***	Add project_bin --run option.  [Craig Barner]
+
+****	Fix Pod::Usage dependency, rt51024.  [Andreas Koenig]
+
+* Dir::Project 3.017 2010-01-12
+
+***	Added contrib/dir-project.el.
+
+* Dir::Project 3.016 2009-07-13
+
+****	Fix test failures when cwd contains spaces. [Bhavin Patel]
+
+* Dir::Project 3.015 2009-06-24
+
+****	Fix project_dir.mk to allow globally installed project_dir programs.
+	The path may be changed with the new DIRPROJECT_PROJECTDIREXE variable.
+
+* Dir::Project 3.014 2009-05-29
+
+****	Fix t/03_spaces.t failure.  [Sebastian Knapp]
+
+* Dir::Project 3.013 2009-05-08
+
+**	This package is now licensed under LGPL v3 and/or Artistic v2.0.
+
+* Dir::Project 3.012 2008-06-10
+
+****	Documentation updates.
+
+* Dir::Project 3.011 2007-07-05
+
+***	Remove use of DIRPROJECT_PREFIX in make install.  [Joel Martin]
+	The Makefile now uses INSTALLLIB as the location for installing
+	makefiles to more closely match the Perl standard; you may need
+	to change this variable, or PREFIX to install globally.
+
+* Dir::Project 3.010 2007-04-24
+
+***	Allow DIRPROJECT_PATH to include absolute directories. [Bryce Denney]
+
+***	Removed unused $Dir::Project::Set_Defaults variable.
+
+* Dir::Project 3.002 2007-04-05
+
+****	Fix 'make test' issues on non-Linux systems.  [cpan-testers]
+
+* Dir::Project 3.001 2007-04-03
+
+****	Fix --help to use Pod::Usage instead of depreciated pod2text.
+
+* Dir::Project 3.000 2006-07-14
+
+**	First public release.  (Has been internal-use for 5 years.)
+
+----------------------------------------------------------------------
+DESCRIPTION: Documentation on change history for this package
+----------------------------------------------------------------------
+
+This uses outline mode in Emacs.  See C-h m [M-x describe-mode].
+
+Copyright 2001-2017 by Wilson Snyder.  This program is free software;
+you can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+Local variables:
+mode: outline
+paragraph-separate: "[ 	\f\n]*$"
+end:

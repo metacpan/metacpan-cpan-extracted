@@ -1,0 +1,83 @@
+NAME
+    Data::Radius::Packet - module to encode/decode RADIUS messages
+
+SYNOPSYS
+        use Data::Radius::Constants qw(:all);
+        use Data::Radius::Packet;
+
+        my $dictionary = Data::Radius::Dictionary->load_file('./radius/dictionary');
+        my $packet = Data::Radius::Packet->new(secret => 'top-secret', dict => $dictionary);
+
+        # build request packet:
+        my ($request, $req_id, $authenticator) = $packet->build(
+            type => ACCESS_REQUEST,
+            av_list => [
+                { Name => 'User-Name', Value => 'JonSnow'},
+                { Name => 'Password', Value => 'Castle Black' },
+                { Name => 'Message-Authenticator', Value => '' },
+            ],
+        );
+
+        # ... send $request and read $reply binary packets from RADIUS server
+
+        # parse reply packet:
+        my ($reply_type, $reply_id, $reply_authenticator, $av_list) = $packet->parse($reply, $authenticator);
+
+DESCRIPTION
+    The "Data::Radius::Packet" module provides a methods to encode/decode
+    RADIUS messages. It can be used to implement both Radius client or
+    Radius server.
+
+CONSTRUCTOR
+    new ( secret => SECRET, dict => DICTIONARY )
+        Create a new object. All arguments are optional. Dictionary is
+        object of "Data::Radius::Dictionary" which allow to use attribute
+        names instead of codes. Secret is global secret string, can be
+        overrided when building a new packet.
+
+METHODS
+    build ( type => CODE, av_list => AVLIST, [ authenticator => AUTH ], [
+    dict => DICTIONARY ], [ secret => SECRET ], [ with_msg_auth => BOOL ], [
+    request_id => BYTE ])
+        Build a binary-encoded RADIUS packet.
+
+        "type" identify type of RADIUS request. They are defined in
+        Data::Radius::Constants.
+
+        "av_list" is ARRAY-REF of attributes, each defined as HASH-REF with
+        keys {Name, Value} or {Id, [VendorId], Value}
+
+        "authenticator" is optional for request (by default the random value
+        will be used), but required for replies.
+
+        "secret" and "dict" can be used to override values from constructor
+        (for example to use individual secrets for different Radius
+        servers).
+
+        "with_msg_auth" can be passed to append Message-Authenticator
+        attribute. It also can be archived by adding this attribyte to AV
+        list with empty value
+
+        "request_id" - allow to define own it. By default internal sequence
+        is used. Value must be in range 0-255 (1byte)
+
+    parse ($radius_packet, [$request_authenticator])
+        Parse binary-encoded RADIUS packet to list of attributes
+
+        Returns multiple values: RADIUS code, request id, authenticator,
+        ARRAY-REF of attributes
+
+    request_id ($radius_packet)
+        Returns request id from packet without parsing it's attribues. Can
+        be used to choose request authenticator before parsing the response
+        packet in full.
+
+SEE ALSO
+    Data::Radius::Constants, Data::Radius::Dictionary
+
+AUTHOR
+    Sergey Leschenko <sergle.ua at gmail.com>
+
+    PortaOne Development Team <perl-radius at portaone.com> is the current
+    module's maintainer at CPAN.
+

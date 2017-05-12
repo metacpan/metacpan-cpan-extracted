@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Simple::UTF8Columns
+
+0.01  Fri Jun 08 15:30:00 2007
+        - original version
+0.02  Mon Jun 11 15:30:00 2007
+        - FIXED: die on after error in query()

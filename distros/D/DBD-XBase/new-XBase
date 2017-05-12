@@ -1,0 +1,601 @@
+
+=head1 NAME
+
+XBase - Perl module for reading and writing the dbf files
+
+=head1 POZOR!
+
+This is suggestion for new interface. Not current documentation,
+see normal perldoc XBase.
+
+=head1 SYNOPSIS
+
+  use XBase;
+  my $table = new XBase "dbase.dbf" or die XBase->errstr;
+  for (0 .. $table->last_record) {
+  	my ($deleted, $id, $msg)
+  		= $table->get_record($_, "ID", "MSG");
+  	print "$id:\t$msg\n" unless $deleted;
+  }
+
+  $table->{'RaiseError'} = 1;			# new
+  my $cur = $table->prepare_select_with_index("dbaseid.ndx",
+  	"id", "msg");
+  $cur->find_eq(156) or do {
+  	print "Value 156 not found.\n"; exit;
+  };
+  my ($id, $msg) = $cur->fetch;
+
+
+=head1 DESCRIPTION
+
+This module can read and write XBase database files, known as dbf in
+dBase and FoxPro world. It also transparently reads memo fields from
+the dbt, fpt and smt files and works with index files (ndx, ntx, mdx, idx,
+cdx and SDBM). This module XBase.pm provides simple native interface
+to XBase files. For DBI compliant database access, see DBD::XBase and
+DBI modules and their man pages.
+
+To work with dbf and associated files, you first need to open the
+dbf file using
+
+    my $table = new XBase 'dbase.dbf' or die XBase->errstr;
+
+type of call. This gives you an object to interact with the table.
+You can then access the records using their position in the file
+
+    my ($deleted, $id, $name, $born)
+    	= $table->get_record($num, 'ID', 'NAME', 'DO_BIRTH');
+    if ($id == 436) {
+    	$table->update_record_hash($num, 'NAME' => 'Peter')
+    }
+
+or via cursors that allow you to walk through the file
+
+    my $cur = $table->prepare_select('ID', 'NAME', 'DO_BIRTH');
+    while (my ($id, $name, $born) = $cur->fetch) {
+		# do some work
+    }
+
+If there are index files for given table, they can be used to speedup
+the searches. You can either use them explicitely to open cursor based
+on the index
+
+    my $cur = $table->prepare_select_with_index('dbaseid.ndx'
+    	'ID', 'NAME', 'DO_BIRTH');
+    if ($cur->find_eq(436)) {
+    	my ($id, $name, $born) = $cur->fetch;
+    }
+
+or you can attach the indexes to the table and they will be used when
+needed and also updated when the dbf table changes
+
+    my $table = new XBase 'file' => 'dbase.dbf', 'RaiseError' => 1,
+    	'index' => [ 'dbaseid.ndx', 'dbasename.ndx' ];
+    my $cur = $table->prepare_select_where('id = 436', 'NAME');
+    while (my ($name) = $cur->fetch) {
+    	print "Old value $name, new value 'Peter'\n";
+    	$table->update_record_hash($cur->last_fetched,
+    		'name' => 'Peter');
+    }
+
+The cdx, mdx and SDBM index files (with the same base name as the dbf)
+are attached by default.
+
+=head1 LIST OF METHODS
+
+The following methods are available for XBase.pm tables and their
+cursors, their meaning and parameters are in more detail described
+below:
+
+=over 4
+
+=item General methods working with the table
+
+	new			close
+	create			drop
+	attach_index
+	pack			errstr
+
+=item Methods returning information about the file
+
+	last_record		field_names
+	last_field		field_types
+	header_info		field_lengths
+	field_type		field_decimals
+	field_length
+	field_decimal
+
+=item Accessing and modifying the records
+
+	get_record		set_record
+	get_record_nf		set_record_hash
+	get_record_as_hash	update_record_hash
+	get_all_records		delete_record
+	dump_records		undelete_record
+
+=item Creating cursors and working with them
+
+	prepare_select			fetch
+	prepare_select_with_index	fetch_hashref
+	prepare_select_where		last_fetched
+					find_eq
+					cursor_uses_index
+
+=back
+
+=head1 General methods
+
+The general methods working with the whole files or tables.
+
+=head2 new
+
+Opens the existing dbf file and provides an object to interact with
+the table. Memo and index files are also opened transparently. If opening
+of the dbf file or any other needed file (memo, index) fails, C<new>
+returns undef and the error message may be retrieved via
+B<XBase-E<gt>errstr>.
+
+The parameters to B<new> are passed as hash:
+
+=over 4
+
+=item name
+
+Name of the dbf file (dbf table). The C<.dbf> suffix may be omitted.
+The name of the file may also be passed as the very first single
+parameter.
+
+=item memofile
+
+Specifies non standard name for the associated memo file.
+By default it's the name of the dbf file, with suffix C<.dbt>,
+C<.fpt> or C<.smt>.
+
+=item ignorememo
+
+Makes B<new> and all subsequent operation to ignore memo file at all.
+This is usefull if you've lost the dbt file and you do not need it.
+The default is undef, not ignoring the memo file.
+
+=item memosep
+
+Separator of memo records in the dBase III memo files. The
+standard says it should be C<"\x1a\x1a">. There are however
+implementations that only put in one C<"\x1a">. XBase.pm tries hard to
+guess which is the case for your dbt but if it fails, you can tell it
+yourself.
+
+=item nolongchars
+
+Prevents B<new> to treat the decimal value of character
+fields as high byte of the length -- there are some broken products
+around producing character fields with decimal values set. XBase.pm
+tries hard to guess which is the case for your dbf, so again you need
+this option only if it fails.
+
+=item index
+
+Name of arrayref of names of index files to attach to the opened
+object. The cdx, mdx and SDBM indexes are attached by default.
+
+=item noindex
+
+Prevents any index file to be attached automatically (cdx, mdx,
+SDBM). Default is undef.
+
+=item PrintError
+
+If the B<new> or any subsequent call to the object fail, they
+generate a warning using warn. The default is undef (but future
+versions may default to 1).
+
+=item RaiseError
+
+If the B<new> or any subsequent call to the object fail, they
+raise an exception (die). The default is undef.
+
+=back
+
+Examples:
+
+    my $table = new XBase "table.dbf" or die XBase->errstr;
+	
+    my $table = new XBase 'name' => 'table.dbf',
+	'index' => 'table.ndx', 'PrintError' => 1;
+
+=head2 create
+
+Creates new empty dbf file on disk; memo file will be also created
+if the table contains some memo fields. Parameters to create are
+passed as hash.
+
+=over 4
+
+=item name
+
+Name of the new dbf file.
+
+=back
+
+You can call this method as method of another XBase object and then
+you only need to pass B<name> value of the hash; the structure
+(fields) of the new file will be the same as of the original object.
+
+If you call B<create> using class name (XBase), you have to (besides
+B<name>) also specify the structure of the file:
+
+=over 4
+
+=item field_names
+
+Arrayref to list of field name.
+
+=item field_types
+
+Arrayref to list of field types, specified either by one letter
+strings (C, N, L, D, ...) or by long versions (char, numeric,
+date, ...)
+
+=item field_lengths
+
+Arrayref to list of field widths.
+
+=item field_decimals
+
+Arrayref to list of precissions, for numeric columns.
+
+=item version
+
+Force different version of the dbf or memo file. The default is 
+version of the source table (if you call B<create> on an object),
+3 (dBase III compatible) otherwise.
+
+=item memofile
+
+Specify nonstandard memo file name or location.
+
+=back
+
+If you keep some value undefined, B<create> will make it into some
+reasonable default. The new dbf file (nor memo file) mustn't exist
+yet -- B<create> will not allow you to overwrite existing table.
+Use B<drop> (or unlink) to delete it first.
+
+    my $newtable = $table->create("name" => "copy.dbf");
+	
+    my $newtable = XBase->create("name" => "new.dbf",
+		"field_names" => [ "ID", "MSG" ],
+		"field_types" => [ "N", "C" ],
+		"field_lengths" => [ 6, 40 ],
+		"field_decimals" => [ 0, undef ]);
+
+=head2 attach_index
+
+The index file may be attached during the B<new> call or
+additionally with this call.
+
+=head2 pack
+
+All records that were marked deleted in the table, will be purged from
+the file. Effectively does a fresh copy to new file and then moves it
+to original location, so is not aimed at efficiency. Also recreates
+all attached index files.
+
+=head2 close
+
+Closes the object and associated memo file and attached index files,
+no arguments.
+
+=head2 drop
+
+This method closes the table and deletes it on disk (including
+associated memo file and attached index files, if there are any).
+
+=head2 errstr
+
+Called either as a class method (after B<new> or B<create>) or on
+a table object, it returns error string describing the last error
+of previous failed method call.
+
+=head1 Information about dbf file
+
+=head2 last_record
+
+Returns number of the last record in the file. The records marked
+deleted but present in the file are included in this number.
+
+=head2 last_field
+
+Returns number of the last field in the file, number of fields minus 1.
+
+=head2 header_info
+
+Returns string with formated information about the file and about
+the fields.
+
+=head2 field_names, field_types, field_lengths, field_decimals
+
+Return list of field names and so on for the dbf file.
+
+=head2 field_type, field_length, field_decimal
+
+For a field name, returns the appropriate value. Returns undef if the
+field doesn't exist in the table.
+
+=head1 Accessing the records
+
+When dealing with the records one by one, reading or writing, you have
+to specify the number of the record in the file as the first argument.
+The valid range is from 0 to C<$table-E<gt>last_record> and
+C<$table-E<gt>last_record+1> to insert new record to the file.
+
+=head2 get_record
+
+Returns list of field values from the specified record. The first
+parameter in the call is the number of the record. If you do not
+specify any other parameters, all fields are returned in the same
+order as they appear in the file. You can also put list of field
+names after the record number and then only those will be returned.
+The first value of the returned list is always the 1/0 C<_DELETED>
+value saying whether the record is marked deleted or not, so
+on success, B<get_record> never returns empty list.
+
+=head2 get_record_as_hash
+
+Like B<get_record>, but returns the values as hash (in list context)
+or reference to hash (in scalar context) containing field values
+indexed by field names. The name of the deleted flag is C<_DELETED>.
+The field names are returned as uppercase.
+
+=head2 get_record_nf
+
+Like B<get_record> but instead if the names of the fields, you can
+pass list of numbers of the fields to read.
+
+=head2 get_all_records
+
+Returns reference to an array containing array of values for each
+undeleted record at once. As parameters, pass list of fields to
+return for each record.
+
+=head2 dump_records
+
+Prints to currently selected filehandle all non-deleted records from
+the file. By default, all fields are printed, separated by colons, one
+record on a row. The method can have parameters in a form of a hash
+with the following keys:
+
+=over 4
+
+=item rs
+
+Record separator, string, newline by default.
+
+=item fs
+
+Field separator, string, one colon by default.
+
+=item fields
+
+Reference to a list of names of the fields to print. By default it's
+undef, meaning all fields. You can also pass in scalar where the field
+names are separated by commas, or by dashes to denote intervals.
+
+=item undef
+
+What to print for undefined (NULL) values, empty string by default.
+
+=back
+
+Example of use is
+
+    use XBase;
+    my $table = new XBase "table" or die XBase->errstr;
+    $table->dump_records("fs" => " | ", "rs" => " <-+\n",
+			"fields" => [ "id", "msg" ]);'
+
+Also note that there is a command line script dbfdump(1) that does
+the printing.
+
+=head1 Writing the data
+
+All three writing methods always undelete the record. On success they
+return true -- the record number actually written.
+
+=head2 set_record
+
+As parameters, takes the number of the record and the list of values
+of the fields. It writes the record to the file. Unspecified fields
+(if you pass less than you should) are set to undef/empty.
+
+=head2 set_record_hash
+
+Takes number of the record and hash as parameters, sets the fields,
+unspecified fields are undefed/emptied.
+
+=head2 update_record_hash
+
+Like B<set_record_hash> but fields that do not have value specified
+in the hash retain their original value.
+
+=head2 delete_record, undelete_record
+
+Marks the specified record in the file deleted/undeleted.
+
+=head1 Sequentially reading the file
+
+If you plan to sequentially walk through the file, you can create
+a cursor first and then repeatedly call B<fetch> to get next record.
+
+=head2 prepare_select
+
+Creates and returns an cursor to walk through the file.
+As parameters, pass list of field names to return, by default all
+fields.
+
+=head2 prepare_select_with_index
+
+The first parameter is the file name of the index file, the rest is
+optional list of field names. For index types that can hold more
+index structures in one file (have tags), instead of file name use
+arrayref with the file name, the tag name and optionaly the index type
+(at the moment, expressions are not supported, so XBase.pm won't be
+able to determine type of the index unless you tell it).
+The B<fetch> will then return records in the ascending order,
+according to the index.
+
+=head2 prepare_select_where
+
+The first parameter is a string with boolean expression, the rest is
+optional list of field names. The B<fetch>es on the returned cursor
+will return only records matching the expression. If there are
+attached index files, they may be used to speed the search.
+
+The previous methods on the table object will return cursor object,
+the following methods are to be called on the cursor, not on the
+table.
+
+=head2 fetch
+
+Returns the fields of the next available undeleted record from the
+cursor. The list thus doesn't contain the C<_DELETED> flag since you
+are guaranteed that the record is not deleted.
+
+=item fetch_hashref
+
+Returns a hash reference of fields for the next undeleted record from
+the cursor.
+
+=item last_fetched
+
+Returns the record number of the record last fetched.
+
+=item find_eq
+
+This only works with cursor created via B<prepare_select_with_index>
+or B<prepare_select_where> that uses index. As a parameter it takes
+the cursor value to find. It returns 1 if there is matching record,
+or 0 otherwise.
+
+If there is a match, the next B<fetch>es will fetch the records
+matching, and continue with records greater than the specified value
+(walk the index). If there isn't match, B<fetch> returns next greater
+record.
+
+=item cursor_uses_index
+
+Returns true if the cursor created with B<prepare_select_where> uses
+index.
+
+=head1 EXAMPLES
+
+Assorted examples of reading and writing:
+
+    my @data = $table->get_record(3, "jezek", "krtek");
+    my $hashref = $table->get_record_as_hash(38);
+    $table->set_record_hash(8, "jezek" => "jezecek",
+					"krtek" => 5);
+    $table->undelete_record(4);
+
+This is a code to update field MSG in record where ID is 123.
+
+    use XBase;
+    my $table = new XBase "test.dbf" or die XBase->errstr;
+    for (0 .. $table->last_record) {
+    	my ($deleted, $id) = $table->get_record($_, "ID")
+    	die $table->errstr unless defined $deleted;
+    	next if $deleted;
+	$table->update_record_hash($_, "MSG" => "New message")
+						if $id == 123;
+    	}
+
+Examples of using cursors:
+
+    my $table = new XBase "names.dbf" or die XBase->errstr;
+    my $cursor = $table->prepare_select("ID", "NAME", "STREET");
+    while (my @data = $cursor->fetch)
+	{ ### do something here, like print "@data\n"; }
+
+    my $table = new XBase "employ.dbf";
+    my $cur = $table->prepare_select_with_index("empid.ndx");
+    ## my $cur = $table->prepare_select_with_index(
+		["empid.cdx", "ADDRES"], "id", "address");
+    $cur->find_eq(1097);
+    while (my $hashref = $cur->fetch_hashref
+			and $hashref->{"ID"} == 1097)
+	{ ### do something here with $hashref }
+
+The second example shows that after you have done B<find_eq>, the
+B<fetch>es continue untill the end of the index, so you have to check
+whether you are still on records with given value. And if there is no
+record with value 1097 in the indexed field, you will just get the
+next record in the order.
+
+The updating example can be rewritten to:
+
+    use XBase;
+    my $table = new XBase "test.dbf" or die XBase->errstr;
+    my $cursor = $table->prepare_select("ID")
+    while (my ($id) = $cursor->fetch) {
+	$table->update_record_hash($cursor->last_fetched,
+			"MSG" => "New message") if $id == 123	
+	}
+
+=head1 DATA TYPES
+
+The character fields are returned "as is". No charset or other
+translation is done. The numbers are converted to Perl numbers. The
+date fields are returned as 8 character string of the 'YYYYMMDD' form
+and when inserting the date, you again have to provide it in this
+form. No checking for the validity of the date is done. The datetime
+field is returned in the number of seconds since 1970/1/1, possibly
+with decimal part (since it allows precision up to 1/1000 s). To get
+the fields, use the gmtime (or similar) Perl function.
+
+If there is a memo field in the dbf file, the module tries to open
+file with the same name but extension dbt, fpt or smt. It uses module
+XBase::Memo(3) for this. It reads and writes this memo field
+transparently (you do not know about it) and returns the data as
+normal scalar.
+
+=head1 INFORMATION SOURCE
+
+This module is built using information from and article XBase File
+Format Description by Erik Bachmann, URL
+
+	http://www.clicketyclick.dk/databases/xbase/format/
+
+Thanks a lot.
+
+=head1 VERSION
+
+1.00
+
+=head1 AUTHOR
+
+(c) 1997--2011 Jan Pazdziora.
+
+All rights reserved. This package is free software; you can
+redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 THANKS
+
+Many people have provided information, test files, test results and
+patches. This project would not be so great without them. See the
+Changes file for (I hope) complete list. Thank you all!
+
+Special thanks go to Erik Bachmann for his great page about the
+file structures; to Frans van Loon, William McKee, Randy Kobes and
+Dan Albertsson for longtime cooperation and many emails we've
+exchanged when fixing and polishing the module's behaviour; and to
+Dan Albertsson for providing support for the project.
+
+=head1 SEE ALSO
+
+XBase::FAQ(3); XBase::Index(3);
+DBD::XBase(3) and DBI(3) for DBI interface;
+dbfdump(1); perl(1)
+
+=cut
+

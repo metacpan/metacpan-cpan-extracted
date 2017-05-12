@@ -1,0 +1,33 @@
+Revision history for Dist-Zilla-Plugin-Test-CreateFromMojoTemplates
+
+0.0701 2016-01-25T16:27:26Z UTC
+ [Other Changes]
+ - Deprecated.
+ - Rebuilt with current Dist::Iller::Config::Author::CSSON.
+
+ [Requirements]
+ - Replaced namespace::sweep with namespace::autoclean.
+
+0.0700 Unreleased
+ - Changed version format.
+
+0.06 2014-09-18T21:21:09Z CEST
+ - Fix missing build prereqs.
+
+0.05 2014-09-10T18:23:49Z CEST
+ - Adjusted to the new (0.09) api of MojoX::CustomTemplateFileParser
+
+0.04 2014-09-08T13:52:39Z CEST
+ - Bumped requirement for MojoX::CustomTemplateFileParser (0.05)
+ - Added Travis build status.
+
+0.03 2014-09-07T21:22:39Z CEST
+ - Cleanup
+ - Bumped requirement for MojoX::CustomTemplateFileParser (0.04)
+
+0.02 2014-09-07T16:42:55Z CEST
+ - Bumped requirement for MojoX::CustomTemplateFileParser
+
+0.01 2014-09-07T14:28:51Z CEST
+ - Initial release
+

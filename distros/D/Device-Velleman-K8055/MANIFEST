@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+K8055D.dll
+lib/Device/Velleman/K8055.pm
+t/00-load.t
+t/01-open_k8055.t
+t/02-digital_led_test.t
+t/03-analog_led_test.t
+t/04-digital_input_test.t
+t/pod-coverage.t
+t/pod.t

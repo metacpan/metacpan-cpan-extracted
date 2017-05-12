@@ -1,0 +1,45 @@
+*** STDOUT ***
+<TABLE BORDER=2 CELLPADDING=1 CELLSPACING=1>
+<TR>
+ <TH ALIGN=CENTER WIDTH=7%>Index</TH>
+ <TH ALIGN=CENTER WIDTH=21%>Name</TH>
+ <TH ALIGN=CENTER WIDTH=20%>Phone</TH>
+ <TH ALIGN=CENTER WIDTH=36%>Address</TH>
+ <TH ALIGN=CENTER WIDTH=14%>Date</TH>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="/cgi/foo?index=1">1</A></TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?name=Alan&#32;Stebbens">Alan Stebbens</A></TD>
+<TD ALIGN=LEFT>555-1234</TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?addr=1234&#32;Something&#32;St.,&#32;CA">1234 Something St., CA</A></TD>
+<TD ALIGN=RIGHT>1998-10-22</TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="/cgi/foo?index=2">2</A></TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?name=Bob&#32;Frankel">Bob Frankel</A></TD>
+<TD ALIGN=LEFT>555-1235</TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?addr=9234&#32;Nowhere&#32;Way,&#32;WA">9234 Nowhere Way, WA</A></TD>
+<TD ALIGN=RIGHT>2001-01-02</TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="/cgi/foo?index=3">3</A></TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?name=Mr.&#32;Goodwrench">Mr. Goodwrench</A></TD>
+<TD ALIGN=LEFT>555-9432</TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?addr=1238&#32;Car&#32;Lane&#32;Pl.,&#32;NY">1238 Car Lane Pl., NY</A></TD>
+<TD ALIGN=RIGHT>2004-04-20</TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="/cgi/foo?index=4">4</A></TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?name=Mr.&#32;Ed">Mr. Ed</A></TD>
+<TD ALIGN=LEFT>555-3215</TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?addr=9876&#32;Cowbarn&#32;Home,&#32;VA">9876 Cowbarn Home, VA</A></TD>
+<TD ALIGN=RIGHT>2008-09-12</TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="/cgi/foo?index=5">5</A></TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?name=Gunther&#32;Sveborg">Gunther Sveborg</A></TD>
+<TD ALIGN=LEFT>44-55-555-5555</TD>
+<TD ALIGN=LEFT><A HREF="/cgi/foo?addr=Kartophelhause&#32;345,&#32;Munich,&#32;Germany">Kartophelhause 345, Munich, Germany</A></TD>
+<TD ALIGN=RIGHT>2013.10.22</TD>
+</TR>
+</TABLE>

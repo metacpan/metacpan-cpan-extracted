@@ -1,0 +1,18 @@
+Revision history for Perl module DateTimeX::AATW
+
+0.04 Mon Jun  1 16:47:37 EDT 2009
+    - Changed to DateTimeX::AATW per request of Dave Rolsky 
+
+0.03 Mon Jun  1 16:13:38 EDT 2009
+    - Using most recent versions of DateTime and DateTime::TimeZone
+    - Updated tests to reflect version changes
+    - Fixed one of the hour build hashes
+    - More Tests
+
+0.02 Mon Jun  1 13:30:25 EDT 2009
+    - Corrected lookup hash references for multiple functions
+
+0.01 Sat May 30 20:11:10 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+

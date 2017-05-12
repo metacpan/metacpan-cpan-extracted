@@ -1,0 +1,26 @@
+---
+abstract: ~
+author:
+  - 'Anders Nor Berle <berle@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  SQL::Translator: 0.09007
+  Test::Exception: 0.21
+  Test::More: 0.47
+  Test::Pod: 1.26
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: MIT
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Tree-CalculateSets
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0.08108
+version: 0.04

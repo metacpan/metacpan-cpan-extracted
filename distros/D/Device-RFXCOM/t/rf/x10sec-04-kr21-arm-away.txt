@@ -1,0 +1,10 @@
+29c6c906f9ef80
+
+master x10security 29.c6c906f9ef80:
+  security/x10sec63/arm-away/min
+  sensor/x10sec63[battery]=90%
+
+
+
+
+

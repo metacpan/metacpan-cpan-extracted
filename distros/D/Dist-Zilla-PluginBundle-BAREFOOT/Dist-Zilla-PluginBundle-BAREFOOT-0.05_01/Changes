@@ -1,0 +1,56 @@
+Revision history for Dist-Zilla-PluginBundle-BAREFOOT
+
+0.05_01   2016-04-01 02:50:00-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+		* test
+
+0.05      2016-03-31 19:59:42-07:00 America/Los_Angeles
+
+	BUG FIXES:
+		* "run" dzil via Perl code instead of calling via `system`
+			because we can't guarantee installers will have it in their path
+		* fix Pod::Weaver not being able to find distro name
+		* fix bugtracker URLs
+	DISTRO FIXES:
+		* clean up Changes file
+			* consolidate trial versions
+			* add headers
+
+0.04      2015-05-29 13:39:55PDT-0700 America/Los_Angeles
+
+	NEW FEATURES:
+		* added check for uncommitted files
+		* ditching README.pod in favor of (static) README.md [GitHub #4]
+		* complete the transmogrification of dist.ini
+			(to make self-hosting: GitHub #2)
+		* check for unbumped version (GitHub #12)
+	BUG FIXES:
+		* add `provides` to meta; PAUSE can no longer get namespace from distname
+		* fixed double commit on release [GitHub #1]
+		* adding dzil build dirs to Git ignore file
+		* fixed build error when doing `dzil release`
+		* made plugins in the bundle match the dist.ini
+			(first step toward fixing GitHub #2)
+		* fix failing tests when installing from CPAN (GitHub #9)
+	CODE CLEANUP:
+		* refactor main class to use PerlX::Maybe
+
+0.03      2013-02-21 12:47:46 PST8PDT
+
+	NEW FEATURES:
+		*	added CheckChangesHasContent
+	DISTRO FIXES:
+		*	cleaned up Changes file
+
+0.02      2013-02-21 12:36:12 PST8PDT
+
+	NEW FEATURES:
+		*	added AutoPrereqs
+			should fix the majority of the CPAN Testers failures
+		*	change FakeRelease to UploadToCPAN
+
+0.01      2012-12-26 14:07:42 America/Los_Angeles
+
+	*	initial version
+		shamelessly stolen from DAGOLDEN's plugin bundle
+		(but with his permission)

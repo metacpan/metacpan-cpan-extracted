@@ -1,0 +1,3 @@
+inclusion
+
+{% include "include_recursive0.txt" %}

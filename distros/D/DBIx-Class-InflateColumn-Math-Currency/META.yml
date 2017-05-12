@@ -1,0 +1,36 @@
+---
+abstract: 'Automagically inflates decimal columns into Math::Currency objects'
+author:
+  - 'Robert Stone <drzigman@cpan.org>'
+build_requires:
+  Data::Dumper: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  Test::Most: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.030, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-InflateColumn-Math-Currency
+requires:
+  Carp: '0'
+  DBIx::Class: '0'
+  Math::Currency: '0'
+  Scalar::Util: '0'
+  base: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/drzigman/dbix-class-inflatecolumn-math-currency/issues
+  homepage: http://search.cpan.org/dist/DBIx-Class-InflateColumn-Math-Currency
+  repository: git://github.com/drzigman/dbix-class-inflatecolumn-math-currency.git
+version: 0.2.0

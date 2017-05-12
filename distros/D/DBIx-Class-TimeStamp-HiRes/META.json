@@ -1,0 +1,50 @@
+{
+   "abstract" : "Like DBIC TimeStamp but in HiRes",
+   "author" : [
+      "John Judd <funkyshu@dark-linux.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-TimeStamp-HiRes",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Perl::Critic" : "1.02",
+            "version" : "0.88"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::TimeStamp" : "0",
+            "DateTime::HiRes" : "0",
+            "version" : "0.77"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::TimeStamp::HiRes" : {
+         "file" : "lib/DBIx/Class/TimeStamp/HiRes.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v1.0.1"
+}

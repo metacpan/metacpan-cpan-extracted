@@ -1,0 +1,58 @@
+<?xml version="1.0"?>
+<swish>
+ <!--written by libswish3 - DO NOT EDIT-->
+ <swish_verson>3.0.0</swish_verson>
+ <swish_lib_version>0.1.0</swish_lib_version>
+ <MetaNames>
+  <swishtitle id="1" bias="0"/>
+  <other id="5" bias="0"/>
+  <weight id="8" alias_for="other"/>
+  <swishdefault id="0" bias="0"/>
+  <color id="6" alias_for="other"/>
+  <uppercase id="10" alias_for="mixedcase"/>
+  <mixedcase id="9" bias="0"/>
+  <foo id="2" bias="10"/>
+  <bar id="3" bias="-5"/>
+  <title id="4" alias_for="swishtitle"/>
+  <size id="7" alias_for="other"/>
+ </MetaNames>
+ <PropertyNames>
+  <swishtitle id="3" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <lastmod id="13" ignore_case="1" verbatim="0" type="2" max="0" sort="0"/>
+  <myaliased id="17" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <uppercase id="20" alias_for="mixedcase"/>
+  <bing id="14" ignore_case="0" verbatim="0" type="1" max="0" sort="0"/>
+  <mixedcase id="21" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <foo id="11" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <bar id="12" ignore_case="1" verbatim="0" type="3" max="0" sort="0"/>
+  <notsorted id="16" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <swishdescription id="6" ignore_case="1" verbatim="0" type="1" max="0" sort="0"/>
+  <description id="15" alias_for="swishdescription"/>
+  <somealias id="18" alias_for="myaliased"/>
+  <someotheralias id="19" alias_for="myaliased"/>
+ </PropertyNames>
+ <Parsers>
+  <XML>application/xml</XML>
+  <HTML>text/html</HTML>
+  <TXT>default</TXT>
+  <TXT>text/flop</TXT>
+  <TXT>text/plain</TXT>
+  <XML>text/foo</XML>
+  <HTML>1234/5678</HTML>
+  <HTML>foo/bar</HTML>
+ </Parsers>
+ <MIME>
+  <au>foo/bar</au>
+ </MIME>
+ <Index>
+  <Format>Test</Format>
+  <Name>index.swish</Name>
+  <Locale>en_US.UTF-8</Locale>
+ </Index>
+ <TagAlias>
+  <body>swishdescription</body>
+  <title>swishtitle</title>
+ </TagAlias>
+ <Tokenize>1</Tokenize>
+ <FollowSymLinks>yes</FollowSymLinks>
+</swish>

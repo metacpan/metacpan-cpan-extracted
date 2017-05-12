@@ -1,0 +1,55 @@
+NAME
+    DBIx::Export - Export data from DBI as a SQLite database
+
+SYNOPSIS
+      my $export = DBIx::Export->new(
+          file   => 'publish.sqlite',
+          source => DBI->connect($dsn, $user, $pass),
+      );
+      
+  $export->table( 'table1',
+          'select * from foo where this < 10',
+      );
+      
+  $export->finish;
+
+DESCRIPTION
+    THIS MODULE IS EXPERIMENTAL
+
+    This is an experimental module that automates the exporting of data from
+    arbitrary DBI handles to a SQLite file suitable for publishing online
+    for others to download.
+
+    It takes a set of queries, analyses the data returned by the query, then
+    creates a table in the output SQLite database.
+
+    In the process, it also ensures all the optimal pragmas are set, an
+    index is places on every column in every table, and the database is
+    fully vacuumed.
+
+    As a result, you should be able to connect to any arbitrary datasource
+    using any arbitrary DBI driver and then map an arbitrary series of SQL
+    queries like views into the published SQLite database.
+
+SUPPORT
+    Bugs should be reported via the CPAN bug tracker at
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Export>
+
+    For other issues, contact the author.
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+SEE ALSO
+    DBI
+
+COPYRIGHT
+    Copyright 2009 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,23 @@
+Dist-Inkt-Role-Hg
+=================
+
+Created:      2014-09-14
+Home page:    <https://metacpan.org/release/Dist-Inkt-Role-Hg>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Hg>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-09-17
+
+ - The just-built tarball should not count as an uncommitted change.
+
+0.003	2014-09-17
+
+ - Allow opportunity to fix uncommitted changes.
+ - Check for uncommitted changes prior to release, not prior to build.
+
+0.002	2014-09-16
+
+ [ Packaging ]
+ - Add missing repo link.
+
+0.001	2014-09-14	Initial release

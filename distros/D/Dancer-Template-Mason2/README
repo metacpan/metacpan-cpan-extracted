@@ -1,0 +1,66 @@
+NAME
+    Dancer::Template::Mason2 - Mason 2.x wrapper for Dancer
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+      # in 'config.yml'
+      template: 'mason2'
+
+      # in the app
+ 
+      get '/foo', sub {
+        template 'foo' => {
+            title => 'bar'
+        };
+      };
+
+    Then, in `views/foo.mc':
+
+        <%args>
+        $.title
+        </%args>
+
+        <h1><% $.title %></h1>
+
+        <p>Mason says hi!</p>
+
+DESCRIPTION
+    This class is an interface between Dancer's template engine abstraction
+    layer and the Mason 2.x templating system.
+
+    In order to use this engine, set the template to 'mason2' in the
+    configuration file:
+
+        template: mason2
+
+    The default template extension is ".mc".
+
+CONFIGURATION
+    Parameters can also be passed to `Mason->new' via the configuration
+    file, like so:
+
+        engines:
+            mason2:
+                data_dir: /path/to/data_dir
+
+    `comp_root', if not specified, defaults to the `views' configuration
+    setting or, if it's undefined, to the `/views' subdirectory of the
+    application.
+
+    `data_dir', if not specified, defaults to a `/data' subdirectory
+    alongside the `comp_root'.
+
+SEE ALSO
+    Dancer, Mason, Dancer::Template::Mason
+
+AUTHOR
+    Jonathan Swartz <swartz@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Swartz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

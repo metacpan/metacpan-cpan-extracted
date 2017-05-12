@@ -1,0 +1,39 @@
+Data::Handle
+
+This Package serves as a very *very* simple interface to a packages
+__DATA__ section.
+
+Its primary purposes is to make successive accesses viable without
+needing to scan the file manually for the __DATA__ marker.
+
+It does this mostly by recording the current position of the file handle
+on the first call to "->new", and then re-using that position on every
+successive "->new" call, which eliminates a bit of the logic for you.
+
+At present, it only does a simple heuristic ( backtracking ) to verify
+the current position is immediately at the start of a __DATA__ section,
+but we may improve on this one day.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

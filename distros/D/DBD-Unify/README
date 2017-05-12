@@ -1,0 +1,257 @@
+DBD::Unify --  a Unify interface for Perl 5 using DBI.
+
+This is the Database Driver for the Unify family of database products.
+See http://www.unify.com/Products/DataServer/default.aspx for Unify
+DataServer products.
+
+See the ChangeLog file for a complete history
+
+REQUIREMENTS
+
+    It has been ported and tested on DataServer 6.3AB, 6.3BE, 8.1CC, 8.1CE,
+    8.1DAB, 8.2AC, 8.2AD, 8.2B, 8.2BC, 8.3E/64, 8.3F/64, 8.3I/64, and 8.3KAB/64,
+    but this does not mean it might not work on U2000 databases or other
+    DataServer releases. I do not have a DS 9.x to play with.
+
+    I use DBI 1.628 and perl-5.8.7 through perl5.16.3, but might get it to
+    work with DBI 0.93 or higher and perl 5.6.1 (the modern toolchain will
+    require 5.8.1 as of Apr 2013). But then again, in that case you should
+    consider an upgrade. As of DBD-Unify-0.40 I've made DBI-1.42 prerequisite.
+    As of DBD-Unify-0.70, I have made perl-5.6 a prerequisite.
+
+    The test case however uses scalarIO to catch errors, so if you use a
+    perl that does not support scalarIO (e.g. perlIO enabled), you will
+    have to disable the failing tests that use it yourself and hope for
+    the best (or better, upgrade to a perl that supports scalarIO).
+
+    If you plan to use DataServer 8.1 or higher database in Unicode encoding
+    (UTF-8), use perl5.8.4 or up. See the Unicode site for the differences
+    between the Unicode standards if you want to know what to expect
+    (http://www.unicode.org/versions/enumeratedversions.html) an
+    http://www.unicode.org/history/publicationdates.html for their age.
+
+      Perl    Unicode
+      ------  -------
+      5.20.0    6.3.0  UCD 6.3.0 released 30 Sep 2013
+      5.18.0    6.2.0  UCD 6.2.0 released 26 Sep 2012
+      5.16.0    6.1.0  UCD 6.1.0 released 31 Jan 2012
+      5.14.0    6.0.0  UCD 6.0.0 released 11 Oct 2010
+      5.12.0    5.2.0  UCD 5.2.0 released 01 Oct 2009
+      5.10.1    5.1.0  UCD 5.1.0 released 04 Apr 2008
+      5.10.0    5.0.0  UCD 5.0.0 released 14 Jul 2006
+      5.8.7     4.1.0  UCD 4.1.0 released 31 Mar 2005
+      5.8.5     4.0.1  UCD 4.0.1 released    Mar 2004
+      5.8.1     4.0.0  UCD 4.0.0 released 24 Apr 2003
+      5.8.0     3.2.0  UCD 3.2.0 released 02 Apr 2002
+      5.7.x     3.1.1  UCD 3.1.1 released    Aug 2001
+                3.0.x  UCD 3.0.0 released    Sep 1999
+                       UCD 1.0.0 draft was planned spring 1991 :)
+
+    Use 'corelist -a Unicode' to see the complete list of what version of
+    Unicode is shipped with what version of perl.
+
+    One user has reported success with perl 5.005_03 on SunOS 5.7 with
+    gcc-2.7.2.2, DBI-1.30, DBD-Unify-0.24 with DataServer-7.2.
+
+    Todd Zervas reported working versions:
+    - 0.65 working on 32bit 9.0G on Linux 2.4.21-47.EL
+    - 0.76 working on 32bit 9.0G on Linux 2.6.18-92.1.22.el5PAE
+    - 0.77 working on 32bit 9.0G on Linux 2.6.18-128.1.14.el5PAE
+                    with GNU g++ 4.1.2, perl-5.8.8, and DBI-1.609
+
+BUILDING, TESTING AND INSTALLING:
+
+    This will only work if DBI is installed on a recent version of perl ;-)
+    and you are working in a valid Unify environment. Makefile.PL will stop
+    with a warning if you are not.
+
+	   # perl Makefile.PL
+
+    This step will ask you if you need networked databases. Probably you do
+    not, which is the default answer. Choosing 'Yes' will include two more
+    libraries that are broken in 8.1CC for HP-UX. Choosing 'No' will prefer
+    U2000ul.a and S2000ul.a over U2000u.a and S2000u.a resulting in smaller
+    binaries with local-only support.
+
+    If you are using gcc, it might be needed to explicitly tell Unify to
+    use it, because ucc defaults to cc (always):
+
+	   # export UPPNAME=/usr/local/pa20_32/bin/gcc
+	   # export UCCNAME=/usr/local/pa20_32/bin/gcc
+	   # export ULDNAME=/usr/local/pa20_32/bin/gcc
+
+    Another approach would be:
+
+	   # ln -s /usr/local/pa20_32/bin/gcc cc
+	   # export PATH=".:$PATH"
+
+    Now you need to build the objects:
+
+	   # make
+
+    And if that succeeds, run the tests:
+
+	   # make test
+
+    Make test will use the current database and create a table "xx". If
+    the test fails, table xx might still exist. If it already exists,
+    it might get lost, so be aware!
+
+    Make test will try to test all DBI features found in the DBI-1.19 docs
+    even some that are not DBD dependent. Partly to show that it still works
+    for DBD::Unify, and partly to find what features are still to be
+    implemented. Features known to fail will issue an ok when ran with
+    make test, but will show additional comments with a todo tag when run
+    directly (e.g. 'perl t/11-dbi-dbh.t'). Note that the t/21-uni-regex test
+    skips the test for 'SHLIKE' because this will cause core dumps. Advice:
+    do *not* use SHLIKE, but use REGLIKE (which is quite easy to convert to
+    from SHLIKE). All versions above A/SQL 8.2AC should have this problem
+    solved. The test is enabled by default. If you have an older (crashing)
+    version, disable this test by removing the hash in line
+
+      #if ("This test is known to fail") { ok ("shlike will core", 1) } else
+
+    If you happen to have a DataServer only product (no accell), make
+    will probably complain about a missing ACCELL.a from Makefile.PL
+    The workaround seems to be to remove the reference to ACCELL.a from
+    Makefile.PL (reported by Ron Kuris)
+
+	   # make install
+
+    Will install the DBD::Unify extension into the default perl path's. If
+    you plan to run different perl versions and/or different Unify versions
+    alongside eachother, use the installu.pl script instead, which installs
+    DBD::Unify in the Unify tree [ .../lib/perl ], and extend the environment
+    variable $PERL5LIB with $UNIFY/perl
+
+	  # make installu
+
+    As with all modules: Patches are welcome.
+
+SOURCE CODE
+
+    Recent changes can be (re)viewed in the public GIT repository at
+    https://github.com/perl5-dbi/DBD-Unify
+    Feel free to clone your own copy:
+
+     $ git clone https://github.com/perl5-dbi/DBD-Unify DBD-Unify
+
+    or get it as a tgz:
+
+     $ wget --output-document=DBD-Unify.tgz \
+            https://github.com/perl5-dbi/DBD-Unify/archive/master.tar.gz
+
+SHARED BUILDS on HP-UX
+
+    As of somewhere in the DataServer 8.2 track, Unify has finally indulged
+    to my request for shared library prepared objects, at least on HP-UX,
+    where they only ship static libraries. Objects inside these libraries
+    are now built with the +Z option, so it is easy to convert the static
+    libraries (.a) to shared libraries (.sl). The Makefile build process
+    will propose such transition, and - once succeeded - use it for the now
+    shared object, which is *much* smaller than when built statically. This
+    does not always work. If things fail, choose for the static route.
+    
+NAMING CONFLICTS
+
+    In their enormous wisdom, Unify have chosen a function named "inflate"
+    to be exported in their libraries. This will conflict with libz. If
+    you use any module that uses a shared lib that requires libz, this
+    will result in core dumps that are hard to trace. A possible solution
+    is to rename the function *after* building. This is - of course - very
+    very very dirty, but if it works, it will circumvent the problem:
+
+     $ make
+     $ perl -pi -e's/\0inflate\0/\0InFlate\0/g' \
+          blib/arch/auto/DBD/Unify/Unify.so
+     $ make test
+
+RESTRICTIONS:
+
+    This is a basic port for Unify. At the moment of writing, this DBD
+    does not support all DBI elements, methods and attributes. I'll add
+    these the moment I need them myself, or one of you will supply them
+    as patches.
+
+    DATE and TIME fields are not fully supported. The database interaction
+    works, but there are some issues left to iron out in the user
+    interface. We're working on it. Suggestions welcome.
+
+    TEXT and BINARY fields are supported as of version 0.60, but probably
+    not fully tested. Feedback and patches welcome.
+
+    Other known restrictions:
+
+    # Incomplete or out-of-date documentation, though I keep trying to
+      keep in pace with what I change
+
+    # Some database attributes not (yet) implemented. (AutoCommit et all)
+
+    # Most statement attributes are now implemented. Those needed for
+      $sth->fetchrow_hashref () now work, but STORE_attrib () doesn't.
+
+      DBD::Unify tries to return the {TYPE} attribute in ANSI/ODBC DBI
+      compliant coding, and has the original Unify field type available
+      in the {uni_types} attribute. For AMOUNT and HUGE AMOUNT however,
+      ANSI has no defined codes. These will be returned as SQL_FLOAT and
+      SQL_DOUBLE, with the {SCALE} set to 2.
+
+    And deficiencies/shortcommings that come with Unify:
+
+    # Unify does not supply the "NULLABLE" indicator when describing
+      fields, the returned value is as documented always 2.
+
+    # Unify does not return the desired length of non-character type
+      fields, but the /maximum/ PRECISION for those fields
+
+    # Unify has no VARCHAR concept
+
+    # Unify only distributes static libraries, so the module might
+      become rather big. Libraries on AIX are always shared, and some
+      of Unify's libraries can safely be converted to shared libs,
+      but that is no guarantee to work.
+
+    # At least until 8.2, Unify library pool does *NOT* allow more then
+      one different database open at the same time from within the same
+      process (even when the first database has correctly disconnected
+      and closed) :-(
+
+      This problem is known  with Unify and registered in their bug
+      database as 'usb100963: disconnect'. Unify Sacramento has finally
+      located the bug's source after yet again I reported this in
+      bug report 22960. DBD-Unify 0.25 and up have a workaround for all
+      versions up to and including 8.2AD. It's fixed in 8.2B.
+
+TODO:
+
+    See module documentation for specific TODO items
+
+    # Remove as many restrictions as possible
+    # Add more tests
+    # Investigate if LIKE and SHLIKE operators in positional parameters
+      indeed do not work (I've seen that, but found no time yet to look
+      into this more). Currently it cores on SHLIKE. See t/21-uni-regex.t
+    # Try finding ways to increase performance, squeezing every last
+      nanosecond out of each handle
+    # If you're into Unify internals, try finding out why describing
+      positional parameters in where clauses (not in selected fields)
+      causes a core dump on the field name. Look in dbdimp.ic in function
+      dbd_prm_describe () for comment about OSF/1.
+
+ACKNOWLEDGEMENTS
+
+    Thanks to Tom Poage <poage@fireball.ucdmc.ucdavis.edu> for keeping
+    the speed in the early development and help in adding the missing
+    features in the earlier stages of this DBD interface.
+
+    Thanks to Todd Zervas <tazervas@earthlink.net> for digging in the
+    binary issues on DS 9.0.
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 1999-2015  H.Merijn Brand <h.m.brand@xs4all.nl>
+
+    This library is free software; you can redistribute it and/or modify
+    it under the same terms as Perl itself. 
+
+As always, have the appropriate amount of fun!

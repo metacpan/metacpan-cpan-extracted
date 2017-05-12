@@ -1,0 +1,56 @@
+README file for DBIx::Hash2Table.
+
+Warning: WinZip 8.1 and 9.0 both contain an 'accidental' bug which stops
+them recognizing POSIX-style directory structures in valid tar files.
+You are better off using a reliable tool such as InfoZip:
+ftp://ftp.info-zip.org/pub/infozip/
+
+1 Installing from a Unix-like distro
+------------------------------------
+shell>gunzip DBIx-Hash2Table-1.04.tgz
+shell>tar mxvf DBIx-Hash2Table-1.04.tar
+
+On Unix-like systems, assuming you have installed Module::Build V 0.25+:
+
+shell>perl Build.PL
+shell>./Build
+shell>./Build test
+shell>./Build install
+
+On MS Windows-like systems, assuming you have installed Module::Build V 0.25+:
+
+shell>perl Build.PL
+shell>perl Build
+shell>perl Build test
+shell>perl Build install
+
+Alternately, without Module::Build, you do this:
+
+Note: 'make' on MS Windows-like systems may be called 'nmake' or 'dmake'.
+
+shell>perl Makefile.PL
+shell>make
+shell>make test
+shell>su              (for Unix-like systems)
+shell>make install
+shell>exit            (for Unix-like systems)
+
+On all systems:
+
+Run Hash2Table.pm through you favourite pod2html translator.
+
+If you are using my fancy-pom2.pl, with its 'default.css' file installed in
+/apache2/htdocs/css/, you'd do:
+
+shell>perl fancy-pom2.pl html -css Hash2Table.pm > /apache2/htdocs/Hash2Table.html
+
+or perhaps something like:
+
+shell>perl fancy-pom2.pl html -css Hash2Table.pm > /perl/html/site/lib/DBIx/Hash2Table.html
+
+2 Installing from an ActiveState distro
+---------------------------------------
+shell>unzip DBIx-Hash2Table-1.04.zip
+shell>ppm install --location=. DBIx-Hash2Table
+shell>del DBIx-Hash2Table-1.04.ppd
+shell>del PPM-DBIx-Hash2Table-1.04.tar.gz

@@ -1,0 +1,51 @@
+---
+abstract: 'Yet Another Unique ID Generator'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  Module::Build::Pluggable::CPANfile: 0.01
+  Module::Build::Pluggable::ReadmeMarkdownFromPod: 0.02
+  Module::Build::Pluggable::Repository: 0.01
+  Pod::Markdown: 0
+configure_requires:
+  Module::Build: 0.40
+  Module::Build::Pluggable: 0.05
+  Module::Build::Pluggable::CPANfile: 0.01
+  Module::Build::Pluggable::ReadmeMarkdownFromPod: 0.02
+  Module::Build::Pluggable::Repository: 0.01
+dynamic_config: 0
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-STUID
+no_index:
+  directory:
+    - inc
+provides:
+  Data::STUID:
+    file: lib/Data/STUID.pm
+    version: 0.01
+  Data::STUID::Client:
+    file: lib/Data/STUID/Client.pm
+    version: 0
+  Data::STUID::Generator:
+    file: lib/Data/STUID/Generator.pm
+    version: 0
+  Data::STUID::Server:
+    file: lib/Data/STUID/Server.pm
+    version: 0
+requires:
+  Class::Accessor::Lite: 0
+  Errno: 0
+  IPC::Semaphore: 0
+  IPC::SysV: 0
+  List::Util: 0
+  Net::Server: 0
+  Task::Weaken: 0
+  Time::HiRes: 0
+resources:
+  license: http://opensource.org/licenses/artistic-license-2.0.php
+  repository: git://github.com/lestrrat/p5-Data-STUID.git
+version: 0.01

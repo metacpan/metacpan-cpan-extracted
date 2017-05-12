@@ -1,0 +1,30 @@
+---
+abstract: 'Check the strength of passwords'
+author:
+  - 'Nils Diewald'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Password-Meter
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  bytes: '0'
+  perl: '5.010001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  license: http://www.opensource.org/licenses/MIT
+  repository: https://github.com/Akron/Data-Password-Meter
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

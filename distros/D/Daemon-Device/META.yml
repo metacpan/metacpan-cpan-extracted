@@ -1,0 +1,36 @@
+---
+abstract: 'Forking daemon device construct'
+author:
+  - 'Gryphon Shafer <gryphon@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  blib: '1.01'
+  constant: '0'
+  perl: '5.0113'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.0113'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daemon-Device
+requires:
+  Carp: '0'
+  Daemon::Control: '0'
+  IO::Pipe: '0'
+  POSIX: '0'
+  perl: '5.0113'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/gryphonshafer/Daemon-Device/issues
+  homepage: https://github.com/gryphonshafer/Daemon-Device
+  repository: https://github.com/gryphonshafer/Daemon-Device.git
+version: '1.07'

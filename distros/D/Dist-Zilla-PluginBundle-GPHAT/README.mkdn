@@ -1,0 +1,59 @@
+# NAME
+
+Dist::Zilla::PluginBundle::GPHAT - Dist::Zilla plugins for gphat
+
+# VERSION
+
+version 0.06
+
+# DESCRIPTION
+
+This is the plugin bundle that GPHAT uses.  It's equivalent to:
+
+    [@Basic]
+
+    [Git::NextVersion]
+    first_version   = 0.01
+    version_regexp  = ^(\d+\.\d+)$
+
+    [ReadmeMarkdownFromPod]
+
+    [PkgVersion]
+
+    [AutoPrereqs]
+
+    [NextRelease]
+    format          = %v %{MMM d yyyy}d
+
+    [Test::Synopsis]
+
+    [PodSyntaxTests]
+
+    [MetaJSON]
+
+    [GithubMeta]
+    issues = 1
+
+    [CopyFilesFromBuild]
+    copy            = README.mkdn
+
+    [PruneFiles]
+    filenames       = dist.ini
+
+    [Git::Commit]
+
+    [Git::Tag]
+    tag_format      = %v
+
+    [PodWeaver]
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Cory G Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

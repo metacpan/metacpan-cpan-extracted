@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+Normalizer.pm
+README
+test.pl
+docs/Normalizer.html
+docs/Normalizer.pod
+docs/Normalizer.txt
+examples/mp3.mysql
+examples/test_normalizer.pl

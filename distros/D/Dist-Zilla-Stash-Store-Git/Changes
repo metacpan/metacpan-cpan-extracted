@@ -1,0 +1,23 @@
+Revision history for Dist-Zilla-Stash-Store-Git
+
+0.000005  2014-05-14 20:26:38 PDT-0700
+	* Make dynamic_config's builder... dynamic
+
+0.000004  2014-05-14 12:59:19 PDT-0700
+	* first non-TRIAL release!  ...though to call us TRIAL is to be, well, overly
+	  kind.
+	* _git_store's builder method in our consumer role now uses the
+	  RegisterStash role's _retrieve_or_register() method
+
+0.000003-TRIAL  2014-05-14 01:08:56 PDT-0700
+	* _git_store in our consumer role now creates the store if needs be
+
+0.000002-TRIAL  2014-04-29 16:18:56 PDT-0700
+	* Add some actual documentation!
+	* rename static_config -> store_config
+	* finalize(!) _build_config()
+	* add the plugin_config attribute
+	* ...and promptly rename to 'dynamic_config'
+
+0.000001-TRIAL  2014-04-27 15:00:07 PDT-0700
+	* initial release

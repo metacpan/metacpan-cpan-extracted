@@ -1,0 +1,267 @@
+SYNOPSIS
+
+        use Modern::Perl;
+        use Data::PaginatedTable;
+        use Data::Printer;
+        
+        my @series = 'aaa' .. 'zzz';
+        
+        my $pt = Data::PaginatedTable->new(
+            {
+                data           => \@series,
+                string_mode    => 'preformatted',
+                fill_direction => 'vertical',
+            }
+        );
+        
+        do { say $pt } while ( $pt->next );
+        
+        # aaa aae aai
+        # aab aaf aaj
+        # aac aag aak
+        # aad aah aal
+        # 
+        # ...
+        # 
+        # zzg zzk zzo
+        # zzh zzl zzp
+        # zzi zzm zzq
+        # zzj zzn zzr
+        # 
+        # zzs zzw
+        # zzt zzx
+        # zzu zzy
+        # zzv zzz
+    
+    
+        say Data::Printer::p( $pt->page( 32 ) );
+    
+        # \ [
+        #     [0] [
+        #         [0] "aoi",
+        #         [1] "aom",
+        #         [2] "aoq"
+        #     ],
+        #     [1] [
+        #         [0] "aoj",
+        #         [1] "aon",
+        #         [2] "aor"
+        #     ],
+        #     [2] [
+        #         [0] "aok",
+        #         [1] "aoo",
+        #         [2] "aos"
+        #     ],
+        #     [3] [
+        #         [0] "aol",
+        #         [1] "aop",
+        #         [2] "aot"
+        #     ]
+        # ]
+        
+
+DESCRIPTION
+
+    This is yet another class to generate tables and paginate data. Each
+    page represents a two-dimensional array of given dimensions, and can be
+    filled horizontally or vertically. In string context, an instance of
+    Data::PaginatedTable will invoke one of the string_mode methods to
+    render the current page.
+
+ATTRIBUTES
+
+ data, data ( ArrayRef REQUIRED )
+
+    Gets or sets the data to be transformed by the instance of
+    Data::PaginatedTable.
+
+ rows, rows ( PositiveInteger default => 4 )
+
+    Gets or sets the number of rows per page.
+
+ columns, columns ( PositiveInteger default => 3 )
+
+    Gets or sets the number of columns per row.
+
+ fill_direction, fill_direction ( Enum[ 'vertical', 'horizontal' ] default
+ => 'horizontal' )
+
+    Gets or sets the order in which data elements will be used to fill the
+    two-dimensional array of each page.
+
+        use Modern::Perl;
+        use Data::PaginatedTable;
+        
+        my @series = 1 .. 9;
+        
+        my $pt = Data::PaginatedTable->new(
+            {
+                data           => \@series,
+                rows           => 3,
+                columns        => 3,
+                fill_direction => 'vertical', # default horizontal
+                string_mode    => 'preformatted'
+            }
+        );
+        say $pt;
+        
+        # 1 4 7
+        # 2 5 8
+        # 3 6 9
+        
+        $pt->fill_direction( 'horizontal' );
+        say $pt;
+    
+        # 1 2 3
+        # 4 5 6
+        # 7 8 9
+
+ string_mode, string_mode ( Enum[ 'html', 'preformatted', 'raw' ] default
+ => 'raw' );
+
+    Gets or sets the method to use when a Data::PaginatedTable object is
+    used in string context. See "STRING MODES".
+
+ current, current ( PositiveInteger default => 1 );
+
+    Gets or sets the current page.
+
+METHODS
+
+ page_count
+
+    Returns the total number of pages based on the number of rows and
+    columns.
+
+ page, page( PositiveInteger )
+
+    Returns the two-dimensional array with the given number of rows and
+    columns representing the current page, or optionally returns a specific
+    page when passed an integer argument.
+
+ pages
+
+    Returns an array reference containing each page of data.
+
+ first
+
+    Sets the current page to the first page and returns the instance.
+
+ next
+
+    Sets the current page to the next page and returns the instance or
+    undef if there are no next pages.
+
+ previous
+
+    Sets the current page to the previous page and returns the instance or
+    undef if there are no previous pages.
+
+ last
+
+    Sets the current page to the last page and returns the instance.
+
+STRING MODES
+
+ as_string
+
+    This is a wrapper around the as_* string_mode methods. This method is
+    called implicitly when the instance is in string context.
+
+ as_html
+
+    The html string_mode stringifies the current page as a plain html
+    table. All page elements are placed in string context (see overload).
+
+        use Modern::Perl;
+        use Data::PaginatedTable;
+        
+        my @series = 1 .. 12;
+        
+        my $pt = Data::PaginatedTable->new(
+            {
+                data        => \@series,
+                string_mode => 'html'
+            }
+        );
+        
+        say $pt;
+        
+        # <table>
+        #   <tr>
+        #     <td>1</td>
+        #     <td>2</td>
+        #     <td>3</td>
+        #   </tr>
+        #   <tr>
+        #     <td>4</td>
+        #     <td>5</td>
+        #     <td>6</td>
+        #   </tr>
+        #   <tr>
+        #     <td>7</td>
+        #     <td>8</td>
+        #     <td>9</td>
+        #   </tr>
+        #   <tr>
+        #     <td>10</td>
+        #     <td>11</td>
+        #     <td>12</td>
+        #   </tr>
+        # </table>
+
+ as_preformatted
+
+    The preformatted string_mode uses Text::Table to format the current
+    page. All page elements are placed in string context (see overload).
+
+        use Modern::Perl;
+        use Data::PaginatedTable;
+        
+        my @series = 1 .. 12;
+        
+        my $pt = Data::PaginatedTable->new(
+            {
+                data        => \@series,
+                string_mode => 'preformatted'
+            }
+        );
+        
+        say $pt;
+        
+        #  1  2  3
+        #  4  5  6
+        #  7  8  9
+        # 10 11 12
+        
+
+ as_raw
+
+    The as_raw method iterates over the page elements and invokes each in
+    string context (see overload), without seperating rows with newlines.
+    This method is likely not how you want to render your data unless your
+    data elements are string overloaded objects with their own rendering
+    logic.
+
+VERSIONING
+
+    This module adopts semantic versioning (http://www.semver.org).
+
+REPOSITORY
+
+    https://github.com/Camspi/Data-PaginatedTable
+
+ SEE ALSO
+
+      * Text::Table
+
+      * Data::Table
+
+      * Data::Tabular
+
+      * Data::Tabulate
+
+      * Data::Tabulator
+
+      * Data::Paginated
+

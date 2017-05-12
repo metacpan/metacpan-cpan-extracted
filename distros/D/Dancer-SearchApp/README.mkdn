@@ -1,0 +1,122 @@
+# NAME
+
+Dancer::SearchApp - A simple local search engine
+
+# SYNOPSIS
+
+# QUICKSTART
+
+Also see [Dancer::SearchApp::Installation](https://metacpan.org/pod/Dancer::SearchApp::Installation).
+
+    cpanm --look Dancer::SearchApp
+    
+    # Install prerequisites
+    cpanm --installdeps .
+
+    # Install Elasticsearch https://www.elastic.co/downloads/elasticsearch
+    # Start Elasticsearch
+    # Install Apache Tika from https://tika.apache.org/download.html into jar/
+
+    # Launch the web frontend
+    plackup --host 127.0.0.1 -p 8080 -Ilib -a bin\app.pl
+
+    # Edit filesystem configuration
+    cat >>fs-import.yml
+    fs:
+      directories:
+          - folder: "C:\\Users\\Corion\\Projekte\\App-StarTraders"
+            recurse: true
+            exclude:
+               - ".git"
+          - folder: "t\\documents"
+            recurse: true
+
+    # Collect some content
+    perl -Ilib -w bin/index-filesystem.pl -f
+
+    # Search in your browser
+
+# CONFIGURATION
+
+Configuration happens through config.yml
+
+    elastic_search:
+      home: "./elasticsearch-2.1.1/"
+      index: "dancer-searchapp"
+
+The Elasticsearch instance to used can also be passed in `%ENV`
+as `SEARCHAPP_ES_NODES`.
+
+# SECURITY CONSIDERATIONS
+
+## Dancer::SearchApp
+
+This web front end can serve not only the extracted content but also
+the original files from your hard disk. Configure the file system crawler
+to index only data that you are comfortable with sharing with whoever
+gets access to the web server.
+
+Consider making the web server only respond on requests originating from
+127.0.0.1:
+
+    plackup --host 127.0.0.1 -p 8080 -Ilib -a bin\app.pl
+
+## Elasticsearch
+
+Elasticsearch has a long history of vulnerabilities and has little to no
+concept of information segregation. This basically means that anything that
+can reach Elasticsearch can read all the data you stored in it.
+
+Configure Elasticsearch to only respond to localhost or to queries from
+within a trusted network, like your home network.
+
+Note that leaking a copy of the Elasticsearch search index is almost as
+bad as leaking a copy of the original data. This is especially true if you
+look at backups.
+
+# REPOSITORY
+
+The public repository of this module is
+[https://github.com/Corion/dancer-searchapp](https://github.com/Corion/dancer-searchapp).
+
+# SUPPORT
+
+The public support forum of this module is
+[https://perlmonks.org/](https://perlmonks.org/).
+
+# TALKS
+
+I've given a talk about this module at Perl conferences:
+
+[German Perl Workshop 2016, German](http://corion.net/talks/dancer-searchapp/dancer-searchapp.de.html)
+
+[Video on Youtube, German](https://www.youtube.com/watch?v=X4j5LgmfgZY)
+
+[YAPC::Europe 2016, Cluj, English](http://corion.net/talks/dancer-searchapp/dancer-searchapp.en.html)
+
+[Video on Youtube, English](https://www.youtube.com/watch?v=TXSM-Izmia8)
+
+<div>
+
+    <iframe title="YouTube video player" class="youtube-player" type="text/html" 
+    width="640" height="390" src="http://www.youtube.com/embed/TXSM-Izmia8"
+    frameborder="0" allowFullScreen></iframe>
+</div>
+
+# BUG TRACKER
+
+Please report bugs in this module via the RT CPAN bug queue at
+[https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-SearchApp](https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-SearchApp)
+or via mail to [dancer-searchapp-Bugs@rt.cpan.org](https://metacpan.org/pod/dancer-searchapp-Bugs@rt.cpan.org).
+
+# AUTHOR
+
+Max Maischein `corion@cpan.org`
+
+# COPYRIGHT (c)
+
+Copyright 2014-2016 by Max Maischein `corion@cpan.org`.
+
+# LICENSE
+
+This module is released under the same terms as Perl itself.

@@ -1,0 +1,145 @@
+Revision history for Perl extension DBIx::Admin::TableInfo.
+
+3.03  2016-09-04T11:17:00
+	- Add scripts/foreign.keys.pl.
+	- Adopt new repo structure. This includes changing the licence from Artistic to Perl. See
+		http://savage.net.au/Ron/html/My.Workflow.for.Building.Distros.html.
+
+3.02  2015-02-18T16:32:00
+	- Switch from Text::TabularDisplay to Text::Table::Manifold.
+	- Add scripts/output2github.pl, to demonstrate outputting in a github-compatible format.
+	- Remove all references to mysql_* hash keys in scripts/*.pl.
+
+3.01  2015-01-27T11:10:00
+	- Add scripts/synopsis.pl, which uses Text::TabularDisplay for nice boxed-with-ASCII rendering.
+	- Reformat the docs and this file to be <= 100 chars per line. My new standard.
+	- Add link to github repo in docs, Build.PL and Makefile.PL.
+	- Add LICENSE from github to MANIFEST.
+
+3.00  2014-08-06T09:45:00
+	- Change the internal data structure returned by method info(), where it pertains to foreign
+		keys. The old code returned a hashref $$info{$table_name}{foreign_keys}{$foreign_table}.
+		This is a bug, since it limits the code to one relationship between $table_name and
+		$foreign_table. Consider this SQL: create table people(id $primary_key, ...);
+		And: create table spouses(id $primary_key, person_id integer not null references people(id),
+			spouse_id integer not null references people(id) ).
+		Here we have 2 foreign keys in the same ('spouses') table, both pointing to the 'people'
+		table. So the hashref has become an arrayref. This affects GraphViz2::DBI, and of course any
+		other module using DBIx::Admin::TableInfo. Hence the version # change from 2.* to 3.*.
+	- Add xt/author/person.spouse.t to test the new code.
+	- Expand the FAQ.
+	- Update docs for method info(), and in reference to versions of MySQL, Pg and SQLite tested.
+	- Remove docs for DBD::mysql V 3.
+
+2.12  2014-07-22T18:34:00
+	- Change the licence (sic) statement in DBIx::Admin::TableInfo to say 'The Artistic License 2.0'
+		rather than just 'The Artistic License'. See RT#97392. Thanx to Petr Pisar for the report.
+
+2.11  2014-03-10T13:30:55
+	- Add Test::Version to the pre-reqs.
+
+2.10  2014-03-06T09:45:07
+	- Rename CHANGES to Changes as per CPAN::Spec::Changes.
+	- Move t/pod.t to xt/author/.
+	- Add t/version.t.
+	- Rename t/test.t to t/load.t.
+	- Switch from Hash::FieldHash to Moo. But not Moops - I don't need that level of complexity.
+	- Fix retrieval of foreign keys under MySQL. In this case, the 'foreign_keys' key in the hashref
+		returned by info() now points to a hashref whose keys are tables pointing to the given
+		table. This is the same as for Postgres, etc. See the docs for details.
+	- Add xt/author/create.analyze.t to explicitly add a table to the 'testdb' and report on it.
+		It uses xt/author/dsn.ini to test MySQL, Pg and SQLite.
+
+2.09  2013-03-21T13:16:00
+	- Add $ENV{DBI_SCHEMA} to examples/table.info.pl.
+	- For the MusicBrainz database, use DBI_SCHEMA=musicbrainz,cover_art_archive,report,statistics.
+		See http://musicbrainz.org/doc/MusicBrainz_Database for details.
+		Users of cpanm will want 'cpanm Carton' instead of 'sudo cpan Carton' in Perl dependencies.
+		See https://github.com/metabrainz/musicbrainz-server/blob/master/INSTALL.md for details.
+
+2.08  2013-03-14T15:02:00
+	- Add Postgres to list of databases which have special tables skipped.
+	- Extend to handle foreign keys in SQLite, using "pragma foreign_key_list($table_name)".
+	- Add an FAQ to explain more about foreign keys and tables with special (i.e. ignored) names.
+	- Rewrite to use Hash::FieldHash for class-building.
+	- Use App::Office::Contacts to create 2 databases, one under Postgres and one under SQLite.
+		Then run examples/table.info.pl on these and save the output as
+		docs/contacts.pg.log and docs/contacts.sqlite.log.
+
+2.07  Thu Jun  7  8:40:00 2012
+	- 'Use Carp' in TableInfo.pm because with call croak().
+		At least I had already put Carp in Build.PL and Makefile.PL.
+
+2.06  2011-02-16T11:46:00
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+
+2.05  2010-06-25T11:27:00
+	- The META.yml file shipped with V 2.04 was faulty. My apologies.
+
+2.04  2010-06-18T13:38:00
+	- Test with Postgres V 08.03.1100 and DBD::Pg V 2.17.1.
+	- With Postgres, note the fact that the 'table' parameter to table_info()
+	  	   must now take the value '%' and not the value 'table'.
+	- Test with MySql V 5.0.51a and DBD::mysql V 4.014.
+	- With MySQL, create tables using these clauses: index, foreign key, engine.
+	- Test with SQLite V 3.6.22 and DBD::SQLite V 1.29.
+	- With SQLite, ignore table 'sqlite_sequence'.
+	- Update docs in various ways.
+	- Rename table-info.pl to table.info.pl.
+
+2.03  2010-02-21T12:54:56
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+	- Replace personal doc root with /var/www.
+	- Use namespace::autoclean with Moose.
+
+2.02  2010-02-10T14:01:44
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+2.01  2009-11-13T13:20:00
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+2.00  2006-04-20T11:19:00
+	- Add primary key info
+	- Add foreign key info
+	- Rename parameters to new():
+		o table_catalog is now catalog
+		o table_schema is now schema
+		o column_catalog is now catalog
+		o column_schema is now schema
+	- Add parameters to new() to support Oracle:
+		o table
+		o type
+	- Document parameter values for:
+		o MS Access
+		o MySQL
+		o Oracle
+		o PostgreSQL
+	- Update docs
+	- Rewrite examples/test-table-info.pl to use Data::Dumper
+	- Chop examples/test-table-info.cgi because it added nothing useful to the distro
+
+1.03  2005-10-27T19:40:00
+	- Simplify code in new() to no longer check if caller is an object
+		as per the new standard on such matters
+	- Regenerate META.yml with Module::Build V 0.2611 to correct a faulty
+		META.yml output by V 0.24 which falsely said 'provides: {}',
+		which in turn stopped the PAUSE indexer from finding the module file,
+		which in turn meant this module might be omitted from the master index:
+		ftp://pause.perl.org/pub/PAUSE/modules/01modules.index.html
+
+1.02  2004-07-19T14:43:00
+	- Change Makefile.PL to coexist with Module::Build
+	- Add comments to the POD about having tested against MySQL V 4, MS Access V 2 (sic) and MS
+		Access 2002
+	- Add t/pod.t to test all PODs
+
+1.01  2004-03-03T10:08:41
+	- Add method refresh() to re-create internal data by re-calling DBI's table_info().
+		This has to be called after you change the database structure, eg by doing
+		'drop table <some table>' or something similar
+
+1.00  2004-01-21T12:37:29
+	- Original version

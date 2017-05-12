@@ -1,0 +1,24 @@
+Changes
+dtperl.c
+DTrace.xs
+examples/subs-tree.d
+lib/Devel/DTrace.pm
+Makefile.PL
+MANIFEST
+plxsdtrace.d
+README
+runops-loop.h
+runops.c
+runops.h
+t/000-load.t
+t/devel-dtrace.t
+t/scripts/dies.pl
+t/scripts/eval.pl
+t/scripts/fib.pl
+t/scripts/fump.pl
+t/scripts/xs.pl
+TODO
+xt/author/pod-coverage.t
+xt/author/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

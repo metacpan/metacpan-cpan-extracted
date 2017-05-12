@@ -1,0 +1,7 @@
+2008-12-09 Alessandro Zummo
+	* First release
+
+2008-12-18
+	* Fixed missing dependency for Time::Seconds
+
+

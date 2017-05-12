@@ -1,0 +1,68 @@
+{
+   "abstract" : "Transform Perl Data Structures, Validate Data against a Schema, Produce Data from a Schema, or produce documentation directly from information in the Schema.",
+   "author" : [
+      "Matthias Bloch <matthias.bloch@puffin.ch>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Processor",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.17",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/maettu/Data-Processor/issues"
+      },
+      "homepage" : "https://github.com/maettu/Data-Processor",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/maettu/Data-Processor.git",
+         "web" : "https://github.com/maettu/Data-Processor"
+      }
+   },
+   "version" : "0.4.3",
+   "x_contributors" : [
+      "Dominik Hassler <hadfl@cpan.org>",
+      "Tobias Oetiker <tobi@oetiker.ch>"
+   ],
+   "x_serialization_backend" : "JSON::XS version 3.02"
+}
+

@@ -1,0 +1,47 @@
+---
+abstract: 'Vivify a Git::Wrapper instance for Dist::Zilla'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Log::Contextual::LogDispatchouli: '0'
+  Log::Dispatchouli: '0'
+  Path::Tiny: '0'
+  Sort::Versions: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Util-Git-Wrapper
+provides:
+  Dist::Zilla::Util::Git::Wrapper:
+    file: lib/Dist/Zilla/Util/Git/Wrapper.pm
+    version: '0.004002'
+  Dist::Zilla::UtilRole::MaybeGit:
+    file: lib/Dist/Zilla/UtilRole/MaybeGit.pm
+    version: '0.004002'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::UtilRole::MaybeZilla: '0'
+  Git::Wrapper: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Util-Git-Wrapper/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Util-Git-Wrapper
+  repository: https://github.com/kentnl/Dist-Zilla-Util-Git-Wrapper.git
+version: '0.004002'

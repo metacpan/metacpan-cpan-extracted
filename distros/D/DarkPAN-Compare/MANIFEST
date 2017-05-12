@@ -1,0 +1,13 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+bin/compare_to_darkpan
+cpanfile
+cpanfile.snapshot
+lib/DarkPAN/Compare.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

@@ -1,0 +1,12 @@
+{
+    "profile_contact": {
+        "required": [
+            "name",
+            "subject",
+            "body"
+        ],
+        "msgs": {
+            "missing": "Not here"
+        }
+    }
+}

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01load.t
+t/02basic.t
+t/02basic.conf
+lib/Data/Phrasebook/Loader/ApacheFormat.pm
+META.yml                                 Module meta-data (added by MakeMaker)

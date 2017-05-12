@@ -1,0 +1,52 @@
+{
+   "abstract" : "Dancer2 Plugin to create multilanguage sites",
+   "author" : [
+      "Simone Fare' <cymon@tiscali.it>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Multilang",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Plugin" : "0.156000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "Data::Dumper" : "0",
+            "FindBin" : "0",
+            "LWP::UserAgent" : "0",
+            "Test::More" : "0",
+            "Test::TCP" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cym0n/Dancer2-Plugin-Multilang.git",
+         "web" : "https://github.com/cym0n/Dancer2-Plugin-Multilang"
+      }
+   },
+   "version" : "1.2.0"
+}
+

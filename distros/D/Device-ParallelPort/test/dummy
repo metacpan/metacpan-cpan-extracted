@@ -1,0 +1,75 @@
+#!/usr/bin/perl -w
+use Test;
+BEGIN { plan tests => 35 };
+use strict;
+use lib '../lib';
+use lib 'lib';
+use Device::ParallelPort;
+
+my $DEBUG = $ARGV[0] || 0;
+
+# 1. We loaded up ok.
+ok(1);
+
+# Tests = 17 * 2
+foreach my $drv_name (qw/dummy_byte dummy_bit/) {
+
+	# 2. Create a byte device.
+	print STDERR "CREATE Device - $drv_name\n" if ($DEBUG);
+	my $pp = Device::ParallelPort->new($drv_name);
+	ok(defined($pp));
+
+	# 3. Set some bits
+	print STDERR "SET_BIT: 2,1\n" if ($DEBUG);
+	$pp->set_bit(2, 1);	# Set the first bit of the 2nd byte on.
+	ok(1);
+
+	# 4,5,6 - BIT Tests
+	print STDERR "GET_BIT: 2\n" if ($DEBUG);
+	ok ($pp->get_bit(2) == 1);
+	print STDERR "GET_BYTE 0\n" if ($DEBUG);
+	ok (ord($pp->get_byte(0)) == 4);
+	print STDERR "GET_BYTE 1\n" if ($DEBUG);
+	ok (ord($pp->get_byte(1)) == 0);
+	
+	# 7. Set some bits
+	print STDERR "SET_BIT: 8,1\n" if ($DEBUG);
+	$pp->set_bit(8, 1);	# Set the first bit of the 2nd byte on.
+	ok(1);
+
+	# 8,9,10 - BIT Tests
+	print STDERR "GET_BIT: 8\n" if ($DEBUG);
+	ok ($pp->get_bit(8) == 1);
+	print STDERR "GET_BYTE 0\n" if ($DEBUG);
+	ok (ord($pp->get_byte(0)) == 4);
+	print STDERR "GET_BYTE 1\n" if ($DEBUG);
+	ok (ord($pp->get_byte(1)) == 1);
+
+	# 11 - Set another bit in same byte
+	print STDERR "SET_BIT: 9,1\n" if ($DEBUG);
+	$pp->set_bit(9, 1);	# Set the first bit of the 2nd byte on.
+	ok(1);
+	
+	# 12, 13 - check ok
+	print STDERR "GET_BIT: 9\n" if ($DEBUG);
+	ok ($pp->get_bit(9) == 1);
+	print STDERR "GET_BYTE 1\n" if ($DEBUG);
+	ok (ord($pp->get_byte(1)) == 3);
+
+	# 14 - Simple byte set and check bits
+	print STDERR "SET_BYTE 2,5\n" if ($DEBUG);
+	$pp->set_byte(2, chr(5));
+	ok(1);
+	
+	# 15, 16, 17, 18 - check ok
+	print STDERR "GET_BYTE 2\n" if ($DEBUG);
+	print STDERR "\t = " . ord($pp->get_byte(2)) . "\n" if ($DEBUG);
+	ok (ord($pp->get_byte(2)) == 5);
+	print STDERR "GET_BIT 16\n" if ($DEBUG);
+	ok ($pp->get_bit(16) == 1);
+	print STDERR "GET_BIT 17\n" if ($DEBUG);
+	ok ($pp->get_bit(17) == 0);
+	print STDERR "GET_BIT 18\n" if ($DEBUG);
+	ok ($pp->get_bit(18) == 1);
+}
+

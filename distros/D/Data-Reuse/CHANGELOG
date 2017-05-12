@@ -1,0 +1,48 @@
+0.10    22 May 2012
+        Fixed problems in test-suite that seemed to be an artefact of some more
+        recent changes in Test::More and/or perl 5.16.0.  I hope I didn't
+        shuffle a deeper lying issue under the carpet.
+
+        Raised dependency on Data::Alias to 1.16.  Some simplifications in the
+        test-suite.  Verified it works with 5.16.0, both threaded and
+        unthreaded.
+
+0.09    4 May 2012
+        Added license information as parameter.  Verified it works with
+        5.15.9 threaded and unthreaded.
+
+0.08    31 March 2012
+        Some minor documentation fixes.  Verified it's working with 5.14.2,
+        both threaded and unthreaded.
+
+        Fix creation of internal keys for UTF-8 encoded strings.
+
+0.07    7 August 2009
+        Upgraded to 5.10.1, and upgraded to latest code esthetics insights.
+
+0.06    11 September 2007
+        Raised dependency of Data::Alias to version 1.07 because of issues
+        with 1.06 that were fixed in 1.07.  And some minor pod fixes.
+
+0.05    23 August 2006
+        Some tweaks in "reuse" for better performance.
+
+        Added subroutine "fixate" for easily initializing hashes and list,
+        and to easily fixate already filled hashes and lists.
+
+        Added subroutine "spread" for easily spreading the same constant
+        value in a hash or a list.
+
+        Added subroutine "forget" for resetting the internal hash for keeping
+        constant values.
+
+        Removed TODO file, please check TODO section in the pod.
+
+0.04    16 July 2006
+        Renamed to Data::Reuse, first version released to CPAN.
+
+0.03    29 June 2006
+        Some fixes and tweaks.
+
+0.02    28 June 2006
+        First public version of Data::Constant.

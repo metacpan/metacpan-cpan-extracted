@@ -1,0 +1,36 @@
+diff -Naur orig/CPAN/Distribution.pm new/CPAN/Distribution.pm
+--- orig/CPAN/Distribution.pm	2009-11-21 20:30:05.000000000 +0100
++++ new/CPAN/Distribution.pm	2009-12-01 13:40:17.000000000 +0100
+@@ -3,6 +3,8 @@
+ use Cwd qw(chdir);
+ use CPAN::Distroprefs;
+ use CPAN::InfoObj;
++use Debian::Apt::PM;
++our $aptpm = Debian::Apt::PM->new();
+ @CPAN::Distribution::ISA = qw(CPAN::InfoObj);
+ use vars qw($VERSION);
+ $VERSION = "1.93";
+@@ -2510,6 +2511,23 @@
+     my(@need);
+     my @merged = %merged;
+     CPAN->debug("all merged_prereqs[@merged]") if $CPAN::DEBUG;
++    my @debs;
++    my @build_dep;
++    while (my($need_module, $need_version) = each %merged) {
++        my $debs = $aptpm->find($need_module, $need_version);
++        if ($debs) {
++            if ($debs->{'min'}) {
++                push @debs, $debs->{'min'}->{'package'};
++            }
++            else {
++                push @build_dep, $debs->{'max'}->{'package'};
++            }
++        }
++    }
++    system('apt-get', 'build-dep', '--yes', @build_dep)
++        if @build_dep;
++    system('apt-get', 'install', '--yes', @debs)
++        if @debs;
+   NEED: while (my($need_module, $need_version) = each %merged) {
+         my($available_version,$available_file,$nmo);
+         if ($need_module eq "perl") {

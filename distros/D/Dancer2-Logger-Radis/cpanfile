@@ -1,0 +1,37 @@
+requires "Carp" => "0";
+requires "Dancer2::Core::Role::Logger" => "0";
+requires "FindBin" => "0";
+requires "Log::Radis" => "0.002";
+requires "Moo" => "2";
+requires "perl" => "5.010";
+requires "strictures" => "2";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "Dancer2" => "0";
+  requires "Exporter" => "0";
+  requires "File::Copy" => "0";
+  requires "File::Temp" => "0";
+  requires "HTTP::Request::Common" => "0";
+  requires "Import::Into" => "0";
+  requires "JSON" => "0";
+  requires "Plack::Test" => "0";
+  requires "Test::Mock::Redis" => "0";
+  requires "Test::Most" => "0";
+  requires "perl" => "5.010";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+  requires "perl" => "5.006";
+};
+
+on 'develop' => sub {
+  requires "Pod::Coverage::TrustPod" => "0";
+  requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::Pod" => "1.41";
+  requires "Test::Pod::Coverage" => "1.08";
+};

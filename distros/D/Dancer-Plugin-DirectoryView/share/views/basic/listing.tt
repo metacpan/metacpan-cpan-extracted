@@ -1,0 +1,12 @@
+<h1>Index of <% path %></h1>
+<hr />
+<table class="listing" cellspacing="0">
+  <tr>
+    <th class="name">Name</th>
+    <th class="size">Size</th>
+    <th class="type">Type</th>
+    <th class="mtime">Last Modified</th>
+  </tr>
+<% files %>
+</table>
+<hr />

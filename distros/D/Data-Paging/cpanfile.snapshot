@@ -1,0 +1,126 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Class-Accessor-Lite-0.05
+    pathname: K/KA/KAZUHO/Class-Accessor-Lite-0.05.tar.gz
+    provides:
+      Class::Accessor::Lite 0.05
+    requirements:
+      ExtUtils::MakeMaker 6.42
+  Find-Lib-1.04
+    pathname: Y/YA/YANNK/Find-Lib-1.04.tar.gz
+    provides:
+      Find::Lib 1.04
+    requirements:
+      ExtUtils::MakeMaker 0
+      File::Spec 0
+      Test::More 0
+  Scope-Guard-0.20
+    pathname: C/CH/CHOCOLATE/Scope-Guard-0.20.tar.gz
+    provides:
+      Scope::Guard 0.20
+    requirements:
+      ExtUtils::MakeMaker 0
+      Test::More 0
+      perl 5.006001
+  Sub-Uplevel-0.24
+    pathname: D/DA/DAGOLDEN/Sub-Uplevel-0.24.tar.gz
+    provides:
+      Sub::Uplevel 0.24
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      File::Find 0
+      File::Temp 0
+      Test::More 0
+      constant 0
+      strict 0
+      warnings 0
+  Term-Encoding-0.02
+    pathname: M/MI/MIYAGAWA/Term-Encoding-0.02.tar.gz
+    provides:
+      Term::Encoding 0.02
+    requirements:
+      ExtUtils::MakeMaker 0
+  Test-Exception-0.32
+    pathname: A/AD/ADIE/Test-Exception-0.32.tar.gz
+    provides:
+      Test::Exception 0.32
+    requirements:
+      Module::Build 0.38
+      Sub::Uplevel 0.18
+      Test::Builder 0.7
+      Test::Builder::Tester 1.07
+      Test::Harness 2.03
+      Test::More 0.7
+      Test::Simple 0.7
+  Test-Fatal-0.013
+    pathname: R/RJ/RJBS/Test-Fatal-0.013.tar.gz
+    provides:
+      Test::Fatal 0.013
+    requirements:
+      Carp 0
+      Exporter 5.57
+      ExtUtils::MakeMaker 6.30
+      Test::Builder 0
+      Try::Tiny 0.07
+      strict 0
+      warnings 0
+  Test-More-Hooks-0.12
+    pathname: A/AI/AINAME/Test-More-Hooks-0.12.tar.gz
+    provides:
+      Test::More::Hooks 0.12
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Module::Build 0.38
+      perl 5.008005
+  Test-Pretty-0.27
+    pathname: T/TO/TOKUHIROM/Test-Pretty-0.27.tar.gz
+    provides:
+      App::Prove::Plugin::Pretty undef
+      App::Prove::Plugin::retty undef
+      TAP::Formatter::Pretty::Multi undef
+      TAP::Formatter::Pretty::Multi::Session undef
+      TAP::Formatter::Pretty::Single undef
+      TAP::Formatter::Pretty::Single::Session undef
+      Test::Pretty 0.27
+      Test::Pretty::Harness undef
+      Test::Pretty::Parser undef
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      Carp 0
+      ExtUtils::CBuilder 0
+      File::Temp 0
+      Module::Build 0.38
+      Scope::Guard 0
+      TAP::Formatter::Base 0
+      TAP::Formatter::Session 0
+      TAP::Harness 0
+      TAP::Parser 0
+      Term::ANSIColor 3.02
+      Term::Encoding 0
+      Test::Builder 0.82
+      Test::More 0.98
+      autodie 0
+      parent 0
+      perl 5.008001
+  Try-Tiny-0.18
+    pathname: D/DO/DOY/Try-Tiny-0.18.tar.gz
+    provides:
+      Try::Tiny 0.18
+    requirements:
+      Carp 0
+      Exporter 0
+      ExtUtils::MakeMaker 6.30
+      base 0
+      constant 0
+      strict 0
+      warnings 0
+  common-sense-3.72
+    pathname: M/ML/MLEHMANN/common-sense-3.72.tar.gz
+    provides:
+      common::sense 3.72
+    requirements:
+      ExtUtils::MakeMaker 0

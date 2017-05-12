@@ -1,0 +1,2 @@
+TYPEMAP
+MyClass *      O_OBJECT

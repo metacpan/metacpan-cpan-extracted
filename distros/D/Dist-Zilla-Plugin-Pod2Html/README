@@ -1,0 +1,86 @@
+NAME
+    Dist::Zilla::Plugin::Pod2Html - create CSS-rich HTML pages from the
+    POD-aware files
+
+VERSION
+    version 0.1.2
+
+SYNOPSIS
+        # dist.ini
+        [Pod2Html]
+
+        # or
+        [Pod2Html]
+        dir = my_docs   ; where to create HTML files
+
+        # or
+        [Pod2Html]
+        ignore = bin/myscript1   ; what input file to ignore
+        ignore = bin/myscript2   ; another input to ignore
+
+DESCRIPTION
+    This plugin generates HTML pages from the POD files and puts them into
+    the distribution in a separate directory (not as a tree of files but
+    flatten). The created HTML pages have the same (or, at least, similar)
+    style as the modules' documentation shown at CPAN.
+
+    It creates HTML pages from all files in the "lib" and "bin" directory
+    that contain a POD section and that have ".pm" or ".pl" extension or
+    that have the word "perl" in their first line. The plugin is run after
+    other plugins that may munge files and create the POD sections (such as
+    *PodWeaver*).
+
+ATTRIBUTES
+    All attributes are optional.
+
+   dir
+    This attribute changes the destination of the generated HTML files. It
+    is a directory (or even a path) relative to the distribution root
+    directory. Default value is "docs". For example:
+
+        [Pod2Html]
+        dir = docs/html
+
+   ignore
+    This attribute allows to ignore some input files that would be otherwise
+    converted to HTML. Its value is a file name that should be ignored
+    (relative to the distribution root directory). By default no
+    (appropriate) files are ignored. The attribute can be repeated if you
+    wish to ignore more files. For example:
+
+        [Pod2Html]
+        ignore = lib/My/Sample.pm
+        ignore = bin/obscure-script
+
+SUBCLASSING
+    New plugins can be created by subclassing this plugin. The subclass may
+    consider to overwrite following methods:
+
+   is_interesting_file ($file)
+    The method decides (by returning something or undef) whether the given
+    file should be a candidate for the conversion to the HTML. The parameter
+    is a blessed object with the "Dist::Zilla::Role::File" role.
+
+   pod2html ($file)
+    This method does the conversion to the HTML (using module
+    "Pod::Simple::HTML"). It gets an input file (a blessed object with the
+    "Dist::Zilla::Role::File" role) and it should return a converted
+    content. By overwriting this method a new plugin can make any
+    conversion, to anything.
+
+   get_css_style
+    It returns a string containing CSS-style definitions. The string will be
+    used in the "head" section of the created HTML file. See its default
+    value in the *__DATA__* section of this module.
+
+AUTHOR
+    Martin Senger <martin.senger@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Martin Senger, CBRC - KAUST
+    (Computational Biology Research Center - King Abdullah University of
+    Science and Technology) All Rights Reserved..
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

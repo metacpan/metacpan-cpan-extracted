@@ -1,0 +1,27 @@
+.006
+  - Improved error/status trapping ($@ can be elusive in Mason)
+  - Added default HTML header/footer, and override methods
+  - Changed MIME Type guesser from File::Path to Media::Type::Simple
+  - Workaround for undef warnings tickled by nested anon components
+  - a couple of bin/pillbug args modified for consistency
+
+2010-01-14: .005
+  - Make net_server and handler_class methods work as setters
+  - Add setters for index filename and default extension
+  - Add allowindex option for directory indexes (off by default)
+  - Misc cleanup and doc work
+
+2009-11-02: .004
+  - Add docroot() method
+  - Add arg parsing to pillbug script
+  - Fix header issue when redirecting
+
+2009-10-22: .003
+  - Update examples
+  - Avoid handle_cgi_request entirely, it makes it impossible to reap status
+  - CLI wrapper defaults to using hostname() for its server name
+
+2009-10-19: .002
+  - Remove unused statement, edit perldoc
+
+2009-10-16: .001 - Hello World

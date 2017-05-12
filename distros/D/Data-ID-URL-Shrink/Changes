@@ -1,0 +1,8 @@
+ Revision history for Data::ID::URL::Shrink
+======================================================
+
+0.02 Thu Jan 10 2013
+      - Fixing issue with README.pod (removing NAME).
+      
+0.01 Thu Jan 10 2013
+      - Initial version of the module.

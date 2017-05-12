@@ -1,0 +1,8 @@
+
+INSERT INTO bk_code VALUES ('code_set','en','code_set','code set',-3,'');
+INSERT INTO bk_code VALUES ('code_set','en','code_lang','language',-2,'');
+INSERT INTO bk_code VALUES ('code_set','en','code_admin','code admin',-1,'');
+
+INSERT INTO bk_code VALUES ('code_admin','en','code_admin','param=1 slave=1',0,'');
+
+INSERT INTO bk_code VALUES ('code_lang','en','en','English',-1,'');

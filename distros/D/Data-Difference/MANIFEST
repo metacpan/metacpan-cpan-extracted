@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+lib/Data/Difference.pm
+t/diff.t

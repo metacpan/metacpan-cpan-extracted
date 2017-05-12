@@ -1,0 +1,33 @@
+/* $Id: demodbixbrowse.css,v 1.3 2002/02/10 15:11:40 evilio Exp $ */
+BODY	{
+		color:		black;
+		background:	rgb(255, 255, 224);
+	}
+TH	{
+	color:	rgb(255, 255, 224);
+	background:	darkblue;
+	}
+
+.Even   {
+	color:		darkblue;
+	background:	rgb(255, 255, 224);
+	}
+.Odd	{
+	color:		darkred;
+	background:	rgb(224, 255, 255);
+	}
+.Bar	{
+	text-align:	center;
+	color:		darkgreen;
+	background:	#E0E0EE;
+	}
+.Debug	{
+        color:          rgb(255, 255, 224); /* lightyellow */
+        background:     red;
+	}
+
+.Error	{
+		font-familiy:	Courier,fixed;
+		color:		red;
+		background:	#EEEEFF; /* Light mauve */
+	}

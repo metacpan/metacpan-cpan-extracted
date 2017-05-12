@@ -1,0 +1,11 @@
+=head1 NAME
+
+INSTALL - How to install Digest::Whirlpool
+
+=head1 SYNOPSIS
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

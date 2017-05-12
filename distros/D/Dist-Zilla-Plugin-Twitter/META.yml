@@ -1,0 +1,58 @@
+---
+abstract: 'Twitter when you release with Dist::Zilla'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  Dist::Zilla::Role::Releaser: '0'
+  Dist::Zilla::Tester: '0'
+  File::Spec: '0'
+  HTTP::Response: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  LWP::UserAgent: '0'
+  Module::Build: '0.28'
+  Params::Util: '0'
+  Sub::Exporter: '0'
+  Test::More: '0.88'
+  base: '0'
+  lib: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Twitter
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  Config::INI::Reader: '0'
+  Config::INI::Writer: '0'
+  Dist::Zilla: '4'
+  Dist::Zilla::Role::AfterRelease: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Dist::Zilla::Util: '0'
+  File::Path: '0'
+  File::Spec: '0'
+  Moose: '0.99'
+  Net::Twitter: '4.00001'
+  Try::Tiny: '0'
+  WWW::Shorten: '3.02'
+  WWW::Shorten::Simple: '0'
+  WWW::Shorten::TinyURL: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.009005'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/dist-zilla-plugin-twitter/issues
+  repository: git://github.com/dagolden/dist-zilla-plugin-twitter.git
+version: '0.026'

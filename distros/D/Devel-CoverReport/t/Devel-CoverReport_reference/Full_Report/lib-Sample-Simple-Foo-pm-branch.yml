@@ -1,0 +1,79 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        branch: 
+          caption: Branch
+          class: src
+          f: "%s"
+          fs: "%s"
+        c_false: 
+          caption: 'False'
+          f: "%s"
+          fs: "%.1f"
+        c_true: 
+          caption: 'True'
+          f: "%s"
+          fs: "%.1f"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        percent: 
+          caption: "%"
+          f: "%d"
+          fs: "%.1f"
+      headers_order: 
+        - line
+        - percent
+        - c_true
+        - c_false
+        - branch
+      label: Branch coverage
+      rows: 
+        - 
+          _coverage: 0
+          branch: if ($a) { }
+          c_false: 
+            class: c0
+            v: F
+          c_true: 
+            class: c0
+            v: T
+          line: 10
+          percent: 
+            class: c0
+            v: 0
+        - 
+          _coverage: 0
+          branch: if ($a or $b)
+          c_false: 
+            class: c0
+            v: F
+          c_true: 
+            class: c0
+            v: T
+          line: 9
+          percent: 
+            class: c0
+            v: 0
+        - 
+          _coverage: 0
+          branch: if ($c > 5 and $c < 10)
+          c_false: 
+            class: c0
+            v: F
+          c_true: 
+            class: c0
+            v: T
+          line: 18
+          percent: 
+            class: c0
+            v: 0
+      summary: []
+
+metadata: 
+  title: "Branch coverage: lib/Sample/Simple/Foo.pm"
+  version: 0.05

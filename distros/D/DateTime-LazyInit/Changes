@@ -1,0 +1,50 @@
+Revision history for Perl module DateTime::LazyInit
+
+Note on version conventions:
+0.0000
+|  | |
+|  | +- Minor Decimal
+|  +---- Major Decimal
++------- Whole Number
+
+* Whole numbers are rewrite releases. They contain major rewrites
+  or alterations to the API. Read the docs before using them.
+* Major decimal number is patch release. Some coding has changed
+  but the API remains the same (or is extended). Upgrading to
+  these should not change any expected behaviour, however it
+  will alter buggy behaviour. Read the docs and check if you've
+  been using work-arounds before using them.
+* Minor decimal number is a doc or installer patch only. If you have
+  the module installed and understand how it works, you don't need
+  this release.
+* Datestamps are generated with:
+  perl -MDateTime -e 'print DateTime->now(time_zone=>"Australia/Melbourne")->strftime("%a, %e %b %Y %T %z")'
+
+0.10 2005-07-23
+        - original version posted to CPAN
+
+1.0100 2006-05-13
+	- Version number fix
+		- Moved to version 1.0100 in line with my other modules and the above
+		  versioning schema. No actual code release. API did not change.
+
+1.0200 2006-05-13
+	- New Constructors
+		- Phillip Garrott provided patches to implement other constructors
+		  and overloading of various things in line with DT.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

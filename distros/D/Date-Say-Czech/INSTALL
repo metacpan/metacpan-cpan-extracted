@@ -1,0 +1,9 @@
+Date::Say::Czech - Output dates as text as you would speak it
+
+For install Date::Say:Czech do the following:
+
+	perl Makefile.PL
+	make
+        make install
+
+Enjoy!

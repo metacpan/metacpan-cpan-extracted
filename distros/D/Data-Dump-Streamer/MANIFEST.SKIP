@@ -1,0 +1,49 @@
+# $Id: MANIFEST.SKIP 29 2006-04-16 15:28:40Z demerphq $
+# Avoid version control files.
+\bRCS\b
+\bCVS\b
+\bSCCS\b
+,v$
+\B\.svn\b
+\b_darcs\b
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+^Build$
+
+^\.git/
+
+^lib/Data/Dump/Streamer\.o$
+^lib/Data/Dump/Streamer\.c$
+^lib/Data/Dump/Streamer\.bs$
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.tmp$
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+#DDS Specific
+\.answer$
+\.build\.tmpl$
+\.tar\.gz$
+DDS\.pm
+\.(bs|c|def|obj|pdb)$
+^dds\w+\.pl
+^MYMETA.yml$

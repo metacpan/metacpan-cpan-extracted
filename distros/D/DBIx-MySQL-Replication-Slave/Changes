@@ -1,0 +1,7 @@
+Revision history for DBIx-MySQL-Replication-Slave 
+
+0.02    2010-04-20
+        - Fixed bug in test plan
+
+0.01    2010-04-19
+        - Beta release

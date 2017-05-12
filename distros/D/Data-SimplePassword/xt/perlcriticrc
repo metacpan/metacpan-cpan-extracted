@@ -1,0 +1,8 @@
+# 
+
+# a tiny exception class :<
+[-Modules::RequireFilenameMatchesPackage]
+
+# no strict 'refs'
+#[TestingAndDebugging::ProhibitNoStrict]
+#allow = refs

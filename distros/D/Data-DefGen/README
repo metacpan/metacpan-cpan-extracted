@@ -1,0 +1,29 @@
+Data-DefGen
+
+Define and Generate arbitrary data structures using composable
+CODE block definitions.
+
+For more info, run the following command after installation:
+
+    perldoc Data::DefGen
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+See "Makefile.PL" under PREREQ_PM key.
+
+
+AUTHOR
+
+Gerald Lai
+

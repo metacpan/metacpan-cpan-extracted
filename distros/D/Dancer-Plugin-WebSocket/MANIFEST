@@ -1,0 +1,10 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+dist.ini
+lib/Dancer/Plugin/WebSocket.pm
+t/01_basic.t

@@ -1,0 +1,516 @@
+0.85     2017-03-14
+
+- Add Code::TidyAll::Plugin::SortLines::Naturally to develop prereqs for
+  modules which use this bundle.
+
+
+0.84     2017-03-14
+
+- Use SortLines::Naturally tidyall plugin to sort lists of stopwords instead
+  of SortLines.
+
+
+0.83     2017-03-05
+
+- Made tidyall.ini generation smarter and more configurable.
+
+- Fix a formatting issue with the generated tidyall.ini when there were no
+  global ignores.
+
+
+0.82     2017-02-28
+
+- Don't assume that our dzil and podweaver plugin bundles have the same
+  prefix.
+
+
+0.81     2017-02-01
+
+- Require Code::TidyAll 0.56 so we can use the global ignore feature in the
+  geneated tidyall.ini file.
+
+
+0.80     2017-01-08
+
+- Fix test failures related to how POD is generated when running in Travis.
+
+
+0.79     2017-01-08
+
+- Replaced DROLSKY::CheckChangesHasContent plugin with
+  EnsureChangesHasContent.
+
+- Replaced DROLSKY::VersionProvider with VersionFromMainModule.
+
+- Improved some POD generation code and the POD which is generated.
+
+
+0.78     2016-11-29
+
+- Handle a ppport.h file being generated in a subdirectory as well as in the
+  root of the distro.
+
+
+0.77     2016-11-12
+
+- Generated POD said my IRC nick was "drolsky" instead of "autarch". Reported
+  by mst.
+
+
+0.76     2016-11-01
+
+- Only tell CopyFileFromBuild to copy files that which actually exist in the
+  distro. The latest version of that plugin now dies on missing files.
+
+
+0.75     2016-10-11
+
+- Added pod_coverage_also_private to pass more stuff to
+  Test::Pod::Coverage::Configurable
+
+
+0.74     2016-10-07
+
+- Added CheckSelfDependency and CheckStrictVersion plugins.
+
+
+0.73     2016-10-02
+
+- Set jobs for Test::TidyAll plugin to 4 by default.
+
+
+0.72     2016-09-25
+
+- Make the Pod::Weaver bits work when used from a subclass of this bundle.
+
+
+0.71     2016-09-17
+
+- Removed Module::Metadata prereq and require Test::Version 2.05 instead.
+
+- Added more docs.
+
+
+0.70     2016-09-16
+
+- Explicitly add Module::Metadata 1.000033 to the develop prereqs in order to
+  work around bugs with Test::Version and earlier versions of
+  Module::Metadata. See https://github.com/plicease/Test-Version/issues/7 for
+  the relevant bug report.
+
+
+0.69     2016-09-13
+
+- Very tiny wording change in CONTRIBUTING.md.
+
+
+0.68     2016-09-12
+
+- Require Perl::Critic::Moose 1.05;
+
+
+0.67     2016-08-20
+
+- Various tweaks and cleanups for the pod weaver bundle.
+
+
+0.66     2016-08-13
+
+- Implemented a rather convoluted way of passing config into my Pod::Weaver
+  bundle in order to allow for disabling the DONATIONS pod section on a
+  per-distro basis.
+
+
+0.65     2016-07-04
+
+- Avoid warnings when t/ directory contains non-UTF8 data.
+
+
+0.64     2016-06-26
+
+- If the distro uses Test2 modules, the Test::More prereq is now set to
+  1.302015 instead of 0.96. Suggested by Graham Knop.
+
+
+0.63     2016-06-17
+
+- Small tweak to generated perlcriticrc.
+
+
+0.62     2016-06-12
+
+- Only run PromptIfStale for release phase.
+
+
+0.61     2016-06-05
+
+- Don't include GitHub::Meta when running under Travis.
+
+
+0.60     2016-06-04
+
+- Don't include PromptIfStale when running under Travis. It's not like I can
+  stop the build and update prereqs anyway.
+
+
+0.59     2016-05-30
+
+- Make the generated tidyall.ini only use Test::Vars on modules. It ends up
+  running code that it checks, so if you run it on .t files it actually runs
+  them, causing all sorts of problems with the tidyall tests.
+
+
+0.58     2016-05-29
+
+- Set the minimum_perl for the Test::Tidyall plugin to 5.10 since Test::Vars
+  requires that version.
+
+
+0.57     2016-05-28
+
+- Move stale module check to build phase.
+
+
+0.56     2016-05-21
+
+- Add the Test::Vars tidyall plugin to my default tidyall.ini.
+
+
+0.55     2016-05-18
+
+- Fix handling of regexes in "exclude" config values.
+
+
+0.54     2016-05-18
+
+- Fix check for XS to check outside of the top-level dir.
+
+
+0.53     2016-05-08
+
+- Add psgi to program-extensions in perlcriticrc.
+
+
+0.52     2016-05-06
+
+- Set program-extensions in perlcriticrc.
+
+
+0.51     2016-05-06
+
+- Make sure we set argv for all PerlCritic & PerlTidy sections when munging
+  tidyall.ini.
+
+
+0.50     2016-04-25
+
+- Always make the Test::TidyAll plugin verbose. There's no downside to seeing
+  diffs on tidy failures.
+
+
+0.49     2016-04-24
+
+- When adding Perl::Critic and Perl::Tidy to development prereqs, ask for the
+  latest versions.
+
+
+0.48     2016-04-24
+
+- Only include the DONATIONS pod section for distros where I am the copyright
+  holder.
+
+
+0.47     2016-04-11
+
+- Revert changes in 0.46 that required a recent Perl. This makes testing on
+  Travis painful and makes it harder for others to contribute to any module of
+  mine which uses this bundle.
+
+
+0.46     2016-04-11
+
+- Switched from [ExtraTests] to [RunExtraTests].
+
+- Made the TidyAll plugin in this bundle rewrite existing tidyall.ini files to
+  make sure we don't try to check or tidy generated xt tests.
+
+
+0.45     2016-03-20
+
+- Make sure generated Pod does not have trailing whitespace.
+
+- Fix links to mailing lists to be "mailto:" links.
+
+
+0.44     2016-03-20
+
+- Make sure that all the Pod::Weaver-related modules that this distribution
+  uses are added to the prereqs list.
+
+
+0.43     2016-03-20
+
+- Added [CheckChangesHasContent].
+
+- Added [Test::CLeanNamespaces].
+
+- If the distro has XS code [PPPort] is added and the generated ppport.h is
+  copied from the build into the repo.
+
+- This bundle now generates a CONTRIBUTING.md file automatically.
+
+- Added a new Pod::Weaver author bundle that replaces the one-time generation
+  of a weaver.ini file.
+
+- Fixed README.md generation to happen after pod weaving, instead of before.
+
+
+0.42     2016-02-01
+
+- Disabled the Subroutines::ProhibitExplicitReturnUndef policy in the
+  generated perlcriticrc file.
+
+
+0.41     2016-01-29
+
+- Added the Test::CPAN::Meta::JSON plugin.
+
+
+0.40 2015-11-24
+
+- Added a new plugin, DROLSKY::Git::CheckFor::CorrectBranch. This plugin only
+  checks that the branch is correct on non-TRIAL releases.
+
+
+0.39     2015-11-24
+
+- Added a use_github_homepage config option.
+
+
+0.38     2015-09-28
+
+- Remove the RewriteVersion plugin and use my own version provider that simply
+  reads the version from the main module. I don't want things appending '#
+  TRIAL' comments to my version lines and un-tidying my code.
+
+
+0.37     2015-08-15
+
+- Include MojibakeTests plugin.
+
+
+0.36     2015-07-12
+
+- Don't include Test::Pod::LinkCheck and Test::Pod::No404s when running under Travis.
+
+
+0.35     2015-07-05
+
+- Make it possible to use GitHub issues instead of rt.cpan.org.
+
+
+0.34     2015-05-14
+
+- Always set xt_mode to true for Test::Compile.
+
+
+0.33     2015-03-10
+
+- Set --iterations=2 in generated perltidyrc.
+
+
+0.32     2015-02-08
+
+- Set --blank-lines-before-packages=0 in generated perltidyrc.
+
+
+0.31     2015-01-15
+
+- Perl::Critic and Perl::Tidy need to be the develop requires list for modules
+  using this bundle, not in the prereqs of the bundle itself.
+
+
+0.30     2015-01-13
+
+- Make sure that Perl::Critic and Perl::Tidy end up in the prereqs for the
+  benefit of the tidyall test.
+
+
+0.29     2015-01-11
+
+- Made the plugin bundle commit and push the post-release version bump.
+
+
+0.28     2015-01-11
+
+- Replaced PkgVersion with BumpVersionAfterRelease and added
+  CheckVersionIncrement and Test::Version for good measure.
+
+- Added Test::TidyAll and a plugin to generate default tidyall.ini,
+  perltidyrc, and perlcriticrc files for my distros.
+
+
+0.27     2014-12-20
+
+- Replace GatherDir and PruneCruft with Git::GatherDir.
+
+
+0.26     2014-11-15
+
+- The generated Makefile.PL or Build.PL file is now copied into the repo and
+  checked in for each release.
+
+
+0.25     2014-11-09
+
+- This bundle now consumes the Dist::Zilla::Role::PluginBundle::Config::Slicer
+  role to allow for arbitrary plugin configuration.
+
+
+0.24     2014-11-04
+
+- Make sure that a copyright_holder in dist.ini overrides the default of
+  "David Rolsky".
+
+
+0.23     2014-11-02
+
+- Oops, accidentally removed the CopyFilesFromBuild plugin from the prereq
+  list in the last release.
+
+
+0.22     2014-11-02
+
+- The DROLSKY::Contributors plugin now leaves existing .mailmap and weaver.ini
+  files alone.
+
+- Exclude plugins shipped with this bundle when checking for stale modules.
+
+- Generate a cpanfile and copy it into the repo after a build.
+
+- Copy the LICENSE file into the repo after abuild.
+
+
+0.21     2014-11-01
+
+- Added custom plugins to setup the weaver.ini file for Contributors and to
+  automatically provide default license info.
+
+
+0.20     2014-11-01
+
+- Explicitly depend on Dist::Zilla::Plugin::PodWeaver because
+  SurgicalPodWeaver doesn't - works around RT #87624.
+
+
+0.19     2014-10-23
+
+- Switched to Test::EOL (0.14)
+
+- Make PkgVersion use a bit smarter (no line insertion and die on existing
+  $VERSION in module)
+
+- Update next release version to indicate if a release is a trial
+
+
+0.18     2014-09-03
+
+- Switched from ContributorsFromGit to Git::Contributors.
+
+
+0.17     2014-08-15
+
+- Renamed the attributes but didn't fix the method calls in the last version.
+
+
+0.16     2014-08-15
+
+- Renamed some options - coverage_* => pod_coverage_*
+
+
+0.15     2014-08-12
+
+- Ordering fix take 2.
+
+
+0.14     2014-08-12
+
+- Hopefully fix an ordering issue with the Git plugins.
+
+
+0.13     2014-08-12
+
+- Use GatherDir to exclude files rather than PruneFiles.
+
+
+0.12     2014-08-03
+
+- Added Test::Pod::Coverage::Configurable plugin.
+
+- Removed the remove option in favor of -remove.
+
+
+0.11     2014-08-02
+
+- Added GitHub::Update plugin.
+
+
+0.10     2014-08-02
+
+- Added a number of additional plugins to help me make better dists.
+
+- Moved this distro to GitHub.
+
+
+0.09     2014-05-04
+
+- Use Test::NoTabs plugin instead of NoTabsTests.
+
+
+0.08     2014-04-05
+
+- Internals fixes to work with Config::MVP that is stricter about handling
+  plugin options passed by this bundle. Reported by Karen Etheridge. RT
+  #94466.
+
+- Make sure all the plugins this bundle uses end up declared as
+  prereqs. Reported by Dagfinn Ilmari Mannsåker. RT #94363.
+
+
+0.07     2014-01-25
+
+- Added the PruneFiles plugin to prune the README file that gets copied from
+  the build.
+
+- Allow the README to be dirty for Git::Commit.
+
+
+0.06     2014-01-25
+
+- Added "do_munging => 0" to the options for the Authority plugin so it
+  doesn't add a useless $AUTHORITY var to packages.
+
+
+0.05     2013-12-13
+
+- Added ContributorsFromGit and Meta::Contributors plugins.
+
+
+0.04     2013-12-13
+
+- Added more plugins and support for removing plugins.
+
+
+0.03     2013-06-07
+
+- Allow multiple prereqs_skip and stopwords properties
+
+
+0.02     2013-05-13
+
+- Allow prereqs_skip option to be passed to AutoPrereqs
+
+
+0.01     2013-04-21
+
+- First release upon an unsuspecting world.

@@ -1,0 +1,14 @@
+Revision history for Perl extension DBIx::SpatialKey
+
+0.031 Thu Mar  3 18:00:52 CET 2005
+	- change of contact address.
+
+0.03  Wed Nov 24 18:47:46 CET 1999
+	- added unpack.
+
+0.02  Tue Aug 24 13:21:16 CEST 1999
+	- changed binary_morton format.
+
+0.01  Fri Jul  9 11:39:35 CEST 1999
+	- original version; created by hand(!)
+

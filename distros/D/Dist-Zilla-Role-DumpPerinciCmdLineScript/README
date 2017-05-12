@@ -1,0 +1,10 @@
+METHODS
+
+ $obj->dump_perinci_cmdline_script($file)
+
+SEE ALSO
+
+    Pod::Weaver::Role::DumpPerinciCmdLineScript basically does the same
+    thing, but it accepts a slightly different argument ($input instead of
+    $file).
+

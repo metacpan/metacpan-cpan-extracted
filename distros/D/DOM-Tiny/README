@@ -1,0 +1,37 @@
+NAME
+
+    DOM::Tiny - This is an empty subclass, you wanted Mojo::DOM58
+
+IT'S DEAD, JIM.
+
+    Development continues under the name Mojo::DOM58.
+
+    This is an empty subclass thereof to avoid defecating on existing users
+    from a great height, but you should still update your code.
+
+AUTHOR
+
+    Dan Book <dbook@cpan.org>
+
+    Code and tests adapted from Mojo::DOM, a lightweight DOM parser by the
+    Mojolicious team.
+
+CONTRIBUTORS
+
+    Matt S Trout (mst)
+
+COPYRIGHT AND LICENSE
+
+    Copyright (c) 2008-2015 Sebastian Riedel.
+
+    Copyright (c) 2015 "AUTHOR" and "CONTRIBUTORS" for adaptation to
+    standalone format.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+
+SEE ALSO
+
+    Mojo::DOM, HTML::TreeBuilder, XML::LibXML, XML::Twig, XML::Smart
+

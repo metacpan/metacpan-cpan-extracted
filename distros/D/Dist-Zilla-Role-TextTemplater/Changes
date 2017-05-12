@@ -1,0 +1,143 @@
+Release history for perl-Dist-Zilla-Role-TextTemplater
+
+v0.8.6 @ 2016-11-18 20:03 UTC
+
+    -   Manual expanded.
+
+    -   Directory with examples renamed to `eg/`.
+
+v0.8.5 @ 2015-10-31 23:02 UTC
+
+    -   Dependency on internal module does not work well: `cpanm` successfully installs
+        `ErrorLogger` (in spite of the fact it is already installed), then fails because
+        `ErrorLogger::Exception::Abort` is not installed. Problem fixed by requiring `ErrorLogger`
+        v0.9.0, not `ErrorLogger::Exception::Abort`.
+
+v0.8.4 @ 2015-10-30 22:28 UTC
+
+    -   `aspell.en.pws` renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+    -   Small changes in POD to make `Test::Synopsis` happy.
+
+    -   Test updated to work with `ErrorLogger` v0.9.0.
+
+v0.8.3 @ 2015-10-03 20:44 UTC
+
+    -   `Dist::Zilla::Role::MutableFile` introduced in `Dist::Zilla` version 5.000. In earlier
+        versions there is no the role and so, file content is never updated, this causes test
+        failure. The test skipped if Dist::Zilla < 5.0 to avoid test failure.
+
+v0.8.2 @ 2015-09-23 12:20 UTC
+
+    -   `use version 0.77` added to the module. Probably it will help to fix problem with
+        mismatched versions in Perl 5.8.x:
+        <http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-MetaResources-Template+v0.4.1>
+
+v0.8.1 @ 2015-09-20 21:11 UTC
+
+    -   One test fails with Perl v5.8 due to slightly different error message. Test fixed to accept
+        old and new error messages.
+
+v0.8.0 @ 2015-09-17 21:56 UTC
+
+    -   Internal change: `ErrorLogger`'s `log_errors_in_file` method used to report errors in
+        template. `ErrorLogger` v0.6.0 required for that.
+
+    -   `tt_broken` attribute replaced with `tt_broken` method. For consumer, it is simpler to
+        override (or modify with `around`) a method rather than work with `CodeRef` (no need to
+        take care about passing `$self` reference).
+
+    -   Error reporting changed:
+
+        -   If more than one code fragment dies, template is shown only once, but with all the
+            detected errors.
+
+        -   "Unmatched opening delimiter" and "Unmatched closing delimiter" messages changed to be
+            consistent with other errors.
+
+        -   "Bad code fragment begins at..." messages indented like call stack reported by `croak`.
+            However, these messages indented with 4 spaces, not tab because tab indent size is
+            unpredictable.
+
+        -   In template listing, "Bad code fragment begins at ..." error is not shown if actual
+            error occurred in the same line.
+
+        -   If number of errors reaches `tt_broken_limit` (10 for now), processing stops.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.007 @ 2015-08-30 22:48 UTC
+
+    -   Debug level message is logged before processing any template.
+
+    -   Documentation improved: documented defining variables.
+
+    -   Attributes `tt_broken_count` and `tt_broken_limit` are introduced. If number of broken
+        Perl code fragments reaches the limit, processing stops. `tt_broken_limit` is not yet
+        settable, though.
+
+    -   `fill_in_string` takes care about recursive calls. If nested call does not have explicitly
+        specified `package` extra argument, it reuses package of outer call. It is important for
+        nested templates: nested template by default have the same variables (because it is
+        evaluated in context of the same package) as outer template. This is applicable to
+        `fill_in_file` too.
+
+0.006 @ 2015-08-13 18:44 UTC
+
+    -   Special care about `Text::Template` "compilation errors". There are two such errors:
+            Unmatched close brace at line N
+            End of data inside program text that began at line N
+        These error messages rewritten to:
+            Unmatched closing delimiter at FILENAME line N
+            Unmatched opening delimiter at FILENAME line N
+        Error messages accompanied with error lines in context, like other errors.
+
+    -   `fill_in_file` method: added support for `Path::Tiny`, `Path::Class::File`,
+        non-`MutableFile`s,  and plain string, which treated as file name.
+
+    -   `ReadMe.pod` dropped.
+
+    -   Added 4 examples.
+
+0.005 @ 2015-08-12 08:18 UTC
+
+    -   Tests explicitly require `Moose` v2.0800. Older `Moose` may cause test failure.
+
+0.004 @ 2015-08-06 16:14 UTC
+
+    -   `fill_in_file` method introduced.
+
+    -   `fill_in_string` reworked to workaround the bug in `Text::Template` (see "FILENAME
+        parameter has no effect" <https://rt.cpan.org/Ticket/Display.html?id=106093>).
+
+    -   Error reporting improved. Now error message includes only focus lines (a line where problem
+        code fragment begins and line where fragment died), and two lines of context below and
+        above focus lines. Error message also includes file name, if any.
+
+    -   Warning object stringified.
+
+0.003 @ 2015-07-22 12:56 UTC
+
+    -   `BUILDARGS` class method eliminated. It works bad in `MetaResources::Template`.
+        `delimiters` option is split by the attribute trigger now.
+
+    -   `delimiters` option checking added. It must include two whitespace-separated words.
+
+0.002 @ 2015-07-18 18:38 UTC
+
+    -   `delimiters` option implemented.
+
+    -   Documentation improved.
+
+    -   Version 0.005 of the `ErrorLogger` role is explicitly requested. It should fix test
+        failures on few platforms.
+
+0.001 @ 2015-07-14 21:52 UTC
+
+    -   `fill_in_string` method is implemented.
+
+    -   `package` and `prepend` options are implemented.
+
+    -   Documentation is in place.
+
+    -   Tests are in place too.

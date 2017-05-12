@@ -1,0 +1,7 @@
+TYPEMAP
+SHA3 *		T_SHA3
+PerlIO *	T_IN
+
+INPUT
+T_SHA3
+	$var = getSHA3(aTHX_ $arg)

@@ -1,0 +1,28 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-Test-CreateFromMojoTemplates
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.010001
+     - Moose: 2.0000
+     - File::Find::Rule: 0.33
+     - namespace::autoclean: 0.18
+     - Path::Tiny: 0.050
+     - MojoX::CustomTemplateFileParser: 0.09
+     - Dist::Zilla::File::InMemory: 5.000
+     - Dist::Zilla::Role::FileGatherer: 5.000
+
+plugins:
+  - +config: Author::CSSON
+
+  - +plugin: Deprecated
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

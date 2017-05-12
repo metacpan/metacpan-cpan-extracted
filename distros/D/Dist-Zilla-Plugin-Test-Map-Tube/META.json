@@ -1,0 +1,55 @@
+{
+   "abstract" : "Provides release test for Test::Map::Tube.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Test-Map-Tube",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Moose" : "0",
+            "Test::Map::Tube" : "0.25",
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Test::Map::Tube" : {
+         "file" : "lib/Dist/Zilla/Plugin/Test/Map/Tube.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Dist-Zilla-Plugin-Test-Map-Tube.git",
+         "web" : "https://github.com/manwar/Dist-Zilla-Plugin-Test-Map-Tube"
+      }
+   },
+   "version" : "0.14",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

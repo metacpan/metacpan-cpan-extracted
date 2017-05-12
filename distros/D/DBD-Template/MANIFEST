@@ -1,0 +1,12 @@
+Changes
+Template.pm
+TemplateSS.pm
+Makefile.PL
+MANIFEST
+README
+test.pl
+example/tmpl1.pl
+example/tmpl1_result
+example/tmps1.pl
+example/tmps1_result
+example/ANYFMT.sfm

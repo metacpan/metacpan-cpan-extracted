@@ -1,0 +1,73 @@
+{
+   "abstract" : "Displays stack trace in HTML",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-StackTrace-AsHTML",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.15",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0",
+            "Test::Synopsis" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::StackTrace" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Devel-StackTrace-AsHTML/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Devel-StackTrace-AsHTML",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Devel-StackTrace-AsHTML.git",
+         "web" : "https://github.com/miyagawa/Devel-StackTrace-AsHTML"
+      }
+   },
+   "version" : "0.15",
+   "x_authority" : "cpan:MIYAGAWA",
+   "x_contributors" : [
+      "Graham Knop <haarg@haarg.org>",
+      "RickFord <ford.rick@gmail.com>",
+      "Shawn M Moore <sartak@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}
+

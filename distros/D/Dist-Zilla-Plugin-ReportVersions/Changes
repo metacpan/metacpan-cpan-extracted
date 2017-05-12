@@ -1,0 +1,43 @@
+Revision history for Perl extension Dist-Zilla-Plugin-ReportVersions
+
+1.110730  2011-03-14 10:31:45 Europe/Vienna
+    - skip the 'open' pragma because 'require open' complains 'Not
+      enough arguments for open'.
+
+1.102460  2010-09-03 12:24:12 Europe/Vienna
+    - require_ok() instead of use_ok() so we don't fail on importing
+      conflicting symbols from different packages (thanks RCAPUTO)
+
+1.101700  2010-06-19 10:49:16 Europe/Vienna
+    - converted tabs to spaces (thanks Caleb)
+
+1.101600  2010-06-09 13:35:12 Europe/Vienna
+    - skip POE::Loop::Tk
+
+1.101460  2010-05-26 09:15:02 Europe/Vienna
+    - skip Template::Test
+
+1.101421  2010-05-22 17:45:00 Europe/Vienna
+
+1.101420  2010-05-22 17:42:24 Europe/Vienna
+    - require Test::More 0.94
+    - skip Test::Kwalitee
+
+1.100880  2010-03-29 21:18:55 Europe/Vienna
+    - moved the warn catcher to before using the candidate module
+    - when skipping a module, make a note about it
+    - skip Moose::Role (conflicts with Moose)
+
+1.100860  2010-03-27 11:07:16 Europe/Vienna
+    - made the generated test more robust by catching and noting warnings.
+      HTML::Table's illegal version string '2.08a' caused problems.
+
+1.100840  2010-03-25 11:50:31 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - catch undefined version numbers so there's no warning
+    - the generated test requires Test::More 0.88 for done_testing() to work
+      without a plan
+    - skip App::FatPacker
+
+1.100700  2010-03-11 15:44:30 Europe/Vienna
+    - original version

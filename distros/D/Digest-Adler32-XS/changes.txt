@@ -1,0 +1,10 @@
+0.03 - 4th April 2010
+
+- Changed "use parent" to "use base" for compatibility with older Perls
+- Added change log
+- Clarified license in distribution
+- Updated Makefile.PL to generate better metadata
+
+0.01 - 2nd April 2010
+
+- Initial release

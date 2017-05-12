@@ -1,0 +1,275 @@
+NAME
+    Data::ICal::RDF - Turn iCal files into an RDF graph
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+        use Data::ICal::RDF;
+
+        # Instantiate a processing context with the appropriate handlers:
+        my $context = Data::ICal::RDF->new(
+            resolve_uid    => sub {
+                # returns an RDF node for the UID...
+            },
+            resolve_binary => sub {
+                # stores a binary object and resolves any relations
+                # between it and its supplied file name; returns either an
+                # identifier for the content or an identifier for the
+                # relation between the name and the content.
+            },
+        );
+
+        # Process a Data::ICal object...
+        $context->process($ical);
+
+        # Successive calls to 'process' against different iCal objects
+        # will accumulate statements in the context's internal model.
+
+        # Now you can do whatever you like with the model.
+        my $result = $context->model;
+
+DESCRIPTION
+    This module is a processor context for turning Data::ICal objects into
+    RDF data. By default it uses version 4 (i.e., random) UUIDs as subject
+    nodes.
+
+METHODS
+  new %PARAMS
+    Initialize the processor context.
+
+    resolve_uid
+        Supply a callback function to resolve the "UID" property of an iCal
+        object. This function *must* return a RDF::Trine::Node::Resource or
+        RDF::Trine::Node::Blank. The function is handed:
+
+        1.  The context object itself, meaning the function should be
+            written as if it were a mixin of Data::ICal::RDF,
+
+        2.  The "UID" of the iCal entry as a string literal.
+
+        This function is used in "subject_for", which is used by
+        "process_events", which is used by "process". If the function is not
+        reliable for any reason, such as a failure to access hardware or
+        network resources, those methods may "croak".
+
+        By default the processor will automatically convert iCal UIDs which
+        are V4 UUIDs into "urn:uuid:" URIs and use them as the subjects of
+        the resulting RDF statements. Furthermore, this is checked *before*
+        running this function to mitigate any database overhead (see
+        "no_uuids"). A V4 UUID URN is also generated as the iCal data's
+        subject if this function returns "undef". If you do *not* want to
+        use UUIDs, then this function must *always* return a valid value.
+
+        Here is an example of a method in a fictitious class which generates
+        a closure suitable to pass into the Data::ICal::RDF constructor:
+
+            sub generate_resolve_uid {
+                my $self = shift;
+                return sub {
+                    my ($data_ical_rdf, $uid) = @_;
+
+                    # magically look up a resource node from some other
+                    # data source
+                    return $self->lookup_uid($uid);
+                };
+            }
+
+        This parameter is *required*.
+
+    resolve_binary
+        Supply a callback function to handle inline "BINARY" attachments.
+        This function *must* return a RDF::Trine::Node::Resource or
+        RDF::Trine::Node::Blank. The function is handed:
+
+        1.  The context object itself, meaning the function should be
+            written as if it were a mixin of Data::ICal::RDF,
+
+        2.  The binary data as a seekable IO object,
+
+        3.  The *declared* Content-Type of the data (as in you might want to
+            verify it using something like File::MMagic or
+            File::MimeInfo::Magic),
+
+        4.  The suggested file name, which will already be stripped of any
+            erroneous path information. File names of zero length or
+            containing only whitespace will not be passed into this
+            function, so you need only check if it is "defined".
+
+        This function is used in the "BINARY" type handler in
+        "process_events", which is used by "process". Once again, if this
+        function is not completely reliable, those methods may "croak".
+
+        Here is an example of a method in a fictitious class which generates
+        a closure suitable to pass into the Data::ICal::RDF constructor:
+
+            sub generate_resolve_binary {
+                my $self = shift;
+                return sub {
+                    my ($data_ical_rdf, $io, $type, $name) = @_;
+
+                    # store the content somewhere and get back an identifier
+                    my $content_id = $self->store($io, $type);
+
+                    # return the content ID if there is no file name
+                    return $content_id unless defined $name;
+
+                    # turn the name into an RDF literal
+                    $name = RDF::Trine::Node::Literal->new($name);
+
+                    # now retrieve the subject node that binds the filename
+                    # to the content identifier
+                    my $subj = $self->get_subject_for($content_id, $name);
+
+                    # now perhaps write the relevant statements back into
+                    # the parser context's internal model
+                    map { $data_ical_rdf->model->add_statement($_) }
+                        for $self->statements_for($content_id, $name);
+
+                    # now we want to return the retrieved *subject*, which
+                    # will be passed into the upstream RDF statement
+                    # generation function.
+                    return $subj;
+                };
+            }
+
+        This parameter is *required*.
+
+    model
+        Supply an RDF::Trine::Model object to use instead of an internal
+        temporary model, for direct interface to some other RDF data store.
+        Note that this is also accessible through the "model" accessor.
+
+        This parameter is *optional*.
+
+    tz  Supply a "HASH" reference whose keys are *known* iCal "TZID"
+        identifiers, and the values are DateTime::TimeZone objects. By
+        default, these values are gleaned from the supplied Data::ICal
+        objects themselves and *will override* any supplied values.
+
+        This parameter is *optional*.
+
+    no_uuids
+        This is a flag to alter the short-circuiting behaviour of
+        "subject_for". When set, it will *not* attempt to return the result
+        of "uid_is_uuid" before running "resolve_uid".
+
+  process $ICAL
+    Process a Data::ICal object and put it into the object's internal model.
+    Note that any "VTIMEZONE" objects found will *not* be inserted into the
+    model, but rather integrated into the appropriate date/time-like
+    property values.
+
+    Note as well that *all* non-standard properties are *ignored*, as well
+    as all non-standard property *parameters* with the exception of
+    "X-FILENAME" and "X-APPLE-FILENAME" since there is no standard way to
+    suggest a file name for attachments.
+
+    This method calls "subject_for" and therefore may croak if the
+    "resolve_uid" callback fails for any reason.
+
+  process_events @EVENTS
+    Process a list of Data::ICal::Entry::Event objects. This is called by
+    "process" and therefore also may croak.
+
+  subject_for $UID
+    Take an iCal "UID" property and return a suitable RDF node which can be
+    used as a subject. This may call the "resolve_uid" callback and
+    therefore may croak if it receives a bad value.
+
+  uuid_is_uid $UID
+    Returns a suitable "urn:uuid:" node if the iCal UID is also a valid
+    (version 4) UUID. Used by "subject_for" and available in the resolve_uid
+    and resolve_binary functions.
+
+  model
+    Retrieve the RDF::Trine::Model object embedded in the processor.
+
+CAVEATS
+    This module is *prototype-grade*, and may give you unexpected results.
+    It does not have a test suite to speak of, at least not until I can come
+    up with an adequate one. An exhaustive test suite to handle the vagaries
+    of the iCal format would likely take an order of magnitude more effort
+    than the module code itself. Nevertheless, I know it works because I'm
+    using it, so my "test suite" is production. I repeat, this is *not*
+    mature software. Patches welcome.
+
+    Furthermore, a number of iCal datatype handlers are not implemented in
+    this early version. These are:
+
+    *   "CAL-ADDRESS"
+
+    *   "DURATION"
+
+    *   "PERIOD"
+
+    *   "RECUR"
+
+    *   "TIME"
+
+    *   "UTC-OFFSET"
+
+    In particular, a lack of a handler for the "DURATION" type means events
+    that follow the "DTSTART"/"DURATION" form will be incomplete. In
+    practice this should not be a problem, as iCal, Outlook, etc. use
+    "DTEND". This is also in part a design issue, as to whether the
+    "DURATION" *property* should be normalized to "DTEND".
+
+    As well, the "GEO", "RESOURCES", and "CLASS" properties are yet to be
+    implemented. Patches are welcome, as are work orders.
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-data-ical-rdf at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-ICal-RDF>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::ICal::RDF
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-ICal-RDF>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-ICal-RDF>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-ICal-RDF>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-ICal-RDF/>
+
+SEE ALSO
+    *   Data::ICal
+
+    *   RDF::Trine
+
+    *   DateTime::TimeZone::ICal
+
+    *   RFC 5545 <http://tools.ietf.org/html/rfc5545>
+
+LICENSE AND COPYRIGHT
+    Copyright 2015 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>.
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

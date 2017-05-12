@@ -1,0 +1,24 @@
+Please see the module documentation.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+XML::LibXML, DBIx::Class and HTML::Entities.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2006, Ashley Pond V
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

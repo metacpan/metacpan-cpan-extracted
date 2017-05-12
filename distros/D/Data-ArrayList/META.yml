@@ -1,0 +1,185 @@
+---
+abstract: 'java.util.ArrayList for perl'
+author:
+  - 'Alex J. G. Burzyński <ajgb@cpan.org>'
+build_requires:
+  Module::Build: 0.3601
+  Scalar::Util: 1.21
+  Test::Exception: 0
+  Test::More: 0
+  Test::NoWarnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-ArrayList
+requires:
+  Data::Clone: 0.001
+  Moose: 1.15
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-ArrayList
+version: 0.01
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Basic/GatherDir'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Basic/MakeMaker'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: ModuleBuild
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::Bugtracker
+      name: Bugtracker
+      version: 1.102670
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: CheckChangesHasContent
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: CheckExtraTests
+      version: 0.004
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: CompileTests
+      version: 1.101800
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: EOLTests
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: NoTabsTests
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: InstallGuide
+      version: 1.101461
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: KwaliteeTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::PortabilityTests
+      name: PortabilityTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101640
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: ReadmeFromPod
+      version: 0.14
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102341
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102341
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102341

@@ -1,0 +1,17 @@
+-- main::(five.pl:4 @0x1234567)
+my $x = "Something simple to demo 'deparse'";
+# code to be run next...
+q[Something simple to demo 'deparse']
+# contained in...
+my $x = q[Something simple to demo 'deparse']
+package main::five;
+sub five{
+    5;
+}
+x1 main::(five.pl:2 @0x1234567)
+    5;
+# code to be run next...
+5
+# contained in...
+{\n\t\n5;\n}
+trepan.pl: That's all, folks...

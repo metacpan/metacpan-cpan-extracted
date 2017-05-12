@@ -1,0 +1,25 @@
+---
+abstract: "Patch perl source a la Devel::PPPort's buildperl.pl"
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-PatchPerl
+requires:
+  File::pushd: '1.00'
+  IO::File: '0'
+  MIME::Base64: '0'
+  Module::Pluggable: '0'
+  perl: v5.6.0
+resources:
+  homepage: https://github.com/bingos/devel-patchperl
+  repository: https://github.com/bingos/devel-patchperl.git
+version: '1.48'
+x_serialization_backend: 'YAML::Tiny version 1.70'

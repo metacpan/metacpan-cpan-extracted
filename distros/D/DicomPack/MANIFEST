@@ -1,0 +1,12 @@
+DicomPack/DB/DicomTagDict.pm
+DicomPack/DB/DicomVRDict.pm
+DicomPack/IO/CommonUtil.pm
+DicomPack/IO/DicomReader.pm
+DicomPack/IO/DicomWriter.pm
+DicomPack/Util/DicomAnonymizer.pm
+DicomPack/Util/DicomDumper.pm
+Examples/createSampleDicom.pl
+Makefile.PL
+MANIFEST			This list of files
+t/modules.t
+META.yml                                 Module meta-data (added by MakeMaker)

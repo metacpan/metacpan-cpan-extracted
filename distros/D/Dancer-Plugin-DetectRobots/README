@@ -1,0 +1,36 @@
+Dancer-Plugin-DetectRobots
+
+A plugin for Dancer applications providing a keyword, is_robot,
+which tests request->user_agent and returns 1 if the user_agent
+appears to be a robot.
+
+This plugin is based upon
+
+  Plack::Middleware::DetectRobots
+
+  Many thanks to Heiko Jansen for his work.
+
+See http://www.perldancer.org/ for details on Dancer.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Plugin::DetectRobots
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2014 Dan Busarow
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

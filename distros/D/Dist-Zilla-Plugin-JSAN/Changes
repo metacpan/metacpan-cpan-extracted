@@ -1,0 +1,51 @@
+Release history for Dist::Zilla::Plugin::JSAN
+
+0.06      2011-07-15 19:07
+
+        - adapted the `postinstall` script to npm 1.0
+        - updated distribution template
+
+0.05      2011-01-12 18:14
+
+        - changed the url of css file for docs converted from markdown and its now configurable
+
+0.04      2010-12-12 15:27
+        
+        - added missed dependency from Dist::Zilla::Plugin::GithubMeta
+        - various docs update
+
+0.03      2010-11-22 13:43
+
+        - don't try to load removed 'Dist::Zilla::Plugin::JSAN::Prereq' in tests
+        - small docs update
+
+0.02      2010-11-15 14:19
+
+        - switched to NPM only distribution
+
+0.01      2010-10-05 13:01
+
+        - only include the 'engines' field if there are an engines specified
+        - strip leading zeros from the version
+        - added `sudo` config option to NPM::Publish
+
+0.01_05   2010-08-27 22:06
+
+        - added PkgVersion plugin
+        - added NPM plugin
+        - added NPM::Publish plugin
+
+0.01_04   2010-08-22 17:53
+        
+        - bundler made FileMunger instead of Gatherer, to allow mungling plugins pre-process files before bundling
+        
+
+0.01_03   2010-08-21 14:09
+
+        - Added "StaticDir" plugin
+        - Some progress on documentation
+
+0.01_02   2010-08-11 11:17
+
+        First version, released on an unsuspecting world.
+

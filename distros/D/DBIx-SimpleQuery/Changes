@@ -1,0 +1,25 @@
+0.05 - 2011-02-24
+- [RT #65983] Add DBI as a pre-requisite (Andreas Koenig)
+
+
+0.04 - 2011-02-10
+- Pass in a parameter for PostgreSQL connections so that multiple
+  queries can still be chained together.
+
+
+0.03 - 2006-06-24
+- Fixed a typo in the synopsis sample code (reported by David Gale)
+- Allow set_defaults to accept either a hash or a hashref of arguments
+
+
+0.02 - 2005-02-27
+- Subs can now be called using thisForm and this_form.
+- Added accessor methods for dsn, user, and password.
+- Eliminated a warning when no rows are returned.
+- Eliminated a number of errors and warnings in the test scripts
+
+
+0.01 - 2004-10-18
+- Initial CPAN release.  Not yet for general consumption, but rather
+  so that people can more easily test it and give me pointers on what
+  needs better documentation.

@@ -1,0 +1,40 @@
+---
+abstract: 'authenticate via DBIx::Class'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Crypt::SaltedHash: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  Dancer::Plugin::Auth::Extensible: 0
+  Dancer::Test: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Auth-Extensible-Provider-DBIC
+provides:
+  Dancer::Plugin::Auth::Extensible::Provider::DBIC:
+    file: lib/Dancer/Plugin/Auth/Extensible/Provider/DBIC.pm
+    version: v0.1.3
+requires:
+  Dancer: 0
+  Dancer::Plugin::Auth::Extensible::Provider::Base: 0
+  Dancer::Plugin::DBIC: 0
+  base: 0
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Auth-Extensible-Provider-DBIC
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-Auth-Extensible-Provider-DBIC/
+  repository: https://github.com/yanick/Dancer-Plugin-Auth-Extensible-Provider-DBIC.git
+version: 0.1.3
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

@@ -1,0 +1,32 @@
+---
+abstract: 'Memcached-based session backend for Dancer'
+author:
+  - 'Alexis Sukrieh <surkia@sukria.net>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Session-Memcached
+requires:
+  Cache::Memcached: 0
+  Carp: 0
+  Dancer::Config: 0
+  Dancer::ModuleLoader: 0
+  Dancer::Session::Abstract: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/sukria/Dancer-Session-Memcached.git
+version: 0.202

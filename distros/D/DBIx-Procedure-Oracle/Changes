@@ -1,0 +1,8 @@
+Revision history for Perl extension DBIx::OracleProcedure
+
+0.1  Tue Jun 18 2002
+     First release.
+
+0.2  Tue Sep 24 2002
+     Crass error on my part. The acknowledgements section wasn't in the POD
+     

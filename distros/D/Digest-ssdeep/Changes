@@ -1,0 +1,18 @@
+Revision history for Digest-ssdeep
+
+0.9.3  Fri Nov  8 00:15:25 2013
+       Solved bug in ssdeep_compare's minimum common length.
+	   Removed distribution tests like perlcritic and pod_coverage.
+
+
+0.9.2  Fri Nov  7 23:56:47 2013
+       Skip t/perlcritic if no Test::Perl::Critic installed.
+
+
+0.9.1  Thu Nov  7 23:51:24 2013
+       Problems to compile CPAN distribution (missing Makefile.PL).
+
+
+0.9.0  Sat Oct  5 01:54:35 2013
+       Initial working release.
+

@@ -1,0 +1,176 @@
+//-*- Mode: C++ -*-
+// Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' QCount.h.in '-vt=^[mbq_]*' -o QCount '-dn=free' '-dm=::json|Compile|Evaluate' '-dt=Indexator'
+
+%module{DDC::XS};
+
+//======================================================================
+// CQCountKeyExpr
+%name{DDC::XS::CQCountKeyExpr} class CQCountKeyExpr : public %name{DDC::XS::CQuery} CQuery
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExpr(string label="");
+	%name{CanCountByFile} bool CanCountByFile();
+};
+
+//======================================================================
+// CQCountKeyExprConstant
+%name{DDC::XS::CQCountKeyExprConstant} class CQCountKeyExprConstant : public %name{DDC::XS::CQCountKeyExpr} CQCountKeyExpr
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprConstant(string label="*");
+};
+
+//======================================================================
+// CQCountKeyExprMeta
+%name{DDC::XS::CQCountKeyExprMeta} class CQCountKeyExprMeta : public %name{DDC::XS::CQCountKeyExpr} CQCountKeyExpr
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprMeta(string label="*");
+};
+
+//======================================================================
+// CQCountKeyExprFileId
+%name{DDC::XS::CQCountKeyExprFileId} class CQCountKeyExprFileId : public %name{DDC::XS::CQCountKeyExprMeta} CQCountKeyExprMeta
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprFileId(string label="fileid");
+};
+
+//======================================================================
+// CQCountKeyExprIndexed
+%name{DDC::XS::CQCountKeyExprIndexed} class CQCountKeyExprIndexed : public %name{DDC::XS::CQCountKeyExprMeta} CQCountKeyExprMeta
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprIndexed(string label="file");
+};
+
+//======================================================================
+// CQCountKeyExprFileName
+%name{DDC::XS::CQCountKeyExprFileName} class CQCountKeyExprFileName : public %name{DDC::XS::CQCountKeyExprIndexed} CQCountKeyExprIndexed
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprFileName(string label="filename");
+};
+
+//======================================================================
+// CQCountKeyExprDate
+%name{DDC::XS::CQCountKeyExprDate} class CQCountKeyExprDate : public %name{DDC::XS::CQCountKeyExprIndexed} CQCountKeyExprIndexed
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  public:
+	%name{new} CQCountKeyExprDate(string label="date");
+};
+
+//======================================================================
+// CQCountKeyExprDateSlice
+%name{DDC::XS::CQCountKeyExprDateSlice} class CQCountKeyExprDateSlice : public %name{DDC::XS::CQCountKeyExprDate} CQCountKeyExprDate
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{slice} unsigned m_slice %get %set;
+  public:
+	%name{new} CQCountKeyExprDateSlice(string label="date", int slice=1);
+};
+
+//======================================================================
+// CQCountKeyExprBibl
+%name{DDC::XS::CQCountKeyExprBibl} class CQCountKeyExprBibl : public %name{DDC::XS::CQCountKeyExprIndexed} CQCountKeyExprIndexed
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{new} CQCountKeyExprBibl(string attrName="");
+};
+
+//======================================================================
+// CQCountKeyExprRegex
+%name{DDC::XS::CQCountKeyExprRegex} class CQCountKeyExprRegex : public %name{DDC::XS::CQCountKeyExprIndexed} CQCountKeyExprIndexed
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+  	%name{Src} CQCountKeyExpr* m_Src %get; //%set;
+  	void setSrc(CQCountKeyExpr* val) %code %{ ddcxs_obj_set(m_Src,val); %};
+
+	%name{Pattern} string m_Pattern %get %set;
+	%name{Replacement} string m_Replacement %get %set;
+	%name{Modifiers} string m_Modifiers %get %set;
+	%name{isGlobal} bool isGlobal %get %set;
+  public:
+	%name{new} CQCountKeyExprRegex(CQCountKeyExpr* src=NULL, string pattern="", string replacement="", string modifiers="");
+};
+
+//======================================================================
+// CQCountKeyExprToken
+%name{DDC::XS::CQCountKeyExprToken} class CQCountKeyExprToken : public %name{DDC::XS::CQCountKeyExprIndexed} CQCountKeyExprIndexed
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{IndexName} string m_IndexName %get %set;
+	%name{MatchId} BYTE m_MatchId %get %set;
+	%name{Offset} int m_Offset %get %set;
+  public:
+	%name{new} CQCountKeyExprToken(string IndexName="Token", BYTE MatchId=0, int Offset=0);
+};
+
+//======================================================================
+// CQCountKeyExprList
+%name{DDC::XS::CQCountKeyExprList} class CQCountKeyExprList : public %name{DDC::XS::CQCountKeyExpr} CQCountKeyExpr
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{Exprs} vector_CQCountKeyExprPtr m_Exprs %get; //%set;
+  	void setExprs(vector_CQCountKeyExprPtr val) %code %{ ddcxs_obj_setvec(vector_CQCountKeyExprPtr,m_Exprs,val); %};
+  
+  public:
+	%name{new} CQCountKeyExprList();
+	%name{Clear} void Clear();
+	%name{empty} bool empty();
+	%name{PushKey} void PushKey(CQCountKeyExpr* expr) %code %{ ddcxs_refcnt_inc(expr,ddcxs_obj_refcnt(THIS)); THIS->PushKey(expr); %};
+};
+
+//======================================================================
+// CQCount
+%name{DDC::XS::CQCount} class CQCount : public %name{DDC::XS::CQuery} CQuery
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{dtr} CQuery* m_dtr %get; //%set;
+  	void setDtr(CQuery* val) %code %{ ddcxs_obj_set(m_dtr, val); %};
+
+	%name{sample} size_t m_sample %get %set;
+	%name{sort} HitSortEnum m_sort %get %set;
+	%name{lo}   string m_lo %get %set;
+	%name{hi}   string m_hi %get %set;
+
+	%name{keys} CQCountKeyExprList& m_keys %get; //%set;
+	void setKeys(CQCountKeyExprList* val) %code %{ ddcxs_obj_set(m_keys,val); %};
+
+  public:
+        %name{new} CQCount(CQuery* dtr_=NULL, CQCountKeyExprList* keys_=NULL, size_t sample_=DDCDefaultCountSampleSize, HitSortEnum sort_=NoSort, string lo="", string hi="");
+  public:
+};
+
+//======================================================================
+// CQKeys
+%name{DDC::XS::CQKeys} class CQKeys : public %name{DDC::XS::CQuery} CQuery
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+  public:
+	%name{qCount} CQCount* m_qCount %get; //%set;
+  	void setQCount(CQCount* val) %code %{ ddcxs_obj_set(m_qCount, val); %};
+
+	%name{CountLimit} size_t m_CountLimit %get %set;
+	%name{IndexNames} vector_string m_IndexNames %get %set;
+	%name{MatchId} BYTE m_MatchId %get %set;
+
+  public:
+        %name{new} CQKeys(CQCount *qCount=NULL, size_t CountLimit=DDCDefaultCountSampleSize, vector_string IndexNames=vector_string());
+	%name{SetMatchId} BYTE SetMatchId(BYTE matchId);
+};
+

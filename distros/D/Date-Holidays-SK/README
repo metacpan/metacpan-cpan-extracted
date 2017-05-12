@@ -1,0 +1,84 @@
+NAME
+    Date::Holidays::SK - determine Slovak Republic bank holidays
+
+VERSION
+    Version 0.02
+
+SYNOPSIS
+       use Date::Holidays::SK qw(
+          is_sk_holiday
+          is_sk_holiday_today
+          sk_holidays
+       );
+
+       my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
+       $year  += 1900;
+       $month += 1;
+       print "Woohoo" if is_sk_holiday( $year, $month, $day );
+   
+       # or
+   
+       print "Woohoo" if is_sk_holiday_today;
+
+       my $hashref;
+       $hashref = sk_holidays(2014);        # full listing for 2014
+       $hashref = sk_holidays(2014, 4);     # just for April, 2014
+       $hashref = sk_holidays(2014, 4, 8);  # just for April 8, 2014
+
+DESCRIPTION
+    This module provides a simple way to get information on Slovak Republic
+    bank holidays.
+
+    This module is a clone of Date::Holidays::CZ.
+
+DEPENDENCIES
+    Date::Holidays::SK depends on the following two modules:
+
+    * Date::Simple
+    * Date::Easter
+
+SLOVAK REPUBLIC BANK HOLIDAYS
+  Fixed and variable
+    With two exceptions, the dates of all Slovak Republic bank holidays are
+    fixed. The exception is Easter Friday and Monday.
+
+    See http://en.wikipedia.org/wiki/Public_holidays_in_Slovakia
+
+EXPORT
+    * is_sk_holiday
+    * is_sk_holiday_today
+    * sk_holidays
+
+SUBROUTINES/METHODS
+  `is_sk_holiday'
+    Takes three named arguments:
+
+    * `year', four-digit number
+    * `month', 1-12, two-digit number
+    * `day', 1-31, two-digit number
+
+  `sk_holidays'
+    Takes one to three arguments: `year' (four-digit number), `month' (1-12,
+    two-digit number), and `day' (1-31, two-digit number). Returns a
+    reference to a hash in which the keys are 'MMDD' (month and day,
+    concatenated) and the values are the names of all the various bank
+    holidays that fall within the year, month, or day indicated by the
+    arguments.
+
+AUTHOR
+    Nathan Cutler, `<presnypreklad at gmail.com>'
+
+    adjusted for Slovakia by
+
+    Jozef Kutej `<jkutej at cpan.org>'
+
+SEE ALSO
+    Date::Holidays::CZ
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the the Artistic License (2.0). You may obtain a copy
+    of the full license at:
+
+    http://www.perlfoundation.org/artistic_license_2_0
+

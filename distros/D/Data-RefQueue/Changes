@@ -1,0 +1,14 @@
+Revision history for Perl extension Data::RefQueue.
+
+0.4  Tue May 08 2007
+  Fixed a typo in t/01-refqueue.t where Data::RefQueue was written as Data::Refqueue.
+  Explicitly defined PL_FILES = {} in Makefile.PL to make older versions of ExtUtils::MakeMaker
+  work with Build.PL.
+
+0.3  Mon May 07 2007
+  Minor changes:
+  Moved tests into t/, added distmeta.
+
+0.2  Wed Nov 28 2002
+	Initial Release.	
+

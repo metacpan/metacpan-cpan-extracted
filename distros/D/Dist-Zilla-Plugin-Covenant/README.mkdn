@@ -1,0 +1,49 @@
+# NAME
+
+Dist::Zilla::Plugin::Covenant - add the author's pledge to the distribution
+
+# VERSION
+
+version 0.1.1
+
+# SYNOPSIS
+
+In dist.ini:
+
+    [Covenant]
+    version = 1
+    pledge_file = AUTHOR_PLEDGE
+
+# DESCRIPTION
+
+`Dist::Zilla::Plugin::Covenant` adds the file
+'_AUTHOR\_PLEDGE_' to the distribution. The author
+as defined in _dist.ini_ is taken as being the pledgee.
+
+The _META_ file of the distribution is also modified to
+include a _x\_author\_pledge_ stanza.
+
+# CONFIGURATION OPTIONS
+
+## version
+
+Version of the pledge to use. 
+
+Defaults to '1'.
+
+## pledge\_file
+
+Name of the file holding the pledge.
+
+Defaults to 'AUTHOR\_PLEDGE'.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,1 @@
+this is static {{ template }} as {% for something %} with keys

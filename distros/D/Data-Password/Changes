@@ -1,0 +1,37 @@
+Revision history for Perl extension Data::Password.
+
+0.01  Wed Jan 16 17:26:03 2002
+	- original version; created by h2xs 1.19
+1.03 Sat Apr 3 23:50:12 2004
+	- Added new variable @DICTIONARIES
+	- Documentation updated
+1.04 Sat Aug 7 11:28:11 IDT 2004
+	- Fixed error message for $MAXLEN==0 (thanks to James Saint-Rossy
+		who submitted a patch)
+1.05 Sat Aug 7 22:47:42 IDT 2004
+	- Fixed test.pl to work on platforms with no dictionaries.
+	  (Thanks to 'Barbie' from cpan-testers)
+
+1.06 Wed Aug 2 22:14:35 IDT 2006
+         - Added dummy dictionary.
+         - Stricter dictionary checking (Requested by Gary Bennett)
+           If your dictionary has entries with '.' password is
+           not checked against these entries.
+1.07 Fri Aug 4 13:18:42 IDT 2006
+         - CheckDict optimized for speed.
+         - Symbol::gensym removed.
+
+1.08 Mon Jul 15 21:35:11 IDT 2013
+         - Minor documentation update (by Neil Bowers)
+
+1.09 Sat Apr 26 09:42:11 IST 2014
+1.10 Sat Apr 26 16:39:11 IST 2014
+         - Passwords contains a space character (by Frederic Van Espen)
+         - new variable ($SKIPCHAR) to skip bad character check.
+
+1.11 Sat Nov 1  22:51:19 IST 2014
+         - Added dependency for Test::More to faciliate install on RedHat platform
+         - Added dependency for Exported added as adviced by Gabor Szabo
+
+1.12 Fri Jan 16 23:14:11 IST 2015
+         - new variable ($BADCHARS) allow users to decide valid characters (Requested by Frederic Van Espen)

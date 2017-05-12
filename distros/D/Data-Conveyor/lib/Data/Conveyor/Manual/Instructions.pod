@@ -1,0 +1,136 @@
+use 5.008;
+use strict;
+use warnings;
+
+package Data::Conveyor::Manual::Instruction;
+# ABSTRACT: About payload instruction objects
+
+
+__END__
+=pod
+
+=head1 NAME
+
+Data::Conveyor::Manual::Instruction - About payload instruction objects
+
+=head1 VERSION
+
+version 1.103130
+
+=head1 PAYLOAD INSTRUCTIONS
+
+Partial updates to business objects have necessitated instruction objects. The
+parser takes the request (EPP frame or mail) and creates the payload. For
+example, if the request specifies that a person's organization should be set
+the parser creates a person payload item object and sets the person handle on
+the data sub-object. It then creates an instruction container for that person
+payload item object and, using the instruction factory, adds a "change
+organization" instruction object to the container.
+
+The policy stage needs to make sure that the new values are valid for the
+respective value objects, so when the payload runs the check() method, it also
+asks the instruction container to check itself. The instruction container asks
+each instruction object to check itself, and each instruction object asks its
+value object (or other data object) to check itself.
+
+The existing values of the business object (for example, the person as it is
+stored in the database) could have invalid values (for example, an invalid
+email address). These values should not be checked, because a change to the
+person's address should not trigger a check on the person's email address. If a
+value was accepted previously, it should be accepted now as well, unless it is
+being changed.
+
+However, we could also imagine the situation where a person that is an owner of
+a domain (i.e., a registrant) has a P.O. box as his address, which would
+trigger an exception. If we only want to change that person's phone number, we
+don't want to trigger an exception because of the P.O. box address. So we need
+to use the value objects' dirty flag. After reading the payload from the
+storage, make sure that none of the business objects' value objects are dirty.
+Each business object has a clear_dirty method (by way of inheriting from
+Class::Scaffold::HierarchicalDirty) which clears the dirty flag of all its
+constituent value objects. That way each object that has value objects (or has
+sub-objects which eventually have value objects) will have a kind of virtual
+dirty flag which is connected to said value objects. Therefore:
+
+    $ticket->payload->clear_dirty;
+
+When the policy has checked the instruction container's values it will copy the
+new values over to the data object (e.g., the person object with the existing
+values). That way the new values will have the dirty flag set. The policy must
+only check that a registrant doesn't have a P.O. box address if the address is
+dirty. An address object can be said to be dirty if any of its constituent
+value objects is dirty.
+
+Certain instructions may only occur as a set. For example, you cannot change
+the zip code of an address alone; you need to change the whole address. On the
+other hand, you can change a person's organization without having to specify
+other fields. When carrying out the instructions, a business objects also needs
+to enforce those instruction sets and, if necessary, throw an exception.
+
+The transaction selector (C<txsel>) for C<NICAT> is also somewhat simplified.
+When trying to determine whether there is a person.set-owner transaction, it
+only has to ask the instruction container whether there is a change to the
+person's name. Previously it had to read the old person object and check
+whether there was a change.
+
+The instruction mechanism still needs to work with other registries that don't
+allow partial updates of objects; in this case, have a "clear" instruction
+which clears the object before setting all the new values.
+
+=head1 INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+L<http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Conveyor>.
+
+=head1 AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<http://search.cpan.org/dist/Data-Conveyor/>.
+
+The development version lives at L<http://github.com/hanekomu/Data-Conveyor>
+and may be cloned from L<git://github.com/hanekomu/Data-Conveyor>.
+Instead of sending patches, please fork this project using the standard
+git and github infrastructure.
+
+=head1 AUTHORS
+
+=over 4
+
+=item *
+
+Marcel Gruenauer <marcel@cpan.org>
+
+=item *
+
+Florian Helmberger <fh@univie.ac.at>
+
+=item *
+
+Achim Adam <ac@univie.ac.at>
+
+=item *
+
+Mark Hofstetter <mh@univie.ac.at>
+
+=item *
+
+Heinz Ekker <ek@univie.ac.at>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2004 by Marcel Gruenauer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

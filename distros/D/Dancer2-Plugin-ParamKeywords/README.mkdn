@@ -1,0 +1,116 @@
+# NAME
+
+Dancer2::Plugin::ParamKeywords - Sugar for the params() keyword (DEPRECATED)
+
+# VERSION
+
+version v0.1.5
+
+# SYNOPSIS
+
+    use Dancer2;
+    use Dancer2::Plugin::ParamKeywords;
+
+    any '/:some_named_parameter' => sub {
+        my $route_param = route_param('some_named_parameter');
+        my $get_param   = query_param('some_named_parameter');
+        my $post_param  = body_param('some_named_parameter');
+    };
+
+# DESCRIPTION
+
+This module is deprecated with the release of [Dancer2](https://metacpan.org/pod/Dancer2)'s
+[Hash::MultiValue](https://metacpan.org/pod/Hash::MultiValue) parameter keywords: route\_parameters,
+query\_parameters, and body\_parameters.  Use this plugin
+only if you are unable to upgrade your installation of
+[Dancer2](https://metacpan.org/pod/Dancer2).
+
+The default [Dancer2::Core::Request params
+accessor](https://metacpan.org/pod/Dancer2::Core::Request#params-source)
+munges parameters in the following precedence from
+highest to lowest: `POST` parameters, named route parameters,
+and `GET` parameters.
+
+Consider the following route:
+
+    post '/people/:person_id' => sub {
+        my $person_id = param('person_id');
+        ...
+        # Perform some operation using $person_id as a key
+    };
+
+In the above example, if the browser/client sends a parameter
+`person_id` with a value of 2 in the `POST` body to route `/people/1`,
+`$person_id` will equal 2 while still matching the route `/people/1`.
+
+This plugin provides keywords that wrap around `params($source)`
+for convenience to fetch parameter values from specific sources.
+
+## CONFIGURATION
+
+The ["munged\_params"](#munged_params) and ["munged\_param"](#munged_param) keywords require you to configure an order of
+precedence by which to prefer parameter sources.  Please see 
+[Dancer2::Core::Request params accessor](https://metacpan.org/pod/Dancer2::Core::Request#params-source)
+for a list of valid sources.
+
+    # In config.yml
+    plugins:
+      ParamKeywords:
+        munge_precedence:
+          - route
+          - body
+          - query
+
+If you won't be using the munged\_\* keywords, you don't need to bother configuring
+this plugin.
+
+# KEYWORDS
+
+## munged\_param(Str)
+
+Returns the value of a given parameter from the ["munged\_params"](#munged_params) hash.
+
+## munged\_params
+
+Returns a hash in list context or a hash reference in scalar context of
+parameters munged according to the precedence provided in the configuration
+file (from highest to lowest).
+
+## query\_param(Str)
+
+Returns the value supplied for a given parameter in the query string.
+
+## query\_params
+
+Returns the arguments and values supplied by query string. Returns a hash in list context or a hasref in scalar context.
+
+## body\_param(Str)
+
+Returns the value supplied for a given parameter in the `POST` arguments.
+
+## body\_params
+
+Returns arguments and values supplied by a `POST` request.  Returns a hash in list context or a hasref in scalar context.
+
+## route\_param(Str)
+
+Returns the value supplied for a given named parameter in the route.
+
+## route\_params
+
+Returns the arguments and values suppled by the route. Returns a hash in list context or a hasref in scalar context.
+
+# VERSIONING
+
+This module follows semantic versioning ([http://www.semver.org](http://www.semver.org)).
+
+# AUTHOR
+
+Chris Tijerina
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Chris Tijerina.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

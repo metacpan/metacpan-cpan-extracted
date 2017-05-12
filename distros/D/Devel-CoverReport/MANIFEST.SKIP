@@ -1,0 +1,15 @@
+cover_db
+\..*?\.swp
+\..*?\.swo
+^MYMETA.yml$
+^t/tmp/
+^.git
+^_build
+^blib/
+^\-$
+^Build$
+cover_report$
+^Devel-CoverReport-\d\.\d\d
+^mk_author_tests.pl$
+prove_cover$
+

@@ -1,0 +1,33 @@
+Changes
+=======
+
+2.03 - 13 June 2016
+  * Permissions could cause repeat builds to fail in v2.02
+
+2.02 - 10 June 2016
+  * Update xxHash lib to 860118 (June 2nd, 2016)
+
+2.01 - 09 November 2015
+  * Documentation fix
+  * Full support for 64bit hashes on 32bit perls built without int64 (basically just DWIM Perl)
+
+2.00 - 04 November 2015
+  * Bring xxHash library up to date (as of 44a6297b)
+  * Include 64 bit hash functions
+  * Remove (really useless in hindsight) object oriented interface
+  * Jump to twopointohoh as API has changed!
+  * Breaking change: xxhash(...) becomes xxhash32(...)
+  * Breaking change: xxhash_hex(...) becomes xxhash32_hex(...)
+
+1.02 - 24 December 2013
+  * Minor POD tweak
+
+1.01 - 24 September 2013
+  * Fix U16 redef errors (cpantesters.org/cpan/report/08b0d39a-239e-11e3-b28b-bdac6d3f5dbc)
+  * POD fixes
+
+1.00 - 22 September 2013
+  * OO interface added
+
+0.99 - 21 September 2013
+  * Initial release.

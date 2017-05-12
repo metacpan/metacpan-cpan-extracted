@@ -1,0 +1,8 @@
+Revision history for DateTime-Event-Klingon
+
+1.0.1 Thu Apr  3 17:34:36 EDT 2008
+    Added DateTime to build dependencies.
+    Added some extra build instructions to README.
+
+1.0 Tue Apr 01 00:00:00 EDT 2008
+    First version unleashed on weak and puny humans.

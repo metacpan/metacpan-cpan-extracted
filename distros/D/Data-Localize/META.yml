@@ -1,0 +1,89 @@
+---
+abstract: 'Alternate Data Localization API'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.94'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.3, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Localize
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Localize:
+    file: lib/Data/Localize.pm
+    version: '0.00027'
+  Data::Localize::Auto:
+    file: lib/Data/Localize/Auto.pm
+  Data::Localize::Format:
+    file: lib/Data/Localize/Format.pm
+  Data::Localize::Format::Gettext:
+    file: lib/Data/Localize/Format/Gettext.pm
+  Data::Localize::Format::Maketext:
+    file: lib/Data/Localize/Format/Maketext.pm
+  Data::Localize::Format::NamedArgs:
+    file: lib/Data/Localize/Format/NamedArgs.pm
+  Data::Localize::Gettext:
+    file: lib/Data/Localize/Gettext.pm
+  Data::Localize::Gettext::Parser:
+    file: lib/Data/Localize/Gettext/Parser.pm
+  Data::Localize::Localizer:
+    file: lib/Data/Localize/Localizer.pm
+  Data::Localize::Log:
+    file: lib/Data/Localize/Log.pm
+  Data::Localize::MultiLevel:
+    file: lib/Data/Localize/MultiLevel.pm
+  Data::Localize::Namespace:
+    file: lib/Data/Localize/Namespace.pm
+  Data::Localize::Storage:
+    file: lib/Data/Localize/Storage.pm
+  Data::Localize::Storage::BerkeleyDB:
+    file: lib/Data/Localize/Storage/BerkeleyDB.pm
+  Data::Localize::Storage::Hash:
+    file: lib/Data/Localize/Storage/Hash.pm
+  Data::Localize::Trait::WithStorage:
+    file: lib/Data/Localize/Trait/WithStorage.pm
+  Data::Localize::Util:
+    file: lib/Data/Localize/Util.pm
+recommends:
+  BerkeleyDB: '0'
+  Config::Any: '0'
+  YAML::XS: '0'
+requires:
+  Encode: '0'
+  I18N::LangTags: '0'
+  I18N::LangTags::Detect: '0'
+  Log::Minimal: '0.14'
+  Module::Load: '0'
+  Module::Pluggable::Object: '0'
+  Moo: '1.000008'
+  MooX::Types::MooseLike::Base: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/lestrrat/Data-Localize/issues
+  homepage: https://github.com/lestrrat/Data-Localize
+  repository: git://github.com/lestrrat/Data-Localize.git
+version: '0.00027'
+x_contributors:
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Stevan Little <stevan.little@iinteractive.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'Karl Williamson <khw@cpan.org>'
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

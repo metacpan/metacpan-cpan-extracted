@@ -1,0 +1,63 @@
+NAME
+    Dist::Zilla::Plugin::Upload::SCP - Dist::Zilla release plugin to upload
+    via scp
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      [Upload::SCP]
+      connection = david@example.com
+      directory = public_html
+
+DESCRIPTION
+    This module uploads a distribution tarball to a remote host via scp on
+    release.
+
+    It does not manage passwords. You can put that in your connection string
+    if you're nuts, but you really should use an SSH key and "ssh-agent".
+
+ATTRIBUTES
+  connection (required)
+    An ssh connection string, either "host" or "user@host" or anything else
+    Net::OpenSSH supports as a "host" parameter.
+
+  directory (required)
+    Remote directory to receive the upload.
+
+  clobber
+    Boolean for whether an existing destination path should be clobbered.
+    Defaults to false.
+
+  atomic
+    Boolean for whether the file should be uploaded with a temporary name
+    and then renamed when the upload is complete. Defaults to false.
+
+SEE ALSO
+    *   Dist::Zilla::Plugin::UploadToSFTP -- very similar but allows you to
+        set passwords via .netrc
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/dist-zilla-plugin-upload-scp/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dist-zilla-plugin-upload-scp>
+
+      git clone git://github.com/dagolden/dist-zilla-plugin-upload-scp.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

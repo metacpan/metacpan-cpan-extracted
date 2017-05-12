@@ -1,0 +1,35 @@
+#/*-*- Mode: C++ -*- */
+%module{DDC::XS};
+
+//======================================================================
+// CQueryCompiler
+%name{DDC::XS::Object} class ddcObject
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+public:
+  ddcObject();
+  %name{free} ~ddcObject();  //-- explicit destruction
+
+  void DESTROY() %code %{
+    REFDEBUG(if (THIS) fprintf(stderr, "Object::DESTROY(obj=%s=%p)\n", THIS->jsonClass().c_str(), THIS));
+    ddcxs_refcnt_dec(THIS);
+  %};
+
+  //-- debug: dump object substructure tree
+  void DumpTree() %code %{ ddcxsDumpObjectTree(THIS); %};
+
+  //-- debug: get internal reference count
+  unsigned refcnt() %code %{ RETVAL = ddcxs_obj_refcnt(THIS); %};
+
+  //-- debug: get self-reference (should auto-magically increment refcnt)
+  ddcObject* self() %code %{ RETVAL = THIS; %};
+
+  //-- object structure
+  ddcObjectList Children();
+  ddcObjectList Descendants();
+  void DisownChildren();
+
+  //-- stringification
+  string toString();
+  string toJson();
+};

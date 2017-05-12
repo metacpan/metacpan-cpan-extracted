@@ -1,0 +1,14 @@
+=pod
+
+=encoding utf8
+
+=name тест
+
+=desc test the DBIx::POS::Template module
+
+=sql
+
+  select * from {% $tables{foo} %};
+
+
+=cut

@@ -1,0 +1,135 @@
+NAME
+    Data::GUID::Any - Generic interface for GUID/UUID creation
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        use Data::GUID::Any 'guid_as_string';
+
+        my $guid = guid_as_string();
+
+DESCRIPTION
+    This module is a generic wrapper around various ways of obtaining
+    Globally Unique ID's (GUID's), also known as Universally Unique
+    Identifiers (UUID's).
+
+    On installation, if Data::GUID::Any can't detect a way of generating
+    both version 1 and version 4 GUID's, it will add either Data::UUID::MT
+    or UUID::Tiny as a prerequisite, depending on whether or not a compiler
+    is available.
+
+    For legacy compatibility with Data::UUID, guid strings are returned
+    uppercase, even though RFC 4122 specifies that generators should provide
+    lower-case strings. To force lower case results from Data::GUID::Any,
+    set $Data::GUID::Any::UC to a false value.
+
+      local $Data::GUID::Any::UC;
+      guid_as_string(); # will be lower case
+
+USAGE
+    The following functions are available for export.
+
+  guid_as_string()
+        my $guid = guid_as_string();
+
+    Returns a guid in string format with upper-case hex characters:
+
+      FA2D5B34-23DB-11DE-B548-0018F34EC37C
+
+    This is the most general subroutine that offers the least amount of
+    control over the result. This routine returns whatever is the default
+    type of GUID for a source, which could be version 1 or version 4 (or, in
+    the case of Win32, something resembling a version 1, but specific to
+    Microsoft).
+
+    It will use any of the following sources, listed from most preferred to
+    least preferred:
+
+    *   Data::UUID::MT (v4)
+
+    *   Data::GUID (v1)
+
+    *   Data::UUID (v1)
+
+    *   Data::UUID::LibUUID (v4 or v1)
+
+    *   UUID (v4 or v1)
+
+    *   Win32 (using GuidGen()) (similar to v1)
+
+    *   uuid (external program) (v1)
+
+    *   APR::UUID (v4 or v1)
+
+    *   UUID::Tiny (v1)
+
+    At least one of them is guaranteed to exist or Data::GUID::Any will
+    throw an exception when loaded. This shouldn't happen if prerequisites
+    were correctly installed.
+
+  v1_guid_as_string()
+        my $guid = v1_guid_as_string();
+
+    Returns a version 1 (timestamp+MAC/random-identifier) GUID in string
+    format with upper-case hex characters from one of the following sources:
+
+    *   Data::UUID::MT
+
+    *   Data::GUID
+
+    *   Data::UUID
+
+    *   Data::UUID::LibUUID
+
+    *   uuid (external program)
+
+    *   UUID::Tiny
+
+    If none of them are available, an exception will be thrown when this is
+    called. This shouldn't happen if prerequisites were correctly installed.
+
+  v4_guid_as_string()
+        my $guid = v4_guid_as_string();
+
+    Returns a version 4 (random) GUID in string format with upper-case hex
+    characters from one of the following modules:
+
+    *   Data::UUID::MT
+
+    *   Data::UUID::LibUUID
+
+    *   uuid (external program)
+
+    *   UUID::Tiny
+
+    If none of them are available, an exception will be thrown when this is
+    called. This shouldn't happen if prerequisites were correctly installed.
+
+SEE ALSO
+    *   RFC 4122 [http://tools.ietf.org/html/rfc4122]
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-GUID-Any>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/data-guid-any>
+
+      git clone git://github.com/dagolden/data-guid-any.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

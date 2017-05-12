@@ -1,0 +1,40 @@
+Revision history for Perl extension DBIx::Schema::DSL
+
+0.12 2015-07-24T04:18:04Z
+    - fix test only (karupanerura++)
+
+0.11 2014-12-09T12:11:29Z
+    - support 'ON UPDATE' option (tokubass++)
+    - ENUM and SET support
+
+0.10 2013-12-19T07:24:59Z
+    - explicitly add `DEFAULT NULL` if `is_nullable` and not specified `default_value`
+
+0.09 2013-11-06T06:14:20Z
+    - suppress warn message of tinyint
+
+0.08 2013-09-25T16:39:34Z
+    - accepts foreign constraints options
+    - fix typo
+
+0.07 2013-07-29T03:20:58Z
+    - add DSL default_not_null (tokubass)
+
+0.06 2013-07-11T04:10:06Z
+    - fix bug of `default_unsigned`
+    - Switch to Minilla.
+
+0.05    Wed Apr  3 06:11:19 2013
+    - `default_varchar_size` to 191 when mysql_charset is utf8mb4
+
+0.04    Tue Mar  5 08:02:34 2013
+    - detect invalid column declaring
+
+0.03    Wed Feb 20 11:47:00 2013
+    - detect undefind colums specified in index and constraint
+
+0.02    Sun Feb 17 13:10:00 2013
+    - set default size of VARCHAR as 255
+
+0.01    Mon Feb 11 15:05:00 2013
+    - original version

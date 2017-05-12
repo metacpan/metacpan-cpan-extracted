@@ -1,0 +1,34 @@
+Dancer2-Serializer-XML version 0.01
+===================================
+
+This module is a plugin for the Web application frmaework Dancer2, and 
+allows it to serialise Perl objects into XML, and deserialise XML into 
+Perl objects. It uses L<XML::Simple> under the covers.
+
+STATUS
+Alpha, but it works for me. Reports of success are gratefully received.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  XML::Simple
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2017 by Ian Gibbs and
+Copyright (C) 2010 by Alexis Sukrieh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

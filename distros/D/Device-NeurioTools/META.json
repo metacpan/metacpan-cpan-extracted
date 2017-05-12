@@ -1,0 +1,43 @@
+{
+   "abstract" : "More complex methods and tools for accessing data                        collected by a Neurio sensor module.",
+   "author" : [
+      "Kedar Warriner"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-NeurioTools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::ISO8601" : "0.08",
+            "Device::Neurio" : "0.10",
+            "Time::Local" : "1.2000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.08"
+}

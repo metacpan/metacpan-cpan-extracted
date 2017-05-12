@@ -1,0 +1,12 @@
+0.04 Thu Jan  1 00:30:17 PST 2015
+ - Update doc
+
+0.03 Tue Dec 30 10:26:12 PST 2014
+ - Update prereqs to include YAML::XS
+
+0.02 Tue Dec 30 10:22:16 PST 2014
+ - Doc fixes. sivoais++
+
+0.01 Sat Dec  6 21:28:30 PST 2014
+ - First Release
+

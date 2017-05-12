@@ -1,0 +1,60 @@
+=pod
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Embed::Reader - embed arbitrary data in a file - reader class
+
+=head1 METHODS
+
+=head2 B<< files >>
+
+Get the list of files embedded into the main file.
+
+In list context, it returns a list of L<Data::Embed::File> objects,
+each representing a different embedded file.
+
+In scalar context, it returns an anonymous array with the list
+above.
+
+=head2 new
+
+Constructor. Takes one positional parameter, that can be either
+a filename or a filehandle (in particular, a GLOB).
+
+If a filename is provided, is it opened for read in C<:raw> mode; an
+exception will be thrown if errors arise.
+
+If a filehandle is provided, it is expected to be seekable and will also
+be C<binmode>-d in C<:raw> mode; again, an exception is thrown in case
+of errors.
+
+=head2 B<< prefix >>
+
+Get the I<prefix> of a file, i.e. the data that is at the beginning of a
+target but that it is not indexed. It is provided as a
+C<Data::Embed::File>.
+
+=head2 B<< reset >>
+
+reset the object's cached data, in particular the list of files. This
+might come handy in case you update the file and you want to re-read
+the index.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2014-2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

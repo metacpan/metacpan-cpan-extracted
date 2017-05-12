@@ -1,0 +1,61 @@
+{
+   "abstract" : "an easy-to-use data-to-disk dumper",
+   "author" : [
+      "Dominik Schulz <dominik.schulz@gauner.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Persist",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Serializer" : "0",
+            "File::Blarf" : "0",
+            "Log::Tree::RequiredLogger" : "0",
+            "Moose" : "0",
+            "Try::Tiny" : "0",
+            "feature" : "0",
+            "mro" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010_000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Test::MockObject::Universal" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gittex/Data-Persist.git",
+         "web" : "https://github.com/gittex/Data-Persist"
+      }
+   },
+   "version" : "0.12",
+   "x_authority" : "cpan:TEX"
+}
+

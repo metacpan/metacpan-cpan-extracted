@@ -1,0 +1,26 @@
+---
+abstract: 'recursive map, apply a block to a data structure'
+author:
+  - 'Brad Bowman E<lt>rmap@bereft.netE<gt>'
+build_requires: {}
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Rmap
+provides:
+  Data::Rmap:
+    file: lib/Data/Rmap.pm
+    version: '0.65'
+requires:
+  Scalar::Util: '0'
+  Test::Exception: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/bowman/Data-Rmap
+version: '0.65'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

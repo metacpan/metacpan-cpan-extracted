@@ -1,0 +1,19 @@
+Source: libdevice-rfxcom-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 5), libanyevent-mocktcpserver-perl
+Build-Depends-Indep: perl (>= 5.6.10-12)
+Maintainer: Mark Hindess <soft-debian@temporalanomaly.com>
+Standards-Version: 3.9.1
+Homepage: http://wiki.github.com/beanz/device-rfxcom-perl/
+
+Package: libdevice-rfxcom-perl
+Architecture: all
+Depends: ${perl:Depends}, ${misc:Depends}, libmodule-pluggable-perl
+Description: Perl extension for RFXCOM RF receivers/transmitters
+ This module provides an API for communicating with RFXCOM RF
+ receivers and transmitters (http://www.rfxcom.com/).  It also
+ provides a small wrapper for W800 receivers from WGL
+ (http://www.wgldesigns.com/w800.html).
+ .
+ Code for RFXCOM RF transmitters will be included shortly.

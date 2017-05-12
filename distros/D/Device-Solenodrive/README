@@ -1,0 +1,76 @@
+NAME
+    Device::Solenodrive - Interface to the solenodrive hardware
+
+VERSION
+    version 0.1
+
+SYNOPSIS
+    my $solenodrive = Device::Solenodrive->new(device => '/dev/ttyUSB0');
+
+DESCRIPTION
+    Host software to interface to solenodrive hardware.
+
+METHODS
+  "new(%parameters)"
+    This constructor returns a new Device::Solenodrive object. Supported
+    parameters are listed below
+
+    device
+        The target device to connect to. This can be either a serial port
+        object (e.g. /dev/ttyUSB0) or a TCP socket (e.g.
+        192.168.1.52:10001).
+
+    baudrate
+        Optional parameter when using a serial port for connecting to the
+        bootloader. Default value is 57600 bps.
+
+    verbose
+        Controls the verbosity of the module. Defaults to 0. Increasing
+        numbers make the module more chatty. 5 is the highest level and
+        probably provides too much information. 3 is a good level to get
+        started.
+
+  "connect_target()"
+    Opens the connection to the device that provides the RS485 interface,
+    should be called before trying to send commands
+
+  "set(ID, channel)"
+    Sets the channel "channel" of the Solenodrive with ID "ID" active.
+
+  "enumerate()"
+    Enumerate the devices on the bus, reports the addresses of the devices
+    together with their firmware version. The returned object is a hash
+    containing the address/firmware version pairs. Only supported from
+    Solenodrive firmware v1.1 and upwards.
+
+  "disconnect_target()"
+    Closes the connection to the RS485 bus.
+
+  "list_devices()"
+    List the devices that were discovered after enumeration.
+
+  "BUILD"
+    An internal function used by Moose to run code after the constructor.
+    Need to document because otherwise Test::Pod::Coverage test fails
+
+  "O_NDELAY"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+  "O_NOCTTY"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+  "O_RDWR"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+AUTHOR
+    Lieven Hollevoet <hollie@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Lieven Hollevoet.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

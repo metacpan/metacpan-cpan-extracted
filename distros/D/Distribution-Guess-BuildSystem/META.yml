@@ -1,0 +1,31 @@
+---
+abstract: 'Guess what this distribution uses to build itself'
+author:
+  - 'brian d foy <bdfoy@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.95'
+  Test::Output: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.64'
+  File::Spec::Functions: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Distribution-Guess-BuildSystem
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Module::Extract::Use: '0'
+  Module::Extract::VERSION: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/briandfoy/distribution-guess-buildsystem/issues
+  homepage: https://github.com/briandfoy/distribution-guess-buildsystem
+  repository: https://github.com/briandfoy/distribution-guess-buildsystem.git
+version: '1.001'

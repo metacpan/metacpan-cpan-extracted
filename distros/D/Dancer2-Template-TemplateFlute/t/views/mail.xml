@@ -1,0 +1,5 @@
+<specification>
+ <list name="listing" iterator="mylist">
+   <param name="image" class="picture" target="src" />
+ </list>
+</specification>

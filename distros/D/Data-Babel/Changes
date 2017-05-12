@@ -1,0 +1,108 @@
+Revision history for Data-Babel
+
+1.13	2013-10-29
+	New features
+	- Filters can use (almost) arbitrary SQL. Implementation uses new
+	  Data::Babel::Filter objects
+	- 'check_contents' method - checks whether explict Masters contain all
+	  ids in the underlying MapTables
+	Diagnosed FAILs seen by David Cantrell. Caused by MySQL bug in duplicate
+	  removal (SELECT DISTINCT) with repeated output columns. Bug present in
+	  MySQL 5.0.32, fixed in or before 5.0.86
+        Bug fixes
+        - 'apostrophe' bug: ID containing apostrophe triggered bug in partial
+	  duplicate removal
+        - Implicit master created in application and passed into Babel
+	  constructor not processed by make_implicit_masters and thus not set up
+	  properly
+        - maptables attribute of recycled idtype not reset
+	Test changes
+	- Added test for schema mechanics
+	- More test cleanup subsequent to fixing of 'implicit masters' bug
+        - Fixed boilerplate & pod tests
+	- Added test for MySQL bug in duplicate removal (SELECT DISTINCT) with 
+	  repeated output column in 000.reqs
+	- Added 'query' arg to select_ur and test cases in 009.util
+	- Added tests for complex filters
+	- Changed 'translate' to use Filter objects
+	- Changed manifest test as in AutoDB, changed MANIFEST.SKIP to not skip
+	  itself, added dependency for Test::CheckManifest
+	Documentation changes
+	- Deprecated obsolete workflow-related attributes and removed them from
+	  examples
+	- Deprecated obsolete maptable header macro - it was just a bad idea...
+----------
+1.12    2013-07-31
+	Bug fixes
+	- Fixed partial duplicates bug in which translate returned rows that 
+	  were identical on all non-null columns, differing only in that one row
+	  had nulls where the other had a real value
+	Test changes
+	- Cleaned up tests to improve CPAN install speed
+	- Changed the scheme for telling CPAN that it's futile to run the tests
+	  because MySQL is not accessible. I now check key requirements in a 
+	  test script and skip out of the test suite if the requirements are not
+	  met.  The main requirement that I check is that MySQL be accessible.
+	  The test suite reports PASS in this case!! It would be far better to
+	  eport NA or UNKNOWN, but I don't know how to do this robustly.
+----------
+1.11    2013-06-18
+	New features
+	- can specify history in IdType, rather than just in Master
+	- new 'show_schema_graph' method
+	Bug fixes
+	- in 'validate', check for unmatched ids has to be case insensitive 
+	  because MySQL does case intensive comparisons, e.g., searching for 
+	  'htt' as gene_symbol
+    	- detect isolated IdTypes, ie, IdTypes not contained in any MapTable.
+          previously, load_implicit_masters would generate illegal empty query
+----------
+1.10	2012-12-02
+	New features
+	* new 'translate' options
+	  - filters
+	  - count
+	  - validate
+	* new methods
+	  - load_implicit_masters
+	  - count
+	  - validate
+	* histories
+	    Master tables can hold old and current values for ids. translate,
+	    count, validate use old values if they exist
+	Bug fixes
+	- 'translate' with empty input_ids. was generating illegal SQL, now
+	  returns empty table
+	- examples/babel.pl used deprecated qw(...) as parentheses. should have
+	  been fixed in 1.02.  sorry	
+	- 'translate' with empty input_ids would sometimes return NULL id
+	- lingering bug in 098.example. test was calling example script with
+	  wrong Perl interpreter and without -Mblib. thanks to CPAN smoke 
+	  testers for finding this bug!!
+----------
+1.03    2012-08-21
+	Added test for version number in POD
+	Removed redundant 'dist_version_from' param from Build.PL
+
+1.02    2012-08-02
+        Changed tests to correct deprecated use of qw(...) as parentheses
+
+1.01    2011-01-22
+        Added 'translate all' (more precisely, the input_ids_all option to
+	  translate) to generate a complete mapping of the input type to the
+          output types.
+
+1.00    2010-11-29
+        First CPAN version, released on an unsuspecting world.
+
+1.00_03 2010-11-19
+	Added Module::Build to build_requires
+	Added view operations to chk_mysql in Build.PL on the theory that FAILs 
+	  are due to inability to create views
+
+1.00_02 2010-11-16
+	Added Class::AutoDB to requires
+
+0.90    2010-08-22
+        First version, released for internal use.
+

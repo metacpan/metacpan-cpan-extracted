@@ -1,0 +1,26 @@
+---
+abstract: 'Print a stack trace whenever a system call is made'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Differences: '0.61'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Trace-Syscall
+requires:
+  perl: v5.18.0
+resources:
+  bugtracker: https://github.com/hoelzro/devel-trace-syscall/issues
+  homepage: https://github.com/hoelzro/devel-trace-syscall
+  repository: https://github.com/hoelzro/devel-trace-syscall.git
+version: '0.02'

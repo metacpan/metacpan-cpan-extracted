@@ -1,0 +1,25 @@
+---
+abstract: 'Metadata resource URLs from Git configuration'
+author:
+  - 'Oliver Gorwits <oliver@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-MetaResourcesFromGit
+requires:
+  Config::INI::Reader: 0
+  Dist::Zilla::Plugin::MetaResources: 0
+  Moose: 0
+  Path::Class: 0
+  String::Formatter: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaResourcesFromGit
+  homepage: https://github.com/ollyg/Dist-Zilla-Plugin-MetaResourcesFromGit/wiki
+  repository: git://github.com/ollyg/Dist-Zilla-Plugin-MetaResourcesFromGit.git
+version: 1.103620

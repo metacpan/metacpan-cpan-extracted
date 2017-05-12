@@ -1,0 +1,104 @@
+NAME
+    DBIx::Class::Relationship::Predicate - Predicates for relationship
+    accessors
+
+VERSION
+    version 0.07
+
+SYNOPSIS
+        package My::Schema::Result::Foo;
+
+        __PACKAGE__->load_components(qw( Relationship::Predicate ... Core ));
+
+        ...
+
+        __PACKAGE__->belongs_to('baz' => 'My::Schema::Result::Baz',  'baz_id');
+
+        __PACKAGE__->might_have(
+            'buzz' => 'My::Schema::Result::Buzz',
+            { 'foreign.foo_id' => 'self.id' },
+            { 'predicate' => 'got_a_buzz' },
+        );
+
+        __PACKAGE__->has_many(
+            'foo_baz' => 'My::Schema::Result::FooBaz',
+            { 'foreign.foo_id' => 'self.id' },
+            { 'predicate' => undef },
+        );
+
+        __PACKAGE__->has_many('bars' => 'My::Schema::Result::Bar', 'foo_id');
+
+        1;
+
+DESCRIPTION
+    DBIx::Class component to automatically create predicates for
+    relationship accessors in a result class. By default, it creates
+    "has_${rel_accessor_name}" methods and injects into the class, thus for
+    that case we would have 'has_baz', 'has_buzz' and 'has_bars' methods on
+    $foo row object. You can define the name for each one (or also disable
+    its creation using "undef" as value) by setting 'predicate' key in the
+    relationship's attrs hashref.
+
+       __PACKAGEE_->might_have(
+           'buzz' => 'My::Schema::Result::Buzz', 'foo_id',
+           { 'predicate' => 'got_a_buzz' }
+       );
+
+       or
+
+       __PACKAGEE_->might_have(
+           'buzz' => 'My::Schema::Result::Buzz', 'foo_id',
+           { 'predicate' => undef }
+       );
+
+AUTHOR
+    Wallace Reis, "<wreis at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-relationship-predicate at rt.cpan.org", or through the
+    web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-Relationship-
+    Predicate>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::Relationship::Predicate
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-Relationship-Pr
+        edicate>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-Class-Relationship-Predicate>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-Class-Relationship-Predicate>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-Class-Relationship-Predicate/>
+
+COPYRIGHT
+    Copyright 2009 Wallace Reis.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+
+AUTHOR
+    Wallace Reis <wreis@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Wallace Reis.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,53 @@
+Revision history for DBGp-Client
+
+0.12     2017-03-12 23:22:25 CET
+
+    - Assume encoding is 'none' by default, for compatibility with Xdebug
+
+0.11     2016-07-09 18:36:04 CEST
+
+    - Optionally force permissions for Unix-domain sockets
+
+0.10     2016-06-20 19:29:47 CEST
+
+    - Add accessor for the 'temporary' state of breakpoints
+
+0.09     2016-06-05 13:26:00 CEST
+
+    - Add support for stream and notification messages
+
+0.08     2016-05-01 19:43:43 CEST
+
+    - Changes to support AnyEvent client
+
+0.07      2016-04-29 12:21:16 CEST
+
+    - Bugfixes for Listener and Client modules
+    - Add simplistic asynchronous client
+
+0.06      2015-12-20 15:57:50 CET
+
+    - Implement parsing for all required DBGp command and some of the
+      optional ones
+    - Document all parsed responses
+
+0.05      2015-12-15 08:25:49 CET
+
+    - Fix for the case when XML::Parser::Style::EasyTree is installed
+
+0.04      2015-12-14 09:51:16 CET
+
+    - Better diagnostics in case of parse error
+
+0.03      2015-12-13 22:22:21 CET
+
+    - Perl 5.6 compatibility
+    - Added basic documentation
+
+0.02      2015-12-11 09:59:34 CET
+
+    - Add option to listen on an Unix-domain socket
+
+0.01      2015-12-11 09:29:42 CET
+
+    - First public release

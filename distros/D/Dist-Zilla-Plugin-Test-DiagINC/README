@@ -1,0 +1,82 @@
+NAME
+    Dist::Zilla::Plugin::Test::DiagINC - Add Test::DiagINC to all .t files
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+        # in dist.ini
+        [Test::DiagINC]
+
+DESCRIPTION
+    This Dist::Zilla plugin adds the following Test::DiagINC line to all
+    ".t" files under the "t/" directory:
+
+        use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC';
+
+    It will be inserted before the first module loaded (without adding a
+    line to preserve line numbering), excluding "strict" and "warnings".
+    This makes sure that it is loaded before Test::More, which Test::DiagINC
+    requires.
+
+    For example, it will turn this:
+
+        use 5.008001;
+        use strict;
+        use warnings;
+
+        use Test::More;
+        # etc.
+
+    Into this:
+
+        use 5.008001;
+        use strict;
+        use warnings;
+
+        use if $ENV{AUTOMATED_TESTING}, 'Test::DiagINC'; use Test::More;
+        # etc.
+
+RATIONALE
+    Prerequisite reporting modules like
+    Dist::Zilla::Plugin::Test::ReportPrereqs and similar modules give an
+    overview of prerequisites, but don't generally list *deep* dependencies
+    — i.e. the modules used by the modules you use.
+
+    Dist::Zilla::Plugin::Test::PrereqsFromMeta offers a feature to report
+    from %INC after loading all prerequisites, but it doesn't cover all
+    types of dependencies and can't account for optional dependencies.
+
+    What I find most relevant is knowing exactly what modules are loaded
+    when any given test fails. This would include test modules, optional
+    modules and so on. It is *specific* to the failure situation.
+
+    That sort of output is also verbose, so this plugin only generates that
+    output if $ENV{AUTOMATED_TESTING} is true. That means it will show up on
+    CPAN Testers, but not clutter up manual test output, which seems to me
+    like the right trade-off.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Test-DiagINC/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Test-DiagINC>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Test-DiagINC.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

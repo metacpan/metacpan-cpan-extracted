@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/DBIx/Compare.pm
+lib/DBIx/Compare/mysql.pm
+lib/DBIx/Compare/SQLite.pm
+lib/DBIx/Compare/Oracle.pm
+lib/DBIx/Compare/Pg.pm
+t/DBIx_Compare.t

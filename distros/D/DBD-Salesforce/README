@@ -1,0 +1,22 @@
+NAME
+    DBD::Salesforce - Treat Salesforce as a datasource for DBI
+
+SYNOPSIS
+      use DBI;
+
+      my $dbh = DBI->connect("dbi:Salesforce", $id, $pass);
+      my $sth = $dbh->prepare(qq[
+          SELECT id, firstname, lastname FROM contact
+      ]);
+
+      while (my $r = $sth->fetchrow_hashref) {
+          ...
+
+DESCRIPTION
+    "DBD::Salesforce" allows you to use Salesforce as a datasource;
+    Salesforce can be queried using SQL *SELECT* statements, and iterated
+    over using standard DBI conventions.
+
+    WARNING: This is still alpha-quality software. It works for me, but that
+    doesn't really mean anything.
+

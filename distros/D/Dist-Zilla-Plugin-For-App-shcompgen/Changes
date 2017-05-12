@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-Plugin-For-App-shcompgen
+
+0.04    2016-05-15 (PERLANCAR)
+
+	- Rename plugin from DZP:shcompgen::InitOnInstall to
+          DZP:For::App::shcompgen.
+
+
+0.03    2016-02-29 (PERLANCAR)
+
+	- Use shcompgen's 'remove' option.
+
+
+0.02    2014-12-14 (PERLANCAR)
+
+	- Show output of init (although most users won't see this because
+	  they use cpanm without -v).
+
+
+0.01     2014-12-14 (PERLANCAR)
+
+         - First release.

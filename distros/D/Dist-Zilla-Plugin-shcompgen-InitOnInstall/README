@@ -1,0 +1,14 @@
+SYNOPSIS
+
+    In your dist.ini:
+
+     [shcompgen::InitOnInstall]
+
+DESCRIPTION
+
+    This plugin is meant only for building App::shcompgen.
+
+SEE ALSO
+
+    shcompgen
+

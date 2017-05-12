@@ -1,0 +1,14 @@
+Artistic
+Build.PL
+Changes
+COPYING
+lib/DateTime/Format/Excel.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00pod.t
+t/basic.t
+t/clone.t
+t/fractions.t

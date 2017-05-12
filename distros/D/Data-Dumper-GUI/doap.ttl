@@ -1,0 +1,161 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [ doap-deps:on "Devel::Size 0.79"^^doap-deps:CpanId ], [
+		doap-deps:on "Exporter::Tiny 0.026"^^doap-deps:CpanId;
+	], [ doap-deps:on "Moo 1.002000"^^doap-deps:CpanId ], [ doap-deps:on "Prima 1.36"^^doap-deps:CpanId ], [
+		doap-deps:on "Types::Standard 0.012"^^doap-deps:CpanId;
+	];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Data-Dumper-GUI>;
+	doap:created         "2013-07-09"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Data-Dumper-GUI>;
+	doap:homepage        <https://metacpan.org/release/Data-Dumper-GUI>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Data-Dumper-GUI";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-006>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-data-dumper-gui>;
+	];
+	doap:shortdesc       "just what Data::Dumper needed... a GUI".
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Data-Dumper-GUI-0.001"^^xsd:string;
+	dc:issued            "2013-07-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Data-Dumper-GUI-0.002"^^xsd:string;
+	dc:issued            "2013-07-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Reply::Plugin::ddGUI";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Data-Dumper-GUI-0.003"^^xsd:string;
+	dc:issued            "2013-07-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Dereference SCALAR refs in outline.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Array indices count from $[, not 1.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Include size of references using Devel::Size.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Show length of arrays.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Show key count for hashes, and bucket count.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Quote hash keys when necessary.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Data-Dumper-GUI-0.004"^^xsd:string;
+	dc:issued            "2013-07-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Make window resizable, and allow the split between the two panels to be dragged across.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/karasik>;
+			rdfs:seeAlso <https://github.com/tobyink/p5-data-dumper-gui/pull/1>;
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Remove useless [-] icons from leaf nodes in outline.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/karasik>;
+			rdfs:comment "I dunno; I don't get any icons anyway.";
+			rdfs:seeAlso <https://github.com/tobyink/p5-data-dumper-gui/pull/1>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Data-Dumper-GUI-0.005"^^xsd:string;
+	dc:issued            "2013-07-12"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Switch off index section in PodView.";
+			doap-changeset:blame <http://purl.org/NET/cpan-uri/person/karasik>;
+			rdfs:seeAlso <https://github.com/dk/Prima/commit/ba12aa0ba61d8f8b11f2c0834447cfed52889309>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Data-Dumper-GUI-0.006"^^xsd:string;
+	dc:issued            "2013-09-30"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Include image in documentation.";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Use Dist::Inkt.";
+		], [
+			a doap-changeset:Update;
+			rdfs:label "Use Exporter::Tiny instead of Exporter::TypeTiny.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Data-Dumper-GUI-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/karasik>
+	a                    foaf:Person;
+	foaf:homepage        <http://www.karasik.eu.org/>;
+	foaf:name            "Dmitry Karasik";
+	foaf:nick            "KARASIK";
+	foaf:page            <https://github.com/dk>, <https://metacpan.org/author/KARASIK>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

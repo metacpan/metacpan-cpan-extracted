@@ -1,0 +1,31 @@
+Changes
+examples/module_cooker
+lib/Distribution/Cooker.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+script/dist_cooker
+t/dist.t
+t/init.t
+t/load.t
+t/module.t
+t/module_to_distname.t
+t/new.t
+t/pod.t
+t/pod_coverage.t
+t/prereq.t
+t/run.t
+t/test_manifest
+templates/Changes
+templates/examples/placeholder.pl
+templates/lib/Foo.pm
+templates/LICENSE
+templates/Makefile.PL
+templates/README
+templates/t/load.t
+templates/t/pod.t
+templates/t/pod_coverage.t
+templates/t/prereq.t
+templates/t/test_manifest
+META.yml                                 Module meta-data (added by MakeMaker)

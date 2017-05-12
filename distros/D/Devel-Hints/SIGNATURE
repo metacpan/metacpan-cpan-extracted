@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e1673b92bc80a09c67c79d74a9d7a7ea596e3b69 Changes
+SHA1 366feb6f439fd22581156b009d76028d05735cca Hints.pm
+SHA1 a321ed38ea10080e0ab18b3399ad384a47c6c332 Hints.xs
+SHA1 0f082a506cfdda35b7b409991d33dcb1ff186987 MANIFEST
+SHA1 51f38120015bb3ae2136e1eaafb184422dc97662 META.yml
+SHA1 722d00c6acecdf77a800dbc7e8c2fc9b72e9ceba Makefile.PL
+SHA1 7c437456e45e5967b00bf15eefd33d94cf1a3951 README
+SHA1 7305dbe2904416e28decb05396988a5d51d578be inc/Module/Install.pm
+SHA1 129960509127732258570c122042bc48615222e1 inc/Module/Install/Base.pm
+SHA1 cf3356ed9a5bd2f732527ef9e7bc5ef4458c8a93 inc/Module/Install/Can.pm
+SHA1 68e183c12cd371e525ec34282eb00b153b29a18d inc/Module/Install/Compiler.pm
+SHA1 a17a3743f8dd277d970dcfd09a909e99b497d8fb inc/Module/Install/DSL.pm
+SHA1 bf0a3e1977effc2832d7a813a76dce3f31b437b6 inc/Module/Install/Fetch.pm
+SHA1 b721c93ca5bc9a6aa863b49af15f1b1de6125935 inc/Module/Install/Makefile.pm
+SHA1 026cc0551a0ad399d195e395b46bdf842e115192 inc/Module/Install/Metadata.pm
+SHA1 a615bb050ca0b2d79bfa0224addcb83019a53b09 inc/Module/Install/ReadmeFromPod.pm
+SHA1 5457015ea5a50e93465bf2dafa29feebd547f85b inc/Module/Install/Win32.pm
+SHA1 051e7fa8063908befa3440508d0584a2497b97db inc/Module/Install/WriteAll.pm
+SHA1 075e952c63274922f43e7638b6b43f26ad1aa128 ppport.h
+SHA1 aed25f06ecfe415eb4f3e3c1526dcb5c2f744cce ptable.h
+SHA1 5cb613c3f818cbdb6f8ab720a742bca3c346ac07 t/1-basic.t
+SHA1 fe7a201f4ec47f4cb3a643341168afaf06177f92 t/2-write.t
+SHA1 26100aae896b71af8bbb2725be05e2af25fd6427 t/3-coderef.t
+SHA1 66385063d4f58b03ba4aa5e71478afd8576bad10 t/4-file-line.t
+SHA1 5b168d2b3cd0b29247adb8dbf88e4af3568342d0 typemap
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (Darwin)
+
+iEYEARECAAYFAkzaiUMACgkQtLPdNzw1AaDMgQCfXitFOuLE7ITNEIUc+0mKXNWW
+svEAn2JhK/7W55KvNmQSu+egrfpwr5PQ
+=W7ao
+-----END PGP SIGNATURE-----

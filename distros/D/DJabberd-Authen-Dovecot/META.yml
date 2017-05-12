@@ -1,0 +1,24 @@
+---
+abstract: 'Dovecot SASL authentificator for DJabberd.'
+author:
+  - 'Ruslan N. Marchenko <me@ruff.mobi>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+distribution_type: module
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.57_05'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DJabberd-Authen-Dovecot
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DJabberd: 0.80
+  MIME::Base64: 0
+version: 0.1

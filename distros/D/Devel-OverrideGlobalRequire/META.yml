@@ -1,0 +1,43 @@
+---
+abstract: 'Override CORE::GLOBAL::require safely'
+author:
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - 'Andrew Main <zefram@cpan.org>'
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  List::Util: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300029, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-OverrideGlobalRequire
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Devel::OverrideGlobalRequire:
+    file: lib/Devel/OverrideGlobalRequire.pm
+    version: 0.001
+requires:
+  perl: 5.006
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-OverrideGlobalRequire
+  homepage: https://metacpan.org/release/Devel-OverrideGlobalRequire
+  repository: git://git.shadowcat.co.uk/p5sagit/Devel-OverrideGlobalRequire.git
+version: 0.001

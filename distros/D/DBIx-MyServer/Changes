@@ -1,0 +1,11 @@
+Revision history for Perl extension DBIx::MyServer.
+
+0.40 Thu Jul  5 04:51:23 EDT 2007
+	- DBIx::MyServer:DBI will correctly report column types, sizes and nullability if connecting to a MySQL server
+	- added myserver.pl with associated configuration files
+	- server salt is now generated fresh for every connection
+
+0.01  Wed Oct 25 15:53:33 2006
+	- original version; created by h2xs 1.23 with options
+		-AX -n DBIx::OurPerl
+

@@ -1,0 +1,34 @@
+---
+abstract: 'A dBase DBF converting processor'
+author:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DataFlow-Proc-DBF
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DataFlow: 1.11148
+  File::Spec: 0
+  File::Temp: 0
+  Moose: 1.09
+  MooseX::Aliases: 0
+  Test::More: 0
+  XBase: 0
+  autodie: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DataFlow-Proc-DBF
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/garu/DataFlow-Proc-DBF
+version: 0.03

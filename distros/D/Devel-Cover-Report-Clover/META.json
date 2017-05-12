@@ -1,0 +1,109 @@
+{
+   "abstract" : "Backend for Clover reporting of coverage statistics",
+   "author" : [
+      "David Bartle <captindave@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Cover-Report-Clover",
+   "no_index" : {
+      "directory" : [
+         "cover_db_test",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "File::Path" : "2.06",
+            "File::Which" : "1.08",
+            "FindBin" : "0",
+            "List::Util" : "0",
+            "TAP::Harness" : "0",
+            "Test::Exception" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::MockTime" : "0"
+         },
+         "requires" : {
+            "Class::Accessor" : "0",
+            "Devel::Cover" : "0",
+            "HTML::Parser" : "0",
+            "Template" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Cover::Report::Clover" : {
+         "file" : "lib/Devel/Cover/Report/Clover.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::Builder" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Builder.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::Class" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Class.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::File" : {
+         "file" : "lib/Devel/Cover/Report/Clover/File.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::FileFragment" : {
+         "file" : "lib/Devel/Cover/Report/Clover/File.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::FileRegistry" : {
+         "file" : "lib/Devel/Cover/Report/Clover/FileRegistry.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::Package" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Package.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::PackageFile" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Package.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::Project" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Project.pm",
+         "version" : "1.01"
+      },
+      "Devel::Cover::Report::Clover::Reportable" : {
+         "file" : "lib/Devel/Cover/Report/Clover/Reportable.pm",
+         "version" : "1.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-Cover-Report-Clover"
+      },
+      "homepage" : "https://github.com/captin411/devel-cover-report-clover",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/captin411/devel-cover-report-clover.git"
+      }
+   },
+   "version" : "1.01"
+}

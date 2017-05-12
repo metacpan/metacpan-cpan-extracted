@@ -1,0 +1,21 @@
+Revision history for Perl extension Db::Mediasurface::Cache.
+
+0.04  Fri Aug 3 17:32:56 2001
+        - complete rewrite (NWETTERS)
+          - lots faster
+        - changed behaviour (NWETTERS)
+          - only one key-value pair allowed to set
+
+0.03  Tue Jul 24 11:28:30 2001
+        - code cleanup (NWETTERS)
+          - get method is faster
+        - changed behaviour (NWETTERS)
+          - omitting size now defaults to infinite size
+        - added README
+
+0.02  Tue Jul 24 09:50:42 2001
+        - pod documentation fixed (NWETTERS)
+
+0.01  Mon Jul 23 19:17:55 2001
+	- original version created (NWETTERS)
+

@@ -1,0 +1,19 @@
+---
+abstract: 'helper methods for numeric columns'
+author:
+  - 'Sam Crawley <mutant.nz@gmail.com>'
+build_requires:
+  SQL::Translator: 0.11006
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101241'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Numeric
+recommends: {}
+requires:
+  DBIx::Class: 0.08121
+  Sub::Name: 0.04
+version: 0.004

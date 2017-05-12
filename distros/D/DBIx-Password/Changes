@@ -1,0 +1,33 @@
+Revision history for Perl extension DBIx::Password.
+
+1.9 Fri May 16 15:02:12 PDT 2008
+  - Added getVirtualUser for Jamie
+
+1.8 Tue Dec 19 15:29:39 PST 2006
+  - Added more undef around failures for connections
+
+1.7 Wed Dec 20 13:45:29 PST 2000
+	-Returns undef if DBI connect fails (never has 
+	 occured to me, but I can certainly see it being
+	 a problem).
+1.6 Mon Nov  6 13:44:10 PST 2000
+	-Fixed each operator
+	-Removed MakePauseHappy.
+1.5 Sun Oct 22 12:30:21 PDT 2000
+	-Added checkVirtualUser
+	-Added connect_cached
+	-More fixes to dummy file
+1.4 Sep 13 19:09:04 PDT 2000
+	-Added dummy file for CPAN
+1.3 Sep  8 11:58:29 2000 
+	-Added support for PostgreSQL
+	-Added port for MySQL
+	-Added support for just adding in the connect string raw
+1.2  Fri August 26 19:48:00 2000
+	- New version includes cache'ing of old methods
+		and getDriver() method that was needed for slashcode
+1.1  Fri July 1 14:29:27 2000
+	- First version released to the outside world
+0.01  Fri Jun 30 11:26:39 2000
+	- Created Makefile to make it easier for others to install
+

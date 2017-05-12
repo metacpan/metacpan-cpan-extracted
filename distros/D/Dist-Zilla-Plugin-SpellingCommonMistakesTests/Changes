@@ -1,0 +1,13 @@
+Revision history for Dist-Zilla-Plugin-SpellingCommonMistakesTests
+
+1.001000  2011-04-01 05:45:51 America/Chicago
+    [Enhancement]
+    *   Add Test::Pod::Spelling::CommonMistakes as a prereq
+
+1.000001  2011-03-17 06:12:34 America/Chicago
+    [BugFix]
+    *   Correct dist.ini name in the synopsis
+
+
+1.000000  2011-03-17 06:01:42 America/Chicago
+    *   Initial version

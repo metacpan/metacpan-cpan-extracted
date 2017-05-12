@@ -1,0 +1,24 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [AddFile::FromCommand]
+     cmd=ls -l /home/ujang/projects/
+     dest=share/ls.txt
+
+    To add more files:
+
+     [AddFile::FromCommand / 2]
+     code=netstat -anp | redact-ips
+     dest=share/sample-netstat-output.txt
+
+DESCRIPTION
+
+    This plugin adds a file from output of command specified in dist.ini.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::AddFile::FromFS
+
+    Dist::Zilla::Plugin::AddFile::FromCode
+

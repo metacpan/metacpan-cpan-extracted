@@ -1,0 +1,15 @@
+Copyright (c) 1997-1998 Nick Ing-Simmons. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+This module provides a basic way to discover if a piece of perl code
+is allocating perl data and not releasing them again.
+
+You install this package using CPAN.pm or the normal:
+
+perl Makefile.PL
+make
+make test 
+make install 
+
+process.

@@ -1,0 +1,240 @@
+Revision history for perl module Dist::Zilla::PluginBundle::Author::MAXHQ
+
+3.3.3 2016-07-27
+ [BUG FIXES]
+ - Made private plugin [ShareDir::ProjectDistDir] compatible with
+   Module::Build::Tiny (concerning share/)
+ - Accidentially excluded dist.ini from dist (thanks ETHER for pointing
+   out)
+
+ [REVISION]
+ - Added [Authority]
+ - Amazing! Discovered Dist::Zilla's integrated logger today
+
+3.3.2 2016-07-21
+ [REVISION]
+ - Replaced [ExtraTests] with [RunExtraTests]
+ - Added [MetaNoIndex] to exclude some directories
+ - Added [MetaProvides::Package]
+ - Added [MetaConfig]
+
+3.3.1 2016-07-21
+ [REVISION]
+ - Use Module::Build::Tiny instead of Module::Build to build/install the
+   dist
+
+3.3.0 2016-07-20
+ [+ENHANCEMENTS]
+ - Own (private) plugin [MAXHQ::BundleDepsDeep] to collect requirements
+
+ [REVISION]
+ - Remove Dist::Zilla's packages from requirement list
+
+3.2.1 2016-07-20
+ [BUG FIXES]
+ - Prevent CPAN from indexing private package
+   Dist::Zilla::Plugin::ShareDir::ProjectDistDir
+
+3.2.0 2016-07-20
+ [+ENHANCEMENTS]
+ - Don't add Dist::Zilla plugins as runtime requirements anymore
+
+ [REVISION]
+ - Replaced [PodCoverageTests] with [Test::Pod::Coverage::Configurable]
+ - Cleaned up some requirements
+
+3.1.2 2016-07-19
+ [BUG FIXES]
+ - Wrong syntax when telling [Git::Commit] which files to commit
+
+3.1.1 2016-07-19
+ [REVISION]
+ - Now using [CopyFilesFromBuild] instead of [CopyFilesFromRelease]
+
+3.1.0 2016-07-19
+ [+ENHANCEMENTS]
+ - Added [Test::EOL] and [Test::NoTabs]
+
+ [BUG FIXES]
+ - Also commit the updated "Changes" file to Git after release
+
+3.0.0 2016-07-19
+ [+ENHANCEMENTS]
+ - Copy back cpanfile from release (after it's updated)
+
+ [REVISION]
+ - Generate version numbers like a.b.c instead of a.bbbccc
+
+2.002001 2016-07-18
+ [BUG FIXES]
+ - Forgot to add new plugins [Test::Pod::*] to cpanfile
+ - Exclude cpanfile.snapshot from release
+
+ [REVISION]
+ - Switched from [GatherDir] to [Git::GatherDir]
+ - Removed [Pod2Html]
+
+2.002000 2016-07-15
+ [+ENHANCEMENTS]
+ - Added [Test::Pod::No404s] and [Test::Pod::LinkCheck]
+
+2.001000 2016-07-15
+ [+ENHANCEMENTS]
+ - Use Dist::Zilla::Plugin::Git to commit and tag releases
+
+ [REVISION]
+ - Added cpanfile which is always updated during release (i.e. copied back
+   from release) so that plugins in dist.ini and my bundle are
+   automatically listed
+
+2.000001 2016-07-01
+ [BUG FIXES]
+ - Added Test::Pod, Test::Pod::Coverage and Pod::Coverage::TrustPod to
+   requirements
+
+2.000000 2016-07-01
+ [*API CHANGES]
+ - Use cpanfile as base for prerequisites (via Prereqs::FromCPANfile)
+
+ [+ENHANCEMENTS]
+ - Plugin [CheckSelfDependency]
+
+ [BUG FIXES]
+ - Make Pod::Elemental::Transformer::List a runtime requirement again as we
+   specify the List plugin in Pod::Weaver::PluginBundle::Author::MAXHQ
+
+1.002001 2015-05-19
+ [BUG FIXES]
+ - Fixed regex that should match top level files to exclude (GatherDir
+   plugin)
+
+1.002000 2015-05-15
+ [+ENHANCEMENTS]
+ - It's now possible to prevent the use of any included plugin by
+   specifying an option 'PluginName = no'
+
+ [REVISION]
+ - Added options 'PodWeaver.replacer'
+
+1.001004 2015-05-13
+ [REVISION]
+ - Tell GatherDir to skip .build, .git, .svn and CVS
+
+1.001003 2015-02-03
+ [DOCUMENTATION]
+ - Updated doc with recent changes concerning required modules
+
+ [REVISION]
+ - Include dot files in dist
+
+1.001002 2015-02-03
+ [BUG FIXES]
+ - Requirements Pod::Elemental::Transformer::List and
+   Pod::Coverage::TrustPod are now correctly declared for phase "develop"
+   instead of "runtime"
+
+ [REVISION]
+ - Tell [GatherDir] to ignore extlib/
+ - Removed obsolete entry in dist.ini
+
+1.001001 2015-01-21
+ [REVISION]
+ - Removed Dist::Zilla-Plugin::Prereqs::MatchInstalled::All (thanks to
+   ETHER for pointing out that this causes grief to users)
+
+1.001000 2015-01-15
+ [+ENHANCEMENTS]
+ - Added "rex_task" as a PodWeaver POD keyword
+ - Rearranged headlines in POD
+
+ [BUG FIXES]
+ - Set version format to 1.222333 explicitely
+ - Added Pod::Elemental::Transformer::List as runtime requirement via
+
+ [DOCUMENTATION]
+ - Added (minimalistic) developer doc
+
+ [Prereq]
+ - Added Pod::Coverage::TrustPod as runtime requirement via [Prereq]
+ - POD headline for functions was empty
+ - Excluded Dist::Zilla::PluginBundle::Author::MAXHQ from requirements to
+   suppress build warning
+
+ [REVISION]
+ - Removed unneccessary weaver.ini (it's now part of the plugin bundle)
+
+1.000006 2014-08-04
+ [BUG FIXES]
+ - moved "no Moose" before __PACKAGE__->meta->make_immutable
+
+1.000005 2014-04-10
+ [DOCUMENTATION]
+ - fixed small typo
+
+1.000004 2014-04-10
+ [DOCUMENTATION]
+ - added equivalent dist.ini content
+ - removed internal method's documentation
+
+1.000003 2014-03-18
+ [REVISION]
+ - use versioning convention x.yyyzzz instead of x.y.z
+
+1.000002 2014-02-28
+ [REVISION]
+ - corrected Change file
+
+1.000001 2014-02-28
+ [REVISION]
+ - corrected Change file
+
+1.000000 2014-02-28
+ [*NEW FEATURES]
+ - new Pod::Weaver plugin bundle @Author::MAXHQ
+
+ [REVISION]
+ - Removed unneccessary "use Getopt::Long"
+ - Removed plugin "Clean"
+ - Replaced plugin "OurPkgVersion" by "PkgVersion" (as the latter now deals
+   with line numbers correctly)
+
+0.012000 2014-01-07
+ [+ENHANCEMENTS]
+ - Added bundle option GatherDir.exclude_match where excludes can be
+   specified
+
+0.011004 2013-11-29
+ [BUG FIXES]
+ - Placed NextRelease before NextVersion::Semantic, otherwise Changes file
+   will be messed up
+
+0.011003 2013-11-29
+ [REVISION]
+ - Changed groups in Changes file to be ordered the way I want it ;-)
+
+0.011002 2013-11-29
+ [DOCUMENTATION]
+ - Code formatting to make comments better readable
+
+ [REVISION]
+ - Replaced plugin LatestPrereqs with Prereqs::MatchInstalled::All
+ - Added NextVersion::Semantic and PreviousVersion::Changelog to the bundle
+
+0.011001 2013-11-26
+ [REVISION]
+ - Shortened version number
+
+0.0110000 2013-11-26
+ [+ENHANCEMENTS]
+ - Replaced code to extract inline tests with reference to new plugin
+   Dist::Zilla::Plugin::Test::Inline
+
+ [REVISION]
+ - Now using plugin NextVersion::Semantic for this module
+ - Added this Changes file
+
+0.0100021 2013-11-22
+ - Added documentation
+
+0.0100017 2013-11-22
+ - Initial release

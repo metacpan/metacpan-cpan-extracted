@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dancer/Plugin/Auth/RBAC/Credentials/DBIC.pm
+t/basic.t
+t/custom.t
+t/lib/TestSchema.pm
+t/lib/TestSchema/Result/CustomRole.pm
+t/lib/TestSchema/Result/CustomUser.pm
+t/lib/TestSchema/Result/User.pm
+t/release-pod-coverage.t
+t/release-pod-syntax.t

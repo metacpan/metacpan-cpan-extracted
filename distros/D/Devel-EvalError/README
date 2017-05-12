@@ -1,0 +1,17 @@
+Devel::EvalError -- Reliably detect if and why eval() failed
+
+See EvalError.pm for full (POD) documentation.
+
+Using Devel::EvalError encourages you to use more reliable ways to check
+whether eval() failed while also giving you access to the failure reason(s)
+even if $@ ended up empty.  (It also makes $@ ending up empty less likely
+for other uses of eval().)  Although it is common to check C<$@> to determine
+if a call to C<eval> failed, it is easy to make C<eval> fail while leaving
+C<$@> empty.
+
+    Copyright (c) 2008 Tye McQueen. All rights reserved.
+    This program is free software; you can redistribute it
+    and/or modify it under the same terms as Perl itself.
+
+Devel::EvalError has no prequisites other than Perl itself (and minimal
+core modules like strict.pm, vars.pm, and Carp.pm).

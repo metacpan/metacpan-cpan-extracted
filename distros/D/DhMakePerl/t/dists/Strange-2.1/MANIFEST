@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+Strange.pm
+Strange.xs
+test.pl

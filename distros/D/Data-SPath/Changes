@@ -1,0 +1,31 @@
+
+0.0004    2010-06-23 17:50:16 America/New_York
+    * general code cleanup
+    * added requirement for perl 5.010_000
+    * fixed bug where call to key_on_non_hash error handler was not being returned
+      for error handlers that do not croak
+    * using switch feature of 5.10.0 to improve readability
+    * moved argument parsing into a seperate function for
+      maintainability/readability
+    * removed EOLTests until:
+      1. Makefile.PL isn't generated with space at the end of the perl
+         require statement
+      2. EOLTests adds a skipfile option
+
+0.0003    2010-06-19 12:58:32 America/New_York
+    * added ability to call methods with simple arguments.
+        * arguments can be quoted with single or double quotes
+        * arguments can be barewords that match \w+
+    * added POD for arguments, still a little shady, but a start
+    * fixed _unqoute to unquote single or double quoted strings
+    * we now tokenize the path string first, simplifying code, easier to maintain
+    * fixed bug that made it not possible to have a key with a new line
+
+0.0002    2010-06-19 08:08:51 America/New_York
+    * fixed Pod linking errors
+    * added missing internal function _unquote
+    * added more testing which caught the missing function
+    * added more documentation about embedded quotes and slashes
+
+0.0001    2010-06-18 21:41:01 America/New_York
+    initial import

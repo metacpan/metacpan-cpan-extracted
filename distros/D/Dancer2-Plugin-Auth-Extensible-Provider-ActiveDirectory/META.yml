@@ -1,0 +1,32 @@
+---
+abstract: 'ActiveDirectory authentication provider for Dancer2::Plugin::Auth::Extensible'
+author:
+  - 'Dominic Sonntag <dominic@s5g.de>'
+build_requires:
+  Test::More: '0'
+  Test::Net::LDAP: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-Extensible-Provider-ActiveDirectory
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Auth::ActiveDirectory: '0'
+  Carp: '0'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin::Auth::Extensible: '0.620'
+  Moo: '2.000000'
+  YAML: '0'
+  namespace::clean: '0'
+  perl: '5.01'
+resources:
+  repository: https://github.com/sonntagd/Dancer2-Plugin-Auth-Extensible-Provider-ActiveDirectory.git
+version: '0.04'

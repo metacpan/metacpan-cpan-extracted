@@ -1,0 +1,13 @@
+---
+abstract: 'Copy to Other Places Plugin for Dist::Zilla'
+author:
+  - woosley.xu
+generated_by: 'Dist::Zilla version 1.093000'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CopyTo
+requires:
+  Dist::Zilla: 0
+version: 0.11

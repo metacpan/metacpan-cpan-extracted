@@ -1,0 +1,12 @@
+DBD::Neo4p - A DBI driver for Neo4j via REST::Neo4p
+
+Mark A. Jensen, Fortinbras Research
+
+See LICENSE for copyright and license info.
+
+To install, issue
+$ perl Build.PL
+$ ./Build
+$ ./Build test
+$ ./Build install
+from the distro directory.

@@ -1,0 +1,116 @@
+Revision history for Perl extension DBIx::MoCo.
+
+0.18 Sun Jun 8 2008
+	- Added DBIx::MoCo::Fixture by naoya
+	- Added session_cache method for obtaining session cache hash ref.
+	- Fixed a bug in flush_has_many_keys (deleting session cache)
+	- Added info to sql error messages (by naoya)
+	- Fixed DateTime problem with null columns (by naoya)
+	- Added scalar method to force scalar context from TT etc. (by naoya)
+	- Updated documents. (by kentaro)
+
+0.17 Fri Mar 7 2008
+	- Fixed zero primary key problem in _merge_objects
+	- Added list_class
+
+0.16 Wed Mar 5 2008
+	- Added string grep feature into MoCo::List->grep
+	- Changed cache style not to cache additional columns
+	- Changed retrieve_multi using OR clauses
+	- Fixed session_cache problem
+	- Added prefetch feature
+	- Added Cache::Dummy for session cache
+	- Changed default cache object to Cache::FastMmap
+	- Added auto require feature for relations using UNIVERSAL::require
+
+0.15 Fri Nov 2 2007
+     	- Changed has_many keys cache using cache instead of icache
+	- Changed find method to receive array arguments
+	- Changed search not to use MoCo's search
+
+0.14 Fri Jul 27 2007
+	- Added restore_from_db
+	- Added where check to update, delete
+	- Added ichache feature to cache in instance variables
+	- Added DBIx::MoCo::Column::utf8
+	- Added utf8_columns definition feature and utf8 flag handling
+	- Added session cache
+	- Chanded DBIx::MoCo::Relation to slim methods.
+	- Added MUID handling in object_ids.
+	- Added DBIx::MoCo::MUID for muid fields.
+	- Added DBIx::MoCo::Column::DateTime, UTCDateTime for L10n.
+
+0.13 Fri Apr 27 2007
+        - Added MoCo::Relation
+	- Added replication features
+	- Fixed AUTOLOAD and can problem
+	- Refactored cache, session, relation methods.
+	- Rewrote and sorted out pod documents.
+	- Fixed has_a_handler problem when retrieving null result
+
+0.12 Fri Apr 13 2007
+	- Added deflate function to DBIx::MoCo::Column handler
+	- Chaned count interface using search condition
+
+0.11 Sat Apr 7 2007
+	- Added index_of to DBIx::MoCo::List
+	- Changed _flush_belongs_to to flush_belongs_to for calling from other modules
+	- Changed retrieve_all_id_hash using DB->search for additional condition
+	- Added additional condition to has_many definition
+
+0.10 Mon Apr 2 2007
+	- Added before_create trigger to MoCo
+
+0.09 Fri Mar 30 2007
+	- Fixed retrieve null cache problem
+ 	- Added store(flush)_self_cache method for solving that
+	- Changed to not to cache when retrieve has failed
+	- Added quote method to MoCo
+	- Added find method to MoCo
+
+0.08 Mon Mar 12 2007
+	- Fixed unique_keys problem. (Sorry for misspelling)
+	- Added has_column method to DBIx::MoCo
+	- Added find method in DBIx::MoCo::List
+
+0.07 Fri Mar 9 2007
+	- Added DBIx::MoCo::Schema for schema definition
+	- Added count method to DBIx::MoCo
+	- Removed keys method and added unique_keys method to MoCo
+	- Changed primary_keys, unique_keys to get info automatically
+        - Added cache_status method to DBIx::MoCo
+	- Added DBIx::MoCo::Column and URI plugin for inflating columns
+	- Added DBIx::MoCo::Join for joined classes
+	- Added DBIx::MoCo::Readonly for read only classes.
+	- Fixed problem new session will start when save_changed is called.
+	- Added retrieve_by_a_or_b handler into DBIx::MoCo
+	- Added descriptions to MoCo's pod.
+	- Added retrieve_keys to MoCo
+
+0.06 Mon Feb 12 2007
+        - changed name from MoCo to DBIx::MoCo. (sorry to change so many times ;)
+	- changed DataBase->dbh using DBI->connect_cached.
+	- added cache_connection attribute in DataBase.
+
+0.05 Sat Feb 3 2007
+        - fixed bug that null cache with other key isn't flushed when a new record is inserted
+        - Added DBIx::MoCo->keys and changed flush_cache to flush all possible oids.
+        - fixed bug in create to set primary key
+	- changed croak in object_id to warning for new created object
+
+0.04 Wed Jan 31 2007
+        - changed name from Class::DBIx::MoCo to DBIx::MoCo
+	- added session & delay saving feature in DBIx::MoCo.
+	- changed AUTOLOAD behavior when undefined attr is called
+	- added retrieve_or_create method using prmary keys.
+
+0.03 Tue Jan 30 2007
+	- added param method to update db
+	- changed name from Class::TableObject to Clsss::DBIx::MoCo
+	- changed Class::DBIx::MoCo::Cache API same as Cache.pm
+
+0.02 Tue Jan 30 2007
+	- added param method (not update db yet)
+
+0.01 Mon Jan 29 2007
+	- initial version

@@ -1,0 +1,25 @@
+Revision history for Desktop-Notify
+
+0.05    2015-05-15
+        Cleanup documentation and tests
+
+0.04    2015-05-13
+        Add app_icon option
+        Add support for passing hints to the notification server. (patch from intrigeri)
+        Add support for a user-defined function to be called whenever an action is invoked. (patch from intrigeri)
+
+0.03    2009-12-25
+        Fixed regression in 0.02 when creating notification with timeout
+        Show a warning when closing a notification that has not been shown
+
+0.02    2009-12-24
+        Fixed non-numeric id/timeout bugs
+
+0.01    2007-05-07
+        Stuff that works:
+            creating/displaying/modifying/updating/closing nofitications
+            catching close signals
+        Stuff that's not implemented yet:
+            actions
+            hints
+            icons

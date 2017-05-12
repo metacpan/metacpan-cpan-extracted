@@ -1,0 +1,17 @@
+Revision history for Dash-Leak
+
+0.05    2010-05-30
+        Fix test for late allocations (give warn at END stage)
+
+0.04    2010-05-25
+        Just fix broken dependency in test
+
+0.03    2010-05-23
+        Fix linux version, fix docs, fix tests, fix $cb->($delta)
+
+0.02    2010-05-21
+        Include patch with linux support
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

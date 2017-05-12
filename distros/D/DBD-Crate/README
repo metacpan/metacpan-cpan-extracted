@@ -1,0 +1,57 @@
+DBD-Crate
+
+Perl interface to Crate DB through perl's most known
+database connector DBI
+
+INSTALLATION & TEST
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+OR
+	
+	cpan install DBD-Crate
+
+If you want to run the complete test suite, you need to have
+Crate DB installed and running, then set environment variable
+CRATE_HOST to crate "ip:port"
+
+on windows
+
+	$ set CRATE_HOST=127.0.0.1:4200
+
+on linux
+	
+	$ export CRATE_HOST=127.0.0.1:4200
+
+Then run tests as usual
+	
+	make test
+
+DOCUMENTATION
+	
+after installation you can read documentation from perldoc
+
+	perldoc DBD::Crate
+
+Other places for support and documentation see
+
+	github : 
+	https://github.com/mamod/DBD-Crate
+
+	metacpan:
+	https://metacpan.org/pod/DBD::Crate
+
+To report an issue please use github repo issues
+	
+	https://github.com/mamod/DBD-Crate/issues
+
+LICENSE AND COPYRIGHT
+	
+	This is a free software under perl's license
+
+	Copyright (C) 2015 Mamod Mehyar

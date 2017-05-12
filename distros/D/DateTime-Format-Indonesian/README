@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use DateTime::Format::Indonesian;
+    
+     my $dt = DateTime::Format::Indonesian->parse_datetime("14 agt 2013");
+
+DESCRIPTION
+
+    This is an early release. Not all things have been implemented yet.
+
+METHODS
+
+ new()
+
+ $fmt->format_datetime()
+
+    NOT YET IMPLEMENTED.
+
+ $fmt->parse_datetime($str) => OBJ
+
+    Parse an Indonesian string. Return undef if $str cannot be parsed.
+    Currently the recognized forms include:
+
+     dd-mmm-yy or dd-mmm-yy   (other separators include whitespace or dash)
+     dd-mmmm-yy or dd-mmmm-yy (long month names)
+
+SEE ALSO
+
+    DateTime
+

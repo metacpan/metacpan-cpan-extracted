@@ -1,0 +1,30 @@
+---
+abstract: "Release tests making sure all MANIFEST'ed modules pass use_oK()"
+author:
+  - 'Alexei Znamensky <russoz@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+  Test::UseAllModules: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Test-UseAllModules
+requires:
+  Dist::Zilla::Plugin::InlineFiles: 0
+  Dist::Zilla::Role::PrereqSource: 0
+  Moose: 0
+  Test::UseAllModules: 0.13
+  namespace::autoclean: 0
+resources:
+  homepage: https://github.com/russoz/Dist-Zilla-Plugin-Test-UseAllModules
+  repository: https://github.com/russoz/Dist-Zilla-Plugin-Test-UseAllModules.git
+version: 0.002

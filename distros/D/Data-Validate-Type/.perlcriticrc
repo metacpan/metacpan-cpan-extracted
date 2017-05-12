@@ -1,0 +1,16 @@
+# Change default severity to harsh.
+severity = harsh
+
+# Use only core PerlCritic policies.
+# This prevents tests from failing if the tester / installer has non-standard
+# additional PerlCritic policies.
+theme = core
+
+# Don't require /x on small regexes.
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 20
+
+# Allow private subroutines that start with an underscore followed by at least
+# three uppercase characters, which are subroutines coming from Params::Util.
+[Subroutines::ProtectPrivateSubs]
+private_name_regex = _(?![A-Z]{3,})\w+

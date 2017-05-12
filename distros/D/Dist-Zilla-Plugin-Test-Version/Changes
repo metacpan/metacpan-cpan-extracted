@@ -1,0 +1,92 @@
+Revision history for Dist-Zilla-Plugin-Test-Version
+
+1.09      2016-05-08
+  - Require Dist::Zilla 5.036
+
+1.08      2016-05-06
+  - migrated to Path::Tiny (ether gh#10)
+
+1.07      2016-05-02
+  - Add an "adaptive" option for is_strict.  This allows you to require
+    strict checking for production releases, while being less strict for
+    trial releases.
+  - Create file during the gather stage, but evaluate the template during
+    the munge files stage, as with similar such plugins (exaple [Test::EOL]).
+  - require latest version of Test::Script.
+    Some smokers were barfing on an "argument list too long" error,
+    and this should fix that issue.
+
+1.06      2016-04-24
+  - Handle the corner case where you specify a finder with no files
+    a little more gracefully.
+  - Compatability with Dist::Zilla 5.x, 6.x and hopefully 7.x
+
+1.05      2015-06-30
+  - Test is now generated as an author test (in xt/author instead of
+    xt/release) so it can be run on every commit rather than just before
+    release (Dave Rolsky gh#4)
+
+1.04      2015-06-17
+  - Added multiple option (requires Test::Version 2.02)
+
+1.03      2015-06-14
+  - Remove accidental prints introduced in previous version
+
+1.02      2015-05-12
+  - Restore friendlieness with Test::EOL when filename_match is not used.
+    Bug introduced in 1.00 (gh#3)
+
+1.01      2015-05-09
+  - Skip filename_match test unless Test::Version 2.00 or better (gh#2)
+
+1.00      2015-05-06
+  - Add support for filename_match property
+  - Add support for dzil file finder (finder property)
+
+0.04      2015-05-05
+  - New maintainer PLICEASE
+
+0.003001  2014-11-20
+  - didn't depend on Test::Version for testing
+
+0.003000  2014-11-20
+  - add Test::Version to DevelopRequires in consumer modules
+  - remove use of eval to prevent Test::Version from being added to
+    TestRequires. Don't use ExtraTests if you don't want this behavior GH #6
+
+0.002004  2012-04-05
+  - remove erroneous tab in test output and add a regression test GH #5
+
+0.002003  2012-04-04
+  - trim code for inserting the generated version comment
+  - recut just to insure fixed externally generated tests
+
+0.002002  2012-04-04
+  - fix unintentional underscore in last release
+
+0.002001  2012-04-03
+  - do not use Test::Requires in generated test, now fail test if
+    Test::Version not installed and running the release test
+
+0.002000  2012-03-18
+  - add some basic tests
+  - require use of Test::Version 1
+  - allow use of Test::Version 1.002 features, future versions may require 1.2
+
+0.001004  2011-12-10
+  - use Test::Requires rather than an eval. GH #3 [Karen Etheridge]
+  - change to perl floating point semantic version style due to toolchain
+    issues with version strings
+
+0.1.3     2011-07-23
+  - minor code improvements
+
+0.1.2     2011-06-02
+  - use Test::Version 0.04 in the test
+
+0.1.1     2011-05-31
+  - Rename project to  Dist::Zilla::Plugin::Test::Version
+  - Fix GH#1: Injected test has tabs [Mike Doherty]
+
+0.1.0     2011-05-28
+  - Initial release.

@@ -1,0 +1,28 @@
+#debugtoolbar_toolbar_frame {
+    background: #f4f4f4;
+    background-image: -moz-linear-gradient(top, #fff 0px, #f4f4f4 32px);
+    border: none;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    box-shadow: 1px 1px 2px #000000;
+    overflow: hidden;
+    padding: 0 0.4em;
+    position: fixed;
+    right: 5px;
+    top: 5px;
+    vertical-align: text-bottom;
+}
+
+#debugtoolbar_window_frame {
+    background: #fff no-repeat center center;
+    background-image: url("images/dcr-header-logo-semitransparent.png");
+    border: none;
+    border-radius: 0.6em;
+    -moz-border-radius: 0.6em;
+    box-shadow: 1px 1px 2px #000000;
+    font-family: Arial, Gill Sans, sans-serif;
+    left: 5px;
+    padding: 0;
+    position: fixed;
+    xwidth: 100%;
+}

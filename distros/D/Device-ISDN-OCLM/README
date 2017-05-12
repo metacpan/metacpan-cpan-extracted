@@ -1,0 +1,38 @@
+This package contains the Device::ISDN::OCLM.pm module with
+friends. This module provides access to the 3com OfficeConnect
+ISDN LanModem.
+
+You need perl5.004 or better to install this package. You also
+need the following additional packages:
+
+  URI
+  MIME-Base64
+  HTML-Parser
+  libnet
+  Digest-MD5
+  libwww-perl
+
+Either download these manually from http://www.cpan.org/ or else
+try the following:
+
+  perl -MCPAN -e "install Bundle::libnet"
+  perl -MCPAN -e "install Bundle::LWP"
+  perl -MCPAN -e "install HTTP::Request::Form"
+
+This uses the Perl CPAN module to automatically download all required
+modules.
+
+Installation of this module is as usual:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Questions about this module should be directed to the author,
+Merlin Hughes, <merlin@merlin.org>.
+
+Copyright 1999-2000 Merlin Hughes.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

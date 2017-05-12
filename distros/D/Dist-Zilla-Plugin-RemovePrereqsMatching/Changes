@@ -1,0 +1,8 @@
+Revision history for Dist-Zilla-Plugin-RemovePrereqsMatching
+
+0.002     2012-06-18 12:20:58 America/North_Dakota/New_Salem
+- dist.ini changes to make PAUSE happy (don't try to provide things we
+  shouldn't)
+
+0.001     2012-06-18 12:04:03 America/North_Dakota/New_Salem
+- First release

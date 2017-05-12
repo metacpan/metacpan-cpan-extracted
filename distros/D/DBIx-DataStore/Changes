@@ -1,0 +1,40 @@
+Revision history for DBIx-DataStore
+
+0.097   2016-12-08
+        - Conversion to dzil packaging and public release of library to CPAN to
+          assist with maintenance of applications with this legacy dependency.
+        - Additions of tests using SQLite.
+        - Changes to the library itself since 0.096 limited almost exclusively
+          to packaging, testing, and documentation. Functionality is unaltered.
+
+0.096   2013-05-23
+        - Ugly work-around to properly handle CTEs as read-oriented DML.
+        - Minor bugfixes.
+
+0.095   2013-01-15
+        - Finally added a new entry to the horribly decrepit and out of date
+          Changes file.
+        - Dropping the code on Github, without any further modifications.
+
+0.094   2012-01-11
+
+0.093   2012-01-11
+
+0.092   2011-04-27
+
+0.085   2009-03-16
+
+0.081   2007-11-02
+        - Brand-new YAML config loader with support for multiple datastore
+          configs in one location, auto-discovery of appropriate config based
+          on top-level package namespace in stack, new syntax in constructor.
+        - Various bug fixes from the last version of SQL::Wrapper.
+        - Cleaner debugging support (code still needs a lot more DEBUG checks).
+        - New methods: hashref(), next_hashref(), schemas().
+        - Automatic rollbacks on connect in the event a cached connection is
+          returned with a stale transaction still open.
+
+0.080   2007-11-02
+        - Branch from original in-house only SQL::Wrapper to the new
+          name DBIx::DataStore.
+

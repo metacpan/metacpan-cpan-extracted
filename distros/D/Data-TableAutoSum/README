@@ -1,0 +1,78 @@
+Data/TableAutoSum version 0.08
+==============================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+Note that the test can take a little time.
+At my 1.1 GHz computer,
+it needs 80 seconds.
+   
+SYNOPSIS
+      use Data::TableAutoSum;
+  
+      my $table = Data::TableAutoSum->new(rows => 10, cols => 20);
+      # or
+      my $table = Data::TableAutoSum->new(rows => ['New York', 'L.A.', 'Chicago'],
+      foreach my $row ($table->rows()) {
+         foreach my $col ($table->cols()) {
+            $table->data($row,$col) = rand();
+            $table->data($row,$col) += $table->data($row-1,$col-1) 
+                if $row >= 1 && $col >= 1;
+         }
+      }
+
+      $table->change(sub {$_ = int ($_ / 10)}); # World War III perhaps
+  
+      print "Row $_ has result: ",$table->rowresult($_) for $table->rows();
+      print "Col $_ has result: ",$table->colresult($_) for $table->cols();
+      print "Table has the total result: ",$table->totalresult();   
+
+      print "Let's have a look to the whole table:\n", $table->as_string;
+
+      $table->store('random.dat');
+      my $old_random_data = Data::TableAutoSum->read('random.dat');
+      
+      # or thinking, we have generated a 
+      # table for the population( [cities], [centre, suburb] )
+      # and a similar table with the crimes( [cities], [centre, suburb] )
+      # we can calculate the crimes per citizen with
+      $crime_rate = Data::TableAutoSum->merge(
+         sub {shift() / shift()}, $crimes, $population
+      );
+      
+
+REQUIREMENTS
+       Params::Validate
+       Regexp::Common
+       Set::Scalar
+       List::Util 
+       Tie::File
+       Tie::CSV_File
+       Data::Compare
+       
+       Math::Random            # for the tests
+       Set::CrossProduct  
+       Data::Dumper       
+
+       Test::More         
+       Test::Exception    
+       Test::Builder
+
+SEE ALSO
+    Data::Xtab, Data::Pivot, Table::Pivoter, AnyData
+
+AUTHOR
+    Janek Schleicher, <bigj@kamelfreund.de>
+
+COPYRIGHT AND LICENSE
+    Copyright 2002 by Janek Schleicher
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

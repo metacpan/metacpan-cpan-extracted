@@ -1,0 +1,41 @@
+Revision history for Perl extension DBIx-Lookup-Field
+
+2.101420  2010-05-22 13:58:57 Europe/Vienna
+    - set major version to 2 to preserve CPAN continuity
+
+1.100850  2010-03-26 21:27:40 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+1.25  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+1.24  Thu, 29 May 2008 12:04:23 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - added t/perlcriticrc
+    - updated MANIFEST
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+1.23  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+1.22  Mon, 10 Sep 2007 09:12:36 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - converted to new-style distro (ShipIt, Module::Install)
+    - fixed documentation
+    - moved files to where they should be
+
+1.21  Tue, 10 Sep 2002 17:04:25 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - Test::Distribution was still called Test::Comprehensive when 1.2 was
+      released, so that got changed (thanks florian)
+
+1.02  Mon, 02 Sep 2002 18:40:48 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - added dbi_lookup_field_with_reverse()
+
+0.01  Thu, 26 Oct 2000 12:03:21 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

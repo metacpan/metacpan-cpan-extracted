@@ -1,0 +1,18 @@
+[%-# Create a 'Table of Contents' section, if there are more than one
+   # sections
+   #
+   # Expected args:
+   # toc - an array ref with keys: link, title, abstract, subs
+   #       (subs is optional and includes a similar array)
+-%]
+[%- IF toc.size && toc.0.title -%]
+
+    <h3>Table of Contents</h3>
+    <div class="toc">
+        [%- INCLUDE page_toc_section subs=toc -%]
+    </div>
+
+[%- ELSE -%]
+
+    <br>
+[%- END -%]

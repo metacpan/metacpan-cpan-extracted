@@ -1,0 +1,14 @@
+These are the Git branches I use when developing this distribution:
+
+    - dev: The main development branch. Usually I apply commits here
+      directly unless I'm working on a major feature.
+
+    - dev-dist: This is a branch *generated* by a script I run locally
+      that basically calls "make test manifest dist" and then "git
+      commit" on the results.
+
+    - master: Records the points in time when a stable release is made.
+      I usually only merge into this branch from the devel branch,
+
+    - master-dist: Records the points in time when a stable release is
+      made.  I only merge into this branch from the devel-dist branch.

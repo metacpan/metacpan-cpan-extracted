@@ -1,0 +1,9 @@
+[% INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget" 
+%]
+
+[% INCLUDE body %]
+ 
+[% INCLUDE tail %]
+

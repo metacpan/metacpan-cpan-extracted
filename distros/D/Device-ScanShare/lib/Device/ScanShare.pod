@@ -1,0 +1,229 @@
+=pod
+
+=head1 NAME
+
+Device::ScanShare - manage USERDIRTS.TXT ecopy file to manage scanner device options
+
+=head1 SYNOPSYS
+	
+	use Device::ScanShare;
+   
+	my $scanshare = new Device::ScanShare({
+		userdirs_abs_path => '/var/www/Content/USERDIRS.TXT', 
+			# therefore all paths saved are /var/www/Content/$PATH
+		server => '192.168.0.150',	
+		default_host => 'Dyer05',		
+	});
+   
+	$scanshare->user_add({
+		label=>'Martin', 
+		path=>'/home/martin/incoming',
+	});
+   
+	$scanshare->save;
+
+
+=head1 DESCRIPTION
+
+ScanShare is a oo module to work with the USERDIRS.TXT file used by ecopy for use with 
+their ShareScan software.
+This enables you to control what the entries are via perl. 
+You can add and remove entries to the file.
+
+
+
+=head2 MOTIVATION
+
+We use ecopy and sharescan software in the office. This is so someone can step 
+up to the scanner and scan to a predetermined place. They have a little touchscreen.. 
+you punch in where you want to send it to, the name of the file, and voila. 
+What you can select from is controlled via a file called USERDIRS.TXT. 
+In it are entries like ;
+
+	The Label=relative\dir\path,The Label,HostName,1,0
+
+You can edit the damn thing in a text editor. If you have a jillion entries (like we have, 
+upwards of 500), then you do not want to micro manage this by either using their crippled 
+interface or via a text editor. Linux and perl to the rescue. 
+
+Included is also a utility called sharescan that will let you edit the file via the 
+command line. It is called L<scanshare>.
+
+
+=cut
+
+
+
+
+
+=head1 METHODS
+
+=head2 new()
+
+Argument is hash ref.
+
+Arguments in hash ref are:
+
+1. 'userdirs_abs_path': the path to the userdirs file
+2. 'server': the server ip as per USERDIRS.TXT
+3. 'default_host': the host for each line (Dyer05 in this example)
+
+	my $scanshare = new Device::ScanShare({
+		userdirs_abs_path => '/var/www/Content/USERDIRS.TXT',
+		server => '192.168.0.150',	
+		default_host => 'Dyer05',
+	});
+
+=head2 userdirs_abs_path()
+
+Takes no argument, abs path to USERDIRS.TXT file.
+Must be provided via constructor.
+
+=head2 abs_base()
+
+Perl setget method, abs path to where USERDIRS.TXT resides, doesn't need to be provided.
+Entries start from here.
+
+=head2 create()
+
+Takes no argument. Called after adding users or to create blank file.
+Will warn and return false if already on disk.
+
+Will create a new USERDIRS.TXT file in the argument provided to the constructor.
+That is, if you want to create a new file:
+
+	my $s = new Device::ScanShare({
+		userdirs_abs_path => cwd().'/t/USERDIRS.TXT',
+		server => '192.168.0.150',
+		default_host => 'Dyer05',
+	});
+
+	$s->create;
+
+create() will return true or false, will carp if file already exists or if create is not
+successful.
+
+=head2 exists()
+
+Takes no argument.
+Returns boolean. 
+
+Checks if userdirs file exists already or not.
+
+=head2 exists_label()
+
+Argument is label string.
+Checks if there is an entry with this label.
+Returns bool.
+
+=head2 exists_path()
+
+Argument is path.
+Checks if there is an entry with this path.
+Returns bool.
+
+=head2 get_users()
+
+Returns array ref with hashes of data for each userdirs entry- if you have made any additions or removals, this is
+reflected. Results are orderded by 'label'.
+
+This method is also used internally to save.
+
+	my @all = $scanshare->get_users();
+
+=head2 get_user()
+
+get userdirs line entry data by path, returns hash
+
+	my $userx = $scanshare->get_user('/path/to/target_directory');
+	print $userx->{label} . ' is set up to scan to directory: '. $userx->{path};
+
+=head2 save()
+
+save changes to userdirs file
+
+	$scanshare->save();
+
+=head2 count()
+
+Returns how many userdirs there are
+
+	my $count = $scanshare->count();
+
+
+
+=head1 METHODS FOR ADDING AND REMOVING ENTRIES
+
+Please note user_add() and user_delete() will save changes to the file.
+
+=head2 user_add()
+
+insert new userdir into records, takes arguments label, and absolute path.
+returns 0 if it already exists (by path), returns 1 on success.
+
+	my $path = '/path/to/dirx';
+	my $label = 'a new scan destination';
+	
+	$scanshare->user_add({ label=>$label, path=>$path }) 
+		or die("entry already existed for the destination $path");
+
+
+=head2 user_delete()
+
+delete user record, takes absolute path to directory that it saves to as argument
+
+	$scanshare->user_delete('/path/to/target_directory');
+	$scanshare->save(); # optionally save it to commit changes.
+
+returns 1 on success
+returns nothing if entry did not exist	
+
+
+=cut
+
+
+
+
+
+
+
+=head1 BUGS
+
+Please contact the L<AUTHOR> with any problems, feature requests, or bugs.
+You can also file in http://rt.cpan.org
+
+=head1 NOTES
+
+Example of a valid USERDIRS.TXT file:
+
+	[PreferredServer]
+	Server=192.168.0.130
+	[RoutingID]
+	NextID=4
+	[Users]
+	Great Place=relative\to\userdirs\location,Great Place,Host04,1,0
+	Also a Great Place=relative\also,Also a Great Place,Host04,2,0
+	Documents=misc\documents,Documents,Host04,3,0
+
+Note the increment 1, 2, 3.. This is taken care of this module.
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=head1 COPYRIGHT
+
+Copyright (c) 2009 Leo Charre. All rights reserved.
+
+=head1 LICENSE
+
+This package is free software; you can redistribute it and/or modify it under the same terms as Perl itself, i.e., under the terms of the "Artistic License" or the "GNU General Public License".
+
+=head1 DISCLAIMER
+
+This package is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+See the "GNU General Public License" for more details.
+   
+=cut
+

@@ -1,0 +1,54 @@
+Date::Roman
+===========
+
+DESCRIPTION
+
+This module defines a class for handling Roman dates as defined by
+Julius Caesar in 45 BC.
+
+The distribution also includes a sample script that will be installed 
+as RomanDate
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  *  Roman
+  *  Getopt::Long
+  *  Test::More (only for the 'test' target)
+
+CHANGES
+
+1.05  Sun Apr 21 09:36:08 2002
+	- corrected a bug in the RomanDate, 
+		added test for the script,
+		revised CPAN version;
+
+1.04  Sun Apr 21 00:10:04 2002
+	- added the RomanDate script;
+
+1.03  Sat Apr 20 21:44:07 2002
+	- corrected typos in the pod
+		original CPAN version;
+
+1.02  Sat Apr 20 21:42:12 2002
+	- preliminar CPAN version;
+
+
+COPYRIGHT AND LICENCE
+
+This software is Copyright (C) 2002 by Leo Cacciari.  This software is free
+software; you can redistribute it and/or modify it under the terms of
+the Perl Artistic License, either as stated in the enclosed LICENSE
+file or (at your option) as given on the Perl home site: 
+http://www.perl.com/language/misc/Artistic.html

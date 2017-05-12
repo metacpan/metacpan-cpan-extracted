@@ -1,0 +1,151 @@
+2012-01-12 Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.24
+	
+	fixed bug with newly created records
+
+2011-06-14 Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.23
+	
+	fixed issues with auto decode/encode data fields
+	fixed oracle package
+	now test completes on mysql and postgresql
+
+
+2011-04-14 Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.22
+	
+	completely rewritten
+	now contains values, fetched from db
+	new object interface
+	embed emulation
+	many minor improvements
+	
+2011-03-27 Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.21
+	
+	restored lost 0.20 release
+	added simplified interface for collection
+
+2010-07-27 Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.20 
+	
+	various fixes with virtual packages
+	new select/update/delete mechanism
+	using vendor aware sql/code
+	removed test packages - now we use virtual packages in tests
+
+2010-06-24	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.19
+	
+	fixed issue with autoconversion
+
+2010-06-22	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.18
+	
+	mainly fix for (auto) encode/decode data fields
+	also fixed timezone for time::piece
+
+2010-04-05	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.17
+	
+	fix for oracle table name redefinition, varchar2 issue
+	fix for virtual entity
+	
+2010-01-17	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.16
+	
+	fix for tests
+
+2010-01-16	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.15
+	
+	minor fix
+	added parametrized group by, order by and limit/offset sql support
+	new collection method, 'records', to avoid noise of 'list'
+	
+
+2010-01-10	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.14
+	
+	reliable dump_fields_include
+	basic support for fieldset fetch support
+
+2009-11-01	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.13
+	
+	added nullable and default properties for column/field description
+
+2009-10-30	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.12
+	
+	fix issue when no primary key in table
+
+2009-10-30	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.11
+	
+	Project::Easy integration fixes
+
+2009-06-01	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.09
+	
+	Fix for oracle sequencers
+	
+	Added Helper package for various helping tasks
+
+
+2009-05-20	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.08
+
+	Added more support for Oracle:
+		Fix for pimary key info
+		Added support for fetch sequence currval after insert 
+			(because support for last_insert_id is unavailable)
+		
+	Now all fields prefixed with underscore treated as sql.
+		Bindings for these fields is available as sql named placeholders
+		Named placeholders converted to ? because lack of support in mysql
+	
+	All DATE, DATETIME and TIMESTAMP(?:\(\d+\))? fields automatically converted
+		before send to database and after fetch from database
+		Oracle suport is available only when developer manually sets NLS_DATE_FORMAT
+		
+	Time::Piece now required for installation
+	
+	Removed patches for old DBD::SQLite
+
+2009-05-04	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.05
+
+	Added partial support for Oracle
+	Added support for handled fetch
+	Extended SQL support 
+
+
+2009-03-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.02
+
+	Fixed tests
+
+2009-02-11	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 0.1
+
+	Initial revision

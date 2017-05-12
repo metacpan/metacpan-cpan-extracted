@@ -1,0 +1,119 @@
+DateTime-Indic
+
+This distribution consists of modules for manipulating dates in various 
+traditional Indian calendar systems.  Currently the following calendars
+are supported:
+
+South Indian Shalivahana Shaka
+Gujarati Vikrama Samvata
+Halari/Kutchhi Samvata
+
+INSTALLATION
+
+If you have the Module::Signature module installed, you can verify the
+integrity of this distribution by typing:
+
+    cpansign -v
+
+Module::Signature requires GnuPG which you can get from: 
+http://www.gnupg.org/download/
+A binary version for Windows is available from that page.
+        
+Then to install this module, run the following commands:
+
+    perl Build.pl
+    ./Build
+    ./Build test
+    ./Build install
+    
+On Windows you don't need to type the preliminary ./
+
+Alternatively, you can do:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+If you are using ActiveState perl on Windows and you don't have a make 
+utility, you can download nmake from:
+http://download.microsoft.com/download/vc15/patch/1.52/w95/en-us/nmake15.exe
+(Replace make with nmake in the instructions above if you are using it.)
+
+If you are using Strawberry perl on Windows, it comes with a make utility 
+called dmake.  (Replace make with dmake in the instructions above if you are
+using it.)
+
+Using this module requires these distributions:
+
+DateTime
+DateTime-Event-Lunar (0.06 or above)
+DateTime-Event-Sunrise
+DateTime-Util-Calc (0.13 or above)
+Params-Validate
+
+At build time you will need these plus the following if you want to run all 
+the tests
+
+Module-Signature
+Test-Pod (1.22 or above)
+Test-Pod-Coverage (1.04 or above)
+Test-Perl-Critic (This test will only run if the env var TEST_AUTHOR has a 
+                  true value)
+
+They are all available on CPAN (http://www.cpan.org)
+
+BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/jaldhar/panchanga/issues>. I
+will be notified, and then you’ll automatically be notified of progress
+on your bug as I make changes. B<Please do not use rt.cpan.org!.>
+
+SUPPORT
+
+Support requests for this module and questions about panchanga ganita should
+be sent to the panchanga-devel@lists.braincells.com email list. See
+L<http://lists.braincells.com/> for more details.
+
+Questions related to the DateTime API should be sent to the
+datetime@perl.org email list. See L<http://lists.perl.org/> for more details.
+
+You can also look for information at:
+
+* This projects git source code repository
+
+https://github.com/jaldhar/panchanga/tree/master/perl
+
+* AnnoCPAN: Annotated CPAN documentation
+
+http://annocpan.org/dist/DateTime-Indic
+
+* CPAN Ratings
+
+http://cpanratings.perl.org/d/DateTime-Indic
+
+* Search CPAN
+
+http://search.cpan.org/dist/DateTime-Indic
+
+AUTHOR
+
+Jaldhar H. Vyas, <jaldhar at braincells.com>
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009, Consolidated Braincells Inc.
+
+This distribution is free software; you can redistribute it and/or modify it 
+under the terms of either:
+ 
+a) the GNU General Public License as published by the Free Software 
+Foundation; either version 2, or (at your option) any later version, or
+ 
+b) the Artistic License version 2.0.
+ 
+The full text of the license can be found in the LICENSE file included
+with this distribution.
+
+$Id$

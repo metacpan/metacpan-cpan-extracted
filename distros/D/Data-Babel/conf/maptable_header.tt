@@ -1,0 +1,5 @@
+[%- BLOCK maptable -%]
+[%- RAWPERL %] $output.='[maptable_'.sprintf("%03d",++$Template::Context::maptable_counter).']'; [% END -%]
+[%- END -%]
+
+[%- MACRO maptable PROCESS maptable -%]

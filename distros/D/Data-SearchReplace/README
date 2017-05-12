@@ -1,0 +1,25 @@
+Data::SearchReplace version 1.02
+================================
+
+Provides the ability to perform search and replace functions to
+all the values in complex data structures.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+none.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2007 by Stephen D. Wells.  All rights reserved.
+ 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,57 @@
+---
+abstract: 'An implementation of the Data Mapper pattern (object-relational mapper).'
+author:
+  - 'Eisuke Oishi'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.97'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-ObjectMapper
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Bit::Vector: 0
+  DateTime::Format::MySQL: 0
+  DateTime::Format::Pg: 0
+  Log::Any::Adapter::Dispatch: 0
+  Mouse: 0.42
+requires:
+  Cache::LRU: 0
+  Capture::Tiny: 0
+  Carp::Clan: 0
+  Class::Data::Inheritable: 0
+  Class::Inspector: 0
+  Class::MOP: 0
+  DBD::SQLite: 1.14
+  DBI: 1.4
+  Data::Dump: 0
+  Data::Page: 2
+  DateTime: 0
+  DateTime::Format::SQLite: 0
+  Digest::MD5: 0
+  Filter::Util::Call: 0
+  Hash::Merge: 0.12
+  List::MoreUtils: 0
+  Log::Any: 0
+  Module::Find: 0
+  Params::Validate: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  Text::Balanced: 0
+  Try::Tiny: 0
+  URI: 0
+  YAML: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/eisuke/dbix-objectmapper.git
+version: 0.3013

@@ -1,0 +1,44 @@
+{
+   "abstract" : "Content negotiation plugin for Dancer",
+   "author" : [
+      "David Zurborg <zurborg@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Negotiate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.312",
+            "HTTP::Negotiate" : "6.01",
+            "Modern::Perl" : "0",
+            "Test::Most" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.031"
+}

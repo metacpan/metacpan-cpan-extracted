@@ -1,0 +1,39 @@
+0.09 Fri, Sep 23, 2011
+    - Close issue #2 - Use BSD::Process maxrss instead of rssize, which was incorrect
+    - Out of beta!
+
+0.08 Sun, Jun 26, 2011
+    - Close issue #1 - callbacks could cause memory growth and incorrect results
+
+0.07 Sat, Jun 11, 2011
+    - Better test case to ensure memory traces are detected
+
+0.06 Fri, Jun 10, 2011
+    - Promotion to beta status
+
+0.05 Fri, Jun 10, 2011
+
+    - Better test coverage
+    - Disable tracing using $DB::single = 0, huge performance gain
+    - Allow tracing of compile-time
+    - Make Devel::MemoryTrace::Light fork safe
+    - Allow custom providers / preferred providers
+    - Doc fixes
+
+0.04 Sun, Apr 17, 2011
+
+    - Set dynamic_build to 1 in META.yml to hopefully resolve
+      build issues
+
+0.03 Fri, Apr 15, 2011
+
+    - Added simple test so at least some functionality is ensured
+
+0.02 Fri, Apr 15, 2011
+
+    - Doc fixes/additions
+    - Only use GTop on FreeBSD if it's already installed
+
+0.01 Thu, Apr 14, 2011
+
+    - Initial (alpha) version

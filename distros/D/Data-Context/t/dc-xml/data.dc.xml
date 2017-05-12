@@ -1,0 +1,22 @@
+<blah>
+    <TYPE>DEFAULT</TYPE>
+    <basic>text</basic>
+    <number>25</number>
+    <hash>
+        <content>
+            <METHOD>expand_vars</METHOD>
+            <value>test.value.0</value>
+        </content>
+        <straight_var>#test.value.1#</straight_var>
+        <longrunning>
+            <MODULE>main</MODULE>
+            <url>http://slashdot.org/</url>
+        </longrunning>
+        <shortrunning>
+            <MODULE>main</MODULE>
+            <url>http://www.google.com/</url>
+        </shortrunning>
+    </hash>
+    <list>one</list>
+    <list>two</list>
+</blah>

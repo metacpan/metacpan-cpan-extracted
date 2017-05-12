@@ -1,0 +1,26 @@
+Revision history for Perl module Date::WeekNumber
+
+0.05 2015-10-25
+    - Updated github repo URL (metadata, doc) after changing my github username
+    - Include META.json in release tarball ([MetaJSON] in dist.ini)
+    - Tag and push to github on release
+
+0.04 2014-04-11
+    - Added t/03-bad-inputs.t testing various cases of bad inputs
+    - Added more error checking as a result of coverage testing the above
+    - Tweaked documentation to get 100% pod coverage.
+
+0.03 2014-03-28
+    - Updated SEE ALSO: Date::WeekOfYear now returns ISO 8601 week number
+      by default, and supports the old week number scheme as an option.
+    - Updated SEE ALSO: the doc Date::ISO now mentions the iso_year() method.
+
+0.02 2014-03-06
+    - POSIX::strftime() doesn't handle %G or %V on Windows. Sigh.
+      We now use strftime() for cpan_week_number() and Date::Calc()
+      for iso_week_number().
+    - Added Date::ISO8601 and Date::ISO to SEE ALSO
+
+0.01 2014-03-03
+    - First release to CPAN
+

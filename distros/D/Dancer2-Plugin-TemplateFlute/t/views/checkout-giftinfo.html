@@ -1,0 +1,38 @@
+		<form name="giftinfo" class="frm-default" action="/checkout" method="POST">
+			<ul>
+				<li>
+					<label>Name</label>
+					<input type="text" name="first_name"/>
+				</li>
+				<li>
+					<label>Surname</label>
+					<input type="text" name="last_name"/>
+				</li>
+                <li>
+				  <label>Day</label>
+				  <select class="fld-date" name="day">
+					<option>Test, 17</option>
+				  </select>
+				</li>
+			</ul>
+			<input type="submit" name="submit" value="Go" class="btn-submit" />
+        </form>
+		<form name="giftdetails" class="frm-default" action="/checkout" method="POST">
+			<ul>
+				<li>
+					<label>Gender</label>
+					<input type="text" name="gender"/>
+				</li>
+				<li>
+					<label>Address</label>
+					<input type="text" name="address"/>
+				</li>
+                <li>
+				  <label>Year</label>
+				  <select class="fld-date" name="year">
+					<option>Test, 17</option>
+				  </select>
+				</li>
+			</ul>
+			<input type="submit" name="submit_details" value="Go" class="btn-submit" />
+        </form>

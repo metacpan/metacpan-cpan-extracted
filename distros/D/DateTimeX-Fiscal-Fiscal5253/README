@@ -1,0 +1,70 @@
+DateTimeX-Fiscal-Fiscal5253 version 0.01
+===================================
+
+Compute dates used to create a 52/53 week calendar from a DateTime object.
+
+The 52/53 week calendar is a fiscal calendar standard widely used by
+companies that need easy comparison between sales periods from year
+to year. It is recognized as a Generally Accepted Accounting Practice and
+by the IRS as an alternative to a traditional calendar year or a fiscal
+year based on twelve calendar months.
+
+Its primary distinguishing characteristic is that it always begins and ends
+on the same weekday. In addition, a 52/53 week year will always have exactly
+52 or 53 perfect seven day weeks, yielding calendars that always have
+either 364 or 371 days. This is what makes it useful for year-over-year
+comparisons where seasonal factors such as holidays are important.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  DateTime
+
+ERROR HANDLING
+
+After reading far too many discussions about "best practice" for error
+handling, espeically by constructors, I have been persuaded that "dieing"
+(via a croak) is the best thing for this module to do. The reasons ave varied:
+
+1. The practice of returning "undef" is largely a holdover from the days of
+the C programming language and be readily emulated by using the following:
+
+    my $object = eval { DateTimeX::Fiscal::Fiscal5253->new() };
+
+2. Returning "undef" and making people check a global error method/variable
+is no different that using the above and having them check "$@" (which can
+be invalid under certain conditions.)
+
+3. Try::Tiny addresses the problem with number 2 above.
+
+4. Returning an object in the face of error conditions just seems wrong!
+
+5. All of the error conditions being trapped are fatal anyway, so throwing
+an exception is probably the right thing to do so code can be corrected.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Jim Bacon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.
+
+The full text of the license can be found in the LICENSE file included
+with this module.

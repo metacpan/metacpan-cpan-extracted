@@ -1,0 +1,40 @@
+NAME
+    DJabberd::Plugin::Balancer - Load balancing djabberd plugin
+
+SYNOPSIS
+      <VHost ...>
+        <Plugin DJabberd::Plugin::Balancer/>
+        ...
+      </VHost>
+
+DESCRIPTION
+    This is a simple load balancer plugin for djabberd that works by
+    distributing all the messages for a single fully qualified JID through
+    several clients.
+
+    Every time a client binds to a resource, this plugin will record that
+    trial and return a different resource, including a sufix in the #999
+    format. The original JID will be saved as a load balancing endpoint.
+    Other clients then can try to bind to the same resource, and will also
+    be assigned different JIDs, but all that will be recorded.
+
+    If some client, on the other hand, tries to bind to the resource of
+    another real client (already with the #999 sufix), the bind will be
+    denied.
+
+    When a message arrives for the load-balancing-endpoint JID, it will be
+    dispatched randomly through all the clients that tried to bind to that
+    resource.
+
+    Messages to the real JIDs will be delivered normally, iq stanzas will
+    work as expected, since when sending that, the client will send using
+    the JID assigned by the server.
+
+DIFFERENCES
+    Unlike the default behaviour, on a real-JID conflict, the new connection
+    will be dropped, and not the old one.
+
+COPYRIGHT
+    This module was created by "Daniel Ruoso" <daniel@ruoso.com>. It is
+    licensed under both the GNU GPL and the Artistic License.
+

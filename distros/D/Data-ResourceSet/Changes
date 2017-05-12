@@ -1,0 +1,13 @@
+Changes
+=======
+
+0.00003 19 May 2008
+    - Moose-fy
+    - No more $class->config, unless you explicitly make the class
+      have one from outside.
+
+0.00002 26 Apr 2008
+    - Typo
+
+0.00001 26 Apr 2008
+    - Initial release

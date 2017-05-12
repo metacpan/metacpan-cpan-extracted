@@ -1,0 +1,12 @@
+TODO:
+    - Add content-source plugin stuff
+    - Integrate with ShareDir?
+
+0.003 Friday June 12 09:16:54 PDT 2009:
+    - Fixed SYNOPSIS
+
+0.002 Thursday May 14 20:26:12 PDT 2009:
+    - Include Directory::Scratch dependency in Makefile.PL
+
+0.001 Saturday May 09 11:50:24 PDT 2009:
+    - Initial release

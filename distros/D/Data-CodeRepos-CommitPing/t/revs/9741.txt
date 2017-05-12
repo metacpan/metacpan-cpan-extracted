@@ -1,0 +1,92 @@
+---
+author: hanekomu
+comment: |-2
+   r6049@nbgr:  marcel | 2008-04-18 16:20:12 +0200
+   lang/perl/Class-Accessor-Bundle: initial commit
+date: 2008-04-18 23:20:29 +0900
+files:
+  - path: lang/perl/
+    status: _U
+  - path: lang/perl/Class-Accessor-Bundle/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/.shipit
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/Changes
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/MANIFEST
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/Makefile.PL
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/README
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/lib/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/lib/Class/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/lib/Class/Accessor/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/lib/Class/Accessor/Bundle.pm
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/t/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.01/t/perlcriticrc
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/.shipit
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/Changes
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/MANIFEST
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/Makefile.PL
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/README
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/lib/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/lib/Class/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/lib/Class/Accessor/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/lib/Class/Accessor/Bundle.pm
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/t/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/tags/Class-Accessor-Bundle-0.02/t/perlcriticrc
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/.shipit
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/Changes
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/MANIFEST
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/Makefile.PL
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/README
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/lib/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/lib/Class/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/lib/Class/Accessor/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/lib/Class/Accessor/Bundle.pm
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/t/
+    status: A
+  - path: lang/perl/Class-Accessor-Bundle/trunk/t/perlcriticrc
+    status: A
+rev: 9741

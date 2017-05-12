@@ -1,0 +1,122 @@
+NAME
+    Dancer::Plugin::TTHelpers - Useful routines for generating HTML for use
+    with Dancer + TT
+
+VERSION
+    version 0.005
+
+SYNOPSIS
+    In your Dancer application's MyApp.pm file ...
+
+        package MyApp;
+        use Dancer ':syntax';
+        use Dancer::Plugin::TTHelpers;
+
+    and in your application's views ...
+
+        <!-- in layout.tt -->
+        <% css('foo') %>
+        <% js('bar') %>
+
+        <!-- in index.tt -->
+        Name: <% text('name') %></br>
+        Shirt Size: <% radio('size', sizes) %></br>
+        Quantity: <% select('quantity', quants) %></br>
+        <!-- etc. -->
+
+DESCRIPTION
+    NOTE: this module is very alpha code. *Use at your own risk*
+
+  Background
+    I was working on a Dancer app and got tired of using the normal Template
+    Toolkit mechanisms for generating forms. Also, I got tired of writing
+    the boiler-plate for CSS and Javascript. Then I remembered when I was
+    working with Rails a few years ago, there were some handy routines for
+    generating this stuff, so after looking around briefly for something
+    similar to what I wanted, I decided to make my own.
+
+    This was the result.
+
+  The Helpers
+    By using this module in your Dancer app, new routines are made available
+    from within your views that aid in generating HTML for forms and the
+    standard HTML required for include CSS or Javascript files.
+
+    Following are the list of routines available from within your templates.
+    Items within square brackets(" [ ] ") are optional and may be omitted:
+
+    "css(FILE, [ IE_COND ], [ ATTR ])"
+        Outputs a "<link>" tag. "FILE" should be the name of a CSS file
+        within the public/css directory of your app. If "FILE" does not end
+        with ".css", then it is appended. If COND is specified, the CSS link
+        is surrounded with appropriate comments for IE. Any additional
+        attributes for the "<link>" tag may be specified as a hashref.
+
+        Example usage:
+
+            <% css('print', { media => "print" }) %>
+            <% css('ie', 'lt IE 8' { media => "screen,projection" }) %>
+
+        which could result in the following output:
+
+            <link rel='stylesheet' href='http://localhost:3000/css/print.css' type='text/css' media="print" />
+        <!--[if lt IE 8]><link rel='stylesheet' href='http://localhost:3000/css/ie.css' type='text/css' media="screen,projection" /><![endif]-->
+
+    "js(FILE, [ IE_COND ], [ ATTR ])"
+        Outputs a "<script>" tag with appropriate "language" and "type"
+        attributes for javascript. "FILE" should be the name of a javascript
+        file located within public/javascripts. If "FILE" does not end with
+        ".js", then it is appended. If COND is specified, the CSS link is
+        surrounded with appropriate comments for IE. Any additional
+        attributes for the "<script>" tag may be specified as a hashref.
+
+        Example usage:
+
+            <% js('jquery') %>
+
+        which could result in the following output:
+
+            <script languages='javascript' src='http://localhost:3000/js/jquery.js' type='text/javascript'></script>
+
+    The rest of the helpers are for generating form elements. Each one may
+    optionally pass an object as its first argument. It is expected that
+    this object will have an accessor with the same name as the one
+    specified as the second argument so that the form elements can be
+    initialized with the object's values by default.
+
+    "radio([OBJ], NAME, [VALUES], [SEPARATOR])"
+        Examples:
+
+            <% radio('item', [ 'hat', 'shirt', 'shorts' ]) %>
+            <% radio(obj, 'size', [ 'small', 'medium', 'large' ]) %>
+
+    "text([OBJ], NAME, VALUE, [ ATTR ])"
+        Examples:
+
+            <% text('title') %>
+            <% text(person, 'name') %>
+            <% text(person, 'dob', { size => 8 }) %>
+
+    "select([OBJ], NAME, OPTIONS, [KEY], [VALUE], [ ATTR ])"
+        Example:
+
+            <% select('priority', [ 'low','medium','high' ]) %>
+
+    "checkbox([OBJ], NAME, CHECKED, [ ATTR ])"
+        Example:
+
+    "button([OBJ], NAME, [VALUE], [ ATTR ])"
+        Example:
+
+    "hidden([OBJ], NAME, VALUE, [ ATTR ] )"
+        Example:
+
+AUTHOR
+    author = Jonathan Scott Duff <duff@pobox.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Jonathan Scott Duff.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,107 @@
+#
+# CONFIG - Configuration file for the DB2 Admin API test suite
+#
+
+#
+# The name of the database to connect to in database-specific tests
+#
+# The default is 'sample', assuming you have the IBM sample database
+# installed.  Specify a database name or alias.
+#
+DBNAME = sample
+
+#
+# The schema used for all tables.  This should match the userid that
+# created the sample database.
+#
+SCHEMA = MSDB2
+
+#
+# Allow the tests to update the database manager / database
+# configuration.  We change it and then set it back, so it should be a
+# no-op.
+#
+# Even so, don't do this on a production database...
+#
+UPDATE_DBM_CONFIG = 0
+UPDATE_DATABASE_CONFIG = 1
+
+#
+# The schema and package name for the rebind test.  This should exist
+# in all databases, so can be left as-is.
+#
+REBIND_SCHEMA = nullid
+REBIND_PACKAGE = sysstat
+
+#
+# The source table for the export test without LOBs
+#
+SOURCE_TABLE = SALES
+
+#
+# The source table for the export test with LOBs
+#
+SOURCE_LOB_TABLE = EMP_PHOTO
+
+#
+# The source table for the export test with XML
+#
+SOURCE_XML_TABLE = PRODUCT
+
+#
+# The target table for the import and load tests without LOBs.  The
+# target table must have the same structure as the source table.
+# (create table XXX like YYY will work)
+#
+# Source and target table may be the same, if you don't mind losing
+# the data if something goes wrong...
+#
+TARGET_TABLE = SALES2
+
+#
+# The target table for the import and load tests with LOBs.  The
+# target table must have the same structure as the source
+# table. (create table XXX like YYY will work)
+#
+# Source and target table may be the same, if you don't mind losing
+# the data if something goes wrong...
+#
+TARGET_LOB_TABLE = EMP_PHOTO_2
+
+#
+# The target table for the import and load tests with XML.  The target
+# table must have the same structure as the source table. (create
+# table XXX like YYY will work)
+#
+# Source and target table may be the same, if you don't mind losing
+# the data if something goes wrong...
+#
+TARGET_XML_TABLE = PRODUCT2
+
+#
+# An optional exception table for load.  This must have the same
+# structure as the target table, plus a timestamp and clob column.  If
+# omitted, the relevant tests will be skipped.
+#
+EXCEPTION_TABLE = SALES2_EX
+
+#
+# The location for load copy files.  This must exist on the database
+# server side.
+#
+LOAD_COPY_DIRECTORY = /var/tmp
+
+#
+# The directory for exported files and logfiles
+#
+EXPORT_DIRECTORY=/var/tmp/db2admin
+
+#
+# The directory for LOB files (created by export test script)
+#
+LOB_DIRECTORY = /var/tmp/db2admin/lob
+
+#
+# The directory for XML files (created by export test script)
+#
+XML_DIRECTORY = /var/tmp/db2admin/xml

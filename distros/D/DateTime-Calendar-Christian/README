@@ -1,0 +1,14 @@
+DateTime-Calendar-Christian
+===========================
+
+This module implements the Christian calendar, which consists of both
+the Julian and the Gregorian calendars.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

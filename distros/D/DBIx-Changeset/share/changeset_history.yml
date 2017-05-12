@@ -1,0 +1,31 @@
+---
+000default: 
+        get_all_changeset_history: "SELECT * FROM changeset_history"
+        create_changeset_history: |
+                CREATE TABLE `changeset_history` (
+                `id` varchar(80) NOT NULL,
+                `filename` varchar(255) default NULL,
+                `version` int(11) NOT NULL default '1',
+                `md5` varchar(32) default NULL,
+                `forced_b` tinyint(1) NOT NULL default '0',
+                `skipped_b` tinyint(1) NOT NULL default '0',
+                `modify_ts` timestamp NOT NULL default 0,
+                `create_ts` timestamp NOT NULL,
+                PRIMARY KEY  (`id`)
+                );
+        get_changeset_record: "SELECT * FROM changeset_history WHERE id = :id"
+        update_changeset_record: "UPDATE changeset_history SET filename = :filename, md5 = :md5, version = version+1, modify_ts = :modify_ts WHERE id = :id"
+        create_changeset_record: "INSERT INTO changeset_history (id,filename,md5,version,modify_ts,create_ts) VALUES(:id,:filename,:md5,:version,:modify_ts,:create_ts)"
+
+PostgreSQL:
+         create_changeset_history: |
+                CREATE TABLE changeset_history (
+                id varchar(80) NOT NULL PRIMARY KEY,
+                filename varchar(255) default NULL,
+                version int NOT NULL default '1',
+                md5 varchar(32) default NULL,
+                forced_b boolean NOT NULL default '0',
+                skipped_b boolean NOT NULL default '0',
+                modify_ts timestamp NOT NULL,
+                create_ts timestamp NOT NULL
+                );

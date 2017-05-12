@@ -1,0 +1,65 @@
+
+=pod
+
+=head1 NAME
+
+DBIx::Cookbook::Recipe::Searching::complex_where - fairly complex WHERE clause
+
+=head1 DESCRIPTION
+
+Execute the following query:
+
+  SELECT * FROM film 
+  WHERE
+    (DESCRIPTION LIKE 'drama%' AND title LIKE 'bikini%')
+     OR
+    title = 'BANG KWAI'
+
+Sample Usage:
+
+  ${orm}_cmd complex_where    # orm = dbic, skinny, rose, etc
+
+=head1 RECIPES
+
+=head2 DBIx::Class
+
+    package DBIx::Cookbook::DBIC::Command::complex_where;
+    use Moose;
+    extends qw(MooseX::App::Cmd::Command);
+    
+    use Data::Dumper;
+    
+    sub execute {
+      my ($self, $opt, $args) = @_;
+    
+    
+     $self->app->schema->storage->debug(1);
+    
+      my $rs = do {
+    
+        my $where = 
+          {
+           -or => [
+    	       -and => [
+    			description => { 'like' , '%drama%' },
+    			title => { 'like', 'bikini%' }
+    		       ],
+    	       title => 'BANG KWAI'
+    	      ]
+          };
+    
+        my $attr = { order_by => 'title' };
+    
+        $self->app->schema->resultset('Film')->search($where, $attr);
+    
+      };
+    
+      while (my $row = $rs->next) {
+        my %data = $row->get_columns;
+        warn Dumper(\%data);
+      }
+    
+    }
+    
+    1;
+

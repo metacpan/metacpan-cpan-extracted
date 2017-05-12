@@ -1,0 +1,67 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.005004
+
+0.005003 2017-03-03T22:36:43Z
+
+0.005002 2016-09-10T06:01:15Z
+
+0.005001 2015-07-11T14:36:47Z
+
+0.005000 2015-07-06T08:09:15Z
+
+0.004003 2015-06-19T04:15:00Z
+
+0.004002 2015-03-01T08:13:27Z
+ [Added / runtime recommends]
+ - Moose 2.000
+ - Path::Tiny 0.058
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 7.04 → 7.00
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 7.04 → 7.00
+ - Test::More 1.001009 → 0.99
+
+0.004001 2014-12-10T10:06:39Z
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 7.00 → 7.04
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 7.00 → 7.04
+ - Test::More 1.001008 → 1.001009
+
+0.004000 2014-10-30T12:33:06Z
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001006 → 1.001008
+
+0.003006 2014-09-27T07:03:04Z
+
+0.003005 2014-09-25T16:09:00Z
+
+0.003004 2014-09-22T19:06:39Z
+
+0.003003 2014-09-21T12:42:45Z
+
+0.003002 2014-09-04T19:09:39Z
+ [Changed / test recommends]
+ - Test::More 1.001003 → 1.001006
+
+0.003001 2014-08-30T11:09:05Z
+
+0.003000 2014-08-30T00:17:44Z
+
+0.002003 2014-08-21T05:45:11Z
+
+0.002002 2014-08-18T04:36:16Z
+
+0.002001 2014-08-17T18:48:43Z
+
+0.002000 2014-08-17T09:16:08Z
+
+0.001001 2014-08-16T21:40:56Z

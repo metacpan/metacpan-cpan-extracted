@@ -1,0 +1,7 @@
+MANIFEST
+README
+LICENSE
+Changes
+Makefile.PL
+lib/Dancer/Plugin/Controller.pm
+t/001_load.t

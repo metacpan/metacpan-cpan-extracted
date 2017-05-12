@@ -1,0 +1,11 @@
+Revision history for Deeme-Backend-Meerkat
+
+0.03  2016-04-09 19:26:52 CEST
+
+	- Fixed tests against new MongoDB syntax
+
+0.02  2014-06-24 11:18:57 CEST
+        - Changed base class to Deeme::Obj
+
+0.01  2014-06-22 11:34:45 CEST
+        - Initial release

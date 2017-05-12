@@ -1,0 +1,77 @@
+##-*- Mode: CPerl -*-
+
+=pod
+
+=head1 NAME
+
+DDC::XS::CQueryCompiler - XS interface to DDC C++ CQueryCompiler objects
+
+=head1 SYNOPSIS
+
+ #---------------------------------------------------------------------
+ # Preliminaries
+ 
+ use DDC::XS;
+
+ #---------------------------------------------------------------------
+ # Constructors etc.
+ 
+ $compiler = DDC::XS::CQueryCompiler->new();
+ undef $compiler;                            #-- auto-magically freed
+
+ #---------------------------------------------------------------------
+ # Accessors
+ 
+ $CQuery = $compiler->getQuery();
+ undef   = $compiler->setQuery($query);      #-- may leak memory!
+
+ #----------------------------------------------------------------------
+ # Methods
+ 
+ $CQuery = $compiler->ParseQuery($string);  #-- croak()s on syntax errors
+ undef   = $compiler->CleanParser();        #-- drops associated query
+ $string = $compiler->QueryToString();      #-- canonical string for current query
+ $string = $compiler->QueryToJson();        #-- json string for current query
+
+=cut
+
+##======================================================================
+
+=pod
+
+=head1 DESCRIPTION
+
+The DDC::XS::CQueryCompiler object provides a perl interface to the DDC C++ CQueryCompiler class,
+used to parse DDC queries. It inherits from L<DDC::XS::Object/DDC::XS::Object>.
+If you only use this class to parse queries and read their properties, you shouldn't
+need to worry about memory leaks.  If you're "stealing" queries from the
+compiler and/or manipulating them
+using the perl API, see the caveats in L<DDC::XS::Object>.
+
+The package C<DDC::XS::QueryCompiler> is a backwards-compatible alias for
+C<DDC::XS::CQueryCompiler>.  Names have been changed to protect the innocent
+and to mirror more precisely the names of the underlying C++ classes.
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::XS(3perl),
+DDC::XS::Object(3perl),
+DDC::XS::CQuery(3perl),
+DDC::XS::CQCount(3perl),
+DDC::XS::CQFilter(3perl),
+DDC::XS::CQueryOptions(3perl).
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

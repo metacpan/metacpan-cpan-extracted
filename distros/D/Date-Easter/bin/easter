@@ -1,0 +1,34 @@
+#!/usr/bin/perl
+use Date::Easter;
+
+#
+# Calculates easter for a particular year
+# Usage: 
+# easter 
+# (to calculate easter for this year) or
+# easter 1983
+# (to calculate for a particular other year)
+#
+
+my @months = qw(January February March April May June July August
+September October November December);
+
+my $year;
+if ($ARGV[0]) {
+    $year = $ARGV[0];
+    print "In $year, ";
+} else {
+    $year = (localtime(time))[5] + 1900;
+    print "This year, ";
+}
+
+my ($month, $day) = gregorian_easter( $year );
+
+print "Easter falls on ";
+print $months[ $month - 1];
+print " $day in the Gregorian reckoning,\nand on ";
+
+($month, $day) = orthodox_easter( $year );
+print $months[ $month - 1];
+print " $day in the Orthodox reckoning.\n\n";
+

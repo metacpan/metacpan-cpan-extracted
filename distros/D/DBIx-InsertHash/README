@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution DBIx-InsertHash, version
+0.011:
+
+  insert/update a database record from a hash
+
+This software is copyright (c) 2009 by Uwe Voelker.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

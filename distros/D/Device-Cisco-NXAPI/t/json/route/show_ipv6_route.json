@@ -1,0 +1,116 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "default",
+          "TABLE_addrf": {
+            "ROW_addrf": {
+              "addrf": "ipv6",
+              "TABLE_prefix": {
+                "ROW_prefix": [
+                  {
+                    "ipprefix": "2002::/64",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ubest": "true"
+                        },
+                        {
+                          "ipnexthop": "2002::1",
+                          "ifname": "Lo0",
+                          "uptime": "00:51:08",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "type": ""
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "2002::1/128",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ubest": "true"
+                        },
+                        {
+                          "ipnexthop": "2002::1",
+                          "ifname": "Lo0",
+                          "uptime": "00:51:08",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "2002:10::/64",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ubest": "true"
+                        },
+                        {
+                          "ipnexthop": "2002:10::1",
+                          "ifname": "Lo1",
+                          "uptime": "00:48:27",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "type": ""
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "2002:10::1/128",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ubest": "true"
+                        },
+                        {
+                          "ipnexthop": "2002:10::1",
+                          "ifname": "Lo1",
+                          "uptime": "00:48:27",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

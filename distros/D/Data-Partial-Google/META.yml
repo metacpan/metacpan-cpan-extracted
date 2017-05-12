@@ -1,0 +1,34 @@
+---
+abstract: 'Filter data structures for "partial responses," Google style'
+author:
+  - 'Andrew Rodland <arodland@cpan.org>'
+build_requires:
+  FindBin: '0'
+  JSON::XS: '0'
+  Test::Most: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Partial-Google
+no_index:
+  directory:
+    - t
+requires:
+  Carp: '0'
+  Marpa::R2: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Partial-Google
+  homepage: http://metacpan.org/release/Data-Partial-Google
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/arodland/Data-Partial-Google.git
+version: '0.02'
+x_authority: cpan:ARODLAND

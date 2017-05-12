@@ -1,0 +1,157 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use App::DBICx::Backend::Move;
+App::DBICx::Backend::Move->run;
+
+=head1 NAME
+
+dbicx-backend-move - Cmdline tool around C<DBICx::Backend::Move>
+
+=head1 SYNOPSIS
+
+This is the command line tool for C<DBICx::Backend::Move>.
+C<DBICx::Backend::Move> allows you to to move your database from one
+backend to another. Imagine you have add your data in a MySQL database
+and want to continue with a PostgreSQL database. Here is the tool for
+you.
+
+   $ dbicx-backend-move --schema 'MyApp::Schema' --from_dsn dbi:mysql:dbname=mydb --from_user user --from_pass pass --to_dsn dbi::pg::dbname=mydb --to_user user --to_pass pass --verbose --rawmode
+
+
+Lets look at the options in detail:
+
+=head1 DESCRIPTION
+
+
+=over 4
+
+=item --schema
+
+Required option. Name of the L<DBIx::Class> based schema description of
+the source database. Therefore, it also will be the schema for the
+destination database.
+
+=item --from_dsn
+
+Required option. This argument is the DSN to connect to the source
+database. It will be passed to DBIx::Class::Schema->connect. For more
+information see L<DBIx::Class::Storage::DBI/"connect_info">.
+
+=item --to_dsn
+
+Required option. This argument is the DSN to connect to the destination
+database. It will be passed to DBIx::Class::Schema->connect. For more
+information see L<DBIx::Class::Storage::DBI/"connect_info">.
+
+=item --from_user
+
+Optional option. This is the user name needed to connect to the source
+database. If the option is not given, dbicx-backend-move will try to
+determine it from the actual user. dbicx-backend-move without any
+options will show you a usage message that contains the user name it
+determined.
+
+=item --to_user
+
+Optional option. This is the user name needed to connect to the
+destination database. If the option is not given, dbicx-backend-move
+will try to determine it from the actual user. dbicx-backend-move
+without any options will show you a usage message that contains the user
+name it determined.
+
+=item --from_pass
+
+Optional option. This is the password needed to connect to the source
+database. If this argument is not given dbicx-backend-move will assume
+no password is needed.
+
+=item --to_pass
+
+Optional option. This is the password needed to connect to the
+destination database. If this argument is not given dbicx-backend-move
+will assume no password is needed.
+
+=item --verbose
+
+Optional option. Print the name of the table the tool is currently
+working on and a dot for every row.
+
+=item --rawmode
+
+Optional mode. Normally during a DB transfer we read and write values
+through the DBIC layers which can contain filters for deflate/inflate.
+This guarantees that possible backend-specific filters are applied and
+converted correctly. However, in some situation this can be too heavy
+(memory/time consuming) or you want the exact same values transferred
+without touching for other reasons. The rawmode does that.
+
+=back
+
+=head1 AUTHOR
+
+Maik Hentsche, C<< <Caldrin at cpan dot org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dbicx-migration at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBICx-Backend-Move>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DBICx::Backend::Move
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBICx-Backend-Move>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/DBICx-Backend-Move>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DBICx-Backend-Move>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/DBICx-Backend-Move/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to
+
+=over 4
+
+=item * renormalist for discussinh design decisions
+
+=item * mst for explaining transaction handling in DBIC and DBI
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Maik Hentsche.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

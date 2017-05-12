@@ -1,0 +1,5 @@
+User-agent: bogus UA with Disallow: /moop
+
+Disallow: /foo   # inline comments with /meep
+# comments are supposed to be ignored
+Disallow: /bar/

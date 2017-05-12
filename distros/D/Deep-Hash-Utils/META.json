@@ -1,0 +1,47 @@
+{
+   "abstract" : "functions for iterating over and working with nested hashes",
+   "author" : [
+      "Chris Becker <clbecker@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Deep-Hash-Utils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/perl-deep-hash-utils",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/perl-deep-hash-utils.git",
+         "web" : "https://github.com/neilb/perl-deep-hash-utils"
+      }
+   },
+   "version" : "0.04"
+}
+

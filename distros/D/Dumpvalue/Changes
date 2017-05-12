@@ -1,0 +1,15 @@
+1.17  Tue, 11 Sep 2012 10:18:28 -0400
+  * Merge changes from the perl core.
+    - Convert ` to '.
+  * Add authority metadata.
+
+1.16  Sat, 09 Jul 2011 11:11:57 +0200
+  * Merge changes from the perl core.
+    - Fix typos.
+
+1.15  Wed, 15 Dec 2010 20:21:10 +0100
+  * Install to the right part of @INC on old perls.
+
+1.14  Wed, 15 Dec 2010 01:16:26 +0100
+  * First upload to cpan. Identical with version 1.14 in the perl core. Upstream
+    for this module is still blead perl.

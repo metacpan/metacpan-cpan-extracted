@@ -1,0 +1,48 @@
+Digest-MD5-Reverse
+
+MD5 sums (see RFC 1321 - The MD5 Message-Digest Algorithm) are used as a one-way
+hash of data. Due to the nature of the formula used, it is impossible to reverse
+it.
+
+This module provides functions to search several online MD5 hashes database and
+return the results (or return undefined if no match found).
+
+We are not breaking security. We are however making it easier to lookup the
+source of a MD5 sum.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Digest::MD5::Reverse
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Digest-MD5-Reverse
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Digest-MD5-Reverse
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Digest-MD5-Reverse
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Digest-MD5-Reverse
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Raoul-Gabriel Urma
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,171 @@
+Revision history for Dist-Zilla-Plugin-Run
+
+0.044     2017-03-29 00:14:00Z
+  - once again streaming command output as each line is produced, rather than
+    buffering until the process ends (this behaviour was changed in 0.040)
+
+0.043     2016-02-15 04:20:20Z
+  - new [Run::BeforeArchive] plugin
+
+0.042     2015-08-04 03:44:33Z
+  - properly chomp carriage returns from output on MSWin32
+
+0.041     2015-08-03 02:18:18Z
+  - fix logic used for extra diagnostics during quiet fatal errors (0.040)
+
+0.040     2015-08-02 02:20:25Z
+  - drop use of Path::Class, when Dist::Zilla is new enough
+  - if a dying command causes the build to fail and the command diagnostics
+    were not shown, show them before dying, to aid debugging (reverted in
+    0.044, as it did not behave as intended)
+
+0.039     2015-06-18 05:59:06Z
+  - fix test failures when using a perl with whitespace in its path
+  - document the execution order of the various command options
+  - guard plugin variables from leaking into the eval string's scope
+
+0.038     2015-05-22 04:01:27Z
+  - new 'quiet' configuration option
+
+0.037     2015-05-14 07:04:34Z
+  - resolve failures on Dist::Zilla 5.035 caused by the release_status code
+    still being in flux at that time
+
+0.036     2015-05-08 21:48:32Z
+  - fix unintended consequence of changes in Dist::Zilla 5.035 where asking
+    for the distribution's trial status might cause other plugins to run
+    prematurely
+  - prevent tests from failing when TRIAL or RELEASE_STATUS is set in the
+    environment
+
+0.035     2015-03-31 03:09:04Z
+  - fix tests to avoid setting a newly-immutable config variable directly
+    (David Golden, PR#11)
+
+0.034     2015-02-09 04:56:26Z
+  - better [Run::Clean] implementation that does not run afoul of MSWin32's
+    poor garbage collection habits
+
+0.033     2015-02-07 23:18:03Z
+  - new [Run::Clean] plugin
+
+0.032     2015-01-13 21:42:01Z
+  - work around test failures with OSX system perl (RT#101483; see also
+    perldoc perlmacosx)
+
+0.031     2015-01-13 02:18:53Z
+  - switch to using $^X for %x, rather than $Config{perlpath}, to avoid
+    mismatches for OSX system perl (RT#101483)
+
+0.030     2015-01-10 21:04:59Z
+  - fix failures in new fatal_errors test on MSWin32 by avoiding executing
+    bash
+
+0.029     2015-01-05 01:59:05Z
+  - added new "fatal_errors" option (defaults to true, as always)
+
+0.028     2014-11-24 02:35:12Z
+  - now properly evaluating formatting codes inside 'eval' lines
+
+0.027     2014-11-12 01:41:50Z
+  - new formatter code added: "%t", for indicating a trial release (PR#9,
+    Thomas Sibley)
+
+0.026     2014-09-06 06:42:06Z
+  - all test reports are green! release the hounds!
+
+0.025     2014-08-18 03:36:32Z (TRIAL RELEASE)
+  - fix use of path separator in test to avoid more failures on MSWin32
+  - fix use of :crlf mode in test to avoid yet more failures on MSWin32
+
+0.024     2014-08-16 00:36:01Z (TRIAL RELEASE)
+  - fix use of path separator in test to avoid failure on MSWin32
+  - new "eval" option, for executing Perl code
+
+0.023     2014-08-06 05:33:20Z
+  - convert uses of Path::Class to Path::Tiny
+  - dump config into metadata when [MetaConfig] used, but the
+    'censor_commands' option can be used to avoid this
+
+0.022     2014-07-24 15:36:32Z
+  - more complete metadata and author tests
+
+0.021     2014-02-23 23:31:47Z
+  - Lazy load runtime dependencies. Thanks Olivier Mengué!
+  - unroll author pluginbundle, to remove some unneeded and broken
+    prerequisites
+
+0.020     2013-04-21 00:02:21Z
+  - Switching to [@Author::GETTY] dzil bundle
+  - Adding .travis.yml for travis-ci
+
+0.019     2013-04-15 14:52:25Z
+  - Delay evaluation of some vars (like dist version) until needed.
+    Thanks, Tatsuhiko Miyagawa!
+
+0.018     2013-03-02 17:46:39Z
+  - Added new options, cleaned up documentation
+
+0.017     2013-02-17 04:20:54Z
+  - Fix silly bug in tests for non-unix platforms
+
+0.016     2013-02-13 14:49:47Z
+  - Add 'run_no_trial' option for running commands
+    only when it is not a trial build/release.
+
+0.015     2013-02-04 00:25:50Z
+  - Copy examples for all runners to Synposis on main page
+
+0.014     2013-01-19 03:21:24Z
+  - Add Run::AfterMint plugin for running commands after making a new dist.
+
+0.013     2011-11-09 13:23:08Z
+  - Fix Pod spelling error pointed out by Debian Perl Group (rt-72278).
+
+0.012     2011-11-06 00:30:03Z
+  - Add '%x' for perl path (similar to $^X)
+  - Use strict and warnings in each module
+  - Test fixes
+
+0.011     2011-10-28 15:25:04Z
+  - Explicitly stringify '%a' to keep String::Formatter happy.
+    Make sure it's tested.
+    Closes rt-72008. Thanks to Olivier Mengué (dolmen) for reporting.
+
+0.010     2011-09-10 18:06:33Z
+  - Define '%p' as the OS path separator in case anybody ever needs
+    cross-platform dist.ini commands
+  - Enable the tests for the Run::Test plugin
+  - Make tests cross-platform
+
+0.009     2011-09-07 14:34:14Z
+  - added the [Run::Test] plugin
+
+0.008     2011-08-09 16:31:33Z
+  - Stream command output incrementally instead of waiting
+    until the command is done. (RWSTAUNER)
+    Closes gh-4.  Thanks to SamuraiJack for the suggestion.
+
+  - Show correct exit status on command failure.
+
+0.007     2011-08-08 03:30:39Z
+  - Define other (constant) string format conversions (%n, %v);
+    Retain positional %s for backward compatibility. (RWSTAUNER)
+
+0.006     2011-05-21 00:58:17Z
+    - Fixed wrong bangpath
+
+0.005     2011-04-29 20:54:18Z
+
+0.005     2011-01-21 10:21:08Z
+
+0.004     2010-12-14 20:19:54Z
+    - Minimal pod changes
+
+0.003     2010-12-14 02:18:00Z
+    - Complete Change of API
+
+0.002     2010-12-13 17:07:27Z
+
+0.001     2010-12-12 03:14:54Z
+    - First release

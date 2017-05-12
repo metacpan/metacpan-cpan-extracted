@@ -1,0 +1,10 @@
+BAM.pm
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-diskname.t
+t/02-diskid.t
+t/03-trackbam.t
+t/04-print.t
+t/05-free-sectors.t

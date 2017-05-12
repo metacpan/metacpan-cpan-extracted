@@ -1,0 +1,15 @@
+
+To access DFS internals directly, DFS-Perl requires two things: the DFS
+header files, usually in /usr/include/dcedfs, and the client side RPC stubs
+for the various DFS servers, generally in the library libdcedfs. Different
+vendors may include one, both, or neither of the two.
+
+Having finally seen the light, IBM/Transarc has made available the
+necessary components to access the DFS API under Solaris and AIX. You can
+download the appropriate distribution from:
+
+    http://www.transarc.ibm.com/Product/EFS/DFS/libdcedfs/
+
+
+Note that the distribution names the library libdfs. DFS-Perl expects the
+library to be named libdcedfs. Rename it or make a symlink.

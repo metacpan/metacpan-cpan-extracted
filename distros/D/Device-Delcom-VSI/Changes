@@ -1,0 +1,16 @@
+Revision history for Device-Delcom-VSI
+
+0.0.1  Mon Jul 31 08:48:43 2006
+       Initial release.
+
+0.0.5  2006
+       Fleshed out
+
+0.0.6  22 Jan 14
+       fixed some typos, added a couple of default values
+
+0.0.7	26 Jan 14
+	added dependency info for Device::USB
+
+0.0.8	27 Jan 14
+	fixed(?) dependency info for Device::USB

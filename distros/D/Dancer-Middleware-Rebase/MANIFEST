@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dancer/Middleware/Rebase.pm
+t/00-load.t
+t/01-base.t
+t/02-strip.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,93 @@
+0.8  2014-02-03 19:50:34 GMT
+  Move back to github
+
+0.7  2013-01-03 22:50:51 Europe/Paris
+
+  Upgrade test to support new D2 Dancer::Test call
+
+0.6  2013-01-03 00:59:48 Europe/Paris
+
+  Simplify test
+
+0.5  2013-01-02 20:18:07 Europe/Paris
+
+  * use plugin_args instead of dancer_version.
+
+0.4  2012-12-28 20:09:43 Europe/Paris
+
+  * Support of Dancer2
+
+0.3  2012-11-28 19:11:49 Europe/Paris
+
+  * update meta
+  * update redis deps : use password generator from it
+
+0.2  2012-07-17 15:28:31 Europe/Paris
+
+  Move to bundle plugin version number
+
+0.14 2012-07-16 22:32:14 Europe/Paris
+
+  Use Dist::Zilla::PluginBundle::Author::Celogeek v0.7
+  move RedisWithAuthSupport outside main module
+
+0.13 2012-07-08 18:52:22 Europe/Paris
+
+  Use Dist::Zilla Bundle Celogeek
+
+0.12 2012-06-08
+
+  Change author name
+
+0.11 2012-06-04
+
+  Fix password connection for multiple connection.
+
+0.10 2012-06-02
+
+  Add support of password option (requirepass)
+
+0.09 2012-06-01
+
+  fix pod
+
+0.08 2012-05-31
+
+  [Ovid]
+  Add some basic tests
+  Add meta and markdown
+
+  [celogeek]
+  Add link to github project
+
+0.07 2012-05-21
+
+  remove useless deps
+
+0.06 2012-05-19
+
+  simplify the code
+  use latest reconnect option of Redis module
+
+
+0.05 2012-05-12
+
+  change base author
+  fix test unit
+
+0.04 2012-04-23
+
+  fix warnings if connection loose
+
+0.03 2011-06-26
+  
+  Optimize redis connection lost and debug message
+  Revamp code
+  Remove time ping
+
+0.02 2011-01-01
+  Change github url and copyright
+
+0.01 2011-01-01
+  Initial version developed based on David Precious Dancer::Plugin::Database
+

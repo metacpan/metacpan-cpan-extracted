@@ -1,0 +1,9 @@
+this module just follows the typical
+
+$ perl Makefile.PL
+$ make && make test
+$ sudo make install
+
+routine, followed by
+
+$ perldoc Devel::Profiler::Plugins::Template

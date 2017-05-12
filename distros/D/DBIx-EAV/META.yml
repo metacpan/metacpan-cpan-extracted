@@ -1,0 +1,59 @@
+---
+abstract: "Entity-Attribute-Value data modeling (aka 'open schema') for Perl"
+author:
+  - 'Carlos Fernando Avila Gratz <cafe@kreato.com.br>'
+build_requires:
+  DBD::SQLite: '1.50'
+  Test2::Suite: '0'
+  YAML: '1.15'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.3, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-EAV
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::EAV:
+    file: lib/DBIx/EAV.pm
+    version: '0.09'
+  DBIx::EAV::Cursor:
+    file: lib/DBIx/EAV/Cursor.pm
+  DBIx::EAV::Entity:
+    file: lib/DBIx/EAV/Entity.pm
+  DBIx::EAV::EntityType:
+    file: lib/DBIx/EAV/EntityType.pm
+  DBIx::EAV::ResultSet:
+    file: lib/DBIx/EAV/ResultSet.pm
+  DBIx::EAV::Schema:
+    file: lib/DBIx/EAV/Schema.pm
+  DBIx::EAV::Table:
+    file: lib/DBIx/EAV/Table.pm
+requires:
+  Class::Load: '0'
+  DBI: '0'
+  Lingua::EN::Inflect: '1.899'
+  Moo: '0'
+  SQL::Abstract: '0'
+  SQL::Translator: '0.11021'
+  Scalar::Util: '0'
+  namespace::clean: '0'
+  perl: '5.010'
+  strictures: '2.000003'
+resources:
+  bugtracker: https://github.com/cafe01/dbix-eav/issues
+  homepage: https://github.com/cafe01/dbix-eav
+  repository: git://github.com/cafe01/dbix-eav.git
+version: '0.09'

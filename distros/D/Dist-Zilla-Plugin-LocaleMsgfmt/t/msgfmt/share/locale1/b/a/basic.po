@@ -1,0 +1,6 @@
+msgid "foo"
+msgstr "bar"
+
+#, fuzzy
+msgid "fuzz"
+msgstr "fuzz"

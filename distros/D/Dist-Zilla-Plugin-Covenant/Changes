@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Plugin-Covenant
+
+0.1.1 2014-11-06
+ - Move the plugin back into the 'FileGatherer' phase. (GH#1, Apocalypse)
+
+ [STATISTICS]
+ - code churn: 5 files changed, 19 insertions(+), 9 deletions(-)
+
+0.1.0 2012-03-19
+ - release the Kraken!
+

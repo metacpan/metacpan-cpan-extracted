@@ -1,0 +1,156 @@
+Release history for Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist
+
+1.001002 2017-03-04T06:54:21Z 8830111
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Bootstrap-ShareDir-Dist/issues/3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: +5 ↑4 -2 (suggests: ↑2)
+ - runtime: -1
+ - test: ↓1
+
+ [Internals]
+ - Drop ConfigDumper
+
+1.001001 2015-01-20T22:33:27Z d97fa56
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +10 ↑2 -2 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1)
+ - test: +1 (recommends: +1 ↑1 ↓1)
+
+ [Documentation]
+ - Improved DESCRIPTION section added for README.
+
+ [Internals]
+ - Removed MooseX::AttributeShortcuts to remove indirect autobox dep.
+
+1.001000 2014-08-30T13:47:50Z
+ [00 Minor]
+ - Tests refactored.
+ - metadata
+ - internals
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +1 -2
+
+ [Internals]
+ - dump_config implemented in config_dumper
+
+ [Metadata]
+ - set author = kentnl
+
+ [Tests]
+ - Refactored in terms of DZPUtAKENTNL::dztest
+
+1.000002 2014-08-15T21:15:41Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code change.
+ - whitespace adjustment.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+1.000001 2014-08-03T02:04:39Z
+ [00 Tests]
+ - Drop use of Path::FindDev for tests.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - test: -2
+
+1.000000 2014-08-02T07:48:52Z
+ [00 Major]
+ - Changes that may affect hand-operated downstreams.
+
+ [01 Version Scheme]
+ - Moved to x.yyyyyy
+ - This is the primary reason for the 1.x on the box.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [02 Toolkit]
+ - Moved to ExtUtils::MakeMaker
+ - "Latest" dependencies now only a recommendation.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.3.0, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 -11 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +2 ↓1 (recommends: +3)
+
+0.3.0 2013-11-21T07:19:14Z
+ [00 Major]
+ - Internals refactored in terms of T:F:SD:O:D
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.4, see misc/*.deps* for details
+ - runtime: +1 -1
+
+0.2.4 2013-11-20T11:51:25Z
+ [Bugfix]
+ - Drop dependency on Perl 5.10
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.3, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↓1
+ - test: ↑1 -3
+
+ [Documentation]
+ - Point README to metacpan
+
+ [Packaging]
+ - use new merged prereqs stuff
+
+ [Tests]
+ - Use Test::Compile::PerFile
+ - Report less things with RVT
+
+0.2.3 2013-09-24T22:31:06Z
+ [Bugfix]
+ - Call Test::DZil instead of calling dzil directly.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.2, see misc/*.deps* for details
+ - test: +3
+
+0.2.2 2013-09-08T08:19:00Z
+ [Bugfix]
+ - Tests require DZP:BS:Lib
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.1, see misc/*.deps* for details
+ - test: +1
+
+0.2.1 2013-09-04T13:18:15Z
+ [!Minor]
+ - Make immutable.
+ - Tidy
+
+0.2.0 2013-09-04T12:57:46Z
+ [!Major]
+ - Reimplemented in terms of ::Role::Bootstrap
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +1 -3
+ - test: +2
+
+0.1.0 2013-09-03T06:40:40Z
+ - First version.

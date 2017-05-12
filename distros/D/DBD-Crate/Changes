@@ -1,0 +1,11 @@
+Revision history for Perl extension DBD::Crate
+
+0.0.3  2016 2016-08-27
+	- Add missing prereqs for clean installation by (xenu)
+
+0.0.2  2016 2016-08-24
+	- code cleanup
+	- use regex to test error strings, this fixes failed tests with new crate versions
+
+0.0.1  2015 2015-07-23
+	- initial version

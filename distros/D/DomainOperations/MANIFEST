@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DomainOperations.pm
+lib/DomainOperations/ResellerClubHTTP.pm
+lib/DomainOperations/ResellerClubSOAP.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t

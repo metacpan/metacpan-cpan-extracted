@@ -1,0 +1,62 @@
+; vim: syntax=dosini
+name    = Dist-Zilla-Plugin-MetaProvides-Class
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+main_module = lib/Dist/Zilla/Plugin/MetaProvides/Class.pm
+
+[Bootstrap::lib]
+try_built = 1
+
+[@Author::KENTNL]
+:version          = 2.021
+bumpversions      = 1
+twitter_extra_hash_tags = #distzilla
+normal_form       = numify
+mantissa          = 6
+toolkit           = eumm
+toolkit_hardness  = soft
+copyfiles         = LICENSE
+srcreadme         = mkdn
+
+;version_major = 1
+;version_minor = 12
+;version_rel_year  = 2009
+;version_rel_month = 8
+;version_rel_day   = 24
+;version_rel_hour  = 0
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs / RuntimeRequires]
+;Dist::Zilla                 = 2.101310
+;Moose                       = 0.89 ; attr fulfills requires
+;namespace::autoclean        = 0.08
+;Class::Discover             = 1.000001
+;Moose::Autobox              = 0.09
+;MooseX::Types::Moose        = 0.19
+;MooseX::Types               = 0.19
+;List::MoreUtils             = 0.22
+;MooseX::Has::Sugar          = 0.0404
+;aliased                     = 0.30
+;Module::Extract::VERSION    = 0.13
+;Module::Extract::Namespaces = 0.14
+Dist::Zilla::Plugin::MetaProvides = 1.12044806
+
+;[Prereqs / TestRequires]
+;MooseX::Declare = 0
+;Test::More  = 0.92
+;FindBin     = 0
+;Path::Class::File = 0.17
+;Path::Class::Dir  = 0.17
+;File::Find::Rule  = 0.30
+;File::Find::Rule::Perl = 1.09
+
+[Prereqs / RuntimeSuggests]
+Dist::Zilla::Plugin::MetaNoIndex = 0
+
+[Prereqs / DevelopRequires]
+Dist::Zilla::Plugin::Bootstrap::lib = 0
+Dist::Zilla::Plugin::MetaNoIndex = 0
+
+[Prereqs / TestSuggests]
+Dist::Zilla::Plugin::MetaNoIndex = 0

@@ -1,0 +1,16 @@
+Revision history for Perl extension Devel::StrictObjectHash.
+
+0.01 Mon May 3 2004
+    * Major work has been done *
+    - added INC filter reg-ex to the import interface, see docs.
+        - added test to verify it works
+    - added the $PUBLIC, $PROTECTED and $PRIVATE reg-exps to allow
+      for more flexibility in detemining the access conventions.
+        - added access to them from import interface
+        - added test to verify they work
+    - added the choice for warn and die error handlers
+    - wrote lots of documentation, revamped the whole thing pretty much
+    
+0.01a  Tue Apr 20 01:25:33 2004
+	- early release to solicit comments and suggestions
+

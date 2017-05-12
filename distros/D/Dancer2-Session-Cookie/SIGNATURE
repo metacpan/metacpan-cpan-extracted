@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 3cb10e57dddd7f59c157436adc26d60dc208e2e6 CONTRIBUTING
+SHA1 27ab9d54bb3718ab6f4edd0de8f94cce3e160614 CONTRIBUTORS
+SHA1 ee81b16798d6bf2080db27d2414a60b7f37937d2 Changes
+SHA1 4145903097b6e71fba164636f59885f3b6896ed7 INSTALL
+SHA1 e188c4892bc1fbfced62c2299a2a24fd21098d81 LICENSE
+SHA1 023f5b405ce8b58819505973dd93d5fe3d65b7a3 MANIFEST
+SHA1 815e3372725b6a1bf778a4022b73ff326781de41 MANIFEST.SKIP
+SHA1 096d0976e807d26d65f0f56712580ff5ab2bd335 META.json
+SHA1 7c757491557e4756af7200b02dc510b6ec30f41d META.yml
+SHA1 21149b6899043a2bc22d02778b0b2c60257b7d0a Makefile.PL
+SHA1 52d158ac2d793154765815e7449c8fd1ab8ae79f README
+SHA1 c6b548f15ccad1fe9a751fb1519c5897c7e907b7 README.mkdn
+SHA1 8a9101ddce2aab1ef8f7cc5279603f5254caadb7 cpanfile
+SHA1 a5201d61b9006c721f206066de106ef3da9de7b1 doap.xml
+SHA1 1de8ccff7d3c5ccc9ca8d3916327dfbe37724776 lib/Dancer2/Session/Cookie.pm
+SHA1 3dfe2947d80c0234b65b05956af341b89a9abf00 t/00-compile.t
+SHA1 a1a4202f4b894a2c80d8410f9a6cdd8f135574d7 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 e94732854d806f11998e6df89717ccad4e31c9ef t/lib/TestApp.pm
+SHA1 f3f7690e99a302aa80f7134fd77cba051c9425bc t/session_lifecycle.t
+SHA1 45b3b0056253ba186a32eac2f2b1649f886672a2 t/with_request_address.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlgcn8gACgkQ34Hwf+GwC4zZ2ACgkXTIgCheBboyIx9C/0yEp/yg
+rmQAn12klajB8iEE3+VvR1GAE26o2Swu
+=+UuZ
+-----END PGP SIGNATURE-----

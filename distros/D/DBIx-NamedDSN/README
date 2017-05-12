@@ -1,0 +1,56 @@
+DBIx-NamedDSN version 0.11
+==========================
+
+OVERVIEW
+
+DBIx::NamedDSN serves as a single point of modification for all of
+your DBI dsn connection strings.  Particularly as your organization's
+data needs grow, you may find yourself transitioning between database
+systems or adding multiplexing or load balancing to a particular
+system setup.  Rather than trying to keep all of the connection
+information in sync throughout all of your site's scripts, it makes
+sense to consolidate this information in one place and refer to it
+through the "short name".
+
+DBIx::NamedDSN provides your scripts with the capability to connect to
+a named data source, whiLE you can change the details in the future
+without changing any of your auxilary tools.
+
+As a happy side effect, DBIx::NamedDSN also adds two methods to the
+standard DBI class:
+
+o  $dbh->connection_string(), which returns a copy of the original
+   connection string for a given database handle, and
+
+o  $dbh->ndsn_identifier(), which gives you the "short name" of the
+   particular database handle, if it exists.
+
+You can use DBIx::NamedDSN's connect method to inherit the above two
+methods regardless of whether a data source has a "short name"---any
+dsn which looks like 'dbi:...' gets passed to the DBI directly, thus
+you can wholesale replace all of your DBI->connect(...) calls with
+DBIx::NamedDSN->connect(...) calls, even if you don't use the "short
+name" capabilities of DBIx::NamedDSN.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+No other dependencies, other than DBI.  Not really useful without it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by David Christensen
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.
+
+

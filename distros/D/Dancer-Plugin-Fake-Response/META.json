@@ -1,0 +1,48 @@
+{
+   "abstract" : "Dancer Plugin Fake Response",
+   "author" : [
+      "Nicolas Oudard"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Fake-Response",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.302",
+            "Dancer::Plugin::REST" : "0.04",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Plugin::Fake::Response" : {
+         "file" : "lib/Dancer/Plugin/Fake/Response.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

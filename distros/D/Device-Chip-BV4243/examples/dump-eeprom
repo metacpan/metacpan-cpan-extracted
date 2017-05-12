@@ -1,0 +1,31 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Chip::BV4243;
+use Device::Chip::Adapter;
+
+use Getopt::Long;
+
+GetOptions(
+   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+) or exit 1;
+
+my $chip = Device::Chip::BV4243->new;
+$chip->mount(
+   Device::Chip::Adapter->new_from_description( $ADAPTER )
+)->get;
+
+foreach my $row ( 0 .. 15 ) {
+   my @bytes;
+   foreach my $col ( 0 .. 15 ) {
+      push @bytes, $chip->eeprom_read( $row*16 + $col )->get;
+   }
+
+   printf "%02X: ", $row*16;
+   printf "%02X ", $_ for @bytes;
+   print " | ";
+   print $_ >= 0x20 && $_ < 0x80 ? chr $_ : "." for @bytes;
+   print "\n";
+}

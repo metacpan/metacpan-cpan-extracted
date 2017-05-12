@@ -1,0 +1,22 @@
+Date::RangeParser::EN
+====================
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    DateTime
+    Date::Manip
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012-2014 Grant Street Group. All rights reserved.

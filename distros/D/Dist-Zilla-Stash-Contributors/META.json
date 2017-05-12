@@ -1,0 +1,77 @@
+{
+   "abstract" : "Stash containing list of contributors",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Stash-Contributors",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moose" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Stash::Contributors" : {
+         "file" : "lib/Dist/Zilla/Stash/Contributors.pm",
+         "version" : "v0.1.0"
+      },
+      "Dist::Zilla::Stash::Contributors::Contributor" : {
+         "file" : "lib/Dist/Zilla/Stash/Contributors/Contributor.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-stash-contributors at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Stash-Contributors"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Stash-Contributors/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dist-Zilla-Stash-Contributors.git",
+         "web" : "https://github.com/yanick/Dist-Zilla-Stash-Contributors"
+      }
+   },
+   "version" : "0.1.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK"
+}
+

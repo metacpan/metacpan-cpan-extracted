@@ -1,0 +1,20 @@
+Revision history for Data-Form-Elements
+
+0.61    March 29 2008/12:120 PM
+        Finally sat down to look at the test failures coming from the cpan testers.  
+        I'm not sure if anyone uses this or not, but at least the tests don't give 
+        spurious failures any more.
+0.60    July 11 2004/9:00 PM
+        Added better compatibility with CGI and Apache::Request style param()
+        calls.  Made some real test files.  Fixed the CPAN.pm problem.  
+        Added accessor shortcuts, so you can call $form->email to get or set
+        the value of the "email" parameter.
+
+0.51    July 6, 2004/4:00 PM (more or less)
+        Made a clean distribution that WAS accepted by PAUSE (unlike 0.50).
+        Forgot to use Module::Build::Compat, though, so CPAN.pm users were
+        out of luck.  Sorry! 
+
+0.50    July 6, 2004/1:16 PM
+        First version, released on an unsuspecting world.
+

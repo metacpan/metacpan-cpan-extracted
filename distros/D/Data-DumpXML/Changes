@@ -1,0 +1,99 @@
+2003-12-18  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.06
+
+   Documentation fixes by Paul Croome <Paul.Croome@softwareag.com>.
+
+
+
+2003-01-06  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.05
+
+   XML Schema fix by Jonathan Stowe <gellyfish@gellyfish.com>.
+
+
+
+2002-12-27  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.04
+
+   Fixed duplicte ATTLIST definition of undef in the DTD.
+
+
+
+2001-12-30  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.03
+
+   Enabling of namespace prefix would generate bad XML; a
+   few end tags would end up un-prefixed.  Patch by
+   Jonathan Stowe <gellyfish@gellyfish.com>.
+
+   Setting $INDENT to "", now suppress most newlines in
+   the output too.
+
+   New configuration variable: $INDENT_STYLE
+
+   Documentation improved a bit.
+
+   Data::DumpXML::Parser will now turn on the 'Namespaces'
+   option automatically.
+
+   Data-DumpXML.xsd fixes:
+      - make element 'key' a complex type with simple content
+        (instead of mixed)
+
+
+
+2001-12-11  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.02
+
+   Added namespace support based on a patch by Jonathan Stowe.
+
+   Added an XML Schema document that describes the dump format.
+
+   Escape ']]>' when it occurs strings.
+
+
+
+2000-09-19  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.01
+
+   Added Blesser argument to Data::DumpXML::Parser.  This can
+   be used to guard which objects are restored.  Patch by
+   Jonathan Stowe <gellyfish@gellyfish.com>.
+
+
+
+2000-09-11  Gisle Aas <gisle@ActiveState.com>
+
+   Release 1.00
+
+   Compensate for the way references to references are stringified
+   in perl-5.7.0.
+
+
+
+2000-01-13  Gisle Aas <gisle@aas.no>
+
+   Release 0.02
+
+   Fix &quot; typo; spotted by Matt Sergeant <msergeant@hotmail.com>
+
+   Don't encode ">", just because we can.
+
+   Deal with binary hash keys.
+
+   The parser will now use av_push instead of av_store and a index to
+   build arrays.
+
+
+
+2000-01-10  Gisle Aas <gisle@aas.no>
+
+   Release 0.01
+
+   Based on Data-Dump-0.03

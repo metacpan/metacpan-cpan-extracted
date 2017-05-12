@@ -1,0 +1,23 @@
+---
+name: Digest-HMAC_MD6
+version: 0.01
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: MD6 Keyed-Hashing for Message Authentication
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Digest-HMAC_MD6
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Digest--HMAC_MD6.git
+requires:
+  Digest::HMAC: 1.01
+  Digest::MD6: 0.08
+  Test::More: 0
+provides:
+  Digest::HMAC_MD6:
+    file: lib/Digest/HMAC_MD6.pm
+    version: 0.01
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

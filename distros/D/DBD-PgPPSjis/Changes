@@ -1,0 +1,131 @@
+Revision history for Perl extension DBD::PgPPSjis.
+
+0.0801001  2015-01-25 00:00:00 JST
+    - DBI->connect() executes "SET NAMES 'SJIS'" at last
+    - $dbh->quote() supports ShiftJIS strings
+    - $dbh->parse_statement() supports ShiftJIS strings
+    - Add Pure-Perl MD5 Algorithm class. This is used only when
+      there is no 'Digest::MD5' module.
+      Please do not question closely about this source code ;-)
+    - needs perl 5.00503
+
+0.08  Sat Jan  9 17:56:15 UTC 2010
+
+    - Regenerate dist using latest ExtUtils::MakeMaker; thanks to Alexandr
+      Ciornii http://github.com/chorny/dbd-pgpp
+
+    - Now needs Perl 5.8
+
+0.07  Sat Aug 29 13:17:21 UTC 2009
+
+    - RT#48919: Allow quoting strings containing \0 (not that doing so is
+      very useful, but there's not much I can do about that).
+
+0.06  Tue Feb 24 11:45:16 UTC 2009
+
+    - RT#15894: New last_insert_id feature; thanks to Roger Crew for the
+      implementation.
+
+    - RT#7686: Update test suite for newer PostgreSQL
+
+    - RT#14318 RT#18733 RT#41511: Allow execution of new queries while
+      fetching an existing one
+
+    - RT#14791 RT#31260: Fix results that have many columns, and long
+      strings in results
+
+    - RT#23900 RT#32864: Fix placeholder values containing "?", and
+      non-placeholder "?" in queries (both comments and literals)
+
+    - Disconnect from the database cleanly
+
+    - Fix use of non-default path for Unix-domain sockets
+
+    - Fix loss of protocol synchronisation when executing a query that
+      yields a warning
+
+    - Fix various bugs in `bind_param` (or at least the simple, non-typed
+      versions of it) and in `execute` with arguments
+
+    - Better support for PostgreSQL 8.1 and above
+
+    - Improved test coverage
+
+0.05  Sun May  9 11:55:35 UTC 2004
+    - All known bugs fixed:
+       * No "can't locate method" exceptions when your query has an
+         error
+       * Permit executing a prepared handle more than once
+       * Correctly handle empty strings in result rows
+       * No infinite loop for long result rows
+       * Permit more than eight columns in a result set
+       * False Boolean values in results are false in your Perl code
+         (not 'f').  This constitutes a change in behaviour, but one
+         that's so obviously the right thing that I haven't created an
+         option to give you the broken behaviour.
+       * Demangle bytea data in results
+       * Correctly quote placeholder values containing backslashes
+       * Actually issue a BEGIN when a transaction starts, so that
+         rollback can roll changes back
+     - Unfortunately, the test suite has not yet been updated to
+       trigger all these bugs.  Since it's nearly two years since the
+       last release of DBD::PgPP, I thought it better to get these
+       crucial bugfixes out the door soon; the test suite is my next
+       priority for 0.06 and beyond.  So there may still be bugs in
+       this code.  However, I've been using this version for a while
+       now in a project for a customer, so I'm fairly confident that
+       at least the bits I use are correct.
+    - This release prepared by new co-maintainer Aaron Crane <arc@cpan.org>
+
+0.04  Wed Jul 24 18:49:09 JST 2002
+    - The problem which cannot use a BEGIN/ROLLBACK statement
+      was repaired.
+    - Add Pure-Perl MD5 Algorithm class. This is used only when
+      there is no 'Digest::MD5' module.
+      Please do not question closely about this source code ;-)
+    - OS tested as use is possible is added.
+       * Linux with perl5.005_03 built for ppc-linux
+       * Solaris 2.6 with perl 5.6.1 built for sun4-solaris
+       * Solaris 2.6 with perl 5.004_04 built for sun4-solaris
+    - The version of Perl to demand was lowered to 5.004.
+    - Add more tests.
+       t/02.local_md5.t
+       t/05.connect.t
+       t/06.setup.t
+       t/07.insert.t
+       t/08.select.t
+       t/09.update.t
+       t/10.delete.t
+       t/11.transaction.t
+       t/12.errorhandle.t
+       t/99.cleanup.t
+    - Net::PostgreSQL was unified to DBD::PgPP.
+
+0.03  Thu Jul 11 22:13:44 JST 2002
+    - Fix can't select Null field problem.
+    - Support of environment without "pack('Z*', $string)".
+      The environment which operation has mistaken is included
+      Ex. perl5.005_03 etc..
+      (Thanks to Tatsuhiko Miyagawa <miyagawa@edge.co.jp>)
+    - The problem on which "Row Description Object" commits
+      suicide is corrected.
+      Old things, such as perl5.005_03, are influenced.
+    - Added the DES-crypt() check.
+      (Thanks to Dan Kogai <dankogai@dan.co.jp>)
+    - Add more tests.
+       t/1.des_crypt_checker.t
+       t/2.crypt_auth.t
+       t/3.md5_auth.t
+
+0.02  Tue Jul  9 21:54:37 JST 2002
+    - 'md5' auth - MD5 encrypt Authentication support.
+      requre Digest::MD5 module
+    - Add script/pgsql.pl demo script.
+    - UNIX Socket connection support.
+
+0.01  Fri Jul 12 21:08:29 2002
+    - original version; created by h2xs 1.21 with options
+            -X -n DBD::PgPP
+    - 'password' auth - Crear-text password Authentication support.
+    - 'crypt' auth - Crypt() encrypt Authentication support.
+    - 'trust' auth - No authentication support.

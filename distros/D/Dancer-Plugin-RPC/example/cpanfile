@@ -1,0 +1,13 @@
+# Example application (excluding the plugin)
+requires 'Dancer'           => '1.32';
+requires 'HTTP::Tiny'       => '0.070';
+requires 'JSON'             => '2.90';
+requires 'Moo'              => '2.0';
+requires 'Params::Validate' => '1.0';
+requires 'URI'              => '1.60';
+
+# do-rpc
+requires 'Log::Log4perl'               => '1.49';
+requires 'MooseX::Log::Log4perl::Easy' => '0.47';
+requires 'RPC::XML'                    => '0.57';
+requires 'UUID::Tiny'                  => '1.04';

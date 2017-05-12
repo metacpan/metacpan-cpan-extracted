@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBICx-MapMaker,
+version 0.03:
+
+  automatically create a DBIx::Class mapping table
+
+This software is copyright (c) 2011 by Jonathan Rockway.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

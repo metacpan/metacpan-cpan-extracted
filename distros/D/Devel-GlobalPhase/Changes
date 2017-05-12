@@ -1,0 +1,31 @@
+Revision history for Devel::GlobalPhase
+
+0.003000 - 2017-04-15
+  - fix threaded tests when . missing from @INC
+  - prevent this module from slowing down Devel::GlobalDestruction
+  - let END detection be slightly less accurate to increase performance and
+    avoid a potential segfault
+
+0.002004 - 2016-10-31
+  - fix TODO in tests (and thus failures on perl < 5.14)
+
+0.002003 - 2016-10-15
+  - stop relying on . being in @INC in tests
+  - prevent modification of emulated ${^GLOBAL_PHASE} during global destruction
+  - report modification of emulated ${^GLOBAL_PHASE} more correctly
+  - added test for segfaulting on perl 5.8.9 - 5.12.x
+
+0.002002 - 2014-08-16
+  - small optimizations
+  - include README in dist
+  - some additional testing
+
+v0.002001   Feb 7, 2013
+  - Fix test exit values on win32
+
+v0.002000   Feb 6, 2013
+  - Fix running under threads
+  - Fix early destruction of global var in ealier perl versions
+
+v0.001000   Feb 3, 2013
+  - Initial release

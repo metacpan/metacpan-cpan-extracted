@@ -1,0 +1,22 @@
+Revision history for Perl extension DBIx:Connection.
+
+0.08  Tue Aug 19 2008
+    - Add extend contructor for passing only dbh and connection_name as parameters
+
+0.07  Fri May 30 2008
+    - Add tests
+    - Improved documentation
+
+0.06  Fri May 30 2008
+    - Removed warnings for primary_key_info
+    - Documentation improvements
+
+0.05  Mon May 26 2008
+    - Documentation improvements
+    - Added update_lob, fetch_lob methods
+0.03  Mon May 12 2008
+    - Documentation improvements
+0.02  Wen May 07 2008
+    - Pod doumentation fix.
+0.01  Mon May 05 2008
+    -  Initial import to CPAN.

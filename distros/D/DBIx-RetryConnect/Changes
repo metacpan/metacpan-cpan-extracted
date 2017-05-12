@@ -1,0 +1,9 @@
+Changes file for DBIx::RetryConnect
+
+0.002002  2015-03-17 22:23:10+00:00 Europe/London
+
+  - Fix pod title. Fix travis-ci config.
+
+0.002001  2015-03-17 18:12:33+00:00 Europe/London
+
+  - the first public release

@@ -1,0 +1,20 @@
+---
+abstract: Fake dist for testing metadata determination
+author:
+- Randy Stauner <rwstauner@cpan.org>
+dynamic_config: 0
+generated_by: hand
+license:
+- perl_5
+meta-spec:
+  url: http://search.cpan.org/perldoc?CPAN::Meta::Spec
+  version: '2'
+name: Dist-Metadata-Test-MetaFile-Incomplete
+no_index:
+  directory:
+  - examples
+  - share
+  - xt
+provides: {}
+release_status: stable
+version: '2.2'

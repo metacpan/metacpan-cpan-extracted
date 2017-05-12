@@ -1,0 +1,86 @@
+NAME
+    Date::Biorhythm - a biorhythm calculator
+
+SYNOPSIS
+    From the command line
+
+      biorhythm --birthday=1994-10-09
+
+    Usage
+
+      use Date::Biorhythm;
+      my $bio = Date::Biorhythm->new({
+        birthday => Date::Calc::Object->new(0, 1970, 1, 1),
+        name     => 'Unix',
+      });
+
+      my $i = 0;
+      my $limit = 365;
+      $bio->day(Date::Calc::Object->today);
+      while ($i < $limit) {
+        print $bio->value('emotional'), "\n";
+        $bio->next;
+        $i++;
+      }
+
+DESCRIPTION
+    I find biorhythms mildly amusing, but I got tired of visiting
+    http://www.facade.com/biorhythm and having to deal with their web-based
+    form for date entry.
+
+    I vaguely remembered there being a Perl module for biorhythm
+    calculation, but I couldn't find it on CPAN. However, further
+    investigation finally led me to BackPAN where I found Date::Biorhythm
+    1.1 which was written by Terrence Brannon (a long time ago).
+
+    Wanting an excuse to try Moose out, I decided to make a new and
+    modernized version of Date::Biorhythm, and this is the result.
+
+BUT WTF IS A BIORHYTHM?
+    !http://i41.photobucket.com/albums/e271/sr5i/GoogleMotherFucker.jpg!
+
+    http://en.wikipedia.org/wiki/Biorhythm
+
+METHODS
+  meta
+    This method was added by Moose, and it gives you access to
+    Date::Biorhythm's metaclass. (See Moose for more details.)
+
+  new
+    The constructor. It takes on optional hashref that will accept the
+    following keys: name, birthday, and day.
+
+  name
+    Get or set the name associated with this biorhythm. This will usually be
+    a person's name.
+
+  birthday
+    Get or set the birthday used for this biorhythm.
+
+  day
+    Get or set the current day (which is represented by a
+    Date::Calc::Object).
+
+  next
+    Go forward one day by incrementing $self->day.
+
+  prev
+    Go backward one day by decrementing $self->day.
+
+  index
+    Given a primary cycle (such as 'emotional', 'intellectual', or
+    'physical'), return how many days we are into the cycle. Note that the
+    first day of the cycle returns 0.
+
+  value
+    Given a primary cycle or secondary cycle, return a value between -1 and
+    1 that represents the current amplitude in the cycle.
+
+SEE ALSO
+    http://www.facade.com/biorhythm
+
+AUTHOR
+    Terrence Brannon <metaperl@gmail.com>
+
+    John Beppu <beppu@cpan.org>
+

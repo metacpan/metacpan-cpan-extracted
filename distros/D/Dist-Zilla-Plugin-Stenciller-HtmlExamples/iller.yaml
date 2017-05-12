@@ -1,0 +1,53 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-Stenciller-HtmlExamples
+
+add_prereqs_as_authordeps: 1
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Stenciller: 0.1400
+      - Types::Standard
+      - Types::Path::Tiny
+      - Dist::Zilla::File::InMemory
+      - syntax
+      - Syntax::Feature::Qs: 0.2004
+      - String::Stomp
+      - Moose
+      - namespace::autoclean
+      - Path::Tiny
+      - MooseX::AttributeDocumented
+
+  test:
+    requires:
+     - Test::DZil
+     - Test::Differences
+     - Path::Tiny
+     - File::Temp
+     - Syntax::Feature::Qi
+     - syntax
+     - String::Cushion
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: MetaNoIndex
+    directory:
+      - t/corpus
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 1
+
+  - +extend_plugin: Splint
+    type_libraries: Types::Stenciller=Stencil,Stenciller
+
+
+

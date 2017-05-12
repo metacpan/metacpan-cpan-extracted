@@ -1,0 +1,42 @@
+DBIx-MultiDB
+
+DBIx::MultiDB provides a simple way to join data from different sources.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::MultiDB
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-MultiDB
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-MultiDB
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-MultiDB
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-MultiDB/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Nelson Ferraz
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

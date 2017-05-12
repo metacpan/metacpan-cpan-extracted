@@ -1,0 +1,29 @@
+Revision history for Devel-Gladiator
+
+0.07    2014-10-19 18:26:32Z
+        - skip failing PadWalker tests on < 5.009 (RT#99581)
+
+0.06    2014-10-19 01:49:27Z
+        - documentation updates (thanks, mohawk!)
+
+0.05    20142014-10-18 06:51:53Z
+        - minor documentation updates
+        - converted packaging to Dist::Zilla; declared correct prerequisites
+        - updated ppport.h to latest version
+
+0.04    2013-05-14
+        - fix pod formatting (Curtis Brandt)
+
+0.03    2013-05-14
+        - walk_arena() now sorts by class name when refcounts are equal, for
+          easier comparison between successive runs (Karen Etheridge)
+
+0.02    2012-10-24 18:30:24Z
+        - fix test failures, and note this caveat in the docs
+
+0.01    2008-10-02 13:44:52Z
+        - Prepared for release by Yuval Kogman
+
+0.00_01 2006-06-26 15:57:11Z
+        - original version; created by h2xs 1.23 with options
+                -A -B -P -c -e -k -n Devel::Gladiator

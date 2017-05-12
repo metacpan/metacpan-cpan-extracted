@@ -1,0 +1,8 @@
+Revision history for Dispatch-Class
+
+0.02    2014-11-29
+        - Use Exporter::Tiny instead of Sub::Exporter.
+
+0.01    2014-01-04
+        First version, released on an unsuspecting world.
+

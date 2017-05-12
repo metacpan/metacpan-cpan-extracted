@@ -1,0 +1,55 @@
+SYNOPSIS
+
+     use Data::Sah::From::JSONSchema qw(convert_json_schema_to_sah);
+    
+     my $jsonsch = {
+         description => "a representation of a person, company, organization, or place",
+         type => "object",
+         required => [qw/familyName givenName/],
+         properties => {
+             fn => {
+                 description => "formatted name",
+                 type => "string",
+             },
+             familyName => {type => "string"},
+             givenName => {type => "string"},
+         },
+     };
+     my $sahsch = convert_json_schema_to_sah($jsonsch);
+    
+     # $sahsch will contain something like:
+     # [hash => {
+     #     description => "a representation of a person, company, organization, or place",
+     #     req_keys => ['familyName', 'givenName'],
+     #     keys => {
+     #         fn => [str => {
+     #             description => "formatted name",
+     #             req => 1,
+     #         }],
+     #         familyName => ['str', {req=>1}],
+     #         givenName => ['str', {req=>1}],
+     #     },
+     # }]
+
+DESCRIPTION
+
+    EARLY DEVELOPMENT, EXPERIMENTAL.
+
+    Some features are not yet supported: $ref, $schema, id, array's
+    uniqueItems, and so on.
+
+FUNCTIONS
+
+ convert_json_schema_to_sah($jsonsch) => ARRAY
+
+    Convert JSON schema in $jsonsch (which must be a hash), to a Sah
+    schema. Dies on failure.
+
+SEE ALSO
+
+    http://json-schema.org/
+
+    Sah, Data::Sah
+
+    Implementation of JSON Schema in Perl: JSON::Schema
+

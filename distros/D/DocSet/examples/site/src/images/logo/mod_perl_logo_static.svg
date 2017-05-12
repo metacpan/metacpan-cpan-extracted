@@ -1,0 +1,36 @@
+<svg width="382" height="85">
+<title>mod_perl logo</title>
+<desc>Michael Demers' mod_perl logo</desc>
+
+
+<!-- mod_perl text -->
+<g style="font-family: Trebuchet MS, sans-serif;
+          font-size: 60pt;">
+    <text x="80" y="65"
+            style="fill: #999999">mod</text>
+    <text x="235" y="65"
+        style="font-weight: bold;
+            fill: #326696">perl</text>
+</g>
+
+<!-- Square around cogs -->
+<rect x="17" y="16" width="52" height="52" style="fill: black;"/>
+
+<!-- Cogs clip path -->
+<clipPath id="rectClip">
+    <rect id="rect1" x="21" y="20" width="44" height="44" style="stroke: gray; fill: none;"/>
+</clipPath>
+
+<!-- Cogs -->
+<g id="cogs" style="clip-path: url(#rectClip);">
+    <circle cx="69" cy="68" r="40" style="fill: white;"/>
+    <circle cx="69" cy="68" r="15" style="fill: black;"/>
+    <polyline id="cog1" style="stroke: white; stroke-linejoin: round; fill: white;"
+        points="61 32, 63 22, 75 22, 77 32"/>
+    <use xlink:href="#cog1" transform="rotate(-30, 69, 68)"/>
+    <use xlink:href="#cog1" transform="rotate(-60, 69, 68)"/>
+    <use xlink:href="#cog1" transform="rotate(-90, 69, 68)"/>
+
+</g>
+
+</svg>

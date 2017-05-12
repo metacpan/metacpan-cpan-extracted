@@ -1,0 +1,130 @@
+NAME
+    Data::Dump::Ruby
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+     use Data::Dump::Ruby qw(dump_ruby ddx_ruby);
+
+     # in Perl
+     $str = dump_ruby($var);
+
+     # in Ruby
+     var = eval str
+
+     # or use it for easy debug printout
+     ddx_ruby localtime;
+
+DESCRIPTION
+    This module provide functions that takes a list of values as their
+    argument and produces a string as its result. The string contains Ruby
+    code that, when "eval"ed, produces a deep copy of the original
+    arguments.
+
+    The main feature of the module is that it strives to produce output that
+    is easy to read. Example:
+
+        @a = (1, [2, 3], {4 => 5});
+        dump_ruby(@a);
+
+    Produces:
+
+        [1, [2, 3], {4 => 5}]
+
+    If you dump just a little data, it is output on a single line. If you
+    dump data that is more complex or there is a lot of it, line breaks are
+    automatically added to keep it easy to read.
+
+    The following functions are provided (only the dd* functions are
+    exported by default):
+
+    dump_ruby( ... )
+    pp_ruby( ... )
+        Returns a string containing a Ruby expression/code. If you pass this
+        string to Ruby's eval(), it should return a copy of the arguments
+        you passed to dump_ruby().
+
+        If you call the function with multiple arguments then the output
+        will be wrapped in an outer array [ ..., ..., ... ]. If you call the
+        function with a single argument the output will not have the
+        wrapping. If you call the function with a single scalar
+        (non-reference) argument it will just return the scalar quoted if
+        needed, but never break it into multiple lines. If you pass multiple
+        arguments or references to arrays of hashes then the return value
+        might contain line breaks to format it for easier reading. The
+        returned string will never be "\n" terminated, even if contains
+        multiple lines. This allows Ruby code like this to place the
+        semicolon in the expected place:
+
+           print 'obj = ', $res, "\n;"
+
+        If dump_ruby() is called in void context, then the dump is printed
+        on STDERR and then "\n" terminated. You might find this useful for
+        quick debug printouts, but the dd*() functions might be better
+        alternatives for this.
+
+        There is no difference between dump_ruby() and pp_ruby().
+
+    quote_ruby( $string )
+        Returns a quoted version of the provided string.
+
+        It differs from "dd_ruby($string)" in that it will quote even
+        numbers and not try to come up with clever expressions that might
+        shorten the output.
+
+    dd_ruby( ... )
+    ddx_ruby( ... )
+        These functions will call dump_ruby() on their argument and print
+        the result to STDOUT (actually, it's the currently selected output
+        handle, but STDOUT is the default for that).
+
+        The difference between them is only that ddx_ruby() will prefix the
+        lines it prints with "# " and mark the first line with the file and
+        line number where it was called. This is meant to be useful for
+        debug printouts of state within programs.
+
+NAME
+    Data::Dump::Ruby - Pretty printing of data structures as Ruby code
+
+BUGS/LIMITATIONS
+    Code references will be displayed as simply "(Proc.new {})" when dumped.
+    Thus, "eval"ing them will not reproduce the original routine.
+
+    Regexes in Ruby by default are multilines (e.g. /^foo/ in Perl means
+    /\Afoo/ in Ruby and /^foo/m in Perl means /^foo/ in Ruby), this is not
+    adjusted yet.
+
+SEE ALSO
+    Data::Dump and Data::Dump::PHP (from which this codebase is based)
+
+    JSON, YAML - Another alternative to exchange data with Ruby (and other
+    languages) is to export/import via YAML and JSON.
+
+ACKNOWLEDGEMENTS
+    Data::Dump::Ruby is a quick hack. I simply copied the code from
+    Data::Dump::PHP, which was copied from Gisle Ass' wonderful "Data::Dump"
+    and changed only whatever is necessary.
+
+AUTHORS
+    The "Data::Dump::Ruby" module is written by Steven Haryanto
+    <stevenharyanto@gmail.com>, based on "Data::Dump" by Gisle Aas
+    <gisle@aas.no>, based on "Data::Dumper" by Gurusamy Sarathy
+    <gsar@umich.edu>.
+
+     Copyright 2011 Steven Haryanto.
+     Copyright 1998-2000,2003-2004,2008 Gisle Aas.
+     Copyright 1996-1998 Gurusamy Sarathy.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

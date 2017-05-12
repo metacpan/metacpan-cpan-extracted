@@ -1,0 +1,97 @@
+NAME
+    Dist::Zilla::Plugin::Doppelgaenger - Creates an evil twin of a CPAN
+    distribution
+
+VERSION
+    version 0.008
+
+SYNOPSIS
+      [Doppelgaenger]
+      source_module = Foo::Bar
+      strip_pod = 1
+
+DESCRIPTION
+    This Dist::Zilla plugin creates a new CPAN distribution with a new name
+    based on the latest stable distribution of a source module.
+
+    Please do not do this without the permission of the authors or
+    maintainers of the source.
+
+    If the Changes files is flagged to be updated, you must have "{{$NEXT}}"
+    in your Changes files and use the "NextRelease" plugin. The source
+    distribution will be added on a line in the Changes file after
+    "{{$NEXT}}". After release, your original Changes file might look
+    something like this:
+
+      0.001     2010-12-17 08:37:08 EST5EDT
+
+        - Generated from AUTHOR/Foo-Bar-1.23.tar.gz
+
+        - See https://metacpan.org/changes/release/AUTHOR/Foo-Bar-1.23 for details
+
+    If you strip Pod, you may with to explore replacing it with new Pod
+    using the Dist::Zilla::Plugin::AppendExternalData plugin.
+
+ATTRIBUTES
+  source_module (REQUIRED)
+    The name of a CPAN module to imitate. E.g. Foo::Bar
+
+  new_name
+    The new name to use in place of the source name. Defaults to the
+    converted form of the distribution name.
+
+  cpan_mirror
+    This is a URI to a CPAN mirror. It must be an 'http' URI. Defaults to
+    "http://www.cpan.org/"
+
+  strip_version
+    Boolean for whether any assignments to $VERSION should be stripped out
+    of the source. This is a crude hack and acts by killing a line of code
+    containing such assignments. This obviously may not work in all cases
+    and should be used with caution. Default is false.
+
+  strip_pod
+    Boolean for whether Pod should be stripped when copying from source.
+    Default is false.
+
+  changes_file
+    Name of change log file. Defaults to 'Changes'.
+
+  update_changes_file
+    Boolean for whether change log should be updated with the source
+    distribution when built. Default is true.
+
+  exclude_filename
+    To exclude certain files from being gathered, use the "exclude_filename"
+    option. This may be used multiple times to specify multiple files to
+    exclude.
+
+  exclude_match
+    This is just like "exclude_filename" but provides a regular expression
+    pattern. Files matching the pattern are not gathered. This may be used
+    multiple times to specify multiple patterns to exclude.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Doppelgaenger/issues>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Doppelgaenger>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Doppelgaenger.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

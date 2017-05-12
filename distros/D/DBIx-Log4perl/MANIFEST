@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+todo.txt
+example.conf
+t/DBIx-Log4perl.t
+t/simple.t
+t/lib.pl
+lib/DBIx/Log4perl.pm
+lib/DBIx/Log4perl/Constants.pm
+lib/DBIx/Log4perl/st.pm
+lib/DBIx/Log4perl/db.pm
+META.yml                                 Module meta-data (added by MakeMaker)

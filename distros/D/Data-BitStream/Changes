@@ -1,0 +1,70 @@
+Revision history for Perl extension Data::BitStream.
+
+0.08    16 Aug 2014
+        - Updates to documentation.
+        - Goldbach encoding almost 2x faster (sped up pair search).
+
+0.07    1 Jan 2013
+	- Change from Mouse to Moo.  Mouse has great performance, but the Perl
+	  community is moving toward Moo/Moose and away from Any:Moose and
+	  Mouse.  In most cases Moo will be similar performance assuming the
+	  Class::XSAccessor module is installed.
+	- Remove some Unicode characters that snuck into references.
+	- Much faster primes for big Goldbach codes.  DBXS is still ~30x
+	  faster overall, but almost all of that is the pair search.
+        - Add BER and Varint codes.
+
+0.06   28 May 2012
+	- Make all tests numbered.
+	- Documentation additions (Pod Coverage testing).
+	- get_arice / put_arice modify the k parameter, just like XS code.
+	- Update Additive / Goldbach to reflect DBXS and MPFS changes.
+
+0.05   17 May 2012
+	- Make a couple 64-bit tests work properly with the 'xs' module on
+	  LLP64 systems.
+	- Add put_raw, from_raw uses it.
+	- String has custom to_raw and put_raw.
+	- Inline C for decorrelator / predictor in image compression example.
+	- Better behavior when doing bad reads.
+	- Unify a lot of error strings.
+	- Add generalized Fibonacci coding (order 2-16).
+	- Add additive and Goldbach G1/G2 codes from Fenwick's 2002 IEEE paper.
+	- Add comma codes (including ternary comma codes e.g. Fenwick 1996).
+	- Add block-based taboo codes (Pigeon 2001).
+
+0.04    9 Nov 2011
+	- Fix late regression in one of the tests, unpack "W" -> "C".
+	- Minor test and documentation changes.
+	- Make most error strings consistent.
+
+0.03   Mon Nov  7 06:00:00 2011
+	- More work on unit tests.
+	- Add BLVec class to use XS.  Inefficient but it works (and even with
+	  the silly setpos/setlen after every call, it's much faster than PP).
+	- Don't use Vec and BitVec implementations unless specifically asked.
+	- Lossless image codec example.
+	- Simple file support (read / write).
+	- Text methods (code_get, code_put, add_code)
+	- Performance.
+	- Clarify POD compression example slightly.
+	- More tests on 32-bit and big-endian machines.
+
+0.02  Fri Sep 30 08:16:13 2011
+	- Create dist with tool instead of by hand.  Uses version number.
+	- WordVec was setting the Vec variables.
+
+0.01  Mon Sep 26 10:12:53 2011
+	- original version; created by h2xs 1.23 with options
+		-XAn Data::BitStream
+
+	- 24 Sep 2011, add Boldi-Vigna Zeta, Levenstein Codes, and Baer codes
+	- 19 Sep 2011, make Golomb take a sub, better default impls
+	- 14 Sep 2011, add skip(), optimizations
+	- 13 Sep 2011, more tests, harden the reader/writer distinction
+	- 12 Sep 2011, add Delta and Omega
+	- 11 Sep 2011, add ExpGolomb, and fix readahead
+	- 9 Sep 2011, split into Base/impls/codes, first unit tests,
+		add Fibonacci, Golomb, and Rice encoding.
+	- 8 Sep 2011, Vec and BitVec code, with Gamma and GG3
+	- 24 Aug 2011, first Perl version, Unary

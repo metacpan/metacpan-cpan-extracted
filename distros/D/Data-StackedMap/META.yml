@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Data-StackedMap
+version:             0.03
+abstract:            An object that stores key/value pairs in a stacked fashion
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Claes Jakobsson <claesjac@cpan.org>

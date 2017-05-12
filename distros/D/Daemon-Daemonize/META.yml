@@ -1,0 +1,22 @@
+---
+abstract: 'An easy-to-use daemon(izing) toolkit'
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+generated_by: 'Dist::Zilla version 2.101170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Daemon-Daemonize
+recommends: {}
+requires:
+  Carp: 0
+  IO::Socket::INET: 0
+  POSIX: 0
+  Path::Class: 0
+  Sub::Exporter: 0
+version: 0.0052

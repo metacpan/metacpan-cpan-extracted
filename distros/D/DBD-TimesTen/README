@@ -1,0 +1,110 @@
+DBD::TimesTen -- DBD module interfacing the TimesTen databases.
+
+   $Id: README 548 2006-11-26 23:51:09Z wagnerch $
+
+   Copyright (c) 1994,1995,1996,1997,1998  Tim Bunce
+   portions Copyright (c) 1997,1998,1999,2000,2001,2002 Jeff Urlwin
+   portions Copyright (c) 1997  Thomas K. Wenrich
+   portions Copyright (c) 2006  Chad Wagner
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+   PLEASE READ THE ENTIRE README FILE CAREFULLY !
+
+
+**** NOTICE ******** NOTICE ******** NOTICE ******** NOTICE ******** NOTICE ****
+
+   This is a BETA version of the driver, since I am not actively using TimesTen
+   I have not encountered every issue.  This driver is based on DBD::ODBC,
+   since the TimesTen client can be directly linked to any ODBC-based
+   application.  The intent is to eventually code all of the TimesTen
+   extensions into this driver.
+
+**** NOTICE ******** NOTICE ******** NOTICE ******** NOTICE ******** NOTICE ****
+
+
+INTRODUCTION:
+   This driver is based on DBD::ODBC 1.13.  Thanks to Tim Bunce, Jeff Urlwin,
+   and the contributors of DBD::ODBC, as they have made this driver fairly
+   easy to implement with TimesTen.
+
+   There is more work to be done here, it appears the bulk inserts need to
+   be done and probably a bunch of other things.
+
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (as per DBI specifications/compatibility)
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module (at least DBI 1.201).
+    It is very important to TEST it and INSTALL it!
+
+    Remember to *read* the DBI README file!
+
+    Remember to *read* the DBD::TimesTen.pm POD documentation!
+
+
+BUILDING:
+
+  set-up these environment variables:
+    DBI_DSN   The dbi data source, e.g. 'dbi:TimesTen:YOUR_DSN_HERE'
+    DBI_USER  The username to use to connect to the database
+    DBI_PASS  The username to use to connect to the database
+    TT_HOME   (Unix only) The dir your driver manager is installed in
+  perl Makefile.PL
+  make                (or nmake, if VC++ on Win32)
+  make test           (or nmake, if VC++ on Win32)
+
+TESTING
+  
+  make test
+  make test TEST_VERBOSE=1   (if any of the t/* tests fail)
+  make install               (if the tests look okay)
+
+
+IF YOU HAVE PROBLEMS:
+
+Do not hand edit the generated Makefile unless you are completely sure
+you understand the implications! Always try to make changes via the
+Makefile.PL command line and/or editing the Makefile.PL.
+
+You should not need to make any changes. If you do *please* let me
+know so that I can try to make it automatic in a later release.
+
+Please post details of any problems (or changes you needed to make) to
+chad.wagner@gmail.com. But note...
+
+** IT IS IMPORTANT TO INCLUDE THE FOLLOWING INFORMATION:
+
+1. A complete log of a all steps of the build, e.g.:
+
+  perl Makefile.PL           (do a make realclean first)
+  make
+  make test
+  make test TEST_VERBOSE=1   (if any tests fail)
+
+2. Full details of which software you are using, including:
+
+  Perl version (the output of perl -V)
+
+3. A repeatable test case, including:
+
+  Tables
+  Data
+  Perl code
+
+It is important to check that you are using the latest version before
+posting.
+
+
+===============================================================================
+Other info:
+
+DBI 'home page': http://dbi.perl.org
+
+perldoc DBI
+perldoc DBD::TimesTen
+
+End.

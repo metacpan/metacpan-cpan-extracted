@@ -1,0 +1,49 @@
+Revision history for Devel-TraceLoad
+
+0.04    2001-04-18
+        - added tests
+
+0.05    2001-04-20
+        - minor documentation enhancements
+        - test corrections
+
+0.06    2001-06-18
+        - minor documentation enhancements
+        - test corrections
+
+0.08    2001-12-12
+        - nearly complete rewritting of the overriding require()
+        - test corrections thanks to Mooney Christophe <CMOONEY1@motorola.com>
+          I hope tests work correctly on non Win32 plateform.
+
+0.9.0   2007-08-04
+        - complete rewrite
+
+0.9.1   2007-11-07
+        - 20.traceload.t added to manifest. Oops.
+      
+1.0.0   2007-11-07
+        - Because 0.08 > 0.9.1:
+          in file: Devel-TraceLoad-0.9.1/lib/Devel/TraceLoad.pm
+            status: Not indexed because lib/Devel/TraceLoad.pm in
+                    P/PV/PVERD/Devel-TraceLoad-0.08.zip has a higher version
+                    number (0.08)
+          Not completely intuitive that.
+
+1.0.1   2007-11-08
+        - Switch to Module::Install
+        - Remove vstring support
+
+1.01    2007-11-16
+        - Made YAML a dependency
+
+1.02    2009-06-05
+        - Fix attempt to modify r/o value in args processing
+        - Moved to GitHub
+
+1.03    2009-06-11
+        - Protect our tests from modules injected via PERL5OPT
+
+1.04    2009-06-15
+        - Don't use -f switch on perls that don't support it.
+

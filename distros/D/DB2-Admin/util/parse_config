@@ -1,0 +1,41 @@
+#-*-perl-*-
+#
+# Parse our config file to get the parameters we need - mostly used
+# to drive the test suite.
+#
+# $Id: parse_config,v 145.2 2007/11/20 21:52:49 biersma Exp $
+#
+
+use strict;
+our %myconfig;
+
+{
+    my $config;
+
+    foreach my $relpath (qw( . .. ../.. ../../.. )) {
+	next unless -f "$relpath/CONFIG";
+	$config = "$relpath/CONFIG";
+	last;
+    }
+    die "Unable to locate CONFIG file\n" unless -f $config;
+
+    open(CONFIG, "$config") ||
+      die "Unable to open CONFIG file '$config': $!\n";
+
+    while (<CONFIG>) {
+	my ($key, $value);
+	
+	next if /^\#/;
+	next unless ($key,$value) = /^(\w+)\s*=\s*(.*)\s*$/;
+	if ( $ENV{$key} ) {
+	    print "Environment variable '$key' overrides CONFIG definition\n";
+	    $myconfig{$key} = $ENV{$key};
+	} else {
+	    $myconfig{$key} = $value;
+	}
+    }
+    close(CONFIG) ||
+      die "Unable to close CONFIG file '$config': $!\n";
+}
+
+1;

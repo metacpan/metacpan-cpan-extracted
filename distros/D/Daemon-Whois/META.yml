@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Daemon-Whois
+version:            1.11
+abstract:           A WHOIS daemon
+author:
+    - Alexx Roche <notice-dev@alexx.net>
+license:            This program is free software; you can redistribute it and/or modify it
+under the following license: Eclipse Public License, Version 1.0
+See http://www.opensource.org/licenses/ for more information.
+
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    CDB_File:     0
+    DateTime:     0
+    Net::Server:  0
+    Test::More:   0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

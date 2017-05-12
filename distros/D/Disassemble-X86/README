@@ -1,0 +1,57 @@
+Disassemble::X86 version 0.13
+=============================
+
+
+This module disassembles Intel x86 (IA32) machine code into a readable
+text format. It understands both 16- and 32-bit code, as well as MMX,
+SSE, SSE2, and 3DNow! extensions.
+
+
+Why not just use objdump/ndisasm/etc?
+
+With this module, you retain control during the disassembly process.
+For instance, if a jump instruction is disassembled, you can start
+disassembling from the target address immediately. This helps avoid
+getting out of sync with the instruction stream.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   cpansign -v
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+Module::Signature is needed to check the signature
+Test::More is needed to run the tests
+
+
+AUTHOR
+
+Bob Mathews <bobmathews@alumni.calpoly.edu>
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2002 Bob Mathews. All rights reserved.
+
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+DISCLAIMER
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+I do my best to ensure that this software works correctly, but my
+resources are limited. If you find any problems, please contact me,
+and I will try to fix them as time permits.
+

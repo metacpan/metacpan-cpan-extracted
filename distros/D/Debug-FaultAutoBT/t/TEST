@@ -1,0 +1,43 @@
+#!/usr/bin/perl
+
+use strict;
+
+$|++;
+use Config;
+
+my @tests = ();
+
+# First we check if we already are within the "t" directory
+if (-d "t") {
+    # try to move into test directory
+    chdir "t" or die "Can't chdir: $!";
+
+    # fix all relative library locations
+    foreach (@INC) {
+	$_ = "../$_" unless m,^(/)|([a-f]:),i;
+    }
+}
+
+# Pick up the library files from the ../blib directory
+unshift @INC, "../lib" ;
+#print "@INC\n";
+
+use Test::Harness;
+$Test::Harness::verbose = shift
+  if $ARGV[0] =~ /^\d+$/ || $ARGV[0] eq "-v";
+
+if (@ARGV) {
+    for (@ARGV) {
+	if (-d $_) {
+	    push(@tests, <$_/*.t>);
+	} else {
+            $_ .= ".t" unless /\.t$/;
+	    push(@tests, $_);
+	}
+    }
+} else {
+    push @tests, <*/*.t>,<*.t>;
+}
+
+runtests @tests;
+

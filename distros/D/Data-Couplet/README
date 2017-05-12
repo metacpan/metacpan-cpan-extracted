@@ -1,0 +1,170 @@
+NAME
+    Data::Couplet - Yet another (But Hopefully Better) Key-Value Storage
+    mechanism
+
+VERSION
+    version 0.02004314
+
+SYNOPSIS
+      use Data::Couplet;
+
+      # Retain order.
+      my $couplet = Data::Couplet->new(   a => $b , c => $d );
+
+      my $output = $couplet->value('a');  # returns $b;
+
+      my $hash = { 'this is a' => 'key' };
+
+      $couplet->set( $hash, "hello");
+      $couplet->value( $hash ); # hello
+
+ALPHA CODE
+    Lots of stuff is probably still broken, unimplemented, untested.
+
+    User beware
+
+DIFFERENT
+    Why is this module different?
+
+    1. No Tied Hashes.
+        Tied hashes are IMO Ugly. Objects are far more handy for many
+        things. Especially in moose world. You want tied hashes, do it
+        yourself.
+
+    2. Trying Hard to preserve non-scalar keys.
+        I want it to be possible, to retain arbitrary references used as
+        keys.
+
+    3. Permutation.
+        Its not here yet, but there *Will* eventually be reordering
+        functions.
+
+    I seriously looked all over CPAN for something that suited my needs and
+    didn't find any.
+
+    I then tried with Tie::IxHash::ButMoreFun, and then discovered that how
+    I was using Tie::IxHash wasn't even sustainable on different versions of
+    Perl, and based on the 1997 release date, I gave up on seeing that
+    fixed.
+
+METHODS
+  CONSTRUCTOR
+   ->new( %orderd_pairs )
+    Create a new Data::Couplet entity using a series of ordered pairs.
+
+      $c = Data::Couplet->new( 'a' => 'b', 'c' => 'd' );
+
+  ENTRY CREATION
+   ->set( Any $object, Any  $value ) : $self : Modifier
+    Record the association of a key ( any object that can be coerced into a
+    string ) to a value.
+
+    New entries are pushed on the logical right hand end of it in array
+    context.
+
+      # { 'a' => 'b', 'c' => 'd' }
+      set( 'a', 'e' );
+      # { 'a' => 'e', 'c' => 'd' }
+      set('e', 'a' );
+      # { 'a' => 'e', 'c' => 'd', 'e' => 'a' }
+
+  ENTRY REMOVAL
+   ->unset( Array[Any] @objects ) : $self : Modifier
+    Entries are ripped out of the structure, and all items moved around to
+    fill the void.
+
+      # { 'a' => 'b', 'c' => 'd','e'=>'f' }
+      ->unset( 'c' );
+      # { 'a' => 'b', 'e'=>'f' }
+      ->unset('a');
+      # { 'e' => 'f' }
+
+   ->unset_at( Array[Int] @indices ) : $self : Modifier
+    Like ->unset, except you know where ( logically ) in the order off
+    things the entry you wish to delete is.
+
+      ->unset_at( 1 );
+      ->unset_at( 0 );
+
+    Should be identical to the above code.
+
+   ->unset_key( Array[Str] @keys ) : $self : Modifier
+    This is what ->unset ultimately calls, except ->unset does implicit
+    object_to_key conversion first. At present, that's not anything huge,
+    its just $object to convert it to a string. But this may change at some
+    future time. So use that method instead.
+
+  VALUE MANIPULATION
+   ->value( Any $object ) : Any $value
+    Returns a value associated with a key object. See "unset" for the
+    semantics of what object keys are.
+
+   ->value_at( Int $index ) : Any $value
+    Like value, but you need to know where in the data set the item is.
+
+   ->values() : Any @list
+    returns an array of all stored values in order.
+
+   ->values_ref() : ArrayRef[Any] $list
+    Just some nice syntax for [$o->values]
+
+   ->key_values() : Any @list
+    Returns an ordered sequence of key,value pairs, just like that passed to
+    the constructor.
+
+      my @d = $o->key_values()
+      while( @d ){
+        my $key = shift @d;
+        my $value = shift @d;
+        print "$key => $value\n"
+      }
+
+   ->key_values_paired() : Any[ArrayRef] @list
+    Returns like ->key_values does but key/value is grouped for your
+    convenience
+
+      for ( $o->key_values_paired() ){
+        my ( $key, $value ) = @{ $_ };
+      }
+
+  KEY MANIPULATION
+   ->keys() : @list
+    returns all known keys in order
+
+   ->key_at( Int $index ) : String
+    Given an index, return the key that holds that place.
+
+   ->key_object( String $key ) : Any $object
+    Given a string key, returns the object stored there.
+
+    This is probably very unhelpful to you unless you explicitly asked us
+    for our internal key name.
+
+   ->key_object_at( Int $index ) : Any $object
+    As with key_object, except partially useful, because you can fetch by
+    ID.
+
+  METHODS FROM PLUGINS
+    By default, this package imports a few methods from various plug-ins.
+
+    *   Data::Couplet::Plugin::KeyCount
+
+        ->count
+        ->last_index
+        ->indices
+
+    *   Data::Couplet::Plugin::BasicReorder
+
+        ->move_up
+        ->move_down
+        ->swap
+
+AUTHOR
+    Kent Fredric <kentnl at cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Kent Fredric.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

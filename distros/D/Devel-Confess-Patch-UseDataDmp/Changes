@@ -1,0 +1,12 @@
+Revision history for Devel-Confess-Patch-UseDataDmp
+
+0.02    2015-12-31 (PERLANCAR)
+
+	- Fix example (-d:Confess is not used because it'll cause
+	  Devel::Confess loaded before the patch module and Module::Patch
+	  complaining).
+
+
+0.01    2015-12-31 (PERLANCAR)
+
+        - First release.

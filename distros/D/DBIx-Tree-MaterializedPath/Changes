@@ -1,0 +1,33 @@
+Revision history for DBIx-Tree-MaterializedPath
+
+0.06    2008-11-25
+        Changed fetchall_arrayref to return array of arrays,
+            instead of array of hashrefs, resulting in a 20-30%
+            speedup for some operations on large trees.
+        Minor POD tweaks.
+
+0.05    2008-11-24
+        API change: Changed D::T::MP::Node->get_descendants() to
+            return a D::T::MP::TreeRepresentation object instead
+            of a raw data structure.  Removed
+            Node->traverse_descendants() in favor of
+            TreeRepresentation->traverse().
+        Minor POD tweaks.
+
+0.04    2008-11-22
+        Changed an unpack() format template in D::T::MP::PathMapper
+            that was not working in Perl 5.6.1 because of
+            parenthesis grouping.
+        Added DBI to Build.PL 'requires' to avoid erroneous fail
+            reports from CPANtesters.
+        Minor POD tweaks.
+
+0.03    2008-11-22
+        Fixed add_children() to allow empy hashref for child data.
+
+0.02    2008-11-21
+        Added perlcritic test, and tweaked code to pass.
+
+0.01    2008-11-19
+        First version, released on an unsuspecting world.
+

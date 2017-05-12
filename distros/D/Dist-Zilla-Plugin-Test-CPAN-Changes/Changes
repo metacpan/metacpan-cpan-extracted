@@ -1,0 +1,43 @@
+Revision history for Perl module Dist-Zilla-Plugin-Test-CPAN-Changes
+
+0.012     2016-06-12
+  - fix silly typo in method name [ether's fault, gh-11]
+
+0.011     2016-06-11
+  - Comments explaining where the added test came from [ether, gh-10]
+  - Add some data for MetaConfig [ether, gh-10]
+  - Some code cleanup [ether, gh-10]
+
+0.010     2016-06-11
+  - Don't use use_ok [gh-8]
+
+0.009     2015-01-22
+  - Eliminate use of Moose::Autobox in tests [kentnl; GH#5]
+
+0.008     2013-04-17
+  - eliminate the FileMunger stage by modifying the file as it is created
+      (Karen Etheridge)
+
+0.007     2013-04-14
+  - Run changes_ok in a subtest for ease of planning [mjgardner; GH#3]
+
+0.006     2013-04-13
+  - Require Test::CPAN::Changes at install & run time [dolmen; GH#2]
+
+0.005     2011-06-14
+  - Fix prerequisite that wasn't getting picked up on some smokers
+  - Fix synopsis [xenoterracide]
+  - Fix documentation [xenoterracide]
+
+0.004     2011-04-20
+  - Added tests
+  - Removed version requirement for File::Find
+
+0.003     2011-04-12
+  - New repository location
+
+0.002     2011-04-12
+  - New name: Dist::Zilla::Plugin::Test::CPANChanges
+
+0.001     2011-04-02
+  - Initial release

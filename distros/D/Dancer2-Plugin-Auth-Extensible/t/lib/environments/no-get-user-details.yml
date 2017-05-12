@@ -1,0 +1,6 @@
+logger: capture
+plugins:
+    Auth::Extensible:
+        realms:
+            config1:
+                provider: Provider::NoGetUserDetails

@@ -1,0 +1,50 @@
+Changelog
+=========
+
+0.06 28 May 2007
+  - Use Module::Install
+  - Require newer version of DateTime::Util::Astro
+
+0.05 06 Feb 2007
+  - Require newer versions of DateTime::Util::Calc and DateTime::Util::Astro
+  - Remove bf_downgrade
+  - Beef up tests
+  - Migrate to Module::Install
+
+0.04 11 Jan 2005
+  - Reequire newer Datetime::Util::Calc/DateTime::Util::Astro
+  - Tweak tests so that allowed delta is much less (now 1/6 of
+    what it used to be)
+
+0.03 24 Jul 2004
+  - Handle infinite datetime
+
+0.02 10 Feb 2004
+  - Add prompt to ask about installing Memoize
+  - Slightly reduce on some function calls to save time calculating
+
+0.01 12 Jan 2004
+  - Bump up version
+
+0.01_04 27 Dec 2003
+  - Some routines just *need* to be able to compute dates that are
+    *on or after* instead of just *after* (same for before), so
+    tentatively introducing the "on_or_after/before" options
+
+0.01_03 23 Dec 2003
+  - Fix silly typo
+  - Fix lunar_phase*() functions so that successive calls to next()
+    and previous() work as expected.
+  - Standardize interface.
+  - Change semantics of *_before() and *_after() functions so that
+    they always return the "next" applicable date. Pointed out by
+    Flavio S. Glock. 
+  - Add lunar phases related constants.
+  - Add some more tests
+
+0.01_02 19 Dec 2003
+  - Add some sanity tests
+  - Fix indentation
+
+0.01_01 09 Dec 2003
+  - First Release

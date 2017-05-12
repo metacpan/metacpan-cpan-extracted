@@ -1,0 +1,105 @@
+---
+file_removals: []
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5
+id: 1
+md5: 438eefef4fb3e42e48e9d181999dd617
+metadata:
+- file: 1
+  id: 1
+  name: archivesets
+  value: '10003'
+- file: 1
+  id: 3
+  name: endtime
+  value: 2009-11-24 08:54:42-05
+- file: 1
+  id: 4
+  name: esdt
+  value: OMCLDO2
+- file: 1
+  id: 5
+  name: orbit
+  value: '28517'
+- file: 1
+  id: 2
+  name: starttime
+  value: 2009-11-24 07:15:49-05
+repository: 1
+size: 215
+symlinks:
+- file: 1
+  id: 1
+  linkname: /tmp/data_downloader_test/dd_store/linktree_default/10003/OMCLDO2/2009/11/24/OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5
+  linktree: 1
+url: https://omisips1.omisips.eosdis.nasa.gov:8000/data/438eefef4fb3e42e48e9d181999dd617/OMI-Aura_L2-OMCLDO2_2009m1124t1215-o28517_v003-2009m1124t181606.he5
+urn: 10003=OMCLDO2=28517
+---
+file_removals: []
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5
+id: 2
+md5: 837cc5240f0550d413574493196bc147
+metadata:
+- file: 2
+  id: 6
+  name: archivesets
+  value: '10003'
+- file: 2
+  id: 8
+  name: endtime
+  value: 2009-11-24 07:15:49-05
+- file: 2
+  id: 9
+  name: esdt
+  value: OMCLDO2
+- file: 2
+  id: 10
+  name: orbit
+  value: '28516'
+- file: 2
+  id: 7
+  name: starttime
+  value: 2009-11-24 05:36:56-05
+repository: 1
+size: 215
+symlinks:
+- file: 2
+  id: 2
+  linkname: /tmp/data_downloader_test/dd_store/linktree_default/10003/OMCLDO2/2009/11/24/OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5
+  linktree: 1
+url: https://omisips1.omisips.eosdis.nasa.gov:8000/data/837cc5240f0550d413574493196bc147/OMI-Aura_L2-OMCLDO2_2009m1124t1036-o28516_v003-2009m1124t181605.he5
+urn: 10003=OMCLDO2=28516
+---
+file_removals: []
+filename: OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5
+id: 3
+md5: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+metadata:
+- file: 3
+  id: 11
+  name: archivesets
+  value: '10003'
+- file: 3
+  id: 13
+  name: endtime
+  value: 2009-11-24 05:36:56-05
+- file: 3
+  id: 14
+  name: esdt
+  value: OMCLDO2
+- file: 3
+  id: 15
+  name: orbit
+  value: '28515'
+- file: 3
+  id: 12
+  name: starttime
+  value: 2009-11-24 03:58:03-05
+repository: 1
+size: 221
+symlinks:
+- file: 3
+  id: 3
+  linkname: /tmp/data_downloader_test/dd_store/linktree_default/10003/OMCLDO2/2009/11/24/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5
+  linktree: 1
+url: https://omisips1.omisips.eosdis.nasa.gov:8000/data/aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/OMI-Aura_L2-OMCLDO2_2009m1124t0858-o28515_v003-2009m1124t145248_aaaaa.he5
+urn: 10003=OMCLDO2=28515

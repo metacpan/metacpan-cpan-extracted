@@ -1,0 +1,4 @@
+  -- Make it actually install ddlockd
+
+0.50 (Tuesday May 15, 2012)
+  -- Refactored release from previously unreleased code.

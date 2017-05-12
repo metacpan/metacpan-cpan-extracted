@@ -1,0 +1,103 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Consolidate::FileAsc - iterator for Pre Consolidated/Sorted files
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::FileAsc;
+
+  my $iterator=Data::Range::Compare::Stream::Iterator::Consolidate::FileAsc->new(
+    filename=>'some_file.csv',
+  );
+
+  while($iterator->has_next) {
+    my $result=$iterator->get_next;
+    print $result,"\n";
+  }
+
+=head1 DESCRIPTION
+
+This module implements a very simple file iterator interface.  This iterator interface assumes that the data is pre-sorted and pre-consolidated. The result objects returned are a container class: Result containers are constructed from $iterator->RESULT_FROM.  The class objects contained within the result object are constructed from $iterator->NEW_FROM.  Parsing is handled by $iterator->parse_line.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $iterator=new Data::Range::Compare::Stream::Iterator::Consolidate::FileAsc;
+
+Instance Constructor Arguments:
+
+      filename=>'source_file.csv'  
+        # the file is assumed to be an absolute or relative path to the file location.
+
+Optional Arguments:
+
+      factory_instance =>$obj
+        
+        # defines the object that implements the $obj->factory($start,$end,$data).
+        # new ranges are constructed from the factory interfcae.  If a factory interface
+        # is not created an instance of Data::Range::Compare::Stream is assumed.
+
+=item * if($iterator->in_error) { ... }
+
+Returns true if there was a problem opening the file.
+
+=item * my $class=$iterator->NEW_FROM;
+
+$class will contain the name of the class new ranges are to be constructed from: This will need to be overloaded if the class is not "Data::Range::Compare::Stream".
+
+=item * my $class=$iterator->RESULT_FROM;
+
+$class will contain the name of the class new result objects will be constructed from.
+
+=item * my $ref=$self->parss_line($line);
+
+This is the actual parser interface: $ref is an anonymous array representing the constructor arguments to be passed to the class referee to via $iterator->NEW_FROM.
+
+The parser logic is very simple and can be described as follows.
+
+    sub parse_line {
+      my ($self,$line)=@_;
+      chomp $line;
+      return [split /\s+/,$line];
+    }
+
+If the data you are dealing with is not parse-able using the above code then you will need to extend this package and overload the $iterator->parse_line interface.
+
+=item * while($iterator->has_next) { ... }
+
+Returns true when there are more rows to fetch.
+
+=item * my $range=$iterator->get_next;
+
+Returns the next Consolidated Result Object from the given source file.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

@@ -1,0 +1,45 @@
+DBIx-Class-I18NColumns
+
+This is a DBIC component to give internationalizable pseudo-column accessors to resultsets.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Class::I18NColumns
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-I18NColumns
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Class-I18NColumns
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Class-I18NColumns
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-Class-I18NColumns/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Diego Kuperman
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

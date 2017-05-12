@@ -1,0 +1,40 @@
+Revision history for Dist-Zilla-PluginBundle-LEONT
+
+0.014     2015-03-24 12:35:33+01:00 Europe/Amsterdam
+          Fix release testing
+
+0.013     2015-03-19 16:30:53+01:00 Europe/Amsterdam
+          Switch to RunExtraTests
+          Add Git::Contributors
+          Add fallback install_tools
+          Make Test::Compile usually be an author test
+          Remove LEONT::XS and LEONT::PP
+
+0.012     2013-11-07 14:40:54 Europe/Amsterdam
+          Replaced MakeMaker::Custom option by none
+
+0.011     2013-11-07 00:09:55 Europe/Amsterdam
+          Added MakeMaker::Custom as an option to install_tool options
+
+0.010     2013-10-01 13:57:38 Europe/Amsterdam
+          Force scripts to be in script/
+          Added MetaProvides
+          Optionally use MinimumPerlFast
+          Added optional plugins to recommended
+
+0.009     2013-05-26 01:27:44 Europe/Amsterdam
+          Embrace Module::Build::Tiny
+          Add Bootstrap::lib to dist.ini
+
+0.008     2013-01-30 17:23:40 Europe/Amsterdam
+          Reordered plugins so that BuildSelf can work
+
+0.007     2013-01-10 17:45:44 Europe/Amsterdam
+          Add Config::Slicer and PluginRemover bundle roles
+          Added BuildSelf to install_tool options
+
+0.006     2013-01-04 01:36:27 Europe/Amsterdam
+          Rerelease as 0.006, to satisfy PAUSE
+
+0.001     2013-01-04 01:21:56 Europe/Amsterdam
+    -

@@ -1,0 +1,448 @@
+00111000-00142000 r-xp 00000000 08:07 122110     /lib/libssl.so.0.9.7a
+Size:               196 kB
+Rss:                 44 kB
+Shared_Clean:        44 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00142000-00145000 rw-p 00031000 08:07 122110     /lib/libssl.so.0.9.7a
+Size:                12 kB
+Rss:                 12 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:       12 kB
+00253000-0026d000 r-xp 00000000 08:03 133629     /usr/lib/libpq.so.3.1
+Size:               104 kB
+Rss:                 28 kB
+Shared_Clean:        28 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+0026d000-0026e000 rw-p 0001a000 08:03 133629     /usr/lib/libpq.so.3.1
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+002d3000-002e6000 r-xp 00000000 08:07 122105     /lib/libnsl-2.3.4.so
+Size:                76 kB
+Rss:                 20 kB
+Shared_Clean:        20 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+002e6000-002e7000 r--p 00012000 08:07 122105     /lib/libnsl-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+002e7000-002e8000 rw-p 00013000 08:07 122105     /lib/libnsl-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+002e8000-002ea000 rw-p 002e8000 00:00 0 
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+0030f000-00325000 r-xp 00000000 08:07 122103     /lib/ld-2.3.4.so
+Size:                88 kB
+Rss:                 80 kB
+Shared_Clean:        80 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00325000-00326000 r--p 00015000 08:07 122103     /lib/ld-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00326000-00327000 rw-p 00016000 08:07 122103     /lib/ld-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00329000-00452000 r-xp 00000000 08:07 122104     /lib/tls/libc-2.3.4.so
+Size:              1188 kB
+Rss:                368 kB
+Shared_Clean:       368 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00452000-00454000 r--p 00129000 08:07 122104     /lib/tls/libc-2.3.4.so
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+00454000-00456000 rw-p 0012b000 08:07 122104     /lib/tls/libc-2.3.4.so
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+00456000-00458000 rw-p 00456000 00:00 0 
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+0045a000-0047b000 r-xp 00000000 08:07 122116     /lib/tls/libm-2.3.4.so
+Size:               132 kB
+Rss:                 24 kB
+Shared_Clean:        24 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+0047b000-0047c000 r--p 00020000 08:07 122116     /lib/tls/libm-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+0047c000-0047d000 rw-p 00021000 08:07 122116     /lib/tls/libm-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+0047f000-00481000 r-xp 00000000 08:07 122106     /lib/libdl-2.3.4.so
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         8 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00481000-00482000 r--p 00001000 08:07 122106     /lib/libdl-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00482000-00483000 rw-p 00002000 08:07 122106     /lib/libdl-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00485000-00493000 r-xp 00000000 08:07 122112     /lib/tls/libpthread-2.3.4.so
+Size:                56 kB
+Rss:                 44 kB
+Shared_Clean:        44 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00493000-00494000 r--p 0000d000 08:07 122112     /lib/tls/libpthread-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00494000-00495000 rw-p 0000e000 08:07 122112     /lib/tls/libpthread-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00495000-00497000 rw-p 00495000 00:00 0 
+Size:                 8 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+0057a000-00589000 r-xp 00000000 08:03 133305     /usr/lib/libz.so.1.2.1.2
+Size:                60 kB
+Rss:                 12 kB
+Shared_Clean:        12 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00589000-0058a000 rw-p 0000e000 08:03 133305     /usr/lib/libz.so.1.2.1.2
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+005c1000-005d0000 r-xp 00000000 08:07 122108     /lib/libresolv-2.3.4.so
+Size:                60 kB
+Rss:                 16 kB
+Shared_Clean:        16 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+005d0000-005d1000 r--p 0000f000 08:07 122108     /lib/libresolv-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+005d1000-005d2000 rw-p 00010000 08:07 122108     /lib/libresolv-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+005d2000-005d4000 rw-p 005d2000 00:00 0 
+Size:                 8 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+005d6000-005d8000 r-xp 00000000 08:07 122107     /lib/libcom_err.so.2.1
+Size:                 8 kB
+Rss:                  4 kB
+Shared_Clean:         4 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+005d8000-005d9000 rw-p 00001000 08:07 122107     /lib/libcom_err.so.2.1
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+005db000-005fb000 r-xp 00000000 08:03 133274     /usr/lib/libk5crypto.so.3.0
+Size:               128 kB
+Rss:                 20 kB
+Shared_Clean:        20 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+005fb000-005fc000 rw-p 00020000 08:03 133274     /usr/lib/libk5crypto.so.3.0
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+005fe000-00611000 r-xp 00000000 08:03 133291     /usr/lib/libgssapi_krb5.so.2.2
+Size:                76 kB
+Rss:                 24 kB
+Shared_Clean:        24 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00611000-00612000 rw-p 00013000 08:03 133291     /usr/lib/libgssapi_krb5.so.2.2
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00614000-00677000 r-xp 00000000 08:03 133288     /usr/lib/libkrb5.so.3.2
+Size:               396 kB
+Rss:                 60 kB
+Shared_Clean:        60 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00677000-00679000 rw-p 00063000 08:03 133288     /usr/lib/libkrb5.so.3.2
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+0067b000-00750000 r-xp 00000000 08:07 122109     /lib/libcrypto.so.0.9.7a
+Size:               852 kB
+Rss:                124 kB
+Shared_Clean:       124 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00750000-00762000 rw-p 000d5000 08:07 122109     /lib/libcrypto.so.0.9.7a
+Size:                72 kB
+Rss:                 12 kB
+Shared_Clean:         4 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+00762000-00765000 rw-p 00762000 00:00 0 
+Size:                12 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00833000-00838000 r-xp 00000000 fd:00 197078     /usr/local/stow/perl-5.6.1-a638/lib/perl5/5.6.1/i686-linux-multi/auto/Data/Dumper/Dumper.so
+Size:                20 kB
+Rss:                 12 kB
+Shared_Clean:        12 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00838000-00839000 rw-p 00004000 fd:00 197078     /usr/local/stow/perl-5.6.1-a638/lib/perl5/5.6.1/i686-linux-multi/auto/Data/Dumper/Dumper.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+008d1000-008d3000 r-xp 00000000 08:07 138409     /lib/libutil-2.3.4.so
+Size:                 8 kB
+Rss:                  8 kB
+Shared_Clean:         8 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+008d3000-008d4000 r--p 00001000 08:07 138409     /lib/libutil-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+008d4000-008d5000 rw-p 00002000 08:07 138409     /lib/libutil-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00abe000-00ac5000 r-xp 00000000 fd:00 199829     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/List/Util/Util.so
+Size:                28 kB
+Rss:                 16 kB
+Shared_Clean:        16 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00ac5000-00ac6000 rw-p 00007000 fd:00 199829     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/List/Util/Util.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00c94000-00c9c000 r-xp 00000000 08:07 122111     /lib/libcrypt-2.3.4.so
+Size:                32 kB
+Rss:                  8 kB
+Shared_Clean:         8 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00c9c000-00c9d000 r--p 00007000 08:07 122111     /lib/libcrypt-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00c9d000-00c9e000 rw-p 00008000 08:07 122111     /lib/libcrypt-2.3.4.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00c9e000-00cc5000 rw-p 00c9e000 00:00 0 
+Size:               156 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00e6b000-00e81000 r-xp 00000000 fd:00 196623     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/DBD/Pg/Pg.so
+Size:                88 kB
+Rss:                 40 kB
+Shared_Clean:        40 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00e81000-00e82000 rw-p 00015000 fd:00 196623     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/DBD/Pg/Pg.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+00e98000-00eb2000 r-xp 00000000 fd:00 199699     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/DBI/DBI.so
+Size:               104 kB
+Rss:                 40 kB
+Shared_Clean:        40 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+00eb2000-00eb3000 rw-p 00019000 fd:00 199699     /usr/local/stow/perl-5.6.1-a638/lib/perl5/site_perl/5.6.1/i686-linux-multi/auto/DBI/DBI.so
+Size:                 4 kB
+Rss:                  4 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        4 kB
+08048000-080f9000 r-xp 00000000 fd:00 197034     /usr/local/stow/perl-5.6.1-a638/bin/perl
+Size:               708 kB
+Rss:                648 kB
+Shared_Clean:       648 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+080f9000-08102000 rw-p 000b0000 fd:00 197034     /usr/local/stow/perl-5.6.1-a638/bin/perl
+Size:                36 kB
+Rss:                 36 kB
+Shared_Clean:        28 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        8 kB
+090a9000-09255000 rw-p 090a9000 00:00 0 
+Size:              1712 kB
+Rss:               1664 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:     1664 kB
+b7d46000-b7f46000 r--p 00000000 08:03 277914     /usr/lib/locale/locale-archive
+Size:              2048 kB
+Rss:                 52 kB
+Shared_Clean:        52 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB
+b7f46000-b7f49000 rw-p b7f46000 00:00 0 
+Size:                12 kB
+Rss:                 12 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:       12 kB
+bff3a000-c0000000 rw-p bff3a000 00:00 0 
+Size:               792 kB
+Rss:                 24 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:       24 kB
+ffffe000-fffff000 r-xp 00000000 00:00 0 
+Size:                 4 kB
+Rss:                  0 kB
+Shared_Clean:         0 kB
+Shared_Dirty:         0 kB
+Private_Clean:        0 kB
+Private_Dirty:        0 kB

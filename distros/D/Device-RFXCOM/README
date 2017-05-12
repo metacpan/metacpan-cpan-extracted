@@ -1,0 +1,31 @@
+SYNOPSIS
+
+      # see Device::RFXCOM::RX (and corresponding example script
+      # rfxcom-rx) and see Device::RFXCOM::TX (and example script
+      # rfxcom-tx)
+
+DESCRIPTION
+
+    Modules to support RF receivers and transmitters produced by RFXCOM,
+    http://www.rfxcom.com/. This code is derived from code written for the
+    xPL-Perl project at http://www.xpl-perl.org.uk/.
+
+    A bonus module is provided to support W800 RF receivers from
+    http://www.wgldesigns.com/. These receivers recognize fewer RF
+    protocols.
+
+    These devices are typically used for home automation and sensor
+    monitoring applications.
+
+THANKS
+
+    Special thanks to RFXCOM, http://www.rfxcom.com/, for their excellent
+    documentation and for giving me permission to use it to help me write
+    this code. I own a number of their products and highly recommend them.
+
+SEE ALSO
+
+    Device::RFXCOM::RX, rfxcom-rx(1p), Device::RFXCOM::TX, rfxcom-tx(1p).
+
+    RFXCOM website: http://www.rfxcom.com/
+

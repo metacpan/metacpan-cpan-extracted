@@ -1,0 +1,50 @@
+PARAMETERS
+
+ change_file
+
+    File name of the changelog. Defaults to Changes.
+
+ numify_version
+
+    If true, the version will be a number using the x.yyyzzz convention
+    instead of x.y.z. Defaults to false.
+
+ format
+
+    Specifies the version format to use. Follows the '%d' convention of
+    sprintf (see examples below), excepts for one detail: '%3d' won't pad
+    with whitespaces, but will only determine the maximal size of the
+    number. If a version component exceeds its given size, the next version
+    level will be incremented.
+
+    Examples:
+
+        %d.%3d.%3d 
+            PATCH LEVEL INCREASES: 0.0.998 -> 0.0.999 -> 0.1.0
+            MINOR LEVEL INCREASES: 0.0.8 -> 0.1.0 -> 0.2.0
+            MAJOR LEVEL INCREASES: 0.1.8 -> 1.0.0 -> 2.0.0
+    
+        %d.%02d%02d
+            PATCH LEVEL INCREASES: 0.0098 -> 0.00099 -> 0.0100
+            MINOR LEVEL INCREASES: 0.0008 -> 0.0100 -> 0.0200
+            MAJOR LEVEL INCREASES: 0.0108 -> 1.0000 -> 2.0000
+    
+        %d.%05d
+            MINOR LEVEL INCREASES: 0.99998 -> 0.99999 -> 1.00000
+            MAJOR LEVEL INCREASES: 0.00108 -> 1.00000 -> 2.00000
+
+    Defaults to '%d.%3d.%3d'.
+
+ major
+
+    Comma-delimited list of categories of changes considered major.
+    Defaults to API CHANGES.
+
+ minor
+
+    Comma-delimited list of categories of changes considered minor.
+    Defaults to ENHANCEMENTS and UNGROUPED. =head2 revision
+
+    Comma-delimited list of categories of changes considered revisions.
+    Defaults to BUG FIXES, DOCUMENTATION.
+

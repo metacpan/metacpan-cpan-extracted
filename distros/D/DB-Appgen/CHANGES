@@ -1,0 +1,27 @@
+Revision history for Perl extension DB::Appgen.
+
+1.02 14-Jan-2005
+    * Compliance with https://rt.cpan.org/Ticket/Display.html?id=9726
+
+1.00 Mon Jan  7 15:20:00 PST 2002
+    * Version bumped to 1.0 pending release on Freshmeat.net
+
+0.6   Fri Oct 20 10:53:47 PDT 2000
+    * Bug fixed in $db->atribute method, cycled forever on not yet
+      created attributes.
+
+0.4   Wed Aug  2 18:38:50 PDT 2000
+    * $db->attribute and $db->record methods added.
+    * Small fixes and enhancements.
+
+0.3   Tue Aug  1 19:47:02 PDT 2000
+    * Extract fixed.
+    * Object oriented inteface if built on top of appgen
+      library. Documentation improved.
+
+0.02  Mon Jul 31 18:13:40 2000
+    * File level interface functions imported and tested.
+
+0.01  Mon Jul 31 17:12:49 2000
+    * original version; created by h2xs 1.20 with options
+      -O -n DB::appgen DB/appgen/aglib/aglib.h

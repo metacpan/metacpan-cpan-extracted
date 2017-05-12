@@ -1,0 +1,670 @@
+@(#) tztab $Date: 2008/12/08 17:21:29 $Revision: r11.11/12 PATCH_11.11 (PHCO_39172)
+
+# Mitteleuropaeische Zeit, Mitteleuropaeische Sommerzeit
+MEZ-1MESZ
+0 3 25-31 3  1983-2038 0   MESZ-2
+0 2 24-30 9  1983-1995 0   MEZ-1
+0 2 25-31 10 1996-2038 0   MEZ-1 
+
+# Middle European Time, Middle European Time Daylight Savings Time
+MET-1METDST
+0 3 25-31 3  1983-2038 0   METDST-2
+0 2 24-30 9  1983-1995 0   MET-1
+0 2 25-31 10 1996-2038 0   MET-1 
+
+# Greenwich Mean Time, British Summer Time
+GMT0BST
+0 3 25-31 3  1983-1984 0   BST-1
+0 3 23-29 3  1985-1990 0   BST-1
+0 3 25-31 3  1991-1995 0   BST-1
+0 2 25-31 3  1996-2038 0   BST-1
+0 1 25-31 10 1983-1985 0   GMT0
+0 1 23-29 10 1986-1994 0   GMT0
+0 1 18-24 10 1995      0   GMT0
+0 1 25-31 10 1996-2038 0   GMT0
+
+# Pacific Standard Time, Pacific Daylight Time
+PST8PDT
+0 3 24-30 4  1970-1973 0   PDT7
+0 3 6     1  1974      0-6 PDT7
+0 3 22-28 2  1975      0   PDT7
+0 3 24-30 4  1976-1986 0   PDT7
+0 3 1-7   4  1987-2006 0   PDT7
+0 3 8-14  3  2007-2038 0   PDT7
+0 1 25-31 10 1970-1973 0   PST8
+0 1 24-30 11 1974      0   PST8
+0 1 25-31 10 1975-2006 0   PST8
+0 1 1-7   11 2007-2038 0   PST8
+
+# Eastern Standard Time, Eastern Daylight Time
+EST5EDT
+0 3 24-30 4  1970-1973 0   EDT4
+0 3 6     1  1974      0-6 EDT4
+0 3 22-28 2  1975      0   EDT4
+0 3 24-30 4  1976-1986 0   EDT4
+0 3 1-7   4  1987-2006 0   EDT4
+0 3 8-14  3  2007-2038 0   EDT4
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2006 0   EST5
+0 1 1-7   11 2007-2038 0   EST5
+
+# Central Standard Time, Central Daylight Time
+CST6CDT
+0 3 24-30 4  1970-1973 0   CDT5
+0 3 6     1  1974      0-6 CDT5
+0 3 22-28 2  1975      0   CDT5
+0 3 24-30 4  1976-1986 0   CDT5
+0 3 1-7   4  1987-2006 0   CDT5
+0 3 8-14  3  2007-2038 0   CDT5
+0 1 25-31 10 1970-1973 0   CST6
+0 1 24-30 11 1974      0   CST6
+0 1 25-31 10 1975-2006 0   CST6
+0 1 1-7   11 2007-2038 0   CST6
+
+# Mountain Standard Time, Mountain Daylight Time
+MST7MDT
+0 3 24-30 4  1970-1973 0   MDT6
+0 3 6     1  1974      0-6 MDT6
+0 3 22-28 2  1975      0   MDT6
+0 3 24-30 4  1976-1986 0   MDT6
+0 3 1-7   4  1987-2006 0   MDT6
+0 3 8-14  3  2007-2038 0   MDT6
+0 1 25-31 10 1970-1973 0   MST7
+0 1 24-30 11 1974      0   MST7
+0 1 25-31 10 1975-2006 0   MST7
+0 1 1-7   11 2007-2038 0   MST7
+
+# The following entry is added, as Indiana
+# will support Daylight Saving Time (DST)
+# from 2006 onwards. Indiana will have two
+# Time zones EST5EDT#Indiana and CST6CDT#Indiana,
+# for provinces within Indiana supporting
+# Eastern or Central Time Zone respectively.
+
+# Eastern Standard Time, Eastern Daylight Time(US: Indiana)
+EST5EDT#Indiana
+0 3 24-30 4  1970-1973 0   EST5
+0 3 6     1  1974      0-6 EST5
+0 3 22-28 2  1975      0   EST5
+0 3 24-30 4  1976-1986 0   EST5
+0 3 1-7   4  1987-2005 0   EST5
+0 3 1-7   4  2006      0   EDT#Indiana4
+0 3 8-14  3  2007-2038 0   EDT#Indiana4
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2005 0   EST5
+0 1 25-31 10 2006      0   EST5
+0 1 1-7   11 2007-2038 0   EST5
+
+# Central Standard Time, Central Daylight Time(US: Indiana)
+CST6CDT#Indiana
+0 3 24-30 4  1970-1973 0   CST6
+0 3 6     1  1974      0-6 CST6
+0 3 22-28 2  1975      0   CST6
+0 3 24-30 4  1976-1986 0   CST6
+0 3 1-7   4  1987-2005 0   CST6
+0 3 1-7   4  2006      0   CDT#Indiana5
+0 3 8-14  3  2007-2038 0   CDT#Indiana5
+0 1 25-31 10 1970-1973 0   CST6
+0 1 24-30 11 1974      0   CST6
+0 1 25-31 10 1975-2005 0   CST6
+0 1 25-31 10 2006      0   CST6
+0 1 1-7   11 2007-2038 0   CST6
+
+# US and Canada use the same rules. It is recommended to use the 
+# simpler timezone strings (EST5EDT, CST6CDT, MST7MDT and PST8PDT) 
+# for Canada. The timezones with #Canada are kept for 
+# compatibility reasons.
+
+# Atlantic Standard Time, Atlantic Daylight Time (Canada)
+AST4ADT
+0 3 24-30 4  1970-1973 0   ADT3
+0 3 6     1  1974      0-6 ADT3
+0 3 22-28 2  1975      0   ADT3
+0 3 24-30 4  1976-1986 0   ADT3
+0 3 1-7   4  1987-2006 0   ADT3
+0 3 8-14  3  2007-2038 0   ADT3
+0 1 25-31 10 1970-1973 0   AST4
+0 1 24-30 11 1974      0   AST4
+0 1 25-31 10 1975-2006 0   AST4
+0 1 1-7   11 2007-2038 0   AST4
+
+# Newfoundland Standard Time, Newfoundland Daylight Time (Canada)
+NST3:30NDT
+0 3 24-30 4  1970-1973 0   NDT2:30
+0 3 6     1  1974      0-6 NDT2:30
+0 3 22-28 2  1975      0   NDT2:30
+0 3 24-30 4  1976-1986 0   NDT2:30
+0 3 1-7   4  1987-2006 0   NDT2:30
+0 3 8-14  3  2007-2038 0   NDT2:30
+0 1 25-31 10 1970-1973 0   NST3:30
+0 1 24-30 11 1974      0   NST3:30
+0 1 25-31 10 1975-2006 0   NST3:30
+0 1 1-7   11 2007-2038 0   NST3:30
+
+# Atlantic Standard Time, Atlantic Daylight Time (Canada)
+AST4ADT#Canada
+0 3 24-30 4  1970-1973 0   ADT#Canada3
+0 3 6     1  1974      0-6 ADT#Canada3
+0 3 22-28 2  1975      0   ADT#Canada3
+0 3 24-30 4  1976-1986 0   ADT#Canada3
+0 3 1-7   4  1987-2006 0   ADT#Canada3
+0 3 8-14  3  2007-2038 0   ADT#Canada3
+0 1 25-31 10 1970-1973 0   AST4
+0 1 24-30 11 1974      0   AST4
+0 1 25-31 10 1975-2006 0   AST4
+0 1 1-7   11 2007-2038 0   AST4
+
+# Newfoundland Standard Time, Newfoundland Daylight Time (Canada)
+NST3:30NDT#Canada
+0 3 24-30 4  1970-1973 0   NDT#Canada2:30
+0 3 6     1  1974      0-6 NDT#Canada2:30
+0 3 22-28 2  1975      0   NDT#Canada2:30
+0 3 24-30 4  1976-1986 0   NDT#Canada2:30
+0 3 1-7   4  1987-2006 0   NDT#Canada2:30
+0 3 8-14  3  2007-2038 0   NDT#Canada2:30
+0 1 25-31 10 1970-1973 0   NST3:30
+0 1 24-30 11 1974      0   NST3:30
+0 1 25-31 10 1975-2006 0   NST3:30
+0 1 1-7   11 2007-2038 0   NST3:30
+
+# Eastern Standard Time, Central Daylight Time (US: Indiana)
+EST5CDT
+0 3 24-30 4  1970-1973 0   CDT5
+0 3 6     1  1974      0-6 CDT5
+0 3 22-28 2  1975      0   CDT5
+0 3 24-30 4  1976-1986 0   CDT5
+0 3 1-7   4  1987-2038 0   CDT5
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2038 0   EST5
+
+# Aleutian Standard Time, Aleutian Daylight Time (US)
+AST10ADT
+0 3 24-30 4  1970-1973 0   ADT9
+0 3 6     1  1974      0-6 ADT9
+0 3 22-28 2  1975      0   ADT9
+0 3 24-30 4  1976-1986 0   ADT9
+0 3 1-7   4  1987-2006 0   ADT9
+0 3 8-14  3  2007-2038 0   ADT9
+0 1 25-31 10 1970-1973 0   AST10
+0 1 24-30 11 1974      0   AST10
+0 1 25-31 10 1975-2006 0   AST10
+0 1 1-7   11 2007-2038 0   AST10
+
+# Yukon Standard Time, Yukon Daylight Time (US)
+YST9YDT
+0 3 24-30 4  1970-1973 0   YDT8
+0 3 6     1  1974      0-6 YDT8
+0 3 22-28 2  1975      0   YDT8
+0 3 24-30 4  1976-1986 0   YDT8
+0 3 1-7   4  1987-2006 0   YDT8
+0 3 8-14  3  2007-2038 0   YDT8
+0 1 25-31 10 1970-1973 0   YST9
+0 1 24-30 11 1974      0   YST9
+0 1 25-31 10 1975-2006 0   YST9
+0 1 1-7   11 2007-2038 0   YST9
+
+# Western European Time, Western European Time Daylight Savings Time
+WET0WETDST
+0 3 25-31 3  1983-1984 0   WETDST-1
+0 3 23-29 3  1985-1995 0   WETDST-1
+0 2 25-31 3  1996-2038 0   WETDST-1
+0 1 25-31 10 1983-1985 0   WET0
+0 1 23-29 10 1986-1995 0   WET0
+0 1 25-31 10 1996-2038 0   WET0
+
+# Portuguese Winter Time, Portuguese Summer Time
+PWT0PST
+0 2 25-31 3  1983-2038 0   PST-1
+0 1 25-31 10 1983-2038 0   PWT0
+
+# South Africa Standard Time 
+SAST-2
+0 1 1-7   3  1985-2038 0   SAST-2
+
+# Australian Central Standard Time, Australian Central Daylight Time
+# (South Australia)
+# Australian DST changes for South Australia.
+
+# Current Regulation in South Australia extends the Daylight Saving time
+# only for year 2008 (later ending in April 2008 and early beginning in 
+# October 2008). The current entry assumes that Daylight Saving changes
+# will be permanent and will match the changes in other Australian provinces.
+# The entry will cause the extension of Daylight Savings time also for 2009
+# and future years. If the changes are not permanent, the entry will change again.
+
+CST-9:30CDT
+0 3 25-31 10 1971-2007 0   CDT-10:30
+0 3 1-7   10 2008-2038 0   CDT-10:30
+0 1 27    2  1972      0-6 CST-9:30
+0 1 1-7   3  1973-1994 0   CST-9:30
+0 2 25-31 3  1995-2005 0   CST-9:30
+0 2 1-7   4  2006      0   CST-9:30
+0 2 25-31 3  2007      0   CST-9:30
+0 2 1-7   4  2008-2038 0   CST-9:30
+
+# Australian Eastern Standard Time, Australian Eastern Daylight Time
+# Australian DST changes for Australian Capital Territory.
+
+EST-10EDT
+0 3 25-31 10 1971-1999 0   EDT-11
+0 3 27    8  2000      0-6 EDT-11
+0 3 25-31 10 2001-2007 0   EDT-11
+0 3 1-7   10 2008-2038 0   EDT-11
+0 1 27    2  1972      0-6 EST-10
+0 1 1-7   3  1973-1985 0   EST-10
+0 1 15-21 3  1986      0   EST-10
+0 1 1-7   3  1987-1995 0   EST-10
+0 2 25-31 3  1996-2005 0   EST-10
+0 2 1-7   4  2006      0   EST-10
+0 2 25-31 3  2007      0   EST-10
+0 2 1-7   4  2008-2038 0   EST-10
+
+# New Zealand Standard Time, New Zealand Daylight Time
+NZST-12NZDT
+0 3 25-31 10 1985-1988 0   NZDT-13
+0 3 8     10 1989      0-6 NZDT-13
+0 3 1-7   10 1990-2006 0   NZDT-13
+0 3 24-30 9  2007-2038 0   NZDT-13
+0 2 1-7   3  1985-1989 0   NZST-12
+0 2 15-21 3  1990-2007 0   NZST-12
+0 2 1-7   4  2008-2038 0   NZST-12
+
+# Pacific Standard Time, Pacific Daylight Time (for Malaysia or Singapore)
+#
+PST-8PDT
+0 1 1-7   4  1996-2038 0   PDT-9
+0 1 25-31 10 1996-2038 0   PST-8
+
+# Finland Standard Time, Finland Daylight Time
+#
+# This entry has been changed to allow for a later ending of
+# Daylight Savings Time from 1996 onwards.
+# It now ends on the last Sunday of October.
+#
+EET-2EETDST
+0 4 25-31 3  1981-2038 0   EETDST-3
+0 3 24-30 9  1981-1995 0   EET-2
+0 3 25-31 10 1996-2038 0   EET-2
+
+# Australian Eastern Standard Time, Australian Eastern Daylight Time (Tasmania)
+# Australian DST changes for Tasmania.
+
+EST-10EDT#Tasmania
+0 3 25-31 10 1971-1994 0   EDT#Tasmania-11
+0 3 1-7   10 1995-1999 0   EDT#Tasmania-11
+0 3 25-31 8  2000      0   EDT#Tasmania-11
+0 3 1-7   10 2001-2038 0   EDT#Tasmania-11
+0 1 27    2  1972      0-6 EST-10
+0 1 1-7   3  1973-1994 0   EST-10
+0 2 25-31 3  1995-2005 0   EST-10
+0 2 1-7   4  2006      0   EST-10
+0 2 25-31 3  2007      0   EST-10
+0 2 1-7   4  2008-2038 0   EST-10
+
+# Australian Eastern Standard Time, Australian Eastern Daylight Time
+# Australian DST changes for New South Wales.
+
+EST-10EDT#NSW
+0 3 25-31 10 1971-1999 0   EDT#NSW-11
+0 3 27    8  2000      0-6 EDT#NSW-11
+0 3 25-31 10 2001-2007 0   EDT#NSW-11
+0 3 1-7   10 2008-2038 0   EDT#NSW-11
+0 1 27    2  1972      0-6 EST-10
+0 1 1-7   3  1973-1985 0   EST-10
+0 1 15-21 3  1986      0   EST-10
+0 2 1-7   3  1987-1995 0   EST-10
+0 2 25-31 3  1996-2005 0   EST-10
+0 2 1-7   4  2006      0   EST-10
+0 2 25-31 3  2007      0   EST-10
+0 2 1-7   4  2008-2038 0   EST-10
+
+# Australian Eastern Standard Time, Australian Eastern Daylight Time
+# Australian DST changes for Victoria.
+
+EST-10EDT#VIC
+0 3 25-31 10 1971-1999 0   EDT#VIC-11
+0 3 27    8  2000      0-6 EDT#VIC-11
+0 3 25-31 10 2001-2007 0   EDT#VIC-11
+0 3 1-7   10 2008-2038 0   EDT#VIC-11
+0 1 27    2  1972      0-6 EST-10
+0 1 1-7   3  1973-1985 0   EST-10
+0 1 15-21 3  1986      0   EST-10
+0 1 1-7   3  1987-1994 0   EST-10
+0 2 25-31 3  1995-2005 0   EST-10
+0 2 1-7   4  2006      0   EST-10
+0 2 25-31 3  2007      0   EST-10
+0 2 1-7   4  2008-2038 0   EST-10
+
+# Australian Western Standard Time, Australian Western Daylight Time 
+# 
+# This entry has been created for the trial daylight savings period 
+# in the Australian state of Western Australia. This entry only 
+# covers the trial period and additional changes will be required 
+# to extend entry if the referendum on daylight savings accepts 
+# daylight savings permanently.
+
+WST-8WDT
+0 3 3     12 2006      0-6 WDT-9
+0 3 25-31 10 2007-2008 0   WDT-9
+0 2 25-31 3  2007-2009 0   WST-8
+
+# Pacific Standard Time, Pacific Daylight Time (Canada)
+PST8PDT#Canada
+0 3 24-30 4  1970-1973 0   PDT#Canada7
+0 3 6     1  1974      0-6 PDT#Canada7
+0 3 22-28 2  1975      0   PDT#Canada7
+0 3 24-30 4  1976-1986 0   PDT#Canada7
+0 3 1-7   4  1987-2006 0   PDT#Canada7
+0 3 8-14  3  2007-2038 0   PDT#Canada7
+0 1 25-31 10 1970-1973 0   PST8
+0 1 24-30 11 1974      0   PST8
+0 1 25-31 10 1975-2006 0   PST8
+0 1 1-7   11 2007-2038 0   PST8
+
+# Mountain Standard Time, Mountain Daylight Time (Canada)
+MST7MDT#Canada
+0 3 24-30 4  1970-1973 0   MDT#Canada6
+0 3 6     1  1974      0-6 MDT#Canada6
+0 3 22-28 2  1975      0   MDT#Canada6
+0 3 24-30 4  1976-1986 0   MDT#Canada6
+0 3 1-7   4  1987-2006 0   MDT#Canada6
+0 3 8-14  3  2007-2038 0   MDT#Canada6
+0 1 25-31 10 1970-1973 0   MST7
+0 1 24-30 11 1974      0   MST7
+0 1 25-31 10 1975-2006 0   MST7
+0 1 1-7   11 2007-2038 0   MST7
+
+# Central Standard Time, Central Daylight Time (Canada)
+CST6CDT#Canada
+0 3 24-30 4  1970-1973 0   CDT#Canada5
+0 3 6     1  1974      0-6 CDT#Canada5
+0 3 22-28 2  1975      0   CDT#Canada5
+0 3 24-30 4  1976-1986 0   CDT#Canada5
+0 3 1-7   4  1987-2006 0   CDT#Canada5
+0 3 8-14  3  2007-2038 0   CDT#Canada5
+0 1 25-31 10 1970-1973 0   CST6
+0 1 24-30 11 1974      0   CST6
+0 1 25-31 10 1975-2006 0   CST6
+0 1 1-7   11 2007-2038 0   CST6
+
+# Eastern Standard Time, Eastern Daylight Time (Canada)
+EST5EDT#Canada
+0 3 24-30 4  1970-1973 0   EDT#Canada4
+0 3 6     1  1974      0-6 EDT#Canada4
+0 3 22-28 2  1975      0   EDT#Canada4
+0 3 24-30 4  1976-1986 0   EDT#Canada4
+0 3 1-7   4  1987-2006 0   EDT#Canada4
+0 3 8-14  3  2007-2038 0   EDT#Canada4
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2006 0   EST5
+0 1 1-7   11 2007-2038 0   EST5
+
+# Eastern Standard Time (US: Most of Indiana)
+#
+# This entry is added to correct the Indiana timezone because 
+# Indiana does not observe Daylight Savings Time.  The original
+# entry EST5CDT is kept to ensure backward compatibility.
+EST5EST
+0 3 24-30 4  1970-1973 0   EST5
+0 3 6     1  1974      0-6 EST5
+0 3 22-28 2  1975      0   EST5
+0 3 24-30 4  1976-1986 0   EST5
+0 3 1-7   4  1987-2038 0   EST5
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2038 0   EST5
+
+# Eastern Standard Time, Central Daylight Time (US: Indiana)
+#
+# This entry is for backward compatibility only, the correct entry
+# is the EST5CDT entry above.  This entry is incorrect because the
+# "6" in EST6CDT below should be a "5".  Other than the "6" being
+# changed to "5", this entry and EST5CDT are the same and the
+# end result of using either is identical.
+#
+EST6CDT
+0 3 24-30 4  1970-1973 0   CDT5
+0 3 6     1  1974      0-6 CDT5
+0 3 22-28 2  1975      0   CDT5
+0 3 24-30 4  1976-1986 0   CDT5
+0 3 1-7   4  1987-2038 0   CDT5
+0 1 25-31 10 1970-1973 0   EST5
+0 1 24-30 11 1974      0   EST5
+0 1 25-31 10 1975-2038 0   EST5
+
+# Western Russia (Moscow) Time, Western Russia (Moscow) Daylight Savings
+# Time
+WST-3WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-4
+0 2 24-30 9  1983-1995 0   WST-3
+0 2 25-31 10 1996-2038 0   WST-3
+
+# Belorussia (minsk) Time, Belorussia (minsk) Daylight Savings Time
+
+WST-2WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-3
+0 2 24-30 9  1983-1995 0   WST-2
+0 2 25-31 10 1996-2038 0   WST-2
+
+# European Russia (samara) Time, European Russia (samara) Daylight Savings
+#Time
+
+WST-4WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-5
+0 2 24-30 9  1983-1995 0   WST-4
+0 2 25-31 10 1996-2038 0   WST-4
+
+# Urals (Ekaterinburg) Time, Urals (Ekaterinburg) Daylight Savings Time
+
+WST-5WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-6
+0 2 24-30 9  1983-1995 0   WST-5
+0 2 25-31 10 1996-2038 0   WST-5
+
+# Western Siberia (Omsk), Western Siberia (Omsk) Daylight Savings Time
+
+WST-6WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-7
+0 2 24-30 9  1983-1995 0   WST-6
+0 2 25-31 10 1996-2038 0   WST-6
+
+# Middle Siberia (Krasnoyarsk) Time, Middle Siberia (Krasnoyarsk)
+# Daylight Savings Time
+
+WST-7WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-8
+0 2 24-30 9  1983-1995 0   WST-7
+0 2 25-31 10 1996-2038 0   WST-7
+
+# Baikal lake (Irkutsk) Time, Baikal lake (Irkutsk) Daylight Savings Time
+
+WST-8WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-9
+0 2 24-30 9  1983-1995 0   WST-8
+0 2 25-31 10 1996-2038 0   WST-8
+
+# Eastern Siberia (Yakutsk) Time, Eastern Siberia (Yakutsk) Daylight
+# Savings Time
+
+WST-9WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-10
+0 2 24-30 9  1983-1995 0   WST-9
+0 2 25-31 10 1996-2038 0   WST-9
+
+# Far East (Khabarovsk) Time, Far East (Khabarovsk) Daylight Savings
+# Time
+
+WST-10WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-11
+0 2 24-30 9  1983-1995 0   WST-10
+0 2 25-31 10 1996-2038 0   WST-10
+
+# Russia Pacific (magadan) Time, Russia Pacific (magadan) Daylight
+# Savings Time
+
+WST-11WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-12
+0 2 24-30 9  1983-1995 0   WST-11
+0 2 25-31 10 1996-2038 0   WST-11
+
+# Kamchatka (Petropavlovsk-Kamchatskiy) Time, Kamchatka(Petropavlovsk
+# -Kamchatskiy) Daylight Savings Time
+
+WST-12WSTDST
+0 3 25-31 3  1983-2038 0   WSTDST-13
+0 2 24-30 9  1983-1995 0   WST-12
+0 2 25-31 10 1996-2038 0   WST-12
+
+# It is recommended to use PSM8PDM, MSM7MDM, CSM6CDM and MXST6MXDT for Mexico.
+# Timezones PST8PDT#Mexico, MST7MDT#Mexico, CST6CDT#Mexico and MXST6MXDT#Mexico
+# are kept for the compatibility reasons. Content of either set is same.
+
+# Timezone MXST6MXDT (Mexico City Standard Time, Mexico City Daylight Time) 
+
+MXST6MXDT
+0 3 24-30 4  1970-1973 0   MXDT5
+0 3 6     1  1974      0-6 MXDT5
+0 3 22-28 2  1975      0   MXDT5
+0 3 24-30 4  1976-1986 0   MXDT5
+0 3 1-7   4  1987-2000 0   MXDT5
+0 3 1-7   5  2001      0   MXDT5
+0 3 1-7   4  2002-2038 0   MXDT5
+0 1 25-31 10 1970-1973 0   MXST6
+0 1 24-30 11 1974      0   MXST6
+0 1 25-31 10 1975-2000 0   MXST6
+0 1 24-30 9  2001      0   MXST6
+0 1 25-31 10 2002-2038 0   MXST6
+
+# Timezone MXST6MXDT#Mexico (Mexico City Standard Time, Mexico City Daylight Time) 
+
+MXST6MXDT#Mexico
+0 3 24-30 4  1970-1973 0   MXDT#Mexico5
+0 3 6     1  1974      0-6 MXDT#Mexico5
+0 3 22-28 2  1975      0   MXDT#Mexico5
+0 3 24-30 4  1976-1986 0   MXDT#Mexico5
+0 3 1-7   4  1987-2000 0   MXDT#Mexico5
+0 3 1-7   5  2001      0   MXDT#Mexico5
+0 3 1-7   4  2002-2038 0   MXDT#Mexico5
+0 1 25-31 10 1970-1973 0   MXST6
+0 1 24-30 11 1974      0   MXST6
+0 1 25-31 10 1975-2000 0   MXST6
+0 1 24-30 9  2001      0   MXST6
+0 1 25-31 10 2002-2038 0   MXST6
+
+# Timezone PST8PDT#Mexico (Pacific Standard Time, Pacific Daylight Time)
+
+PST8PDT#Mexico
+0 3 24-30 4  1970-1973 0   PDT#Mexico7
+0 3 6     1  1974      0-6 PDT#Mexico7
+0 3 22-28 2  1975      0   PDT#Mexico7
+0 3 24-30 4  1976-1986 0   PDT#Mexico7
+0 3 1-7   4  1987-2038 0   PDT#Mexico7
+0 1 25-31 10 1970-1973 0   PST8
+0 1 24-30 11 1974      0   PST8
+0 1 25-31 10 1975-2038 0   PST8
+
+# Timezone MST7MDT#Mexico (Mountain Standard Time, Mountain Daylight Time)
+
+MST7MDT#Mexico
+0 3 24-30 4  1970-1973 0   MDT#Mexico6
+0 3 6     1  1974      0-6 MDT#Mexico6
+0 3 22-28 2  1975      0   MDT#Mexico6
+0 3 24-30 4  1976-1986 0   MDT#Mexico6
+0 3 1-7   4  1987-2038 0   MDT#Mexico6
+0 1 25-31 10 1970-1973 0   MST7
+0 1 24-30 11 1974      0   MST7
+0 1 25-31 10 1975-2038 0   MST7
+
+# Timezone CST6CDT#Mexico (Central Standard Time, Central Daylight Time)
+
+CST6CDT#Mexico
+0 3 24-30 4  1970-1973 0   CDT#Mexico5
+0 3 6     1  1974      0-6 CDT#Mexico5
+0 3 22-28 2  1975      0   CDT#Mexico5
+0 3 24-30 4  1976-1986 0   CDT#Mexico5
+0 3 1-7   4  1987-2038 0   CDT#Mexico5
+0 1 25-31 10 1970-1973 0   CST6
+0 1 24-30 11 1974      0   CST6
+0 1 25-31 10 1975-2038 0   CST6
+
+# Timezone PSM8PDM for Mexico (Pacific Standard Time, Pacific Daylight Time) 
+
+PSM8PDM
+0 3 24-30 4  1970-1973 0   PDM7
+0 3 6     1  1974      0-6 PDM7
+0 3 22-28 2  1975      0   PDM7
+0 3 24-30 4  1976-1986 0   PDM7
+0 3 1-7   4  1987-2038 0   PDM7
+0 1 25-31 10 1970-1973 0   PSM8
+0 1 24-30 11 1974      0   PSM8
+0 1 25-31 10 1975-2038 0   PSM8
+
+# Timezone MSM7MDM for Mexico (Mountain Standard Time, Mountain Daylight Time)
+
+MSM7MDM
+0 3 24-30 4  1970-1973 0   MDM6
+0 3 6     1  1974      0-6 MDM6
+0 3 22-28 2  1975      0   MDM6
+0 3 24-30 4  1976-1986 0   MDM6
+0 3 1-7   4  1987-2038 0   MDM6
+0 1 25-31 10 1970-1973 0   MSM7
+0 1 24-30 11 1974      0   MSM7
+0 1 25-31 10 1975-2038 0   MSM7
+
+# Timezone CSM6CDM for Mexico (Central Standard Time, Central Daylight Time)
+
+CSM6CDM
+0 3 24-30 4  1970-1973 0   CDM5
+0 3 6     1  1974      0-6 CDM5
+0 3 22-28 2  1975      0   CDM5
+0 3 24-30 4  1976-1986 0   CDM5
+0 3 1-7   4  1987-2038 0   CDM5
+0 1 25-31 10 1970-1973 0   CSM6
+0 1 24-30 11 1974      0   CSM6
+0 1 25-31 10 1975-2038 0   CSM6
+
+# Time zone for Brasilia, Brazil(Brazil Standard Time, Brazil Daylight Time)
+
+BRST3BRDT
+0 1 15-21 10 2008-2037 0   BRDT2
+0 23 14-20 2  2009-2011 6   BRST3
+0 23 21-27 2  2012      6   BRST3
+0 23 14-20 2  2013-2014 6   BRST3
+0 23 21-27 2  2015      6   BRST3
+0 23 14-20 2  2016-2022 6   BRST3
+0 23 21-27 2  2023      6   BRST3
+0 23 14-20 2  2024-2025 6   BRST3
+0 23 21-27 2  2026      6   BRST3
+0 23 14-20 2  2027-2033 6   BRST3
+0 23 21-27 2  2034      6   BRST3
+0 23 14-20 2  2035-2036 6   BRST3
+0 23 21-27 2  2037      6   BRST3
+0 23 14-20 2  2038      6   BRST3
+
+# Time zone for West Brazil(Brazil West Standard Time, Brazil West Daylight Time)
+
+BRWST4BRWDT
+0 1 15-21 10 2008-2037 0   BRWDT3
+0 23 14-20 2  2009-2011 6   BRWST4
+0 23 21-27 2  2012      6   BRWST4
+0 23 14-20 2  2013-2014 6   BRWST4
+0 23 21-27 2  2015      6   BRWST4
+0 23 14-20 2  2016-2022 6   BRWST4
+0 23 21-27 2  2023      6   BRWST4
+0 23 14-20 2  2024-2025 6   BRWST4
+0 23 21-27 2  2026      6   BRWST4
+0 23 14-20 2  2027-2033 6   BRWST4
+0 23 21-27 2  2034      6   BRWST4
+0 23 14-20 2  2035-2036 6   BRWST4
+0 23 21-27 2  2037      6   BRWST4
+0 23 14-20 2  2038      6   BRWST4
+
+# Time zone for Argentina (Argentina Standard Time, Argentina Daylight Time)
+
+ARST3ARDT
+0 1  15-21 10 2008       0   ARDT2
+0 23 14-20  3 2009       6   ARST3

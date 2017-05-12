@@ -1,0 +1,97 @@
+<HTML>
+<HEAD>
+<TMPL_LOOP default>
+<TITLE>funlib -<TMPL_VAR title></TITLE>
+<LINK rel="stylesheet" href="funlib.css" type="text/css">
+</HEAD>
+
+<BODY bgcolor="#FFFFFF">
+<P>| <A href="home.dbt">to the search-page</A>|</P>
+<P>&nbsp;</P>
+
+
+
+<form action="" method="post">
+<P><B>Title :</B>
+<input type="hidden" name="id" value="<TMPL_VAR id>">
+<INPUT type="text" name="title" value="<TMPL_VAR title>" size="50"></P>
+<P><B>Author : </B>
+<INPUT type="text" name="author" value="<TMPL_VAR author>" size="50"></P>
+<P><B>Comment :<BR></B>
+<TEXTAREA name="comment" cols="50" rows="5" wrap="VIRTUAL"><TMPL_VAR comment></TEXTAREA></P>
+<P><B>Keywords (for searching) :</B>
+<INPUT type="text" name="keywords" value="<TMPL_VAR keywords>" size="50"></P>
+<P>
+<p>Please help your co-workers by adding comments about the book, or relevant keywords for searching. (keywords should be comma-separated) </p>
+
+<INPUT type="submit" name="=update" value=" change "></P>
+</form>
+<HR>
+
+<TMPL_LOOP name="-copy">
+<P><B>Book ID # :</B> <TMPL_VAR id></P></B></P>
+
+
+
+<h3>Where is this darn copy when i want it?? </h3>
+
+
+<TMPL_IF type_1>	
+<p>this copy is in the custody of <A href="mailto:<TMPL_VAR actor>@funcom.com"><TMPL_VAR actor></A>, and has been so since <TMPL_VAR created>.</p>
+<p><a href="http://intranett.funcom.com/phonelist/<TMPL_VAR actor>/">user info about <TMPL_VAR actor></a></p>
+this is what <TMPL_VAR actor> looks like, in case you wondered... 
+<img src="http://intranett.funcom.com/phonelist/<TMPL_VAR actor>/picture">
+<p>If you fetch this book from <TMPL_VAR actor> , please enter your username in the box below and click 'change'.</p>
+</TMPL_IF>
+
+
+<TMPL_IF type_2>this copy is in the library<br>
+<img src="http://intranett.funcom.com/phonelist/library/picture">
+<p>If you fetch this book from the library, please enter your username in the box below and click 'change'.</p>
+</TMPL_IF>
+
+
+<TMPL_IF type_3>this copy is in the library<br>
+<img src="http://intranett.funcom.com/phonelist/library/picture">
+<p>If you fetch this book from the library, please enter your username in the box below and click 'change'.</p>
+</TMPL_IF>
+
+
+<TMPL_IF type_4>this copy is lost, gone, away, whatever.. tell tobiasb if you happen to find it.. </TMPL_IF>
+
+<form action="" method="post">
+<P><B>This book is borrowed by : </B><INPUT type="text" name="/nt/actor" value="<TMPL_VAR actor>">
+<input type="hidden" name="/nt/book_copy" value="<TMPL_VAR book_copy>">
+<input type="hidden" name="/nt/type" value="1">
+<input type="hidden" name="id" value="<TMPL_VAR book_copy>">
+<input type="hidden" name="/nt/=insert" value="1">
+<INPUT type="submit" name="submit" value=" change "></P>
+
+
+</form>
+
+
+
+
+
+<TMPL_IF type_1>
+<form action="" method="post">
+<P><B>Mark this book as returned to library :</B> 
+<input type="hidden" name="/nt/book_copy" value="<TMPL_VAR book_copy>">
+<input type="hidden" name="id" value="<TMPL_VAR book_copy>">
+<input type="hidden" name="/nt/type" value="2">
+<INPUT type="hidden" name="actor" value="<TMPL_VAR actor>">
+<input type="hidden" name="/nt/=insert" value="1">
+<INPUT type="submit" name="submit" value=" return to library "></P>
+</form>
+</TMPL_IF>
+
+<HR>
+<P>&nbsp;</P>
+
+</TMPL_LOOP>
+
+</BODY>
+
+</TMPL_LOOP default>
+</HTML>

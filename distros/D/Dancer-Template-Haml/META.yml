@@ -1,0 +1,26 @@
+---
+abstract: 'Haml wrapper for Dancer'
+author:
+  - 'This module has been written by David Moreno, L<http://stereonaut.net/>. This module'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-Haml
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Dancer: 1.130
+  Text::Haml: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

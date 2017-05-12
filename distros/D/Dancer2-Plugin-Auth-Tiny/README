@@ -1,0 +1,182 @@
+NAME
+    Dancer2::Plugin::Auth::Tiny - Require logged-in user for specified
+    routes
+
+VERSION
+    version 0.008
+
+SYNOPSIS
+      use Dancer2::Plugin::Auth::Tiny;
+
+      get '/private' => needs login => sub { ... };
+
+      get '/login' => sub {
+        # put 'return_url' in a hidden form field
+        template 'login' => { return_url => params->{return_url} };
+      };
+
+      post '/login' => sub {
+        if ( _is_valid( params->{user}, params->{password} ) ) {
+          session user => params->{user};
+          return redirect params->{return_url} || '/';
+        }
+        else {
+          template 'login' => { error => "invalid username or password" };
+        }
+      };
+
+      sub _is_valid { ... } # this is up to you
+
+DESCRIPTION
+    This Dancer2 plugin provides an extremely simple way of requiring that a
+    user be logged in before allowing access to certain routes.
+
+    It is not "Tiny" in the usual CPAN sense, but it is "Tiny" with respect
+    to Dancer2 authentication plugins. It provides very simple sugar to wrap
+    route handlers with an authentication closure.
+
+    The plugin provides the "needs" keyword and a default "login" wrapper
+    that you can use like this:
+
+      get '/private' => needs login => $coderef;
+
+    The code above is roughly equivalent to this:
+
+      get '/private' => sub {
+        if ( session 'user' ) {
+          goto $coderef;
+        }
+        else {
+          return redirect uri_for( '/login',
+            { return_url => uri_for( request->path, request->params ) } );
+        }
+      };
+
+    It is up to you to provide the '/login' route, handle actual
+    authentication, and set "user" session variable if login is successful.
+
+    If the original request contains a parameter in the "passthrough" list,
+    it will be added to the login query. For example,
+    "http://example.com/private?user=dagolden" will be redirected as
+    "http://example.com/login?user=dagolden&return_url=...". This
+    facilitates pre-populating a login form.
+
+CONFIGURATION
+    You may override any of these settings:
+
+    *   "login_route: /login" -- defines where a protected route is
+        redirected
+
+    *   "logged_in_key: user" -- defines the session key that must be true
+        to indicate a logged-in user
+
+    *   "callback_key: return_url" -- defines the parameter key with the
+        original request URL that is passed to the login route
+
+    *   "passthrough: - user" -- a list of parameters that should be passed
+        through to the login handler
+
+EXTENDING
+    The class method "extend" may be used to add (or override)
+    authentication criteria. For example, to add a check for the "session
+    'is_admin'" key:
+
+      Dancer2::Plugin::Auth::Tiny->extend(
+        admin => sub {
+          my ($dsl, $coderef) = @_;
+          return sub {
+            if ( $dsl->app->session->read("is_admin") ) {
+              goto $coderef;
+            }
+            else {
+              $dsl->app->redirect '/access_denied';
+            }
+          };
+        }
+      );
+
+      get '/super_secret' => needs admin => sub { ... };
+
+    It takes key/value pairs where the value must be a closure generator
+    that wraps arguments passed to "needs".
+
+    You could pass additional arguments before the code reference like so:
+
+      # don't conflict with Dancer2's any()
+      use Syntax::Keyword::Junction 'any' => { -as => 'any_of' };
+
+      Dancer2::Plugin::Auth::Tiny->extend(
+        any_role => sub {
+          my $coderef = pop;
+          my ($dsl, @requested_roles) = @_;
+          return sub {
+            my @user_roles = @{ $dsl->app->session->read("roles") || [] };
+            if ( any_of(@requested_roles) eq any_of(@user_roles) ) {
+              goto $coderef;
+            }
+            else {
+              $dsl->app->redirect '/access_denied';
+            }
+          };
+        }
+      );
+
+      get '/parental' => needs any_role => qw/mom dad/ => sub { ... };
+
+SEE ALSO
+    For more complex Dancer2 authentication, see:
+
+    *   Dancer2::Plugin::Auth::Extensible
+
+    *   Dancer2::Plugin::Auth::RBAC -- possibly not yet (or going to be)
+        ported to Dancer2
+
+    *   Dancer2::Plugin::Auth::YARBAC
+
+    For password authentication algorithms for your own '/login' handler,
+    see:
+
+    *   Auth::Passphrase
+
+    *   Dancer2::Plugin::Passphrase
+
+ACKNOWLEDGMENTS
+    This simplified Auth module was inspired by
+    Dancer::Plugin::Auth::Extensible by David Precious and discussions about
+    its API by members of the Dancer Users mailing list.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny>
+
+      git clone https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Sawyer X <xsawyerx@cpan.org>
+
+CONTRIBUTORS
+    *   Jason A. Crome <jason@crome-plated.com>
+
+    *   Jim Davis <revhippie@gmail.com>
+
+    *   Pedro Melo <melo@simplicidade.org>
+
+    *   Peter Mottram <peter@sysnix.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

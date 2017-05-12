@@ -1,0 +1,9 @@
+#!/usr/local/bin/perl
+use warnings;
+use strict;
+
+    # Available at http://perlmeister.com/scripts
+use local::lib;
+use lib "$ENV{HOME}/perl-modules";
+use ModDevUtils;
+ModDevUtils::release(0) or exit 0;

@@ -1,0 +1,58 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Cwd qw(cwd);
+use File::chdir;
+use Path::FindDev qw(find_dev);
+
+local($CWD) = find_dev(cwd);
+
+my %opts = map {
+	/^--TRAVIS$/     ? (should_sign => 0, should_compress => 0) :
+	/^--(\w+)=(.+)$/ ? ($1 => $2) :
+	die("Unrecognized argument: $_");
+} @ARGV;
+
+require Dist::Inkt;
+my $dist = 'Dist::Inkt'->new_from_ini(undef, %opts);
+$dist->BuildTravisYml;
+exit(0);
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=for stopwords gzipped tarball distinkt-travisyml
+
+=head1 NAME
+
+distinkt-travisyml - build a Travis-CI config file for a Dist::Inkt-based distribution
+
+=head1 SYNOPSIS
+
+   distinkt-travisyml
+
+=head1 DESCRIPTION
+
+After generating the file, you probably want to tweak it by hand.
+
+=head1 AUTHOR
+
+Toby Inkster E<lt>tobyink@cpan.orgE<gt>.
+
+=head1 COPYRIGHT AND LICENCE
+
+This software is copyright (c) 2014 by Toby Inkster.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 DISCLAIMER OF WARRANTIES
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

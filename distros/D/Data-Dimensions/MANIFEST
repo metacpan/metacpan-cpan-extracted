@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+lib/Data/Dimensions.pm
+lib/Data/Dimensions/Map.pm
+lib/Data/Dimensions/SickTie.pm
+t/01_general.t
+t/02_map.t
+t/03_options.t
+t/04_import.t
+t/05_prefix.t
+META.yml                                 Module meta-data (added by MakeMaker)

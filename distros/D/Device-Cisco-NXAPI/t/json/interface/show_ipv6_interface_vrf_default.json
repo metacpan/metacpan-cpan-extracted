@@ -1,0 +1,120 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_intf": [
+        {
+          "ROW_intf": {
+            "intf-name": "loopback0",
+            "proto-state": "up",
+            "link-state": "up",
+            "admin-state": "up",
+            "addr": "2002::1/64",
+            "prefix": "2002::/64",
+            "linklocal-addr": "fe80::86b8:2ff:fe0f:15c8",
+            "linklocal-configured": "FALSE",
+            "mrouting-enabled": "disabled",
+            "mgroup-locally-joined": "TRUE",
+            "mtu": 1500,
+            "urpf-mode": "none",
+            "ipv6-lstype": "none",
+            "stats-last-reset": "never",
+            "upkt-fwd": 0,
+            "upkt-orig": 0,
+            "upkt-consumed": 0,
+            "ubyte-fwd": 0,
+            "ubyte-orig": 0,
+            "ubyte-consumed": 0,
+            "mpkt-fwd": 0,
+            "mpkt-orig": 0,
+            "mpkt-consumed": 0,
+            "mbyte-fwd": 0,
+            "mbyte-orig": 0,
+            "mbyte-consumed": 0,
+            "TABLE_maddr": {
+              "ROW_maddr": [
+                {
+                  "m-addr": "ff02::2"
+                },
+                {
+                  "m-addr": "ff02::1"
+                },
+                {
+                  "m-addr": "ff02::1:ff00:1"
+                },
+                {
+                  "m-addr": "ff02::1:ff0f:15c8"
+                },
+                {
+                  "m-addr": "ff02::1:ff00:0"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "ROW_intf": {
+            "intf-name": "loopback1",
+            "proto-state": "up",
+            "link-state": "up",
+            "admin-state": "up",
+            "addr": "2002:10::1/64",
+            "prefix": "2002:10::/64",
+            "linklocal-addr": "fe80::86b8:2ff:fe0f:15c8",
+            "linklocal-configured": "FALSE",
+            "mrouting-enabled": "disabled",
+            "mgroup-locally-joined": "TRUE",
+            "mtu": 1500,
+            "urpf-mode": "none",
+            "ipv6-lstype": "none",
+            "stats-last-reset": "never",
+            "upkt-fwd": 0,
+            "upkt-orig": 0,
+            "upkt-consumed": 0,
+            "ubyte-fwd": 0,
+            "ubyte-orig": 0,
+            "ubyte-consumed": 0,
+            "mpkt-fwd": 0,
+            "mpkt-orig": 0,
+            "mpkt-consumed": 0,
+            "mbyte-fwd": 0,
+            "mbyte-orig": 0,
+            "mbyte-consumed": 0,
+            "TABLE_maddr": {
+              "ROW_maddr": [
+                {
+                  "m-addr": "ff02::2"
+                },
+                {
+                  "m-addr": "ff02::1"
+                },
+                {
+                  "m-addr": "ff02::1:ff00:1"
+                },
+                {
+                  "m-addr": "ff02::1:ff0f:15c8"
+                },
+                {
+                  "m-addr": "ff02::1:ff00:0"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "TABLE_vrf": [
+        {
+          "ROW_vrf": {
+            "vrf-name-out": "default"
+          }
+        },
+        {
+          "ROW_vrf": {
+            "vrf-name-out": "default"
+          }
+        }
+      ]
+    }
+  },
+  "id": 1
+}

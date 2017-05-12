@@ -1,0 +1,51 @@
+{
+   "abstract" : "Send packets compatible with the Spektrum RC protoocol",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Device-Spektrum",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Device::SerialPort" : "1.04",
+            "HiPi" : "0"
+         },
+         "requires" : {
+            "Moose" : "0",
+            "Test::More" : "0",
+            "Throwable" : "0",
+            "Time::HiRes" : "1.97236",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/frezik/Device-Spektrum"
+      }
+   },
+   "version" : "0.498225878299312"
+}
+

@@ -1,0 +1,59 @@
+Dancer-Logger-Pipe
+
+NAME
+       Dancer::Logger::Pipe - pipe-based logging engine for Dancer
+
+VERSION
+       Version 0.01
+
+SYNOPSIS
+       Used to pipe the logs from Dancer. This requires some additional settings.
+
+         logger: pipe
+         pipe:
+           command:     "/usr/bin/cronolog /var/log/dancer/%Y/%m/%d/dancer.log"
+
+DESCRIPTION
+       This is a pipe-based logging engine that allows you to pipe your log output
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Logger::Pipe
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Logger-Pipe
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Logger-Pipe
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Logger-Pipe
+
+    Search CPAN
+        http://search.cpan.org/dist/Dancer-Logger-Pipe/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Moshe Good
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

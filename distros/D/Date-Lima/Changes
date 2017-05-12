@@ -1,0 +1,51 @@
+1.4300: Thu Dec 15 2011
+   - added rev() to go from 9h22m5s to 33_725 seconds
+
+1.4210: Sun Jan 17 2010
+   - added sidereal computations.  Boring really.
+
+1.4200: Sun Jul 12 2009
+   - adding a bunch of tests, like critic and the pod tests
+   - added daysmallest_conversions()
+
+1.4100: Fri Jun 26 15:16:35 EDT 2009
+   - added a readme
+
+1.4: Fri Jun 26 12:34:01 EDT 2009
+   - I might just release this with both namespaces... we'll see.
+
+1.3: Tue Aug 12 07:19:17 EDT 2008
+   - I modernized this greatly
+
+1.2:  Fri Sep 22 07:47:51 EDT 2000
+   - jettero redid the NAME field to match cpan
+
+1.1:  Fri Sep 22 07:47:51 EDT 2000
+   - jettero redid the exports
+
+1.00:  Thu Sep 21 09:36:25 EDT 2000
+   - jettero think this thing is ready to go... everything
+     is tested. Let's do it!
+
+0.23:  Thu Sep 21 08:07:10 EDT 2000
+   - jettero got the functions all fleshed out, they're
+     probably ready to go... now on to the testing (and the
+     exports).
+
+0.13:  Thu Sep 21 08:00:31 EDT 2000
+   - jettero sped up the versioning ... this shouldn't take
+     long anyway
+
+0.03:  Thu Sep 21 08:00:14 EDT 2000
+   - jettero got some docs stubs and some functions
+     cut-and-pasted into the .pm
+
+0.02:  Thu Sep 21 07:45:22 EDT 2000
+   - jettero got a naked .pm setup
+
+Revision history for Perl extension Date::Lima.
+
+0.01  Thu Sep 21 07:43:59 2000
+        - original version; created by h2xs 1.20 with
+          options -n Date::Lima -X
+

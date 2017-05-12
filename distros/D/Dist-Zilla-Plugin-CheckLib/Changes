@@ -1,0 +1,32 @@
+Revision history for Dist-Zilla-Plugin-CheckLib
+
+0.006     2014-11-12 05:47:37Z
+          - fix optional tests of interaction with [MakeMaker::Fallback] that
+            broke with its newest release
+          - avoid testing with [MakeMaker::Awesome] if its version is too old
+
+0.005     2014-11-11 06:54:15Z
+          - fix optional tests of interaction with [ModuleBuildTiny::Fallback]
+            that broke with its newest release
+
+0.004     2014-10-18 04:41:46Z
+          - bump optional dependency on [MakeMaker::Awesome] to avoid old bug
+            with loaded modules
+
+0.003     2014-09-06 02:31:19Z
+          - now also testing interaction with [MakeMaker::Fallback],
+            [ModuleBuildTiny::Fallback] -- the latter requiring fixes
+
+0.002     2014-09-04 06:34:59Z
+          - insertion of check_lib_or_exit arguments updated, so
+            defined-but-false values are not skipped
+          - now also testing interaction with [ModuleBuild],
+            [ModuleBuildTiny], and [MakeMaker::Awesome]
+          - Makefile.PL/Build.PL content inserted a little lower in the file
+          - bump the required version of Devel::CheckLib, to work around an
+            issue in perl 5.18 or later
+          - now munging the file at the proper phase, if the plugin generating
+            the file also does so
+
+0.001     2014-04-19 08:32:40Z
+          - Initial release.

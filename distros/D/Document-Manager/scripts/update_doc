@@ -1,0 +1,226 @@
+#!/usr/bin/perl -w
+
+# This script allows alteration of properties of a given doc,
+# such as state and keywords
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use File::Find;
+use SOAP::Lite;
+use SOAP::Lite::Utility;
+use MIME::Base64 qw(encode_base64);
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our %opt_properties;
+our @opt_keyword_add;
+our @opt_keyword_remove;
+our $opt_state;
+our $opt_resource = ($ENV{'DMS_RESOURCE'} or
+                     'http://www.openclipart.org/Document/Manager');
+our $opt_server   = ($ENV{'DMS_SERVER'} or 'http://localhost:8012/');
+our $opt_debug    = 0;
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           'version|V'          => \$opt_version,
+           'help|h'             => \$opt_help,
+           'man'                => \$opt_man,
+	   'properties|p=s'     => \%opt_properties,
+	   'keyword_add|k=s'    => \@opt_keyword_add,
+	   'keyword_remove|d=s' => \@opt_keyword_remove,
+	   'state|S=s'          => \$opt_state,
+           'server|s=s'         => \$opt_server,
+           'resource|r=s'       => \$opt_resource,
+           'debug|D=i',         => \$opt_debug
+           );
+
+# Handle -V or --version
+if ($opt_version) {
+    print '$0: $Revision: 1.2 $', "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+my $doc_id = shift @ARGV;
+
+if ($doc_id !~ /^\d+$/) {
+    warn "Document ID must be an integer\n";
+    pod2usage(-verbose => 1, -exitstatus => -1);
+}
+
+
+exit main();
+
+my $soap;
+my $dms;
+
+sub main {
+    # Connect to the server
+    $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the document manager object
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    $dms = $response->result;
+
+    if (! $dms) {
+	die "Could not create dms object\n";
+    }
+
+    if (keys %opt_properties > 0) {
+	$response = $soap->properties($dms, $doc_id, %opt_properties);
+	soap_assert($response);
+	if ($response->result) {
+	    warn "Set $doc_id properties: ".$response->result."\n";
+	} else {
+	    warn $soap->get_error($dms)->result, "\n";
+	}
+    }
+
+    if ($opt_state) {
+	$response = $soap->state($dms, $doc_id, $opt_state);
+	soap_assert($response);
+	if ($response->result) {
+	    warn "Set $doc_id state\n";
+	} else {
+	    $response = $soap->get_error($dms);
+	    warn($response->result or "Unknown error setting state\n");
+	}
+    }
+
+    if (@opt_keyword_add) {
+	$response = $soap->keyword_add($dms, $doc_id, @opt_keyword_add);
+	soap_assert($response);
+	if ($response->result) {
+	    warn "Set $doc_id keywords\n";
+	} else {
+	    warn $soap->get_error($dms)->result, "\n";
+	}
+    }
+
+    if (@opt_keyword_remove) {
+	$response = $soap->keyword_remove($dms, $doc_id, @opt_keyword_remove);
+	soap_assert($response);
+	if ($response->result) {
+	    warn "Removed $doc_id keywords\n";
+	} else {
+	    warn $soap->get_error($dms)->result, "\n";
+	}
+    }
+
+    return 0;
+}
+
+
+__END__
+
+=head1 NAME
+
+B<update_doc> - command-line program for updating a document in a document 
+management system.
+
+=head1 SYNOPSIS
+
+update_doc file.svg [file2.svg dir/ ...]
+
+    Options:
+   -h, --help                    Prints a brief help message
+   -m, --man                     Displays full man page
+   -D, --debug=integer           Prints debug messages
+   -V, --version                 Prints version information
+   -s, --server                  URL of the dms server
+   -r, --resource                URI for the service
+   -p, --properties              Set properties for the doc
+   -k, --keyword_add             Adds the list of keywords
+   -d, --keyword_remove          Removes the given keywords
+   -S, --state                   Sets the state of the document
+
+=head1 DESCRIPTION
+
+B<update_doc> - This program is a client-side tool for updating
+properties of a document stored in a document management system 
+via SOAP.  Specifically, it's used for updating the metadata in
+SVG files in the Open Clip Art Library (http://www.openclipart.org).
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-D> I<num>, B<--debug>=I<num>
+
+Prints debug messages.  The higher I<num>, the more detailed the debug
+messages will be.
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the Document::Manager server to connect to.  By default,
+it uses 'http://localhost:8012'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.openclipart.org/Document/Manager'.  Users should not typically
+need to alter this setting.
+
+=item B<-p> I<property>=I<value>, B<--properties>=I<property>=I<value>
+
+Sets one or more properties for the document
+
+=item B<-k> I<keyword(s)>, B<--keyword_add>=I<keyword(s)>
+
+Adds the keyword or keywords to the document
+
+=item B<-d> I<keyword(s)>, B<--keyword_remove>=I<keyword(s)>
+
+Removes the keyword or keywords from the document
+
+=item B<-S> I<state>, B<--state>=I<state>
+
+Sets the state of the document
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce at bryceharrington dot comE<gt>
+
+L<http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce W. Harrington.
+All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.2 $
+
+=cut

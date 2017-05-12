@@ -1,0 +1,60 @@
+Revision history for Devel-Backtrace
+
+0.01    Apr 25 2007
+        First version, released on an unsuspecting world.
+
+0.02    May 11 17:42:40 CEST 2007
+        Disabled a test for Windows, because it failed due to perl features
+        that are not available on Windows.
+
+0.03    May 12 02:19:24 CEST 2007
+        Update documentation
+
+0.04    May 13 01:30:13 CEST 2007
+        Added support for perl 5.9's caller's hinthash.
+        Added by_index method to Devel::Backtrace::Point.
+
+0.05    May 20 19:59:28 CEST 2007
+        Make the tests work with perl 5.9
+
+0.06    Mar 27 15:17:04 CET 2008
+        Change the license to public domain.
+        Added Devel::DollarAt.
+        Added skipmysubs to Devel::Backtrace and called_package to
+        Devel::Backtrace::Point.
+
+0.07    Thu Mar 27 16:14:03 CET 2008
+        Some minor changes (nothing in the code).
+
+0.08    Sat Mar 29 18:43:42 CET 2008
+        Added some documentation fixes.
+        Previously, some tests were skipped in perl 5.6.  I made them work in
+        5.6 and don't skip them any more.
+        Previously, a test failed in 5.10 because perl 5.8 and 5.10 sometimes
+        generate different line numbers in error messages.  I made the test
+        work (see examples/dollarat.pl).
+
+0.09    Sun Mar 30 16:08:25 CEST 2008
+        Documentation fixes
+        Added version to Devel::Backtrace::Point
+
+0.10    Wed Apr  2 02:51:43 CEST 2008
+        Format strings for stringification.
+        Level information in Devel::Backtrace::Point.
+        Fix a warning in examples/dollarat.pl in perl 5.10.
+        Change the test system.  Previously it used to automatically run the
+        examples, but now it's independent from the examples because that's
+        more flexible.
+        Again, added some fixes to make the tests work on all platforms.
+
+0.11    Mon Jul  7 00:55:37 CEST 2008
+        DBP is in the public domain too.  (Forgot that in 0.06)
+        Fix a test that failed on Windows because of path separators.
+        Add the Perl license as a fallback license...
+
+0.11_01 Wed Jan 21 00:14:18 CET 2009
+        Try again to make the test suite windows-compatible.
+
+0.12    2009-01-27
+        Non-dev release after 0.11_01 seemed fine with testers.
+        Pod fix.

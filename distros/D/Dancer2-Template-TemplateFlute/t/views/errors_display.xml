@@ -1,0 +1,8 @@
+<specification>
+  <value name="error_year" />
+  <value name="error_email" />
+  <form name="dtv">
+    <field name="email" id="email" />
+    <field name="year" id="year" />
+  </form>
+</specification>

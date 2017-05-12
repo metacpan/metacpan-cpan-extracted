@@ -1,0 +1,32 @@
+Data::Dumper::Perltidy
+
+DESCRIPTION
+
+Data::Dumper::Perltidy encapsulates both Data::Dumper and Perl::Tidy
+to provide a function that stringifies a Perl data structure in a
+pretty printed format.
+
+    use Data::Dumper::Perltidy;
+
+    ...
+
+    print Dumper $some_data_structure;
+
+See the documentation for Data::Dumper and Perl::Tidy for further information.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2012 John McNamara
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

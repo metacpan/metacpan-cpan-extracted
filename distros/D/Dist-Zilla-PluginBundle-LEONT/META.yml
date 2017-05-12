@@ -1,0 +1,76 @@
+---
+abstract: "LEONT's dzil bundle"
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-LEONT
+provides:
+  Dist::Zilla::PluginBundle::LEONT:
+    file: lib/Dist/Zilla/PluginBundle/LEONT.pm
+    version: '0.014'
+recommends:
+  Dist::Zilla::Plugin::BuildSelf: '0'
+  Dist::Zilla::Plugin::MakeMaker::Fallback: '0'
+  Dist::Zilla::Plugin::Meta::Dynamic::Config: '0'
+  Dist::Zilla::Plugin::MinimumPerlFast: '0'
+  Dist::Zilla::Plugin::ModuleBuild::Custom: '0'
+  Dist::Zilla::Plugin::ModuleBuildTiny::Fallback: '0'
+requires:
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::Bugtracker: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::ConfirmRelease: '4.300000'
+  Dist::Zilla::Plugin::ExecDir: '4.300000'
+  Dist::Zilla::Plugin::GatherDir: '4.300000'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::InstallGuide: '0'
+  Dist::Zilla::Plugin::License: '4.300000'
+  Dist::Zilla::Plugin::MakeMaker: '4.300000'
+  Dist::Zilla::Plugin::Manifest: '4.300000'
+  Dist::Zilla::Plugin::ManifestSkip: '4.300000'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaYAML: '4.300000'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::ModuleBuild: '4.300000'
+  Dist::Zilla::Plugin::ModuleBuildTiny: '0.004'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::PkgVersion: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::PruneCruft: '4.300000'
+  Dist::Zilla::Plugin::Readme: '4.300000'
+  Dist::Zilla::Plugin::Repository: '0'
+  Dist::Zilla::Plugin::RunExtraTests: '0'
+  Dist::Zilla::Plugin::ShareDir: '4.300000'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::UploadToCPAN: '4.300000'
+  Dist::Zilla::PluginBundle::Git: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Moose: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-LEONT
+  repository: git://github.com/Leont/dist-zilla-pluginbundle-leont.git
+version: '0.014'
+x_contributors:
+  - 'Leon Timmermans <fawaka@gmail.com>'

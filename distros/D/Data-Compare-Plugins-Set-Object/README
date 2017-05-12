@@ -1,0 +1,33 @@
+Data-Compare-Plugins-Set-Object version 1.0
+
+This module is a plugin for Data::Compare, enabling it to compare the data
+within Set::Object objects.  It uses Data::Compare to recursively descend
+references to data structures within sets, rather than merely comparing the
+references themselves to see if they refer to the same object/structure.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Data::Compare >= 0.06
+version >= 0.77
+Set::Object
+List::Util
+English
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Mark Gardner
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.10.1 itself.

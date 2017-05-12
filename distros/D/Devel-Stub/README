@@ -1,0 +1,170 @@
+NAME
+    Devel::Stub - stub some methods for development purpose
+
+DESCRIPTION
+    For example, when you develop a webapp,you'd like to develop views
+    and/or controllers using stubbed model modules which can return expected
+    data. This module helps it.
+
+    * With this module,you can stub some methods on exisiting moudle
+
+    * This module adds a lib path on initializing the app (when invoked with
+      specific environment variable) so that you can organize stub file on
+      the path outside of main lib path
+
+    * Changes you have to do on main app are just one line and it doesn't
+      affect if you kick the app in usual way. You have to do nothing on
+      existing modules.
+
+SYNOPSIS
+    The step is; 1) declare Devel::Stub::lib on main applicaton file. 2)
+    Overide methods with module which has same pacakge of original one.
+
+  Devel::Stub::lib
+    Change lib path for stubbing.
+
+     use lib qw/mylib/;
+     use Devel::Stub::lib active_if => $ENV{STUB};
+     use Foo::Bar;
+
+    In this case,if $ENV{STUB} are given, this script will add 'stub' to
+    @INC.
+
+  Devel::Stub
+    Stub some methods on existing module.
+
+    stub/Foo/Bar.pm
+
+      package Foo::Bar;
+      use Devel::Stub on => 'mylib';
+      # this moudle override methods on mylib/Foo/Bar.pm
+
+      stub foo => sub {
+          "stubbed!"
+      };
+
+EXAMPLE
+    Suppose these files;
+
+      ./app.pl
+      ./mylib/Abcd/Efg.pm
+      ./mylib/Foo/Bar.pm
+      ./stub/Foo/Bar.pm
+
+    app.pl
+         use lib 'mylib';
+         use Devel::Stub::lib active_if => $ENV{STUB}
+         use Foo::Bar;
+
+         my $b = Foo::Bar->new
+         print $b->woo;
+         print $b->moo;
+
+    mylib/Foo/Bar.pm
+         package Foo::Bar
+
+         sub new{
+             bless {},shift;
+         }
+         sub woo{
+             "woo!";
+         }
+         sub moo {
+             "moo!"
+         }
+         1;
+
+    stub/Foo/Bar.pm
+         package Foo::Bar;
+         use Devel::Stub on => "mylib";
+
+         stub woo => sub {
+            "stubbed!";
+         };
+         # override just 'woo' method. Others are intact.
+         1;
+
+    normal use
+
+     $ perl app.pl  #=> woo!moo!
+
+    stub use
+
+     $ STUB=1 perl app.pl #=>stubbed!moo!
+
+PARAMETERS
+  Devel::Stub::lib
+    EXAMPLE:
+
+     use Devel::Stub::lib 
+        active_if => ($ENV{APP_ENV} eq 'development'), path => 'mystub', quiet => 1;
+
+    active_if (optional - default: $ENV{STUB} )
+        specify condition for including stub path.
+
+    path (optional - default: 'stub' )
+        specify path for stub modules. That will insert on top of @INC
+
+    quite (optional - default: false )
+        if true is given,no warning message will be shown when entering stub
+        mode.
+
+  Devel::Stub
+    EXAMPLE:
+
+      use Devel::Stub on => "mylib"
+
+    on (required)
+        specify where original modules are located. That mean if you want to
+        stub method in 'foo_lib/Foga/Woo.pm', you should put 'foo_lib'.
+
+WRITING STUBS
+    you can define stubs with "stub" method.
+
+      package Foo::Woo;
+      use Devel::Stub on => 'mylib'
+
+      stub hoo => sub {
+         +{ stubbed => "data"};
+      };
+
+  INVOKE ORIGINAL METHOD
+    you can invoke original method with "_orginal()".
+
+     stub foo => sub {
+       my ($self,$param) = @_;
+       if($param ne 'xxx') {
+           return _original(@_);  # invoke original one for some situation.
+       }  
+       ["stubbed","data","is","here"];
+     };
+
+  TAG option
+    Opionaly,if you specify "TAG" parameter with stub method. That won't be
+    activated unless you exec app with STUB_TAG environment.
+
+      stub foo => sub {
+        "stubbed!";
+      },TAG => ["devel","local"];
+
+      stub 
+        TAG => ["staging"],
+        moo => sub  {
+          "stubbed!";
+        };
+
+    with stub file above,
+
+      STUB=1 STUB_TAG=local perl app.pl  # 'foo' is stubbed
+      STUB=1 STUB_TAG=staging perl app.pl # 'moo' is stubbed.
+      STUB=1 perl app.pl # neither is stubbed.
+
+AUTHOR
+    Masaki Sawamura <sawamur@cpan.org>
+
+LICENCE AND COPYRIGHT
+    Copyright (c) 2012, Masaki Sawamura. All rights reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic.
+

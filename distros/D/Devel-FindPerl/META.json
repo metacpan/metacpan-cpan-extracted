@@ -1,0 +1,80 @@
+{
+   "abstract" : "Find the path to your perl",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>, Randy Sims <randys@thepierianspring.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-FindPerl",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "ExtUtils::Config" : "0.007"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Cwd" : "0",
+            "Exporter" : "5.57",
+            "File::Basename" : "0",
+            "File::Spec::Functions" : "0",
+            "IPC::Open2" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::FindPerl" : {
+         "file" : "lib/Devel/FindPerl.pm",
+         "version" : "0.014"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-devel-findperl at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-FindPerl"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/devel-findperl.git",
+         "web" : "https://github.com/Leont/devel-findperl"
+      }
+   },
+   "version" : "0.014",
+   "x_contributors" : [
+      "cm-perl <cm-perl@users.noreply.github.com>",
+      "Leon Timmermans <fawaka@gmail.com>"
+   ]
+}
+

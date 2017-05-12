@@ -1,0 +1,16 @@
+TODO list for Perl module Date::Namedays::Simple
+
+- Allow external nameday files to be fetched during runtime
+- We need reverse mappings : given a name, find out the date
+- Make the tarball more CPAN-ready
+- Test it on differen OS-es, with different Perl versions...
+- At least UTF8 encoding should be supported, now it is only Latin2 (ISO-8859-2)
+- Check for Perl version and dependencies
+- Finalize API
+- Create "final" version
+- More docs!
+- Even more docs!!
+- Write more tests
+- Add more languages
+- More precise leap-year calculation
+- Check how leap-years work in Hungary

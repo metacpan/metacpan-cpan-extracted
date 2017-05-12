@@ -1,0 +1,30 @@
+---
+abstract: 'Generic interface for perl encoder or serializer'
+author:
+  - 'xaicron <xaicron {at} cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.02'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Encoder
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  Data::MessagePack: 0
+  JSON: 0
+  YAML: 0
+requires:
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/xaicron/p5-Data-Encoder.git
+version: 0.05

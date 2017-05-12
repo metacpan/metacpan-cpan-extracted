@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Debian-Package-HTML.t
+lib/Debian/Package/HTML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

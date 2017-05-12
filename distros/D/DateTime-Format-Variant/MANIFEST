@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+'inc\\Devel\\AssertOS.pm'
+'inc\\Devel\\AssertOS\\MSWin32.pm'
+'inc\\Devel\\CheckOS.pm'
+lib/DateTime/Format/Variant.pm
+t/00-load.t
+t/01-base.t

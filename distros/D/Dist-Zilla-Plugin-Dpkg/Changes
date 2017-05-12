@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-Plugin-Dpkg
+
+0.05 Apr 10 2013
+
+0.05 Apr 10 2013
+  - The file generation code has been modified to pass a pristine copy
+    of the template variables every time _generate_file is called.  This
+    allows subclasseses overriding or otherwise augmenting _generate_file
+    to scribble on the template variables without affecting subsequent
+    invocations.
+
+0.04 Oct 10 2012
+
+0.03 Dec 21 2011
+
+0.02 Dec 21 2011
+  - Add package_shell_name variable
+
+0.01
+  - First version, released on an unsuspecting world.
+

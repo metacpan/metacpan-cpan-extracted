@@ -1,0 +1,102 @@
+---
+abstract: 'Dist::Zilla configuration the way DAGOLDEN does it'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::pushd: '0'
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150009'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-DAGOLDEN
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::PluginBundle::DAGOLDEN:
+    file: lib/Dist/Zilla/PluginBundle/DAGOLDEN.pm
+    version: '0.078'
+  Pod::Weaver::PluginBundle::DAGOLDEN:
+    file: lib/Pod/Weaver/PluginBundle/DAGOLDEN.pm
+    version: '0.078'
+requires:
+  Dist::Zilla: '5.014'
+  Dist::Zilla::Plugin::Authority: '1.006'
+  Dist::Zilla::Plugin::Bugtracker: '1.110'
+  Dist::Zilla::Plugin::BumpVersionAfterRelease: '0.003'
+  Dist::Zilla::Plugin::CPANFile: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckMetaResources: '0.001'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0.002'
+  Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered: '0'
+  Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0.007'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::GithubMeta: '0.36'
+  Dist::Zilla::Plugin::InsertCopyright: '0.001'
+  Dist::Zilla::Plugin::MetaNoIndex: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '1.14'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::Pod2Readme: '0'
+  Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0'
+  Dist::Zilla::Plugin::PromptIfStale: '0.011'
+  Dist::Zilla::Plugin::RewriteVersion: '0'
+  Dist::Zilla::Plugin::RunExtraTests: '0'
+  Dist::Zilla::Plugin::SurgicalPodWeaver: '0'
+  Dist::Zilla::Plugin::TaskWeaver: '0.101620'
+  Dist::Zilla::Plugin::Test::Compile: '2.036'
+  Dist::Zilla::Plugin::Test::MinimumVersion: '2.000003'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::PodSpelling: '2.006001'
+  Dist::Zilla::Plugin::Test::Portability: '0'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0.016'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::PluginBundle::Filter: '0'
+  Dist::Zilla::PluginBundle::Git: '1.121010'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Moose: '0.99'
+  Pod::Elemental::PerlMunger: '0.200001'
+  Pod::Elemental::Transformer::List: '0.102000'
+  Pod::Weaver: '4'
+  Pod::Weaver::Config::Assembler: '0'
+  Pod::Weaver::Plugin::WikiDoc: '0'
+  Pod::Weaver::Section::Contributors: '0.008'
+  Pod::Weaver::Section::Support: '1.001'
+  Pod::Wordlist: '1.10'
+  Test::Portability::Files: '0.06'
+  namespace::autoclean: '0.09'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN
+  repository: https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN.git
+version: '0.078'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+  - 'Eric Johnson <eric.git@iijo.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'Sergey Romanov <complefor@rambler.ru>'
+  - '김도형 - Keedi Kim <keedi@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

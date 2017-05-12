@@ -1,0 +1,50 @@
+# NAME
+
+Dist::Zilla::App::Command::cover - Code coverage metrics for your distribution
+
+# VERSION
+
+version 1.101001
+
+# SYNOPSIS
+
+    # dzil cover -outputdir /my/dir
+
+# DESCRIPTION
+
+This is a command plugin for [Dist::Zilla](http://search.cpan.org/perldoc?Dist::Zilla). It provides the `cover` command,
+which generates code coverage metrics for your distribution using
+[Devel::Cover](http://search.cpan.org/perldoc?Devel::Cover).
+
+If there were any test errors, the `cover` command won't be run. Author and
+release tests are not run since they should not be counted against code
+coverage. Any additional command-line arguments are passed to the `cover`
+command.
+
+# AVAILABILITY
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Dist::Zilla::App::Command::cover/](https://metacpan.org/module/Dist::Zilla::App::Command::cover/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Dist-Zilla-App-Command-cover](http://github.com/doherty/Dist-Zilla-App-Command-cover)
+and may be cloned from [git://github.com/doherty/Dist-Zilla-App-Command-cover.git](git://github.com/doherty/Dist-Zilla-App-Command-cover.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Dist-Zilla-App-Command-cover/issues](https://github.com/doherty/Dist-Zilla-App-Command-cover/issues).
+
+# AUTHORS
+
+- Marcel Grünauer <marcel@cpan.org>
+- Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Marcel Grünauer <marcel@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

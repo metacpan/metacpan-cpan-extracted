@@ -1,0 +1,79 @@
+NAME
+
+    Dist::Zilla::Plugin::GitHubREADME::Badge - Dist::Zilla - add badges to
+    github README.md
+
+SYNOPSIS
+
+        # in dist.ini
+        [GitHubREADME::Badge]
+    
+        # configure it yourself
+        [GitHubREADME::Badge]
+        badges = travis
+        badges = appveyor
+        badges = coveralls
+        badges = gitter
+        badges = cpants
+        badges = issues
+        badges = github_tag
+        badges = license
+        badges = version
+        badges = codecov
+        badges = gitlab_ci
+        badges = gitlab_cover
+        place = bottom
+        phase = release
+
+DESCRIPTION
+
+    Dist::Zilla::Plugin::GitHubREADME::Badge adds badges to GitHub
+    README.md
+
+CONFIG
+
+ badges
+
+    Currently only travis, coveralls, codecov, gitter, cpants and GH issues
+    are supported. However patches are welcome.
+
+    The default goes to travis, coveralls and cpants.
+
+        [GitHubREADME::Badge]
+        badges = travis
+        badges = coveralls
+        badges = gitter
+        badges = cpants
+
+ place
+
+        [GitHubREADME::Badge]
+        place = bottom
+
+    Place the badges at the top or bottom of the README. Defaults to top.
+
+ phase
+
+        [GitHubREADME::Badge]
+        phase = release
+
+    Which Dist::Zilla phase to add the badges: build or release. The
+    default is build.
+
+SEE ALSO
+
+    Minilla, Dist::Zilla::Plugin::TravisCI::StatusBadge
+
+AUTHOR
+
+    Fayland Lam <fayland@gmail.com>
+
+COPYRIGHT
+
+    Copyright 2014- Fayland Lam
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,158 @@
+Revision history for Data::Transpose
+
+0.0023 Mon Oct 31 12:06:53 2016 CET
+
+    [ENHANCEMENTS]
+
+    * Move build dependencies to BUILD_REQUIRES (Peter Mottram, GH #28).
+
+    [TESTS]
+
+    * Add coverage to Travis and more tests (Lisa Hare, GH #27).
+
+0.0022 Wed Feb 10 21:58:15 2016 CET
+
+    [BUG FIXES]
+
+    * Remove obsolete test credit card numbers for Discover cards
+      (Slaven Rezić, Marco Pessotto, GH #25, #26).
+
+0.0021 Tue Jan 19 11:49:42 2016 CET
+
+    [BUG FIXES]
+
+    * Do not rely on unknown domains for checking mail validation
+      (Marco Pessotto, GH #24).
+
+    [TESTS]
+
+    * Add Travis CI configuration file (Stefan Hornburg/Racke).
+
+0.0020 Sun Aug 16 10:53:30 2015 WEST
+
+    [ENHANCEMENTS]
+
+    * Add DataTime validator (Sam Batschelet, GH #16, #18).
+
+    [BUG FIXES]
+
+    * Avoid double errors on undefined strings in String validator
+      (Marco Pessotto).
+
+    [DOCUMENTATION]
+
+    * Improve clarity in Data::Transpose::Validator::Subrefs
+      (Peter Mottram, GH #19).
+    * Remove superfluous "the" from POD for the Validator class
+      (Stefan Hornburg).
+
+    [TESTS]
+
+    * Add tests and documentation for errors_hash method.
+
+0.0015 Sun Jul  5 11:05:00 2015 CEST
+
+    [BUG FIXES]
+
+    * Fix "repetion" typo (Stefan Hornburg).
+
+0.0014 Wed Jun  3 11:00:13 2015 CEST
+
+    [BUG FIXES]
+
+	* Fix stale data caused by missing input fields
+	  (GH #14, Marco Pessotto).
+
+    [DOCUMENTATION]
+
+	* Add example to synopsis and improve name and
+	  description (GH #12, #13, Todd Wade).
+
+0.0013 Sun May 17 21:45:06 2015 CEST
+
+    [TESTS]
+
+    * Fix for mxcheck test failures (GH #5, #11, Todd Wade).
+
+0.0012 Fri Feb  6 10:43:29 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Add Data::Transpose::Prefix class (Stefan Hornburg).
+    * Migrate Data::Transpose to Moo (GH #8, Marco Pessotto).
+    * Add auto correction for email addresses with double dots
+      before top level domain (Stefan Hornburg).
+
+0.0011 Fri Dec  5 12:28:44 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Added option collapse_whitespace to validator (GH #7, Marco Pessotto).
+    * Clarify error message on hashref check in transpose method
+      (Stefan Hornburg).
+
+0.0010 Wed Apr 30 08:58:07 2014 CEST
+
+    [BUG FIXES]
+
+    * Remove the additional check on ' for email addresses, as this is a
+      valid character per RFC 822 (GH #6, Marco Pessotto).
+
+0.0009 Thu Mar 13 19:34:00 2014 CET
+
+    * Add iterator Data::Transpose::Iterator::Scalar.
+
+0.0008 Fri Feb 28 16:32:04 2014 CET
+
+    * Add transpose_object method to Data::Transpose.
+
+    * Add links to classes in POD for Data::Transpose.
+
+0.0007 Tue Feb 25 19:16:45 2014 CET
+
+    * Allow to pass validator options inside field arguments for named
+      validators.
+
+    * Fix typo in Data::Transpose::Validator's documentation for prepare
+      method.
+
+    * Fix typos in NumericRange iterator.
+
+    * Fix link to credit card validator in the documentation.
+
+    * Add Moo to prequisites.
+
+0.0006 Fri Feb  7 17:33:56 2014 CET
+
+    * Add base and errors iterators.
+
+0.0005 Sat Jan 18 13:41:32 2014 CET
+
+    * Add group validation.
+
+    * Add success method to Data::Transpose::Validator.
+
+    * Fix spurious =item in Data::Transpose::Validator's POD.
+
+    * Run POD tests only when RELEASE_TESTING is set.
+
+    * Add resource and bugtracker to Makefile.PL.
+
+0.0004 Thu Feb 21 13:46:56 2013 CET
+
+    * Added Data::Transpose::Validator, a module to validate incoming
+      data (form-oriented).
+
+0.0003
+
+    * Added documentation
+
+0.0002
+
+    * Added Data::Transpose::EmailValid and Data::Transpose::PasswordPolicy
+
+0.0001
+
+    * Initial release.
+
+

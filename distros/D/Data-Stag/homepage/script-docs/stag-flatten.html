@@ -1,0 +1,85 @@
+<HTML>
+<HEAD>
+<TITLE>stag-flatten</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#usage">USAGE</A></LI>
+	<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-flatten.pl - turns stag data into a flat table</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-flatten.pl -c name -c person/name dept MyFile.xml</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>reads in a file in a stag format, and 'flattens' it to a tab-delimited
+table format. given this data:</P>
+<PRE>
+  (company
+   (dept
+    (name &quot;special-operations&quot;)
+    (person
+     (name &quot;james-bond&quot;))
+    (person
+     (name &quot;fred&quot;))))</PRE>
+<P>the above command will return a two column table</P>
+<PRE>
+  special-operations      james-bond
+  special-operations      fred</PRE>
+<P>If there are multiple values for the columns within the node, then the
+cartesian product will be calculated</P>
+<P>
+<HR>
+<H1><A NAME="usage">USAGE</A></H1>
+<PRE>
+  stag-flatten.pl [-p PARSER] [-c COLS] [-c COLS] NODE &lt;file&gt;</PRE>
+<P>
+<HR>
+<H1><A NAME="arguments">ARGUMENTS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dp%7Cparser_FORMAT">-p|parser FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dc%7Ccolumn_COL1%2CCOL2%2CCOL3%2C%2E%2E">-c|column COL1,COL2,COL3,..</A></STRONG><BR>
+<DD>
+the name of the columns/elements to write out
+<P>this can be specified either with multiple -c arguments, or with a
+comma-seperated (no spaces) list of column (terminal node) names after
+a single -c</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dn%7Cnest">-n|nest</A></STRONG><BR>
+<DD>
+if set, then the output will be a compress repeating values into the
+same row; each cell in the table will be enclosed by {}, and will
+contain a comma-delimited set of values
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="./Data/Stag.html">the Data::Stag manpage</A></P>
+
+</BODY>
+
+</HTML>

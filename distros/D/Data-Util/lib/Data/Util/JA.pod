@@ -1,0 +1,598 @@
+
+=encoding utf-8
+
+=head1 NAME
+
+Data::Util::JA - データとデータ型のためのユーティリティ集
+
+=head1 VERSION
+
+This document describes Data::Util version 0.63
+
+=for test_synopsis no warnings 'redefine';
+
+=head1 SYNOPSIS
+
+	use Data::Util qw(:validate);
+
+	sub foo{
+		# they will die if invalid values are supplied
+		my $sref = scalar_ref(shift);
+		my $aref = array_ref(shift);
+		my $href = hash_ref(shift);
+		my $cref = code_ref(shift);
+		my $gref = glob_ref(shift);
+		my $rref = regex_ref(shift);
+		my $obj  = instance(shift, 'Foo');
+		# ...
+	}
+
+	use Data::Util qw(:check);
+
+	sub bar{
+		my $x = shift;
+		if(is_scalar_ref $x){
+			# $x is an array reference
+		}
+		# ...
+		elsif(is_instance $x, 'Foo'){
+			# $x is an instance of Foo
+		}
+		# ...
+	}
+
+	# miscelaneous
+	use Data::Util qw(:all);
+
+	my $x = anon_scalar();
+	$x = anon_scalar($x); # OK
+
+	my $stash = get_stash('Foo');
+
+	install_subroutine('Foo',
+		hello  => sub{ "Hello!\n" },
+		goodby => sub{ "Goodby!\n" },
+	);
+
+	print Foo::hello(); # Hello!
+
+	my($pkg, $name) = get_code_info(\&Foo::hello); # => ('Foo', 'hello')
+	my $fqn         = get_code_info(\&Foo::hello); # =>  'Foo::Hello'
+	my $code        = get_code_ref($fqn);          # => \&Foo::hello
+
+	uninstall_subroutine('Foo', qw(hello goodby));
+
+	print neat("Hello!\n"); # => "Hello!\n"
+	print neat(3.14);       # => 3.14
+	print neat(undef);      # => undef
+
+=head1 DESCRIPTION
+
+このモジュールはデータとデータ型のためのユーティリティ関数を提供します。
+
+ユーティリティはチェック関数群と検証関数群とその他の関数群があります。
+チェック関数群は値の型を調べ，真偽値を返す機能を提供します。
+検証関数群は値の型を調べ，真であればその値自身を返し，
+偽であれば致命的エラーとなる機能を提供します。
+その他の関数群は，無名スカラーリファレンスの生成やシンボルテーブルの操作，
+コードリファレンスの操作などの機能を提供します。
+これらユーティリティはいずれもコードの繰り返しを避けるために設計されました。
+
+このモジュールはXSとPure Perl双方で実装されており，Cコンパイラのある
+環境ではXSバックエンドが，ない環境ではPure Perlバックエンドが使用されます。
+なお，環境変数C<DATA_UTIL_PUREPERL>を真に設定することで，強制的にPure Perl
+バックエンドを使用することができます。
+
+XSバックエンドは注意深く実装されており，
+Pure Perlバックエンドより2倍から10倍程度高速に動作します。
+実際，XSバックエンドが提供するほぼ全ての関数は，等価のPure Perlコードを
+インラインで展開したコードよりも更に高速です。
+
+ディストリビューションのF<benchmark/>ディレクトリにベンチマークがあります。
+
+=head1 INTERFACE
+
+=head2 Check functions
+
+チェック関数群はC<:check>インポートタグによって導入できます。これらはある値
+の型が目的の型であれば真を，そうでなければ偽を返します。
+
+また，これらの関数はオーバーロードマジックも調べます。たとえば，C<${}>が
+オーバーロードされているオブジェクトは，スカラーリファレンスとして扱われます。
+
+リファレンスの型チェックをする関数は，オブジェクトリファレンスに対しては，
+オーバーロードされていない限り常に偽を返します。
+これは，オブジェクトの実装に依存するコードを書かないようにするためです。
+
+=over 4
+
+=item is_scalar_ref(value)
+
+スカラーリファレンスかどうかのチェックを行います。
+
+=item is_array_ref(value)
+
+配列リファレンスかどうかのチェックを行います。
+
+=item is_hash_ref(value)
+
+ハッシュリファレンスかどうかのチェックを行います。
+
+=item is_code_ref(value)
+
+コードリファレンスかどうかのチェックを行います。
+
+=item is_glob_ref(value)
+
+グロブリファレンスかどうかのチェックを行います。
+
+=item is_regex_ref(value)
+
+C<qr//>によって作られる正規表現かどうかのチェックを行います。
+
+=item is_instance(value, class)
+
+I<class>のインスタンスかどうかのチェックを行います。
+
+C<< Scalar::Util::blessed($value) && $value->isa($class) >>というコードと
+ほぼ等価です。
+
+I<class>が未定義値またはリファレンスであれば致命的エラーとなります。
+
+=item is_invocant(value)
+
+I<value>に対してメソッドを起動できるかどうかをチェックします。
+
+=item is_value(value)
+
+I<value>がプリミティブ値かどうかをチェックします。すなわち，定義済みであり，
+リファレンスではなく，型グロブでもなければ真を返します。
+
+この関数(およびC<is_string>/C<is_number()>/C<is_integer()>)は，
+オブジェクトリファレンスに対しては常に偽を返します。
+たとえI<value>が文字列化/数値化/真偽値化オーバーロードメソッドを
+持っていたとしても，それはプリミティブ値としては判断しません。
+
+この関数には検証を行う対応関数がありません。
+
+=item is_string(value)
+
+I<value>がプリミティブ値であり，
+かつ文字列化したときに1文字以上の内容を持つ値かどうかをチェックします。
+
+C<< do{ is_value($value) && length($value) > 0 } >>と同じです。
+
+この関数には検証を行う対応関数がありません。
+
+=item is_number(value)
+
+I<value>が数値かどうかをチェックします。
+ここでB<数値>とは，数値コンテキスト(たとえばC<< sprintf '%g', $value >>）
+で警告を出さずに数値に変換可能であり，
+かつPerlプログラム中にリテラルとしておくことができる値という意味です。
+
+すなわち，この関数はC<Scalar::Util::looks_like_number()>と異なり，
+C<Infinity>やC<NaN>はリテラルとしてプログラム中に置くことはできないため，
+数値として扱いません。また，数値化したときに警告を出さない例外である
+C<"0 but true">も同じ理由で数値として扱いません。
+
+この関数には検証を行う対応関数がありません。
+
+=item is_integer(value)
+
+I<value>が整数かどうかをチェックします。これはC<is_number()>の判定に加えて，
+整数値かどうかをチェックします。
+
+この関数には検証を行う対応関数がありません。
+
+=back
+
+
+=head2 Validating functions
+
+検証関数はC<:validate>タグによって導入できます。これらはチェック関数と
+同じ方法でチェックを行います。
+ただし，その結果が真であれば第一引数をそのまま返し，
+偽であれば致命的エラーとなります。
+
+これらの関数もオーバーロードマジックを考慮します。
+
+=over 4
+
+=item scalar_ref(value)
+
+スカラーリファレンスかどうかの検証を行います。
+
+=item array_ref(value)
+
+配列リファレンスかどうかの検証を行います。
+
+=item hash_ref(value)
+
+ハッシュリファレンスかどうかの検証を行います。
+
+=item code_ref(value)
+
+コードリファレンスかどうかの検証を行います。
+
+=item glob_ref(value)
+
+グロブリファレンスかどうかの検証を行います。
+
+=item regex_ref(value)
+
+C<qr//>によって作られる正規表現かどうかの検証を行います。
+
+=item instance(value, class)
+
+I<class>のインスタンスかどうかの検証を行います。
+
+I<class>が未定義値またはリファレンスであれば致命的エラーとなります。
+
+=item invocant(value)
+
+I<value>に対してメソッドを起動できるかどうかの検証を行います。
+
+I<value>がクラス名である場合，そのクラス名を正規化した文字列を返します。
+すなわち，C<"::Foo">やC<"main::Foo">を与えるとC<"Foo">を返します。
+
+=back
+
+=head2 Micellaneous utilities
+
+その他，個別にインポートできるいくつかのユーティリティ関数があります。
+
+=over 4
+
+=item anon_scalar()
+
+C<undef>を参照する匿名スカラーリファレンスを生成します。
+
+=item anon_scalar(value)
+
+I<value>のコピーを参照する匿名スカラーリファレンスを生成します。
+
+これはC<< do{ my $tmp = $value; \$value; } >>というコードと等価です。
+
+=item neat(value)
+
+I<value>を表示に適するよう整形した文字列を返します。
+C<< do{ defined($value) ? qq{"$value"} : 'undef' } >>を置き換える機能
+として提供されますが，より高機能です。
+
+=item get_stash(invocant)
+
+I<invocant>のスタッシュ B<stash>，つまりシンボルテーブルハッシュが
+存在すれば，そのスタッシュを返します。
+
+I<invocant>がオブジェクトリファレンスであれば，そのオブジェクトのパッケージの
+スタッシュを返します。
+
+I<invocant>がパッケージ名であり，そのパッケージが既に存在すれば，
+そのパッケージのスタッシュを返します。
+
+=item install_subroutine(package, name => subr [, ...])
+
+サブルーチンI<subr>をI<package>にI<name>としてインストールします。
+
+C<< do{ no strict 'refs'; *{$package.'::'.$name} = \&subr; } >>というコードと
+ほぼ等価です。さらに，I<subr>が匿名サブルーチンであれば，I<package>に
+名前付きサブルーチンI<&package::name>として命名します(ただし，Pure Perl版のコードでは匿名サブルーチンの命名は行いません)。
+
+サブルーチンを再インストールするときは，C<< no warnings 'redefine' >>
+ディレクティブを使ってください。
+
+	no warnings 'redefine';
+	install_subrouitne($package, $name => $subr);
+
+I<package>かI<name>が未定義値またはリファレンスであれば致命的エラーとなります。
+I<subr>がコードリファレンスでないときも致命的エラーとなりますが，
+オーバーロードマジックは考慮されます。
+
+
+この関数はC<< no strict 'refs' >>を必要としないため，B<strict無効化の誤謬>を犯す危険性がありません。strict無効化の誤謬とは，以下のような状況を指します。
+
+	my $property = ...;
+	# ...
+
+	no strict 'refs';
+	# simple read-only accessor
+	*{$pkg . '::' . $sub_name} = sub{
+		my($self) = @_;
+		return $self->{$property};
+	}
+
+これはオブジェクトのプロパティを参照するアクセサを生成するコードです。このアクセサは，正しく使う限りでは問題はありません。
+しかし，このアクセサをクラスメソッドとして呼び出すと，問題が顕在化します。
+つまりそのときC<$self>に入っているのはクラスを表す文字列であり，
+C<< $self->{$property} >>というコードはシンボリックリファレンスと解釈され，
+このアクセサが定義されたパッケージのグローバル変数としてデリファレンスされます。
+これは多くの場合，単にC<undef>を返すだけでしょう。
+C<<use strict 'refs'>>はまさにこのような誤ったシンボリックリファレンスの
+デリファレンスを検出するために用意されている機能なのですが，ここではその恩恵を
+得ることができず，デバッグの難しいコードを生成してしまいます。
+
+このケースでstrictの恩恵を得るためには，以下のように無名関数内で再度
+C<use strict>を有効にする必要があります。
+
+	no strict 'refs';
+	*{$pkg . '::' . $sub_name} = sub{
+		use strict 'refs';
+		my($self) = @_;
+		return $self->{$property};
+	}
+
+
+そこで，C<install_subroutine()>を使うともC<strict>を使用する必要がなくなります。
+
+	install_subroutine $pkg => (
+		$sub_name => sub{
+			my($self) = @_;
+			return $self->{$property};
+		},
+	);
+
+このstrict無効化の誤謬については，L<"Perlベストプラクティス"/18.10>
+I<「制約の無効化 - 制約または警告を無効にする場合は，明示的に，段階的に，最も狭いスコープで行う」> に解説があります。
+
+=item uninstall_subroutine(package, name [=> code], ...)
+
+サブルーチンI<name>をパッケージI<package>から削除します。
+
+C<< undef &subr >>がC<&subr>を未定義にして型グロブのコードスロットを
+そのままにするのに対して，C<uninstall_subroutine>は型グロブを
+シンボルテーブルから削除し，コードスロットを以外の値をシンボルテーブルに
+戻します。
+この挙動はC<namespace::clean>やC<constant::lexical>を実現するためのものです。
+
+I<name>に対してI<code>が与えられている場合は，C<&package::name>がI<code>である
+場合のみ削除します。すなわち，以下の二つのコードは等価です。
+
+	uninstall_subroutine($pkg, $name) if \&{$pkg . '::' . $name} == $code;
+	uninstall_subroutine($pkg, $name => $code);
+
+この関数はC<Sub::Delete::delete_sub()>と同じアルゴリズムに基づいていますが，
+複数のサブルーチンを一度に削除できます。
+
+=item get_code_info(subr)
+
+サブルーチンI<subr>のパッケージと名前のペアを返します。
+これはC<Sub::Identify::get_code_info()>とほぼ同じ機能です。
+ただし，スカラーコンテキストでは完全修飾名を返します。
+
+I<subr>の名前が不明なときは，リストコンテキストでは空リストを，
+スカラーコンテキストではC<undef>を返します。
+
+=item get_code_ref(package, name)
+
+I<\&package::name>が存在すれば，それを返します。
+これはC<< do{ no strict 'refs'; *{$package . '::' . $name}{CODE} } >>
+に似ていますが，I<\&package::name>が存在しない場合でも
+I<*package::name>を生成しません。
+
+第三引数としてC<"-create">を与えると，I<\&package::name>が存在しなくても
+スタブを生成してそれを返します。
+これはC<< do{ no strict 'refs'; \&{$package . '::' . $name} } >>と同じです。
+
+=item curry(subr, args and/or placeholders)
+
+サブルーチンI<subr>のカリー化を行います。
+つまり特定の引数を固定したクロージャを生成します。
+
+I<args and/or placeholders>には，固定する引数か，カリー化サブルーチンの引数に
+置き換えられるプレースホルダを渡します。プレースホルダには，添え字I<x>を参照
+するC<\x>と，C<\x>で参照した最大の添え字の以降の引数リストを参照する
+C<*_>があります。
+
+たとえば，以下のC<$closure>とC<$curried>は同じ機能を持つサブルーチンとなります。
+
+	my $class = 'Foo';
+	$closure = sub{ is_instance($_[0], $class) };
+	$curried = curry \&is_instance, \0, $class;
+
+	$closure = sub{ install_subroutine($class, @_) };
+	$curried = curry \&install_subroutine, $class, *_;
+
+なお，C<*_>はC<\x>で参照しなかった引数リストではないので注意してください。
+たとえば，C<< curry(\&subr, *_, \1)->(0, 1, 2, 3) >>というカリー化では，
+C<subr(2, 3, 1)>が呼び出され，カリー化されたサブルーチンに与えられた
+C<$_[0]>(つまり0)が無視されます。
+
+カリー化はクロージャよりも生成・呼び出しが高速です。
+
+より詳しいサンプルコードがL<Data::Util::Curry>にあります。
+
+=item modify_subroutine(subr, modifier_type => [subroutines], ...)
+
+サブルーチンI<subr>をI<modifier_type>にしたがってI<subroutines>で修飾し，
+無名関数I<modified_subr>として返します。
+
+I<modifier_type>にはC<before>, C<around>, C<after>があり，C<before>は
+I<subr>の呼び出し前に，C<after>はI<subr>の呼出し後に，I<modified_subr>に
+与えられた引数で呼び出されます。C<before>とC<after>の戻り値は捨てられます。
+C<around>はI<subr>の入出力をフィルタリングするための修飾子です。
+
+その際，呼び出順は，C<before>とC<around>は後で定義されたものが先に呼び出され
+(last-defined-first-called)，C<after>は先に定義されたものが先に呼び出されます(first-defined-first-called)。この呼び出し順はC<subroutine_modifier()>でも同じ
+です。
+
+たとえば：
+
+	$modified = modify_subroutine(\&foo, around => [sub{
+		my $next = shift;
+		do_something();
+		goto &{$next}; # continuation
+	}]);
+	$modified->();
+
+	$modified = modify_subroutine(\&foo,
+		before => \@befores,
+		around => \@arounds,
+		after  => \@afters,
+	);
+	$modified->();
+
+XSによる実装では，サブルーチン修飾子のコストが非常に安くなっています。
+
+このディストリビューションに付属しているF<example/lib/Method/Modifiers.pm>
+(C<modify_subroutine()>/C<subroutine_modifier()>のデモ)のベンチマーク
+F<benchmark/methext_bench.pl>によれば，メソッド修飾のコストはほぼ次のようになります：
+
+	with before modifier: 100% slower
+	with after  modifier: 100% slower
+	with around modifier: 200% slower
+
+特に，C<before>とC<after>はC<SUPER::>疑似クラスによってメソッドを拡張するよりも高速です。
+
+各修飾子については，L<Class::MOP::Class/"Method Modifiers">に
+詳しい解説があります。L<Class::Method::Modifiers>にも解説があります。
+このモジュールが提供するAPIはこれらのモジュールより低水準ですが，
+機能には互換性があります。
+
+=item subroutine_modifier(modified, modifier_type => subroutines, ...)
+
+C<modify_subroutine()>で生成したI<modified>を操作します。
+
+引数をI<modified>のみ渡した場合は，そのI<modified>がC<modify_subroutine()>で
+生成されたものかどうかを示す真偽値を返します。
+
+	if(subroutine_modifier $subr){
+		# $subrは修飾子つきサブルーチン
+	}
+
+I<modified>とI<modifier_type>(C<before>, C<around>, C<after>)
+を渡すと，そのI<modifier_type>に応じた修飾関数を返します。
+
+	@befores = subroutine_modifier $modified, 'before';
+
+このほか，更に関数のリストを渡した場合には，I<modified>のI<modifier_type>に
+その関数を追加します。
+
+	subroutine_modifier $modified, before => @befores;
+
+=item mkopt(input, moniker, require_unique, must_be)
+
+I<input>を元に名前と値のペア配列からなる配列リファレンスを作成します。
+
+これはC<Data::OptList::mkopt()>に似ています。それに加えて，I<must_be>は
+名前と型のペアからなるハッシュリファレンスでもかまいません。
+
+For example:
+
+	$array_ref = mkopt([qw(foo bar), baz => [42]], 'moniker');
+	# $array_ref == [ [foo => undef], [bar => undef], baz => [42] ]
+
+=item mkopt_hash(input, moniker, must_be)
+
+I<input>を元にハッシュリファレンスを作成します。
+
+これはC<Data::OptList::mkopt_hash()>に似ています。それに加えて，I<must_be>は
+名前と型のペアからなるハッシュリファレンスでもかまいません。
+
+For example:
+
+	$hash_ref = mkopt([qw(foo bar), baz => [42]], 'moniker');
+	# $hash_ref == { foo => undef, bar => undef, baz => [42] }
+
+=back
+
+=head2 Error handling
+
+検証関数によって放出される致命的エラーは，C<Data::Util::Error>モジュールによって変更することができます。
+
+	package Foo;
+	use Data::Util::Error sub{ Foo::InvalidArgument->throw(@_) };
+	use Data::Util qw(:validate);
+
+	# ...
+
+このエラーハンドラはパッケージ毎に設定され，そのパッケージ内でC<Data::Util>が発生させるエラーにはそのエラーハンドラが使われます。
+
+=head1 DISCUSSIONS
+
+=head1 What is a X-reference?
+
+「Xのリファレンス」とは何を指すのでしょうか。ここではハッシュリファレンスを例にとって考えます。
+まず，判断要素は以下の3つを想定します。
+
+=over 4
+
+=item 1
+
+C<ref($x) eq 'HASH'>
+
+=item 2
+
+C<Scalar::Util::reftype($x) eq 'HASH'>
+
+=item 3
+
+C<overload::Method($x, '%{}')>
+
+=back
+
+C<ref()>は非常に高速なので，実用上はこれで事足りることが多いと思われます。しかし，これはオーバーロードマジックを考慮しません。
+
+C<reftype()>を使うべきではありません。$xがオブジェクトである場合，オブジェクトの実装型を参照し，カプセル化を壊してしまうことになるからです。
+
+そしてC<overload::Method>が捕捉するのは，オブジェクトをある型のリファレンスとみなしてよい特殊なケースです。
+
+なお，直接$xをハッシュリファレンスとみなして参照すること(C<< $x->{$key} >>)は避けるべきです。これは$xがハッシュリファレンスでない場合に正しく致命的エラーを発生させますが，ブレスされたハッシュリファレンスのときにはアクセスが成功します。しかし，そのアクセスの成功はオブジェクトの実装に依存しています。
+
+さて，それではC<is_hash_ref()>は何を調べればいいのでしょうか。回答の一つはC<Params::Util>が示しています。Version 0.35の時点では，C<P::U::_HASH>は(1)を，C<P::U::_HASHLIKE>は(2)と(3)をチェックします。しかし先に述べたように，(1)は高速ですがオーバーロードマジックを考慮しないので不完全であり，(2)はオブジェクトのカプセル化を壊すため使うべきではありません。このように考えると，C<is_hash_ref()>は(1)と(3)によるチェックを行うのが正しい実装ということになります。
+
+したがって，C<is_hash_ref()>ではC<ref()>とC<overload::Method()>を使ってリファレンスの型を調べます。C<is_scalar_ref()>，C<is_array_ref()>，C<is_code_ref()>，C<is_glob_ref()>も同様です。
+
+=head1 ENVIRONMENT VARIABLES
+
+=head2 DATA_UTIL_PUREPERL
+
+真であれば，Pure Perl版のバックエンドが使われます。
+
+=head1 DEPENDENCIES
+
+Perl 5.10 or later.
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests to the author.
+
+=head1 SEE ALSO
+
+L<overload>.
+
+L<Scalar::Util>.
+
+L<Class::MOP>.
+
+このモジュールのいくつかの機能は以下のモジュールの機能をXSに移植して
+最適化したものであり，またいくつかはそれに加えて更に拡張を施したものです。
+
+L<Params::Util>.
+
+L<Sub::Install>.
+
+L<Sub::Identify>.
+
+L<Sub::Delete>.
+
+L<Sub::Curry>.
+
+L<Class::Method::Modifiers>.
+
+L<Data::OptList>.
+
+=head1 AUTHOR
+
+Goro Fuji (gfx) E<lt>gfuji(at)cpan.orgE<gt>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2008-2009, Goro Fuji (gfx) E<lt>gfuji(at)cpan.orgE<gt>. Some rights reserved.
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut

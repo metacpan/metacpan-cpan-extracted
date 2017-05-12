@@ -1,0 +1,132 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.08';
+
+use Getopt::Long;
+use Pod::Usage;
+use Debian::Apt::PM 0.03;
+use List::MoreUtils 'none';
+
+exit main();
+
+sub main {
+	my $help;
+	my $sources;
+	my $search_src = 0;
+	my $print_version;
+	GetOptions(
+		'help|h'      => \$help,
+		'sources|s=s' => \$sources,
+		'deb-src'     => \$search_src,
+		'version|V'         => \$print_version,
+	) or pod2usage;
+	pod2usage if $help;
+	print_version() if $print_version;
+	
+	# the switch makes no sence when sources explicitely set
+	$search_src = 0
+		if $sources;
+	
+	my $cmd     = shift @ARGV;
+	my $package = shift @ARGV;
+	pod2usage if not $cmd;
+	pod2usage if none { $_ eq $cmd } qw(search find update clean);
+	
+	my $aptpm     = Debian::Apt::PM->new();
+	my $aptpm_src = Debian::Apt::PM->new(repo_type => 'deb-src');
+	$aptpm->sources([split(',', $sources)])
+		if ($sources);
+	
+	if ($cmd eq 'update') {
+		$aptpm->update();
+		$aptpm_src->update()
+			if not $sources;
+
+		$aptpm->_create_modules_index;
+		$aptpm_src->_create_modules_index;
+		die "no modules in index. did you add/set apt sources.list?\n"
+			unless ((scalar keys %{$aptpm->_modules_index()}) or (scalar keys %{$aptpm_src->_modules_index()}) );
+	}
+	
+	if ($cmd eq 'clean') {
+		$aptpm->clean();
+		$aptpm_src->clean()
+			if not $sources;
+	}
+
+	$aptpm = $aptpm_src
+		if ($search_src);
+	
+	# lookup the package
+	if (($cmd eq 'search') or ($cmd eq 'find')) {
+		pod2usage if not $package;
+		
+		# get provides hash with packages
+		my $version_info = $aptpm->find($package);
+		
+		# nothing to do if the package is not there
+		return 0 if not $version_info;
+		
+		# print all available versions
+		foreach my $version (keys %{$version_info}) {
+			my $distribution = $version_info->{$version}->{'distribution'} || 'unknown';
+			my $component    = $version_info->{$version}->{'component'} || 'unknown';
+			
+			print
+				$version_info->{$version}->{'package'},
+				'_',
+				$version_info->{$version}->{'version'},
+				'_',
+				$version_info->{$version}->{'arch'},
+				' ',
+				$distribution,
+				' ',
+				$component,
+				': ',
+				$package,
+				' ',
+				$version,
+				' ',
+				"\n";
+		}
+	}
+	
+	return 0;
+}
+
+sub print_version {
+	print "$0 $VERSION, Debian::Apt::PM $Debian::Apt::PM::VERSION\n";
+	exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+apt-pm - locate Perl Modules in Debian repositories
+
+=head1 SYNOPSIS
+
+	apt-pm search Moose::Meta::Role
+	apt-pm update
+	apt-pm clean
+	
+options:
+
+	--sources
+		comman separated list of index files to use for search/find
+	--deb-src
+		search in source repositories
+
+=head1 DESCRIPTION
+
+Lookup Perl package in Debian .deb files.
+
+=head1 SEE ALSO
+
+L<Debian::Apt::PM>
+
+=cut

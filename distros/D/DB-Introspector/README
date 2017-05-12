@@ -1,0 +1,33 @@
+#-------------------------------
+# README
+#-------------------------------
+
+
+DESCRIPTION:
+------------
+
+    DB::Introspector looks into database metadata and derives detailed
+    table level and foreign key information in a way that conforms to a
+    collection of common interfaces across all dbs.
+
+    The DB::Introspector::Utils::* classes provide a collection of
+    algorithms, which carry out relationship traversal and SQL
+    generation algorithms (like finding the column level and table level
+    mappings between two indirectly related tables and generating DDL
+    code). Because the DB::Introspector::Utils algorithms take advantage
+    of the DB::Introspector's database independent metadata classes,
+    these traversal algorithms can be performed on any database for
+    which there exists an introspector (eg DB::Introspector::Oracle and
+    DB::Introspector::PostgresSQL).
+
+
+Should this be in DBI?
+----------------------
+    I think it is appropriate to separate this interface from the existing DBI
+    module since it will allow for the expression of more arbitrary mappings
+    between tables and columns (like subtables and boolean simulation) which
+    can take into account the database being queried (eg like interpreting the
+    Postgres internal inheritance structures). In addition, future drivers can
+    be written to extract metadata from a source that can't be queried as a
+    regular database ( like an XML source that just contains metadata -like
+    hibernate mapping files ).

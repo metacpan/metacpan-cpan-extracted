@@ -1,0 +1,8 @@
+Not escaped:
+{% include "autoescape_sample.txt" %}
+{% autoescape on %}
+Escaped:
+{% include "autoescape_sample.txt" %}
+{% endautoescape %}
+Not escaped:
+{% include "autoescape_sample.txt" %}

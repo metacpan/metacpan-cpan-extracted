@@ -1,0 +1,4 @@
+name = "Dredd-Hooks"
+badges = ["travis"]
+readme_from = "lib/Dredd/Hooks/Methods.pm"
+module_maker = "ModuleBuildTiny"

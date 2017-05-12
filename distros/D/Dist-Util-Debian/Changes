@@ -1,0 +1,30 @@
+0.006   2017-01-18 (PERLANCAR)
+
+	- Fix regex (version in parenthesis can be something like: '0.40-1
+	  and others' or '0.40-1+b3 [ppc64, sparc64], 0.40-1+b2 [alpha,
+	  ...]').
+
+
+0.005   2017-01-17 (PERLANCAR)
+
+	- Add functions: deb_ver, dist_deb_ver.
+
+
+0.004   2017-01-17 (PERLANCAR)
+
+	- Accept multiple dists input.
+
+
+0.003   2017-01-16 (PERLANCAR)
+
+        - Add option: use_allpackages.
+
+
+0.002   2017-01-13 (PERLANCAR)
+
+	- Add functions: dist2deb, deb_exists.
+
+
+0.001   2017-01-13 (PERLANCAR)
+
+        - First release.

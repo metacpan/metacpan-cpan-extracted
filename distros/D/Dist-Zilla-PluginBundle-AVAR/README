@@ -1,0 +1,99 @@
+NAME
+
+    Dist::Zilla::PluginBundle::AVAR - Use Dist::Zilla like AVAR does
+
+DESCRIPTION
+
+    This is the plugin bundle that AVAR uses. Use it as:
+
+        [@AVAR]
+        ;; same as `name' earlier in the dist.ini (optional, detected from $dzil->name)
+        dist = MyDist
+        ;; If you're not avar (will be read from "git config github.user" or $ENV{GITHUB_USER} by default)
+        github_user = imposter
+        ;; Bugtracker github or rt, default is rt
+        bugtracker = rt
+        ;; custom homepage/repository, defaults to metacpan page and github repository lc($dist->name)
+        homepage = http://example.com
+        repository = http://git.example.com/repo.git
+        ;; use various stuff or not
+        no_AutoPrereq = 1 ; evil for this module
+        use_MakeMaker = 0 ; If using e.g. MakeMaker::Awesome instead
+        use_TestCompile = 0 ; I have my own compile tests here..
+        ;; cpan:YOUR_CPAN_ID is the default authority, read from "dzil setup" entry for PAUSE
+        authority = cpan:AVAR
+        ; no_Authority = 1 ; If you don't want to use the authority module
+        ;; if you want to install your dist after release (set $ENV{PERL_CPANM_OPTS} if you need --sudo or --mirror etc.)
+        ;; default is OFF
+        install_command = cpanm .
+
+    It's equivalent to:
+
+        [@Filter]
+        bundle = @Classic
+        remove = PodVersion
+        remove = PodCoverageTests
+        
+        [Git::NextVersion]
+        [AutoPrereqs]
+        [MetaJSON]
+    
+        [MetaNoIndex]
+        ;; Only added if these directories exist
+        directory = inc
+        directory = t
+        directory = xt
+        directory = utils
+        directory = example
+        directory = examples
+        
+        [ReadmeFromPod]
+    
+        [MetaResources]
+        ;; $github_user is 'avar' by default, $lc_dist is lc($dist)
+        homepage   = http://search.cpan.org/dist/$dist/
+        bugtracker.mailto = bug-$dist@rt.cpan.org
+        bugtracker.web = https://rt.cpan.org/Public/Dist/Display.html?Name=$dist
+        repository.web = http://github.com/$github_user/$lc_dist
+        repository.url = git://github.com/$github_user/$lc_dist.git
+        repository.type = git
+        license    = http://dev.perl.org/licenses/
+    
+        [Authority]
+        authority   = cpan:AVAR
+        do_metadata = 1
+        
+        [NextRelease]
+        format = %-2v %{yyyy-MM-dd HH:mm:ss}d
+        
+        [@Git]
+        tag_format = %v
+        version_regexp = '^(\d.*)$'
+        first_version = '0.01'
+    
+        [InstallRelease]
+        install_command = cpanm .
+
+    If you'd like a minting profile (to create new modules with all the
+    boilerplate) for this PluginBundle, check out:
+    Dist::Zilla::MintingProfile::Author::Caelum.
+
+SEE ALSO
+
+      * Dist::Zilla
+
+      * Dist::Zilla::PluginBundle::Git
+
+      * Dist::Zilla::MintingProfile::Author::Caelum
+
+AUTHOR
+
+    Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2010 Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+    This program is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

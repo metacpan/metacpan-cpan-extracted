@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    In ~/pmversions.ini:
+
+     Log::Any::IfLOG=0.07
+     File::Write::Rotate=0.28
+
+    In dist.ini:
+
+     [Prereqs::EnsureVersion]
+
+DESCRIPTION
+
+    This plugin will check versions specified in prereqs. First you create
+    ~/pmversions.ini containing list of modules and their mininum versions.
+    Then, the plugin will check all prereqs against this list. If minimum
+    version is not met (e.g. the prereq says 0 or a smaller version) then
+    the build will be aborted.
+
+    Ideas for future version: ability to blacklist certain versions,
+    specify version ranges, e.g.:
+
+     Module::Name = 1.00-2.00, != 1.93
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::MinimumPrereqs
+
+    There are some plugins on CPAN related to specifying/detecting Perl's
+    minimum version, e.g.: Dist::Zilla::Plugin::MinimumPerl,
+    Dist::Zilla::Plugin::Test::MinimumVersion.
+

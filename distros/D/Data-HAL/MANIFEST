@@ -1,0 +1,34 @@
+Build.PL
+Changes
+lib/Data/HAL.pm
+lib/Data/HAL/Link.pm
+lib/Data/HAL/URI.pm
+lib/Data/HAL/URI/NamespaceMap.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00.load.t
+t/curies.t
+t/deprecation.t
+t/double.t
+t/example.json
+t/example1.json
+t/example2.json
+t/example3.json
+t/example4.json
+t/exampleWithArray.json
+t/exampleWithLiteralNullProperty.json
+t/exampleWithMultipleNestedSubresources.json
+t/exampleWithMultipleSubresources.json
+t/exampleWithNullProperty.json
+t/exampleWithoutHref.json
+t/exampleWithSubresource.json
+t/exampleWithSubresourceLinkingToItself.json
+t/exampleWithTemplate.json
+t/exampleWithUnderscoredProperty.json
+t/headers.t
+t/invalid.t
+t/profile.t
+t/round-trip.t
+SIGNATURE    Added here by Module::Build

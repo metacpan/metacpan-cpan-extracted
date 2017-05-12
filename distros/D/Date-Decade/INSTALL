@@ -1,0 +1,25 @@
+Requirements:
+~~~~~~~~~~~~~
+
+	Needs Perl version 5.003_03
+
+	Date:Calc 4.3 by Steffen Beyer <sb@engelschall.com>,
+	http://www.cpan.org/authors/id/STBEY/Date-Calc-4.3.tar.gz
+
+	or (with some changes)
+
+	Date:Pcalc 1.2 by J. David Eisenberg <nessus@best.com>,
+	http://www.cpan.org/authors/id/STBEY/Date-Pcalc-1.2.tar.gz
+
+
+To install:
+~~~~~~~~~~~
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Copyright (c) 2001 Michael Diekmann <michael.diekmann@undef.de>. All rights
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

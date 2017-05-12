@@ -1,0 +1,9 @@
+Changes
+lib/DBIx/DWIW.pm
+Makefile.PL
+examples/MyDBI.pm
+MANIFEST
+README
+test.pl
+TODO
+META.yml                                 Module meta-data (added by MakeMaker)

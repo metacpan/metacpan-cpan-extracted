@@ -1,0 +1,48 @@
+Date/Hijri version 0.02
+=======================
+
+This simple module converts gregorian dates to islamic (hijri) and
+vice versa.
+
+The dates must be given as array containing the day, month and year,
+and return the corresponding date as a list with the same elements.
+
+I haven't really tested if the converted dates are right and hope
+someone will point out mistakes.
+
+Hijri calculations are very difficult. Please see
+http://www.rabiah.com/convert/introduction.html for an explanation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require other modules or libraries:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Alex Pleiner - zeitform Internet Dienste
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This code is just stolen from KDE's L<kcalendarsystemhijri.cpp> at
+http://webcvs.kde.org/cgi-bin/cvsweb.cgi/kdelibs/kdecore/kcalendarsystemhijri.cpp
+
+Copyright (c) 2002-2003 Carlos Moro <cfmoro@correo.uniovi.es>
+Copyright (c) 2002-2003 Hans Petter Bieker <bieker@kde.org>
+
+kcalendarsystemhijri.cpp is translated from the Lisp code in
+``Calendrical Calculations'' by Nachum Dershowitz and Edward
+M. Reingold, Software---Practice & Experience, vol. 20, no. 9
+(September, 1990), pp. 899--928.
+
+This code is in the public domain, but any use of it should publically
+acknowledge its source.

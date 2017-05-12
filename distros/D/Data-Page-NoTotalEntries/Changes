@@ -1,0 +1,8 @@
+Revision history for Perl extension Data::Page::NoTotalEntries
+
+0.02
+
+        - fixed off-by-one issue on ->last method.
+
+0.01    Fri Feb  4 12:42:34 2011
+        - original version

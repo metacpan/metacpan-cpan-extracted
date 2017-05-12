@@ -1,0 +1,204 @@
+Revision history for Perl extension DBIx::XHTML_Table.
+
+1.49
+
+1.48
+    - fixed bug #111950 (License clarification)
+
+1.47
+    - update copyright date
+    - fix bug tracker location
+
+1.46
+    - added github meta to makefile
+    - reformatted source code to use spaces for indentation
+        instead of tabs -- all repo changes prior to 1.37 are gone anyway
+
+1.45
+    - readdressed bug #21761, client must now set 'encode_cells' to true
+
+1.44
+    - fixed distro tests
+
+1.43
+    - fixed distro manifest
+
+1.42
+    - fixed bug #6962 (Support for mixed case field names returned by the SQL query)
+    - added DBD::CSV and HTML::TableExtract tests (will only run if mods are installed)
+
+1.41
+    - fixed critical bug #104484 (Makefile.PL or Build.PL) :(
+
+1.40
+    - restructed tests
+    - corrected external sites in docs
+
+1.39
+    - corrected MANIFEST
+    - added DBI as makefile dependency 
+
+1.38
+    - using .md for readme
+    - fixed bug #104380 (cpan / cpanm install hangs)
+    - fixed bug #21761 (Special XML characters should be expressed as entities)
+    - fixed bug #11681 (Possible problem with modify() on column number 0)
+    - fixed bug #11666 (cell data containing newlines does not render)
+
+1.37
+    - using Module::Starter and Module::Build
+    - added to github 
+
+1.36
+	- doc updates
+
+1.34
+	- constructer now checks for DBI::db subclasses
+	- exec_query() now accepts DBI::st subclasses
+
+1.32
+	- forced lc end tag
+	- more minor doc changes
+
+1.30
+	- minor doc changes
+
+1.28
+	- finally 'blessed' add_cols and drop_calls
+	  (no longer undocumented)
+
+1.26
+	- changed the blessed ref regex to simply /DBI/
+	  (forgot about Apache::DBI ... doh!)
+
+1.24
+	- finally realized that w3c requires tfoot to come before
+	  tbody ... fixed
+	- added DBIx::Password compatibility, any blessed ref
+	  passed to constructor that matches /^DBIx?::/ will work
+
+1.22
+	- well, extremely's patch turned 0's into &nbsp; - fixed
+	  (you rule anyway Mark!)
+	- also, now escaping ampersands in _build_body_row
+	  (this prolly should be a user option ...)
+
+1.20
+	- added extremely's patch to keep NULL warnings at bay
+
+1.18
+	- forgot to name directory correctly in last version
+
+1.16
+	- incremented copyright date
+
+1.14
+	- finally fixed 1..1 in test.pl ... sillly /me
+
+1.12
+	- fixed bugs in _build_body_row(): 0's were being replaced
+          with &nbsp; tags (thanks LTJake!)
+
+1.10
+	- fixed two bugs in set_col_colors - first, modify would
+	  over write it; second - 4 colors, 6 columns did not work
+	- attributes are now inheritable
+
+1.01    - fixed bug within _refinate() - introduced from
+	  cols by number feature 
+
+1.00    - added support for specifying columns by number
+	- fixed map_cell bug - second call would wipe out first
+	- experimenting with tests ... :/
+
+0.99
+	- deprecated modify_tag() for modify() - same results
+	- deprecated no_whitespace output() attrib for no_indent
+	- set_row_colors() now only works for entire rows
+	  added set_col_colors() to handle columns, also
+	  refactored both subs to use modify_tag() instead
+	- bug fix: default ucfirst on headers overrode map_head()
+	- bug fix: modify_tag() on 'td' with 'body' works now
+	- added MIT license
+
+0.98
+	- set_row_colors() now uses style, can use old bgcolor
+	- all methods that normally returned void now return $self
+	  (this allows stacking methods)
+	- changed output() arguments to a hash ref
+	- modify_tag() now recognizes 'style' attribute values as
+	  hash references themselves
+
+0.97
+	- deprecated get_table() for output() - same results
+	- added automatic header ucfirst and 'no_ucfirst' to turn off
+	- removed tutorial from POD
+	- added link to homepage to POD and corrected typos
+
+0.96
+	- deprecated map_col() for map_cell() - same results
+	  just hopefully a more descriptive name
+	- added get_current_row() and get_current_col()
+	- added set_pk(), this and the last 2 subs were
+	  inspired by Jim Cromie to finagle XHTML_Table into
+	  a 'spreadsheet' - see the POD for set_pk()
+
+0.95
+	- added map_head()
+	- changed default behavior of not specifying cols
+	  in methods such as map_col and calc_totals
+	  new behavior: no cols = all cols
+	- constructor now accepts a hash ref as last arg
+	  which allows minor table config to be specified
+	  without multiple modify_tag() calls
+	- modified behavior of map_col() and map_head()
+	  they no longer permantly change the data, all
+	  processing is done when creating table output
+
+0.90
+	- MAJOR: Changed HEADER to HEAD and FOOTER to FOOT
+	- Apparrently all past versions have a syntax error
+	  occur when modify_tag() is called on <colgroup>
+	  BEFORE add_col_tag() is called - fixed.
+	- modifying <tr> affects all areas now, not just BODY
+	  this probably makes set_row_colors() obsolete, except
+	  when subtotals are present.
+	- more minor output formatting fixed - should be perfect!
+0.86 
+	- fixed minor output fomatting - <thead> was on same 
+	  line as <table>, and <tbody> would do the same if
+	  headers were supressed
+
+0.85  Sat May 12 14:38:02 CDT 2001
+	- found major bug in _build_body() - a <tbody>
+	  tag pair was being created for every row if a
+	  group was not set (.. is not the same as ,)
+
+0.84  Sat May 12 02:51:58 CDT 2001
+	- MAJOR: changed add_colgroup() to add_col_tag()
+	  the former name was ambigious (col or colgroup?)
+	- implemented new calc_totals(), calc_subtotals(),
+	  set_group(), _build_body(), _build_body_row(),
+	  and added _build_body_group() to handle producing
+	  the proper <tbody> tag pairs, as well as simplifying
+	  the complexity of calculating totals
+	- added a tag reference table to documentation
+
+0.83  Thu May 10 17:09:16 CDT 2001
+	- added Mark's patch to produce </tbody> tag
+	- patch also lower cased all tags
+	- documentation typo fixes
+
+0.82  Tue May  8 09:14:54 CDT 2001
+	- corrected incorrect version number
+	- corrected formatting in credits
+
+0.81  Mon May  7 22:34:16 CDT 2001
+	- made the package name fully qualified
+	- updated and corrected documentation
+	- updated and corrected tutorial
+	- updated and corrected credits
+
+0.80  Sun May  6 18:23:01 CDT 2001
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,12 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+TODO
+lib/Devel/TraceCalls.pm
+t/ARG.t
+t/caller.t
+t/methods.t
+t/subs.t
+t/use.t
+META.yml                                 Module meta-data (added by MakeMaker)

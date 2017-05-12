@@ -1,0 +1,15 @@
+.cvsignore$
+^.lwpcookies
+^.releaserc
+^blib/
+^DBIx-VersionedSubs-.*
+^.git
+CVS/
+^pm_to_blib
+.tar.gz$
+.old$
+^Makefile$
+^cvstest$
+^blibdirs$
+^MYMETA.*$
+.bak$

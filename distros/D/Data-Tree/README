@@ -1,0 +1,50 @@
+NAME
+    Data::Tree - a hash-based tree-like data structure
+
+SYNOPSIS
+        use Data::Tree;
+        my $DT = Data::Tree::->new();
+
+        $DT->set('First::Key',[qw(a b c]);
+        $DT->get('First::Key'); # should return [a b c]
+        $DT->get_scalar('First::Key'); # should return a
+        $DT->get_array('First::Key'); # should return (a, b, c)
+
+DESCRIPTION
+    A simple hash-based nested tree.
+
+METHODS
+  decrement
+    Decrement the numeric value of the given key by one.
+
+  delete
+    Remove the given key and all subordinate keys.
+
+  get
+    Return the value associated with the given key. May be an SCALAR, HASH
+    or ARRAY.
+
+  get_array
+    Return the values associated with the given key as a list.
+
+  get_scalar
+    Return the value associated with the given key as an SCALAR.
+
+  increment
+    Increment the numeric value of the given key by one.
+
+  set
+    Set the value of the given key to the given value.
+
+NAME
+    Data::Tree - A simple hash-based tree.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

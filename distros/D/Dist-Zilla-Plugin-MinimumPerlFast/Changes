@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Plugin-MinimumPerlFast
+
+0.003     2015-02-04 21:20:29+01:00 Europe/Amsterdam
+          Correct plugin name in description
+
+0.002     2014-03-17 16:21:11CET+0100 Europe/Amsterdam
+          Switched to strict version strings
+          Fixed documention
+
+0.001     2013-05-29 22:13:35 Europe/Amsterdam
+          Initial release

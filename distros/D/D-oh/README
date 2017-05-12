@@ -1,0 +1,35 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+Monday, February 2, 1998
+
+This is D'oh 0.05, a simple debug module that redirects STDERR and 
+STDOUT to files.  The name is somewhat cathartic, don't you think?
+
+This archive can always be obtained from:
+
+    http://pudge.net/macperl/
+    http://perl.com/CPAN/authors/id/CNANDOR/
+    http://perl.com/CPAN/modules/by-module/D/
+
+Mac users: The file is a tarred, gzipped file.  Use Stuffit Expander 
+or a similar program to get at the archive.
+
+Please let me know how well it does(n't) work, and any changes you'd 
+like to see.
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGPfreeware 5.0 for non-commercial use <http://www.pgp.com>
+Charset: noconv
+
+iQCVAwUBNNX8/yhcZja3bnKtAQEITQP/WOT7WYoXRw7xMJ4Vxzxo/ZnA5jhj/dpL
+E6BjyuoJeaUQpBYIg0OwOjyVm2aZ66dPqFDD6fjiO8eAxHG0d5ZNf3e0qoP4Kwy1
+tMtGVqKw1UpwiBK/WggIpbceX/Cd74IjIVoWdCjz2RcJall8N2hFufW84XjoD+LK
+VLbVMhE9wYU=
+=1RSp
+-----END PGP SIGNATURE-----
+
+-- 
+Chris Nandor          mailto:pudge@pobox.com         http://pudge.net/
+%PGPKey=('B76E72AD',[1024,'0824 090B CE73 CA10  1FF7 7F13 8180 B6B6'])
+#==       New Book: MacPerl:  Programming for the Rest of Us       ==#
+#==    Publishing Date: Early 1998. http://www.ptf.com/macperl/    ==#

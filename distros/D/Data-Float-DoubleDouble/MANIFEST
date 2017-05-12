@@ -1,0 +1,24 @@
+MANIFEST
+Changes
+Makefile.PL
+DoubleDouble.pm
+DoubleDouble.xs
+t/01_load.t
+t/02_str2mpfr_cross_checks.t
+t/03_next.t
+t/05_DD.t
+t/06_DD2HEX.t
+t/07_nv2mpfr_cross_checks.t
+t/08_express.t
+t/09_NV2binary.t
+t/10_get_doubles.t
+t/11_float_H_B.t
+t/15_corner_cases.t
+t/16_inf_nan_zero.t
+t/17_float_class.t
+t/20_H_float.t
+t/21_H_float_roundup.t
+t/22_dd_bytes.t
+README
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

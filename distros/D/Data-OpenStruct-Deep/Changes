@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::OpenStruct::Deep
+
+0.03
+        - no functional changes
+        - changed version format for avoid warnings
+
+0.02
+        - updated the detection way of method chain
+
+0.01
+        - original version

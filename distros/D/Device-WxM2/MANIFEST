@@ -1,0 +1,7 @@
+CHANGES
+COPYING				GPL license
+MANIFEST			list of contents
+Makefile.PL			for MakeMaker
+README				text documentation
+WxM2.pm				package file
+test.pl				regression tests

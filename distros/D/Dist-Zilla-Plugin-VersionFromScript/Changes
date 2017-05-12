@@ -1,0 +1,8 @@
+Revision history for Perl extension Dist::Zilla::Plugin::VersionFromScript
+
+0.017 Tue Nov  8 11:58:31 PST 2011
+	- add this Changes file to satisfy PAUSE
+
+0.016 Tue Nov  8 11:57:01 PST 2011
+	- original version
+

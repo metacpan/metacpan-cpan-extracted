@@ -1,0 +1,58 @@
+---
+abstract: 'Helps keep your data in sync with elasticsearch'
+author:
+  - =over
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ElasticSync
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Class::ElasticSync:
+    file: lib/DBIx/Class/ElasticSync.pm
+    version: '0.06'
+  DBIx::Class::ElasticSync::ResultSet:
+    file: lib/DBIx/Class/ElasticSync/ResultSet.pm
+  DBIx::Class::ElasticSync::Role::ElasticBlackholeResult:
+    file: lib/DBIx/Class/ElasticSync/Role/ElasticBlackholeResult.pm
+  DBIx::Class::ElasticSync::Role::ElasticResult:
+    file: lib/DBIx/Class/ElasticSync/Role/ElasticResult.pm
+  DBIx::Class::ElasticSync::Role::ElasticSchema:
+    file: lib/DBIx/Class/ElasticSync/Role/ElasticSchema.pm
+requires:
+  DBIx::Class: '0'
+  DBIx::Class::ResultClass::HashRefInflator: '0'
+  DateTime::Format::MySQL: '0'
+  Moose::Role: '0'
+  Search::Elasticsearch: '0'
+  Search::Elasticsearch::Compat::QueryParser: '0'
+  namespace::autoclean: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/itnode/DBIx-Class-Elasticsearch/issues
+  homepage: https://github.com/itnode/DBIx-Class-Elasticsearch
+  repository: git://github.com/itnode/DBIx-Class-Elasticsearch.git
+version: '0.06'
+x_contributors:
+  - 'Sales User <sales@nydsosweb6.(none)>'
+  - 'Chris Shepherd <cshepherd@about.com>'
+  - 'Patrick Simon <info@webentwicklung-ruhr.de>'
+  - 'Patrick Kilter <pas.freelance@googlemail.com>'
+  - 'Jens Gassmann <jens.gassmann@atomix.de>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

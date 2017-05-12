@@ -1,0 +1,726 @@
+#   ---------------------------------------------------------------------- copyright and license ---
+#
+#   file: lib/Dist/Zilla/Role/TextTemplater/Manual.pod
+#
+#   Copyright © 2015, 2016 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Role-TextTemplater.
+#
+#   perl-Dist-Zilla-Role-TextTemplater is free software: you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by the Free Software
+#   Foundation, either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Dist-Zilla-Role-TextTemplater is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+#   PARTICULAR PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Dist-Zilla-Role-TextTemplater. If not, see <http://www.gnu.org/licenses/>.
+#
+#   ---------------------------------------------------------------------- copyright and license ---
+
+# PODNAME: Dist::Zilla::Role::TextTemplater::Manual
+# ABSTRACT: C<TextTemplater> role user manual
+
+#pod =for :this This is C<TextTemplater> role user manual. Read this if you are using a
+#pod C<TextTemplater>-based plugin.
+#pod
+#pod =for :those If you want to have text templating capabilities in your Dist::Zilla plugin, read the L<module documentation|Dist::Zilla::Role::TextTemplater>.
+#pod General topics like getting source, building, installing, bug reporting and some others are covered
+#pod in the F<README>.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     [APlugin]
+#pod         delimiters = (* *)
+#pod         package    = MY
+#pod         prepend    = use strict;
+#pod         prepend    = use warnings;
+#pod         … ; Other APlugin-specific options.
+#pod
+#pod (It is assumed you are using C<Text-Templater>-based plugin named I<APlugin>.)
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod For sake of brevity in this manual the term I<APlugin> means "any C<TextTemplater>-based plugin" or
+#pod "any plugin which consumes C<TextTemplater> role".
+#pod
+#pod C<TextTemplater> is a C<Dist::Zilla> role. It cannot be directly used by the end user. However, the
+#pod role provides the same behavior and options for all C<TextTemplater>-based plugins (including
+#pod I<APlugin>, of course). Describing common behavior and options in single place makes documenting
+#pod I<APlugin> simpler.
+#pod
+#pod C<TextTemplater> is just a bridge between I<APlugin> and the great C<Text::Template> templating
+#pod engine, so reading C<Text::Template> documentation is highly recommended for better understanding
+#pod of gory details.
+#pod
+#pod =head2 Philosophy
+#pod
+#pod Must read this first: L<Text::Template/"Philosophy">.
+#pod
+#pod =head2 Template
+#pod
+#pod I<Template> is text with (zero or more) embedded Perl code fragments:
+#pod
+#pod     …plain text {{ Perl code fragment }} plain text again…
+#pod
+#pod C<TextTemplater> evaluates code fragments in order of appearance and replaces each fragment with
+#pod the result of its evaluation. For example, template
+#pod
+#pod     2 + 2 = {{ 2 + 2 }}.
+#pod
+#pod is processed to
+#pod
+#pod     2 + 2 = 4.
+#pod
+#pod The example above is trivial, but Perl code fragments can be arbitrary complex: full Perl power is
+#pod at your service.
+#pod
+#pod As stated above, template is just text. It could be a source file, a value of an option from your
+#pod F<dist.ini>, or whatever else — it depends on I<APlugin>. C<TextTemplater> processes ("fills in")
+#pod the provided template, while providing the template is I<APlugin> responsibility.
+#pod
+#pod Gory details: L<Text::Template/"Template Parsing">. However, take into account that
+#pod C<TextTemplater> default delimiters are likely "alternative delimiters" for C<Text::Template>, so
+#pod backslash escaping does I<not> work.
+#pod
+#pod =head2 Delimiters
+#pod
+#pod In order to be recognized a Perl code fragment must be separated from surrounding plain text by the
+#pod pair of delimiters: opening delimiter and closing delimiter. C<TextTemplater> default opening
+#pod delimiter is C<{{>, default closing delimiter is C<}}>, they are used in all the
+#pod code fragment examples in this manual.
+#pod
+#pod Note: I<APlugin> can override C<TextTemplater> default, though. Also, user can set desired
+#pod delimiters in the C<delimiters> option.
+#pod
+#pod Gory details: L<Text::Template/"Alternative Delimiters">.
+#pod
+#pod =head2 Predefined Variables
+#pod
+#pod There are few predefined variables which can be used in Perl code fragments. C<TextTemplater>
+#pod defines two variables, and one is defined by Text::Temlate.
+#pod
+#pod Note: I<APlugin> may define more variables or cancel definitions of C<$plugin> and C<$dist>.
+#pod
+#pod =over
+#pod
+#pod =item $dist
+#pod
+#pod Reference to C<Dist::Zilla> object. Primary purpose of the variable is providing access to the
+#pod distribution properties, like
+#pod
+#pod     This is {{$dist->name}} version {{$dist->version}}…
+#pod
+#pod but C<$dist> gives I<full> access to C<Dist::Zilla> object:
+#pod
+#pod     The list of installed modules: {{ join( ", ",
+#pod     map( { $_->name } @{ $dist->find_files( ":InstallModules" ) } )
+#pod     ); }}.
+#pod
+#pod =item $plugin
+#pod
+#pod Reference to the plugin. The variable is provided for compatibility with C<GatherDir::Template>
+#pod plugin. The variable can be used for debug or error reporting, e. g.:
+#pod
+#pod     {{ …; $plugin->log_debug( … ); …; }}
+#pod     {{ …; if ( … ) { $plugin->log_fatal( … ); }; … }}
+#pod
+#pod =item $OUT
+#pod
+#pod Gory details: L<Text::Template/"The $OUT variable">.
+#pod
+#pod =back
+#pod
+#pod =head2 Package
+#pod
+#pod By default all the code fragments in a template are evaluated in the context of the same I<private>
+#pod package ("private" is I<not> the package name). The package called "private" because it is created
+#pod specially for processing of this template, code fragments of another template are evaluated in the
+#pod context of I<another> private package.
+#pod
+#pod Default behavior can be changed by C<package> option. If value of the option is not empty, I<all
+#pod templates> share I<the same package>. Use it carefully because one template can affect another
+#pod template I<implicitly>.
+#pod
+#pod Note: I<APlugin> can set another default or ignore C<package> option specified by user.
+#pod
+#pod Gory details: L<Text::Template/"PACKAGE">. Note that default behavior (when package is not
+#pod explicitly set) in C<Text::Template> and C<TextTemplate> differs.
+#pod
+#pod =head2 Prepend
+#pod
+#pod If every your Perl code fragment starts with the same prologue (e. g. C<use strict;>), you can let
+#pod the template engine insert this prologue automatically. Just specify your prologue in the
+#pod L</"prepend"> option.
+#pod
+#pod Gory details: L<Text::Template/"PREPEND feature and using strict in templates">.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod The role provides three options: C<delimiters>, C<package> and C<prepend>. Options can be specified
+#pod by user in the I<APlugin> section of the F<dist.ini> file:
+#pod
+#pod     [APlugin]
+#pod         delimiters = (* *)
+#pod         package    = MY
+#pod         prepend    = use strict;
+#pod
+#pod =option delimiters
+#pod
+#pod Pair of delimiters to separate code fragments from surrounding text, see L</"Delimiters">.
+#pod
+#pod The value should consist of two whitespace-separated delimiters: opening delimiter and closing
+#pod delimiter. Leading and trailing whitespaces are ignored.
+#pod
+#pod =option package
+#pod
+#pod Name of package to evaluate code fragments in, see L</"Package">.
+#pod
+#pod =option prepend
+#pod
+#pod Perl code to automatically prepend to the beginning of every code fragment, see L</"Prepend">.
+#pod
+#pod Option may be specified several times. Every value will be a separate line of code.
+#pod
+#pod     prepend = use strict;
+#pod     prepend = use warnings;
+#pod     prepend = use utf8;
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =for :list
+#pod = L<Dist::Zilla>
+#pod = L<Dist::Zilla::Role::TextTemplater>
+#pod = L<Text::Template>
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/what.pod
+#
+#   This file is part of perl-Dist-Zilla-Role-TextTemplater.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Dist-Zilla-Role-TextTemplater> is a C<Dist::Zilla> role, a replacement for standard role C<TextTemplate>. Both
+#pod roles have the same great C<Text::Template> engine under the hood, but this one provides better
+#pod control over the engine and much better error reporting.
+#pod
+#pod =cut
+
+# end of file #
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/why.pod
+#
+#   This file is part of perl-Dist-Zilla-Role-TextTemplater.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod C<TextTemplate> role from C<Dist::Zilla> distribution v5.037 has the same great C<Text::Template>
+#pod engine under the hood, but lacks of control and has I<awful> error reporting.
+#pod
+#pod =head2 Error Reporting
+#pod
+#pod Let us consider an example. For sake of example simplicity, it contains only one file, F<dist.ini>.
+#pod Two files, F<lib/Assa.pm> and F<lib/Assa.pod>, are generated on-the-fly with C<GenerateFile>
+#pod plugin.
+#pod
+#pod Have a look at F<dist.ini>:
+#pod
+#pod     name     = Assa
+#pod     version  = 0.001
+#pod     abstract = Example
+#pod     [GenerateFile/lib/Assa.pm]
+#pod         filename = lib/Assa.pm
+#pod         content  = package Assa; 1;
+#pod     [GenerateFile/lib/Assa/Manual.pod]
+#pod         filename = lib/Assa/Manual.pod
+#pod         content  = =head1 NAME
+#pod         content  =
+#pod         content  = {{$dst->name} - {{$dist->abstract}}
+#pod         content  =
+#pod         content  = Version {{$dist->version}}.
+#pod         content  =
+#pod         content  = {{$dist->license->notice}}
+#pod     [TemplateFiles]
+#pod         filename = lib/Assa.pm
+#pod         filename = lib/Assa/Manual.pod
+#pod     [MetaResources::Template]
+#pod         homepage = https://example.org/release/{{$dist->name}}
+#pod         license  = {{$dist->license->url}}
+#pod
+#pod
+#pod (Do you see a typo? How many? Note this is a small example, real files are much larger.) Now let us
+#pod build the distribution:
+#pod
+#pod     $ dzil build
+#pod     [DZ] beginning to build Assa
+#pod     [TemplateFiles] Filling in the template returned undef for:
+#pod     [TemplateFiles] =head1 NAME
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] Version {{$dist->version}}.
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] {{$dist->license->notice}}
+#pod
+#pod     [TemplateFiles] Filling in the template returned undef for:
+#pod     [TemplateFiles] =head1 NAME
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] Version {{$dist->version}}.
+#pod     [TemplateFiles]
+#pod     [TemplateFiles] {{$dist->license->notice}}
+#pod      at /home/vdb/.usr/opt/local-lib/lib/perl5/x86_64-linux-thread-multi/Moose/Meta/Method/Delegation.pm line 110.
+#pod
+#pod
+#pod Oops. What's happened? Where? Why? All we have is a highly unclear error message
+#pod
+#pod     Filling in the template returned undef for:
+#pod
+#pod and file content printed twice. (Yep, if the file had 1000 lines, we would have it printed twice
+#pod too.) We do not ever have a file name and have to guess it by the content. Good bug hunting, dude.
+#pod
+#pod Ok, let us fix the problem (mistyped closing delimiter in the first line of file
+#pod F<lib/Assa/Manual.pod>) and build the distribution again:
+#pod
+#pod     $ dzil build
+#pod     [DZ] beginning to build Assa
+#pod     Can't call method "name" on an undefined value at template line 3.
+#pod
+#pod
+#pod Oops. Error message much is better now, but where the problem is? There are many templates in the
+#pod project: F<lib/Assa.pm>, F<lib/Assa/Manual.pod>, and even resources in F<META.yml> — all are
+#pod generated from templates. Where is the problem? Good bug hunting for us all.
+#pod
+#pod Such error reporting is simply unacceptable. I am a human, I often make mistakes, and I want the
+#pod tool clearly warns me I<what> and I<where> the problem is, so I can fix it quickly. For example,
+#pod in the first case I want to see:
+#pod
+#pod     $ dzil build
+#pod     [DZ] beginning to build Assa
+#pod     [Templates] Unmatched opening delimiter at lib/Assa/Manual.pod line 3.
+#pod     [Templates] lib/Assa/Manual.pod:
+#pod     [Templates]     1: =head1 NAME
+#pod     [Templates]     2:
+#pod     [Templates]     3: {{$dst->name} - {{$dist->abstract}}
+#pod     [Templates]        ^^^ Unmatched opening delimiter at lib/Assa/Manual.pod line 3. ^^^
+#pod     [Templates]     4:
+#pod     [Templates]     5: Version {{$dist->version}}.
+#pod     [Templates]        ... skipped 2 lines ...
+#pod     Aborting...
+#pod
+#pod
+#pod In the second case:
+#pod
+#pod     $ dzil build
+#pod     [DZ] beginning to build Assa
+#pod     [Templates] Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3.
+#pod     [Templates] Bad code fragment begins at lib/Assa/Manual.pod line 3.
+#pod     [Templates] lib/Assa/Manual.pod:
+#pod     [Templates]     1: =head1 NAME
+#pod     [Templates]     2:
+#pod     [Templates]     3: {{$dst->name}} - {{$dist->abstract}}
+#pod     [Templates]        ^^^ Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3. ^^^
+#pod     [Templates]        ^^^ Bad code fragment begins at lib/Assa/Manual.pod line 3. ^^^
+#pod     [Templates]     4:
+#pod     [Templates]     5: Version {{$dist->version}}.
+#pod     [Templates]        ... skipped 2 lines ...
+#pod     Aborting...
+#pod
+#pod
+#pod C<TextTemplater> makes it real. All I need is using C<TextTemplater>-based plugins: C<Templates>,
+#pod C<MetaResources::Template> (starting from v0.002).
+#pod
+#pod =head2 Engine Control
+#pod
+#pod C<TextTemplater> allows the end-user to specify C<delimiters>, C<package> and C<prepend> engine
+#pod options in F<dist.ini> file, while C<TextTemplate> allows to specify C<prepend> only
+#pod programmatically, and does I<not> allow to specify C<delimiters> and C<package>.
+#pod
+#pod =cut
+
+# end of file #
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Role::TextTemplater::Manual - C<TextTemplater> role user manual
+
+=head1 VERSION
+
+Version v0.8.6, released on 2016-11-18 20:03 UTC.
+
+=head1 WHAT?
+
+C<Dist-Zilla-Role-TextTemplater> is a C<Dist::Zilla> role, a replacement for standard role C<TextTemplate>. Both
+roles have the same great C<Text::Template> engine under the hood, but this one provides better
+control over the engine and much better error reporting.
+
+This is C<TextTemplater> role user manual. Read this if you are using a
+C<TextTemplater>-based plugin.
+
+If you want to have text templating capabilities in your Dist::Zilla plugin, read the L<module documentation|Dist::Zilla::Role::TextTemplater>.
+General topics like getting source, building, installing, bug reporting and some others are covered
+in the F<README>.
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    [APlugin]
+        delimiters = (* *)
+        package    = MY
+        prepend    = use strict;
+        prepend    = use warnings;
+        … ; Other APlugin-specific options.
+
+(It is assumed you are using C<Text-Templater>-based plugin named I<APlugin>.)
+
+=head1 DESCRIPTION
+
+For sake of brevity in this manual the term I<APlugin> means "any C<TextTemplater>-based plugin" or
+"any plugin which consumes C<TextTemplater> role".
+
+C<TextTemplater> is a C<Dist::Zilla> role. It cannot be directly used by the end user. However, the
+role provides the same behavior and options for all C<TextTemplater>-based plugins (including
+I<APlugin>, of course). Describing common behavior and options in single place makes documenting
+I<APlugin> simpler.
+
+C<TextTemplater> is just a bridge between I<APlugin> and the great C<Text::Template> templating
+engine, so reading C<Text::Template> documentation is highly recommended for better understanding
+of gory details.
+
+=head2 Philosophy
+
+Must read this first: L<Text::Template/"Philosophy">.
+
+=head2 Template
+
+I<Template> is text with (zero or more) embedded Perl code fragments:
+
+    …plain text {{ Perl code fragment }} plain text again…
+
+C<TextTemplater> evaluates code fragments in order of appearance and replaces each fragment with
+the result of its evaluation. For example, template
+
+    2 + 2 = {{ 2 + 2 }}.
+
+is processed to
+
+    2 + 2 = 4.
+
+The example above is trivial, but Perl code fragments can be arbitrary complex: full Perl power is
+at your service.
+
+As stated above, template is just text. It could be a source file, a value of an option from your
+F<dist.ini>, or whatever else — it depends on I<APlugin>. C<TextTemplater> processes ("fills in")
+the provided template, while providing the template is I<APlugin> responsibility.
+
+Gory details: L<Text::Template/"Template Parsing">. However, take into account that
+C<TextTemplater> default delimiters are likely "alternative delimiters" for C<Text::Template>, so
+backslash escaping does I<not> work.
+
+=head2 Delimiters
+
+In order to be recognized a Perl code fragment must be separated from surrounding plain text by the
+pair of delimiters: opening delimiter and closing delimiter. C<TextTemplater> default opening
+delimiter is C<{{>, default closing delimiter is C<}}>, they are used in all the
+code fragment examples in this manual.
+
+Note: I<APlugin> can override C<TextTemplater> default, though. Also, user can set desired
+delimiters in the C<delimiters> option.
+
+Gory details: L<Text::Template/"Alternative Delimiters">.
+
+=head2 Predefined Variables
+
+There are few predefined variables which can be used in Perl code fragments. C<TextTemplater>
+defines two variables, and one is defined by Text::Temlate.
+
+Note: I<APlugin> may define more variables or cancel definitions of C<$plugin> and C<$dist>.
+
+=over
+
+=item $dist
+
+Reference to C<Dist::Zilla> object. Primary purpose of the variable is providing access to the
+distribution properties, like
+
+    This is {{$dist->name}} version {{$dist->version}}…
+
+but C<$dist> gives I<full> access to C<Dist::Zilla> object:
+
+    The list of installed modules: {{ join( ", ",
+    map( { $_->name } @{ $dist->find_files( ":InstallModules" ) } )
+    ); }}.
+
+=item $plugin
+
+Reference to the plugin. The variable is provided for compatibility with C<GatherDir::Template>
+plugin. The variable can be used for debug or error reporting, e. g.:
+
+    {{ …; $plugin->log_debug( … ); …; }}
+    {{ …; if ( … ) { $plugin->log_fatal( … ); }; … }}
+
+=item $OUT
+
+Gory details: L<Text::Template/"The $OUT variable">.
+
+=back
+
+=head2 Package
+
+By default all the code fragments in a template are evaluated in the context of the same I<private>
+package ("private" is I<not> the package name). The package called "private" because it is created
+specially for processing of this template, code fragments of another template are evaluated in the
+context of I<another> private package.
+
+Default behavior can be changed by C<package> option. If value of the option is not empty, I<all
+templates> share I<the same package>. Use it carefully because one template can affect another
+template I<implicitly>.
+
+Note: I<APlugin> can set another default or ignore C<package> option specified by user.
+
+Gory details: L<Text::Template/"PACKAGE">. Note that default behavior (when package is not
+explicitly set) in C<Text::Template> and C<TextTemplate> differs.
+
+=head2 Prepend
+
+If every your Perl code fragment starts with the same prologue (e. g. C<use strict;>), you can let
+the template engine insert this prologue automatically. Just specify your prologue in the
+L</"prepend"> option.
+
+Gory details: L<Text::Template/"PREPEND feature and using strict in templates">.
+
+=head1 OPTIONS
+
+The role provides three options: C<delimiters>, C<package> and C<prepend>. Options can be specified
+by user in the I<APlugin> section of the F<dist.ini> file:
+
+    [APlugin]
+        delimiters = (* *)
+        package    = MY
+        prepend    = use strict;
+
+=head2 delimiters
+
+Pair of delimiters to separate code fragments from surrounding text, see L</"Delimiters">.
+
+The value should consist of two whitespace-separated delimiters: opening delimiter and closing
+delimiter. Leading and trailing whitespaces are ignored.
+
+=head2 package
+
+Name of package to evaluate code fragments in, see L</"Package">.
+
+=head2 prepend
+
+Perl code to automatically prepend to the beginning of every code fragment, see L</"Prepend">.
+
+Option may be specified several times. Every value will be a separate line of code.
+
+    prepend = use strict;
+    prepend = use warnings;
+    prepend = use utf8;
+
+=head1 WHY?
+
+C<TextTemplate> role from C<Dist::Zilla> distribution v5.037 has the same great C<Text::Template>
+engine under the hood, but lacks of control and has I<awful> error reporting.
+
+=head2 Error Reporting
+
+Let us consider an example. For sake of example simplicity, it contains only one file, F<dist.ini>.
+Two files, F<lib/Assa.pm> and F<lib/Assa.pod>, are generated on-the-fly with C<GenerateFile>
+plugin.
+
+Have a look at F<dist.ini>:
+
+    name     = Assa
+    version  = 0.001
+    abstract = Example
+    [GenerateFile/lib/Assa.pm]
+        filename = lib/Assa.pm
+        content  = package Assa; 1;
+    [GenerateFile/lib/Assa/Manual.pod]
+        filename = lib/Assa/Manual.pod
+        content  = =head1 NAME
+        content  =
+        content  = {{$dst->name} - {{$dist->abstract}}
+        content  =
+        content  = Version {{$dist->version}}.
+        content  =
+        content  = {{$dist->license->notice}}
+    [TemplateFiles]
+        filename = lib/Assa.pm
+        filename = lib/Assa/Manual.pod
+    [MetaResources::Template]
+        homepage = https://example.org/release/{{$dist->name}}
+        license  = {{$dist->license->url}}
+
+(Do you see a typo? How many? Note this is a small example, real files are much larger.) Now let us
+build the distribution:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [TemplateFiles] Filling in the template returned undef for:
+    [TemplateFiles] =head1 NAME
+    [TemplateFiles]
+    [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+    [TemplateFiles]
+    [TemplateFiles] Version {{$dist->version}}.
+    [TemplateFiles]
+    [TemplateFiles] {{$dist->license->notice}}
+
+    [TemplateFiles] Filling in the template returned undef for:
+    [TemplateFiles] =head1 NAME
+    [TemplateFiles]
+    [TemplateFiles] {{$dst->name} - {{$dist->abstract}}
+    [TemplateFiles]
+    [TemplateFiles] Version {{$dist->version}}.
+    [TemplateFiles]
+    [TemplateFiles] {{$dist->license->notice}}
+     at /home/vdb/.usr/opt/local-lib/lib/perl5/x86_64-linux-thread-multi/Moose/Meta/Method/Delegation.pm line 110.
+
+Oops. What's happened? Where? Why? All we have is a highly unclear error message
+
+    Filling in the template returned undef for:
+
+and file content printed twice. (Yep, if the file had 1000 lines, we would have it printed twice
+too.) We do not ever have a file name and have to guess it by the content. Good bug hunting, dude.
+
+Ok, let us fix the problem (mistyped closing delimiter in the first line of file
+F<lib/Assa/Manual.pod>) and build the distribution again:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    Can't call method "name" on an undefined value at template line 3.
+
+Oops. Error message much is better now, but where the problem is? There are many templates in the
+project: F<lib/Assa.pm>, F<lib/Assa/Manual.pod>, and even resources in F<META.yml> — all are
+generated from templates. Where is the problem? Good bug hunting for us all.
+
+Such error reporting is simply unacceptable. I am a human, I often make mistakes, and I want the
+tool clearly warns me I<what> and I<where> the problem is, so I can fix it quickly. For example,
+in the first case I want to see:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [Templates] Unmatched opening delimiter at lib/Assa/Manual.pod line 3.
+    [Templates] lib/Assa/Manual.pod:
+    [Templates]     1: =head1 NAME
+    [Templates]     2:
+    [Templates]     3: {{$dst->name} - {{$dist->abstract}}
+    [Templates]        ^^^ Unmatched opening delimiter at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]     4:
+    [Templates]     5: Version {{$dist->version}}.
+    [Templates]        ... skipped 2 lines ...
+    Aborting...
+
+In the second case:
+
+    $ dzil build
+    [DZ] beginning to build Assa
+    [Templates] Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3.
+    [Templates] Bad code fragment begins at lib/Assa/Manual.pod line 3.
+    [Templates] lib/Assa/Manual.pod:
+    [Templates]     1: =head1 NAME
+    [Templates]     2:
+    [Templates]     3: {{$dst->name}} - {{$dist->abstract}}
+    [Templates]        ^^^ Can't call method "name" on an undefined value at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]        ^^^ Bad code fragment begins at lib/Assa/Manual.pod line 3. ^^^
+    [Templates]     4:
+    [Templates]     5: Version {{$dist->version}}.
+    [Templates]        ... skipped 2 lines ...
+    Aborting...
+
+C<TextTemplater> makes it real. All I need is using C<TextTemplater>-based plugins: C<Templates>,
+C<MetaResources::Template> (starting from v0.002).
+
+=head2 Engine Control
+
+C<TextTemplater> allows the end-user to specify C<delimiters>, C<package> and C<prepend> engine
+options in F<dist.ini> file, while C<TextTemplate> allows to specify C<prepend> only
+programmatically, and does I<not> allow to specify C<delimiters> and C<package>.
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla>
+
+=item L<Dist::Zilla::Role::TextTemplater>
+
+=item L<Text::Template>
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015, 2016 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

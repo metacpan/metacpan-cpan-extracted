@@ -1,0 +1,56 @@
+Revision history for Dist-Surveyor
+
+0.016     2016-06-15 23:03:13-04:00 America/New_York
+	- Use Test::RequiresInternet in test files
+
+0.015     2016-06-11 21:51:03-04:00 America/New_York
+	- Sort generated 02packages case insensitively (miyagawa)
+	- Use HTTP::Tiny instead of LWP::UserAgent
+	- Use JSON::MaybeXS instead of JSON
+
+0.014     2016-06-11 17:48:44-04:00 America/New_York
+	- Corrected prereqs
+	- Various fixes to distribution packaging
+
+0.013     2013-07-09 16:19:07 Asia/Tokyo
+	- Adding keep_alive to connections - major speedup
+
+0.011     2013-07-08 16:11:57 Asia/Tokyo
+
+0.010     2013-07-05 11:15:05 Asia/Tokyo
+	- Major refactoring done
+	- A fatpacked version created
+
+0.009     2013-02-20 15:45:32 Asia/Tokyo
+	- Bugfix - including is_error from LWP::Simple
+
+0.008     2012-12-05 15:48:08 Asia/Tokyo
+	- Using SDBM_File when DB_File not available
+
+0.007     2012-11-14 11:52:31 Asia/Tokyo
+	- Useing looks_like_number from Scalar::Util instead of DBI
+
+0.006     2012-11-05 15:24:54 Asia/Tokyo
+	- Moving Compress::Zlib to be required (instead of use) for fatpack
+	- improving memorize code
+
+0.005     2012-10-24 14:49:27 Asia/Tokyo
+	- Trying to minimize the used dependencies
+
+0.004     2012-10-18 13:40:39 Asia/Tokyo
+	- adding MANIFEST.SKIP
+	- created a private wrapper for DB_File, for storing Perl hashs
+	- reducing dependecies
+
+0.003     2012-10-10 13:53:57 Asia/Tokyo
+	- change db file lock system to support windows
+
+0.002     2012-10-03 17:42:13 Asia/Tokyo
+	- don't die if there is not perllocal.pod available
+	- SiePerl now have 5.8 version - got to catch them all
+	- Middleware-RequestHeaders-0.03 included a lot of modules in his local-lib directory
+	- clarifing warning wording about modules that are laready core in Perl
+
+0.001     2011-11-17 13:00:29 Europe/Dublin
+	- Initial release
+

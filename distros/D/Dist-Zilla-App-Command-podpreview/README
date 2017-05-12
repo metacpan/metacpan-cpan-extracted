@@ -1,0 +1,27 @@
+NAME
+    Dist::Zilla::App::Command::podpreview - preview munged pod in browser
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        dzil podpreview My::Module
+
+DESCRIPTION
+    A Dist::Zilla command to preview the munged pod of a module in a browser
+    using App::PodPreview.
+
+SEE ALSO
+    *   Dist::Zilla
+
+    *   App::PodPreview
+
+AUTHOR
+    Peter Shangov <pshangov@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Peter Shangov.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

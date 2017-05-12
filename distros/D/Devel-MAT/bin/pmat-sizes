@@ -1,0 +1,46 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use List::Util qw( max );
+use List::UtilsBy qw( max_by rev_nsort_by );
+
+use Devel::MAT;
+
+GetOptions(
+   's|size=s' => \my $SIZE,
+) or exit 1;
+
+my $size = $SIZE ? "${SIZE}_size" : "size";
+
+my $pmat = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" );
+$pmat->load_tool( "Sizes" );
+
+my %total_svs;
+my %total_bytes;
+
+foreach my $sv ( $pmat->dumpfile->heap ) {
+   my $type = $sv->blessed ? sprintf( "%s(%s)", $sv->type, $sv->blessed->stashname ) 
+                           : $sv->type;
+
+   $total_svs{$type}   += 1;
+   $total_bytes{$type} += $sv->$size;
+}
+
+my $typewidth = length max_by { length } keys %total_svs;
+my $svswidth  = length max values %total_svs;
+my $bytewidth = length max values %total_bytes;
+
+printf "%-*s | %-*s | %s\n",
+   $typewidth, "Type",
+   $svswidth, "SVs",
+              "Bytes";
+
+foreach my $type ( rev_nsort_by { $total_bytes{$_} } keys %total_svs ) {
+   printf "%-*s | % *u | % *u\n",
+      $typewidth, $type,
+      $svswidth,  $total_svs{$type},
+      $bytewidth, $total_bytes{$type};
+}

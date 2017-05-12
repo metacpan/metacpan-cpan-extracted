@@ -1,0 +1,60 @@
+Revision history for Dist::Zilla::Plugin::ManifestInRoot
+
+0.16.1    2016-12-29 18:46:31
+          - Avoid Path::Tiny and Path::Class, use File::Spec
+            Total cockup in backward compatibility
+
+0.15.1    2016-12-25 16:13:44
+          - Tests only for developers
+
+0.14.1    2016-12-24 21:10:37
+          - Toolchain update
+          - Refactored smoker exceptions to dump file
+          - Fewer test dependencies in boilerplate
+
+0.13.1    2015-09-26 01:04:22
+          - Old smokers may not understand TestRequires
+
+0.12.1    2015-09-15 02:41:08
+          - Broken smoker 85ab240c-6bfd-1014-828b-aa2bd4cf89d2
+          - Toolchain update
+          - Better prereq data for build and test phases
+
+0.11.1    2015-08-29 10:01:39
+          - Broken smoker 85ab240c-6bfd-1014-828b-aa2bd4cf89d2
+
+0.10.1    2015-08-03 13:28:29
+          - Fixed tests on mwwin32
+
+0.9.1     2015-08-02 18:14:02
+          - Fixed line termination on mswin32
+
+0.8.1     2015-08-02 12:07:20
+          - Can filter unwanted files from root copy
+          - Updated toolchain
+
+0.7.1     2015-05-22 09:24:18
+          - Added badges and public repository
+
+0.6.1     2014-08-27 16:52:09
+          - Hopefully this time the broken smoker will be silenced
+            b6c8672d-6bf5-1014-99ad-e1a5890cd912
+
+0.5.1     2014-08-26 18:02:12
+          - This broken smoker is a rash across CPAN
+            69bc01aa-6c01-1014-a840-c829b95c3ac1
+
+0.4.1     2014-05-17 12:47:04
+          - Copy MANIFEST rather than read / write
+
+0.3.1     2014-05-15 22:25:04
+          - Removed dependency on File::Slurp
+
+0.2.1     2013-08-15 11:17:02
+          - Switched to Dist::Zilla
+
+0.1.3     2013-08-07 14:47:32
+          - Reset min perl testing to original behaviour
+          - Added code from Module::Provision
+          - Added project files to master branch
+

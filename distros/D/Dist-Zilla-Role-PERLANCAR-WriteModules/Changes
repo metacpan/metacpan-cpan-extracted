@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Role-PERLANCAR-WriteModules
+
+0.02    2015-07-27 (PERLANCAR)
+
+	- Observe DEBUG_KEEP_TEMPDIR instead of DEBUG to keep tempdir (also
+	  observed by App::fsql, App::depak, App::perlmv).
+
+
+0.01    2015-07-06 (PERLANCAR)
+
+        - First release.

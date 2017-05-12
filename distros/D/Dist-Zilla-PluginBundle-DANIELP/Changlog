@@ -1,0 +1,66 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit 4458973032d2a9ed35917636354516e0a1400eb7
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Wed Nov 10 09:47:48 2010 +1100
+  
+    Generate a README in markdown for GitHub niceness...
+
+  commit 5e79154d7da1c2440aee3a92bf3b316c8e894185
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Wed Nov 10 09:46:44 2010 +1100
+  
+    Move away from the old git version bump plugin...
+
+  commit bd9ce4bc4486563e5c9498843c7c2f3bcd79c038
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Wed Nov 10 09:38:30 2010 +1100
+  
+    Use a non-v-string version dependency to avoid portability warnings.
+
+  commit 327f0696c200746e022c23d2c23dd1422a0fec8c
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Wed Nov 10 09:34:42 2010 +1100
+  
+    update prereq stuff for newer dzil version. 
+
+======================================
+2010-05-30 17:48:57 +1000 release-1.03
+======================================
+
+  commit 8340fc33eaa1caecbb815e76ab573e40ffc3191a
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sun May 30 17:45:48 2010 +1000
+  
+    Add the ability to exclude modules from ReportVersion::Tiny.
+
+  commit 9c9a1bdd3ccec358c82b3066cbba011b558ccdad
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sun May 30 17:40:29 2010 +1000
+  
+    Support skipping the synopsis syntax check.
+
+    Some of my modules don't have Perl code in there, so we may as well skip
+    over it to something that actually will work.
+
+  commit 5ee210f859355c7209a3e97bbdc848cea6e4608e
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sun May 30 17:24:13 2010 +1000
+  
+    use ReportVersions::Tiny rather than ReportVersions. 
+
+======================================
+2010-05-29 02:15:19 +1000 release-1.01
+======================================
+
+  commit a29fc471d59f93a450d9542e77a6586d967534c3
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sat May 29 02:15:19 2010 +1000
+  
+    Prepare for real-world release. 
+
+===================================
+End of changes in the last 365 days
+===================================

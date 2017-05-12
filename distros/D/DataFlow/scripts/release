@@ -1,0 +1,12 @@
+#!/bin/bash
+
+[[ -f lib/DataFlow.pm ]] || exit 1
+[[ -n "$1" ]] || exit 2
+
+VER="$1"
+shift
+
+git flow release start "$VER" &&
+	git flow release finish -n "$VER" &&
+	dzil release &&
+	git checkout develop

@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-DP-simple.t
+t/02-DP-ordering.t
+t/05-DP-pod.t
+t/06-DP-api.t
+t/07-DP-nonoop.t
+t/08-DP-nonoop_ordering.t
+lib/Data/Pairs.pm
+META.yml                                 Module meta-data (added by MakeMaker)

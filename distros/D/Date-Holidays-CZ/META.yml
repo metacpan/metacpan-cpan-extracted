@@ -1,0 +1,29 @@
+---
+abstract: 'determine Czech Republic bank holidays'
+author:
+  - 'Smithfarm <presnypreklad@gmail.com>'
+build_requires:
+  Date::Calc: '5'
+configure_requires:
+  Module::Build: '0'
+  Software::License: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.150005'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-CZ
+provides:
+  Date::Holidays::CZ:
+    file: lib/Date/Holidays/CZ.pm
+    version: '0.13'
+requires:
+  Date::Calc: '5'
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/smithfarm/date-holidays-cz/issues
+  license: http://opensource.org/licenses/bsd-license.php
+  repository: https://github.com/smithfarm/date-holidays-cz.git
+version: '0.13'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

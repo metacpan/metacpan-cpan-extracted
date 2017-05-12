@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+Inspect.pm
+README
+Changelog
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                 Module meta-data (added by MakeMaker)
+t/run.t
+sample/bin/inspect.pl
+sample/formats/sample.csv
+sample/formats/sample.yml
+sample/formats/sample.ini
+sample/formats/sample.xml
+sample/formats/sample.json
+sample/formats/sample.conf
+sample/formats/sample.perl

@@ -1,0 +1,101 @@
+{
+   "abstract" : "Text::Template engine for Dancer2",
+   "author" : [
+      "Thibaut Le Page <thilp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Template-TextTemplate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CHI" : "0",
+            "Carp" : "0",
+            "Dancer2::Core::Role::Template" : "0",
+            "Dancer2::Core::Types" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "Safe" : "2.26",
+            "Scalar::Util" : "0",
+            "Text::Template" : "1.46",
+            "namespace::clean" : "0",
+            "perl" : "5.010_000",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::API" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.88",
+            "autodie" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Template::TextTemplate" : {
+         "file" : "lib/Dancer2/Template/TextTemplate.pm",
+         "version" : "1.003"
+      },
+      "Dancer2::Template::TextTemplate::FakeEngine" : {
+         "file" : "lib/Dancer2/Template/TextTemplate/FakeEngine.pm",
+         "version" : "1.003"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thilp/Dancer2-Template-TextTemplate/issues"
+      },
+      "homepage" : "https://github.com/thilp/Dancer2-Template-TextTemplate",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/thilp/Dancer2-Template-TextTemplate.git",
+         "web" : "https://github.com/thilp/Dancer2-Template-TextTemplate"
+      }
+   },
+   "version" : "1.003"
+}
+

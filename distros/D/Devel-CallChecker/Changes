@@ -1,0 +1,72 @@
+version 0.007; 2015-03-21
+
+  * update tests for Perl 5.21.2, where the op_sibling field has changed
+    meaning
+
+version 0.006; 2013-09-21
+
+  * bugfix: allow generated headers to work on API-compatible Perls 
+    other than the specific version under which this module was installed
+
+  * fix test for thread safety, which risked false negatives
+
+  * avoid a C compiler warning in a test
+
+version 0.005; 2012-02-11
+
+  * be thread-safe, by idempotence and mutex control on op check hooking
+
+  * load DynaLoader::Functions lazily, because it is only required at
+    build time of users of this module, not required at all in normal
+    runtime
+
+  * avoid potential circular dependency chain, by requiring a version
+    of DynaLoader::Functions that has reduced its dependencies
+
+  * fix some C preprocessor directive indentation
+
+version 0.004; 2012-02-01
+
+  * in documentation, clarify that the header and linkable functions
+    should be called at build time
+
+  * add B::CallChecker to "see also" list
+
+  * update tests to accept Perl 5.15.7's modified panic error messages
+
+  * in Build.PL, declare incompatibility with pre-0.19
+    B::Hooks::OP::Check, which doesn't play nicely around op check hooking
+
+  * convert .cvsignore to .gitignore
+
+version 0.003; 2011-05-29
+
+  * bugfix: set up CV name links correctly for error messages from
+    prototype checkers
+
+  * bugfix: don't leak temporary GVs and CVs in prototype checkers
+
+version 0.002; 2011-05-19
+
+  * add callchecker_linkable constant to help users link with this module
+
+  * fully document the C functions
+
+  * avoid false test failures with parallel testing
+
+  * correct abstract line
+
+  * add Devel::CallParser to "see also" list
+
+version 0.001; 2011-04-11
+
+  * bugfix: use PERL_CALLCONV to achieve consistent ABI across compilers
+
+  * port to Windows (GCC toolchain) and Cygwin, where additional linker
+    magic is required to make importation from shared object work (MSVC
+    and BCC on Windows presumably still don't generate the linkable
+    version of the shared library)
+
+version 0.000; 2011-04-03
+
+  * initial released version

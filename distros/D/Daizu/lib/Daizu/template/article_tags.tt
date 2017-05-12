@@ -1,0 +1,11 @@
+[% SET tags = file.tags %]
+[% IF tags.size %]
+ <div class="entry-tags">
+  <h4>Tags:</h4>
+  <ul>
+   [% FOREACH tag = tags %]
+    <li><a href="http://technorati.com/tag/[% tag.tag |uri |html %]" rel="tag">[% tag.original_spelling |encode |html %]</a></li>
+   [% END %]
+  </ul>
+ </div>
+[% END %]

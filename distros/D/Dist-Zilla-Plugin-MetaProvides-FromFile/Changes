@@ -1,0 +1,201 @@
+Revision history for Dist-Zilla-Plugin-MetaProvides-FromFile
+
+2.001002 2017-03-07T14:15:57Z 91340b1
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Removed use of ConfigDumper
+ - Removed use of dztest
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001001, see misc/*.deps* for details
+ - develop: +5 ↑2 -1 (suggests: ↑2)
+ - runtime: -1
+ - test: ↓1 -1
+
+2.001001 2015-06-06T13:39:39Z f6c555d
+ [Bugs]
+ - Make reader_name a string because ClassName requires it to be loaded, but we internally load things. Closes #1.
+   Thanks PJFL for reporting.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +9 ↑3 -2 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1 (recommends: +1)
+ - test: +1 (recommends: ↑1 ↓1)
+
+2.001000 2014-09-04T18:28:48Z
+ [00 Minor]
+ - now dumps configuration.
+ - Tests improved.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +2 -1
+
+ [Tests]
+ - Reimplemented with dztest
+
+2.000001 2014-08-16T00:23:28Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - test: -3
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update test::reportprereqs
+
+2.000000 2014-07-31T04:49:22Z
+ [00 Major]
+ - Sizeable changes that may impact downsteams that work by hand.
+
+ [01 Tooling]
+ - Tooling switched to ExtUtils::MakeMaker
+ - Dependency ramping softened.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [02 Version Scheme]
+ - Version scheme shorted from x.yyyyyyyy ( Mantissa =8 ) to x.yyyyyy ( Mantissa = 6 )
+ - This is the primary reason for the 2.x on the box.
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11060211, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +44 -2 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +2 ↑1 -2
+ - test: +5 ↓1 -2 (recommends: +3)
+
+ [Misc]
+ - Whitespace padded by replace_with_blank
+ - use Module::Runtime instead of Class::Load
+ - Don't use Autobox
+ - Tigher to critic
+ - Many generated test updates
+
+1.11060211 2013-04-08T09:49:35Z
+ [Documentation]
+ - Greatly improve previously lacklustre documentation so its not confusing for people who didn't read the MetaProvides
+   docs first.
+
+1.11060210 2013-04-08T08:33:46Z
+ - Maintenance Release for Module::Build 0.4004
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11060209, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5 (recommends: ↑1, suggests: ↑1)
+ - test: ↑1
+
+ [Documentation]
+ - Update Copyright year.
+ - Add README.mkdn
+
+ [Meta]
+ - Bugtracker to github
+
+ [Packaging]
+ - Update Build.PL for new test_requires feature
+
+1.11060209 2012-02-02T20:02:50Z
+ - Maintenance release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11060208, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - All namespaces now declare $AUTHORITY
+ - $VERSION declarations moved outside BEGIN
+
+ [Packaging]
+ - Update LICENSE ( Year, Indent, Address )
+ - Move extra-tests to xt/
+ - GIT urls moved to https://
+ - declares x_authority
+ - Git Versions
+
+1.11060208 2011-04-05T20:05:45Z
+ - Minor changes only, mostly infrastructural.
+
+ [Dependencies]
+ - Now depends on Class::Load
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11034201, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: +1
+ - test: +1
+
+ [Features]
+ - Now uses Class::Load instead of eval() for loading specified readers. This increases security somewhat.
+
+ [Packaging]
+ - Moved to @Author::KENTNL
+ - Critic is now stricter.
+ - Ship .perltidyrc
+ - Reworked Changes for CPAN::Changes style.
+ - Moved perlcriticrc to perlcritic.rc
+ - Remove inc/*
+ - Use Bootstrap::lib
+ - Fix prereq -> prereqs
+
+ [Tests]
+ - Dropped handwritten perlcritic tests in favour of generated ones.
+ - Dropped portability tests.
+ - Added CPAN::Changes tests.
+
+1.11034201 2010-07-24T13:43:57Z
+ - History forks here from Dist::Zilla::Plugin::MetaProvides
+
+1.10034117 2010-07-24T05:37:49Z
+ - Dropped xt/author/kwalitee.t to avoid the needless dep. ( Kwalitee Test plugin doesn't have this issue )
+
+1.10027802 2010-05-22T13:08:02Z
+ - Replaced most of dist.ini with @KENTNL ( Yeilding more accurate t/ depends )
+ - Removed =inc::Dist style loopback in favour of the more reliable and more generic =inc::lib
+
+1.10027518 2010-05-20T05:33:10Z
+ - Upgraded tests to Dist::Zilla 2.x. ( should resolve rt #56482 ) ( Thanks to DAXIM/Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 for reporting )
+ - Upgraded dist.ini to Dist::Zilla 2.x
+
+1.10001919 2009-09-12T06:17:57Z
+ - Dropped the version dep on FindBin because it causes problems for some. Apparently deping on something that may or
+   may not be in core which may or may not be in core later is a bad thing.
+ - Added CompileTests
+ - Add dist.ini to release for diagnostic reasons.
+
+1.10000417 2009-08-28T04:52:32Z
+ - Moved the tests around.
+ - More tests.
+ - All versions now maxing out to encourage upgrading.
+ - Moved to relative dating scheme
+ - Tighter DogFeed Loopback in buildsystem.
+ - Critic'd.
+ - Documentation Upped on the plugs.
+
+1.0920022 2009-07-19T22:52:48Z
+ - Moved Documentation to a .pm file to satisfy Module::Build
+
+1.0920015 2009-07-19T15:31:07Z
+ - Now eating own dog food.
+ - Scan *.pm|*.pod so that .pod files index properly
+ - Only scan lib/
+ - Fixed Bug with META's having ; in them.
+
+1.0920012 2009-07-19T12:24:43Z
+ - First version.

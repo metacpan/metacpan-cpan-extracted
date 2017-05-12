@@ -1,0 +1,49 @@
+Revision history for Dancer-Session-CHI
+
+v0.1.6    2013-02-26 18:46:21 America/Chicago
+    - Fixed Dancer import.
+    - Switched to using &Dancer::Exception::raise instead of &Carp::croak.
+    - Promoted to full release.
+
+v0.1.5    2013-02-26 14:38:13 America/Chicago
+    - Added C<purge> method to give access to CHI's method of the same name.
+    - Undefined session cookie on session destruction.
+    - Changed license to MIT.
+
+v0.1.4    2012-04-11 15:02:20 America/Chicago
+    - Reverted previous fix attempt, implemented actual fix by correcting
+      session key mismatch.
+
+v0.1.3    2012-04-11 12:51:19 America/Chicago
+    - Unblessed session object before passing to CHI to prevent hilarity during
+      serialization by Storable.
+
+v0.1.2    2012-04-11 09:26:18 America/Chicago
+    - Module fully reimplemented without Moose.
+    - Fixed issue where CHI, when using file-based cache systems, would place
+      the session directory in $app_dir/public if given a relative path.
+
+v0.1.1    2011-11-08 13:03:37 CST6CDT
+    - Remove unused Scalar::Util prereq
+    - Avoid Dancer's pernicious global actions by removing `use Dancer qw(...);`
+    - Refactor tests
+
+v0.1.0    2011-11-06 13:11:29 America/Chicago
+    - Change license to LGPL, v3
+    - First non-point release
+
+v0.0.5    2011-11-06 12:33:21 America/Chicago
+    - Build with Module::Build
+
+v0.0.4    2011-11-06 12:15:20 America/Chicago
+    - Removed a couple MooseX:: dependencies and Perl v5.10-related pragmas
+
+v0.0.3    2011-10-24 05:03:13 America/Chicago
+    - Removed calls to Dancer v1 deep guts in anticipation of changes in Dancer v2.
+
+v0.0.2    2011-10-24 01:23:18 America/Chicago
+    - Avoided smart-match bug in Perl <= v5.12 by not using "given".
+    - Set version requirements for most dependencies
+
+v0.0.1    2011-10-23 03:43:17 America/Chicago
+    - First version, released on an unsuspecting world.

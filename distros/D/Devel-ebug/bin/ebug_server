@@ -1,0 +1,82 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+ebug-server - Debugger server for remote debugging Perl script
+
+=head1 SYNOPSIS
+
+ebug-server [-keepio][-port port] -- script args...
+
+=head1 DESCRIPTION
+
+ebug-server is an debugger server for remote debugging
+Perl script, using ebug-client.
+
+When invoked, it will show you how to invoke ebug-client.
+
+=head1 EXAMPLE
+
+ # Run hello.pl and wait for "ebug-client" to attach
+ $ ebug-server -- hello.pl
+
+ # Same as above, but keep I/O happen on server side
+ $ ebug-server -keepio -- hello.pl
+
+=head1 NOTE
+
+You can't specify secret key - it must be generated automatically.
+Also, you can't specify port below 3141.
+
+Since Devel::ebug::Backend listens to "localhost" socket,
+you will need to relay I/O using tool like socat for true
+remote debugging.
+
+=head1 SEE ALSO
+
+L<Devel::debug>, L<ebug>, L<ebug-client>
+
+=head1 AUTHOR
+
+Taisuke Yamada, <tyamadajp!list!rakugaki!org>
+
+=cut
+
+use String::Koremutake;
+use Getopt::Long;
+use strict;
+use warnings;
+
+GetOptions( my $OPT = {}, 'help', 'port=i', 'keepio' ) || help();
+help() if $OPT->{help} || !@ARGV;
+help() if $OPT->{port} && $OPT->{port} < 3141;
+
+my $cmd  = "$^X -d:ebug::Backend @ARGV";
+my $gen  = String::Koremutake->new;
+my $rand = $OPT->{port} ? $OPT->{port} - 3141 : int( rand(100_000) );
+my $key  = $gen->integer_to_koremutake($rand);
+my $port = 3141 + ( $rand % 1024 );
+
+$ENV{PERL_DEBUG_DONT_RELAY_IO} = 1 if $OPT->{keepio};
+$ENV{SECRET} = $key;
+
+print STDERR <<EOF;
+Debuggee started. Please attach with:
+
+ ebug-client -key $key -port $port
+
+Waiting...
+EOF
+exec($cmd);
+
+exit(0);
+
+sub help {
+    print STDERR <<EOF;
+Usage: $0 [-help][-port <n>] -- debuggee args...
+Note:
+- Listening port must be >= 3141
+EOF
+    exit(1);
+}
+

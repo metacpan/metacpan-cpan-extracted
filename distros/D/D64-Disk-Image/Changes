@@ -1,0 +1,28 @@
+Revision history for Perl extension D64::Disk::Image.
+
+0.02  2013-01-12
+    - Fixed "Segmentation fault" exception on OpenBSD and alikes, which was
+      originally caused by closing an opened file without having written any
+      data into it. Such operation had resulted in creating a new diskfile with
+      track and sector values both initialized to $00. When trying to open such
+      a saved file in OpenBSD environment by getting a pointer to block data
+      (with "get_ts_addr" function) an illegal address had actually been
+      retrieved, which was causing "Segmentation fault" exception while
+      attempted to be read from. The reason why this bug has manifested itself
+      on OpenBSD systems lays in the memory management specifics of OpenBSD.
+      Apparently reading from an invalid address on Linux and alikes results in
+      retrieving a "(nil)" value, which then gets successfully assigned to a
+      char variable. The final fix was very simple and included an attempt to
+      write a single byte of data into each file that was opened for writing and
+      closed before any actual data has been actually written into it, and thus
+      making sure that both track and sector values will get correctly
+      initialized on a new disk directory item creation. Of course the ultimate
+      fix would be to implement proper file save operation in the "diskimage.c"
+      library, however creation of an empty file with no single byte of data is
+      not only very unlikely, but also quite useless for any practical purpose
+      (since the entire 254-bytes sector will always get allocated anyway).
+
+0.01  2010-10-10
+    - initial version (provides Perl interface to Per Olofsson's "diskimage.c",
+      supports manipulating Commodore disk images using functions implemented
+      in diskimage.c)

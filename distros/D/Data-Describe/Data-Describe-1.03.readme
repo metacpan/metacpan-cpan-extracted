@@ -1,0 +1,363 @@
+NAME
+    Data::Describe - Perl extension for scanning/describing a text file or
+    array.
+
+SYNOPSIS
+      use Data::Describe;
+
+      $dsp = Data::Describe->new;       # create an empty object
+      my %arg = ( input_file_name => 'input.txt', # the same as 'ifn' 
+                  skip_first_row  => 'Y',         # the same as 'sfr'
+                  input_field_sep => ',',         # the same as 'ifs'
+                  ofs=>'|',             # the same as 'output_field_sep'
+                  ofn=>'out.dat',       # the same as 'output_file_name'
+                  odf=>'out.def',       # the same as 'output_def_file'
+                );
+      $dsp = Data::Describe->new(%arg); # with arguments
+
+      $dsp->skip_first_row;             # i,e. 1st row contains col names
+      $dsp->set_sfr(1);                 # is the same as the above       
+
+      $dsp->set_ifs('\t');              # set input field separator to tab
+      $dsp->input_field_separator('|'); # set input field separator to '|'
+      $dsp->set_ofs('|');               # set output field separator to |
+      $dsp->output_field_separator('|');# set output field separator to | 
+
+      $dsp->set_ifn('input.txt');       # set input file name
+      $dsp->input_file_name('input.txt'); # set input file name
+      $dsp->input_file_name($arf);      # it can be array ref
+
+      $dsp->set_ofn('out.dat');         # set output file name
+      $dsp->output_file_name('out.dat');# set output file name
+      $dsp->output_file_name('Y');      # it can be array ref
+
+      $dsp->set_odf('out.def');         # set output def file name
+      $dsp->output_def_file('output.def');# set output definition file name
+      $dsp->output_def_file('Y');       # default to '${in}.def" 
+
+      # all the set method has its corresponding get method
+      $rc      = $dsp->get_sfr;
+      $rc      = $dsp->get_ifs; 
+      $rc      = $dsp->input_field_separator; # the same as get_ifs
+
+      $dsp->debug(5);                   # set debug level to 5
+      $dsp->echoMSG('This message', 1); # tag the message as level 1
+      my $crf = $dsp->get_def_arrayref;
+      my $drf = $dsp->get_dat_arrayref;
+      $dsp->output($crf, "", 'def');    # output def file to STDOUT
+      $dsp->outptu($drf, 'out.dat', 'dat'); 
+
+DESCRIPTION
+    This class contains a describe method that scans through each records or
+    number of records sepcified and fields in those records in the array or
+    a file to collect information about the content in the array or the
+    file. It creates a column definition array and a data array containing
+    all the data without the column record.
+
+    The column definition array built by the module is actually an array
+    with hash members. It contains these hash elements ('col', 'typ', 'max',
+    'min', 'dec', 'req' and 'dsp') for each column. The subscripts in the
+    array are in the format of $ary[$col_seq]{$hash_ele}. The hash elements
+    are:
+
+      col - column name
+      typ - column type, 'N' for numeric, 'C' for characters, 
+            and 'D' for date
+      max - maximum length of the records in the column
+            (could use 'wid' to record the max length of the 
+             records.)
+      min - minimum length of the record in the column
+            (When 'wid' is used, no 'min' is needed.)
+      dft - date format such as YYYY/MM/DD, MON/DD/YYYY, etc.
+      dec - maximun decimal length of the record in the column
+      req - whether there is null or zero length records in the 
+            column only 'NOT NULL is shown
+      dsp - description of the columns
+
+    The array or records passed to the module can have the first row
+    containing column names.
+
+METHODS
+    This class contains many methods to "set" and/or "get" parameters. Here
+    is the list of methods:
+
+    * the constructor new(%arg)
+        Without any input, i.e., new(), the constructor generates an empty
+        object. If any argument is provided, the constructor expects them in
+        the right order.
+
+    * [set|get]_sfr/skip_first_row(1)
+        This method tells whether the first row in the array or a file
+        containing column names. If it is true, the describe method will
+        skip it. The get method allows you to query current condition. The
+        default is false.
+
+    * [set|get]_ifs/input_field_sep/input_field_separator
+        This method sets/gets input field separator. The default separator
+        is vertical bar ('|').
+
+    * [set|get]_ofs/output_field_sep/output_field_separator
+        This method sets/gets output field separator. The default separator
+        is a vertical bar ('|').
+
+    * [set|get]_ifn/input_file_name
+        This method sets/gets input file name. It can also be an array
+        reference to a two-dimension array. If it contains an array ref, an
+        array will be scanned and described instead of a text file.
+
+    * [set|get]_ofn/output_file_name
+        This method sets/gets output file file name. It defaults to undef.
+        It can be a 'Y', then the output file name will be defaulted to
+        'dsbf.dat' or the same as input file name with extension as '.dat'.
+
+    * [set|get]_odf/output_def_file
+        This method sets/gets output file name for column definition. It
+        defaults to undef. It can be 'Y', then the file name will be
+        defaulted to the same as input file name with extension as '.def';
+        if the input is an array, then it defaults to 'dsbf.def'.
+
+    * get_def_arrayref
+        This method gets the reference pointing to the column definition
+        array. The column definition array contains column name, column
+        type, column max length, column min length, column decimal length,
+        and column constraints.
+
+    * get_dat_arrayref
+        This method gets data array reference. It does not change the
+        internal attributes defined for the object, so you can pass any data
+        array reference to this method without touching the internal
+        attributes in the object. Actually, all the *get* methods do not
+        change anything in the object.
+
+    * describe($inf,$def,$out,$sfr,$ifs,$ofs,$nrc,$owt,$chr)
+        * Input variables:
+                  $inf - input file name, full path to a ASCII file
+                  $def - output file name for column definitions,
+                         default to "*.def" while $def = undef or 'Y'
+                  $out - output file name for data,
+                         default to "*.dat" while $out = 'Y'
+                  $sfr - skip first row, i.e., the first row contains
+                         column names
+                  $ifs - input field separator, default is '|'
+                  $ofs - output field separator, default is '|'
+                  $nrc - first number of lines to be read,
+                         default is to read all
+                  $owt - overwrite existing files, default to 'N'
+                  $chr - quote characters to be removed.
+
+        * Variables used or routines called:
+                  echoMSG - print debug messages
+
+        * How to use:
+                  use Data::Describe;
+                  my $dsb= Data::Describe->new;
+                  my ($crf,$drf) = $dsp->describe($inf,'Y','',$sfr);
+
+        * Return: none.
+                You can get the output through method *get_def_arrayref* and
+                *get_dat_arrayref*, or specify output file names and call
+                *output* method.
+
+        This routine reads in a text file, search its content and create
+        column definitons. The $crf contains the column definiton, i.e.,
+        ${$crf}[$j]{$itm}, where $j is column sequence and $itm includes:
+        'col', 'typ', 'wid', 'dec', 'dft', 'dsp', etc.
+
+        The $drf contains the data, ${$drf}[$i][$j], where $i is record
+        number and $j is column name. The first row contains column names.
+        The rest rows are data.
+
+    * output($arf,$out,$otp,$ifn,$ofs,$owt)
+        * Input variables:
+                  $arf - array ref
+                  $out - output file name
+                  $otp - output type: data or definition
+                  $ifn - input file name as name reference
+                  $ofs - output field separator
+                  $owr - whether to overwrite existing file
+
+        * Variables used or routines called:
+                  get_def_arrayref - get column definition array reference
+                  get_dat_arrayref - get data array reference
+                  get_odf - get definition output file name
+                  get_ofn - get data output file name 
+                  get_ofs - get output field separator
+                  get_ifn - get input file name
+                  fileparse - parse file name 
+
+        * How to use:
+                  my $crf = $self->get_def_arrayref;
+                  # output $crf to standard output device - STDOUT
+                  $self->output($crf, "", 'def');  
+                  my $drf = $self->get_dat_arrayref;
+                  # output $drf to 'out.dat'
+                  $self->output($drf, "out.dat", 'dat'); 
+
+        * Return: None.
+    * debug($n)
+        * Input variables:
+                  $n   - a number between 0 and 100. It specifies the
+                         level of messages that you would like to
+                         display. The higher the number, the more
+                         detailed messages that you will get.
+
+        * Variables used or routines called: None.
+        * How to use:
+                  $self->debug(2);     # set the message level to 2
+                  print $self->debug;  # print current message level
+
+        * Return: the debug level or set the debug level.
+    * echoMSG($msg, $lvl, $yn)
+        * Input variables:
+                  $msg - the message to be displayed. No newline
+                         is needed in the end of the message. It
+                         will add the newline code at the end of
+                         the message.
+                  $lvl - the message level is assigned to the message.
+                         If it is higher than the debug level, then
+                         the message will not be displayed.
+                  $yn  - whether to return the message
+
+        * Variables used or routines called:
+                  debug - get debug level.
+
+        * How to use:
+                  # default msg level to 0
+                  $self->echoMSG('This is a test");
+                  # set the msg level to 2
+                  $self->echoMSG('This is a test", 2);
+
+        * Return: None.
+        This method will display message or a hash array based on *debug*
+        level. If *debug* is set to '0', no message or array will be
+        displayed. If *debug* is set to '2', it will only display the
+        message level ($lvl) is less than or equal to '2'. If you call this
+        method without providing a message level, the message level ($lvl)
+        is default to '0'. Of course, if no message is provided to the
+        method, it will be quietly returned.
+
+        This is how you can call *echoMSG*:
+
+          my $df = Data::Describe->new;
+             $df->echoMSG("This is a test");   # default the msg to level 0
+             $df->echoMSG("This is a test",1); # assign the msg as level 1 msg
+             $df->echoMSG("Test again",2);     # assign the msg as level 2 msg
+             $df->echoMSG($hrf,1);             # assign $hrf as level 1 msg
+             $df->echoMSG($hrf,2);             # assign $hrf as level 2 msg
+
+        If *debug* is set to '1', all the messages with default message
+        levels 0 and 1 will be displayed. The higher level messages will not
+        be displayed.
+
+    * get_date_format($r1, $r2, $r3, $ds)
+        Input variables:
+
+          $r1 - date range 1: 'min:max'
+          $r2 - date range 2: 'min:max'
+          $r3 - date range 3: 'min:max'
+          $ds - date separator
+
+        Variables used or routines called:
+
+          None.
+
+        How to use:
+
+          # the $dft = 'MM/DD/YY'
+          my $dft = $self->get_date_format('1:12','1:31','1:2');
+          # the $dft = 'MM/DD/YYYY'
+             $dft = $self->get_date_format('1:12','1:31','0:2002');
+
+        Return: the date format.
+
+FAQ
+  How to create a describe object?
+
+    You can create a describe object as the following:
+
+      $dsc = Data::Describe->new;   # an empty object
+ 
+    You can set a hash to define your object attributes and create it as the
+    following:
+
+      %attr = ( 
+         input_field_sep => ':',    # output field separator
+         skip_first_row' => 1,      # 1st row has col names
+        );
+      $dsp = Data::Describe->new(%attr);
+
+  How is the column definition generated?
+
+    If the first row in the data array contains column names, it uses the
+    column names in the row to define the column definition array. The
+    column type is determined by searching all the records in the data
+    array. If all the records in the column only contain digits, i.e., only
+    [0-9.], the column is defined as numeric ('N'); otherwise, it is defined
+    as character ('C'). In type 'C', it checks whether the string is a date
+    type. If the field only contains digits and '/', then it consider the
+    field as a date field. It calls to *get_date_foramt* to determine the
+    date format.
+
+    If the first row does not contain column names, it will generate field
+    names as "FLD###". The "###" is a sequential number starting with 1. If
+    the minimum length of a column is zero, then the value in the column can
+    be null; if the minimum length is greater than zero, then it is a
+    required column.
+
+    The default indicator for the first row is false, i.e., the first row
+    does not contain column names. You can indicate whether the first row in
+    the data array is column names by using *skip_first_row* or *set_sfr* to
+    set it.
+
+      $dsp->skip_first_row('Y');      # first row contains column names
+      $dsp->set_sfr('Y');             # the same as the above
+      $dsp->set_sfr(1);               # the same as the above
+
+    To reverse it, here is how to
+
+      $dsp->set_sfr('N');             # no column in the first row
+      $dsp->skip_first_row(0);        # the same as the above
+
+  Future Implementation
+
+    Although it seems a simple task, it requires a lot of thinking to get it
+    working in an object-oriented frame. Intented future implementation
+    includes
+
+    * add a sampling function
+        Instead of scanning all the records, just randomly sample portion of
+        the records. It can be specified as percentage or number of records.
+
+    * add a statistic function
+        This function will help to analyze the quality of the data.
+
+    * any more function?
+        The column definition array will be used in other classes to
+        generate control file and sql*loader codes for uploading the data
+        into Oracle. The class I temporarily name it *Data::Loader*. It may
+        be changed based on the name approval from PAUSE.
+
+        You are welcome to give me suggestions.
+
+AUTHOR
+    Hanming Tu, hanming_tu@yahoo.com
+
+CODING HISTORY
+    * Version 1.03: 11/06/2002 - fixed a bug in *output* method with
+    fileparse(): need a valid pathname.
+    * Version 1.02: 11/03/2002 - add Makefile.PL to include required classes
+    for testing.
+    * Version 1.01: 10/30/2002 - ported *get_date_format* from
+    Fax::DataFax::DateTime.
+    * Version 1.00: 10/26/2002 - Ported to this class
+        I ported from the initial class and just keep the
+        describing/scanning capability in this class..
+
+    * Version 0.01: 06/10/1999 - Initial coding
+        This is part of initial class *Data::Display*. I coded a while ago -
+        probably in 1999.
+
+SEE ALSO (some of docs that I check often)
+    perltoot(1), perlobj(1), perlbot(1), perlsub(1), perldata(1),
+    perlsub(1), perlmod(1), perlmodlib(1), perlref(1), perlreftut(1).
+

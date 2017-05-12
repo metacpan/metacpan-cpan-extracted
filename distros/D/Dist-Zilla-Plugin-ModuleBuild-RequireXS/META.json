@@ -1,0 +1,52 @@
+{
+   "abstract" : "Auto-promote recommended XS modules to required, when a C compiler is available.",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-ModuleBuild-RequireXS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Most" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/Dist-Zilla-Plugin-ModuleBuild-RequireXS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/Dist-Zilla-Plugin-ModuleBuild-RequireXS.git",
+         "web" : "https://github.com/clintongormley/Dist-Zilla-Plugin-ModuleBuild-RequireXS"
+      }
+   },
+   "version" : "0.01"
+}
+

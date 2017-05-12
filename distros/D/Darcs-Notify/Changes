@@ -1,0 +1,37 @@
+Darcs-Notify (2.0.1)
+
+  * Added Changes file.
+
+  * Fixed typos in documentation.
+
+  * Add a basic test file so it doesn't look completely bad in the CPAN test results.
+
+ -- David Caldwell <david@porkrind.org>  Sat, 24 Jan 2009 17:10:08 -0800
+
+Darcs-Notify (2.0)
+
+  * Darcs::Notify Darcs:Notify::Email: Split email routines into new
+    subclass Darcs::Notify::Email. This should allow subclassing for
+    different notification techniques.
+
+  * Darcs::Notify: Changed calling convention so that the subclasses can
+    work.
+
+  * Added Darcs::Notify::Base for extending Darcs::Notify with new
+    notifiers. This is better than the previous change and should allow
+    for multiple notifiers at once.
+
+  * Changed the calling conventions for Darcs::Notify->new() yet
+    again. I'm way more happy about it this time, at least.
+
+  * Released 2.0 (Seems crazy to release a major version 2 days later, but
+    the API completely changed--apparently 1.0 was a little optimistic,
+    numbering-wise).
+
+ -- David Caldwell <david@porkrind.org>  Fri, 09 Jan 2009 05:01:00 -0800
+
+Darcs-Notify (1.0)
+
+  * Split main code from darcs-notify into new Darcs::Notify module.
+
+ -- David Caldwell <david@porkrind.org>  Fri, 07 Jan 2009 04:48:00 -0800

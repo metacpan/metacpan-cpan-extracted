@@ -1,0 +1,17 @@
+Revision history for Dist-Zilla-Plugin-Test-TrailingSpace
+
+v0.2.0  2014-11-08 (SHLOMIF)
+    - Add the filename_regex parameter.
+
+v0.0.4  2014-02-02 (SHLOMIF)
+    - Fix the =encoding at the PODs.
+
+v0.0.3  2014-01-27 (SHLOMIF)
+    - Add minimal version of perl to prereqs. (CPANTS Kwalitee)
+    - Add provides to META.yml (CPANTS Kwalitee)
+
+v0.0.2  2013-10-13 (SHLOMIF)
+    - Add a SEE ALSO section.
+
+v0.0.1  2013-10-12 (SHLOMIF)
+    - First version, released on an unsuspecting world

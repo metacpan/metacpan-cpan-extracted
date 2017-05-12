@@ -1,0 +1,35 @@
+0.06 Released 2007/05/23
+. With smashing help from Jonathon Wyza, Plibwrap and DBD::Plibdata were fixed
+  to return the error number and message as expected by register_aps and 
+  friends.
+
+0.05 Released 2006/01/04
+. Plibwrap patch to add SQLClose and allow SELECTs with leading whitespace from
+  Kirk Turner-Rustin
+. Change disconnect test in t/3.t to use SQLClose
+. Upgrade requirement to DBI 1.43. The version distributed with Jenzabar on AIX
+  is too old.
+. Downgrade Digest::MD5 requirement to 2.16 per Kirk
+. Update copyright dates
+
+0.04 Released 2005/11/08
+. Fixed "always = RET_EOD" bug in Plibwrap per Kirk Turner-Rustin
+. Reworked t/3.t to break if Fetch not successful per above
+
+0.03 Released 2005/11/02
+. AutoCommit=>1 "not in transaction" bug fixed
+. Documentation updates
+. Patch from Kirk Turner-Rustin to implement better error handling in Plibwrap
+. Plibwrap's Plibdata::RET_OK is the same as the real Plibdata::RET_OK, now 
+. sub data_sources returns undef now, instead of n/a
+
+0.02 Released 2005/10/31
+. Transaction support
+. Refactoring
+. Plibwrap.pm implemented
+. Documentation updates
+. plb_RowsPerPacket implemented
+. Serious protocol bug fixed
+. Unit tests written
+
+0.01 Released 2005/10/25

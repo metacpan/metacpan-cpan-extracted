@@ -1,0 +1,135 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - Path::Tiny
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+1.001001 2014-08-29T09:51:56Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.002000 → 1.003001
+
+1.001000 2014-08-25T21:17:31Z
+ [Added / test requires]
+ - Test::DZil
+
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000510 → 1.002000
+
+ [Removed / runtime requires]
+ - Moose::Autobox
+
+1.000002 2014-08-15T22:05:57Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000001 2014-07-17T11:57:21Z
+
+1.000000 2014-04-18T10:46:37Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.99 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4007
+
+ [Removed / configure requires]
+ - Module::Build 0.4007
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.01025803 2013-10-31T12:44:10Z
+ [Added / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4002 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4002 → 0.4007
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.99
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01025802 2012-07-28T20:17:35Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.01025801 2012-01-04T02:01:25Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01025800 2011-07-13T02:16:46Z
+
+0.01016513 2011-04-13T15:09:11Z
+
+0.01003312 2010-12-05T14:48:13Z
+
+0.01000515 2010-11-08T17:06:39Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 0.01000011 → 0.01000510
+ - Test::Fatal 0 → 0.003
+ - Test::More 0.88 → 0.96
+
+0.01000101 2010-11-04T03:15:07Z
+
+0.01000100 2010-11-04T02:33:20Z
+ [Added / runtime requires]
+ - Carp
+ - Dist::Zilla::Prereqs
+ - Moose
+ - namespace::autoclean

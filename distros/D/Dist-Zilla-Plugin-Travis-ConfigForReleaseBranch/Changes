@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-Plugin-Travis-ConfigForReleaseBranch
+
+0.004     2015-04-29 21:00:21 PDT-0700
+	* no changes; 0.003 validated.
+
+0.003-TRIAL  2015-04-29 20:51:18 PDT-0700
+	* add 5.21 (with allow-fail)
+	* switch to using the default travis install/script stanzas
+
+0.002     2015-04-09 22:23:41 PDT-0700
+	* add 5.20 to our list
+	* use the container-based travis infrastructure (much faster)
+	* quiet down cpanm
+
+0.001     2013-08-12 00:49:39 PDT-0700
+	* Initial indexed release -- still need tests, etc, but we work as
+	  advertised:
+	  https://travis-ci.org/RsrchBoy/dist-zilla-plugin-travis-configforreleasebranch/builds/10102478
+
+0.000_01  2013-08-11 22:10:05 PDT-0700
+	* initial release -- could use some test and other love, but WFM :)

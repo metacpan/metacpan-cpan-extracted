@@ -1,0 +1,135 @@
+# Copyright (c) 2014-2016 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Data::Checker::IP - check data to see if it is a valid IP
+
+=head1 SYNOPSIS
+
+   use Data::Checker;
+   $obj = new Data::Checker;
+
+   $obj->check($data,"IP",$check_opts);
+
+=head1 DESCRIPTION
+
+This module is meant to be used by the L<Data::Checker> module.
+
+One set of checks that is often done is to see if a piece of
+data is a valid IP.  A valid IP might be a string that simply
+meets the criteria of an IP, an IP that is on a specific network,
+an IP that defines a network, etc.
+
+This module performs several IP releated checks.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<check>
+
+This is the only function provided by this module, and it is
+intended to be used by the L<Data::Checker> module.
+
+=back
+
+=head1 CHECKS OPTIONS
+
+This checks elements to see if they are valid IPv4 or IPv6 addresses
+using the L<NetAddr::IP> module.
+
+The C<$check_opts> hashref defines exactly what IP checks to
+perform, and some options used by those checks.  Known keys that
+specify the checks are:
+
+=over 4
+
+=item B<ipv4, ipv6>
+
+If either of these options are given, the IP must be an IPv4 or IPv6
+address respectively.
+
+=item B<network_ip, broadcast_ip>
+
+If either of these options are given, the IP must be a network IP
+or a broadcast IP.  The IP should be specified in CIDR notation so
+that the mask can be determined.  Alternately, if the B<network>
+option is given, the IP must be the network or broadcast IP for
+that network.
+
+=item B<in_network>
+
+The IP must belong to the network specified by the B<network> option.
+The value must be any network definition accepted by L<NetAddr::IP>.
+
+=back
+
+The following options are supported.
+
+=over 4
+
+=item B<network>
+
+This specifies the network that an IP should belong to (or NOT belong
+to if the negate option is used) with the B<in_network> check.
+
+=back
+
+=head1 EXAMPLES
+
+   use Data::Checker;
+   $obj = new Data::Checker;
+
+   $data = ...
+   $opts = ...
+
+   ($pass,$fail,$info,$warn) = $obj->check($data,"IP",$opts);
+
+The value of C<$data> and C<$opts> is listed below in the examples.
+
+=over 4
+
+=item To check that the values are valid IPs
+
+   $data = [ '1.2.3.4', '1:2:3:4:5:6:7:8', 'some-string' ];
+   $opts = { }
+
+This yields:
+
+   $pass = [ '1.2.3.4', '1:2:3:4:5:6:7:8' ];
+   $fail = { 'some-string' => 'Not a valid IP' }
+
+=item To check if an IP is a valid IPv4
+
+   $data = [ '1.2.3.4', '1:2:3:4:5:6:7:8' ];
+   $opts = { 'ipv4' => undef }
+
+=item To check that all of the IPs are contained in a specific network
+
+   $data = [ '1.2.3.4', '10.20.30.40' ];
+   $opts = { 'in_network' { 'network' => '1.2.3.0/24' } };
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+None known.
+
+=head1 SEE ALSO
+
+L<Data::Checker>, L<NetAddr::IP>
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

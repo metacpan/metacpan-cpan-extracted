@@ -1,0 +1,34 @@
+---
+abstract: 'A fairly simplistic debug statement handler'
+author:
+  - 'Buddy Burden'
+build_requires:
+  B::Deparse: 0.89
+  ExtUtils::MakeMaker: 6.36
+  Monkey::Patch: 0.03
+  Test::Command: 0.08
+  Test::Exception: 0.31
+  Test::More: 0.88
+  Test::Output: 0.16
+  Test::Warn: 0.23
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+  YAML::Tiny: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Debuggit
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+resources:
+  homepage: https://github.com/barefootcoder/debuggit/tree
+  license: http://opensource.org/licenses/artistic-license.php
+  repository: git://github.com/barefootcoder/debuggit.git
+version: 2.06

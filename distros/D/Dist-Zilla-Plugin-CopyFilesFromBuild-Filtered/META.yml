@@ -1,0 +1,50 @@
+---
+abstract: 'Copy files from build directory, but filter out lines'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::pushd: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered:
+    file: lib/Dist/Zilla/Plugin/CopyFilesFromBuild/Filtered.pm
+    version: '0.002'
+requires:
+  Dist::Zilla::Role::AfterBuild: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Try::Tiny: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered.git
+version: '0.002'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'

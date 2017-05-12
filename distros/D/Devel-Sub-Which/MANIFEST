@@ -1,0 +1,11 @@
+Changes
+lib/Devel/Sub/Which.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01-basic.t
+t/02-export.t
+t/03-errors.t
+t/04-regression.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

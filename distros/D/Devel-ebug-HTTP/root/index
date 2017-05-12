@@ -1,0 +1,6 @@
+[% IF ebug.finished %]
+  [% INCLUDE finished %]
+[% ELSE %]
+  [% INCLUDE running %]
+[% END %]
+ 

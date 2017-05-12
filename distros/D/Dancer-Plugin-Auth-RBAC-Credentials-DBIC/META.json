@@ -1,0 +1,54 @@
+{
+   "abstract" : "Dancer::Plugin::Auth::RBAC authentication via DBIx::Class",
+   "author" : [
+      "Dagfinn Ilmari Manns\u00c3\u00a5ker <ilmari@photobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200007, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Auth-RBAC-Credentials-DBIC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer::Plugin::Auth::RBAC::Credentials" : 0,
+            "Dancer::Plugin::DBIC" : "0.15",
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBIx::Class::Core" : 0,
+            "DBIx::Class::Schema" : 0,
+            "File::Temp" : 0,
+            "SQL::Translator" : "0.11006",
+            "Test::More" : 0,
+            "ok" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dancer-plugin-auth-rbac-credentials-dbic at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Auth-RBAC-Credentials-DBIC"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ilmari/Dancer-Plugin-Auth-RBAC-Credentials-DBIC.git",
+         "web" : "http://github.com/ilmari/Dancer-Plugin-Auth-RBAC-Credentials-DBIC"
+      }
+   },
+   "version" : "0.003"
+}
+

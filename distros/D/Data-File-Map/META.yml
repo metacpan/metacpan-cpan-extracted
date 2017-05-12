@@ -1,0 +1,20 @@
+---
+abstract: 'Read data file definitions stored as XML'
+author:
+  - 'Jeffrey Ray Hallock <jeffrey.hallock@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-File-Map
+requires:
+  Moose: '0'
+  MooseX::SemiAffordanceAccessor: '0'
+  MooseX::StrictConstructor: '0'
+  XML::LibXML: '0'
+version: '0.09'

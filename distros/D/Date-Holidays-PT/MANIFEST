@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Date/Holidays/PT.pm
+t/00.load.t
+t/pod-coverage.t
+t/pod.t
+t/01.2000.t
+t/01.2004.t
+t/02.others.t
+t/01.2002.t
+t/01.2016.t
+META.json                                Module JSON meta-data (added by MakeMaker)

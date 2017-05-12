@@ -1,0 +1,31 @@
+---
+abstract: 'dispatch on the type (class) of an argument'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  IO::Handle: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+  strict: '0'
+  warnings: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dispatch-Class
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Exporter::Tiny: '0'
+  Scalar::Util: '0'
+  perl: '5.006000'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/mauke/Dispatch-Class.git
+version: '0.02'

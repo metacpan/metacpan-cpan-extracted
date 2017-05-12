@@ -1,0 +1,25 @@
+---
+abstract: 'a __DIR__ constant for the directory your source file is in'
+author:
+  - 'Lukas Mai <l.mai@web.de>'
+build_requires:
+  Test::More: 0
+  lib: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dir-Self
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  File::Spec: 0
+  strict: 0
+resources:
+  repository: git://github.com/mauke/Dir-Self.git
+version: 0.11

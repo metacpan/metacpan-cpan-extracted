@@ -1,0 +1,1 @@
+Pod::Weaver::PluginBundle::MAXMIND = $config

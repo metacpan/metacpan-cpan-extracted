@@ -1,0 +1,18 @@
+---
+abstract: 'DEPRECATED! Please use L<Dancer::Plugin::Auth::RBAC>.'
+author:
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Authorize
+requires:
+  Dancer: 0
+  Dancer::Plugin::Database: 0
+version: 1.110720

@@ -1,0 +1,26 @@
+---
+abstract: 'Pretty printing of data structures as PHP code'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Data::Dump: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Dump-PHP
+requires:
+  perl: 5.010001
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-PHP
+  homepage: https://metacpan.org/release/Data-Dump-PHP
+  repository: git://github.com/sharyanto/perl-Data-Dump-PHP.git
+version: 0.10

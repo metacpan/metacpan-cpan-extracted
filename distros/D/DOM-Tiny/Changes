@@ -1,0 +1,17 @@
+0.005     2016-08-01 16:10:40 UTC
+  - Gut tests to avoid having to keep them in sync with Mojo::DOM58 changes
+
+0.004     2016-04-10 15:09:07 UTC
+  - Murderize dist due to replacement by Mojo::DOM58
+
+0.003     2016-03-19 18:35:22 UTC
+  - Merge several CSS bugfixes and improvements from Mojolicious 6.31 and 6.32.
+  - Merge wrap and wrap_content bugfixes from Mojolicious 6.34.
+  - Fix small html_unescape bug in DOM::Tiny::Entities
+  - Merge handling of "on" default values in val method from Mojolicious 6.49.
+
+0.002     2015-11-09 19:28:42 EST
+  - Support perl 5.8 (mst)
+
+0.001     2015-11-09 02:56:35 EST
+  - First release

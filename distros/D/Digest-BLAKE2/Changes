@@ -1,0 +1,7 @@
+Revision history for Digest::BLAKE2
+
+0.02 2014-03-24
+  - Fix the bugs in threaded Perl by rurban (RT #94112)
+
+0.01 2013-02-10
+  - Initial version

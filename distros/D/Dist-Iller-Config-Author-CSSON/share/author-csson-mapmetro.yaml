@@ -1,0 +1,48 @@
+---
+doctype: dist
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.016000
+      - Moose: 2.1400
+      - Map::Metro: 0.2300
+      - namespace::autoclean: 0.24
+  test:
+    requires:
+      - Test::More: 0.96
+  develop:
+    requires:
+      - Test::Warnings
+
+plugins:
+  - +config: Author::CSSON
+    homepage: $self.homepage
+
+  - +replace_plugin: Changelog::Grouped
+    +with: Changelog::Grouped
+    groups: API Changes, New Features, Enhancements, Requirements, Testing, Other Changes, Bug Fixes, Documentation, Map Changes
+
+  - +extend_plugin: Git::GatherDir
+    exclude_match:
+      - \.png
+
+  - +plugin: MapMetro::MakeGraphViz
+
+  - +plugin: MapMetro::MakeLinePod
+
+  - +replace_plugin: TravisYML
+    perl_version: 5.16 5.18 5.20 5.22
+    post_before_install:
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install: 
+     - cpanm Test::Stream --force
+     - cpanm GraphViz2 -v
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 0

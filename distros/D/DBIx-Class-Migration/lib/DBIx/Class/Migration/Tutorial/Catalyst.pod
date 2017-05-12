@@ -1,0 +1,466 @@
+=head1 NAME
+
+DBIx::Class::Migration::Tutorial::Catalyst - Using a web framework
+
+=head1 GOAL
+
+By the end of this section, you will learn some strategies for using migrations
+with web development and for testing.
+
+This is not a L<Catalyst> tutorial.  You should be familar with the L<Catalyst>
+web development framework, and have read the L<Catalyst::Manual>.  Although
+we will build a minimal L<Catalyst> application we are focused on database
+integration as well as exploring some strategies for testing and would not
+consider this application to represent overall best practices.
+
+Reviewing the documentation for L<Catalyst::Test> would be valuable, as well as
+L<Catalyst::Plugin::ConfigLoader> for a refresher on the idea of localized and
+enviroment specific configurations.
+
+=head1 Bootrap a basic Catalyst application
+
+Update you C<dist.ini> file:
+
+    name    = DBIx-Class-Migration
+    author  = John Napiorkowski <jjnapiork@cpan.org>
+    license = Perl_5
+    copyright_holder = John Napiorkowski
+    copyright_year   = 2012
+    abstract = Tutorial Application for DBIx-Class-Migration
+
+    version = 0.001
+
+    [@Basic]
+    [Prereqs]
+    Moose = 0
+    MooseX::MethodAttributes = 0
+    DBIx::Class = 0
+    DBIx::Class::Migration = 0
+    Catalyst = 0
+    Catalyst::Devel = 0
+    Catalyst::Plugin::ConfigLoader = 0
+    Catalyst::Model::DBIC::Schema = 0
+    Catalyst::Action::RenderView = 0
+    Catalyst::View::TT = 0
+    Plack = 0
+
+    [Prereqs / TestRequires]
+    Test::DBIx::Class = 0
+    Test::Most = 0
+
+You should see we've added two dependencies related to L<Catalyst>.  Now install
+them with cpanm:
+
+    dzil listdeps | cpanm
+
+Next, bootstrap a L<Catalyst> application.  I know you can use the L<catalyst.pl>
+commandline tool, but for our simple application let's just create a few files
+manually:
+
+    touch app.psgi
+    touch lib/MusicBase/Web.pm
+    mkdir lib/MusicBase/Web
+    mkdir lib/MusicBase/Web/Controller
+    mkdir lib/MusicBase/Web/Model
+    mkdir lib/MusicBase/Web/View
+    touch lib/MusicBase/Web/Controller/Root.pm
+    touch lib/MusicBase/Web/Model/Schema.pm
+    touch lib/MusicBase/Web/View/HTML.pm
+    mkdir share/etc
+    touch share/etc/musicbase_web.pl
+    mkdir share/html
+    touch share/html/index.tt
+
+Now open C<lib/MusicBase/Web.pm> and change it to look like this:
+
+    package MusicBase::Web;
+
+    use Moose;
+    use Catalyst qw/
+      ConfigLoader
+    /;
+
+    extends 'Catalyst';
+
+    our $VERSION = '0.01';
+
+    __PACKAGE__->config(
+      'Plugin::ConfigLoader' => {
+        file => __PACKAGE__->path_to('share', 'etc'),
+      },
+    );
+
+    __PACKAGE__->setup;
+    __PACKAGE__->meta->make_immutable;
+
+This is a pretty plain and straight Catalyst application class.  The only thing
+I've done differently from default is I've placed our configuration files in
+C<share/etc>, rather than in the application root (the directory that contains
+your C<dist.ini> file).  I think this is a bit more forward looking, and since
+we already have the C<share> directory, why not use it?
+
+For your Model, we'll use C<Catalyst::Model::DBIC::Schema> to provide a bit of
+thin glue between you L<Catalyst> web application and your L<MusicBase::Schema>:
+
+C<lib/MusicBase/Web/Model/Schema.pm>
+
+    package MusicBase::Web::Model::Schema;
+
+    use Moose;
+    extends 'Catalyst::Model::DBIC::Schema';
+
+    __PACKAGE__->meta->make_immutable;
+
+As is typical for L<Catalyst> models, there's not a lot going on here, just the
+minimum useful glue to make L<Catalyst> aware of your Schema.
+
+Let's add the View now.  Open C<lib/MusicBase/Web/View/HTML.pm> and enter:
+
+    package MusicBase::Web::View::HTML;
+    use base  'Catalyst::View::TT';
+
+    1;
+
+We'll need a bit of configuration to finish the job of hooking the two together
+so open C<share/etc/musicbase_web.pl> in your text editor and make it look like
+this:
+
+    {
+      name => 'MusicBase::Web',
+      default_view => 'HTML',
+      disable_component_resolution_regex_fallback => 1,
+      'Controller::Root' => {
+        namespace => '',
+      },
+      'Model::Schema' => {
+        traits => ['FromMigration'],
+        schema_class => 'MusicBase::Schema',
+        install_if_needed => {
+          default_fixture_sets => ['all_tables']},
+      },
+      'View::HTML' => {
+        INCLUDE_PATH => [ '__path_to(share,html)__' ],
+        TEMPLATE_EXTENSION => '.tt',
+      },
+    };
+
+I know many of the C<Catalyst> examples use C<Config::General> or YAML for
+configuration information.  I tend to use Perl configuration files because of
+the extra flexibility.
+
+I'm setting a few things here, but for our discussion the most important one is
+the C<Model::Schema> section, where I point our model to the SQLite database
+we've been using all along.  Since we just want L<Catalyst> to use our database
+sandbox, the easiest way to do this is to use the C<FromMigration> trait, which
+you get for free when you install L<DBIx::Class::Migration>.  You can review
+the documentation at L<Catalyst::TraitFor::Model::DBIC::Schema::FromMigration>.
+
+The configuration given would use the SQLite sandbox.  What if you wanted to
+switch to using the MySQL sandbox instead?  The C<Model::Schema> parameters
+would look like so:
+
+    'Model::Schema' => {
+      traits => ['FromMigration'],
+      schema_class => 'MusicBase::Schema',
+      extra_migration_args => {
+        db_sandbox_class => 'DBIx::Class::Migration::MySQLSandbox'},
+      install_if_needed => {
+        default_fixture_sets => ['all_tables']},
+      },
+
+In any case, you hopefully noticed that we also run some setup code to install
+the database and populate some fixtures, if they are missing.
+
+B<NOTE>: If you use the C<FromMigration> trait, we will automatically start and
+stop the database if needed (and you are using a database like MySQL or Postgresql
+that needs starting and stopping).  This startup and teardown can impact the
+startup time of you application.
+
+B<NOTE>: If you already had a database setup, and are not using the database
+sandbox feature (as you won't when in a production server, or if you are using
+some shared hosting setups, for example) you should setup your C<connect_info>
+as you normally would in a L<Catalyst> configuration.
+
+Let's setup a trivial controller that pulls a few rows out of the database
+and just outputs this to a web page.
+
+    package MusicBase::Web::Controller::Root;
+
+    use Moose;
+    use MooseX::MethodAttributes;
+
+    extends 'Catalyst::Controller';
+
+    sub index :Path :Args(0) {
+      my ($self, $ctx) = @_;
+      my @artists = $ctx->model('Schema::Artist')
+        ->search({},{ result_class =>
+          'DBIx::Class::ResultClass::HashRefInflator' })
+        ->all;
+
+      $ctx->stash(artists => \@artists);
+    }
+
+    sub end : ActionClass('RenderView') {}
+
+    __PACKAGE__->meta->make_immutable;
+
+Here we want to just get all the Artists and send them to our View.  Since in
+MVC it is considered correct to inform a View of a Model in a Read Only manner
+(in other words, your View should not be able to modify the Model) I generally
+use the L<DBIx::Class::ResultClass::HashRefInflator> result class which will
+flatten your results to an array of hashrefs, rather than return a list of
+result objects.  Besides making it impossible for your template authors to
+accidentally modify the model, you get a nice speed bump since inflating an
+array of hashrefs is much faster than creating all those result objects.
+
+Usually I create a resultset method in my base resultset class, and have all
+my custom resultsets inherit from that.  Something like:
+
+    package MusicBase::Schema::ResultSet;
+    use base 'DBIx::Class::ResultSet;
+
+    sub all_as_array {
+      shift->search({},{ result_class =>
+          'DBIx::Class::ResultClass::HashRefInflator' })
+      ->all;
+    }
+
+    sub all_as_arrayref { [shift->all_as_array] }
+
+I would have C<MusicBase::Schema::ResultSet::Artist> inherit from
+C<MusicBase::Schema::ResultSet> instead of L<DBIx::Class::ResultSet> as it does
+now.  Then I could have written:
+
+    sub index :Path :Args(0) {
+      my ($self, $ctx) = @_;
+      $ctx->stash( artists =>
+        $ctx->model('Schema::Artist')->all_as_arrayref );
+    }
+
+This is a common enough pattern for me that it is worth the trouble to create
+the base class.  Additionally, if you have lots of L<DBIx::Class> components to
+load it helps to create a central base class, since that speeds things up at
+load time.
+
+And here's the template for the webpage: C<share/html/index.tt>
+
+    <html>
+      <head>
+        <title>Artists</title>
+        <link rel="stylesheet"
+          href="http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"
+          type="text/css" rel="Stylesheet">
+      </head>
+      <body class="container">
+        <h1>Artist List</h1>
+        [% FOR artist IN artists %]
+          <p>[% artist.name %]</p>
+        [% END %]
+      </body>
+    </html>
+
+We'll use Twitter's Bootstrap CSS to make things look neat. Lastly you need to
+edit C<app.psgi> as follows:
+
+    use MusicBase::Web;
+    MusicBase::Web->psgi_app;
+
+So now we can start our L<Catalyst> application!
+
+    plackup -Ilib
+
+=head1 Integrating DBIx::Class::Migration and Catalyst.
+
+There's two main places to where L<Catalyst> and L<DBIx::Class::Migration>
+can cooperate: Running migrations and Running Tests.
+
+=head2 Running Migrations
+
+Although you can just use L<dbic-migration> directly with you L<Catalyst>
+application, since L<Catalyst> already does a great job of managing
+configuration, let's learn how to subclass L<DBIx::Class::Migration::Script>
+and customize it for your application.  That way you don't need to set C<ENV>
+or pass option flags to the C<dbic-migration> commandline tool (and easily
+make a mistake and upgrade the wrong database :) ).
+
+    touch lib/MusicBase/Schema/MigrationScript.pm
+
+And then open C<lib/MusicBase/Schema/MigrationScript.pm> in your editor and
+change it to look like this:
+
+    package MusicBase::Schema::MigrationScript;
+
+    use Moose;
+    use MusicBase::Web;
+
+    extends 'DBIx::Class::Migration::Script';
+
+    sub defaults {
+      schema => MusicBase::Web->model('Schema')->schema,
+    }
+
+    __PACKAGE__->meta->make_immutable;
+    __PACKAGE__->run_if_script;
+
+Basically you've made a subclass of L<DBIx::Class::Migration::Script> but you
+are setting the C<schema> to always be whatever L<Catalyst> thinks it is.  Now
+you can use L<Catalyst>s built in configuration management to decide what
+database you are running migrations on.  For example you can run this straight
+out (remember to remove the ENV var DBIC_MIGRATION_SCHEMA_CLASS, if you have it
+set now for running the tutorial)
+
+    $ perl -Ilib lib/MusicBase/Schema/MigrationScript.pm status
+    Schema is 3
+    Deployed database is 3
+
+And you can reset the data from fixtures, dump new ones, etc.  Plus, if you
+created an enviroment specific configuration (such as if you have a file
+C<share/etc/musicbase_web_qa.pl> that points to your QA datase) you can leverage
+you L<Catalyst> based configuration to make your life a bit easier.  For
+example:
+
+    CATALYST_CONFIG_LOCAL_SUFFIX=qa perl -Ilib \
+      lib/MusicBase/Schema/MigrationScript.pm status
+
+Would grab the connected schema for your qa enviroment specific configuration
+and give you the status on that (assuming you can ping it from your logged
+in terminal).  This integration is very useful since you can use whatever your
+L<Catalyst> application thinks is the current database as the target of the
+migration.  You can use other bits of configuration info as well, such as a
+custom C<target_dir> etc.
+
+B<Alternative>: If subclasing L<DBIx::Class::Migration::Script> seems like an
+overly heavy handed solution, or running the *.pm file like a script just
+weirds you out, you can simply create a script like the following, which would
+work identically:
+
+For example, something in C<script/my-dbic-migration>
+
+    #!/usr/bin/env perl
+
+    use MusicBase::Web;
+    use DBIx::Class::Migration::Script;
+
+    DBIx::Class::Migration::Script
+      ->run_with_options(
+        schema => MusicBase::Web->model('Schema')->schema);
+
+
+And then use it like:
+
+    perl -Ilib script/my-dbic-migration status
+
+B<NOTE>: In this case you need to invoke the perl interp with C<-Ilib> so that
+we can find C<MusicBase::Web>
+
+If you have a bunch of files in C</script> or if you need to be able to run
+your custom migration tool after installation, this could be a good option.
+
+=head2 Running Tests
+
+We've seen how using tools like L<Test::DBIx::Class> together with L<DBIx::Class::Migration>
+can really simplify your unit level testing effort.  Using them you don't
+need to spend a lot of time setting up dedicated testing databases and
+managing configuration sets (that need to change over time).  However if you
+want to write tests that check your actual web pages (for example you want to
+test things like if a page shows the correct results and if web forms work)
+you need to manage that a bit differently.  Here's what I do:
+
+First, create a enviroment specific configuration for testing:
+
+    touch share/etc/musicbase_web_test.pl
+
+Then open C<share/etc/musicbase_web_test.pl> and add the following:
+
+    {
+      'Model::Schema' => {
+        traits => ['FromMigration'],
+        schema_class => 'MusicBase::Schema',
+        extra_migration_args => {
+          db_sandbox_builder_class => 'DBIx::Class::Migration::TempDirSandboxBuilder',
+          db_sandbox_class => 'DBIx::Class::Migration::MySQLSandbox'},
+        install_if_needed => {
+          default_fixture_sets => ['all_tables']},
+      },
+    };
+
+So what is going to happen here is if you start the application pointing to
+this configuration (with C<CATALYST_CONFIG_LOCAL_SUFFIX>=test) when the application
+runs it will automatically create a clean new database and populate it with
+the C<all_tables> fixture set.  Just for fun, we will create a test instance
+of Mysql.  Please note this will be a temporary sandbox, and will be deleted
+when your L<Catalyst> application exits.  It is not the same as the MySQL
+sandbox we created in C<share/musicbase-schema/*>.
+
+This looks similar to the first configuration file we did, where we use the
+C<FromMigration> trait to hookup your migration deployments.  However, instead
+of running our tests on the database sandbox in C</share> (which you don't want
+to so since that's not going to be a reliable and consistent database for
+testing) we use the following bit:
+
+    db_sandbox_builder_class => 'DBIx::Class::Migration::TempDirSandboxBuilder',
+
+To instruct the sandbox builder to put the sandbox into a temporary directory
+instead of C</share>.  What will happen here is that (similar to the way that
+we saw with L<Test::DBIx::Class>) we build up a database from scratch, populate
+it with known fixtures, run tests, and then tear it down at the end.  This way
+you get clean and repeatable tests.  The downside is that the buildup / teardown
+can add time to the tests, athough you should be able to run your test cases
+in parallel (using C<prove -j9 ...>, to run up to nine tests at once) to offset
+this issue.
+
+Let's write a test case:
+
+    touch t/web.t
+
+And open C<t/web.t> in your editor:
+
+    #!/usr/bin/env perl
+
+    use Test::Most;
+    use Catalyst::Test 'MusicBase::Web';
+
+    ok my $content  = get('/'),
+      'got some content';
+
+    like $content, qr/Michael Jackson/,
+      'Found Michael Jackson';
+
+    done_testing;
+
+
+Finally run your test:
+
+    CATALYST_CONFIG_LOCAL_SUFFIX=test prove -lvr t/web.t
+
+You know from when we did the original demo data script that "Michael Jackson"
+was one of the artist, so we'd expect to find him in the <$content> from the
+Root controller (since that's just a list of all the Artist names).  So you'd
+probably want a bit more testing on this page, but this should give you the
+idea.
+
+Since the above test builds and breaks down a full MySQL sandbox, it might not
+run instantly, just FYI.
+
+=head1 SUMMARY
+
+That's it for some ideas on using migrations with a web development framework
+like L<Catalyst>.  If you are using L<Catalyst> you can take advantage of its
+great configuration management tools to make it even easier to manage your
+migrations.  You also now have some strategies for making it easy to test.
+
+=head1 NEXT STEPS
+
+Proceed to L<DBIx::Class::Migration::Tutorial::Conclusion>
+
+=head1 AUTHOR
+
+See L<DBIx::Class::Migration> for author information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<DBIx::Class::Migration> for copyright and license information
+
+=cut
+

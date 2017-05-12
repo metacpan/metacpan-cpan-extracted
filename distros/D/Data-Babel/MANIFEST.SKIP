@@ -1,0 +1,27 @@
+^_build
+^Build$
+^blib
+^BAK
+^Makefile$
+~$
+\.bak\d*$
+\.BAK\d*$
+\.sav\d*$
+\.SAV\d*$
+\.html$
+\.htm$
+\.tar\.gz$
+\.tgz$
+^ignore\.txt
+^cover_db
+^pm_to_blib
+CVS
+^\.
+\/\.
+runtests.pl
+foo
+Foo
+^$
+^MYMETA\.yml$
+^MYMETA\.json$
+# ^MANIFEST\.SKIP$

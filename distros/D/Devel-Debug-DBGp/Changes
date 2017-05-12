@@ -1,0 +1,115 @@
+Revision history for Devel-Debug-DBGp
+
+0.20      2016-09-10 15:34:09 CEST
+
+    - Can now set breakpoints inside eval STRING source code
+    - Don't die on invalid eval or watchpoint expressions
+
+0.19      2016-08-14 15:23:26 CEST
+
+    - Don't ignore undef scalar lexicals in context_get
+    - Fix inverted condition that was skipping hash references without
+      an active iterator instead of skipping the ones with an active
+      iterator
+
+0.18      2016-08-09 22:32:16 CEST
+
+    - Fix for when the debugger is loaded after Enbugger
+
+0.17      2016-08-07 16:54:06 CEST
+
+    - Fix crash in code enumerating package variables
+
+0.16      2016-08-02 11:29:06 CEST
+
+    - Compilation fixes for threaded Perl
+
+0.15      2016-08-01 21:58:38 CEST
+
+    - Fixed step_over/step_out when using the XS version on Perl 5.22
+      or newer
+    - Use the pure-Perl DB::lsub implementation on Perl 5.14 or older
+      (the XS one does not work, not investigated)
+    - Skip DB::lsub tests for old Perls that don't support it
+    - Fixed building with MakeMaker 6.83 or older
+
+0.14      2016-07-31 16:16:15 CEST
+
+    - Actually use the XS implementation added in 0.13
+    - Fix lvalue subroutines
+
+0.13      2016-07-25 22:41:44 CEST
+
+    - Add optional XS implementation for DB::sub, for speed
+    - Return 'undef' type for undefined values (the value is still
+      an empty string because DBGp does not have a special "null"
+      value)
+    - Blind fix for 32-bit Perls when not using PadWalker
+    - use strict 'vars' and 'subs' in the debugger
+
+0.12      2016-07-17 17:09:17 CEST
+
+    - Reduce slowdown caused by enabling the debugger
+
+0.11      2016-06-20 19:38:41 CEST
+
+    - Another Xdebug compatibility option (for temporary breakpoints)
+    - Don't crash when changing output redirection mode multiple times
+    - Made property_value response more compatible with Xdebug
+    - Various fixes for 'source', 'stack_get', 'breakpoint_set',
+      'breakpoint_list', 'breakpoint_get' (see git log for full description)
+
+0.10      2016-06-04 16:07:33 CEST
+
+    - Perl 5.22 fixes
+
+0.09      2016-06-04 10:14:56 CEST
+
+    - Require perl 5.8
+    - Use B instead of code parsing to implement context_get when
+      PadWalker is not installed
+    - Remove 'interact' command
+    - Use 'open $fh, $mode, \$scalar' instead of IO::Scalar
+
+0.08      2016-05-01 19:40:42 CEST
+
+    - Speed up evaluation of complex evals from inside the debugger
+
+0.07      2016-04-28 15:06:27 CEST
+
+    - Fix check for unbreakable line
+
+0.06      2015-12-20 16:15:44 CET
+
+    - Prevent a failed connection at startup from breaking breakpoints
+
+0.05      2015-12-15 20:18:03 CET
+
+    - Run tests using an Unix-domain socket on non-Windows platforms
+
+0.04      2015-12-15 10:10:10 CET
+
+    - Test fixes for Perl 5.6
+    - Basic documentation
+
+0.03      2015-12-06 22:49:27 CET
+
+    - Test fixes for Perl 5.14
+
+0.02      2015-12-06 20:10:37 CET
+
+    - More compatibility fixes for existing Xdebug clients
+    - Optionally do not open a DBGp connection during startup,
+      and don't terminate the program when the debugger disconnects
+
+0.01      2015-11-26 15:29:27 CET
+
+    - Xdebug compatibility mode (to be able to use existing
+      IDE debugger plugins)
+    - Speed up program execution when the debugger is loaded but
+      debugging is disabled
+    - Add the option to connect throug an Unix-domain socket
+    - Fixes for working under uWSGI (multi-process, one DBGp
+      connection per HTTP request)
+    - Minimal test suite and CPAN packaging
+    - Imported Komodo-PerlRemoteDebugging-8.5.4-86985

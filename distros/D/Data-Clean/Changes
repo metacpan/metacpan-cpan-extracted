@@ -1,0 +1,119 @@
+0.48    2017-01-14 (PERLANCAR)
+
+	- [Bugfix] Used the wrong variable to access !clone_func option.
+
+
+0.47    2017-01-14 (PERLANCAR)
+
+	- [Internal] [Incompatible change] Put compiled code in
+	  $self->{_code} instead of $self->{code}, put compilation data
+	  result in $self->{_cd}.
+
+
+0.46    2017-01-14 (PERLANCAR)
+
+	- [Internal] [Incompatible change] _generate_cleanser_code() now returns
+	  compilation data containing source code as well as required modules,
+	  etc. This gives more useful information for code generators e.g.
+	  Perinci::CmdLine::Inline.
+
+	- [Incompatible change] command_* methods now take $cd (compilation data
+	  structure) as the first argument to ease passing data between routines
+	  during generation of cleanser code.
+
+        - Remove use of Acme::Damn to simplify things. Acme::Damn modifies the
+	  original object while Data::Clone does not clone objects, so we needed
+	  to differentiate case of clone_and_clean vs clean_in_place. In the
+	  case of clone_and_clean() we also need to make sure we don't use
+	  Acme::Damn to avoid modifying the original object. We now always
+	  shallow clone object to unbless it, so we don't need this case
+	  differentiation.
+
+
+0.45    2017-01-10 (PERLANCAR)
+
+	- Remove embedding of String::LineNumber & String::PerlQuote (I
+	  don't feel embedding is elegant or worth the hassle, we should
+	  fatpack/datapack only the scripts).
+
+
+0.44    2017-01-03 (PERLANCAR)
+
+	- Add option: !clone_func.
+
+	- Add command: unbless_ffc_inlined.
+
+
+0.43    2016-12-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- Update fatpack snippet.
+
+
+0.42    2016-12-28 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Fix expressing embed prereq relationship with x_embed.
+
+
+0.41    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Use _EMBED:: prefix to express embed relationship.
+
+
+0.40    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Standardize header & footer comment for embedded modules.
+
+
+0.39    2016-12-27 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace embedding code with fatpack code so it can be loaded on
+	  demand.
+
+
+0.38    2016-12-26 (PERLANCAR)
+
+	- Downgrade String::LineNumber and String::PerlQuote from
+	  RuntimeRequires to RuntimeSuggests, embed these modules.
+
+
+0.37    2016-05-31 (PERLANCAR)
+
+        - Replace circular test with another one which is not failing [CT].
+
+
+0.36    2016-05-28 (PERLANCAR)
+
+        - [Bugfix] Fix deep recursion problem by detecting circular reference
+          early, before other options.
+
+
+0.35    2016-05-21 (PERLANCAR)
+
+        - [Bugfix] Recursing into object should be done after processing object
+          of specific class and -object (any object).
+
+        - [Bugfix] A couple more bug fixes.
+
+
+0.34    2016-05-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix][doc] Fix wrong documentation: !recurse_object should
+	  have been !recurse_obj.
+
+
+0.33    2016-04-14 (PERLANCAR)
+
+	- First release, renamed from Data::Clean::Base and separated to its own
+          dist.

@@ -1,0 +1,22 @@
+Revision history for Perl extension DBI::XML.
+
+0.05  Wed Dec 13 2000
+        - XML Encode better
+
+0.04  Fri Dec 01 2000
+        - Updated to work with MySQL (Kip Hampton)
+        - Driver now specified in an attribute (Kip Hampton)
+
+0.03  Fri Jan 08 1999
+	- Fixed test.pl to "use DBIx::XML_RDB;" (thanks Randal!)
+	- Use UTF-8 encoding, rather than MIME::Base64
+
+0.02  Mon Jan 04 1999
+	- Added xml2sql.pl
+	- Updated to more Unixish install
+	- minor fixes
+
+0.01  Thu Oct 22 09:58:13 1998
+	- original version; created by h2xs 1.18
+	- actually not quite original. Converted from sql2xls and then
+		converted from Win32::ODBC to DBI

@@ -1,0 +1,17 @@
+Revision history for Perl extension Device::ParallelPort::drv::win32
+
+1.3  Sun Jun 26 08:39:41 EST 2005
+	- Again trying to fix the CPAN module
+
+1.2  Mon, 18 Oct 2004 09:37:27 +1000
+	- Try and fix the CPAN upload issue (not being indexed)
+
+1.1  Wed, 24 Mar 2004 20:34:37 +1100
+	- Fix the ord vs chr set_byte
+
+1.0  Wed, 24 Mar 2004 20:34:37 +1100
+	- Working Windows Version
+
+0.01  Mon, 22 Mar 2004 14:22:46 +1100
+	- Initial alpha release
+

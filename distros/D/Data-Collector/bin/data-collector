@@ -1,0 +1,36 @@
+#!/usr/bin/perl
+use strictures 1;
+package
+    datacollector;
+# ABSTRACT: command line interface for Data::Collector via Data::Collector::App
+
+use Data::Collector::App;
+
+my $app = Data::Collector::App->new_with_options;
+
+exit $app->run;
+
+__END__
+=pod
+
+=head1 NAME
+
+datacollector - command line interface for Data::Collector via Data::Collector::App
+
+=head1 VERSION
+
+version 0.15
+
+=head1 AUTHOR
+
+Sawyer X <xsawyerx@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Sawyer X.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

@@ -1,0 +1,544 @@
+==================================================
+Changes from 1742-04-22 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.023 at 2016-02-04 02:00:59 +0000
+------------------------------------------
+
+  Change: 11c11b26925d8fe803d7e87431de4e50aa36be40
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-31 09:32:01 +0000
+
+    Do not allow environment overrides with default value.
+
+    as @zmughal, empty string '' unsets an environment variable on
+    Windows, and thus the default I had chosen was unwise as it did
+    subtly different things on different platforms. If someone really
+    does want to set to '' they still can, but they have to explicitly do
+    it. Also we note that it may be unportable in the documentation. 
+
+  Change: a14b943cb8a7c1e294c131e76938c6735ae39281
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:36:56 +0000
+
+    bin_requires should not imply configure_requires 
+
+  Change: dfa6ab0b13a35b85647d246cce86ca89e64342d8
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:25:10 +0000
+
+    add support for alien_env 
+
+  Change: 53b8b4befeac6b36cd481bfff472fd03bb631ae8
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:25:10 +0000
+
+    Detect %X and adjust prereqs as appropriate. 
+
+  Change: 5b3f5a3fd59dcda4f699c94abc452215e03ae4eb
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:25:10 +0000
+
+    Ensure mvp values are mvp for the bundle as well.
+
+    Since the [@Alien] bundle just passes its config to [Alien] it can
+    use the same mvp settings. This allows multiple *_command values,
+    which is essential to make it useful. 
+
+  Change: 32c138a4c3cb14bcc2f8b6cc7bf02701b24005fc
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:25:10 +0000
+
+    add support for alien_test_commands
+
+    this option has always been available, but not documented until
+    recently. 
+
+  Change: 8ed55e268838cab2fda498158eb5ff3ae3183be4
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2016-01-29 03:24:51 +0000
+
+    add travis 
+
+  Change: 3e635a3a3660f673667900a98dff483650919dbf
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2016-01-28 20:55:28 +0000
+
+    add #native to the meta 
+
+  Change: 6b61bf66f86147a40c6eb5e9f34a8700244d0be3
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2016-01-28 20:52:15 +0000
+
+    It is also dynamic when using the default build command
+
+    on recent versions of Alien::Base, and you should probably upgrade if
+    you are using such an old AB anyway :) 
+
+  Change: 0fd14b4afb02f1b329f2c5e72f6ed916963bfabe
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2016-01-28 20:52:07 +0000
+
+    add additional dynamic config situations
+
+    if you use msys => 1 or %c in a build command then the dist will also
+    be dynamic since Alien::MSYS is installed on demand on windows only,
+    not statically. 
+
+  Change: d770c08a70009b1f8e853c65177048e748abfe8e
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2016-01-28 12:50:11 +0000
+
+    make config dynamic if alien_bin_requires is in use 
+
+------------------------------------------
+version 0.022 at 2016-01-13 12:49:00 +0000
+------------------------------------------
+
+  Change: aa4785a6aa9f277b76438ff1926612ba9d37b354
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2016-01-13 07:49:00 +0000
+
+    Make configure_requires Alien::Base::ModuleBuild
+
+    Instead of requiring Alien::Base require the installer class that
+    will actually be used during the configure stage. This has a couple
+    of advantages:
+
+    - As mentioned, it is the actual module that will be used during
+
+    the configure stage
+
+    - If we ever implement an alternate installer (either based on
+
+    EUMM or a MB replacement) then the first thing that we will
+
+    want to do is separate AB::MB from the main AB dist. This
+
+    will help future proof this process, for at least dists using
+
+    the plugin going forward. 
+
+------------------------------------------
+version 0.021 at 2015-07-15 02:13:11 +0000
+------------------------------------------
+
+  Change: 8f38dc45d524a204114b0dffa713d0b9315a2a37
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2015-07-14 21:13:11 +0000
+
+    Merge pull request #11 from plicease/version_check
+
+    add version_check 
+
+  Change: 9788241ed0e593009770e6d063e33166e05d8bcc
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-07-14 21:16:56 +0000
+
+    add version_check 
+
+------------------------------------------
+version 0.020 at 2015-07-13 13:46:32 +0000
+------------------------------------------
+
+  Change: 39d20cb87b4436463c2739f052cf67d7a55702c5
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2015-07-13 08:46:32 +0000
+
+    Merge pull request #9 from plicease/alien_0.020
+
+    Alien::Base 0.020 
+
+  Change: 973025a1446a5909972ddd1baf78e1871bbfd58c
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-07-02 09:12:36 +0000
+
+    also support exact_filename 
+
+  Change: dcc8b2b5b259010c22d3c00abaafc3e5f7c0d2da
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-07-02 08:54:47 +0000
+
+    add support for alien_provides_* 
+
+  Change: c774aa3f7bd7fb2c9f00d00e8c365c339f566efe
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-07-02 08:00:12 +0000
+
+    implement features for 0.020 
+
+------------------------------------------
+version 0.019 at 2015-07-01 12:11:48 +0000
+------------------------------------------
+
+  Change: 3cc2e840f9798692117a46a535184d7bb1378552
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2015-07-01 07:11:48 +0000
+
+    Merge pull request #8 from plicease/update_configure_example
+
+    use %c 
+
+  Change: 5df8b560b78e5d16ddb3faa4b875ae3d123731dd
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-07-01 08:08:25 +0000
+
+    use %c
+
+    Instead of %pconfigure as this is more portable 
+
+------------------------------------------
+version 0.018 at 2015-04-22 13:05:02 +0000
+------------------------------------------
+
+  Change: fc084c4d20623e6d278e3a49765a8256cd60b6a9
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2015-04-22 08:05:02 +0000
+
+    Merge pull request #7 from plicease/alien_stage_install
+
+    add alien_stage_install option 
+
+  Change: 03f3302e6eba8c53ab60ccf1363cd93011f8a1eb
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-04-22 08:42:18 +0000
+
+    grammar fixes 
+
+  Change: 4cf15e0db3f6ffa844256f9cd6a5778b22949795
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2015-04-22 07:47:27 +0000
+
+    add alien_stage_install option 
+
+------------------------------------------
+version 0.017 at 2014-12-12 03:55:48 +0000
+------------------------------------------
+
+  Change: cb3468305c01ae505885200c364e583dc2281391
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-12-11 21:55:48 +0000
+
+    remove unused Moose::Autobox dep 
+
+------------------------------------------
+version 0.016 at 2014-12-10 19:37:04 +0000
+------------------------------------------
+
+  Change: c3e8674a9391c4687af0248d69d6cdf60f310fd5
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-12-10 13:37:04 +0000
+
+    `gather_files` turned into an `after` method modifier
+
+    This is so that `DZ::Plugin::ModuleBuild` can run its own
+    `gather_files` method and `Build.PL` is available. 
+
+------------------------------------------
+version 0.014 at 2014-10-13 09:02:08 +0000
+------------------------------------------
+
+  Change: 69a82181e0d1b87831e0bd6c87fb6f1308309d2f
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-10-13 04:02:08 +0000
+
+    whitespace 
+
+  Change: c9f9dd01f0856886cd7a3545a1a0a8017a765716
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2014-10-13 03:50:25 +0000
+
+    Merge pull request #6 from plicease/alien_0.006
+
+    Support for some more Alien::Base 0.006 options 
+
+  Change: 1304496d5c713ad1aa47918d6d0b04e793aaaa3f
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2014-10-09 20:22:07 +0000
+
+    also need to add as configure requires 
+
+  Change: cac51139c6819337aa954e4a221254ccf8185fdc
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-10-09 17:49:24 +0000
+
+    document new options 
+
+  Change: 017635163d0abe2cf820ff113af53b460916f1cc
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-10-09 17:46:47 +0000
+
+    add bin_requires option 
+
+  Change: 016e234f7a99ce6b6d243aae4cd875bb4f928555
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-10-09 17:30:49 +0000
+
+    add msys option 
+
+  Change: 46b4f46b3906355aa17107be5388c3f252938e00
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2014-09-22 16:55:42 +0000
+
+    Merge pull request #5 from plicease/inline_auto_include
+
+    support for inline_auto_include 
+
+  Change: c4a9100d855a2e235dac208ca43d8bd3005237ca
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2014-09-22 17:46:57 +0000
+
+    support for inline_auto_include 
+
+------------------------------------------
+version 0.013 at 2014-09-14 23:06:21 +0000
+------------------------------------------
+
+  Change: 72b76934cc1fdd9d2af5a38fb92bc68232abbd15
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-09-14 18:06:21 +0000
+
+    remove Test::LoadModules test dependency
+
+    - from RT#98840 <https://rt.cpan.org/Ticket/Display.html?id=98840> -
+    Thanks SREZIC and GETTY 
+
+------------------------------------------
+version 0.012 at 2014-09-14 22:29:43 +0000
+------------------------------------------
+
+  Change: f89c936ca0b251d172bdd50657bbead13cd7aec4
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-09-14 17:29:43 +0000
+
+    ensure test prereqs are installed 
+
+------------------------------------------
+version 0.011 at 2014-09-11 06:23:23 +0000
+------------------------------------------
+
+  Change: 5b81a910d88338c69adc235a5d3f67f9a383d9da
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2014-09-11 01:23:23 +0000
+
+    fix whitespace 
+
+  Change: a2b1a381e0b2a2d352da4ec664d9d8a191bbbfeb
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2014-09-10 11:58:51 +0000
+
+    Merge pull request #4 from plicease/alien_0.005
+
+    add support for Alien 0.005 features 
+
+  Change: de2674424d99a00481ff6ccb434bbc474a2f5329
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-09-10 12:50:56 +0000
+
+    usage of 0.005 features will require Alien::Base 0.005 
+
+  Change: dc24c1a4ded53bd6c9e90847b5db97616faee7e8
+  Author: Graham Ollis <plicease@cpan.org>
+  Date : 2014-09-10 12:41:04 +0000
+
+    add support for new Alien::Base options 
+
+------------------------------------------
+version 0.010 at 2013-12-27 02:45:48 +0000
+------------------------------------------
+
+  Change: f3a8620a6f108b8fefe71ccb2e69b6dbeddd5cf2
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-12-26 20:45:48 +0000
+
+    use string for pattern instead of using a compiled regex
+
+    - because the compiled regex may add flags that can not be parsed
+    with
+
+    older versions of Perl 
+
+------------------------------------------
+version 0.009 at 2013-11-30 04:21:58 +0000
+------------------------------------------
+
+  Change: 9da000c53b5fadaa65952087b0841ff0d4ea7b7a
+  Author: Zaki Mughal [sivoais] <zaki.mughal@gmail.com>
+  Date : 2013-11-29 20:21:58 +0000
+
+    Merge pull request #3 from plicease/path_class
+
+    don't require Path::Class unless necessary 
+
+  Change: 1b1b1c478541098a75d6f9a709f30e2602a3ecaf
+  Author: Graham Ollis <perl@wdlabs.com>
+  Date : 2013-11-15 10:34:12 +0000
+
+    don't require Path::Class unless necessary 
+
+  Change: 542434cc91eb4f0758dcee17dbf60eb0d8440af8
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-08-15 13:36:55 +0000
+
+    revert dist.ini 
+
+------------------------------------------
+version 0.008 at 2013-08-15 18:34:05 +0000
+------------------------------------------
+
+  Change: cc462993f157b4cdaef6c7e23103ba975407274f
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-08-15 13:34:05 +0000
+
+    v0.008 
+
+  Change: c1bd9bc731378362aac0455f4ffb2abb09699f19
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-15 10:04:01 +0000
+
+    Merge pull request #1 from zmughal/feature/protocol-local-support
+
+    Add support for local repositories 
+
+  Change: 42db71ab6890f9621494dbadea670214faa030b9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-08-15 10:03:29 +0000
+
+    Merge pull request #2 from zmughal/feature/option-build-commands
+
+    add option to pass build/install commands 
+
+  Change: 349990b89b0534c1b5612648b66a3de47abbbcbb
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-15 07:33:53 +0000
+
+    fix comment 
+
+  Change: 7d454e3b5021ae3e273fd806b161f99317848343
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-15 07:32:20 +0000
+
+    add option to pass install commands 
+
+  Change: 6038823c5c049b8630349ae7af68b339923e19dd
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-12 08:19:04 +0000
+
+    indicate that build commands are optional 
+
+  Change: 5499cd9fe323442f90d7d8d1aed4c6f7c6e297a3
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-12 08:14:39 +0000
+
+    add option to pass build commands 
+
+  Change: 6dbb8e3b2b2a370992404a7bd3b68bc1b3083ca7
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-12 07:19:48 +0000
+
+    document usage of file: scheme for local repository 
+
+  Change: 73e173b5a1e4800cb3b25ff4369025b69af24c45
+  Author: Zakariyya Mughal <zaki.mughal@gmail.com>
+  Date : 2013-07-12 07:10:34 +0000
+
+    add support for local repository 
+
+------------------------------------------
+version 0.007 at 2013-03-02 22:52:51 +0000
+------------------------------------------
+
+  Change: 2ffa8fee38ce3539eaadaad947c8ba33a2bc14f1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 23:52:51 +0000
+
+    Tuning of the documentation, especially adding the Run::Test trick 
+
+------------------------------------------
+version 0.006 at 2013-03-02 20:18:36 +0000
+------------------------------------------
+
+  Change: 93ee3cec036a42985e95d945174b13e6cda8cc81
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-03-02 21:18:36 +0000
+
+    Handling of default port more proper 
+
+------------------------------------------
+version 0.005 at 2013-02-26 23:58:31 +0000
+------------------------------------------
+
+  Change: 566c3731938db0320340f306a316630db8049a52
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-27 00:58:31 +0000
+
+    Make the generated bins also executable 
+
+  Change: 55836426e24aee5aae5002527f5a64d093c24b01
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 22:41:54 +0000
+
+    Ok added a carriage return in the end 
+
+  Change: 5cfd76499d8b022db72b964e8be4f19cf13187f2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 22:41:39 +0000
+
+    A bit of documentation tuning 
+
+------------------------------------------
+version 0.004 at 2013-02-26 20:34:57 +0000
+------------------------------------------
+
+  Change: d7e018c05344d57e1feb8cde1b16ed75718bcd29
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 21:34:57 +0000
+
+    Added feature to auto add binaries, added more documentation 
+
+------------------------------------------
+version 0.003 at 2013-02-26 02:23:30 +0000
+------------------------------------------
+
+  Change: 43b46bd2a52499a2c3238c822cc0be76425c1f9f
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 03:23:30 +0000
+
+    It should also require Alien::Base 
+
+------------------------------------------
+version 0.002 at 2013-02-26 02:22:33 +0000
+------------------------------------------
+
+  Change: ab381169b6605830ae2d534090819d9a57d40991
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 03:22:33 +0000
+
+    Ok now the PluginBundle really does what is told! 
+
+------------------------------------------
+version 0.001 at 2013-02-26 02:06:56 +0000
+------------------------------------------
+
+  Change: 8449867c41b804b134f036f406448294bfc1965b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 03:06:56 +0000
+
+    Fixed requirements 
+
+  Change: 5773e0a9d3ee4ffbdbfc3d7a96437f01b9ac1bf1
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 03:00:02 +0000
+
+    Added Alien PluginBundle, added tests 
+
+  Change: 0ac4dd79cd0bf465d3180a0efa66c7567e448777
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-02-26 01:09:37 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

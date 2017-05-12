@@ -1,0 +1,47 @@
+---
+abstract: 'A class implementing a stream of bits and coding methods'
+author:
+  - 'Dana A Jacobsen <dana@acm.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-BitStream
+no_index:
+  directory:
+    - t
+    - inc
+optional_features:
+  bitvec:
+    description: 'The Bit::Vector implementation, just for example'
+    requires:
+      Bit::Vector: '0'
+  mpu:
+    description: 'Fast primes for Goldbach codes, if Data::BitStream::XS is not available'
+    requires:
+      Math::Prime::Util: '0'
+  release_testing:
+    description: 'Extra modules for author testing'
+    requires:
+      Test::Kwalitee: '0'
+      Test::Perl::Critic: '0'
+      Test::Pod: '1.41'
+      Test::Pod::Coverage: '1.08'
+requires:
+  Carp: '0'
+  Class::XSAccessor: '0'
+  Exporter: '5.57'
+  Moo: '1.000006'
+  Moo::Role: '0'
+  MooX::Types::MooseLike: '0'
+  perl: '5.006002'
+resources:
+  homepage: https://github.com/danaj/BitStream
+version: '0.08'

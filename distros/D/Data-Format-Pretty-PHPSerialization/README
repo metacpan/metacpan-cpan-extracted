@@ -1,0 +1,55 @@
+NAME
+    Data::Format::Pretty::PHPSerialization - Pretty-print data structure as
+    PHP serialization format
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+     use Data::Format::Pretty::PHPSerialization qw(format_pretty);
+     print format_pretty($data);
+
+    Some example output:
+
+    *   format_pretty({a=>1, b=>2})
+
+         a:2:{s:1:"a";i:1;s:1:"b";i:2;}
+
+DESCRIPTION
+    This module uses PHP::Serialization to encode data as PHP serialization
+    format, which I frankly wouldn't call as a "pretty" format, but added
+    for completeness sake (used by e.g. Perinci::Access::HTTP::Server).
+
+FUNCTIONS
+  format_pretty($data, \%opts)
+    Return formatted data structure as PHP serialization format. Currently
+    there are no known options.
+
+SEE ALSO
+    Data::Format::Pretty
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Format-Pretty-PHPSerialization>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Data-Format-Pretty-PHPSerialization>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Format-Pretty-PH
+    PSerialization>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

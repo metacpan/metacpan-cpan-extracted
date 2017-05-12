@@ -1,0 +1,11 @@
+501a2d10a42115702536d0
+
+master oregon 50.1a2d10a42115702536d0:
+  sensor/thgr228n.a4[temp]=15.2
+  sensor/thgr228n.a4[humidity]=57
+  sensor/thgr228n.a4[battery]=90%
+
+
+
+
+

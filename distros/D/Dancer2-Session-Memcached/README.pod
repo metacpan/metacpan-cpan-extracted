@@ -1,0 +1,23 @@
+=attr memcached_servers (required)
+
+An array (or a comma-separated list) of reachable memcached 
+servers (can be either address:port or socket paths).
+
+=head1 SYNOPSIS
+
+  # In Dancer 2 config.yml file
+
+  session: Memcached
+  engines:
+    session:
+      Memcached:
+        memcached_servers: 
+          - 10.0.1.31:11211
+          - 10.0.1.32:11211
+          - /var/sock/memcached
+
+=head1 DESCRIPTION
+
+This module implements a session factory for L<Dancer2> that stores session
+state within Memcached using L<Cache::Memcached>.
+

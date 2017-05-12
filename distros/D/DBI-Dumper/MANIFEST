@@ -1,0 +1,16 @@
+bin/dbidumper.pl
+Changes
+grammar.prd
+lib/DBI/Dumper.pm
+lib/DBI/Dumper/C.pm
+lib/DBI/Dumper/Grammar.pm
+lib/DBI/Dumper/PurePerl.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/01_use.t
+t/basic.t
+t/dbidumper.t
+t/grammar.t
+t/test.ctl

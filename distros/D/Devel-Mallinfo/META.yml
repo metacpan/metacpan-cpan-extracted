@@ -1,0 +1,35 @@
+---
+abstract: 'Get mallinfo() malloc memory stats, and more.'
+author:
+  - 'Kevin Ryde <user42_kevin@yahoo.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Mallinfo
+no_index:
+  directory:
+    - t
+    - inc
+    - devel
+optional_features:
+  maximum_tests:
+    description: 'Have "make test" do as much as possible.'
+    requires:
+      Scalar::Util: '0'
+      Test::Weaken: '0'
+requires:
+  Test: '0'
+  lib: '0'
+  perl: '5'
+  vars: '0'
+resources:
+  homepage: http://user42.tuxfamily.org/devel-mallinfo/index.html
+  license: http://www.gnu.org/licenses/gpl.html
+version: '14'

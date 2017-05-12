@@ -1,0 +1,54 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-CheckOS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Compare" : "1.21",
+            "File::Find::Rule" : "0.28",
+            "File::Temp" : "0.19",
+            "Test::More" : "0.88",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DrHyde/perl-modules-Devel-CheckOS/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/DrHyde/perl-modules-Devel-CheckOS"
+      }
+   },
+   "version" : "1.79",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,2 @@
+[% SET homepage = file.homepage_file -%]
+<h1>[% IF homepage.custom_url == url.url %][% homepage.title |encode |html %][% ELSE %]<a href="[% homepage.custom_url |html %]" rel="home">[% homepage.title |encode |html %]</a>[% END %]</h1>

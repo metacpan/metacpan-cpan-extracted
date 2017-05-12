@@ -1,0 +1,59 @@
+NAME
+    Devel::Messenger - Let Your Code Talk to You
+
+DESCRIPTION
+    Do you want your program to tell you what it is doing? Send this
+    messenger into the abyss of your code to bring back to you all the
+    pertinent information you want.
+
+    First, set notes in your code, in-line comments that start with `note'
+    instead of `#'.
+
+        # this is an in-line comment (it is boring)
+        note "this is a note (things start getting exciting now)\n";
+
+    To keep your program from giving you terrible errors about `note' not
+    being defined, give it something to do.
+
+      use subs qw{note};
+      sub note {}
+
+    Or you could import the slightly more powerful `note' subroutine defined
+    in Devel::Messenger.
+
+      use Devel::Messenger qw{note};
+
+    By itself, `note' does not do anything. Right now, all it is doing is
+    making sure Perl doesn't give you an error message and die.
+
+    So how do you make Devel::Messenger go and activate these notes?
+    Continue reading in the accompanying documentation to find out.
+
+INSTALLATION
+
+    Download distribution: Devel-Messenger-0.xx.tar.gz
+    Unzip and untar it:
+
+      gunzip Devel-Messenger-0.xx.tar.gz
+      tar -xf Devel-Messenger-0.xx.tar
+
+    Perl module standard installation procedure:
+
+      perl Makefile.PL
+      make
+      make test
+
+    Become superuser and install
+
+      make install
+
+    Full documentation is available in the Messenger.pm file as POD.
+    You may view the documentation after you have run 'make'.
+
+      perldoc Devel::Messenger
+
+    Or you can just read the POD.
+
+AUTHOR
+    Nathan Gray - kolibrie@southernvirginia.edu
+

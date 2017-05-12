@@ -1,0 +1,213 @@
+Building DBD::DB2
+-----------------
+1.  The DBD::DB2 driver is supported by DB2 UDB V8.2 and
+    later. See http://www.software.ibm.com/data/db2/perl
+    for more information on supported environments.
+2.  The DB2 Application Development Client is required.
+    You can download the client here:
+    http://www.ibm.com/software/data/db2/udb/support/
+3.  The build must be performed in a properly configured
+    DB2 environment (ie. You have installed the DB2
+    Application Development Client).  On Unix, make sure
+    the shell has sourced the sqllib/db2profile OR the
+    DB2_HOME environment variable must point to
+    the installed location of DB2.  For example, if you
+    installed DB2 to /home/inst1/sqllib then you would need
+    to export DB2_HOME=/home/inst1/sqllib before building
+    the DBD::DB2 driver.
+
+
+Common Build Errors:
+--------------------
+When compiling the DBD::DB2 driver and you see errors such
+as the following:
+
+sqlcli.h: No such file or directory
+sqlc1l1.h: No such file or directory
+sqlext.h: No such file or directory
+
+This usually means that you are not in a properly configured
+DB2 client shell. A typical case would be that you installed
+DB2 to /home/inst1/sqllib and now you are using root to install
+DBD::DB2.  The root id does not have the DB2 Client configured.
+The fix for this scenario is as follows:
+
+export DB2_HOME=/home/inst1/sqllib
+perl Makefile.PL     (This will create the proper INC)
+
+Then check the Makefile created to verify that the INC is correct.
+For example:
+
+INC = -I"/home/inst1/sqllib/include" -I"/usr/lib/perl5/site_perl
+/5.8.0/i386-linux-thread-multi/auto/DBI" -I"/usr/lib/perl5/vendor_
+perl/5.8.0/i386-linux-thread-multi/auto/DBI"
+
+The headers files are located under /home/inst1/sqllib/include.
+
+Known Test Case issues:
+-----------------------
+1) perld020_stmtWithHostVars: Due to error code changes from version V95 to V97 of DB2 you will see this test case failing against V97. 
+	This can be safely ignored as it does not impact any functionality.
+2) perld071_connIncorrectPortRemote: This test case checks that a proper connection failure message is thrown when passed wrong port information.
+	Given that the protocol specific codes is different on different platforms you might see this case failing on some platforms due to mismatch
+	in the protocol code.
+	
+Special Notes re: Linux
+-----------------------
+Some versions of gcc have problems with optimization.  This
+can cause Contants.C to take a long time to compile.  Please
+be patient, it will probably finish eventually.  If it
+doesn't, or the resulting build causes a 'Total
+Environment allocation failure!' error when you try to
+connect, you will have to edit the Makefile (after running
+perl Makefile.PL) and change:
+
+        OPTIMIZE = -O2
+          to
+        OPTIMIZE = -O0
+
+
+If during the "make test" step, you get the following error:
+
+"/auto/DBD/DB2/Constants/SQL_PARAM_I.al" cannot be located
+
+you will need to remove some constants from Constants.pm or
+Constants.C file. This file is located under the Constants
+directory.  The Constants.pm is there to allow you to use
+constants inside your perl script. You can remove all the
+constants that you don't need.
+
+
+Special Notes re: HP-UX
+-----------------------
+1.  At the present time, HP-UX V11 cannot dynamically load
+    libraries that contain thread local storage.  As such,
+    additional libraries, -lpthread and -lcl, MUST be
+    specified when building perl.  If this is not done,
+    errors will occur during the DBD::DB2 "make test" phase.
+2.  In order to avoid some warnings when building perl, DBI,
+    and DBD::DB2, you may want to add the compile option,
+    +DAportable.  This compile option is used to generate
+    code that is compatible across both PA_RISC 1.1 and 2.0
+    workstations and servers.
+3.  If an "out of memory" error is returned when compiling
+    the file Constants.c during the DBD::DB2 build process,
+    remove the "+Onolimit" compile option from the file
+    Makefile.PL in the Constants subdirectory and restart
+    the build process.  Removing this compile option will
+    result in a warning like "Exceeding compiler resource
+    limits in constants; some optimizations skipped", but
+    this warning can be ignored.
+
+
+Special Notes re: AIX 5.1
+-------------------------
+When using AIX v5.1.0.0 with DB2 v8.1.1.32 and Visual Age
+Compiler v6.0.0.0, make returns the following error:
+
+"dbdimp.c", line 1272.28: 1506-196 (E) Initialization between
+types "const unsigned char*" and "char*" is not allowed.
+"dbdimp.c", line 1273.27: 1506-196 (E) Initialization between
+ types "const unsigned char*" and "char*" is not allowed.
+
+The fix is to edit the Makefile and add "-qlanglvl=extended"
+to the CCFLAGS entry
+
+
+Special Notes re: Windows
+-------------------------
+When using MS Visual Studio 7 (cl compiler version 13.10.3077),
+"nmake test" fails. This problem can be fixed by upgrading to
+Service Pack 1 (cl compiler version 13.10.6030). With this version,
+if you continue with the install, the programs run fine.
+
+
+Special Notes re: Binding the CLI packages
+------------------------------------------
+The DBD::DB2 uses CLI to access the server. The DB2 CLI
+packages are automatically bound to the databases when the
+databases are created or migrated.  If a FixPak is applied
+to either the client or server, or a user has intentionally
+dropped a package, then you must rebind db2cli.lst, by issuing
+the following command:
+
+On UNIX:
+db2 connect to <dbAlias>
+db2 bind <BNDPATH>/.lst blocking all grant public
+
+On Windows:
+db2 connect to <dbAlias>
+db2 bind "%DB2PATH%\bnd\.lst" blocking all grant public
+
+For z/OS (OS/390) server, use the ddcsmvs.lst bind list file.
+For iSeries (AS/400) server, use the ddcs400.lst bind list file.
+For VM/VSE, use ddcsvm.lst and ddcsvse.lst bind files.
+
+For more information, please see the infocenter:
+
+http://publib.boulder.ibm.com/infocenter/db2help/index.jsp
+
+Search for CLI bind files.
+
+
+Special Notes re: Metadata functions
+------------------------------------
+Each of the perl metadata functions maps to a CLI equivalent.
+
+     DBI method        CLI function
+     ----------        -------------
+     column_info       SQLColumns
+     foreign_key_info  SQLForeignKeys
+     get_info          SQLGetInfo
+     primary_key_info  SQLPrimaryKeys
+     table_info        SQLTables
+     type_info         SQLGetTypeInfo
+
+For more information on each of the CLI functions,
+please see the infocenter:
+
+http://publib.boulder.ibm.com/infocenter/db2help/index.jsp
+
+The above link contains information for DB2 UDB v8.
+For v7 users, please consult the v7 CLI Guide And Reference.
+
+The metadata functions require certain stored procedures to
+be installed on the DB2 Server.  These stored procedures are
+installed by default, but if you get errors calling these
+methods, you may want to check that your DB2 server has the
+following pre-requisites installed:
+
+DB2 for z/OS (OS/390):
+APAR 76858
+
+DB2 for iSeries (OS/400):
+5722SS1 SI05363 is the PTF to refer to for v5r1 enablement
+
+DB2 for VM/VSE:
+Schema function stored procedures are available for download from the
+DB2 Server for VM/VSE web page:
+http://www-306.ibm.com/software/data/db2/vse-vm/support/dwnldsfs.html
+
+
+Special Notes re: type_info
+---------------------------
+To retrieve the type information for DATE, TIME or TIMESTAMP,
+you must pass to $dbh->type_info one of the following constants:
+
+SQL_TYPE_DATE
+SQL_TYPE_TIME
+SQL_TYPE_TIMESTAMP
+
+For example:
+
+use DBD::DB2::Constants;
+@ra = $dbh->type_info( SQL_TYPE_DATE );
+
+
+Unsupported Features
+--------------------
+1.  Fetching any type of LOB directly to a file.
+2.  The child process of a fork cannot use the DB2 Perl driver
+    whatsoever.  In addition the child process must turn on the
+    InactiveDestroy flag for any DBI handles inherited.
+3.  Local row caching: $dbh->{RowCacheSize} and $sth->{RowsInCache}

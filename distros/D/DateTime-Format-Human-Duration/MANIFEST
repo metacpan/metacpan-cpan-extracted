@@ -1,0 +1,23 @@
+Build.PL
+Changes
+lib/DateTime/Format/Human/Duration.pm
+lib/DateTime/Format/Human/Duration/Locale.pm
+lib/DateTime/Format/Human/Duration/Locale/de.pm
+lib/DateTime/Format/Human/Duration/Locale/es.pm
+lib/DateTime/Format/Human/Duration/Locale/fr.pm
+lib/DateTime/Format/Human/Duration/Locale/it.pm
+lib/DateTime/Format/Human/Duration/Locale/ja.pm
+lib/DateTime/Format/Human/Duration/Locale/ko.pm
+lib/DateTime/Format/Human/Duration/Locale/pt.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.methods.t
+t/02.array.t
+t/lib/DateTime/Format/Human/Duration/Locale/nb.pm
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

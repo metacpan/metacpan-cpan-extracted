@@ -1,0 +1,80 @@
+{
+   "abstract" : "PPPort for Dist::Zilla",
+   "author" : [
+      "Leon Timmermans <leont@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.011, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-PPPort",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "File::Spec::Functions" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types::Perl" : "0",
+            "MooseX::Types::Stringlike" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Path::Class" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::PPPort" : {
+         "file" : "lib/Dist/Zilla/Plugin/PPPort.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-ppport at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-PPPort"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Leont/dist-zilla-plugin-ppport.git",
+         "web" : "https://github.com/Leont/dist-zilla-plugin-ppport"
+      }
+   },
+   "version" : "0.007"
+}
+

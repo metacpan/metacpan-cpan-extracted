@@ -1,0 +1,1 @@
+this is a {% include "included_with.txt" with test1="test2" test2=var1 %} include {{ with.substitution }}

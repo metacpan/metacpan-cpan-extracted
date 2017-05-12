@@ -1,0 +1,44 @@
+Changes
+Makefile.PL
+lib/Device/Cisco/NXAPI.pm
+lib/Device/Cisco/NXAPI/Test.pm
+MANIFEST			This list of files
+MANIFEST.bak
+README
+t/00-load.t
+t/01-physical_interfaces.t
+t/02-routes_ipv4.t
+t/03-arp.t
+t/04-bgp_rib.t
+t/05-bgp_peers.t
+t/json/arp/show_ip_arp.json
+t/json/bgp/show_bgp_ip_unicast.json
+t/json/bgp/show_bgp_ip_unicast_neighbors.json
+t/json/bgp/show_bgp_ip_unicast_vrf_all.json
+t/json/bgp/show_bgp_ip_unicast_vrf_other_vrf.json
+t/json/bgp/show_bgp_ipv6_unicast.json
+t/json/cdp/show_cdp_neighbors.json
+t/json/interface/show_interface.json
+t/json/interface/show_ip_interface_vrf_all.json
+t/json/interface/show_ipv6_interface_vrf_default.json
+t/json/ospf/show_ip_ospf.json
+t/json/ospf/show_ip_ospf_database_detail.json
+t/json/route/no_vrf_present.json
+t/json/route/show_ip_route.json
+t/json/route/show_ip_route_multiple_paths.json
+t/json/route/show_ip_route_vrf_all.json
+t/json/route/show_ip_route_vrf_default.json
+t/json/route/show_ip_route_vrf_empty_vrf.json
+t/json/route/show_ip_route_vrf_other_vrf.json
+t/json/route/show_ipv6_route.json
+t/json/route/show_ipv6_route_vrf_default.json
+t/json/route/show_ipv6_route_vrf_other_vrf.json
+t/json/system/show_environment.json
+t/json/system/show_version.json
+t/json/vlans/show_vlan.json
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

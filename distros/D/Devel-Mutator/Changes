@@ -1,0 +1,18 @@
+Revision history for Perl extension Devel-Mutator
+
+0.03 2016-09-21T18:43:01Z
+
+    - pass the command argument into Devel::Mutator::Command::Test constructor
+      (pvallev)
+    - switched operators: "less than" now opposite of "greater than or equal to"
+      (hooverbag)
+
+0.02 2015-04-02T11:22:57Z
+
+    - incompatibility with perl 5.10.1 and earlier (chorny)
+    - escape $mutants_dir in regex (chorny)
+
+0.01 2015-02-18T11:32:07Z
+
+    - original version
+

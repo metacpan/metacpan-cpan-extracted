@@ -1,0 +1,471 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Validator
+
+=head1 DESCRIPTION
+
+This module contains factory functions to generate I<tubes> that ease
+validation of records.
+
+The factory functions below have two names, one starting with
+C<validate_> and the other without this prefix. They are perfectly
+equivalent to each other, whereas the short version can be handier e.g.
+when using C<tube> or C<pipeline> from L<Data::Tubes>.
+
+=head1 FUNCTIONS
+
+=head2 B<< admit >>
+
+   $tube = admit(@validators); # OR
+   $tube = admit(@validators, \%args);
+
+simple validator mainly aimed at providing regular expressions to be
+tested against text input. For this reason, the default input field from
+the record is C<raw> and not C<structured> like in L</thoroughly>,
+although you can override it.
+
+The goal of this validator is to get rid of uninteresting parts quickly.
+For this reason, there is no on-the-fly collection of validation
+outcomes; see L</thoroughly> if you need them.
+
+The input record MUST be a hash reference I<except> when C<input> is set
+to C<undef>. In this case it can be almost anything, although it SHOULD
+be a string if you plan using regular expressions (anything that
+stringifies will do, anyway).
+
+C<@validators> can be either regular expressions or sub references. All
+of them MUST pass to get the input record out, otherwise you will get
+nothing (which means that the particular section of the pipeline will
+stop here for the specific record). You can revert this behaviour
+setting option C<refuse> to a I<true> value.
+
+Accepts the following options:
+
+=over
+
+=item C<input>
+
+the name of the input field in the input record. Defaults to C<raw>,
+which means that this validator is mainly aimed at filtering input
+records before they are parsed. You can set it to C<undef> and the input
+record itself will be validated, not a subfield;
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<refuse>
+
+boolean flag to indicate that the test should be reversed, i.e. that all
+provided C<@validators> MUST fail for getting the record on. If this is
+the case, you might be interested in using L</validate_refuse>, because
+it advertises your intentions a bit more clearly.
+
+=back
+
+=head2 B<< refuse >>
+
+   $tube = refuse(@validators); # OR
+   $tube = refuse(@validators, \%args);
+
+This is the same as L</validate_admit>, except that the parameter
+C<refuse> is inconditionally set to a true value. No, you cannot revert
+this setting C<refuse> to a false value explicitly, because it would not
+be sane.
+
+=head2 B<< refuse_comment >>
+
+   $tube = refuse_comment(%args); # OR
+   $tube = refuse_comment(\%args);
+
+Thin wrapper around L</validate_refuse> to eliminate comment lines,
+defined as any line that starts with optional spaces and whose first
+non-space character is the hash C<#>.
+
+=head2 B<< refuse_comment_or_empty >>
+
+   $tube = refuse_comment(%args); # OR
+   $tube = refuse_comment(\%args);
+
+Thin wrapper around L</validate_refuse> to eliminate comment or empty
+lines, defined as any line that starts with optional spaces and whose
+first non-space character, if present, is the hash C<#>.
+
+=head2 B<< refuse_empty >>
+
+   $tube = refuse_comment(%args); # OR
+   $tube = refuse_comment(\%args);
+
+Thin wrapper around L</validate_refuse> to eliminate empty lines,
+defined as any line that only contains optional whitespaces.
+
+=head2 B<< thoroughly >>
+
+   $tube = thoroughly(@validators); # OR
+   $tube = thoroughly(@validators, \%args);
+
+validate record according to provided C<@validators>.
+
+Differently from other validators in this plugin:
+
+=over
+
+=item *
+
+the input record MUST be a hash reference;
+
+=item *
+
+the input to be validated is set via argument C<input>, that defaults to
+C<structured> (instead of C<raw>). You might want to change this if you
+intend to use regular expression validators;
+
+=item *
+
+one field in the hash (according to factory argument C<output>, set to
+C<validation> by default) is set to the output of the validation
+operation.
+
+=back
+
+Items in C<@validators> can be sub references, regex references or array
+references, as explained below. An optional hash reference at the end
+can carry options, see below for their explanation.
+
+A I<validator> basically boils down to a sub reference that is called to
+perform the validation, or a regular expression. It can be either
+provided directly as an item in C<@validators>, or embedded in an array
+reference, prefixed with a I<name> and with optional additional
+parameters. Example:
+
+   $tube = thoroughly(
+      sub { $_[0]{foo} =~ /bar|baz/ }, # straight sub ref
+      [
+         'Number should be even',
+         sub { $_[0]{number} % 2 == 0 },
+      ],
+      [
+         'Name of something else',
+         sub { ... },
+         @parameters
+      ],
+   );
+
+The validator function will be called in I<list> context, like this:
+
+   my @outcome = $validator->(
+      $target,     # what pointed by "input", or the whole record
+      $record,     # the whole record, if necessary
+      \%args,      # args passed to the factory
+      @parameters, # anything sub in the array ref version
+   );
+
+The validator can:
+
+=over
+
+=item *
+
+return the empty list, in which case the validation is considered
+I<failed>;
+
+=item *
+
+return a single value, that represents the outcome of the validation.
+Anything considered I<false> by Perl means that the validation failed,
+otherwise the validation is considered a success;
+
+=item *
+
+return more values, the first representing the outcome of the validation
+as in the previous bullet, the following ones things that you want to
+track as the outcome of the validation (e.g. some explanation of what
+went wrong with the validation).
+
+=back
+
+If one of the validators throws an exception, this will not be trapped
+unless C<wrapper> is set properly. See below if you want to catch
+exceptions and transform them into failed validation steps.
+
+All validations are performed in the order provided in C<@validators>,
+independently of whether they succeed or fail. This is by design, so
+that you can provide a thorough feedback about what you think is wrong
+with the input data.
+
+Validation outcomes are collected into an array of arrays that is
+eventually referenced by the record provided as output (which is the
+same as the input, only augmented). By default this array of arrays is
+referenced by key C<validation>, but you can control the key via option
+C<output>.
+
+Normally, only failed validations are collected in the array, so that
+you can easily check if validation was successful at a later stage. You
+can decide to collect all outcomes via option C<keep_positives>.
+
+By default, if the validation collection procedure does not collect
+anything (i.e. all validations were successful and C<keep_positives> is
+I<false>), the output key is set to C<undef>, so that you can check for
+validation errors very quickly instead of checking the number of items
+in the array. If you prefer to receive an empty array instead, you can
+set option C<keep_empty>.
+
+You can wrap the call to all your validators via an optional C<wrapper>
+sub reference. This means that the following call will be used instead:
+
+   my @outcome = $wrapper->(
+      $validator,  # the validation function
+      $target,     # what pointed by "input", or the whole record
+      $record,     # the whole record, if necessary
+      \%args,      # args passed to the factory
+      @parameters, # anything sub in the array ref version
+   );
+
+In this case, your C<wrapper> function will be responsible for calling
+C<$validator> in the right way. You can use this e.g. to perform some
+adaptation of interface for either the input or the output of the
+validation sub. As a matter of fact, in this case C<$validator> is not
+even required to be a sub reference.
+
+In addition to setting C<wrapper> to a sub reference, you can also set
+it to the string C<try>. This will wrap the call to the validator in a
+C<try>/C<catch> using L<Try::Tiny>, which you are supposed to have
+installed independently.
+
+Allowed arguments are:
+
+=over
+
+=item C<input>
+
+the name of the input field in the record. Defaults to C<structured>, in
+the assumption that you will want to perform validation after parsing,
+but you can of course set it to whatever you want. If you set it to
+C<undef>, the whole input record will be considered the C<$target> for
+the validation. Keep in mind that each validator will always receive
+also a reference to the C<$record> as the second argument anyway;
+
+=item C<keep_empty>
+
+if all validators succeed and C<keep_positives> below is I<false>, the
+overall outcome of the validation process will be an empty array. This
+option allows you to control whether you want an empty array as
+C<output> in this case, or you prefer to receive a I<false> value for
+quicker identification of I<no validation errors> condition. Defaults to
+C<0>, i.e. a I<false> value, meaning that you will receive an undefined
+value in C<output> in case all validations were successful;
+
+=item C<keep_positives>
+
+validations that are successful are normally discarded, as you are
+assumed to be interested into failures most. If you want an account of
+all the validation steps, instead, you can set this flag to a I<true>
+value. Defaults to C<0>, a I<false> value, meaning that positive
+validations are discarded;
+
+=item C<name>
+
+the name of the tube, useful when debugging. Defaults to C<validate with
+subs>;
+
+=item C<output>
+
+the name of the output field in the output record. Defaults to
+C<validation>.
+
+=item C<wrapper>
+
+a subroutine to wrap each call to a validator. In this case,
+C<thoroughly> will call the wrapper instead, passing as the first
+parameter the I<validator>, then the list of parameter it would have
+passed to the validator itself.
+
+You can also pass the special value C<try>, that allows you to set the
+following wrapper subroutine equivalent:
+
+   use Try::Tiny;
+   sub {
+      my ($validator, @parameters) = @_;
+      return try {
+         $validator->(@parameters);
+      }
+      catch {
+         (0, $_);
+      };
+   }
+
+except that L<Try::Tiny> is loaded dynamically at runtime and no
+function is imported. This allows you to turn exceptions into failed
+validations (note that the first item in the expression inside the
+C<catch> part is C<0>, i.e. a failed validation) where the exception
+iteself is passed as additional "reason" that is eventually collected in
+the outcome.
+
+=back
+
+A few examples should be of help now.
+
+First, an example with validators that all return a true or false value,
+hence there is nothing to trap:
+
+   my $v = thoroughly(
+      sub { $_[0]{foo} =~ /bar|baz/ },
+      ['is-even' => sub { $_[0]{number} % 2 == 0 }],
+      ['in-bounds' =>
+       sub { $_[0]{number} >= 10 && $_[0]{number} <= 21}]
+   );
+
+   my $o1 = $v->({structured => {foo => 'bar', number => 12}});
+   my $o2 = $v->({structured => {foo => 'bar', number => 13}});
+   my $o3 = $v->({structured => {foo => 'hey', number => 3}});
+
+In all cases the output record contains a new C<validation> key,
+pointing to:
+
+=over
+
+=item * 
+
+C<$o1> an C<undef> value
+
+=item *
+
+C<$o2> an array reference like this:
+
+   [ ['is-even', ''] ]
+
+because the test C<is-even> fails returning an empty string
+
+=item *
+
+C<$o3> an array reference like this:
+
+   [
+      ['validator-0', 0],  # empty list transformed into "0"
+      ['is-even', ''],     # empty string from validator
+      ['in-bound', '']     # empty string from validator
+   ]
+
+=back
+
+As you can see, in the case of the first test a name is automatically
+generated based on the index of the test in the list of validators.
+
+Here's an example for trapping exceptions:
+
+   my $v= thoroughly(
+      sub { $_[0]{foo} =~ /bar|baz/ },
+      ['is-even' => 
+       sub { ($_[0]{number} % 2 == 0) or die "odd\n" }],
+      ['in-bounds' =>
+       sub { $_[0]{number} >= 10 or die "too low\n" }],
+      {wrapper => 'try'},
+   );
+
+   my $o4 = $v->({structured => {foo => 'bar', number => 13}});
+   my $o5 = $v->({structured => {foo => 'hey', number => 3}});
+
+Again, you will get a C<validation> key in each output record, like
+this:
+
+=over
+
+=item C<$o4>
+
+only the first test fails in this case, so this is what you get:
+
+   [ ['is-even', 0, "odd\n"] ]
+
+=item C<$o5>
+
+all three tests fail, two with exception, leading to this:
+
+   [
+      ['validator-0', 0],        # as before
+      ['is-even', 0, "odd\n"],   # exception to failure
+      ['in-bound', 0, "too low"] # exception to failure
+   ]
+
+=back
+
+You hopefully get the idea at this point.
+
+It's important to always remember the difference between the following
+validators:
+
+   sub { ($_[0]{number} % 2 == 0) or die "odd\n" };
+   sub { die "odd\n" if $_[0]{number} % 2 };
+
+The second validator I<always fails>: it either throws an exception, or
+returns a I<false> value. This is not the case with the first one.
+Always remember to return a true value from your validators, like this:
+
+   sub { die "odd\n" if $_[0]{number} % 2; 1 }
+
+(Yes, this actually happened while writing the tests...)
+
+=head2 B<< validate_admit >>
+
+Alias for L</admit>.
+
+=head2 B<< validate_refuse >>
+
+Alias for L</refuse>.
+
+=head2 B<< validate_refuse_comment >>
+
+Alias for L</refuse_comment>.
+
+=head2 B<< validate_refuse_comment_or_empty >>
+
+Alias for L</refuse_comment_or_empty>.
+
+=head2 B<< validate_refuse_empty >>
+
+Alias for L</refuse_empty>.
+
+=head2 B<< validate_thoroughly >>
+
+Alias for L</thoroughly>.
+
+=head2 B<< validate_with_subs >>
+
+Alias for L</with_subs>.
+
+=head2 B<< with_subs >>
+
+   $tube = with_subs(@validators); # OR
+   $tube = with_subs(@validators, \%args);
+
+This function is DEPRECATED and currently aliased to L</thoroughly>. It
+used to do all that L</thoroughly> does, except handling regular
+expression validators; now ith supports them too, which is why a name
+change was necessary.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

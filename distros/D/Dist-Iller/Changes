@@ -1,0 +1,218 @@
+Revision history for Dist-Iller
+
+0.1408 2016-03-12 20:16:19 UTC
+ [New Features]
+ - Can add all prereqs as authordeps (add_prereqs_as_authordeps)
+
+ [Stats & Dependency Changes]
+ - 17 files changed, 37 insertions(+), 17 deletions(-)
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) ~ Dist::Iller 0.1407 --> 0.1408
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0308 --> 0.0309
+
+0.1407 2016-02-18T19:06:10Z UTC
+ [New Features]
+ - Configs can now add a list of default prereq versions. If no version is
+   given in iller.yaml, the default version is used. Only already added
+   prereqs are checked for default versions.
+ - Add Gitignore doctype.
+
+ [Stats & Dependency Changes]
+ - 20 files changed, 186 insertions(+), 22 deletions(-)
+ - (run req) ~ Carp (any) --> 1.38
+ - (run req) ~ DateTime (any) --> 1.05
+ - (run req) ~ File::ShareDir (any) --> 1.102
+ - (run req) ~ File::chdir (any) --> 0.1010
+ - (run req) ~ JSON::MaybeXS (any) --> 1.003003
+ - (run req) ~ List::MoreUtils (any) --> 0.408
+ - (run req) ~ List::Util (any) --> 1.42
+ - (run req) ~ Module::Load (any) --> 0.26
+ - (run req) ~ MooseX::AttributeDocumented (any) --> 0.1003
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ MooseX::StrictConstructor (any) --> 0.19
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ PerlX::Maybe (any) --> 1.001
+ - (run req) ~ Safe::Isa (any) --> 1.000005
+ - (run req) ~ Try::Tiny (any) --> 0.24
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (run req) ~ YAML::Tiny (any) --> 1.67
+ - (run req) ~ version (any) --> 0.9913
+ - (test req) ~ File::chdir (any) --> 0.1010
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Badge::Depot (any) --> 0.0103
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+   --> 0.0100
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::NextRelease::Grouped (any) --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.054
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Kwalitee::Extra (any) --> v0.2.1
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.05
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Homepage::DefaultCPAN (any) --> 0.05
+ - (dev req) ~ Pod::Weaver::Section::Source::DefaultGitHub (any) --> 0.07
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev sug) ~ Dist::Iller 0.1406 --> 0.1407
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0307 --> 0.0308
+
+0.1406 2016-02-18T00:20:14Z UTC
+ [New Features]
+ - Plugins can now add additional prereqs.
+
+ [Enhancements]
+ - Dist::Iller (and any used configs) are now added to prereqs as develop
+   suggests (instead of required).
+
+ [Stats & Dependency Changes]
+ - 19 files changed, 87 insertions(+), 28 deletions(-)
+ - (dev req) + Badge::Depot (any)
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   (any) --> 0.007
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) - Dist::Iller
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev sug) + Dist::Iller 0.1406
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0307
+
+0.1405 2016-02-15T16:22:28Z UTC
+ [Other Changes]
+ - Authority added to all packages.
+
+ [Bug Fixes]
+ - Now ::DocType::Cpanfile reads META.json after dzil has run, the previous
+   release didn't quite get there.
+
+ [Stats & Dependency Changes]
+ - 17 files changed, 64 insertions(+), 47 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) ~ Dist::Iller 0.1404 --> 0.1405
+ - (dev req) ~ Dist::Iller::Config::Author::CSSON 0.0303 --> 0.0304
+ - (dev req) ~ Dist::Zilla::Plugin::RewriteVersion::Transitional (any) -->
+   0.007
+
+0.1404 2016-02-11T23:27:47Z UTC
+ [Enhancements]
+ - ::DocType::Cpanfile now reads META.json after dzil has run, and then the
+   cpanfile is created to ensure that it contains all prereqs.
+
+0.1403 2016-02-10T23:01:50Z UTC
+ [New Features]
+ - Added basic support for generating cpanfile.
+
+0.1402 2016-02-07T15:12:47Z UTC
+ [New Features]
+ - Add +documentation parameter for plugins in configs (planned to be used
+   in a future Pod::Weaver plugin).
+
+ [Requirements]
+ - Removed some no longer used dependencies.
+
+0.1401 2016-02-05T22:38:01Z UTC
+ [Bug Fixes]
+ - The version of a prereq should be updatable.
+
+0.1400 2016-02-05T20:25:34Z UTC
+ [API Changes]
+ - Configs should now do the Dist::Iller::Config role instead of
+   Dist::Iller::Role::Config.
+
+ [Enhancements]
+ - Heavily refactored.
+ - Ensure plugins are only added once.
+ - Files are always generated in the same order.
+ - Dist::Iller (and any used configs) are automatically added as develop
+   prereqs (and requires the version used).
+
+ [Testing]
+ - Tests now generates files in a tempdir (instead of just to_string-ing
+   them)
+
+0.1302 2016-02-03T17:18:44Z UTC
+ [Enhancements]
+ - Only add develop requirements to authordeps.
+
+0.1301 2016-02-03T15:47:08Z UTC
+ [Enhancements]
+ - Add +version parameter for plugins to set minimum required version.
+
+ [Bug Fixes]
+ - Add Dist::Zilla plugins to authordeps (and not just Pod::Weaver
+   plugins).
+
+0.1300 2016-01-29T17:21:18Z UTC
+ [Other Changes]
+ - Removed dependency on Moops/Kavorka, should now work on 5.10+.
+ - Built using dzil plugins in Dist::Iller::Config::Author::CSSON instead
+   of maintaining separate plugin list.
+
+0.1204 2016-01-22T16:46:56Z UTC
+ [Requirements]
+ - New prereqs: Module::Load, Carp.
+
+ [Testing]
+ - Fixed config test.
+
+ [Other Changes]
+ - Removed [CheckExtraTests].
+ - Added [Test::Compile] (and removed t/basic.t).
+
+0.1203 2016-01-09T21:53:44Z UTC
+ [Enhancements]
+ - Mention in the .ini-files which configs (and versions) where used to
+   build them.
+
+ [Requirements]
+ - New develop requirements: D::Z::P::MetaProvides::Package,
+   D::Z::P::MetaProvides::Class.
+
+ [Other Changes]
+ - Add provides in Meta for all classes.
+
+ [Documentation]
+ - Fixed outdated example in the synopsis.
+
+0.1202 2015-11-27T15:29:57Z UTC
+ [Requirements]
+ - Fixed missing prereq (fixes #2, SREZIC++)
+ - Test::Pod should now be a develop prereq rather than build.
+
+ [Other Changes]
+ - Fixed some minor kwalitee issues.
+
+0.1201 2015-11-24T12:56:59Z UTC
+ [Meta]
+ - Fixed version number.
+
+0.1200 2015-11-24T12:42:53Z UTC
+ - Initial release

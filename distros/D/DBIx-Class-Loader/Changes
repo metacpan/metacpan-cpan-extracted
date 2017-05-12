@@ -1,0 +1,92 @@
+Revision history for Perl extension DBIx::Class::Loader
+
+0.21  Mon Feb 27 23:42:48 2006
+        - Reverted the additional_base / left_base behavior
+	  to the original behavior, so that at least existing
+	  users get what they expect.  Schema::Loader will be
+	  doing things somewhat differently...
+
+0.20  Tue Feb 14 18:26:31 2006
+        - Added correct bug contact info
+        - Vendor modules now use ->storage
+
+0.19  Sun Feb 12 22:24:32 2006
+        - No longer tries to parse out the table name from the dsn for mysql,
+          was unneccesary vestigial code from previous method.
+
+0.18  Sat Feb 04 00:18:58 2006
+        - Docs updates, including module deprecation notice
+
+0.17  Fri Feb 03 01:45:27 2006
+        - Set postgresql default schema back to 'public' instead of ''
+
+0.16  Tue Jan 31 03:33:48 2006
+        - Fixed tests on non-innodb mysql installations
+        - do ->storage->dbh->disconnect when done loading
+        - croak if required args namespace or dsn not specified
+
+0.15  Thu Jan 26 02:05:30 2006
+        - tons of DB2-related fixes
+        - better schema support for postgres
+        - bugfix to sqlite pk-finding
+        - test updates/fixes
+        - fixes for injecting base classes
+        - mysql quoting detection more reliable
+        - DBIx::Class dependency bumped to 0.04001
+
+0.14  Sat Jan 21 00:05:11 2006
+        - Bugfix to pgsql tests
+        - Bugfix for pause/cpan module version parsing
+
+0.13  Thu Jan 19 06:40:11 2006
+        - Test suite infrastructure overhauled
+        - New advanced relationship testing [chisel]
+        - Several relationship fixes
+        - some minor pod cleanup
+        - misc bugfixes
+
+0.12  Fri Jan 13 06:09:04 2006
+        - Changed "comment" to "Comment" for mysql "SHOW TABLE STATUS"
+        - Added relationship tests for pg, mysql, and db2
+
+0.11  Mon Jan 02 17:25:14 2006
+        - use UNIVERSAL::require for loading the implementation class [Jason Kohles]
+        - docs fixes [Jason Kohles]
+        - fixed http://rt.cpan.org/NoAuth/Bug.html?id=16100 (implicit disconnects) [blblack]
+        - carp rather than croak if a table has no PKs [blblack]
+        - Added test for DB2 [blblack]
+
+0.10  Tue Dec 20 06:22:23 2005
+        - Fixed foreign key relationships to columns other than primary keys [blblack]
+        - Fixed mysql test script [blblack]
+        - Some schema support added [castaway]
+        - DB2 support added [castaway]
+
+0.09  Mon Nov 07 18:00:00 2005
+        - Updated mysql loader
+
+0.08  Mon Nov 07 18:00:00 2005
+        - Fixed Pg loader
+
+0.07  Mon Nov 07 18:00:00 2005
+        - Fixed mysql loader
+
+0.06  Thu Nov 03 18:00:00 2005
+        - Fixed the _croak bug
+
+0.05  Wed Nov 02 18:00:00 2005
+        - Fixed dump output
+
+0.04  Wed Nov 02 18:00:00 2005
+        - Fixed Pg loader
+
+0.03  Wed Nov 02 18:00:00 2005
+        - new version number :P
+
+0.02  Mon Oct 24 18:00:00 2005
+        - Added $DBIx::Class::Loader::SCHEMA
+        - Fixed Pg loader
+        - Bumped version dependency.
+
+0.01  Mon Sep 19 00:00:00 2005
+        - original version.

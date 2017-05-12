@@ -1,0 +1,264 @@
+
+
+
+DBI::Shell(3)  User Contributed Perl Documentation  DBI::Shell(3)
+
+
+NNNNAAAAMMMMEEEE
+       DBI::Shell - Interactive command shell for the DBI
+
+SSSSYYYYNNNNOOOOPPPPSSSSIIIISSSS
+         perl -MDBI::Shell -e shell [<DBI data source> [<user> [<password>]]]
+
+       or
+
+         dbish [<DBI data source> [<user> [<password>]]]
+         dbish --debug [<DBI data source> [<user> [<password>]]]
+         dbish --batch [<DBI data source> [<user> [<password>]]] < batch file
+
+
+DDDDEEEESSSSCCCCRRRRIIIIPPPPTTTTIIIIOOOONNNN
+       The DBI::Shell module (and dbish command, if installed)
+       provide a simple but effective command line interface for
+       the Perl DBI module.
+
+       DBI::Shell is very new, very experimental and very subject
+       to change.  Your mileage _w_i_l_l vary. Interfaces _w_i_l_l change
+       with each release.
+
+TTTTOOOO DDDDOOOO
+       Proper docs - but not yet, too much is changing.
+
+       "/source file" command to read command file.  Allow to
+       nest via stack of command file handles.  Add command log
+       facility to create batch files.
+
+       Commands:
+
+       Use Data::ShowTable if available.
+
+       Define DBI::Shell plug-in semantics.       Implement
+       import/export as plug-in module
+
+       Clarify meaning of batch mode
+
+       Completion hooks
+
+       Set/Get DBI handle attributes
+
+       Portability
+
+       Emulate popular command shell modes (Oracle, Ingres etc)?
+
+AAAARRRRGGGGUUUUMMMMEEEENNNNTTTTSSSS
+       debug
+           dbish --debug  enable debug messages
+
+       batch
+           dbish --batch < batch_file
+
+CCCCOOOOMMMMMMMMAAAANNNNDDDDSSSS
+       Many commands - few documented, yet!
+
+       help
+             /help
+
+
+
+       chistory
+             /chistory          (display history of all commands entered)
+             /chistory | YourPager (display history with paging)
+
+
+       clear
+             /clear             (Clears the current command buffer)
+
+
+       commit
+             /commit            (commit changes to the database)
+
+
+       connect
+             /connect           (pick from available drivers and sources)
+             /connect dbi:Oracle (pick source from based on driver)
+             /connect dbi:YourDriver:YourSource i.e. dbi:Oracle:mysid
+
+           Use this option to change userid or password.
+
+       current
+             /current            (Display current statement in the buffer)
+
+
+       do
+             /do                 (execute the current (non-select) statement)
+
+                   dbish> create table foo ( mykey integer )
+                   dbish> /do
+
+                   dbish> truncate table OldTable /do (Oracle truncate)
+
+
+       drivers
+             /drivers            (Display available DBI drivers)
+
+
+       edit
+             /edit               (Edit current statement in an external editor)
+
+           Editor is defined using the environment variable
+           $VISUAL or $EDITOR or default is vi.  Use /option
+           editor=new editor to change in the current session.
+
+           To read a file from the operating system invoke the
+           editor (/edit) and read the file into the editor
+           buffer.
+
+       exit
+             /exit              (Exits the shell)
+
+
+       get
+             /get               (Retrieve a previous command to the current buffer)
+
+
+       go
+             /go                (Execute the current statement)
+
+           Run (execute) the statement in the current buffer.
+           This is the default action if the statement ends with
+           /
+
+                   dbish> select * from user_views/
+
+                   dbish> select table_name from user_tables
+                   dbish> where table_name like 'DSP%'
+                   dbish> /
+
+                   dbish> select table_name from all_tables/ | more
+
+
+       history
+             /history            (Display combined command and result history)
+             /history | more
+
+
+       load
+             /load file name    (read contains of file into the current buffer)
+
+           The contains of the file is loaded as the current
+           buffer.
+
+       option
+             /option [option1[=value]] [option2 ...]
+             /option            (Displays the current options)
+             /option   MyOption (Displays the value, if exists, of MyOption)
+             /option   MyOption=4 (defines and/or sets value for MyOption)
+
+
+       perl
+             /perl               (Evaluate the current statement as perl code)
+
+
+       quit
+             /quit               (quit shell.  Same as exit)
+
+
+       redo
+             /redo               (Re-execute the previously executed statement)
+
+
+       rhistory
+             /rhistory           (Display result history)
+
+
+       rollback
+             /rollback           (rollback changes to the database)
+
+           For this to be useful, turn the autocommit off.
+           /option autocommit=0
+
+       run
+             /run file name      (load and execute a file.)
+
+           This commands load the file (may include full path)
+           and executes.  The file is loaded (replaces) the
+           current buffer.  Only 1 statement per file is allowed
+           (at this time).
+
+       save
+             /save file name    (write contains of current buffer to file.)
+
+           The contains of the current buffer is written to file.
+           Currently, this command will overwrite a file if it
+           exists.
+
+       table_info
+             /table_info         (display all tables that exist in current database)
+             /table_info | more  (for paging)
+
+
+       trace
+             /trace              (set DBI trace level for current database)
+
+           Adjust the trace level for DBI 0 - 4.  0 off.  4 lots
+           of information.  Useful for determining what is really
+           happening in DBI.  See DBI.
+
+       type_info
+             /type_info          (display data types supported by current server)
+
+
+EEEENNNNVVVVIIIIRRRROOOONNNNMMMMEEEENNNNTTTT
+       DBISH_TMP
+           Where to write temporary files.
+
+       DBISH_CONFIG
+           Which configuration file used.  Unset to not read any
+           additional configurations.
+
+AAAAUUUUTTTTHHHHOOOORRRRSSSS aaaannnndddd AAAACCCCKKKKNNNNOOOOWWWWLLLLEEEEDDDDGGGGEEEEMMMMEEEENNNNTTTTSSSS
+       The DBI::Shell has a long lineage.
+
+       It started life around 1994-1997 as the pmsql script
+       written by Andreas König. Jochen Wiedmann picked it up and
+       ran with it (adding much along the way) as _d_b_i_m_o_n, bundled
+       with his DBD::mSQL driver modules. In 1998, around the
+       time I wanted to bundle a shell with the DBI, Adam Marks
+       was working on a dbish modeled after the Sybase sqsh
+       utility.
+
+       Wanting to start from a cleaner slate than the feature-
+       full but complex dbimon, I worked with Adam to create a
+       fairly open modular and very configurable DBI::Shell
+       module. Along the way Tom Lowery chipped in ideas and
+       patches. As we go further along more useful code and
+       concepts from Jochen's dbimon is bound to find it's way
+       back in.
+
+CCCCOOOOPPPPYYYYRRRRIIIIGGGGHHHHTTTT
+       The DBI::Shell module is Copyright (c) 1998 Tim Bunce.
+       England.  All rights reserved. Portions are Copyright by
+       Jochen Wiedmann, Adam Marks and Tom Lowery.
+
+       You may distribute under the terms of either the GNU
+       General Public License or the Artistic License, as
+       specified in the Perl README file.
+
+
+
+2001-06-04                 perl v5.6.1                          1
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

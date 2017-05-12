@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-Plugin-Version-Git-Flowish
+
+0.09 Feb 11 2012
+  - Typo fix in POD. (John "genehack" Anderson)
+
+0.08 Feb 10 2012
+  - provide the version in the formatted log_debug call (Mike Eldridge)
+
+0.07 Dec 8 2011
+  - Add environment variable FLOWISH_EXTRA_VERSION to add onto version number.
+
+0.06 Nov 27 2011
+  - Add dependency (Andreas Koenig)
+
+0.05 Nov 22 2011
+  - Add some logging to clarify when we can't find a version (Mike Eldridge)
+
+0.04 Nov 16 2011
+  - Remove debugging that was left in
+
+0.03 Nov 15 2011
+  - Fix deps
+
+0.02 Nov 14 2011
+
+0.01 Nov 11 2011
+  - First version, released on an unsuspecting world.
+

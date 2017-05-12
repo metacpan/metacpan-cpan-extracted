@@ -1,0 +1,25 @@
+---
+abstract: 'all your code are belong into the DB'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-VersionedSubs
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Data::Inheritable: 0
+  DBD::SQLite: 1.09
+  HTTP::Server::Simple: 0
+  Template: 0
+version: 0.08

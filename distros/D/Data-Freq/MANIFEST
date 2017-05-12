@@ -1,0 +1,17 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+bin/data-freq
+lib/Data/Freq.pm
+lib/Data/Freq/Field.pm
+lib/Data/Freq/Node.pm
+lib/Data/Freq/Record.pm
+t/00-load.t
+t/10-field.t
+t/11-record.t
+t/12-evaluate.t
+t/13-select.t
+t/20-freq.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

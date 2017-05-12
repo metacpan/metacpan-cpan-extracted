@@ -1,0 +1,104 @@
+This is the README file for Devel::DebugInit
+
+LEGAL HOOP JUMPING
+==================
+Copyright (c) 1997 Jason E. Stewart. All rights reserved.  This
+package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. 
+
+	You should have received a copy of the Perl license along with
+	Perl; see the file README in Perl distribution.
+ 
+	You should have received a copy of the GNU General Public License
+	along with Perl; see the file Copying.  If not, write to
+	the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+	You should have received a copy of the Artistic License
+	along with Perl; see the file Artistic.
+
+The author of this software makes no claim as to the performance or
+reliability of this product. Use it at your own risk. If you find it
+helpful, I'm very happy, if not, don't hold me responsible.
+
+WHAT
+====
+
+Devel::DebugInit is aimed at C/C++ developers who want access to C
+macro definitions from within a debugger. It provides a simple and
+automated way of creating debugger initialization files for a specific
+project. The initialization files created contain user-defined
+functions built from the macro definitions in the project's header
+files.
+
+By calling new(), the files specified by the 'filenames' parameter are
+parsed by the C preprocessor, and all macros #define'd in the file
+(and if desired, all macros #define'd by all #include'd files as
+well), will be parsed and expanded. By then calling the write()
+method, these macros can be written to an output file in the format of
+user-defined functions specific for your debugger.
+
+By automating the process, a new file can be created whenever the code
+of a project changes, and that way there will not be antiquated copies
+lying around to trap the unwary.
+
+INSTALL
+=======
+
+Devel::DebugInit::*
+---
+In order to write out an initialization file, you will need one of the
+debugger-specific backends. The GDB backend is supplied with the
+module (and it is currently the only one available ;-). So if this
+works for you, great! If you are interested in writing a backend for a
+different debugger, please volunteer!
+
+C::Scan - Data::Flow
+-----
+You will need the C-Scan, version 0.4 or better, as well as
+Data-Flow, version 0.05 or better, in order to use these modules. These
+can be gotten at your favorite CPAN site: 
+
+ftp any-CPAN-site 
+cd CPAN/authors/id/JASONS/
+bin
+get C-Scan-0.4.tar.gz 
+get Data-Flow-0.05.tar.gz 
+
+unpack the tar files anywhere you wish.
+
+then for each module:
+   perl Makefile.PL
+   make 
+   make test 
+   	(presuming you are satisfied)
+   make install
+
+Devel::DebugInit and Devel::DebugInit::GDB
+---
+unpack the tar file anywhere you wish.
+
+When you have an up-to-date C::Scan and Data::Flow installed:
+   perl Makefile.PL
+   make 
+   make test 
+   	(presuming you are satisfied)
+   make install
+
+RUNNING
+=======
+Read the included pod documentation and see ./t/DebugInit.t and
+t/GDB.t to get a more detailed idea of how to use this module.
+
+NOTES
+=====
+There are currently a number of ways to customize the output of this
+program, but if you can think of more useful ones, I'd like to hear
+about them.
+
+AUTHOR INFO and BUG REPORTS
+===========================
+Jason E. Stewart
+jason@cs.unm.edu. 
+
+I enjoy writing software that makes peoples lives better and makes
+their work more enjoyable. If you like this module, let me know! 

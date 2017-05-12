@@ -1,0 +1,152 @@
+Inputs
+------
+
+totalEntries
+entriesPerPage
+currentPage
+maxPages          this is actually the maximum numbers of pages to show *excluding* the current page
+
+
+Outputs
+-------
+qtr1Range
+qtr2Range
+qtr3Range
+qtr4Range
+
+
+Definitions
+-----------
+ceiling = the smallest integer value greater than or equal to the given numerical argument.
+floor   = the largest integer value less than or equal to the numerical argument.
+round   = the nearest integer value to the numerical argument, 
+          Numbers that are halfway between two integers are rounded "to infinity",
+          per standard conventions
+
+
+Step 1
+======
+
+totalPages = ceiling( totalEntries / entriesPerPage )
+
+visiblePages = minimum of maxPages and ( totalPages - 1 )
+
+
+Step 2
+======
+
+if we can show all the pages   [  totalPages - 1   <=  maxPages  ]
+then
+
+    q1Size = currentPage - 1
+    q2Size = 0
+    q3Size = 0
+    q4Size = totalPages - currentPage
+
+ and skip forwards to Step 3
+
+
+otherwise calculate the base segment sizes
+
+    q1Size = floor( visiblePages / 4 )
+    q2Size = round( visiblePages / 4 )
+    q3Size = ceiling( visiblePages / 4 )
+    q4Size = round( (visiblePages - q2Size) / 3 )
+
+
+and now carry out the steps for the first matching condition
+
+
+a) current page is in the 1st quarter   [  currentPage - q1Size  <  1  ]
+
+    additionalPages = q1Size + q2Size - currentPage + 1
+
+    q1Size = currentPage - 1
+    q2Size = 0
+    q3Size = q3Size + ceiling( additionalPages / 2 )
+    q4Size = q4Size + floor( additionalPages / 2 )
+
+
+b) 1st and 2nd quarters intersect   [  currentPage - q2Size - ceiling( q2Size / 3 )  <=  q1Size  ]
+
+    adjustment = ceiling( (3 * (currentPage - q1Size - 1)) / 4 )
+    additionalPages = q2Size - adjustment
+
+    q2Size = adjustment
+    q3Size = q3Size + ceiling( additionalPages / 2 )
+    q4Size = q4Size + floor( additionalPages / 2 )
+
+
+c) current pages is in the 4th quarter   [  currentPage + q4Size  >=  totalPages  ]
+
+    additionalPages = q3Size + q4Size - totalPages + currentPage
+
+    q1Size = q1Size + floor( additionalPages / 2 )
+    q2Size = q2Size + ceiling( additionalPages / 2 )
+    q3Size = 0
+    q4Size = totalPages - currentPage
+
+
+d) 3rd and 4th quarters intersect   [  currentPage + q3Size  >=  totalPages - q4Size  ]
+
+    adjustment = ceiling( (3 * (totalPages - currentPage - q4Size)) / 4 )
+    additionalPages = q3Size - adjustment
+
+    q1Size = q1Size + floor( additionalPages / 2 )
+    q2Size = q2Size + ceiling( additionalPages / 2 )
+    q3Size = adjustment
+
+
+Step 3
+======
+
+if q1Size = 0
+then q1Range is empty
+otherwise q1Range is 1 .. q1Size
+
+if q2Size = 0
+then q2Range is empty
+otherwise q2Range is (currentPage - q2Size) .. (currentPage - 1)
+
+if q3Size = 0
+then q3Range is empty
+otherwise q3Range is (currentPage + 1) .. (currentPage + q3Size)
+
+if q4Size = 0
+then q4Range is empty
+otherwise q4Range is (totalPages - q4Size + 1) .. totalPages
+
+
+
+
+Example Results
+===============
+
+totalEntries = 200
+entriesPerPage = 10
+maxPages = 10
+-----------------------
+
+currentPage = 3
+
+q1Range is 1 .. 2
+q2Range is empty 
+q3Range is 4 .. 8
+q4Range is 18 .. 20
+---------------------
+
+currentPage = 12
+
+q1Range is 1 .. 2
+q2Range is 9 .. 11
+q3Range is 13 .. 15
+q4Range is 19 .. 20
+----------------------
+
+currentPage = 15
+
+q1Range is 1 .. 2
+q2Range is 12 .. 14
+q3Range is 16 .. 18
+q4Range is 19 .. 20
+-----------------------

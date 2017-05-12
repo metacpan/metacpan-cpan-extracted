@@ -1,0 +1,115 @@
+{
+  "title" : "Perl Mongers",
+  "id"    : "perl-mongers",
+  "questions" : [
+     {
+        "text" : "What do you expect from your Perl Monger group?",
+        "id"   : "pm_group_expectation",
+        "type" : "multiple_choice",
+        "limit" : 3,
+        "other" : 1,
+        "answers" : [
+            "Meeting like minded people to socialize with.",
+            "Help in finding my next job.",
+            "Listening to technical lectures.",
+            "Asking questions on the mailing list within a small group of people.",
+            "Discussing Perl issues in my own mother-tongue.",
+            "Help to recruit Perl programmers."
+        ]
+     },
+     {
+        "text" : "What kinds of meetings do you prefer?",
+        "id"   : "type_of_meetings",
+        "type" : "single_choice",
+        "other" : 1,
+        "answers" : [
+           "Technical meetings",
+           "Social meetings",
+           "A mix of technical and social meetings"
+        ]
+     },
+     {
+        "text" : "How often do you attend your Perl Monger group meetings?",
+        "id"   : "how_oftent_attend",
+        "type" : "single_choice",
+        "other" : 1,
+        "answers" : [
+           "once a month",
+           "every other month",
+           "4 times a year",
+           "every now and then",
+           "Never"
+        ]
+      },
+      {
+        "text" : "If you don't regularly attend your Perl Monger meetings, what is the reason?",
+        "id"   : "reason_not_attending",
+        "type" : "multiple_choice",
+        "limit" : 3,
+        "other" : 1,
+        "answers" : [
+           "Location",
+           "Time",
+           "Wrong kind of meeting (prefer social to technical or the reverse)"
+        ]
+      },
+      {
+        "text" : "Do you attend any other programming or technical user group meetings? If so, which ones?",
+        "id"   : "other_user_groups",
+        "type" : "free_text"
+     },
+     {
+        "text" : "What is your preferred content/level of presentations?",
+        "id"   : "preferred_presentations",
+        "type" : "multiple_choice",
+        "other" : 1,
+        "answers" : [
+           "Introductions to Perl / development tools and methods.",
+           "Intermediate development tools and methods.",
+           "Various domain-specific topics and problem-solving overviews.",
+           "Various domain-specific modules and solutions in-depth.",
+           "Advanced development tools and methods.",
+           "Over-the-top metacoding geek-out acmeism."
+        ]
+     },
+     {
+        "text" : "what other languages and technologies are regular topic on your meetings?",
+        "id"   : "other_languages",
+        "type" : "multiple_choice",
+        "limit" : 3,
+        "other" : 1,
+        "answers" : [
+            "Python",
+            "Ruby",
+            "PHP",
+            "Javascript",
+            "HTML",
+            "CSS",
+            "C/C++",
+            "Java",
+            "Lua",
+            "Haskell",
+            "Lisp",
+            "SQL",
+            "NoSQL"
+        ]
+     },
+     {
+        "text" : "What is your primary PM group?",
+        "id"   : "primary_pm_group",
+        "type" : "single_choice_drop_down",
+        "other" : 1,
+        "answers" : [
+           "Boston.pm",
+           "London.pm",
+           "list of active groups from pm.org"
+        ]
+     },
+     {
+        "text" : "What do you suggest to improve your PM group?",
+        "id"   : "pm_group_suggestion",
+        "type" : "free_text"
+     }
+   ]
+}
+

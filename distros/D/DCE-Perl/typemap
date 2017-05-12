@@ -1,0 +1,48 @@
+perlrpcsub		T_PV
+DCE::Registry		T_PTROBJ
+DCE::Registry::era	T_PTROBJ
+DCE::cursor		T_PTROBJ
+DCE::RegistryCursor	T_PTROBJ
+DCE::Login		T_PTROBJ
+DCE::UUID 		T_PTROBJ
+DCE::RPC		T_PTROBJ
+DCE::login_name		T_PTROBJ
+uuid_t			T_PTR
+uuid_t *		T_PTR
+handle_t		T_PTROBJ
+rpc_auth_identity_handle_t	T_PTR
+rpc_if_handle_t		T_PTROBJ
+rpc_ns_handle_t		T_PTROBJ
+rpc_ns_handle_t	*	T_PTR
+unsigned_char_p_t	T_PV
+unsigned_char_p_t *	T_PV
+sec_login_flags_t	T_IV
+boolean32		T_IV
+sec_login_handle_t *	T_PTROBJ
+sec_login_handle_t	T_PTR
+sec_passwd_rec_t *	T_PTR
+boolean32 *		T_PV
+sec_login_auth_src_t	T_IV
+error_status_t *	T_PV
+error_status_t		T_IV
+signed32		T_IV
+unsigned32		T_IV
+sec_rgy_bind_auth_info_type_t	T_IV
+sec_rgy_handle_t	T_PTR
+sec_rgy_login_name_t *	T_PTR
+unsigned_char_t 	T_U_CHAR
+unsigned_char_t *	T_PV
+sec_rgy_domain_t	T_IV
+sec_rgy_pgo_flags_t	T_IV
+sec_rgy_pname_t		T_PV
+unsigned16		T_IV
+sec_rgy_name_t		T_PV
+sec_passwd_type_t	T_IV
+sec_passwd_version_t	T_IV
+sec_rgy_acct_key_t	T_IV
+sec_rgy_acct_user_flags_t	T_IV
+sec_rgy_acct_admin_flags_t	T_IV
+sec_rgy_acct_auth_flags_t	T_IV
+sec_timeval_sec_t	T_IV
+sec_timeval_period_t	T_IV
+sec_rgy_plcy_pwd_flags_t	T_IV

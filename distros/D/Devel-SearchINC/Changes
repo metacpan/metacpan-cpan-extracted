@@ -1,0 +1,106 @@
+Revision history for Perl extension Devel-SearchINC
+
+2.103460  2010-12-12 12:39:39 Europe/Vienna
+    - follow symlinks
+
+2.101440  2010-05-24 20:50:20 Europe/Vienna
+    - fixed Makefile.PL's BUILD_REQUIRES handling by using latest Dist::Zilla
+    - more realistic SYNOPSIS
+
+2.101410  2010-05-21 12:40:11 Europe/Vienna
+    - set major version to 2 so version continuity on CPAN is preserved.
+
+1.101400  2010-05-20 14:04:46 Europe/Vienna
+    - removed bin/distfind; now lives in its own App-distfind distribution
+
+1.101040  2010-04-14 18:10:19 Europe/Vienna
+    - the :debug option is now -debug
+    - added -clear option
+    - development directories and options can be separated by colons as well
+    - improved tests
+
+1.101000  2010-04-10 18:35:28 Europe/Vienna
+    - added bin/distfind, adapted from the now-deprecated Dist::Joseki
+    - removed unused variables
+
+1.100850  2010-03-26 21:34:37 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+1.39 Sat 2010.02.06 14:46:06 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - set broad untaint_pattern for File::Find, as that gets it wrong on OS X
+      (its pattern doesn't allow spaces in filenames)
+
+1.38 Tue Aug  4 19:09:11 WEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - more output under :debug
+    - prune a directory if it contains INC.SKIP
+
+1.37  Thu Nov  6 23:09:35 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - caused a bug where a program running under -T caused an "Insecure
+      dependency in chdir while running with -T switch" error
+
+1.36  Tue Nov  4 12:49:31 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - build_cache() just returns if no paths were set to avoid a warning from
+      File::Find::find(); had CPAN tester failures because of that; my own
+      tests worked because I used Devel::SearchINC in $PERL5OPT...
+
+1.35  Thu Oct 30 16:32:55 CET 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - If a module is found, set its entry in %INC to avoid the
+      '/loader/0x1234567/Foo/Bar.pm' effect, so it works nicely with
+      Devel::NYTProf
+
+1.34  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - Devel::SearchINC now uses File::Find::find() like
+      Devel::SearchINC::FindLib does, and caches the result during the first
+      pass. So this is more flexible than the previous version and allows you
+      to use Devel::SearchINC with complex development directory setups,
+      without the disadvantage of Devel::SearchINC::FindLib cluttering up your
+      @INC.
+
+1.33  Thu, 29 May 2008 12:04:28 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - Devel::SearchINC::FindLib now also skips skel/
+    - added t/perlcriticrc
+    - updated MANIFEST
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - Devel::SearchINC::FindLib can now handle semicolon-separated paths as
+      well
+    - .shipit: new svk.tagpattern
+    - Devel::SearchINC::FindLib: also deal with blib; ignore _build
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+1.32  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+1.31  Wed, 03 Oct 2007 17:27:25 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - changed the $VERSION of all modules to '1.31'.
+    - switched back to Makefile.PL and to Module::AutoInstall
+    - uses Module::Install::StandardTests
+
+1.03  Thu, 17 Feb 2005 23:53:39 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - added Devel::SearchINC::FindLib
+    - switched to Build.PL
+
+1.02  Sun, 01 Sep 2002 12:06:22 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - tests now use Test::More and have been reorganized
+    - added a debugging option and verbose debugging output
+    - previously it tried to open last guess regardless of whether the search
+      loop was ended because there were no more paths to search or because it
+      found a file. So I introduced a $found variable that takes care of that.
+
+0.03  Thu, 11 Oct 2001 09:46:10 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - added PERL5OPT documentation (thanks Michael Graham)
+
+0.02  Sat, 19 May 2001 13:39:31 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - can now also find modules in lib/ subdirectories
+
+0.01  Thu, 15 Mar 2001 14:38:37 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

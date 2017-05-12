@@ -1,0 +1,31 @@
+Revision history for Data-Paginator
+
+0.08 Oct 31 2014
+
+0.07 Oct 27 2014
+
+0.06 Oct 27 2014
+
+0.05 Nov 22 2011
+  * Convert to Dist::Zilla
+  * Fix bug that threw exceptions on empty pagination.
+
+0.05
+  * Fix POD typo
+
+0.04
+  * Document pages_per_set attribute.
+
+0.03
+  * Fix problem that prevented subclassing Data::Paginator
+  * Prevent division by zero when calling set_for with no pages_per_set set
+
+0.02    November 25th, 2009
+  * Make current_page more lenient, adjusting invalid values to valid ones.
+  * Add lots of methods
+  * Add Pageset functionality
+
+
+0.01    November 25th, 2009
+        First version, released on an unsuspecting world.
+

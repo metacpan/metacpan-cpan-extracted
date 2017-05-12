@@ -1,0 +1,3 @@
+WINDOW *	T_PTR
+chtype		T_IV
+

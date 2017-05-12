@@ -1,0 +1,38 @@
+Data::Page::Pagination version 0.006
+====================================
+
+This module calculates the pagination view using a Date::Page object.
+The provided methods are simple enough to use them in a template system.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Moose
+    Moose::Util::TypeConstraints
+    MooseX::StrictConstructor
+    MooseX::Types::Moose
+    List::Util
+    namespace::autoclean
+    syntax
+    Syntax::Feature::Method
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2012 - 2015,
+Steffen Winkler
+steffenw at cpan.org.
+All rights reserved.
+
+This module is free software;
+you can redistribute it and/or modify it
+under the same terms as Perl itself.

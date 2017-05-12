@@ -1,0 +1,8 @@
+0.03      2014-02-15 16:00:10 Europe/Minsk
+    - Allow rebase, i.e. apply rules relative to some other base (prefix) route
+
+0.02      2014-02-03 20:24:38 Europe/Minsk
+    - Add missing dependency (List::MoreUtils)
+
+0.01      2014-02-03 01:52:42 Europe/Minsk
+    - Initial release

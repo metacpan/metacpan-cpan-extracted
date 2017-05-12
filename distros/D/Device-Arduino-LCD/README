@@ -1,0 +1,43 @@
+PerLCD version 1.0
+==================
+
+The Arduino is an open-source physical computing platform.  Among the
+many things one might want to do with such a device is connect an LCD
+to it and print stuff (at least that's what I wanted to do with it).  
+
+There are a couple of excellent low-level libraries that can be linked
+into an arduino sketch to provide this functionality.  I've chosen the
+LCD4Bit library to link against.  The perlcd.cc sketch provides a few
+higher level functions as well as a serial listener.
+
+This Perl library provides a very high level interface for formatting
+and sending messages to the sketch's listener.  Once the device is
+wired up to an LCD (a fairly trivial task), the USB serial drivers
+installed, and the sketch compiled and uploaded, getting text on the
+screen should be no more difficult than the example in the POD's
+synopsis: Zero knowledge of LCDs required.
+
+The sketch provided can obviously be used with a client library
+written in any language, the choice of Perl was (almost) arbitrary.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+See the POD for information for dependencies.  The only required Perl
+library is Device::SerialPort available from CPAN.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Kevin Montuori & mconsultancy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.

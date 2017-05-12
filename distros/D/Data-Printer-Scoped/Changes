@@ -1,0 +1,18 @@
+0.001004  2014-02-21 14:30:32EST-0500 EST5EDT
+
+0.001004  2014-02-21 13:16:23EST-0500 EST5EDT
+  - fix a code typo
+
+0.001003  2014-02-21 13:14:10EST-0500 EST5EDT
+  - fix broken dep from dist.ini
+
+0.001002  2013-12-18 10:44:55 America/Toronto
+  - removed Sub::Exporter::Progressive, use Exporter instead
+  - add DDP::S shorthand module
+  - import Data::Printer by default into caller when using ::Scoped
+
+0.001001  2013-12-18 10:44:55 America/Toronto
+  - added missing prereqs.
+
+0.001000  2013-12-06 16:39:26 EST5EDT
+  - Initial drop to cpan.

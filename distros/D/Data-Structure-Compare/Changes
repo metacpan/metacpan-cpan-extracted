@@ -1,0 +1,8 @@
+Revision history for Data-Structure-Compare
+
+0.01    Date/time  2012/09/07
+        First version, released on an unsuspecting world.
+
+0.02    Date/time  2012/09/08
+        1. fix bug with not ok test case
+        2. finish some document could use this module

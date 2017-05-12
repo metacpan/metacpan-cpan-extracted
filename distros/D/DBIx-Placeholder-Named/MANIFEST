@@ -1,0 +1,15 @@
+Changes
+lib/DBIx/Placeholder/Named.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-smoke.t
+t/02-prefix.t
+t/03-suffix.t
+t/04-both.t
+t/05-root.t
+t/06-root-smoke.t
+t/pod.t

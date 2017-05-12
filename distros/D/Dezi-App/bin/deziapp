@@ -1,0 +1,99 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+use Dezi::CLI;
+
+our $VERSION = $Dezi::CLI::VERSION;
+
+$Dezi::CLI::CLI_NAME = $0;
+$Dezi::CLI::CLI_NAME =~ s,^.*[\\/],,g;
+my $app = Dezi::CLI->new_with_options();
+$app->run();
+exit(0);
+
+__END__
+
+=pod
+
+=head1 NAME
+
+deziapp - command-line interface for Dezi
+
+=head1 SYNOPSIS
+
+ % deziapp index path/to/files
+ % deziapp search -q foo
+
+=head1 DESCRIPTION
+
+Type:
+
+ % deziapp -h
+
+for a full usage statement. See the L<Dezi::CLI> class documentation for
+details.
+
+=head1 AUTHOR
+
+Peter Karman, E<lt>karpet@dezi.orgE<gt>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi-app at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-App>.  
+I will be notified, and then you'll automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc deziapp
+
+You can also look for information at:
+
+=over 4
+
+=item * Website
+
+L<http://dezi.org/>
+
+=item * IRC
+
+#dezisearch at freenode
+
+=item * Mailing list
+
+L<https://groups.google.com/forum/#!forum/dezi-search>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-App>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi-App>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi-App>
+
+=item * Search CPAN
+
+L<https://metacpan.org/dist/Dezi-App/>
+
+=back
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2014 by Peter Karman
+
+This library is free software; you can redistribute it and/or modify
+it under the terms of the GPL v2 or later.
+
+=head1 SEE ALSO
+
+L<Dezi::CLI>, L<Dezi::App>, L<http://dezi.org/>, L<http://swish-e.org/>, L<http://lucy.apache.org/>
+
+=cut

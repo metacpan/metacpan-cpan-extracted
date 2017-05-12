@@ -1,0 +1,151 @@
+=head1 NAME
+
+Device::USB::FAQ - Frequently Asked Questions for Device::USB
+
+=head1 SYNOPSIS
+
+perldoc Device::USB::FAQ
+
+=head1 DESCRIPTION
+
+This is an attempt to answer some of the frequently asked questions about
+the Device::USB module
+
+=head1 QUESTIONS
+
+=head2 Which platforms does Device::USB support?
+
+C<Device:USB> supports any platform that C<libusb> supports. This list
+currently includes Linux, FreeBSD, NetBSD, OpenBSD, Darwin, and MacOS X.
+
+There is a port of the C<libusb> library to the Windows environment called
+C<LibUsb-Win32>. Because I don't have a development environment for testing
+this library, C<Device::USB> does not yet support this library.
+
+=head2 Do I have to use Device::USB as root?
+
+By default, access to the USB devices on a Unix-based system appear to be
+limited to the root account. This usually causes access to most of the
+C<libusb> features to fail with a permission error.
+
+Using the C<Device::USB> module as root avoids this feature, but is not
+very satisfying from a security standpoint. (See the next question for
+more options.)
+
+=head2 How do I enable use of Device::USB as a non-root user?
+
+Some of the attributes of USB devices are available to non-root users, but
+accessing many of the more interesting features require special privileges.
+According to the libusb source, the C<open()> function requires either device
+nodes to be present or the usbfs file system to be mounted in specific
+locations. Those places in order are:
+
+=over 4
+
+=item 1)
+
+F</dev/bus/usb>  - pre-2.6.11: via devfs / post-2.6.11: via udev
+
+=item 2)
+
+F</proc/bus/usb> - usbfs
+
+=back
+
+Look in both locations on your system for which of these two methods your
+libusb will use.
+
+No matter which method your system uses, you will probably want to create a
+separate group to control access. Run this command to add a system group:
+
+  addgroup --system usb
+
+or
+
+  groupadd --system usb
+
+You can then add users to that group to allow access to your usb devices.
+
+=head3 DEVFS / HOTPLUG
+
+TODO
+
+=head3 UDEV
+
+If you use Debian/Ubuntu, look in the F</etc/udev/permissions.rules> file.
+If you want to allow global access to all usb devices, make this change:
+
+Change this:
+  SUBSYSTEM=="usb_device", MODE="0664"
+
+To this:
+  SUBSYSTEM=="usb_device", MODE="0664", GROUP="usb"
+
+After you reboot, all usb devices will inherit the mode and group specified.
+
+If you want to only change permissions for certain devices, you can add this
+on one line and adjust the product and vendor IDs:
+
+  SUBSYSTEM=="usb_device", GROUP="usb", \
+    SYSFS{idVendor}=="1234", SYSFS{idProduct}=="1234"
+
+=head3 USBFS
+
+The usbfs defaults to root as the user and group. This can be changed in the
+F</etc/fstab> by adding the following on one line:
+
+  none /proc/bus/usb usbfs noauto,\
+      listuid=0,listgid=118,listmode=0664,\
+      busuid=0,busgid=118,busmode=0775,\
+      devuid=0,devgid=118,devmode=0664\
+      0 0
+
+The value C<118> in the above should be replaced with the group id of
+your usb group (created above). The list* values are to allow listing
+devices, the bus* is to control access to the bus directories and the
+dev* values control access to the device files. This approach does not
+allow the kind of granular permission that the udev approach gives, so
+it is all or nothing unless permissions are changed programmatically.
+
+If your F</etc/fstab> file already has a line for F</proc/bus/usb>, add the
+options above to the line that is already there rather than adding the
+new line. For example, you would change
+
+  usbfs   /proc/bus/usb   usbfs   noauto  0 0
+
+to
+
+  usbfs   /proc/bus/usb   usbfs  noauto,\
+      listuid=0,listgid=118,listmode=0664,\
+      busuid=0,busgid=118,busmode=0775,\
+      devuid=0,devgid=118,devmode=0664\
+      0 0
+
+Once again, this needs to be all on one line with the C<\> characters
+removed.
+
+=head1 SEE ALSO
+
+Device::USB and the C<libusb> library site at
+L<http://libusb.sourceforge.net/>.
+
+=head1 AUTHOR
+
+G. Wade Johnson (gwadej at cpan dot org)
+Paul Archer (paul at paularcher dot org)
+
+Houston Perl Mongers Group
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks go to various users who submitted questions and answers for the
+list. In particular, Anthony L. Awtrey who contributed the first FAQ answer.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2006-2013 Houston Perl Mongers
+
+This document is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

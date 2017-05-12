@@ -1,0 +1,115 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Util::Cache
+
+=head1 DESCRIPTION
+
+Simple class for handling caching. The interface is compatible with that
+of L<CHI> for methods used by L<Data::Tubes::Plugin::Plumbing/cache>, so
+it is provided as a simple replacement in case you don't have, or don't
+want to use, L<CHI>.
+
+The class implements both an in-memory and a on-filesystem caches,
+depending on what you set as parameter C<repository>. A hash reference
+means caching in memory; a directory name means caching on file (the
+directory will be created if not existent).
+
+The class is realized via L<Mo>. You can extend it, to a certain degree.
+
+=head1 CLASS METHODS
+
+=head2 B<< new >>
+
+   my cache = Data::Tubes::Util::Cache->new(%args);
+
+constructor for the class. See L</ACCESSOR METHODS> for the accepted arguments.
+
+=head1 ACCESSOR METHODS
+
+=head2 B<< repository >>
+
+   $cache->repository($href);
+   $href = $cache->repository();
+
+set/retrieve the repository for the cache. It can be either of:
+
+=over
+
+=item *
+
+an hash reference, in which case the cache is kept in memory;
+
+=item *
+
+a directory name, in which case the cache is kept in the filesystem.
+
+=back
+
+Defaults to an empty hash.
+
+=head2 B<< max_items >>
+
+   $cache->max_items($n);
+   $n = $cache->max_items();
+
+set/retrieve the maximum numbers of elements you want to store in the
+cache. When set to a false value, the limitation is disabled.
+
+Used by L</purge>.
+
+=head1 BUSINESS LOGIC METHODS
+
+=head2 B<< get >>
+
+   $item = $cache->get($key, @args);
+
+get the item related to C<$key>, taking it from the cache. Any
+additional argument in C<@arg> is ignored. Returns C<undef> if the
+C<$key> is missing.
+
+=head2 B<< purge >>
+
+   $cache->purge();
+
+cleanup the cache. If the value of L</max_items> is not true, this
+method does nothing. Otherwise, elements are removed from the cache
+until the number of items is less than, or equal to, the maximum number
+set.
+
+=head2 B<< set >>
+
+   $cache->set($key, $value, @args);
+
+set the C<$value> corresponding to the C<$key> in the cache, overriding
+any previous value or creating a new item. Any additional argument in
+C<@args> is ignored. Returns C<$value>.
+
+=head1 SEE ALSO
+
+L<Data::Tubes> is a valid entry point of all of this.
+
+L<CHI> for a comprehensive caching library.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

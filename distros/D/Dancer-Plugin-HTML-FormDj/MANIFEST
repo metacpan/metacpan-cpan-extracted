@@ -1,0 +1,7 @@
+lib/Dancer/Plugin/HTML/FormsDj.pm
+Makefile.PL
+MANIFEST
+README
+META.yml
+META.json
+

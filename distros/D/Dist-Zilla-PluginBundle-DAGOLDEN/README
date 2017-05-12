@@ -1,0 +1,269 @@
+NAME
+    Dist::Zilla::PluginBundle::DAGOLDEN - Dist::Zilla configuration the way
+    DAGOLDEN does it
+
+VERSION
+    version 0.078
+
+SYNOPSIS
+      # in dist.ini
+      [@DAGOLDEN]
+
+DESCRIPTION
+    This is a Dist::Zilla PluginBundle. It is roughly equivalent to the
+    following dist.ini:
+
+      ; version provider
+      [RewriteVersion] ; also munges
+
+      ; collect contributors list
+      [Git::Contributors]
+
+      ; choose files to include
+      [Git::GatherDir]         ; everything from git ls-files
+      exclude_filename = README.pod   ; skip this generated file
+      exclude_filename = README.mkdn  ; skip this generated file
+      exclude_filename = META.json    ; skip this generated file
+      exclude_filename = cpanfile     ; skip this generated file
+      exclude_filename = Makefile.PL  ; skip this generated file
+
+      [PruneCruft]        ; default stuff to skip
+      [ManifestSkip]      ; if -f MANIFEST.SKIP, skip those, too
+
+      ; file modifications
+      [InsertCopyright]    ; add copyright at "# COPYRIGHT"
+      [SurgicalPodWeaver]         ; generate Pod
+      config_plugin = @DAGOLDEN ; my own plugin allows Pod::WikiDoc
+      replacer = replace_with_comment
+      post_code_replacer = replace_with_nothing
+
+      ; generated files
+      [License]           ; boilerplate license
+      [Pod2Readme]        ; from Pod (runs after PodWeaver)
+
+      ; t tests
+      [Test::ReportPrereqs]   ; show prereqs in automated test output
+
+      ; xt tests
+      [Test::MinimumVersion]  ; xt/release/minimum-version.t
+      max_target_perl = 5.010 ; don't use syntax/features past 5.10
+      [Test::PodSpelling] ; xt/author/pod-spell.t
+      [Test::Perl::Critic]; xt/author/critic.t
+      [MetaTests]         ; xt/release/meta-yaml.t
+      [PodSyntaxTests]    ; xt/release/pod-syntax.t
+      [PodCoverageTests]  ; xt/release/pod-coverage.t
+      [Test::Portability] ; xt/release/portability.t (of file name)
+      options = test_one_dot = 0
+      [Test::Version]     ; xt/release/test-version.t
+      [Test::Compile]     ; xt/author/00-compile.t
+      fake_home = 1       ; fakes $ENV{HOME} just in case
+      xt_mode = 1         ; make sure all files compile
+
+      ; metadata
+      [AutoPrereqs]       ; find prereqs from code
+      skip = ^t::lib
+
+      [Authority]
+      authority = cpan:DAGOLDEN
+      do_munging = 0
+
+      [MinimumPerl]   ; determine minimum perl version
+
+      [MetaNoIndex]       ; sets 'no_index' in META
+      directory = t
+      directory = xt
+      directory = examples
+      directory = corpus
+      package = DB        ; just in case
+
+      [GithubMeta]        ; set META resources
+      remote = origin
+      remote = github
+      issues = 1
+
+      [MetaProvides::Package] ; add 'provides' to META files
+      meta_noindex = 1        ; respect prior no_index directives
+
+      [Prereqs::AuthorDeps]   ; add authordeps as develop/requires
+      [MetaYAML]              ; generate META.yml (v1.4)
+      [MetaJSON]              ; generate META.json (v2)
+      [CPANFile]              ; generate cpanfile
+
+      ; build system
+      [ExecDir]           ; include 'bin/*' as executables
+      [ShareDir]          ; include 'share/' for File::ShareDir
+      [MakeMaker]         ; create Makefile.PL
+      eumm_version = 6.17
+      default_jobs = 9
+
+      ; manifest (after all generated files)
+      [Manifest]          ; create MANIFEST
+
+      ; copy Makefile.PL back to repo dis
+      [CopyFilesFromBuild::Filtered]
+      copy = Makefile.PL
+
+      ; before release
+
+      [PromptIfStale]     ; check if our build tools are out of date
+      module = Dist::Zilla
+      module = Dist::Zilla::PluginBundle::DAGOLDEN
+      check_all_plugins = 1
+
+      [Git::CheckFor::CorrectBranch] ; ensure on master branch
+
+      [Git::Check]        ; ensure all files checked in
+      allow_dirty = dist.ini
+      allow_dirty = Changes
+      allow_dirty = cpanfile
+
+      [CheckMetaResources]     ; ensure META has 'resources' data
+      [CheckPrereqsIndexed]    ; ensure prereqs are on CPAN
+      [CheckChangesHasContent] ; ensure Changes has been updated
+
+      [RunExtraTests]   ; ensure xt/ tests pass
+      default_jobs = 9
+
+      [TestRelease]       ; ensure t/ tests pass
+      [ConfirmRelease]    ; prompt before uploading
+
+      ; releaser
+      [UploadToCPAN]      ; uploads to CPAN
+
+      ; after release
+      [Git::Commit / Commit_Dirty_Files] ; commit Changes (as released)
+
+      [Git::Tag]          ; tag repo with custom tag
+      tag_format = release-%v
+
+      ; NextRelease acts *during* pre-release to write $VERSION and
+      ; timestamp to Changes and  *after* release to add a new {{$NEXT}}
+      ; section, so to act at the right time after release, it must actually
+      ; come after Commit_Dirty_Files but before Commit_Changes in the
+      ; dist.ini.  It will still act during pre-release as usual
+
+      [NextRelease]
+      [BumpVersionAfterRelease]
+
+      [Git::Commit / Commit_Changes] ; commit Changes (for new dev)
+
+      [Git::Push]         ; push repo to remote
+      push_to = origin
+
+USAGE
+    To use this PluginBundle, just add it to your dist.ini. You can provide
+    the following options:
+
+    *   "is_task" — this indicates whether "TaskWeaver" or
+        "SurgicalPodWeaver" should be used.
+
+        Default is 0.
+
+    *   "authority" — specifies the "x_authority" field for pause. Defaults
+        to 'cpan:DAGOLDEN'.
+
+    *   "auto_prereq" — this indicates whether "AutoPrereqs" should be used
+        or not. Default is 1.
+
+        # "auto_version" - this indicates whether "AutoVersion" should be
+        used or not. Default is 0.
+
+    *   "darkpan" — for private code; uses "FakeRelease" and fills in dummy
+        repo/bugtracker data
+
+    *   "fake_release" — swaps "FakeRelease" for "UploadToCPAN". Mostly
+        useful for testing a dist.ini without risking a real release.
+
+    *   "git_remote" — where to push after release
+
+    *   "github_issues" — whether to use github issue tracker. Defaults is
+        1.
+
+    *   "stopwords" — add stopword for "Test::PodSpelling" (can be repeated)
+
+    *   "tag_format" — given to "Git::Tag". Default is 'release-%v' to be
+        more
+
+        robust than just the version number when parsing versions for
+        Git::NextVersion
+
+    *   "weaver_config" — specifies a Pod::Weaver bundle. Defaults to
+        @DAGOLDEN.
+
+    *   "version_regexp" — given to Git::NextVersion. Default
+
+        is '^release-(.+)$'
+
+    *   "no_git" — bypass all git-dependent plugins
+
+    *   "no_copy_files" — skip copying Makefile.PL or cpanfile
+
+    *   "no_critic" — omit "Test::Perl::Critic" tests
+
+    *   "no_spellcheck" — omit "Test::PodSpelling" tests
+
+    *   "no_coverage" — omit PodCoverage tests
+
+    *   "no_minimum_perl" — omit "Test::MinimumVersion" tests
+
+    *   "no_bugtracker" — DEPRECATED
+
+    When running without git, "GatherDir" is used instead of
+    "Git::GatherDir". and all git check and commit operations are disabled.
+
+    By default, versions are taken/rewritten in the source file using
+    "RewriteVersion" and "BumpVersionAfterRelease". If the "auto_version"
+    option is true, the version is set by "AutoVersion" and munged with
+    "PkgVersion". For "auto_version" the generated "cpanfile" is copied to
+    the repo on build; otherwise, "Makefile.PL" is copied.
+
+    This PluginBundle now supports "ConfigSlicer", so you can pass in
+    options to the plugins used like this:
+
+      [@DAGOLDEN]
+      Test::MinimumVersion.max_target_perl = 5.014
+      ExecDir.dir = scripts
+
+    This PluginBundle also supports "PluginRemover", so dropping a plugin is
+    as easy as this:
+
+      [@DAGOLDEN]
+      -remove = InsertCopyright
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN/issues>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN>
+
+      git clone https://github.com/dagolden/Dist-Zilla-PluginBundle-DAGOLDEN.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Christian Walde <walde.christian@googlemail.com>
+
+    *   Eric Johnson <eric.git@iijo.org>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+    *   Philippe Bruhat (BooK) <book@cpan.org>
+
+    *   Sergey Romanov <complefor@rambler.ru>
+
+    *   김도형 - Keedi Kim <keedi@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

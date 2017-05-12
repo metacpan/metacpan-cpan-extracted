@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>hdb</title>
+
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="utf-8" http-equiv="encoding">
+    <!-- Bootstrap -->
+    <link href="db/bootstrap.css" rel="stylesheet" media="screen">
+    <link href="db/css-treeview.css" rel="stylesheet" media="screen">
+    <link href="db/debugger.css" rel="stylesheet" media="screen">
+    <link rel="icon" href="/db/favicon.ico" type="image/x-icon" />
+    <script src="db/jquery.js"></script>
+    <script src="db/bootstrap.js"></script>
+    <script src="db/handlebars.js"></script>
+    <script src="db/perlvalue.js"></script>
+    <script src="db/filemanager.js"></script>
+    <script src="db/stackmanager.js"></script>
+    <script src="db/jquery.scrollTo.js"></script>
+    <script src="db/filepicker.js"></script>
+    <script src="db/restinterface.js"></script>
+    <script src="db/breakpointmanager.js"></script>
+    <script src="db/watchedexprmanager.js"></script>
+    <script src="db/program_events.js"></script>
+    <script src="db/debugger.js"></script>
+    <script>
+        $(document).ready(function() {
+            var d = new Debugger('div.debugger-window');
+            d.run();
+        });
+    </script>
+
+    <! template for the sub picker >
+    <script id="sub-picker-template" type="text/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4>Subroutines</h4>
+            </div>
+            <div class="modal-body css-treeview">
+                <ul></ul>
+            </div>
+        </div>
+    </script>
+
+    <! template for the tree view inside the sub picker>
+    <script id="sub-picker-tree" type="text/x-handlebars-template">
+        {{#each subs}}
+            <li>
+                <a class="subroutine" data-package="{{#if ../package_name}}{{../../package_name}}{{else}}main{{/if}}" data-sub="{{this}}">{{this}}</a>
+            </li>
+        {{/each}}
+        {{#each packages}}
+            <li>
+                <input unfilled="true" type="checkbox" id="{{#if ../package_name}}{{../../package_name}}::{{/if}}{{this}}" />
+                <label for="{{#if ../package_name}}{{../../package_name}}::{{/if}}{{this}}">{{this}}</label>
+                <ul></ul>
+            </li>
+        {{/each}}
+    </script>
+
+    <! template for forked child modal>
+    <script id="forked-child-modal-template" type="text/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>Alert</h3>
+            </div>
+            <div class="modal-body">
+                Child process forked with pid {{pid}}
+            </div>
+            <div class="modal-footer">
+                <a href="{{continue_href}}" class="btn continue-child" data-dismiss="modal">Detach</button>
+                <a href="{{gui_href}}" class="btn btn-primary debug-child" target="_blank">Open</a>
+            </div>
+        </div>
+    </script>
+
+    <! template for the watchpoint-triggered notification >
+    <script id="watchpoint-triggered-modal-template" type="test/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">
+                Watchpoint
+            </div>
+            <div class="modal-body">
+                Watch expression {{expr}} changed value
+                <dl>
+                    <dt>from</dt>
+                        <dd>{{{old}}}</dd>
+                    <dt>to</dt>
+                        <dd>{{{new}}}</dd>
+                </dl>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </script>
+
+    <! Template for the execution trace difference notification>
+    <script id="trace-diff-modal-template" type="text/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">
+                Stopped
+            <div>
+            <div class="modal-body">
+                Execution has deviated from the trace file.  The next expected line was
+                {{#if expected_offset}}
+                    {{expected_subroutine}} line {{expected_offset}}
+                    in {{expected_filename}}:{{expected_line}}
+                {{else}}
+                    <dl>
+                        <dt>package</dt>
+                            <dd>{{expected_package}}</dd>
+                        <dt>file</dt>
+                            <dd>{{expected_filename}}</dd>
+                        <dt>subroutine</dt>
+                            <dd>{{expected_subroutine}}</dd>
+                        <dt>line</dt>
+                            <dd>{{expected_line}}</dd>
+                    </dl>
+                {{/if}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </script>
+
+    <! template for 'program terminated' modal>
+    <script id="program-terminated-modal-template" type="text/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">Program Terminated</div>
+            <div class="modal-body">
+                Debugged program terminated with exit code {{value}}
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" value="ok">Ok</button>
+                <button class="btn btn-danger control-button" data-action="exit" data-dismiss="modal" value="exit">Exit</button>
+            </div>
+        </div>
+    </script>
+
+    <! template for 'uncaught exception' modal>
+    <script id="uncaught-exception-modal-template" type="text/x-handlebars-template">
+        <div class="modal">
+            <div class="modal-header">Program Terminated</div>
+            <div class="modal-body">
+                Exception in {{subroutine}} at {{filename}}:{{line}}
+                <br>
+                <div class="alert alert-error">{{exception}}</div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-dismiss="modal" value="ok">Ok</button>
+                <button class="btn btn-danger control-button" data-action="exit" data-dismiss="modal" value="exit">Exit</button>
+            </div>
+        </div>
+    </script>
+
+    <! template for save/load breakpoints>
+    <script id="save-load-breakpoints-modal-template" type="text/x-handlebars-template">
+        <div class="modal">
+        <form>
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h3>{{action}} Breakpoints</h3>
+            </div>
+            <div class="modal-body">
+                    <div class="control-group">
+                        <label class="control-label" for="filename">Breakpoint file</label>
+                        <div class="controls">
+                            <input type="text" autofocus="autofocus" value="{{filename}}" class="span3" name="filename">
+                        </div>
+                    </div>
+            <div>
+            <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" value="cancel">Cancel</button>
+                <button type="submit" class="btn btn-primary" value="{{action}}">{{action}}</button>
+            </div>
+        </form>
+        </div>
+    </script>
+
+    <! template for the file tabs along the top>
+    <script id="file-tab-template" type="text/x-handlebars-template">
+        <li data-contentid="{{id}}" class="trunc-left {{#active}}active{{/active}}">
+            <a href="#pane-{{id}}" data-toggle="tab">
+            {{#if closable}}<span class="remove-loaded-file close-button">
+                    <i class="icon-remove-sign icon-white"></i>
+                </span>
+            {{/if}}
+            {{label}}</a>
+        </li>
+    </script>
+
+    <! template for Bootstrap stack nav tabs>
+    <script id="nav-tab-template" type="text/x-handlebars-template">
+        <li id="tab-{{serial}}" data-frameno="{{frameno}}" class="stack-tab trunc-left {{class}}{{#active}} active{{/active}}" rel="tooltip" data-html="true" data-placement="right" title="{{longlabel}}<br>{{filename}}: {{lineno}}">
+            <a href="#pane-{{serial}}" data-toggle="tab">{{wantarray}}{{#if is_string_eval}}"eval"{{else}}{{label}}{{/if}}</a>
+        </li>
+    </script>
+
+    <! template for Bootstrap nav panes>
+    <script id="nav-pane-template" type="text/x-handlebars-template">
+        <div id="pane-{{serial}}" data-frameno="{{frameno}}" class="tab-pane{{#active}} active{{/active}}">
+            <div class="current-sub-and-args alert">{{#if banner}}{{banner}}{{else}}&nbsp;{{/if}}</div>
+            <div class="managed-height program-code-container breakpoint-listener" data-filename="{{filename}}">
+                {{{html}}}
+            </div>
+        </div>
+    </script>
+
+    <! template for program file contents>
+    <script id="program-listing-template" type="text/x-handlebars-template">
+        <div class="program-code" data-filename="{{filename}}">
+            {{#rows}}
+                <div class="{{#active}}active{{/active}}{{#unbreakable}} unbreakable{{/unbreakable}}{{#breakpoint}} breakpoint{{/breakpoint}}{{#inactivebreakpoint}} inactive-breakpoint{{/inactivebreakpoint}}{{#action}} bpaction{{/action}} code-line" data-lineno="{{line}}">
+                    <span class="lineno"><span>{{line}}</span></span>
+                    <span class="code">{{code}}</span>
+                </div>
+            {{/rows}}
+        </div>
+    </script>
+
+    <! template for the top bar of the program stack windows - show the current sub & args>
+    <script id="current-sub-and-args-template" type="text/x-handlebars-template">
+        <span class="current-subroutine">{{subroutine}}</span>
+        (
+        <ul class="sub-arg-list">
+            {{#each subArgs}}
+                <li class="sub-arg">{{{this}}}</li>
+            {{/each}}
+        </ul>
+        )
+    </script>
+
+    <! template for watched expression>
+    <script id="watched-expr-template" type="text/x-handlebars-template">
+        <div class="expr-container">
+            <div class="watched-expression-form">
+                <form>
+                    <input type="text" name="expr" value="{{expr}}">
+                    <input type="hidden" name="originalExpr" value="{{expr}}">
+                </form>
+            </div>
+            <div id="{{id}}" class="watched-expression">
+                <span>
+                    <span class="remove-watched-expression close-button">
+                        <i class="icon-remove-sign icon-white"></i>
+                    </span>
+                </span>
+                <span class="watchpoint-checkbox">
+                    <input type="checkbox" class="enable-watchpoint" title="break when value changes" {{#if isWatchpoint}}checked="checked"{{/if}}/>
+                </span>
+                <span class="expr label label-inverse">{{expr}}</span>
+                <span>: </span>
+                <span class="value">{{value}}</span>
+            </div>
+        </div>
+    </script>
+
+    <! template for a breakpoint or action condition in the breakpoint menu/list>
+    <script id="breakpoint-code-template" type="text/x-handlebars-template">
+        {{#ifDefined condition}}<span>{{condition}}</span>
+        {{else}}<span class="label none">none</span>{{/ifDefined}}
+    </script>
+    <script id="action-code-template" type="text/x-handlebars-template">
+        {{#ifDefined action}}<span>{{action}}</span>
+        {{else}}<span class="label none">none</span>{{/ifDefined}}
+    </script>
+    <! template for the breakpoint right-click menu>
+    <script id="breakpoint-right-click-template" type="text/x-handlebars-template">
+        <div class="breakpoint-marker" data-filename="{{filename}}" data-lineno="{{lineno}}">
+            <div class="bpaction-details breakpoint-details">
+                <input type="checkbox" class="bpaction-toggle toggle-breakpoint" {{#if conditionEnabled}}checked="checked"{{/if}}>
+                <i class="icon-stop"></i>&nbsp;
+                <span class="bpaction-code">
+                    {{>breakpoint-code-template}}
+                </span>
+            </div>
+            <div class="bpaction-details action-details">
+                <input type="checkbox" class="bpaction-toggle toggle-action" {{#if actionEnabled}}checked="checked"{{/if}}>
+                <i class="icon-tasks"></i>&nbsp;
+                <span class="bpaction-code">
+                    {{>action-code-template}}
+                </span>
+            </div>
+        </div>
+    </script>
+
+    <! template for an item in the breakpoints pane list>
+    <script id="breakpoint-pane-item-template" type="text/x-handlebars-template">
+        <li class="breakpoint-pane-item" data-filename="{{filename}}" data-lineno="{{lineno}}">
+            <div>
+                <span class="remove-breakpoint close-button">
+                    <i class="icon-remove-sign icon-white"></i>
+                </span>
+                <small>line {{lineno}}</small>
+                <i class="icon-share-alt breakpoint-goto"></i>
+            </div>
+            {{> breakpoint-right-click-template}}
+        </li>
+    </script>
+
+</head>
+<body>
+    <div id="columnator" class="debugger-window">
+        <div class="container-column">
+            <div class="row">
+                <div id="controls" class="span6 offset1">
+                    <button class="btn control-button" data-action="stepin">Step In</button>
+                    <button class="btn control-button" data-action="stepover">Step Over</button>
+                    <button class="btn control-button" data-action="stepout">Step Out</button>
+                    <button class="btn btn-primary control-button" data-action="continue">Run</button>
+
+                    <button class="btn btn-danger control-button pull-right" data-action="exit">Exit</button>
+                </div>
+            </div>
+
+            <div id="filewindow" class="tabbable">
+                <ul class="nav nav-tabs">
+                    <li id="program-name" class="active trunc-left"><a href="#stack" data-toggle="tab">Program Name</a></li>
+                    <li><span id="add-file"><i class="icon-plus"></i></span></li>
+                </ul>
+                <div id="file-content" class="tab-content">
+                    <div id="stack" class="tab-pane active tabbable tabs-left">
+                        <ul id="stack-tabs" class="nav nav-tabs managed-height managed-height"></ul>
+                        <div id="stack-panes" class="tab-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="drag-divider" class="container-column managed-height"></div>
+        <div id="side-tray" class="container-column">
+            <div id="breakpoint-container" class="container-column">
+                <div id="breakpoints" class="container-column managed-height">
+                    <div>
+                        <strong>Breakpoints</strong>
+                        <a href="#" id="save-breakpoints" class="btn save-load-breakpoints" title="Save Breakpoints">
+                            <i class="icon-hdd"></i></a>
+                        <a href="#" id="load-breakpoints" class="btn save-load-breakpoints" title="Load Breakpoints">
+                            <i class="icon-folder-open"></i></a>
+                    </div>
+                    <ol id="breakpoints-list"></ul>
+                </div>
+                <div id="breakpoint-container-handle" class="container-column managed-height">
+                    <div style="height: 50%"></div>
+                    <i id="breakpoint-container-handle-icon" class="icon-chevron-right"></i>
+                </div>
+            </div>
+            <div id="watch-expressions" class="container-column managed-height">
+                <div id="watch-expressions-title">
+                    <strong>Watch Expressions</strong>
+                    <button class="btn btn-mini" id="add-watch-expr" type="button" title="Add watch expr"><i class="icon-plus"></i></button>
+                </div>
+                <div id="watch-expressions-container" class="managed-height"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

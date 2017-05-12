@@ -1,0 +1,21 @@
+---
+name: gsics
+storage_root: /tmp/datastore
+cache_max_size: 2048000
+cache_strategy: LRU
+feeds:
+  name: all
+  feed_template: http://gsics.nesdis.noaa.gov/datacast/all.xml
+  file_source:
+    filename_xpath: title
+    url_xpath: enclosure/@url
+  metadata_sources:
+    - name: starttime
+      xpath: datacasting:customElement[@name="validity_start_time"]/@value
+    - name: endtime
+      xpath: datacasting:customElement[@name="validity_end_time"]/@value
+linktrees:
+  - condition: ~
+    path_template: '<starttime:%Y/%m/%d>'
+    root: /tmp/datalinks
+

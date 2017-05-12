@@ -1,0 +1,43 @@
+CONTENTS
+
+1. DESCRIPTION
+2. INSTALLATION
+3. COPYRIGHT
+
+
+--------------
+1. DESCRIPTION
+--------------
+
+The Devel::Tokenizer::C module provides a small class for creating
+the essential ANSI C source code for a fast keyword tokenizer.
+
+The generated code is optimized for speed. On the ANSI-C keyword
+set, it's 2-3 times faster than equivalent code generated with the
+gprof utility.
+
+---------------
+2. INSTALLATION
+---------------
+
+Installation of the Devel::Tokenizer::C module follows the standard
+Perl Way and should not be harder than:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Note that you may need to become superuser to 'make install'.
+
+If you're building the module under Windows, you may need to use a
+different make program, such as 'nmake', instead of 'make'.
+
+------------
+3. COPYRIGHT
+------------
+
+Copyright (c) 2002-2008 Marcus Holland-Moritz. All rights reserved.
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

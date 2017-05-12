@@ -1,0 +1,147 @@
+
+		------------------------------------
+			XBase and DBD::XBase
+		------------------------------------
+
+This is the README file for the XBase and DBD::XBase packages. Please
+read it if you install this module for the first time or if there are
+some problems with the module.
+
+Module XBase provides access to XBase (dBase, Fox*) database files,
+namely dbf, dbt, fpt, ndx and ntx. It provides native Perl interface
+($table->get_record, $table->update_record) to read and write the tables.
+Module DBD::XBase is a DBI driver that uses the XBase module to work with
+the data, providing you with DBI compliant processing interface and SQL
+commands ($dbh->prepare("SELECT * FROM TABLE")). As an argument to
+DBI->connect, specify "dbi:XBase:$dir", where $dir is the directory with
+the data files.
+
+So this package offers two ways of accessing your beloved data in dbf
+files: XBase and DBD::XBase. You are free to pick any you find more
+suitable for your project, I personally prefer the DBD::XBase.
+
+No other servers/software are needed, these modules directly read and
+write the files. The main goal was to create a parser, mainly to work
+with data from your legacy applications. If you are looking for something
+more powerfull, check real relation database servers, such as MySQL or
+PostgreSQL.
+
+The distribution also includes a dbfdump script that prints the content
+of the table in readable form.
+
+The support for ndx/ntx index files is rather minimal. It currently
+allows you to search directly to the record you want, in the XBase
+module. But you cannot create the index, nor is the index updated when
+you change the dbf. Check the eg/ directory for how you can help to
+make it better.
+
+You have to have Perl version 5.004. [Please do not ask me to make these
+modules work under 5.003 or older version -- upgrade instead.]
+
+You need a DBI module version at least 1.0 to use the DBD driver. If you
+have older DBI and cannot upgrade for some reason, check the CPAN for
+DBD::XBase version < 0.090. Those are the last versions that do not
+require DBI 1.0. [Please do not ask me to make this line of DBD::XBase
+work under older DBI's -- it will not work. Please do not ask me to make
+the DBD::XBase work without DBI -- it will not work. Use the XBase
+interface or install the DBI module. (This may seem rude but I only
+try to avoid missunderstanding and unhappiness -- on both sides ;-)]
+
+This module is provided in a hope you might find it usefull. My intent
+is to support as many variations of formats as possible, but I do not
+have dBase/Fox* and do not plan to have, so send me examples of your
+data files if you feel your native XBase engines produce data
+incompatible with this module.
+
+Man pages for XBase, DBD::XBase and dbfdump are included, examples of
+little scripts can also be found in eg/ directory of the distribution.
+Read the DBI man page for DBI specific issues.
+
+Installation:
+	Download the tar.gz, unpack it, change to the DBD-XBase-*
+	directory. Then do
+
+		perl Makefile.PL
+		make
+		make test
+		make install
+
+	or you can use CPAN module and do
+	
+		perl -MCPAN -e shell
+		cpan> install DBD::XBase
+		
+	You have to have Perl version 5.004. You need a DBI module version
+	1.0 or higher to use the DBD driver.
+
+	Some people asked whether it is possible to use the module
+	even if they do not have root access. Even if this is in
+	sufficient detail covered in the docs that come with Perl,
+	here's the process:
+
+	You install the module
+
+		perl Makefile.PL LIB=/your/directory \
+			INSTALLMAN1DIR=/path/for/man1 \
+			INSTALLMAN3DIR=/path/for/man3
+
+	instead of just perl Makefile.PL, and in your scripts do
+				   
+		use lib '/your/directory';
+		use XBase;
+
+	Some people asked how to use this module when they are not
+	able to run make on their system. Even if it's beyond my
+	understanding why somebody would want to use such system, you
+	are free to just copy the lib/ directory where you want it to
+	have. This should work. (BTW: some systems have make renamed
+	and do not take the time to make a symlink. Ask your system
+	administrator.)
+
+Problems and bug reports:
+	If anything goes wrong when installing/make test, please send
+	me output of your installation messages and of
+
+		make test TEST_VERBOSE=1
+
+	Each version of the module is tested on IRIX, Linux and
+	Solaris before releasing but surely there might be situation
+	where something is corrupted on other platforms. If you send
+	me reasonable output, these errors are typically fixed in
+	a matter of hours (unless I'm gone for a vacation).
+
+	If there are errors when actually using the module on your
+	data, please check first that it's really a XBase/DBD::XBase
+	problem. If so, please send me example of your script, the
+	errstr messages you get and (if possible) your data files that
+	cause the problems, so that I can trace down the problem. Add
+	info about your OS, version of Perl and other modules that
+	might be relevant. You can of course also send patches to
+	actual bugs.
+
+	Mention the word "XBase" in the Subject line, otherwise your
+	post will probably just slip through my 1 MB daily email load
+	without even being read. Please note that I'm _very_ busy, so
+	try to help me to help you by using the latest version of the
+	module, minimalizing the script code that causes you problems,
+	providing me with tiny sample of datafile, anything that might
+	be related. Detailed description and small examples are the
+	best.
+	
+	For general Perl issues, use the comp.lang.perl.m* newsgroups,
+	for DBI issues, use dbi-users@fugue.com.
+	
+If it works for you:
+	I'd appreciate any message if you use the module and find it
+	usefull -- I'm just curious what tasks people use the module
+	for and what they expect from it. You can of course also
+	send something more valuable.
+
+Available:
+	http://www.fi.muni.cz/~adelton/perl/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1997--1999 Jan Pazdziora, adelton@fi.muni.cz. All rights
+	reserved. This package is free software; you can redistribute
+	it and/or modify it under the same terms as Perl itself.
+

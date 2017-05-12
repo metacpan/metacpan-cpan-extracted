@@ -1,0 +1,46 @@
+{
+   "abstract" : "framework for laconic DBI",
+   "author" : [
+      "Oleksandr Kharchenko <okharch@okharch.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Brev",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1.27",
+            "ExtUtils::MakeMaker" : "6.66",
+            "Parse::CPAN::Meta" : "1.4404"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::General" : "2.51",
+            "DBI" : "1.625",
+            "DBIx::Connector" : "0.53",
+            "SQL::SplitStatement" : "1.0002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

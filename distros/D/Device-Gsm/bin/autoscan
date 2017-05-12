@@ -1,0 +1,81 @@
+#!/usr/bin/perl
+
+#
+# Autoscan utility, creates a log file with all commands
+#
+# Please send the `profile.log' generated file to
+# cosimo@cpan.org with subject "Device::Gsm profile"
+#
+# Usage: autoscan --device=/dev/ttyS0 --baud=19200 --file=my_device.log
+
+use Device::Gsm;
+use Getopt::Long;
+
+
+my $dev  = '/dev/nokia6600';
+my $baud = 19200;
+my $file = 'profile.log';
+
+usage() unless @ARGV;
+
+GetOptions( 'device:s'=>\$dev, 'baud:i'=>\$baud, 'file:s'=>\$file );
+
+my $gsm = new Device::Gsm( port => $dev, log=>"file,$file", loglevel=>'info' );
+$gsm->connect( baudrate => $baud ) or die "could not connect!\n";
+print "Auto scan of device on $dev (\@ $baud bps)\n\n";
+$gsm->log->write('info', "# Autoscan of device on device $dev (\@ $baud bps)");
+$gsm->log->write('info', '# Device::Gsm v'.Device::Gsm->VERSION().', Device::Modem v'.Device::Modem->VERSION().', perl version '.$]);
+$gsm->log->write('info', '# Started on '.localtime());
+
+my @command = (
+	'+CCLK', '+CGMI', '+CGMM', '+CGMR', '+CGSN',
+	'+CSCA', '+CSQ',  '+CHUP', '+CPIN',
+	'+CMGF', '+CMGL', '+CMGS',
+	'^SBNR',
+);
+
+$gsm->log->write('info', 'Start of GSM commands support test.');
+
+testcmd($gsm,$_) foreach @command;
+
+$gsm->log->write('info', 'End of commands test. Now some methods will be called.');
+
+$gsm->datetime();
+$gsm->imei();
+$gsm->manufacturer();
+$gsm->model();
+$gsm->software_version();
+$gsm->service_center();
+$gsm->signal_quality();
+$gsm->messages();
+
+
+sub testcmd {
+	my $gsm = $_[0];
+	my $cmd = $_[1];
+	$gsm->log->write('info', 'testing command ['.$cmd.']');
+	$gsm->test_command($cmd);
+}
+
+sub usage {
+	print <<EOT;
+
+$0 - Create profile of GSM supported commands
+
+Usage: $0 [options]
+Accepted options are:
+
+     --device=<device>       Device to connect to.
+                             Ex.: --device=/dev/ttyS0 for serial ports
+                                  --device=/dev/rfcomm0 for bluetooth device
+     --baud=<baudrate>       Speed of serial communication.
+                             Ex.: --baud=19200 or --baud=9600
+     --file=<filename>       Name of profile filename to be saved
+                             Ex.: --file=my_device.log
+
+EOT
+
+	exit;
+
+}
+

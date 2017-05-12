@@ -1,0 +1,48 @@
+NAME
+    Dist::Inkt::DOAP - various DOAP-related roles for Dist::Inkt
+
+DESCRIPTION
+    Dist::Inkt is a framework for writing your own distribution builder. It's
+    a simple class that makes an empty directory, creates a MANIFEST file
+    listing the contents of the directory, and then compresses it into a
+    tarball.
+
+    Which seems pretty useless. However, it provides tonnes of hooks that can
+    be used by roles applied to the class. This distribution provides a
+    collection of roles that help you populate the distribution's metadata
+    (META.json, Changes, etc) from DOAP.
+
+  The Straight DOAP
+    So what is DOAP? This explanation is lifted from Wikipedia
+    <http://en.wikipedia.org/wiki/DOAP>.
+
+    *DOAP (Description of a Project) is an RDF Schema and XML vocabulary to
+    describe software projects, in particular free and open source software.*
+
+    *It was created and initially developed by Edd Dumbill to convey semantic
+    information associated with open source software projects.*
+
+    *It is currently used in the Mozilla Foundation's project page and in
+    several other software repositories, notably the Python Package Index.*
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-DOAP>.
+
+SEE ALSO
+    Dist::Inkt.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

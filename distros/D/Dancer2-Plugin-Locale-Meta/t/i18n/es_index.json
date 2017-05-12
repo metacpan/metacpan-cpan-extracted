@@ -1,0 +1,10 @@
+{
+  "es": {                
+    "color": {         
+      "trans" : "color",
+    },
+    "greeting": {
+      "trans": "hola"
+    }
+  }
+}

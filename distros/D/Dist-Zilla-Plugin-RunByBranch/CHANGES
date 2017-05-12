@@ -1,0 +1,306 @@
+==================================================
+Changes from 2013-01-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.214 at 2014-01-17 03:00:29 +0000
+------------------------------------------
+
+  Change: 3cfb92c118dfe6480b8eeea17cc6cadaa72e3cf9
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2014-01-17 02:59:52 +0000
+
+    Adding stuffs
+
+    Because why not 
+
+------------------------------------------
+version 0.213 at 2014-01-17 00:11:26 +0000
+------------------------------------------
+
+  Change: 9429404ce371945a6e9de93ac289b3b27725b738
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2014-01-17 00:11:26 +0000
+
+    Add realness
+
+    (demo test) 
+
+  Change: 8dde7353d91571c9dd29a0dcda86d38dda1c4e28
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 02:22:14 +0000
+
+    Remove broken pod 
+
+  Change: b08a2aa3dbc558b78531e4b6c4fec03fd1d66521
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 02:16:40 +0000
+
+    Remove another non-existant module 
+
+  Change: bb8b38226b065def118328f40a3493516a001faa
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 02:11:49 +0000
+
+    Comment out missing weird module
+
+    And skip tests for namespace autoclean 
+
+  Change: cfc6c3013fd934942dfd3a7dfc7278ed65c71421
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 02:05:25 +0000
+
+    Add more deps 
+
+  Change: 9251186264fbf7481d48eebae396dcd8c61c1031
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:57:58 +0000
+
+    Simplify travis config, add meta test 
+
+  Change: 628c15fbd3fd3e6766707dd258bea757647d8c6c
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:51:54 +0000
+
+    Add specific version of Test::Kwalitee 
+
+  Change: d911bdd90b170cbcafef21a9f5134b3434353fac
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:44:08 +0000
+
+    Skip tests for Test::NoTabs 
+
+  Change: b35fe16d5e05365321560acab7a8c0bd4c400c79
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:30:48 +0000
+
+    Switch README 
+
+------------------------------------------
+version 0.212 at 2013-10-20 01:27:47 +0000
+------------------------------------------
+
+  Change: fe2faf897228cbdd35922bc4edd02f8f2dc836fb
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:27:47 +0000
+
+    v0.212 
+
+------------------------------------------
+version 0.211 at 2013-10-20 01:19:46 +0000
+------------------------------------------
+
+  Change: 59d31d1d849c0980497c1d5166e302d84691e38c
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:19:46 +0000
+
+    Add first version to make up for daft 
+
+  Change: 42a30921c49f69314b9d0042007f1b5a9a6426da
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:13:18 +0000
+
+    Remove unnecessary plugin 
+
+  Change: af3068ff1ae32b7ac085dfc9aa537b5222600b69
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:09:37 +0000
+
+    Fix bug in test plugin 
+
+  Change: 6f91b9e437e1564bd465e4ce093562461f39e42f
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:07:05 +0000
+
+    Add coveralls 
+
+  Change: 834255e2df7108335efe21cc14612cfc796e85a1
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:06:20 +0000
+
+    Update pod, no functional changes 
+
+  Change: e61b0638b1b25d4d0c93e11860b48c9a11a5b45f
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-20 01:05:28 +0000
+
+    Update dist.ini with personal plugin bundle 
+
+  Change: ce43eee297cd49701b6895305dae352c2634651e
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 17:24:12 +0000
+
+    Add readme.md with travis-ci and coveralls badges 
+
+  Change: 06fc2472939db567365d2b831133fa288d99a2c8
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 16:29:36 +0000
+
+    Remove extra? cover line 
+
+  Change: 8a508132b1bff91115990ed1c6648ac07d7e0d84
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 16:07:52 +0000
+
+    Update travis-ci config
+
+    Add cover report for coveralls 
+
+  Change: 6bf7c2ec0c8cccbbeecf1b660f3026062544e307
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 01:31:49 +0000
+
+    Correct version increment 
+
+  Change: c58fbaac6f15a2da77ab2e2b910616b2b12cce32
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 01:15:52 +0000
+
+    Update version to 0.03
+
+    Also adds Change plugins 
+
+  Change: e3818ac5fb2ba766528a63ee82b9d4fe9b5ba674
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 01:02:39 +0000
+
+    Force install Test::CheckDeps
+
+    Install fails on travis 
+
+  Change: 130b85600aff49c7b4d5021f25b56aeb3792e25b
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:59:25 +0000
+
+    Add specific version module for travis 
+
+  Change: 1f6b5430754021d7bfbaaeca605b0f28117648a7
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:37:09 +0000
+
+    Force install System::Command 
+
+  Change: c9a7202d24d6067743c04f27dc727ca2d0ee4d84
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:33:03 +0000
+
+    Add cpanm to authordeps 
+
+  Change: 87b483b71b5ff619b70053b8fe6a52cd0a733d53
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:27:55 +0000
+
+    Fix silly spelling mistake in travis-ci config 
+
+  Change: 0079477033578d4282b25417a47222a87cee8e22
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:25:22 +0000
+
+    Update travis-ci config 
+
+  Change: 0f5ba1abf492f8b67d1e3892f46952d29ccae9b5
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-11 00:15:16 +0000
+
+    Add travis-ci config 
+
+  Change: ec5bdcb63daa42a3c7f74e35f77be90ec1ae769e
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-07 04:36:58 +0000
+
+    Clean up POD 
+
+  Change: d15359e487e08905341d8dee5c0db89bfe4e0fb5
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-07 04:16:30 +0000
+
+    Testing builder 
+
+  Change: ab54e571c0800630d4f32bd1c28f9242f34997e1
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-07 04:10:58 +0000
+
+    Remove Twitter plugin 
+
+  Change: 75287e7ed2bf266181e51d46bf920d1717805dc7
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-07 04:07:04 +0000
+
+    Remove plugins temporarily 
+
+  Change: 6d87b5ac2dafb5fbd4a44429e556815e86d1709d
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-07 03:22:30 +0000
+
+    Add updated synopsis 
+
+  Change: 894ffa101209d4e45a724acab854d85fd83312cd
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 23:33:27 +0000
+
+    Add dist.ini 
+
+  Change: 0eaa24d6c7bdbb89c1fbfbc9e905a1bc8b1fd0be
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 23:05:29 +0000
+
+    Bugfix all phases test
+
+    Test was throwing warnings 
+
+  Change: 1f57f0cec53dbae64debff490840fee9008ee8fe
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 23:05:06 +0000
+
+    Bugfix all phases test
+
+    Incorrect dist root folder name 
+
+  Change: 60c61c40db71de33aa63da58a01998737c31cbeb
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 23:04:31 +0000
+
+    Gitignore build directory and tgz 
+
+  Change: badf923da107799c9367b59f25495a51226f2bd8
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 23:02:59 +0000
+
+    Remove README
+
+    Handled by Dist::Zilla::Plugin::Readme 
+
+  Change: 14f3cd4da65d85dc0cb6a574f39eb0983d45fedf
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 21:29:18 +0000
+
+    Add tests 
+
+  Change: f8a7ad7a0f27ba466523b27d5467ccfb8ddd4f3b
+  Author: Matt Finkel <finkel.matt@gmail.com>
+  Date : 2013-10-06 21:26:57 +0000
+
+    Change namespace
+
+    Dist::Zilla::Plugin::Run::ByBranch to
+    Dist::Zilla::Plugin::RunByBranch
+
+    Also moves role inside Dist::Zilla::Plugin::RunByBranch namespace 
+
+  Change: 93915f16a88e8b75ef0dd0effe15e38cf7064a29
+  Author: Matt Finkel <matthew.finkel@streetlinks.com>
+  Date : 2013-08-29 09:09:34 +0000
+
+    Clean up, add POD, no functional changes 
+
+  Change: f47480b902173c4f549e6a6f64a8e4b81b1e403d
+  Author: Matt Finkel <matthew.finkel@streetlinks.com>
+  Date : 2013-08-27 17:45:42 +0000
+
+    Initial commit
+
+    Includes all necessary packages, lacks tests 
+
+================
+End of releases.
+================

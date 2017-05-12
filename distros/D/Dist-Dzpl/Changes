@@ -1,0 +1,10 @@
+TODO:
+    - Parse 'requires', 'recommends', 'prefers'
+    - Search for dzpl/dz.pl/dist.pl
+
+0.0010 Saturday May 08 11:49:13 PDT 2010:
+    - Handle bundles _correctly_ (via bundle_config)
+    - Include Dist::Zilla, etc, as a prerequisite
+
+0.0001:
+    - Initial release

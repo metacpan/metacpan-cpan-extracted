@@ -1,0 +1,56 @@
+{
+   "abstract" : "Flexible I18N using Locale::Maketext::Lexicon for Dancer apps",
+   "author" : [
+      "Clinton Gormley <drtech@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Lexicon",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "0",
+            "Dancer::Plugin" : "0",
+            "File::Spec::Functions" : "0",
+            "I18N::LangTags" : "0",
+            "I18N::LangTags::Detect" : "0",
+            "I18N::LangTags::List" : "0",
+            "Package::Stash" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/clintongormley/Dancer-Plugin-Lexicon/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/clintongormley/Dancer-Plugin-Lexicon.git",
+         "web" : "https://github.com/clintongormley/Dancer-Plugin-Lexicon"
+      }
+   },
+   "version" : "0.06"
+}
+

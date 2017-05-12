@@ -1,0 +1,8 @@
+Revision history for Perl extension Date::Holidays::FR.
+
+0.02 2004-04-25
+	- added 3 new functions : get_easter, get_ascension and get_pentecost
+
+0.01  Sun Apr 18 20:20:38 2004
+	- original version; created by h2xs 1.23 with options
+		-X Date::Holidays::FR

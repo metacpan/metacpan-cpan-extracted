@@ -1,0 +1,19 @@
+Revision history for DBIx::Query
+
+1.06      2015-01-29 19:52:36-08:00 America/Los_Angeles
+        - Add explicit module prereq for test
+
+1.05      2015-01-29 16:45:21-08:00 America/Los_Angeles
+        - Implementing use of Dist::Zilla.
+
+1.04      Wed Jul 17 15:21:41 PDT 2013
+        - Some OCD, and added TravisCI and Coveralls.
+
+1.03      Wed Jul 17 15:21:41 PDT 2013
+        - Added Perl 5.10.1 as a dependency to pick up parent pragma.
+
+1.02      Wed Jul 17 15:21:41 PDT 2013
+        - Fixed unmarked dependency on DBD::SQLite.
+
+1.01      Mon Jun 10 18:56:29 PDT 2013
+        - First version, released on an unsuspecting world.

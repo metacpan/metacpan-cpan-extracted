@@ -1,0 +1,24 @@
+Revision history for Dist-Zilla-Plugin-Pod-Spiffy
+
+1.001007 2014-02-13
+    - fixed up generated HTML to NOT produce white-space at the end
+      of lines
+
+1.001006 2014-02-10
+    - PAUSE refuses to budge with previous version... Also there was
+      an error in SYNOPSIS
+
+1.001005 2014-02-10
+    - Damn space got into the theme URL, ruining half the icons display
+
+1.001004 2014-02-10
+    - Added a whole bunch of section icons
+
+1.001003 2014-02-09
+    - Modified AUTHOR section CSS; in hopes of making it purtier
+
+1.001002 2014-02-08
+    - Fixed up AUTHOR section CSS
+
+1.001001 2014-02-07
+    - First version released on an unsuspecting world

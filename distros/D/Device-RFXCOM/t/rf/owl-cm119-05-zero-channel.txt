@@ -1,0 +1,9 @@
+6c0a839146065067bf00000010051e
+
+master cm119 6c.0a839146065067bf00000010051e: sensor/cm119.91.0[power]=1606
+
+CM119 channel not 1 - 3?
+
+
+
+

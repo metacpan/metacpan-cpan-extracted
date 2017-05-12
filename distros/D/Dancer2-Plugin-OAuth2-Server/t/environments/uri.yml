@@ -1,0 +1,12 @@
+logger: Null
+plugins:
+  "OAuth2::Server":
+    clients:
+      client1:
+        client_secret: secret
+        scopes:
+          other: 1
+        redirect_uri:
+          - http://localhost/cb
+          - http://localhost/callback
+

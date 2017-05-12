@@ -1,0 +1,16 @@
+
+README for perl module Devel::Fail::MakeTest
+
+This module was created as a debugging aid for mechanized module
+installers such as CPAN and CPANPLUS.
+
+* `perl Makefile.PL` will run fine and create a good Makefile.
+
+* `make` will succeed and print "`make all` was successful."
+
+* `make test` will fail.  One test program, one test planned, one test failure.
+
+* `make install` will succeed (without actually installing anything).
+
+AUTHOR: Martin Thurn <mthurn@cpan.org>
+

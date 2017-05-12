@@ -1,0 +1,26 @@
+---
+abstract: 'Template::Flute wrapper for Dancer'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Template-TemplateFlute
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: '0'
+  Template::Flute: '0.014'
+  Test::More: '0'
+resources:
+  repository: https://github.com/racke/Dancer-Template-TemplateFlute.git
+version: '0.0142'

@@ -1,0 +1,21 @@
+Revision history for DateTimeX-Start
+
+1.6.0   2016-11-01
+        - Optimized based on the assumption that most calls will be for days
+          with a midnight and only one midnight.
+        - Now croaks rather than returning the wrong answer when a DateTime
+          can't be found. This will never happen if the documented assumptions
+          are correct.
+        - Minor documentation improvements.
+
+1.4.0   2016-10-31
+        - Fix bug RT#118417 which could produce the wrong result when passing
+          a DT object to start_of_day/day.
+
+1.2.0   2016-05-09
+        - Skip tests requiring newer DateTime::TimeZone than the one installed.
+        - Fixes for "make disttest".
+        - Documentation improvements.
+
+1.0.0   2016-04-24
+        - Initial version.

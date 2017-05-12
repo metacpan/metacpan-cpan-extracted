@@ -1,0 +1,25 @@
+0.007 2015-06-05 12:29:42-0500
+  - update the URLs for the example images (now under EntropyOrg on GitHub)
+  - update the URLs for USC SIPI backup data (now under EntropyOrg-data on GitHub)
+
+0.006 2014-05-28 00:51:56-0500
+  - build and test fixes
+
+0.005 2014-05-27 12:51:40-0500
+  - small build fix
+
+0.004 2014-05-26 03:47:42-0500
+  - documentation: link to images to demo what the TIFF files contain
+  - documentation: installation options
+
+0.003 2014-05-25 15:31:31-0500
+  - documentation
+
+0.002 2014-05-25 13:17:18-0500
+  - add more documentation of the interfaces
+
+0.001 2014-05-24 19:17:50-0500
+  - initial version
+  - provides an interface to the USC SIPI image database and installs the misc
+    portion by default
+  - provides cameraman.tiff

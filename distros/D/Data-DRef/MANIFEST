@@ -1,0 +1,5 @@
+MANIFEST
+Makefile.PL
+lib/Data/DRef.pm
+t/dref.t
+t/leaf.t

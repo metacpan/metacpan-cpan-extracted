@@ -1,0 +1,25 @@
+---
+abstract: 'A plugin for Dancer to wrap XML-RPC calls'
+author:
+  - 'Jesper Dalberg <jdalberg@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-RPC-XML
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: 0
+  Dancer::Plugin: 0
+  RPC::XML: 0.69
+  Test::More: 0
+version: 0.06

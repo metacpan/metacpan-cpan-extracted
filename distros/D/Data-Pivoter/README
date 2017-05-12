@@ -1,0 +1,29 @@
+Table::Pivoter version 0.08
+
+
+Object oriented pivot / crosstabulation. 
+
+Installation:
+
+  perl Makefile.PL
+  make
+  make test
+  su -c 'make install'
+
+or for the lazy: 
+perl Makefile.PL && make test
+su -c 'make install'
+(make test will force a make if neccesary)
+
+on some platforms (e.g. HP-UX), do a su -c root 'make install' to install.
+
+Do a perldoc Pivoter.pm to get information on usage. Pivotdriver.pm is provided
+as an example for usage, it can read the tables used for testing 
+(t/table[123].dat)
+
+The newest version can be found at CPAN or at
+
+http://home.newmedia.no/sickel
+
+
+Morten Sickel, Drøbak 200802

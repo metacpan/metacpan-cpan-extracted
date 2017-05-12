@@ -1,0 +1,6 @@
+Revision history for Perl extension Dendral::HTTP::Response.
+
+0.01  Fri Apr  8 13:43:07 2011
+	- original version; created by h2xs 1.23 with options
+		-b 5.8.0 -A -n Dendral::HTTP::Response
+

@@ -1,0 +1,68 @@
+Revision history for DateTime-Format-Duration
+
+1.04    2015-09-20 06:17:20Z
+    - converted tooling to Dist::Zilla (fixes RT#48187, RT#82055, RT#53462)
+    - added missing prereq declarations (Params::Validate)
+    - fix ""Unescaped left brace in regex is deprecated" warning in 5.22+
+      (RT#101607)
+    - remove use of $& to improve executable speed (RT#97667)
+    - fix formatting of code snippets in pod (RT#105323)
+
+1.03    2007-06-01
+    - the Björn Again release
+        - This has been a looooong time coming, and I've only just
+          managed to get off my arse and fix it thanks to Björn
+          Tackmann.
+        - Fixed test 41 was incorrect.
+        - All other tests were correct, but as date math had changed,
+          we needed to refactor the normalisation
+        - Updated DateTime requirement to 0.30 -- the new math
+
+1.02    2004-04-04
+    - the 'Mixed Components' release
+        - DateTime::Duration now accepts mixed components so the need
+          to handle them differently has been removed. Old methods
+          remain in place though. See the POD.
+
+1.0101  2004-01-09T02:28:00Z
+    - the 'anonymous tester' release
+        - added 'use warnings'
+        - fixed a missing escape on the whitespace parser
+            - thanks to fairly anonymous CPAN tester!
+
+1.01    2004-01-08 02:19:00Z
+    - the 'Britney Spears' release (oops I did it again)
+        - Removed reliance on DateTime::Event::DST which doesn't exist!
+            - Thanks David Wheeler and Mike Castle
+        - Reorganised code to make it neater
+        - Created new tests for normalising and parsing
+        - Fixed bugs new tests revealed
+        - Moved old, redundant tests to *.old.
+          They should still pass if you want them!
+
+1.0002  2004-01-07 12:35:00Z
+    - quiet release to cpan
+        - This release just fixes some doc bugs I should have fixed last night.
+          Sorry!
+
+1.0001  2004-01-06 09:18:00Z
+    - second release to mailing list
+        - Support for Leap Seconds
+        - Normalise dramtically overhauled and quickened
+        - Docs said normalise and normalize. Code didn't.
+        - Patterns now allowed outside the object
+        - Parsing and Formatting now available without OO interface
+        - Made pretty pictures for explaining normalisation concepts
+        - Changed example formats to not look like DateTimes
+        - Reworded parts of docs to make things clearer
+        - Added a lot of normalisation tests as that's the most likely
+          place to get errors!
+        Thanks to Dave Rolsky for most of the above suggestions.
+
+1.00    2003-12-15 13:29:43Z
+    - Changed name to DateTime::Format::Duration
+    - initial release to mailing list
+
+0.00    2003-11-09 07:39:56Z
+    - original version; created by h2xs 1.22 with options
+        -X -v1.00 --use-new-tests -b5.0.5 -nDateTime::Format::StrfDuration

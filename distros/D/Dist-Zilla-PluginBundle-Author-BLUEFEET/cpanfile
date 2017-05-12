@@ -1,0 +1,23 @@
+requires 'Moose' => 2.1604;
+requires 'strictures'       => 2.000002;
+requires 'namespace::clean' => 0.26;
+
+# Modules from the Dist-Zilla distribution.
+requires 'Dist::Zilla::Role::PluginBundle::Easy' => 5.042;
+requires 'Dist::Zilla::PluginBundle::Basic' => 5.042;
+requires 'Dist::Zilla::Plugin::NextRelease' => 5.042;
+requires 'Dist::Zilla::Plugin::PkgVersion' => 5.042;
+requires 'Dist::Zilla::Plugin::PodSyntaxTests' => 5.042;
+
+# Modules from the Dist-Zilla-Plugin-Git distribution.
+requires 'Dist::Zilla::Plugin::Git::NextVersion' => 2.036;
+requires 'Dist::Zilla::Plugin::Git::Check' => 2.036;
+requires 'Dist::Zilla::Plugin::Git::Commit' => 2.036;
+requires 'Dist::Zilla::Plugin::Git::Tag' => 2.036;
+requires 'Dist::Zilla::Plugin::Git::Push' => 2.036;
+
+# Other distributions.
+requires 'Dist::Zilla::Plugin::GithubMeta' => 0.54;
+requires 'Dist::Zilla::Plugin::Test::ReportPrereqs' => 0.021;
+requires 'Dist::Zilla::Plugin::ReadmeAnyFromPod' => 0.150250;
+requires 'Dist::Zilla::Plugin::Prereqs::FromCPANfile' => 0.08;

@@ -1,0 +1,31 @@
+DBIx::DWIW
+==========
+
+DBIx::DWIW is a DBI wrapper intended to Do What I Want (DWIW)
+
+Please see `perldoc DBIx::DWIW' as well as examples/MyDBI.pm for
+additional documentation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  DBD::mysql
+  Carp
+
+COPYRIGHT AND LICENSE
+
+DBIx::DWIW is Copyright (c) 2001, Yahoo! Inc.  All rights reserved.
+
+You may distribute under the same terms of the Artistic License, as
+specified in the Perl README file.

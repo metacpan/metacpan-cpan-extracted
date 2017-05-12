@@ -1,0 +1,12 @@
+Revision history for Dancer-Plugin-RequireSSL
+
+0.121370  2012-05-16 23:29:42 Europe/Paris
+
+    Fix minimal version of Perl and Dancer.
+
+0.121331  2012-05-13 00:24:06 Europe/Paris
+
+    Rename the project.
+
+0.121330  2012-05-12 21:47:39 Europe/Paris
+    Initial version developed.

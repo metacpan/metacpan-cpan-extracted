@@ -1,0 +1,37 @@
+---
+abstract: 'Text::Xslate wrapper for Dancer'
+author:
+  - 'franck cuny <franck@lumberjaph.net>'
+build_requires:
+  Dancer: 0
+  Dancer::Test: 0
+  English: 0
+  File::Find: 0
+  File::Spec: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300014, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-Xslate
+requires:
+  Carp: 0
+  Dancer::App: 0
+  Dancer::Template::Abstract: 0
+  File::Spec::Functions: 0
+  Text::Xslate: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/franckcuny/dancer-template-xslate/issues
+  homepage: https://github.com/franckcuny/dancer-template-xslate
+  repository: git://github.com/franckcuny/dancer-template-xslate.git
+version: 0.03

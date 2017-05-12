@@ -1,0 +1,4 @@
+/.build
+/Dist-Zilla-Plugin-Bootstrap-lib-*
+/tmp/
+*.swp

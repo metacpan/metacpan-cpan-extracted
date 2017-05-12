@@ -1,0 +1,61 @@
+[%- INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget"
+    content = ''
+-%]
+
+<!-- Swishcommand noindex -->
+
+<div class="logobox">
+<hr>
+<p>Logobox</p>
+<hr>
+</div>
+<!-- logobox end -->
+
+
+<hr>
+<span style="display: block; position: relative">
+<span style="display: block; position: relative">
+
+<!-- left box begin -->
+<div class="leftbox">
+<p>leftbox</p>
+<p>leftbox</p>
+<p>leftbox</p>
+<p>leftbox</p>
+</div>
+<!-- left box end -->
+
+<!-- right box begin-->
+<div class="rightbox">
+<p>rightbox</p><p>rightbox</p><p>rightbox</p>
+<p>rightbox</p><p>rightbox</p><p>rightbox</p>
+<p>rightbox</p><p>rightbox</p><p>rightbox</p>
+</div>
+
+</span>
+</span>
+<hr>
+
+<p>outside bodybox</p>
+
+
+<!-- tail start -->
+<div class="tailbox">
+<hr>
+<p>tailbox</p>
+<hr>
+</div>
+<!-- tail end -->
+
+<p>outerbox ends</p>
+</body>
+</html>
+
+
+
+
+
+
+

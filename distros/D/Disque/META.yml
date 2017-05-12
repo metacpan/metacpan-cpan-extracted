@@ -1,0 +1,35 @@
+---
+abstract: 'Perl client for Disque, an in-memory, distributed job queue'
+author:
+  - 'Ezequiel Lovelle <ezequiellovelle@gmail.com>'
+build_requires:
+  Digest::SHA: '0'
+  Test::More: '0.96'
+  Test::TCP: '1.17'
+configure_requires:
+  ExtUtils::MakeMaker: '6.3002'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - disque
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Disque
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Encode: '0'
+  List::Util: '0'
+  Redis: '1.97'
+  perl: '5.008004'
+resources:
+  bugtracker: https://github.com/lovelle/perl-disque/issues
+  homepage: https://github.com/lovelle/perl-disque
+  license: https://github.com/lovelle/perl-disque/blob/master/LICENSE
+  repository: git://github.com/lovelle/perl-disque
+version: '0.04'

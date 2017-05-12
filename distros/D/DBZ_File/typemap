@@ -1,0 +1,11 @@
+TYPEMAP
+DBZ_File		T_PTROBJ
+datum			T_DATUM
+
+INPUT
+T_DATUM
+	$var.dptr = SvPV($arg, na);
+	$var.dsize = (int)na+1;
+OUTPUT
+T_DATUM
+	sv_setpvn($arg, $var.dptr, $var.dsize);

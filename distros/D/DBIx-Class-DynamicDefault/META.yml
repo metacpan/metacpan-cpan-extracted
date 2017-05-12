@@ -1,0 +1,31 @@
+---
+abstract: 'Automatically set and update fields'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  DBICx::TestDatabase: 0
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-DynamicDefault
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  DBIx::Class::DynamicDefault:
+    file: lib/DBIx/Class/DynamicDefault.pm
+    version: 0.04
+requires:
+  DBIx::Class: 0.08127
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.04

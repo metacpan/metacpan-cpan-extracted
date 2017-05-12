@@ -1,0 +1,551 @@
+#!/usr/bin/perl -w
+
+#  dbr-browse
+#
+#  % pod2text ./dbr-browse
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+
+use DBR;
+use DBR::Util::Logger;
+
+# script args: default values
+my %args = ( class    => 'query',  # default instance class - the other typical one is "master"
+             pkeymax  => 10,       # maximum number of sample table pkeys to list with each field value
+             dumpmax  => 10,       # maximum number of full records to dump for a non-field search
+             highvar  => 200,      # number of distinct values that trip a high variability status
+             highsamp => 20,       # the number of sample stats to show when high value variability
+           );
+# script args: command line overrides
+map { $_ =~ m!^([^=]+)=(.+)$! ? ($args{$1} = $2) : ($args{$_} = 1) } @ARGV;
+
+my $conf = $args{conf} or die &usage;
+
+my $logger = new DBR::Util::Logger(-logpath => '/tmp/dbr-browse.log', -logLevel => 'warn') or die "no logger!\n";
+my $dbr    = new DBR( -logger => $logger, -conf => $conf ) or die "\nno dbr - check config file path\n\n";
+
+my $lookup = {};
+my @tables = ();  # persistent filtered results
+
+while (1) {
+      my $schema_handle = &get_schema or last;
+      my $inst  = $dbr->get_instance( $schema_handle, $args{class} ) or die "failed to get instance!\n";
+      my $info = $inst->schema->browse or die "\nfailed to get browse info!\n\n";
+      #print "INFO:\n", Dumper( $info );
+      $info->{instance} = $inst;
+      &browse( $info );
+}
+
+sub browse {
+      my $info = shift or die "no info!\n";
+
+      print "\nBrowsing " . $info->{schema}->{display} . "\n\n";
+
+      # build lookups
+      $lookup->{table} = { map { $_->{name} => $_ } @{ $info->{schema}->{tables} } };
+
+      while (1) {
+            my $trec = &get_table( $info ) or last;
+            my @fields = ();
+            foreach my $frec (@{$trec->{fields}}) {
+                  my $field = {
+                               field  => $frec->{name},
+                               type   => $frec->{type},
+                               trans  => $frec->{trans},
+                               target => $frec->{to},
+                               via    => $frec->{via},
+                               enums  => $frec->{enums} ? join( ', ', @{ $frec->{enums} } ) : '',
+                              };
+                  $frec->{pkey} ?
+                    unshift @fields, $field :
+                      push @fields, $field;
+            }
+            print "\n$trec->{name}:\n";
+            &grid( \@fields, [ qw( field type trans target via enums ) ] );
+
+            if ($trec->{from}) {
+                  print "Targeted By:\n";
+                  &grid( $trec->{from}, [ qw( path via ) ] );
+            }
+      }
+}
+
+sub get_table {
+      my $info = shift;
+
+      my $table;
+
+      while (1) {
+            print "\nTABLE> ";  chomp( $table = <STDIN> );
+            return undef unless length( $table );
+
+            # numeric pick from previous filter
+            if ($table =~ m!^\d+!) {
+                  my ($pick,$fields) = split( /\s+/, $table, 2 );
+                  $table = $tables[$pick];
+                  last unless $fields;
+                  $table .= " $fields";   # restore
+            }
+
+            &sampler( $info, $table ) and next if $table =~ m! !;
+
+            # search for matching table names
+            @tables = 
+              map { $_->{name} }
+                grep { $table eq '?' || $_->{name} =~ m!$table! }
+                  @{ $info->{schema}->{tables} };
+
+            # exact match
+            $table = $tables[0] and last if @tables == 1;
+
+            print "no matches!\n" and next unless @tables;
+
+            # list matches
+            my $idx = 0;
+            foreach my $tname (@tables) {
+                  printf "  %3d) %s\n", $idx++, $tname;
+            }
+      }
+
+      return $table ? $lookup->{table}->{$table} : undef;
+}
+
+sub get_schema {
+      print "\nAvailable Schemas:\n   ";
+      print join( "\n   ", map { $_->{handle} } @{ DBR::Config::Schema->list_schemas } );
+      print "\n\nSCHEMA> "; chomp( my $handle = <STDIN> );
+      return $handle;
+}
+
+sub sampler {
+      my $info = shift;
+      my $tspec = shift;
+
+      my ($table,@fields) = split( /\s+/, $tspec );
+      return 1 unless @fields;
+      my $tinf = $lookup->{table}->{$table};
+      @fields = map { $_->{name} } @{ $tinf->{fields} } if $fields[0] eq '*';
+      my ($pkey) = map { $_->{name} } grep { $_->{pkey} } @{ $tinf->{fields} };
+
+      my %field_lookup = map { $_->{name} => $_ } @{$tinf->{fields}};
+
+      foreach my $field (@fields) {
+            my ($fname,$filtspec) = split( /\//, $field, 2 );
+            my ($where,$dumpwhere);
+            if ($filtspec) {
+                  my @filters = split( /\//, $filtspec );
+                  foreach my $filter (@filters) {
+                        my ($path,$val) = split( /=/, $filter );
+                        my @vals = split( /,/, $val );
+                        $where->{$path} = @vals == 1 ? $vals[0] : [ 'd in', @vals ]; # for sample_field()
+                        #$where->{$path} = @vals == 1 ? $vals[0] : \@vals;           # for sample_field2()
+                        $dumpwhere->{$path} = @vals == 1 ? $vals[0] : \@vals;           # hack
+                  }
+            }
+
+            if ($fname) {
+                  my $finf = $field_lookup{$fname};
+                  &sample_field( $info, $tinf, $finf, $where );
+                  #&sample_field2( $info, $tinf, $finf, $where );
+            }
+            else {
+                  &dumprecs( $info, $tinf, $dumpwhere );
+            }
+      }
+
+      return 1;
+}
+
+sub dumprecs {
+      my $info = shift;
+      my $tinf = shift;
+      my $where = shift;
+
+      my $dbh = $info->{instance}->connect;   # ('dbh')  ??
+
+      my ($pkey) = map { $_->{name} } grep { $_->{pkey} } @{ $tinf->{fields} };
+
+      my @fields = map { $_->{name} } @{ $tinf->{fields} };
+
+      my $obj = $tinf->{name};
+      my $recs = $where ?
+        $dbh->$obj->where( %{$where} ) :
+          $dbh->$obj->all
+            or die "failed to query with WHERE:\n" . Dumper( $where );
+
+      my $max = $args{dumpmax};
+      while (my $rec = $recs->next) {
+            my $vals = $rec->get( @fields );
+            my @refs = map { ref $_ } @{$vals};
+            my @more = map { ref $_ eq 'DBR::_ENUM' ? join( ' / ', $_->id, $_->handle, $_->name ) :
+                               ref $_ eq 'DBR::_UXTIME' ? join( ' / ', $_->unixtime, $_->fancydatetime ) : '' } @{$vals};
+            my $rows = [ map { { field => $_, value => shift @{ $vals }, 'ref' => shift @refs, 'more' => shift @more } } @fields ];
+            print "\n";
+            &grid( $rows, [ 'field', 'value', 'ref', 'more' ] );
+            unless (--$max) {
+                  print "listing stopped!  (max of $args{dumpmax} matching rows will be dumped)\n";
+                  last;
+            }
+      }
+      print "no data!\n" if $max == $args{dumpmax};
+      print "found " . ($args{dumpmax} - $max) . " matching rows\n" if $max && $max < $args{dumpmax};
+
+      return 1;
+}
+
+sub sample_field2 {
+      my $info = shift;
+      my $tinf = shift;
+      my $finf = shift;
+      my $where = shift;
+
+      my $dbh = $info->{instance}->connect;   # ('dbh')  ??
+
+      my ($pkey) = map { $_->{name} } grep { $_->{pkey} } @{ $tinf->{fields} };
+
+      my $fieldname = $finf->{name};
+
+      my $obj = $tinf->{name};
+      my $recs = $where ?
+        $dbh->$obj->where( %{$where} ) :
+          $dbh->$obj->all;
+      die "recs query failed!\n" unless $recs;
+
+      my $slurped = 0;
+      my %stats = ();
+
+      my $highvar = 0;
+      while (my $rec = $recs->next) {
+            my $row = $rec->get( $pkey, $fieldname );
+            my $stat = $stats{$row->[1] || '(undef)'} ||= {};
+            my $count = ++$stat->{count};
+            push @{$stat->{pkeys} ||= []}, $row->[0] if $count <= $args{pkemax};
+            ++$slurped;
+            if (scalar keys %stats > $args{highvar}) {  # highly variable
+                  $highvar = 1;
+                  last;
+            }
+      }
+
+      my @keys = keys %stats;
+      my @samples = map { { $fieldname => $_,
+                              count => $stats{$_}->{count},
+                                $pkey => join(',',@{$stats{$_}->{pkeys}}) } }
+        $highvar ? sort splice( @keys, 0, $args{highsamp} ) : sort @keys;
+
+      print "\nfield $tinf->{name}.$finf->{name}   ($pkey column are up to $args{pkeymax} sample pkey values)\n";
+      &grid( \@samples, [ $fieldname, 'count', $pkey ], '(UNDEFINED)' );
+      print "$slurped rows processed" . ($highvar ? " ... highly variable - showing $args{highsamp} samples." : '') . "\n";
+
+      return 1;
+}
+
+sub sample_field {
+      my $info = shift;
+      my $tinf = shift;
+      my $finf = shift;
+      my $where = shift;
+
+      my $dbh = $info->{instance}->connect;   # ('dbh')  ??
+
+      my ($pkey) = map { $_->{name} } grep { $_->{pkey} } @{ $tinf->{fields} };
+      my $fieldname = $finf->{name};
+
+      my %query = (
+                   -table  => $tinf->{name},
+                   -fields => "$pkey $fieldname",
+                   -rawsth => 1,
+                  );
+      $query{-where} = $where if $where;
+
+      my $sth = $dbh->select( %query ) or print "select failed with query:\n" . Dumper( \%query ) and return 0;
+      my $chunker = &make_chunker( 5000, $sth, 'arrayref' );
+
+      my $slurped = 0;
+      my %stats = ();
+
+      my $highvar = 0;
+      while (my $chunk = $chunker->()) {
+            foreach my $row (@{$chunk}) {
+                  my $stat = $stats{$row->[1] || '(undef)'} ||= {};
+                  my $count = ++$stat->{count};
+                  push @{$stat->{pkeys} ||= []}, $row->[0] if $count <= $args{pkeymax};
+            }
+            $slurped += scalar( @{$chunk} );
+            if (scalar keys %stats > $args{highvar}) {  # highly variable
+                  $highvar = 1;
+                  last;
+            }
+      }
+      $sth->finish();
+
+      my @keys = keys %stats;
+      my @samples = map { { $fieldname => $_,
+                              count => $stats{$_}->{count},
+                                $pkey => join(',',@{$stats{$_}->{pkeys}}) } }
+        $highvar ? sort splice( @keys, 0, $args{highsamp} ) : sort @keys;
+
+      print "\nfield $tinf->{name}.$finf->{name}   ($pkey column are up to $args{pkeymax} sample pkey values)\n";
+      &grid( \@samples, [ $fieldname, 'count', $pkey ], '(UNDEFINED)' );
+      print "$slurped rows processed" . ($highvar ? " ... highly variable - showing $args{highsamp} samples." : '') . "\n";
+
+      return 1;
+}
+
+sub grid {
+      my $rows = shift;  # data rows
+      my $fieldsref = shift;
+      my $undef = shift || '';
+
+      my @fields = @{ $fieldsref };   # column keys order
+      my %max = ();
+      foreach my $row ({ map { $_ => $_ } @fields }, @{$rows}) {
+            foreach my $field (@fields) {
+                  my $len = defined $row->{$field} ? length( $row->{$field} ) : length( $undef );
+                  $max{$field} = $len if $len && $len > ($max{$field}||=0);
+            }
+      }
+      my $box = '+-' . join( '-+-', map { '-' x $max{$_} } @fields ) . '-+';
+      print "$box\n";
+      print '| ' . join( ' | ', map { sprintf( '%'.$max{$_}.'s', $_ ) } @fields ) . " |\n";
+      print "$box\n";
+      foreach my $row (@{$rows}) {
+            my @vals = ();
+            foreach my $field (@fields) {
+                  my $val = $row->{$field};
+                  my $just = $max{$field} > 20 ? '-' : '';  # cheap justification heuristic
+                  push @vals, sprintf( '%'.$just.$max{$field}.'s', defined $val ? $val : $undef );
+            }
+            print '| ' . join( ' | ', @vals ) . " |\n";
+      }
+      print "$box\n";
+}
+
+sub make_chunker {
+      my ($size,$sth,$fmt) = @_;
+
+      die "size must be passed\n" unless $size;
+      die "sth must be passed\n" unless $sth;
+      die "sth must be a db ref using -rawsth" unless ref($sth) eq 'DBI::st';
+
+      $fmt ||= 'hashref';
+      die "format must be hashref or arrayref\n" unless $fmt =~ m!^(hashref|arrayref)$!;
+      my $hash = $fmt eq 'hashref' ? 1 : 0;
+
+      my $done = 0;
+
+      return sub {
+            return undef if $done;
+	    my $ct = 0;
+	    my @chunk;
+            if ($hash) {
+                  while(my $data = $sth->fetchrow_hashref()) {
+                        push @chunk, $data;
+                        last if ($ct++ >= $size);
+                  }
+            }
+            else {
+                  while (1) {
+                        if (my $data = $sth->fetchrow_arrayref()) {
+                              push @chunk, [ @{ $data } ];
+                              last if ($ct++ >= $size);
+                        }
+                        else {
+                              $done = 1;
+                              last;
+                        }
+                  }
+            }
+	    return undef unless @chunk;
+	    return \@chunk;
+      }
+}
+
+sub usage {
+      return <<"EOF";
+
+usage:
+    $0 conf=<path to DBR conf file> [ <options> ]
+
+options:
+    conf=<conf-file>
+    class=<class>     [query]  DBR instance class.
+    pkeymax=<count>   [10]     sample pkeys to show.
+    dumpmax=<count>   [10]     sample records to show.
+    highvar=<count>   [200]    distinct values that flag a field as "highly variable".
+    highsamp=<count>  [20]     count of sample fields to show when highly variable.
+
+docs:
+    pod2text <path-to-$0-script>
+
+EOF
+}
+
+1;
+
+=pod
+
+=head1 Title
+
+   DBR Schema and Data Browser
+
+=head1 Synopsis
+
+    % dbr-browse conf=dbr.conf
+
+    % dbr-browse conf=foo.conf class=master
+
+    % dbr-browse conf=foo.conf pkeymax=50 dumpmax=25 highvar=300 highsamp=10
+
+If you have not installed DBR yet:
+
+    % perl -I ../lib dbr-browse conf=bar.conf
+
+=head1 Description
+
+dbr-browse is a DBR tool that shows you database tables with DBR metadata mixed in.
+DBR metadata includes the translator type (e.g. UnixTime, Dollars, Enum, Percent),
+enumeration handles associated with an Enum field, and the forward and backward
+names of relationships to other tables via foreign keys.
+
+At present, the dbr-admin tool is the preferred method for adding in DBR metadata.
+Developers will subsequently find dbr-browse a useful tool for coding the correct
+names in "table paths" when accessing data from a Record object, specifying key
+values to use with ResultSet's hasmap_single() and hashmap_multi() methods, and
+when expressing constraints for an Object where() method.
+
+=head1 Use
+
+=head2 Synopsis
+
+    SCHEMA> webshop
+
+=item Find Tables
+
+    TABLE> item
+
+        0) items
+        1) item_shipment
+        2) received_items
+
+=item Table Information
+
+    TABLE> 0
+
+    TABLE> products
+
+=item Field Value Stats
+
+    TABLE> 0 type
+
+    TABLE> 0 type/product_id=432,654,765
+
+=item Sample Record Dumps
+
+    TABLE> 0 /item_id=1234
+
+    TABLE> 0 /product.brand.name=Ford,GM/type=coupe,wagon,suv
+
+    TABLE> 0 /order.customer.lastname=Jones
+
+=head2 General
+
+    The config file parameter establishes your access to a collection of databases.
+
+    Those databases that have been scanned will have schema data available.
+
+    The schemas will be listed and you will be prompted to enter the name of one.
+
+    Table view mode is now entered.
+
+    Your remaining inputs will be the name (or number) of a table to view.
+
+    A blank input will return to the schema prompt; blank input again will exit.
+
+    A '?' will list all tables, otherwise a list will be shown matching the input.
+
+    When presented with a list, enter the number for the item or key in the full name.
+
+    The number must be used if the table name is also a substring of other table names.
+
+=head2 Command Arguments
+
+=item conf
+
+    The DBR config file.
+
+    Required.
+
+=item class
+
+    By default, the "query" class database is queried.  You may have other classes defined.
+    The other typical class is "master", which is the read-write instance.
+
+    default: query
+
+=item pkeymax
+
+    When sample data for a field is requested, this arg sets the maximum number of sample
+    pkey values for the table that will be shown.
+
+    default: 10
+
+=item dumpmax
+
+    When a field is not specified with a search expression, full records are dumped.
+    This arg controls the maximum number of sample dumps shown.
+
+    default: 10
+
+=item highvar
+
+    This is the threshold number of distinct values for a field that will truncate the
+    values listing.  Stands for "high variability" of field values.
+
+    default: 200
+
+=item highsamp
+
+    If the values listing is truncated, this sets the number of sample values to display.
+
+    default: 20
+
+=head2 Field Value Stats
+
+    Getting a sample of table field values is very helpful when
+    getting to know a database.
+
+    A table or result index may be followed with a field specification.
+
+    If there are less than 200 (or highvar) distinct values in the field, each value
+    and the number of times it occurs will be listed.
+
+    If there are over 200 (or highvar) distinct values, a sampler of 20 (or highsamp) values
+    will be shown.
+
+    In any case, a sampler of up to 10 (or pkeymax) of the table's pkeys will be listed
+    with each of the values shown.
+
+    Multiple fields may be specified, separated by spaces, or "*" for
+    all the table's fields (handy for getting an idea of all the data in the table).
+
+=head2 Full Record Dumps
+
+    If no field is specified with a search, a maximum of 10 (or dumpmax) records
+    will be shown.
+
+=head1 Examples
+
+    examples/music/browse_test.sh
+
+=head1 Technical Notes
+
+    The get_chunker() and related manual chunking is not required - DBR will do this for
+    us, but for large tables DBR simply has too much overhead when the scan covers the
+    entire table (such as getting stats on the number of records associated with each
+    one of 3 possible "status" field values).
+
+=cut

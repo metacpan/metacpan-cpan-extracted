@@ -1,0 +1,22 @@
+--- 
+abstract: get table name list from database
+author: 
+  - Atsushi Kobayashi  C<< <nekokak __at__ gmail.com> >>
+build_requires: 
+  Test::Declare: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.680
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: DBIx-Class-TableNames
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp::Clan: 0
+  DBIx::Class: 0
+version: 0.01

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+SIGNATURE
+lib/Data/CloudWeights.pm
+t/01always_pass.t
+t/02pod.t
+t/03podcoverage.t
+t/05kwalitee.t
+t/06yaml.t
+t/07podspelling.t
+t/10test_script.t

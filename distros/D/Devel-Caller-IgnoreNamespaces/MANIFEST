@@ -1,0 +1,14 @@
+ARTISTIC.txt
+CHANGES
+GPL2.txt
+lib/Devel/Caller/IgnoreNamespaces.pm
+Makefile.PL
+MANIFEST
+README
+t/00_alltests.t
+t/lib/a.pm
+t/lib/b.pm
+t/lib/c.pm
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

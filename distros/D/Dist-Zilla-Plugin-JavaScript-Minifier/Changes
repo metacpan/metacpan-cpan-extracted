@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-JavaScript-Minifier
+
+0.02      2013-12-13 21:25:22 -0500
+  - support Perl 5.8
+
+0.01      2012-12-17 13:20:09 America/New_York
+  - initial version

@@ -1,0 +1,35 @@
+Revision history for Desktop-Detect
+
+0.06    2016-10-07 (PERLANCAR)
+
+	- Detect 'plasma' in addition to 'kde-plasma' (KDE5) (thanks dnebauer)
+          [GH#1].
+
+	- Add CLI.
+
+
+0.05    2015-06-05 (PERLANCAR)
+
+	- Detect gnome-fallback.
+
+
+0.04    2015-06-05 (PERLANCAR)
+
+	- Detect gnome-classic.
+
+
+0.03    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.02    2014-11-22 (PERLANCAR)
+
+        - Detect gnome, lxde, openbox, cinnamon.
+
+
+0.01    2014-11-22 (PERLANCAR)
+
+        - First release, only support xfce & kde-plasma.

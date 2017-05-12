@@ -1,0 +1,30 @@
+<sql:spec xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+
+  <sql:type name="text">
+    <sql:module>DBIx::XMLServer::TextField</sql:module>
+  </sql:type>
+  <sql:type name="number">
+    <sql:module>DBIx::XMLServer::NumberField</sql:module>
+  </sql:type>
+  <sql:type name="datetime">
+    <sql:module>DBIx::XMLServer::DateTimeField</sql:module>
+  </sql:type>
+
+  <sql:table name="employees" sqlname="dbixtest1"/>
+ 
+  <sql:template table="employees">
+    <employees>
+      <sql:record>
+      	<employee>
+      	  <id>
+      	    <sql:field type="number" expr="employees.id"/>
+      	  </id>
+          <seen>
+	    <sql:field type="datetime" expr="employees.lastseen"/>
+          </seen>
+      	</employee>
+      </sql:record>
+    </employees>
+  </sql:template>
+	
+</sql:spec>

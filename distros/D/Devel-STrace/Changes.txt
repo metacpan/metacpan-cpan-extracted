@@ -1,0 +1,16 @@
+Version 0.30 2006-04-28	D. Arnold
+
+	- remove threads dependency
+
+Version 0.30 2006-04-28	D. Arnold
+
+	- extracted RingBuffer, Ring modules into separate module
+
+Version 0.20 2006-04-16	D. Arnold
+
+	- updated to use new IPC::Mmap
+	- removed Win32 restrictions
+	- removed Devel::STrace::Mmap, Devel::STrace::Win32MMF
+
+Version 0.10 2006-04-06	D. Arnold
+	Coded.

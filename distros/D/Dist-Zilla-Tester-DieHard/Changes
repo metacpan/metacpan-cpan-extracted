@@ -1,0 +1,79 @@
+Release history for perl-Dist-Zilla-Tester-DieHard
+
+v0.6.4 @ 2016-12-18 08:53 UTC
+
+    -   Bug #117511: installation test failure (missing updated error text from
+        Dist::Zilla::Tester). Test fails because `Dist::Zilla` changed the error message. Test was
+        rewritten to use double dot ("..") as invalid file name. It seems it is the most portable
+        bad file name from all checked variants.
+
+v0.6.3 @ 2015-11-16 23:22 UTC
+
+    -   I do not know how to let `Dist::Zilla` < 5.023 die in `from_config` but before constructing
+        a builder on `MSWin32` (and `Cygwin`). So the test is skipped in such conditions.
+
+v0.6.2 @ 2015-11-11 23:05 UTC
+
+    -   Another attempt to make test work on MSWin32 + old `Dist::Zilla`: `Dist::Zilla` before
+        5.023 does not die in case of file name with backslash.
+
+    -   Bug in test found: `autodie` is not applied to inner package. Fixed.
+
+v0.6.1 @ 2015-11-10 13:20 UTC
+
+    -   New test (`from_config` dies before constructing builder) fails on some OSes. This is an
+        attempt to use different approaches on MSWin-like OSes (file name with backslash) and other
+        OSes (read-only temporary directory).
+
+v0.6.0 @ 2015-11-09 21:35 UTC
+
+    -   `Survivor` saves chrome instead of logger. It allows to reuse `Dist::Zilla::Tester` code
+        better: consuming `Dist::Zilla::Tester:_Role` brings few methods "for free". For example:
+        `log_messages` (was implemented before, now explicit implementation is not needed),
+        `log_events`, `clear_log_events` (new methods).
+
+    -   There was a problem: if `from_config` dies before constructing builder, `DieHard` did not
+        work well. Namely, constructing survivor failed in such a case due to undefined logger.
+        The problem fixed.
+
+    -   Documentation updated.
+
+v0.5.0 @ 2015-10-26 21:38 UTC
+
+    -   `release` method added.
+
+    -   Documentation fixed a bit: `DieHard` is not a replacement, but an extension of
+        `Dist::Zilla::Tester`.
+
+v0.4.1 @ 2015-10-22 14:52 UTC
+
+    -   Infrastructure updated to work with the latest `@Author::VDB` plugin bundle.
+
+    -   `aspell.en.pws` renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+    -   Minor changes in Synopsis to make `Test::Synopsis` happy.
+
+    -   Short version of license notice is used in the documentation.
+
+v0.4.0 @ 2015-09-17 16:57 UTC
+
+    -   `from_config` warns if exception is caught *and* logger is undefined. I hope this will help
+        to debug `Dist::Zilla::Plugin::Manifest::Read` test failure on `MSWin32` machines.
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.003 @ 2015-09-15 12:31 UTC
+
+    -   The test explicitly requires `Path::Tiny` v0.59 in spite it is not used directly by the
+        test (`Path::Tiny` is used by `Dist::Zilla`). Earlier version of `Path::Tiny` may cause
+        test failure due to exception "Can't locate Unicode/UTF8.pm in @INC" thrown from
+        `Path::Tiny`.
+
+0.002 @ 2015-08-15 13:26 UTC
+
+    -   Undocumented prefix `[DieHard] ` stripped from rethrown exception. The exception is
+        rethrown in original form, without stringifying, as described in documentation.
+    -   Documentation improved a bit, added abstraction, etc.
+
+0.001 @ 2015-08-14 22:44 UTC
+
+    -   Initial revision

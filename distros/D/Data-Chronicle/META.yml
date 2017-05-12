@@ -1,0 +1,37 @@
+---
+abstract: 'Chronicle storage system'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::More: '0.94'
+  Test::NoWarnings: '0'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Chronicle
+requires:
+  DBD::Pg: '0'
+  DBI: '0'
+  Date::Utility: '0'
+  JSON: '0'
+  Moose: '0'
+  Test::Mock::Redis: '0'
+  Test::PostgreSQL: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Data-Chronicle/issues
+  repository: git://github.com/binary-com/perl-Data-Chronicle.git
+version: '0.15'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,61 @@
+{
+   "abstract" : "Collection of web-related plugins for DZil",
+   "author" : [
+      "Nickolay Platonov <nplatonov@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Web",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "1.52",
+            "Capture::Tiny" : "0.08",
+            "Data::Section" : "0.004",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.003",
+            "Dist::Zilla::Plugin::Git" : "1.112070",
+            "Dist::Zilla::Plugin::GithubMeta" : "0.10",
+            "Dist::Zilla::Plugin::InstallRelease" : "0.007",
+            "File::Find::Rule" : "0.28",
+            "File::Temp" : "0.22",
+            "Getopt::LL" : "1.00",
+            "IPC::Run" : "0.90",
+            "JSON" : "2.90",
+            "MIME::Types" : "0.00",
+            "Path::Class" : "0.16",
+            "String::BOM" : "0.3",
+            "Text::Markdown" : "v1.0.26",
+            "Text::MultiMarkdown" : "v1.0.29"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/SamuraiJack/Dist-Zilla-Plugin-Web",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/SamuraiJack/Dist-Zilla-Plugin-Web.git",
+         "web" : "https://github.com/SamuraiJack/Dist-Zilla-Plugin-Web"
+      }
+   },
+   "version" : "0.0.10"
+}
+

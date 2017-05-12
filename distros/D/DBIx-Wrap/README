@@ -1,0 +1,32 @@
+                                DBI::Wrap
+                                  v1.00
+
+       Copyright (c) 2002 Jonathan A. Waxman.  All rights reserved.
+
+          This is free software; you can redistribute it and/or
+             modify it under the same terms as Perl itself.
+
+
+OVERVIEW
+--------
+
+DBI::Wrap is a simple object oriented wrapper around DBI.  It provides
+methods for most SQL queries.  SQL query clauses and parameters are
+defined by named parameters to the methods.  See the POD document for
+DBI::Wrap for more documentation.
+
+INSTALLATION
+------------
+
+The latest version of DBI::Wrap can be obtained from:
+
+  http://search.cpan.org/author/EMRYS/DBI-Wrap-1.00
+
+To install DBI::Wrap
+
+  gunzip DBI-Wrap-1.00.tar.gz
+  tar xvf DBI-Wrap-1.00.tar
+  perl Makefile.PL
+  make
+  make test
+  make install

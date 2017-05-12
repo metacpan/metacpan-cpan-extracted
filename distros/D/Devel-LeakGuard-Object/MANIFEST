@@ -1,0 +1,20 @@
+Makefile.PL
+Changes
+lib/Devel/LeakGuard/Object.pm
+lib/Devel/LeakGuard/Object/State.pm
+LICENSE
+MANIFEST
+README.md
+t/auto.t
+t/basic.t
+t/guard.t
+t/inherit.t
+t/rebless.t
+t/scope.t
+xt/author/kwalitee.t
+xt/author/manifest.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/preflight.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

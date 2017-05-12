@@ -1,0 +1,13 @@
+Changes
+Dua.pm
+Dua.xs
+MANIFEST
+Makefile.PL
+README
+README.duaperl
+dualib/Makefile
+dualib/dua.c
+dualib/dua.h
+examples/example.pl
+examples/example2.pl
+typemap

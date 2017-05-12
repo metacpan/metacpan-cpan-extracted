@@ -1,0 +1,54 @@
+Date::Holidays::AT
+==================
+
+This module creates a list of Austrian holidays in a given year.
+
+Holidays that occur on weekends can be excluded from the generated list.
+
+The generated list can be freely formatted using regular strftime() format
+definitions.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+DEVELOPMENT STATUS
+
+Mostly untested. It works and it's Good Enough(tm) for the author to 
+use it in a small application he wrote for one of his clients.
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Module::Build
+  Date::Calc 5.0
+  POSIX, Time::Local (from the standard Perl distribution)
+  version
+
+
+AUTHOR
+
+Matthias Dietrich <perl@rainboxx.de>
+
+
+ACKNOWLEDGEMENTS
+
+Thanks to Martin Schmitt <mas at scsy dot de>. Date::Holidays::AT
+is based on his Date::Holidays::DE.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright 2007 plusW, Rolf Schaufelberger.  All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

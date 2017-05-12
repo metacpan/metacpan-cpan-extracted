@@ -1,0 +1,162 @@
+# Translation of perl-DateLocale to Russian
+# Copyright (C) 2014 Nikolas Shulyakovskiy
+# This file is distributed under the same license as the perl-DateLocale package.
+#
+# Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: perl-DateLocale\n"
+"Report-Msgid-Bugs-To: shulyakovskiy@mail.ru\n"
+"PO-Revision-Date: 2014-08-12 17:04+0400\n"
+"Last-Translator: Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+msgid "day"
+msgid_plural "day"
+msgstr[0] "день"
+msgstr[1] "дня"
+msgstr[2] "дней"
+
+msgid "min"
+msgid_plural "min"
+msgstr[0] "минута"
+msgstr[1] "минуты"
+msgstr[2] "минут"
+
+msgid "min_ago"
+msgid_plural "min_ago"
+msgstr[0] "минуту назад"
+msgstr[1] "минуты назад"
+msgstr[2] "минут назад"
+
+msgid "shortmin"
+msgstr "мин"
+
+msgid "weekdaywithtime"
+msgstr "%A в %H:%M"
+
+msgid "monthdaywithtime"
+msgstr "%e %B в %H:%M"
+
+msgid "yeardaywithtime"
+msgstr "%e %B %Y в %H:%M"
+
+msgid "weekdaywithouttime"
+msgstr "%A"
+
+msgid "monthdaywithouttime"
+msgstr "%e %B"
+
+msgid "yeardaywithouttime"
+msgstr "%e %B %Y"
+
+msgid "hour"
+msgid_plural "hour"
+msgstr[0] "час"
+msgstr[1] "часа"
+msgstr[2] "часов"
+
+msgid "hour_ago"
+msgid_plural "hour_ago"
+msgstr[0] "час назад"
+msgstr[1] "часа назад"
+msgstr[2] "часов назад"
+
+msgid "fmtdateoccured"
+msgstr "%e %B %Y года"
+
+msgid "today"
+msgstr "сегодня в %H:%M"
+
+msgid "yesterday"
+msgstr "вчера в %H:%M"
+
+msgid "yesterday_short"
+msgstr "вчера"
+
+msgid "tommorow"
+msgstr "завтра в %H:%M"
+
+msgid "datommorow"
+msgstr "послезавтра в %H:%M"
+
+msgid "mon1g"
+msgstr "января"
+
+msgid "mon2g"
+msgstr "февраля"
+
+msgid "mon3g"
+msgstr "марта"
+
+msgid "mon4g"
+msgstr "апреля"
+
+msgid "mon5g"
+msgstr "мая"
+
+msgid "mon6g"
+msgstr "июня"
+
+msgid "mon7g"
+msgstr "июля"
+
+msgid "mon8g"
+msgstr "августа"
+
+msgid "mon9g"
+msgstr "сентября"
+
+msgid "mon10g"
+msgstr "октября"
+
+msgid "mon11g"
+msgstr "ноября"
+
+msgid "mon12g"
+msgstr "декабря"
+
+msgid "mon1"
+msgstr "январь"
+
+msgid "mon2"
+msgstr "февраль"
+
+msgid "mon3"
+msgstr "март"
+
+msgid "mon4"
+msgstr "апрель"
+
+msgid "mon5"
+msgstr "май"
+
+msgid "mon6"
+msgstr "июнь"
+
+msgid "mon7"
+msgstr "июль"
+
+msgid "mon8"
+msgstr "август"
+
+msgid "mon9"
+msgstr "сентябрь"
+
+msgid "mon10"
+msgstr "октябрь"
+
+msgid "mon11"
+msgstr "ноябрь"
+
+msgid "mon12"
+msgstr "декабрь"
+
+msgid "recent"
+msgstr "только что"
+

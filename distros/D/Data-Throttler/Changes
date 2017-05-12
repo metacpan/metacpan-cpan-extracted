@@ -1,0 +1,33 @@
+######################################################################
+Revision history for Perl extension Data::Throttler
+
+0.08 (2015/06/28)
+    (ms) Chris Kirke added the force option for try_push() as 
+         discussed in [rt.cpan.org #33407].
+
+0.07 (2015/06/08)
+    (ms) Chris Kirke added a license and Travis CI integration.
+
+0.06 (2013/05/23)
+    (ms) [rt.cpan.org 85325] Added better diagnostics in case locking
+         of db_file fails, as suggested by Nigel Horne.
+
+0.05 (2010/07/09)
+    (ms) Disabling YAML checks if YAML isn't present
+
+0.04 (2010/05/01)
+    (ms) Added github repository link to Makefile.PL
+    (ms) Daniel Westermann-Clark added reset_key() method
+
+0.03 (2009/06/27)
+    (ms) Replaced DBM::Deep by YAML backend
+    (ms) Fixed bug RT47189 (reported by Jools Smyth)
+    (ms) Text::ASCIITable is now optional
+
+0.02 (2008/03/07)
+    (ms) Persistent file now only modified on write attempts. This allows 
+         for read attempts without knowing the bucket parameters of a 
+         throttler data file.
+
+0.01 (2007/04/08)
+    (ms) Where it all began.

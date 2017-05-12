@@ -1,0 +1,44 @@
+Digest::SHA2
+============
+
+SHA-2 is the collective name of one-way hash functions developed by the
+NIST. SHA-256, SHA-384, and SHA-512 pertains to hashes whose outputs
+are 256 bits, 384 bits and 512 bits, respectively.
+
+This Perl implementation is meant to be a replacement for the older
+SHA256 by Rafael R. Sevilla. His module has a bug in the SHA-256
+implementation.
+
+This new implementation uses the C source of Aaron Gifford.
+
+BONUS
+
+The C file, _sha2.c, is a standalone SHA-2 implementation. To
+compile it, type:
+
+        gcc -Wall _sha2.c
+
+A new binary, a.out, will be created.
+
+To run the binary, type:
+
+        ./a.out
+
+CAVEAT!!!
+
+If you are using a C compiler that does not support 64-bit operations,
+i.e., does not understand "long long" types, please comment out the
+line
+
+    'DEFINE' => '-DSHA2_USE_INTTYPES_H',
+
+in the Makefile.PL.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2003 Julius C. Duque. Please read contact.html that comes
+with this distribution for details on how to contact the author.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as the GNU General Public License.
+

@@ -1,0 +1,8 @@
+38dc63d29392d013
+
+master oregonscale 38.dc63d29392d013: sensor/bwr102.06[weight]=92.9
+
+
+
+
+

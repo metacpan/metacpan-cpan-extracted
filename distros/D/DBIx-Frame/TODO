@@ -1,0 +1,10 @@
+Add in some sample databases - at the very least, map out the 'mysql' DB.
+
+More user testing of dbiframe.cgi's interface.
+
+Try to either remove dependencies on HTML::FormRemove, or make it a useful  
+  module, one of the two.
+
+Safari doesn't support the <caption align=top> thing.
+
+Move base_table() from TB::Download into DBIx::Frame::CGI (or something).

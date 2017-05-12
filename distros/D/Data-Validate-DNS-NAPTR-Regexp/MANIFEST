@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+TODO
+dist.ini
+lib/Data/Validate/DNS/NAPTR/Regexp.pm
+t/00_use.t
+t/01_functional_api.t
+t/02_object_api.t
+t/03_count_captures.t
+t/lib/BadTests.pm
+t/lib/GoodTests.pm
+t/release-pod-syntax.t

@@ -1,0 +1,38 @@
+appname: 'testapp'
+layout: 'main'
+charset: 'UTF-8'
+template: 'template_toolkit'
+engines:
+ template:
+  template_toolkit:
+    encoding: 'utf8'
+    start_tag: '[%'
+    end_tag: '%]'
+    INCLUDE_PATH: 'views'
+
+plugins:
+  Auth::YARBAC:
+    after_logout: '/login'
+    after_login: '/'
+    login_denied: '/login'
+    no_login_required: '^/login|/denied|/css|/images|/generate_hash'
+    realms:
+      test:
+        provider: 'Database'
+        users_table: 'users'
+        users_id_column: 'id'
+        users_username_column: 'username'
+        users_password_column: 'password'
+        password_strength:
+          required_score: 25
+          min_length: 6
+          max_length: 32
+          special_characters: 1
+          control_characters: 1
+          no_repeating: 1
+          upper_case: 1
+          lower_case: 1
+          numbers: 1
+  Database:
+    driver: 'SQLite'
+    database: 'testapp.db'

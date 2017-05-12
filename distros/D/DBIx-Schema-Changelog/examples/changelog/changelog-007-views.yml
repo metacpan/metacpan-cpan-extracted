@@ -1,0 +1,589 @@
+---
+- author: Mario Zieschang
+  entries:
+  - as: |2-
+       SELECT address_information.zip,
+          address_information.city,
+          address_information.state,
+          address_information.country,
+          localvalues.gender,
+          localvalues.birthday,
+          localvalues.forum_topic,
+          localvalues.session_mails,
+          localvalues.logins,
+          localvalues.forum_posts,
+          localvalues.mails,
+          users.last_login,
+          users.last_action,
+          users.last_steahlth,
+          users.id,
+          users.number,
+          users.nickname,
+          users.active,
+          users.flag,
+          users.is_stealth,
+          users.message_sound
+         FROM users,
+          localvalues,
+          address_information
+        WHERE (((((users.id = localvalues.dbuser) AND (address_information.dbuser = users.id)) AND (users.system_user = B'0'::"bit")) AND (users.active = B'1'::"bit")) AND (users.auth_searchable = B'1'::"bit"));
+    name: search_user
+    type: createview
+  - as: |2-
+       SELECT count(forum_post.dbuser) AS count,
+          forum_post.dbuser
+         FROM forum_post_hits,
+          forum_post
+        WHERE ((forum_post.id = forum_post_hits.post) AND ((forum_post.flag)::date > ((('now'::text)::date - '7 days'::interval))::date))
+        GROUP BY forum_post.dbuser
+        ORDER BY count(forum_post.dbuser) DESC;
+    name: view_best_post_user_last_week
+    type: createview
+  - as: |2-
+       SELECT count(forum_post_hits.post) AS count,
+          forum_post.last_post_time,
+          forum_post.dbuser,
+          forum_post.topic,
+          forum_post.description,
+          forum_post.flag,
+          forum_post.number,
+          forum_post.active,
+          forum_post.id
+         FROM forum_post_hits,
+          forum_post
+        WHERE ((forum_post.id = forum_post_hits.post) AND ((forum_post.flag)::date > ((('now'::text)::date - '7 days'::interval))::date))
+        GROUP BY forum_post.last_post_time, forum_post.dbuser, forum_post.topic, forum_post.description, forum_post.flag, forum_post.number, forum_post.active, forum_post.id
+        ORDER BY count(forum_post_hits.post) DESC;
+    name: view_best_posts_last_week
+    type: createview
+  - as: |2-
+       SELECT count(forum_topics.category) AS count,
+          forum_topics.category
+         FROM forum_categories,
+          forum_topics
+        WHERE (forum_categories.id = forum_topics.category)
+        GROUP BY forum_topics.category;
+    name: view_count_cat_topics
+    type: createview
+  - as: |2-
+       SELECT count(forum_post.topic) AS count,
+          forum_post.topic
+         FROM forum_topics,
+          forum_post
+        WHERE (forum_topics.id = forum_post.topic)
+        GROUP BY forum_post.topic;
+    name: view_count_topic_post
+    type: createview
+  - as: |2-
+       SELECT forum_topics.last_post,
+          forum_topics.last_post_time,
+          forum_topics.closed,
+          forum_topics.lang,
+          forum_topics.visits,
+          forum_topics.dbuser,
+          forum_topics.category,
+          forum_topics.description,
+          forum_topics.name,
+          forum_topics.flag,
+          forum_topics.number,
+          forum_topics.active,
+          forum_topics.id,
+          forum_user_subscription.dbuser AS sub_user
+         FROM forum_post,
+          forum_topics,
+          forum_user_subscription
+        WHERE (((((forum_post.id = forum_user_subscription.last_post) AND (forum_topics.id = forum_user_subscription.topic)) AND (forum_topics.id = forum_post.topic)) AND (forum_topics.last_post_time > forum_post.last_post_time)) OR (((((forum_topics.id = forum_user_subscription.topic) AND (forum_topics.dbuser = forum_user_subscription.dbuser)) AND (forum_post.id = forum_topics.last_post)) AND (forum_user_subscription.last_post IS NULL)) AND (forum_topics.last_post IS NOT NULL)))
+        ORDER BY forum_topics.last_post_time DESC;
+    name: view_current_user_subscription
+    type: createview
+  - as: |2-
+       SELECT user_permissions.name AS permission,
+          forum_categories.id,
+          forum_categories.active,
+          forum_categories.number,
+          forum_categories.flag,
+          forum_categories.name,
+          forum_categories.description,
+          forum_categories.head,
+          forum_categories.min_age,
+          forum_categories.male_ro,
+          forum_categories.male_iv,
+          forum_categories.female_ro,
+          forum_categories.female_iv
+         FROM user_permissions,
+          forum_categories,
+          forum_category_need_permissions,
+          forum_cat_sort_table
+        WHERE ((((user_permissions.id = forum_category_need_permissions.user_permission) AND (forum_categories.id = forum_category_need_permissions.forum_category)) AND (forum_cat_sort_table.cat = forum_category_need_permissions.forum_category)) AND (forum_categories.active = B'1'::"bit"))
+        ORDER BY forum_categories.head, forum_cat_sort_table.sort_index;
+    name: view_forum_category
+    type: createview
+  - as: |2-
+       SELECT forum_head_categories.id,
+          forum_head_categories.active,
+          forum_head_categories.number,
+          forum_head_categories.flag,
+          forum_head_categories.name,
+          forum_head_categories.description,
+          forum_head_categories.min_age,
+          user_permissions.name AS permission
+         FROM forum_head_cat_sort_table,
+          forum_head_categories,
+          forum_head_category_need_permissions,
+          user_permissions
+        WHERE ((((forum_head_cat_sort_table.head = forum_head_category_need_permissions.forum_head_category) AND (forum_head_categories.id = forum_head_category_need_permissions.forum_head_category)) AND (user_permissions.id = forum_head_category_need_permissions.user_permission)) AND (forum_head_categories.active = B'1'::"bit"))
+        ORDER BY forum_head_cat_sort_table.sort_index;
+    name: view_forum_head_category
+    type: createview
+  - as: |2-
+       SELECT forum_topics.id,
+          forum_topics.last_post,
+          forum_topics.last_post_time,
+          forum_topics.closed,
+          forum_topics.lang,
+          forum_topics.visits,
+          forum_topics.dbuser,
+          forum_topics.category,
+          forum_topics.description,
+          forum_topics.name,
+          forum_topics.flag,
+          forum_topics.number,
+          forum_count_post.number AS last_post_number,
+          forum_categories.id AS cat_id,
+          forum_categories.female_iv,
+          forum_categories.female_ro,
+          forum_categories.male_iv,
+          forum_categories.male_ro,
+          forum_categories.min_age,
+          forum_categories.description AS cat_description,
+          forum_categories.name AS cat_name,
+          forum_categories.number AS cat_number,
+          forum_head_categories.id AS head_id,
+          forum_head_categories.min_age AS head_min_age,
+          forum_head_categories.description AS head_description,
+          forum_head_categories.name AS head_name,
+          forum_head_categories.number AS head_number,
+          cat_permission.name AS cat_permission,
+          head_permission.name AS head_permission
+         FROM forum_topics,
+          forum_categories,
+          forum_head_categories,
+          forum_category_need_permissions,
+          forum_head_category_need_permissions,
+          user_permissions cat_permission,
+          user_permissions head_permission,
+          forum_count_post
+        WHERE ((((((((((forum_count_post.topic = forum_topics.id) AND (forum_topics.category = forum_categories.id)) AND (forum_categories.head = forum_head_categories.id)) AND (forum_categories.id = forum_category_need_permissions.forum_category)) AND (forum_head_categories.id = forum_head_category_need_permissions.forum_head_category)) AND (forum_category_need_permissions.user_permission = cat_permission.id)) AND (forum_head_categories.active = B'1'::"bit")) AND (forum_categories.active = B'1'::"bit")) AND (forum_topics.active = B'1'::"bit")) AND (head_permission.id = forum_head_category_need_permissions.user_permission));
+    name: view_forum_topic
+    type: createview
+  - as: |2-
+       SELECT up1.name AS cat_permission,
+          up2.name AS head_permission,
+          forum_topics.last_post,
+          forum_topics.closed,
+          forum_topics.lang,
+          forum_topics.visits,
+          forum_topics.dbuser,
+          forum_topics.category,
+          forum_topics.description,
+          forum_topics.name,
+          forum_topics.flag,
+          forum_topics.number,
+          forum_topics.active,
+          forum_topics.id,
+          users.nickname AS last_post_nickname,
+          users.number AS last_post_number,
+          forum_post.flag AS last_post_flag,
+          forum_categories.head
+         FROM forum_head_categories,
+          forum_topics,
+          forum_categories,
+          forum_category_need_permissions,
+          forum_head_category_need_permissions,
+          user_permissions up1,
+          user_permissions up2,
+          forum_post,
+          users
+        WHERE (((((((((forum_head_categories.id = forum_categories.head) AND (forum_categories.id = forum_topics.category)) AND (forum_category_need_permissions.forum_category = forum_categories.id)) AND (forum_head_category_need_permissions.forum_head_category = forum_head_categories.id)) AND (up1.id = forum_category_need_permissions.user_permission)) AND (up2.id = forum_head_category_need_permissions.user_permission)) AND (forum_post.topic = forum_topics.id)) AND (forum_post.id = forum_topics.last_post)) AND (users.id = forum_post.dbuser));
+    name: view_forum_topics_open
+    type: createview
+  - as: |2-
+       SELECT forum_topics.id,
+          forum_topics.number,
+          forum_topics.flag,
+          forum_topics.name,
+          forum_topics.description,
+          forum_topics.visits,
+          forum_user_subscription.dbuser,
+          forum_topics.category,
+          forum_post.number AS last_post,
+          forum_post.flag AS last_flag,
+          forum_topics.active
+         FROM forum_post,
+          forum_user_subscription,
+          forum_topics
+        WHERE ((((forum_post.id = forum_user_subscription.last_post) AND (forum_topics.id = forum_post.topic)) AND (forum_topics.id = forum_user_subscription.topic)) AND (forum_topics.active = B'1'::"bit"))
+        ORDER BY forum_post.flag DESC;
+    name: view_join_user_subscription
+    type: createview
+  - as: |2-
+       SELECT DISTINCT forum_categories.id AS category,
+          forum_post.dbuser,
+          forum_post.topic,
+          forum_post.description,
+          forum_post.flag,
+          forum_post.number,
+          forum_post.active,
+          forum_post.id
+         FROM forum_categories,
+          forum_topics,
+          forum_post
+        WHERE ((((forum_topics.category = forum_categories.id) AND (forum_post.topic = forum_topics.id)) AND (forum_topics.active = B'1'::bit(1))) AND (forum_categories.active = B'1'::bit(1)))
+        ORDER BY forum_categories.id DESC, forum_post.flag DESC;
+    name: view_last_post_by_cat
+    type: createview
+  - as: |2-
+       SELECT forum_user_subscription.topic AS id,
+          users.last_login,
+          users.last_action,
+          users.nickname,
+          users.number,
+          forum_user_subscription.dbuser
+         FROM users,
+          forum_user_subscription
+        WHERE ((((forum_user_subscription.dbuser = users.id) AND (users.last_action > ((date_part('epoch'::text, now()))::integer - 600))) AND (users.active = B'1'::"bit")) AND (users.system_user = B'0'::"bit"));
+    name: view_online_topic_subscription_users
+    type: createview
+  - as: |2-
+       SELECT user_roles.id AS user_role,
+          user_permissions.name,
+          user_permissions.description,
+          user_roles.name AS role_name
+         FROM user_role_has_permissions,
+          user_permissions,
+          user_roles
+        WHERE ((user_permissions.id = user_role_has_permissions.user_permission) AND (user_roles.id = user_role_has_permissions.user_role));
+    name: view_role_permissions
+    type: createview
+  - as: |2-
+       SELECT address_information.zip,
+          address_information.city,
+          address_information.state,
+          address_information.country,
+          localvalues.gender,
+          localvalues.birthday,
+          localvalues.forum_topic,
+          localvalues.session_mails,
+          localvalues.logins,
+          localvalues.forum_posts,
+          localvalues.mails,
+          users.last_login,
+          users.last_action,
+          users.id,
+          users.number,
+          users.nickname,
+          users.active,
+          users.flag,
+          profile_settings_attributes.avatar,
+          users.is_stealth
+         FROM users,
+          address_information,
+          localvalues,
+          profile_settings_attributes
+        WHERE ((((((address_information.dbuser = users.id) AND (localvalues.dbuser = users.id)) AND (profile_settings_attributes.dbuser = users.id)) AND (users.system_user = B'0'::"bit")) AND (users.active = B'1'::"bit")) AND (users.auth_searchable = B'1'::"bit"));
+    name: view_search_user_avatar
+    type: createview
+  - as: |2-
+       SELECT user_friends.friend,
+          user_friends.dbuser,
+          friends.last_action AS fr_last_action,
+          friends.last_status AS fr_last_status,
+          users.last_action,
+          users.last_status
+         FROM user_friends,
+          users,
+          users friends
+        WHERE ((users.id = user_friends.dbuser) AND (friends.id = user_friends.friend));
+    name: view_summarize_online_friends
+    type: createview
+  - as: |2-
+       SELECT users.active,
+          users.id,
+          users.number,
+          users.flag,
+          users.nickname,
+          users.mail,
+          users.last_login,
+          users.last_action,
+          users.system_user,
+          users.auth_friends_only,
+          users.auth_online_only,
+          users.last_steahlth,
+          users.auth_searchable,
+          users.is_stealth,
+          users.message_sound,
+          users.is_blog_public,
+          users.smileys,
+          users.verified,
+          profile_settings_attributes.avatar,
+          profile_settings_attributes.color,
+          profile_settings_attributes.bordercolor,
+          profile_settings_attributes.theme_2,
+          profile_settings_attributes.theme_1,
+          profile_settings_attributes.bg_image,
+          address_information.zip,
+          address_information.city,
+          address_information.state,
+          address_information.country,
+          users.salt,
+          users.last_status,
+          users.last_idle_remind,
+          localvalues.locale,
+          localvalues.gender,
+          localvalues.birthday,
+          localvalues.mails,
+          localvalues.forum_posts,
+          localvalues.logins,
+          localvalues.forum_topic,
+          localvalues.session_mails,
+          localvalues.hide_birthday,
+          localvalues.hide_age,
+          localvalues.visits,
+          user_has_user_role.user_role
+         FROM address_information,
+          profile_settings_attributes,
+          users,
+          localvalues,
+          user_has_user_role
+        WHERE ((((((users.id = user_has_user_role.dbuser) AND (address_information.dbuser = profile_settings_attributes.dbuser)) AND (profile_settings_attributes.dbuser = localvalues.dbuser)) AND (users.id = profile_settings_attributes.dbuser)) AND (users.id = address_information.dbuser)) AND (localvalues.dbuser = users.id));
+    name: view_user
+    type: createview
+  - as: |2-
+       SELECT user_has_user_role.user_role,
+          user_settings.hide_age,
+          user_settings.hide_birthday,
+          user_settings.smileys,
+          user_settings.public_blog,
+          user_settings.message_sound,
+          user_settings.stealth,
+          user_settings.auth_searchable,
+          user_settings.auth_friends_only,
+          user_settings.auth_online_only,
+          user_settings.avatar,
+          user_settings.color,
+          user_settings.bordercolor,
+          user_settings.theme_2,
+          user_settings.theme_1,
+          user_settings.bg_image,
+          users.deleted,
+          users.locale,
+          users.birthday,
+          users.gender,
+          users.verified,
+          users.last_status,
+          users.last_idle_remind,
+          users.last_steahlth,
+          users.system_user,
+          users.last_login,
+          users.last_action,
+          users.salt,
+          users.nickname,
+          users.mail,
+          users.flag,
+          users.number,
+          users.active,
+          users.id,
+          user_roles.name
+         FROM users,
+          user_has_user_role,
+          user_settings,
+          user_roles
+        WHERE ((((users.id = user_settings.dbuser) AND (user_has_user_role.dbuser = users.id)) AND (user_settings.dbuser = user_has_user_role.dbuser)) AND (user_roles.id = user_has_user_role.user_role));
+    name: view_user_2
+    type: createview
+  - as: |2-
+       SELECT user_has_user_role.user_role,
+          user_settings.hide_age,
+          user_settings.hide_birthday,
+          user_settings.smileys,
+          user_settings.public_blog,
+          user_settings.stealth,
+          user_settings.auth_searchable,
+          user_settings.auth_friends_only,
+          user_settings.auth_online_only,
+          user_settings.avatar,
+          user_settings.color,
+          user_settings.bordercolor,
+          user_settings.theme_2,
+          user_settings.theme_1,
+          user_settings.bg_image,
+          users.id,
+          users.active,
+          users.flag,
+          users.number,
+          users.nickname,
+          users.pass,
+          users.salt,
+          users.mail,
+          users.last_action,
+          users.last_login,
+          users.system_user,
+          users.last_steahlth,
+          users.last_idle_remind,
+          users.last_status,
+          users.verified,
+          users.token,
+          users.gender,
+          users.birthday,
+          users.locale,
+          users.deleted,
+          users.delete_reason,
+          user_roles.name
+         FROM users,
+          user_has_user_role,
+          user_settings,
+          user_roles
+        WHERE ((((users.id = user_settings.dbuser) AND (user_has_user_role.dbuser = users.id)) AND (user_settings.dbuser = user_has_user_role.dbuser)) AND (user_roles.id = user_has_user_role.user_role));
+    name: view_user_3
+    type: createview
+  - as: |2-
+       SELECT user_friends.id,
+          user_friends.flag,
+          users.id AS user_id,
+          users.active AS user_active,
+          users.number AS user_number,
+          users.nickname AS user_nickname,
+          users.last_action AS user_last_action,
+          users.last_login AS user_last_login,
+          friend.id AS friend_id,
+          friend.active AS friend_active,
+          friend.number AS friend_number,
+          friend.nickname AS friend_nickname,
+          friend.last_action AS friend_last_action,
+          friend.last_login AS friend_last_login
+         FROM user_friends,
+          users,
+          users friend
+        WHERE ((((users.id = user_friends.dbuser) AND (friend.id = user_friends.friend)) AND (friend.active = B'1'::"bit")) AND (users.active = B'1'::"bit"))
+        ORDER BY friend.last_action, users.last_action DESC;
+    name: view_user_friend
+    type: createview
+  - as: |2-
+       SELECT messages.id AS message_id,
+          messages.sender,
+          messages.recipient,
+          messages.flag,
+          users.id,
+          users.nickname,
+          users.salt,
+          messages.read
+         FROM users,
+          messages
+        WHERE (((messages.sender = users.id) AND (messages.trash = B'0'::"bit")) AND (users.active = B'1'::"bit"));
+    name: view_user_inbox
+    type: createview
+  - as: |2-
+       SELECT users.id,
+          user_permissions.name,
+          user_permissions.number,
+          user_permissions.description
+         FROM user_role_has_permissions,
+          user_roles,
+          user_permissions,
+          user_has_user_role,
+          users
+        WHERE ((((user_roles.id = user_role_has_permissions.user_role) AND (user_roles.id = user_has_user_role.user_role)) AND (user_permissions.id = user_role_has_permissions.user_permission)) AND (users.id = user_has_user_role.dbuser));
+    name: view_user_permissions
+    type: createview
+  - as: |2-
+       SELECT messages.id AS message_id,
+          messages.sender,
+          messages.recipient,
+          messages.flag,
+          users.id,
+          users.nickname,
+          users.salt
+         FROM users,
+          messages
+        WHERE ((messages.recipient = users.id) AND (users.active = B'1'::"bit"));
+    name: view_user_sent
+    type: createview
+  - as: |2-
+       SELECT forum_topics.last_post,
+          forum_topics.last_post_time,
+          forum_topics.closed,
+          forum_topics.lang,
+          forum_topics.visits,
+          forum_topics.category,
+          forum_topics.description,
+          forum_topics.name,
+          forum_topics.flag,
+          forum_topics.number,
+          forum_topics.active,
+          forum_topics.id,
+          forum_user_subscription.dbuser,
+          forum_post.flag AS last_flag
+         FROM forum_post,
+          forum_user_subscription,
+          forum_topics
+        WHERE ((((forum_post.id = forum_user_subscription.last_post) AND (forum_topics.id = forum_post.topic)) AND (forum_topics.id = forum_user_subscription.topic)) AND (forum_topics.active = B'1'::"bit"))
+        ORDER BY forum_post.flag DESC;
+    name: view_user_subscription_unfiltered
+    type: createview
+  - as: |2-
+       SELECT system_news_for_user.active,
+          system_news.description,
+          system_news.name,
+          system_news.flag,
+          system_news.number,
+          system_news.id,
+          system_news_for_user.dbuser
+         FROM system_news,
+          system_news_for_user,
+          users
+        WHERE (((system_news.id = system_news_for_user.system_news) AND (users.id = system_news_for_user.dbuser)) AND (system_news_for_user.active = B'1'::"bit"));
+    name: view_user_system_news
+    type: createview
+  - as: |2-
+       SELECT messages.id AS message_id,
+          messages.sender,
+          messages.recipient,
+          messages.flag,
+          users.id,
+          users.nickname,
+          users.salt
+         FROM users,
+          messages
+        WHERE (((messages.sender = users.id) AND (messages.trash = B'1'::"bit")) AND (users.active = B'1'::"bit"));
+    name: view_user_trash
+    type: createview
+  - as: |2-
+       SELECT cat.description,
+          cat.name,
+          cat.active,
+          cat.number,
+          cat.created_by,
+          cat.id,
+          idx.order_idx,
+          hier.rgt,
+          hier.lft
+         FROM ((gallery_categories cat
+           JOIN gallery_category_hierarchy hier ON ((cat.id = hier.category)))
+           LEFT JOIN gallery_category_order_idx idx ON ((cat.id = idx.category)));
+    name: view_gallery_unfiltered
+    type: createview
+  - as: |2-
+       SELECT msg_session_members.last_read,
+          msg_session_messages.trash,
+          msg_session_messages.read,
+          msg_session_messages.msg_user,
+          msg_session_messages.msg_session,
+          msg_session_messages.description,
+          msg_session_messages.flag,
+          msg_session_messages.id
+         FROM msg_session_messages,
+          msg_session_members
+        WHERE ((msg_session_members.last_read < msg_session_messages.flag) AND (msg_session_members.msg_session = msg_session_messages.msg_session));
+    name: view_msg_list_all_unread
+    type: createview
+  id: 007-maz

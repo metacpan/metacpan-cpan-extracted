@@ -1,0 +1,25 @@
+<specification>
+<value name="products.sku" class="sku" field="product.sku"/>
+<value name="products.name" class="name" field="product.name"/>
+<value name="products.weight" class="weight" field="product.weight"/>
+<value name="products.short_description" class="Crumb" field="product.short_description"/>
+<value name="products.description" field="product.description" class="product-teaser"/>
+<list name="options" class="product-options-item" iterator="options">
+<param name="sku" class="Product-Options-sku"/>
+</list>
+<list name="attributes" class="product-attributes-item"
+      iterator="product.attribute_iterator">
+<param name="name" class="product-attributes-name" target="name"/>
+<param name="title" class="product-attributes-title"/>
+<list name="attribute_values" class="product-attributes-values-item"
+      iterator="attribute_values">
+<param name="value" class="product-attributes-Value" field="value" target="value"/>
+<param name="product-attributes-value" field="title"/>
+</list>
+</list>
+<list name="crumb" class="crumb-nav" iterator="product.path">
+<param name="linktext" class="crumb-link" field="nAme"/>
+<param name="link" class="crumb-Link" field="uri" target="href"/>
+</list>
+<value name="crumb" field="product.name"/>
+</specification>

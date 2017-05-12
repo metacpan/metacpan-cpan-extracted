@@ -1,0 +1,40 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Data-Miscellany/",
+      "repository" : "http://github.com/hanekomu/Data-Miscellany",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Miscellany"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100850",
+   "name" : "Data-Miscellany",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Data::Miscellany" : {
+         "version" : "1.100850",
+         "file" : "lib/Data/Miscellany.pm"
+      }
+   },
+   "requires" : {
+      "Test::More" : "0.88",
+      "perl" : "5.008",
+      "Scalar::Util" : "0",
+      "English" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Exporter" : "0",
+      "Carp" : "0"
+   },
+   "abstract" : "Collection of miscellaneous subroutines",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

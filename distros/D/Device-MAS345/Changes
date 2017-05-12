@@ -1,0 +1,14 @@
+######################################################################
+Revision history for Perl extension Device::MAS345
+
+0.03  2010/12/04
+    (ms) Moved repo to github: https://github.com/mschilli/device-mas345-perl
+    (ms) Added k/MOhm regex patch by superkuh
+
+0.02  2007/10/17
+    (ms) Skipping tests by default, because we can't assume which serial
+         port the device is connected on (and only losers ask questions 
+         during a cpan install)
+
+0.01  2007/05/19
+    (ms) Where it all began.

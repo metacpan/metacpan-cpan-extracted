@@ -1,0 +1,249 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Util
+
+=head1 DESCRIPTION
+
+This module contains functions to ease using tubes.
+
+=head1 FUNCTIONS
+
+=head2 B<< identify >>
+
+   identify($args, $opts);
+
+print out an identification for a tube as a log (via
+L<Log::Log4perl::Tiny>). This function is supposed to be used in tube
+factories, to print out a message stating that the specific factory is
+running.
+
+In general, C<$args> is the hash reference of arguments that is used as
+input for the factory. On the other hand, C<$opts> are options for
+C<identity> itself.
+
+Both C<$args> and C<$opts> MUST be hash references. If not provided (or
+C<undef>), it is taken from field C<identification> in C<$args>.
+
+The function tries to figure out the name of the factory that is calling
+the function itself, so that you don't have to. You can override this
+automatic detection through option C<caller> inside C<$opts>.
+
+The following keys are supported in C<$opts>:
+
+=over
+
+=item C<caller>
+
+the result of running C<CORE::caller> where the input sees fit. This is
+useful whenever you have a tube factory that relies upon another tube
+factory, and you want to ensure that the right I<caller> will be used;
+
+=item C<level>
+
+hint for C<CORE::caller> for automatic detection of the caller. You are
+probably better off using L</caller> instead;
+
+=item C<loglevel>
+
+log level to use for emitting the log message;
+
+=item C<message>
+
+a L<Template::Perlish>-compliant string with the message. This template
+will be expanded with a hash containing the following parameters:
+
+=over
+
+=item C<package>
+
+=item C<filename>
+
+=item C<line>
+
+=item C<subroutine>
+
+=item C<hasargs>
+
+=item C<wantarray>
+
+=item C<evaltext>
+
+=item C<is_require>
+
+=item C<hints>
+
+=item C<bitmask>
+
+=item C<hintsh>
+
+whatever is available as C<caller> (either from C<$opts>, or
+automatically detected);
+
+=item C<name>
+
+of the tube, tanek from C<$args> (or set to string C<*unknown*>, in
+case it is undefined in C<$args>);
+
+=item C<args>
+
+what passed as C<$args>
+
+=item C<opts>
+
+what passed or deduced as C<$opts>
+
+=back
+
+=item C<tp_opts>
+
+options for L<Template::Perlish>'s constructor.
+
+=back
+
+The following options are supported in C<$args>:
+
+=over
+
+=item C<identifier>
+
+the default value for C<$opts>;
+
+=item C<name>
+
+the name of the tube, defaults to C<*undef*>.
+
+=back
+
+=head2 B<< log_helper >>
+
+   my $lh = log_helper($args, $opts);
+
+generate a sub reference that can be useful for emitting log messages,
+possibly inserted by a factory inside a generated tube. Weight carefully
+if you really want to use a I<log helper> or if you're just better off
+using a C<logger> from L<Data::Tubes::Plugin::Plumbing>.
+
+C<$args> is supposed to be arguments used to call the tube factory.
+C<$opts> contain options for C<log_helper> itself.
+
+If not defined, C<$opts> is taken from field C<logger> in C<$args>.
+
+The returned sub takes a record as input, and expands a
+L<Template::Perlish> template. See C<message> in the options C<$opts>
+below.
+
+The following options are available for C<$opts>:
+
+=over
+
+=item C<loglevel>
+
+log level to use for emitting the log message;
+
+=item C<message>
+
+a L<Template::Perlish>-compliant string with the message. This template
+will be expanded with a hash containing the following parameters:
+
+=over
+
+=item C<args>
+
+whatever was passed as C<$args>;
+
+=item C<opts>
+
+whatever passed as C<$opts> or taken from C<$args> in field C<logger>;
+
+=item C<record>
+
+the input record.
+
+=back
+
+=item C<tp_opts>
+
+options for L<Template::Perlish>'s constructor.
+
+=back
+
+The following options are recognised from C<$args>:
+
+=over
+
+=item C<logger>
+
+the default value for C<$opts>;
+
+=item C<name>
+
+the name of the tube, defaults to C<*undef*>.
+
+=back
+
+=head2 B<< read_file >>
+
+   my $contents = read_file($filename, %args); # OR
+   my $contents = read_file(%args); # OR
+   my $contents = read_file(\%args);
+
+See L<Data::Tubes::Util/read_file>, this is a re-export for ease of use
+with L<Data::Tubes/summon> and backwards compatibility.
+
+=head2 B<< tubify >>
+
+   @tubes = tubify(@specifications); # OR
+   @tubes = tubify(\%opts, @specifications);
+
+automatically transform input specifications into tubes. Each item in
+C<@specification> can be either a tube (i.e. a code reference), or
+something that can be transformed into a tube (see L<Data::Tubes/tube>
+for a definition). Additionally, whatever in C<@specification> is found
+to be I<false> (in the Perl sense) will just be ignored.
+
+Hence, this does returns the two tubes you think:
+
+   @tubes = tubify(
+      'Reader::by_line',
+      ['Parser::by_format', format => 'foo,bar,baz'],
+   );
+
+Additionally, this actually does what you think:
+
+   @tubes = tubify(
+      'Reader::by_line',
+      ['Parser::by_format', format => 'foo,bar,baz'],
+      ($foobar && sub { die unless $_[0]->{structured}}),
+   );
+
+You can optionally pass a I<hash reference> of options as the first
+parameter. This allows you to set any option available through
+L<Data::Tubes/tube>, e.g. C<prefix>.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

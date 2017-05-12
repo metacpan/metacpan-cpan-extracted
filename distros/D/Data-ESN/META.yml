@@ -1,0 +1,28 @@
+---
+abstract: 'Manipulate mobile ESN values'
+author:
+  - 'Adam Wohld <adam@spatialsystems.org>'
+build_requires:
+  Test::Carp: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0.4'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-ESN
+provides:
+  Data::ESN:
+    file: lib/Data/ESN.pm
+    version: '0.04'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  perl: '5.006'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.04'

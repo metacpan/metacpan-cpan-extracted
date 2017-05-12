@@ -1,0 +1,16 @@
+Revision history for Dist-Zilla-Plugin-Git-ExcludeUntracked
+
+0.05 January 12 2016
+    - Set up deprecated metadata
+
+0.04 January 12 2016
+    - Mark this plugin as deprecated in favor of Dist::Zilla::Plugin::Git::GatherDir
+
+0.03 March 27 2013
+     - Fix bug where subrepos would be included in resulting distribution
+
+0.02 March 17 2013
+     - Remove usage of Archive::Tar::Wrapper, which broke tests (Ivan Bessarabov++)
+
+0.01 March 27 2012
+     - Initial release.

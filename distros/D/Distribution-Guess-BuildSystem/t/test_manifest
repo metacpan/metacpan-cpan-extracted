@@ -1,0 +1,15 @@
+load.t
+pod.t
+pod_coverage.t
+#prereq.t
+_setting.t
+file_has_string.t
+makemaker-true.t
+makemaker-build-wrapped.t
+makemaker-build-either.t
+module-build.t
+module-install.t
+module-install-autoinstall.t
+module-build-compat.t
+just_give_me_a_hash.t
+preferred.t

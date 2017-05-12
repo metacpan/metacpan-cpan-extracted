@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DNS-BL
+version:      0.03
+version_from: lib/DNS/BL.pm
+installdirs:  site
+requires:
+    BerkeleyDB:                    0
+    NetAddr::IP:                   3
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

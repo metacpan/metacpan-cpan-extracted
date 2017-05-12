@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ccf1a61611ff82f66b8c2d445ba085bd330e9f5f Build.PL
+SHA1 84c257dd56a2731dff1284ee60cb2512f3d8d16f Changes
+SHA1 37dbdd8d9c27fadd3e68329ba4820120b81c4042 LICENSE
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba LICENSES/artistic.txt
+SHA1 18eaf66587c5eea277721d5e569a6e3cd869f855 LICENSES/gpl-1.0.txt
+SHA1 4cc77b90af91e615a64ae04893fdffa7939db84c LICENSES/gpl-2.0.txt
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 LICENSES/gpl-3.0.txt
+SHA1 7f20fcdcedc67cd3e0e596866fc181e6e446ee56 MANIFEST
+SHA1 ef20b9c21577ba56dd59cad594d7d36a9a67c479 MANIFEST.SKIP
+SHA1 26bda34de239fc6426e803ec3eb58fed5b81b0f4 META.json
+SHA1 9b773911a19a6ece522de38f409b02240d34d8d6 META.yml
+SHA1 d89df7d7647b9dc8c1e07dca866efaba4fded5ed README
+SHA1 2b50897add942e85721b65c0dd62c37a68636c91 bin/p800date
+SHA1 4a1ea3c2efac7cedb53110891867874674817da4 bin/p800exif
+SHA1 1f8eee22e875837004e8d3df952ba0f2cf9952ef lib/Date/Extract/P800Picture.pm
+SHA1 8e76857049c86383dd92a83fe23cf4d732379c7b lib/Date/Extract/P800Picture/Exceptions.pm
+SHA1 2fdbb7b82753db69eb5026a7d93fb1fc046ce7a7 sample/36LC0079.jpg
+SHA1 53a0143169dfcce7450466bf83be1b24fb19b099 sample/36LC0079_original.jpg
+SHA1 696cf079f7629da295221983f12a8a33e9b86840 t/00_base.t
+SHA1 322ab33a41682805a643d6aec5c9493ed815d391 t/00_signature.t
+SHA1 98cb49f2d5319a41c1c42426e8d9a4874f48c92d t/01_boundaries.t
+SHA1 ee6e9ec6ad6743dcddf7328b7cc92afd28103745 t/02_hours.t
+SHA1 92d9a80266250f73c96f417909ed8e16f486d1a4 t/03_days.t
+SHA1 7faa951881997c4e342b774613498202c26bd5f0 t/04_months.t
+SHA1 24dc6a080aa331d16b98069462351bf46ddd5249 t/05_years.t
+SHA1 5e5c1fc8f3e4c2a0f7888fc6cebbe3dc2448bff1 t/06_exceptions.t
+SHA1 9ddc70b1a5f6686a6285322cf6eff317d096f6ef t/07_field.t
+SHA1 e9c6a5881fc60173fbc8d479c1afd2ce3b43bef1 t/09_pod.t
+SHA1 e87bc7bb9fe9e02af2ba48b4525f6e1dadc16f8f t/10_pod-coverage.t
+SHA1 ac8a49e2fe0d0b8dfbda83a73bb6104b088c7c04 t/11_test-coverage.t
+SHA1 986a8495ad0233bfdd64cfd2d32cc328f8e8ad18 t/12_manifest.t
+SHA1 36d3bb9354e7fe3fb0453891623242d493479629 t/13_critic.t
+SHA1 e70f577987aa799eabb3179b657de55f9821a117 t/14_kwalitee.t
+SHA1 845fc6c0eccaa979f24a52790081cfd6ea925666 t/15_spell.t
+SHA1 cb04adee449966827cb3d0b1dc8ce205bf9264e6 t/perlcriticrc
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlj7degACgkQ8EyqqHBOVHeVrgCgnPyMUfGpQnyb34WTl3RUU98U
+OH8An0BhO8Bp0TKrFaxZpBq7qGta4R5o
+=A0bu
+-----END PGP SIGNATURE-----

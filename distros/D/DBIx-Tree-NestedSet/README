@@ -1,0 +1,41 @@
+DBIx::Tree::NestedSet
+========================
+ 
+See the module documentation for more information.
+ 
+INSTALLATION
+ 
+To install this module type the following:
+ 
+   perl Makefile.PL
+   make
+   make test
+   make install
+ 
+DEPENDENCIES
+ 
+This module requires DBI for normal usage.  
+
+It requires CGI::Application and HTML::Template if you want to use the 
+included "helper class," DBIx::Tree::NestedSet::Manage, which
+provides a CGI interface to your tree.
+
+NOTES
+
+This module has been tested on MySQL versions 4.0.18 and 3.23.49 and SQLite 2.x.
+Porting it to another RDBMS should be trivial, given the existence of RDBMS
+specific driver classes that abstract out non-portable SQL. 
+
+This module *does not work* with SQLite version 3. It segfaults.
+
+If you're using this module successfully on another system, please let me know
+AND SEND IN YOUR DRIVER CLASS! Please. It's how CPAN gets better.
+ 
+COPYRIGHT AND LICENSE
+ 
+Copyright (C) Geekuprising Internet Consultants
+ 
+http://www.geekuprising.com
+ 
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

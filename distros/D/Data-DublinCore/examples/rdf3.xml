@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/dcmes-xml/
+ -->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <rdf:Description rdf:about="http://www.ilrt.bristol.ac.uk/people/cmdjb/">
+    <dc:title>Dave Beckett's Home Page</dc:title>
+    <dc:creator>Dave Beckett</dc:creator>
+    <dc:publisher>ILRT, University of Bristol</dc:publisher>
+    <dc:date>2002-07-31</dc:date>
+  </rdf:Description>
+</rdf:RDF>
+

@@ -1,0 +1,10 @@
+0.02    2011-05-13
+
+ - Add dzil plugin for $VERSION.
+ - Update repository URL.
+ - Add missing BUGS and SUPPORT sections in POD.
+
+0.01    2011-05-05
+
+ - Initial release.
+

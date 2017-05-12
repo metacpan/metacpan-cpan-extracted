@@ -1,0 +1,15 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+examples/adder/dancer-app-add-numbers.pl
+examples/adder/logs/development.log
+examples/adder/worker.pl
+lib/Dancer/Plugin/GearmanXS.pm
+t/00-load.t
+t/01-server-running.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

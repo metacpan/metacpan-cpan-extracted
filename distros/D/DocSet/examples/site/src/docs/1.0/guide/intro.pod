@@ -1,0 +1,106 @@
+=head1 NAME
+
+Introduction and Incentives
+
+=head1 Description
+
+An introduction to what mod_perl is all about, its different features,
+and some explanations of the C API, C<Apache::Registry>,
+C<Apache::PerlRun> and the Apache/Perl API.
+
+
+=head1 What is mod_perl?
+
+The Apache/Perl integration project brings together the full power of
+the Perl programming language and the Apache HTTP server. With
+mod_perl it is possible to write Apache modules entirely in Perl,
+letting you easily do things that are more difficult or impossible in
+regular CGI programs, such as running sub requests. In addition, the
+persistent Perl interpreter embedded in the server saves the overhead
+of starting an external interpreter, i.e. the penalty of Perl start-up
+time.  And not the least important feature is code caching, where
+modules and scripts are loaded and compiled only once, and for the
+rest of the server's life they are served from the cache. Thus the
+server spends its time only running already loaded and compiled code,
+which is very fast.
+
+The primary advantages of mod_perl are power and speed. You have full
+access to the inner workings of the web server and can intervene at
+any stage of request-processing. This allows for customized processing
+of (to name just a few of the phases) URI-E<gt>filename translation,
+authentication, response generation, and logging. There is very little
+run-time overhead. In particular, it is not necessary to start a
+separate process, as is often done with web-server extensions. The
+most wide-spread such extension, the Common Gateway Interface (CGI),
+can be replaced entirely with Perl code that handles the response
+generation phase of request processing.  mod_perl includes two general
+purpose modules for this purpose: C<Apache::Registry>, which can
+transparently run existing perl CGI scripts and C<Apache::PerlRun>,
+which does a similar job but allows you to run "dirtier" (to some
+extent) scripts.
+
+You can configure your httpd server and handlers in Perl (using
+C<PerlSetVar>, and E<lt>PerlE<gt> sections). You can even define your
+own configuration directives.
+
+For examples on how you use mod_perl, see our L<What is
+mod_perl?|start::index> section.
+
+Many people ask "How much of a performance improvement does mod_perl
+give?" Well, it all depends on what you are doing with mod_perl and
+possibly who you ask. Developers report speed boosts from 200% to
+2000%. The best way to measure is to try it and see for yourself! (See
+L<Technologie Extraordinaire|outstanding::index> for the facts.)
+
+=head2 mod_cgi
+
+When you run your CGI scripts by using a configuration like this:
+
+  ScriptAlias /cgi-bin/ /home/httpd/cgi-bin/
+
+you run it under a mod_cgi handler, you never define it
+explicitly. Apache does all the configuration work behind the scenes,
+when you use a ScriptAlias.
+
+By the way, don't confuse C<ScriptAlias> with the C<ExecCGI>
+configuration option, which we enable so that the script will be
+executed rather than returned as a plain text file. For example for
+mod_perl and C<Apache::Registry> you would use a configuration like:
+
+  <Location /perl>
+    SetHandler perl-script
+    PerlHandler Apache::Registry
+    Options +ExecCGI
+    PerlSendHeader On
+  </Location>
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

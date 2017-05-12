@@ -1,0 +1,50 @@
+SYNOPSIS
+
+     use Data::Sah::JS qw(gen_validator);
+    
+     my $v = gen_validator(["int*", min=>1, max=>10]);
+    
+     # validate your data using the generated validator
+     say "valid" if $v->(5);     # valid
+     say "valid" if $v->(11);    # invalid
+     say "valid" if $v->(undef); # invalid
+     say "valid" if $v->("x");   # invalid
+    
+     # generate validator which reports error message string, in Indonesian
+     my $v = gen_validator(["int*", min=>1, max=>10],
+                           {return_type=>'str', lang=>'id_ID'});
+     say $v->(5);  # ''
+     say $v->(12); # 'Data tidak boleh lebih besar dari 10'
+                   # (in English: 'Data must not be larger than 10')
+
+DESCRIPTION
+
+FUNCTIONS
+
+    None exported by default.
+
+ gen_validator($schema, \%opts) => CODE (or STR)
+
+    Generate validator code for $schema. This is currently used for testing
+    purposes only, as this will first generate JavaScript validator code,
+    then generate a Perl coderef that will feed generated JavaScript
+    validator code to a JavaScript engine (currently node.js) via
+    command-line. Not exactly efficient.
+
+    Known options (unknown options will be passed to JS schema compiler):
+
+      * source => BOOL (default: 0)
+
+      If set to 1, return JavaScript source code string instead of Perl
+      coderef. Usually only needed for debugging (but see also
+      $Data::Sah::Log_Validator_Code and LOG_SAH_VALIDATOR_CODE if you want
+      to log validator source code).
+
+ENVIRONMENT
+
+    LOG_SAH_VALIDATOR_CODE
+
+SEE ALSO
+
+    Data::Sah, Data::Sah::Compiler::js.
+

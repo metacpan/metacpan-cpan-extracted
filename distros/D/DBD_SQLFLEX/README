@@ -1,0 +1,269 @@
+README for DBD::Sqlflex -- an Sqlflex interface for Perl 5 using DBI.
+
+   Portions Copyright (c) 1994-96 Alligator Descartes
+   Portions Copyright (c) 1996-98 Jonathan Leffler
+   Portions Copyright (c) 1998-99 Infoflex, Inc.
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+-- The following is a standard warning for all DBI and DBD::* software --
+       WARNING: THIS IS ALPHA SOFTWARE. IT IS POSSIBLY UNRELIABLE!
+
+---------------------------------------------------------------------------
+
+PREREQUISITES
+
+    If you do not have Perl version 5.003 or later, then build, test and
+    install it before doing anything else!  And please ensure that you
+    compile it with whatever options are necessary to get __STDC__ defined.
+
+    If you do not have DBI version 0.90 or later installed, then build,
+    test and install it.
+
+    To build DBD::Sqlflex, the C compiler must accept function prototypes.
+    This is not a problem on any machine to which Sqlflex is currently
+    ported (though the HP-UX compiler does not accept prototypes unless
+    told to do so).
+
+    You must have a version of Sqlflex-ESQL/C available to you.  You
+    should read the Sqlflex.License file for information about what you
+    need.  If you do not have ESQL/C and are not prepared to buy it, then
+    please don't try to use DBD::Sqlflex -- it won't work.
+
+    *** BEWARE ***
+
+    You need to have a fully working Sqlflex environment before you try to
+    build and test DBD::Sqlflex.  Please use the sample software available
+    from Infoflex, or their command-line SQL program, xsql to build a 
+    test database.
+
+          ------------------> NOTE NOTE NOTE <-----------------
+
+    The database must reside on a LOCAL (NOT NFS) disk.  If you need remote 
+    access to a database, please see the Infoflex documentation for setting 
+    up a remote database server.
+
+    Please ensure that you have $DBTEMP and $DBPATH set up in your environment.  
+    What is good for xsql is good for DBD::Sqlflex -- if you can't run xsql 
+    against a database, you'll never get DBD::Sqlflex working.
+
+BUILDING DBD::Sqlflex
+
+    With the Sqlflex software from Infoflex, you should find instructions on
+    setting the SQLDIR environment variable to use their esqlpp and sqlcc
+    commands.  Follow these instructions prior to building DBD::Sqlflex.
+
+    Makefile.PL will attempt to connect to a database, by default the
+    STORES database, which you should create using xsql.  You do not
+    need any tables created within the database.  You may alternatively
+    override the test database, using the DBD_SQLFLEX_DATABASE variable.
+    Note that this variable only has significance when running the
+    DBD::Sqlflex tests.  It is not used by DBD::Sqlflex or Sqlflex itself.
+
+    When Perl, DBI and ESQL/C are all installed do, and with the $SQLDIR variable
+    set to point to your Sqlflex installation:
+
+        perl Makefile.PL
+
+    The script will attempt to work out what it needs to build the module.
+    Then do:
+
+        make
+
+    This should complete without errors, and ideally without warnings
+    either.  If you get warnings, I'm interested to know what they are and
+    how they could be fixed generically.  If it fails horribly, see below.
+
+    Do NOT hand edit the generated Makefile unless you are completely sure
+    you understand the implications (and are willing to make those changes
+    manually every time the Makefile is regenerated)!  Always try to make
+    changes by editing Makefile.PL, which is extensively annotated.  You
+    should also read the section on ExtUtils::MakeMaker in the 2nd Edition
+    of 'Programming Perl'.
+
+    You should never need to make any changes to the generated Makefile,
+    nor to Makefile.PL.  If you do *please* let me know so that I can try
+    to make it automatic in a later release.
+
+  *------------------------    NOT YET!  --------------------------------
+  |
+  | The "make test" facility documented here is currently unavailable
+  | with the DBD::Sqlflex release.  It should be fully implemented soon.
+  | Sorry for any inconvenience.
+  |
+  *----------------------------------------------------------------------
+  | Then run:
+  |
+  |     make test
+  |
+  | Note that testing DBD::Sqlflex does create some tables and databases.
+  | The database is normally called 'dbd_ix_db', and the table names start
+  | with 'dbd_ix_'.  Some of the tables are permanent; most are temporary.
+  | The tests are designed to work whether the tables and database are
+  | present when the tests start or not; that means they get dropped.  Do
+  | not run the tests if you have precious tables or databases that begin
+  | 'dbd_ix_'!
+  |
+  | It is a good idea to run:
+  |
+  |     make test TEST_VERBOSE=1
+  |
+  | You should inspect the results as not every test compares the actual
+  | data returned with the data that should be returned (though many of
+  | them do check the data which is returned).
+  |
+  | Additionally, for a really thorough scrutiny of DBD::Sqlflex, you need
+  | to test with at least 3 different databases: one created MODE ANSI, one
+  | created with a transaction log but not MODE ANSI, and one created
+  | without any transaction logs at all.
+  |
+  |     DBD_SQLFLEX_DATABASE=mode_ansi make test
+  |     DBD_SQLFLEX_DATABASE=logged    make test
+  |     DBD_SQLFLEX_DATABASE=unlogged  make test
+  |
+  *----------------------------------------------------------------------
+
+    Once you are satisfied that DBD::Sqlflex is working correctly, you
+    should install it:
+
+        make install
+
+    If you ever need to remove it, possibly as a preamble to installing a
+    new version, you should use the old version's makefile and run:
+
+        make uninstall
+
+    You can then install using the new version's makefile.  It is important
+    to use the correct (old or new) makefiles because the installed files
+    may be different, and if some file is made obsolete by the new version
+    (is not used by the new version), its makefile will not uninstall the
+    obsolete file; over time and multiple versions, this could, eventually,
+    lead to 'coronary thrombosis' on your disk drive -- or disk full.
+
+KNOWN PROBLEMS:
+
+    None at this time.
+
+IF YOU HAVE PROBLEMS BUILDING DBD::SQLFLEX
+
+Firstly, check the Frequently Asked Questions, Known Bugs and any other
+pertinent documents at:
+
+    http://www.arcana.co.uk/technologia/DBI
+
+If this does *not* resolve your problem, please post the details of your
+problem to dbi-users@fugue.com and CC them to me at help@infoflex.com
+
+There are 4 types of failures which you might encounter:
+    A.  A configuration failure (perl Makefile.PL does not work)
+    B.  A build failure (the Makefile was generated but there were problems
+        during the build proper so that no test worked at all)
+    C.  A general test failure (although the build appeared OK, every
+        single test fails, or almost all of them fail).
+    D.  A selective test failure (the build appeared OK and most of the
+        tests pass, but a few (say 1 to 5) of them fail).
+Please classify your problem and follow the relevant steps below.
+
+Please include:
+
+1. A log of a complete build:
+
+    # Before doing anything, please either re-extract the source from the
+    # compressed tar file you retrieved from CPAN into an empty directory
+    # or make sure that the build area is really clean:
+    [ -f Makefile ] && make realclean
+    rm -f esql esqlvrsn.h
+
+    # Send this output for all failure types (A, B, C, D)
+    perl Makefile.PL
+
+    # Send this output for failure types B, C, D.
+    make
+
+    # Send this output for failure types C, D
+    # If the output is more than about 30 lines, then just send the first
+    # 30 lines or so of the output -- anything more is unlikely to give any
+    # extra information.
+    make test
+
+    # Send this output for failure types C, D
+    # Then, taking the first test which fails (typically basic00.t) send
+    # the output from:
+    test.one t/basic00.t
+
+    # Send this output for failure type D
+    # If the failing tests are failing in distinctly different ways
+    # (different error messages, or one is a core dump, or ...) then send
+    # the test output for each of the different outputs, but do not send
+    # more than 5 sets of test results unless requested to do so.
+    test.one t/dbase.t
+
+    If you use a Bourne or Korn Shell (or any work-alikes), you can also
+    use the following command to get a lot more debug information, but
+    don't send this unless asked to do so:
+
+    PERL_DBI_DEBUG=2 test.one t/basic00.t
+
+    Use this to verify that the problems you are reporting as different for
+    failure type D really are different, but still don't send the output
+    unless asked to do so.
+
+2. A complete, sorted dump of your environment:
+
+    env | sort
+
+3. If you are not currently subscribed to the mailing list please subscribe
+   via http://www.fugue.com/dbi.  If you do not have WWW access, then send
+   email to dbi-request@fugue.com.  There are 3 mailing lists:
+
+       dbi-announce@fugue.com
+       dbi-users@fugue.com
+       dbi-dev@fugue.com
+
+   You should probably subscribe to dbi-users and probably do not need to
+   subscribe to dbi-dev.
+
+IF YOU HAVE PROBLEMS USING DBD::SQLFLEX
+
+If your problem is with your own code and the DBD::Sqlflex tests all pass,
+then the initial message should give the version information (see point 3
+above, plus the version of the Sqlflex database engine you are using), a
+description of the problem, a minimal test script, and the results of
+running the test script on your machine (along with an explanation of why
+the result is wrong -- it may not be obvious to me -- and what the correct
+result should be).
+
+The minimal test script should preferably:
+
+(1) Use the stores database, with empty username and password fields.  If
+    the test needs a particular type of database (eg with transactions) to
+    demonstrate the problem, alternative convenient names are 'logged',
+    'unlogged' and 'mode_ansi'.
+(2) Use temporary tables rather than permanent ones.
+(3) Load just enough data to show the problem.
+(4) Test every statement using DBI functions for success.
+(5) Clearly indicate when it fails.
+(6) Clearly indicate when it passes.
+(7) It had better not use DBI->install_driver() without an extremely good
+    reason, and I can't immediately think of a reason which would be good
+    enough.
+
+If your test is failing with a core dump, the stack trace for it is useful
+if it lists function names -- it is not useful if it does not.
+
+Regards,
+Infoflex <help@infoflex.com>
+
+@(#)$Id: README $
+
+---------------------------------------------------------------------------
+
+NOTE: This document is derived from the DBD::Oracle README.  Many of the
+points made in that will apply to DBD::Sqlflex too.
+
+Original document: (c) Tim Bunce <Tim.Bunce@ig.co.uk>
+Amendments 1:      (c) Alligator Descartes <descarte@arcana.co.uk>
+Amendments 2:      (c) Jonathan Leffler <johnl@informix.com>
+Amendments 3:      (c) Jonathan Leffler <j.leffler@acm.org>
+Amendments 4:      (c) Infoflex

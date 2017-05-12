@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Data-NestedSet
+version:             1.03
+abstract:            calculate left - right values from depth (modified preorder tree traversal algorithm)
+license:             ~
+author:              
+    - SHIRIRU <shiriru-111@hotmail.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

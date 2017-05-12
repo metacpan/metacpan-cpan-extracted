@@ -1,0 +1,331 @@
+=pod
+
+=head1 NAME
+
+Data::Nested::Multifile - A multi-file version of Data::Nested::Multiele
+
+=head1 SYNOPSIS
+
+  use Data::Nested::Multifile;
+
+=head1 DESCRIPTION
+
+This module is an extension to the Data::Nested::Multiele module, and
+an understanding of that module is assumed in this documentation.
+
+The Data::Nested::Multiele module accesses a set of data elements in
+a single data source. This module adds the ability to treat a
+set of data elements from multiple files as one set of elements.
+
+There are some limitations to this functionality that are not present
+in the Data::Nested::Multiele module:
+
+=over 4
+
+=item Ordered lists are not supported
+
+Separating ordered elements across files makes several operations
+difficult, so this is currently not supported. Only unordered
+lists are used.
+
+=item Default elements only apply to the file
+
+A default element in one file ONLY applies to data elements in
+that file. If the same default is required in other files, the
+data element must be added to each file.
+
+=item All files must be identical in many ways
+
+All will use the same Data::Nested object, so they will have
+identical structural characteristics. All files must contain
+hashes OR list, not a mixture of the two.
+
+=item All elements must be unique
+
+For hash files, the same element may not appear in multiple
+files.
+
+=item Default elements must be unique
+
+Since every element must be unique, the same name may not be
+used for default elements in two different files. If there is
+a default element in one file named _default, an element of
+the same name may not exist in a second file.
+
+=item List element indexes differ
+
+Since multiple files are read in, the index of list elements is
+the index in the combined list of elements with all of the
+elements from all files.
+
+=back
+
+=head1 METHODS
+
+=over 4
+
+=item new
+
+=item file
+
+A new Data::Nested::Multifile object can be created and assigned to data
+sources using these methods. In order to create a new object and
+bind it to two different files, use the following calls:
+
+   $obj = new Data::Nested::Multifile [NDS];
+   $obj->file(LABEL1,FILE1);
+   $obj->file(LABEL2,FILE2);
+
+or an equivalent one call method:
+
+   $obj = new Data::Nested::Multifile [NDS,] LABEL1, FILE1, LABEL2, FILE2;
+
+A Data::Nested object is needed. If one is passed in as an argument to
+the new method, it is used. By creating an NDS, and then passing it in
+to the new method, the same NDS can be used for multiple
+Data::Nested::Multiele/Data::Nested::Multifile objects, each reading
+elements independent of each other.  In this way, all structural
+information in the NDS applies to all elements use by all of the
+objects.
+
+If no Data::Nested object is passed in, one is created.
+
+Creating two Data::Nested::Multifile objects which use the same NDS can be
+done in the following way:
+
+   $NDS  = new Data::Nested;
+   $obj1 = new Data::Nested::Multifile $NDS [LABEL1a, FILE1a, ...];
+   $obj2 = new Data::Nested::Multifile $NDS [LABEL2a, FILE2a, ...];
+
+The same effect can be achieved with:
+
+   $obj1 = new Data::Nested::Multifile [LABEL1a, FILE1a, ...];
+   $obj2 = $obj1->new([LABEL2a, FILE2a, ...]);
+
+If no file is passed in to the new method, you need to use the file
+method to set it and read the data.
+
+One note about labels: they should not be strictly numeric since there
+are times when that may conflict with numeric element indices in data
+consisting of lists. Add any non-digit character to them to avoid this
+problem.
+
+All file calls must be done immediately after the object is created,
+and before any other operations (including default_element oeprations).
+
+=item nme
+
+   $NME = $obj->nme(LABEL);
+
+This returns the Data::Nested::Multiele object associated with a label.
+
+=item ele_file
+
+   $label = $obj->ele_file($ele);
+
+Returns the label for the file that $ele belongs to. Returns nothing
+if the element does not exist.
+
+=item default_element
+
+   $obj->default_element($label [,$ruleset] [,$path,$val,...]);
+   $obj->default_element($ele   [,$ruleset] [,$path,$val,...]);
+
+This is used to declare that one of the elements that was read
+in from one of the data file is used to provide defaults for other elements
+in that same data file.
+
+If the data files contains lists of elements, the first form is used
+($label must be passed in as the first argument). The first element
+from the given file is used as a default.
+
+If the data files contain hashes of elements, the second form is used ($ele
+is passed in as the first argument). The named element (in whichever file
+it occurs) is used as a default. It should be noted that default elements
+must be uniquely named in a Multifile object.
+
+The default_element methods must be done immediately after the file
+methods, and before any other operations.
+
+=item rename_ele
+
+   $obj->rename_ele($ele,$newele);
+
+This is identical to the function in Data::Nested::Multiele. The only thing
+to note is that the renamed element will remain in the same file. The
+only way to move an element from one file to another is to first
+delete it, and then add it in the new file.
+
+The rename_ele method is not applicable to a file containing a list of
+elements since the order of the elements is not currently used, and
+ordered lists are not supported.
+
+=item add_ele
+
+   $obj->add_ele([$label,] [$ele,] $nds [,$new]);
+
+This adds a new element to a file. The new element is checked for
+validity, and then added. Note that the element is not actually
+stored in the data file. Use the save method to do that.
+
+Because the NDS does not have defaults applied, the new element may
+have additional data present once defaults are applied.
+
+The location (and file) where the new element is added depends
+on several things.
+
+If the data files contain lists, there are three different ways to
+call this:
+
+   $obj->add_ele([$label,] $nds [,$new]);
+
+This adds the element to the end of the given file, or the last data file
+if $label is not included.
+
+   $obj->add_ele($ele,$nds [,$new]);
+
+This inserts the new element at $ele (which must refer to an existing
+element) in the same data file as $ele.
+
+If the data file contains a hash, there is only one way to call it:
+
+   $obj->add_ele([$label,] $ele,$nds [,$new]);
+
+If $label is not given, it is inserted into the last data
+file. Otherwise, it is inserted into the file specifed by $label.
+
+=item copy_ele
+
+   $obj->copy_ele($ele [,$label] [,$newele]);
+
+This will create a new element which is a copy of another element.
+The new element is created in the same way as the add_ele method based
+on the value of $newele and the type of data.
+
+If $label is not given, it defaults to the same file as the original
+element.
+
+=item version
+
+=item nds
+
+=item err
+
+=item errmsg
+
+=item eles
+
+=item ele
+
+=item which
+
+=item path_valid
+
+=item value
+
+=item keys
+
+=item values
+
+=item path_values
+
+=item path_in_use
+
+=item delete_ele
+
+=item update_ele
+
+=item is_default_value
+
+=item dump
+
+=item save
+
+These work the same as in the Data::Nested::Multiele module and are
+fully documented in that module.
+
+=back
+
+Any method not documented here, especially those beginning with an
+underscore (_), are for internal use only. Please do not use them.
+Absolutely no support is offered for them.
+
+=head1 ERROR CODES
+
+Each error code produced by a method in the Data::Nested::Multifile module
+is prefixed by the characters "nmf", followed by a 3 character
+operation code which tells what type of operation failed, followed
+by 2 digits.
+
+The following error codes are used to identify problems working
+with files containing data:
+
+   nmffil01   An even number of arguments required to
+              specify files.
+   nmffil02   An attempt to reuse a file label already in use.
+   nmffil03   An error occurred reading the data file.
+   nmffil04   All files must contain the same type of data (list
+              or hash).
+   nmffil05   A data element is duplicated in 2 files.
+   nmffil06   An invalid file label was used.
+   nmffil07   An attempt to read in a file after element
+              operations have been done.
+   nmffil08   No file has been set.
+   nmffil09   Defaults must be set immediately after the files
+              are read in.
+
+The following error codes identify problems accessing an element:
+
+   nmfele01   Attempt to access an undefined element.
+   nmfele02   Attempt to overwrite an existing element.
+   nmfele03   When accessing a hash element, a name must be given.
+   nmfele04   When adding an element, a name must be given.
+
+=head1 BUGS AND QUESTIONS
+
+If you find a bug in this module, please send it directly to me (see
+the AUTHOR section below).  Alternately, you can submit it on CPAN. This
+can be done at the following URL:
+
+   http://rt.cpan.org/Public/Dist/Display.html?Name=Data-NDS-Multifile
+
+Please do not use other means to report bugs (such as usenet newsgroups,
+or forums for a specific OS or linux distribution) as it is impossible
+for me to keep up with all of them.
+
+When filing a bug report, please include the following information:
+
+=over 4
+
+=item *
+
+The version of the module you are using.  You can get this by using
+the script:
+
+        use Data::Nested::Multifile;
+        $obj = new Data::Nested::Multifile;
+        print $obj->version(),"\n";
+
+=item *
+
+The output from "perl -V"
+
+=back
+
+If you have a problem using the module that perhaps isn't a bug (can't
+figure out the syntax, etc.), you're in the right place.  Go right back to
+the top of this manual and start reading.  If this still doesn't answer
+your question, mail me directly.
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)

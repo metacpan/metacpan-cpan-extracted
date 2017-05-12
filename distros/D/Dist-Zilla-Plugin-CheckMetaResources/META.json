@@ -1,0 +1,78 @@
+{
+   "abstract" : "Ensure META includes resources",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-CheckMetaResources",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4",
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Moose" : "0.99",
+            "autodie" : "2.00",
+            "namespace::autoclean" : "0.09",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Dist::Zilla::Tester" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Path::Class" : "0.26",
+            "Test::More" : "0.88",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CheckMetaResources" : {
+         "file" : "lib/Dist/Zilla/Plugin/CheckMetaResources.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-checkmetaresources at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckMetaResources"
+      },
+      "homepage" : "https://github.com/dagolden/dist-zilla-plugin-checkmetaresources",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/dist-zilla-plugin-checkmetaresources.git",
+         "web" : "https://github.com/dagolden/dist-zilla-plugin-checkmetaresources"
+      }
+   },
+   "version" : "0.001"
+}
+

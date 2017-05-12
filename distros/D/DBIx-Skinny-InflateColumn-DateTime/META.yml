@@ -1,0 +1,32 @@
+---
+abstract: 'DateTime inflate/deflate settings for DBIx::Skinny'
+author:
+  - 'Ryo Miyake  C<< <ryo.studiom __at__ gmail.com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Skinny-InflateColumn-DateTime
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBD::SQLite: 0
+  DBIx::Skinny: 0.05
+  DateTime: 0
+  DateTime::Format::MySQL: 0
+  DateTime::Format::Strptime: 0
+  DateTime::TimeZone: 0
+  Filter::Util::Call: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

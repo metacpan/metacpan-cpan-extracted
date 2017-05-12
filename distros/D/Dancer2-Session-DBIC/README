@@ -1,0 +1,181 @@
+NAME
+
+    Dancer2::Session::DBIC - DBIx::Class session engine for Dancer2
+
+VERSION
+
+    0.110
+
+DESCRIPTION
+
+    This module implements a session engine for Dancer2 by serializing the
+    session, and storing it in a database via DBIx::Class.
+
+    JSON was chosen as the default serialization format, as it is fast,
+    terse, and portable.
+
+SYNOPSIS
+
+    Example configuration:
+
+        session: "DBIC"
+        engines:
+          session:
+            DBIC:
+              dsn:      "DBI:mysql:database=testing;host=127.0.0.1;port=3306" # DBI Data Source Name
+              schema_class:    "Interchange6::Schema"  # DBIx::Class schema
+              user:     "user"      # Username used to connect to the database
+              password: "password"  # Password to connect to the database
+              resultset: "MySession" # DBIx::Class resultset, defaults to Session
+              id_column: "my_session_id" # defaults to sessions_id
+              data_column: "my_session_data" # defaults to session_data
+              serializer: "YAML"    # defaults to JSON
+
+    Or if you are already using Dancer2::Plugin::DBIC and want to use its
+    existing configuration for a database section named 'default' with all
+    else set to default in this module then you could simply use:
+
+        session: "DBIC"
+        engines:
+          session:
+            DBIC:
+              db_connection_name: default
+
+SESSION EXPIRATION
+
+    A timestamp field that updates when a session is updated is
+    recommended, so you can expire sessions server-side as well as
+    client-side.
+
+    This session engine will not automagically remove expired sessions on
+    the server, but with a timestamp field as above, you should be able to
+    to do this manually.
+
+ATTRIBUTES
+
+ schema_class
+
+    DBIx::Class schema class, e.g. Interchange6::Schema.
+
+ db_connection_name
+
+    The Dancer2::Plugin::DBIC database connection name.
+
+    If this option is provided then "schema_class", "dsn", "user" and
+    "password" are all ignored.
+
+ resultset
+
+    DBIx::Class resultset, defaults to Session.
+
+ id_column
+
+    Column for session id, defaults to sessions_id.
+
+    If this column is not the primary key of the table, it should have a
+    unique constraint added to it. See "add_unique_constraint" in
+    DBIx::Class::ResultSource.
+
+ data_column
+
+    Column for session data, defaults to session_data.
+
+ dsn
+
+    DBI dsn to connect to the database.
+
+ user
+
+    Database username.
+
+ password
+
+    Database password.
+
+ schema
+
+    DBIx::Class schema.
+
+ serializer
+
+    Serializer to use, defaults to JSON.
+
+    Dancer2::Session::DBIC provides the following serializer classes:
+
+    JSON - Dancer2::Session::DBIC::Serializer::JSON
+
+    Sereal - Dancer2::Session::DBIC::Serializer::Sereal
+
+    YAML - Dancer2::Session::DBIC::Serializer::YAML
+
+    If you do not use the default JSON serializer then you might need to
+    install additional modules - see the specific serializer class for
+    details.
+
+    You can also use your own serializer class by passing the
+    fully-qualified class name as argument to this option, e.g.:
+    MyApp::Session::Serializer
+
+ serializer_object
+
+    Vivified "serializer" object.
+
+ serialize_options
+
+    Options to be passed to the constructor of the the serializer class as
+    a hash reference.
+
+ deserialize_options
+
+    Options to be passed to the constructor of the the deserializer class
+    as a hash reference.
+
+METHODS
+
+ _flush
+
+    Write the session to the database. Returns the session object.
+
+ _retrieve($id)
+
+    Look for a session with the given id.
+
+    Returns the session object if found, undef if not. Dies if the session
+    was found, but could not be deserialized.
+
+ _change_id( $old_id, $new_id )
+
+    Change ID of session with $old_id to <$new_id>.
+
+ _destroy()
+
+    Remove the current session object from the database.
+
+SEE ALSO
+
+    Dancer2, Dancer2::Session
+
+AUTHOR
+
+    Stefan Hornburg (Racke) <racke@linuxia.de>
+
+ACKNOWLEDGEMENTS
+
+    Based on code from Dancer::Session::DBI written by James Aitken and
+    code from Dancer::Plugin::DBIC written by Naveed Massjouni.
+
+    Peter Mottram, support for JSON, YAML, Sereal and custom serializers,
+    GH #8, #9, #11, #12. Also for adding _change_id method and accompanying
+    tests.
+
+    Rory Zweistra, GH #9.
+
+    Andy Jack, GH #2.
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) Stefan Hornburg.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

@@ -1,0 +1,190 @@
+#!perl
+use 5.10.0;
+use strict;
+use warnings;
+
+use App::Rad;
+use Data::Petitcom qw{ :all };
+use Path::Class;
+use YAML;
+
+my $config = Load( do { local $/; <DATA> } );
+
+App::Rad->run;
+
+sub setup {
+    my $c = shift;
+    $c->unregister_command('help');
+    my $commands = +{
+        map { ( $_, $config->{$_}->{inline_help} ) } keys %$config
+    };
+    $c->register_commands($commands);
+}
+
+sub pre_process {
+    my $c = shift;
+    return if ( $c->cmd eq 'help' || !$c->options->{help} );
+    unshift @{ $c->argv }, $c->cmd;
+    $c->execute('help');
+}
+
+sub post_process {
+    my $c = shift;
+    if ($c->cmd eq 'help' ) {
+        print STDERR $c->output() . $/ if ($c->output());
+        exit 1;
+    }
+    print $c->output() . $/ if ($c->output());
+}
+
+sub help {
+    my $c = shift;
+    if ( my ($cmd) = @{ $c->argv } ) {
+        my $help = $config->{$cmd}->{help};
+        return _sub_cmdstr( $help, $cmd ) if ($help);
+    }
+    return App::Rad::Help::help($c);
+}
+
+sub load {
+    my $c = shift;
+
+    my ($ptc_file, $out_file) = @{ $c->argv };
+    _subcmd_help($c) if ( !$ptc_file || !$out_file );
+
+    my $opts = $c->options;
+    my $data_raw = LoadFile( $ptc_file, %$opts );
+
+    my $fh = file($out_file)->open('>')
+        or die "open failed: $!";
+    $fh->binmode;
+    $fh->print($data_raw);
+
+    return undef;
+}
+
+sub save {
+    my $c = shift;
+
+    my ($data_file, $out_file) = @{ $c->argv };
+    _subcmd_help($c) if ( !$out_file || !$data_file );
+
+    my $data_fh = file($data_file)->open('<')
+        or die "open failed: $!";
+    my $data_raw = do { local $/; <$data_fh> };
+
+    my $opts = $c->options;
+    SaveFile( $out_file, $data_raw, %$opts );
+
+    return undef;
+}
+
+sub qrcode {
+    my $c = shift;
+
+    my ($src_file) = @{ $c->argv };
+    _subcmd_help($c) unless ($src_file);
+
+    my $src_fh = file($src_file)->open('<')
+        or die "open failed: $!";
+    my $src_raw = do { local $/; <$src_fh> };
+
+    my $opts = $c->options;
+    my $qrcode = QRCode( $src_raw, %$opts );
+
+    if ( $opts->{type} && $opts->{type} eq 'image' ) {
+        require GD::Tiler;
+        my $image = GD::Tiler->tile(
+            Images       => $qrcode,
+            Background   => 'white',
+            ImagesPerRow => 3
+        );
+        print $image;
+    }
+    else {
+        for my $i ( 1 .. @$qrcode ) {
+            printf( "QR: %d / %d\n", $i, scalar(@$qrcode) );
+            say $qrcode->[ $i - 1 ];
+        }
+    }
+
+    return undef;
+}
+
+sub _sub_cmdstr {
+    my ($str, $subcmd) = @_;
+    $str =~ s/\b?#CMD\b/$0/g;
+    $str =~ s/\b?#SUBCMD\b/$subcmd/g;
+    return $str;
+}
+
+sub _subcmd_help {
+    my $c = shift;
+    unshift @{ $c->argv }, $c->cmd;
+    $c->execute('help');
+}
+
+__DATA__
+help:
+    inlne_help: 'show syntax and available commands'
+save:
+    inline_help: 'Writes the PTC'
+    help: |-
+        USAGE: #CMD #SUBCMD [OPTIONS] IN_DATA_FILE OUT_PTC_FILE
+
+        OPTIONS:
+            --resource     resource type [PRG|GRP|CHR|COL] (default: PRG)
+            --name         filename in Petitcom mkII (default: D_PTC)
+            --encoding     [PRG] IN_DATA_FILE encoding (default: utf8)
+            --sp_width     [CHR] SPRITE width (default: 16)
+            --sp_height    [CHR] SPRITE height (default: 16)
+
+        EXAMPLES:
+            $ #CMD #SUBCMD program.txt PRG.ptc
+            $ #CMD #SUBCMD --name=PRG_X --encoding=cp932 program.txt PRG.ptc
+            $ #CMD #SUBCMD --resource=CHR --sp_width=32 --sp_height=64 character.bmp CHR.ptc
+            $ #CMD #SUBCMD --resource=GRP graphic.bmp GRP.ptc
+            $ #CMD #SUBCMD --resource=COL any.bmp COL.ptc
+load:
+    inline_help: 'Reads the PTC'
+    help: |-
+        USAGE: #CMD #SUBCMD [OPTIONS] IN_PTC_FILE OUT_DATA_FILE
+
+        OPTIONS:
+            --encoding     [PRG] OUT_DATA_FILE encoding (default: utf8)
+            --zenkaku      [PRG] output zenkaku chars
+            --sp_width     [CHR] SPRITE width (default: 16)
+            --sp_height    [CHR] SPRITE height (default: 16)
+
+        EXAMPLES:
+            $ #CMD #SUBCMD PRG.ptc program.txt
+            $ #CMD #SUBCMD --zenkaku PRG.ptc program.txt
+            $ #CMD #SUBCMD --sp_width=32 --sp_height=64 CHR.ptc character.bmp
+            $ #CMD #SUBCMD GRP.ptc graphic.bmp
+            $ #CMD #SUBCMD COL.ptc color.bmp
+qrcode:
+    inline_help: 'Plot the QRcode'
+    help: |-
+        USAGE: #CMD #SUBCMD [OPTIONS] IN_(PTC|DATA)_FILE
+
+        OPTIONS:
+            --type         output QRCode type [text|term|image] (default: text)
+            --version      QRCode version [1-24] (default: 20)
+            --ecc          QRCode ecc mode [L|M|H|Q] (default: M)
+            --resource     [IN_DATA_FILE] resource type [PRG|GRP|CHR|COL] (default: PRG)
+            --name         [IN_DATA_FILE] PTC FILENAME (default: D_PTC)
+            --encoding     [IN_DATA_FILE:PRG] IN_DATA_FILE encoding (default: utf8)
+            --sp_width     [IN_DATA_FILE:CHR] SPRITE width (default: 16)
+            --sp_height    [IN_DATA_FILE:CHR] SPRITE height (default: 16)
+
+        EXAMPLES:
+            $ #CMD #SUBCMD program.txt
+            $ #CMD #SUBCMD PRG.ptc
+            $ #CMD #SUBCMD --type=term --version=5 --encoding=cp932 program.txt
+            $ #CMD #SUBCMD --type=term --version=5 PRG.ptc
+            $ #CMD #SUBCMD --type=image --resource=CHR --sp_width=32 --sp_height=64 character.bmp
+            $ #CMD #SUBCMD --type=image CHR.ptc
+            $ #CMD #SUBCMD --resource=GRP graphic.bmp
+            $ #CMD #SUBCMD GRP.ptc
+            $ #CMD #SUBCMD --resource=COL any.bmp
+            $ #CMD #SUBCMD COL.ptc

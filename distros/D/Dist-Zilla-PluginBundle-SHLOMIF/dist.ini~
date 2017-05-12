@@ -1,0 +1,52 @@
+name = Dist-Zilla-PluginBundle-SHLOMIF
+author = Shlomi Fish <shlomif@cpan.org>
+license = MIT
+copyright_holder = Jesse Luehrs
+version = 0.000006
+
+[@Filter]
+-bundle = @SHLOMIF
+-remove = Authority
+dist = Dist-Zilla-PluginBundle-SHLOMIF
+repository = github
+github_user = shlomif
+authority = cpan:SHLOMIF
+github_name = Dist-Zilla-PluginBundle-SHLOMIF
+
+[AutoPrereqs]
+[Prereqs]
+Dist::Zilla =
+Dist::Zilla::Plugin::Authority =
+Dist::Zilla::Plugin::AutoPrereqs =
+Dist::Zilla::Plugin::CheckChangesHasContent =
+Dist::Zilla::Plugin::ConfirmRelease =
+Dist::Zilla::Plugin::ExecDir =
+Dist::Zilla::Plugin::FakeRelease =
+Dist::Zilla::Plugin::GatherDir =
+Dist::Zilla::Plugin::License =
+Dist::Zilla::Plugin::Manifest =
+Dist::Zilla::Plugin::ManifestSkip =
+Dist::Zilla::Plugin::MetaConfig =
+Dist::Zilla::Plugin::MetaJSON =
+Dist::Zilla::Plugin::MetaProvides::Package =
+Dist::Zilla::Plugin::MetaResources =
+Dist::Zilla::Plugin::MetaYAML =
+Dist::Zilla::Plugin::ModuleBuild =
+Dist::Zilla::Plugin::PkgVersion =
+Dist::Zilla::Plugin::PodCoverageTests =
+Dist::Zilla::Plugin::PodSyntaxTests =
+Dist::Zilla::Plugin::PodVersion =
+Dist::Zilla::Plugin::PodWeaver =
+Dist::Zilla::Plugin::PruneCruft =
+Dist::Zilla::Plugin::Readme =
+Dist::Zilla::Plugin::RunExtraTests =
+Dist::Zilla::Plugin::ShareDir =
+Dist::Zilla::Plugin::TaskWeaver =
+Dist::Zilla::Plugin::Test::CPAN::Changes =
+Dist::Zilla::Plugin::Test::Compile =
+Dist::Zilla::Plugin::Test::EOL =
+Dist::Zilla::Plugin::Test::Kwalitee::Extra =
+Dist::Zilla::Plugin::Test::NoTabs =
+Dist::Zilla::Plugin::Test::TrailingSpace =
+Dist::Zilla::Plugin::TestRelease =
+Dist::Zilla::Plugin::UploadToCPAN =

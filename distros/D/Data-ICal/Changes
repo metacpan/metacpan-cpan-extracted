@@ -1,0 +1,89 @@
+Revision history for Data-ICal
+
+0.22 2015-02-17
+ - Add URI and NONE alarm types, for compatibility with Apple iCal
+ - Add support for the common X-WR-CalName property
+ - Optionally enforce UID attribute
+ - Optionally auto-generate UID
+ - Run with taint mode enabled
+ - Packaging updates
+
+0.21 2013-07-03
+ - Examine properties in consistent order, so tests pass on 5.18 and above
+
+0.20 2013-05-01
+ - Properly restrict the valid properties when iCal version 1.0 (Ashley
+   Willis)
+
+0.19 2012-12-03
+ - Always output the VERSION property first
+
+0.18 2011-12-05
+ - Spelling fixes from Debian (Salvatore Bonaccorso)
+
+0.17 2011-11-27
+ - Allow chaining of methods (H.Merijn Brand)
+ - Allow properties and entries in constructor (H.Merijn Brand)
+
+0.16 2009-07-10
+ - Use \r\n as the newline character, per RFC 3445
+ - Escaping of \ was being done incorrectly, and tested incorrectly
+ - Remove a useless and incorrect "escape code"
+ - Mention Data::ICal::DateTime (patch from Mark Stosberg)
+ - Update copyright
+ - POD cleanup
+ - Update README from POD
+ - POD nits; mostly reflowing and whitespace fixes
+ - Perltidy
+
+0.15 2009-03-02
+ - Escaping fixes
+
+0.14 2008-04-07
+ - No longer explodes if your .ics file lacks a VERSION property
+ - Perl 5.11 adds additional strictures. Patch from ANDK to deal
+   [rt.cpan.org #34717]
+
+0.13 2007-03-14
+ - We now ignore blank lines in parsed files (by ignoring null properties
+   when adding them to a data structure)
+ - ical2html example script contributed by Tatsuhiko Miyagawa
+   <miyagawa@bulknews.net>
+
+0.12 2007-01-12
+ - Better handling of properties that should read "0" - Patch from Duncan
+   Forsyth <duncan@wcn.co.uk>
+ - Removed the note about Google and weird folding behaviour
+
+0.11 2006-11-27
+ - Added the ability to not fold the output, to appease the great
+   Google-monster
+
+0.10 2006-10-15
+ - Fix the test suite to stop assuming version numbers
+
+0.09 2006-10-15
+ - Quieted down ::Property when you passed in undef strings.
+
+0.08 2006-09-16
+ - Fix escaping within the recur type
+
+0.07 2006-01-24
+ - Doc patches from MARKSTOS
+ - Proper quoting in properties, from MARKSTOS
+
+0.05 2005-10-06
+ - Fixed a signature file
+
+0.04 2005-08-30
+ - Better roundtripping to .ics
+
+0.03 2005-08-15
+ - Can parse strings, not just files (this is an incompatible API change)
+
+0.02 2005-08-03
+ - Parser support, thanks to Simon Wistow
+ - Full Time Zone support
+
+0.01 2005-07-27
+ - Initial release

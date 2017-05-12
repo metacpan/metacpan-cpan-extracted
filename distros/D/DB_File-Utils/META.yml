@@ -1,0 +1,29 @@
+---
+abstract: 'Creates db_util command line for DB_File management'
+author:
+  - 'Alberto Simoes <ambs@cpan.org>'
+build_requires:
+  App::Cmd::Tester: '0'
+  File::Temp: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DB_File-Utils
+requires:
+  App::Cmd::Setup: '0'
+  DB_File: '0'
+  Encode: '0'
+  Fcntl: '0'
+  File::Slurp: '0'
+  perl: v5.20.0
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/ambs/DB_File-Utils.git
+version: '0.006'

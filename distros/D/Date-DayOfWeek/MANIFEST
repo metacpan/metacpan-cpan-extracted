@@ -1,0 +1,15 @@
+lib/Date/Doomsday.pm
+lib/Date/DayOfWeek.pm
+lib/Date/DayOfWeek/Birthday.pm
+lib/Date/DayOfWeek/Nails.pm
+lib/Date/DayOfWeek/Sneeze.pm
+
+MANIFEST
+Makefile.PL
+README
+LICENSE
+
+t/00doomsday.t
+t/01dayofweek.t
+t/02birthday.t
+

@@ -1,0 +1,7 @@
+DESCRIPTION
+
+    The rule is not enabled by default. You can enable it in a schema using
+    e.g.:
+
+     ["date", "x.perl.coerce_rules"=>["str_natural"]]
+

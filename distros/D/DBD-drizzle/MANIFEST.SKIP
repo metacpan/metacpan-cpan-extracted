@@ -1,0 +1,4 @@
+\B\.svn\b
+^blib\/
+\~$
+^Makefile(\.old)?$

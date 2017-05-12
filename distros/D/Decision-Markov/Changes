@@ -1,0 +1,8 @@
+Revision history for Perl extension Decision::Markov.
+
+0.02  Mon Sep 30 18:00:00 2002
+	- Improved the test script
+
+0.01  Fri Mar 13 18:14:20 1998
+	- original version; created by h2xs 1.18
+

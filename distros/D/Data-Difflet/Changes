@@ -1,0 +1,73 @@
+Revision history for Perl extension Data::Difflet
+
+0.11 2015-04-22T12:08:14Z
+
+    - Add inserted(<<<) and deleted(>>>) mark as comment #9
+      (hirose31)
+
+
+0.10 2013-12-03T21:13:37Z
+
+    commit 46ddaec66229e2519bc7c82d5b37b0865b6c0dd1
+    Author: HIROSE Masaaki <hirose31@gmail.com>
+    Date:   Tue Dec 3 21:42:44 2013 +0900
+
+    Enable to set default colors by environment variable DD_COLOR
+
+    commit 4bc342dc713456efbf6a12b24d4e687d5240b9b0
+    Author: Neil Bowers <neil@bowers.com>
+    Date:   Tue Oct 8 22:28:43 2013 +0100
+
+    Reformatted as per CPAN::Changes::Spec
+
+0.09 2013-07-24T04:05:04Z
+
+    - Enable difflet_is_deeply when run tests by prove
+      (HIROSE Masaaki)
+
+    - Override Test::More::is_deeply when use with "qw(is_deeply)"
+
+      I want to use difflet_is_deeply as is_deeply personally so I added
+      '''--exec "perl -Ilib -MTest::Difflet=is_deeply"''' to my ~/.proverc
+      but no effect.
+      (HIROSE Masaaki)
+
+0.08 2013-05-19T13:17:19Z
+
+    - fix for hash randomization
+      (Takumi Akiyama)
+
+0.07 2013-05-07T10:59:14Z
+
+    - re-packaging with minilla
+
+0.06 2012-11-27
+
+    - need to sort keys when comparing dump result
+
+0.05 2012-09-14
+
+    - fix the problem when execute test file with prove
+      When we execute the test file with prove, we've got an error message.
+
+      <<Can't locate object method "is_deeply" via package "Test::Builder">>
+
+      I simply replaced the call $builder->is_deeply() with is_deeply().
+      Kozaki, Tsuneaki <kozaki.tsuneaki@gmail.com>
+
+0.04 2012-08-31
+
+    - fixed for 5.8
+
+0.03 2012-08-14
+
+    - Fixed colorize next line(syohex++)
+
+0.02 2012-08-12
+
+    - bundle Test::Difflet
+
+0.01 2012-08-12
+
+    - original version
+

@@ -1,0 +1,9 @@
+2003f30217
+
+master unknown 20.03f30217
+
+RFXSensor info rfxsensor03f3: battery low detected
+
+
+
+

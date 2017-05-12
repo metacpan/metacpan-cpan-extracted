@@ -1,0 +1,142 @@
+README FILE FOR PERL MODULE -- DBD::AnyData
+
+WHAT THE HECK IS IT?
+
+  The DBD::AnyData module provides a DBI (Perl Database Interface)
+  and SQL (Structured Query Language) interface to data in many 
+  formats and from many sources.
+
+  There are actually two modules DBD::AnyData and AnyData.  The AnyData
+  module provides most of the same features as DBD::AnyData
+  through a tied hash interface which does not require or support
+  DBI and SQL.  
+
+  Both modules allow accessing and modifying data in over a dozen
+  formats.  If the DBI/SQL approach is the one you want, read on.
+  Otherwise see the documentation for AnyData.pm
+
+  Currently supported formats include general format flatfiles (CSV,
+  Fixed Length, Tab or Pipe "delimited", etc.), specific formats 
+  (passwd files, web logs, etc.), a variety of other kinds of 
+  formats (XML, Mp3, HTML tables), and, for some
+  operations, any DBI accessible database. The number of supported
+  formats will continue to grow rapidly since there is an open API
+  making it easy for any author to create additional format parsers
+  which can be plugged in to AnyData.
+
+  Data in these various formats can come from local files, from
+  remote files, or from perl data structures such as strings and
+  arrays.
+
+  Regardless of the format or source of the data, it may be accessed
+  and/or modified using all standard DBI methods and a subset of SQL
+  syntax.
+
+  In addition to standard database access to files, the module also
+  supports in-memory tables which allow you to create temporary
+  views; to combine data from a number of sources; to quickly
+  prototype database systems; and to display or save the data in any
+  of the supported formats (e.g. to display data in a CSV file as an
+  HTML table).  These in-memory tables can be created from any 
+  combination of DBI databases or files of any format.  They may also
+  be created from perl data structures which means it's possible to
+  quickly prototype a database system without any file access or 
+  rdbms backend.
+
+  The module also supports converting files between any of the supported
+  formats (e.g. save selected data from MySQL or Oracle to an XML file).
+
+  HISTORICAL NOTE: this module was formerly called DBD::RAM.  Its name
+  was changed because many people were unaware that the module supports
+  file operations in addition to in-memory operations.  See the Changes
+  file for a description of changes since the last release of DBD::RAM.
+
+SOME EXAMPLES
+
+  # SELECT DATA FROM A PASSWD FILE
+  #
+  $dbh->func( 'users', 'Passwd', '/etc/passwd', 'ad_catalog');
+  my $sth = $dbh->prepare("SELECT username,homedir,GID FROM users');
+
+  # INSERT A NEW ROW INTO A CSV FILE
+  #
+  $dbh->func( 'cars', 'CSV', 'cars.csv', 'ad_catalog');
+  $dbh->do("INSERT INTO cars VALUES ('Honda','Odyssey')");
+
+  # READ A REMOTE XML FILE AND PRINT IT AS AN HTML TABLE
+  #
+  print $dbh->func( 'XML', $url, 'HTMLtable', 'ad_convert');
+
+  # CONVERT A MYSQL DATABASE INTO XML AND SAVE IT IN A NEW FILE
+  #
+  $dbh->func( 'DBI', $mysql_dbh, 'XML', 'data.xml', 'ad_convert');
+
+  # CREATE AND ACCESS A VIEW CONTAINING DATA FROM 
+  # AN ORACLE DATABASE AND A TAB DELIMITED FILE
+  #
+  $dbh->func( 'combo', 'DBI', $oracle_dbh, 'ad_import');
+  $dbh->func( 'combo', 'Tab', 'data.tab', 'ad_import');
+  my $sth = $dbh->prepare("SELECT * FROM combo");
+
+  # CREATE  A TEST TABLE FROM A REFERENCE TO AN ARRAY OF ARRAYS
+  #
+  $dbh->func( 'test', 'ARRAY', $array_ref, 'ad_import');
+  my $sth = $dbh->prepare("SELECT * FROM test WHERE foo='bar'");
+
+  # CREATE  A TEST TABLE FROM THE DATA SECTION OF A SCRIPT
+  #
+  $dbh->func( 'test', 'XML', [<DATA>], 'ad_import');
+  my $sth = $dbh->prepare("SELECT phrase FROM test WHERE id=2");
+  __END__
+  <phrases>
+      <phrase id="1">Hello World!</phrase>
+      <phrase id="2">Just Another Perl Hacker</phrase>
+  </phrases>
+
+WHAT ELSE DO I NEED?
+
+  To use DBD::AnyData you will need to install these modules,
+  all available from CPAN and most available from activeState.
+
+  * DBI
+  * SQL::Statement
+  * DBD::File
+  * AnyData
+  * DBD::AnyData
+
+  Note: DBD::File is part of the DBD::CSV distribution
+
+  Additional modules are required for some advanced features,
+  see 'perldoc DBD::AnyData'.
+
+HOW DO I INSTALL IT?
+
+   1.  Install all the prerequired modules first if they 
+       are not already installed
+
+   2.  Unpack the compressed files.
+       (DBD-AnyData-version.tar.gz or DBD-AnyData-version.zip)
+
+   3a. If you are not familiar with the standard Perl
+       makefile method, you can simply copy the file DBD-AnyData.pm
+       into your ...site/lib/DBD directory
+  
+   3b. If you are familiar with the standard Perl make 
+       installation, just do as always (perl Makefile.PL; 
+       make; make test; make install) this should also 
+       work with dmake or nmake. 
+
+WHERE CAN I GET MORE INFO?
+
+   After installing the module, type "perldoc DBD::AnyData" at 
+   the command prompt, or just read the documentation at 
+   the bottom of the ...DBD/AnyData.pm file.
+
+WHO DUNNIT?
+
+  Jeff Zucker <jeff@vpservices.com>
+
+Enjoy!
+
+
+

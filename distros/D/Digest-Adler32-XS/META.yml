@@ -1,0 +1,28 @@
+--- #YAML:1.0
+name:               Digest-Adler32-XS
+version:            0.03
+abstract:           Generate Adler32 digests efficiently
+author:
+    - Stuart Watt <swatt@infobal.com>
+license:            lgpl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::More:  0
+requires:
+    Test::More:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+optional_features:
+    benchmark_tests:
+        description:  Include the benchmark tests against Digest::Adler32.
+        requires:
+            Digest::Adler32:  0
+            Time::HiRes:      0

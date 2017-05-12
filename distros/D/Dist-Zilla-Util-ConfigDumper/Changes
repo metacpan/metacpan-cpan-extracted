@@ -1,0 +1,98 @@
+Release history for Dist-Zilla-Util-ConfigDumper
+
+0.003009 2017-03-18T07:48:14Z 1a10562
+ - Remove use of Test::KENTNL/dztest
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003008, see misc/*.deps* for details
+ - develop: (suggests: ↑2)
+ - test: -1
+
+0.003008 2017-03-01T22:26:39Z fb86583
+ [Bugfix]
+ - Update tooling to avoid problems with '.' going away in @INC
+ - Closes https://github.com/kentnl/Dist-Zilla-Util-ConfigDumper/issues/4
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003007, see misc/*.deps* for details
+ - develop: +3 ↑2 (suggests: ↑1)
+ - test: ↓1
+
+0.003007 2015-07-31T03:43:06Z cf8cff3
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003006, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +12 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1
+ - test: +1 (recommends: +1 ↑1 ↓1)
+
+ [Documentation]
+ - Enhance DESCRIPTION section and ABSTRACT as per request #3
+
+0.003006 2014-10-02T04:27:34Z
+ [Bugfix]
+ - Require 1.(0x5)3, as versions prior to that can fail due to a missing dependency on an appropriate role.
+ - This is a propagation of kentnl/Dist-Zilla-Plugin-Bootstrap-lib#2
+ - This closes #1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003005, see misc/*.deps* for details
+ - test: ↑1
+
+0.003005 2014-10-02T04:13:44Z
+ [Bugfix]
+ - Require a newer version of Bootstrap::lib for testing as older than 0.04x is known to fail.
+ - This might be a solution for gh#1 ( by Brendan Byrd )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003004, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: ↑1 (recommends: ↑1)
+
+0.003004 2014-08-31T21:17:10Z
+ [Bugfix]
+ - Don't report empty config payloads.
+
+0.003003 2014-08-30T14:20:07Z
+ [Bugfix]
+ - Croak if __PACKAGE__ is a ref.
+
+ [Metadata]
+ - author = kentnl
+
+0.003002 2014-08-29T10:02:14Z
+ [Bugfix]
+ - Avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - test: ↑1
+
+0.003001 2014-08-27T22:48:37Z
+ [Bugfix]
+ - use instance->meta->find_attribute_by_name().
+ - because: PACKAGE-> can't be used because roles don't work
+ - because: dumpconfig( __PACKAGE__ , attrs ... ) assumes that the instance will have the attr
+ - because: $instance->get_attribute() doesn't trace inheritance.
+
+0.003000 2014-08-23T14:08:57Z
+ [00 Major]
+ - Add dump_plugin utility for deep nested "I want to pretend I'm dzil" stuff.
+
+0.002001 2014-08-22T18:38:02Z
+ [Bugfix]
+ - Seems Roles don't like ->meta->get_attribute being used for anything, so early attribute sanity checking options
+   were misguided.
+
+0.002000 2014-08-22T17:52:30Z
+ [00 Major]
+ - now supports coderefs
+ - now supports hashrefs depicting true attributes
+ - Moose plumbing internals for attributes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +1
+
+0.001000 2014-08-22T14:16:22Z
+ - First version.

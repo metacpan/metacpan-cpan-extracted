@@ -1,0 +1,26 @@
+Revision history for Perl extension DBIx::Librarian
+
+0.5   09 May 2005
+	- needed class method in DESTROY
+
+0.5   07 May 2005
+	- should be calling class methods when reconnecting
+
+0.4
+	- eliminated TRACE (replaced by Log::Channel)
+	- traverse hierarchy when substituting bind variables
+	- SelectExactlyOne should support data structure, just like
+	  SelectOne and SelectMany
+	- test suite should check correctly for working mysql
+
+0.3   07 Jan 2002
+	- List of row counts returned by lbn->execute
+	- Row counts include SELECT statements
+	- Oracle-specific features: comment-stripping and PL/SQL support
+	- more logging; TRACE flag passed to Statement
+	- attempt to reconnect to database if connection fails
+	- DBIX::Librarian::can()
+	- disconnect() in DESTROY
+	- improve pattern match for bind variables (not ideal yet)
+	- toc() in archivers
+	- set LOADTS in find, not cache, in archivers

@@ -1,0 +1,53 @@
+The MySQL Benchmarks
+
+This directory contains a selection of the MySQL Benchmarks.
+
+They have been supplied as a means of testing the PrimeBase DBD for
+Perl and as a means of demonstrating the speed of PrimeBase in relation to
+other databases. A few minor changes have been made to them so as they
+will run correctly against PrimeBase. Most of these changes had to do
+with the fact that currently PrimeBase does a 'distinct' select by default.
+
+Please refer to the benchmarks available with the MySQL database server 
+for the complete set of original benchmarks.
+
+
+
+File			Description
+
+Data/ATIS		Contains data for 29 related tables used in the ATIS tests.
+Data/Wisconsin		Contains data for the Wisconsin benchmark.
+test-ATIS		Cretation of 29 tables and a lot of selects on them.
+test-connect		Test how fast a connection to the server is.
+test-create		Test how fast a table is created.
+test-insert		Test create and fill of a table.
+test-wisconsin		This is a port of the PostgreSQL version of this
+			benchmark.
+server-cfg		Contains the limit and functions for all supported
+			SQL servers.  If you want to add a new server, this
+			should be the only file that neads to be changed.
+
+
+The Wisconsin Benchmark
+
+The Wisconsin Benchmark described in [Bitton, DeWitt, and Turbyfill
+1983] [Boral and DeWitt 1984] [Bitton and Turbyfill 1985] [Bitton and
+Turbyfill 1988], and [DeWitt 1993] is the first effort to
+systematically measure and compare the performance of relational
+database systems with database machines.  The benchmark is a
+single-user and single-factor experiment using a synthetic database
+and a controlled workload.  It measures the query optimization
+performance of database systems with 32 query types to exe cise the
+components of the proposed systems.  The query suites include
+selection, join, projection, aggregate, and simple update queries.
+
+The test database consists of four generic relations.  The tenk
+relation is the key table and most used. Two data types of small
+integer number and character string are utilized.  Data values are
+uniformly distributed. The primary metric is the query elapsed
+time. The main criticisms of the benchmark include the nature of
+single-user workload, the simplistic database structure, and the
+unrealistic query tests.  A number of efforts have been made to extend
+the benchmark to incorporate the multi-user test.  However, they do
+not receive the same acceptance as the original Wisconsin benchmark
+except an extension work called the AS3AP benchmark.

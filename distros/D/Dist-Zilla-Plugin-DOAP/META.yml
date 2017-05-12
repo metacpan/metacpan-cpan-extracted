@@ -1,0 +1,28 @@
+---
+abstract: 'create a doap.xml file for your project'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-DOAP
+requires:
+  CPAN::Changes: '0'
+  CPAN::Meta: '0'
+  Dist::Zilla: '5'
+  Moose: '2.0600'
+  RDF::DOAP::Lite: '0'
+  namespace::autoclean: '0.20'
+  perl: '5.010'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-DOAP
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-DOAP
+  repository: git://github.com/tobyink/p5-dist-zilla-plugin-doap.git
+version: '0.003'

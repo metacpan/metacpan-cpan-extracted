@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [AddFile::FromFS]
+     src=/home/ujang/doc/tips.txt
+     dest=share/tips.txt
+
+    To add more files:
+
+     [AddFile::FromFS / OtherTips]
+     src=/home/ujang/doc/othertips.txt
+     dest=share/othertips.txt
+
+DESCRIPTION
+
+    This plugin lets you add single file(s) from local filesystem to your
+    build.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::GatherDir is the standard way to add files to your
+    build, but this plugin currently does not offer a way to include single
+    files. Wishlist ticket already created:
+    https://rt.cpan.org/Ticket/Display.html?id=105583
+
+    Dist::Zilla::Plugin::GenerateFile
+
+    Dist::Zilla::Plugin::AddFile::FromCode
+
+    Dist::Zilla::Plugin::AddFile::FromCommand
+

@@ -1,0 +1,580 @@
+=head1 NAME
+
+Date::Reformat - Rearrange date strings
+
+=head1 SYNOPSIS
+
+    use Date::Reformat;
+
+    my $reformat = Date::Reformat->new(
+        parser => {
+            regex  => qr/^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)$/,
+            params => [qw(year month day hour minute second)],
+        },
+        defaults => {
+            time_zone => 'America/New_York',
+        },
+        transformations => [
+            {
+                from    => 'year',
+                to      => 'century',
+                coderef => sub { int($_[0] / 100) },
+            },
+        ],
+        formatter => {
+            sprintf => '%s-%02d-%02dT%02d:%02d:02d %s',
+            params  => [qw(year month day hour minute second time_zone)],
+        },
+    );
+
+    my $reformat = Date::Reformat->new(
+        parser => {
+            strptime => '%Y-%m-%dT%M:%H:%S',
+            # or heuristic => 'ymd', # http://www.postgresql.org/docs/9.2/static/datetime-input-rules.html
+        },
+        defaults => {
+            time_zone => 'America/New_York',
+        },
+        formatter => {
+            strftime => '%Y-%m-%dT%M:%H:%S %Z',
+            # or data_structure => 'hashref' || 'hash' || 'arrayref' || 'array'
+            # or coderef => sub { my ($y, $m, $d) = @_; DateTime->new(year => $y, month => $m, day => $d) },
+            # params => [qw(year month day)],
+        },
+    );
+
+    my $reformatted_string = $reformat->reformat_date($date_string);
+
+=head1 DESCRIPTION
+
+This module aims to be a lightweight and flexible tool for rearranging
+components of a date string, then returning the components in the order
+and structure specified.
+
+My motivation was a month of trying to compare data from spreadsheets from
+several sources, and every single one used a different date format, which
+made comparison difficult.
+
+There are so many modules for doing date math, or parsing a specific date
+format.  I needed something that could take in pretty much any format
+and turn it into a single format that I could then use for comparison.
+
+
+=cut
+
+=head2 METHODS
+
+=over 4
+
+=item new()
+
+Returns a new reformatter instance.
+
+    my $reformat = Date::Reformat->new(
+        'parser'          => $parsing_instructions,
+        'transformations' => $transformation_instructions,
+        'defaults'        => $default_values,
+        'formatter'       => $formatting_instructions,
+        'debug'           => 0,
+    );
+
+Parameters:
+
+=over 4
+
+=item parser
+
+A hashref of instructions used to initialize a parser.
+
+See L</"prepare_parser()"> for details.
+
+=item transformations
+
+An arrayref of hashrefs containing instructions on how to
+convert values of one token into values for another token
+(such as C<month_abbr> to C<month>).
+
+See L</"prepare_transformations()"> for details.
+
+=item defaults
+
+A hashref specifying values to use if the date string does
+not contain a specific token (such as a time_zone value).
+
+See L</"prepare_defaults()"> for details.
+
+=item formatter
+
+A hashref of instructions used to initialize a formatter.
+
+See L</"prepare_formatter()"> for details.
+
+=item debug
+
+Either a 1 or a 0, to turn debugging on or off, respectively.
+
+=back
+
+
+=cut
+
+=item prepare_parser()
+
+Builds a parser based on the given instructions.  To add it to
+the currently active parsers, see L</"add_parser()">.
+
+If several parsers are active, the first one to successfully parse
+the current date string returns the results of the parse, and subsequent
+parsers are not utilized.  See L</"parse_date()"> for more information.
+
+The types of parsers that can be initialized via this method are:
+
+=over 4
+
+=item regex
+
+The regex must specify what parts should be captured, and a list
+of token names must be supplied to identify which token each captured
+value will be assigned to.
+
+    $reformat->prepare_parser(
+        {
+            regex  => qr/^(\d{4})-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d)$/,
+            params => [qw(year month day hour minute second)],
+        },
+    );
+
+=item regex with named capture
+
+The regex must specify what parts should be captured, using named
+capture syntax.
+
+    $reformat->prepare_parser(
+        {
+            regex  => qr/^(?<year>\d{4})-(?<month>\d\d)-(?<day>\d\d) (?<hour>\d\d?):(?<minute>\d\d):(?<second>\d\d)$/,
+        },
+    );
+
+=item strptime
+
+The format string must be in strptime() format.
+
+    $reformat->prepare_parser(
+        {
+            strptime => '%Y-%m-%dT%M:%H:%S',
+        },
+    );
+
+=item heuristic
+
+A hint must be provided that will help the parser determine the meaning
+of numbers if the ordering is ambiguous.
+
+Currently the heuristic parsing mimics the PostgreSQL date parser (though
+I have not copied over all the test cases from the PostgreSQL regression
+tests, so there are likely to be differences/flaws).
+
+    $reformat->prepare_parser(
+        {
+            heuristic => 'ymd',  # or 'mdy' or 'dmy'
+        },
+    );
+
+Currently when the heuristic parser parses a date string, it creates a
+named regex parser which it injects into the active parsers directly in
+front of itself, so that subsequent date strings that are in the same
+format will be parsed via the regex.
+
+I plan to add a parameter that will control whether parsers are generated
+by the heuristic parser (I also plan to refactor that method quite a bit,
+because it kind of makes me cringe to look at it).
+
+=back
+
+
+=cut
+
+=item prepare_formatter()
+
+Builds a formatter based on the given instructions.  To add it to the
+currently active formatters, see L</"add_formatter">.
+
+If several formatters are active, they are each called in turn, receiving
+the output from the previous parser.
+
+The types of parsers that can be initialized via this method are:
+
+=over 4
+
+=item sprintf
+
+The format string must be in sprintf() format, and a list of token names
+must be supplied to identify which token values to send to the formatter.
+
+    $reformat->prepare_formatter(
+        {
+            sprintf => '%s-%02d-%02dT%02d:%02d:02d %s',
+            params  => [qw(year month day hour minute second time_zone)],
+        },
+    );
+
+=item strftime
+
+The format string must be in strftime() format.
+
+    $reformat->prepare_formatter(
+        {
+            strftime => '%Y-%m-%dT%M:%H:%S %Z',
+        },
+    );
+
+=item data_structure
+
+The type of the desired data structure must be specified, and a list of
+token names to identify which token values to include in the data structure.
+
+Valid data structure types are:
+
+=over 4
+
+=item hash
+
+=item hashref
+
+=item array
+
+=item arrayref
+
+=back
+
+    $reformat->prepare_formatter(
+        {
+            data_structure => 'hashref',
+            params         => [qw(year month day hour minute second time_zone)],
+        },
+    );
+
+=item coderef
+
+The supplied coderef will be passed the token values specified.  Whatever the
+coderef returns will be passed to the next active formatter, or will be returned,
+if this is the final formatter.
+
+    $reformat->prepare_formatter(
+        {
+            coderef => sub { my ($y, $m, $d) = @_; DateTime->new(year => $y, month => $m, day => $d) },
+            params  => [qw(year month day)],
+        },
+    );
+
+=back
+
+
+=cut
+
+=item prepare_transformations()
+
+Accepts an arrayref of hashrefs that specify how to transform
+token values from one token type to another.
+
+Returns the same arrayref.  To add it to the currently active
+transformers, see L</"add_transformations">.
+
+
+=cut
+
+=item add_transformations()
+
+Accepts an arrayref of hashrefs that specify how to transform
+token values from one token type to another.  Adds each
+transformation instruction to the list of active transformers.
+A transformation instruction with the same C<to> and C<from>
+values as a previous instruction will overwrite the previous
+version.
+
+    $reformat->add_transformations(
+        [
+            {
+                'to'             => 'hour',
+                'from'           => 'hour_12',
+                'transformation' => sub {
+                    my ($date) = @_;
+                    # Use the value of $date->{'hour_12'} (and $date->{'am_or_pm'})
+                    # to calculate what the value of $date->{'hour'} should be.
+                    # ...
+                    return $hour;
+                },
+            },
+        ],
+    );
+
+The values in each hashref are:
+
+=over 4
+
+=item to
+
+The name of the token type that is desired (for instance
+'hour', meaning the 24-hour format).
+
+=item from
+
+The name of the token type that is available in the date
+string (for instance 'hour_12', meaning the 12-hour format).
+
+=item transformation
+
+A coderef which accepts a hashref containing the information
+which has been parsed out of the date string.  The coderef
+is expected to examine the date information, transform the
+token type specified via C<from> into the correct value for the
+token type specified via C<to>, and return that value.
+
+=back
+
+Several transformations have been built into this module.
+Search for C<$DEFAULT_TRANSFORMATIONS> in the source code.
+
+Transformations added via this method will take precedence
+over built-in transformations.
+
+
+=cut
+
+=item prepare_defaults()
+
+Accepts a hashref of default values to use when transforming
+or formatting a date which is missing tokens that are needed.
+
+This method clears out any defaults which had been set
+previously.
+
+Returns the same hashref it was given, but does not set them.
+To add defaults, see L</"add_defaults">.
+
+
+=cut
+
+=item add_defaults()
+
+Accepts a hashref of default values to use when transforming
+or formatting a date which is missing tokens that are needed.
+
+Each key should be the name of a token, and the corresponding
+value is the default value that will be used when a date is
+missing that token.
+
+    $reformat->add_defaults(
+        {
+            'time_zone' => 'America/New_York',
+        },
+    );
+
+
+=cut
+
+=item debug()
+
+Turns debugging statements on or off, or returns the
+current debug setting.
+
+Expects a true value to turn debugging on, and a false value
+to turn debugging off.
+
+    $reformat->debug(1);  # 1 or 0
+
+
+=cut
+
+=item prepare_parser_for_regex_with_params()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item prepare_parser_for_regex_named_capture()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item prepare_parser_for_strptime()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item prepare_parser_heuristic()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item prepare_formatter_for_arrayref()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item prepare_formatter_for_hashref()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item prepare_formatter_for_coderef()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item prepare_formatter_for_sprintf()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item prepare_formatter_for_strftime()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item strptime_token_to_regex()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item strftime_token_to_internal
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item transform_token_value()
+
+Internal method called by L</"prepare_formatter()">.
+
+
+=cut
+
+=item most_likely_token()
+
+Internal method called by L</"prepare_parser()">.
+
+
+=cut
+
+=item add_parser()
+
+Adds a parser to the active parsers.  When parsing a date string,
+the parser will be called if each preceeding parser has failed to
+parse the date.
+
+See L</"prepare_parser()"> for generating a parser in the correct
+format.
+
+    $reformat->add_parser(
+        $reformat->prepare_parser( ... ),
+    );
+
+
+=cut
+
+=item add_formatter()
+
+Adds a formatter to the active formatters.  When formatting a date,
+the formatter will be called after each preceeding formatter, receiving
+as input the output from the previous formatter.
+
+See L</"prepare_formatter()"> for generating a formatter in the correct
+format.
+
+    $reformat->add_formatter(
+        $reformat->prepare_formatter( ... ),
+    );
+
+
+=cut
+
+=item parse_date()
+
+Given a date string, attempts to parse it via the active parsers.
+Returns a hashref containing the tokens that were extracted
+from the date string.
+
+    my $date_hashref = $reformat->parse_date($date_string);
+
+
+=cut
+
+=item format_date()
+
+Given a hashref containing the tokens that were extracted from a
+date string, formats the date using each of the active parsers,
+passing the output from the previous formatter to the next formatter.
+
+    my $date_string = $reformat->format_date($date_hashref);
+
+
+=cut
+
+=item reformat_date()
+
+Given a date string, attempts to parse it and format it using the
+active parsers and formaters.
+
+    my $date_string = $reformat->reformat_date($date_string);
+
+
+=cut
+
+=back
+
+
+=cut
+
+=head1 SEE ALSO
+
+=over 4
+
+=item Date::Transform
+
+=item Date::Parse
+
+=item Date::Format
+
+=item DateTime::Format::Flexible
+
+=item DateTime::Format::Builder
+
+=back
+
+=head1 AUTHOR
+
+Nathan Gray E<lt>kolibrie@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Nathan Gray
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+
+=cut
+

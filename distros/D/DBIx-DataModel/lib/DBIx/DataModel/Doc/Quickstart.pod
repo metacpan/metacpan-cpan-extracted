@@ -1,0 +1,413 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Quickstart - Get quickly started with DBIx::DataModel
+
+=head1 DOCUMENTATION CONTEXT
+
+This chapter is part of the C<DBIx::DataModel> manual.
+
+=over
+
+=item * 
+
+L<SYNOPSIS AND DESCRIPTION|DBIx::DataModel>
+
+=item * 
+
+L<DESIGN|DBIx::DataModel::Doc::Design>
+
+=item * 
+
+QUICKSTART
+
+=item *
+
+L<REFERENCE|DBIx::DataModel::Doc::Reference>
+
+=item *
+
+L<MISC|DBIx::DataModel::Doc::Misc>
+
+=item *
+
+L<INTERNALS|DBIx::DataModel::Doc::Internals>
+
+=item *
+
+L<GLOSSARY|DBIx::DataModel::Doc::Glossary>
+
+=back
+
+
+This chapter is a tutorial that shows the main steps to get started
+with C<DBIx::DataModel>. The goal here is conciseness, not
+completeness; a full reference is given in 
+the L<REFERENCE|DBIx::DataModel::Doc::Reference> chapter.
+
+The tutorial is a gentle expansion of the examples given 
+in the L<SYNOPSIS|DBIx::DataModel/SYNOPSIS>,
+namely a small human resources management system.
+
+=head1 BASIC ASSUMPTIONS
+
+Before starting with C<DBIx::DataModel>, you should have 
+installed CPAN modules L<DBI|DBI> and 
+L<SQL::Abstract::More|SQL::Abstract::More>.
+You also need a database management system with a L<DBD|DBD> driver. 
+
+Use your database modeling tool to create some tables for employees,
+departments, activities (an employee working in a department from
+a start date to an end date), and employee skills. If you have
+no modeling tool, you can also feed something like the following
+SQL code to the database
+
+  CREATE TABLE t_employee (
+    emp_id     INTEGER AUTO_INCREMENT PRIMARY KEY,
+    lastname   TEXT    NOT NULL,
+    firstname  TEXT,
+    d_birth    DATE 
+  ); 
+  CREATE TABLE t_department (
+    dpt_code   VARCHAR(5) PRIMARY KEY,
+    dpt_name   TEXT    NOT NULL 
+  );
+  CREATE TABLE t_activity (
+    act_id     INTEGER AUTO_INCREMENT PRIMARY KEY,
+    emp_id     INTEGER NOT NULL REFERENCES t_employee(emp_id),
+    dpt_code   VARCHAR(5) NOT NULL REFERENCES t_department(dpt_code),
+    d_begin    DATE    NOT NULL,
+    d_end      DATE
+  );
+  CREATE TABLE t_skill (
+    skill_code VARCHAR(2) PRIMARY KEY,
+    skill_name TEXT    NOT NULL 
+  );
+  CREATE TABLE t_employee_skill (
+    emp_id         INTEGER NOT NULL REFERENCES t_employee(emp_id),
+    skill_code     VARCHAR(2)  NOT NULL REFERENCES t_skill(skill_code),
+    CONSTRAINT PRIMARY KEY (emp_id, skill_code)
+  );
+
+As can be seen from this SQL, we assume that the primary keys 
+for C<t_employee> and C<t_activity> are generated
+automatically by the RDBMS. Primary keys for other tables
+are character codes and therefore should be supplied by
+the client program. We decided to use the suffixes
+C<_id> for auto-generated keys, and C<_code> for user-supplied
+codes.
+
+All examples in this document use I<single-schema> mode, which
+is the simplest way to work with C<DBIx::DataModel>. 
+If your application needs to simultaneously work with several databases
+that share the same schema structure (like for example when
+transferring data between various sources), then you need
+to work in I<multi-schema> mode; explanations are provided
+L<DBIx::DataModel::Doc::Reference/"SCHEMA METHODS">.
+
+
+=head1 DECLARE SCHEMA AND TABLES
+
+C<DBIx::DataModel> needs to acquire some knowledge about 
+the datamodel. The rest of this chapter will go through the 
+steps to manually write the necessary declarations, which
+are quite concise; however, you may gain some time
+by using 
+L<DBIx::DataModel::Schema::Generator|DBIx::DataModel::Schema::Generator>
+to automatically create a skeleton of these declarations.
+
+First load C<DBIx::DataModel> :
+
+  use DBIx::DataModel;
+
+Now define a I<schema> :
+
+  DBIx::DataModel->Schema('HR');
+
+Here we have chosen a simple acronym C<HR> as the schema name, but it 
+could as well have been something like C<Human::Resources>.
+
+The schema now is a Perl class, so we can invoke its C<Table>
+method to declare the first table within the schema :
+
+  HR->Table(qw/Employee      t_employee        emp_id/);
+
+This creates a new Perl class named C<HR::Employee>
+(the schema name C<HR> has been automatically prepended
+before the table name). The second argument C<t_employee> is the
+database table, and the third argument C<emp_id> is the primary key.
+So far nothing is declared about other columns in the table.
+
+Other tables are declared in a similar fashion :
+
+  HR->Table(qw/Department    t_department      dpt_code/)
+    ->Table(qw/Activity      t_activity        act_id/)
+    ->Table(qw/Skill         t_skill           skill_code/)
+    ->Table(qw/EmployeeSkill t_employee_skill  emp_id  skill_code/);
+
+This last declaration has 4 arguments because the primary key
+ranges over 2 columns.
+
+=head1 DECLARE COLUMN TYPES
+
+RDBMS usually require that dates be in ISO format of shape
+C<yyyy-mm-dd>. Let's assume our users are European and want
+to see and enter dates of shape C<dd.mm.yyyy>. Insert of converting
+back and forth within the client code, it's easier to do it at the ORM
+level. So we define conversion routines within a "Date" column type
+
+  HR->Type(Date => 
+     fromDB => sub {$_[0] =~ s/(\d\d\d\d)-(\d\d)-(\d\d)/$3.$2.$1/   if $_[0]},
+     toDB   => sub {$_[0] =~ s/(\d\d)\.(\d\d)\.(\d\d\d\d)/$3-$2-$1/ if $_[0]},
+     validate => sub {$_[0] =~ m/\d\d\.\d\d\.\d\d\d\d/},
+   );
+
+and then apply this type to the appropriate columns, by calling the 
+L<define_column_type()|DBIx::DataModel::Doc::Reference/define_column_type()>
+method on the I<meta-table> objects associated with our tables.
+
+  HR::Employee->metadm->define_column_type(Date => qw/d_birth/);
+  HR::Activity->metadm->define_column_type(Date => qw/d_begin d_end/);
+
+Here we just perform scalar conversions; another design choice 
+could be to "inflate" the data to some kind of Perl objects.
+
+=head1 DECLARE ASSOCIATIONS
+
+=head2 Basic associations
+
+Now we will declare a binary association between departements
+and activities:
+
+  HR->Association([qw/Department department  1 /],
+                  [qw/Activity   activities  * /]);
+
+The C<Association> method takes two references to lists of arguments;
+in each of them, we find : class name, role name, multiplicity, and
+optionally the names of columns participating in the join. Here
+column names are not specified, so the method assumes that the join
+is on C<dpt_code> (from the primary key of the class
+with multiplicity 1 in the association). This declaration
+corresponds to the following UML diagram :
+
+  +----------------+                            +--------------+
+  |                | 1                        * |              |
+  | HR::Department +----------------------------+ HR::Activity |
+  |                | department      activities |              |
+  +----------------+                            +--------------+
+
+
+Like when reading the diagram, the declaration should be read crosswise :
+here we are stating that a department may be associated
+with several activities; therefore the C<HR::Department> class will
+contain an C<activities> method which returns an arrayref. Conversely,
+an activity is associated with exactly one department, so the
+C<HR::Activity> class will contain a C<department> method which returns a
+single instance of C<HR::Department>.
+
+Since associations are symmetric, the two arrayrefs in the
+C<Association> declaration could as well be given in the reverse 
+order, yielding exactly the same effect.
+
+=head3 Choosing role names
+
+Technically, a role name can be any valid Perl identifier, so it
+can be chosen arbitrarily; however, in most cases it is a good
+idea to take the name of the associated table : this will make it
+easier to follow method calls and joins that navigate between
+tables. In addition, it is also a good idea to use role names
+in I<singular> when the multiplicity is 1, and in I<plural> when
+the multiplicity is greater than 1, again for readability reasons.
+
+One exception to this recommendation is when there are several
+associations between the same tables, in which case role names
+are precisely useful to make the distinction. For example,
+suppose that each department has offices in one or several buildings,
+and has its address in one building: this could be modeled with 
+one pair of roles C<office_buildings> / C<departments_using>, and
+one other pair of roles C<address_building> / C<departments_addressed_at>.
+
+
+=head2 Compositions
+
+The second association could be defined in a similar way; but here
+we will introduce the new concept of I<composition>. 
+
+  HR->Composition([qw/Employee   employee    1 /],
+                  [qw/Activity   activities  * /]);
+
+This looks exactly like an association declaration; but it states
+that an activity somehow "belongs" to an employee (cannot exist
+without being attached to an employee, and is often created and 
+deleted together with the employee). In a UML class diagram, this
+would be pictured with a black diamond on the Employee side.
+Using a composition instead of an association in this particular
+example would perhaps be debated by some data modelers; but at least
+it allows us to illustrate the concept.
+
+A composition declaration behaves in all respects like an association.
+The main difference is in C<insert> and C<delete> methods, which will
+be able to perform more complex operations on data trees : for example 
+it will be possible in one method call to insert an employee together
+with its activities. Compositions also support auto-expansion 
+of data trees through the 
+L<auto_expand()|DBIx::DataModel::Doc::Reference/auto_expand()>
+method.
+
+
+=head2 Many-to-many associations
+
+Now comes the association between employees and skills, which
+is a many-to-many association. This happens in two steps: first
+we declare as usual the associations with the linking table :
+
+  HR->Association([qw/Employee      employee   1 /],
+                  [qw/EmployeeSkill emp_skills * /]);
+
+  HR->Association([qw/Skill         skill      1 /],
+                  [qw/EmployeeSkill emp_skills * /]);
+
+Then we declare the many-to-many association:
+
+  HR->Association([qw/Employee  employees  *  emp_skills employee/],
+                  [qw/Skill     skills     *  emp_skills skill   /]);
+
+This looks almost exactly like the previous declarations, except that
+the last arguments are no longer column names, but rather I<role names>:
+these are the sequences of roles to follow in order to implement the 
+association. This example is just an appetizer; more explanations are 
+provided in the reference section.
+
+=head1 USE THE SCHEMA
+
+To use the schema, we first need to give it a database
+connection :
+
+  my $dbh = DBI->connect(...); # parameters according to your RDBMS
+  HR->dbh($dbh);               # give $dbh handle to the schema
+
+Now we can start populating the database:
+
+  my ($bach_id, $berlioz_id, $monteverdi_id)
+    = HR->table('Employee')->insert(
+        [qw/ firstname    lastname   /],
+        [qw/ Johann       Bach       /],
+        [qw/ Hector       Berlioz    /],
+        [qw/ Claudio      Monteverdi /],
+    );
+
+This form of C<insert()>, supplying a list of arrayrefs with column names
+in the first arrayref, is convenient for inserting a bunch of rows at
+once. The other form is to supply one or several hashrefs, where each
+hashref corresponds to a record to create, and yields the same result :
+
+    HR->table('Employee')->insert(
+      {firstname => "Johann",  lastname => "Bach"      },
+      {firstname => "Hector",  lastname => "Berlioz"   },
+      {firstname => "Claudio", lastname => "Monteverdi"},
+    );
+
+According to our earlier assumptions, keys are generated automatically
+within the database, so they need not be supplied here. The return
+value of the method is the list of generated ids (provided that your
+database driver supports DBI's L<last_insert_id|DBI/last_insert_id>
+method).
+
+Similarly, we create some departments and skills
+(here with explicit primary keys, and using both insertion syntaxes) :
+
+  HR->table('Department')->insert(
+    {dpt_code => "CPT",  dpt_name => "Counterpoint" },
+    {dpt_code => "ORCH", dpt_name => "Orchestration"},
+  );
+
+  HR->table('Skill')->insert(
+    [qw/ skill_code  skill_name /],
+    [qw/ VL          Violin     /],
+    [qw/ KB          Keyboard   /],
+    [qw/ GT          Guitar     /],
+   );
+
+To perform updates, there is either a class method or an object method.
+Here is an example with the class method :
+
+  HR->table('Employee')->update($bach_id => {firstname => "Johann Sebastian"});
+
+Associations have their own insert methods, named C<insert_into_*> :
+
+  my $bach = HR->table('Employee')->fetch($bach_id); 
+  
+  $bach->insert_into_activities({d_begin => '01.01.1695',
+			         d_end   => '18.07.1750',
+			         dpt_code => 'CPT'});
+  
+  $bach->insert_into_emp_skills({skill_code => 'VL'},
+			        {skill_code => 'KB'});
+
+Compositions implement cascaded inserts from a given data tree :
+
+  HR->table('Employee')->insert(
+    {firstname  => "Richard",  
+     lastname   => "Strauss",
+     activities => [ {d_begin  => '01.01.1874',
+                      d_end    => '08.09.1949',
+                      dpt_code => 'ORCH'      } ]}
+  );
+
+and if we need the keys of records generated by those insertions, we
+can use the C<< -returning => {} >> option :
+
+  my $data = {firstname  => "Richard",  
+              lastname   => "Strauss",
+              activities => [ {d_begin  => '01.01.1874',
+                               d_end    => '08.09.1949',
+                               dpt_code => 'ORCH'      } ]};
+  my $ids = HR->table('Employee')->insert($data, -returning => {});
+  # ids now contains : { emp_id     => ..., 
+  #                      activities => [{act_id => ...}]};
+
+
+The C<select()> method retrieves several records from a class :
+
+  my $all_employees = HR->table('Employee')->select; 
+  foreach my $emp (@$all_employees) {
+    do_something_with($emp);
+  }
+
+or maybe we want something more specific :
+
+  my @columns  = qw/firstname lastname/;
+  my %criteria = (lastname => {-like => 'B%'});
+  my $some_employees = HR->table('Employee')->select(
+    -columns  => \@columns,
+    -where    => \%criteria,
+    -order_by => 'd_birth',
+   );
+
+From a given object, role methods allow us to get associated
+objects :
+
+  foreach my $emp (@$all_employees) {
+    print "$emp->{firstname} $emp->{lastname} ";
+    my @skill_names = map {$_->{skill_name}  }} @{$emp->skills};
+    print " has skills ", join(", ", @skill_names) if @skill_names;
+  }
+
+Passing arguments to role methods, we can restrict to 
+specific columns or specific rows, exactly like the 
+C<select()> method :
+
+  my @columns = qw/d_begin d_end/;
+  my %criteria = (d_end => undef);
+  my $current_activities = $some_emp->activities(-columns => \@columns,
+                                                 -where   => \%criteria);
+
+And it is possible to join on several roles at once:
+
+  my $result = $emp->join(qw/activities department/)
+                   ->select(-columns => \@columns,
+                            -where   => \%criteria);
+
+This concludes our short tutorial. More examples are given
+in the L<Reference|DBIx::DataModel::Doc::Reference> chapter.

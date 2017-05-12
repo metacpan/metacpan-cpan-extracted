@@ -1,0 +1,51 @@
+Data::Babel
+
+This module translates biological identifiers based on information
+contained in a database.  The principal method is 'translate' which
+converts identifiers of one type into identifiers of one or more
+output types.  Each Data::Babel object provides a unique mapping over
+a set of identifier types. The system as a whole can contain multiple
+Data::Babel objects; these may share some or all identifier types, and
+may provide the same or different mappings over the shared types.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Babel
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Babel
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Babel
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Babel
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Babel/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Institute for Systems Biology
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

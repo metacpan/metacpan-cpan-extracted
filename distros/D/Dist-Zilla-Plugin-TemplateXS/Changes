@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-TemplateXS
+
+0.002     2014-01-13 17:51:45CET+0100 Europe/Amsterdam
+          Fix the path for MakeMaker
+
+0.001     2014-01-12 03:25:10CET+0100 Europe/Amsterdam
+          Initial release

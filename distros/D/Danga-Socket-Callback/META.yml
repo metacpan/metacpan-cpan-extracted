@@ -1,0 +1,40 @@
+---
+abstract: 'Use Danga::Socket From Callbacks'
+author:
+  - 'Copyright (c) Daisuke Maki <daisuke@endeworks.jp>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.0.53, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Danga-Socket-Callback
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Danga::Socket::Callback:
+    file: lib/Danga/Socket/Callback.pm
+    version: 0.013
+requires:
+  Danga::Socket: 0
+  Test::More: 0
+resources:
+  bugtracker: https://github.com/lestrrat/p5-Danga-Socket-Callback/issues
+  homepage: https://github.com/lestrrat/p5-Danga-Socket-Callback
+  repository: git://github.com/lestrrat/p5-Danga-Socket-Callback.git
+version: 0.013
+x_contributors:
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

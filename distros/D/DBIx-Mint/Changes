@@ -1,0 +1,35 @@
+Revision history for Perl extension DBIx::Mint
+
+0.07 2014-03-23
+     - Added dependency on MooX::Singleton and removed global hash
+       of connections
+
+0.06 2014-02-20
+     - Modified connection code for lazyness, and added test
+
+0.05  2013-08-27
+     -Fixed POD for DBIx::Mint::Schema. fields_not_in_db
+	  was documented as not_in_db. Thanks to Alexey Vavilkin.
+
+0.04
+	- Added support for simultaneus database connections
+	  and different schemas.
+
+0.03 2013-06-04
+	- Removed use of given/when construct as it is now
+	  marked as 'experimental' in Perl 5.17 and upwards
+	- In DBIx::Mint::Schema, add_relationship checks the 
+	  validity of parameter result_as. The documentation
+	  and tests were updated, since the option 'result_set'
+	  should have been 'resultset' instead.
+
+0.02  2013-06-02
+	- Added DBIx::Connector
+	- DBIx::Mint now establishes the database connection
+	  directly, and it will not accept the database handle
+	  as it did before.
+
+0.01  Wed Sep  5 11:42:36 2012
+	- original version; created by h2xs 1.23 with options
+		-X DBIx::Mint
+

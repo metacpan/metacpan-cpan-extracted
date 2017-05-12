@@ -1,0 +1,36 @@
+This examples directory contains a complete set of configuration files
+for creating a Data::Babel.  The files are copies of the one we were
+using in our production system at the time we created the example.
+
+The script in this directory, babel.pl, is a very simplified version
+of the script we use in production to create and manage our
+Babels. The script creates and displays Babel objects which contain
+the metadata for performing translations but DOES NOT create the
+actual data for the translations.  For this reason, the Babels
+produced by the script cannot be used to do translations.
+
+The script (like all the tests in the distribution), requires that you
+have access to a MySQL database named 'test', with sufficient
+permissions to create and drop tables and views, and insert data into
+the tables, and select data from the tables and views. It also
+requires that you have Class::AutoDB installed (this is a prerequisite
+of the module; if you installed Data::Babel via CPAN, Class::AutoDB
+should have been installed also).
+
+To run the example, cd to the parent directory and execute the following:
+
+> perl -Mblib examples/babel.pl --create
+
+If all goes well, this will create an AutoDB database containing your
+Babel.  It will also print output to the screening showing your Babel
+in a human-readable form, and a line saying that check_schema found no
+errors.
+
+You can subsequently remake the Babel without recreating the AutoDB
+database by running
+
+> perl -Mblib examples/babel.pl --reread
+
+and print the output without remaking the Babel by running
+
+> perl -Mblib examples/babel.pl

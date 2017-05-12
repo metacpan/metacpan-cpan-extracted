@@ -1,0 +1,9 @@
+Revision history for DNS-PunyDNS
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02	2012-02-01
+		Added PREREQ modules to Makefile.pl
+		Changed internal sub names
+

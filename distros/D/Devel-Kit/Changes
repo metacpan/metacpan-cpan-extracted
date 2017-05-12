@@ -1,0 +1,49 @@
+Revision history for Devel-Kit
+
+0.81 Sun Dec 15 11:31:47 2013
+    - add missing 0.8 Changes entry
+    - update required ver of Module::Want to latest silly-DIE-handler safe version
+    - update required ver of String::UnicodeUTF8 to latest Unicode zero padding \x{} version
+
+0.8  Wed Dec 11 21:42:99 2013
+    - 2 minor POD fixes
+    - correct variable name
+
+0.7  Sun Dec  1 20:38:42 2013
+    - add a()
+    - improve punycode logic
+    - add si()
+
+0.6  Wed Sep  4 20:47:04 2013
+    - add Hex support via xe() and xu()
+
+0.5  Tue Jul 16 21:34:25 2013
+    - require min version of module want
+    - Add _CODE.pm to manifest
+    - not use 'Devel::Kit' in ni() test to avoid confusion
+    
+0.4  Sun Jul 14 23:13:37 2013
+    - Add coderef stat dumping: ci()
+    - Add name space dumping support: ni()
+        - strict/warnings import flag changed to 'no' so it doesn't conflict w/ ni()
+    - add devel info (made ri() for refs and added to vd(ARG,1) for strings)
+    - add Regex debugging: rx()
+    - add misc runtime environment dumping: ei()
+    - implement se() and su()
+    - Add tidy test
+
+0.3  Thu Nov 22 10:28:29 2012
+    - replace temp functions with module
+    - rt 80378: Add handy alias command to POD
+    - rt 79991: catch File::Slurp failures and report error instead of dying
+    - Add crockford base32 encode/decode
+
+0.2  Sat Aug 25 10:33:03 CEST 2012
+    - use more universally installable punycode module
+    - tests for @ behaviors
+    - rt 79159: POD fixes, thanks Kevin!
+    - Sub class tests (minor snafu on that and I wanted it out initially during YAPC::EU 2012) README has notes-to-self
+    - adjust test regexp to try and address erroneous failure on cpantesters.org 4cb7b3be-6f98-1014-af33-fcab386ac21f
+
+0.1  Thu May  3 21:28:17 2012
+       Initial release (@ YAPC::EU Wed Aug 22 15:26:18 CEST 2012)

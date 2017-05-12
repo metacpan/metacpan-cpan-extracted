@@ -1,0 +1,27 @@
+---
+abstract: 'Manage credentials for DBI'
+author:
+  - '=over 4'
+build_requires:
+  DBD::SQLite: 0
+  Test::MockObject: 1.09
+  Test::More: 0.42
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Config
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Any: 0
+  DBI: 0
+  File::HomeDir: 0
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000002

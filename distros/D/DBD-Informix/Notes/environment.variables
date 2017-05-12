@@ -1,0 +1,319 @@
+Key Environment Variables for Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+
+There are many possible environment variables which affect Informix
+software and therefore which affect DBD::Informix.  All of the ones
+mentioned here are also documented in the Informix documentation (usually
+the Informix Guide to SQL: Reference manual for the version of the software
+that you are using).  You should be able to obtain this documentation from
+the Informix web site http://www.informix.com/answers.
+
+Major Environment Variables
+---------------------------
+
+INFORMIXSERVER
+    This must be set with 6.00 and later versions of Informix ESQL/C (and
+    all versions of ClientSDK, therefore).  Even if no other Informix
+    variable is set, this one must be.  This is mandated by the products
+    used by DBD::Informix, so it is also required by DBD::Informix.
+    Further, the server referenced by it must be available; things are apt
+    to fail, but take a very long time (many seconds) over doing so, if the
+    server is missing.
+
+INFORMIXDIR
+    When building DBD::Informix, this must be set, even if the value is is
+    the default of /usr/informix (I'm discussing Unix primarily!).  When
+    running, you can get away without this environment variable being set,
+    because the process which creates Informix.pm records the value of
+    $INFORMIXDIR used at compile time.  It is still a good idea, in
+    general, to set it explicitly in the environment.
+
+PATH
+    Usually, you will need $INFORMIXDIR/bin on your PATH to find other
+    Informix executable programs.  When building DBD::Informix, it is
+    mandatory that it is on your PATH.  At runtime, you could get away
+    without having it on your PATH provided that you use an explicit
+    pathname to identify any executable found in $INFORMIXDIR/bin.
+
+LD_LIBRARY_PATH
+    Also known as SHLIB_PATH on HP-UX and LIBPATH on AIX.  If you are using
+    shared libraries, you may need to set this when you build your
+    executable.  The versions of DBD::Informix from 0.95 onwards arrange
+    for the shared libraries to be identified by full pathname rather than
+    by the abbreviated (relative) name, so new versions of DBD::Informix
+    won't need LD_LIBRARY_PATH set unless you compiled DBD::Informix with
+    the DBD_INFORMIX_RELOCATABLE_INFORMIXDIR environment variable set.
+
+Minor Environment Variables
+---------------------------
+
+INFORMIXSQLHOSTS
+    The name of the sqlhosts file if it is not $INFORMIXDIR/etc/sqlhosts
+
+SQLEXEC
+    Only of relevance to version 5.x versions of ESQL/C.  The name of the
+    server executable.  You might need to know about SQLRM and SQLRMDIR,
+    which give an alternative method of identifying the server.
+
+ONCONFIG
+    TBCONFIG in version 5.x OnLine.  The configuration file for the server.
+    Seldom needed with 7.x and later systems.
+
+DBDATE
+    Controls format of date variables on output, and assumed format on
+    input.
+
+DBMONEY
+DBFORMAT
+    Should control format of MONEY values (and, arguably, DECIMAL and FLOAT
+    and SMALLFLOAT values) when converted to a string.  However,
+    DBD::Informix leaves FLOAT and SMALLFLOAT values as C doubles, and
+    ignores it for DECIMAL and MONEY types.
+
+INFORMIXCONRETRY
+INFORMIXCONTIME
+    You might need to have these set on some systems.  Such systems are
+    most likely to be Windows 95/98/NT client machines connecting to a
+    remote server.  I've never needed them on Unix; I'm not sure whether
+    they work on Unix.
+
+CLIENT_LOCALE
+SERVER_LOCALE
+DB_LOCALE
+DBLANG
+GL_DATE
+GL_TIME
+GL_*
+LANG
+LC_ALL
+LC_COLLATE
+LC_DATE
+LC_MESSAGES
+LC_MONETARY
+LC_NUMERIC
+    These are environment variables which collectively control the locale
+    in which the DBD::Informix software works.
+
+DBD::Informix Environment Variables
+-----------------------------------
+
+All these environment variables apply strictly to the build and test
+phases of making DBD::Informix.  They are of no relevance when running
+DBD::Informix unless you've modified something.
+
+DBD_INFORMIX_AIX_USENETSTUB
+    By default, ClientSDK 2.01.UC1 (ESQL/C 9.15) on AIX 4.2 includes
+    -lnetstub on the link line.  The library $INFORMIXDIR/lib/libnetstub.so
+    is not acceptable to the loader (for reasons which are not clear; not
+    permissions, and the 'file' command doesn't suggest any differences),
+    so the linking fails.  The simplest workaround seems to be to use
+    libnetstubshr.a instead.  The code in Makefile.PL detects it is on AIX
+    (but does not distinguish the version number) and edits the reference
+    to this library, warning you that it has done so and referencing these
+    environment variables in the message.  The variables must be set to any
+    non-false value (so 'yes' is a good value to use).  Using environment
+    variables to fix the infelicities of the ESQL/C script is in vogue.
+
+DBD_INFORMIX_AUXILLIARY_OBJECT_FILES
+    A list of other object files to include in the Perl shared library.
+
+DBD_INFORMIX_DATABASE
+    The primary test database.  You need DBA permissions on this
+    database.  It does not matter which logging mode you use, but a
+    logged database (buffered, unbuffered or MODE ANSI) gives better
+    test coverage.
+
+DBD_INFORMIX_DATABASE2
+    The secondary test database.  You need CONNECT permissions on this
+    database.  It does not matter which logging mode you use, but a
+    different logging mode from the primary test database is
+    recommended.
+
+DBD_INFORMIX_DATABASE3
+    The tertiary test database.  You need CONNECT permissions on this
+    database.  Although it does not matter which logging you use, it
+    exists to allow the t/t51getinfo.t tests to validate the third
+    distinct logging mode (unlogged, logged, MODE ANSI) in a single test
+    run.
+
+DBD_INFORMIX_DEBUG_CONNATTR
+    Set to debug the handling of connection attributes.  Seldom set by
+    users.
+
+DBD_INFORMIX_DEBUG_ESQLCC
+    Set to debug what the esqlcc script is doing.  Seldom set by users.
+
+DBD_INFORMIX_DEBUG_ESQLLD
+    Set to debug what the esqlld script is doing.  Seldom set by users.
+
+DBD_INFORMIX_DEBUG_ESQLTEST
+    Set to see the compilation for the esqltest program.  Seldom set by
+    users.
+
+DBD_INFORMIX_DEBUG_GCC
+    Set to get extra flags (-Wall -pedantic -Wno-comment) passed to GCC.
+    Primarily for the maintenance team.
+
+DBD_INFORMIX_DEBUG_LIBDETECTION
+    Set to force the use of code to detect the list of ESQL/C libraries,
+    usually needed on machines like HP-UX or AIX where the C compiler is
+    not used to create the executable.  Seldom set by users.
+
+DBD_INFORMIX_DEBUG_LIBMAP
+    Set to see the mapping of relative shared library names (-lifgen) into
+    absolute names ($INFORMIXDIR/lib/esql/libifgen.so).  Seldom set by
+    users.
+
+DBD_INFORMIX_ENABLE_ASSERT
+    Set to include assertions in the code.  Seldom set by users.
+
+DBD_INFORMIX_ESQLCC_REMOVE_OPTIONS_REGEX
+    Parallel to DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX.  If set, any
+    arguments which match this option are removed from the command line
+    generated by ESQLCC.  Note that this always prints out the regex used.
+    If you have DBD_INFORMIX_DEBUG_ESQLCC set too, then you also see the
+    'before' and 'after' lists of arguments.  The regex is enclosed inside
+    percent symbols instead of slashes (you might use slashes inside the
+    regex).  It can be helpful to set it to '^-KPIC$' to remove complaints
+    from GCC on Solaris 7 when using the c4gl script instead of esql -- set
+    it in DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX too.
+
+DBD_INFORMIX_ESQLC_LINKAGE
+    Set to -shared or -static to force a particular linkage mechanism.
+    Seldom set by users.
+
+DBD_INFORMIX_ESQLLD_NO_G_OPTION
+    Remove -g option from linker command line when requested, based on a
+    problem found by Brad Huan-Ming Kao <proton@iiidns.iii.org.tw> on SCO
+    3.2v5.0.2.
+
+By the time you're using any of the ESQLLD remove or replace environment
+variables that follow, it is usually better to think about hacking (a
+copy of) the esql script itself.  However, each has had its uses.
+
+DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX
+    Generalization of DBD_INFORMIX_ESQLLD_NO_G_OPTION; if it is set, any
+    arguments which match this option are removed from the command line
+    generated by ESQLLD.  Note that this always prints out the regex used.
+    If you have DBD_INFORMIX_DEBUG_ESQLLD set too, then you also see the
+    'before' and 'after' lists of arguments.  The regex is enclosed inside
+    percent symbols instead of slashes (you might use slashes inside the
+    regex).  Note, you can set it to "^-l(c|aio|elf)$" to see what happens
+    when you omit the C, AIO and ELF libraries from the command line; my
+    experience is that everything still works OK.
+
+DBD_INFORMIX_ESQLLD_REMOVE_OPTION_PAIRS
+    Another generalization of DBD_INFORMIX_ESQLLD_NO_G_OPTION; if it
+    set, then any multi-word options which match this regex are removed.
+    It might be set to the value '-z\s*(combreloc|ignore|lazyload)\b' on
+    Solaris to avoid shared library loading problems with versions of
+    Perl built to use the '-z ignore' option, etc.  Note that the name
+    is a misnomer; it maps the options into a single string, removes all
+    text matching the regular expression, and then resplits the string
+    into options separated by blanks.  Note too that it could be used in
+    place of either of the other options mentioned.  Do not use it if
+    there are pathnames with blanks in them - or, better, do not use
+    pathnames with blanks in them.
+
+DBD_INFORMIX_ESQLLD_REPLACE_OPTIONS_REGEX
+    And another generalization of DBD_INFORMIX_ESQLLD_NO_G_OPTION; ever
+    get the feeling that linking causes problems?  Used, for example, to
+    map -xarch=sparcv9 to -m64.  The value should be a Perl substitute
+    operator such as "s/^-xarch=sparcv9$/-m64/".  It operates on single
+    arguments; it is painful to devise a mechanism that substitutes
+    multiple of these things.
+
+DBD_INFORMIX_HPUX_USELIBV3
+DBD_INFORMIX_HPUX_USELIBCL
+    By default, ClientSDK 2.40.HC1 (ESQL/C 9.30) on HP-UX 11.0 includes
+    two libraries which are counter-productive.  The more serious
+    problems are caused by '-lcl' and '-l:libcl.1', which contains some
+    thread-local storage that causes the testing phase to fail.  The
+    less serious problem is '-lV3' which doesn't seem to provide any
+    symbols to the linking.  The code in Makefile.PL detects it is on
+    HP-UX (but does not distinguish the version number) and deletes the
+    references to those libraries, warning you that it has done so and
+    referencing these environment variables in the message.  The
+    variables must be set to any non-false value (so 'yes' is a good
+    value to use).  If you get a link failure or a runtime failure with
+    missing symbols, you could try setting these environment variables.
+    These libraries are also included on HP-UX 10.20, but don't seem to
+    spoil things there -- but they can equally well be removed.
+
+DBD_INFORMIX_NO_DBCREATE
+    On some Informix systems, permission to create databases is not
+    given to all and sundry.  This is a good thing for security, but
+    makes it harder to test some parts of DBD::Informix.  If you do not
+    have database create permission, set this environment variable to
+    any non-zero (Perl 'TRUE') value.  (Note that this is independent of
+    DBD_INFORMIX_NO_RESOURCE permission.)
+
+DBD_INFORMIX_NO_ESQLTEST
+    Suppress the esqltest phase of the checking.  Do not attempt to
+    report build errors if you have this value set in your environment.
+
+DBD_INFORMIX_NO_RESOURCE
+    Sometimes, a user without DBA or RESOURCE privileges will need to
+    install DBD::Informix.  Setting this environment variable will tell
+    the DBD::Informix test suite to avoid tests that need DBA or
+    RESOURCE privileges.  All tests that are run will use temporary
+    tables only, and will avoid creating stored procedures, and so on.
+
+DBD_INFORMIX_NO_SBSPACE
+    Suppress the testing of smart blobs (BLOB and CLOB).  Use it if you
+    have an IDS 9.x server but no smart blob spaces.  See also
+    DBD_INFORMIX_SBSPACE.
+
+DBD_INFORMIX_PASSWORD
+    Password for connection to primary test database.
+
+DBD_INFORMIX_PASSWORD2
+    Password for connection to secondary test database.  Defaults to
+    DBD_INFORMIX_PASSWORD.
+
+DBD_INFORMIX_PASSWORD3
+    Password for connection to tertiary test database.  Defaults to
+    DBD_INFORMIX_PASSWORD2.
+
+DBD_INFORMIX_RELOCATABLE_INFORMIXDIR
+    Set if the shared libraries should be linked specifying relative
+    library names (-L$INFORMIXDIR/lib -lname) rather than absolute path
+    names ($INFORMIXDIR/lib/libname.so).
+
+    This allows you to build DBD::Informix for Perl on Machine A and
+    install it on Machine B which has $INFORMIXDIR in a different
+    location, or to use DBD::Informix with multiple different values of
+    $INFORMIXDIR all on Machine A.  The downside of setting it is that
+    root-privileged processes (and some SUID processes) may not work,
+    and you need to ensure that the correct value of LD_LIBRARY_PATH or
+    its many equivalents (SHLIB_PATH, /etc/ld.so.conf, ...) are set
+    appropriately.  Recommendation: use the default fixed location of
+    $INFORMIXDIR if you possibly can.
+
+DBD_INFORMIX_SBSPACE
+    This specifies the name of the smart blob space that will be used when
+    creating smart blobs in during the tests, and defaults to "sbspace".
+
+DBD_INFORMIX_SERVER
+    Obsolete.
+
+DBD_INFORMIX_USERNAME
+    Username for connection to primary test database.
+
+DBD_INFORMIX_USERNAME2
+    Username for connection to secondary test database.  Defaults to
+    DBD_INFORMIX_USERNAME.
+
+DBD_INFORMIX_USERNAME3
+    Username for connection to tertiary test database.  Defaults to
+    DBD_INFORMIX_USERNAME2.
+
+DBD_INFORMIX_USE_EPRINTF_CODE
+    If you run into problems with GCC and missing symbol eprintf
+    (possibly with one or two leading underscore characters), then set
+    this to use the supplied alternative eprintf.c code.  It is much
+    better to avoid setting this.
+
+---------------------------------------------------------------------------
+
+Author: Jonathan Leffler (jleffler@us.ibm.com)
+@(#)$Id: environment.variables,v 2007.1 2007/09/14 15:30:18 jleffler Exp $

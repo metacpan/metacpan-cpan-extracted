@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+SIGNATURE
+SawAmpersand.xs
+lib/B/FindAmpersand.pm
+lib/Devel/FindAmpersand.pm
+lib/Devel/SawAmpersand.pm
+t/50pod.t
+t/52podcover.t
+t/find.t
+t/saw.t
+META.json                                Module JSON meta-data (added by MakeMaker)

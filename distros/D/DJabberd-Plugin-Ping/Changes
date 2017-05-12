@@ -1,0 +1,8 @@
+Revision history for DJabberd-Plugin-Ping
+
+0.46    15/03/2008
+        Fix compliance problem, reported by Edward Rudd, bug 34089 on rt
+
+0.45    27/01/2007
+        First version, released on CPAN
+

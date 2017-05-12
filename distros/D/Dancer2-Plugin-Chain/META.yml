@@ -1,0 +1,38 @@
+---
+abstract: 'Dancer2 add-on for route chaining.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack: '1.0029'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Chain
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Dancer2::Plugin::Chain:
+    file: lib/Dancer2/Plugin/Chain.pm
+    version: '0.08'
+  Dancer2::Plugin::Chain::Router:
+    file: lib/Dancer2/Plugin/Chain/Router.pm
+    version: '0.08'
+requires:
+  Dancer2: '0.159002'
+  Dancer2::Plugin: '0.159002'
+  Moo: '2.000000'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Dancer2-Plugin-Chain.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

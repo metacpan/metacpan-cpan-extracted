@@ -1,0 +1,269 @@
+Revision history for Devel-MAT
+
+0.25    2017/03/27 14:09:55
+        [CHANGES]
+         * Attempt to elide RVs in `identify` output
+         * Add a 'help' command to pmat shell
+         * Added the start of Devel::MAT::UserGuide
+         * Moved `pmat-callstack` to  `pmat> callstack`
+         * Removed used of given/when syntax
+
+        [BUGFIXES]
+         * Fix for perl 5.25.x's removal of ->op_sibling (RT114581)
+         * Avoid creating files called -e.pmat (RT119164)
+         * abs_path() the dumpfile path at startup time in case of chdir()
+           (RT117842)
+
+0.24    2016/06/03 19:07:47
+        [CHANGES]
+         * Capture the input/output fileno values of IO handles
+         * Moved more standalone commands into 'pmat' command Tools
+            + pmat-identify-sv  becomes  pmat> identify
+            + pmat-show-sv      becomes  pmat> show
+         * Added  pmat> io  commands
+         * Make main 'pmat' into an interactive repl-like program if run with
+           no additional arguments
+
+0.23    2016/04/05 16:32:43
+        [CHANGES]
+         * Allow -dump_at_SIGNAME for any named signal
+         * Added simple 'pmat-diff' script
+         * Distinguish undefined scalars from defined ones, using a new icon
+         * Initial experiment at generic 'command' ability
+         * Moved GTK explorer to its own distribution;
+             App-Devel-MAT-Explorer-GTK
+
+0.22    2016/03/16 16:22:19
+        [CHANGES]
+         * Added a simple script to find PVs by content
+         * Updated documentation to =head2 barename style
+
+        [BUGFIXES]
+         * Fix back-compat loading of v0.1 files with EVAL contexts in
+         * Fix perl5.22/ithreads that lacks padnames
+         * Fix perl5.23.8 that removes blk_sub.argarray
+
+0.21    2015/10/29 20:58:29
+        [CHANGES]
+         * Compatibility with perl 5.22 (RT100458):
+            + Added/removed roots
+            + Correctly handle GV-less CVs
+         * Updated dumpfile format
+            + Store the CvDEPTH of CVs and the olddepth of SUB contexts
+              (RT108094)
+            + Capture CvLEXICAL flag and the name of CvNAMED CVs
+         * Allow lookup of PAD index from padname for lexicals (RT100967)
+         * Improved output format of pmat-callstack, showing the value of a
+           $self lexical if one exists
+         * Increased dump format minor version to 2
+
+        [BUGFIXES]
+         * No need to emit two copies of the default stash if perl has heap-
+           allocated it (RT103499)
+
+0.20    2014/12/04 18:35:09
+        [CHANGES]
+         * Allow serial-numbering of .pmat files in the Dumper
+         * Totally refactored $pmat->identify to return an abstract Graph
+           structure
+         * Much improved pmat-identify-sv output; sort strong-refs first,
+           use Unicode linedrawing, identify "already seen" SVs clearer
+         * GTK Explorer improvements:
+            + Allow search by symbol
+            + Show longer PV strings in tooltip
+            + Selectable SV detail labels
+
+0.19    2014/11/18 13:17:28
+        [CHANGES]
+         * No need to annotate 'directly' or 'indirectly' on outref names
+         * Added -dump_at_DIE option to Devel::MAT::Dumper
+         * Added icon for INVLIST from perl 5.20
+
+0.18    2014/07/14 22:45:08
+        [CHANGES]
+         * Improved for Tools to create custom UIs
+            + Widget trees
+            + Label text + icon
+            + Tool-localised icon load paths
+         * Support loading Tools automatically
+         * Neater API for inrefs/outrefs that also indicates link strength
+
+0.17    2014/01/22 21:33:45
+        [CHANGES]
+         * Also dump SvUTF8() flag of PVs
+         * Added pmat-cat-svpv
+
+        [BUGFIXES]
+         * Don't crash on NULL PADLIST elements (RT92290)
+
+0.16    2014/01/15 18:18:53
+        [CHANGES]
+         * More accurate format for dumping SV MAGIC annotations
+            - note that older files will contain incorrect information
+         * More accurate backref information
+         * Improvements to analysis of PAD lexicals
+
+        [BUGFIXES]
+         * Fix many cases of optree dumping to get correct PAD indexes
+         * Further minor fixes that improve SvREFCNT / inrefs accuracy
+
+0.15    2014/01/14 11:12:37
+        [CHANGES]
+         * Remember to basename() $0 for default dumpfile name
+         * Added -eager_option import option
+         * Added $df->roots_strong
+         * Added options to $pmat->identify and pmat-identify-sv command
+
+        [BUGFIXES]
+         * Avoid infinite loop in $pmat->identify in cyclic cases
+         * Fix docs on ->rv method (RT92122)
+
+0.14    2014/01/04 20:25:16
+        [CHANGES]
+         * Move much core data storage into XS structs, for reduced memory
+           consumption of analyser and some CPU performance gains
+         * Display human-readable size information in GTK explorer
+         * Added a size totals summary commandline tool
+         * Improved recursion logic in Inrefs tool; avoids multiple recursions
+           into shared structures
+
+        [BUGFIXES]
+         * Fix for 5.10.0
+
+0.13    2013/12/06 21:37:35
+        [CHANGES]
+         * Performance improvement to inrefs counting
+         * Added Sizes tool - calculates structure and owned set and sizes
+         * Allow Tools to declare UI radiobutton sets
+         * Improved Tools ability to interact with the SV list
+         * Disable Tools menu items for loaded tools to avoid loading them
+           twice
+
+        [BUGFIXES]
+         * Add List::UtilsBy to requirements
+         * Our version of dopoptosub_at() doesn't need aTHX_
+
+0.12    2013/12/03 15:18:43
+        [CHANGES]
+         * Classify outrefs and inrefs into various kinds
+         * Subclass ARRAY into PADLIST, PADNAMES, PAD for CODE
+         * Allow selection of what kinds of refs to count/display on the GTK
+           explorer
+         * Store more flags (CvWEAKOUTSIDE, CvCVGV_RC, AvREAL) so as to get
+           strong/weak references correct
+         * Store the SvOUTSTASH of SCALARs and REFs
+         * Added a commandline wrapper for $pmat->identify
+
+        [BUGFIXES]
+         * require() tool .pm files automatically when calling ->load_tool
+
+0.11    2013/11/28 14:30:32
+        [CHANGES]
+         * Complete redesign of dumpfile format so it is more extensible in future
+         * Represent RVs by their own type, REF, rather than being a kind of SCALAR
+         * Store caller()-like context in dumpfiles as well
+         * Store CLONE/CLONED/ISXSUB CV flags and oproot
+         * Attempt to match CLONE protosubs with CLONED closures
+         * Added SCALAR->iv method
+         * Neaten the names of STASHes whose names begin with a control character
+         * Pretty-print PVs and limit length to 32 characters in GTK explorer
+         * Added icons for REF and LVALUE types
+
+        [BUGFIXES]
+         * Guard against PL_main_root being NULL, as it can be early in compilation
+         * Improved Reachability tool logic for CODE PAD slots
+
+0.10    2013/11/26 00:42:14
+        [CHANGES]
+         * Display dumped perl version, SV and byte counts in GTK explorer
+           status bar
+         * Dump all GVs, even those without GPs
+         * Store size information about all SVs
+            + TODO: CODE size does not take account of optree
+         * Have dump_at_{END,SIGABRT,SIGQUIT} print to STDERR
+         * Limit the capture size of PVs, but still note the full length
+         * Dump FILE and LINE of CVs and GVs
+         * Redrawn type icons
+
+        [BUGFIXES]
+         * Fix for NVLEN=16 architectures
+
+0.09    2013/11/22 00:25:17
+        [CHANGES]
+         * Remove orphan count unit test as it is too unreliable
+
+        [BUGFIXES]
+         * Sometimes a PAD(0) slot is NULL
+         * ->identify is now a $pmat method
+         * ->identify should load Inrefs tool
+         * Try harder to clear PL_tmpsv when making an unreachable cycle
+
+0.08    2013/11/10 19:27:30
+        [CHANGES]
+         * Chase more fields of an HV's mro_meta
+         * Document how Tools may interact with the UI
+         * Allow Tools to register and use icons on the UI
+         * Rework Reachability tool to analyse kinds of reachability
+         * Move inrefs logic into its own new Inrefs Tool
+         * Slight performance improvement to dumpfile loading
+         * Display icons also for general SV type
+
+        [BUGFIXES]
+         * Ensure ->find_symbol actually works for deeply-nested symbols
+
+0.07    2013/11/08 01:33:01
+        [CHANGES]
+         * Added new concept of Devel::MAT::Tool::* and Devel::MAT::UI
+         * Implement SV type counting and reachability analysis Tools
+         * Allow dumping on SIGABRT
+
+        [BUGFIXES]
+         * Support perl 5.10
+         * Support NVSIZE==16 architectures
+
+0.06    2013/10/28 00:14:24
+        [CHANGES]
+         * Don't yield constants from both anonymous subs -and- constix/constsv
+           lists
+         * Don't bother including all the PL_sv_undef lexnames
+
+        [BUGFIXES]
+         * Remember to store padlist in pre-5.18 perls
+         * PL_main_cv does not have a CvROOT(); need to use PL_main_root
+           (fixes unit test failures on non-threaded perls)
+
+0.05    2013/10/22 01:34:44
+        [CHANGES]
+         * Added ->find_symbol and ->find_glob
+         * Identify weakrefs in descriptions and in GTK explorer
+         * All hashes have the backrefs AV field, not just stashes
+         * Recognise import() options on D:M:Dumper
+         * Grab padnames and pad AVs on 5.18
+         * Added a toolbar with back/forward buttons in GTK explorer
+
+        [BUGFIXES]
+         * Don't crash when ->identify'ing SVs that are stack temporaries
+
+0.04    2013/10/09 23:23:27
+        [CHANGES]
+         * Renamed dumpfile() to just dump()
+         * Don't delete elided RVs; include both direct and via-RV outrefs
+
+        [BUGFIXES]
+         * Start 'identify' with the initial SV already seen so it doesn't
+           infinitely recurse
+         * Remember to still fix up consts_at from constix on ithreaded 5.18
+         * Need to check if SVs are actually magical (SvMAGICAL), not just
+           potentially magical (>= SVt_PVMG)
+
+0.03    CHANGES:
+         * Altered handling of PADLISTs for perl 5.18.0
+         * Ensure that UINTs and PTRs are written in correct platform sizes
+
+0.02    CHANGES:
+         * Bugfixes for non-threaded perls
+         * Trace constants/GVs/etc... through optrees
+         * Handle SVt_PVLV
+
+0.01    First version, released on an unsuspecting world.
+

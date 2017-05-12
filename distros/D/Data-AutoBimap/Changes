@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::AutoBimap.
+
+0.03  February 2014
+	- Correct minimum Perl version
+
+0.02  January 2014
+	- Use array for n2s reverse lookup for speed
+
+0.01  January 2014
+	- original version

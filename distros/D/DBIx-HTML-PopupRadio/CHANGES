@@ -1,0 +1,93 @@
+Revision history for Perl extension DBIx::HTML::PopupRadio.
+
+1.16  Sun Feb 21 12:55:00 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.15  Wed Feb 10 14:01:48 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.14  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.13  Wed Mar 22 10:57:00 2006
+	- In subs popup_menu and radio_group, use a case-insensitive compare when trying to set the default menu item.
+		I need this in one project because the menu values and the default come from different databases
+
+1.12  Mon Dec 12 13:18:00 2005
+	- In sub popup_menu(), check the caller has set a default value before trying to use the default.
+		This stops an 'uninitialized' warning being emitted
+	- Add more patterns to MANIFEST.SKIP
+
+1.11  Wed Nov  9 15:38:00 2005
+	- Add a new parameter to new() and set(): options.
+		This takes a hash ref as its value, and allows you to specify any list of options
+		you wish to add to the HTML of the 'select'. Eg:
+			With new(name => 'a_name', ...), the 'select' would look like:
+			<select id = "a_name" name = "a_name">
+			With new(name => 'a_name', options => {tabindex => 2, force => 1}, ...),
+			the 'select' would look like:
+			<select id = "a_name" name = "a_name" tabindex = "2" force = "1">
+	- Make this module depend on HTML::Entities::Interpolate so we can output any text
+		by calling HTML::Entities::encode_entities when appropriate
+
+1.10  Mon Feb 14 20:08:00 2005
+	- Extend the flexibility of the 'prompt' option, to allow it to point to an anonymous
+		hash, so you can specify a set of strings, and their corresponding values, to be output
+		at the top of the menu. The default behaviour is identical to the previous version.
+		Original patch by Sean McKenna
+	- Update docs
+
+1.09  Mon Jul 19 14:43:00 2004
+	- Change Makefile.PL to coexist with Module::Build
+	- Delete ./test.pl
+	- Add t/pod.t to test all PODs
+
+1.08  Mon Jun  3 19:48:00 2003
+	- Change the option 'prompt', which can be used to set the first selection in pop-up menus,
+		so that it is either a string (as it was originally), or a hash ref (new in this version).
+		Hence we can say new(prompt => 'Choose one') or new(prompt => {'0' => 'Choose one'}).
+		In the first case, the string 'Choose one' is both a visible menu item and the value
+		passed back to the CGI script if the user selects that item.
+		In the new case, the string 'Choose one' is the visible menu item, and the other value,
+		here '0', is the one passed back to the CGI script. In particular, this works -
+		new(prompt => {'' => 'Choose one'}) - to return the empty string to the CGI script.
+
+1.07  Mon Apr 28 21:31:00 2003
+	- Backticks with redirection of STDERR failed in Module::MakeDist V 1.04 when making
+		V 1.06 of this module, so I've had to re-make then both
+
+1.06  Mon Apr 28 09:09:00 2003
+	- The constructor now takes a 'javascript' parameter, whose value is, say, an event handler
+	- A sample would be: 'onChange = "replicate()"'. See the POD for details
+
+1.05  Sun Mar 23 11:29:00 2003
+	- No source code changes in this version
+	- Patch to stop shipping blib/ directory in Unix distros, because the
+		PAUSE indexer takes this directory to indicate a binary distro,
+		which means it does not index the module, and this in turn means
+		the module is not listed in the CPAN daily update list, etc.
+
+1.04  Wed Dec 11 12:53:57 2002
+	- Minor documentation changes. No need to upgrade
+
+1.03  Mon Nov 18 12:53:57 2002
+	- Fix sub radio_group so that if there is no default,
+		the items are counted, and the first becomes the default.
+		This was the plan all along, but it was so clear in my
+		mind I did not transfer the logic to the code
+
+1.02  Sat Oct 26 14:29:00 2002
+	- Minor documentation changes. No need to upgrade
+
+1.01  Tue Oct 15 11:41:13 2002
+	- Change the meaning of the 'default' parameter so it refers
+		to the visible menu item and not the value associated with
+		the visible menu item. This now matches the meaning of the
+		'default' parameter used in DBIx::HTML::ClientDB
+	- Add a primitive test program t/test.t
+	- Minor documentation changes
+
+1.00  Sat Sep 28 12:37:29 2002
+	- original version

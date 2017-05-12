@@ -1,0 +1,27 @@
+Revision history for Dist-Zilla-Plugin-Test-EOF
+
+0.0501 2015-02-04T01:42:00Z CET
+ [Documentation]
+ - Rebuilt with Podweaver.
+
+ [Meta]
+ - Use @Author::CSSON dist zilla bundle, expanded.
+
+ [Requirements]
+ - Bump Test::EOF to 0.0800.
+
+0.0500 2015-01-05T00:14:00Z CET
+ - Re-implemented with D::Z::P::Test::EOL as a base. It's better now.
+
+0.0400 2014-11-27T13:33:17Z CET
+ - Added check in test for Test::EOF (thanks harleypig!)
+
+0.03 2014-09-18T21:10:43Z CEST
+ - Fix missing prereqs.
+
+0.02 2014-09-06T15:03:02Z CEST
+ - Missing dependency
+
+0.01 2014-09-06T13:18:20Z CEST
+ - Initial release
+

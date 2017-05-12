@@ -1,0 +1,100 @@
+# PODNAME: Dallycot::Manual::Intro
+# ABSTRACT: Introduction to and overview of Dallycot
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+This document aims to answer the questions:
+
+=over 4
+
+=item *
+
+What needs does Dallycot fill?
+
+=item *
+
+Why would I use Dallycot?
+
+=item *
+
+How does everything broadly fit together?
+
+=back
+
+Dallycot is designed to work with the asynchronous nature of the web. When
+running a program in Dallycot, the web is your memory, providing data and code
+storage.
+
+I<N.B.>: Almost everything about Dallycot is subject to change. For now, Dallycot
+provides read-only access to information.
+
+=head2 Writing Dallycot
+
+Dallycot provides a custom functional language designed to think the way linked data
+thinks. See L<the W3C Linked Data Platform specification|http://www.w3.org/TR/ldp/>
+for an example of the kind of data services Dallycot will target. Dallycot
+prefers JSON-LD when communicating with services.
+
+Dallycot is not a query language. Projects like L<Marmotta|http://marmotta.apache.org/>
+provide linked data query languages.
+
+These examples probably don't work yet, but indicate what we're working towards.
+
+=head3 Example: Name things that share a subject with I<The Lord of the Rings>
+
+The following snippet describes walking the DBPedia graph from the resource
+representing I<The Lord of the Rings> to anything that shares a common subject
+with that book, and extracting the label (imagine how the directional edges
+point from node to node in the data graph).
+
+   <http://dbpedia.org/data/The_Lord_of_the_Rings.rdf>
+     -> :dcterms:subject
+     <- :dcterms:subject
+     -> :rdf:label
+
+=head3 Example: Euclid's algorithm for GCD
+
+This uses simple recursion to calculate the greatest common divisor.
+
+   gcd := (
+     gcd_f(self, a, b) :> (
+       (a = 0) : b
+       (b = 0) : a
+       (a > b) : self(self, a mod b, b)
+       (     ) : self(self, a, b mod a)
+     );
+     gcd_f(gcd_f, ___)
+   )
+
+For now, a symbol such as C<gcd_f> isn't defined until after the expression
+has finished running, so recusion requires a form of the Y-combinator, such
+as provided by L<Dallycot::Library::Core::Functions>.
+
+=head2 When Not to Use Dallycot
+
+Because anything might result in retrieving information from the web, Dallycot
+makes extensive use of promises. Promises are great for managing asynchronous
+execution, but introduce overhead that makes programs slower if all of the
+information is local to the processor.
+
+Dallycot is not designed to be good at:
+
+=over 4
+
+=item * Immediate gratification
+
+Some programs take a while. When coupled with ad hoc information
+retrieval over the web, programs can seem to slow to a crawl. This is
+the nature of linked data in general, not Dallycot. If you already know
+exactly which data you will need, and how the data fits together, then
+consider processing it locally with a SPARQL service or a general purpose
+programming language designed to work exclusively with local data.
+
+=item * Scientific computing
+
+Use programs such as Matlab, Mathematica, or R. Consider the scientific
+computing libraries available to Perl, Python, or Ruby.
+
+=back

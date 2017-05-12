@@ -1,0 +1,140 @@
+<HTML>
+<HEAD>
+<TITLE>stag-diff</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#output">OUTPUT</A></LI>
+		<LI><A HREF="#algorithm">ALGORITHM</A></LI>
+		<LI><A HREF="#author">AUTHOR</A></LI>
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-diff.pl - finds the difference between two stag files</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-diff.pl -ignore foo-id -ignore bar-id file1.xml file2.xml</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Compares two data trees and reports whether they match. If they do not
+match, the mismatch is reported.</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dhelp%7Ch">-help|h</A></STRONG><BR>
+<DD>
+shows this document
+<P></P>
+<DT><STRONG><A NAME="item_%2Dignore%7Ci_ELEMENT">-ignore|i ELEMENT</A></STRONG><BR>
+<DD>
+these nodes are ignored for the purposes of comparison. Note that
+attributes are treated as elements, prefixed by the containing element
+id. For example, if you have
+<PRE>
+  &lt;foo ID=&quot;wibble&quot;&gt;</PRE>
+<P>And you wish to ignore the ID attribute, then you would use the switch</P>
+<PRE>
+  -ignore foo-ID</PRE>
+<P>You can specify multiple elements to ignore like this</P>
+<PRE>
+  -i foo -i bar -i baz</PRE>
+<P>You can also specify paths</P>
+<PRE>
+  -i foo/bar/bar-id</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dparser%7Cp_FORMAT">-parser|p FORMAT</A></STRONG><BR>
+<DD>
+which parser to use. The default is XML. This can also be autodetected
+by the file suffix. Other alternatives are <STRONG>sxpr</STRONG> and <STRONG>itext</STRONG>. See
+<A HREF="./Data/Stag.html">the Data::Stag manpage</A> for details.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dreport%7Cr_ELEMENT">-report|r ELEMENT</A></STRONG><BR>
+<DD>
+report mismatches as they occur on each element of type ELEMENT
+<P>multiple elements can be specified</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dverbose%7Cv">-verbose|v</A></STRONG><BR>
+<DD>
+used in conjunction with the <STRONG>-report</STRONG> switch
+<P>shows the tree of the mismatching element</P>
+<P></P></DL>
+<P>
+<H2><A NAME="output">OUTPUT</A></H2>
+<P>If a mismatch is reported, a report is generated displaying the
+subpart of the tree that could not be matched. This will look like
+this:</P>
+<P>REASON:
+no_matching_node: annotation
+  no_matching_node: feature_set
+    no_matching_node: feature_span
+      no_matching_node: evidence
+        no_matching_node: evidence-id
+          data_mismatch(:15077290 ne :15077291): evidence-id AND evidence-id</P>
+<P>Due to the nature of tree matching, it can be difficult to specify
+exactly how trees do not match. To investigate this, you may need to
+use the <STRONG>-r</STRONG> and <STRONG>-v</STRONG> options. For the above output, I would
+recommend using</P>
+<PRE>
+  stag-diff.pl -r feature_span -v</PRE>
+<P>
+<H2><A NAME="algorithm">ALGORITHM</A></H2>
+<P>Both trees are recursively traversed... see the actual code for how this works</P>
+<P>The order of elements is not important; eg
+</P>
+<PRE>
+
+  &lt;foo&gt;
+    &lt;bar&gt;
+      &lt;baz&gt;1&lt;/baz&gt;
+    &lt;/bar&gt;
+    &lt;bar&gt;
+      &lt;baz&gt;2&lt;/baz&gt;
+    &lt;/bar&gt;
+  &lt;/foo&gt;</PRE>
+<P>matches</P>
+<PRE>
+  &lt;foo&gt;
+    &lt;bar&gt;
+      &lt;baz&gt;2&lt;/baz&gt;
+    &lt;/bar&gt;
+    &lt;bar&gt;
+      &lt;baz&gt;1&lt;/baz&gt;
+    &lt;/bar&gt;
+  &lt;/foo&gt;</PRE>
+<P>The recursive nature of this algorithm means that certain tree
+comparisons will explode wrt time and memory. I think this will only
+happen with very deep trees where nodes high up in the tree can only
+be differentiated by nodes low down in the tree.</P>
+<P>Both trees are loaded into memory to begin with, so it may thrash with
+very large documents</P>
+<P>
+<H2><A NAME="author">AUTHOR</A></H2>
+<P>Chris Mungall 
+cjm at fruitfly dot org</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="./Data/Stag.html">the Data::Stag manpage</A></P>
+
+</BODY>
+
+</HTML>

@@ -1,0 +1,85 @@
+Revision history for Perl extension DBIx::ResultSet.
+
+0.17      2011-06-24
+ - Get rid of nasty type coercion in favor of providing two separate
+   interfaces for connecting.
+ - Various documentation cleanups.
+ - Default the underlying DBIx::Connector object to having the
+   connection mode 'fixup'.
+ - Provide a way, via connect(), to override the default connection
+   mode.
+
+0.16      2011-06-13
+ - Actually add connect() method.
+
+0.15      2011-06-13
+ - Provide a DBIx::ResultSet->connect() shortcut.
+ - Fix "simpliefies" typo (thanks Terrence).
+
+0.14      2010-06-27
+ - Rearranged resultset methods in to logical sections.
+ - Added a couple sections to the cookbook.
+ - row_array() was still returning an array ref even if a record
+   was not found.
+ - Use init_arg where appropriate.
+
+0.13      2010-05-11
+ - Doc edits.
+
+0.12      2010-05-07
+ - The value of an auto incrementing column can now be retrieved
+   after an INSERT, but it currently only works for MySQL and SQLite.
+ - Fix some doc typos.
+
+0.11      2010-05-06
+ - Add AUTHOR and LICENSE sections to modules.
+ - Many documentation edits.
+ - Added a new Cookbook.pod.
+
+0.10      2010-05-05
+ - Rename from DBIx::Meld to DBIx::ResultSet.
+ - Major restructuring of everything.
+
+0.09      2010-04-27
+ - Fix DateTime::Format::SQLite build dependency.
+
+0.08      2010-04-27
+ - More documentation edits.
+ - Add build prerequisits so that tests actually get run.
+
+0.07      2010-04-27
+ - Remove update_synopsis.pl from dist.
+ - Fix libs with wrong pod NAME.
+ - MORE documentation fixes and edits!
+ - No need for each result set to create its own abstract object.
+
+0.06      2010-04-26
+ - Move all of ResultSet's capabilities in to result set traits.
+ - Better tests.
+ - Made some changes that break back-compat.
+
+0.05      2010-04-23
+ - Add module dependencies that were missed.
+ - Add tests for ResultSet.
+ - Add pager support to ResultSet, just like DBIC.
+
+0.04      2010-04-23
+ - More documentation fixes.
+ - Fix SQLAbstract trait so that it actually works.
+ - Add automated tests.
+
+0.03      2010-04-22
+ - Lots of documentation edits.
+ - Use Traits::SQLAbstract in the ResultSet class.
+ - New methods: select_sth, insert_sth, update_sth, delete_sth, and bind_values.
+
+0.02      2010-04-22
+ - Fix $rs->column() to call column() instead of count().
+ - Make the various SQLAbstract methods more consistant
+   (hash_row instead of row_hash, etc).
+ - Move some result set code in to a new ResultSet trait.
+ - Fix "SQL::Astract" dependency.
+
+0.01      2010-04-21
+ - First release.
+

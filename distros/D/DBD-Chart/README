@@ -1,0 +1,114 @@
+NAME
+    DBD::Chart - DBI driver abstraction for Rendering Charts and Graphs
+
+SYNOPSIS
+            $dbh = DBI->connect('dbi:Chart:')
+                or die "Cannot connect: " . $DBI::errstr;
+            #
+            #       create file if it deosn't exist, otherwise, just open
+            #
+            $dbh->do('CREATE TABLE mychart (name CHAR(10), ID INTEGER, value FLOAT)')
+                    or die $dbh->errstr;
+
+            #       add data to be plotted
+            $sth = $dbh->prepare('INSERT INTO mychart VALUES (?, ?, ?)');
+            $sth->bind_param(1, 'Values');
+            $sth->bind_param(2, 45);
+            $sth->bind_param(3, 12345.23);
+            $sth->execute or die 'Cannot execute: ' . $sth->errstr;
+
+            #       and render it
+            $sth = $dbh->prepare('SELECT BARCHART FROM mychart');
+            $sth->execute or die 'Cannot execute: ' . $sth->errstr;
+            @row = $sth->fetchrow_array;
+            print $row[0];
+
+            # delete the chart
+            $sth = $dbh->prepare('DROP TABLE mychart')
+                    or die "Cannot prepare: " . $dbh->errstr;
+            $sth->execute or die 'Cannot execute: ' . $sth->errstr;
+
+            $dbh->disconnect;
+
+WARNING
+    THIS IS BETA SOFTWARE.
+
+DESCRIPTION
+    The DBD::Chart provides a DBI abstraction for rendering pie charts, bar
+    charts, box&whisker charts (aka boxcharts), histograms, Gantt charts,
+    and line, point, and area graphs.
+
+    For detailed usage information, see the included the dbdchart.html
+    manpage webpage. See the DBI(3) manpage for details on DBI.
+
+  Prerequisites
+
+    Perl 5.6.0 minimum
+    DBI 1.14 minimum
+    DBD::Chart::Plot 0.80 (included with this package)
+    GD X.XX minimum
+    GD::Text X.XX minimum
+    Time::HiRes
+    libpng
+    zlib
+    libgd
+    jpeg-6b
+  Installation
+
+    For Windows users, use WinZip or similar to unpack the file, then copy
+    Chart.pm to wherever your site-specific modules are kept (usually
+    \Perl\site\lib\DBD for ActiveState Perl installations). Also create a
+    'Chart' directory in the DBD directory, and copy the Plot.pm module to
+    the new directory. Note that you won't be able to execute the install
+    test with this, but you need a copy of 'nmake' and all its libraries to
+    run that anyway. I may whip up a PPM in the future.
+
+    For Unix, extract it with
+
+        gzip -cd DBD-Chart-0.80.tar.gz | tar xf -
+
+    and then enter the following:
+
+        cd DBD-Chart-0.80
+        perl Makefile.PL
+        make
+
+    You can test the installation by running
+
+            make test
+
+    this will render a bunch of charts and an HTML page to view them with.
+    Assuming the test completes successfully, you should use a web browser
+    to view the file t/plottest.html and verify the images look reasonable.
+
+    If tests succeed, proceed with installation via
+
+        make install
+
+    Note that you probably need root or administrator permissions. If you
+    don't have them, read the ExtUtils::MakeMaker man page for details on
+    installing in your own directories. the ExtUtils::MakeMaker manpage.
+
+FOR MORE INFO
+    Check out http://www.presicient.com/dbdchart with your favorite browser.
+    It includes all the usage information.
+
+AUTHOR AND COPYRIGHT
+    This module is Copyright (C) 2001, 2002 by Presicient Corporation
+
+        Email: darnold@presicient.com
+
+    You may distribute this module under the terms of the Artistic License,
+    as specified in the Perl README file.
+
+SEE ALSO
+    the DBI(3) manpage
+
+    For help on the use of DBD::Chart, see the DBI users mailing list:
+
+      dbi-users-subscribe@perl.org
+
+    For general information on DBI see
+
+      http://dbi.perl.org
+

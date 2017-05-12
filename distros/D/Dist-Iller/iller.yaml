@@ -1,0 +1,74 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Iller
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose: 2.1400
+      - namespace::autoclean: 0.18
+      - Dist::Zilla: 5.000
+      - Safe::Isa
+      - File::chdir
+      - MooseX::AttributeDocumented
+      - MooseX::AttributeShortcuts
+      - MooseX::StrictConstructor
+      - Types::Standard: 1.000000
+      - Types::Path::Tiny
+      - JSON::MaybeXS
+      - DateTime
+      - String::CamelCase: 0.02
+      - version
+      - YAML::Tiny
+      - File::ShareDir
+      - List::Util
+      - List::MoreUtils
+      - Path::Tiny
+      - PerlX::Maybe
+      - Module::Load
+      - Carp
+      - Try::Tiny
+      - Text::Diff: 1.43
+
+  test:
+    requires:
+     - Test::Differences
+     - syntax
+     - Syntax::Feature::Qi
+     - Syntax::Feature::Qs
+     - File::chdir
+
+plugins:
+  - +config: Author::CSSON
+
+  - +replace_plugin: ShareDir
+    +with: ModuleShareDirs
+    Dist::Zilla::MintingProfile::DistIller::Basic: profiles
+
+  - +extend_plugin: TravisYML
+
+  - +extend_plugin: ExecDir
+    dir: script
+
+  - +plugin: Test::CleanNamespaces
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+    splint: 0
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+
+always:
+ - /Dist-Iller-*

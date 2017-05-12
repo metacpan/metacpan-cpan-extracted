@@ -1,0 +1,175 @@
+NAME
+    Devel::CoverReport - Advanced Perl code coverage report generator
+
+SYNOPSIS
+    To get coverage report, from existing *cover_db* database, use:
+
+      cover_report
+
+DESCRIPTION
+    This module provides advanced reports based on Devel::Cover database.
+
+WARNING
+    Consider this module to be an early ALPHA. It does the job for me, so
+    it's here.
+
+    This is my first CPAN module, so I expect that some things may be a bit
+    rough around edges.
+
+    The plan is, to fix both those issues, and remove this warning in next
+    immediate release.
+
+API
+    new Constructor for "Devel::CoverReport".
+
+    make_report
+        Make the report, as it was specified during object construction.
+
+        Most probably, this is the only method, that most users will have to
+        call, if they want to use this module directly.
+
+        The rest will either run prove_cover (it's still the recomended way)
+        or hack deeper - if, for some reason, You just need parts of this
+        module.
+
+    validate_digest
+        Check if there are some issues, that would not allow a digest to be
+        edded to the report. In case such issues exist, digest has to be
+        re-classified, and it's analise abandoned.
+
+        Parameters: (ARRAY) $self $structure_data : digest's structure data.
+
+        Returns: $new_classification : string (like: MISSING, CHANGED) or
+        undef (if no issues ware detected).
+
+    classify_file
+        Determine, if file (identified by it's path) should be INCLUDE-d,
+        MENTION-ed or EXCLUDE-d.
+
+        Parameters: (ARRAY) $self $file_path
+
+        Returns: $classification_string - one of the: "INCLUDE", "MENTION",
+        "EXCLUDE".
+
+    classify_file
+        Internal function.
+
+        Backend for "classify_file", iterate over every possible
+        classification method.
+
+        Parameters: (ARRAY) $self $file_path
+
+        Returns: $classification_string - one of the: "INCLUDE", "MENTION",
+        "EXCLUDE".
+
+    analyse_digest
+        Prepare detailed reports related to coverage or single module, and
+        return some metadata, used later to make a report-wide summary.
+
+        Parameters: (ARRAY) $self $runs - array of run IDs, that are related
+        to this file (runs, that cover this file) $digest - file's ID,
+        assigned to it by Devel::Cover
+
+        Returns: nothing
+
+    make_generic_summary
+        Prepare table, which shows, for each metric: - coverable items -
+        covered items - coverage (in percent)
+
+        Parameters: ($self + HASH) item_summary - data for the summary row
+
+    make_runs_details
+        Parameters: ($self + HASH) digest - digest of the file, for which to
+        prepare run details report structure_data run_hits - per-run part of
+        the %hits hash per_run_info source_lines - array ref, containing
+        covereg file's contents - line by line. item_summary - data for the
+        summary row
+
+    make_coverage_summary
+        Make coverage information report for single structure entiry (Perl
+        script or module).
+
+        Parameters: ($self + HASH) structure_data hits report_id - string:
+        'namified' file path with run ID (if per-run coverages are turned
+        ON) source_lines - array ref, containing covereg file's contents -
+        line by line. item_summary - data for the summary row
+
+    _make_per_line_criterions
+        Internal function.
+
+        Distribute criterions from DB into each of the phisical source
+        lines.
+
+        Parameters: (ARRAY) $self $structure_data $hits
+
+        Returns: Hash
+
+    make_branch_details
+        Make detailed branch coverage report.
+
+        Parameters: $self $basename $structure_data $hits
+
+    make_subroutine_details
+        Make detailed subroutine coverage report.
+
+        Parameters: $self $basename $structure_data $hits
+
+    make_condition_details
+        Make detailed branch coverage report.
+
+        Parameters: $self $basename $structure_data $hits
+
+    make_summary_report
+        Make file index, with coverage summary for each.
+
+        Parameters: $self $total_summary - total (all files/runs average)
+        summary
+
+    compute_summary
+        Utility routine, compute summary for each criterion.
+
+        Source should be a hash - key for each criterion, holding arrays.
+        Example:
+
+            $source = {
+                branch     => \@branch_line_hits,
+                condition  => \@condition_line_hits,
+                statement  => \@statement_line_hits,
+                subroutine => \@subroutine_line_hits,
+                pod        => \@pod_line_hits,
+            }
+
+        Params: $source
+
+    c_class
+        Compute proper c-class, used for color-coding coverage information:
+
+         c0 : not covered or coverage < 50%
+         c1 : coverage >= 50%
+         c2 : coverage >= 75%
+         c3 : coverage >= 90%
+         c4 : covered or coverage = 100%
+
+        Static function.
+
+    namify_path
+        If image is worth a thousand words, then example should cound as
+        about 750... Turn something like this:
+        /home/natanael/Perl/Foo/Bar/Baz.pm
+
+        into this: -home-natanael-Perl-Foo-Bar-Baz-pm
+
+        Additionally, remove any characters, that could confuse shell.
+        Effectivelly, the resulting string should be safe for use in shell,
+        web and by childrens under 3 years old :)
+
+        Static function.
+
+LICENCE
+    Copyright 2009-2012, Bartłomiej Syguła (perl@bs502.pl)
+
+    This is free software. It is licensed, and can be distributed under the
+    same terms as Perl itself.
+
+    For more, see my website: http://bs502.pl/
+

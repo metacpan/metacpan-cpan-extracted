@@ -1,0 +1,4 @@
+name = "DarkPAN-Compare"
+# badges = ["travis"]
+authority="cpan:KABLAMO"
+module_maker="ModuleBuild"

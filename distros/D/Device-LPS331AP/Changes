@@ -1,0 +1,30 @@
+Changelog for Device-LPS331AP
+
+0.006 2016-04-07T06:43:14
+ - Added travis and badges (Shantanu Bhadoria)
+
+0.005 2015-03-25T07:29:34
+ - v0.005 (Shantanu Bhadoria)
+ - fixed extends removed commented code, why the heck did I do that??
+   (Shantanu Bhadoria)
+
+0.004 2013-09-27T10:29:46
+ - v0.004 (Shantanu)
+ - Resolved xt test failures (Shantanu)
+ - Refactoring Submodule to allow easy loading of similar subdevices as
+   plugins using a common prefix in MOP (Shantanu Bhadoria)
+ - Minor Changes (Shantanu Bhadoria)
+
+0.003 2013-09-12T09:22:34
+ - v0.003 (Shantanu)
+ - Added README.pod and Changes (Shantanu)
+
+0.002 2013-09-11T09:27:04
+ - pod fix (Shantanu)
+
+0.001 2013-09-11T09:08:21
+ - first push (Shantanu)
+ - First push (Shantanu Bhadoria)
+ - first fixes (Shantanu Bhadoria)
+ - First few working changes (Shantanu Bhadoria)
+ - first commit (Shantanu Bhadoria)

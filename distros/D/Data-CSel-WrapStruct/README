@@ -1,0 +1,61 @@
+SYNOPSIS
+
+     use Data::CSel qw(csel);
+     use Data::CSel::WrapStruct qw(wrap_struct);
+    
+     my $data = [
+         0,
+         1,
+         [2, ["two","dua"], {url=>"http://example.com/two.jpg"}, ["even","prime"]],
+         3,
+         [4, ["four","empat"], {}, ["even"]],
+     ];
+    
+     my $tree = wrap_struct($data);
+     my @nodes = csel(":root > * > *:nth-child(4) > *", $tree);
+     my @tags = map { $_->value } @nodes; # -> ("even", "prime", "even")
+
+    Arrays are wrapped in a Data::CSel::WrapStruct::Array, hashes in a
+    Data::CSel::WrapStruct::Hash, and so on. So if you are using type
+    selectors, you might want to add Data::CSel::WrapStruct into
+    class_prefixes for convenience:
+
+     my @hashes = map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Hash", $tree);
+     # -> ({url=>"http://example.com/two.jpg"}, {})
+
+    The wrapper objects provide some methods, e.g.:
+
+     my @empty_hashes = map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Hash[length=0]", $tree);
+     # -> ({})
+
+    Refer to their respective documentation for the list of methods
+    available.
+
+    Some more examples:
+
+     [map {$_->value} csel({class_prefixes=>["Data::CSel::WrapStruct"]}, "Scalar[value >= 3]")]
+     # -> (3, 4)
+
+DESCRIPTION
+
+    This module provides wrap_struct() which creates a tree of objects from
+    a generic data structure. You can then perform node selection using
+    Data::CSel's csel().
+
+    You can retrieve the original value of data items by calling value()
+    method on the tree nodes.
+
+FUNCTIONS
+
+    None exported by default, but exportable.
+
+ wrap_struct($data) => tree
+
+    Wrap a data structure using a tree of objects.
+
+    Currently cannot handle recursive structure.
+
+SEE ALSO
+
+    Data::CSel
+

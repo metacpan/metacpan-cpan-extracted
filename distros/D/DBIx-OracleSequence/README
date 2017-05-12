@@ -1,0 +1,78 @@
+
+DBIx::OracleSequence -- an interface to Oracle sequences via DBD-Oracle
+
+   Copyright (c) 1999 Doug Bloebaum. All rights reserved. This program is
+   free software; you can redistribute it and/or modify it under the same
+   terms as Perl itself.
+
+*** *BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5
+      (see http://www.perl.com/pub/language/info/software.html)
+
+    Build, test and install the latest DBI module
+      (see http://www.perl.com/CPAN-local/authors/id/TIMB/)
+
+    Build, test and install the latest DBD-Oracle module
+      (see http://www.perl.com/CPAN-local/authors/id/TIMB/)
+
+    Have access to an Oracle Database server
+    
+    DBIx::OracleSequence is useless without all of the above!
+
+INSTALLING
+
+    perl Makefile.PL
+    make
+    export ORACLE_USERID=user/password@SID # defaults to scott/tiger
+    make test
+    make install
+
+DBIx::OracleSequence - interface to Oracle sequences via DBI.  A sequence is
+    a database object from which multiple users may generate unique
+    integers. You might use sequences to automatically generate primary key
+    values.  See:
+
+    http://technet.oracle.com/doc/server.815/a68003/01_03sch.htm#1203
+
+    for the full story on Oracle sequences.  Note that you must register to
+    access this URL, but registration is free.
+
+SYNOPSIS
+
+    use DBIx::OracleSequence;
+
+    $oracleDbh = DBI->connect("dbi:Oracle:SID", 'login', 'password');
+
+    my $seq = new DBIx::OracleSequence($oracleDbh,'my_sequence_name');
+
+    $seq->create();                 # create a new sequence with default parms
+    $seq->incrementBy(5);           # alter the seq to increment by 5
+
+    my $nextVal = $seq->nextval();  # get the next sequence value
+    my $currval = $seq->currval();  # retrieve the current sequence value
+    $seq->print();                  # print information about the sequence
+
+    # connect to a sequence that already exists
+    my $seq2 = new DBIx::OracleSequence($oracleDbh,'preexisting_seq');
+    $seq2->print();
+    $seq2->drop();                  # get rid of it
+
+NOTE
+
+The constructor is lazy, so if you want to alter the defaults for a sequence,
+you need to use the maxvalue(), cache(), incrementBy(), etc. methods after
+constructing your sequence.
+
+You can access an existing Oracle sequence by calling the constructor with
+the existing sequence name as the second parameter.  To create a new
+sequence, call the constructor with your new sequence name as the second
+parameter, then call the create() method.
+
+The OracleSequence object holds no state about the Oracle sequence (well,
+except for its name.) Instead it just serves as a passthrough to the Oracle
+DDL to create, drop, set and get information about a sequence.
+
+AUTHOR
+
+Doug Bloebaum - bloebaum@dma.org

@@ -1,0 +1,89 @@
+#!/usr/bin/perl
+use strict;
+use FindBin qw($Bin);
+use lib "$Bin/../lib";
+
+use Device::MiniSSCII;
+use Config::Auto;
+use Getopt::Long;
+use Pod::Usage;
+
+my ($Baudrate, $Device, $Verbose, $Help);
+GetOptions( "baudrate=s" => \$Baudrate,
+			"device=s"   => \$Device,
+			"verbose"	 => \$Verbose,
+			"help"		 => \$Help
+			);
+pod2usage(-verbose => 2) if $Help;
+pod2usage(-verbose => 0) unless @ARGV;
+my $Config = {};
+my $cfgfile = glob "~/.minissciirc";
+$Config = Config::Auto::parse($cfgfile);
+
+$Baudrate ||= $Config->{'baudrate'} || die "Missing baudrate";
+$Device ||= $Config->{'device'} || die "Missing device";
+
+
+my $ssc = Device::MiniSSCII->new(
+				baudrate => $Baudrate,
+				device => $Device
+				);
+warn "using a baudrate of $Baudrate bps on device $Device\n" if $Verbose;
+
+while (@ARGV) {
+	my ($servo, $position) = (shift @ARGV, shift @ARGV);
+	die "Need a servo, position pair" unless defined $servo && defined $position;
+	warn "Move servo $servo to position $position\n" if $Verbose;
+	$ssc->move($servo, $position);
+}
+
+$ssc->close;
+
+exit(0);
+
+__END__
+
+=head1 NAME
+
+minisscii - a little tool to control servos via the Mini SSC II servo controller.
+
+=head1 SYNOPSIS
+
+ minissc [--baudrate=2400|9600] [--device=/dev/ttyS0] [--verbose] [--help] <servo id> <servo pos> [<servo id> <servo pos> [ ... ]]
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--baudrate> - The baudrate to use, either 2400 or 9600.
+
+=item B<--device> - The serial port device to use.
+
+=item B<--verbose> - Be verbose about what you do.
+
+=item B<--help> - What you are reading now.
+
+=item B<servo id> - A number from 0 to 255, identifying the servo ID.
+
+=item B<servo pos> - A number from 0 to 255, identifying the servo position.
+
+=back
+
+Options can be specified in a ~/.minisscrc file, having the following layout:
+
+ # Mini SSC II resource file
+ baudrate	9600
+ device		/dev/ttyS0
+
+=head1 DESCRIPTION
+
+This mini tool allows you to control servos via the Mini SSC II serial servo controller from Scott Edwards Electronics Inc (http://www.seetron.com/ssc.htm).
+
+=head1 AUTHOR
+
+Johan Van den Brande <johan@vandenbrande.com>
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

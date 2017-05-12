@@ -1,0 +1,51 @@
+{
+   "abstract" : "DBI based session engine for Dancer",
+   "author" : [
+      "James Aitken <jaitken@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Session-DBI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "Dancer" : "0",
+            "Try::Tiny" : "0.01",
+            "parent" : "0.215",
+            "perl" : "v5.8.8"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.63"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/LoonyPandora/Dancer-Session-DBI/issues"
+      },
+      "homepage" : "https://github.com/LoonyPandora/Dancer-Session-DBI",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/LoonyPandora/Dancer-Session-DBI.git",
+         "web" : "https://github.com/LoonyPandora/Dancer-Session-DBI"
+      }
+   },
+   "version" : "1.2.1"
+}
+

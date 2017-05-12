@@ -1,0 +1,24 @@
+Release 0.03
+  * Have tracked down the cause of connection problems in Windows. It turns
+  out I believe to be a bug in Win32::SerialPort where the baudrate is not
+  being set correctly. A bug has been raised which I assume will be fixed in
+  the next version. See http://rt.cpan.org/Ticket/Display.html?id=25539
+  * The read_ax25_frame method in Device::TNC has been renamed to read_frame as
+  this not an AX.25 frame at this point. It's already been decoded by the TNC.
+  Though all the fields are containded in the frame except the FCS.
+
+Release 0.02
+  * Fixed a bug that caused most of the data in the INFO field to be ignored.
+  * Now the full INFO field for the captured frame is being included.
+  * The Device::TNC::KISS module can now read frames from a raw KISS log file.
+  * The FCS bits at the end of AX.25 frames are not present in the frames I
+  collect using my TNC-X. Thus I cannot parse this data and return it in the
+  structure returned by read_ax25_frame for now the field has been removed.
+
+Release 0.01
+  * Initial creation.
+  * Has been tested with a TNC-X under Linux (2.6.16 kernel) and Windows 2000.
+  * There is a bug on Windows where the KISS TNC doesn't open properly for some
+  reason. To work around this I've found that if you connect to the TNC using
+  UI-View and the quite UI-View the TNC can be used after that. I have not been
+  able to track down the cause of this issue however.

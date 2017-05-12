@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>Example</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        <!--
+            .invisible {
+                visibility: hidden;
+            }
+            .inline {
+                display: inline;
+            }
+        -->
+    </style>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <th>given_name</th>
+                <th>surname</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr class="z-result">
+                <td class="z-given-name">Christine</td>
+                <td class="z-surname">Drechsler</td>
+            </tr><tr class="z-result">
+                <td class="z-given-name">Detlev</td>
+                <td class="z-surname">Eder</td>
+            </tr>
+            <tr>
+                <td colspan="3" class="z-pagination">
+                    <a href="?current_page=1" class="z-previous-page">&lt;</a>
+                    <a href="?current_page=1" class="z-first-page">1</a>
+                    <span class="z-hidden-previous invisible">..</span>
+                    <span class="z-previous-pages"></span>
+                    <form class="inline z-current-page-form" method="post" action="?current_page=2">
+                        <div class="inline">
+                            <input name="current_page" class="z-current-page" style="text-align: center;" value="2" size="1" />
+                        </div>    
+                    </form>
+                    <span class="z-next-pages">
+                        <a href="?current_page=3">3</a>
+                    
+                        <a href="?current_page=4">4</a>
+                    </span>
+                    <span class="z-hidden-next">..</span>
+                    <a href="?current_page=6" class="z-last-page">6</a>
+                    <a href="?current_page=3" class="z-next-page">&gt;</a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

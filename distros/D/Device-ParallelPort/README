@@ -1,0 +1,28 @@
+Device/ParallelPort
+===================
+
+This is Device::ParallelPort. It provides very simple low level (byte and bit)
+access to the parallel port. You need to install one of the modules available
+for your operating system. As of this writing they include linux direct io,
+linux par port, simple script (mainly for testing) and windows.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only core modules such as IO::File.
+
+COPYRIGHT AND LICENCE
+
+Distributed under the Perl Artistic License and the GPL
+
+Copyright (C) 2002,2003,2004 Scott Penrose - scottp@dd.com.au
+
+

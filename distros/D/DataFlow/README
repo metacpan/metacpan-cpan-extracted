@@ -1,0 +1,313 @@
+NAME
+    DataFlow - A framework for dataflow processing
+
+VERSION
+    version 1.121830
+
+SYNOPSIS
+            use DataFlow;
+
+            my $flow = DataFlow->new(
+                    procs => [
+                        DataFlow::Proc->new( p => sub { do this thing } ), # a Proc
+                            sub { ... do something },   # a code ref
+                            'UC',                       # named Proc
+                            [                           # named Proc, with parameters
+                              CSV => {
+                                    direction     => 'CONVERT_TO',
+                                    text_csv_opts => { binary => 1 },
+                              }
+                            ],
+                            # named Proc, named "Proc"
+                            [ Proc => { p => sub { do this other thing }, deref => 1 } ],
+                            DataFlow->new( ... ),       # another flow
+                    ]
+            );
+
+            $flow->input( <some input> );
+            my $output = $flow->output();
+
+            my $output = $flow->output( <some other input> );
+
+            # other ways to invoke the constructor
+            my $flow = DataFlow->new( sub { .. do something } );   # pass a sub
+            my $flow = DataFlow->new( [                            # pass an array
+                    sub { ... do this },
+                    'UC',
+                    [
+                      HTMLFilter => (
+                        search_xpath => '//td',
+                            result_type  => 'VALUE'
+                      )
+                    ]
+            ] );
+            my $flow = DataFlow->new( $another_flow ); # pass another DataFlow or Proc
+
+            # other way to pass the data through
+            my $output = $flow->process( qw/long list of data/ );
+
+DESCRIPTION
+    A "DataFlow" object is able to accept data, feed it into an array of
+    processors (DataFlow::Proc objects), and return the result(s) back to
+    the caller.
+
+ATTRIBUTES
+  name
+    (Str) A descriptive name for the dataflow. (OPTIONAL)
+
+  default_channel
+    (Str) The name of the default communication channel. (DEFAULT:
+    'default')
+
+  auto_process
+    (Bool) If there is data available in the output queue, and one calls the
+    "output()" method, this attribute will flag whether the dataflow should
+    attempt to automatically process queued data. (DEFAULT: true)
+
+  procs
+    (ArrayRef[DataFlow::Role::Processor]) The list of processors that make
+    this DataFlow. Optionally, you may pass CodeRefs that will be
+    automatically converted to DataFlow::Proc objects. (REQUIRED)
+
+    The "procs" parameter will accept some variations in its value. Any
+    "ArrayRef" passed will be parsed, and additionaly to plain
+    "DataFlow::Proc" objects, it will accept: "DataFlow" objects (so one can
+    nest flows), code references ("sub{}" blocks), array references and
+    plain text strings. Refer to DataFlow::Types for more information on
+    these different forms of passing the "procs" parameter.
+
+    Additionally, one may pass any of these forms as a single argument to
+    the constructor "new", plus a single "DataFlow", or "DataFlow:Proc" or
+    string.
+
+METHODS
+  has_queued_data
+    Returns true if the dataflow contains any queued data within.
+
+  clone
+    Returns another instance of a "DataFlow" using the same array of
+    processors.
+
+  input
+    Accepts input data for the data flow. It will gladly accept anything
+    passed as parameters. However, it must be noticed that it will not be
+    able to make a distinction between arrays and hashes. Both forms below
+    will render the exact same results:
+
+            $flow->input( qw/all the simple things/ );
+            $flow->input( all => 'the', simple => 'things' );
+
+    If you do want to handle arrays and hashes differently, we strongly
+    suggest that you use references:
+
+            $flow->input( [ qw/all the simple things/ ] );
+            $flow->input( { all => the, simple => 'things' } );
+
+    Processors using the DataFlow::Policy::ProcessInto policy (default) will
+    process the items inside an array reference, and the values (not the
+    keys) inside a hash reference.
+
+  channel_input
+    Accepts input data into a specific channel for the data flow:
+
+            $flow->channel_input( 'mydatachannel', qw/all the simple things/ );
+
+  process_input
+    Processes items in the array of queues and place at least one item in
+    the output (last) queue. One will typically call this to flush out some
+    unwanted data and/or if "auto_process" has been disabled.
+
+  output_items
+    Fetches items, more specifically objects of the type DataFlow::Item,
+    from the data flow. If called in scalar context it will return one
+    processed item from the flow. If called in list context it will return
+    all the items from the last queue.
+
+  output
+    Fetches data from the data flow. It accepts a parameter that points from
+    which data channel the data must be fetched. If no channel is specified,
+    it will default to the 'default' channel. If called in scalar context it
+    will return one processed item from the flow. If called in list context
+    it will return all the elements in the last queue.
+
+  reset
+    Clears all data in the dataflow and makes it ready for a new run.
+
+  flush
+    Flushes all the data through the dataflow, and returns the complete
+    result set.
+
+  process
+    Immediately processes a bunch of data, without touching the object
+    queues. It will process all the provided data and return the complete
+    result set for it.
+
+  proc_by_index
+    Expects an index (Num) as parameter. Returns the index-th processor in
+    this data flow, or "undef" otherwise.
+
+  proc_by_name
+    Expects a name (Str) as parameter. Returns the first processor in this
+    data flow, for which the "name" attribute has the same value of the
+    "name" parameter, or "undef" otherwise.
+
+FUNCTIONS
+  dataflow
+    Syntax sugar function that can be used to instantiate a new flow. It can
+    be used like this:
+
+            my $flow = dataflow
+                    [ 'Proc' => p => sub { ... } ],
+                    ...
+                    [ 'CSV' => direction => 'CONVERT_TO' ];
+
+            $flow->process('bananas');
+
+HISTORY
+    This is a framework for data flow processing. It started as a spin-off
+    project from the OpenData-BR <http://www.opendatabr.org/> initiative.
+
+    As of now (Mar, 2011) it is still a 'work in progress', and there is a
+    lot of progress to make. It is highly recommended that you read the
+    tests, and the documentation of DataFlow::Proc, to start with.
+
+    An article has been recently written in Brazilian Portuguese about this
+    framework, per the São Paulo Perl Mongers "Equinócio" (Equinox) virtual
+    event. Although an English version of the article in in the plans, you
+    can figure a good deal out of the original one at
+
+    <http://sao-paulo.pm.org/equinocio/2011/mar/5>
+
+    UPDATE: DataFlow is a fast-evolving project, and this article, as it was
+    published there, refers to versions 0.91.x of the framework. There has
+    been a big refactor since then and, although the concept remains the
+    same, since version 0.950000 the programming interface has been changed
+    violently.
+
+    Any doubts, feel free to get in touch.
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc DataFlow
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/DataFlow>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annotations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/DataFlow>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/DataFlow>
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/DataFlow>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/DataFlow>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/D/DataFlow>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual overview
+        of the test results for a distribution on various Perls/platforms.
+
+        <http://matrix.cpantesters.org/?dist=DataFlow>
+
+  Email
+    You can email the author of this module at "RUSSOZ at cpan.org" asking
+    for help with any problems you have.
+
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and join this
+        channel: #sao-paulo.pm then talk to this person for help: russoz.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to "bug-dataflow at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DataFlow>. You will be
+    automatically notified of any progress on the request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <https://github.com/russoz/DataFlow>
+
+      git clone https://github.com/russoz/DataFlow.git
+
+AUTHOR
+    Alexei Znamensky <russoz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alexei Znamensky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <http://rt.cpan.org>.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

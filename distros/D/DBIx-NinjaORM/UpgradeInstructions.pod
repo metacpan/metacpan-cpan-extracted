@@ -1,0 +1,166 @@
+=head1 UPGRADE INSTRUCTIONS
+
+=head2 Upgrading to v3.0.1
+
+=head3 static_class_info() changes
+
+v3.0.1 introduces a separate class for the static class information. In theory,
+this change is backwards-compatible, but future evolutions of DBIx::NinjaORM
+may change the internals of C<DBIx::NinjaORM> and break your implementations of
+C<static_class_info()>.
+
+It is therefore strongly recommended to modify C<static_class_info()> in your
+subclasses as follows:
+
+=over 4
+
+=item * Before:
+
+	sub static_class_info
+	{
+		my ( $class ) = @_;
+
+		# Load defaults.
+		my $info = $class->SUPER::static_class_info();
+
+		# Values specific to this class.
+		$info->{'key'} = 'value';
+		$info->{'...'} = '...';
+
+		return $info;
+	}
+
+=item * After:
+
+	sub static_class_info
+	{
+		my ( $class ) = @_;
+
+		# Load defaults.
+		my $info = $class->SUPER::static_class_info();
+
+		# Values specific to this class.
+		# IMPORTANT: now set using set() instead of using a hash assignation.
+		$info->set(
+			{
+				'key' => 'value',
+				'...' => '...',
+			}
+		);
+
+		return $info;
+	}
+
+=back
+
+=head3 Deprecated methods
+
+The following methods have been deprecated:
+
+=over 4
+
+=item * get_default_dbh()
+
+Replaced by C<get_info('default_dbh')>.
+
+=item * get_list_cache_time()
+
+Replaced by C<get_info('list_cache_time')>.
+
+=item * get_memcache()
+
+Replaced by C<get_info('memcache')>.
+
+=item * get_object_cache_time()
+
+Replaced by C<get_info('object_cache_time')>.
+
+=item * get_primary_key_name()
+
+Replaced by C<get_info('primary_key_name')>.
+
+=item * get_readonly_fields()
+
+Replaced by C<get_info('readonly_fields')>.
+
+=item * get_table_name()
+
+Replaced by C<get_info('table_name')>.
+
+=item * get_unique_fields()
+
+Replaced by C<get_info('unique_fields')>.
+
+=item * has_created_field()
+
+Replaced by C<get_info('created_field')>.
+
+=item * has_modified_field()
+
+Replaced by C<get_info('modified_field')>.
+
+=back
+
+Those methods will still work for this release, but they will be removed in the
+next. In the meantime, they will print out a warning regarding the need to
+convert the caller to use the new C<get_info> method.
+
+
+=head1 AUTHOR
+
+Guillaume Aubert, C<< <aubertg at cpan.org> >>.
+
+
+=head1 BUGS
+
+Please report any bugs or feature requests through the web interface at
+L<https://github.com/guillaumeaubert/DBIx-NinjaORM/issues/new>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+	perldoc DBIx::NinjaORM
+
+
+You can also look for information at:
+
+=over 4
+
+=item * GitHub's request tracker
+
+L<https://github.com/guillaumeaubert/DBIx-NinjaORM/issues>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/DBIx-NinjaORM>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DBIx-NinjaORM>
+
+=item * MetaCPAN
+
+L<https://metacpan.org/release/DBIx-NinjaORM>
+
+=back
+
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2009-2017 Guillaume Aubert.
+
+This code is free software; you can redistribute it and/or modify it under the
+same terms as Perl 5 itself.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the LICENSE file for more details.
+
+=cut
+
+1;
+

@@ -1,0 +1,20 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DashProfiler.pm
+lib/DashProfiler/Apache.pm
+lib/DashProfiler/Auto.pm
+lib/DashProfiler/Core.pm
+lib/DashProfiler/Import.pm
+lib/DashProfiler/Sample.pm
+lib/DashProfiler/UserGuide.pm
+t/00.load.t
+t/01.core.t
+t/02.sample.t
+t/03.flush.t
+t/10.period.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

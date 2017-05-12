@@ -1,0 +1,10 @@
+0.03 Sat Mar 31 23:34:49 CEST 2012
+	Corrections to the documentation’s formatting (including POD syntax),
+	alignment, grammar and style (by Shlomi Fish)
+	Add t/pod.t to test for POD validity (by Shlomi Fish)
+
+0.02 Tue Feb 23 20:30:57 CET 2010
+	Add a README
+
+0.01 Sat Feb 13 19:51:55 CET 2010
+	First release

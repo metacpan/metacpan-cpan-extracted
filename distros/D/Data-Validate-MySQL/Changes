@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::Validate::MySQL.
+
+0.03  Jul 24 17:35:27 2006
+	- Finished all current data types
+	
+0.02  Apr 26 15:27:24 2005
+	- Finished numeric types
+	
+0.01  Apr 23 12:47:07 2005
+	- original version
+

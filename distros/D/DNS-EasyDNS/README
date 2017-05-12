@@ -1,0 +1,44 @@
+#==============================================================================#
+  DNS::EasyDNS
+#==============================================================================#
+
+Access to the EasyDNS dynamic DNS update API. Included is also an example 
+script that may be all you need to update your DNS.
+
+#==============================================================================#
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If you are using Activestate perl, you can also install as a PPM:
+
+   ppm install --location=http://brock-family.org/gavin/perl/ppm DNS::EasyDNS
+
+#==============================================================================#
+
+DEPENDENCIES
+
+This module requires at least perl 5.6.0 and these other modules and libraries:
+
+  LWP::UserAgent and HTTP::Request from the libwww-perl bundle
+
+It is also highly recommended to use SSL to avoid plain text passwords over
+the network. For this, install:
+
+  Crypt::SSLeay
+
+#==============================================================================#
+
+COPYRIGHT AND LICENCE
+
+This module is Copyright (c) 2003 Gavin Brock gbrock@cpan.org. All rights 
+reserved. This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+#==============================================================================#

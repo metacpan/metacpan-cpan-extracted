@@ -1,0 +1,11 @@
+Revision history for DMTF-CIM-MOF
+
+0.05  Tue Septeber 10 2013
+       Don't @ISA(Exporter), just import import from Exporter.
+
+0.04  Mon May 7 2012
+       Remove POD and Perl::Critic tests.
+
+0.03  Tue Apr 24 2012
+       Initial public release.
+

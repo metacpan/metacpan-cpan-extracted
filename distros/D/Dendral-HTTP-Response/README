@@ -1,0 +1,24 @@
+Dendral-HTTP-Response version 0.01
+==================================
+
+Dendral::HTTP::Response - Response object for Dendral framework.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+or perl Makefile.PL --apache-include=/path/to/apache/include/dir   
+or perl Makefile.PL --apache-include=/path/to/apache/include/dir --apr-include=/path/to/apr/include/dir
+
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+This module requires installed Apache web server version 1.3 or 2.X.
+You can download it here: http://httpd.apache.org/  
+

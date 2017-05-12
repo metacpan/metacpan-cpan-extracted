@@ -1,0 +1,31 @@
+Revision history for Perl extension Data::Swap
+
+0.08  Fri Sep 12 15:40 CEST 2008
+	- support deref of aggregates in "refgen context", so you can
+	  do things like  tied deref($anyref)
+
+0.07  Sun Jan  6 15:26 CET 2008
+	- fixed the horrible breakage introduced by 0.06
+	- fixed handling of IVs and RVs in perl 5.10
+	- make sure various flags stay with their container
+	- removed restriction on swapping overloaded objects in 5.10
+
+0.06  Fri Dec 28 15:16 CET 2007
+	- fixed to support perl 5.10 (patches 22741 and 26530)
+
+0.05  Wed Sep 29 15:36 CEST 2004
+	- split off Data::Swap from Data::Alias again
+
+0.04  Sun Aug 29 21:01 CEST 2004
+	- minor fix because PAUSE complained about missing version in Data::Swap
+
+0.03  Sun Aug 29 00:36 CEST 2004
+	- initial version of Data::Alias  (incorporates Data::Swap)
+	- fixed swapping objects with weakrefs
+
+0.02  Thu Jul  3 11:34 CEST 2003
+	- added Changes file.
+	- disallow swapping an overloaded object with a non-overloaded one.
+
+0.01  Mon Jun 30 20:08 CEST 2003
+	- initial version.

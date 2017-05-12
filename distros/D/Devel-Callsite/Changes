@@ -1,0 +1,48 @@
+Revision history for Devel-Callsite
+
+0.10 - Mar 19, 2017
+
+- Botched 0.09 release - add ppport.h to
+  distribution tarball
+
+0.09 - Mar 16, 2017
+
+- fix Devel::PPPort breakage starting with Devel::PPPort 3.25
+  thanks to wolfsage
+
+0.08 - Mar 10, 2014
+
+NOTE: semantics in this release change slighty when this used in a
+debugger, e.g. $^P != 0. Previously, we might not give a location in
+the source code, but instead a location in the debugger guts.
+
+-  Semantics change noted above. We think this is what is normally desired,
+   for an op-location even if it is incompatible.
+-  Add optional level parameter that functions like builtin caller()
+-  Change repository location in META.yml
+-  Fully document callsite() and context() functions.
+-  Don't use DynaLoader but use XSLoader instead.
+
+0.07 - Oct 5, 2013
+-  Add Perl Artistic License
+
+0.06 - Sep 30, 2012
+-  Make return values be unsigned integers (they are really pointers)
+   Should fix some failing tests
+
+0.05 - Sep 14, 2012
+-  Use PERL_GET_CONTEXT rather than Perl_get_context(). The former macro
+   works for code not built with threading. See
+   https://rt.cpan.org/Public/Bug/Display.html?id=65625
+-  Revise documentation to reflect that the return values are OP addresses
+   (i.e. unsigned pointer values).
+-  Rocky Bernstein takes over maintainership from Ted Zlatanov.
+
+0.04 - Aug 14, 2008
+- Add context() function
+
+0.02 - Aug 06, 2008
+- Probably a cut-and-paste typo in README. (Remove copyright)
+
+0.01 - Aug 06, 2008
+- Initial release

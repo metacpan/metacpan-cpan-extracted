@@ -1,0 +1,26 @@
+---
+abstract: 'Session store in Redis with JSON serialization'
+author:
+  - 'Forest Belton <forest@homolo.gy>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Session-Redis-JSON
+requires:
+  Dancer::Config: 0
+  Dancer::Session::Abstract: 0
+  Digest::SHA: 0
+  Exporter: 0
+  Function::Parameters: 0
+  JSON: 0
+  Redis: 0
+  base: 0
+  strict: 0
+  warnings: 0
+version: 0.001

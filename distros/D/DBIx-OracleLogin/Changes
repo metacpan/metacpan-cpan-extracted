@@ -1,0 +1,5 @@
+Revision history for Perl extension DBIx::OracleLogin.
+
+0.01  Tue Jul 23 13:26:13 2002
+	- original version; created by h2xs 1.19
+

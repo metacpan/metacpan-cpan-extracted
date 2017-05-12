@@ -1,0 +1,23 @@
+Revision history for Perl extension Dua.
+
+2.2 Thu Aug 13 11:23:18 1998
+
+	- added a retrieve attribute method to allow retrieval of
+	  binary data.
+
+2.1 Tue May 27 12:19:35 1997
+
+	- updated documentation and modified modattr to allow deletion of
+	  attributes.
+
+2.0 Tue May 20 16:22:36 1997
+
+	- converted version 1.x to object class.
+
+1.1  Mon Mar 17 15:33:22 1997
+	- added some sample code in the form of example.pl 
+
+1.0  Thu May 23 17:36:47 1996
+	- original version; created by h2xs 1.16
+
+

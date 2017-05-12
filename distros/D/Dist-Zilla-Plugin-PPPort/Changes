@@ -1,0 +1,25 @@
+Revision history for Dist-Zilla-Plugin-PPPort
+
+0.007     2014-04-26 00:13:51CEST+0200 Europe/Amsterdam
+          Support Module::Build style ppport paths
+          Add a develop requirement on Devel::PPPort
+
+0.006     2014-02-13 02:32:32CET+0100 Europe/Amsterdam
+          Add ascii encoding for ppport.h
+          Use Stringlike type instead of Path::Class type for filename
+          Use StrictVersionString instead of VersionObject for version
+
+0.005     2013-05-19 17:06:07 Europe/Amsterdam
+          Get rid of Test::Kwalitee dependency
+
+0.004     2011-10-14 18:05:48 Europe/Amsterdam
+          Fixed missing make_immutable call
+
+0.003     2011-10-09 13:57:58 Europe/Amsterdam
+          Allow user to set the filename for ppport file
+
+0.002     2011-10-09 12:45:42 Europe/Amsterdam
+          Add corpus to no_index
+
+0.001     2011-10-09 01:31:33 Europe/Amsterdam
+          Released to an unsuspecting world

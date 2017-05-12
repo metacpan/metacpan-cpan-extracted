@@ -1,0 +1,37 @@
+package DesignPattern::Factory;
+$VERSION = '0.01';
+use vars qw( $VERSION );
+
+# nothing to see here - just a bunch of documentation
+
+1;
+__END__
+=head1 NAME
+
+DesignPattern::Factory - Perl implementation of the Factory Method.
+
+=head1 DESCRIPTION
+
+This group of modules implement the Factory Method as described in Gamma E, et al. 'Design Patterns: elements of reusable object-oriented software' Addison-Wesley, 1995 [known to many as GOF].
+
+The Factory Method's intent is to 'Define an interface for creating an object, but let subclasses decide which class to instatiate. Factory Method lets a class defer instantiation to subclasses.' [GOF, p107]
+
+Fuller documentation is available in each of the participating classes, named:
+
+  DesignPattern::Factory::Product
+  DesignPattern::Factory::ConcreteProduct
+  DesignPattern::Factory::Creator
+  DesignPattern::Factory::ConcreteCreator
+
+A good place to start reading the documentation is DesignPattern::Factory::ConcreteCreator, which in a real-world example would be your application.
+
+=head1 AUTHOR 
+
+Nigel Wetters (nwetters@cpan.org) 
+
+=head1 COPYRIGHT 
+
+Copyright (c) 2001, Nigel Wetters. All Rights Reserved. This module is free software. 
+It may be used, redistributed and/or modified under the same terms as Perl itself.
+
+=cut

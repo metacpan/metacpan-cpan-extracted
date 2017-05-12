@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name:                DbFramework
+version:             1.12
+abstract:            Classes for Manipulating DBI Databases, Based on the CDIF Data Model Subject Area
+license:             perl
+author:              
+    - imacat <imacat@mail.imacat.idv.tw>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Alias:                         0
+    CGI:                           0
+    DBI:                           1.06
+    Term::ReadKey:                 0
+    Text::FillIn:                  0
+    URI::Escape:                   0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

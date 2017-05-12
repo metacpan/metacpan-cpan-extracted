@@ -1,0 +1,15 @@
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+Pivoter.pm
+README
+pivotdriver.pl
+t/00basic.t
+t/01simple.t
+t/02testtest.t
+t/03errors.t
+t/04sorting.t
+t/table1.dat
+t/table2.dat
+t/table3.dat

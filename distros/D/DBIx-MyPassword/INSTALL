@@ -1,0 +1,16 @@
+Just a standard module install will get the job done. If you would like,
+you can set the environment variables MP_DBUSER, MP_DBPASS, MP_DBDS, and
+MP_DBOPTS to allow the test scripts to connect to a real database.
+
+	MP_DBUSER -> A real database user name
+	MP_DBPASS -> The database user's password
+	MP_DBDS   -> A DBI data source, for instance "dbi:mysql:test"
+	MP_DBOPTS -> Any DBI connection options, for instance "RaiseError => 1, PrintError => 1"
+
+Environment variables are not, these are the commands to install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+

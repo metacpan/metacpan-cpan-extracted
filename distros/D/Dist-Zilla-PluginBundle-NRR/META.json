@@ -1,0 +1,84 @@
+{
+   "abstract" : "Rampage through CPAN-Tokyo the NRR way!",
+   "author" : [
+      "Nathaniel Reindl <nrr@corvidae.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-NRR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "Pod::Elemental::Transformer::List" : "0.101620",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Plugin::WikiDoc" : "0",
+            "Pod::Weaver::Section::Support" : "1.001",
+            "charnames" : "0",
+            "open" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "strictures" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::NRR" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/NRR.pm",
+         "version" : "0.121220"
+      },
+      "Pod::Weaver::PluginBundle::NRR" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/NRR.pm",
+         "version" : "0.121220"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "nrr+bug-DIST-ZILLA-PLUGINBUNDLE-NRR@corvidae.org",
+         "web" : "https://github.com/nrr/Dist-Zilla-PluginBundle-NRR/issues"
+      },
+      "homepage" : "https://github.com/nrr/Dist-Zilla-PluginBundle-NRR",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nrr/Dist-Zilla-PluginBundle-NRR.git",
+         "web" : "https://github.com/nrr/Dist-Zilla-PluginBundle-NRR"
+      }
+   },
+   "version" : "0.121220"
+}
+

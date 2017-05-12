@@ -1,0 +1,61 @@
+{
+  "templates": {
+    "tpl_std": [
+      {
+        "name": "id",
+        "type": "integer",
+        "notnull": 1,
+        "primarykey": 1,
+        "default": "inc"
+      },
+      {
+        "name": "name",
+        "type": "varchar",
+        "notnull": 1,
+        "default": "current"
+      },
+      {
+        "name": "active",
+        "type": "bool",
+        "default": 1
+      },
+      {
+        "name": "flag",
+        "type": "timestamp",
+        "default": "current",
+        "notnull": 1
+      }
+    ],
+    "tpl_client_ref": [
+      {
+        "tpl": "tpl_std"
+      },
+      {
+        "name": "client",
+        "type": "integer",
+        "notnull": 1,
+        "foreign": {
+          "reftable": "client",
+          "refcolumn": "id"
+        }
+      }
+    ],
+    "tpl_company_ref": [
+      {
+        "tpl": "tpl_client_ref"
+      },
+      {
+        "name": "company",
+        "type": "integer",
+        "notnull": 1,
+        "foreign": {
+          "reftable": "company",
+          "refcolumn": "id"
+        }
+      }
+    ]
+  },
+  "changelogs": [
+    "01"
+  ]
+}

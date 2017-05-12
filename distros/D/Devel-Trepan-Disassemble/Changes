@@ -1,0 +1,58 @@
+Revision history for Devel-Trepan-Disassemble
+
+2.0.2 Nov 24, 2015 Johnish
+- fix and revise highlight options and processing,
+- improve documentation
+- disassemble (no options) is from current line to line + listsize
+
+2.0.1  Nov 17, 2015 Cairole
+
+- add -from -to for tree formats
+- default line style is terse now.
+
+2.0.0  Oct 31, 2015 Jedi
+- Colorize tree and terse formats.
+- Redo how  we mark current line in line via Devel::Callsite and its requirement
+  in Devel::trepan 0.70.
+
+1.99  May 15, 2014  Lewis Bernstein update
+- Upgrade in Devel::Trepan has caused tests to fail
+
+1.9  June 12, 2013
+- DB::LineCache is now Devel::Trepan::DB::LineCache
+- Minor bug fixes
+
+1.8  Dec 18, 2012
+- Deal with deal with customized Perl's. need 0.47 or better for testing output
+  change.
+
+1.7  Oct 20, 2012
+- Add -from and -to options to allow limiting output
+- on -basic output op_flags is now shown as a bit vector with flag descriptions
+
+1.6  Sept 18, 2012
+- Botched 1.5 release
+
+1.5  Sept 18, 2012
+- Add POD help
+- Mark breakpoints
+- Colorize source code lines if highlight
+- In basic format:
+  * Mark current location via Callsite
+
+1.4  Aug 20, 2012
+- Revise for Devel::Trepan 0.30
+
+1.3  May 27, 2012
+- Redo disassembly test to not use the trepan.pl script.
+
+1.2  May 26, 2012
+- Remove non-UTF8 character causing a CPANTS failure.
+- Add a disassembly test
+
+1.1  May 25, 2012
+- Remove spurious dependency causing a CPANTS failure.
+- Add more documentation and tests.
+
+1.0  Jan 16, 2012
+- Initial release. Add debugger command "disassemble" and alias "disasm".

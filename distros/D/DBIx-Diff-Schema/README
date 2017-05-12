@@ -1,0 +1,23 @@
+SYNOPSIS
+
+     use DBIx::Diff::Schema qw(diff_db_schema diff_table_schema
+                               db_schema_eq table_schema_eq);
+
+    To compare schemas of whole databases:
+
+     my $res = diff_db_schema($dbh1, $dbh2);
+     say "the two dbs are equal" if db_schema_eq($dbh1, $dbh2);
+
+    To compare schemas of a single table from two databases:
+
+     my $res = diff_table_schema($dbh1, $dbh2, 'tablename');
+     say "the two tables are equal" if table_schema_eq($dbh1, $dbh2, 'tablename');
+
+DESCRIPTION
+
+    Currently only tested on Postgres and SQLite.
+
+SEE ALSO
+
+    DBIx::Compare to compare database contents.
+

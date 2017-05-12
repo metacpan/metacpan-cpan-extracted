@@ -1,0 +1,12 @@
+README
+lib/Daemon/Generic.pm
+lib/Daemon/Generic.pod
+lib/Daemon/Generic/Event.pm
+lib/Daemon/Generic/AnyEvent.pm
+lib/Daemon/Generic/While1.pm
+Makefile.PL
+MANIFEST
+Changes
+t/daemon.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

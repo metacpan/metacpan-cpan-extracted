@@ -1,0 +1,125 @@
+# NAME
+
+Dancer::Plugin::REST - A plugin for writing RESTful apps with Dancer
+
+# VERSION
+
+version 0.11
+
+# DESCRIPTION
+
+This plugin helps you write a RESTful webservice with Dancer.
+
+# SYNOPSYS
+
+    package MyWebService;
+
+    use Dancer;
+    use Dancer::Plugin::REST;
+
+    prepare_serializer_for_format;
+
+    get '/user/:id.:format' => sub {
+        User->find(params->{id});
+    };
+
+    # curl http://mywebservice/user/42.json
+    { "id": 42, "name": "John Foo", email: "john.foo@example.com"}
+
+    # curl http://mywebservice/user/42.yml
+    --
+    id: 42
+    name: "John Foo"
+    email: "john.foo@example.com"
+
+# KEYWORDS
+
+## prepare\_serializer\_for\_format
+
+When this pragma is used, a before filter is set by the plugin to automatically
+change the serializer when a format is detected in the URI.
+
+That means that each route you define with a __:format__ token will trigger a
+serializer definition, if the format is known.
+
+This lets you define all the REST actions you like as regular Dancer route
+handlers, without explicitly handling the outgoing data format.
+
+## resource
+
+This keyword lets you declare a resource your application will handle.
+
+    resource user =>
+        get    => sub { # return user where id = params->{id}   },
+        create => sub { # create a new user with params->{user} },
+        delete => sub { # delete user where id = params->{id}   },
+        update => sub { # update user with params->{user}       };
+
+    # this defines the following routes:
+    # GET /user/:id
+    # GET /user/:id.:format
+    # POST /user
+    # POST /user.:format
+    # DELETE /user/:id
+    # DELETE /user/:id.:format
+    # PUT /user/:id
+    # PUT /user/:id.:format
+
+## helpers
+
+Some helpers are available. This helper will set an appropriate HTTP status for you.
+
+### status\_ok
+
+    status_ok({users => {...}});
+
+Set the HTTP status to 200
+
+### status\_created
+
+    status_created({users => {...}});
+
+Set the HTTP status to 201
+
+### status\_accepted
+
+    status_accepted({users => {...}});
+
+Set the HTTP status to 202
+
+### status\_bad\_request
+
+    status_bad_request("user foo can't be found");
+
+Set the HTTP status to 400. This function as for argument a scalar that will be used under the key __error__.
+
+### status\_not\_found
+
+    status_not_found("users doesn't exists");
+
+Set the HTTP status to 404. This function as for argument a scalar that will be used under the key __error__.
+
+# LICENCE
+
+This module is released under the same terms as Perl itself.
+
+# AUTHORS
+
+This module has been written by Alexis Sukrieh `<sukria@sukria.net>` and Franck
+Cuny.
+
+# SEE ALSO
+
+[Dancer](https://metacpan.org/pod/Dancer) [http://en.wikipedia.org/wiki/Representational\_State\_Transfer](http://en.wikipedia.org/wiki/Representational_State_Transfer)
+
+# AUTHORS
+
+- Alexis Sukrieh <sukria@sukria.net>
+- Franck Cuny <franckc@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alexis Sukrieh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

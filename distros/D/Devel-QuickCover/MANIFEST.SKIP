@@ -1,0 +1,7 @@
+gonzo/.*
+html/.*
+\.git/.*
+qc\.dat
+.*\.tar\.gz
+.*\.zip
+.*\.swp

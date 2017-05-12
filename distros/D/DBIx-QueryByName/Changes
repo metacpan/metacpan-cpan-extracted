@@ -1,0 +1,99 @@
+DBIx::QueryByName 0.18
+----------------------
+ - fixing tests
+
+DBIx::QueryByName 0.17
+----------------------
+ - fixed Log4perl 'Root logger not initialized' message
+ - added the xml 'retry' attribute to specify per query what to do
+   upon getting a timeout
+ - added to_list() method to iterators which returns the iterator's
+   contents as a list
+ - added params() which returns a list of the parameter names required
+   by a query
+ - fixed a bug in DbhPool: InactiveDestroy was only set when children
+   called connect()
+
+DBIx::QueryByName 0.16
+----------------------
+ - added can() and unload($session)
+
+DBIx::QueryByName 0.15
+----------------------
+ - fixed so a query can receive arrayref in argument, without
+   interfering with bulk execution.
+
+DBIx::QueryByName 0.14
+----------------------
+ - added call trace to some error messages
+
+DBIx::QueryByName 0.13
+----------------------
+ - improved error messages
+ - iterator method next() accepts arguments
+
+DBIx::QueryByName 0.12
+----------------------
+ - .11 was broken: some modules were missing
+
+DBIx::QueryByName 0.11
+----------------------
+ - added the 'result' keyword to the queries's xml specification
+ - a query can now return an iterator, a scalar, a hash or a
+   sth (default)
+ - more explicit error messages when validating query arguments
+
+DBIx::QueryByName 0.10
+----------------------
+ - fix error message when calling DESTROY
+ - allow _ in parameter names
+
+DBIx::QueryByName 0.09
+----------------------
+ - removed unnecessary dependency to Sys::SigAction (RT #51798)
+
+DBIx::QueryByName 0.08
+----------------------
+ - attempted to add timeout (alarm/eval) support for execute and
+   decided against
+ - smooth support of bulk execution using DBI's execute_array
+ - added module SthPool.pm
+ - fixed bug in DESTROY call order
+ - fixed bug in setting InactiveDestroy for dbhs owned by other
+   processes
+
+DBIx::QueryByName 0.07
+----------------------
+ - fixed test error
+ - support spaces in xml params value
+
+DBIx::QueryByName 0.06
+----------------------
+ - added debug possibilities
+ - better pod
+
+DBIx::QueryByName 0.05
+----------------------
+ - don't retry when execute fails because the 'server closed the
+   connection unexpectedly', die instead
+ - better pod
+ - Logger supports more Log4perl methods
+
+DBIx::QueryByName 0.04
+----------------------
+ - croak when faulty arguments are passed to named query
+ - more tests
+
+DBIx::QueryByName 0.03
+----------------------
+ - moved version to module file
+
+DBIx::QueryByName 0.02
+----------------------
+ - allow underscores in query names
+ - more fork tests
+ - fix dependency error in tests (RT #50605)
+
+DBIx::QueryByName 0.01
+----------------------
+ - first release

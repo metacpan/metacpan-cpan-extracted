@@ -1,0 +1,42 @@
+---
+abstract: 'an automated logrotate.'
+author:
+  - 'Masaaki Saito <masakyst.public@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Logger-File-RotateLogs
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dancer2::Logger::File::RotateLogs:
+    file: lib/Dancer2/Logger/File/RotateLogs.pm
+    version: '0.01'
+requires:
+  Dancer2: '0.161000'
+  File::RotateLogs: '0.07'
+  perl: 5.010_001
+resources:
+  bugtracker: https://github.com/masakyst/Dancer2-Logger-File-RotateLogs/issues
+  homepage: https://github.com/masakyst/Dancer2-Logger-File-RotateLogs
+  repository: git://github.com/masakyst/Dancer2-Logger-File-RotateLogs.git
+version: '0.01'
+x_authority: cpan:MASAKYST
+x_contributors:
+  - 'Masaaki Saito <masakyst.mobile@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,43 @@
+#!/bin/sh
+
+if [ ! -d "tzdata/dump" ]; then
+   echo "Dump files removed."
+   exit
+fi
+
+for file in `cd tzdata/dump; echo *` ;do
+   tz=`head -1 tzdata/dump/$file | awk '{print $1}'`
+   echo "##########################################################"
+   echo "### $tz"
+
+   # Create the new dump.  Ignore lines with the year 0001 and 9999.
+
+   perl -I./lib examples/dm_zdump -v $tz | egrep -v '0001|9999' > z.dump.new
+   ln=`wc -l z.dump.new | awk '{print $1}'`
+
+   # Copy the old dump.  Ignore the 2 first and 2 last lines.
+
+   tail --lines=+3 tzdata/dump/$file | head --lines=-2 > z.dump.old
+   lo=`wc -l z.dump.old | awk '{print $1}'`
+
+   if [ "$ln" = "0" ]; then
+      echo "***"
+      echo "*** ERROR ***"
+      echo "***"
+
+   elif [ $lo -gt $ln ]; then
+      mv z.dump.old z.dump.old.1
+      head --lines=$ln z.dump.old.1 > z.dump.old
+      rm -f z.dump.old.1
+
+   elif [ $ln -gt $lo ]; then
+      mv z.dump.new z.dump.new.1
+      head --lines=$lo z.dump.new.1 > z.dump.new
+      rm -f z.dump.new.1
+   fi
+
+   diff -c z.dump.old z.dump.new
+   rm -f z.dump.old z.dump.new
+
+done
+

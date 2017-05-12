@@ -1,0 +1,8 @@
+Revision history for DBIx-MySperqlOO
+
+1.0.0  Mon Dec  1 10:32:44 2008
+       Initial release.
+
+1.0.1  Mon Dec  2 10:32:44 2008
+       Makefile dependency corrections.
+

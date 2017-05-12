@@ -1,0 +1,35 @@
+Dist::Zilla::Plugin::RemovePrereqs::Provided
+
+This module is a utility for people who are working with self-consuming
+code ( predominantly "Dist::Zilla" distributions ) who wish to avoid
+self-dependencies in cases where some other prerequisite providing tool
+is over-zealous in determining prerequisites.
+
+This is an initial implementation that assumes you have "[MetaProvides]"
+of some description in place, and uses the data it provides to make sure
+the same modules don't exist as prerequisites.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

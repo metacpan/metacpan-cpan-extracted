@@ -1,0 +1,90 @@
+#!/usr/local/bin/perl -w
+use lib qw(lib);
+use strict;
+use Device::Ericsson::AccessoryMenu;
+use Device::SerialPort;
+use X11::GUITest qw(SendKeys GetMousePos MoveMouseAbs PressMouseButton ReleaseMouseButton);
+
+my %mousestate;
+
+my $port = shift || '/dev/rfcomm0';
+
+my $remote = Device::Ericsson::AccessoryMenu->new(
+    debug => 1,
+    port  => Device::SerialPort->new( $port ) || die,
+    menu  => [
+        'Remote' => [
+	    'X11' => sub {
+		my $r = shift;
+		%mousestate = ();
+		$r->mouse_mode( callback => sub {
+		    my ($key, $updown) = @_;
+		    if ($key =~ /^[v<>^]$/) {
+			$mousestate{$key} = $updown;
+		    }
+		    elsif ($key eq 's' and $updown eq 1) {
+			PressMouseButton(1);
+		    }
+		    elsif ($key eq 's' and $updown eq 0) {
+			ReleaseMouseButton(1);
+		    }
+		    elsif ($key eq 'c' and $updown eq 1) {
+			PressMouseButton(2);
+		    }
+		    elsif ($key eq 'c' and $updown eq 0) {
+			ReleaseMouseButton(2);
+		    }
+		    elsif ($key eq 'f' and $updown eq 1) {
+			SendKeys("{ENT}");
+		    }
+		    elsif ($key eq '2' and $updown eq 1) {
+			SendKeys("{PGU}");
+		    }
+		    elsif ($key eq '0' and $updown eq 1) {
+			SendKeys("{PGD}");
+		    }
+		    elsif ($key eq '1' and $updown eq 1) {
+			SendKeys("+({TAB})");
+		    }
+		    elsif ($key eq '3' and $updown eq 1) {
+			SendKeys("{TAB}");
+		    }
+		    else {
+			print "### key $key event $updown\n";
+		    }
+		});
+	    },
+           ],
+       ],
+   );
+
+$remote->register_menu;
+
+print "Ready to rock.\n";
+
+my $sleep = undef;
+my $inc = undef;
+while (1) {
+    $remote->control($sleep);
+    if (grep { $_ eq '1' } values %mousestate) {
+	$inc ||= 5;
+	my ($x, $y) = GetMousePos();
+	$y -= $inc if $mousestate{'^'};
+	$y += $inc if $mousestate{'v'};
+	$x -= $inc if $mousestate{'<'};
+	$x += $inc if $mousestate{'>'};
+	MoveMouseAbs($x, $y);
+	$inc *= 1.2;
+	$inc = 10 if $inc > 10;
+	if ($sleep) {
+	    $sleep = 20;
+	}
+	else {
+	    $sleep = 100;
+	}
+    }
+    else {
+	$inc = undef;
+	$sleep = undef;
+    }
+}

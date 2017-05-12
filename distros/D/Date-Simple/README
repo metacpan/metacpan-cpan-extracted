@@ -1,0 +1,278 @@
+NAME
+    Date::Simple - a simple date object
+
+SYNOPSIS
+        use Date::Simple ('date', 'today');
+
+        # Difference in days between two dates:
+        $diff = date('2001-08-27') - date('1977-10-05');
+
+        # Offset $n days from now:
+        $date = today() + $n;
+        print "$date\n";  # uses ISO 8601 format (YYYY-MM-DD)
+
+        use Date::Simple ();
+        my $date  = Date::Simple->new('1972-01-17');
+        my $year  = $date->year;
+        my $month = $date->month;
+        my $day   = $date->day;
+
+        use Date::Simple (':all');
+        my $date2 = ymd($year, $month, $day);
+        my $date3 = d8('19871218');
+        my $today = today();
+        my $tomorrow = $today + 1;
+        if ($tomorrow->year != $today->year) {
+            print "Today is New Year's Eve!\n";
+        }
+
+        if ($today > $tomorrow) {
+            die "warp in space-time continuum";
+        }
+
+        print "Today is ";
+        print(('Sun','Mon','Tues','Wednes','Thurs','Fri','Satur')
+              [$today->day_of_week]);
+        print "day.\n";
+
+        # you can also do this:
+        ($date cmp "2001-07-01")
+        # and this
+        ($date <=> [2001, 7, 1])
+
+INSTALLATION
+
+     If your system has the "make" program or a clone:
+
+         perl Makefile.PL
+         make
+         make test
+         make install
+
+     If you lack "make", copy the "lib/Date" directory to your module
+     directory (run "perl -V:sitelib" to find it).
+
+     If "make test" fails, perhaps it means your system can't compile C
+     code.  Try:
+
+         make distclean
+         perl Makefile.PL noxs
+         make
+         make test
+         make install
+
+     This will use the pure-Perl implementation.
+
+DESCRIPTION
+    Dates are complex enough without times and timezones. This module may be
+    used to create simple date objects. It handles:
+
+    Validation.
+        Reject 1999-02-29 but accept 2000-02-29.
+
+    Interval arithmetic.
+        How many days were between two given dates? What date comes N days
+        after today?
+
+    Day-of-week calculation.
+        What day of the week is a given date?
+
+    It does not deal with hours, minutes, seconds, and time zones.
+
+    A date is uniquely identified by year, month, and day integers within
+    valid ranges. This module will not allow the creation of objects for
+    invalid dates. Attempting to create an invalid date will return undef.
+    Month numbering starts at 1 for January, unlike in C and Java. Years are
+    4-digit.
+
+    Gregorian dates up to year 9999 are handled correctly, but we rely on
+    Perl's builtin "localtime" function when the current date is requested.
+    On some platforms, "localtime" may be vulnerable to rollovers such as
+    the Unix "time_t" wraparound of 18 January 2038.
+
+    Overloading is used so you can compare or subtract two dates using
+    standard numeric operators such as "==", and the sum of a date object
+    and an integer is another date object.
+
+    Date::Simple objects are immutable. After assigning "$date1" to
+    "$date2", no change to "$date1" can affect "$date2". This means, for
+    example, that there is nothing like a "set_year" operation, and
+    "$date++" assigns a new object to "$date".
+
+    This module contains various undocumented functions. They may not be
+    available on all platforms and are likely to change or disappear in
+    future releases. Please let the author know if you think any of them
+    should be public.
+
+CONSTRUCTORS
+    Several functions take a string or numeric representation and generate a
+    corresponding date object. The most general is "new", whose argument
+    list may be empty (returning the current date), a string in format
+    YYYY-MM-DD or YYYYMMDD, a list or arrayref of year, month, and day
+    number, or an existing date object.
+
+    Date::Simple->new ([ARG, ...])
+    date ([ARG, ...])
+            my $date = Date::Simple->new('1972-01-17');
+
+        The "new" method will return a date object if the values passed in
+        specify a valid date. (See above.) If an invalid date is passed, the
+        method returns undef. If the argument is invalid in form as opposed
+        to numeric range, "new" dies.
+
+        The "date" function provides the same functionality but must be
+        imported or qualified as "Date::Simple::date". (To import all public
+        functions, do "use Date::Simple (':all');".) This function returns
+        undef on all invalid input, rather than dying in some cases like
+        "new".
+
+    today()
+        Returns the current date according to "localtime".
+
+        Caution: To get tomorrow's date (or any fixed offset from today), do
+        not use "today + 1". Perl parses this as "today(+1)". You need to
+        put empty parentheses after the function: "today() + 1".
+
+    ymd (YEAR, MONTH, DAY)
+        Returns a date object with the given year, month, and day numbers.
+        If the arguments do not specify a valid date, undef is returned.
+
+        Example:
+
+            use Date::Simple ('ymd');
+            $pbd = ymd(1987, 12, 18);
+
+    d8 (STRING)
+        Parses STRING as "YYYYMMDD" and returns the corresponding date
+        object, or undef if STRING has the wrong format or specifies an
+        invalid date.
+
+        Example:
+
+            use Date::Simple ('d8');
+            $doi = d8('17760704');
+
+        Mnemonic: The string matches "/\d{8}/". Also, "d8" spells "date", if
+        8 is expanded phonetically.
+
+INSTANCE METHODS
+    DATE->next
+            my $tomorrow = $today->next;
+
+        Returns an object representing tomorrow.
+
+    DATE->prev
+            my $yesterday = $today->prev;
+
+        Returns an object representing yesterday.
+
+    DATE->year
+            my $year  = $date->year;
+
+        Return the year of DATE as an integer.
+
+    DATE->month
+            my $month = $date->month;
+
+        Return the month of DATE as an integer from 1 to 12.
+
+    DATE->day
+            my $day   = $date->day;
+
+        Return the DATE's day of the month as an integer from 1 to 31.
+
+    DATE->day_of_week
+        Return a number representing DATE's day of the week from 0 to 6,
+        where 0 means Sunday.
+
+    DATE->as_ymd
+            my ($year, $month, $day) = $date->as_ymd;
+
+        Returns a list of three numbers: year, month, and day.
+
+    DATE->as_d8
+        Returns the "d8" representation (see "d8"), like
+        "$date->format("%Y%m%d")".
+
+    DATE->format (STRING)
+    DATE->strftime (STRING)
+        These functions are equivalent. Return a string representing the
+        date, in the format specified. If you don't pass a parameter, an ISO
+        8601 formatted date is returned.
+
+            my $change_date = $date->format("%d %b %y");
+            my $iso_date1 = $date->format("%Y-%m-%d");
+            my $iso_date2 = $date->format;
+
+        The formatting parameter is similar to one you would pass to
+        strftime(3). This is because we actually do pass it to strftime to
+        format the date. This may result in differing behavior across
+        platforms and locales and may not even work everywhere.
+
+OPERATORS
+    Some operators can be used with Date::Simple instances. If one side of
+    an expression is a date object, and the operator expects two date
+    objects, the other side is interpreted as "date(ARG)", so an array
+    reference or ISO 8601 string will work.
+
+    DATE + NUMBER
+    DATE - NUMBER
+        You can construct a new date offset by a number of days using the
+        "+" and "-" operators.
+
+    DATE1 - DATE2
+        You can subtract two dates to find the number of days between them.
+
+    DATE1 == DATE2
+    DATE1 < DATE2
+    DATE1 <=> DATE2
+    DATE1 cmp DATE2
+    etc.
+        You can compare two dates using the arithmetic or string comparison
+        operators. Equality tests ("==" and "eq") return false when one of
+        the expressions can not be converted to a date. Other comparison
+        tests die in such cases. This is intentional, because in a sense,
+        all non-dates are not "equal" to all dates, but in no sense are they
+        "greater" or "less" than dates.
+
+    DATE += NUMBER
+    DATE -= NUMBER
+        You can increment or decrement a date by a number of days using the
+        += and -= operators. This actually generates a new date object and
+        is equivalent to "$date = $date + $number".
+
+    "$date"
+        You can interpolate a date instance directly into a string, in the
+        format specified by ISO 8601 (eg: 2000-01-17).
+
+UTILITIES
+    leap_year (YEAR)
+        Returns true if YEAR is a leap year.
+
+    days_in_month (YEAR, MONTH)
+        Returns the number of days in MONTH, YEAR.
+
+AUTHOR
+        Marty Pauley <marty@kasei.com>
+        John Tobey <jtobey@john-edwin-tobey.org>
+
+COPYRIGHT
+          Copyright (C) 2001  Kasei
+          Copyright (C) 2001,2002 John Tobey.
+
+          This program is free software; you can redistribute it and/or
+          modify it under the terms of either:
+
+          a) the GNU General Public License;
+             either version 2 of the License, or (at your option) any later
+             version.  You should have received a copy of the GNU General
+             Public License along with this program; see the file COPYING.
+             If not, write to the Free Software Foundation, Inc., 59
+             Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+          b) the Perl Artistic License.
+
+          This program is distributed in the hope that it will be useful,
+          but WITHOUT ANY WARRANTY; without even the implied warranty of
+          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

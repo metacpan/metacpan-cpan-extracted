@@ -1,0 +1,37 @@
+NAME
+    DBIx::SearchBuilder - Encapsulate SQL queries and rows in simple perl
+    objects
+
+DESCRIPTION
+    This module provides an object-oriented mechanism for retrieving and
+    updating data in a DBI-accesible database.
+
+INSTALLATION
+    $ perl Makefile.PL
+    $ make
+    $ make test   # but see below for how to actually test against a test database
+    # make install
+
+TESTING
+    In order to test most of the features of "DBIx::SearchBuilder", you need
+    to provide "make test" with a test database. For each DBI driver that
+    you would like to test, set the environment variables "SB_TEST_FOO",
+    "SB_TEST_FOO_USER", and "SB_TEST_FOO_PASS" to a database name, database
+    username, and database password, where "FOO" is the driver name in all
+    uppercase. You can test as many drivers as you like. (The appropriate
+    "DBD::" module needs to be installed in order for the test to work.)
+    Note that the "SQLite" driver will automatically be tested if
+    "DBD::Sqlite" is installed, using a temporary file as the database. For
+    example:
+
+      SB_TEST_MYSQL=test SB_TEST_MYSQL_USER=root SB_TEST_MYSQL_PASS=foo \
+        SB_TEST_PG=test SB_TEST_PG_USER=postgres  make test
+
+AUTHOR
+    Copyright (c) 2001-2005 Jesse Vincent, jesse@fsck.com.
+
+    All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

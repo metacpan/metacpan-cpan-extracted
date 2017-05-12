@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::Denon::DN1400F.
+
+0.01  Sat Jul 19 15:39:53 2003
+	- original version; created by h2xs 1.21 with options
+		-X -A Device::Denon::DN1400F
+

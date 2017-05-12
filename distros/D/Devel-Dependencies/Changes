@@ -1,0 +1,30 @@
+Revision history for Perl module Devel::Dependencies
+
+1.04 2015-10-23 NEILB
+    - Changed repo URL after changing my github username
+
+1.03 2014-01-26
+    - Added the TOBYINK string to fool CPANTS into
+      thinking we're using strict and warnings.
+    - Specified min perl version as 5.6.1 in metadata
+    - Switched to meta-spec v2 and updated github info
+    - Specified license type as 'perl' in Makefile.PL metadata
+
+1.02 2012-09-09
+    - Devel::Dependencies no longer uses strict or warnings,
+      because that meant it could never report whether the target
+      was using those pragmata
+
+1.01 2012-08-10
+    - Neil Bowers has taken over maintenance of this module
+      Thanks to Jean-Louis
+    - Updated documentation to reflect new maintainer and github repo
+    - Added repository to metadata in Makefile.PL
+
+1.00 2006-01-05
+    - first public release
+
+0.01  Thu Jan  5 13:50:15 2006
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.6.1 -n Devel::Dependencies
+

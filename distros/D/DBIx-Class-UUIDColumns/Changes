@@ -1,0 +1,43 @@
+Revision history for DBIx::Class::UUIDColumns
+
+0.02006 Wed Dec 21 16:58:00 2011
+    - Repackaged with Module::Install 1.00
+    - Migrated repository from svn to git and added links to meta tags
+
+0.02005 Sun June 22 23:10:23 2008
+    - Added support for UUID::Random - Moritz Onken
+
+0.02004 Mon Apr 22 20:41:23 2008
+    - Fix test failure under SQL::Translator <= 0.07
+    - Removed Build.PL now that Module::Install no longer supports it
+    - Removed bogus tests entry in Makefile.PL
+
+0.02003 Fri Mar 7 19:52:56 2008
+    - Quick fix for CPANTS META/author
+
+0.02002 Mon Sep 24 23:14:45 2007
+    - Added Class::Accessor::Grouped to PREREQ. Duh.
+
+0.02001 Sun July 1 20:15:33 2007
+    - Use Class::Accessor::Grouped instead of Class::Data::Accesor
+        because I'm a damn idiot.
+    - Fixed spelling test
+
+0.02000 Sun June 24 21:09:35 2007
+    - Converted to Class::Accessor::Grouped after mk_classdata
+        snafu in DBIC 0.08
+    - uuid_columns now also returns the list of columns
+    - insert now uses uuid_columns instead of internal list
+
+0.01001 Sat May 05 20:01:13 2007
+    - RT#22364 (ASH) hopefully fixed with updated prereq
+    - Added Data::GUID support
+    - Fixed ::Win32API::GUID incorrect subclass
+    - Converted to Module::Install
+    - Added cargo tests/TEST_AUTHOR
+    - Much improved test coverage
+    - Fixed case where no uuid module found so that it dies with error, not with
+        method not found
+
+0.00001
+    - initial release

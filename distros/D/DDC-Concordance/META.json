@@ -1,0 +1,58 @@
+{
+   "abstract" : "Query utilities for ddc-concordance search engine",
+   "author" : [
+      "Bryan Jurish <moocow@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DDC-Concordance",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Alien::DDC::Concordance" : "0.002",
+            "DDC::XS" : "0.14"
+         },
+         "requires" : {
+            "IO::Socket::INET" : "0",
+            "JSON" : "0",
+            "NetServer::Generic" : "1.03",
+            "Parse::Yapp" : "0",
+            "Test::More" : "0",
+            "Text::Wrap" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "svn",
+         "url" : "svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/",
+         "web" : "https://sourceforge.net/p/ddc-concordance/code/HEAD/tree/ddc-perl/"
+      }
+   },
+   "version" : "0.37"
+}

@@ -1,0 +1,10 @@
+Revision history for Perl extension Devel::Messenger.
+
+0.02  Fri May  2 10:18:07 2008 kolibrie
+	- applied patch from Andreas Koenig which fixes tests 26 and 4
+	- [rt.cpan.org #33054]
+
+0.01  Sat Jun  2 11:18:06 2001
+	- original version; created by h2xs 1.20 with options
+		-X -n Devel::Messenger
+

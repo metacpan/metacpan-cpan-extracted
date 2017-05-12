@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/DMTF/CIM.pm
+lib/DMTF/CIM/_model.pm
+lib/DMTF/CIM/_valued.pm
+lib/DMTF/CIM/Instance.pm
+lib/DMTF/CIM/Instance/Property.pm
+lib/DMTF/CIM/Instance/Method.pm
+lib/DMTF/CIM/Instance/Method/Parameter.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+META.yml                                 Module meta-data (added by MakeMaker)

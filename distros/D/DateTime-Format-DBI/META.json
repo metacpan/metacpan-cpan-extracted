@@ -1,0 +1,56 @@
+{
+   "abstract" : "Find a parser class for a database connection.",
+   "author" : [
+      "Claus Färber <CFAERBER@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4005, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-DBI",
+   "no_index" : {
+      "directory" : [
+         "eg"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Test::Database" : "0"
+         },
+         "requires" : {
+            "DBI" : "1.21",
+            "DateTime" : "0.1"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::DBI" : {
+         "file" : "lib/DateTime/Format/DBI.pm",
+         "version" : "0.041"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.041"
+}

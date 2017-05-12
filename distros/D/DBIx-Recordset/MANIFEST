@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+Recordset.pm
+Database.pm
+Compat.pm
+README
+TODO
+eg/README
+eg/search.pl
+eg/search.htm
+Intrors.pod
+Recordset/FileSeq.pm
+Recordset/DBSeq.pm
+
+META.yml                                Module meta-data (added by MakeMaker)

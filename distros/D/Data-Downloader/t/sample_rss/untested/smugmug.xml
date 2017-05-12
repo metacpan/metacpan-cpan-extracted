@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss version="2.0" xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#" xmlns:exif="http://www.exif.org/specifications.html" xmlns:media="http://search.yahoo.com/mrss/" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>SmugMug's all-time most popular photos</title>
+    <link>http://www.smugmug.com/popular/all/</link>
+    <description>A feed of the all-time most popular photos on SmugMug, calculated using PhotoRank.</description>
+    <atom:icon>http://www.smugmug.com/img/feed-icon.png</atom:icon>
+    <pubDate>Wed, 15 Apr 2009 09:07:49 -0700</pubDate>
+    <lastBuildDate>Wed, 15 Apr 2009 09:07:49 -0700</lastBuildDate>
+    <generator>http://www.smugmug.com/</generator>
+    <copyright>Copyright 2009, the copyright holder of each photograph.  Some portions copyright SmugMug.  All rights reserved.</copyright>
+    <image>
+      <url>http://www.smugmug.com/img/smuggy64.gif</url>
+    </image>
+    <image>
+      <title>SmugMug's all-time most popular photos</title>
+    </image>
+    <image>
+      <link>http://www.smugmug.com/popular/all/</link>
+    </image>
+    <atom:link rel="next" href="http://www.smugmug.com/hack/feed.mg?Type=popular&amp;format=&amp;start=100&amp;PageCount=100"/>
+    <item>
+      <title>This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ...</title>
+      <link>http://kenconger.smugmug.com/gallery/1269226_pnAPz#60948552_nLkH5</link>
+      <description>&lt;p&gt;&lt;a href="http://kenconger.smugmug.com"&gt;Ken Conger&lt;/a&gt;&lt;br /&gt;This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ...&lt;/p&gt;&lt;a href="http://kenconger.smugmug.com/gallery/1269226_pnAPz#60948552_nLkH5" title="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..."&gt;&lt;img src="http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg" width="150" height="100" alt="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..." title="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..." style="border: 1px solid #000000;" /&gt;&lt;/a&gt;</description>
+      <category>Nature</category>
+      <pubDate>Sat, 21 Feb 2009 17:04:03 -0800</pubDate>
+      <author>nobody@smugmug.com (Ken Conger)</author>
+      <guid isPermaLink="true">http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg</guid>
+      <enclosure url="http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg" length="8265" type="image/jpeg"/>
+      <exif:DateTimeOriginal>2006-03-08 20:22:26</exif:DateTimeOriginal>
+      <media:group>
+        <media:content url="http://kenconger.smugmug.com/photos/60948552_nLkH5-Ti-3.jpg" fileSize="4519" type="image/jpeg" medium="image" width="100" height="67">
+          <media:hash algo="md5">7b11933b7e2e36646dec8b171b4c3159</media:hash>
+        </media:content>
+        <media:content url="http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg" fileSize="8265" type="image/jpeg" medium="image" width="150" height="100" isDefault="1">
+          <media:hash algo="md5">b800769b08ef7db43a1b9f90f27f5260</media:hash>
+        </media:content>
+        <media:content url="http://kenconger.smugmug.com/photos/60948552_nLkH5-S-3.jpg" fileSize="44250" type="image/jpeg" medium="image" width="400" height="267">
+          <media:hash algo="md5">26136c3b418ae698e42bb00cd63656b9</media:hash>
+        </media:content>
+        <media:content url="http://kenconger.smugmug.com/photos/60948552_nLkH5-M-3.jpg" fileSize="82689" type="image/jpeg" medium="image" width="600" height="400">
+          <media:hash algo="md5">66eb0f4f95469f63a58497e6911cee6a</media:hash>
+        </media:content>
+      </media:group>
+      <media:title type="html">This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ...</media:title>
+      <media:text type="html">&lt;p&gt;&lt;a href="http://kenconger.smugmug.com"&gt;Ken Conger&lt;/a&gt;&lt;br /&gt;This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ...&lt;/p&gt;&lt;a href="http://kenconger.smugmug.com/gallery/1269226_pnAPz#60948552_nLkH5" title="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..."&gt;&lt;img src="http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg" width="150" height="100" alt="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..." title="This Bald Eagle photograph was captured in Homer, Alaska (3/06). &#13;
+&#13;
+This photograph is protected by the U.S. Copyright Laws and shall not to be downloaded or reproduced by any means without ..." style="border: 1px solid #000000;" /&gt;&lt;/a&gt;</media:text>
+      <media:thumbnail url="http://kenconger.smugmug.com/photos/60948552_nLkH5-Th-3.jpg" width="150" height="100"/>
+      <media:category>Nature</media:category>
+      <media:keywords>eagle, eagles, alaska, homer, bald eagle</media:keywords>
+      <media:copyright url="http://www.kencongerphotography.com">Ken Conger</media:copyright>
+      <media:credit role="photographer">Ken Conger</media:credit>
+    </item>
+    <item>
+      <title>Great Egret at dusk</title>
+      <link>http://jlvaillant.smugmug.com/gallery/2400674_UpJUk#125787395_hQSj9</link>
+      <description>&lt;p&gt;&lt;a href="http://jlvaillant.smugmug.com"&gt;Jean-Luc Vaillant&lt;/a&gt;&lt;br /&gt;Great Egret at dusk&lt;/p&gt;&lt;a href="http://jlvaillant.smugmug.com/gallery/2400674_UpJUk#125787395_hQSj9" title="Great Egret at dusk"&gt;&lt;img src="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg" width="150" height="100" alt="Great Egret at dusk" title="Great Egret at dusk" style="border: 1px solid #000000;" /&gt;&lt;/a&gt;</description>
+      <category>Animals</category>
+      <pubDate>Sat, 14 Feb 2009 23:24:14 -0800</pubDate>
+      <author>nobody@smugmug.com (Jean-Luc Vaillant)</author>
+      <guid isPermaLink="true">http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg</guid>
+      <enclosure url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg" length="3389" type="image/jpeg"/>
+      <exif:DateTimeOriginal>2004-12-12 16:20:12</exif:DateTimeOriginal>
+      <media:group>
+        <media:content url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Ti-1.jpg" fileSize="2075" type="image/jpeg" medium="image" width="100" height="67">
+          <media:hash algo="md5">a0f50c4c8f8b5653084ca24e9547703d</media:hash>
+        </media:content>
+        <media:content url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg" fileSize="3389" type="image/jpeg" medium="image" width="150" height="100" isDefault="1">
+          <media:hash algo="md5">97e45f7eef5306e4ee4fee7c20d73a06</media:hash>
+        </media:content>
+        <media:content url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-S-1.jpg" fileSize="16744" type="image/jpeg" medium="image" width="400" height="267">
+          <media:hash algo="md5">280a6f7a9279db4e806a6987c3ba4a9d</media:hash>
+        </media:content>
+        <media:content url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-M-1.jpg" fileSize="34058" type="image/jpeg" medium="image" width="600" height="400">
+          <media:hash algo="md5">69fa3f90b04b7aa14eecc64f920eb173</media:hash>
+        </media:content>
+        <media:content url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-L-1.jpg" fileSize="57701" type="image/jpeg" medium="image" width="800" height="534">
+          <media:hash algo="md5">fe6434430972374c253e01b79828ccdc</media:hash>
+        </media:content>
+      </media:group>
+      <media:title type="html">Great Egret at dusk</media:title>
+      <media:text type="html">&lt;p&gt;&lt;a href="http://jlvaillant.smugmug.com"&gt;Jean-Luc Vaillant&lt;/a&gt;&lt;br /&gt;Great Egret at dusk&lt;/p&gt;&lt;a href="http://jlvaillant.smugmug.com/gallery/2400674_UpJUk#125787395_hQSj9" title="Great Egret at dusk"&gt;&lt;img src="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg" width="150" height="100" alt="Great Egret at dusk" title="Great Egret at dusk" style="border: 1px solid #000000;" /&gt;&lt;/a&gt;</media:text>
+      <media:thumbnail url="http://jlvaillant.smugmug.com/photos/125787395_hQSj9-Th-1.jpg" width="150" height="100"/>
+      <media:category>Animals</media:category>
+      <media:keywords>bird, great egret, outdoor</media:keywords>
+      <media:copyright url="http://www.jlvaillant.com">Jean-Luc Vaillant</media:copyright>
+      <media:credit role="photographer">Jean-Luc Vaillant</media:credit>
+    </item>
+  </channel>
+</rss>

@@ -1,0 +1,18 @@
+Revision history for Perl extension Device::LabJack.
+
+0.02  Tue Oct 25 11:20:00 2005
+	- added linux support, based on the labjack.com GPL released linux driver 0.03b (included herein)
+	- moved some files around, removed legacy "LJperl" names from some places
+	- added "smarts" to Makefile.PL to detect the platform this runs on and compile/install properly
+	- moved most of Neil Cherry's new stuff back into my source, and added tests for it all
+
+
+0.015  Neil Cherry <lt>ncherry\@comcast.net<gt> Aug. 16, 2003
+	- added a lot of extra labjack functions
+	http://home.comcast.net/ncherry/index.html (http://mywebpages.comcast.net/ncherry/)
+
+
+0.01  Thu Apr  3 00:15:19 2003
+	- first version (originally named "LJperl"); created by h2xs 1.23 with options
+		-A -b 5.6.0 -n Device::LabJack
+

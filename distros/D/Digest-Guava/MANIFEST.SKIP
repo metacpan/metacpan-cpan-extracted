@@ -1,0 +1,49 @@
+# Avoid version control files.
+\B\.git(?:ignore|modules|)\b
+.travis.yml
+
+# Avoid Makemaker generated and utility files.
+\bMANIFEST\.bak
+\bMakefile$
+\bblib/
+\bMakeMaker-\d
+\bpm_to_blib\.ts$
+\bpm_to_blib$
+\bblibdirs\.ts$         # 6.18 through 6.25 generated this
+
+# Avoid Module::Build generated and utility files.
+\bBuild$
+\b_build/
+
+# Avoid temp and backup files.
+~$
+\.old$
+\#$
+\b\.#
+\.bak$
+\.rpm$
+Guava.c
+Guava.o
+Guava.bs
+
+# Avoid Devel::Cover files.
+\bcover_db\b
+
+# Avoid local testing/dist files
+^MYMETA\.
+^libs/
+^dist/
+^makeall\.sh$
+^tmp/
+^Digest-Guava-.*
+Kit\.pm$
+^xt/
+^ex/
+^topdir-
+makerpm
+^etc
+\.spec$
+^mockbuild\/repository
+^mockbuild.yaml
+
+README.pod

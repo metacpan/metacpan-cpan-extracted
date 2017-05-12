@@ -1,0 +1,11 @@
+DBIx::Recordset - Perl extension for DBI recordsets
+
+EXAMPLES
+
+The file search.htm (HTML::Embperl version) and search.pl (CGI.pm version)
+contains a short example for a web page, where you can supply a table name
+(and a search condition) to view the whole content or a part of a table.
+
+NOTE: To view search.htm it's easier to use your browser then an ascii
+editor.
+

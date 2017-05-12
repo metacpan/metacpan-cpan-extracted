@@ -1,0 +1,29 @@
+# Change default severity to harsh.
+severity = harsh
+
+# Use only core PerlCritic policies.
+# This prevents tests from failing if the tester / installer has non-standard
+# additional PerlCritic policies.
+theme = core
+
+# What's wrong with tabs? They're more friendly.
+[-CodeLayout::ProhibitHardTabs]
+
+# Newlines in SQL statements are much easier to read.
+[-ValuesAndExpressions::ProhibitImplicitNewlines]
+
+# Don't require /x on small regexes.
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 20
+
+# Not everything is that simple.
+[Subroutines::ProhibitExcessComplexity]
+max_mccabe = 30
+
+# As long as the subroutine is doesn't have a dual scalar/array return mode,
+# returning undef explicitely for scalar returns is actually better in case
+# the subroutine is called to set the value of a hash (which happens in list
+# context and would cause odd number of elements with clobbered data).
+# Ex: { key1 => test(), key2 => 1 } would be [ 'key1', 'key2', 1 ] if test()
+# just returns with return instead of return undef.
+[-Subroutines::ProhibitExplicitReturnUndef]

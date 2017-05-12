@@ -1,0 +1,35 @@
+==================================================
+Changes from 2013-08-13 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.01 at 2014-08-13 02:19:15 +0000
+-----------------------------------------
+
+  Change: 22e0c91da2400a19e190f0a96738370f8db3e007
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-12 23:06:27 +0000
+
+    Replaced MetaResources to AutoMetaResources 
+
+  Change: 6c19a080144abdd743649a0ca265734acafb7874
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-12 21:49:59 +0000
+
+    Modified Pod Description 
+
+  Change: d1bfbf6b6f3cb0ce990e49804053e162221648bf
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-12 21:42:33 +0000
+
+    First release 
+
+  Change: fb78c1adc4ccee397733bedfc6b5ba687caf5a6f
+  Author: Gabriel Vieira <gabriel.vieira@gmail.com>
+  Date : 2014-08-12 21:21:12 +0000
+
+    Starting GABRIEL Dist::Zilla bundle 
+
+================
+End of releases.
+================

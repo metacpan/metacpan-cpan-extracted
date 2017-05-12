@@ -1,0 +1,12 @@
+0.03 2016-01-06
+
+  - Fixes for new Dancer2::Plugin architecture
+    (Peter Mottram)
+
+0.02 2015-04-22
+
+  - Setting minimum Dancer2 version to 0.15, with psgi_app
+
+0.01 2015-04-19
+
+  - Initial release

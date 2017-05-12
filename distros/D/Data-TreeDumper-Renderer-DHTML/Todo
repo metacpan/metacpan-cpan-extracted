@@ -1,0 +1,33 @@
+Todo for Data/TreeDumper/Renderer/DHTML 
+=======================================
+
+Add the possibility to expand collaps and link (explorer style)
+
+change module name to DHTML::Simple
+
+Add DHTML::Arrow module for the example with red/green arrow
+
+add module that displays +/- images located in the current directory (try with inline base64 encoded images too)
+
+#Integrate latest staffan's modifications (the one verified with W3C validator)
+
+#Add search option
+	can't do  on closed nodes!
+	
+#Add links between nodes
+
+open node when clicking on a link to it (like for search)
+
+#Have a single Expand/collapse button
+
+#Expand collapse buttons should have a unique id per dumped data!
+
+Add pathes opening and closing in the renderers interface
+
+#start expanded/collapsed option
+
+flash target
+
+glyph, link, address, size, perl_address should have different classes
+
+#Javascripts should be specific for a the tree to allow us to dump multiple trees in the same document

@@ -1,0 +1,55 @@
+NAME
+    Devel::CoreDump - create core dumps of the running perl interpreter,
+    without terminating
+
+SYNOPSIS
+        use Devel::CoreDump;
+
+        Devel::CoreDump->write('perl.core');
+
+DESCRIPTION
+    This module allows to create GDB readable coredumps from the running
+    perl interpreter, without terminating execution.
+
+METHODS
+  get
+        my $fh = Devel::CoreDump->get;
+
+    Returns a file handle that can be read to obtain a snapshot of the
+    current state of this process. If a core file could not be generated for
+    any reason, an exception is thrown.
+
+    This function momentarily suspends all threads, while creating a COW
+    (copy-on-write) copy of the process's address space.
+
+    This function is neither reentrant nor async signal safe. Callers should
+    wrap a mutex around the invocation of this function, if necessary.
+
+    The current implementation tries very hard to behave reasonably when
+    called from a signal handler, but no guarantees are made that this will
+    always work. Most importantly, it is the caller's responsibility to make
+    sure that there are never more than one instance of "get()" or "write()"
+    executing concurrently.
+
+  write($file)
+        Devel::CoreDump->write('perl.core');
+
+    Writes the core file to disk. This is a convenience method wrapping
+    "get()". If a core file could not be generated for any reason, an
+    exception is thrown.
+
+AUTHOR
+    Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2008 Florian Ragwitz
+
+    This software is distributed under the terms of the BSD License
+
+    Parts of this module are taken from Google's coredumper library.
+    <http://code.google.com/p/google-coredumper/>.
+
+    Copyright (c) 2005-2008, Google Inc. All rights reserved.
+
+    Coredumper is distributed under the terms of the BSD License.
+

@@ -1,0 +1,73 @@
+{
+   "abstract" : "get values from Apache mod_status page",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Apache-mod_status",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Slurp" : "0",
+            "File::Which" : "0",
+            "Test::Differences" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp::Clan" : "0",
+            "Data::Dumper" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Getopt::Long" : "0",
+            "IPC::Run3" : "0",
+            "LWP::UserAgent" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Pod::Usage" : "0",
+            "XML::LibXML" : "0",
+            "XML::LibXSLT" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Apache::mod_status" : {
+         "file" : "lib/Data/Apache/mod_status.pm",
+         "version" : "0.02"
+      },
+      "Data::Apache::mod_status::2XML" : {
+         "file" : "lib/Data/Apache/mod_status/2XML.pm",
+         "version" : "0.02"
+      },
+      "Data::Apache::mod_status::Info" : {
+         "file" : "lib/Data/Apache/mod_status/Info.pm",
+         "version" : "0.02"
+      },
+      "Data::Apache::mod_status::Workers" : {
+         "file" : "lib/Data/Apache/mod_status/Workers.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

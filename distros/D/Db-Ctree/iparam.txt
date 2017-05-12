@@ -1,0 +1,84 @@
+#
+# CTREE ISAM paramter file info
+#
+# note: The paramter file can't have comments.
+# delete any lines beginning with #
+#
+# For more information, see the CTREE Programmer's Reference Guide page 5-25
+#
+# Initialization Record
+# Data File Description Record
+#    Index File Description Record
+#       Index Member Record (optional) 
+#           Index KEY segment Record
+#
+# Initialization Record  (see InitCTree)
+#        (bufs, number of indicies, sect, number of data files)
+#      
+# Data File Description Record (see CreateDataFile)
+#        (datno, filenam, datalen, xtdsiz, filmod, number of indexes)
+#         filmod: 	Exclusive	0
+#                       Shared          1 
+#                       Virtual         0
+#                       Permanent       2
+#                       Fixed           0
+#                       VLENGTH         4
+#                       READFIL         8
+#                       Preimg         16
+#                       Trnlog         32
+#                       Writethru      64
+#                       Checklock     128
+#                       DupChannel    256
+#                       Superfile     512
+#                       Checkread    1024
+#                       Disableres   2048
+#                       Mirror_SKP   8192
+#                       Opencrpt    16384
+#
+# Index File Description Record (see CreateIndexFile)
+#        (keyno, filnam, keylen, keytyp, keydup, nomemb,
+#                   xtdsiz, filmod, null, empty, num segments)
+#         key type:   fixed length keys            0
+#                     leading char compression     4
+#                     padding compression          8
+#                     leading/padding compression 12
+#                                  
+#
+# Index Member Record (optional) 
+#        (keyno, keylen, keytyp, keydup, null, empty, num segments)
+#
+# Index KEY segment Record
+#        (position, length, mode)
+#        mode : REGSEG       0 (see Program Ref page 5-17)
+#               INTSEG       1
+#               UREGSEG      2
+#               SRLSEG       3
+#               VARSEG       4
+#               UVARSEG      5
+#               YOURSEG1     6
+#               YOURSEG2     7
+#               SGNSEG       8
+#               FLTSEG       9
+#               DECSEG      10
+#               BCDSEG      11
+#               SCHSEG      12
+#               USCHSEG     13
+#               VSCHSEG     14
+#               UVSCHSEG    15
+#               DSCSEG      16
+#               ALTSEG      32
+#               ENDSEG      64
+#
+# Example
+# 18 3 4 1
+# 3    cust.dat 128 4096 1 3
+#   0  custnam.idx 24 0 0 1 4096 1 1 32 3
+#      6 14 2
+#     30  6 2
+#    121  4 3
+#   1               4 0 0          0  0 1
+#      2  4 1
+#   2  custzip.idx 22 0 0 0 4096 1 1 32 3
+#    112 9 2
+#      6 9 2
+#    121 4 3

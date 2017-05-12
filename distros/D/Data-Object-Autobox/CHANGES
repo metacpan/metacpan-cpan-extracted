@@ -1,0 +1,62 @@
+Changelog for Data-Object-Autobox
+
+0.14 2015-09-27T11:59:58
+ - Updated build.
+ - Updated distro to support Data::Object 0.53+.
+
+0.13 2015-07-03T08:34:51
+ - v0.13
+ - Updated build.
+ - Added type object instantiation routines.
+
+0.12 2015-06-30T01:56:03
+ - v0.12
+ - Updated POD.
+
+0.11 2015-06-26T05:10:19
+ - v0.11
+ - Dropped superfluous Moo dep.
+ - Corrected misspelling in POD.
+ - Updated build.
+ - Updated .travis.yml config.
+
+0.10 2015-03-26T05:57:10
+ - v0.10
+ - Excluding development files.
+
+0.09 2015-03-26T05:31:35
+ - v0.09
+ - Updated build.
+ - Refactored to work with the latest Data::Object release.
+
+0.08 2015-01-04T02:31:49
+ - v0.08
+ - Support for user-defined boxing classes.
+
+0.07 2015-01-02T05:24:51
+ - v0.07
+ - Now forcing the latest Data::Object version.
+
+0.06 2015-01-01T05:54:08
+ - v0.06
+ - Added flavors; autoload and composite boxing implementations.
+
+0.05 2014-12-15T12:20:16
+ - v0.05
+ - Added META file to dist.
+
+0.04 2014-12-13T20:36:59
+ - v0.04
+ - Added autobox shims for Data::Object classes.
+
+0.03 2014-12-11T06:49:15
+ - v0.03
+ - Updated documentation.
+
+0.02 2014-12-07T21:27:54
+ - v0.02
+ - Added undocumented functionality.
+
+0.01 2014-12-03T11:01:32
+ - v0.01
+ - Initial commit.

@@ -1,0 +1,32 @@
+
+DESCRIPTION
+
+Date::Business provides the functionality to perform simple
+date manipulations quickly. Support for calendar date and
+business date math is provided.
+ 
+Business dates are weekdays only. Adding 1 to a weekend
+returns Monday, subtracting 1 returns Friday. User defined
+Holidays are supported. 
+
+Date::Business works very well for iterating over dates,
+and determining start and end dates of arbitray n business day
+periods (e.g. consider how to perform a computation for
+a series of business days starting from an arbitrary day).
+ 
+ $end   = new Date::Business(); # today
+ $start = new Date::Business($end, -10); # 10 business days ago
+
+ while (!$start->gt($end)) {
+   compute_something($start);
+   $start->nextb();
+ }
+
+INSTALLATION
+
+Requires packages Time::Local and POSIX.
+
+perl Makefile.PL [ LIB=<alternate installation> ]
+make
+make test
+make install

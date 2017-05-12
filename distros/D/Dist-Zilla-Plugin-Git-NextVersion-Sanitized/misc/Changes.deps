@@ -1,0 +1,56 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002003
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002002 2014-09-01T01:07:22Z
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+ - Git::Wrapper::Plus::Support
+ - Git::Wrapper::Plus::Tester
+ - Test::DZil
+ - Test::Fatal
+
+0.002001 2014-08-16T03:46:40Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.002000 2014-07-13T23:00:16Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4203
+
+ [Removed / configure requires]
+ - Module::Build 0.4203

@@ -1,0 +1,35 @@
+---
+abstract: "Author tests making sure no debugger breakpoints make it to 'released'"
+author:
+  - 'Chisel <chisel@chizography.net>'
+build_requires:
+  Test::UseAllModules: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-NoBreakpoints
+requires:
+  Data::Section: '0.004'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Tiny: '0'
+  Sub::Exporter::ForMethods: '0'
+  Test::NoBreakpoints: '0.15'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Test-NoBreakpoints
+  repository: https://chiselwright@github.com/chiselwright/dist-zilla-plugin-test-nobreakpoints.git
+version: 0.0.2

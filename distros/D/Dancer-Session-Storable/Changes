@@ -1,0 +1,30 @@
+Revision history for Dancer-Session-Storable
+
+0.06    2012-11-26
+        Fix log message on startup, thanks to Vernon (VLYON) in RT #81464
+
+0.05    2011-10-07
+        Use lock_nstore and lock_retrieve to avoid problems with multiple
+        processes trying to read the session at the same time.
+        Reported by onelesd in Issue 672 @ sukria/Dancer on GitHub - thanks!
+
+0.04    2011-03-29
+        Use $class->session_name to retrieve the session, for a safe default
+        session name if sessin_name hasn't been configured.  Thanks to alexrj.
+
+0.03    2011-03-25
+        Use the session_name (e.g. dancer.session, or the value of the
+        session_name config setting) for the session filename.  NOTE: this is
+        mildly backwards-incompatible, in that upgrading will mean that existing
+        sessions will not be recognised.
+        Resolves GH #1, thanks to alexrj
+        Minor bugfix: call $self->id, not $self->{id}, thanks Puneet Kishor
+
+0.02    2011-03-11
+        Bugfix: call SUPER::init() first, to initialise session engine
+        appropriately.  Thanks to Alessandro Ranellucci ("Sound" on IRC) for
+        this.
+
+0.01    2010-02-18
+        First version released.
+

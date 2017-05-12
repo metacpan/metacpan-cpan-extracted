@@ -1,0 +1,45 @@
+{
+   "abstract" : "Easy SMS text message sending from Dancer apps",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.82, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-SMS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.2",
+            "SMS::Send" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bigpresh/Dancer-Plugin-SMS.git",
+         "web" : "https://github.com/bigpresh/Dancer-Plugin-SMS"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,42 @@
+NAME
+    Dist::Inktly::Minty - create distributions that will use Dist::Inkt
+
+SYNOPSIS
+      distinkt-mint Local::Example::Useful
+
+STATUS
+    Experimental.
+
+DESCRIPTION
+    This package provides just one (class) method:
+
+    `Dist::Inktly::Minty->create($distname, %options)`
+        Create a distribution directory including all needed files.
+
+    There are various methods that may be useful for people subclassing this
+    class to look at (and possibly override).
+
+    `set_defaults`
+    `create_module`
+    `create_dist_ini`
+    `create_metadata`
+    `create_tests`
+    `create_author_tests`
+
+SEE ALSO
+    Dist::Inkt.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

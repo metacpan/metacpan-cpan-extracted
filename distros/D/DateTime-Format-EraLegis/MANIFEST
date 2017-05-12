@@ -1,0 +1,9 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/DateTime/Format/EraLegis.pm
+t/001-basic.t
+t/test.sqlite3

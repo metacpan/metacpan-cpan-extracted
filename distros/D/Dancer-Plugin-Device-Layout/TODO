@@ -1,0 +1,3 @@
+TODO list for Dancer::Plugin::Device::Layout
+
+* Make Dancer::Plugin::Device::Layout be zeroconf (before and after hooks)

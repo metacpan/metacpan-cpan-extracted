@@ -1,0 +1,42 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+
+my $df = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" )->dumpfile;
+
+my @queue = ( [ $df->defstash, "" ] );
+while( @queue ) {
+   $_ = shift @queue;
+   if( $_->[0]->isa( "Devel::MAT::SV::GLOB" ) ) {
+      my ( $gv, $name ) = @$_;
+      print "\$${name}\n" if $gv->scalar;
+      print "\@${name}\n" if $gv->array;
+      print "\%${name}\n" if $gv->hash;
+      print "\&${name}\n" if $gv->code;
+
+      unshift @queue, [ $gv->hash, $name ] if $gv->hash;
+   }
+   elsif( $_->[0]->isa( "Devel::MAT::SV::STASH" ) ) {
+      my ( $stash, $pkg ) = @$_;
+      my @more;
+      foreach my $key ( sort $stash->keys ) {
+         my $gv = $stash->value($key);
+
+         my $name;
+         if( $key =~ m/^([\0-\x1f])/ ) {
+            $name = "{^" . chr(ord($1)+0x40) . substr( $key, 1 ) . "}";
+         }
+         else {
+            $name = "${pkg}$key";
+         }
+
+         next if $name eq "main::";
+         push @more, [ $gv, $name ];
+      }
+
+      unshift @queue, @more;
+   }
+}

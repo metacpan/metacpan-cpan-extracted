@@ -1,0 +1,381 @@
+Revision history for Perl module DBIx::Easy.
+
+* Tue Jan 28 17:48:27 2014 CET
+
+DBIx::Easy v0.21 released.
+
+* Tue Jan 28 15:42:38 2014 CET Marco Pessotto <melmothx@gmail.com>
+
+Fix regular expression to extract table names.
+Fix bug with incoming parameters in is_table method.
+
+* Tue Nov 19 11:16:49 2013 CET
+
+DBIx::Easy v0.20 released.
+
+* Thu Jul  5 11:39:42 2012 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+
+Use table structure cache for insert method as well to prevent one extra
+select query for each insert query.
+
+* Mon Jan 23 16:59:43 2012 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+
+Enable UTF8 flag by default for MySQL, PostgreSQL, Sqlite and Sybase
+drivers.
+
+* Sun Jan 22 14:02:29 2012 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.19 released
+
+* Sun Jan 22 13:47:20 2012 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): fix CSV imports
+
+* Tue Nov 1 17:07:06 2011 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): use Val hash key instead of Value method to retrieve 
+values from spreadsheet cells.
+
+* Tue Nov 1 16:49:32 2011 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): fix crash with undefined values inside of
+spreadsheet cells.
+
+* Sat Oct 29 15:31:28 2011 CEST
+(scripts/dbs_update): add --insert-only commandline option.
+
+* Thu Oct 20 11:42:05 2011 CEST
+(Easy.pm): add special case for specifiying mysql_socket.
+
+* Thu Oct 20 10:56:52 2011 CEST
+(scripts): switch to /usr/bin/env in shebang.
+
+* Thu Jan  8 19:32:57 2009 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.18 released
+
+* Mon Dec 15 09:14:31 2008 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): additional pattern for login failure to PostgreSQL databases
+
+* Fri Apr 18 15:21:08 2008 CEST Jure Kodzoman <jure@tenalt.com>
+(Easy.pm): new method do_without_transaction
+
+* Mon May 21 11:38:02 2007 CEST
+
+DBIx::Easy v0.17 released
+
+* Fri May 18 17:27:15 2007 CEST
+(Easy.pm): MySQL 5 has a different message for bad credentials
+commit only if AutoCommit is turned off to avoid spurious warnings
+
+* Fri May 18 00:17:37 2007 CEST
+(Easy.pm): fixed now method for Postgresql
+
+* Thu May  3 09:53:42 2007 CEST
+(dbs_dumptabstruct): new option --dump-options
+
+* Thu Jul 13 13:31:15 2006 CEST
+(Easy.pm): escape umlauts in POD documentation
+
+* Wed May  3 12:01:07 2006 CEST
+(Easy.pm): remove object from argument list before calling DBI prepare method
+
+* Sat Oct  8 01:24:40 2005 CEST
+
+DBIx::Easy v0.16 released
+
+* Thu Jan 13 17:57:29 2005 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): connect first before issue prepare statement
+
+* Sun Jan  9 13:34:45 2005 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): remove quotes from table names in tables method
+(dbs_dumptabstruct): put table names into quotes in system commands
+
+* Mon Jul  5 15:30:56 2004 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): don't call passwd method on Win32 machines
+
+* Tue Feb 10 14:10:04 2004 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): return on connections errors from various methods to allow failover with custom error handler
+(Import.pm): new module
+
+* Mon Feb  9 22:54:01 2004 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(dbs_update): new option --map-filter
+(Easy.pm): Sybase support fixed, allow empty database name for Sybase, avoid
+empty parentheses on some fatal errors
+
+* Wed Jan 21 18:15:03 2004 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(dbs_update): don't insert a column twice if used both in --map and --columns
+
+* Sat Oct  4 00:04:24 2003 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): rollback method added
+
+* Wed Oct  1 13:08:46 2003 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): delete with empty conditions parameter fails, new methods
+describe_table, create_table
+
+* Mon Jun 16 14:07:13 2003 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): explicit return added to cache method avoids malfunction if
+method columns is called first
+
+* Tue May 13 14:40:21 2003 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): scalar references allow embedding strings without further quoting
+in the update method as well
+
+* Thu Mar 13 17:38:09 2003 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): fixed fallback in passwd method
+
+* Wed Mar  5 18:15:09 2003 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): new method put
+
+* Sun Feb  2 11:28:27 2003 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): makemap now can be directed to put the whole record into the
+values of the resulting hash
+
+* Mon Dec 16 15:33:20 2002 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): allow input files in XLS format
+
+* Fri Apr 19 19:23:49 2002 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): new display method
+(scripts/dbs_dumptabstruct): --filter option added
+
+* Sat Mar 16 13:00:32 2002 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.15 released
+
+* Sun Feb 24 22:00:32 2002 -0500 David B. Bitton <david@codenoevil.com>
+(Easy.pm): support for Sybase and ODBC
+
+* Sat Dec  9 02:13:00 2001 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.14 released
+
+* Sun Nov 18 14:09:59 2001 CET Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): implemented the optional map parameter in the random_row()
+method which was already documented
+
+* Thu Sep 20 17:20:50 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.13 released
+
+* Thu Sep 20 17:19:19 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): --cleanse could fail if one of the keys is '0'
+
+* Wed Aug  8 00:15:25 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): don't use password from ~/.my.cnf for databases on other hosts
+(scripts/dbs_dumptabdata): dbs_printtab is emulated instead called as program
+
+* Tue Aug  7 23:50:54 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): new method is_auth_error
+
+* Tue Aug  7 22:20:36 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): --headline and --format=CSV weren't fully compatible
+
+* Mon Aug  6 12:16:17 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_printtab): new option --sort
+
+* Tue Jul 24 16:25:10 2001 CEST Dennis Schön <dennis@cobolt.net>
+(Easy.pm): database port is configurable now
+
+* Tue Jul 17 14:14:43 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.12 released
+
+* Tue Jul 17 13:30:23 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): new method random_row
+
+* Tue Jul 17 11:51:08 2001 CEST Dennis Schön <dennis@cobolt.net>
+violation of Debian policy fixed (.packlist in binary package)
+
+* Fri Jun 29 11:10:34 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+
+DBIx::Easy v0.11 released
+
+* Sun Jun 24 23:54:34 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(Easy.pm): new method delete
+
+* Wed Mar 28 12:44:31 2001 CEST Stefan Hornburg (Racke) <racke@linuxia.de>
+(scripts/dbs_update): new option --match-sql
+
+* Thu Mar 15 23:54:23 EST 2001 Dennis Schön <dennis@cobolt.net>
+(scripts/{dbs_dumptabdata,dbs_dumptabstruct,dbs_printtab}):
+ Database handler warning fixed
+
+* Mon Feb 12 10:40:37 2001 CET Dennis Schön <dennis@cobolt.net>
+(scripts/dbs_update): Perl 5.6 warnings fixed
+
+* Sat Feb 10 01:10:29 2001 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): Perl warning fixed
+
+* Tue Feb  6 16:46:51 2001 CET Stefan Hornburg <racke@linuxia.de>
+
+DBIx::Easy v0.10 released
+
+* Thu Jan 25 10:18:43 2001 CET Dennis Schön <dennis@cobolt.net>
+(scripts/dbs_dumptabdata): pass user parameter to dbs_printtab
+
+* Mon Jan 15 23:20:43 2001 CET Stefan Hornburg <racke@linuxia.de>
+
+DBIx::Easy v0.09 released
+
+* Tue Dec 26 15:07:47 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): insert an empty string, even if undef is given
+
+* Thu Nov  2 04:55:45 2000 CET Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): escape tabulators in view method
+(scripts/dbs_update): expand tabulators, add columns explicitly
+selected to column list
+
+* Sun Oct  8 15:47:21 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): issue warning on missing type information
+
+* Thu Sep 28 14:07:50 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): return values of user-defined filters indicate 
+if record is valid
+
+* Sun Sep 24 20:21:23 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): apply user-defined filter routine only once
+
+* Mon Sep 18 17:32:56 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptabdata, scripts/dbs_dumptabstruct): pass options
+first to mysqldump for compatibility with older versions
+
+* Sun Sep 17 13:10:37 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): make --columns to work with inclusions again
+
+* Fri Sep 15 18:32:35 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): new option --rows, option --keys accepts key names
+now, new functions key_names and prefix
+(Easy.pm): caches table structures now, new methods columns, types,
+sizes, typemap, sizemap, fold and info_proc
+
+* Tue Sep 12 10:38:22 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): now really choosed comma as default field separator 
+for CSV format
+
+* Fri Sep  8 21:58:04 2000 CEST Stefan Hornburg <racke@linuxia.de>
+
+DBIx::Easy v0.08 released
+
+* Fri Sep  8 21:56:59 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): strip whitespace from column names found
+in the headline
+
+* Thu Sep  7 17:04:24 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): comma is now the default field separator
+for CSV format, field separator can selected from the commandline
+
+* Tue Sep  5 15:14:28 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): brown paper bug fixed that kept --cleanse 
+from working by growing the SQL statement which each record to be cleansed
+
+* Sun Sep  3 20:37:41 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): bug fixed that may be trigged by the combination 
+of --headline and --map, assorted error messages improved, example
+for --routine added to documentation
+
+* Sun Sep  3 19:03:08 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): strip blanks from parameter list for --columns
+
+* Sun Sep  3 17:03:46 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): --columns can be used to exclude columns
+explicitly
+
+* Fri Sep  1 02:20:09 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): first field may contain table name and
+start column
+
+* Mon Aug 28 23:42:36 2000 CEST Stefan Hornburg <racke@linuxia.de>
+
+DBIx::Easy v0.07 released
+
+* Wed Jul 19 00:07:26 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): documentation for is_table and tables added, new method
+sequences
+(scripts/dbs_dumptabstruct): dump sequences too
+
+* Mon Jul 17 12:55:53 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptabstruct): new option --pipe
+
+* Sun Jul 16 16:24:49 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): --table and --columns are working together now,
+handle keys excessing the column size
+
+* Sun Jul 16 13:01:44 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): problems with --cleanse fixed
+
+* Tue Jul  4 16:18:32 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(Easy.pm:view, script/dbs_printtab, scripts/dbs_update): new option --columns
+(scripts/dbs_update): new option --cleanse
+
+* Sat Jul  1 12:34:28 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): handles special characters and multilines
+with CSV format now
+
+* Fri Jun 23 11:36:27 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): several new options
+
+* Mon May  8 02:29:47 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): remove carriage returns from input file
+
+* Sun May  7 16:47:59 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): renember table name if given explicitly
+
+* Sat Apr  1 15:39:16 2000 CEST Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptabstruct, scripts/dbs_dumptabdata): new option --tables
+
+* Thu Mar 23 20:15:13 2000 CET Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): better method to determine directory, force commit
+documented in POD
+(scripts/dbs_empty): ensure that all changes are commited
+
+* Thu Mar 23 16:05:33 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): expand newlines
+(Easy.pm): escape newlines in view method
+
+* Wed Mar 22 16:16:22 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_empty): new option --tables
+
+* Mon Mar 20 00:22:14 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): more verbose error messages, ensure that
+all changes are committed
+
+* Sun Mar 19 11:20:25 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptab*): typo fixed
+(scripts/dbs_dumptabdata): new option --use-printtab
+
+* Sat Mar 18 23:15:22 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_printtab): new script
+(Easy.pm): added option separator to view method
+
+* Tue Feb 29 19:33:13 2000 CET Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): made more verbose if connection cannot be established
+method view fixed in respect to limit option
+             
+* Fri Jan 21 10:59:03 2000 CET Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): optional parameter CONDITION added to method makemap
+
+* Thu Jan 20 12:56:10 2000 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_empty, scripts/dbs_dumptabstruct, scripts/dumptabdata):
+new option --exclude-matching-tables
+
+* Sat Jan 15 15:24:30 2000 CET Stefan Hornburg <racke@linuxia.de>
+(Easy.pm): don't call rollback within error handler 
+if AutoCommit is enabled
+
+* Sun Jan  2 17:48:46 2000 CET Stefan Hornburg <racke@linuxia.de>
+
+(Easy.pm): new method is_table
+(scripts/dbs_update): new option --map
+
+* Thu Dec 16 23:15:37 1999 CET Stefan Hornburg <racke@linuxia.de>
+
+DBIx::Easy v0.06 released
+
+* Sat Dec  4 23:19:20 1999 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_update): asks for a password if authentification fails,
+option -f/--file added
+(Easy.pm): new method passwd
+
+* Wed Dec  1 11:45:00 1999 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptabdata, scripts/dbs_empty): new script(s)
+
+* Fri Nov 26 01:01:22 1999 CET Stefan Hornburg <racke@linuxia.de>
+(scripts/dbs_dumptabstruct): POD documentation added
+(scripts/dbs_update): fixed old script name in POD section

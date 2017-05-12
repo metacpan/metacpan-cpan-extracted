@@ -1,0 +1,86 @@
+0.900010    2016-11-09
+            * Minor fixes for report generation
+
+0.800000    2016-10-23
+            * Added documentation and command-line help for scripts
+              Thanks to Gunnar Þór Magnússon
+            * Added support for collecting subroutine coverage
+
+0.700000    2016-07-04
+            * Fixed unbalanced braces; easiest seen when running
+              as "perl -MDevel::QuickCover -E1".
+              Thanks to Vytas Dauksa.
+            * Several cleanups and improvements.
+              Thanks to SawyerX.
+
+0.600100    2016-06-03
+            * Fixed compilation on newer Perls.
+
+0.600000    2016-06-02
+            * Added support for gathering information about
+              Perl compiler phases.
+              Thanks to Stevan Little.
+            * Fixed mistakes in memory allocation, and
+              improved integration of Stevan's changes
+              into the rest of the module.
+              Thanks to Vikentiy Fesunov.
+0.500000    2016-02-29
+            * Many great improvements by Mattia Barbon:
+              + Hook dbstate as well as nextstate, to allow
+                coverage when debugging is enabled.
+              + Track actual source lines as seen by Perl.
+                The previous implementation tried to parse
+                the source code, which is obviously less
+                accurate than getting the source lines
+                directly from the interpreter.
+              + Don't track source code from eval STRING.
+              + TEST_REQUIRES and META_MERGE require a
+                recent ExtUtils::MakeMaker.
+              + Remove unused return values.
+              + Don't track coverage for evals. It does not
+                exclude evals with #line directives, but it
+                serves to reduce report size.
+            * Changes on leap day... cool!
+
+0.400001    2016-01-18
+            * Add support for option noatexit.
+
+0.400000    2016-01-18
+            * Support passing an optional boolean nodump arg to end().
+            * Include -D_XOPEN_SOURCE=700 only when not compiling for FreeBSD.
+            * Use a dynamically growing buffer, for output_dir and metadata.
+            * Allow multiple calls to start() and end() with no ill effects.
+            * Add functions to set output dir and metadata.
+
+0.300002    2016-01-15
+            * Add a newline at the end of generated cover files.
+            * Fix / improve scripts qc-aggregate.pl and qc-html.pl.
+            * Scripts qc-aggregate.pl and qc-html.pl are now installed.
+
+0.300001    2016-01-05
+            * Fix typo: medatada is really metadata...
+            * Fix prerrequisites for the building and for testing.
+            * Everywhere we now use JSON::XS instead of JSON.
+
+0.300000    2016-01-04
+            * Allow passing metadata only when calling import.
+            * Change dump format to have an array of lines for each file.
+            * Change av_top_index to av_len, trying to fix warnings
+              reported by CPAN.
+
+0.200001    2015-12-31
+            * Improve how we manage dumping the cover data, whether when
+              end() has specifically been called or when the module exits.
+              Particularly relevant in the pressence of fork(), such as
+              when running under Plack.
+            * Check that all memory is properly disposed of; particularly
+              relevant for long running processes (again, Plack).
+            * Improve logging messages when compiled with -DGMEM_CHECK and/or
+              -DGLOG_SHOW.
+            * Don't break tests, use $^X instead of perl.
+            * Be more succint with logging.
+            * Attribute all authors in Makefile.PL.
+            * Happy new year!
+
+0.200000    2015-12-29
+            * First released version.

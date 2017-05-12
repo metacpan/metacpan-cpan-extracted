@@ -1,0 +1,69 @@
+Revision history for Data-SearchEngine-ElasticSearch
+
+0.21 Jun 26 2012
+
+0.19 Feb 21 2012
+  * Git merging went awry and gave us too many ->engine methods.
+
+0.18 Feb 16 2012
+  * Score wasn't being passed all the way up to the resulting Item.
+
+0.17 Jan 25 2012
+  * Use the fields attribute to return a smaller document, upon request.
+    Requires Data::SearchEngine 0.33.
+
+0.16 Dec 23 2011
+  * Reverse the last change, turning it into a query() parameter.
+
+0.15 Dec 23 2011
+  * Make filter_combiner attribute to allow configuration of filter combining
+    behavior. Previously only "and" was allowed.  You can now use "or" when
+    it makes sense.
+
+0.14 Dec 20 2011
+  * Don't wrap delete in a try {}, since it breaks for no reason
+  * Don't delete type and index from the passed in item
+
+0.13 Dec 11 2011
+  * Use Time::HiRes so that the elapsed time works.
+
+0.12 Dec 3 2011
+  * Clone the incoming item hash so that we don't modify the one passed to us
+  * If _version is present in the item, pass it along in the index call
+  * Add find_by_id
+
+0.11 Dec 3 2011
+  * Make _version a value in the Item for search results
+
+0.10 Nov 27 2011
+  * Automatically combine filters inside a parent and filter
+  * Automatically copy filters into facets so that facets match the overall
+    queries filters
+
+0.09 Nov 21 2011
+  * Add an engine method (Stevan Little)
+
+0.08 Nov 18 2011
+  * Make update an alias of add (Stevan Little)
+
+0.07 Nov 10 2011
+  * Default to page 1 so that empty results to blow up Data::Paginator.
+
+0.06 Oct 22 2011
+  * POD fixes
+
+0.05 Oct 22 2011
+  * Use the debug and raw attributes of D:SE::Query
+
+0.04 Oct 21 2011
+  * Include item in ElasticSearch.pm to prevent runtime errors.
+
+0.03 Jul 17 2011
+  * Make _index a value in the Item for search results.
+
+0.02 Jul 16 2011
+  * Fix multiple facets not working
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

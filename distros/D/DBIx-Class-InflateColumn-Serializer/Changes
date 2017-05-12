@@ -1,0 +1,40 @@
+Revision history for DBIx-Class-InflateColumn-Serializer
+
+0.09      2017-01-14 17:31:18+00:00 Europe/London
+    - Cosmetic changes to release and test files. No functional changes.
+      Thanks to paultcochrane for the several PRs
+
+0.08      2016-04-29 22:18:08+01:00 Europe/London
+    - Tests improved. Ensuring UTF8 encoding works properly. Thanks to kaoru
+      for the PR
+
+0.07      2014-11-06 20:34:13+00:00 Europe/London
+    - Switch JSON backend JSON::MaybeXS. Thanks to ether for the PR
+
+0.06      2013-06-28 18:36:02 Europe/Madrid
+    - Ticket #86304 fixed. Thanks to ribasushi for the bug report :)
+
+0.05      2013-06-03 22:44:09 Europe/Madrid
+    - Not using GitHub issues for this module
+    - Version in modules now managed by Dist::Zilla plugin
+
+0.04      2013-05-23 23:02:23 Europe/Madrid
+    - Some POD errors fixed
+    - Author tests moved to xt/
+    - Migrate to Dist::Zilla
+
+0.03 Mon Feb 7 18:48:00 2011
+    - Migrate to Module::Install
+    - Declare test_requires and optional packages (solves RT #64925)
+    - use JSON instead of JSON::Any (RT #61551)
+
+0.02 Sat Jun 27 13:32:00 2009
+    - Moved from DBIx::Class::Inflator:: to DBIx::Class::InflateColumn
+    - Moved to a driver model for the serializers. No need to specify
+      the serializer in the load_components, just InflateColumn::Serializer
+    - abandonded is_json => 1, is_storable => 1, is_yaml => 1 properties for
+      serializer_class => 'JSON', serializer_class => 'YAML',
+      serializer_class => 'Storable'
+
+0.01 Mon Jun  8 22:39:35 2009
+    - original version

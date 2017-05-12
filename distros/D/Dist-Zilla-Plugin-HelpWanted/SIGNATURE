@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 98f9b6f09fbaea42e6075348515c2c16cc251c92 AUTHOR_PLEDGE
+SHA1 79c5733a778d72d83eaf420a7b334ad6ba6bcc9e Build.PL
+SHA1 7d2fb3556ab4887789aa48c8e38a5d6b2f4f1d11 CONTRIBUTORS
+SHA1 f5c4924166ad63b3ee334c18c6064ba9da8ecb0a Changes
+SHA1 aed579611b4b9e20b9161249b3e7afcc6639ec31 INSTALL
+SHA1 42a9b278ca94a31df654fec186efe74ba9565d7e LICENSE
+SHA1 185a1b697e68667a7432d0c56826a1daa910d574 MANIFEST
+SHA1 665c7146e0aafb4ecca5a857af3855ac8ada2ea1 META.json
+SHA1 810d2036c0bf283045ff95cf93d3f3f227ade13d META.yml
+SHA1 2cdc16575406be60fdc5f03cb5fe9a91035a3f77 README
+SHA1 11c717f50b3556d32f883647796478cd36c448ff README.mkdn
+SHA1 2ee65a0fa83b1d687d352afd30def3a5abb185ac lib/Dist/Zilla/Plugin/HelpWanted.pm
+SHA1 3e3273ff78197b2125475651a5ed3dd2c33d6450 t/00-compile.t
+SHA1 5986876f69a4890e71ab6c78d34b95f3fb6ac7d0 t/000-report-versions-tiny.t
+SHA1 2deac6284c98b274f98e1afcdb831493014bfebd t/basic.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlJDZfAACgkQ34Hwf+GwC4xiuwCdHPoP1whGQkStfUqdBJ3PTnBn
+TNsAoOIFhpqHJ7X2hwQaNiwAfi0UZLJp
+=p7Fz
+-----END PGP SIGNATURE-----

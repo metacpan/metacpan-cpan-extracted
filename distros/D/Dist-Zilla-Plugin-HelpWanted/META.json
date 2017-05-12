@@ -1,0 +1,85 @@
+{
+   "abstract" : "insert 'Help Wanted' information in the distribution's META",
+   "author" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-HelpWanted",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::InstallTool" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "List::MoreUtils" : "0",
+            "Moose" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::MetaYAML" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "JSON::Any" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::HelpWanted" : {
+         "file" : "lib/Dist/Zilla/Plugin/HelpWanted.pm",
+         "version" : "v0.3.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-helpwanted at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-HelpWanted"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-HelpWanted/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted.git",
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-HelpWanted"
+      }
+   },
+   "version" : "0.3.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Toby Inkster <mail@tobyinkster.co.uk>"
+   ],
+   "x_help_wanted" : [
+      "developer"
+   ]
+}
+

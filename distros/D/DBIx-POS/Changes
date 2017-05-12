@@ -1,0 +1,14 @@
+Revision history for Perl extension DBIx::POS.
+
+0.02  Wed Jun 23 14:12:30 2004
+
+      Overload stringification for the objects that are in the hash
+      returned by the instance, since that's what we want to get at
+      90% of the time.
+
+0.01  Wed Jun 23 08:00:57 2004
+
+      Moved from within another project to be its own separate
+      distribution.  At the same time, converted from using export to
+      make SQL available to using code lifted from Class::Singleton to
+      use a singleton instance to provide access.

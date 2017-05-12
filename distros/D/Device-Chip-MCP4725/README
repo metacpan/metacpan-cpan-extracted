@@ -1,0 +1,73 @@
+NAME
+
+    Device::Chip::MCP4725 - chip driver for MCP4725
+
+SYNOPSIS
+
+     use Device::Chip::MCP4725;
+    
+     my $chip = Device::Chip::MCP4725->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     # Presuming Vcc = 5V
+     $chip->write_dac( 4096 * 1.23 / 5 )->get;
+     print "Output is now set to 1.23V\n";
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a
+    Microchip MCP4725 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ addr
+
+    The I²C address of the device. Can be specified in decimal, octal or
+    hex with leading 0 or 0x prefixes.
+
+ACCESSORS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Returns a HASH reference containing the chip's current configuration
+
+       RDY => 0 | 1
+       POR => 0 | 1
+    
+       PD  => "normal" | "1k" | "100k" | "500k"
+       DAC => 0 .. 4095
+    
+       EEPROM_PD  => "normal" | "1k" | "100k" | "500k"
+       EEPROM_DAC => 0 .. 4095
+
+METHODS
+
+ write_dac
+
+       $chip->write_dac( $dac, $powerdown )->get
+
+    Writes a new value for the DAC output and powerdown state in "fast"
+    mode.
+
+    $powerdown is optional and will default to 0 if not provided.
+
+ write_dac_and_eeprom
+
+       $chip->write_dac_and_eeprom( $dac, $powerdown )
+
+    As "write_dac" but also updates the EEPROM with the same values.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

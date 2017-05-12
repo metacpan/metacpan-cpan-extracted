@@ -1,0 +1,17 @@
+2.2.0 11/22/2015
+
+- deparse by explicit address; allow '@' prefix; change operaiton
+  slightly depending on whether we are deparsing the rrent address
+
+- Note that this works now for 5.18
+
+- Add set/show autodeparse
+
+- switch from useing codref2list to coderef2info
+
+2.1.0
+
+- Be able to deparse main::. (requires DeparseTree 2.1.0)
+
+2.0.0
+- Initial release

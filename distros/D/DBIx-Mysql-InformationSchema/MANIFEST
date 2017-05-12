@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-Mysql-InformationSchema.t
+lib/DBIx/Mysql/InformationSchema.pm

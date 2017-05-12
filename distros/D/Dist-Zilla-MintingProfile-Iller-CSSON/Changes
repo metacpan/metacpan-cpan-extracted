@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-MintingProfile-Iller-CSSON
+
+0.0101 2016-01-20T20:46:58Z UTC
+ [Bug Fixes]
+ - Removed faulty Build.PL (fixes #1).
+
+ [Enhancements]
+ - Added simple test template.
+
+ [Requirements]
+ - Added missing prereqs: Carp, Dist::Zilla::Role::MintingProfile
+
+0.0100 2016-01-14T23:40:08Z UTC
+ - Initial release
+

@@ -1,0 +1,14 @@
+This file was generated with {{ ref($plugin) }} {{ $plugin->VERSION }}
+from a template file originating in {{
+    (my $module = $plugin->dist) =~ s/-/::/g;
+    eval "require $module";
+    $plugin->dist . '-' . $module->VERSION
+}} and with the help of Dist::Zilla {{ $dist->VERSION || eval '$' . ref($dist) . '::ISA[0]->VERSION' }}.
+
+Les hivers de mon enfance étaient des saisons longues, longues. Nous vivions
+en trois lieux: l'école, l'église et la patinoire; mais la vraie vie était sur
+la patinoire.
+
+[Le numéro de Maurice Richard est {{ $numero }}.]
+
+¡And hello 김도형 - Keedi Kim!

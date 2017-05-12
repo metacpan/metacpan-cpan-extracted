@@ -1,0 +1,35 @@
+DateTime::Event::Cron::Quartz
+=============================
+
+This module generates DateTime objects based on quartz 
+cron-like entries.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime, Readonly, Class::Accessor
+
+SUPPORT
+
+Contact the author <vadim.loginov@gmail.com> directly.
+
+COPYRIGHT AND LICENSE
+
+Based on the source code and documentation of OpenSymphony
+L<http://www.opensymphony.com/team.jsp> Quartz 1.4.2 project licensed
+under the Apache License, Version 2.0
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+Copyright (c) 2009 Vadim Loginov.

@@ -1,0 +1,33 @@
+$Id: README.vms,v 1.1 1999/05/19 15:22:37 mpeppler Exp $
+
+From: "Craig A. Berry" <craig.berry@metamor.com>
+To: Michael Peppler <mpeppler@peppler.org>, dbi-users@fugue.com,
+        vmsperl@perl.org
+Subject: DBD::Sybase 0.15 makefile.pl patch for VMS
+Date: Tue, 18 May 1999 17:39:59 -0500
+
+Two minor fixes to makefile.pl were necessary.  The first one avoids a
+double colon in the filename for MAN3PODS.  The second moves the call
+to unixify up earlier where it needs to be.  The patch at the end of
+this message accomplishes both.  I did my build using DEC C V5.2-003
+on OpenVMS Alpha V7.1 with perl 5.005_03, DBI 1.08.
+
+<NOTE from mpeppler: the patch has been applied to the Makefile.PL>
+
+There is a bug in the VMS portion of Liblist.pm that messes up the
+order of the libraries when creating the linker options file.  You can
+either edit sybase.opt by hand to restore the original order or apply
+the patch available at the following location:
+
+for 5.005_02:
+<http://www.xray.mpe.mpg.de/mailing-lists/vmsperl/1998-09/msg00046.html>
+for 5.005_03:
+<http://www.xray.mpe.mpg.de/mailing-lists/vmsperl/1999-05/msg00057.html>
+
+and a fix for File::Spec:VMS is necessary to get the test suite to even
+begin to work:
+<http://www.xray.mpe.mpg.de/mailing-lists/vmsperl/1999-05/msg00058.html>
+
+Oh, and if you want Dynaloader to find it (pretty important), rename
+sybase.exe to libsybase.exe after you do the install.
+

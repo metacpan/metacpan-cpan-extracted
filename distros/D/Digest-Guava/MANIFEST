@@ -1,0 +1,13 @@
+Changes
+Guava.xs
+lib/Digest/Guava.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+ppport.h
+README
+t/00-use.t
+t/01-basic.t
+t/testdata.json
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

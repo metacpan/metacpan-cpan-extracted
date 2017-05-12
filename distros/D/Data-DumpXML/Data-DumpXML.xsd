@@ -1,0 +1,113 @@
+<schema
+  xmlns='http://www.w3.org/2001/XMLSchema'
+  targetNamespace='http://www.cpan.org/modules/by-authors/Gisle_Aas/Data-DumpXML-1.05.xsd'
+  xmlns:t='http://www.cpan.org/modules/by-authors/Gisle_Aas/Data-DumpXML-1.05.xsd'>
+
+  <attributeGroup name='stdattlist'>
+   <attribute name='id' type='ID' use='optional'/>
+   <attribute name='class' type='string' use='optional'/>
+  </attributeGroup>
+
+  <attribute name='encoding' default='plain'>
+   <simpleType>
+    <restriction base='string'>
+     <enumeration value='plain'/>
+     <enumeration value='base64'/>
+    </restriction>
+   </simpleType>
+  </attribute>
+
+  <group name='scalar'>
+   <choice>
+    <element ref='t:undef'/>
+    <element ref='t:str'/>
+    <element ref='t:ref'/>
+    <element ref='t:alias'/>
+   </choice>
+  </group>
+
+ <element name='data'>
+  <complexType>
+   <sequence minOccurs='0' maxOccurs='unbounded'>
+    <group ref='t:scalar'/>
+   </sequence>
+  </complexType>
+ </element>
+
+ <element name='undef'>
+  <complexType>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+
+ <element name='str'>
+  <complexType>
+   <simpleContent>
+    <extension base="string">
+     <attributeGroup ref='t:stdattlist'/>
+     <attribute ref='t:encoding'/>
+    </extension>
+   </simpleContent>
+  </complexType>
+ </element>
+
+ <element name='ref'>
+  <complexType>
+   <choice>
+    <group ref='t:scalar'/>
+    <element ref='t:array'/>
+    <element ref='t:hash'/>
+    <element ref='t:glob'/>
+    <element ref='t:code'/>
+   </choice>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+
+ <element name='alias'>
+  <complexType>
+   <attribute name='ref' type='IDREF' use='optional'/>
+  </complexType>
+ </element>
+
+ <element name='array'>
+  <complexType>
+   <sequence minOccurs='0' maxOccurs='unbounded'>
+    <group ref='t:scalar'/>
+   </sequence>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+
+ <element name='hash'>
+  <complexType>
+   <sequence minOccurs='0' maxOccurs='unbounded'>
+    <element ref='t:key'/>
+    <group ref='t:scalar'/>
+   </sequence>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+
+ <element name='key'>
+  <complexType>
+   <simpleContent>
+    <extension base="string">
+     <attribute ref='t:encoding'/>
+    </extension>
+   </simpleContent>
+  </complexType>
+ </element>
+
+ <element name='glob'>
+  <complexType>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+
+ <element name='code'>
+  <complexType>
+   <attributeGroup ref='t:stdattlist'/>
+  </complexType>
+ </element>
+</schema>

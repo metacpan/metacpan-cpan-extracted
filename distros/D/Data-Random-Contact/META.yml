@@ -1,0 +1,27 @@
+---
+abstract: 'Generate random contact data'
+author:
+  - 'Dave Rolsky <autarch@urth.org>'
+build_requires:
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Random-Contact
+requires:
+  Class::Load: 0
+  DateTime: 0
+  Moose: 0
+  MooseX::Types: 0
+  autodie: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Random-Contact
+  repository: http://hg.urth.org/hg/Data-Random-Contact
+version: 0.05

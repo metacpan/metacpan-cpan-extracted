@@ -1,0 +1,23 @@
+$Id: Changes,v 1.6 2001/07/28 06:36:50 btrott Exp $
+
+Revision history for Data::Buffer
+
+0.04  2001.07.27
+    - Added new_with_init.
+    - Added set_offset and reset_offset.
+
+0.03  2001.07.13
+    - Fixed bug in get_int8 and put_int8; was using signed char ('c'),
+      should have been using unsigned char ('C').
+    - Added get_bytes and put_bytes; the first grabs a number of bytes
+      from the buffer and returns them, the latter appends bytes into
+      the buffer.
+    - Added extract, which grabs a piece of the buffer and returns a
+      new buffer containing that chunk, updating the offset in the
+      original buffer.
+
+0.02  2001.05.02
+    - Fixed number of tests in test suite.
+
+0.01  2001.03.01
+    - original version; created by h2xs 1.19

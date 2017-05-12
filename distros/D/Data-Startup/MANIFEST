@@ -1,0 +1,14 @@
+lib/Docs/Site_SVD/Data_Startup.pm
+MANIFEST
+Makefile.PL
+README
+lib/Data/Startup.pm
+t/Data/Startup.d
+t/Data/Startup.pm
+t/Data/Startup.t
+t/Data/File/Package.pm
+t/Data/Test/Tech.pm
+t/Data/Data/Secs2.pm
+t/Data/Data/Str2Num.pm
+t/ExtUtils/SVDmaker/Test.pm
+t/ExtUtils/SVDmaker/Algorithm/Diff.pm

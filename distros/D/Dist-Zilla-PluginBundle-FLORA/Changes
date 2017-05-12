@@ -1,0 +1,67 @@
+Revision history for Dist-Zilla-PluginBundle-FLORA
+
+0.17  Tue  2 Feb 2016 18:47:59 PST
+  * re-release using latest version of self, to eliminate UNKNOWN results from
+    cpantesters
+
+0.16  Sat  1 Aug 2015 13:30:13 PDT
+  * added [Test::NewVersion], to guard against not bumping the distribution
+    version
+  * added [MinimumPerl], for metadata, and [Test::ReportPrereqs], to ensure
+    there will always be a runnable test for every distribution
+  * added missing prereqs (RT#106167)
+
+0.15  Fri  3 Jul 2015 13:10:37 PDT
+  * resolve deprecation warnings from old plugins
+  * add ConfigSlicer, PluginRemover roles
+
+0.14  Tue, 05 Jul 2011 23:51:47 +0200
+  * Use metacpan.org instead of search.cpan.org for the distribution homepage
+    metadata.
+
+0.13  Tue, 05 Oct 2010 00:24:29 +0200
+  * Allow 'catsvn' to be used to refer to dists in Catalyst's SVN repository.
+  * Use AutoPrereqs instead of the deprecated AutoPrereq plugin.
+  * Minor documentation fixes.
+
+0.12  Tue, 15 Jun 2010 11:44:01 +0200
+  * Fix gitmo repository urls.
+
+0.11  Sat, 05 Jun 2010 20:18:39 +0200
+  * Allow EOLTests trailing whitespace checks to be turned off.
+  * Depend on a Pod::Weaver::PluginBundle::FLORA using
+    Pod::Weaver::Plugin::Encoding.
+
+0.10  Sat, 29 May 2010 17:06:50 +0200
+  * Use NoTabsTests and EOLTests instead of SanityTests.
+
+0.09  Wed, 26 May 2010 04:07:04 +0200
+  * Emit additional resources metadata for CPAN META 2.0.
+
+0.08  Sun, 23 May 2010 22:52:39 +0200
+  * Add a way to disable pod coverage testing.
+
+0.07  Thu, 20 May 2010 23:07:15 +0200
+  * Depend on Pod::Weaver::PluginBundle::FLORA 0.02 for the TYPE collector
+    section.
+
+0.06  Sat, 15 May 2010 13:07:27 +0200
+  * Make specifying github repo urls with camel case dist names easier.
+  * Allow specifying the github username to use.
+  * Enable the SanityTests plugin.
+
+0.05  Sun, 09 May 2010 23:23:19 +0200
+  * Make authority configurable.
+
+0.04  Sat, 08 May 2010 21:22:38 +0200
+  * Re-enable PkgVersion.
+
+0.03  Sat, 08 May 2010 21:13:24 +0200
+  * Use @Basic and add Pod{Syntax,Coverage}Tests instead of using @Classic and
+    removing {Pod,Bump}Version.
+
+0.02  Fri, 07 May 2010 04:13:13 +0200
+  * Set authority to cpan:FLORA in both the modules and and metadata.
+
+0.01  Thu, 06 May 2010 20:20:29 +0200
+  * Initial release.

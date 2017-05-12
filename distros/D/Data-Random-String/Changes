@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::Random::String.
+
+0.03  Mon Jan 5 11:55:00 2007
+	   - Removed constraint of Perl 5.8.8 since the module works with previous versions of Perl (thanks to David Betz for testing the module in earlier version of Perl)
+
+0.02  Mon Jan 1 11:08:00 2007
+	   - Pod documentation updates in String.pm
+
+0.01  Thu Dec 28 15:43:52 2006
+       - Initial release.
+

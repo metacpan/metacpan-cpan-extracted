@@ -1,0 +1,23 @@
+lib/Date/ICal.pm
+lib/Date/ICal/Duration.pm
+
+MANIFEST
+Makefile.PL
+README
+INTERNALS
+LICENSE
+Changes
+
+t/00load.t
+t/01sanity.t
+t/02normalize.t
+t/03components.t
+t/04epoch.t
+t/05ical.t
+t/06add.t
+t/07compare.t
+t/08offset.t
+t/09greg.t
+t/10subtract.t
+t/11duration.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,6 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Devel/VersionDump.pm
+t/00-load.t

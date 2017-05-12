@@ -1,0 +1,95 @@
+Devel-Graph
+===========
+
+This module will turn Perl code like the following:
+
+	$a = "9"; my $b = 1;
+	if ($a == 9)
+	  {
+	  $b = 9;
+	  }
+	if ($b == 9)
+	  {
+	  $b = $a + 1; 
+	  }
+	else
+	  {
+	  $c = 1;
+	  }
+	my $i = 0;
+
+into a Graph::Easy object, which lets you then generate output like
+the following:
+
+                      ###################
+                      #      start      #
+                      ###################
+                        |
+                        |
+                        v
+                      +-----------------+
+                      |   $a = "9";     |
+                      |   my $b = 1;    |
+                      +-----------------+
+                        |
+                        |
+                        v
+                      +-----------------+
+                      |  if ($a == 9)   |--+
+                      +-----------------+  |
+                        |                  |
+                        | true             |
+                        v                  |
+                      +-----------------+  |
+                      |    $b = 9;      |  |
+                      +-----------------+  |
+                        |                  |
+                        |                  | false
+                        v                  |
+  +--------+  false   +-----------------+  |
+  | $c = 1 | <------- |  if ($b == 9)   | <+
+  +--------+          +-----------------+
+    |                   |
+    |                   | true
+    |                   v
+    |                 +-----------------+
+    |                 |  $b == $a + 1;  |
+    |                 +-----------------+
+    |                   |
+    |                   |
+    |                   v
+    |                 +-----------------+
+    +---------------> |   my $i = 0;    |
+                      +-----------------+
+                        |
+                        |
+                        v
+                      ###################
+                      #      end        #
+                      ###################
+
+INSTALLATION
+============
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install
+
+Under Windows, you need the "nmake" utility from Microsoft and then
+replace "make" with nmake like so:
+
+   perl Makefile.PL
+   nmake
+   nmake test
+   nmake install
+
+COPYRIGHT AND LICENCE
+=====================
+
+Copyright (C) 2004-2007 by Tels C<http://bloodgate.com>
+
+See the LICENSE file for more information.
+

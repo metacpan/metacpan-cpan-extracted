@@ -1,0 +1,17 @@
+INSTALL file for Date-Holidays-Abstract
+
+$Id: INSTALL 1306 2004-05-13 10:59:01Z jonasbn $
+
+1. tar -xvzf Date-Holidays-Abstract-0.01.tar.gz 
+
+2. cd Date-Holidays-Abstract
+
+3. perl Makefile.PL
+
+4. make
+
+5. make test
+
+6. make install (requires privileged access)
+
+7. make clean  

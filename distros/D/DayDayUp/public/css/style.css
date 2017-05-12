@@ -1,0 +1,19 @@
+img { border:0px }
+body { font-family: geneva, verdana, arial, sans-serif; }
+pre {
+	margin-left: 4%;
+	margin-right: 4%;
+	background: #eee;
+	border: 1px solid #333;
+	color: #000;
+	padding: 1em;
+	padding-top: 0.5em;
+	padding-bottom: 0.5em;
+	white-space: -moz-pre-wrap;  /* Mozilla, supported since 1999 */
+	white-space: -pre-wrap;      /* Opera 4 - 6 */
+	white-space: -o-pre-wrap;    /* Opera 7 */
+	white-space: pre-wrap;       /* CSS3 - Text module (Candidate Recommendation)
+                                 http://www.w3.org/TR/css3-text/#white-space */
+	word-wrap: break-word;       /* IE 5.5+ */
+}
+li { margin:0.5em }

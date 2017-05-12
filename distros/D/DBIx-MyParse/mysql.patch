@@ -1,0 +1,177 @@
+diff -u -r mysql-5.0.33/sql/item_cmpfunc.h mysql-5.0.33-myparse/sql/item_cmpfunc.h
+--- mysql-5.0.33/sql/item_cmpfunc.h	2007-01-09 07:51:50.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_cmpfunc.h	2007-01-12 18:59:49.000000000 -0500
+@@ -611,16 +611,16 @@
+ 
+ class Item_func_case :public Item_func
+ {
+-  int first_expr_num, else_expr_num;
+   enum Item_result cached_result_type;
+   String tmp_value;
+   uint ncases;
+   Item_result cmp_type;
+   DTCollation cmp_collation;
+ public:
++  int first_expr_num, else_expr_num;
+   Item_func_case(List<Item> &list, Item *first_expr_arg, Item *else_expr_arg)
+-    :Item_func(), first_expr_num(-1), else_expr_num(-1),
+-    cached_result_type(INT_RESULT)
++    :Item_func(), cached_result_type(INT_RESULT),
++    first_expr_num(-1), else_expr_num(-1)
+   {
+     ncases= list.elements;
+     if (first_expr_arg)
+@@ -1107,11 +1107,9 @@
+   bool turboBM_matches(const char* text, int text_len) const;
+   enum { alphabet_size = 256 };
+ 
++public:
+   Item *escape_item;
+-  
+   bool escape_used_in_parsing;
+-
+-public:
+   int escape;
+ 
+   Item_func_like(Item *a,Item *b, Item *escape_arg, bool escape_used)
+diff -u -r mysql-5.0.33/sql/item_func.h mysql-5.0.33-myparse/sql/item_func.h
+--- mysql-5.0.33/sql/item_func.h	2007-01-09 07:51:28.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_func.h	2007-01-12 18:16:30.000000000 -0500
+@@ -898,8 +898,8 @@
+ 
+ class Item_func_benchmark :public Item_int_func
+ {
+-  ulong loop_count;
+ public:
++  ulong loop_count;
+   Item_func_benchmark(ulong loop_count_arg,Item *expr)
+     :Item_int_func(expr), loop_count(loop_count_arg)
+   {}
+@@ -1265,10 +1265,10 @@
+ 
+ class Item_func_get_system_var :public Item_func
+ {
++public:
+   sys_var *var;
+   enum_var_type var_type;
+   LEX_STRING component;
+-public:
+   Item_func_get_system_var(sys_var *var_arg, enum_var_type var_type_arg,
+                            LEX_STRING *component_arg, const char *name_arg,
+                            size_t name_len_arg);
+diff -u -r mysql-5.0.33/sql/item_row.h mysql-5.0.33-myparse/sql/item_row.h
+--- mysql-5.0.33/sql/item_row.h	2007-01-09 07:51:08.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_row.h	2007-01-12 19:01:43.000000000 -0500
+@@ -16,20 +16,21 @@
+ 
+ class Item_row: public Item
+ {
+-  Item **items;
+-  table_map used_tables_cache;
+-  uint arg_count;
+   bool const_item_cache;
+   bool with_null;
+ public:
++  Item **items;
++  uint arg_count;
++  table_map used_tables_cache;
++
+   Item_row(List<Item> &);
+   Item_row(Item_row *item):
+     Item(),
++    const_item_cache(item->const_item_cache),
++    with_null(0),
+     items(item->items),
+-    used_tables_cache(item->used_tables_cache),
+     arg_count(item->arg_count),
+-    const_item_cache(item->const_item_cache),
+-    with_null(0)
++    used_tables_cache(item->used_tables_cache)
+   {}
+ 
+   enum Type type() const { return ROW_ITEM; };
+diff -u -r mysql-5.0.33/sql/item_strfunc.h mysql-5.0.33-myparse/sql/item_strfunc.h
+--- mysql-5.0.33/sql/item_strfunc.h	2007-01-09 07:51:08.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_strfunc.h	2007-01-12 18:16:30.000000000 -0500
+@@ -357,9 +357,9 @@
+ class Item_func_encode :public Item_str_func
+ {
+  protected:
+-  SQL_CRYPT sql_crypt;
+   String seed;
+ public:
++  SQL_CRYPT sql_crypt;
+   Item_func_encode(Item *a, char *seed_arg):
+     Item_str_func(a), sql_crypt(seed_arg)
+     {
+diff -u -r mysql-5.0.33/sql/item_subselect.h mysql-5.0.33-myparse/sql/item_subselect.h
+--- mysql-5.0.33/sql/item_subselect.h	2007-01-09 07:51:49.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_subselect.h	2007-01-12 18:16:30.000000000 -0500
+@@ -37,10 +37,6 @@
+   THD *thd;
+   /* substitution instead of subselect in case of optimization */
+   Item *substitution;
+-  /* unit of subquery */
+-  st_select_lex_unit *unit;
+-  /* engine that perform execution of subselect (single select or union) */
+-  subselect_engine *engine;
+   /* old engine if engine was changed */
+   subselect_engine *old_engine;
+   /* cache of used external tables */
+@@ -55,6 +51,13 @@
+   bool const_item_cache;
+ 
+ public:
++
++  /* unit of subquery */
++  st_select_lex_unit *unit;
++
++  /* engine that perform execution of subselect (single select or union) */
++  subselect_engine *engine;
++
+   /* changed engine indicator */
+   bool engine_changed;
+   /* subquery is transformed */
+@@ -238,7 +241,6 @@
+ class Item_in_subselect :public Item_exists_subselect
+ {
+ protected:
+-  Item *left_expr;
+   /*
+     expr & optimizer used in subselect rewriting to store Item for
+     all JOIN in UNION
+@@ -249,6 +251,7 @@
+   bool abort_on_null;
+   bool transformed;
+ public:
++  Item *left_expr;
+   /* Used to trigger on/off conditions that were pushed down to subselect */
+   bool enable_pushed_conds;
+   Item_func_not_all *upper_item; // point on NOT/NOP before ALL/SOME subquery
+diff -u -r mysql-5.0.33/sql/item_timefunc.h mysql-5.0.33-myparse/sql/item_timefunc.h
+--- mysql-5.0.33/sql/item_timefunc.h	2007-01-09 07:51:17.000000000 -0500
++++ mysql-5.0.33-myparse/sql/item_timefunc.h	2007-01-12 18:16:30.000000000 -0500
+@@ -763,11 +763,11 @@
+ 
+ class Item_char_typecast :public Item_typecast
+ {
+-  int cast_length;
+-  CHARSET_INFO *cast_cs, *from_cs;
+   bool charset_conversion;
+   String tmp_value;
+ public:
++  int cast_length;
++  CHARSET_INFO *cast_cs, *from_cs;
+   Item_char_typecast(Item *a, int length_arg, CHARSET_INFO *cs_arg)
+     :Item_typecast(a), cast_length(length_arg), cast_cs(cs_arg) {}
+   enum Functype functype() const { return CHAR_TYPECAST_FUNC; }
+@@ -980,8 +980,8 @@
+ 
+ class Item_func_timestamp_diff :public Item_int_func
+ {
+-  const interval_type int_type;
+ public:
++  const interval_type int_type;
+   Item_func_timestamp_diff(Item *a,Item *b,interval_type type_arg)
+     :Item_int_func(a,b), int_type(type_arg) {}
+   const char *func_name() const { return "timestampdiff"; }

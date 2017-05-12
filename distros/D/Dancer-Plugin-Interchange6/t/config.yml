@@ -1,0 +1,38 @@
+log: debug
+logger: capture
+show_errors: 0
+template: simple
+plugins:
+  Auth::Extensible:
+    disable_roles: 0
+    no_login_handler: 1
+    login_page: /login
+    logout_page: /logout
+    denied_page: /login/denied
+    no_default_pages: 1
+    no_api_change_warning: 1
+    realms:
+      users:
+        provider: 'DBIC'
+        db_connection_name: 'default'
+        users_resultset: User
+        roles_relationship: roles
+        role_column: name
+        username_column: username
+        password_column: password
+        password_check: check_password
+  Interchange6:
+    payment:
+      default_provider: MockSuccess
+      providers:
+        MockDie:
+          foo: bar
+        MockFail: 
+          foo: bar
+        MockSuccess:
+          foo: bar
+  Interchange6::Routes:
+    checkout:
+      active: 1
+    navigation:
+      records: 10

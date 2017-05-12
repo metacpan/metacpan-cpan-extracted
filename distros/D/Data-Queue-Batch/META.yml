@@ -1,0 +1,38 @@
+---
+abstract: 'FIFO data structure for "batching" items'
+author:
+  - 'Ichito Nagata <i.nagata110@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Synopsis::Expectation: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.8, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Queue-Batch
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Queue::Batch:
+    file: lib/Data/Queue/Batch.pm
+    version: '0.04'
+requires:
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/i110/Data-Queue-Batch/issues
+  homepage: https://github.com/i110/Data-Queue-Batch
+  repository: git://github.com/i110/Data-Queue-Batch.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

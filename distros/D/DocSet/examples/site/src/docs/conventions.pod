@@ -1,0 +1,69 @@
+=head1 NAME
+
+Conventions used in the mod_perl Documentation
+
+=head1 Description
+
+We use a number of conventions in this documentation, that are mostly
+easy to understand; if you're in doubt, look here for the explanation.
+
+
+=head1 Prompts
+
+For commands that should be typed in your shell (or your I<Command
+prompt>, or whatever your OS calls it), we use the following prompts:
+
+  % ls -l
+
+for the user-mode prompt (ie. a normal user account, with no special
+privileges).
+
+  # ls -l
+
+for the superuser prompt: this means you'll have to change users to
+become the super user on your platform. On Unix you can use the C<su>
+or C<sudo> utilities to gain superuser privileges (provided you know
+the I<root> password); on other platforms you might have to change the
+user -- to I<Administrator> for example on Windows.
+
+If you cannot obtain super user privileges, there will often be
+explanations about how doing the selected task without those
+privileges; in any other case, contact your system administrator.
+
+On documents specific to a certain Operating System, the prompt might
+change. For example, in Windows documentation, we might use:
+
+  C:\> nmake
+
+instead of any other prompt.
+
+
+=head1 Typographical conventions
+
+We try to be consisten about our use of different fonts and faces, so
+that you'll recognize special words more easily.
+
+=over
+
+=item *
+
+I<Italic>
+
+is used for file names or things you have to replace.
+
+=item *
+
+C<Constant width>
+
+is used for commands/program names, configuration items or Perl
+code/function names, and manpage references.
+
+=item *
+
+B<Bold>
+
+is used for things we want to stress.
+
+=back
+
+=cut

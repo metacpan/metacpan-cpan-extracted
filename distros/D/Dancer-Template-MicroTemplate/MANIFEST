@@ -1,0 +1,13 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dancer/Template/MicroTemplate.pm
+t/00-load.t
+t/01-main.t
+t/02-app.t
+t/lib/TestApp.pm
+t/views/01-main.mt
+t/views/02-app.mt

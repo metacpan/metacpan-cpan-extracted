@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 48b351d0d9492f846269151f9c5e4c8b4d482305 CONTRIBUTORS
+SHA1 a70a30c5c831472c2ee6b43158bccffdec427925 Changes
+SHA1 5005a70a36b3315cfd54234a968b04e884ebcc44 INSTALL
+SHA1 4c4d8319718ef9f8df374b44197e951e076cb156 LICENSE
+SHA1 80c1195b0d19e3fe4774aed603ab4bacbd943e1b MANIFEST
+SHA1 4b564f7e3be67c4cb08f84d2fc7e1372edb00467 META.json
+SHA1 2537ef2c6215fd28791cfbaba709c0c34e69d9e4 META.yml
+SHA1 8136b7da0975d6a535110670a3567acd08714a14 Makefile.PL
+SHA1 032e228ac99c7c148f76716229af532bf0b2f6c6 README
+SHA1 96bcb8dca80e57fa750cace3e248445f7418f1c0 README.mkdn
+SHA1 f084353ee596afb273f4975784dcc4365cd98dd2 cpanfile
+SHA1 2e53c0dad30d3b5b81f9aa44998f69bb2506ccea doap.xml
+SHA1 e5c1517a8c15120e8b1eca76fd2f387612d24f05 lib/DBIx/NoSQL.pm
+SHA1 a0291ddc7bb1085f463d9b61a608f575d1e020db lib/DBIx/NoSQL/ClassScaffold.pm
+SHA1 1155e7911e652297a63dd3beeb9de60212698430 lib/DBIx/NoSQL/Entity.pm
+SHA1 da04b0ebd3522725f285df183fae831c4f4ccdb4 lib/DBIx/NoSQL/Model.pm
+SHA1 df8d6a567dd2c71d285a99bbd6a0f83219168614 lib/DBIx/NoSQL/Model/Field.pm
+SHA1 abb36f0bc12f0196b998bbe68b85246ec702db73 lib/DBIx/NoSQL/Model/Index.pm
+SHA1 5bebc95b6b6581279f87688e71c6fc09c1de89eb lib/DBIx/NoSQL/Search.pm
+SHA1 7b56daed7230133758278735398cd79f62e69308 lib/DBIx/NoSQL/Stash.pm
+SHA1 06759d59310813efff604017405ee7ef27fdd49a lib/DBIx/NoSQL/Storage.pm
+SHA1 2f7a3ec7e5f17971e6f44c37ed97fa7f1b811ae7 lib/DBIx/NoSQL/Store.pm
+SHA1 2d79f0706c0bf8d8ce19b22f533d2122bfa263cf lib/DBIx/NoSQL/TypeMap.pm
+SHA1 9fed231dc15b231ee9ba69df977364af6f438f4d lib/DBIx/NoSQLite.pm
+SHA1 116b01cbacd1a56c993277a48f9964d7fd6c1bfb t/00-compile.t
+SHA1 f6c20818ef3373e40e0275ff96d69a635ec9adf1 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 db54a38395b6b6585e3c178e0bcded4eed1805ca t/01-basic.t
+SHA1 1751fcf400960fc0744c492950bac798efa383e7 t/02-class.t
+SHA1 d876f56378a7a6baf9d2b8388154209d6fe3202c t/03-type-map.t
+SHA1 11ae48521a5fc3dfcd85d084c790acfdbc3132b0 t/04-stash.t
+SHA1 96c4c7543d01b02f94f1cc29107ab57f78e7bfd8 t/05-migrate.t
+SHA1 ee4cbece4a55c203cb68196ecfda6b38e6955937 t/06-synopsis.t
+SHA1 e7eb6ad7e337295d064a0a3d96547307cdcb78d5 t/07-synopsis-NoSQLite.t
+SHA1 ccb8759750c293cdc7079ac3476cc3b4c1536b5a t/08-persist.t
+SHA1 6dcb9f9fdb9995db6c483bd8803c4458ec68cdef t/09-file-connection.t
+SHA1 643351f766b51576f31fde313657253499366438 t/10-next.t
+SHA1 f07d95f33a9ff9212cb1b6d6acb11a49728d471b t/Test.pm
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlj6gEoACgkQ34Hwf+GwC4x0RQCgq0moL1Bbvhb9C0YOE/Ul7n0b
+PagAoMc6JMgOxrVp9BjGbJ+8BfqhvLxR
+=QdOW
+-----END PGP SIGNATURE-----

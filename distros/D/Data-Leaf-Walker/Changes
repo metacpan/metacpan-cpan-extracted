@@ -1,0 +1,24 @@
+Revision history for Data-Leaf-Walker
+
+0.21    5/1/2013
+        - bug fix for exists() calls where the queried key path is two or more
+          levels deeper than existing key path
+          (https://github.com/danboo/perl-data-leaf-walker/issues/1)
+
+0.20    Sat Jan  9 23:13:59 2010
+        - fix but in _each() handling of auto extended arrays (indexes filled in
+          the gap, do not exist())
+        - added reset() method to handle immediate iterator resetting
+        - added opts() method to get or set options
+        - added t/twig.t to test example of iterating over the twig values
+          (those just above the leaves)
+
+0.10    Mon Jan  4 23:10:41 2010
+        - embellish, clarify and clean docs
+        - implemented max_depth and min_depth iteration depth limiters
+        - added tests for iteration depth limiters
+
+0.01    Sat Jan  2 11:00:40 2010
+        - initial release
+        
+

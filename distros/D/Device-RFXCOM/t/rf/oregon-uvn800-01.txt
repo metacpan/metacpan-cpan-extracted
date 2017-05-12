@@ -1,0 +1,10 @@
+48da7814560010073480
+
+master oregon 48.da7814560010073480:
+  sensor/uvn800.56[uv]=0
+  sensor/uvn800.56[battery]=100%
+
+
+
+
+

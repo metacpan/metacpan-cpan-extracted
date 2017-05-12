@@ -1,0 +1,216 @@
+DBIx::Easy - Einfache DBI-Schnittstelle
+***************************************
+
+   * Die Homepage von `DBIx::Easy' ist http://www.linuxia.de/DBIx/Easy/.
+   * Die aktuelle Version (zur Zeit 0.15) ist erhältlich als 
+     http://www.linuxia.de/DBIx/Easy/DBIx-Easy.tar.gz.
+   * Für weitere Informationen ist die Manpage heranzuziehen.
+
+Anforderungen
+*************
+
+   * DBI (URL: http://www.symbolstone.org/technology/perl/DBI/index.html)
+   * `DBD::Pg', `DBD::mysql', `DBD::mSQL', `DBD::ODBC' or `DBD::sybase'
+     (andere Datenbanktreiber auf Anfrage)
+
+Installation
+************
+
+
+tar -xzf DBIx-Easy.tar.gz
+cd DBIx-Easy-0.15
+perl Makefile.PL
+make
+make install
+
+
+Skripte
+*******
+
+Das `DBIx::Easy'-Paket enthält die folgenden Skripte: 
+
+
+Name                Beschreibung                                   Bemerkungen 
+`dbs_dumptabdata'   erzeugt Dateisatz mit SQL-Tabellendaten                    Manual page
+`dbs_dumptabstruct' erzeugt Dateisatz mit SQL-Tabellenstrukturen               Manual page
+`dbs_empty'         löscht alle Daten aus einer SQL-Datenbank                  Manual page
+`dbs_printtab'      gibt Daten einer SQL-Tabelle aus               Neu in 0.07 Manual page
+`dbs_update'        aktualisiert SQL-Datenbank aus einer Textdatei             Manual page
+
+
+Debianpaket
+***********
+
+Diese Anwendung ist auch als Debianpaket verfügbar. Der Maintainer ist
+Dennis Schön <dennis@cobolt.net>. Die Downloadadresse ist 
+http://www.linuxia.de/DBIx/Easy/libdbix-easy-perl_0.15-1_all.deb.
+
+Änderungen
+**********
+
+0.15
+****
+
+`Easy.pm'
+=========
+
+   * Unterstützung für ODBC und Sybase hinzugefügt
+
+0.14
+****
+
+`Easy.pm'
+=========
+
+   * Optionalen Parameter `map' der Methode `random_row' implementiert.
+     Dieser war bereits in früheren Versionen dokumentiert.
+
+0.13
+****
+
+`Easy.pm'
+=========
+
+   * Das Passwort in `~/.my.cnf' wird nicht mehr für Datenbanken auf anderen
+     Rechnern verwendet
+   * Port der Datenbank kann nun auch konfiguriert werden
+   * Neue Methode `is_auth_error'
+
+`dbs_dumptabdata'
+=================
+
+   * `--cleanse' schlug in einigen Fällen fehl, wenn einer der Schlüssel '`0''
+     war
+
+`dbs_printtab'
+==============
+
+   * neue Option `--sort'
+
+`dbs_update'
+============
+
+   * `dbs_printtab' wird nicht mehr als Programm aufgerufen, sondern
+     imitiert
+   * `--headline' und `--format=CSV' waren nicht vollkommen kompatibel
+
+0.12
+****
+
+`Easy.pm'
+=========
+
+   * neue Methode `random_row'
+
+0.11
+****
+
+   * verschiedene Warnungen, die vor allem im Zusammenhang mit Perl 5.6
+     aufgetreten sind, wurden behoben
+
+`Easy.pm'
+=========
+
+   * neue Methode `delete'
+
+`dbs_update'
+============
+
+   * neue Option `--match-sql'
+
+0.10
+****
+
+`dbs_dumptabdata'
+=================
+
+   * Der `user'-Parameter wird an `dbs_printtab' übergeben.
+
+0.09
+****
+
+`Easy.pm'
+=========
+
+   * Tabulator wird geschützt in Methode `view'
+   * Tabellenstrukturen werden in einem Cache abgelegt
+   * neue Methoden `columns', `types', `sizes', `typemap', `sizemap'
+
+`dbs_dumptabdata', `dbs_dumptabstruct'
+======================================
+
+   * um die Kompatibilität mit älteren MySQL-Versionen zu erhalten, werden
+     die Optionen zuerst an `mysqldump' übergeben
+
+`dbs_update'
+============
+
+   * Rückgabewerte von benutzerdefinierten Filter zeigen an, ob ein
+     Datensatz gültig ist
+   * Fehler bei der explizite Spaltenangabe mit `--columns' behoben
+   * Tabulatoren werden wieder hergestellt
+   * der durch `--routine' angegebene benutzerdefinierter Filter wird nur
+     einmal angewendet
+   * Komma ist jetzt voreingestelltes Trennzeichen für das CSV-Format
+   * leerer String wird für Stringtypen anstatt eines NULL-Wertes verwendet
+   * neue Option `--rows'
+   * Option `--keys' läßt Schlüsselnamen zu
+   * Ausgabe einer Warnung bei fehlenden Typinformationen
+
+0.08
+****
+
+`dbs_update'
+============
+
+   * Fehler behoben, der `--cleanse' durch Anwachsen der SQL-Anweisung mit
+     jedem zu löschenden Datensatz unbrauchbar gemacht hat
+   * Fehler behoben, der bei der Kombination von `--headline' und `--map'
+     auftreten kann
+   * Leerzeichen werden aus Spaltennamen entfernt, die der Kopfzeile der
+     Eingabe entstammen
+   * Trennzeichen für das CSV-Format kann von der Kommandozeile festgelegt
+     werden
+   * `--columns' kann zum expliziten Ausschluß von Tabellenspalten benutzt
+     werden
+   * Leerzeichen werden aus der Parameterliste für `--columns' entfernt
+   * Das erste Feld kann sowohl den Tabellennamen als auch eine Startspalte
+     enthalten anstatt nur den Tabellennamen.
+   * Dokumentation um Beispiel für `--routine' erweitert
+
+0.07
+****
+
+   * neues Skript `dbs_printtab'
+   * aussagekräftiger im Falle einer fehlgeschlagenen Verbindung
+   * Methode `view' verbessert im Hinblick auf die `limit'-Option, neue
+     Option `separator' hinzugefügt, Tabulator ist jetzt das voreingestellte
+     Trennzeichen, Zeilenendezeichen werden umgewandelt
+   * neue Option `--exclude-matching-tables' für `dbs_dumptabdata', `
+     dbs_dumptabstruct' und `dbs_empty'
+   * neue Option `--tables' für `dbs_empty', `dbs_dumptabstruct' and `
+     dbs_dumptabdata'
+   * neue Optionen `--cleanse', `--columns', `--format', `--keys', `--map', `
+     --skipbadlines' und `--update-only' für `dbs_update'
+   * neue Option `--use-printtab' für `dbs_dumptabdata'
+   * neue Option `--pipe' für `dbs_dumptabstruct'
+   * `dbs_dumptabstruct' speichert nun auch Sequenzen
+   * zusätzlicher optionaler Parameter CONDITION für Methode `makemap'
+   * zusätzlicher optionaler Parameter COLUMNS für Methode `view'
+   * aussagekräftigere Fehlermeldungen von `dbs_update', Bestätigung der Verä
+     nderungen, Zeilenendezeichen werden wieder hergestellt, Tabellenname wird
+     gemerkt wenn er mit `--table' angegeben wurde, Wagenrückläufe werden aus der
+     Eingabe entfernt
+   * Aufruf von `rollback' in der Fehlerbehandlungsroutine wird nicht getä
+     tigt, sollte `AutoCommit' aktiviert sein.
+   * neue Methode `is_table', `sequences'
+
+Autoren
+*******
+
+Stefan Hornburg <racke@linuxia.de>
+
+Dennis Schön <dennis@cobolt.net>
+
+Unterstützung für Sybase und ODBC wurde von David B. Bitton 
+<david@codenoevil.com> zur Verfügung gestellt.

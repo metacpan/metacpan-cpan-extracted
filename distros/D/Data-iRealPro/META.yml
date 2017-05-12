@@ -1,0 +1,31 @@
+---
+abstract: 'Convert iRealBook/iRealPro data'
+author:
+  - 'Johan Vromans <jvromans@squirrel.nl>'
+build_requires:
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-iRealPro
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Data::Struct: '1.701'
+  Font::TTF: '1.06'
+  HTML::Entities: '3.69'
+  JSON::PP: '2.273'
+  PDF::API2: '2.026'
+  Text::CSV_XS: '1.19'
+  perl: '5.010000'
+resources:
+  repository: git://github.com/sciurius/perl-Data-iRealPro
+version: '1.07'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

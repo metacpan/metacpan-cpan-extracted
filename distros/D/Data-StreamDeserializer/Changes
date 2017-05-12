@@ -1,0 +1,12 @@
+Revision history for Perl extension Data::StreamDeserializer.
+
+0.01  Sat Jan 29 15:03:40 2011
+	- original version; created by h2xs 1.23 with options
+		-n Data::StreamDeserializer
+
+0.04  Sat Feb  5 21:32:03 UTC 2011
+        - Add next_object and skip_divider functions.
+        - Rewrite low-level functions to work wih blessed object instead
+          a hash.
+        - Drop useless includes that was created by h2xs.
+        - Hashes like { 'a' => 1, 'a' => 2 } are processed properly.

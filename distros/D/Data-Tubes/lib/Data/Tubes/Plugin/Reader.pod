@@ -1,0 +1,194 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Reader
+
+=head1 DESCRIPTION
+
+This module contains factory functions to generate I<tubes> that ease
+reading of input records.
+
+Each of the generated tubes has the following contract:
+
+=over
+
+=item *
+
+the input record MUST be a hash reference;
+
+=item *
+
+depending on the presence of an argument C<input>, the record itself or
+the sub-hash indicated by C<input> MUST contain a field C<fh> with a
+filehandle. By default, the C<input> field is set to C<source>;
+
+=item *
+
+one field in the hash (according to factory argument C<output>, set to
+C<raw> by default) is set to the output of the reading operation.
+
+=back
+
+The factory functions below have two names, one starting with C<read_>
+and the other without this prefix. They are perfectly equivalent to each
+other, whereas the short version can be handier e.g. when using C<tube>
+or C<pipeline> from L<Data::Tubes>.
+
+=head1 FUNCTIONS
+
+=head2 B<< by_line >>
+
+This is a simple wrapper around L</by_separator>, where the
+C<separator> argument is forced to be a newline C<\n>.
+
+=head2 B<< by_paragraph >>
+
+This is a simple wrapper around L</by_separator>, where the
+C<separator> argument is forced to be the empty string.
+
+=head2 B<< by_record_reader >>
+
+   my $tube = by_record_reader($record_reader, %args); # OR
+   my $tube = by_record_reader(%args); # OR
+   my $tube = by_record_reader(\%args);
+
+read inputs according to a I<record reader> subroutine.
+
+Accepted arguments are:
+
+=over
+
+=item C<emit_eof>
+
+when an end-of-file is hit, emit a record with the output field set to
+C<undef>, so that this condition will be visible in the tubes on the
+downstream;
+
+=item C<identification>
+
+you don't normally need to use this... so look at the code in case you
+have to;
+
+=item C<input>
+
+name of the input field in the record. If defined and not empty, it
+points to a sub-hash that will contain a filehandle field C<fh>;
+otherwise, this C<fh> field MUST be contained directly in the input
+record contents. Defaults to C<source>;
+
+=item C<name>
+
+name of the tube, for easier debugging;
+
+=item C<output>
+
+name of the output field. The output record is ALWAYS a hash reference,
+containing the input record and the output correponding to this key.
+Defaults to C<raw>;
+
+=item C<record_reader>
+
+a sub reference that takes a filehandle as the only input parameter, and
+returns whatever is read. This is the I<main> parameter, so it can also
+be provided as the first unnamed argument when calling this factory
+function. It has no default and is required.
+
+=back
+
+=head2 B<< by_separator >>
+
+   my $tube = by_separator($separator, %args); # OR
+   my $tube = by_separator(%args); # OR
+   my $tube = by_separator(\%args);
+
+read inputs setting a separator string (a-la C<INPUT_RECORD_SEPARATOR>,
+see L<perlvar>).
+
+Accepted arguments are:
+
+=over
+
+=item C<chomp>
+
+apply the C<chomp> function before emitting what's read. Defaults to a
+I<true> value;
+
+=item C<emit_eof>
+
+when an end-of-file is hit, emit a record with the output field set to
+C<undef>, so that this condition will be visible in the tubes on the
+downstream. Defaults to a I<false> value;
+
+=item C<identification>
+
+you don't normally need to use this... so look at the code in case you
+have to;
+
+=item C<input>
+
+name of the input field in the record. If defined and not empty, it
+points to a sub-hash that will contain a filehandle field C<fh>;
+otherwise, this C<fh> field MUST be contained directly in the input
+record contents. Defaults to C<source>;
+
+=item C<name>
+
+name of the tube, for easier debugging;
+
+=item C<output>
+
+name of the output field. The output record is ALWAYS a hash reference,
+containing the input record and the output correponding to this key.
+Defaults to C<raw>;
+
+=item C<separator>
+
+a separator string to set as C<INPUT_RECORD_SEPARATOR>, see L<perlvar>.
+This parameter defaults to C<undef>. It is the I<main> parameter, so it
+can also be provided as the first unnamed argument when calling this
+factory function.
+
+=back
+
+=head2 B<< read_by_line >>
+
+Alias for L</by_line>.
+
+=head2 B<< read_by_paragraph >>
+
+Alias for L</by_paragraph>.
+
+=head2 B<< read_by_record_reader >>
+
+Alias for L</by_record_reader>.
+
+=head2 B<< read_by_separator >>
+
+Alias for L</by_separator>.
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

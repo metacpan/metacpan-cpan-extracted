@@ -1,0 +1,15 @@
+Revision history for Data::Tabulate::Plugin::HTMLTable
+
+0.03    Tue Sep 14 08:52:31 2010
+        - require version >= 2.08 of HTML::Table
+        - switch to Dist::Zilla
+
+0.02    Fri Dec 29 00:17:23 2007
+        - bugfix:
+          - check for version of HTML::Table as of version 2.07 the output changed
+          - added prerequesits to Build.PL
+          - changed 01_render.t as the API of Data::Tabulate changed as of version 0.04
+
+0.01    Wed Dec 27 13:08:02 2006
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,484 @@
+commit 2c9f97179bf98f8e941b383b594246c0a6df51f3 (HEAD -> master, origin/master, origin/HEAD)
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Oct 6 18:38:08 2016 +0200
+
+    ADDED: user can set rule, offset, and cumulative_offset, color
+
+commit f0668745a4a4cd5beb8f6c4de16ef4b96414d8fd
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Jan 14 12:24:02 2016 +0100
+
+    FIXED: Build.PL typo
+
+commit 42aa8bb6c108db95bd8ad2e34ada06eab477b826
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Jan 3 18:00:22 2014 +0100
+
+    CHANGED: bits in bitfield are displayed as bytes
+
+commit 0846bf038503d68db6401b54bd025210fda436e4
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Jan 2 16:52:52 2014 +0100
+
+    FIXED: do not use color cycle when bitfield is not displayed
+
+commit ed332144bc8cf59ecceb91aec32d041372f3539c
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Thu Jan 2 16:23:40 2014 +0100
+
+    ADDED: HEXASCII dump
+
+commit 277d008aa4f6836eaafc16850e1c3a90813ff822
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Fri Dec 27 11:44:24 2013 +0100
+
+    CHANGED: -bw means that only user defined colors are used not that the output is bw
+    CHANGED: Replace "oxff oxff ... skiped" with "skipped 0xff 0xff bytes"
+    CHANGED: Do not show cumulative offset which is zero, first cumulative offset
+
+commit 2294c7a7e684f40c066b796475b6283ef7423c7c
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Wed Dec 18 06:59:44 2013 +0100
+
+    ADDED: new requirements
+
+commit c6a58ed0924254dd0f99cb7ab75bbb3011e9e932
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Wed Dec 18 06:41:45 2013 +0100
+
+    ADDED: new requirements
+
+commit 02055a6f76e97d5d290a02dcb5e37bcd4ce10362
+Merge: 1a90526 41bbe61
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Sun Sep 16 21:15:09 2012 +0200
+
+    FIXED: size and offset handling
+
+commit 1a905267cc49cc786bf20719969fd5cc64953df8
+Author: Nadim Khemir <nadim.khemir@gmail.com>
+Date:   Tue Oct 25 01:07:56 2011 +0200
+
+    Initial commit
+
+commit 41bbe61af190d444dc10fed99783b34f5f1cea96
+Merge: 21d7433 77a0b2a
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 30 16:40:45 2011 +0200
+
+    Merge branch 'gh-pages'
+
+commit 77a0b2ab8595de67f5a9527464c411b7d670eb3a
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 30 16:27:55 2011 +0200
+
+    CHANGED: github index page to contain hdr examples
+
+commit 21d74336d199e7c2dbae757f3723a6c45e004f0b
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 30 16:23:01 2011 +0200
+
+    ADDED: META.yml
+
+commit ebc2420f80ba8f72fa24c33ba5226cda9b9a0d79 (origin/gh-pages)
+Author: Nadim Khemir <nadim@khemir.net>
+Date:   Mon May 30 07:19:46 2011 -0700
+
+    github generated gh-pages branch
+
+commit 8138ed3bf54de0a4d2a379a380bb1a5fe0d2bb66
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 30 15:46:03 2011 +0200
+
+    ADDED: accept hexadecimal values in hdr options
+    
+    FIXED: ascii headers use hex in hex mode
+    FIXED: documented use of hexadecimal values in range descriptions
+
+commit 3319db918be8a42ba628c1d7f22d0c73d1a91277
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 30 13:09:28 2011 +0200
+
+    CHANGED: --offset_start aligned on boundary
+
+commit fff348dbd89679e5442d5e3d15a47abb9c15572e
+Author: nadim khemir <nadim@khemir.net>
+Date:   Tue May 24 01:56:45 2011 +0200
+
+    ADDED: range definition can be defined with decimal or hexadecimal numbers
+
+commit e703fc6a7a38a2896ede578b5c74879c9160cb3a
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 23:56:10 2011 +0200
+
+    CHANGED: Updated documentation
+
+commit d6f37ec39526e3513536254c9500ec711c4f402d
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 21:37:08 2011 +0200
+
+    CHANGED: redefined color and set default bw color to bright white
+
+commit e54e649b1887d635b85f90ea8048935aa1d3d141
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 21:19:30 2011 +0200
+
+    FIXED: bitfield not displayed
+    
+    FIXED: skipp range accepts x or X
+
+commit 926226f0aea5d36543e982ab34a27db3bfc569d2
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 20:05:11 2011 +0200
+
+    CHANGED: Align data in dump when skipping ranges
+
+commit 79cf9bc432e6369b870b549d979572b342b5020e
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 11:14:56 2011 +0200
+
+    FIXED: wrong offset when displaying skip field #68390
+
+commit b54ea11229ba808681f0014cffc81f0af9a3231d
+Author: nadim khemir <nadim@khemir.net>
+Date:   Mon May 23 10:44:58 2011 +0200
+
+    ADDED: header range type
+
+commit 0b09a7a53aa8df86e8161b7b1ba02671defa3b10
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Aug 22 00:09:51 2010 +0200
+
+    CHANGED: better bitfield error messages
+
+commit 1a44797303b72ae26b8e3401d0ade16dccf28c3d
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Aug 21 23:27:29 2010 +0200
+
+    CHANGED: bitfield error message. RT #60545
+
+commit b25d7e4df452fd243cc2213a7054beee7c794a16
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue May 4 11:39:53 2010 +0200
+
+    ADDED: whole byte offset to bitfields
+
+commit a2802708467b2b5957423baae59ce94094d16819
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue May 4 10:42:16 2010 +0200
+
+    CHANGED: comment as sub example
+
+commit b14b9cd308cdbedfba3fb376e18f3b2e18afa487
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun May 2 10:38:46 2010 +0200
+
+    ADDED: better DUMP_[ORIGINAL_]RANGE_DESCRIPTION description
+
+commit b9ce070dbee8ae80cc1fe3dee292e772a3c971da
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat May 1 21:15:12 2010 +0200
+
+    ADDED: IPV4 example in documentation
+
+commit 17a141617198581d6c7153ec52f94bcced90ad87
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat May 1 16:09:22 2010 +0200
+
+    ADDED: DISPLAY_COMMENT_RANGE
+
+commit 78b3de0d0576b8affb597d064e35347376a9aa3f
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat May 1 11:33:37 2010 +0200
+
+    FIXED: in horizontal mode, all bf have the same color
+    FIXED: in horizontal mode, bitfield display was delayed
+
+commit f6292c060103f54a7a83b9bda9334bdb23e51a97
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat May 1 10:54:01 2010 +0200
+
+    ADDED: documented single sub range description arguments
+    ADDED: Better  message if the range descriptionpars is perl and contains errors
+    ADDED: IPV4 header parser example
+
+commit 16e8379897588766583bd9206ca95afcb84e0c95
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat May 1 09:40:09 2010 +0200
+
+    CHANGED: single sub range definition are called at gather time and can choose to not return a range
+    ADDED: MAXIMUM_USER_INFORMATION_SIZE
+
+commit 503c597d4af1d4dd4aa9e62f527d90c46a4c7842
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 28 09:34:15 2010 +0200
+
+    ADDED: GATHERED_CHUNK callback
+
+commit fd2a407abd94f472ba80c6da1becc5dc10f5ba46
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 27 23:31:03 2010 +0200
+
+    CHANGED: object keeps track of gathered ranges even when "dump" is called
+
+commit 7be6471ef95e3a5483cad112d1221425b6372402
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 27 22:54:33 2010 +0200
+
+    CHANGED: refactoring to pass perl critics
+
+commit de758c7e2c16bed2054c450e07655d457208a953
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 26 00:34:49 2010 +0200
+
+    CHANGED: some refactoring
+
+commit 836bf0074092420c1c3cad2f1ed31424011870e0
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 24 14:46:30 2010 +0200
+
+    CHANGED: hdr examples to reflect bit zero is on the right by default
+
+commit 856bea788654642bc7e1940b987f6a908d35b827
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 24 14:36:21 2010 +0200
+
+    CHANGED: module documentation to reflect bit zero is on the right by default
+
+commit 6695c62034eb1e683dbb0409e2e942e26c35c1b1
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 24 14:20:33 2010 +0200
+
+    CHANGED: bitfield bit zero is on the right by default
+
+commit be364a188931e8af16f87a515cb2a40b688e4575
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 24 12:22:02 2010 +0200
+
+    FIXED: colorizer does not handle '<'
+    FIXED: column width computation
+    ADDED: option to add the command line into the output
+    ADDED: option --color_start
+    ADDED: options --start_tag and --end_tag
+    ADDED: option --offset_start
+    ADDED: completed hdr examples
+    CHANGED: use warn instead for carp in hdr command
+
+commit dca055ebfe4bc048cd5b52c490a9b00dbf12137a
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Apr 23 23:16:48 2010 +0200
+
+    ADDED: entries in hdr examples
+    FIXED: size warnings in the right order
+    CHANGED: default colors to bright_ colors
+    FIXED: BITFIELDS_SOURCE was displayed even if not bitfields where to be displayed
+    FIXED: information color in HTML format
+
+commit 881775d5b8b5eb51f93ab085ad82774737a02888
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Apr 22 15:11:59 2010 +0200
+
+    CHANGED: Colorize through Text::Colorizer
+    ADDED: hdr accept a color file definition
+    ADDED: skip ranges
+
+commit d01109fce598f2e091fe41210ed1267c9f6a0208
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 21 21:57:18 2010 +0200
+
+    ADDED: Warn about range truncation due to --maximum_size
+    ADDED: truncated ranges have <T> prepended to their name
+    ADDED: Handle mixed sub and data in the range description
+    FIXED: random color index part of the object
+    CHANGED: Horizontal display do no show bitfields per default
+
+commit 44065d57ae54bf72e98aea9b34b27ee9dfaa0647
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 21 00:34:34 2010 +0200
+
+    ADDED: range description defined by a sub can return complex range
+    definition
+    ADDED: warn if more ranges exist but there is no more data
+
+commit 199a4b127b29f91d2e63f95f8c40bde19ba138c4
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 20 01:06:03 2010 +0200
+
+    FIXED: maximum_size applied within a range
+    FIXED:bitfield displayed one line too late when range last offset == data_width
+    ADDED: truncated ranges (max_size) have their bitfields displayed
+
+commit 7f54546a6c6a5ba062aec8928cdead2e734d4ba0
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 19 00:11:50 2010 +0200
+
+    ADDED: bash completion script generation
+    FIXED: string definition 'name,7,,comment' forced grey as color
+    ADDED: user comments to bitfields
+    CHANGED: unified option names
+
+commit fc395bf4275e414537019cc1479408727219ab69
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 18 23:06:59 2010 +0200
+
+    ADDED: display user info for bitfields
+    FIXED: defining user info without color used grey color
+    FIXED: proper check of bitfield size definition
+
+commit 251ba85fa909c8a2a5cc9383f1ae768047a14388
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 18 11:40:31 2010 +0200
+
+    CHANGES: move object creation to own module
+
+commit 8809c8e84eb323bbaa3669e948b685026c35fa59
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 18 03:32:03 2010 +0200
+
+    ADDED: DISPLAY_BITFIELDS
+
+commit ec569e83dfb7ed8081b183b24716b22fee7e21be
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 17:59:35 2010 +0200
+
+    ADDED: handle range size passed in as a sub ref
+
+commit 29d36b48ff01b4f4726f622da08ec83b31f5daee
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 15:46:28 2010 +0200
+
+    CHANGED: refactored coloring code
+    ADDED: output format verification
+
+commit e02b998d6e21d58234a6352a344d508426804a9e
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 15:12:00 2010 +0200
+
+    CHANGED: split into four modules
+
+commit 48fc8e0c2c8d888206f7e8b794fe9ffdef0ab833
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 14:10:53 2010 +0200
+
+    FIXED: comment fields had data
+
+commit 1446b791f6812db7bb6108da1d818e608c2a5658
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 13:02:57 2010 +0200
+
+    CHANGED: act more like a standard hexdumper if no arguments are given
+
+commit 30fce50547b3f8b3d15426eeb00dd278fd6d7f3a
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 17 03:28:11 2010 +0200
+
+    ADDED: bitfield description parsing
+
+commit 6b7649e960013f53dea70326a0fbd550242d1f35
+Author: nadim khemir <nkh@cpan.org>
+Date:   Fri Apr 16 00:27:38 2010 +0200
+
+    FIXED: missing =end html in pod
+    ADDED: bitfield rendering (parsing not done yet)
+
+commit a633d55dc5629aa214116e25257e5e73b1d0a76f
+Author: nadim khemir <nkh@cpan.org>
+Date:   Thu Apr 15 02:28:05 2010 +0200
+
+    ADDED: HTML rendering
+
+commit 8177c24de8f7d0af4574840718129655f80dc9c9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 14 21:41:47 2010 +0200
+
+    ADDED: horizontal ruler
+    ADDED: max dump size to hdr
+
+commit 022692181f497f59a5eb9d8dd6b8ce00e76d5e75
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 14 16:49:46 2010 +0200
+
+    FIXED: cycle colors should not change before range is changed
+    FIXED: comment and zero size  show when -show_range_name 0
+
+commit 74909c7657edb894efaee4cd7943ce7875fb2619
+Author: nadim khemir <nkh@cpan.org>
+Date:   Wed Apr 14 01:27:56 2010 +0200
+
+    ADDED: user defined parsers
+
+commit 5ef08d2e6f8224978be11160fbb0a0d92439342f
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 13 23:23:20 2010 +0200
+
+    ADDED: DISPLAY_COLUMN_NAMES
+
+commit 5f10e8828a8374fabdae4a076958fa78193ce577
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 13 20:38:13 2010 +0200
+
+    ADDED: show range size in name
+
+commit 1b21732ac6889135f062749561a5240aa5ce6b4a
+Author: nadim khemir <nkh@cpan.org>
+Date:   Tue Apr 13 01:15:09 2010 +0200
+
+    ADDED: comment ranges
+
+commit 6c5dc1bfc3611ccc11e1583a807062f7deecdf46
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 12 23:01:19 2010 +0200
+
+    ADDED: accept input from stdin
+
+commit 7c1ff07a51460813cb15b45c025270264cac1c51
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 12 22:22:57 2010 +0200
+
+    CHANGED: display about missing data in range name (ie: -16:padding)
+
+commit c2581c6a6dab982d5ba4383cbfe93960a5eab9ed
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 12 21:57:20 2010 +0200
+
+    ADDED: MAXIMUM_RANGE_NAME_SIZE
+
+commit bc3646a2d31ea880d1d1eeb81160b96eebb25c86
+Author: nadim khemir <nkh@cpan.org>
+Date:   Mon Apr 12 20:26:40 2010 +0200
+
+    ADDED: accept string range description
+
+commit e214889a7639fbbd8e06b0835afd480d58c48a14
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 11 19:15:45 2010 +0200
+
+    ADDED: Install hdr application
+    FIXED: dependency list
+
+commit a510873b71089fe40f252d0f462371e051d96c57
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 11 19:08:27 2010 +0200
+
+    ADDED: options to handle zero sized range display and warnings
+
+commit ea3f598ea43434ca5d40f16eb7a1cd2fae406246
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 11 18:13:15 2010 +0200
+
+    CHANGED: better range verification
+    ADDED: handle zero size ranges
+    ADDED: range description accept subs
+
+commit df663e70fe85aaea34c045727358b1bbd3a17dc9
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sun Apr 11 01:17:45 2010 +0200
+
+    ADDED: range description checking
+    ADDED: user colors handling
+
+commit 12e9a7ea381d1ac5989e5a7ac9823064345d4cfa
+Author: nadim khemir <nkh@cpan.org>
+Date:   Sat Apr 10 22:21:23 2010 +0200
+
+    INITAL COMMIT

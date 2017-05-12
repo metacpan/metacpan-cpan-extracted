@@ -1,0 +1,45 @@
+Revision history for DBIx-VersionedDDL
+
+0.01    20 October 2009
+        First version, released on an unsuspecting world.
+0.02    20 October 2009
+        Fixed documentation typos.
+0.03    20 October 2009
+        Yikes. More typo fixes.
+0.04    21 October 2009
+        Build assumed existence of data directory, which is not part of distro.
+        This is now created and removed as part of the tests.
+0.05    23 October 2009
+        Documentation update
+0.06    17 March 2010
+        RT #55550, fix coment parsing (succssive lines having -- comments)
+          Reported by by Alan Snelson
+        Added # and C-style comments.
+0.07    10 May 2010
+        * Determine the Oracle Schema by retrieving ANSI Constant SQL_USER_NAME.
+        * Add user-defined statement separator.
+        * If no version is provided, the schema will be upgraded to the latest
+          version in the ddl directory
+0.08    10 May 2010
+        The check regarding whether a table exists now handles db handle
+        FetchHashKeyName = NAME_lc
+0.09    11 May 2010
+        Returns 1 if the schema is already at the requested version
+0.10    13 May 2010
+        Driver name now in lower case
+0.11    28 May 2010
+        RT #57342 - Parse DDL that contains double quotes
+0.12    30 May 2010
+        Whoops RT #57342 changes were missing
+0.13    29 Oct 2010
+        RT #62276 Provide a possibility for custom script processing via plugins.
+        Thanks to Jiri Pavlovsky
+0.14    15 Nov 2010
+        Added File::Slurp as a pre-requisite in Makefile.PL
+0.15    16 Nov 2010
+        * Removed File::Slurp as a pre-req and returned to slurping "by hand"
+        * migrate_schema warns when error encontered
+0.16    16 Nov 2010
+        * Clarify the default processor separator
+0.17    01 Dec 2012
+        * Determine Perl from $^X (RT #77461)

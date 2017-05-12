@@ -1,0 +1,71 @@
+Data::Struct
+
+A Data::Struct is a data structure that can contain values
+(attributes). The values of the attributes can be set at creation
+time, and read and modified at run time. Attributes can be anything
+that Perl can handle.
+
+  use Data::Struct;
+  # Define.
+  struct Person => qw( name address city );
+  # Create.
+  my $p = struct Person => { name = "John Doe", city => "Paris" };
+  # Use.
+  $p->address = "Rue d'Eiffel 4993";
+
+There's no checking done on types. You may want to use
+L<Class::Struct> if you need type checking and inheritance.
+
+This module implements structures without object features. It uses
+lvalue accessors to allow value assignment. Lvalue accessors solve the
+bikeshed problem of naming the accessors:
+
+  attr / attr(1)
+  set_attr / get_attr
+  setAttr / getAttr
+  SetAttr / GetAttr
+  and so on.
+
+Objects are much more powerful. Besides data, they can contain
+behaviour (methods), support inheritance and encapsulation. Since this
+module is dealing with data structuress and not Objects, I put it
+under the Data:: hierarchy.
+
+Please see L<Object::Tiny|Object::Tiny> cum suis for many similar
+ideas.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Struct
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Struct
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Struct
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Struct
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

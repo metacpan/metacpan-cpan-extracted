@@ -1,0 +1,239 @@
+#!/usr/bin/perl -w
+use strict;
+
+use Carp;
+use Danga::Socket;
+use Data::YUID::Generator;
+use Getopt::Long;
+use IO::Socket::INET;
+use POSIX ();
+
+use constant DEFAULT_PORT => 9001;
+
+our $Debug = 0;
+our $Generator;
+our %Stats;
+
+GetOptions(
+        'daemon|d'      => \my($daemonize),
+        'port|p=i'      => \my($port),
+        'hostid|h=s'    => \my($host_id),
+        'debug'         => \$Debug,
+    );
+$port ||= DEFAULT_PORT;
+
+$Generator = Data::YUID::Generator->new($host_id);
+$Stats{started} = time;
+
+daemonize() if $daemonize;
+
+sub debug {
+    print STDERR join('', @_), "\n" if $Debug;
+}
+
+my $server = IO::Socket::INET->new(
+        LocalPort => $port,
+        Type        => SOCK_STREAM,
+        Proto       => 'tcp',
+        Blocking    => 0,
+        Reuse       => 1,
+        Listen      => 10
+    ) or die "Error creating socket: $@";
+
+my $accept_handler = sub {
+    my $sock = $server->accept or return;
+
+    debug "Listen child making a client for " . fileno($sock);
+    $sock->blocking(0);
+
+    my $client = Data::YUID::Server::Client->new($sock);
+    $client->watch_read(1);
+};
+
+Data::YUID::Server::Client->OtherFds(fileno($server) => $accept_handler);
+Data::YUID::Server::Client->EventLoop;
+
+sub daemonize {
+    my $pid;
+
+    ## Fork and exit parent.
+    $pid = fork() and exit 0;
+
+    ## Detach from the terminal.
+    POSIX::setsid()
+        or croak "Cannot detach from controlling terminal";
+
+    ## Prevent possibility of acquiring a controlling terminal.
+    $SIG{'HUP'} = 'IGNORE';
+    $pid = fork() and exit 0;
+
+    ## Change working directory and file mask.
+    chdir '/' or croak "Can't chdir to /: $!";
+    umask 0;
+
+    ## Detach open file descriptors, and re-attach to /dev/null.
+    close STDIN;
+    close STDOUT;
+    close STDERR;
+    open STDIN, '+>/dev/null';
+    open STDOUT, '+>&STDIN';
+    open STDERR, '+>&STDIN';
+}
+
+package Data::YUID::Server::Client;
+use base qw( Danga::Socket );
+use URI::Escape;
+
+use fields qw( read_buf );
+
+sub new {
+    my Data::YUID::Server::Client $client = shift;
+    $client = fields::new($client) unless ref $client;
+    $client->SUPER::new(@_);
+    $client->{read_buf} = '';
+    $client;
+}
+
+sub event_read {
+    my Data::YUID::Server::Client $client = shift;
+    my $bref = $client->read(1024);
+    return $client->close unless defined $bref;
+    $client->{read_buf} .= $$bref;
+
+    if ($client->{read_buf} =~ s/^(.+?)\r?\n//) {
+        my $line = $1;
+        $client->process_line($line);
+    }
+}
+
+sub process_line {
+    my Data::YUID::Server::Client $client = shift;
+    my($line) = @_;
+
+    if ($line =~ /^(\w+)\s*(.*)/) {
+        my($cmd, $args) = ($1, $2);
+        $cmd = lc $cmd;
+
+        if (my $meth = $client->can('CMD_' . $cmd)) {
+            $meth->($client, decode_args($args));
+            return 1;
+        }
+    }
+
+    return $client->err_line('unknown_command');
+}
+
+sub CMD_getid {
+    my Data::YUID::Server::Client $client = shift;
+    my($args) = @_;
+    my $id = $Generator->get_id($args->{ns})
+        or return $client->err_line('too_many');
+    $Stats{count}{total}++;
+    return $client->ok_line({ id => $id });
+}
+
+sub CMD_stats {
+    my Data::YUID::Server::Client $client = shift;
+    return $client->ok_line({
+        total_given => $Stats{count}{total} || 0,
+        started     => $Stats{started},
+    });
+}
+
+sub CMD_ping {
+    my Data::YUID::Server::Client $client = shift;
+    return $client->ok_line;
+}
+
+sub CMD_shutdown {
+    exit 0;
+}
+
+sub ok_line {
+    my Data::YUID::Server::Client $client = shift;
+    my($args) = @_;
+    my $argline = join ' ',
+                  map uri_escape($_) . '=' . uri_escape($args->{$_}),
+                  keys %$args;
+    $client->write("OK $argline\r\n");
+    return 1;
+}
+
+sub err_line {
+    my Data::YUID::Server::Client $client = shift;
+    my($err) = @_;
+    $client->write("ERR $err\r\n");
+    return 0;
+}
+
+sub decode_args {
+    my($str) = @_;
+    my $args;
+    for my $pair (split /\s+/, $str) {
+        my($name, $val) = split /=/, $pair;
+        for ($name, $val) {
+            $_ = uri_unescape($_);
+        }
+        $args->{$name} = $val;
+    }
+    $args;
+}
+
+1;
+__END__
+
+=head1 NAME
+
+yuidd - YUID Distributed ID server
+
+=head1 SYNOPSIS
+
+    yuidd [--port <port>] [--hostid <hostid>]
+
+=head1 DESCRIPTION
+
+I<yuidd> implements the server portion of the YUID client/server protocol.
+
+=head1 USAGE
+
+The options are:
+
+=over 4
+
+=item --hostid <host-id>
+
+Specifies the unique host ID of the machine running this server instance.
+This is equivalent to the use of a MAC address in Type-1 UUIDs.
+
+This argument is optional, but highly recommended. If you don't provide a
+host ID, an ID will be randomly generated, but this leaves the potential
+for collisions.
+
+=item --port <port>
+
+Specifies the port for the server to listen on.
+
+This argument is optional. If not provided, I<yuidd> will listen on port
+C<9001>.
+
+=item --daemon
+
+Specifies that the server should be daemonized to run in the background.
+
+This argument is optional. If not provided, the server will run in the
+foreground.
+
+=item --debug
+
+Turns on debugging information.
+
+This argument is optional. If not provided, debugging is off.
+
+=back
+
+=head1 AUTHOR & COPYRIGHT
+
+Please see the I<Data::YUID> manpage for author, copyright, and license
+information.
+
+=cut

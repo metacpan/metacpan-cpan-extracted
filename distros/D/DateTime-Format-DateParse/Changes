@@ -1,0 +1,25 @@
+Revision history for Perl module DateTime::Format::DateParse
+
+0.05
+    - test warning fix
+    - Nanoseconds are always turned into an integer, with rounding as
+      needed. (Dave Rolsky)
+
+0.04 Sun Sep 17 13:10:19 HST 2006
+    - fix a bug in Build.pl
+
+0.03 Sun Sep 17 09:41:16 HST 2006
+    - rt.cpan.org #21540]: Make sure that the test format & epoch time are
+      compared in the same time zone.  This fixes the issue with the epoch time
+      being relative to UTC but the format being intereprated as being in the
+      local (non-UTC) timezone.
+
+0.02 Mon Jul 25 17:29:07 HST 2005
+    - use strptime() instead of str2time() as the interface to Date::Parse
+    - fix timezone handling so not all DT objects are set to 'local'
+
+
+0.01 Wed Jul 20 17:51:08 2005
+    - original version; created by ExtUtils::ModuleMaker 0.36
+
+

@@ -1,0 +1,18 @@
+Revision history for Data-Password-Entropy
+
+0.08    2013-11-21
+        Change builder to ExtUtils::MakeMaker
+        Fix link to repository (thanks to David Steinbrunner, https://github.com/dsteinbrunner)
+
+0.07    2010-10-15
+        Minimum version of Test::More is 0.88 (method isa_ok() could work with classes)
+
+0.06    2010-07-21
+        Spell-checking of POD, thanks to Natalie Balabanova http://www.tatusia.com/
+
+0.04    2010-06-30
+        Licensed under Artistic License 2.0.
+        Minor changes in POD.
+
+0.03    2010-06-22
+        Initial public revision.

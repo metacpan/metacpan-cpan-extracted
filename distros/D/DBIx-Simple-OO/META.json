@@ -1,0 +1,46 @@
+{
+   "abstract" : "Retrieve database rows as objects",
+   "author" : [
+      "Jos Boumans <kane[at]cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Simple-OO",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.624",
+            "DBIx::Simple" : "0",
+            "Object::Accessor" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jib/dbix-simple-oo.git",
+         "web" : "https://github.com/jib/dbix-simple-oo"
+      }
+   },
+   "version" : "0.03"
+}

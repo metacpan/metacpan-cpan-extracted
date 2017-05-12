@@ -1,0 +1,303 @@
+<html>
+<head>
+<title>BabelKit HTML Select Element Methods</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000" link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="bk_read.html">Code Descriptions</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_set.html">Code Sets</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+HTML Select Element Methods</h2></center>
+
+These methods return a string containing HTML code
+for various types of select boxes.
+
+<p>
+Deprecated codes are not offered as new user choices but
+are displayed if already selected in the data.
+
+<p>
+If the data contains codes for which there is no code value
+the raw data values are displayed.  Submitting
+a form without making changes will always will keep
+the data unchanged whether or not the code descriptions
+exist and whether or not the selections are deprecated.
+
+
+<a name="common"></a>
+<h3>Common Options</h3>
+
+Each of the select methods takes two standard parameters:
+the code set and the language to display in.  Extra options
+can be passed in as name - value pairs.
+
+<p>
+The following four options are common to all of the HTML
+select methods.  Here is an example using all of them:
+
+<pre>
+<b># PHP</b>
+print $babelkit-&gt;select('day', $lang, array(
+                        'var_name' =&gt; 'start_day',
+                        'value'    =&gt; $start_day,
+                        'default'  =&gt; 1,
+                        'subset'   =&gt; array( 1, 2, 3, 4, 5 ),
+                        'options'  =&gt; 'onchange="submit()"'
+                        ));
+</pre>
+
+<pre>
+<b># Perl</b>
+print $babelkit-&gt;select('day', $lang,
+                        var_name =&gt; 'start_day',
+                        value    =&gt; $start_day,
+                        default  =&gt; 1,
+                        subset   =&gt; [ 1, 2, 3, 4, 5 ],
+                        options  =&gt; 'onchange="submit()"'
+                        );
+</pre>
+
+<pre>
+<b># HTML</b>
+&lt;select name="start_day" onchange="submit()"&gt;
+&lt;option value="1" selected&gt;Montag
+&lt;option value="2"&gt;Dienstag
+&lt;option value="3"&gt;Mittwoch
+&lt;option value="4"&gt;Donnerstag
+&lt;option value="5"&gt;Freitag
+&lt;/select&gt;
+</pre>
+
+
+<h4>'var_name' =&gt; 'start_day'</h4>
+
+The HTML select methods all declare a form variable
+name which will hold the value(s) that the user selects.
+'var_name' defaults to $code_set.  For example, a select
+element displaying 'day' code set choices will
+by default return the user selection in the 'day' variable.
+
+<p>
+In the example above the programmer has specified that
+the user selection will be returned in the 'start_day'
+form variable.
+
+<p>
+Multi-value select elements will return the selected
+values in an array variable.  For example, a "select multiple"
+element will by default return multiple user day selections
+in the 'day[]' variable.  Specify multivalue form
+variable names *without* the '[]' at the end.  For example,
+specify 'sick_days' instead of 'sick_days[]'.
+
+
+<h4>'value' =&gt; $start_day</h4>
+
+If you specify a 'value' option, that value will always be used.
+Select multiple value methods will expect 'value' to
+be an array.
+
+<p>
+If a 'value' parameter is not passed in, BabelKit looks
+at the incoming form variable for the value to use.
+
+<p>
+In PHP, the value is found like this:
+
+<pre>
+$value = $_POST ? $_POST[$var_name] : $_GET[$var_name];
+</pre>
+
+<p>
+Perl gives the programmer control over the parsing of
+the GET and POST information.  As a result, it is the
+programmer's responsibility to tell BabelKit how to
+get those values.  See the <a href="bk_new_perl.html">
+Perl Handle Creation</a> page to see how this is done.
+Or simply pass the value using the 'value' option.
+
+
+<h4>'default' =&gt; 1</h4>
+
+If no 'value' is specified, and no value is found in
+the incoming form variable, then BabelKit will use
+any optional 'default' value specified.  In the
+example above the default is the code for Monday.
+
+
+<h4>'subset' =&gt; $show_these_codes</h4>
+
+It is sometimes the case that we only want to display
+a subset of all possible codes for the user to
+select from.  In the example above we constrain
+the user choices to the codes for Monday - Friday
+and return the choice in the 'start_day' form variable.
+
+
+<h4>'options' =&gt; 'onchange="submit()"'</h4>
+
+You can select select options using the optional
+'options' option.  Separate multiple options
+with spaces.
+
+
+<a name="single"></a>
+<h3>HTML Select Single Value Methods</h3>
+
+The following two single value HTML select methods accept
+the common options listed above plus some method specific options.
+
+
+<h4>select()</h4>
+
+<pre>
+<b># PHP</b>
+$html = $babelkit-&gt;select($code_set, $code_lang, array(
+                          'select_prompt' =&gt; 'Code set description?',
+                          'blank_prompt'  =&gt; 'None'
+                          ));
+</pre>
+
+<pre>
+<b># Perl</b>
+$html = $babelkit-&gt;select($code_set, $code_lang,
+                          select_prompt =&gt; 'Code set description?',
+                          blank_prompt  =&gt; 'None'
+                          );
+</pre>
+
+<p>
+select() prepares a "drop down" HTML select element
+for user selection of a single value.
+
+<p>
+'select_prompt' is the name to show if there is no initial selection.
+It defaults to the code set description and a question mark.
+
+<p>
+'blank_prompt' is the name to show to blank out a selection.
+If none is provided it is not possible for the user to
+blank out an initial selection.
+
+
+<h4>radio()</h4>
+
+<pre>
+<b># PHP</b>
+$html = $babelkit-&gt;radio($code_set, $code_lang, array(
+                         'sep'          =&gt; "&lt;br&gt;\n",
+                         'blank_prompt' =&gt; 'None'
+                         ));
+</pre>
+
+<pre>
+<b># Perl</b>
+$html = $babelkit-&gt;radio($code_set, $code_lang,
+                         sep          =&gt; "&lt;br&gt;\n",
+                         blank_prompt =&gt; 'None'
+                         );
+</pre>
+
+<p>
+radio() prepares HTML radio box elements for
+user selection of a single value.
+
+<p>
+'blank_prompt' is the name to show to blank out a selection.
+If none is provided it is not possible for the user to
+blank out an initial selection.
+
+<p>
+'sep' is the string to insert between radiobox
+elements.  It defaults to "&lt;br&gt;\n".
+
+
+<a name="multiple"></a>
+<h3>HTML Select Multiple Value Methods</h3>
+
+The following two multiple value HTML select methods accept
+the common options listed above some method specific options.
+These accept and produce multiple values so do not forget
+to pass in an array value.
+
+
+<h4>multiple()</h4>
+
+<pre>
+<b># PHP</b>
+$html = $babelkit-&gt;multiple($code_set, $code_lang, array(
+                            'size' =&gt; 10
+                            ));
+</pre>
+
+<pre>
+<b># Perl</b>
+$html = $babelkit-&gt;multiple($code_set, $code_lang,
+                            size =&gt; 10
+                            );
+</pre>
+
+multiple() prepares a select multiple HTML element.
+
+<p>
+'size' is optional and gives the maximum number of elements
+to scroll.
+
+<h4>checkbox()</h4>
+
+<pre>
+<b># PHP</b>
+$html = $babelkit-&gt;checkbox($code_set, $code_lang, array(
+                            'sep' =&gt; "&lt;br&gt;\n"
+                            ));
+</pre>
+
+<pre>
+<b># Perl</b>
+$html = $babelkit-&gt;checkbox($code_set, $code_lang,
+                            sep =&gt; "&lt;br&gt;\n"
+                            );
+</pre>
+
+checkbox() prepares multiple checkbox elements for multiple
+user selections.
+
+<p>
+'sep' is the string to insert between checkbox
+elements.  It defaults to "&lt;br&gt;\n".
+
+
+<p>
+<div align="right">
+[<a href="bk_read.html">Code Descriptions</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_set.html">Code Sets</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

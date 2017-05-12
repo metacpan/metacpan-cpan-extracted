@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+Perform.pm
+Perform/DButils.pm
+Perform/DoTable.pm
+Perform/DigestPer.pm
+Perform/Forms.pm
+Perform/Widgets/TextField.pm
+Perform/Widgets/ButtonSet.pm
+bin/perform
+bin/generate
+README
+t/1.t

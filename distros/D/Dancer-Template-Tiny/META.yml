@@ -1,0 +1,24 @@
+---
+abstract: 'Template::Tiny backend to Dancer'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.101610'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-Tiny
+requires:
+  Dancer::FileUtils: 0
+  Dancer::Template::Abstract: 0
+  Template::Tiny: 0
+version: 0.03

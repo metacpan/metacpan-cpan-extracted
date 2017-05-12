@@ -1,0 +1,40 @@
+---
+abstract: 'Soft-dependency on Dist::Zilla for Utilities.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Log::Dispatchouli: '0'
+  Moose: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-UtilRole-MaybeZilla
+provides:
+  Dist::Zilla::UtilRole::MaybeZilla:
+    file: lib/Dist/Zilla/UtilRole/MaybeZilla.pm
+    version: '0.002000'
+requires:
+  Log::Contextual::LogDispatchouli: '0'
+  Moose::Role: '0'
+  Scalar::Util: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-UtilRole-MaybeZilla/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-UtilRole-MaybeZilla
+  repository: https://github.com/kentnl/Dist-Zilla-UtilRole-MaybeZilla.git
+version: '0.002000'

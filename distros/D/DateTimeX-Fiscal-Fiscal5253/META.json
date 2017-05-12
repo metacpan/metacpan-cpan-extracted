@@ -1,0 +1,46 @@
+{
+   "abstract" : "Create fiscal 52/53 week calendars",
+   "author" : [
+      "Jim Bacon <jim@nortx.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Fiscal-Fiscal5253",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime" : "0",
+            "Moo" : "0",
+            "MooX::StrictConstructor" : "0",
+            "perl" : "5.008008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.01"
+}

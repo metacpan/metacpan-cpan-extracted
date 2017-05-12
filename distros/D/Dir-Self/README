@@ -1,0 +1,24 @@
+Dir-Self
+========
+
+Provides a __DIR__ pseudo-constant expanding to the full path to the
+surrounding source file. Useful for access to files "in the same
+directory".
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, 2008, 2013 by Lukas Mai
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

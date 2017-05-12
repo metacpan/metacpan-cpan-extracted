@@ -1,0 +1,37 @@
+Revision history for Dist-Zilla-Plugin-CheckIssues
+
+0.010     2016-06-23 02:13:20Z
+          - warn if resources metadata could not be inferred from the
+            distribution in the 'dzil issues' command
+
+0.009     2015-09-27 07:32:40Z
+          - fix test failures by avoiding versions of Log::Dispatch that lost
+            STDOUT content
+
+0.008     2015-04-10 20:36:40Z
+          - bump up required version of Term::ANSIColor, to ensure the
+            requested bright colours are available
+
+0.007     2014-12-06 05:09:40Z
+          - bump up required version of JSON::MaybeXS, to ensure necessary
+            interfaces are available
+
+0.006     2014-11-22 03:39:42Z
+          - better way of avoiding warnings in perl 5.21.6, while still
+            allowing this dist to install
+
+0.005     2014-11-21 01:11:07Z
+          - add a dynamic test prereq to avoid new warnings added to perl 5.21.6
+
+0.004     2014-10-27 19:22:56Z
+          - fix bad use of "orange" as an ANSI colour (thanks, Apocalypse!)
+
+0.003     2014-10-26 21:47:27Z
+          - new "dzil issues" command
+
+0.002     2014-05-20 04:48:01Z
+          - "github" option now fully supported
+          - fix colour bleeding between output lines
+
+0.001     2014-05-16 22:33:16Z
+          - Initial release.

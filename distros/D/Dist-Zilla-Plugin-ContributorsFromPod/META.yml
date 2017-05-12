@@ -1,0 +1,36 @@
+---
+abstract: 'Populate meta x_contributors from CONTRIBUTORS POD in the dist'
+author:
+  - 'Rafael Kitover <rkitover@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.017, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ContributorsFromPod
+no_index: {}
+requires:
+  Dist::Zilla::Role::MetaProvider: '0'
+  List::AllUtils: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  Pod::Text: '0'
+  perl: '5.008001'
+  utf8: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ContributorsFromPod
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-ContributorsFromPod
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rkitover/dist-zilla-plugin-contributorsfrompod.git
+version: '0.01'
+x_authority: cpan:RKITOVER

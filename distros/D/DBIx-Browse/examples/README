@@ -1,0 +1,96 @@
+
+DemoDBIxBrowse - A demostration of use of DBIx::Browse and DBIx::Browse::CGI
+(c) Copyright 2002 Evilio José del Río Silván <edelrio@icm.csic.es>
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+
+Description
+-----------
+
+DemoDBIxBrowse is a perl CGI that uses the DBIx::Browse::CGI to manage
+a set of related tables (the database).
+
+The database represent a way to show the same piece of information
+(normally a little text) in diferent languages (locales). The first
+table ("Locale") represents the difernt languages. The second table
+"Resource" represents the diferent pieces of information to show (for
+example the title of a web page), the third one (Messages) contains
+the actual information content of the diferent resources in diferent
+locales. To retrieve the content of a resource ('copiright') in a
+determined language (Catalan, 'ca') you should issue a SQL command
+like this:
+
+SELECT msg
+ FROM message m, resource r, locale l
+ WHERE
+	m.locale = locale.id     AND
+	m.resource = resource.id AND
+	r.name     = 'copiright' AND
+	l.lang     = 'ca';
+
+This query will return the value 'Tots els drets reservats' if you
+have followed point ii) in "Build and Install" below.
+
+Prerequisites
+-------------
+
+The same as the DBIX::Browse module (that is: perl, DBI, and a
+transaction-allowed DBD driver like Postgres or MySQL).
+
+
+Build and Install
+-----------------
+
+   i) Build and Install the DBIx::Browse package.
+
+  ii) Create the tables needed with the help of the
+demodbixbrowse.psql file. It contains the SQL commands needed to
+create the table set required by the example. The file is in
+PostgresSQL dialect, you should be able to adapt it to others without
+much trouble. You will need write access to some database(*). This
+file will also populate the three tables with some records.
+
+ iii) Modify the example CGI DemoDBIxBrowse to reflect your database
+source name (the line that begins with $dsn = 'DBI:Pg:...).
+
+  iv) Optionally copy the DemoDBIxBrowse somewhere in your Web server
+document tree so that it will be treated as a perl CGI script. For
+example (in a *nix box):
+
+  cp DemoDBIxBrowse ${HOME}/public_html/cgi-bin/demodbix.pl
+
+if you want to use css styles copy also the stylesheet file in the
+same location:
+  cp demodbixbrowse.css ${HOME}/public_html/cgi-bin/
+
+If you don't have access to any web server you can try to execute the
+script by hand. It will produce some HTML output:
+
+  perl DemoDBIxBrowse < /dev/null
+
+   v) Point your browser to the location of the copy you put in your
+server, something like this:
+
+  http://localhost/~myuser/cgi-bin/demodbix.pl
+
+You are now ready to Browse the three tables.
+
+
+---
+(*) If you don't know wether you have such an access you can try the
+"dbish" command that comes with the standard DBI module.

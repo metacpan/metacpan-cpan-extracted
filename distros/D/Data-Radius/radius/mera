@@ -1,0 +1,22 @@
+#
+#	MVTS Pro from Mera Networks
+#
+VENDOR	Cisco	9
+
+#
+#	Request Attributes
+#
+ATTRIBUTE	xpgk-md5-auth			1	avpair	Cisco
+ATTRIBUTE	xpgk-src-number-in		1	avpair	Cisco
+ATTRIBUTE	xpgk-dst-number-out		1	avpair	Cisco
+ATTRIBUTE	xpgk-request-type		1	avpair	Cisco
+ATTRIBUTE	xpgk-routing-request		1	avpair	Cisco
+
+ATTRIBUTE	h323-gw-address			1	avpair	Cisco
+
+#
+#	Reply Attributes
+#
+ATTRIBUTE	xpgk-xrouting-username		251	string	Cisco
+ATTRIBUTE	xpgk-routing-reply		252	string	Cisco
+

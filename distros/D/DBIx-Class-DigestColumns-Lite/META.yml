@@ -1,0 +1,13 @@
+abstract: " easy to use Digest Value for DBIx::Class"
+author: Atsushi Kobayashi  C<< <atsushi __at__ mobilefactory.jp> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: DBIx-Class-DigestColumns-Lite
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Digest::SHA1: 0
+version: 0.03

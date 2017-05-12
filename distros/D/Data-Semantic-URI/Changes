@@ -1,0 +1,36 @@
+Revision history for Perl extension Data-Semantic-URI
+
+1.100850  2010-03-26 15:49:58 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.03  Thu, 29 May 2008 12:03:45 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.03
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.02  Thu, 22 Nov 2007 13:09:03 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+      had a bug in make_real_object()
+
+0.01  Wed, 21 Nov 2007 18:22:13 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - Makefile.PL: fixed requirements
+    - Data::Semantic::URI::TestData::*: there's not just 'good' and 'bad',
+      there's 'well_formed', 'not_well_formed', 'valid' and 'invalid' under
+      certain argument combinations
+    - Data::Semantic::URI::*_TEST: don't inherit from
+      Data::Semantic::RegexpTest, inherit from Data::Semantic::Test instead
+    - updated MANIFEST
+    - getting rid of the distinction between well-formedness and validity.
+      Only validity remains
+    - all classes: added documentation
+    - Data::Semantic::URI::http_TEST: run() tests keep()
+    - Makefile.PL: build requires Test::Differences
+    - updated t/perlcriticrc

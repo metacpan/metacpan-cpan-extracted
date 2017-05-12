@@ -1,0 +1,14 @@
+#!/bin/sh
+testdir=t
+template=OBJ-TEST.pl
+kinds=`cd $testdir >&/dev/null ; ls -1 [a-z]*.pl | sed -e 's/\.pl//g'`
+echo "These are the kinds: $kinds"
+for obj in box simple list html ; do
+    for kind in $kinds ; do
+        testfile=t/$obj-$kind.t
+	if [[ -f $testfile ]]; then
+	  rm -f $testfile
+	fi
+	( set -x ; ln -s $template $testfile )
+    done
+done

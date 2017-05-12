@@ -1,0 +1,43 @@
+---
+abstract: 'Client for Daioikachan'
+author:
+  - 'ryopeko <ryopeko@gmail.com>'
+build_requires:
+  Test::Exception: '0.40'
+  Test::Mock::Guard: '0.10'
+  Test::More: '1.001014'
+  Test::Pretty: '0.31'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.4.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Daioikachan-Client
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Daioikachan::Client:
+    file: lib/Daioikachan/Client.pm
+    version: '0.01'
+requires:
+  Furl: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/ryopeko/Daioikachan-Client/issues
+  homepage: https://github.com/ryopeko/Daioikachan-Client
+  repository: git://github.com/ryopeko/Daioikachan-Client.git
+version: '0.01'
+x_contributors:
+  - 'ryopeko <ryopeko+free@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

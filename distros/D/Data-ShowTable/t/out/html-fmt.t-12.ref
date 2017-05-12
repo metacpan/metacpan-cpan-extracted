@@ -1,0 +1,45 @@
+*** STDOUT ***
+<TABLE BORDER=2 CELLPADDING=1 CELLSPACING=1>
+<TR>
+ <TH ALIGN=CENTER WIDTH=6%>Index</TH>
+ <TH ALIGN=CENTER WIDTH=26%>Name</TH>
+ <TH ALIGN=CENTER WIDTH=20%>Phone</TH>
+ <TH ALIGN=CENTER WIDTH=33%>Address</TH>
+ <TH ALIGN=CENTER WIDTH=13%>Date</TH>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="http://cgi-bin/lookup?Index=1?Key=Index?Value=1"><FONT SIZE=-1>1</FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=2?Key=Name?Value=&lt;B&gt;Alan&#32;Stebbens&lt;/B&gt;"><FONT SIZE=-1><B>Alan Stebbens</B></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=3?Key=Phone?Value=&lt;I&gt;555-1234&lt;/I&gt;"><FONT SIZE=-1><I>555-1234</I></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=4?Key=Address?Value=1234&#32;Something&#32;St.,&#32;CA"><FONT SIZE=-1>1234 Something St., CA</FONT></A></TD>
+<TD ALIGN=RIGHT><FONT SIZE=-1>1998-10-22</FONT></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="http://cgi-bin/lookup?Index=1?Key=Index?Value=2"><FONT SIZE=-1>2</FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=2?Key=Name?Value=&lt;B&gt;Bob&#32;Frankel&lt;/B&gt;"><FONT SIZE=-1><B>Bob Frankel</B></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=3?Key=Phone?Value=&lt;I&gt;555-1235&lt;/I&gt;"><FONT SIZE=-1><I>555-1235</I></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=4?Key=Address?Value=9234&#32;Nowhere&#32;Way,&#32;WA"><FONT SIZE=-1>9234 Nowhere Way, WA</FONT></A></TD>
+<TD ALIGN=RIGHT><FONT SIZE=-1>2001-01-02</FONT></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="http://cgi-bin/lookup?Index=1?Key=Index?Value=3"><FONT SIZE=-1>3</FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=2?Key=Name?Value=&lt;B&gt;Mr.&#32;Goodwrench&lt;/B&gt;"><FONT SIZE=-1><B>Mr. Goodwrench</B></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=3?Key=Phone?Value=&lt;I&gt;555-9432&lt;/I&gt;"><FONT SIZE=-1><I>555-9432</I></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=4?Key=Address?Value=1238&#32;Car&#32;Lane&#32;Pl.,&#32;NY"><FONT SIZE=-1>1238 Car Lane Pl., NY</FONT></A></TD>
+<TD ALIGN=RIGHT><FONT SIZE=-1>2004-04-20</FONT></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="http://cgi-bin/lookup?Index=1?Key=Index?Value=4"><FONT SIZE=-1>4</FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=2?Key=Name?Value=&lt;B&gt;Mr.&#32;Ed&lt;/B&gt;"><FONT SIZE=-1><B>Mr. Ed</B></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=3?Key=Phone?Value=&lt;I&gt;555-3215&lt;/I&gt;"><FONT SIZE=-1><I>555-3215</I></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=4?Key=Address?Value=9876&#32;Cowbarn&#32;Home,&#32;VA"><FONT SIZE=-1>9876 Cowbarn Home, VA</FONT></A></TD>
+<TD ALIGN=RIGHT><FONT SIZE=-1>2008-09-12</FONT></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><A HREF="http://cgi-bin/lookup?Index=1?Key=Index?Value=5"><FONT SIZE=-1>5</FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=2?Key=Name?Value=&lt;B&gt;Gunther&#32;Sveborg&lt;/B&gt;"><FONT SIZE=-1><B>Gunther Sveborg</B></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=3?Key=Phone?Value=&lt;I&gt;44-55-555-5555&lt;/I&gt;"><FONT SIZE=-1><I>44-55-555-5555</I></FONT></A></TD>
+<TD ALIGN=LEFT><A HREF="http://cgi-bin/lookup?Index=4?Key=Address?Value=Kartophelhause&#32;345,&#32;Munich,&#32;Germany"><FONT SIZE=-1>Kartophelhause 345, Munich, Germany</FONT></A></TD>
+<TD ALIGN=RIGHT><FONT SIZE=-1>2013.10.22</FONT></TD>
+</TR>
+</TABLE>

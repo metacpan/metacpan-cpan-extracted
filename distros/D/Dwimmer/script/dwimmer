@@ -1,0 +1,155 @@
+#!/usr/bin/perl
+use 5.012000;
+use warnings;
+
+use Data::Dumper;
+use Getopt::Long qw(GetOptions);
+use Pod::Usage   qw(pod2usage);
+
+use Dwimmer::Client;
+
+
+my %opt;
+GetOptions(\%opt,
+	'version',
+	'url=s',
+	'username=s',
+	'password=s',
+) or pod2usage();
+
+if ($opt{version}) {
+	say "Dwimmer Client: v$Dwimmer::Client::VERSION";
+	exit;
+}
+
+$opt{username} ||= 'admin';
+pod2usage() if not $opt{url} or not $opt{username} or not $opt{password};
+
+$opt{url} =~ s{/+$}{};
+
+my %commands = (
+	add_user        =>  [qw(uname email password)],
+	list_users      =>  [],
+	change_password =>  [qw(name password)],
+);
+
+my $cmd = shift;
+
+pod2usage() if not $cmd or $cmd eq 'help';
+
+pod2usage() if not $commands{$cmd};
+
+my %data;
+my @fields = @{ $commands{$cmd} };
+
+# TODO check the validity of the parameters too
+if (@ARGV != @fields) {
+	die "Invalid number of arguments. Needed: @{ $commands{$cmd} }\n";
+}
+@data{ @fields } = @ARGV;
+
+my $dw = Dwimmer::Client->new( host => $opt{url} );
+my $login = $dw->login( username => $opt{username}, password => $opt{password} );
+given ($login->{error}) {
+	when (undef) {}
+	when ('invalid_password') {
+		die "Invalid password\n";
+	}
+	when ('not_logged_in') {
+		die "Could not login\n";
+		# maybe some error in the routing? e.g. multiple /-es somewhere?
+	}
+	default {
+		die "Unhandled error: " . Dumper $login;
+	}
+}
+#print Dumper $login;
+
+given ($cmd) {
+	when ('add_user') {
+		$data{verify} = 'verified';
+		$data{pw1} = $data{pw2} = delete $data{password};
+	}
+	when ('change_password') {
+		$data{new_password} = delete $data{password};
+		$data{admin_password} = $opt{password};
+	}
+}
+
+my $r = $dw->$cmd(%data);
+
+
+given ($cmd) {
+	when ('list_users' ) {
+		print "Users: \n\n";
+		foreach my $u ( sort { $a->{name} cmp $b->{name} } @{ $r->{users} } ) {
+			say $u->{name};
+		}
+	}
+	when ('add_user') {
+		if ($r->{success}) {
+			say 'Success';
+		}
+		given ($r->{error}) {
+			when (undef) {}
+			when ('username_taken') {
+				die "The username '$data{uname}' is already in use\n";
+			}
+			when ('email_used') {
+				die "The email '$data{email}' is already in use\n";
+			}
+			default {
+				die 'Unrecognized error: ' . Dumper $r;
+			}
+		}
+	}
+	when ('change_password') {
+		if ($r->{success}) {
+			say 'Success. Password changed';
+		} else {
+			die Dumper $r;
+		}
+	}
+	default {
+		print Dumper $r;
+	}
+}
+
+exit;
+
+=head1 NAME
+
+dwimmer - command line client to interact with a Dwimmer server
+
+=head1 SYNOPSIS
+
+OPTIONAL PARAMETER:
+
+   --username  OF_ADMINISTRATOR    (admin by default)
+
+   --version                  to show the version number of the Dwimmer
+
+REQUIRED PARAMETERS:
+
+   --password  OF_ADMINISTRATOR
+   --url       OF_DWIMMER_SITE
+
+
+Commands:
+
+   add_user USERNAME EMAIL PASSWORD
+   list_users
+   change_password USERNAME PASSWORD 
+
+
+For example if you would like to add a user called 'foo' with a password 'secret'
+to the system you run
+
+ dwimmer --url http://mycompany.com/ --password ADMIN_PASSWORD add_user foo foo@mycompany.com secret
+
+If you'd like to list all the users run
+
+ dwimmer --url http://mycompany.com/ --password ADMIN_PASSWORD list_users
+
+=cut
+

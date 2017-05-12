@@ -1,0 +1,104 @@
+=head1 NAME
+
+Changes - Revision history for DashProfiler
+
+=head1 RELEASES
+
+=cut
+
+TODO:
+Flush at rollover (new profile node created - may not be reliable/safe)?
+Option to Flush (_if_due) only at period end
+Move DashProfiler::Dump* packages out to modules DashProfiler::DumpTo::*
+Ponder need for workaround for systems with clocks that go backwards
+    such as cygwin http://www.nntp.perl.org/group/perl.cpan.testers/2007/09/msg630399.html
+    current assumption is that it doesn't matter if profiling for 'long enough'.
+Add test for throwing an exception in context2edit as way to veto sample - and document
+Add tests for set_precondition
+
+disabled should set inuse so the check for disabled can be moved inside the 'already inuse' block
+
+=head2 DashProfiler 1.13 - r50 - May 8th 2008
+
+  Changed DashProfiler subs that may be used as Apache handlers
+    to return -1 (DECLINED).
+
+=head2 DashProfiler 1.12 - r48 - Mar 25th 2008
+
+  Fixed period_exclusive sample calculation of overheads.
+  Fixed period_sample to be disabled until start_period_sample() called.
+  Slight performance boost (0.000015 instead of 0.000017).
+
+=head2 DashProfiler 1.11 - r45 - Mar 24 2008
+
+  Now ~17% faster (cheaper) when using DBI >= 1.603.
+  Make tests more robust and work with Perl 5.10.
+
+=head2 DashProfiler 1.09 - r43 - Feb 20 2008
+
+  Added $sample->current_sample_duration method.
+  Added $core->period_start_time method.
+  Added DashProfiler->profile_names method.
+  Added DashProfiler->set_precondition method.
+  Added DashProfiler::Core->estimate_sample_overheads.
+  Added automatic measurement of sample overhead time.
+  Updated DashProfiler::Apache to use set_precondition
+    to start sample periods only for initial requests.
+  Updated DashProfiler::Apache docs to suggest PerlInitHandler
+    instead of PerlPostReadRequestHandler.
+
+=head2 DashProfiler 1.08 - r36 - Sept 11 2007
+
+  Fixed fatal error in visit_profile_nodes() for DBI profiles with no Data.
+
+  Changed propagate_period_count() to not reset period_count.
+  Changed to increment period_count in end_sample_period() not start_sample_period().
+  Changed start_sample_period() to not call end_sample_period() automatically.
+    So now multiple start_sample_period() calls without end_sample_period() calls
+    are harmless - the period runs from the most recent start_sample_period() call.
+
+  Added period_strict_start and period_strict_end attributes to control how
+    missing/multiple start_sample_period() & end_sample_period calls are handled.
+    The attributes can be code refs which are called when needed.
+  Added extra_info attribute for use by scripts to carry any extra information.
+
+=head2 DashProfiler 1.07 - r32 - Aug 16 2007
+
+  Added DashProfiler::Apache
+  Added -optional syntax to DashProfiler::Import
+
+=head2 DashProfiler 1.06 - r29 - Aug 14 2007
+
+  Fixed DashProfiler::Import :optionally to still export stubs
+  Changed DashProfiler reset_all_profiles() to not call start_sample_period_all_profiles().
+  Changed DashProfiler::Auto to use file name not full path.
+  Changed DashProfiler::Core end_sample_period() to do nothing if no period is active.
+  Added more docs, especially to UserGuide and Auto.
+
+=head2 DashProfiler 1.05 - r25 - Aug 10 2007
+
+  Added :optional to DashProfiler::Import
+  Added dbi_profile_args to pass extra args to dbi_profile_class->new().
+  Added DashProfiler::Auto for simple uses, including one-liners
+  Added lots of documentation.
+
+  Require perl 5.8 (just due to sprintf '%$N' usage in tests). Works for 5.6
+  Made Scalar::Util::weaken optional.
+  Removed spool_directory arg (use dbi_profile_args => { Dir => ... } instead)
+  Set local $ENV{DBI_AUTOPROXY} to avoid risk of problems
+  Generalized get_dbi_profile() to take a '*'
+  start_sample_period and end_sample_period check for overlaps
+  end_sample_period now returns period_sample DBI Profile object not dbh
+  Changed semantics of flush_hook return value.
+
+=head2 DashProfiler 1.03 - r15 - Jun 23 2007
+
+  Fix flush_hook attribute in flush(),
+  Make Hash::Util optional.
+  Make Perl::Critic optional.
+
+=head2 DashProfiler 1.02 - r12 - Jun 21 2007
+
+  First full release (1.01 was incomplete)
+
+=cut

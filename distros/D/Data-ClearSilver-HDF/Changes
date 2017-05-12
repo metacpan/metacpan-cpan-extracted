@@ -1,0 +1,16 @@
+Revision history for Data-ClearSilver-HDF
+
+0.04  2008-04-20 23:10
+  * Fixed some statement for warning of uninitilize variable,
+    Thanks 33rpm.
+
+0.03  2007-07-03 00:42
+  * Fixed cspage pod
+
+0.02  2007-07-02 19:00
+  * Add few tests
+  * Add cspage command
+
+0.01  2007-06-28 20:33
+   First version
+

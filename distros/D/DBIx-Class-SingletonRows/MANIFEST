@@ -1,0 +1,12 @@
+Makefile.PL
+README
+MANIFEST
+t/lib/DBIx/Class/SingletonRows/Tests/TestSchema/Hlagh.pm
+t/lib/DBIx/Class/SingletonRows/Tests/TestSchema.pm
+t/02-singletonness.t
+lib/DBIx/Class/SingletonRows.pm
+ARTISTIC.txt
+GPL2.txt
+CHANGES
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

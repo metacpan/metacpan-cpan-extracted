@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DBIPR.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/01-raw.t
+t/02-cursor.t
+t/03-array.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Role-FileWatcher
+
+0.006     2015-06-27 21:52:29Z
+          - log the FileWatcher's $VERSION in metadata for the plugin that
+            consumes it
+          - rename this distribution from
+            Dist-Zilla-Role-File-ChangeNotification
+
+0.005     2014-08-26 06:39:03Z
+          - allow a file to be watched more than once
+
+0.004     2014-08-26 05:18:50Z
+          - new role for plugins: Dist::Zilla::Role::FileWatcher, to
+            facilitate common usecases for watching and locking files
+
+0.003     2014-01-15 03:09:32Z
+          - test fixed to work around a use of the file metaclass in older
+            Dist::Zilla::Role::FileInjector
+
+0.002     2014-01-12 08:05:15Z
+          - the checksum is updated (and therefore the callback is invoked)
+            for every change to the content, not just (potentially) the first
+            (thanks, Yanick!)
+
+0.001     2013-10-21 01:49:13Z
+          - Initial release.

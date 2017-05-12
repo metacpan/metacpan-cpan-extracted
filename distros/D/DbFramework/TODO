@@ -1,0 +1,22 @@
+DbFramework TODO list
+
+- Moved the test tables creation from Makefile.PL/Build.PL to the
+  test suite, and clean up the test tables after the test suite
+  finished.
+- Remove the Makefile.PL/Build.PL dependency to DbFramework::Util,
+  and hence Term::ReadKey.  It does not make sense that
+  Makefile.PL/Build.PL fails to run.  CPAN and CPANPLUS shells
+  cannot install with this, too.
+- Rename t/util.pl to t/util.pm, and remove Makefile.PL/Build.PL
+  dependency to it, too.
+- Dealing with the installation of forms/dbforms.cgi.
+- Seperate INSTALL from README.
+- Register a proper name space and drop the unused.
+- Transfer the primary maintainer of DbFramework::CandidateKey,
+  DbFramework::Catalog, DbFramework::DataModelObject,
+  DbFramework::DataType::ANSII, DbFramework::DataType::Mysql,
+  DbFramework::DefinitionObject, DbFramework::Relationship and
+  DbFramework::Template to me.
+- Remove "UNAUTHORIZED RELEASE" from search.cpan.org.
+- Maybe make DbFramework working again.
+- Retire DbFramework.

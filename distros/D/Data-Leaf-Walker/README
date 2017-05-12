@@ -1,0 +1,87 @@
+Data-Leaf-Walker
+
+SYNOPSIS
+
+   $data   = {
+      a    => 'hash',
+      or   => [ 'array', 'ref' ],
+      with => { arbitrary => 'nesting' },
+      };
+
+   $walker = Data::Leaf::Walker->new( $data );
+   
+   while ( my ( $k, $v ) = $walker->each )
+      {
+      print "@{ $k } : $v\n";
+      }
+      
+   ## output might be
+   ## a : hash
+   ## or 0 : array
+   ## or 1 : ref
+   ## with arbitrary : nesting
+
+DESCRIPTION
+
+C<Data::Leaf::Walker> provides simplified access to nested data structures. It
+operates on key paths in place of keys. A key path is a list of HASH and ARRAY
+indexes which define a path through your data structure. For example, in the
+following data structure, the value corresponding to key path C<[ 0, 'foo' ]> is
+'bar': 
+
+   $aoh = [ { foo => 'bar' } ];
+
+You can get and set that value like so:
+
+   $walker = Data::Leaf::Walker->new( $aoh );      ## create the walker
+   $bar    = $walker->fetch( [ 0, 'foo' ] );       ## get the value 'bar'
+   $walker->store( [ 0, 'foo'], 'baz' );           ## change value to 'baz'
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+Alternatively, to install with ExtUtils::MakeMaker, you can use the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Leaf::Walker
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Leaf-Walker
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Leaf-Walker
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Leaf-Walker
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Leaf-Walker/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Dan Boorstein
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

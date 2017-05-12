@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/DublinCore/Element.pm
+lib/DublinCore/Record.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01-use.t
+t/10-empty.t
+t/11-constructor.t
+t/12-setters.t
+t/98-pod_coverage.t
+t/99-pod.t

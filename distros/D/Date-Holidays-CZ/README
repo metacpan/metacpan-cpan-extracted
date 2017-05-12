@@ -1,0 +1,36 @@
+Date::Holidays::CZ
+==================
+
+This module creates a list of Czech holidays in a given year.
+
+Holidays that occur on weekends can be excluded from the generated list.
+
+The generated list can be freely formatted using regular strftime() format
+definitions.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+
+PATCHES
+
+Patches are welcome. If you can, please fork the project on github to 
+submit your change:
+
+  http://github.com/smithfarm/date-holidays-cz.git
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Date::Calc 5.0
+  POSIX, Time::Local (from the standard Perl distribution)
+

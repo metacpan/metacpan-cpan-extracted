@@ -1,0 +1,17 @@
+Revision history for Digest-EdonR
+
+0.05  Mon Dec 13 22:58:08 UTC 2010
+    - Fix for big-endian systems. (Jorn Amundsen)
+
+0.04  Tue Nov 30 00:20:34 UTC 2010
+    - Fix for Solaris.
+
+0.03  Mon Nov 29 21:27:17 UTC 2010
+    - Fix for Win32.
+
+0.02  Mon Nov 29 11:04:26 UTC 2010
+    - Converted hex and base64 encoders to C.
+    - Added implicit reset upon call to digest method.
+
+0.01  Thu Nov 25 10:13:58 UTC 2010
+    - Initial distribution.

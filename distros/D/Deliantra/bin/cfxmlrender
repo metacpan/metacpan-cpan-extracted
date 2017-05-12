@@ -1,0 +1,375 @@
+#!/opt/perl/bin/perl
+
+use Data::Dumper;
+use Storable qw/dclone/;
+use Math::Trig;
+use XML::Parser;
+use XML::Writer;
+use Cwd;
+use File::Spec::Functions;
+use strict;
+
+our $DEBUG = 1;
+
+sub slurp { open FO, $_[0] or die "Couldn't open $_[0]: $!"; return join '', <FO> }
+
+sub read_scene_cfg {
+   my ($file) = @_;
+
+   my $cfg = {};
+   eval {
+      my $cont = slurp ($file);
+
+      for (split /\n/, $cont) {
+
+         if (m/dir\s*=\s*(\d+)\s*-\s*(\d+)/) {
+            for ($1..$2) { push @{$cfg->{dir}}, $_ }
+
+         } elsif (m/dir\s*=\s*(\d+)/) {
+            push @{$cfg->{dir}}, $1;
+
+         } elsif (m/replace\s+(\S+)\s+(\S+)/) {
+            push @{$cfg->{replace}}, [$1, $2];
+
+         } elsif (m/(\S+)\s*=\s*(.*)/) {
+            $cfg->{$1} = $2;
+
+         }
+      }
+   };
+   if ($@) { warn "Couldn't read $file\n" }
+
+   $cfg->{w}      ||= 32;
+   $cfg->{h}      ||= 32;
+   $cfg->{height} ||= 100;
+   $cfg->{dir}    ||= [5];
+
+   return $cfg;
+}
+
+sub xml2str {
+   my ($tree, $wr) = @_;
+
+   my $out;
+
+   unless ($wr) {
+      $tree = dclone $tree;
+      $wr = XML::Writer->new (
+         OUTPUT => \$out,
+         DATA_INDENT => 3,
+         DATA_MODE => 1
+      );
+   }
+
+   require Data::Dumper;
+   while (@$tree) {
+      my $tag  = shift @$tree;
+      my $cont = shift @$tree;
+      my $attr = {};
+
+      if (ref ($cont) eq 'ARRAY') {
+         $attr = shift @$cont;
+      }
+
+      my $close = 0;
+      if ($tag ne '0') {
+         if ((ref ($cont) eq 'ARRAY') && @$cont) {
+            $wr->startTag ($tag, %$attr);
+            xml2str ($cont, $wr);
+            $wr->endTag ($tag);
+         } else {
+            $wr->emptyTag ($tag, %$attr)
+               if $tag ne '0';
+         }
+      } else {
+         #$wr->characters ($cont);
+      }
+
+   }
+
+   if ($out) {
+      return $out;
+   }
+}
+
+sub filter_tags {
+   my ($tree, %ftags) = @_;
+
+   my $sce = $tree->[1];
+
+   my @out;
+   my $tag = '';
+   for (my $i = 1; $i < @$sce; $i += 2) {
+      my $tag = $sce->[$i];
+      my $con = $sce->[$i + 1];
+
+      if ($ftags{$tag}) {
+         push @out, $_ for $ftags{$tag}->($tag, $con);
+      } else {
+         push @out, $tag, $con;
+      }
+   }
+   @$sce = ($sce->[0], @out);
+
+   $tree
+}
+
+sub remove_tags {
+   my ($tree, @remtags) = @_;
+
+   my $sce = $tree->[1];
+
+   my @out;
+   my $tag = '';
+   for (my $i = 1; $i < @$sce; $i += 2) {
+      my $tag = $sce->[$i];
+      my $con = $sce->[$i + 1];
+
+      unless (grep { $tag eq $_ } @remtags) {
+         push @out, $tag, $con;
+      }
+   }
+   @$sce = ($sce->[0], @out);
+
+   $tree
+}
+
+sub add_tags {
+   my ($tree, %tags) = @_;
+   push @{$tree->[1]}, %tags;
+}
+
+sub trans_add_shear {
+   my ($m, $dir_n) = @_;
+
+   $m->{m02} += 0.25;
+   $m->{m12} += 0.5;
+
+   for (keys %$m) {
+      $m->{$_} = sprintf "%.6f", $m->{$_}
+   }
+}
+
+sub render_dir {
+   my ($cont, $dir_n, $cfg, $outfile) = @_;
+
+   my $cam;
+
+   for (@{$cfg->{replace}}) {
+      $cont =~ s/\Q$_->[0]\E/$_->[1]/egs;
+   }
+
+   my $p = new XML::Parser (Style => 'Tree');
+
+   my $tree = $p->parse ($cont);
+
+   my $a = 0;
+
+   my %dir_to_degree = (
+#         5 => 0,
+#         5 => 0,
+#         6 => 45,
+#         7 => 90,
+#         8 => 135,
+#         1 => 180,
+#         2 => 225,
+#         3 => 270,
+#         4 => 315
+         0 => 0,
+         1 => 0,
+         2 => 45,
+         3 => 90,
+         4 => 135,
+         5 => 180,
+         6 => 225,
+         7 => 270,
+         8 => 315
+   );
+   $a = $dir_to_degree{$dir_n};
+   $a = deg2rad - $a; # -$a because we want a clockwise rotation
+
+   remove_tags ($tree, qw/render camera background/);
+   if (!$cfg->{preserve_light}) {
+      remove_tags ($tree, qw/light/);
+   }
+   filter_tags ($tree, 
+      object => sub {
+         my ($tag, $con) = @_;
+         my $ot = 'transform';
+         my $om = {
+            m00 => cos($a), m01 => -sin($a), m02 => 0, m03 => 0,
+            m10 => sin($a), m11 => cos($a),  m12 => 0, m13 => 0,
+            m20 => 0, m21 => 0, m22 => 1, m23 => 0,
+            m30 => 0, m31 => 0, m32 => 0, m33 => 1,
+         };
+         ($ot, [$om, $tag, $con])
+      },
+      transform => sub {
+         my ($tag, $con) = @_;
+         my $ot = 'transform';
+         my $om = {
+            m00 => cos($a), m01 => -sin($a), m02 => 0, m03 => 0,
+            m10 => sin($a), m11 => cos($a),  m12 => 0, m13 => 0,
+            m20 => 0, m21 => 0, m22 => 1, m23 => 0,
+            m30 => 0, m31 => 0, m32 => 0, m33 => 1,
+         };
+         ($ot, [$om, $tag, $con])
+      }
+   );
+
+   unless ($cfg->{frontal}) {
+      filter_tags ($tree,
+         transform => sub {
+            my ($tag, $con) = @_;
+            my $ot = 'transform';
+            my $om = {
+               m00 => 1, m01 => 0, m02 => 0, m03 => 0,
+               m10 => 0, m11 => 1, m12 => 0, m13 => 0,
+               m20 => 0, m21 => 0, m22 => 1, m23 => 0,
+               m30 => 0, m31 => 0, m32 => 0, m33 => 1,
+            };
+            trans_add_shear ($om);
+            ($ot, [$om, $tag, $con])
+         }
+      );
+   }
+
+   if ($cfg->{xoffs} || $cfg->{yoffs} || $cfg->{zoffs}) {
+      filter_tags ($tree,
+         transform => sub {
+            my ($tag, $con) = @_;
+            my $ot = 'transform';
+            my $om = {
+               m00 => 1, m01 => 0, m02 => 0, m03 => $cfg->{xoffs},
+               m10 => 0, m11 => 1, m12 => 0, m13 => $cfg->{yoffs},
+               m20 => 0, m21 => 0, m22 => 1, m23 => $cfg->{zoffs},
+               m30 => 0, m31 => 0, m32 => 0, m33 => 1,
+            };
+            ($ot, [$om, $tag, $con])
+         }
+      );
+   };
+
+
+   my ($w, $h) = ($cfg->{w}, $cfg->{h} || $cfg->{w});
+   my @to   = (0, 0, 0);
+   my @from = (0, 0, $cfg->{height});
+   my @up   = (0, 1, 0);
+   @up = map { $up[$_] + $from[$_] } 0..2;
+
+   my $aspect = $cfg->{aspect} || 1;
+   my $focal  = $cfg->{focal}  || 10;
+   my $power_offs = $cfg->{power_offs} || 0;
+
+   add_tags ($tree,
+      light => [
+         { type => 'sunlight', name => 'w_Infinite', power => sprintf ("%1.1f", 0.5 + $power_offs),
+           cast_shadows => "off"
+         },
+         from => [{ x => -1, y => 1, z => 0.7 }],
+         color => [{ r => 1, g => 1, b => 1 }]
+      ]
+   );
+   add_tags ($tree,
+      light => [
+         { type => 'sunlight', name => 'w_Infinite2', power => sprintf ("%1.1f", 1 + $power_offs),
+           cast_shadows => "off"
+         },
+         from => [{ x => 1, y => -1, z => 0.7 }],
+         color => [{ r => 1, g => 1, b => 1 }]
+      ]
+   );
+   add_tags ($tree,
+      camera => [
+         { name => "xcam", resx => $w, resy => $h, focal => $focal,
+           aspect_ratio => $aspect, type => "ortho" },
+         to   => [{ x => 0, y => 0, z => 0 }],
+         from => [{ x => 0, y => $from[1], z => $from[2] }],
+         up   => [{ x => $up[0], y => $up[1], z => $up[2] }],
+      ],
+      render => [
+         { camera_name => "xcam", raydepth => "4",
+           gamma => "1",
+           exposure => ($cfg->{exposure} || "0"), save_alpha => "on",
+           AA_passes => "2",
+           bias => "0.1", AA_threshold => "0", AA_minsamples => "16",
+           AA_pixelwidth => "1.25", AA_jitterfirst => "off",
+           clamp_rgb => "on"
+         },
+         outfile => [{ value => $outfile }],
+      ]
+   );
+   $cont = xml2str ($tree);
+
+   if ($DEBUG and open FO, ">cfxmlrender.out.xml") {
+      print FO $cont;
+   }
+
+   $cont
+}
+
+@ARGV or die "cfxmlrender <xml>\n";
+
+for my $xml (@ARGV) {
+   my $outfile = $xml;
+   $outfile =~ s/\.xml$/\.tga/;
+
+   my $xmlcont = slurp ($xml);
+   my $cfg = read_scene_cfg ($xml . ".cfg");
+
+   my ($vol, $dir, $file) = File::Spec->splitpath($xml);
+
+   $file =~ m/^(.*?)\.xml/;
+   my $filebase = $1 || $file;
+
+   for my $d (@{$cfg->{dir}}) {
+      my $ofile = File::Spec->catpath ($vol, $dir, "${filebase}_dir_${d}.tga");
+      my $oxfile = File::Spec->catpath ($vol, $dir, "${filebase}_rend_${d}.xml");
+
+      my $nc = render_dir ($xmlcont, $d, $cfg, "${filebase}_dir_${d}.tga");
+
+      open OUT, ">$oxfile"
+         or die "Couldn't write '$nc': $!";
+      print OUT $nc;
+      close OUT;
+
+      my $cwd = getcwd;
+
+      if ($dir) {
+         system ("cd $dir; yafray ${filebase}_rend_${d}.xml > yafray_out.log 2> yafray_out.log");
+      } else {
+         system ("yafray ${filebase}_rend_${d}.xml > yafray_out.log 2> yafray_out.log");
+      }
+
+      unlink $oxfile unless $DEBUG;
+
+      my $png;
+      if ($cfg->{archname}) {
+         if (@{$cfg->{dir}} > 1) {
+            my $aname = $cfg->{archname};
+            unless ($aname =~ s/%/$d/g) {
+               $aname .= $d;
+            }
+            $png = "$aname.png";
+         } else {
+            $png = "$cfg->{archname}.png";
+         }
+      } else {
+         $png = "${filebase}_dir_${d}.png";
+      }
+
+      system "convert", "${filebase}_dir_${d}.tga", $png;
+      system "optipng", -q => $png;
+
+      print "saved arch png to: $png\n";
+
+      if ($cfg->{archpath} and $ENV{CFDEV_ROOT}) {
+         my $archpath = "$ENV{CFDEV_ROOT}/arch/$cfg->{archpath}";
+         system "cp", $png, "$archpath/$png";
+         print "copied $png to $cfg->{archpath}/$png\n";
+      }
+
+      unlink $ofile;
+   }
+}
+

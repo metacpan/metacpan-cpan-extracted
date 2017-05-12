@@ -1,0 +1,30 @@
+---
+name: DBIx-Fun
+version: 0.02
+author:
+  - Jeffrey Klein
+abstract: 'DBIx::Fun - access database stored procedures as methods'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBI: 1.38
+  perl: 5.8
+build_requires:
+  Test::More: 0.01
+provides:
+  DBIx::Fun:
+    file: lib/DBIx/Fun.pm
+    version: 0.02
+  DBIx::Fun::Oracle:
+    file: lib/DBIx/Fun/Oracle.pm
+    version: 0.01
+  DBIx::Fun::Oracle::type:
+    file: lib/DBIx/Fun/Oracle.pm
+  DBIx::Fun::Sybase:
+    file: lib/DBIx/Fun/Sybase.pm
+    version: 0.00
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

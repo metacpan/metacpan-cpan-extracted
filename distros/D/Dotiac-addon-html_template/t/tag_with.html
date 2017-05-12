@@ -1,0 +1,1 @@
+{% with "a"|upper as var1 %}{{ var1 }}B{{ var1|lower }}{% endwith %}{% with foo.text|upper as var %}{{var|cut:"X"}}{% endwith %}{% with X.X as var2 %}{{ var2 }}B{{ var2|upper }}{% endwith %}

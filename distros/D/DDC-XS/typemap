@@ -1,0 +1,161 @@
+# -*- Mode: Perl -*-
+
+##-- object types: ddcObject
+ddcObject*	  O_DDCXS_OBJECT
+ddcObjectList	  T_ddcxs
+
+##-- object types: QueryCompiler.xsp
+CQueryCompiler*	  O_DDCXS_OBJECT
+
+##-- object types: Query.xsp
+CQuery*	O_DDCXS_OBJECT
+CQNegatable*	O_DDCXS_OBJECT
+CQAtomic*	O_DDCXS_OBJECT
+CQBinOp*	O_DDCXS_OBJECT
+CQAnd*	O_DDCXS_OBJECT
+CQOr*	O_DDCXS_OBJECT
+CQWith*	O_DDCXS_OBJECT
+CQWithout*	O_DDCXS_OBJECT
+CQWithor*	O_DDCXS_OBJECT
+CQToken*	O_DDCXS_OBJECT
+CQTokExact*	O_DDCXS_OBJECT
+CQTokAny*	O_DDCXS_OBJECT
+CQTokAnchor*	O_DDCXS_OBJECT
+CQTokRegex*	O_DDCXS_OBJECT
+CQTokSet*	O_DDCXS_OBJECT
+CQTokInfl*	O_DDCXS_OBJECT
+CQTokSetInfl*	O_DDCXS_OBJECT
+CQTokPrefix*	O_DDCXS_OBJECT
+CQTokSuffix*	O_DDCXS_OBJECT
+CQTokInfix*	O_DDCXS_OBJECT
+CQTokPrefixSet*	O_DDCXS_OBJECT
+CQTokSuffixSet*	O_DDCXS_OBJECT
+CQTokInfixSet*	O_DDCXS_OBJECT
+CQTokMorph*	O_DDCXS_OBJECT
+CQTokLemma*	O_DDCXS_OBJECT
+CQTokThes*	O_DDCXS_OBJECT
+CQTokChunk*	O_DDCXS_OBJECT
+CQTokFile*	O_DDCXS_OBJECT
+CQNear*	O_DDCXS_OBJECT
+CQSeq*	O_DDCXS_OBJECT
+
+##-- object types: QCount.xsp
+CQCountKeyExpr*	O_DDCXS_OBJECT
+CQCountKeyExprConstant*	O_DDCXS_OBJECT
+CQCountKeyExprMeta*	O_DDCXS_OBJECT
+CQCountKeyExprFileId*	O_DDCXS_OBJECT
+CQCountKeyExprIndexed*	O_DDCXS_OBJECT
+CQCountKeyExprFileName*	O_DDCXS_OBJECT
+CQCountKeyExprDate*	O_DDCXS_OBJECT
+CQCountKeyExprDateSlice*	O_DDCXS_OBJECT
+CQCountKeyExprBibl*	O_DDCXS_OBJECT
+CQCountKeyExprRegex*	O_DDCXS_OBJECT
+CQCountKeyExprToken*	O_DDCXS_OBJECT
+CQCountKeyExprList*	O_DDCXS_OBJECT
+CQCount*	O_DDCXS_OBJECT
+CQKeys*		O_DDCXS_OBJECT
+
+##-- object types: QueryFilter.xsp
+CQFilter*	O_DDCXS_OBJECT
+CQFSort*	O_DDCXS_OBJECT
+CQFRankSort*	O_DDCXS_OBJECT
+CQFDateSort*	O_DDCXS_OBJECT
+CQFSizeSort*	O_DDCXS_OBJECT
+CQFRandomSort*	O_DDCXS_OBJECT
+CQFBiblSort*	O_DDCXS_OBJECT
+CQFContextSort*	O_DDCXS_OBJECT
+CQFHasField*	O_DDCXS_OBJECT
+CQFHasFieldValue*	O_DDCXS_OBJECT
+CQFHasFieldRegex*	O_DDCXS_OBJECT
+CQFHasFieldPrefix*	O_DDCXS_OBJECT
+CQFHasFieldSuffix*	O_DDCXS_OBJECT
+CQFHasFieldInfix*	O_DDCXS_OBJECT
+CQFHasFieldSet*	O_DDCXS_OBJECT
+
+##-- object types: QueryOptions.xsp
+CQueryOptions*	O_DDCXS_OBJECT
+CQSubcorpusList	T_ddcxs
+
+##-- object types: TODO
+#TxChain	T_
+
+##-- STL types
+std_string 	  T_ddcxs
+string 	  	  T_ddcxs
+set_string	  T_ddcxs
+vector_string	  T_ddcxs
+vector_BYTE	  T_ddcxs
+vector_char	  T_ddcxs
+vector_BYTEasCHAR  T_VECTOR_BYTE_AS_CHAR
+vector_CQTokenPtr T_ddcxs
+vector_CQCountKeyExprPtr T_ddcxs
+CQFilterList	T_ddcxs
+
+##-- atomic types
+char		  T_CHAR
+BYTE		  T_U_CHAR
+WORD		  T_UV
+DWORD		  T_UV
+QWORD		  T_UV
+uint		  T_UV
+uint32_t	  T_UV
+size_t		  T_UV
+HitSortEnum	  T_UV
+
+
+######################################################################
+# perl->C
+INPUT
+
+O_DDCXS_OBJECT
+  if (ddcxs_object_ok($arg)) {
+    ddcxs_perl2c<ddcObject*>($arg,reinterpret_cast<ddcObject*&>($var));
+  }
+  else {
+    warn( \"${Package}::$func_name() -- $var is neither undef nor a blessed SV reference\" );
+    XSRETURN_UNDEF;
+  }
+
+T_VECTOR_BYTE_AS_CHAR
+  ddcxs_xtypemap< BYTE, vector<BYTE>, ddcxs_typemap<char> >().perl2c($arg,$var);
+
+T_ddcxs
+  ddcxs_perl2c($arg,$var);
+
+T_CHAR
+      $var = *( SvPV_nolen($arg) );
+
+T_INT
+      $var = SvIV($arg);
+
+T_UINT
+      $var = SvUV($arg);
+
+T_FLOAT
+      $var = SvNV($arg);
+
+
+######################################################################
+# C->perl
+OUTPUT
+
+O_DDCXS_OBJECT
+  ddcxs_c2perl<$type>($var,$arg);
+
+T_VECTOR_BYTE_AS_CHAR
+  ddcxs_xtypemap< BYTE, vector<BYTE>, ddcxs_typemap<char> >().c2perl($var,$arg);
+
+T_ddcxs
+  ddcxs_c2perl($var,$arg);
+
+T_CHAR
+  sv_setpvn($arg,&$var,1);
+
+T_INT
+  sv_setiv($arg,$var);
+
+T_UINT
+  sv_setuv($arg,$var);
+
+T_FLOAT
+  sv_setnv($arg,$var);

@@ -1,0 +1,33 @@
+---
+abstract: 'Common date functions as Moo Role.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Utils
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Date::Utils:
+    file: lib/Date/Utils.pm
+    version: '0.23'
+requires:
+  Date::Exception: '0.03'
+  Moo::Role: '2.000000'
+  Term::ANSIColor::Markup: '0.06'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Date-Utils.git
+version: '0.23'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

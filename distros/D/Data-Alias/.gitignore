@@ -1,0 +1,9 @@
+/Makefile
+/pm_to_blib
+/blib
+/MYMETA.json
+/MYMETA.yml
+/Data-Alias-*
+/Alias.c
+/Alias.o
+/Alias.bs

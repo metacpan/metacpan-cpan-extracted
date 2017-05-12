@@ -1,0 +1,13 @@
+*** STDOUT ***
+         Name                                   Biography                            
+ --------------------  ------------------------------------------------------------  
+ Alan                  This is a very long line of text which simulates a text     >
+                      <string which is supposed to wrap in its field width.         
+ Kevin                 This is another long line of text which will also wrap so I >
+                      <can see if this part of ShowTable really works as designed. >
+                      < If not it's back to the drawing board.                      
+ Toad                  This is a short line                                         
+ Monica                This is another short line                                   
+ Stu                   Finally, here is another long line which shold wrap but     >
+                      <maybe not                                                    
+

@@ -1,0 +1,1 @@
+{% load importloop %}A{% importloop loop %}a{{ Title }}a{{ Text }}{{ Foo }}a{% endimportloop %}A{% importloop loop reversed %}a{{ Title }}a{{ Text }}a{{ Foo }}{% empty %}XXX{% endimportloop %}A{% importloop empty %}a{{ Title }}a{{ Text }}{{ Foo }}a{% empty %}YYY{% endimportloop %}

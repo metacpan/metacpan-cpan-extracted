@@ -1,0 +1,80 @@
+{
+   "abstract" : "Flexible serialization of a record",
+   "author" : [
+      "The Smithsonian Astrophysical Observatory",
+      "Diab Jerius <djerius@cpan.org>"
+   ],
+   "dynamic_config" : "0",
+   "generated_by" : "Module::Install version 1.14, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Record-Serialize",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Module::Install" : "0",
+            "Module::Install::CPANfile" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::SQLite" : "0",
+            "JSON::Tiny" : "0",
+            "YAML::Tiny" : "0"
+         },
+         "requires" : {
+            "Class::Load" : "0",
+            "Hash::Util" : "0",
+            "List::Util" : "1.38",
+            "Moo" : "1.004002",
+            "Package::Variant" : "0",
+            "Types::Standard" : "0.042",
+            "perl" : "v5.10.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "File::Temp" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Dist/Display.html?Name=Data-Record-Serialize"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.html"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/djerius/data-record-serialize"
+      }
+   },
+   "version" : "0.07"
+}

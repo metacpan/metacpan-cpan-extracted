@@ -1,0 +1,81 @@
+NAME
+    Devel::UseAnyFunc - Import any of several equivalent functions
+
+SYNOPSIS
+      use Devel::UseAnyFunc 'url_esc', HTML::Mason::Escapes => 'url_escape', 
+                                       URI::Escape          => 'uri_escape',
+                                       CGI::Util            => 'escape',
+                                       PApp::HTML           => 'escape_uri';
+  
+      # I don't care which of the above I get, as long as it works locally.
+      print url_esc( $my_address );
+
+DESCRIPTION
+    Devel::UseAnyFunc allows you to request any one of several equivalent
+    functions from separate modules without forcing a dependancy on a
+    specific one.
+
+  Motivation
+
+    As an example, many different modules provide essentially-equivalent URL
+    escaping functions. A developer writing a CGI script might use
+    Devel::UseAnyFunc to allow their script to run on a variety of different
+    hosts, as long as it has at least one of the relevant modules is
+    installed.
+
+  Operation
+
+    To take advantage of this module, "use" it, passing the name of the
+    function you would like, followed by a list of pairs of a package name
+    and a function name.
+
+    Each of the listed packages is tested in turn, in the order provided. If
+    that module can be loaded with "require", then the associated function
+    is selected; if not, then the next one is tested. If none of the modules
+    is found, it "croak"s and lists the modules it tried.
+
+    Whichever function is selected, it is installed in the callers namespace
+    under the name provided by the first argument to the use statement.
+    (Internally, the same type of symbol-table manipulation is used as in
+    Exporter.)
+
+  Diagnostics
+
+    If you set $DIGANOSTICS to a true value before using the module, it will
+    warn a series of diagnostic messages that explain which modules it's
+    testing and which one it settles on.
+
+      BEGIN { $Devel::UseAnyFunc::DIGANOSTICS = 1 }
+      use Devel::UseAnyFunc ...
+
+  Subcassing
+
+    You may easily subclass this packge in order to provde a specialized
+    "Any" module.
+
+      package My::AnyFoo;
+      use strict;
+      use Devel::UseAnyFunc '-isasubclass';
+  
+      sub import { 
+        my ( $self, $name, @sources ) = @_;
+        ... adjust the contents of $name and @sources as needed...
+        $self->SUPER::import( $name, @sources );
+      }
+
+CREDITS AND COPYRIGHT
+    Developed by Matthew Simon Cavalletto at Evolution Softworks. More free
+    Perl software is available at "www.evoscript.org".
+
+    You may contact the author directly at "evo@cpan.org" or
+    "simonm@cavalletto.org".
+
+    To report bugs via the CPAN web tracking system, go to
+    "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-UseAnyFunc" or send mail
+    to "Dist=Devel-UseAnyFuncE#rt.cpan.org", replacing "#" with "@".
+
+    Copyright 2003 Matthew Simon Cavalletto.
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
+

@@ -1,0 +1,36 @@
+Revision history for Perl extension DBIx::LogAny.
+
+0.04 Thursday December 9 2012
+
+  [Bug Fixes]
+
+  A misspelt Module:::Loaded, Module::Load
+
+0.03 Thursday December 6 2012
+
+  [Bug Fixes]
+
+  Module::Loaded was missing from dependencies in Makefile.PL
+  Thanks to CPAN smokers for spotting.
+
+0.02 Friday November 30 2012
+
+  [ENHANCEMENTS]
+
+  Added dbix_la_category attribute so you can override the category passed
+  to get_logger.
+
+  Added dbix_la_logger attribute so you can pass in your own log handle.
+
+  Added DBIX_LA_LOG_STORE so you can log calls to STORE seperately.
+
+  [MISCELLANEOUS]
+
+  Switched to use Log::Log4perl's register_wrapper instead of using
+  caller_depth.
+
+  Updated SYNOPSIS to include more/better examples.
+
+0.01 Wednesday November 28 2012
+
+  First version based on DBIx::Log4perl

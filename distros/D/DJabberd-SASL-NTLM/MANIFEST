@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DJabberd-SASL-NTLM.t
+lib/DJabberd/SASL/NTLM.pm
+lib/DJabberd/SASL/NTLMManager.pm

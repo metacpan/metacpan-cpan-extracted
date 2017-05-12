@@ -1,0 +1,19 @@
+---
+abstract: 'Perl XS interface to the endian neutral MurmurHash2 algorithm'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Digest-MurmurHash2-Neutral
+resources:
+  bugtracker: https://github.com/frioux/Digest-MurmurHash2/issues
+  homepage: https://github.com/frioux/Digest-MurmurHash2
+  repository: https://github.com/frioux/Digest-MurmurHash2.git
+version: '0.001000'

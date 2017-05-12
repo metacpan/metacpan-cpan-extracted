@@ -1,0 +1,6 @@
+Works with Jenzabar CX systems running cisaps.
+
+Installation instructions:
+perl Makefile.PL
+make
+make install

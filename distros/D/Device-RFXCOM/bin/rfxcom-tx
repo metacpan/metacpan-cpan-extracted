@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+# ABSTRACT: simple example script to control an RFXCOM RF transmitter
+# PODNAME: rfxcom-tx
+
+
+use warnings;
+use strict;
+use Device::RFXCOM::TX;
+
+my $device = shift or die "Usage: $0 device [key=value] ...\n";
+
+my $tx = Device::RFXCOM::TX->new(device => $device, map{split/=/}@ARGV);
+
+$|=1; # don't buffer output
+
+while (<STDIN>) {
+  chomp;
+  $tx->transmit(split /[\t =]/);
+  do {
+    $tx->wait_for_ack();
+  } until (!$tx->queue);
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+rfxcom-tx - simple example script to control an RFXCOM RF transmitter
+
+=head1 VERSION
+
+version 1.163170
+
+=head1 SYNOPSIS
+
+  # send x10 a1/on command via USB tty device
+  echo type=x10 command=on device=a1 | rfxcom-tx /dev/ttyUSB0
+
+  # send homeeasy message via a USB device with helpful name,
+  # see Device::RFXCOM::TX(3)
+  echo type=homeeasy command=on address=0x3333 unit=1 | \
+    rfxcom-tx /dev/rfxcom-tx
+
+  # read commands to send from stdin and send them via a
+  # network/wireless device, disable x10 (which defaults to on)
+  rfxcom-tx 10.0.0.1:10001 x10=0
+
+=head1 DESCRIPTION
+
+This script is an example of the usage of the L<Device::RFXCOM::TX>
+API.  It simply initializes the transmitter and reads messages
+specifications from stdin.  The keys and values given on the command
+line become the parameter hash for the L<Device::RFXCOM::TX>
+constructor and are documented in that module.
+
+=head1 THANKS
+
+Special thanks to RFXCOM, L<http://www.rfxcom.com/>, for their
+excellent documentation and for giving me permission to use it to help
+me write this code.  I own a number of their products and highly
+recommend them.
+
+=head1 SEE ALSO
+
+L<Device::RFXCOM::TX>
+
+RFXCOM website: http://www.rfxcom.com/
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,138 @@
+0.46	- 2016-05-12, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Skip nomemoize in old Perl::Tidy (RT#113433, Slaven)
+    * Test with perl-5.24.0
+
+0.45	- 2016-02-16, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Add CONTRIBUTING.md
+    * It's 2016
+    * Test::More with Test2 does not preserve $! and $?
+
+0.44	- 2015-03-25, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * DDisplay in void context consistency
+
+0.43	- 2015-02-11, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Move repo to github
+    * Remove perl recommendation from META as it breaks cpan clients
+
+0.42	- 2015-01-02, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Prevent caching of .perltidyrc (RT#99514)
+    * Upped copyright to 2015
+
+0.41	- 2014-09-27, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Add alternative test results for 5.21.5 and up (PADMY)
+
+0.40	- 2014-02-27, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Upped copyright to 2014
+    * Guard Perl::Tidy against stupid user options in .perltidyrc
+
+0.39	- 2013-08-17, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Upped copyright to 2013
+    * Add alternative test results for 5.19.3 and up (COW and no PV for IV)
+
+0.38	- 2012-05-29, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Backslashed { in regex in test to satisfy perl-5.17
+
+0.37	- 2012-04-16, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Upped copyright to 2012
+    * Allow length for DHexDump ()
+
+0.36	- 2011-09-07, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * NAME / DISTNAME in Makefile.PL
+
+0.35	- 2011-09-07, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * More cross-checks for META data
+
+0.34	- 2011-09-01, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Tests require Test::More-0.88 or up (RT#70538)
+    * Tested on perl-5.14.1 and 5.15.1
+
+0.33	- 2011-02-16, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Added DTidy (): stream DDumper output through Perl::Tidy
+    * Upped copyright to 2011
+
+0.32	- 2010-11-21, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Require perl 5.8.0
+    * DGrow tests for bigger gap
+    * Spell checking
+    * Add DHexDump ()
+
+0.31	- 2010-03-16, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Dropped YAML spec to 1.0
+
+0.30	- 2010-02-14, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Use $Data::Dumper::Quotekeys = 0; instead of removing the quotes myself
+    * Put first hash element after opening lonely brace
+    * Upped copyright to 2010
+    * Use warn () instead of print STDERR
+
+0.29	- 2009-11-09, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Use skip instead of skip_all for builds that have no DPeek ()
+    * Be more lenient towards the allocated space
+
+0.28	- 2009-11-06, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * DDump () now dumps the variable itself, instead of a copy (Zefram)
+    * Add DGrow ()
+
+0.27	- 2009-06-03, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * void context behaviour for DPeek ()
+    * void context behaviour for DDual ()
+
+0.26	- 2009-06-03, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Upped copyright to 2009
+    * Corrected paren placement for bless (...)
+    * Documentation fixes
+    * Added Test::NoWarnings
+    * Added DDsort ()
+
+0.25	- 2008-11-24, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Wrong e-mail in META.yml
+    * #34831 fixed tied $,
+
+0.24	- 2008-10-31, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Implement DDisplay ()
+    * Implement triplevar ()
+    * Update ppport.h to 3.14_05 (mhx++)
+    * 5.6.x DDisplay ()'s UTF8 different
+    * make leaktest/leakcheck enabled and executed
+
+0.23	- 2008-10-21, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Selecting to install DP did not install Data::Peek
+
+0.22	- 2008-10-20, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Updated to ppport-3.14_01
+    * YAML declared 1.4 (META.yml) instead of 1.1 (YAML)
+    * DP.pm gets version from Peek.pm
+    * DP.pm should not be installed in Data namespace
+
+0.21	- 2008-10-13, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Typo in pod (Joshua Juran)
+    * MSwin doesn't use plain \n (RT#39916)
+    * Some MSWin (ActivePerl) and AIX builds do not have
+      Perl_sv_peek () exported (RT#39916)
+
+0.20	- 2008-10-08, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Renamed DDumper to Data::Peek
+    * Default argument for DPeek is $_
+    * Optionally install DP as shortcut for Data::Peek
+    * Public git repo set up
+
+0.16	- 2008-10-07, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Allocated length for PV's depends on arch (upped test to 8)
+    * Released on Amsterdam.pm
+
+0.15	- 2008-09-26, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Start writing tests for DDump ()
+    * Added DDual ()
+
+0.11	- 2008-09-25, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * PerlIO is only available in 5.8 and up
+    * Perl 5.6 is a minimal requirement for 'use warnings'
+    * Tests for DPeek ()
+    * 5.8.0 did not export Perl_sv_catpvn ()
+    * Tested for 5.6.2, 5.8.0, 5.8.7, 5.8.8, 5.10.0, and devel
+    * Tests for DDumper ()
+    * Doc changes
+    * In void context DDumper prints to STDERR
+
+0.10	- 2008-09-24, H.Merijn Brand   <h.m.brand@xs4all.nl>
+    * Initial attempt

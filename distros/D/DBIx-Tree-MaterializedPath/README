@@ -1,0 +1,53 @@
+DBIx-Tree-MaterializedPath
+
+DBIx::Tree::MaterializedPath - fast DBI queries and updates on "materialized path" trees
+
+This module implements database storage for a "materialized path"
+parent/child tree.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build test --verbose   (if any of the t/* tests fail)
+    ./Build install          (if the tests look okay)
+
+TESTING
+
+The test harness currently requires DBD::SQLite to run.  Additional
+DBD drivers (and corresponding DSNs) can be added to the file:
+"t/testlib/testutils.pm".  The driver will need to support some
+sort of autoincrement or trigger for primary key values.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Tree::MaterializedPath
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Tree-MaterializedPath
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Tree-MaterializedPath
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Tree-MaterializedPath
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-Tree-MaterializedPath
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Larry Leszczynski
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

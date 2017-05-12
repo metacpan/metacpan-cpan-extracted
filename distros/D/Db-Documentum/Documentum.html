@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Db::Documentum - Documentum API interface for Perl.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#warranty">WARRANTY</a></li>
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#authors">AUTHORS</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Db::Documentum - Documentum API interface for Perl.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+        use Db::Documentum qw(:all);</pre>
+<pre>
+        scalar = dmAPIGet(&lt;method&gt;);
+        $sessionID = dmAPIGet(&quot;connect,docbase,username,password&quot;);</pre>
+<pre>
+        scalar = dmAPIExec(&lt;method&gt;);
+        $rv = dmAPIExec(&quot;next,c,$collection_id&quot;);</pre>
+<pre>
+        scalar = dmAPISet(&lt;method&gt;,&lt;value&gt;);
+        $api_stat = dmAPISet(&quot;set,c,last,object_name&quot;,&quot;My Document&quot;);</pre>
+<pre>
+    See scripts in /etc for more examples.</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>The <strong>Db::Documentum</strong> module provides a Perl interface to
+the client API libraries for the Documentum Enterprise Document
+Management System (EDMS98/4i/5). You must have already
+obtained the necessary libraries and purchased the necessary
+licenses from Documentum before you can build this module. For
+more information on Documentum, see <em><a href="http://www.documentum.com/">http://www.documentum.com/</a></em></p>
+<p>This module provides an interface to the three listed API
+functions: <strong>dmAPIGet</strong>, <strong>dmAPIExec</strong>, and <strong>dmAPISet</strong>. For most purposes,
+these are the only functions you need to use, as the bulk of the
+API is implemented as server methods accessed by one of the API
+commands. <strong>dmAPIExec</strong> returns a scalar (1 or 0) which can be evaluated
+to determine success (1 for success, 0 for failure). <strong>dmAPISet</strong> also
+returns a scalar, but takes two arguments, the method argument and the
+value to use. <strong>dmAPIGet</strong> takes a single argument and returns a string
+containing the results. This string, which may contain an object or
+query collection identifier can be used later with other method calls.</p>
+<p>This module, by default, does not import all of its symbols into the calling
+package's namespace.  Therefore, the Documentum API commands must be
+called with the fully-qualified package path:</p>
+<pre>
+        Db::Documentum::dmAPIGet</pre>
+<p>To use the module functions without having to supply the module name,
+use the second form of the ``use'' statement shown here:</p>
+<pre>
+        use Db::Documentum qw (:all);</pre>
+<p>That said, check your Documentum documentation for complete information
+on how to interact with the Documentum server.</p>
+<p><table cellspacing="0" cellpadding="0"><tr><td>Check the version of this module with:
+<tr><td><td>&gt;perl -MDb::Documentum -e Db::Documentum::version</table></p>
+<p>
+</p>
+<hr />
+<h1><a name="warranty">WARRANTY</a></h1>
+<p>There is none, implied, expressed, or otherwise.  We are providing this gratis,
+out of the goodness of our hearts.  If it breaks, you get what you
+paid for.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>The Documentum perl extension may be redistributed under the same terms as
+Perl.  The Documentum EDMS is a commercial product.  The product name,
+concepts, and even the mere thought of the product are the sole property of
+Documentum, Inc. and its shareholders.</p>
+<p>
+</p>
+<hr />
+<h1><a name="authors">AUTHORS</a></h1>
+<p>M. Scott Roth, <code>scott@dm-book.com</code></p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1).</p>
+
+</body>
+
+</html>

@@ -1,0 +1,29 @@
+appname: "AppName"
+
+layout: "main"
+
+charset: "UTF-8"
+
+#log4perl:
+#  config: |
+#    log4perl.rootLogger              = WARN, console
+#    log4perl.appender.console        = Log::Log4perl::Appender::Screen
+#    log4perl.appender.console.layout = Log::Log4perl::Layout::PatternLayout
+#    log4perl.appender.console.layout.ConversionPattern = %d{ISO8601} - %H[%P] %p: %m%n
+#    log4perl.oneMessagePerAppender = 1
+
+template: "simple"
+
+public: "/dev/null"
+
+plugins:
+  DynamicConfig:
+    example_file: "etc/example.json"
+    example_valcaps:
+      path: "etc/example.json"
+      rewrite_class: "Test::ValCaps"
+    scratch_file: "etc/scratch.json"
+    scratch_valcaps:
+      path: "etc/scratch.json"
+      rewrite_class: "Test::ValCaps"
+

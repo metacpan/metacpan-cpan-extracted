@@ -1,0 +1,11 @@
+Revision history for DBIx-Class-FromSledge
+
+0.03   Jan 11 2007
+       FIX: pod typo fix.(thanks to Steven Schubiger.)
+
+0.02   Wed Jan 10 17:52:15 2007
+       FIX: use self method.
+
+0.0.1  Wed Jan 10 16:31:53 2007
+       Initial release.
+

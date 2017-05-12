@@ -1,0 +1,65 @@
+Revision history for Dist::Zilla::Plugin::Prepender
+
+2.004     2017-03-23 02:41:00+01:00 Europe/Paris
+ - removed MooseX::Has::Sugar dependency
+
+2.003     2016-11-26 03:46:22+01:00 Europe/Paris
+ - fix warnings in tests caused by changes in Dist::Zilla 6 (RT#118890)
+
+2.002     2015-08-20 10:10:11+02:00 Europe/Paris
+ - fix logic error that caused files to be skipped (Karen Etheridge)
+
+2.001     2015-01-21 14:36:18+01:00 Europe/Paris
+ - On Dzil 5, skip files with encoding eq 'bytes' (kent fredric)
+
+2.000     2015-01-21 14:27:39+01:00 Europe/Paris
+ - updated bundle usage
+ - do not try to munge files that cannot be altered (Karen Etheridge)
+
+**
+
+1.112280  2011-08-16 19:22:55 Europe/Paris
+ - allow to skip files (randy stauner)
+
+1.103470  2010-12-13 20:33:44 Europe/Paris
+ - add support for editor mode lines (david golden)
+
+1.101590  2010-06-08 10:44:57 Europe/Paris
+ - fix #58230: license should not output lines finished by whitespaces
+
+1.100960  2010-04-06 17:36:39 Europe/Paris
+ - make test dzil2 compliant
+ - use dist-zilla-tester framework for tests
+
+1.100130  2010-01-13 14:59:18 Europe/Paris
+ - copyright param defaults to true
+ - bug fix: no more trimming blank lines at the end of files
+
+1.093190 Sun Nov 15 16:49:27 2009
+ - plugin is stable, bumping to 1.yydddn versioning scheme
+ - adding some author tests
+ - sweetening code with moosex::types::moose
+ - sweetening code with moosex::has::sugar
+
+**
+
+0.2.1 Tue Jul 28 10:04:12 CEST 2009
+ - fix plugin to work with latest dist-zilla & multivalued args
+
+0.2.0 Sun Jun 21 11:32:47 CEST 2009
+ - automatic copyright boilerplate option added
+ - unit test for prepender plugin
+
+**
+
+0.1.2 Sat Jun 20 16:23:40 CEST 2009
+ - pod fix
+ - adding repository resource in meta.yml
+
+0.1.1 Sat Jun 20 12:03:52 CEST 2009
+ - adding missing prereqs
+
+0.1.0 Sat Jun 20 11:52:52 CEST 2009
+ - original release
+ - basic prepending
+

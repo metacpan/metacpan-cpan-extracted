@@ -1,0 +1,16 @@
+Changes
+lib/DBQuery.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ignore.txt
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/DBQuery.pm
+t/DBQuery.t
+t/pod-spell.t
+t/no-tabs.t
+t/boilerplate.t

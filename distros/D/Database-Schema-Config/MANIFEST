@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Database-Schema-Config.t
+lib/Database/Schema/Config.pm
+META.yml                                 Module meta-data (added by MakeMaker)

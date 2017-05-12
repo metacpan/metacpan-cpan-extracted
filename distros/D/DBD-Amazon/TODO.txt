@@ -1,0 +1,7 @@
+DBD::Amazon TODO:
+
+- support for other than just Books
+- support for write operations to place orders
+- scan for/eliminate redundant requests
+- enhance DNF processing to isolate single table filters
+- migrate DNF into SQL::Statement

@@ -1,0 +1,20 @@
+--- 
+abstract: Memcached-Based Data::Throttler
+author: 
+  - Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Data-Throttler-Memcached
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Cache::Memcached::Managed: 0
+  Data::Throttler: 0
+  Digest::MD5: 0
+version: 0.00003

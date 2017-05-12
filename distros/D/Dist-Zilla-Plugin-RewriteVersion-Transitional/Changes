@@ -1,0 +1,36 @@
+Revision history for Dist-Zilla-Plugin-RewriteVersion-Transitional
+
+0.007     2015-07-16 18:58:00Z
+          - work around (hopefully temporary) breakage with the addition of
+            extra comments after $VERSION declarations by [RewriteVersion]
+
+0.006     2015-06-28 06:05:57Z
+          - add documentation amendment about the handling of multiple
+            packages in a file, where not all of them have $VERSIONs.
+          - warn when underscore versions are used -- no sanitization is
+            added, so the runtime $VERSION will not be numeric
+
+0.005     2015-05-20 02:32:40Z
+          - now logging the number of version statements that were replaced
+          - fix the name of the fallback version provider plugin used in
+            [BumpVersionAfterRelease::Transitional] (shows up in log messages)
+          - removed addition of # TRIAL suffix to the repository files after release
+
+0.004     2015-01-19 03:49:55Z
+          - avoid dying if [OurPkgVersion] is not installed
+          - accomodate older [RewriteVersion], before skip_version_provider
+            was added
+          - accomodate the use of all [RewriteVersion] configuration options
+
+0.003     2015-01-17 03:55:55Z
+          - include the configs for the fallback_version_provider,
+            [PkgVersion] and/or [OurPkgVersion], when used, in dumped
+            configs
+          - avoid misleading log messages when nothing was actually modified
+            in the file
+
+0.002     2015-01-13 06:06:52Z
+          - first working version
+
+0.001     2014-12-31 20:55:07Z (TRIAL RELEASE)
+          - Initial release.

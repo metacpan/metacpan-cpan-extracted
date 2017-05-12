@@ -1,0 +1,211 @@
+
+		-----------------------------------------
+			Installation of Docserver
+		-----------------------------------------
+
+This is a INSTALL file for the docserver/docclient project.
+
+The steps to do and check for are:
+	1. Have Windows server with Perl and Word/Excel.
+	2. Install additional Perl modules.
+	3. Have client machine with Perl.
+	4. Check that the versions of Storable module are compatible.
+	5. Check that the Doc(client|server)/Config.pm files are reasonable.
+	6. Run tests locally on the server.
+	7. Debug errors you might get from running the tests.
+	8. Run remote tests from the client.
+	9. Install and setup the docserver as service.
+
+This document was back-translated from Czech original; it is
+possible that names of some options/services on the MS side do not
+match exactly -- please use common sense.
+
+Windows server:
+
+For the server, we use WinNT with 630 build of ActiveStave Perl;
+previous builds worked fine as well. Different version of Perl or
+different version of OS may/should work for you but please note
+that I won't be of much help resolving OS problems on this side.
+
+Install Perl and additional modules:
+
+After installing the ActiveState Perl, use ppm to further install
+RPC::PlServer, Win32::OLE and WIN32::API packages, if they didn't come
+with the default ActiveState distribution. Run ppm and on its
+prompt enter install RPC::PlServer <Enter> and similarily for those
+other two packages. You also need Storable module (from those that are
+rare) but that seems to be installed by ActiveState by default
+when installing RPC::PlServer.
+
+If you experience problems with the repository at activestate.com
+because of differing versions of Perl, run ppm genconfig and edit
+the output to match the correct locations on activestate.com. If
+you used some other Perl distribution, check documentation that came
+with that distribution for information about installing these modules.
+
+Install Word and Excel:
+
+You need to have Word (and Excel for xls conversion) installed, the
+newer version the better. The 2000 versions seem to be working fine.
+Install converters Word/Text with Layout and Converters/Text/RTF and
+export to Word 6.0. If you plan to do some development or debugging
+of Docserver, install Help and Tools for Office/Help for Visual
+Basic. It may be necessary to set user's name and initials to
+space, because of an error in one convertor. You can also consider
+installing applicable patches from http://office.microsoft.com.
+
+In Word and Excel in Options/Macro/Security select High securify
+level for the user under which the Docserver will be running, and
+remove any trusted resources and setup no trust to any plugins, etc.
+
+The following steps will be shown on the SYSTEM account. You can change
+the security leve in registry by setting
+HKU/.default/SW/MS/Office/9.0/Word/Security/Level to 3 (dword) and
+DontTrustInstalledFiles to 1 (dword). For Excel it is similar, the
+registry records are
+
+[HKEY_USERS\.default\Software\Microsoft\Office\9.0\Word\Security]
+"Level"=dword:00000003
+"DontTrustInstalledFiles"=dword:00000001
+
+[HKEY_USERS\.default\Software\Microsoft\Office\9.0\Excel\Security]
+"Level"=dword:00000003
+"DontTrustInstalledFiles"=dword:00000001
+
+I don't know how to add a trusted resource, well I do not know how
+to do that without running Word -- the safest would be to run under
+SYSTEM account something like
+	use Win32::OLE;
+	my $word = Win32::OLE->new('Word.Application');
+	$word->{'Visible'} = 1;
+and do it manually.
+
+Setup PostScript printers:
+
+For conversions to PostScript, install printer with Adobe PS Printer
+Driver (http://www.adobe.com/products/printerdrivers/main.html) as
+local on port FILE: and with driver Adobe Generic PS. You may want to
+setup ASCII output protokol, no ^D before nor after the job, and check
+that the output format matches your local customs (A4 for Europe,
+probably). Set the memory for PS to value reasonable for your needs,
+4096kB works fine for us. In document defaults set TrueType Font to
+Download as Softfont, TrueType Font Download Option to Outline
+and PostScript Output Option to Optimize for Speed. It is recommended
+to install another printer (ps1 in Docserver) as Optimize for
+Portability (that gives you reasonable PostScript that you can work
+with in Un*x). Yet another printer (and another setting in
+Docserver/Config.pm) could be with Substitute with Device Fonts
+Automatic and Optimize for Speed for smallest output PostScript,
+however if you're in non-English speaking country, your diacritical
+characters will be of worse quality. If you decide to use some other
+driver (for example HP), set Page Independence Yes and Generate Job
+Control Code No.
+
+Client machine:
+
+For the client, any machine is OK, you need the RPC::PlClient package
+here. The version of Storable module has to be the same on the client
+and on the server (or they have to be close/compatible -- 1.0.13 on
+client and 1.0.10 on Windows server seem to work). So you will probably
+want to install whatever is available for the ActiveState on Windows
+and then match the version on the client (Un*x) side.
+
+Installing the docserver/docclient Perl code:
+
+The installation goes the ordinary way
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Installing Docserver.pm on Un*x machine doesn't hurt -- it just won't
+be used.
+
+Many people don't have working make on Windows, so alternatively you
+can do
+
+	perl Makefile.PL
+	perl do_test.pl
+
+and copy lib/ and bin/ directories to wherever you like them.
+
+Configuration is stored in lib/Docclient/Config.pm for client side and
+lib/Docserver/Config.pm for the server. You should match the machine
+names and the port numbers. On the server, check that the printer
+names for PostScript output (ps, ps1) match the names of PostScript
+printers (drivers) in your system.
+
+On one system we tested, Excel under SYSTEM had troubles using
+printers installed under different account. It can be solved by
+copying HKEY_USER\[user]\Printers and
+HKEY_USER\[user]\Software\Microsoft\Windows
+NT\CurrentVersion\[Devices|PrinterPorts|Windows\Device] to appropriate
+places in HKEY_USER\.default.
+
+Running docserver as service:
+
+To setup docserver as a service, you can try FireDaemon from
+http://www.firedaemon.com/. After installation, follow documentation
+and set variables MXBIN and MXHOME, and then run (this should be one
+line)
+
+firedaemon -i docserver working\directory path\to\perl.exe "[-Ipath]
+				[path\to\]docserver.pl" N 0 0 Y Y
+
+With this setup you won't be able to log the output of docserver, you
+can try something like (again, one line)
+
+firedaemon -i docserver working\directory path\to\cmd.exe "/c
+				docserver.cmd" N 0 0 Y Y
+
+where in docserver.cmd you'll have (two lines, this time)
+
+start /b [path\]cmd.exe /c ([path\]perl.exe [-Ilib] [path\]docserver.pl >>[path\]docserver.log 2>&1)
+net stop docserver
+
+If you setup the SYSTEM account in Control Panel/Services as the
+account under which docserver should run, you won't be able to kill
+the process (docserver.pid) from Task Manager, should it hang. You can
+use free pskill from psutils package from www.sysinternals.com, or it
+is possible to use FireDaemon to create service which would be
+checking and killing the process which got out of control.
+
+Before restarting (after kill or crash), you have to do
+net stop docserver. If you use the docserver.cmd above, you can do
+something like
+
+(for /f %i in ([path\]docserver.pid) do [path\]pskill %i) & net start docserver
+
+You can also use AutoExNT from Resource Kit. You need files
+autoexnt.exe, autoexnt.bat, instexnt.exe and servmess.dll. Except
+instexnt.exe they have to be copied to %systemroot%\system32.
+Autoexnt.bat should contain line
+	start "docserver.pl" /DC:\directory\to\docserver.pl /MIN
+		C:\full\path\to\perl.exe docserver.pl
+The enter instexnt install /interactive and check Control Panels/
+Services/AutoExNT/Startup for Automatic. You can start docserver as
+service without reboot using
+	net start autoexnt
+
+You can also try to use srvany from Resource Kit.
+
+You should also be able to achieve the same result by directly
+editing registry.
+
+Known bugs & limitations (onot on our side):
+
+The normal text convertor (txt1) puts header under the normal text.
+
+When converting from xls95 to csv, convertor is adding extra sheet
+with the content of the first sheet after each macro.
+
+The MS products may fail on you at any time under any conditions. This
+is not a 100 percent solution -- remember, the conversion from
+proprietary format is done by proprietary software. Hopefully you'll
+get reasonable results for most of your documents.
+
+Author: Jan Pazdziora, adelton@fi.muni.cz.
+	The Windows/Word/Excel specific documentation is
+	a translation of description by Pavel Smerk.
+

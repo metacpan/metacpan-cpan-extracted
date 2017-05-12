@@ -1,0 +1,2 @@
+TYPEMAP
+struct ftdi_context *	T_PTROBJ

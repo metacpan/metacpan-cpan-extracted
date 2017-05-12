@@ -1,0 +1,895 @@
+## -*- Mode: CPerl -*-
+
+################################################################
+##
+##      File: DDC::yyqparser.yp
+##    Author: Bryan Jurish <moocow@cpan.org>
+##
+## Description: Yapp parser specification for DDC queries
+##  + last updated for ddc v2.1.1
+##
+################################################################
+
+################################################################
+## Header section
+################################################################
+%{
+
+################################################################
+##
+##      File: DDC::yyqparser.yp
+##    Author: Bryan Jurish <moocow@cpan.org>
+##
+## Description: Yapp parser for DDC queries
+##  + OBSOLETE: needs update for ddc-2.x syntax
+##
+################################################################
+
+##==============================================================
+##
+## * WARNING * WARNING * WARNING * WARNING * WARNING * WARNING *
+##
+##==============================================================
+##
+##  Do *NOT* change yyqparser.pm directly, change yyqparser.yp
+##  and re-call 'yapp' instead!
+##
+##==============================================================
+
+package DDC::PP::yyqparser;
+use DDC::Utils qw(:escape);
+use DDC::PP::Constants;
+use DDC::PP::CQuery;
+use DDC::PP::CQCount;
+use DDC::PP::CQFilter;
+use DDC::PP::CQueryOptions;
+
+##----------------------------------------
+## API: Hints
+
+## undef = $yyqparser->hint($hint_code,$curtok,$curval)
+##
+sub show_hint {
+  $_[0]->{USER}{'hint'} = $_[1];
+  $_[0]->YYCurtok($_[2]);
+  $_[0]->YYCurval($_[3]);
+  $_[0]->YYError;
+}
+
+%}
+
+##----------------------------------------
+## Grammar: Start symbol
+%start query
+
+##----------------------------------------
+## Grammar: Precedence
+
+%nonassoc OP_CLAUSE_MATCHID
+%nonassoc OP_CLAUSE_CONCAT
+%nonassoc OP_CLAUSE_BOOL
+%nonassoc OP_CLAUSE_BASIC
+
+#%nonassoc OP_CLAUSE
+%nonassoc OP_PHRASE
+%nonassoc OP_WORD
+
+%left	  OP_BOOL_AND OP_BOOL_OR
+%nonassoc '!'
+
+%nonassoc	COUNT
+%nonassoc	KEYS
+%nonassoc	NEAR
+%left		','
+%left		WITH WITHOUT WITHOR
+%left   	'='
+%nonassoc 	'<'
+%nonassoc	'$'
+%nonassoc	'@' '^' '%' '#' '/' '~'
+
+# %left	SIM_PRECISE  //-- what was this for?
+
+
+##----------------------------------------
+## expect some shift/reduce conflicts:
+##---------------------------------------
+#%expect 3
+
+%%
+################################################################
+## Rules Section
+################################################################
+
+##-------------------------------------------------------------
+## query (q*): Top Level (Query Root)
+query:
+	  query_conditions	{ $_[0]->SetQuery($_[1]) }
+  	| count_query	 	{ $_[0]->SetQuery($_[1]) }
+  	;
+
+##-------------------------------------------------------------
+## count_query (count_*)
+
+count_query:
+	COUNT '(' query_conditions count_filters ')' count_filters	{ $_[0]->newCountQuery($_[3], {%{$_[4]}, %{$_[6]}}) }
+	;
+
+##-- count_filters: HASH-ref
+count_filters:
+						{ {} }	##-- empty
+	|	count_filters count_filter	{ my $tmp={%{$_[1]}, %{$_[2]}}; $tmp }
+	;
+
+##-- count_filter: HASH-ref
+count_filter:
+		count_by 			{ $_[1] }
+	|	count_sample			{ $_[1] }
+	|	count_limit			{ $_[1] }
+	|	count_sort			{ $_[1] }
+	;
+
+count_by:
+		BY l_countkeys 			{ {Keys=>$_[2]} }
+	|	BY '[' l_countkeys ']'  	{ {Keys=>$_[3]} }
+	;
+
+count_sample:
+		SAMPLE integer			{ {Sample=>$_[2]} }
+	|	SAMPLE '[' integer ']'		{ {Sample=>$_[3]} }
+	;
+
+##-- non-cqcount option
+count_limit:
+		CLIMIT integer			{ {Limit=>$_[2]} }
+	|	CLIMIT '[' integer ']'		{ {Limit=>$_[3]} }
+	;
+
+count_sort:
+		count_sort_op count_sort_minmax	{ $_[2]->{Sort}=$_[1]; $_[2] }
+	;
+
+count_sort_op:
+		LESS_BY_KEY			{ DDC::PP::LessByCountKey }
+	|	GREATER_BY_KEY			{ DDC::PP::GreaterByCountKey }
+	|	LESS_BY_COUNT			{ DDC::PP::LessByCountValue }
+	|	GREATER_BY_COUNT		{ DDC::PP::GreaterByCountValue }
+	;
+
+count_sort_minmax:
+						{ {} } ##-- empty
+	|	'[' ']'				{ {} }
+	|	'[' ',' ']'			{ {} }
+	|	'[' symbol ']'			{ {Lo=>$_[2]} }
+	|	'[' symbol ',' ']'		{ {Lo=>$_[2]} }
+	|	'[' ',' symbol ']'		{ {Hi=>$_[3]} }
+	|	'[' symbol ',' symbol ']'	{ {Lo=>$_[2],Hi=>$_[4]} }
+	;
+
+##-------------------------------------------------------------
+## query_conditions (q*)
+
+query_conditions:
+		q_clause q_filters		{ $_[1] }
+	;
+
+##-------------------------------------------------------------
+## q_filters (qf*): Filters and Global Query Flags
+q_filters:
+						{ undef }
+	|	q_filters q_flag		{ undef }
+	|	q_filters q_filter		{ undef }
+	;
+
+q_flag:
+		':' qf_subcorpora 	{ undef }
+  	|	CNTXT integer 		{ $_[0]->qopts->{ContextSentencesCount} = $_[2]; undef }
+	|	CNTXT '[' integer ']'	{ $_[0]->qopts->{ContextSentencesCount} = $_[3]; undef }
+	|	WITHIN s_breakname	{ push(@{$_[0]->qopts->{Within}}, $_[2]); undef }
+	|	SEPARATE_HITS		{ $_[0]->qopts->{SeparateHits} = 1; undef }
+	|	NOSEPARATE_HITS		{ $_[0]->qopts->{SeparateHits} = 0; undef }
+	|	FILENAMES_ONLY 		{ $_[0]->qopts->{EnableBibliography} = 0; undef }
+	|	'!' FILENAMES_ONLY	{ $_[0]->qopts->{EnableBibliography} = 1; undef }
+	|	DEBUG_RANK		{ $_[0]->qopts->{DebugRank} = 1; undef }
+	|	'!' DEBUG_RANK		{ $_[0]->qopts->{DebugRank} = 0; undef }
+	;
+
+
+qf_subcorpora:
+						{ undef } ##-- empty
+	|	s_subcorpus			{ push(@{$_[0]->qopts->{Subcorpora}}, $_[1]); undef }
+	|	qf_subcorpora ',' s_subcorpus	{ push(@{$_[0]->qopts->{Subcorpora}}, $_[3]); undef }
+	;
+
+q_filter:
+		qf_has_field	{ $_[1]; }
+	|	qf_rank_sort	{ $_[1]; }
+	|	qf_context_sort	{ $_[1]; }
+	|	qf_size_sort	{ $_[1]; }
+	|	qf_date_sort	{ $_[1]; }
+	|	qf_bibl_sort	{ $_[1]; }
+	|	qf_random_sort	{ $_[1]; }
+	;
+
+qf_has_field:
+		HAS_FIELD '[' s_biblname ',' symbol ']'		{ $_[0]->newf('CQFHasFieldValue', $_[3], $_[5]) }
+	|	HAS_FIELD '[' s_biblname ',' regex ']'		{ $_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]) }
+	|	HAS_FIELD '[' s_biblname ',' neg_regex ']'	{ (my $f=$_[0]->newf('CQFHasFieldRegex', $_[3], $_[5]))->Negate(); $f }
+	|	HAS_FIELD '[' s_biblname ',' s_prefix ']'	{ $_[0]->newf('CQFHasFieldPrefix', $_[3],$_[5]) }
+	|	HAS_FIELD '[' s_biblname ',' s_suffix ']'	{ $_[0]->newf('CQFHasFieldSuffix', $_[3],$_[5]) }
+	|	HAS_FIELD '[' s_biblname ',' s_infix ']'	{ $_[0]->newf('CQFHasFieldInfix', $_[3],$_[5]) }
+	|	HAS_FIELD '[' s_biblname ',' '{' l_set '}' ']'	{ $_[0]->newf('CQFHasFieldSet', $_[3], $_[6]) }
+	|	'!' qf_has_field 				{ $_[2]->Negate; $_[2] }
+	;
+
+qf_rank_sort:
+		GREATER_BY_RANK { $_[0]->newf('CQFRankSort', DDC::PP::GreaterByRank) }
+	|	LESS_BY_RANK    { $_[0]->newf('CQFRankSort', DDC::PP::LessByRank) }
+	;
+
+qf_context_sort:
+		LESS_BY_LEFT       qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::LessByLeftContext,      -1, $_[2]) }
+	|	GREATER_BY_LEFT	   qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::GreaterByLeftContext,   -1, $_[2]) }
+	|	LESS_BY_RIGHT      qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::LessByRightContext,      1, $_[2]) }
+	|	GREATER_BY_RIGHT   qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::GreaterByRightContext,   1, $_[2]) }
+	|	LESS_BY_MIDDLE     qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::LessByMiddleContext,     0, $_[2]) }
+	|	GREATER_BY_MIDDLE  qfb_ctxsort	{ $_[0]->newCFilter(DDC::PP::GreaterByMiddleContext,  0, $_[2]) }
+	;
+
+qf_size_sort:
+		LESS_BY_SIZE qfb_int		{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    @{$_[2]}) }
+	|	GREATER_BY_SIZE qfb_int		{ $_[0]->newf('CQFSizeSort', DDC::PP::GreaterBySize, @{$_[2]}) }
+	|	IS_SIZE '[' int_str ']'		{ $_[0]->newf('CQFSizeSort', DDC::PP::LessBySize,    $_[3],$_[3]) }
+	;
+
+qf_date_sort:
+		LESS_BY_DATE qfb_date		{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[2]}) }
+	|	GREATER_BY_DATE qfb_date	{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[2]}) }
+	|	IS_DATE '[' date ']'		{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    $_[3],$_[3]) }
+	;
+
+qf_random_sort:
+		RANDOM					{ $_[0]->newf('CQFRandomSort') }
+	|	RANDOM '[' ']'				{ $_[0]->newf('CQFRandomSort') }
+	|	RANDOM '[' int_str ']'			{ $_[0]->newf('CQFRandomSort',$_[3]) }
+	;
+
+qf_bibl_sort:
+		LESS_BY    '[' KW_DATE qfb_bibl ']'	{ $_[0]->newf('CQFDateSort', DDC::PP::LessByDate,    @{$_[4]}) }
+	|	GREATER_BY '[' KW_DATE qfb_bibl ']'	{ $_[0]->newf('CQFDateSort', DDC::PP::GreaterByDate, @{$_[4]}) }
+	|	LESS_BY    '[' s_biblname qfb_bibl ']'	{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
+	|	GREATER_BY '[' s_biblname qfb_bibl ']'	{ $_[0]->newf('CQFBiblSort', DDC::PP::LessByFreeBiblField, $_[3], @{$_[4]}) }
+	;
+
+##-------------------------------------------------------------
+## (qfb*): Filter Bounds
+
+##-- qfb_int: [0:$lb,1:$ub]
+qfb_int:
+						{ [] } ##-- empty
+	|	'[' ']'				{ [] }
+  	|	'[' ',' ']'			{ [] }
+	|	'[' int_str ']'			{ [$_[2]] }
+	|	'[' int_str ',' ']'		{ [$_[2]] }
+	|	'[' int_str ',' int_str ']'	{ [$_[2],$_[4]] }
+	|	'[' ',' int_str ']'		{ [undef,$_[3]] }
+	;
+
+##-- qfb_date: [0:$lb,1:$ub]
+qfb_date:
+						{ [] } ##-- empty
+	|	'[' ']'				{ [] }
+	|	'[' date ']'			{ [$_[2]] }
+	|	'[' date ',' ']'		{ [$_[2]] }
+	|	'[' date ',' date ']'		{ [$_[2],$_[4]] }
+	|	'[' ',' date ']'		{ [undef,$_[3]] }
+	;
+
+##-- qfb_bibl: [0:$lb,1:$ub]
+qfb_bibl:
+					{ [] } ##-- empty
+	|	qfb_bibl_ne		{ $_[1] }
+	;
+
+
+##-- qfb_bibl_ne: [0:$lb,1:$ub]
+qfb_bibl_ne:
+		',' 			{ [] }
+	|	','        ','		{ [] }
+	|	',' symbol		{ [$_[2]] }
+	|	',' symbol ','		{ [$_[2]] }
+	|	','        ',' symbol	{ [undef,$_[3]] }
+	|	',' symbol ',' symbol	{ [$_[2],$_[4]] }
+	;
+
+##-- qfb_ctxsort : [0:$field,1:$matchid,2:$offset,3:$lb,4:$ub]
+qfb_ctxsort:
+						{ [] } ##-- empty
+	|	'[' qfb_ctxkey             ']'	{ $_[2] }
+  	|	'[' qfb_ctxkey qfb_bibl_ne ']'	{ [@{$_[2]}, @{$_[3]}] }
+	;
+
+##-- qfb_ctxkey: [0:$field,1:$matchid,2:$offset]
+qfb_ctxkey:
+		sym_str qfbc_matchref qfbc_offset	{ [$_[1],$_[2],$_[3]] }
+	|		qfbc_matchref qfbc_offset	{ [undef,$_[1],$_[2]] }
+	;
+
+##-- qfbc_matchref: $matchid
+qfbc_matchref:
+				{ 0 }     ##-- empty
+	|	matchid		{ $_[1] }
+	;
+
+##-- qfbc_offset: offset
+qfbc_offset:
+				{  undef }   ##-- empty: use filter-type default
+	|	integer		{  $_[1] }
+	|	'+' integer	{  $_[2] }
+	|	'-' integer	{ -$_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## q_clause (qc*): query clauses (logical operations)
+
+q_clause:
+		qc_basic		%prec OP_CLAUSE_BASIC	{ $_[1] }
+	|	qc_boolean		%prec OP_CLAUSE_BOOL	{ $_[1] }
+	|	qc_concat		%prec OP_CLAUSE_CONCAT	{ $_[1] }
+	|	qc_matchid		%prec OP_CLAUSE_MATCHID	{ $_[1] }
+	;
+
+qc_matchid:
+		q_clause matchid	 { $_[1]->SetMatchId($_[2]); $_[1] }
+	|	'(' qc_matchid ')' 	 { $_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## qc_boolean: query clause: complex boolean expression
+qc_boolean:
+		q_clause OP_BOOL_AND q_clause	{ $_[0]->newq('CQAnd', $_[1],$_[3]) }
+	|	q_clause OP_BOOL_OR q_clause	{ $_[0]->newq('CQOr', $_[1],$_[3]) }
+	|	'!' q_clause 			{ $_[2]->Negate; $_[2] }
+	|	'(' qc_boolean ')'		{ $_[2] }
+	;
+
+##-------------------------------------------------------------
+## qc_concat: query clause: implicit logical conjunction
+qc_concat:
+ 	  qc_basic qc_basic	{ $_[0]->newq('CQAnd', $_[1],$_[2]) }
+	| qc_concat  qc_basic	{ $_[0]->newq('CQAnd', $_[1],$_[2]) }
+	| '(' qc_concat ')'	{ $_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## qc_basic: query clause: basic (single logical condition)
+
+qc_basic:
+		qc_tokens	%prec OP_PHRASE	{ $_[1] }
+	|	qc_near		%prec OP_PHRASE { $_[1] }
+	;
+
+qc_near:
+		NEAR '(' qc_tokens ',' qc_tokens ',' integer ')'		{ $_[0]->newq('CQNear', $_[7],$_[3],$_[5]) }
+	|	NEAR '(' qc_tokens ',' qc_tokens ',' qc_tokens ',' integer ')'	{  $_[0]->newq('CQNear', $_[9],$_[3],$_[5],$_[7]) }
+ 	|	qc_near matchid		{ $_[1]->SetMatchId($_[2]); $_[1] }
+	|	'(' qc_near ')' 	{ $_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## qc_tokens: condition with hit position (can be arg to NEAR()):
+
+qc_tokens:
+		qc_word			%prec OP_WORD	{ $_[1] }
+	|	qc_phrase 		%prec OP_PHRASE	{ $_[1] }
+	|	qc_tokens matchid	%prec OP_PHRASE { $_[1]->SetMatchId($_[2]); $_[1] }
+	;
+
+qc_phrase:
+		'"' l_phrase '"'	{ $_[2] }
+	|	'(' qc_phrase ')'	{ $_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## qc_word (qw*): Single-Token Queries
+
+qc_word:
+	qw_bareword			{ $_[1] }
+	|	qw_exact		{ $_[1] }
+	|	qw_regex		{ $_[1] }
+	|	qw_any			{ $_[1] }
+	|	qw_set_infl		{ $_[1] }
+	|	qw_set_exact		{ $_[1] }
+	|	qw_infix		{ $_[1] }
+	|	qw_infix_set		{ $_[1] }
+	|	qw_prefix		{ $_[1] }
+	|	qw_prefix_set		{ $_[1] }
+	|	qw_suffix		{ $_[1] }
+	|	qw_suffix_set		{ $_[1] }
+	|	qw_thesaurus		{ $_[1] }
+	|	qw_morph		{ $_[1] }
+	|	qw_lemma		{ $_[1] }
+	|	qw_chunk		{ $_[1] }
+	|	qw_anchor		{ $_[1] }
+	|	qw_listfile		{ $_[1] }
+	|	qw_with			{ $_[1] }
+	|	qw_without		{ $_[1] }
+	|	qw_withor		{ $_[1] }
+	|	qw_keys			{ $_[1] }
+   	|	qw_matchid		{ $_[1] }
+	|	'(' qc_word ')'		{ $_[2] }
+	;
+
+qw_bareword:
+	 	s_word l_txchain		{ $_[0]->newq('CQTokInfl', "", $_[1], $_[2]) }
+	| 	s_index '=' s_word l_txchain	{ $_[0]->newq('CQTokInfl', $_[1], $_[3], $_[4]) }
+	;
+
+qw_exact:
+		'@' s_word			{ $_[0]->newq('CQTokExact', "", $_[2]) }
+	|	s_index '=' '@' s_word		{ $_[0]->newq('CQTokExact', $_[1], $_[4]) }
+	;
+
+qw_regex:
+		regex				{ $_[0]->newq('CQTokRegex', "",   $_[1]) }
+	|	s_index '=' regex		{ $_[0]->newq('CQTokRegex', $_[1],$_[3]) }
+	|	neg_regex			{ $_[0]->newq('CQTokRegex', "",    $_[1], 1) }
+	|	s_index '=' neg_regex		{ $_[0]->newq('CQTokRegex', $_[1], $_[3], 1) }
+	;
+
+qw_any:
+		'*'				{ $_[0]->newq('CQTokAny') }
+	|	s_index '=' '*'			{ $_[0]->newq('CQTokAny',$_[1]) }
+	;
+
+qw_set_exact:
+		AT_LBRACE l_set '}'		{ $_[0]->newq('CQTokSet', "",    undef, $_[2]) }
+	|	s_index '=' AT_LBRACE l_set '}'	{ $_[0]->newq('CQTokSet', $_[1], undef, $_[2]) }
+	;
+
+qw_set_infl:
+		'{' l_set '}' l_txchain			{ $_[0]->newq('CQTokSetInfl', "",    $_[2], $_[4]) }
+	|	s_index '=' '{' l_set '}' l_txchain	{ $_[0]->newq('CQTokSetInfl', $_[1], $_[4], $_[6]) }
+	;
+
+qw_prefix:
+		s_prefix			{ $_[0]->newq('CQTokPrefix', "",    $_[1]) }
+	|	s_index '=' s_prefix		{ $_[0]->newq('CQTokPrefix', $_[1], $_[3]) }
+	;
+
+qw_suffix:
+		s_suffix			{ $_[0]->newq('CQTokSuffix', "",    $_[1]) }
+	|	s_index '=' s_suffix		{ $_[0]->newq('CQTokSuffix', $_[1], $_[3]) }
+	;
+
+qw_infix:
+		s_infix				{ $_[0]->newq('CQTokInfix', "",    $_[1]) }
+	|	s_index '=' s_infix		{ $_[0]->newq('CQTokInfix', $_[1], $_[3]) }
+	;
+
+qw_infix_set:
+		STAR_LBRACE l_set RBRACE_STAR			{ $_[0]->newq('CQTokInfixSet', "", $_[2]) }
+	|	s_index '=' STAR_LBRACE l_set RBRACE_STAR	{ $_[0]->newq('CQTokInfixSet', $_[1], $_[4]) }
+	;
+
+qw_prefix_set:
+		'{' l_set RBRACE_STAR				{ $_[0]->newq('CQTokPrefixSet',"", $_[2]) }
+	|	s_index '=' '{' l_set RBRACE_STAR		{ $_[0]->newq('CQTokPrefixSet',$_[1], $_[4]) }
+	;
+
+qw_suffix_set:
+		STAR_LBRACE l_set '}'				{ $_[0]->newq('CQTokSuffixSet',"", $_[2]) }
+	|	s_index '=' STAR_LBRACE l_set '}'		{ $_[0]->newq('CQTokSuffixSet',$_[1], $_[4]) }
+	;
+
+qw_thesaurus:
+		COLON_LBRACE s_semclass '}'		{ $_[0]->newq('CQTokThes', "Thes",$_[2]) }
+	|	s_index '=' ':' '{' s_semclass '}'	{ $_[0]->newq('CQTokThes', $_[1], $_[5]) }
+	;
+
+qw_morph:
+		'[' l_morph ']'			{ $_[0]->newq('CQTokMorph', "MorphPattern", $_[2]) }
+	|	s_index '=' '[' l_morph ']'	{ $_[0]->newq('CQTokMorph', $_[1], $_[4]) }
+	;
+
+qw_lemma:
+	 	'%' s_lemma			{ $_[0]->newq('CQTokLemma', "Lemma", $_[2]) }
+	|	s_index '=' '%' s_lemma		{ $_[0]->newq('CQTokLemma', $_[1], $_[4]) }
+	;
+
+qw_chunk:
+		'^' s_chunk			{ $_[0]->newq('CQTokChunk', "", $_[2]) }
+	| 	s_index '=' '^' s_chunk		{ $_[0]->newq('CQTokChunk', $_[1], $_[4]) }
+	;
+
+qw_anchor:
+		DOLLAR_DOT        '=' int_str	{ $_[0]->newq('CQTokAnchor', "",    $_[3]) }
+	|	DOLLAR_DOT symbol '=' int_str	{ $_[0]->newq('CQTokAnchor', $_[2], $_[4]) }
+	;
+
+qw_listfile:
+	 	'<' s_filename			{ $_[0]->newq('CQTokFile', "",    $_[2]) }
+	| 	s_index '=' '<' s_filename	{ $_[0]->newq('CQTokFile', $_[1], $_[4]) }
+	;
+
+qw_with:
+		qc_word WITH    qc_word		{ $_[0]->newq('CQWith', $_[1],$_[3]) }
+	;
+
+qw_without:
+		qc_word WITHOUT qc_word		{ $_[0]->newq('CQWithout', $_[1],$_[3]) }
+	;
+
+qw_withor:
+		qc_word WITHOR qc_word		{ $_[0]->newq('CQWithor', $_[1],$_[3]) }
+	;
+
+qw_keys:
+		KEYS '(' qwk_countsrc ')'			{ $_[0]->newKeysQuery($_[3][0], $_[3][1]); }
+	|	qwk_indextuple '=' KEYS '(' qwk_countsrc ')'	{ $_[0]->newKeysQuery($_[5][0], $_[5][1], $_[1]); }
+	;
+
+qwk_indextuple:
+		'$' '(' l_indextuple ')'			{ $_[3] }
+	;
+
+##-- qwk_countsrc: [$qCount, \%keysOpts]
+qwk_countsrc:
+		count_query					{ [$_[1], {}] }
+	|	query_conditions count_filters 			{ [$_[0]->newCountQuery($_[1], $_[2]), $_[2]] }
+	;
+
+qw_matchid:
+		qc_word matchid 		{ $_[1]->SetMatchId($_[2]); $_[1] }
+	;
+
+
+##-------------------------------------------------------------
+## l_*: List-like constituents
+
+l_set:
+					{ [] } ##-- empty
+	|	l_set s_word		{ push(@{$_[1]}, $_[2]); $_[1] }
+	|	l_set ','		{ $_[1] }
+#	|	l_set ';'		{ $_[1] }
+	;
+
+l_morph:
+					{ [] } ##-- empty
+	|	l_morph s_morphitem	{ push(@{$_[1]}, $_[2]); $_[1] }
+	|	l_morph ','		{ $_[1] }
+	|	l_morph ';'		{ $_[1] } ##-- backwards-compatible
+	;
+
+l_phrase :
+	  	qc_word					{ $_[0]->newq('CQSeq', [$_[1]]) }
+	| 	l_phrase qc_word			{ $_[1]->Append($_[2]); $_[1] }
+	|	l_phrase '#'           integer qc_word	{ $_[1]->Append($_[4], $_[3]); $_[1] }
+	|	l_phrase HASH_LESS     integer qc_word	{ $_[1]->Append($_[4], $_[3], '<'); $_[1] }
+	|	l_phrase HASH_GREATER  integer qc_word	{ $_[1]->Append($_[4], $_[3], '>'); $_[1] }
+	|	l_phrase HASH_EQUAL    integer qc_word	{ $_[1]->Append($_[4], $_[3], '='); $_[1] }
+	;
+
+l_txchain:
+					{ []; } ##-- empty
+	|	l_txchain s_expander	{ push(@{$_[1]}, $_[2]); $_[1] }
+	;
+
+##-- l_countkeys: CQCountKeyExprList
+l_countkeys:
+						{ $_[0]->newq('CQCountKeyExprList') }
+	|	count_key			{ $_[0]->newq('CQCountKeyExprList', Exprs=>[$_[1]]) }
+	|	l_countkeys ',' count_key	{ $_[1]->PushKey($_[3]); $_[1] }
+	;
+
+l_indextuple:
+								{ [] }
+	|	s_indextuple_item				{ [$_[1]] }
+	|	l_indextuple ',' s_indextuple_item		{ push(@{$_[1]},$_[3]); $_[1] }
+	;
+
+##-------------------------------------------------------------
+## count_key: count-key expressions
+
+count_key:
+		'*'				{ $_[0]->newq('CQCountKeyExprConstant', "*") }
+	|	'@' symbol			{ $_[0]->newq('CQCountKeyExprConstant', $_[2]) }
+	|	KW_FILEID			{ $_[0]->newq('CQCountKeyExprFileId', $_[1]) }
+	|	KW_FILENAME			{ $_[0]->newq('CQCountKeyExprFileName', $_[1]) }
+	|	KW_DATE				{ $_[0]->newq('CQCountKeyExprDate', $_[1]) }
+    	|	KW_DATE '/' integer		{ $_[0]->newq('CQCountKeyExprDateSlice', $_[1],$_[3]) }
+	|	s_biblname			{ $_[0]->newq('CQCountKeyExprBibl', $_[1]) }
+	|	s_index ck_matchid ck_offset	{ $_[0]->newq('CQCountKeyExprToken', $_[1],$_[2],$_[3]) }
+ 	|	count_key '~' replace_regex	{ $_[0]->newq('CQCountKeyExprRegex', $_[1],@{$_[3]}) }
+	|	'(' count_key ')'		{ $_[2]; }
+	;
+
+ck_matchid:
+				{     0 } ##-- empty
+	|	matchid		{ $_[1] }
+	;
+
+ck_offset:
+				{      0 } ##-- empty
+	|	integer		{  $_[1] }
+	|	'+' integer	{  $_[2] }
+	|	'-' integer	{ -$_[2] }
+	;
+
+
+##-------------------------------------------------------------
+## s_*: semantic sugar for symbols
+
+s_index:
+		'$'		{ '' }
+	|	index		{ $_[1] }
+	;
+
+s_indextuple_item:
+		s_index		{ $_[1] }
+	|	symbol		{ $_[1] }
+	;
+
+s_word:		symbol 		{ $_[1] } ;
+s_semclass:	symbol		{ $_[1] } ;
+s_lemma:	symbol		{ $_[1] } ;
+s_chunk: 	symbol		{ $_[1] } ;
+s_filename:	symbol		{ $_[1] } ;
+s_morphitem:	symbol		{ $_[1] } ;
+s_subcorpus:	symbol		{ $_[1] } ;
+s_biblname:	symbol		{ $_[1] } ;
+
+s_breakname:	symbol		{ $_[1] }
+	|	KW_FILENAME	{ "file" }
+	;
+
+
+##-------------------------------------------------------------
+## Preterminals
+
+symbol:
+ 		SYMBOL     { unescape($_[1]) }
+	| 	INTEGER    { $_[1] }
+	| 	DATE       { $_[1] }
+  	;
+
+index:
+		'$'	   { '' }
+  	|	INDEX	   { unescape($_[1]) }
+  	;
+
+sym_str:	SYMBOL	   	{ unescape($_[1]) } ;
+
+s_prefix:	PREFIX		{ unescape($_[1]) } ;
+s_suffix:	SUFFIX		{ unescape($_[1]) } ;
+s_infix:	INFIX		{ unescape($_[1]) } ;
+
+s_expander:	EXPANDER	{ unescape($_[1]) } ;
+
+regex:
+		REGEX		{ $_[0]->newre($_[1]) }
+	|	REGEX REGOPT	{ $_[0]->newre($_[1],$_[2]) }
+	;
+
+neg_regex:
+		NEG_REGEX		{ $_[0]->newre($_[1]) }
+	|	NEG_REGEX REGOPT	{ $_[0]->newre($_[1],$_[2]) }
+  	;
+
+##-- replace_regex: [$pattern,$replacement,$modifiers]
+replace_regex:	REGEX_SEARCH REGEX_REPLACE		{ [$_[1],$_[2],''] }
+	|	REGEX_SEARCH REGEX_REPLACE REGOPT	{ [$_[1],$_[2],$_[3]] }
+	;
+
+int_str:	INTEGER	{ $_[1] } ;
+
+integer:	int_str		{ no warnings 'numeric'; ($_[1]+0) } ;
+
+date:
+  		DATE		{ $_[1] }
+	|	INTEGER		{ $_[1] }
+	;
+
+matchid:	matchid_eq integer	{ $_[0]->yybegin('INITIAL'); $_[2] } ;
+
+matchid_eq:	'='			{ $_[0]->yybegin('Q_MATCHID'); $_[1] } ;
+
+%%
+##############################################################
+# Footer Section
+###############################################################
+
+package DDC::PP::yyqparser;
+#require Exporter;
+
+## $q = $yyqparser->newq($querySubclass, @queryArgs)
+##  + just wraps DDC::PP::CQueryCompiler::newq
+sub newq {
+  return $_[0]{USER}{qc}->newq(@_[1..$#_]);
+}
+
+## $qf = $yyqparser->newf($filterSubclass, @filterArgs)
+##  + wraps DDC::PP::CQueryCompiler::newf and pushes filter onto current options' filter-list
+sub newf {
+  my $f = $_[0]{USER}{qc}->newf(@_[1..$#_]);
+  push(@{$_[0]->qopts->{Filters}}, $f);
+  return $f;
+}
+
+## $cf = $yyqparser->newCFilter($filterSortType, $defaultOffset, \@args)
+sub newCFilter {
+  my ($qp,$type,$off,$args) = @_;
+  print STDERR "newCFilter: ", Data::Dumper->Dump([@_[1..$#_]]), "\n";
+  $args->[2] = $off if (!defined($args->[2]));
+  return $qp->newf('CQFContextSort', $type, @$args);
+}
+
+## $qc = $yyqparser->newCountQuery($qSrc, \%qcOpts)
+sub newCountQuery {
+  my ($qp,$qsrc,$qcopts) = @_;
+  $qp->SetQuery($qsrc);
+  my $qc = $qp->newq('CQCount', $qsrc);
+  foreach my $key (keys %{$qcopts||{}}) {
+    $qc->can("set$key")->($qc, $qcopts->{$key}) if ($qc->can("set$key"));
+  }
+  return $qc;
+}
+
+## $qk = $yyqparser->newKeysQuery($qCount, \%qcOpts, $indexTuple)
+sub newKeysQuery {
+  my ($qp,$qcount,$qcopts,$ituple) = @_;
+  return $qp->newq('CQKeys', $qcount, ($qcopts||{})->{Limit}, $ituple);
+}
+
+## $re = $yyqparser->newre($regex, $regopt)
+##  + wraps DDC::PP::CQueryCompiler::newre
+sub newre {
+  return $_[0]{USER}{qc}->newre(@_[1..$#_]);
+}
+
+## $qo = $yyqparser->qopts()
+##  + just wraps DDC::PP::CQueryCompiler::qopts()
+sub qopts {
+  return $_[0]{USER}{qc}->qopts(@_[1..$#_])
+}
+
+## $q = $yyqparser->SetQuery($q)
+##  + sets compiler query and assigns its options
+sub SetQuery {
+  $_[1]->setOptions($_[0]->qopts) if ($_[1]);
+  $_[0]->qopts(DDC::PP::CQueryOptions->new);
+  $_[0]{USER}{qc}->setQuery($_[1]);
+}
+
+## undef = $yyqparser->yycarp($message_template,\%macros)
+sub yycarp {
+  die($_[0]{USER}{qc}->setError(@_[1..$#_]));
+}
+
+## undef = $yyqparser->yybegin($q)
+sub yybegin {
+  $_[0]{USER}{qc}{lexer}{state} = $_[1];
+}
+
+### $esc = $yyqparser->unescape($sym)
+###  + wraps DDC::Query::Parser::unescape($sym)
+#sub unescape {
+#  return $_[0]{USER}{qc}->unescape($_[1]);
+#}
+
+1; ##-- be happy
+
+__END__
+
+##========================================================================
+## POD DOCUMENTATION, auto-generated by podextract.perl
+
+##========================================================================
+## NAME
+=pod
+
+=head1 NAME
+
+DDC::PP::yyqparser - low-level Parse::Yapp parser for DDC::Query::Parser [DEPRECATED]
+
+=cut
+
+##========================================================================
+## SYNOPSIS
+=pod
+
+=head1 SYNOPSIS
+
+ use DDC::PP::yyqparser;
+
+ $q = $yyqparser->newQuery($querySubclass, %queryArgs);
+ undef = $yyqparser->yycarp($message_template,\%macros);
+
+ ##... (any Parse::Yapp method) ...
+
+=cut
+
+##========================================================================
+## DESCRIPTION
+=pod
+
+=head1 DESCRIPTION
+
+B<Caveat Programmor>:
+This module is auto-generated with Parse::Yapp.
+Do I<NOT> change yyqparser.pm directly, change yyqparser.yp instead!
+
+Use of this module is deprecated in favor of the L<DDC::XS::CQueryCompiler|DDC::XS::CQueryCompiler>
+module providing direct access to the underlying C++ libraries.
+
+=cut
+
+##----------------------------------------------------------------
+## DESCRIPTION: DDC::PP::yyqparser
+=pod
+
+=over 4
+
+=item show_hint
+
+(undocumented)
+
+=item new
+
+(undocumented)
+
+=item newQuery
+
+ $q = $yyqparser->newQuery($querySubclass, %queryArgs);
+
+Just wraps DDC::newQuery.
+
+=item yycarp
+
+ undef = $yyqparser->yycarp($message_template,\%macros);
+
+Error reporting subroutine.
+
+=back
+
+=cut
+
+##========================================================================
+## END POD DOCUMENTATION, auto-generated by podextract.perl
+
+##======================================================================
+## Footer
+##======================================================================
+
+=pod
+
+=head1 ACKNOWLEDGEMENTS
+
+Perl by Larry Wall.
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2011-2017 by Bryan Jurish
+
+This package is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::PP(3perl),
+DDC::PP::CQueryCompiler(3perl),
+DDC::PP::yyqlexer(3perl).
+
+=cut

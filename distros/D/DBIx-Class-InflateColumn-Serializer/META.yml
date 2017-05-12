@@ -1,0 +1,41 @@
+---
+abstract: 'Inflators to serialize data structures for DBIx::Class'
+author:
+  - 'Jose Luis Martinez (jlmartinez@capside.com)'
+build_requires:
+  DBD::SQLite: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-InflateColumn-Serializer
+provides:
+  DBIx::Class::InflateColumn::Serializer:
+    file: lib/DBIx/Class/InflateColumn/Serializer.pm
+    version: '0.09'
+  DBIx::Class::InflateColumn::Serializer::JSON:
+    file: lib/DBIx/Class/InflateColumn/Serializer/JSON.pm
+    version: '0.09'
+  DBIx::Class::InflateColumn::Serializer::Storable:
+    file: lib/DBIx/Class/InflateColumn/Serializer/Storable.pm
+    version: '0.09'
+  DBIx::Class::InflateColumn::Serializer::YAML:
+    file: lib/DBIx/Class/InflateColumn/Serializer/YAML.pm
+    version: '0.09'
+requires:
+  DBIx::Class: '0'
+  JSON::MaybeXS: '1.002005'
+  YAML: '0'
+  namespace::clean: '0'
+  perl: v5.8.0
+resources:
+  homepage: http://metacpan.org/release/DBIx-Class-InflateColumn-Serializer/
+  repository: git://github.com/miquelruiz/DBIx-Class-InflateColumn-Serializer.git
+version: '0.09'
+x_serialization_backend: 'YAML::Tiny version 1.69'

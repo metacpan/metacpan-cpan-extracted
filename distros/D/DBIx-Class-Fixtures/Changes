@@ -1,0 +1,171 @@
+Revision history for DBIx-Class-Fixtures
+
+1.001036  2016-03-21 14:59:55+00:00 UTC
+
+- releasing as stable
+
+1.00103_5 2016-03-11 20:39:49+00:00 UTC (TRIAL RELEASE)
+
+- Will completely ignore sequences in Oracle due to having to drop and recreate them
+
+
+1.001034  2016-01-05 15:05:26+00:00 UTC
+
+1.00103_3 2015-12-08 16:33:56+00:00 UTC (TRIAL RELEASE)
+
+
+- RT#108017 bugfix ( hatorikibble++ )
+- added File::Temp to deps ( hatorikibble++ )
+
+1.001032  2015-06-04 15:03:38+00:00 UTC
+
+- releasing as stable
+
+1.001_031 2015-05-27 14:54:24+00:00 UTC (TRIAL RELEASE)
+
+- Fix for an issue where when inserting data into a database,
+    the tables were being sorted alphabetically, rather than in dependency order. ( TBSliver++ )
+
+1.001_030 2015-05-27 14:43:34+00:00 UTC (TRIAL RELEASE)
+
+- use Test::TempDir::Tiny for better test parallelization and cleanup ( RsrchBoy++ )
+
+1.001_029 2015-01-14 15:17:28+00:00 Europe/London
+
+- fix for bugtracker pointing to gh, should be rt, added test to identify windows issues
+
+1.001028  2015-01-05 00:40:41+00:00 Europe/London
+
+- releasing as stable
+
+1.001027_02 2014-12-30 19:50:50+00:00 Europe/London
+
+- changed tests to use portable directory management
+
+1.001027_01 2014-12-26 17:06:08+00:00 Europe/London
+
+- Fix fixture filenames to be compatible with ntfs systems - mrf++
+
+1.001026  2014-12-01 16:43:10+00:00 Europe/London
+
+- bugfix: not relying on $src->from to be a string anymore, use $src->name or $src->source_name. mrf++
+
+1.001025  2014-11-30 00:58:13+00:00 Europe/London
+
+- optimization: add empty string as second arg to encode_base64 - rammo++
+    https://github.com/dbsrgits/DBIx-Class-Fixtures/pull/1/commits
+
+1.001024  2014-08-15 13:55:57+01:00 Europe/London
+
+-  Missing test dependency added
+
+1.001023  2014-08-13 22:20:17+01:00 Europe/London
+- No change from last version
+
+1.001021_01
+- add in option use_find_or_create
+
+1.001021
+- Applied patch to solve issue when trying to copy fixtures across volumes
+
+1.001020
+- Bumped some dependencies to stop cpan tester fails.
+
+1.001019
+- Fixed issue when using fixtures and parallel testing (such as prove -j9 ...)
+
+1.001018
+- Reduced the size of a PK in the fixtures to stop (hopefully) some occasional
+  error reports
+
+1.001017
+- POD fixes (justin hunter++)
+- Changed the test suite so it doesn't mindlessly break with the changes
+  introduced by DBIC 0.08200 (nerox++ for bug report).
+
+1.001016
+- Support more Postgresql types for datetime_relative (added TIME, DATE,
+  INTERVAL, TIMESTAMP)
+- If $result_source->column_info defines a sequence, make sure we properly
+  set that sequence to whatever the max value currently is.
+
+1.001015
+- ::External::File makes the path if its missing
+
+1.001014
+- Allow you to perform value substitutions inside config-sets
+- Added a framework to allow you to backup / restore data external to the
+  database as part of your fixtures.  Added an external handler for File
+  based data, and docs and tests for this.
+
+1.001013
+- fixed functionality in last release by more deeply cloning parameters, which
+  prevents bad things when parameters get deleted in the wrong places.  Also 
+  be sure we clear state properly after a dump.
+
+1.001012
+- Added new method 'available_config_sets' which returns and caches a list of
+  all the json set configs found in the 'config_dir' directory.  This was added
+  to make it easier when you need to dump all the fixtures programatically.
+- Added method 'dump_config_sets' to let you dump more than one set at a time
+  more easily
+- Added method 'dump_all_config_sets' which helps automate dumping all your 
+  current config sets to a directory.  
+
+1.001011
+- Added an excludes resultsource option to the ->dump({all=>1,...}) feature
+- Allow you to directly set a configuration via a Perl HashRef instead of a
+  JSON file.  Useful for testing and when you have simple or generated configs.
+- New option to force use of ->create rather than ->populate.
+- Fixed a bug in the test suite that would fail on certain JSON parsers
+
+1.001010
+- Fixed docs to use double quotes which is valid JSON
+
+1.001009
+- Force operations to work inside a transaction so with_deferred_fks actually works.
+
+1.001008
+- Man, I should test better.
+
+1.001007
+- Should use Schema->source(), not ->resultset().
+
+1.001006
+- Schema->resultset() throws an exception, not return undef, when it can't find
+  a moniker.
+
+1.001005
+- Fixed problem where rules containing an override of has_many weren't applied
+  correctly.
+
+1.001004
+- Fixed problem where descending a has_many to something with two belongs_to
+  relationships wouldn't get the second belongs_to.
+
+1.001003
+- Fix t/var/configs/*.json to use valid JSON syntax
+- Fixed DateTime::Format dependencies
+
+1.001002
+- Allow passing schema object to ->populate
+- Check that fixture population dir was created
+
+1.001001
+- debug defaults to 0 rather than undef
+- cleanup only deletes what's necessary
+- added db specific dbi files so that postgres can use deferrable
+
+1.001000
+- Added includes functionality
+- Added post_ddl and cascade attributes to populate (Drew Taylor)
+- Scalar refs in cond clauses handled in sets as well as fetches (Sebastian Willert)
+- Directory separators in primary keys do not cause a crash (Sebastian Willert)
+- Optimised populate to take advantage of insert_bulk (Drew Taylor)
+
+1.000001
+- Added missing deps
+
+1.000000
+- Released
+

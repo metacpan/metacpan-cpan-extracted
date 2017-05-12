@@ -1,0 +1,4 @@
+Digest::BLAKE2s T_PTROBJ
+Digest::BLAKE2b T_PTROBJ
+Digest::BLAKE2sp T_PTROBJ
+Digest::BLAKE2bp T_PTROBJ

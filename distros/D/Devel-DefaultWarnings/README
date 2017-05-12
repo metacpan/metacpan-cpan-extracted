@@ -1,0 +1,40 @@
+NAME
+    Devel::DefaultWarnings - Detect if warnings have been left at defaults
+
+SYNOPSIS
+      use Devel::DefaultWarnings;
+      {
+        BEGIN { my $def = warnings_default(); } #true;
+      }
+      {
+        use warnings;
+        BEGIN { my $def = warnings_default(); } #false;
+      }
+      {
+        no warnings;
+        BEGIN { my $def = warnings_default(); } #false;
+      }
+
+DESCRIPTION
+    Check if lexical warnings have been changed from the default. Checks the
+    current compiling context.
+
+FUNCTIONS
+    warnings_default
+        Returns a true value if lexical warnings have been left as the
+        default.
+
+AUTHOR
+    haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>
+
+CONTRIBUTORS
+    None yet.
+
+COPYRIGHT
+    Copyright (c) 2014 the Devel::DefaultWarnings "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software and may be distributed under the same
+    terms as perl itself.
+

@@ -1,0 +1,18 @@
+Revision history for Perl module Dist-Zilla-Plugin-Test-CPAN-Meta-JSON
+
+0.004     2015-03-21
+    * Decleare JSON::PP 2.27103 dependency
+    * Don't silently skip the test if Test::CPAN::Meta::JSON is not installed
+    * Inject develop/requires dependency on Test::CPAN::Meta::JSON into the
+      dist using the plugin
+    * Bump Test::CPAN::Meta::JSON dependency to 0.16 (latest) that has fixes
+      for the license
+
+0.003     2011-04-19
+    * File::Path 2.08 needed for remove_tree()
+
+0.002     2011-04-17
+    * Test file pruned from dist if META.json doesn't exist
+
+0.001     2011-04-16
+    * Initial version

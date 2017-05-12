@@ -1,0 +1,37 @@
+Revision history for Perl extension Data::FixedFormat.
+
+0.04  Sat Nov 22 21:45:07 2008
+        - Removed requirement for Perl 5.8.8 from Makefile.PL.  That
+	  was inserted by h2ph and I hadn't noticed it.
+
+0.03  Mon Feb 12 16:03:46 2007
+	- Wrote extensive tests which exposed some bugs which have
+	  been fixed.
+
+	- Added the tied interface.
+
+	- Created a new shell using h2xs 1.23 with options
+		--f -n Data::FixedFormat --use-new-tests
+		--skip-exporter --skip-autoloader -X
+
+0.02 Sat Aug 17 13:13:00 2002
+       - Restructured the class.  The initial implementation used a
+         single package for variant and non-variant records.  All
+         attempts to format or unformat buffers resulted in checking
+         for variants.  Non-variant records can now skip this step and
+         should be faster.
+
+       - B<Data::FixedFormat> was rewritten to handle a single
+         variant.  The C<new> method now returns a
+         B<Data::FixedFormat::Variants> if a variant record layout is
+         requested.  This class maintains a list of
+         B<Data::FixedFormat> objects to perform conversions.
+
+       - Added the C<blank> method.
+
+       - Updated the documentation and corrected some errors in the
+         examples.
+
+0.01  Thu Aug 17 23:06:21 2000
+	- original version; created by h2xs 1.19
+

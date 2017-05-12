@@ -1,0 +1,259 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+#use English qw/-no_match_vars/;
+use Carp;
+use Getopt::Long qw/GetOptions/;
+use FindBin;
+use File::Temp qw/tempfile/;
+
+# make sure Parse::Yapp is installed (correctly)
+use Parse::Yapp;
+
+use lib "$FindBin::RealBin/../lib";
+use Data::Validate::Perl qw/gen_yp_rules/;
+
+our %opt;
+
+sub usage {
+    print STDERR << "EOU";
+usage: $0 -m MyParser data.yml.spec
+EOU
+    exit 1;
+}
+
+sub main {
+    GetOptions(
+        \%opt,
+        'm|module=s',
+        'd|debug',
+        'v|verbose',
+        'h|help',
+    ) or usage();
+    usage() if $opt{h};
+    usage() if !$opt{m};
+    usage() if !@ARGV;
+    croak "file not found: $ARGV[0]" if !-f $ARGV[0];
+
+    print STDERR "parsing specification\n" if $opt{d};
+    my $yapp_grammar = gen_yp_rules($ARGV[0]);
+    #print STDERR $yapp_grammar if $opt{v};
+    my ( $F, $grammar_file ) = tempfile('grammar_XXXXXXXX', SUFFIX => '.yp', UNLINK => 1);
+    print STDERR "saving grammar to temp file: $grammar_file\n" if $opt{d};
+    print $F $yapp_grammar;
+    close $F or croak "cannot write to file: $!";
+    print STDERR "calling yapp to create parser module\n" if $opt{d};
+    my $cmd = "yapp -m ". $opt{m};
+    $cmd .= " -v" if $opt{v};
+    $cmd .= " ". $grammar_file;
+    print STDERR $cmd, "\n" if $opt{d};
+    system($cmd) == 0 or croak "error running yapp command: $!";
+
+    exit 0;
+}
+&main;
+
+=head1 NAME
+
+dvp_gen_parser - creates in-memory perl data validator
+
+=head1 SYNOPSIS
+
+   $ dvp_gen_parser -m MyParser data.yml.spec
+   options:
+      -m|module : parser module name
+      -v|verbose: print grammar created
+      -d|debug  : print debug message
+
+=head1 DESCRIPTION
+
+This is the command-line utility of L<Data::Validate::Perl>. It reads
+in the data structure specification and creates the parser module
+directly. For most users this is only thing to run in order to
+facilitate the module behind.
+
+=head1 DATA SPECIFICATION FORMAT
+
+Each data item here has a symbolic prefix, pretty much like in perl:
+
+   1. scalar: $
+   2. array: @
+   3. hash: %
+   4. value: '
+
+=over
+
+=item SCALAR
+
+   # the value of scalar 'foo' can be any string
+   $foo: TEXT
+
+   # the value of scalar 'foo' must be 'bar'
+   $foo: 'bar
+
+   # the value of scalar 'foo' can be either 'bar1' or 'bar2'
+   # note there is only one single-quote at begin
+   $foo: 'bar1 'bar2
+
+=item ARRAY
+
+   # the array 'foo' may contain a scalar called 'bar'
+   # the possible values of 'bar' can be defined like above
+   @foo: $bar
+
+   # the array 'foo' may contain another array called 'bar'
+   # the structure of 'bar' needs to be defined somewhere
+   @foo: @bar
+
+   # the array 'foo' may contain another 2 arrays 'bar1' and 'bar2'
+   @foo: @bar1 @bar2
+
+   # the array 'foo' may contain 1 array called 'bar1' and 1 hash
+   # called 'bar2'
+   @foo: @bar1 %bar2
+
+   # the array 'foo' can be a simple array made up by scalars too
+   @foo: 'bar1 'bar2 'bar3
+
+Generic array rules:
+
+   1. each declared array item may or may NOT appear (optional), except for the case of single item;
+   2. relationship between multiple declared array items is OR;
+   3. when array is declared, item(s) not in the declaration will be rejected;
+   4. array referred by other data structure might NOT be declared, it will be treated as simple array which contains any number of scalar values (anonymous array);
+
+=item HASH
+
+   # the hash 'foo' may contain a key 'bar', whose value is 'zoo'
+   %foo: $bar
+   $bar: 'zoo
+
+   # the hash 'foo' may contain a key 'bar', whose value is array
+   %foo: @bar
+   # or the key and value symbol may be different
+   %foo: @(bar)bar_list
+
+
+   # the hash 'foo' may contain a key 'bar', whose value is another
+   # hash
+   %foo: %bar
+
+   # the hash 'foo' may contain 2 keys: 'bar1' whose value is array,
+   # 'bar2' whose value is hash
+   %foo: @bar1 %bar2
+
+   # the hash 'foo' may contain 3 keys: 'bar1' whose value is array,
+   # 'bar2' whose value is hash, 'bar3' whose value is scalar
+   %foo: @bar1 %bar2 $bar3
+
+Generic hash rules:
+
+   1. each declared hash key may or may NOT appear (optional), except for the case of single key;
+   2. relationship between multiple declared keys is OR;
+   3. when hash is declared, key(s) not in the declaration will be rejected;
+   4. hash referred by other data structure might NOT be declared, it will be treated as simple hash which contains any number of scalar key/value pairs (anonymous hash);
+
+=back
+
+=head1 USECASE
+
+=head2 Requirement
+
+Say you have a program which reads all the postcode and areacode of all
+China mainland cities from a yaml file. Before taking the information inside
+you want to make sure this file looks like the one with proper data.
+
+The sample format of this yaml file is like below:
+
+   ---
+   - city: Beijing
+     postcode: 100000
+     areacode: 010
+   - city: Shanghai
+     postcode: 200000
+     areacode: 020
+   - city: Hangzhou
+     postcode: 310000
+     areacode: 0571
+   - city: Kunming
+     postcode: 650000
+     areacode: 0871
+   ...
+
+=head2 STEP 1: Write the Specification
+
+The structure is not complicated, top container is an array, each item inside is
+hash with 3 keys. The corresponding specification can be written as:
+
+   @root: %record
+   %record: $city $postcode $areacode
+
+Which is good enough to walk through the data. If you have the full list of
+city names that may appear, one more line can be inserted to list them:
+
+   $city: 'Beijing 'Shanghai 'Hangzhou 'Kunming ...
+
+Save these lines into a file called city_yaml.spec
+
+=head2 STEP 2: Create the Parser Module
+
+Simply call the command-line tool C<dvp_gen_parser> like this:
+
+   $ dvp_gen_parser -m City::Record::Validator city_yaml.spec
+
+This will create Validator.pm under current working directory, move it to
+the right folder your main script will use later.
+
+=head2 STEP 3: Put Together
+
+Final step, write a simple script to load yaml and call the module method to
+validate data inside:
+
+   # demonstration purpose only
+   use FindBin;
+   use YAML::XS qw/Load/;
+   use lib "$FindBin::RealBin/../lib/perl5";
+   use City::Record::Validator;
+   open my $F, '<', $ARGV[0] or croak "cannot open file to read: $!";
+   my $cont = do { local $/; <$F> };
+   close $F;
+   my $data = Load($cont);
+   my $validator = City::Record::Validator::->new();
+   $validator->parse($data);
+   print STDERR '#error = ', $parser->YYNBerr(), "\n";
+
+That is it.
+
+=head2 Conclusion
+
+The advantage of this module is to process data in memory, this will
+not bound it with any specific file format. As long as perl understands
+the target format and is capable of loading it, the created module will
+check the data in memory.
+
+=head1 TROUBLESHOOTING
+
+L<Parse::Yapp> provides a debug flag to control the degree of running
+information of state machine. This flag is controlled by an environment
+variable named C<YYDEBUG> and defaults off.
+
+   $ YYDEBUG=31 validate.pl data.yml
+
+=head1 BUGS
+
+   1. no support of required hash key(s);
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2014 Dongxu Ma.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+=cut
+
+### dvp_gen_parser ends here

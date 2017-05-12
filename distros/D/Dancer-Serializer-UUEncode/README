@@ -1,0 +1,59 @@
+NAME
+    Dancer::Serializer::UUEncode - UU Encoding serializer for Dancer
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        # in your Dancer app:
+        setting serializer => 'UUEncode';
+
+        # or in your Dancer config file:
+        serializer: 'UUEncode'
+
+DESCRIPTION
+    This serializer serializes your data structure to UU Encoding. Since UU
+    Encoding is just encoding and not a serialization format, it first
+    freezes it using Storable and only then serializes it.
+
+    It uses Storable's "nfreeze" and "thaw" functions.
+
+SUBROUTINES/METHODS
+  init
+    An initializer that is called automatically by Dancer.
+
+    Runs "loaded".
+
+  loaded
+    Lazily loads Storable and imports the appropriate functions.
+
+  serialize
+    Serializes a given data to UU encoding after freezing it with Storable.
+
+  deserialize
+    Deserializes a given data from UU encoding after thawing it with
+    Storable.
+
+  from_uuencode
+    Helper function to create a new Dancer::Serializer::UUEncode object and
+    run "serialize".
+
+  to_uuencode
+    Helper function to create a new Dancer::Serializer::UUEncode object and
+    run "deserialize".
+
+  content_type
+    Returns the content type of UU encode which is text/uuencode.
+
+SEE ALSO
+    The Dancer Advent Calendar 2010.
+
+AUTHOR
+      Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

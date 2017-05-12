@@ -1,0 +1,3 @@
+TYPEMAP
+sophia_t * T_PTROBJ
+Database::Sophia T_PTROBJ

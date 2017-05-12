@@ -1,0 +1,65 @@
+---
+abstract: 'update the next version, semantic-wise'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DZil: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-NextVersion-Semantic
+no_index:
+  directory:
+    - corpus
+provides:
+  Dist::Zilla::Plugin::NextVersion::Semantic:
+    file: lib/Dist/Zilla/Plugin/NextVersion/Semantic.pm
+    version: v0.2.5
+  Dist::Zilla::Plugin::NextVersion::Semantic::Incrementer:
+    file: lib/Dist/Zilla/Plugin/NextVersion/Semantic.pm
+    version: v0.2.5
+  Dist::Zilla::Plugin::PreviousVersion::Changelog:
+    file: lib/Dist/Zilla/Plugin/PreviousVersion/Changelog.pm
+    version: v0.2.5
+  Dist::Zilla::Role::YANICK::PreviousVersionProvider:
+    file: lib/Dist/Zilla/Role/YANICK/PreviousVersionProvider.pm
+    version: v0.2.5
+requires:
+  CPAN::Changes: '0.20'
+  Dist::Zilla::Role::AfterRelease: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Dist::Zilla::Role::VersionProvider: '0'
+  List::AllUtils: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util::TypeConstraints: '0'
+  Perl::Version: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-NextVersion-Semantic/issues
+  homepage: https://github.com/yanick/Dist-Zilla-Plugin-NextVersion-Semantic
+  repository: https://github.com/yanick/Dist-Zilla-Plugin-NextVersion-Semantic.git
+version: 0.2.5
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Alex Peters <lxp@cpan.org>'
+  - 'Mike Doherty <mike@mikedoherty.ca>'

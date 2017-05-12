@@ -1,0 +1,698 @@
+#!/nw/dev/usr/bin/perl -w
+
+use strict;
+use Benchmark;
+use IO::File;
+use Getopt::Std;
+use File::stat;
+use vars qw($ME %FATAL @FLOWSET);
+$ME = 'ccovinstrument';
+
+my $LIB;
+{
+    my $mydir = 'Devel/CCov';
+    for my $d (@INC) {
+	if (-f "$d/$mydir/ccov_registry.c") { $LIB = "$d/$mydir"; last; }
+    }
+}
+die "CCov: can't find lib-files \@INC (".join(' ', @INC).")" if !$LIB;
+
+sub usage {
+    print "usage: $ME [-f] -c in.c [-o out.c] [-e errs]\n";
+    print "       $ME -r\n";
+    exit;
+}
+
+my %opt;
+getopts('rvc:o:e:', \%opt) or &usage;
+&usage if @ARGV != 0 || (!$opt{'c'} and !$opt{'r'});
+
+if ($opt{'r'}) {
+    my $regi = "$LIB/ccov_registry.c";
+    my $build = time;
+    my $cmd = qq[perl -pe 's/\%BUILD\%/$build/g' $regi > ccov_registry.c];
+    print $cmd."\n";
+    system $cmd;
+    exit;
+}
+
+if ($opt{'o'}) {
+    my $cst = stat($opt{'c'}) or die "stat $opt{'c'}: $!";
+    my $ost = stat($opt{'o'});
+    if (($ost? $ost->mtime:0) > $cst->mtime and $ost->size > 0) {
+	warn "$opt{'o'} looks up-to-date\n";
+	exit;
+    }
+    open(STDOUT, '>'.$opt{'o'}) or die "open $opt{'o'}: $!";
+}
+if ($opt{'e'}) {
+    open(STDERR, '>'.$opt{'e'}) or die "open $opt{'e'}: $!";
+}
+
+package Chunk;
+
+sub new {
+    my ($class, $str, $line, $live) = @_;
+    bless {str=>$str, line=>$line, live=>$live}, $class
+}
+
+sub str {
+    my ($o, $new) = @_;
+    $o->{str} = $new if @_==2;
+    $o->{str};
+}
+sub line { shift->{line} }
+sub live { shift->{live} }
+
+package main;
+
+use Devel::CCov qw(extract_balanced cc_strstr cc_exprstr);
+use vars qw/$CASE $err $toterr/;
+
+$CASE=0;
+$toterr=0;
+
+@FLOWSET = (qw(if for do while else return break continue goto switch exit),
+	    #XS
+	    qw(XSRETURN XSRETURN_EMPTY XSRETURN_UNDEF XSRETURN_YES XSRETURN_NO
+	      XSRETURN_PV XSRETURN_NV XSRETURN_IV),
+	    #perl
+	    qw(croak my_exit my_exit_jump DIE RETURN RETPUSHYES RETPUSHNO
+	       RETPUSHUNDEF RETURNOP));
+for (qw( exit croak my_exit my_exit_jump DIE )) {
+    $FATAL{$_} = 1;
+}
+my $detoothRE;
+my $cmtRE = '\/\* .*? \*\/';
+
+sub set_flow {
+    $detoothRE = ('('.join('|', @FLOWSET).')');
+#    warn $detoothRE;
+}
+&set_flow;
+
+sub detooth {
+    my ($s) = @_;
+    $s =~ tr/{}//d;
+    $s =~ s/$detoothRE/z_$1/sxg;
+    $s;
+}
+
+sub nextcase() {
+    my $c = "CASE($CASE);";
+    ++$CASE;
+    $c;
+}
+
+sub add_braces_ok {
+    my ($newtext, $line, $body) = @_;
+    if ($body =~ m/ \b (while | for | if | else) \b /sx) {
+	warn ("\n\$CCov: confusing (inner flow-control '$1' without braces?) at line $line:\n".
+	      substr($newtext, -100).'???'.substr($body,0,150)."\n");
+	++$err;
+	0;
+    } else {
+	1;
+    }
+}
+
+sub highpass_filter {
+    my ($text) = @_;
+
+    # remove keywords from comments
+    $text =~ s{ ( \/\* .*? \*\/ ) }{&detooth($1)}gsex;
+    $text =~ s{ ( \/\/ [^\n]* \n ) }{&detooth($1)}gsex;
+    # simplify cpp formatting
+    $text =~ s{ \n \# \s* (ifdef | if | else) \b }{\n\#$1}gsx;
+
+    # add braces {} to keywords :: this is the grossest (and most error prone)
+    for my $keyword (qw(while for if else)) {
+	my $line = 1;
+	my $newtext='';
+	my $save = sub {
+	    my $s = shift;
+	    $line += $s =~ tr/\n/\n/;
+	    $newtext .= $s;
+	};
+	while (1) {
+	    my @at = cc_strstr($text, '\b'.$keyword.'\b');
+	    if (@at) {
+		$save->($at[0]);
+		$text = $at[1];
+#		warn "[".substr($text, 0, 200)."]\n";
+		if ($keyword ne 'else' and
+		    $text =~ s/^ ( $keyword \s*) (?= \( ) //sx) {
+		    $save->($1);
+		    my @m = extract_balanced($text, '()');
+		    if (!$m[0]) {
+			warn "--CONFUSING--\n";
+			die substr($text, 0, 200);
+		    }
+		    $save->($m[0]);
+		    substr($text,0,length($m[0])) = '';
+
+		    if ($text =~ m/^ \s* \{ /sx) {
+			next;
+		    }
+		    my @sem = cc_exprstr($m[1], ';');
+		    die $m[1] if !@sem;
+		    if ($sem[0] !~ m/ [\#{}] /sx) {
+			next if !add_braces_ok($newtext, $line, $sem[0]);
+			$save->("{ $sem[0];}");
+			$text = substr($sem[1],1);
+		    } else {
+			warn ("\n\$CCov: confusing (outer flow-control without braces?) at line $line:\n".
+			      substr($newtext, length($newtext)-100).'???'.
+			      substr($sem[0],0,150)."\n");
+			++$err;
+		    }
+
+		} elsif ($text =~ s/^ ( else ) (?=\s+($cmtRE)?\s*if ) //sx) {
+		    $save->( $1);
+		    next;
+		} elsif ($text =~ s/^ ( else \s* ) //sx) {
+		    $save->($1);
+		    if ($text =~ m/^ \s* \{ /sx) {
+			next;
+		    }
+		    my @sem = cc_exprstr($text, ';');
+		    die $text if !@sem;
+		    if ($sem[0] !~ m/ [\#{}] /sx) {
+			next if !add_braces_ok($newtext, $line, $sem[0]);
+			$save->("{ $sem[0];}");
+			$text = substr($sem[1],1);
+		    } else {
+			warn "\n\$CCov: confused at else at line $line:\n".substr($newtext,-50).'???'.$sem[0]."\n";
+			++$err;
+			next;
+		    }
+
+		} elsif ($text =~ s/^ ( $keyword ) //sx) {
+		    $save->($1);
+		    next;
+		} else {
+		    die "\n\$CCov: confused at $keyword at line $line:\n".substr($text,0,200)."\n";
+		}
+	    } else {
+		$save->( $text);
+		last;
+	    }
+	}
+	$text = $newtext;
+    }
+    $text;
+}
+
+sub block_tree {
+    my ($text, $st, $level) = @_;
+    ++ $level;
+#    warn "block_tree at '".substr($text,0,40)."'\n";
+
+    my @ready;
+    my $save = sub {
+	my ($s, $yes) = @_;
+	my $c = new Chunk($s, $st->{line}, $yes);
+	push(@ready, $c);
+	$st->{line} += $s =~ tr/\n/\n/;
+	$c;
+    };
+
+    while (length($text)) {
+	my @at = cc_strstr($text, "{");# next open brace
+	if ($at[0]) {
+	    my $skipblock=0;
+	    if (length $at[0]) {
+		my $prefix = $at[0];
+		$skipblock = 
+		    $prefix =~ m/ ( DEBUG [\w\s]* \( \s* | 
+				    \= \s* |
+				    \b (struct|union|class) \b [^;]*
+				  ) $/x;
+#		warn "***SKIP $prefix" if $skipblock;
+		$save->($prefix, $level > 1);
+	    }
+	    $text = $at[1];
+#	    warn "EXTRACT: ".substr($text,0,200);
+	    my @match = extract_balanced($text, "{}");
+#	    warn "MATCH: ".join('',map { substr($_,0,400)."\n---\n" } @match);
+	    if ($match[0]) {
+		my $block = $match[0];
+		if (!$skipblock) {
+		    $block =~ s/^ \{ (.*) \} $/$1/sx;
+		    $save->('{', 0);
+		    if ($block =~ m/^\s*$/) {
+			$save->($block.&nextcase,0);
+		    } else {
+			push(@ready, block_tree($block, $st, $level));
+		    }
+		    $save->('}', 0);
+		} else {
+#		    warn "--SNARF--$block";
+		    $save->($block, 0);
+		}
+		$text = $match[1];
+	    } else {
+		my $open = $match[1] =~ tr/{/{/;
+		my $close = $match[1] =~ tr/}/}/;
+		if ($open != $close) {
+		    ++$err;
+		    warn "\n\$CCov: Mismatched braces (open $open != close $close) at $st->{line}\n  #ifdef induced confusion?\n";
+		    $save->($match[1], 0);
+		    last;
+		} else {
+		    die "what?";
+		}
+	    }
+	} else {
+#	    my @c = split(m{ ( \/\* [.\n]*? \*\/ ) }sx, $text);
+#	    for (my $x=0; $x < @c-1; $x++) {
+#		$save->($c[$x], 0);
+#	    }
+#	    $save->($c[$#c], $level > 1);
+	    $save->($text, $level > 1);
+	    last;
+	}
+    }    
+    \@ready;
+}
+
+sub stmts {
+    my ($stmts, $level) = @_;
+
+    # detect dubious or confusing patterns
+    for (my $s=0; $s < @$stmts; $s++) {
+	if (ref $stmts->[$s] ne 'Chunk') {
+	    stmts($stmts->[$s], $level+1);
+	    next;
+	}
+	next if $level == 0;
+	my $line = $stmts->[$s]->line;
+	my $text = $stmts->[$s]->str;
+	next if $text =~ m/^ [{}] $/x;
+	my $last = $line + ($text =~ tr/\n/\n/);
+	my $where = "\n\$CCov: $line-$last:";
+	
+	if ($text =~ m/\# \s* (if \b | ifdef \b)/sx) {
+	    warn "$where Conditionals can cause difficulty in parsing; factor it?\n".substr($text, -200)."\n";
+	    ++$err;
+	}
+	if ($text =~ m/ \s if \s* ( \( .* ) $/sx) {
+	    my @m = extract_balanced($1, "()");
+	    if ($m[0] =~ m{ \|\| }sx and $m[0] !~ m{ /\*OK\*/ }sx) {
+		warn "$where Split-up or macroize confusing || in 'if' test:\n".substr($text, -200)."\n";
+		++$err;
+	    }
+	}
+    }
+    return if $level == 0;
+
+    # insert trip-wires
+    for (my $s=0; $s < @$stmts; $s++) {
+	my $prefix='';
+	next if ref $stmts->[$s] ne 'Chunk';
+	next if !$stmts->[$s]->live;
+	my $text = $stmts->[$s]->str;
+	
+	my @rest = @$stmts[$s+1..$s+4]; # $text :: '{' \@nested '}' $next
+	pop @rest while (@rest and !defined $rest[$#rest]);
+	next if @rest && $rest[0]->str ne '{';
+
+	next if ($text =~ m/^ \s* ( $cmtRE )? \s* $/sx or
+		 $text =~ m{ \b else \b }sx
+		 );
+
+	# do {...} while ();
+	if ($text =~ m/^ (\s* while \s* (?= \( )) /sx) {
+	    my $while = $1;
+	    my $rest = $';
+	    my @m = extract_balanced($rest, '()');
+	    die $rest if !$m[0];
+	    if ($m[1] =~ m/^ \s* \; /sx) {
+		$prefix = $while.$m[0];
+		$text = $m[1];
+	    }
+	}
+
+	my @entries = (0);
+
+	# switch statements may cause many extra entry points
+	while ($text =~ m/\b (
+			      case \s+ ( [\w:]+ | \'.+?\' ) \s* \: |
+			      default \s* \:
+			     ) /gsx) {
+	    push(@entries, pos($text) - length($1));
+	}
+	@entries = sort { $b <=> $a } @entries;
+#	warn join(' ', @entries);
+
+	for my $pos (@entries) {
+#	    warn "--FLOWCHECK\n[".substr($text, $pos, 100)."]\n";
+	    my $at;
+	    my $isfatal;
+	    for my $kw (@FLOWSET, 'CASE') {
+		my @m = cc_strstr(substr($text,$pos), '\b'.$kw.'\b');
+		next if !@m;
+		if (!defined $at) {
+		    $isfatal = $FATAL{$kw};
+		    $at = length($m[0]);
+		} else {
+		    if (length($m[0]) < $at) {
+			$isfatal = $FATAL{$kw};
+			$at = length($m[0]);
+		    }
+		}
+	    }
+	    if (defined $at) {
+		$at += $pos;
+#		warn "--MATCH:\n[".substr($text, $at, 50)."]\n";
+		next if substr($text,$at) =~ m/^CASE/;
+		if ($opt{'f'} or !$isfatal) {
+		    substr($text,$at,0) = nextcase;
+		}
+	    } else {
+		$text .= nextcase;
+	    }
+	}
+
+	$stmts->[$s]->str($prefix.$text);
+    }
+}
+
+sub print_tree {
+    my ($t) = @_;
+    for my $b (@$t) {
+	if (ref $b eq 'Chunk') { print $b->str; }
+	else { print_tree($b); }
+    }
+}
+
+sub do_swath {
+    my ($st) = @_;
+    $err=0;
+    warn "STAGE: from line $st->{line}\n";
+    warn "STAGE: highpass_filter\n";
+    my $text = highpass_filter($st->{text});
+    warn "STAGE: block_tree\n";
+    my $tree = block_tree($text, $st, 0);
+    warn "STAGE: stmts\n";
+    stmts($tree, 0);
+    warn "STAGE: print_tree\n";
+    print_tree($tree);
+    $toterr += $err;
+    $st->{on} = 0;
+    $st->{text} = '';
+}
+
+sub scan {
+    my $t0 = new Benchmark;
+    my $name = $opt{'c'};
+    my $fh = new IO::File;
+    $fh->open($name) or die "open $name: $!";
+    my $st = { name => $name, text=>'', line=>1, on=>1 };
+    my $line=0;
+    my $decl=0;
+    while (defined(my $l = <$fh>)) {
+	++$line;
+	
+	if ($l =~ m{ \/\*+ \s* (CCOV|CCov) \s* \: \s* ( [^\*]* ) \*\/ }x) {
+	    
+	    my ($cmd, @args) = split(/\s+/, $2);
+	    if ($cmd =~ m/^off$/) {
+		if ($st->{on}) {
+		    do_swath($st);
+		    $st->{on} = 0;
+		}
+			
+	    } elsif ($cmd =~ m/^on$/) {
+		warn "\n\$CCov: already on at line $line\n"
+		    if $st->{on};
+		$st->{on} = 1;
+		$st->{line} = $line+1;
+		
+	    } elsif ($cmd =~ m/^fatal$/) {
+		for (@args) { $FATAL{$_} = 1; }
+		push(@FLOWSET, @args);
+		&set_flow;
+
+	    } elsif ($cmd =~ m/^jump$/) {
+		push(@FLOWSET, @args);
+		&set_flow;
+		
+	    } else {
+		warn "\n\$CCov: unknown command '$cmd' on line $line\n";
+	    }
+	    print $l;
+	    next;
+	}
+	
+	if ($st->{on}) {
+	    if (!$decl and $l !~ m/^ \s* \# /sx) {
+		$l = "static void CASE(int dd); ".$l;
+		++$decl;
+	    }
+	    $st->{text} .= $l;
+	} else {
+	    print $l;
+	}
+    }
+    do_swath($st) if $st->{on};
+    print recorder($name, $CASE, $t0);
+    my $plur = ($toterr>1?'s':'');
+    warn ("[$name: $toterr error$plur/warning$plur]\n")
+	if $toterr;
+    my $tm = new IO::File;
+    $tm->open(">.ccov-timestamp") or die "open: $!";
+}
+
+# assumes existance of 32bit (or better) unsigned long
+sub recorder {
+    my ($file, $max, $t0) = @_;
+    my $t1 = new Benchmark;
+    my $instrtm = timestr(timediff($t1,$t0));
+    $file =~ s/\.\w+$//;
+    $file =~ tr/./_/;
+    my $nowstr = localtime;
+    my $now = time;
+    qq{
+/***************************************** CCOV FLIGHT RECORDER */
+#include <stdlib.h>
+#include <stdio.h>
+#define CCOV_BUILDSTAMP $now
+#define CCOV_MAXCASE $max
+#define CCOV_MASKLEN (1+CCOV_MAXCASE/32)
+static unsigned long ccov_mask[CCOV_MASKLEN];
+#define CCOV_ISHIT(caseno)  (*(ccov_mask+(caseno>>5)) & (1 << ((caseno) & 0x1f)))
+
+typedef void (*CCOV_HITS_T)(int *hitp, int *maxp);
+static void ccov_hits(int *hitp, int *maxp)
+{
+  int mx;
+  int hits=0;
+  for (mx=0; mx < CCOV_MAXCASE; mx++) if (CCOV_ISHIT(mx)) hits++;
+  if (hitp) *hitp = hits;
+  if (maxp) *maxp = CCOV_MAXCASE;
+}
+
+typedef void (*CCOV_REPORT_T)(unsigned long build, char *testname, 
+			      unsigned long now, FILE *out, int verbose);
+static void ccov_report(unsigned long build, char *testname, 
+			unsigned long now, FILE *out, int verbose)
+{
+  int mx;
+  int hits;
+  ccov_hits(&hits, 0);
+  if (out) {
+    fprintf(out, "build=%08x test=%s tm=%08x file=%s max=%d hits=", 
+	    build, testname, now, __FILE__, CCOV_MAXCASE);
+    for (mx=CCOV_MASKLEN-1; mx >= 0; mx--) fprintf(out, "%08x", ccov_mask[mx]);
+    fprintf(out, "\\n");
+  }
+  if (verbose) {
+    fprintf(stderr, "%s: hit %d out of %d cases: ", __FILE__, hits, CCOV_MAXCASE);
+    for (mx=0; mx < CCOV_MAXCASE; mx++) {
+	if (CCOV_ISHIT(mx)) fprintf(stderr, "%d ", mx);
+    }
+    fprintf(stderr, "\\n");
+  }
+}
+
+static void
+CASE(int hitno)
+{
+  static int ccov_init=0;
+  extern void ccov_register_file(char *, CCOV_HITS_T f1, CCOV_REPORT_T f2);
+
+  if (!ccov_init) {
+    int mx;
+    for (mx=0; mx < CCOV_MASKLEN; mx++) ccov_mask[mx]=0;
+    ccov_register_file(__FILE__, ccov_hits, ccov_report);
+    ++ccov_init;
+  }
+  if (hitno >= CCOV_MAXCASE) {
+    fprintf(stderr, "CCov: assertion failed: test %d out of range(0..%d)\\n",
+	    hitno, CCOV_MAXCASE);
+    abort();
+  }
+  *(ccov_mask+(hitno>>5)) |= 1 << (hitno & 0x1f);
+}
+/** $nowstr: $ME $Devel::CCov::VERSION
+*@* $nowstr:$instrtm
+************************************ CCOV FLIGHT RECORDER (END) */
+};
+}
+
+scan();
+
+__END__
+
+=head1 NAME
+
+  ccovinstrument - instruments C/C++ code for test coverage analysis
+
+=head1 SYNOPSIS
+
+  ccovinstrument code.c > covcode.c
+  ccovinstrument code.c [-f] -o covcode.c [-e errs]
+     -f    instrument fatal code as well as normal code
+
+=head1 DESCRIPTION
+
+Scans C/C++ source (before cpp) and inserts trip-wires in each code
+path to record execution.
+
+A number of error prone coding styles are also detected.  Many of
+these ideas came from study of the highly regarded perl5 source code
+(and from my own coding experience :-).
+
+This approach (or almost any approach) to coverage analysis is NOT
+fullproof!  Just because you exercise every code path does NOT mean
+you have exercised all possibilities.  For example, consider the
+following code:
+
+  char
+  fetch_char(int xx)
+  {
+    static char *string = "Dr. Zorph Trokien";
+    if (xx < 0) {
+      return 0;
+    } else {
+      return string[xx];
+    }
+  }
+
+Unfortunately, you still have to be somewhat intelligent about
+designing your test scripts.  However, assuming you're clever, you can
+use this tool to know when to stop writing more tests.  Thus, thereby
+achieving test coverage.
+
+=head1 CCov SOURCE DIRECTIVES
+
+=over 4
+
+=item * /* CCov: off */
+
+Turns off coverage instrumentation.  You probably don't want to
+analyze debugging code.
+
+=item * /* CCov: on */
+
+Turns on coverage instrumentation.
+
+=item * /* CCov: jump if for do while else return */
+
+Adds to the list of identifiers that cause a change in execution flow.
+In addition to the usual keywords, macros used by the perl core and
+XSUBs are included by default.
+
+=item * /* CCov: fatal myexit croak panic */
+
+Adds to the list of identifiers that cause a fatal exception.
+Instrumentation of these blocks is turned off by default.  (You
+usually want to make sure the code is suppose to work works before you
+make sure that the code that isn't support to work works.)
+
+=back
+
+=head1 CCov LIMITATIONS
+
+=over 4
+
+=item * {}
+
+Braces are required when control-flow directives are nested.  This is
+reasonable since it makes code easier to maintain.  Arbitrary
+cut-and-paste is less likely to mess up correctness.
+
+=item * ||
+
+In general, CCov prefers that the || operator not be used in C<if>
+tests.  If you must use it, you can turn off the warning by adding an
+/*OK*/ comment inside the C<if> expression.
+
+=item * ?:
+
+The ?: operator is not checked.
+
+=back
+
+=head1 HOW DOES IT WORK?
+
+The instrumenter processes source code before it is seen by cpp.  This
+helps you isolate your testing.  Usually, you want to do test analysis
+on each library/application individually.  A global analysis would
+cause you to test new code and all the libraries you are using (for
+every single application!).
+
+The instrumentor does not really use a lexer (tokenizer).  The
+techniques are probably more similar to image processing than parsing.
+As you might imagine, this doesn't work in the general case.  CCov
+tries to be forgiving, but it simply doesn't understand obfuscated
+code.  Rather than calling it a bug, I think it's an significant
+feature.
+
+Simple code probably has fewer bugs than complex code.  Not only is
+this tool aimed at test coverage analysis, it is also helps you
+improve your coding style.  There are still some rough edges, but I am
+mostly satisfied with the degree of strictness.
+
+=head1 ENVIRONMENT VARIABLE
+
+=over 4
+
+=item * REGRESSION_TEST
+
+The tag used to group together a result set.  Defaults to '?FAKE'.
+
+=item * CCOV_LOG
+
+The location of the log file.  Defaults to '/tmp/ccov.log'.
+
+=item * CCOV_DB
+
+The ccovanalyze database.  Defaults to './ccov.db'.
+
+=item * CCOV_VERBOSE
+
+Cause the instrumented binary to output to stderr complete coverage
+information upon exit.  (Not recommended.  Use ccovanalyze!)
+
+=back
+
+=head1 BUGS
+
+?
+
+=head1 SEE ALSO
+
+Test, Test::Harness
+
+=head1 AUTHOR
+
+Copyright © 1998 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)
+
+=cut

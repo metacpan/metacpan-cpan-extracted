@@ -1,0 +1,15 @@
+#
+#	Quintum uses the same attributes as Cisco, but with a
+#	different vendor ID - we avoid repeating those here.
+#	Only the Quintum specific attributes are below
+#
+VENDOR	Quintum	6618
+
+#	Due to some bugofeature Quintum CMS for the PSTN->PSTN calls on the
+#	originate/Telephony call leg does not provide correct value for the
+#	NAS-Port-Name. Instead the value provided there is the same as
+#	NAS-Port-Name on the answer/Telephony. And the name of the actual port
+#	which is used to carry outgoing telephony call supposedly reported in
+#	the magic attribute with code 231.
+ATTRIBUTE	Quintum-NAS-Port-Name-In 	230	string	Quintum
+ATTRIBUTE	Quintum-NAS-Port-Name-Out	231	string	Quintum

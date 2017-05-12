@@ -1,0 +1,298 @@
+README - Documentum Perl 5 Extension
+====================================
+
+This is the Documentum API interface to Perl.
+
+These modules have been built and tested with EDMS versions 3.1.5, 3.1.6, 98,
+4.0.2, 4.1, 4.2, 5.2, 5.2.5 SP2, 5.3 SP1.  They should also work with other versions,
+as the API hasn't changed much in a long time.
+
+* IMPORTANT NOTE #1*
+The Makefile.pl is primarily designed to run in a Microsoft Windows
+environment.  However, the script does contain configuration information
+for Solaris, AIX, and HP-UX environments.  These portions of the Makefile.pl
+script have been graciously donated by users and are mostly untested since I
+don't have facilities to test them.  Therefore, if you are running in a
+UNIX environment, you might need to tweak the Makefile.pl script.
+
+* IMPORTANT NOTE #2*
+This module has changed in one significant way from 1.01:  dmAPIInit()
+and dmAPIDeinit() are now called implicitly within the module.  As such
+your client programs do not need to call this.  Especially careful
+client code which may check the return status of these calls will
+complain or fail, depending on what you're doing with the results.
+
+To build this extension, unpack the distribution, and edit Makefile.PL
+if necessary.  Then do the typical Perl module building stuff:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+The test.pl script will prompt you for the information it needs, and then
+will connect to your docbase.  It will generate a new document (dm_document)
+named 'Perl Module Test' and link it to the /Temp cabinet.  The test script
+will also create a new object type named 'my_document', create an instance
+of one named 'Perl Module Tools Test Doc' and link it to a new folder at
+/Temp/Db-Documentum-Test'.  Finally, the script copies and moves the 'Perl
+Module Tools Test Doc' among several folders and then deletes the whole mess.
+If you're nervous about the test script doing evil things to your production
+docbase, examine the code, point it at a test docbase, or write your own test
+script.
+
+To check the version of this module from the command line, use:
+	>perl -MDb::Documentum -e Db::Documentum::version
+
+
+Documentum::Tools
+=================
+
+This is a set of helper functions that simplify a couple of common
+tasks when writing a Documentum client application.
+
+dm_Connect
+----------
+
+	Encapsulates the process of connecting to a docbase.
+
+	Arguments:  docbase, username, and password are required.  Two
+		extra args are optional, and your dm_check_password program
+		(or equivalent) should be configured to do the right thing
+		with them.  See the etc/dm_check_password.pl program included
+		with this distribution for an example that uses Kerberos v4
+		service tickets to authenticate to Documentum.
+
+	Returns:  the session identifer on success.  Nothing on failure.
+
+dm_LastError
+------------
+
+	Generic interface for evaluating the error log for the current
+	session.
+
+	Arguments: session identifier, error level, and number of entries
+		to report, all optional.  Session id defaults to 'apisession'
+		for handling connect() failures.  Error level defaults to 3, which
+		is a good choice in most situations, and number of entries
+		defaults to 'all'.
+
+	Returns:  character string containing the error data, suitable for
+		printing to the user.
+
+dm_CreateObject
+---------------
+
+    NOTE: The %ATTRS hash is no longer a HoL.  This is a change from v1.2
+
+	Generic wrapper to create new instances of object types and optionally
+	populate attributes.  Note: this function does NOT perform a 'save'.
+	Repeating attributes are declared as a scalar with delimiters between
+	repeating values.  See below.  The default delimiter is set at:
+	$Db::Documentum::Tools::Delimiter
+
+	Arguments: Documentum object type, required.  Hash of attributes for object,
+	optional.  For example:
+
+	    $delim = $Db::Documentum::Tools::Delimiter;
+		%ATTRS = (object_name =>  'test_doc2',
+               	  title       =>  'My Test Doc 2',
+               	  authors     =>  'Scott 1'.$delim.'Scott 2',
+              	  keywords    =>  'Scott'.$delim.'Test'.$delim.$DocVar.$delim.'2',
+               	  r_version_label => 'TEST');
+
+   		$doc_id = dm_CreateObject ("dm_document",%ATTRS);
+
+	Returns: scalar containing the r_object_id of the new object.
+
+dm_CreateType
+-------------
+
+	Generic wrapper to create new object type in the docbase.
+
+	Arguments: Object name and Documentum superclass name, required.  Hash
+	of field definitions, optional.  For example:
+
+		%field_defs = (cat_id    => 'char(16)',
+			           loc       => 'char(64)',
+                       editions  => 'char(6) REPEATING');
+
+     		$api_stat = dm_CreateType ("my_document","dm_document",%field_defs);
+
+	Returns: TRUE on success, FALSE on failure.
+
+dm_CreatePath
+-------------
+
+	Generic wrapper to create new folder heirarchies in Docbase.
+
+	For example,
+	$dir_id = dm_CreatePath ('/Temp/Testing/Unit-1');
+
+	Returns: r_object_id of folder or undef.
+
+dm_LocateServer
+---------------
+
+	Locates the currently-active server for a particular docbase.
+
+	This is only really necessary since to obtain a Kerberos
+	service ticket, you must know the hostname of the machine you're
+	connecting to.  The Docbroker hides this layer from the user
+	by default, and this routine exposes it.  This only gets
+	called by dm_KrbConnect() in my implementation.
+
+    Example:  $server = dm_LocateServer($docbase);
+	Returns:  Hostname for docbase on success.  Nothing on failure.
+
+dm_Copy
+-------
+    Copies an object and optionally moves it to a new location specified by
+    $to_folder.  If $to_folder is undefined, the copy will reside with the
+    original.  Do not copy folders and cabinets with this routine.  Returns
+    the r_object_id of copy.
+
+    Example:  $object_id = dm_Copy($orig_obj_id, $to_folder)
+
+    Note:  $to_folder can be the r_object_id of the destination folder,
+         or the full path (e.g., "/Temp/2004/Q1/Jan/15").  If the path
+         does not exist, it is created by calling dm_CreatePath.
+
+dm_Move
+-------
+    Moves an object from the location specified by $from_folder, to the
+    location specified by $to_folder.  If $from_folder is undefined, unlink
+    from all locations.  Returns true for success, false for failure.
+
+    Example:  $rv = dm_Move($object_id, $to_folder, $from_folder)
+
+    Note:  $to_folder can be the r_object_id of the destination folder,
+         or the full path (e.g., "/Temp/2004/Q1/Jan/15").  If the path
+         does not exist, it is created by calling dm_CreatePath.
+
+    Note:  $from_folder can be the r_object_id of the current folder or its
+         full path (e.g., "/Temp/2004/Q2/Jun/1").
+
+dm_Delete
+---------
+    Deletes the object specified by $obj_id.  If the optional $all argument is
+    set to true, will delete all versions of the object specified by $obj_id.
+    By default, $all is false.  If the object specified by $obj_id is a cabinet
+    or folder, this sub will execute a deep delete and remove all versions of
+    all objects contained in the cabinet or folder.  Returns true on success,
+    false on failure.
+
+    Example:  $rv = dm_Delete($obj_id, $all)
+
+dm_KrbConnect
+-------------
+    !! EXPERIMENTAL !!
+	Requires Krb4.pm from CPAN.  You'll want to comment out the
+	'use Krb4'; statement in the header of the library if you
+	don't plan on using this.
+
+	Connects to Documentum and authenticates the user using a Kerberos
+	v4 service ticket.  This is fairly tricky stuff.  The library does a
+	bunch of Kerberos calls to obtain all of the necessary info to
+	build the service ticket.  The ticket is then encoded, along with
+	a nonce value used to prevent replay attacks, and sent to the
+	server.  A compatible dm_check_password program should be installed
+	on the server to decode and decrypt the session info.
+
+	You need to be fairly Kerberos-savvy to make this work.  The code is
+fairly-well commented, but it does assume you have a working
+	K4 KDC installed, and a service ticket entry in your server machine's
+	srvtab.  I did my testing with the default rcmd.hostname@REALM ticket,
+	but now use documentum.hostname@REALM (which is how this code is
+	configured).  You'll need to configure the service in both the
+	client library code as well as the dm_check_password.pl program if
+	you want to change it.
+
+	The big problem with this code is that there is no good way to
+	map Kerberos problems to Documentum connect() error codes, and
+	reporting reporting Kerberos messages back to the user is not
+	possible given the interface between the authentication program
+	and the user, which is simply the exit value of the program (0
+	on success, something else on failure).  Thus this may be
+	difficult to support if there are Kerberos problems.  The
+	client code does capture basic problems, like the user's TGT
+	having expired.
+
+	Arguments: docbase name (required)
+	Returns: The session identifier on success.  Nothing on failure.
+
+
+intro-db-dctm-11.pdf
+====================
+
+    Tutorial explaining all the features and demonstrating several uses of
+    Db::Documentum.
+
+
+etc/dm_check_password.pl
+========================
+
+	This Perl version of dm_check_password knows how to authenticate
+	users in the following ways:
+
+	1.  Local passwords in /etc/passwd (/etc/shadow, whatever).
+	2.  Against a Kerberos KDC using the user's kerberos password.
+	3.  Against a Kerberos KDC using the user's kerberos service ticket.
+
+	It should be installed setuid root with appropriate permissions.  See
+	the existing dm_check_password for the right settings.
+
+	Method #2 should be deprecated, given the fact that there doesn't
+	appear to be any session encryption between the documentum client
+	and server during the authentication phase.  Exposing your
+	kerberos password to the network is potentially hazardous to the
+	health of your network, and certain to make your network administrator
+	unhappy (or it should).
+
+	Checking works like this:
+
+	- If the user supplies the additional optional arguments to connect,
+	  the first one is ignored, and the second one is assumed to be
+	  the encrypted nonce for this session, as long as it is at least
+	  8 characters long.  We ignore the first one since the server
+	  doesn't appear to pass it properly.
+
+	- If a nonce is found, method 3 is tried (Kerberos service ticket).
+
+	- If a nonce is not found, the user is authenticated against the
+	  local passwd file.  If the user has a local entry, but the password
+	  does not match, the session is denied.
+
+	- If the user does not have a local passwd entry, then they are
+	  authenticated against the Kerberos KDC (a la krb_get_pw_in_tkt).
+	  If the password doesn't match here, the session is denied.
+
+	- If for some reason we don't exit before this point, the session
+	  is denied (just in case).
+
+	Error passing back to the user is pretty primitive.  Also I don't
+	pay attention to any of the password-aging stuff.
+
+
+etc/idql.pl
+===========
+
+	This Perl version of the Interactive DQL Editor is provided for your
+	convenience and as an example of Db::Documentum programming power.
+
+
+etc/tickler.pl
+==============
+
+    Sample application that checks for items in your inbox.
+
+
+If you encounter problems with the module that appear to be confined
+to the module (or can't tell), please let me know.  If you find this
+module useful, let me know as well.
+
+Scott Roth <scott@dm-book.com>
+
+## -----------------
+##      <SDG><
+## -----------------

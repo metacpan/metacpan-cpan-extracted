@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DynGig/Multiplex/CMD.pm
+lib/DynGig/Multiplex/TCP.pm
+lib/DynGig/Multiplex.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

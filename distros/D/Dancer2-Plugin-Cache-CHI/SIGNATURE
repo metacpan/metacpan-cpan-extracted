@@ -1,0 +1,48 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 4c155391dc709e44e2b9eb254c219400b1cec9ef AUTHOR_PLEDGE
+SHA1 730d2cbeaa15daca4502e426d9a60aae8543236d CONTRIBUTORS
+SHA1 a701b73b934f55865d225afb73d83b24e4c3f4cd Changes
+SHA1 55e178fddcf6e53c3325af948be3d35ce17217a9 INSTALL
+SHA1 769557ae7e699664d9c0bba4a6e3e7f7ac31c0ae LICENSE
+SHA1 543ea918a69caaccb2860eba71e428cab29ca34a MANIFEST
+SHA1 a96f167d1c0e5bc8c6bdfc6f1f0ed14b05722a46 META.json
+SHA1 04e91a69d484a0fd994fdf348c71ffbbfd640696 META.yml
+SHA1 7ce802d305c42d38be392d3666f9e676161ea804 Makefile.PL
+SHA1 d6d78619e81fd1bddf9768d82e40e44847e05838 README
+SHA1 160c25c3b3171e404716169c518918bec76ff054 README.mkdn
+SHA1 b0b28ffb007b03090b7ebe57a8158eb95da8ea47 cpanfile
+SHA1 46e04a444d7c54ae3754c4027bc21c1231aae67d doap.xml
+SHA1 32a541c2de921e6d3975cddd35c9c86d985d059a lib/Dancer2/Plugin/Cache/CHI.pm
+SHA1 d9558bace3bd898ecc63eb533769772c638539f1 t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 c41f6b6e85cd63bdb9554968aeeeaa2b5601cbee t/TestApp.pm
+SHA1 d761a3b6167b2f55dbc718f47eb8a2e02b472c53 t/basic.t
+SHA1 310a88a8e81cfab078cd95dcc62f96ef9fb0ded0 t/honor-no-cache.t
+SHA1 79d64a1100afad5ceec31a53d358ea5f29748e86 t/hooks.t
+SHA1 fe6bf1c1533d5ce13a79f5b9c9aa69b08918610e t/init-check-page-cache.t
+SHA1 a76c3beb830746aeef6d6583fb4076b193f63405 t/key-gen.t
+SHA1 9e945afff795bba773eff18629ec0caf25ac0271 t/namespaces.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAleif7sACgkQ34Hwf+GwC4xaMgCgkrYaDSv53357xcZ280AA5cSI
+16cAoOH5a/WDGuIJtif3TkhqlJ6v/lDc
+=eLRm
+-----END PGP SIGNATURE-----

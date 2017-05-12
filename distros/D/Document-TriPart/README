@@ -1,0 +1,38 @@
+NAME
+    Document::TriPart - Read, write & edit a tri-part document (preamble,
+    YAML::Tiny header, and body)
+
+VERSION
+    version 0.024
+
+SYNOPSIS
+        my $document;
+        $document = Document::TriPart::->read( \<<_END_ ); # Or you can use ->read_string( ... )
+        # vim: #
+        ---
+        hello: world
+        ---
+        This is the body
+        _END_
+
+        $document->preamble   "# vim: #\n"
+        $document->header     { hello => world }
+        $document->body       "This is the body\n"
+
+DESCRIPTION
+    This distribution is meant to take the headache out of reading, writing,
+    and editing "interesting" documents. That is, documents with both
+    content and meta-data (via YAML::Tiny)
+
+    More documentation coming soon, check out the code and tests for usage
+    and examples. This is pretty beta, so the interface might change.
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

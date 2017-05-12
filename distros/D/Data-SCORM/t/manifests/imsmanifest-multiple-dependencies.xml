@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<manifest identifier="CBNO00014219" version="1.00"
+    xmlns="http://www.imsproject.org/xsd/imscp_rootv1p1p2"
+    xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_rootv1p2"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.imsproject.org/xsd/imscp_rootv1p1p2 imscp_rootv1p1p2.xsd http://www.imsglobal.org/xsd/imsmd_rootv1p2p1 imsmd_rootv1p2p1.xsd http://www.adlnet.org/xsd/adlcp_rootv1p2 adlcp_rootv1p2.xsd">
+    <organizations default="BB33909">
+        <organization identifier="BB33909">
+            <title>Customer Operations knowledge nugget</title>
+            <item identifier="SA33910" identifierref="RSA33910" isvisible="true">
+                <title>Customer Operations knowledge nugget</title>
+                <metadata>
+                    <schema>ADL SCORM</schema>
+                    <schemaversion>1.2</schemaversion>
+                    <adlcp:location>metadata/SA33910.xml</adlcp:location>
+                </metadata>
+            </item>
+            <metadata>
+                <schema>ADL SCORM</schema>
+                <schemaversion>1.2</schemaversion>
+                <adlcp:location>metadata/BB33909.xml</adlcp:location>
+            </metadata>
+        </organization>
+    </organizations>
+    <resources>
+        <resource adlcp:scormtype="sco"
+            href="content/SCO000000032457.html?width=1010&amp;height=630"
+            identifier="RSA33910" type="webcontent">
+            <metadata>
+                <schema>ADL SCORM</schema>
+                <schemaversion>1.2</schemaversion>
+                <adlcp:location>metadata/RSA33910.xml</adlcp:location>
+            </metadata>
+            <file href="content/SCO000000032457.html"/>
+            <file href="content/000000032457/000000032457.xml"/>
+            <file href="images/429408.jpg"/>
+            <file href="content/000000032457/en_GB/120113192094015.xml"/>
+            <file href="images/429416.jpg"/>
+            <file href="content/000000032457/en_GB/120113193830369.xml"/>
+            <file href="images/427842.jpg"/>
+            <file href="content/000000032457/en_GB/1201131959666306.xml"/>
+            <file href="content/000000032457/en_GB/1201131101788320.xml"/>
+            <file href="images/429444.jpg"/>
+            <file href="content/000000032457/en_GB/1201131121463586.xml"/>
+            <file href="images/429560.jpg"/>
+            <file href="images/429563.jpg"/>
+            <file href="images/429562.jpg"/>
+            <file href="content/000000032457/en_GB/12011311131896925.xml"/>
+            <file href="images/429564.jpg"/>
+            <file href="content/000000032457/en_GB/12011311252249254.xml"/>
+            <file href="content/000000032457/en_GB/1201131125246256.xml"/>
+            <file href="content/000000032457/en_GB/12011311258617292.xml"/>
+            <file href="images/429558.jpg"/>
+            <file href="content/000000032457/en_GB/1201131130968314.xml"/>
+            <file href="content/000000032457/en_GB/12011311014122368.xml"/>
+            <file href="content/000000032457/en_GB/12011311022934458.xml"/>
+            <file href="images/429430.jpg"/>
+            <file href="content/000000032457/en_GB/12011311037203470.xml"/>
+            <dependency identifierref="skin_vodafone_skin"/>
+            <dependency identifierref="asset_player"/>
+        </resource>
+        <resource adlcp:scormtype="asset"
+            href="skin/vodafone_skin/assets/answer.swf"
+            identifier="skin_vodafone_skin" type="webcontent">
+            <file href="skin/vodafone_skin/assets/answer.swf"/>
+            <file href="skin/vodafone_skin/assets/correct.swf"/>
+            <file href="skin/vodafone_skin/assets/dot.swf"/>
+            <file href="skin/vodafone_skin/assets/fasit2.swf"/>
+            <file href="skin/vodafone_skin/assets/line_between_dots.swf"/>
+            <file href="skin/vodafone_skin/assets/my.swf"/>
+            <file href="skin/vodafone_skin/assets/neste.swf"/>
+            <file href="skin/vodafone_skin/assets/preloader.swf"/>
+            <file href="skin/vodafone_skin/assets/radiobutton.swf"/>
+            <file href="skin/vodafone_skin/assets/teori2.swf"/>
+            <file href="skin/vodafone_skin/assets/test2.swf"/>
+            <file href="skin/vodafone_skin/config.xml"/>
+            <file href="skin/vodafone_skin/resources.html"/>
+            <file href="skin/vodafone_skin/skin.xml"/>
+            <file href="skin/vodafone_skin/vodafone_skin.jpg"/>
+            <file href="skin/vodafone_skin/vodafone_skin.swf"/>
+        </resource>
+        <resource adlcp:scormtype="asset" href="player/APIWrapper.js"
+            identifier="asset_player" type="webcontent">
+            <file href="player/APIWrapper.js"/>
+            <file href="player/build.js"/>
+            <file href="player/config.js"/>
+            <file href="player/id.html"/>
+            <file href="player/launch.js"/>
+            <file href="player/LessonLib.js"/>
+            <file href="player/Note.doc"/>
+            <file href="player/Player.html"/>
+            <file href="player/player.js"/>
+            <file href="player/player8.swf"/>
+            <file href="player/player9.swf"/>
+            <file href="player/PlayerWin.html"/>
+            <file href="player/PlayerX.html"/>
+            <file href="player/swfobject.js"/>
+            <file href="player/tracewin.html"/>
+            <file href="player/0561/blank.swf"/>
+            <file href="player/0561/innhold_A.swf"/>
+            <file href="player/0561/innhold_B.swf"/>
+            <file href="player/0561/innhold_C.swf"/>
+            <file href="player/0561/innhold_D.swf"/>
+            <file href="player/0561/innhold_E_FO.swf"/>
+            <file href="player/0561/innhold_F.swf"/>
+            <file href="player/0561/innhold_G.swf"/>
+            <file href="player/0561/innhold_H.swf"/>
+            <file href="player/0561/innhold_I.swf"/>
+            <file href="player/0561/innhold_J.swf"/>
+            <file href="player/0561/innhold_K.swf"/>
+            <file href="player/0561/innhold_L.swf"/>
+            <file href="player/0561/innhold_M.swf"/>
+            <file href="player/0561/innhold_N.swf"/>
+            <file href="player/0561/innhold_R.swf"/>
+            <file href="player/0561/Nopage.swf"/>
+            <file href="player/0561/summary.swf"/>
+            <file href="player/0561/summary_narvesen.swf"/>
+            <file href="player/0561/summary_nsikr.swf"/>
+            <file href="player/0561/innhold_Q.swf"/>
+            <file href="player/0561/innhold_P.swf"/>
+            <file href="player/0561/innhold_P_test.swf"/>
+            <file href="player/0561/innhold_M_old.swf"/>
+            <file href="player/0561/innhold_P.bak"/>
+            <file href="player/0561/innhold_O.swf.bak"/>
+            <file href="player/0561/innhold_O.swf"/>
+            <file href="player/flvplayback_skin.swf"/>
+            <file href="player/frames.swf"/>
+            <file href="player/flashfilter.swf"/>
+            <file href="player/config.js"/>
+        </resource>
+        <resource adlcp:scormtype="asset" href="autorun.inf"
+            identifier="asset_system" type="webcontent">
+            <file href="autorun.inf"/>
+            <file href="index.html"/>
+            <file href="start.exe"/>
+            <file href="start.ini"/>
+            <file href="systemfiles/CM_key.js"/>
+            <file href="systemfiles/config.js"/>
+            <file href="systemfiles/empty.htm"/>
+            <file href="systemfiles/index.js"/>
+            <file href="systemfiles/localTracking.htm"/>
+            <file href="systemfiles/localTracking.swf"/>
+            <file href="systemfiles/login.htm"/>
+            <file href="systemfiles/SCO_navigation.htm"/>
+            <file href="systemfiles/swfobject.js"/>
+            <file href="systemfiles/treemenu.htm"/>
+            <file href="systemfiles/treemenu_sidebar.htm"/>
+            <file href="systemfiles/waiting.htm"/>
+            <file href="systemfiles/welcome.htm"/>
+            <file href="systemfiles/images/bumps.gif"/>
+            <file href="systemfiles/images/button_login.gif"/>
+            <file href="systemfiles/images/close_btn.gif"/>
+            <file href="systemfiles/images/eg_logo.gif"/>
+            <file href="systemfiles/images/flash.gif"/>
+            <file href="systemfiles/images/footer-BG.gif"/>
+            <file href="systemfiles/images/header-BG.gif"/>
+            <file href="systemfiles/images/hide_treemenu.gif"/>
+            <file href="systemfiles/images/icon_expand.gif"/>
+            <file href="systemfiles/images/icon_report.gif"/>
+            <file href="systemfiles/images/icon_search.gif"/>
+            <file href="systemfiles/images/leftarrow.gif"/>
+            <file href="systemfiles/images/pioneering_solutions.gif"/>
+            <file href="systemfiles/images/rightarrow.gif"/>
+            <file href="systemfiles/images/top_background.gif"/>
+            <file href="systemfiles/images/treemenu/folder_closed.gif"/>
+            <file href="systemfiles/images/treemenu/folder_open.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2blank.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2lastnode.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2mlastnode.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2mnode.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2node.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2plastnode.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2pnode.gif"/>
+            <file href="systemfiles/images/treemenu/ftv2vertline.gif"/>
+            <file href="systemfiles/images/treemenu/SCO.gif"/>
+            <file href="systemfiles/images/treemenu/SCO_status_completed.gif"/>
+            <file href="systemfiles/images/treemenu/SCO_status_failed.gif"/>
+            <file href="systemfiles/images/treemenu/SCO_status_incomplete.gif"/>
+            <file href="systemfiles/images/treemenu/SCO_status_notStarted.gif"/>
+            <file href="systemfiles/images/treemenu/SCO_status_passed.gif"/>
+            <file href="systemfiles/library/browserCheck.js"/>
+            <file href="systemfiles/library/flash_detect.js"/>
+            <file href="systemfiles/library/report.js"/>
+            <file href="systemfiles/library/SCORM_API.js"/>
+            <file href="systemfiles/library/SCO_search.js"/>
+            <file href="systemfiles/library/treemenu.js"/>
+            <file href="systemfiles/styles/CM.css"/>
+            <file href="systemfiles/styles/EDG.css"/>
+            <file href="systemfiles/index.js"/>
+            <file href="systemfiles/CM_key.js"/>
+        </resource>
+        <resource adlcp:scormtype="asset" href="coursebuilder.xml"
+            identifier="asset_cb" type="webcontent">
+            <file href="coursebuilder.xml"/>
+            <file href="imsmanifest.xml"/>
+            <file href="metadata/BB33909.xml"/>
+        </resource>
+        <resource adlcp:scormtype="asset" href="converter.html"
+            identifier="asset_aicc" type="webcontent">
+            <file href="converter.html"/>
+            <file href="scorm2aicc.html"/>
+            <file href="scorm2aicc/API.class"/>
+            <file href="scorm2aicc/ErrorManager.class"/>
+            <file href="scorm2aicc/LMSComm.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/AiccDataParser.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/CMICoreData.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/CMIResponse.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/CMIScoreData.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/CMIStatusData.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/CMITime.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/DataValidator.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/GroupObject.class"/>
+            <file href="scorm2aicc/com/coursekeeper/cmi/KeywordObject.class"/>
+            <file href="course.AU"/>
+            <file href="course.CRS"/>
+            <file href="course.CST"/>
+            <file href="course.DES"/>
+        </resource>
+    </resources>
+</manifest>

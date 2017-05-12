@@ -1,0 +1,35 @@
+Revision history for Dist-Zilla-Plugin-InsertCopyright
+
+0.005     2014-03-21 06:15:21-04:00 America/New_York
+
+    [FIXED]
+
+    - Fixed encoding problems munging UTF-8 files (reported by Keedi Kim)
+
+0.004     2014-03-16 19:33:26+01:00 Europe/Paris
+
+    [CHANGED]
+
+    - Optimized with cached PPI document
+
+0.003     2014-02-23 11:45:38-05:00 America/New_York
+
+    [FIXED]
+
+    - Is now file encoding aware for Dist::Zilla 5+
+
+    [CHANGED]
+
+    - Uses Path::Tiny instead of Path::Class
+
+    - Modernized distribution packaging layout
+
+0.002     2013-08-21 18:54:37 America/New_York
+
+    [FIXED]
+
+    - Carp wasn't being loaded for calling croak
+
+0.001     2011-07-11 21:16:16 America/New_York
+    - Initial release to CPAN
+

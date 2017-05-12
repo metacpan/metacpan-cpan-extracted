@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/dcmes-xml/
+ -->
+<rdf:RDF 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+<rdf:Description rdf:about="http://example.org/">
+  <dc:source rdf:resource="http://example.org/elsewhere/"/>
+</rdf:Description>
+
+<rdf:Description>
+  <dc:title>Internet Ethics</dc:title>
+  <dc:creator>Duncan Langford</dc:creator>
+  <dc:format>Book</dc:format>
+  <dc:identifier>ISBN 0333776267</dc:identifier>
+</rdf:Description>
+
+<rdf:Description>
+  <dc:title>The Mona Lisa</dc:title>
+  <dc:description>A painting by ...</dc:description>
+</rdf:Description>
+
+</rdf:RDF>

@@ -1,0 +1,143 @@
+0.19    2016-08-20
+
+- Don't rely on '.' being in the current @INC in the code added to a distro's
+  Makefile.PL or Build.PL. Reported by Graham Knop. GitHub #7.
+
+
+0.18    2016-02-27
+
+- The previous release didn't have any Pod. Fixed by Karen Etheridge a while
+  back but for some reason I never did a release.
+
+
+0.17    2014-12-21
+
+- Removed the use of autobox, following Dist::Zilla's lead. Patch by Karen
+  Etheridge. GitHub PR #4.
+
+
+0.16    2014-09-03
+
+- Add a hint for [SurgicalPodWeaver] so it does not try to modify the file (no
+  longer possible since version 0.15). Patch by Karen Etheridge. GitHub PR #3.
+
+- Repository moved to the github moose organization.
+
+
+0.15    2014-08-31
+
+- Generate the Conflicts module as a FromCode file, so its content is not
+  calculated until after prereqs are available: restores the -also section
+  lost in version 0.09. Patch by Karen Etheridge. GitHub PR #2.
+
+- The generated files now include comments indicating what version of this
+  plugin was used to generate them.  Patch by Karen Etheridge. GitHub PR #1.
+
+
+0.14    2014-04-06
+
+- Same as 0.13001
+
+
+0.13001 2014-04-06 (TRIAL RELEASE)
+
+- Fixed the x_breaks metadata to properly indicate the problematic version
+  range. Patch by Karen Etheridge. RT #94467.
+
+
+0.13    2013-08-25
+
+- MetaCPAN was picking up the "# ABSTRACT" line in the conflicts module
+  template.
+
+- Removed some incorrect docs left over from 0.11
+
+
+0.12    2013-08-25
+
+- Fix bad conflicts entries added to metaspec (Karen is very sorry!), broken
+  in v0.11. Sort of resolves RT #87123.
+
+
+0.11    2013-07-22
+
+- This plugin now adds conflicts type entries to the distro's Meta
+  information, per the CPAN meta spec. Patch by Karen Etheridge. RT #87123.
+
+
+0.10    2013-06-07
+
+- The x_conflicts key added to the META.* files has now been renamed to
+  x_breaks, per the Lancaster Consensus of 2013
+  (https://github.com/Perl-Toolchain-Gang/toolchain-site/blob/master/lancaster-consensus.md).
+
+- The generated check_conflicts sub added to the Makefile.PL or Build.PL file
+  now checks the AUTOMATED_TESTING and NONINTERACTIVE_TESTING env vars to
+  determine whether or not it should sleep for a few seconds so its message
+  can be read. These env vars also come from the Lancaster Consensus.
+
+
+0.09    2013-03-31
+
+- If the plugin is run before a Makefile.PL or Build.PL can be generated, a
+  fatal error is thrown. RT#80271. (Karen Etheridge)
+
+- The files this plugin generates are now added early enough to be seen by any
+  FileMunger plugins. However, the PkgVersion plugin still skips the generated
+  *::Conflicts module because the package name of the generated module is
+  intentionally hidden from PAUSE.
+
+- Added an ABSTRACT to the generated module.
+
+
+0.08    2011-07-22
+
+- Add Dist::CheckConflicts to both configures and runtime dependency lists for
+  modules which use this plugin.
+
+
+0.07    2011-01-27
+
+- Fix module name in pod.
+
+- Add a dep on Dist::CheckConflicts 0.02 to modules which use this plugin (not
+  0.01).
+
+
+0.06    2011-01-16
+
+- The dist.ini wouldn't load if a -script wasn't defined in the Conflicts
+  config section.
+
+
+0.05    2011-01-03
+
+- The conflict warning added to your Makefile.PL or Build.PL now mentions the
+  generated script if you ask for one to be generated. (Jesse Luehrs)
+
+- No -also will be passed to Dist::CheckConflicts if you don't have
+  dependencies. (Jesse Luehrs)
+
+- Require Dist::CheckConflicts 0.02, which has better -also handling.
+
+
+0.04    2010-12-31
+
+- In the generated conflict module, all of the distro's runtime prereqs are
+  passed in the -also parameter to Dist::CheckConflicts.
+
+
+0.03    2010-12-31
+
+- Added support for a -script config key, which tells this plugin to generate
+  a script of the given name that lists conflicts. (Jesse Luehrs)
+
+
+0.02    2010-11-22
+
+- This module loaded Test::ConsistentVersion, which it wasn't actually using.
+
+
+0.01    2010-11-22
+
+- Initial release

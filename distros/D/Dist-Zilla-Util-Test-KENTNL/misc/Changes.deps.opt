@@ -1,0 +1,120 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.005014
+
+1.005013 2015-10-19T11:29:36Z
+
+1.005012 2015-04-13T03:25:53Z
+
+1.005011 2015-04-12T03:04:32Z
+
+1.005010 2015-04-11T10:03:55Z
+ [Added / runtime recommends]
+ - Moo 1.000008
+ - Path::Tiny 0.058
+
+ [Changed / runtime recommends]
+ - Test::More 1.001009 → 0.99
+
+ [Changed / test recommends]
+ - Test::More 1.001009 → 0.99
+
+ [Removed / runtime recommends]
+ - Data::DPath
+
+1.005000 2014-11-06T15:24:12Z
+ [Added / runtime recommends]
+ - Test::TempDir::Tiny
+
+ [Changed / runtime recommends]
+ - Test::More 1.001008 → 1.001009
+
+ [Changed / test recommends]
+ - Test::More 1.001008 → 1.001009
+
+1.004002 2014-11-01T11:43:22Z
+
+1.004001 2014-10-30T12:56:17Z
+ [Added / runtime recommends]
+ - Data::DPath
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / runtime recommends]
+ - Test::More 1.001006 → 1.001008
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001006 → 1.001008
+
+1.004000 2014-10-12T15:44:27Z
+
+1.003003 2014-09-28T07:27:06Z
+
+1.003002 2014-09-07T09:07:01Z
+ [Changed / runtime recommends]
+ - Test::More 1.001003 → 1.001006
+
+ [Changed / test recommends]
+ - Test::More 1.001003 → 1.001006
+
+1.003001 2014-08-29T09:27:43Z
+
+1.003000 2014-08-29T07:46:22Z
+
+1.002000 2014-08-22T17:40:28Z
+ [Added / runtime recommends]
+ - Test::Differences
+
+1.001002 2014-08-21T05:38:29Z
+
+1.001001 2014-08-18T23:05:17Z
+
+1.001000 2014-08-18T21:14:28Z
+ [Added / runtime recommends]
+ - Test::More 1.001003
+
+1.000003 2014-08-03T12:37:40Z
+ [Changed / test recommends]
+ - CPAN::Meta 0 → 2.120900
+
+ [Removed / test recommends]
+ - CPAN::Meta::Prereqs
+ - CPAN::Meta::Requirements 2.120900
+
+1.000002 2014-07-25T06:22:28Z
+ [Added / test recommends]
+ - CPAN::Meta::Prereqs
+
+1.000001 2014-07-13T18:11:06Z
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.88 → 6.98
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.88 → 6.98
+ - Test::More 1.001002 → 1.001003
+
+1.000000 2014-02-02T07:19:39Z
+ [Added / configure recommends]
+ - ExtUtils::MakeMaker 6.88
+
+ [Added / test recommends]
+ - CPAN::Meta
+ - CPAN::Meta::Requirements 2.120900
+ - ExtUtils::MakeMaker 6.88
+ - Test::More 1.001002
+
+0.01015824 2013-11-21T10:47:13Z
+
+0.01015823 2013-04-09T02:43:44Z
+
+0.01015822 2012-02-03T03:21:20Z
+
+0.01015821 2011-04-07T01:33:45Z
+
+0.01000510 2010-11-08T14:01:08Z
+
+0.01000011 2010-11-03T15:01:43Z
+
+0.01000004 2010-11-03T08:28:59Z

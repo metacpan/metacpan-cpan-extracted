@@ -1,0 +1,107 @@
+NAME
+    DelayLine - Simple time-delay data stucture
+
+SYNOPSIS
+        use DelayLine;
+
+        my $dl = DelayLine->new(delay => $defaultdelay);
+
+        $dl->in($item);
+
+        [ ... ]
+
+        if (my $ob = $dl->out()) {
+            # do stuff with $ob
+        }
+
+DESCRIPTION
+    The `DelayLine' is a simple two-port data structure, like a FIFO, but
+    with variable delay. Each object put into the input of the DelayLine
+    will appear on the output only after some pre-determined amount of time
+    has elapsed. This time can be set as a default for the DelayLine, or can
+    be individually overridden for each object put into the DelayLine.
+
+    If the default delay time is set to zero, and is not overridden for the
+    individual objects, the DelayLine mimics a straightforward FIFO.
+
+    The DelayLine accepts any scalar value as input, including references.
+
+    The DelayLine is a very useful component when building simple event
+    loops.
+
+  Methods
+
+    `DelayLine' provides the following methods:
+
+    DelayLine->new( [ delay => DELAY [, debug => DEBUG ]] )
+        Returns a newly created `DelayLine' object.
+
+        The default delay is 0 seconds, unless an optional `DELAY' time in
+        seconds is given.
+
+        Debugging is turned off by default. Setting DEBUG to true, enables
+        debugging output to STDOUT.
+
+        The parameter naming style is very flexible: the keyword can be in
+        lower, upper or mixed case, and can be optionally prefixed with a
+        dash. Thus, the following are all equivalent:
+
+          $dl = DelayLine->new( -delay => 42 );
+          $dl = DelayLine->new(  delay => 42 );
+          $dl = DelayLine->new( -Delay => 42 );
+          $dl = DelayLine->new(  DELAY => 42 );
+          $dl = DelayLine->new( -deLaY => 42 );
+
+        `new()' can be called as a class (static) or object method. Calling
+        `new()' as an object method is only a convenience; no data from the
+        original DelayLine is carried over into the newly created object.
+
+    $DL->in( OBJ [, DELAY ] )
+        This method puts object `OBJ' into DelayLine `$DL'.
+
+        The object `OBJ' can be any scalar value, including references.
+
+        The default delay as set in the `new()' method is used, unless
+        overridden by setting `DELAY'.
+
+    $DL->out()
+        This method fetches objects from the out from the DelayLine `$DL'.
+
+        Returns the first of the timed-out objects, if any.
+
+        Returns `undef' if the DelayLine is empty, of if no objects in the
+        DelayLine have timed out yet.
+
+    $DL->delay( [ DELAY ] )
+        Returns the current default delay setting of the DelayLine. If the
+        optional value DELAY is set, sets a new default delay value.
+
+    $DL->debug( [ DEBUG ] )
+        Returns the current debug setting of the DelayLine. If the optional
+        value DEBUG is set, sets a new debug value.
+
+        If the debug value is set (true), calling any of the 'active'
+        methods (`in()' or `out()' will yield a short debug message on
+        STDERR.
+
+BUGS
+    This is a fairly simple module, so no serious bugs are expected. Patches
+    are welcome, though.
+
+RELEASE HISTORY
+    v0.02 - 2000-jul-22
+    Fixed test for multiple unknown args. Removed superfluous test output.
+    Streamlined debug output.
+
+    v0.01 - 2000-jul-13
+    Initial release.
+
+COPYRIGHT
+    Copyright (c) 2000 Lars Thegler. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+AUTHOR
+    Lars Thegler <lars@thegler.dk>
+

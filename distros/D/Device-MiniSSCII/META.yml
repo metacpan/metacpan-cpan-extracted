@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Device-MiniSSCII
+version: 1.2
+license: perl
+distribution_type: module
+requires:
+  Device::SerialPort: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Device::MiniSSCII:
+    file: lib/Device/MiniSSCII.pm
+    version: 1.2
+generated_by: Module::Build version 0.21

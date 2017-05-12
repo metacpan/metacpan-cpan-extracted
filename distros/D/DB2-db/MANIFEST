@@ -1,0 +1,24 @@
+Build.PL
+Changes
+db/TableCreator.pm
+lib/DB2/db.pm
+lib/DB2/Row.pm
+lib/DB2/Table.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+README
+samples/My/db.pm
+samples/My/Employee.pm
+samples/My/EmployeeR.pm
+samples/My/Product.pm
+samples/My/Row.pm
+samples/My/Table.pm
+samples/My/tables.xml
+samples/mySample.pl
+t/001_basic.t
+t/003_my.t
+t/kwalitee.t
+t/pod-coverage.t
+t/pod.t
+TODO

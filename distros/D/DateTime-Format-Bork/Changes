@@ -1,0 +1,9 @@
+Revision history for Perl module DateTime::Format::Bork
+
+0.02 Fri Aug  1 00:13:52 HST 2003
+    - bork() now clones passed objects
+        thanks to Eugene van der Pijll for the bug report
+
+0.01 Mon Jun 23 22:05:39 HST 2003
+    - bork
+    - debork

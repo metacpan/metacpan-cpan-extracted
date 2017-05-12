@@ -1,0 +1,12 @@
+0.06 Corrected a bug so that the module works with tables with missing data
+
+0.07 ** Interface change ** sends arrayrefs rather than arrays back and forth
+
+0.07a Cleanded up the tests, removed an unneccesary dependency
+
+0.07b Added more tests, only internal
+
+0.08 Added possible numerical sort on rows and cols, cleaned a few minor bugs
+
+
+

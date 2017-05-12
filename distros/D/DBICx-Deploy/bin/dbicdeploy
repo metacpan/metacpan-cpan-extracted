@@ -1,0 +1,126 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Pod::Usage;
+use DBICx::Deploy;
+
+my (@lib, @tmp);
+BEGIN {
+    foreach my $arg (@ARGV){
+        if(my ($path) = ($arg =~ /-I(.+)/)){
+            push @lib, $path;
+        }
+        elsif ($arg eq '-l') {
+            push @lib, 'lib';
+        }
+        elsif ($arg eq '-b') {
+            require blib;
+            blib->import;
+        }
+        else {
+            push @tmp, $arg;
+        }
+    }
+}
+
+use lib @lib;
+
+pod2usage("$0: Need the schema and the dsn to deploy to") if @tmp < 2;
+
+my ($schema, $dsn, @args) = @tmp;
+
+if(@args > 2){
+    # change '{foo => bar}' into a data structure
+    my $struct = $args[2];
+    $args[2] = eval $struct or die "$struct doesn't parse"; 
+}
+
+DBICx::Deploy->deploy($schema => $dsn, @args);
+exit 0;
+
+__END__
+
+=head1 NAME
+
+dbicdeploy - deploy a DBIx::Class schema to a database
+
+=head1 SYNOPSIS
+
+Deploy to a database server:
+
+    dbicdeploy schema DSN [username [password [{ extra => 'args'}]]]
+
+Generate a directory containing SQL to execute to create the schema:    
+
+    dbicdeploy schema directory [databases]
+
+Examples:
+
+    dbicdeploy -Ilib MyApp::Schema DBI:SQLite:root/database
+
+    dbicdeploy MyApp::Schema DBI:mysql:foo username password
+
+    dbicdeploy MyApp::Schema DBI:Pg:foo user pass '{ pg_enable_utf8 => 1 }'
+
+    dbicdeploy MyApp::Schema root/myapp_schema
+
+    dbicdeploy MyApp::Schema root/myapp_schema SQLite MySQL
+
+See C<perldoc dbicdeploy> for more information.
+
+=head1 OPTIONS
+
+=head2 -Ilib
+
+C<lib> is a directory to add to the search path for the schema.  You
+can have 0 or more of these, just like C<perl>.
+
+=head2 -l
+
+Alias for -Ilib
+
+=head2 -b
+
+Get libraries from L<blib|blib> instead.
+
+=head2 Schema
+
+The name of the L<DBIx::Class::Schema|DBIx::Class::Schema> subclass
+that you want to deploy.
+
+=head2 DSN
+
+The DBI data source (C<DBI:...>) that you want to connect to, or the
+directory to write SQL scripts to.
+
+=head2 Extra Arguments
+
+Everything after the Schema and DSN will be passed to the connect
+command.  Usually the first two arguments are the username and
+password.
+
+The third argument is special.  It will be run through eval, so you
+can say C<< { hash => 'of options', and => 'so on' } >>, and DBI will see
+a hash, not a string.  If the option doesn't parse as perl, the deploy
+will be aborted.
+
+In the case that you're deploying to a file instead of a database, the
+arguments after the filename are used as the names of the database
+engines you want to generate SQL for.
+
+=head1 SEE ALSO
+
+L<DBICx::Deploy|DBICx::Deploy>, included with this distribution.
+
+=head1 AUTHOR
+
+Jonathan Rockway C<< <jrockway@cpan.org> >>
+
+=head1 LICENSE
+
+This program is free software.  You may redistribute it under the same
+terms as Perl it self.
+
+=cut

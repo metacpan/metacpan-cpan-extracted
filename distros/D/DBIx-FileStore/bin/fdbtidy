@@ -1,0 +1,96 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+
+use DBIx::FileStore;
+use DBIx::FileStore::UtilityFunctions qw(get_date_and_time);
+
+# fdbtidy: cleans up stray blocks in an fdb database
+
+my $verbose = 0;
+my $clean = 0;
+
+main();
+
+sub Usage {
+        "fdbtidy [--verbose] [--clean]: Removes dangling FileDB blocks. Like fsck.\n";
+}
+
+sub main {
+    GetOptions("verbose" => \$verbose,
+                "clean" => \$clean ) || die Usage();
+
+    my $filestore = new DBIx::FileStore();
+    my $dbh = $filestore->{dbh};
+
+    # THIS CODE SHOULD BE MOVED INTO A DBIx::FileStore method.
+    
+    $dbh->do( "lock tables files write, fileblocks write" );
+    # get a list of all the files and their checksums, 
+    my $files = $dbh->selectall_arrayref( "select name, c_len, c_md5 from files where b_num=0");
+    for my $f (@$files) {
+        $f->[0] =~ s/ 0+$//;
+        print "fdbtidy: looking for blocks of file: $f->[0]...\n" if $verbose;
+
+        # then delete blocks that are 'old' and not matching first block's checksum
+        my $badblocks = $dbh->selectall_arrayref( 
+            "select name, lasttime from files 
+            where name like ? and c_md5 != ?  having lasttime < ?", 
+            {}, "$f->[0] %", $f->[2], get_date_and_time(time() - 60*60) );
+        for my $b (@$badblocks) {
+            if (!$clean) {
+                warn "fdbtidy: IGNORING dangling blocks named '$b->[0]'\n";
+            } else {
+                warn "fdbtidy: DELETING dangling blocks named '$b->[0]'\n";
+                $dbh->do("delete from files where name is ?", {}, $b->[0]);
+                $dbh->do("delete from fileblocks where name is ?", {}, $b->[0]);
+            }
+        }
+    }
+    $dbh->do( "unlock tables" );
+}
+
+__END__     
+
+=pod
+            
+=head1 NAME     
+            
+fdbtidy - Handle dangling blocks in the DBIx::FileStore filestore
+                    
+=head1 SYNOPSIS     
+                
+    % fdbtidy 
+
+shows if any rows in the fileblocks table don't have a corresponding
+for in the files table.
+
+    % fdbtidy -v
+
+shows if any rows in the fileblocks table don't have a corresponding
+for in the files table, and shows files being checked.
+
+    % fdbtidy -clean
+
+removes any dangling blocks found.
+
+=head1 DESCRIPTION 
+
+fdbtidy - looks for dangling blocks in the DBIx::FileStore filestore.
+
+If --clean is used, it will clean up the dangling blocks.
+
+If --verbose is used, it will show verbose data about what it's doing.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbget>, L<fdbls>, L<fdbmv>,  L<fdbput>,  
+L<fdbrm>,  L<fdbstat>
+    
+=cut    
+

@@ -1,0 +1,33 @@
+Changes for Dist::Zilla::Plugin::NoSmartCommentsTests
+
+0.009     2016-10-09 19:05:49 CDT-0500
+	* Add Test::NoSmartComments as a develop requires on a generated
+	  distribution.
+
+0.008-TRIAL  2015-08-07 18:32:43 PDT-0700
+	* Switch over to using FileFinders rather than Test::NoSmartComments' own
+	  file finding functionality.
+	* Add a shim Test::NoSmartComments plugin
+
+0.007     2014-12-02 19:51:38 PST-0800
+    * check t/*.t, too.
+
+0.006     2011-04-24 16:10:00 America/Los_Angeles
+    * Update POD
+
+0.005     2011-03-27 07:56:00 America/Los_Angeles
+    * Add done_testing() to the end of our generated .t
+
+0.004     2011-03-17 21:14:33 America/Los_Angeles
+    * Switch to Test::NoSmartComments
+
+0.003
+    * AutoPrereqs wasn't picking up Module::ScanDeps -- so require it
+      manually
+
+0.002     2011-03-13 16:16:29 America/Los_Angeles
+    * Metadata update
+
+0.001     2011-03-13 16:09:56 America/Los_Angeles
+    * Initial release
+

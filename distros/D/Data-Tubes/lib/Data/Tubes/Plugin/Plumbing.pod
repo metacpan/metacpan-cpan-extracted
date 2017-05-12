@@ -1,0 +1,496 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Plumbing
+
+=head1 DESCRIPTION
+
+This module contains I<tubes> factories for handling general plumbing
+requirements, e.g. put some other I<tubes> in a sequence.
+
+=head1 FUNCTIONS
+
+=head2 B<< alternatives >>
+
+   $tube = alternatives(@tubes); # OR
+   $tube = alternatives(@tubes, \%args);
+
+consider a series of tubes as different alternatives, to be triggered in
+order until one of them returns something.
+
+In simple terms, the first item in C<@tubes> is called with the input
+record. If it returns I<nothing>, the second item in C<@tubes> is tried,
+and so on. The first one to return something (i.e. a record, or multiple
+ones) wins and its result is returned. Think of it as some I<OR>
+function in tubeland.
+
+If no tube returns anything, the tube itself returns nothing.
+
+You can set the following options with the optional C<%args>:
+
+=over
+
+=item C<name>
+
+set a name for the dispatcher, might be useful while debugging if you
+plan to use more than one dispatcher.
+
+=back
+
+=head2 B<< cache >>
+
+   $ctube = cache($tube, %args); # OR
+   $ctube = cache(%args); # OR
+   $ctube = cache(\%args);
+
+create a cache layer around another tube.
+
+The wrapped tube can be provided either as the first unnamed parameter
+or via argument C<tube>. You can set it using any of the alternatives
+supported by L<Data::Tubes::Plugin::Util/tubify>.
+
+The main algorithm for caching is the following:
+
+=over
+
+=item *
+
+a I<key> is derived from the record. Option C<key> can be used to this
+regard, but the whole record is considered the key otherwise. In this
+last case, it is forbidden to set option C<output> as the input record
+is supposed to I<not> be a hash reference;
+
+=item *
+
+the I<cache> is queried with the I<key> and a I<value> is retrieved;
+
+=item *
+
+if the I<cache> did not return anything, the wrapped C<tube> is invoked
+and its contents are cached. If the C<tube> returns an iterator, it is
+exhausted and transformed into an array reference of C<records>.
+Whatever is cached is also set as I<value> for the following processing;
+
+=item *
+
+depending on the I<value>, the output record(s) is(are) generated and
+returned.
+
+=back
+
+The output of this tube can be everything except an iterator. The input
+record might be overridden depending on C<output> and C<merger>, see
+below.
+
+Any time an item is set in the cache, a I<clearer> function might be
+called if set in option C<cleaner>.
+
+Accepted arguments are:
+
+=over
+
+=item C<cache>
+
+something that can be used as a cache, namely:
+
+=over
+
+=item *
+
+a hash reference, that will be used via
+L<Data::Tubes::Util::Cache/repository>;
+
+=item *
+
+anything supporting the interface of L<Data::Tubes::Util::Cache>, which
+is also valid for any cache valid for L<CHI>;
+
+=item *
+
+an array reference that will be transformed in a cache object. The first
+element of the array can be either a sub reference or a string; if a
+string, it is considered the name of a module (according to the rules
+set for L<Data::Tubes::Util/resolve_module>) and its C<new> method is
+considered. The rest of the array is passed as arguments to the sub ref
+or the C<new> method.
+
+=back
+
+If you want to use L<CHI>, you can do like this:
+
+   cache => ['^CHI', driver => 'File', root_dir => '/path/to/root']
+
+Note that the exclamation point is necessary in this case to avoid the
+automatic prefixing performed by L<Data::Tubes::Util/resolve_module>.
+
+If this parameter is missing, an empty hash is assumed and
+L<Data::Tubes::Util::Cache> is used.
+
+=item C<cleaner>
+
+an optional cleaning function for avoiding cache explosion. If you set
+it to a string, it is supposed to be a method supported by whatever
+comes from C<cache>. Otherwise, you can set it to a sub reference.
+
+For example, if you use L<Data::Tubes::Util::Cache> and set
+C<max_items>, you might want to set C<cleaner> to C<purge> so that the
+L<Data::Tubes::Util::Cache/purge> will be called (otherwise,
+C<max_items> will be ignored as a matter of fact).
+
+=item C<get_options>
+
+an optional array reference of values passed when invoking method C<get>
+on the cache. Ignored by L<Data::Tubes::Util::Cache/get>, but not by
+L<CHI>. Defaults to an empty array reference;
+
+=item C<key>
+
+mechanism for deriving a key from the input record, to use as index in
+the cache. It can be:
+
+=over
+
+=item *
+
+a sub reference, that is run with the input record as the only
+parameter, and MUST return the key to use;
+
+=item *
+
+a single string or an array reference containing a sequence of strings,
+passed to L<Data::Tubes::Util/traverse> for arriving to something
+meaningful;
+
+=back
+
+=item C<merger>
+
+optional subroutine reference for generating an output record from an
+input record and a value retrieved from the cache. When defined, the sub
+is run with three positional parameers:
+
+=over
+
+=item *
+
+the input record;
+
+=item *
+
+the name of the output field (factory argument C<output>);
+
+=item *
+
+the value to associate to C<output>.
+
+=back
+
+The default operation when returning a single record is I<equivalent> to
+the following:
+
+   {%$input_record, $output => $value}
+
+=item C<name>
+
+name of the tube, useful when debugging. Defaults to 'cache';
+
+=item C<output>
+
+name of the output field in the returned record. If it is not defined,
+the whole record is considered the output.
+
+=item C<set_options>
+
+an optional array reference of values passed when invoking method C<set>
+on the cache. Ignored by L<Data::Tubes::Util::Cache/set>, but not by
+L<CHI>. Defaults to an empty array reference;
+
+=item C<tube>
+
+the I<wrapped tube>, i.e. the tube whose output we want to cache for
+later reuse. You can use whatever L<Data::Tubes::Plugin::Util/tubify>
+accepts, which means a tube or whatever can be turned into one.
+
+=back
+
+
+
+=head2 B<< dispatch >>
+
+   $tube = dispatch(%args); # OR
+   $tube = dispatch(\%args);
+
+this function decides a sub-tube to use for dispatching a specific
+record. The selection of the sub-tube is performed through two different
+mechanisms:
+
+=over
+
+=item *
+
+first, a I<selector> function is applied to the input record, optionally
+defaulting to a configurable value. This selector is a string that MUST
+uniquely identify the output tube where the record should be dispatched;
+
+=item *
+
+then, if the tube associated to the I<selector> is already known, it
+will be used for the dispatching. Otherwise, a I<factory> will be used
+to get a new handler tube for the specific I<selector>, if possible.
+
+=back
+
+The arguments passed through C<%args> allow you to define the
+I<selector> and the I<factory> in a flexible way. Available options are:
+
+=over
+
+=item C<default>
+
+this allows defining the default I<selection key> when none is available
+(i.e. it would be the undefined value). If set to an C<undef> value,
+lack of a selector will throw an exception. Defaults to C<undef>;
+
+=item C<factory>
+
+set a sub reference to generate new tubes when needed. The factory
+function will be fed with the specific I<selection key> as the first
+argument, and the record as the second argument, and it is supposed to
+return anything that can be converted to a valid tube via
+L<Data::Tubes::Plugin::Util/tubify> (although it might throw an
+exception by itself, of course);
+
+=item C<handlers>
+
+this is a quick way to set a simple factory that just returns elements
+from a hash reference (that is passed as value). If this is used, every
+key that is I<not> present in the hash will throw an exception;
+
+=item C<key>
+
+this is a quick way to specify a selector function. It points to either
+a string/integer, or an array containing a sequence of strings/integers;
+these items will be used to access the provided C<$record> in a "visit"
+that uses an item at each step. Example:
+
+   $record = {aref => [1, 2, {foo => 'bar'}]};
+   @key = qw< aref 2 foo >; # this will select 'bar' above
+
+If the option C<selector> is passed, this field will be ignored;
+
+=item C<name>
+
+set a name for the dispatcher, might be useful while debugging if you
+plan to use more than one dispatcher;
+
+=item C<selector>
+
+set to a subroutine reference that will be passed the input record and
+SHOULD provide a string back, that will uniquely identify a tube.
+
+=back
+
+One between C<selector> or C<key> MUST be provided. At least one between
+C<factory> and C<handlers> MUST be provided (but you can provide both,
+in which case C<handlers> acts as a starting point).
+
+
+=head2 B<< fallback >>
+
+   $tube = fallback(@tubes); # OR
+   $tube = fallback(@tubes, \%args);
+
+consider a series of tubes as different alternatives, to be triggered in
+order until one of them does not throw an exception.
+
+In simple terms, the first item in C<@tubes> is called with the input
+record. If it throws an exception, the second item in C<@tubes> is
+tried, and so on. The first one to I<NOT> throw na exception wins and
+its result is returned. Think of it as some I<OR> function in tubeland,
+applied to exception throwing. This function is very similar to
+L</alternatives>, although there is a different exception handling here.
+
+Returns nothing if all tubes throw an exception, otherwise it returns
+the return value of the first tube that does not throw an exception, and
+ignores the rest of the tubes.
+
+The exception handling is performed via L<Try::Tiny>.
+
+You can set the following options with the optional C<%args>:
+
+=over
+
+=item C<catch>
+
+an optional sub reference to be called when an exception is catched. The
+sub is called like this:
+
+   $catcher->($exception, $record);
+
+The return value of this function is ignored.
+
+=item C<name>
+
+set a name for the dispatcher, might be useful while debugging if you
+plan to use more than one dispatcher.
+
+=back
+
+
+=head2 B<< logger >>
+
+   my $tube = logger(%args); # OR
+   my $tube = logger(\%args);
+
+this function generates a tube that is useful for logging things. You
+can pass the following arguments:
+
+=over
+
+=item C<loglevel>
+
+the level where the logging should happen. See L<Log::Log4perl::Tiny>
+for the available ones. You can pass either the numeric value of the log
+level (as exported via C<:levels> by L<Log::Log4perl::Tiny>) or the log
+level name (uppercase, e.g. C<INFO> or C<DEBUG>);
+
+=item C<name>
+
+the name assigned to the logger tube, might be useful while debugging;
+
+=item C<target>
+
+a facility to isolate part of the target record and/or produce a message
+suitable for logging.
+
+If not provided or undefined (which is the default), the whole input
+record will be passed to the logger function. This is probably what you
+don't want in the vast majority of cases, as you will only see a strange
+address printed out. Works fine if the input record is something
+printable, anyway.
+
+The most flexible thing that you can pass is a sub reference. This will
+receive the input record, and SHOULD return back a string that will be
+printed in the log stream.
+
+You can also provide either a string or a sequence of strings in an
+array reference. In this case, the record will be visited using these
+I<keys>, much in the same way as described for L</dispatch> above.
+Again, you should be pretty sure that the leaf value found after this
+traversal is something meaningful for printing.
+
+=back
+
+The generated tube always returns back the input record, unchanged.
+
+=head2 B<< pipeline >>
+
+   $tube = pipeline(@tubes); # OR
+   $tube = pipeline(@tubes, \%args);
+
+this is a thin wrapper around L</sequence>, added to avoid changing its
+signature. It is the same as calling:
+
+   $tube = sequence(tubes => \@tubes); # OR
+   $tube = sequence(%args, tubes => \@tubes);
+
+(depending on what you provide as input), only a bit more natural.
+
+=head2 B<< sequence >>
+
+   my $tube = sequence(\@tubes, %args); # OR
+   my $tube = sequence(%args); # OR
+   my $tube = sequence(\%args);
+
+this function takes a sequence of tubes (i.e. functions that are
+compliant with the I<tube> definition) and returns a I<tube> that
+provides serialization of the operations, in the order as the passed
+list.
+
+The returned tube is such that it will always return an iterator back
+(in particular, it will return two elements, the first is the string
+C<iterator> and the second is an iterator sub reference).
+
+Arguments can be passed through a single reference to a hash, or as a
+sequence of key/value pairs. The following options are supported:
+
+=over
+
+=item C<gate>
+
+a sub ref that is called over each intermediate record to establish if
+it can continue down the sequence or it should be returned immediately,
+depending on the truth of the returned value. The sub reference is
+passed the record and might change it. Defaults to C<undef>, which means
+that no gating function is invoked;
+
+=item C<name>
+
+set a name for the sequence, which might come handy when debugging.
+Defaults to C<sequence>;
+
+=item C<logger>
+
+can be optionally set to a function that will be called for each input
+record, being passed the record itself and a reference to the hash of
+arguments. Use this if you want to do some logging, ignore otherwise;
+
+=item C<tubes>
+
+an array reference containing the list of tubes part of the sequence.
+These can be either direct tubes (i.e. references to subroutines) or
+definitions suitable for calling L<Data::Tubes/tube>. This parameter can
+also be passed as the first unnamed argument in the call to the
+function.
+
+=back
+
+The sequence makes no assumption as to the input record, although the
+first element in the provided list might do.
+
+Note that the last I<tube> in the sequence might actually return an
+output record with an C<undef> or otherwise false value (Perl-wise). To
+cope with this, when called in list context, the iterator is guaranteed
+to either return one single output record, or the empty list when the
+iterator is exhausted.
+
+The suggested idiom for taking items from the iterator is then the
+following:
+
+   my $it1 = $sequence1->($input_record)->{iterator};
+   while (my ($output_record) = $it1->()) {
+      # work with $output_record here, it's your output record!
+   }
+
+   # if you're waiting for a single output record, use if
+   my $it2 = $sequence2->($input_record)->{iterator};
+   if (my ($output_record) = $it2->()) {
+      # work with $output_record here, it's your output record!
+   }
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

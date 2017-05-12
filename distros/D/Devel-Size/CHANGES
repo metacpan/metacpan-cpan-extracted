@@ -1,0 +1,269 @@
+Revision history for Perl extension Devel::Size.
+
+0.80 2015-03-31 nicholas
+ [no changes]
+
+0.79_54 2015-03-27 nicholas
+  * Fix the definition of padlist_size() for post-5.20 perls.
+  * Avoid tests failing because Test::More lazy-loading changes the size of %::
+  * Fix the build under 5005 threads. [Not that anyone is using them :-)]
+
+0.79_53 2015-03-25 nicholas
+  * Avoid t/recurse.t failing on earlier versions on 32 bit platforms
+    (subroutines are smaller than it assumes)
+  * Count the size of padlist names in CVs (for v5.18 and later - earlier TODO)
+  * Handle PADNAMELIST/PADNAME introduced in v5.21.7
+    two patches from Zefram:
+  * Add handling of children of METHOP and UNOP_AUX ops [CPAN #102911]
+  * More complete handling of padlists for XSUBs [CPAN #102909]
+
+0.79_52 2015-03-20 nicholas
+    two patches from Zefram:
+  * handle the new METHOP. [CPAN #101071]
+  * handle the multideref op, and to a limited extent the UNOP_AUX op class in
+    general. [CPAN #102911]
+
+  * As of eacbb37937698a03 (v5.21.6), can't call CvPADLIST on an XSUB.
+    More usefully, the slot is now used for XS versioning protection, which
+    means that we can be confident that nothing out there is using it for data.
+    Reported as [CPAN #102909].
+  * Avoid t/recurse.t failing because Test::More::is() has been refactored and
+    is now larger than it was. [CPAN #102910].
+
+0.79_51 2015-02-28 nicholas
+  * as of 5.20.0, s/// is no longer a reliable test for OOK [CPAN #95493]
+
+0.79_50 2015-02-28 nicholas
+    patches from Zefram:
+  * wrong test for magicalness [CPAN #88180]
+  * reading tied scalar shrinks it [CPAN #88182]
+
+0.79 2013-05-12 nicholas
+ [no changes]
+
+0.78_52 2013-05-10 nicholas
+ * Fix the bug in the previous fix. Oops :-)
+
+0.78_51 2013-05-10 nicholas
+ * v5.17.1 and later handle CopSTASH differently under ithreads
+
+0.78_50 2013-05-10 nicholas
+ * Alternative test for CvOUTSIDE, and one for CvPADLIST
+ * v5.17 changes the type of PADLIST [CPAN #83904]
+ * stubbed subs no longer have CvOUTSIDE set [CPAN #77913]
+ * Fix for v5.17.2's OP slab allocator [CPAN #83903]
+ * Spelling fix to docs from gregor herrmann [CPAN #78766]
+
+0.78 2012-07-26 nicholas
+ [no changes]
+
+0.77_51 2012-07-17 nicholas
+ * Fix for MSVC builds from bulk 88 [CPAN #77589]
+
+0.77_50 2012-02-10 nicholas
+ * t/globs.t was failing on 5.15.6 and later due to side effects of a change
+   to strict.pm [CPAN #73998]
+ * skip tests in t/magic.t that use formline on 5.8.1 and 5.8.2, as those
+   versions have a buggy formline that can trigger an assertion failure.
+
+0.77 2011-05-16 nicholas
+ [no changes]
+
+0.76_50 2011-05-12 nicholas
+ * Split out HEK size calculation into hek_size(). Add the shared HE overhead.
+ * Handle shared hash key scalars correctly.
+ * GvNAME() is shared from 5.10 onwards.
+ * Count HvNAME(), the HV "aux" struct, the mro_meta struct, and ENAMEs.
+
+0.76 2011-05-11 nicholas
+ * Just fix the version number in the line below.
+
+0.75_52 2011-05-09 nicholas
+ * Use a table for SV body sizes. These incorporate the space saving post 5.8.x
+ * Correctly handle SvOOK scalars. 5.12 and later don't use SvIVX().
+ * Magic vtables aren't freed when magic is freed, so don't count them.
+   (They are static structures. Anything that assumes otherwise is buggy.)
+ * Reinstate 5.6.x "support". (i.e. it compiles and passes tests.)
+ * Reinstate 5.005_xx "support". (i.e. it compiles and passes tests.)
+
+0.75_51 2011-05-05 nicholas
+ * Only use a static array of vtables on gcc.
+
+0.75_50 2011-05-04 nicholas
+ * The core's magic vtables are global constants, so aren't part of the size.
+ * Follow mg_obj and mg_ptr.
+
+0.75 2011-05-04 nicholas
+ [no changes]
+
+0.74_53 2011-05-01 nicholas
+ * Fix typo error in bit-vector tracking mechanism. On 64 bit platforms which
+   allocate on 8 byte alignment (rather than 16), a low pointer bit could get
+   lost, resulting in new pointers being considered already "seen".
+   "Found" by BinGOs' smoker, fixed on spectre.mongueurs.net. Thanks.
+
+0.74_52 2011-04-23 nicholas
+ * Fix potential SEGVs for OP_AELEMFAST on a lexical (eg $foo[3])
+ * Fix likely SEGVs for PVOPs (missing break)
+ * Fix potential SEGVs for PVBMs on 5.10 and later
+ * Move hash and array traversal from total_size() to sv_size()
+   - this allows total_size() and size() to be XS ALIASes.
+
+0.74_51 2011-04-22 nicholas
+ * Don't count PL_sv_{undef,no,yes} in the size returned
+ * total_size() was double-counting entries in typeglobs
+ * sv_size() was double-counting the PVGV size if GvEGV() looped back
+ * fix classic off-by-one error - the answer is strlen() + 1, not just strlen()
+
+0.74_50 2011-04-19 nicholas
+ * Ensure that size() doesn't add the referent's size for non SVt_RV references
+
+0.74 2011-04-19 nicholas
+ * Correct the Makefile.PL - LICENSE was added to ExtUtils::MakeMaker in 6.31
+
+0.73_51 2011-04-17 nicholas
+ * Refactor the C code to accumulate the size inside the tracking structure
+   - this means that the C *_size() functions now return void
+   - The XS functions size() and total_size() now return UV, not IV
+
+0.73_50 2011-04-17 nicholas
+ * Avoid using assert() on ithreaded 5.8.8 and earlier, as it needs my_perl
+ * Fix the test added in 0.73, as it tripped over a combination of bugs
+
+0.73 2011-04-16 nicholas
+ * Revert a bad assertion introduced in 0.72_50, which was logically wrong.
+   - and a test to demonstrate one case that would trigger it
+
+0.72_52 2011-04-15 nicholas
+ * Add a test for the non-exceptional warnings.
+
+0.72_51 2011-04-15 nicholas
+ * Add PERL_NO_GET_CONTEXT to improve performance under multiplicity
+
+0.72_50 2011-04-14 nicholas
+ * Exception handling is totally MSVC specific, so only use it there
+   - this means that we don't need to use a C++ compiler anywhere
+ * Rework bit-vector tracking mechanism to use a 256-way tree. This avoids
+   making assumptions about 64-bit platforms' memory layouts, and eliminates
+   the fatal error introduced in 0.72 when the assumption was violated.
+ * Convert to XSLoader
+ * Resolve CPAN #49437 (Devel::Size adds magic in Perl 5.10)
+ * Resolve CPAN #58484 and #58485 (related to CVs that are XSUBs)
+
+0.72 2008-10-14 BrowserUk 70 tests
+ * Added bit-vector pointer tracking mechanism.
+   - new fatal error (64-bit platforms only)
+ * Added exception handling
+    - 4 new warnings (disabled by default)
+ * Updated POD to reflect above
+ * Added basic.t test 13 
+ * replaced Module::Install with hand crafted EU::MM Makefile.pl
+   (With many thanks to Sisyphus)
+   because we couldn't work out how to add C++ options to allow 
+   exception handling.
+
+0.71 2008-08-24 Tels 69 tests
+  * adapt patch from Reini Urban to fix failing RV under 5.10 and 5.11. AV
+    and HV were pushed directly onto the pending_array, and not the RV,
+    which caused #33530. So he rewrote the logic to deref the RV inside
+    the array traversal. Applied this with one small omission, which
+    caused test faiures.
+  * Fixed 5.11 RV/IV logic. (Thanx Reini Urban!)
+  * Removed one duplicate total_size arrayref test. (Thanx Reini Urban!)
+  * changed //printf to dbg_printf() (Thanx Reini again!)
+
+0.70 2008-08-23 Tels 69 tests
+  * fix SEGFAULTS under v5.10 (Thanx Reini Urban!)
+  * fix compilation under blead (Thanx Reini Urban!)
+  * require Perl 5.006 (to stop CPANTESTERS sending bogus reports
+    about failed compiling on ancient Perls)
+  * update the bundles Module::Install to v0.77
+
+0.69 2007-08-11 Tels 69 tests
+  * fix compilation under Perl v5.9.5 and v5.10 (Thanx Steve Peters!)
+  * clarify the license by specifying Perl v5.8.8's license
+  * small doc fixes, add a README file
+
+0.68 2007-06-12 Tels 69 tests
+  * remove a bit of duplicate code in op_size, the second instance
+    was a no-op anyway
+  * fix the failing tests by rewriting the test logic to be sane
+  * the count of array slots was off by one
+
+0.67 2007-03-15 Tels 20 tests
+  * rip out Build.PL since it doesn't actually work
+  * fix bug #1653: All SVPV subtype may contain an RV instead of a PV
+    (Thanx a lot Jan, and sorry for the truly horrible long delay!)
+  * fix bug #24846: Does not correctly recurse into references in PVNV
+    (Thanx STEVIEO)
+  * add t/recurse.t that tests the two bugfixes in combination
+
+0.66 2007-03-02 Tels 15 tests
+  * fix the failing test (the code was right, but the test wrong)
+
+0.65 2007-02-24 Tels 15 tests
+  * fix the test failings under 64 bit (bugs #21037, #18596, #21404)
+  * fix wrong size for strings (bug #17586)
+  * reverse Changelog (bug #16636)
+  * Size.xs: remove unused variable "count"
+  * Size.xs: fix warnings about missing ()
+  * Size.xs: fix size of array refs when AvALLOC == 0
+  * Modernize package:
+    + maintained by me, signed with my key
+    + bundle Module::Install and use it
+    + add POD tests
+    + rewrite tests to use Test::More; add more tests
+
+0.64  Mon Dec 19 18:46:00 2005
+        - Patch to make Devel::Size compile on bleadperl (Courtesy of
+      Nick Clark)
+    - Fix up the PVIV string size calcs (Courtesy of Andrew Shirrayev)
+
+0.63  Thu Jun 30 14:29:43 2005
+        - Turns out that OP_TRANS is a basic op, not a loop op. This
+      is a bug in versions of perl 5.8.x before 5.8.7. Work around
+      it.
+
+0.62  Tue Jun 28 11:59:00 2005
+        - Took out // comments
+    - Added in copyright notice
+    - Some small amount of regex parsing
+    - Suppress multiple copies of each warning on each call
+
+0.61  Mon Jun 27 16:19:00 2005
+        - Added more checks for formats
+    - Got CVs sizing right
+
+0.59  Sat Nov 27 16:42:42 2004
+        - Applied documentation and sane warning patch from Nigel Sandever
+        - Taught Devel::Size how to size up IO and globs properly
+
+0.58  Fri Jul 18 11:42:32 2003
+        - Fix for problems triggered by perl 5.8.0 and up, more tests, and
+      removal of an "our" for better backwards compatibility. (Courtesy
+      of Marcus Holland-Moritz <mhx-perl@gmx.net>)
+
+0.57  Thu Mar 20 13:21:14 2003
+        - setting $Devel::Size::warn to 0 disables not complete warnings
+
+0.56  Mon Feb 24 12:10:13 2003
+        - Chopped out some C++ comments. D'oh! Version incremented for CPAN
+
+0.55  Sat Feb 22 17:21:00 2003
+        - Fixed a bad size calculation (we were overestimating by one byte)
+    - Updated the docs to show some of the places that there might be 'dark'
+      memory that Devel::Size can't see.
+    - Added in tests from Ken Williams
+
+0.54  Sat Oct 12 14:11:00 2002
+    - Applied a patch to get it working on 5.8.0 under Tru64
+
+0.53  Thu Oct 10 12:30:00 2002
+        - Finally started updating Changes file
+    - Applied doc patch from Ann Barcomb
+    - Got globs sizing right
+
+0.01  Mon Oct  7 01:05:32 2002
+    - original version; created by h2xs 1.2 with options
+        -A -n Devel::Size
+

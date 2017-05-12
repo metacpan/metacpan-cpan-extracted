@@ -1,0 +1,29 @@
+Revision history for Data-Microformat
+
+0.04	Date?
+		Bugfixes:
+			Fixed a problem with accidentally sucking CSS into the psychotic decoder.
+				This problem was helpfully found, and a fix provided, by Simon
+				Wistow L<http://search.cpan.org/~simonw/>.
+
+0.03	August 21, 2008
+		Bugfixes:
+			Fixed one slight problem with "psychotic" encodings.
+			Fixed a dependency problem causing build FAILing on some platforms.
+
+0.02	August 19, 2008
+		Bugfixes:
+			Added support for "psychotic" encodings, a la 
+				http://hcard.geekhood.net/encode/ .
+			Fixed nested vcards discarding their secondary class, as in
+				t/08nested.t.
+			Fixed issues hurting the Kwalitee of the distribution.
+		New Features:
+			Now using HTML::Element for dumping the hCards out, so we get nicer
+				formatting and easier output, essentially for free (no extra
+				dependencies).
+			Added to_text, to return a plaintext representation of an hCard.
+
+0.01    August 11, 2008
+        	First version, released on an unsuspecting world.
+

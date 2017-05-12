@@ -1,0 +1,53 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0',
+                                      'Test::Pod' => '1.41'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '5.014',
+                                      'Dist::Zilla::Plugin::AutoPrereqs' => '1.100130',
+                                      'Dist::Zilla::Plugin::CheckExtraTests' => '0',
+                                      'Dist::Zilla::Plugin::CheckPrereqsIndexed' => '0',
+                                      'Dist::Zilla::Plugin::Git::Contributors' => '0',
+                                      'Dist::Zilla::Plugin::GithubMeta' => '0.12',
+                                      'Dist::Zilla::Plugin::PodWeaver' => '4',
+                                      'Dist::Zilla::Plugin::PromptIfStale' => '0',
+                                      'Dist::Zilla::Plugin::TaskWeaver' => '0.093330',
+                                      'Dist::Zilla::Plugin::Test::ChangesHasContent' => '0',
+                                      'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
+                                      'Dist::Zilla::PluginBundle::Basic' => '0',
+                                      'Dist::Zilla::PluginBundle::Filter' => '0',
+                                      'Dist::Zilla::PluginBundle::Git' => '0',
+                                      'Dist::Zilla::Role::PluginBundle::Easy' => '0',
+                                      'Moose' => '0',
+                                      'Pod::Elemental' => '0.092970',
+                                      'Pod::Elemental::PerlMunger' => '0.200000',
+                                      'Pod::Elemental::Transformer::List' => '0',
+                                      'Pod::Weaver' => '4',
+                                      'Pod::Weaver::Config::Assembler' => '0',
+                                      'Pod::Weaver::Section::Contributors' => '0.008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

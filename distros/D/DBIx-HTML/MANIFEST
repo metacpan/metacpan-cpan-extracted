@@ -1,0 +1,14 @@
+Changes
+lib/DBIx/HTML.pm
+Makefile.PL
+MANIFEST			This list of files
+readme.md
+t/00-use.t
+t/01-run.t
+t/02-decorate.t
+t/03-methods.t
+t/data/decorate.csv
+t/data/test.csv
+t/data/test_copy.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

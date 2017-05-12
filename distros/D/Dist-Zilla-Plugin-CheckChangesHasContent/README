@@ -1,0 +1,80 @@
+NAME
+    Dist::Zilla::Plugin::CheckChangesHasContent - Ensure Changes has content
+    before releasing
+
+VERSION
+    version 0.010
+
+SYNOPSIS
+      # in dist.ini
+
+      [CheckChangesHasContent]
+
+DESCRIPTION
+    This is a "before release" Dist::Zilla plugin that ensures that your
+    Changes file actually has some content since the last release. If it
+    doesn't find any, it will abort the release process.
+
+    This can be contrasted to Dist::Zilla::Plugin::Test::ChangesHasContent,
+    which generates a test to perform the check.
+
+    The algorithm is very naive. It looks for an unindented line starting
+    with the version to be released. It then looks for any text from that
+    line until the next unindented line (or the end of the file), ignoring
+    whitespace.
+
+    For example, in the file below, algorithm will find "- blah blah blah":
+
+      Changes file for Foo-Bar
+
+      {{$NEXT}}
+
+        - blah blah blah
+
+      0.001  Wed May 12 13:49:13 EDT 2010
+
+        - the first release
+
+    If you had nothing but whitespace between "{{$NEXT}}" and 0.001, the
+    release would be halted.
+
+    If you name your change log something other than "Changes", you can
+    configure the name with the "changelog" argument:
+
+      [CheckChangesHasContent]
+      changelog = ChangeLog
+
+SEE ALSO
+    * Dist::Zilla::Plugin::Test::ChangesHasContent * Dist::Zilla
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent/is
+    sues>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent.git
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   Randy Stauner <randy@magnificent-tears.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

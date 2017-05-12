@@ -1,0 +1,15 @@
+0.4
+
+Fixed minor bug in documentation
+
+0.3
+
+Fixed major bug where this broke string literals.
+
+0.2
+
+Fixed bug in the unimport(), so the addon won't stay loaded.
+
+0.1
+
+First version

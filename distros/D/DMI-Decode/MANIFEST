@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+Decode.pm
+src/util.h
+src/util.c
+src/types.h
+src/dmidecode.c
+examples/dmi.pl
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

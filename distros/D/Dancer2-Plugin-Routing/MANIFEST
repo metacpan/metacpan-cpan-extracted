@@ -1,0 +1,19 @@
+Changes
+lib/Dancer2/Plugin/Routing.pm
+Makefile.PL
+MANIFEST			This list of files
+LICENSE
+README.md
+t/00-load.t
+t/01-base.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/lib/TestAPI.pm
+t/lib/TestApp.pm
+t/lib/public/.placeholder
+t/lib/views/index.tt
+t/lib/views/vars.tt
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

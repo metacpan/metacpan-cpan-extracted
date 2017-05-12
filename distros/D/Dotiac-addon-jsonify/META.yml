@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                Dotiac-addon-jsonify
+version:             0.1
+abstract: |-
+  Generate JSON data from any value in a Dotiac template
+license:             mit
+generated_by:        hand
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL: 0.5
+    JSON:        2
+build_requires:
+    Test::More: 0
+    Test::Pod:  0
+provides:
+   Dotiac::DTL::Addon::jsonify:
+     file: lib/Dotiac/DTL/Addon/jsonify.pm
+     version: 0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

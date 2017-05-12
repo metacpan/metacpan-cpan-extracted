@@ -1,0 +1,33 @@
+?  my %variables = %{$_[0]};
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" type="text/css" href="quickcover.css">
+    <script src="sorttable.js"></script>
+    <title>QuickCover: file list</title>
+  </head>
+  <body>
+?= $variables{include}->('header', $_[0])
+    <div id="body-content">
+      <table class="sortable">
+        <caption>Files, sorted by exclusive sample count</caption>
+        <tr>
+          <th class="sorttable_sorted">Lines</th>
+          <th class="sorttable_sorted">Subs</th>
+          <th>File</th>
+        </tr>
+<? my ($format_ratio, $color_code) = @variables{qw(format_ratio color_code)};
+   for my $file (@{$variables{files}}) {
+ ?>
+        <tr>
+          <td sorttable_customkey="<?= $file->{line_percentage} ?>" class="coverage-number <?= $color_code->($file->{line_percentage}) ?>"><?= $format_ratio->($file->{line_percentage}) ?></td>
+          <td sorttable_customkey="<?= $file->{sub_percentage} ?>" class="coverage-number <?= $color_code->($file->{sub_percentage}) ?>"><?= $format_ratio->($file->{sub_percentage}) ?></td>
+          <td><a href="<?= $file->{report_name} ?>"><?= $file->{display_name} ?></a></td>
+        </tr>
+?  }
+      </table>
+    </div>
+  </body>
+</html>

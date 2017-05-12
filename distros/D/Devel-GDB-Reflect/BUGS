@@ -1,0 +1,35 @@
+Bugs and missing features
+=========================
+
+1. Setting certain GDB variables will break things, for example, "set prompt".
+   We should catch such actions and either disallow them or correct for them
+   (i.e. change Devel::GDB's prompt regex).
+
+   The best solution is probably to have "set prompt" affect OUR $prompt, never
+   passing the value to GDB itself.  (And in fact, we should alter the GDB
+   prompt to be some convoluted string that's even more unlikely to appear in
+   output than "(gdb)").
+
+2. Typing a backslash at the prompt destroys GDB.  We should catch end-of-line
+   backslashes ourselves.  I'm not sure why a quote or apostrophe doesn't cause
+   the same behavior; probably because GDB is run in non-interactive mode.
+
+3. Any output not terminated with a newline is hidden from view. (e.g. printf "hi")
+   Easy fix: add a newline before showing the prompt.
+
+4. Because GDB is run in non-interactive mode, it doesn't prompt for things like:
+     - Quit while program is running
+     - "r" while program is running
+
+
+5. Ctrl-C exits.  We probably don't want this.
+
+6. Related to #5: we want ctrl-c and ctrl-z to have the same effect within
+   gdbwrap as within gdb proper.  That is, we should be able to stop the running
+   program -- not kill GDB.
+
+   (This may require some logic that requires us to know whether or not the
+    program is currently running.  Not too hard; we just need to catch the "run"
+    command and update our state.  While we're at it, if we catch a run command,
+    we should send it to Devel::GDB with *NO* timeout.  Waiting indefinitely for
+    "run" to finish is *NOT* an error.)

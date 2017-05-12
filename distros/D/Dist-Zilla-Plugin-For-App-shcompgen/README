@@ -1,0 +1,21 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [For::App::shcompgen]
+
+DESCRIPTION
+
+    This plugin is meant only for building App-shcompgen distribution (see
+    App::shcompgen). Currently what it does:
+
+      * Modify Makefile.PL so Makefile will run shcompgen init & shcompgen
+      generate when distribution is installed
+
+      This allows initialization of shcompgen after installation, so it's
+      ready for use.
+
+SEE ALSO
+
+    shcompgen
+

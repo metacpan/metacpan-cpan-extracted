@@ -1,0 +1,40 @@
+---
+abstract: 'Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.'
+author:
+  - 'Michael Wayne Arnold <marmanold@cpan.org>'
+build_requires:
+  Test::CheckManifest: '0.9'
+  Test::Exception: '0.43'
+  Test::More: '1.302040'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+keywords:
+  - lectionary
+  - christian
+  - liturgical
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Lectionary-Time
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Date::Lectionary::Time:
+    file: lib/Date/Lectionary/Time.pm
+    version: '1.20170311'
+requires:
+  Carp: '1.38'
+  Exporter::Easy: '0.18'
+  Time::Piece: '1.31'
+  Time::Seconds: '1.31'
+  Try::Tiny: '0.24'
+  perl: '5.022'
+resources:
+  repository: git://github.com/marmanold/Date-Lectionary-Time.git
+version: '1.20170311'
+x_twitter: https://www.twitter.com/marmanold/

@@ -1,0 +1,135 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+	<title>Garage Door</title>
+    <script type="text/javascript" src="../../jquery.js"></script>
+    <script type="text/javascript">
+        var IMG_WIDTH       = 640;
+        var IMG_HEIGHT      = 480;
+        var IMG_RELOAD_MS   = 20000;
+        var TOGGLE_PIN      = 4;
+        var TOGGLE_SPEED_MS = 500;
+
+        var update_pic;
+        var toggle_door;
+
+        $( document ).ready( function() {
+            update_pic  = $( "#update-pic" );
+            toggle_door = $( "#toggle-door" );
+            set_garage_pic_event();
+            set_toggle_door_event();
+
+            var img = $( "#garage_pic" );
+            img.attr( "width", IMG_WIDTH );
+            img.attr( "height", IMG_HEIGHT );
+            updateGaragePic();
+
+
+            setInterval( function () {
+                updateGaragePic();
+            }, IMG_RELOAD_MS );
+        });
+
+        function set_garage_pic_event()
+        {
+            update_pic.click(  function(event) { updateGaragePic() } );
+        }
+
+        function set_toggle_door_event()
+        {
+            toggle_door.click( function(event) { toggleDoor() } );
+        }
+
+        function disable_toggle_door_event()
+        {
+            toggle_door.off();
+        }
+
+        function callPost( path )
+        {
+            $.ajax( path, {
+                async: false,
+                cache: false,
+                type:  "POST",
+            });
+        }
+
+        function callGet( path )
+        {
+            $.ajax( path, {
+                async: false,
+                cache: false,
+                type:  "GET",
+            });
+        }
+
+        function updateGaragePic()
+        {
+            return 1; // Ignore
+
+            //window.navigator.vibrate( 400 );
+            callPost( "/devices/rpi/image/0/resolution/"
+                + IMG_WIDTH + "/" + IMG_HEIGHT );
+
+            var img = $( "#garage_pic" );
+            img.attr( "src", "/devices/rpi/image/0/stream/image/jpeg?"
+                // Force image to be reload despite browser cache
+                + new Date().getTime()
+            );
+
+            //window.navigator.vibrate( 200, 50, 400 );
+            return 1;
+        }
+
+        function toggleDoor()
+        {
+            // Ignore subsequent button presses
+            disable_toggle_door_event();
+            toggle_door.toggleClass( "toggle-door toggle-door-wait" );
+
+            //window.navigator.vibrate( 200 );
+            callPost( "/GPIO/" + TOGGLE_PIN + "/sequence/"
+                + TOGGLE_SPEED_MS + ",10" );
+            //window.navigator.vibrate( 200, 50, 200, 50, 200 );
+
+            set_toggle_door_event();
+            toggle_door.toggleClass( "toggle-door toggle-door-wait" );
+        }
+    </script>
+
+    <style type="text/css">
+        .toggle-door {
+            background-color: red;
+        }
+
+        .toggle-door-wait {
+            background-color: grey;
+        }
+
+        #update-pic {
+            background-color: blue;
+        }
+
+        .button {
+            cursor: pointer;
+            padding: 20px;
+            border: 4px solid black;
+            display: inline;
+            font-family: sans-serif;
+            font-size: 2em;
+        }
+    </style>
+</head>
+<body>
+<h1>Garage Door</h1>
+<div id="content">
+
+<p><img id="garage_pic"></p>
+
+<div id="update-pic" class="button">Update Pic</div>
+<div id="toggle-door" class="button toggle-door">Toggle Door</div>
+
+</div>
+</body>
+</html>

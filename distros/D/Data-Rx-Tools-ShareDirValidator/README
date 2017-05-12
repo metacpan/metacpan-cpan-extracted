@@ -1,0 +1,96 @@
+NAME
+    Data::Rx::Tools::ShareDirValidator - A Simple base class for generating
+    simple validators based on Data::Rx
+
+VERSION
+    version 0.1.3
+
+SYNOPSIS
+      package Foo;
+      use Data::Rx::Tools::ShareDirValidator;
+      use parent 'Data::Rx::Tools::ShareDirValidator';
+
+      sub filename { 'schema' } # default value.
+      sub suffix  {'.json'} # default value.
+
+      1;
+
+      ...
+
+    Later:
+
+      use Foo;
+      Foo->check({ some => [ 'data', 'structure' ] }) # true/false
+
+      1;
+
+DESCRIPTION
+    The purpose of this is to make creating a portable validator with
+    Data::Rx as painless as possible, while still permitting you to keep the
+    specification itself separate from the actual implementation.
+
+METHODS
+  filename
+    Defaults to just 'schema' and is combined with "suffix" to form the name
+    of the file to load from the share directory.
+
+  suffix
+    Defaults to '.json' and is combined with "filename" to form the name of
+    the file.
+
+  check
+      ClassName->check( $data )
+
+    Does all the lifting behind this module and validates the data in $data.
+
+  decode_file
+    Defaults to a decoder that can read JSON files.
+
+      ->decode_file( Path::Class::File $file )
+
+    Override this method with something else if you don't want JSON files.
+
+IMPLEMENTATION INSTRUCTIONS
+    1. Create package 'Foo' and fill it with the generic boilerplate to
+    extend the base class.
+    2. Generate your Data::Rx schema in the format you desire ( ideally JSON
+    ) and place it in the modules "Share" directory.
+        ( i.e.: With Dist::Zilla, you would do this:
+
+          [ModuleSharedirs]
+          Foo = sharedir/Foo
+
+        or something similar. )
+
+    3. Ship your distribution and/or install it.
+    4. Use it by simply doing:
+          use Foo;
+          if( Foo->check({ datastructure => [] })
+
+        passing the data structure you need validated to check().
+
+EXTENDING
+    By default, we assume you want JSON for everything, so by default, the
+    suffix is ".json", and the default deserialiser is as follows:
+
+      sub decode_file {
+        my ( $self, $file ) = @_;
+        require JSON;
+        return JSON->new()->utf8(1)->relaxed(1)->decode( scalar $file->slurp() );
+      }
+
+    If you want to use a file format other than JSON, overriding the suffix
+    and decode_file sub is required.
+
+    Note: $file in this context is a "file" from Path::Class, which is why
+    we can just do "slurp()" on it.
+
+AUTHOR
+    Kent Fredric <kentnl@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric <kentnl@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

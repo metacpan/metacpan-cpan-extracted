@@ -1,0 +1,38 @@
+Changes
+=======
+
+1.00  29 Nov 2011
+    * No code changes. Releasing as an official release
+
+0.99999_02 29 Nov 2011
+    * Add more tests
+
+0.99999_01 19 Aug 2010
+    * Migrate to using XS backend (DateTime::Astro)
+        - XS is a requirement now....
+    * Migrate to github
+
+0.05 28 May 2007 (Wow, has it been that long?)
+  - Require new version of modules.
+  - Migrate to Module::Install
+  - Use Exporter w/o subclassing
+  - Use warnings
+  - Add POD tests
+
+0.04 24 July 2004
+  - Be able to handle DateTime::Infinite objects being passed to methods.
+
+0.03 30 Jan 2004
+  - Fix documentation (bad case of copy/paste)
+
+0.02 22 Jan 2004
+  - Fix bad no_major_term_on(). This was causing much unhappiness in the
+    calculations for month 12 -> month 1 of cycle 78, year 20 to 21
+    (gregorian year 2004) for DT::C::Chinese
+
+0.01 12 Jan 2004
+  - Bump version
+  - minor doc tweaks
+
+0.01_01 27 Dec 2003
+  - Initial release

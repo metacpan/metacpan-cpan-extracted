@@ -1,0 +1,22 @@
+Revision history for Perl extension Dancer::Session::Redis.
+
+0.22    Sun Apr 7 11:20:18 2013 +0000
+    - start using Test::Exception in *.t
+    - set minimum version of perl to 5.8.9
+
+0.21    Sun Mar 24 17:06:21 2013 +0000
+    - refactored connection establishing to redis server
+    - updated and added some *.t
+    - dzillify distribution
+
+0.20  Thu Jan 17 16:37:18 2013
+    - added example of usage
+    - added support unix socket configurations (GH#2) [thanks to c0decafe!]
+    - added license and changelog files
+    - other minor fixes
+
+0.1.9  Fri Dec 21 07:42:20 2012
+    - added support for authenticated sessions
+
+0.1.8  Fri Dec 7 12:31:19 2012
+	- original version

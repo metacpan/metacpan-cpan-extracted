@@ -1,0 +1,17 @@
+---
+abstract: 'Easily create Google DataTable objects'
+author:
+  - 'Peter Sergeant <pete@clueball.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Google-Visualization-DataTable
+requires:
+  JSON::XS: '2.0'
+version: '0.11'

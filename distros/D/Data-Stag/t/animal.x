@@ -1,0 +1,58 @@
+#!/usr/local/bin/perl
+
+if (1) {
+    N(top=>[
+            N('personset'=>[
+                            N('person'=>[
+                                         N('name'=>'davey'),
+                                         N('address'=>'here'),
+                                         N('description'=>[
+                                                           N('hair'=>'green'),
+                                                           N('eyes'=>'two'),
+                                                           N('teeth'=>5),
+                                                          ]
+                                          ),
+                                         N('pets'=>[
+                                                    N('petname'=>'igor'),
+                                                    N('petname'=>'ginger'),
+                                                   ]
+                                          ),
+                                                                          
+                                        ],
+                             ),
+                            N('person'=>[
+                                         N('name'=>'shuggy'),
+                                         N('address'=>'there'),
+                                         N('description'=>[
+                                                           N('hair'=>'red'),
+                                                           N('eyes'=>'three'),
+                                                           N('teeth'=>1),
+                                                          ]
+                                          ),
+                                         N('pets'=>[
+                                                    N('petname'=>'thud'),
+                                                    N('petname'=>'spud'),
+                                                   ]
+                                          ),
+                                        ]
+                             ),
+                           ]
+             ),
+            N('animalset'=>[
+                            N('animal'=>[
+                                         N('name'=>'igor'),
+                                         N('class'=>'rat'),
+                                         N('description'=>[
+                                                           N('fur'=>'white'),
+                                                           N('eyes'=>'red'),
+                                                           N('teeth'=>50),
+                                                          ],
+                                          ),
+                                        ],
+                             ),
+                           ]
+             ),
+
+           ]
+     );
+}

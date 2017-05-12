@@ -1,0 +1,14 @@
+Revision history for Perl extension Devel::OptreeDiff.
+
+0.01  Mon Jun 28 20:53:01 2004
+    - original version; created by h2xs 1.23 with options
+	    -X -n Devel::OptreeDiff
+0.02  same day
+    - added tests and caveats
+    - added fmt_optree_diff to the export list
+2.0   Tue Dec 25 01:12:13 2007 -0800
+    - apparently a lot of things
+2.1   Sun Mar 20 11:41:09 2011 -0700
+    - Fix tests for threaded perl
+2.2   Sun Mar 20 12:40:28 PDT 2011
+    - Re-declare dependencies

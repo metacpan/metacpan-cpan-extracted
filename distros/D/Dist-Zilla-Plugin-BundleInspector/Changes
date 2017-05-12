@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-Plugin-BundleInspector
+
+0.004     2015-05-05T14:20:18Z
+
+  - Link to Dist::Zilla::Role::BundleDeps in See Also section.
+    Thanks to Olivier Mengué for the pull request [gh-1].
+
+0.003     2013-03-25T02:00:51Z
+
+  - Use namespace::autoclean
+  - Use type coercion instead of BUILDARGS
+  - Require Config::MVP::Writer::INI 0.003 for strip_bundle_prefix
+    to fix test failures.
+
+0.002     2013-03-21T04:36:12Z
+
+  - Fix usage for older Path::Class and perls < v5.10
+
+0.001     2013-03-18T02:55:28Z
+
+  - Initial release

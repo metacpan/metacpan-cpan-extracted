@@ -1,0 +1,65 @@
+DB-Color
+
+Syntax highlighting for the Perl debugger.
+
+Want this?
+http://blogs.perl.org/users/ovid/2010/11/syntax-highlighting-for-the-perl-debugger.html
+
+Then add this to your $HOME/.perldb
+
+ use DB::Color;
+
+Then use your debugger like normal:
+
+ perl -d some_file.pl
+
+If you don't want a $HOME/.perldb file:
+
+ perl -MDB::Color -d some_file.pl
+
+See perldoc DB::Color for more information.
+
+This code is a proof of concept and is buggy. The syntax highlighting is
+buggy. Fix it :)
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DB::Color
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DB-Color
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DB-Color
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DB-Color
+
+    Search CPAN
+        http://search.cpan.org/dist/DB-Color/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Curtis "Ovid" Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

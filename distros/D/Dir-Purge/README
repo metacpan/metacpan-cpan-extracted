@@ -1,0 +1,43 @@
+Dir::Purge implements functions to reduce the number of files in a
+directory according to a strategy. It currently provides one strategy:
+removal of files by age.
+
+EXAMPLES
+========
+
+From the command-line:
+
+  perl -MDir::Purge -e 'purgedir (5, @ARGV)' /spare/backups
+
+From your Perl program:
+
+  use Dir::Purge;
+  purgedir ({keep => 5, strategy => "by_age", verbose => 1}, "/spare/backups");
+
+  use Dir::Purge qw(purgedir_by_age);
+  purgedir_by_age (5, "/spare/backups");
+
+AVAILIBILITY
+============
+
+The Comprehensive Perl Archive Network (CPAN), see
+"http://www.perl.com/CPAN/authors/Johan_Vromans".
+
+The kit is named Dir-Purge-x.yy.tar.gz, where x.yy is the version
+number.
+
+COPYRIGHT AND DISCLAIMER
+========================
+
+Module Dir::Purge is Copyright 2000,2005 by Squirrel Consultancy.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the Perl Artistic License or the
+GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any
+later version.
+
+-------------------------------------------------------------------
+Johan Vromans                                  jvromans@squirrel.nl
+Squirrel Consultancy                       Haarlem, the Netherlands
+http://www.squirrel.nl       http://www.squirrel.nl/people/jvromans
+------------------ "Arms are made for hugging" --------------------

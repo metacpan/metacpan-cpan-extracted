@@ -1,0 +1,97 @@
+Changelog for DBIx::DBStag
+
+Version 0.01
+============
+
+2003-04-20      - Initial Release
+
+Version 0.02
+============
+
+2004-04-01      - Addition of Templates
+                - Use of double underscore to force columns into table
+
+
+Version 0.03
+============
+
+2004-04-02      - Problem with 0.02 distribution (accidentally included blib)
+
+Version 0.04
+============
+
+2004-07-15      - Fixed storenode() so that it works with databases
+                  that use the primary_key="id" convention (eg GO DB)
+                - added code to deal with <dbstag_mapping> in storenode
+                - DBStag now used for loading data into GO DB
+                  (http://www.godatabase.org)
+
+Version 0.05
+============
+
+2004-10-01      - Added switches for caching and bulkloading
+
+Version 0.06
+============
+
+2004-10-29      - Efficiency improvements
+
+Version 0.07
+============
+
+2005-02-09      - [cjm] added cache option to storenode.pl
+                -       escapes tabs and newlines with -rows switch
+                -       added check-resources.pl
+
+2005-03-06      - [cjm] added support for loading XORT-style XML
+                -       nodes are only made dbsafe if requested
+
+2005-03-18      - [cjm] added include_metadata option
+
+2005-04-29      - [cjm] added tests for xort-mode: chado feature
+
+Version 0.08
+============
+
+2005-07-15      - [cjm] removed noaliases option
+                        replaced with aliaspolicy
+                  [cjm] fixed IN and multivalued bindings
+                  [cjm] stag-storenode.pl
+                                arguments for user and password
+
+2005-08-22      - [cjm] added stag-connect-params.pl
+
+2005-08-26      - [cjm] Pg insert uses SEQUENCE to fetch inserted serial pk
+                        (mysql still uses max(pk))
+
+2005-10-28      - [cjm] DB2 DBI string fixes
+                  [cjm] improvements to stag-qsh
+
+2006-03-11      - [cjm] back to using last_insert_id from mysql
+                        (now works on DBI/DBD::mysql)
+
+Version 0.09
+============
+
+2006-08-08      - [cjm] XORT ID fix
+2006-08-08      - [cjm] added more docs to stag-storenode.pl - cache options
+
+2007-08-08      - [cjm] allowed additional DBI arguments in DBSTAG_DBIMAP_FILE
+
+2007-08-29      - [cjm] changed to DBIx::DBSchema 0.34 interface (now requires 0.34)
+
+
+Version 0.10
+============
+
+2008-02-05      - [cjm] removed default assumption that entire colset can function as UC
+2008-02-05      - [cjm] use placeholders for inserts
+2008-06-03      - [cjm] added missing test file to MANIFEST
+
+Version 0.11
+============
+
+2009-12-14	- miration to github
+
+2010-01-21	- compensated from bug(?) in DBSchema 0.38, where default values of '' were being quoted, resulting in double quoting
+		  DBSchema 0.38 also appears to use refs for defaults. DBStag is now neutral w.r.t. version of DBSchema, it derefs if it is a reference.

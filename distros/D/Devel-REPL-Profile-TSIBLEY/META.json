@@ -1,0 +1,66 @@
+{
+   "abstract" : "TSIBLEY's personal Devel::REPL profile",
+   "author" : [
+      "Thomas Sibley <tsibley@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.1, Dist::Zilla version 4.300032, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-REPL-Profile-TSIBLEY",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.017"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Printer" : "0",
+            "Devel::REPL::Plugin::DDP" : "0",
+            "Devel::REPL::Plugin::ReadLineHistory::WithoutExpansion" : "0",
+            "Devel::REPL::Profile::Default" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY/issues"
+      },
+      "homepage" : "https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY.git",
+         "web" : "https://github.com/tsibley/Devel-REPL-Profile-TSIBLEY"
+      }
+   },
+   "version" : "0.02"
+}
+

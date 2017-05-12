@@ -1,0 +1,18 @@
+Heading plain text {% if athlete_list %}
+    Number of athletes: {{ athlete_list|length }}
+{% elif athlete_in_locker_room_list %}
+    Athletes should be out of the locker room soon!
+{{ test_value }}
+{% else %}
+    No athletes.
+{% endif %}
+Finishing text
+
+{% if text_value > 1 %}
+print text
+{% endif %}
+
+{% if test_value =~ /blahblah/ %}
+
+testing regexp
+{% endif %}

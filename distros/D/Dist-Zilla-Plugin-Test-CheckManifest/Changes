@@ -1,0 +1,89 @@
+==================================================
+Changes from 2011-08-21 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.04 at 2012-08-20 09:13:17 +0000
+-----------------------------------------
+
+  Change: 3a7e7c3ebaf4880365f2e92be4b9d2c9ab76d0ed
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-08-20 11:13:04 +0000
+
+    CheckManifest.pm: re-order use strict/warnings 
+
+-----------------------------------------
+version 0.03 at 2012-07-07 12:51:55 +0000
+-----------------------------------------
+
+  Change: 208d40051573c6fabe3ed5cb86722d12ae03ea7e
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-07-07 14:51:55 +0000
+
+    dist.ini: use Git::NextVersion plugin 
+
+  Change: e2a01c58eccd0c452f028686f50a745258285bc2
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-07-07 14:50:31 +0000
+
+    dist.ini: update repo name 
+
+-----------------------------------------
+version 0.02 at 2011-09-11 13:20:15 +0000
+-----------------------------------------
+
+  Change: 6f86d47661537a3c2d9a128e42387e2d96bccaae
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:20:15 +0000
+
+    bump version 
+
+  Change: 339e15951857c12bab3dfa5d9540fa4244de69a7
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:17:35 +0000
+
+    fix doc errors 
+
+-----------------------------------------
+version 0.01 at 2011-09-11 13:05:22 +0000
+-----------------------------------------
+
+  Change: 5f8d1cdb10e6e13496578f9c9e45d835cce89896
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:05:22 +0000
+
+    remove trailing newline in dist.ini 
+
+  Change: 31d47b70c2c407356e099656e934d253eadf6e79
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:03:08 +0000
+
+    improve SEE ALSO 
+
+  Change: 9cc657a9cf15cae126cc2d8073673603eab952fd
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:00:21 +0000
+
+    add Test::CheckManifest to prereqs 
+
+  Change: 6ebcfc03ca5d4f710c3926640b70a4f37faba8a5
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 14:59:12 +0000
+
+    remove tests 
+
+  Change: 63b29867474aa1db96da54c86b1d8c0fe2ecad92
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 14:59:02 +0000
+
+    fix test file name 
+
+  Change: c99afcc7c632f79816dab788f3f043f36917a705
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 14:45:03 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

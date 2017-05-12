@@ -1,0 +1,17 @@
+AUTHOR_PLEDGE
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+README.mkdn
+SIGNATURE
+lib/Dist/Zilla/Stash/Contributors.pm
+lib/Dist/Zilla/Stash/Contributors/Contributor.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/basic.t
+xt/release/unused-vars.t

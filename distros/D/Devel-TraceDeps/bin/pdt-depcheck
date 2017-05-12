@@ -1,0 +1,118 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2009 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+pdt-depcheck - check perl dependencies against declared requirements
+
+=head1 Usage
+
+  pdt-depcheck [options]
+
+=head1 Options
+
+=over
+
+=item -r, --refresh
+
+Re-run the prove process to refresh the test tree.
+
+=item -v, --version
+
+Show version number and quit.
+
+=item -h, --help
+
+Show help about options.
+
+=back
+
+=cut
+
+package bin::pdt_depcheck;
+
+use Devel::TraceDeps::Scan;
+our $VERSION = Devel::TraceDeps::Scan->VERSION;
+
+use Getopt::AsDocumented;
+use File::Fu;
+
+use Module::CoreList;
+
+sub main {
+  my (@args) = @_;
+
+  my $o = Getopt::AsDocumented->process(\@args) or return;
+
+  my $tree = File::Fu->dir('tracedeps');
+  unless($tree->e) {
+    die "ERROR '$tree' missing and no option --refresh given\n"
+      unless($o->refresh);
+  }
+  if($o->refresh) {
+    my $prove = File::Fu->which('prove');
+    # TODO maybe just hookup via App::Prove
+    $tree->remove if($tree->e);
+    system($^X, '-MDevel::TraceDeps=tree', $prove,
+      '-l', '-b', '-q', '-r', 't')
+      and die "fail $!";
+  }
+
+  # TODO maybe just run find on lib or something -- we need to catch
+  # evals in our packages of interest, thus: should really just analyze
+  # by-package.
+  # Perhaps this implies that TraceDeps should be dumping the final
+  # %INC, then we could just analyze all of the packages from that?
+
+  my %reqs;
+  foreach my $file ($tree->list) {
+    my $scan = Devel::TraceDeps::Scan->load($file->open);
+    foreach my $item ($scan->items) {
+      my $by = File::Fu->file($item->file)->relative;
+
+      $by =~ m/^lib/ or next;
+      # TODO by might be 'eval'
+
+      #print $item->req, ' ', $by, "\n";
+      $reqs{$item->req} = 1;
+      if($item->req eq 'base') {
+        my %tracemap = map({$_->trace => $_} $scan->items);
+        my $trace = $item->trace;
+        $trace =~ s/(\d+)$/$1+1/e;
+        my $proxy = $tracemap{$trace} or
+          die "can't find where your use base (",
+            $item->trace, ") lands\n";
+        $reqs{$proxy->req} = 1 unless($proxy->fail);
+      }
+    }
+  }
+
+  # TODO sort-out all of the findings and try to hack Build.PL?
+  my @wanted = sort keys %reqs;
+  my @versions;
+  foreach my $mod (@wanted) {
+    my $v = Module::CoreList->first_release($mod);
+    if($v) {
+      push(@versions, $v);
+      print "$mod core in $v\n";
+    }
+    else {
+      print "$mod not core\n";
+    }
+  }
+  my $req_perl = (sort({$b <=> $a} @versions))[0];
+  print "you depend on perl $req_perl\n";
+}
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::pdt_depcheck::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::pdt_depcheck';

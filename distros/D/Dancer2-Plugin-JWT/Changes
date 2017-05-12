@@ -1,0 +1,31 @@
+0.009  2016-06-06
+   - Should test before release. Now fixed.
+
+0.008  2016-06-06
+   - Further fixes, now that Dancer 0.2 is out.
+
+0.007  2016-05-13
+   - Yet more fixes by Peter Mottram.
+
+0.006  2016-05-06
+   - Further compatibility fixes by Peter Mottram.
+
+0.005  2015-12-31
+    - Compat with new plugin system. 
+      Thanks to Peter Mottram.
+
+0.004  2015-12-26
+    - Make jwt available on template
+    - Fixed problem with using $@ on hooks;
+
+0.003  2015-09-14
+	- Fixed bug when calling jwt_exception hook;
+
+0.002  2015-09-06
+	- Request Dancer2 0.162000.
+	- Better dist.ini.
+	- jwt now returns the payload.
+	- Added jwt_exception hook;
+
+0.001  2015-09-04
+	- First version with basic behavior.

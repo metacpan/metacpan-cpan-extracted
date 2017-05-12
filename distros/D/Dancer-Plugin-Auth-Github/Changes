@@ -1,0 +1,13 @@
+Revision history for Dancer-Plugin-Auth-Github
+
+0.01    1-1-2013
+        First version, released to welcome the new year.
+
+0.02	1-1-2013
+	Updated just the distribution because of an issue when uploading to CPAN.
+
+0.03	13-1-2013
+	Fixed issue when sending state to github.
+
+0.04	14-1-2013
+	Fixed unfortunate _END_ statement placed before the return 1 required in a package.

@@ -1,0 +1,57 @@
+NAME
+    Dist::Zilla::Plugin::Control::Debian - Add a debian/control file to your
+    distribution
+
+VERSION
+    version 0.002
+
+ATTRIBUTES
+  file_name
+     file_name=debian/control
+    You will not need to change this from the default.
+
+  maintainer_email
+  maintainer_name
+  priority
+     priority=optional
+
+    Default value is 'optional'
+
+  buildDepends
+        buildDepends=debhelper (>= 8)
+
+    value for Build-Depends
+
+METHODS
+  gather_files
+    imported from FileGatherer
+
+  render_control
+    Simple method used to generate the content for control files
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through github at
+    <https://github.com/shantanubhadoria/dist-zilla-plugin-control-debian/is
+    sues>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/shantanubhadoria/dist-zilla-plugin-control-debian>
+
+      git clone git://github.com/shantanubhadoria/dist-zilla-plugin-control-debian.git
+
+AUTHOR
+    Shantanu Bhadoria <shantanu at cpan dott org>
+
+CONTRIBUTOR
+    Shantanu <shantanu@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

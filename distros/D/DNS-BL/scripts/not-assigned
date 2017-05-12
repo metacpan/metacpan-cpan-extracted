@@ -1,0 +1,63 @@
+# This script illustrates the creation of a very simple database.
+# Entries consisting of currently unassigned IP space are added to
+# this same database.
+
+# This file is based on the following sources
+#
+# http://www.iana.org/assignments/ipv4-address-space
+#   (last updated 03 August 2004)
+
+# Please review carefully the entries included in this
+# file. Regularly, new IP space blocks are assigned to RIRs for
+# allocation. When this occurs, holes need to be punched in your
+# existing database. See perldoc DNS::BL::cmds::punch for a neat way
+# to do this.
+
+# Start by connecting to the database file. You can choose here the
+# name of the database.
+
+connect db file "test.db"
+
+#
+# IANA reserved blocks
+#
+
+add ip 1.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 2.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 5.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Jul 95)"
+add ip 7.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 95)"
+add ip 23.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Jul 95)"
+add ip 27.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 95)"
+add ip 31.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 99)"
+add ip 36.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Jul 00)"
+add ip 37.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 95)"
+add ip 39.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 95)"
+add ip 41.0/8 without checking code 127.0.0.2 text "IANA - Reserved (May 95)"
+add ip 42.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Jul 95)"
+add ip 73.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 74.0/7 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 76.0/6 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 89.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 90.0/7 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 92.0/6 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 96.0/4 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 112.0/5 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 120.0/6 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 124.0/7 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 126.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+add ip 173.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 174.0/7 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 176.0/5 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 184.0/6 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 189.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 190.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 197.0/8 without checking code 127.0.0.2 text "IANA - Reserved (May 93)"
+add ip 223.0/8 without checking code 127.0.0.2 text "IANA - Reserved (Apr 03)"
+add ip 224.0/4 without checking code 127.0.0.2\
+    text "IANA - Reserved for multicast, not email (Sep 81)"
+add ip 240.0/4 without checking code 127.0.0.2 text "IANA - Reserved (Sep 81)"
+
+# Finally, commit the operation. This is not needed with DB, but it
+# is a good idea to always commit
+
+commit

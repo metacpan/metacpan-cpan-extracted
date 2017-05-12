@@ -1,0 +1,19 @@
+Changes for Devel-Main:
+
+0.005 2013-08-24
+ - Added [GithubMeta] to dist.ini so github repo details will be in metadata
+ - Made link to BDFY's article a L<> link and downcased his name :-)
+ - Thanks to TOBYINK and NEILB for the above!
+
+0.004 2013-08-23
+ - Reformatted Changes file
+
+0.003 2013-06-21
+ - Remove extra files and specify required perl
+
+0.002 2013-06-13
+ - Change to less funky package syntax so that PAUSE indexer can (one
+   hopes) read it
+
+0.001 2013-06-13
+ - Initial release

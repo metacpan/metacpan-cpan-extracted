@@ -1,0 +1,43 @@
+{
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "resources" : {
+      "homepage" : "https://github.com/barefootcoder/debuggit/tree",
+      "repository" : "git://github.com/barefootcoder/debuggit.git",
+      "license" : "http://opensource.org/licenses/artistic-license.php"
+   },
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "generated_by" : "Module::Install version 1.06 using Module::Install::JSONMETA version 7.001",
+   "distribution_type" : "module",
+   "version" : "2.06",
+   "name" : "Debuggit",
+   "author" : [
+      "Buddy Burden"
+   ],
+   "dynamic_config" : 1,
+   "license" : "artistic",
+   "build_requires" : {
+      "Test::Exception" : "0.31",
+      "B::Deparse" : "0.89",
+      "ExtUtils::MakeMaker" : 6.36,
+      "Monkey::Patch" : "0.03",
+      "Test::More" : "0.88",
+      "Test::Warn" : "0.23",
+      "Test::Output" : "0.16",
+      "Test::Command" : "0.08"
+   },
+   "abstract" : "A fairly simplistic debug statement handler",
+   "configure_requires" : {
+      "YAML::Tiny" : 0,
+      "ExtUtils::MakeMaker" : 6.36
+   }
+}
+

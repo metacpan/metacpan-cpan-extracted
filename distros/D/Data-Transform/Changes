@@ -1,0 +1,7 @@
+0.06 -  add Data::Transform::POE to fix POE::Wheel::ReadWrite
+0.05 -  add metadata handling
+0.04 -  add Block filter 
+     -  fix case where input evaluates to false
+0.03 -  add Grep, Map and Stackable filters
+0.02 -  add Meta.pm to the dist
+0.01 -  first release

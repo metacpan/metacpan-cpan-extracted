@@ -1,0 +1,242 @@
+- id: 001.01-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createtable
+      name: 'client'
+      columns:
+        - tpl: 'tpl_std'
+    - type: createtable
+      name: 'company'
+      columns:
+          - tpl: 'tpl_std_client_ref'
+
+- id: 001.02-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createtable
+      name: '"user"'
+      columns:
+          - tpl: 'tpl_std_client_ref'
+          - name: mail
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+          - name: last_login
+            type: timestamp
+            default: current
+          - name: locale
+            type: char
+          - name: salt
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+          - name: pass
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+    - type: createtable
+      name: 'player'
+      columns:
+          - tpl: 'tpl_std_company_ref'
+          - name: surname
+            type: varchar
+            lenght: 255
+            notnull: 1
+            default: current
+    - type: createtable
+      name: 'team'
+      columns:
+        - tpl: 'tpl_std_company_ref'
+        - name: player1
+          type: integer
+          notnull: 1
+          foreign:
+            reftable: 'player'
+            refcolumn: 'id'
+        - name: player2
+          type: integer
+          notnull: 1
+          foreign:
+            reftable: 'player'
+            refcolumn: 'id'
+    - type: createtable
+      name: 'match_player'
+      columns:
+          - tpl: 'tpl_std_company_ref'
+          - name: player1
+            type: integer
+            notnull: 1
+            foreign:
+                reftable: 'player'
+                refcolumn: 'id'
+          - name: player2
+            type: integer
+            notnull: 1
+            foreign:
+                reftable: 'player'
+                refcolumn: 'id'
+          - name: player1_ht1
+            type: integer
+          - name: player1_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: player2_ht1
+            type: integer
+          - name: player2_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: duration
+            type: integer
+    - type: createtable
+      name: 'match_team'
+      columns:
+          - tpl: 'tpl_std_company_ref'
+          - name: team1
+            type: integer
+            notnull: 1
+            foreign:
+                reftable: 'team'
+                refcolumn: 'id'
+          - name: team2
+            type: integer
+            notnull: 1
+            foreign:
+                reftable: 'team'
+                refcolumn: 'id'
+          - name: team1_ht1
+            type: integer
+          - name: team1_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: team2_ht1
+            type: integer
+          - name: team2_ht2
+            type: integer
+            notnull: 1
+            default: 0
+          - name: duration
+            type: integer
+    - type: createindex
+      name: 'index_test'
+      taple: 'match_team'
+      using: btree
+      column: id
+    - type: altertable
+      name: '"user"'
+      addcolumn:
+          - { name: 'guest', type: integer }
+
+- id: 001.03-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createview
+      name: 'view_client'
+      as:  'SELECT "user".guest, "user".pass, "user".salt, "user".locale, "user".last_login, "user".mail, "user".client, "user".flag, "user".active, "user".name, company.name AS company, client.id FROM client, company, "user" WHERE client.id = company.id AND company.id = "user".id AND "user".id = client.id'
+
+- id: 001.04-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: sql
+      as:  'SELECT * FROM "user"'
+
+- id: 001.05-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: altertable
+      name: '"user"'
+      addcolumn:
+          - { name: 'drop_test', type: integer }
+    - type: altertable
+      name: '"user"'
+      dropcolumn:
+          - { name: 'drop_test', type: integer }
+
+- id: 001.06-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createtable
+      name: 'dop_table_test'
+      columns:
+          - tpl: 'tpl_std_client_ref'
+    - type: droptable
+      name: 'dop_table_test'
+
+- id: 001.07-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createtable
+      name: 'add_foreign_test'
+      columns:
+          - tpl: 'tpl_std_client_ref'
+          - name: player1
+            type: integer
+
+- id: 001.08-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: altertable
+      name: 'add_foreign_test'
+      addconstraint:
+        name: player1
+        foreign:
+            reftable: 'team'
+            refcolumn: 'id'
+
+- id: 001.09-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: droptable
+      name: 'add_foreign_test'
+
+
+- id: 001.10-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: createtable
+      name: 'add_unique_test'
+      columns:
+          - tpl: 'tpl_std_client_ref'
+          - name: player1
+            type: integer
+
+- id: 001.11-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: altertable
+      name: 'add_unique_test'
+      addconstraint:
+        name: add_unique_test_id_player1
+        unique:
+          - id
+          - player1
+
+- id: 001.12-maz
+  author: "Mario Zieschang"
+  entries:
+    - type: droptable
+      name: 'add_unique_test'
+
+- id: 001.13-maz
+  author: Mario Zieschang
+  entries:
+  - columns:
+    - {tpl: tpl_std}
+    - {lenght: 50, name: cent_name, type: varchar}
+    - {name: decimal_places, notnull: 1, type: integer}
+    - {lenght: 10, name: currency_key, type: varchar}
+    - {lenght: 10, name: symbol, type: varchar}
+    name: currencies
+    type: createtable
+  - add:
+    - [Euro, cent, 3, EUR, "€"]
+    - [Dollar, Cent, 3, USD, $]
+    - [Swiss fran, Rappen, 2, CHF, CHF]
+    cols: [name, currency_key, decimal_places, cent_name, symbol]
+    name: currencies
+    type: insert

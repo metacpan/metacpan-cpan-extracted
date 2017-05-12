@@ -1,0 +1,73 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 38dd40d4fe9a8a408648f2f2c1a2a3ac76bbac72 Build.PL
+SHA1 3441378d449b333ff703f4791c81d321de7c0871 CHANGES
+SHA1 02154445bc9831e791c35050f1a018ed99030016 LICENSE
+SHA1 170e39f4d816637fb61b825e82e415cffe6168b5 MANIFEST
+SHA1 4f111e5808a5629971aa04ec56c3eb886255ff10 MANIFEST.SKIP
+SHA1 cbec22bae45e5133f5c956d3598b02050d4f17fe META.yml
+SHA1 3e8886f4ab27932101a20087684150ab1c9fe976 Makefile.PL
+SHA1 30a3178a5110ec1d981adcc5a6128538a4fe1764 README
+SHA1 a4fcf0fc6a485f15814c9c0855e3be55808f7e5f TODO
+SHA1 414f218461ba808184dc64d94614e2f72d331dae examples/chart
+SHA1 603bb9de29fb8cba7f13409c546750972eff645d inc/Module/AutoInstall.pm
+SHA1 7e2cfa1b9efe0d502ee57717649c90ba4bd28ba9 inc/Module/Install.pm
+SHA1 182a0df45b65151afdc2be0b7246a2d02d0f0567 inc/Module/Install/AutoInstall.pm
+SHA1 6e1392d80a0f239eecd5664f7f21f922cedb9329 inc/Module/Install/Base.pm
+SHA1 c9121d9bff4f4ab617c78ada27f458355cad0f19 inc/Module/Install/Build.pm
+SHA1 f69417fe831d9cc22a78f00a617afadceade4d81 inc/Module/Install/Can.pm
+SHA1 c61d02895330310048bf388881b5e2e064031561 inc/Module/Install/Fetch.pm
+SHA1 4933b00c3a646da8d223c6957f94552bbd62f8c6 inc/Module/Install/Include.pm
+SHA1 54fcbed19232ec959bb17cfb4410599afc7f0779 inc/Module/Install/Makefile.pm
+SHA1 7d3be9b158e37b2b2c22084740099955623b1d56 inc/Module/Install/Metadata.pm
+SHA1 0a8b66180229ba2f9deaea1fedd0aacf7a7ace6b inc/Module/Install/Win32.pm
+SHA1 d3352eb33fe43a5f3ead513f645224fe34d73bc9 inc/Module/Install/WriteAll.pm
+SHA1 da575875d8b06694c2408f26d36486e33b6e48af lib/Devel/Graph.pm
+SHA1 8e4efa68a0eb57e6cfd7e23595ec61bb0b37342b t/closure.t
+SHA1 ad8def85adca2cc31260ff842337520d481b60a7 t/croak.t
+SHA1 904a74eca44ce4f61244eaea74d528c95f7bd595 t/data/00_00_if.txt
+SHA1 6c73955e5f1b8b9543f893e264378ceaa66c7d83 t/data/00_01_if.txt
+SHA1 1b1f314d13f9550ee675c4f846b8b122f19b22c9 t/data/00_02_if.txt
+SHA1 aa27db923f69b5f6c6af55ffd746cf338ce04d42 t/data/00_03_if.txt
+SHA1 3da3d20e104efe5d0502f6322528a52e22632cad t/data/00_04_if.txt
+SHA1 c85c68d38ad72278250476dbfda587d9d4c092c7 t/data/01_00_unless.txt
+SHA1 40401de972deee99a47e339647459699f376ca6d t/data/01_01_unless.txt
+SHA1 ab83492128c878587ef085364d94dd6d656ff21b t/data/01_02_unless.txt
+SHA1 89c5a1131df084ea66971b52bf0cc9424ccf3b24 t/data/01_03_unless.txt
+SHA1 a950c895328895f44113e354272d6dba82efbf39 t/data/02_00_while.txt
+SHA1 2b1bb4918e4c6265caf162cc9362b815c958b51c t/data/02_01_while.txt
+SHA1 fc6588210387d9e35f1529ec405f3de84355bd1d t/data/03_00_until.txt
+SHA1 a34e533314950d5d61515d8c7b29f42cbfedd7e5 t/data/03_01_until.txt
+SHA1 b9414e85553c1ee9a742e89ed440e68c59c425fb t/data/03_02_until.txt
+SHA1 bba4869306f8abe723c491aa5486488a30b1f32d t/data/03_03_until.txt
+SHA1 e35361c0a9ea20ce67b4120407d4596617d40921 t/data/04_00_sub.txt
+SHA1 a499978bda2cac5c23f02fdadda89e7a0debed66 t/graphpm.t
+SHA1 5f47198bb09384760e9b89c5f4b674ecc05fb558 t/loop.t
+SHA1 406ba33c16987171a44147baf4e38ef08b411ad8 t/parse.t
+SHA1 6d6e35debb38d9c0ea316b7397199c779561f188 t/pod.t
+SHA1 caf7f6bf721bcdae900533f3ef8817bf1f43df1c t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBR2PV7XcLPEOTuEwVAQJ1ZAf8CyynV9okqTvwHo/pD7qj9uAgPmg6a6Tu
+mxUpBJ+5YVEilqdAV3GC4bMrsYugm5IaKa0jBRV61hSuvf7Bw37J1FnxBz13iizc
+0tiQXhHq85rtbZBWVOZs/sRHUgaM0Fuj5EjS0n1LQaQUPILb1fd+BpXOgh6pWVZ6
+rg26io2KqjXZ+ayPTj70ffoWvtkd+HrCOjNeBMdklbA464ZBjHzybeebBp0snpOT
+a1K53ow+nJ6CR1uGP8p7EIIdkP4cm+TBPYyKdrHGCVpB5Vq9jVxabVsmmIH52Gwn
+7ql0qtNvd1H5pooDSq7ql32whTMgNTtVGQMLusG9ACEJkto9lAAlFQ==
+=C5J0
+-----END PGP SIGNATURE-----

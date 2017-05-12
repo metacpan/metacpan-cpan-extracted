@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ce0cad4d02eb9eb96c6732c2b3f5aa26c1057943 Build.PL
+SHA1 75db7a6df261686ffccebd0148a11702edbef9de ChangeLog
+SHA1 c6ccf9b9437446d847556e32d78b2764fe56ad77 Changes
+SHA1 af531d645e03eb61e9d7a83321eeabfc72e2ce78 GNUmakefile
+SHA1 bad276ab80b448135df8e71898974b9b2a7b725f MANIFEST
+SHA1 92971b2f5ea035a66c2176091b9f046aacff1301 META.json
+SHA1 222bfa0b206796c26a4e7a65b47a08ad77353808 META.yml
+SHA1 f320e7f5292b3042f1e67fe8719d4dc510d112d6 Makefile.PL
+SHA1 891cbf8aae1368506aceb66ab6becd4e95ab7a32 README
+SHA1 d317f9477b6b2a7325312d60f8b4d98b2bfd0d94 README.md
+SHA1 707515cc7467e98ef5b0c11334c1ae33342a5fc2 bin/trepanpl.sh
+SHA1 c0ef4a68f80e586af8ec45bc71714ad01bbc39e7 example/five.pm
+SHA1 512f0d795470ab8816b6dc16ed52b6cbd8323d82 lib/Devel/REPL/Plugin/Perl5db.pm
+SHA1 aa9b5c957dfa7c2014166df82931115583a4c6f8 lib/Devel/REPL/Plugin/Trepan.pm
+SHA1 0f0412a66f72cd5593ed94a362d221abd9a7ec49 lib/Devel/REPL/Plugin/TrepanShell.pm
+SHA1 69c7876821ad5af5977014c066937fa8f9d3e623 lib/Devel/Trepan/CmdProcessor/Command/Shell.pm
+SHA1 5c59f9d6460cd66c6593e91e3382dc3756a2b50a lib/Devel/Trepan/Shell.pm
+SHA1 0d98d0cd8044d452c8f95afe5970fc17ad900cbc t/00load.t
+SHA1 0028fef9be7783d9eba29ae4d3940cc99cc8d14e t/00test-pod.t
+SHA1 0b03073b14b336ca27538a375c31fc8be922216e t/10test-cmd-complete.t
+SHA1 0f8b725de2ee535bcfa446b071e63ee8307c04fd t/Helper.pm
+SHA1 bba98fddf13474755ecd2188f3137eec075631ff t/data/shell.cmd
+SHA1 e7505dcdccbd182ce045a0265aa3f50e4d0eaab7 t/data/shell.right
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlN78tEACgkQGo3lAIJ17CGEqwCfaOl6vTmqwopQOWCi8l+8Xcg6
+hUcAn0SeYM/AOIV5wrTqJFe7HLpcPmWe
+=bQvk
+-----END PGP SIGNATURE-----

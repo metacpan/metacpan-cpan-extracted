@@ -1,0 +1,26 @@
+SYNOPSIS
+
+     use Data::Format::Pretty::Ruby qw(format_pretty);
+     print format_pretty($data);
+
+    Some example output:
+
+      * format_pretty({a=>1, b=>2})
+
+       { "a" => 1, "b" => 2 }
+
+DESCRIPTION
+
+    This module uses Data::Dump::Ruby to encode data as Ruby code.
+
+FUNCTIONS
+
+ format_pretty($data, \%opts)
+
+    Return formatted data structure. Currently there are no known
+    formatting options.
+
+SEE ALSO
+
+    Data::Format::Pretty
+

@@ -1,0 +1,23 @@
+0.05     2013-06-16
+
+- Provide the _driver_name sub needed by the latest Database::Migrator::Core.
+
+
+0.04     2013-04-02
+
+- Improved documentation.
+
+
+0.03     2013-04-01
+
+- Updates to work with the latest Database::Migrator.
+
+
+0.02     2012-06-14
+
+- Made the SYNOPSIS use Moose (derr).
+
+
+0.01     2012-04-13
+
+- First release upon an unsuspecting world.

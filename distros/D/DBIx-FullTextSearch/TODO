@@ -1,0 +1,57 @@
+TODO
+
+0.
+	Explore use of Berkeley DB as faster alternative to MySQL.
+	It is likely that Berkeley DB will give a performance
+	increase over MySQL
+
+1.
+	implement searching by substrings, by creating a lookup table
+	for _words with three letter combinations.  this lookup table
+	will have two fields - word_id and substring (three letters)
+
+	for example, a search for 'bix::' would require a call to
+	$fts->contains('%bix::%') which would not utilize the index
+	in the _words table because of the first wildcard character '%'
+	This query, by the way, on the CPAN subsite should return 
+	"DBIx::FullTextSearch".
+
+	the user would turn on this option at table create time by
+	setting 'use_substring' to true.  the substring table can be
+	specified by setting 'substring_table', defaults to the name
+	of the index with the _substring suffix.
+
+2.
+	implement the following Scoring Algorithm:
+
+		for a word in a doc
+
+		      (occurances in doc)                    num docs
+		------------------------------- * log ( ------------------ )
+		(max occur in doc of all words)         num docs with word
+
+	to implement, note that you will have to store the maximum occurance
+	of a word for every doc in the *_docid table.  Note that for the
+	default (and in some cases the table) frontend, you will have to
+	make sure that the *_docid table is created.
+
+3.
+	implement Thesaurus (using Linuga::Wordnet???)
+
+4.
+	extend the documentation to show how you can use your own
+		splitter and filter to strip down the HTML markup;
+
+5.
+	extend the backends so that one DBIx::FullTextSearch index can store
+		more views of the documents -- for example for indexing
+		mailinglist archives, it'd be nice to index from,
+		subject and body of the messages separately yet in one
+		index, so that you could base the selection critaria on
+		what part of the documents (headers or body in this
+		case) contains the pattern; for HTML document, indexing
+		titles and body in this way seems natural requirement.
+
+6.
+	make benchmarks showing the performance on various data sets and
+		various document types and lengths.

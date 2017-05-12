@@ -1,0 +1,14 @@
+Revision history for Perl extension Data::DigestPath
+
+0.04    Sat Mar 29 14:10:36 JST 2014
+        - implemented the 'trancate' option
+        - fixed POD
+
+0.03    Tue Feb 11 22:43:07 JST 2014
+        - fixed POD
+
+0.02    Tue Feb 11 22:22:34 JST 2014
+        - removed the dependency module(Carp: no need)
+
+0.01    Tue Feb 11 21:41:24 JST 2014
+        - original version

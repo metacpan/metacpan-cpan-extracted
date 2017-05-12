@@ -1,0 +1,36 @@
+Revision history for Perl extension DPKG::Log.
+
+1.20 Wed Feb 23 09:30:00 2011
+    - Switch to DistZilla
+    - Remove debugging output from DPKG::Log
+    - Various changes to examples/dpkg-report:
+        - Add merging for common hostnames (e.g. if there is
+          data for test1 and test2, show test* with all packages
+          common to BOTH systems starting with test.
+        - Add a no_data flag to the data handed to Template::Toolkit
+          in order to handle cases properly where there is no
+          data for the current period and hostname.
+        - Add a merge flag to the data handed to Template::Toolkit
+          in order to know weither merge mode is active or not
+          in the templates
+    - In t/timing.t use RELEASE_TESTING environment variable, because
+      this is set by dzil test.
+    - Extend POD documentation for DPKG::Log::Analyse::Package
+
+1.10  Fri Feb 18 14:35:00 2011
+    - Bugfix in DPKG::Log::Entry: available_version did not return
+      a value.
+    - Bugfix in DPKG::Log: Handle parse param properly
+    - Fixed some perlcritic critics
+    - Fixed various POD problems
+    - Use test_data/dpkg.log in t/dpkg-log.t
+    - Make it possible to initialize new objects from existing
+      references
+    - Extend tests
+    - Add support to DPKG::Log::Analyse to specify an existing
+      DPKG::Log object as log_handle
+    - Add support to DPKG::Log to specify time_zone as
+      DateTime::TimeZone objects
+    - Add missing file (DPKG/Log/Analyse/Package.pm) to tarball
+1.00  Fri Feb 18 10:00:00 2011
+	- Initial version

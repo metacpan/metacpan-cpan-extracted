@@ -1,0 +1,28 @@
+Revision history for Perl extension Dancer::Plugin::Auth::Facebook.
+
+0.06
+    - update code to use Facebook's Graph API v2.8 (garu)
+    - new 'fields' option to control what Facebook returns (garu)
+    - minor doc updates (garu)
+
+0.05
+    - improved error handling (garu)
+    - typo fixes (garu)
+
+0.04
+    - updated meta resources for repo, bugtracker and license (garu)
+
+0.03
+    - changed FaceBook() exported helper to facebook() (garu)
+    - internal session handling using 'fb_' namespace (garu)
+    - returning all user data on session('fb_user') (garu)
+    - improved Facebook scope setup (garu)
+    - more tests (garu)
+    - adding extra debug() information (garu)
+    - minor documentation updates (garu)
+
+0.02  Sun Apr  6 10:51:50 2014
+    - Fixed some minor bugs and updated pod
+
+0.01  Sun Apr  3  23:51:50 2014
+	- Very first version, just for own purpose

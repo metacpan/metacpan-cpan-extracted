@@ -1,0 +1,39 @@
+Devel-PL_origargv
+=================
+
+Created:      2012-11-06
+Home page:    <https://metacpan.org/release/Devel-PL_origargv>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Devel-PL_origargv>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.004	2014-04-26
+
+ [ Packaging ]
+ - use Dist::Inkt
+
+ [ Other ]
+ - Switch from Inline::C to XS.
+   Anonymous Monk++
+   <http://www.perlmonks.org/?node_id=1083955>
+
+0.003	2013-07-11
+
+ [ Bug Fixes ]
+ - Rename the internal C functions because they conflict with functions
+   from stdlib.h in some versions of gcc.
+   Fixes RT#86838.
+   Sisyphus++
+   <https://rt.cpan.org/Ticket/Display.html?id=86838>
+
+ [ Documentation ]
+ - Note that test suite will not pass when run via `forkprove`.
+
+0.002	2013-01-11
+
+ [ Documentation ]
+ - Document test suite.
+
+ [ Other ]
+ - Added: Include an example script in the distribution.
+
+0.001	2012-11-07	Initial release

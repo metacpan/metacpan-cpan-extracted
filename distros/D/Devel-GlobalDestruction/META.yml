@@ -1,0 +1,34 @@
+---
+abstract: "Provides function returning the equivalent of C<${^GLOBAL_PHASE} eq 'DESTRUCT'> for older perls."
+author:
+  - 'Yuval Kogman <nothingmuch@woobling.org>'
+  - 'Florian Ragwitz <rafl@debian.org>'
+  - 'Jesse Luehrs <doy@tozt.net>'
+  - 'Peter Rabbitson <ribasushi@cpan.org>'
+  - "Arthur Axel 'fREW' Schmidt <frioux@gmail.com>"
+  - 'Elizabeth Mattijsen <liz@dijkmat.nl>'
+  - 'Graham Knop <haarg@haarg.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-GlobalDestruction
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Sub::Exporter::Progressive: '0.001011'
+  perl: '5.006'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-GlobalDestruction
+  homepage: https://metacpan.org/release/Devel-GlobalDestruction
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/p5sagit/Devel-GlobalDestruction.git
+version: '0.14'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

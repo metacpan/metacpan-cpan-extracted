@@ -1,0 +1,10 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+data/cache/tidy.dat
+lib/Dist/Zilla/Plugin/PodWeaverIfPod.pm
+t/01-use.t

@@ -1,0 +1,131 @@
+Revision history for Devel-EndStats
+
+0.20    2015-03-26 (PERLANCAR)
+
+	- [ux] Show program runtime in ms too.
+
+
+0.19    2015-01-03 (PERLANCAR)
+
+	- No functional changes.
+
+	- Rebuild (Generate TODO.md).
+
+
+0.18    2014-11-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Avoid the use of defined-or operator because we still allow
+	  5.8/earlier perls [CT].
+
+
+0.17    2014-11-09 (PERLANCAR)
+
+	- No functional changes.
+
+	- Typo in checking 'time' sort order.
+
+
+0.16    2014-11-09 (PERLANCAR)
+
+        - Don't show warning when encountering file '-e' in %INC (I encountered
+          this when using Moo, where this pair shows up: 'main.pm' => '-e').
+
+
+0.15    2014-08-21 (SHARYANTO)
+
+        [BUG FIXES]
+
+        - Sorting fixes.
+
+        - Return 1 if module already loaded (listed in %INC), not 0. This caused
+          problem with code like: 'eval "require $mod" or die ...' (even though
+          it is advised that one does 'eval "require $mod; 1" or die ...').
+
+
+0.14    2014-05-18 (SHARYANTO)
+
+        - Add option: show_memsize.
+
+
+0.13    2014-05-09 (SHARYANTO) - Happy birthday, Jinny!
+
+        - Add options: hide_core, hide_noncore.
+
+
+0.12    2013-07-17 (SHARYANTO)
+
+        - No functional changes. Minor documentation improvements (thanks Neil).
+
+
+0.11    2012-12-11 (SHARYANTO)
+
+        - Add option 'force'.
+
+
+0.10    2012-10-18 (SHARYANTO)
+
+        - No functional changes. Tweak warning message and avoid perl undef
+          warning.
+
+
+0.09    2012-10-04 (SHARYANTO)
+
+        - No functional changes. Fix a typo, avoid perl undef warning, and add a
+          helpful warning message when Devel::EndStats is loaded late.
+
+
+0.08    2012-07-27 (SHARYANTO)
+
+        - No functional changes
+
+        - Tweak: show module load times in ms instead of s.
+
+
+0.07    2012-07-26 (SHARYANTO)
+
+        - Bug: don't increase order unless requiring a new file.
+
+
+0.06    2012-07-26 (SHARYANTO)
+
+        - Add caller, load timing (still inclusive though), and load order
+          information.
+
+        - Allow sorting list of modules using the 'sort' option.
+
+
+0.05    2011-02-16 (SHARYANTO)
+
+        - Use Time::HiRes for more precision.
+
+        - Don't show stats if BEGIN phase failed.
+
+        - No longer require Perl 5.10.
+
+	- Some formatting tweaks.
+
+
+0.04    2010-08-26 (SHARYANTO)
+
+        - Some doc work: sample output, formatting, wording.
+
+
+0.03    2010-08-04 (SHARYANTO)
+
+        - print stats to STDERR instead of STDOUT.
+
+        - Fix failing tests.
+
+
+0.02    2010-07-28 (SHARYANTO)
+
+        - Require Perl 5.10.
+
+        - Add options: verbose, exclude_endstats_modules.
+
+
+0.01    2010-07-28 (SHARYANTO)
+
+        - First release.

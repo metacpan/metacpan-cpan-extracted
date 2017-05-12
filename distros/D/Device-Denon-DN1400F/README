@@ -1,0 +1,30 @@
+Device/Denon/DN1400F version 0.01
+=================================
+
+The DN1400F is a high end computer controlled jukebox CD player. This
+Perl module provides a userspace interface to the RS232 (and possibly
+RS485) protocols used by the device. It provides a fairly low level
+interface allowing CDs to be loaded, unloaded, played, paused, etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::SerialPort
+
+COPYRIGHT AND LICENCE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Copyright (C) 2003 Shevek <shevek@cpan.org>
+

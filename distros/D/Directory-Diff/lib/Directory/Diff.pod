@@ -1,0 +1,266 @@
+
+=head1 NAME
+
+Directory::Diff - recursively find differences between similar directories
+
+=head1 SYNOPSIS
+
+    
+    use Directory::Diff 'directory_diff';
+    
+    # Do a "diff" between "old_dir" and "new_dir"
+    
+    directory_diff ('old_dir', 'new_dir', 
+                {diff => \& diff,
+                 dir1_only => \& old_only});
+    
+    # User-supplied callback for differing files
+    
+    sub diff
+    {
+        my ($data, $dir1, $dir2, $file) = @_;
+        print "$dir1/$file is different from $dir2/$file.\n";
+    }
+    
+    # User-supplied callback for files only in one of the directories
+    
+    sub old_only
+    {
+        my ($data, $dir1, $file) = @_;
+        print "$file is only in the old directory.\n";
+    }
+    
+
+
+=head1 VERSION
+
+This document describes Directory::Diff version 0.05,
+corresponding to git commit 415adc953083b811ba31d2fffa0f047a3f5c2e60 at Tue Aug 23 09:16:18 2016 +0900.
+
+=head1 DESCRIPTION
+
+Directory::Diff finds differences between two directories and all
+their subdirectories, recursively. If it finds a file with the same
+name in both directories, it uses L<File::Compare> to find out whether
+they are different. It is callback-based and takes actions only if
+required.
+
+=head1 FUNCTIONS
+
+The main function of this module is L</directory_diff>. The other
+functions are helper functions, but these can be exported on request.
+
+=head2 ls_dir
+
+     my %ls = ls_dir ("dir");
+
+C<ls_dir> makes a hash containing a true value for each file and
+directory which is found under the directory given as the first
+argument.
+
+It also has an option to print messages on what it finds, by setting a
+second argument to a true value, for example
+
+     my %ls = ls_dir ("dir", 1);
+
+=head2 get_only
+
+     my %only = get_only (\%dir1, \%dir2);
+
+Given two hashes containing true values for each file or directory
+under two directories, return a hash containing true values for the
+files and directories which are in the first directory hash but not in
+the second directory hash.
+
+For example, if
+
+     %dir1 = ("file" => 1, "dir/" => 1, "dir/file" => 1);
+
+and 
+
+     %dir2 = ("dir/" => 1, "dir2/" => 1);
+
+C<get_only> returns
+
+     %only = ("file" => 1, "dir/file" => 1);
+
+There is also a third option which prints messages on what is found if
+set to a true value, for example,
+
+     my %only = get_only (\%dir1, \%dir2, 1);
+
+=head2 get_diff
+
+     my %diff = get_diff ("dir1", \%dir1_ls, "dir2", \%dir2_ls);
+
+Get a list of files which are in both C<dir1> and C<dir2>, but which
+are different. This uses L<File::Compare> to test the files for
+differences. It searches subdirectories. Usually the hashes
+C<%dir1_ls> and C<%dir2_ls> are those output by L</ls_dir>.
+
+=head2 directory_diff
+
+     directory_diff ("dir1", "dir2", 
+                     {dir1_only => \&dir1_only,
+                      diff => \& diff});
+
+Given two directories F<dir1> and F<dir2>, this calls back a
+user-supplied routine for each of three cases:
+
+=over
+
+=item A file is only in the first directory
+
+In this case a callback specified by C<dir1_only> is called once
+
+     &{$third_arg->{dir1_only}} ($third_arg->{data}, "dir1", $file);
+
+for each file C<$file> which is in F<dir1> but not in F<dir2>,
+including files in subdirectories.
+
+=item A file is only in the second directory
+
+In this case a callback specified by C<dir2_only> is called once
+
+     &{$third_arg->{dir2_only}} ($third_arg->{data}, "dir2", $file);
+
+for each file C<$file> which is in F<dir2> but not in F<dir1>,
+including files in subdirectories.
+
+=item A file with the same name but different contents is in both directories
+
+In this case a callback specified by C<diff> is called once
+
+     &{$third_arg->{diff}} ($third_arg->{data}, "dir1", "dir2", $file);
+
+for each file name C<$file> which is in both F<dir1> and in F<dir2>,
+including files in subdirectories.
+
+=back
+
+The first argument to each of the callback functions is specified by
+C<data>. The second argument to C<dir1_only> and C<dir2_only> is the
+directory's name. The third argument is the file name, which includes
+the subdirectory part. The second and third arguments to C<diff> are
+the two directories, and the fourth argument is the file name
+including the subdirectory part.
+
+If the user does not supply a callback, no action is taken, even if a
+file is found.
+
+The routine does not return a meaningful value. It does not check the
+return values of the callbacks. Therefore if it is necessary to stop
+midway, the user must use something like C<eval { }> and C<die>.
+
+A fourth argument, if set to any true value, causes directory_diff to
+print messages about what it finds and what it does.
+
+=head2 default_dir_only
+
+     use Directory::Diff qw/directory_diff default_dir_only/;
+     directory_diff ('old', 'new', {dir1_only => \&default_dir_only});
+
+A simple routine to print out when a file is only in one of the
+directories. This is for testing the C<Directory::Diff> module.
+
+=head2 default_diff
+
+     use Directory::Diff qw/directory_diff default_diff/;
+     directory_diff ('old', 'new', {dir1_only => \&default_diff});
+
+A simple routine to print out when a file is different between the
+directories. This is for testing the C<Directory::Diff> module.
+
+=head1 SEE ALSO
+
+=head2 CPAN modules
+
+=over
+
+=item L<File::DirCompare>
+
+This seemingly does a very similar thing to Directory::Diff.
+
+=item L<File::Dircmp>
+
+=back
+
+=head1 DEPENDENCIES
+
+This section lists Perl modules which this depends on, with a
+rationale for why they are used.
+
+=over
+
+=item L<File::Compare>
+
+File::Compare is used to check whether two files are different or not.
+
+=back
+
+=head1 CONTRIBUTORS
+
+This section lists people who have contributed to the module.
+
+Mohammad S. Anwar (MANWAR) contributed fixes for broken tests.
+
+=head1 MOTIVATION
+
+This section discusses why I wrote the module and what I use it for.
+
+The reason I wrote this module is because C<< `diff --recursive` >>
+stops when it finds a subdirectory which is in one directory and not
+the other, without descending into the subdirectory. For example, if
+one has a file like C<dir1/subdir/file>,
+
+     diff -r dir1 dir2
+
+will tell you "Only in dir1: subdir" but it won't tell you anything
+about the files under "subdir".
+
+I needed to go down into the subdirectory and find all the files which
+were in all the subdirectories, so I wrote this.
+
+I've been using this module for updating web sites with a lot of pages
+since 2009, to avoid repeatedly having to upload the entire
+site's-worth of pages for each small change. The way I use this is as
+follows. I keep a local copy of the uploaded web site in a directory
+like F<old-site>, and then rebuild all the pages in another directory
+like F<new-site>, then I use L<Directory::Diff::Copy> to put the
+changed files into yet another directory, like
+F<changed-site-files>. Once the changed files are copied, then I tar,
+gzip, and upload the directory of changed files, and untar it at the
+web host, replacing only files which have changed. I also delete the
+F<old-site> directory and rename F<new-site> to F<old-site> at this
+point in preparation for the next upload.
+
+I'm currently using this for almost all the static content for the
+following web sites: L<http://www.sljfaq.org>,
+L<http://kanji.sljfaq.org>, and L<http://www.lemoda.net>. I put this
+module on github in about 2012 and on CPAN in 2016.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head2 Request
+
+If you'd like to see this module continued, let me know that you're
+using it. For example, send an email, write a bug report, star the
+project's github repository, add a patch, add a C<++> on Metacpan.org,
+or write a rating at CPAN ratings. It really does make a
+difference. Thanks.
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2009-2016
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

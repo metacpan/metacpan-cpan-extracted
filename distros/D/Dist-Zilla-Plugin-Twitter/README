@@ -1,0 +1,116 @@
+NAME
+    Dist::Zilla::Plugin::Twitter - Twitter when you release with Dist::Zilla
+
+VERSION
+    version 0.026
+
+SYNOPSIS
+    In your dist.ini:
+
+        [Twitter]
+        hash_tags = #foo
+        url_shortener = TinyURL
+
+DESCRIPTION
+    This plugin will use Net::Twitter to send a release notice to Twitter.
+    By default, it will include a link to release on <http://metacpan.org>.
+
+    The default configuration is as follows:
+
+        [Twitter]
+        tweet_url = https://metacpan.org/release/{{$AUTHOR_UC}}/{{$DIST}}-{{$VERSION}}/
+        tweet = Released {{$DIST}}-{{$VERSION}}{{$TRIAL}} {{$URL}} !META{resources}{repository}{web}
+        url_shortener = TinyURL
+
+    The "tweet_url" is shortened with WWW::Shorten::TinyURL or whichever
+    other service you choose (use 'none' to use the full URL, in which case
+    Twitter will shorten it for you) and appended to the "tweet" message.
+
+  VARIABLE INTERPOLATION
+    The following variables are available for substitution in the URL and
+    message templates:
+
+          DIST        # Foo-Bar
+          MODULE      # Foo::Bar
+          ABSTRACT    # Foo-Bar is a module that FooBars
+          VERSION     # 1.23
+          TRIAL       # -TRIAL if is_trial, empty string otherwise.
+          TARBALL     # Foo-Bar-1.23.tar.gz
+          AUTHOR_UC   # JOHNDOE
+          AUTHOR_LC   # johndoe
+          AUTHOR_PATH # J/JO/JOHNDOE
+          URL         # http://tinyurl.com/...
+
+   DISTMETA INTERPOLATION
+    Resources information available in the META.* files of the distribution
+    can be accessed via "<META{key}{subkey}[1]">. You may mix-and-match
+    "{...}" to access hashref elements and "[\d]" to access arrayref
+    elements. You're responsible for making sure you are accessing the right
+    part of the META data structure, and treating it as the right type of
+    data. See CPAN::Meta::Spec and the "$TYPE DATA" sections of CPAN::Meta
+    in particular.
+
+    The "META{...}" replacement may also have one of two modifiers, which
+    are prefixed directly before "META":
+
+    "!" - URL shortening
+        Providing an exclamation point ("!META{...}") will URL-shorten the
+        value you extract from the distmeta data structure. This will have
+        no effect unless the value is a URL to begin with.
+
+    "@" - Arrayref stringification
+        Providing an at-symbol (@META{...}) will include all the elements of
+        the arrayref you specify by joining them with $". So, this is just
+        like doing "@{ $your_array_ref }".
+
+    So, for example, to use the GitHub home of the project instead of its
+    metacpan page, one can do:
+
+        [Twitter]
+        tweet = Released {{$DIST}}-{{$VERSION}}{{$TRIAL}} !META{resource}{repository}{web}
+        url_shortener = TinyURL
+
+    Or, to include the authors in your tweet:
+
+        [Twitter]
+        tweet = @META{author} released {{$MODULE}} {{$VERSION}}: {{$URL}}
+
+  PAUSEID
+    You must be using the "UploadToCPAN" or "FakeRelease" plugin for this
+    plugin to determine your PAUSEID.
+
+  HASHTAGS
+    You can use the "hash_tags" option to append hash tags (or anything,
+    really) to the end of the message generated from "tweet".
+
+        [Twitter]
+        hash_tags = #perl #cpan #foo
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Dist::Zilla::Plugin::Twitter/>.
+
+SOURCE
+    The development version is on github at
+    <http://github.com/dagolden/dist-zilla-plugin-twitter> and may be cloned
+    from <git://github.com/dagolden/dist-zilla-plugin-twitter.git>
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <https://github.com/dagolden/dist-zilla-plugin-twitter/issues>.
+
+AUTHORS
+    *   David Golden <dagolden@cpan.org>
+
+    *   Mike Doherty <doherty@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

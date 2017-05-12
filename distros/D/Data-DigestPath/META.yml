@@ -1,0 +1,29 @@
+---
+abstract: 'the path generator as digest hash'
+author:
+  - 'Dai Okabayashi <bayashi@cpan.org>'
+build_requires:
+  Digest::SHA1: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4005, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-DigestPath
+provides:
+  Data::DigestPath:
+    file: lib/Data/DigestPath.pm
+    version: 0.04
+requires:
+  Class::Accessor::Lite: 0
+  Digest::MD5: 0
+  perl: 5.008001
+resources:
+  bugtracker: http://github.com/bayashi/Data-DigestPath/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/bayashi/Data-DigestPath
+version: 0.04

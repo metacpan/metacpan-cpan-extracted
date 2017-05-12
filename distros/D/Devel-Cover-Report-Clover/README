@@ -1,0 +1,59 @@
+NAME
+    Devel::Cover::Report::Clover - Backend for Clover reporting of coverage
+    statistics
+
+SYNOPSIS
+     cover -report clover
+
+DESCRIPTION
+    This module generates a Clover compatible coverage xml file which can be
+    used in a variety of continuous integration software offerings.
+
+    It is designed to be called from the `cover' program distributed with
+    Devel::Cover.
+
+OPTIONS
+    Options are specified by adding the appropriate flags to the `cover'
+    program. This report format supports the following:
+
+    outputfile
+        This will be the file name that you would like to write this report
+        out to. It defaults to clover.xml.
+
+    projectname
+        This is simply a cosmetic item. When the xml is generated, it has a
+        project name which will show up in your continuous integration
+        system once it is parsed. This can be any string you want and it
+        defaults to 'Devel::Cover::Report::Clover'.
+
+SEE ALSO
+    Devel::Cover
+
+    http://www.atlassian.com/software/clover/
+
+    http://jenkins-ci.org/
+
+    https://wiki.jenkins-ci.org/display/JENKINS/Clover+Plugin
+
+BUGS
+    https://github.com/captin411/Devel-Cover-Report-Clover/issues
+
+CREDITS
+    Jun Kuriyama - nice cosmetic changes to package names
+
+    Olivier Mengué - fix tests for those using local::lib
+
+    Oliver Trosien - added branch, statement, and subroutine details
+
+AUTHOR
+    David Bartle <captindave@gmail.com>
+
+LICENSE
+    Copyright David Bartle (captindave@gmail.com)
+
+    This software is free. It is licensed under the same terms as Perl
+    itself.
+
+    The latest version of this software should be available on github.com
+    https://github.com/captin411/Devel-Cover-Report-Clover
+

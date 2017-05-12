@@ -1,0 +1,15 @@
+Revision history for DBIx-Class-ResultSet-Faceter
+
+0.04    2010-07-21
+        Correct busted POD link (Alex "frew" Schmidt)
+
+0.03    2010-07-21
+        Fix busted "default" set for missing keys (and the accompanying             
+        warnings)
+
+0.02    2010-06-30
+        Include MooseX::Types in Makefile.PL
+
+0.01    2010-06-24
+        First version, released on an unsuspecting world.
+

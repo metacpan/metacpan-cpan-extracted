@@ -1,0 +1,14 @@
+MANIFEST
+README
+c/test.c
+c/speedyb.c
+c/speedyb.h
+Makefile.PL
+perlobject.map
+SPEEDYB.pm
+SPEEDYB.pod
+SPEEDYB.xs
+t/all-tests.t
+tiny.db
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

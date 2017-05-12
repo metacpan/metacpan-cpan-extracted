@@ -1,0 +1,126 @@
+Revision history for Dist-Zilla-Plugin-BumpVersionAfterRelease
+
+0.015     2016-04-03 13:43:32-04:00 America/New_York
+
+    [ADDED]
+
+    - Support for the [ModuleBuild] plugin. Added by Dave Rolsky. GitHub #22.
+
+0.014     2016-03-01 13:58:33-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed version number validity checks.
+
+    [DOCUMENTED]
+
+    - Added missing closing parenthesis.
+
+0.013     2016-01-26 22:18:08-05:00 America/New_York
+
+    [FIXED]
+
+    - Fixed tests on Windows
+
+0.012     2015-08-21 14:17:33-04:00 America/New_York
+
+    [CHANGED]
+
+    - Changed the error message for unsupported versions to indicate
+      they are not *allowed* rather than not *valid*.
+
+    [DOCUMENTED]
+
+    - Documented supported versions styles
+
+0.011     2015-07-17 06:31:46-04:00 America/New_York (TRIAL RELEASE)
+
+    [ADDED]
+
+    - configurations are logged in metadata, when combined with [MetaConfig]
+
+    - new 'add_tarball_name' option, to add the tarball name as a comment to
+      files munged during build so the source is more evident (in case the
+      module name bears no relation to the tarball name).
+
+    [CHANGED]
+
+    - when a $VERSION is updated after release, the correct filename is
+      included in the log message, if it was changed
+
+0.010     2015-07-16 06:35:38-04:00 America/New_York (TRIAL RELEASE)
+
+    [CHANGED]
+
+    - Decimal versions with underscore are prohibited unless the
+      'allow_decimal_underscore' option is set to true.
+
+    - The # TRIAL suffix is no longer added to repository files when
+      bumping the version after release.
+
+    - The tarball name is added as a comment to files munged during
+      build so the source is more evident (in case the module name
+      bears no relation to the tarball name).
+
+    [FIXED]
+
+    - Adds "$VERSION = eval $VERSION" when version contains an underscore
+
+0.009     2015-01-27 06:47:35-05:00 America/New_York
+
+    [CHANGED]
+
+    - Clarified/added debug log messages
+
+    [DOCUMENTATION]
+
+    - Added link to BumpVersionAfterRelease::Transitional
+
+0.008     2014-12-01 09:59:35-05:00 America/New_York
+
+    [DOCUMENTATION]
+
+    - Documented 'finder' option
+
+0.007     2014-11-13 16:52:44-05:00 America/New_York
+
+    [PREREQS]
+
+    - Require Path::Tiny 0.061 to avoid an append w/ truncate bug
+
+0.006     2014-11-04 17:38:47-05:00 America/New_York
+
+    [CHANGED]
+
+    - Version bumps now truncate+append to preserve file modes
+
+0.005     2014-10-30 10:32:18-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'skip_version_provider' option
+
+0.004     2014-10-06 16:54:32-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'global' attribute to replace all occurances of the version
+      number assignment.
+
+0.003     2014-09-26 16:07:12-04:00 America/New_York
+
+    [ADDED]
+
+    - Added 'munge_makefile_pl' attribute (default true) that
+      munges $VERSION in a Makefile.PL in the root.
+
+0.002     2014-03-28 10:44:02-04:00 America/New_York
+
+    [DOCUMENTATION]
+
+    - Removed unnecessary VersionFromModule in example dist.ini
+
+0.001     2014-03-27 17:02:51-04:00 America/New_York
+
+    - First release
+

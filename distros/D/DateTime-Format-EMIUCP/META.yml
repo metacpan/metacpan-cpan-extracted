@@ -1,0 +1,38 @@
+---
+abstract: 'Parse time formats for EMI-UCP protocol'
+author:
+  - 'Piotr Roszatycki <dexter@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-EMIUCP
+provides:
+  DateTime::Format::EMIUCP:
+    file: lib/DateTime/Format/EMIUCP.pm
+    version: 0.0300
+  DateTime::Format::EMIUCP::DDT:
+    file: lib/DateTime/Format/EMIUCP/DDT.pm
+    version: 0.0300
+  DateTime::Format::EMIUCP::DSCTS:
+    file: lib/DateTime/Format/EMIUCP/DSCTS.pm
+    version: 0.0300
+  DateTime::Format::EMIUCP::SCTS:
+    file: lib/DateTime/Format/EMIUCP/SCTS.pm
+    version: 0.0300
+  DateTime::Format::EMIUCP::VP:
+    file: lib/DateTime/Format/EMIUCP/VP.pm
+    version: 0.0300
+requires:
+  DateTime::Format::Builder: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-EMIUCP
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/dex4er/perl-DateTime-Format-EMIUCP
+version: 0.0300

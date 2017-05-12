@@ -1,0 +1,58 @@
+Dist::Zilla::App::Command::critic
+
+"critic" is an "App::Command" for "Dist::Zilla" which streamlines
+running "Perl::Critic" on your built distribution.
+
+This competes with the likes of "[Test::Perl::Critic]" by:
+
+*   not requiring the rest of the steps in the test life-cycle to
+    execute.
+
+*   not being impeded by the other tests cluttering your output.
+
+*   not suffering the limitations of "Test::Perl::Critic" which discards
+    profile color settings.
+
+*   carefully formatting output to give a clearer visualization of where
+    failures lie.
+
+*   not requiring your dist have a "Test::Perl::Critic" test pass for
+    release.
+
+*   not requiring your dist to have any explicit "Perl::Critic"
+    consumption.
+
+Behaviorally:
+
+  dzil critic
+
+Behaves very similar to:
+
+   dzil run --no-build perlcritic -p perlcritic.rc lib/
+
+Except with improved verbosity of file name reporting.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

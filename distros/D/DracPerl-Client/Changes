@@ -1,0 +1,13 @@
+Revision history for Perl extension DracPerl-Client
+
+0.10 2016-11-01T22:06:34Z
+
+	- Added openSession/saveSession/closeSession
+	- Removed login
+	- Added log as an attribute
+	- More doc
+
+0.01 2016-09-20T20:35:15Z
+
+    - original version
+

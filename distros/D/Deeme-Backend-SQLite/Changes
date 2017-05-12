@@ -1,0 +1,11 @@
+Revision history for Deeme-Backend-SQLite
+
+0.03  2014-08-12 18:21:38 CEST
+        - oops cpanfile
+
+0.02  2014-07-11 00:25:46 CEST
+
+	- POD fixes
+
+0.01  2014-07-09 00:21:18 CEST
+        - Initial release

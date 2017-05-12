@@ -1,0 +1,79 @@
+Revision history for Perl extension Dist-Zilla-PluginBundle-Author-RTHOMPSON
+
+0.161990  2016-07-16 23:48:32-07:00 America/Los_Angeles
+    - Fix an issue with the test corpus that prevented the tests from
+      passing on Perl 5.14.4.
+
+0.160630  2016-03-02 17:05:02-08:00 America/Los_Angeles
+    - add [MetaProvides::Package]
+
+0.160500  2016-02-19 13:12:15-08:00 America/Los_Angeles
+    - add [MetaJSON]
+
+0.142221  2014-08-10 16:38:56PDT-0700 America/Los_Angeles
+    - Switch to PluginRemover for implementation of "-remove" option
+    - Add the Config::Slicer role to enable arbitrary plugin options
+    - Improved tests, including tests for the two above additions
+
+0.142220  2014-08-10 15:36:20PDT-0700 America/Los_Angeles
+    - Fix handling of copy_file and move_file arguments when they are
+      empty. This eliminates an error on some configurations but
+      otherwise has no visible effect.
+
+0.142180  2014-08-06 10:50:49PDT-0700 America/Los_Angeles
+    - Fix a few mismatches between comments/documentation and code
+    - Fix a few dependencies that were specified for the wrong phase
+    - Use the new release-only mode of ReadmeAnyFromPod
+
+0.133030  2013-10-30 01:53:13 America/Los_Angeles
+    - Move ConfirmRelease plugin to the end. This prevents the
+    frustrating case where you answer yes to confirm the release and
+    then the release aborts anyway to to a subsequent pre-release
+    check.
+
+0.132960  2013-10-23 15:39:25 America/Los_Angeles
+    - Actually use the "allow_dirty" option instead of ignoring the
+      user-set value and always using the default.
+    - Fix broken vcs dispatch (broken since v0.132800)
+    - Only load CopyFilesFromBuild plugin if it is used
+
+0.132801  2013-10-07 16:51:23 America/Los_Angeles
+    - Update SynopsisTests to Test::Synopsis
+
+0.132800  2013-10-07 16:43:53 America/Los_Angeles
+    - Remove use of given/when
+
+0.120160  2012-01-15 18:44:05 PST8PDT
+    - Rename to [@Author::RTHOMPSON]
+
+0.120120  2012-01-12 00:18:24 PST8PDT
+    - Replace KwaliteeTests with Test::Kwalitee
+
+0.120052  2012-01-05 11:23:24 PST8PDT
+    - Add CheckVersionIncrement
+
+0.120051  2012-01-04 23:39:50 PST8PDT
+    - Prevent modules in corpus directory from being indexed.
+      (TODO: make this configurable)
+
+0.120050  2012-01-04 16:04:45 PST8PDT
+    - Add a simple test suite that ensures a dist can be built
+      successfully with the bundle
+    - Add Git::Push and Git::Remote::Check with associated options
+    - Small bugfix in the code for choosing whether to provide a
+      version
+
+0.111290  2011-05-08 19:18:09 PST8PDT
+    - Maunally specify Dist::Zilla prerequisites, since they are not automatically detected
+    - Adjust for Dist::Zilla 4.200006
+    - Add CheckPrereqsIndexed
+
+0.103532  2010-12-19 02:36:06 EST5EDT
+    - Allow Changes to be dirty when releasing (Git::Commit)
+    - Make allow_dirty a configurable option
+
+0.103531  2010-12-19 02:12:28 EST5EDT
+    - Allow Changes to be dirty when releasing (Git::Check)
+
+0.103521  2010-12-18 00:03:22 EST5EDT
+    - Initial CPAN release

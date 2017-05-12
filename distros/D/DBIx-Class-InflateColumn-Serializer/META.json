@@ -1,0 +1,69 @@
+{
+   "abstract" : "Inflators to serialize data structures for DBIx::Class",
+   "author" : [
+      "Jose Luis Martinez (jlmartinez@capside.com)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Class-InflateColumn-Serializer",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "JSON::MaybeXS" : "1.002005",
+            "YAML" : "0",
+            "namespace::clean" : "0",
+            "perl" : "v5.8.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::InflateColumn::Serializer" : {
+         "file" : "lib/DBIx/Class/InflateColumn/Serializer.pm",
+         "version" : "0.09"
+      },
+      "DBIx::Class::InflateColumn::Serializer::JSON" : {
+         "file" : "lib/DBIx/Class/InflateColumn/Serializer/JSON.pm",
+         "version" : "0.09"
+      },
+      "DBIx::Class::InflateColumn::Serializer::Storable" : {
+         "file" : "lib/DBIx/Class/InflateColumn/Serializer/Storable.pm",
+         "version" : "0.09"
+      },
+      "DBIx::Class::InflateColumn::Serializer::YAML" : {
+         "file" : "lib/DBIx/Class/InflateColumn/Serializer/YAML.pm",
+         "version" : "0.09"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://metacpan.org/release/DBIx-Class-InflateColumn-Serializer/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/miquelruiz/DBIx-Class-InflateColumn-Serializer.git",
+         "web" : "https://github.com/miquelruiz/DBIx-Class-InflateColumn-Serializer"
+      }
+   },
+   "version" : "0.09",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

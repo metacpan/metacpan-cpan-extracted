@@ -1,0 +1,58 @@
+{
+   "abstract" : "easy database connections for Dancer2 applications",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Database",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.166001",
+            "Dancer::Plugin::Database::Core" : "0.16"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack" : "1.0032",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/bigpresh/Dancer-Plugin-Database/issues"
+      },
+      "homepage" : "https://github.com/bigpresh/Dancer-Plugin-Database/",
+      "repository" : {
+         "url" : "https://github.com/bigpresh/Dancer-Plugin-Database"
+      }
+   },
+   "version" : "2.17"
+}

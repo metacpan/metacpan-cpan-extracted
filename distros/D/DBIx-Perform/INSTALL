@@ -1,0 +1,474 @@
+Installating Perl modules for DBIx::Perform
+-------------------------------------------
+Need a working installation of Informix.
+
+Downloads
+---------
+ncurses         http://ftp.gnu.org/pub/gnu/ncurses/ncurses-5.6.tar.gz
+
+The downloads below are from http://search.cpan.org/CPAN/authors/id/
+
+Curses		G/GI/GIRAFFED/Curses-1.15.tgz
+CursesWidgets	C/CO/CORLISS/CursesWidgets-1.997.tar.gz
+CursesForms	C/CO/CORLISS/CursesForms-1.997.tar.gz
+CursesApplication	C/CO/CORLISS/CursesApplication-0.2.tar.gz
+ExtUtils-AutoInstall	A/AU/AUTRIJUS/ExtUtils-AutoInstall-0.63.tar.gz
+Pod-Escapes	S/SB/SBURKE/Pod-Escapes-1.04.tar.gz
+Pod-Simple	A/AR/ARANDAL/Pod-Simple-3.05.tar.gz
+Test-Simple	M/MS/MSCHWERN/Test-Simple-0.70.tar.gz
+Test-Pod	P/PE/PETDANCE/Test-Pod-1.26.tar.gz
+DBI		T/TI/TIMB/DBI-1.58.tar.gz 
+DBD		J/JO/JOHNL/DBD-Informix-2007.0226.tar.gz
+YAML		I/IN/INGY/YAML-0.65.tar.gz
+ParseRecDescent		D/DC/DCONWAY/Parse-RecDescent-1.94.tar.gz
+
+Extras needed for HPUX:
+Scalar-Utils	G/GB/GBARR/Scalar-List-Utils-1.19.tar.gz
+Test-Harness	P/PE/PETDANCE/Test-Harness-2.64.tar.gz
+Text-Balanced   D/DC/DCONWAY/Text-Balanced-v2.0.0.tar.gz
+version         J/JP/JPEACOCK/version-0.7203.tar.gz
+
+Optional:
+Sort-Versions	E/ED/EDAVIS/Sort-Versions-1.5.tar.gz
+Time-Hires      J/JH/JHI/Time-HiRes-1.9707.tar.gz
+
+*** Do not use Curses-1.16!  It has a bug in the function "chgat" ***
+
+Commands in gory detail
+-----------------------
+
+These commands were used on Red Hat Enterprise Linux 4
+(Linux kernel version 2.6.9-55.ELsmp) with Informix SE 7.25,
+perl 5.8.5, and gcc 3.4.6.
+
+# cd /usr/include
+# rm curses.h ncurses.h form.h menu.h panel.h
+
+$ tar xzf Curses-1.15.tar.gz
+$ cd Curses-1.15
+$ perl Makefile.PL PANELS MENUS FORMS
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf CursesWidgets-1.997.tar.gz
+$ cd CursesWidgets-1.997
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+
+$ tar xzf CursesForms-1.997.tar.gz
+$ cd CursesForms-1.997
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf CursesApplication-0.2.tar.gz
+$ cd CursesApplication-0.2
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf DBI-1.56.tar.gz 
+$ cd DBI-1.56
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf ExtUtils-AutoInstall-0.63.tar.gz
+$ cd ExtUtils-AutoInstall-0.63
+$ perl Makefile.PL; make
+$ sudo make install
+$ cd ..
+
+$ tar xzf Pod-Escapes-1.04.tar.gz
+$ cd Pod-Escapes-1.04
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf Pod-Simple-3.05.tar.gz
+$ cd Pod-Simple-3.05
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf Test-Simple-0.70.tar.gz
+$ cd Test-Simple-0.70
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf Test-Pod-1.26.tar.gz
+$ cd Test-Pod-1.26
+$ perl Makefile.PL
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf DBD-Informix-2007.0226.tar.gz
+$ cd DBD-Informix-2007.0226
+$ perl Makefile.PL
+$ make
+$ sudo make install
+
+$ tar xzf YAML-0.62.tar.gz
+$ cd YAML-0.62
+$ perl Makefile.pl
+Continue installing YAML.pm? [y]
+$ make
+$ sudo make install
+$ cd ..
+
+$ tar xzf Parse-RecDescent-1.94.tar.gz
+$ cd Parse-RecDescent-1.94
+$ perl Makefile.pl
+$ make
+$ sudo make install
+$ cd ..
+
+
+$ tar xjf DBIx-Perform-0.694.tar.bz2
+$ cd DBIx-Perform-0.694.tar.bz2
+$ perl Makefile.pl
+$ make
+$ sudo make install
+$ cd ..
+
+
+------------------------------------------------------------------------
+HP-UX installation
+
+The setup used for this installation may be atypical and much of the
+following may not apply to another HP-UX system.
+
+The system is HP-UX 11.11, with Informix (IBM Informix Dynamic Server
+Version 10.00.HC4) in /usr/informix, and perl 5.6.1.
+gcc 3.4.6 and ncurses are installed in /usr/local/bin.
+
+Ncurses can be built with the native compiler.  But, must make one change.
+NCURSES_INLINE does not work with the native compiler.  The configuration
+script detects that the compiler does support "inline" and sets
+NCURSES_INLINE=inline, which causes a compiler error on any line
+in the ncurses source that contains NCURSES_INLINE.
+Editing the ncurses configuration script to remove the test for inline is
+one way around this problem.
+
+
+$ gzip -d < ncurses-5.6.tar.gz
+$ cd ncurses-5.6
+
+Delete these lines from "configure":
+
+if test "$ac_cv_c_inline" != no ; then
+        cat >>confdefs.h <<\EOF
+#define CC_HAS_INLINE_FUNCS 1
+EOF
+
+        NCURSES_INLINE=inline
+fi
+
+$ ./configure;make;make
+$ su
+# make install
+$ cd ..
+
+
+
+# cd /usr/include
+# rm curses.h ncurses.h form.h menu.h panel.h
+
+$ export PATH=/usr/local/bin:$PATH
+$ export CURSES_CFLAGS="-I/usr/local/include -I/usr/local/include/ncurses"
+$ export CURSES_LDFLAGS="-L/usr/local/lib -lncurses"
+
+$ gzip -d < Curses-1.15.tar.gz | tar xf -
+$ cd Curses-1.15
+$ perl Makefile.PL PANELS MENUS FORMS
+$ make
+$ su
+# make install
+$ cd ..
+
+$ gzip -d < Scalar-List-Utils.tar.gz | tar xf -
+$ cd Scalar-List-Utils
+$ perl Makefile.PL
+For HP-UX "make", edit line 282 of Makefile, changing
+  XSUBPPARGS +=  -typemap mytypemap
+to
+  XSUBPPARGS = $(XSUBPPARGS) -typemap mytypemap
+$ make
+$ su
+# make install
+$ cd ..
+
+Need Test-Harness before Test-Simple.
+Need Test-Simple before DBI.
+
+$ gzip -d < DBI-1.56.tar.gz | tar xf -
+$ cd DBI-1.56
+$ perl Makefile.PL
+$ make
+$ make
+$ su
+# make install
+$ cd ..
+
+Need "version" before Text-Balanced.
+
+Now things get strange.  /usr/informix/bin/esql uses the native compiler.
+To use gcc, I backed up /usr/informix/bin/esql to /usr/informix/bin/esql.hp
+and copied esql from an installation of Informix 7.25 on a Linux system
+to /usr/informix/bin/esql.gcc and modified it.
+(Point esql to esql.gcc with ln -s or just copy esql.gcc to esql.)
+The differences from /usr/informix/bin/esql.hp are:
+
+
+$ diff /usr/informix/bin/esql.gcc /usr/informix/bin/esql.hp
+26,30c26,30
+< CC="${INFORMIXC=/usr/local/bin/gcc} -lxti -lsec"
+< CC_TH="${INFORMIXC=/usr/local/bin/gcc} -lxti -lsec"
+< CPP="${INFORMIXCPP=CC} "
+< CPP_TH="${INFORMIXCPP=CC} "
+< STATICFLAGS=""
+---
+> CC="${INFORMIXC=cc} +DS2.0 +DA1.1"
+> CC_TH="${INFORMIXC=cc} +DS2.0 +DA1.1"
+> CPP="${INFORMIXCPP=aCC} +DS2.0 +DA1.1"
+> CPP_TH="${INFORMIXCPP=aCC} +DS2.0 +DA1.1"
+> STATICFLAGS="-Wl,+n"
+36c36
+< CC_AMD32="-m32"
+---
+> CC_AMD32=""
+215,217c215,217
+< SYSLIB="-lc -lm -lcrypt "
+< SYSNLIB=""
+< TLILIB="/usr/lib/libnsl.a /usr/lib/libnsl.so"
+---
+> SYSLIB="-lm -lsec -lnsl_s "
+> SYSNLIB="-lnsl_s "
+> TLILIB="/usr/lib/libnsl_s.a  /usr/lib/libnsl_s.sl"
+350c350
+<                THRLIB="$TLIB -lpthread"
+---
+>                THRLIB="$TLIB "
+378,379c378,379
+<             SYSTHRLIB="-lc -lm -lcrypt "
+<             SYSTHRNLIB="-lpthread"
+---
+>             SYSTHRLIB="-lm -lsec -lnsl_s "
+>             SYSTHRNLIB=""
+439c439
+<             THRLIB="$TLIB -lpthread"
+---
+>             THRLIB="$TLIB "
+442c442
+<                 if [ ! -f /usr/lib/lib$THLIB_SUB.so ]
+---
+>                 if [ ! -f /usr/lib/lib$THLIB_SUB.sl ]
+804c804
+<                 cpinput=$base.pcp.c
+---
+>                 cpinput=$base.pcp
+808c808
+<                 cpinput=$base.pcp.c
+---
+>                 cpinput=$base.pcp
+825c825
+<                 rm -f $base.tmp $base.pcp.c
+---
+>                 rm -f $base.tmp $base.pcp
+
+
+Once the modified esql is in place, then can make the DBD-Informix
+Perl module in HP-UX:
+
+$ tar xzf DBD-Informix-2007.0226.tar.gz
+$ cd DBD-Informix-2007.0226
+$ perl Makefile.PL
+$ make
+$ su
+# make install
+
+------------------------------------------------------------------------
+HP-UX stand alone executable using the Perl ARchiver (PAR)
+
+To create executable files with PAR, need these Perl modules:
+
+AutoLoader-5.63
+Compress-Raw-Zlib-2.006
+IO-Compress-Base-2.006
+IO-Compress-Zlib-2.006
+Compress-Zlib-2.006
+Archive-Zip-1.20
+Getopt-ArgvFile-1.11
+ExtUtils-CBuilder-0.19
+ExtUtils-ParseXS-2.18
+Module-Build-0.2808
+Module-ScanDeps-0.76
+PAR-Dist-0.25
+PAR-0.976
+PAR-Packer-0.976
+
+A basic stand alone executable is not too difficult.
+Inside the DBIx-Perform-0.694 directory, do:
+
+$ pp -z 9 -M Curses/Widgets/Label.pm -M Perform/Widgets/TextField.pm bin/perform
+
+This creates a file "a.out".  Replace bin/perform with bin/pformbld for the
+other program.
+
+A lighter version that needs perl and 3 of the above modules, AutoLoader,
+PAR-Dist, and PAR, can be built by adding "-P" to the options for pp. 
+This creates a file "a.pl".
+
+However, the target system must have ncurses and the Informix shared libraries
+installed.
+
+A complete version that includes the shared libraries is difficult but possible.
+It is also not really a good idea, as start up time could be more than 1 min.
+First, there are two shared libraries, Informix.sl and Curses.sl, to build.
+Informix.sl depends on 6 Informix library files (see pp command at bottom for
+the list), and Curses.sl depends on the 4 libraries ncurses, form, menu, and
+panel.  Easiest (to avoid having to edit the paths hard coded into the shared
+libraries with a hex editor) is to copy all ten libraries to the root directory.
+Then use a feature of the HP-UX linker, ld:  the "+origin" flag.
++origin was added in a patch, so ld must be new enough to support this.
+Check the man page for ld to see if "+origin" is present.
+
+Build the Perl modules Curses-1.15 and DBD-Informix-2007.0226, but don't
+install yet.  Inside blib/arch/auto/ will be Curses/Curses.sl and
+Informix/informix.sl respectively.  These shared libraries must be linked
+differently, with the following commands:
+
+$ ld -b -L/ Curses.o  -o blib/arch/auto/Curses/Curses.sl +origin -lpanel +origin -lmenu +origin -lform +origin -lncurses +b \$ORIGIN
+
+$ ld -b Informix.o dbdimp.o dbdattr.o sqltoken.o sqltype.o ixblob.o odbctype.o kludge.o link.o esqlcver.o esqlc_v6.o -L/ +origin -lifsql +origin -lifasf +origin -lifgen +origin -lifos +origin -lifgls -lc -lm -lcrypt /usr/informix/lib/esql/checkapi.o +origin -lifglx -o blib/arch/auto/DBD/Informix/Informix.sl +b \$ORIGIN
+
+The libraries can be checked with chatr (or ldd).  All the links should be
+$ORIGIN//libncurses.sl and similar.  The default way would produce something
+like /usr/local/lib/libncurses.sl.  Now install these 2 modules.
+
+Next, there is a bug in PAR that prevents added libraries from being run.
+They are unpacked into a /tmp/par-username/cache-xxx directory without
+execute permission.  So, must change PAR-0.976/lib/PAR.pm.  After line
+884 (which says "$par_temp = $1;"), add the following, then rebuild and
+reinstall PAR:
+
+        foreach my $i (<$par_temp/lib*.sl>) {
+            chmod 0755, $i;
+        }
+
+
+Then issue the following command to build the PAR standalone executable:
+
+$ pp -z 9 -l /libncurses.sl -l /libpanel.sl -l /libmenu.sl -l /libform.sl -l /libifglx.sl -l /libifgls.sl -l /libifgen.sl -l /libifasf.sl -l /libifos.sl -l /libifsql.sl -M Curses/Widgets/Label.pm -M Perform/Widgets/TextField.pm bin/perform
+
+
+
+=========================================================================
+"make test" has not been updated, and will likely print many errors.
+
+=========================================================================
+
+USAGE
+"make install" installs scripts "pformbld" and "perform".
+
+To run a Perform script "example.per":
+
+1st have appropriate environment variables set for the database.
+The crucial one is DB_NAME.
+
+
+Here is an example of the environment variables needed for Informix 7.2:
+$ export DB_HOST=$(hostname)
+$ export DBPATH=/usr/informix
+$ export DB_NAME=mydatabase
+$ export DB_CLASS=Informix
+$ export DB_USER=informix
+$ export DB_PASSWORD=mydbpasswd
+$ export DBD_INFORMIX_USERNAME=informix
+$ export DBD_INFORMIX_PASSWORD=$DB_PASSWORD
+$ export DBD_INFORMIX_PASSWORD2=$DB_PASSWORD
+$ export DBD_INFORMIX_USERNAME2=informix
+
+Might also need to set the terminal:
+$ export TERM=vt100
+$ export TERMINFO=/usr/lib/terminfo
+
+And these are optional:
+$ export BGCOLOR=blue
+$ export FIELDBGCOLOR=blue
+$ export DBDATE="Y4MD-"
+
+
+The 2nd step need only be done once.  Create "example.yml" with:
+
+$ pformbld example.per
+
+
+3rd, run the script with:
+
+$ perform example
+
+
+Lastly, if the script calls external C functions, will need to build
+a C executable.  For details, read the comments at the head of 
+Perform/src/perl_perform_tools.c.  Once a source file "cfuncs.ec" with
+the external functions is compiled to an executable "cfuncs", the
+Perform script can be run with those functions with an extra parameter:
+
+$ perform example cfuncs
+
+=========================================================================
+
+Known problems
+==============
+
+problems
+--------
+None known.
+
+minor problems
+--------------
+Help screen doesn't come up in HP-UX.
+
+After a big slow query, the next query is slow.  After fetching something
+like 100,000 rows, the next query will be as slow even if it only fetches
+1000 rows.  If instead, only the smaller query is run, it will be fast.
+If the 1st query is run and then the 2nd query is run twice, the 2nd
+time on the 2nd query will be fast.
+
+Some queries with lookups can be slow.  Each query can actually result
+in several queries being made, and some of those fetch all rows from
+another table to do a lookup.  If the looked up table has many rows,
+then the process can be slow.
+
+May have different behavior on fields with the "picture" attribute.
+Sperform does not do the "picture" attribute correctly.
+
+trivial problems
+----------------
+Different behavior if wildcards are put in a "serial only" field for
+a query.  sperform gives "Error in field" and stays in the field.
+DBIx::Perform tries to run the query, gets and reports a DB error,
+and returns to the main menu.
+
+Reverse color fields on any screen but the first aren't always displayed
+reversed.  Depends on the TERM environment variable.  (And yet the reverse
+coloring always works on the first screen?)
+
+When running under another user acct, somehow Perl was including my
+sandbox in its libraries path, @INC.  Worked around this by removing
+all group and world permission to that directory of mine.  Think it's not
+a problem with DBIx::Perform, but with the environment.
+

@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>Daizu CMS test page</title>
+  <link rel="stylesheet" type="text/css" href="/style/site.css">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+  <style>
+    /* this should get filtered as well: */
+    @import "foo.css";
+  </style>
+  <script type="text/javascript">
+    // This should be ignored by the filtering stuff.  */
+  </script>
+  <script type="text/javascript" language="JavaScript" src="stuff.js"></script>
+ </head>
+ <body>
+
+  <div id="Header"><div class="Box2">
+   <h1>Daizu CMS</h1>
+   <img src="http://example.com/logo.gif" />
+  </div></div>
+
+  <table id="Layout">
+   <tr>
+    <td id="TableTrick"></td>
+    <td id="Content" rowspan="2">
+     <h2>Daizu CMS blog</h2>
+  </table>
+
+  <h3>Miniblog</h3>
+  <p class="Strapline">(nuggets of inanity)</p>
+  <object data="/blog/miniblog.html" width="200" height="400"
+          title="Recent miniblog entries"
+          archive="foo.bar baz.quux">
+   <a href="/blog/2006/02/miniblog/">Miniblog archive</a>
+  </object>
+
+  <form method="get" action="browse.php">
+   <input name="search" type="text" size="30" value="" /><br />
+   <input name="cat" type="hidden" value="0" />
+   <input name="incldead" type="hidden" checked="checked" value="1" />
+   <input type="submit" value="Search Torrents!" style="width:10em" />
+  </form>
+
+<object classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000" codebase="http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0" width="300" height="300" id="foo" align="middle">
+<param name="movie" value="foo.swf?x=1&amp;y=2">
+<param name="allowScriptAccess" value="samedomain">
+<param name="quality" value="high">
+<param name="bgcolor" value="#ffffff">
+<embed src="foo.swf?x=1&amp;y=2" quality="high" bgcolor="#ffffff" width="300" height="300" name="foo" align="middle" allowScriptAccess="samedomain" type="application/x-shockwave-flash" pluginspage="http://www.macromedia.com/go/getflashplayer"></embed>
+</object>
+
+ </body>
+</html>

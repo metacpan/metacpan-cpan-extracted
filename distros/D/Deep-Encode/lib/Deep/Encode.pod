@@ -1,0 +1,90 @@
+=head1 NAME 
+
+Deep::Encode - Bulk encoding and decoding.
+
+=cut
+
+=head1 SYNOPSIS
+
+ use Deep::Encode;
+
+ my $s = [ 1, 2, "string in cp1251 encoding" ];
+
+ # convert to utf8 encoding from cp1251
+ deep_from_to( $s, "cp1251", "utf8" ); 
+
+ deep_utf8_encode( $s ) ; # call utf8::encode on every string in $s
+ deep_utf8_decode( $s ) ; # call utf8::decode on every string in $s
+
+ deep_encode( $s, $encoding );  # call Encode::encode for every string scalar in
+ deep_decode( $s, $encoding );  # call Encode::decode for every string scalar in 
+
+ # utf8 string validity on entire data
+ if ( deep_utf8_check( $s ) ){
+     deep_utf8_decode( $s );
+ }
+ else {
+     croak( "Data not in utf8 encoding" );
+ }
+
+=cut
+    
+=head1 DESCRIPTION
+
+This module allow apply Encode::from_to, utf8::decode, utf8::encode and etc  
+on every string scalar in array or hash recursively
+=head1 FUNCTIONS
+
+=over 4
+
+=cut
+
+=item deep_from_to( $s, $from, $to )
+
+=item deep_utf8_decode( $s )
+
+=item deep_utf8_encode( $s )
+
+=item deep_encode( $s, $encoding );  # call Encode::encode on every string scalar in
+
+=item deep_decode( $s, $encoding );  # call Encode::decode on every string scalar in 
+
+=item deep_utf8_off( $s ); # check off utf8 flag. return number applied items.
+
+=item deep_utf8_upgrade( $s );   # Make same as Encode::upgrade for all strings in $s. return number applied items.
+
+=item deep_utf8_downgrade( $s ); # Make same as Encode::downgrade for all strings in $s. return number applied items.
+
+=item deep_utf8_check( $s ); # return true if all string can be properly decode from utf8
+
+=back
+
+=head1 BUGS and TODO
+
+For now this module can't handle self referrenced structures. 
+This module does not handle hash keys, but values it does.
+Do benchmark.
+
+=cut
+
+=head1 SEE ALSO
+
+L<Encode>, L<utf8>, L<Data::Recursive::Encode> (pure perl implementation)
+
+=cut 
+
+=head1 AUTHOR
+
+ A.G. Grishaev, E<lt>grian@cpan.orgE<gt>
+
+=cut
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by A.G. Grishaev.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

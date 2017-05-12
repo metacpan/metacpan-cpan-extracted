@@ -1,0 +1,5 @@
+libdist-zilla-plugin-launchpadppa-perl (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 9 Jun 2013 20:36:23 +0400

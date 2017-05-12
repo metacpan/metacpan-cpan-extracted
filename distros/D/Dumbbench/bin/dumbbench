@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Dumbbench;
+use Getopt::Long qw/GetOptions/;
+
+sub usage {
+  my $msg = shift;
+  print "$msg\n\n" if defined $msg;
+
+  print <<USAGE;
+Usage: $0 [options] -- command with arguments
+Or:    $0 [options] --code='Perl-code-to-benchmark'
+Or:    $0 [options] --package='Perl-package-with-subs-to-benchmark'
+
+For a full manual of the underlying module, see
+"perldoc Dumbbench"
+
+Options:
+ -p=X
+ --precision=X     Set the target precision (default: 0.10=10%)
+                   Set to 0 to disable.
+ -a=x
+ --absprecision=X  Set the target absolute precision (default: 0)
+                   Set to 0 to disable.
+ -v|--verbose      Increase verbosity. Increases up to three times.
+ -i=X|--initial=X  Set number of initial timing runs (default: 20)
+                   Increase, not decrease this number if possible.
+ -m=X|--maxiter=X  Set a hard maximum number of iterations (default:1000)
+                   If this hard limit is hit, the precision is off.
+ -d=X|--dry-run=X  Set explicit dry-run command or code.
+ --no-dry-run      Disable subtraction of dry runs.
+ --raw             Set raw output mode. Only the final count will be
+                   printed to stdout.
+ -s|--std          Use the standard deviation instead of the MAD as a
+                   measure of variability.
+ --code='code'     Benchmarks Perl code (can be specified multiple times
+                   for multiple benchmarks)
+ --package='package' Perl package of subroutines to benchmark. The
+                   package must define get_subs_to_benchmark() that
+                   returns a list of subroutine names to benchmark
+ --t|table=X       Output timings as a data table suitable for R. Each
+                   column of timings is headed by the code name.
+ --pin-frequency   Advanced option (Linux only): Attempt to use 'sudo'
+                   to pin the CPU frequency on CPUs that can do dynamic
+                   frequency scaling. This improves accuracy, but relies
+                   on a hardcoded location in the /sys/ filesystem.
+                   Use at your own risk.
+USAGE
+  exit(1);
+}
+
+
+our $RelPrecision    = 0.10;
+our $AbsPrecision    = 0;
+our $V               = 0;
+our $InitialTimings  = 20; # more or less arbitrary but can't be much smaller than 6-7 on fundamental grounds
+our $DryRunCmd;
+our $MaxIter         = 1000;
+our $RawOutput       = 0;
+our $UseStdDeviation = 0;
+our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
+our $DataTable       = undef;
+our $NoDryRun        = 0;
+our $Package         = undef;
+our $PinFrequency    = 0;
+our @Code;
+
+Getopt::Long::Configure('bundling');
+GetOptions(
+  'h|help'           => \&usage,
+  'p|precision=f'    => \$RelPrecision,
+  'a|absprecision=f' => \$AbsPrecision,
+  'v|verbose+'       => \$V,
+  'i|initial=i'      => \$InitialTimings,
+  'm|maxiter=i'      => \$MaxIter,
+  'raw'              => \$RawOutput,
+  's|std'            => \$UseStdDeviation,
+  'plot_timings'     => \$PlotTimings,
+  't|table=s'        => \$DataTable,
+  'code=s'           => \@Code,
+  'd|dryrun|dry-run|dry_run=s' => \$DryRunCmd,
+  'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
+  'package=s'        => \$Package,
+  'pin_frequency|pin-frequency'
+                     => \$PinFrequency,
+);
+
+if ($RawOutput) {
+  $V = 0;
+}
+
+usage() if not @Code and not @ARGV and not $Package;
+
+my @CMD = @ARGV;
+
+if ($PlotTimings) {
+  eval "use SOOT";
+  die "Timing distribution plots require the SOOT module" if $@;
+  require Capture::Tiny;
+  my @discarded = Capture::Tiny::capture(sub {
+    SOOT::Init(1);
+  });
+}
+
+my $bench = Dumbbench->new(
+  verbosity            => $V,
+  target_rel_precision => $RelPrecision,
+  target_abs_precision => $AbsPrecision,
+  initial_runs         => $InitialTimings,
+  max_iterations       => $MaxIter,
+  variability_measure  => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
+  subtract_dry_run     => !$NoDryRun,
+);
+
+if (@CMD) {
+  $bench->add_instances(
+    Dumbbench::Instance::Cmd->new(
+      name    => 'cmd',
+      (
+        defined $DryRunCmd
+        ? (dry_run_command => $DryRunCmd, use_shell => 1, command => join(" ", @CMD))
+        : (command => \@CMD)
+      ),
+    ),
+  );
+}
+
+if (@Code) {
+  my $i = 0;
+  $bench->add_instances(
+    map {
+      $i++;
+      Dumbbench::Instance::PerlEval->new(
+        name => 'code' . $i,
+        code => $Code[$i-1],
+      ),
+    } @Code
+  );
+}
+
+if ($Package) {
+  die "Invalid package name [$Package]\n" unless
+    $Package =~ m/\A[A-Z0-9_]+(?:::[A-Z0-9_])*\z/i;
+  eval "require $Package" or die "Could not load package $Package: $@\n";
+  die "get_subs_to_benchmark not defined in $Package"
+    unless $Package->can( 'get_subs_to_benchmark' );
+  my @subs = $Package->get_subs_to_benchmark;
+  foreach my $sub ( @subs ) {
+    unless ( $sub =~ m/\A[A-Z0-9_]+\z/i ) {
+      warn "$sub name is invalid. Skipping.\n";
+      next;
+    }
+    unless ( defined &{"${Package}::$sub"} ) {
+      warn "$sub is not defined in $Package. Skipping.\n";
+      next;
+    }
+
+    $bench->add_instances(
+      Dumbbench::Instance::PerlSub->new(
+        name => $sub,
+        code => \&{"${Package}::$sub"}
+      )
+    );
+  }
+}
+
+SCOPE: {
+  my $frequency_pinner;
+  local $SIG{INT} = sub {undef $frequency_pinner; exit;};
+  if ($PinFrequency) {
+    require Dumbbench::CPUFrequencyPinner;
+    $frequency_pinner = Dumbbench::CPUFrequencyPinner->new;
+    $frequency_pinner->set_max_frequencies($frequency_pinner->min_frequencies->[0]);
+  }
+
+  $bench->run;
+
+}
+
+$bench->report($RawOutput);
+
+if ($PlotTimings) {
+  my @src = (
+    $NoDryRun ? (qw(timings_as_histogram))
+              : (qw(dry_timings_as_histogram timings_as_histogram))
+  );
+  foreach my $instance ($bench->instances) {
+    foreach my $src (@src) {
+      my $hist = $instance->$src;
+      if (defined $hist) {
+        my $cv = TCanvas->new->keep;
+        $cv->cd;
+        $hist->Draw;
+        $hist->keep;
+        $cv->Update;
+      }
+    }
+  }
+
+  $bench->box_plot->show;
+
+  defined($SOOT::gApplication) && 1; # silence warnings;
+  $SOOT::gApplication->Run();
+}
+
+if ($DataTable) {
+  my @timings = map { $_->timings } $bench->instances;
+
+  my $filename = join( '-', map { $_->name } $bench->instances ) . '.dat';
+  open my $fh, '>:utf8', $DataTable
+    or die "Could not open $DataTable: $!\n";
+
+  require List::Util;
+  my $max = List::Util::max( map { $#$_ } @timings );
+
+  say { $fh } join "\t", map { sprintf q("%s"), $_->name } $bench->instances;
+  foreach my $i ( 0 .. $max ) {
+    no warnings 'uninitialized';
+    say { $fh } join "\t", map { $_->[$i] } @timings;
+  }
+  # stuff here to run R to make a plot?
+}
+

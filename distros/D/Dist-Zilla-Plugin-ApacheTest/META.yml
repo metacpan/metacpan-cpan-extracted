@@ -1,0 +1,28 @@
+---
+abstract: 'Dist::Zilla Plugin Bundle That Configures Makefile.PL for Apache::Test'
+author:
+  - 'Michael Schout <mschout@cpan.org>'
+build_requires:
+  Socket: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ApacheTest
+requires:
+  Dist::Zilla::Plugin::DynamicPrereqs: '0'
+  Dist::Zilla::Plugin::MakeMaker::Awesome: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ApacheTest
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-ApacheTest/
+  repository: git://github.com/mschout/dist-zilla-plugin-apachetest.git
+version: '0.03'

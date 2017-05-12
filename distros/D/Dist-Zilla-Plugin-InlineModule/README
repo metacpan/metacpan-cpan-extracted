@@ -1,0 +1,51 @@
+NAME
+
+    Dist::Zilla::Plugin::InlineModule - Dist::Zilla Plugin for
+    Inline::Module
+
+SYNOPSIS
+
+        [InlineModule]
+        module = My::Simple::XS::Module
+        stub = My::Simple::XS::Module::Inline
+        ilsm = Inline::C
+
+DESCRIPTION
+
+    This module provides support for Inline::Module in Dist::Zilla.
+
+KEYWORDS
+
+    module
+
+      A module in lib that uses Inline code. You can specify this keyword
+      multiple times.
+
+    stub
+
+      An Inline::Module stub module. You can specify this keyword multiple
+      times. The default is to append ::Inline to each module keyword.
+
+    ilsm
+
+      The ILSM(s) (Inline Language Support Module) you are using. You can
+      specify this keyword multiple times. The default Inline::C.
+      Inline::CPP is the other most common value.
+
+AUTHORS
+
+    Ingy döt Net <ingy@cpan.org>
+
+    David Oswald <davido@cpan.org>
+
+    Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2014-2015. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

@@ -1,0 +1,8 @@
+40d36c421406388406
+
+master oregonscale 40.d36c421406388406: sensor/gr101.6c[weight]=62.1
+
+
+
+
+

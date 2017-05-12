@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 ea8fdaacb0397985331e9bf3a409b385429aacef COPYRIGHT
+SHA1 a78991d6f9006becad1828d184302eb1ce2d1b44 CREDITS
+SHA1 22b0dcde5641dc783d9480ac7b96efd54ffb8128 Changes
+SHA1 866c433d90865143f44096ac27de35245067e4c2 INSTALL
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 58b376a0860773058de834e36b1f437b19100464 MANIFEST
+SHA1 8523b5a944fa763c8ea0b5d283ce760c6f71a756 META.json
+SHA1 a0bc06ed70dd71d85e951d84e59a22440050054d META.yml
+SHA1 6400c55af2c6a2ca5f8f3c66d37b4ec1291a924e Makefile.PL
+SHA1 509c443753937e2b791255ff38054003a7c6ab7c README
+SHA1 799aa0564b37057c40f44d6b3f25b38c728ccdde TODO
+SHA1 da38afae3f272a399534c7113bdd201a13ad0e13 dist.ini
+SHA1 8ceee552146f96e34395b6e378a48de2bd1e3277 doap.ttl
+SHA1 42a36a5d033056e2a996e3a8a821997eb1044ff7 examples/ddGUI-eg1.png
+SHA1 bb06eb73df4b655dcbd00f4e0d2cce88f5e43484 lib/Data/Dumper/GUI.pm
+SHA1 000e3a7d7562f4362f4e02253bdc55e808f3f764 lib/Reply/Plugin/ddGUI.pm
+SHA1 a08e73da23f2a76c40a2eecbc74c08edfe1b21bb lib/ddGUI.pm
+SHA1 2481635014e76b49ce220c832ec015f312c8e5bb lib/ddGUI/Window.pm
+SHA1 ee649cb342799e15a0113e3fff89909fafa390e7 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlJJ3UgACgkQzr+BKGoqfTkXCACZAZaGOOuPu/neKAHToRFydxi2
+sgUAn1QS6Rm2QF5Kd033FqQNp/m9l0Zk
+=RRPN
+-----END PGP SIGNATURE-----

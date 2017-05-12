@@ -1,0 +1,9 @@
+[TestingAndDebugging::ProhibitNoStrict]
+allow=refs
+
+[-Subroutines::ProhibitSubroutinePrototypes]
+
+[TestingAndDebugging::RequireUseStrict]
+equivalent_modules=Any::Moose
+
+[-ValuesAndExpressions::ProhibitLeadingZeros]

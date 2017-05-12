@@ -1,0 +1,4 @@
+name = "Daioikachan-Client"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

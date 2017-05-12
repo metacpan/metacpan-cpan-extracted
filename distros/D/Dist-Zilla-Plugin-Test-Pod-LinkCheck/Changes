@@ -1,0 +1,19 @@
+Revision history for Dist-Zilla-Plugin-Test-Pod-LinkCheck
+
+1.003     2017-01-09T01:05:37Z
+
+  - Make this an author test rather than a release test. It should pass on all
+    commits, not just before a release. GH #2 (Dave Rolsky)
+
+1.002     2015-07-03T03:56:57Z
+
+  - Add Test::Pod::LinkCheck as a develop phase prereq on distros which use
+    this plugin. GH #1 (Dave Rolsky)
+
+1.001     2011-07-14T23:49:41Z
+
+  - Superficial dist/release changes
+
+1.000     2011-04-12T00:28:34Z
+
+  - Initial release

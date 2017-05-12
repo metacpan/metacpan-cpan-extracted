@@ -1,0 +1,14 @@
+abstract: like CDBI::Plugin::AsFdat.
+author: Atsushi Kobayashi  C<< <atsushi __at__ mobilefactory.jp> >>
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: DBIx-Class-AsDdat
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  DBIx::Class: 0
+  Scalar::Util: 0
+version: 0.02

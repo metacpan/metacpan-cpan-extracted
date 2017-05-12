@@ -1,0 +1,31 @@
+---
+abstract: 'List or install Dist::Zilla authors dependencies as Debian packages'
+author:
+  - 'Dominique Dumont'
+build_requires:
+  Module::Build: '0.34'
+  Path::Tiny: '0'
+  Probe::Perl: '0'
+  Test::Command: '0.08'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.34'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-Authordebs
+requires:
+  Debian::AptContents: '0'
+  DhMakePerl::Utils: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Util::AuthorDeps: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/dod38fr/dist-zilla-app-command-authordebs/issues
+  homepage: https://github.com/dod38fr/dist-zilla-app-command-authordebs
+  repository: https://github.com/dod38fr/dist-zilla-app-command-authordebs.git
+version: '0.003'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,448 @@
+#!/usr/bin/perl -w
+#
+# Copyright (c) 2015 T.v.Dein <tlinden |AT| cpan.org>.
+# All Rights Reserved. Std. disclaimer applies.
+# Artistic License, same as perl itself. Have fun.
+#
+
+
+use Getopt::Long;
+use DBM::Deep::Manager;
+use strict;
+no strict 'refs';
+
+our ($dbfile, $debug, $version, $help, $export, $import, $config);
+our (%dbparams);
+
+Getopt::Long::Configure( qw(no_ignore_case));
+if (! GetOptions (
+		  "export|e=s"      => \$export,
+		  "import|i=s"      => \$import,
+		  "config|c=s"      => \$config,
+		  "version|v"       => \$version,
+		  "help|h"          => \$help,
+		  "verbose|V"       => \$debug
+                 )    ) {
+  &usage;
+}
+
+if ($help){
+  &usage;
+}
+
+if ($version) {
+  print STDERR "dmbdeep version $DBM::Deep::Manager::VERSION\n";
+  exit;
+}
+
+$dbfile = shift;
+
+if ($config) {
+  if (open Y, "<$config") {
+    my $yaml = join '', <Y>;
+    close Y;
+    my $parsed = YAML::Load($yaml);
+    %dbparams = %{$parsed};
+    if (exists $dbparams{perl}) {
+      # there's perl code in the config, run it
+      my $perl = delete $dbparams{perl};
+      my %params; # we expect $perl to define this
+
+      eval $perl;
+      if ($@) {
+	print "Failed to evaluate perl code in $config: $@\n";
+      }
+
+      %dbparams = (%dbparams, %params); # merge them in
+      if (exists $dbparams{file}) {
+	$dbfile = $dbparams{file}; # no commandline $dbfile required
+      }
+      elsif ($dbfile) {
+	$dbparams{file} = $dbfile;
+      }
+      elsif (!exists $dbparams{dbi}) {
+	print STDERR "No 'file' or 'dbi' parameter specified\n";
+	exit 1;
+      }
+    }
+  }
+  else {
+    die "Could not open config $config: $!\n";
+  }
+}
+else {
+  # work with dbfile, assume defaults
+  if (!$dbfile) {
+    &usage;
+  }
+  %dbparams = (
+	       file => $dbfile,
+	       locking   => 1,
+	       autoflush => 1,
+	       num_txns => 10,
+	      );
+}
+
+if ($export) {
+  _export($export, $dbfile, %dbparams);
+  exit;
+}
+if ($import) {
+  _import($import, $dbfile, %dbparams);
+  exit;
+}
+
+# main
+my $db = opendb($dbfile, %dbparams);
+my $shell = getshell($db, $dbfile);
+$shell->inspect();
+exit;
+
+
+
+
+sub usage {
+  print STDERR qq(Usage: dbmdeep [-ceiVhv] [<dbfile>]
+Manage a DBM::Deep database. Options:
+
+  --config=<config>   | -c <config>    yaml config containing connect params
+  --export=<file>     | -e <file>      export db to <file>
+  --import=<file>     | -i <file>      import db from <file>
+  --verbose           | -V             enable debug output
+  --help              | -h             this help message
+  --version           | -v             print program version
+
+If - is specified as <file>, STDIN or STDOUT is used respectively.
+Interactive commands can be piped into dbmdeep as well, e.g.:
+echo "drop users" | dbmdeep my.db.
+
+dbmdeep version $DBM::Deep::Manager::VERSION.
+);
+
+  exit 1;
+}
+
+
+
+
+
+
+
+1;
+
+=head1 NAME
+
+dbmdeep - manage DBM::Deep databases via command line
+
+=head1 SYNOPSIS
+
+ Usage: dbmdeep [-ceiVhv] [<dbfile>]
+ Manage a DBM::Deep database. Options:
+ 
+   --config=<config>   | -c <config>    yaml config containing connect params
+   --export=<file>     | -e <file>      export db to <file>
+   --import=<file>     | -i <file>      import db from <file>
+   --verbose           | -V             enable debug output
+   --help              | -h             this help message
+   --version           | -v             print program version
+ 
+ If - is specified as <file>, STDIN or STDOUT is used respectively.
+ Interactive commands can be piped into dbmdeep as well, e.g.:
+ echo "drop users" | dbmdeep my.db.
+
+
+=head1 DESCRIPTION
+
+B<dbmdeep> is a command line utility which can be used to maintain L<DBM::Deep>
+databases. It is possible to view, modify or delete contents of the database and
+you can export to a L<YAML> file or import from one.
+
+The utility presents an interactive prompt where you enter commands to maintain
+the database, see section B<INTERACTIVE COMMANDS> for more details. Commands can
+also be piped into the tool via STDIN. Example:
+
+ dbmdeep my.db
+ my.db> show
+
+is the same as:
+
+ echo "show" | dbmdeep my.db
+
+=head1 OPTIONS
+
+=over
+
+=item B<--config>
+
+Specify a config file in L<YAML> format. The config may contain special customizations
+for the L<DBM::Deep> instanziation. See section B<CONFIG> for more details.
+
+=item B<--export>
+
+Export the contents of the database to a L<YAML> file. If the specified file name
+is B<->, STDOUT will be used to print the export.
+
+=item B<--import>
+
+Import data from a L<YAML> file. If the database already exists, the contents of
+the import file will be merged with the existing contents, otherwise the database
+will be created.
+
+=item B<--verbose>
+
+Enable debugging output.
+
+=item B<--help>
+
+Print a usage message to STDERR.
+
+=item B<--version>
+
+Print the software version to STDERR.
+
+=back
+
+=head1 CONFIG
+
+A config file is optional. If no config file is specified, B<dbmdeep> makes a couple
+of assumptions about the database: it opens it with the L<DBM::Deep::Storage::File>
+backend with transactions enabled.
+
+Since L<DBM::Deep> allows for a range of options about the storage backend, the B<dbmtree>
+utility supports complete customization using the config file (parameter B<--config>).
+
+Here are couple of examples:
+
+ ---
+ perl: |
+   use Compress::Zlib;
+   %params = (
+       filter_store_key => \&my_compress,
+       filter_store_value => \&my_compress,
+       filter_fetch_key => \&my_decompress,
+       filter_fetch_value => \&my_decompress,
+   );
+   sub my_compress {
+       my $s = shift;
+       utf8::encode($s);
+       return Compress::Zlib::memGzip( $s ) ;
+   }
+   sub my_decompress {
+       my $s = Compress::Zlib::memGunzip( shift ) ;
+       utf8::decode($s);
+       return $s;
+   }
+
+This config implements the sample in L<DBM::Deep::Cookbook#Real-time-Compression-Example>.
+It uses the standard File backend but compresses everything using L<Compress::Zlib>. Note
+that this config only contains one entry: B<perl>, with a multiline value which contains
+perl code. This perl code will be evaluated by B<dbmdeep> at runtime.
+
+Please note, that the hash B<%params> is predefined by B<dbmdeep>, so it must exist and
+must not be local (e.g. don't use: 'my %params'!). The hash may contain anything allowed
+by L<DBM::Deep::new()>.
+
+Also note, that this config doesn't specify a database, so the file name of the database
+must be specified on the command line, eg:
+
+ dbmdeep -c zip.yaml my.db
+
+Another example:
+
+ ---
+ dbi:
+   dsn: dbi:SQLite:dbname=sb.sqlite
+   username:
+   password:
+   connect_args:
+
+Here we use the L<DBM::Deep::Storage::DBI> backend with a sqlite database. You don't need
+to speficy a database file name on the command line in such a case, eg:
+
+ dbmdeep -c sqlite.yaml
+
+Other supported config parameters are: B<editor> which will be used by the interactive
+B<edit> command and B<more> which will be used by interactive commands which display
+large amounts of data.
+
+=head1 INTERACTIVE COMMANDS
+
+=head2 DISPLAY COMMANDS
+
+=over
+
+=item B<list>
+
+Lists the keys of the current level of the database hash.
+
+Shortcut: B<l>.
+
+=item B<show>
+
+Does nearly the same as B<list> but also shows the content of the
+keys. If a key points to a structure (like a hash or an array), B<show>
+whill not display anything of it, but instead indicate, that there'e
+more behind that key.
+
+Shortcut: B<sh>.
+
+=item B<dump>
+
+Dumps out everything of the current level of the database hash.
+
+Shortcut: B<d>.
+
+=item B<get> key | /regex>
+
+Displays the value of B<key>. If you specify a regex, the values of
+all matching keys will be shown.
+
+=back
+
+=head2 NAVIGATION COMMANDS
+
+=over
+
+=item B<enter> key
+
+You can use this command to enter a sub hash of the current hash.
+It works like browsing a directory structure. You can only enter
+keys which point to sub hashes.
+
+Shortcuts: B<cd>
+
+If the key you want to enter doesn't collide with a command, then
+you can also just directly enter the key without 'enter' or 'cd' in
+front of it, eg:
+
+ my.db> list
+ subhash
+ my.db> subhash
+ my.db subhash> dump
+ my.db subhash> ..
+ my.db>^D
+
+If you specify B<..> as parameter (or as its own command like in the
+example below), you go one level up and leave the current sub hash.
+
+=back
+
+=head2 EDIT COMMANDS
+
+=over
+
+=item B<set> key value
+
+Use the B<set> command to add a new key or to modify the value
+of a key. B<value> may be a valid perl structure, which you can
+use to create sub hashes or arrays. Example:
+
+ my.db> set users [ { name => 'max'}, { name => 'joe' } ]
+ ok
+ mydb> get users
+ users =>
+ {
+   'name' => 'max'
+ },
+ {
+   'name' => 'joe'
+ }
+
+B<Please note that the B<set> command overwrites existing values
+without asking>.
+
+=item B<edit> key
+
+You can edit a whole structure pointed at by B<key> with the
+B<edit> command. It opens an editor with the structure converted
+to L<YAML>. Modify whatever you wish, save, and the structure will
+be saved to the database.
+
+=item B<append> key value
+
+This command can be used to append a value to an array. As with the
+B<set> command, B<value> can be any valid perl structure.
+
+=item B<drop> key
+
+Delete a key.
+
+Again, note that all commands are executed without further asking
+or warning!
+
+=item B<pop> key
+
+Remove the last element of the array pointed at by B<key>.
+
+=item B<shift> key
+
+Remove the first element of the array pointed at by B<key>.
+
+=back
+
+=head2 TRANSACTION COMMANDS
+
+See L<DBM::Deep#TRANSACTIONS>.
+
+=over
+
+=item B<begin>
+
+Start a transaction.
+
+=item B<commit>
+
+Save all changes made since the transaction began to the database.
+
+=item B<rollback>
+
+Discard all changes of the transaction.
+
+=back
+
+=head2 MISC COMMANDS
+
+=over
+
+=item B<help>
+
+Display a short command help.
+
+Shortcuts: B<h> or B<?>.
+
+=item B<CTRL-D>
+
+Quit B<dbmdeep>
+
+Shortcuts: B<quit>.
+
+=back
+
+=head1 AUTHOR
+
+T.v.Dein <tlinden@cpan.org>
+
+=head1 BUGS
+
+Report bugs to
+http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBM::Deep::Manager
+
+=head1 SEE ALSO
+
+L<DBM::Deep>
+
+=head1 COPYRIGHT
+
+Copyright (c) 2015 by T.v.Dein <tlinden@cpan.org>.
+All rights reserved.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl itself.
+
+=head1 VERSION
+
+This is the manual page for B<dbmdeep> Version 0.01.
+
+=cut

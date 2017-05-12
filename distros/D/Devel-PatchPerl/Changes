@@ -1,0 +1,675 @@
+==================================================
+Changes from 2012-02-14 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.48 at 2017-02-12 18:32:39 +0000
+-----------------------------------------
+
+  Change: 5a47f8c8ee6a2658264412f66d010fd50820e304
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2017-02-12 18:32:39 +0000
+
+    Updated hints 
+
+  Change: cbdc230953a7bb62852d6f9bd65ea2ebecec935a
+  Author: David Golden <xdg@xdg.me>
+  Date : 2017-02-12 14:29:34 +0000
+
+    Patch Time::HiRes in 5.24.[01] (#26)
+
+    Time::HiRes is broken on threaded darwin in 5.24.0 and 5.24.1. This
+    patch brings in changes from blead that fix it. The patch is
+    unfortunately large, as untangling just the compilation fix from
+    other changes and still getting tests to pass wasn't straightforward. 
+
+-----------------------------------------
+version 1.46 at 2016-11-21 11:02:53 +0000
+-----------------------------------------
+
+  Change: d89ef82256c963746f576c2ce1dfb8ef8bd0aca6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-11-21 11:02:53 +0000
+
+    Updated hints 
+
+-----------------------------------------
+version 1.44 at 2016-08-18 11:38:32 +0000
+-----------------------------------------
+
+  Change: 7438a96d49d498b6bd3752293c4d147d9f3fef49
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-08-18 12:38:32 +0000
+
+    Updated hints for darwin, freebsd and gnu (hurd) 
+
+-----------------------------------------
+version 1.42 at 2016-04-21 16:08:59 +0000
+-----------------------------------------
+
+  Change: af3745be4c87fbf89b59c0a6356a3944b59d6179
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-04-21 17:08:59 +0000
+
+    Update hints file for Darwin 
+
+  Change: 0c03b74346458076f014851f7501e7cb96c4c06d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2016-04-21 17:08:52 +0000
+
+    Don't patch the patchlevel if in Git repository
+
+    This should address https://rt.cpan.org/Ticket/Display.html?id=108689 
+
+  Change: d8048d8ce5280d4ac67a5f99b97d2fc43aef8bef
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2016-01-01 01:41:04 +0000
+
+    Merge pull request #25 from book/master
+
+    Add the proper patch for ext/Errno/Errno_pm.PL in Perl 5.7.2 
+
+  Change: c3e98d2f49d52819b85982e118fda73baaa90070
+  Author: Philippe Bruhat (BooK) <book@cpan.org>
+  Date : 2015-12-30 08:47:59 +0000
+
+    Add the proper patch for ext/Errno/Errno_pm.PL in Perl 5.7.2
+
+    Fixes GH #24 
+
+-----------------------------------------
+version 1.40 at 2015-12-16 23:26:59 +0000
+-----------------------------------------
+
+  Change: 2470c63125a797ae436d0bc3cca165e5e38ba268
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-12-16 23:26:59 +0000
+
+    Update hints files 
+
+  Change: 6571d84e655c6feddb346beb46d44a87d41c1ef7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-09-29 20:20:58 +0000
+
+    Add BuiltbyPatchPerl entry to %Config::Config 
+
+-----------------------------------------
+version 1.38 at 2015-07-03 18:12:12 +0000
+-----------------------------------------
+
+  Change: 049fc9226c524846e51c1bdd4e2b17e97e05667d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-07-03 19:12:12 +0000
+
+    Fix the patches introduced in the last release 
+
+-----------------------------------------
+version 1.36 at 2015-07-03 11:48:26 +0000
+-----------------------------------------
+
+  Change: 61c7a95065f599b9dc31c8791efab770ad7fba94
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-07-03 12:48:26 +0000
+
+    Added Errno GCC5 patches as far back as v5.6.0 
+
+-----------------------------------------
+version 1.34 at 2015-04-25 15:23:56 +0000
+-----------------------------------------
+
+  Change: 89bb0b402fb68d598d7f0499e18540fb4a1dae0f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-04-25 16:23:56 +0000
+
+    Release engineering for 1.34 
+
+  Change: 5677b4c71e15af57d8fb359fda214f12abff88ba
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-04-17 17:19:35 +0000
+
+    Merge pull request #19 from wolfsage/topic/various-fixes
+
+    Topic/various fixes 
+
+  Change: 7e270ee6d6e9fe5b65a8794fc8884bcfa405e0b0
+  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
+  Date : 2015-04-17 07:10:05 +0000
+
+    Specific patch for 5.005 
+
+  Change: 97f4c4059de179e581a695ec7aa41a078cb4dddd
+  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
+  Date : 2015-04-17 06:58:28 +0000
+
+    Specific patches for 5.005_02 and 5.005_01 
+
+  Change: 91defd96b9246858f1f386e42f35aa5eea1b5c53
+  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
+  Date : 2015-04-17 06:14:25 +0000
+
+    Allow building of 5.005_0[34] on linux. 
+
+  Change: d81295c3de45538390e9a6573e371382a2d65026
+  Author: Matthew Horsfall (alh) <wolfsage@gmail.com>
+  Date : 2015-04-17 06:10:44 +0000
+
+    Updated hints files, necessary to build older Perls 
+
+-----------------------------------------
+version 1.32 at 2015-03-30 15:52:27 +0000
+-----------------------------------------
+
+  Change: 20838d9989acda6d0ed987ab6daa9b740aaaecf4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-30 16:52:27 +0000
+
+    Favour gpatch over patch
+
+    This should work better on older versions of Solaris
+
+    Updated the included hints to latest from blead 
+
+-----------------------------------------
+version 1.30 at 2014-12-23 22:41:27 +0000
+-----------------------------------------
+
+  Change: b24bdbf3acebd609a1765de0f527429b139074bb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-12-23 22:41:27 +0000
+
+    Release engineering for 1.30 
+
+  Change: 01c501f02b6c02d952d904e9d6c09362aa083191
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-12-23 21:31:37 +0000
+
+    Merge pull request #18 from
+    dagolden/add-patchperl-version-to-patchlevel
+
+    add Devel::PatchPerl version to list of local patches 
+
+  Change: 86a0e5b2de764deb73c641c4ce6f69df1f0b79e9
+  Author: David Golden <dagolden@cpan.org>
+  Date : 2014-12-23 14:38:10 +0000
+
+    add Devel::PatchPerl version to list of local patches 
+
+-----------------------------------------
+version 1.28 at 2014-10-03 08:37:00 +0000
+-----------------------------------------
+
+  Change: 880fb900db81dac342b2a90087afda61934b4d32
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-03 09:37:00 +0000
+
+    Fix the patch for v5.18.3 
+
+-----------------------------------------
+version 1.26 at 2014-10-02 20:17:19 +0000
+-----------------------------------------
+
+  Change: 92b1112f71c93511f92e9d05a3b8e5e2794efe87
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-02 21:17:19 +0000
+
+    Release engineering for 1.26 
+
+  Change: bd03bcc953cc4fde772216b42a11752599268223
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-02 21:16:51 +0000
+
+    Update included hints files 
+
+  Change: b31fee861de7216f54bb3a5e220fea7bccf48eba
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-02 21:13:57 +0000
+
+    Fix META.json on v5.18.3 
+
+  Change: 6641a5dbcfe4d3159d51488c9134f23b5c303755
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-10-02 21:04:35 +0000
+
+    Merge pull request #17 from threebytesfull/fix_preprocessing
+
+    Patch 5.6, 5.8 and 5.10 to use freestanding preprocessor 
+
+  Change: 35feb730a91d6e065b8c4001b9233461923aacd3
+  Author: Rufus Cable <rufus@threebytesfull.com>
+  Date : 2014-09-24 17:08:10 +0000
+
+    Patch 5.6, 5.8 and 5.10 to use freestanding preprocessor 
+
+-----------------------------------------
+version 1.24 at 2014-05-31 08:38:25 +0000
+-----------------------------------------
+
+  Change: 0e1ef35c5ba5de4b93191c7d6c26628861234214
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-31 09:38:25 +0000
+
+    Add COW speedup fix for v5.20.0
+
+    http://perl5.git.perl.org/perl.git/commit/ce861ea79 
+
+-----------------------------------------
+version 1.22 at 2014-04-23 21:15:10 +0000
+-----------------------------------------
+
+  Change: 7c1a27bdbab0089738942aaae5cf0a741bc5b377
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-04-23 22:15:10 +0000
+
+    Look for gpatch if patch is not found 
+
+-----------------------------------------
+version 1.20 at 2014-03-21 14:16:30 +0000
+-----------------------------------------
+
+  Change: 664f16a3e9c1b27b711dbd424a209d985b7801e4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-03-21 14:16:30 +0000
+
+    Update included hints files 
+
+-----------------------------------------
+version 1.18 at 2014-02-20 20:02:45 +0000
+-----------------------------------------
+
+  Change: 659a308a8a5c6b0f87b9c16875ce71fca8e04c9e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-02-20 20:02:45 +0000
+
+    Update included hints to v5.19.9 level 
+
+-----------------------------------------
+version 1.16 at 2014-01-17 10:59:57 +0000
+-----------------------------------------
+
+  Change: 8a3d35406361540497404dd1a3825394fd47f8d7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-01-17 10:59:57 +0000
+
+    Release engineering for 1.16 
+
+  Change: 7e4ab3377588f8f63de4ddc19d1f4cbf966a896c
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-01-16 16:55:37 +0000
+
+    Merge pull request #16 from haarg/extra-phony
+
+    add extra phony targets to help case insensitive file systems 
+
+  Change: c1be34c45a96334f90eb97020deb278e25de12cd
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-01-16 16:54:50 +0000
+
+    Merge pull request #15 from haarg/db-configure
+
+    Configure should check same Berkeley DB header DB_File uses 
+
+  Change: fd70e1b3b18dd093a25442c0c6fb473d1b06fee6
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2014-01-16 19:34:54 +0000
+
+    add extra phony targets to help case insensitive file systems 
+
+  Change: da7a9f9303fd2fc4a8668660893b0dc0c2229751
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2014-01-14 11:54:06 +0000
+
+    Configure should check same Berkeley DB header DB_File uses 
+
+-----------------------------------------
+version 1.14 at 2013-10-20 15:38:09 +0000
+-----------------------------------------
+
+  Change: 0b1f81c0ce692a37bc8552cd278e90c0d0a3122c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-10-20 16:38:09 +0000
+
+    RT#89635 Configure on 5.6 uses sort +N, which isn't supported by
+    modern sort(1)
+
+    The two instances of 'sort -n +1' in Configure on perl 5.6 need to be
+    replaced with the portable equivalent used since perl 5.7.3:
+
+    ($sort -n -k 2 2>/dev/null || $sort -n +1)
+
+    This works on both old and new sorts. 
+
+  Change: 9989391d5011cb1d518db37a32e9b8eeefafcc9a
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-25 12:19:09 +0000
+
+    Merge pull request #14 from haarg/gconvert-5.6
+
+    better gconvert detection 
+
+  Change: 0003e6aeaf8c055074b75ceea5accb22025ce776
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2013-09-25 10:30:53 +0000
+
+    better gconvert detection 
+
+-----------------------------------------
+version 1.12 at 2013-09-15 20:31:14 +0000
+-----------------------------------------
+
+  Change: 96317bf956f3b5ff36a30c41e293ff134101c6dc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-15 21:31:14 +0000
+
+    Add GNU/Hurd hints file 
+
+-----------------------------------------
+version 1.10 at 2013-08-22 23:10:22 +0000
+-----------------------------------------
+
+  Change: 28b9d595ae1f44274a07bb8e845ac7173632b28d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-23 00:10:22 +0000
+
+    Only try to change perms if the hints file already exists 
+
+-----------------------------------------
+version 1.08 at 2013-08-22 22:56:58 +0000
+-----------------------------------------
+
+  Change: fc01a16685418d3d2d20621c717836b1172982d3
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-22 23:56:58 +0000
+
+    Support Bitrig all the way back to at least v5.8.9 
+
+-----------------------------------------
+version 1.06 at 2013-08-22 21:03:11 +0000
+-----------------------------------------
+
+  Change: 045c78ad316cddf498ed22c05ce80430d2f51835
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-22 22:03:11 +0000
+
+    Fix issues with Bitrig patch and version normalisation 
+
+-----------------------------------------
+version 1.04 at 2013-08-22 20:48:36 +0000
+-----------------------------------------
+
+  Change: e53776114d6df0e124f1a60b8c313caa29a37166
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-22 21:48:36 +0000
+
+    Remove Test::Compile from dzil configuration 
+
+-----------------------------------------
+version 1.02 at 2013-08-22 20:12:47 +0000
+-----------------------------------------
+
+  Change: cdd0d8342146cdcb03638aadb3ccb67cb96f70e1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-22 21:12:47 +0000
+
+    Handle version number comparisons in a saner manner 
+
+  Change: 0120ad2d8b6ec5091ed47771c656e812ff991f37
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-22 19:38:13 +0000
+
+    Added support for Bitrig 
+
+-----------------------------------------
+version 1.00 at 2013-07-25 10:37:01 +0000
+-----------------------------------------
+
+  Change: 97f7d7261e9156edba84a2e45b5d0b7d9dd9aec8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-25 11:37:01 +0000
+
+    Set PATCH_GET env var to 0 to stop patch doing VCS madness 
+
+-----------------------------------------
+version 0.98 at 2013-07-25 08:53:30 +0000
+-----------------------------------------
+
+  Change: 5e3d365324bb2ffa0ff756cb021fc98c2de87e57
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-25 09:53:30 +0000
+
+    Bump to version 0.98 
+
+  Change: 0b699704fd0bfe61274270253a758e15157a0e4b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-25 09:51:26 +0000
+
+    Fix issues with patching Configure under Solaris
+
+    https://github.com/gugod/App-perlbrew/issues/355 
+
+-----------------------------------------
+version 0.96 at 2013-07-08 06:53:34 +0000
+-----------------------------------------
+
+  Change: a78109ca3e2c9338bf98185c2014ba2be4a04942
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-08 07:53:34 +0000
+
+    Fix patch applying for v5.18.0 
+
+-----------------------------------------
+version 0.94 at 2013-07-07 13:45:00 +0000
+-----------------------------------------
+
+  Change: c5257739abd2cde575036ba9b105977679a30273
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-07 14:45:00 +0000
+
+    Added commit 4149c7198d9b78d861df289cce40dd865cab57e7
+
+    Fixes a regmatch pointer 32-bit wraparound regression in v5.18.0 
+
+-----------------------------------------
+version 0.92 at 2013-07-07 13:29:48 +0000
+-----------------------------------------
+
+  Change: 8881838495367f05f599939d4e1eac86106785fa
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-07 14:29:48 +0000
+
+    Update Midnight BSD hints for 0.4-RELEASE 
+
+-----------------------------------------
+version 0.90 at 2013-05-18 22:58:06 +0000
+-----------------------------------------
+
+  Change: fe0a97026ae5a56374b1d9a5968554a0c9b693bc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-18 23:58:06 +0000
+
+    Bumped version to 0.90 
+
+  Change: cc5a37b1298b45fe2e74a4db92e85561a12f1052
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-18 23:50:04 +0000
+
+    Added gcc m64 fixes for Solaris 11
+
+    http://perl5.git.perl.org/perl.git/commitdiff/1ddb6a4
+
+    http://perl5.git.perl.org/perl.git/commitdiff/767f54d 
+
+  Change: 815ff70a8a86c97742a0afdc5a092c590c729e80
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-18 22:04:29 +0000
+
+    Update hpux hints 
+
+  Change: 089592af98239448a956586cf8998dee7b2ab7b6
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-18 21:46:55 +0000
+
+    Added hints audit tool 
+
+  Change: 842e6a11a1dac1adfa253a4a9dbd60d53286fa8e
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-18 18:24:52 +0000
+
+    Added 'hints' function to Devel::PatchPerl::Hints 
+
+-----------------------------------------
+version 0.88 at 2013-05-16 12:02:55 +0000
+-----------------------------------------
+
+  Change: 7a381f7a969eeb683343ddc3511169298aa19889
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-16 13:02:55 +0000
+
+    Make determine_version() available in the public API
+
+    https://github.com/bingos/devel-patchperl/issues/12 
+
+-----------------------------------------
+version 0.86 at 2013-05-08 15:39:07 +0000
+-----------------------------------------
+
+  Change: 50d0a6e5c2b5f25de596463f219c78204e0ae477
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-08 16:39:07 +0000
+
+    Bump version 
+
+  Change: 09c3d04f1eddb60cdbba7b597a9c114c7396be2f
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-05-08 08:11:48 +0000
+
+    Merge pull request #11 from hirose31/prevent-premature-hsplit
+
+    Add patch on prevent premature hsplit for Perl 5.8.[89], 5.10.1,
+    5.12.5 
+
+  Change: 19a38ec13e6634a4707bb5043da051b6c551c23f
+  Author: HIROSE Masaaki <hirose31@gmail.com>
+  Date : 2013-05-08 13:52:42 +0000
+
+    Add patch on prevent premature hsplit for Perl 5.8.[89], 5.10.1,
+    5.12.5 
+
+-----------------------------------------
+version 0.84 at 2013-03-08 21:35:14 +0000
+-----------------------------------------
+
+  Change: 7b5f0d6c51dbff9a22f250813e230816d3d36f08
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-03-08 21:35:14 +0000
+
+    Remove requirement on IPC::Cmd
+
+    This should make the perlbrew peeps happy 
+
+-----------------------------------------
+version 0.82 at 2013-02-25 21:38:08 +0000
+-----------------------------------------
+
+  Change: 3e146301433f8098460dc6fd5d1930fc48c2903a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-25 21:38:08 +0000
+
+    Update Linux hints 
+
+-----------------------------------------
+version 0.80 at 2013-02-25 12:04:03 +0000
+-----------------------------------------
+
+  Change: ef4dfcccd90f7f786847998cba8891b69fd5a2e1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-25 12:04:03 +0000
+
+    Bump version to 0.80 
+
+  Change: 4e3020edfa3b3adcb79dd4d3c8e410f8cb12bf53
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-25 12:02:09 +0000
+
+    Ensure that the linux hints file gets updated for kfreebsd as well 
+
+  Change: 52fde6650e6a6324c7817fb81d9d08260f73d96a
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-25 11:41:38 +0000
+
+    Add updated hints for gnukfreebsd 
+
+-----------------------------------------
+version 0.78 at 2013-02-17 16:58:31 +0000
+-----------------------------------------
+
+  Change: 0c2be36694492d5824f7704cf9d3473c28228d99
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-02-17 16:58:31 +0000
+
+    Added midnightbsd hints file which supports 0.4 
+
+-----------------------------------------
+version 0.76 at 2012-08-27 23:29:08 +0000
+-----------------------------------------
+
+  Change: 9f71defdd149f82f3a243dfd025802dcf0e34c2a
+  Author: Ruslan Zakirov <ruz@bestpractical.com>
+  Date : 2012-08-28 00:29:08 +0000
+
+    [rt.cpan.org #79223] bad patch for 5.8.9 in 0.74
+
+    Patch for perlio.c is for patch -p1 while module runs -p0.
+
+    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
+
+-----------------------------------------
+version 0.74 at 2012-07-24 18:32:11 +0000
+-----------------------------------------
+
+  Change: b2b8a945b03d573501700db99ae6f2b32c2cabfc
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-07-24 19:32:11 +0000
+
+    Add v5.8.9 patch
+
+    [perl #63886] 5.8.9 binary incompatibility with PL_perlio_mutex
+
+    Applied as:
+
+    commit 03fe696d61d94bd59d878a9f81b0af85465d7e1e Author: From: Edward
+    Moy <emoy@apple.com> Date: Sun Jul 8 23:01:23 2012 -0700 
+
+-----------------------------------------
+version 0.72 at 2012-06-04 23:44:17 +0000
+-----------------------------------------
+
+  Change: fcfe67838eea00f8108f80ce0cecacd014df6407
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-06-05 00:44:17 +0000
+
+    Clarify in the POD, we only facilitate building not testing 
+
+-----------------------------------------
+version 0.70 at 2012-05-15 07:37:48 +0000
+-----------------------------------------
+
+  Change: 1e16483dc23a38624187dd4b1c65a6dff2914fad
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-05-15 08:37:48 +0000
+
+    Updated Linux hints which includes gcc search libraries localisation
+    fix 
+
+-----------------------------------------
+version 0.68 at 2012-04-03 09:06:44 +0000
+-----------------------------------------
+
+  Change: e261b60280ae83ce7a643f5ebf1e33628e3e5660
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2012-04-03 10:06:44 +0000
+
+    Updated hints files, includes support for NetBSD 6.* 
+
+=================================================
+Plus 33 releases after 2012-02-14 00:00:00 +0000.
+=================================================

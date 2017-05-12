@@ -1,0 +1,33 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Test-Synopsis
+
+2.000007  2016-06-11
+  - Make this an author test instead of a release test [autarch: GH #5]
+
+2.000006  2015-01-22
+  - Remove dependency on Moose::Autobox in tests [kentnl; GH #4]
+
+2.000005  2014-08-03
+  - Enforce a runtime dependency on Test::Synopsis [dolmen; gh-3]
+
+2.000004  2013-08-03
+  - Don't shoot ourselves in the foot in tests [kentnl; GH #2]
+
+2.000003  2013-04-09
+  - Check only for our own deprecation warnings
+
+2.000002  2012-06-16
+  - Declare Dist::Zilla dependency
+  - Use a decimal version number
+
+2.0.1     2011-09-07
+  - Packaging updates
+
+v2.0.0    2011-09-07
+  - Renamed to Dist::Zilla::Plugin::Test::Synopsis
+
+1.101420  2010-05-22 18:19:47 Europe/Vienna
+  - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+  - list Test::Synopsis in dist.ini so we don't use() it anymore
+
+1.100700  2010-03-11 00:23:16 Europe/Vienna
+  - original version

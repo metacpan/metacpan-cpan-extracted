@@ -1,0 +1,20 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Data/Float.pm
+t/class.t
+t/const.t
+t/copysign.t
+t/hex.t
+t/id_cmp.t
+t/nextafter.t
+t/parts.t
+t/pod_cvg.t
+t/pod_syn.t
+t/pow2.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,56 @@
+{
+   "abstract" : "Data::SearchEngine backend for Solr",
+   "author" : [
+      "Cory G Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-SearchEngine-Solr",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : 0,
+            "Data::SearchEngine" : "0.28",
+            "Data::SearchEngine::Item" : 0,
+            "Data::SearchEngine::Paginator" : 0,
+            "Data::SearchEngine::Results" : 0,
+            "Data::SearchEngine::Results::Spellcheck::Suggestion" : 0,
+            "Moose" : 0,
+            "Time::HiRes" : 0,
+            "WebService::Solr" : "0.11"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::SearchEngine::Query" : 0,
+            "HTTP::Headers" : 0,
+            "HTTP::Response" : 0,
+            "Test::More" : 0,
+            "WebService::Solr::Response" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/gphat/data-searchengine-solr",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gphat/data-searchengine-solr.git",
+         "web" : "https://github.com/gphat/data-searchengine-solr"
+      }
+   },
+   "version" : "0.20"
+}
+

@@ -1,0 +1,8 @@
+0.02 
+- 2006-01-19T11:27:37+0800
+- Add operator overloading. Stringifing now return the value of next
+  element. Many of others ore implemented too
+----
+0.01
+- Initial Release
+- implement OO interface, an ->next() method that works perfectly.

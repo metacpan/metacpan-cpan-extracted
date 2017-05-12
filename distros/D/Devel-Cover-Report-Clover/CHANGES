@@ -1,0 +1,120 @@
+Devel::Cover::Report::Clover.pm history
+
+Release 1.01 - 30th December 2016
+ - Updated versioning for CPAN indexing
+
+Release 1.00 - 30th December 2016
+ - Added branch, statement, and subroutine details thanks to
+   Oliver Trosien
+
+Release 0.35 - 13th March 2012
+ - Fix RT#75376 thanks to Olivier Mengué - unit tests
+   pass when using local::lib based installs
+
+Release 0.34 - 27th February 2012
+ - dist version mistake
+
+Release 0.32 - 27th February 2012
+ - use the package name 'main' instead of ''
+ - sort the package names
+
+Release 0.31 - 25th October 2011
+ - BUG: if summary was empty the script would die
+ - minor documentation adjustments
+
+Release 0.30 - 18th October 2011
+ - BUG: report was being written twice for no reason
+ - BUG: branch+condition needs to be the default
+ - BUG: make sure to pass project name from the command line
+ - BUG: element (and covered element) totals were wrong and sometimes
+   even zero
+ - More tests for end to end testing to ensure files are written
+ - Refactored metrics call to reduce duplication.  Tests to
+   help test this refactor.
+ - a few less undef warnings
+
+Release 0.29 - 17th October 2011
+ - Decided to take out command existance prereq testing
+   out of the Build.PL and Makefile.PL sections.  Will 
+   try and solve the missing command problems in other ways
+   to prevent cpan tests from exploding
+
+Release 0.28 - 17th October 2011
+ - One more place to find 'perl' binary '$^X'
+ - One more place to find 'cover' binary '$Devel::Cover::Inc::Base'
+
+Release 0.27 - 15th October 2011
+ - Per http://wiki.cpantesters.org/wiki/CPANAuthorNotes, exit(0)
+   if we're running in automated testing mode and the 'cover'
+   command line program was not found (it's a dependency for testing).
+
+Release 0.26 - 15th October 2011
+ - Try and find perl related commands based on the Config module
+   paths rather than the unix 'which' command. Same with the
+   perl command.
+
+Release 0.25 - 15th October 2011
+ - I'm not good at TAP::Harness
+
+Release 0.24 - 15th October 2011
+ - tests in verbose mode failed cause of system command STDOUT
+   spewing.
+ - use TAP::Harness for testing the tests instead of 'prove'
+
+Release 0.23 - 15th October 2011
+ - test setup script no longer blindly tries to delete a (nonexistant)
+   cover_db.
+
+Release 0.22 - 15th October 2011
+ - clover.tt file no longer missing when using Makefile.PL
+
+Release 0.21 - 15th October 2011
+ - Fix for tests for working paths containing spaces 
+ - Added explicit license file .  License was listed in makefile but
+   some tools like it spelled out in a text file.
+
+Release 0.20 - 15th October 2011
+ - Fairly substantial change to the Clover stats for 'conditionals' /
+   'coveredconditionals'.  Previous to this version, it was only the
+   Devel::Cover 'branch' metric.  Now it is the summation of the
+   'branch' and 'condition' criterion.
+ - Bug fixed where Class/FileFragment objects were not being created
+   with a builder.
+ - Lots more unit tests
+
+Release 0.11 - 14th October 2011
+ - prevent tests from being indexed on CPAN
+ - support older template toolkit versions w/o 'xml' filter
+ - Test::MockTime is now only recommended
+ - die if test system() calls fail
+ - more specific testing of keys in the summarize() methods
+
+Release 0.10 - 13th October 2011
+
+ - Backend refactor to promote testability
+
+   A lot of these changes were made to help map the Perl package model
+   into the Java package model.
+
+   In Perl, a "package" is named, for example, Devel::Cover.  In Java,
+   the package would be "Devel" and the class would be "Cover".  Many
+   tools and file formats based on Java tech presume this sort of
+   hierarchy.  Thus, the backend was rewritten to take this into account
+   for the Clover xml file format.
+
+   The backend also allows metric summaries to be calculated from the
+   Devel::Cover database on particular ranges in a source file rather
+   than presuming they should be calculated on the entire file all at
+   once.
+
+ - Also, noted that the extended format of the file with per-line
+   annotations is really no use to implement.  After digging into
+   the source code of the Clover ant stuff for the Jenkins plugin,
+   it only parses the metric summaries.
+
+Release 0.09 - 11th October 2011
+ - refactor template variable creation to help make testing easier
+ - fixed a bug with methods_covered being set improperly to methods
+
+Release 0.08 - 11th October 2011
+ - first stable release

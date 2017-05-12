@@ -1,0 +1,9 @@
+3000f00006000b
+
+master unknown 30.00f00006000b
+
+RFXMeter parity error 10 != 11
+
+
+
+

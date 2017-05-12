@@ -1,0 +1,100 @@
+package Data::MuForm::Manual::Defaults;
+# ABSTRACT: form defaults documentation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Defaults - form defaults documentation
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+How to set defaults for your fields.
+
+=head1 Defaults
+
+Defaults for form fields come from a number of different places. The simplest
+way to set a field's default is on the field definition:
+
+   has_field 'foo' => ( type => 'Text', default => 'my_foo' );
+   has_field 'select_many' => ( type => 'Multiple', default => [1, 2, 3] );
+
+You can also set the default for a field with a method in the form with the name
+'default_<field_name>', where any periods in the field name are replaced
+with underscores.
+
+   has_field 'foo';
+   sub default_foo { 'my_default' }
+
+Or a method set with 'methods':
+
+   has_field 'foo' => ( methods => { default => \&my_default } );
+   sub my_default { 'my_default' }
+
+For forms where you pass in a 'model' (usually a database row object), the
+values in that object will be used preferentially as defaults; if an accessor exists
+in the 'model' object, then the defaults in a field definition won't be used.
+
+   $form->process( model => $row, params => {} );
+
+You can provide some defaults from the model and some from 'init_values'. If an
+accessor doesn't exist in the model, init_values will be used.
+
+   $form->process( model => $row, init_values => $init_values, params => {} );
+
+If you provide an empty row object for 'create' type
+actions, the row is not used for defaults (unless you override the
+'use_model_for_defaults' sub), so you can provide defaults in the
+init_values.
+
+   $form->process( model => $empty_row, init_values => $init_values,  params => {} );
+
+Note: Do NOT set select field defaults by explicitly setting 'selected' or 'checked'
+in the options. It will not work properly. Use one of the default methods discussed above.
+
+=head2 Defaults when processing params
+
+Normally when a form is posted, the params will contain all the values
+that are necessary to fill in the form. However, when a form is used in
+an API-like fashion, such as complex search forms, sometimes it is
+convenient to only provide particular params and let the others use
+defaults. If there is a default provided for a non-submitted param (except
+checkboxes and selects) it will be used to fill-in-the form unless the
+'skip_fields_without_input' flag has been set.
+
+=head2 Query parameters for defaults
+
+If you have a posted form and also some query parameters, it generally doesn't
+work well to provide them both as 'params', because it will confuse the issue
+of whether the form has been submitted or not, and you risk getting doubled up
+parameters. Using init_values for the query parameters may work in that case.
+You can also explicitly set the 'submitted' flag on the process call.
+
+    $form->process( submitted => ( $c->req->method eq 'POST' ), params => $c->req->params );
+
+Note that in Catalyst, there are 'query_parameters' and 'body_parameters'. The
+'parameters' contains both 'query_parameters' and 'body_parameters'. Other
+web frameworks probably have similar distinctions.
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,139 @@
+<html>
+  <head>
+    <title>Stag - Structured Tag Library</title>
+  </head>
+
+  <body>
+    <h1>Stag - Structured Tag Library</h1>
+
+    <table>
+      <tr>
+          <td valign="top" bgcolor="#000000">
+            <img src="images/celtic-stag.gif"></img>
+          </td>
+          <td>
+
+            The Stag project currently consists of two perl modules,
+            both of which are available from <a href="http://www.cpan.org">CPAN</a> or <a href="http://sourceforge.net/projects/stag">sourceforge</a>:
+
+            <h3>Data::Stag</h3>
+
+            This module is for manipulating data as recursively
+            nested tag/value pairs (<b>S</b>tructured <b>tag</b>s or <b>S</b>imple <b>T</b>ree
+            <b>ag</b>greggates). At this time there is only a perl
+            implementation, <a href="http://search.cpan.org/perldoc?Data::Stag">Data::Stag</a>, but C and Lisp implementations
+            are planned.
+
+            <br></br>
+            <br></br>
+            Stags can easily be represented as XML or as lisp-style
+            S-expressions, or using the Stag native indented text
+            format. They can also be represented in perl using nested
+            arrays.
+
+            <h3>DBIx::DBStag</h3>
+
+            This module is for conversion between relational
+            representations and hierarchical (Stag)
+            representations. SQL query results are automatically
+            decomposed into the relations and a hierarchical structure
+            is inferred. This modules also allows you to create SQL
+            templates - a powerful way of reusing SQL statements
+            joining multiple tables.
+
+            <br>
+            </br>
+            
+            <a href="http://search.cpan.org/perldoc?DBIx::DBStag">DBIx::DBStag</a>
+
+          </td>
+        </tr>
+    </table>
+
+    <hr>
+    </hr>
+
+    <table>
+        <tr>
+          <td bgcolor="#FF8888">
+            <a
+	       href="http://www.godatabase.org/cgi-bin/ubiq/ubiq.cgi">UBIQ Query Interface</a>
+          </td>
+          <td>
+            A demo of DBStag for mapping query results to hierarchical
+            tag-value data. This interface provides WWW access to a
+            number of bioinformatics databases (Gene Ontology, Ensembl, Chado,
+            BioSQL, GadFly). Templates can be selected, or you can
+            feed in your own SQL.
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#FF8888">
+            <a href="http://sourceforge.net/projects/stag">Stag
+              project page on Sourceforge</a>
+          </td>
+          <td>
+            Here you can find the Stag CVS repository, mail lists, etc
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#FF8888">
+            <a
+               href="http://www.fruitfly.org/~cjm/rel-talk/dbistag.html">DBStag Tutorial</a>
+          </td>
+          <td>
+            Brief tutorial on basic DBStag usage for biological
+	    databases.
+	    (slightly out of date - some aspects of DBStag may have changed)
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#FF8888">
+            <a href="http://search.cpan.org/perldoc?DBIx::DBStag::Cookbook">DBIx::DBStag::Cookbook</a>
+          </td>
+          <td>
+            DBStag cookbook - shows how to generate a normalised
+            relational db from an XML source (the CIA world factbook),
+            create your own SQL templates and build a WWW query
+            interface
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#FF8888">
+            <a href="http://search.cpan.org/perldoc?DBIx::DBStag::SQLTemplate">DBIx::DBStag::SQLTemplate</a>
+          </td>
+          <td>
+            The POD manpage describing SQL templates - a powerful way
+            of reusing complex SQL statements
+          </td>
+        </tr>
+
+        <tr>
+          <td bgcolor="#FF8888">
+            <a href="stag-poster.html">Stag Poster</a>
+          </td>
+          <td>
+            DBStag poster from Genome Informatics 2003 at Cold Spring Harbor
+            Laboratory (large image)
+          </td>
+        </tr>
+    </table>
+
+    <hr>
+    </hr>
+    <a href="http://sourceforge.net"> 
+      <img src="http://sourceforge.net/sflogo.php?group_id=68482&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></img></a>
+   
+    <hr>
+    </hr>
+    <address><a href="mailto:cjm@fruitfly.org">chris mungall</a></address>
+<!-- Created: Tue Dec  3 11:47:11 PST 2002 -->
+<!-- hhmts start -->
+Last modified: Mon Apr 12 11:33:36 PDT 2004
+<!-- hhmts end -->
+  </body>
+</html>

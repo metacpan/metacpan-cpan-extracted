@@ -1,0 +1,12 @@
+Device-BCM2835-Timer
+
+Access to the Raspberry Pi's internal 1 MHz timer.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make install

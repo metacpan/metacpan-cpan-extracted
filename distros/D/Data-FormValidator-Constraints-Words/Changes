@@ -1,0 +1,47 @@
+Changes log for Data-FormValidator-Constraints-Words
+====================================================
+
+0.10    2014-12-04
+        - fixed prerequisite version.
+
+0.09    2014-10-02
+        - fixed license fields in META.json to be lists.
+        - extended META test suite.
+        - we now require minimum version of Data::FormValidator, due to use
+          of 'constraint_methods' in tests.
+
+0.08    2014-07-27
+        - promote prerequisite Data::FormValidator to requires.
+        - fixed distribution name in metadata.
+
+0.07    2014-02-09
+        - added USERNAME and PASSWORD, and associated methods.
+
+0.06    2013-02-03
+        - removed Artistic file.
+        - change file dates changed to meet W3CDTF standards.
+        - spelling fixes. (thanks to Florian Schlichting & Gregor Herrmann).
+        - added GitHub repo.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated test suite.
+
+0.05    2011-07-11
+        - now released under the Artistic License v2.
+        - included META.json and Test::CPAN::Meta::JSON tests.
+        - patterns now strings not compiled regular expressions.
+
+0.04    2009-08-10
+        - updates to various package files
+        - added 95changedate.t test file
+
+0.03    2008-03-28
+        - fixed 5.005 issues with 'our' (Slaven Rezic)
+
+0.02    2008-01-20
+        - added requires DFV to META.yml
+        - corrected Changes file
+
+0.01    2008-01-20
+        - Initial release.
+        - extracted from Labyrinth source code

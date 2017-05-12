@@ -1,0 +1,37 @@
+Changes
+eg/create.pl
+eg/lib/My/App.pm
+eg/lib/VersionedSubs/Server.pm
+eg/server.pl
+eg/templates/error.tmpl
+eg/templates/index.tmpl
+eg/templates/view.tmpl
+eg/update.pl
+lib/DBIx/VersionedSubs.pm
+lib/DBIx/VersionedSubs/AutoLoad.pm
+lib/DBIx/VersionedSubs/Hash.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+META.json
+META.yml			Module meta-data (added by MakeMaker)
+t/01_overload.t
+t/01_setup.t
+t/01_setup_autoload.t
+t/01_setup_hash.t
+t/02_best_practices.t
+t/02_best_practices_autoload.t
+t/02_create_sub.t
+t/02_create_sub_autoload.t
+t/02_create_sub_hash.t
+t/02_detect_change.t
+t/02_detect_change_autoload.t
+t/03_package.t
+t/03_strict.t
+t/03_syntax_error.t
+t/04_hash_namespace.t
+t/99-manifest.t
+t/99-pod.t
+t/99-todo.t
+t/99-unix-text.t
+t/99-versions.t

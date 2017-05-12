@@ -1,0 +1,9 @@
+README			
+MANIFEST		This file
+M4p.pm			Digest::MD5::M4p Perl Module
+M4p.xs			M4p Perl 'XS' source file
+Makefile.PL		Perl Makefile builder
+t/01_test.t		brief testing
+Changes			Version history
+typemap         for the compiler
+META.yml                                 Module meta-data (added by MakeMaker)

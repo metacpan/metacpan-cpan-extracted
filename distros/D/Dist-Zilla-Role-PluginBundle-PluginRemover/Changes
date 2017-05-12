@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-Role-PluginBundle-PluginRemover
+
+0.104     2017-01-09T02:08:48Z
+
+  - Use newer List::Util instead of List::MoreUtils.
+    Thanks to Karen Etheridge for the pull request (gh-3).
+
+0.103     2015-01-06T13:41:13Z
+
+  - also allow removing individual plugins by unique name, where more than one
+    plugin of the same type is in use
+    Thanks to Karen Etheridge for the patch! (gh-2).
+
+0.102     2013-04-15T05:08:23Z
+
+  - Use 'around' (and an empty sub) to add attribute name to
+    mvp_multivalue_args.  Thanks to Karen Etheridge for the patch!
+
+0.101     2011-12-09T23:47:09Z
+
+  - Initial release

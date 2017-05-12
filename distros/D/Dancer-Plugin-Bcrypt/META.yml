@@ -1,0 +1,26 @@
+---
+abstract: 'DEPRECATED Bcrypt interface for Dancer'
+author:
+  - 'James Aitken <jaitken@cpan.org>'
+build_requires:
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Bcrypt
+requires:
+  Crypt::Eksblowfish::Bcrypt: 0
+  Crypt::Random::Source: 0
+  Dancer::Config: 0
+  Dancer::Plugin: 0
+  strict: 0
+resources:
+  bugtracker: https://github.com/LoonyPandora/Dancer-Plugin-Bcrypt/issues
+  repository: git://github.com/LoonyPandora/Dancer-Plugin-Bcrypt.git
+version: 0.4.1

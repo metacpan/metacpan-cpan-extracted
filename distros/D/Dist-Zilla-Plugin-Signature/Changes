@@ -1,0 +1,7 @@
+1.100930 -- Fri Apr 02 19:25:38 CDT 2010
+  * use Dist::Zilla::Role::BeforeArchive now it is in core
+
+1.100900 -- Wed Mar 31 13:04:51 CDT 2010
+  * Do not require Dist::Zilla::Role::BeforeArchive as it is not part of Dist::Zilla
+
+1.000 -- Sat Feb 27 13:05:37 CST 2010

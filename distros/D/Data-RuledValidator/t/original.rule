@@ -1,0 +1,19 @@
+;;GLOBAL
+
+ID_KEY page
+
+page is word
+i    is num
+
+;;a
+
+i is n/a
+
+;;b
+
+i is word
+n is num
+
+;;c
+
+mail is mail

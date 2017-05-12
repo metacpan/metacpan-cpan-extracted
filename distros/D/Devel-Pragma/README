@@ -1,0 +1,31 @@
+Devel::Pragma version 1.1.0
+================================
+
+This module provides helper functions for developers of lexical pragmas, though a few functions may
+be useful to non-pragma developers as well.
+
+Pragmas can be used both in older versions of perl (from 5.8.1), which had limited support, and in
+the most recent versions, which have improved support.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Lexical::SealRequireHints
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008-2016 by chocolateboy
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.

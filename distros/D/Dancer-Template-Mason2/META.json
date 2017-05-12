@@ -1,0 +1,51 @@
+{
+   "abstract" : "Mason 2.x wrapper for Dancer",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-Mason2",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer::Config" : "0",
+            "Dancer::Template::Abstract" : "0",
+            "FindBin" : "0",
+            "Mason" : "2.05"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dancer-template-mason2@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Template-Mason2"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-dancer-template-mason2.git",
+         "web" : "https://github.com/jonswar/perl-dancer-template-mason2"
+      }
+   },
+   "version" : "0.05"
+}
+

@@ -1,0 +1,34 @@
+.travis.yml
+Build.PL
+Changes
+INSTALL
+internal/build.yaml
+internal/NOTES
+internal/TODO
+lib/Data/Checker.pm
+lib/Data/Checker.pod
+lib/Data/Checker/Date.pm
+lib/Data/Checker/Date.pod
+lib/Data/Checker/DNS.pm
+lib/Data/Checker/DNS.pod
+lib/Data/Checker/IP.pm
+lib/Data/Checker/IP.pod
+lib/Data/Checker/Ping.pm
+lib/Data/Checker/Ping.pod
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/date.t
+t/date_parallel.1.t
+t/date_parallel.2.t
+t/dns.t
+t/ip.t
+t/ping.t
+t/pod.t
+t/pod_coverage.t
+t/runtests
+t/runtests.bat
+t/simple.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

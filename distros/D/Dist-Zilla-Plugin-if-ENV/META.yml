@@ -1,0 +1,41 @@
+---
+abstract: 'Load a plugin when an ENV key is true.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-if-ENV
+provides:
+  Dist::Zilla::Plugin::if::ENV:
+    file: lib/Dist/Zilla/Plugin/if/ENV.pm
+    version: '0.001001'
+  Dist::Zilla::Plugin::if::not::ENV:
+    file: lib/Dist/Zilla/Plugin/if/not/ENV.pm
+    version: '0.001001'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Role::PluginLoader::Configurable: '0'
+  Dist::Zilla::Util: '0'
+  Moose: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-if-ENV/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-if-ENV
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-if-ENV.git
+version: '0.001001'

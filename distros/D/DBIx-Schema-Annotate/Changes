@@ -1,0 +1,26 @@
+Revision history for Perl extension DBIx-Schema-Annotate
+
+0.06 2015-05-26T08:48:55Z
+
+    - table ddl acquired from database is decoded
+
+0.05 2015-05-21T06:07:10Z
+
+    - not do anything if there is no difference
+
+0.04 2014-12-24T03:29:04Z
+
+    - update document
+
+0.03 2014-12-23T17:07:39Z
+
+    - fixbug. key of mysql schema is case-sensitive
+
+0.02 2014-12-23T16:18:06Z
+
+    - bug fix when making more than one index
+
+0.01 2014-12-23T15:53:59Z
+
+    - original version
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Data-Dumper-LispLike,
+version 0.004:
+
+  Dump perl data structures formatted as Lisp-like S-expressions
+
+This software is copyright (c) 2013 by Sergey Redin.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,43 @@
+---
+abstract: 'Compare local Perl packages/versions with your DarkPAN'
+author:
+  - 'Eric Johnson <eric.git@iijo.org>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DarkPAN-Compare
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DarkPAN::Compare:
+    file: lib/DarkPAN/Compare.pm
+    version: 0.03
+requires:
+  ExtUtils::Installed: 0
+  ExtUtils::MakeMaker: 0
+  HTTP::Tiny: 0
+  Module::Extract::Namespaces: 0
+  Moo: 0
+  Parse::CPAN::Packages: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/kablamo/DarkPAN-Compare/issues
+  homepage: https://github.com/kablamo/DarkPAN-Compare
+  repository: git://github.com/kablamo/DarkPAN-Compare.git
+version: 0.03
+x_authority: cpan:KABLAMO

@@ -1,0 +1,52 @@
+{
+   "abstract" : "Dancer interface to a lightweight Perl CMS Framework",
+   "author" : [
+      "Daniel Perrett <perrettdl@googlemail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Articulate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Articulate" : "0",
+            "Dancer" : "1.3118",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/pdl/Articulate/issues"
+      },
+      "homepage" : "http://github.com/pdl/Articulate",
+      "repository" : {
+         "url" : "http://github.com/pdl/Articulate"
+      }
+   },
+   "version" : "0.003"
+}

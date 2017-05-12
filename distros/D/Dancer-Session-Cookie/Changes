@@ -1,0 +1,97 @@
+Revision history for Dancer-Session-Cookie
+
+0.27 2015-09-23
+  - Remode  'README.pod' from distribution. [GH#6]
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 62 insertions(+), 126 deletions(-)
+
+0.26 2015-09-10
+  - Switch Test::WWW::Mechanize::PSGI for raw HTTP::Request/Response.
+    (GH#5, xsawyerx)
+
+  [ DOCUMENTATION ]
+    - Document the 'session_expires' setting. - Warn about maximal cookie
+      size. (GH#2 David Precious)
+
+  [ STATISTICS ]
+    - code churn: 10 files changed, 304 insertions(+), 192 deletions(-)
+
+0.25 2014-08-04
+  [ MISC ]
+    - Move tests from Test::TCP to Test::WWW::Mechanize::PSGI.
+
+  [ STATISTICS ]
+    - code churn: 5 files changed, 138 insertions(+), 174 deletions(-)
+
+0.24 2014-07-29
+  [ MISC ]
+    - Release again, this time with real co-maint permissions.
+
+  [ STATISTICS ]
+    - code churn: 1 file changed, 57 insertions(+), 53 deletions(-)
+
+0.23 2014-07-17
+  [ CHANGED ]
+    - Requires Session::Storage::Secure 0.010 to allow storing objects,
+      which is specially relevant for JSON::bool data.
+
+  [ STATISTICS ]
+    - code churn: 8 files changed, 67 insertions(+), 119 deletions(-)
+
+0.22 2013-05-31T23:38:07Z America/New_York
+  [ CHANGED ]
+    - Requires Session::Storage::Secure 0.007 for improved resistance to
+      timing attacks
+
+0.21 2013-05-08T22:33:10Z America/New_York
+  - Require Dancer 1.3113 and use its new features to fix more bugs that
+    caused sessions to not be set or reset correctly
+
+0.20 2013-04-25T11:41:22Z America/New_York
+  - Fix bug where session wasn't cleared correctly if route handler died
+    while processing a request
+
+0.19 2013-02-24T22:49:14Z America/New_York
+  - Fix bug with session_expires always expiring a cookie early
+
+0.18 2013-02-16T00:16:32Z America/New_York
+  - Hack around Dancer bug that renders the request object headers
+    repeatedly and locks out setting cookies after the first time
+
+0.17 2013-02-07T15:36:58Z America/New_York
+  - Fix localhost address used in tests
+
+0.16 2013-02-01T14:39:14Z America/New_York
+  - Now uses Session::Storage::Secure for encrypting and decrypting data;
+    Legacy decryption is preserved in case old cookies need to be read.
+  - Fix session destruction bug to ensure session is overwritten in the
+    browser, not just no longer sent (David Golden)
+
+0.15 2011-05-21
+  - skip test 02-configfile.t if YAML is not present FIX smoker test
+    failure. (Alexis Sukrieh)
+
+0.14 2011-03-12
+  [ Michael G. Schwern ]
+    - Fix for Dancer > v1.3012 
+    - Add support for session_secure to serve https only cookies. 
+    - Add missing MYMETA.yml 
+    - Make Dancer::Session::Cookie honor the session_name setting      
+      added to Dancer::Session::Abstract
+    - Add session_cookie_path to control the path of the cookie.
+
+0.13 2010-11-28T17:19:58Z
+  - Some documentation fixes. No functional change.
+
+0.12 2010-09-16T13:29:09Z
+  - Fix a warning when testing against newer Dancer. No functional
+  - change.
+
+0.11 2010-02-17T16:12:21Z
+  - Chase the ever-changing Dancer core :) No functional change.
+  - More tests.
+
+0.1 2010-02-02T17:20:11Z
+  - First version separated from the Dancer core. No functional
+  - change.

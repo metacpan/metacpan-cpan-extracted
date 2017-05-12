@@ -1,0 +1,54 @@
+Revision history for Dist-Zilla-Plugin-AlienBuild
+
+0.16      2017-03-28 14:18:44 -0400
+  - Fix some typos
+  - Bump prereq for Alien::Build to 0.32
+
+0.15      2017-03-28 13:17:04 -0400
+  - Include prereqs in documentation for Buid.PL and Makefile.PL
+  - Bump prereq for Alien::Build to 0.31
+
+0.14      2017-03-28 12:27:53 -0400
+  - Remove accidentally included [AlienBase] plugin
+
+0.12      2017-03-28 12:23:48 -0400
+  - Add Dist::Zilla::Plugin::AlienBase::Doc
+
+0.11      2017-03-10 15:08:52 -0500
+  - Require Alien::Build 0.25 and Alien::Build 0.038
+
+0.10      2017-03-01 11:38:06 +1100
+  - If Alien::Base is a prereq make it 0.036 at minimum as
+    that is the first version compatible with Alien::Build
+  - require Alien::Build 0.19 for very minor bug fixes
+
+0.09      2017-02-09 14:10:08 -0500
+  - require Alien::Build 0.15 for bug fixes
+
+0.08      2017-02-08 07:57:56 -0500
+  - require Alien::Build 0.11 for bug fixes
+
+0.07      2017-02-06 05:34:43 -0500
+  - Make Alien::Build a configure and build require
+    in addition to Alien::Build::MM (or ::MB)
+
+0.06      2017-02-04 11:36:45 -0500
+  - require Alien::Build 0.08
+
+0.05      2017-02-04 11:24:04 -0500
+  - Updated documentation for MB support
+  - require Alien::Build 0.07
+
+0.04      2017-02-02 13:36:30 -0500
+  - Add support for Module::Build via Alien::Build::MB
+
+0.03      2017-01-31 16:48:00 -0500
+  - Explicitly require Perl 5.14.
+  - Require Alien::Build 0.02 in generated code
+
+0.02      2017-01-31 13:31:35 -0500
+  - Added documentation
+  - Require Alien::Build 0.02
+
+0.01      2017-01-30 22:32:38 -0500
+  - initial version

@@ -1,0 +1,193 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001002
+ [Changed / configure requires]
+ - perl 5.008 → 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+1.001001 2017-03-01T21:09:23Z
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001000 2014-08-31T19:36:06Z
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+ [Removed / test requires]
+ - Cwd
+ - File::Copy::Recursive
+ - FindBin
+ - Path::Tiny
+ - Test::Fatal
+
+1.000005 2014-08-15T21:16:17Z
+
+1.000004 2014-08-03T12:29:48Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+1.000003 2014-07-15T12:39:08Z
+ [Changed / runtime requires]
+ - Dist::Zilla::Role::Bootstrap 0 → 1.000000
+
+1.000002 2014-07-15T07:33:24Z
+
+1.000001 2014-04-05T11:36:12Z
+ [Added / test requires]
+ - FindBin
+
+ [Removed / test requires]
+ - Path::FindDev
+
+1.000000 2014-04-05T06:23:20Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4200
+
+ [Removed / configure requires]
+ - Module::Build 0.4200
+
+0.04000002 2013-11-18T07:22:31Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4200
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4200
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.04000001 2013-09-24T16:22:46Z
+ [Added / test requires]
+ - File::Spec
+ - Test::DZil
+ - Test::Fatal
+
+ [Removed / test requires]
+ - Dist::Zilla
+
+0.04000000 2013-09-05T08:17:38Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::Bootstrap
+ - Moose
+
+ [Added / test requires]
+ - Cwd
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Cwd
+ - Moo::HandleMoose::FakeMetaClass
+ - Path::Tiny
+ - Role::Tiny
+ - lib
+
+0.03000200 2013-09-03T03:36:10Z
+ [Added / test requires]
+ - Dist::Zilla
+ - File::Copy::Recursive
+ - Path::FindDev
+
+0.03000101 2013-08-31T01:52:46Z
+
+0.03000100 2013-08-31T01:43:36Z
+ [Added / runtime requires]
+ - Moo::HandleMoose::FakeMetaClass
+ - Role::Tiny
+
+0.03000000 2013-08-30T23:46:07Z
+ [Added / runtime requires]
+ - lib
+
+ [Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.02000100 2013-04-06T09:53:45Z
+
+0.02000000 2013-04-06T09:38:52Z
+ [Added / runtime requires]
+ - Cwd
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Carp
+ - File::Spec
+
+0.01023602 2013-04-06T08:37:50Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01023601 2012-02-02T19:41:29Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01023600 2011-04-04T15:58:33Z

@@ -1,0 +1,22 @@
+---
+author: ~
+build_requires:
+  Test::Deep: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: Perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-SExpression
+no_index:
+  directory:
+    - build
+    - inc
+    - t
+  package:
+    - Parse::Yapp::Driver
+requires:
+  Class::Accessor::Fast: 0
+version: 0.41

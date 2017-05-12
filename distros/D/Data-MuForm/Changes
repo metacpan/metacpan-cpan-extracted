@@ -1,0 +1,22 @@
+Revision history for Perl module Data::MuForm
+
+0.04 2017-02-05
+ - allow $option->{attributes}
+ - add Data::MuForm::Manual::Hooks
+ - Renderer::Base doc cleanup; change default of 'render_element_errors'
+ - add is_html5 processing. rename html5_type_attr to html5_input_type
+ - handle form tag attributes
+ - construct lexicon file path
+
+0.03 2017-01-31
+ - fix some prereq issues
+
+0.02 2017-01-29
+ - Remove 'default_' from some renderer attributes
+ - pod tweaks
+ - add some prereqs
+
+0.01 2017-01-29
+
+ - Initial release
+

@@ -1,0 +1,124 @@
+NAME
+    DBIx::SQLite::Deploy - Easy SQLite deployment
+
+VERSION
+    Version 0.011
+
+SYNOPSIS
+        # ::Deploy will create the 'path/to' for you if it does not already exist
+        my $deploy = DBIx::SQLite::Deploy->deploy( path/to/database.sqlite => <<_END_ )
+        [% PRIMARY_KEY = "INTEGER PRIMARY KEY AUTOINCREMENT" %]
+        [% KEY = "INTEGER" %]
+        [% CLEAR %]
+        ---
+        CREATE TABLE artist (
+
+            id                  [% PRIMARY_KEY %],
+            uuid                TEXT NOT NULL,
+
+            name                TEXT,
+            description         TEXT,
+
+            UNIQUE (uuid)
+        );
+        ---
+        CREATE TABLE cd (
+
+            id                  [% PRIMARY_KEY %],
+
+            title               TEXT,
+            description         TEXT
+        );
+        _END_
+
+    To use with DBI
+
+        $dbh = $deploy->connect 
+
+        # ...or the long way:
+
+        $dbh = DBI->connect( $deploy->information )
+
+    To use with DBIx::Class
+
+        $schema = My::Schema->connect( $deploy->information )
+
+DESCRIPTION
+    DBIx::SQLite::Deploy is a tool for creating a database and getting back
+    a DBI connection in as little work as possible. Essentially, you pass
+    the path of your database and the schema (as a Template Toolkit
+    template) to "DBIx::SQLite::Deploy->deploy". If the database is not
+    there (file does not exist or is size 0), then ::Deploy will create the
+    database and install the schema
+
+Why Template Toolkit?
+    Purely as a convenience. You probably have lots of repetition in your
+    schema, and TT gives a way to combat that redundancy. You don't need to
+    use it if you don't want/need to.
+
+USAGE
+  $deploy = DBIx::SQLite::Deploy->deploy( <path>, [ <schema> ], ... )
+    Create a new deployment using <path> as the file for the SQLite
+    database, and <schema> as the (optional) schema
+
+    The schema argument can be in the form of a Template Toolkit document.
+
+    The database will NOT be created until you ask to "->connect", ask for
+    "->information", or manually "->deploy". To do creation on construction,
+    pass "create => 1" as an argument
+
+    DBIx::SQLite::Deploy will not deploy over an existing database (the file
+    exists and has non-zero size)
+
+  $deploy->connect
+    Return a DBI database handle ($dbh)
+
+  $deploy->information
+  $deploy->info
+    Return a list of connection information, suitable for passing to
+    "DBI->connect"
+
+  $deploy->deploy
+    Deploy the database unless it already exists
+
+SYNOPSIS
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dbix-sqlite-deploy at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-SQLite-Deploy>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::SQLite::Deploy
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-SQLite-Deploy>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-SQLite-Deploy>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-SQLite-Deploy>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-SQLite-Deploy/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

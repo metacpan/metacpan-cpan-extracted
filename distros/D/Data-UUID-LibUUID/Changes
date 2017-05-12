@@ -1,0 +1,29 @@
+0.05
+    - non dev release
+
+0.05_04
+    - fix broken test plan
+
+0.05_03
+    - Some platforms don't use time based UUID generation even when asked to
+
+0.05_02
+    - Attempt to reseed only on OSX for now
+
+0.05_01
+    - Attempt to reseed the random number generator at least on OSX
+
+0.04
+    - Avoid using the non portable POPpx
+
+0.03
+    - hex, base64 support
+    - Data::UUID compat api
+    - improve the makefile bailout logic
+
+0.02
+    - Attempt to bail out of Makefile.PL if no <uuid/uuid.h> can be found
+    - simplify overloaded object branch in XS code
+
+0.01
+    - Initial version

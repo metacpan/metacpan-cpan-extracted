@@ -1,0 +1,9 @@
+=head2 Unwanted Dependencies
+
+C<Data::Printer> is a great module, I often use it for debugging. However, sometimes I forget to
+remove
+
+    use DDP;
+
+from the code and make a release with this unwanted dependency. C<Hook::BeforeRelease> checks the
+distribution does not have unwanted dependencies. If it does, release will be aborted.

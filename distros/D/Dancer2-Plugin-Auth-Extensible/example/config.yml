@@ -1,0 +1,34 @@
+appname: authextest
+
+session: simple
+logger: console
+log: core
+
+plugins:
+    Auth::Extensible:
+        realms:
+            example:
+                provider: Example
+            config:
+                provider: Config
+                users:
+                    - user: 'beerdrinker'
+                      pass: 'password'
+                      name: 'Beer drinker'
+                      roles:
+                        - Beer_Drinker
+                    - user: 'vodkadrinker'
+                      pass: '{SSHA}hDx1aYOV3UcMI9OAwE5RSOO+dzwSRehz'
+                      name: 'Vodka drinker'
+                      roles:
+                        - Vodka_Drinker
+                        - Heavy_Drinker
+                    - user: 'arakdrinker'
+                      pass: '{SSHA}lHxzJtu9bxJeCrhSN+IQWJz2kBzV4fjJ'
+                      name: 'Arak drinker'
+                      roles:
+                        - Arak_Drinker
+                        - Heavy_Drinker
+
+show_errors: 1
+

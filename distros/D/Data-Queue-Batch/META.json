@@ -1,0 +1,74 @@
+{
+   "abstract" : "FIFO data structure for \"batching\" items",
+   "author" : [
+      "Ichito Nagata <i.nagata110@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.8",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Queue-Batch",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Synopsis::Expectation" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Queue::Batch" : {
+         "file" : "lib/Data/Queue/Batch.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/i110/Data-Queue-Batch/issues"
+      },
+      "homepage" : "https://github.com/i110/Data-Queue-Batch",
+      "repository" : {
+         "url" : "git://github.com/i110/Data-Queue-Batch.git",
+         "web" : "https://github.com/i110/Data-Queue-Batch"
+      }
+   },
+   "version" : "0.04",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

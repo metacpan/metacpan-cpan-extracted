@@ -1,0 +1,57 @@
+{
+   "abstract" : "handling and comparing dpkg-style version numbers",
+   "author" : [
+      "Don Armstrong <don@donarmstrong.com>, Colin Watson\n<cjwatson@debian.org> and RaphaÃ«l Hertzog <hertzog@debian.org>, based on\nthe implementation in C<dpkg/lib/vercmp.c> by Ian Jackson and others."
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112150",
+   "keywords" : [
+      "debian",
+      "perl",
+      "versions"
+   ],
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Debian-Dpkg-Version",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Debian::Dpkg::Version" : {
+         "file" : "lib/Debian/Dpkg/Version.pm",
+         "version" : "v1.15.5.6.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Debian-Dpkg-Version/issues"
+      },
+      "license" : [
+         "http://www.gnu.org/licenses/old-licenses/gpl-1.0.txt"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Debian-Dpkg-Version.git"
+      }
+   },
+   "version" : "v1.15.5.6.1"
+}

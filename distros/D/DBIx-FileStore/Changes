@@ -1,0 +1,137 @@
+Revision history for DBIx-FileStore
+
+0.29    2015/02/11
+        Small logic and doc changes.
+
+0.28    2015/01/03
+        Fix date test to pass in 2015
+        Update docs a little
+        Update copyrights to 2015
+
+0.27    2014/12/22
+        Test release
+
+0.26    2014/04/22
+        Note that fdbslurp is implemented.
+
+0.25    2013/10/08
+        Reorganize methods in DBIx::FileStore, document changes.
+        Improve docs.
+
+0.24    2013/09/30  
+        Improve docs.
+
+0.23    2013/09/30  
+        Improve documentation and use of pod.
+        Update copyrights.
+
+0.22    2012/12/26  11:39AM
+        List File::Slurp, which is used in tests, in prereqs.
+
+0.21    2012/12/23  1:14AM
+        Updated MANIFEST
+        Re-released so we can tag the code correctly.
+
+0.20    2012/12/23  1:05AM
+        Implemented fdbslurp, documented it as implemented.
+        Don't read file twice when inserting data any more.
+        Code factorings to make fdbslurp work.
+        Changes to tests.
+
+0.19    2012/12/23  6:00PM
+        Note that scripts are in the bin/ directory, not the scripts/ 
+        directory, in the README.
+        Improve formatting of POD.
+
+0.18    2012/12/23  5:36PM
+        Update copyright years.
+        Don't put mkmanifest script into distro.
+
+0.17    2012/12/23  5:25PM
+        Move scripts to where build systems expect, from script/ to bin/
+        Test that self-tests can _find_ scripts, too.
+
+0.16    2012/12/23  5:10PM
+        Fix version numbers to match everywhere.
+
+0.15    2012/12/23  5:10PM
+        Use Dist::Zilla in place of Makefile.PL directly.
+        Update test to use new location of fdb* scripts.
+
+0.14    -
+        No such release.
+
+0.13    2010/12/12  4:15PM
+        Don't distribute mkmanifest.
+        Added t/actualtest.t, which tests putting files
+        in the filestore.
+        Added t/exes.t test, which checks that all
+        the scripts at least compile.
+        README and DBIx::FileStore documentation improved,
+        reordered, and rewritten.
+        Don't lock database tables by default during changes.
+        
+0.12    2010/11/28  3:01PM
+        Factor more code from command line tools to 
+          DBIx::FileStore methods.
+        Check complet content md5 when reading data from database.
+        Changes to test code and documentation.
+
+0.11    2010/11/24  3:41PM
+        Revert default block size to 512K.
+
+0.10    2010/11/24  1:30PM
+        Document dependency on DBD::mysql in Makefile.PL.
+        Add Usage() function to fdbstat.
+        Allow user to set dbhost through the config file.
+        Code comments and documentation changes and updates.
+        Code cleanups.
+        Don't allow filenames to be stored without a name.
+
+0.09    2010/11/19  11:10AM
+        Integrate QUICKSTART.pod into README for search.cpan.org.
+        Update README, TODO, and MANIFEST.
+        Documentation changes and updates.
+        Tweak to DBIx::FileStore::ConfigFile for perl 5.6.2.
+
+0.08    2010/11/17  3:02PM
+        Change QUICKSTART.txt to QUICKSTART.pod in MANIFEST.
+        
+0.07    2010/11/17  2:44PM
+        Documentation added for mkmanifest.
+        Tweaks to POD after seeing DBIx-FileStore 0.05 on CPAN.
+        Renamed QUICKSTART.txt to QUICKSTART.pod.
+
+0.06    2010/11/17  1:28PM
+        Documentation added for script/fdbstat.
+        Incomplete script/fdbslurp script cleaned up
+        and documented.
+        Comments and documentation cleaned up.
+        Mention mysql's max_allowed_packet setting in 
+        DBIx/FileStore.pm's pod.  
+        TODO updated.
+        Not released.
+
+0.05    2010/11/17  12:10PM
+        Documentation added for all scripts and modules.
+        QUICKSTART.txt added.
+        README updated.
+        Enable t/pod-coverage.t test.
+        fdbput and fdbget have --local=filename option added.
+        Removed fdbcp.
+        Code cleanup.
+
+0.04    2010/11/16  3:12PM
+        This release skipped.
+
+0.03    2010/11/10  3:12PM
+        Added needed lib/DBIx/FileStore/ConfigFile.pm file.
+
+0.02    2010/11/10  1:30PM
+        Added table-definitions.sql to the source.
+        Don't hardcode name of files table in fdbmv.
+        Better Usage() output for fdbls.
+
+0.01    2010/11/10 12:30PM
+        First version, released on an unsuspecting world.
+

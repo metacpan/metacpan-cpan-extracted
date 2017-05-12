@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+README
+t/array.t
+lib/Data/COW.pm
+META.yml                                 Module meta-data (added by MakeMaker)

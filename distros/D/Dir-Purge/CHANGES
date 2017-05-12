@@ -1,0 +1,14 @@
+Revision history for Perl extension Dir::Purge.
+
+1.02  Tue Sep 19 14:24:54 2006
+	- fix problem with purgedir_by_age.
+
+1.01  Tue Feb 21 22:37:35 2005
+        - Add "include" with subroutine or regex to preselect
+	  candidates.
+      	- Add "reverse" option to reverse the strategy.
+	- Add verbosity levels.
+	- Thread safe (use a local hash to keep state).
+
+1.00  Sun May 21 15:36:15 2000
+	- First CPAN release.

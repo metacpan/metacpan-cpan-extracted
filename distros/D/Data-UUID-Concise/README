@@ -1,0 +1,103 @@
+NAME
+    Data::UUID::Concise - Encode UUIDs to be more concise or communicable
+
+VERSION
+    version 0.121240
+
+SYNOPSIS
+        use Data::UUID::Concise;
+
+        my $duc = Data::UUID::Concise->new();
+        my $encoded_uuid = $duc->encode((Data::UUID->new)->create);
+        my $decoded_uuid = $duc->decode('M55djt9tt4WoFaL68da9Ef');
+
+        $duc->alphabet('aaaaabcdefgh1230123');
+        $duc->alphabet; # 0123abcdefgh
+
+ATTRIBUTES
+  alphabet
+    This is the collection of symbols that are used for the encoding scheme.
+
+    By default, a reasonably unambiguous set of characters is used that is
+    reminiscent of the base 58 scheme used by a rather prominent photo
+    site's URL shortener.
+
+METHODS
+  encode
+    Encode a Data::UUID instance as a string with the appropriate set of
+    symbols.
+
+  decode
+    Decode a string with the appropriate set of symbols and return a
+    Data::UUID instance representing the decoded UUID.
+
+FUNCTIONS
+  _normalize_alphabet
+    Private method. Normalize the alphabet such that it is sorted and that
+    all elements are distinct.
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Data::UUID::Concise
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Data-UUID-Concise>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Data-UUID-Concise>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/D/Data-UUID-Concise>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual overview
+        of the test results for a distribution on various Perls/platforms.
+
+        <http://matrix.cpantesters.org/?dist=Data-UUID-Concise>
+
+    *   CPAN Testers Dependencies
+
+        The CPAN Testers Dependencies is a website that shows a chart of the
+        test results of all dependencies for a distribution.
+
+        <http://deps.cpantesters.org/?module=Data::UUID::Concise>
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "nrr+bug-DATA-UUID-CONCISE@corvidae.org", or through the web interface
+    at <https://github.com/nrr/Data-UUID-Concise/issues>. You will be
+    automatically notified of any progress on the request by the system.
+
+  Source Code
+    <https://github.com/nrr/Data-UUID-Concise>
+
+      git clone https://github.com/nrr/Data-UUID-Concise.git
+
+AUTHOR
+    Nathaniel Reindl <nrr@corvidae.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Nathaniel Reindl.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

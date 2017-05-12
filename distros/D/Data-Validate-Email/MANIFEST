@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+INSTALL
+README
+Email.pm
+t/ExtUtils/TBone.pm
+t/is_email.t
+t/is_email_rfc822.t
+t/is_domain.t
+t/is_username.t
+META.yml                                 Module meta-data (added by MakeMaker)

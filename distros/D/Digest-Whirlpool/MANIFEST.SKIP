@@ -1,0 +1,5 @@
+^Makefile$
+^Makefile.old$
+^MANIFEST.bak$
+^.git
+Digest-Whirlpool*

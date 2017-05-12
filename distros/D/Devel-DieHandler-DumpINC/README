@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     % perl -MDevel::DieHandler::DumpINC -e'...'
+
+DESCRIPTION
+
+    When imported, this module installs a __DIE__ handler which dumps the
+    content of %INC to STDERR, then calls the previous handler (or die).
+
+    Unimporting (via no Devel::DieHandler::DumpINC) after importing
+    restores the previous handler.
+

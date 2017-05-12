@@ -1,0 +1,1 @@
+<% where %>: <% IF flash.substr(0, 1) %><% flash %><% ELSE %><% flash.join('*') %><% END %>

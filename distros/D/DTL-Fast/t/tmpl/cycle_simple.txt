@@ -1,0 +1,2 @@
+This is one-pass cycle {% cycle "val1" "val2" "val3" %} example
+This is one-pass depricated cycle {% cycle "val4", "val5", "val6" %} example

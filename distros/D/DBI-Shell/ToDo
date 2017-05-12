@@ -1,0 +1,26 @@
+
+*** Assorted to-do items and random thoughts *** in no particular order ***
+
+begin_work
+
+test shell /connect user etc
+
+Primary Key metadata
+
+attribute for 'last inserted id'
+
+test suite
+
+$sth->{Database} and $dbh->{Driver} should hold the
+outer handle not the inner one.
+
+$sth->more_results, now and $sth->become($sth2) later
+
+dbish - state AutoCommit status clearly at connect time.
+(And try to set AutoCommit off in eval?)
+
+t/shell uninit var at 5.00502/Term/Cap.pm line 284.
+
+Add TYPE, SCALE, PRECISION to DBD::Sponge
+
+Metadata! (DBI::Metadata?)

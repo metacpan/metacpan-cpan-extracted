@@ -1,0 +1,37 @@
+---
+abstract: 'A plugin for using cross origin resource sharing'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Dancer::Test: '0'
+  Module::Signature: '0'
+  Socket: '0'
+  Test::More: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-CORS
+requires:
+  Carp: '0'
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Data::Dumper: '0'
+  Scalar::Util: '0'
+  Sub::Name: '0'
+  URI: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer-plugin-cors-perl/issues
+  homepage: https://github.com/zurborg/libdancer-plugin-cors-perl
+  repository: https://github.com/zurborg/libdancer-plugin-cors-perl.git
+version: '0.13'
+x_contributors:
+  - 'David Zurborg <d.zurborg@propartner-it.de>'

@@ -1,0 +1,9 @@
+Revision history for Perl extension Device::WWN.
+
+1.01
+    - Fixed the automatic detection of the type of WWN, so the example code
+      in the Device::WWN docs actually works now.  Reported by Stefan Wolf
+      and Steve Stockwell.
+
+1.00
+    - Initial release

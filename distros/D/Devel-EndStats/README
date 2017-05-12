@@ -1,0 +1,116 @@
+SYNOPSIS
+
+     # from the command line
+     % perl -MDevel::EndStats script.pl
+    
+     ##### sample output #####
+     <normal script output, if any...>
+    
+     # BEGIN stats from Devel::EndStats
+     # Program runtime duration: 0.055s
+     # Total number of required files loaded: 132
+     # Total number of required lines loaded: 48772
+     # END stats
+    
+     ##### sample output (with verbose=1, some cut) #####
+     <normal script output, if any...>
+    
+     # BEGIN stats from Devel::EndStats
+     # Program runtime duration: 0.055s
+     # Total number of required files loaded: 132
+     # Total number of required lines loaded: 48772
+     #   #  1   1747 lines  0.023489s( 43%)  Log/Any/App.pm (loaded by main)
+     #   # 52   1106 lines  0.015112s( 28%)  Log/Log4perl/Logger.pm (loaded by Log::Log4perl)
+     #   # 17    190 lines  0.011983s( 22%)  Log/Any/Adapter.pm (loaded by Log::Any::App)
+     #   # 18    152 lines  0.011679s( 21%)  Log/Any/Manager.pm (loaded by Log::Any::Adapter)
+     #   #  5    981 lines  0.007299s( 13%)  File/Path.pm (loaded by Log::Any::App)
+     ...
+     # END stats
+
+DESCRIPTION
+
+    Devel::EndStats runs in the END block, displaying various statistics
+    about your program, such as:
+
+      * how many seconds the program ran;
+
+      * how many required files and total number of lines loaded (from
+      %INC);
+
+      * etc.
+
+    Some notes/caveats:
+
+    Devel::EndStats should be loaded before other modules, for example by
+    running it on the command-line, as shown in the SYNOPSIS.
+
+OPTIONS
+
+    Some options are accepted. They can be passed via the use statement:
+
+     # from the command line
+     % perl -MDevel::EndStats=verbose,1 script.pl
+    
+     # from script
+     use Devel::EndStats verbose=>1;
+
+    or via the DEVELENDSTATS_OPTS environment variable:
+
+     % DEVELENDSTATS_OPTS='verbose=1' perl -MDevel::EndStats script.pl
+
+      * verbose => BOOL (default: 0)
+
+      Can also be set via VERBOSE environment variable. If set to true,
+      display more statistics (like per-module statistics).
+
+      * sort => STR (default: '-time')
+
+      Set how to sort the list of loaded modules ('file' = by file, 'time'
+      = by load time, 'caller' = by first caller's package, 'order' = by
+      order of loading, 'lines' = by number of lines). Only relevant when
+      'verbose' is on.
+
+      * force => BOOL (default: 0)
+
+      By default, if BEGIN phase did not succeed, stats will not be shown.
+      This option forces displaying the stats.
+
+      * hide_core => BOOL (default: 0)
+
+      Whether to hide core modules while listing modules in verbose mode.
+
+      * hide_noncore => BOOL (default: 0)
+
+      Whether to hide non-core modules while listing modules in verbose
+      mode.
+
+      * show_memsize => BOOL (default: 0)
+
+      Whether to show memory usage information. Currently this is done by
+      probing /proc/$$/statm because some other memory querying modules are
+      unusable (e.g. Devel::SizeMe currently segfaults on my system,
+      Devel::InterpreterSize is too heavy).
+
+FAQ
+
+ What is the purpose of this module?
+
+    This module might be useful during development. I first wrote this
+    module when trying to reduce startup overhead of a command line
+    application, by looking at how many modules the app has loaded and try
+    to avoid loading modules whenever it's unnecessary.
+
+ Can you add (so and so) information to the stats?
+
+    Sure, if it's useful. As they say, (comments|patches) are welcome.
+
+SEE ALSO
+
+    There are many modules on CPAN that can be used to generate dependency
+    information for your code. Neil Bowers has written a review
+    <http://neilb.org/reviews/dependencies.html> that covers most of them.
+
+KNOWN ISSUES
+
+    * Timing and memory usage is inclusive instead of exclusive.
+

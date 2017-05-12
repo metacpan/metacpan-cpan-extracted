@@ -1,0 +1,69 @@
+{
+   "abstract" : "Read data from __DATA__",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.4, Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Section-Simple",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Data-Section-Simple/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Data-Section-Simple",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Data-Section-Simple.git",
+         "web" : "https://github.com/miyagawa/Data-Section-Simple"
+      }
+   },
+   "version" : "0.07",
+   "x_contributors" : [
+      "Bruce Gray <bruce.gray@acm.org>",
+      "HIROSE Masaaki <hirose31@gmail.com>",
+      "Tatsuhiko Miyagawa <miyagawa@gmail.com>",
+      "tokuhirom <tokuhirom@gmail.com>"
+   ]
+}
+

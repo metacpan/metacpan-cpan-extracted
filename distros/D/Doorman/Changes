@@ -1,0 +1,33 @@
+0.10:
+- Add Auth0 Doorman
+
+0.09:
+- Remove use of given/when to make this friendly with 5.18
+- Pass through to app when access is denied by the user
+
+0.08:
+- Avoid deprecated warning in Net::Twitter::Lite by lukec
+
+0.07:
+- fixed a subtle bug resulting inconsistent sign in/out behaviour with many help from lukec++
+
+0.06:
+- documentation and refactoring
+
+0.05:
+- Make middlewares chainable
+
+0.04:
+- Add a base authentication middleware DoormanAuthentication for doing local auth in the app.
+
+0.03:
+- Minor fix on too many "/"s in URI path
+
+0.02:
+- ua and consumer_secret are now configurable
+- root_url is now optional -- a default one would be your app host without path (something looks like http://foo.com or http://bar.com:8080)
+- scope is now default to 'users', and optional.
+
+0.01: First Release.
+- Contains basic OpenID and Twitter auth middleware.
+

@@ -1,0 +1,41 @@
+---
+abstract: 'Advertise versions of things you have as soft dependencies'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Module::Metadata: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled
+provides:
+  Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled:
+    file: lib/Dist/Zilla/Plugin/Prereqs/Recommend/MatchInstalled.pm
+    version: '0.003003'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Role::PrereqSource: '0'
+  Module::Data: '0'
+  Moose: '0'
+  MooseX::Types::Moose: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Recommend-MatchInstalled.git
+version: '0.003003'

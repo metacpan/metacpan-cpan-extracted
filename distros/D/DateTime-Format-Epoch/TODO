@@ -1,0 +1,7 @@
+* Add more specific epochs (Windows? DOS?)
+
+* Accessors for formatter/parser attributes
+
+* Adding DT::Duration support for units
+
+and much more, undoubtedly

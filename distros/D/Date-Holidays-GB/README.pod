@@ -1,0 +1,164 @@
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+Date::Holidays::GB - Date::Holidays compatible package for the UK, with public/bank holiday dates, updated from gov.uk
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+    use Date::Holidays::GB qw/ holidays is_holiday /;
+    
+    # All UK holidays
+    my $holidays = holidays( year => 2013 );
+    
+    # Holidays in England & Wales and Scotland
+    my $holidays = holidays( year => 2013, regions => [ 'EAW', 'SCT' ] );
+    
+    if (is_holiday(
+            year => 2013, month => 12, day => 25,
+            regions => [ 'EAW', 'SCT' ] )
+    ) {
+        print "No work today!";
+    }
+
+=head1 DESCRIPTION
+
+A L<Date::Holidays> style package updated with the British bank holiday dates now
+published at L<https://www.gov.uk/bank-holidays>. Holidays may apply to all
+regions, or some combination - see the C<regions> parameter for more details.
+
+Module is named with correct ISO-3166-1 code for the United Kingdom: "GB"
+(Great Britain)
+
+To just work with holiday days for a single region, use one of the subclasses:
+L<Date::Holidays::GB::EAW>, L<Date::Holidays::GB::NIR>, or
+L<Date::Holidays::GB::SCT>.
+
+=head1 EXPORTS
+
+Exports C<holidays> and C<is_holiday> on demand.
+
+=head1 METHODS
+
+Both C<is_holiday> and C<holidays> take either an argument list or hash of
+named arguments.
+
+The named arguments are C<year>, C<month>, C<day>, and C<region>. C<region>
+should be either omitted (to search all regions) or an arrayref of the UK
+regions that you are interested in, as ISO-3166-2 codes.
+
+The argument list should be in the following order: year, month, day, and
+(optionally) regions.
+
+Note that you will need to specify region(s) to make correct use of this
+module!
+
+=head2 holidays
+
+    # year, month, day, [regions]
+    my $holidays = Date::Holidays::GB->holidays( @args );
+
+or
+    # ( year => ..., month => ..., day => ..., [ regions => \@. .. ] )
+    my $holidays = Date::Holidays::GB->holidays( %args );
+
+Returns hashref of holiday dates, values are a string listing the holiday(s)
+taking place on that date, with the region name(s) in parenthesis.
+
+Holidays that occur in all regions are returned with a single canonical name,
+taken from the name in England & Wales.
+
+Date keys are in the format MMDD, as per the behaviour ofL<Date::Holidays>.
+
+=head2 is_holiday
+
+    # year, month, day, [regions]
+    my $holiday = Date::Holidays::GB->is_holiday( @args );
+
+or
+    # ( year => ..., month => ..., day => ..., [ regions => \@. .. ] )
+    my $holiday = Date::Holidays::GB->is_holiday( %args );
+
+Returns the holiday details (as per C<holidays>) but for a single date.
+Returns false if the specified date is not a holiday in the appropriate
+region(s).
+
+=head2 date_generated
+
+    print Date::Holidays::GB->date_generated;
+
+Prints the date that the data was downloaded, in YYYY-MM-DD format.
+
+=head1 ISO-3166-2 REGION CODES
+
+Valid codes for the regions that make up ISO-3166-1 "GB" are:
+
+=over
+
+=item *
+
+EAW - England & Wales
+
+=item *
+
+SCT - Scotland
+
+=item *
+
+NIR - Northern Ireland
+
+=back
+
+=head1 GENERATING THE DATA
+
+The source for this package is generated via a script, included with the
+distribution (L<share/generate_date_holidays_gb.pl>). This downloads the
+latest iCal files from L<http://www.gov.uk/>, and could be used to
+update/alter the package if necessary.
+
+=head1 SEE ALSO
+
+=over
+
+=item *
+
+L<Date::Holidays>
+
+=back
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests through the issue tracker
+at L<https://github.com/mjemmeson/date-holidays-gb/issues>.
+You will be notified automatically of any progress on your issue.
+
+=head2 Source Code
+
+This is open source software.  The code repository is available for
+public review and contribution under the terms of the license.
+
+L<https://github.com/mjemmeson/date-holidays-gb>
+
+  git clone git://github.com/mjemmeson/date-holidays-gb.git
+
+=head1 AUTHOR
+
+Michael Jemmeson <mjemmeson@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Michael Jemmeson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

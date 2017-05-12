@@ -1,0 +1,24 @@
+If no structural information is kept, merge methods can only
+keep/replace/append for lists but unordered non-uniform lists
+are allowed.
+
+When specifying structure, /foo/* forces uniform if it is not
+already specified as non-uniform. If a structure is uniform,
+then applying structure to /foo/1 is equivalent to /foo/* (but
+a warning may be issued).
+
+Add validity tests for data
+see Data::Domain, Data::Validator
+
+Add subtract (to remove items in one NDS from another)
+see Data::Validate::XSD
+treats all lists as ordered... it's simply too complicated
+otherwise
+
+Add clean (to remove empty paths)
+   a hash key with a value of undef should be deleted
+   a list element with a value of undef should be deleted if unordered
+   a list consisting of only undefs should be deleted (and fix parent)
+   a hash with no keys should be deleted (and fix parent)
+
+

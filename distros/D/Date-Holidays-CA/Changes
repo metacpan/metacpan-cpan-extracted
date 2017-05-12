@@ -1,0 +1,16 @@
+0.01  Initial version; released Tue Sep 1 2009.
+
+0.02  Released Tue Nov 17 2009.
+
+      Fix missed dep on Test::Exception.  Closes RT 50695.
+      Thanks to ANDK (Andreas J. König) for this one.  
+
+      Add Family Day to Ontario Holiday list.  Closes RT 50525.
+      Thanks to Kevin Field for pointing this one out. 
+
+0.03  Released Fri Sep 24 2010.
+
+      Fix mojibake in Date::Holidays::CA pod by properly declaring
+      encoding to be utf8.  Thanks to Chris McMahon for pointing it out.
+
+      Change build toolkit from Extutils::MakeMaker to Module::Build. 

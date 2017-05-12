@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DBIx/Pager.pm
+t/00_compile.t
+t/01_pager.t

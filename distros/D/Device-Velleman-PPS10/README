@@ -1,0 +1,94 @@
+Device-Velleman-PPS10 version 0.01
+==================================
+
+This is the introduction of the Device::Velleman::PPS10 module, for
+parsing of the data sent by the Velleman PPS10 oscilloscope. The scope
+sends data of each frame displayed on the LCD screen over the serial
+line. The scope outputs data only and cannot be controlled by external
+software. Each packet of data contains enough information to allow
+rendering of the frame graphically on the screen.
+
+Each packet contains two bytes for marking the start of the packet,
+followed by a small set of header bytes containing information on the
+scope settings and finally followed by a set of bytes of the voltage
+sampling values. The voltage samples are 8-bit values, and thus range
+from 0 to 255. The value of 127 represents the 0 volt baseline. These
+values are converted by the module to volts using the scope settings
+in the header bytes. The same is done to sample time intervals.
+
+The scope sends three types of packets, named here using the ascii
+values of the two bytes used to indicate the start of packet.
+
+BA  	  Contains data of an complete frame, 256 samples
+BR	  Contains an arbitrary number of samples
+BS	  Contains only a single sample
+
+For now, this module only parses for the BA packet, which is composed
+of the following stream of bytes:
+bytes 0-1     A'B'  + A'A'
+bytes 2-3     16-bit length record: H'0A' + H'01'
+bytes 4-9     headers bytes
+256 bytes     256 x 8-bit sample values
+
+The PPS10 LCD display is 128x64 pixels, which is smaller in resolution
+than the sample data sent over the serial port. The scope scales the
+8-bit voltage samples but only shows about half the number of samples
+taken.
+
+Given that the sample values cover the full 8-bit range and that the
+packet-start bytes are also in this range, there is a non-zero chance
+that the start bytes could be seen in the sample data. The two header
+bytes following the 'BA' packet-start bytes have fixed values, so the
+module looks for four bytes instead of the 'BA'. This decreases the
+chance of seeing 'BA' in the sample data.
+
+The following observations have been made on the data read over the
+serial port:
+
+- The BA packets are supposed to contain 256 samples, but not
+  always. The total is often 2-3 bytes fewer. Therefore the module
+  always parses the stream by the packet-start bytes instead of
+  counting 256 for data.
+
+- Sometimes the initial dozen or so sampling values are extremely
+  jittery, swinging from almost 0 to 255 and back before settling down
+  to the form of the signal renderd on the scope. The scope itself
+  does not show this, which makes me wonder if it's only displaying
+  the second half of the samples rather than the first. Or it may be
+  an issue after the voltage value are sampled and before thyey are
+  sent over the serial line.
+
+- The BR packets are not seen until the 20ms/division setting.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Device::SerialPort
+  Running this module as non-root user may involve permission changes
+  on the serial port device.
+
+TESTING
+
+Tested on a linux system, using Device::SerialPort v1.04 and a
+Velleman PPS10. The parsed packet data was displayed by piping to
+gnuplot.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Narbey Derbekyan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

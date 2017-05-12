@@ -1,0 +1,83 @@
+{
+   "abstract" : "a Dist::Inkt profile for TOBYINK",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.024, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Inkt-Profile-TOBYINK",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Inkt" : "0.024",
+            "Dist::Inkt::DOAP" : "0.017",
+            "Dist::Inkt::Role::Hg" : "0.004",
+            "Dist::Inkt::Role::Release" : "0",
+            "Dist::Inkt::Role::Test::BumpedVersion" : "0",
+            "Dist::Inkt::Role::Test::Kwalitee" : "0",
+            "Dist::Inkt::Role::Test::SaneVersions" : "0",
+            "Dist::Inkt::Role::Test::TestSuite" : "0",
+            "Test::EOL" : "0",
+            "Test::Tabs" : "0",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Inkt::Profile::TOBYINK" : {
+         "file" : "lib/Dist/Inkt/Profile/TOBYINK.pm",
+         "version" : "0.024"
+      },
+      "Dist::Inkt::Role::Test::Whitespace" : {
+         "file" : "lib/Dist/Inkt/Role/Test/Whitespace.pm",
+         "version" : "0.024"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Profile-TOBYINK"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Inkt-Profile-TOBYINK",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-dist-inkt-profile-tobyink.git",
+         "web" : "https://github.com/tobyink/p5-dist-inkt-profile-tobyink"
+      },
+      "x_identifier" : "http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Profile-TOBYINK/project"
+   },
+   "version" : "0.024",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01",
+   "x_static_install" : 1
+}

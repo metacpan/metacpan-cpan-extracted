@@ -1,0 +1,54 @@
+{
+   "abstract" : "Manage a file of DSNs, for both testing and production",
+   "author" : [
+      "Ron Savage <ron@savage.net.au>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Admin-DSNManager",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Version" : "1.002003"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::Tiny" : "2.12",
+            "File::Slurp" : "9999.13",
+            "File::Spec" : "3.31",
+            "File::Temp" : "0.22",
+            "Moo" : "1.004002",
+            "Try::Tiny" : "0.06",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Admin::DSNManager" : {
+         "file" : "lib/DBIx/Admin/DSNManager.pm",
+         "version" : "2.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "2.01"
+}

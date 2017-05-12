@@ -1,0 +1,19 @@
+$Id: BUGS,v 1.3 2011/09/06 17:26:01 mpeppler Exp $
+
+Known problems:
+--------------
+
+t/fail.t fails on test 8 if the server is 11.0.3.3. This is not a problem 
+with DBD::Sybase, but rather a problem with the error handling of
+the Sybase server itself.
+
+Prepared statements with ?-style placeholders become unusable after
+an error on the execute, with an error similar to: 
+     Stored procedure '*00001500000000_70d40f' not found.
+This error shows up when DBD::Sybase is used against some versions
+of ASE 12.0 (known versions to be affected are 12.0 ESD#1 and ESD#2,
+and 12.0.0.1 ESD#3 on Solaris.)
+On ASE 11.9.2/linux $sth->execute() calls that follow the call that 
+fails simply hang.
+
+

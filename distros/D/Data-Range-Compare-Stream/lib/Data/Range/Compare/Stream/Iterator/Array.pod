@@ -1,0 +1,139 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Array - simple array iterator
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+
+  my $iterator=Data::Range::Compare::Stream::Iterator::Array->new(
+    factory_instance=>'Data::Range::Compare::Stream',
+  );
+
+  # create a new range and add it to the iterator
+  $iterator->create_range(0,0);
+
+  my $range=Data::Range::Compare::Stream->new(0,1);
+
+  # add a new range from the existing one
+  $iterator->add_range($range);
+
+  $iterator->prepare_for_consolidate_asc;
+
+  while($iterator->has_next) {
+    my $next_range=$iterator->get_next;
+  }
+
+=head1 DESCRIPTION
+
+This module implements Data::Range::Compare::Stream::Iterator::Base and provides an array iterator.
+
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $iterator=new Data::Range::Compare::Stream::Iterator::Array;
+
+Instance Constructor, all arguments are optional:
+  
+      factory_instance =>$obj
+        
+	# defines the object that implements the $obj->factory($start,$end,$data).
+	# new ranges are constructed from the factory interfcae.  If a factory interface
+	# is not created an instance of Data::Range::Compare::Stream is assumed.
+
+      new_from   =>  'Data::Range::Compare::Stream'
+        
+	# depricated, but supported
+	# Defines what class to call new against for $iterator->create_range(x,x,x)
+
+      range_list =>  []
+        
+	# Defines the array reference used internally
+
+      sorted     =>  0
+
+        # Sets the sorted state
+
+       autosort  =>  'prepare_for_consolidate_asc' or 'prepare_for_consolidate_desc'
+         
+	 # Allows for dynamic sort support when has_next is called
+
+=item * $iterator->add_range($obj)
+
+Adds $obj to the internal array.  This function returns false once $iterator has been sorted
+
+=item * $iterator->create_range(0,0);
+
+Creates a new range object and adds it to the internal array.  This function returns false once $iterator has been sorted.
+
+=item * $iterator->prepare_for_consolidate_asc;
+
+Sorts the internal array and sets the sorted flag $iterator->has_next returns false until the internal array has been sorted.
+
+=item * $iterator->prepare_for_consolidate_desc;
+
+Sorts the internal array and sets the sorted flag: $iterator->has_next returns false until the internal array has been sorted.
+
+=item * $iterator->set_sorted(0|1);
+
+Used to set the internal array sorted flag
+
+=item * if($iterator->sorted) { ... }
+
+Returns the sorted state
+
+=item * while($iterator->has_next) { ... }
+
+Returns true when the internal array has been sorted and still contains data.  If autosrot has been set, then it will return true if the array contains data.
+
+=item * my $range=$iterator->get_next;
+
+If $iterator->has_next returns true, then the next value from the internal array is returned
+
+=item * my $string=$iterator->to_string;
+
+Returns the instance name of $iterator
+
+=item * $iterator->insert_range($range);
+
+Inserts a range into a the iterator regardless of the "sorted" state. Use with caution!
+
+=item * if($iterator->prepared) { ... }
+
+Returns the prepared state
+
+=item * $iterator->prepare
+
+Prepares the object to be used for iteration.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

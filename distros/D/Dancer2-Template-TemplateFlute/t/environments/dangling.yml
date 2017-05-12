@@ -1,0 +1,8 @@
+template: template_flute
+engines:
+  template:
+    template_flute:
+      check_dangling: 1
+log: debug
+logger: capture
+views: t/views

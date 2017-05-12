@@ -1,0 +1,61 @@
+Data-Consumer
+
+Framework for repeatedly consuming a data resource in a robust way.
+
+It is a common requirement to need to process a feed of some sort in
+a robust manner. Such a feed might be records that are inserted into
+a table, or files dropped in a delivery directory, or what have you.
+Writing a script that handles all the edge cases, like getting "stuck"
+on a failed item, and manages things like locking so that the script 
+can be parallelized can be tricky and repetitive.
+
+The aim of Data::Consumer is to provide a framework to allow writing
+such consumer type scripts as easy as writing a callback that processes
+each item. The framework handles the rest.
+
+The basic idea is that one need only define a Data::Consumer subclass
+which implements a few primitive methods which handle the required tasks,
+and then the Data::Consumer methods use those to provide a DWIMily 
+consistant interface. Currently Data::Consumer comes with two subclasses,
+Data::Consumer::MySQL for handling records in a Mysql db (using the 
+MySQL 'get_lock' function), and Data::Consumer::Dir for handling a drop
+directory scenario (like for FTP or a mail directory).
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Consumer
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Consumer
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Consumer
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Consumer
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Consumer
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008, 2010, 2011 Yves Orton
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

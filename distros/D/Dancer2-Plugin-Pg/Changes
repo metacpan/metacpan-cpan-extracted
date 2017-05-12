@@ -1,0 +1,23 @@
+Revision history for Dancer2-Plugin-Pg
+
+0.07    2016-05-30/08:19
+	Solved problems in core, had many bugs.
+
+0.06    2016-05-20/17:34
+	Solved error in documentation.
+
+0.05    2016-05-09/09:03
+	Removed folder.
+
+0.04    2016-04-13/22:44
+	Solved Error 'Type of arg 1 to keys must be hash (not array dereference)' in old versions of Perl
+
+0.03    2016-04-13/13:05
+	Solved Error 'Type of arg 1 to keys must be hash (not array dereference)' in old versions of Perl
+
+0.02    2016-04-12/06:16
+	Solved problem of dependency
+
+0.01    2016-04-12/04:40
+    First version, released on an unsuspecting world.
+

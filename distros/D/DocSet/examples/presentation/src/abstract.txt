@@ -1,0 +1,18 @@
+Tutorial: mod_perl 2.0, the next generation
+by Stas Bekman,
+Thursday, July 25 1:45pm - 2:30pm
+
+Who Should Attend: 
+Experienced mod_perl Programmers who want to learn what's new in the
+mod_perl world. And wannabes who want to learn what they can achieve with
+mod_perl 2.0. The talk will be quite technical.
+
+Abstract:
+This session will provide an overview of what's new in mod_perl 2.0 and
+what else is planned for the future. Learn how mod_perl 2.0 has adjusted
+to Apache 2.0's threaded architecture using new features of Perl version
+5.6 to provide significant performance and memory-sharing improvements
+over mod_perl's 1.xx versions. Apache 2.0 has also introduced a number of
+new APIs and module hooks, this session will discuss where and how
+mod_perl fits into these new areas of the server.
+

@@ -1,0 +1,99 @@
+{
+   "abstract" : "faster XLSX parser",
+   "author" : [
+      "Daisuke Murase <typester@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-XLSX-Parser",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "XML::Parser::Expat" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::XLSX::Parser" : {
+         "file" : "lib/Data/XLSX/Parser.pm",
+         "version" : "0.14"
+      },
+      "Data::XLSX::Parser::DocumentArchive" : {
+         "file" : "lib/Data/XLSX/Parser/DocumentArchive.pm"
+      },
+      "Data::XLSX::Parser::Relationships" : {
+         "file" : "lib/Data/XLSX/Parser/Relationships.pm"
+      },
+      "Data::XLSX::Parser::SharedStrings" : {
+         "file" : "lib/Data/XLSX/Parser/SharedStrings.pm"
+      },
+      "Data::XLSX::Parser::Sheet" : {
+         "file" : "lib/Data/XLSX/Parser/Sheet.pm"
+      },
+      "Data::XLSX::Parser::Styles" : {
+         "file" : "lib/Data/XLSX/Parser/Styles.pm"
+      },
+      "Data::XLSX::Parser::Workbook" : {
+         "file" : "lib/Data/XLSX/Parser/Workbook.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/acidlemon/Data-XLSX-Parser/issues"
+      },
+      "homepage" : "https://github.com/acidlemon/Data-XLSX-Parser",
+      "repository" : {
+         "url" : "git://github.com/acidlemon/Data-XLSX-Parser.git",
+         "web" : "https://github.com/acidlemon/Data-XLSX-Parser"
+      }
+   },
+   "version" : "0.14",
+   "x_contributors" : [
+      "Masatoshi Kawazoe (acidlemon) <kawazoe-masatoshi@kayac.com>",
+      "Shinichiro Sei <sei@kayac.com>",
+      "Masatoshi Kawazoe <github@beatsync.net>",
+      "Masatoshi Kawazoe (acidlemon) <acidlemon@beatsync.net>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

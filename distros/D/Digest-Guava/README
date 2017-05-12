@@ -1,0 +1,58 @@
+NAME
+    Digest::Guava - Perl XS interface to the Google's Guava consistent
+    hashing algorithm
+
+SYNOPSIS
+      use Digest::Gauva qw(guava_hash);
+      guava_hash($integer_key, $buckets_count);
+
+    OR
+
+      use Digest::Gauva;
+      Digest::Gauva::guava_hash($integer_key, $buckets_count);
+
+DESCRIPTION
+    Google's Guava hashing algorithm.
+
+    Assign to input a "bucket" in the range [0, buckets), in a uniform
+    manner that minimizes the need for remapping as buckets grows. That is,
+    consistentHash(h, n) equals:
+
+    *   n - 1, with approximate probability 1/n;
+
+    *   consistentHash(h, n - 1), otherwise (probability 1 - 1/n).
+
+SEE ALSO
+    See the wikipedia article on consistent hashing:
+    <http://en.wikipedia.org/wiki/Consistent_hashing> for more information.
+
+    Google's implementation of Guava hash at
+    <https://github.com/google/guava>.
+
+    For alternative consistent hash algorithms/implementations, search CPAN,
+    but here's some:
+
+    Hash::Consistent
+
+    Digest::MurmurHash
+
+    Algorithm::ConsistentHash::CHash
+
+    Algorithm::ConsistentHash::Ketama
+
+AUTHOR
+    Mons Anderson, "<mons@cpan.org>"
+
+    igorcoding, "<igorcoding@gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests in
+    <https://github.com/igorcoding/Digest-Guava/issues>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2016 by igorcoding
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.20.2 or, at
+    your option, any later version of Perl 5 you may have available.
+

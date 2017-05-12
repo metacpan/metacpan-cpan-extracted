@@ -1,0 +1,22 @@
+Changes
+ignore.txt
+lib/Devel/Decouple.pm
+lib/Devel/Decouple/DB.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.build.t
+t/01.override.t
+t/01.report.t
+t/complexity.t
+t/coverage.t
+t/kwalitee.t
+t/perlcritic.t
+t/pod-coverage.t
+t/pod.t
+t/TestMod/Bar.pm
+t/TestMod/Baz.pm
+t/TestMod/Foo.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

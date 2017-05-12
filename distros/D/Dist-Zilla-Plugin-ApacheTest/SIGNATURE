@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 29b16d0b2a58075d12119b14c4ceb12ede4a5c60 Changes
+SHA1 0b0d3fe360f7a445c3a3a21feb6ea278db155ba3 LICENSE
+SHA1 a793bfeae2bab83cd0d1ea8b073e09ee24655af0 MANIFEST
+SHA1 01d2fe93a1f48980dc7dcf19310a6613a1c4f2e0 MANIFEST.SKIP
+SHA1 9570d5ad1fc4b131dfef74468d5af4bf260fd749 META.yml
+SHA1 e38910e72c92a3ae5473c95342edc5a144550e8d Makefile.PL
+SHA1 c2eb9c9da0622ce9bda7ba50f0773c60bb788dad README
+SHA1 359988ad1b8ab785e56eae77b81a3db7149526bb lib/Dist/Zilla/Plugin/ApacheTest.pm
+SHA1 89e69d3cf3046753034b9922ea988347abc94fb5 lib/Dist/Zilla/Plugin/MakeMaker/ApacheTest.pm
+SHA1 37e371c87e17e20773521be1a8ea6b40c49edd18 lib/Dist/Zilla/PluginBundle/ApacheTest.pm
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 8524be11a3b5ba5e93c98ba99b29384c1fe1ddb1 t/compile.t
+SHA1 2609ea72587926aeab4ed4ac4d584f667dec2698 t/signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iD8DBQFXeWPo+CqvSzp9LOwRAqkDAKCs3mLvrzjA7B9aE3G/HsoYsMvjbgCgzHlu
+XlDPUTUdAIaSmtOHLushvSg=
+=SR1U
+-----END PGP SIGNATURE-----

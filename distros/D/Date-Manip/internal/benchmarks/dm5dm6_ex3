@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+# Usage: dm5dm6 VERS FILE
+#    VERS  = 5, 6, 6o
+#    FILE  = file containing a list of dates
+
+use warnings;
+use strict;
+
+use Time::HiRes  		qw / gettimeofday tv_interval /;
+
+my ($vers,$file) = @ARGV;
+
+my @dates = `cat $file`;
+chomp(@dates);
+
+my $obj;
+if ($vers eq '5') {
+   require Date::Manip::DM5;
+   Date::Manip::DM5->import(qw(ParseDate));
+} elsif ($vers eq '6') {
+   require Date::Manip::DM6;
+   Date::Manip::DM6->import(qw(ParseDate));
+} elsif ($vers eq '6o') {
+   require Date::Manip::Date;
+   $obj = new Date::Manip::Date;
+} else {
+   die "ERROR: invalid version\n";
+}
+
+my $t0 = [gettimeofday()];
+
+if ($vers eq '5'  ||  $vers eq '6') {
+   foreach my $date (@dates) {
+      ParseDate($date);
+   }
+} elsif ($vers eq '6o') {
+   foreach my $date (@dates) {
+      $obj->parse($date);
+   }
+}
+
+my $t1 = [gettimeofday()];
+my $et = tv_interval($t0, $t1)*1000;
+
+printf(STDOUT "Elapsed:   %6.3f\n",$et);
+
+#                 5          6            6o
+# dateset3.txt    857.250    2246.340     2090.676
+#   _notz         683.084     462.898      431.781

@@ -1,0 +1,17 @@
+SearchServer.h
+SearchServer.pm
+SearchServer.xs
+README
+README.dec_osf
+MANIFEST
+Makefile.PL
+dbdimp.c
+dbdimp.h
+fultest/placeholder.txt
+t/aaa.t
+t/base.t
+t/misc.t
+t/dbishsupp.t
+test.fte
+test.pl
+build-dir.sh

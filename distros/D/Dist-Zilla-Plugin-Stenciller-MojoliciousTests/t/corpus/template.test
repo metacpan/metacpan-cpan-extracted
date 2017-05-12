@@ -1,0 +1,11 @@
+use 5.10.1;
+use strict;
+use warnings FATAL => 'all';
+use Test::More;
+use Test::Warnings;
+use Test::Mojo::Trim;
+use Mojolicious::Lite;
+
+use if $ENV{'AUTHOR_TESTING'}, 'Test::Warnings';
+
+my $test = Test::Mojo::Trim->new;

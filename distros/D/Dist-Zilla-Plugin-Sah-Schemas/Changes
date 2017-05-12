@@ -1,0 +1,50 @@
+0.008   2017-01-31 (PERLANCAR)
+
+	- Replace Data::Dump with Data::Dmp so we can deparse coderefs.
+
+
+0.007   2017-01-15 (PERLANCAR)
+
+	- [Bugfix] Fix regression bug when introducing use of
+	  Dist::Zilla::Role::RequireFromBuild.
+
+	- Use Require::Hook::DzilBuild instead of DZR:RequireFromBuild.
+
+
+0.006   2017-01-09 (PERLANCAR)
+
+	- UPDATE 2017-01-15: this release is broken, don't use.
+
+        - Use Dist::Zilla::Role::RequireFromBuild.
+
+
+0.005   2016-12-26 (PERLANCAR)
+
+	- Fix typo in generated text [RT#119466].
+
+
+0.004   2016-08-04 (PERLANCAR)
+
+	- Add some description in generated Sah::SchemaR::* about what the
+	  module is for.
+
+	- Handle (skip) when schema cannot be resolved, e.g. recursive.
+
+
+0.003   2016-07-22 (PERLANCAR)
+
+	- Produce Sah::SchemaR::* modules (pre-resolved edition of
+	  schemas).
+
+
+0.002   2016-07-20 (PERLANCAR)
+
+	- Add prereq to other Sah::Schema::* modules used by each
+	  Sah::Schema::* module in the distribution.
+
+	- Tweak error message to make it clearer.
+
+
+0.001   2016-05-08 (PERLANCAR)
+
+        - First release.

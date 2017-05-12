@@ -1,0 +1,20 @@
+Revision history for Dist-Zilla-App-Command-shell.
+
+0.005    2011-11-09    Olivier Mengué (DOLMEN)
+	Fix for the display of exceptions in DZ commands.
+	Add dummy tests just for raising Kwalitee.
+
+0.004    2011-11-07    Olivier Mengué (DOLMEN)
+	Fix repository metadata after GitHub repo renaming.
+
+0.003    2011-11-02    Olivier Mengué (DOLMEN)
+	Rename distribution from Dist-Zilla-App-Command-shell to
+	  Dist-Zilla-Shell.
+
+0.002    2011-10-28    Olivier Mengué (DOLMEN)
+	New feature: forward unknown commands to the system shell.
+
+0.001    2011-10-27    Olivier Mengué (DOLMEN)
+	First release.
+	My first real use of Dist::Zilla was at the QA Hackathon 2011 in
+	  Amsterdam, and since that day I needed this extension.

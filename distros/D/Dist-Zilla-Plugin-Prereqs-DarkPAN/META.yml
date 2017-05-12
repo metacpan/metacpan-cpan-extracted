@@ -1,0 +1,58 @@
+---
+abstract: 'Depend on things from arbitrary places-not-CPAN'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Prereqs-DarkPAN
+provides:
+  Dist::Zilla::App::Command::listdeps_darkpan:
+    file: lib/Dist/Zilla/App/Command/listdeps_darkpan.pm
+    version: v0.3.0
+  Dist::Zilla::ExternalPrereq:
+    file: lib/Dist/Zilla/ExternalPrereq.pm
+    version: v0.3.0
+  Dist::Zilla::Plugin::Prereqs::DarkPAN:
+    file: lib/Dist/Zilla/Plugin/Prereqs/DarkPAN.pm
+    version: v0.3.0
+  Dist::Zilla::Role::PrereqSource::External:
+    file: lib/Dist/Zilla/Role/PrereqSource/External.pm
+    version: v0.3.0
+  Dist::Zilla::Role::xPANResolver:
+    file: lib/Dist/Zilla/Role/xPANResolver.pm
+    version: v0.3.0
+recommends:
+  Moose: '2.000'
+requires:
+  App::Cache: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Parse::CPAN::Packages: '0'
+  Path::ScanINC: '0'
+  Try::Tiny: '0'
+  URI: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-DarkPAN/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-DarkPAN
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-DarkPAN.git
+version: v0.3.0

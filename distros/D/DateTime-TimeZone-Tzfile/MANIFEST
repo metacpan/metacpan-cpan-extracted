@@ -1,0 +1,23 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/DateTime/TimeZone/Tzfile.pm
+t/Davis.tz
+t/Hebron.tz
+t/Kaliningrad.tz
+t/London.tz
+t/Loyston.tz
+t/San_Luis.tz
+t/construct.t
+t/crlf.t
+t/ident.t
+t/local.t
+t/offset.t
+t/pod_cvg.t
+t/pod_syn.t
+SIGNATURE    Added here by Module::Build

@@ -1,0 +1,6 @@
+This is a Dancer interface for Business::PayPal::API::ExpressCheckout. 
+
+It gives Dancer keywords for the three PaypalExpress requests, plus keywords
+giving access to the hashes returned from the 'getrequest' and final 'dorequest'.
+
+Lyn St George, lyn@zolotek.net, April 2014

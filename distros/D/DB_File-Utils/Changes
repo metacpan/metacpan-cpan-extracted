@@ -1,0 +1,32 @@
+Revision history for perl module DB_File::Utils
+
+0.006 2015-10-06
+
+ - Updated Changes file
+
+0.005 2015-10-06
+
+ - use warnings and strick everywhere;
+ - add LICENSE and COPYRIGHT;
+
+0.004 2015-07-19
+
+ - added -i option to put command. (read from file)
+ - support RecNo indexing scheme.
+   (note that keys need to be positive integer)
+
+0.003 2015-07-16
+
+ - added tests.
+ - support 'new' command to create empty db.
+ - support switches to change the type of DB_File indexing
+   (BTree and Hash supported ATM)
+
+0.002 2015-07-16
+
+ - added a 'put' command, to add a pair key/value;
+ - added an 'utf-8' switch to force encoding/decoding;
+
+0.001 2015-07-04
+
+ - First version, with commands 'keys' and 'get'

@@ -1,0 +1,133 @@
+CHARSET="ANSI";
+AXIS-VERSION="2000";
+LANGUAGE="en";
+CREATION-DATE="20110815 12:01";
+DECIMALS=0;
+SHOWDECIMALS=0;
+MATRIX="AIA36";
+SUBJECT-AREA="";
+SUBJECT-CODE="DB";
+TITLE="Manufacturing Local Units which Export by Region, Industry Sector NACE"
+"Rev 2, Year and Statistic";
+CONTENTS="Manufacturing Local Units which Export";
+UNITS="Number";
+STUB="Region","Industry Sector NACE Rev 2";
+HEADING="Year","Statistic";
+CONTVARIABLE="Statistic";
+VALUES("Region")="Border, Midland and Western","Southern and Eastern","State";
+VALUES("Industry Sector NACE Rev 2")="Textiles (13)","Wearing apparel (14)","Wood and wood products, except furniture (16)",
+"Paper and paper products (17)","Printing and reproduction of recorded media (18)","Rubber and plastic products (22)",
+"Other non-metallic mineral products (23)","Basic metals (24)","Fabricated metal products, except machinery and equipment (25)",
+"Computer, electronic and optical products (26)","Electrical equipment (27)","Machinery and equipment n.e.c. (28)",
+"Motor vehicles, trailers and semi-trailers (29)","Repair and installation of machinery and equipment (33)",
+"Food; chemical and pharmaceutical products (10,20,21)","Food, chemical, pharmaceutical products, computer and optical products (10,20,21,26)",
+"Manufacturing industries (10 to 33)","Beverages; tobacco; coke and refined petroleum products; furniture (11,12,19,31)",
+"Leather, electrical, motor vehicles, trailers, transport, other manufacturing (15,27,29,30,32)",
+"Leather; other transport equipment and other manufacturing (15,30,32)";
+VALUES("Year")="2008","2009";
+VALUES("Statistic")="Manufacturing Local Units (Number)","Persons Engaged in Manufacturing Local Units (Number)",
+"Gross Output in Manufacturing Local Units (Euro Thousand)","Gross Output Exported (Euro Thousand)",
+"Distribution of Output Exported - UK (Euro Thousand)","Distribution of Output Exported - EU Excl UK (Euro Thousand)",
+"Distribution of Output Exported - USA (Euro Thousand)","Distribution of Output Exported - Rest of World (Euro Thousand)";
+TIMEVAL("Year")=TLIST(A1),"2008","2009";
+CODES("Region")="IE1","IE2","-";
+CODES("Industry Sector NACE Rev 2")="13","14","16","17","18","22","23","24","25","26","27","28","29","33","V2070","V2076","V2100","V2158","V2675","V2680";
+CODES("Statistic")="AIA36C1","AIA36C2","AIA36C3","AIA36C4","AIA36C5","AIA36C6","AIA36C7","AIA36C8";
+DOMAIN("Region")="C02196V02652";
+DOMAIN("Industry Sector NACE Rev 2")="C02653V03212";
+LAST-UPDATED("Manufacturing Local Units (Number)")="20110815 11:02";
+LAST-UPDATED("Persons Engaged in Manufacturing Local Units (Number)")="20110815 11:02";
+LAST-UPDATED("Gross Output in Manufacturing Local Units (Euro Thousand)")="20110815 11:02";
+LAST-UPDATED("Gross Output Exported (Euro Thousand)")="20110815 11:02";
+LAST-UPDATED("Distribution of Output Exported - UK (Euro Thousand)")="20110815 11:02";
+LAST-UPDATED("Distribution of Output Exported - EU Excl UK (Euro Thousand)")="20110815 11:02";
+LAST-UPDATED("Distribution of Output Exported - USA (Euro Thousand)")="20110815 11:02";
+LAST-UPDATED("Distribution of Output Exported - Rest of World (Euro Thousand)")="20110815 11:02";
+UNITS("Manufacturing Local Units (Number)")="Number";
+UNITS("Persons Engaged in Manufacturing Local Units (Number)")="Number";
+UNITS("Gross Output in Manufacturing Local Units (Euro Thousand)")="Euro Thousand";
+UNITS("Gross Output Exported (Euro Thousand)")="Euro Thousand";
+UNITS("Distribution of Output Exported - UK (Euro Thousand)")="Euro Thousand";
+UNITS("Distribution of Output Exported - EU Excl UK (Euro Thousand)")="Euro Thousand";
+UNITS("Distribution of Output Exported - USA (Euro Thousand)")="Euro Thousand";
+UNITS("Distribution of Output Exported - Rest of World (Euro Thousand)")="Euro Thousand";
+SOURCE="Central Statistics Office, Ireland";
+DATABASE="CSO Databank";
+REFPERIOD("Manufacturing Local Units (Number)")=" ";
+REFPERIOD("Persons Engaged in Manufacturing Local Units (Number)")=" ";
+REFPERIOD("Gross Output in Manufacturing Local Units (Euro Thousand)")=" ";
+REFPERIOD("Gross Output Exported (Euro Thousand)")=" ";
+REFPERIOD("Distribution of Output Exported - UK (Euro Thousand)")=" ";
+REFPERIOD("Distribution of Output Exported - EU Excl UK (Euro Thousand)")=" ";
+REFPERIOD("Distribution of Output Exported - USA (Euro Thousand)")=" ";
+REFPERIOD("Distribution of Output Exported - Rest of World (Euro Thousand)")=" ";
+BASEPERIOD("Manufacturing Local Units (Number)")=" ";
+BASEPERIOD("Persons Engaged in Manufacturing Local Units (Number)")=" ";
+BASEPERIOD("Gross Output in Manufacturing Local Units (Euro Thousand)")=" ";
+BASEPERIOD("Gross Output Exported (Euro Thousand)")=" ";
+BASEPERIOD("Distribution of Output Exported - UK (Euro Thousand)")=" ";
+BASEPERIOD("Distribution of Output Exported - EU Excl UK (Euro Thousand)")=" ";
+BASEPERIOD("Distribution of Output Exported - USA (Euro Thousand)")=" ";
+BASEPERIOD("Distribution of Output Exported - Rest of World (Euro Thousand)")=" ";
+INFOFILE="DB_AI";
+DATA=
+26 406 44127 32416 10292 14408 1333 6383 19 319 34698 25732 7457 12191 1320 4763 
+18 509 15395 6530 711 2095 2415 1309 16 285 12041 7377 1888 1737 2744 1008 
+62 1734 309476 103967 63433 32525 4923 3086 59 1389 194834 78325 46441 24125 4525 3234 
+14 321 47079 13649 9233 3673 182 561 11 247 33975 9050 6889 1193 806 162 
+28 742 79554 38829 8693 12087 12383 5666 27 763 89637 42683 10633 12681 13428 5941 
+58 3038 531544 376578 133764 190711 47652 4451 56 2811 469123 315712 92511 166077 46124 11000 
+69 2200 831440 360606 340496 16920 1685 1505 66 1801 447079 125534 113242 10022 1249 1021 
+30 331 63983 19543 13204 4316 970 1054 28 239 49881 15611 9831 4297 757 726 
+92 2274 381098 159819 91398 56174 6256 5991 76 1868 221942 98131 60043 29268 4225 4594 
+27 2011 407324 371864 42641 284064 27478 17682 ".." ".." ".." ".." ".." ".." ".." ".." 
+21 1683 274517 193781 118745 65618 3783 5636 ".." ".." ".." ".." ".." ".." ".." ".." 
+69 2875 1031085 918047 142964 589905 99624 85554 57 2070 436164 370649 81020 208044 30428 51157 
+10 517 135342 99553 34714 44304 10187 10349 ".." ".." ".." ".." ".." ".." ".." ".." 
+22 163 19379 6158 4493 972 350 343 14 124 12892 4781 3387 563 316 516 
+169 13582 8309577 6831460 1527961 3648271 106632 1548595 ".." ".." ".." ".." ".." ".." ".." ".." 
+".." ".." ".." ".." ".." ".." ".." ".." 184 15468 9097211 7462621 1376528 3768981 497709 1819403 
+853 45275 15011961 11714461 2670656 6204541 1015938 1823327 769 42228 14261640 11305079 2056687 5806033 1384413 2057946 
+79 1363 249302 155918 47122 90115 14607 4075 72 1171 189641 137293 36156 82647 12231 6258 
+".." ".." ".." ".." ".." ".." ".." ".." 84 13673 2972523 2611582 210662 1484207 768550 148163 
+59 11526 2281738 2025743 80793 1148385 675479 121087 ".." ".." ".." ".." ".." ".." ".." ".." 
+47 1288 154685 120144 23429 79097 7402 10216 40 1660 173637 128477 18118 80817 14001 15540 
+35 734 75966 39320 20831 15136 1710 1644 25 601 65669 34222 18007 13295 1776 1143 
+44 1214 320769 188784 146455 40012 354 1963 49 1372 277572 164278 128410 33161 883 1824 
+54 1746 292033 79220 63942 12103 1506 1670 52 1747 258512 63195 39198 21134 1542 1321 
+98 2612 1208008 899361 189892 618971 36626 53872 88 2294 1104936 787452 170212 558813 16383 42044 
+107 3493 563527 318702 152421 147972 6371 11938 94 3320 497920 281425 119325 139625 8083 14392 
+90 2699 560853 180209 116341 35855 21669 6343 85 2175 364109 88246 41201 27224 9930 9891 
+51 1767 684874 360213 165621 140017 2043 52532 42 1373 301883 194613 80181 73897 1516 39019 
+205 4842 781419 360484 168787 147799 20806 23092 178 3968 601576 346660 100804 150511 45020 50325 
+80 19380 19235572 18666477 4231896 9617823 2669354 2147403 ".." ".." ".." ".." ".." ".." ".." ".." 
+60 2597 507927 433547 102441 232974 50343 47789 ".." ".." ".." ".." ".." ".." ".." ".." 
+145 7323 1555565 1243810 161782 569927 299003 213098 142 6540 1451065 1257652 141007 550606 390225 175813 
+23 1869 452046 383988 80669 275654 8641 19024 ".." ".." ".." ".." ".." ".." ".." ".." 
+58 1462 201434 103017 22678 38921 14996 26423 48 1217 150225 83639 21049 34295 9022 19273 
+373 38001 39708241 36576347 3097047 16547314 9714465 7217521 ".." ".." ".." ".." ".." ".." ".." ".." 
+".." ".." ".." ".." ".." ".." ".." ".." 417 50971 58608232 55188336 7472194 22341646 16650594 8723902 
+1730 109805 74131362 64747677 9404091 29874704 14727959 10740923 1556 97697 70967529 63431221 8941275 25487951 18835697 10166298 
+148 6006 4060584 1211465 518075 340055 197779 155554 133 5403 2990433 870683 358330 216422 178718 117212 
+".." ".." ".." ".." ".." ".." ".." ".." 163 15056 4121759 3942343 233238 1246505 1508001 954598 
+112 12772 3767858 3582590 141785 1015074 1674890 750841 ".." ".." ".." ".." ".." ".." ".." ".." 
+73 1694 198812 152560 33721 93505 8735 16599 59 1979 208334 154209 25576 93009 15321 20304 
+53 1243 91361 45850 21542 17231 4126 2953 41 886 77710 41599 19895 15033 4520 2152 
+106 2948 630245 292751 209888 72537 5277 5048 108 2761 472406 242602 174851 57286 5408 5058 
+68 2067 339112 92869 73174 15776 1688 2232 63 1994 292487 72244 46086 22327 2349 1483 
+126 3354 1287562 938189 198585 631058 49009 59538 115 3057 1194573 830135 180845 571494 29811 47986 
+165 6531 1095071 695280 286184 338683 54023 16390 150 6131 967043 597137 211836 305702 54207 25392 
+159 4899 1392294 540815 456837 52775 23355 7848 151 3976 811188 213780 154442 37246 11180 10912 
+81 2098 748857 379756 178824 144332 3013 53587 70 1612 351764 210224 90012 78194 2273 39745 
+297 7116 1162517 520303 260185 203973 27062 29083 254 5836 823518 444791 160848 179779 49245 54919 
+107 21391 19642896 19038341 4274537 9901887 2696832 2165085 ".." ".." ".." ".." ".." ".." ".." ".." 
+81 4280 782443 627328 221186 298592 54126 53425 ".." ".." ".." ".." ".." ".." ".." ".." 
+214 10198 2586650 2161857 304746 1159832 398627 298652 199 8610 1887229 1628301 222028 758650 420653 226970 
+33 2386 587388 483541 115383 319958 18828 29372 ".." ".." ".." ".." ".." ".." ".." ".." 
+80 1625 220813 109175 27171 39893 15345 26766 62 1341 163117 88420 24436 34857 9338 19789 
+542 51583 48017818 43407807 4625009 20195585 9821097 8766116 ".." ".." ".." ".." ".." ".." ".." ".." 
+".." ".." ".." ".." ".." ".." ".." ".." 601 66439 67705442 62650957 8848722 26110627 17148303 10543305 
+2583 155080 89143323 76462138 12074746 36079245 15743897 12564250 2325 139925 85229169 74736301 10997962 31293984 20220109 12224245 
+227 7369 4309886 1367383 565198 430170 212386 159629 205 6574 3180074 1007976 394486 299070 190950 123471 
+".." ".." ".." ".." ".." ".." ".." ".." 247 28729 7094282 6553925 443900 2730712 2276552 1102761 
+171 24298 6049595 5608333 222577 2163459 2350369 871927 ".." ".." ".." ".." ".." ".." ".." "..";

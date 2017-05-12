@@ -1,0 +1,15 @@
+INSTALLATION
+============
+
+First unpack the kit, if you have not already done so:
+
+   tar -xzvf Data-Validate-Email-x.xx.tar.gz
+   cd Data-Validate-Email-x.xx
+
+Data::Validate::Email can be installed with:
+
+   perl Makefile.PL
+   make 
+   make test
+   make install
+

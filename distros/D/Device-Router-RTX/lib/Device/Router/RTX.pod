@@ -1,0 +1,248 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Device::Router::RTX - interact with Yamaha RTX routers
+
+=head1 SYNOPSIS
+
+    
+    use utf8;
+    use FindBin '$Bin';
+    use Device::Router::RTX;
+    my $rtx = Device::Router::RTX->new (
+        address => '12.34.56.78',
+        password => 'pwd',
+        admin_password => 'admin_pwd',
+    );
+    $rtx->connect ();
+
+
+=head1 VERSION
+
+This documents Device::Router::RTX version 0.06
+corresponding to git commit L<2dbe79580bfdf0991b02f9caaf8ba6483fc0a2ec|https://github.com/benkasminbullock/Device-Router-RTX/commit/2dbe79580bfdf0991b02f9caaf8ba6483fc0a2ec> released on Wed Jan 25 13:03:47 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module allows one to automate some interactions with Yamaha RTX
+routers.
+
+=head1 METHODS
+
+=head2 new
+
+    my $rtx = Device::Router::RTX->new (
+        address => '12.34.56.78',
+    );
+
+Create a new object for communicating with the router. The IP address
+of the router is compulsory. If the router has a password set, you
+also need to supply a password. For some commands, you need to set the
+administrator password.
+
+This does not open a telnet connection to the router. Use L</connect>
+to open the telnet connection.
+
+The fields which may be supplied to C<new> are
+
+=over
+
+=item address
+
+The IP address of the router on your subnet.
+
+=item password
+
+If your router has a password set, supply it here.
+
+=item admin_password
+
+If your router has an administrator password set, supply it here.
+
+=item config
+
+The name of your configuration file. If you supply this, it reads it
+using L</read_config>.
+
+=item verbose
+
+Print debugging messages.
+
+=back
+
+=head2 connect
+
+    $rtx->connect ();
+
+Connect to the router. This dies if there is an error. If you need to
+debug the telnet connection, see the source code of the module which
+contains extensive debugging code (commented out for the production
+version).
+
+=head2 get_config
+
+    $rtx->get_config ("config");
+
+Get the router's configuration file and put it into the file
+F<config>. This uses TFTP (trivial FTP). It dies on error. If you have
+not set an administrator password in L</new> but your router requires
+one, this will fail with an error "Access violation".
+
+=head2 read_config
+
+    $rtx->read_config ("config");
+
+Read a router configuration file from the specified local file.
+
+Not every option of the router is specified.
+
+=head2 save
+
+    $rtx->save ();
+
+Save an altered configuration to the router's permanent memory.
+
+=head2 command
+
+    $rtx->command ($command);
+
+Send a command to the router specified by C<$command>, and save it.
+
+=head2 wake
+
+   $rtx->wake (<LAN>,<MAC>);
+
+Send a "wake-on-lan" ("wol") packet to the specified MAC address on
+the specified LAN (give the number of the LAN, e.g. 1-3 for RTX1000
+routers). There is no return value.
+
+=head2 arp
+
+    my $arp = $rtx->arp ();
+
+Read the router's arp table. The return value is the undefined value
+if the command fails, or an array reference containing hash references
+if it succeeds. The hash references have four fields, C<lan> (the
+number of the local area network), C<ip> (the IP address), C<mac> (the
+MAC address) and C<ttl> (time to live).
+
+The following example shows retrieving MAC and IP from the router:
+
+    
+    use Device::Router::RTX;
+    my $rtx = Device::Router::RTX->new (address => '12.34.56.78',);
+    my $arp = $rtx->arp();
+    if ($arp) {
+        for my $entry (@$arp) {
+            print "MAC: $entry->{mac} IP: $entry->{ip}.\n";
+        } 
+    } 
+
+
+=head1 TESTING
+
+The default module test does nothing except try to load the module and
+then exit. There is an extra test in the file
+F<extratests/connecting-test.t> which actually tries to connect to the
+router and do a few things. You can either edit this file to insert
+the password and IP address of your router, or you can set the
+following environment variables:
+
+=over
+
+=item RTX_ADDRESS
+
+Set this to the IP address of your router.
+
+=item RTX_PASSWORD
+
+Set this to the user password of your router. If the router's password
+is unset, set this to an empty string.
+
+=item RTX_ADMIN_PASSWORD
+
+This is the administrator password.
+
+=back
+
+When you run the test, and some environment variables are incorrectly
+set, then run the test again shortly afterwards, or if you run the
+test when you already have a telnet session open, you may find that
+the telnet connection is refused. This is a limitation of the device
+itself, so close all connections, wait for a short time, and try
+again.
+
+=head1 SEE ALSO
+
+=head2 About RTX routers
+
+=over
+
+=item L<Yamaha's router site|http://jp.yamaha.com/products/network/routers/> 
+
+The manufacturer's Japanese-language site. I'm not aware of an English
+language site.
+
+=item L<Yamaha RTX1000 router|http://www.lemoda.net/networking/rtx1000/> 
+
+A guide to some of the router's commands by Ben Bullock (author of
+this module).
+
+=item L<Getting started with Yamaha Routers|http://www.denphone.com/getting-started-with-yamaha-routers>  by Simon Gibson at Denphone
+
+A guide to some commands.
+
+=back
+
+=head2 Other Perl modules
+
+=over
+
+=item L<Net::MAC::Vendor>
+
+This allows you to look up the vendor for a MAC, which is quite useful
+when looking at an arp table generated by L</arp>, and trying to work
+out what device a particular MAC address represents.
+
+=back
+
+=head1 DEPENDENCIES
+
+=over
+
+=item L<Net::Telnet>
+
+=item L<Net::TFTP>
+
+=item L<Carp>
+
+=back
+
+=head1 DISCLAIMER
+
+The author of this Perl module is not and has never been affiliated
+with Yamaha Corporation. The author cannot take any responsibility for
+what happens to your router or other security systems if you use this
+module. Please carefully evaluate the source code before operating,
+and use this code only at your own risk.
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+
+

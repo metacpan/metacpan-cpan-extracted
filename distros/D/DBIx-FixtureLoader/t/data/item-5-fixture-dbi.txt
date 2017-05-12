@@ -1,0 +1,7 @@
+---
+- data:
+    id: 8
+    name: 与一の弓
+- data:
+    id: 9
+    name: 賢者の杖

@@ -1,0 +1,26 @@
+---
+abstract: 'Show a spinner in the console on Dancer log messages!'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Logger-ConsoleSpinner
+requires:
+  Dancer: 0
+  Dancer::Logger::Abstract: 0
+resources:
+  repository: http://github.com/xsawyerx/dancer-logger-spinner
+version: 0.02

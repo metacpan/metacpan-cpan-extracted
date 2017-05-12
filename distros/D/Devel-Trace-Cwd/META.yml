@@ -1,0 +1,18 @@
+---
+abstract: 'Print out each line before it is executed and track cwd changes'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.110240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Trace-Cwd
+resources:
+  homepage: http://github.com/bingos/devel-trace-cwd/tree
+  repository: git://github.com/bingos/devel-trace-cwd.git
+version: 0.02

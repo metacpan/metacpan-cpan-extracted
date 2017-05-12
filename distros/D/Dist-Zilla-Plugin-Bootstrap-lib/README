@@ -1,0 +1,31 @@
+Dist::Zilla::Plugin::Bootstrap::lib
+
+This module exists for loading either "/lib" or
+"/Dist-Name-$VERSION/lib" into your @INC early on.
+
+This is mostly useful for writing "Dist::Zilla" plug-ins, so that you
+may build and release a plug-in using itself.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

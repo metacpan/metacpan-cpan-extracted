@@ -1,0 +1,129 @@
+Revision history for Dist-Metadata
+
+0.927     2017-01-09T02:41:39Z
+
+  - Change tests to not rely on '.' in @INC.
+    Thanks to Graham Knop for the pull request (gh-15).
+
+0.926     2015-04-29T03:16:55Z
+
+  - Always add local, perl5, and fatlib to "no_index.directory"
+    for consistency with PAUSE.  Closes gh-12 and gh-14.
+    Thanks to Sawyer X for the pull-req and the prodding.
+
+0.925     2013-02-08T02:40:09Z
+
+  - Specify 1.03 as minimum required version of Digest
+    to ensure that it tries Digest::SHA.  Closes gh-6.
+
+0.924     2012-11-10T17:38:33Z
+
+  - Add 'module_info' method for getting additional data (like checksums)
+    with the provided module hashref.  Thanks to Jeffrey Ryan Thalhammer
+    for the suggestion.
+  - Add 'file_checksum' method to the Dist::Metadata::Dist base class.
+
+0.923     2012-06-19T03:13:55Z
+
+  - By default, when determining packages, filter out packages
+    that don't match the file name (ones that can't be loaded via use/require).
+    This mimics the behavior of PAUSE.
+    If you want the old behavior of including "inner" packages in the meta
+    "provides" set "include_inner_packages" to true in the constructor.
+    Thanks to Jeffrey Ryan Thalhammer for finding and fixing this
+    (and including tests)!
+
+0.922     2011-10-19T22:30:53Z
+
+  - Let CPAN::Meta set release_status instead of defaulting to 'stable'.
+    Fixes an issue with dev/alpha versions.
+    Thanks to Jeffrey Ryan Thalhammer (thaljef) for reporting and fixing.
+
+0.921     2011-09-09T23:10:21Z
+
+  - Fix 'no_index' checking with non-unix paths.
+
+0.920     2011-08-18T04:11:45Z
+
+  [API Change]
+  - Dist::extract_into() and Dist::physical_directory() now return just $dir
+    in scalar context (and continue to return ($dir, @files) in list context)
+
+  [Enhancements]
+  - Support zip archives (in addition to tar files).
+    (Thanks to thaljef for reporting.)
+
+  [Fixes]
+  - Always include inc/, t/, and xt/ in meta/no_index.
+    (Thanks to thaljef for reporting.)
+  - Make return value of Dir::physical_directory() consistent with
+    other subclasses.
+
+0.915     2011-08-16T18:52:01Z
+
+  - Remove warning for no packages found (thaljef).
+
+0.914     2011-08-02T16:01:46Z
+
+  - Use Path::Class::Dir's mkpath for simplicity/compatibility.
+    Closes RT 69961.  Thanks to MELEZHIK for reporting.
+
+0.913     2011-07-19T21:15:24Z
+
+  - Pass paths to CPAN::DistnameInfo in Unix format.
+    Thanks to jeroenl for figuring out that test failure on Win32.
+    Closes RT 69585.
+
+  - Remove unnecessary build file from release tarball
+
+0.912     2011-07-14T23:38:40Z
+
+  - Use CPAN::DistnameInfo to parse name/version from file name
+
+0.911     2011-07-04T22:10:24Z
+
+  - Fix test to use non-os specific paths in regexp
+
+0.910     2011-07-03T00:06:00Z
+
+  [Fixes]
+  - Work around weird, possible perl bug (described at http://bit.ly/mhaQ4x)
+    that made Struct->file_content return undef for IO-like objects
+
+  [Prereqs]
+  - use Path::Class instead of File::Spec
+  - ensure File::Spec::Native is available
+
+  [Documentation]
+  - Clarify details of module's purpose in Pod Description
+
+  [Testing]
+  - Add dist format tests
+  - Report version of JSON::PP (if any) installed to help debug
+    troublesome smoke testing environments
+
+0.904     2011-06-24T06:09:23Z
+
+  - Fix path mismatch for "provides" when using Module::Metadata on Win32
+  - Add more TODO ideas
+
+0.903     2011-06-23T05:59:41Z
+
+  - Load File::Spec (and subclasses) consistently
+
+0.902     2011-06-23T05:51:42Z
+
+  [Fixes]
+  - Change determine_packages to always return paths in unix format
+    (as required by CPAN::Meta::Spec)
+  - Fix regexp path bugs on windows
+
+  [Enhancements]
+  - Include 'xt/' in the default no_index:directory list
+
+  [Documentation]
+  - Add items to pod TODO list
+
+0.901     2011-06-22T01:22:07Z
+
+  - Initial release

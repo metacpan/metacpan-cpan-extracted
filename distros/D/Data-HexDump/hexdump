@@ -1,0 +1,32 @@
+#!/usr/bin/perl -w
+
+use lib "lib";
+use strict;
+use Data::HexDump;
+use FileHandle;
+
+my $prgname = "hexdump";
+my $file = shift;
+my $fh;
+
+if ($file) {
+  die "$prgname: $file: Is a directory\n" if -d $file;
+  $fh = new FileHandle $file;
+  die "$prgname: $file: $!\n" unless defined $fh;
+
+  my $f = new Data::HexDump;
+  $f->fh($fh);
+  $f->block_size(1024);
+  print while $_ = $f->dump;
+
+  close $fh;
+}
+else {
+  # read STDIN
+}
+
+sub Usage {
+  die "Usage: $prgname [FILE]\n" .
+    "Dump FILE, or standard input, to standard output.\n\n" .
+    "With no FILE, or when FILE is -, read standard input.\n";
+}

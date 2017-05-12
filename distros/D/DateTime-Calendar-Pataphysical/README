@@ -1,0 +1,14 @@
+DateTime-Calendar-Pataphysical
+==============================
+
+This module implements the pataphysical calendar, perpetrated by Alfred
+Jarry.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

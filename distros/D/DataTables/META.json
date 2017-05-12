@@ -1,0 +1,44 @@
+{
+   "abstract" : "a server-side solution for the jQuery DataTables plugin",
+   "author" : [
+      "Adam Hopkins <srchulo@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DataTables",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CGI" : "3.6",
+            "Carp" : "0",
+            "DBI" : "1.611",
+            "JSON::XS" : "2.32"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

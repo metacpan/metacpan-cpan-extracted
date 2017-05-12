@@ -1,0 +1,43 @@
+---
+abstract: 'DateTime factory module with default options.'
+author:
+  - 'Nishibayashi Takuji <takuji31@gmail.com>'
+build_requires:
+  Module::Build: 0.38
+  Test::More: 0.96
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.4.2, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTimeX-Factory
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  DateTimeX::Factory:
+    file: lib/DateTimeX/Factory.pm
+    version: 1.00
+requires:
+  Class::Accessor::Lite: 0.04
+  DateTime: 0
+  DateTime::Format::Strptime: 0
+  perl: 5.010001
+resources:
+  bugtracker: https://github.com/takuji31/DateTimeX-Factory/issues
+  homepage: https://github.com/takuji31/DateTimeX-Factory
+  repository: git://github.com/takuji31/DateTimeX-Factory
+version: 1.00
+x_contributors:
+  - 'Nishibayashi Takuji <takuji@senchan.jp>'

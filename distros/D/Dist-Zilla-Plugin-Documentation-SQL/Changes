@@ -1,0 +1,9 @@
+0.03: 2015-01-22 14:48:30
+  Add call to Pod::Weaver::Section::SQL formatter, with specific version.
+  Add link to source file in top of the listing of SQL requests.
+
+0.02: 2015-01-13 10:58:40 UTC +2
+  Group SQL requests by file.
+
+0.01: 2014-12-22 12:14:23 UTC +2
+  Create a Dist::Zilla plugin that generates an SQL documentation file.

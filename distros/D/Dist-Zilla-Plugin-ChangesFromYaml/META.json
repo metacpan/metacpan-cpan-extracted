@@ -1,0 +1,81 @@
+{
+   "abstract" : "convert Changes from YAML to CPAN::Changes::Spec format",
+   "author" : [
+      "Carlos Lima <carlos@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-ChangesFromYaml",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Changes" : "0",
+            "Carp" : "0",
+            "DateTime::Format::CLDR" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Exporter" : "0",
+            "Moose" : "0",
+            "YAML::XS" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.88",
+            "blib" : "1.01",
+            "utf8" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/carloslima/dist-zilla-plugin-changesfromyaml/issues"
+      },
+      "homepage" : "https://github.com/carloslima/dist-zilla-plugin-changesfromyaml",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/carloslima/dist-zilla-plugin-changesfromyaml.git",
+         "web" : "https://github.com/carloslima/dist-zilla-plugin-changesfromyaml"
+      }
+   },
+   "version" : "0.005"
+}
+

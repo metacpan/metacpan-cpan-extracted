@@ -1,0 +1,75 @@
+---
+abstract: 'get/set key+value extensible manipulations, base module for Data::Keys::E::*'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  JSON::Util: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  Test::NoMalware: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+keywords:
+  - key
+  - value
+  - file
+  - store
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Keys
+provides:
+  Data::Keys:
+    file: lib/Data/Keys.pm
+    version: '0.04'
+  Data::Keys::E::Dir::Auto:
+    file: lib/Data/Keys/E/Dir/Auto.pm
+    version: '0.04'
+  Data::Keys::E::Dir::Lock:
+    file: lib/Data/Keys/E/Dir/Lock.pm
+    version: '0.04'
+  Data::Keys::E::Dir::LockInPlace:
+    file: lib/Data/Keys/E/Dir/LockInPlace.pm
+    version: '0.04'
+  Data::Keys::E::Key::Adapt:
+    file: lib/Data/Keys/E/Key/Adapt.pm
+    version: '0.04'
+  Data::Keys::E::Key::Auto:
+    file: lib/Data/Keys/E/Key/Auto.pm
+    version: '0.04'
+  Data::Keys::E::Key::AutoLock:
+    file: lib/Data/Keys/E/Key/AutoLock.pm
+    version: '0.04'
+  Data::Keys::E::Locking:
+    file: lib/Data/Keys/E/Locking.pm
+    version: '0.04'
+  Data::Keys::E::Store::Dir:
+    file: lib/Data/Keys/E/Store/Dir.pm
+    version: '0.04'
+  Data::Keys::E::Store::Mem:
+    file: lib/Data/Keys/E/Store/Mem.pm
+    version: '0.04'
+  Data::Keys::E::UniqSet:
+    file: lib/Data/Keys/E/UniqSet.pm
+    version: '0.04'
+  Data::Keys::E::Value::InfDef:
+    file: lib/Data/Keys/E/Value/InfDef.pm
+    version: '0.04'
+requires:
+  Carp::Clan: '0'
+  Digest::SHA1: '0'
+  IO::Any: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  Moose::Util: '0'
+resources:
+  bugtracker: http://github.com/jozef/Data-Keys/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/Data-Keys.git
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

@@ -1,0 +1,341 @@
+Make sure you have the prerequisite modules installed.
+For example if you have Redhat/Centos 7.x
+
+	yum install perl-devel perl-ExtUtils-ParseXS perl-ExtUtils-Install perl-ExtUtils-MakeMaker perl-ExtUtils-Manifest perl-Test-Harness
+	yum install perl-CPAN perl-CPAN-Meta perl-CPAN-Meta-Requirements perl-CPAN-Meta-YAML perl-CPANPLUS-Dist-Build perl-Parse-CPAN-Meta perl-Test-CPAN-Meta perl-CPAN-Changes perl-CPANPLUS perl-Module-Signature perl-Version-Requirements perl-YAML
+	yum install perl-Data-Dumper
+	yum install perl-App-cpanminus 
+
+	cpanm XML::Hash::XS
+	cpanm JSON::XS
+	cpanm YAML::XS
+	cpanm Moo
+	cpanm Plack
+	cpanm Plack::Middleware::Deflater
+	cpanm Starman
+	cpanm Dancer2
+	cpanm Dancer2::Plugin::WebService
+
+You should run the service with an unprivilidged user e.g. joe
+Please be careful that non root users can not bind port numbers from 1 to 1024
+Create the user if not exists
+
+	getent group  joe >/dev/null || groupadd joe
+	getent passwd joe >/dev/null || useradd -g joe --no-log-init -c "Dancer2-Plugin-WebService user" -s /sbin/nologin joe
+	lslogins -o USER,GROUP,UID,SHELL joe
+
+Create the application e.g TestService inside e.g. the /opt folder
+
+	cd /opt
+	dancer2 gen --application TestService
+
+Give ownership to joe
+
+	mkdir            /var/log/TestService
+	mkdir            /usr/local/sessions
+	chown -R joe:joe /opt/TestService
+	chown -R joe:joe /var/log/TestService
+	chown -R joe:joe /usr/local/sessions
+	
+	# Redhat        
+	chown -R joe:joe /usr/local/share/perl5/Dancer2/Plugin/scripts
+	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/HttpBasic/users.pl
+	chmod u+x        /usr/local/share/perl5/Dancer2/Plugin/scripts/HttpBasic/admins.pl
+
+	# Archlinux
+	chown -R joe:joe /usr/share/perl5/site_perl/Dancer2/Plugin/scripts
+	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/HttpBasic/users.pl
+	chmod u+x        /usr/share/perl5/site_perl/Dancer2/Plugin/scripts/HttpBasic/admins.pl
+
+
+Use logrotate to housekeeping the log files
+vi /etc/logrotate.d/TestService
+
+	/var/log/TestService/*.log
+	{
+	create 640 joe joe
+	compress
+	missingok
+	notifempty
+	daily
+	rotate 7
+	}
+
+
+If an authentication method needs sudo you must add the user running the application at the sudoers file e.g.
+vi /etc/sudoers
+
+	joe ALL=NOPASSWD: /usr/local/share/perl5/Dancer2/Plugin/scripts/LinuxOS/AuthUser.pl
+
+
+If you want your routes ro provide geop ip information install the GeoIP package
+
+At archlinux        pacman -S geoip geoip-database geoip-database-extra
+At debian           apt-get install geoip-bin
+At fedora, redhat   yum install geoip
+At CentOS 5         rpm -Uvh http://mirrors.kernel.org/fedora-epel/5/i386/epel-release-5-4.noarch.rpm
+At CentOS 6         rpm -Uvh http://mirrors.kernel.org/fedora-epel/6/i386/epel-release-6-8.noarch.rpm
+                    yum repolist
+                    yum install geoip
+
+
+
+
+Use compression replies if you have fast CPU and large replies
+vi /opt/TestService/bin/app.psgi
+
+	#!/usr/bin/env perl
+	use FindBin;
+	use lib "$FindBin::Bin/../lib";
+	use TestService;
+	use Plack::Builder;
+	builder { enable 'Deflater'; TestService->to_app }
+
+Or if you have slow CPU use uncompressed replies
+vi /opt/TestService/bin/app.psgi
+	
+	#!/usr/bin/env perl
+	use FindBin;
+	use lib "$FindBin::Bin/../lib";
+	use TestService;	
+	TestService->to_app;
+
+
+Configure the production enviroment
+vi /opt/TestService/environments/production.yml
+
+
+show_errors      : 1
+startup_info     : 1
+warnings         : 1 
+no_server_tokens : 0
+log              : "core"
+logger           : "file"
+engines          :
+  logger         :
+    File         :
+      log_dir    : "/var/log/TestService"
+      file_name  : "activity.log"
+
+
+
+
+
+
+Configure your application settings
+vi /opt/TestService/config.yml
+
+
+
+appname                 : TestService
+environment             : production
+plugins                 :
+  WebService            :
+    Version             : 2.0.1
+    Owner               : Joe Lunchbucket, Joe.Lunchbucket@example.com
+    Session directory   : /usr/local/sessions
+    Session idle timout : 3600
+    Default format      : json
+    Command sudo        : /usr/bin/sudo
+    Command rm          : /usr/bin/rm
+    Routes              :
+      test_mirror       : public
+      test_get_one_key  : public
+      test_get_data     : public
+      test_new_data     : public
+      test_session      : private
+      
+    Allowed hosts:
+
+      - 127.*
+      - 10.*
+      - 192.168.1.23
+      - 172.20.*
+      - 32.??.34.4?
+      - 4.?.?.??
+      - ????:????:????:6d00:20c:29ff:*:ffa3
+      - "*"
+
+    User must belong to one or more of the groups:
+
+      - power
+      - storage
+      - network
+
+    Authentication methods:
+      simple:
+        Command  : INTERNAL
+        Active   : yes
+        Users    :
+          <any>  : secret4all
+          user1  : <any>
+          user2  : pass2
+          user2  : pass2
+      Linux native users:
+        Command  : MODULE_INSTALL_DIR/scripts/LinuxOS/AuthUser.pl
+        Active   : yes
+        Use sudo : yes
+      Basic Apache auth for simple users:
+        Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/users.pl
+        Active   : no
+        Use sudo : no
+      Basic Apache auth for admins:
+        Command  : MODULE_INSTALL_DIR/scripts/HttpBasic/admins.pl
+        Active   : no
+        Use sudo : no
+
+
+
+Write your real code e.g.
+vi /opt/TestService/lib/TestService.pm
+
+
+
+
+package TestService;
+use     strict;
+use     warnings;
+use     Dancer2;
+use     Dancer2::Plugin::WebService;
+our     $VERSION = setting('plugins')->{WebService}->{Version};
+
+any '/test_mirror'      => sub { RestReply('DATA_USER_SEND') };
+any '/test_get_one_key' => sub { RestReply('k1') };
+any '/test_get_data'    => sub {
+my ($var1, $var2) = get_data_user('k1', 'k2');
+RestReply( Total => ($var1 + $var2), Thought => 'Lets add !' )
+};
+
+any '/test_new_data'    => sub { 
+my %data = 
+set_data_user( new1 => 'N1', new2 => 'N2' );
+set_data_user( new3 => 'N3', new4 => 'N4' );
+del_data_user( 'new1' , 'new4' );
+RestReply('DATA_USER_ALL')
+};
+
+setting('plugins')->{'WebService'}->{'Routes'}->{'test_session'} = 'private';
+
+any '/test_session' => sub {
+my ($v1, $v2) = get_data_user('k1', 'k2');
+	        set_data_session(s1 =>'L1', s2=>'L2', s3=>['L3a', 'L3b']);
+	        del_data_session('s7', 's8');
+my @Some      = get_data_session('s1', 's2', 's3', 's7');
+my %All       = get_data_session();
+RestReply(k1=>$v1, k2=>$v2, SesData_A => $Some[2], SesData_b=> [ @Some[0..1] ], SesData_all=> { %All } )
+};
+
+dance;
+
+
+
+
+
+
+
+
+
+If you are using nginx web server to reverse proxy you service 
+from port 80 or for adding https protection ( port 443 )
+Add at your nginx.conf something similar to
+
+	...
+	upstream TestService { server 127.0.0.1:65535 fail_timeout=0; keepalive 1024; }
+	...
+	server
+	{
+	server_name      anotherdimension.mooo.com;
+	listen           80;
+	listen           443 ssl;
+	root             /tmp;
+	proxy_redirect   off;
+	proxy_set_header Host      $host;
+	proxy_set_header X-Real-IP $remote_addr; # needed for real client IP pass as server enviroment variable HTTP_X_REAL_IP
+
+	    location /
+	    {
+	    fastcgi_param REMOTE_ADDR X-Real-IP;
+	    proxy_pass http://TestService;
+	    } 
+	}
+
+
+
+
+
+It is a good idea tou start your application as Linux service
+We bind at port 127.0.0.1 because we usually publish such services
+using the the nginx as reverse proxy
+
+vi /usr/lib/systemd/system/testservice.service
+
+
+
+
+[Unit]
+Description=Perl Dancer2 restful web service
+Documentation=https://metacpan.org/pod/Dancer2
+After=network.target
+ConditionPathExists=/usr/local/bin/plackup
+
+[Service]
+Type=simple
+User=joe
+Group=joe
+ExecStart=/usr/local/bin/plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+# for Archlinux   ExecStart=/usr/bin/site_perl/plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+ExecStop=/bin/kill -s QUIT $MAINPID
+WorkingDirectory=/opt/TestService
+KillMode=mixed
+KillSignal=QUIT
+StandardOutput=journal
+StandardError=inherit 
+NoNewPrivileges=true
+PrivateTmp=true
+LimitNOFILE=infinity
+RestartPreventExitStatus=255
+Restart=on-failure
+RestartSec=60s
+NotifyAccess=all
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+
+
+start the service
+
+	systemctl enable testservice.service
+	systemctl cat    testservice
+	systemctl start  testservice
+	systemctl show --property=ActiveState testservice
+	systemctl status testservice
+	journalctl -xeu  testservice | less
+
+to delete the service
+
+	systemctl stop    testservice
+	systemctl disable testservice.service
+	rm /usr/lib/systemd/system/testservice.service
+
+start the application manual
+
+	cd /opt/TestService; sudo -u joe plackup --host 127.0.0.1 --port 65535 --server Starman --workers=10 --env production -a /opt/TestService/bin/app.psgi
+
+or during development. Redhat (up) and Archlinux
+
+	cd /opt/TestService; sudo -u joe /usr/local/bin/plackup     --port 65535 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/local/share/perl5/Dancer2/Plugin
+	cd /opt/TestService; sudo -u joe /usr/bin/site_perl/plackup --port 65535 -a /opt/TestService/bin/app.psgi --Reload /opt/TestService/lib,/opt/TestService/config.yml,/usr/share/perl5/site_perl/Dancer2/Plugin
+	
+or without Plack
+
+	sudo -u joe  perl /opt/TestService/bin/app.psgi
+
+quick test
+
+	netstat -anp | grep :65535
+	curl -X GET http://localhost:65535/info?to=human

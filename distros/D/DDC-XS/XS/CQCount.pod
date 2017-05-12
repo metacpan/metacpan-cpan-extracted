@@ -1,0 +1,204 @@
+##-*- Mode: CPerl -*-
+## Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' QCount.h.in '-vt=^[mbq_]*' -o QCount '-dn=free' '-dm=::json|Compile|Evaluate' '-dt=Indexator'
+
+=pod
+
+=head1 NAME
+
+DDC::XS::CQCount - XS interface to DDC C++ CQCount objects
+
+=cut
+
+##======================================================================
+## Synopsis
+
+=pod
+
+=head1 SYNOPSIS
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExpr : @ISA=qw(DDC::XS::CQuery);
+ 
+ $CQCountKeyExpr = DDC::XS::CQCountKeyExpr->new($label);
+ 
+ # Methods
+ $bool   = $CQCountKeyExpr->CanCountByFile();
+ $string = $CQCountKeyExpr->toString();
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprConstant : @ISA=qw(DDC::XS::CQCountKeyExpr);
+ 
+ $CQCountKeyExprConstant = DDC::XS::CQCountKeyExprConstant->new($label);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprMeta : @ISA=qw(DDC::XS::CQCountKeyExpr);
+ 
+ $CQCountKeyExprMeta = DDC::XS::CQCountKeyExprMeta->new($label);
+ 
+ # Accessors
+ $DWORD  = $CQCountKeyExprMeta->getCurFile();
+ undef   = $CQCountKeyExprMeta->setCurFile($CurFile);
+ $string = $CQCountKeyExprMeta->getCurKey();
+ undef   = $CQCountKeyExprMeta->setCurKey($CurKey);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprFileId : @ISA=qw(DDC::XS::CQCountKeyExprMeta);
+ 
+ $CQCountKeyExprFileId = DDC::XS::CQCountKeyExprFileId->new($label);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprIndexed : @ISA=qw(DDC::XS::CQCountKeyExprMeta);
+ 
+ $CQCountKeyExprIndexed = DDC::XS::CQCountKeyExprIndexed->new($label);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprFileName : @ISA=qw(DDC::XS::CQCountKeyExprIndexed);
+ 
+ $CQCountKeyExprFileName = DDC::XS::CQCountKeyExprFileName->new($label);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprDate : @ISA=qw(DDC::XS::CQCountKeyExprIndexed);
+ 
+ $CQCountKeyExprDate = DDC::XS::CQCountKeyExprDate->new($label);
+ 
+ # Accessors
+ $unsigned int = $CQCountKeyExprDate->getYear();
+ undef         = $CQCountKeyExprDate->setYear($year);
+ $unsigned int = $CQCountKeyExprDate->getOnth();
+ undef         = $CQCountKeyExprDate->setOnth($onth);
+ $unsigned int = $CQCountKeyExprDate->getDay();
+ undef         = $CQCountKeyExprDate->setDay($day);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprDateSlice : @ISA=qw(DDC::XS::CQCountKeyExprDate);
+ 
+ $CQCountKeyExprDateSlice = DDC::XS::CQCountKeyExprDateSlice->new($label, $slice);
+ 
+ # Accessors
+ $unsigned int = $CQCountKeyExprDateSlice->getSlice();
+ undef         = $CQCountKeyExprDateSlice->setSlice($slice);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprBibl : @ISA=qw(DDC::XS::CQCountKeyExprIndexed);
+ 
+ $CQCountKeyExprBibl = DDC::XS::CQCountKeyExprBibl->new($attrName);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprRegex : @ISA=qw(DDC::XS::CQCountKeyExprIndexed);
+ 
+ $CQCountKeyExprRegex = DDC::XS::CQCountKeyExprRegex->new($src, $pattern, $replacement, $modifiers);
+ 
+ # Accessors
+ $CQCountKeyExpr = $CQCountKeyExprRegex->getSrc();
+ undef           = $CQCountKeyExprRegex->setSrc($Src);
+ $string         = $CQCountKeyExprRegex->getPattern();
+ undef           = $CQCountKeyExprRegex->setPattern($Pattern);
+ $string         = $CQCountKeyExprRegex->getReplacement();
+ undef           = $CQCountKeyExprRegex->setReplacement($Replacement);
+ $string         = $CQCountKeyExprRegex->getModifiers();
+ undef           = $CQCountKeyExprRegex->setModifiers($Modifiers);
+ $bool           = $CQCountKeyExprRegex->getIsGlobal();
+ undef           = $CQCountKeyExprRegex->setIsGlobal($isGlobal);
+ $RML_RE         = $CQCountKeyExprRegex->getRegex();
+ undef           = $CQCountKeyExprRegex->setRegex($Regex);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprToken : @ISA=qw(DDC::XS::CQCountKeyExprIndexed);
+ 
+ $CQCountKeyExprToken = DDC::XS::CQCountKeyExprToken->new($IndexName, $MatchId, $Offset);
+ 
+ # Accessors
+ $string          = $CQCountKeyExprToken->getIndexName();
+ undef            = $CQCountKeyExprToken->setIndexName($IndexName);
+ $BYTE            = $CQCountKeyExprToken->getMatchId();
+ undef            = $CQCountKeyExprToken->setMatchId($MatchId);
+ $int             = $CQCountKeyExprToken->getOffset();
+ undef            = $CQCountKeyExprToken->setOffset($Offset);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCountKeyExprList : @ISA=qw(DDC::XS::CQCountKeyExpr);
+ 
+ $CQCountKeyExprList = DDC::XS::CQCountKeyExprList->new();
+ 
+ # Accessors
+ \@CQCountKeyExprs = $CQCountKeyExprList->getExprs();
+ undef             = $CQCountKeyExprList->setExprs($Exprs);
+ $string           = $CQCountKeyExprList->getKey();
+ undef             = $CQCountKeyExprList->setKey($Key);
+ 
+ # Methods
+ undef = $CQCountKeyExprList->Clear();
+ $bool = $CQCountKeyExprList->empty();
+ undef = $CQCountKeyExprList->PushKey($expr);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQCount : @ISA=qw(DDC::XS::CQuery);
+ 
+ $CQCount = DDC::XS::CQCount->new($dtr_, $keys_, $sample_, $sort_, $lo_, $hi_);
+ 
+ # Accessors
+ $CQuery             = $CQCount->getDtr();
+ undef               = $CQCount->setDtr($dtr);
+ $size_t             = $CQCount->getSample();
+ undef               = $CQCount->setSample($sample);
+ $HitSortEnum        = $CQCount->getSort();
+ undef               = $CQCount->setSort($sort);
+ $string             = $CQCount->getLo();
+ undef               = $CQCount->setLo($lo);
+ $string             = $CQCount->getHi();
+ undef               = $CQCount->setHi($hi);
+ $CQCountKeyExprList = $CQCount->getKeys();
+ undef               = $CQCount->setKeys($keys);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQKeys : @ISA=qw(DDC::XS::CQuery);
+ 
+ $CQKeys = DDC::XS::CQKeys->new($qCount, $CountLimit, \@IndexNames);
+ 
+ # Accessors
+ $qCount             = $CQCount->getQCount();
+ undef               = $CQCount->setQCount($qCount);
+ $size_t             = $CQCount->getCountLimit();
+ undef               = $CQCount->setCountLimit($CountLimit);
+ \@strings           = $CQCount->getIndexNames();
+ undef               = $CQCount->setIndexNames(\@IndexNames);
+ $BYTE               = $CQCount->getMatchId();
+ undef               = $CQCount->setMatchId($MatchId);
+ 
+ # Methods
+ $BYTE               = $CQCount->SetMatchId($MatchId);
+
+=cut
+
+##======================================================================
+
+=pod
+
+=head1 DESCRIPTION
+
+The DDC::CQCount hierarchy provides a perl interface to the DDC C++ CQCount hierarchy for count() queries.
+See the caveats in L<DDC::XS::Query> and L<DDC::XS::Object>.
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::XS(3perl),
+DDC::XS::Object(3perl),
+DDC::XS::CQueryCompiler(3perl),
+DDC::XS::CQueryFilter(3perl),
+DDC::XS::CQuery(3perl).
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015-2016 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

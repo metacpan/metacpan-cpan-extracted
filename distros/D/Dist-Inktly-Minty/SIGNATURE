@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 e2e24878d31b169774a1b99d30b638850c456e8e COPYRIGHT
+SHA1 6bd7b17d81be63d08d4efa6cb80106e72887842c CREDITS
+SHA1 167e54a06e8fba11ab18f5e608e1809fa1677f71 Changes
+SHA1 ec5a7b4f3023f03ebf821b57690758f7e6f3ae2a LICENSE
+SHA1 9ef492c956af12e9ea3225c0966d871851686cb6 MANIFEST
+SHA1 36def083547fbb90a7564c8592827061d3d9ccdb META.json
+SHA1 2d41104781f255dd5f0e6aa944a50f5e28f66c94 META.ttl
+SHA1 f7d303197c9556d72f0534bc9b900101f1ce67b5 META.yml
+SHA1 09dccd643e1d5c1d2b57c09e38cf6e3605bf951f Makefile.PL
+SHA1 052631c39d2a4628a4bffc7dfcdb79a7777596c5 README
+SHA1 56897f027d1270362d5a0eca8ad99b3f11c442dd bin/distinkt-mint
+SHA1 bbbf6d76575318bdb89b4306e388be88e3c17718 dist.ini
+SHA1 d1483c74068d4eafd0deeddabaaae2c0e9be0ca8 lib/Dist/Inktly/Bovine.pm
+SHA1 3108961e6ee75c991f998ca985b63c5163f19264 lib/Dist/Inktly/Cervine.pm
+SHA1 3f0d7c5abd53c6ddc3a4dbb7d3e57a9e8c7817a5 lib/Dist/Inktly/Minty.pm
+SHA1 c4583dac562fd8d9dd3878a756363a091a8389d9 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iEYEARECAAYFAlIKL/cACgkQzr+BKGoqfTm4NwCcCsWnXiz4mSZvSxZJvVBkqCk9
+QMEAn29k0cDgDipSpxFcDUXUxrWpesIJ
+=H2M1
+-----END PGP SIGNATURE-----

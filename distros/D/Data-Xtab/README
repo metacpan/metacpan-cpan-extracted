@@ -1,0 +1,49 @@
+This is Date::Xtab, version 0.70 
+
+REQUIRED COMPONENTS
+===================
+
+You will need the following modules:
+
+CGI
+GD
+GIFgraph
+
+all of which can be found on CPAN. Start at http://www.perl.com to make your
+way towards these modules. These modules may have other dependencies, so you 
+should consult the documentation for each module, and ensure that they install 
+correctly and pass 'make test'.
+
+INSTALLATION
+============
+
+In order to install this, you should enter the top-level directory
+of the distribution, and issue the following commands:
+
+  perl Makefile.PL
+  make
+  make install
+
+There are no tests for this module, but there is a test.cgi script, 
+which will display a GIF in your web browser if it is run as a CGI 
+script under your web server.
+
+NOTES
+=====
+
+Documentation is contained within the module (Xtab.pm) in pod format;
+when you issue the installation commands, you should then be able to type:
+
+  man Data::Xtab
+
+or:
+
+  perldoc Data::Xtab
+
+
+to get the whole story.
+
+Have fun,
+
+Brian Jepson
+bjepson@ids.net

@@ -1,0 +1,472 @@
+package My::TestObj;
+#use utf8;
+
+#Need to play nice on different Filesystems!
+
+use File::Spec;
+my $file_path = File::Spec->catfile('t', 'datastore.txt');
+
+sub new {
+  my $class = (shift);
+  my $self = {};
+  $self->{monkey} = [qw(a b c d e f g h)];
+  bless $self, $class;
+  return $self;
+}
+
+sub data_test {
+  my $self = (shift);
+  return $self->{monkey}->[4];
+}
+
+sub package_test {
+  return ref( (shift) );
+}
+
+package main;
+
+use IO::File;
+
+$object_package = 'My::TestObj';
+
+%counts = (
+                simpleobject  => 2,
+                simplescalar  => 1,
+                trickyscalar  => 1,
+                simplescalarref  => 1,
+                simplearray   => 1,
+                complexarray  => 2,
+                selfrefarray   => 1,
+                simplehash    => 1,
+                utf8hash    => 2,
+                complexhash   => 3,
+                selfrefhash   => 1,
+           );
+
+
+%testrefs = (
+
+   simpleobject    => My::TestObj->new(),
+   trickyscalar    => '{foo=>"bar"}',
+   simplescalar    => 'pointless',
+   simplescalarref    => \'pointless',
+   simplehash    => { alpha => 1,
+	   	     beta  => 2 },
+   simplearray   => [qw ( one two three ) ],
+
+
+   complexarray  => ['one', {alpha => 1, beta => 2},['bob','dole']],
+
+   selfrefarray  => ['one', {alpha => 1, beta => 2},['bob','dole']],
+
+   complexhash   => {
+			apple  => [qw ( one two three ) ],
+			orange => { alpha => 1, beta  => 2 },
+			pear   => { 
+				chain => {
+					hippie => 'smelly', 
+					donkey => 'worship',
+					 }, 
+				monkey => 3,
+			 	  },
+		 },
+   selfrefhash   => {
+			apple  => [qw ( one two three ) ],
+		 },
+	);
+
+{
+	$testrefs{utf8hash} = { alpha => q|“water” and “road”|,
+				beta => q|mañana| };
+}
+
+
+$testrefs{selfrefhash}->{pear}   = $testrefs{selfrefhash}->{apple};
+
+$testrefs{selfrefarray}->[3]   = $testrefs{selfrefarray}->[1];
+
+%serializers = (
+                        'Data::Dumper'  => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Data::Taxi'  => {
+                                                simpleobject  => $counts{simpleobject},
+                                              #  simplescalar  => $counts{simplescalar},		#doesn't support this
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Data::Denter'  => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Storable'      => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => 0,	#Storable cannot serialize scalars
+                                                trickyscalar  => 0,	#Storable cannot serialize scalars
+                                                simplescalarref  => $counts{simplescalarref},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'FreezeThaw'    => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Config::General' => {
+                                                simpleobject  => 0,
+                                                simplescalar  => 0,
+                                                simplearray  => 0,
+                                                complexarray => 0,
+                                                selfrefarray  => 0,
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'YAML'  => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'YAML::Syck'  => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'JSON'  => {
+                                                simpleobject  => 0,	#JSON doesn't do objects
+                                                simplescalar  => 0,	#JSON doesn't do scalars
+                                                simplescalarref  => 0,	#JSON doesn't do scalars
+                                                trickyscalar  => 0,	#JSON doesn't do scalars
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'JSON::Syck'  => {
+                                                simpleobject  => 0,	#JSON doesn't do objects
+                                                simplescalar  => 0,	#JSON doesn't do scalars
+                                                simplescalarref  => 0,	#JSON doesn't do scalars
+                                                trickyscalar  => 0,	#JSON doesn't do scalars
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                #selfrefarray  => $counts{selfrefarray},
+                                                #selfrefhash  => $counts{selfrefhash},
+                                                selfrefarray  => 0,	#JSON no longer supports "circular references"
+                                                selfrefhash  => 0,	#JSON no longer supports "circular references"
+                                           },
+                        'XML::Dumper'   => {
+                                                simpleobject  => $counts{simpleobject},
+                                                simplescalar  => $counts{simplescalar},
+                                                simplescalarref  => $counts{simplescalarref},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => 0, #Chokes on UTF8
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'XML::Simple'   => {
+                                                simpleobject  => 0,
+                                                simplescalar  => 0,
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => 0, #Chokes on UTF8 sometimes
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'PHP::Serialization'    => {
+                                                simpleobject  => 0,
+                                                simplescalar  => 0,
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Bencode'  => {
+                                                simpleobject  => 0,	#Bencode does not support serializing objects
+                                                simplescalarref  => 0,	#Bencode does not support serializing saclar references
+                                                simplescalar  => $counts{simplescalar},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Convert::Bencode'  => {
+                                                simpleobject  => 0,	#Convert::Bencode does not support serializing objects
+                                                simplescalarref  => 0,	#Convert::Bencode does not support serializing saclar references
+                                                simplescalar  => $counts{simplescalar},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                        'Convert::Bencode_XS'  => {
+                                                simpleobject  => 0,	#Convert::Bencode_XS does not support serializing objects
+                                                simplescalarref  => 0,	#Convert::Bencode_XS does not support serializing saclar references
+                                                simplescalar  => $counts{simplescalar},
+                                                trickyscalar  => $counts{trickyscalar},
+                                                simplearray  => $counts{simplearray},
+                                                complexarray => $counts{complexarray},
+                                                selfrefarray  => $counts{selfrefarray},
+                                                simplehash   => $counts{simplehash},
+                                                utf8hash   => $counts{utf8hash},
+                                                complexhash  => $counts{complexhash},
+                                                selfrefhash  => $counts{selfrefhash},
+                                           },
+                  );
+
+%features = (
+                'objraw'     	 => [],
+                'raw'     	 => [],
+                'rawnew'     	 => [],
+                'non-portable'   => [],
+                'basic'     	 => [],
+                'cgopt'     	 => [],
+                'xmldumpopt'   	 => [],
+                'encryption'     => [qw (Crypt::CBC Crypt::Blowfish)],
+                'compresszlib'    => [qw (Compress::Zlib)],
+                'compressppmd'    => [qw (Compress::PPMd)],
+                'encoding'       => [qw (MIME::Base64)],
+                'md5'       => [qw (Crypt::CBC Crypt::Blowfish Digest::MD5)],
+                'sha1'     	 => [qw (Crypt::CBC Crypt::Blowfish Digest::SHA1)],
+                'sha-256'     	 => [qw (Crypt::CBC Crypt::Blowfish Digest::SHA)],
+                );
+
+
+sub run_test {
+        my ($T,$serializer,$test,$features) = @_;
+        $T->msg("Test $serializer $test $features");  # message for the log
+	my $obj;
+        my @features = (split(" ", $features));
+        if (grep {/^objraw$/} @features) {
+        	$obj = Data::Serializer::Raw->new(serializer=>$serializer);
+	} else {
+        	$obj = Data::Serializer->new(serializer=>$serializer);
+	}
+        foreach my $feature (@features) {
+                if ($feature eq 'basic') {
+                        #do nothing special
+                } elsif ($feature eq 'non-portable') {
+                        #make sure we work without ascii armoring
+                        $obj->portable(0);
+                } elsif ($feature eq 'encryption') {
+                        #setup a secret so we use encryption on this run
+                        $obj->secret('test');
+                } elsif ($feature eq 'md5') {
+			#only relevant if we have a secret
+                        $obj->secret('test');
+                        $obj->digester('MD5');
+                } elsif ($feature eq 'sha1') {
+			#only relevant if we have a secret
+                        $obj->secret('test');
+                        $obj->digester('SHA-256');
+                } elsif ($feature eq 'sha-256') {
+			#only relevant if we have a secret
+                        $obj->secret('test');
+                        $obj->digester('SHA-256');
+                } elsif ($feature eq 'compresszlib') {
+                        # use compression 
+                        $obj->compress(1);
+                        $obj->compressor("Compress::Zlib");
+                } elsif ($feature eq 'compressppmd') {
+                        # use compression 
+                        $obj->compress(1);
+                        $obj->compressor("Compress::PPMd");
+                } elsif ($feature eq 'encoding') {
+                        # test alternate encoding
+                        $obj->encoding('b64');
+                } elsif ($feature eq 'cgopt') {
+                        # test options for Config::General
+                        $obj->options( {
+                                         -LowerCaseNames       => 1,
+                                         -UseApacheInclude     => 1,
+                                         -MergeDuplicateBlocks => 1,
+                                         -AutoTrue             => 1,
+                                         -InterPolateVars      => 1
+                                       });
+                } elsif ($feature eq 'xmldumpopt') {
+                        # test options for XML::Dumper
+                        $obj->options( {
+                                         dtd       => 1,
+                                       });
+                }
+        }
+        my ($frozen,$thawed);
+        if (grep {/^objraw$/} @features) {
+          $frozen = $obj->serialize($testrefs{$test});
+          $thawed = $obj->deserialize($frozen);
+        }elsif (grep {/^raw$/} @features) {
+          $frozen = $obj->raw_serialize($testrefs{$test});
+          $thawed = $obj->raw_deserialize($frozen);
+        } elsif (grep {/^rawnew$/} @features) {
+          my $newobj = Data::Serializer->new(
+					serializer=>$serializer,
+					raw => 1,
+					#portable=>undef,
+					#serializer_token=>undef,
+						);
+          $frozen = $obj->serialize($testrefs{$test});
+          $thawed = $obj->deserialize($frozen);
+	
+	  
+        } elsif (grep {/fh-storage/} @features) {
+    	  my $fh = IO::File->new($file_path, O_CREAT|O_WRONLY, 0600);
+          $obj->store($testrefs{$test},$fh);
+          $fh->close(); 
+
+    	  $fh = IO::File->new($file_path, O_RDONLY);
+          $thawed = $obj->retrieve($fh);
+          $fh->close(); 
+          unlink($file_path);
+        } elsif (grep {/storage/} @features) {
+          $obj->store($testrefs{$test},$file_path);
+          $thawed = $obj->retrieve($file_path);
+          unlink($file_path);
+        } elsif (grep {/rawstorage1/} @features) {
+          my $newobj = Data::Serializer->new(
+					serializer=>$serializer,
+					raw => 1,
+						);
+          $newobj->store($testrefs{$test},$file_path);
+          $thawed = $newobj->retrieve($file_path);
+          unlink($file_path);
+        } elsif (grep {/rawstorage2/} @features) {
+          my $newobj = Data::Serializer::Raw->new(
+					serializer=>$serializer,
+						);
+          $newobj->store($testrefs{$test},$file_path);
+          $thawed = $newobj->retrieve($file_path);
+          unlink($file_path);
+        } else {
+          $frozen = $obj->serialize($testrefs{$test});
+          $thawed = $obj->deserialize($frozen);
+        }
+        if ($test eq 'simplescalar') {
+                $T->ok_eq($testrefs{$test}, $thawed,'scalar');
+        }elsif ($test eq 'trickyscalar') {
+                $T->ok_eq($testrefs{$test}, $thawed,'tricky scalar');
+        }elsif ($test eq 'simplescalarref') {
+                $T->ok_eq(${$testrefs{$test}}, ${$thawed},'simple scalar ref');
+        }elsif ($test eq 'simpleobject') {
+                $T->ok_eq($testrefs{$test}->package_test(), $thawed->package_test,'object namespace');
+                $T->ok_eq($testrefs{$test}->data_test(), $thawed->data_test,'object data');
+        }elsif ($test eq 'simplearray') {
+                $T->ok_eq($testrefs{$test}->[0], $thawed->[0],'array');
+        } elsif ($test eq 'complexarray') {
+                $T->ok_eq($testrefs{$test}->[2]->[0], $thawed->[2]->[0],'array of arrays');
+                $T->ok_eqnum($testrefs{$test}->[1]->{alpha}, $thawed->[1]->{alpha},'array of hashes');
+        } elsif ($test eq 'simplehash') {
+                $T->ok_eqnum($testrefs{$test}->{alpha}, $thawed->{alpha},'hash');
+        } elsif ($test eq 'utf8hash') {
+                $T->ok_eq($testrefs{$test}->{alpha}, $thawed->{alpha},'utf8 hash');
+                $T->ok_eq($testrefs{$test}->{beta}, $thawed->{beta},'utf8 hash 2');
+        } elsif ($test eq 'complexhash') {
+                $T->ok_eq($testrefs{$test}->{apple}->[1], $thawed->{apple}->[1],'hash of arrays');
+                $T->ok_eqnum($testrefs{$test}->{orange}->{alpha}, $thawed->{orange}->{alpha},'hash of hashes');
+                $T->ok_eq($testrefs{$test}->{pear}->{chain}->{hippie}, $thawed->{pear}->{chain}->{hippie},'hash of hash of hashes');
+        } elsif ($test eq 'selfrefhash') {
+                $T->ok_eq($testrefs{$test}->{apple}->[1], $thawed->{pear}->[1],'hash self ref to internal array');
+        } elsif ($test eq 'selfrefarray') {
+                $T->ok_eq($testrefs{$test}->[1]->{alpha}, $thawed->[3]->{alpha},'array self ref to internal array');
+        }
+}
+
+sub test_feature {
+	my ($feature) = @_;
+	foreach my $module (@{$features{$feature}}) {
+		return 0 unless (eval "require $module");
+        }
+        return 1;
+}
+
+sub test_serializer {
+	my ($serializer) = @_;
+        return 1 if (eval "require $serializer");
+	return 0;
+}
+
+
+sub find_features {
+	my $T = (shift);
+	foreach my $type (@_) {
+       		if (test_feature($type)) {
+               		$found_type{$type} = 1;
+               		$T->msg("Found feature $type");
+        	}
+       	}
+}

@@ -1,0 +1,50 @@
+DBIx::HTMLTable Installation
+
+System Requirements
+
+1.  A Unix or derivative operating system.
+2.  Perl version 5.004 or greater.
+3.  Perl DBI and the DBD module for your database server.
+4.  Apache with mod_cgi and Perl CGI.pm
+5.  GNU make.
+
+
+Installation
+
+1.  Unpack the archive, substitute the actual version in the 
+    commands:
+
+    $ tar zxvf DBIx-HTMLTable-<version>.tar.gz   # GNU Tar
+
+    $ gunzip -c DBIx-HTMLTable-<version>.tar.gz | tar xvf -  # Standard tar
+
+2.  Change to the top-level subdirectory:
+
+    $ cd DBIx-HTMLTable-<version>
+
+3.  The top-level Makefile should work on any Unix or derivative
+    system.  It uses the host system's Perl installation to 
+    build the package Makefiles.  At the prompt, type:
+
+    $ perl Makefile.PL
+
+4.  Build the program modules and documentation.  Type:
+
+    $ make
+
+5.  Become root and install the source files and documentation 
+    in the system's site_perl library.
+
+    $ su
+    Enter Password:
+    # make install
+
+
+Copyright
+
+This software is distributed under the Perl Artistic License.
+Refer to the file "Artistic" in this directory.
+
+Author
+
+Robert Allan Kiesling <rkiesling@earthlink.net>

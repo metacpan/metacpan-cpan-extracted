@@ -1,0 +1,173 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     ; it is recommended that the name of lump dist ends with '-Lumped'
+     name=Perinci-CmdLine-Any-Lumped
+    
+     version=0.01
+    
+     ; you should use minimal plugins and avoid those that munge files (e.g.
+     ; OurVersion, PodWeaver, etc)
+     [@Basic]
+    
+     [PERLANCAR::AddDeps]
+     ; lump all modules from a single dist
+     lump_dist = Perinci::CmdLine::Any
+     ; lump all modules from a single dist and their recursive dependencies
+     lump_dist_and_deps = Perinci::CmdLine::Any
+     ; filter by author
+     include_author = PERLANCAR
+    
+     ; all the lump_* and include_* configurations can be specified multiple times
+
+    In your main module, e.g. "Perinci/CmdLine/Any/Lumped.pm" in lib:
+
+     package Perinci::CmdLine::Any::Lumped;
+    
+     our $VERSION = 0.01;
+     # LUMPED_MODULES
+     # LUMPED_DISTS
+    
+     ...
+
+    And in the built version the directives will be replaced with:
+
+     our @LUMPED_MODULES = (...); # LUMPED_MODULES
+     our @LUMPED_DISTS = (...); # LUMPED_DISTS
+
+    You can also add in the POD area:
+
+     =head1 LIST OF LUMPED MODULES
+    
+     # LUMPED_MODULES_POD
+    
+     =head1 LIST OF LUMPED DISTS
+    
+     # LUMPED_DISTS_POD
+
+    And in the built version they will become:
+
+     =head1 LIST OF LUMPED MODULES
+    
+     =over
+    
+     =item * ...
+    
+     =item * ...
+    
+     ...
+    
+     =back
+    
+     =head1 LIST OF LUMPED DISTS
+    
+     =over
+    
+     =item * ...
+    
+     =item * ...
+    
+     ...
+    
+     =back
+
+DESCRIPTION
+
+    WARNING: EXPERIMENTAL
+
+    This plugin will lump (add together) one or more module files to your
+    dist during building. When done carefully, this can reduce the number
+    of dists that users need to download and install because they are
+    already included in your dists.
+
+    The module file(s) to be added must be indexed on (your local) CPAN and
+    installed on your local Perl installation, as they will be copied from
+    the installed version on your local installation. They will thus be
+    contained in their original distributions as well as on your lump dist.
+    To avoid conflict, the lumped files on your lump dist will be excluded
+    from indexing (using no_index <file> in CPAN META) so PAUSE does not
+    index them.
+
+ How it works
+
+    1. Gather the module files to be added as specified in lump_dist and
+    lump_dist_and_deps. To get a list of modules in a dist, or to get list
+    of (recursive) dependencies, lcpan is used. Make sure you have lcpan
+    installed and your local CPAN mirror is sufficiently up-to-date (use
+    lcpan update regularly to keep it up-to-date).
+
+    2. Do some minimal munging on the files to be added:
+
+      * If the POD indicates which dist the module is in, will replace it
+      with our dist. For example if there is a VERSION section with this
+      content:
+
+       This document describes version 0.10 of Perinci::CmdLine::Any (from Perl
+       distribution Perinci-CmdLine-Any), released on 2015-04-12.
+
+      then the text will be replaced with:
+
+       This document describes version 0.10 of Perinci::CmdLine::Any (from Perl
+       distribution Perinci-CmdLine-Any-Lumped version 0.01), released on 2015-05-15.
+
+    3. Add all files into no_index metadata, so they don't clash with the
+    original dists.
+
+    4. For all the dependencies found in #1 but excluded (not lumped),
+    express them as dependencies.
+
+ Other caveats/issues
+
+      * Only module files from each distribution are included. This means
+      other stuffs are not included: scripts/binaries, shared files, .pod
+      files, etc. This is because PAUSE currently only index packages (~
+      modules). We have .packlist though, and can use it in the future when
+      needed.
+
+      * Currently all the dependency dists must be installed on your local
+      Perl installation. (This is purely out of my coding laziness though.
+      It could/should be extracted from the release file in local CPAN
+      index though.)
+
+      * Aside from adding the module files, your main module (which should
+      be named Something::Lumped) should contain these directives:
+
+       # LUMPED_MODULES
+       # LUMPED_DISTS
+
+      During building, the plugin will replace those directives with:
+
+       our @LUMPED_MODULES = (...); # LUMPED_MODULES
+       our @LUMPED_DISTS = (...); # LUMPED_DISTS
+
+      The @LUMPED_MODULES array contains all the modules (packages) that
+      are lumped in this lump dist. The purpose of this variable is to help
+      tools like lint-prereqs. Lint-prereqs is a tool to warn if you
+      underspecify/overspecify prereqs in dist.ini. If you put a lump
+      module (e.g. Something::Lumped) as a prereq, lint-prereqs can load
+      the module and read the @LUMPED_MODULES variable to see what other
+      modules are lumped together in the lump dist. When you also specify
+      one of those modules as prereqs, lint-prereqs can warn you that it is
+      not necessary, since that module has already been included in the
+      lump dist.
+
+      Similarly, @LUMPED_DISTS array contains all the dists that are lumped
+      in this lump dist. The purpose of this variable is to help tools like
+      Dist::Zilla::Plugin::PERLANCAR::CheckDepDists. This plugin will look
+      for all lump dists on the local installation (via searching for
+      modules ending with ::Lumped). If one of the dists specified in
+      @LUMPED_DISTS is the dist currently being built, then the plugin will
+      issue a notification that the corresponding lump dist will need to be
+      rebuilt.
+
+      * If the lump dist is to be converted into a package-manager-based
+      package (e.g. deb or RPM), the package should have a Provides to all
+      the dists that are lumped (@LUMPED_DISTS) so they can conflict with
+      the original distribution's packages. This is because the files do
+      conflict.
+
+SEE ALSO
+
+    lcpan
+

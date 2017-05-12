@@ -1,0 +1,21 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+inc/Module/Install/XSUtil.pm
+lib/Digest/MurmurHash3.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+src/MurmurHash3.cpp
+src/MurmurHash3.h
+src/perl-murmurhash3.xs
+t/001_basic.t
+tools/update_cpp.pl
+xshelper.h

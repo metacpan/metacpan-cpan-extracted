@@ -1,0 +1,4 @@
+name = "Data-Monad-Control"
+badges = ["travis", "coveralls"]
+module_maker="ModuleBuildTiny"
+

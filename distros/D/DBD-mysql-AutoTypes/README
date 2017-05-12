@@ -1,0 +1,51 @@
+NAME
+    DBD::mysql::AutoTypes -- automatically assign parameters' sql type to
+    support old DBD::mysql functionality
+
+SYNOPSIS
+     use DBI;
+     use DBD::mysql::AutoTypes;
+
+     my $dbh = DBI->connect('DBI:mysql:...', '...', '...') and mysql_auto_types();
+
+DESCRIPTION
+    Since version 2.9002 DBD::mysql requires explicit sql type for query
+    parameters. You should change the tonnes of $dbh->selectall_arrayref()
+    to the ugly "prepare - bind - execute - fetch" pipeline.
+
+    This module is provided to solve the problem.
+
+    You have to change only two lines of code (use the module, and apply
+    fixup after accuring database connection).
+
+DEPENDENCIES
+    *  DBI
+
+    *  DBD::mysql
+
+    *  Regexp::Common
+
+BUGS
+    May be...
+
+SEE ALSO
+    *   DBI -- Perl DataBase Interface (<http://search.cpan.org/~timb/DBI/>)
+
+    *   DBD::mysql -- MySQL (<http://www.mysql.com>) driver
+        (<http://search.cpan.org/~rudy/DBD-mysql/>) and DBD::mysql ChangeLog
+        -- look for the version 2.9002 changes
+        (<http://search.cpan.org/src/RUDY/DBD-mysql-2.9002/ChangeLog>), that
+        break old behaviour
+
+    *   Regexp::Common -- determine is data number or string
+
+AUTHOR
+    Greg "Grishace" Belenky <greg@webzavod.ru>
+
+COPYRIGHT
+    Copyright (C) 2004 Greg "Grishace" Belenky Portions of code cut'n'pasted
+    from the DBI module
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

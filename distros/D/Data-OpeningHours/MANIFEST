@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Data/OpeningHours.pm
+lib/Data/OpeningHours/Calendar.pm
+lib/Data/OpeningHours/Hours.pm
+t/calendar.t
+t/hours.t
+t/next-open.t
+t/release-pod-syntax.t

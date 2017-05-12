@@ -1,0 +1,46 @@
+Changelog for Device-L3GD20
+
+0.010 2016-04-07T06:37:21
+ - Added travis and badges (Shantanu Bhadoria)
+
+0.009 2015-03-25T07:31:37
+ - v0.009 (Shantanu Bhadoria)
+ - Pod errors fixed (Shantanu Bhadoria)
+
+0.008 2015-03-25T07:23:19
+ - v0.008 (Shantanu Bhadoria)
+ - Moved extends, added stopwords for spell checks (Shantanu Bhadoria)
+
+0.007 2013-10-05T00:46:59
+ - v0.007 (Shantanu)
+ - new readings (Shantanu Bhadoria)
+
+0.006 2013-10-05T00:46:00
+ - v0.006 (Shantanu)
+ - new readings (Shantanu Bhadoria)
+ - Renamed getReading to getReadingDegreesPerSecond (Shantanu Bhadoria)
+
+0.005 2013-09-29T02:46:07
+ - v0.005 (Shantanu)
+ - Pod Spelling Fixes (Shantanu)
+
+0.004 2013-09-27T10:18:18
+ - v0.004 (Shantanu)
+ - Xt test fixes (Shantanu)
+ - Fixed error in L3GD20.pm (Shantanu)
+ - Refactored Libraries to give all similar devices a common prefix for
+   easy identification as plugins (Shantanu)
+ - minor Changes (Shantanu Bhadoria)
+
+0.003 2013-09-12T09:21:01
+ - v0.003 (Shantanu)
+ - Added README.pod and Changes (Shantanu)
+
+0.002 2013-09-11T09:13:46
+ - pod fix (Shantanu)
+
+0.001 2013-09-11T08:25:26
+ - First Release (Shantanu)
+ - first commit (Shantanu Bhadoria)
+ -  minor commit (Shantanu Bhadoria)
+ - First Commit (Shantanu Bhadoria)

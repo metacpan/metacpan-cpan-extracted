@@ -1,0 +1,84 @@
+{
+   "abstract" : "The module to work with binary data effectively",
+   "author" : [
+      "Vladimir Timofeev <vovkasm@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-BinaryBuffer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::Spec" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::More" : "0.88",
+            "blib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::BinaryBuffer" : {
+         "file" : "lib/Data/BinaryBuffer.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/vovkasm/data-binarybuffer/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Data-BinaryBuffer",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/vovkasm/data-binarybuffer.git",
+         "web" : "https://github.com/vovkasm/data-binarybuffer"
+      }
+   },
+   "version" : "0.005",
+   "x_authority" : "cpan:VOVKASM"
+}
+

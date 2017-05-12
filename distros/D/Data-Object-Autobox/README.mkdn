@@ -1,0 +1,174 @@
+# NAME
+
+Data::Object::Autobox - An Autobox Implementation for Perl 5
+
+# VERSION
+
+version 0.14
+
+# SYNOPSIS
+
+    use Data::Object::Autobox;
+
+    my $input  = [1,1,1,1,3,3,2,1,5,6,7,8,9];
+    my $output = $input->grep('$a < 5')->unique->sort; # [1,2,3]
+    my $object = $output->array;
+
+    $output->join(',')->print; # 1,2,3
+    $object->join(',')->print; # 1,2,3
+
+    $object->isa('Data::Object::Array');
+
+# DESCRIPTION
+
+Data::Object::Autobox implements autoboxing via [autobox](https://metacpan.org/pod/autobox) to provide
+[boxing](http://en.wikipedia.org/wiki/Object_type_\(object-oriented_programming\))
+for native Perl 5 data types. This functionality is provided by [Data::Object](https://metacpan.org/pod/Data::Object)
+which provides a collection of object classes for handling SCALAR, ARRAY, HASH,
+CODE, INTEGER, FLOAT, NUMBER, STRING, UNDEF, and UNIVERSAL data type operations.
+Data::Object provides its own boxing strategy in that every method call which
+would normally return a native data type will return a data type object, but
+this functionality requires an initial data type object. Data::Object::Autobox
+makes it so that you do not need to explicitly create the initial data type
+object, and once the initial autobox method call is made, the Data::Object
+boxing takes over.
+
+# FLAVORS
+
+Data::Object::Autobox endeavors to implement autoboxing in various flavors to be
+suitable in different environments. Currently, there are two boxing flavors
+available, `autoload` and `composite`, both of which implement the boxing
+architecture but handle dispatching and returning in different ways. The default
+boxing flavor is `composite` because that flavor is the closest, in
+implementation, to what most people are already familiar with. The following
+example describes how flavors are enacted:
+
+    use Data::Object::Autobox -autoload;  # autoboxing via autoload
+    use Data::Object::Autobox -composite; # autoboxing via composite
+
+The differences between the main boxing flavors is in how they react to input,
+dispatch, and return data. The `autoload` flavor uses AUTOLOAD to delegate
+autoboxing to the [Data::Object](https://metacpan.org/pod/Data::Object) framework. It is likely that once the initial
+delegation happens, autoboxing is no longer necessary in the chaining of
+routines. Additionally, the data returned from autoboxed actions under autoload
+will always be Data::Object instances.
+
+Conversely, the `composite` flavor uses role composition, with the respective
+roles which [Data::Object](https://metacpan.org/pod/Data::Object) objects are comprised of, to provide type-specific
+boxing functions only. This implementation uses the typical autoboxing approach,
+i.e. the autobox pragma handles the boxing, composition provides the functions,
+and the data returned is not a Data::Object instance.
+
+Additionally, this module supports passing user-defined classes to
+Data::Object::Autobox. The follow is an example of passing custom user-defined
+classes which can be completely custom, or inherit from any of the existing
+implementations.
+
+    use Data::Object::Autobox -custom => (
+        ARRAY     => "MyApp::Autobox::Array",
+        CODE      => "MyApp::Autobox::Code",
+        FLOAT     => "MyApp::Autobox::Float",
+        HASH      => "MyApp::Autobox::Hash",
+        INTEGER   => "MyApp::Autobox::Integer",
+        NUMBER    => "MyApp::Autobox::Number",
+        SCALAR    => "MyApp::Autobox::Scalar",
+        STRING    => "MyApp::Autobox::String",
+        UNDEF     => "MyApp::Autobox::Undef",
+        UNIVERSAL => "MyApp::Autobox::Universal",
+    );
+
+## Array Methods
+
+Array methods are called on array references, for example, using `$array->method(@args)`, which will act on the `$array` reference and will
+return a new data type object. Many array methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Array methods are handled via the [Data::Object::Array](https://metacpan.org/pod/Data::Object::Array) object class
+which is provided to the autobox ARRAY option.
+
+## Code Methods
+
+Code methods are called on code references, for example, using `$code->method(@args)`, which will act on the `$code` reference and will
+return a new data type object. Many code methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Code methods are handled via the [Data::Object::Code](https://metacpan.org/pod/Data::Object::Code) object class
+which is provided to the autobox CODE option.
+
+## Float Methods
+
+Float methods are called on float values, for example, using `$float->method(@args)`, which will act on the `$float` value and will
+return a new data type object. Many float methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Float methods are handled via the [Data::Object::Float](https://metacpan.org/pod/Data::Object::Float) object class
+which is provided to the autobox FLOAT option.
+
+## Hash Methods
+
+Hash methods are called on hash references, for example, using `$hash->method(@args)`, which will act on the `$hash` reference and will
+return a new data type object. Many hash methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Hash methods are handled via the [Data::Object::Hash](https://metacpan.org/pod/Data::Object::Hash) object class
+which is provided to the autobox HASH option.
+
+## Integer Methods
+
+Integer methods are called on integer values, for example, using `$integer->method(@args)`, which will act on the `$integer` value and will
+return a new data type object. Many integer methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Integer methods are handled via the [Data::Object::Integer](https://metacpan.org/pod/Data::Object::Integer) object
+class which is provided to the autobox INTEGER option.
+
+## Number Methods
+
+Number methods are called on number values, for example, using `$number->method(@args)`, which will act on the `$number` value and will
+return a new data type object. Many number methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Number methods are handled via the [Data::Object::Number](https://metacpan.org/pod/Data::Object::Number) object
+class which is provided to the autobox NUMBER option.
+
+## Scalar Methods
+
+Scalar methods are called on scalar references and values, for example, using
+`$scalar->method(@args)`, which will act on the `$scalar` reference and
+will return a new data type object. Many scalar methods are simply wrappers
+around core functions, but there are additional operations and modifications to
+core behavior. Scalar methods are handled via the [Data::Object::Scalar](https://metacpan.org/pod/Data::Object::Scalar) object
+class which is provided to the autobox SCALAR option.
+
+## String Methods
+
+String methods are called on string values, for example, using `$string->method(@args)`, which will act on the `$string` value and will
+return a new data type object. Many string methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. String methods are handled via the [Data::Object::String](https://metacpan.org/pod/Data::Object::String) object
+class which is provided to the autobox STRING option.
+
+## Undef Methods
+
+Undef methods are called on undef values, for example, using `$undef->method(@args)`, which will act on the `$undef` value and will
+return a new data type object. Many undef methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Undef methods are handled via the [Data::Object::Undef](https://metacpan.org/pod/Data::Object::Undef) object
+class which is provided to the autobox UNDEF option.
+
+## Universal Methods
+
+Universal methods can be called on any values, for example, using `$universal->method(@args)`, which will act on the reference or value and will
+return a new data type object. Many universal methods are simply wrappers around
+core functions, but there are additional operations and modifications to core
+behavior. Universal methods are handled via the [Data::Object::Universal](https://metacpan.org/pod/Data::Object::Universal)
+object class which is provided to the autobox UNIVERSAL option.
+
+# SEE ALSO
+
+- [Data::Object](https://metacpan.org/pod/Data::Object)
+
+# AUTHOR
+
+Al Newkirk <anewkirk@ana.io>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Al Newkirk.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

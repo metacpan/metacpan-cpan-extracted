@@ -1,0 +1,4 @@
+README for examples/
+
+This directory will hold examples of how to use Devel-Git-MultiBisect to
+gather test output for subsequent diagnosis of problems.

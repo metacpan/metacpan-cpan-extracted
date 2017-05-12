@@ -1,0 +1,28 @@
+Revision history for Perl extension DBIx::DSN::Resolver
+
+0.09    Thu Oct 18 13:05:31 2012
+        - fixed uuv
+
+0.08    Thu Oct 18 12:52:03 2012
+        - supports more variation of dsn, like dbi:mysql:db;hostname=xxx:3306
+
+0.07    Thu Oct 1 13:37:33 2012
+        - updated document
+
+0.06    Mon Oct 1 22:43:50 2012
+        - more fixed test, check noneexistent entry
+
+0.05    Mon Oct 1 16:37:27 2012
+        - more fixed test
+
+0.04    Mon Oct 1 12:27:13 2012
+        - fixed test and added doc about Solaris cannot resolved hostname without "-lresolv" configure
+
+0.03    Thu Sep 28 0:07:38 2012
+        - changed sample code
+
+0.02    Thu Sep 27 22:48:28 2012
+        - fixed warning "Use of uninitialized value in subroutine entry lib/DBIx/DSN/Resolver.pm line 15"
+
+0.01    Thu Sep 27 12:36:54 2012
+        - original version

@@ -1,0 +1,54 @@
+                     =====================================
+                       Package "Date::Pcalc" Version 6.1
+                     =====================================
+
+
+                  Copyright (c) 1995 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Version history:
+----------------
+
+Version 6.1   15.10.2009
+
+ +  United "Date::Calc" and "Date::Pcalc" into a single distribution
+ +  Fixed Polish names of months and days of week (RT ticket #14159)
+
+Version 6.0   07-Oct-2009   Copyright (c) by Steffen Beyer
+
+ +  Complete rewrite based on Date::Calc version 6.0
+    (Note that this is a 1:1 transcription and that it should
+    therefore behave exactly like the original Date::Calc module)
+ +  BEWARE that the system call "mktime()" is not available in
+    Perl; therefore, "Mktime()" in this module does not call it,
+    but tries to calculate the same result on its own. This works
+    on my machine (for some tested dates), but no guarantees can be
+    given it will work on yours (and for other dates and locations).
+
+Version 1.2   02-Apr-2001   Copyright (c) by J. David Eisenberg
+
+ +  Cosmetic changes to accompanying text files
+ +  "Flattened" the directory structure to make PAUSE and its
+    maintainer more happy :-)
+
+Version 1.1   06-Feb-2000   Copyright (c) by J. David Eisenberg
+
+ +  Added year windowing (yy < 70 ? 20yy : 19yy) to Decode_Date_EU2
+    and Decode_Date_US2
+ +  Added English_Ordinal for use in Date_to_Text_Long
+ +  Updated documentation to match Date::Calc version 4.3
+ +  Added various fixes to Pcalc.pm from Steffen Beyer, mostly
+    involving optimizing use of returned lists
+
+Version 1.0   03-Aug-1999   Copyright (c) by J. David Eisenberg
+
+ +  First release of module. I wrote this module because I was doing
+    a project that required date calculations.  Date::Calc did
+    exactly what I wanted, but the client's ISP would not allow me to
+    compile C code.  I rewrote the few subroutines that I needed into
+    Perl, and then decided to translate the entire module to Perl in
+    case other people encountered the same problem.
+
+----------------------------------------------------------------------------
+

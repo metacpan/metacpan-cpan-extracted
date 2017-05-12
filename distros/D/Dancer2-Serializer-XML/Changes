@@ -1,0 +1,14 @@
+Revision history for Perl extension Dancer2::Serializer::XML.
+
+0.04  2017-02-19
+	- Switch Changes file to ISO date format
+	- Remove a few unused classes in module
+	- Remove Test::More from inside test class to silence warning
+	- Remove perl version requirement from Makefile.PL
+
+0.03  2017-02-18
+	- Header fix in docs
+
+0.01  2017-02-19
+	- First version
+

@@ -1,0 +1,62 @@
+Revision history for DB-Color
+
+0.20   2015/11/21
+        - Add optional sentinel support to avoid loading DB::Color unless
+          requested.
+        - Add an example in examples/colorize of a program which can
+          continuously colorize your files on the fly.
+        - Add a "WORKFLOW" section to the docs to explain more efficient usage
+          of this module.
+        - Remove Module::Build. RIP :/
+
+0.10   2012/01/08
+        - Fix "Argument isn't numeric" warnings.
+        - Assert minimum version of File::Path to fix "make_path is not
+          exported" build failures.
+
+0.09   2012/09/05
+        - Don't use BRIGHT_BLUE if they have Term::ANSIColor < 3 (Cosimo
+          Streppone)
+
+0.08   2012/04/08
+        - Fixed bug where two or more package declarations in a single file
+          would break syntax highlighting.
+        - Added a perldbsyntax script to pre-generate syntax files.
+
+0.07   2012/04/01
+        - Add a config file to let people control some behavior.
+        - The afterinit() sub is no longer required in the .perldb file (it's
+          done internally).
+        - The md5 sum is now generate with the "format number" and classname.
+        - Caching can now be disabled by not passing a cache_dir to the
+          highlighter.
+
+0.06    2012/03/31
+        - Don't highlight if NO_DB_COLOR environment variable is set to a true value.
+        - Add optional debugging to log file (internal and undocumented. Use
+          at own risk.
+        - Naive caching of output files. File deleted after thirty days of
+          non-use.
+        - Workaround Syntax::Highlight::Kate POD bug (https://rt.cpan.org/Ticket/Display.html?id=76160)
+        - Fix broken breakpoints. Thanks to Nick Perez and Liz for the help!
+        - Fix off-by-one error (Thanks Liz!)
+
+0.05    2012/01/04
+        - Ouch! Add the actual highlighter to the MANIFEST
+
+0.04    2012/01/04
+        - Fix Github link in Build.PL
+
+0.03    2012/01/04
+        - Add Build.PL. List github repo.
+        - Syntax highlighter requires 5.8.0, so put that in the Makefile.PL
+        - POD for DB::Color::Highlighter.
+
+0.02    2011/12/30
+        - Quick hack to silence uninit warnings in DB::DB
+        - Silence warnings from Kate highlighter
+        - Tried to make the colors easier to work with
+
+0.01    2011/12/30
+        - Debugger syntax highlighting
+

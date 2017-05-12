@@ -1,0 +1,333 @@
+1.98    2017-04-26
+
+    - Adjust tests to calculate daylight time offsets in different months to avoid
+      making those calculations during Ramadan, as Daylight Savings Time is suspended
+      in Morocco during Ramadan.
+
+1.97    2017-04-15
+
+    - Add new time zone for Magallanes Standard Time.
+
+1.96    2017-03-16
+
+    - Add new time zones for Saratov Standard Time and UTC+13.
+
+1.95    2017-01-15
+
+    - Fix tests to handle daylight savings time changes for durations other than
+      one hour (Lord Howe Island in Australia shifts the clock only thirty minutes).
+
+1.94    2016-09-19
+
+    - Add new time zone for Omsk Standard Time.
+    
+    - Removed known bad time zone for author testing as time is now fixed.
+    
+    - Updated documentation to reflect newer operating systems.
+
+1.93    2016-08-13
+
+    - Run certain tests only during automated testing to avoid user test failures
+      should time zones change before the module is updated.
+      
+    - Build changes to improve CPANTS Kwalitee score.
+
+1.92    2016-08-12
+
+    - Correct test failure when running as Administrator on Windows when using older
+      versions of DateTime::TimeZone. RT 116909.
+      
+    - Added time zone as a known bad zone until Microsoft fixes updates. This affects
+      author testing only and not functionality.
+
+1.91    2016-07-01
+
+    - Correct mappings of a few time zones.
+
+1.90    2016-06-27
+
+    - Fix test failure when registry was writable, but extra data existed after the
+      time zone key.
+
+1.89    2016-06-27
+
+    - Many new time zones and updates from May 2016 and June 2016 DST and time
+      zone updates for Windows.
+    
+    - Fix test warnings when testing from non-admin shell using readonly registry values.
+    
+    - Remove Chile time zone as exception to prevent author test from failing.
+
+1.88    2016-04-16
+
+    - Add support for new time zones in Russia.
+    
+    - Fix test failure when new time zone exists but is not handled in library.
+    
+    - Mark Chile time zone as not being updated yet by Microsoft to prevent
+      author test from failing.
+
+1.87    2016-01-11
+
+    - Fix files missing warning on install.
+
+1.86    2015-12-13
+
+    - Add support for new time zone in North Korea.
+    
+    - Reorganize tests so that many tests can run with only read access to the
+      registry. Currently, most testers have all tests skipped because they are
+      not running as an Administrator during testing.
+      
+    - Add internal method to read Windows to IANA hash so as to enable testing for
+      those with only read access to the registry.
+
+1.85    2015-06-27
+
+    - Change compile test to an author test due to possibility of
+      DateTime::TimeZone::Local not being present. Patch by Dave Rolsky.
+      
+    - Change environment variable for author testing in main test script to
+      be consistent with conventions.
+      
+    - Include extra modules when reporting prerequisites from testing.
+
+1.84    2015-06-22
+
+    - Require testers to have minimum version of DateTime::TimeZone::Local
+      before any tests are run.
+
+1.83    2015-06-22
+
+    - Remove prerequisite to DateTime::TimeZone::Local and DateTime.
+    
+    - Update tests to run conditionally on presence of DateTime::TimeZone::Local
+      and DateTime.
+      
+    - Require maintainer tests to work only on a recent build of DateTime::TimeZone.
+    
+    - Rename references to Olson to IANA as the current maintainer of the tz database.
+    
+    - Modify prerequisite versions for some modules.
+
+1.82    2015-02-19
+
+    - Add support for upcoming Windows time zone update for March 2015, which
+      will have a new time zone for Mexico.
+    
+    - Require latest DateTime-TimeZone-Local to ensure Windows mappings
+      map to existing IANA time zones.
+
+
+1.81    2015-02-18
+
+    - Required Win32-TieRegistry v0.27 to fix failures on Perl 5.20.1.  
+      RT #100334 & 102178.
+    
+    - Fix failures on Windows 2008 when newlines appear following null
+      character in time zone name.  Patch in main code by Stuart Watt and for
+      test by Tom Koelman.  RT #68607 & 70989.
+      
+    - Fix maintainer test to appropriate test time zones in current time, not
+      historical time.
+
+
+1.80    2014-11-16
+
+    - This is the initial release creating a separate distribution for
+      DateTime::TimeZone::Local::Win32. As a result, additional changes specific
+      to the Windows platform should be made more often.
+
+---------------------------------------------------------------------------------
+Earlier changes are a subset of the Win32-related changes from DateTime-TimeZone.
+---------------------------------------------------------------------------------
+
+1.78    2014-11-05
+
+    - Fix warnings from Perl 5.8.8 and before. Apparently it doesn't like when
+      $SIG{__DIE__} is set to undef. Patch by Peter Rabbitson. GitHub PR #88.
+
+
+1.77    2014-11-04
+
+    - Updated the mapping of Windows -> IANA time zones. Patch by David
+      Pinkowitz. RT #10025.
+
+    - Replaced Class::Load with Module::Runtime, and replaced eval with Try::Tiny.
+
+
+1.55    2012-11-30
+
+    - Updated mapping from Win32 to Olson time zone names. Patch by Andrey
+      Makhnutin. RT #81456.
+
+
+1.36    2011-08-29
+
+    - This release is based on version 2011i of the Olson database. This release
+      includes a new zone for South Sudan (Africa/Juba) and changes for Samoa,
+      Kaliningrad (Russia), Alaska, Hawaii, Newfoundland/Labrador (Canada), and
+      Resolute Bay.
+
+    - Require ExtUtils::MakeMaker 6.58+. This fixes an installation problem on
+      Windows.
+
+
+1.31    2011-03-18
+
+    - Updates for Win32 time zones. Patch by David Pinkowitz.
+
+
+1.19    2010-05-10
+
+    - This release is based on version 2010j of the Olson database. This release
+      creates a new zone for Mexico (America/Bahia_Banderas).
+
+    - Dateline time zone on Win32 now always maps to a fixed -12:00 zone. Patch by
+      David Pinkowitz.
+
+
+1.17    2010-04-10
+
+    - Updated Win32 to Olson name translation mapping. Patch by David
+      Pinkowitz. RT #56445.
+
+
+1.07    2009-12-24
+
+    - Fixed for local time zone determination on Win32. Our tests broke after the
+      December 2009 Cumulative Time Zone Update from Microsoft. Patch by David
+      Pinkowitz. RT #52978.
+
+
+0.98    2009-09-11
+
+    - Fixes for Win32 time zones. Added handling for new Windows time zones,
+      thanks to Jim Brunette. This should fix test failures on some Win32 systems.
+
+
+0.85    2009-03-16
+
+    - This release is based on version 2009c of the Olson database. The
+      only changes in this release are for Cuba.
+
+    - Fixes for Win32 with Microsoft's December time zone update. This
+      updated added a zone for Mauritius that wasn't accounted for in the
+      DateTime::TimeZone::Local::Win32 module. Reported by David
+      Pinkowitz. RT #43535.
+
+    - Added a hack to fix some brokenness with Module::Build::Compat that
+      causes the compatibility Makefile.PL to fail on really old
+      ExtUtils::MakeMaker versions (6.17 and older). RT #43605.
+
+
+0.8301  2008-11-07
+
+    - Test fixes only. The 19local-win32 tried to skip tests when they're
+      run without write access to the registry, but this was done in a
+      very broken way.
+
+
+0.83    2008-10-27
+
+    - This release is based on version 2008i of the Olson database. The
+      major changes in this release are for Argentina.
+
+    - Updated the docs on how the local time zone is determined for
+      various platforms.
+
+
+0.7904  2008-08-30
+
+    - Added three more Windows time zone names to the Windows -> Olson
+      mapping. This should fix test failures on up-to-date Windows
+      boxes. Patch by David Pinkowitz. RT #38735.
+
+
+0.79    2008-07-29
+
+    - This release is based on version 2008e of the Olson database. The
+      major changes in this release are for Mauritius and Central Europe
+      (historical changes only).
+
+    - Fixes for the local TZ tests on Win32. Thanks to David Pinkowitz for
+      pointing out my mistake.
+
+
+0.7701  2008-06-03
+
+    - Many fixes and improvements to the tests for local time zone
+      handling on Windows. Based on a patch from David Pinkowitz.
+
+    * There are no code changes in this release besides these test
+      changes.
+
+
+0.77     2008-05-27
+
+    - This release is based on version 2008c of the Olson database. The
+      major changes in this release are for Morocco, Mongolia, and
+      Pakistan.
+
+    - More Windows changes from David Pinkowitz. Determining the local
+      time zone on a Win32 system should now work regardless of the
+      system's locale. Previously it only worked for English language
+      systems. RT #36201.
+
+
+0.76     2008-05-18
+
+    * Dropped support for Perl 5.005.
+
+    - Made the Win32 local time zone bits work on Vista and Server
+      2008. Patch by David Pinkowitz. RT #35733.
+
+
+0.75     2008-04-25
+
+    - A stray STORABLE_attach method in DT::TZ::Floating caused freezing
+      and thawing a floating timezone with Storable to fail
+      badly. Reported by Kostas Chatzikokolakis.
+
+    - Changed the local time zone detection on Win32 to only require read
+      access to the registry. Patch by David Pinkowitz. RT #35273.
+
+
+0.6904   2007-11-09
+
+    - Updated the Windows -> Olson conversion table, though it's still
+      English-only. Added some more Win32 tests to hopefully help diagnose
+      a test failure report from a Win32 tester.
+
+
+0.6903   2007-11-08
+
+    - The Win32::TieRegistry prereq was requiring version 1.0, which
+      doesn't exist. I meant to require just any version. Reported by
+      CJM. RT #30580.
+
+    - No code changes in this release.
+
+
+0.6902   2007-11-05
+
+    - Fixed many sloppy uses of eval blocks which would leave $@ set after
+      calling various DT::TZ methods/functions. This could cause unrelated
+      error checking to find $@ set to something and log an error or
+      die. Reported by Kat.
+
+
+0.6901   2007-11-02
+
+    - Add Win32::TieRegistry to our prereqs if we're on Win32. Reported by
+      Ruud H.G. van Tol.
+
+
+0.61     2007-02-18
+
+    - Lots of internal changes in the code used to determine a system's
+      local time zone.
+
+    - As a result, we now have a much better method for doing this on
+      Windows systems, by looking at the registry. See
+      DateTime::TimeZone::Local::Win32 for details.

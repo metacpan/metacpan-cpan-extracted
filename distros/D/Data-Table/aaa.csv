@@ -1,0 +1,10 @@
+Amino acid,Entry,Solvent,"Grams ""(a.a.)""/100g sol.","Temp, C",Ref No.
+Alanine,1,Ethanol,0.0087,25.0,1
+L-aspartate,2,Ethanol,0.000196,25.0,2
+L-glutamate,3,Ethanol,0.0056,44.93,2
+Glycine,4,Ethanol,0.0037,25.0,1
+L-allo-isoleucine,5,Ethanol,0.19,79,5
+L-isoleucine,6,Ethanol,0.13,79,5
+L-leucine,7,Ethanol,0.217,25.0,1
+L-proline,8,Ethanol,1.5,19,6
+Valiane,9,Ethanol,0.019,25.0,1

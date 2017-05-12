@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/Data/FormValidator/Constraints/HTTP.pm
+MANIFEST			This list of files
+t/01-use.t
+t/02-validator.t
+t/98-pod_coverage.t
+t/99-pod.t
+META.yml
+Makefile.PL
+README

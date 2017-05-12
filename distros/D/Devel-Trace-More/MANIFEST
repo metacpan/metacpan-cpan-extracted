@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Devel-Trace-More.t
+lib/Devel/Trace/More.pm
+META.yml                                 Module meta-data (added by MakeMaker)

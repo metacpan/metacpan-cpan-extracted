@@ -1,0 +1,163 @@
+########################################################################
+# HISTORY
+########################################################################
+
+Data::ALoNE (never released to CPAN)
+====================================
+
+Version 1.00  2007-08-31
+   Initial release
+
+Version 1.01  2008-01-24
+   Added _ae so that the AEs are actually calculated and stored (a
+      significant number of the guts routines were rewritten to
+      take advantage of this)
+   Significant reorg/rewrite of the guts to clean it up
+   Updated test.pl
+
+At this point, Data::ALoNE was renamed and split into Data::NDS and
+Data::Multisource.
+
+Data::NDS and Data::NDS::Multisource
+====================================
+
+Data::NDS  Version 1.00   2008-02-27
+   Initial release
+
+Data::NDS  Version 1.01   2008-05-05
+   Fixed bug where merge ignored the $new=1 arg. Ashley Hindmarsh
+   Added identical and contains methods
+   keys and values now only return non-empty elements
+   Added value method
+   Added default and override rulesets
+   Added ruleset_valid method
+   Added which method
+   Added lots of examples to manual
+   Added Build.PL and several other things to meet requirements on
+      http://cpants.perl.org/
+
+Data::NDS::Multisource  Version 2.00  2008-05-05
+   Updated test.pl
+   Abstracted some of the routines into the newly created Data::NDS
+      module (complete rewrite to account for this)
+   Renamed to Data::NDS::Multisource
+   Added Build.PL and several other things to meet requirements on
+      http://cpants.perl.org/
+
+Data::NDS  Version 1.02  2008-05-08
+   Additional changes to meet requirements on http://cpants.perl.org/
+   Speedups.
+
+Data::NDS  Version 1.03  2008-05-09
+   Final changes to meet requirements on http://cpants.perl.org/
+   Bug fix so it won't fail with "Too early to specify a build action"
+
+Data::NDS  Version 1.04  2008-06-12
+   Added check_value method
+   Added print method
+   Added "keys" to get_structure functionality
+   Explicitly defined each method as working with the actual structure,
+     or with a copy of the structure.
+
+Data::NDS::Multisource  Version 2.01  2008-06-12
+   Additional changes to meet requirements on http://cpants.perl.org/
+   Much faster
+   Better handling of defaults
+
+Data::NDS  Version 1.05  2008-06-19
+   Fixed a bug in merging
+
+Data::NDS::Multisource  Version 2.02  2008-06-19
+   Added support for erasing paths to update_ele
+
+At this point, I realized that Data::NDS::Multisource was complicated
+enough that I chose not to use all of the functionality. I extracted
+the functionality I DID use and created Data::NDS::Multiele and
+Data::NDS::Multifile and deprecated Data::NDS::Multisource.
+
+Data::NDS, Data::NDS::Multiele, and Data::NDS::Multifile
+========================================================
+
+Data::NDS  Version 3.00  2009-03-02
+   NOTE: jumped versions to synchronize Data::NDS modules
+   Backwards incompatible rethink of the module.
+   Almost all functions have changed slightly (different error codes,
+      different return values).
+
+Data::NDS::Multiele  Version 3.00  2009-03-02
+   Complete rewrite.
+   Released as Data::NDS::Multiele.
+
+Data::NDS::Multifile  Version 3.00  2009-03-02
+   Initial release. Most of the functionality comes from the
+      Data::NDS::Multisource module.
+
+Data::NDS  Version 3.10  2009-04-14
+   Some docs imporovments prompted by Michael
+   Added test_conditions method (previously an internal only part of
+      the Multiele module).
+
+Data::NDS::Multiele  Version 3.10  2009-04-14
+   Cleaned up some of the internals.
+   Moved test_conditions to Data::NDS module (for use with other
+      Data::NDS::* modules)
+   Added raw option to value, keys, values.
+
+Data::NDS::Multifile  Version 3.10  2009-04-14
+   Cleaned up some of the internals.
+
+Data::NDS::Multiele  Version 3.11  2010-02-05
+   Added "no new structure" option to the file method.
+   Fixed a couple bugs.
+   Added path_in_use method.
+   Performance improvements.
+
+Data::NDS  Version 3.11  2010-02-25
+   Renamed the module to Data::Nested .  3.11 is the final version of
+      Data::NDS .
+
+Data::NDS::Multifile  Version 3.11  2010-02-05
+   Added path_in_use method.
+   Minor bug fix in path_values.
+
+Data::NDS::Multiele  Version 3.12  2010-03-04
+   Fixed "use Data::NDS" to require the correct version.
+   Renamed the module to Data::Nested::Multiele and added to the
+      Data::Nested distribution .  3.12 is the final release of
+      Data::NDS::Multiele .
+
+Data::NDS::Multifile  Version 3.12  2010-03-04
+   Fixed "use Data::NDS::Multiele" to require the correct version.
+   Renamed the module to Data::Nested::Multifile and added to the
+      Data::Nested distribution .  3.12 is the final release of
+      Data::NDS::Multifile .
+
+Data::Nested
+============
+
+Version 3.11  2010-02-25
+   Renamed the module Data::NDS to Data::Nested .  3.11 is the final
+      version of Data::NDS and the first version of Data::Nested .
+
+Version 3.12  2010-03-04
+   Added Data::Nested::Multiele and Data::Nested::Multifile.
+
+########################################################################
+# BACKWARDS INCOMPATIBILITIES
+########################################################################
+
+Version 3.00
+   *** NOTE ***
+   Version 3.00 is a complete rethink/rewrite of the modules. Based on
+   real-life use of the module, a number of changes were made to
+   make the module easier to use and more consistent internally.
+
+Version 3.10
+   The API of the 3.10 series is backward compatible with 3.00, but
+   due to changes in the internals, the 3.10 Data::NDS module is
+   required for the 3.10 version of other Data::NDS::* modules.
+
+Version 3.11/3.12
+   Renamed the module at the suggestion of the perl module list
+   maintainers.
+

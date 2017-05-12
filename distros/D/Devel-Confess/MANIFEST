@@ -1,0 +1,32 @@
+Changes
+lib/Devel/Confess.pm
+lib/Devel/Confess/_Util.pm
+lib/Devel/Confess/Builtin.pm
+lib/Devel/Confess/Source.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/color.t
+t/confess.t
+t/devel.t
+t/dump.t
+t/end-debugging.t
+t/evalsource.t
+t/find_sig.t
+t/global-destruct.t
+t/leak.t
+t/lib/Capture.pm
+t/lib/MiniTest.pm
+t/lib/ThreadsCheck.pm
+t/names.t
+t/options.t
+t/rethrow.t
+t/safe.t
+t/sig.t
+t/source.t
+t/threads.t
+t/universal.t
+xt/builtin.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

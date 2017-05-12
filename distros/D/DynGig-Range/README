@@ -1,0 +1,67 @@
+DynGig-Range
+
+In addition to expanding range expressions into lists, and serializing lists as range expressions, DynGig::Range::String is also able to interpret and perform set operations.
+
+Union of sets A and B, is denoted as A,B.
+
+Difference of set A from B, is denoted as A,-B.
+
+Intersection of sets A and B, is denoted as A,&B.
+
+Catenation of sets A and B, is denoted as AB.
+
+Scope is denoted with { }.
+
+Union, difference, and intersection have equal precedence, and are preceded by catenation. Scope precedes all other operators. e.g.
+
+'{a1,b2}{1~9,&{3~11,-2~7}}' results in a18, a19, b28, b29
+
+Furthermore, Range::String is able to interpret a subset* of perl regular expressions, so that simple ad-hoc filtration of results is possible.
+
+'{a1,b2}{1~9,&{3~11,-2~7}},-/^a/' results in b28, b29
+'{a1,b2}{1~9,&{3~11,-2~7}},&/9$/' results in a19, b29
+
+With overloaded operators +, -, &, +=, -=, &=, "", @{}, etc., set calculations on range objects are like simple integer arithmetic, and range objects can be interpolated like strings or lists.
+
+Given properly named hosts, DynGig::Range::String can give your tools the ability to interpret range expressions from the command line or configuration files. Along with other techniques which we will introduce in later chapters, the complexity and difficulty of administrating hundreds of thousands of hosts can possibly be reduced to that of operating a handful.
+
+<Footnote>: Due to the implementation of DynGig::Range::String, Range has precedence on symbols common to both Range and regex. Therefore symbols such as , { } cannot be used in regex.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DynGig::Range
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DynGig-Range
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DynGig-Range
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DynGig-Range
+
+    Search CPAN
+        http://search.cpan.org/dist/DynGig-Range/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 Kan Liu
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

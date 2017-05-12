@@ -1,0 +1,175 @@
+---
+atime: ~
+disk: ~
+file_removals: []
+filename: OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5
+id: 1
+log_entries: []
+md5: 8adf4a35531501f5fd89a4523386b901
+metadata:
+- file: 1
+  id: 1
+  name: archivesets
+  value: '10003'
+- file: 1
+  id: 3
+  name: endtime
+  value: 2007-11-14 20:13:52-05
+- file: 1
+  id: 4
+  name: esdt
+  value: OMTO3
+- file: 1
+  id: 5
+  name: orbit
+  value: '17733'
+- file: 1
+  id: 2
+  name: starttime
+  value: 2007-11-14 18:34:59-05
+on_disk: ~
+repository: 1
+size: ~
+symlinks: []
+url: https://omisips1.omisips.eosdis.nasa.gov/data/8adf4a35531501f5fd89a4523386b901/OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5
+urn: 10003=OMTO3=17733
+---
+atime: ~
+disk: ~
+file_removals: []
+filename: OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5
+id: 2
+log_entries: []
+md5: 60e58cfa2421b6aa3f7d46d142bc081a
+metadata:
+- file: 2
+  id: 6
+  name: archivesets
+  value: '10003'
+- file: 2
+  id: 8
+  name: endtime
+  value: 2007-12-03 05:53:15-05
+- file: 2
+  id: 9
+  name: esdt
+  value: OMTO3
+- file: 2
+  id: 10
+  name: orbit
+  value: '18001'
+- file: 2
+  id: 7
+  name: starttime
+  value: 2007-12-03 04:14:22-05
+on_disk: ~
+repository: 1
+size: ~
+symlinks: []
+url: https://omisips1.omisips.eosdis.nasa.gov/data/60e58cfa2421b6aa3f7d46d142bc081a/OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5
+urn: 10003=OMTO3=18001
+---
+atime: ~
+disk: ~
+file_removals: []
+filename: OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5
+id: 3
+log_entries: []
+md5: 9b8478aa4bf6cb2b70f7e49c09592797
+metadata:
+- file: 3
+  id: 11
+  name: archivesets
+  value: '10003'
+- file: 3
+  id: 13
+  name: endtime
+  value: 2007-12-03 04:14:22-05
+- file: 3
+  id: 14
+  name: esdt
+  value: OMTO3
+- file: 3
+  id: 15
+  name: orbit
+  value: '18000'
+- file: 3
+  id: 12
+  name: starttime
+  value: 2007-12-03 02:35:29-05
+on_disk: ~
+repository: 1
+size: ~
+symlinks: []
+url: https://omisips1.omisips.eosdis.nasa.gov/data/9b8478aa4bf6cb2b70f7e49c09592797/OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5
+urn: 10003=OMTO3=18000
+---
+atime: ~
+disk: ~
+file_removals: []
+filename: file_that_superceded_10003
+id: 4
+log_entries: []
+md5: 04055d2f6a84a662e57b4a6dfae2df73
+metadata:
+- file: 4
+  id: 16
+  name: archivesets
+  value: '70003'
+- file: 4
+  id: 18
+  name: endtime
+  value: 2007-12-03 07:32:07-05
+- file: 4
+  id: 19
+  name: esdt
+  value: OMTO3
+- file: 4
+  id: 20
+  name: orbit
+  value: '18000'
+- file: 4
+  id: 17
+  name: starttime
+  value: 2007-12-03 05:53:15-05
+on_disk: ~
+repository: 1
+size: ~
+symlinks: []
+url: https://omisips1.omisips.eosdis.nasa.gov/data/04055d2f6a84a662e57b4a6dfae2df73/OMI-Aura_L2-OMTO3_2007m1203t1053-o18002_v003-2007m1207t214123.he5
+urn: 70003=OMTO3=18000
+---
+atime: ~
+disk: ~
+file_removals: []
+filename: OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5
+id: 5
+log_entries: []
+md5: 8ffb77692799e529a9423467de3bdc08
+metadata:
+- file: 5
+  id: 21
+  name: archivesets
+  value: 10003 70003 90003
+- file: 5
+  id: 23
+  name: endtime
+  value: 2007-12-03 09:11:00-05
+- file: 5
+  id: 24
+  name: esdt
+  value: OMTO3
+- file: 5
+  id: 25
+  name: orbit
+  value: '18003'
+- file: 5
+  id: 22
+  name: starttime
+  value: 2007-12-03 07:32:07-05
+on_disk: ~
+repository: 1
+size: ~
+symlinks: []
+url: https://omisips1.omisips.eosdis.nasa.gov/data/8ffb77692799e529a9423467de3bdc08/OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5
+urn: 10003=OMTO3=18003

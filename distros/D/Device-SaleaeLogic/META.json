@@ -1,0 +1,43 @@
+{
+   "abstract" : "Perl extension for accessing the Logic or Logic16 devices made by Saleae Logic.",
+   "author" : [
+      "Vikas Kumar <vikas@selectiveintellect.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-SaleaeLogic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Zip" : "0",
+            "LWP::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.02"
+}

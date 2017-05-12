@@ -1,0 +1,272 @@
+Revision history for Data-ModeMerge
+
+0.35    2016-07-22 (PERLANCAR)
+
+        - No functional changes.
+
+        - Re-release to get indexed on PAUSE, because I accidentally uploaded
+          Bencher-Scenarios-DataModeMerge-0.001.tar.gz which contains archive/
+          with Data::ModeMerge 0.34 inside, making PAUSE indexing that instance
+          instead.
+
+
+0.34    2016-07-19 (PERLANCAR)
+
+	- Delay load Data::Dmp to reduce startup overhead.
+
+
+0.33    2016-02-25 (PERLANCAR)
+
+	- No functional changes.
+
+	- Replace Data::Dumper with Data::Dmp.
+
+
+0.32    2015-02-21 (PERLANCAR)
+
+	- No functional changes.
+
+        - Delay loading Data::Dumper and Data::ModeMerge::Config to further
+          reduce startup overhead.
+
+
+0.31    2015-02-21 (PERLANCAR)
+
+	- No functional changes.
+
+	- Switch from Moo to Mo to reduce startup overhead.
+
+
+0.30    2013-07-16 (SHARYANTO)
+
+        - No functional changes. Replace indirect call to avoid warning from
+         'indirect'.
+
+
+0.29   2012-12-13 (SHARYANTO) - Thank God the apocalypse did not happen, allowing me to do this release.
+
+        - Fix cloning bug exposed by hash randomization of perl 5.17.6
+          [RT#81807]. Turns out Data::Clone does not deep-copy objects by
+          default. So now we copy configs manually.
+
+
+0.28    2012-11-30 (SHARYANTO)
+
+        - Replace Clone::Any with Data::Clone (Clone::Any fallbacks to Storable
+          which doesnt support storing Regexp)
+
+        - Add missing dependency to Test::Exception [RT#81544]
+
+
+0.27    2011-02-24 (SHARYANTO)
+
+        - regression: Clone needed as dependency
+
+
+0.26    2011-02-23 (SHARYANTO)
+
+        - switch from Mouse to Moo
+
+
+0.25    2010-11-10 (SHARYANTO)
+
+        - add use 5.010 instead of use feature (5.8.x doesn't have this yet)
+
+
+0.24    2010-07-23 (SHARYANTO)
+
+        - switch from Clone to Clone::Any (but still list Clone as dep)
+
+
+0.23   2010-02-17 (SHARYANTO)
+
+       - switch from Moose to Any::Moose (+Mouse as dependency)
+
+
+0.22    2009-12-17 (SHARYANTO)
+
+        - some work on doc
+
+        - minor fixes
+
+
+0.21    2009-12-15 (SHARYANTO)
+
+        - replace Storable + Regexp::Copy with Clone
+
+
+0.20    2009-12-15 (SHARYANTO)
+
+        - use Regexp::Copy
+
+
+0.19    2009-12-14 (SHARYANTO)
+
+        - fix copy-paste bug
+
+
+0.18    2009-12-12 (SHARYANTO)
+
+        - bug fix: custom prefix_re got reset in hash merge
+
+        - bug fix: restore_config() didn't recreate DM::Config object but hash
+          instead
+
+
+0.17    2009-12-12 (SHARYANTO)
+
+        - INCOMPATIBLE BEHAVIOUR CHANGE: SUBTRACT merge on two hashes is now
+          defined as a NORMAL merge, except that all keys on the right-side hash
+          which do not have a merge prefix will be assumed to have a DELETE
+          prefix. This means the SUBTRACT mode can now grok mode prefix and
+          options key too.
+
+        - INCOMPATIBLE BEHAVIOUR CHANGE: merging hash keys with DELETE mode now
+          will make the key disappear even if there is no corresponding left or
+          right side. merge({}, {"!a"=>1}) and merge({"!a"=>1}, {}) used to be
+          {"!a"=>1} but now will be {}. I believe this is more
+          intuitive/expected.
+
+
+0.16    2009-12-11 (SHARYANTO)
+
+        - some work on doc
+
+
+0.15    2009-12-11 (SHARYANTO)
+
+        - new config; premerge_pair_filter
+
+        - NORMAL mode can handle CODE refs
+
+        - can merge recursive/circular references (though not all possible cases)
+
+
+0.14    2009-12-07 (SHARYANTO)
+
+        - Minor fix to Makefile.PL
+
+        - Minor fix to options key handling
+
+
+0.13    2009-12-07 (SHARYANTO)
+
+        - This is a major refactoring of the module. The goal is to make the
+          code more flexible (e.g. adding future modes, changing prefix for each
+          mode, etc). Configuration is also significantly expanded.
+
+        - rename dist: Data-PrefixMerge -> Data-ModeMerge (to reflect the fact
+          that merging mode can be selected not only via a "prefix" but more
+          generally by a regex test on key).
+
+        - incompatible behaviour: all hash prefixes on the left-side and
+          right-side hash will be removed recursively after merge, even if it is
+          not a hash-hash merge, e.g. mode_merge({a=>1}, {b=>{"+c"=>1}) used to
+          become {a=>1, b=>{"+c"=>1}} but now it will become {a=>1, b=>{c=>1}}.
+          this ensures that all prefixes are "cleaned" after merge.
+
+        - incompatible behaviour: KEEP prefix (^) is now always sticky so it
+          always protects future merges (equivalent to old config's
+          preserve_keep_prefix). If you want KEEP prefix to be removed after
+          merge, set config C<readd_prefix> to 0.
+
+        - incompatible change: options key is now enabled by default, with ""
+          (empty string) as the key.
+
+        - incompatible change: configuration 'parse_hash_key_prefix' renamed to
+          'parse_prefix'.
+
+        - removed: remove_keep_prefix(), replaced by the more generic
+          remove_prefix().
+
+        - configurable prefix for each merging mode.
+
+        - new config: set_prefix allows you to change prefixes, even in the
+          middle of recursive merge.
+
+        - new config: allow_override & disallow_override.
+
+        - new config: allow_create_array, allow_create_hash,
+          allow_destroy_array, allow_destroy_hash.
+
+        - new config: exclude_parse, exclude_parse_regex, include_parse,
+          include_parse_regex.
+
+        - new config: exclude_merge, exclude_merge_regex, include_merge,
+          include_merge_regex.
+
+        - new config: disable_modes. each merging mode can now be individually
+          enabled/disabled through configuration.
+
+        - options key now understands almost all configuration.
+
+
+0.12    2009-11-25 (SHARYANTO)
+
+        - new option: hash_options_key
+
+        - fixed random ordering bug (closes #51799)
+
+
+0.11    2009-11-23 (SHARYANTO)
+
+        - add max_level parameter to remove_keep_prefixes()
+
+
+0.10    2009-11-23 (SHARYANTO)
+
+        - handle recursion in remove_keep_prefixes()
+
+
+0.09    2009-11-18 (SHARYANTO)
+
+        - fix bug in remove_keep_prefixes()
+
+
+0.08    2009-11-18 (SHARYANTO)
+
+        - new method: remove_keep_prefixes()
+
+
+0.07    2009-11-18 (SHARYANTO)
+
+        - minor fixes
+
+
+0.06    2009-11-08 (SHARYANTO)
+
+        - INCOMPATIBLE CHANGE: getting and setting config is now done via
+          $merger->config->confname instead of $merger->config->{confname} to
+          catch config name typos at compile time.
+
+
+0.05    2009-06-22 (SHARYANTO)
+
+        - yet another incompatible change: keep prefix now uses '^' instead of
+          '!' on the left side. this allows keep mode on the right side. on a
+          series of merge we can now introduce keep mode at one point (not just
+          on the first hash) and then preserve that keep mode afterwards.
+
+
+0.04    2009-06-17 (SHARYANTO)
+
+        - support KEEP merge for hash & hash
+
+
+0.03    2009-06-12 (SHARYANTO)
+
+        - incompatible change: '*' prefix on the left now means normal merge
+          mode (to protect hash keys having special characters). keep mode now
+          uses '!' on the left side.
+
+        - add config: preserve_prefix (default is 0).
+
+
+0.02    2009-03-30 (SHARYANTO)
+
+        - Rename Data-RecMerge to Data-PrefixMerge.
+
+
+0.01    2009-03-29 (SHARYANTO)
+
+        - First release.

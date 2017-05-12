@@ -1,0 +1,12 @@
+Dancer2-Plugin-Flash
+
+A flash is session data with a specific life cycle. When you put something into the flash it stays then until the end of the next request. This allows you to use it for storing messages that can be accessed after a redirect, but then are automatically cleaned up.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

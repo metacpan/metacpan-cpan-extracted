@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+use strict;
+use base 'Dyer::CLI';
+use strict;
+use Carp;
+use Cwd;
+our $VERSION = sprintf "%d.%02d", q$Revision: 1.1.1.1 $ =~ /(\d+)/g;
+
+
+
+
+
+
+
+
+
+
+
+
+my $abs;
+my $abs_loc;
+my $filename;
+
+
+# path specified?
+if ($ARGV[0]){
+	$abs = Cwd::abs_path($ARGV[0]) or die("cant resolve ".$ARGV[0]);
+	$abs=~/(.+)\/+([^\/]+)$/ or die('cant match loc and filename');
+	($abs_loc, $filename) = ($1,$2);	
+}
+
+else {
+	$abs_loc = cwd().'/bin';
+	$filename = 'blank_'.time().'.pl';
+	$abs = "$abs_loc/$filename";	
+	-d $abs_loc or die("No arg provided and $abs_loc does not exist either");
+}
+
+if ( -e $abs ){
+	die("already exists: $abs");
+}
+
+
+
+
+
+
+my $DATUM = <<"__DATUM__";
+#!/usr/bin/perl -w
+use base 'Dyer::CLI';
+use strict;
+use Carp;
+our \$VERSION = sprintf "\%d.%02d", q\$Revision: 1.1.1.1 $ =~ /(\\d+)/g;
+
+# write code here.
+
+
+__END__
+
+=pod
+
+=head1 NAME
+
+$filename - description
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+	-v version
+	-h help
+
+=head1 USAGE
+
+=head1 SEE ALSO
+
+L<Dyer::CLI>
+
+=head1 AUTHOR
+
+=cut
+
+__DATUM__
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+open(FILE,">$abs") or die($!);
+print FILE $DATUM;
+close FILE;
+
+print STDERR "$0, file created [$abs]\n";
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+mkperlbin - make blank perl script 
+
+=head1 DESCRIPTION
+
+This is just to start up making a script in perl
+You should give it a full path to where you want the script made
+it will not overrite a file
+if no argument is provided, will look for a 'bin' dir in the current dir, 
+and will make a randomnamedfile script there and return what its name is.
+
+If you specify a place to create, then the directory must already exist.
+
+=head1 USAGE
+
+	mkperlbin ./bin/blanky.pl
+	mkperlbin ./bin/dothis
+
+=head1 AUTHOR
+
+Leo Charre leocharre at cpan dot org
+
+=cut

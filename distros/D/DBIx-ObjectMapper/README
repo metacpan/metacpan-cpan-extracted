@@ -1,0 +1,126 @@
+NAME
+    DBIx::ObjectMapper - An implementation of the Data Mapper pattern
+    (object-relational mapper).
+
+SYNOPSIS
+    Create a engine and a mapper object.
+
+     use DBIx::ObjectMapper;
+     use DBIx::ObjectMapper::Engine::DBI;
+
+     my $engine = DBIx::ObjectMapper::Engine::DBI->new({
+        dsn => 'dbi:SQLite:',
+        username => undef,
+        password => undef,
+     });
+
+     my $mapper = DBIx::ObjectMapper->new( engine => $engine );
+
+    Create a ordinary perl class.
+
+     package My::User;
+     use base qw(Class::Accessor::Fast);
+     __PACKAGE__->mk_accessors(qw(id name));
+
+     1;
+
+    Get/Define metadata of the table.
+
+     my $user_meta = $mapper->metadata->table( 'user' => 'autoload' );
+
+     # or
+
+     use DBIx::ObjectMapper::Metadata::Sugar qw(:all);
+     my $user_meta = $mapper->metadata->table(
+         'user' => [
+             Col( id => Int(), PrimaryKey ),
+             Col( name => String(128), NotNull ),
+         ]
+     );
+
+    Map the table metadata to the ordinary class.
+
+     $mapper->maps( $user_meta => 'My::User' );
+
+    Create session. And add My::User object to session object.
+
+     my $session = $mapper->begin_session;
+     my $user = My::User->new({ id => 1, name => 'name1' });
+     $session->add($user);
+
+    When the $session is destroyed, the session object send a insert query
+    to the database.
+
+    Get a My::User Object.
+
+     my $session = $mapper->begin_session;
+     my $user = $session->get( 'My::User' => 1 );
+     $user->id;
+     $user->name;
+
+DESCRIPTION
+    DBIx::ObjectMapper is a implementation of the Data Mapper pattern. And
+    abstraction layer for database access.
+
+    Concepts and interfaces of this module borrowed from SQLAlchemy.
+    <http://www.sqlalchemy.org/>
+
+METHODS
+  new(%args)
+    engine
+         DBIx::ObjectMapper::Engine
+
+    metadata
+         By default DBIx::ObjectMapper::Metadata. Set a
+         DBIx::ObjectMapper::Metadata based object if you want.
+
+    mapping_class
+         By default DBIx::ObjectMapper::Mapper. Set a
+         DBIx::ObjectMapper::Mapper based object if you want.
+
+    session_class
+         By default DBIx::ObjectMapper::Session. Set a
+         DBIx::ObjectMapper::Session based class if you want.
+
+    session_attr
+         Set a hash reference of counstructor parameters of
+         DBIx::ObjectMapper::Session. When you call the begin_session
+         method, you get a DBIx::ObjectMapper::Session object that this
+         option is set up.
+
+  begin_session(%session_option)
+    Gets a session object instance, and begins session. See the
+    DBIx::ObjectMapper::Session for more information.
+
+  maps(%map_config)
+    Sets a configuration of mapping. See the DBIx::ObjectMapper::Mapper for
+    more information.
+
+  relation( $relation_type => \%relation_config )
+    DBIx::ObjectMapper::Relation
+
+  metadata()
+    Returns the metadata object.
+
+  engine()
+    Returns the engine object.
+
+  mapping_class()
+    Returns the mapping_class.
+
+  session_class()
+    Returns the session_class.
+
+AUTHOR
+    Eisuke Oishi
+
+CONTRIBUTORS
+    nekokak: Atsushi Kobayashi
+
+COPYRIGHT
+    Copyright 2010 Eisuke Oishi
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

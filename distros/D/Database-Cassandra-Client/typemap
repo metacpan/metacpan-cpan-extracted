@@ -1,0 +1,26 @@
+TYPEMAP
+
+cassandra_t * T_PTROBJ
+CassFuture * T_PTROBJ
+CassSession * T_PTROBJ
+CassStatement * T_PTROBJ
+CassBatch * T_PTROBJ
+CassResult * T_PTROBJ
+CassPrepared * T_PTROBJ
+CassCollection * T_PTROBJ
+CassRow * T_PTROBJ
+CassIterator * T_PTROBJ
+CassValue * T_PTROBJ
+const CassValue * T_PTROBJ
+CassError T_IV
+CassUuidGen * T_PTROBJ
+CassSsl * T_PTROBJ
+CassSchema * T_PTROBJ
+const CassSchema * T_PTROBJ
+CassSchemaMeta * T_PTROBJ
+const CassSchemaMeta * T_PTROBJ
+CassSchemaMetaType T_IV
+CassSchemaMetaField * T_PTROBJ
+const CassSchemaMetaField * T_PTROBJ
+
+Database::Cassandra::Client T_PTROBJ

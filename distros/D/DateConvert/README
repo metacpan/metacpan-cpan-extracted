@@ -1,0 +1,24 @@
+
+Date::Convert 0.13 pre-alpha by Mordechai T. Abzug <morty@umbc.edu>
+
+Allows you to convert date formats using an OO mechanism that lets you
+easily choose any two formats and add in new ones.
+
+At the moment, the only documentation is the man page.  That's not
+surprising, since it *is* pre-alpha.  And of course, since it's pre-alpha,
+'tis subject to change, and is unreliable.
+
+Install the normal way:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you have suggestions, bug reports, or if you want to add a new date
+format, feel free to contact me:  morty@sanctuary.arbutus.md.us
+
+If you want to be on the announcement list for new releases, send a mail
+with "subscribe" as the first line of the body to:
+dateconvert-announce-request@sanctuary.arbutus.md.us
+

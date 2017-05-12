@@ -1,0 +1,17 @@
+Revision history for Devel::LineName
+
+0.05    2015-03-31
+        RT103179
+
+0.04    2012-02-29
+        Really fix RT75362 this time
+
+0.03    2012-02-28
+        Fix failing test, RT75362
+
+0.02    2010-06-03
+        Pod improvements.
+
+0.01    2010-04-11
+        Initial release.
+

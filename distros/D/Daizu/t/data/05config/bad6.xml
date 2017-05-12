@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="US-ASCII"?>
+<!-- EXPECT ERROR: only one <database> element is allowed -->
+<config xmlns="http://www.daizucms.org/ns/config/">
+ <database dsn="dbi:Pg:dbname=daizu_test" />
+ <database dsn="dbi:Pg:dbname=daizu_test" />
+</config>

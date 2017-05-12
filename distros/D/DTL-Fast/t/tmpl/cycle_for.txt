@@ -1,0 +1,4 @@
+{% for var in array %}This is cycle {% cycle "val1" var2 hash1.var %} example, step {{ var }}
+{% endfor %}
+{% for var in array %}This is depricated cycle {% cycle "val4",var3,array2.0 %} example, step {{ var }}
+{% endfor %}

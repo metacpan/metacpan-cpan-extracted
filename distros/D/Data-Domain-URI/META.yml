@@ -1,0 +1,68 @@
+---
+abstract: 'Data domain classes for URIs'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Domain-URI
+provides:
+  Data::Domain::URI:
+    file: lib/Data/Domain/URI.pm
+    version: 1.100850
+  Data::Domain::URI::fax:
+    file: lib/Data/Domain/URI/fax.pm
+    version: 1.100850
+  Data::Domain::URI::fax_TEST:
+    file: lib/Data/Domain/URI/fax_TEST.pm
+    version: 1.100850
+  Data::Domain::URI::file:
+    file: lib/Data/Domain/URI/file.pm
+    version: 1.100850
+  Data::Domain::URI::file_TEST:
+    file: lib/Data/Domain/URI/file_TEST.pm
+    version: 1.100850
+  Data::Domain::URI::ftp:
+    file: lib/Data/Domain/URI/ftp.pm
+    version: 1.100850
+  Data::Domain::URI::ftp_TEST:
+    file: lib/Data/Domain/URI/ftp_TEST.pm
+    version: 1.100850
+  Data::Domain::URI::http:
+    file: lib/Data/Domain/URI/http.pm
+    version: 1.100850
+  Data::Domain::URI::http_TEST:
+    file: lib/Data/Domain/URI/http_TEST.pm
+    version: 1.100850
+  Data::Domain::URI_TEST:
+    file: lib/Data/Domain/URI_TEST.pm
+    version: 1.100850
+requires:
+  Carp: 0
+  Data::Domain::SemanticAdapter: 0
+  Data::Domain::SemanticAdapter::Test: 0
+  Data::Semantic::URI::TestData::fax: 0
+  Data::Semantic::URI::TestData::file: 0
+  Data::Semantic::URI::TestData::ftp: 0
+  Data::Semantic::URI::TestData::http: 0
+  English: 0
+  Exporter: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::CompanionClasses: 0
+  Test::CompanionClasses::Base: 0
+  Test::More: 0.88
+  constant: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Domain-URI
+  homepage: http://search.cpan.org/dist/Data-Domain-URI/
+  repository: http://github.com/hanekomu/Data-Domain-URI
+version: 1.100850

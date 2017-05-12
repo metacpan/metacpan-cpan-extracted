@@ -1,0 +1,28 @@
+2.0 2016-08-11
+   + Support Dancer2
+
+1.0 2014-09-30
+   + Reduce logging for unmatches
+
+0.9 2014-07-23
+   + support any method
+   + support head method
+
+0.61 2014-02-18
+   - Bugfix - @list = @_ not shift
+
+0.6 2013-12-18
+    - Using one before sub for doing all the before-route checking
+
+0.5 2013-12-13
+    - Add tests to covers more areas
+
+0.4 2013-12-09
+    - Export the route checking helper
+
+0.3 2013-12-09
+    - Update POD
+    - Using effective test cases
+
+0.1 2013-12-06
+    - Initial release

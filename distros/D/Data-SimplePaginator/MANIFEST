@@ -1,0 +1,15 @@
+Build.PL
+Changes
+configure
+INSTALL
+lib/Data/SimplePaginator.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+sample/pageset.pl
+t/00require.t
+t/ceil.t
+t/pod-coverage.t
+t/pod-snippets.t
+t/pod.t
+META.yml

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dancer-Plugin-Progress,
+version 0.001:
+
+  Dancer plugin to display a progress bar during long-running requests
+
+This software is copyright (c) 2011 by Michael Stapelberg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

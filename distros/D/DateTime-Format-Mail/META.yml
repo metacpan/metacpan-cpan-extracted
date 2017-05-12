@@ -1,0 +1,33 @@
+---
+abstract: 'Convert between DateTime and RFC2822/822 formats'
+author:
+  - 'Iain Truskett <spoon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-Mail
+requires:
+  Carp: '0'
+  DateTime: '1.04'
+  Params::Validate: '0'
+  perl: '5.006'
+  strict: '0'
+  vars: '0'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Mail
+  repository: http://github.com/book/DateTime-Format-Mail.git
+version: '0.403'
+x_contributors:
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+  - 'Dave Rolsky <autarch@urth.org>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'

@@ -1,0 +1,63 @@
+Revision history for Data-Dump-PHP
+
+0.10     2013-11-09 (SHARYANTO)
+
+         [BUG FIXES]
+
+         - No longer escape "@" as "\@" like in Perl, since it causes backslash
+           to be printed (suggested by Darren Embry).
+
+         - No longer escapes "\013" as "\v" and "\014" as "\f" since they are
+           recognized only since PHP 5.2.5 (suggested by Darren Embry).
+
+
+0.09     2013-11-07 (SHARYANTO)
+
+         - No functional changes. Rebuild to test MetaCPAN indexing (previous
+           release not indexed by MetaCPAN).
+
+
+0.08     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.07     2010-11-25 (SHARYANTO)
+
+         - Update $VERSION
+
+
+0.06     2010-11-25 (SHARYANTO)
+
+         - Fix PHP escape sequence (PHP doesn't have \a, \b, \e but has \v)
+
+
+0.05     2010-11-03 (SHARYANTO)
+
+         - (apply Data::Dump change) Deal with the perl-5.13 (?^:...) regex
+           construct
+
+
+0.04     2010-04-14 (SHARYANTO)
+
+         - Add flag ($Data::Dump::PHP::USE_LAMBDA, default 0) to output PHP 5.3
+           code (which uses lambda function instead of the ugly
+           create_function()).
+
+
+0.03     2010-04-14 (SHARYANTO)
+
+         - Fixed typos in POD.
+
+
+0.02     2010-04-14 (SHARYANTO)
+
+         - Fixed typos in POD and Changes.
+
+         - Fixed skipping Data::Dump original tests.
+
+
+0.01     2010-04-06 (SHARYANTO)
+
+         - First release. Code is copied from Data-Dump-1.15.

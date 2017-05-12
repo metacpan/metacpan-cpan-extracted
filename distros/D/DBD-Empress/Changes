@@ -1,0 +1,35 @@
+Changes for DBD::Empress v0.52
+
+- Written Steve Williams <swilliam@empress.com>
+- July 1999
+
+0.50 Release
+------------
+ 1) Added ODBC version of underlying Database API - optional at link time
+ 2) Added parameter binding 
+ 3) Corrected Bulk data retrieval. Bulk data now retrieved in its true
+    binary format.
+ 4) Allow allow opening of multiple cursors
+ 5) Removed limit of 200 prepared statements in the lifetime of a
+    perl script. Note: there is still a limit (in Dynamic SQL version)
+    for the number of current prepared statements. If you prepare more
+    than 128 statements you must destroy some of then using the undef
+    command in perl.
+ 6) Chunk retrieval of binary/text data is  not yet implemented 
+    (we have not been able to discover what the DBI implementation
+    requires - Not yet documented by the DBI implementor)
+
+0.51 Release
+------------
+ 1) Correct fault in dbd_st_FETCH_attrib that prevented any calls being
+    issued to the RDBMS system.
+ 2) Modified preparse function to allow for colon separator for database name
+
+0.52 Release
+------------
+ 1) Added call to dbd_st_finish to dbd_st_fetch to set the Active flag to
+    off, and to close the cursor.
+ 2) Modified Empress.h and dbdimp.h to correct some minor problems with
+    defined functions. Primarily to allow values for number of rows
+    affected by SQL statements to be returned correctly.
+

@@ -1,0 +1,58 @@
+---
+abstract: 'I2C interface to LSM303DLHC 3 axis magnetometer(compass) and accelerometer using Device::SMBus'
+author:
+  - 'Shantanu Bhadoria <shantanu at cpan dott org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  blib: 1.01
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.010
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-LSM303DLHC
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Device::Accelerometer::LSM303DLHC:
+    file: lib/Device/Accelerometer/LSM303DLHC.pm
+    version: 0.014
+  Device::LSM303DLHC:
+    file: lib/Device/LSM303DLHC.pm
+    version: 0.014
+  Device::Magnetometer::LSM303DLHC:
+    file: lib/Device/Magnetometer/LSM303DLHC.pm
+    version: 0.014
+requires:
+  Device::SMBus: 0
+  Moose: 0
+  POSIX: 0
+  constant: 0
+  integer: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-device-lsm303dlhc/issues
+  homepage: https://metacpan.org/release/Device-LSM303DLHC
+  repository: git://github.com/shantanubhadoria/perl-device-lsm303dlhc.git
+version: 0.014
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'

@@ -1,0 +1,13 @@
+Revision history for Dancer2-Plugin-Auth-Extensible-Provider-IMAP
+
+0.003 Fri  4 Nov 14:25:11 CET 2016
+
+    * Add test using subclassed provider with roles
+
+0.002 Thu  3 Nov 18:25:36 CET 2016
+
+    * Changes to keep compatibility with latest plugin v0.620
+
+0.001 Thu 27 Oct 16:34:19 CEST 2016
+
+    * first release

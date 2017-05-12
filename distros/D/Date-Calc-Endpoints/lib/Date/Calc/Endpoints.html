@@ -1,0 +1,402 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title></title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:root@osx300.apple.com" />
+</head>
+
+<body style="background-color: white">
+
+
+
+<ul id="index">
+  <li><a href="#NAME">NAME</a></li>
+  <li><a href="#VERSION">VERSION</a></li>
+  <li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+  <li><a href="#DESCRIPTION">DESCRIPTION</a>
+    <ul>
+      <li><a href="#Illustrations">Illustrations</a></li>
+    </ul>
+  </li>
+  <li><a href="#METHODS">METHODS</a>
+    <ul>
+      <li><a href="#new">new</a></li>
+      <li><a href="#get_dates">get_dates</a></li>
+      <li><a href="#Accessors">Accessors</a>
+        <ul>
+          <li><a href="#set_intervals-get_intervals">set_intervals / get_intervals</a></li>
+          <li><a href="#set_span-get_span">set_span / get_span</a></li>
+          <li><a href="#set_start_day_of_week-get_start_day_of_week">set_start_day_of_week / get_start_day_of_week</a></li>
+          <li><a href="#set_start_day_of_month-get_start_day_of_month">set_start_day_of_month / get_start_day_of_month</a></li>
+          <li><a href="#set_start_month_of_year-get_start_month_of_year">set_start_month_of_year / get_start_month_of_year</a></li>
+          <li><a href="#set_today_date-get_today_date">set_today_date / get_today_date</a></li>
+          <li><a href="#set_sliding_window-get_sliding_window">set_sliding_window / get_sliding_window</a></li>
+          <li><a href="#set_direction-get_direction">set_direction / get_direction</a></li>
+        </ul>
+      </li>
+      <li><a href="#get_error">get_error</a></li>
+      <li><a href="#clear_error">clear_error</a></li>
+    </ul>
+  </li>
+  <li><a href="#EXAMPLES">EXAMPLES</a></li>
+  <li><a href="#DIAGNOSTICS">DIAGNOSTICS</a></li>
+  <li><a href="#DEPENDENCIES">DEPENDENCIES</a></li>
+  <li><a href="#AUTHOR">AUTHOR</a></li>
+  <li><a href="#LICENSE-COPYRIGHT-DISCLAIMER">LICENSE / COPYRIGHT / DISCLAIMER</a></li>
+  <li><a href="#LIMITATIONS">LIMITATIONS</a></li>
+</ul>
+
+<h1 id="NAME">NAME</h1>
+
+<p>Date::Calc::Endpoints - Generate start/end dates easily, based on type (year, month,...), number of consecutive entities (&quot;4 months&quot;), number of intervals from the current date, and direction (past/future).</p>
+
+<h1 id="VERSION">VERSION</h1>
+
+<p>1.03</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS</h1>
+
+<pre><code>    use Date::Calc::Endpoints;
+    
+    my $dr = Date::Calc::Endpoints-&gt;new(%params);
+    
+    my ($start_date,$end_date,$last_date) = $dr-&gt;get_dates();
+    
+    my ($start_date,$end_date,$last_date) = $dr-&gt;get_dates(%params);
+    
+    $dr-&gt;set_type([ YEAR | QUARTER | MONTH | WEEK | DAY ]);
+    
+    $dr-&gt;set_intervals(n);
+    
+    $dr-&gt;set_span(n);
+    
+    $dr-&gt;set_sliding_window([ 0 | 1 ]);
+    
+    $dr-&gt;set_direction([ &#39;+&#39; | &#39;-&#39; ]);
+    
+    $dr-&gt;set_start_day_of_week([ MONDAY | TUESDAY | ...]);
+    
+    $dr-&gt;set_start_day_of_month([ 1, 2, 3, ... 28 ]);
+    
+    $dr-&gt;set_start_month_of_year([ 1, 2, 3, ... 12 ]);
+    
+    $dr-&gt;set_today_date(&#39;YYYY-MM-DD&#39;);
+    
+    $dr-&gt;get_error();</code></pre>
+
+<h1 id="DESCRIPTION">DESCRIPTION</h1>
+
+<p>Date::Calc::Endpoints calculates a start/end date based on a interval type, and a number of intervals from the current date. This is often required in running scheduled and ad-hoc reports using the same script, where the desired date range has the requirement of, &quot;7 months ago&quot;, or, &quot;5 weeks ago, running Tuesday to Monday&quot;.</p>
+
+<p>Three dates are returned for the given interval:</p>
+
+<ul>
+
+<li><p>First date of the interval</p>
+
+</li>
+<li><p>First date of the next interval</p>
+
+</li>
+<li><p>Last date of the interval</p>
+
+</li>
+</ul>
+
+<p>Two &quot;end&quot; dates are returned for convenience, as a report using a date+time field may require a query from &quot;2015-10-01 through 2015-11-01&quot;, but the title of the report may be, &quot;Output for 2015-10-01 through 2015-10-31&quot;.</p>
+
+<p>Date ranges are calculated based on the following parameters:</p>
+
+<ul>
+
+<li><p>type - the basic time interval for the report [ YEAR | QUARTER | MONTH | WEEK | DAY ] - no default, must be specified</p>
+
+<p>Note: QUARTER calculates the ranges for (Jan-Mar / Apr-Jun / Jul-Sep / Oct-Dec)</p>
+
+</li>
+<li><p>intervals - how many &quot;units in the past&quot; (eq, &quot;4 months ago&quot;) - default = 1</p>
+
+</li>
+<li><p>span - number of consecutive units (eq, &quot;5 month window&quot;) - default = 1</p>
+
+</li>
+<li><p>sliding_window - Applicable if span &gt; 1. If sliding_window is set, each interval back will slide by one unit of type. If sliding window is not set, each interval back will slide by (span) units of type. - default = 0</p>
+
+</li>
+<li><p>direction - If set to &quot;-&quot;, each positive value for &quot;intervals&quot; goes further into the past, and each negative value for &quot;intervals&quot; goes further into the future. If set to &quot;+&quot;, the opposite applies.</p>
+
+</li>
+<li><p>start_day_of_week - For type = WEEK, the day which should be used as the first day of the week (SUNDAY, MONDAY, ...) - default = MONDAY</p>
+
+</li>
+<li><p>start_day_of_month - For type = MONTH, the day which should be used as the start date of the month. Valid values are 1..28. Date::Calc is used for these calculations. If adding/subtracting months, and the day component of the start month is greater than the number of days in the resulting month (ex, &quot;Feb 30&quot;), Date::Calc extends the calculation into the following month (&quot;Mar 2&quot;). To prevent confusion, Date::Calc::Endpoints only supports start_dom of 1 to 28.</p>
+
+</li>
+<li><p>start_month_of_year - For type = YEAR, the month which should be used as the first day of the year. Valid values are 1..12. This would be applicable for fiscal years, which do not always start with <i>January</i>.</p>
+
+</li>
+<li><p>today_date - Overrides the current date, typically for development/test purposes.</p>
+
+</li>
+</ul>
+
+<p>The current window (intervals = 0) contains the current date.</p>
+
+<h2 id="Illustrations">Illustrations</h2>
+
+<p>The following tables illustrate the effect of various values of direction, sliding window, and interval, assuming span = 2. Notice in each case, &quot;interval=1&quot; is one unit away from the one containing the current date (C).</p>
+
+
+
+<pre>Direction = "-", sliding window = 0
+     -3| -2| -1| C | 1 | 2 | 3 
+    ---|---|---|---|---|---|---
+-1)    |   |   |   |   |xxx|xxx
+ 0)    |   |   |xxx|xxx|   |   
+ 1)    |xxx|xxx|   |   |   |   
+<br>
+Direction = "-", sliding window = 1
+     -3| -2| -1| C | 1 | 2 | 3 
+    ---|---|---|---|---|---|---
+-1)    |   |   |xxx|xxx|   |   
+ 0)    |   |xxx|xxx|   |   |   
+ 1)    |xxx|xxx|   |   |   |   
+<br>
+Direction = "+", sliding window = 0
+     -3| -2| -1| C | 1 | 2 | 3 
+    ---|---|---|---|---|---|---
+-1) xxx|xxx|   |   |   |   |   
+ 0)    |   |xxx|xxx|   |   |   
+ 1)    |   |   |   |xxx|xxx|   
+<br>
+Direction = "+", sliding window = 1
+     -3| -2| -1| C | 1 | 2 | 3 
+    ---|---|---|---|---|---|---
+-1)    |   |xxx|xxx|   |   |   
+ 0)    |   |   |xxx|xxx|   |   
+ 1)    |   |   |   |xxx|xxx|   </pre>
+
+<h1 id="METHODS">METHODS</h1>
+
+<h2 id="new">new</h2>
+
+<p>Object constructor. Parameters can be set here, or in get_dates, or by set_<i>param</i> methods.</p>
+
+<dl>
+
+<dt id="Arguments:-parameters">Arguments: <i>\%parameters</i></dt>
+<dd>
+
+<p>my ($start, $end, $last) = $dr-&gt;new(<i>\%parameters</i>);</p>
+
+</dd>
+</dl>
+
+<dl>
+
+<dt id="type-YEAR-QUARTER-MONTH-WEEK-DAY">type =&gt; [ <i>YEAR | QUARTER | MONTH | WEEK | DAY</i> ]</dt>
+<dd>
+
+<p>Interval type. No default value - must be specified.</p>
+
+</dd>
+<dt id="intervals-n">intervals =&gt; <i>n</i></dt>
+<dd>
+
+<p>Number of intervals to move back/forth from the current interval. Default = 1.</p>
+
+</dd>
+<dt id="span-n">span =&gt; <i>n</i></dt>
+<dd>
+
+<p>Number of <i>type</i> to include in the range. Default = 1.</p>
+
+</dd>
+<dt id="start_day_of_week-MONDAY-TUESDAY-WEDNESDAY">start_day_of_week =&gt; [ <i>MONDAY | TUESDAY | WEDNESDAY | ...</i> ]</dt>
+<dd>
+
+<p>For <i>type = WEEK</i>, the day to denote the first day of the week. Default = MONDAY.</p>
+
+</dd>
+<dt id="start_day_of_month-1-2-3...28">start_day_of_month =&gt; [ <i>1, 2, 3...28</i> ]</dt>
+<dd>
+
+<p>For <i>type = MONTH</i>, the day to denote the first day of the month. Default = 1.</p>
+
+</dd>
+<dt id="sliding_window-O-1">sliding_window =&gt; [ <i>O | 1</i> ]</dt>
+<dd>
+
+<p>Applicable when span &gt; 1. If <i>sliding_window=1</i>, each successive <i>intervals</i> results in a shift of <i>span</i> (years, months, etc). If <i>sliding_window=0</i>, each successive <i>intervals</i> results in a shift of one (year, month, etc). Default = 0.</p>
+
+</dd>
+<dt id="direction">direction =&gt; [ <i>&quot;+&quot; | &quot;-&quot;</i> ]</dt>
+<dd>
+
+<p>If <i>direction=&quot;-&quot;</i>, <i>intervals</i> progresses further into the past. If <i>direction=&quot;+&quot;</i>, <i>intervals</i> progresses further into the future. Default = &quot;-&quot;.</p>
+
+</dd>
+</dl>
+
+<h2 id="get_dates">get_dates</h2>
+
+<p>Main method. Returns <i>start_date</i>, <i>end_date</i>, and <i>last_date</i>.</p>
+
+<dl>
+
+<dt id="Arguments:-Parameters">Arguments: <i>\%Parameters</i></dt>
+<dd>
+
+<p>my ($start, $end, $last) = $dr-&gt;get_dates(<i>\%parameters</i>);</p>
+
+<p>Any of the parameters set in <i>new</i> may be set/overridden here.</p>
+
+</dd>
+</dl>
+
+<h2 id="Accessors">Accessors</h2>
+
+<p>Each of the parameters may be set/restrieved using set_<i>param</i> / get_<i>param</i> methods.</p>
+
+<h3 id="set_intervals-get_intervals">set_intervals / get_intervals</h3>
+
+<p>Interval type: [ <i>YEAR | QUARTER | MONTH | WEEK | DAY</i> ]. No default - must be specified.</p>
+
+<h3 id="set_span-get_span">set_span / get_span</h3>
+
+<p>Overrides the ranges running only one year/quarter/month/week/day at a time. Default = 1.</p>
+
+<h3 id="set_start_day_of_week-get_start_day_of_week">set_start_day_of_week / get_start_day_of_week</h3>
+
+<p>For weekly ranges, defines the starting day to be used for the week, [ <i>MONDAY | TUESDAY | WEDNESDAY | ...</i> ]. Default = Monday.</p>
+
+<h3 id="set_start_day_of_month-get_start_day_of_month">set_start_day_of_month / get_start_day_of_month</h3>
+
+<p>For monthly ranges, defines the starting day to be used for the month. Only supported values are 1-28, as months with less than 31 days may yield results unexpected by the end user. Default = 1.</p>
+
+<h3 id="set_start_month_of_year-get_start_month_of_year">set_start_month_of_year / get_start_month_of_year</h3>
+
+<p>For yearly ranges, defiens the starting month to be used. The starting day is fixed at 1. Default = 1 (January)..</p>
+
+<h3 id="set_today_date-get_today_date">set_today_date / get_today_date</h3>
+
+<p>By default, the current date is used. This can be overridden, for development/test purposes. Format must be YYYY-MM-DD.</p>
+
+<h3 id="set_sliding_window-get_sliding_window">set_sliding_window / get_sliding_window</h3>
+
+<p>Applicable if span &gt; 1. Determines whether successive intervals move an entire span, or just a single amount of type. For instance, if type = MONTH and span = 5, should each successive value of <i>intervals</i> advance one month at a time, or five months at a time. Default = 0 (&quot;five months at a time&quot;).</p>
+
+<h3 id="set_direction-get_direction">set_direction / get_direction</h3>
+
+<p>The direction which successive intervals progresses. This allows for positive values of <i>interval</i>, whether looking into the past, or into the future. To get date ranges which are further into the past, recommend setting direction to &quot;-&quot;. If date ranges in the future are required, recommend setting direction to &quot;+&quot;. Default = &quot;-&quot;. Refer to the Illustrations section for examples.</p>
+
+<h2 id="get_error">get_error</h2>
+
+<p>Retrieve any errors detected by the object.</p>
+
+<h2 id="clear_error">clear_error</h2>
+
+<p>Reset the error stack</p>
+
+<h1 id="EXAMPLES">EXAMPLES</h1>
+
+<p>Date is 2015-10-10, type = &#39;MONTH&#39;, direction = &#39;-&#39;, span = 1. Such a setup would be used for running monthly reports.</p>
+
+<p>Intervals = 0 would be the current month:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 0);
+        (2015-10-01, 2015-11-01, 2015-10-31)</code></pre>
+
+<p>Intervals = 4 would be four months prior to this:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 4);
+        (2015-06-01, 2015-07-01, 2015-06-30)</code></pre>
+
+<p>If &quot;intervals&quot; is a negative number, ranges would be in the future (improbable, but supported):</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; -1);
+        (2015-11-01, 2015-12-01, 2015-11-30)</code></pre>
+
+<p>Date is 2015-10-10, type = &#39;MONTH&#39;, direction = &#39;-&#39;, span = 5. Sliding window now becomes relevant.</p>
+
+<p>Intervals = 1 should still be the most recent, completed period. If sliding_window = 0:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;, span =&gt; 5);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 1);
+        (2015-05-01, 2015-10-01, 2015-09-30)</code></pre>
+
+<p>Intervals = 0 will be the next period, starting with the current month:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;, span =&gt; 5);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 0);
+        (2015-10-01, 2016-03-01, 2016-02-29)</code></pre>
+
+<p>Now, if sliding window is enabled, intervals = 1 should still be the most recent, completed period:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;, span =&gt; 5, sliding_window =&gt; 1);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 1);
+        (2015-05-01, 2015-10-01, 2015-09-30)</code></pre>
+
+<p>This time, intervals = 0 will end with the current month:</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;, span =&gt; 5, sliding_window =&gt; 1);
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 0);
+        (2015-06-01, 2015-11-01, 2015-10-31)</code></pre>
+
+<p>All parameters can be set at instantiation, set distinctly, or passed in with get_dates.</p>
+
+<pre><code>    my $dr = Date::Calc::Endpoints-&gt;new(type =&gt; &#39;MONTH&#39;, intervals =&gt; 1);
+    my ($start, $end, $last) = $dr-&gt;get_dates();
+        (2015-09-01, 2015-10-01, 2015-09-30)
+
+    $dr-&gt;set_intervals(2);
+    my ($start, $end, $last) = $dr-&gt;get_dates();
+        (2015-08-01, 2015-09-01, 2015-08-31)
+
+    my ($start, $end, $last) = $dr-&gt;get_dates(intervals =&gt; 3);
+        (2015-07-01, 2015-08-01, 2015-07-31)</code></pre>
+
+<h1 id="DIAGNOSTICS">DIAGNOSTICS</h1>
+
+<p>Any errors detected may be retrieved via <i>$dr-&gt;get_errors</i>. Errors are accumulated as they are encountered. They are cleared only when <i>$dr-</i>clear_errors&gt; is invoked.</p>
+
+<h1 id="DEPENDENCIES">DEPENDENCIES</h1>
+
+<p><a>Class::Accessor</a></p>
+
+<p><a>Date::Calc</a></p>
+
+<h1 id="AUTHOR">AUTHOR</h1>
+
+<p>T. Olenchuk</p>
+
+<h1 id="LICENSE-COPYRIGHT-DISCLAIMER">LICENSE / COPYRIGHT / DISCLAIMER</h1>
+
+<p>This is free software, you may use it and distribute it under the same terms as Perl itself. There is no warranty of any kind, either expressed or implied.</p>
+
+<h1 id="LIMITATIONS">LIMITATIONS</h1>
+
+<ul>
+
+<li><p>The only allowed format for returned dates is &#39;YYYY-MM-DD&#39;.</p>
+
+</li>
+<li><p>&quot;Start day-of-month&quot; is only valid only for values 1-28. This was to avoid trying to use last-day-of-month, which becomes problematic for days with less than 31 days. Arguments could be made that, &quot;one month after the last day of January&quot; is Feb 28, or March 3, or even March 4 on a leap year.</p>
+
+</li>
+<li><p>Any date calculations not supported by Date::Calc are not supported here, such as &quot;3000 years ago&quot;.</p>
+
+</li>
+</ul>
+
+
+</body>
+
+</html>
+
+

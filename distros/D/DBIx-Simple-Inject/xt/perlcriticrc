@@ -1,0 +1,9 @@
+severity = 5
+verbose  = 8
+
+[CodeLayout::ProhibitHardTabs]
+
+[-ValuesAndExpressions::ProhibitLeadingZeros]
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs

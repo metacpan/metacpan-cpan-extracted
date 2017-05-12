@@ -1,0 +1,58 @@
+{
+   "abstract" : "iterate, filter and validate data, and transpose to different field names",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Transpose",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::CreditCard" : "0.32",
+            "Email::Valid" : "0",
+            "Module::Load" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike" : "0",
+            "Scalar::Util" : "0",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/racke/Data-Transpose/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/racke/Data-Transpose"
+      }
+   },
+   "version" : "0.0023",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

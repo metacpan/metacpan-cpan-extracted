@@ -1,0 +1,22 @@
+Changes
+lib/DBIx/Class/PgLog.pm
+lib/DBIx/Class/ResultSet/PgLog.pm
+lib/DBIx/Class/Schema/PgLog.pm
+lib/DBIx/Class/Schema/PgLog/Structure.pm
+lib/DBIx/Class/Schema/PgLog/Structure/Log.pm
+lib/DBIx/Class/Schema/PgLog/Structure/LogSet.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/00-load.t
+t/boilerplate.t
+t/generate_dbix_schema.pl
+t/lib/PgLogTest/Schema.pm
+t/lib/PgLogTest/Schema/Result/Role.pm
+t/lib/PgLogTest/Schema/Result/User.pm
+t/lib/PgLogTest/Schema/Result/UserRole.pm
+t/log_schema.pl
+t/manifest.t
+t/pg_log_test.sql
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,84 @@
+NAME
+    DBIx::Class::CustomPrefetch - Custom prefetches for DBIx::Class
+
+DESCRIPTION
+    DBIx::Class onle allows joins for prefetches. But sometimes you can't
+    use JOIN for prefetch. E.g. for prefetching many related objects to
+    resultset with paging.
+
+    Also you can use this module to create cross-database prefetches.
+
+    This module provides other logic for prefetching data to resultsets.
+
+VERSION
+    Version 0.09
+
+SYNOPSIS
+        package MyApp::Schema::Foo;
+
+        __PACKAGE__->load_components( qw(Core CustomPrefetch) );
+        __PACKAGE__->add_column( qw(id artist_id) );
+        __PACKAGE__->resultset_class( 'DBIx::Class::ResultSet::CustomPrefetch' );
+        __PACKAGE__->custom_relation( artist => sub { MyOtherResultSetClass->new } => {
+            'foreign.id' => 'self.artist_id'
+        });
+
+    And your code:
+
+        my $resultset = $schema->resultset('Foo')->search( undef, { rows => 10 } );
+        foreach ($resultset->all) {
+            say $_->artist->name;
+        }
+
+    will make only two SQL requests:
+
+        SELECT id, artist_id FROM foo LIMIT 10;
+        SELECT * FROM artists WHERE id IN (1, 2, 3, 5, 8, 13, 21, 34, 55, 89);
+
+METHODS
+  custom_relation
+    Makes IN relation. In can be has_one, might_have or many_to_many
+
+    Args: $relation_name, $resultset_callback, $condition
+
+AUTHOR
+    Andrey Kostenko, "<andrey at kostenko.name>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-customprefetch at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-CustomPrefetc
+    h>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::CustomPrefetch
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-CustomPrefetch>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-Class-CustomPrefetch>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-Class-CustomPrefetch>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-Class-CustomPrefetch/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Andrey Kostenko, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

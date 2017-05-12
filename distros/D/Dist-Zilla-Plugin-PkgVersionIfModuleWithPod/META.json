@@ -1,0 +1,56 @@
+{
+   "abstract" : "Apply PkgVersion to .pm files with =pod sections",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-PkgVersionIfModuleWithPod",
+   "no_index" : {
+      "directory" : [
+         "lib/Dist/Zilla/Plugin/PkgVersionIfModuleWithPod/t",
+         "lib/Dist/Zilla/Plugin/PkgVersionIfModuleWithPod/Test"
+      ],
+      "file" : [
+         "lib/Dist/Zilla/Plugin/PkgVersionIfModuleWithPod/Util.pm"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::PkgVersion" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-pkgversionifmodulewithpod@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-PkgVersionIfModuleWithPod"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-dist-zilla-plugin-pkgversionifmodulewithpod.git",
+         "web" : "https://github.com/jonswar/perl-dist-zilla-plugin-pkgversionifmodulewithpod"
+      }
+   },
+   "version" : "0.01"
+}
+

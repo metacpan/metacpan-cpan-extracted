@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-Plugin-CoderwallEndorse
+
+0.2.0 2013-12-15
+ [ENHANCEMENTS]
+ - Move the plugin to the dzil file munging phase.  (RT#91409, reported by
+   Karen Etheridge)
+
+ [STATISTICS]
+ - code churn: 5 files changed, 133 insertions(+), 16 deletions(-)
+
+0.1.2 2012-11-11
+ [BUG FIXES]
+ - Typo in POD, and added a link to an example of the output of the plugin
+   (thanks to Mr. Spaz)
+
+ [STATISTICS]
+ - code churn: 2 files changed, 12 insertions(+), 2 deletions(-)
+
+0.1.1 2012-11-11
+ [BUG FIXES]
+ - Moving name for Dist::Zilla::Plugin::CoderwallEndorse
+
+ [STATISTICS]
+ - code churn: 5 files changed, 18 insertions(+), 6 deletions(-)
+
+0.1.0 2012-11-11
+ - First version, unleashed on an unsuspecting world.
+

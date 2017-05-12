@@ -1,0 +1,76 @@
+NAME
+
+    Devel::PatchPerl - Patch perl source a la Devel::PPPort's buildperl.pl
+
+VERSION
+
+    version 1.48
+
+SYNOPSIS
+
+      use strict;
+      use warnings;
+    
+      use Devel::PatchPerl;
+    
+      Devel::PatchPerl->patch_source( '5.6.1', '/path/to/untarred/perl/source/perl-5.6.1' );
+
+DESCRIPTION
+
+    Devel::PatchPerl is a modularisation of the patching code contained in
+    Devel::PPPort's buildperl.pl.
+
+    It does not build perls, it merely provides an interface to the source
+    patching functionality.
+
+FUNCTION
+
+    patch_source
+
+      Takes two parameters, a perl version and the path to unwrapped perl
+      source for that version. It dies on any errors.
+
+      If you don't supply a perl version, it will attempt to auto-determine
+      the perl version from the specified path.
+
+      If you don't supply the path to unwrapped perl source, it will assume
+      the current working directory.
+
+    determine_version
+
+      Takes one optional parameter, the path to unwrapped perl source. It
+      returns the perl version of the source code at the given location. It
+      returns undef on error.
+
+      If you don't supply the path to unwrapped perl source, it will assume
+      the current working directory.
+
+PLUGIN SYSTEM
+
+    See Devel::PatchPerl::Plugin for details of Devel::PatchPerl's plugin
+    system.
+
+CAVEAT
+
+    Devel::PatchPerl is intended only to facilitate the building of perls,
+    not to facilitate the testing of perls. This means that it will not
+    patch failing tests in the perl testsuite.
+
+SEE ALSO
+
+    Devel::PPPort
+
+    Devel::PatchPerl::Plugin
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams and Marcus
+    Holland-Moritz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

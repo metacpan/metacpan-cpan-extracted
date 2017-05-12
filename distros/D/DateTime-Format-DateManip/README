@@ -1,0 +1,13 @@
+This module handles converting between Date::Manip parsable date and
+recurrence strings and DateTime family objects and vice-versa.
+
+INSTALLATION
+
+To install this module type the following in the distribution
+directory:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

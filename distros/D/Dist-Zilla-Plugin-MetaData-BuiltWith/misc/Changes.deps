@@ -1,0 +1,234 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.004005
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.004004 2016-09-10T10:08:39Z
+
+1.004003 2016-05-01T21:35:06Z
+ [Added / runtime requires]
+ - Module::Metadata
+ - Path::Tiny
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+ - Module::Data
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+ - Path::Tiny
+
+1.004002 2015-03-06T23:08:04Z
+
+1.004001 2014-12-29T14:33:59Z
+ [Changed / configure requires]
+ - perl 5.008 → 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.004000 2014-12-14T08:34:41Z
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / runtime requires]
+ - Dist::Zilla::File::FromCode
+ - Dist::Zilla::Role::FileGatherer
+ - Dist::Zilla::Role::MetaProvider
+
+ [Added / test requires]
+ - perl 5.008
+
+1.003001 2014-09-24T06:28:04Z
+ [Added / runtime requires]
+ - Devel::CheckBin
+
+1.003000 2014-09-03T22:13:41Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+ - Module::Runtime
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+ - constant
+
+1.002000 2014-08-18T03:26:39Z
+ [Added / runtime requires]
+ - JSON::MaybeXS
+
+ [Removed / runtime requires]
+ - JSON
+
+1.001001 2014-08-15T21:17:00Z
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+1.001000 2014-07-30T13:22:16Z
+ [Added / runtime requires]
+ - CPAN::Meta::Converter
+ - Dist::Zilla::Role::FileMunger
+ - JSON
+ - YAML::Tiny
+
+ [Added / test requires]
+ - Path::Tiny
+ - Test::DZil
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / runtime requires]
+ - Class::Load
+ - Dist::Zilla::Role::MetaProvider
+ - Dist::Zilla::Util::EmulatePhase 0.01000101
+ - Readonly
+
+ [Removed / test requires]
+ - version 0.77
+
+1.000001 2014-07-19T02:16:32Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+1.000000 2014-05-20T05:33:17Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.04000002 2013-11-25T08:35:49Z
+ [Added / runtime requires]
+ - Carp
+
+0.04000001 2013-11-22T04:23:48Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.04000000 2013-09-26T00:25:33Z
+
+0.03000101 2013-09-26T00:14:19Z
+ [Added / runtime requires]
+ - Module::Data
+
+ [Added / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+ [Changed / build requires]
+ - Module::Build 0.4001 → 0.4007
+
+ [Changed / configure requires]
+ - Module::Build 0.4001 → 0.4007
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.03000100 2012-07-28T18:27:33Z
+ [Added / runtime requires]
+ - Readonly
+
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4001
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.02000100 2012-02-27T04:05:24Z
+ [Added / runtime requires]
+ - Class::Load
+
+0.02000000 2012-02-27T03:48:01Z
+ [Added / runtime requires]
+ - MooseX::Types::Moose
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - Moose 0 → 2.0
+
+ [Removed / runtime requires]
+ - Hash::Merge::Simple
+ - Moose::Autobox
+
+0.01018205 2011-10-22T12:24:24Z
+ [Added / runtime requires]
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01018204 2010-12-07T17:05:34Z
+
+0.01016607 2010-11-21T20:30:38Z
+
+0.01014716 2010-11-04T05:26:16Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::EmulatePhase 0.01000101
+ - Hash::Merge::Simple
+ - Moose::Autobox
+
+ [Added / test requires]
+ - English
+
+ [Removed / runtime requires]
+ - Carp
+
+0.01005122 2010-07-31T11:43:00Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::ConfigDumper 4.101540
+
+0.01005020 2010-07-30T09:06:26Z
+ [Added / runtime requires]
+ - Carp
+
+0.01000216 2010-06-13T05:07:31Z
+ [Added / runtime requires]
+ - namespace::autoclean

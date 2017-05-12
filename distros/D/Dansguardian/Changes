@@ -1,0 +1,19 @@
+Revision history for dansguardian Perl Module.
+
+0.06  16 Jan 2009
+   - Remove Tie::File from PREREQ_PM in Makefile.PL
+
+0.05  16 Jan 2009
+   - Improve code
+
+0.04  14 Jan 2009
+   - Use Tie::File to delete lines in file
+
+0.03  8 Jan 2009
+   -  Adapted pod to pod2man
+
+0.02  8 Jan 2009
+   -  Improve documentation files and README
+
+0.01  27 Dec 2008
+	-  First release 

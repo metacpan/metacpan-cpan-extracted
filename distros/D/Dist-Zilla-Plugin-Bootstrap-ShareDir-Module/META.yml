@@ -1,0 +1,43 @@
+---
+abstract: 'Use a share directory on your dist for a module during bootstrap'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Plugin::Bootstrap::lib: '0.04000000'
+  Dist::Zilla::Util::Test::KENTNL: '1.003001'
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Bootstrap-ShareDir-Module
+provides:
+  Dist::Zilla::Plugin::Bootstrap::ShareDir::Module:
+    file: lib/Dist/Zilla/Plugin/Bootstrap/ShareDir/Module.pm
+    version: '1.001002'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Dist::Zilla::Role::Bootstrap: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  Test::File::ShareDir::Object::Module: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module.git
+version: '1.001002'

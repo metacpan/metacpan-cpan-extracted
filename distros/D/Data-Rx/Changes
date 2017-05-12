@@ -1,0 +1,51 @@
+Revision history for Data-Rx
+
+0.200007  2015-04-10 18:23:08-04:00 America/New_York
+        - add some basic docs for how failures and failuresets work
+
+0.200006  2014-05-20 19:06:44-04:00 America/New_York
+        - big ol' pile of examples and docs! thanks, Hakim Cassimally!
+
+0.200005  2013-12-22 21:46:53-0500 America/New_York
+          replace Module::Pluggable with a hard-coded list
+
+0.200004  2013-07-05 22:02:12 America/New_York
+          repackage for new bug tracker
+
+0.200003  2013-03-08 09:23:30 America/New_York
+          correct the type that failed in error stringification (Thanks, Ronald
+          J Kimball!)
+
+0.200002  2012-09-18 10:53:28 America/New_York
+          structured failures, now for real
+
+0.200001  2012-07-01 17:11:55 America/New_York
+          major changes to how structured failures report; still experimental
+
+          introduces CommonType abstract base class
+
+0.200000  2012-04-01 14:33:26 Europe/Paris
+
+          first pass at merging in Ronald J Kimball (and rjbs's) work on
+          structured failures; still experimental
+
+0.100110  2010-01-11 22:42:19 America/New_York
+          do not require JSON::XS
+
+0.007     2009-03-06
+          register_type_plugin can now accept bundles
+
+0.006     2009-02-01
+          unbreak the "prefix" arument to new
+
+0.005     2009-01-29
+          introduce TypeBundles
+
+0.004     2008-10-04
+          fix packaging issue
+
+0.003     2008-10-04
+          document (and facilitate) plugging in extra type libraries
+
+0.002     2008-09-03
+          require Module::Pluggable 3.7 to avoid SUPER:: bug

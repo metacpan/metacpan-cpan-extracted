@@ -1,0 +1,371 @@
+=head1 REST API
+
+This document defines the REST API.  By and large, this follows the WebIOpi 
+REST interface:
+
+  https://code.google.com/p/webiopi/wiki/INSTALL?tm=6
+
+There are a few notable differences, mostly to account for being on more 
+than just the Rapsberry Pi.  For instance, the pcDuino has different 
+voltage and bit resolutions for some of its ADC and PWM channels, so 
+the API to access that data must specify a pin.
+
+Specific differences are noted as "B<COMPATIBILITY NOTE>" below.
+
+=head2 Status Codes
+
+Just a few of the HTTP status codes you might expect to hit.
+
+400 Bad Request (path incomplete)
+403 GPIO # Not Available
+403 GPIO # Disabled
+404 [something] Not Found 
+
+
+=head2 BASIC
+
+=head3 GET /map
+
+Returns a JSON list, with each entry corresponding to a pin on the physical 
+header.  Each entry can be:
+
+=over 4
+
+=item * Some number (corresponding to a GPIO number)
+
+=item * "V33" (3.3 volt power)
+
+=item * "V50" (5.0 volt power)
+
+=item * "GND" (ground)
+
+=back
+
+Example:
+
+    ["V33", "V50", 2, "V50", 3, "GND", 4, 14, "GND", 15, 17, 18, 27, "GND", 22, 23, "V33", 24, 10, "GND", 9, 25, 11, 8, "GND", 7]
+
+=head3 GET /*
+
+Returns a JSON of available interfaces.  Keys:
+
+=over 4
+
+=item * UART [bool]
+
+=item * SPI [bool]
+
+=item * I2C [bool]
+
+=item * ONEWIRE [bool]
+
+=item * GPIO [object]
+
+=back
+
+GPIO's keys are numbers mapping to each GPIO pin.  The values are objects 
+containing:
+
+=over 4
+
+=item * function ["IN", "OUT", "ALTn" (where n is some number)]
+
+=item * value [bool]
+
+=back
+
+Example: 
+
+    {
+        "UART": 1, 
+        "SPI": 0, 
+        "I2C": 0, 
+        "ONEWIRE": 0, 
+        "GPIO": {
+            "0": {"function": "IN", "value": 1}, 
+            "1": {"function": "IN", "value": 1}, 
+            "2": {"function": "IN", "value": 1}, 
+            "3": {"function": "IN", "value": 1}, 
+            "4": {"function": "IN", "value": 1}, 
+            "5": {"function": "IN", "value": 1}, 
+            "6": {"function": "IN", "value": 1}, 
+            "7": {"function": "ALT0", "value": 1},
+            "8": {"function": "ALT0", "value": 1},
+            "9": {"function": "ALT0", "value": 0},
+            "10": {"function": "ALT0", "value": 0}, "11": {"function": "ALT0", "value": 0}, "12": {"function": "IN", "value": 0}, "13": {"function": "IN", "value": 0}, "14": {"function": "ALT0", "value": 1}, "15": {"function": "ALT0", "value": 1}, "16": {"function": "IN", "value": 0}, "17": {"function": "IN", "value": 0}, "18": {"function": "IN", "value": 0}, "19": {"function": "IN", "value": 0}, "20": {"function": "IN", "value": 0}, "21": {"function": "IN", "value": 0}, "22": {"function": "IN", "value": 0}, "23": {"function": "IN", "value": 0}, "24": {"function": "IN", "value": 0}, "25": {"function": "IN", "value": 0}, "26": {"function": "IN", "value": 0}, "27": {"function": "IN", "value": 0}, "28": {"function": "IN", "value": 1}, "29": {"function": "IN", "value": 1}, "30": {"function": "IN", "value": 0}, "31": {"function": "OUT", "value": 1}, "32": {"function": "OUT", "value": 0}, "33": {"function": "IN", "value": 0}, "34": {"function": "IN", "value": 1}, "35": {"function": "IN", "value": 1}, "36": {"function": "IN", "value": 1}, "37": {"function": "IN", "value": 0}, "38": {"function": "OUT", "value": 0}, "39": {"function": "IN", "value": 0}, "40": {"function": "ALT0", "value": 0}, "41": {"function": "OUT", "value": 0}, "42": {"function": "IN", "value": 0}, "43": {"function": "IN", "value": 0}, "44": {"function": "ALT0", "value": 1}, "45": {"function": "ALT0", "value": 0}, "46": {"function": "IN", "value": 1}, "47": {"function": "OUT", "value": 0}, "48": {"function": "ALT3", "value": 1}, "49": {"function": "ALT3", "value": 1}, "50": {"function": "ALT3", "value": 1}, "51": {"function": "ALT3", "value": 1}, "52": {"function": "ALT3", "value": 1}, "53": {"function": "ALT3", "value": 1}}}
+
+=head2 GPIO
+
+=head3 GET /devices/[name]/count
+
+Returns the digital channel count
+
+=head3 GET /devices/[name]/[channel]/value
+
+Returns the value of the given digital channel
+
+=head3 GET /devices/[name]/*/value
+
+Returns a list of values of all digital channels
+
+(Return as CSV list?)
+
+(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as POST)
+
+=head3 POST /devices/[name]/[channel]/value/[digit]
+
+Sets the value of the digital channel
+
+=head3 GET /devices/[name]/*/integer
+
+Return an integer of all digital bits
+
+=head3 POST /devices/[name]/*/integer/[value]
+
+Write an integer for all digital bits
+
+=head3 GET /devices/[name]/[channel]/function
+
+Returns the current function of the given channel ("IN" or "OUT"(?))
+
+=head3 POST /devices/[name]/[channel]/function/[func]
+
+Sets the function of the given digital channel.
+
+setFunctionString()
+
+(B<COMPATIBILITY NOTE>: This is in the WebIOpi docs as GET)
+
+=head3 GET /devices/[name]/*
+
+Returns a list containing the value and function of all digital channels.
+
+(Return as CSV list?)
+
+
+=head2 ADC (Analog-to-Digital Converter)
+
+=head3 GET /devices/[name]/analog/count
+
+(B<NOTE>: Redundant listings in WebIOpi docs for analogCount and 
+analogResolution)
+
+=head3 GET /devices/[name]/analog/maximum
+
+B<DEPRECATED>.  Return the maximum integer value of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
+=head3 GET /devices/[name]/analog/[channel]/maximum
+
+Return the maximum integer value of the given channel.
+
+analogMaximum()
+
+=head3 GET /devices/[name]/analog/integer/vref
+
+B<DEPRECATED>.  Return the voltage reference of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
+=head3 GET /devices/[name]/analog/[channel]/integer/vref
+
+Return the voltage reference of the given channel.
+
+analogReference()
+
+=head3 GET /devices/[name]/analog/[channel]/integer
+
+=head3 GET /devices/[name]/analog/[channel]/float
+
+=head3 GET /devices/[name]/analog/[channel]/volt
+
+=head3 GET /devices/[name]/analog/*/integer
+
+analogReadAll()
+
+(list returned as CSV?)
+
+=head3 GET /devices/[name]/analog/*/float
+
+(list returned as CSV?)
+
+
+=head2 DAC (Digital-to-Analog Converter)
+
+Extends ADC interface
+
+=head3 POST /devices/[name]/analog/[channel]/integer/[value]
+
+=head3 POST /devices/[name]/analog/[channel]/float/[value]
+
+=head3 POST /devices/[name]/analog/[channel]/volt/[value]
+
+=head2 PWM (Pulse Width Modulation)
+
+=head3 GET /devices/[name]/pwm/count
+
+=head3 GET /devices/[name]/pwm/resolution
+
+B<DEPRECATED>.  Return the PWM resolution of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
+=head3 GET /devices/[name]/pwm/[channel]/resolution
+
+Return the PWM resolution of the given channel.
+
+pwmResolution()
+
+=head3 GET /devices/[name]/pwm/maximum
+
+B<DEPRECATED>.  Return the PWM maximum integer value of channel 0.
+
+This is retained for compatibility with the original WebIOPi.  Since different 
+pins can have different values, you should use the version that specifies a 
+pin instead.
+
+=head3 GET /devices/[name]/pwm/[channel]/maximum
+
+Return the PWM maximum integer value of the given channel.
+
+pwmMaximum()
+
+(B<COMPATIBILITY NOTE>: WebIOpi does not use channel argument)
+
+=head3 POST /devices/[name]/pwm/[channel]/integer/[value]
+
+=head3 POST /devices/[name]/pwm/[channel]/float/[value]
+
+=head3 POST /devices/[name]/pwm/[channel]/angle/[value]
+
+=head3 GET /devices/[name]/pwm/[channel]/integer
+
+=head3 GET /devices/[name]/pwm/[channel]/float
+
+=head3 GET /devices/[name]/pwm/[channel]/angle
+
+=head3 GET /devices/[name]/pwm/*/integer
+
+=head3 GET /devices/[name]/pwm/*/float
+
+=head3 GET /devices/[name]/pwm/*/angle
+
+=head3 GET /devices/[name]/pwm/*
+
+
+=head2 VideoStream
+
+B<COMPATIBILITY NOTE>: This is an extension which is not currently 
+implemented in WebIOPi
+
+=head3 GET /devices/[name]/video/count
+
+Returns the number of video streams that are available.
+
+=head3 GET /devices/[name]/video/[channel]/resolution
+
+Returns the width and height separated by an I<x> list, followed by a 
+I<p>, followed the fps.  Example:
+
+  640x480p60
+
+=head3 POST /devices/[name]/video/[channel]/resolution/[width]/[height]/[fps]
+
+Sets the resolution and frame rate of the given channel.
+
+If the channel refuses to set the given resolution, HTTP status code 403 
+will be sent.
+
+=head3 GET /devices/[name]/video/[channel]/kbps
+
+Get the current bitrate, as an integer in kb per second.
+
+=head3 POST /devices/[name]/video/[channel]/kbps/[value]
+
+Set the current bitrate.  C<[value]> is an integer in kb per second.
+
+=head3 GET /devices/[name]/video/[channel]/allowed-content-types
+
+Get list of allowed MIME content types.  Allowed types will be sent as a 
+MIME string, with one on each line.
+
+=head3 GET /devices/[name]/video/[channel]/stream/[content-type1]/[content-type2]
+
+Get the video stream with the desired content type.
+
+B<NOTE>: [content-type1]/[content-type2] is really just a straight MIME 
+type, like "text/video".  It's split up this way for the sake of 
+popular server-side web libraries.
+
+
+=head2 Still Images
+
+B<COMPATIBILITY NOTE>: This is an extension which is not currently 
+implemented in WebIOPi
+
+=head3 GET /devices/[name]/image/count
+
+Returns the number of image streams that are available.
+
+=head3 GET /devices/[name]/image/[channel]/resolution
+
+Returns the width and height separated by an I<x> list.  Example:
+
+  640x480
+
+=head3 POST /devices/[name]/image/[channel]/resolution/[width]/[height]
+
+Sets the resolution of the given channel.
+
+If the channel refuses to set the given resolution, HTTP status code 403 
+will be sent.
+
+=head3 GET /devices/[name]/image/[channel]/allowed-content-types
+
+Get list of allowed MIME content types.  Allowed types will be sent as a 
+MIME string, with one on each line.
+
+=head3 GET /devices/[name]/image/[channel]/stream/[content-type1]/[content-type2]
+
+Get the image with the desired content type.
+
+B<NOTE>: [content-type1]/[content-type2] is really just a straight MIME 
+type, like "text/video".  It's split up this way for the sake of 
+popular server-side web libraries.
+
+=head2 Temperature
+
+=head3 GET /devices/[name]/sensor/temperature/c
+
+Returns the current temperature in celsius.
+
+=head3 GET /devices/[name]/sensor/temperature/k
+
+Returns the current temperature in kelvin.
+
+=head3 GET /devices/[name]/sensor/temperature/f
+
+Returns the current temperature in fahrenheit.
+
+
+=head2 SPI
+
+=head2 I2C
+
+=head2 OneWire
+
+=head2 Pressure
+
+=head2 Luminosity
+
+=head2 Distance
+
+
+=end

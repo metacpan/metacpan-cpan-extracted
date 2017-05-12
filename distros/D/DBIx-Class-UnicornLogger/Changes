@@ -1,0 +1,18 @@
+Revision history for DBIx-Class-UnicornLogger
+
+0.001004  2015-01-16 22:16:48-06:00 America/Chicago
+       - Allow setting profile via ENV var (GH#3)
+
+0.001003  2014-07-03 23:40:54-05:00 America/Chicago
+       - Fix stacktrace option (T)
+       - Fix warning coming from SQL::Abstract::Tree
+
+0.001002  2013-03-02 10:31:56 CST6CDT
+       - Fix a typo in ::FromProfile POD
+
+0.001001  2012-11-17 16:35:28 CST6CDT
+       - Put MetaYAML back in dist
+
+0.001000  2012-04-28 13:53:24 America/Chicago
+       - Initial Release
+

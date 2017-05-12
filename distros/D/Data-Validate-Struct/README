@@ -1,0 +1,473 @@
+NAME
+    Data::Validate::Struct - Validate recursive Hash Structures
+
+SYNOPSIS
+     use Data::Validate::Struct;
+     my $validator = new Data::Validate::Struct($reference);
+     if ( $validator->validate($config_hash_reference) ) {
+       print "valid\n";
+     }
+     else {
+       print "invalid " . $validator->errstr() . "\n";
+     }
+
+DESCRIPTION
+    This module validates a config hash reference against a given hash
+    structure in contrast to Data::Validate in which you have to check each
+    value separately using certain methods.
+
+    This hash could be the result of a config parser or just any hash
+    structure. Eg. the hash returned by XML::Simple could be validated using
+    this module. You may also use it to validate CGI input, just fetch the
+    input data from CGI, map it to a hash and validate it.
+
+    Data::Validate::Struct uses some of the methods exported by
+    Data::Validate, so you need to install it too.
+
+PREDEFINED BUILTIN DATA TYPES
+    int Match a simple integer number.
+
+    range(a-b)
+        Match a simple integer number in a range between a and b. Eg:
+
+         { loginport => 'range(22-23)' }
+
+    hex Match a hex value.
+
+    oct Match an octagonal value.
+
+    number
+        Match a decimal number, it may contain , or . and may be signed.
+
+    word
+        Match a single word, _ and - are tolerated.
+
+    line
+        Match a line of text - no newlines are allowed.
+
+    text
+        Match a whole text(blob) including newlines. This expression is very
+        loosy, consider it as an alias to any.
+
+    regex
+        Match a perl regex using the operator qr(). Valid examples include:
+
+          qr/[0-9]+/
+          qr([^%]*)
+          qr{\w+(\d+?)}
+
+        Please note, that this doesn't mean you can provide here a regex
+        against config options must match.
+
+        Instead this means that the config options contains a regex.
+
+        eg:
+
+          $cfg = {
+            grp  = qr/root|wheel/
+          };
+
+        regex would match the content of the variable 'grp' in this example.
+
+        To add your own rules for validation, use the type() method, see
+        below.
+
+    uri Match an internet URI.
+
+    ipv4
+        Match an IPv4 address.
+
+    cidrv4
+        The same as above including cidr netmask (/24), IPv4 only, eg:
+
+          10.2.123.0/23
+
+        Note: shortcuts are not supported for the moment, eg:
+
+          10.10/16
+
+        will fail while it is still a valid IPv4 cidr notation for a network
+        address (short for 10.10.0.0/16). Must be fixed in Regex::Common.
+
+    ipv6
+        Match an IPv6 address. Some examples:
+
+          3ffe:1900:4545:3:200:f8ff:fe21:67cf
+          fe80:0:0:0:200:f8ff:fe21:67cf
+          fe80::200:f8ff:fe21:67cf
+          ff02:0:0:0:0:0:0:1
+          ff02::1
+
+    cidrv6
+        The same as above including cidr netmask (/64), IPv6 only, eg:
+
+          2001:db8:dead:beef::1/64
+          2001:db8::/32
+
+    quoted
+        Match a text quoted with single quotes, eg:
+
+          'barbara is sexy'
+
+    hostname
+        Match a valid hostname, it must qualify to the definitions in RFC
+        2396.
+
+    resolvablehost
+        Match a hostname resolvable via dns lookup. Will fail if no dns is
+        available at runtime.
+
+    path
+        Match a valid absolute path, it won't do a stat() system call. This
+        will work on any operating system at runtime. So this one:
+
+          C:\Temp
+
+        will return TRUE if running on WIN32, but FALSE on FreeBSD!
+
+    fileexists
+        Look if value is a file which exists. Does a stat() system call.
+
+    user
+        Looks if the given value is an existent user. Does a getpwnam()
+        system call.
+
+    group
+        Looks if the given value is an existent group. Does a getgrnam()
+        system call.
+
+    port
+        Match a valid tcp/udp port. Must be a digit between 0 and 65535.
+
+    vars
+        Matches a string of text containing variables (perl style variables
+        though) eg:
+
+          $user is $attribute
+          I am $(years) old
+          Missing ${points} points to succeed
+
+MIXED TYPES
+    If there is an element which could match more than one type, this can be
+    matched by using the pipe sign "|" to separate the types.
+
+      { name => 'int | number' }
+
+    There is no limit on the number of types that can be checked for, and
+    the check is done in the sequence written (first the type 'int', and
+    then 'number' in the example above).
+
+OPTIONAL ITEMS
+    If there is an element which is optional in the hash, you can use the
+    type 'optional' in the type. The 'optional' type can also be mixed with
+    ordinary types, like:
+
+      { name => 'text | optional' }
+
+    The type 'optional' can be placed anywhere in the type string.
+
+NEGATIVE MATCHING
+    In some rare situations you might require a negative match. So a test
+    shall return TRUE if a particular value does NOT match the given type.
+    This might be usefull to prevent certain things.
+
+    To achieve this, you just have to prepend one of the below mentioned
+    types with the keyword no.
+
+    Example:
+
+     $ref = { path => 'novars' }
+
+    This returns TRUE if the value of the given config hash does NOT contain
+    ANY variables.
+
+VALIDATOR STRUCTURE
+    The expected structure must be a standard perl hash reference. This hash
+    may look like the config you are validating but instead of real-live
+    values it contains types that define of what type a given value has to
+    be.
+
+    In addition the hash may be deeply nested. In this case the validated
+    config must be nested the same way as the reference hash.
+
+    Example:
+
+      $reference = { user => 'word', uid => 'int' };
+
+    The following config would be validated successful:
+
+      $config = { user => 'HansDampf',  uid => 92 };
+
+    this one not:
+
+      $config = { user => 'Hans Dampf', uid => 'nine' };
+                               ^                ^^^^
+                               |                |
+                               |                +----- is not a number
+                               +---------------------- space not allowed
+
+    For easier writing of references you yould use a configuration file
+    parser like Config::General or Config::Any, just write the definition
+    using the syntax of such a module, get the hash of it and use this hash
+    as validation reference.
+
+NESTED HASH STRUCTURES
+    You can also match against nested structures. Data::Validate::Struct
+    iterates into the given config hash the same way as the reference hash
+    looks like.
+
+    If the config hash doesn't match the reference structure, perl will
+    throw an error, which Data::Validate::Struct catches and returns FALSE.
+
+    Given the following reference hash:
+
+      $ref = {
+          'b1' => {
+              'b2' => {
+                  'b3' => {
+                      'item' => 'int'
+                  }
+              }
+          }
+      }
+
+    Now if you validate it against the following config hash it will return
+    TRUE:
+
+      $cfg = {
+          'b1' => {
+              'b2' => {
+                  'b3' => {
+                      'item' => '100'
+                  }
+              }
+          }
+      }
+
+    If you validate it for example against this hash, it will return FALSE:
+
+      $cfg = {
+          'b1' => {
+              'b2' => {
+                  'item' => '100'
+              }
+          }
+      }
+
+SUBROUTINES/METHODS
+    validate($config)
+        $config must be a hash reference you'd like to validate.
+
+        It returns a true value if the given structure looks valid.
+
+        If the return value is false (0), then the error message will be
+        written to the variable $!.
+
+    type(%types)
+        You can enhance the validator by adding your own rules. Just add one
+        or more new types using a simple hash using the type() method.
+        Values in this hash can be regexes or anonymous subs.
+
+        "type" does accept either a hash (%hash), a hash ref (%$hash) or a
+        list of key/values ("key => value") as input.
+
+        For details see "CUSTOM VALIDATORS".
+
+    debug()
+        Enables debug output which gets printed to STDERR.
+
+    errors
+        Returns an array ref with the errors found when validating the hash.
+        Each error is on the format '<value> doesn't match <types> at
+        <ref>', where <ref> is a comma separated tree view depicting where
+        in the the error occured.
+
+    errstr()
+        Returns the last error, which is useful to notify the user about
+        what happened. The format is like in "errors".
+
+EXPORTED FUNCTIONS
+  add_validators
+    This is a class function which adds types not per object but globally
+    for each instance of Data::Validate::Struct.
+
+     use Data::Validate::Struct qw(add_validators);
+     add_validators( name => .. );
+     my $v = Data::Validate::Struct->new(..);
+
+    Parameters to add_validators are the same as of the type method.
+
+    For details see "CUSTOM VALIDATORS".
+
+CUSTOM VALIDATORS
+    You can add your own validators, which maybe regular expressions or
+    anonymous subs. Validators can be added using the type() method or
+    globally using the add_validators() function.
+
+  CUSTOM REGEX VALIDATORS
+    If you add a validator which is just a regular expressions, it will
+    evaluated as is. This is the most simplest way to customize validation.
+
+    Sample:
+
+     use Data::Validate::Struct qw(add_validators);
+     add_validators(address => qr(^\w+\s\s*\d+$));
+     my $v = Data::Validate::Struct->new({place => 'address'});
+     $v->validate({place => 'Livermore 19'});
+
+    Regexes will be executed exactly as given. No flags or ^ or $ will be
+    used by the module. Eg. if you want to match the whole value from
+    beginning to the end, add ^ and $, like you can see in our 'address'
+    example above.
+
+  CUSTOM VALIDATOR FUNCTIONS
+    If the validator is a coderef, it will be executed as a sub.
+
+    Example:
+
+     use Data::Validate::Struct qw(add_validators);
+     add_validators(
+        list => sub {
+          my $list = shift;
+          my @list = split /\s*,\s*/, $list;
+          return scalar @list > 1;
+        },
+     );
+
+    In this example we add a new type 'list', which is really simple. 'list'
+    is a subroutine which gets called during evaluation for each option
+    which you define as type 'list'.
+
+    Such a subroutine must return a true value in order to produce a match.
+    It receives the following arguments:
+
+    *   value to be evaluated
+
+    *   unparsed arguments, if defined in the reference
+
+    *   array of parsed arguments, tokenized by , and -
+
+    That way you may define a type which accepts an arbitrary number of
+    arguments, which makes the type customizable. Sample:
+
+     # new validator
+     $v4 = Data::Validate::Struct->new({ list => nwords(4) });
+ 
+     # define type 'nwords' with support for 1 argument
+     $v4->type(
+       nwords => sub {
+         my($val, $ignore, $count) = @_;
+         return (scalar(split /\s+/, $val) == $count) ? 1 : 0;
+       },
+     );
+ 
+     # validate
+     $v4->validate({ list => 'these are four words' });
+
+  CUSTOM VALIDATORS USING A GRAMMAR
+    Sometimes you want to be more flexible, in such cases you may use a
+    parser generator to validate input. This is no feature of
+    Data::Validate::Struct, you will just write a custom code ref validator,
+    which then uses the grammar.
+
+    Here's a complete example using Parse::RecDescent:
+
+     use Parse::RecDescent;
+     use Data::Validate::Struct qw(add_validators);
+ 
+     my $grammar = q{
+        line: expr(s)
+        expr: number operator number
+        number: int | float
+        int: /\d+/
+        float: /\d*\\.\d+/
+        operator: '+' | '-' | '*' | '/'
+     };
+ 
+     my $parse = Parse::RecDescent->new($grammar);
+ 
+     add_validators(calc => sub { defined $parse->line($_[0]) ? 1 : 0; });
+ 
+     my $val = Data::Validate::Struct->new({line => 'calc'});
+ 
+     if ($val->validate({line => "@ARGV"})) {
+       my $r;
+       eval "\$r = @ARGV";
+       print "$r\n";
+     }
+     else {
+       print "syntax error\n";
+     }
+
+    Now you can use it as follows:
+
+     ./mycalc 54 + 100 - .1
+     153.9
+ 
+     ./mycalc 8^2
+     syntax error
+
+  NEGATED VALIDATOR
+    A negative/reverse match is automatically added as well, see "NEGATIVE
+    MATCHING".
+
+EXAMPLES
+    Take a look to t/run.t for lots of examples.
+
+CONFIGURATION AND ENVIRONMENT
+    No environment variables will be used.
+
+SEE ALSO
+    I recommend you to read the following documentations, which are supplied
+    with perl:
+
+    perlreftut Perl references short introduction.
+
+    perlref Perl references, the rest of the story.
+
+    perldsc Perl data structures intro.
+
+    perllol Perl data structures: arrays of arrays.
+
+    Data::Validate common data validation methods.
+
+    Data::Validate::IP common data validation methods for IP-addresses.
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2007-2015 T. v.Dein
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+BUGS AND LIMITATIONS
+    Some implementation details as well as the API may change in the future.
+    This will no more happen if entering a stable release (starting with
+    1.00).
+
+    To submit use <http://rt.cpan.org>.
+
+INCOMPATIBILITIES
+    None known.
+
+DIAGNOSTICS
+    To debug Data::Validate::Struct use debug() or the perl debugger, see
+    perldebug.
+
+    For example to debug the regex matching during processing try this:
+
+     perl -Mre=debug yourscript.pl
+
+DEPENDENCIES
+    Data::Validate::Struct depends on the module Data::Validate,
+    Data::Validate:IP, Regexp::Common, File::Spec and File::stat.
+
+AUTHORS
+    T. v.Dein <tlinden |AT| cpan.org>
+
+    Per Carlson <pelle |AT| cpan.org>
+
+    Thanks to David Cantrell for his helpful hints.
+
+VERSION
+    0.10
+

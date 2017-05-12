@@ -1,0 +1,40 @@
+---
+abstract: 'a driver for the Pertelian X2040 USB LCD'
+author:
+  - 'Alex Kapranoff, C<< <alex at kapranoff.ru> >>'
+build_requires:
+  Test::More: '0'
+  Test::NoWarnings: '0'
+configure_requires:
+  Module::Build: '0.38'
+  perl: 5.008_001
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.142690'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Pertelian
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Device::Pertelian:
+    file: lib/Device/Pertelian.pm
+    version: '0.03'
+requires:
+  Time::HiRes: '0'
+resources:
+  bugtracker: https://github.com/kappa/Device-Pertelian/issues
+  homepage: https://github.com/kappa/Device-Pertelian
+  repository: git://github.com/kappa/Device-Pertelian.git
+version: '0.03'
+x_contributors:
+  - 'Alex Kapranoff <alex@kapranoff.ru>'

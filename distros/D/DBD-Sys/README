@@ -1,0 +1,133 @@
+NAME
+    DBD::Sys - System tables interface via DBI
+
+SYNOPSIS
+      use DBI;
+      my $dbh = DBI->connect('DBI::Sys:');
+      my $st  = $dbh->prepare('select distinct * from filesystems join filesysdf on mountpoint');
+      my $num = $st->execute();
+      if( $num > 0 )
+      {
+          while( my $row = $st->fetchrow_hashref() )
+          {
+              # ...
+          }
+      }
+
+DESCRIPTION
+    DBD::Sys is a so called database driver for DBI designed to request
+    information from system tables using SQL. It's based on SQL::Statement
+    as SQL engine and allows to be extended by DBD::Sys::Plugins.
+
+  Prerequisites
+    Of course, a DBD requires DBI to run. Further, SQL::Statement as SQL
+    engine is required, Module::Pluggable to manage the plugin's and
+    Module::Build for installation. Finally, to speed up some checks,
+    Params::Util is needed.
+
+    All these modules are mandatory and DBD::Sys will fail when they are not
+    available.
+
+    To request system information, existing modules from CPAN are used -
+    there are available ones to provide access to some system tables. These
+    modules are optional, but recommended. It wouldn't make much sense to
+    use DBD::Sys without the ability to access the tables from the
+    (operating) system.
+
+    To get an overview which dependencies are there, please check the
+    plugins or take a look into META.yml.
+
+USAGE
+  Installation
+    We chose "Module::Build" installation, because not every system has a
+    suitable make utility - but at least everyone who's using perl modules
+    has a running perl. So installing can be done after extracting
+
+      gzip -dc DBD-Sys-${VERSION}.tar.gz | tar xvf -
+
+    without too much extra effort:
+
+      1  cd DBD-Sys-${VERSION}
+      2  perl Build.PL
+      3  ./Build
+      4  ./Build test
+      5  ./Build install
+
+    If you want to skip the tests (not recommended), you can skip over lines
+    3 and 4.
+
+  Fetching data
+    To retrieve data, you can use the following example:
+
+        my $dbh = DBI->connect('DBI:Sys:');
+        $st  = $dbh->prepare( 'SELECT DISTINCT username, uid FROM pwent WHERE username=?' );
+        $num = $st->execute(getlogin() || $ENV{USER} || $ENV{USERNAME});
+        while( $row = $st->fetchrow_hashref() )
+        {       
+            printf( "Found result row: uid = %d, username = %s\n", $row->{uid}, $row->{username} );
+        }
+
+  Error handling
+    Errors while processing statements are handled via DBI - read DBI
+    documentation, especially the "err" and "errstr" documentation, if
+    you're not familiar with error handling in DBI.
+
+    Errors while modifying attributes, calling driver methods etc. are
+    reported by throwing an exception using Carp.
+
+  Metadata
+    Each table implementor can request configurable meta data attributes.
+    They will be accessible via the database handle:
+
+        print $dbh->{"sys_" . lc $table . "_" . $attr}, "\n";
+        # e.g.
+        print DBI->neat( $dbh->{sys_filesysdf_blocksize} ), "\n";
+
+BUGS & LIMITATIONS
+    This module does not support any changes to the provided tables in order
+    to prevent inconsistent data.
+
+    The design of the plugins makes it less predictable what columns are
+    provided in the end. Well, at least those columns from the tables
+    provided by the DBD::Sys::Plugin::Meta and DBD::Sys::Plugin::Any will be
+    available, even if they are not filled with data when the appropriate
+    module is missing (e.g. if Sys::Filesystem is not available, the table
+    "filesystems" gets the columns provided by
+    DBD::Sys::Plugin::Any::Filesys, but no data at all).
+
+    All additional table implementors must use the same primary key as all
+    other implementors. To stay at the example of "filesystems", the primary
+    key is *mountpoint* - and if any additional module provides another
+    implementation (with data from another module than "Sys::Filesystem"),
+    it needs to ensure that the column *mountpoint* is provided and unique.
+    Additionally it must return *mountpoint* as primary key when it's method
+    "getPrimaryKey" is invoked.
+
+AUTHOR
+        Jens Rehsack                        Alexander Breibach
+        CPAN ID: REHSACK
+        rehsack@cpan.org                    alexander.breibach@googlemail.com
+        http://search.cpan.org/~rehsack/
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SUPPORT
+    Free support can be requested via regular CPAN bug-tracking system at
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-Sys>. There is no
+    guaranteed reaction time or solution time, but it's always tried to give
+    accept or reject a reported ticket within a week. It depends on business
+    load. That doesn't mean that ticket via rt aren't handles as soon as
+    possible, that means that soon depends on how much I have to do.
+
+    Business and commercial support should be acquired from the authors via
+    preferred freelancer agencies.
+
+SEE ALSO
+    perl(1), DBI, Module::Build, Module::Pluggable, Params::Util,
+    SQL::Statement.
+

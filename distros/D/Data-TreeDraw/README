@@ -1,0 +1,43 @@
+Data-TreeDraw version 0.0.5
+
+While there are a number of great programs out there for Dumping and visualising heavily nested data structures these can
+often be over-whelming and hard to read. Additionally, often in order to access a particular data entry you often
+have to back-trace over a Dumped structure to find the specific code appropriate to dereference that particular
+value. This module aims to address these issues and several others by providing number of different features with a
+very simple interface that is particularly aimed at helping to visualise data-rich heavily-nested structures - see
+OVERVIEW. 
+
+This module exports a single sub-routine call C<draw>. Simply call this routine with the data structure you wish to
+print along with a HASH reference of any options you wish to pass - see OPTIONS and OVERVIEW. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+'Scalar::Util'          => "1.22", 
+'Class::MOP'            => "0.95",
+'Text::SimpleTable'     => "2.0",
+'Carp'                  => "1.08",
+'MRO::Compat'           => '0',      # for solaris
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009, Daniel S. T. Hughes
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

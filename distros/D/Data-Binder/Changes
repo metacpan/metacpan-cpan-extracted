@@ -1,0 +1,5 @@
+Revision history for Perl extension Data::Binder.
+
+1.00  Sun Mar 23 09:13:56 2003
+	- original version; h2xs -AX -n Data::Binder
+

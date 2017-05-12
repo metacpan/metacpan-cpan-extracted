@@ -1,0 +1,27 @@
+---
+abstract: 'Make valid NCName tokens which are also UUIDs.'
+author:
+  - 'Dorian Taylor, C<< <dorian at cpan.org> >>, Dorian Taylor <dorian@cpan.org>'
+build_requires:
+  Data::UUID: '0'
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 7, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-UUID-NCName
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  MIME::Base32: '0'
+  MIME::Base64: '0'
+  UUID::Tiny: '0'
+  perl: '5.008'
+version: '0.04'

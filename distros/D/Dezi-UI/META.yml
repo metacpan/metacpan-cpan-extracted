@@ -1,0 +1,32 @@
+---
+abstract: 'HTML interface to a Dezi server'
+author:
+  - 'Peter Karman, C<< <karman at cpan.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: http://dev.perl.org/licenses/
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dezi-UI
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Data::Dump: 0
+  Dezi: 0.001004
+  Plack: 0
+  Test::More: 0
+  perl: 5.8.3
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-UI
+  homepage: https://github.com/karpet/Dezi-UI
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: git://github.com/karpet/Dezi-UI.git
+version: '0.001005'

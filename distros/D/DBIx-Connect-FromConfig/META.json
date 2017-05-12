@@ -1,0 +1,49 @@
+{
+   "abstract" : "Creates a DB connection from a configuration file",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Connect-FromConfig",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBI" : "0",
+            "perl" : "5"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Connect::FromConfig" : {
+         "file" : "lib/DBIx/Connect/FromConfig.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.07"
+}

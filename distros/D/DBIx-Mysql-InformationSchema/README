@@ -1,0 +1,52 @@
+DBIx-Mysql-InformationSchema version 0.04
+=========================================
+
+
+DBIx::Mysql::InformationSchema - Perl module to access the mysql INFORMATION_SCHEMA view, which contains database metadata.
+
+
+
+Mysql 5 introduced a system view called INFORMATION_SCHEMA that contains
+metadata describing the structure of all the databases, tables and
+columns.
+
+This module provides methods to get at SOME of that data.  While you
+certainly can query the INFORMATION_SCHEMA view manually, if your
+program uses this data frequently, you may find this module convenient.
+In order for this to run, you must already have the DBI perl module
+installed.
+
+This module creates and uses its own database handle, stored in
+$object->{DBH}.  See the dbconnect method.  To connect, you must supply
+a username and password that can read INFORMATION_SCHEMA, which is just
+about any valid mysql id.
+
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  blah blah blah
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Gerry Lawrence
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

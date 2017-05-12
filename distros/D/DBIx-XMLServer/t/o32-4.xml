@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>2</id>
+    <birthday>1963-01-01</birthday>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>4</id>
+    <birthday>1976-02-28</birthday>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>5</id>
+    <birthday>1976-02-29</birthday>
+  </employee>
+</employees>

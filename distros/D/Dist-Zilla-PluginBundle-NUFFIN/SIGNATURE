@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.62.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2efbd7a42890a4835514ca99e505c40773f6cafe LICENSE
+SHA1 3cf7f3ecca63f0656a0703b5ef0c089cb6b16854 MANIFEST
+SHA1 2b6fce1787c873b843729f6fbe08d5585e7a46a2 META.json
+SHA1 b181a0d48abd8ebe6bb05453f702b8a5a9d65ce5 META.yml
+SHA1 1d5d5438380812ed6e55066561f1643926e5dbb9 Makefile.PL
+SHA1 0d0a1e94f112ff55ec67cbd12a33c125c5e26b15 README
+SHA1 de30ba9f62dade1b4ea5c5c2793c328e3c5efe43 dist.ini
+SHA1 65e76eafdd8bb7d5e9f820594cf42f0181dcd916 lib/Dist/Zilla/PluginBundle/NUFFIN.pm
+SHA1 112c89628e0ccbc9df1d55056660e621af28d053 lib/Dist/Zilla/PluginBundle/NUFFIN.pm~
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 9433c240fe590bc404ab68ff63984df763e347ed t/release-pod-coverage.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAk0RUNYACgkQVCwRwOvSdBiwZwCfUJZV11j/9FvOckgCTvG3tv8N
+09sAn0RPEI9pCWJzt3om+d9GwofSKz1y
+=N8X1
+-----END PGP SIGNATURE-----

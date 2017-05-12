@@ -1,0 +1,45 @@
+---
+abstract: 'PkgVersion for block packages'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '5.000'
+  Test::More: '0.96'
+  autodie: '2.00'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-PkgVersion-Block
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Dist::Zilla::Plugin::PkgVersion::Block:
+    file: lib/Dist/Zilla/Plugin/PkgVersion/Block.pm
+    version: '0.0107'
+requires:
+  Dist::Zilla::Role::FileFinderUser: '5.000'
+  Dist::Zilla::Role::FileMunger: '5.000'
+  Dist::Zilla::Role::PPI: '5.000'
+  Moose: '2.0000'
+  MooseX::Types::Perl: '0'
+  PPI: '1.215'
+  namespace::autoclean: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Zilla-Plugin-PkgVersion-Block/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-PkgVersion-Block
+  repository: https://github.com/Csson/p5-Dist-Zilla-Plugin-PkgVersion-Block.git
+version: '0.0107'

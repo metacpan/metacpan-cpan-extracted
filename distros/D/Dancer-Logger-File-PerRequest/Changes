@@ -1,0 +1,12 @@
+Revision history for Dancer-Logger-File-PerRequest
+
+0.03  2014-10-09 09:51:22 CST
+        - call after_error_render on serializer because it's not calling after hook
+
+0.02  2014-10-08 16:48:31 CST
+        - change the hook to after
+        - add request->id to default logfile_callback (more unique)
+        - add hooks before_file_per_request_close/after_file_per_request_close
+
+0.01  2014-10-08 14:35:49 CST
+        - Initial release

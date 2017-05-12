@@ -1,0 +1,502 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<HTML><HEAD><TITLE>RS232 communication with Megasquirt 2-Extra</TITLE>
+<META http-equiv=Content-Type content="text/html; charset=iso-8859-1">
+<META content=MGB,ignition,Lucas,optical,megasquirt,crane name=keywords>
+<META content="MSHTML 6.00.6000.16414" name=GENERATOR></HEAD>
+<BODY bgColor=#ffffff leftMargin=0 topMargin=0 marginwidth="0" marginheight="0">
+<TABLE width="100%" height="241" border=0 
+      cellPadding=0 bgColor=#cccccc 
+      style="BACKGROUND: rgb(204,204,204) 0% 50%; WIDTH: 100%; -moz-background-clip: -moz-initial; -moz-background-origin: -moz-initial; -moz-background-inline-policy: -moz-initial">
+  <TBODY>
+    <TR style="HEIGHT: 110.25pt"> 
+      <TD 
+          style="PADDING-RIGHT: 0.75pt; PADDING-LEFT: 0.75pt; PADDING-BOTTOM: 0.75pt; WIDTH: 99%; PADDING-TOP: 0.75pt; HEIGHT: 110.25pt" 
+          width="99%" height=292> <P style="TEXT-ALIGN: center" align=center><B><a href="http://www.msextra.com/index.php"><img src="../logo_phpBB.gif" width="325" height="67" border="0"></a></B></P>
+        <H2 style="TEXT-ALIGN: center" align=center>RS-232 Communication with 
+          MS2/Extra</H2>
+        <DIV align=center> 
+          <DIV align=center></DIV>
+        </DIV>
+        <P style="TEXT-ALIGN: center" align=center><FONT size=2><B><SPAN 
+            style="COLOR: rgb(51,0,102); FONT-FAMILY: Arial">Only for use with 
+          the MS2 Extra code </SPAN></B></FONT></P>
+        <P style="TEXT-ALIGN: center" align=center><FONT size=2><B><SPAN 
+            style="FONT-SIZE: 10pt; COLOR: rgb(51,0,102)">By </SPAN><SPAN 
+            style="COLOR: rgb(51,0,102)">Philip Ringwood</SPAN><SPAN 
+            style="FONT-SIZE: 10pt; COLOR: rgb(51,0,102)"> (daxtojeiro), </SPAN><SPAN style="COLOR: rgb(51,0,102)">James 
+          Murrey </SPAN><SPAN 
+            style="FONT-SIZE: 10pt; COLOR: rgb(51,0,102)">(jsmcortina) and </SPAN><SPAN style="COLOR: rgb(51,0,102)">Ken 
+          Calver </SPAN><SPAN 
+            style="FONT-SIZE: 10pt; COLOR: rgb(51,0,102)">(muythaibxr)</SPAN></B></FONT></P>
+        <P style="TEXT-ALIGN: center" align=center><b><span style="font-size: 10pt; color: rgb(51,0,102);">Updates 
+          and errors? please PM Werner (woh)</span></b></P></TD>
+      <TD 
+          style="PADDING-RIGHT: 0.75pt; PADDING-LEFT: 0.75pt; PADDING-BOTTOM: 0.75pt; WIDTH: 1%; PADDING-TOP: 0.75pt; HEIGHT: 110.25pt" 
+          width="1%" height=292> <FORM>
+        </FORM></TD>
+    </TR>
+  </TBODY>
+</TABLE>
+<BR>
+<DIV align=center> 
+  <DIV align=center> 
+    <TABLE height=117 width="79%" border=1>
+      <TBODY>
+        <TR> 
+          <TD bgColor=#99ffff height=58> <DIV align=center><FONT size=2>Please 
+              Note: </FONT></DIV>
+            <P align=center><FONT size=2>All of these instructions / diagrams 
+              are to be used at your own risk, like most things there is more 
+              than one way to do the same thing. We have tried to offer a method 
+              that we have tested or that others have tested for us. No warranty 
+              expressed or implied. </FONT></P>
+            <P align=center><FONT size=2>Use at your own risk.</FONT></P></TD>
+        </TR>
+      </TBODY>
+    </TABLE>
+    <p>&nbsp; </p>
+  </DIV>
+</DIV>
+<BLOCKQUOTE> 
+  <div align="left"><font size="-1"> July 7, 2008. updated to rel. 2.0.1 MS2/Extra</font></div>
+  <h3 align=left><font color="#0000FF"><strong>Overview</strong></font></h3>
+  <p align=left><font color="#333333">MegaSquirt 2 Extra (MS2/Extra) comes with 
+    an RS-232 port that allows loading new firmware and the operation of such 
+    applications as MegaTune. With a program such as Hyperterminal you can send 
+    some rudimentary commands to MS2/Extra. With a programming language such as 
+    C or Visual Basic you can do more sophisticated communication to retrieve 
+    data from MS2 or modify the tables. The only requirement is that you can write 
+    a program to send and receive strings and data (an array of bytes) with RS232 
+    (also referred to as COM1, COM2 etc)</font></p>
+  <p align=left>In this section I'll explain some of the commands for MS2/Extra 
+    and demonstrate how to use Visual Basic 6.0 to use these commands. I'll also 
+    show you how to read the <strong>megaquirt-ii.ini</strong> file to get more 
+    information on how to use the data from MS2/Extra. You can read the <strong>megaquirt-ii.ini</strong> 
+    file with Word or an editor like <a href="http://www.vim.org/download.php" target="_blank">Vim</a> 
+    . You can not read the file using Notepad. To load the file in Word use the 
+    File&gt;Open menu and then in the View menu select web view.</p>
+  <p align=left>A <a href="MS2_Extra_VB.zip">VB 6.0 example program</a> is available 
+    for download. It shows how to download real time variables, and tables.</p>
+  <p align=left>&nbsp;</p>
+  <h3 align=left><font color="#0000FF">Commands for MS2/Extra RS-232<a name="cmds"></a></font></h3>
+  <p align=left> The commands for sending and receiving data to and from MS2/Extra 
+    via RS232 use a single character and in some cases the character is followed 
+    by one or more bytes of instruction or data. In the case of primary commands 
+    compatible with the CAN interface, the first byte is the ANSI code for a <strong>Command 
+    Character</strong>, the second byte is the <strong><a href="#CANid">CANid</a> 
+    </strong>or I/O identification and is always 0 (zero) for MS2/Extra, the third 
+    byte specifies the <strong><a href="#tble_idx">Table Index</a></strong> (tble_idx). 
+    These three bytes may be followed by additional data or instruction bytes. 
+    For some commands a Word (16 bits) is required. A Word variable will be represented 
+    here with two bytes (8 bits each). The the high byte will have an 'H' as the 
+    suffix, and the low byte an 'L' suffix. The brackets &lt;var&gt; indicate 
+    a one byte variable except for a data array. The parenthesis on the next line 
+    after the command character, for example &quot;a&quot; is (61 ), indicate 
+    the ANSI code for the command character. It is the ANSI code that is send 
+    as a byte to represent the character. Examples with single quotes are bytes 
+    seperated by a space. </p>
+  <blockquote> 
+    <h3><strong><font color="#0000FF">Primary Command Character</font></strong><font color="#0000FF">s</font></h3>
+    <blockquote> 
+      <p>Three byte commands:</p>
+      <p><strong>&quot;<a href="#a_cmd">a</a>&quot;</strong>, 0,&lt;tble_idx&gt; 
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; (97) - MS2 returns an array from the <em>outpc</em> 
+        array in MS II <br>
+        <strong>&quot;<a href="#r_cmd">r</a>&quot;</strong>, 0,&lt;tble_idx&gt;&lt;offset_H&gt;&lt;offset_L&gt;&lt;numb_points_H&gt;&lt;numb_points_L&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp; (114) - Read data from MS2. Generic form of the 
+        'a' command that controls the size and start of the array returned<br>
+        <strong>&quot;<a href="#w_cmd">w</a>&quot;</strong>,0,&lt;tble_idx&gt;&lt;offset_H&gt;,&lt;offset_L&gt;,&lt;numb_points_H&gt;&lt;numb_points_L&gt; 
+        &lt;data array &gt; <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; (119) - Write data to MS2. The reverse of the 
+        'r' command - sends data to MS II. <br>
+        <strong>&quot;<a href="#e_cmd">e</a>&quot;</strong>, 0,&lt;tble_idx&gt;,&lt;offset_H&gt;&lt;offset_L&gt;&lt;numb_points_H&gt;&lt;numb_points_L&gt; 
+        &lt;data array &gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp; (101) - Write with echo. Returns the data written. 
+        Same as &quot;w&quot; but with echo for verification.<br>
+        <strong>&quot;<a href="#y_cmd">y</a>&quot;</strong>, 0, &lt;tble_idx&gt; 
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; (121) - Verify that input data in a ram block 
+        matches the corresponding flash block. <br>
+        <strong>&quot;<a href="#b_cmd">b</a>&quot;</strong>, 0, &lt;tble_idx&gt; 
+        <br>
+        &nbsp;&nbsp;&nbsp;&nbsp;(98) - Burn the ram copy of tbl_idx into the flash 
+        memory. <br>
+        <strong>&quot;<a href="#t_cmd">t</a>&quot;</strong>, 0, &lt;tble_idx&gt;&lt;data 
+        array &gt;<br>
+        &nbsp;&nbsp;&nbsp; &nbsp;(116) - re-flashing new Coolant, MAT, Ego, and 
+        MAF tables. tble_idx = 0 - 3</p>
+      <p>&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;<br>
+        <strong>Note:<br>
+        You must add a delay of &gt;200ms after the &lt;tble_idx&gt; whenever 
+        changing the page. The first time a new &lt;tble_idx&gt; is used/changed 
+        a delay is required after the &lt;tble_idx&gt; before sending any further 
+        information. Failure to do so will result in the return of no data.<br>
+        </strong>&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;&#8212;</p>
+    </blockquote>
+    <h3><strong><font color="#0000FF">Single Character </font></strong><strong><font color="#0000FF">Commands</font></strong> 
+    </h3>
+    <blockquote> 
+      <p><strong>&quot;<a href="#Acmd">A</a>&quot; </strong><br>
+        &nbsp;&nbsp;&nbsp; (65) - MS2 sends the real time variables as an array 
+        of 152 bytes (will continues to change).<br>
+        <strong>&quot;<a href="#Ccmd">c</a>&quot;</strong><br>
+        &nbsp;&nbsp;&nbsp; (99) -&nbsp;Test communications - MS2 sends high byte 
+        of variable 'seconds'<br>
+        <strong>&quot;<a href="#Scmd">S</a>&quot;</strong><br>
+        &nbsp;&nbsp;&nbsp; (83) - Signature - MS2 sends an identifier 32 character 
+        string (this is not the version) <br>
+        <strong>&quot;<a href="#Scmd">Q</a>&quot;</strong><br>
+        &nbsp;&nbsp;&nbsp; (81) - Revision - MS2 sends the code version as a 20 
+        character string </p>
+    </blockquote>
+    <h3><font color="#0000FF">&quot;<a href="#EX_cmd"> ! </a>&quot; Commands</font></h3>
+    <blockquote> 
+      <p>The &quot;!&quot; commands are multiple character commands to initialize, 
+        reboot, and load new firmware. They all start with '!' . <br>
+        <br>
+        <strong>&quot;! x&quot;</strong> &nbsp;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp; '33 120'&nbsp; - causes MS2/Extra to re-initialize 
+        various program values, <br>
+        <strong>&quot;! ! x&quot; </strong> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; '33 33 120' - reboot MS2/Extra and start running. 
+        <br>
+        <strong>&quot;! ! !&quot;</strong> <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; '33 33 33' - reboot MS2/Extra and come up ready 
+        to load a new code version</p>
+    </blockquote>
+    <p><strong><font color="#0000FF">CANid</font><a name="CANid"></a></strong> 
+      - an integer byte from 0-15. Use 0 for MS II, for other (GPIO) devices it 
+      is arbitrary depending on how a user has configured the devices in his network. 
+      Set to 0 for communications between PC and MS2/Extra.</p>
+    <p><strong><font color="#0000FF">tble_idx</font><a name="tble_idx"></a></strong> 
+      - a byte from 0-15 that specifies the block of data from which to get/send 
+      data. The variable blocks in MS2 corresponding to tble_idx &nbsp;0-10 are 
+      as follows: </p>
+    <blockquote> 
+      <p><strong>These are in flash only and are downloaded with the 't' command. 
+        1024 signed 16 bit words;</strong><br>
+        0 - array of coolant temperatures vs ADC counts, <br>
+        &nbsp;&nbsp;&nbsp;&nbsp; units are deg multiplied by 10, so 1801 represents 
+        180.1 degrees. &nbsp;&nbsp;&nbsp;&nbsp;<br>
+        1 - Same as coolant temp table above except array of manifold air temperatures.<br>
+        2 - array of ego reading vs ADC counts , 147 = 14.7 afr<br>
+        3 - array of maf reading vs ADC counts , mg/sec x 10. </p>
+      <p><strong>These contain the user <a href="RS232_MS2_tables.htm">tables</a></strong> 
+        <strong>and other constants</strong><br>
+        <strong>Also see MT megaquirt-ii.ini file for offset address and size 
+        </strong><br>
+        4 - page 1, first input ram structure ( <a href="RS232_MS2_tables.htm">AFR 
+        table</a>)<br>
+        5 - page 2, second input ram structure<br>
+        6 - output ram structure ( real time variables, use <a href="#Acmd">&quot;A&quot;</a> 
+        cmd)<br>
+        7 - page 3, <a href="RS232_MS2_tables.htm#adv_tbl">Ignition Table</a> 
+        1 &amp; 2<br>
+        8 - page 4, <a href="RS232_MS2_tables.htm#adv_tbl">Ignition Table</a> 
+        3<br>
+        9 - page 5, <a href="RS232_MS2_tables.htm#ve_tbl">VE table</a> 1, 2 &amp; 
+        3<br>
+        10 - page 6 (not used at time of this writing)</p>
+      <p>&nbsp;</p>
+    </blockquote>
+  </blockquote>
+  <h3 align=left><a name="simple_VB"></a><font color="#0000FF">Simple communications 
+    with VB 6.0</font></h3>
+  <p align=left>Microsoft VB 6.0 (and Microsoft Excel) have the capability to 
+    easily communicate with RS232 using the Microsoft COMM object. To use the 
+    Microsoft COMM object it must be setup to the same communication properties 
+    as MS2. First open VB using a form and then place the MS COMM object on the 
+    form. It will be named MSCOMM1. Place a command button on the form and copy 
+    or type in this code.</p>
+  <blockquote> 
+    <p align="left"><font size="-1" face="Courier New, Courier, mono">Private 
+      Sub Command1_click ()<br>
+      &nbsp;&nbsp;&nbsp; ' Buffer to hold input string<br>
+      &nbsp;&nbsp;&nbsp;Dim Version As Variant<br>
+      &nbsp;&nbsp;&nbsp; ' Use COM1.<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.CommPort = 1<br>
+      &nbsp;&nbsp;&nbsp;' 115200 baud, no parity, 8 data, and 1 stop bit.<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.Settings = &quot;115200,N,8,1&quot;<br>
+      &nbsp;&nbsp;&nbsp;' Tell the control to read entire buffer<br>
+      &nbsp; &nbsp;' when Input is used.<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.InputLen = 0</font></p>
+    <p align="left"><font size="-1" face="Courier New, Courier, mono">&nbsp;&nbsp;&nbsp;' 
+      Tell the control to get input as string<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.InputMode = comInputModeText<br>
+      &nbsp;&nbsp;&nbsp;' Open the port.<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.PortOpen = True<br>
+      &nbsp;&nbsp;&nbsp;' Send the get version command to MS<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.Output = &quot;Q&quot;<br>
+      &nbsp;&nbsp;&nbsp;<br>
+      &nbsp;&nbsp;&nbsp;' Wait for data to come back to the serial port.<br>
+      &nbsp;&nbsp;&nbsp;Do <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DoEvents <br>
+      &nbsp;&nbsp;&nbsp;Loop Until MSComm1.InBufferCount &gt; 10<br>
+      <br>
+      &nbsp;&nbsp; ' Read the response in the serial port.<br>
+      &nbsp;&nbsp;&nbsp;Version = MSComm1.Input &nbsp;&nbsp;<br>
+      &nbsp; &nbsp;' Close the serial port.<br>
+      &nbsp;&nbsp;&nbsp;MSComm1.PortOpen = False<br>
+      End Sub</font></p>
+  </blockquote>
+  <p></p>
+  <p align=left>With RS232 connected to the correct port and MS2 powered up you 
+    will receive the version string from MS2 when clicking the command button. 
+    Download <a href="MS2_Extra_VB.zip">VB 6.0 example</a> that demonstrates many 
+    of the above commands as well as reconstructing tables.</p>
+  <p>&nbsp;</p>
+  <h3><font color="#0000FF">&quot;a&quot; Command<a name="a_cmd"></a></font></h3>
+  <p> &quot;a&quot;, 0,&lt;tble_idx&gt; (not recommended)<br>
+    ' 97 0 6' - example, sending this will return buffered real time data of 113 
+    bytes..<br>
+    MS2 returns a byte array from the txbuf which is a copy of the <em>outpc</em> 
+    array. For this command the data is buffered as it is sent so that the data 
+    is not changed during the send operation and all bytes are from the same instant 
+    of time. For real time data this assures the different variables correctly 
+    relate to each other. </p>
+  <p>Use the &quot;<a href="#Acmd"><strong>A</strong></a>&quot; command for reading 
+    real time variables. </p>
+  <p>Use &quot;r&quot; for fixed data to avoid the extra time of buffering the 
+    data.<br>
+  </p>
+  <h3><font color="#0000FF">&quot;b&quot; Command<a name="b_cmd"></a></font></h3>
+  <p>&quot;b&quot;, 0, &lt;tble_idx&gt;<br>
+    '98 0 5' - example to burn table 5 to flash<br>
+    Used to tell MS II to burn the ram copy of <a href="#tble_idx">tble_idx</a> 
+    into the Flash memory. The command is only for ram buffered data because on 
+    tuning it has to be fast. There is a timeout of ~2ms for flash to be erased 
+    and interrupts disabled. <br>
+  </p>
+  <h3><font color="#0000FF">&quot;e&quot; Command<a name="e_cmd"></a></font></h3>
+  <p> &quot;e&quot;, 0,&lt;tble_idx&gt;&lt;offset_H&gt;&lt;offset_L&gt;&lt;numb_points_H&gt;&lt;numb_points_L&gt; 
+    &lt;data array&gt; <br>
+    '101 0 5 0 0 144', &lt;data array&gt; - example send 144bytes to MS2 and have 
+    MS2 echo them back <br>
+    The 'e' (echo) command is the same as 'w', except that after MS2 has received 
+    all the bytes from the sender, it echoes them back for verification. Thus 
+    a sender who has sent n bytes to be written should expect n bytes back from 
+    MS II starting after he has sent the last byte to be written. <br>
+    &nbsp; </p>
+  <h3><font color="#0000FF">&quot;r&quot; Command<a name="r_cmd"></a></font></h3>
+  <p>&quot;r&quot;, 0, &lt;tble_idx&gt;&lt;offset_H&gt;,&lt;offset_L&gt;,&lt;numb_points_H&gt;&lt;numb_points_L&gt;<br>
+    '114 0 5 0 0 144'- example, MS2 will reply with 144 bytes of the VE table 
+    1<br>
+    Generic form of the 'a' command. The returned bytes from MS II are not buffered. 
+    Send 'r', 0, &lt;tble_idx&gt;. followed by 2 bytes specifying the offset from 
+    the array or structure corresponding to tble_idx, followed by 2 bytes specifying 
+    the total number of data bytes to return. After all 7 bytes are received, 
+    MS II will start sending the requested number of bytes. </p>
+  <p> In order to fetch the 256 byte VE table, we would need to send the following 
+    out the serial port: </p>
+  <blockquote> 
+    <p>114 (byte value for lower case 'r') <br>
+      0 (one byte for CANid, always zero for RS232) <br>
+      9 (one byte for tble_idx)</p>
+    <p> delay of &gt;200 ms (if table index changes)</p>
+    <p> 0 (High byte of location index) <br>
+      0 (Low byte of location index) <br>
+      1 (High byte of the number of data points) <br>
+      0 (low byte of the number of data points)</p>
+    </blockquote>
+  <p><font color="#333333">The table definition and variables are contained in 
+    the <strong>megasquirt-ii.ini</strong> file. Some commonly used tables are 
+    repeated here for convenience</font></p>
+  <p><font color="#333333"><a href="RS232_MS2_tables.htm">AFR target</a>, <a href="RS232_MS2_tables.htm#ve_tbl">VE 
+    fuel</a>, <a href="RS232_MS2_tables.htm#adv_tbl">Ignition Advance</a></font></p>
+  <p align="left"><font color="#333333">For scaling and more details, see the 
+    <strong>megasquirt-ii.ini </strong>file.</font> Pages are somewhat different 
+    than variables outlined above in the &quot;A&quot; command, but the concept 
+    is the same. Here is a line with headings from the target AFR table 1 (<font size="-1" face="Courier New, Courier, mono">afrTable1</font>) 
+    on Page = 1: </p>
+  <p><font size="-1" face="Courier New, Courier, mono"> <strong>Variable &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;index&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&lt;-------&nbsp;scaling&nbsp;------&gt;<br>
+    name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type, size, offset, shape, units, 
+    scale. &nbsp;translate &nbsp;lo, &nbsp;hi, digits</strong><br>
+    afrTable1= array, U08, &nbsp;48, &nbsp;[12x12], &quot;AFR&quot;, 0.10000, 
+    0.00000, 9.00, 20.00, 1</font></p>
+  <p>The <strong>type</strong> is either array, bits, or scalar where an array 
+    is multiple bytes of data (e.g. tables) bits is a byte where each bit may 
+    have a True/False meaning, and scalar is a single number.</p>
+  <p>The <strong>size</strong> indicates the memory size. U08 is an unsigned 8 
+    bit number, U16 is an unsigned 16 bit number and will require two bytes of 
+    data.</p>
+  <p><strong>Shape</strong> tells you the number of dimensions to the array. A 
+    [12x12] shape indicates a two dimensional array such as a VE table. A [12] 
+    is a one dimensional array such as the x or y axis table data for MAP and 
+    rpm. The tables start on the lower left going from left to right and up. See 
+    the example VB program for creating a table.</p>
+  <p><strong>Units</strong> are the human readable units. ADC means the value 
+    from the analog to digital converter before they are scaled. ADC units typically 
+    represent 0-5V max using 0-255 </p>
+  <p align="left">The scaling is done with a multiplier (<strong>scale</strong>) 
+    and an offset (<strong>translate</strong>) to get to user units (in the above 
+    example AFR) use this formula: <br>
+    userValue = (msValue + translate) * scale.</p>
+  <p align="left"> The<strong> lo</strong> and<strong> hi</strong> value indicate 
+    the range of the values. In this example for an input of 0-5V (Innovate 0-5V 
+    LC-1) the user units will range from an AFR of 10 to 20. The scaling values 
+    will be different for different sensor settings. </p>
+  <p>The <strong>digits</strong> indicates the number of useful digits after the 
+    decimal point. </p>
+  <p>Do a search of the variable in the <font color="#333333"><strong>megasquirt-ii.ini</strong></font> 
+    file for details.</p>
+  <p><font color="#333333"><strong>VB example</strong></font></p>
+  <p>This snippet of code demonstrates how to read the VE table1 and constants 
+    from page 5 (tbl_idx=9) into an array. This is only the table and does not 
+    include the axis definition.</p>
+  <blockquote> 
+    <p> <font size="-1" face="Courier New, Courier, mono">Dim DataOut As Variant<br>
+      Dim byteArray(6) As Byte</font></p>
+    <p><font size="-1" face="Courier New, Courier, mono">' Send commands as array 
+      of bytes<br>
+      MSComm1.InputMode = comInputModeBinary</font></p>
+    <p> ReDim byteArray(2)<br>
+      ' Select a page<br>
+      byteArray(0) = Asc(&quot;r&quot;)<br>
+      byteArray(1) = 0<br>
+      byteArray(2) = 9<br>
+      <font size="-1" face="Courier New, Courier, mono">MSComm1</font>.Output 
+      = byteArray</p>
+    <p> delay 200<br>
+      <br>
+      ' Sent starting address (0)<br>
+      ReDim byteArray(3)<br>
+      byteArray(0) = 0<br>
+      byteArray(1) = 0</p>
+    <p> ' Send size (256 bytes)<br>
+      byteArray(2) = 1<br>
+      byteArray(3) = 0</p>
+    <p> ' Send the commands to get a page and return the variables<br>
+      <font size="-1" face="Courier New, Courier, mono">MSComm1</font>.Output 
+      = byteArray<br>
+      <br>
+      ' wait 200msec<br>
+      delay 200</p>
+    <p> ' grab data from comm port.<br>
+      DataIn = <font size="-1" face="Courier New, Courier, mono">MSComm1</font>.Input<br>
+    </p>
+    </blockquote>
+  <h3><font color="#0000FF">&quot;t&quot; Command<a name="t_cmd"></a></font></h3>
+  <p>&quot;t&quot;, 0, &lt;tble_idx&gt; &lt;data array&gt; <br>
+    '116 0 3' delay 50ms &lt;table data&gt; Example for re-flashing <br>
+    For changing calibration data in MS2. Use for re-flashing new coolant, MAT, 
+    Ego, and MAF tables. These tables are all 1024 word (2 bytes) tables. The 
+    't' command is followed by &lt;tble_idx&gt; of &nbsp;0-3, to identify the 
+    table of interest. At that point the MS II erases the table flash sector entirely 
+    (that is why you do NOT want to be driving while this is going on). So you 
+    want to delay about 50 ms before sending the the rest of the data, which consists 
+    of the table words. These are sent in order of ascending index, msb byte first, 
+    then lsb byte for each of the 1024 16-bit words. <br>
+    <font color="#0000FF"><br>
+    </font> </p>
+  <h3><font color="#0000FF">&quot;w&quot; Command<a name="w_cmd"></a></font></h3>
+  <p>&quot;w&quot;,0,&lt;tble_idx&gt;&lt;offset_H&gt;,&lt;offset_L&gt;,&lt;numb_points_H&gt;&lt;numb_points_L&gt; 
+    &lt;data array &gt; <br>
+    '119 0 4 0 20 0 2 0 250' example of sending cranking rpm of 250<br>
+    The 'w' command is the reverse of the 'r' command - it writes to MS2. The 
+    format of the command is identical to 'r', except send 'w' and follow the 
+    seventh byte with the nbytes of data to be written to MS II ram. </p>
+  <p>There will, of course, be timing issues for writing some tables, as you are 
+    writing to flash instead of RAM, and the serial line may be quite a bit faster 
+    than the device, hence buffer overflow will occur.<br>
+    <br>
+    &nbsp; <a href="#cmds">Back to Commands</a></p>
+  <p>&nbsp;</p>
+  <h3><font color="#0000FF">&quot;y&quot; Command<a name="y_cmd"></a></font></h3>
+  <p>&quot;y&quot;, 0, &lt;tble_idx&gt;&nbsp;&nbsp;<br>
+    '121 0 5' <br>
+    Used to verify that input data in a ram block matches the corresponding flash 
+    block. This is typically used after a flash burn command to verify the data 
+    were correctly burned. MS II sends back a 2 byte word, lsb first, that holds 
+    the number of times a ram and flash byte pair failed to match. So if it returns 
+    a zero, all is good. <br>
+    &nbsp; </p>
+  <h3 align=left> <a name="Acmd"></a><font color="#0000FF">&quot;A&quot; command</font></h3>
+  <p align=left>&quot;A&quot; (65) - MS2 returns an array of bytes from the <em>outpc</em> 
+    array in MS2. For this command the data is buffered as it is sent so it is 
+    not changed between bytes during the time of transmission. use this command 
+    to retrieve real time variables from MS2.</p>
+  <p align=left> The &quot;A&quot; command will return the real time variables 
+    as an array of 152 bytes ( this may change with future revisions). Each byte 
+    or multiple bytes represents a variable in MS2. The variable names and properties 
+    for each byte are described in the msn-extra.ini file shipped with each version 
+    of MS2/Extra. This <a href="RS232_RTvar.htm">table</a> is a summary of the 
+    MS2/Extra variable description. </p>
+  <p>The data returned is 'raw' data as stored in MS2/Extra. To obtain maximum 
+    resolution and at the same time use as little as possible memory space the 
+    variables are scaled to best fit into the available memory. This means that 
+    some variables will not be recognizable until they are scaled to some user 
+    readable form. The scaling is documented in the file <strong>megaquirt-ii.ini 
+    </strong>file and the <a href="RS232_RTvar.htm">table</a>.</p>
+  <p>As an example lets assume we have send the string &quot;A&quot; and received 
+    an array. We want to know the Air Fuel Ratio. To get the scaling we have to 
+    use the file <strong>megaquirt-ii.ini </strong>&nbsp;Open megaquirt-ii.ini<strong> 
+    </strong> (found along with the firmware) and search for afr1 after the line 
+    [BurstMode] </p>
+  <p>afr1 = scalar, S16, 28, &quot;AFR&quot;, 0.100, 0.0</p>
+  <p>The AFR value is a signed 16 bit variable made up of the 28th and 29th byte 
+    of the returned array. To calculate the AFR&nbsp;use the last two fields<strong> 
+    AFR = (afr1 +0.0) * 0.1</strong> or stated differently; the AFR stored in 
+    MS2/Extra is ten times the actual AFR. This data is also recorded in this 
+    <a href="RS232_RTvar.htm">table</a>.</p>
+  <p><strong>VB 6.0 example:</strong></p>
+  <p><font size="-1" face="Courier New, Courier, mono"> &nbsp;&nbsp;&nbsp;Dim 
+    Data As Variant<br>
+    <br>
+    &nbsp;&nbsp;&nbsp;' Send command to MS as text<br>
+    &nbsp;&nbsp;&nbsp;MSComm1.InputMode = comInputModeBinary <br>
+    </font><font size="-1" face="Courier New, Courier, mono">&nbsp;&nbsp;&nbsp;' 
+    Send the commands to get a page<br>
+    &nbsp;&nbsp;&nbsp;MSComm1.Output = &quot;A&quot;</font></p>
+  <p><font size="-1" face="Courier New, Courier, mono"> &nbsp;&nbsp;&nbsp;' wait 
+    200 ms &nbsp;&nbsp;&nbsp;delay 200<br>
+    </font><font size="-1" face="Courier New, Courier, mono">&nbsp;&nbsp;&nbsp;Data 
+    = MSComm1.Input ' grab data from comm port.</font></p>
+  <p><a href="#cmds">Back to Commands</a></p>
+  <p>&nbsp;</p>
+  <h3><font color="#0000FF"><a name="Ccmd"></a>&quot;c&quot; command</font></h3>
+  <p>Returns the high byte of the variable seconds. Used to confirm RS232 connection. 
+    Read the value like this in VB</p>
+  <blockquote> 
+    <p><font size="-1" face="Courier New, Courier, mono">Dim DataIn As Variant 
+      <br>
+      With MSComm1<br>
+      &nbsp;&nbsp;&nbsp;&nbsp;.InputMode = comInputModeBinary <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;.Output = &quot;c&quot; <br>
+      &nbsp;&nbsp;&nbsp;&nbsp;DataIn = .Input <br>
+      End With</font></p>
+  </blockquote>
+  <p>&nbsp;</p>
+  <h3><font color="#0000FF"><a name="Scmd"></a>&quot;Q&quot; &amp; &quot;S&quot; 
+    command</font></h3>
+  <p>The 'Q' and 'S' commands (both caps) are used to retrieve two indicators 
+    of the MS II code version. &quot;Q&quot; is the 20-byte ascii string for the 
+    revision number of the code version. The revision is changed in the code whenever 
+    there has been an input parameter or output variable added. &quot;S&quot; 
+    is for a 32-byte Signature string. The Signature string is changed in the 
+    code whenever a new feature is added . Read version as <a href="#simple_vb">shown 
+    above in VB</a><br>
+  </p>
+  <h3><font color="#0000FF">&quot; ! &quot; Commands<a name="EX_cmd" id="EX_cmd"></a></font></h3>
+  <p>Re-initialization, reboot and code reloading commands, all start with <strong>'!'</strong>. 
+    The complete commands are: </p>
+  <p><strong>&quot;!x&quot;</strong> causes MS II to re-initialize various program 
+    values, for example the ncylinder-dependent coefficient for computing RPM, 
+    to be re-calculated. It should be used only when the following specific variables 
+    are changed: </p>
+  <ul>
+    <li>spark polarity</li>
+    <li> tach input polarity</li>
+    <li> ignition options. including dual spark options</li>
+    <li> warmup enrichment parameters or tables</li>
+    <li> baud rate </li>
+    <li>can_id </li>
+  </ul>
+  <p><strong>&quot;!!x&quot;&nbsp;&nbsp;&nbsp;</strong>If rpm &lt; crank_rpm, 
+    this causes the program to reboot itself and start running. </p>
+  <p><strong>&quot;!!!&quot;</strong> &nbsp;If rpm &lt; crank_rpm, this is the 
+    same as reboot, except the program comes up ready to load a new code version.</p>
+  <p><a href="#cmds">Back to Commands</a></p>
+  <h3>&nbsp;</h3>
+</BLOCKQUOTE>
+</BODY></HTML>

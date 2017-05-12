@@ -1,0 +1,13 @@
+Adler_test_file
+Changes
+lib/Digest/XSAdler32.pm
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Digest-XSAdler32.t
+XSAdler32.bs
+XSAdler32.c
+XSAdler32.o
+XSAdler32.xs
+META.yml                                 Module meta-data (added by MakeMaker)

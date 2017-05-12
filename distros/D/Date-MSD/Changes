@@ -1,0 +1,65 @@
+version 0.004; 2012-02-05
+
+  * introduce new conversion functions *_to_*nn and *_to_*nf, which
+    do the job of *_to_*n but without the annoying context-sensitive
+    output convention
+
+  * reword the documentation of all the conversion functions
+
+  * in documentation, elaborate slightly on the quantity naming pattern
+
+  * skip Math::BigRat tests if Math::BigRat is of a version that doesn't
+    work adequately
+
+  * remove an unused variable from the code
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.003; 2010-07-29
+
+  * use simpler "parent" pragma in place of "base"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-03-22
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * include "distribution_type" entry in META.yml to satisfy CPANTS
+
+  * in documentation, separate "license" section from "copyright" section
+
+  * use full stricture in Build.PL
+
+  * remove from .cvsignore items that don't occur with Module::Build
+
+version 0.001; 2007-09-08
+
+  * bugfix: in initialisation, override any ambient $SIG{__DIE__}
+    handler when using eval { }
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * express relationship with versions of Math::BigRat as a conflict
+    rather than a dependency
+
+  * include signature in distribution
+
+version 0.000; 2007-02-17
+
+  * initial released version

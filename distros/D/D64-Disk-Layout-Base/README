@@ -1,0 +1,22 @@
+D64::Disk::Layout::Base 0.01
+============================
+
+D64::Disk::Layout::Base provides a base class for designing physical layouts of
+various Commodore disk image formats, represented by data that can be allocated
+into tracks and sectors.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright 2011 by Pawel Krol <pawelkrol@cpan.org>.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

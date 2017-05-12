@@ -1,0 +1,323 @@
+Data::UNLreport version 1.05
+======================
+Author: Jacob Salomon
+        jakesalomon@yahoo.com
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   [sudo] make install  # This part may require root privilige
+
+DEPENDENCIES
+
+This module has no dependencies
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011 by Jacob Salomon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
++-------------------------------------------------------------------------
+
+Motivation and Origins:
+----------------------
+Historically, this module started life as a thin wrapping of shell (ksh)
+around an AWK script.  The purpose of the original script and the new
+one are explained in the next section, "Target Audience".
+
+Target Audience:
+---------------
+The original beautify-unl.sh and the new pl/pm files are primarily for
+Informix users who frequently use the UNLOAD command from within
+dbaccess or isql, or the dbexport command at the shell level.  These
+commands generate flat files with the column data separated (delimited)
+by a single character.  Although the user can specify this delimiter -
+it is an option to both of these commands - the default delimiter is the
+vertical bar (AKA "pipe", '|').
+
+The Problem:
+-----------
+In the process of debugging many programs, we frequently unload the
+results of a query to a flat file in order to examine the data by eye.
+This is a daunting task simply by virtue (vice? ;-) of the width of each
+line. If this is not enough to discourage you, try navigating down the
+uneven columns in the .unl output.  Here is a cut-out box from one such
+.unl file:
+
+1|F96|305|||R|05/31/96|1161|235||0.0|L|M|O|BF|Z|C|P|M|002045|06/05/96|
+1|F96|305|||L|05/31/96|189|235||0.0|L|M|O|BF|Z|C|P|M|002045|06/05/96|
+1|F96|305|||L|06/30/96|180|235||0.0|L|M|O|BF|Z|C|P|M|002045|07/15/96|
+1|F96|305|||R|06/30/96|1020|235||0.0|L|M|O|BF|Z|C|P|M|002045|07/15/96|
+1|F96|041|||R|06/30/96|1232|235||0.0|L|M|O|BF|Z|C|P|M|002045|07/15/96|
+1|F96|041|||L|06/30/96|218|235||0.0|L|M|O|BF|Z|C|P|M|002045|07/15/96|
+1|F96|010|||R|07/30/96|1125|235||33.29|L|M|O|BF|Z|C|P|M|002045|07/30/|
+1|F96|010|||L|07/30/96|125|235||33.29|L|M|O|BF|Z|C|P|M|002045|07/30/9|
+1|F96|041|||R|07/30/96|1275|235||33.29|L|M|O|BF|Z|C|P|M|002045|07/30/|
+1|F96|305|||L|05/31/96|301|235||0.0|L|M|O|BF|Z|C|B|M|002046|06/25/96|
+
+This one is not all that bad - the uneven columns start later.  Still,
+not a pretty sight, is it?  Now imagine trying to follow all that if
+the column of 235 varied between 1 and 10,000,000, plus a few other
+wild column-width variations. It would be so much more readable if only
+the columns were aligned.
+
+The Original Solution: beautify-unl.sh
+--------------------------------------
+The shell-script beautify-unl.sh, originally written in 1998, does 
+exactly this.  Historical information about that can be obtained by
+downloading that script from the IIUG repository.  And it still works
+well.  It scans down the lines, noting the greatest width of each column
+in the .unl output and then prints it out again, giving each column the
+greatest width it had needed in the original unl file.  This gives the
+result the appearance of neat columns, like the following:
+
+1|F96|305| ||R |05/31/96|1161|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|305| ||L |05/31/96| 189|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|305| ||L |06/30/96| 180|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|305| ||R |06/30/96|1020|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|041| ||R |06/30/96|1232|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|041| ||L |06/30/96| 218|235|| 0.00|L|M|O |BF|Z|C|P |M |
+1|F96|010| ||R |07/30/96|1125|235||33.29|L|M|O |BF|Z|C|P |M |
+1|F96|010| ||L |07/30/96| 125|235||33.29|L|M|O |BF|Z|C|P |M |
+1|F96|041| ||R |07/30/96|1275|235||33.29|L|M|O |BF|Z|C|P |M |
+1|F96|305| ||R |07/30/96|2508|235||33.29|L|M|O |BF|Z|C|P |M |
+
+(Note - in this case, the lines were truncated to fit into a 72-column
+line.)
+
+The lines may still be ugly and long but at least you can trace the
+value of a column down a straight path instead of snaking your way down
+the page.
+
+Note one more nicety: Numeric values are right-justified in their
+columns while non-numeric values are left justified.  (Alignment by the
+decimal point was later implemented.) 
+
+For more information about how to invoke beautify-unl.sh, please
+download beautify-unl.shar from the IIUG software library.
+
+While this does a nice job, it is limited to reading a file and beauti-
+fying it for output.  If one wants to use it as part of an application,
+the app must first produce the "unload" file (henceforth to be called
+the UNL) and pipe it to the script.  What if I wish to fetch data
+(using the DBI/DBD modules) and have it thus formatted?  With the
+original shell script, I was out of luck. (Well, some contortions were
+possible but let's not get into that.)
+
+The New Solution: beautify-unl.pl and Package UNLreport.pm
+--------------------------------------------------------------
+Most shell scripts that I subsequently wrote piped their output to
+beautify-unl.sh as their last step, as described above.  Since I plan to
+rewrite most of them in Perl for better performance, I wanted them to
+also handle their own output rather than pipe to another program.  A
+Perl class would do the job very well.  More on the class requirements
+later.  Note that beautify-unl.pl in combination with the UNLreport
+module still performs the same function as the original shell script.
+But with the module, it is now possible to run queries that fetch
+a row of data into an array and pass that array to a UBLreport
+object.
+
+Best of all, the module is completely divorced from the database.  If
+your Perl application fetches Sybase and Oracle data rows together, or
+generates the rows by its own means, each row can be passed to the same
+object.  It does, of course, require that the user set certain
+parameters and settings.  In short, this is now a simple report writer.
+
+Instructions on how to use the module itself are given in the POD.  To
+view these once you have installed UNLreport.pm in your library
+directory, simply type (at the shell prompt):
+$ perldoc UNLreport
+
+Planned additions to module UNLreport.pm:
+--------------------------------------------
+Since the beautifier is intended as a simple report writer, it would
+seem appropriate to add the following features thereto, as time
+permits:
+o Specifying the Output File: Currently, the UNLreport writes all
+  to STDOUT.  This means if you wish to generate two separate reports
+  in one pass through the data, you are out of luck.  This was an over-
+  sight and is expected to be corrected shortly.  In the meantime,
+  if you require only one report per pass, it is perfectly usable as
+  is.
+o Even and odd page headers and trailers, including page number. (Page
+  N of M may not be possible at this point.)
+o Column Headers and Footers: An array sent to the report object
+  that, when the output is printed, will appear atop (and abottom) each
+  column.  Actually, a set of arrays, in case the desired column heading
+  consists of multiple lines.  Similarly, column footers. (Some of you
+  may remember the trigonometric tables with columns footers.  But that
+  dates us.. ;-)
+o Page line limits: Related to the above item, a line count per-page
+  before outputting a form-feed and another copy of the column/page
+  headers/trailers.
+o Column Wrapping: Allow the user to specify the maximum width for a
+  column.  If the data is wider than that maximum, it will either
+  truncate or wrap within that column, within a new line whose columns
+  are all empty. (Except for the continuation data of other wrapped
+  columns.)
+o Aggregate functions: Any respectable report generator included func-
+  tions such as sum, average, standard deviation etc.  This needs to be
+  thought out because we have not determined how these aggregates are
+  to be displayed: In the column (as in a spreadsheet) or in a formatted
+  string (as in a 4GL report).
+
+o Group Aggregates: If the data being sent to the UNLreport object
+  is already sorted (and I don't wish to wade into that wheel factory)
+  then it is reasonable to want to calculate those same aggregates for
+  groups of data with a column value in common.
+
+User Guide to beautify-unl.pl:
+-----------------------------
+To invoke beautify-unl.pl simply type the command and specify a .unl
+file and the character used at the delimiter:
+$ beautify-unl.pl [-d input delimiter] [-D output delimiter] [yutz.unl] 
+
+As you can see, all options are, well, optional
+o Omit the input delimiter and it will default to the '|' pipe, the
+  Informix default for unloads.
+o Unload the output delimiter and it will default to the input
+  delimiter.
+o If you omit a file, it will default to stdin.
+
+As with the shell script, beautify-unl.pl is a filter; it sends its
+data out stdout.
+
+Note that some delimiters need to be escaped for the sake of the shell.
+FOr example, if you wished to specify the pipe character, you would
+need to run the command as:
+$ beautify-unl.pl -d'|'  # or -d \|
+to prevent the shell from invoking the pipe mechanism.
+
+The <space> character as a delimiter:
+=====================================
+
+Many files - like the output of the [Informix] onstat commands - are
+space delimited.  This poses a nasty problem:
+How do I tell beautify-unl.sh that the delimiter is a blank?  With a
+'-d ' parameter?   This is doable but awkward; it's too easy to forget
+the quote marks and some shell implementations of the are too brain-
+damaged to correctly recognize this.
+
+Solution: Specify the blank parameter as -db
+e.g.: onstat -d|beautify-unl.pl -db
+
+One caveat with this parameter: If the delimiter is the [default] pipe
+symbol or a comma, then a pair of successive delimiters are interpreted
+as separating null column values. If the delimiter is a space then
+successive spaces will be folded by the package and treated as one
+delimiter.  Fortunately, this is normally what we humans expect with
+blank delimiters.
+
+Delimiters Within Columns:
+==========================
+
+While not desirable, it is sometimes unavoidable: The data in a column 
+contains the delimiter. e.g. address="333 Pickle Street|Yechupetz".
+When such data is unloaded, the unl file will present it as:
+    ..|333 Pickle Street\|Yechupetz|..
+
+This escape is recognized by the load command and the dbload utility.
+However, Perl is not that clever - it will automatically separate this
+into two fields: "333 Pickle Street\" and "Yechupetz". (It may also be
+argued that I was not clever enough to come up with a pattern to
+recognize this.  I won't disagree.)  To compensate for this, the
+package checks for a backslash at the end of every field and reunites
+the separated data.
+
+Note that I have not tested the escape-handling code for the blank
+delimiter.
+
+Planned Features for beautify-unl.pl:
+------------------------------------
+It would seem reasonable to try to take advantage of the newer features
+of the module as they are implemented.
+
+o Column Headers and Lines Per Page
+  ---------------------------------
+  One plan on the back burner is an option to designate the first N
+  lines of the input file as column headers, to be repeated at the top
+  of every page.  (i.e. -r55) In that case, an arbitrary page size of
+  56 rows would be set.  But once I include that, it demands I allow a
+  parameter for the line count of a page so that you might specify -l
+  40 if you plan to send the output to a landscape printer.
+
+o Limiting Column Width
+  ---------------------
+  Another feature I'd like to see solves a problem I had with my script
+  fragments.sh:  The fragmentation expression was very long; I would
+  rather have displayed it as a column 40 bytes wide and have it break
+  in the same column over multiple rows.  And since I may wish to do
+  this on several columns, I would need to modify the way I parse the
+  command line options, since I would have to allow the same option to
+  be reused.  For example, if I wished to limit column 3 to 20
+  characters and column 6 to 38 characters, the user would specify:
+  -w3,20 -w6,38
+  in the command line.
+
+  Of course, such output would be entirely unfit for loading into a
+  database.  But it would fit on a sheet and be more readable.
+
+  This issue also has a comment in the POD for UNLreport.pm
+
+Possible bug:
+=============
+
+As I write this, I realize that I have omitted a possible error in the
+output:
+
+Suppose I allow for the | input delimiter but specify comma for the
+output delimiter. Now suppose a column contains a comma already e.g. a
+complete address.  The result would have a delimiter embedded within
+the column. I have made no provision to escape the embedded delimiter.
+Hence, if the output file is subsequently used to load another table,
+it would have the incorrect number of columns.
+
+Truth be known, it's not totally straightforward; what if it is already
+escaped? By adding another escape, I have effectively un-escaped the
+delimiter by escaping the escape.
+
+Perl Issues
+===========
+
+Although written as a set of related Perl classes, any Perl guru
+eyeballing my code would recognize that it comes from the fingers of a
+C programmer.  Sorry about that and I am working on the expertise.
+However there was one problem I was unable to overcome: As originally
+conceived, the module contains two packages and a set of utility
+functions.  (The user addresses only the UNLreport methods.) I was
+unable to correctly export the utility function names to the name-spaces
+of the object methods.  Instead, I placed the utility functions into a
+package called UNLreport::_util, create an empty object of this type and
+invoke the utility functions as object->function(parameters).
+
+Another issue is the help page.  To get some brief help text on the use
+of beautify-unl.pl, type:
+    $ beautify-unl.pl -h
+
+There is a fairly wordy pod for the UNLreport package. To view
+that (once you have the .pm in your INC path or current directory),
+type:
+    $ perldoc UNLreport
+
+--------------------------------------------------------------------------
+Bug Fixes:
+1.03 -> 1.05:
+    (Note: Skipped 1.04 due to a failed upload of 1.04, but CPAN would
+	not let me try again with that number.)
+1.  If a columns contains both numeric and character data, the data
+    column is printed at the maximume character width, even if some
+    decimal data in the same column is wider.
+2.  A duplicated typo in some patterns had the ^ (for start of string)
+    after the optional sign for decimal and integer patterns.  Thanks
+    to John Altom at Telcordia for pointing this out to me.
+3.  1.03 had failed to account for numeric data with a + sign; it was being
+    treated like strings.  It is now recognized as part of the numeric
+    pattern, although the + sign will not be counted into the columns width.
+========================================================================

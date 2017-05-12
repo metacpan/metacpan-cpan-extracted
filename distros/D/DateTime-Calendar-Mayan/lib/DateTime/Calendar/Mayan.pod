@@ -1,0 +1,259 @@
+=head1 NAME
+
+DateTime::Calendar::Mayan - The Mayan Long Count, Haab, and Tzolkin calendars
+
+=head1 SYNOPSIS
+ 
+   use DateTime::Calendar::Mayan
+
+   my $dtcm = DateTime::Calendar::Mayan->new(
+        baktun  => 12,
+        katun   => 19,
+        tun     => 10,
+        uinal   => 2,
+        kin     => 8,
+        # alternate epoch
+        epoch   => DateTime->new(
+                year    => -3113,
+                month   => 8,
+                day     => 13,
+            ),
+    );
+
+   print $dtcm->date; 
+   # prints 12.19.10.2.8
+   print $dtcm->haab; 
+   # prints 3 Uayeb
+   print $dtcm->tzolkin; 
+   # prints 3 Oc
+
+=head1 DESCRIPTION
+
+An implementation of the Mayan Long Count, Haab, and Tzolkin calendars as
+defined in "Calendrical Calculations The Millennium Edition".  Supplemented
+by "Frequently Asked Questions about Calendars".
+
+=head1 METHODS
+
+=over 4
+
+=item * new( baktun => $scalar, ..., epoch => $object ) 
+
+Accepts a hash representing a date on the Long Count calendar
+and a "DateTime::Calendar" object specifying an alternate epoch.
+All keys are optional.
+
+
+   The units are:
+   kin   = 1 day
+   uinal = 20 days
+   tun   = 360 days
+   katun = 7200 days
+   baktun = 144000 days
+
+In the future pictuns, calabtuns, kinchiltuns, and alautuns may be accepted.
+
+=item * now
+
+Alternate constructor.  Uses DateTime->now to set the current date.
+
+=item * today
+
+Alternate constructor.  Uses DateTime->today to set the current date.
+
+=item * clone
+
+This object method returns a replica of the given object.
+
+=item * from_object( object => $object )
+
+Accepts a "DateTime::Calendar" object.  Although this calendar doesn't support
+time it will preserve the time value of objects passed to it.  This prevents a
+loss of precision when chaining calendars.
+
+Note: Language support is not implemented.
+
+=item * utc_rd_values
+
+Returns the current UTC Rata Die days, UTC Rata Die seconds, and nanoseconds
+as a three element list. 
+
+=item * from_epoch( epoch => $scalar )
+
+Creates a new object from a number of seconds relative to midnight 1970-01-01.
+
+=item * epoch
+
+Returns the number of seconds since midnight 1970-01-01.
+
+=item * set_mayan_epoch( object => $object )
+
+Accepts a "DateTime::Calendar" object.  The epoch is set to this value
+on a per object basis
+
+The default epoch is:
+
+Goodman-Martinez-Thompson
+   Aug. 11, -3113 / Sep. 6, 3114 B.C.E. / 584,283 JD
+
+=item * mayan_epoch
+
+Returns a "DateTime::Calendar::Mayan" object set to the current Mayan epoch.
+
+=item * date
+
+=item * bktuk
+
+=item * long_count( $scalar )
+
+Returns the Long Count calendar date.  Think DateTime::ymd.  Like ymd this
+method also accepts an optional field separator string.
+
+=item * haab( $scalar )
+
+Returns the Haab calendar date.  Accepts an optional field separator string.
+
+=item * tzolkin( $scalar )
+
+Returns the Tzolkin calendar date.  Accepts an optional field separator string.
+
+=item * baktun
+
+=item * katun
+
+=item * tun
+
+=item * uinal
+
+=item * kin( $scalar )
+
+Gets/Sets the long count value of the function name.
+
+=item * set_baktun
+
+=item * set_katun
+
+=item * set_tun
+
+=item * set_uinal
+
+=item * set_kin( $scalar )
+
+Aliases to the combined accessor/mutators.
+
+=item * set( baktun => $scalar, ... )
+
+Accepts a hash specifying new long count values.  All units are optional.
+
+=item * add
+
+=item * subtract( baktun => $scalar, ... )
+
+Accepts a hash specifying values to add or subject from the long count.
+All units are optional.
+
+=item * add_duration
+
+=item * subtract_duration( $object )
+
+Accepts a "DateTime::Duration" object and either adds or subtracts it from the
+current date.   See the DateTime::Duration docs for more details.  
+
+=back
+
+=head1 BACKGROUND
+
+Please see:
+
+Chapter 10 of Calendarical Calculations "The Millennium Edition".
+
+and
+
+Chapter 7 of Frequently Asked Questions about Calendars.
+   http://www.tondering.dk/claus/cal/node8.html
+
+=head1 GOTCHAS
+
+The Long Count calendar is cyclical and it is possible to have different dates
+in other calendars that convert to be the same Long Count date.  Under this
+calendar the dates 0.0.0.0.0 and 13.0.0.0.0 are equivalent.
+
+The Long Count calendar will next roll over in late 2012 (Gregorian).  In
+anticipation of this Long Count dates input as 0-12.*.*.*.* will convert to
+Gregorian dates in the Mayan year that started in -3113 (Gregorian).  Long
+Count dates input as 13.*.*.*.* will convert to Gregorian dates in the Mayan
+year that start in 2012 (Gregorian).
+
+Example:
+
+   use DateTime;
+   use DateTime::Calendar::Mayan;
+
+   my $dtcm = DateTime::Calendar::Mayan->new( baktun => 0 );
+   print $dtcm->date, "\n";
+   print DateTime->from_object( object => $dtcm )->ymd, "\n";
+
+   $dtcm->set( baktun => 13);
+   print $dtcm->date, "\n";
+   print DateTime->from_object( object => $dtcm )->ymd, "\n";
+
+Will print:
+
+   13.0.0.0.0
+   -3113-08-11
+   13.0.0.0.0
+   2012-12-21
+
+As you can see the Long Count dates are identical but the Gregorian equivalent
+dates are different.
+
+Support for a count of Mayan "years" or "cycles" allowing accurate conversion
+to/from Gregorian dates may be added to this module in the future.  This would
+be an extension to the historical Long Count calendar.
+
+=head1 CREDITS
+
+Dave Rolsky (DROLSKY) for the DateTime project and carrying
+us this far.
+
+Eugene van der Pijll (PIJLL) for DateTime::Calendar::Julian
+which I looked at more then once.
+
+Calendrical Calculations
+"The Millennium Edition"
+By Edward M. Reingold & Nachum Dershowitz.
+(ISBN 0-521-77752-6 paperback)
+   http://www.calendarists.com
+
+Abigail (ABIGAIL) for Date::Maya from which I confirmed the algorithm
+for Mayan years.
+
+"Frequently Asked Questions about Calendars" by
+Claus TE<248>ndering.
+   http://www.tondering.dk/claus/calendar.html
+
+=head1 SUPPORT
+
+Support for this module is provided via the datetime@perl.org email
+list. See http://lists.perl.org/ for more details.
+
+=head1 AUTHOR
+
+Joshua Hoblitt <jhoblitt@cpan.org>
+
+=head1 COPYRIGHT
+ 
+Copyright (c) 2003 Joshua Hoblitt.  All rights reserved.  This program
+is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included
+with this module.
+
+=head1 SEE ALSO
+
+datetime@perl.org mailing list
+
+http://datetime.perl.org/
+
+=cut

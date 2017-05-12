@@ -1,0 +1,199 @@
+NAME
+    Data::PrintUtils - A Collection of Pretty Print routines like
+    Data::Dumper
+
+VERSION
+    Version 0.11
+
+SYNOPSIS
+    Provides a collection of pretty print routines
+
+PURPOSE
+    This module is meant to provide some Data::Dumper like print routines
+    tailored to DBI style tables and hashes along with some debug options
+
+EXPORT
+    print_pid say_pid formatList formatOneLineHash formatHash formatTable
+    pivotTable joinTable $USE_PIDS $USE_TIME
+
+SUBROUTINES/METHODS
+  print_pid
+    A replacement for print that will optionally prepend the processID and
+    the timestamp to a line
+
+    These two fields are turned off/on with the package variables:
+
+        $Data::PrintUtils::USE_PIDS = 1 or 0;
+        $Data::PrintUtils::USE_TIME = 1 or 0;
+
+  say_pid
+    A replacement for say that will optionally prepend the processID and the
+    timestamp to a line
+
+    These two fields are turned off/on with the package variables:
+
+        $Data::PrintUtils::USE_PIDS = 1 or 0;
+        $Data::PrintUtils::USE_TIME = 1 or 0;
+
+  formatList
+    Formats a list as a single line of comma seperated values in '(' ')'
+
+    An optional hash may be passed as the first argument to configure the
+    following:
+
+            LIST_START          => "(", # The String denoting the start of the list
+            LIST_END            => ")", # The String denoting the end of the list
+            ELEMENT_SEPARATOR   => ", ",  # The String seperating elements of the list
+
+    Note that these means that the unadorned list may not start with a hash
+    ref :(
+
+  formatOneLineHash
+    Formats a hash as a single line of => and comma separated values in '{'
+    '}'
+
+    The hash to be printed is passed as a reference in the first parameter
+    The rest of the arguments are parsed as options in
+    Getopt::CommandLineExports format:
+
+            PRIMARY_KEY_ORDER       => undef, # ordering for the has keys (undef means undefined perl ordering)
+            HASH_START              => "{",   # String denoting the start of the hash 
+            HASH_END                => "}",   # String denoting the end of the hash 
+            ELEMENT_SEPARATOR       => ", ",  # String seperating the key/value pairs of the hash 
+            KEY_VALUE_SEPARATOR     => " => ",# String seperating the keys and the values of the hash
+            UNDEF_VALUE             => "undef", # String to print if the  value of the hash is undefined or if the key does not exist, but does in the PRIMARY_KEY_ORDER
+            NOTEXIST_VALUE          => "notExist", # String to print if the key does not exist, but does in the PRIMARY_KEY_ORDER
+
+  formatHash
+    Formats a Hash with one level deep expansion Each key/value pair is a
+    single line that may be justified right or left for prettiness
+
+            KEY_JUSTIFCATION    => 'Right', # justifcation (Right or Left) for the key column
+            VALUE_JUSTIFICATION => 'Left', # justifcation (Right or Left)  for the Value column
+            MAX_KEY_WIDTH       => 10000, # maximum column width for the key column
+            MAX_VALUE_WIDTH     => 10000, # maximum column width for the Value column
+            PRIMARY_KEY_ORDER   => undef, # ordering for the hash keys (undef means undefined perl ordering)
+            SECONDARY_KEY_ORDER => undef, # ordering for the hash keys of any sub keys (undef means undefined perl ordering)
+            KEY_VALUE_SEPARATOR     => " => ",# String seperating the keys and the values of the hash
+            UNDEF_VALUE             => "undef", # String to print if the  value of the hash is undefined or if the key does not exist, but does in the PRIMARY_KEY_ORDER
+            NOTEXIST_VALUE          => "notExist", # String to print if the key does not exist, but does in the PRIMARY_KEY_ORDER
+
+  formatTable
+    Formats a table (given as an array of hash references (as returned from
+    DBI) ) into a somewhat pleasant display. With the Columns argument, you
+    can chose to only print a subset of the columns (and you can define the
+    column ordering).
+
+    ROWS
+        This is a reference to the table (which should be an array of hashes
+        refs)
+
+    COLUMNS
+        This is a list of columns (in order) to be displayed
+
+    UNDEF_VALUE
+        This is a string value to be displayed whenever an item is
+        "undefined"
+
+  pivotTable
+    pivots an attribute-value table (given as an array of hash references
+    (as returned from DBI) ) into a new table with a row for each unique
+    PIVOT_KEY and a column for each attribute
+
+    example:
+
+            my @table = 
+            (
+            {COL1 => 1, Name => 'PID',  VALUE => '1a', XTRA1 => '111'},
+            {COL1 => 1, Name => 'SID',  VALUE => 's1', XTRA1 => '112'},
+            {COL1 => 1, Name => 'XV1',  VALUE => 'YY', XTRA1 => '116'},
+            {COL1 => 1, Name => 'XV2',  VALUE => 'XX', XTRA1 => '117'},
+
+            {COL1 => 2, Name => 'PID',  VALUE => '2a', XTRA1 => '221'},
+            {COL1 => 2, Name => 'SID',  VALUE => 's2', XTRA1 => '222'},
+            {COL1 => 2, Name => 'XV2',  VALUE => 'XX2', XTRA1 => '224'},
+            );
+            my @newTable1 = pivotTable { ROWS => \@table, PIVOT_KEY => 'COL1', VALUE_HEADER_KEY=> 'Name', VALUE_KEY => 'VALUE'};
+            say formatTable { ROWS => \@newTable1, UNDEF_VALUE => 'NULL'} if @newTable1;
+
+    results in
+
+            COL1 PID SID  XV1 XV2
+            1  1a  s1   YY  XX
+            2  2a  s2 NULL XX2
+
+    example:
+
+            my @table = 
+            (
+            {COL1 => 1, Name => 'PID',  VALUE => '1a', XTRA1 => '111'},
+            {COL1 => 1, Name => 'SID',  VALUE => 's1', XTRA1 => '112'},
+            {COL1 => 1, Name => 'XV1',  VALUE => 'YY', XTRA1 => '116'},
+            {COL1 => 1, Name => 'XV1',  VALUE => 'ZZ', XTRA1 => '116'},
+            {COL1 => 1, Name => 'XV2',  VALUE => 'XX', XTRA1 => '117'},
+
+            {COL1 => 2, Name => 'PID',  VALUE => '2a', XTRA1 => '221'},
+            {COL1 => 2, Name => 'SID',  VALUE => 's2', XTRA1 => '222'},
+            {COL1 => 2, Name => 'XV2',  VALUE => 'XX2', XTRA1 => '224'},
+            );
+            my @newTable1 = pivotTable { ROWS => \@table, PIVOT_KEY => 'COL1', VALUE_HEADER_KEY=> 'Name', VALUE_KEY => 'VALUE', CONCAT_DUPLICATE => 1};
+            say formatTable { ROWS => \@newTable1, UNDEF_VALUE => 'NULL'} if @newTable1;
+
+    results in
+
+            COL1 PID SID  XV1      XV2
+            1  1a    s1   YY | ZZ  XX
+            2  2a    s2   NULL     XX2
+
+  joinTable
+    creates a new table that is either the simple equijoin of the left and
+    right table, or, if LEFT_JOIN_KEY_UNIQUE is set, then Joins the Right
+    Table to the Left Table (all rows of the left table are included)
+
+AUTHOR
+    Robert Haxton, "<robert.haxton at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-Data-printutils at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-PrintUtils>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::PrintUtils
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-PrintUtils>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-PrintUtils>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-PrintUtils>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-PrintUtils/>
+
+    *   Code Repository
+
+        <https://code.google.com/p/data-printutils/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2008-2011 Robert Haxton.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

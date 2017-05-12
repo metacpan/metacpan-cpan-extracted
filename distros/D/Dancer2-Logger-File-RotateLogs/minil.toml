@@ -1,0 +1,6 @@
+name = "Dancer2-Logger-File-RotateLogs"
+# badges = ["travis"]
+authority="cpan:MASAKYST"
+
+module_maker="ModuleBuildTiny"
+

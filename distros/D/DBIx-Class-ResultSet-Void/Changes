@@ -1,0 +1,17 @@
+Revision history for Perl extension DBIx-Class-ResultSet-Void
+
+0.06    2009.05.20
+        .t fixes
+
+0.05    2009.05.20
+        add C<exists>
+
+0.04    2009.05.11
+        Thank ribasushi to tell me C<count> is bad
+        pod fix
+
+0.02    2009.05.10
+        fix version
+
+0.01    2009.05.10
+        a start

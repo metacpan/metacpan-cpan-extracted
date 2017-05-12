@@ -1,0 +1,44 @@
+package Dist::Zilla::Plugin::RunByBranch;
+
+# ABSTRACT: Run external commands at specific phases of Dist::Zilla on regex'd Git branches
+
+use strict;
+use warnings;
+
+1;
+
+=head1 NAME
+
+Dist::Zilla::Plugin::RunByBranch - Run external commands at specific phases of Dist::Zilla on regex'd Git branches
+
+I am a very terrible programmer and user of words.
+
+=head1 SYNOPSIS
+
+  [RunByBranch::BeforeBuild]
+  run = ^dev script/clean_artifacts.pl %s
+  run = ^test script/prepare_tests.pl %n %v
+
+  [RunByBranch::BeforeRelease]
+  run = ^master$ script/myapp_deploy1.pl %s
+
+  [RunByBranch::AfterBuild]
+  run = ^dev script/myapp_after.pl %s %v
+  run_no_trial ^dev script/no_trial.pl
+  run = ^test(.*)/v1.[0-3]$ script/report_test_results.pl %s %v
+
+  [RunByBranch::Test]
+  run = ^feature/ script/report.pl
+
+=head1 DESCRIPTION
+
+This module aims to duplicate the interface of the fantasticly useful
+L<Dist::Zilla::Plugin::Run> by allowing the user to specify a regex that
+determines on which Git branch the command should be run.
+
+=head1 SEE ALSO
+
+L<Dist::Zilla::Plugin::Run>
+L<Dist::Zilla::Plugin::Git>
+
+=cut

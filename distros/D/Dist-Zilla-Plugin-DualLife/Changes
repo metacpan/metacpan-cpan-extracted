@@ -1,0 +1,41 @@
+Revision history for Dist-Zilla-Plugin-DualLife
+
+0.07      2016-08-14 00:19:09Z
+          - fix tests that break with older [MakeMaker] that did not create
+            Makefile.PL at file gathering time
+
+0.06      2016-08-10 20:47:46Z
+          - Makefile.PL is now processed at filemunging time, by inserting
+            content into pre-processed template: this allows other plugins to
+            see the full file content earlier, and properly respects the
+            purpose of each dzil phase.
+          - all modules in the distribution are now checked in
+            Module::CoreList, as they may have different entered_core versions
+            (e.g. autodie, Fatal)
+
+0.05      2015-08-03 02:46:08Z
+          - use Module::Metadata to extract the package name of the main
+            module, rather than deriving it from the distribution name
+          - bump prereq on Module::CoreList, to ensure it is new enough to be
+            aware of all relevant core releases
+          - fix checks for module not being dual-lifed at all
+          - configuration variables are now included in distribution metadata
+
+0.04      2014-11-02 19:42:43Z
+          - do nothing if the version the module entered core is late enough
+            that no special action is needed
+          - calculate 'entered_core' parameter from Module::CoreList, rather
+            than assuming 5.009005
+          - build fails if module is not dual-life at all
+
+0.03      2013-08-30 16:20:05Z
+          - Document entered_core (David Golden).
+          - Add support for distributions bundled with ExtUtils::MakeMaker
+            (David Golden).
+
+0.02      2013-07-10 13:37:01Z
+          - Make the version the module first entered the core configurable
+            (David Golden).
+
+0.01      2010-12-15 18:03:13Z
+          - Initial release.

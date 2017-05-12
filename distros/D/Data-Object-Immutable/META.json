@@ -1,0 +1,53 @@
+{
+   "abstract" : "Immutable Data Type Objects for Perl 5",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Object-Immutable",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object" : "0.57",
+            "Readonly" : "2.00",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Data-Object-Immutable/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Data-Object-Immutable/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Data-Object-Immutable.git",
+         "web" : "https://github.com/alnewkirk/Data-Object-Immutable"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:AWNCORP",
+   "x_contributors" : [
+      "Developer <dev@example.com>"
+   ]
+}
+

@@ -1,0 +1,12 @@
+Revision history for Data::DefGen
+
+1.001003  2015/04/20
+         - Made obj_cloner only effective per definition.
+         - Compatibility with older Perl versions.
+
+1.001002  2015/04/20
+         - Fix documentation for obj_cloner.
+
+1.001001  2015/04/19
+         - Initial revision.
+

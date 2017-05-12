@@ -1,0 +1,429 @@
+/*** main elements ***/
+
+body {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1.0em;
+    color: #000000;
+    background-color: #ffffff;
+}
+
+p {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1.0em;
+}
+
+code {
+    font-family: courier new, courier, monospace;
+}
+
+dl, ul, ol {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1.0em;
+}
+
+.pre-section {
+    font-family: courier new, courier, monospace;
+    font-size: 1.0em;
+    border-style: solid;
+    border-width: 0px 0px 0px 1px;
+    white-space: pre;
+    border-color: #004080; /* same color as quotation */
+    /* width: 100%;  might be needed for konqueror?*/
+}
+
+
+
+
+
+/*** headers ***/
+
+h1, h2, h3, h4 {
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #000000;
+    background-color: #ffffff;
+}
+h1 { font-size: 1.3em; }
+h2 { font-size: 1.2em; }
+h3 { font-size: 1.1em; }
+h4 { font-size: 1.0em; }
+
+
+
+
+
+/*** links ***/
+
+/* hidden links */
+h1 a:link,    h2 a:link,    h3 a:link,    h4 a:link, 
+h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited,
+h1 a:hover,   h2 a:hover,   h3 a:hover,   h4 a:hover  {
+    color: #000000;
+    text-decoration: none;
+}
+
+a.more {
+    font-size: 0.8em;
+    color: red;
+    text-decoration: none;
+}
+
+a.pdfsrc {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.9em;
+    font-weight: bold;
+    color: #525d76;
+}
+a.pdfsrc:link, 
+a.pdfsrc:visited, 
+a.pdfsrc:active {
+    text-decoration: none;
+}
+a.pdfsrc:hover {
+    text-decoration: underline;
+}
+
+ul.toc a {
+    text-decoration: none;
+}
+
+ul.toc a:hover {
+    text-decoration: underline;
+}
+
+
+
+
+div.nonselectedmenuitem a:link, 
+div.nonselectedmenuitem a:visited, 
+div.nonselectedmenuitem a:active {
+    color: #525d76;
+    text-decoration: none;
+}
+div.nonselectedmenuitem a:hover {  
+    text-decoration: underline; 
+}
+
+div.selectedmenuitem a, 
+div.selectedmenuitem a:link, 
+div.selectedmenuitem a:visited, 
+div.selectedmenuitem a:active {
+    color: #ffffff;
+    text-decoration: none;
+}
+div.selectedmenuitem a:hover { 
+    text-decoration: underline; 
+}
+
+div.menu-title a:link,
+div.menu-title a:visited, 
+div.menu-title a:active, 
+div.menu-title a:hover {
+    color: #000000;
+    text-decoration: none;
+}
+
+
+
+
+
+/*** main boxes ***/
+div.logobox {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    /* this border MUST be _0px_ for ns4 and others */
+    border: 0px;
+    border-style: none;
+    border-color: #000000;
+}
+
+div.leftbox {
+    position: absolute;
+    top: 55px;
+    left: 0px;
+    width: 174px;
+    /* this border MUST be _1px_ for ns4 */
+    border: 1px;
+    border-style: none;
+    border-color: #000000;
+}
+
+div.rightbox {
+    position: absolute;
+    top: 55px;
+    left: 190px;
+    padding: 0px;
+    padding-right: 10px;
+    /* this border MUST be _1px_ for ns4 */
+    border: 1px;
+    border-style: none;
+    border-color: #000000;
+}
+
+div.adtext {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 5px;
+}
+
+div.tail {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.85em;
+    border: 1px;
+    border-style: none;
+    border-color: #000000;
+    margin-right: 0px;
+    padding: 5px;
+}
+
+p.copyright {
+    font-size: 0.7em;
+}
+
+div.headline {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-weight: bold;
+    font-size: 1.3em;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 3px;
+    margin-right: 0px;
+}
+
+
+
+
+
+
+/*** breadcrumb ***/
+td.navbarglobal {
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #828da6;
+    font-size: 0.85em;
+}
+
+td.navbarglobal a:link, td.navbarglobal a:visited, td.navbarglobal a:active {
+    text-decoration: none;
+    color: #828da6;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+td.navbarglobal a:hover {
+    text-decoration: none;
+    color: #666666;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+
+
+
+
+
+
+
+/*** menu styles ***/
+
+/* light blue bg-color for menu-titles */
+td.menu-title-bg { 
+    background-color: #828da6; 
+}
+
+/* light gray/white bg-color for non-selected menu-items */
+td.non-sel-bg { 
+    background-color: #eeeeee; 
+}
+
+/* dark blue bg-color for selected menu-items */
+td.sel-bg {
+    background-color: #525d76;
+}
+
+div.nonselectedmenuitem {
+    padding: 3px;
+    background-color: #eeeeee;
+    font-size: 0.9em;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+div.selectedmenuitem {
+    padding: 3px;
+    background-color: #525d76;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.9em;
+}
+
+div.menu-title {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: #828da6;
+    text-align: center;
+    padding: 3px;
+    color: #000000;
+}
+
+
+/* dark blue border color for menu-boxes */
+td.menu-border { 
+    background-color: #525d76; 
+}
+
+
+/* Wrapped around each section of content */
+div.index-section {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1.0em;
+    color: #000000;
+}
+
+
+
+
+/*** swish-e search stuff ***/
+
+/* Wrapped around the entire search form in src/search/search.tt */
+div.search-form { 
+    font-size: 1.0em; 
+}
+
+/* List of site sections in search.tt */
+li.search-list {
+    list-style: none;
+}
+
+
+
+/* Search form styles */
+input {
+    font-size: 12px;
+}
+
+select {
+    font-size: 12px;
+}
+
+
+
+/* "Results for" line in search results search.tt */
+td.search-header {
+    background-color: #525d76;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #ffffff;
+    font-size: 0.9em;
+}
+
+/* Shows search time */
+td.search-times {
+    background-color: #525d76;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #ffffff;
+    font-size: 0.7em;
+}
+
+/* Prev|Next page in search results */
+td.search-nav {
+    background-color: #eeeeee;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #000000;
+    font-size: 0.8em;
+}
+
+
+/* title line for a search result */
+span.search-result-title {
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #000000;
+    font-size: 1.0em;
+}
+
+
+/* context in search result */
+div.search-summary {
+    font-size: 0.8em;
+}
+
+/* a search result's properties */
+div.search-props {
+    margin-top: 0.4em;
+    font-size: 0.80em;
+    color: #009999;
+}
+
+/* swish.cgi */
+span.searchhighlight { 
+    background-color: #ffff99;
+}
+
+
+/*** misc ***/
+
+/* general border-color for ad-images */
+.img-border {
+    color: #000000; 
+}
+
+/* dark-blue bg-color */
+td.blue-bg {
+    background-color: #525d76;
+}
+
+/* light gray/white bg-color for ad-sec */
+td.ad-bg { 
+    background-color: #eeeeee; 
+}
+
+/* lines for camel */
+td.camel-line-top {
+    background-color: #bfcfe7;
+}
+td.camel-line-bottom {
+    background-color: #525d76;
+}
+
+/* instead of using space.gif */
+.smallbr {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1px;
+    line-height: 1px;
+}
+
+.hr { 
+    height: 1px; 
+}
+
+/*** quotations, mainly for the first page ***/
+
+span.big-mod {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 2.0em;
+    font-weight: bold;
+    text-align: left;
+    float: left;
+}
+
+/* quotations, mainly for the first page */
+div.quotation {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.8em;
+    font-style: normal;
+    font-weight: bold;
+    text-align: justify;
+    padding-top: 10px;
+    padding-right: 40px;
+    padding-bottom: 10px;
+    padding-left: 40px;
+    margin-right: 20px;
+    margin-left: 20px;
+    border-width: 0;
+    border-style: solid;
+}
+
+/* Used to cite the author */
+div.quote-details {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-weight: normal;
+    font-size: 0.9em;
+    margin-top: 10px;
+    float: right;
+}

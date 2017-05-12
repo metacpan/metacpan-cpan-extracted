@@ -1,0 +1,222 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2009-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+
+require 5.010000;
+use Date::Manip::Date;
+use IO::File;
+use strict;
+use warnings;
+
+###############################################################################
+# HELP
+###############################################################################
+
+our($usage);
+my $COM = $0;
+$COM =~ s/^.*\///;
+
+$usage=
+  "usage: $COM OPTIONS
+      -h/--help        : Print help.
+
+      Options to tell which date to print (only one of
+      the following should be entered... if none are,
+      'now' is printed).
+
+      -d/--date=STRING : Print information about that date.
+      -f/--file=FILE   : Print out each date (1/line) in FILE
+      -r/--reference=FILE
+                       : Print out the last modification
+                         time of FILE
+
+      Other options
+
+      -R/--rfc-2822    : Print the date in RFC 2822 format
+                         (any +FORMAT string is ignored)
+                         Mon, 07 Aug 2006 12:34:56 -0600
+      -u/--utc/--universal:
+                         Converts date(s) to UT time.
+";
+
+=pod
+
+=head1 NAME
+
+dm_date - print out the system date and time
+
+=head1 SYNOPSIS
+
+This performs the same operation as the unix 'date' command, but using
+the Date::Manip module.
+
+   dm_date [OPTION]... [+FORMAT]
+
+=head1 DESCRIPTION
+
+This displays information about the current system time, or some
+other time. Options are:
+
+=over 4
+
+=item -h, --help
+
+Print online help.
+
+=item -d STRING, --date=STRING
+
+Display time described by STRING. STRING can be any string which can
+be parsed by Date::Manip.  Please refer to the Date::Manip::Date
+documentation for details.
+
+=item -f DATEFILE, --file=DATEFILE
+
+This reads each line in DATEFILE, and extracts a date from it and
+prints out the information.
+
+Blank lines and lines starting with a pound (#) are ignored. Lines
+not containing a valid date are also ignored.
+
+=item -r FILE, --reference=FILE
+
+Displays the last modification time of FILE.
+
+=item -R, --rfc-2822
+
+Displayc the date and time in RFC 2822 format.
+
+Example: Mon, 07 Aug 2006 12:34:56 -0600
+
+=item -u, --utc, --universal
+
+Converts the date to UT (GMT) and prints out the information.
+
+=back
+
+Only one of -d, -f, or -r should be included. If more than
+one is included, the first one from the list (-d, -f, -r)
+is used and any other is ignored.
+
+The format string starts with a plus (+) and contains any
+of the format directives described in Date::Manip::Date.
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the Date::Manip::Problems documentation for
+information on submitting bug reports or questions to the author.
+
+=head1 SEE ALSO
+
+Date::Manip::Date
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+our($date,$file,$ref,$rfc,$ut,$format);
+
+while ($_ = shift) {
+
+   (print $usage),   exit  if ($_ eq "-h"   ||  $_ eq "--help");
+
+   $date = shift,    next  if ($_ eq "-d"   ||  $_ eq "--date");
+   $date = $1,       next  if ($_ =~ /^\-\-date=(.*)/);
+
+   $file = shift,    next  if ($_ eq "-f"   ||  $_ eq "--file");
+   $file = $1,       next  if ($_ =~ /^\-\-file=(.*)/);
+
+   $ref = shift,     next  if ($_ eq "-r"   ||  $_ eq "--reference");
+   $ref = $1,        next  if ($_ =~ /^\-\-reference=(.*)/);
+
+   $rfc = 1,         next  if ($_ eq "-R"   ||  $_ eq "--rfc-2822");
+   $ut = 1,          next  if ($_ eq "-u"   ||  $_ eq "--utc"  ||  $_ eq "--universal");
+
+   $format = $_,     last  if ($_ =~ s/^\+//);
+   die $usage;
+}
+
+if ($rfc) {
+   $format ='%a, %d %b %Y %H:%M:%S %z';
+}
+
+if (@ARGV  ||  ! $format) {
+   die $usage;
+}
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+
+my $d = new Date::Manip::Date;
+
+if      ($date) {
+   my $err = $d->parse($date);
+   exit 1  if ($err);
+   $d->convert("GMT")  if ($ut);
+   print $d->printf($format),"\n";
+
+} elsif ($file) {
+   my $in = new IO::File;
+   $in->open($file)  ||  die "ERROR: unable to open date file: $file\n\n$usage";
+   my @in = <$in>;
+   $in->close();
+   chomp(@in);
+
+   foreach my $date (@in) {
+      $date =~ s/\#.*//;
+      $date =~ s/\s*$//;
+      next  if (! $date);
+
+      my $err = $d->parse($date);
+      next  if ($err);
+      $d->convert("GMT")  if ($ut);
+      print $d->printf($format),"\n";
+   }
+
+} elsif ($ref) {
+   if (-e $ref) {
+      my $date = ( stat($ref) )[9];
+      my $err = $d->parse("epoch $date");
+      exit  if ($err);
+      $d->convert("GMT")  if ($ut);
+      print $d->printf($format),"\n";
+   }
+
+} else {
+   my $err = $d->parse("now");
+   exit 1  if ($err);
+   $d->convert("GMT")  if ($ut);
+   print $d->printf($format),"\n";
+}
+
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

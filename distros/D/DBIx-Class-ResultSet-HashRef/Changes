@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-ResultSet-HashRef
+
+1.002  Sun Jun 14 2009
+       New method: hashref_pk
+       Calls hashref_array and returns a reference to a hash
+       containing the primary key (rbo)
+
+1.001  Fri Dec 05 2008
+       Changed tests to use SQLite in memory instead of temp file.
+
+1.000  Sat Jun 14 2008
+       Initial release.
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Simple benchmark for subs.'
+author:
+  - unknown
+build_requires:
+  Module::Build: '0.4'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.40'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-SimpleProfiler
+provides:
+  Devel::SimpleProfiler:
+    file: lib/Devel/SimpleProfiler.pm
+    version: '1.0'
+requires:
+  Aspect: '1.04'
+  perl: v5.12.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '1.0'

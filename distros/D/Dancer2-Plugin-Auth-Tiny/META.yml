@@ -1,0 +1,58 @@
+---
+abstract: 'Require logged-in user for specified routes'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  Dancer2: 0.154000
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0.19
+  HTTP::Cookies: 0
+  HTTP::Request: 0
+  HTTP::Request::Common: 0
+  Plack::Builder: 0
+  Plack::Request: 0
+  Plack::Test: 0
+  Test::More: 0.96
+  perl: 5.008001
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+  perl: 5.008001
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.142690'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer2-Plugin-Auth-Tiny
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::Auth::Tiny:
+    file: lib/Dancer2/Plugin/Auth/Tiny.pm
+    version: 0.008
+requires:
+  Carp: 0
+  Dancer2: 0.154000
+  Dancer2::Plugin: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny/issues
+  homepage: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny
+  repository: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Tiny.git
+version: 0.008
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Jason A. Crome <jason@crome-plated.com>'
+  - 'Jim Davis <revhippie@gmail.com>'
+  - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Peter Mottram <peter@sysnix.com>'

@@ -1,0 +1,65 @@
+NAME
+    dbmdeep - manage DBM::Deep databases via command line
+
+SYNOPSIS
+     Usage: dbmdeep [-ceiVhv] [<dbfile>]
+     Manage a DBM::Deep database. Options:
+ 
+       --config=<config>   | -c <config>    yaml config containing connect params
+       --export=<file>     | -e <file>      export db to <file>
+       --import=<file>     | -i <file>      import db from <file>
+       --verbose           | -V             enable debug output
+       --help              | -h             this help message
+       --version           | -v             print program version
+ 
+     If - is specified as <file>, STDIN or STDOUT is used respectively.
+     Interactive commands can be piped into dbmdeep as well, e.g.:
+     echo "drop users" | dbmdeep my.db.
+
+DESCRIPTION
+    dbmdeep is a command line utility which can be used to maintain
+    DBM::Deep databases. It is possible to view, modify or delete contents
+    of the database and you can export to a YAML file or import from one.
+
+    The utility presents an interactive prompt where you enter commands to
+    maintain the database, see section INTERACTIVE COMMANDS for more
+    details. Commands can also be piped into the tool via STDIN. Example:
+
+     dbmdeep my.db
+     my.db> show
+
+    is the same as:
+
+     echo "show" | dbmdeep my.db
+
+INSTALLATION
+
+	to install, type:
+	  perl Makefile.PL
+	  make
+	  make test
+	  make install
+
+	to read the complete documentation, type:
+	perldoc Data::Interactive::Inspect
+
+AUTHOR
+    T.v.Dein <tlinden@cpan.org>
+
+BUGS
+    Report bugs to
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBM::Deep::Manager
+
+SEE ALSO
+    DBM::Deep
+
+COPYRIGHT
+    Copyright (c) 2015 by T.v.Dein <tlinden@cpan.org>. All rights reserved.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+VERSION
+    This is the manual page for dbmdeep Version 0.01.
+

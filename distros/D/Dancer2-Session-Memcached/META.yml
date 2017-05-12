@@ -1,0 +1,50 @@
+---
+abstract: 'Dancer 2 session storage with Cache::Memcached'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dancer2: '0.15000'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.22'
+  HTTP::Cookies: '0'
+  HTTP::Date: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON: '0'
+  Plack::Test: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-Memcached
+provides:
+  Dancer2::Session::Memcached:
+    file: lib/Dancer2/Session/Memcached.pm
+    version: '0.005'
+requires:
+  Cache::Memcached: '0'
+  Dancer2: '0.15000'
+  Dancer2::Core::Role::SessionFactory: '0'
+  Moo: '0'
+  Type::Tiny: '0'
+  Types::Standard: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/dancer2-session-memcached/issues
+  homepage: https://github.com/PerlDancer/dancer2-session-memcached
+  repository: https://github.com/PerlDancer/dancer2-session-memcached.git
+version: '0.005'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Peter Mottram <peter@sysnix.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

@@ -1,0 +1,23 @@
+Revision history for Dist::Zilla::PluginBundle::MANWAR
+
+0.07  Tue Dec 27 20:50:00 2016
+      - Bumped version as pause indexer failed.
+
+0.06  Tue Dec 27 01:25:00 2016
+      - Added dzil plugin [GithubMeta].
+
+0.05  Mon Dec 26 11:10:00 2016
+      - Added prereq Dist::Zilla::Plugin::MinimumPerlFast to Makefile.PL script.
+
+0.04  Wed Dec 21 13:20:00 2016
+      - Used dzil plugin [MinimumPerlFast] instead of [MinimumPerl].
+
+0.03  Wed Sep 21 12:50:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+      - Updated pod document with regards to dzil plugin [MetaProvides::Package].
+
+0.02  Thu Sep 01 11:20:00 2016
+      - Added 'provides' to the Makefile.PL script.
+
+0.01  Wed Jul 27 10:10:00 2016
+      - First version, released.

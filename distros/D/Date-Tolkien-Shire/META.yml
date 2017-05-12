@@ -1,0 +1,39 @@
+---
+abstract: 'Convert dates into the Shire Calendar.'
+author:
+  - 'Tom Braun <tbraun@pobox.com>'
+  - 'Tom Wyant (wyant at cpan dot org)'
+build_requires:
+  Test::More: '0.47'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Tolkien-Shire
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Date::Tolkien::Shire:
+    file: lib/Date/Tolkien/Shire.pm
+    version: '1.901'
+requires:
+  Date::Tolkien::Shire::Data: '0.001'
+  Time::Local: '0'
+  overload: '0'
+  perl: '5.006002'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/trwyant/perl-Date-Tolkien-Shire.git
+version: '1.901'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,26 @@
+---
+abstract: 'HTML::Template::Compiled template engine for Dancer2'
+author:
+  - 'Tina Müller <cpan2@tinita.de>'
+build_requires:
+  Data::Dumper: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-HTCompiled
+requires:
+  Carp: '0'
+  Dancer2::Core::Role::Template: '0'
+  HTML::Template::Compiled: '0'
+  Moo: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: git://github.com/perlpunk/Dancer2-Template-HTCompiled.git
+version: '0.003'

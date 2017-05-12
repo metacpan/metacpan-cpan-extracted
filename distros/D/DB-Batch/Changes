@@ -1,0 +1,10 @@
+Revision history for Perl extension DB::Batch.
+
+0.10  Wed Feb 24 11:59:02 2010
+	- original version; created by h2xs 1.23 with options
+		-AXn DB::Batch -v 0.10
+
+
+0.11  2012-07-15
+      Updated documentation
+      Updated Makefile.PL

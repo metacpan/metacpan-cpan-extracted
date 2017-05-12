@@ -1,0 +1,31 @@
+Revision history for Perl extension Device::CurrentCost.
+
+1.142240  2014-08-12 15:46:29+01:00 Europe/London
+    - Fix constant usage in tests to avoid error on perl 5.6.x.
+
+1.142230  2014-08-11 20:49:13+01:00 Europe/London
+    - Fix constant usage to avoid error on perl 5.6.x.
+    - Fix test warning.
+
+1.130190  2013-01-19 17:27:09 Europe/London
+    - Use Device::SerialPort.
+
+1.112970  2011-10-24 22:16:21 Europe/London
+    - Modify timeout test to make it less error prone.
+    - Pod link fix.
+
+1.110792  2011-03-20 21:17:26 Europe/London
+    - Make reader parser more liberal so it accepts more types of
+      input.
+
+1.110791  2011-03-20 13:03:26 Europe/London
+    - Minor regexp improvement.
+
+1.110790  2011-03-20 09:19:26 Europe/London
+    - Add history API.
+
+1.110390  2011-02-08 22:59:34 Europe/London
+    - Fix tests on non-linux platforms.
+
+1.110370  2011-02-06 20:35:11 Europe/London
+    - Initial release.

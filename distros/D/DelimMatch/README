@@ -1,0 +1,77 @@
+README for DelimMatch version 1.06, 20 May 2003
+
+DelimMatch allows you to match delimited substrings in a buffer.
+The delimiters can be specified with any regular expression and
+the start and end delimiters need not be the same.  If the
+delimited text is properly nested, entire nested groups are
+returned.
+
+In addition, you may specify quoting and escaping characters that
+contribute to the recognition of start and end delimiters.
+
+For more detail, see the POD documentation in DelimMatch.pm
+
+CHANGES
+
+2003/05/20: Released 1.06, fixed a couple of places where "/s" was missing
+            from the regex, preventing multi-line matches from working correctly.
+
+2002/10/02: Released 1.05, with the plan to actually upload this one to CPAN.
+            No real changes from 1.04, just updates to documentation.
+
+1999/04/14: Added returndelim() and strip_delim() methods to control
+            whether or not the match returned includes the start and
+            end delimiters. By default, delimiters are returned.
+
+1997/10/27: Released version 1.03.  Tweaked the documentation a little.
+            Finally uploaded to PAUSE.  NOTE: NestedMatch-1.03, uploaded
+            on 10/25 WAS AN ERROR.  Use this INSTEAD.
+
+1997/07/03: Released version 1.02
+            Made -w clean
+
+1997/07/02: Released version 1.01
+            Support for Perl 5.004. 
+              The scoping of $1, $2, etc. changed!?
+              POD buglet
+            Allow more arguments to constructor
+
+            Released version 1.00
+            This module replaces Text::NestedMatch which was only 
+            ever in limited release (never in CPAN).
+
+PREREQUISITES
+
+DelimMatch is implemented as an object.  It has no requirements
+beyond Perl 5.000.
+
+INSTALLATION
+
+This module is written entirely in Perl.  There's nothing to build,
+and installation should be as simple as
+ 
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+To install this module by hand, simply copy DelimMatch.pm to your
+Perl library directory.  Test by running perl test.pl.
+
+CONTACTING THE AUTHOR
+
+The best way to reach me is by email to <ndw@nwalsh.com>
+You will find additional contact information at http://nwalsh.com/
+
+COPYRIGHT
+
+Copyright (C) 1997-2003 Norman Walsh.
+All rights reserved.  This program is free software; you can 
+redistribute it and/or modify it under the same terms as Perl itself.
+
+WARRANTY
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.

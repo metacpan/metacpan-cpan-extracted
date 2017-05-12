@@ -1,0 +1,70 @@
+NAME
+
+Devel::Profiler::Plugins::Template - gather tmon.out data for Template Toolkit templates
+
+SYNOPSIS
+
+  use Devel::Profiler::Plugins::Template;  # enable TT hooks
+  use Devel::Profiler;                     # required
+
+  my $tt = Template->new();
+  ...
+
+DESCRIPTION
+
+C<Devel::Profiler::Plugins::Template> wraps various Template Toolkit
+calls in such a way that they are captured by Devel::Profiler
+and added to C<tmon.out>, thus making them visible through
+C<dprofpp>.  much hackery is involved, so it's not guaranteed
+to work on all platforms, versions of perl, or versions of TT.
+but if it does work, your C<dprofpp> results will look like this
+
+  %Time ExclSec CumulS #Calls sec/call Csec/c  Name
+   3.20   0.048  0.048   1794   0.0000 0.0000  Encode::_utf8_on
+   1.27   0.019  0.028      2   0.0095 0.0140  TT::PROCESS::get_standard_nav
+   0.00   0.000  0.000      2   0.0000 0.0000  TT::INCLUDE::layout_2fframe_2fhead_2ett
+
+which corresponds to something like
+
+  [% BLOCK get_standard_nav %]
+    ...
+  [% END %]
+
+  [% PROCESS get_standard_nav %]
+  [% INCLUDE layout/frame/head.tt %]
+
+note that the TT results are right alongside of your normal perl calls,
+which I find very convenient.  
+
+currently, only C<PROCESS> and C<INCLUDE> blocks are instrumented.
+hopefully this list will grow over time.
+
+CAVEATS
+
+this module contains a number of hacks just to get things working
+at all, so it may not work for you.  but it is working well at work,
+and if you ever saw our code you'd say that's probably a good enough
+test.
+
+oh, and this probably won't work so well unless you have the current
+Devel::Profiler code from svn:
+
+  http://sourceforge.net/projects/devel-profiler/
+
+but it might.
+
+SEE ALSO
+
+C<Devel::Profiler>, C<Devel::Profiler::Plugins::Template::Context>
+
+AUTHOR
+
+Geoffrey Young <geoff@modperlcookbook.org>
+
+COPYRIGHT
+
+Copyright (c) 2007, Geoffrey Young
+All rights reserved.
+
+This module is free software.  It may be used, redistributed
+and/or modified under the same terms as Perl itself.

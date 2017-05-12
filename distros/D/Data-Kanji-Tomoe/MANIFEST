@@ -1,0 +1,16 @@
+Changes
+examples/synopsis.pl
+examples/user-data.pl
+lib/Data/Kanji/Tomoe.pm
+lib/Data/Kanji/Tomoe.pod
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Data-Kanji-Tomoe.t
+t/handwriting-zh_CN.xml
+xt/checkpod.t
+xt/distro.t
+xt/git.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

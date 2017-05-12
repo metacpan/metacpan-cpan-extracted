@@ -1,0 +1,26 @@
+Revision history for Perl extension Data::Mapper
+
+0.06    2012-03-04
+        - data now can be a Hash-based POPO not apply only to subclass of
+        Data::Mapper::Data (Naoki Tomita: http://e8y.net/; hereinafter the
+        same)
+        - keys in data which start with `_' are regarded as private
+        - data_class() method is now public. you can customize which
+        data class to be mapped
+
+0.05    2012-02-21
+        - fixed a bug: data_class now caches class name by full-qualified one
+
+0.04    2012-02-14
+        - adapter now takes also coderef as a driver factory
+
+0.03    2012-02-07
+        - added detailed information into POD
+        - added support for table name concatinated by underscores
+
+0.02    2012-02-07
+        - changes in data object will be discarded after updating
+        - more appropriate error handling
+
+0.01    2012-02-07
+        - original version

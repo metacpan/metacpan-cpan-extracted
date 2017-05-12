@@ -1,0 +1,10 @@
+Revision history for Perl extension Device::ParallelPort::JayCar.
+
+0.01  Fri May  3 22:54:56 EST 2002
+	- Initial Release
+
+0.02  Mon May  6 22:54:56 EST 2002
+	- Include License
+
+0.03  Sat May 11 08:19:10 EST 2002
+	- Include Perl Dependencies

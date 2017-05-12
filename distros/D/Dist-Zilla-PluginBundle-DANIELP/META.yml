@@ -1,0 +1,202 @@
+---
+abstract: "(you shouldn't) use Dist::Zilla like DANIELP"
+author:
+  - 'Daniel Pittman <daniel@rimspace.net>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-DANIELP
+requires:
+  Dist::Zilla: 2.101040
+  Dist::Zilla::Plugin::ChangelogFromGit: 0
+  Dist::Zilla::Plugin::CompileTests: 0
+  Dist::Zilla::Plugin::HasVersionTests: 0
+  Dist::Zilla::Plugin::MinimumVersionTests: 0
+  Dist::Zilla::Plugin::PortabilityTests: 0
+  Dist::Zilla::Plugin::ReadmeMarkdownFromPod: 0
+  Dist::Zilla::Plugin::ReportVersions::Tiny: 0
+  Dist::Zilla::Plugin::SynopsisTests: 0
+  Dist::Zilla::Plugin::UnusedVarsTests: 0
+  Dist::Zilla::PluginBundle::Git: 1.102810
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.008001
+  utf8: 0
+version: 1.04
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@DANIELP/Git::NextVersion'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@DANIELP/GatherDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@DANIELP/ExecDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@DANIELP/ShareDir'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@DANIELP/PruneCruft'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@DANIELP/ManifestSkip'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@DANIELP/AutoPrereqs'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@DANIELP/PkgVersion'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::PodVersion
+      name: '@DANIELP/PodVersion'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@DANIELP/ReportVersions::Tiny'
+      version: 1.01
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@DANIELP/CompileTests'
+      version: 1.103030
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@DANIELP/HasVersionTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@DANIELP/MetaTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MinimumVersionTests
+      name: '@DANIELP/MinimumVersionTests'
+      version: 1.101421
+    -
+      class: Dist::Zilla::Plugin::PortabilityTests
+      name: '@DANIELP/PortabilityTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::SynopsisTests
+      name: '@DANIELP/SynopsisTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@DANIELP/PodSyntaxTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::UnusedVarsTests
+      name: '@DANIELP/UnusedVarsTests'
+      version: 1.100860
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@DANIELP/ExtraTests'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@DANIELP/MetaConfig'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@DANIELP/MetaYAML'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@DANIELP/MetaJSON'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@DANIELP/License'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@DANIELP/Readme'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      name: '@DANIELP/ReadmeMarkdownFromPod'
+      version: 0.100700
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@DANIELP/MakeMaker'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ChangelogFromGit
+      name: '@DANIELP/ChangelogFromGit'
+      version: 0.002
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@DANIELP/Manifest'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@DANIELP/Git::Check'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@DANIELP/TestRelease'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@DANIELP/ConfirmRelease'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@DANIELP/Git::Commit'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@DANIELP/Git::Tag'
+      version: 1.102810
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@DANIELP/UploadToCPAN'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.102342
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.102342
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.102342

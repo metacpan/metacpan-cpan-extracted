@@ -1,0 +1,6 @@
+Data::SimplePaginator is for making fixed length "pages" of any set of data
+and accessing them in a simple way.  I created it after trying other
+pagination modules on CPAN and not feeling comfortable with the defaults,
+or the interface, or the implementation. 
+
+Data::SimplePaginator is short and to the point.

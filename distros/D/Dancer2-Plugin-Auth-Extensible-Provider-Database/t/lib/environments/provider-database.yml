@@ -1,0 +1,37 @@
+plugins:
+  Database:
+    connections:
+      database1:
+        driver: SQLite
+        database: ':memory:'
+        on_connect_do: ['PRAGMA synchronous = OFF', 'PRAGMA foreign_keys = ON']
+        dbi_params:
+          PrintError: 0
+          RaiseError: 1
+      database2:
+        driver: SQLite
+        database: ':memory:'
+        on_connect_do: ['PRAGMA synchronous = OFF', 'PRAGMA foreign_keys = ON']
+        dbi_params:
+          PrintError: 0
+          RaiseError: 1
+      database3:
+        driver: SQLite
+        database: ':memory:'
+        on_connect_do: ['PRAGMA synchronous = OFF', 'PRAGMA foreign_keys = ON']
+        dbi_params:
+          PrintError: 0
+          RaiseError: 1
+  Auth::Extensible:
+    realms:
+      config1:
+        provider: Database
+        db_connection_name: database1
+      config2:
+        provider: Database
+        priority: 10
+        db_connection_name: database2
+      config3:
+        provider: Database
+        priority: 2
+        db_connection_name: database3

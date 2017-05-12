@@ -1,0 +1,130 @@
+NAME
+    DBIx::Class::HTML::FormFu - Fill a HTML::FormFu form from the database
+    and vice-versa
+
+SYNOPSIS
+        # fill a form from the database
+    
+        my $row = $schema->resultset('Foo')->find($id);
+        
+        $row->fill_formfu_values( $form )
+
+        # populate the database from a submitted form
+    
+        if ( $form->submitted && !$form->has_errors ) {
+        
+            my $row = $schema->resultset('Foo')->find({ id => $params->{id} });
+        
+            $row->populate_from_formfu( $form );
+        }
+
+ATTRIBUTES
+    The fill_formfu_values and populate_from_formfu functions can both take
+    an optional hasref argument to process the field names from form field
+    name to database fieldname.
+
+    The hasref takes to arguments: prefix_col takes a string to add to the
+    begining of the form field names. suffix_col takes a string to add to
+    the end of the form field names.
+
+  Example
+    If you have the following form fields:
+
+        private_street
+        private_city
+        private_email
+        office_street
+        office_city
+        office_email
+
+    You most likely would like to save both datasets in same table:
+
+        my $private = $user->new_related( 'data', { type => 'private' } );
+        $private->populate_from_formfu( $form, { prefix_col => 'private_' } );
+        my $office = $user->new_related( 'data', { type => 'office' } );
+        $office->populate_from_formfu( $form, { prefix_col => 'office_' } );
+
+    The table needs the following rows:
+
+        id     (not really needed)
+        street
+        city
+        email
+        type
+        user_id
+
+FREQUENTLY ASKED QUESTIONS (FAQ)
+  If I have another column in the database that is not present on the form? How do I add a value to the form to still use 'populate_from_formfu'?
+    Use $form->add_valid( name => 'value' );
+
+    Example:
+
+        my $passwd = generate_passwd();     $form->add_valid( passwd =>
+    $passwd );     $resultset->populate_from_formfu( $form );
+
+    add_valid() works for fieldnames that don't exist in the form.
+
+CAVEATS
+    To ensure your column's inflators and deflators are called, we have to
+    get / set values using their named methods, and not with "get_column" /
+    "set_column".
+
+    Because of this, beware of having column names which clash with
+    DBIx::Class built-in method-names, such as "delete". - It will have
+    obviously undesirable results!
+
+SUPPORT
+    Project Page:
+
+    <http://code.google.com/p/html-formfu/>
+
+    Mailing list:
+
+    <http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/html-formfu>
+
+    Mailing list archives:
+
+    <http://lists.scsys.co.uk/pipermail/html-formfu/>
+
+BUGS
+    Please submit bugs / feature requests to
+    <http://code.google.com/p/html-formfu/issues/list> (preferred) or
+    <http://rt.perl.org>.
+
+SUBVERSION REPOSITORY
+    The publicly viewable subversion code repository is at
+    <http://html-formfu.googlecode.com/svn/trunk/DBIx-Class-HTML-FormFu>.
+
+    If you wish to contribute, you'll need a GMAIL email address. Then just
+    ask on the mailing list for commit access.
+
+    If you wish to contribute but for some reason really don't want to sign
+    up for a GMAIL account, please post patches to the mailing list
+    (although you'll have to wait for someone to commit them).
+
+    If you have commit permissions, use the HTTPS repository url:
+    <https://html-formfu.googlecode.com/svn/trunk/DBIx-Class-HTML-FormFu>
+
+SEE ALSO
+    HTML::FormFu, DBIx::Class, Catalyst::Controller::HTML::FormFu
+
+AUTHOR
+    Carl Franks
+
+CONTRIBUTORS
+    Adam Herzog
+
+    Daisuke Maki
+
+    Mario Minati
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Carl Franks
+
+    Based on the original source code of DBIx::Class::HTMLWidget, copyright
+    Thomas Klausner.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

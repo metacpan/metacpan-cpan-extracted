@@ -1,0 +1,51 @@
+NAME
+    Dancer::Template::Haml - Haml wrapper for Dancer
+
+SYNOPSIS
+     set template => 'haml';
+     
+ get '/bazinga', sub {
+            template 'bazinga' => {
+                    title => 'Bazinga!',
+                    content => 'Bazinga?',
+            };
+     };
+
+    Then, on "views/bazinga.haml":
+
+     !!!
+     %html{ :xmlns => "http://www.w3.org/1999/xhtml", :lang => "en", "xml:lang" => "en"}
+       %head
+         %title= title
+       %body
+         #content
+           %strong= content
+
+    And... bazinga!
+
+DESCRIPTION
+    This class is an interface between Dancer's template engine abstraction
+    layer and the Text::Haml module.
+
+    In order to use this engine, set the following setting as the following:
+
+        template: haml
+
+    This can be done in your config.yml file or directly in your app code
+    with the set keyword.
+
+SEE ALSO
+    Dancer, Text::Haml
+
+TODO
+    The usage of helpers, filters and attributes. This will be implemented
+    once Dancer has capabilities to take specific parameters for each
+    templating engine it supports.
+
+AUTHOR
+    This module has been written by David Moreno, <http://stereonaut.net/>.
+
+LICENSE
+    This module is free software and is released under the same terms as
+    Perl itself.
+

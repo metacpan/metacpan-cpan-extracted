@@ -1,0 +1,48 @@
+[%- INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget"
+    content = ''
+-%]
+
+    [%- INCLUDE navbar_global
+            nav=doc.nav
+    -%]
+
+    <div align="right">
+        [%- INCLUDE prev_next_link
+                    nav=doc.nav.up
+                    rel_doc_root=doc.dir.rel_doc_root;
+        -%]
+    </div>
+
+    [% INCLUDE title %]
+
+    <!-- content begin -->
+    
+    [%-
+        IF doc.meta.abstract;
+            "<p>${doc.meta.abstract}</p>\n";
+        END;
+    
+        IF doc.body.top;
+            "${doc.body.top}\n";
+        END;
+    
+        PROCESS index_toc toc=doc.toc;
+    
+        IF doc.body.bot;
+            "${doc.body.bot}\n";
+        END;
+    
+    -%]
+        <br>
+        
+    <!-- content end -->
+
+    <br>
+    <hr noshade size="1">
+
+    [%- INCLUDE tail -%]
+
+</body>
+</html>

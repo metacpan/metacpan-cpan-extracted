@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+META.json
+Makefile
+README.md
+cpanfile
+lib/Devel/InheritNamespace.pm
+t/001_load.t
+t/002_inherit.t
+META.yml
+MANIFEST

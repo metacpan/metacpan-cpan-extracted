@@ -1,0 +1,20 @@
+Revision history for Perl extension Request.
+
+0.01  Sat Feb 24 13:12:05 1996
+	- original version; created by h2xs 1.16
+0.03  Renamed to DataFlow
+0.04  Renamed to Data::Flow
+0.05  Made new() use two arg version of bless to allow subclassing.
+0.06  'process' was misdocumented.  Correct, and add 'oo_process' which
+      matches the old docs for 'process'.
+0.07  Add aget() and oo_output method
+0.08  oo_output and SYNOPSYS example made correct. 
+0.09  New inference type 'self_filter'.
+      New method already_set().
+      Move test to ./t.
+      Undocumented method unset().
+      Allow 'prerequisites' to be supplied alone if it sets the value.
+1.00  Test suite was relying on presense of cat.
+      Make test suite strict.
+1.01  v1.00 was erroneously based on obsolete v0.06.
+1.02  Test suite was STILL relying on presense of cat.

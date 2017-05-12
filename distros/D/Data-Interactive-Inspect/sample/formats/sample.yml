@@ -1,0 +1,116 @@
+---
+cloud:
+  # Cloud Name: The cloud name must not contain spaces or special
+  # characters. The name is used for the OpenStack region name. The
+  # default value for the ICOS Hybrid cloud is RegionTwo.
+  name: RegionTwo
+  # Cloud Description
+  description: ICOS Hybrid - Controller + N Compute Topology - x86 KVM
+  # Cloud Administrator (admin) User's Password. For the ICOS Hybrid
+  # cloud, the cloud administrator user's password is contained in the
+  # password JSON file. It can be overridden here if needed.
+  password: ~
+  # Cloud Password JSON File. This is required for the ICOS Hybrid cloud.
+  # Copy the example password file for the ICOS Hybrid cloud located in
+  # the ICM chef-repo to the deployment folder, rename it, and set the
+  # password values in the file for the on premise admin user and services
+  # required for the ICOS Hybrid cloud. Enter the fully qualified path and
+  # file name of that password file here.
+  password_file: YOUR_PASSWORD_FILE
+  # Cloud Database Service Type: db2, mariadb or mysql
+  database_service_type: db2
+  # Cloud Messaging Service Type: rabbitmq or qpid
+  messaging_service_type: rabbitmq
+# (Optional) Cloud SSL certificate chain file. This is not required.
+# If not specified, the cacert_file will be created automatically,
+# and placed on the Chef server. Only specify this value if you are
+# providing your own cloud SSL certificate chain file, and controller
+# SSL certificate and private key files for FIPS compliance. If specified,
+# it must include all certificate chains required in the hybrid environment
+# including any needed in the off-premise region.
+# cacert_file: YOUR_CLOUD_CACERT_FILE_LOCATION
+  # Cloud Features: The cloud features to be enabled or disabled. The
+  # icos_hybrid_cloud, and fips_compliance features are enabled, by default. The
+  # self_service_portal feature must be disabled for the ICOS Hybrid cloud.
+  features:
+    self_service_portal: disabled
+    platform_resource_scheduler: enabled
+    icos_hybrid_cloud: enabled
+    fips_compliance: enabled
+  # Cloud Topology: References the node name(s) for each role
+  # within the cloud's topology. A self_service_portal_node_name
+  # should not be specified for the ICOS Hybrid cloud.
+  topology:
+    database_node_name: controller
+    controller_node_name: controller
+    self_service_portal_node_name: ~
+    kvm_compute_node_names: kvm_compute
+
+# ================================================================
+# Environment Information
+# ================================================================
+environment:
+  base: example-ibm-os-single-controller-n-compute
+  default_attributes:
+    # (Optional) Add Default Environment Attributes
+
+  override_attributes:
+    # (Optional) Add Override Environment Attributes
+    ntp.servers: [0.pool.ntp.org, 1.pool.ntp.org, 2.pool.ntp.org, 3.pool.ntp.org]
+
+# ================================================================
+# Hybrid Cloud Information.
+# ================================================================
+hybrid:
+  # The Keystone Identity service endpoint host. Enter either the host FQDN or
+  # it's IP address. This value is not validated. Please ensure it is correct.
+  # The value is defaulted to 192.168.101.10 for the ICOS Hybrid cloud.
+  keystone_endpoint_host: 192.168.101.10
+  # The Identity service admin tenant name. The value is defaulted to
+  # on-prem-admin for the ICOS Hybrid cloud.
+  admin_tenant_name: on-prem-admin
+  # The Identity service admin user name. The value is defaulted to
+  # admin-on-prem for the ICOS Hybrid cloud.
+  admin_user: admin-on-prem
+  # The SSL certificate chain file for the ICOS region. Enter the local
+  # location on the Chef server of the ICOS SSL certificate chain file as a
+  # fully qualified path and file name. This value is required unless both the
+  # on-premise region, and the ICOS system have trusted, commercially signed
+  # SSL certificates. This value is ignored if the optional cacert_file value
+  # is specified.
+  off_prem_certificate_chain_file: YOUR_OFF_PREM_CERTIFICATE_CHAIN_FILE_LOCAL_LOCATION
+
+# ================================================================
+# Node Information
+# ================================================================
+nodes:
+  - name: controller
+    description: Cloud controller node
+    fqdn: YOUR_CONTROLLER_NODE_FQDN
+    password: ~
+    identity_file: ~
+    nics:
+      management_network: eth0
+      data_network: eth1
+    # (Optional) Node Attribute JSON File
+    attribute_file: ~
+    # (Optional) Controller SSL certificate and private key files.
+    # These values are not required. If not specified, the cert_file and
+    # key_file will be created automatically, and placed on the Chef
+    # server. Only specify these values if you are providing your own cloud
+    # SSL certificate chain file, and controller SSL certificate and
+    # private key files for FIPS compliance.
+  # cert_file: YOUR_CONTROLLER_CERTIFICATE_FILE_LOCATION
+  # key_file: YOUR_CONTROLLER_PRIVATE_KEY_FILE_LOCATION
+  - name: kvm_compute
+    description: Cloud KVM compute node
+    fqdn: YOUR_KVM_COMPUTE_NODE_FQDN
+    password: ~
+    identity_file: ~
+    nics:
+      management_network: eth0
+      data_network: eth1
+    # (Optional) Node Attribute JSON File
+    attribute_file: ~
+  # Copy the kvm_compute node section above for additional
+  # KVM compute nodes in your cloud.

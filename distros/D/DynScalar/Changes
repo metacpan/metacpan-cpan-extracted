@@ -1,0 +1,9 @@
+Revision history for Perl extension DynScalar.
+
+1.02  Mon Jan 29 12:27:00 2001
+	- minor doc patch (added some whitespace, fixed SYNOPSIS)
+1.01  Wed Jan 24 12:00:00 2001
+	- documentation patch regarding lexical variables
+1.00  Tue Jan 23 17:47:12 2001
+	- original version; created by h2xs 1.18
+

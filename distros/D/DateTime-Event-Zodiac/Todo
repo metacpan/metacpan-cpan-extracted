@@ -1,0 +1,5 @@
+TODO list for Perl module DateTime::Event::Zodiac
+
+* The "zodiac_astro_horoscope" and "zodiac_date_horoscope" functions have
+  not yet been implemented ;-)
+* Add localized values for zodiac names

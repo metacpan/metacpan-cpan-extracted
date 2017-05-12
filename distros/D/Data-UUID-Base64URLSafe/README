@@ -1,0 +1,24 @@
+NAME
+    Data::UUID::Base64URLSafe - URL-safe UUIDs
+
+SYNOPSIS
+      use Data::UUID::Base64URLSafe;
+      my $ug = Data::UUID::Base64URLSafe->new;
+      my $uuid = $ug->create_b64_urlsafe;
+
+DESCRIPTION
+    Data::UUID creates wonderful Globally/Universally Unique Identifiers
+    (GUIDs/UUIDs). This module is a subclass of that module which adds a
+    method to get a URL-safe Base64-encoded version of the UUID using
+    MIME::Base64::URLSafe. What that means is that you can get a
+    22-character UUID string which you can use safely in URLs.
+
+AUTHOR
+    Leon Brocard, "<acme@astray.com>"
+
+COPYRIGHT
+    Copyright (C) 2008, Leon Brocard
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+

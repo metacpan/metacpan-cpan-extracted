@@ -1,0 +1,36 @@
+=head1 Welcome to Deliantra
+
+Deliantra is a multi-player graphical arcade and adventure game originally made
+for the X Window System environment, which has been ported to Mac OS X and
+Microsoft Windows. It has certain flavours from other games, especially
+gauntlet and the rogue-like games. Any number of players can move around,
+finding and using items and battling monsters. They can choose to cooperate or
+compete in the same world.
+
+B<If you are new to Deliantra> you might want to read the L<Client Tutorial|pod/tutorial>!
+
+=head1 Documentation
+
+The L<Client Tutorial|pod/tutorial> is for those of you who are B<new to
+Deliantra> and want a gentle introduction.
+
+The L<Game FAQ/Tips and Tricks|pod/faq> might have an answer if you are
+completely puzzled about something. It might also contain a trick you
+didn't know yet.
+
+The L<Command Reference|pod/command_help> lists and explains all server-side commands.
+
+The L<Skill Reference|skill_help> lists and explains all skills available
+in Deliantra.
+
+The L<Manual|pod/manual> is the main manual for Deliantra. It explains
+the user interface mainly.
+
+The L<Glossary|pod/glossary> is a list of game concepts and other stuff.
+
+The L<Dungeon Master Command Reference|pod/dmcommand_help> documents the commands
+normally only available to Dungeon Masters/Wizards.
+
+The L<About Page|pod/about> tells you about intricate licensing details,
+as well as the homepage of this program where you can get source and
+binaries.

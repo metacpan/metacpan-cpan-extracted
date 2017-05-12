@@ -1,0 +1,49 @@
+## TODO:
+#  * Localtime defaults!!!  Specifiable defaults.
+#  * Build regexp in _parse_format_string
+# 	* Add an a way to return value by position for Tie::IxHash
+
+my @LOCALTIME = localtime();
+
+use constant DEFAULT_SECONDS 	=> 0;
+use constant DEFAULT_MINUTES 	=> 0;
+use constant DEFAULT_HOURS		=> 0;
+use constant DEFAULT_DAY			=> 1;
+use constant DEFAULT_MONTH		=> 0;
+use constant DEFAULT_YEAR			=> $LOCALTIME[5];
+
+
+
+## SUBROUTINE: _create_defaults
+##  * Creates the placeholder where the values are
+##	placed once extracted from the input.
+##  * The value can be accessed by either the order
+##	found in the regular expression $cache->ValueFromPosition->[$index]
+##	or by name $cache->FETCH{'$name'}
+sub _create_defaults {
+
+	my $self 		= shift;
+	my $defaults	= Tie::IxHash->new();
+
+	## CREATE PLACE for POSIX ARRAY OF DATE
+	## sec, min, hour, mday, mon, year, wday
+	## {filter} will be the array passed to Posix::strftime
+	$defaults->STORE( 'format', $self->{destination}->{expanded_format} );
+	
+	## Load Defaults.
+	$defaults->Push( 'S', DEFAULT_SECONDS);
+	$defaults->Push( 'M', DEFAULT_MINUTES);
+	$defaults->Push( 'H', DEFAULT_HOURS);
+	$defaults->Push( 'd', DEFAULT_DAY);
+	$defaults->Push( 'm', DEFAULT_MONTH);
+	$defaults->Push( 'S', DEFAULT_YEAR);
+
+	$self->{filter}->{input} = $defaults;
+	$self->{filter}->{default} = $defaults;
+	return;
+
+}
+
+in init
+
+	$self->_create_defaults; 	# This is where the temporary data resides.

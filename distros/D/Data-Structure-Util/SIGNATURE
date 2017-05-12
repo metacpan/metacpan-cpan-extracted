@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 f70228a587d7ed2040638c4c6bc7a843db861adf CHANGES
+SHA1 9811a73cbfe186488501ddccd7dcdf02d6034ebd MANIFEST
+SHA1 ca2cc9aad47532bcc5604182748984a7a1bebf95 META.json
+SHA1 5c320f4b81b3538d1d89ee28721c0f26c0912c6e META.yml
+SHA1 005ab7aaed04f79d6c07e53a7773f54d4e73dbaf Makefile.PL
+SHA1 c012e531a57bae33bd51bd54cf471c0d2ede456d NINJA
+SHA1 0637effa677b3380caea210ddde0e16ba47c57aa README
+SHA1 dd82223a7bf3d40390295d029102de878268b972 Util.xs
+SHA1 150fa4f28e960bd5fecb41e718e69fcf0c650991 bin/packages.pl
+SHA1 632a566b4f388c3c12350ed830aa87c6fd410d24 inc/Devel/CheckLib.pm
+SHA1 f7e235a7e912d3a8394dfb0d7822bef213bbda16 inc/IO/CaptureOutput.pm
+SHA1 0e7e0f1d446e01dffdeb2bb853aa56f57a56fe4e lib/Data/Structure/Util.pm
+SHA1 0aecef19b41df53deec039d4989a8e4f2a3b2b8e t/00pod.t
+SHA1 0ca7413e5c4abb499671fa3e6be90396295d805f t/01compile.t
+SHA1 6ffcdf17aa60124010b621e90baa68ffc78c43bc t/02circular.t
+SHA1 4f19d45862189ee54f1f120425fdcfd377b58657 t/02circular_off.t
+SHA1 9190cb14d996aff3f0ec591faa468d5c11efc847 t/03bless.t
+SHA1 7e5306d8da76de7212e3e265617029ff884ecaa1 t/04utf8.t
+SHA1 e1ecd132e83af395b7c2433a718fb8a165471880 t/05refs.t
+SHA1 9496a34d3b74e4b2b2444b8032af2444ebe7d9e0 t/06signature.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlT8JS0ACgkQwoknRJZQnCH2xwCeIf1rrDVvr0ioDo/kIEafcGmR
+Az4An0sjp2uR6GwPx2yUZtOl8RIB2ivt
+=/t09
+-----END PGP SIGNATURE-----

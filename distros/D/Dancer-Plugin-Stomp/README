@@ -1,0 +1,124 @@
+NAME
+    Dancer::Plugin::Stomp - A Dancer plugin for messaging using STOMP based
+    message queues.
+
+VERSION
+    version 1.0302
+
+SYNOPSIS
+        use Dancer;
+        use Dancer::Plugin::Stomp;
+
+        post '/messages' => sub {
+            stomp_send { destination => '/queue/foo', body => request->body };
+        };
+
+        dance;
+
+DESCRIPTION
+    The goal of this module is to make it as easy as possible to interact
+    with a STOMP message broker. STOMP stands for Simple (or Streaming) Text
+    Orientated Messaging Protocol. It is a simple and standard protocol for
+    messaging systems. See <http://stomp.github.com> for more details about
+    the protocol.
+
+KEYWORDS
+  stomp_send
+        stomp_send \%data
+        stomp_send name => \%data
+
+    This is a convenience function that handles connection details for you.
+    It sends your message using the default configured client. If you have
+    only one client configured, it is your default one. If you have multiple
+    clients configured, the one named "default" will be used. Doing this
+
+        stomp_send { destination => '/queue/foo', body => 'hello' };
+
+    is the same as:
+
+        my $stomp = stomp();
+        $stomp->connect(login => $login, passcode => $passcode);
+        $stomp->send(destination => '/queue/foo', body => 'hello');
+        $stomp->disconnect();
+
+    If you have multiple clients configured, you can distinguish between
+    them by providing the name of the client as the first argument, followed
+    by the data as the second argument:
+
+        stomp_send foo => { destination => '/queue/foo', body => 'hello' };
+
+  stomp
+        my $stomp = stomp
+        my $stomp = stomp $name
+
+    This simply returns a Net::Stomp object. You are responsible for
+    connecting and disconnecting. When no arguments are given, it returns a
+    handle to the default configured client. You may provide a name if you
+    have multiple clients configured.
+
+CONFIGURATION
+    Configuration at a minimum requires a name and a host. The following
+    example defines one client named "default".
+
+        plugins:
+          Stomp:
+            default:
+              hostname: foo.com
+              port: 61613
+
+    Multiple clients can also be configured:
+
+        plugins:
+          Stomp:
+            default:
+              hostname: foo.com
+              port: 61613
+            bar:
+              hostname: bar.com
+              port: 61613
+              login: bob
+              passcode: secret
+
+    Failover hosts are supported:
+
+        plugins:
+          Stomp:
+            default:
+              hosts:
+                -
+                  hostname: foo.com
+                  port: 61613
+                -
+                  hostname: bar.com
+                  port: 61613
+
+    The available configuration options for a client are:
+
+    hostname
+        This is the location of the STOMP server. It can be an ip address or
+        a hostname. Either hostname or hosts is required.
+
+    hosts
+        This is to support failover hosts as documented in Net::Stomp. In
+        Perl terms, it should be an arrayref of hashrefs, each of which
+        contains at least a hostname and a port. Either hostname or hosts is
+        required.
+
+    port
+    login
+    passcode
+
+SEE ALSO
+    Net::Stomp
+    POE::Component::MessageQueue
+    <http://stomp.github.com>
+
+AUTHOR
+    Naveed Massjouni <naveedm9@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Naveed Massjouni.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

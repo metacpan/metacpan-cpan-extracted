@@ -1,0 +1,63 @@
+---
+abstract: 'Have text templating capabilities in your Dist::Zilla plugin'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  Dist::Zilla::Role::Plugin: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  IPC::System::Simple: '0'
+  Moose: '0'
+  Path::Class: '0'
+  Path::Tiny: '0'
+  Test::Deep: '0'
+  Test::DiagINC: '0.002'
+  Test::Dist::Zilla::Build: '0'
+  Test::More: '0'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  autodie: '0'
+  blib: '1.01'
+  if: '0'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Role-TextTemplater
+provides:
+  Dist::Zilla::Role::TextTemplater:
+    file: lib/Dist/Zilla/Role/TextTemplater.pm
+    version: v0.8.6
+requires:
+  Carp: '0'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::File::OnDisk: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  List::Util: '0'
+  Moose::Role: '0'
+  Text::Template: '0'
+  namespace::autoclean: '0'
+  overload: '0'
+  perl: '5.006'
+  strict: '0'
+  version: '0.77'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Role-TextTemplater
+  homepage: https://metacpan.org/release/Dist-Zilla-Role-TextTemplater
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Role-TextTemplater
+version: v0.8.6
+x_serialization_backend: 'YAML::Tiny version 1.69'

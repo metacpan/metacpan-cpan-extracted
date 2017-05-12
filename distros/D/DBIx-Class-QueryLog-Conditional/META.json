@@ -1,0 +1,57 @@
+{
+   "abstract" : "Disable QueryLogger instead of all query logging",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-QueryLog-Conditional",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Moo" : "1.004002",
+            "Sub::Name" : "0.05",
+            "namespace::clean" : "0.24"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Deep" : "0.112",
+            "Test::Fatal" : "0.013",
+            "Test::More" : "1.001002",
+            "aliased" : "0.31"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frioux/DBIx-Class-QueryLog-Conditional/issues"
+      },
+      "homepage" : "https://github.com/frioux/DBIx-Class-QueryLog-Conditional",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/DBIx-Class-QueryLog-Conditional.git",
+         "web" : "https://github.com/frioux/DBIx-Class-QueryLog-Conditional"
+      }
+   },
+   "version" : "0.001000"
+}
+

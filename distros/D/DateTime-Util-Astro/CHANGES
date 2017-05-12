@@ -1,0 +1,80 @@
+Changelog
+=========
+
+0.12000 - Tue 04 Nov 2007 [rev 3804]
+  - Fix ephemeris_correction. The Calculations for middle ages were
+    totally and utterly wrong. rt #31157
+  - Cache the results from ephemeris_correction. This makes things nominally
+    faster.
+
+0.11001 - Wed 30 May 2007
+  - Just realized that Exporter qw(import) does not work for Exporter
+    versions < 5.57.
+
+0.11 28 May 2007
+  - fix solar_longitude_after() to a degree. I still can't get a few dates
+    to calculate a close enough approximation, but this should do for
+    many cases (patches welcome)
+  - use Exporter without subclassing (Sun.pm, Common.pm)
+  - add warnings
+
+0.10 28 May 2007
+  - use Class::Data::Inheritable.
+  - remove set_cache()/get_cache() in favor for cache()
+  - make Cache::MemoryCache optional
+  - use Exporter without subclassing (Lunar.pm)
+
+0.09 06 Feb 2007
+  - Change versioning. No code change.
+
+0.08 05 Feb 2007
+  - Use DateTime::Util::Calc 0.12, which fixes various problems.
+  - Fix tests accordingly.
+
+0.07 12 Jan 2005
+  - Fix bug that came up while debugging DateTime::Event::SolarTerm
+  - This version was never released
+
+0.06 12 Jan 2005
+  - Fix solar_longitude_before()
+  - Add tests
+
+0.05 08 Jan 2005
+  - Introduce set_cache()/add_cache() interface.
+  - Change default cache to MemoryCache, but recommend FileCache
+
+0.04 07 Jan 2005
+  - No more param validation in the name of efficiency
+  - Use Math::BigInt/Math::BigFloat more extensively
+  - Require newer DateTime::Util::Calc
+  - Use Cache::Cache for caching
+  - No more memoizing
+
+0.02 10 Feb 2004
+  - Change Build.PL to require DateTime::Util::Calc 0.02, which will handle
+    prompting for math libraries more elegantly
+  - Slightly reduce on the number of calls to moment()
+
+0.01 12 Jan 2004
+  - Turn memoization back on.
+  - Various minor optimizations (~20% performance increase on some
+    cases)
+
+0.01_04 29 Dec 2003
+  - Doc tweak
+
+0.01_03 20 Dec 2003
+  - Removed debug statement
+  - Turns out memoization sometime breaks things. Commented out
+    for the time being
+  - Changed output of solar_longitude() and lunar_longitude such that
+    the calculated value is passed through bf_downgrade(). This should
+    speed things up... in some cases.
+  - Use constants where applicable
+
+0.01_02 19 Dec 2003
+  - Add sanity tests
+  - fix some indentation problems
+
+0.01_01 09 Dec 2003
+  - Initial Release

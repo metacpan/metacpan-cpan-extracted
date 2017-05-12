@@ -1,0 +1,32 @@
+---
+abstract: 'Self Contained SQLcipher RDBMS in a DBI Driver'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  DBI: 1.57
+  ExtUtils::MakeMaker: 6.48
+  File::Spec: 0.82
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-SQLcipher
+no_index:
+  directory:
+    - t
+    - inc
+    - util
+requires:
+  DBI: 1.57
+  File::Spec: 0.82
+  Test::Builder: 0.86
+  Test::More: 0.47
+  Tie::Hash: 0
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.48

@@ -1,0 +1,11 @@
+Revision history for DBIx-Class-InflateColumn-Markup
+
+0.021	2009-09-29, 23:34:00
+	Pointless update due to a typo
+
+0.02	2009-09-29, 23:30:00
+	Small bug fix in the load test
+
+0.01    2009-09-29, 18:00:00
+        First version.
+

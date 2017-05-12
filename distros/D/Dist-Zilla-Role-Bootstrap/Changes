@@ -1,0 +1,190 @@
+Release history for Dist-Zilla-Role-Bootstrap
+
+1.001004 2017-03-03T07:00:55Z 934c2a5
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Role-Bootstrap/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001003, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑1)
+ - test: ↓1
+
+1.001003 2016-04-29T22:50:28Z be1b807
+ - Simplifed MetaConfig generation
+ - $VERSION added to MetaConfig ( This is typically lost due to hiding in roles
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +2 ↑2 (suggests: ↑1)
+ - runtime: ↓1 -1
+ - test: ↓1
+
+1.001002 2015-07-01T04:05:24Z 66d4baf
+ [Bugfix]
+ - Bodge around testers with broken mtime implementations by agressively trying to make files with seperate mtimes and
+   then skipping all the tests if that isnt possible, with a grace window of up to 5 seconds to get it right.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - develop: +2 (suggests: ↑1)
+
+1.001001 2015-06-29T09:03:38Z ab79bd2
+ [Bugfix]
+ - Add diagnostics on mtime test to see why it failed.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - develop: +1 ↑3 -1 (suggests: ↑2)
+
+1.001000 2015-01-20T20:29:54Z f0042b5
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000003, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +9 ↑3 -2 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1)
+ - test: +1 (recommends: +1 ↑1 ↓1)
+
+ [Documentation]
+ - Furnish a simple DESCRIPTION section for README
+
+ [Internals]
+ - Cease use of MX::AttributeShortcuts to remove autobox indirect dependency.
+
+ [Meta]
+ - Assign author=cpanid
+
+1.000003 2014-08-15T21:30:54Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: +1 -2 (recommends: ↑1 -1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - Update ReportPrereqs tests.
+
+1.000002 2014-07-15T09:52:40Z
+ [00 Trivial]
+ - Minor packaging cleanups.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: (recommends: ↑1)
+
+1.000001 2014-04-05T07:37:23Z
+ [00 Test Fixes]
+ - Drop dependency on Path::FindDev
+
+ [Dependencies::Aggregate]
+ - 5.008 : 207 → 205
+ - 5.010 : 187 → 185
+ - 5.019 : 166 → 163
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - test: +1 -1
+
+1.000000 2014-04-05T05:29:35Z
+ [00 Major]
+ - This distribution has a few changes that are major enough that non-perl toolchains may need to pay attention.
+ - Everyone else should find the changes in this release boring, except maybe those who are trying to get off the
+   Module::Build train.
+
+ [01 Versioning Scheme change]
+ - x.y.z becomes x.abydez, aka: Floats. If this is a problem, please normalise versions downstream.
+ - Versioning scheme change is primary reason for 1.XXX on the box.
+
+ [02 Tooling Change]
+ - Internals now run on ExtUtils::MakeMaker instead of Module::Build.
+
+ [Dependencies::Aggregate]
+ - 5.008 : 205 → 207
+ - 5.010 : 183 → 187
+ - 5.019 : 167 → 166
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.3, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 ↑1 -9
+ - runtime: +1 ↑1
+ - test: +3 ↓1 (recommends: +4)
+
+0.2.3 2013-11-18T17:50:53Z
+ [00 Bugfix]
+ - Depend on a minimum version of MooseX::AttributeShortcuts to provide builder => sub {} support
+ - Thanks, Graham Ollis for reporting, closes #1
+
+ [Dependencies::Noteworthy]
+ - MooseX::AttributeShortcuts 0 → 0.015
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.2, see misc/*.deps* for details
+ - runtime: ↑1
+
+0.2.2 2013-11-18T04:24:16Z
+ [00 Minor/Bugfix]
+ - Drop mandatory dep on 5.10.1. You will need a recent version.pm if you want a version-specific dependency to work
+ - Use latest MB Magic
+ - Switch to Compile::PerFile
+
+ [Dependencies::Noteworthy]
+ - Module::Build upgrade
+ - perl v5.10.0 → 5.006
+ - Test::More 0.98 → 1.001002
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↓1
+ - test: ↑1 -3
+
+ [Documentation]
+ - Use MetaCPAN in README.mkdn
+
+ [Tests]
+ - Regenerate Report::Versions to not report develop things.
+ - S/Compile/Compile::PerFile/
+
+0.2.1 2013-09-24T02:37:30Z
+ [Bugfix]
+ - use ->realpath for comparisons to avoid symlink confusion on darwin
+ - use $zilla->root instead of calling cwd()
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - runtime: -1
+
+0.2.0 2013-09-21T12:39:54Z
+ [00 Major - try_built_method]
+ - New mechanisms for try_built if there is >1 build trees
+ - Default mechanism 'mtime' picks built dir with the most recent mtime
+ - Alternative mechanism attempts to parse versions out of build dirs and use the latest
+
+ [Dependencies::Noteworthy]
+ - added : List::UtilsBy
+ - added : version
+ - added : File::Copy::Recursive
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +2
+ - test: +2
+
+0.1.0 2013-09-04T11:24:24Z
+ - First version.

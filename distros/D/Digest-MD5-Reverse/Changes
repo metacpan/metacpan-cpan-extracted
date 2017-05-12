@@ -1,0 +1,15 @@
+Revision history for Digest-MD5-Reverse
+
+1.3    31/8/2007
+          - no more poo interface
+          - bigger database
+          - minor fixes
+          - 5 tests
+
+1.2    23/6/2007
+		  - synopsis
+
+1.1    22/6/2007 
+          - new code
+          - reverse_md5 function
+

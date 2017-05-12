@@ -1,0 +1,13 @@
+Build.PL
+Changes
+examples/pcf8563.pl
+lib/Device/Chip/PCF8563.pm
+MANIFEST			This list of files
+t/00use.t
+t/01time.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

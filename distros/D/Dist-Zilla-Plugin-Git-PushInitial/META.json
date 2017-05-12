@@ -1,0 +1,69 @@
+{
+   "abstract" : "do initial git push from your minting profile",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Git-PushInitial",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::AfterMint" : "0",
+            "File::Spec::Functions" : "0",
+            "Git::Wrapper" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-Plugin-Git-PushInitial@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Git-PushInitial"
+      },
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-Plugin-Git-PushInitial",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/dist-zilla-plugin-git-pushinitial.git",
+         "web" : "http://github.com/rkitover/dist-zilla-plugin-git-pushinitial"
+      }
+   },
+   "version" : "0.02",
+   "x_authority" : "cpan:RKITOVER"
+}
+

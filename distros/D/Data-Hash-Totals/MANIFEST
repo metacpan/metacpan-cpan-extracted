@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+Totals.pm
+t/00-load.t
+t/as_table.t
+t/as_table_comma.t
+t/pod-coverage.t
+t/pod.t

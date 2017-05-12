@@ -1,0 +1,15 @@
+lib/Docs/Site_SVD/Data_Secs2.pm
+MANIFEST
+Makefile.PL
+README
+lib/Data/Secs2.pm
+t/Data/Secs2.d
+t/Data/Secs2.pm
+t/Data/Secs2.t
+t/Data/File/Package.pm
+t/Data/File/SmartNL.pm
+t/Data/Text/Scrub.pm
+t/Data/Test/Tech.pm
+t/Data/Data/SecsPack.pm
+t/Data/Data/Str2Num.pm
+t/Data/Data/Startup.pm

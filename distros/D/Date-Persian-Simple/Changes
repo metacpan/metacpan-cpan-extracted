@@ -1,0 +1,70 @@
+Revision history for Date::Persian::Simple
+
+0.17  Tue Jan 17 13:00:00 2017
+      - Moved version up as last release wasn't indexed for some reason.
+
+0.16  Tue Jan 17 10:30:00 2017
+      - Updated the dependency on Date::Utils v0.22.
+
+0.15  Fri Dec 16 23:15:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.14  Sun Nov 06 11:55:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.13  Fri Aug 05 14:45:00 2016
+      - Updated the dependency on Date::Utils v0.21.
+
+0.12  Sat Jul 23 12:00:00 2016
+      - Updated the dependency on Date::Utils v0.20.
+      - Dropped method get_calendar() as it's no longer relevant here.
+
+0.11  Wed Jun 29 11:15:00 2016
+      - Addressed issue raised in the CPAN Tester Report.
+        http://www.cpantesters.org/cpan/report/5d3ad818-3d02-11e6-a5ff-abe4273a1f7f
+
+0.10  Sat May 21 08:40:00 2016
+      - Renamed method get_days_in_persian_month_year() to days_in_month_year().
+      - Updated unit test to respect the above change.
+
+0.09  Thu May 19 10:15:00 2016
+      - Updated the dependency on Date::Utils v0.19.
+      - Updated method get_calendar() and method as_string() to use get_month_name().
+      - Renamed method persian_months() to months().
+      - Renamed method persian_days() to days().
+      - Updated method get_calendar() to respect the above changes.
+
+0.08  Tue Apr 26 10:35:00 2016
+      - Updated the dependency on Date::Utils v0.16.
+      - Added $AUTHORITY.
+      - Added section "SEE ALSO".
+      - Updated copyright year information.
+
+0.07  Wed Aug 26 09:35:00 2015
+      - Added the dependency on Date::Utils v0.11.
+
+0.06  Sat Jul 18 07:45:00 2015
+      - Added the dependency on Date::Utils v0.10.
+      - Added method get_calendar().
+
+0.05  Sun Jul 05 17:50:00 2015
+      - Added the dependency on Date::Utils v0.09.
+
+0.04  Fri Jun 26 14:45:00 2015
+      - Removed duplicate tests from the test script.
+      - Renamed method is_persian_leap_year() to is_leap_year().
+      - Added sample code for method from_gregorian() and from_julian() to the section "SYNOPSIS".
+      - Tidied up test script in general.
+
+0.03  Mon May 25 12:55:00 2015
+      - Removed the dependency on Date::Utils::Bahai.
+      - Added the dependency on Date::Utils v0.08.
+      - Added the dependency on Date::Calc v6.0.
+      - Merged the code from Date::Utils::Persian into Date::Persian::Simple.
+      - Updated unit test w.r.t the merged code.
+
+0.02  Thu Apr 23 23:30:00 2015
+      - Re-structured and consumed Date::Utils::Persian as Moo Role.
+
+0.01  Sat Apr 18 03:50:00 2015
+      - First version, released.

@@ -1,0 +1,84 @@
+{
+   "abstract" : "DSL for Database schema declaration",
+   "author" : [
+      "Masayuki Matsuki <y.songmu@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Schema-DSL",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Array::Diff" : "0",
+            "Clone" : "0.06",
+            "Moo" : "1.000003",
+            "SQL::Translator" : "0.11019",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Schema::DSL" : {
+         "file" : "lib/DBIx/Schema/DSL.pm",
+         "version" : "0.12"
+      },
+      "DBIx::Schema::DSL::Context" : {
+         "file" : "lib/DBIx/Schema/DSL/Context.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Songmu/p5-DBIx-Schema-DSL/issues"
+      },
+      "homepage" : "https://github.com/Songmu/p5-DBIx-Schema-DSL",
+      "repository" : {
+         "url" : "git://github.com/Songmu/p5-DBIx-Schema-DSL.git",
+         "web" : "https://github.com/Songmu/p5-DBIx-Schema-DSL"
+      }
+   },
+   "version" : "0.12",
+   "x_contributors" : [
+      "tokubass <tomi21110@gmail.com>",
+      "tokubass <tokubass@cpan.org>",
+      "karupanerura <karupa@cpan.org>"
+   ]
+}

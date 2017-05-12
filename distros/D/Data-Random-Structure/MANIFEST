@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Random/Structure.pm
+t/00_load.t
+t/01_basic.t
+weaver.ini

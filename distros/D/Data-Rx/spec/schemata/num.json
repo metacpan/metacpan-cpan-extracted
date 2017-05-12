@@ -1,0 +1,13 @@
+{
+  "schema": { "type": "//num" },
+  "pass": {
+    "num": "*"
+  },
+  "fail": {
+    "arr" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "str" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } }
+  }
+}

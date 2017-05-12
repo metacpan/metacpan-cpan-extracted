@@ -1,0 +1,9 @@
+Revision history for Perl extension Debian::Package::HTML.
+
+0.01  Tue Jul 18 23:36:31 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Debian::Package::HTML
+	- changed namespace, introduced new "dump" feature.
+        - first version shipped, first CPAN module, first OO program
+          added new features over the old procedural program and
+          wrote an example HTML::Template template in webpage.

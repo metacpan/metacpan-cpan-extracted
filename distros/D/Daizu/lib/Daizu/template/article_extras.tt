@@ -1,0 +1,3 @@
+[% FOREACH filename = file.article_extra_templates -%]
+ [% INCLUDE $filename %]
+[%- END -%]

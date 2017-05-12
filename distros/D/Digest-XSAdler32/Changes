@@ -1,0 +1,6 @@
+Revision history for Perl extension Digest::XSAdler32.
+
+0.01  Wed Oct 13 12:36:25 2010
+	- original version; created by h2xs 1.23 with options
+		-A -n Digest::XSAdler32
+

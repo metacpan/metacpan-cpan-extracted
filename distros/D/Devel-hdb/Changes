@@ -1,0 +1,99 @@
+26 Jan 2016 - v0.23
+    * Right-click on a variable in the Code Pane to add it to the Watch Pane
+    * Exit code is now displayed properly by the Program Terminated modal
+        (Eli Lindsey)
+    * Child processes listen on the parent process's port + 1, if available
+    * Fix tests running with Devel::Chitin 0.06 which include 'callsite' in
+        Location/stackframe objects
+    * POD fixes
+
+v0.22 - Skipped because of a packaging problem
+
+15 Dec 2014 - v0.21001
+    * Fix for running tests on machines with IPv6 enabled
+    * Typo fix that prevented the WatchPoint module for getting loaded
+
+12 Dec 2014 - v0.21
+    * New feature: Add a watchpoint by enabling the checkbox next to a watched
+        expression.  Execution will stop when its value changes.
+    * The whole expression is now hilited when mousing over an array or hash
+        element expression.
+    * The stack tab pane is now scrollable.
+
+18 Aug 2014 - v0.20001
+    * Fix bug scrolling the current line into view
+    * fix bug that was discarding keystrokes
+
+16 Aug 2014 - v0.20
+    * Back-end now uses a documented REST api
+    * Added module to communicate with the api - Devel::hdb::Client
+    * Rewritten GUI to use the REST api
+    * Faster page loading when the stack is deep
+
+1 July 2014 - v0.13
+    * Extracted a module to transform a Perl data structure into a serializable
+      format: Data::Transform::ExplicitMetadata
+    * Fix a test that failed in Perl 5.21
+
+4 Mar 2014 - v0.12
+    * Extracted debugger infrastructure into a separate module: Devel::Chitin
+    * Fix a bug when a difference is found in follow mode
+
+31 Dec 2013 - v0.11
+    * Documentation and typo fixes
+    * Stack now shows wantarray-ness
+    * Improved mouseover for hash keys
+    * Bug fixes for scrolling code windows, editing breakpoints, debugging
+        child processes
+
+17 Oct 2013 - v0.10
+    * Fix keybinding problems on multiple browsers
+    * Fix rendering of HTML-like strings in code and data
+    * Send tied values over the wire and render them on the web frontend
+    * Fix undeclared test dependancy on WWW::Mechanize
+
+23 May 2013 - v0.09
+    * After a fork(), the always stop the parent process
+    * Add key bindings similar to the command-line debugger
+    * Sending v-strings and self-referential data structures over the wire now works
+    * Improve test reliability
+
+16 May 2013 - v0.08
+    * Fix text overflow with the main program tab
+    * Fix bug in the open-file picker
+
+16 May 2013 - v0.07
+    * Perl value serializer can now handle typeglobs
+    * Opening additional code windows now works
+    * Untrapped exceptions are now caught and shown in the GUI
+    * Added trace/follow mode
+
+4 Apr 2013 - v0.06
+    * Hover-over-variable works for hash and array elements, and for (most)
+      Perl special variables.
+    * User is notified immediately after a fork(), rather than waiting until
+      after the next user interaction
+    * Fix for code pane rendering in Firefox
+
+26 Mar 2013 - v0.05
+    * When the debugged program forks, the user is notified and given the
+      option to debug the child process in another window
+    * Breakpoints can be saved and restored
+
+21 Mar 2013 - v0.04
+    * New breakpoint list view
+    * Breakpoints and actions can be marked inactive without removing them
+
+16 Mar 2013 - v0.03
+    * Fix a bug where clicking on a line number would not set a breakpoint
+    * Code panes are rendered smaller to fit more on the screen
+
+15 Mar 2013 - v0.02
+    * Hover over a variable to see its value.  Works for all stack frames.
+    * Currently executing sub and its args are shown at the top of the code
+    * The PerlValue serializer can now handle Regexp refs
+
+9 Mar 2013 - v0.01
+    * First Release
+    * Single step, step over, step out, continue
+    * Watch expressions

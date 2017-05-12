@@ -1,0 +1,148 @@
+=head1 NAME
+
+DBICx::Backend::Move - Migrate an existing database to another backend
+
+
+=cut
+
+=head1 SYNOPSIS
+
+    use DBICx::Backend::Move::Psql;
+    use Try::Tiny;
+
+    my $connect_from = [ 'dbi:mysql:dbname=mydb', 'mysql_user', 'mysql_password' ];
+    my $connect_to   = [ 'dbi::pg::dbname=mydb' , 'psql_user' , 'psql_password'  ];
+    my $schema       = 'My::Schema';
+    my $verbose      = 1;
+
+    my $migrator = DBICx::Backend::Move::Psql->new()
+
+    try { 
+          $migrator->migrate( $connect_from, $connect_to, $schema, $opt)
+    } catch {
+          ... # handle error
+    };
+
+
+=head1 DESCRIPTION
+
+When you use L<DBIx::Class> to work with your database, migrating it from one
+backend to another should be really easy. Turns out it is not. This module
+offers a turn-key solution to the problem. Create an object of the
+DBICx::Migration subclass that contains the type of the B<destination>
+database in the name. For example if you want to migrate from MySQL to
+PostgreSQL you use C<new DBICx::Backend::Move::Psql>. Currently, Psql and SQLite
+are supported. If you want it even more easy, there is an application that
+uses DBICx::Backend::Move. Have a look at L<App::DBICx::Backend::Move>.
+
+=head1 SUBROUTINES
+
+=head2 migrate
+
+Execute the migration process.
+
+=over 4
+
+=item Arguments: \@connect_from, \@connect_to, $schema_name, $verbose?
+
+=back
+
+=over
+
+=item connect_from
+
+This argument is an array ref containing DSN, username, password and an
+optional option hash. It will be passed to DBIx::Class::Schema->connect. For
+more information see L<DBIx::Class::Storage::DBI/"connect_info">. The array
+should contain all information to connect to the source database.
+
+=item connect_to
+
+This argument is an array ref containing DSN, username, password and an
+optional option hash. It will be passed to DBIx::Class::Schema->connect. For
+more information see L<DBIx::Class::Storage::DBI/"connect_info">. The array
+should contain all information to connect to the destination database. The
+destination needs to exist and be empty (i.e. contain no tables).
+
+=item schema_name
+
+Name of the L<DBIx::Class> based schema description of the source
+database. Therefore, it also will be the schema for the destination database.
+
+=item verbose 
+
+Print the name of the table the tool is currently working on and a dot for
+every row.
+
+=back
+
+In case of an error the function will throw an exception.
+
+
+
+
+=head1 AUTHOR
+
+Maik Hentsche, C<< <Caldrin at cpan dot org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dbicx-migration at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBICx-Backend-Move>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DBICx::Backend::Move
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBICx-Backend-Move>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/DBICx-Backend-Move>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DBICx-Backend-Move>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/DBICx-Backend-Move/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+Thanks to
+
+=over 4
+
+=item * renormalist for discussinh design decisions
+
+=item * mst for explaining transaction handling in DBIC and DBI
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2012 Maik Hentsche.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

@@ -1,0 +1,32 @@
+cgi/thisweek.cgi
+Changes
+lib/DateTime/Event/Jewish.pm
+lib/DateTime/Event/Jewish/Declination.pm
+lib/DateTime/Event/Jewish/Eqt.pm
+lib/DateTime/Event/Jewish/Haversine.pm
+lib/DateTime/Event/Jewish/Parshah.pm
+lib/DateTime/Event/Jewish/Sedrah.pm
+lib/DateTime/Event/Jewish/Sunrise.pm
+lib/DateTime/Event/Jewish/Yomtov.pm
+lib/DateTime/Event/Jewish/ZoneLocation.pm
+Makefile.PL
+MANIFEST
+README
+samples/sample001.pl
+samples/sample002.pl
+samples/sample003.pl
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/t001.t
+t/t002.t
+t/t003.t
+t/t004.t
+t/t005.t
+t/t006.t
+t/t007.t
+Torah_Portions.xls
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

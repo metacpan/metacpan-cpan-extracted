@@ -1,0 +1,46 @@
+{
+   "abstract" : "Faster implementation of the Devel::GlobalDestruction API",
+   "author" : [
+      "Yuval Kogman <nothingmuch@woobling.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-GlobalDestruction-XS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {},
+      "configure" : {},
+      "runtime" : {},
+      "test" : {}
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-GlobalDestruction-XS@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-GlobalDestruction-XS"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/p5sagit/Devel-GlobalDestruction-XS.git",
+         "web" : "http://github.com/p5sagit/Devel-GlobalDestruction-XS"
+      },
+      "x_IRC" : "irc://irc.perl.org/#toolchain"
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

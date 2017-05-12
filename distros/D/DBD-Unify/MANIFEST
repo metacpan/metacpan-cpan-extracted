@@ -1,0 +1,38 @@
+ChangeLog
+dbdimp.h
+dbdimp.ic
+ic2ec
+installu.pl
+Makefile.PL
+MANIFEST
+ppport.h
+README
+Unify.h
+Unify.xs
+lib/DBD/Unify.pm
+lib/DBD/Unify/TypeInfo.pm
+lib/DBD/Unify/GetInfo.pm
+t/00-pod.t
+t/00-podc.t
+t/01-base.t
+t/02-connect.t
+t/03-general.t
+t/10-dbi-drv.t
+t/11-dbi-dbh.t
+t/12-dbi-sth.t
+t/15-uni-fail.t		Test that should fail to connect
+t/20-uni-basic.t
+t/21-uni-regex.t
+t/22-uni-utf8.t
+t/24-text.t
+t/25-binary.t
+t/26-uni-multiarg.t
+t/27-uni-max.t
+t/28-datetime.t
+t/30-reconnect.t
+t/40-info.t
+t/50-trace.t
+t/99-done.t
+examples/row_counts
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

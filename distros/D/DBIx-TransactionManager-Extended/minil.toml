@@ -1,0 +1,4 @@
+name = "DBIx-TransactionManager-Extended"
+badges = ["travis", "codecov"]
+module_maker="ModuleBuildTiny"
+

@@ -1,0 +1,11 @@
+Revision history for Debug-LTrace
+
+0.01    
+        First version, released on an unsuspecting world.
+
+0.02    
+        Minor additions to documentation
+        Tests improvements to work with perl 5.8.x
+
+0.03
+        Minor changes in documentation

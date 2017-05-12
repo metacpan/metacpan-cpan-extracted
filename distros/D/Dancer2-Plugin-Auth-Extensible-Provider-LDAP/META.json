@@ -1,0 +1,60 @@
+{
+   "abstract" : "LDAP authentication provider for Dancer2::Plugin::Auth::Extensible",
+   "author" : [
+      "Peter Mottram <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Auth-Extensible-Provider-LDAP",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Net::LDAP" : "0.07"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Plugin::Auth::Extensible" : "0.620",
+            "Moo" : "2.000000",
+            "Net::LDAP" : "0",
+            "YAML" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/",
+      "repository" : {
+         "url" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.702",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,6 @@
+{
+    expected    =>  'output',
+    subhash     =>  {
+                        more    =>  "\toutput",
+                    },
+}

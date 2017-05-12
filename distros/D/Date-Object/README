@@ -1,0 +1,51 @@
+################
+# DATE::OBJECT #
+################
+
+Date::Object - Handles dates/calendars/timezones and it's representation/convertions using a single Date::Object.
+
+###############
+# DESCRIPTION #
+###############
+
+Date::Object is an alternative to the L<DateTime> modules, with the main pourpose
+to handle dates using a single object or make multiple I<Date::Object>s work together
+to calculate and handle dates.
+
+Other main poupose of I<Date::Object> is to find a simple way to store dates
+in a persistent enverioment (any database) using a simple INTEGER field.
+The use of a INTEGER field for that make possible searches in the DB by ranges,
+what is impossible with normal storages of dates, specially if they are saved as STRING,
+generally in the comon format of "YYYY-MM-DD". Also an INTEGER field have all the informations
+of a date, including I<year, month, day, hour, minute, second and timezone>. Other good
+thing is that any DB supports INTEGER fields, what doesn't make our Perl code dependent
+of the SQL nuances of each different way to handle dates of each DB.
+
+
+See POD for more...
+
+################
+# INSTALLATION #
+################
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+##########
+# AUTHOR #
+##########
+
+Graciliano M. P. <gm@virtuasites.com.br>
+
+I will appreciate any type of feedback (include your opinions and/or suggestions). ;-P
+
+############# 
+# COPYRIGHT #
+#############
+
+This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.
+

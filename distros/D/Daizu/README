@@ -1,0 +1,9 @@
+Daizu CMS  is an experimental content management system. It is an
+attempt to build a solid base on which a more general CMS can eventually
+be built. As such, it doesn't yet provide a simple user interface, but
+it does solve some basic problems to do with tracking changes to
+content.
+
+There is documentation on the Daizu CMS website:
+
+    http://www.daizucms.org/

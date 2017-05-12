@@ -1,0 +1,78 @@
+=head1 NAME
+
+DBIx::Struct - convenience SQL functions with Class::Struct-like row objects
+
+=head1 SYNOPSIS
+
+    use DBIx::Struct;
+
+    DBIx::Struct::connect($data_source, $username, $auth);
+
+    my $row = one_row("table", $idField);
+
+    print $row->field;
+
+    $row->field('new data');
+
+    $row->update;
+
+    my $rows = all_rows("table", {field => "some data"});
+
+    print $rows->[0]->field;
+
+=head1 DESCRIPTION
+
+Makes SQL queries from Perl data structures. It uses L<SQL::Abstract> 
+module to parse "where" and "order by" structures. This module does B<not> 
+try to map all possible SQL features to Perl structures but it greatly
+simplifies really simple and most often used scenarios. Complex queries
+are also possible, but sometimes it'd better to use real SQL.
+
+=head1 USAGE
+
+Suppose you have tables
+
+ session:
+   session_key text unique,
+   id_client integer references client(id),
+   expires timestamp
+ 
+ client
+   id serial primary key,
+   name text
+   
+ client_balance
+   balance decimal(14,2),
+   currency text, 
+   id_client integer references client(id),
+   unique(currency, id_client)
+   
+How to access this structure
+
+ # get session object
+   my $session = one_row("session", {session => $input->{session}, ip => $input->{ip}});
+ # throw exception when there's no session
+   NoUser->throw("User is not logged in or does not exist") unless defined $session;
+ # get client's row
+   my $client = $session->Client;
+ # strip microseconds part
+   $client->filter_timestamp;
+ # throw exception if client is blocked
+   BlkUser->throw   if $client->state eq 'blocked';
+ # set expire date
+   $session->expire(\"now() + interval '2 day'");
+ # update session
+   $session->update;
+ # get usd client's balance from client_balance
+   my $usd_balance = $client->refClientBalance(currency => "USD");
+ 
+To use SQL 
+
+ use DBIx::Struct qw(connector);
+ # ... 
+ my $name;
+ connector->run(sub {
+   ($name) = $_->selectrow_array('select name from client join '
+     . 'session on (id = id_client) where session_key = ?', undef, $input->{session})
+   }
+ );

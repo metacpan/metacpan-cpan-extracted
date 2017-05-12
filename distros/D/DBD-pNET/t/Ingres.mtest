@@ -1,0 +1,8 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: Ingres.mtest,v 1.1.1.1 1997/09/19 20:34:23 joe Exp $
+#
+# module specific definitions for an 'Ingres' database
+
+
+1;

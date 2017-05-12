@@ -1,0 +1,49 @@
+0.32  2016-04-19 06:46:20 CEST
+   - release after 299 PASS on CPAN Testers (thanks!)
+
+0.31_1  2016-02-06 13:28:21 CET
+   - fixed bug occurring when calling prefix before files
+   - worked around bug in pre-5.14 perls (open() on scalar refs)
+
+0.31  2016-02-05 15:25:06 CET
+   - removed duplicate test file pod.t
+   - set version for all modules to make indexer happy
+
+0.3_02  2016-02-05 09:58:57 CET
+   - added IO::Slice to the requirements
+
+0.3_01  2016-02-05 07:20:00 CET
+   - added cpanfile for dependencies
+
+0.30  2016-02-04 17:47:23 CET
+   - removed cruft from package
+   - simplified Dist::Zilla handling, moved to Milla
+   - expanded interface and added reassemble for "complex" operations
+
+0.21      2015-01-06 19:43:19 Europe/Rome
+   - release after 64 passes on CPAN Testers (thanks!)
+
+0.2_03    2015-01-06 07:32:02 Europe/Rome
+   - fixed test t/10-writer-add.t for openining a handle to a scalar
+     ref in perl prior to 5.14 (no ':raw' allowed, using binmode()
+     just after)
+
+0.2_02    2015-01-06 01:38:39 Europe/Rome
+   - new D::E::Writer and writer() implementation (sanitized)
+   - added documentation for data-embed script
+   - documentation bugfixes
+
+0.2_01    2015-01-03 16:41:07 Europe/Rome
+   - added package for embedding one file in a Perl module
+   - added sub-command in data-embed for feature above
+
+0.1       2015-01-01 09:37:16 Europe/Rome
+   - release after 71 passes on CPAN Testers (thanks!)
+
+0.1_02    2014-12-31 14:09:57 Europe/Rome
+   - workaround for perl bug in open() prior to version 5.14
+   - added name() method to Data::Embed::File
+   - added script for embedding/listing/extracting from container files
+
+0.1_01    2014-12-30 17:47:32 Europe/Rome
+   - developer release to see what CPAN Testers say

@@ -1,0 +1,39 @@
+---
+abstract: 'Dist::Zilla::PluginBundle for BerryGenomics Bioinformatics Department'
+author:
+  - 'Huo Linhe <huolinhe@berrygenomics.com>'
+build_requires:
+  Module::Build: '0.28'
+  Module::Find: '0'
+  Test::More: '0'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-BerryGenomics
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes: '0'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::Git: '2'
+  Dist::Zilla::Plugin::InstallGuide: '1.0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PodWeaver: '4'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::Run: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  Sub::Install: '0'
+  namespace::autoclean: '0'
+version: 0.3.2

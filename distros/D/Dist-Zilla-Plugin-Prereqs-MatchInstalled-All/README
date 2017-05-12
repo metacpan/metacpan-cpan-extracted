@@ -1,0 +1,67 @@
+Dist::Zilla::Plugin::Prereqs::MatchInstalled::All
+
+This is a special case of "Dist::Zilla::Plugin::Prereqs::MatchInstalled"
+that automatically upgrades all versions of all dependencies, unless
+asked not to.
+
+  PITFALLS
+
+Presently, there is one very large gotcha about using this module, in
+that it will upgrade everything, even things that don't make sense to
+upgrade.
+
+For instance:
+
+   Local Versions
+
+If you have a single dependency on your system you might use, which is
+locally patched, and locally patched in such a way the local version is
+more recent than any on "CPAN", you should either
+
+a. Not use this module
+b. Put that module in the exclusion list
+
+   Non-Dual Life modules
+
+This plugin is not very smart, and can't differentiate between modules
+that do exist on "CPAN" independent of Perl, and modules that don't.
+
+For instance, if you use "Autoprereqs", its very likely your
+distribution will add a dependency on either "strict" or "warnings"
+
+This module will ask your user to upgrade those versions to their latest
+versions, which will likely require them to upgrade their Perl
+installation to do so.
+
+Which basically means for the mean time, either
+
+a. You must be o.k. with end users needing more recent Perls
+b. You should avoid upgrading those dependencies by either
+
+    a. Not using this plugin
+    b. Adding problematic modules to the exclusion list
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

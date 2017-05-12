@@ -1,0 +1,17 @@
+INSTALL file for Date-Holidays
+
+$Id: INSTALL 1589 2005-10-10 10:13:21Z jonasbn $
+
+1. tar -xvzf Date-Holidays-<version>.tar.gz 
+
+2. cd Date-Holidays
+
+3. perl Build.PL
+
+4. ./Build
+
+5. ./Build test
+
+6. ./Build install (might require privileged access)
+
+7. ./Build realclean 

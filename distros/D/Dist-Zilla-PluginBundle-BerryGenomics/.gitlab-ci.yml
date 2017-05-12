@@ -1,0 +1,25 @@
+before_script:
+  - git config --global user.email "build@example.com"
+  - git config --global user.name "Gitlab CI Runner"
+
+build:
+  script:
+    - perlbrew -q exec cpanm -M http://192.168.4.13:2963/ Dist::Zilla
+    - perlbrew -q exec dzil authordeps --missing | xargs perlbrew -q exec cpanm -M http://192.168.4.13:2963/
+    - perlbrew exec dzil test
+  tags:
+    - perl
+  except:
+    - /^release/
+    - /^build/
+
+release:
+  script:
+    - perlbrew exec perl Build.PL
+    - perlbrew exec ./Build
+    - perlbrew exec ./Build test
+    - perlbrew exec ./Build install
+  tags:
+    - perl
+  only:
+    - /^release/

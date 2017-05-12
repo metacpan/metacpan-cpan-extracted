@@ -1,0 +1,137 @@
+<html>
+<head>
+<title>BabelKit Perl Source Code Setup</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+<div align="right">
+[<a href="bk_setup_php.html">PHP Setup</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_admin.html">Translation Utility</a>]
+</div>
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Perl Source Code Setup</h2></center>
+
+<p>
+Read the <a href="bk_overview.html">Overview</a> and the
+<a href="bk_schema.html">Code Table Setup</a> pages first.
+
+<p>
+The BabelKit Perl source code is in the perl directory:
+
+<pre>
+    BabelKit.pm       - BabelKit module definition.
+    bk_admin.pl       - Setup for bk_admin_main.pl.
+    bk_admin_main.pl  - BabelKit Translation Utility.
+    bk_connect.pl     - Database connection setup.
+    bk_demo.pl        - BabelKit Demo page.
+    regression.test   - Regression testing.
+    Makefile.PL       - Makefile setup.
+</pre>
+
+BabelKit.pm requires the DBI.pm module.  The Translation
+Utility and the Demo page need the CGI.pm module.
+
+
+<h4>1. Database Schema and Core Record Loading</h4>
+
+Read and follow directions for 
+<a href="bk_schema.html">Code Table Setup</a>.
+
+<p>
+Load and test the bk_code table schema definition as well
+as the core data records.  If you want to run the demo
+load the demo data records as well.
+
+
+<h4>2. Database Connection Setup</h4>
+
+Customize the bk_connect.pl file to open
+a database handle to your database.  If your application
+setup has already opened a database handle, use that
+handle instead of opening a new one.  The handle
+should be set up to autocommit.
+
+<p>
+bk_connect.pl is used by bk_admin.pl, bk_demo.pl
+and by regression.test.
+
+
+<h4>3. BabelKit.pm Installation</h4>
+
+Copy the BabelKit.pm file into a directory on your Perl
+include path.  Or do the makefile thing:
+
+<pre>
+    $ perl Makefile.PL
+    $ make
+    $ make test
+    # make install
+</pre>
+
+<p>
+Run regression.test on the basic BabelKit class functions.
+This will fail unless you have completed the above steps!
+
+
+<h4>4. BabelKit Translation Utility Setup</h4>
+
+You may wish to customize the bk_admin.pl file to your situation:
+
+<ul>
+<li>
+Require and open a <a href="bk_new_perl.html">BabelKit handle</a>.
+</li>
+<li>
+Set the $perm_add, $perm_upd and $perm_del global variables.
+These let the user add, update and delete codes.
+</li>
+<li>
+Define the bka_sess_url() function.  Customize this if
+you are carrying session identifiers in your urls.
+</li>
+<li>
+Require bk_admin_main.pl and call the bka_admin_main() function.
+</li>
+</ul>
+
+It is fine to make multiple copies of bk_admin.pl
+to set up different permissions for different classes
+of users.
+
+
+<h4>5. Demo Page Setup</h4>
+
+In order for the demo page to function, you will need
+to load the <a href="bk_schema.html#demodata">demo data records</a>.
+
+
+<p>
+<div align="right">
+[<a href="bk_setup_php.html">PHP Setup</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_admin.html">Translation Utility</a>]
+</div>
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

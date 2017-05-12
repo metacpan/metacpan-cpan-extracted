@@ -1,0 +1,80 @@
+[% FILTER null %]
+[%#------------------------------------------------------------
+  # File: dstar/common.ttk
+  # Description: common variables for dstar webapi
+  #  + drop-in replacement for dstar/web/common.ttk in diacollo standalone installations
+%]
+[% USE date %]
+[% USE HTML %]
+[% USE URL %]
+[% SET
+    diacollo_standalone = 1
+%]
+
+[% DEFAULT
+   defaults     = {}
+   dstar        = {}
+   dstar.corpus = "Corpus"
+   root_title   = "$dstar.corpus"
+   root_email   = "moocow@cpan.org"
+   root_url     = defaults.root_url or dstar.www_url or "http://" _ ENV.HTTP_HOST _ dstar.path
+   root_dir     = ""
+   favicon_url  = root_dir _ "images/diacollo-favicon.png"
+   ##
+   ##-- diacollo-specific stuff
+   dstar.diacollo_enabled = 1
+   defaults.diacollo_enabled = dstar.diacollo_enabled
+   diacollo_logo    = root_dir _ "images/diacollo-logo.png"
+   diacollo_icon    = root_dir _ "images/diacollo-favicon.png"
+%]
+
+[% PERL %]
+  ##-- $uristr = quri($base, \%form)
+  use URI;
+  my $quri = sub {
+    my ($base,$form)=@_;
+    my $uri=URI->new($base);
+    $uri->query_form($uri->query_form, map {utf8::is_utf8($_) ? Encode::encode_utf8($_) : $_} %{$form||{}});
+    return $uri->as_string;
+  };
+  $stash->set('quri'=>$quri);
+
+  ## $urisub = uuri($base, \%form)
+  ## $uristr = $urisub->(\%form)
+  $stash->set('uuri',
+  sub {
+    my $base = $quri->(@_);
+    return sub { $quri->($base,@_); };
+  });
+
+  ##-- $elapsed_secs = elapsed()
+  ##-- $elapsed_secs = elapsed($t0)
+  use Time::HiRes;
+  my $elapsed_sub = sub {
+    my $t0 = shift || $stash->get('t0');
+    return Time::HiRes::tv_interval($t0,[Time::HiRes::gettimeofday]);
+  };
+  $stash->set('elapsed'=>$elapsed_sub);
+[% END %]
+
+##-- local overrides (optional)
+[% SET corpus_ttk = root_dir _ "corpus.ttk" %]
+[% SET custom_ttk = root_dir _ "custom.ttk" %]
+[% TRY %]
+ [% PROCESS $corpus_ttk %]
+[% CATCH %]
+ [% 1 %]
+[% END %]
+[% TRY %]
+ [% PROCESS $custom_ttk %]
+[% CATCH %]
+ [% 1 %]
+[% END %]
+
+##-- computed values
+[% SET
+   diacollo_enabled  = defaults.diacollo_enabled;
+   diacollo_enabled_b = (diacollo_enabled && diacollo_enabled != "no");
+%]
+
+[% END %]

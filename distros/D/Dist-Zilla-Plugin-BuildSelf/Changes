@@ -1,0 +1,14 @@
+Revision history for Dist-Zilla-Plugin-BuildSelf
+
+0.004     2015-03-08 17:58:36+01:00 Europe/Amsterdam
+          Adapt to new argument passing scheme in Build.PL
+
+0.003     2013-05-25 19:38:02 Europe/Amsterdam
+          Get rid of version attribute
+          Add minimumperl attribute
+
+0.002     2012-02-23 14:17:27 Europe/Amsterdam
+          Added auto_configure_requires parameter, change default to false
+
+0.001     2011-05-02 09:19:27 Europe/Bucharest
+          Initial release

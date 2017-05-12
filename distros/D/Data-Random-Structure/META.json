@@ -1,0 +1,51 @@
+{
+   "abstract" : "Generate random data structures",
+   "author" : [
+      "Mark Allen <mrallen1@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132661",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Random-Structure",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Random" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-Random-Structure@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Random-Structure"
+      },
+      "homepage" : "https://metacpan.org/dist/Data-Random-Structure",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mrallen1/WebService-Geocodio.git",
+         "web" : "https://github.com/mrallen1/WebService-Geocodio"
+      }
+   },
+   "version" : "0.01"
+}
+

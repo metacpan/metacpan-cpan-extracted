@@ -1,0 +1,64 @@
+NAME
+
+Data::IEEE754::Tools - Various tools for understanding and manipulating the underlying IEEE-754 representation of floating point values
+
+DESCRIPTION
+
+These tools give access to the underlying IEEE 754 floating-point 64bit
+representation used by many instances of Perl (see perlguts). They
+include functions for converting from the 64bit internal representation
+to a string that shows those bits (either as hexadecimal or binary) and
+back, functions for converting that encoded value into a more
+human-readable format to give insight into the meaning of the encoded
+values, and functions to manipulate the smallest possible change for a
+given floating-point value (which is the ULP
+<https://en.wikipedia.org/wiki/Unit_in_the_last_place> or "Unit in the
+Last Place").
+
+COMPATIBILITY
+
+Data::IEEE754::Tools works with 64bit floating-point representations.
+
+If you have a Perl setup which uses a larger representation (for
+example, "use Config; print $Config{nvsize}; # 16 => 128bit"), values
+reported by this module will be reduced in precision to fit the 64bit
+representation.
+
+If you have a Perl setup which uses a smaller representation (for
+example, "use Config; print $Config{nvsize}; # 4 => 32bit"), the
+installation will likely fail, because the unit tests were not set up
+for lower precision inputs. However, forcing the installation *might*
+still allow coercion from the smaller Perl NV into a true IEEE 754
+double (64bit) floating-point, but there is no guarantee it will work.
+
+INSTALLATION
+
+To install this module, use your favorite CPAN client.
+
+For a manual install, type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+(On Windows machines, you may need to use "dmake" instead of "make".)
+
+AUTHOR
+
+Peter C. Jones <petercj AT cpan DOT org>
+
+Please report any bugs or feature requests emailing <bug-Data-IEEE754-Tools AT rt.cpan.org>
+or thru the web interface at <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-IEEE754-Tools>
+
+COPYRIGHT
+
+Copyright (C) 2016 Peter C. Jones
+
+LICENCE
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See <http://dev.perl.org/licenses/> for more information.

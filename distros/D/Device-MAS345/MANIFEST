@@ -1,0 +1,10 @@
+Changes
+eg/masloop
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+MAS345.pm
+README
+t/001Basic.t
+t/002Parser.t
+META.yml                                 Module meta-data (added by MakeMaker)

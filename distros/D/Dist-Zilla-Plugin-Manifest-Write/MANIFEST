@@ -1,0 +1,20 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.6_01.
+Build.PL                                        #                        3rd party file built by ModuleBuildTiny
+COPYING                                         # Dist-Zilla-Plugin-Manifest-Write file built by GenerateFile
+Changes                                         # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+GPLv3                                           # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+MANIFEST                                        #                         metainfo file built by Manifest::Write
+META.json                                       #                         metainfo file built by MetaJSON
+META.yml                                        #                         metainfo file built by MetaYAML
+README                                          # Dist-Zilla-Plugin-Manifest-Write file built by GenerateFile
+VERSION                                         # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+eg/MANIFEST                                     # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+eg/ManifestWithFileSize.out                     # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+eg/ManifestWithFileSize.pm                      # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Manifest/Write.pm         # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Manifest/Write/Manual.pod # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+t/00-compile.t                                  #                        3rd party file built by Test::Compile
+t/examples.t                                    # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+t/lib/CustomPlugin.pm                           # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+t/lib/ManifestWriteTester.pm                    # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read
+t/manifest-write.t                              # Dist-Zilla-Plugin-Manifest-Write file added by Manifest::Read

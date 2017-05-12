@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Data/XML/Variant.pm
+lib/Data/XML/Variant/Build.pm
+lib/Data/XML/Variant/Output.pm
+Makefile.PL
+MANIFEST
+META.yml			# Will be created by "make dist"
+README
+t/10-variant.t
+t/20-build.t
+t/30-output.t
+t/pod-coverage.t
+t/pod.t

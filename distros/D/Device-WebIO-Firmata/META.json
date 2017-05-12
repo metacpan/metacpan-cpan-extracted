@@ -1,0 +1,48 @@
+{
+   "abstract" : "Interface between Device::WebIO and Device::Firmata (Arduino)",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-WebIO-Firmata",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Firmata" : "0",
+            "Device::WebIO" : "0.002",
+            "Exception::Tiny" : "0",
+            "Moo" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/Device-WebIO-Firmata.git",
+         "web" : "https://github.com/frezik/Device-WebIO-Firmata"
+      }
+   },
+   "version" : "0.002"
+}
+

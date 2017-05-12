@@ -1,0 +1,12 @@
+Revision history for Document-Transform: 1.110530
+
+1.110530  2011-02-22 11:08:58 America/Chicago
+        Re-engineer the innards significantly.
+        Shift the burden of type constraints to the backend implementations.
+        Remove Types.pm
+        Use newer MongoDBx::AutoDeref
+        Clean up documentation to follow changes
+        Allow for arbitarily deep nested transform references
+
+Wed Feb  9 10:18:12 2011 UTC
+        Initial Release

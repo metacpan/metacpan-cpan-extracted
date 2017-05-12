@@ -1,0 +1,16 @@
+#!/usr/bin/perl 
+#-------------------------------------------------------
+# Script for reading in files created with the Perl
+# Storable module.  Scott Lindsey suggested this. 
+#-------------------------------------------------------
+
+use Storable;
+use Data::Walker;
+
+($ARGV[0]) or (die 'No input file specified.');
+(-r $ARGV[0]) or (die 'Can\'t find and/or read file.');
+
+my $ref = retrieve($ARGV[0]);
+$ARGV[0] = '-';
+
+Data::Walker->cli( $ref );

@@ -1,0 +1,19 @@
+---
+name: Data-Random-String
+version: 0.03
+author:
+  - 'Ioakim (Makis) Marmaridis <m.marmaridis@gmail.com>'
+abstract: This is a module for generating random strings
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0
+provides:
+  Data::Random::String:
+    file: lib/Data/Random/String.pm
+    version: 0.03
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,15 @@
+use strict;
+use warnings;
+use Test::More;
+use Test::Exception;
+use Data::Dumper;
+no warnings 'once';
+
+ok require Devel::DidYouMean;
+throws_ok { Dumpr({ foo => 'bar' }) } qr/Did you mean Dumper/, 'Imported sub';
+throws_ok { prnt('just a test') } qr/Did you mean print/, 'builtin function';
+throws_ok { Data::Dumper::Dumber({ foo => 'bar' }) } qr/Did you mean Dumper/, 'Class sub';
+
+print @$Devel::DidYouMean::DYM_MATCHING_SUBS;
+
+done_testing();

@@ -1,0 +1,105 @@
+{
+   "abstract" : "Oracle database driver for the DBI module",
+   "author" : [
+      "Tim Bunce <timb@cpan.org>",
+      "John Scoles <byterock@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>",
+      "Martin J. Evans <mjevans@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.014, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBD-Oracle",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "DBI" : "1.51",
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "DynaLoader" : "0",
+            "Exporter" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "B" : "0",
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Devel::Peek" : "0",
+            "Encode" : "0",
+            "Math::BigInt" : "0",
+            "Test::More" : "0.88",
+            "Thread::Semaphore" : "0",
+            "lib" : "0",
+            "utf8" : "0",
+            "vars" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBD::Oracle" : {
+         "file" : "lib/DBD/Oracle.pm",
+         "version" : "1.74"
+      },
+      "DBD::Oracle::GetInfo" : {
+         "file" : "lib/DBD/Oracle/GetInfo.pm",
+         "version" : "1.74"
+      },
+      "DBD::Oracle::Object" : {
+         "file" : "lib/DBD/Oracle/Object.pm",
+         "version" : "1.74"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pythian/DBD-Oracle/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/DBD-Oracle/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pythian/DBD-Oracle.git",
+         "web" : "https://github.com/pythian/DBD-Oracle"
+      }
+   },
+   "version" : "1.74",
+   "x_authority" : "cpan:PYTHIAN",
+   "x_contributors" : [
+      "David E. Wheeler <david@justatheory.com>",
+      "David Perry <perry@pythian.com>",
+      "David Steinbrunner <dsteinbrunner@pobox.com>",
+      "Gwen Shapira <shapira@pythian.com>",
+      "Joe Crotty <joe.crotty@returnpath.net>",
+      "Michael Portnoy <portnoy@pythian.com>",
+      "StephenCIQG <StephenCIQG@50811bd7-b8ce-0310-adc1-d9db26280581>",
+      "cjardine <cjardine@50811bd7-b8ce-0310-adc1-d9db26280581>",
+      "gregor herrmann <gregoa@debian.org>",
+      "jurl <jurl@50811bd7-b8ce-0310-adc1-d9db26280581>",
+      "lbaxter <lbaxter@50811bd7-b8ce-0310-adc1-d9db26280581>",
+      "robert <robert@50811bd7-b8ce-0310-adc1-d9db26280581>"
+   ],
+   "x_help_wanted" : [
+      "developer",
+      "documenter",
+      "tester"
+   ]
+}
+

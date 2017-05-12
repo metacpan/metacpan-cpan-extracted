@@ -1,0 +1,30 @@
+NAME
+    Daemon::Mplayer - run mplayer daemonized
+
+SYNOPSIS
+      use Daemon::Mplayer;
+
+      mplayer_play( $pidfile, $logfile, @mplayer_args );
+
+      ...
+
+      mplayer_stop($pid);
+
+DESCRIPTION
+    Daemon::Mplayer ...
+
+EXPORTS
+  mplayer_play()
+  mplayer_stop()
+AUTHOR
+      Magnus Woldrich
+      CPAN ID: WOLDRICH
+      magnus@trapd00r.se
+      http://japh.se
+
+COPYRIGHT
+    Copyright 2011 Magnus Woldrich <magnus@trapd00r.se>. This program is
+    free software; you may redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO

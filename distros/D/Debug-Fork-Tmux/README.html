@@ -1,0 +1,887 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <title>
+      Debug::Fork::Tmux
+    </title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  </head>
+  <body class='pod'>
+    <!--
+
+ If you want to change this HTML document, you probably shouldn't do that
+   by changing it directly.  Instead, see about changing the calling options
+   to Pod::Simple::HTML, and/or subclassing Pod::Simple::HTML,
+   then reconverting this document from the Pod source.
+   When in doubt, email the author of Pod::Simple::HTML for advice.
+   See 'perldoc Pod::Simple::HTML' for more info.
+
+-->
+    <!-- start doc -->
+    <a name='___top' class='dummyTopAnchor'></a>
+    <h1>
+      Debug::Fork::Tmux
+    </h1>
+    <p>
+      Makes fork() in debugger to open a new Tmux window
+    </p>
+    <div class='indexgroup'>
+      <ul class='indexList indexList1'>
+        <li class='indexItem indexItem1'>
+          <a href='#NAME'>NAME</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#VERSION'>VERSION</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SYNOPSIS'>SYNOPSIS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DESCRIPTION'>DESCRIPTION</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SUBROUTINES%2FMETHODS'>SUBROUTINES/METHODS</a>
+          <ul class='indexList indexList2'>
+            <li class='indexItem indexItem2'>
+              <a href='#PUBLIC'>PUBLIC</a>
+              <ul class='indexList indexList3'>
+                <li class='indexItem indexItem3'>
+                  <a href='#DB%3A%3Aget_fork_TTY()'>DB::get_fork_TTY()</a>
+                </li>
+              </ul>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#PRIVATE'>PRIVATE</a>
+              <ul class='indexList indexList3'>
+                <li class='indexItem indexItem3'>
+                  <a href='#_spawn_tty()'>_spawn_tty()</a>
+                </li>
+                <li class='indexItem indexItem3'>
+                  <a href='#_tmux_new_window()'>_tmux_new_window()</a>
+                </li>
+                <li class='indexItem indexItem3'>
+                  <a href=
+                  '#_tmux_window_tty(_%24window_id_)'>_tmux_window_tty(
+                  $window_id )</a>
+                </li>
+                <li class='indexItem indexItem3'>
+                  <a href=
+                  '#_read_from_cmd(_%24cmd_%3D%3E_%40args_)'>_read_from_cmd(
+                  $cmd =&gt; @args )</a>
+                </li>
+                <li class='indexItem indexItem3'>
+                  <a href=
+                  '#_croak_on_cmd(_%24cmd_%3D%3E_%40args%2C_%24happen_)'>_croak_on_cmd(
+                  $cmd =&gt; @args, $happen )</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#CONFIGURATION_AND_ENVIRONMENT'>CONFIGURATION AND
+          ENVIRONMENT</a>
+          <ul class='indexList indexList2'>
+            <li class='indexItem indexItem2'>
+              <a href='#DFTMUX_FQFN'>DFTMUX_FQFN</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#DFTMUX_CMD_NEWW'>DFTMUX_CMD_NEWW</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#DFTMUX_CMD_NEWW_EXEC'>DFTMUX_CMD_NEWW_EXEC</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#DFTMUX_CMD_TTY'>DFTMUX_CMD_TTY</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href=
+              '#Earlier_versions%27_SPUNGE_*_environment_variables'>Earlier
+              versions' SPUNGE_* environment variables</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Attaching_to_the_other_Tmux_session'>Attaching to
+              the other Tmux session</a>
+            </li>
+          </ul>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DIAGNOSTICS'>DIAGNOSTICS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DEPENDENCIES'>DEPENDENCIES</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#BUGS_AND_LIMITATIONS'>BUGS AND LIMITATIONS</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#WEB_SITE'>WEB SITE</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SUPPORT'>SUPPORT</a>
+          <ul class='indexList indexList2'>
+            <li class='indexItem indexItem2'>
+              <a href='#Perldoc'>Perldoc</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Websites'>Websites</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Email'>Email</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Bugs_%2F_Feature_Requests'>Bugs / Feature
+              Requests</a>
+            </li>
+            <li class='indexItem indexItem2'>
+              <a href='#Source_Code'>Source Code</a>
+            </li>
+          </ul>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#AUTHOR'>AUTHOR</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#COPYRIGHT_AND_LICENSE'>COPYRIGHT AND LICENSE</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#SEE_ALSO'>SEE ALSO</a>
+        </li>
+        <li class='indexItem indexItem1'>
+          <a href='#DISCLAIMER_OF_WARRANTY'>DISCLAIMER OF WARRANTY</a>
+        </li>
+      </ul>
+    </div>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="VERSION" id="VERSION">VERSION</a>
+    </h2>
+    <p>
+      This documentation refers to the module contained in the distribution
+      <code>Debug-Fork-Tmux</code> version 1.000012.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SYNOPSIS" id="SYNOPSIS">SYNOPSIS</a>
+    </h2>
+    <pre>
+    #!/usr/bin/perl -d
+    #
+    # ABSTRACT: Debug the fork()-contained code in this file
+    #
+    ## Works only under Tmux: http://tmux.sf.net
+    #
+    # Make fork()s debuggable with Tmux
+    use Debug::Fork::Tmux;
+
+    # See what happens in your debugger then...
+    fork;
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DESCRIPTION" id="DESCRIPTION">DESCRIPTION</a>
+    </h2>
+    <p>
+      Make sure you have the running <code>Tmux</code> window manager:
+    </p>
+    <pre>
+    $ tmux
+</pre>
+    <ul>
+      <li>Only <code>Tmux</code> version 1.6 and higher works with
+      <code>Debug::Fork::Tmux</code>. See <a href="#DEPENDENCIES" class=
+      "podlinkpod">"DEPENDENCIES"</a>.
+      </li>
+      <li>It is not necessary to run this under <code>Tmux</code>, see
+      <a href="#Attaching_to_the_other_Tmux_session" class=
+      "podlinkpod">"Attaching to the other <code>Tmux</code> session"</a>.
+      </li>
+    </ul>
+    <p>
+      Then the real usage example of this module is:
+    </p>
+    <pre>
+    $ perl -MDebug::Fork::Tmux -d your_script.pl
+</pre>
+    <p>
+      As Perl's standard debugger requires additional code to be written
+      and used when the debugged Perl program use the <a href=
+      "http://search.cpan.org/perldoc?perlfunc#fork" class=
+      "podlinkpod">fork()</a> built-in.
+    </p>
+    <p>
+      This module is about to solve the trouble which is used to be
+      observed like this:
+    </p>
+    <pre>
+  ######### Forked, but do not know how to create a new TTY. #########
+  Since two debuggers fight for the same TTY, input is severely entangled.
+
+  I know how to switch the output to a different window in xterms, OS/2
+  consoles, and Mac OS X Terminal.app only.  For a manual switch, put the
+  name of the created TTY in $DB::fork_TTY, or define a function
+  DB::get_fork_TTY() returning this.
+
+  On UNIX-like systems one can get the name of a TTY for the given window
+  by typing tty, and disconnect the shell from TTY by sleep 1000000.
+</pre>
+    <p>
+      All of that is about getting the pseudo-terminal device for another
+      part of user interface. This is probably why only the
+      <code>GUI</code>s are mentioned here: <code>OS/2</code> 'Command
+      Prompt', <code>Mac OS X</code>'s <code>Terminal.app</code> and an
+      <code>xterm</code>. For those of you who develop server-side stuff it
+      should be known that keeping <code>GUI</code> on the server is far
+      from always to be available as an option no matter if it's a
+      production or a development environment.
+    </p>
+    <p>
+      The most ridiculous for every <code>TUI</code> (the <code>ssh</code>
+      particularly) user is that the pseudo-terminal device isn't that much
+      about <code>GUI</code>s by its nature so the problem behind the bars
+      of the <a href="http://search.cpan.org/perldoc?perl5db.pl" class=
+      "podlinkpod">perl5db.pl</a> report (see more detailed problem
+      description at the <a href="http://perlmonks.org/?node_id=128283"
+      class="podlinkurl">PerlMonks thread</a>) is the consoles management.
+      It's a kind of a tricky, for example, to start the next
+      <code>ssh</code> session initiated from the machine serving as an
+      <code>sshd</code> server for the existing session.
+    </p>
+    <p>
+      Thus we kind of have to give a chance to the consoles management with
+      a software capable to run on a server machine without as much
+      dependencies as an <code>xterm</code>. This module is a try to pick
+      the <a href="http://tmux.sf.net" class="podlinkurl">Tmux</a> windows
+      manager for such a task.
+    </p>
+    <p>
+      Because of highly-developed scripting capabilities of
+      <code>Tmux</code> any user can supply the 'window' or a 'pane' to
+      Perl's debugger making it suitable to debug the separate process in a
+      different <code>UI</code> instance. Also this adds the features like
+      <code>groupware</code>: imagine that your mate can debug the process
+      you've just <code>fork()ed</code> by mean of attaching the same
+      <code>tmux</code> you are running on a server. While you keep working
+      on a process that called a <code>fork()</code>.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SUBROUTINES/METHODS">SUBROUTINES/METHODS</a>
+    </h2>
+    <p>
+      All of the following are functions:
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="PUBLIC" id="PUBLIC">PUBLIC</a>
+    </h3>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DB::get_fork_TTY()"><code>DB::get_fork_TTY()</code></a>
+    </h4>
+    <p>
+      Finds new <code>TTY</code> for the <code>fork()</code>ed process.
+    </p>
+    <p>
+      Takes no arguments. Returns <code>Str</code> name of the
+      <code>tty</code> device of the &lt;tmux&gt;'s new window created for
+      the debugger's new process.
+    </p>
+    <p>
+      Sets the <code>$DB::fork_TTY</code> to the same <code>Str</code>
+      value.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="PRIVATE" id="PRIVATE">PRIVATE</a>
+    </h3>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="_spawn_tty()"><code>_spawn_tty()</code></a>
+    </h4>
+    <p>
+      Creates a <code>TTY</code> device and returns <code>Str</code> its
+      name.
+    </p>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="_tmux_new_window()"><code>_tmux_new_window()</code></a>
+    </h4>
+    <p>
+      Creates a given <code>tmux</code> window and returns <code>Str</code>
+      its id/number.
+    </p>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="_tmux_window_tty(_$window_id_)"><code>_tmux_window_tty(
+      $window_id )</code></a>
+    </h4>
+    <p>
+      Finds a given <code>tmux</code> window's tty name and returns its
+      <code>Str</code> name based on a given window id/number typically
+      from <a href="#_tmux_new_window()" class=
+      "podlinkpod">"_tmux_new_window()"</a>.
+    </p>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="_read_from_cmd(_$cmd_=&gt;_@args_)"><code>_read_from_cmd( $cmd
+      =&gt; @args )</code></a>
+    </h4>
+    <p>
+      Takes the list containing the <code>Str</code> <a href=
+      "http://search.cpan.org/perldoc?perlfunc#system" class=
+      "podlinkpod">system()</a> command and <code>Array</code> its
+      arguments and executes it. Reads <code>Str</code> the output and
+      returns it. Throws if no output or if the command failed.
+    </p>
+    <h4>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name=
+      "_croak_on_cmd(_$cmd_=&gt;_@args,_$happen_)"><code>_croak_on_cmd(
+      $cmd =&gt; @args, $happen )</code></a>
+    </h4>
+    <p>
+      Takes the <code>Str</code> command, <code>Array</code> its arguments
+      and <code>Str</code> the reason of its failure, examines the
+      <code>$?</code> and dies with explanation on the <a href=
+      "http://search.cpan.org/perldoc?perlfunc#system" class=
+      "podlinkpod">system()</a> command failure.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="CONFIGURATION_AND_ENVIRONMENT" id=
+      "CONFIGURATION_AND_ENVIRONMENT">CONFIGURATION AND ENVIRONMENT</a>
+    </h2>
+    <p>
+      The module requires the <a href="http://tmux.sf.net" class=
+      "podlinkurl">Tmux</a> window manager for the console to be present in
+      the system.
+    </p>
+    <p>
+      This means that it requires the <code>Unix</code>-like operating
+      system not only to have a <a href=
+      "http://search.cpan.org/perldoc?fork" class="podlinkpod">fork</a>
+      implemented and a <code>TTY</code> device name supplement but the
+      system should have Tmux up and running.
+    </p>
+    <p>
+      Therefore <code>Cygwin</code> for example isn't in at this moment,
+      see the <a href=
+      "http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/1354"
+      class="podlinkurl">explanation</a> why.
+    </p>
+    <p>
+      Configuration is made via environment variables, the default is taken
+      for each of them with no such variable is set in the environment:
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DFTMUX_FQFN" id="DFTMUX_FQFN"><code>DFTMUX_FQFN</code></a>
+    </h3>
+    <p>
+      The <code>tmux</code> binary name with the full path.
+    </p>
+    <p>
+      Default : The first of those for executable to exist:
+    </p>
+    <dl>
+      <dt>
+        <a name="PATH_environment_variable_contents" id=
+        "PATH_environment_variable_contents"><code>PATH</code> environment
+        variable contents</a>
+      </dt>
+      <dt>
+        <a name="Path_to_the_Perl_binary_interpreter" id=
+        "Path_to_the_Perl_binary_interpreter">Path to the Perl binary
+        interpreter</a>
+      </dt>
+      <dt>
+        <a name="Current_directory" id="Current_directory">Current
+        directory</a>
+      </dt>
+    </dl>
+    <p>
+      and just the <code>tmux</code> as a fallback if none of above is the
+      location of the <code>tmux</code> executable file.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DFTMUX_CMD_NEWW" id=
+      "DFTMUX_CMD_NEWW"><code>DFTMUX_CMD_NEWW</code></a>
+    </h3>
+    <p>
+      The <a href="http://search.cpan.org/perldoc?perlfunc#system" class=
+      "podlinkpod">system()</a> arguments for a <code>tmux</code> command
+      for opening a new window and with output of a window address from
+      <code>tmux</code>. String is sliced by spaces to be a list of
+      parameters.
+    </p>
+    <p>
+      Default : <code>neww -P</code>
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DFTMUX_CMD_NEWW_EXEC" id=
+      "DFTMUX_CMD_NEWW_EXEC"><code>DFTMUX_CMD_NEWW_EXEC</code></a>
+    </h3>
+    <p>
+      The <a href="http://search.cpan.org/perldoc?perlfunc#system" class=
+      "podlinkpod">system()</a> or a shell command to be given to the
+      <code>DFTMUX_CMD_NEWW</code> command to be executed in a brand new
+      created window. It should wait unexpectedly and do nothing till the
+      debugger catches the device and puts in into the proper use.
+    </p>
+    <p>
+      Default : <code>sleep 1000000</code>
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DFTMUX_CMD_TTY" id=
+      "DFTMUX_CMD_TTY"><code>DFTMUX_CMD_TTY</code></a>
+    </h3>
+    <p>
+      Command- line parameter(s) for a <code>tmux</code> command to find a
+      <code>tty</code> name in the output. The string is sliced then by
+      spaces. The <code>tmux</code>'s window address is added then as the
+      very last argument.
+    </p>
+    <p>
+      Default : <code>lsp -F #{pane_tty} -t</code>
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Earlier_versions'_SPUNGE_*_environment_variables">Earlier
+      versions' <code>SPUNGE_*</code> environment variables</a>
+    </h3>
+    <p>
+      Till v1.000009 the module was controlled by the environment variables
+      like <code>SPUNGE_TMUX_FQDN</code>. Those are deprecated and should
+      be replaced in your configuration(s) onto the
+      <code>DFTMUX_</code>-prefixed ones.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Attaching_to_the_other_Tmux_session" id=
+      "Attaching_to_the_other_Tmux_session">Attaching to the other
+      <code>Tmux</code> session</a>
+    </h3>
+    <p>
+      For the case you can not or don't want to use the current
+      <code>tmux</code> session you are running in, you may want to have
+      the separate <code>tmux</code> server up and running and use its
+      windows or panes to be created. This can be done by mean of
+      prepending the correct <code>-L</code> or <code>-S</code> switch to
+      the start of the every of the command-line parameters string to be
+      used, for example:
+    </p>
+    <pre>
+    $ DFTMUX_CMD_NEWW="-L default neww -P" \
+    &gt; DFTMUX_CMD_TTY="-L default lsp -F #{pane_tty} -t" \
+    &gt; perl -MDebug::Fork::Tmux -d your_script.pl
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DIAGNOSTICS" id="DIAGNOSTICS">DIAGNOSTICS</a>
+    </h2>
+    <ul>
+      <li>
+        <code>The command ...</code>
+        <p>
+          Typically the error message starts with the command the <a href=
+          "http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux" class=
+          "podlinkpod">Debug::Fork::Tmux</a> tried to execute, including
+          the command's arguments.
+        </p>
+      </li>
+      <li>
+        <code>failed opening command: ...</code>
+        <p>
+          The command was not taken by the system as an executable binary
+          file.
+        </p>
+      </li>
+      <li>
+        <code>... didn't write a line</code>
+      </li>
+      <li>
+        <code>failed reading command: ...</code>
+        <p>
+          Command did not output exactly one line of the text.
+        </p>
+      </li>
+      <li>
+        <code>... did not finish</code>
+        <p>
+          Command outputs more than one line of the text.
+        </p>
+      </li>
+      <li>
+        <code>provided empty string</code>
+        <p>
+          Command outputs exactly one line of the text and the line is
+          empty.
+        </p>
+      </li>
+      <li>
+        <code>failed to execute: ...</code>
+        <p>
+          There was failure executing the command
+        </p>
+      </li>
+      <li>
+        <code>child died with(out) signal X, Y coredump</code>
+        <p>
+          Command was killed by the signal X and the coredump is (not)
+          located in Y.
+        </p>
+      </li>
+      <li>
+        <code>child exited with value X</code>
+        <p>
+          Command was not failed but there are reasons to throw an error
+          like the wrong command's output.
+        </p>
+      </li>
+    </ul>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DEPENDENCIES" id="DEPENDENCIES">DEPENDENCIES</a>
+    </h2>
+    <p>
+      * <code>Perl 5.8.9+</code> is available from <a href=
+      "http://www.perl.org" class="podlinkurl">The Perl website</a>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Config" class=
+      "podlinkpod">Config</a>, <a href="http://search.cpan.org/perldoc?Cwd"
+      class="podlinkpod">Cwd</a>, <a href=
+      "http://search.cpan.org/perldoc?DB" class="podlinkpod">DB</a>,
+      <a href="http://search.cpan.org/perldoc?ExtUtils%3A%3AMakeMaker"
+      class="podlinkpod">ExtUtils::MakeMaker</a>, <a href=
+      "http://search.cpan.org/perldoc?File%3A%3AFind" class=
+      "podlinkpod">File::Find</a>, <a href=
+      "http://search.cpan.org/perldoc?File%3A%3ASpec" class=
+      "podlinkpod">File::Spec</a>, <a href=
+      "http://search.cpan.org/perldoc?File%3A%3ABasename" class=
+      "podlinkpod">File::Basename</a>, <a href=
+      "http://search.cpan.org/perldoc?Scalar%3A%3AUtil" class=
+      "podlinkpod">Scalar::Util</a>, <a href=
+      "http://search.cpan.org/perldoc?Test%3A%3AMore" class=
+      "podlinkpod">Test::More</a> are available in core <code>Perl</code>
+      distribution version 5.8.9 and later
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Const%3A%3AFast" class=
+      "podlinkpod">Const::Fast</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Module%3A%3ABuild" class=
+      "podlinkpod">Module::Build</a> is available in core <code>Perl</code>
+      distribution since version 5.9.4
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Sort%3A%3AVersions" class=
+      "podlinkpod">Sort::Versions</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Test%3A%3AException" class=
+      "podlinkpod">Test::Exception</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Test%3A%3AMost" class=
+      "podlinkpod">Test::Most</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Test%3A%3AStrict" class=
+      "podlinkpod">Test::Strict</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?Env%3A%3APath" class=
+      "podlinkpod">Env::Path</a> is available from <code>CPAN</code>
+    </p>
+    <p>
+      * <a href="http://search.cpan.org/perldoc?autodie" class=
+      "podlinkpod">autodie</a> is available in core <code>Perl</code>
+      distribution since version 5.10.1
+    </p>
+    <p>
+      * <code>Tmux</code> v1.6+ is available from <a href=
+      "http://tmux.sourceforge.net" class="podlinkurl">The Tmux website</a>
+    </p>
+    <p>
+      Most of them can easily be found in your operating system
+      distribution/repository.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="BUGS_AND_LIMITATIONS" id="BUGS_AND_LIMITATIONS">BUGS AND
+      LIMITATIONS</a>
+    </h2>
+    <p>
+      You can make new bug reports, and view existing ones, through the web
+      interface at <a href=
+      "http://bugs.vereshagin.org/product/Debug-Fork-Tmux" class=
+      "podlinkurl">http://bugs.vereshagin.org/product/Debug-Fork-Tmux</a>.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="WEB_SITE" id="WEB_SITE">WEB SITE</a>
+    </h2>
+    <p>
+      The web site of <a href=
+      "http://gitweb.vereshagin.org/Debug-Fork-Tmux/README.html" class=
+      "podlinkurl">Debug::Fork::Tmux</a> currently consists of only one
+      page cause it's a very small module.
+    </p>
+    <p>
+      You may want to visit a <a href=
+      "https://github.com/petr999/Debug-Fork-Tmux" class=
+      "podlinkurl">GitHub page</a>, too.
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SUPPORT" id="SUPPORT">SUPPORT</a>
+    </h2>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Perldoc" id="Perldoc">Perldoc</a>
+    </h3>
+    <p>
+      You can find documentation for this module with the perldoc command.
+    </p>
+    <pre>
+  perldoc Debug::Fork::Tmux
+</pre>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Websites" id="Websites">Websites</a>
+    </h3>
+    <p>
+      The following websites have more information about this module, and
+      may be of help to you. As always, in addition to those websites
+      please use your favorite search engine to discover more resources.
+    </p>
+    <ul>
+      <li>MetaCPAN
+        <p>
+          A modern, open-source CPAN search engine, useful to view POD in
+          HTML format.
+        </p>
+        <p>
+          <a href="http://metacpan.org/release/Debug-Fork-Tmux" class=
+          "podlinkurl">http://metacpan.org/release/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>Search CPAN
+        <p>
+          The default CPAN search engine, useful to view POD in HTML
+          format.
+        </p>
+        <p>
+          <a href="http://search.cpan.org/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://search.cpan.org/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>RT: CPAN's Bug Tracker
+        <p>
+          The RT ( Request Tracker ) website is the default bug/issue
+          tracking system for CPAN.
+        </p>
+        <p>
+          <a href=
+          "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux" class=
+          "podlinkurl">http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>AnnoCPAN
+        <p>
+          The AnnoCPAN is a website that allows community annotations of
+          Perl module documentation.
+        </p>
+        <p>
+          <a href="http://annocpan.org/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://annocpan.org/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Ratings
+        <p>
+          The CPAN Ratings is a website that allows community ratings and
+          reviews of Perl modules.
+        </p>
+        <p>
+          <a href="http://cpanratings.perl.org/d/Debug-Fork-Tmux" class=
+          "podlinkurl">http://cpanratings.perl.org/d/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Forum
+        <p>
+          The CPAN Forum is a web forum for discussing Perl modules.
+        </p>
+        <p>
+          <a href="http://cpanforum.com/dist/Debug-Fork-Tmux" class=
+          "podlinkurl">http://cpanforum.com/dist/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPANTS
+        <p>
+          The CPANTS is a website that analyzes the Kwalitee ( code metrics
+          ) of a distribution.
+        </p>
+        <p>
+          <a href="http://cpants.perl.org/dist/overview/Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://cpants.perl.org/dist/overview/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers
+        <p>
+          The CPAN Testers is a network of smokers who run automated tests
+          on uploaded CPAN distributions.
+        </p>
+        <p>
+          <a href="http://www.cpantesters.org/distro/D/Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://www.cpantesters.org/distro/D/Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers Matrix
+        <p>
+          The CPAN Testers Matrix is a website that provides a visual
+          overview of the test results for a distribution on various
+          Perls/platforms.
+        </p>
+        <p>
+          <a href="http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux"
+          class=
+          "podlinkurl">http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux</a>
+        </p>
+      </li>
+      <li>CPAN Testers Dependencies
+        <p>
+          The CPAN Testers Dependencies is a website that shows a chart of
+          the test results of all dependencies for a distribution.
+        </p>
+        <p>
+          <a href="http://deps.cpantesters.org/?module=Debug::Fork::Tmux"
+          class=
+          "podlinkurl">http://deps.cpantesters.org/?module=Debug::Fork::Tmux</a>
+        </p>
+      </li>
+    </ul>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Email" id="Email">Email</a>
+    </h3>
+    <p>
+      You can email the author of this module at
+      <code>peter@vereshagin.org</code> asking for help with any problems
+      you have.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Bugs_/_Feature_Requests">Bugs / Feature Requests</a>
+    </h3>
+    <p>
+      Please report any bugs or feature requests by email to
+      <code>peter@vereshagin.org</code>, or through the web interface at
+      <a href="http://bugs.vereshagin.org/product/Debug-Fork-Tmux" class=
+      "podlinkurl">http://bugs.vereshagin.org/product/Debug-Fork-Tmux</a>.
+      You will be automatically notified of any progress on the request by
+      the system.
+    </p>
+    <h3>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="Source_Code" id="Source_Code">Source Code</a>
+    </h3>
+    <p>
+      The code is open to the world, and available for you to hack on.
+      Please feel free to browse it and play with it, or whatever. If you
+      want to contribute patches, please send me a diff or prod me to pull
+      from your repository :)
+    </p>
+    <p>
+      <a href="http://gitweb.vereshagin.org/Debug-Fork-Tmux" class=
+      "podlinkurl">http://gitweb.vereshagin.org/Debug-Fork-Tmux</a>
+    </p>
+    <pre>
+  git clone https://github.com/petr999/Debug-Fork-Tmux.git
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="AUTHOR" id="AUTHOR">AUTHOR</a>
+    </h2>
+    <p>
+      <a href="http://vereshagin.org" class="podlinkurl">Peter
+      Vereshagin</a> &lt;peter@vereshagin.org&gt;
+    </p>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="COPYRIGHT_AND_LICENSE" id="COPYRIGHT_AND_LICENSE">COPYRIGHT AND
+      LICENSE</a>
+    </h2>
+    <p>
+      This software is Copyright (c) 2013 by Peter Vereshagin.
+    </p>
+    <p>
+      This is free software, licensed under:
+    </p>
+    <pre>
+  The (three-clause) BSD License
+</pre>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="SEE_ALSO" id="SEE_ALSO">SEE ALSO</a>
+    </h2>
+    <p>
+      Please see those modules/websites for more information related to
+      this module.
+    </p>
+    <ul>
+      <li>
+        <a href=
+        "http://search.cpan.org/perldoc?Debug%3A%3AFork%3A%3ATmux%3A%3AConfig"
+        class="podlinkpod">Debug::Fork::Tmux::Config</a>
+      </li>
+      <li>
+        <a href="http://perlmonks.org/?node_id=128283" class=
+        "podlinkurl">http://perlmonks.org/?node_id=128283</a>
+      </li>
+      <li>
+        <a href="nntp://nntp.perl.org/perl.debugger" class=
+        "podlinkurl">nntp://nntp.perl.org/perl.debugger</a>
+      </li>
+      <li>
+        <a href="http://debugger.perl.org/" class=
+        "podlinkurl">http://debugger.perl.org/</a>
+      </li>
+    </ul>
+    <h2>
+      <a class='u' href='#___top' title='click to go to top of document'
+      name="DISCLAIMER_OF_WARRANTY" id="DISCLAIMER_OF_WARRANTY">DISCLAIMER
+      OF WARRANTY</a>
+    </h2>
+    <p>
+      BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO
+      WARRANTY FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW.
+      EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR
+      OTHER PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY
+      KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+      IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+      PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+      SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+      THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+    </p>
+    <p>
+      IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+      WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+      REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+      LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL,
+      INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR
+      INABILITY TO USE THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF
+      DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR
+      THIRD PARTIES OR A FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER
+      SOFTWARE), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE
+      POSSIBILITY OF SUCH DAMAGES.
+    </p><!-- end doc -->
+  </body>
+</html>

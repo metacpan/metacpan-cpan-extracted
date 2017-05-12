@@ -1,0 +1,55 @@
+Revision history for Data-Context-BEM
+
+0.1   2016-02-14
+        Updating for release of version 0.1
+        Added missing JSON::XS dependency (Ivan Wills)
+        Added actions dependency and updated version minimum (Ivan Wills)
+        Updated date (Ivan Wills)
+        Only showing diagnostics on error (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Moved setting scripts to end of document (for better performance) (Ivan Wills)
+        Added pushing any class specified onto the element class (Ivan Wills)
+        Added some commandline docs (Ivan Wills)
+        Added protection for JSON having an error (Ivan Wills)
+        Fixed unused argument (Ivan Wills)
+        Added test of blocks (Ivan Wills)
+        Fixed incorrect method call (Ivan Wills)
+        Updated to extend actions and make the default get_data return data unmodified (Ivan Wills)
+        Set Block as default action class (Ivan Wills)
+        Added protection for change in type from child to parent (Ivan Wills)
+        Added json output (Ivan Wills)
+        Added eval for check that may harmlessly fail (Ivan Wills)
+
+0.0.6   2015-08-21
+        Updating for release of version 0.0.6
+        Removed creation of makefile (Ivan Wills)
+
+0.0.5   2015-07-16
+        Updating for release of version 0.0.5
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.0.4   2015-06-11
+        Updating for release of version 0.0.4
+        Added another file to skip (Ivan Wills)
+        Set Test::More minimum version (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+
+0.0.3   2015-01-12
+        Updating for release of version 0.0.3
+        Fixed spelling (Ivan Wills)
+        Updated License (Ivan Wills)
+        Fixed boilerplate test and resultant failures (Ivan Wills)
+        Added missing skip files (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/data-context-bem (Ivan Wills)
+
+0.0.2   2014-08-15
+        More to skip (Ivan Wills)
+        Added missing dependencies (Ivan Wills)
+
+
+0.0.1   2014-01-03
+        First version, released on an unsuspecting world.
+

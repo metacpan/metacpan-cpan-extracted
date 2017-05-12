@@ -1,0 +1,115 @@
+#
+#    RFC2865 - The main RADIUS authentication specification
+#
+
+ATTRIBUTE    User-Name                    1    string
+ATTRIBUTE    Password                     2    string
+ATTRIBUTE    CHAP-Password                3    string
+ATTRIBUTE    NAS-IP-Address               4    ipaddr
+ATTRIBUTE    NAS-Port                     5    integer
+ATTRIBUTE    Service-Type                 6    integer
+ATTRIBUTE    Framed-Protocol              7    integer
+ATTRIBUTE    Framed-IP-Address            8    ipaddr
+ATTRIBUTE    Framed-IP-Netmask            9    ipaddr
+ATTRIBUTE    Framed-Routing               10    integer
+ATTRIBUTE    Filter-Id                    11    string
+ATTRIBUTE    Framed-MTU                   12    integer
+ATTRIBUTE    Framed-Compression           13    integer
+ATTRIBUTE    Login-IP-Host                14    ipaddr
+ATTRIBUTE    Login-Service                15    integer
+ATTRIBUTE    Login-TCP-Port               16    integer
+ATTRIBUTE    Reply-Message                18    string
+ATTRIBUTE    Callback-Number              19    string
+ATTRIBUTE    Callback-Id                  20    string
+ATTRIBUTE    Framed-Route                 22    string
+ATTRIBUTE    Framed-IPX-Network           23    ipaddr
+ATTRIBUTE    State                        24    string
+ATTRIBUTE    Class                        25    string
+ATTRIBUTE    Vendor-Specific              26    string
+ATTRIBUTE    Session-Timeout              27    integer
+ATTRIBUTE    Idle-Timeout                 28    integer
+ATTRIBUTE    Termination-Action           29    integer
+ATTRIBUTE    Called-Station-Id            30    string
+ATTRIBUTE    Calling-Station-Id           31    string
+ATTRIBUTE    NAS-Identifier               32    string
+ATTRIBUTE    Proxy-State                  33    string
+ATTRIBUTE    Login-LAT-Service            34    string
+ATTRIBUTE    Login-LAT-Node               35    string
+ATTRIBUTE    Login-LAT-Group              36    string
+ATTRIBUTE    Framed-AppleTalk-Link        37    integer
+ATTRIBUTE    Framed-AppleTalk-Network     38    integer
+ATTRIBUTE    Framed-AppleTalk-Zone        39    string
+
+ATTRIBUTE    CHAP-Challenge               60    string
+ATTRIBUTE    NAS-Port-Type                61    integer
+ATTRIBUTE    Port-Limit                   62    integer
+ATTRIBUTE    Login-LAT-Port               63    integer
+
+VALUE    Service-Type                Login-User          1
+VALUE    Service-Type                Framed-User         2
+VALUE    Service-Type                Callback-Login-User    3
+VALUE    Service-Type                Callback-Framed-User    4
+VALUE    Service-Type                Outbound-User       5
+VALUE    Service-Type                Administrative-User    6
+VALUE    Service-Type                NAS-Prompt-User     7
+VALUE    Service-Type                Call-Check          10
+
+VALUE    Framed-Protocol             PPP                 1
+VALUE    Framed-Protocol             SLIP                2
+
+VALUE    Framed-Routing              None                0
+VALUE    Framed-Routing              Broadcast           1
+VALUE    Framed-Routing              Listen              2
+VALUE    Framed-Routing              Broadcast-Listen    3
+
+VALUE    Framed-Compression          None                0
+VALUE    Framed-Compression          Van-Jacobson-TCP-IP    1
+
+VALUE    Login-Service               Telnet              0
+VALUE    Login-Service               Rlogin              1
+VALUE    Login-Service               TCP-Clear           2
+VALUE    Login-Service               PortMaster          3
+
+VALUE    Termination-Action          Default             0
+VALUE    Termination-Action          RADIUS-Request      1
+
+VALUE    NAS-Port-Type               Async               0
+VALUE    NAS-Port-Type               Sync                1
+VALUE    NAS-Port-Type               ISDN                2
+VALUE    NAS-Port-Type               ISDN-V120           3
+VALUE    NAS-Port-Type               ISDN-V110           4
+VALUE    NAS-Port-Type               Virtual             5
+VALUE    NAS-Port-Type               PIAFS               6
+VALUE    NAS-Port-Type               HDLC-Clear-Channel    7
+VALUE    NAS-Port-Type               X.25                8
+VALUE    NAS-Port-Type               X.75                9
+VALUE    NAS-Port-Type               G.3-Fax             10
+VALUE    NAS-Port-Type               SDSL                11
+VALUE    NAS-Port-Type               ADSL-CAP            12
+VALUE    NAS-Port-Type               ADSL-DMT            13
+VALUE    NAS-Port-Type               IDSL                14
+VALUE    NAS-Port-Type               Ethernet            15
+VALUE    NAS-Port-Type               xDSL                16
+VALUE    NAS-Port-Type               Cable               17
+VALUE    NAS-Port-Type               Wireless-Other      18
+VALUE    NAS-Port-Type               Wireless-802.11     19
+
+# These int transaltions might not be covered by the RFC2865
+# but there is no better place to put them
+VALUE    NAS-Port-Type               Wireless-CDMA2000    22
+VALUE    NAS-Port-Type               Wireless-UMTS       23
+VALUE    NAS-Port-Type               Wireless-1X-EV      24
+VALUE    NAS-Port-Type               IAPP                25
+
+VALUE   NAS-Port-Type               FTTP                26
+VALUE   NAS-Port-Type               Wireless-802.16     27
+VALUE   NAS-Port-Type               Wireless-802.20     28
+VALUE   NAS-Port-Type               Wireless-802.22     29
+
+VALUE   NAS-Port-Type               PPPoA               30
+VALUE   NAS-Port-Type               PPPoEoA             31
+VALUE   NAS-Port-Type               PPPoEoE             32
+VALUE   NAS-Port-Type               PPPoEoVLAN          33
+VALUE   NAS-Port-Type               PPPoEoQinQ          34
+VALUE   NAS-Port-Type               xPON                35
+VALUE   NAS-Port-Type               Wireless-XGP        36

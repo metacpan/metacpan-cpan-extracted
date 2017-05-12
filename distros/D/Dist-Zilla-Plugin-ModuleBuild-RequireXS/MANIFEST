@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+README
+dist.ini
+lib/Dist/Zilla/Plugin/ModuleBuild/RequireXS.pm
+t/01-compile.t
+t/author-critic.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

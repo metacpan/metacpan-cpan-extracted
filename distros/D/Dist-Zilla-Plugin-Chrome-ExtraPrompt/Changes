@@ -1,0 +1,50 @@
+Revision history for Dist-Zilla-Plugin-Chrome-ExtraPrompt
+
+0.014   2015-04-12 21:19:10Z
+        - avoid using the shell for tests that require the command to receive
+          a kill signal
+
+0.013   2015-04-12 06:32:44Z
+        - properly kill the command process after the prompt returns
+          (broken since 0.008)
+
+0.012   2015-04-09 03:35:35Z
+        - fixes for "perl! in! space!!!!"
+
+0.011   2015-04-08 16:32:55Z
+        - yet more fixes for tests of process output on MSWin32
+
+0.010   2015-04-07 03:25:32Z
+        - more fixes for tests of process output on MSWin32
+
+0.009   2015-04-06 02:45:33Z
+        - fix another test issue on MSWin32 (CRLF in captured strings)
+
+0.008   2015-04-04 22:18:39Z
+        - hopefully fix problematic tests on MSWin32
+        - stderr output from the prompt is captured and displayed
+
+0.007   2015-03-21 18:00:39Z
+        - log a warning when the command did not exit successfully
+
+0.006   2013-11-03 20:04:02Z
+        - more fixing of string interpolation issues in tests on win32
+
+0.005   2013-11-03 03:11:20Z
+        - fix string interpolation issues in tests on win32
+        - remove use of shared tempdir to avoid race conditions when testing
+          in parallel
+
+0.004   2013-10-26 05:42:35Z
+        - tweaked tests for more win32 friendliness
+
+0.003   2013-10-21 17:15:36Z
+        - fix test to use the same perl executable, to ensure required modules
+          are present
+
+0.002   2013-10-20 04:26:21Z
+        - "repeat_prompt" now works properly, passing the string as a single
+          argument to the command
+
+0.001   2013-10-18 03:30:47Z
+        - Initial release.

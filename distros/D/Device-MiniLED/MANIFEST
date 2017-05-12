@@ -1,0 +1,15 @@
+ignore.txt
+README
+MANIFEST
+META.yml
+META.json
+Changes
+Makefile.PL
+Build.PL
+t/pod-coverage.t
+t/pod.t
+t/functional.t
+t/manifest.t
+t/boilerplate.t
+t/00-load.t
+lib/Device/MiniLED.pm

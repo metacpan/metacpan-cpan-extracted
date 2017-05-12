@@ -1,0 +1,14 @@
+Revision history for Perl extension Device::Modem::SMSModem.
+
+0.1  Fri Sep  4 13:50:13 2015
+	- original version; 
+		-Device::Modem::SMSModem
+
+0.2  Sat Sep  5 20:50:13 2015
+	- Comments improvement; 
+
+0.4  Wed Sep  10 10:50:13 2015
+	- Fixes for Huawei E398
+0.9 Sat Nov 8 10:50:13 2015
+	- Added SMS listing functionality
+  

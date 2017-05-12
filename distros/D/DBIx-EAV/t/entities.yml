@@ -1,0 +1,29 @@
+
+Artist:
+  many_to_many: [CD]
+  has_many:
+      - [ compositions, Track, composer]
+  attributes:
+     - { name: 'name' }
+     - { name: 'birth_date', type: 'datetime' }
+     - description:text
+     - rating:int
+
+CD:
+  has_many: Track
+  attributes:
+    - title
+    - description:text
+    - { name: 'review', type: 'text' }
+    - rating:int
+
+Track:
+  has_one: Lyric
+  attributes:
+    - { name: 'title' }
+    - { name: 'description', type: 'text' }
+    - { name: 'duration', type: 'int' }
+
+Lyric:
+  attributes:
+    - { name: 'content', type: 'text' }

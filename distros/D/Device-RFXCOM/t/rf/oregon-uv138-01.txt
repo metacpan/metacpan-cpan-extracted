@@ -1,0 +1,10 @@
+78ea7c10804870ade4fbffafce070188
+
+master oregon 78.ea7c10804870ade4fbffafce070188:
+  sensor/uv138.80[uv]=4
+  sensor/uv138.80[battery]=90%
+
+
+
+
+

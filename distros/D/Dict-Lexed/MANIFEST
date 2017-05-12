@@ -1,0 +1,8 @@
+ChangeLog
+lib/Dict/Lexed.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00distribution.t
+t/01run.t

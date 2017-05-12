@@ -1,0 +1,32 @@
+0.07 2017-05-08
+
+    * ping DB if we take 30+ seconds old handle from the pool
+    * handle more exceptions and turn them into promise's rejects
+    * delete release_to state var so the same handle can be takes
+      in different mode
+    * don't accept handles for release that have an error and are
+      not pingable
+    * handle server closing connection
+    * ->errobj method on dbh
+    * avoid memory leak in transaction release code
+    * rollback not finished transactions on destruction
+
+0.06 2016-08-29
+
+    * re-implement auto release using resurrection on destroy
+
+0.05 2016-08-12
+
+    * keep handles in "auto" release mode, so they don't get destroyed
+
+0.03 2016-02-25
+
+    * Promises was not listed as a dep
+
+0.02 2016-02-19
+
+    * implement auto release of handles to the pool
+
+0.01 2016-02-18
+
+    * initial release

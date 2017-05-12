@@ -1,0 +1,3 @@
+#!/bin/sh
+./dbicx-autodoc -It/lib --output=examples --schema=ExampleDB
+#rm -f examples/*-dump.txt

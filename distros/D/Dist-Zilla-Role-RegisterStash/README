@@ -1,0 +1,71 @@
+NAME
+    Dist::Zilla::Role::RegisterStash - A plugin that can register stashes
+
+VERSION
+    This document describes version 0.003 of
+    Dist::Zilla::Role::RegisterStash - released May 14, 2014 as part of
+    Dist-Zilla-Role-RegisterStash.
+
+SYNOPSIS
+        # in your plugin...
+        with 'Dist::Zilla::Role::RegisterStash';
+
+        # and elsewhere...
+        $self->_register_stash('%Foo' => $stash);
+
+DESCRIPTION
+    Sometimes it's handy for a plugin to register a stash, and there's no
+    easy way to do that (without touching $self->zilla->_local_stashes or
+    somesuch).
+
+    This role provides a _register_stash() method to your plugin, allowing
+    you to register stashes. Yes, the leading underscore is intentional: the
+    purpose of this method is to allow the consuming plugin to register
+    stashes, not anyone else, so this method is private to the consumer.
+
+METHODS
+  _register_stash($name => $stash_instance)
+    Given a name and a stash instance, register it with our zilla object.
+
+  _register_or_retrieve_stash
+    Given a stash name (e.g. %Store::Git), return that stash. If our "dzil"
+    claims to not be aware of any such stash we register a new instance of
+    the stash in question and return it.
+
+SOURCE
+    The development version is on github at
+    <http://https://github.com/RsrchBoy/Dist-Zilla-Role-RegisterStash> and
+    may be cloned from
+    <git://https://github.com/RsrchBoy/Dist-Zilla-Role-RegisterStash.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/Dist-Zilla-Role-RegisterStash/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+  I'm a material boy in a material world
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr this
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithu
+    b.com%2FRsrchBoy%2FDist-Zilla-Role-RegisterStash&title=RsrchBoy's%20CPAN
+    %20Dist-Zilla-Role-RegisterStash&tags=%22RsrchBoy's%20Dist-Zilla-Role-Re
+    gisterStash%20in%20the%20CPAN%22>, gittip me
+    <https://www.gittip.com/RsrchBoy/>, or indulge my Amazon Wishlist
+    <http://bit.ly/rsrchboys-wishlist>... If you so desire.
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

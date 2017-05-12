@@ -1,0 +1,7 @@
+=head1 INSTALLATION
+
+    sudo cpan Dancer::Plugin::WebSocket
+
+=head1 DOCUMENTATION
+
+see L<Dancer::Plugin::WebSocket>

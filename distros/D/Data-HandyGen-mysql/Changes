@@ -1,0 +1,8 @@
+Revision history for Perl extension Data::HandyGen::mysql.
+
+0.02  Sun Mar 30 04:12:00 2014
+   -  Enable to pass tests on Windows env.
+
+0.01  Sat Feb 15 02:40:00 2014
+   -  Original version.
+

@@ -1,0 +1,14 @@
+0.02 Thu Aug  2 18:38:01 BST 2007
+
+Updated documentation to remind people that this must
+be the last Plugin in the chain (thanks Edward Rudd)
+
+0.03 Thu Nov 22 10:39:24 NZDT 2007
+In memory messages not deleted - thanks  Michael Scherer
+
+0.04 Tue Feb  5 19:36:09 NZDT 2008
+Error with InMemoryStorage - moved to using full hash refs:
+Error example for reference -
+26238 INFO  DJabberd.Delivery.OfflineStorage.InMemoryOnly InMemoryOnly                                   
+OfflineStorage load for: a@test.com                                                                      
+  ... ERROR: [Can't call method "downbless" on an undefined value at  

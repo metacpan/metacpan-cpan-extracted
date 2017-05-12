@@ -1,0 +1,87 @@
+{
+   "abstract" : "Ultra special pretty cute diff generator Mark II",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Difflet",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Term::ANSIColor" : "0",
+            "Test::More" : "0.96",
+            "parent" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Difflet" : {
+         "file" : "lib/Data/Difflet.pm",
+         "version" : "0.11"
+      },
+      "Test::Difflet" : {
+         "file" : "lib/Test/Difflet.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Data-Difflet/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Data-Difflet",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Data-Difflet.git",
+         "web" : "https://github.com/tokuhirom/Data-Difflet"
+      }
+   },
+   "version" : "0.11",
+   "x_contributors" : [
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "Olaf Alders <olaf@wundersolutions.com>",
+      "Kozaki, Tsuneaki <kozaki.tsuneaki@gmail.com>",
+      "Takumi Akiyama <t.akiym@gmail.com>",
+      "Neil Bowers <neil@bowers.com>",
+      "HIROSE Masaaki <hirose31@gmail.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

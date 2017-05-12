@@ -1,0 +1,41 @@
+DBD::Yaswi
+==========
+
+DBD interface to SWI-Prolog module Language::Prolog::Yaswi.
+
+
+INSTALLATION
+
+Type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+BUGS
+
+???
+
+
+DEPENDENCIES
+
+This module requires SWI-Prolog already installed in your system and
+these other modules and libraries:
+
+	Language::Prolog::Types
+	Language::Prolog::Sugar (recommended)
+	Language::Prolog::Yaswi
+	Test::More (only for testing)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Salvador Fandiño
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+SWI-Prolog is distributed under the LGPL/GPL licenses, consult the
+documentation bundled with your copy for details.
+

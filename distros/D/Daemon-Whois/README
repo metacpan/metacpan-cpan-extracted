@@ -1,0 +1,69 @@
+Daemon-Whois
+
+A WHOIS server daemon.
+
+This version needs permission to bind to port 43 and uses CDB_File as
+its database.
+
+There are plenty of scripts in CPAN that will talk to a whois server,
+or extracted data from a remote whois server, but if you need to build
+ one for yourself there seemed to be just RFC3912 to keep you company. 
+ If you happen to be building a complete domain registry from scratch,
+then this module will help you. 
+
+It is also a simple example of a port daemon. This code originated as
+a supporter script in a module called Notice, and was adapted from the
+exim-quota daemon that was written for that module.
+
+It would be possible to improve this module using Template-Toolkit
+and DBIx to connect to more types of databases. The logical conclusion
+might be to also build data on which domains are being quired and hold
+a cache of the 100 most popular this day, the 10 most popular this week
+and the most popular this year. Obviously the best design would have to
+factor in such variables as disk-access and availability of RAM.
+
+This version does not interact with other instances in a cluster.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Daemon::Whois
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Daemon-Whois
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Daemon-Whois
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Daemon-Whois
+
+    Search CPAN
+        http://search.cpan.org/dist/Daemon-Whois/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alexx Roche
+
+This program is free software; you can redistribute it and/or modify it
+under the Eclipse Public License, Version 1.0
+
+See http://www.opensource.org/licenses/ for more information.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

@@ -1,0 +1,21 @@
+---
+abstract: 'Kind of emulates command line flag -Dt on normal perl'
+author:
+  - 'Josh Jore <jjore@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Dt
+requires:
+  B: 0
+  B::Utils: 0
+  IO::Handle: 0
+  Runops::Trace: 0
+version: 0.04

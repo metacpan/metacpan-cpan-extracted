@@ -1,0 +1,154 @@
+Revision history for DBD-Cassandra
+
+0.56    2017/05/06
+
+      * Unbreak bind_param
+
+0.55    2017/03/06
+
+      * Very basic TLS support
+
+0.54    2017/01/30
+
+      * Require a newer version of Cassandra::Client
+
+0.53    2016/10/25
+
+      * No more Perl 5.8 support -- 5.10 is now required
+      * Fix a corner case where DBI didn't like the output of a 'LIST PERMISSIONS' with zero rows
+
+0.52    2016/09/26
+
+      * Attempt to support older Perl versions, from 5.08 and up
+
+0.51    2016/08/23
+
+      * Splits Cassandra-specific code into Cassandra::Client.
+        DBD::Cassandra is now a wrapper providing a DBI interface
+
+0.25    2016/03/17
+
+      * Fix encoding and decoding of floats and doubles. If you were using these prior to 0.25, please read the upgrade notice in the DBD::Cassandra pod.
+
+0.24    2016/01/25
+
+      * Drop the Authen::SASL dependency, which was (sort of) incompatible with Cassandra's SASL
+
+0.23    2015/10/13
+
+      * Revert a change from 0.21 (finishing handles earlier) which caused compat issues with DBD::mysql
+      * Support for the map<..,..> data type
+
+0.22    2015/10/08
+
+      * Fix an issue where an "insert into .. if not exists update .." would cause warnings
+      * Add support for list<..> and set<..> data types
+
+0.21    2015/09/17
+
+      * Finish the st handle slightly earlier: when we actually read the last row
+      * Add a very basic readline-based plcqlsh implementation for machines without Java
+      * Support for the 'counter' data type
+
+0.20    2015/09/14
+
+      * Timeuuid/uuid support
+
+0.19    2015/09/09
+
+      * Performance improvements
+
+0.18    2015/09/07
+
+      * Fix an issue where executing more than 32767 queries may break the driver
+
+0.17    2015/09/07
+
+      * Support for asynchronous queries
+      * Drop 'retries' which was a bad idea
+
+0.16    2015/09/03
+
+      * When running with "perl -l", the driver now actually works
+
+0.15    2015/08/11
+
+      * Support for pagination through result sets
+      * careful: Timestamps are now in msec accuracy instead of having them as floating points
+      * Enable TCP keepalive on sockets
+
+0.14    2015/05/19
+
+      * Resolve an old bug where connecting to CQL3 might cause compilation errors
+      * Fix an issue where the consistency ONE was treated as LOCAL_ONE
+
+0.13    2015/05/06
+
+      * Avoid uninitialized value warnings when the connection goes away
+      * Fix an issue where data was corrupted during reading
+
+0.12    2015/04/30
+
+      * Support for read/write/connect timeouts
+
+0.11    2015/04/28
+
+      * Patch a DBI warning that occurs when we drop an implicitly disconnected handle
+      * Allow automatically retrying in case of timeouts (opt-in)
+
+0.10    2015/04/22
+
+      * Disable Nagle's algorithm, for a nice performance boost
+      * Implement ping() to check whether we're still connected
+
+0.09    2015/04/20
+
+      * Avoid double-encoding UTF-8 strings when passed in without the right flags
+      * Automatically prune the prepare() cache to avoid memory leaks
+      * Add support for the 'TIMESTAMP' type
+      * Boolean types are now actually inserted as booleans
+
+0.08    2015/04/17
+
+      * Avoid causing trouble when disconnecting an inactive handle
+      * Cache any prepare()'d statement for 60 seconds
+      * Don't consider a disconnected handle as active
+
+0.07    2015/04/05
+
+      * Authentication support through Authen::SASL
+      * Allow setting a default consistency level for all queries
+
+0.06    2015/04/02
+
+      * Automatically utf8::decode VARCHAR/TEXT columns
+      * Automatically pick the best compression and CQL version settings
+      * Allow setting consistency levels on queries
+
+0.05    2015/04/02
+
+      * Fix Makefile.PL to properly list the dependencies added in 0.04
+
+0.04    2015/04/02
+
+      * Bugfix: refuse to connect if the keyspace doesn't exist
+      * Refactor some network code
+      * Compression support through Compress:LZ4 and Compress::Snappy
+      * Allow selecting a CQL version for the connection
+
+0.03    2015/04/01
+
+      * Add some documentation to the main module. Mostly for CPAN
+      * Make keyspace an optional part of the connection's dsn
+      * Add some new test cases for better coverage
+      * Better error handling when the server misbehaves
+      * Some performance improvements
+      * Remove dependency on Protocol::CassandraCQL
+
+0.02    2015/04/01
+
+      * Better utf8 support for queries (not result sets)
+
+0.01    2015/03/31
+
+      * Needed something to reach Cassandra from Perl. Wrote something for it.

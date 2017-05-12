@@ -1,0 +1,8 @@
+Revision history for DJabberd-RosterStorage-SQLite-Fixed
+
+0.02	2007-08-21
+	Add rosteredit.pl script.  Add in views
+
+0.01    2007-08-01
+        First version, released on an unsuspecting world.
+

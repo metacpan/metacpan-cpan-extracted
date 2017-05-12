@@ -1,0 +1,427 @@
+Device::XBee::API(3)  User Contributed Perl Documentation Device::XBee::API(3)
+
+
+
+[1mNAME[0m
+       Device::XBee::API - Object-oriented Perl interface to Digi XBee module
+       API mode.
+
+[1mEXAMPLE[0m
+       A basic example:
+
+        use Device::SerialPort;
+        use Device::XBee::API;
+        use Data::Dumper;
+        $Data::Dumper::Useqq = 1;
+
+        my $serial_port_device = Device::SerialPort->new( '/dev/ttyU0' ) || die $!;
+        $serial_port_device->baudrate( 9600 );
+        $serial_port_device->databits( 8 );
+        $serial_port_device->stopbits( 1 );
+        $serial_port_device->parity( 'none' );
+        $serial_port_device->read_char_time( 0 );        # don't wait for each character
+        $serial_port_device->read_const_time( 1000 );    # 1 second per unfulfilled "read" call
+
+        my $api = Device::XBee::API->new( { fh => $serial_port_device } ) || die $!;
+        if ( !$api->tx( { sh => 0, sl => 0 }, 'hello world!' ) ) {
+            die "Transmit failed!";
+        }
+        my $rx = $api->rx();
+        die Dumper( $rx );
+
+[1mSYNOPSIS[0m
+       Device::XBee::API is a module designed to encapsulate the Digi XBee API
+       in object-oriented Perl. This module expects to communicate with an
+       XBee module using the API firmware via a serial (or serial over USB)
+       device.
+
+       This module is currently a work in progress and thus the API may change
+       in the future.
+
+[1mLICENSE[0m
+       This module is licensed under the same terms as Perl itself.
+
+[1mCONSTANTS[0m
+       A single set of constants, ':xbee_flags', can be imported. These
+       constants all represent various XBee flags, such as packet types and
+       broadcast addresses.  See the XBee datasheet for details. The following
+       constants are available:
+
+        XBEE_API_TYPE__MODEM_STATUS
+        XBEE_API_TYPE__AT_COMMAND
+        XBEE_API_TYPE__AT_COMMAND_QUEUE_PARAMETER_VALUE
+        XBEE_API_TYPE__AT_COMMAND_RESPONSE
+        XBEE_API_TYPE__REMOTE_COMMAND_REQUEST
+        XBEE_API_TYPE__REMOTE_COMMAND_RESPONSE
+        XBEE_API_TYPE__ZIGBEE_TRANSMIT_REQUEST
+        XBEE_API_TYPE__EXPLICIT_ADDRESSING_ZIGBEE_COMMAND_FRAME
+        XBEE_API_TYPE__ZIGBEE_TRANSMIT_STATUS
+        XBEE_API_TYPE__ZIGBEE_RECEIVE_PACKET
+        XBEE_API_TYPE__ZIGBEE_EXPLICIT_RX_INDICATOR
+        XBEE_API_TYPE__ZIGBEE_IO_DATA_SAMPLE_RX_INDICATOR
+        XBEE_API_TYPE__XBEE_SENSOR_READ_INDICATOR_
+        XBEE_API_TYPE__NODE_IDENTIFICATION_INDICATOR
+
+        XBEE_API_BROADCAST_ADDR_H
+        XBEE_API_BROADCAST_ADDR_L
+        XBEE_API_BROADCAST_NA_UNKNOWN_ADDR
+
+        XBEE_API_TYPE_TO_STRING
+        XBEE_API_BAUD_RATE_TABLE
+
+       The above should be self explanatory (with the help of the datasheet).
+       The constant "XBEE_API_TYPE_TO_STRING" is a hashref keyed by the
+       numeric id of the packet type with the value being the constant name,
+       to aid in debugging. The constant XBEE_API_BAUD_RATE_TABLE is the baud
+       rate table used by the BD API command.
+
+[1mMETHODS[0m
+   [1mnew[0m
+       Object constructor. Accepts a single parameter, a hashref of options.
+       The following options are recognized:
+
+       [4mfh[0m
+
+       Required. The filehandle to be used to communicate with. This object
+       can be a standard filehandle (that can be accessed via [4msysread()[24m and
+       [4msyswrite()[24m), or a Device::SerialPort object.
+
+       [4mpacket_timeout[0m
+
+       Optional, defaults to 20. Amount of time (in seconds) to wait for a
+       read to complete. Smaller values cause the module to wait less time for
+       a packet to be received by the XBee module. Setting this value too low
+       will cause timeouts to be reported in situations where the network is
+       "slow".
+
+       When using standard filehandles, the timeout is implemented via
+       [4mselect()[24m. When using a Device::SerialPort object, the timeout is done
+       via Device::SerialPort's [4mread()[24m method, and will expect the object to
+       be configured with a read_char_time of 0 and a read_const_time of 1000.
+
+       [4mnode_forget_time[0m
+
+       If a node has not been heard from in this time, it will be "forgotten"
+       and removed from the list of known nodes. Defaults to one hour. See
+       known_nodes for details.
+
+       [4mauto_reuse_frame_id[0m
+
+       All sent packets need a frame ID to uniquely identify them. There are
+       only 254 available IDs and thus there can only be 254 outstanding
+       commands sent to the XBee. Normally frame IDs will be freed and reused
+       once a command reply is received, however there are scenarios where
+       this can not be done (generally those that involve local or remote AT
+       commands, sleeping/offline nodes, etc).
+
+       Normally, when no frame IDs are available but one is needed, the module
+       will die with an error and the send attempt will be aborted. This
+       condition could be trapped by the caller (via eval) to retry later, or
+       could be treated as fatal.
+
+       With this flag set, instead of dieing, the oldest frame ID will be
+       reused. This will help work around any issues with frame ID's
+       "leaking", but could cause odd behavior in cases where all outstanding
+       frame IDs are still in use. This option should be used with caution.
+
+       [4malloc_frame_id_func[24m [4m=head3[24m [4mfree_frame_id_func[0m
+
+       Optional code references to functions used to allocate and free frame
+       IDs. If both are specified they will be called in place of the internal
+       frame ID tracking functions allowing the user more control over how
+       frame IDs are generated. The alloc_frame_id_func will be called when a
+       new frame ID is needed and will be passed as a parameter the reference
+       to the Device:XBee::API object and must return an integer between 1 and
+       255 inclusive. The free_frame_id_func will be called when the reply
+       frame is received and the frame ID is no longer needed and will be
+       passed as parameters a reference to the Device::XBee::API obect and the
+       frame ID to be freed.
+
+       See auto_reuse_frame_id for details on how this module uses frame IDs.
+
+       [4mapi_mode_escape[0m
+
+       Optional. If set to a true value, the module will automatically escape
+       outgoing data and un-escape incoming data for use with XBee API mode 2.
+       Defaults to false.
+
+       See the XBee datasheet for details on API mode 2 and escaped
+       characters.
+
+   [1mat[0m
+       Send an AT command to the module. Accepts two parameters, the first is
+       the AT command name (as two-character string), and the second is the
+       expected data for that command (if any). Data will be converted to a
+       string before it is sent, so integers must first be packed before
+       sending. See the XBee datasheet for a list of supported AT commands and
+       expected data for each.
+
+       Returns the frame ID sent for this packet. This method does not wait
+       for a reply from the XBee, as the expected reply is dependent on the AT
+       command sent.  To retrieve the reply (if any), call one of the rx
+       methods.
+
+       If no reply is expected, the caller should immediately free the
+       returned frame ID via free_frame_id to prevent frame ID leaks.
+
+       [4mExample[0m
+
+       my $at_frame_id = $api->at( 'AO', pack( 'C', 1 ) );
+
+   [1mremote_at[0m
+       Send an AT command to a remote module. Accepts three parameters: a
+       hashref with endpoint addresses, command options, frame_id; the AT
+       command name (as two-character string); and the third as the expected
+       data for that command (if any) as a string. See the XBee datasheet for
+       a list of supported AT commands and expected data for each.
+
+       Endpoint addresses should be specified as a hashref containing the
+       following keys:
+
+       sh  The high 32-bits of the destination address.
+
+       sl  The low 32-bits of the destination address.
+
+       na  The destination network address.
+
+       apply_changes
+           If set, changes are applied immediately. If not set, an AT AC
+           command must be sent separately before the changes will take
+           effect.
+
+       Note: The following command options are not supported on all XBee
+       devices.
+
+       disable_ack
+           If set, the remote node will not reply with an ack.
+
+       extended_xmit_timeout
+           If set, the exteded transmission timeout will be used.
+
+       Returns the frame ID sent for this packet. To retrieve the reply (if
+       any), call one of the rx methods. If no reply is expected, the caller
+       should immediately free the returned frame ID via free_frame_id to
+       prevent frame ID leaks.
+
+       [4mExample[0m
+
+       The following example disables the blinking association light on the
+       XBee with a constant on.
+
+        if (
+            !$api->remote_at(
+                { sh => 1234567, sl => 1234567890, apply_changes => 1 },
+                'D5', "\x1"
+            )
+        ) {
+            die "Transmit failed!";
+        }
+        my $rx = $api->rx();
+        warn Dumper( $rx );
+
+   [1mtx[0m
+       Sends a transmit request to the XBee. Accepts three parameters, the
+       first is the endpoint address, the second is a scalar containing the
+       data to be sent, and the third is an optional flag (known as the async
+       flag) specifying whether or not the method should wait for an
+       acknowledgement from the XBee.
+
+       Endpoint addresses should be specified as a hashref containing the
+       following keys:
+
+       sh  The high 32-bits of the destination address.
+
+       sl  The low 32-bits of the destination address.
+
+       na  The destination network address. If this is not specified, it will
+           default to XBEE_API_BROADCAST_NA_UNKNOWN_ADDR.
+
+       If both sh and sl are missing or the parameter is undefined,, they will
+       default to XBEE_API_BROADCAST_ADDR_H and XBEE_API_BROADCAST_ADDR_L.
+
+       The meaning of these addresses can be found in the XBee datasheet.
+       Note: In the future, a Device::XBee::API::Node object will be an
+       acceptable parameter.
+
+       If the async flag is not set, the method will wait for an
+       acknowledgement packet from the XBee. Return values depend on calling
+       context. In scalar context, true or false will be returned representing
+       transmission acknowledgement by the remote XBee device. In array
+       context, the first return value is the delivery status (as set in the
+       transmit status packet and documented in the datasheet), and the second
+       is the actual transmit status packet (as a hashref) itself.
+
+       If the async flag is set, the method will not wait for an
+       acknowledgement packet and the tx frame ID will be returned. The caller
+       will need to then receive the transmit status packet (via one of the rx
+       methods) and free the frame ID (via free_frame_id) manually.
+
+       No retransmissions will be attempted by this module, but the XBee
+       device itself will likely attempt retransmissions as per its
+       configuration (and subject to whether or not the packet was a
+       "broadcast").
+
+   [1mrx[0m
+       Receives a packet from the XBee module. This packet may be a
+       transmission from a remote XBee node or a control packet from the local
+       XBee module.
+
+       If no packet is received before the timeout period expires, undef is
+       returned.
+
+       Returned packets will be as a hashref of the packet data, broken out by
+       key for easy access. Note, as this module is a work in progress, not
+       every XBee packet type is supported. Callers should check the
+       "api_type" key to determine the type of the received packet. When
+       possible, packed integers will be unpacked into the "data_as_int" key.
+       If no packed integer is found this key will not be present. If
+       unpacking is not possible (due to an unknown packet type, etc), the
+       value will be undef.
+
+       Accepts a single parameter, a flag indicating the received frame ID
+       should NOT be freed automatically. See rx_frame_id for why you might
+       want to use this flag (generally, cases when you expect multiple
+       packets to arrive with the same frame ID).
+
+   [1mrx_frame_id[0m
+       Like rx but only returns the packet with the requested frame ID number
+       and then frees that frame ID. If no packet with the specified frame ID
+       is received within the object's configured packet_timeout time, undef
+       will be returned. Any other packets received will be enqueued for later
+       processing by another rx function call.
+
+       Accepts two parameters, the first being the desired frame ID and the
+       second a flag denoting that the frame ID should NOT be automatically
+       freed. In cases where multiple frames with the same ID are expected to
+       be returned (such as after an AT ND command), it is preferable to set
+       this flag to a true value and continue to call rx_frame_id until undef
+       is returned, and then free the ID via free_frame_id.
+
+   [1mdiscover_network[0m
+       Performs a network node discovery via the ND 'AT' command. Blocks until
+       no replies have been received in packet_timeout seconds.
+
+   [1mnode_info[0m
+   [1mknown_nodes[0m
+       Returns a hashref of all known nodes indexed by their full serial
+       number (i.e.  $node->{sh} . '_' . $node->{sl}).  Nodes that haven't
+       been heard from in the configured node_forget_time will be
+       automatically removed from this list if they've not been heard from in
+       that time. Nodes are added to that list when a message is received from
+       them or a discover_network call has been made.
+
+       Note, the age-out mechanism may be susceptable to stepping of the
+       system clock.
+
+[1mEXAMPLES[0m
+       Miscellaneous code examples follow.
+
+   [1mFetch modem baud rage[0m
+        use Device::SerialPort;
+        use Device::XBee::API;
+
+        # From XBee datasheet pg 73.
+        my @baud_rate_table = (
+            1200,
+            2400,
+            4800,
+            9600,
+            19200,
+            38400,
+            57600,
+            115200
+        );
+
+        # Configure the serial port
+        my $serial_port_device = Device::SerialPort->new( '/dev/ttyU0' )
+            || die $!;
+        $serial_port_device->baudrate( 9600 );
+        $serial_port_device->databits( 8 );
+        $serial_port_device->stopbits( 1 );
+        $serial_port_device->parity( 'none' );
+        $serial_port_device->read_char_time( 0 );
+        $serial_port_device->read_const_time( 1000 );
+
+        # Create the API object
+        my $api = Device::XBee::API->new( { fh => $serial_port_device } )
+            || die $!;
+
+        # Send the BD API command
+        my $at_frame_id = $api->at( 'BD' );
+        die "Transmit failed" unless $at_frame_id;
+
+        # Receive the reply
+        my $rx = $api->rx_frame_id( $at_frame_id );
+        die "No reply received" if !$rx;
+        if ( $rx->{status} != 0 ) {
+            die "API error" if $rx->{is_error};
+            die "Invalid command" if $rx->{is_invalid_command};
+            die "Invalid parameter" if $rx->{is_invalid_parameter};
+            die "Unknown error";
+        }
+
+        my $baud_rate = $baud_rate_table[ $rx->{data_as_int} ];
+        if ( !$baud_rate ) {
+            $baud_rate = $rx->{data_as_int};
+        }
+
+        print "Modem baud rate is $baud_rate bps.\n";
+
+[1mCHANGES[0m
+   [1m0.8, 20140914 - jeagle[0m
+       Clean up remote_at function.
+
+       Improve error checking for invalid and empty packets.
+
+   [1m0.7, 20130330 - jeagle[0m
+       Add ability to allow users to specify their own frame allocation
+       routines.
+
+       Update API mode 2 with latest version from jdodgen
+
+   [1m0.6, 20120624 - jeagle[0m
+       Update documentation.
+
+       Add support for API mode 2 escapes. Needs testing.
+
+       Add constant for the "BD" baud rate table.
+
+   [1m0.5, 20120401 - jeagle[0m
+       Add support for Win32::SerialPort to enable Windows support. (Thanks
+       Jerry)
+
+       Fix issue with [4mtx()[24m in async mode. (Thanks Vicente)
+
+       Add support for "explicit rx indicator" packets. (Thanks Vicente)
+
+   [1m0.4, 20110831 - jeagle[0m
+       Fix packet timeout bug reported by Dave S.
+
+       Replace call to [4mdie()[24m in __data_to_int with return undef, update docs
+       to reflect this.
+
+   [1m0.3, 20110621 - jeagle, jdodgen[0m
+       Change from internal Device::SerialPort wrapper to accepting an fh.
+
+       Add asynchronous support to tx and add some helpful methods to support
+       it.
+
+       Handle more command types (remote AT, ZigBee IO, node identification).
+
+       Add an option to re-use frame IDs under high tx load.
+
+       Many more changes!
+
+   [1m0.2, 20101206 - jeagle[0m
+       Initial release to CPAN.
+
+[1mPOD ERRORS[0m
+       Hey! [1mThe above document had some coding errors, which are explained[0m
+       [1mbelow:[0m
+
+       Around line 534:
+           =back without =over
+
+
+
+perl v5.16.3                      2014-09-14              Device::XBee::API(3)

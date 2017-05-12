@@ -1,0 +1,21 @@
+By default, print errors
+
+Easier serialization of BEACON format
+  beacon(">$file") 
+  beacon( to => $file )
+  beacon( from => $a, to => $b )
+  beacon( from => $a, to => $b, links => \&filter ) # needed?
+
+Better document 'appendline/link'
+
+instead of plainbeaconlink
+
+  $b->condense( @link ) # auch expanded!
+  beacon->condense( @link )
+
+Document mixing of raw / expanded
+
+document 'query'
+
+add basic RDF functionality
+

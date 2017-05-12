@@ -1,0 +1,48 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+0.001004
+
+0.001003 2017-02-28T09:02:40Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001003
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+ - Dist::Zilla::Plugin::lib
+ - English
+ - Software::License::Perl_5
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0 → 0.001002
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003901
+ - Test::More 0.88 → 0.96
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002000 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024000 → 2.025020
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib
+ - Dist::Zilla::Plugin::MetaYAML
+
+0.001002 2015-03-01T09:37:04Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.023002 → 2.024000
+
+0.001001 2015-02-05T04:53:48Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+ - Dist::Zilla::Plugin::Readme::Brief
+
+ [Changed / develop recommends]
+ - Test::More 1.001014 → 0.99
+
+ [Changed / develop requires]
+ - Test::More 0 → 0.88
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.022003 → 2.023002
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Pod2Readme

@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DateTime-Calendar-Hijri
+version:      0.00
+version_from: lib/DateTime/Calendar/Hijri.pm
+installdirs:  site
+requires:
+    Date::Hijri:                   0.02
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

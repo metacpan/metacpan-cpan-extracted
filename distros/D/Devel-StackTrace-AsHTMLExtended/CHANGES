@@ -1,0 +1,52 @@
+==================================================
+Changes from 2013-10-17 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.18 at 2014-10-17 14:17:20 +0000
+-----------------------------------------
+
+  Change: b67bcdb0267513da4e119b85b3f3af523493eccc
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-17 10:16:40 +0000
+
+    Add max_dump_size limit to prevent huge data dumps.
+
+    Set to the maximum number of bytes you want to see for arguments and
+    lexicals. 
+
+-----------------------------------------
+version 0.17 at 2014-10-15 00:15:54 +0000
+-----------------------------------------
+
+  Change: 998ef263b6c72cf0d876b006e1dacefa3fda0e09
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 20:15:54 +0000
+
+    Some version fixes 
+
+-----------------------------------------
+version 0.16 at 2014-10-15 00:13:05 +0000
+-----------------------------------------
+
+  Change: 19f8f8b23d2e3bb3b6b18cb14ebf87820fb6719f
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 20:13:05 +0000
+
+    Fix method name documentation 
+
+  Change: 4c7ef087fb45741a18267ac41c02e4f4a6a9e4b2
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 16:22:44 +0000
+
+    Some Dist::Zilla changes 
+
+  Change: a1f339b161ebeed297b14e2dd31a9ef89abb4d29
+  Author: Rusty Conover <rusty@luckydinosaur.com>
+  Date : 2014-10-14 16:17:33 +0000
+
+    Initial import to git 
+
+================
+End of releases.
+================

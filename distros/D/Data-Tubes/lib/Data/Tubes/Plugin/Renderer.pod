@@ -1,0 +1,186 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Renderer
+
+=head1 DESCRIPTION
+
+This module contains factory functions to generate I<tubes> that ease
+rendering records as text (or data).
+
+Each of the generated tubes has the following contract:
+
+=over
+
+=item *
+
+the input record MUST be a hash reference;
+
+=item *
+
+one field in the input record (according to factory argument C<input>,
+set to C<structured> by default) indicates which input field contains
+variables for expansion;
+
+=item *
+
+one field in the hash (according to factory argument C<output>, set to
+C<rendered> by default) is set to the output of the reading operation.
+
+=back
+
+The factory functions below have two names, one starting with C<render_>
+and the other without this prefix. They are perfectly equivalent to each
+other, whereas the short version can be handier e.g. when using C<tube>
+or C<pipeline> from L<Data::Tubes>.
+
+=head1 FUNCTIONS
+
+=head2 B<< render_with_template_perlish >>
+
+Alias for L</with_template_perlish>.
+
+=head2 B<< with_template_perlish >>
+
+   my $tube = with_template_perlish($template, %args); # OR
+   my $tube = with_template_perlish(%args); # OR
+   my $tube = with_template_perlish(\%args);
+
+render input variables using a L<Template::Perlish> template. The
+I<template> is the I<main> parameter, and can be passed as unnamed first
+argument or with key C<template> inside the C<%args> hash.
+
+Allowed arguments are:
+
+=over
+
+=item C<input>
+
+the name of the input field in the record, where record-specific
+variables can be found;
+
+=item C<name>
+
+the name of the tube, useful when debugging;
+
+=item C<output>
+
+the name of the output field in the output record;
+
+=item C<start>
+
+parameter for L<Template::Perlish>, defaults to C<[%>. It will be
+ignored if C<template_perlish> is present in the arguments. It will also
+be ignored if C<template> is already compiled or gets compiled not using
+the L<Template::Perlish> instance generated with this setting;
+
+=item C<stop>
+
+parameter for L<Template::Perlish>, defaults to C<%]>. It will be
+ignored if C<template_perlish> is present in the arguments. It will also
+be ignored if C<template> is already compiled or gets compiled not using
+the L<Template::Perlish> instance generated with this setting;
+
+=item C<template>
+
+template that will be expanded. It can be either of the following:
+
+=over
+
+=item *
+
+a plain string. In this case, it MUST be compliant with the rules
+explained in L<Template::Perlish> and the settings for C<start>
+and C<stop>, or whatever set in C<template_perlish>;
+
+=item *
+
+a hash reference. In this case, the template is assumed to be a
+I<pre-compiled> template that is immediately useable with
+L<Template::Perlish/evaluate>. Depending on whether it has been compiled
+with checks or not (see L<Template::Perlish/compile>), it might actually
+ignore C<variables> or C<template_perlish>'s variables or not. If you go
+this route, it is usually a good idea to pass the L<Template::Perlish>
+instance that compiled this template via argument C<template_perlish>;
+
+=item *
+
+an array reference. This will be expanded into an argument list for
+L<Data::Tubes::Plugin::Util/read_file>, that allows reading the template
+from a file (or whatever can be C<open>ed, like a scalar reference).
+
+=item *
+
+a code reference. This is provided for maximum flexibility. It will be
+invoked to get the template, getting the full arguments hash as input
+(the arguments has will always have C<template_perlish> populated,
+either with the provided value or with a newly created one). It can
+return either of the above, and the return value will be treated
+accordingly (it I<cannot> return another code reference though, please
+do all the indirections in the sub yourself!).
+
+=back
+
+This is the I<main> parameter, so it can be provided I<un-named> as the
+first stand-alone argument.
+
+=item C<template_input>
+
+optional identifier of a field in the input record that has the template
+to be expanded. When this argument is defined, and the corresponding
+field in the input record is defined too, this field in the input record
+will be used as template instead of argument C<template>. Defaults to
+C<undef>, i.e. use whatever set as C<template>;
+
+=item C<template_perlish>
+
+an instance of L<Template::Perlish> that has to be used for all
+compilations and evaluation of templates. If this is present, options
+C<start>, C<stop> and C<variables> will be ignored; otherwise, a
+L<Template::Perlish> instance will be created with these three
+parameters;
+
+=item C<template_perlish_input>
+
+optional identifier of a field in the input record that has the
+L<Template::Perlish> instance to use for expansions. If this argument is
+missing/undefined, or if the corresponding field in the input record is
+missing/undefined, the default L<Template::Perlish> instance will be
+used (i.e. either the one passed with C<template_perlish>, or the
+auto-generated one). Defauts to C<undef>, i.e. use whatever set as
+C<template_perlish> or the auto-generated instance;
+
+=item C<variables>
+
+hash reference with variables that will always be available when
+expanding the template. Defaults to the empty hash. Will be ignored if
+C<template_perlish> is present in the arguments.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

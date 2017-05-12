@@ -1,0 +1,29 @@
+Revision history for Dist-Zilla-Plugin-MatchManifest
+
+4.02   2014-07-19
+	- Update tests to use Test::DZil
+
+4.01   2013-08-09
+	- Add safety check to ensure MatchManifest comes after MakeMaker
+	  (The new require_builder attribute controls this.)
+
+4.00   2010-12-07
+	- Write MANIFEST without CRs on Win32
+	- The major version is now 4, because it requires Dist::Zilla 4.
+	  (I meant to make this change with the last release, but forgot.)
+
+0.04   2010-11-11
+	- Handle spaces and single quotes in filenames
+	- Use the prompt_yn method of dzil's chrome
+	- Now has actual tests
+
+0.03   2010-04-14
+	- Added SYNOPSIS
+	- Made the MANIFEST diff less likely to wrap
+	- Added compile test
+
+0.02   2010-03-07
+	- Use the plugin's log method so the plugin name appears in the log
+
+0.01   2009-10-20
+	- Initial release

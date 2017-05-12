@@ -1,0 +1,59 @@
+Revision history for Data-Munge
+
+0.097   2017-03-17
+        * Don't require '.' in @INC during install.
+
+0.096   2016-03-02
+        * eval_string() now preserves the value of $@ both inside the eval'd
+          code and outside (if no exception is thrown).
+
+0.095   2015-05-08
+        * Extend documentation for slurp, submatches, eval_string.
+
+0.094   2015-03-08
+        * elem("$ref", [$ref]) is now false.
+          (elem($ref, ["$ref"]) had been false before.)
+
+0.093   2014-12-23
+        * Fix typo in synopsis (thanks, Ivan Wills).
+
+0.092   2014-11-25
+        * Work around some parser bug in perl 5.6.
+
+0.091   2014-11-19
+        * Work around regex bug (#115242) in perls < 5.18 that causes spurious
+          test failures.
+
+0.09    2014-11-18
+        * Add slurp.
+        * Don't leave $VERSION and @EXPORT in scope for eval_string.
+
+0.08    2014-09-15
+        * Make trim(undef) return undef without warnings.
+
+0.07    2013-10-22
+        * eval_string() now sets __FILE__ and __LINE__ for the eval'd code.
+          This may or may not make error locations more useful.
+
+0.06    2013-03-07
+        * add elem
+
+0.05    2013-03-05
+        * add trim, eval_string, and rec
+
+0.04    2011-08-04
+        * Fix buggy behavior for list2re('') and list2re()
+
+0.032   2010-01-23
+        * Fix overly strict test that fails on < 5.10
+
+0.031   2010-01-20
+        * Also remove Defaults::Mauke from tests (sigh).
+
+0.03    2010-01-19
+        * Dropped dependency on Defaults::Mauke.
+        * Added submatches/replace.
+
+0.02    2009-12-14
+        First version, released on an unsuspecting world.
+

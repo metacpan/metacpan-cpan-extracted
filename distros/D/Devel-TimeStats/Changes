@@ -1,0 +1,24 @@
+Revision history for Perl extension Devel-TimeStats
+
+0.04 2013-05-26T15:01:06Z
+
+    - fixed documentation for 'color_map'
+
+0.03 2013-05-25T13:01:00Z
+
+    - added perl 5.10 to .travis.yml
+    - removed report_border_style attribute and doc
+      (cafe01)
+    - support Perl 5.8
+      - Text::ANSITable depends on Perl 5.10. Removed that dependency.
+      - replaced by Text::UnicodeTable::Simple + Term::ExtendedColor
+      (Dai Okabayashi) 
+
+0.02 2013-05-24T22:49:36Z
+
+    - fixed cpanfile, added Tree::Simple::Visitor::FindByUID
+
+0.01 2013-05-24T22:31:55Z
+
+    - original version
+

@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-Factory
+
+0.01    2015-03-27
+        - Initial release, never worked
+
+0.02    2015-03-30
+        - First stable release
+
+0.03    2015-04-15
+        - Add "discard_changes" after create
+
+0.03    2015-04-15
+        - Remove create options

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d07ae77d5fd0904ec145083447ffb7b5b9614d95 Build.PL
+SHA1 aa4d2d42eab5d8660c48fa8aece0449d4fdeb9be CONTRIBUTORS
+SHA1 9d1553b313c7fcff782cfef36de64a3d5fd402f1 Changes
+SHA1 83113919207f914ccbf0562c3120a1c159baa3dc LICENSE
+SHA1 e101b3fd5f853f8d9ed08a4c242df604aafc1ef7 MANIFEST
+SHA1 70ad20d90c330b6bf934c9858b0cb9284eb9b2d0 META.yml
+SHA1 0701fc46971dea101da3a413682facd6802648a7 README
+SHA1 19d3aafb3fe20f671bbe387a84d29bab347a4963 cpanfile
+SHA1 56ccd2959cd70e2eb52ecf55326cc2d2beb8169a lib/Dist/Zilla/MintingProfile/ZURBORG.pm
+SHA1 be32c00a3cd341c9186aa7e84fb3905c53db6c9d lib/Dist/Zilla/PluginBundle/ZURBORG.pm
+SHA1 7196d9338db60e06419088bc26fd3655bd2ca7e8 lib/Pod/Weaver/PluginBundle/ZURBORG.pm
+SHA1 648af218b51af661c6be53e154b4eeab2847b460 share/profiles/github/Module.pm
+SHA1 4251e00551e0d11681fa7933facbadf20080cb06 share/profiles/github/profile.ini
+SHA1 3523faea71cca7e7450a11a818349e7804b9ff51 share/profiles/github/skel/dist.ini
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b share/profiles/github/skel/perlcritic.rc
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXJgh8AAoJEJVzeMw4kNooamMP/1GqkKlR5TpeZED1OJ/BzrpZ
+vudEF7s9AxIY1AeEAaGiaOeWRvEgiziqNiewAaGsr3oDhnOcLOm5p15tiBCzbiGc
+DsmDL3XKaohPgd5zTHNMz5TFdC07pPpdYJhsH5XBzUKtg+SRKbVIZ6cfyIqEkzg8
+WL4E4+WgEzbAInWuvRA/J8T3KON3qb4mE2sTqQQGfEsgy6ki9l3beaORT5Q/vk18
+s1YiiXh6UO9i85wMSsgzkfV9ZnXYFYQTSYT1gt0blVnvC3xOUknfejGXfssWz+v0
+fkgFXVg+8PmLoY9/G7ogrwJVQA+Xa99GhilLKLqx7ZSTKfY12SJ+PDrRcBCvSjVE
+F/COznZ1L3yiEQOtfyS0EVXDG75LOway302YXXCYeJYl9Me8QO6/ins+ZzUo00PO
+WZEiDLsmUQ4mh47UNnwxiUj8SGVCqfRGO2MmNFalvybKFD1O6iv2Nrp5L3Z6YPhL
+4woFO2Bf8P/EeaezGmwmZdcDgGuB66Ic0cMR1nHozWEFLUPiV8GBrdsZ9QhxCBIz
+4v9gtf0rAr/Mm529Bxu+2zR5LdLfFZbs44RDYUQLLkPClCBlytd6Ma8pXHgc/6Rj
+YmIsW0/VAVZKnSIJdIXZgiga5CJEC5umsC4jTNFKSEm3r+QU92wchLMA2UGARek9
+i3kyhYCXRgZTYI67ULae
+=MfMC
+-----END PGP SIGNATURE-----

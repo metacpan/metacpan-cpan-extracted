@@ -1,0 +1,53 @@
+ChangeLog
+---------
+
+[2014-09-05]
+* Release version 1.0.1.
+* Update dist.ini to ensure README.md is included in tarball.
+* Add Changes file.
+
+[2014-09-05]
+* Release version 1.0.0.
+* Add initial dzil dist.ini, remove cruft.
+* Update perldocs for 1.0.0 release.
+
+[2010-04-29]
+* Bump version to 0.9.1.
+* Add environment support, including to applied dir.
+
+[2010-02-28]
+* Bump version to 0.9.
+* Update perldocs for file-based version.
+* Other changes to file-based version.
+* Update tests to file-based versions.
+* Convert from database-based tracking to file-based.
+
+[2008-02-23]
+* Bump version to 0.6.
+* Fix buglet in testdir location.
+* Updates to MANIFEST.
+* Add perldocs on new statement filtering.
+* Add statement filtering tests; add -s flag for stmt reporting.
+
+[2007-11-22]
+* Bump version to 0.5.
+* Add a filter_statement method to DBIx::Delta; bump version to 0.5.
+* Remove leftover t02_base/delta.db.
+
+[2007-11-22]
+* Bump version to 0.4.
+* Add real test case (02_base.t).
+
+[2007-07-31]
+* Bump version to 0.3.1.
+* Fix quiet buglet.
+* Add -q quiet argument.
+
+[2007-07-31]
+* Bump version to 0.3.
+* Reenable semicolon escaping inside single quotes.
+
+[2007-06-08]
+* Add noop support to Delta; comment out semicolon escaping temporarily.
+* Initial import.
+

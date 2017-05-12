@@ -1,0 +1,40 @@
+Revision history for Perl extension ctree.
+
+0.01  Fri Nov 21 11:00:24 1997
+	- original version; created by h2xs 1.18
+
+0.02  Mon Feb  2 13:00:24 1998
+	- first local test release
+
+0.03  Wed Feb 11 08:00:24 1998
+	- major rewrite of ctree.xs, using function list processed from
+          Faircom's quick reference guide.  Includes *MOST* ctree functions,
+          although *MOST* will not be tested.
+
+0.04  Tue Mar 3 13:37:24 1998
+        - some repackaging and start of documentation
+
+0.05  Tue Mar 3 13:37:24 1998
+        - first general beta!!
+
+0.06  Wed Mar 3 21:46:24 1998
+        - new version due to CPAN upload problems
+
+0.10   
+        - added install instructions to README (oops)
+
+0.11   
+        - added support for IOPERFORMANCEX call
+        - fixed bug in STORE method and AddRecord/AddVRecord
+
+1.0     - ready for release... verified Windows operation
+
+1.1     - updated comments/code to remove strategiconline reference
+        - removed empty subroutine templates in PH files to allow
+          program to work with Windows Perl Dev Kit PerlApp compiler
+        - added extra PACKAGE statement in PH files to workaround bug in
+          Windows Perl Dev Kit PerlApp compiler
+        - added utilities ctload, ctcount, ctmod
+
+1.2     - updated Makefile to block automated CPAN testers, since it needs
+          a Faircom license and library

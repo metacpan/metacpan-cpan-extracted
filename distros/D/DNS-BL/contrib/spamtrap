@@ -1,0 +1,1712 @@
+#!/usr/bin/perl
+#
+# spamtrap: Help manage DNS::BL dnsbls and spamtraps or spam sinks.
+#
+# luismunoz@cpan.org
+#
+# $Id: spamtrap,v 1.30 2004/12/24 11:45:45 lem Exp $
+
+use strict;
+use warnings;
+
+use Socket;
+use IO::File;
+use IO::Scalar;
+use Pod::Usage;
+use File::Spec;
+use File::Path;
+use MLDBM::Sync;
+use NetAddr::IP;
+use Getopt::Std;
+use Email::Send;
+use Email::Simple;
+use MIME::Parser;
+use HTML::Parser;
+use Text::Template;
+use Digest::MD5 qw(md5_hex);
+use Net::Whois::Raw qw(whois);
+use Fcntl qw(:flock :DEFAULT);
+use MLDBM qw(DB_File Storable);
+use Sys::Syslog qw(:DEFAULT setlogsock);
+
+use vars qw/
+    $opt_A $opt_a $opt_C $opt_D $opt_d $opt_F $opt_f $opt_H $opt_h 
+    $opt_I $opt_i $opt_k $opt_l $opt_m $opt_r $opt_O $opt_o $opt_S 
+    $opt_s $opt_T $opt_t $opt_u $opt_v $opt_V $opt_W $opt_w $opt_X
+    /;
+
+getopts('A:a:C:D:d:H:I:i:k:lFf:hm:O:o:r:S:s:T:tuvVW:w:X:');
+pod2usage({verbose => 2, exitval => 0}) if $opt_h;
+
+# This is the list of all gTLDs and a number that shows how many
+# words are "taken up" by the choosen domain name scheme used at each
+# registrar. This is used to get to the actual domain name of a given host
+# or to analyze its 'host' part.
+#
+# Feel free to send updates to this table to the author :)
+my %domains = (
+	       # The "traditional" gTLDs
+	       com	=> { depth => 1 },
+	       net	=> { depth => 1 },
+	       org     	=> { depth => 1 },
+	       pro	=> { depth => 1 },
+	       gov	=> { depth => 1 },
+	       edu	=> { depth => 1 },
+	       mil	=> { depth => 1 },
+	       int	=> { depth => 1 },
+	       
+	       # The "new & improved" gTLDs
+	       aero	=> { depth => 1 },
+	       biz	=> { depth => 1 },
+	       coop	=> { depth => 1 },
+	       info	=> { depth => 1 },
+	       museum	=> { depth => 1 },
+	       name	=> { depth => 1 },
+	       
+	       # The ccTLDs defined in ISO-3166 standard
+	       ac	=> { depth => 1 },
+	       ad	=> { depth => 1 },
+	       ae	=> { depth => 1 },
+	       af	=> { depth => 1 },
+	       ag	=> { depth => 1 },
+	       ai	=> { depth => 1 },
+	       al	=> { depth => 1 },
+	       am	=> { depth => 1 },
+	       an	=> { depth => 1 },
+	       ao	=> { depth => 1 },
+	       aq	=> { depth => 1 },
+	       ar	=> { depth => 2 },
+	       as	=> { depth => 1 },
+	       at	=> { depth => 2 },
+	       au	=> { depth => 2 },
+	       aw	=> { depth => 1 },
+	       ax	=> { depth => 1 },
+	       az	=> { depth => 1 },
+	       ba	=> { depth => 1 },
+	       bb	=> { depth => 1 },
+	       bd	=> { depth => 1 },
+	       be	=> { depth => 1 },
+	       bf	=> { depth => 1 },
+	       bg	=> { depth => 1 },
+	       bh	=> { depth => 1 },
+	       bi	=> { depth => 1 },
+	       bj	=> { depth => 1 },
+	       bm	=> { depth => 1 },
+	       bn	=> { depth => 1 },
+	       bo	=> { depth => 2 },
+	       br	=> { depth => 2 },
+	       bs	=> { depth => 1 },
+	       bt	=> { depth => 1 },
+	       bv	=> { depth => 1 },
+	       bw	=> { depth => 1 },
+	       by	=> { depth => 1 },
+	       bz	=> { depth => 1 },
+	       ca	=> { depth => 1 },
+	       cc	=> { depth => 1 },
+	       cd	=> { depth => 1 },
+	       cf	=> { depth => 1 },
+	       cg	=> { depth => 1 },
+	       ch	=> { depth => 1 },
+	       ci	=> { depth => 1 },
+	       ck	=> { depth => 1 },
+	       cl	=> { depth => 1 },
+	       cm	=> { depth => 1 },
+	       cn	=> { depth => 1 },
+	       co	=> { depth => 1 },
+	       cr	=> { depth => 1 },
+	       cs	=> { depth => 1 },
+	       cu	=> { depth => 1 },
+	       cv	=> { depth => 1 },
+	       cx	=> { depth => 1 },
+	       cy	=> { depth => 1 },
+	       cz	=> { depth => 1 },
+	       de	=> { depth => 1 },
+	       dj	=> { depth => 1 },
+	       dk	=> { depth => 1 },
+	       dm	=> { depth => 1 },
+	       do	=> { depth => 1 },
+	       dz	=> { depth => 1 },
+	       ec	=> { depth => 1 },
+	       ee	=> { depth => 1 },
+	       eg	=> { depth => 1 },
+	       eh	=> { depth => 1 },
+	       er	=> { depth => 1 },
+	       es	=> { depth => 1 },
+	       et	=> { depth => 1 },
+	       fi	=> { depth => 1 },
+	       fj	=> { depth => 1 },
+	       fk	=> { depth => 1 },
+	       fm	=> { depth => 1 },
+	       fo	=> { depth => 1 },
+	       fr	=> { depth => 1 },
+	       ga	=> { depth => 1 },
+	       gb	=> { depth => 1 },
+	       gd	=> { depth => 1 },
+	       ge	=> { depth => 1 },
+	       gf	=> { depth => 1 },
+	       gg	=> { depth => 1 },
+	       gh	=> { depth => 1 },
+	       gi	=> { depth => 1 },
+	       gl	=> { depth => 1 },
+	       gm	=> { depth => 1 },
+	       gn	=> { depth => 1 },
+	       gp	=> { depth => 1 },
+	       gq	=> { depth => 1 },
+	       gr	=> { depth => 1 },
+	       gs	=> { depth => 1 },
+	       gt	=> { depth => 1 },
+	       gu	=> { depth => 1 },
+	       gw	=> { depth => 1 },
+	       gy	=> { depth => 1 },
+	       hk	=> { depth => 1 },
+	       hm	=> { depth => 1 },
+	       hn	=> { depth => 1 },
+	       hr	=> { depth => 1 },
+	       ht	=> { depth => 1 },
+	       hu	=> { depth => 1 },
+	       id	=> { depth => 1 },
+	       ie	=> { depth => 1 },
+	       il	=> { depth => 2 },
+	       im	=> { depth => 1 },
+	       in	=> { depth => 1 },
+	       io	=> { depth => 1 },
+	       iq	=> { depth => 1 },
+	       ir	=> { depth => 1 },
+	       is	=> { depth => 1 },
+	       it	=> { depth => 1 },
+	       je	=> { depth => 1 },
+	       jm	=> { depth => 1 },
+	       jo	=> { depth => 1 },
+	       jp	=> { depth => 2 },
+	       ke	=> { depth => 1 },
+	       kg	=> { depth => 1 },
+	       kh	=> { depth => 1 },
+	       ki	=> { depth => 1 },
+	       km	=> { depth => 1 },
+	       kn	=> { depth => 1 },
+	       kp	=> { depth => 1 },
+	       kr	=> { depth => 2 },
+	       kw	=> { depth => 2 },
+	       ky	=> { depth => 1 },
+	       kz	=> { depth => 1 },
+	       la	=> { depth => 1 },
+	       lb	=> { depth => 1 },
+	       lc	=> { depth => 1 },
+	       li	=> { depth => 1 },
+	       lk	=> { depth => 1 },
+	       lr	=> { depth => 1 },
+	       ls	=> { depth => 1 },
+	       lt	=> { depth => 1 },
+	       lu	=> { depth => 1 },
+	       lv	=> { depth => 1 },
+	       ly	=> { depth => 1 },
+	       ma	=> { depth => 1 },
+	       mc	=> { depth => 1 },
+	       md	=> { depth => 1 },
+	       mg	=> { depth => 1 },
+	       mh	=> { depth => 1 },
+	       mk	=> { depth => 1 },
+	       ml	=> { depth => 1 },
+	       mm	=> { depth => 1 },
+	       mn	=> { depth => 1 },
+	       mo	=> { depth => 1 },
+	       mp	=> { depth => 1 },
+	       mq	=> { depth => 1 },
+	       mr	=> { depth => 1 },
+	       ms	=> { depth => 1 },
+	       mt	=> { depth => 1 },
+	       mu	=> { depth => 1 },
+	       mv	=> { depth => 1 },
+	       mw	=> { depth => 1 },
+	       mx	=> { depth => 2 },
+	       my	=> { depth => 1 },
+	       mz	=> { depth => 1 },
+	       na	=> { depth => 1 },
+	       nc	=> { depth => 1 },
+	       ne	=> { depth => 1 },
+	       nf	=> { depth => 1 },
+	       ng	=> { depth => 1 },
+	       ni	=> { depth => 1 },
+	       nl	=> { depth => 1 },
+	       no	=> { depth => 1 },
+	       np	=> { depth => 1 },
+	       nr	=> { depth => 1 },
+	       nu	=> { depth => 1 },
+	       nz	=> { depth => 2 },
+	       om	=> { depth => 1 },
+	       pa	=> { depth => 1 },
+	       pe	=> { depth => 2 },
+	       pf	=> { depth => 1 },
+	       pg	=> { depth => 1 },
+	       ph	=> { depth => 1 },
+	       pk	=> { depth => 2 },
+	       pl	=> { depth => 1 },
+	       pm	=> { depth => 1 },
+	       pn	=> { depth => 1 },
+	       pr	=> { depth => 1 },
+	       ps	=> { depth => 1 },
+	       pt	=> { depth => 1 },
+	       pw	=> { depth => 1 },
+	       py	=> { depth => 2 },
+	       qa	=> { depth => 1 },
+	       re	=> { depth => 1 },
+	       ro	=> { depth => 1 },
+	       ru	=> { depth => 1 },
+	       rw	=> { depth => 1 },
+	       sa	=> { depth => 1 },
+	       sb	=> { depth => 1 },
+	       sc	=> { depth => 1 },
+	       sd	=> { depth => 1 },
+	       se	=> { depth => 1 },
+	       sg	=> { depth => 1 },
+	       sh	=> { depth => 1 },
+	       si	=> { depth => 1 },
+	       sj	=> { depth => 1 },
+	       sk	=> { depth => 1 },
+	       sl	=> { depth => 1 },
+	       sm	=> { depth => 1 },
+	       sn	=> { depth => 1 },
+	       so	=> { depth => 1 },
+	       sr	=> { depth => 1 },
+	       st	=> { depth => 1 },
+	       sv	=> { depth => 1 },
+	       sy	=> { depth => 1 },
+	       sz	=> { depth => 1 },
+	       tc	=> { depth => 1 },
+	       td	=> { depth => 1 },
+	       tf	=> { depth => 1 },
+	       tg	=> { depth => 1 },
+	       th	=> { depth => 2 },
+	       tj	=> { depth => 1 },
+	       tk	=> { depth => 1 },
+	       tl	=> { depth => 1 },
+	       tm	=> { depth => 1 },
+	       tn	=> { depth => 1 },
+	       to	=> { depth => 1 },
+	       tp	=> { depth => 1 },
+	       tr	=> { depth => 1 },
+	       tt	=> { depth => 1 },
+	       tv	=> { depth => 1 },
+	       tw	=> { depth => 1 },
+	       tz	=> { depth => 1 },
+	       ua	=> { depth => 1 },
+	       ug	=> { depth => 1 },
+	       uk	=> { depth => 2 },
+	       um	=> { depth => 1 },
+	       us	=> { depth => 0 },
+	       uy	=> { depth => 2 },
+	       uz	=> { depth => 1 },
+	       va	=> { depth => 1 },
+	       vc	=> { depth => 1 },
+	       ve	=> { depth => 2 },
+	       vg	=> { depth => 1 },
+	       vi	=> { depth => 1 },
+	       vn	=> { depth => 1 },
+	       vu	=> { depth => 1 },
+	       wf	=> { depth => 1 },
+	       ws	=> { depth => 1 },
+	       ye	=> { depth => 1 },
+	       yt	=> { depth => 1 },
+	       yu	=> { depth => 1 },
+	       za	=> { depth => 2 },
+	       zm	=> { depth => 1 },
+	       zw	=> { depth => 1 },
+	       );
+
+##
+## No user serviceable parts below this point :)
+##
+
+my @exclude = ();		# Subnets to exclude
+my @include = ();		# Subnets to include
+my @own = ();			# Our own subnets
+
+# Load our subnet include list
+if ($opt_A)
+{
+    eval { @include = map { NetAddr::IP->new($_) } split(/,/, $opt_A) };
+    pod2usage({message => 'Check arguments to -A', verbose => 1})
+	if $@ or grep { not defined $_ } @include;
+}
+
+# By default, we accept anything
+push @include, NetAddr::IP->new("default") unless @include;
+
+# Load our subnet exclude list
+if ($opt_X)
+{
+    eval { @exclude = map { NetAddr::IP->new($_) } split(/,/, $opt_X) };
+    pod2usage({message => 'Check arguments to -X', verbose => 1})
+	if $@ or grep { not defined $_ } @exclude;
+}
+
+# Load our own subnet list
+if ($opt_O)
+{
+    eval { @own = map { NetAddr::IP->new($_) } split(/,/, $opt_O) };
+    pod2usage({message => 'Check arguments to -O', verbose => 1})
+	if $@ or grep { not defined $_ } @own;
+}
+
+# Setup the logging if requested
+if ($opt_l)
+{
+    setlogsock 'unix';
+    openlog 'spamtrap', 'pid|ndelay|nowait', 'LOG_MAIL';
+    syslog 'notice', 'Starting';
+    $SIG{__WARN__} = sub {
+	syslog 'warning', @_;
+	warn @_;
+    };
+    $SIG{__DIE__} = sub {
+	syslog 'warning', @_;
+	die @_;
+    };
+}
+
+# Set the default WHOIS server and cache to use
+$opt_w = 'whois.cyberabuse.org' unless $opt_w;
+$opt_W = '/tmp/whois-cache' unless $opt_W;
+$opt_w = lc $opt_w;
+mkpath [ $opt_W ] unless -d $opt_W;
+
+# Default abuse address
+$opt_o = 'abuse' unless $opt_o;
+
+# Translate the policy string, if supplied
+my $Max_Age	= 604800;
+my $Host_Thr	= 1;
+my $Net_Thr	= 3;
+
+if ($opt_H)
+{
+    my ($age, $host, $net) = split(/,/, $opt_H);
+    if (defined $age)
+    {
+	$age = lc $age;
+	if ($age =~ s/([dwmy])$//)
+	{
+	    if ($1 eq 'd')	{ $age *= 86400 }
+	    elsif ($1 eq 'w')	{ $age *= 604800 }
+	    elsif ($1 eq 'm')	{ $age *= 2592000 }
+	    elsif ($1 eq 'y')	{ $age *= 31536000 }
+	    else { die "Invalid argument to -H. See -h for help\n" }
+	}
+	$Max_Age = $age;
+    }
+
+    $Host_Thr = $host if defined $host;
+    $Net_Thr = $net if defined $net;
+}
+
+# Compile the -m regexp if given
+eval { $opt_m = qr/$opt_m/ if $opt_m };
+pod2usage({message => 'Arguments to -m must be a valid perl regex', 
+	   verbose => 1}) if ($@);
+
+my $abuse_templ = undef;
+
+# Setup and configure our MIME parser
+my $parser = new MIME::Parser;
+$parser->ignore_errors(1);
+$parser->extract_uuencode(1);
+$parser->decode_headers(1);
+$parser->extract_nested_messages(0);
+
+# Cleanup in case we have to leave abruptly. Log the fact if required.
+END
+{
+    if ($opt_l) { syslog 'notice', 'Terminating'; closelog }
+    $parser->filer->purge if $parser;
+}
+
+# Parse the abuse-complaint template, if required
+if ($opt_C)
+{
+    $abuse_templ = Text::Template->new(TYPE	=> 'FILE',
+				       SOURCE	=> $opt_C);
+    die "Failed to parse complaint template $opt_C: $!\n$Text::Template::ERROR"
+	unless $abuse_templ;
+    print STDERR "Complaint Text::Template $opt_C parsed\n" if $opt_v;
+}
+
+# We will keep each part of the message safely within this hashref. This
+# allows for an easy treatment of complaints that contains two or more
+# spam samples.
+my $text = [];
+
+# These are used to keep the whitelist regexps handy
+my $spam_w	= [];
+my $dul_w	= [];
+
+# This code is used to factor the loading of whitelists
+sub load_whitelist ($)
+{
+    my $name	= shift;
+    my $fh	= new IO::File $name;
+    my @ret	= ();
+
+    die "Failed to open whitelist file $name: $!\n"
+	unless $fh;
+
+    while (<$fh>)
+    {
+	chomp;
+	s/\s*#.+$//g;
+	next if m/^\s*$/;
+	my $re;
+	eval { $re = qr/$_/ };
+	die "Bad regexp <$_> at $name, line ", $fh->input_line_number, "\n$@"
+	    if $@ or not $re;
+	push @ret, $re;
+    }
+
+    $fh->close;
+
+    return \@ret;
+}
+
+# Now load the whitelists specified in the command line.
+$spam_w	= load_whitelist $opt_S if $opt_S;
+$dul_w	= load_whitelist $opt_D if $opt_D;
+
+# This function checks the whitelisting status of a given name
+# with a set of regexps
+sub whitelisted ($$)
+{
+    my $obj	= shift;	# Arrayref of things to check
+    my $res	= shift;	# Arrayref of whitelists
+    return unless @$res;	# Exit early on empty whitelists
+    for my $r (@$obj)
+    {
+	next unless defined $r;
+	return 1 if grep { $r =~ m/$_/i } @$res;
+    }
+    return;
+}
+
+# This function splices a FQDN in its domain and host components
+sub splice_name ($)
+{
+    my $name = shift;
+
+    return unless defined $name and length $name;
+
+    my @parts = reverse split /\./, lc $name;
+
+    my $domain = join '.', reverse splice(@parts, 0, 
+					  ($domains{$parts[0]}->{depth} || 1) 
+					  + 1);
+    my $host = join '.', reverse @parts;
+    return ($domain, $host);
+}
+
+# This function decides wether a PTR (name) is dynamic or not.
+# It uses a few heuristics we've compiled.
+sub is_dynamic ($)
+{
+    my $name = shift;
+
+    # No-name is dynamic.
+    return 1 unless defined $name and length $name;
+    my ($domain, $host) = splice_name $name;
+
+    # See if the name contains any sugestive keywords.
+
+    return if $host =~ m/(?:static|host|server|mail|mx|relay)/;
+    return "keyword" if $host =~ m/(?:cpe|ppp|dsl|dial(up)?|dyn
+				    |pool|modem|cable|dhcp)/x;
+
+    # See if the name contains "many digits". Usually, names consisting of
+    # more than 50% digits, point to massivelly assigned (or dynamic)
+    # IP spaces.
+
+    return "digits" if (($host =~ tr/[0-9a-f]/[0-9a-f]/) 
+			> length($host) / 2);
+    
+    # Otherwise, we choose static
+    return;
+}
+
+# This is an utility function that converts a /32 to its enclosing /24
+sub to_net ($)
+{
+    my $ip = shift;
+    return NetAddr::IP->new($ip->addr . "/24")->network;
+}
+
+# This function manages the WHOIS lookups and the caching of the results.
+
+sub do_whois ($$$)
+{
+    my $ip	= shift;
+    my $server	= shift;
+    my $cache	= shift;
+
+    # The WHOIS data we seek
+    my $data = '';
+
+    # First, see wether we have a cached copy of the data in our
+    # on-disk cache
+    for my $mask (reverse 0 .. 32)
+    {
+	my $net = NetAddr::IP->new($ip, $mask)->network->addr . '-' . $mask;
+	my $name = File::Spec->catfile($cache, $net);
+	next unless -f $name;
+	my $fh = new IO::File $name;
+	if ($fh)
+	{
+	    print STDERR "WHOIS cache hit for $ip in $name\n" if $opt_v;
+	    local $/ = undef;
+	    $data = <$fh>;
+	    close $fh;
+	    return $data;
+	}
+	else
+	{
+	    warn "Failed to open WHOIS cache $name: $!\n";
+	}
+    }
+
+    # Ok, no cache. Then fetch the data from the whois server and
+    # cache it, then return it to the caller
+    $data = Net::Whois::Raw::whois($ip, $server);
+    unless ($data)
+    {
+	warn "Whois info for $ip\@$server is empty\n"
+	    if $opt_v;
+	return;
+    }
+
+    unless ($data =~ m/Abuse\sE-mail\s+:/
+	    and $data =~ m/IP\s+range\s+:/)
+    {
+	if ($opt_v)
+	{
+	    warn "Extraneous Whois info for $ip\@$server (won't cache)\n";
+	    if ($opt_V)
+	    {
+		warn "# $_\n" for split /\n/, $data;
+	    }
+	}
+	return $data;
+    }
+
+    if ($data =~ m/IP\s+Range\s+:\s+([\d\.]+)\s+-\s+([\d\.]+)/i)
+    {
+	my $net = NetAddr::IP->new("$1-$2");
+	unless ($net)
+	{
+	    warn "IP Range $1-$2 for $ip\@$server not understood\n"
+		if $opt_v;
+	    return $data;
+	}
+
+	my $file = $net->addr . '-' . $net->masklen;
+	my $name = File::Spec->catfile($cache, $file);
+	my $fh = new IO::File $name, ">";
+	if ($fh)
+	{
+	    print $fh $data;
+	    close $fh;
+	    print "Cached WHOIS info for $ip at $name\n" if $opt_v;
+	}
+	else
+	{
+	    warn "Failed to create WHOIS cache $name: $!\n";
+	}
+    }
+    return $data;
+}
+
+# This function is used to parse the MIME structure within the message we
+# were fed. This is most useful for spam complaints sent as attachments.
+# Note that it is recursive.
+sub decode_entities
+{
+    my $ent = shift;
+
+    if (my @parts = $ent->parts)
+    {
+	decode_entities($_) for @parts;
+    }
+    elsif (my $body = $ent->bodyhandle)
+    {
+	my $type = $ent->head->mime_type;
+	if (grep { $type eq $_ } qw(text/plain message/rfc822 text/html))
+	{ my $b;
+
+	  if ($type eq 'text/html')
+	  {
+	      my $html_p = HTML::Parser->new
+		  (
+		   api_version	=> 3,
+		   default_h	=> [ "" ],
+		   start_h	=> [ sub { $b .= "\n" if $_[0] eq 'br' }, 
+				     "tagname, attr" ],
+		   text_h	=> [ sub { $_[0] =~ s/\n/ /g; $b .= $_[0] }, 
+				     "dtext" ],
+		   ) or die "Cannot create HTML parser\n";
+	      
+	      $html_p->ignore_elements(qw(script style));
+	      $html_p->strict_comment(1);
+	      $html_p->parse($body->as_string);
+	  }
+	  else
+	  {
+	      $b = $body->as_string;
+	  }
+
+	  print STDERR "[Decoded part $type (", length $b, " bytes)]\n"
+	      if $opt_v;
+
+	  # Sometimes users will do a Forward and the original
+	  # message will be slightly munged by the '>' at the
+	  # beginning of the line...
+
+	  if ($b =~ /^([\s\W]+)Received:/m)
+	  {
+	      my $mark = $1;
+	      $b =~ s/^${mark}//gm;
+	  }
+
+	  # Sometimes the mail client will munge the From or From:
+	  # lines that might come in. This is an honest attempt to
+	  # remove those lines for good
+
+	  while ($b =~ s/^From_.+\@.+\n//mg) {}
+	  while ($b =~ s/^( +|[\._])From .+\@.+\n//mg) {}
+	  
+	  push @$text, $b; }
+	else
+	{ 
+	    print STDERR "[Unhandled part of type $type (",
+	    length $body->as_string, " bytes)]\n" 
+		if $opt_v; 
+	}
+    }
+}
+
+# Sometimes the headers are truncated in weird ways by the text 
+# justification in some email clients. Try to repair the damage. The
+# basis for this, is that a header always begins with an ucfirst word
+# followed by :. If we add a single space at the beginning of each 
+# non-empty line not matching this criteria, we would be easing up the
+# parsing of the headers.
+sub clean_breaks
+{
+    my $r_p = shift;
+
+    # Step 1, get rid of newlines at the start...
+    $$r_p =~ s/^(\s*\n)+//;
+
+    # Step 2, split the message by the empty line
+    my ($head, $body) = split(/\n\n/, $$r_p, 2);
+    $head = '' unless $head;
+    $body = '' unless $body;
+    
+    # Step 3, add a space before each non-header
+    while ($head =~ s/(^)(?!\s|[A-Z][^:\s]+: )/ /gm) {};
+
+    # Step 4, remove superfluous space
+    $head =~ s/[ \t]{2,}/ /g;
+
+    # Step 5, re-merge the whole thing
+    $$r_p = $head . "\n\n" . $body;
+}
+
+# Perform the analysis and extraction of data from our given data
+# samples.
+
+sub perform($$)
+{
+    my $sample	= shift;
+    my $r_msg	= shift;
+    my $msg	= $$r_msg;
+
+    print STDERR "Analizing sample at $sample\n" if $opt_v;
+
+    # IP space that is found after header analysis, will be included
+    # in this list...
+    my @all_ips = ();
+
+    # Start with a clean list of chunks to analyze
+    @$text = [];
+
+    # In spamtrap mode, we simply fetch all of our input for analysis. This
+    # will be assumed to be a piece of spam sent to a trap. Otherwise, we 
+    # assume our input to be a spam report. Headers will be inside this 
+    # message.
+
+    if ($opt_t)			# Are we in spamtrap mode?
+    {
+	print STDERR "[Single chunk (", length $msg, " bytes)]\n" if $opt_v;
+	push @$text, $msg;
+	$msg = undef unless $opt_a;
+    }
+    else			# No, we're not in spamtrap mode.
+    {
+	# Parse our spam sample
+	my $e;
+	eval { $e = $parser->parse_data($msg); };
+	
+	# See if we found any errors worth reporting
+	my $error = $@ || $parser->last_error;
+	if ($error)
+	{
+	    warn "Failed to parse message: $error\n";
+	    return;
+	}
+
+	# Walk through the entities, producing the working text. 
+	# We'll store each segment in @$text. This strategy allows 
+	# for easy separation of messages.
+	
+	decode_entities($e);	# Start the decoding recursion
+	
+	# @$text should contain a compendium of the messages that were
+	# sent. We will now try to analyse those chunks to figure out
+	# which addresses to black list
+	
+	clean_breaks(\$_) for @$text;
+
+	# It is possible that the user packed various samples that ended
+	# in the same chunk. Our only hope here would be to try and detect
+	# this with some heuristics...
+	
+	my $ntext = [];
+	for my $p (@$text)
+	{
+	    # Split on where the boundary between header and body should be
+	    my @p = split(/\n\n+/, $p);
+	    
+	    print STDERR "[Analysing part " if $opt_v;
+	    
+	    # Merge chunks them according to wether we see things 
+	    # resembling headers or not...
+	    my $chunk = shift @p;
+	    while (@p)
+	    {
+		if (2 < grep { $p[0] =~ m/$_: / } qw(Received Return-Path Date 
+						     Message-Id Delivered-To
+						     Cc X-Mailer Subject 
+						     MIME-Version))
+		{
+		    print STDERR "." if $opt_v;
+		    clean_breaks(\$chunk);
+		    push @$ntext, $chunk;
+		    $chunk = '';
+		}
+		else
+		{
+		    print STDERR "+" if $opt_v;
+		    $chunk .= "\n\n";
+		}
+		$chunk .= shift (@p);
+	    }
+	    
+	    if ($chunk)
+	    {
+		print STDERR "." if $opt_v;
+		clean_breaks(\$chunk);
+		push @$ntext, $chunk;
+	    }
+
+	    print STDERR "]\n" if $opt_v;
+	}
+	$text = $ntext;
+    }
+
+    # After so much cleaning, we could probably unleash the power of 
+    # Mail::Header in the resulting part.
+
+    print STDERR "This message had ", scalar @$text, " parts\n"
+	if $opt_v;
+
+    for my $p (@$text)
+    {
+	# This will help us coerce Mail::Header into reading from our
+	# scalar
+	my $fh = new IO::Scalar \$p;
+
+	# We would like to skip any "user comments" in the message,
+	# before actual headers. Note that this also skips over
+	# boring headers
+
+	if ($p =~ m/(^.+?)^Received: /ms)
+	{
+	    my $buf;
+	    $fh->read($buf, length $1);
+	    print STDERR "[Skipped ", length($1), " chars at head of part]\n"
+		if $opt_v;
+	}
+
+	my $head = new Mail::Header Modify => 0;
+	$head->read($fh);
+	
+	my @ips = ();
+	
+	# Now, iterate through the Received: headers, looking for
+	# the given regexes
+	for my $r ($head->get('Received'))
+	{
+#	    print STDERR "-m is $opt_m - r=$r\n";
+	    next unless !$opt_m or $r =~ m/$opt_m/;
+	    while ($r =~ m/[\(\[](\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})[\)\]]/g)
+	    {
+		my $ip = new NetAddr::IP $1;
+		next unless $ip;
+		next unless grep { $ip->within($_) } @include;
+		next if grep { $ip->within($_) } @exclude;
+		push @ips, $ip unless grep { $ip == $_ } @ips;
+	    }
+	}
+	print STDERR "Matches in this chunk: ", 
+	(@ips ? (join ',', @ips) : 'none'), "\n" if $opt_v;
+	for my $ip (@ips)
+	{
+	    push @all_ips, $ip unless grep { $ip->within($_) } @all_ips;
+	}
+    }
+
+    print STDERR "Combined matches in all chunks: ", 
+    (@all_ips ? (join ',', @all_ips) : 'none'), "\n" if $opt_v;
+    
+    # Clean-up the files produced by the MIME parsing.
+    $parser->filer->purge;
+
+    my @own_ips = ();		# IPs that are our own
+    my @other_ips = ();		# IPs not our own
+
+    for my $ip (@all_ips)
+    {
+	if (grep { $_->contains($ip) } @own)
+	{
+	    push @own_ips, $ip;
+	    next;
+	}
+	push @other_ips, $ip;
+    }
+
+    # Send abuse complaints to ourselves
+    if ($opt_o and @own_ips)
+    {
+	my $MSG = $$r_msg;
+	my $Head;
+	if ($opt_t)
+	{
+	    $Head = "Subject: Spamtrap capture\n";
+	}
+	else
+	{
+	    $Head = substr($MSG, 0, index($MSG, "\n\n"));
+	    $Head =~ s/^To: (.*)$/Originally-To: $1/m;
+	    substr($MSG, 0, index($MSG, "\n\n")) = '';
+	}
+
+	$Head .= 'X-Generated-By: $Id: spamtrap,v 1.30 2004/12/24 11:45:45 lem Exp $ ';
+	$Head .= "\n";
+	$Head .= "\nTo: $opt_o\n";
+
+	my $email = Email::Simple->new("$Head\n\n$MSG");
+	
+	if ($opt_V)
+	{
+	    print STDERR "Note the following abuse complaint\n";
+	    print "| $_\n" for split /\n/, $email->as_string;
+	}
+
+	syslog 'notice', "Taking note about abuse from " . join(',', @own_ips)
+	    if $opt_l;
+
+	if ($opt_r)
+	{
+	    warn "Failed to note abuse complaint with relay $opt_r: $!\n" 
+		unless send SMTP => $email, $opt_r;
+	}
+	else
+	{
+	    warn "Failed to note abuse complaint with Sendmail: $!\n" 
+		unless send Sendmail => $email;
+	}
+    }
+
+    # Fill the template complaint with the currently available data
+    if ($abuse_templ and @other_ips)
+    {
+	my $MSG = $$r_msg;
+	substr($MSG, 0, index($MSG, "\n\n")) = '' unless $opt_t;
+	$MSG =~ s/[-_\.\w\d]+\@[-_\.\w\d]+/\$munged\$@\$munged\$/g;
+	$MSG =~ s!/h/././././[^/]+/Maildir!/\$munged\$/Maildir!g;
+
+	# Find out the contacts for each given IP address.
+	my @contacts = ();
+
+	for my $ip (@other_ips)
+	{
+	    my $data = do_whois($ip->addr, $opt_w, $opt_W);
+	    unless ($data)
+	    {
+		warn "Whois info for $ip\@$opt_w is empty\n"
+		    if $opt_v;
+		next;
+	    }
+
+	    if ($data =~ m/Abuse\s+E-mail\s+:\s+(.+)\s*$/m)
+	    {
+		my $c = $1;
+		next if grep { $_ eq $c } @contacts;
+		push @contacts, $c;
+	    }
+	}
+
+	if (@contacts)
+	{
+	    my $abuse_msg = $abuse_templ->fill_in
+		(
+		 HASH => {
+		     contacts	=> \@contacts,
+		     listed	=> \@other_ips,
+		     source	=> $sample,
+		     registrar	=> $opt_w,
+		     sample	=> \$MSG,
+		 },
+		 );
+	    print STDERR "--- Begin abuse complaint $opt_C ---\n",
+	    "$abuse_msg\n--- End abuse complaint ---\n" 
+		if $opt_V;
+
+	    my $email = Email::Simple->new($abuse_msg);
+	    die "Failed to convert supplied Text::Template to Email::Simple\n"
+		unless $email;
+
+	    syslog 'notice', "Notifying " . join(',', @contacts) .
+	    " about abuse from " . join(',', @other_ips) if $opt_l;
+
+	    if ($opt_r)
+	    {
+		warn "Failed to send message with relay $opt_r: $!\n" 
+		    unless send SMTP => $email, $opt_r;
+	    }
+	    else
+	    {
+		warn "Failed to send message with Sendmail: $!\n" 
+		    unless send Sendmail => $email;
+	    }
+
+	}
+	else
+	{
+	    warn "Failed to locate contacts for ", join(',', @other_ips), "\n";
+	}
+    }
+
+    # Provide archive functionality (-a). Files are stored under the given
+    # dir. Name is composed with current date + MD5 of its contents or,
+    # if no -a but -f, will be the name of the source sample.
+
+    my $pname = '';
+
+    if ($opt_a)
+    {
+	$pname = sprintf("%012d-%s", time, md5_hex($msg));
+	my $name = File::Spec->catfile($opt_a, $pname);
+	
+	my $fh = new IO::File $name, "w";
+	die "Failed to create file $name: $!\n" 
+	    unless $fh;
+	die "Failed to write to $name: $!\n" 
+	    unless print $fh $msg;
+	die "Failed to close $name: $!\n" 
+	    unless $fh->close;
+	syslog 'notice', "sample stored at $name" if $opt_l;
+    }
+    elsif ($opt_f)
+    {
+	$pname = $sample;
+    }
+    
+    # Now, see if we need to update our index...
+    if ($pname and $opt_i)
+    {
+	die "Failed to tie index file $opt_i: $!\n"
+	    unless tie my %DB, 'MLDBM::Sync', $opt_i, O_CREAT|O_RDWR, 0640;
+	
+	$pname = File::Spec->catfile((File::Spec->splitdir($opt_a))[-1], 
+				     $pname) if $opt_I;
+	$pname = File::Spec->catfile(($opt_I ? $opt_I : $opt_a), $pname);
+	
+	syslog 'notice', "updating index $opt_i pointing to $pname" 
+	    if $opt_l;
+	
+	for my $ip (@all_ips)
+	{
+	    my $cur = $DB{$ip->addr} || [];
+	    unless (grep { $pname eq $_ } @$cur)
+	    {
+		push @$cur, $pname;
+		$DB{$ip->addr} = $cur;
+	    }
+	}
+	    
+	untie %DB;
+    }
+
+    syslog 'notice', "%d addresses found", scalar @all_ips if $opt_l;
+
+    # This hash will keep the score for each IP address, if required
+    # by later checks. In any case, we will update the scores accordingly
+    # and leave them updated in the hash
+
+    my %scores = ();
+    if ($opt_k and @all_ips)
+    {
+	die "Failed to tie score file $opt_k: $!\n"
+	    unless tie my %sdb, 'MLDBM::Sync', $opt_k, O_CREAT|O_RDWR, 0640;
+	
+	for my $ip (@all_ips)
+	{
+	    my ($domain, $name) = splice_name 
+		gethostbyaddr(inet_aton($ip->addr), 
+			      AF_INET);
+	    # Fetch existing data
+	    my $hs = $sdb{$ip} || [ 0, time ];
+	    my $ns = $sdb{to_net $ip} || [ 0, time ];
+	    my $ds = $sdb{$domain} || [ 0, time ] if $domain;
+	    
+	    # Report if -v was specified
+	    if ($opt_v)
+	    {
+		print STDERR "Previous score for $ip: $hs->[0] (", 
+		time - $hs->[1], " seconds ago)\n";
+		print STDERR "Previous score for ", to_net $ip, 
+		": $ns->[0] (", time - $ns->[1], " seconds ago)\n";
+		print STDERR "Previous score for $domain: $ds->[0] (", 
+		time - $ds->[1], " seconds ago)\n" if $domain;
+	    }
+	    
+	    # "Forget" old scores
+	    $hs = [ 0, time ] if $hs->[1] + $Max_Age < time;
+	    $ns = [ 0, time ] if $ns->[1] + $Max_Age < time;
+	    $ds = [ 0, time ] if $domain and $ds->[1] + $Max_Age < time;
+	    
+	    # Age existing scores lineally
+	    $hs->[0] *= (time - $hs->[1]) / $Max_Age if $hs->[0];
+	    $ns->[0] *= (time - $ns->[1]) / $Max_Age if $ns->[0];
+	    $ds->[0] *= (time - $ds->[1]) / $Max_Age if $ds->[0];
+	    
+	    # Update entries with current score
+	    $hs = [ $hs->[0] + 1, time ];
+	    $ns = [ $ns->[0] + 1, time ];
+	    $ds = [ $ds->[0] + 1, time ] if $domain;
+	    
+	    # Update existing data
+	    $sdb{$ip} = $hs;
+	    $sdb{to_net $ip} = $ns;
+	    $sdb{$domain} = $ds if $domain;
+	    
+	    # Remember for later, if needed
+	    $scores{$ip} = $hs->[0] + $ns->[0] + ($domain ? $ds->[0] : 0);
+	    $scores{to_net $ip} = $ns->[0];
+	    
+	    # Report if -v was specified
+	    if ($opt_v)
+	    {
+		print STDERR "Resulting score for $ip: $scores{$ip}\n";
+		print STDERR "Resulting score for ", to_net $ip, 
+		": ", $scores{to_net $ip}, "\n";
+	    }
+	}
+	
+	untie %sdb;
+    }
+
+    # Output the commands that are requested by -d and -s. Also
+    # perform heuristic checks for dul, as well as whitelisting (if
+    # requested)
+    if (@all_ips and $opt_s || $opt_d)
+    {
+	my $fh_s = undef;	# Filehandle for spam commands
+	my $fh_d = undef;	# Filehandle for dul commands
+	
+	if ($opt_s)
+	{
+	    die "Failed to open $opt_s: $!\n"
+		unless $fh_s = new IO::File "$opt_s", ">>";
+	    die "Failed to lock $opt_s: $!\n"
+		unless flock($fh_s, LOCK_EX);
+	}
+	
+	if ($opt_d)
+	{
+	    die "Failed to open $opt_d: $!\n"
+		unless $fh_d = new IO::File "$opt_d", ">>";
+	    die "Failed to lock $opt_d: $!\n"
+		unless flock($fh_d, LOCK_EX);
+	}
+	
+	for my $ip (@all_ips)
+	{
+	    my $name = gethostbyaddr(inet_aton($ip->addr), AF_INET);
+	    
+	    if ($fh_s
+		and !whitelisted [$ip, $name], $spam_w
+		and (not exists $scores{$ip}
+		     or $scores{$ip} >= $Host_Thr))
+	    {
+		print $fh_s qq{add ip $ip text "hit } #"}
+		. ($name ? $name : 'noPTR') . qq { ($ip)} #"}
+		. ($opt_T ? qq{ $opt_T} : '') . q{"} #"}
+		. ($opt_F ? " without checking" : "")
+		    . "\n";
+		syslog 'notice', "%s blacklisted as spam source", $ip 
+		    if $opt_l;
+	    }
+	    
+	    next unless $fh_d;
+	    next if whitelisted [$ip, $name], $dul_w;
+	    
+	    if (not defined $name)
+	    {
+		if ($fh_d
+		    and (not exists $scores{to_net $ip}
+			 or $scores{to_net $ip} >= $Net_Thr))
+		{
+		    print $fh_d qq{add ip } 
+		    . to_net($ip)
+			. q{ text "hit } #"}
+		    . ($name ? $name : 'noPTR') . qq { ($ip)} #"}
+		    . ($opt_T ? qq{ $opt_T} : '') . q{"} #"}
+		    . ($opt_F ? " without checking" : "")
+			. "\n";
+		    syslog 'notice', "%s blacklisted due to noPTR", 
+		    to_net($ip) 
+			if $opt_l;
+		}
+	    }
+	    elsif (my $r = is_dynamic $name)
+	    {
+		if ($fh_d
+		    and (not exists $scores{to_net $ip}
+			 or $scores{to_net $ip} >= $Net_Thr))
+		{
+		    print $fh_d qq{add ip } . to_net($ip)
+			. qq{ text "hit $name ($ip) $r} #"}
+		    . ($opt_T ? qq{/$opt_T} : '') . q{"} #"}
+		    . ($opt_F ? " without checking" : "")
+			. "\n";
+		    syslog 'notice', "%s blacklisted due to dynamic PTR", 
+		    to_net($ip) 
+			if $opt_l;
+		}
+	    }
+	}
+	
+	$fh_s->close || die "Failed to close $opt_s: $!\n"
+	    if $fh_s;
+	
+	$fh_d->close || die "Failed to close $opt_d: $!\n"
+	    if $fh_d;
+    }
+
+    return (@all_ips ? 0 : 1);
+}
+
+# Now, determine the processing method we will be using (ie, where to
+# find the spam samples...
+
+if ($opt_f)
+{
+    my $ret = 0;
+    my $fh_list = new IO::File;
+
+    die "Failed to open sample list file $opt_f: $!\n"
+	unless $fh_list->open($opt_f);
+
+    while (my $name = $fh_list->getline)
+    {
+	chomp $name;
+	my $fh = new IO::File $name;
+	die "Failed to open spam sample at $name: $!\n"
+	    unless $fh;
+
+	# XXX - Slow, but headers are not properly separated
+	# by slurping the whole thing with $/
+	my $msg = join '', <$fh>;
+	close $fh;
+	$msg =~ s/\r\n/\n/g;
+	$ret ||= perform $name, \$msg;
+	if ($opt_u)
+	{
+	    warn "Failed to unlink $name: $!\n"
+		unless unlink $name;
+	}
+    }
+
+    $fh_list->close;
+    exit $ret;
+}
+else
+{
+    # We will keep a copy of the message, in order to safely store it
+    # if required to.
+    my $msg = join('', <STDIN>);
+
+    exit perform '<STDIN>', \$msg;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+spamtrap - Manage a spamtrap and produce DNS::BL commands to respond
+
+=head1 SYNOPSIS
+
+  spamtrap [-A accept-subnets] [-a archive-dir] [-C complaint-template]
+    [-S spam-whitelist] [-s spam-dnsbl-commands] [-D dul-whitelist] 
+    [-d dul-dnsbl-commands] [-F] [-f sample-list] [-H policy-string] 
+    [-h] [-I path-substitute] [-i index-file] [-k score-file] [-l] 
+    [-m match-regexp] [-O own-subnets] [-o own-abuse-address] 
+    [-r mail-relay] [-T tag] [-t] [-u] [-v] [-V] [-W whois-cache-dir] 
+    [-w whois-server] [-X exclude-subnets] 
+
+=head1 DESCRIPTION
+
+This program is meant to be used in procmail recipes serving spamtrap
+and/or spam reporting addresses. Its main functions include:
+
+=over 4
+
+=item B<Evidence archiving>
+
+When instructed to do so, each processed spam sample is stored in a
+file within a path. The file name is unique and encodes the timestamp
+of spam processing.
+
+=item B<Multiple DNSBL listings per spam sample>
+
+When specified, commands can be produced to update two dnsbls. The
+first dnsbl, referred to as 'spam-dnsbl', will contain entries for
+/32s that sent spam to our known mail servers.
+
+The second dnsbl, referred to as 'dul-dnsbl', will include entries for
+/24s where the /32s are located, if said /32 does not pass a set of
+heuristic tests designed to locate space of a dynamic nature.
+
+=item B<Understands various forms of complex complaints>
+
+When deployed in an address used by users to report spam, will attempt
+to find the spam headers within attachments, possibly including
+decoded uuencoded and base64 parts. Multiple header sets can be
+analyzed in a single complaint, which will be archived separatedly.
+
+=item B<Keeps an index of spam samples>
+
+An external index, maintained with L<MLDBM>, L<Storable> and
+L<DB_File>. This is very useful to quickly locate evidence related to
+a given IP address.
+
+=item B<Flexible whitelisting>
+
+Various whitelists can be specified in configuration files. Files are
+composed of one-line regular expressions. Perl comments and whitespace
+can be added for documentation purposes.
+
+=item B<Score-based blacklisting>
+
+Optionally, a score or "spam history" can be kept for the IP space and
+domains identified with analyzed samples. This history can be used to
+implement thresholds for blacklisting, adding hosts only after a
+certain number of spam samples have been collected.
+
+=back 
+
+The following options control the behaviour of this script.
+
+=over 4
+
+=item B<-A accept-subnets>
+
+B<accept-subnets> is a comma-separated list of subnets, specified in
+any format that L<NetAddr::IP> will understand. When IP addresses
+found in matching B<Received:> headers are found, they are rejected if
+they don't fall within the networks given by this option.
+
+When the option is unspecified, all IP addresses are accepted.
+
+=item B<-a archive-dir>
+
+Causes the current message to be archived at the supplied directory,
+which must exist and be writeable. If these conditions are not met,
+processing is aborted.
+
+The file name will be of the form
+
+  <timestamp>-<hash>
+
+Where E<lt>timestampE<gt> is the number of seconds since the epoch and
+E<lt>hashE<gt> is the MD5 in hex of the message. Note that this feature
+requires the L<Digest::MD5> module.
+
+=item B<-C complaint-template>
+
+If specified, use the supplied file as a L<Text::Template> for
+producing an automated abuse complaint. See the supplied example for
+guidance in writing your own.
+
+=item B<-D dul-whitelist>
+
+If specified, B<dul-whitelist> is the name of a whitelist file that is
+applied to the IP addresses and names being considered for dul
+listing. If a match occurs, the entry is not listed.
+
+=item B<-d dul-dnsbl-commands>
+
+Test the name associated to each IP address eligible to get in the
+spam dnsbl. If no name is associated or the name "seems" dynamic, add
+commands to this list for the /24 that encloses the given IP address.
+
+=item B<-h>
+
+Output this documentation and terminate the program.
+
+=item B<-F>
+
+When specified together with B<-s> or B<-d>, cause the B<without
+checking> clause to be added to the list commands. Note that in
+certain environments, this might lead to overlapping entries.
+
+=item B<-f sample-list>
+
+Normally, a single spam sample is read from standard input. When this
+option is specified, spam samples are assumed to be on files, whose
+names are stored within a file named B<sample-list>, one on each
+line. If B<sample-list> is B<->, then the names of the files to
+process are read from the standard input.
+
+Note that B<-a> can still be used with B<-f>. You should be careful to
+delete spam samples already processed and archived according to B<-a>.
+
+=item B<-H policy-string>
+
+Specify a policy string for use with B<-k> score based blacklisting. A
+policy string has the form:
+
+    <max-age>,<host-threshold>,<net-threshold>
+
+Where the components have the following semantics:
+
+=over 4
+
+=item B<E<lt>max-ageE<gt>>
+
+Maximum age allowed for the scores, which are "forgotten" after this
+time has elapsed. The suffixes 'd', 'm', 'w' or 'y' can be used to
+specify the units to mean 'days', 'months', 'weeks' or 'years'
+respectively.
+
+The default value is one week, meaning that spam older than one week
+will be forgiven.
+
+=item B<E<lt>host-thresholdE<gt>>
+
+What score is required to list a specific host. The score is
+calculated by adding the individual host score, the network score and
+the domain score. If the result is greater than this threshold, the
+host will be listed.
+
+This value defaults to 1, which will list the host inmediately.
+
+=item B<E<lt>net-thresholdE<gt>>
+
+What score is required to list a network. The score of the network is
+compared to the given threshold.
+
+The default value for this threshold is 3, which causes a /24 network
+to be listed after receiving the third piece of spam.
+
+=back
+
+Any element can be left unspecified, in which case it will assume the
+default value.
+
+=item B<-I path-substitute>
+
+When B<-i> is used to update an index, causes the replacement of the
+pathname up to the parent of the path component give in the B<-a>
+option, with B<path-substitute>. This is used to hide the real
+location in the filesystem where the samples are stored.
+
+=item B<-i index-file>
+
+Causes the index specified by B<index-file> to be updated with the
+currently stored spam sample. This is only useful when using the B<-a>
+option to specify archiving of the messages. See also B<-I>.
+
+This index provides a convenient reference between an IP address, and
+the spamtrap hit or spam complaints that mention it. These references
+are updated, regardless of the blacklisting of the address. That is,
+the reference will be recorded even when the IP address is not
+eligible for listing due to other criteria such as whitelists or
+scores.
+
+This feature provides for a simple evidence archive.
+
+=item B<-k score-file>
+
+When specified, B<score-file> will be used to create a "spam history"
+index for each analyzed sample. The index works as follows: When an IP
+address has been identified out of a spam sample...
+
+=over 4
+
+=item The /32 that originated the spam receives one point
+
+=item The /24 enclosing the sending /32, receives one point
+
+=item The domain name specified in the PTR record (if any), receives one point
+
+=back
+
+The scores are removed if older than the parameters set with the B<-H>
+option (or the default policy, if this is not set).
+
+=item B<-l>
+
+Turns on logging via L<syslog(3)> if your system supports it. This is
+recommended. Logging is done to the unix socket.
+
+=item B<-m match-regexp>
+
+If provided, B<match-regexp> must be a Perl regular expression that
+must match the contents of a B<Received:> header before it is
+processed. This is useful to restrict the matches to those headers
+actually produced by your servers.
+
+=item B<-O own-subnets>
+
+B<own-subnets> is a comma-separated list of subnets, specified in any
+format that L<NetAddr::IP> will understand. When IP addresses found in
+matching B<Received:> headers are found that correspond to these
+ranges, they are reported to the abuse address (defaults to B<abuse>
+but can be changed with the B<-o> option below).
+
+=item B<-o own-abuse-address>
+
+Email address to forward complaints about abuse from our own
+networks. Defaults to B<abuse>.
+
+=item B<-r mail-relay>
+
+When using B<-C>, L<Email::Send> is used to send the email. If B<-r>
+is not used, then L<Email::Send::Sendmail> is used. Otherwise,
+L<Email::Send::SMTP> is used, specifying B<mail-relay> as the host to
+send email to.
+
+=item B<-S spam-whitelist>
+
+If specified, B<spam-whitelist> is the name of a whitelist file that is
+applied to the IP addresses and names being considered for spam
+listing. If a match occurs, the entry is not listed.
+
+Note that the IP address will still be considered for addition to dul,
+even when matching this rule.
+
+=item B<-s spam-dnsbl-commands>
+
+For each IP address found in the headers and satifying all the
+filtering criteria, output L<DNS::BL> commands into the file named
+B<spam-dnsbl-commands>. The commands will list the /32.
+
+An attempt will be made to lock the file with C<flock(2)> prior to
+updating it. File contents will not be clobbered.
+
+=item B<-T tag>
+
+Add the give B<tag> to the text of the L<DNS::BL> commands
+generated. This is useful to include codes or instructions in a
+specific listing.
+
+=item B<-t>
+
+Enter B<spamtrap> mode. In spamtrap mode, the header of the message
+passed is processed. The rest of the message is considered as body. No
+attempts are made to find other headers within the body.
+
+By default (ie, without specifying B<-t>) the header of the message
+passed to this program is ignored. The body is searched for new
+headers, as if processing spam complaints from users.
+
+=item B<-u>
+
+Unlink the given spam sample after succesful processing.
+
+=item B<-v>
+
+Be verbose about progress. Verbose output is sent to STDERR.
+
+=item B<-V>
+
+Be even more verbose.
+
+=item B<-W whois-cache-dir>
+
+When complaints must be sent about processed spam samples,
+WHOIS is used to find out the contacts to notify. This
+option allows for a cache of WHOIS information to be stored somewhere
+in the filesystem. The deafult place is B</tmp/whois-cache>.
+
+The path will be created if non-existant. Old entries must be removed
+by an external process after their expiration, which eases the
+interaction with complex scripted environments such as the ones this
+program is designed to be a part of.
+
+=item B<-w whois-server>
+
+Specifies the WHOIS server to query for the list of contacts to send
+complaints to. Defaults to B<whois.cyberabuse.org>
+
+=item B<-X exclude-subnets>
+
+B<exclude-subnets> is a comma-separated list of subnets, specified in
+any format that L<NetAddr::IP> will understand. When IP addresses
+found in matching B<Received:> headers are found, they are rejected if
+they fall within the networks given by this option.
+
+When the option is unspecified, all IP addresses are accepted.
+
+=back
+
+=head1 EXAMPLES
+
+=head1 HISTORY
+
+$Log: spamtrap,v $
+Revision 1.30  2004/12/24 11:45:45  lem
+Corrected typo on sending abuse complaints. ($opt_t -> $opt_o)
+
+Revision 1.29  2004/12/21 20:46:50  lem
+Small fix when sending complaints to our own abuse address
+
+Revision 1.28  2004/12/18 12:15:51  lem
+-m works now witf -f
+Note that the reading of the sample files is now quite slower
+
+Revision 1.27  2004/12/18 11:58:33  lem
+Return values are now correct, even when -f is used
+Fixed syslog() messages
+
+Revision 1.26  2004/12/18 00:56:47  lem
+Make it less prone to die(). Replaced with warn()s to keep it running
+longer. This might cause data loss in some chronic cases, but is
+important to improve the flow.
+
+Revision 1.25  2004/12/17 22:20:09  lem
+Added a warning when the unlink fails. Also, added a missing chomp()
+to remove newlines in the filenames.
+
+Revision 1.24  2004/12/17 22:00:44  lem
+Added -u
+
+Revision 1.23  2004/12/17 21:52:25  lem
+Added a From: address to abuse complaints. Set to the same value of -o
+
+Revision 1.22  2004/12/16 23:23:22  lem
+Added the capability to note abuse complaints automatically.
+
+Revision 1.21  2004/12/16 22:51:11  lem
+Added our own do_whois function to better handle the caching of WHOIS
+information.
+
+Revision 1.20  2004/12/16 21:37:26  lem
+Added -W/-w to perform WHOIS queries to locate the source of an abuse
+(thanks to Luis Moreno for part of the code)
+TODO: Better caching of the results.
+Added Text::Template based complaint composition.
+Added -V
+
+Revision 1.19  2004/12/16 16:21:48  lem
+Added -V and fixed leaking MIME temporary files.
+
+Revision 1.18  2004/12/16 15:41:58  lem
+Added -f for processing of multiple spam samples in one single run.
+
+Revision 1.17  2004/12/04 02:09:24  lem
+-I was non-functional
+
+Revision 1.16  2004/11/10 20:58:36  lem
+Added ability to parse HTML
+
+Revision 1.15  2004/11/09 13:27:42  lem
+Remove the .txt extension
+
+Revision 1.14  2004/11/08 22:42:58  lem
+Added linear decay of existing scores
+
+Revision 1.13  2004/11/03 23:36:45  lem
+Improved DUL messages
+
+Revision 1.12  2004/11/03 23:34:52  lem
+Improved DUL messages
+
+Revision 1.11  2004/11/03 23:27:05  lem
+Corrected HTML-entities in POD documentation
+Verbose print is now sent to STDERR
+
+Revision 1.10  2004/11/03 19:07:43  lem
+Added an exit value based in the matching of IP addresses
+
+Revision 1.9  2004/10/29 19:05:52  lem
+Added -A to check for addresses within a set of subnets.
+
+Revision 1.8  2004/10/28 21:08:39  lem
+Fixed minor bug with __DIE__ and syslog
+
+Revision 1.7  2004/10/28 21:00:35  lem
+Added basic comment at the beginning. Actual test starts.
+
+Revision 1.6  2004/10/28 20:58:25  lem
+Added EXAMPLES section.
+Added -i and -I for producing useable indexes
+
+Revision 1.5  2004/10/27 23:56:24  lem
+Added score keeping and policy, dynamic heuristics, whitelisting and
+various other checks. Defined -l for logging. -i is still missing. We
+need some backward compatibility here.
+
+Revision 1.4  2004/10/27 02:51:53  lem
+Added -F. Implemented -s and -d. Stubs for whitelisting and dynamic
+heuristics are in place. -a now works.
+
+Revision 1.3  2004/10/27 00:47:27  lem
+Removed -p
+
+Revision 1.2  2004/10/27 00:45:33  lem
+Minor updates to the parser. All reg-tests verified.
+
+Revision 1.1  2004/10/25 05:00:31  lem
+Interim version of spamtrap. Under development
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), procmail(1), MLDBM(3), Storable(3), DB_File(3),
+NetAddr::IP(3), Digest::MD5(3), DNS::BL(3), Sys::Syslog(3), 
+Text::Template(3).
+
+=end

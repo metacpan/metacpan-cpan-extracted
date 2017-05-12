@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dist-Zilla-Shell,
+version 0.005:
+
+  An interactive shell to run Dist::Zilla commands
+
+This software is copyright (c) 2011 by Olivier Mengué.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

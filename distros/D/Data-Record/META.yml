@@ -1,0 +1,19 @@
+---
+name: Data-Record
+version: 0.02
+author:
+  - Curtis "Ovid" Poe <moc.oohay@eop_divo_sitruc>
+abstract: '"split" on steroids'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Sub::Uplevel: 0.09
+build_requires:
+  Test::Exception: 0.21
+  Test::More: 0.6
+provides:
+  Data::Record:
+    file: lib/Data/Record.pm
+    version: 0.02
+generated_by: Module::Build version 0.2702

@@ -1,0 +1,12 @@
+Revision history for Perl extension Data::TreeDumper::Renderer::ASCII.
+
+0.03  Wed Dec 1 00:03:00 2004
+	FIXED: upgraded to latest DataTreeDumper
+
+0.02  Sat Oct 9 14:00:00 2004
+	CHANGED: use new renderer interface
+
+0.01  Sun Jun 27 00:55:48 2004
+	- original version; created by h2xs 1.21 with options
+		-X -A Data::TreeDumper::Renderer::ASCII
+

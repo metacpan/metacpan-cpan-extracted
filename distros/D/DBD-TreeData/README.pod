@@ -1,0 +1,189 @@
+=head1 NAME
+
+DBD::TreeData - DBI driver for any abstract hash/array tree
+
+=head1 SYNOPSIS
+
+    use DBI;
+    use JSON::Any;
+    use LWP::Simple;
+ 
+    # Example JSON object
+    my $json = get 'http://maps.googleapis.com/maps/api/geocode/json?address=1600+Pennsylvania+Ave+NW,+20500&region=us&language=en&sensor=false';
+    my $obj = JSON::Any->jsonToObj($json);
+ 
+    my $dbh = DBI->connect('dbi:TreeData:', '', '', {
+       tree_table_name => 'geocode',
+       tree_data       => $obj,
+    });
+ 
+    # Informational dump
+    use Data::Dump;
+    dd ($dbh->table_info->fetchall_arrayref);
+    dd (map { [ @{$_}[2 .. 6] ] } @{
+       $dbh->column_info('','','','')->fetchall_arrayref
+    });
+ 
+    # DBIC dump
+    use DBIx::Class::Schema::Loader 'make_schema_at';
+    make_schema_at(
+       'My::Schema', {
+          debug => 1,
+          dump_directory  => './lib',
+       },
+       [ 'dbi:TreeData:geocode', '', '', { tree_data => $obj } ],
+    );
+
+=head1 DESCRIPTION
+
+DBD::TreeData provides a DBI driver to translate any sort of tree-based data set (encapsulated in a Perl object) into a flat set of tables,
+complete with real SQL functionality.  This module utilizes L<DBD::AnyData> to create the new tables, which uses L<SQL::Statement> to support
+the SQL parsing.  (Any caveats with those modules likely applies here.)
+
+This module can be handy to translate JSON, XML, YAML, and many other tree formats to be used in class sets like L<DBIx::Class>.  Unlike
+L<DBD::AnyData>, the format of the data doesn't have to be pre-flattened, and will be spread out into multiple tables.
+
+Also, this driver fully supports all of the C<<< *_info >>> methods, making it ideal to shove into modules like L<DBIx::Class::Schema::Loader>.
+(The C<<< table_info >>> and C<<< column_info >>> filters use REs with beginE<sol>end bounds pre-set.)
+
+=encoding utf8
+
+=head1 CONNECT ATTRIBUTES
+
+=head2 tree_data
+
+The actual tree object.  Of course, this attribute is required.
+
+=head2 tree_table_name
+
+The name of the starting table.  Not required, but recommended.  If not specified, defaults to 'tree_data', or the value of the driver
+DSN string (after the C<<< dbi:TreeData: >>> part).
+
+=head2 tree_debug
+
+Boolean.  Print debug information while translating the tree.
+
+=head2 tree_rename_tables
+
+Hashref of table names.  If you don't like the name of an auto-created table, you can rename them while the database is being built.  Within
+the hashref, the keysE<sol>values are the oldE<sol>new names, respectively.
+
+=head1 TRANSLATION BEHAVIOR
+
+The tree translation into flat tables is done using a recursive descent algorithm.  It starts with a check of the current node's reference
+type, which dictates how it interprets the children.  The goal is to create a fully L<4NF|http://en.wikipedia.org/wiki/Fourth_normal_form>
+database from the tree.
+
+Arrays are interpreted as a list of rows, and typically get rolled up into "group" tables.  Hashes are interpreted as a list of column names
+and values.  Non-references are considered values.  Scalar refs and VStrings are de-referenced first.  Other types of refs are processed as
+best as possible, but the driver will complain.  (Code ref blocks are currently NOT executed and discarded.)
+
+Nested arrays will create nested group tables with different suffixes, like C<<< matrix >>>, C<<< cube >>>, and C<<< hypercube >>>.  If it has to go beyond
+that (and you really shouldn't have structures like that), it'll start complaining (sarcastically).
+
+In almost all cases, the table name is derived from a previous key.  Table names also use L<Lingua::EN::Inflect::Phrase> to create
+pluralized names.  Primary IDs will have singular names with a C<<< _id >>> suffix.
+
+For example, this tree:
+
+    address_components => [
+       {
+          long_name  => 1600,
+          short_name => 1600,
+          types      => [ "street_number" ]
+       },
+       {
+          long_name  => "President's Park",
+          short_name => "President's Park",
+          types      => [ "establishment" ]
+       },
+       {
+          long_name  => "Pennsylvania Avenue Northwest",
+          short_name => "Pennsylvania Ave NW",
+          types      => [ "route" ]
+       },
+       {
+          long_name  => "Washington",
+          short_name => "Washington",
+          types      => [ "locality", "political" ]
+       },
+       ... etc ...,
+    ],
+
+Would create the following tables:
+
+    <main_table>
+       address_component_groups
+          address_components
+             type_groups
+                types
+
+In this case, C<<< address_components >>> has most of the columns and data, but it also has a tie to an ID of C<<< address_component_groups >>>.
+
+Since C<<< types >>> points to an array, it will have its own dedicated table.  That table would have data like:
+
+    type_id │ type
+    ════════╪════════════════
+          1 │ street_number
+          2 │ establishment
+          3 │ route
+          4 │ locality
+          5 │ political
+        ... │ ...
+
+Most of the C<<< type_groups >>> table would be a 1:1 match.  However, the last component entry has more than one value in the C<<< types >>> array, so the
+C<<< type_group_id >>> associated to that component would have multiple entries (4 & 5).  Duplicate values are also tracked, so that IDs are reused.
+
+=head1 CAVEATS
+
+=head2 DBI E<sol> DBD::AnyData Conflict
+
+As of the time of this writing, the latest version of L<DBI> (1.623) and the latest version of L<DBD::AnyData> (0.110) do not work together.
+Since TreeData relies on L<DBD::AnyData> for table creation, you will need to downgrade to L<DBI> 1.622 to use this driver, until a new
+version of L<DBD::AnyData> comes out.
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/DBD-TreeData/wiki>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/DBD::TreeData/>.
+
+=for :stopwords cpan testmatrix url annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata placeholders metacpan
+
+=head1 SUPPORT
+
+=head2 Internet Relay Chat
+
+You can get live help by using IRC ( Internet Relay Chat ). If you don't know what IRC is,
+please read this excellent guide: L<http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please
+be courteous and patient when talking to us, as we might be busy or sleeping! You can join
+those networks/channels and get help:
+
+=over 4
+
+=item *
+
+irc.perl.org
+
+You can connect to the server at 'irc.perl.org' and join this channel: #dbi then talk to this person for help: SineSwiper.
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests via L<L<https://github.com/SineSwiper/DBD-TreeData/issues>|GitHub>.
+
+=head1 AUTHOR
+
+Brendan Byrd <BBYRD@CPAN.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+

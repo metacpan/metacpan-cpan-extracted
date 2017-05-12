@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DynGig/RCE/Access.pm
+lib/DynGig/RCE/Client.pm
+lib/DynGig/RCE/Code.pm
+lib/DynGig/RCE/Query.pm
+lib/DynGig/RCE/Server.pm
+lib/DynGig/RCE.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,9 @@
+Lazy.pm
+Makefile.PL
+t/01-basic.t
+t/02-array.t
+t/03-hash.t
+t/04-untie.t
+Changes
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)

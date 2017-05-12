@@ -1,0 +1,8 @@
+Revision history for Perl extension Devel::Trace.
+
+0.12  Thu Feb 16 12:26:09 EST 2012
+  - eliminate interactive prompting during test phase
+
+0.01  Mon Sep  6 21:32:55 1999
+	- original version; created by h2xs 1.19
+

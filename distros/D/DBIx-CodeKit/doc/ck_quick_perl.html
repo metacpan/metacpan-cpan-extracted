@@ -1,0 +1,152 @@
+<html>
+<head>
+<title>CodeKit Perl API Quick Reference</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/codekit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="ck_new_php.html">PHP Handle Creation</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_new_perl.html">Perl Handle Creation</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/codekit">CodeKit</a>
+Perl API Quick Reference</h2></center>
+
+
+<a href="ck_new_perl.html">
+<h4>CodeKit Handle Creation</h4>
+</a>
+
+<pre>
+use DBIx::CodeKit;
+
+$codekit = new DBIx::CodeKit($dbh,
+                table     =&gt; 'ck_code',
+                getparam  =&gt; \&get_scalar,
+                getparams =&gt; \&get_list
+            ):
+</pre>
+
+
+<a href="ck_read.html#display">
+<h4>Display Methods</h4>
+</a>
+
+<pre>
+$code_desc = $codekit-&gt;desc(   $code_set, $code_code);
+$Code_desc = $codekit-&gt;ucfirst($code_set, $code_code);
+$Code_Desc = $codekit-&gt;ucwords($code_set, $code_code);
+</pre>
+
+
+<a href="ck_read.html#data">
+<h4>Data Methods</h4>
+</a>
+
+<pre>
+$code_desc = $codekit-&gt;data(  $code_set, $code_code);
+</pre>
+
+
+<a href="ck_select.html#common">
+<h4>HTML Select Common Options</h4>
+</a>
+
+<pre>
+print $codekit-&gt;select('day',
+                        var_name =&gt; 'start_day',
+                        value    =&gt; $start_day,
+                        default  =&gt; 1,
+                        subset   =&gt; [ 1, 2, 3, 4, 5 ],
+                        options  =&gt; 'onchange="submit()"'
+                        );
+</pre>
+
+
+<a href="ck_select.html#single">
+<h4>HTML Select Single Value Methods</h4>
+</a>
+
+<pre>
+$html = $codekit-&gt;select($code_set,
+                          select_prompt =&gt; 'Code set description?',
+                          blank_prompt  =&gt; 'None'
+                          );
+
+$html = $codekit-&gt;radio($code_set,
+                         blank_prompt =&gt; 'None'
+                         sep          =&gt; "&lt;br&gt;\n",
+                         );
+</pre>
+
+
+<a href="ck_select.html#multiple">
+<h4>HTML Select Multiple Value Methods</h4>
+</a>
+
+<pre>
+$html = $codekit-&gt;multiple($code_set,
+                            size =&gt; 10
+                            );
+
+$html = $codekit-&gt;checkbox($code_set,
+                            sep =&gt; "&lt;br&gt;\n"
+                            );
+</pre>
+
+
+<a href="ck_set.html">
+<h4>Code Set Methods</h4>
+</a>
+
+<pre>
+$rows = $codekit-&gt;code_set($code_set);
+</pre>
+
+<a href="ck_update.html">
+<h4>Code Table Update Methods</h4>
+</a>
+
+<pre>
+$codekit-&gt;remove($code_set, $code_code);
+
+( $code_desc, $code_order, $code_flag ) =
+    $codekit-&gt;get($code_set, $code_code);
+
+$codekit-&gt;put($code_set,  $code_code,
+              $code_desc, $code_order, $code_flag);
+</pre>
+
+
+<p>
+<div align="right">
+[<a href="ck_new_php.html">PHP Handle Creation</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_new_perl.html">Perl Handle Creation</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

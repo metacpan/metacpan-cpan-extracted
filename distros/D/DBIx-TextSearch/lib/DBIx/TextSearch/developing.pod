@@ -1,0 +1,99 @@
+=head1 DEVELOPING FOR OTHER DATABASES
+
+Users of DBIx::TextSearch only use the generic methods provided in 
+TextSearch.pm (and documented above) to interact with the index. 
+Some of these methods then use database specific subroutines
+internally. These subroutines are provided by modules written 
+separately for each database (such as DBIx::TextSearch::Pg).
+
+See the code and comments in TextSearch/Pg.pm for further details.
+
+*Danger Will Robinson* The code itself is probably more recent than
+this documentation
+
+=head3 Requirements
+
+=over 4
+
+=item * A database engine supported by the perl DBI which is capable
+of matching queries across several tables.
+
+=item * The database engine must also have a corresponding
+Text::Query::BuildSQL package (unless you want to write your own text
+query->SQL parser).
+
+=back
+
+=head3 Generic methods with a database specific component
+
+Non-specific methods are all in lowercase like_this, database specific
+subroutines are all in studly caps LikeThis, private methods are prefixed 
+with an underscore _like_this.
+
+=over 4
+
+=item * new. Passes the index object (database handle and index name)
+to CreateIndex which creates the database tables for this index.
+
+=item * find_document. Passes a single query (scalar) to GetQuery
+which runs the query through a Text::Query::ParseAdvanced parser and
+returns an SQL statement representing that query.
+
+=item * _store_plain and _store_html. These are both invoked from
+index_file, they pass the URI, title, description and document
+contents (all scalars) into IndexFile. IndexFile doesn't return anything.
+
+
+=back
+
+=head3 Database specific methods
+
+=over 4
+
+=item * CreateIndex - see above for parameters. Creates database
+tables of the following structure (data types are all Postgres ones)
+
+Assume the index is called shme
+
+ Table: shme_docID
+        |-> URI          varchar(255)
+        |-> title        varchar(100)
+        \-> d_ID         int4
+
+ Table: shme_words
+        |-> w_ID         int4
+        \-> word         text
+
+ Table: shme_mets
+        |-> m_ID         int4
+        \-> description  text
+
+Returns nothing, croaks if unable to create table.
+
+=item * FlushIndex - takes a DBIx::TextSearch object, and deletes all 
+data stored within that index.
+
+=item * GetQuery - see above for description
+
+=item * IndexFile  - Takes the index object, document URI, title, 
+description and content as input.
+
+
+
+Finds a unique document ID number to use as d_ID, w_ID and m_ID by querying
+the database for the highest one used. Executes the following storage 
+statements
+
+ # URI, title and doc_ID
+ "insert into $self->{name}_doc_ID (URI, title, d_ID) values 
+ ($uri, $title, $docid)"
+
+ # words
+ "insert into $self->{name}_words (w_ID, word) values ($docid,
+ $content)"
+
+ # meta description
+ "insert into $self->{name}_meta (m_ID, description) 
+ values ($docid, $description)"
+
+=back

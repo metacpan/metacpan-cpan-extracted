@@ -1,0 +1,19 @@
+Add support for path specific directions:
+  objs -> PATH -> OBJ_OPTIONS
+support objects:
+  $VAR->foo->[0]
+  $VAR->foo->[*]
+
+
+Add support for different scalar print methods including:
+   type   : SCALAR
+   trunc  : this is a long ...
+trunc takes a long (possibly multi-line) scalar and prints it as no more than one line
+with ... at the end
+
+
+Add list_format=compact
+   list = [ a, b, c ]
+but it will only apply to lists simple (1-line) scalars or objects treated as
+scalars (and can apply if max_depth ends here)
+

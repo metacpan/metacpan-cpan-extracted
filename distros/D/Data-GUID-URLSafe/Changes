@@ -1,0 +1,19 @@
+Changelog for Data-GUID-URLSafe
+
+0.006     2013-09-28 20:38:51 America/New_York
+          update bugtracker and repo *correct* (thanks, David Steinbrunner!)
+
+0.005     2013-07-05 21:33:10 America/New_York
+          update bugtracker, repackage
+
+0.004     2009-01-16
+          add repo info to metadata
+
+0.003     2008-03-05
+          fix non-conformant META.yml
+
+0.002     2007-08-24
+          fix pod error
+
+0.001     2007-08-23
+          first release

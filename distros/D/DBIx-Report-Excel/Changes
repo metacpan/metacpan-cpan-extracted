@@ -1,0 +1,32 @@
+Revision history for Perl extension DBIx::Report::Excel.
+
+0.4 Mon Dec 12 10:00:54 JST 2011
+    - Fix dependencies for tests: DBI, DBD::Sqlite
+    - Change from binary sqlite3 tp DBD::Sqlite for test DB generation
+
+0.3 Sat Dec 10 10:16:22 JST 2011
+    - Fix for SQL::Parser > 1.24 SQL::Parser don't have 'column_names' attr.
+      https://rt.cpan.org/Public/Bug/Display.html?id=68606
+      https://rt.cpan.org/Public/Bug/Display.html?id=73136
+    - example.pl made into test
+    - Use numeric version number
+
+0.2a Sun Nov 28 12:12:45 JST 2010
+	- Spreadsheet::WriteExcel lost dependency fixed
+
+0.2  Thu Nov 25 13:09:15 JST 2010
+	- bug fix release, fixed
+	  https://rt.cpan.org/Ticket/Display.html?id=60913
+	  https://rt.cpan.org/Ticket/Display.html?id=60912
+   	  https://rt.cpan.org/Ticket/Display.html?id=48655
+
+0.1b Fri Jul 24 10:58:46 JST 2009
+	- Spreadsheet::WriteExcel dependency fixed
+
+0.1  Tue Mar 31 19:00:27 2009
+	- original version; created by h2xs 1.23 with options
+		-XA -n DBIx::Report::Excel
+
+      Apr 8, 2009
+        - version 0.1 release
+

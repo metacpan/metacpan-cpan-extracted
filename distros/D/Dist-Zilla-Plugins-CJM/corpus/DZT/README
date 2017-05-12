@@ -1,0 +1,35 @@
+{{$dist}} version {{$version}}, released {{$date}}
+
+
+Blah blah blah.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+{{ $t->dependency_list }}
+
+
+
+CHANGES
+    Here's what's new in version {{$version}} of {{$dist}}:
+    (See the file "Changes" for the full revision history.)
+
+{{$changes}}
+
+
+
+COPYRIGHT AND LICENSE
+
+{{ local $_ = $zilla->license->notice; chomp; $_ }}

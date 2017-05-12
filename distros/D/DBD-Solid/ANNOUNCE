@@ -1,0 +1,46 @@
+Everyone, 
+
+This is an update to our previous release of DBD::Solid.  It now supports
+Solid Embedded Engine v 3.52, complete with unicode and the latest odbc.
+
+DBD::Solid is a DBD module originally written by Thomas Wenrich to access
+he Solid Embedded Engine.
+
+Tim Bunce's DBI module is *the* standard way to access a number of 
+different databases from perl.  FYI, DBD::Solid is a driver code that enables
+ Perl 5.003 and 5.004 to access the Solid RDBMS via the DBI module 
+(you will need the code for the latest release of DBI and DBD::Solid).
+
+Since there hasn't been much interest by anyone else in keeping it up to
+date, and we've already made a number of changes to keep it working, we
+thought it would be nice to release our changes as a new version.  In the
+future we'll continue to do our best to try to fix problems/update it as 
+quickly as possible.
+
+Have Fun,
+
+Joe & Everyone at Geospiza
+
+-----------------------------------------------------------------------------
+Changes:
+   This version now links correctly to Solid 3.52.
+
+Tested using:
+	  Red Hat Linux 7.1, with kernel 2.4.3-12
+	  perl5.6.0
+	  Solid 3.52
+
+The source of DBD::Solid version 0.20 is available from
+
+     CPAN (authors/id/SLAGEL/DBD-Solid-0.20a.tar.gz)
+
+You will also need:
+   * Perl (of course!), Version 5.003 or better
+	* a recent DBI driver module
+	* the Solid development system (3.52!)
+	* a Solid database server
+
+Information about the SOLID database can be found via
+
+	http://www.solidtech.com/
+-----------------------------------------------------------------------------

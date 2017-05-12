@@ -1,0 +1,76 @@
+Revision history for Disk-SMART
+
+0.18	2015-11-16
+	Added example calling script to POD
+
+0.17	2015-11-11
+	Updated MANIFEST to remove build files
+
+0.15	2015-11-05
+	Added check for root as the executing user, updated unit tests
+
+0.14	2015-06-14
+	Fixed to run unit tests without smartctl binary being installed
+
+0.13	2015-06-12
+	Removed bad mocking code from module and unit tests and refactored to use Test::MockModule
+	Refactored getting smart output into subroutine
+
+0.12	2015-05-02
+	Added get_disk_list() to detect sdX and hdX devices
+	Changed new() to use get_disk_list() if no device list is passed to it
+	Changed shell call to 'which' to use File::Which
+	Changed update_data() to take a list of devices
+
+0.11	2014-11-24
+	Updated POD
+	Code cleanup.
+	Added extended output to get_disk_health() that will report any values > 1 from specific attributes that show impending drive failure
+
+0.10	2014-10-18
+	Updated regex to get disk temperature to look for two different lines that could contain temp
+	Corrected get_disk_attributes() to return hash correctly on Perl < 5.14
+
+0.09    2014-10-17 
+        Minor changes to get unit tests to pass on smokers
+        Added testing of env parameter for smartctl path, which will enable multi OS support
+        Added COMPATABILITY pod section
+
+0.08    2014-10-16 
+        Corrected test data var name in new();        
+
+0.07    2014-10-15
+        Implemented dummy testing in unit tests to bypass the need for smokers having smartctl installed
+        Regex and function cleanups
+        Added run_short_test() to run the SMART short self test and unit tests for it
+
+0.06    2014-10-09
+        Fixed issue with N/A disk temp not returning correctly and causing failure
+
+0.05    2014-10-08
+        Separated out data processing from the getter methods. Getter methods now only return hash data.
+        Added methods and unit tests for update_data() and get_disk_attributes(). update_data() can be called at any point in a calling script to update the drive data. This makes it where Disk::SMART can be used in a script called by cron, or a continuously running daemon.
+        Updated MANIFEST to include LICENSE file
+        Changes to satisfy perl critic
+        Simplified get_disk_temp with substr to read the disk temp
+
+0.04    2014-10-06
+        Updated Makefile.PL to better interact with Meta::CPAN
+        Updated pod for clarity
+
+0.03    2014-10-04
+        Added Math::Round to dependency list in Makefile.PL. Credit - Syohei YOSHIDA.
+        Refactored methods to return N/A first before any further proessing is done
+        Cleaned up unit tests
+        get_disk_model() only outputs just the model information now.
+        Added get_disk_errors()
+        Methods now validate the device passed to it, to ensure smartctl has already read it
+        Added unit tests to test passing invalid device to methods
+        Changed to croak() as I didn't feel a trace was necessary with proper error returning
+
+0.02    2014-10-03
+        Added confess to new() in case smartctl cannot find the specified device
+
+0.01    2014-10-03
+        First version, released on an unsuspecting world.
+

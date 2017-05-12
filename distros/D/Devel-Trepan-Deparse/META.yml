@@ -1,0 +1,37 @@
+---
+abstract: 'Adds deparse support via B::DeparseTree to Devel::Trepan'
+author:
+  - 'Rocky Bernstein <rocky@cpan.org>'
+build_requires:
+  Test::Simple: '0.81'
+  rlib: '0.02'
+configure_requires:
+  Module::Build: '0.4214'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Trepan-Deparse
+provides:
+  Devel::Trepan::CmdProcessor::Command::Deparse:
+    file: lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm
+  Devel::Trepan::CmdProcessor::Command::Set::Auto::Deparse:
+    file: lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Auto_Subcmd/Deparse.pm
+  Devel::Trepan::CmdProcessor::Command::Show::Auto::Deparse:
+    file: lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Auto_Subcmd/Deparse.pm
+  Devel::Trepan::Deparse:
+    file: lib/Devel/Trepan/Deparse.pm
+    version: v2.2.0
+requires:
+  B::DeparseTree: v2.1.0
+  Devel::Trepan: '0.71'
+  perl: '5.018000'
+  rlib: '0.02'
+resources:
+  bugtracker: https://github.com/rocky/p5-Devel-Trepan-Deparse/issues
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: http://github.com/rocky/p5-Devel-Trepan-Deparse
+version: v2.2.0
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

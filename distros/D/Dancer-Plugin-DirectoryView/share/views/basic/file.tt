@@ -1,0 +1,8 @@
+<tr class="file">
+  <td class="name">
+    <a class="<% file.class %>" href="<% file.url %>"><% file.name %></a>
+  </td>
+  <td class="size"><% file.size %></td>
+  <td class="type"><% file.mime_type %></td>
+  <td class="mtime"><% file.mtime %></td>
+</tr>

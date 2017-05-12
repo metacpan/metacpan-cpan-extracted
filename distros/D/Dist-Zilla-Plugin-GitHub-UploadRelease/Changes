@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-Plugin-Github-UploadRelease
+
+0.002 2016-05-01
+ - Spit out File::LibMagic and hardcode content-type
+ - Add dependency for Git::Tag plugin
+
+0.001 2016-05-01
+ - Inital release
+
+0.000 0000-00-00

@@ -1,0 +1,45 @@
+---
+abstract: 'Author tests for synopses'
+author:
+  - 'Marcel Grünauer <marcel@cpan.org>'
+  - 'Mike Doherty <doherty@cpan.org>'
+  - 'Olivier Mengué <dolmen@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  Test::Output: '0'
+  autodie: '0'
+  blib: '1.01'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-Synopsis
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+requires:
+  Dist::Zilla: '4'
+  Dist::Zilla::Plugin::InlineFiles: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Moose: '0'
+  Test::Synopsis: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-Test-Synopsis/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-Test-Synopsis/
+  repository: git://github.com/doherty/Dist-Zilla-Plugin-Test-Synopsis.git
+version: '2.000007'

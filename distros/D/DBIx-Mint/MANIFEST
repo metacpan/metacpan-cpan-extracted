@@ -1,0 +1,34 @@
+Changes
+lib/DBIx/Mint.pm
+lib/DBIx/Mint/ResultSet.pm
+lib/DBIx/Mint/ResultSet/Iterator.pm
+lib/DBIx/Mint/Schema.pm
+lib/DBIx/Mint/Schema/Class.pm
+lib/DBIx/Mint/Singleton.pm
+lib/DBIx/Mint/Table.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.pod
+t/010-ResultSet.t
+t/015-ResultSet.t
+t/020-Table.t
+t/030-Schema.t
+t/035-Schema.t
+t/040-Schema.t
+t/045-Schema.t
+t/050-Transactions.t
+t/060-Examples_in_POD.t
+t/065-Schema.t
+t/070-one-to-many.t
+t/075-many-to-many.t
+t/100-multiple_connections_basic.t
+t/110-multiple_connections_table.t
+t/120-lazy_connection.t
+t/Bloodbowl/Coach.pm
+t/bloodbowl2.db
+t/Test/DB.pm
+t/Test/DB2.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

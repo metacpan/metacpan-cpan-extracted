@@ -1,0 +1,53 @@
+NAME
+
+Data::Entropy - entropy (randomness) management
+
+DESCRIPTION
+
+This distribution includes modules relating to sources and use of entropy.
+They all interoperate, but can also be used independently.
+
+The Data::Entropy module maintains a concept of a current selection
+of entropy source.  Algorithms that require entropy, such as those in
+Data::Entropy::Algorithms, can use the source nominated by this module,
+avoiding the need for entropy source objects to be explicitly passed
+around.  This is convenient because usually one entropy source will
+be used for an entire program run and so an explicit entropy source
+parameter would rarely vary.  There is also a default entropy source,
+avoiding the need to explicitly configure a source at all.
+
+The Data::Entropy::Source class manages the entropy coming from a
+particular source.  Methods allow entropy to be dispensed in any quantity
+required, even fractional bits.  This class acts as a layer over a raw
+entropy source, which may be a normal I/O handle or a special-purpose
+class.
+
+The Data::Entropy::RawSource::* classes provide fundamental sources
+of entropy.  The sources specially supported are an OS-supplied entropy
+collector, downloads from servers on the Internet, and cryptographic
+fake entropy.
+
+The Data::Entropy::Algorithms module contains a collection of fundamental
+algorithms that use entropy.  There are random number generators, and
+functions to shuffle arrays and perform related tasks.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2009, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,11 @@
+78ea00a642000000169bff5f1dc05408
+
+master electrisave 78.ea00a642000000169bff5f1dc05408:
+  sensor/electrisave.a6[current]=6.6
+  sensor/electrisave.a6.1[current]=6.6
+  sensor/electrisave.a6.2[current]=0
+  sensor/electrisave.a6.3[current]=0
+  sensor/electrisave.a6[battery]=90%
+
+
+

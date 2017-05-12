@@ -1,0 +1,58 @@
+This file contains information about how to configure a MySQL database
+for use with DNS::BL. These instructions assume that you have full
+access to a MySQL database. Note that with small changes to the DSNs
+and the database creation scripts, this code should be compatible with
+many DBI-supported external.
+
+The first step is to create a database where the tables used by the
+"connect mysql" backend will reside. We will create a database named
+"dnsbl" to store all our dnsbl information. This is done easily with
+the following command
+
+$ mysqladmin --host=dbhost --user=root \
+  --password=pass create dnsbl
+
+This follows the assumption that the database server's DNS name is
+"dbhost", the "root" user has enough privileges for database creation
+and that "pass" is the correct user.
+
+Note that you may name your database as you wish, however, the scripts
+that accompany this distribution will assume that your database is
+named "dnsbl".
+
+The next step, is to create the tables that will hold the dnsbl data
+in our new database. The commands in the ./etc/mysql-create.sql file
+on this distribution, will perform the required creation. You can
+execute such commands with the following incantation, with the same
+assumptions as before:
+
+$ mysql --host=dbhost --user=root \
+  --password=pass < ./etc/mysql-create.sql
+
+As a next step, we should define the users we will use for managing
+these tables. MySQL provides a few mechanisms to control the
+activities of each users, so it's a very good idea to read your
+documentation now, to figure out a user scheme you're comfortable
+with.
+
+My recommendation, is to have a "read-only" user and a few
+"read-write" users that you will use to update your dnsbl
+data. Creatively, these users will be named "dnsbl-ro" and
+"dnsbl-rw".
+
+Finally, we grant the required privileges to these users, according to
+their tasks. These two steps are performed with the following
+invocation:
+
+$ mysql --host=dbhost --user=root \
+  --password=pass < ./etc/mysql-users.sql
+
+Note that you MUST customize the script according to your environment
+(passwords, which hosts can do queries, etc).
+
+After succesfully installing this module, you should be able to do something
+along the lines of:
+
+$ dnsbltool -i
+$ ...
+

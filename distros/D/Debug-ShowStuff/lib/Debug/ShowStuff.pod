@@ -1,0 +1,840 @@
+=head1 NAME
+
+Debug::ShowStuff - A collection of handy debugging routines for displaying
+the values of variables with a minimum of coding.
+
+=head1 SYNOPSIS
+
+Here's a sampling of a few of my favorite functions in this module.
+
+ use Debug::ShowStuff ':all';
+ 
+ # display values of a hash or hash reference
+ showhash %hash;
+	showhash $hashref;
+ 
+ # display values of an array or array reference
+ showarr @arr;
+ showarr $arrref;
+ 
+ # show all the params received through CGI
+ showcgi();
+ 
+ # A particularly fancy utility: display STDERR at top of web page
+ my $warnings = showstderr;
+
+=head1 INSTALLATION
+
+C<Debug::ShowStuff> can be installed with the usual routine:
+
+ perl Makefile.PL
+ make
+ make test
+ make install
+
+=head1 DESCRIPTION
+
+C<Debug::ShowStuff> grew dynamically from my needs in debugging code.  I found 
+myself doing the same tasks over and over... displaying the keys and
+values in a hash, displaying the elements in an array, displaying the output
+of STDERR in a web page, etc.  C<Debug::ShowStuff> began as two or three of my
+favorite routines and grew as I added to that collection.  Finally I decided
+to publish these tools in the hope that other Perl programmers will find
+them useful.
+
+=head2 Not for production work
+
+C<Debug::ShowStuff> is for debugging, not for production work. It does not
+always output the actual value of something, but rather information B<about>
+the value. For example, the following code outputs the actual value in the
+first line, but a note about the value in the second.
+
+ println 'my value';
+ println undef;
+
+which outputs
+
+ my value
+ [undef]
+
+I would discourage you from using C<Debug::ShowStuff> in production code.
+C<Debug::ShowStuff> is only for quick-n-dirty displays of variable values in
+order to debug your code.
+
+=head2 Text and web modes
+
+The functions in C<Debug::ShowStuff> are designed to output either in plain
+text mode (like if you're running the script from a command prompt), or in web
+mode (like from a CGI).  If the script appears to be running in a CGI or other
+web mode (see the C<inweb> function) then values are output using HTML, with
+special HTML characters escaped for proper display.  Othewise the values are
+output as they are.
+
+Generally you won't need to bother telling C<Debug::ShowStuff> if you're in
+text or web mode... it figures it out on its own.
+
+=head2 Dynamic output/return: different than previous versions
+
+NOTE: The dynamic behavior of "show" functions has changed since earlier
+versions of Debug::ShowStuff.  "show" functions now always outputs to STDOUT
+or STDERR unless $Debug::ShowStuff::always_void is set to false. By default
+$always_void is true.
+
+If $always_void is false, then the following applies:
+
+The functions that start with "show" dynamically either output to STDOUT or
+STDERR or return a string, depending on the context in which the
+functions are called.  For example, if you call showhash in a void context:
+
+  showhash %myhash;
+
+then the contents of %myhash are output to STDOUT.  On the other hand, if the
+function is called in scalar context:
+
+  my $var = showhash(%myhash);
+
+then the same string that would have been output to STDOUT is instead
+returned and stored in $var.
+
+By default, output is sent to STDOUT, not STDERR.  You can change the
+default output to STDERR using the C<setoutput> command.  See the docs
+for that command for more detail.
+
+=head2 Displaying "invisible" strings
+
+To facilitate telling the difference between C<[undef]> and an empty string,
+functions output the strings "[undef]" and "[empty string]".  So, for example,
+this code:
+
+ println undef;
+ println "";
+
+produces this:
+
+ [undef]
+ [empty string]
+
+=head1 FUNCTION DESCRIPTIONS
+
+=head2 println
+
+C<println> was the original Debug::ShowStuff function.  It simply outputs the
+given values.
+
+In text mode it adds a newline to the end.
+
+For example, this code:
+
+ println "hello world";
+
+produces this output, including the newline:
+
+ hello world
+
+In L<web mode|/"Text and web modes"> it puts the output inside a <p> element. The values are HTML
+escaped so that HTML-significant characters like < and > are actually
+displayed as < and >.  The <p> element has CSS styles set so that the
+characters are always black, the background is always white, text is
+left-aligned, and the <p> element has a black border, regardless of the styles
+of the surrounding elements. So, for example, in web mode, the following code:
+
+ println 'whatever';
+
+outputs the following HTML:
+
+ <p style="background-color:white;color:black;text-align:left">whatever</p>
+
+Like other "show" functions, undef is output as the string "[undef]" and
+an empty string is output as the string "[empty string]".
+
+Values in the arguments array are output concatenated together with no
+spaces in between.  Each value is evaluated independently for if it
+is undef, empty string, or a string with visible content.  So, for example,
+this code:
+
+ println "whatever", "", undef, "dude";
+
+outputs this:
+
+ whatever[empty string][undef]dude
+
+=head2 indent()
+
+C<indent()> is for situations where you're outputting a lot of stuff and you
+want to tidy up the putput with indentation.
+In L<text mode|/"Text and web modes"> the output is indented with 3 spaces per
+indentation level.  In web mode the output is indented with 20px per
+indentation level.
+
+C<indent()> must be assigned to a variable or it has no effect.  C<indent()>
+increases the indent level by one.  When the variable goes out of scope, the
+indent level is decreased by one.
+
+For example suppose you want to display the values of records from a database.
+You might loop through the records, outputting them like this:
+
+ while (my $record = $sth->fetchrow_hashref) {
+    println $record->{'name_nick'};
+    my $indent = indent();
+    showhash $record;
+ }
+
+That would produce output something like this:
+
+ Ricky
+   ---------------------------------------
+   name_first  = Rick
+   name_last   = Adams
+   ---------------------------------------
+
+ Dan
+   ---------------------------------------
+   name_first  = Daniel
+   name_last   = Bradley
+   ---------------------------------------
+
+By default, three spaces are used to indent. To change that set
+$Debug::ShowStuff::indent_tab to whatever string you want to use for
+indentation.
+
+B<option:> bottom_space
+
+The C<bottom_space> option indicates to output an extra line at the bottom
+of the indented output, just to give some extra division before the next
+batch of code.  For example, the following code does not use C<bottom_space>:
+
+ foreach my $name (qw[Larry Moe]) {
+    println $name;
+    my $indent = indent(bottom_space=>1);
+    println 'years: ', length($name);
+ }
+
+and so produces the following output:
+
+ Larry
+    years: 5
+ Moe
+    years: 3
+
+But this code:
+
+ foreach my $name (qw[Larry Moe]) {
+    println $name;
+    my $indent = indent(bottom_space=>1);
+    println 'years: ', length($name);
+ }
+
+produces this output:
+
+ Larry
+    years: 5
+
+ Moe
+    years: 3
+
+=head2 showstuff()
+
+This function turns on/off most of the functions in this module, with one
+important exception explained below.  The function also returns the state of
+whether or not Debug::ShowStuff is on/off.
+
+If a parameter is sent, that param is used to turn display on/off.  The
+value is stored in the global variable $Debug::ShowStuff::active.
+
+The function is also used by most subroutines to determine if they should
+actually output anything.  $Debug::ShowStuff::active is not the only criteria
+used to determine if Debug::ShowStuff is active.  The algorithm is as follows:
+
+- If the environment variable $ENV{'SHOWSTUFF'} is defined and false then
+showstuff() returns false regardless of the state of $active.
+
+- If the environment variable $ENV{'SHOWSTUFF'} is not defined or is defined
+and true then showstuff() uses $Debug::ShowStuff::active to determine on/off.
+
+The purpose of this algorithm is to allow the use of debugging display in
+situations where one perl script calls another, such as in regression testing.
+
+For example, suppose you have a script as follows:
+
+ #!/usr/bin/perl -w
+ use strict;
+ use Debug::ShowStuff ':all';
+ 
+ my ($rv);
+ 
+ println 'running my_function()';
+ $rv = my_function();
+ println 'the returned value is: ', $rv;
+ 
+ $rv or die 'error!';
+
+The output of the script might look something like this:
+
+ running my_function()
+ 1
+
+Now suppose you call that and other scripts from some OTHER script, and
+you don't want the screen cluttered with all that debugging, you just want
+to see if all those scripts run successfully.  You could use $ENV{'SHOWSTUFF'}
+to turn off showing stuff:
+
+ #!/usr/bin/perl -w
+ use strict;
+ use Debug::ShowStuff ':all';
+ 
+ my @tests = ("./script1.pl", "./script2.pl", "./script3.pl");
+ $ENV{'SHOWSTUFF'} = 0;
+ 
+ foreach my $test () {
+    system($test) and die "$test failed";
+ }
+
+In that case, none of the stuff from the test scripts would be output.
+
+=head2 printnorm
+
+Works like println but doesn't add trailing newline.  In web environment uses
+<span> instead of <p>.
+
+=head2 showhash
+
+Displays the keys and values in a hash.  Input is either a single hash
+reference or a regular hash. The key=values pairs are sorted by the names
+of the keys.
+
+So, for example, the following code:
+
+ my %hash = (
+    Larry => 'curly headed guy',
+    Curly => 'funny bald guy',
+    Moe => 'guy in charge',
+ );
+
+ showhash %hash;
+
+Produces the following output.  Notice that the keys are in alphabetic order:
+
+ ---------------------------------------
+ Curly = funny bald guy
+ Larry = curly headed guy
+ Moe   = guy in charge
+ ---------------------------------------
+
+This code, using a hash reference, produces exactly the same output:
+
+ my $hash = {
+    Larry => 'curly headed guy',
+    Curly => 'funny bald guy',
+    Moe => 'guy in charge',
+ };
+
+ showhash $hash;
+
+If the hash is empty, then that fact is output.  So, this code:
+
+ showhash {};
+
+produces this output:
+
+ ---------------------------------------
+ [empty hash]
+ ---------------------------------------
+
+If an undef value is sent instead of a hashref, then that fact is displayed
+instead of a hash.  For example consider the following code that uses
+a variable that is undef:
+
+ my ($hash);
+ showhash $hash;
+
+That code produces this output:
+
+ ---------------------------------------
+ Only one element input and it was undefined
+ ---------------------------------------
+
+Optional arguments only come into play if the first argument is a hashref.
+
+B<option:> title => "string"
+
+If this option is sent, the string is displayed at the top of the
+display of the hash values.  So this code:
+
+ my $hash = {
+    Larry => 'curly headed guy',
+    Curly => 'funny bald guy',
+    Moe => 'guy in charge',
+ };
+
+ showhash $hash, title=>'Stooges';
+
+produces this output:
+
+ --- Stooges ---------------------------------
+ Curly = funny bald guy
+ Larry = curly headed guy
+ Moe   = guy in charge
+ ---------------------------------------------
+
+B<option:> line_cut => 1
+
+If the C<line_cut> option is sent, then each value is truncated after the first
+newline if there is one. The fact that there is more output is mentioned. So
+the following code:
+
+ my $hash = {
+    Larry => "curly\nheaded guy",
+    Curly => "funny\nbald guy",
+    Moe => "guy\nin charge",
+ };
+
+ showhash $hash, line_cut =>1;
+
+produces this output.
+
+ ---------------------------------------
+ Curly = funny [more lines...]
+ Larry = curly [more lines...]
+ Moe   = guy [more lines...]
+ ---------------------------------------
+
+Several other options do exactly the same thing: linecut, line_chop, and first_line.
+
+=head2 showarr, showarray
+
+Displays the values of an array.  c<showarr> and c<showarray>
+
+Each element is displayed in a table row (in L<web mode|/"Text and web modes">)
+or on a separate line (in text mode).
+
+If C<showarray> receives exactly one argument, and if that item is an array
+reference, then the routine assumes that you want to display the elements in
+the referenced array. Therefore, the following blocks of code display the
+same thing:
+
+   showarray @myarr;
+   showarray \@myarr;
+
+=head2 showarraydiv
+
+Works just like C<showarray>, except that in text mode displays a solid line between
+each element of the array.
+
+=head2 showscalar
+
+Outputs the value of a scalar.  The name is slightly innaccurate: you can
+input an array. The array will be joined together to form a single scalar.
+
+Actually, I hardly ever use C<showscalar>, but it seemed unbalanced to have
+C<showhash> and C<showarray> without C<showscalar>.
+
+=head2 showcgi
+
+Displays the CGI parameter keys and values.  This sub always outputs HTML.
+
+There are several optional parameters, described in the following sections.
+
+B<option:> q
+
+The optional parameter C<q>, may be a CGI query object:
+
+   my $query = CGI->new();
+   showcgi q => $query;
+
+If C<q> is not sent, then a CGI object is created on the fly.
+
+B<option:> skipempty
+
+If the optional parameter C<skipempty> is true:
+
+   showcgi skipempty => 1;
+
+then CGI params that are empty (i.e. do not have
+at least one non-space character) are not displayed.
+
+B<option:> skip
+
+C<skip> sets a list of parameters to not display.  For example, if you don't
+want to see the C<choices> or C<toppings> params, then call showcgi like this:
+
+   showcgi skip => ['choices', 'toppings'];
+
+Single item lists can be passed in directly without putting them in
+an anonymous array:
+
+   showcgi skip => 'choices';
+
+=head2 showref($ref, %options)
+
+Displays a hash, array, or scalar references, treeing down through other
+references it contains.  So, for example, the following code:
+
+ my $ob = {
+    name    => 'Raha',
+    email   => 'raha@idocs.com',
+    friends => [
+       'Shalom',
+       'Joe',
+       'Furocha',
+       ],
+    };
+    
+ showref $ob;
+
+produces the following output:
+
+   /-----------------------------------------------------------\
+   friends =
+      ARRAY
+         Shalom
+         Joe
+         Furocha
+   email = raha@idocs.com
+   name = Raha
+   \-----------------------------------------------------------/
+
+The values of the hash or arrays being referenced are only displayed once, so
+you're safe from infinite recursion.
+
+There are several optional parameters, described in the following sections.
+
+B<option:> maxhash
+
+The C<maxhash> option allows you to indicate the maximum number of hash
+elements to display.  If a hash has more then C<maxhash> elements then none of
+them are displayed or recursed through, and instead an indicator of how many
+elements there are is output.  So, for example, the following command only
+displays the hash values if there are 10 or fewer elements in the hash:
+
+   showref $myob, maxhash=>10;
+
+If C<maxhash> is not sent then there is no maximum.
+
+B<option:> maxarr
+
+The C<maxarr> option allows you to indicate the maximum number of array
+elements to display.  If an array has more then C<maxarr> elements then none
+of them are displayed or recursed through, and instead an indicator of how
+many elements there are is output.  If C<maxarr> is not sent then there is no
+maximum.
+
+B<option:> depth
+
+The C<depth> option allows you to indicate a maximum depth to display in the
+tree. If C<depth> is not sent then there is no maximum depth.
+
+B<option:> skip
+
+A list of hash elements to skip.  Only applies to the top element and only if
+it is a hash.
+
+B<option:> skipall
+
+Works the same as C<skip>, but applies to all hashes in the structure, not
+just the top-level hash.
+
+=head2 printhr
+
+Prints a horizontal rule.  Handy for dividing up multiple println's.
+
+In text mode, the horizontal rule is a set of 80 dashes. In
+L<web mode|/"Text and web modes">, the output is either a <hr> element or a <p>
+element, depending on the title option (see "title" below).
+
+So, for example, the following line outputs a simple horizontal rule:
+
+B<option:> title
+
+If the C<title>option is sent, the title is embedded in the horizontal rule.
+So, for example, the following code produces a horizontal rule with with the
+string "test" embedded in it:
+
+ printhr title=>'test';
+
+If only one param is sent, it is assumed that param is the title.  So the'
+following code produces exactly the same thing as the example above:
+
+ printhr 'test';
+
+In web mode, a title changes the HTML element that is output.  If no title is
+given then printhr outputs an <hr> element.  If a title is given the output is
+C<p> element with the title as the content. The <p> element has a gray
+background and a black border.
+
+B<option:> dash
+
+If the C<dash>option is sent, the given character is used as the separator.
+This param only applies to text mode;
+
+=head2 preln
+
+Outputs the given values inside a <pre> element.  If not in a web environment,
+works just like preln.
+
+=head2 dieln
+
+Works like the C<die> command, except it always adds an end-of-line to the
+input array so you never get those "at line blah-blah-blah" additions.
+
+=head2 devexit
+
+Works like C<dieln> except it prepends 'dev exit: ' to the end of the string.
+If no string is sent, just outputs "dev exit".
+
+=head2 diearr
+
+Displays an array, then dies using C<dieln>.
+
+=head2 pressenter
+
+For use at the command line.  Outputs a prompt to "press enter to continue",
+then waits for you to do exactly that.
+
+=head2 confirm
+
+Prompts the user for a y or n.  Exits quietly if y is pressed.
+
+=head2 httpheader
+
+Outputs a text/html HTTP header.  Not useful if you're using mod_perl.
+
+=head2 showstderr
+
+This function allows you to see, in the web page produced by a CGI, everything
+the CGI output to STDERR.
+
+To use C<showstderr>, assign the return value of the function to a variable
+that is scoped to the entire CGI script:
+
+  my $stderr = showstderr();
+
+You need not do anything more with that variable.  The object reference by
+your variable holds on to everything output to both STDOUT and STDERR.  When
+the variable goes out of scope, the object outputs the STDOUT content with the
+STDERR content at the top of the web page.
+
+=head2 forcetext, forceweb, forcenone
+
+By default, Debug::Showstuff guesses if it should be in
+L<text or web mode|/"Text and web modes">. These functions are for when you
+want to explicitly tell Debug::ShowStuff what mode it should be in.
+C<forcetext> forces text mode.  C<forceweb> forces web mode.  C<forcenone>
+tells Debug::Showstuff that you don't want to force either mode.
+
+=head2 inweb
+
+Returns a guess on if we're in a L<web environment|/"Text and web modes">.  The
+guess is pretty simple: if the environment variable C<REQUEST_URI> is true (in
+the Perlish sense) then this function returns true.
+
+If the global C<$Debug::ShowStuff::forceenv> is defined, this function returns
+the value of C<$Debug::ShowStuff::forceenv>.
+
+=head2 output_to_file($path)
+
+Sends Debug::ShowStuff output to a file instead of to STDOUT or STDERR.  The
+value of this function must be assigned to a variable or it has no effect.
+Don't do anything with the returned value... it is NOT a file handle.  The
+returned value is an object that, when it goes out of scope, closes the output
+file handle.
+
+For example, the following code will output to three files names
+Larry.txt, Curly.txt, and Moe.txt:
+
+ foreach my $name (qw[Larry Curyl Moe]) {
+    my $output = output_to_file("$name.txt");
+    println $name;
+    println 'length: ', length($name);
+ }
+
+=head2 setoutput
+
+Sets the default output handle.  By default, routines in C<Debug::ShowStuff>
+output to STDOUT.  With this command you can set the default output to STDERR,
+back to STDOUT, to a filehandle you specify, or to a
+Debug::ShowStuff::SeparatePrint file handle.
+
+The following command sets default output to STDERR:
+
+ setoutput 'stderr';
+
+This command sets output back to STDOUT:
+
+ setoutput 'stdout';
+
+This command sends output to a file handle of your choice:
+
+ setoutput $fh;
+
+This command sends output to a Debug::ShowStuff::SeparatePrint file handle.
+This option is a good way to create a simple log file.  When you print to this
+type of file handle, the file is opened separately just for that write, an
+exclusive lock on the file is obtained, and the end of the file is sought.
+
+Note that the next parameter must be the path to the output file:
+
+ setoutput 'separateprint', $file_path;
+
+B<option:> new
+
+If the C<new> parameter is true, then the output file is open in non-append
+mode, which means any existing contents are removed.
+
+=head2 fixundef
+
+Takes a single argument.  If that argument is undefined, returns an
+empty string.  Otherwise returns the argument exactly as it is.
+
+=head2 findininc
+
+Given one or more file names, searches @INC for where they are located.
+Returns an array of full file names.
+
+=head2 showtainted(@values)
+
+Given an array of values, shows which are tainted and which are not.  If the
+first argument is a hashref, displays the tainted status of each element value.
+
+=head2 showsth
+
+Outputs a table of all rows in the given DBI statement handle.  Note that
+this function "uses up" the statement handle.
+
+=head2 showsql
+
+showsql output the results of an SQL statement.  showsql takes three
+parameters: the database handle, the SQL statement, and an array-ref of
+parameters for the SQL statement.
+
+=head2 explainsql
+
+explainsql outputs the result of an SQL EXPLAIN call.  This function works much
+like showsql.  The parameters are the database handle, the SQL statement, and
+an array-ref of SQL parameters.  explainsql prepends "EXPLAIN ANALYZE" to your
+SQL, runs the statement, then outputs the results.
+
+I have only used explainsql with PostGresql.  I would be interested hear about
+how it works with other database management systems and how it might be
+improved to work in those environments.
+
+=head2 tempshowstuff
+
+Temporarily turn showstuff on or off.  Create a variable in the lexical scope
+where you want the tempoary change, like this:
+
+my $temp = tempshowstuff(1)
+
+When the variable goes out of scope, showstuff will revert back to its previous
+state.
+
+=head2 showisa
+
+Outputs the ISA hierarchy of an object or class.  For example, the following
+code outputs the ISA hierarchy for a Xapat object (Xapat is a web server
+written in Perl and which uses Net::Server).
+
+ $xapat = Xapat->new(%opts);
+ showisa $xapat;
+
+which outputs:
+
+ ------------------------------------
+ Xapat
+ Net::Server::HTTP
+ Net::Server::MultiType
+ Net::Server
+ ------------------------------------
+
+Note that showisa loads Class::ISA, which is available on CPAN.
+
+=head2 timer
+
+This function is for when you want to display how long it took for your code to
+run.  Assign the return value of this function to a variable.  When the
+variable goes out of scope then the difference between the start and end time
+is displayed in seconds.  For example, the following code:
+
+ do {
+    my $timer = timer();
+    sleep 3;
+ };
+
+outputs this:
+
+ start timer
+ duration: 3 seconds
+
+B<option:> title
+
+If you send the C<title> option, then that title will be displayed with the
+beginning and ending output.  For example, this code:
+
+ do {
+    my $timer = timer(title=>'my block');
+    sleep 3;
+ };
+
+produces this output:
+
+ start timer - my block
+ duration - my block: 3 seconds
+
+B<method:> $timer->elapsed
+
+Returns the difference between when the timer was started and the current
+time.
+
+B<method:> $timer->silence
+
+Turns off the timer so that it doesn't display anything when it dies.
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2010-2013 by Miko O'Sullivan.  All rights reserved.  This
+program is free software; you can redistribute it and/or modify it under the
+same terms as Perl itself. This software comes with B<NO WARRANTY> of any kind.
+
+=head1 AUTHORS
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+=head1 VERSION
+
+=over 4
+
+=item Version 1.00    May 29, 2003
+
+Initial public release.
+
+=item Version 1.01    May 29, 2003
+
+Setting sort order of hash keys to case insensitive.
+
+=item Version 1.10    Nov 6, 2010
+
+After seven years, decided to update the version on CPAN.
+
+=item Version 1.11    Nov 13, 2010
+
+Fixed prerequisite requirement for MemHandle and Taint. Added timer()
+functions.  Some minor documentation fixes and tidying up.
+
+=item Version 1.12    Nov 29, 2010
+
+Changing from using Taint module, which has had a lot of problems, to
+Scalar::Util, which is more (but not completely) stable.
+
+=item Version 1.13    Dec 1, 2010
+
+Fixed bug in prerequisites for Scalar::Util.
+
+=item Version 1.14    February 23, 2013
+
+Added showsth, showsql, and explainsql.  Added the separateprint option to
+setoutput.  Tidied up documentation.  Fixed problems with prerequisites.
+Probably added many other features since the last time I uploaded this module,
+but can't remember tham all.
+
+=back
+

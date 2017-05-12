@@ -1,0 +1,24 @@
+Changes
+lib/DBI/Easy.pm
+lib/DBI/Easy/DBH.pm
+lib/DBI/Easy/DriverPatcher.pm
+lib/DBI/Easy/Record.pm
+lib/DBI/Easy/SQL.pm
+lib/DBI/Easy/Record/Collection.pm
+lib/DBI/Easy/Helper.pm
+lib/DBI/Easy/Vendor/Base.pm
+lib/DBI/Easy/Vendor/oracle.pm
+lib/DBI/Easy/Vendor/postgresql.pm
+lib/DBI/Easy/Vendor/mysql.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/000-sql-test.t
+t/001-item-test.t
+t/002-relation-test.t
+t/003-int-vars.t
+t/004-speed.t
+t/005-collection.t
+t/db-config.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

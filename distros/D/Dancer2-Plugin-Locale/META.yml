@@ -1,0 +1,31 @@
+---
+abstract: 'Localize your Dancer2 application'
+author:
+  - 'Daniel Muey <http://drmuey.com/cpan_contact.pl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Locale
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2::Plugin: '0'
+  File::Path::Tiny: '0'
+  File::Slurp: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  Locale::Maketext::Utils: '0'
+  Locales: '0.33'
+  Plack::Test: '0'
+  Template: '0'
+  Test::More: '0'
+version: '0.06'

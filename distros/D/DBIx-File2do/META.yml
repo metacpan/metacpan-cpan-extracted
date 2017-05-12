@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-File2do
+version:      0.001
+version_from: File2do.pm
+installdirs:  site
+requires:
+    DBI:                           1.4
+    Test::Simple:                  0.44
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

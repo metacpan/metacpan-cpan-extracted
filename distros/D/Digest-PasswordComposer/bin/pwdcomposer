@@ -1,0 +1,55 @@
+#!perl
+
+use warnings;
+use strict;
+use feature qw(say);
+
+package pwdcomposer;
+{
+  $pwdcomposer::VERSION = '0.1';
+}
+
+# ABSTRACT: command line tool to generate a password
+
+use Term::ReadKey;
+use Digest::PasswordComposer qw(pwdcomposer);
+
+if ($#ARGV == 0) {
+  my $domain = $ARGV[0];
+
+  ReadMode 2;
+  say "Enter password (will not echo)";
+  chomp(my $password = ReadLine(0));
+  ReadMode 0;
+
+  say pwdcomposer($domain, $password);
+
+} else {
+  say STDERR "Usage: <password site> (host name, like \"perl.org\"";
+}
+
+
+__END__
+=pod
+
+=head1 NAME
+
+pwdcomposer - command line tool to generate a password
+
+=head1 VERSION
+
+version 0.1
+
+=head1 AUTHOR
+
+Søren Lund <soren@lund.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Søren Lund.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut
+

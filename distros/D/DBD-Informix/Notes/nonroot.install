@@ -1,0 +1,100 @@
+From: David Alt <David.Alt@mailhost.bellhow.com>
+Subject: Re: compiling/installing DBI/DBD modules in home directory tree
+To: matthew@nocturnal.org
+Date: Thu, 18 Jun 1998 15:15:12 -0400 (EDT)
+
+> I basically dont wanna deal with the sysadmin's on this contract anymore,
+> so I wanna start installing all my modules in my home dir.  This has been
+> successful with installing every module i've run into EXCEPT DBD modules
+> that wanna compile against DBI.
+
+I've done this on Solaris with Oracle (for essentially the same reason),
+and these steps work for me:
+
+1) run the Makefile.PL command for DBI with the PREFIX=$PREFIX option
+   (where you've defined PREFIX to the location you'd like)
+
+2) run the Madefile.PL command for DBD with the options PREFIX=$PREFIX and
+   -I$PREFIX
+
+3) when you run your scripts, either invoke them with the -I$PREFIX option,
+   or put a "use $ENV{'PREFIX'}" statement in them.
+
+> perl -I$HOME/perl_mod -I$HOME/perl_mod/i386-linux Makefile.PL
+>      PREFIX=~/perl_mod LIB=~/perl_mod
+
+I don't think you need the -I$HOME/perl_mod/i386-linux argument.  I started
+out specifying the architecture specific directory, too, but it turnes out
+you don't really need it.
+
+> It just seems to be puking when it tries to get at the DBI header files.
+> Now, I noticed in (atleast the DBD::Pg) that $Config{installsitearch}
+> and $Config{installarchlib} are getting set, but I was under the
+> impression that setting INSTALLARCHLIB and INSTALLSITEARCH as attributes
+> to the Makefile.PL should fix the matter.
+
+I don't think you need to specify INSTALLARCHLIB and INSTALLSITEARCH,
+because they just default to PREFIX/site-lib.  I tend to use  them,
+though, because I'm not interested in that extra hierarchy.
+
+In summary, what works for me is:
+
+DBI
+---
+perl Makefile.PL PREFIX=$PREFIX INSTALLSITELIB=$PREFIX INSTALLSITEARCH=$PREFIX/sun4-solaris
+
+DBD
+---
+perl -I$PREFIX Makefile.PL PREFIX=$PREFIX INSTALLSITELIB=$PREFIX INSTALLSITEARCH=$PREFIX/sun4-solaris
+
+David Alt
+bird@alum.mit.edu              "confusion is highly underrated"
+(415) 474-1439
+
+---------------------------------------------------------------------------
+
+Date: Wed, 1 Jul 1998 14:20:03 -0700 (PDT)
+To: dbi-users@fugue.com
+From: Matt Johnson <mattj@spaatz.org>
+Subject: Re: DBI Installation (PUT INTO DBI DOCUMENTATION/FAQ!!!)
+
+> I now want to install the perl DBI.  My problem is that I do not have
+> root access, nor write access to the perl directories.  So my question
+> is, can I install the perl DBI without access to the perl directories?
+> If so, what are the changes I have to make to the Makefile?
+
+This question comes up *so* often, could somebody just add this to the
+DBI documentation/FAQ? (provided by Randy Kobes, it worked flawlessly
+for me):
+
+What one would have to do is first install DBI into your own local perl
+library, using
+
+$ perl Makefile.PL PREFIX=/path/to/my/perllib \
+  INSTALLMAN1DIR=/path/to/my/man/man1 \
+  INSTALLMAN3DIR=/path/to/my/man/man3
+$ make
+$ make test
+$ make install
+
+You may get an error in this about a file not being created - just
+create the path indicated to the file, and install again.  Then do the
+same thing with the Msql-Mysql modules.  However, these need to see DBI,
+which has just been installed in your private directory.  To ensure DBI
+can be found, set the environment variable PERL5LIB to your private perl
+library before going through the installation procedure; eg,
+
+$ PERL5LIB=/path/to/my/perllib/site_perl
+$ export PERL5LIB
+
+Then, in your scripts, insert the line (for later perls)
+
+    use lib '/path/to/my/perllib/site_perl';
+
+or for earlier perls (5.000 and 5.001)
+
+    BEGIN { unshift(@INC, "/path/to/my/perllib/site_perl") }
+
+to indicate where your private library is.
+
+@(#)$Id: nonroot.install,v 100.2 2002/02/08 22:49:58 jleffler Exp $

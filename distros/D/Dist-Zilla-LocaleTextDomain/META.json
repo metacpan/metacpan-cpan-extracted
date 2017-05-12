@@ -1,0 +1,77 @@
+{
+   "abstract" : "Tools for managing Locale::TextDomain language catalogs",
+   "author" : [
+      "David E. Wheeler <david@justatheory.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-LocaleTextDomain",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.35"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.35"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::App" : "0",
+            "Dist::Zilla::File::FromCode" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Email::Address" : "0",
+            "Encode" : "0",
+            "File::Basename" : "0",
+            "File::Copy" : "0",
+            "File::Find::Rule" : "0",
+            "File::Path" : "2.07",
+            "File::Temp" : "0",
+            "IPC::Cmd" : "0",
+            "IPC::Run3" : "0",
+            "Locale::Country" : "0",
+            "Locale::Language" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "MooseX::Types::Path::Class" : "0",
+            "Path::Class" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "v5.8.5",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester::CaptureExternal" : "0",
+            "Dist::Zilla::App::Tester" : "0",
+            "Test::DZil" : "0",
+            "Test::File" : "0",
+            "Test::File::Contents" : "0",
+            "Test::More" : "0.90"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/theory/dist-zilla-localetextdomain.git",
+         "web" : "https://github.com/theory/dist-zilla-localetextdomain"
+      }
+   },
+   "version" : "0.90"
+}
+

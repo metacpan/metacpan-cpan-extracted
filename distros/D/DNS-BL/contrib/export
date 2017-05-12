@@ -1,0 +1,192 @@
+#!/usr/bin/perl
+#
+# export: Convert existing DNS::BL data into useable zones for a name
+# server
+#
+# luismunoz@cpan.org
+#
+# $Id: export,v 1.2 2004/11/09 23:35:04 lem Exp $
+
+use strict;
+use warnings;
+
+use DNS::BL;
+use IO::File;
+use Pod::Usage;
+use Getopt::Std;
+
+# We'll use this function to return an error message
+sub _error
+{
+    my $msg	= shift;
+    return "$msg - DNS::BL returned ", join('/', @_), "\n";
+}
+
+# This function sends the $source file to the end of $fh
+sub _cat
+{
+    my $fh	= shift;
+    my $source	= shift;
+
+    local $/ = undef;
+
+    my $sfh = new IO::File $source or return;
+    for (<$sfh>)
+    {
+	print $fh $_ or return;
+    }
+    1;
+}
+
+use vars qw/$opt_c $opt_F $opt_h $opt_H $opt_o $opt_T/;
+
+getopts('c:F:hH:o:T:');
+pod2usage({verbose => 2, exitval => 0}) if $opt_h;
+
+pod2usage({verbose => 1, 
+	   exitval => 1,
+	   message => '-c option is mandatory',}) 
+    unless $opt_c;
+
+# Normalize some default values
+$opt_F = 'djdnsbl' unless $opt_F;
+pod2usage({verbose => 1, 
+	   exitval => 1,
+	   message => '-F must be a single format word',})
+    if $opt_F =~ /\s/;
+
+# Here we'll store the return values from DNS::BL operations
+my @r = ();
+
+# This filename will be used to store temporary output. This file
+# must be erased after we're done
+my $tmp_file = "./tmp_$$";
+$tmp_file ++ while -f $tmp_file . '.tmp';
+$tmp_file .= '.tmp';
+END { unlink $tmp_file; };
+
+# Our beloved DNS::BL object, which will do all the work.
+my $bl = new DNS::BL;
+
+# Connect with the given connect string. Verify the result.
+@r = $bl->parse($opt_c);
+die _error("Failed to connect", @r)
+    unless $r[0] == &DNS::BL::DNSBL_OK;
+
+# At this point, we're properly connected to the DNS::BL database.
+# Now, output its values...
+@r = $bl->parse('print within any as ' . $opt_F . ' to ' . $tmp_file);
+die _error("Failed to extract data: $!", @r)
+    unless $r[0] == &DNS::BL::DNSBL_OK;
+
+# Now, assemble the output according to the wishes of our masters...
+# $fh contains the filehandle where we're required to store our output.
+my $fh = \*STDOUT;
+
+if ($opt_o)
+{
+    $fh = new IO::File ("$opt_o", ">");
+    die "Failed to open $opt_o: $!\n" unless $fh;
+}
+
+# Output the head file
+if ($opt_H)
+{
+    die "Failed to copy $opt_H: $!" unless _cat($fh, $opt_H);
+}
+
+# Output the DNS::BL data (already in tmp_file)
+die "Failed to copy DNS::BL output: $!" unless _cat($fh, $tmp_file);
+
+# Output the tail file
+if ($opt_T)
+{
+    die "Failed to copy $opt_T: $!" unless _cat($fh, $opt_T);
+}
+
+exit !$opt_o || $fh->close;
+
+__END__
+
+=pod
+
+=head1 NAME
+
+export - Manage a spamtrap and produce DNS::BL commands to respond
+
+=head1 SYNOPSIS
+
+  export -c connect-command [-F format] [-h] [-H head-file] [-o output-file] [-T tail-file]
+
+=head1 DESCRIPTION
+
+This program is helpful for converting a DNS::BL data store into a useable zone file. Tipically, it will be invoked via crontab(5).
+
+The following options control the behaviour of this program.
+
+=over 4
+
+=item B<-c connect-string>
+
+How to connect to the DNS::BL backing store. This is essentially a
+connect command. See L<DNS::BL::cmds::connect> for more information.
+
+=item B<-F format>
+
+Define the format in which entries are to be extracted from the
+DNS::BL store. Supported formats are provided by
+L<DNS::BL::cmds::print>.
+
+Defaults to "djdnsbl". Note that although "internal" is accepted, it
+produces no useable output.
+
+=item B<-h>
+
+Output this documentation and terminate the program.
+
+=item B<-H head-file>
+
+The contents of this file, are added at the beginning of the output
+file.
+
+=item B<-o output-file>
+
+Where to send the output of the conversion to. Defaults to C<STDOUT>
+if left unspecified.
+
+=item B<-T tail-file>
+
+The contents of this file are appended at the end of the output file.
+
+=back
+
+=head1 HISTORY
+
+$Log: export,v $
+Revision 1.2  2004/11/09 23:35:04  lem
+Fixed bug in contrib/export
+
+Revision 1.1  2004/11/05 22:29:48  lem
+Added export
+
+
+=head1 LICENSE AND WARRANTY
+
+This code and all accompanying software comes with NO WARRANTY. You
+use it at your own risk.
+
+This code and all accompanying software can be used freely under the
+same terms as Perl itself.
+
+=head1 AUTHOR
+
+Luis E. Muñoz E<lt>luismunoz@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+perl(1), crontab(5), DNS::BL(3), DNS::BL::cmds::connect(3),
+DNS::BL::cmds::print(3).
+
+=end
+
+

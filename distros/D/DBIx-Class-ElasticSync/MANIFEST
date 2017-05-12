@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+cpanfile.snapshot
+lib/DBIx/Class/ElasticSync.pm
+lib/DBIx/Class/ElasticSync/ResultSet.pm
+lib/DBIx/Class/ElasticSync/Role/ElasticBlackholeResult.pm
+lib/DBIx/Class/ElasticSync/Role/ElasticResult.pm
+lib/DBIx/Class/ElasticSync/Role/ElasticSchema.pm
+minil.toml
+t/00_compile.t
+META.yml
+MANIFEST

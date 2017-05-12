@@ -1,0 +1,89 @@
+---
+abstract: 'Backend for Codecov reporting of coverage statistics'
+author:
+  - 'Pine Mizune'
+build_requires:
+  Archive::Tar: '2.04'
+  Capture::Tiny: '0.30'
+  Cwd: '3.47'
+  Cwd::Guard: '0.04'
+  Devel::Cover: '1.20'
+  File::Temp: '0.2304'
+  File::Which: '1.19'
+  Perl::Critic: '1.125'
+  Test::Deep: '0.117'
+  Test::Exception: '0.40'
+  Test::Mock::Guard: '0.10'
+  Test::MockObject: '1.20150527'
+  Test::More: '1.001014'
+  Test::Perl::Critic: '1.03'
+  Test::Requires::Git: '1.003'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.7, CPAN::Meta::Converter version 2.150010'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Cover-Report-Codecov
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::Cover::Report::Codecov:
+    file: lib/Devel/Cover/Report/Codecov.pm
+    version: '0.17'
+  Devel::Cover::Report::Codecov::Service::AppVeyor:
+    file: lib/Devel/Cover/Report/Codecov/Service/AppVeyor.pm
+  Devel::Cover::Report::Codecov::Service::Circle:
+    file: lib/Devel/Cover/Report/Codecov/Service/Circle.pm
+  Devel::Cover::Report::Codecov::Service::Codeship:
+    file: lib/Devel/Cover/Report/Codecov/Service/Codeship.pm
+  Devel::Cover::Report::Codecov::Service::Drone:
+    file: lib/Devel/Cover/Report/Codecov/Service/Drone.pm
+  Devel::Cover::Report::Codecov::Service::Git:
+    file: lib/Devel/Cover/Report/Codecov/Service/Git.pm
+  Devel::Cover::Report::Codecov::Service::GitLab:
+    file: lib/Devel/Cover/Report/Codecov/Service/GitLab.pm
+  Devel::Cover::Report::Codecov::Service::Magnum:
+    file: lib/Devel/Cover/Report/Codecov/Service/Magnum.pm
+  Devel::Cover::Report::Codecov::Service::Mercurial:
+    file: lib/Devel/Cover/Report/Codecov/Service/Mercurial.pm
+  Devel::Cover::Report::Codecov::Service::Semaphore:
+    file: lib/Devel/Cover/Report/Codecov/Service/Semaphore.pm
+  Devel::Cover::Report::Codecov::Service::Shippable:
+    file: lib/Devel/Cover/Report/Codecov/Service/Shippable.pm
+  Devel::Cover::Report::Codecov::Service::Snap:
+    file: lib/Devel/Cover/Report/Codecov/Service/Snap.pm
+  Devel::Cover::Report::Codecov::Service::Travis:
+    file: lib/Devel/Cover/Report/Codecov/Service/Travis.pm
+  Devel::Cover::Report::Codecov::Service::Wercker:
+    file: lib/Devel/Cover/Report/Codecov/Service/Wercker.pm
+requires:
+  Capture::Tiny: '0.30'
+  Devel::Cover: '0'
+  Furl: '3.07'
+  IO::Socket::SSL: '2.016'
+  JSON::XS: '3.01'
+  Module::Find: '0.13'
+  URI: '1.60'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/codecov/codecov-perl/issues
+  homepage: https://github.com/codecov/codecov-perl
+  repository: git://github.com/codecov/codecov-perl.git
+version: '0.17'
+x_authority: cpan:PINE
+x_contributors:
+  - 'stevepeak <steve@stevepeak.net>'
+  - 'Pedro Melo <melo@simplicidade.org>'
+  - 'Pine Mizune <pinemz@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

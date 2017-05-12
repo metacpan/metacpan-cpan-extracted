@@ -1,0 +1,22 @@
+NAME
+    Devel::FakeOSName - Make Perl think it runs on a different OS
+
+SYNOPSIS
+      # build us Makefile for aix
+      perl -MDevel::FakeOSName=aix Makefile.PL
+
+DESCRIPTION
+    Sometimes your code includes code specific to an OS that you don't have
+    an access to, but you want to see what happens if it was to run on that
+    other OS.
+
+    Currently mostly useful for looking at generated Makefiles. Needs much
+    more work to be really useful.
+
+TODO
+    Currently the module just modifies $^O and $Config{osname}. Could
+    probably somehow supply overrides for other %Config::Config values and
+    ExtUtils::Embed.
+
+    Patches are welcome.
+

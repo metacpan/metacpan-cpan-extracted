@@ -1,0 +1,70 @@
+#!/usr/bin/perl
+
+use constant SOURCE => "/Users/mark/Library/Application Support/iCal/Sources/E49F498D-968C-4A4F-93E8-6E9AF7F44B2B.calendar/corestorage.ics";
+
+use strict;
+use warnings;
+
+use XML::RSS;
+
+# load the calendar
+use Data::ICal::DateTime;
+
+# create a new RSS feed
+my $rss = new XML::RSS (version => '1.0');
+
+rss(0, 1,  "today!");
+rss(1, 2,  "tomorrow!");
+rss(2, 3,  "day after tomorrow!");
+rss(3, 7,  "within a week");
+rss(7, 14, "within a fortnight");
+
+print $rss->as_string;
+
+#################################
+
+my ($ical, @events);
+sub rss
+{
+  my ($start, $end, $comment) = @_;
+
+  # calculate the next 14 days.  This is done once because it 'explodes'
+  # the events and hence is quite expensive
+  unless ($ical)
+  {
+    $ical = Data::ICal->new( filename => SOURCE );
+    @events = $ical->events(
+      DateTime::Span->from_datetimes(
+        start => midnight(),
+        end   => midnight()->add( days => 14, seconds => -1),
+      )
+    );
+  }
+  
+  # what are we looking for this time?
+  my $span = DateTime::Span->from_datetimes(
+    start => midnight()->add( days => $start ),
+    end   => midnight()->add( days => $end, seconds => -1),
+  );
+  
+  # find which of those events in the next 14 days we're concerned
+  # with and add them to the rss feed
+  foreach my $event (grep { $_->is_in($span) } @events)
+  {
+    $rss->add_item(
+     title => $event->summary . " $comment",
+     description => "On ".$event->start->ymd." (".(qw(
+      Sunday Monday Tuesday Wednesday Thursday Friday Saturday Sunday ))[ $event->start->dow ]
+      . ")"
+    );
+  }
+}
+
+# midnight today.
+my $midnight;
+sub midnight
+{
+   $midnight ||= 
+     DateTime->now->set( hour => 0, minute => 0, second => 0, nanosecond => 0 );
+   return $midnight->clone;
+}

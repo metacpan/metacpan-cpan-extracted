@@ -1,0 +1,54 @@
+Revision history for Perl extension DateTime::Calendar::Christian.
+
+0.06		2016-11-20	T. R. Wyant
+    - Repackage licenses into LICENSE/ directory
+
+    - Implement full DateTime interface. Unless I missed something.
+
+    - Better validation on reform dates (I hope!), plus more ways to
+      specify.
+
+    - Add method calendar_name, and override strftime() so that
+      calendar_name() can appear in a template.
+
+    - Add author tests for various desiderata,
+
+0.05		2016-11-08	T. R. Wyant
+    - Convert from DateTime language interface to DateTime locale
+      interface.
+
+    - Require Perl 5.008004, since DateTime does.
+
+    - Add today() constructor, with same caveats as truncate().
+
+    - Document reform date location names.
+
+    - Add Tom Wyant to author and copyright notices.
+
+    - Use warnings.
+
+0.04  2003-07-28	Eugene van der Pijll
+    - DateTime 0.14 introduced some incompatible changes.
+      Updated DT::C::Christian to this new DateTime version.
+
+    - If new() is passed a date which is one of the missing days (during
+      a calendar transform), this is now interpreted as a proleptic
+      Gregorian date; this means that the returned date is now *before*
+      the calendar change, instead of *after* the change.
+
+0.03  2003-04-24	Eugene van der Pijll
+    - added nanosecond support, by requiring DateTime 0.10
+
+    - a change in DateTime caused a failure of a test script (t/08math.t
+      again); fortunately it was in a TODO block; replaced that by
+      todo_skip
+
+0.02  2003-03-27	Eugene van der Pijll
+    - how embarrassing - there's a bug in t/08math.t ... now fixed, of
+      course
+
+    - added a number of calendar reform dates; there are now 41 of them
+      included
+
+0.01  2003-03-26	Eugene van der Pijll
+	- original version (still buggy, probably)

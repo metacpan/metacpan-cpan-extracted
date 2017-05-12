@@ -1,0 +1,70 @@
+Release history for Dist-Zilla-Plugin-Git-NextVersion-Sanitized
+
+0.002003 2017-03-03T10:34:25Z 57a0ef0
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Git-NextVersion-Sanitized/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+0.002002 2014-09-01T01:07:22Z
+ [00 Minor]
+ - Add tests
+ - metadata
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: +5
+
+ [Metadata]
+ - Author = kentnl
+
+ [Tests]
+ - tests for basic tag+bump and env normalisation added.
+
+0.002001 2014-08-16T03:46:40Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - metadata update
+ - test update
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Metadata]
+ - migrate to kentnl org
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.002000 2014-07-13T23:00:16Z
+ [00 Major]
+ - Packaging changes that might affect downstreams that work by hand.
+
+ [01 Tooling]
+ - Switched to EUMM ( https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f )
+ - Using softened dependencies for toolchain in recommends instead of requires
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +7 -8 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+0.001000 2013-12-01T10:42:14Z
+ - First version.

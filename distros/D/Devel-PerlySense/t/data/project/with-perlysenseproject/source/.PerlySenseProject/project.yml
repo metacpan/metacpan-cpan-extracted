@@ -1,0 +1,116 @@
+#PerlySense Project Config
+
+#What's this all about? See: http://search.cpan.org/dist/Devel-PerlySense/
+
+project:
+
+  #The human readable name of the Project
+  moniker: 'Worm Game'
+
+  #Extra @INC directories, relative to the project root
+  inc_dir:
+    - glib/perl5lib
+    - deps/perl5lib
+    - ../../with-dir/source/lib
+
+
+#These are evaluated in order to find a way to run a file. First
+#match is used.
+run_file:
+  -
+    command: "prove -v ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: Test
+    rex: \.t$
+    run_from: source_root_directory
+  -
+    command: "perl -c ${INC} \"${SOURCE_FILE}\""
+    alternate_command: "Alternate Module"
+    moniker: Module
+    rex: \.pm$
+    run_from: source_root_directory
+  -
+    command: "perl ${INC} \"${SOURCE_FILE}\""
+    alternate_command: "Alternate File"
+    moniker: Script
+    rex: \.pl$
+    run_from: file_directory
+
+  #This is a catch-all for all other types of files
+  -
+    command: "perl ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: 'Script (no .pl)'
+    rex: .
+    run_from: file_directory
+
+
+
+#These are evaluated in order to find a way to debug a file. First
+#match is used.
+debug_file:
+  -
+    command: "perl -d ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: Test
+    rex: \.t$
+    debug_from: source_root_directory
+  -
+    command: "perl -d ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: Script
+    rex: \.pl$
+    debug_from: file_directory
+
+  -
+    command: "perl -d ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: Module
+    rex: \.pm$
+    debug_from: source_root_directory
+
+  #This is a catch-all for all other types of files
+  -
+    command: "perl -d ${INC} \"${SOURCE_FILE}\""
+    alternate_command: ""
+    moniker: 'Script (no .pl)'
+    rex: .
+    debug_from: file_directory
+
+
+
+external:
+  editor:
+
+    #Emacs specific configuration
+    emacs:
+
+      #To enable flymake in Emacs, add this to your .emacs file, after you
+      #require cperl-mode and perly-sense.
+      #
+      # ;; Flymake
+      # (require 'flymake)
+      #
+      # ;; Make it recognize Perl Modules
+      # (setq
+      #  flymake-allowed-file-name-masks
+      #  (append (quote (("\\.pm\\'" flymake-perl-init))) flymake-allowed-file-name-masks))
+      #
+      # (add-hook 'cperl-mode-hook 'flymake-mode t)
+      #
+      #
+      # ;; If you only want syntax check whenever you save, not continously
+      # (setq flymake-no-changes-timeout 9999)
+      #
+      # ;; Emacs named colors: http://www.geocities.com/kensanata/colors.html
+      # (set-face-background 'flymake-errline "antique white")
+      # (set-face-background 'flymake-warnline "lavender")
+      flymake:
+
+        #During a flymake compilation, perly_sense can run:
+
+        #Syntax Check (perl -c)
+        syntax: 1
+
+
+#EOF

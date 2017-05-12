@@ -1,0 +1,10 @@
+Revision history for Perl extension Data-ResultsHelper.
+
+1.04  Wed Jan 21          2003
+  - fixing example
+1.03  Wed Jan 21          2003
+  - adding at least a little perldoc
+1.02  Wed Jan 21          2003
+  - fixing a couple broken dependencies
+1.00  Mon Oct 20          2003
+	- first release to CPAN

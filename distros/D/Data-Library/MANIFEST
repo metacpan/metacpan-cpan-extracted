@@ -1,0 +1,12 @@
+Makefile.PL
+Changes
+MANIFEST
+Library.pm
+Library/OnePerFile.pm
+Library/ManyPerFile.pm
+t/00basic.t
+t/01one.t
+t/02many.t
+t/ts/foo.str
+t/ts/two.str
+t/ts/library.multi

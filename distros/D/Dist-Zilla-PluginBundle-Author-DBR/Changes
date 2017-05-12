@@ -1,0 +1,51 @@
+1.2.5     2014-01-07 17:34:10 Europe/Berlin
+
+  - forgot to add MetaProvides::Package which made cpan refuse to index
+
+1.2.4     2014-01-07 17:05:08 Europe/Berlin
+
+  - Add DZ::Plugin::MetaYAML
+
+1.2.3     2014-01-04 11:29:55 Europe/Berlin
+  
+  - Merge pull request #1 from sergeyromanov/patch-1
+
+1.2.2     2013-09-25 21:46:02 Europe/Berlin
+
+    - Still trouble with AutoMetaResources (remove)...
+    - Add Pod::Weaver::Section::Support
+
+1.2.0     2013-09-25 21:17:06 Europe/Berlin
+
+    - Add GithubMeta
+
+1.1.0     2013-09-25 21:10:26 Europe/Berlin
+
+    - Let's try AutoMetaResources on this module itself
+
+1.0.0     2013-09-25 20:41:52 Europe/Berlin
+
+    - Remove [AutoMetaResources] again, seems to not work in vanilla dist.
+    - Let's just try again with AutoMetaResources
+    - Change to semantic versioning
+    - add Dist::Zilla::Test::CPAN::Changes
+
+0.930     2013-07-04 08:59:41 Europe/Berlin
+
+    - Add more information to [AutoMetaResources]
+
+0.920     2013-07-04 00:30:45 Europe/Berlin
+
+    - Add Documentation
+
+0.900     2013-07-04 00:23:54 Europe/Berlin
+
+    - Finally getting Dist::Zilla::Role::PluginBundle::Merged under control...
+
+0.842     2013-07-03 23:20:21 Europe/Berlin
+
+    - Adding Changes stuff.
+
+0.840
+
+    - This was the beginning, back in the days, when no Changelog was kept.

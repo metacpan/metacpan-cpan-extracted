@@ -1,0 +1,245 @@
+NAME
+    Dancer::Plugin::Lexicon - Flexible I18N using Locale::Maketext::Lexicon
+    for Dancer apps
+
+VERSION
+    version 0.06
+
+SYNOPSIS
+  A language specific sub-class
+        package MyApp::Lexicon::pl;
+
+        sub quant {
+            # Override default plural handling to cope
+            # with the Polish form of plurals, ie:
+            # 1   -> single
+            # 2-4 -> "few"
+            # 5-  -> plural
+        }
+
+  Config file
+        plugins:
+            Lexicon:
+                namespace:      MyApp::Lexicon
+                path:           languages
+                auto_detect:    1
+                default:        en
+                func:           [l, _]
+                session_name:   lang
+                param_name:     lang
+                langs:
+                      en:       "English"
+                      en-us:    "US English"
+                      da:       "Dansk"
+                      de:       "Deutsch"
+                      pl:       "Polish"
+
+  In your code
+        package MyApp::Handler;
+
+        use Dancer qw(:syntax);
+        use Dancer::Plugin::Lexicon;
+
+        print language;
+        # English
+
+        print language_tag;
+        # en
+
+        my $installed = installed_langs;
+        my $number    = keys %$installed;
+
+        print _('I know [quant,_1,language,languages]', $number);
+        # I know 5 languages
+
+        print set_language('fr','de_DE','en');
+        # Deutsch
+
+
+        get '/' => sub {
+            debug "Auto-detected language is ".language;
+
+        };
+
+DESCRIPTION
+    Dancer::Plugin::Lexicon uses Locale::Maketext::Lexicon to provide I18N
+    functionality to your Dancer application.
+
+    Translations are stored in PO or MO (compiled PO) gettext files in the
+    "languages/" dir. You can generate or update your PO files by
+    automatically extracting translatable strings from your code and
+    templates with xgettext.pl.
+
+    It allows you to add language sub-classes which can handle grammatical
+    differences in that language (such as the Polish example given in the
+    "SYNOPSIS").
+
+    The user's preferred language can be auto-detected from their browser
+    settings, and the current language is automatically stored in the user's
+    session. Including "lang=$lang_tag" in the query string change the
+    user's language.
+
+CONFIGURATION
+  namespace
+    The only required configuration is "namespace", which should be the base
+    class in your application that you will use for I18N. The class itself
+    doesn't have to exist, but will be loaded if it does exist:
+
+        plugins:
+            Lexicon:
+                namespace:  MyApp::Lexicon
+
+    See "LANGUAGE SUB-CLASSES" for more.
+
+  path
+    The "path" option (default "languages/") allows you to set a different
+    path for where to find your PO files.
+
+  default
+    The default language to use. If not specifified, it defaults to "en".
+    The language must exist in your "languages/" directory. If a translation
+    doesn't exist in the current language, it will be translated using the
+    default language instead.
+
+  langs
+    If not specified, then any PO files in your "languages/" directory will
+    be loaded.
+
+    Alternatively, you can specify a list of language tags:
+
+        langs:
+            en
+            en_US
+            pt
+            pt_BR
+
+    The name of each language will be derived from "name" in
+    I18N::LangTags::List which provides the name in English.
+
+    You can provide your own names as follows:
+
+        langs:
+            en:     English
+            en_US:  US English
+            de:     Deutsch
+            it:     Italiano
+
+    A PO file must exist for all listed languages.
+
+  func
+    One or more function names which will be exported to your modules and
+    templates to localize text. For instance:
+
+        func:   x
+
+    Would allow you to do:
+
+        x('Localize me')
+
+    And:
+
+        func:   [l, _]
+
+    Would allow you to do:
+
+        _('Localize me');
+        l('Localize me');
+
+  session_name
+    The "session_name" param (default "lang") is the session key used to
+    store the user's current language (if sessions are available).
+
+  param_name
+    The "param_name" param (default "lang") is the query string parameter
+    used to change the user's current language.
+
+  auto_detect
+    If you don't want Dancer::Plugin::Lexicon to automatically detect the
+    user's preferred language from their browser headers, then set:
+
+        auto_detect: 0
+
+FUNCTIONS
+  set_language
+    "set_language()" accepts a list of language tags, and chooses the best
+    matching available language. For instance, if you have these languages
+    available: 'en_GB','fr':
+
+        set_language('en_US','en_AU');
+        # British English
+
+        set_language('it','de');
+        # French (closer to Italian)
+
+    If no suitable language is found, then it will set the default language,
+    which you can also force with:
+
+        set_language;
+
+  language
+    The name of the current language as specified in "installed_langs".
+
+  language_tag
+    The language tag of the current language.
+
+  installed_langs
+    A hashref containing all installed languages. The keys are language
+    tags, and the values are the names as specified in your config, or as
+    derived from "name" in I18N::LangTags::List.
+
+  localize
+    The "localize" function will translate the passed in phrase using the
+    current language:
+
+        localize('Translate me', @any_args);
+
+    Also, and functions that you specify in "/func" will also be exported as
+    aliases of "localize"
+
+LANGUAGE SUB-CLASSES
+    No ".pm" files need to exist, but if they do exist, they will be loaded
+    and setup correctly.
+
+    For instance, the class specified in "namespace" (eg "MyClass::Lexicon")
+    is loaded or inflated, and setup to inherit from Locale::Maketext. If
+    you load "fr.po" then it tries to load "MyClass::Lexicon::fr" if it
+    exists, otherwise it inflates it. This class inherits from
+    MyClass::Lexicon.
+
+    If you want to override any functionality for a particular language,
+    then you can create the file "lib/MyClass/Lexicon/fr.pm" and add your
+    overrides in there.
+
+    Also, you could have (eg) "MyClass::Lexicon::pt_br" (Brazilian
+    Portuguese), which is a subclass of "MyClass::Lexicon::pt" (Portuguese).
+    Any translations that aren't found in "pt_br.po" will be looked for in
+    "pt.po", before finally failing over to the default language.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Plugin::Lexicon
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/clintongormley/Dancer-Plugin-Lexicon>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Dancer-Plugin-Lexicon>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/Dancer::Plugin::Lexicon>
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

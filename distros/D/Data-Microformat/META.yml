@@ -1,0 +1,46 @@
+---
+name: Data-Microformat
+version: 0.04
+author:
+  - "Brendan O'Connor <perl@ussjoin.com>"
+abstract: A base class for hCards and related modules
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime::Format::W3CDTF: 0
+  HTML::Entities: 0
+  HTML::Stream: 0
+  HTML::TreeBuilder: 0
+build_requires:
+  Test::More: 0
+provides:
+  Data::Microformat:
+    file: lib/Data/Microformat.pm
+    version: 0.04
+  Data::Microformat::adr:
+    file: lib/Data/Microformat/adr.pm
+    version: 0.04
+  Data::Microformat::geo:
+    file: lib/Data/Microformat/geo.pm
+    version: 0.04
+  Data::Microformat::hCard:
+    file: lib/Data/Microformat/hCard.pm
+    version: 0.04
+  Data::Microformat::hCard::name:
+    file: lib/Data/Microformat/hCard/name.pm
+    version: 0.04
+  Data::Microformat::hCard::organization:
+    file: lib/Data/Microformat/hCard/organization.pm
+    version: 0.04
+  Data::Microformat::hCard::type:
+    file: lib/Data/Microformat/hCard/type.pm
+    version: 0.04
+  Data::Microformat::hFeed:
+    file: lib/Data/Microformat/hFeed.pm
+  Data::Microformat::hFeed::hEntry:
+    file: lib/Data/Microformat/hFeed/hEntry.pm
+generated_by: Module::Build version 0.3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

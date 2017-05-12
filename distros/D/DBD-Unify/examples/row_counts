@@ -1,0 +1,73 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+sub usage
+{
+    my $err = shift and select STDERR;
+    print "usage: vol [-1] [-a] [-e] [-s schema] [tbl]\n";
+    exit $err;
+    } # usage
+
+use Getopt::Long qw(:config nopermute bundling);
+my $opt_a  = 0;
+my $opt_e  = 0;
+my $opt_1  = 0;
+my $opt_s  = (split m{/}, $ENV{DBUSER}//"")[0] || "PRO\U$ENV{PROD}";
+GetOptions (
+    "help|?" => sub { usage (0); },
+    "a"      => \$opt_a,
+    "e"      => \$opt_e,
+    "1"      => \$opt_1,
+    "s=s"    => \$opt_s,
+    ) or usage (1);
+
+my $opt_t = @ARGV ? lc (shift @ARGV) : "^";
+   $opt_t = qr/$opt_t/;
+$opt_a and $opt_s = "";
+
+use DBI;
+
+# Connect to the database
+my $dbh = DBI->connect ("DBI:Unify:", "", "", {
+			    RaiseError		=> 1,
+			    PrintError		=> 1,
+			    AutoCommit		=> 0,
+			    ChopBlanks		=> 1,
+			    ShowErrorStatement	=> 1,
+
+			    uni_scanlevel	=> 7,
+			    }) or die $DBI::errstr;
+
+my $col = ($ENV{COLUMNS} || 80) - 1;
+my $w = $opt_1 ? 30 : int (($col - 39) / 3);
+my $x = 0;
+
+# For all accessable tables (in the current SCHEMA if $USCHEMA is set),
+# show the number of records in it
+foreach (sort $dbh->tables (undef, $ENV{USCHEMA} || undef, undef, "T")) {
+    # As of DBI-1.38, quotes suddenly appeared. It was a BIG mistake to do so!
+    s/["'`]//g;
+
+    my ($sch, $tbl) = split m/\./;
+    $tbl = lc $tbl;
+    $opt_s and $sch ne $opt_s and next;
+    $opt_t and $tbl !~ $opt_t and next;
+
+    my ($cnt, $sth) = (0);
+    unless ($sth = $dbh->prepare ("select count (*) from $tbl") and
+	    $sth->execute and
+	    $sth->bind_columns (\$cnt) and
+	    $sth->fetch) {
+	print STDERR "Cannot select count (*) from $sch.$tbl\n";
+	next;
+	}
+
+    $opt_e and $cnt == 0 and next;
+    $opt_a and $tbl = "$sch.$tbl";
+    $x++ and print $opt_1 ? "\n" : ($x - 1) % 3 ? " | " : "\n";
+    printf "%-$w.${w}s:%10d", $tbl, $cnt;
+    }
+print "\n";
+$dbh->disconnect;

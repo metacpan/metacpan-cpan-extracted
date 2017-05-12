@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Dict-Lexed
+version:      0.2.2
+version_from: lib/Dict/Lexed.pm
+installdirs:  site
+requires:
+    IO::Handle:                    0
+    IPC::Open2:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

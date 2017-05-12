@@ -1,0 +1,117 @@
+NAME
+    Data::Pack - Pack data structures so only real content remains
+
+VERSION
+    version 1.101611
+
+SYNOPSIS
+        use Data::Pack ':all';
+
+        my $h = {
+            a => 1,
+            b => [ 2..4, undef, 6..8 ],
+            c => [],
+            d => {},
+            e => undef,
+            f => (bless {
+                f1 => undef,
+                f2 => 'f2',
+            }, 'Foo'),
+            g => {
+                g1 => undef,
+                g2 => undef,
+                g3 => [ undef, undef, undef ],
+                g4 => {
+                    g4a => undef,
+                    g4b => undef,
+                },
+            },
+        };
+
+        my $p = pack_data($h);
+        my %h2 = pack_hash(%$h);
+
+    The result is
+
+        $p = {
+            a => 1,
+            b => [ 2..4, 6..8 ],
+            f => (bless {
+                f2 => 'f2',
+            }, 'Foo'),
+        };
+
+DESCRIPTION
+    This module provides a way to traverse data structures and eliminate any
+    undefined or otherwise empty pieces from it. None of the functions are
+    exported automatically, but you can request them by name, or get all of
+    them if you use the ":all" tag.
+
+FUNCTIONS
+  pack_data
+    This function takes a possibly blessed hash or array reference and
+    traverses it, returning a copy that has no undefined or otherwise empty
+    pieces. That is, key/value pairs where the value is undefined - or
+    recursively deemed to be without content - are eliminated from the copy,
+    as are undefined or recursively content-free elements from arrays.
+    Checking for content is done with "has_content()", so for example a hash
+    key/value pair whose value is a hash of arrays or the like, but whose
+    leaves are all undefined or empty, is omitted. See the Synopsis for an
+    example.
+
+    In list context, hashes and arrays are returned as such. In scalar
+    context, references are returned.
+
+  pack_hash
+    This convenience function can be passed a hash instead of a reference.
+    It returns the packed hash in list context, or a reference to it in
+    scalar context.
+
+  pack_array
+    This convenience function can be passed an array instead of a reference.
+    It returns the packed array in list context, or a reference to it in
+    scalar context.
+
+  has_content
+    This is really just a convenience function used by "data_pack()", but
+    can still be exported.
+
+    Given a scalar, it returns whether this is a defined value.
+
+    Given a possibly blessed array reference, it returns whether that array
+    contains any elements.
+
+    Given a possibly blessed hash reference, it returns whether that hash
+    contains any key/value pairs.
+
+    Given any other type of reference, it will die.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see <http://search.cpan.org/dist/Data-Pack/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Pack/>. Instead of sending patches,
+    please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2008 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

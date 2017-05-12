@@ -1,0 +1,22 @@
+0.0052 Wednesday June 09 13:31:02 PDT 2010:
+    - Added pgrep check to t/9-basic.t
+
+0.0051 Sunday June 06 22:56:13 PDT 2010:
+    - Attempt to fix issue rt52148
+    - Conversion to dzpl
+
+0.0050 Monday November 23 23:37:19 PST 2009:
+    - Added restriction to !MSWin* (for POSIX usage)
+
+0.0040 Thursday November 19 13:49:32 PST 2009:
+    - Added fix for rt51198 (thanks m-uchino)
+    - Removed erroneous test 
+
+0.0030 Monday October 26 23:36:36 PDT 2009:
+    - Improved documentation
+
+0.0020 Monday October 26 19:28:15 PDT 2009:
+    - Interface & documentation tweaks
+
+0.0010 Monday October 26 00:34:12 PDT 2009:
+    - Initial release

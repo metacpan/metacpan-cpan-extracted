@@ -1,0 +1,76 @@
+#!/usr/bin/perl
+
+BEGIN
+{
+	$| = '1';
+}
+
+END
+{
+  print "Bye!";
+}
+
+use Dblink;
+use Data::Dumper;
+use Getopt::Long;
+use DBI;
+
+$main::DEBUG = '0';
+$main::STDIN = '0';
+
+my ($Order_Date, %Options);
+
+Getopt::Long::Configure ('no_ignore_case', 'bundling');
+GetOptions(\%Options, "s=s", "d=s", "f=s", "t=s", "h");
+
+if (exists($Options{'h'}))
+{
+  Usage();
+  exit;
+}
+
+$main::SLINE = $Options{'s'} || 1;
+$main::DLINE = $Options{'d'} || 2;
+$main::TABLE = $Options{'t'} || Usage();
+$main::CFILE = $Options{'f'} || $ENV{'HOME'} . "/.pgpass";
+
+#print "$main::SLINE $main::DLINE $main::CFILE\n";
+$main::Dblink			= Dblink->new($main::Objects);
+
+@params = $main::Dblink->get_db_params($main::SLINE - 1);
+($host, $port, $db, $user, $pass) = @params;
+
+$params = "dbi:Pg:host=$host;dbname=$db"; 
+#print "Source Params :$params:\n";
+$SDbh = DBI->connect($params, $user, $pass, {RaiseError => 0, PrintError => 0});
+#print "Source Dbh :$SDbh:\n";
+
+@params = $main::Dblink->get_db_params($main::DLINE - 1);
+($host, $port, $db, $user, $pass) = @params;
+
+$params = "dbi:Pg:host=$host;dbname=$db"; 
+#print "Dest. Params :$params:\n";
+$DDbh = DBI->connect($params, $user, $pass, {RaiseError => 0, PrintError => 0});
+#print "Dest. Dbh :$DDbh:\n";
+
+$ret = $main::Dblink->create_remote_view($SDbh, $DDbh, 'dbl_', $main::TABLE);
+#print "create_remote_view() returned :$ret:\n";
+$SDbh->disconnect();
+$DDbh->disconnect();
+
+sub Usage
+{
+	my ($Program) = (split (/\//, $0))[-1];
+print<<USAGE;
+Usage : $Program -sdtf
+	-s -- Line No. of Source Database Details in configuration file
+        (default: line no: 1)
+	-d -- Line No. of Dest. Database Details in configuration file
+        (default: line no: 2)
+	-f -- Configuration file (default: $ENV{'HOME'}/.pgpass)
+	-t -- Table to create the dblink view
+	-h -- Displays this help
+USAGE
+exit;
+}
+

@@ -1,0 +1,8 @@
+Carp.pm
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+t/blur.t
+t/load.t

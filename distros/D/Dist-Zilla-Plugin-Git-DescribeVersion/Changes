@@ -1,0 +1,41 @@
+Revision history for Dist::Zilla::Plugin::Git::DescribeVersion
+
+1.004     2012-08-18T18:30:29Z
+
+  [Documentation]
+  - Clarify in the Pod that this plugin was designed for use with manual
+    two-part version tags (v1.2 => v1.2.34)
+    (and threfore not desgined to work with Dist::Zilla::Plugin::Git::Tag).
+    Thanks to Matthew Astley for helping straighten this out (rt-71626).
+
+1.003     2011-07-14T23:46:03Z
+
+  - Remove unused namespace::autoclean prereq
+  - Documentation improvements
+  - Superficial dist/release changes
+
+1.001011  2010-12-17T04:26:42Z
+
+  - use Module::Build for installation
+  - Documentation/dist meta improvements
+
+1.001005  2010-12-10T19:29:47Z
+
+  - Add test script for provide_version()
+  - Documentation/dist meta improvements
+
+1.000010  2010-12-07T21:07:19Z
+
+  - Documentation/dist meta improvements
+
+0.007006  2010-11-17T16:22:34Z
+
+  - Initial release after being separated from Git-DescribeVersion dist
+
+0.006012  2010-11-15T13:27:00Z
+
+  - Initial non-development release to CPAN (in Git-DescribeVersion dist)
+
+0.004008  2010-10-24T22:09:00Z
+
+  - Initial  (development)  release to CPAN (in Git-DescribeVersion dist)

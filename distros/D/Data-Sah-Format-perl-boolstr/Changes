@@ -1,0 +1,12 @@
+Revision history for Data-Sah-Format-perl-boolstr
+
+0.002   2016-06-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- [test] Use Test::Data::Sah::Format.
+
+
+0.001   2016-06-14 (PERLANCAR)
+
+        - First release.

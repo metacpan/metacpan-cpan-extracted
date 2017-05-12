@@ -1,0 +1,45 @@
+This file contains instructions about setting up your environment for
+testing the DBI backend provided by DNS::BL. Following these
+instructions will:
+
+* Create a database (default name is dns-bl-test)
+* Create the tables bls and entries
+* Create a single dnsbl named 'testing-123'
+* Grant required rights to user 'dns-bl-test' over all objects in the
+  created database, when connecting to the database from any host and
+  with no password. THIS IS DANGEROUS
+
+The steps listed above can be accomplished easily by running the
+following command (note that this assumes a MySQL database as the
+backend but should be easy to adapt to other database engines)
+
+$ mysqladmin --host=dbhost --user=root \
+  --password=pass create dns-bl-test
+
+$ mysql --host=dbhost --user=root \
+  --password=pass < ./etc/mysql-testing.sql
+
+After doing this, you must tell the test suite how to connect to the
+freshly configured test environment. To do this, you must configure
+two environment variables prior to running make test.
+
+$DNS_BL_DBI_TEST and $DNS_BL_DBI_BLNAME must be set according to the
+configuration info applied to the database. The first variable should
+contain a valid DBI DSN referring to the test database. For MySQL,
+this DSN might be written as
+
+DNS_BL_DBI_TEST="DBI:mysql:host=dbhost;database=dnsbltest;user=dnsbltest"
+export DNS_BL_DBI_TEST
+
+If you changed the test dnsbl from the default 'testing-123', you must
+then change the following variable accordingly
+
+DNS_BL_DBI_NAME='testing-456'
+export DNS_BL_DBI_NAME
+
+After all of this is done, you should
+
+make test
+
+After you're satisfied with the results, make sure to drop the test
+database and purge the testing user from your configuration.

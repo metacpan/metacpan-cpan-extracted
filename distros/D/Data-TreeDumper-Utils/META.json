@@ -1,0 +1,56 @@
+{
+   "abstract" : "A selection of utilities to use with Data::TreeDumper",
+   "author" : [
+      "Nadim ibn hamouda el Khemir. <nkh@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-TreeDumper-Utils",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Block" : "0",
+            "Test::Exception" : "0",
+            "Test::NoWarnings" : "0",
+            "Test::Warn" : "0",
+            "Text::Diff" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Check::ISA" : "0",
+            "Data::TreeDumper" : "0.35",
+            "Readonly" : "0",
+            "Sort::Naturally" : "0",
+            "Sub::Exporter" : "0",
+            "Sub::Uplevel" : "0.2",
+            "Tie::IxHash" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::TreeDumper::Utils" : {
+         "file" : "lib/Data/TreeDumper/Utils.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "v0.04.4"
+}

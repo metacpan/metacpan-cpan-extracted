@@ -1,0 +1,196 @@
+Changes for DBD::JDBC.
+
+November 2008
+        Version 0.71
+         
+        Added a private method, jdbc_disconnect, that can be used
+        to invoke disconnect in cases where the public disconnect
+        method provided by DBI has been overridden or otherwise
+        made unavailable (this was happening in Apache::DBI). 
+         
+        Server changes: Modified the way methods are found when
+        invoking JDBC methods via reflection.
+
+        Added support for last_insert_id using the JDBC method
+        getGeneratedKeys.
+
+        Added code to the server to attempt to roll back any
+        existing transactions before closing a connection due to
+        a fatal error. Thanks to Martin Evans for the suggestion.
+
+        When the DBI version is >= 1.54, DBD::JDBC no longer
+        exports SQL_BIGINT since it's been added back to DBI.
+
+
+June 2006
+        Version 0.70
+
+        Changed the default behavior when reading long fields to
+        read the entire field. Added a new property,
+        jdbc_longreadall, which can be set to false to disable
+        this behavior and return to the DBI standard behavior
+        controlled by LongReadLen and LongTruncOk.
+
+        Statements are now marked inactive when their DESTROY
+        method is called. Thanks to Jesper Krogh for the
+        suggestion. 
+
+        Server changes: The server now uses log4j for its
+        logging. 
+        
+        The server will attempt to close database connections
+        when a connection thread is ending. Thanks to Jesper
+        Krogh for the patch.
+        
+
+January 2006
+        Version 0.69
+ 
+        Added the first bit of $dbh->get_info support thanks to
+        Jesper Krogh.
+
+        Server changes: Updated the method which reads data in
+        the server (handleRequest(FetchRequest aRequest)) to use
+        different JDBC methods for BLOB, CLOB, and LONGVARCHAR
+        data types. The server now retrieves BLOB and CLOB
+        objects using getBlob and getClob. The use of the
+        deprecated method getUnicodeStream to read LONGVARCHAR
+        has been replaced by use of getCharacterStream.
+
+
+November 2005
+        Version 0.68
+
+        Fixed a bug in the handle DESTROY methods which caused
+        DESTROY to override the current value of $@. Code like
+        the following: 
+          eval { my $sth = $dbh->prepare(...); $sth->execute() }; 
+          die $@ if $@; 
+        might fail to die even when $sth->execute failed because
+        $sth->DESTROY was called when the eval block was exited. 
+
+        Added distribution tests which use hsqlbd thanks to Frank
+        Tolstrup. hsqldb is a pure Java SQL database. This should
+        make it possible to run "make test" without having
+        another database set up.
+
+
+November 2005
+        Version 0.67
+
+        This is DBD::JDBC 0.66 with a few further updates based
+        on reviewing the DBI 1.48 documentation. 
+
+        Fixed the local build process to synchronize the
+        DBD::JDBC version with the server version. 
+
+        Added support for $sth->{ParamValues}. (DBI 1.28)
+
+        Removed locally-defined err, errstr, and state
+        variables. (DBI 1.33)
+
+        Updated NUM_OF_FIELDS behavior. (DBI 1.42)
+
+
+January 2005
+        Version 0.66
+ 
+        Unofficial release, not sent to CPAN.
+        Requires edits to DBI.pm.
+
+        Updated DBD::JDBC to work with DBI 1.46. No work has been
+        done to add support for DBI features added since the last
+        DBI release with which this driver was certified. "Works
+        with DBI 1.46" means that the test suite now passes
+        again.
+
+        This release uses DBI's install_method method to add
+        jdbc_func. Use of install_method requires that the
+        driver-specific prefix be registered with DBI. This has
+        not been done as of DBI 1.46, so until a DBI release is
+        made with the prefix registered, it is necessary to edit
+        DBI.pm to add the jdbc_ prefix to $dbd_prefix_registry. 
+
+        Scripts which used $h->func to call JDBC methods must now
+        use $h->jdbc_func. Error handling with jdbc_func follows
+        the standard DBI model, so it's no longer necessary to
+        check for errors explicitly as it was when using func.
+
+        Removed references to the DBI constant SQL_BIGINT, which
+        was removed in an earlier DBI release. Scripts which need
+        to use SQL_BIGINT should import the constant from DBD::JDBC: 
+
+          use DBI qw(:sql_types);
+          use DBD::JDBC qw(:sql_types);
+
+        
+
+May 2001
+        Version 0.64
+
+        Added support for arbitrary (string) JDBC connection
+        properties. 
+
+        Added support for "jdbc_" prefixes on method names used
+        in $h->func() calls as required by DBI. Unprefixed method
+        names are still supported in this release, though support
+        may be removed in a future release.
+
+        Changed the format of the connect message between the
+        client and server. This means that this version of the
+        client is not compatible with any older version of the
+        server. 
+
+
+June 2000
+        Version 0.63
+
+        Changed required version of DBI to 1.13 in order to have
+        access to the SQL_BIT constant (used to specify boolean
+        method parameters for func).
+
+        Added $h->func implementations for $dbh and $sth
+        objects. This implementation passes the method name and
+        parameters to the Java server. The server uses reflection
+        to call the requested method. The current implementation
+        only supports a limited set of types for parameters and
+        return values. Most object types are not supported.
+
+        Allow the driver to close Statement objects when
+        $sth->DESTROY is called.
+
+        Fixed, or at least altered, the behavior of the driver
+        when the JDBC driver doesn't provide a SQLSTATE value
+        in a SQLException. Previously, this problem caused DBI to
+        die. 
+
+        Reset the value of the jdbc_error attribute before
+        setting a new error.
+
+
+May 2000
+        Version 0.62.
+
+        Changed required version of Convert::BER to 1.31 and
+        removed Convert::BER 1.265 from the driver distribution.
+
+        Changed connect implementation to delay creation of $dbh
+        until server connection has succeeded. This allows
+        checking of $DBI::{err,errstr,state} in a separate
+        statement after the call to connect.
+
+
+January 2000
+        Added ability to create a single Server with a
+        pre-existing Java connection within a Java
+        application. See the example in the example directory. 
+
+
+        Added $! to socket error reporting; why'd I leave that
+        out? 
+
+
+October 1999
+        Initial version.
+
+

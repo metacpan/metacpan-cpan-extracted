@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+META.yml                                 Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+lib/DBIx/POS.pm
+t/DBIx-POS.t

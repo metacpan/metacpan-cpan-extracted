@@ -1,0 +1,31 @@
+---
+abstract: 'Templatize your data.'
+author:
+  - 'Aran Deltac <bluefeet@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test2::Bundle::Extended: '0.000051'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Xslate
+requires:
+  Carp: '0'
+  Moo: '1.006'
+  Storable: '0'
+  Text::Xslate: '3'
+  Type::Tiny: '1'
+  namespace::clean: '0'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/bluefeet/Data-Xslate/issues
+  homepage: https://github.com/bluefeet/Data-Xslate
+  repository: https://github.com/bluefeet/Data-Xslate.git
+version: '0.03'

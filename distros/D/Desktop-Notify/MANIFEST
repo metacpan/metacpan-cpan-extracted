@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Desktop/Notify.pm
+lib/Desktop/Notify/Notification.pm
+t/00-load.t
+t/01-connect.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.json                                Module JSON meta-data (added by MakeMaker)

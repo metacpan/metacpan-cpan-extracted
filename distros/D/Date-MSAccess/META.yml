@@ -1,0 +1,24 @@
+---
+abstract: 'Manage dates in MS Access format'
+author:
+  - 'Ron Savage <ron@savage.net.au>'
+build_requires:
+  Test::More: 0
+  Test::Pod: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-MSAccess
+provides:
+  Date::MSAccess:
+    file: lib/Date/MSAccess.pm
+    version: 1.05
+requires:
+  Date::Calc: 5.3
+resources:
+  license: http://www.perlfoundation.org/artistic_license_1_0
+version: 1.05

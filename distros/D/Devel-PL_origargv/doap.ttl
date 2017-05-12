@@ -1,0 +1,115 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-bugs: <http://ontologi.es/doap-bugs#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.006"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Devel-PL_origargv>;
+	doap:created         "2012-11-06"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Devel-PL_origargv>;
+	doap:homepage        <https://metacpan.org/release/Devel-PL_origargv>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Devel-PL_origargv";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-devel-pl_origargv>;
+	];
+	doap:shortdesc       "access to the Perl interpreter's argv".
+
+<http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Devel-PL_origargv-0.001"^^xsd:string;
+	dc:issued            "2012-11-07"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-PL_origargv-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Devel-PL_origargv-0.002"^^xsd:string;
+	dc:issued            "2013-01-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Include an example script in the distribution.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Document test suite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-PL_origargv-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Devel-PL_origargv-0.003"^^xsd:string;
+	dc:issued            "2013-07-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Note that test suite will not pass when run via `forkprove`.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Rename the internal C functions because they conflict with functions from stdlib.h in some versions of gcc.";
+			doap-changeset:fixes <http://purl.org/NET/cpan-uri/rt/ticket/86838>;
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/sisyphus>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-PL_origargv-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Devel-PL_origargv/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Devel-PL_origargv-0.004"^^xsd:string;
+	dc:issued            "2014-04-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "use Dist::Inkt";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Switch from Inline::C to XS.";
+			doap-changeset:blame [ a foaf:Person; foaf:nick "Anonymous Monk" ];
+			rdfs:seeAlso <http://www.perlmonks.org/?node_id=1083955>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Devel-PL_origargv-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/sisyphus>
+	a                    foaf:Person;
+	foaf:name            "Sisyphus";
+	foaf:nick            "SISYPHUS";
+	foaf:page            <https://metacpan.org/author/SISYPHUS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+
+<http://purl.org/NET/cpan-uri/rt/ticket/86838>
+	a                    doap-bugs:Issue;
+	doap-bugs:id         "86838"^^xsd:string;
+	doap-bugs:page       <https://rt.cpan.org/Ticket/Display.html?id=86838>.
+

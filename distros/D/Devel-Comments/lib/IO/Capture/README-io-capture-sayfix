@@ -1,0 +1,16 @@
+README-sayfix		2010-05-20 02:30:37
+
+IO::Capture version 0.05 does not handle feature 'say' correctly. 
+The bug has been reported to the author. Meanwhile, a fix is needed. 
+
+IO::Capture::Sayfix works around this bug: 
+
+	IO::Capture::Stdout is loaded, if it's not already. 
+	'say' is captured
+	if the capture doesn't include the trailing newline, 
+		then the workaround is loaded. 
+
+The hope is that this will play equally well with the current version
+	and any future version that does or does not fix the 'say' bug. 
+
+Xiong Changnian <xiong@xuefang.com>

@@ -1,0 +1,17 @@
+Revision history for Perl extension Data::RuledCluster
+
+0.06 2016-11-17T02:33:18Z
+    - the resolve_node_keys method is delegated to strategy class. (internal changes)
+
+0.05 2014/03/10
+    - added options argument (resolve and resolve_node_keys)
+
+0.04 2013/03/05
+    - added Formatted Strategy.
+
+0.03 2013/02/15
+    - added dependency.
+
+0.02 2012/08/14
+    - release for CPAN.
+

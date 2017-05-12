@@ -1,0 +1,20 @@
+Revision history for Dancer2-Plugin-BrowserDetect
+
+1.163590  2016-12-24 19:20:51+01:00 Europe/Paris
+
+    Convert to pure Plugin2 (Dancer2::Plugin v0.200000). This allows plugin to
+    be consumed by other plugins. (Peter Mottram)
+
+1.162360  2016-08-23 23:48:18+02:00 Europe/Paris
+
+    Remove dancer 1 dependency by nfg (#3).
+
+1.160190  2016-01-19 23:36:52+01:00 Europe/Paris
+
+    Remove some existing deprecation warnings and add changes needed for next Dancer2::Plugin by Peter Mottram (#2).
+
+1.141180  2014-04-28 10:59:07CEST+0200 Europe/Paris
+
+    Fix github url project by MartinMcGrath (#1).
+    Initial version developed.
+

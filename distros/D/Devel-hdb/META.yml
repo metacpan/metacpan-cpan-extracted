@@ -1,0 +1,49 @@
+---
+abstract: 'A Perl debugger implemented as a REST service and accompanying browser program'
+author:
+  - 'Anthony Brummett <brummett@cpan.org>'
+build_requires:
+  Devel::Callsite: '0'
+  Fcntl: '0'
+  File::Basename: '0'
+  File::Temp: '0'
+  HTML::TreeBuilder: '0'
+  IO::Socket: '0'
+  Test::More: '0'
+  lib: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.027, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-hdb
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Data::Transform::ExplicitMetadata: '0'
+  Devel::Chitin: '0.06'
+  Digest::MD5: '0'
+  Exception::Class: '0'
+  Exporter: '0'
+  HTTP::Server::PSGI: '0'
+  IO::File: '0'
+  IO::Socket::INET: '0'
+  JSON: '0'
+  LWP::UserAgent: '0'
+  Plack::Request: '0'
+  Scalar::Util: '0'
+  Socket: '0'
+  Sub::Name: '0'
+  Sys::Hostname: '0'
+  Time::HiRes: '0'
+  URI::Escape: '0'
+  base: '0'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/brummett/Devel-hdb.git
+version: '0.23'

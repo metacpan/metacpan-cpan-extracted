@@ -1,0 +1,18 @@
+Version 0.31 2006-08-14	D. Arnold
+
+	- remove threads dependency
+
+Version 0.30 2006-04-28	D. Arnold
+
+	- broke out from Devel::STrace 0.30 (decoupled to more easily
+		support Devel::Psichedb or other debuggers/diagnostics)
+
+	- added DESTROY for Devel::RingBuffer and Devel::RingBuffer::Ring
+	
+	- added global message area
+	
+	- added per-thread message area
+	
+	- added per-thread expression-watch area
+	
+	- converted most mmap'd area accesses to XS/C code

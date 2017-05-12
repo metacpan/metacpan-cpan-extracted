@@ -1,0 +1,48 @@
+Dist::Zilla::App::Command::dumpwith
+
+This command, like its sibling "dumpphases", exists to help make
+understanding what is going on in "Dist::Zilla" a little easier.
+
+At least, having this command means debugging certain kinds of problems
+is more obvious.
+
+If you want to see all plugins that are adding files to your dist?
+
+    dzil dumpwith -- -FileGatherer
+
+Though, of course, this requires some knowledge of what roles are
+applicable.
+
+If you want to turn colors off, use "Term::ANSIcolor"'s environment
+variable "ANSI_COLORS_DISABLED". E.g.,
+
+    ANSI_COLORS_DISABLED=1 dzil dumpphases
+
+Alternatively, specify a color-free theme:
+
+    dzil dumpwith --color-theme=basic::plain -- -VersionProvider
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

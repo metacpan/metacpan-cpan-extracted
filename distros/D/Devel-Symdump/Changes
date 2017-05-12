@@ -1,0 +1,289 @@
+2017-02-07  k  <andk@cpan.org>
+
+	* release 2.18
+
+	* Makefile.PL changes to support perls without "." in @INC (Todd
+	Rinaldo); no functional change
+
+2016-04-19  k  <andk@cpan.org>
+
+	* release 2.17
+
+	* address #113886: unlist Compress::Zlib as a prereq, it was and
+	still is only used by a test that won't run for normal user
+	installs (Thanks to Graham Knop for reporting)
+
+2016-04-11  k  <andk@cpan.org>
+
+	* release 2.16
+
+	* docs only change: create a real link to perlref.pod (Slaven Rezić)
+
+2015-06-11  k  <andk@cpan.org>
+
+	* release 2.15
+
+	* In the tests, always check for exists before checking for
+	definedness (Reini Urban)
+
+2014-12-16  k  <andk@cpan.org>
+
+	* release 2.14
+
+	* no change to 2.14-TRIAL
+
+2014-12-08  k  <andk@cpan.org>
+
+	* release 2.14-TRIAL
+
+	* support for fileno() on directory handles (perl commit v5.21.6-337-g67f2cc7)
+
+2014-07-26  k  <andk@cpan.org>
+
+	* release 2.13-TRIAL
+
+	* support for telldir (Brian Fraser)
+
+2014-06-20  k  <andk@cpan.org>
+
+	* release 2.12
+
+	* test rewrite: v5.21.0-424-ge35475d stopped supporting
+	defined(@$ref) which was used in t/symdump.t (thanks to Aaron
+	Crane for spotting)
+
+2013-10-30  k  <andk@cpan.org>
+
+	* release 2.11
+
+	* v5.19.5-71-gd456e3f stopped producing the %@ hash at startup
+
+2013-03-27  k  <k@k83.linux.bogus>
+
+	* release 2.10
+
+	* no change to 2.10-TRIAL
+
+2013-03-24  k  <k@k83.linux.bogus>
+
+	* release 2.10-TRIAL
+
+	* release 2.09-TRIAL
+
+	* address RT#84139: fix test to work with upcoming perl 5.18
+	(Thanks to ZEFRAM)
+
+	* fixed the autogen.t test again, this time for perl 5.8.9
+
+2012-05-20  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.08_53
+
+	* apply doc patch by Nick Stokoe from ticket #77102
+
+	* declare dependency on Compress::Zlib
+
+2009-03-01  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.08_51
+
+	* added a test by Jason M. Mills to chase down the bug he reports
+	in https://rt.cpan.org/Ticket/Display.html?id=43675
+
+2007-10-11  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.08
+
+	* skip the recurse test on 5.005
+
+2007-01-05  Andreas J. Koenig  <andreas.koenig.7os6VVqR@franz.ak.mind.de>
+
+	* release 2.07
+
+	* rewrite symdump.t using Test::More
+
+	* adjust test suite to accept main::- also introduced for named
+	captures
+
+2006-10-08  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.0604
+
+	* adjust test suite to accept main::+ introduced by named captures
+
+2006-09-20  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* relase 2.0603
+
+	* add LICENSE field to Makefile.PL to also have it in the META.yml
+
+2006-07-19  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.0602
+
+	* adjust test suite to accept new variable in bleadperl, the hash
+	$main::^H
+
+2006-05-03  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.0601
+
+	* add copyright and license
+
+2006-01-18  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.06
+
+	* New warnings in bleadperl now suppressed; minor pod issues fixed
+
+2006-01-02  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.05
+
+	* fix the testcase for recursion so that it compiles and works
+	also after patch 26370 to perl after which stashes are not
+	autovivified anymore.
+
+2005-12-25  Andreas J. Koenig  <andreas.koenig.gmwojprw@franz.ak.mind.de>
+
+	* release 2.04
+
+	* Export.pm now strict clean
+
+	* Makefile.PL up to date
+
+	* added ChangeLog.svn
+
+	* added tests for recursion, pod, podcover
+
+	* Fixed rt.cpan.org #8766--recursion
+
+2002-03-01  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* lib/Devel/Symdump.pm: perl 5.6.1 introduced a package name of
+	"<none>" to work around a bug if somebody uses the deprecated
+	C<package> without an argument. I believe we need to ignore that
+	symbol completely so that at least we follow the lead of the B::
+	extensions. Thanks to Sreeji K Das /sreeji_k at yahoo.com/ for the
+	report.
+
+2000-10-31  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Typo fix: hashs --> hashes. Thanks to Sebastien Blondeel
+	<Sebastien.Blondeel@idealx.com> for the report.
+
+2000-06-14  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Fixed my email address in and made a few tiny editorial changes
+	to the manpage.
+
+	* Replaced Changes file with this ChangeLog file, appended the
+	full Changes file below.
+
+	* Fixed the test 6 in t/symdump.t. This test was broken by
+	perl-5.6.0 but not Devel::Symdump itself.
+
+1997-05-16  Andreas Koenig
+
+	* Release 2.00
+
+	* Fixed typos in the manpage, added a test for tree, no functional
+	change, released 2.00.
+
+1997-03-31  Andreas Koenig
+
+	* 1.99_01
+
+	* 1.99_01 is the designated 2.00.
+
+	* Between 1.20 and 1.23 the method as_HTML was introduced and a
+	few code cleanups happened.
+
+	* 2.00 switches implementation to use *ENTRY{XXX} internally. This
+	means that we can determine scalarness even for undefined scalars.
+	We don't expect unknowns anymore.
+
+	* 2.00 introduces the new ios() method which should replace the
+	older filehandles() and dirhandles() methods. For backwards
+	compatibility the old methods continue to work as they used to.
+
+	* 2.00 comes with isa_tree and inh_tree utility methods for
+	analysing the inheritance tree. Devel::Symdump objects may be used
+	to create snapshots, but their typical use would be as class
+	methods.
+
+1995-08-16  Andreas Koenig
+
+	* 1.20
+
+	* test 7 of t/symdump.t was too capricious. In fact the test was
+	based on wrong assumptions about loaded packages in the perl
+	binary. Static perls and dynamic perls have different symbol
+	tables when they run thetests. So test 7 is gone.
+
+	* test 4 of t/symdump.t relied on $@ being set like in perl5.001m.
+	This might not be a correct assumption. So test 4 is replaced with
+	a dummy 'print ok' until the $@ problem is sorted out
+
+1995-07-03  Andreas Koenig
+
+	* 1.19
+
+	* Added an as_string method.
+
+	* Rewrote the test scripts so they output standard test strings
+	"ok nnn". This is dangerous for new perl releases, but will help
+	me do get bug reports early.
+
+	* Renamed the exporting example package to Devel::Symdump::Export.
+
+1995-05-29  Andreas Koenig
+
+	* 1.16
+
+	* Changed '${pack}::' and relatives back to "$pack\:\:" to make
+	the package "-w" safe. Deleted the debug statement in _doit()
+	after Gurusamy Sarathy fixed the bug in perl5.001, but left a
+	comment there.
+
+	* Changed the AUTHORS section to plain "Andreas & Tom".
+
+	* Added this Changes file :)
+
+1995-05-28  Andreas Koenig
+
+	* 1.14
+
+	* After a considerable amount of mail exchange between Tom and me,
+	we now have a unknowns() method for all the rest in the symbol
+	table that we currently don't follow further. new() is renamed to
+	rnew() which stands for recursive new. new() now does not go into
+	recursion which becomes the default behaviour for people calling
+	directly Devel::Symdump->arrays etc.
+
+	* Added a Devel::Symdump::Exp package for Tom who wanted the
+	methods exported. Tom had tried to add Exporter to the package and
+	to export the undefined methods directly. Andreas didn't trust
+	this trick although it seemed to work fine. So they are still
+	considering if it can be done.
+
+1995-05-27  Andreas Koenig
+
+	* 1.09
+
+	* Drops all prettyprint functionality and becomes a primitiv
+	package after some talk with Tom Christiansen and Gurusamy
+	Sarathy. Moreover, Dean Roehrich's additions to the perlbot
+	manpage gave me (Andreas) some hints about package globals which
+	now get a new dress within the object.
+
+1995-05-xx  Andreas Koenig
+
+	* 1.05
+
+	* First release of the formerly Devel::Debug called package.
+
+	Local Variables:
+	mode: change-log
+	change-log-default-name: "Changes"
+	End:

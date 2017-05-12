@@ -1,0 +1,93 @@
+NAME
+    Data::FormValidator::Constraints::CreditCard - Data constraints, using
+    Business::CreditCard
+
+SYNOPSIS
+      use Data::FormValidator::Constraints::CreditCard qw(:all);
+
+      constraint_methods => {
+          cc_number     => [
+            # number is syntactically valid
+            FV_cc_number(),
+
+            # verify type, by value
+            FV_cc_type(qw(Visa MasterCard)),
+
+            # verify type, by regex
+            FV_cc_type(qr/visa|mastercard/i),
+            ],
+
+          # expiry month is within valid range
+          cc_exp_mon    => FV_cc_expiry_month(),
+
+          # expiry year is not in the past
+          cc_exp_year   => FV_cc_expiry_year(),
+
+          # full expiry date is not in the past
+          cc_expiry     => FV_cc_expiry(),
+      },
+
+DESCRIPTION
+    "Data::FormValidator::Constraints::CreditCard" provides several methods
+    that can be used to generate constraint closures for use with
+    "Data::FormValidator" for the purpose of validating credit card numbers
+    and expiry dates, using "Business::CreditCard".
+
+METHODS
+    FV_cc_number()
+        Creates a constraint closure that returns true if the constrained
+        value appears to be a valid credit card number.
+
+        NOTE: "appears to be a valid credit card number" ONLY means that the
+        number appears to be valid and has passed the checksum test; -NO-
+        tests have been performed to verify that this is actually a
+        real/valid credit card number.
+
+    FV_cc_type(@set)
+        Creates a constraint closure that returns true if the constrained
+        value appears to be a credit card of one of the types listed in the
+        given @set. The @set can be provided as either a list of scalars
+        (which are compared using the "eq" operator), or as a list of
+        regular expressions.
+
+        For more information on the actual card types that can be checked
+        for, please refer to the information for the "cardtype()" method in
+        "Business::CreditCard".
+
+    FV_cc_expiry()
+        Creates a constraint closure that returns true if the constrained
+        value appears to be a valid credit card expiry date; correct integer
+        values for year/month, with the date not being in the past.
+
+        Accepted formats include "MM/YY" and "MM/YYYY".
+
+        NOTE: use of this method requires that the full credit card expiry
+        date be present in a single field; no facilities are provided for
+        gathering the month/year data from two separate fields.
+
+    FV_cc_expiry_month()
+        Creates a constraint closure that returns true if the constrained
+        value appears to be a valid credit card expiry month; an integer in
+        the range of "1-12".
+
+    FV_cc_expiry_year()
+        Creates a constraint closure that returns true if the constrained
+        value appears to be a valid credit card expiry year; an integer
+        value for a year, not in the past.
+
+        Expiry years can be provided as either "YY" or "YYYY". When using
+        the two-digit "YY" format, the year is considered to be part of the
+        sliding window 1970-2069.
+
+AUTHOR
+    Graham TerMarsch (cpan@howlingfrog.com)
+
+COPYRIGHT
+    Copyright (C) 2008, Graham TerMarsch. All Rights Reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same license as Perl itself.
+
+SEE ALSO
+    Data::FormValidator, Business::CreditCard.
+

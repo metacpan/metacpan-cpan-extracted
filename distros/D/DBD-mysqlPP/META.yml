@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               DBD-mysqlPP
+version:            0.07
+abstract:           ~
+author:
+    - Hiroyuki OYAMA <oyama@module.jp>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBI:         1
+    Net::MySQL:  0.08
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

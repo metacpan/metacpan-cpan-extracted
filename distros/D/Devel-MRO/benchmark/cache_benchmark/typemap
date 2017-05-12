@@ -1,0 +1,7 @@
+
+STASH* T_STASH
+
+INPUT
+
+T_STASH
+	$var = gv_stashsv($arg, TRUE);

@@ -1,0 +1,307 @@
+Revision history for Devel::Examine::Subs
+
+1.69    2017-02-03
+        - no operational/functional changes
+        - forgot to add the t/57-heredoc-bug.t test file to MANIFEST, and this
+          caused off-by-one test failures on Testers
+
+1.68    2017-02-01
+        - merge pull request #13, changes PPIs "content" with "serialize", as
+          the former can mangle heredocs (thanks Varadinksy)
+        - migrated the test files accompanying the PR into the normal test suite
+        - added check in _read_file() to see if the file is a proper file
+        - merged in PR #14 and PR #15 with some minor changes. Both PRs dealt
+          with POD fixes and clarifications (thanks Anthony Brummett (brummett))
+
+1.67    2016-03-14
+        - bump version of File::Edit::Portable prereq to v1.24 due to bug fixes
+          in previous versions of that module (File::Edit::Portable #35)
+        - corrected logic in t/05-object.t tests and verified with accuracy
+          that all tests are correct and working (fixes #11)
+        - fixed test in t/21-core_dump.t to accommodate FEP updates
+
+1.66    2016-02-23
+        - order() dies if it's called on a directory structure, as opposed to a
+          single file (closes #9)
+        - changed all croak()s to confess() for better diagnostic output
+        - POD fixes (closes #8)
+        - bumped prereq of Mock::Sub to 1.06
+        - bumped prereq of File::Edit::Portable to 1.19
+
+1.65    2016-02-07
+        - bumped prereq ver of File::Edit::Portable to 1.18
+
+1.64    2016-02-04
+        - removed erroneous build requirement that negated the File::Edit::Portable
+          prereq_pm version update, allowing tests to continue to fail on some
+          versions of FreeBSD
+
+1.63    2016-02-03
+        - added backup(), set/get status of _read_file() creating a '.bak' copy
+          of each file on every read. Defaults to disabled (0) (fixes #7)
+        - _read_file() now compares the file's line endings with that of the
+          platform, and skips creating a tempfile if they match (performance).
+          (fixes #4)
+        - re-implemented t/002-critic.t, if RELEASE_TESTING is enabled, and
+          Perl::Critic is installed
+        - cosmetic changes to tests and test data files to satisfy critic
+        - module() now checks to see if a module is already loaded, and then
+          unloads it if it wasn't (fixes #5)
+
+
+1.62    2016-01-26
+        - we now require File::Edit::Portable v1.17, due to an issue in the
+          previous version where an flock() problem in FBSD 10.1 and 9.2 amd64
+          was causing tests to fail on those platforms
+
+1.61    2016-01-18
+        - _write_file() was breaking with file is a dir param and no copy param
+          was sent in (closes #3)
+
+1.60    2016-01-16
+        - no functional changes
+        - POD updates
+
+1.59    2016-01-14
+        - 100% test coverage!
+        - when file param is a directory, we now use the copy param as a dir,
+          create that dir, and copy all the files in the file param to it, and
+          operate on those (in operations that write to files)
+        - add_functionality() now checks to see if the sub being added already
+          exists (closes #2)
+        - true value at end of module remains in the correct place (closes #1)
+
+1.58    20151230
+        - _proc() now sets $p->{order}, which keeps track of the original order
+          of subs in the file being worked on 
+        - added order(), returns the list of sub names in the order they appear
+          in the file
+        - fixed minor issues in a couple of unit test files (file cleanup on 
+          windows wasn't working correctly)
+        - removed 'blead' from travis
+        - win32 tests in CPAN Testers should be ok again after last dev version
+        - re-enable t/24-preproc (seems to be working on win32 again)
+
+1.57_01   20151120
+        - certain deprications will be necessary after the rest of the module
+          is rewritten to use PPI where it currently isn't
+        - reworked _read_file(), it now populates $self->{params}{file_contents}
+          from a PPI doc
+        - _proc() modified to use PPI to get the sub code from the file,
+          instead of extracting it out manually out of an array slice by
+          counting line nums
+        - $subs struct no longer has a copy of the entire file contents in each
+          sub. This reduces the size of the data and all objects significantly
+
+1.56    20151029
+        - no noticeable functional changes
+        - most examples have been removed as unnecessary
+        - extra check put in before we clobber *trace() in BEGIN
+
+1.55    20151022
+        - no functional changes
+        - runs down to perl v5.8
+        - removed all features beyond 5.8 (defined-or, each on array etc)
+
+1.53    20151019
+        - reorganized tests as extensions.t was breaking on windows due to
+          the same number of files not being used
+
+1.52    20151016
+        - inject() with line_num param now uses File::Edit::Portable::splice()
+        - inject() w/ inject_use param uses the same as inject() w/ line_num
+
+1.51    20151015
+        - API CHANGE: extensions param changed to accept what
+          File::Find::Rule::name takes, as opposed to just the extensions less
+          the dot
+        - _run_directory() now uses File::Edit::Portable::dir() for finding
+          files
+        - Travis-CI integration
+        - inject() now allows a line_num param along with a code param, will
+          inject the block of code in the array ref immediately after the
+          line number in the file
+        - File::Find prereq removed, we now use File::Edit::Portable for
+          everything
+        - add_functionality() now injects the new sub, updates the dispatch
+          table in all three core phases (pre_proc, engine, post_proc)
+
+1.46    20150930
+        - renamed everything from pre_filter to post_proc
+        - removed test that was failing across platforms (t/24)
+
+1.45    20150930
+        - module() now allows just a single string param
+          "$des->module('Data::Dumper')". Backwards compatibility has remained
+        - _read_file() now uses File::Edit::Portable read()
+        - _write_file() now uses File::Edit::Portable write()
+        - internally, _subs() has been renamed to _proc()
+        - reduced the size of the data and instance by ~50% (according to
+          core_dump)
+        - new prereq: File::Basename (fixes bug where module file bak couldn't
+          be saved)
+        - fixed "use Symbol;" to import 'delete_package'
+        - re-enabled t/24-pre-proc tests
+
+1.43    20150923
+        - search_replace() now takes a coderef that encompasses the
+          substitution regex info
+        - new replace() method, similar to search_replace(), but works on
+          entire file. See examples/ver.pl
+        - added/updated tests
+
+1.41    20150922
+        - fix problems with forcing CPAN Testers to honour perl v5.012
+        - disabled t/24 preproc tests
+
+1.39    20150921
+        - Tie::File no longer needed, we have our own built-in read/write
+          methods
+        - upon reading in a file, the line endings are saved, then completely
+          removed
+          prior to the file array being populated. Upon write, the saved line
+          endings are added back in to each line
+        - hundreds of new tests across numerous files
+        - fixed a couple bugs in inject_after() relating to Tie::File removal
+        - modules now have their version applied in the 'package' line
+        - min perl version is 5.012;
+
+1.35    20150917
+        - reworked Makefile.PL, allows tests on MSWin32 to pass
+        - we now look in all files to determine and set line-ending
+          characters program-wide
+        - added a '\r\n' file and added a test
+
+1.33    20150916
+        - re-added Devel::Trace::Subs integration in a way that the module
+          won't break install if DTS isn't installed
+
+1.32    20150915
+        - moved repo from bitbucket to https://github.com/stevieb9/devel-examine-subs
+        - removed Devel::Trace::Subs integration... breaks CPAN install because
+          of the circular dependency
+
+1.31    20150915
+        - Devel::Trace::Subs has been introduced. See DEBUGGING in
+          'perldoc Devel::Examine::Subs'
+        - code injection now has much more reliable indenting
+
+1.30    20150914
+        - inject_after() no longer adds a new empty line after code is
+          inserted
+        - fixed bug where Module::Name wasn't being required properly
+        - added 'inject_after_sub_def' param to inject() preproc
+
+
+1.29    20150913
+        - added inject(), with 'inject_use' parameter
+        - added remove(), which operates at the file level
+        - fixed a couple of undef warnings in inject_after()
+
+1.28    
+        - Data::Compare to compare for caching
+        - cache is now working again
+        - added cache (default off) persistent param
+        - added cache_dump transient param
+        - all public methods (less run()) now take a hash as params
+          (as opposed to hash ref).
+        - pre_filters are now accepted in an aref if there are more than one:
+          ['string', $cref, 'string'] etc.
+
+1.27    20150813
+        - 'regex' param now enabled by default
+        - new 'objects_as_hash' param
+
+1.24    20150812
+        - fixes bug 54: implement _clean_config()
+        - fixes bug 56: allow 'file' param to be a module name
+        - params are separated into persistent and transient
+        - all params are now validated
+        - transient params get reset after each run()
+        - added valid_params()
+        - major pod rework
+
+1.23    20150811
+        - removed all traces of cache
+        - dependency fixes
+        - cleaned up POD
+        - fixed typos and PPI var names
+        - added POD for Engine and Prefilter
+        - ./Build dist
+
+1.20_01 20150723
+        - engine framework in place
+        - uses pre_proc, pre_filter and engine callbacks
+        - callbacks can be sent in by user code
+        - search uses optional regex
+        - directory or file can be sent in
+        - refined objects, they now have 'lines'
+        - began making things more generic
+        - can search/replace and inject code
+        - can cache results in directory searching
+        - countless bug fixes        
+
+1.17    20150715
+        - implemented PPI sub checking, much safer
+        - removed the old _subs() that was not PPI-based
+        - most everything is OO based now
+        - all core parameters are set into $self through _config()
+        - basic consolidation of error checking in _config()
+        - extensive refactoring to make tests pass
+        - separate out the ::Sub.pm module into its own file
+        - bug 12 fix: new() now sets $self->{file} for use by other methods
+        - bug 14 fix: add file validation: done in _config()
+        - bug 13 fix: new() now accepts 'file' param
+        - new test for 'search'
+        - many other test additions/updates
+        - test for ::Sub
+        - test for _config() 
+
+        To consider:
+        - need to sort out esc/unescape for 'search'
+
+1.11    20150714
+        - fixed bug where only one line was being added for has_lines
+
+1.10    20150714
+        - added bool 'lines' param to has()
+        -- returns hash of arrays of hashes
+        - updated POD
+        - new tests for has() (lines)
+
+1.09    20150714
+        - added module()
+        -- return all subs found in a running module
+        - cleaned up POD/Readme
+
+1.07    20150630
+        - added sublist()
+        - similar to line_numbers(), but returns a list of
+          objects that have start(), stop(), name() and count()
+          methods
+
+0.14    20150624
+        - added line_numbers()
+        - retrieves line numbers for the start and end of each
+          function
+
+0.07    20120330
+        - fixes bug 11
+        - add new() method and allow object method calls
+
+0.06    20120330
+        - changed name of project from Devel::ExamineSubs
+          to Devel::Examine::Subs
+
+0.05    20120330
+        - changed API to all public calls to use href params
+
+0.02    20120330
+        - added tests
+        - dies() if number of params is not correct (consider
+          changing this internally)
+        - created repository on bitbucket
+
+0.01    20120330 
+        First version, released on an unsuspecting world.
+

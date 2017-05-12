@@ -1,0 +1,36 @@
+{
+   "abstract" : "DHTMLX Perl connector",
+   "author" : [
+      "Jos\u00e9 Eduardo Perotta de Almeida <eduardo@web2solutions.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120530",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DHTMLX-Connector",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "0",
+            "Locale::Currency::Format" : "0",
+            "XML::Mini::Document" : "0",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.002"
+}
+

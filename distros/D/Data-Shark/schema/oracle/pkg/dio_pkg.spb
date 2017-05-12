@@ -1,0 +1,235 @@
+create or replace package body sharkapi2.dio_pkg is
+
+procedure dio_duplicate(vnew_id       in out integer,
+                        vcd_id        in integer)
+  is
+    c_name varchar2(64);
+    c_id   integer;
+  begin
+    /* grab new key */
+    sharkapi2.util_pkg.get_seqkey('core_dio', c_id);
+
+    vnew_id := c_id;
+
+    /* make a new name */
+    select cd_name || '_' || to_char(c_id)
+      into c_name
+      from sharkapi2.core_dio
+     where cd_id = vcd_id;
+ 
+    /* new DIO record */
+    insert into core_dio (cd_id,cd_namespace,cd_name,cd_version,cd_sysclass,cd_type,cd_return, cd_profile, cd_cache, cd_stmt, cd_stmt_noarg, cd_repl, cd_action,cd_audit) select c_id,cd_namespace,c_name,cd_version,cd_sysclass,cd_type,cd_return, cd_profile, cd_cache,cd_stmt,cd_stmt_noarg, cd_repl, cd_action, cd_audit from core_dio where cd_id = vcd_id;
+ 
+    /* new in/out key records */
+    insert into core_dio_inkey (ci_cd_id,ci_name,ci_pos,ci_req,ci_default,ci_key) select c_id,ci_name,ci_pos,ci_req,ci_default,ci_key from core_dio_inkey where ci_cd_id = vcd_id;
+    insert into core_dio_outkey (co_cd_id,co_name,co_pos,co_default,co_key) select c_id,co_name,co_pos,co_default,co_key from core_dio_outkey where co_cd_id = vcd_id;
+ 
+    insert into core_dio_cache_exp (ce_cd_id, ce_exp_id) select c_id, ce_exp_id from core_dio_cache_exp where ce_cd_id = vcd_id;
+ 
+    insert into core_dio_cache_exp_key (ck_cd_id, ck_exp_id, ck_key) select c_id, ck_exp_id, ck_key from core_dio_cache_exp_key where ck_cd_id = vcd_id;
+
+  end dio_duplicate;
+
+procedure dio_insert(vcd_id           in out integer,
+                     vcd_namespace    in varchar2,
+                     vcd_name         in varchar2,
+                     vcd_version      in varchar2,
+                     vcd_sysclass     in varchar2,
+                     vcd_type         in varchar2,
+                     vcd_return       in varchar2,
+                     vcd_profile      in varchar2,
+                     vcd_cache        in varchar2,
+                     vcd_cache_expire in varchar2,
+                     vcd_stmt         in varchar2,
+                     vcd_stmt_noarg   in varchar2,
+                     vcd_repl         in varchar2,
+                     vcd_action       in varchar2,
+                     vcd_audit        in varchar2)
+  is
+    c_id integer;
+  begin
+    /* grab key if needed */
+    if (vcd_id is null or vcd_id = 0) then
+      sharkapi2.util_pkg.get_seqkey('core_dio', c_id);
+    else
+      c_id := vcd_id;
+    end if;
+
+    /* insert record */
+    insert into sharkapi2.core_dio
+      (cd_id,cd_namespace,cd_name,cd_version,cd_sysclass,cd_type,cd_return,
+       cd_profile,cd_cache,cd_cache_expire,cd_stmt,cd_stmt_noarg,cd_repl,
+       cd_action,cd_audit)
+    values
+      (c_id,vcd_namespace,vcd_name,vcd_version,vcd_sysclass,vcd_type,vcd_return,
+       vcd_profile,vcd_cache,vcd_cache_expire,vcd_stmt,vcd_stmt_noarg,vcd_repl,
+       vcd_action,vcd_audit);
+
+    vcd_id := c_id;
+  end dio_insert;
+
+procedure dio_update(vcd_id           in integer,
+                     vcd_namespace    in varchar2,
+                     vcd_name         in varchar2,
+                     vcd_version      in varchar2,
+                     vcd_sysclass     in varchar2,
+                     vcd_type         in varchar2,
+                     vcd_return       in varchar2,
+                     vcd_profile      in varchar2,
+                     vcd_cache        in varchar2,
+                     vcd_cache_expire in varchar2,
+                     vcd_stmt         in varchar2,
+                     vcd_stmt_noarg   in varchar2,
+                     vcd_repl         in varchar2,
+                     vcd_action       in varchar2,
+                     vcd_audit        in varchar2)
+  is
+  begin
+    /* update record */
+    update sharkapi2.core_dio
+       set cd_namespace    = vcd_namespace,
+           cd_name         = vcd_name,
+           cd_version      = vcd_version,
+           cd_sysclass     = vcd_sysclass,
+           cd_type         = vcd_type,
+           cd_return       = vcd_return,
+           cd_cache        = vcd_cache,
+           cd_profile      = vcd_profile,
+           cd_cache_expire = vcd_cache_expire,
+           cd_stmt         = vcd_stmt,
+           cd_stmt_noarg   = vcd_stmt_noarg,
+           cd_repl         = vcd_repl,
+           cd_action       = vcd_action,
+           cd_audit        = vcd_audit
+     where cd_id           = vcd_id;
+  end dio_update;
+
+procedure dio_delete(vcd_id in integer)
+  is
+  begin
+
+    delete from sharkapi2.core_dio_inkey         where ci_cd_id  = vcd_id;
+    delete from sharkapi2.core_dio_outkey        where co_cd_id  = vcd_id;
+    delete from sharkapi2.core_dio_cache_exp_key where ck_exp_id = vcd_id;
+    delete from sharkapi2.core_dio_cache_exp     where ce_exp_id = vcd_id;
+    delete from sharkapi2.core_dio_cache_exp_key where ck_cd_id  = vcd_id;
+    delete from sharkapi2.core_dio_cache_exp     where ce_cd_id  = vcd_id;
+    delete from sharkapi2.core_dio               where cd_id     = vcd_id;
+
+  end dio_delete;
+
+/****/
+
+procedure dio_inkey_insert(vci_cd_id   in integer,
+                           vci_name    in varchar2,
+                           vci_pos     in integer,
+                           vci_req     in varchar2,
+                           vci_default in varchar2,
+                           vci_key     in varchar2,
+                           vci_inout   in varchar2,
+                           vci_opt     in varchar2)
+  is
+  begin
+
+  /* insert record */
+  insert into sharkapi2.core_dio_inkey
+    (ci_cd_id,ci_name,ci_pos,ci_req,ci_default,ci_key,ci_inout,ci_opt)
+  values
+    (vci_cd_id,vci_name,vci_pos,vci_req,vci_default,vci_key,vci_inout,vci_opt);
+
+  end dio_inkey_insert;
+
+procedure dio_inkey_update(vci_cd_id   in integer,
+                           vold_name   in varchar2,
+                           vci_name    in varchar2,
+                           vci_pos     in integer,
+                           vci_req     in varchar2,
+                           vci_default in varchar2,
+                           vci_key     in varchar2,
+                           vci_inout   in varchar2,
+                           vci_opt     in varchar2)
+  is
+  begin
+
+  /* update record */
+  update sharkapi2.core_dio_inkey
+     set ci_name    = vci_name,
+         ci_pos     = vci_pos,
+         ci_req     = vci_req,
+         ci_default = vci_default,
+         ci_key     = vci_key,
+         ci_inout   = vci_inout,
+         ci_opt     = vci_opt
+   where ci_cd_id   = vci_cd_id
+     and ci_name    = vold_name;
+
+  end dio_inkey_update;
+
+procedure dio_inkey_delete(vci_cd_id   in integer,
+                           vci_name    in varchar2)
+  is
+  begin
+
+  delete
+    from sharkapi2.core_dio_inkey
+   where ci_cd_id = vci_cd_id
+     and ci_name = vci_name;
+
+  end dio_inkey_delete;
+
+/****/
+
+procedure dio_outkey_insert(vco_cd_id   in integer,
+                            vco_name    in varchar2,
+                            vco_pos     in integer,
+                            vco_default in varchar2,
+                            vco_key     in varchar2,
+                            vco_inout   in varchar2)
+  is
+  begin
+
+  /* insert record */
+  insert into sharkapi2.core_dio_outkey
+    (co_cd_id,co_name,co_pos,co_default,co_key,co_inout)
+  values
+    (vco_cd_id,vco_name,vco_pos,vco_default,vco_key,vco_inout);
+
+  end dio_outkey_insert;
+
+procedure dio_outkey_update(vco_cd_id   in integer,
+                            vold_name   in varchar2,
+                            vco_name    in varchar2,
+                            vco_pos     in integer,
+                            vco_default in varchar2,
+                            vco_key     in varchar2,
+                            vco_inout   in varchar2)
+  is
+  begin
+
+  /* update record */
+  update sharkapi2.core_dio_outkey
+     set co_name    = vco_name,
+         co_pos     = vco_pos,
+         co_default = vco_default,
+         co_key     = vco_key,
+         co_inout   = vco_inout
+   where co_cd_id   = vco_cd_id
+     and co_name    = vold_name;
+
+  end dio_outkey_update;
+
+procedure dio_outkey_delete(vco_cd_id   in integer,
+                            vco_name    in varchar2)
+  is
+  begin
+
+  delete
+    from sharkapi2.core_dio_outkey
+   where co_cd_id = vco_cd_id
+     and co_name = vco_name;
+
+  end dio_outkey_delete;
+
+end dio_pkg;
+/
+show errors;

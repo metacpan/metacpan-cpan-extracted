@@ -1,0 +1,50 @@
+{
+   "abstract" : "Pretty printing of data structures as Ruby code",
+   "author" : [
+      "Steven Haryanto <stevenharyanto@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dump-Ruby",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Data-Dump-Ruby/",
+      "repository" : {
+         "url" : "http://github.com/sharyanto/perl-Data-Dump-Ruby"
+      }
+   },
+   "version" : "0.02"
+}
+

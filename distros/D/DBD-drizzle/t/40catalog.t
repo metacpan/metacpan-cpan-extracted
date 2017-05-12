@@ -1,0 +1,289 @@
+#!perl -w
+# vim: ft=perl
+
+use Data::Dumper;
+use Test::More;
+use DBI;
+use DBI::Const::GetInfoType;
+use lib '.', 't';
+require 'lib.pl';
+use strict;
+$|= 1;
+
+use vars qw($table $test_dsn $test_user $test_password);
+
+my $dbh;
+eval {$dbh= DBI->connect($test_dsn, $test_user, $test_password,
+                      { RaiseError            => 1,
+                        PrintError            => 1,
+                        AutoCommit            => 1,
+                        drizzle_server_prepare  => 0 });};
+
+if ($@) {
+    plan skip_all => "ERROR: $DBI::errstr. Can't continue test";
+}
+plan tests => 77;
+
+ok(defined $dbh, "connecting");
+
+my $sth;
+
+my ($version)= $dbh->selectrow_array("SELECT version()") 
+  or (print "ERROR code: $dbh->err errstr: $dbh->errstr\n" &&
+    die);
+
+#
+# Bug #26604: foreign_key_info() implementation
+#
+# The tests for this are adapted from the Connector/J test suite.
+#
+SKIP: {
+  #skip "Server is too old to support INFORMATION_SCHEMA for foreign keys", 16
+  #  if substr($version, 0, 4) < 2010;
+  
+    # this was a path to pain
+  skip "Drizzle forieign key information is a work in progress, skipping",
+  16 if 1 == 1;
+
+  ok($dbh->do(qq{DROP TABLE IF EXISTS child, parent}), "cleaning up");
+
+  ok($dbh->do(qq{CREATE TABLE parent(id INT NOT NULL,
+                                     PRIMARY KEY (id)) ENGINE=INNODB}));
+  ok($dbh->do(qq{CREATE TABLE child(id INT, parent_id INT,
+                                    FOREIGN KEY (parent_id)
+                                      REFERENCES parent(id) ON DELETE SET NULL)
+              ENGINE=INNODB}));
+
+  $sth= $dbh->foreign_key_info(undef, undef, "parent", undef, undef, "child");
+  my ($info)= $sth->fetchall_arrayref({});
+
+  is($info->[0]->{PKTABLE_NAME}, "parent");
+  is($info->[0]->{PKCOLUMN_NAME}, "id");
+  is($info->[0]->{FKTABLE_NAME}, "child");
+  is($info->[0]->{FKCOLUMN_NAME}, "parent_id");
+
+  $sth= $dbh->foreign_key_info(undef, undef, "parent", undef, undef, undef);
+  ($info)= $sth->fetchall_arrayref({});
+
+  is($info->[0]->{PKTABLE_NAME}, "parent");
+  is($info->[0]->{PKCOLUMN_NAME}, "id");
+  is($info->[0]->{FKTABLE_NAME}, "child");
+  is($info->[0]->{FKCOLUMN_NAME}, "parent_id");
+
+  $sth= $dbh->foreign_key_info(undef, undef, undef, undef, undef, "child");
+  ($info)= $sth->fetchall_arrayref({});
+
+  is($info->[0]->{PKTABLE_NAME}, "parent");
+  is($info->[0]->{PKCOLUMN_NAME}, "id");
+  is($info->[0]->{FKTABLE_NAME}, "child");
+  is($info->[0]->{FKCOLUMN_NAME}, "parent_id");
+
+$dbh->{AutoCommit} = 1;
+  ok($dbh->do(qq{DROP TABLE IF EXISTS child, parent}), "cleaning up");
+};
+
+#
+# table_info() tests
+#
+# These tests assume that no other tables name like 't_dbd_drizzle_%' exist on
+# the server we are using for testing.
+#
+SKIP: {
+  skip "Server can't handle tricky table names", 33
+    if $dbh->get_info($GetInfoType{SQL_DBMS_VER}) lt "2010.10";
+
+  my $sth = $dbh->table_info("%", undef, undef, undef);
+  is(scalar @{$sth->fetchall_arrayref()}, 0, "No catalogs expected");
+
+  $sth = $dbh->table_info(undef, "%", undef, undef);
+  ok(scalar @{$sth->fetchall_arrayref()} > 0, "Some schemas expected");
+
+  $sth = $dbh->table_info(undef, undef, undef, "%");
+  ok(scalar @{$sth->fetchall_arrayref()} > 0, "Some table types expected");
+
+  ok($dbh->do(qq{DROP TABLE IF EXISTS t_dbd_drizzle_t1, t_dbd_drizzle_t11,
+                                      t_dbd_drizzle_t2, t_dbd_drizzleat2,
+                                      `t_dbd_drizzle_a'b`,
+                                      `t_dbd_drizzle_a``b`}),
+              "cleaning up");
+  ok($dbh->do(qq{CREATE TABLE t_dbd_drizzle_t1 (a INT)}) and
+     $dbh->do(qq{CREATE TABLE t_dbd_drizzle_t11 (a INT)}) and
+     $dbh->do(qq{CREATE TABLE t_dbd_drizzle_t2 (a INT)}) and
+     $dbh->do(qq{CREATE TABLE t_dbd_drizzleat2 (a INT)}) and
+     $dbh->do(qq{CREATE TABLE `t_dbd_drizzle_a'b` (a INT)}) and
+     $dbh->do(qq{CREATE TABLE `t_dbd_drizzle_a``b` (a INT)}),
+     "creating test tables");
+
+  # $base is our base table name, with the _ escaped to avoid extra matches
+  my $esc = $dbh->get_info(14); # SQL_SEARCH_PATTERN_ESCAPE
+  (my $base = "t_dbd_drizzle_") =~ s/([_%])/$esc$1/g;
+
+  # Test fetching info on a single table
+  $sth = $dbh->table_info(undef, undef, $base . "t1", undef);
+  my $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_CAT}, undef);
+  is($info->[0]->{TABLE_NAME}, "t_dbd_drizzle_t1");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 1, "one row expected");
+
+  # Test fetching info on a wildcard
+  $sth = $dbh->table_info(undef, undef, $base . "t1%", undef);
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_CAT}, undef);
+  is($info->[0]->{TABLE_NAME}, "t_dbd_drizzle_t1");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is($info->[1]->{TABLE_CAT}, undef);
+  is($info->[1]->{TABLE_NAME}, "t_dbd_drizzle_t11");
+  is($info->[1]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 2, "two rows expected");
+
+  # Test fetching info on a single table with escaped wildcards
+  $sth = $dbh->table_info(undef, undef, $base . "t2", undef);
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_CAT}, undef);
+  is($info->[0]->{TABLE_NAME}, "t_dbd_drizzle_t2");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 1, "only one table expected");
+
+  # Test fetching info on a single table with ` in name
+  $sth = $dbh->table_info(undef, undef, $base . "a`b", undef);
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_CAT}, undef);
+  is($info->[0]->{TABLE_NAME}, "t_dbd_drizzle_a`b");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 1, "only one table expected");
+
+  # Test fetching info on a single table with ' in name
+  $sth = $dbh->table_info(undef, undef, $base . "a'b", undef);
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_CAT}, undef);
+  is($info->[0]->{TABLE_NAME}, "t_dbd_drizzle_a'b");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 1, "only one table expected");
+
+  # Test fetching our tables with a wildcard schema
+  # NOTE: the performance of this could be bad if the drizzle user we
+  # are connecting as can see lots of databases.
+  $sth = $dbh->table_info(undef, "%", $base . "%", undef);
+  $info = $sth->fetchall_arrayref({});
+
+  is(scalar @$info, 5, "five tables expected");
+  
+  # Check that tables() finds and escapes the tables named with quotes
+  $info = [ $dbh->tables(undef, undef, $base . 'a%') ];
+  like($info->[0], qr/\.`t_dbd_drizzle_a'b`$/, "table with single quote");
+  like($info->[1], qr/\.`t_dbd_drizzle_a``b`$/,  "table with back quote");
+  is(scalar @$info, 2, "two tables expected");
+
+  # Clean up
+  ok($dbh->do(qq{DROP TABLE IF EXISTS t_dbd_drizzle_t1, t_dbd_drizzle_t11,
+                                      t_dbd_drizzle_t2, t_dbd_drizzleat2,
+                                      `t_dbd_drizzle_a'b`,
+                                      `t_dbd_drizzle_a``b`}),
+              "cleaning up");
+};
+
+#
+# view-related table_info tests
+#
+SKIP: {
+  skip "Server is too old to support views", 19
+    if substr($version, 0, 1) < 5;
+
+  #
+  # Bug #26603: (one part) support views in table_info()
+  #
+  ok($dbh->do(qq{DROP VIEW IF EXISTS bug26603_v1}) and
+     $dbh->do(qq{DROP TABLE IF EXISTS bug26603_t1}), "cleaning up");
+
+  ok($dbh->do(qq{CREATE TABLE bug26603_t1 (a INT)}) and
+     $dbh->do(qq{CREATE VIEW bug26603_v1 AS SELECT * FROM bug26603_t1}),
+     "creating resources");
+
+  # Try without any table type specified
+  $sth = $dbh->table_info(undef, undef, "bug26603%");
+  my $info = $sth->fetchall_arrayref({});
+  is($info->[0]->{TABLE_NAME}, "bug26603_t1");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is($info->[1]->{TABLE_NAME}, "bug26603_v1");
+  is($info->[1]->{TABLE_TYPE}, "VIEW");
+  is(scalar @$info, 2, "two rows expected");
+
+  # Just get the view
+  $sth = $dbh->table_info(undef, undef, "bug26603%", "VIEW");
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_NAME}, "bug26603_v1");
+  is($info->[0]->{TABLE_TYPE}, "VIEW");
+  is(scalar @$info, 1, "one row expected");
+
+  # Just get the table
+  $sth = $dbh->table_info(undef, undef, "bug26603%", "TABLE");
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_NAME}, "bug26603_t1");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is(scalar @$info, 1, "one row expected");
+
+  # Get both tables and views
+  $sth = $dbh->table_info(undef, undef, "bug26603%", "'TABLE','VIEW'");
+  $info = $sth->fetchall_arrayref({});
+
+  is($info->[0]->{TABLE_NAME}, "bug26603_t1");
+  is($info->[0]->{TABLE_TYPE}, "TABLE");
+  is($info->[1]->{TABLE_NAME}, "bug26603_v1");
+  is($info->[1]->{TABLE_TYPE}, "VIEW");
+  is(scalar @$info, 2, "two rows expected");
+
+  ok($dbh->do(qq{DROP VIEW IF EXISTS bug26603_v1}) and
+     $dbh->do(qq{DROP TABLE IF EXISTS bug26603_t1}), "cleaning up");
+
+};
+
+#
+# column_info() tests
+#
+SKIP: {
+  ok($dbh->do(qq{DROP TABLE IF EXISTS t1}), "cleaning up");
+  ok($dbh->do(qq{CREATE TABLE t1 (a INT PRIMARY KEY AUTO_INCREMENT,
+                                  b INT,
+                                  `a_` INT,
+                                  `a'b` INT,
+                                  bar INT
+                                  )}), "creating table");
+
+  #
+  # Bug #26603: (one part) add drizzle_is_autoincrement
+  #
+  $sth= $dbh->column_info(undef, undef, "t1", 'a');
+  my ($info)= $sth->fetchall_arrayref({});
+  is($info->[0]->{drizzle_is_auto_increment}, 1);
+
+  $sth= $dbh->column_info(undef, undef, "t1", 'b');
+  ($info)= $sth->fetchall_arrayref({});
+  is($info->[0]->{drizzle_is_auto_increment}, 0);
+
+  #
+  # Test that wildcards and odd names are handled correctly
+  #
+  $sth= $dbh->column_info(undef, undef, "t1", "a%");
+  ($info)= $sth->fetchall_arrayref({});
+  is(scalar @$info, 3);
+  $sth= $dbh->column_info(undef, undef, "t1", "a" . $dbh->get_info(14) . "_");
+  ($info)= $sth->fetchall_arrayref({});
+  is(scalar @$info, 1);
+  $sth= $dbh->column_info(undef, undef, "t1", "a'b");
+  ($info)= $sth->fetchall_arrayref({});
+  is(scalar @$info, 1);
+
+  ok($dbh->do(qq{DROP TABLE IF EXISTS t1}), "cleaning up");
+  $dbh->disconnect();
+};
+
+
+$dbh->disconnect();

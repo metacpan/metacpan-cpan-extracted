@@ -1,0 +1,21 @@
+
+DBIx::Fun is a perl module to make calling database stored procedures easier.
+Check out the examples to see before and after examples and even a small MVC
+pattern with DBIx::Fun, Template Toolkit, and CGI::Application.
+
+Installation:
+
+  If you don't have Module::Build installed, you'll have to install it before
+you can use this module's installer.  That is the only dependency in this
+module.  The easiest way to install Module::Build is to do
+"perl -MCPAN -e 'install Module::Build'".
+
+There aren't really any tests at the moment.   The author recommends using
+the examples to verify functionality on your systems for now.
+ 
+  perl Build.PL
+  perl Build
+  perl Build test
+  perl Build install
+
+Please report bugs on http://rt.cpan.org.

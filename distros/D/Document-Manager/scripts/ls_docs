@@ -1,0 +1,184 @@
+#!/usr/bin/perl
+
+#use lib "/projects/clipart/share/perl/5.8.3/";
+#use lib "/projects/clipart/lib/perl/5.8.3/";
+#use lib "/projects/clipart/share/perl/5.8.4/";
+#use lib "/projects/clipart/lib/perl/5.8.4/";
+
+use Pod::Usage;
+use Getopt::Long;
+use SOAP::Lite;
+use SOAP::Lite::Utility;
+use strict;
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_resource = ($ENV{'DMS_RESOURCE'} or 
+                     'http://www.openclipart.org/Document/Manager');
+our $opt_server   = ($ENV{'DMS_SERVER'} or 'http://localhost:8012/');
+our $opt_debug    = 0;
+
+# Handle commandline options
+Getopt::Long::Configure ('bundling', 'no_ignore_case');
+GetOptions(
+           'version|V'    => \$opt_version,
+           'help|h'       => \$opt_help,
+           'man'          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+           );
+
+
+# Handle -V or --version
+if ($opt_version) {
+    print '$0: $Revision: 1.3 $', "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+
+exit main();
+
+
+sub main {
+    # Connect to the server
+    warn "Connecting to server...\n" if $opt_debug>1;
+    my $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the test service object
+    warn "Creating the DMS object\n" if $opt_debug>1;
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    my $dms = $response->result;
+
+    if (! $dms) {
+	die "Could not create dms object\n";
+    }
+
+    $response = $soap->query($dms);
+    soap_assert($response);
+
+    if (! $response->result) {
+	warn "No results received\n" if $opt_debug>0;
+	return -1;
+    }
+
+    use Data::Dumper;
+    printf("%-8s  %-24s  %-8s  %-8s  %-12s\n", 'ID', 'Title', 'State', 'Size', 'Date');
+    my $num_docs = 0;
+    foreach my $doc_id (@{$response->result}) {
+	next unless $doc_id;
+	$num_docs++;
+
+	$response = $soap->properties($dms, $doc_id);
+	soap_assert($response);
+	my $properties = $response->result;
+	if (! $properties ) {
+	    $response = $soap->get_error($dms);
+	    if (! $response or ! $response->result) {
+		warn "Unknown error retrieving document properties\n";
+	    } else {
+		warn $response->result, "\n";
+	    }
+	    next;
+	}
+
+        # PRINt Dumper($properties,$response->result,$response );
+
+        # print Dumper( $response->{'_content'}, $response-> );
+
+        # foreach my $field ($response)
+	# while ( my $field = $response->result )
+	# {
+        #    print Dumper($field);
+	# }
+
+
+	# print "$doc_id $properties";
+	printf("%08d  %-24s  %-8s  %-8s  %-12s\n", 
+	       $doc_id, 
+	       ($properties->{'title'} or ''), 
+	       ($properties->{'state'} or ''), 
+	       ($properties->{'size'} or ''), 
+	       ($properties->{'date'} or '')
+	       );
+    }
+    if ($num_docs == 0) {
+	print "No documents\n";
+    }
+    return 0;
+}
+
+
+__END__
+
+=head1 NAME
+
+ls_docs - lists documents in the document management system
+
+=head1 SYNOPSIS
+
+ls_docs [options]
+
+=head1 DESCRIPTION
+
+This tool lists the documents available in the Document Management
+System (DMS).
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the Document::Manager server to connect to.  By default,
+it uses 'http://localhost:8012'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.openclipart.org/Document/Manager'.  Users should not typically
+need to alter this setting.
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce Harrington E<lt>bryce@bryceharrington.orgE<gt>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce Harrington.com.  All Rights Reserved.
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.3 $
+
+=cut
+
+
+

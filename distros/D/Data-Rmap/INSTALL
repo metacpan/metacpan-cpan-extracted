@@ -1,0 +1,14 @@
+INSTALL INSTRUCTIONS FOR Data::Rmap
+
+perl Makefile.PL;
+make;
+make test;
+make install;
+
+OR
+
+perl Build.PL;
+./Build;
+./Build test;
+./Build install;
+

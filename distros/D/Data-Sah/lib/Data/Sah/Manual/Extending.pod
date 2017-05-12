@@ -1,0 +1,147 @@
+# ABSTRACT: Extending Data::Sah
+# PODNAME: Data::Sah::Manual::Extending
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Sah::Manual::Extending - Extending Data::Sah
+
+=head1 VERSION
+
+This document describes version 0.87 of Data::Sah::Manual::Extending (from Perl distribution Data-Sah), released on 2016-09-14.
+
+=head1 DESCRIPTION
+
+This document explains the various ways of extending L<Data::Sah>.
+
+=head1 ADDING A NEW CLAUSE
+
+Example: Add an C<is_palindrome> clause to C<str>.
+
+=over
+
+=item * Create a distribution called Data-Sah-TypeX-str-is_palindrome
+
+=item * In lib/Data/Sah/TypeX/str/is_palindrome.pm, write:
+
+ package Data::Sah::TypeX::str::is_palindrome;
+ use Data::Sah::Util::Compiler qw(add_clause add_translation_path);
+
+ add_clause("str", "is_palindrome",
+     definition => {
+     },
+     handlers => {
+         perl => sub {
+             ...
+         },
+         js => sub {
+             ...
+         },
+         human => sub {
+             ...
+         },
+     },
+ );
+
+=item * Provide translation of messages
+
+For example, for Indonesian, in
+lib/Data/Sah/Lang/id_ID/TypeX/str/is_palindrome.pm write:
+
+ package Data::Sah::Lang::id_ID::TypeX::str::is_palindrome:
+ ...
+
+Add more language files as necessary.
+
+=back
+
+=head1 CREATING A NEW TYPE
+
+Example: complex number.
+
+=over
+
+=item * Create distribution Data-Sah-Type-complex
+
+=item * In lib/Data/Sah/Type/complex.pm write:
+
+ package Data::Sah::Type::complex;
+
+ use Moo::Role;
+ use Data::Sah::Util::Role 'has_clause';
+ with 'Data::Sah::Type::Comparable';
+ with 'Data::Sah::Type::Sortable';
+
+ ...
+
+ 1;
+
+=item * In lib/Data/Sah/Compiler/perl/TH/complex.pm write:
+
+XXX
+
+=item * In lib/Data/Sah/Compiler/js/TH/complex.pm write:
+
+XXX
+
+=item * In lib/Data/Sah/Compiler/human/TH/complex.pm write:
+
+XXX
+
+=item * Provide translation of messages
+
+For example, for Indonesian, in lib/Data/Sah/Lang/id_ID/Type/complex.pm write:
+
+ package Data::Sah::Lang::id_ID::TypeX::str::is_palindrome:
+ ...
+
+Add more language files as necessary.
+
+=back
+
+=head1 ADDING A NEW FUNCTION
+
+XXX
+
+=head1 CREATING A NEW FUNCTION SET
+
+XXX
+
+=head1 CREATING A NEW COMPILER
+
+Take a look at one of the existing compilers like L<Data::Sah::Compiler::perl>
+or L<Data::Sah::Compiler::human>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

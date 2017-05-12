@@ -1,0 +1,34 @@
+---
+def12:
+  dh1:
+    a: def1a
+    b: def1b
+def22:
+  dh2:
+    a: def2a
+    c: def2c
+  usedef3: 1
+def32:
+  dh2:
+    d: def3d
+e:
+  usedef1: 1
+  usedef2: 0
+f:
+  usedef1: 1
+  usedef2: 1
+  dh1:
+    a: valFa
+g:
+  usedef1: 1
+  usedef2: 0
+  usedef3: 0
+  dh1:
+    b: valGb
+h:
+  usedef1: 1
+  usedef2: 1
+  usedef3: 0
+  dh1:
+    a: valHa
+    b: valHb

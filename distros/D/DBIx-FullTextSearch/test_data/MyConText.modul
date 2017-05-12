@@ -1,0 +1,232 @@
+
+=head1 NAME
+
+MyConText - Perl extension for indexing of documents in MySQL
+
+=cut
+
+package MyConText;
+use strict;
+
+use vars qw($errstr $VERSION);
+$errstr = undef;
+$VERSION = 0.13;
+
+sub open {
+	my ($class, $dbh, $TABLE) = @_;
+	$errstr = undef;
+	my ($cnt) = $dbh->selectrow_array("select count(*) from ${TABLE}_data");
+	if (not defined $cnt) {
+		$errstr = "Table ${TABLE}_data not found in the database, call create first";
+		return;
+		}
+	my %PARAMS = (
+		'num_of_docs' => 0,
+		'max_doc_id' => undef,
+		);
+	my $sth = $dbh->prepare("select * from ${TABLE}_param");
+	$sth->execute;
+	while (my ($param, $value) = $sth->fetchrow_array) {
+		if (exists $PARAMS{$param}) {
+			$PARAMS{$param} = $value;
+			}
+		}
+	my $self = bless {
+		'dbh' => $dbh,
+		'table' => $TABLE,
+		%PARAMS
+		}, $class;
+	$self;
+	}
+
+sub create {
+	my ($class, $dbh, $TABLE, $word_length) = @_;
+	$errstr = undef;
+	$word_length = 30 unless defined $word_length;
+	my $CREATE_DATA = <<EOF;
+		create table ${TABLE}_data (
+			word varchar($word_length) binary default '' not null,
+			idx longblob,
+			primary key (word)
+			)
+EOF
+	$dbh->do($CREATE_DATA) or do { $errstr = $dbh->errstr; return; };
+	my $CREATE_PARAM = <<EOF;
+		create table ${TABLE}_param (
+			param varchar(10) binary not null,
+			value integer,
+			primary key (param)
+			)
+EOF
+	$dbh->do($CREATE_PARAM) or do { $errstr = $dbh->errstr; return; };
+	$class->open($dbh, $TABLE);
+	}
+sub drop {
+	my $self = shift;
+	my $TABLE = $self->table;
+	$self->dbh->do("drop table ${TABLE}_data");
+	$self->dbh->do("drop table ${TABLE}_param");
+	delete $self->{'table'};
+	delete $self->{'dbh'};
+	undef;
+	}
+sub dbh { shift->{'dbh'}; }
+sub table { shift->{'table'}; }
+
+sub index_document {
+	my ($self, $id, $data) = @_;
+	return unless defined $id and defined $data;
+	my $dbh = $self->dbh;
+	my $TABLE = $self->table;
+	if (not defined $self->{'max_doc_id'} or $id > $self->{'max_doc_id'}) {
+		$self->{'max_doc_id'} = $id;
+		$dbh->do("replace into ${TABLE}_param values (?, ?)",
+			{}, 'max_doc_id', $id);
+		}
+	my %words = ();
+	for my $word ( map { lc $_ } grep { defined $_ and length $_ >= 2 } split /\W+/, $data)
+		{
+		$words{$word} = 0 if not defined $words{$word};
+		$words{$word}++;
+		} 
+	my $num_of_words = keys %words;
+	for my $word (keys %words) {
+		my ($pos, $shift) = $self->find_position($word, $id);
+### print STDERR "$word($id) -> ($pos, $shift)\n";
+		if (not defined $pos) {
+			$dbh->do("insert into ${TABLE}_data values (?, ?)", {},
+				$word, pack('SS', $id, $words{$word}));
+			}
+		elsif ($shift) {
+			$dbh->do("update ${TABLE}_data set idx =
+				concat(substring(idx,1,?),?,substring(idx,?+5))
+				where word = ?", {},
+				$pos, pack('SS', $id, $words{$word}), $pos, $word);
+			}
+		else {
+			$dbh->do("update ${TABLE}_data set idx =
+				concat(substring(idx,1,?),?,substring(idx,?+1))
+				where word = ?", {},
+				$pos, pack('SS', $id, $words{$word}), $pos, $word);
+			}
+		}
+	return ($num_of_words ? $num_of_words : '0E0');	
+	}
+sub find_position {
+	my ($self, $word, $doc) = @_;
+	my $dbh = $self->dbh;
+	my $TABLE = $self->table;
+	my ($length) = $dbh->selectrow_array(
+		"select length(idx)/4 from ${TABLE}_data where word = ?",
+			{}, $word);
+	
+	if (not defined $length) { return; }
+	$length = int($length);
+	my ($low, $top, $med, $val) = (0, $length);
+	if (not defined $self->{'max_doc_id'}) { $med = int(($top-$low)/2); }
+	else {	$med = int($doc/$self->{'max_doc_id'}*$top); }
+	$med = int(($top-$low)/2);
+	while ($low != $top) {
+		if ($top - $low < 6) {
+			my ($alldata) = $dbh->selectrow_array(
+				"select substring(idx,(?*4)+1,?) from ${TABLE}_data where word = ?",
+				{}, $low, ($top - $low) * 4, $word);
+			return unless defined $alldata;
+			my @docs = unpack 'S*', $alldata;
+			for (my $i = 0; $i < @docs; $i += 2) {
+### print STDERR "$low--$top |$i| $docs[$i] vs. $doc\n";
+				if ($docs[$i] == $doc) { return (($low+($i/2))*4, 1); }
+				if ($docs[$i] > $doc) { return (($low+($i/2))*4, 0); }
+				}
+			return ($top*4, 0);	
+			}
+		($val) = $dbh->selectrow_array(
+			"select substring(idx,(?*4)+1,2) from ${TABLE}_data where word = ?", {}, $med, $word);
+		if (not defined $val) { return; }
+		$val = unpack 'S', $val;
+		if ($val == $doc) { return ($med*4, 1); }
+		elsif ($val < $doc) { $low = $med + 1; }
+		else { $top = $med; }
+		$med = int(($top + $low) / 2);
+		}
+	return ($med*4, 0);
+	}
+sub contains {
+	my ($self, $word) = @_;
+	my $TABLE = $self->table;
+	my ($blob) = $self->dbh->selectrow_array(
+		"select idx from ${TABLE}_data where word like ?",
+		{}, $word);
+	return unless defined $blob;	
+	my @out;
+	my $pos = 0;
+	while ($pos < length $blob) {
+		my $str_doc = substr($blob, $pos, 3);
+		push @out, unpack 'S', $str_doc;
+		$pos += 4;
+		}
+	@out;
+	}
+
+1;
+
+=head1 SYNOPSIS
+
+	use MyConText;
+	use DBI;
+	my $dbh = DBI->connect('dbi:mysql:database', 'user', 'passwd');
+	my $ctx = create MyConText($dbh, 'ctx_web_1');
+	### my $ctx = open MyConText($dbh, 'ctx_web_1');
+
+	$ctx->index(1, 'krtek leze');
+	my @documents = $ctx->contains('krtek');
+
+
+=head1 DESCRIPTION
+
+MyConText is a pure man's solution for indexing documents. It uses the
+MySQL database for basic storing of the information and provides Perl
+interface for indexing new documents, making changes and searching for
+matches.
+
+MyConText uses a single table to store information about a collection
+of documents. These documents may also be stored in the database or it
+may be a bunch of web pages, anything. The only restriction is that
+these documents have to be indexed by integers.
+
+The first thing, you have to create the table. Call B<create> method,
+with the database handler $dbh and a desired name of the table as
+parameters. The optional third parameter is the length of the words
+that will be indexed, 30 by dafault. This method returns a MyConText
+object that you can work with:
+
+	my $ctx = create MyConText($dbh, 'ctx_web_1');
+
+If you already have the table created, you use a method B<open> that
+again returns a object:
+
+	my $ctx = open MyConText($dbh, 'ctx_web_1');
+
+Once you have the object, you can tell it to index a document:
+
+	$ctx->index(56, $a_very_long_html_page);
+
+The first argument is the integer identificator of the document, the
+second is the text of the document. This text will be splitted into
+words and an information about each word occurence will be recorded.
+
+Then, you can ask for a list of ids of documents that contain certain
+word:
+
+	my @documents = $ctx->contains('krtek');
+
+=head1 VERSION
+
+0.13
+
+=head1 AUTHOR
+
+(c) 1999 Jan Pazdziora, adelton@fi.muni.cz
+
+=cut
+

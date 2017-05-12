@@ -1,0 +1,27 @@
+Revision history for Dancer2-Plugin-Locale
+
+0.06  2016-12-30 22:03:39
+    - Issue #4 from_json() is not defined anymore
+    - Tests for lexicon file logic
+
+0.05  2016-05-27 07:16:00
+    - Convert to plugin2 (thanks SysPete!)
+
+0.04  2016-01-20 21:18:42
+    - Hack around https://github.com/PerlDancer/Dancer2/issues/1107
+    - Change rt to github
+    - WS fixups
+
+0.03  2015-08-19 18:49:10
+    - Use Dancer’s json function
+    - call locale as dsl method, drop no-op ||=, remove YAGNI comment
+    - rt 105533 (thanks DRUTHB!) fix Template dependency
+
+0.02  2015-05-25 19:02:34
+    - fix template keyword
+    - Do the TODO POD items about the object itself
+    - perl critic notations
+
+0.01  2015-01-24 09:49:59
+       Initial release.
+

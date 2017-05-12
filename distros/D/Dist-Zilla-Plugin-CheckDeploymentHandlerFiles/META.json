@@ -1,0 +1,71 @@
+{
+   "abstract" : "Check you've created the DH files for this version",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CheckDeploymentHandlerFiles",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "Dist::Zilla" : "0",
+            "File::ShareDir" : "0",
+            "File::pushd" : "0",
+            "Moose" : "0",
+            "namespace::autoclean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CheckDeploymentHandlerFiles" : {
+         "file" : "lib/Dist/Zilla/Plugin/CheckDeploymentHandlerFiles.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/Dist-Zilla-Plugin-CheckDeploymentHandlerFiles/issues"
+      },
+      "homepage" : "https://github.com/Altreus/Dist-Zilla-Plugin-CheckDeploymentHandlerFiles",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/Dist-Zilla-Plugin-CheckDeploymentHandlerFiles.git",
+         "web" : "https://github.com/Altreus/Dist-Zilla-Plugin-CheckDeploymentHandlerFiles"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>"
+   ]
+}
+

@@ -1,0 +1,153 @@
+Revision history for Dist-Zilla-PluginBundle-CSSON
+
+0.1103 2016-02-18 22:13:23 UTC
+ [Other Changes]
+ - Deprecated. Will be removed shortly.
+
+ [Stats & Dependency Changes]
+ - 9 files changed, 94 insertions(+), 292 deletions(-)
+ - (run req) ~ Moose 2.0000 --> 2.1405
+ - (run req) ~ MooseX::AttributeShortcuts (any) --> 0.028
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Types::Standard (any) --> 1.000005
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (run req) - Dist::Zilla
+ - (run req) - Dist::Zilla::Plugin::CheckChangesHasContent
+ - (run req) - Dist::Zilla::Plugin::ConfirmRelease
+ - (run req) - Dist::Zilla::Plugin::ContributorsFromGit
+ - (run req) - Dist::Zilla::Plugin::CopyFilesFromBuild
+ - (run req) - Dist::Zilla::Plugin::ExtraTests
+ - (run req) - Dist::Zilla::Plugin::FakeRelease
+ - (run req) - Dist::Zilla::Plugin::Git::Check
+ - (run req) - Dist::Zilla::Plugin::Git::Commit
+ - (run req) - Dist::Zilla::Plugin::Git::GatherDir
+ - (run req) - Dist::Zilla::Plugin::Git::Push
+ - (run req) - Dist::Zilla::Plugin::Git::Tag
+ - (run req) - Dist::Zilla::Plugin::GithubMeta
+ - (run req) - Dist::Zilla::Plugin::License
+ - (run req) - Dist::Zilla::Plugin::Manifest
+ - (run req) - Dist::Zilla::Plugin::ManifestSkip
+ - (run req) - Dist::Zilla::Plugin::MetaJSON
+ - (run req) - Dist::Zilla::Plugin::MetaNoIndex
+ - (run req) - Dist::Zilla::Plugin::MetaYAML
+ - (run req) - Dist::Zilla::Plugin::ModuleBuildTiny
+ - (run req) - Dist::Zilla::Plugin::NextRelease
+ - (run req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (run req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (run req) - Dist::Zilla::Plugin::PodSyntaxTests
+ - (run req) - Dist::Zilla::Plugin::PodWeaver
+ - (run req) - Dist::Zilla::Plugin::Prereqs::FromCPANfile
+ - (run req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (run req) - Dist::Zilla::Plugin::ReadmeAnyFromPod
+ - (run req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (run req) - Dist::Zilla::Plugin::ShareDir
+ - (run req) - Dist::Zilla::Plugin::Test::EOL
+ - (run req) - Dist::Zilla::Plugin::Test::Kwalitee::Extra
+ - (run req) - Dist::Zilla::Plugin::Test::NoTabs
+ - (run req) - Dist::Zilla::Plugin::TestRelease
+ - (run req) - Dist::Zilla::Plugin::TravisYML
+ - (run req) - Dist::Zilla::Plugin::UploadToCPAN
+ - (run req) - Dist::Zilla::Plugin::UploadToStratopan
+ - (run req) - File::chdir
+ - (run req) - Git::Wrapper
+ - (run req) - IPC::Run
+ - (run req) - Pod::Weaver::Config::Assembler
+ - (test req) + ExtUtils::MakeMaker (any)
+ - (test req) + File::Spec (any)
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (test req) - Test::NoTabs
+ - (test rec) + CPAN::Meta 2.120900
+ - (build req) - Module::Build
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (conf req) - Module::Build
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::CheckChangesHasContent 0.008
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::ConfirmRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680
+ - (dev req) + Dist::Zilla::Plugin::Deprecated (any)
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::ExecDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::Check (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::Git::GatherDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Push (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Tag (any)
+ - (dev req) + Dist::Zilla::Plugin::GithubMeta 0.54
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::License (any)
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::Manifest (any)
+ - (dev req) + Dist::Zilla::Plugin::ManifestSkip (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaJSON (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaNoIndex (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaProvides::Package 2.003001
+ - (dev req) + Dist::Zilla::Plugin::MetaYAML (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PodSyntaxTests (any)
+ - (dev req) + Dist::Zilla::Plugin::PodWeaver 4.006
+ - (dev req) + Dist::Zilla::Plugin::Prereqs (any)
+ - (dev req) + Dist::Zilla::Plugin::Readme (any)
+ - (dev req) + Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::RunExtraTests 0.028
+ - (dev req) + Dist::Zilla::Plugin::ShareDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::ReportPrereqs 0.021
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Dist::Zilla::Plugin::TestRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::TravisYML 1.15
+ - (dev req) + Dist::Zilla::Plugin::UploadToCPAN (any)
+ - (dev req) + Pod::Elemental::Transformer::List (any)
+ - (dev req) + Pod::Weaver::Plugin::SingleEncoding (any)
+ - (dev req) + Pod::Weaver::Plugin::Transformer (any)
+ - (dev req) + Pod::Weaver::PluginBundle::CorePrep (any)
+ - (dev req) + Pod::Weaver::Section::Authors (any)
+ - (dev req) + Pod::Weaver::Section::Collect (any)
+ - (dev req) + Pod::Weaver::Section::Generic (any)
+ - (dev req) + Pod::Weaver::Section::Homepage::DefaultCPAN 0.05
+ - (dev req) + Pod::Weaver::Section::Leftovers (any)
+ - (dev req) + Pod::Weaver::Section::Legal (any)
+ - (dev req) + Pod::Weaver::Section::Name (any)
+ - (dev req) + Pod::Weaver::Section::Region (any)
+ - (dev req) + Pod::Weaver::Section::Source::DefaultGitHub 0.07
+ - (dev req) + Pod::Weaver::Section::Version (any)
+ - (dev req) + Test::Version 1
+ - (dev req) + Test::Warnings 0.026
+ - (dev req) ~ Test::More (any) --> 0.88
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev sug) + Dist::Iller 0.1407
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0308
+
+0.1102 2015-01-07T18:57:27Z CET
+ [Enhancements]
+ - Make all Dzil plugin tests optional.
+
+0.1101 2015-01-07T18:27:41Z CET
+ [Meta]
+ - Added missing prereqs.
+
+0.1100 2015-01-07T18:06:42Z CET
+ [Enhancements]
+ - Make it easier to use travis
+ - Make it optional to run Test::Kwalitee::Extra
+ - Use DZ::PluginBundle::Author::CSSON
+
+ [Bug Fixes]
+ - Actually use settings..
+
+0.1000 2015-01-07T00:02:37Z CET
+ - Initial release

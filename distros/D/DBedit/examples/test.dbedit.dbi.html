@@ -1,0 +1,31 @@
+<table>
+
+
+<tr><td>item1</td><td><input name="item1" value=""></td></tr>
+<tr><td>item2</td><td><input name="item2" value=""></td></tr>
+</table>
+
+<%filter>
+my($table) = 'test_dbedit';
+
+use strict;
+use lib "/home/httpd/lib";
+use DBedit;
+use DBstorage::DBI;
+
+
+
+my ($dbh) = DBstorage::DBI->new('dbi:Pg:dbname=testDBI');
+my ($dbedit) = DBedit->new ({
+   "scan_table", $table,
+    "scan_page_length",	0, # length of page 0 if no paging
+   "scan_marker", "(edit)",
+   "append_marker", "Append record"});
+
+$dbedit->storage($dbh);
+$dbedit->table($table);
+$dbedit->keycols(["item1"]);
+$dbedit->form($_);
+
+$_ = $dbedit->process(\%ARGS);
+</%filter>

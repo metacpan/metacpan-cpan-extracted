@@ -1,0 +1,73 @@
+{
+   "abstract" : "Kit for Solitaire Medici",
+   "author" : [
+      "gugo <gugo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dreamhack-Solitaire-Medici",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dreamhack::Solitaire" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Dreamhack::Solitaire::Medici" : {
+         "file" : "lib/Dreamhack/Solitaire/Medici.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici/issues"
+      },
+      "homepage" : "https://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici",
+      "repository" : {
+         "url" : "git://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici.git",
+         "web" : "https://github.com/gugo-kaluga/Dreamhack-Solitaire-Medici"
+      }
+   },
+   "version" : "0.01"
+}

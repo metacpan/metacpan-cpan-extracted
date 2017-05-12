@@ -1,0 +1,280 @@
+NAME
+    DBIx::DBO2::Docs::Changes - Revision History
+
+CHANGES
+    Revision history for DBIx::DBO2:
+
+  Version 0.008
+
+    2004-04-04 Released to CPAN as DBIx-DBO2-0.008.tar.gz.
+
+    2004-04-03 Fixed use of deprecated
+    DBIx::SQLEngine::Criteria::StringEquality package; thanks to Robert
+    Rothenberg for the bug report.
+
+  Version 0.007
+
+    2004-03-30 Released to CPAN as DBIx-DBO2-0.007.tar.gz.
+
+    2004-03-30 Expunged old schema classes in favor of
+    DBIx::SQLEngine::Schema.
+
+    2004-03-26 Continued updates to work with DBIx::SQLEngine version 0.018.
+
+    2004-03-23 Beginning updates to work with DBIx::SQLEngine version 0.016.
+
+    2004-03-23 Moved POD files to a new Docs directory.
+
+  Version 0.006
+
+    2002-04-29 Released to CPAN as DBIx-DBO2-0.006.tar.gz.
+
+    2002-04-19 Addition of more types, rounding out range of calculated_
+    fields.
+
+  Version 0.005
+
+    2002-03-23 Distribution DBIx-DBO2-0.005.tar.gz.
+
+    2002-03-12 Addition of more field types, including first calculated_
+    fields.
+
+    2002-03-01 Fixed stringable_hash's run-time requires. Fixed missing
+    parentheses in Field type storable_hash.
+
+  Version 0.004
+
+    2002-03-01 Released to CPAN as DBIx-DBO2-0.004.tar.gz.
+
+    2002-03-01 Minimize field-specific dependencies via run-time requires.
+
+    2002-02-19 Additional tweaks to Fields storable_hash.
+
+    2002-02-14 Added Record install_hooks method to simplify hook sub
+    creation.
+
+    2002-02-13 Added Field types: storable_hash, stringified_hash.
+
+    2002-02-01 Added binary Field type.
+
+    2002-01-31 Fixed line_items fetch criteria.
+
+  Version 0.003
+
+    2002-01-31 Released to CPAN as DBIx-DBO2-0.003.tar.gz.
+
+    2002-01-31 Added comparison with other CPAN modules to ReadMe.
+
+    2002-01-26 Simon: Corrected Fields::alias(). Corrected Record's check of
+    hooks before deletion and insertion. Added interfaces to
+    Fields::line_items for cascade_delete, restrict_delete, and
+    nullify_delete interfaces.
+
+  Version 0.002
+
+    2002-01-25 Simon: Corrected dependency; we require DBIx-SQLEngine-0.003.
+    Eliminated pointless dependency on Perl 5.6.
+
+  Version 0.001
+
+    2002-01-21 Simon: Now using Composite::Inheritable hooks for post_fetch,
+    etc.
+
+    2002-01-17 Simon: Update of Fields to use new version of
+    Class::MakeMethods.
+
+    2002-01-15 Created centralized Changes and ToDo files.
+
+    2002-01-15 Added ColumnSet->as_hashes to simplify SQLEngine interface.
+
+    2001-12-01 Moved Adaptor and SQLWriter functionality to DBIx::SQLEngine.
+
+    2001-06-29 Updates.
+
+    2001-06-28 Moved query generation to SQLWriter.
+
+    2001-06-27 Moved to DBIx::DBO namespace. Flattened class hierarchy;
+    we're only going to support SQL. Expunged old code. Switched to
+    Class::MakeMethods
+
+VERSION HISTORY FOR DBO
+    2001-05-04 Simon: Expunged Table's old dependency on Mysql.pm.
+
+    2001-04-10 Piglet: Added @_ to Record save method.
+
+    2001-04-09 Simon: Added line_items attrib:
+    default_criteria=>[field=>value,...]
+
+    2001-03-07 Simon: added support for criteria in call to count_rows.
+
+    2001-02-07 Simon: Completed fields() method, and improved column attr
+    detection.
+
+    2001-02-07 Simon: Added change_and_save method to Record.
+
+    2001-01-30 Simon: Added _readable method for all number fields (for
+    ',000's).
+
+    2001-01-29 Simon: Filled in missing chunks of documentation for Fields.
+
+    2001-01-29 Simon: Added *_invalid methods and column-info detection.
+
+    2001-01-20 Simon: Added method_init method to Record.
+
+    2001-01-20 Simon: Added Fields saved_total_uspennies
+
+    2001-01-16 Simon: Added Fields saved_total
+
+    2000-12-?? Simon: Added Fields foreign_key and line_items types
+
+    2000-12-?? Simon: Added Fields currency_uspennies and timestamp
+
+    2000-12-15 Simon: Added table_or_die() to Record for better debugging
+    output.
+
+    2000-11-29 Simon: Initial use of parameters for insert and update
+    statements.
+
+    2000-11-29 Simon: Added re_init and de_init hooks to Record.
+
+    2000-08-04 Simon: Moved Record package into EBiz::Database.
+
+    2000-08-04 Simon: Moved Fields package into EBiz::Database.
+
+    2000-04-12 Simon: Check whether Record fetch is being called on instance
+    or class before blessing.
+
+    2000-03-30 Simon: Julian day readable now calls method to access value.
+
+    2000-03-10 Simon: Added Fields: get_and_set, get_set_filter.
+
+    2000-03-06 Simon: Added Fields: get_set_alias
+
+    2000-02-29 Simon: Created Fields method generator.
+
+    2000-01-07 Simon: Restored support for criteria passed as array to be
+    anded.
+
+    1999-10-21 Chaos: Added last_insert_id() for use with MySQL.
+
+    1999-10-08 Chaos: Altered sql_insert() to ignore columns with no values.
+
+    1999-10-08 Chaos: Altered quote_for_column() to preserve NULL values.
+
+    1999-09-26 Simon: Added Record subclassing import method.
+
+    1999-08-29 Chaos: Altered sql_quote() to use Mysql.pm's quoting.
+
+    1999-08-28 Chaos: Altered quote_for_column() to be less picky about
+    types.
+
+    1999-08-22 Simon: Added Record insert_row, delete_row
+
+    1999-08-17 Added delete_where().
+
+    1999-08-15 Simon: Corrected non-ref return of Record fetch; added
+    count_rows, delete_all
+
+    1999-08-04 Simon: Adjustments to Row.
+
+    1999-08-02 Richard: Created Record subclass.
+
+    1999-07-28 Tweaked generation of trivial_sql
+
+    1999-07-28 Added error handling for column_named.
+
+    1999-07-27 Simon: Created DBO::Row.
+
+    1999-07-27 Added use of DBO::Column package.
+
+    1999-07-27 Added use of DBO::Column package.
+
+    1999-02-21 Improved warnings in quote_for_column().
+
+    1999-01-31 Removed Data::Collection dependancy; now handlded by
+    Data::DRef.
+
+    1999-01-28 Fixed arrayref in column_named.
+
+    1999-01-28 Changed usage of column_named to list context.
+
+    1999-01-16 Changes to quoted_column_values: unjoined list, default
+    colnames
+
+    1998-11-01 Changed importing style for
+    Class::MethodMaker::Compatibility.
+
+    1998-11-01 Changed importing style for
+    Class::MethodMaker::Compatibility.
+
+    1998-10-05 Minor cleanups.
+
+    1998-08-10 Minor change.
+
+    1998-05-09 Moved connection behaviour from SQL Table into Adaptor
+    classes.
+
+    1998-05-08 Extended Tableto work with new DBMS package for
+    server-specific code.
+
+    1998-03-19 SQL table refactoring.
+
+    1998-03-15 Interface munged; doc added.
+
+    1998-03-12 DBAdaptor package (and subpackages) renamed to DBO::Table.
+
+VERSION HISTORY FOR DBAdaptor
+    1998-03-02 Added ensure_source_exists method.
+
+    1998-02-25 Moved columnset->flat_columns call out of sql_create.
+
+    1998-02-24 Fixed scoping of temp list in quoted_column_values.
+
+    1998-02-01 Some debugging on update and quoting methods.
+
+    1997-11-16 Cleanup.
+
+    1997-11-16 Added datasource registry
+
+    1997-11-06 Addidional mucking with interface.
+
+    1997-11-04 Updated to use SubclassFactory; reviewed code and added
+    comments
+
+    1997-10-15 Switched from msql to mysql, enhanced criteria.
+
+    1997-10-08 Added database selection for insert (if not loaded first).
+
+    1997-10-07 Query optimization for 'or' clauses and regex matching.
+
+    1997-10-03 Enhanced client-side/server-side criteria handling.
+
+    1997-09-24 IntraNetics97 Version 1.00.000
+
+    1997-09-03 Fixed the same typo in isstringinlist_criteria.
+
+    1997-09-02 Fixed typo in twiddle_criteria.
+
+    1997-08-11 Fixed the bug introduced by last night's minor change.
+
+    1997-08-10 Added isequal as synonym for equals to keep up with sql
+    criteria
+
+    1997-04-10 Changed handling of criteria.
+
+    1997-03-** Various changes
+
+    1997-02-20 Simon: General cleanup; record data moved to datastore.pm.
+
+VERSION HISTORY FOR Evo::msql
+    1997-02-01 Simon: Refactored existing code into adaptor subclasses.
+
+    1997-01-03 Simon: Added ()s around or'd sets of criteria
+
+    1996-09-08 Simon: Moved to Evo::msql.
+
+    1996-09-06 Simon: First build of database wrapper library.
+
+SEE ALSO
+    the DBIx::DBO2::ReadMe manpage
+

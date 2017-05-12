@@ -1,0 +1,25 @@
+---
+name: DateTime-Event-WarwickUniversity
+version: 0.05
+author:
+  - 'Tim Retout <tim@retout.co.uk>'
+abstract: Warwick University academic calendar events
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0
+  perl: 5.8.4
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+  Test::Pod: 0
+  Test::Pod::Coverage: 0
+provides:
+  DateTime::Event::WarwickUniversity:
+    file: lib/DateTime/Event/WarwickUniversity.pm
+    version: 0.05
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

@@ -1,0 +1,6 @@
+# $Id: PWD.factory,v 1.1 2004/01/05 22:09:41 mpeppler Exp $
+
+DB=
+SRV=SYBASE
+UID=sa
+PWD=

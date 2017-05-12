@@ -1,0 +1,250 @@
+Changes in DBD::SQLAnywhere 2.13 14 May 2015
+ Change ping() so that it never reports an error even if RaiseError is set. It only
+   returns a boolean. 
+ Added CONFIGURE_REQUIRES parameter.
+
+Changes in DBD::SQLAnywhere 2.12 17 Apr 2015
+ Fixed compliation problems with versions of ActivePerl that use MinGW, updated README.
+ Fixed statement preparsing to handle comments when looking for host variables.
+ Fixed problem with using "long long" with old Microsoft compilers.
+ Fixed some compiler warnings.
+ 
+Changes in DBD::SQLAnywhere 2.11 27 Apr 2012
+ dbd_st_fetch did not return Nullav (end-of-cursor indication) when attempting
+   to fetch from a statement that is execute-only and can't return any
+   row (such as INSERT).
+
+Changes in DBD::SQLAnywhere 2.10 15 September 2011
+ Corrected error reporting from more_results().
+
+Changes in DBD::SQLAnywhere 2.09 23rd August 2011
+ Added support for more_results() which permits access to multiple result sets.
+ Example:
+    $sth->execute();
+    do {
+	while (my $data = $sth->fetch) {
+	    print "@$data\n";
+	}
+    } while (defined $sth->more_results());
+
+Changes in DBD::SQLAnywhere 2.08 23rd November 2010, 10th January 2011
+  Prepare for removal of PERL_POLLUTE support.
+  Moved usage documentation into SQLAnywhere.pm as POD documentation. README
+    only contains information for building. CPAN search "all" function actually
+    only looks at the POD documentation.
+  table_info, etc now use SYSUSER rather than SYSUSERPERM. SYSUSERPERM was
+    deprecated in v10 and can only be read by DBA.
+
+Changes in DBD::SQLAnywhere 2.07 22nd October 2010
+  Somehow, the v2.06 package that I uploaded to PAUSE contained the old tests.
+    I'm just going to try again but that requires a new version number.
+  I also added a dependency on Test::Simple (which contains Test::More)
+
+Changes in DBD::SQLAnywhere 2.06 21st October 2010
+  Removed leak of bind_names hv for hostvars
+  Added PERL_NO_GET_CONTEXT for efficiency on threaded perl.
+  Changed tests to pass/skip if SQL Anywhere is not installed or demo.db
+    is not accessible.
+
+Changes in DBD::SQLAnywhere 2.05 19th October 2010
+  Fixed resource cleanup on failed connect
+  Added META.yml
+
+Changes in DBD::SQLAnywhere 2.04 19th October 2010
+  Used refcounting for SACAPI context since DBI can free driver handles
+    before all database handles have been destroyed.
+
+Changes in DBD::SQLAnywhere 2.03 4th December 2009
+  Fixed fetching of double/floating point values
+  Updated sacapi files.
+
+Changes in DBD::SQLAnywhere 2.02 1st October 2009
+  Previous driver (version 2.01) broke support to SQLAnywhere external through Perl. This
+    has been fixed.
+
+Changes in DBD::SQLAnywhere 2.01 2nd June 2009
+  Improved threading support with SACAPI v1 and added SACAPI v2 support.
+  Removed primary_key func (to rely on the one in DBI.PM)
+  Added statistics_info (returns NULL) and last_insert_rowid
+
+Changes in DBD::SQLAnywhere 2.00 9th May 2008
+  Changed to use simplified SQLAnywhere C API (SACAPI). The driver can now be built
+    without having SQLAnywhere installed but SQLAnywhere is required to use the driver.
+  Added support for the the get_info method.
+
+Changes in DBD::SQLAnywhere 1.16 2nd Nov 2007, 28th Feb 2008, 17th March 17 2008
+  (version 1.15 was not released)
+  Fixed installation location & increased version number so that we can detect it
+  Support new bin32/bin64 directories for SQLAnywhere 11.0 on Windows
+  Automated CPAN testing requires a successful exit from Makefile.PL if the module
+    cannot be built (due to libs not found). Go figure.
+
+Changes in DBD::SQLAnywhere 1.15 17th July 2007
+  (version 1.14 was not released)
+  Improved table_info routine
+  Added column_info, primary_key, primary_key_info routines
+
+Changes in DBD::SQLAnywhere 1.14 18th Jan 2007
+  (previous changes to 1.14 were not released)
+  Fixed UNIX builds. With the SQLAnywhere 10.0 release the bin and lib
+  directories in the UNIX install have been renamed to bin32/bin64 and
+  lib32/lib64. Fixed Makefile.PL to search for libraries in the correct path.
+
+Changes in DBD::ASAny 1.14 21th Nov 2006
+  (previous changes to 1.14 were not released)
+  Fixed Windows x64 builds.
+
+Changes in DBD::ASAny 1.14 7th Sept 2006
+  (previous changes to 1.14 were not released)
+  Added a manifest to the DLL for VS2005 builds.
+
+Changes in DBD::SQLAnywhere 1.14 9th Dec 2005
+  (previous changes to 1.14 were not released)
+  Renamed from DBD::ASAny to DBD::SQLAnywhere for Jasper release
+    which includes changes to use demo.db instead of asatest.db.
+  Added -D_CRT_SECURE_NO_DEPRECATE to avoid VS2005 warnings.
+  Cleaned up the README & the examples a bit.
+  Added README.NT with CRLF line endings.
+
+Changes in DBD::ASAny 1.14  29th Jan 2004, 5th Apr 2005
+  Parsing for placeholders assumed that only single-quotes could be used to 
+    delimit a string. Now, either single or double quotes can be used.
+  If fetch was called when there were no more rows, the driver set the err 
+    value to (integer) zero but DBI could interpret that as a warning because
+    it converted it to a string and saw that it was non-empty. We now set
+    err to the empty string.
+
+Changes in DBD::ASAny 1.13	7th Mar 2002, 3rd Sept 2003, 29th Oct 2003
+  Support 64bit UNIX platforms
+  Avoid compile-time warning about assign_blob()
+  Added /opt/sybase/SYBS* as default installation directories to search for ASA
+  An error was reported if execute() was called twice on the same statement
+    handle. Changed execute() to close a previously opened cursor using that
+    statement. Also, the prepared statement was being dropped during
+    finish() rather during destroy & that prevented the prepare_cache from
+    working.
+  Updated README to warn about resource governor errors now that statement
+    handles are not dropped until destroy time.
+  Set the "state" value on the handle when an error occurs.
+  Fetching 64-bit integers failed when they contained more than 8 digits
+    because we fetch them as strings but left the length as the size of the
+    bigint datatype (8 bytes).
+  Fixed additional compiler warnings from VC7.
+  Added CLONE method.
+  Added better handling for detecting new ASA versions -- should handle
+   up to version 15 now (version 9 is the highest shipping version).
+  Implemented the blob_read function which is an undocumented DBI API.
+  Changed the long string/binary fetching code so that long character strings
+    are fetched as varchar rather than binary so that character set translation
+    will be applied to the string.
+  Added a commit operation after a cursor is closed if AutoCommit is enabled.
+    Previously, a commit was only performed if a non-cursor statement was
+    executed. DML executed in procedures returning result sets were not
+    committed.
+  Added "-r" switch to sqlpp to generate thread-safe code.
+  Added dbtasks library to UNIX link lines.
+  Link against "_r" reentrant versions of ASA libraries when using ithreads
+    on UNIX platforms.
+  Avoid warning when building with VS.NET 2003 which has deprecated the
+    /Gf switch (automatically added by MakeMaker). Changed it to /GF.
+  Allow ASANY installation directory to be specified by the "ASANY{ver}"
+    environment variable (ASANY9, ASANY8, etc).
+
+Changes in DBD::ASAny 1.12	11th May 2001
+  Fixed a problem with inout parameters where binding other parameters can
+    cause us to find the incorrect location of the output parameter in the
+    output SQLDA.
+  Correctly handle NULL output parameters from procedures.
+  Removed some debug printfs that snuck into v1.10.
+  Corrected README to show that bind_param_inout is a supported function.
+  Do not treat warnings as errors (err/errstr are still set but the calls
+    to execute/fetch will not report a failure).
+
+Changes in DBD::ASAny 1.11	27th March 2001
+  Calling a procedure or batch that returned a result set for which
+    the engine could not infer the data types, errors were reported. Fixed
+    by describing the cursor after it was opened.
+
+Changes in DBD::ASAny 1.10	13th November 2000
+  Added support for AutoCommit.
+
+Changes in DBD::ASAny 1.09	21st September 2000
+  Added support for type_info_all and (indirectly) quote()
+  Added support for the following statement attributes:
+    TYPE, ASATYPE, SCALE, PRECISION, NULLABLE, CursorName,
+    Statement, and RowsInCache. 
+  	RowsInCache always returns undef.
+	ASATYPE returns an array of native ASA type codes which
+	  is more detailed than the ODBC-types returned
+	  by the TYPE attribute. ASA type codes correspond to
+	  integer values defined in sqldef.h or you can use
+	  ASA type codes directly by doing 'use DBD::ASAny qw(:asa_types);'
+  Changed handling of parameters to the connect() method to be more
+    consistent with other drivers.
+  Fixed a memory leak: space allocated for non-string, non-binary fields
+    of an output SQLDA were not freed.
+
+Changes in DBD::ASAny 1.08	15th August 2000
+  When executing a statement that affected zero rows, an error was
+    reported rather than success.
+  Fixed driver to build with ActivePerl build 616 and DBI 1.14.
+  Makefile now searches for SQLAnywhere in /opt/SYBSsa[6-9] as well as
+    /opt/SYBSasa[6-9].
+
+Changes in DBD::ASAny 1.07	17th May 2000
+  Fixed bug introduced in 1.06 - a statement that is prepared
+    then dropped before being used could cause a GPF.
+  Minor revision to license text.
+
+Changes in DBD::ASAny 1.06	10th March 2000
+  Added support for blobs and long strings. Values transferred to
+    or from the engine can be up to 2GB in size. Default LongReadLen
+    value for DBD::ASAny is 1MB. There is no default limit to
+    the length of string that can be written (there appears to be
+    no 'LongWriteLen' attribute in DBI).
+  Added support for treating strings as binary data. When sending
+    data to the engine (for an insert or update), the user must
+    provide the DBI::SQL_BINARY or similar type attribute in
+    a bind_param call. For fetching data, DBD::ASAny automatically
+    detects that a column is binary. If binary data is treated as
+    text it may be subjected to character set translation.
+  Removed reference to GNU public license/Artistic license.
+
+Changes in DBD::ASAny 1.05	25th January 2000
+
+  Added Sybase license agreement
+  Adding a call to db_fini when a connection attempt failed. Not calling
+    db_fini in this situation caused a memory leak.
+  Added better handling for detecting new ASA versions -- should handle
+   up to version 9 now (which doesn't exist yet...)
+
+Changes in DBD::ASAny 1.04	19th November 1999
+
+  Fixed inout parameter support.
+  Moved changes info from Makefile.PL to this file.
+
+Changes in DBD::ASAny 1.03	9th November 1999
+
+  Driver now builds on HPUX, AIX, Linux with native and GNU compilers.
+  Dynamically resize SQLDA for bind variables or output values if the
+    default size is not large enough.
+  Avoid "memory leak" caused by dblib holding onto cursor information
+    so that the cursor can be reopend without being redeclared.
+
+Changes in DBD::ASAny 1.02	21st October 1999
+
+  Driver should now be thread safe & it builds with the
+    threaded version of perl; however, perl threads and/or DBI
+    in a threaded environment is very unstable. Simple multithreaded
+    tests easily crash perl.
+
+Changes in DBD::ASAny 1.01	5th August 1999
+
+  Initial Win32 support by Matthew C. Keranen (mck@iag.net).
+  Win32 version requires ActivePerl (www.activestate.com).
+
+Changes in DBD::ASAny 1.00	8th December 1998
+
+  Changed SQL Anywhere driver (DBD::SQLAny) into Adaptive Server Anywhere
+    driver(DBD::ASAny)
+

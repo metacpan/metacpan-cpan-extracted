@@ -1,0 +1,36 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Test-MinimumVersion
+
+2.000007  2016-10-18
+    - Add Test::MinimumVersion as a develop prereq [rsrchboy]
+
+2.000006  2015-01-22
+    - Eliminate use of Moose::Autobox in tests [GH#5 - kentnl++]
+
+2.000005  2013-05-18
+    - Allow tests to run in parallel [GH#3 - kentnl++]
+
+2.000004  2013-04-02
+    - Fix spurious test failures with new deprecation warnings [GH#2]
+
+2.000003  2013-03-02
+    - Add max_target_perl to control the maximum perl we're
+      okay with requiring explicitly [GH#1 - xdg++]
+
+2.000002  2012-06-16
+    - Declare Dist::Zilla dependency
+    - Use a decimal version number
+
+2.0.1     2011-09-07
+    - Packaging updates
+
+v2.0.0    2011-09-07
+    - Renamed to Dist::Zilla::Plugin::Test::MinimumVersion
+
+1.101421  2010-05-22 18:01:53 Europe/Vienna
+
+1.101420  2010-05-22 18:00:19 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - list Test::MinimumVersion in dist.ini so we don't use() it anymore
+
+1.100700  2010-03-11 09:36:26 Europe/Vienna
+    - original version

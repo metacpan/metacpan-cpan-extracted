@@ -1,0 +1,722 @@
+#!/usr/local/bin/perl
+
+# stag-q
+# cjm@fruitfly.org
+
+use strict;
+no strict qw(vars);
+use Carp;
+use DBIx::DBStag;
+use Data::Stag qw(:all);
+use Data::Dumper;
+use Getopt::Long;
+use FileHandle;
+use Term::ANSIColor;
+
+my $h = {};
+$| = 1;
+
+my $dbname = '';
+my $connect;
+my $term;
+my @hist = ();
+my $XTERMMODE = 0;
+my $MLINEMODE = 0;
+my $TBLMODE = 0;
+my $PAGER = "less -fR";
+
+my $cscheme =
+  {
+   'keyword'=>'cyan',
+   'variable'=>'magenta',
+   'text' => 'reset',
+   'comment' => 'red',
+   'block' => 'blue',
+   'property' => 'green',
+  };
+
+my $dbimap;
+my $schema;
+GetOptions(
+           "dbname|d=s"=>\$dbname,
+           "connect|c"=>\$connect,
+	   "dbimap=s"=>\$dbimap,
+	   "schema|s=s"=>\$schema,
+          );
+if ($dbimap) {
+    $ENV{DBSTAG_DBIMAP_FILE} = $dbimap;
+}
+
+# parent dbh
+my $sdbh = 
+  DBIx::DBStag->new;
+
+# child dbh
+my $dbh;
+
+my $stag;
+my $res;
+my $loc;
+my $templates = [];
+my $varnames = [];
+my $options = {};
+my $nesting;
+my $rows = [];
+my $template;
+my $template_name = '';
+my %exec_argh = ();
+my $resources = $sdbh->resources_list;
+my $resources_hash = $sdbh->resources_hash;
+my @dbresl = grep {$_->{type} eq 'rdb'} @$resources;
+my @dbnames = (map {$_->{name}} @dbresl);
+my $W = Data::Stag->getformathandler('sxpr');
+my $ofh = \*STDOUT;
+$W->fh($ofh);
+$W->use_color(1);
+
+if ($connect) {
+    db($dbname);
+}
+else {
+    setdb($dbname) if $dbname;
+}
+
+shell();
+exit 0;
+
+
+sub shell {
+    my $prompt = $ENV{STAG_SHELL} || "Stag[\$dbname]\$template_name> ";
+    my $quit = 0;
+    my @lines = ();
+    my $r;
+    my $rv;
+    my $outfh;
+    my $return;
+    my $echo;
+    my $line;
+
+#    welcome;
+    require Term::ReadLine;
+    require Shell;
+
+    welcome();
+
+#    checkoptions;
+    $term = shift || Term::ReadLine->new($prompt);
+
+    my $rcfile = "$ENV{HOME}/.stagshellrc";
+    if (-f $rcfile) {
+        open(F, $rcfile);
+        @lines = <F>;
+        close(F);
+    }
+
+    my $end_signal = ";";
+    while (!$quit) {
+	my $line;
+        if ($MLINEMODE) {
+	    $line = '';
+	    my $thisline =
+	      $term->readline(prompt($prompt));
+	    if ($thisline =~ /^\\/ || $thisline =~ /^\w$/ ||
+		$thisline =~ /^\w\s+/ || $thisline =~ /^\//) {
+		$line = $thisline;
+	    }
+	    else {
+		while (1) {
+		    if($thisline !~ /(.*)$end_signal/) {
+			$line.= "$thisline\n";
+		    }
+		    else {
+			$line.= "$1\n";
+			last;
+		    }
+		    $thisline = $term->readline('- ');
+		}
+            }
+        }
+	else {
+	    $line =
+	      @lines ? shift @lines : $term->readline(prompt($prompt));
+	}
+        if ($line =~ /^\^/) {
+            $line =~ s/^\^//;
+            print "$prompt$line";
+            my $e = <STDIN>;
+            if ($e =~ /^q/) {
+                $line = "";
+                @lines = ();
+            }
+        }
+        if ($options->{echo} && $line !~ /[\+]wait/) {
+            if ($line =~ /^\#/) {
+                print "$line\n";
+            }
+            else {
+                print "$prompt$line\n";
+            }
+            if ($options->{sleep}) {
+                sleep $options->{sleep};
+            }
+            if ($options->{wait}) {
+                sleep $options->{wait};
+            }
+        }
+        my ($cmd, @w) = split(' ',$line);
+        my $rest = join(" ", @w);
+        $_ = $cmd;
+
+	addhist($line);
+
+	$line =~ s/\#[^\n]*\n*/\n/gs;
+        $line =~ s/^\s*select/:SELECT/i;
+
+        # : - sql tunnel and escape everything after in quotes
+        if ($line =~ /^:/) {
+            if ($line =~ /\!\s*$/) {
+                $line =~ s/\!\s*$//;
+                # interpolate
+                $line = eval("\"$line\"");
+            }
+            $line =~ s/^:/ sqlselect q\[/;
+            $line .= ']';
+        }
+        if ($line =~ /^\/\//) {
+#            $line =~ s/^\/\/(.*)/\@r = apph\-\>$1; print tree2xml\(\@r\)/;
+        }
+        if ($line =~ /^\//) {
+#            $line =~ s/^\//\@r = apph\-\>/;
+        }
+        if ($line =~ /^\\dd\s*(.*)/) {
+	    my $arg = $1 ? "('$1')" : '';
+	    $line = "dshowdbs $arg";
+        }
+        if ($line =~ /^\\d\s*(.*)/) {
+	    my $arg = $1 ? "('$1')" : '';
+	    $line = "showdbs $arg;";
+        }
+        if ($line =~ /^\\tt\s*(.*)/) {
+	    my $arg = $1 ? "('$1')" : '';
+	    $line = "dshowtemplates $arg;";
+        }
+        if ($line =~ /^\\t\s*(.*)/) {
+	    my $arg = $1 ? "('$1')" : '';
+	    $line = "showtemplates $arg;";
+        }
+        if ($line =~ /^\\v\s*(.*)/) {
+	    my $arg = $1 ? "('$1')" : '';
+	    $line = "showvars $arg;";
+        }
+        if ($line =~ /^d\s+(.*)/) {
+	    $line = "db '$1';";
+        }
+        if ($line =~ /^w\s+(.*)/) {
+	    $line = "writer '$1';";
+        }
+        if ($line =~ /^t\s+(.*)/) {
+	    $line = "template '$1';";
+        }
+        if ($line =~ /^\/$/) {
+	    ex();
+	    next;
+        }
+        if ($line =~ /^\/\s*(.*)$/) {
+	    ex(split(' ', $1));
+	    next;
+        }
+        if ($line =~ /^\\l/) {
+	    $MLINEMODE = !$MLINEMODE;
+	    printf "MLINEMODE = %s\n", $MLINEMODE ? 'MULTI' : 'SINGLE';
+	    $line = '';
+        }
+        if ($line =~ /^\\x/) {
+	    $XTERMMODE = !$XTERMMODE;
+	    printf "XTERMMODE = %s\n", $XTERMMODE ? 'ON' : 'OFF';
+	    $line = '';
+        }
+        if ($line =~ /^\\r/) {
+	    $TBLMODE = !$TBLMODE;
+	    printf "TBLMODE = %s\n", $TBLMODE ? 'ON' : 'OFF';
+	    $line = '';
+        }
+        if ($line =~ /^\\c/) {
+	    showresourcesfile();
+	    next;
+        }
+        if ($line =~ /^\\q/) {
+	    $quit = 1;
+	    last;
+        }
+	if ($line =~ /^(\w+)\s*=\s*(.*)/) {
+	    $exec_argh{"$1"} = $2;
+	    msg("SETTING $1 to $2");
+	    next;
+	}
+        # ! - shell and escape everything after in quotes
+        if ($line =~ /^\!/) {
+            $line =~ s/^\!/sh q\[/;
+            $line .= ']';
+        }
+        # ? - show
+        if ($line =~ /^\?/) {
+            $line =~ s/^\?/help /;
+        }
+        # ? - show
+        if ($line =~ /^\#/) {
+            next;
+        }
+        # + is the set command
+        if ($line =~ /^\+/) {
+            $line =~ s/\+//;
+            $line = "set ".join(",", map {"q[$_]"} split(' ', $line));
+        }
+
+	# --- EXECUTE ---
+
+
+        print "Echo:$line\n" if $echo;
+        $rv = eval $line;
+
+        if ($@) {
+	    print STDERR $@;
+        }
+        print "\n";
+        print "$rv\n" if $return;
+        if ($options->{sleep}) {
+            sleep $options->{sleep};
+        }
+        if ($options->{wait}) {
+            sleep $options->{wait};
+            $options->{wait} = 0;
+        }
+
+    }
+}
+sub trace {
+    $ENV{DBSTAG_TRACE} = !$ENV{DBSTAG_TRACE};
+}
+sub setdb {
+    $dbname = shift;
+    msg("Set dbname to $dbname");
+    $res = $resources_hash->{$dbname};
+    if ($res) {
+	$schema = $res->{schema};
+	$loc = $res->{loc} || '';
+	msg("loc: $loc") if $loc;
+    }
+    else {
+	warnmsg("Unknown $dbname");
+    }
+    if ($schema) {
+	$templates = $sdbh->find_templates_by_schema($schema);
+	msg("schema: $schema");
+    }
+    else {
+	msg("schema not known; templates unrestricted");
+	$templates = $sdbh->template_list;
+    }
+    msg("Templates available: " . scalar(@$templates));
+    $res;
+}
+sub db {
+    $dbname = shift;
+    if ($dbh) {
+	$dbh->disconnect;
+    }
+    eval {
+	$dbh = DBIx::DBStag->connect($dbname);
+	msg("Connected to $dbname");
+	setdb($dbname);
+    };
+    if ($@) {
+	print STDERR "Could not connect to database '$dbname'\n";
+    }
+    $dbh;
+}
+sub conn {
+    $dbname = shift if @_;
+    if (!$dbh) {
+	if (!$dbname) {
+	    warnmsg("You need to set a database with 'd' first");
+	}
+	else {
+	    db($dbname);
+	}
+    }
+}
+sub addhist {
+    my $line = shift;
+    next unless $line;
+#    $term->addhistory($line);
+    push(@hist, $line);
+}
+sub showhist {
+    print "$_\n" foreach @hist;
+}
+sub showdbs {
+    showfilter(shift, [sort @dbnames]);
+}
+sub dshowdbs {
+    my @N = filter(shift, \@dbnames);
+    my @R =
+      map {$resources_hash->{$_}} @N;
+    page(sub {
+	     my $fh = shift;
+	     my $r = shift @R;
+	     return 0 unless $r;
+	     printf $fh "%-20s %s\n", $r->{name}, hilite('keyword', $r->{schema});
+	     return 1;
+	 });
+}
+sub showfilter {
+    foreach my $item (filter(@_)) {
+	printf "$item\n";
+    }
+}
+sub writer {
+    $W = Data::Stag->getformathandler(shift);
+    $W->use_color(1);
+    $W->fh($ofh);
+}
+sub filter {
+    my $re = shift;
+    my $list = shift || [];
+    return 
+      grep { !$re || $_ =~ /$re/ } @$list;
+}
+sub showresourcesfile {
+    `xterm -e less $ENV{DBSTAG_DBIMAP_FILE}`;
+}
+sub showtemplates {
+    if ($templates) {
+	showfilter(shift, [map {$_->name} @$templates]);
+    }
+    else {
+	warnmsg("no templates for $dbname");
+    }
+}
+sub dshowtemplates {
+    my @T = map {$sdbh->find_template($_)} filter(shift, [map {$_->name} @$templates]);
+    page(sub {
+	     my $fh = shift;
+	     my $t = shift @T;
+	     return 0 unless $t;
+	     my $n = $t->name;
+	     my $hdr =
+	       hilite('comment',
+		      join("\n", 
+			   "+" x 60,
+			   "++++  $n". (' ' x (50 - length($n))). "++++",
+			   ("+" x 60),
+			   "\n"));
+	     my $ftr =
+	       hilite('comment',
+		      "// -- END OF TEMPLATE --\n". ("=" x 60));
+	     print $fh $hdr;
+	     $t->show($fh, $cscheme, sub { Term::ANSIColor::color(@_)});
+	     print $fh $ftr;
+	     print $fh "\n";
+	 });
+#    my $fn;
+#    my $fh = \*STDOUT;
+#    ($fn, $fh) = opentmp();
+#    foreach (@t) {
+#	$_->show($fh, $cscheme);
+#    }
+#    $fh->close;
+#    if ($XTERMMODE) {
+#	my ($pfn, $pfh) = opentmp();
+#	print $pfh "more $fn && sleep 3600";
+#	system("xterm -e sh $pfn");
+#	$pfh->close;
+#    }
+#    else {
+#	system("more $fn");
+#    }
+#    unlink $fn;
+
+}
+sub page {
+    my $sub = shift;
+    my $fn;
+    my $fh = \*STDOUT;
+    ($fn, $fh) = opentmp();
+    while ($sub->($fh)) {
+	#
+    }
+#    print $fh "\n\L";
+    $fh->close;
+    if ($XTERMMODE) {
+	my ($pfn, $pfh) = opentmp();
+	print $pfh "$PAGER $fn";
+	$pfh->close;
+	system("xterm -e sh $pfn &");
+	sleep(1);
+	unlink $pfn;
+    }
+    else {
+	system("$PAGER $fn");
+    }
+    unlink $fn;
+}
+sub prompt {
+    my $p = shift;
+    $p =~ s/(\$\w+)/eval($1)/eg;
+    $p;
+}
+sub template {
+    my $n = shift;
+    my @matches = grep {$_->name eq $n} @$templates;
+    if (@matches) {
+	if (@matches > 1) {
+	    msg("not set - these are the possibilities");
+	    showfilter(undef, \@matches);
+	}
+	elsif (!@matches) {
+	    warnmsg("No templates match: $n");
+	}
+	else {
+	    $template = shift @matches;
+            $varnames = $template->get_varnames;
+	    $template_name = $n;
+	    msg("Set template to \"$n\"");
+	    msg("varnames:");
+	    %exec_argh = ();
+	    showvars();
+	}
+    }
+}
+sub showvars {
+    foreach my $vn (@$varnames) {
+	printf("%-20s => %s\n",
+	       hilite('keyword', $vn),
+	       defined($exec_argh{$vn}) ? 
+	       hilite('variable', $exec_argh{$vn}) : ' - NOT SET - ');
+    }
+}
+sub ex {
+    my @args = @_;
+    my $bind = {%exec_argh};
+    if (@args) {
+	foreach my $arg (@args) {
+	    if ($arg =~ /(\w+)=(\S+)/) {
+		$bind->{$1} = $2;
+	    }
+	    else {
+		$bind = [] unless ref($bind) eq 'ARRAY';
+		push(@$bind, $arg);
+	    }
+	}
+    }
+    conn();
+    $stag =
+      $dbh->selectall_stag(-template=>$template,
+			   -bind=>$bind,
+			   -nesting=>$nesting,
+			  );
+
+    showstag();
+}
+sub sqlselect {
+    my $sql = shift;
+    conn();
+    if ($TBLMODE) { 
+	$rows =
+	  $dbh->selectall_arrayref($sql);
+        if ($rows) {
+            showrows();
+        }
+        else {
+            print STDERR "Query failed\n";
+        }
+    }
+    else {
+	$stag =
+	  $dbh->selectall_stag(-sql=>$sql,
+			       -nesting=>$nesting,
+			      );
+	showstag();
+			       
+    }
+}
+sub sql {
+    my $sql = shift;
+    $dbh->do($sql);
+}
+sub hilite {
+    my $cn = shift;
+    my $str = shift;
+    color($cscheme->{$cn}) . $str . color('reset');
+}
+sub showstag {
+    my @kids = $stag->kids;
+    if (!@kids) {
+	msg("NO DATA");
+	return;
+    }
+    page(sub {
+	     my $fh = shift;
+	     $W->fh($fh);
+	     $stag->sax($W);
+	     return 0;
+	 });
+}
+sub showrows {
+    my @R = @$rows;
+    page(sub {
+	     my $fh = shift;
+	     my $r = shift @R;
+	     return 0 unless $r;
+	     my @C = values %$cscheme;
+	     for (my $i=0; $i<@$r; $i++) {
+		 printf $fh "%s%s\t", color($C[$i%3]), $r->[$i];
+#		 printf $fh $r->[$i], "\t";
+	     }
+	     print $fh color('reset') . "\n";
+	     return 1;
+	 });
+}
+sub x {
+    print Dumper shift;
+}
+sub msg {
+    print "@_\n";
+}
+sub warnmsg {
+    print "WARNING:@_\n";
+}
+sub welcome {
+    msg("Hello. This is the command line interface to DBStag.");
+    msg("Type ? or help if you are ever confused.\n");
+}
+sub make_offering {
+    print "Thank you! You are very kind\n";
+    `xv /users/cjm/stag/stag-god.jpg`;
+}
+sub help {
+    my $s =
+      join("\n",
+	   'COMMAND SUMMARY',
+	   '===============',
+	   ' ?              displays this help message',
+	   ' \d             displays available databases',
+	   ' \d MATCH       available databases containing regexp MATCH',
+	   ' \dd            displays available databases - DETAILED',
+	   ' \dd MATCH      available databases containing regexp MATCH - DETAILED',
+	   ' \t [MATCH]     lists available templates (optionally matching MATCH regexp)',
+	   ' \tt [MATCH]    as above, but detailed view',
+	   ' \x             toggle pager - from shell to popup xterm',
+	   ' \r             toggle queryresult mode - rows vs trees',
+	   ' \c             show resources conf file',
+	   ' d DBNAME       set the database',
+	   ' w WRITER       set the tree writer (xml, sxpr or itext)',
+	   ' t TEMPLATE     set the template',
+           ' x VARIABLE     show perl variable using Data::Dump',
+           ' trace          toggle DBSTAG_TRACE',
+	   ' \v             show template variable bindings',
+	   ' \l             toggle multi/single line mode',
+	   ' \q             QUIT',
+           ' :SQL           runs SQL',
+	   ' / [ARGS]       execute the template; bind using ARGS',
+	   'INTRO',
+	   'This is the dbstag interactive query shell',
+           'You can issue SQL queries or call dbstag parameterized',
+           'canned query templates here. This is also a perl interpreter',
+           '',
+           'TEMPLATED QUERIES',
+           'See DBIx::DBStag::SQLTemplate for more details',
+           'You can execute the current template using forward-slash',
+           'Use the t command to set a template by name',
+           '',
+	   'Binding to template args:',
+	   '',
+	   'You can bind any template argument on the command line by saying',
+	   'VARIABLE = VALUE',
+	   '(spaces around the = are optional)',
+	   '  you do not need a $ prefix',
+	   '  you do not need quotes around the value',
+	   '',
+	   'you can also bind variables when you execute the query, like this',
+	   '',
+	   ' /VAR1=VAL1 VAR2=VAL2',
+	   '',
+	   'or sequentially:',
+	   ' / VAL1 VAL2',
+	   'single value:',
+	   ' /VAL1',
+	   'example with wildcard:',
+	   ' /*foo*',
+	   '',
+	   'if you have already bound the variables using =, then just type "q"',
+	   '',
+	   "\n\n\n",
+	   "Other possibilities",
+	   "-------------------",
+	   'SQL',
+	   ' type in any SQL SELECT statement, and the results will be turned',
+	   ' into a Stag tree and displayed as either xml, sxpr or itext',
+           ' the resulting tree goes into the $stag global variable',
+           '   You can also switch to table mode using the \\r toggle',
+           '   (in this case results go into the $rows variable)',
+           ' perl variable will not be interpolated by default - you',
+           ' can force interpolation by ending your SQL with !',
+           '           $x="foo"',
+           '           select * from bar where name=\'$x\'!',
+	   '',
+	   'Perl',
+	   ' type in any perl and it will be evaluated. don\'t use my to declare',
+	   ' variables though!',
+	   '',
+	   'Weird stuff',
+	   '-----------',
+	   ' the xterm pager acts kind of weird depending on the stag god\'s whims',
+	   ' try running the same command again',
+	   '',
+	   'you will need xhost+ set if you want to use the xterm pager',
+	   '',
+	   'have fun and be careful out there',
+	  );
+    page(sub {
+	     my $fh = shift;
+	     print $fh $s, "\n";
+	     return 0;
+	 });
+}
+our $ID = 0;
+sub opentmp {
+    my $fn = "/tmp/stag-tmp-$ID-$$";
+    $ID++;
+    my $fh = new FileHandle "> $fn";
+    $fh || die($fn);
+    return ($fn, $fh);
+}
+sub closetmp {
+    my ($fn, $fh) = shift;
+    $fh->close || die($fn);
+    unlink($fn);
+}
+
+=head1 NAME 
+
+stag-qsh - DBStag query shell
+
+=head1 SYNOPSIS
+
+  stag-qsh
+  help
+
+=head1 DESCRIPTION
+
+This is an interactive database query shell. For a full description,
+execute this script and type 'help'
+
+=head2 ARGUMENTS
+
+=head3 -d B<DBNAME>
+
+This is either a DBI locator or the logical name of a database in the
+DBSTAG_DBIMAP_FILE config file
+
+=cut
+

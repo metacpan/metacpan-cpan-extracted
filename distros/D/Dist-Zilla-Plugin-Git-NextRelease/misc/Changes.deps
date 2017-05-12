@@ -1,0 +1,80 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.004001
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.004000 2014-10-04T01:35:02Z
+
+0.003000 2014-08-31T20:47:43Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+ [Removed / test requires]
+ - Cwd
+ - File::Copy::Recursive
+ - FindBin
+ - Path::Tiny
+
+0.002012 2014-08-15T21:16:31Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+0.002011 2014-07-16T14:58:54Z
+
+0.002010 2014-01-31T04:25:22Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / test requires]
+ - version
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4204
+
+ [Removed / configure requires]
+ - Module::Build 0.4204
+
+0.002001 2014-01-15T02:28:43Z
+ [Added / runtime requires]
+ - Dist::Zilla 5.000
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+
+0.002000 2014-01-13T22:29:38Z
+ [Added / test requires]
+ - Git::Wrapper::Plus::Support
+
+ [Removed / test requires]
+ - Git::Wrapper::Plus::Versions
+
+0.001001 2014-01-12T21:05:29Z
+ [Added / runtime requires]
+ - utf8
+
+ [Changed / runtime requires]
+ - Git::Wrapper::Plus 0 → 0.003100
+ - perl 5.006 → 5.008

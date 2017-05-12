@@ -1,0 +1,36 @@
+[%-# '<=prev | up | next=>' chapters navigation bar
+   # if there is no up, prev or next we render only a transparent placeholder
+   # expects to be set 
+   # nav          - cache navigator object
+   # rel_doc_root - relative docs path
+-%]
+[%- prev = nav.prev;
+   next = nav.next;
+   IF prev;
+       prev_link = INCLUDE link prefix=rel_doc_root link=prev.meta.link;
+   END;
+   IF next;
+       next_link = INCLUDE link prefix=rel_doc_root link=next.meta.link;
+   END;
+-%]
+
+[%- # don't add the navigation for the top level index.html
+    IF prev_link || next_link || doc.meta.id != 'home' -%]
+    [%- IF prev_link -%]
+<a href="[%- prev_link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_prev.gif" alt="previous page: [% prev.meta.title | html %]" border="0" width="48" height="16"></a>
+    [%- ELSE -%]
+<img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_noprev.gif" alt="no previous page" border="0" width="48" height="16">
+    [%- END -%]
+    [%- IF rel_doc_root -%]
+<a href="[%- rel_doc_root -%]/index.html"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_parent.gif" alt="page up: [% nav.up.meta.title | html %]" border="0" height="16" width="25"></a>
+    [%- ELSE -%]
+<img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_noparent.gif" alt="no parent page" border="0" height="16" width="25">
+    [%- END -%]
+    [%- IF next_link -%]
+<a href="[%- next_link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_next.gif" alt="next page: [% next.meta.title | html %]" border="0" width="48" height="16"></a>
+    [%- ELSE -%]
+<img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_nonext.gif" alt="no next page" border="0" width="48" height="16">
+    [%- END -%]
+[%- ELSE -%]
+<!-- XXX: <img src="[%- doc.dir.abs_doc_root -%]/images/trans_pix.gif" alt="navigation" border="0" width="123" height="16">-->
+[%- END -%]

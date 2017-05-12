@@ -1,0 +1,13 @@
+requires "Crypt::Random" => "0";
+requires "Net::Address::Ethernet" => "0";
+requires "Readonly" => "0";
+requires "namespace::clean" => "0";
+requires "perl" => "v5.8.8";
+
+on 'configure' => sub {
+  requires "ExtUtils::MakeMaker" => "0";
+};
+
+on 'develop' => sub {
+  requires "Test::Pod" => "1.41";
+};

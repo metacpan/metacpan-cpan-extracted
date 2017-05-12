@@ -1,0 +1,31 @@
+---
+abstract: 'Text::MicroTemplate engine for Dancer'
+author:
+  - 'James Aitken <jaitken@cpan.org>'
+build_requires:
+  Dancer: 0
+  Dancer::Test: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-MicroTemplate
+requires:
+  Dancer::Template::Abstract: 0
+  Text::MicroTemplate::File: 0
+  base: 0
+  perl: 5.006
+  strict: 0
+  vars: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/sukria/Dancer-Template-MicroTemplate/issues
+  repository: git://github.com/sukria/Dancer-Template-MicroTemplate.git
+version: 1.0.0

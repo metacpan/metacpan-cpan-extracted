@@ -1,0 +1,13 @@
+Revision history for Dir-Self
+
+0.11    2013-09-03
+        Clean up distribution; no user visible changes.
+
+0.10    2008-05-11
+        Make dynamic recomputation the default and provide ':static'.
+
+0.03    2008-01-30
+        Include the volume name on platforms with volumes.
+
+0.02    2007-08-13
+        First version, released on an unsuspecting world.

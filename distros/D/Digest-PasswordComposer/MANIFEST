@@ -1,0 +1,13 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+bin/pwdcomposer
+dist.ini
+lib/Digest/PasswordComposer.pm
+t/00-load.t
+t/01-class.t
+t/02-procedural.t
+t/password.t

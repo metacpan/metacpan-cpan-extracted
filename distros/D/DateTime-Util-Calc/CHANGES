@@ -1,0 +1,105 @@
+Changes
+=======
+
+Unless otherwise noted, all changes by Daisuke Maki.
+
+0.13003 Sun 28 Jun 2015
+  - Fix tests for newer perls
+  - Note that this module isn't really maintained
+
+0.13002 Wed 30 May 2007
+  - Don't inherit from Exporter
+  - Update POD tests
+
+0.13001 Tue 22 May 2007
+  - Actually append FastCalc in the libs for Math::BigInt
+  - Remove execution bit from Makefile.PL
+
+0.13
+  - Fix typo in binary_search()
+
+0.12 
+  - Andreas Koenig and Tels have been kind enough to warn me of some
+    problems with this family of modules. Some fundamental changes:
+    - Use of '*_downgrade' is no longer an option. Everything is
+      Math::BigInt or Math::BigFloat, otherwise things will get
+      way too messy. In case we need real ints or whatever, we'll
+      manually downgrade by doing ->as_number()->bstr()
+  - Move to Module::Install.
+  - Add Math::BigInt::FastCalc as an option to install as a backend
+  - Fix mod(): At some point I ceased to use the Reignold & Dershowitz
+    version of mod(), apparently. 
+  - Change use case of floor() to POSIX::floor()
+
+0.11 16 Jul 2006
+  - Don't clone and set time zone when calculating moment. 
+  - Don't call set() three times in truncate_to_midday.
+  - Beef up moment tests
+  - Add tests
+
+0.10 16 Nov 2005
+  - Add POD tests
+  - Add POD
+
+0.09 28 Jun 2005
+  - fix mod(). somehow $bigint->bmod($mod) isn't working, so try using
+    $bigint % $mod instead.
+
+0.08 07 Jan 2005
+  - It wasn't a bug. Handle it.
+  - Fix Build.PL for MANIFEST
+
+0.07 07 Jan 2005
+  - Optimization for polynomial(0, ...)
+  - Fixed something that might be a Math::BigInt bug.
+
+0.06 07 Jan 2005
+  - Fix Build.PL craziness trying to install things via CPAN
+
+0.05 07 Jan 2005
+  - Removed non-existent functions 'bi_upgrade' 'bf_upgrade'
+    and replaced them with bigfloat() and bigint()
+  - Fixed dt_from_moment(). 
+  - rt #9478: Module::Build doesn't include Makefile.PL in MANIFEST
+    so manually adding it.
+  - No more memoizing
+
+0.04 06 Jan 2005
+  - Add revolution() and rev180() (Ronald Hill)
+  - Require use of Math::BigInt / Math::BigFloat
+
+0.03 25 Feb 2004
+  - acos_deg() and asin_deg() were reporting incorrect results.
+    Reported by Ronald Hill.
+
+0.02 10 Feb 2004
+  - Add prompts to install Math::BigInt::GMP and Math::BigInt::Pari on
+    demand. 
+  - Make underlying Math::BigFloat to fall back to Pari if loading GMP fails
+
+0.01 12 Jan 2004
+  - House cleaning
+  - Minor tweaks
+
+0.01_04 27 Dec 2003
+  - Aah, bad bad. The DateTime object returned from rata_die() was set
+    to a floating time zone. Yew. Now rata_die() is always in UTC
+  - Introduce truncate_to_midday()
+
+0.01 12 Jan 2004
+  - House cleaning
+  - Minor tweaks
+
+0.01_04 27 Dec 2003
+  - Aah, bad bad. The DateTime object returned from rata_die() was set
+    to a floating time zone. Yew. Now rata_die() is always in UTC
+  - Introduce truncate_to_midday()
+
+0.01_03 23 Dec 2003
+  - Try memoizing some of this stuff...
+
+0.01_02 19 Dec 2003
+  - Add some tests
+
+0.01_01 09 Dec 2003
+  - Initial release

@@ -1,0 +1,7 @@
+<% where %>:
+<% FOR msg = flash.warn -%>
+* warn: '<% msg %>'
+<% END -%>
+<% FOR msg = flash.error -%>
+* error: '<% msg %>'
+<% END -%>

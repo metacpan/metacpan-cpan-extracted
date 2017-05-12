@@ -1,0 +1,1 @@
+this is parsed {% for v in array %}{{ v }} {% endfor %} template

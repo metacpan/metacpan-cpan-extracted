@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+test.pl-orig
+Password.pm-orig
+Password.pm
+LICENSE
+README
+VERSION
+META.yml                                 Module meta-data (added by MakeMaker)

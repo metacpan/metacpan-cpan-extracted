@@ -1,0 +1,53 @@
+#!perl
+use strict;
+use warnings;
+use utf8;
+use Distribution::Metadata;
+use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
+use Pod::Usage 'pod2usage';
+
+@ARGV = map { /^(-I)(.+)/ ? ($1, $2) : $_ } @ARGV;
+
+GetOptions
+    'I=s@'   => \(my $include = []),
+    'h|help' => sub { pod2usage(0) },
+or exit 1;
+
+my $module = shift or die "Missing argument, try: `which-meta --help`\n";
+
+my $dist = Distribution::Metadata->new_from_module(
+    $module, inc => [@$include, @INC], fill_archlib => 1,
+);
+
+if ($dist->packlist) {
+    print $dist->packlist, "\n";
+    if ($dist->install_json) {
+        print $dist->install_json, "\n";
+        print $dist->mymeta_json, "\n";
+    } else {
+        print "Could not find install.json nor MYMETA.json\n";
+    }
+} else {
+    die "Could not find meta files for $module\n";
+}
+
+__END__
+
+=head1 NAME
+
+which-meta - search install.json and MYMETA.json for a module
+
+=head1 SYNOPSIS
+
+  > which-meta [options] Module::Name
+
+=head1 OPTIONS
+
+  -I directory   prepend search directory to @INC
+  -h, --help     show this help
+
+  eg:
+  > which-meta Moouse
+  > which-meta -Ilocal/lib/perl5 Plack
+
+=cut

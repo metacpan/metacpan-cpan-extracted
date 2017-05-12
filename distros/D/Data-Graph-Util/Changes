@@ -1,0 +1,14 @@
+Revision history for Data-Graph-Util
+
+0.002   2016-06-24 (PERLANCAR)
+
+	- toposort() now accepts an optional second argument to sort
+	  specified nodes.
+
+	- [doc] Add description for toposort(), link to Wikipedia article
+	  about topological sorting.
+
+
+0.001   2016-06-24 (PERLANCAR)
+
+        - First release.

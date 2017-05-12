@@ -1,0 +1,32 @@
+Revision history for Perl extension Data::Password::passwdqc.
+
+0.08  Sat Mar  4 22:40:52 SGT 2017
+        - Fix build with recent EUMM and some make, thanks to Slaven Rezic RT#120447
+        - Update to passwdqc v1.3.1
+        - Add META.yml/json to CPAN distribution, thanks to Alexandr Ciornii RT#108330
+
+0.07  Sat Jun 13 01:52:33 SGT 2015
+        - Reflect change to the random_bits range
+
+0.06  Sat Jun 13 00:52:18 SGT 2015
+        - Forget about Any::Moose and use Moose directly (reported by Karen Etheridge)
+        - Update to passwdqc v1.3.0
+        - Update to Devel::CheckOS v1.76
+
+0.05  Mon Apr  9 16:01:55 PHT 2012
+        - require Unix or Cygwin platform
+
+0.04  Mon Apr  9 11:11:52 PHT 2012
+        - Added coercion test
+
+0.03  Fri Apr  6 22:38:38 PHT 2012
+        - Reguire Carp
+        - Added tests for assumptions
+
+0.02  Fri Apr  6 01:41:11 PHT 2012
+        - First released version
+
+0.01  Tue Apr  3 02:19:30 2012
+	- original version; created by h2xs 1.23 with options
+		-A -n Data::Password::passwdqc
+

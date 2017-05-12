@@ -1,0 +1,51 @@
+[%- INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget"
+    content = ''
+-%]    
+
+    [%- INCLUDE navbar_global
+            nav=doc.nav
+            rel_doc_root=doc.dir.rel_doc_root;
+    -%]
+
+    <div align="right">
+        [%- INCLUDE prev_next_link
+                    nav=doc.nav
+                    rel_doc_root=doc.dir.rel_doc_root;
+        -%]
+    </div>
+
+    [% INCLUDE title %]
+
+    <!-- content begin -->
+    [%-
+        INCLUDE page_toc toc=doc.toc;
+    
+        # render the content
+        # index-section is used to break up the doc into sections for indexing
+    
+    FOREACH sec = doc.body;
+    -%]
+
+      <div class="index-section">
+      [%-
+      sec;
+      "<br><br>\n";
+          INCLUDE top_link;
+      -%]
+    
+      <br><br>
+
+      </div>
+    [%- END -%]
+
+    <!-- content end -->
+
+    <br>
+    <hr noshade size="1">
+
+    [%- INCLUDE tail -%]
+
+</body>
+</html>

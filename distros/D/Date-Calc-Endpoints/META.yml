@@ -1,0 +1,24 @@
+---
+abstract: 'Generate start/end dates easily, based on type (year, month,...),'
+author:
+  - 'Terry Olenchuk <OLENCHUK@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.133380'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Calc-Endpoints
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Class::Accessor: 0.34
+  Date::Calc: 6
+  Test::More: 0.98
+version: 1

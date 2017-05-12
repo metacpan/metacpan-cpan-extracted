@@ -1,0 +1,170 @@
+=head1 NAME
+
+INSTALL - How to install and configure DBD::PrimeBase
+
+
+=head1 SYNOPSIS
+
+  perl Makefile.PL [options]
+  make
+  make test
+  make install
+
+
+=head1 DESCRIPTION
+
+This document describes the installation and configuration of
+DBD::PrimeBase, the Perl DBI driver for the PrimeBase database. Before
+reading on, make sure that you have the prerequisites available:
+Perl, the PrimeBase data server and DBI. For details see the separate section.
+L</PREREQUISITES>.
+
+
+=head1 PREREQUISITES
+
+=over 4
+
+=item Perl
+
+Preferably a version of Perl, that comes pre configured with
+your system. For example, all Linux and FreeBSD distributions
+come with Perl. For Windows, ActivePerl is recommended, see
+http://www.activestate.com for details.
+
+=item PrimeBase
+
+The PrimeBase database server and SDK are available for download
+from http://www.PrimeBase.com
+
+You need not install the actual PrimeBase database server, the
+PrimeBase SDK is sufficient if you have a PrimeBase database server
+running on a separate machine.
+
+Follow the instructions for installing the PrimeBase software. The
+default installation is recommended.
+
+
+=item DBI
+
+DBD::PrimeBase is a DBI driver, hence you need DBI. It is available
+from the same source where you got the DBD::PrimeBase distribution
+from.
+
+
+
+=back
+
+
+
+=head1 SOURCE INSTALLATION
+
+For a manual installation you need to fetch the DBD::PrimeBase
+source distribution. The latest version is always available
+from
+
+  http://www.cpan.org/modules/by-module/DBD/
+
+The name is typically something like
+
+  DBD-PrimeBase-1.4001.tar.gz
+
+  gzip -cd DBD-PrimeBase-1.4001.tar.gz | tar xf -
+
+This will create a sub directory DBD-PrimeBase-1.4001. Enter this
+sub directory and type
+
+  perl Makefile.PL
+  make
+  make test
+
+If the tests seem to look fine, you may continue with
+
+  make install
+
+If the tests fail, you might need to configure some settings.
+
+=head2 Configuration
+
+If you have installed the PrimeBase database server on the current
+machine and have not changed it's default published name 'PrimeServer'
+or the administrator user's password, then the default configuration
+will work. If you have altered the default PrimeBase database server
+settings or if the PrimeBase database server is running on a different
+machine then you will have to alter the default settings.
+
+The install script "Makefile.PL" can be configured via a lot of
+switches. All switches can be used on the command line. For
+example, the test database:
+
+  perl Makefile.PL --testdb=<db>
+
+
+Available switches are:
+
+=over 4
+
+=item testdb
+
+Name of the test database, defaults to B<Perl_test>.
+
+If the database doesn't exist the test scripts will create
+it automatically.
+
+=item testuser
+
+Name of the test user, defaults to B<Administrator>. 
+
+=item testpassword
+
+Password of the test user, defaults to empty.
+
+=item testhost
+
+Host name or IP number of the test database server; defaults to localhost.
+
+=item testserver
+
+The published name of the PrimeBase database server, defaults to B<PrimeServer>.
+
+
+=back
+
+
+The configuration process will create a PrimeBase.env file in
+the test directory 't' and the bench mark directory 'sql-bench'.
+
+You can change the PrimeBase database server connection settings by
+editing this file.
+  
+
+=head1 Benchmarks
+
+The PrimeBase DBD includes a selection of the MySQL Benchmarks
+in the directory 'benchmarks'. These benchmarks remain true to the
+originals that are available with the MySQL database server with only
+slight modifications made to ensure correct execution using PrimeBase.
+Any changes made have been documented in the files them selves.
+
+After building, testing and installing the PrimeBase DBD you will be able
+to run the benchmarks by changing directory to 'benchmarks' and executing
+the benchmarks such as:
+
+B<perl test-wisconsin>
+
+
+=head1 SUPPORT
+
+For support you should join the PrimeBase Talk mail list. To 
+subscribe to the PrimeBase mail list send mail to : 
+B<PrimeBase-Talk-on@lists.imd.net>. Once you have joined you will 
+have access to the search able PrimeBase Talk archive,
+B<http://PrimeBase-Talk.imd.net>, where you can search for postings
+related to your problem or question. 
+
+If you don't find what you are looking for in the archive then post
+a question to the mail list. The mail list is monitored by the developers 
+at SNAP Innovation and you can be sure of a quick response if not from 
+someone in the PrimeBase development community, then from one of SNAP
+Innovation's developers personally.
+
+

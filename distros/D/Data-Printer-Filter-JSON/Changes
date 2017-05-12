@@ -1,0 +1,8 @@
+Revision history for Data-Printer-Filter-JSON
+
+0.03    Support for JSON::JOM, fixed doc typos
+        Added Tim Heaney (oylenshpeegul) to CONTRIBUTORS :)
+
+0.02    Fixed tests
+
+0.01    First version, released on an unsuspecting world.

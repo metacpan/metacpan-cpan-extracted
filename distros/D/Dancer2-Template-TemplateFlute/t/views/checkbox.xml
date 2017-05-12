@@ -1,0 +1,7 @@
+<specification>
+  <list name="items" iterator="items" class="list">
+    <param name="received" field="code"/>
+    <param name="received_check" class="received-check" op="toggle" args="tree"/>
+  </list>
+</specification>
+

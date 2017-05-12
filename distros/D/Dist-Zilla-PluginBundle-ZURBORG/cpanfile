@@ -1,0 +1,67 @@
+requires "Carp" => "0";
+requires "Dist::Zilla::Plugin::AutoPrereqs" => "0";
+requires "Dist::Zilla::Plugin::CPANFile" => "0";
+requires "Dist::Zilla::Plugin::ConfirmRelease" => "0";
+requires "Dist::Zilla::Plugin::ContributorsFile" => "0";
+requires "Dist::Zilla::Plugin::ExecDir" => "0";
+requires "Dist::Zilla::Plugin::ExtraTests" => "0";
+requires "Dist::Zilla::Plugin::Git::Check" => "0";
+requires "Dist::Zilla::Plugin::Git::Commit" => "0";
+requires "Dist::Zilla::Plugin::Git::Contributors" => "0";
+requires "Dist::Zilla::Plugin::Git::GatherDir" => "0";
+requires "Dist::Zilla::Plugin::Git::Push" => "0";
+requires "Dist::Zilla::Plugin::Git::Tag" => "0";
+requires "Dist::Zilla::Plugin::GitHub" => "0";
+requires "Dist::Zilla::Plugin::GitHub::UploadRelease" => "0";
+requires "Dist::Zilla::Plugin::GithubMeta" => "0";
+requires "Dist::Zilla::Plugin::License" => "0";
+requires "Dist::Zilla::Plugin::Manifest" => "0";
+requires "Dist::Zilla::Plugin::ManifestSkip" => "0";
+requires "Dist::Zilla::Plugin::MetaYAML" => "0";
+requires "Dist::Zilla::Plugin::MinimumPerl" => "0";
+requires "Dist::Zilla::Plugin::ModuleBuild" => "0";
+requires "Dist::Zilla::Plugin::NextRelease" => "0";
+requires "Dist::Zilla::Plugin::NextVersion::Semantic" => "0";
+requires "Dist::Zilla::Plugin::OurPkgVersion" => "0";
+requires "Dist::Zilla::Plugin::PodCoverageTests" => "0";
+requires "Dist::Zilla::Plugin::PodSyntaxTests" => "0";
+requires "Dist::Zilla::Plugin::PodWeaver" => "0";
+requires "Dist::Zilla::Plugin::PreviousVersion::Changelog" => "0";
+requires "Dist::Zilla::Plugin::PruneCruft" => "0";
+requires "Dist::Zilla::Plugin::PruneFiles" => "0";
+requires "Dist::Zilla::Plugin::Readme" => "0";
+requires "Dist::Zilla::Plugin::ShareDir" => "0";
+requires "Dist::Zilla::Plugin::Signature" => "0";
+requires "Dist::Zilla::Plugin::Test::CPAN::Changes" => "0";
+requires "Dist::Zilla::Plugin::Test::Kwalitee::Extra" => "0";
+requires "Dist::Zilla::Plugin::Test::Perl::Critic" => "0";
+requires "Dist::Zilla::Plugin::TestRelease" => "0";
+requires "Dist::Zilla::Plugin::UploadToCPAN" => "0";
+requires "Dist::Zilla::Role::MintingProfile" => "5.047";
+requires "Dist::Zilla::Role::PluginBundle::Easy" => "0";
+requires "File::ShareDir" => "0";
+requires "Moose" => "0";
+requires "Path::Tiny" => "0";
+requires "Pod::Weaver::Config::Assembler" => "0";
+requires "Software::License::ISC" => "0";
+requires "namespace::autoclean" => "0";
+requires "perl" => "5.006";
+requires "strictures" => "2";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.3601";
+};
+
+on 'test' => sub {
+  requires "perl" => "5.006";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.3601";
+  requires "perl" => "5.006";
+};
+
+on 'develop' => sub {
+  requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::Pod" => "1.41";
+};

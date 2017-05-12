@@ -1,0 +1,7 @@
+CHANGES
+Makefile.PL
+README
+TODO
+WeakRef.xs
+lib/Devel/WeakRef.pm
+t/Devel-Weakref.t

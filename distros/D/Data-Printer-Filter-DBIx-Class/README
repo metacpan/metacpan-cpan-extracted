@@ -1,0 +1,41 @@
+NAME
+    Data::Printer::Filter::DBIx::Class - Apply special Data::Printer filters
+    to DBIx::Class objects
+
+VERSION
+    version 0.000004
+
+SYNOPSIS
+    In your program:
+
+        use Data::Printer filters => { -external => ['DBIx::Class'] };
+
+    or, in your ".dataprinter" file:
+
+        { filters => { -external => ['DBIx::Class'] } };
+
+DESCRIPTION
+    Huge chunks of this have been lifted directly from
+    Data::Printer::Filter::DB This filter differs in that it also adds the
+    values from "get_columns()" to the output. For a DBIx::Class::Row
+    object, the column values are return in the data. For a
+    DBIx::Class::ResultSet, by default the first 5 rows in the ResultSet are
+    returned, with the contents of "get_columns()" included. You can change
+    this behaviour via $ENV{DDP_DBIC_ROW_LIMIT}.
+
+        # Return up to 1,000 rows per ResultSet
+        $ENV{DDP_DBIC_ROW_LIMIT} = 1000;
+
+        # Return every row from every ResultSet
+        $ENV{DDP_DBIC_ROW_LIMIT} = 0;
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2016 by MaxMind, Inc.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

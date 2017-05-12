@@ -1,0 +1,95 @@
+Release history for perl-Dist-Zilla-Plugin-Hook:
+
+v0.8.3 @ 2016-11-25 22:04 UTC
+
+    -   Example directory renamed from `ex/` to `eg/`. Metacpan now shows example files correctly
+        (before many example files were shown in Documentation section).
+
+v0.8.2 @ 2016-11-03 22:18 UTC
+
+    -   Test fixed to pass under `Dist::Zilla` v6.0.0.
+
+    -   Minor fixes in the POD.
+
+v0.8.1 @ 2015-11-16 23:09 UTC
+
+    -   One test fails on Perl 5.8 due to slightly different error message. The test fixed to
+        accept both variants.
+
+v0.8.0 @ 2015-11-14 09:24 UTC
+
+    -   `Hook::ModuleMaker` plugin added.
+
+    -   `Hooker` role: `prologue` and `line_directive` methods are renamed to `_prologue` and
+        `_line_directive` to make them private.
+
+    -   `use version 0.77;` added to all the modules.
+
+    -   Bug in `VersionHandling` example found: The example assumes root directory is current,
+        while sometimes it is not. Fixed.
+
+    -   Added new example: `AdaptiveTestVersion`.
+
+    -   Minor changes to make `Test::Portability` and `Test::Synopsis` happy.
+
+    -   Short version of license notice used in POD.
+
+0.007 @ 2015-08-13 19:35 UTC
+
+    -   Bug: If Hook name contains space(s), in case of error the message will report error in
+        prologue (with line number greater than actual number of lines in prologue). Fixed.
+
+    -   `ReadMe.pod` dropped.
+
+    -   `Releaser` module added.
+
+0.006 @ 2015-08-11 20:12 UTC
+
+    -   Minor changes in examples.
+
+    -   Tests explicitly require `Moose` v2.0800. Older `Moose` may cause test failure.
+
+    -   "Multiple Hooks of the Same Type" section added to manual.
+
+    -   One more attempt to remove `BUGS.pod` from documentation. Replacing `=head1` with `=head2`
+
+        did not help, now I try to drop `=cut`.
+
+0.005 @ 2015-08-07 22:29 UTC
+
+    -   New module/role added: `PrereqSource`. It defines method `register_prereqs`.
+
+    -   One test failed on older Perl versions due to new package syntax `package Foo { … }`.
+        Test fixed to use old syntax `{ package Foo; … }`. Should work for older Perls.
+
+    -   VersionHandling example: `Perl::Version` used to bump version.
+
+    -   TemplateVariables example: CPAN treats example file `BUGS.pod` as documentation. At the
+        same time it does not treat `README.pod` as documentation. `=head1` in `BUGS.pod` is
+        replaced with `=head2`, I hope it will remove `BUGS.pod` from documentation files.
+
+0.004 @ 2015-08-06 12:43 UTC
+
+    -   Localizing `$@` variable fixed to work in pre-5.14 Perls.
+
+0.003 @ 2015-07-25 21:49 UTC
+
+    -   Few errors fixed in documentation.
+
+    -   Tests on many platforms fail due to missed module. Added a hint to let `AutoPrereqs`
+        detect this dependency.
+
+    -   Tests on many platforms fail due to slightly different error messages printed by various
+        versions of Perl interpreter. The test fixed to accept any variation.
+
+0.002 @ 2015-07-23 22:08 UTC
+
+    -   `[Hook/prologue]` implemented.
+
+    -   `UnwantedDependencies` example added.
+
+    -   `$zilla` variable added.
+
+0.001 @ 2015-07-22 08:39 UTC
+
+    -   Initial revision

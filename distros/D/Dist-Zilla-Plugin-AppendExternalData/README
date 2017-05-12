@@ -1,0 +1,68 @@
+NAME
+    Dist::Zilla::Plugin::AppendExternalData - Append data to gathered files
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+       [AppendExternalData]
+       source_dir = pod       ; required
+       prune_source_dir = 1   ; default
+
+DESCRIPTION
+    This Dist::Zilla plugin appends files in a directory to files being
+    gathered for the distribution.
+
+    When using this plugin, be thoughtful about the order in which you want
+    files to be modified. For example, if you are appending Pod, it makes a
+    big difference if you append before or after a plugin like "PodWeaver".
+    If you list this plugin first, the Pod will be appended before weaving
+    and the added Pod will wind up in the middle of the generated Pod. If
+    this plugin is listed last, the Pod will be appended after weaving and
+    will follow the generated Pod from "PodWeaver".
+
+    If appending a "__DATA__" section, be sure to put this plugin last among
+    plugins that modify your files.
+
+ATTRIBUTES
+  source_dir (REQUIRED)
+    This is the directory containing data to append. Files within this
+    directory that have the same relative names as modules and executables
+    will have their contents appended. E.g. if "source_dir" is pod, then
+    pod/lib/Foo.pm will be appended to lib/Foo.pm. If a gathered file does
+    not match a file in the source directory or vice-versa, it will not
+    altered and is not considered an error.
+
+  prune_source_dir
+    This is a boolean that indicates whether the "source_dir" should also be
+    pruned from the distribution. The default is 1.
+
+CAVEAT
+    This is a proof-of-concept and does not yet have any tests of its
+    behavior.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Appe
+    ndExternalData>. You will be notified automatically of any progress on
+    your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dist-zilla-plugin-appendexternaldata>
+
+      git clone https://github.com/dagolden/dist-zilla-plugin-appendexternaldata.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

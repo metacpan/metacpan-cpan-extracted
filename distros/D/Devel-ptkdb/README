@@ -1,0 +1,157 @@
+
+1.109  Fixed various lacks of backwards incompatibility in Tk804
+	Added a 'bug report' item to the File menu.
+
+1.1084 Changed the 'bareword' and bareword options for widgets and pack to -bareword
+       to support Tk804.024
+
+
+1.1083   A perl debugger package is required to define a subroutine name 'sub'. 
+This routine is a 'proxy' for handling subroutine calls and allows the
+debugger pacakage to track subroutine depth so that it can implement
+'step over', 'step in' and 'return' functionality.  It must also handle
+the same context as the proxied routine; it must return a scalar where a
+scalar was being expected, an array where an array is being expected and
+a void where a void was being expected.  Ptkdb was not handling the case
+for void.  99.9% of the time this will have no ill effects although it
+is being handled incorrectly. 
+
+1.1075   Fix for perl 5.8.0.  Fixes to doc formatting.  $^W saves now done
+         with local($^W).  Overdue correction for @_ context save.
+
+
+1.1075beta   Expedient fix for perl 5.8.0
+
+
+1.1074  Fixed deficiency where the 'Exprs' pane would not display or decomposed the 
+        members of a blessed array.  
+
+1.1073  Added key shortcuts.  Added 'white' foreground to the 'stoppt' tag to make text more visible.  
+	Experimental feature that checks for and tries to install Tk if it's missing.  
+
+1.1072  Added feature that delays loading of the subs page until the notebook page is brought forward
+
+1.107   Release
+
+1.1068  Fixed a minor warning put out by pod2man during installation that's been grating
+        on the terminally pedantic.  
+
+        Data::Dumper is now a requirement for running.  This has been included with perl
+        since 5.00505.
+
+1.1067  Fixed a problem where ptkdb would not evaluate an expression such as 'keys %hash' in
+	its expression window.
+
+	Fixed some problems with balloons coordinate system and made them respond faster.
+
+1.1063  Menu initialization has been 'tuned' up a bit.   New handling for closure of window
+        and quit.  Beginning to deal with 'reused' addresses.
+
+1.1059  Corrected a bug where vars in the dbval subroutine could eclipse
+        vars that were in targe code
+
+1.1052  Added a configuration option that allows users to change
+        the packing arrangement of the code and notebook panes.  
+	Use xresource ptkdb*codeside: left|right|top|bottom
+        Or environmental var PTKDB_CODE_SIDE=left|right|top|bottom
+
+        See POD section item:  PTKDB_CODE_SIDE
+
+1.105   Fixed incorrect evaluation of $@ in expressions.
+        Corrected some formatting issues with the POD section.
+
+1.104
+
+
+	Fixed a conflict with 'qw' and perl 5.004.
+
+        Fixed a warning issued with perl 5.004
+
+        Corrected a problem with where using ptkdb for 
+        debugging other ptk apps would cause 'grab' problems.
+
+
+
+   This is version 1.1 of ptkdb, a debugger for perl that uses the
+perlTk user interface.   It features pushbutton controls for run,
+step-in, step-out, return, controls for breakpoints, expression
+evaluation and package browsing.  
+
+Installation:
+
+   You  use the MakeMaker interface:
+
+perl Makefile.PL
+make
+make install
+
+If worse comes to worse you can simply copy the ptkdb.pm file into 
+cp ptkdb.pm /usr/local/lib/perl5/5.xxx/Devel/ptkdb.pm
+
+On Windows:
+
+copy ptkdb.pm C:\perl\5.x\lib\Devel\ptkdb.pm
+
+To Test:
+
+perl -d:ptkdb -e 1
+
+
+
+
+Installing Tk:
+
+   In order to use ptkdb you must first install PerlTk.
+
+Using the CPAN module:
+
+   perl -MCPAN -e "install Tk"
+
+Using the Active State PPM Module:
+
+   ppm
+   > install Tk
+
+      or
+
+   retrieve the latest Tk archive from CPAN (Tk800.022 as of this writing)
+
+   http://www.perl.com/CPAN/modules/by-category/08_User_Interfaces/Tk/
+
+UNIX:
+
+   gunzip Tk800.022.tar.gz
+   tar xf Tk800.022.tar
+   cd Tk800.022
+   perl Makefile.PL
+   make 
+# This may require su or root permissions
+   make install
+
+Win32:
+
+   # Unix WinZip to extract the Tk archive
+   using Visual C++:
+
+   perl Makefile.PL
+   nmake 
+   nmake install
+
+
+
+
+Revision history for Perl extension Devel::ptkdb.
+
+1.1  Mon Dec  7 14:36:17 1998
+	- original version; created by h2xs 1.18
+
+1.101 Tue Dec 15 16:00 1998
+
+       Corrected POD document to change -d:ptkdb1048 to -d:ptkdb
+
+       Removed Dead code for font specifications and tag configuration
+       that is no longer used
+
+       Broke up a chained call to Data::Dumper->Terse->Ident into 
+       two separate calls to make it compatible with older versions
+       of Data::Dumper

@@ -1,0 +1,14 @@
+Revision history for Perl extension DBIx::ActiveRecord.
+
+0.03  Dec 11 2012
+  - refactor Arel.
+  - SubQuery support.
+
+0.02  Dec 7 2012
+  - add "croak" if Occur sql error.
+  - add "count" method.
+
+0.01  Nov 29 2012
+	- original version; created by h2xs 1.23 with options
+		-AX -n DBIx::ActiveRecord
+

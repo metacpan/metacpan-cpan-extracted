@@ -1,0 +1,28 @@
+
+    <!-- content begin -->
+    [%-
+        INCLUDE page_toc toc=doc.toc;
+    
+        # render the content
+        # index-section is used to break up the doc into sections for indexing
+    
+FOREACH sec = doc.body;
+    -%]
+
+    <div class="index-section">
+    <!-- SwishCommand index -->
+    
+    [%-
+    sec;
+    "<br><br>\n";
+    IF loop.count != loop.size;
+        INCLUDE top_link;
+    END;
+    -%]
+    
+    <br><br>
+    <!-- SwishCommand noindex -->
+    </div>
+[%- END -%]
+
+    <!-- content end -->

@@ -1,0 +1,10 @@
+---
+author: yappo
+comment: dumy
+date: 2008-04-19 21:12:57 +0900
+files:
+  - path: /
+    status: _U
+  - path: lang/php/ARGF/trunk/ARGF.php
+    status: U
+rev: dumy2

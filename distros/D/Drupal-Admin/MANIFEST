@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+examples/drupal-upgrade
+lib/Drupal/Admin.pm
+lib/Drupal/Admin/ModuleCheckbox.pm
+lib/Drupal/Admin/ModuleState.pm
+lib/Drupal/Admin/Status.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

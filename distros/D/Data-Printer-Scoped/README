@@ -1,0 +1,41 @@
+NAME
+    Data::Printer::Scoped - silence Data::Printer except in a controlled
+    scope
+
+VERSION
+    version 0.001004
+
+SYNOPSIS
+    Sometimes you want to stick a dumper statement on a very hot codepath,
+    but you are interested in the output of your specific invocation. Often
+    times this is in the middle of a test. To narrow down when and what gets
+    dumped, you can just do this:
+
+      use Data::Printer::Scoped qw/scope/;
+
+      scope {
+        do_something();
+      };
+
+      # elsewhere deep in another package
+      sub some_hot_codepath {
+        use Data::Printer;
+        p $foo;
+      }
+
+PROVIDED FUNCTIONS
+    scope(&)
+        Takes a single code block, and runs it. Before running, the
+        overridden print method of Data::Printer will be enabled, and
+        disabled afterward.
+
+AUTHOR
+    Matthew Phillips <mattp@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Matthew Phillips
+    <mattp@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

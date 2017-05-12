@@ -1,0 +1,13 @@
+DateTime-Format-Roman
+=====================
+
+This module implements the Roman system of day numbering.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL
+make
+make test
+make install

@@ -1,0 +1,52 @@
+---
+abstract: 'Control and read hardware devices with i2c(SMBus)'
+author:
+  - 'Slava Volkov <sv99@inbox.ru>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: v5.10.1
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-I2C
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Device::I2C:
+    file: lib/Device/I2C.pm
+    version: '0.06'
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  IO::File: '0'
+  XSLoader: '0'
+  constant: '0'
+  perl: v5.10.1
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/sv99/perl-device-i2c/issues
+  homepage: https://metacpan.org/release/Device-I2C
+  repository: git://github.com/sv99/perl-device-i2c.git
+version: '0.06'
+x_contributors:
+  - 'Slava Volkov <svolkov att cpan dott org>'

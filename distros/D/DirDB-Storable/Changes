@@ -1,0 +1,15 @@
+Revision history for Perl extension DirDB (DirDB::Storable fork).
+
+0.01  Mon Jun  3 15:59:28 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n DirDB
+0.05 11 Nov 2003  dln
+	added saving of hash references
+	added check for "$rootpath LOCK$key" to go away in FETCH 
+	added tying of stored hashrefs
+	
+0.06 18 Nov 2003 dln
+	added recursive return of deleted directories into hashrefs
+
+0.07 08 Dec 2003 dln 
+	renamed to DirDB::Storable

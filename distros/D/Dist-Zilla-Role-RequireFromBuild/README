@@ -1,0 +1,42 @@
+SYNOPSIS
+
+    In your plugin's preamble, include the role:
+
+     with 'Dist::Zilla::Role::RequireFromBuild';
+
+    Then in your plugin subroutine, e.g. munge_files():
+
+     $self->require_from_build("Foo/Bar.pm");
+     $self->require_from_build("Baz::Quux");
+
+DESCRIPTION
+
+    Since build files are not necessarily on-disk files, but might also be
+    in-memory files or files with munged content, we cannot use require()
+    directly. require_from_build() is like Perl's require() except it looks
+    for files not from @INC but from build files $self->zilla->files. It
+    searches libraries in lib/ and ..
+
+    $self->require_from_build("Foo/Bar.pm") or
+    $self->require_from_build("Foo::Bar") is a convenient shortcut for
+    something like:
+
+     return if exists $INC{"Foo/Bar.pm"};
+    
+     my @files = grep { $_->name eq "lib/Foo/Bar.pm" } @{ $self->zilla->files };
+     @files    = grep { $_->name eq "Foo/Bar.pm" }     @{ $self->zilla->files } unless @files;
+     die "Can't find Foo/Bar.pm in lib/ or ./ in build files" unless @files;
+    
+     eval $files[0]->encoded_content;
+     die if $@;
+    
+     $INC{"Foo/Bar.pm"} = "(set by Dist::Zilla::Role::RequireFromBuild, loaded from build file)";
+
+METHODS
+
+ $obj->require_from_build($file)
+
+SEE ALSO
+
+    Require::Hook::DzilBuild
+

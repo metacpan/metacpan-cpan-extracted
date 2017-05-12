@@ -1,0 +1,26 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBIx/Config.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/00_load.t
+t/01_pass_through.t
+t/02_load_credentials.t
+t/03_config_paths.t
+t/04_dbi_credentials.t
+t/05_integration_config_files.t
+t/05_integration_connect.t
+t/05_integration_connect_info.t
+t/05_integration_connect_info_passthrough.t
+t/05_integration_normal.t
+t/06_filter_loaded_credentials.t
+t/07_load_credentials.t
+t/etc/config.perl

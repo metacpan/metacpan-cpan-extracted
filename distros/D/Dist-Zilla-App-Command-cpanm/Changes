@@ -1,0 +1,17 @@
+1.0.2     2015-09-09 14:47:54+01:00 Europe/London
+
+    - Environment variable changed to DZ_CPANM_OPTIONS
+    
+    - The user's ~/.dzil/config.ini file can contain a CPANMinus stash with the
+      options defined:
+      
+      [%CPANMinus]
+      options = --interactive --verbose --sudo
+    
+1.0.1     2015-09-08 23:18:18+01:00 Europe/London
+
+    - Copyright year incorrect and POD had a version section (now removed)
+    
+1.0.0     2015-09-08 22:49:16+01:00 Europe/London
+
+    - Original version

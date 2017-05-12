@@ -1,0 +1,70 @@
+Perl Module Devel::Cycle
+========================
+
+This module can be used to find memory cycles in objects and other
+references.  Here is the synopsis:
+
+  #!/usr/bin/perl
+  use Devel::Cycle;
+
+  # create an object that has four cycles
+  my $test = {fred   => [qw(a b c d e)],
+	    ethel  => [qw(1 2 3 4 5)],
+	    george => {martha => 23,
+		       agnes  => 19}
+	   };
+  # cycle 1
+  $test->{george}{phyllis} = $test;
+  # cycle 2
+  $test->{fred}[3]      = $test->{george};
+  # cycles 3 and 4
+  $test->{george}{mary} = $test->{fred};
+  find_cycle($test);
+  exit 0;
+
+  # output of the script:
+
+ Cycle (1):
+ 	HASH(0x8171d30)->{george} => HASH(0x8171d00)
+	HASH(0x8171d00)->{phyllis} => HASH(0x8171d30)
+
+ Cycle (2):
+	HASH(0x8171d30)->{george} => HASH(0x8171d00)
+	HASH(0x8171d00)->{mary} => ARRAY(0x814be60)
+	ARRAY(0x814be60)->[3] => HASH(0x8171d00)
+
+ Cycle (3):
+	HASH(0x8171d30)->{fred} => ARRAY(0x814be60)
+	ARRAY(0x814be60)->[3] => HASH(0x8171d00)
+	HASH(0x8171d00)->{phyllis} => HASH(0x8171d30)
+
+ Cycle (4):
+	HASH(0x8171d30)->{fred} => ARRAY(0x814be60)
+	ARRAY(0x814be60)->[3] => HASH(0x8171d00)
+	HASH(0x8171d00)->{mary} => ARRAY(0x814be60)
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEVELOPING
+
+The master repository for Devel::Cycle is kept on GitHub at
+https://github.com/lstein/Devel-Cycle. Please contribute by sending
+pull requests.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2014 by Lincoln Stein <lincoln.stein@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

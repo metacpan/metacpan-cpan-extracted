@@ -1,0 +1,31 @@
+---
+abstract: "Manipulate 'remind' output with Perl"
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Remind-Event
+no_index:
+  directory:
+    - example
+    - inc
+    - t
+    - xt
+requires:
+  DateTime: 0
+  DateTime::Duration: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Date-Remind-Event
+  license: http://opensource.org/licenses/gpl-license.php
+  repository: git://github.com/mlawren/date-remind-event.git
+version: '0.06'

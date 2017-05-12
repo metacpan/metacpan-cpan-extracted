@@ -1,0 +1,62 @@
+Revision history for Perl extension DBIx::Handler
+
+0.14 2016-04-11T10:11:40Z
+    - fixed caller when exit in a txn callback
+    - fixed dependencies
+
+0.13 2016-04-02T06:19:47Z
+    - Added no_ping option
+    - Added documentations for options
+
+0.12 2016-02-23T04:56:31Z
+    -  trace_query_set_comment is changed to a public api
+
+0.11 2016-02-14T12:52:24Z
+    - Minor pod fix (MANWAR)
+
+0.10 2016-02-08T17:47:27Z
+    - Fixed mysql has gone away
+    - Merged #7 added `trace_ignore_if` option for ignoreing class in tracing (karupanerura)
+    - Merged #6 auto disable PrintError when enabled RaiseError (karupanerura)
+
+0.09 2014-01-17T08:51:46Z
+    - re-packaging
+
+0.08 2014-01-16T14:19:40Z
+    - fixed test (soh335++)
+
+0.07
+   2013-04-11
+        - fixed txn manager problem (thanks xaicron)
+        - rename _replace_named_placeholder to replace_named_placeholder.
+
+0.06
+   2013-02-15
+        - fixed pod. (thanks tokuhirom)
+        - support DBI wrapper class. (thanks walf443)
+
+0.05
+   2013-01-30
+        - Remove broken txn_end() (thanks gunyarakun)
+        - add run() (thanks xaicron)
+
+0.04
+   2011-11-18
+        - fixed query method.
+        - fixed trace_query.
+
+0.03
+   2011-11-14
+        - add connect method. connect method call new method.
+
+0.02
+   2011-10-19
+        - add query method.
+        - add result_class method.
+        - add trace_query method.
+        - fixed txn method bug.(thanks xaicron)
+
+0.01
+   Thu Feb 10 23:08:09 2011
+        - initial release.
+

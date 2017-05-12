@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/DBIx/Migration.pm
+MANIFEST			This list of files
+script/dbix-migration.pl
+t/01use.t
+t/02pod.t
+t/03podcoverage.t
+t/04sqlite.t
+t/sql/sqlite_1_down.sql
+t/sql/sqlite_1_up.sql
+t/sql/sqlite_2_down.sql
+t/sql/sqlite_2_up.sql
+META.yml
+Makefile.PL
+README

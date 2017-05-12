@@ -1,0 +1,19 @@
+Revision history for Devel-LeakTrace-Fast
+
+0.0.1   2007-01-30
+        Initial release.
+
+0.0.2   2007-02-07
+        Added parentheses around SvTYPE(sv) in tools.c in the hope of
+        fixing the test failures.
+
+0.0.3   2007-02-23
+        Minor tidying
+
+0.10    2007-11-22
+        Move author tests to xt/author
+
+0.11    2007-11-22
+        More tidying.
+        Actually removed version.pm dep.
+

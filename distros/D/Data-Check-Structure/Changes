@@ -1,0 +1,18 @@
+Revision history for Data-Check-Structure
+
+0.03    2014-07-14 (SHARYANTO)
+
+        - Add functions: is_hoa, is_hoaos, is_hoh, is_hohos.
+
+
+0.02    2014-07-10 (SHARYANTO)
+
+        - [Bugfix] forgot to pass options to is_hos().
+
+        - Small optimization.
+
+
+0.01    2014-07-10 (SHARYANTO) - Still so happy it's not as bad as previously diagnosed!
+
+        - First release, first released when writing formatter for
+          Perinci::CmdLine::Lite.

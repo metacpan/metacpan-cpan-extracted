@@ -1,0 +1,8 @@
+Changes for Data::Crumbr:
+
+0.1.1     2015-12-10 10:39:12+01:00 Europe/Rome
+   - removed dependency on perl 5.18
+   - tidied code a bit
+
+0.1.0     2015-09-28 15:29:53+02:00 Europe/Rome
+   - initial release on CPAN

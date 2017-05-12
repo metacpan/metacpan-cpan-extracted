@@ -1,0 +1,58 @@
+Data-Reach
+
+Data::Reach - Walk down a datastructure, without autovivification
+
+The C<reach> function walks down a nested datastructure of hashrefs
+and arrayrefs, choosing the next subnode at each step according to the
+next key supplied in C<@path>. If there is no such sequence of
+subnodes, C<undef> is returned. No autovivification nor any writing
+into the datastructure is ever performed. Missing data merely returns
+C<undef>, while wrong use of data (for example looking into an
+arrayref with a non-numerical index) generates an exception.  Blessed
+objects within the datastructure are generally treated just like raw,
+unblessed datastructures; however that behaviour can be changed
+through pragma options.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+        perl Build
+        perl Build test
+        perl Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Reach
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Reach
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Reach
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Reach
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Reach/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2015 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+

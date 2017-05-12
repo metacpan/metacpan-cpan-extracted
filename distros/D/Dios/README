@@ -1,0 +1,28 @@
+Dios version 0.001001
+
+Declare Perl6-like classes, attributes, methods, functions,
+and subtypes in Perl 5.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Data::Alias (prior to Perl 5.22)
+Const::Fast
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015, Damian Conway
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

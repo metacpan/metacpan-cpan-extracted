@@ -1,0 +1,84 @@
+Changelog for Dancer-Logger-ConsoleAggregator
+
+v0.003 2012-03-22T11:35:44
+ [Khaled Hussein - KnightHacker <khaled.hussein@gmail.com>]
+ - Merge pull request #4 from throughnothing/master
+   
+   Fixes a bug with debugging strings
+
+ - Merge pull request #3 from throughnothing/master
+   
+   Fix issue when debugging strings only.
+
+
+ [KnightHacker <khaled.hussein@gmail.com>]
+ - Upping the version
+
+ - Merge branch 'master' of
+   github.com:khussein/Dancer-Logger-ConsoleAggregator
+   
+   * 'master' of github.com:khussein/Dancer-Logger-ConsoleAggregator:
+     Fix issue with logging strings only.
+
+
+ [William Wolf <throughnothing@gmail.com>]
+ - Fix issue with eval on scalars.
+   
+   This fix an issue where strings were being used as
+   objects rather than being appended to messages.
+
+ - Fix issue with logging strings only.
+   
+   If no perl objects or json objects were logged, but
+   only strings, then it would fail to output anything.
+
+
+v0.002 2012-03-20T20:47:56
+ [Khaled Hussein - KnightHacker <khaled.hussein@gmail.com>]
+ - Merge pull request #2 from throughnothing/json
+   
+   Adds capability to log to a specific key. This is helpful for indexing
+   logs.
+
+
+ [KnightHacker <khaled.hussein@gmail.com>]
+ - Readme changes
+
+ - Adds more documentation.
+
+
+ [William Wolf <throughnothing@gmail.com>]
+ - Make all request data a nicely formatted json object.
+
+
+v0.001 2012-03-20T02:32:54
+ [Khaled Hussein - KnightHacker <khaled.hussein@gmail.com>]
+ - Merge pull request #1 from throughnothing/master
+   
+   Dzil
+
+
+ [KnightHacker <khaled.hussein@gmail.com>]
+ - Removes implicit dereferencing :).
+
+ - Cleans my 'use' packages;
+
+ - Registers an 'after' hook.
+   
+   That way the app developer doesn't need to explicitly add an after hook
+   to their
+   app.
+
+ - Fixes a bug: log messages not reset after printed.
+
+ - Initial Commit
+
+
+ [William Wolf <throughnothing@gmail.com>]
+ - get rid of Exporter stuff
+
+ - fix newline issue
+
+ - Add Dzil stuff for cpan.
+
+

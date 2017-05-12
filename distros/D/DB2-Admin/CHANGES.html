@@ -1,0 +1,1497 @@
+    <HTML> 
+	<HEAD> 
+	    <TITLE>CHANGES</TITLE> 
+	</HEAD>
+
+	<BODY>
+
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#Changes_in_the_3_1_release">Changes in the 3.1 release</A>
+	<UL>
+
+		<LI><A HREF="#Remove_support_for_DB2_releases_">Remove support for DB2 releases prior to V8.2</A>
+		<LI><A HREF="#Improve_support_for_Windows">Improve support for Windows</A>
+		<LI><A HREF="#Add_database_manager_configurati">Add database manager configuration parameters for V9.7</A>
+		<LI><A HREF="#Generate_constants_locally">Generate constants locally</A>
+		<LI><A HREF="#ListUtilities_fix">ListUtilities fix</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_3_0_release">Changes in the 3.0 release</A>
+	<UL>
+
+		<LI><A HREF="#Backup">Backup</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_9_release">Changes in the 2.9 release</A>
+	<UL>
+
+		<LI><A HREF="#Fix_core_dump_in_load_from_curso">Fix core dump in load from cursor</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_8_release">Changes in the 2.8 release</A>
+	<UL>
+
+		<LI><A HREF="#Fix_core_dump_in_load_from_curso">Fix core dump in load from cursor</A>
+		<LI><A HREF="#BugFix_in_Load_Import">BugFix in Load / Import</A>
+		<LI><A HREF="#Add_the_ReOpt_option_to_the_Re">Add the 'ReOpt' option to the Rebind method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_7_release">Changes in the 2.7 release</A>
+	<UL>
+
+		<LI><A HREF="#Rename_module_to_DB2_Admin">Rename module to DB2::Admin</A>
+		<LI><A HREF="#Add_list_of_files_support_for_">Add "list of files" support for Load of DEL files</A>
+		<LI><A HREF="#Support_new_protocol_types_for_">Support new protocol, types for node directory</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_6_release">Changes in the 2.6 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_XML_support_to_Export_Impor">Add XML support to Export, Import and Load methods</A>
+		<LI><A HREF="#Add_connect_attributes">Add connect attributes</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_5_release">Changes in the 2.5 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_the_NoCharDel_option_for_the">Add the NoCharDel option for the import and load commands</A>
+		<LI><A HREF="#Support_Update_Profile_Only_fo">Support "Update Profile Only" for Runstats</A>
+		<LI><A HREF="#Fine_tune_error_handling">Fine-tune error handling</A>
+		<LI><A HREF="#Support_the_ExcludingXML_option_">Support the ExcludingXML option for the Runstats command</A>
+		<LI><A HREF="#Support_the_CodePage_file_type_m">Support the CodePage file type modifier</A>
+		<LI><A HREF="#Rename_the_system_admin_group_co">Rename the system admin group constants</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_4_release">Changes in the 2.4 release</A>
+	<UL>
+
+		<LI><A HREF="#Changes_in_db2CfgGet_db2CfgSet">Changes in db2CfgGet / db2CfgSet for V9.1</A>
+		<LI><A HREF="#Support_for_new_format_IP_v4_for">Support for new format IP v4 for datastream elements</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_3_release">Changes in the 2.3 release</A>
+	<UL>
+
+		<LI><A HREF="#Changes_in_db2Load_API_for_V9_1">Changes in db2Load API for V9.1</A>
+		<LI><A HREF="#IP_v6_support_for_datastream_ele">IP v6 support for datastream elements</A>
+		<LI><A HREF="#Add_new_instance_and_database_co">Add new instance and database configuration parameters for V9.1</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_2_release">Changes in the 2.2 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_basic_support_for_DB2_V9_1">Add basic support for DB2 V9.1</A>
+		<LI><A HREF="#Add_ClientInfo_method">Add ClientInfo method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_1_release">Changes in the 2.1 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_DPF_options_to_the_Load_comm">Add DPF options to the Load command</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_2_0_release">Changes in the 2.0 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_LOB_support_to_the_Export_I">Add LOB support to the Export, Import and Load methods</A>
+		<LI><A HREF="#Add_the_DelPriorityChar_option">Add the 'DelPriorityChar' option </A>
+		<LI><A HREF="#Support_the_DB2_V8_2_FP9_enhance">Support the DB2 V8.2 FP9 enhanced deadlock event monitor</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_9_release">Changes in the 1.9 release</A>
+	<UL>
+
+		<LI><A HREF="#Fix_bugs_in_Load_option_handling">Fix bugs in Load option handling</A>
+		<LI><A HREF="#Support_the_SQLM_HEAP_xx_constan">Support the SQLM_HEAP_xx constants</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_8_release">Changes in the 1.8 release</A>
+	<UL>
+
+		<LI><A HREF="#Support_fork_ing_programs">Support fork()ing programs</A>
+		<LI><A HREF="#Handle_cross_partition_connectio">Handle cross-partition connection names</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_7_release">Changes in the 1.7 release</A>
+	<UL>
+
+		<LI><A HREF="#Support_the_ReorgStatus_constant">Support the ReorgStatus constants</A>
+		<LI><A HREF="#Support_the_HADR_constants">Support the HADR constants</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_6_release">Changes in the 1.6 release</A>
+	<UL>
+
+		<LI><A HREF="#Bugfix_for_Runstats_method">Bugfix for Runstats method</A>
+		<LI><A HREF="#Bugfix_for_Runstats_Rebind_meth">Bugfix for Runstats, Rebind methods</A>
+		<LI><A HREF="#Support_TempFilesPath_for_Load">Support 'TempFilesPath' for Load method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_5_release">Changes in the 1.5 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_Runstats_method">Add Runstats method</A>
+		<LI><A HREF="#Minor_Load_FileOptions_changes">Minor Load FileOptions changes</A>
+		<LI><A HREF="#Bugfix_for_load_terminate_">Bugfix for "load terminate"</A>
+		<LI><A HREF="#Add_ListUtilities_method">Add ListUtilities method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_4_release">Changes in the 1.4 release</A>
+	<UL>
+
+		<LI><A HREF="#Support_exception_tables_for_Loa">Support exception tables for Load</A>
+		<LI><A HREF="#Support_the_Utility_type_const">Support the 'Utility type' constants</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_3_release">Changes in the 1.3 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_more_Export_options">Add more Export options</A>
+		<LI><A HREF="#Handle_quoting_for_FileOptions">Handle quoting for FileOptions</A>
+		<LI><A HREF="#Add_LoadQuery_method">Add LoadQuery method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_2_release">Changes in the 1.2 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_ListHistory_command">Add ListHistory command</A>
+		<LI><A HREF="#Make_test_suite_configurable">Make test suite configurable</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_1_release">Changes in the 1.1 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_Load_method">Add Load method</A>
+		<LI><A HREF="#Add_TargetColumns_InputColumns_">Add TargetColumns, InputColumns to Import method</A>
+		<LI><A HREF="#Add_ImportOptions_to_Import_meth">Add ImportOptions to Import method</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_1_0_release">Changes in the 1.0 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_CatalogDatabase_UncatalogD">Add CatalogDatabase / UncatalogDatabase methods</A>
+		<LI><A HREF="#Add_CatalogNode_UncatalogNode_">Add CatalogNode / UncatalogNode methods</A>
+		<LI><A HREF="#Add_CatalogDCSDatabase_Uncatal">Add CatalogDCSDatabase / UncatalogDCSDatabase methods</A>
+		<LI><A HREF="#Add_import_export_options_for_DE">Add import/export options for DEL files</A>
+		<LI><A HREF="#Use_db2Export_db2Import_function">Use db2Export/db2Import function for export/import</A>
+		<LI><A HREF="#Use_db2DbDirXXX_functions_for_Ge">Use db2DbDirXXX functions for GetDatabaseDirectory()</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_9_release">Changes in the 0.9 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_import_export_functions">Add import/export functions</A>
+		<LI><A HREF="#Add_database_connection_function">Add database connection functions</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_8_release">Changes in the 0.8 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_more_database_manager_config">Add more database manager configuration parameters</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_7_release">Changes in the 0.7 release</A>
+	<UL>
+
+		<LI><A HREF="#More_value_types_formatted_by_DB">More value types formatted by DB2API::DataElement</A>
+		<LI><A HREF="#DB2API_EventParser_more_toleran">DB2API::EventParser more tolerant of unexpected files</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_6_release">Changes in the 0.6 release</A>
+	<UL>
+
+		<LI><A HREF="#Linux_ia64_Itanium_support">Linux/ia64 (Itanium) support</A>
+		<LI><A HREF="#DB2_V8_2_support_on_Solaris">DB2 V8.2 support on Solaris</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_5_release">Changes in the 0.5 release</A>
+	<UL>
+
+		<LI><A HREF="#Accept_unknown_elements_in_DB2AP">Accept unknown elements in DB2API::DataStream, DB2API::DataElement</A>
+		<LI><A HREF="#Convert_tests_to_Test_More">Convert tests to Test::More</A>
+		<LI><A HREF="#Add_ForceApplications_and_ForceA">Add ForceApplications and ForceAllApplications methods</A>
+		<LI><A HREF="#Add_GetDCSDirectory_method">Add GetDCSDirectory method</A>
+		<LI><A HREF="#Change_keys_in_catalog_entries">Change keys in catalog entries</A>
+		<LI><A HREF="#Support_for_event_files">Support for event files</A>
+		<LI><A HREF="#More_configuration_parameter_wor">More configuration parameter work</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_4_release">Changes in the 0.4 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_additional_configuration_par">Add additional configuration parameters</A>
+		<LI><A HREF="#Add_additional_constant_categori">Add additional constant categories</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_3_release">Changes in the 0.3 release</A>
+	<UL>
+
+		<LI><A HREF="#Re_implement_self_describing_dat">Re-implement self-describing data stream class</A>
+		<LI><A HREF="#Add_GetDatabaseDirectory_and_Get">Add GetDatabaseDirectory and GetNodeDirectory methods to DB2API</A>
+		<LI><A HREF="#Database_Dbm_Config_methods_supp">Database/Dbm Config methods support multiple flags</A>
+		<LI><A HREF="#Bugfixes_and_V7_inter_operabilit">Bugfixes and V7 inter-operability fixes</A>
+	</UL>
+
+	<LI><A HREF="#Changes_in_the_0_2_release">Changes in the 0.2 release</A>
+	<UL>
+
+		<LI><A HREF="#Add_UpdateDatabaseConfig_method_">Add UpdateDatabaseConfig method to DB2API</A>
+		<LI><A HREF="#Add_GetDatabaseConfig_method_to_">Add GetDatabaseConfig method to DB2API</A>
+		<LI><A HREF="#Add_UpdateDbmConfig_method_to_DB">Add UpdateDbmConfig method to DB2API</A>
+		<LI><A HREF="#Add_GetDbmConfig_method_to_DB2AP">Add GetDbmConfig method to DB2API</A>
+		<LI><A HREF="#Add_GetConfigParam_method_to_DB2">Add GetConfigParam method to DB2API::Constants</A>
+		<LI><A HREF="#Add_sqlutil_h_to_DB2API_Const">Add <sqlutil.h> to DB2API::Constants</A>
+	</UL>
+
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="Changes_in_the_3_1_release">Changes in the 3.1 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Remove_support_for_DB2_releases_">Remove support for DB2 releases prior to V8.2
+
+</A></H2>
+Support for DB2 releases V7.2 and V8.1 has been dropped.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Improve_support_for_Windows">Improve support for Windows
+
+</A></H2>
+Mike O'Reilly gracefully and patiently pointed out a number of
+Unix-specific assumptions that have to be corrected to compile the module
+with ActiveState Perl 5.8.8 for 32-bit and 64-bit Windows.
+
+
+<P>
+
+Most of these affect device and filenames
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_database_manager_configurati">Add database manager configuration parameters for V9.7
+
+</A></H2>
+Add the new DB2 V9.7 configuration parameters, most of which are
+SSL-related.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Generate_constants_locally">Generate constants locally
+
+</A></H2>
+The <CODE>db2_constants.pl</CODE> file translates DB2 constants from symbolic names to numeric values.
+Previous releases generated the file when the package was created for
+distribution; the file will now be generated locally as part of the build
+process. This is necessary because IBM changes the value of some constants
+in an incompatible manner; so a file generated for V9.5 will not work with
+V8.2.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="ListUtilities_fix">ListUtilities fix
+
+</A></H2>
+The <CODE>ListUtilities</CODE> method now supports the <CODE>Version</CODE> parameter.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_3_0_release">Changes in the 3.0 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Backup">Backup
+
+</A></H2>
+Add support for the Backup command, including support for DPF backups (with
+included logs) in DB2 V9.5.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_9_release">Changes in the 2.9 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Fix_core_dump_in_load_from_curso">Fix core dump in load from cursor
+
+</A></H2>
+A second bug in the db2Load command, caused a load from cursor (source type
+``Statement'') to perform an invalid free, sometimes leading to a core
+dump. Now fixed. Have run valgrind on import/export/load to verify no
+additional mistakes are present.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_8_release">Changes in the 2.8 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Fix_core_dump_in_load_from_curso">Fix core dump in load from cursor
+
+</A></H2>
+A bug in the db2Load command, introduced in the 2.7 release, caused a load
+from cursor (source type ``Statement'') to dump core. Now fixed.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="BugFix_in_Load_Import">BugFix in Load / Import
+
+</A></H2>
+A bug in the Load and Import methods prevented load/import operations
+against mixed-case schema and table names (which have to be double-quoted
+when passed to DB2). Now fixed.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_the_ReOpt_option_to_the_Re">Add the 'ReOpt' option to the Rebind method
+
+</A></H2>
+The re-optimization level can now be set at Rebind time.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_7_release">Changes in the 2.7 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Rename_module_to_DB2_Admin">Rename module to DB2::Admin
+
+</A></H2>
+The modules/classes have been renamed from DB2API to DB2::Admin as
+recommended by Tim Bunce.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_list_of_files_support_for_">Add "list of files" support for Load of DEL files
+
+</A></H2>
+The Load method now supports loading a list of DEL files in a single
+command.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_new_protocol_types_for_">Support new protocol, types for node directory
+
+</A></H2>
+Support the TCP/IP v4, TCP/IP v6 and TCP/IP v4 using SOCKS protocol types
+for the node directory methods.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_6_release">Changes in the 2.6 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_XML_support_to_Export_Impor">Add XML support to Export, Import and Load methods
+
+</A></H2>
+The Export, Import and Load methods now supports the XML options introduced
+in DB2 V9.1 (Export, Import) and DB2 V9.5 (Load). Note that the
+schema-related XML validate / default / ignore / map options are not
+supported at this time.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_connect_attributes">Add connect attributes
+
+</A></H2>
+Allow the user to specify the program name and connect time-out as connect
+attributes. Default options can be set with
+<CODE>SetConnectAttributes</CODE> and per-connect options can be specified with the <CODE>ConnectAttr</CODE> parameter to the <CODE>Connect</CODE> method.
+
+
+<P>
+
+The default program name is no longer <CODE>perl</CODE> or <CODE>perl5.8</CODE>, but the script name (the basename of <CODE>$0</CODE>).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_5_release">Changes in the 2.5 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_the_NoCharDel_option_for_the">Add the NoCharDel option for the import and load commands
+
+</A></H2>
+The NoCharDel option, which is used to handle files where character strings
+have no delimiters, is now supported for FileOptions parameters of the the
+Import and Load methods. It was already supported for the Import method.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_Update_Profile_Only_fo">Support "Update Profile Only" for Runstats
+
+</A></H2>
+The implementation of the runstats API contained a bug that made ``update
+profile only'' not work. This was due to an discrepancy between the
+documented constant name in the IBM documentation
+(DB2RUNSTATS_UPDATE_PROFILE_ONLY) and the actual #define
+(DB2RUNSTATS_UPDA_PROFILE_ONLY), missing the letters TE from the middle.
+
+
+<P>
+
+The code now handles both cases
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Fine_tune_error_handling">Fine-tune error handling
+
+</A></H2>
+The error handling now differentiates between errors and warnings. The
+default behavior is unchanged - error messages are printed for errors and
+warnings, and no exception is thrown. However, the 'RaiseError' option now
+only throws exceptions for errors, not warnings - the new 'RaiseWarn'
+option handles the latter.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_ExcludingXML_option_">Support the ExcludingXML option for the Runstats command
+
+</A></H2>
+The new DB2RUNSTATS_EXCLUDING_XML flag for the db2Runstats API is now
+supported as the ExcludingXML option.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_CodePage_file_type_m">Support the CodePage file type modifier
+
+</A></H2>
+The Export, Import, and Load commands now support the CodePage file type
+modifier. The Load command claimed to support this before,. but the
+implementation was incorrect.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Rename_the_system_admin_group_co">Rename the system admin group constants
+
+</A></H2>
+The SysAdm, SysMaint, SysCtrl and SysMon group instance configuration
+parameters (SQLF_KTN_xxx_GROUP) were limited to 16 characters in DB2 V8.1
+and before. With DB2 V8.2, new configuration parameters were introduced
+that changed this limit to 30, but had a different name: SQLF_KTN_xxx_GRP.
+However, the documentation hides this difference and refers to the new
+parameters by the old name.
+
+
+<P>
+
+DB2 V9.1 introduces a bug in the handling of the old parameters. In order
+to work around this, the new parameters now override the old ones in the
+parse_constants script. So in DB2 V8.2 and above, the old names (e.g.
+'sysadm_group') can be used and do the right thing by using the new
+constants.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_4_release">Changes in the 2.4 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Changes_in_db2CfgGet_db2CfgSet">Changes in db2CfgGet / db2CfgSet for V9.1
+
+</A></H2>
+The get/update instance/database configuration parameters methods have new
+flags for DB2 V9.1: 'Computed' (get/set) and 'Manual' (set). Add support
+for these new flags.
+
+
+<P>
+
+The only value that supports 'Computed' as far as I am aware, is
+'database_memory'. When the Command Line Processor reports it as
+'computed', the admin API can now do the same.
+
+
+<P>
+
+The 'Manual' option allow you to turn off automatic management for
+parameters while DB2 maintains the last automatically set value.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_for_new_format_IP_v4_for">Support for new format IP v4 for datastream elements
+
+</A></H2>
+When IP v4 clients running DB2 V9.1 connect to a database, the application
+id has a new format and includes the IP address and port in plain text.
+Support this new format and straighten out the existing IP v4 format so it
+is now always ``&lt;address&gt; port &lt;port&gt;''.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_3_release">Changes in the 2.3 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Changes_in_db2Load_API_for_V9_1">Changes in db2Load API for V9.1
+
+</A></H2>
+On DB2 V9.1, use the ``iSetIntegrityPending'' field for the db2Load API
+instead of the ``iCheckPending'' field.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="IP_v6_support_for_datastream_ele">IP v6 support for datastream elements
+
+</A></H2>
+Support IP v6 addresses for the application-id in snapshot and event
+monitor data elements (untested)
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_new_instance_and_database_co">Add new instance and database configuration parameters for V9.1
+
+</A></H2>
+The following database manager and database configuration parameters are
+new for DB2 V9.1 and have been added:
+
+
+<P>
+
+<DL>
+<DT><STRONG><A NAME="item_federated_async">federated_async
+
+</A></STRONG><DD>
+<DT><STRONG><A NAME="item_fcm_num_channels">fcm_num_channels
+
+</A></STRONG><DD>
+<DT><STRONG><A NAME="item_self_tuning_mem">self_tuning_mem
+
+</A></STRONG><DD>
+<DT><STRONG><A NAME="item_db_mem_thresh">db_mem_thresh
+
+</A></STRONG><DD>
+<DT><STRONG><A NAME="item_db_collname">db_collname
+
+</A></STRONG><DD>
+<DT><STRONG><A NAME="item_restrict_access">restrict_access
+
+</A></STRONG><DD>
+</DL>
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_2_release">Changes in the 2.2 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_basic_support_for_DB2_V9_1">Add basic support for DB2 V9.1
+
+</A></H2>
+The module now compiles on DB2 V9.1. No new features are supported, but the
+makefiles and various utility scripts have been adjusted and compile issues
+fixed.
+
+
+<P>
+
+No support has been added for new instance / database configuration
+parameters or for the new XML-related features of db2Import and db2Export.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_ClientInfo_method">Add ClientInfo method
+
+</A></H2>
+A new ClientInfo method can be used to get/set the TPM client information
+(sqleseti, sqleqryi).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_1_release">Changes in the 2.1 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_DPF_options_to_the_Load_comm">Add DPF options to the Load command
+
+</A></H2>
+Various DPF-related options for the Load command are now supported. In
+addition, a more detailed second return value describes the DPF aspects of
+the load, including each agent, in detail.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_2_0_release">Changes in the 2.0 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_LOB_support_to_the_Export_I">Add LOB support to the Export, Import and Load methods
+
+</A></H2>
+Support for the LobPath, LobFile and LobsInFile options of the Export,
+Import and Load methods has been added. (LobFile is Export specific.)
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_the_DelPriorityChar_option">Add the 'DelPriorityChar' option 
+
+</A></H2>
+Support for the 'DelPriorityChar' option for the DEL file type modifiers of
+Import/Load now supports data files with embedded newlines in column
+values.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_DB2_V8_2_FP9_enhance">Support the DB2 V8.2 FP9 enhanced deadlock event monitor
+
+</A></H2>
+The enhanced deadlock event monitor in DB2 V8.2.2 (FP9) writes a new type
+of monitoring element, called 'handle' (but really a blob).
+
+
+<P>
+
+Support to decode this has been added (the data is returned as a
+hexadecimal string).
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_9_release">Changes in the 1.9 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Fix_bugs_in_Load_option_handling">Fix bugs in Load option handling
+
+</A></H2>
+The XS code was handling load options incorrectly, leading the
+'NonRecoverable' flag to set the ``HoldQuiesce'' flag instead, and leading
+the ``Allow Read Access'' flag to set the IndexingMode to ``rebuild''.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_SQLM_HEAP_xx_constan">Support the SQLM_HEAP_xx constants
+
+</A></H2>
+The various constants for database manager, database and application pool
+ids are now supported. Previously, a numeric code was displayed.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_8_release">Changes in the 1.8 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Support_fork_ing_programs">Support fork()ing programs
+
+</A></H2>
+The XS code now detects a <CODE>fork()</CODE> has occurred and will mark as
+closed database connections opened by the parent. This requires some care,
+as closing the connection in the child will affect the connections in the
+parent. And, of course, IBM doesn't properly document this.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Handle_cross_partition_connectio">Handle cross-partition connection names
+
+</A></H2>
+The code parsing connection names got cross-DPF node connections wrong and
+spewed out large amounts of ``unitialized value'' warnings. Now corrected.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_7_release">Changes in the 1.7 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Support_the_ReorgStatus_constant">Support the ReorgStatus constants
+
+</A></H2>
+The reorg status constants returned by database snapshots are now
+supported. Previously, a numeric code was displayed.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_HADR_constants">Support the HADR constants
+
+</A></H2>
+The HADR-related constants returned by database snapshots (HADR role,
+state, syncmode, connection status) are now supported. Previously, a
+numeric code was displayed.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_6_release">Changes in the 1.6 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Bugfix_for_Runstats_method">Bugfix for Runstats method
+
+</A></H2>
+Bugfix for the 'Runstats' method: you can now collect index statistics
+using a previously set profile without collecting/updating column
+statistics.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Bugfix_for_Runstats_Rebind_meth">Bugfix for Runstats, Rebind methods
+
+</A></H2>
+Bugfix for the 'Runstats' and 'Rebind' methods: the low-level
+administrative API functions used to implement these methods ignore the
+connection-level auto-commit flag. This means they will continue to hold
+locks on the catalog until an explicit commit or disconnect is issued.
+
+
+<P>
+
+Both methods now explicitly issue a commit (whether the low-level call
+succeeded or not).
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_TempFilesPath_for_Load">Support 'TempFilesPath' for Load method
+
+</A></H2>
+A new 'TempFilesPath' parameter for the Load method allows users to specify
+the pathname for load temporary files.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_5_release">Changes in the 1.5 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_Runstats_method">Add Runstats method
+
+</A></H2>
+A new 'Runstats' method can be used to collect table and index statistics.
+Only a subset of options is supported; specifically, the column
+distribution options and column group features are not supported. This may
+change in future releases. This method requires DB2 V8.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Minor_Load_FileOptions_changes">Minor Load FileOptions changes
+
+</A></H2>
+Minor changes to the 'FileOptions' parameter to the 'Load' method: fix some
+typos, add 'DumpFileAccessAll', add documentation.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Bugfix_for_load_terminate_">Bugfix for "load terminate"
+
+</A></H2>
+The perl and XS code for 'LOAD' got the caller_action wrong; this was set
+to SQLU_TERMINATE for a ``LOAD TERMINATE'', but should always be set to
+SQLU_INITIAL. This removes code and is a Good Thing...
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_ListUtilities_method">Add ListUtilities method
+
+</A></H2>
+A new 'ListUtilities' method supports listing currently active utilities.
+It is implemented using an instance snapshot and requires DB2 V8.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_4_release">Changes in the 1.4 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Support_exception_tables_for_Loa">Support exception tables for Load
+
+</A></H2>
+The Load method now supports the optional 'ExceptionTabe' and
+'ExceptionSchema' parameters to set the exception table for load
+exceptions.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_the_Utility_type_const">Support the 'Utility type' constants
+
+</A></H2>
+The 'utility type' constants returned by instance snapshots are now
+supported. Previously, a numeric code was displayed.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_3_release">Changes in the 1.3 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_more_Export_options">Add more Export options
+
+</A></H2>
+Add the 'StripZeros', 'DatesISO' and 'DecPlusBlank' options to the Export
+file modifiers
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Handle_quoting_for_FileOptions">Handle quoting for FileOptions
+
+</A></H2>
+FileOptions for Import, Export and Load that contain embedded blanks (e.g.
+a TimestampFormat like 'MMM D YYY H:M:S') are now quoted before being fed
+to the DB2 APIs.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_LoadQuery_method">Add LoadQuery method
+
+</A></H2>
+A new LoadQuery method allows you to query the progress of a Load command
+against a table.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_2_release">Changes in the 1.2 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_ListHistory_command">Add ListHistory command
+
+</A></H2>
+A new ListHistory method implements the equivalent of the CLP ``List
+History'' command that allows you to query loads, backups, rollforwards,
+etc.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Make_test_suite_configurable">Make test suite configurable
+
+</A></H2>
+A CONFIG file is used to drive the test suite, externalizing the names of
+the test database, test tables, schema names, etc.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_1_release">Changes in the 1.1 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_Load_method">Add Load method
+
+</A></H2>
+New Load method provides an API to the table load functions; only a subset
+of features is supported (most notably, partitioned loads, table
+hierarchies, TSM media, LOBs and Data Links are not supported).
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_TargetColumns_InputColumns_">Add TargetColumns, InputColumns to Import method
+
+</A></H2>
+New parameters to the Import method allow specification of the target
+columns and selection of the relevant columns from the input file (by
+position or DEL files and by name for IXF files).
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_ImportOptions_to_Import_meth">Add ImportOptions to Import method
+
+</A></H2>
+Add import options to the 'Import' method; this allows users to set commit
+count, warning count, row count, skip count, etc. Most options are
+available only with DB2 V8.2.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_1_0_release">Changes in the 1.0 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_CatalogDatabase_UncatalogD">Add CatalogDatabase / UncatalogDatabase methods
+
+</A></H2>
+New methods to catalog a database in the database directory or uncatalog
+one.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_CatalogNode_UncatalogNode_">Add CatalogNode / UncatalogNode methods
+
+</A></H2>
+New methods to catalog a node in the node directory or uncatalog one.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_CatalogDCSDatabase_Uncatal">Add CatalogDCSDatabase / UncatalogDCSDatabase methods
+
+</A></H2>
+New methods to catalog a DCS database in the DCS directory or uncatalog
+one.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_import_export_options_for_DE">Add import/export options for DEL files
+
+</A></H2>
+The following import options have been added for DEL files:
+<CODE>DateFormat</CODE>, <CODE>TimeFormat</CODE>, <CODE>TimestampFormat</CODE>, <CODE>ImpliedDecimal</CODE>,
+<CODE>StripTBlanks</CODE>.
+
+
+<P>
+
+The following export options have been added for DEL files:
+<CODE>NoCharDel</CODE>, <CODE>TimestampFormat</CODE>.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Use_db2Export_db2Import_function">Use db2Export/db2Import function for export/import
+
+</A></H2>
+On DB2 V8.2, the new db2Export function is used instead of sqluexpr and the
+new db2Import function is used instead of sqluimpr.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Use_db2DbDirXXX_functions_for_Ge">Use db2DbDirXXX functions for GetDatabaseDirectory()
+
+</A></H2>
+The <CODE>DatabaseDirectory()</CODE> method now uses the db2DbDirXXX
+functions when available (DB2 V8.2). For global database directories, this
+means the new 'Alternate Hostname' and 'Alternate Port Number' fields are
+returned for HADR setups.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_9_release">Changes in the 0.9 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_import_export_functions">Add import/export functions
+
+</A></H2>
+Building on the database connection functions, provide limited table
+export/import methods.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_database_connection_function">Add database connection functions
+
+</A></H2>
+New Connect and Disconnect functions allow database connections; this is
+implies the database configuration get/set functions can now use the
+'Immediate' option.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_8_release">Changes in the 0.8 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_more_database_manager_config">Add more database manager configuration parameters
+
+</A></H2>
+All medium/high important updatable database manager configuration
+parameters have been added.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_7_release">Changes in the 0.7 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="More_value_types_formatted_by_DB">More value types formatted by DB2API::DataElement
+
+</A></H2>
+More types of monitor elements are being formatted by the
+DB2API::DataElement class. This includes lock mode, statement
+type/operation, server platform, application status.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="DB2API_EventParser_more_toleran">DB2API::EventParser more tolerant of unexpected files
+
+</A></H2>
+The EventParser class warns when it encounters un-expected files. It now
+does not warn for hidden files (dotfiles) that we use internally to keep
+track of event file state.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_6_release">Changes in the 0.6 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Linux_ia64_Itanium_support">Linux/ia64 (Itanium) support
+
+</A></H2>
+Make the module work on Linux/ia64 (Itanium) and DB2 V8.2.0
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="DB2_V8_2_support_on_Solaris">DB2 V8.2 support on Solaris
+
+</A></H2>
+Make the module work on Solaris 7/8 with DB2 V8.2.0 (32-bit perl only)
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_5_release">Changes in the 0.5 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Accept_unknown_elements_in_DB2AP">Accept unknown elements in DB2API::DataStream, DB2API::DataElement
+
+</A></H2>
+When an unknown monitoring element / even code is found, the decoding
+functions now return ``(unknown element XXX)'' instead of
+<CODE>die()ing.</CODE>
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Convert_tests_to_Test_More">Convert tests to Test::More
+
+</A></H2>
+All tests have been converted to the Test::More framework
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_ForceApplications_and_ForceA">Add ForceApplications and ForceAllApplications methods
+
+</A></H2>
+Two new methods can be used to force selected applications or all
+applications. These should obviously be used with care.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_GetDCSDirectory_method">Add GetDCSDirectory method
+
+</A></H2>
+A new method allows retrieval of the DCS (gateway) directory
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Change_keys_in_catalog_entries">Change keys in catalog entries
+
+</A></H2>
+The name of the keys in the <CODE>GetDatabaseDirectory()</CODE> and
+<CODE>GetNodeDirectory()</CODE> methods has been changed to match the
+(Morgan Stanley private) reverse-engineered catalog decoding/generation
+code.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Support_for_event_files">Support for event files
+
+</A></H2>
+Add an event file parser module, <CODE>DB2API::EventParser</CODE> which can 'tail' growing event files and delete those marked as processed.
+A sample program provides the skeleton for a minimal event monitor.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="More_configuration_parameter_wor">More configuration parameter work
+
+</A></H2>
+The checking script now warns if IBM-internal configuration parameters are
+used; more V8.2 configuration parameters have been added.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_4_release">Changes in the 0.4 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_additional_configuration_par">Add additional configuration parameters
+
+</A></H2>
+A number of additional database and database manager configuration
+parameters have been added; this includes support for a 'float' type,
+constants used for both the database and the database manager, and a
+mechanism to try and deal with configuration parameter names that have
+switched to a new constant name and new type between releases.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_additional_constant_categori">Add additional constant categories
+
+</A></H2>
+Add the 'LockMode' and 'LockObjectType' categories to the
+<CODE>DB2API::Constants</CODE>  <CODE>Lookup</CODE> method; use these in the
+<CODE>DB2API::DataElement</CODE>  <CODE>getValue</CODE> method.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_3_release">Changes in the 0.3 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Re_implement_self_describing_dat">Re-implement self-describing data stream class
+
+</A></H2>
+The <CODE>DB2API::Elements</CODE> class has been replaced by
+<CODE>DB2API::DataStream</CODE> and <CODE>DB2API::DataElement</CODE>, which decode the information lazily and provide an object-oriented
+interface to get the data, including a path search loosely modeled after
+XPath.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_GetDatabaseDirectory_and_Get">Add GetDatabaseDirectory and GetNodeDirectory methods to DB2API
+
+</A></H2>
+These new methods allow retrieval of the database directory and node
+directory.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Database_Dbm_Config_methods_supp">Database/Dbm Config methods support multiple flags
+
+</A></H2>
+The database / database manager config methods now support passing in a
+single 'Flag' parameter string, or a reference to a hash with multiple
+flags.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Bugfixes_and_V7_inter_operabilit">Bugfixes and V7 inter-operability fixes
+
+</A></H2>
+Basically, release 0.2 did not work very well in practice (dealing with
+64-bit values, very slow decoding of snapshot data). A number of small
+fixes were applied to DB2API::Elements to address this.
+
+
+<P>
+
+<P>
+<HR>
+<H1><A NAME="Changes_in_the_0_2_release">Changes in the 0.2 release
+
+</A></H1>
+<P>
+<HR>
+<H2><A NAME="Add_UpdateDatabaseConfig_method_">Add UpdateDatabaseConfig method to DB2API
+
+</A></H2>
+This new method allows updating of database configuration parameters. Until
+such time that we support database connections, only delayed database
+parameters updates are allowed.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_GetDatabaseConfig_method_to_">Add GetDatabaseConfig method to DB2API
+
+</A></H2>
+This new method allows retrieval of database configuration parameters.
+Until such time that we support database connections, only delayed and
+default database parameters may be retrieved.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_UpdateDbmConfig_method_to_DB">Add UpdateDbmConfig method to DB2API
+
+</A></H2>
+This new method allows updating of database manager configuration
+parameters.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_GetDbmConfig_method_to_DB2AP">Add GetDbmConfig method to DB2API
+
+</A></H2>
+This new method allows retrieval of database manager configuration
+parameters.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_GetConfigParam_method_to_DB2">Add GetConfigParam method to DB2API::Constants
+
+</A></H2>
+This new method allows lookup of meta-data about configuration parameters.
+The API is provisional, as I have not yet decided how to deal with
+parameters that change constant name and type between DB2 releases.
+
+
+<P>
+
+<P>
+<HR>
+<H2><A NAME="Add_sqlutil_h_to_DB2API_Const">Add <sqlutil.h> to DB2API::Constants
+
+</A></H2>
+The constants generated are now for both <CODE>sqlmon.h</CODE> and <CODE>sqlutil.h</CODE>
+<P>
+
+</DL>
+    </BODY>
+
+    </HTML>

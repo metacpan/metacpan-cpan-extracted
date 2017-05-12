@@ -1,0 +1,13 @@
+.git
+\.bak$
+\.bak/
+\.old$
+\.swp$
+pm_to_blib
+blib
+^Makefile$
+^MYMETA\.(?:json|yml)$
+^Dancer2-Plugin-Auth-Extensible-Provider-DBIC-[0-9]+\.
+README.md
+~$
+

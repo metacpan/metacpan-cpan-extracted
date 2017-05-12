@@ -1,0 +1,24 @@
+---
+abstract: 'Calculates a delta between 2 callgrind files'
+author:
+  - 'Andreas Hernitscheck <ahernit@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: lgpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-NYTProf-Callgrind-TicksDiff
+requires:
+  App::Cmd: '0.313'
+  Getopt::Long::Descriptive: '0'
+  Moose: '0'
+  MooseX::App::Cmd: '0'
+  MooseX::App::Cmd::Command: '0'
+  MooseX::Declare: '0'
+  MooseX::Getopt: '0'
+  strict: '0'
+version: '0.05'

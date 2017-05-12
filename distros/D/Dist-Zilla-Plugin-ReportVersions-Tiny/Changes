@@ -1,0 +1,121 @@
+Changes for Dist-Zilla-Plugin-ReportVersions-Tiny
+
+1.12    2015-05-08    DOLMEN (Olivier Mengué)
+
+	This plugin is still deprecated.
+
+	[ Fixes ]
+	- use eval-block instead of eval-string to load modules because if.pm
+	  is incompatible with < eval "require $module" > as perl isn't able
+	  to parse < require if; >
+
+1.11    2015-04-19    DOLMEN (Olivier Mengué)
+
+	[ Features ]
+	- This plugin is now deprecated. Use [Test::ReportPrereqs] instead.
+	  A warning will be shown at runtime.
+
+	[ Doc ]
+	- This plugin is now deprecated. Use [Test::ReportPrereqs] instead.
+
+	[ Meta ]
+	- Module marked as 'x_deprecated' in META.json
+
+1.10    2013-10-03    DOLMEN (Olivier Mengué)
+
+	[ Fixes ]
+	- RT#88083: do not report dependencies listed only as 'develop'.
+	  Thanks to Karen Etheridge, Kent Frederic, Graham Knop for raising
+	  this issue!
+
+1.09    2013-07-27    DOLMEN (Olivier Mengué)
+
+	[ Doc ]
+	- Add CAVEATS and SEE ALSO sections in POD. Read them!
+	  Thanks to David Golden, Karen Etheridge and Caleb Cushing for raising
+	  those issues!
+
+	[ Tests ]
+	- Use Test::Deep instead of Test::Differences. Thanks Karen Etheridge!
+
+1.08    2012-10-08    DOLMEN (Olivier Mengué)
+
+	[ Fixes ]
+	- Enforce Test::More 0.88 dependency in the built distribution.
+	  This allows to avoid depending on the user using AutoPrereqs to
+	  scan our generated test file.
+	- Enforce 'version.pm' dependency as a 'develop' dependency in the
+	  built distribution. This allows 'version' to be listed in
+	  'dzil listdeps --author' as well as this plugin.
+
+1.07    2012-10-08    DOLMEN (Olivier Mengué)
+
+	[ Fixes ]
+	- Require a recent version of version.pm (0.9901) to avoid failures
+	  in t/3part-prereq.t. As 'version.pm' was not required before, its
+	  version was not reported before in t/000-report-version-tiny.t of
+	  this distribution, so I don't know exactly which version.pm was
+	  failing.
+
+1.06    2012-09-19    DOLMEN (Olivier Mengué)
+
+	[ Fixes ]
+	- Use $] instead of $^V for compatibility with older perl. Thanks RJBS!
+
+	[ Meta ]
+	- DZ: drop ChangelogFromGit
+	- Rewrote 'Changes' in a human readable format instead of a bare git
+	  log.
+
+1.05    2012-07-18    DOLMEN (Olivier Mengué)
+
+	[ Fixes ]
+	- Fixed RT#67127 and other various things. See git log for details.
+	- Thanks KENTNL (Kent Frederic), MITHALDU, RSTAUNER (Randy Stauner)
+	  and APOCALYPSE!
+
+	[ Features ]
+	- Add 'include' option. Thanks RSTAUNER (Randy Stauner) and KENTNL
+	  (Kent Fredric)!
+
+	[ Tests ]
+	- More tests. Thanks KENTNL!
+	- Cleanup test dependencies (DOLMEN):
+	  - remove FindBin, vars, File::Temp.
+	  - load Test::Differences where it is used.
+
+1.04    2012-07-02    DOLMEN (Olivier Mengué)
+
+	[ Meta ]
+	- New maintainer.
+	- Add Github repo in META.
+	- Rename 'Changlog' to 'Changes'.
+
+1.03    2010-12-25    DANIELP (Daniel Pittman)
+
+	[ Fixes ]
+	- Fix misdetection of versions like '0.0.6' as 'any version'
+
+1.02    2010-11-09    DANIELP (Daniel Pittman)
+
+	[ Fixes ]
+	- Increase the width of the package name in the formatted output
+
+1.01    2010-05-31    DANIELP (Daniel Pittman)
+
+	[ Fixes ]
+	- Added a work-around for Template::Test generating a second test plan.
+
+	[ Features ]
+	- Added display of the the required version to modules, courtesy
+	  Apocalypse.
+	- Rewrite the desired version reporting to support Perl requests also.
+	- Make the "please help me out" text a little nicer.
+	- Final polish: report more nicely 'any version' rather than 0 for
+	  modules.
+
+	[ Tests ]
+	- More tests!
+
+1.00    2010-05-30    DANIELP (Daniel Pittman)
+	- First release!

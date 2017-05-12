@@ -1,0 +1,6 @@
+#!/bin/bash
+PLIB=/Users/lemke/perllib
+cp blib/lib/DBD/Cego.pm $PLIB/DBD
+cp blib/arch/auto/DBD/Cego/Cego.bs $PLIB/auto/DBD/Cego
+cp blib/arch/auto/DBD/Cego/Cego.bundle $PLIB/auto/DBD/Cego
+ 

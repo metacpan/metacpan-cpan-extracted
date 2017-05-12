@@ -1,0 +1,12 @@
+CHANGES
+Hierarchy.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/1basic.t
+t/2basic-with-sep.t
+t/3store-vs-store_recursively.t
+t/4merge.t
+t/5relative.t
+t/6wrappers.t

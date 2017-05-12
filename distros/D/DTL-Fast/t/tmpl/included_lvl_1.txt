@@ -1,0 +1,4 @@
+{% extends "included_lvl_0.txt" %}
+{% block block1 %}This is level 1
+{% block block2 %}Block 2 as is{% endblock %}
+{% endblock %}

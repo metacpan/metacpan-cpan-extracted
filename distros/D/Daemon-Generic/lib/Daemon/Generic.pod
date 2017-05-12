@@ -1,0 +1,479 @@
+=head1 NAME
+
+ Daemon::Generic - framework to provide start/stop/reload for a daemon
+
+=head1 SYNOPSIS
+
+ use Daemon::Generic;
+
+ sub gd_run { ... stuff }
+
+ newdaemon();
+
+=head1 DESCRIPTION
+
+Daemon::Generic provides a framework for starting, stopping,
+reconfiguring daemon-like programs.  The framework provides
+for standard commands that work for as init.d files and 
+as apachectl-like commands.
+
+Programs that use Daemon::Generic subclass Daemon::Generic
+to override its behavior.  Almost everything that 
+Genric::Daemon does can be overridden as needed.
+
+=head1 EXAMPLE USAGE OUTPUT
+
+Unless overridden, the usage output for your program will 
+look something like this:
+
+ Usage: $progname [ -c file ] [ -f ] { start | stop | reload | restart | help | version | check }
+  -c		Specify configuration file (defaults to $configfile)
+  -f		Run in the foreground (don't detach)
+  start		Starts a new $progname if there isn't one running already
+  stop		Stops a running $progname
+  reload	Causes a running $progname to reload it's config file.  Starts
+ 		a new one if none is running.
+  restart	Stops a running $progname if one is running.  Starts a new one.
+  check		Check the configuration file and report the daemon state
+  help		Display this usage info
+  version	Display the version of $progname
+
+=head1 CONSTRUCTION
+
+To hand control over to C<Daemon::Generic>, call C<newdaemon()>.
+Control will be handed back through method calls to functions you
+define.
+
+Your C<@ISA> will be modified to include C<Daemon::Generic> if 
+if it isn't already there.  
+
+These are the arguments to C<newdaemon()>.
+Defaults are in (parenthesis).
+
+=over 15
+
+=item progname
+
+(C<$0>) The name of this program.  This will be used for 
+logging and for naming the PID file.
+
+=item configfile
+
+(C</etc/$progname.conf>) The location of the configuration
+file for this daemon.
+
+=item pidbase
+
+(/var/run/$progname) We include the configuration file name
+as part of the pid file in case there are multiple instances
+of this daemon.  The pidbase is the part of the PID file
+that does not include the configuration file name.
+
+=item pidfile
+
+(C<$pidbase.$configfile.pid>) The location of the
+process id file.  
+
+=item foreground
+
+(C<0>) Do not detach/daemon and run in the foreground instead.
+
+=item debug
+
+(C<0>) Turn on debugging. 
+
+=item no_srand
+
+(C<0>) Normall srand() is called.  If no_srand is set then
+srand() won't be called.
+
+=item options
+
+() Additional arguments for L<Getopt::Long::GetOptions> which
+is used to parse C<@ARGV>.  Alternatively: define C<&gd_more_opt()>.
+
+=item minimum_args
+
+(C<1>) Minimum number of @ARGV arguments after flags have been
+processed.
+
+=item maximum_args
+
+(C<1>) Maximum number of @ARGV arguments after flags have been
+processed.
+
+=item version
+
+(C<$pkg::VERSION>) The version number of the daemon.
+
+=item logpriority
+
+Used for C<logger -p>.
+
+=back
+
+=head1 MUST-OVERRIDE CALLBACK METHODS
+
+The package that subclasses Daemon::Generic must provide the following
+callback methods.
+
+=over 15
+
+=item gd_run()
+
+This is where you put your main program.
+
+It is okay to change userid/group as the first action of gd_run().
+
+=back
+
+=head1 MAY-OVERRIDE CALLBACK METHODS
+
+The package that subclasses Daemon::Generic does not have to override these
+methods but it may want to.
+
+=over 15
+
+=item gd_preconfig()
+
+C<gd_preconfig()> is called to parse the configuration file 
+(C<$self-E<gt>{configfile}>).  Preconfig is called on all invocations
+of the daemon (C<daemon reload>, C<daemon check>, C<daemon stop>, etc).
+It shouldn't start anything but it can and should verify that
+the config file is fine.
+
+The return value should be a hash.  With one exception, the return
+value is only used by C<gd_postconfig()>.  The exception is that 
+C<gd_preconfig()> may return a revised PID file location (key C<pidfile>).
+
+Most uses of Daemon::Generic should define C<gd_preconfig>.
+
+=item gd_postconfig(%config)
+
+Postconfig() is called only when the daemon is actually starting up.
+(Or on reconfigs).  It is passed the return value from C<gd_preconfig>.
+
+=item gd_setup_signals()
+
+Set things up so that SIGHUP calls gd_reconfig_event() and
+SIGINT calls gd_quit_event().  It will call these at any time
+so if you want to delay signal delivery or something you should 
+override this method.
+
+=item gd_getopt()
+
+This is invoked to parse the command line.  Useful things to modify are:
+
+=over 20
+
+=item $self->{configfile}
+
+The location of the configuration file to be parsed by C<gd_preconfig()>.
+
+=item $self->{foreground}
+
+Run in the foreground (don't daemonize).
+
+=item $self->{debug}
+
+Use it yourself.
+
+=back
+
+The supplied C<gd_getopt()> method uses L<Getopt::Long>.
+
+=item gd_parse_argv()
+
+Parse any additional command line arguments beyond what C<gd_getopt()>
+handled.
+
+C<$ARGV[0]> needs to be left alone if it is one of the following
+standard items:
+
+=over 10
+
+=item start
+
+Start up a new daemon.
+
+=item stop
+
+Stop the running daemon.
+
+=item restart
+
+Stop the running daemon, start a new one.
+
+=item reload
+
+Send a signal to the running daemon, asking
+it to reconfigure itself.
+
+=item check
+
+Just check the configuration file. 
+
+=item help
+
+Print the help screen (probably usage()).
+
+=item version
+
+Display the daemon's version.
+
+=back
+
+There is no default C<gd_parse_argv()>.
+
+=item gd_check($pidfile, $pid)
+
+Normal behavior: return.  Define additional checks to run when
+the C<check> command is given.  A C<$pid> will only be supplied
+if there is a daemon running.
+
+=item gd_version()
+
+Normal behavior: display a version message and exit.
+
+=item gd_help()
+
+Normal behavior: call C<gd_usage()>.
+
+=item gd_commands_more()
+
+Used by C<gd_usage()>: provide information on additional commands
+beyond C<start>, C<stop>, C<reload>, etc.  Return is an array of
+key value pairs.  
+
+ sub gd_commands_more 
+ {
+	return (
+		savestate => 'Tell xyz server to save its state',
+		reset     => 'Tell xyz servr to reset',
+	);
+ }
+
+=item gd_flags_more
+
+Like C<gd_commands_more()> but defines additional command line flags.
+There should also be a C<gd_more_opt()> or an C<options> argument to
+C<new()>.
+
+=item gd_positional_more
+
+Like C<gd_commands_more()> but defines positional arguments.
+
+=item gd_usage()
+
+Display a usage message.  
+The return value from C<gd_usage()> is the exit code for the program.
+
+=item gd_more_opt()
+
+() Additional arguments for L<Getopt::Long::GetOptions> which
+is used to parse C<@ARGV>.  Alternatively: pass C<options> to C<new()>.
+
+=item gd_pidfile()
+
+Figure out the PID file should be. 
+
+=item gd_error()
+
+Print out an error (call die?)
+
+=item gd_other_cmd()
+
+Called C<$ARGV[0]> isn't one of the commands that Daemon::Generic knows
+by default.  Default behavior: call C<gd_usage()> and C<exit(1)>. 
+
+=item gd_daemonize()
+
+Normal behavior: C<fork()>, C<fork()>, detach from tty.
+
+=item gd_redirect_output()
+
+This is a mis-named method.  Sorry.  This directs C<STDOUT>/C<STDERR>/C<STDIN>
+to C</dev/null> as part of daemonizing.  Used by C<gd_daemonize()>.
+
+=item gd_reopen_output()
+
+After daemonizing, output file descriptors are be re-established.
+Normal behavior: redirect C<STDOUT> and C<STDERR> to 
+C<logger -t $progname[$$]>.  Used by C<gd_daemonize()>.
+
+=item gd_logname()
+
+Normal behavior: C<$progname[$$]>.  Used by C<gd_redirect_output()>.
+
+=item gd_reconfig_event()
+
+Normal behavior: call C<gd_postconfig(gd_preconfig))>.  
+Only referenced by C<gd_setup_signals()>.
+
+=item gd_quit_event()
+
+Normal behavior: exit. 
+Only referenced by C<gd_setup_signals()>.
+
+=item gd_kill_groups()
+
+Return true if gd_kill should kill process groups ($pid) instead of just
+the one daemon ($pid).  Default is false.
+
+=item gd_kill($pid)
+
+Used by the C<stop> and C<restart> commands to get rid of
+the old daemon.
+Normal behavior: send a SIGINT.  
+Check to see if process C<$pid> has died.  If it has not, keep checking
+and if it's still alive.  After 
+C<$Daemon::Generic::force_quit_delay> seconds,
+send a SIGTERM.  Keep checking.  After another
+C<$Daemon::Generic::force_quit_delay> seconds,
+send a SIGKILL (-9).  Keep checking.  After 
+C<$Daemon::Generic::force_quit_delay * 4> seconds or 60 seconds
+(whichever is smaller), give up and exit(1).
+
+=item gd_install
+
+Installs the daemon so that it runs automatically at next
+reboot.  Currently done with a symlink to C<$0> and 
+C</usr/sbin/update-rc.d>.  Please send patches for other 
+methods!
+
+=item gd_can_install
+
+Returns a function to do an C<gd_install> if installation
+is possible.  Returns C<0> otherwise.
+
+=item gd_install_pre($method)
+
+Normal behavior: return.  Called just before doing an installation.
+The method indicates the installation method (currently always
+C<update-rc.d>.)
+
+=item gd_install_post($method)
+
+Normal behavior: return.  Called just after doing an installation.
+
+=item gd_uninstall
+
+Will remove the daemon from the automatic startup regime.
+
+=item gd_can_uninstall
+
+Returns a function to do the work for C<gd_uninstall> if it's
+possible.  C<0> otherwise.
+
+=item gd_uninstall_pre($method)
+
+Normal behavior: return.  Called just before doing an un-installation.
+The method indicates the installation method (currently always
+C<update-rc.d>.)
+
+=item gd_install_post($method)
+
+Normal behavior: return.  Called just after doing an un-installation.
+
+=back
+
+=head1 MEMBER DATA
+
+Since you need to subclass Daemon::Generic, you need to know
+what the internal data structures for Daemon::Generic are.  
+With two exceptions, all of the member data items begin with 
+the prefix C<gd_>.
+
+=over 15
+
+=item configfile
+
+The location of the configuration file.  (Not used by
+Daemon::Generic).
+
+=item debug
+
+Display debugging?  (Not used by Daemon::Generic)
+
+=item gd_args
+
+The original C<%args> passed to C<new>.
+
+=item gd_progname
+
+The process name.  (defaults to $0)
+
+=item gd_pidfile
+
+The location of the process ID file.
+
+=item gd_logpriority
+
+Used for C<logger -p>.
+
+=item gd_foreground
+
+Are we running in the foreground?
+
+=back
+
+=head1 EXAMPLE PROGRAM
+
+ my $sleeptime = 1;
+
+ newdaemon(
+	progname	=> 'ticktockd',
+	pidfile		=> '/var/run/ticktockd.pid',
+	configfile	=> '/etc/ticktockd.conf',
+ );
+
+ sub gd_preconfig
+ {
+	my ($self) = @_;
+	open(CONFIG, "<$self->{configfile}") or die;
+	while(<CONFIG>) {
+		$sleeptime = $1 if /^sleeptime\s+(\d+)/;
+	}
+	close(CONFIG);
+	return ();
+ }
+
+ sub gd_run
+ {
+	while(1) {
+		sleep($sleeptime);
+		print scalar(localtime(time))."\n";
+	}
+ }
+
+=head1 SEE ALSO
+
+With a while(1) and delayed signal delivery: L<Daemon::Generic::While1>.
+
+With L<Event>: L<Daemon::Generic::Event>.
+
+With L<AnyEvent>: L<Daemon::Generic::AnyEvent>.
+
+Modules that use Daemon::Generic:
+L<SyslogScan::Daemon>;
+L<IO::Event> (rinetd.pl)
+
+Other modules that do similar things: 
+L<Net::Daemon>,
+L<Net::Server>,
+L<Net::Server::Daemonize>, 
+L<NetServer::Generic>,
+L<Proc::Application::Daemon>,
+L<Proc::Daemon>,
+L<Proc::Forking>.
+
+=head1 LICENSE
+
+Copyright (C) 2006-2010 David Muir Sharnoff <cpan@dave.sharnoff.org>.
+Copyright (C) 2011 Google, Inc.
+This module may be used and distributed on the same terms
+as Perl itself.
+
+=head1 PACKAGERS
+
+Daemon::Generic is packaged for Fedora by Emmanuel Seyman <emmanuel.seyman@club-internet.fr>.

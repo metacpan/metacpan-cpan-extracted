@@ -1,0 +1,172 @@
+# NAME
+
+Dist::Zilla::PluginBundle::Author::DOHERTY - configure Dist::Zilla like DOHERTY
+
+# VERSION
+
+version 0.40
+
+# SYNOPSIS
+
+    # in dist.ini
+    [@Author::DOHERTY]
+
+# DESCRIPTION
+
+`Dist::Zilla::PluginBundle::Author::DOHERTY` provides shorthand for
+a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) configuration that does what Mike wants.
+
+# USAGE
+
+Just put `[@Author::DOHERTY]` in your `dist.ini`. You can supply the following
+options:
+
+- `custom_build` specifies to use [Dist::Zilla::Plugin::ModuleBuild::Custom](https://metacpan.org/pod/Dist::Zilla::Plugin::ModuleBuild::Custom)
+instead of generating boilerplate [ExtUtils::MakeMaker](https://metacpan.org/pod/ExtUtils::MakeMaker) and [Module::Build](https://metacpan.org/pod/Module::Build)
+build tools.
+- `fake_release` specifies whether to use `[FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease)`
+instead of `[UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN)`.
+
+    Default is false.
+
+- `enable_tests` is a comma-separated list of testing plugins to add
+to `[TestingMania](https://metacpan.org/pod/Dist::Zilla::PluginBundle::TestingMania)`.
+
+    Default is none.
+
+- `disable_tests` is a comma-separated list of testing plugins to skip in
+`[TestingMania](https://metacpan.org/pod/Dist::Zilla::PluginBundle::TestingMania)`.
+
+    Default is none.
+
+- `tag_format` specifies how a git release tag should be named. This is
+passed to `[Git::Tag](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Tag)`.
+
+    Default is ` %v%t `.
+
+- `version_regexp` specifies a regexp to find the version number part of
+a git release tag. This is passed to
+`[Git::NextVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::NextVersion)`.
+
+    Default is `^(v.+)$`.
+
+- `twitter` says whether releases of this module should be tweeted.
+
+    Default is true.
+
+- `surgical` says to use [Dist::Zilla::Plugin::SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver).
+
+    Default is false.
+
+- `max_target_perl` is the highest minimum version of perl you intend to require.
+This is passed to [Dist::Zilla::Plugin::Test::MinimumVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::MinimumVersion), which generates
+a `minimum-version.t` test that'll warn you if you accidentally used features
+from a higher version of perl than you wanted. (Having a lower required version
+of perl is okay.)
+- `changelog` is the filename of the changelog.
+
+    Default is `Changes`.
+
+- `push_to` is the git remote to push to; can be specified multiple times.
+
+    Default is `origin`.
+
+- `github` is a boolean specifying whether to use the plugins
+[Dist::Zilla::Plugin::GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta) and [Dist::Zilla::Plugin::GitHub::Update](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Update).
+- `critic_config` is a filename to pass through to [Dist::Zilla::Plugin::Test::Perl::Critic](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Perl::Critic).
+- `googlecode_project` tells [UploadToGoogleCode](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToGoogleCode)
+which project to upload to. This is required if you want to upload your release
+to Google Code.
+- `fork_is_authoritative` tells [GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta)
+that your fork is authoritative. That means that the repository, issues, etc
+will point to your stuff on github, instead of wherever you forked from. This
+is useful if your repository on Github is a fork, but you have taken over
+maintaining the module, so people should probably send bug reports to you
+instead of the original author, and should fork from your repo, etc.
+- `github_metadata_remote` tells [GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta)
+that this is the Github repository from which to take metadata. This can be freely
+combined with `fork_is_authoritative` to control whether we "follow the symlink"
+if the repo this points to is a fork. By default, the repo will be extracted from
+the url for the `origin` remote.
+- `release_to` is a string that specifies where to send the release. Valid release
+targets are:
+
+    - PAUSE (or CPAN)
+
+        We'll use [UploadToPAUSE](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN) to do the release,
+        and clean up afterwards. This is the default
+
+    - GoogleCode
+
+        Well use [UploadToGoogleCode](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToGoogleCode) to do the
+        release, and clean up afterwards. Make sure you set `googlecode_project`
+
+    - local
+
+        We will do all the releasey things like tagging and pushing and whatnot, but
+        we won't do any releasing things, and we won't clean up. This leaves the release
+        tarball sitting there for you to do with as you will.
+
+    In the future, there might be an option to scp the tarball somewhere.
+
+- `has_version` and `strict_version` set options in [Dist::Zilla::PluginBundle::TestingMania](https://metacpan.org/pod/Dist::Zilla::PluginBundle::TestingMania),
+which passes them along to [Dist::Zilla::Plugin::Test::Version](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Version) and thus
+[Test::Version](https://metacpan.org/pod/Test::Version). They set `has_version` and `is_strict` respectively.
+- `sharedir` indicates which directory is your dist's share directory. The
+default is `share`.
+
+# COMMAND LINE OPTIONS
+
+- `--fake-release`
+
+    Do a fake release.
+
+- `--release-to`
+
+    Specify release targets - can be specified multiple times.
+
+- `--offline`
+
+    Don't do things that need a network connection: sets `github` and `twitter`
+    to false; sets `push_to` to an empty array ref (ie: don't push anywhere);
+    and sets `release_to` to local.
+
+# ENVIRONMENT
+
+- `NO_TEST`
+
+    If true, doesn't add [TestRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::TestRelease) or
+    [CheckExtraTests](https://metacpan.org/pod/Dist::Zilla::Plugin::CheckExtraTests).
+
+# SEE ALSO
+
+`[Dist::Zilla](https://metacpan.org/pod/Dist::Zilla)`
+
+# AVAILABILITY
+
+The project homepage is [http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/](http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Dist::Zilla::PluginBundle::Author::DOHERTY/](https://metacpan.org/module/Dist::Zilla::PluginBundle::Author::DOHERTY/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY](http://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY)
+and may be cloned from [git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git](git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY/issues](https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Mike Doherty <doherty@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

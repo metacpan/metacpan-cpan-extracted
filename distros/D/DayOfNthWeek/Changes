@@ -1,0 +1,24 @@
+Revision history for Perl extension Date::DayOfNthWeek.
+
+1.0   Wed Dec 04 20:56:21 2002
+	- Tested repeatedly and sent out for peer review and no problems 
+      found so decided to go to 1.0 release.
+	- Changed the method week_day to day_week to make it consistent
+	  with the other method names.  
+
+0.03  Wed Nov 29 07:51:44 2002
+	- Changed the required Perl version from 5.008 (default of h2xs)
+      to 5.005.  Since it is pure core Perl it should work with any
+      version.
+	- Added calc_week.pl to Examples.  Show formula and logic for
+      calculating which week the day falls in.
+
+0.02  Tue Nov 26 23:11:05 2002
+	- Original missed some test cases. Required me to change each of 
+      the methods.  
+	- Added some examples
+
+0.01  Mon Nov 25 10:59:11 2002
+	- original version; created by h2xs 1.22 with options
+		-XA -n Date::DayOfNthWeek
+

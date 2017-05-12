@@ -1,0 +1,31 @@
+--- #YAML:1.0
+name: DBD-PgPPSjis
+abstract: Pure Perl PostgreSQL driver for (not raw) ShiftJIS
+version: 0.0801001
+author:
+  - INABA Hitoshi <ina@cpan.org>
+license: perl
+requires:
+  ExtUtils::MakeMaker: 5.4302
+  Archive::Tar: 0.072
+  Compress::Zlib: 1.03
+  Config: 0
+  Fcntl: 1.03
+  File::Basename: 2.6
+  File::Copy: 2.02
+  File::Path: 1.0401
+  FindBin: 1.42
+  Getopt::Std: 1.01
+  Test: 1.122
+  Test::Harness: 1.1602
+  Carp: 0
+  DBI: 1.14
+  perl: 5.005_03
+build_requires:
+  Test: 1.122
+urls:
+  license: http://dev.perl.org/licenses/
+meta-spec:
+  version: 1.3
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+generated_by: INABA Hitoshi <ina@cpan.org>

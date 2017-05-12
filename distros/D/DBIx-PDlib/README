@@ -1,0 +1,226 @@
+NAME
+    DBIx::PDlib - DBI SQL abstraction and convenience methods
+
+SYNOPSIS
+      use DBIx::PDlib;
+      my $db = DBIx::PDlib->connect({
+        driver   => 'mydriver',
+        host     => 'myhost.com',
+        dbname   => 'mydb',
+        user     => 'myuser',
+        password => 'mypassword',
+        });
+
+      my ($name) = $db->select('name','table1',"id = '10'");
+
+      my $dbi_sth = $db->iterated_select('name','table1',
+                                           "id > 2",'ORDER BY name');
+      while (my ($name) = $dbi_sth->fetchrow_array) { ...do stuff... }
+
+      my $rv = $db->insert('table1',['id','name'],['11','Bob']);
+
+      my $rv = $db->update('table1',['name'],['Bob Jr.'],"id = '11'");
+
+      my $rv = $db->delete('table1',"id = '11'");
+
+      my @quoted = $db->quote( "something", $foo, $bar, @moredata );
+
+      my $rv = $db->raw_query("CREATE TABLE table1 (id int, name char)");
+
+      if ($db->connected) { ...we're connected... }
+
+      $db->disconnect;
+
+ABSTRACT
+    DBIx::PDlib provides a simplified way to interact with DBI. It provides
+    methods for SELECT, INSERT, UPDATE, and DELETE which result in having to
+    type less code to do the DBI queries. It does as little as possible to
+    make things easier.
+
+    What it doesn't do... It isn't trying to replace DBI. It's not trying to
+    completely abstract SQL statement building into some 100% perllike
+    syntax (though that is REALLY cool, and what I liked about
+    DBIx::Abstract), but it does abstract it some.
+
+REQUIRES
+        DBI
+
+INSTALLATION
+    Download the gzipped tar file from:
+
+        http://search.cpan.org/search?dist=DBIx-PDlib
+
+    Unzip the module as follows or use winzip:
+
+        tar -zxvf DBIx-PDlib-1.xxx.tar.gz
+
+    For "make test" to work, you need to setup some parameters for the
+    build.
+
+        perl Makefile.PL --help
+
+    The rest is done the standard Perl way:
+
+        make
+        make test
+        make install    # you need to be root
+
+    Windows users without a working "make" can get nmake from:
+
+        ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe
+
+METHODS
+  MAIN METHODS
+
+    "$db = DBIx::PDlib->connect( $connect_config | $dbihandle )"
+    *CONSTRUCTOR*
+        Open a connection to a database as configured by $connect_config.
+        $connect_config can either be a scalar, in which case it is a DBI
+        data source, or a referance to a hash with the following keys:
+
+         dsn      -- The data source to connect to your database
+ 
+         OR, DBIx::PDlib will try to generate it if you give these instead:
+
+         driver   -- DBD driver to use (defaults to mysql)
+         host     -- Host of database server
+         port     -- Port of database server
+         dbname   -- Name of database
+
+         Username and password are always valid.
+
+         user     -- Username to connect as
+         password -- Password for user
+
+        Alternatively you can pass in a DBI handle directly. This will
+        disable the methods "reconnect" and "ensure_connection" as they rely
+        on connection info not available on a DBI handle.
+
+    "$sth = $db->iterated_select( 't.field1,t2.field2','table t, table2
+    t2','t.id = t2.id','ORDER BY t.field1')"
+        This builds an SQL query, executes it, and returns the DBI statement
+        handle if execute succeeds. It will return undef if execute fails.
+
+        The above query would build the following SQL statement: SELECT
+        t.field1, t2.field2 FROM table t, table2 t2 WHERE t.id = t2.id ORDER
+        BY t.field1
+
+        The first two options (fields and table) are required. The third
+        option is the WHERE statement, which you can leave blank or undef to
+        exclude using a where statement. The fourth option is any additional
+        raw SQL to append to the query (ORDER BY, GROUP BY, etc type stuff
+        can be put here).
+
+    "$field = $db->select( 'field1','table','id > 10','ORDER BY field1')"
+        This will return the first row of data, and call DBI's finish() on
+        the handle. If called in array context, an array of the fields will
+        be returned. If called in scalar context, the first field in the
+        first row returned will be returned. 'undef' will be returned if the
+        call fails.
+
+        This is very useful if you just need to grab one row of data. The
+        statement fields have the same requirements as iterated_select.
+
+    "$arrayref = $db->select_all( 'field1','table','id > 10','ORDER BY
+    field1')"
+        This will execute the statement (same requirements as
+        iterated_select), and call DBI's fetchall_arrayref on the handle,
+        finish() the handle, and return the resulting arrayref. The
+        $arrayref will contain an array representing all rows returned, of
+        arrayrefs containing the columns for each row (an array of arrays).
+
+    "$rv = $db->insert('table1',['id','name'],['11','Bob']);"
+        Inserts a row into the database.
+
+        The first option is the table to insert into. The second option is
+        the list of field names. The third option is a list of values.
+
+        Use the perl 'undef' value to insert a NULL.
+
+        This format was chosen to allow Insert's and Update's to use the
+        same calling semantics.
+
+    "$rv = $db->update('table1',['name'],['Bob Jr.'],'id = 11');"
+        Updates a row in the database.
+
+        The first three options have the same requirements as insert(). The
+        last option is the WHERE statement, and is optional (though
+        recommended).
+
+        Use the perl 'undef' value to update a field to NULL.
+
+    "$rv = $db->delete('table1','id = 11');"
+        Deletes rows matching the where statement in the second option from
+        the database table 'table1'.
+
+        The where statement is required as a safety precaution. If you
+        really want to delete everything in the table, pass in a "1" as the
+        where statement.
+
+    "@quoted = $db->quote('something', $foo, $bar, @moredata );"
+        Takes in an array of values, and returns an array of those same
+        values quoted using DIB's quote(). If called in scalar context, it
+        will return the first item in the list.
+
+  ACCESSOR METHODS
+
+    "$db->raw_query($sql)"
+        This executes a DBI do() on whatever you pass to it. This is useful
+        for CREATE, DROP, ALTER, etc type SQL commands.
+
+    "$db->connected"
+        Check to see if this object is connected to a database. It will do a
+        DBI ping on the current DBI database handle that is inside the
+        DBIx::PDlib object, returning 1 if it is successful.
+
+    "$db->disconnect"
+        You don't need to call this, but if you really want to disconnect
+        from the database for some reason, this will do the job. It just
+        calls DBI's disconnect() on the current DBI handle in the object.
+
+QUOTING
+    An attempt has been made to provide automatic quoting where appropriate,
+    but there are some areas normally used that you will need to do your own
+    value quoting.
+
+    In areas where you will need to do your own quoting, the quote() method
+    is the recommended way to do it.
+
+    insert() - The values passed to insert will automatically be quoted by
+    use of DBI's placeholders (?). To pass a NULL, simply pass an undef
+    value. You should NOT manually quote values passed to insert(), as DBI's
+    quote will be called on those values, resulting in the actual quotes
+    being entered into the database.
+
+    update() - The values portion will be automatically quoted, the same way
+    as insert(). However, the WHERE statement will simply be appended to the
+    query string that is built, so you MUST quote your own values.
+
+    select(), iterated_select(), select_all(), delete() - No quoting is done
+    by these methods. Any fields that need quoted will need to be handled by
+    your program.
+
+TODO
+    not sure yet.
+
+SEE ALSO
+    DBI
+
+    DBIx::Abstract (From which connect(), Makefile.PL, and t/1.pl borrow
+    heavily)
+
+AUTHOR
+    Josh I. Miller, <jmiller@purifieddata.net>
+
+COPYRIGHT AND LICENSE
+    Portions copyright 2003 by Josh I. Miller
+
+    Portions copyright 2001-2002 by Andrew Turner
+
+    Portions copyright 2000-2001 by Adelphia Business Solutions
+
+    Portions copyright 1998-2000 by the Maine Internetworks (MINT)
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

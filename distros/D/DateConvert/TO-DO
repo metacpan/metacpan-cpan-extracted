@@ -1,0 +1,16 @@
+- stick some sort of forward_day and back_day methods into the base class
+- make things more OO.
+- make it impossible to instantiate the base class (ie. make it an ADT).
+- move the responsibilty for default constructor from subclasses to base
+	class
+- make Gregorian inherit from Julian rather than the other way around
+- Add more calendars (ie. Islamic)
+- Get ahold of my original sources
+- make the default constructor initialize using today's date.
+- add a whole lot more test cases to the test suites, particularly boundary
+	conditions
+- add more argument passing options a la CGI.pm, ie. 'year'=>1974 or 
+	-year=>1974
+- docs: explain about the second-part approximation that bugged Ed. Sabol
+- add some form of format specifier to date_string for Gregorian
+- Conversion between formats that understand time of dat and ones that don't?

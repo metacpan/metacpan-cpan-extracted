@@ -1,0 +1,139 @@
+#!/usr/bin/perl
+
+(our $ME = $0) =~ s|^.*/||;
+
+use strict;
+use warnings;
+
+###############################################################################
+# BEGIN user-customizable section
+
+# Path to serial device.
+my $Serial = '/dev/lacrosse';
+
+# Path to output log file.  <YYYY> will be replaced with the current year,
+# <MM> with the numeric month (01-12), <DD> with the day (01-31).  The
+# base directory will be created if it doesn't exist.  See 'sub logfile'
+# below for full details.
+my $Log_File_Template = '/tmp/var/www/wx/data/<YYYY>/<MM>/<DD>';
+
+# The fields we want, in the format we want.
+#
+# By now you've probably realized that Ed is fanatical, nay, neurotic
+# about writing table-driven code.  All this could be written much more
+# quickly with a simple printf "..." and a series of $ws->get()s.  But
+# any attempt to edit that would end in disaster as the format sequences
+# fall out of sync with the fields.  This is maintainable.
+#
+# The format below generates output looking like this:
+#
+#    <date> 67.8 37%  55.6 35% 30.41 Rising  247 @  0  0.0  0.0  0.0
+#
+# That's a format that Ed likes because it's easy to read at a glance,
+# easy to identify what each number means, and easy to scan multiple
+# lines at once because the columns match up even if the number widths change.
+#
+# It may not be a format you like.  If you want to change it, do so!
+# The format of this table is:
+#
+#        <Field>       [units]    <printf format>
+# where:
+#        Field     is a name; see Device::LaCrosse::WS23xx::MemoryMap
+#        [units]   is the desired units to which to convert
+#        Format    is a standard printf format, possibly with other characters
+#
+# Note Format in particular.  For humidity, '%2d%%' results in ' 5%' or '10%'.
+# The '@' in Wind_Direction gives lines like '270 @ 10'.  The only thing you
+# can't have is trailing spaces; I implement those by padding the next field.
+#
+my $want = <<'END_WANT';
+Indoor_Temperature       F      %4.1f
+Indoor_Humidity                 %2d%%	# The '%' sign is for readability
+Outdoor_Temperature      F      %5.1f	# 5.1f gives us an extra space, ibid.
+Outdoor_Humidity                %2d%%
+Relative_Pressure        inHg   %5.2f
+Tendency                        %-7s
+Wind_Direction                  %03d @	# '@' sign is again for readability
+Wind_Speed               kt     %2.0f
+Rain_1h                         %4.1f
+Rain_24h                        %4.1f
+Rain_Total                      %4.1f
+END_WANT
+
+# END   user-customizable section
+###############################################################################
+
+use Device::LaCrosse::WS23xx;
+use Time::Piece;
+use File::Path		qw(mkpath);
+use File::Basename	qw(dirname);
+
+my $ws = Device::LaCrosse::WS23xx->new( $Serial )
+    or die "$ME: Cannot communicate with $Serial: $!\n";
+
+my $now = localtime;
+
+# All records start with the current date and time
+my $logline = sprintf("%d-%02d-%02d %02d:%02d:%02d",
+		      $now->year, $now->mon, $now->mday,
+		      $now->hour, $now->min, $now->sec);
+
+# The rest of the line is a space-separated formatted list; see above.
+for my $line (split "\n", $want) {
+    $line =~ s/\s+#.*$//;		# strip comments
+
+    #           1   1   23   3   2 4   4
+    $line =~ m!^(\S+)\s+((\S+)\s+)?(%.*)$!
+	or die "$ME: Internal error: cannot grok formattine line '$line'";
+    my @field = ($1);
+    push @field, $3	if defined $2;
+    my $format = $4;
+
+    my $value = $ws->get(@field);
+    $logline .= " " . sprintf($format, $value);
+}
+
+# Done.  Write the record to our log file.
+my $logfile = logfile($now);
+open LOG, '>>', $logfile
+    or die "$ME: Cannot append to $logfile: $!\n";
+
+# FIXME: a more careful implementation would do:
+#   flock LOG, LOCK_EX;
+#   seek  LOG, 0, SEEK_END;
+
+print LOG $logline, "\n";
+close LOG
+    or die "$ME: Error writing to $logfile: $!\n";
+
+exit 0;
+
+
+
+
+sub logfile {
+    my $t = shift;			# in: Time::Piece object
+
+    # The substitutions we know how to make: each 'XX' below
+    # will replace a given <XX> in the log file template.
+    my %YMD = (
+	YYYY =>                 $t->year,        # 2007
+	YY   => sprintf("%02d", $t->yy),         #   07
+	MMM  =>                 $t->monname,     #  Mar
+	MM   => sprintf("%02d", $t->mon),        #   03
+	DD   => sprintf("%02d", $t->mday),       #   05
+    );
+
+    # Do the substitution.  Barf if someone gets cute with '<NONESUCH>'
+    (my $log = $Log_File_Template) =~ s{<([A-Z]+)>}{
+	$YMD{$1} || die "Cannot interpret '<$1>'";
+    }ge;
+
+    # If parent directory doesn't exist, silently create it.
+    if (! -d (my $dir = dirname($log))) {
+	mkpath $dir, 0, 02755
+	    or die "$ME: Cannot mkdir $dir: $!\n";
+    }
+
+    return $log;
+}

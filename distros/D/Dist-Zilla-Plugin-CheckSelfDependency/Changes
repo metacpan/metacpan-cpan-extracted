@@ -1,0 +1,44 @@
+Revision history for Dist-Zilla-Plugin-CheckSelfDependency
+
+0.011     2015-03-29 23:28:45Z
+          - now using Dist::Zilla::Role::ModuleMetadata to use a cached object
+            for efficiency
+
+0.010     2015-01-03 20:48:28Z
+          - bump Module::Metdata prereq for $VERSION parsing (RT#101095)
+
+0.009     2014-12-03 02:07:51Z
+          - increase minimum required version of CPAN::Meta::Prereqs (broken
+            in 0.008)
+
+0.008     2014-11-15 08:34:49Z
+          - drop prereq requirement on Dist::Zilla 5.x
+          - check against the version being required, not just the module,
+            when this is relevant (for develop prereqs)
+
+0.007     2014-01-25 03:20:52Z
+          - now using a filefinder to find all modules to check -- now only
+            checking files in lib/ by default
+
+0.006     2013-12-07 22:27:04Z
+          - now also checking for develop prereqs, that aren't listed in
+            'provides' metadata
+
+0.005     2013-10-26 01:31:06Z
+          - set minimum version prereq for Module::Metadata
+
+0.004     2013-10-24 04:17:27Z
+          - fixes for Dist::Zilla 5.x, where we need to set the binmode on the
+            fh before opening to the encoded content (we are still compatible
+            with older Dist::Zilla as well)
+
+0.003     2013-10-18 01:13:36Z
+          - properly handle .pm files that don't exist on disk yet (e.g.
+            ::Conflicts)
+
+0.002     2013-10-17 02:58:11Z
+          - skip checking develop prereqs, (it is not horrible for a plugin or
+            bundle to list itself as a develop prereq)
+
+0.001     2013-10-14 02:15:52Z
+          - Initial release.

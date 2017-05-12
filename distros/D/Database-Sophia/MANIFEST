@@ -1,0 +1,69 @@
+Changes			History of this package
+README			The Instructions
+MANIFEST		This file
+Makefile.PL		Will create 'Makefile' to build this extention
+Sophia.pm	        Bootstrap & documentation
+Sophia.xs	        XS glue
+t/000_create.t          Base test file
+typemap			
+Sophia-src/COPYRIGHT    Sophia source
+Sophia-src/db
+Sophia-src/db/a.h
+Sophia-src/db/cat.c
+Sophia-src/db/cat.h
+Sophia-src/db/core.h
+Sophia-src/db/crc.c
+Sophia-src/db/crc.h
+Sophia-src/db/cursor.c
+Sophia-src/db/cursor.h
+Sophia-src/db/e.c
+Sophia-src/db/e.h
+Sophia-src/db/file.c
+Sophia-src/db/file.h
+Sophia-src/db/gc.c
+Sophia-src/db/gc.h
+Sophia-src/db/i.c
+Sophia-src/db/i.h
+Sophia-src/db/list.h
+Sophia-src/db/lock.h
+Sophia-src/db/macro.h
+Sophia-src/db/makefile
+Sophia-src/db/merge.c
+Sophia-src/db/merge.h
+Sophia-src/db/meta.h
+Sophia-src/db/recover.c
+Sophia-src/db/recover.h
+Sophia-src/db/ref.h
+Sophia-src/db/rep.c
+Sophia-src/db/rep.h
+Sophia-src/db/sophia.h
+Sophia-src/db/sp.c
+Sophia-src/db/sp.h
+Sophia-src/db/task.h
+Sophia-src/db/track.h
+Sophia-src/db/util.c
+Sophia-src/db/util.h
+Sophia-src/debian/changelog
+Sophia-src/debian/compat
+Sophia-src/debian/control
+Sophia-src/debian/copyright
+Sophia-src/debian/postinst
+Sophia-src/debian/rules
+Sophia-src/debian/source
+Sophia-src/debian/source/format
+Sophia-src/makefile
+Sophia-src/README
+Sophia-src/sophia.gyp
+Sophia-src/test/common.c
+Sophia-src/test/concurrent.c
+Sophia-src/test/crash.c
+Sophia-src/test/i.c
+Sophia-src/test/issues.c
+Sophia-src/test/limit.c
+Sophia-src/test/makefile
+Sophia-src/test/merge.c
+Sophia-src/test/recover.c
+Sophia-src/test/test.h
+Sophia-src/test/transaction.c
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

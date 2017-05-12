@@ -1,0 +1,18 @@
+Makefile.PL
+Changes
+README
+.gitignore
+lib/Dancer/Plugin/TagHelper.pm
+examples/lib/tagtest.pm
+examples/bin/xslate.t
+examples/views/index.tt
+examples/config.yml
+t/boilerplate.t
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+t/00-load.t
+MANIFEST
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

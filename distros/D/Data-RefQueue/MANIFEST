@@ -1,0 +1,12 @@
+Build.PL
+Changes
+examples/example.pl
+lib/Data/RefQueue.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-pod_coverage.t.disabled
+t/00-POD_valid.t
+t/01-refqueue.t

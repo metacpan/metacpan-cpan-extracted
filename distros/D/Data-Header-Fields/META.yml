@@ -1,0 +1,63 @@
+---
+abstract: 'encode and decode RFC822 header field lines'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Deep: '0'
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+keywords:
+  - rfc822
+  - rfc2822
+  - header
+  - parse
+  - edit
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Header-Fields
+provides:
+  Data::Header::Fields:
+    file: lib/Data/Header/Fields.pm
+    version: '0.05'
+  Data::Header::Fields::Line:
+    file: lib/Data/Header/Fields.pm
+  Data::Header::Fields::Value:
+    file: lib/Data/Header/Fields.pm
+  Data::v:
+    file: lib/Data/v.pm
+    version: '0.03'
+  Data::v::Calendar:
+    file: lib/Data/v.pm
+  Data::v::Card:
+    file: lib/Data/v.pm
+  Data::v::Card::Entry:
+    file: lib/Data/v.pm
+  Data::v::Card::Line:
+    file: lib/Data/v.pm
+  Data::v::Card::Value::Adr:
+    file: lib/Data/v.pm
+  Data::v::Card::Value::Name:
+    file: lib/Data/v.pm
+  Data::v::Param:
+    file: lib/Data/v.pm
+requires:
+  Carp: '0'
+  Encode: '0'
+  IO::Any: '0'
+  List::MoreUtils: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  Scalar::Util: '0'
+  String::Escape: '0'
+resources:
+  bugtracker: http://github.com/jozef/Data-Header-Fields/issues
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/jozef/Data-Header-Fields.git
+version: '0.05'

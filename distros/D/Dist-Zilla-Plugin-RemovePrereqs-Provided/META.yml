@@ -1,0 +1,42 @@
+---
+abstract: 'Remove prerequisites that are already provided.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::Prereqs: '0'
+  Dist::Zilla::Util::Test::KENTNL: '1.005000'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-RemovePrereqs-Provided
+provides:
+  Dist::Zilla::Plugin::RemovePrereqs::Provided:
+    file: lib/Dist/Zilla/Plugin/RemovePrereqs/Provided.pm
+    version: '0.001001'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Role::PrereqSource: '0'
+  Dist::Zilla::Util::ConfigDumper: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-RemovePrereqs-Provided/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-RemovePrereqs-Provided
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-RemovePrereqs-Provided.git
+version: '0.001001'

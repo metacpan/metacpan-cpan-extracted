@@ -1,0 +1,11 @@
+Revision history for DBIx-Class-Preview
+
+  Fixed problem with connecting schema without first doing ->compose_namespace
+
+1.000000
+  Initial release
+
+1.000003
+  Works with new DBIC
+
+

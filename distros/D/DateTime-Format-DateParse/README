@@ -1,0 +1,67 @@
+NAME
+    DateTime::Format::DateParse - Parses Date::Parse compatible formats
+
+SYNOPSIS
+        use DateTime::Format::DateParse;
+
+        my $dt = DateTime::Format::DateParse->parse_datetime( $date );
+        my $dt = DateTime::Format::DateParse->parse_datetime( $date, $zone );
+
+DESCRIPTION
+    This module is a compatibility wrapper around Date::Parse.
+
+USAGE
+  Import Parameters
+    This module accepts no arguments to it's "import" method and exports no
+    *symbols*.
+
+  Methods
+   Class Methods
+    *   parse_datetime($date [, $zone])
+
+        Accepts a Date::Parse compatible $date string and optionally a
+        Time::Zone compatible $zone string.
+
+        Returns a DateTime object.
+
+GOTCHAS
+    *   If parse_datetime is called on a $date that doesn't know specify a
+        timezone and $zone is not set, then the timezone of the returned
+        DateTime object will be set to the "local" timezone. This is
+        consistent with the behavior of Date::Parse.
+
+    *   If parse_datetime is called without a $zone but the $date string
+        *does* specify a timezone/offset or if parse_datetime is called with
+        a $zone that DateTime::TimeZone does not understand, the returned
+        DateTime object will have it's timezone set to a fixed offset from
+        UTC. This means that "DST" information is not available and date
+        math will not reflect "DST" transitions. This may be resolved for
+        true timezones by using the DateTime::TimeZone::Alias module to
+        "alias" the Time::Zone timezone to an Olson DB name. This may be
+        done automatically in a future release.
+
+CREDITS
+    Graham Barr (GBARR) <gbarr@pobox.com>, author of Date::Parse
+
+    Everyone at the DateTime "Asylum".
+
+SUPPORT
+    Support for this module is provided via the <datetime@perl.org> email
+    list. See <http://lists.perl.org/> for more details.
+
+AUTHOR
+    Joshua Hoblitt (JHOBLITT) <jhoblitt@cpan.org>
+
+COPYRIGHT
+    Copyright (c) 2005-6 Joshua Hoblitt. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself.
+
+    The full text of the licenses can be found in the *LICENSE* file
+    included with this module, or in perlartistic and perlgpl as supplied
+    with Perl 5.8.1 and later.
+
+SEE ALSO
+    Date::Parse, Time::Zone, DateTime, DateTime::TimeZone,
+    DateTime::TimeZone::Alias, <http://datetime.perl.org/>
+

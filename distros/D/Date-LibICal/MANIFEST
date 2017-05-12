@@ -1,0 +1,8 @@
+Changes
+LibICal.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Date-LibICal.t
+lib/Date/LibICal.pm

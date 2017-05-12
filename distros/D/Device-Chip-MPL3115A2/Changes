@@ -1,0 +1,25 @@
+Revision history for Device-Chip-MPL3115A2
+
+0.05    2016/12/10 23:15:39
+        [CHANGES]
+         * Remove legacy direction docs from Device::BusPirate::Chip::MPL3115A2
+
+0.04    2015/11/13 00:40:53
+        [CHANGES]
+         * Use Device::Chip::Base::RegisteredI2C
+
+0.03    2015/11/12 12:37:15
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::MPL3115A2
+         * Changed to implement Device::Chip interface
+
+Previously, this distribution was called Device-BusPirate-Chip-MPL3115A2
+
+0.02    2015/01/20 23:40:40
+        [CHANGES]
+         * Wrap more registers - CTRL_REG1 to CTRL_REG3, BAR_IN, T/P_MIN/MAX
+         * Support altimeter mode
+
+0.01    2015/01/15 23:25:39
+        First version, released on an unsuspecting world.
+

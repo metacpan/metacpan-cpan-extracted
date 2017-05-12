@@ -1,0 +1,30 @@
+Debian-Package-HTML version 0.01
+================================
+
+Debian-Package-HTML provides an easy way to generate Webpages from the
+results of your daily package building. The POD documentation for
+the module covers most aspect of the usage of this module. Any bugs
+or recommendations are greatly welcome.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires HTML::Template and a Debian system.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jose Parrella <joseparrella@cantv.net>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,56 @@
+Revision history for DBIx-Class-HTMLWidget
+0.16    2008-02-06
+    - Fix manifest
+    
+0.15    2008-02-05
+    - Note to self: COPYFILE_DISABLE=1
+    
+0.14    2008-02-05
+    - Missing dep
+    
+0.13    2008-02-05
+    - Bad dist 0.12
+    
+0.12    2008-02-05 
+    - Special case columns data_type => boolean, is_nullable => 0 for postgres, as they
+      can't handle undef as value, they need 0.
+0.11
+    - Backwards incompatible change: If an element has a value when fill_form is run, it
+    will not be overwritten with a new value.
+    
+0.10
+    - Fix problem with undefing values not properly updating on postgres
+    
+0.09
+    - Changed from using set_column($col, $value) to $col($value)
+        (Thanks to Matt S. Trout for report)
+    - Fix undef check to ignore refs, silencing DateTime comparison with string
+        (Thanks to Marcus Ramberg for report)
+    - Fix uninitialized warning
+        (Thanks to Marcus Ramberg)
+0.08    2006-11-26 09:37
+    - Updated deps to make sure we use the latest HTML::Widget, with 
+      multi-level support
+    - Fix for  DBIx::Class::InflateColumn::DateTime and the one-to-many support
+        (Thanks to Guillermo Sansovic)
+	- More HTML-Widget fixes from omega.
+0.07    2006-10-10 14:03
+    - Fix for checkboxes again
+    - properly use the new embedded structures
+0.06    2006-06-22 14:33
+	- Fixes for embedded widgets and numerous other goodies (thanks omega!)
+0.05    2006-06-03 18:43
+    - Blank out password fields.
+	- Iterates the Widget elements on insert for security reasons (thanks ash!) 
+0.04	?
+	- Supports embedded widgets
+0.03    2006-04-13 12:24
+    - Fixed outdated pod synopsis. (thanks dave)
+    - Fixed so empty values doesn't get set to 0. (thanks alex)
+	- Use get_column to avoid inflation instead.
+0.02    2006-01-25 15:06
+	- Fix checkboxes
+	- Fix foreign keys.
+0.01    2006-01-25 15:06
+        First version, released on an unsuspecting world.
+

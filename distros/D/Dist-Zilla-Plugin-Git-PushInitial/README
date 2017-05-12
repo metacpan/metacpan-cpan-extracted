@@ -1,0 +1,61 @@
+NAME
+    Dist::Zilla::Plugin::Git::PushInitial - do initial git push from your
+    minting profile
+
+SYNOPSIS
+    In your profile.ini:
+
+        [Git::Init]
+
+        [GitHub::Create]
+        repo   = {{ lc $dist->name }}
+        prompt = 1
+
+        [Git::PushInitial]
+        remote = origin # default
+
+DESCRIPTION
+    This module is only of interest to authors of Dist::Zilla minting
+    profiles.
+
+    After minting a new dist with Git::Init and setting remote information
+    with e.g. GitHub::Create, if "push.default" is not configured or set at
+    the default value ("tracking"), or an older git is being used, it is
+    necessary to create the branch on the remote before a simple "git push",
+    done by e.g. Git::Push will work on "dzil release".
+
+    Using this plugin in your minting profile should save the users of your
+    minting profile the step of doing a manual push, regardless of their git
+    config. They can just commit and do a "dzil release", assuming they are
+    using Git::Push in their dist.ini.
+
+    It runs this command:
+
+        git push <remote> <current-branch>
+
+    remote defaults to 'origin' but can be specified as a parameter to this
+    plugin.
+
+PARAMETERS
+  remote
+    The remote to push to, default is "origin".
+
+SEE ALSO
+    *   Minting Profiles Tutorial
+        <http://dzil.org/tutorial/minting-profile.html>
+
+    *   Dist::Zilla::Plugin::Git::Init
+
+    *   Dist::Zilla::Plugin::GitHub::Create
+
+    *   Dist::Zilla::Plugin::Git::Push
+
+    *   Dist::Zilla::MintingProfile::Author::Caelum
+
+ACKNOWLEDGEMENTS
+    Some code/ideas stolen from Alessandro Ghedini's
+    Dist::Zilla::Plugin::GitHub::Create.
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+

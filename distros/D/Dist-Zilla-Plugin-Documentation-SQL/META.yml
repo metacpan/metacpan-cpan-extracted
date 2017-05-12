@@ -1,0 +1,33 @@
+---
+abstract: 'Create a file gathering all =sql commands'
+author:
+  - 'Armand Leclercq <armand.leclercq@gmail.com>'
+build_requires:
+  Test::DZil: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Documentation-SQL
+requires:
+  Dist::Zilla::Role::FileFinderUser: 0
+  Dist::Zilla::Role::FileInjector: 0
+  Dist::Zilla::Role::FileMunger: 0
+  Dist::Zilla::Role::Plugin: 0
+  Moose: 0
+  Path::Class: 0
+  Pod::Elemental: 0
+  Pod::Elemental::Element::Nested: 0
+  Pod::Weaver::Section::SQL: 0.03
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/marmand/Dist-Zilla-Plugin-Documentation-SQL/issues
+  homepage: https://github.com/marmand/Dist-Zilla-Plugin-Documentation-SQL/wiki
+  repository: git://github.com/marmand/Dist-Zilla-Plugin-Documentation-SQL.git
+version: 0.03

@@ -1,0 +1,4 @@
+Revision history for Perl extension DNS::Bananafonana.
+
+0.1 Thu Oct 20 00:16:10 CEST 2011
+	- initial version based on Math::Base85 from Tony Monroe

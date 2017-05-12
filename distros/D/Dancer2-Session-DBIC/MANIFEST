@@ -1,0 +1,27 @@
+CHANGES
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Dancer2/Session/DBIC.pm
+lib/Dancer2/Session/DBIC/Role/Serializer.pm
+lib/Dancer2/Session/DBIC/Serializer/JSON.pm
+lib/Dancer2/Session/DBIC/Serializer/Sereal.pm
+lib/Dancer2/Session/DBIC/Serializer/YAML.pm
+t/basics.t
+t/lib/Test/Custom.pm
+t/lib/Test/Custom/Result/Custom.pm
+t/lib/Test/Schema.pm
+t/lib/Test/Schema/Result/Session.pm
+t/lib/Test/SchemaNonPK.pm
+t/lib/Test/SchemaNonPK/Result/Session.pm
+t/manifest.t
+t/plugin_dbic.t 
+t/pod.t
+t/pod-coverage.t
+t/schema.t
+t/serializers/json.t
+t/serializers/sereal.t
+t/serializers/yaml.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

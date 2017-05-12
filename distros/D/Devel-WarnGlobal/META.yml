@@ -1,0 +1,25 @@
+---
+abstract: 'Helps track down and eliminate globals'
+author:
+  - 'Stephen Nelson <stephenenelson@mac.com>'
+build_requires:
+  Test: 0
+  vars: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-WarnGlobal
+requires:
+  Carp: 0
+  perl: v5.6.0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/stephenenelson/devel-warnglobal
+  repository: https://github.com/stephenenelson/devel-warnglobal.git
+version: 0.09

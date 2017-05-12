@@ -1,0 +1,141 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Compare::LayerCake - Compare Result Filtering layer
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream::Iterator::Consolidate;
+  use Data::Range::Compare::Stream::Iterator::Compare::LayerCake;
+
+  my $iterator_a=Data::Range::Compare::Stream::Iterator::Array->new(
+    new_from=>'Data::Range::Compare::Stream',
+  );
+
+  # create a new range and add it to the iterator
+  $iterator_a->create_range(0,0);
+
+  my $iterator_b=Data::Range::Compare::Stream::Iterator::Array->new(
+    new_from=>'Data::Range::Compare::Stream',
+  );
+
+  # create a new range and add it to the iterator
+  $iterator_b->create_range(1,2);
+
+  $iterator_a->prepare_for_consolidate_asc;
+  $iterator_b->prepare_for_consolidate_asc;
+
+  my $consolidate_a=Data::Range::Compare::Stream::Iterator::Consolidate->new($iterator_a);
+  my $consolidate_b=Data::Range::Compare::Stream::Iterator::Consolidate->new($iterator_b);
+  
+
+  my $compare=new Data::Range::Compare::Stream::Iterator::Compare::LayerCake;
+
+  $compare->add_consolidator($consolidate_a);
+  $compare->add_consolidator($consolidate_b);
+
+  while($compare->has_next) {
+    # Result objects are instances of: Data::Range::Compare::Stream::Iterator::Compare::Result
+    my $result=$compare->get_next;
+  }
+
+=head1 DESCRIPTION
+
+This module extends Data::Range::Compare::Stream::Iterator::Compare::Asc.
+
+Data::Range::Compare::Stream::Iterator::Compare::LayerCake compares results from Data::Range::Compare::Stream::Iterator::Consolidate in the following order: Consolidation Asc range_start asc,range_end desc
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $compare=new Data::Range::Compare::Stream::Iterator::Compare::LayerCake;
+
+=item * my $compare=new Data::Range::Compare::Stream::Iterator::Compare::LayerCake(key=>value);
+
+The constructor takes all the same arguments Data::Range::Compare::Stream::Iterator::Compare::Asc does along with the following optional arguments:
+
+    factory_instance =>$obj
+      # defines the object that implements the $obj->factory($start,$end,$data).
+      # new ranges are constructed from the factory interfcae.  If a factory interface
+      # is not created an instance of Data::Range::Compare::Stream is assumed.
+
+    ignore_empty=>0|1 # default 0
+      # when set to true all empty result sets are returned
+
+    ignore_full=>0|1 # default 0
+      # when set to true all full result sets are returned
+
+    filter=>undef|code_ref
+      # Default: undef  
+      # When Defined: code_ref is used to filter results, code_ref->($result);
+      #   if the code_ref returns false the result is ignored
+      #   if the code_ref returns true the result will be used as the next valid result
+
+=item * $compare->add_consolidator($iterator);
+
+An $iterator object must implement one of the following iterator classes: Data::Range::Compare::Stream::Iterator::Consolidate, Data::Range::Compare::Stream::Iterator::Compare::Asc.  Result objects from $iterator->has_next must implement one of the following result objects: Data::Range::Compare::Stream::Iterator::Consolidate::Result, Data::Range::Compare::Stream::Iterator::Compare::Result.
+
+=item * while($compare->has_next) { do something }
+
+Returns true when the there are more ranges to consolidate.
+
+=item * my $result=$compare->get_next;
+
+if $compare->has_next returns true Returns a instance of Data::Range::Compare::Stream::Iterator::Compare::Result.
+
+=item * my $count=$compare->get_column_count_human_readable;
+
+Returns a human readable count of the columns in the comparison object.
+
+=item * my $count=$compare->get_column_count;
+
+Returns the last index id of the iterator column counts.
+
+=item * my $range=$compare->get_current_row;
+
+Returns the range object that will be used in the $compare->get_next call
+
+=item * my $boolean=$compare->iterators_empty;
+
+Returns false when all iterator objects in $compare are depleted
+
+=item * my $result=$compare->get_next;
+
+If $compare->has_next returns true Returns an instance of Data::Range::Compare::Stream::Iterator::Compare::Result.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Iterator::Compare::Result
+
+Data::Range::Compare::Stream::Iterator::Consolidate::Result
+
+Data::Range::Compare::Stream::Iterator::Consolidate
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

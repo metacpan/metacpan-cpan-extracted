@@ -1,0 +1,71 @@
+==================================================
+Changes from 2011-08-21 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.07 at 2012-08-20 11:21:53 +0000
+-----------------------------------------
+
+  Change: 32445d390731b5555e9f9c61141e0b4b2ec52ea3
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-08-20 13:21:33 +0000
+
+    Clean.pm: re-order use (just cosmetics) 
+
+  Change: 87e7bd303a527c9f1881bf5f9d2e7106e005f573
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-08-18 16:37:00 +0000
+
+    Clean.pm: twek description 
+
+-----------------------------------------
+version 0.06 at 2012-08-11 14:04:37 +0000
+-----------------------------------------
+
+  Change: 84f1cfac68ff542bae9495731d488487469324d4
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-08-11 16:04:37 +0000
+
+    Clean.pm: fix use strict (no functional changes) 
+
+-----------------------------------------
+version 0.05 at 2012-07-07 12:42:37 +0000
+-----------------------------------------
+
+  Change: e4e06446083fc062ff20097de92cee108937d8b5
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-07-07 14:42:37 +0000
+
+    dist.ini: update repo name 
+
+-----------------------------------------
+version 0.03 at 2012-02-15 11:07:40 +0000
+-----------------------------------------
+
+  Change: d4dc72b1936fd8e6873170e34924ffbc90c72441
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-02-15 12:07:40 +0000
+
+    update description and log messages 
+
+  Change: 5dd585156c33f505d485fa938da74ac9ce549a1a
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2012-02-08 14:36:11 +0000
+
+    use Git::NextVersion plugin 
+
+  Change: ee1676c7bd81142f37f398d0ffcffb3d4b27a47b
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:30:41 +0000
+
+    do not check pod coverage 
+
+  Change: 6bcdf9ab8300b79ae8870da8a7d93fc39dc45fc2
+  Author: Alessandro Ghedini <al3xbio@gmail.com>
+  Date : 2011-09-11 15:30:27 +0000
+
+    remove tests 
+
+================================================
+Plus 2 releases after 2011-08-21 00:00:00 +0000.
+================================================

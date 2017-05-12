@@ -1,0 +1,3 @@
+[% IF entry.description %]
+ <p class="entry-summary">[% entry.description |encode |html %]</p>
+[% END %]

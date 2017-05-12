@@ -1,0 +1,10 @@
+
+Bugs known in version 0.02
+
+* Broken Condition handling - it will probably work on summaries, but is ultimately broken on detail pages
+* cover_report is very noisy when it cleans the cover_db directory
+* no warning about cover_db being wiped out. Maybe, there should be one?
+* File's total coverage sometimes is counted as AND, instead of OR from all runs.
+    This happens mostly, if parts of the module are re-defined in tests.
+	Seems to be a problem in the way original Devel::Cover stores coverage metrics.
+

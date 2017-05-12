@@ -1,0 +1,125 @@
+Revision history for DBIx-Class-Visualizer
+
+0.0200 2016-09-19 23:33:53 UTC
+ [New Features]
+ - Can transform the rendered svg document so that it is much more useful
+   in a web application.
+
+ [Requirements]
+ - Mojolicious is required to make use of the improved svg transformation
+   (but not otherwise).
+
+ [Bug Fixes]
+ - Remove use of /r in a regexp.
+
+ [Documentation]
+ - Removed outdated example, but Mojolicious::Plugin::DbicSchemaViewer has
+   a demo.
+
+ [Stats & Dependency Changes]
+ - 13 files changed, 1154 insertions(+), 271 deletions(-)
+ - (run req) + JSON::MaybeXS 1.003003
+ - (run req) + Log::Handler 0.84
+ - (run req) + PerlX::Maybe 1.001
+ - (run req) + ReadonlyX 1.03
+ - (run req) + Syntax::Keyword::Gather 1.002000
+ - (run req) + Types::Standard 1.000005
+ - (run req) ~ GraphViz2 2.38 --> 2.42
+ - (run rec) + Mojolicious 6.0
+ - (test req) + DBIx::Class 0.08260
+
+0.0100 2016-09-04T20:13:20Z UTC
+ - Initial release
+
+ [Stats & Dependency Changes]
+ - (run req) + DateTime::Tiny 1.06
+ - (run req) + GraphViz2 2.38
+ - (run req) + List::Util 1.45
+ - (run req) + Moo 2.00
+ - (run req) + perl 5.010001
+ - (test req) + ExtUtils::MakeMaker (any)
+ - (test req) + File::Spec (any)
+ - (test req) + IO::Handle (any)
+ - (test req) + IPC::Open3 (any)
+ - (test req) + Test::More 0.96
+ - (test rec) + CPAN::Meta 2.120900
+ - (conf req) + ExtUtils::MakeMaker (any)
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::CheckChangesHasContent 0.008
+ - (dev req) + Dist::Zilla::Plugin::Clean 0.07
+ - (dev req) + Dist::Zilla::Plugin::ConfirmRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680
+ - (dev req) + Dist::Zilla::Plugin::DistIller::MetaGeneratedBy (any)
+ - (dev req) + Dist::Zilla::Plugin::ExecDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::Check (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Contributors 0.017
+ - (dev req) + Dist::Zilla::Plugin::Git::GatherDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Push (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::Tag (any)
+ - (dev req) + Dist::Zilla::Plugin::GithubMeta 0.54
+ - (dev req) + Dist::Zilla::Plugin::InstallRelease 0.008
+ - (dev req) + Dist::Zilla::Plugin::License (any)
+ - (dev req) + Dist::Zilla::Plugin::MakeMaker (any)
+ - (dev req) + Dist::Zilla::Plugin::Manifest (any)
+ - (dev req) + Dist::Zilla::Plugin::ManifestSkip (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaJSON (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaNoIndex (any)
+ - (dev req) + Dist::Zilla::Plugin::MetaProvides::Package 2.003001
+ - (dev req) + Dist::Zilla::Plugin::MetaYAML (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::PodSyntaxTests (any)
+ - (dev req) + Dist::Zilla::Plugin::PodWeaver 4.006
+ - (dev req) + Dist::Zilla::Plugin::Prereqs (any)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale (any)
+ - (dev req) + Dist::Zilla::Plugin::Readme (any)
+ - (dev req) + Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::RunExtraTests 0.028
+ - (dev req) + Dist::Zilla::Plugin::ShareDir (any)
+ - (dev req) + Dist::Zilla::Plugin::Test::Compile 2.054
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::ReportPrereqs 0.021
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Dist::Zilla::Plugin::TestRelease (any)
+ - (dev req) + Dist::Zilla::Plugin::TravisYML 1.15
+ - (dev req) + Dist::Zilla::Plugin::UploadToCPAN (any)
+ - (dev req) + Pod::Elemental::Transformer::List (any)
+ - (dev req) + Pod::Weaver::Plugin::SingleEncoding (any)
+ - (dev req) + Pod::Weaver::Plugin::Transformer (any)
+ - (dev req) + Pod::Weaver::PluginBundle::CorePrep (any)
+ - (dev req) + Pod::Weaver::Section::Authors (any)
+ - (dev req) + Pod::Weaver::Section::Badges 0.0401
+ - (dev req) + Pod::Weaver::Section::Collect (any)
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Pod::Weaver::Section::Generic (any)
+ - (dev req) + Pod::Weaver::Section::Leftovers (any)
+ - (dev req) + Pod::Weaver::Section::Legal (any)
+ - (dev req) + Pod::Weaver::Section::Name (any)
+ - (dev req) + Pod::Weaver::Section::Region (any)
+ - (dev req) + Pod::Weaver::Section::Version (any)
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Pod 1.41
+ - (dev req) + Test::Version 1
+ - (dev req) + Test::Warnings 0.026
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0312

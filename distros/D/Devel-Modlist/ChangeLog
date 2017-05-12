@@ -1,0 +1,90 @@
+Revision history for Perl extension Devel::Modlist.
+
+0.801	Fri Sep  5 02:34:20 PDT 2008
+
+	Previous release missed some commits/files. Did not deliver the
+	Module::Build support (new file Build.PL) or the author/abstract
+	meta-data in Makefile.PL.
+
+	Modlist.pm had an outdated link for the LGPL 2.1 license, fixed.
+
+0.8	Thu Sep  4 02:17:39 PDT 2008
+
+	Added and documented support for a YAML output format. Also added
+	explicit license information in the pod.
+
+	Moved Modlist.pm into a lib/Devel library to create a more traditional
+	layout. Affects MANIFEST and Makefile.PL as well.
+
+0.7	Tue Jun 13 16:01:32 MDT 2006
+
+	The 0.6 release failed to deliver an updated README, ChangeLog, or
+	the newly-added test-suites.
+
+0.6	Wed May 31 20:47:26 MDT 2006
+
+	Modlist.pm:
+	Several changes: A fix to the handling of options passed in via
+	environment variables; Restored use of "strict" pragma and notes in
+	the docs about always removing it from the output; Updated use of
+	CPAN mechanics for the "cpan" option.
+
+	t/pod.t:
+	t/pod_coverage.t:
+	New test suites to test pod correctness and coverage.
+
+	Makefile.PL:
+	Extended the list of files to clean.
+
+0.5	Sat Apr 27 02:36:46 PDT 2002
+	- second beta
+
+	Added support for options to be specified in environment variables,
+	either "Devel::Modlist" or "Devel__Modlist" (in order of preference).
+	See the man page for the details of using this.
+
+0.4	Sat Jul 22 02:54:46 PDT 2000
+	- first beta
+
+	Added the options "cpan" and "cpandist" to do CPAN-based reduction.
+	Assuming your Perl installation uses the CPAN module for management
+	of modules, these options will reduce the list of modules such that
+	only one representative of a given CPAN distribution file is shown.
+	The "cpandist" option causes the displayed value to be the actual
+	CPAN file, rather than just the shorted package name.
+
+	Make use of File::Spec->splitdir when translating filenames into
+	package names. This should avoid any problems on Macs, etc.
+
+0.3	Wed Feb  2 00:41:59 PST 2000
+	- third alpha
+
+	Added patch from Alex Stewart (alex@redhat.com) to have the output
+	refer to file paths rather than packages. This is useful for feeding
+	to package management commands such as RPM, for dependancy checks.
+
+	Tuned the "path" option, added the "stop" option (which ended up
+	affecting a large part of the structure) and cleaned up the docs.
+	Also decided to not use any pragmas so as to not add to the output
+	should the user not have included them. Released to CPAN as 0.3.
+
+0.2	Sat Feb 13 03:12:57 PST 1999
+	- second alpha
+
+	Changed the algorithm that removes core modules. Now decendant
+	directories are no longer an issue. Added a new option, 'noversion',
+	to suppress display of the version number.
+
+0.1	Thu Feb 11 00:48:51 1999
+	- first CPAN-ready version
+
+	Basic package ready for public scrutiny; implements the basic
+	functionality as well as the 'nocore' option. There is a test
+	in Makefile.PL to warn about problems with nocore if your
+	installprivlib is a direct ancestor of your installsitelib.
+
+0.01	Fri Jan  8 01:06:17 1999
+	- original version; created by h2xs 1.18
+
+	Part proof-of-concept, part oops-I-volunteered. A Devel::* package
+	to list loaded/used modules at script exit, for dep lists and such.

@@ -1,0 +1,23 @@
+Revision history for Data-PcAxis
+
+0.0.7 2014-01-25T21:53:20+00:00 2014-01-25 21:53:20+00:00 Europe/Dublin
+ [BUG FIXES]
+ - PcAxis files where data starts on same line as DATA keyword now handled
+   correctly
+
+0.0.6 2012-10-12T13:59:01Z
+ [BUG FIXES]
+ - Test suite improvements
+
+0.0.5 2012-10-10T10:05:51Z
+ [BUG FIXES]
+ - Minor changes to test suite to improve pass rate on certain platforms
+
+0.0.4 2012-10-09T00:38:59Z
+
+0.0.3 2012-10-08T22:14:33Z
+
+0.0.2 2012-10-08T21:57:23Z
+
+0.0.1 2012-04-04T02:22:54Z
+

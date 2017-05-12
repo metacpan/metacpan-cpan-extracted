@@ -1,0 +1,49 @@
+0.002009  2014-06-26 21:04:12EDT-0400 America/Toronto
+  - fixes pod test failures. thanks gregor herrmann / Debian perl team!
+
+0.002008  2014-06-25 11:37:43EDT-0400 America/Toronto
+
+0.002007  2013-05-19 22:22:25 America/Toronto
+  - fixes another hash-ordering dependency failure. no lib change
+
+0.002006  2013-03-15 13:19:36 EST5EDT
+  - fixes hash-ordering dependency test failure/bug on new (5.17+) perls
+
+0.002005  2013-03-01 22:01:14 America/Toronto
+  - modification to API alpha unstability warning. Removes guarantee on Moose
+    native trait compatibility.
+  - adds parent as dep for older (<=5.10 perls)
+
+0.002003  2013-02-25 12:21:48 EST5EDT
+  - fixes improperly specified requirements in meta, updated dist.ini to fix
+
+0.002002  2013-02-25 10:00:23 EST5EDT
+  - adds missing Module::Runtime dep to dist.ini/build_requires
+
+0.002001  2013-02-22 18:18:01 EST5EDT
+
+0.002000  2013-02-22 18:13:38 EST5EDT
+  - Make it easier to subclass the collection classes (@tobyink)
+  - all logic has been moved to Data::Perl::Role roles via Role::Tiny for code
+    easier reuse.
+
+0.001005  2013-02-07 10:03:48 EST5EDT
+  - adds missed changelog entries for 0.001004 release.
+
+0.001004  2013-02-06 18:17:44 EST5EDT
+  - method chaining introduced as default functionality with Array and Hash
+    collection classes. For old behavior, Collection::Hash::AutoFlatten and
+    Collection::Array::AutoFlatten subclasses are provided.
+  - bugfixes and test suite work
+
+0.001003  2013-01-25 20:26:52 America/Toronto
+  - added other missing dependencies.
+
+0.001002  2013-01-25 16:11:38 EST5EDT
+  - fixes ugly POD typo in Data::Perl
+
+0.001001  2013-01-25 13:22:36 EST5EDT
+  - adds missing dependencies on strictures.
+
+0.001000  2013-01-18 17:17:05 EST5EDT
+  - Initial drop to cpan.

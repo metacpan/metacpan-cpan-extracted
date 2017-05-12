@@ -1,0 +1,211 @@
+# NAME
+
+Dancer2::Plugin::REST - A plugin for writing RESTful apps with Dancer2
+
+# VERSION
+
+version 1.01
+
+# DESCRIPTION
+
+This plugin helps you write a RESTful webservice with Dancer2.
+
+# SYNOPSYS
+
+    package MyWebService;
+
+    use Dancer2;
+    use Dancer2::Plugin::REST;
+
+    prepare_serializer_for_format;
+
+    get '/user/:id.:format' => sub {
+        User->find(params->{id});
+    };
+
+    get qr{^/user/(?<id>\d+)\.(?<format>\w+)} => sub {
+        User->find(captures->{id});
+    };
+
+    # curl http://mywebservice/user/42.json
+    { "id": 42, "name": "John Foo", email: "john.foo@example.com"}
+
+    # curl http://mywebservice/user/42.yml
+    --
+    id: 42
+    name: "John Foo"
+    email: "john.foo@example.com"
+
+# CONFIGURATION
+
+## serializers
+
+The default format serializer hash which maps a given `:format` to 
+a `Dancer2::Serializer::*` serializer. Unless overriden in the 
+configuration, it defaults to:
+
+    serializers:
+      json: JSON
+      yml:  YAML
+      dump: Dumper
+
+# KEYWORDS
+
+## prepare\_serializer\_for\_format
+
+When this pragma is used, a before filter is set by the plugin to automatically
+change the serializer when a format is detected in the URI.
+
+That means that each route you define with a **:format** param or captures token 
+will trigger a serializer definition, if the format is known.
+
+This lets you define all the REST actions you like as regular Dancer2 route
+handlers, without explicitly handling the outgoing data format.
+
+Regexp routes will use the file-extension from captures->{'format'} to determine
+the serialization format.
+
+## resource
+
+This keyword lets you declare a resource your application will handle.
+
+    resource user =>
+        get    => sub { # return user where id = params->{id}   },
+        create => sub { # create a new user with params->{user} },
+        delete => sub { # delete user where id = params->{id}   },
+        update => sub { # update user with params->{user}       };
+
+    # this defines the following routes:
+    # GET /user/:id
+    # GET /user/:id.:format
+    # POST /user
+    # POST /user.:format
+    # DELETE /user/:id
+    # DELETE /user/:id.:format
+    # PUT /user/:id
+    # PUT /user/:id.:format
+
+## helpers
+
+Helpers are available for all HTTP codes as recognized by [Dancer2::Core::HTTP](https://metacpan.org/pod/Dancer2::Core::HTTP):
+
+    status_100    status_continue
+    status_101    status_switching_protocols
+    status_102    status_processing
+
+    status_200    status_ok
+    status_201    status_created
+    status_202    status_accepted
+    status_203    status_non_authoritative_information
+    status_204    status_no_content
+    status_205    status_reset_content
+    status_206    status_partial_content
+    status_207    status_multi_status
+    status_208    status_already_reported
+
+    status_301    status_moved_permanently
+    status_302    status_found
+    status_303    status_see_other
+    status_304    status_not_modified
+    status_305    status_use_proxy
+    status_306    status_switch_proxy
+    status_307    status_temporary_redirect
+
+    status_400    status_bad_request
+    status_401    status_unauthorized
+    status_402    status_payment_required
+    status_403    status_forbidden
+    status_404    status_not_found
+    status_405    status_method_not_allowed
+    status_406    status_not_acceptable
+    status_407    status_proxy_authentication_required
+    status_408    status_request_timeout
+    status_409    status_conflict
+    status_410    status_gone
+    status_411    status_length_required
+    status_412    status_precondition_failed
+    status_413    status_request_entity_too_large
+    status_414    status_request_uri_too_long
+    status_415    status_unsupported_media_type
+    status_416    status_requested_range_not_satisfiable
+    status_417    status_expectation_failed
+    status_418    status_i_m_a_teapot
+    status_420    status_enhance_your_calm
+    status_422    status_unprocessable_entity
+    status_423    status_locked
+    status_424    status_failed_dependency
+    status_425    status_unordered_collection
+    status_426    status_upgrade_required
+    status_428    status_precondition_required
+    status_429    status_too_many_requests
+    status_431    status_request_header_fields_too_large
+    status_444    status_no_response
+    status_449    status_retry_with
+    status_450    status_blocked_by_windows_parental_controls
+    status_451    status_redirect
+    status_494    status_request_header_too_large
+    status_495    status_cert_error
+    status_496    status_no_cert
+    status_497    status_http_to_https
+    status_499    status_client_closed_request
+
+    status_500    status_internal_server_error status_500    status_error
+    status_501    status_not_implemented
+    status_502    status_bad_gateway
+    status_503    status_service_unavailable
+    status_504    status_gateway_timeout
+    status_505    status_http_version_not_supported
+    status_506    status_variant_also_negotiates
+    status_507    status_insufficient_storage
+    status_508    status_loop_detected
+    status_509    status_bandwidth_limit_exceeded
+    status_510    status_not_extended
+    status_511    status_network_authentication_required
+    status_598    status_network_read_timeout_error
+    status_599    status_network_connect_timeout_error
+
+All 1xx, 2xx and 3xx status helpers will set the response status to the right value
+and serves its argument as the response, serialized.
+
+    status_ok({users => {...}});
+    # set status to 200, serves the serialized format of { users => {... } }
+
+    status_200({users => {...}});
+    # ditto
+
+    status_created({users => {...}});
+    # set status to 201, serves the serialized format of { users => {... } }
+
+For error statuses ( 4xx and 5xx ), there is an additional dash of
+syntaxic sugar: if the argument is a simple string, it'll
+be converted to `{ error =` $error }>.
+
+    status_not_found({ error => "file $name not found" } );
+    # send 404 with serialization of { error => "file blah not found" }
+
+    status_not_found("file $name not found");
+    # ditto
+
+# LICENCE
+
+This module is released under the same terms as Perl itself.
+
+# AUTHORS
+
+This module has been written by Alexis Sukrieh `<sukria@sukria.net>` and Franck
+Cuny.
+
+# SEE ALSO
+
+[Dancer2](https://metacpan.org/pod/Dancer2) [http://en.wikipedia.org/wiki/Representational\_State\_Transfer](http://en.wikipedia.org/wiki/Representational_State_Transfer)
+
+# AUTHOR
+
+Dancer Core Developers
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alexis Sukrieh.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,42 @@
+---
+abstract: 'make the perl debugger skip statements in given packages or subs'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  Capture::Tiny: 0.13
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::InDistDir: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DB-Skip
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  DB::Skip:
+    file: lib/DB/Skip.pm
+    version: 1.132980
+requires:
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DB-Skip
+  homepage: https://github.com/wchristian/db-skip
+  repository: https://github.com/wchristian/db-skip.git
+version: 1.132980

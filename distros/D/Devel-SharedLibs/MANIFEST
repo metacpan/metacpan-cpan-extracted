@@ -1,0 +1,13 @@
+Changes
+lib/Devel/SharedLibs.pm
+Makefile.PL
+MANIFEST
+t/00-Use.t
+t/01-NoPrint.t
+t/02-Print.t
+t/03-DiskOutput.t
+t/04-DiskOutput.t
+t/bin/exec-path
+t/bin/exec-stdout
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

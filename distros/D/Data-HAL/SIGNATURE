@@ -1,0 +1,66 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 6716f26200ebb14dc8a8fd59f6c1c965f8ad4b75 Build.PL
+SHA1 a76b9d8a0f1e4d79220acfb833819d6d8bc5e6b7 Changes
+SHA1 6c79a8c2deb18d6f4b702bd8495731f86ddd0fb0 MANIFEST
+SHA1 483d207fdfee85541b3813a96fd299f4a866d68c META.json
+SHA1 1a839a648279a21c1daa0c723c6a0f96baccbdfc META.yml
+SHA1 b8c8df5a3e0b2214e8b848ae1e8301020a93d9cd README
+SHA1 95bf82cc9dd9268d72c11644eb09de2f9faee5cd lib/Data/HAL.pm
+SHA1 d923daeb277126265e7b49d5e738c225ade0ee93 lib/Data/HAL/Link.pm
+SHA1 0d6e407c7c52fc6ea8274494401aee32b88333c7 lib/Data/HAL/URI.pm
+SHA1 ac5108b667d94b94b1ee580a0d33fc12db98c5df lib/Data/HAL/URI/NamespaceMap.pm
+SHA1 00e96bace07bf698d7751a3c187c7eabdf01d018 t/00.load.t
+SHA1 49cd2b3e81db4b3daca75b2263076fdda9f2dde8 t/curies.t
+SHA1 92c86c92a4e6a827b38b595b3636ca088451ea56 t/deprecation.t
+SHA1 7298689f99e7fd75b8106ce89fbb3c39e2aad73a t/double.t
+SHA1 38a4b359fccf0203e4c3b02cd095b93cded14121 t/example.json
+SHA1 b8dd154a00af9a2aee799ee6ff13bc30d5c8fecf t/example1.json
+SHA1 72b9e9a45fbbafa78f5e5bbc02bff7eb77faed0d t/example2.json
+SHA1 8f0d0fdec24bae09e2bc08da8e0ee56d969b633f t/example3.json
+SHA1 f0449ba681a10499d03dfa78b6f22515ba453d26 t/example4.json
+SHA1 794d4f1c7798b01dfe238852a86b7464954223c9 t/exampleWithArray.json
+SHA1 ddab26e6c23b941073cd825073270b723fa43abc t/exampleWithLiteralNullProperty.json
+SHA1 69337af80b63145dd80023e9b317e8c3ab0fb5a8 t/exampleWithMultipleNestedSubresources.json
+SHA1 abb4ef6b596e0bd16d764c7a5e4a61d71ab5a4c7 t/exampleWithMultipleSubresources.json
+SHA1 c337677f8142ac73ac8911e97527609dd0144b5a t/exampleWithNullProperty.json
+SHA1 f0eac9579aeffe3e2f37cdb5f38d00ca73a89d91 t/exampleWithSubresource.json
+SHA1 5e32f0492adfcad2dd7fd1207e737d2b306de7a8 t/exampleWithSubresourceLinkingToItself.json
+SHA1 020cdb4111df3d4cfafba112296f30e76d09549b t/exampleWithTemplate.json
+SHA1 30794dfb518ff4008b544f6b20aa1a0f4a7a118f t/exampleWithUnderscoredProperty.json
+SHA1 26258edc80b74473f58b6ebda41448bb3cc96fdc t/exampleWithoutHref.json
+SHA1 8f3b8ef4ee1eea63b21fc271e780022885f9cf60 t/headers.t
+SHA1 4fcca67f2960f002c8b0ca7a98e766132adca6e5 t/invalid.t
+SHA1 1f687ec41f30d65cb99c855e9a01101c04a58dc6 t/profile.t
+SHA1 f758b35a5052db598fc723d2791800979e0dacee t/round-trip.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.22 (GNU/Linux)
+
+iQIcBAEBCgAGBQJSXSK5AAoJEO5ZBCSkxNcgLkEQALXiv40U9ZPjcUgMc6NoKjg8
+jhNude1viqoT0OAYzkA0Xu4UD1a3dGbSqEolYVkXUgAsMPosy0PSG6Eo6mqtUqXd
+lFnpys9UhU5iseet1WUt7g8KDa7E+MSx1mH79+4sbmvNJm8mnryyID1wnOj1oQzq
+5EWflhjAsup4SDAQHONh7QdopO+li7iYlyNzKPLsPebRM1YtGH2S+3YJcPEKhPmu
+ylTvsdaLltLcB+jjkIaI9TuxCL33tl0DU3iszc6X6jnYZXI/lcBabKvu+vSxV2dc
+azW3nqv+dFpqTKS2/n7WW6eP7OJrbxDS3zoNyIX4Aq9FbIg5Lg9I6OVf9jkETpdQ
+zXv9C7Y/y2aBxrNpBEHK/YPuwgTYjdbq+87dfrIycJtYGR356Yd95SLi5HlF9iLK
+ptCUrrARShmJUuTbXwP81z1B2LByGrCeKyh3Pei12XLBOmrCMfJUn66o9i2DEtJ3
+ULk7ogAKDnN0CLbRXWmUklT0PAtkKf+5GMQynyW4N595iIm+JmFapRDRnNN7Dbgo
+JxY0PhPufSW++q79vgrHEEPt4mgjdqQIt5rovimWLr3Sz5tK1fTUrB615B9/wIuW
+mnrABZzfbczf4fCRY5GbZxYDomTR3EBN57PtpJEazBf3WEKVepzusSAuWYGN7Knz
+I+muOiXjZxtE39COWWp6
+=t6Sb
+-----END PGP SIGNATURE-----

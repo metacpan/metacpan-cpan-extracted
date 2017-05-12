@@ -1,0 +1,180 @@
+Revision history for Data-Util
+
+0.66 2017-04-05T17:09:54Z
+    - Fix tests of @INC issue on newer Perl
+
+0.65 2016-08-01T13:12:55Z
+    - Drop Perl 5.8 for maintenance
+    - Fix pure perl installation
+
+0.64 2016-07-23T15:13:01Z
+    - Fix on perl 5.22.x or higher versions
+    - Minilla migrate
+
+0.63 2014-03-06 07:42:05+0900
+    - Fix a crash on perl 5.19.x (tokuhirom)
+
+0.62 2013-04-03 16:06:46
+    - Fix a crash on perl 5.17.x (tokuhirom)
+
+0.61 2013-01-28 10:52:13
+    - Fix usage of get_code_ref() in SYNOPSIS (thanks to @toku_bass)
+
+0.60 2012-10-20 20:54:58
+    - No feature changes. Just upgraded Module::Install.
+
+0.59 2011-10-19 20:08:49
+    - Re-packaging with better dependencies and latest M::I
+
+0.58 Mon Sep 13 19:40:34 2010
+    - Use GvCV_set() for newer perls
+
+0.57 Sun Aug  1 17:33:44 2010
+    - Fix tests for newer perls
+
+0.56 Fri Jan  1 12:24:20 2010
+    - Fix RT #53167 (thanks to Andreas Koenig)
+    - Fix a configuration issue
+
+0.55 Thu Dec 24 16:31:07 2009
+    - Shipped with Module::Install::XSUtil 0.19
+
+0.54 Wed Oct 21 14:24:29 2009
+    - re-fix the method-modifiers issue (thanks @nekoya)
+        - this issue seems related to RT #69939
+
+0.53 Mon Oct 19 19:08:19 2009
+    - fix an issue which broke method modifiers in some cases (thanks @nekoya)
+
+0.52 Mon Jul 13 12:20:03 2009
+    - fix t/06_subroutine.t for bleadperl
+    - add repository information
+
+0.51 Thu Jul  9 09:42:11 2009
+    - add rx() and is_rx() (alias regex_ref() and is_regex_ref())
+    - fix possible segv in modifiers (t/23_largeargs.t)
+    - fix typos in pods
+
+0.50 Tue Jan 20 12:32:14 2009
+    - fix negative subscriptive placeholders for curry() (t/23_curry_neg_ph.t)
+    - remove wrap_subroutine() which was deprecated from 0.31
+
+0.44 Sun Dec 21 13:06:36 2008
+    - add get_code_ref() for do{ no strict 'refs'; *{$pkg.'::'.$name}{CODE} }
+    - change install/uninstall_subroutine() to accept single hash parameter
+        (e.g. install_subroutine($pkg, { name => \&subr })
+    - optimize mkopt() when a HASH ref is supplied as the option list
+    - fix possible memory leaks in mkopt()
+    - fix documentation
+    - fix "Insecure dependency while -T" with DATA_UTIL_PUREPERL=1
+
+0.43 Sun Dec 14 13:37:43 2008
+    - fix modifer's order of modify_subroutine()/subroutine_modifier()
+        to be compatible with Moose
+    - fix some bugs on neat()/is_number()/install_subroutine()
+    - remove "original" property from subroutine_modifier(), which seems
+        a waste of memory
+    - internal cleanup
+
+0.42 Wed Dec 10 13:42:50 2008
+    - fix is_number()/is_integer() to refuse Infinity and NaN correctly
+    - fix a possible segfault on install_subrouitne()
+    - internal cleanup
+
+0.41 Man Dec  8 11:36:38 2008
+    - change get_stash() to be able to take an object reference
+    - change is_number()/is_integer() to refuse "0 but true"
+    - fix some bugs
+
+0.40 Sun Dec  7 13:42:17 2008
+    - add is_value()/is_string()/is_number()/is_integer() functions
+    - change get_stash/invocant/is_invocant to refuse "" as a class name
+    - change uninstall_subroutine() to be able to take the same arguments
+        as install_subroutine()
+
+0.32 Thu Dec  4 13:25:29 2008
+    - fix uninstall_subroutine() to work correctly (t/17_nsclean.t)
+
+0.31 Wed Dec  3 11:56:29 2008
+    - rewrite mro_compat.[hc] using MRO::Compat
+    - rename wrap_subroutine to modify_subroutine,
+        (wrap_subroutine has been deprecated)
+    - add benchmark/install_subr_bench.pl
+    - internal cleanup
+
+0.30 Sun Nov 30 17:18:46 2008
+    - fix wrapped subroutines to get correct arguments
+
+0.29_02 Sun Nov 30 14:22:47 2008
+    - improve portability on VC++/ICC (RT#41204)
+    - move MethodModifiers.pm from lib/ to example/lib/
+    - fix uninstall_subroutine() to delete subroutine stubs correctly
+    - fix modifier calling order
+
+0.29_01 Mon Nov 24 12:43:03 2008
+    - add curry() function for currying (argument binding)
+    - add wrap_subroutine() and subroutine_modifier()
+    - add Data::Util::MethodModifiers module
+    - add DISCUSSIONS section in JA.pod
+    - update ppport.h to 3.14_05
+
+0.21 Mon Nov 17 13:15:52 2008
+    - allow install_subroutine() to accept multiple pairs of name and code
+    - add uninstall_subroutine()
+    - change get_code_info() to return the full qualified name in scalar context
+
+0.20 Sun Nov 16 13:04:56 2008
+    - add more tests
+    - fix some bugs
+    - remove Data::OptList dependency
+    - internal cleanup
+
+0.19_01 Wed Nov 12 22:33:23 2008
+    - some imcompatible changes
+        - remove -fast_isa subdirective, which is no longer useful
+        - remove -fail_handler subdirective, use Data::Util::Error instead.
+    - add Data::Util::Error module for error handling
+    - add invocant() and is_invocant()
+    - add mkopt() and mkopt_hash() which are compatible with Data::OptList
+    - improve error handlers to be inheritable
+    - fix install_subroutine() not to locate subroutines named by Sub::Name
+
+0.11 Mon Nov  3 10:09:57 2008
+    - fix possible segfault in get_code_info()
+
+0.10 Sat Nov  1 11:02:06 2008
+    - add get_code_info()
+    - add lib/Data/Util/JA.pod
+    - add pure-perl implementation
+    - internal cleanup
+
+0.05 Tue Oct 28 22:39:58 2008
+    - add install_subroutine()
+    - internal cleanup
+
+0.041 Mon Oct 27 08:27:11 2008
+    - fix C99 portability
+    - fix is_instance() to return a bool
+    - fix get_stash() to accept undef silently
+
+0.04 Sun Oct 26 10:19:11 2008
+    - change messsages
+    - improve neat() when HASH or ARRAY is supplied
+    - add "-fail_handler" subdirective
+    - add c99portability.h for C99 portability
+
+0.03 Fri Oct 24 12:17:13 2008
+    - remove unused code
+    - a bit of optimization (using 'inline' effectively)
+
+0.02 Fri Oct 24 09:10:31 2008
+    - derived from Scalar::Util::Ref
+    - add "-fast_isa" subdirective
+        which makes UNIVERSAL::isa() faster
+    - remove "instanceof" operator
+    - many optimizations
+    - fix some bugs
+
+0.01 Sat Oct  4 11:32:36 2008
+    - original version; created by Module::Starter
+        started as Scalar::Util::Ref

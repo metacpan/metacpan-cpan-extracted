@@ -1,0 +1,258 @@
+
+=head1 NAME
+
+Data::Dumper::Again - An OO alter ego for Data::Dumper
+
+=head1 SYNOPSIS
+
+    use Data::Dumper::Again;
+
+    $dumper = Data::Dumper::Again->new( purity => 1 );
+    $dumper->dump($scalar);
+    $dumper->dump(@list);
+
+    $dumper->dump_named( '$var' => $scalar, '*list' => \@list );
+
+=head1 DESCRIPTION
+
+This is meant to be a I<proper> OO interface to L<Data::Dumper>.
+As any pretentious piece of code that starts with bold statements,
+that does not mean anyone else will think it is proper too.
+
+My rant with L<Data::Dumper> is because I wanted to deal with it
+like this:
+
+=over 4
+
+=item *
+
+create a dumper
+
+=item *
+
+configure the dumper
+
+=item *
+
+use it to dump (possibly many values)
+
+=back
+
+And when I think something similar, the code that comes to mind
+looks like:
+
+    $dumper = Data::Dumper->new;
+    $dumper->Purity(1);
+    $dumper->Sortkeys(1);
+    print $dumper->dump($value1);
+    print $dumper->dump($value2);
+
+and not
+
+    $dumper = Data::Dumper->new([ $value1 ]);
+    $dumper->Purity(1);
+    $dumper->Sortkeys(1);
+    print $dumper->dump;
+
+    # and then I repeat the sequence (replacing $value1 by $value2) or
+    $dumper->Values([ $value2 ]);
+    print $dumper->dump;
+
+So this module cheats, being yet another simpler wrapper
+around L<Data::Dumper> that makes it more OOish (at least to me).
+
+So that I do not look just opportunist, it also provides some nice
+features for the user's delight. Among them:
+
+=over 4
+
+=item 1.
+
+A constructor which can be given configuration options to
+be setted at object creation. So instead of doing
+
+    $dumper = Data::Dumper->new([]);
+    $dumper->Purity(1);
+    $dumper->Sortkeys(1);
+
+you may say
+
+    $dumper = Data::Dumper::Again->new( purity => 1, sortkeys => 1 );
+
+=item 2.
+
+A C<dump> method that tests to see if the arguments looks like
+a single scalar or a list. So that
+
+    $dumper->dump(1); # output looks like "$VAR1 = 1;"
+    $dumper->dump(qw(a b)); # @VAR1 = ( 'a', 'b' );
+    $dumper->dump( () ); # @VAR1 = ();
+
+Obviously, the criterion for this is pretty stupid. If
+the argument list of the method has one element, dump it
+as a scalar. Otherwise, dump a list. This is basically
+what Gisle's C<Data::Dump> does.
+
+But what if I want to dump a one-element list? See below.
+
+=item 3.
+
+If you are sure that you want to dump a list, no matter how
+much elements there is (zero, one or more), you may use
+C<dump_list> method for this effect.
+
+    $dumper->dump_list(1); # output looks like "@VAR1 = (1);"
+    $dumper->dump_list(qw(a b)); # @VAR1 = ( 'a', 'b' );
+    $dumper->dump_list( () ); # @VAR1 = ();
+
+Orthogonally, you have a C<dump_scalar> which only cares
+for the first method argument and dumps it as a scalar.
+
+    $dumper->dump_scalar({ a => 3 }); # $VAR1 = { a => 3 };
+
+=item 4.
+
+A C<dump_named> method to which you specify variable names
+and values in pairs.
+
+    $dump_named( '$s' => 1, '@a' => [ 1, 2] );
+    # returns "$s = 1; @a = ( 1, 2 ); "
+
+=back
+
+=head2 METHODS
+
+Here they are:
+
+=over 4
+
+=item B<new>
+
+    $dumper = Data::Dumper::Again->new(%args);
+
+The constructor.
+
+Actually the supported arguments are the configurable
+variables/methods provided by L<Data::Dumper>. Actually they are
+
+    indent
+    purity
+    pad
+    varname
+    useqq
+    terse
+    freezer
+    toaster
+    deepcopy
+    quotekeys
+    bless
+    pair
+    maxdepth
+    useperl
+    sortkeys
+    deparse
+
+XXX
+
+=item B<guts>
+
+    $ddumper = $dumper->guts;
+
+Inside a C<Data::Dumper::Again> lives a C<Data::Dumper> object.
+This method returns the underlying beast. But just because
+it is here, it does not mean that it is such a good idea to
+fuss around with this and expect that everything keeps
+working. Its purpose was to instrument the tests and to
+give you an opportunity to shoot at your feet. Don't use!
+You have been warned.
+
+=item B<dump>
+
+    $s = $dumper->dump($scalar);
+    $s = $dumper->dump(@list);
+
+XXX
+
+=item B<dump_scalar>
+
+XXX
+
+=item B<dump_list>
+
+XXX
+
+=item B<dump_named>
+
+    $s = $dumper->dump_named( $name1 => $value1, ... );
+
+XXX
+
+=item B<set_>*
+
+XXX
+
+=item B<get_>*
+
+XXX
+
+=back
+
+=head2 EXPORTS
+
+None. This is supposed to be a pure OO module, and let's
+leave it that way for now.
+
+=head1 GOTCHAS
+
+Remember not to say
+
+    dump($var)
+
+while working with this module (or you will be greeted with
+a nice core dump). (See B<perldoc -f dump>.) You probably meant
+
+    $dumper->dump($var);
+
+Yep. I actually did this a few times. (More than a few to
+tell the truth.)
+
+=head1 TO DO
+
+Document that the L<Data::Dumper> configurable attributes, like
+C<Purity> or C<Terse>, are available via the interface of this class,
+with getter (get_*) and setter (set_*) methods.
+
+Write many more tests.
+
+=head1 SEE ALSO
+
+There is a whole feast out there on C<Data::Dump(er)> namespace:
+
+    Data::Dumper
+    Data::Dump
+    Data::Dump::Streamer
+    Data::Dumper::Simple
+    Data::Dumper::Names
+
+(It was not me, but Yves Orton that noticed this.)
+
+=head1 BUGS
+
+At least as many as the ones from L<Data::Dumper> itself.
+But probably more.
+
+Please report bugs via CPAN RT L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Dumper-Again>
+or L<mailto://bugs-Data-Dumper-Again@rt.cpan.org>.
+
+=head1 AUTHOR
+
+Adriano Ferreira, E<lt>ferreira@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

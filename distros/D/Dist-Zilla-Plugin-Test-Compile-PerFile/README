@@ -1,0 +1,117 @@
+Dist::Zilla::Plugin::Test::Compile::PerFile
+
+This module is inspired by its earlier sibling "[Test::Compile]".
+
+Test::Compile is awesome, however, in the process of its development, we
+discovered it might be useful to run compilation tests in parallel.
+
+This lead to the realization that implementing said functions are kinda
+messy.
+
+However, a further realization is, that parallelism should not be
+codified in the test itself, because platform parallelism is rather not
+very portable, so parallelism should only be enabled when asked for.
+
+And this lead to the realization that "prove" and "Test::Harness"
+ALREADY implement parallelism, and ALREADY provide a safe way for
+platforms to indicate parallelism is wanted.
+
+Which means implementing another layer of parallelism is unwanted and
+unproductive effort ( which may be also filled with messy
+parallelism-induced bugs )
+
+So, here is the Test::Compile model based on how development is
+currently proceeding.
+
+    prove
+      \ ----- 00_compile.t
+     |           \ ----- Compile Module 1
+     |           \ ----- Compile Module 2
+     |
+     \ ----- 01_basic.t
+
+That may be fine for some people, but this approach has several
+fundamental limits:
+
+1. Sub-Tasks of compile don't get load balanced by the master harness.
+2. Parallelism is developer side, not deployment side governed.
+3. This approach means "prove -s" will have no impact.
+4. This approach means "prove -j" will have no impact.
+5. This approach inhibits other features of "prove" such as the
+"--state=slow"
+
+So this variation aims to employ one test file per module, to leverage
+"prove" power.
+
+One initial concern cropped up on the notion of having excessive numbers
+of "perl" instances, e.g:
+
+    prove
+      \ ----- 00_compile/01_Module_1.t
+     |           \ ----- Compile Module 1
+     |
+      \ ----- 00_compile/02_Module_2.t
+     |           \ ----- Compile Module 2
+     |
+     \ ----- 01_basic.t
+
+If we were to implement it this way, we'd have the fun overhead of
+having to spawn 2 "perl" instances per module tested, which on "Win32",
+would roughly double the test time and give nothing in return.
+
+However, Most of the reason for having a "perl" process per compile, was
+to separate the modules from each other to assure they could be loaded
+independently.
+
+So because we already have a basically empty compile-state per test, we
+can reduce the number of "perl" processes to as many modules as we have.
+
+    prove
+      \ ----- 00_compile/01_Module_1.t
+     |
+      \ ----- 00_compile/02_Module_2.t
+     |
+     \ ----- 01_basic.t
+
+Granted, there is still some bleed here, because doing it like this
+means you have some modules preloaded prior to compiling the module in
+question, namely, that "Test::*" will be in scope.
+
+However, "testing these modules compile without "Test::" loaded" is not
+the real purpose of the compile tests, the compile tests are to make
+sure the modules load.
+
+So this is an acceptable caveat for this module, and if you wish to be
+distinct from "Test::*", then you're encouraged to use the much more
+proven "[Test::Compile]".
+
+Though we may eventually provide an option to spawn additional "perl"
+processes to more closely mimic "Test::*"'s behaviour, the cost of doing
+so should not be understated, and as this module exist to attempt to
+improve efficiency of tests, not to decrease them, that would be an
+approach counter-productive to this modules purpose.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

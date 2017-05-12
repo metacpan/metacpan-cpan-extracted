@@ -1,0 +1,80 @@
+{
+   "abstract" : "Adding keywords to perl, in perl",
+   "author" : [
+      "Matt S Trout - <mst@shadowcat.co.uk> - original author"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.2501, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-Declare",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "B::Hooks::OP::Check" : "0.19",
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "B::Hooks::OP::Check" : "0.19",
+            "ExtUtils::Depends" : "0.302"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Hooks::EndOfScope" : "0.05",
+            "B::Hooks::OP::Check" : "0.19",
+            "Scalar::Util" : "1.11",
+            "Sub::Name" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-Declare@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Declare"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://git.shadowcat.co.uk/p5sagit/Devel-Declare.git",
+         "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-Declare.git"
+      }
+   },
+   "version" : "0.006019",
+   "x_contributors" : [
+      "Florian Ragwitz <rafl@debian.org>",
+      "Matt S Trout <mst@shadowcat.co.uk>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Zefram <zefram@fysh.org>",
+      "Rhesa Rozendaal <rhesa@cpan.org>",
+      "Ash Berlin <ash@cpan.org>",
+      "Chia-liang Kao <clkao@clkao.org>",
+      "Marcus Ramberg <marcus@nordaaker.com>",
+      "Christopher Nehren <apeiron@cpan.org>",
+      "Yuval Kogman <nothingmuch@woobling.org>",
+      "Cory Watson <gphat@cpan.org>",
+      "Alexandr Ciornii <alexchorny@gmail.com>",
+      "Father Chrysostomos <sprout@cpan.org>",
+      "Graham Knop <haarg@haarg.org>",
+      "Matthew Horsfall <WolfSage@cpan.org>",
+      "Nick Perez <nperez@cpan.org>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "x_deprecated" : 1,
+   "x_serialization_backend" : "JSON::MaybeXS version 1.003009"
+}

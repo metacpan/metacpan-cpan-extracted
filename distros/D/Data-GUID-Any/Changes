@@ -1,0 +1,31 @@
+Revision history for Data-GUID-Any
+
+0.004     2012-12-03 11:59:00 America/New_York
+
+    - Documented that uppercase strings are not compliant with RFC 4122
+
+    - Added $Data::GUID::Any::UC variable that can be set false to get
+      lowercase strings instead
+
+0.003     2012-04-18 12:59:58 America/New_York
+    
+    - The ordering of GUID providers  has changed and there are now
+      separate functions for generic GUID (any supported type), v1 and v4
+      type GUIDs.
+    
+    - Data::UUID::MT is now preferred, since it offers good speed and the
+      best control.
+
+    - The uuid binary is now preferred to pure-perl UUID::Tiny.
+
+    - UUID::Generator::PurePerl has been dropped as the author has listed
+      it as deprecated.
+    
+    - distribution converted to Dist::Zilla style
+
+0.002 Fri Apr 10 10:19:55 EDT 2009
+    - added UUID::Generator::PurePerl
+    - cleaned up some internals
+
+0.001 Tue Apr  7 23:33:51 EDT 2009
+    - initial release

@@ -1,0 +1,27 @@
+SYNOPSIS
+
+    in dist.ini
+
+            [OurDate]
+            ; optional, default is '%Y-%m-%d'
+            date_format='%Y-%m-%d'
+
+    in your modules
+
+            # DATE
+
+    or
+
+            our $DATE = '2014-04-16'; # DATE
+
+DESCRIPTION
+
+    This module is like Dist::Zilla::Plugin::OurVersion except that it
+    inserts release date $DATE instead of $VERSION.
+
+    Comment/directive below __DATA__ or __END__ will not be replaced.
+
+SEE ALSO
+
+    Dist::Zilla
+

@@ -1,0 +1,18 @@
+Revision history for Dist::Zilla::Plugin::ApocalypseTests
+
+1.002	2014-10-27 21:49:08 UTC
+
+	Removed the ugly kwalitee hacks for Test::Pod and friends!
+	This module will be renamed to DZP::Test::Apocalypse in the future!
+
+1.001	2011-03-06 00:37:26 UTC
+
+	Bumped the Test::Apocalypse prereq to 1.000
+
+1.000	2010-12-14 03:40:32 UTC
+
+	Converted to Dist::Zilla for the release process!
+
+0.01	0000-00-00 00:00:00 UTC
+
+	initial release

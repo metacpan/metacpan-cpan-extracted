@@ -1,0 +1,7 @@
+[% IF entry.retired -%]
+ [%- SET reason = entry.property('daizu:reason-retired') %]
+ <p class="article-retired">[%
+   IF reason %][% reason | encode |html %][%
+   ELSE %]This page may be out of date.[%
+   END %]</p>
+[% END -%]

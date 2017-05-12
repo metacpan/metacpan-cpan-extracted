@@ -1,0 +1,24 @@
+Revision history for Perl extension Date::LastModified.
+
+0.60  Mon May 20 19:36:49 2003
+    - Deleted DATELASTMODCFG environment variable from module
+    - Added DLMUPCFG environment variable to dlmup
+    - Added SQLite driver (tested with SQLite V2.8.0)
+    - Includes sqlite-2.8.0-os.h.patch to patch DBD::SQLite os.h
+      so it will compile under Cygwin with gcc V2.95.3
+    - "make test" now calls "perl test-dlmup.pl" to test dlmup
+      if module tests all ran OK
+    - Added "SQL92" pseudo-entry for DBI that should have the
+      correct syntax for SQL92-compliant databases like Oracle9i
+    - Started changes for testing any two databases -- test.pl
+      code still should only work for Oracle and MySQL for now
+    - Fixed MANIFEST so that all necessary files are present
+    - Added TODO
+    - Updated email for home email address
+    - NOTE: UNTESTED on Oracle and MySQL as I don't have those
+      databases loaded at home
+
+0.50  Fri Nov  8 13:31:06 2002
+	- original version at Thomson
+        created by h2xs 1.21 with options -v 0.50 -AXf Date::LastModified
+

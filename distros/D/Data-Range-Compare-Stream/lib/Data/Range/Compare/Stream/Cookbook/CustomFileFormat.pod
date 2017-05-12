@@ -1,0 +1,260 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Cookbook::CustomFileFormat - HOW TO Change the Parser Functionality
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc;
+  use Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn;
+  
+  my $cmp=new Data::Range::Compare::Stream::Iterator::Compare::Asc;
+  
+  sub parse_file_one {
+    my ($line)=@_;
+    my @list=split /\s+/,$line;
+    return [@list[4,5],$line]
+  }
+  
+  sub parse_file_two {
+    my ($line)=@_;
+    my @list=split /\s+/,$line;
+    return [@list[2,3],$line]
+  }
+  
+  sub range_to_line {
+    my ($range)=@_;
+    return $range->data;
+  }
+  
+  my $file_one=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    result_to_line=>\&range_to_line,
+    parse_line=>\&parse_file_one,
+    filename=>'custom_file_1.src',
+  );
+  
+  my $file_two=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    result_to_line=>\&range_to_line,
+    parse_line=>\&parse_file_two,
+    filename=>'custom_file_2.src',
+  );
+  
+  my $set_one=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn($file_one,$cmp);
+  my $set_two=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn($file_two,$cmp);
+  
+  $cmp->add_consolidator($set_one);
+  $cmp->add_consolidator($set_two);
+  
+  while($cmp->has_next) {
+    my $result=$cmp->get_next;
+    next if $result->is_empty;
+  
+    my $ref=$result->get_root_results;
+    next if $#{$ref->[0]}==-1;
+    next if $#{$ref->[1]}==-1;
+  
+    foreach my $overlap (@{$ref->[0]}) {
+      print $overlap->get_common->data;
+    }
+  
+  }
+
+=head1 DESCRIPTION
+
+This pod explains how to create custom call backs for various file formats and sort very large data files:  These examples are for Data::Range::Compare::Stream::Iterator::File and Data::Range::Compare::Stream::Iterator::File::MergeSortAsc.
+
+=head1 What we want to accomplish.
+
+=over 2
+
+=item * Problem_1
+
+Given these 2 different file formats we want to compare file1 for overlaps in file 2. 
+
+=item * Problem_2
+
+Both File1 and File2 are to large to be loaded into memory and sorted as arrays for comparison.  So we will have to sort the files on disk.  This adds 2 more components: Data serialization and an on disk Merge-Sort.
+
+=item * Problem_3
+
+The line from file1 needs to be printed to STDOUT when file1 and file2 overlap. 
+
+=back
+
+=head2 File 1 Format
+
+Column 5 represents the starting value for our range.  Column 6 represents the ending value for our range.
+
+  101_#2          1       2    F0       263        278        2       1.5
+  102_#1          1       6    F1       766        781        1       1.0
+  103_#1          2       15   V1       526        581        1       0.0
+  103_#1          2       9    V2       124        134        1       1.3
+  104_#1          1       12   V3       137        172        1       1.0
+  105_#1          1       17   F2       766        771        1       1.0
+
+=head2 File 2 Format
+
+Column 3 represents the starting value of our range.  Column 4 represents the ending value for our range.
+
+  97486   9   262           279
+  67486   9   118           119
+  87486   9   183           185
+  248233  9   124           134
+
+=head3 Creating Functions to parse the file formats ( Problem_1 Solution )
+
+Parsing files 1 and 2 isn't that difficult, but the question raised is where is the original line going  to be saved?  Lucky for us Data::Range::Compare::Stream offers a data function for associating custom data with a range.
+
+The actual Constructor for Data::Range::Compare::Stream is a 2 or 3 argument list.  Arguments 1 and 2 are the start and end values of our range, but argument 3 is an optional value that can be accessed via the $range->data function.
+
+So our parser for each file format is slightly different.
+
+=over 2 
+
+=item * function to parse file1
+
+The function takes the raw line from the iterator internals and returns an array ref.  The array ref itself contains 3 values, the first 2 values represent the range the last value is a copy of the original line the range came from.
+
+  sub parse_file_one {
+    my ($line)=@_;
+    my @list=split /\s+/,$line;
+    return [@list[4,5],$line]
+  }
+
+=item * function to parse file2
+
+Just like parse_file_one file2 returns an anonymous array ref that contains 3 values: begin, end, original line.
+
+  sub parse_file_two {
+    my ($line)=@_;
+    my @list=split /\s+/,$line;
+    return [@list[2,3],$line]
+  }
+
+=item * Using the custom parser functions.
+
+Both Data::Range::Compare::Stream::Iterator::File and Data::Range::Compare::Stream::Iterator::File::MergeSortAsc support the parse_line function, so each function can be passed into the constructor call.  
+
+File1 Iterator example:
+
+  my $file_one=Data::Range::Compare::Stream::Iterator::File->new(
+    filename=>'file1',
+    parse_line=>\&parse_file_one,
+  );
+
+File2 Iterator example:
+
+  my $file_two=Data::Range::Compare::Stream::Iterator::File->new(
+    filename=>'file2',
+    parse_line=>\&parse_file_two,
+  );
+
+=back
+
+=head3 Sorting our massive files ( Solution to Problem_2 )
+
+As stated our files are far to large to be sorted in memory.  Fortunately Data::Range::Compare::Stream offers an on disk Merge-Sort feature, but to use it we will need to convert our ranges back to their original format they were parsed from.
+
+The parser function for both File1 and File2 save the original line in $range->data.  Our serialization function simply needs to return the value from $range->data. 
+
+  sub range_to_line {
+    my ($range)=@_;
+    return $range->data;
+  }
+
+File1 Sorted Iterator Example:
+  
+  my $file_one=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    result_to_line=>\&range_to_line,
+    parse_line=>\&parse_file_one,
+    filename=>'custom_file_1.src',
+  );
+
+File2 Sorted Iterator Example:
+
+  my $file_two=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc(
+    result_to_line=>\&range_to_line,
+    parse_line=>\&parse_file_two,
+    filename=>'custom_file_2.src',
+  );
+
+=head3 Showing what ranges overlap ( Solving Problem_3 )
+
+Our data in File1 given the sample contains overlaps, we can safely assume File22 will as well.  Given that fact we will need to retain each range overlap as the files are iterated through.
+
+=over 2
+
+=item * Creating our Compare Object
+
+In order to get started we have to create a compare object.
+
+  my $cmp=new Data::Range::Compare::Stream::Iterator::Compare::Asc;
+
+=item * Creating our Consolidation objects
+
+We all ready know our data in file1 contains overlaps and we will assume our data in file2 contains overlaps as well.  But we need to retain our overlaps, not glue them together, this rules out Data::Range::Compare::Stream::Iterator::Consolidate, in stead we will need to use Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn.
+
+  my $set_one=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn(
+    $file_one,
+    $cmp
+  );
+
+  my $set_two=new Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn(
+    $file_two,
+    $cmp
+  );
+
+Now we add our consolidation objects to the compare object.
+
+  $cmp->add_consolidator($set_one);
+  $cmp->add_consolidator($set_two);
+
+
+=item * Getting our desired output
+
+Data::Range::Compare::Stream fills in gaps, shows differences and may other things,  getting the desired output is simply a matter of filtering the compare result objects.  Since the number of columns in the result object is set dynamically we will need to use some of the root related interfaces in the result objects to get our work done.
+
+  while($cmp->has_next) {
+    my $result=$cmp->get_next;
+    next if $result->is_empty;
+
+    my $ref=$result->get_root_results;
+    next if $#{$ref->[0]}==-1;
+    next if $#{$ref->[1]}==-1;
+
+    foreach my $overlap (@{$ref->[0]}) {
+      print $overlap->get_common->data;
+    }
+  }
+
+=item * Output Based on our sample data.
+
+  103_#1          2       9    V2       124        134        1       1.3
+  101_#2          1       2    F0       263        278        2       1.5
+
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

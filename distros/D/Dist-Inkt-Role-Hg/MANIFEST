@@ -1,0 +1,16 @@
+CONTRIBUTING
+COPYRIGHT
+CREDITS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+SIGNATURE
+dist.ini
+doap.ttl
+lib/Dist/Inkt/Role/Hg.pm
+t/01basic.t

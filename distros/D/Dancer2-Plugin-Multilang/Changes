@@ -1,0 +1,51 @@
+1.2.0
+=====
+
+__Sat Oct 30 2016__
+
+* Config option 'no_lang_prefix' to define a path without any language
+change.
+* Force redirect with code 307 to allow other types of method
+redirection. Now it's possible to redirect POST with the
+multilanguage processing.
+* Create SEO headers even if the app has layouts turn off - to use
+Template Toolkit variables and functions. Changed the hook
+'after_layout_render' to 'after'.
+
+All of this thanks to biafra
+
+1.1.2
+=====
+
+__Mon May 9 2016__
+
+* Deprecated call removed (thanks to Peter Mottram)
+
+1.1.1
+=====
+
+__Fri Oct 16 2015__
+
+* Pod correction (thanks to Mohammad S. Anwar)
+
+
+1.1.0
+=====
+
+__Mon Dec 08 2014__
+
+* Updated to work with Dancer2 0.156000
+
+1.0.1
+=====
+
+_Tue Aug 26 2014_
+
+* Metadata improved (thanks to Gabor Szabo)
+
+1.0.0
+=====
+
+_Mon Aug 25 2014_
+
+* First CPAN release

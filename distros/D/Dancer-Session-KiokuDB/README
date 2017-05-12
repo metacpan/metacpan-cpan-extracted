@@ -1,0 +1,88 @@
+NAME
+    Dancer::Session::KiokuDB - KiokuDB Dancer session backend
+
+VERSION
+    version 0.05
+
+SYNOPSIS
+        # in your Dancer app:
+        setting session              => 'KiokuDB';
+        setting kiokudb_backend      => 'DBI';
+        setting kiokudb_backend_opts => {
+            dsn => 'dbi:SQLite:dbname=mydb.sqlite',
+        };
+
+        # or in your Dancer config file:
+        session:         'KiokuDB'
+        kiokudb_backend: 'DBI'
+        kiokudb_backend_opts:
+            dsn: 'dbi:SQLite:dbname=mydb.sqlite'
+
+DESCRIPTION
+    When you want to save session information, you can pick from various
+    session backends, and they each determine how the session information
+    will be saved. You can use Dancer::Session::Cookie,
+    Dancer::Session::MongoDB or... you use Dancer::Session::KiokuDB.
+
+    This backend uses KiokuDB to save and access session data.
+
+OPTIONS
+  kiokudb_backend
+    A string which specifies what backend to use, under "KiokuDB::Backend",
+    that means that backend *DBI* will be "KiokuDB::Backend::DBI". If you'll
+    get smart and provide *KiokuDB::Backend::Cool*, you'll get
+    "KiokuDB::Backend::KiokuDB::Backend::Cool", which is, evidently, not
+    cool! :)
+
+    Not mandatory.
+
+    The default backend is KiokuDB::Backend::Hash.
+
+  kiokudb_backend_opts
+    A hash reference which indicates options you want to send to the
+    backend's "new()" method.
+
+    Not mandatory.
+
+    The default opts are "<create =" 1>>. If you do not want it to
+    automatically create, set:
+
+        # in your app
+        set kiokudb_backend_opts => {
+            create => 0,
+            ...
+        };
+
+        # or in your configuration
+        kiokudb_backend_opts:
+            create: 0
+
+SUBROUTINES/METHODS
+  init
+    Initializes the object by loading the proper KiokuDB backend and
+    creating the initial connection.
+
+  create
+    Creates a new object, runs "flush" and returns the object.
+
+  flush
+    Writes the session information to the KiokuDB session database.
+
+  retrieve
+    Retrieves session information from the KiokuDB session database.
+
+  destroy
+    Deletes session information from the KiokuDB session database.
+
+SEE ALSO
+    The Dancer Advent Calendar 2010.
+
+AUTHOR
+      Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

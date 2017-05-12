@@ -1,0 +1,33 @@
+Revision history for Perl module DBIx::Class::DeleteAction
+
+1.05 Sun Feb 20 2010
+    - Fix test warnings with latest DBIx::Class version
+    - Fix failing test
+
+1.04 Tue Aug 11 2009
+    - Additional documentation
+    - Fix warning
+    - Add github repo to Makefile.PL/META.yml
+    - Make deleteactions on resultsets more efficient and secure
+
+1.03 Fri Dec 5 2008
+    - Updated Manifest && Manifest skip
+    - Fixed problems that occured after upgrade to DBIx-Class-0.08100
+    - Use named parameters instead of positinal parameters for custom
+      delete action methods (this change breaks compatibility with old code
+      that uses this feature)
+    - Update documentation 
+
+1.02 Fri Dec 5 2008
+    - Added additional delete type 'deleteall'
+    - Additional tests
+
+1.01 Fri Dec 5 2008
+    - Added additional delete type 'ignore'
+    - Additional tests
+    - Test coverage to 87.8%
+    - Added dep to SQL::Abstract; Hopefully this stops some cpantesters
+      from failing
+
+1.00 Wed Oct 15 2008
+    - original version

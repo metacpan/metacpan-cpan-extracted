@@ -1,0 +1,6 @@
+Kleene.pm
+MANIFEST
+Makefile.PL
+README
+lib/Math/Kleene.pod
+t/00____version.t

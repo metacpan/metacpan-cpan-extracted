@@ -1,0 +1,218 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use boolean qw(true false);
+
+use DateTime;
+use DateTime::Format::Natural;
+use Getopt::Long qw(:config no_auto_abbrev no_ignore_case);
+use Term::ReadLine;
+
+use constant LANG_DEFAULT => 'en';
+
+my %args;
+my $extract;
+my $lang;
+my @supported_languages = qw(en);
+my $trace;
+my %valid_languages = map { $_ => true } @supported_languages;
+
+{
+    my $opts = {};
+    $opts = parse_switches() if @ARGV;
+    set_values($opts);
+    process();
+}
+
+sub parse_switches
+{
+    my %opts;
+    GetOptions(\%opts, qw(d|datetime=s
+                          e|extract
+                          f|format=s
+                          h|help
+                          l|lang=s
+                          p|prefer_future
+                          s|supported
+                          t|time_zone=s
+                          T|trace
+                          V|version)) or usage();
+
+    usage()     if $opts{h};
+    version()   if $opts{V};
+    supported() if $opts{s};
+
+    return \%opts;
+}
+
+sub set_values
+{
+    my $opts = shift;
+
+    $extract = $opts->{e} || false;
+    $lang    = $opts->{l} || LANG_DEFAULT;
+    $trace   = $opts->{T} || false;
+
+    if (exists $opts->{d}) {
+        local $_ = $opts->{d};
+        my ($got_date, $got_time) = (false) x 2;
+        my $ignore = false;
+        my %time;
+        if (/^\S+? (?:\s+? \S+?)?$/x) {
+            if (/^(\d{4}-\d{2}-\d{2})\b/) {
+                @time{qw(year month day)} = split /-/, $1;
+                $got_date = true;
+            }
+            if (/\b(\d{2}:\d{2}:\d{2})$/) {
+                @time{qw(hour minute second)} = split /:/, $1;
+                $got_time = true;
+            }
+        }
+        if ($got_date || $got_time) {
+            if (!$got_date) { # time only
+                my @units = qw(year month day);
+                @time{@units} = map DateTime->now->$_, @units;
+            }
+            eval { $opts->{d} = DateTime->new(%time) } or $ignore = true;
+        }
+        else {
+            $ignore = true;
+        }
+        if ($ignore) {
+            warn "ignoring invalid datetime string '$opts->{d}'\n";
+            delete $opts->{d};
+        }
+    }
+
+    my %table = (
+        d => 'datetime',
+        l => 'lang',
+        f => 'format',
+        p => 'prefer_future',
+        t => 'time_zone',
+    );
+
+    foreach my $opt (keys %$opts) {
+        if (exists $table{$opt}) {
+            $args{$table{$opt}} = $opts->{$opt};
+        }
+    }
+}
+
+sub usage
+{
+    print <<USAGE;
+Usage: $0 [switches]
+   -d, --datetime=<string>     datetime string
+   -e, --extract               extract expressions
+   -f, --format=<format>       format of numeric dates
+   -h, --help                  this help screen
+   -l, --lang=<code>           language code
+   -p, --prefer_future         use future dates (when possible)
+   -s, --supported             list of supported languages
+   -t, --time_zone=<string>    time zone string
+   -T, --trace                 print trace after processing
+   -V, --version               print version
+USAGE
+    exit;
+}
+
+sub version
+{
+    print "  DateTime::Format::Natural $DateTime::Format::Natural::VERSION\n";
+    exit;
+}
+
+sub supported
+{
+    print "$_\n" foreach @supported_languages;
+    exit;
+}
+
+sub process
+{
+    unless ($valid_languages{lc $lang}) {
+        warn "Language [$lang] isn't supported, switching to default [", LANG_DEFAULT, "]\n";
+        $lang = $args{lang} = LANG_DEFAULT;
+    }
+
+    my $parser = DateTime::Format::Natural->new(%args);
+
+    my $term = Term::ReadLine->new('dateparse');
+    my $prompt = 'dateparse> ';
+
+    while (defined(my $input = $term->readline($prompt))) {
+        $term->addhistory($input) if $input =~ /\S/;
+        last if $input =~ /^(?:q(?:uit)?|exit)$/i;
+
+        if ($input =~ /^(?:\?|help)$/i) {
+            print <<EOT;
+
+Commands
+ ?, help                this help screen
+ exit, q, quit          leave dateparse
+ everything else        input string
+
+EOT
+            next;
+        }
+
+        my @expressions = $extract ? $parser->extract_datetime($input) : ($input);
+
+        warn "no parsable expressions extracted\n" unless @expressions;
+
+        foreach my $expression (@expressions) {
+            print "extracted: $expression\n" if $extract;
+
+            my @dt = $parser->parse_datetime_duration(string => $expression);
+            my @traces = $parser->trace;
+
+            if ($parser->success) {
+                foreach my $dt (@dt) {
+                    printf("%4d-%02d-%02d %02d:%02d:%02d\n", map $dt->$_, qw(year month day hour min sec));
+                    if ($trace && @traces) {
+                        print shift @traces, "\n";
+                    }
+                }
+            }
+            else {
+                warn $parser->error, "\n";
+            }
+        }
+    }
+}
+
+=head1 NAME
+
+dateparse - frontend to DateTime::Format::Natural
+
+=head1 SYNOPSIS
+
+ Usage: dateparse [switches]
+   -d, --datetime=<string>     datetime string *
+   -e, --extract               extract expressions
+   -f, --format=<format>       format of numeric dates
+   -h, --help                  this help screen
+   -l, --lang=<code>           language code
+   -p, --prefer_future         use future dates (when possible)
+   -s, --supported             list of supported languages
+   -t, --time_zone=<string>    time zone string
+   -T, --trace                 print trace after processing
+   -V, --version               print version
+
+* The date must conform to YYYY-MM-DD and the time to hh:mm:ss.
+Valid datetime strings consist of either date, date/time or time.
+
+=head1 AUTHOR
+
+Steven Schubiger <schubiger@cpan.org>
+
+=head1 LICENSE
+
+This program is free software; you may redistribute it and/or
+modify it under the same terms as Perl itself.
+
+See L<http://dev.perl.org/licenses/>
+
+=cut

@@ -1,0 +1,201 @@
+Revision History for DataFlow
+=============================
+
+v1.121690 2012-06-16
+--------------------
+
+commit 5fcbf8be396b037414587d6dd34c82a1096dbc01
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Make tests happy
+
+v1.121280 2012-05-06
+--------------------
+
+commit 1107297339c72d3be939875986c45e57c00c320f
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    release script
+
+commit f105425f44b01e955690c43a6414dd49cd50a367
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    some scripts had unmapped dependencies
+
+v1.121260 2012-05-05
+--------------------
+
+commit ca7df9bc5623d400dd2131d2136bf5d8ad42ea5c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    updated for 5.14.2
+
+commit 3a9cb99a12f7c0fd888a404c6e460cd90b462292
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    perl tidy
+
+commit ce2a122ec6e9c2300d37168d352fef30b2113285
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    fixed deprecated use of DataFLow::Util::HTTPGet
+
+commit 5474cdff987bce0c192c59a78b98eb0a3fbafea8
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    revert autobox commit in ProcPolicy
+
+commit 77f3cc24fafebc3a615b8fd113e826ca5df6b339
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    better interface for 'procs' attribute
+
+v1.112100 2011-07-28
+--------------------
+
+commit e03aa12ee65a14326d88ebee0db2ce7a3292b115
+Merge: f26cfbf c4bdadc
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Merge branch 'rc/1.112100'
+
+commit c4bdadc7dbf47d5a93dbec65100e1ef31691ba3d
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Autobox+tidy+small things
+
+commit 7a114e15e1dbbaf60b8a848b3ac3fdbd7c70ea8c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose::Autobox
+
+commit 76aec758659d0d8082434c51247ade9c6e4c7bdc
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    moved dump_input/dump_output attrs to Dumper role
+
+commit 3de8c90a9206a5ffbb8929829c3eb7ffc9388e75
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added documentation for DataFlow::Types
+
+commit 60c13834b5f68c0cb4c0f20593945afcce0b5d0c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added channels-aware input/output methods to DataFlow
+
+commit fb86b602f27d9a51c912cbd78f649e9ce51c5058
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    First implementation using channels and items
+
+commit 29322d0afbb951558d6b923b7b74ed2a2ee5ed3c
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    implemented Item & ProcWrapper, with tests and docs
+
+commit 3f8d8192650c8eea4dbdec276b0ef74bb50ed052
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added ProcWrapper and first draft of test cases
+
+commit 74c1fbed04ac2f32485692b3227cee9f8f2e3cb2
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    DataFlow::Item coded and tested
+
+commit 6361c5c1687c8a9624adb19de07bce1d38a2cfe1
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    changed to sugar syntax
+
+commit ac8d7c62670859d0828149920b8d6bda0f204cf6
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added POD version for QuickGuide
+
+commit 2daee2a583f94762e8b9d85df7592c111d4bdaa3
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    more sugar, please
+
+commit a26b56d750fc1febd7b1d0f3350f27eddba3abb0
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added strictures to test files
+
+commit f63857e118cc406e0197e24f9e1e446390c40d1b
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    unused line of code removed
+
+commit db38851fafcb6cb6ef37f0789ef4ae2d9d605470
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    updated dist.ini to lates @Author::RUSSOZ bundle
+
+v1.111980 2011-07-17
+--------------------
+
+commit f26cfbfe8a699911915884a06dce3d979e4c2999
+Merge: 69a73b8 8fcff30
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Merge branch 'rc/1.111980'
+
+commit 8fcff30312669b64876a954e44170ca4b70f2e10
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using builder rather than default in Encoding
+
+commit 0cff8556e601eea2ea1d4a7399f40c08a60de126
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Fixed bug when loading named procs
+
+commit 088d8290bfe348f1fc48c82e69d224180e7595bc
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    improved tidy script
+
+v1.111910 2011-07-10
+--------------------
+
+commit 69a73b8ca1e14d19e1700ffe2227519ff182cd5d
+Merge: 82ef0db 3b05645
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Merge branch 'rc/1.111910'
+
+commit 3b05645f310c47023b51c25d839625626bd2ee68
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    couple of changes
+
+v1.111860 2011-07-04
+--------------------
+
+commit 82ef0db195ce073fc2b0a959433cd072bb2e08fa
+Merge: a46946a 4223b75
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    Merge branch 'rc/1.111860'
+
+commit 4223b758eb6bab728243e5a0b20572cff60bc9f9
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using builder instead of default in class DataFlow
+
+commit e09a1c5a3b62e18d3d81b3c6172c9c02b113adf5
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added the Quick Start Guide
+
+commit 95de2dc689b54c210b1b82094b4a095fff9b7dd5
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+===================================
+End of changes in the last 365 days
+===================================

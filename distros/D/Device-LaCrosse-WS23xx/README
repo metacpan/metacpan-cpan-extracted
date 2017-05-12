@@ -1,0 +1,66 @@
+Device-LaCrosse-WS23xx version 0.10
+===================================
+
+Device::LaCrosse::WS23xx provides a simple interface for reading data
+from La Crosse Technology WS-2300 series weather stations.  It is
+based on the Open2300 project, but differs in several respects:
+
+* Simplicity: the interface is simple and intuitive.  For hackers, the
+  Tied interface makes it easy to visualize the address space.  And
+  you don't have to do any of the nybble shifting or masking: it's all
+  done for you.
+
+* Versatility: read the values you want, in the units you want.  Write
+  a script that logs only the values you're interested in.
+
+* Caching: to minimize communication errors, Device::LaCrosse::WS23xx
+  reads large blocks and caches them for a few seconds.
+
+* Debugging: the La Crosse units don't always communicate too
+  reliably.  Use the trace option to log serial I/O and track down
+  problems.
+
+Device::LaCrosse::WS23xx is intended for Perl hackers who
+want a simple way to talk to their La Crosse weather station.
+It could also be useful for non-Perl-types who want a simple
+way to explore their devices.
+
+Device::LaCrosse::WS23xx is standalone; it does not require Open2300.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Device::LaCrosse::WS23xx
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-LaCrosse-WS23xx
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Device-LaCrosse-WS23xx
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Device-LaCrosse-WS23xx
+
+    Search CPAN
+        http://search.cpan.org/dist/Device-LaCrosse-WS23xx
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Eduardo Santiago
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

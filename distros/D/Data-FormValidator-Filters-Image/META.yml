@@ -1,0 +1,29 @@
+---
+name: Data-FormValidator-Filters-Image
+version: 0.40
+author:
+  - 'Cees Hek <ceeshek@gmail.com>'
+abstract: Filter that allows you to shrink incoming image uploads when using Data::FormValidator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  CGI: 0
+  Data::FormValidator: 0
+  File::Basename: 0
+  File::Spec: 0
+  Image::Magick: 0
+  MIME::Types: 0
+build_requires:
+  File::Slurp: 0
+  HTTP::Request::Common: 0
+  IO::Scalar: 0
+  Image::Size: 0
+provides:
+  Data::FormValidator::Filters::Image:
+    file: lib/Data/FormValidator/Filters/Image.pm
+    version: 0.40
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

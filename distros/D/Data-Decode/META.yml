@@ -1,0 +1,25 @@
+--- 
+abstract: Pluggable Data Decoder
+author: 
+  - Copyright (c) 2007 Daisuke Maki <daisuke@endeworks.jp>
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Data-Decode
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Encode: 0
+  Encode::Guess: 0
+  Exception::Class: 0
+  HTML::Parser: 0
+  HTTP::Response::Encoding: 0
+tests: t/*.t t/*/*.t
+version: 0.00006

@@ -1,0 +1,32 @@
+{
+   "abstract" : "even less indentation plus string prefix",
+   "author" : [
+      "Jeremy Mates <jmates@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-Concise-Aligned",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.48",
+            "strict" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.25"
+}

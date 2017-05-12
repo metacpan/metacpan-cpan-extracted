@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>DBIx-NoSQL</name>
+  <shortdesc>NoSQL-ish overlay for an SQL database</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Robert Krimen</foaf:name>
+      <foaf:mbox rdf:resource="mailto:robertkrimen@gmail.com" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>John Lifsey</foaf:name>
+      <foaf:mbox rdf:resource="mailto:nebulous@crashed.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>nebulous</foaf:name>
+      <foaf:mbox rdf:resource="mailto:nebulous@crashed.net" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/yanick/DBIx-NoSQL" />
+  <bug-database rdf:resource="https://github.com/yanick/DBIx-NoSQL/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/yanick/DBIx-NoSQL" />
+      <location rdf:resource="https://github.com/yanick/DBIx-NoSQL.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0010</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0011</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0012</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0013</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0014</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0015</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0016</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0017</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0018</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0019</revision>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.0020</revision>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

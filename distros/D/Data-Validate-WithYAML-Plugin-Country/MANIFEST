@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Validate/WithYAML/Plugin/Country.pm
+t/01_check.t

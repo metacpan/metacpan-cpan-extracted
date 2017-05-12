@@ -1,0 +1,21 @@
+---
+name: Device-MatrixOrbital-GLK
+version: 0.01
+author:
+  - 'Nicholas J Humfrey, njh@cpan.org'
+abstract: Control the GLK series Matrix Orbital displays
+license: perl
+requires:
+  Device::SerialPort: 0
+  Params::Util: 0
+  Test::More: 0
+  Test::Pod: 0
+  Time::HiRes: 0
+  perl: 5.5.0
+build_requires:
+  Module::Build: 0.20
+provides:
+  Device::MatrixOrbital::GLK:
+    file: lib/Device/MatrixOrbital/GLK.pm
+    version: 0.01
+generated_by: Module::Build version 0.26

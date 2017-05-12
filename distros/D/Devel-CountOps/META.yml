@@ -1,0 +1,16 @@
+---
+abstract: 'Simply and precisely count operations in Perl code'
+author:
+  - "Stefan O'Rear <stefanor@cox.net>"
+build_requires:
+  Test::More: 0.86
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.101612, CPAN::Meta::Converter version 2.101670'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-CountOps
+version: 0.01

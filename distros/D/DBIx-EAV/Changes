@@ -1,0 +1,69 @@
+Revision history for Perl extension DBIx-EAV
+
+0.09 2016-08-23T01:46:22Z
+
+    [ FIX ]
+    * added undeclared deps to cpanfile (GH #1 by andk)
+
+0.08 2016-08-15T19:01:30Z
+
+    [ NEW ]
+    * Implemented custom Entity/ResultSet classes
+      - set via entity_namespaces/resultset_namespaces
+      - can now define entities via custom classes instead of register_types()
+
+    [ TESTS ]
+    * migrated to Test2
+
+0.07 2016-07-26T22:36:26Z
+
+    - improved schema deployment, now using a version table
+      - added method 'version_table'
+      - added method 'version_table_is_installed'
+      - added method 'install_version_table'
+      - added method 'version'
+      - added method 'installed_version'
+    - schema->deploy() now abort silently when the current version is already deployed
+
+0.06 2016-06-04T18:35:21Z
+
+    - implemented DBIx::EAV::EntityType load() class method
+    - type() can now load previously registered types
+    - improved relationship registration/installation
+    - added column 'incoming_name' to table relationships
+    - fixed tenant.t
+
+0.05 2016-06-04T14:12:15Z
+
+    - renamed option 'default_data_type' to 'default_attribute_type'
+    - added tests for multi-tenancy disable mode
+    - improved docs
+
+0.04 2016-06-04T11:31:14Z
+
+    - constructor param 'schema_config' replaces all schema-config-related params
+    - Schema now enables foreign keys for SQLite on BUILD
+    - fixed constraints from 'entity_relationships' to 'entities' table
+    - moved methods 'db_driver_name' and 'has_data_type' to Schema.pm
+    - renamed method 'register_schema' to 'register_types'
+    - fixed Entity->_get_related() to handle query and options arguments
+    - improved docs
+
+
+0.03 2016-06-03T17:56:55Z
+
+    * DBIx::EAV can now deploy the eav schema to the database (via SQL::Translator)
+
+    - implemented schema->deploy
+    - implemented schema->get_ddl($sqlt_producer)
+    - new constructor option 'static_attributes' to define extra 'entities' table columns
+    - tests now using schema->deploy instead of eav-schema.sql (deleted it)
+
+
+0.02 2016-06-02T04:59:44Z
+
+    - implemented DBIx::EAV->connect() method
+
+0.01 2016-06-02T03:10:43Z
+
+    - initial import from cafe's private repo

@@ -1,0 +1,19 @@
+{
+        "might_have": {
+            "fetch": 0
+        },
+        "has_many": {
+            "fetch": 0
+        },
+        "sets": [{
+            "class": "CD",
+            "ids": ["5"]
+        }],
+        "rules": {
+            "Artist": {
+                "has_many": {
+                    "fetch": 1
+                }
+            }                    
+        }
+}

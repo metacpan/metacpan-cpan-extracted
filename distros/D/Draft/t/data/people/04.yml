@@ -1,0 +1,14 @@
+--- #YAML:1.0
+copyright:
+  - Bruno Postle <bruno@postle.net>
+license: http://creativecommons.org/licenses/sa/1.0/
+location:
+  - 'woman/'
+points:
+  -
+    - 106.265890674358
+    - -444.616037174381
+    - 0
+type: reference
+units: mm
+version: draft1

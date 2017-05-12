@@ -1,0 +1,43 @@
+DateTime::Format::XMLTV version 1.001, released March 8, 2014
+
+
+This module understands the datetime format used by XMLTV files,
+and converts to & from DateTime objects.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+
+DEPENDENCIES
+
+  Package                    Minimum Version
+  -------------------------- ---------------
+  perl                        5.8.0
+  DateTime::Format::Builder   0.80
+
+
+
+CHANGES
+    Here's what's new in version 1.001 of DateTime::Format::XMLTV:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Add tests with time zones and incomplete times
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

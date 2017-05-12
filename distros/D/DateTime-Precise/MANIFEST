@@ -1,0 +1,8 @@
+CHANGES
+MANIFEST
+README
+Makefile.PL
+lib/DateTime/Precise.pm
+lib/DateTime/Math/bigint.pl
+lib/DateTime/Math/bigfloat.pl
+t/01date_time.t

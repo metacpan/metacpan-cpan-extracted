@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/dcmes-xml/
+ -->
+<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+         xmlns:dc ="http://purl.org/dc/elements/1.1/">
+ <rdf:Description rdf:about="http://dublincore.org/">
+   <dc:title>Dublin Core Metadata Initiative - Home Page</dc:title>
+   <dc:description>The Dublin Core Metadata Initiative Web site.</dc:description>
+   <dc:date>2001-01-16</dc:date>
+   <dc:format>text/html</dc:format>
+   <dc:language>en</dc:language>
+   <dc:contributor>The Dublin Core Metadata Initiative</dc:contributor>
+   <!-- guesses for the translation of the above titles -->
+   <dc:title xml:lang="fr">L'Initiative de métadonnées du Dublin Core</dc:title>
+   <dc:title xml:lang="de">der Dublin-Core Metadata-Diskussionen</dc:title>
+ </rdf:Description>
+</rdf:RDF>

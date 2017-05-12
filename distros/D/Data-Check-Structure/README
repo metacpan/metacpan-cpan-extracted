@@ -1,0 +1,148 @@
+NAME
+    Data::Check::Structure - Check structure of data
+
+VERSION
+    This document describes version 0.03 of Data::Check::Structure (from
+    Perl distribution Data-Check-Structure), released on 2014-07-14.
+
+SYNOPSIS
+DESCRIPTION
+    This small module provides several simple routines to check the
+    structure of data, e.g. whether data is an array of arrays ("aoa"),
+    array of scalars ("aos"), and so on.
+
+FUNCTIONS
+  is_aos($data, \%opts) => bool
+    Check that data is an array of scalars. Examples:
+
+     is_aos([]);                     # true
+     is_aos(['a', 'b']);             # true
+     is_aos(['a', []]);              # false
+     is_aos([1,2,3, []], {max=>3});  # true
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_aoa($data, \%opts) => bool
+    Check that data is an array of arrays. Examples:
+
+     is_aoa([]);                          # true
+     is_aoa([[1], [2]]);                  # true
+     is_aoa([[1], 'a']);                  # false
+     is_aoa([[1],[],[], 'a'], {max=>3});  # true
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_aoaos($data, \%opts) => bool
+    Check that data is an array of arrays of scalars. Examples:
+
+     is_aoaos([]);                           # true
+     is_aoaos([[1], [2]]);                   # true
+     is_aoaos([[1], [{}]]);                  # false
+     is_aoaos([[1],[],[], [{}]], {max=>3});  # true
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_aoh($data, \%opts) => bool
+    Check that data is an array of hashes. Examples:
+
+     is_aoh([]);                             # true
+     is_aoh([{}, {a=>1}]);                   # true
+     is_aoh([{}, 'a']);                      # false
+     is_aoh([{},{},{a=>1}, 'a'], {max=>3});  # true
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_aohos($data, \%opts) => bool
+    Check that data is an array of hashes of scalars. Examples:
+
+     is_aohos([]);                                 # true
+     is_aohos([{a=>1}, {}]);                       # true
+     is_aohos([{a=>1}, {b=>[]}]);                  # false
+     is_aohos([{a=>1},{},{}, {b=>[]}], {max=>3});  # true
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_hos($data, \%opts) => bool
+    Check that data is a hash of scalars. Examples:
+
+     is_hos({});                                   # true
+     is_hos({a=>1, b=>2});                         # true
+     is_hos({a=>1, b=>[]});                        # false
+     is_hos({a=>1, b=>2, c=>3, d=>[]}, {max=>3});  # true (or false, depending on random hash key ordering)
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_hoa($data, \%opts) => bool
+    Check that data is a hash of arrays. Examples:
+
+     is_hoa({}) );       # true
+     is_hoa({a=>[]}) );  # true
+     is_hoa({a=>1}) );   # false
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_hoaos($data, \%opts) => bool
+    Check that data is a hash of arrays of scalars. Examples:
+
+     is_hoaos({}) );         # true
+     is_hoaos({a=>[]}) );    # true
+     is_hoaos({a=>[1]}) );   # true
+     is_hoaos({a=>1}) );     # false
+     is_hoaos({a=>[{}]}) );  # false
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_hoh($data, \%opts) => bool
+    Check that data is a hash of hashes. Examples:
+
+     is_hoh({}) );       # true
+     is_hoh({a=>{}}) );  # true
+     is_hoh({a=>1}) );   # false
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+  is_hohos($data, \%opts) => bool
+    Check that data is a hash of hashes of scalrs. Examples:
+
+     is_hohos({}) );            # true
+     is_hohos({a=>{}}) );       # true
+     is_hohos({a=>{b=>1}}) );   # true
+     is_hohos({a=>1}) );        # false
+     is_hohos({a=>{b=>[]}}) );  # false
+
+    Known options: "max" (maximum number of items to check, undef means
+    check all items).
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Check-Structure>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Data-Check-Structure>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Check-Structure>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

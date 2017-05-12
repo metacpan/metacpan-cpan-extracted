@@ -1,0 +1,26 @@
+Revision history for Perl extension Data::Table::Excel.
+0.5 Thu May  1 08:45:45 PDT 2014
+  Use Spreadsheet::ParseXLSX instead of Spreadsheet::XLSX
+  (Spreadsheet::XLSX does not handle some cell values correctly)
+
+  Modify excelFileToTable, xls2tables and xlsx2tables, so that
+  sheet_name and sheet_index can be a str or an int, instead of an array reference
+
+0.4 Sat Apr 26 13:32:43 PDT 2014
+  Add methods: is_xlsx, xls2xlsx, xlsx2xls
+  excelFileToTable, xls2tables and xlsx2tables will return a new columnHeader array
+
+0.3 Wed Feb 20 20:41:17 PST 2013
+  Fix an exception in excelFileToTable when a spreadsheet has no data
+
+0.2 Wed Aug  8 20:31:33 PDT 2012
+  Remove inheritance from AutoLoader
+  Remove methods from exporter by default
+
+0.1 Mon Jul 23 12:35:56 PDT 2012
+  Clean up code and documentation.
+  Added support for .xlsx
+  Ready for CPAN release
+
+0.01 Fri Jan  4 00:47:42 PST 2008
+  First version

@@ -1,0 +1,75 @@
+Draft Version 0.05
+==================
+
+This is just a proof of concept to demonstrate an alternative
+system for doing Computer Aided Design (CAD) centering on a truly
+open file format:
+
+    http://bugbear.blackfish.org.uk/~bruno/draft/
+
+Some basic drawing elements and a viewer have been implemented.
+
+BUGS
+
+ - Probably
+
+TODO
+
+ - None, otherwise this will become Yet Another Half-Finished CAD
+   Program.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This package depends on perl and the following CPAN modules:
+
+   Tk
+   Tk::WorldCanvas
+   Test::Helper
+   SGI::FAM
+   YAML
+
+It also depends on the command-line utilities 'diff' and 'patch' for
+the undo/redo functionality.
+
+USAGE
+
+Make sure that FAM is running; on my machine I need to do this:
+
+   service portmap start
+   service xinetd start
+
+   (or manually start FAM: `/usr/bin/fam -T 0 &`)
+
+Try and open some of the example drawings:
+
+   tkdraft.pl t/data/arrows.drawing/ &
+   tkdraft.pl t/data/arrow.drawing/ &
+   tkdraft.pl t/data/crowd.drawing/ &
+   tkdraft.pl t/data/people/ &
+   tkdraft.pl t/data/fridge.drawing/ &
+
+Zoom in and out with the 'i' and 'o' keys, pan the viewport with the
+middle mouse-button and move items around with the left
+mouse-button.
+
+Undo any action with the 'Ctrl-z' key combination and redo with
+'Ctrl-y' - The undo history survives restarting the application.
+
+Note that whenever you move something, the change is immediately
+committed to disk.  Any changes to one viewport are immediately
+reflected in other viewports showing the same items.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2004 Bruno Postle <bruno@postle.net> All Rights
+Reserved.  This module is Free Software. It may be used,
+redistributed and/or modified under the same terms as Perl itself.

@@ -1,0 +1,41 @@
+==================================================
+Changes from 2013-10-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.002 at 2014-10-28 18:20:33 +0000
+------------------------------------------
+
+  Change: 9a8355835473993ea6f2238230976d4b7fc2aad0
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-28 11:19:47 +0000
+
+    silence unused vars 
+
+  Change: 576b43cf11fa43285e2feb0273f71e993926c94a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-28 11:18:27 +0000
+
+    tweak pod 
+
+  Change: e537e19bad3bde58d406d0aceb11c9417e5cd997
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-28 10:34:43 +0000
+
+    officially deprecate this module 
+
+  Change: 52e9fafbc794808e28e046c74287d43e87999dee
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 19:51:09 +0000
+
+    minor updates 
+
+  Change: ef18db54d03424b842c86ba06bc3af4c1093db5b
+  Author: Apocalypse <perl@0ne.us>
+  Date : 2011-05-05 21:57:00 +0000
+
+    add note for Module::build::tiny 
+
+================================================
+Plus 2 releases after 2013-10-28 00:00:00 +0000.
+================================================

@@ -1,0 +1,10 @@
+Revision history for Perl extension DBIx::Copy.
+
+0.1 - Everything is new
+0.2 - Translation tables
+
+TODO
+
+- better test routines
+- smart mirroring
+- The rest of the stuff described in the POD

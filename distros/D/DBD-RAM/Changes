@@ -1,0 +1,165 @@
+DBD::RAM - a DBI driver for in-memory and file data
+
+Documentation and most recent version available on CPAN, and at:
+
+    http://www.vpservices.com/jeff/programs/dbd-ram.html
+
+Revision history for Perl extension DBD::RAM.
+
+Version 0.072, 25th May, 2000
+
+ * Fixed bug in interpreting eol for USR data type
+
+ * Fixed problems in POD (bad head3, wrong USR info)
+
+Version 0.071, 24th May, 2000
+
+ * Uploaded again because of failed CPAN upload
+
+Version 0.07, 24th May, 2000
+
+ * Greatly expanded support for XML and for User-Defined formats
+
+ * Added export() method to allow saving tables directly to disk files in
+   many formats including CSV, Fixed-width and XML
+
+ * Expanded capabilities of continous file access with catalog()
+
+ * Added remote-file support via LWP for additional file formats
+
+ * Added ability to specify alternate field and record separator patterns
+
+ * Added convenience names TAB and PIPE to support tab and pipe
+   "delimited" files.
+
+ * Modified and Standardized the import() syntax
+
+ * Greatly expanded POD documentation
+
+Version 0.06, 25th April, 2000
+
+ * Added support for XML::Parser and LWP.  The module can now use 
+   XML::Parser to read XML files and import them into database tables.
+   It can also use LWP to fetch the files from remote locations.  
+   Here's the complete code to build an on-the-fly, in-memory 
+   database table accessible with DBI and SQL from the latest 
+   news XML file on slashdot:
+
+   $dbh->func({
+       remote_source => 'http://www.slashdot.org/slashdot.xml',
+       data_type     => 'XML',
+       record_tag    => 'backslash story',
+       col_names     => [title,url,time,author,department,
+                        topic,comments,section,image]
+   },'import');
+
+ If the XML is a local file rather than a remote file, simply
+ substitute "file_source => $fullpath" for the "remote_source"
+ attribute or if it is from a string rather than a file, change it to
+ "data_source => $xml_string".
+
+ Supports tags at any depth of nesting and supports both text and tag 
+ attributes as fields, e.g., these two are equivalent:
+
+       <quiz_item id='1' question='Is the sky blue?' answer='Yes'/>
+
+       <quiz_item>
+          <id>1</id>
+          <question>Is the sky blue?</question>
+          <answer>Yes</answer>
+       </quiz_item>
+
+ * Updated POD documentation
+
+ * Added a demo directory, currently containing portal.cgi, a demo of 
+   support for XML and LWP; and mp3.pl, a demo of support for MP3 music
+   files.
+
+
+Version 0.05, 20th April, 2000
+
+ * Added support for mp3 music files!  You can now create and 
+   search an on-the-fly database of mp3 files.  Just feed it a
+   list of directories where you store mp3 files and DBD::RAM 
+   will automagically create an in-memory table with each file 
+   as a record containing the fields:  file_name, song_name, 
+   artist, album, year, comment,genre. The fields will be filled
+   in automatically from the ID3v1 header information in the mp3 
+   file itself, assuming, of course, that the mp3 file contains a 
+   valid ID3v1 header.
+
+Version 0.042,  17th April, 2000
+
+ * Minor bug fix: typo on use FileHandle (thx Mathew Persico!)
+
+Version 0.041,  15th April, 2000
+
+ * Minor bug fix on fixed-width column name reading
+
+ * Minor correction in readme list of prerequisites
+
+Version 0.04,  14th April, 2000
+
+ * Added ability to handle both in-memory and file-based data.
+   The module now supports flat file databases similarly to the
+   way DBD::CSV does.  Currently CSV files, fixed-width records
+   files, name=value ini files, and XML files are supported.  The
+   XML support is minimal at the moment, included more as 'proof of
+   concept' but will get more robust soon.  Support for HTML, mail
+   files, web logs, and more, also coming soon.  
+
+ * Added defaults to the import function so that even quicker
+   and dirtier prototyping is possible.  This now becomes the
+   hands-down DBI golf winner for printing our favorite phrase:
+
+      use DBI;
+      my $dbh = DBI->connect('DBI:RAM:');
+      $dbh->func( [<DATA>], 'import' );
+      print $dbh->selectrow_array('SELECT col2 FROM table1');
+      __END__
+      1,"Hello, new world!",sample
+
+ * Changed the names of the import data types.
+
+ * Added lots more documentation
+
+Version 0.03,  9th March, 2000
+
+ * added an import() data_type "sth" which allows you to open a database
+   handle to any other DBI database, do a prepare/execute for a SELECT 
+   statement into that database and pass the resulting statement handle 
+   to the import() constructor thus importing the results of the SELECT 
+   from the other database into a DBD::RAM table
+
+ * changed the behavior of import() so that it does not overwrite existing
+   tables thus allowing data from multiple data structures to be imported
+   into the same DBD::RAM table (e.g. pull in config files from name=value
+   and fixed-width files and from another DBI database and combine it all
+   into a single in-memory table)
+
+ * made name=value importing smarter so that it can accept embedded equal
+   signs in the value
+
+ * changes and additions to the POD
+
+Version 0.02,  8th March, 2000
+
+ * added capability of processing arrays of hashes, arrays of 
+   name=value pairs, and arrays of fixed-width record strings
+
+ * added capability to pass a user-defined pattern processing method
+   so that users can import any data structures they can parse
+
+ * added a WARNING that, at least for the next week, the module is in
+   a phase of rapid development and that its capabilities, interface,
+   and name might all be changing (suggestions welcome)
+
+ * corrected drop, disconnect, and destroy methods to release memory 
+   appropriately when $dbh goes out of scope and/or tables are
+   dropped
+
+ * expanded documentation
+
+Version 0.01,  7th March, 2000
+
+ * original version; handles in-memory DBI access to arrays of arrays

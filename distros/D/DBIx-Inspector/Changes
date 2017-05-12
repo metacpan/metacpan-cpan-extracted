@@ -1,0 +1,77 @@
+Revision history for Perl extension DBIx::Inspector
+
+0.12 2013-07-09T03:14:37Z
+
+    - minil migrate
+
+0.11 2013-02-25T10:41:13
+
+    - removed experimental feature introduced in 0.10.
+    - [EXPERIMENTAL] Added tables_and_views, table_or_view methods.
+
+0.10 2013-02-25T06:30:30
+
+    - [EXPERIMENTAL] ->tables method allows table type.
+
+0.09 2013-02-20T06:06:22
+
+    - support views
+
+0.08
+
+    commit e9e0d8af806d7f6ae796dcd2769d2d452f2fa025
+    Author: hatyuki29 <hatyuki29@gmail.com>
+    Date:   Tue Jul 24 17:05:12 2012 +0900
+
+        return empty list
+
+        if the context of the currently executing subroutine expect a list value.
+
+    lib/DBIx/Inspector/Driver/Pg.pm |    2 +-
+    t/03_pg.t                       |   12 ++++++++++--
+    2 files changed, 11 insertions(+), 3 deletions(-)
+
+    commit 7b8c3e1a080c0a3817699099c0ce34b205aad3ed
+    Author: hatyuki <hatyuki29@gmail.com>
+    Date:   Thu Jul 19 18:29:10 2012 +0900
+
+    primary key is not required on PostgreSQL
+
+    lib/DBIx/Inspector/Driver/Pg.pm |    3 +++
+    t/03_pg.t                       |   10 +++++++++-
+    2 files changed, 12 insertions(+), 1 deletion(-)
+
+
+0.07
+
+    commit 594bef90278b1eaa802b61d2b445c182acc5e702
+    Author: hatyuki29 <hatyuki29@gmail.com>
+    Date:   Tue Jul 17 20:43:14 2012 +0900
+
+        hash keys should be upper case
+
+0.06
+
+    - fixed fail if $dbh->{FetchHashKeyName} set 'NAME_lc'
+      (nihen)
+
+0.05
+
+    - support table and column names for postgresql reserved word
+      (makamaka)
+
+0.04
+
+        - added $column->get($name)
+
+0.03
+
+        - fixed typo in docs
+        - use Module::Load instead of Class::Load
+
+0.02
+
+        - fixed packaging
+
+0.01    Sat Nov 27 16:59:53 2010
+        - original version

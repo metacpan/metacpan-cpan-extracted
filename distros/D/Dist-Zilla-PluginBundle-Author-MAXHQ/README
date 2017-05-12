@@ -1,0 +1,195 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::MAXHQ - MAXHQ's default Dist::Zilla
+    configuration
+
+VERSION
+
+    version 3.3.3
+
+SYNOPSIS
+
+    Put following into your My-Module/dist.ini:
+
+        [@Author::MAXHQ]
+        GatherDir.exclude_match = ^[^\/\.]+\.txt$
+        PodWeaver.replacer = replace_with_nothing
+        ReadmeAnyFromPod = no
+
+ DESCRIPTION
+
+    The bundles' behaviour can be altered by the following options:
+
+      * GatherDir.exclude_match - a regex specifying which files or
+      directories to ignore (they are not processed and thus not added to
+      the distribution tarball). This option can be specified several times
+      for different regexes.
+
+      * PodWeaver.replacer - Which replacer to use for POD sections. See
+      Pod::Elemental::PerlMunger. Currently possible values:
+      "replace_with_nothing", "replace_with_comment" (default),
+      "replace_with_blank"
+
+OVERVIEW
+
+    Currently this plugin bundle is equivalent to:
+
+        #
+        # Include files tracked by Git with some exceptions
+        #
+        [Git::GatherDir]
+        exclude_match = ^cpanfile$
+        exclude_match = ^cpanfile.snapshot$
+        exclude_match = \A[^\/]+\.ini\Z
+        exclude_match = \A[^\/]+\.tar\.gz\Z
+        exclude_match = ^\.build\b
+        exclude_match = ^\.git\b
+        exclude_match = ^\.svn\b
+        exclude_match = ^extlib\b
+        exclude_match = ^local\b
+        exclude_match = ^CVS\b
+        include_dotfiles = 1
+    
+        [PruneCruft]
+        [ExecDir]
+        dir = bin
+    
+        [ShareDir]
+        dir = share/dist/My-Module
+    
+        #
+        # Conversion and replacements
+        #
+        [Authority]
+    
+        [PkgVersion]
+        die_on_existing_version = 1
+        die_on_line_insertion   = 1
+    
+        [NextRelease]
+        format = '%-9v %{yyyy-MM-dd}d'
+    
+        [PreviousVersion::Changelog]
+        [NextVersion::Semantic]
+        major = *NEW FEATURES, *API CHANGES
+        minor = +ENHANCEMENTS
+        revision = REVISION, BUG FIXES, DOCUMENTATION
+        numify_version = 1
+        format = %d.%03d%03d
+    
+        [PodWeaver]
+        config_plugin = @Author::MAXHQ
+        replacer      = replace_with_comment
+    
+        #
+        # Prerequisites
+        #
+        [Prereqs::FromCPANfile]
+        [Prereqs::AuthorDeps]
+        [AutoPrereqs]
+    
+        [Prereqs / MAXHQ]
+        -phase = runtime
+        -relationship = requires
+        Pod::Elemental::Transformer::List = 0.102000
+    
+        [Prereqs / MAXHQ-DEV]
+        -phase = devlop
+        -relationship = requires
+        Pod::Coverage::TrustPod = 0.100003
+    
+        [RemovePrereqs]
+        remove = strict
+    
+        [CheckSelfDependency]
+    
+        #
+        # Auto generation --- meta info
+        #
+        [Authority]
+        do_munging = 0
+        [MetaProvides::Package]
+        [MetaConfig]
+    
+        #
+        # Auto generation --- generate files
+        #
+        [ModuleBuild]
+        [MetaYAML]
+        [MetaJSON]
+        [Manifest]
+        [License]
+        [ReadmeAnyFromPod]
+        [CPANFile]
+    
+        [MetaNoIndex]
+        directory = t
+        directory = xt
+        directory = inc
+        directory = share
+        directory = eg
+        directory = examples
+    
+        #
+        # Auto generation --- tests
+        #
+        [Test::Inline]
+        [RunExtraTests]
+        [Test::Perl::Critic]
+        [PodSyntaxTests]
+        [Test::Pod::Coverage::Configurable]
+        [Test::Pod::No404s]
+        [Test::Pod::LinkCheck]
+        [Test::EOL]
+        [Test::NoTabs]
+    
+        #
+        # Copy files back into project dir
+        #
+        [CopyFilesFromBuild]
+        copy = cpanfile
+    
+        #
+        # Release
+        #
+        [TestRelease]
+    
+        [Git::Check]
+        allow_dirty => cpanfile
+    
+        [Git::Commit]
+        allow_dirty => cpanfile
+        allow_dirty => Changes
+        commit_msg = Release %v%n%n%c
+    
+        [Git::Tag]
+        tag_format  = %v
+        ;# make a lightweight tag
+        tag_message =
+        [Git::Push]
+    
+        [ConfirmRelease]
+
+METHODS
+
+ add_plugins_if_wanted
+
+    Adds the given plugins unless there is a configuration option given to
+    the plugin bundle that tells not to use it.
+
+    E.g. plugin 'PruneCruft' is used unless the following is given:
+
+        [@Author::MAXHQ]
+        PruneCruft = no
+
+AUTHOR
+
+    Jens Berthold <jens.berthold@jebecs.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Jens Berthold.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

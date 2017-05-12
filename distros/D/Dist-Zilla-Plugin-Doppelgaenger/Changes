@@ -1,0 +1,52 @@
+Revision history for Dist-Zilla-Plugin-Doppelgaenger
+
+0.008     2015-08-04 12:03:15-04:00 America/New_York
+
+    [ADDED]
+
+    - URL for MetaCPAN Changes entry for the source distribution gets
+      added to the generated Changes file
+
+0.007     2014-02-05 22:18:58-05:00 America/New_York
+
+    [ADDED]
+
+    - Added file/match exclusion options for gathering from
+      the source distribution
+
+0.006     2014-02-05 22:01:28-05:00 America/New_York
+
+    [FIXED]
+
+    - Requires Dist::Zilla 5 and is updated to respect new encodings API
+
+    - Munging moved from gather phase to regular munging phase to be able
+      to act after encodings are set
+
+0.005     2013-09-23 12:59:16 America/New_York
+
+    [FIXED]
+
+    - Now munges module paths (Old/Name.pm to New/Name.pm)
+
+0.004     2013-09-23 10:15:12 America/New_York
+
+    [FIXED]
+
+    - Fixed bug when stripping $VERSION inside a block
+
+0.003     2013-09-23 08:15:03 America/New_York
+
+    - Change default mirror to www.cpan.org
+
+0.002     2010-12-17 12:31:36 EST5EDT
+
+    - Added 'strip_version' option
+
+    - Fixed up line spacing of additions to Changes files
+
+0.001     2010-12-17 08:50:22 EST5EDT
+
+    - First draft
+
+# vim: ts=4 sts=4 sw=4 et:

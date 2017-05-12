@@ -1,0 +1,71 @@
+{
+   "abstract" : "Interface to the solenodrive hardware",
+   "author" : [
+      "Lieven Hollevoet <hollie@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Solenodrive",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "Device::SerialPort" : "0",
+            "Digest::CRC" : "0",
+            "Fcntl" : "0",
+            "Getopt::Std" : "0",
+            "IO::Socket::INET" : "0",
+            "Moose" : "0",
+            "Pod::Help" : "0",
+            "Symbol" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.012",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "IO::Select" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::SharedFork" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hollie/device-solenodrive/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hollie/device-solenodrive.git",
+         "web" : "https://github.com/hollie/device-solenodrive"
+      }
+   },
+   "version" : "0.1"
+}
+

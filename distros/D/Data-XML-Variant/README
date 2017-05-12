@@ -1,0 +1,24 @@
+Data-XML-Variant
+
+Write XML "variants".  Regrettably, we often find ourselves in the position of
+having to write malformed XML either due to third-party applications or legacy
+code.  This module allows one to write XML more loosely than "official" XML
+modules.  It is recommended that you try and figure out if well-formed XML can
+be used instead of this module.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Curtis "Ovid" Poe
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,61 @@
+{
+   "abstract" : "List or install Dist::Zilla authors dependencies as Debian packages",
+   "author" : [
+      "Dominique Dumont"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-App-Command-Authordebs",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.34"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Debian::AptContents" : "0",
+            "DhMakePerl::Utils" : "0",
+            "Dist::Zilla::App" : "0",
+            "Dist::Zilla::Util::AuthorDeps" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Tiny" : "0",
+            "Probe::Perl" : "0",
+            "Test::Command" : "0.08",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "ddumont at cpan.org",
+         "web" : "https://github.com/dod38fr/dist-zilla-app-command-authordebs/issues"
+      },
+      "homepage" : "https://github.com/dod38fr/dist-zilla-app-command-authordebs",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dod38fr/dist-zilla-app-command-authordebs.git",
+         "web" : "http://github.com/dod38fr/dist-zilla-app-command-authordebs"
+      }
+   },
+   "version" : "0.003",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

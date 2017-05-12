@@ -1,0 +1,45 @@
+{
+   "abstract" : "Automatically set column default values on insert",
+   "author" : [
+      "Graham Barr"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-ColumnDefault",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "DateTime" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "DateTime::Format::SQLite" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gbarr/DBIx-Class-ColumnDefault.git",
+         "web" : "http://github.com/gbarr/DBIx-Class-ColumnDefault"
+      }
+   },
+   "version" : "0.122200"
+}
+

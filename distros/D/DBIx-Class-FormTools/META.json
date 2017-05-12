@@ -1,0 +1,49 @@
+{
+   "abstract" : "Helper module for building forms with multiple related L<DBIx::Class> objects.",
+   "author" : [
+      "David Jack Olrik <david@olrik.dk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4008, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-FormTools",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dump" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.06003",
+            "Moose" : "0.11",
+            "Test::More" : "0",
+            "version" : "0.50"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::FormTools" : {
+         "file" : "lib/DBIx/Class/FormTools.pm",
+         "version" : "0.000009"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.000009"
+}

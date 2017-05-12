@@ -1,0 +1,164 @@
+##-*- Mode: CPerl -*-
+## Auto-generated from C++ header file(s) by h2xspp.perl;
+##  + command-line: h2xspp.perl -prefix 'DDC::XS::' QueryFilter.h.in '-vt=^[mb]_' -o QueryFilter '-dn=free' '-dt=Node|Compiler|Options|FilterWithBounds' '-dm=::json|::arg|valueString|SetValueString|SortBounds'
+##  + ... then edited!
+
+=pod
+
+=head1 NAME
+
+DDC::XS::CQFilter - XS interface to DDC C++ CQFilter objects
+
+=head1 SYNOPSIS
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFilter : @ISA=qw(DDC::XS::Object);
+ 
+ # Methods
+ $string = $CQFilter->toString();
+ $string = $CQFilter->toJson();
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFSort : @ISA=qw(DDC::XS::CQFilter);
+ 
+ $CQFSort = DDC::XS::CQFSort->new($ftype, $arg0, $arg1, $arg2);
+ $CQFSort = DDC::XS::CQFSort->new_i($ftype, $arg0, $arg1i, $arg2i);
+ 
+ # Accessors
+ $HitSortEnum = $CQFSort->getType();
+ undef        = $CQFSort->setType($ftype);
+ $string = $CQFSort->getArg0();
+ undef   = $CQFSort->setArg0($arg0);
+ $string = $CQFSort->getArg1();
+ undef   = $CQFSort->setArg1($arg1);
+ $string = $CQFSort->getArg2();
+ undef   = $CQFSort->setArg2($arg2);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFRankSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFRankSort = DDC::XS::CQFRankSort->new($ftype);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFDateSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFDateSort = DDC::XS::CQFDateSort->new($ftype, $lb, $ub);
+ 
+ # Methods
+ $int = $CQFDateSort->Str2Date($datestr, $onEmpty);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFSizeSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFSizeSort = DDC::XS::CQFSizeSort->new($ftype, $lb, $ub);
+ $CQFSizeSort = DDC::XS::CQFSizeSort->new_i($ftype, $lbi, $ubi);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFRandomSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFRandomSort = DDC::XS::CQFRandomSort->new($seed0);
+ $CQFRandomSort = DDC::XS::CQFRandomSort->new_i($seed0);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFBiblSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFBiblSort = DDC::XS::CQFBiblSort->new($ftype, $field, $lb, $ub);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFContextSort : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFContextSort = DDC::XS::CQFContextSort->new($ftype, $field, $matchid, $offset, $lb, $ub);
+ 
+ # Accessors
+ $int = $CQFContextSort->getMatchId();
+ undef = $CQFContextSort->setMatchId($int);
+ 
+ $int = $CQFContextSort->getOffset();
+ undef = $CQFContextSort->setOffset($int);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasField : @ISA=qw(DDC::XS::CQFSort);
+ 
+ $CQFHasField = DDC::XS::CQFHasField->new($field, $val, $isNegated);
+ 
+ # Accessors
+ $bool = $CQFHasField->getNegated();
+ undef = $CQFHasField->setNegated($Negated);
+ 
+ # Methods
+ undef = $CQFHasField->Negate();
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldValue : @ISA=qw(DDC::XS::CQFHasField);
+ 
+ $CQFHasFieldValue = DDC::XS::CQFHasFieldValue->new($field, $val, $isNegated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldRegex : @ISA=qw(DDC::XS::CQFHasField);
+ 
+ $CQFHasFieldRegex = DDC::XS::CQFHasFieldRegex->new($field, $val, $isNegated);
+ 
+ # Accessors
+ $string = $CQFHasFieldRegex->getRegex();
+ undef   = $CQFHasFieldRegex->setRegex($Regex);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldPrefix : @ISA=qw(DDC::XS::CQFHasFieldRegex);
+ 
+ $CQFHasFieldPrefix = DDC::XS::CQFHasFieldPrefix->new_string_string_bool($field, $val, $isNegated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldSuffix : @ISA=qw(DDC::XS::CQFHasFieldRegex);
+ 
+ $CQFHasFieldSuffix = DDC::XS::CQFHasFieldSuffix->new($field, $val, $isNegated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldInfix : @ISA=qw(DDC::XS::CQFHasFieldRegex);
+ 
+ $CQFHasFieldInfix = DDC::XS::CQFHasFieldInfix->new($field, $val, $isNegated);
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQFHasFieldSet : @ISA=qw(DDC::XS::CQFHasField);
+ 
+ $CQFHasFieldSet = DDC::XS::CQFHasFieldSet->new($field, \@vals, $isNegated);
+ 
+ # Accessors
+ \@Values = $CQFHasFieldSet->getValues();
+ undef    = $CQFHasFieldSet->setValues(\@Values);
+
+=cut
+
+##======================================================================
+
+=pod
+
+=head1 DESCRIPTION
+
+The DDC::CQFilter hierarchy provides a perl interface to the DDC C++ CQFilter classes.
+CQFilter objects may be created either manually or by a parsing a query-string
+with a L<DDC::XS::CQueryCompiler|DDC::XS::CQueryCompiler>.
+
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::XS(3perl),
+DDC::XS::Object(3perl),
+DDC::XS::CQuery(3perl),
+DDC::XS::CQCount(3perl),
+DDC::XS::CQueryOptions(3perl),
+DDC::XS::CQueryCompiler(3perl).
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

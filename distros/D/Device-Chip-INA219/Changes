@@ -1,0 +1,21 @@
+Revision history for Device-Chip-INA219
+
+0.04    2016/12/10 23:24:09
+        [CHANGES]
+         * Remove legacy redirection docs from Device::BusPirate::Chip::INA219
+
+0.03    2015/11/18
+        [CHANGES]
+         * Updated for Device::Chip 0.04:
+            + Use mount parameters
+
+0.02    2015/11/13
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::INA219
+         * Changed to implement Device::Chip interface
+
+Previously, this distribution was called Device-BusPirate-Chip-INA219
+
+0.01    2014/11/01 16:57:50
+        First version, released on an unsuspecting world.
+

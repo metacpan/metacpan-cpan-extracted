@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dist-Zilla-Plugin-DOAP</name>
+  <shortdesc>create a doap.xml file for your project</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Toby Inkster</foaf:name>
+      <foaf:nick>TOBYINK</foaf:nick>
+      <foaf:mbox rdf:resource="mailto:tobyink@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://metacpan.org/release/Dist-Zilla-Plugin-DOAP" />
+  <bug-database rdf:resource="http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-DOAP" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/tobyink/p5-dist-zilla-plugin-doap" />
+      <location rdf:resource="git://github.com/tobyink/p5-dist-zilla-plugin-doap.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.001</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-03-13</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.002</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-03-14</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.003</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-10-12</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -1,0 +1,11 @@
+Revision history for Dancer-Plugin-Preprocess-Less
+
+0.021     2014-04-28
+          Added missing documentation on the use of the lessc executable.
+
+0.020     2014-04-21
+          * Added support for the lessc executable
+          * Added the documentation of plugin settings
+
+0.010     2014-04-20
+          First version, released on an unsuspecting world.

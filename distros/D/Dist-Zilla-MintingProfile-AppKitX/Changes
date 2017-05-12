@@ -1,0 +1,16 @@
+0.04      2016-05-16 11:23:02+01:00 Europe/London
+
+    - Moved to CPAN
+
+0.03      2016-04-08 22:49:19+01:00 Europe/London
+
+    - Added new column added recently to AppKit
+
+0.02      2016-04-08 20:55:31+01:00 Europe/London
+
+    - Updated modules dependencies
+    - Added cpanfile to generated module.
+
+0.01      2015-10-27 12:42:38+00:00 Europe/London
+
+    - Initial release

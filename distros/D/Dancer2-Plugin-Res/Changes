@@ -1,0 +1,25 @@
+Revision history for Dancer2::Plugin::Res
+
+0.07  Fri Sep 22 10:25:00 2016
+      - Addressed issue RT #117991 raised by DBOOK.
+
+0.06  Tue Sep 20 10:45:00 2016
+      - Added unit test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.05  Sun Sep 11 08:15:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.04  Mon Mar 21 11:50:00 2016
+      - Merged in GitHub PR #2, thanks to SysPete.
+      - Updated copyright year information in the pod document.
+
+0.03  Thu Jan 21 11:30:00 2016
+      - Merged in GitHub PR #1, thanks to SysPete.
+      - Upgraded pre-reqs Test::More to v0.94 as the test added by SysPete using 'subtest'
+        only supported in v0.94 or above.
+
+0.02  Wed Nov 11 10:40:00 2015
+      - Fixed minor typo in the pod document.
+
+0.01  Sun Apr 12 01:15:00 2015
+      - Module Created.

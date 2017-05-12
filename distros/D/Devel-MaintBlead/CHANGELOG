@@ -1,0 +1,37 @@
+0.08    7 December 2012
+        Fixed problem with other parameters than "maint" or "blead" being
+        passed to the initial call of "perl Makefile.PL" as described by
+        Justin Traer in https://rt.cpan.org/Ticket/Display.html?id=81354 .
+
+0.07    12 June 2012
+        Fixed additional problem with deeper source directories, which would
+        cause the copies in blib to not be updated when they should.
+
+0.06    12 June 2012
+        Fixed problem with distributions that have more than one directory
+        with module files.  Now also allows different number of source
+        files to exist between maint and blead versions.  Some empty
+        directories may get created in the process, but that doesn't feel
+        like a real problem.
+
+0.05    6 June 2012
+        Integrated some remarks / notions from last nights's Amsterdam PM
+        meeting.
+
+0.04    4 June 2012
+        Always exit with failure if there is an internal error (instead of
+        useing -die-, which would get hidden by the eval).
+
+0.03    4 June 2012
+        Added support for "default" setting, so additional runs of Makefile.PL
+        without code version, will keep using the one that was last seen.
+        Made sure that we will never overwrite any files when switching
+        between states.  Also added test-suite.
+
+0.02    2 June 2012
+        Fixed problem with "die" not exiting the script if called inside an
+        eval.  Also made sure the line number mentioned is correct, when it
+        is impossible to run "blead" on the version of perl given.
+
+0.01    1 June 2012
+        First version of Devel::MaintBlead.  No real tests yet.

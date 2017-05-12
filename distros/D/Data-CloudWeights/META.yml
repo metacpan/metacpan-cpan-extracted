@@ -1,0 +1,207 @@
+---
+abstract: 'Calculate values for an HTML tag cloud'
+author:
+  - 'Peter Flanigan, C<< <pjfl@cpan.org> >>'
+build_requires:
+  Module::Build: '0.4004'
+  Test::Requires: '0.06'
+  version: '0.88'
+configure_requires:
+  Module::Build: '0.4004'
+  version: '0.88'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-CloudWeights
+no_index:
+  directory:
+    - examples
+    - inc
+    - share
+    - t
+provides:
+  Data::CloudWeights:
+    file: lib/Data/CloudWeights.pm
+    version: v0.15.1
+requires:
+  Moo: '2.000001'
+  Type::Tiny: '1.000004'
+  namespace::autoclean: '0.22'
+  perl: '5.01'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-CloudWeights
+  homepage: https://metacpan.org/author/PJFL
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/pjfl/p5-data-cloudweights.git
+version: 0.15.1
+x_Dist_Zilla:
+  perl:
+    version: '5.010001'
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: configure
+          type: requires
+      name: ConfigureRequires
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: build
+          type: requires
+      name: BuildRequires
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::Meta::Dynamic::Config
+      name: Meta::Dynamic::Config
+      version: '0.04'
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      config:
+        Dist::Zilla::Plugin::MetaProvides::Package:
+          finder_objects:
+            -
+              class: Dist::Zilla::Plugin::FinderCode
+              name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+              version: '5.020'
+        Dist::Zilla::Role::MetaProvider::Provider:
+          inherit_missing: '1'
+          inherit_version: '0'
+          meta_noindex: '1'
+      name: MetaProvides::Package
+      version: '2.001002'
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmeMarkdownInRoot
+      version: '0.142470'
+    -
+      class: Dist::Zilla::Plugin::Run::BeforeBuild
+      config:
+        Dist::Zilla::Plugin::Run::Role::Runner:
+          run:
+            - 'cp .build.PL Build.PL'
+      name: Run::BeforeBuild
+      version: '0.026'
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: CopyFilesFromBuild
+      version: '0.103510'
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: GatherDir
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: ReadmeAnyFromPod
+      version: '0.142470'
+    -
+      class: Dist::Zilla::Plugin::Signature
+      name: Signature
+      version: '1.100930'
+    -
+      class: Dist::Zilla::Plugin::AbstractFromPOD
+      name: AbstractFromPOD
+      version: 0.2.1
+    -
+      class: Dist::Zilla::Plugin::LicenseFromModule
+      name: LicenseFromModule
+      version: '0.05'
+    -
+      class: Dist::Zilla::Plugin::VersionFromModule
+      name: VersionFromModule
+      version: '0.08'
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild::Custom
+      name: ModuleBuild::Custom
+      version: '4.24'
+    -
+      class: Dist::Zilla::Plugin::CPANFile
+      name: CPANFile
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::License
+      name: License
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: MetaYAML
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::ManifestInRoot
+      name: ManifestInRoot
+      version: 0.6.1
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: ManifestSkip
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':AllFiles'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':NoFiles'
+      version: '5.020'
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: MetaProvides::Package/AUTOVIV/:InstallModulesPM
+      version: '5.020'
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: '0'
+    version: '5.020'

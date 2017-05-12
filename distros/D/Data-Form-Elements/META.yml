@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: Data-Form-Elements
+version: 0.60
+author:
+  - jason gessner <jason@multiply.org>
+abstract: ~
+license: perl
+requires:
+  Data::FormValidator: 0
+  Test::More: 0
+provides:
+  Data::Form::Elements:
+    file: lib/Data/Form/Elements.pm
+    version: 0.60
+generated_by: Module::Build version 0.25

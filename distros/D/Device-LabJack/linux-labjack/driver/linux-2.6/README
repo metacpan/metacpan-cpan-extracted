@@ -1,0 +1,14 @@
+The patch folder contains a patch for the labjack.c file.  The patch
+replaces the usb_unlink_urb calls with usb_kill_urb.  This takes care 
+of the "Badness in usb_unlink_urb" message seen when running dmesg.  
+You only need to use the patch with kernels 2.6.10 and above.
+
+Patching Instructions 
+  
+From the patch folder, run the following command:
+	
+	# patch -p0 <labjack_urb_kill.patch
+
+The labjack.c file should be patched now.  To install the patched 
+device driver, follow the instructions in the ../../INSTALL file for
+2.6 kernel users.

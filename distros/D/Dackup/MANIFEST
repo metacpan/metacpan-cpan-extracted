@@ -1,0 +1,15 @@
+CHANGES
+lib/Dackup.pm
+lib/Dackup/Cache.pm
+lib/Dackup/Entry.pm
+lib/Dackup/Target.pm
+lib/Dackup/Target/CloudFiles.pm
+lib/Dackup/Target/Filesystem.pm
+lib/Dackup/Target/S3.pm
+lib/Dackup/Target/SSH.pm
+Makefile.PL
+MANIFEST
+README
+t/filesystem.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

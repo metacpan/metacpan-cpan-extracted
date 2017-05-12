@@ -1,0 +1,92 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.004000
+
+0.003902 2017-02-28T23:57:38Z
+ [Added / runtime requires]
+ - B
+
+0.003901 2017-02-28T03:42:06Z
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.003900 2017-02-28T02:09:54Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+
+0.003000 2014-09-14T14:02:09Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Capture::Tiny
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+ - Test::DZil
+ - Test::File::ShareDir::Dist
+
+0.002002 2014-08-15T21:20:26Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+0.002001 2014-07-17T23:32:23Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / configure requires]
+ - File::ShareDir::Install 0.03 → 0.06
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+0.002000 2014-04-13T03:23:15Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+ - File::ShareDir::Install 0.03
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006001 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4200
+
+ [Removed / configure requires]
+ - Module::Build 0.4200
+
+0.001001 2013-11-13T10:47:34Z
+ [Changed / build requires]
+ - Module::Build 0.4008 → 0.4200
+
+ [Changed / configure requires]
+ - Module::Build 0.4008 → 0.4200

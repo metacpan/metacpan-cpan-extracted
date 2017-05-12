@@ -1,0 +1,9 @@
+id    name    team
+1     Amy     Blues
+2     Bob     Reds
+3     Chuck   Blues
+4     Dick    Blues
+5     Ethel   Reds
+6     Fred    Blues
+7     Gilly   Blues
+8     Hank    Reds

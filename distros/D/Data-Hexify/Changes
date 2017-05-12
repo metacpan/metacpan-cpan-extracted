@@ -1,0 +1,9 @@
+Revision history for Perl extension Data::Hexify.
+
+1.00  Fri Nov  5 10:15:46 2004
+	- Added 'group' option.
+
+0.01  Tue Jun 29 10:51:34 2004
+	- original version; created by h2xs 1.23 with options
+		-X -b5.6.0 -n Data::Hexify
+

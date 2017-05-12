@@ -1,0 +1,7 @@
+Revision history for Perl extension Dist-Zilla-Plugin-StaticVersion
+
+0.103521  2010-12-18 00:09:11 EST5EDT
+    - Pruned README.pod
+
+0.103440  2010-12-09 22:37:33 PST8PDT
+    - Initial CPAN release

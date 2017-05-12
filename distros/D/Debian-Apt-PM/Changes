@@ -1,0 +1,56 @@
+Revision history for Debian-Apt-PM
+
+0.09
+    * add --force-all option for apt-cpan
+    * sudo no more default
+    * throw an exception when the index is empty or missing
+    * add --version to all scripts
+    * apt-pm-web include data generation date-time
+    * fix dpkg-scanpmpackages to be less memory greedy
+
+0.08    21 Sep 2011
+    * s/Debian::Dpkg::Version/Dpkg::Version/
+    * Pod updates (thanks to Salve J. Nilsen)
+
+0.07    16 Sep 2011
+    * distribution fixes
+
+0.06    15 Sep 2011
+    * not need for full mirror any more, deb-s can be dowloaded on demand
+    * 02packages.dependencies.txt.gz generation in apt-pm-web
+    * add apt-cpan script
+
+0.05    18 Apr 2011 (last day of QA Hackathon 2011 in Amsterdam)
+    * dh-make-pm --tilde added
+    * dh-make-pm --debian-version added
+    * dh-make-pm will generate META.yml if not present
+    * dh-make-pm uses /var/lib/cpan-patches/set and /var/lib/cpan-patches/debian-set
+      to find patches
+    * handles properly same module in diffrent types of require with
+      different versions properly
+    * corrected order for packaging dependecies
+    * add distribution and component to package info
+    * basic CPAN => Debian package mapping web
+
+0.04
+    * s/Dpkg::Version/Debian::Dpkg::Version/
+    * Pod update
+    * no cpan-patches switch
+    * repository+apt-pm only after successful build
+
+0.03
+    * dh-make-pm
+    * DhMakePerl patch
+    * deb-src sources
+
+0.02    12 Feb 2010
+    * Build.PL fixes
+    * more Pod
+    * showing architecture too
+    * clean cache command
+    * look for deb with min pm version
+    * CPAN::Distribution patch
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

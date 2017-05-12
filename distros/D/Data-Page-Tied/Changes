@@ -1,0 +1,22 @@
+Revision history for Perl extension Data::Page::Tied.
+
+2.01  Mon Nov  6 09:42:11 2006
+    - More distribution upgrades: spec-conformant META.yml,
+      clear licensing, etc.
+
+2.00  Sun Sep  3 16:05:12 2006
+    - Fixed issues with the distribution. No functional changes.
+    - Now works with Data::Page 2.00. Requires 2.00, too.
+
+0.03  Fri Jul 12 13:50:48 2002
+    - More minor documentation fixes
+    - Fixed a few error messages
+    - Should now survive make test on *nix
+
+0.02  Fri Jul 12 11:36:48 2002
+    - Minor documentation fixes
+    - Included HTML documentation
+
+0.01  Thu Jul 11 14:56:48 2002
+    - original version as uploaded to CPAN
+

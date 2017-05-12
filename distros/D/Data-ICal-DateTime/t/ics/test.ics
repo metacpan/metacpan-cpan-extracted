@@ -1,0 +1,1439 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+X-WR-CALNAME:London.pm
+PRODID:-//Apple Computer\, Inc//iCal 2.0//EN
+X-WR-RELCALID:DEF1B3EE-62EF-4B86-BBDC-710AAC4B6867
+X-WR-TIMEZONE:Europe/London
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:Europe/London
+LAST-MODIFIED:20050716T111510Z
+BEGIN:DAYLIGHT
+DTSTART:20030330T020000
+TZOFFSETTO:+0100
+TZOFFSETFROM:+0000
+TZNAME:BST
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20031026T020000
+TZOFFSETTO:+0000
+TZOFFSETFROM:+0100
+TZNAME:GMT
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20040328T020000
+TZOFFSETTO:+0100
+TZOFFSETFROM:+0000
+TZNAME:BST
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20041031T020000
+TZOFFSETTO:+0000
+TZOFFSETFROM:+0100
+TZNAME:GMT
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:20050327T020000
+TZOFFSETTO:+0100
+TZOFFSETFROM:+0000
+TZNAME:BST
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:20051030T020000
+TZOFFSETTO:+0000
+TZOFFSETFROM:+0100
+TZNAME:GMT
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030709
+DTEND;VALUE=DATE:20030710
+SUMMARY:OSCon\, day 3
+UID:B7685C95-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20050226
+DTEND;VALUE=DATE:20050228
+SUMMARY:FOSDEM
+UID:03AC396F-6316-11D9-A8C0-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20050110T144347Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040315T170000
+LOCATION:Smiths of Smithfield
+SUMMARY:London Java
+URL;VALUE=URI:http://web1.2020media.com/j/jez/javanicuscom/londonjava/
+UID:E8E3F7D0-754C-11D8-AE04-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DURATION:PT6H
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:The Clachan (Mayfair/SOHO near Regents Street)
+DTSTAMP:20040527T160401Z
+UID:F623FDE4-AFF6-11D8-8B00-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+URL;VALUE=URI:http://london.pm.org/meetings/locations/the_clachan.html
+DTSTART;TZID=Europe/London:20040603T180000
+SUMMARY:London.pm Social Meet @ The Clachan
+DTEND;TZID=Europe/London:20040603T230000
+DESCRIPTION:It's another social meet.  This time at a *new* *pub*
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20050209
+DTEND;VALUE=DATE:20050212
+SUMMARY:German Perl Workshop
+UID:E7CC599C-1522-11D9-8247-000393DA37B4-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030617
+DTEND;VALUE=DATE:20030618
+SUMMARY:YAPC::NA\, day 2
+UID:48070B23-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040309T190000
+STATUS:TENTATIVE
+SUMMARY:London SVG Users Group Meeting
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm/Week-of-Mon-20040
+ 216/024834.html
+UID:6E7BB522-6136-11D8-A86D-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:11
+DURATION:PT4H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030508T180000
+SUMMARY:London.pm Meeting\, venue tbc
+UID:7DDA96AB-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:14
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050505T180000
+SUMMARY:London.pm Social @ The Windmill
+UID:08FE45EF-A5E7-11D9-9459-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+DTSTAMP:20050430T055559Z
+SEQUENCE:1
+DESCRIPTION:This month's London.pm social will\, once again\, be at The 
+ Windmill in\nMayfair on Thursday the 5th of May at 6:30pm.\n\n    http:/
+ /london.pm.org/meetings/locations/windmill.html\n    http://www.windmill
+ mayfair.co.uk/\n    http://www.streetmap.co.uk/streetmap.dll?G2M?X=52900
+ 1&Y=180921&A=Y&Z=1\n    http://london.openguides.org/index.cgi?Windmill%
+ 2C_W1S_2AT\n
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040429T180000
+STATUS:TENTATIVE
+SUMMARY:UKUUG Perl night
+UID:58D46F46-7C23-11D8-BFFB-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DESCRIPTION:TENTATIVE: Possible date for aselection of Perl talks (speak
+ ers\, Dave Cross\, Mark Fowler\, Andy Wardley\, Simon Cozens) given to t
+ he UK Unix User Group
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040805T180000
+STATUS:CONFIRMED
+DTEND;TZID=Europe/London:20040805T230000
+SUMMARY:Social Meet @ The Star
+UID:DF2C43AA-CBAA-11D8-975D-000393DA37B4-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+DTSTAMP:20040803T095111Z
+END:VEVENT
+BEGIN:VEVENT
+DURATION:P1D
+DTSTAMP:20040629T152410Z
+UID:5251010A-C9E0-11D8-8E69-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+STATUS:CONFIRMED
+DTSTART;VALUE=DATE:20040813
+SUMMARY:YAPC::EU Slides Deadline
+DESCRIPTION:If you've been accepted to speak this year\, this is the dea
+ dline for Papers/Slides for the proceedings\n\n(updated)
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Paris
+UID:BCAB74AC-74E0-11D8-AE04-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+URL;VALUE=URI:http://conferences.mongueurs.net/2004/
+DTSTART;VALUE=DATE:20040606
+SUMMARY:Les Journées Perl
+DTEND;VALUE=DATE:20040608
+DESCRIPTION:Le dimanche 6 et le lundi 7 juin prochains\, se tiendra à Pa
+ ris la première conférence Perl en français\, Les Journées Perl 2004.\n\
+ nTous les détails concernant cette conférence sont disponibles sur le si
+ te http://conferences.mongueurs.net/2004/.\n\nLes Journées Perl sont l'o
+ ccasion de se rencontrer et parler de Perl en français. Y seront réunis 
+ des gens qui ont mené des projets en Perl\, qui travaillent sur le langa
+ ge lui-même\, qui utilisent ce langage tous les jours et qui veulent en 
+ apprendre plus.\n\nQuelques-uns des meilleurs auteurs et développeurs Pe
+ rl francophones seront présents pour discuter de leur travail\, de leurs
+  projets\, pour les mettre aux niveaux de tous\, débutants et confirmés.
+ \n\nRejoignez-nous à Paris pendant ces deux jours pour parler et entendr
+ e parler de Perl à la Cité des Sciences et de l'Industrie\, dans le 19èm
+ e arrondissement de Paris.\n\n    * Les pré-inscriptions seront possible
+ s dès le 19 avril 2004\n    * Les inscriptions seront ouvertes dès la fi
+ n avril 2004\n\nFrais d'inscription à la conférence : environ 20 euro.\n
+ \nUne liste de diffusion est ouverte pour discuter spécifiquement de cet
+ te conférence et y poser toutes vos questions : http://conferences.mongu
+ eurs.net/liste.html\n\nTous les détails concernant la conférence sont di
+ sponibles sur le site http://conferences.mongueurs.net/2004/\n\nPlus d'i
+ nformations sur ce que sera la conférence : http://conferences.mongueurs
+ .net/2004/appel_participation.html\n\nPour soumettre une présentation : 
+ http://conferences.mongueurs.net/2004/appel_presentation.html\n\nNos spo
+ nsors : http://conferences.mongueurs.net/sponsors.html
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030616
+DTEND;VALUE=DATE:20030617
+SUMMARY:YAPC::NA\, day 1
+UID:41E5E412-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030611T200000
+SUMMARY:Deadline for TT book review
+UID:7C3569D0-9785-11D7-820F-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041206T180000
+DTEND;TZID=Europe/London:20041206T180000
+SUMMARY:Slide Deadline for LPW
+UID:C96D98B0-3957-11D9-A2FD-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20041118T114918Z
+DESCRIPTION:Speakers should have submitted thier slides to lpw by this p
+ oint\n
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:BUPA house
+DTSTAMP:20040902T163635Z
+UID:494491EC-C6B0-11D8-8E69-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm-announce/2004-Sep
+ tember/000111.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040909T190000
+SUMMARY:London.pm Tech Meet
+DTEND;TZID=Europe/London:20040909T230000
+DESCRIPTION:This month Alex will be talking about making music in Perl\,
+  giving a live\ndemonstration (with big speakers and everything) of what
+  he's been talking\nabout in his 'as seen on slashdot today' Perl.com ar
+ ticle[1].\n\nSimon Cozens will be giving us a talk which is simply label
+ led \"What I've\nbeen working on\"\, which will probably cover things li
+ ke Where Was\, his new\n'search everything you've ever seen' and other e
+ xciting things.\n\nTom Hukins will be doing his talk[2] on Running Web B
+ usiness With Perl\,\nwhich he's practising for the upcoming YAPC::Europe
+ .\n\nAnd I'll be talking to you briefly about a couple of modules I've b
+ een\nplaying with\, and experiment with the Template Toolkit and AxKit a
+ nd then\nbugging everyone about the Phalanx[2] project.\n\nSigning Up\n\
+ n  We're collecting names of people that want to attend on our website.\
+ n\n     http://london.pm.org/signup/\n\n  No sign up\, no entry.  Signup
+  will close midnight spanning Tues\n  7th/Weds 8th.  We won't use your n
+ ame or email address for anything\n  nasty\, honest guv'ner.\n\nDirectio
+ ns to the Venue:\n\n  http://www.streetmap.co.uk/streetmap.dll?G2M?X=530
+ 262&Y=181615&A=Y&Z=1\n\n  BUPA House is located on Bury Place.  It's abo
+ ut five minutes walk from\n  either Tottenham Court Road or Holborn stat
+ ion.  A large eight floor\n  building with big steps outside and the BUP
+ A logo shown really large.\n  Can't miss it.\n\n  From Holborn Station:\
+ n\n  Turn left out of the station and cross Kingsway and continue down\n
+   High Holborn as it bears slightly to the right.  Bury Place is on\n  y
+ our right.\n\n  From Tottenham Court Road Station:\n\n  Walk east out of
+  the station down New Oxford Street so you're passing\n  Centre point on
+  your right.  Keep going straight on as the road turns\n  into Bloomsbur
+ y Way.  Bury place will be on your right.\n\nHope to see you there\, if 
+ not before (as tonight's the social.)\n\nMark.\n\n[1] http://www.perl.co
+ m/pub/a/2004/08/31/livecode.html\n[2] http://belfast.yapc.org/wiki/index
+ .cgi?RunningWebBusinessWithPerl\n[3] http://qa.perl.org/phalanx/\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040421
+LOCATION:http://www.linuxuser.co.uk/expo
+DTEND;VALUE=DATE:20040423
+SUMMARY:Linux Expo
+UID:A14C3B88-6DFE-11D8-8A32-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041129T150000
+SUMMARY:New Event
+UID:54720D5A-4604-11D9-897D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DTSTAMP:20041204T145359Z
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+DTSTAMP:20040504T120739Z
+UID:1C6ACFBA-92C1-11D8-AD10-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040504T180000
+SUMMARY:Meeting wiht dha
+DESCRIPTION:At the founders arms\, near the tate modern
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040915
+DTEND;VALUE=DATE:20040918
+SUMMARY:YAPC::Europe
+UID:1EED7E92-5274-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20031204T180000
+SUMMARY:London.pm social meeting\, venue tbc
+UID:F48595A9-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20050831
+LOCATION:Braga\, Portugal
+DTEND;VALUE=DATE:20050903
+SUMMARY:YAPC::Europe 2005
+UID:7E726022-5E59-11D9-8199-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:6
+DTSTAMP:20050104T140451Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040205T190000
+SUMMARY:Social Meet @ The Sun Tavern
+UID:B4815776-5575-11D8-A079-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+DESCRIPTION:http://london.pm.org/pipermail/london.pm-announce/2004-Janua
+ ry/000083.html
+DURATION:PT4H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030522T180000
+SUMMARY:London.pm Tech Meet
+UID:8C98AB84-6ACC-11D7-8EC3-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DESCRIPTION:state 51
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030602
+DTEND;VALUE=DATE:20030603
+SUMMARY:Perl Whirl\, day 2
+UID:E8CF33F3-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040327
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040329
+SUMMARY:YAPC::Taipei
+UID:90F1B68D-5273-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+LOCATION:The CLACHAN\, 34 Kingly St.\,West End\, nr Oxford Cir
+UID:9AACB018-5A42-11D8-8AEE-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040212T180000
+SUMMARY:Pub Recce - The 	CLACHAN
+DESCRIPTION:http://london.pm.org/pipermail/london.pm/Week-of-Mon-2004012
+ 6/024365.html
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030605T180000
+SUMMARY:London.pm Socail Meeting\, venue tbc
+UID:9598D4F8-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:7
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+LOCATION:De Hems - 11 Macclesfield Street Soho - Tel 020 74
+UID:216800BE-6DFE-11D8-8A32-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+URL;VALUE=URI:http://www.streetmap.co.uk/newmap.srf?x=529778&y=180890&z=
+ 1
+DTSTART;TZID=Europe/London:20040311T180000
+SUMMARY:Lonix
+DESCRIPTION:This month's meeting will be held upstairs in De Hems\, \na 
+ spacious Dutch bar in the heart of China Town\, Soho.\nA large range of 
+ beers from the continent are served\nalong with a selection of Dutch bar
+  snacks. \n\nAs usual this month we will continue various linux \ndiscus
+ sions and debates/punch-ups :) All are welcome\nto attend\, new\, old an
+ d those inbetween. I'll have \na few Lonix shirts for sale which are sti
+ ll \ncluttering up the basement. 
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040531
+DTEND;VALUE=DATE:20040601
+SUMMARY:YAPC::EU Speaker Notification
+UID:00AA1D29-6C27-11D8-95B1-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+DESCRIPTION:If you've submitted a paper\, you'll be told if you're speak
+ ing by this date
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040629
+DTEND;VALUE=DATE:20040702
+SUMMARY:German Perl Workshop
+UID:EABE791B-5273-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20031106T181500
+SUMMARY:London.pm social meeting\, venue tbc
+UID:E5A209C8-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20050411T164145Z
+UID:8AA4D86A-AAA8-11D9-B65D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://www.perl.it/workshop/
+DTSTART;VALUE=DATE:20050623
+SUMMARY:Italian Perl Workshop
+DTEND;VALUE=DATE:20050625
+DESCRIPTION:http://www.perl.it/workshop/
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030623T190000
+SUMMARY:Tim O'Reilly speaking?
+UID:4D175B63-7C8F-11D7-B275-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Penderel's Oak\, High Holborn
+DTSTAMP:20040811T124137Z
+UID:05B252C6-EB92-11D8-8FFD-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm/Week-of-Mon-20040
+ 809/028550.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040812T190000
+SUMMARY:Emergency Meet (XERN)
+DTEND;TZID=Europe/London:20040812T230000
+DESCRIPTION:Hello\,\n\nSo here's hopefully the last emergency social bei
+ ng announced for\nthese days.\n\nWhy? because XERN (@cpan) is in town.\n
+ \nWhen: Thursday\, 12th August from 7pm\nWhere: Penderel's Oak\nHuh?: ht
+ tp://london.openguides.org/index.cgi?Penderel's_Oak\,_WC1V_7HP\nMap: htt
+ p://www.streetmap.co.uk/streetmap.dll?P2M?P=WC1V7HP&Z=1\n\nHope to see y
+ ou there.\n\nCheers\,\nCLK
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+LOCATION:The Champion - 1 Wellington Terrace W2 4LW
+UID:287126C7-9155-11D8-AD10-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+URL;VALUE=URI:http://tinyurl.com/2nta9
+DTSTART;TZID=Europe/London:20040421T180000
+SUMMARY:Lonix
+DESCRIPTION:Nearest Tube:  Nottinghill Gate. Bus 27 or 28 from Olympia. 
+ \nPhone: 020 8896 2600\n\nThis month we'll be going to the Champion in N
+ ottinghill\nGate. Which is a stone's throw from Olympia where the\nLinux
+  User and Developer show is happening this month\non the 20th and 21st (
+ next week). If you are going to\ncome along to the show you must registe
+ r here to gain\nfree entrance.\n\nhttp://www.linuxuser.co.uk/expo\n\nWe'
+ ll meet up at the end of the show (5.00pm) and go \ndown in a group (21s
+ t). If you're going there on your\nown the nearest tube is Nottinghill G
+ ate and it's a \nshort walk to the Champion. On exiting the station head
+ \ntowards the Waterstones/Rhymans direction. You'll see \nthe Champion o
+ n your left.\n\nThis pub has only just opened in the last week with \nne
+ w management (if you knew the old pub \;) ) and we\nhave the entire down
+ stairs and beer garden reserved\nfor us. A variety of fine ales and beer
+ s are served\nas well as a huge selection of reasonably priced\nfood\, f
+ rom sausage and mash to cray fish.\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030724
+DTEND;VALUE=DATE:20030725
+SUMMARY:YAPC::Europe day 2
+UID:266FF32E-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050721T190000
+SUMMARY:Potential Alternative London.pm social meet
+UID:D946FCFF-6759-4A02-9E76-12F7427DC845-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+DTSTAMP:20050716T111414Z
+SEQUENCE:3
+DURATION:P1DT4H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT4H
+LOCATION:Morgan Stanley
+UID:D1538E40-5278-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040318T190000
+SUMMARY:Tech Meet @ MS
+DESCRIPTION:We're in Morgan Stanly's Shakespeare Room in the Datacraft H
+ ospitality Suite.  Not the same room as last time.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030515
+DTEND;VALUE=DATE:20030516
+SUMMARY:YAPC::Canada\, day 1
+UID:6EB67C85-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040306
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040307
+SUMMARY:BCS Programming Heat
+UID:45B28664-573D-11D8-A079-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:6
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030604
+DTEND;VALUE=DATE:20030605
+SUMMARY:Perl Whirl\, day 4
+UID:F53F8BE3-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Monash University in Melbourne
+UID:DEB7C76A-7D7B-11D8-BFFB-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+URL;VALUE=URI:http://yapc.dlist.com.au/
+STATUS:CONFIRMED
+DTSTART;VALUE=DATE:20041201
+SUMMARY:YAPC::AU
+DTEND;VALUE=DATE:20041204
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040719
+DTEND;VALUE=DATE:20040721
+SUMMARY:Italian Perl Workshop
+URL;VALUE=URI:http://www.perl.it/workshop/
+UID:5D72868E-7460-11D8-A9B7-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040616
+DTEND;VALUE=DATE:20040619
+SUMMARY:YAPC::NA
+UID:03E457BA-5274-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040726
+DTEND;VALUE=DATE:20040731
+SUMMARY:OSCON
+UID:0DCE1F51-5274-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTAMP:20040828T111601Z
+UID:29DE970F-F8E3-11D8-AA35-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+URL;VALUE=URI:http://www.streetmap.co.uk/streetmap.dll?G2M?X=529001&Y=18
+ 0921&A=Y&Z=1
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040902T180000
+SUMMARY:Social at The Windmill
+DTEND;TZID=Europe/London:20040902T230000
+DESCRIPTION:This is the announcement for the September Social Meet\, whi
+ ch will take place at 7pm on Thursday the 2nd of September 2004 at the W
+ indmill pub in Mayfair\, just south of Oxford Circus\, the same pub we h
+ ad our April meeting in.\n\nhttp://www.streetmap.co.uk/streetmap.dll?G2M
+ ?X=529001&Y=180921&A=Y&Z=1\n\nhttp://london.pm.org/meetings/locations/wi
+ ndmill.html\n\nhttp://london.openguides.org/index.cgi?Windmill%2C_W1S_2A
+ T\n\nDirections From Oxford Circus: Get out of the tube\, and head south
+  down Regent Street Street.  This is directly south from the circus\, aw
+ ay from the church\, towards Piccadilly Circus.  Take the forth exit on 
+ your right\, roughly opposite Hamleys\, down Conduit Street.  Take the f
+ irst left down Mill Street and the Pub is on the left side of the street
+ .
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030710
+DTEND;VALUE=DATE:20030711
+SUMMARY:OSCon\, day 4
+UID:BD108AAF-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20051017
+DTEND;VALUE=DATE:20051021
+SUMMARY:Euro OSCON Date?
+UID:4FFDB59E-AAA8-11D9-B65D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20050411T164002Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030707
+DTEND;VALUE=DATE:20030708
+SUMMARY:OSCon\, day 1
+UID:AACD7E94-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT1H
+DTSTAMP:20040903T161332Z
+UID:1E2BE254-FDC4-11D8-BB3D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+STATUS:TENTATIVE
+DTSTART;TZID=Europe/London:20040927T180000
+SUMMARY:Potential Emergancy Social Meet
+DESCRIPTION:mbm writes:\n\nSo\, at some point in the next few weeks\, I 
+ propose an emergency trip to the\nOakdale Arms\, Haringay. http://www.in
+ dividualpubs.co.uk/oakdale/ All of you\nwill love it because you walk in
+  and 8 hand pumps\, each with a different\nbeer will face you. It also h
+ appens to be run by Steve Early\, who many of\nyou may or may not know a
+ s the moderator of UKCrypto\, the old owner of the\nhouse at Green End R
+ oad in Cambridge (hence greenend.org.uk) and other such\ndistinctions.\n
+ 
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:The Anchor\, South Bank
+DTSTAMP:20040811T124220Z
+UID:3AAB3FCE-EB92-11D8-8FFD-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm/Week-of-Mon-20040
+ 809/028549.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040818T190000
+SUMMARY:Emergency Meet (Jody and Jesse)
+DTEND;TZID=Europe/London:20040818T230000
+DESCRIPTION:Leon wasn't kidding when he said there might be other emerge
+ ncy meets  \nnext week\, though I have\nprobably committed some horrible
+  faux-pas by managing to turn two pub  \noutings into one.\n\nJody Belka
+  and I will both be in town\, but neither of us are able to  \nmake it t
+ o the Star on Saturday. Jody\n  and I were independently plotting to dra
+ g folks out to the pub\, but we  \nmanaged to settle on Wednesday\nas a 
+ date that works for both of us.\n\nThe Anchor has been suggested me as a
+  reasonable place to go\,  \nespecially if it's reasonably nice out.\n\n
+ \nWhen: Wedneday\, August 18th\, 7pm onward\nWhere:     The Anchor\, Ban
+ kside\, SE1\nWhere?:  (http://london.pm.org/meetings/locations/theanchor
+ .html)\nMap:  \n        http://www.streetmap.co.uk/newmap.srf? \nx=53244
+ 7&y=180423&z=1&sv=SE1%209DN&st=PostCode&lu=N&tl=~&ar=y&bi=~\n\n\nBest\,\
+ n\nJesse\n\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041211T100000
+LOCATION:Imperial College Union\, Exhibition Road\, London
+SUMMARY:London Perl Workshop
+URL;VALUE=URI:http://london.pm.org/lpw/
+UID:B94EF70F-0C6C-11D9-BDE1-000393DA37B4-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DURATION:PT8H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040408T190000
+STATUS:CONFIRMED
+SUMMARY:London PM Meet - The Windmill
+UID:954ED510-790F-11D8-8061-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+DESCRIPTION:confirmed
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030601
+DTEND;VALUE=DATE:20030602
+SUMMARY:Perl Whirl\, day 1
+UID:E1D96D37-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050106T190000
+LOCATION:The Windmill
+DTEND;TZID=Europe/London:20050106T230000
+SUMMARY:Social Meet
+UID:146B569D-5F38-11D9-B40C-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20050105T163801Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040327
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040329
+SUMMARY:Nordic Perl Workshop
+UID:814BB078-5273-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040430
+DTEND;VALUE=DATE:20040501
+SUMMARY:YAPC::EU CFP Deadiline
+URL;VALUE=URI:http://belfast.yapc.org/cfp.html
+UID:E2386592-6C26-11D8-95B1-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030606
+DTEND;VALUE=DATE:20030607
+SUMMARY:Perl Whirl\, day 6
+UID:02A5692C-5B94-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041104T180000
+STATUS:TENTATIVE
+SUMMARY:London.pm Social
+UID:FD7AD02C-0C6C-11D9-BDE1-000393DA37B4-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030511
+DTEND;VALUE=DATE:20030512
+SUMMARY:YAPC::Israel
+UID:5DFE0224-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+LOCATION: St Stephen's Tavern (Westminster\, Opposite The Ho
+UID:E577CB21-BA06-11D8-9276-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+URL;VALUE=URI:http://london.pm.org/lpma/2004-June/000096.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040708T180000
+SUMMARY:London.pm Social Meet @ St Stephen's Tavern
+DESCRIPTION:It's another social meet.  This time in another a *new* *pub
+ *
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Brussels
+UID:8B6BAACE-5962-11D8-838E-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+STATUS:CONFIRMED
+DTSTART;VALUE=DATE:20040221
+SUMMARY:FOSDEM
+DTEND;VALUE=DATE:20040223
+DESCRIPTION:http://www.fosdem.org
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20050609
+DTEND;VALUE=DATE:20050611
+SUMMARY:Austrian Perl Workshop
+UID:72FFF8F8-AAA8-11D9-B65D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20050411T164057Z
+DESCRIPTION:http://conferences.mongueurs.net/apw2005/?language=en
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20050801
+DTEND;VALUE=DATE:20050806
+SUMMARY:OSCON
+UID:83557149-63C2-11D9-B456-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20050111T111835Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050407T180000
+DTEND;TZID=Europe/London:20050407T230000
+SUMMARY:London.pm Social @ The Star
+UID:EB9A6527-A5E6-11D9-9459-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+DTSTAMP:20050405T152535Z
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:University of Toronto\, Toronto\, Canada
+DTSTAMP:20050210T170349Z
+UID:5D3DD57C-0E0F-11D9-A987-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://yapc.org/America/
+DTSTART;VALUE=DATE:20050627
+SUMMARY:YAPC::NA
+DTEND;VALUE=DATE:20050630
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Morgan Stanley\, Canda Water
+DTSTAMP:20040716T134949Z
+UID:6FC6588C-BA07-11D8-9276-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:8
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040722T190000
+SUMMARY:London.pm Tech Meet
+DTEND;TZID=Europe/London:20040722T213000
+DESCRIPTION:http://london.pm.org/pipermail/london.pm-announce/2004-July/
+ 000102.html
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Porter House Pub - 21-22 Maiden Lane\, WC2 E7NA
+DTSTAMP:20040719T202418Z
+UID:57F3DCD0-D9C1-11D8-B716-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+URL;VALUE=URI:http://www.lonix.org.uk/cgi-bin/Lonix?CODE=searchMeeting&C
+ URRENT=YES
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040721T180000
+SUMMARY:Lonix
+DTEND;TZID=Europe/London:20040721T230000
+DESCRIPTION:Lonix is The London Linux User Group\n\nVenue: http://www.co
+ ventgardenlife.com/places.asp?PlaceID=145\n\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040816
+DTEND;VALUE=DATE:20040823
+SUMMARY:Linuxbierwanderung
+UID:E3698780-615A-11D8-A86D-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm-announce/2004-Jan
+ uary/000082.html
+SEQUENCE:3
+DESCRIPTION:Linux\, Beer\, and Walking
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT4H
+LOCATION:The Porter House\, Covent Gdn
+DTSTAMP:20050105T163838Z
+UID:1FD6BDFB-5F38-11D9-B40C-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DTSTART;TZID=Europe/London:20050112T190000
+SUMMARY:Lonix
+DESCRIPTION:\n\nTo kick start the year and enjoy the sales\,\nwe'll be m
+ eeting in the Porter House pub. This is\nlocated in Covent Garden and is
+  an excellent venue\nboasting at least one beer from each country along\
+ nwith a variety of wines\, Belgium beers\nand micro breweries from many 
+ continents. We are in\nthe corporate hospitality suite up the stairs tow
+ ards\nthe back. Again we'll be having a set of games\, including \na lin
+ ux pub quiz\, prizes\, forfeits and other activities.\nOff course seriou
+ s linux discussion will be carried \nout throughout the night.\n\nFrom C
+ ovent Garden Station\, walk into the main square\nand take a right\, wal
+ k out of the square and take\nthe next left. Keep walking straight until
+  you \nsee Maiden Lane on your left. (down a small \nroad). Porter House
+  is on your right next\nto the Spanish Tapas place\, La Tasca.\n\nIf thi
+ s sounds all too much we'll be going for\na curry around the corner at 9
+ .00pm at the\nStrand Tandoori restaurant\, 45 Bedford Place.\nhttp://tin
+ yurl.com/5s62n. We're having a set\nmenu here (12 pounds a head for 4 co
+ urses)\nwhich is both vegetarian and non veg.\n\nRemember there is also 
+ a Lonix Mailling List\nthat you can sign up to. Simply log into \nthe Lo
+ nix web site to subscribe to one of the\ngroups!\n\nThere are a few Loni
+ x Polo Shirts left. Email \nin advance if you're interested.\n\nHope to 
+ see you next week\,\n
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:Imperial College Union (Biet Quad)
+DTSTAMP:20040528T165717Z
+UID:EB571330-B0C7-11D8-8858-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+URL;VALUE=URI:http://www.xcom2002.com/nc04/
+DTSTART;TZID=Europe/London:20040606T110000
+SUMMARY:Notcon
+DTEND;TZID=Europe/London:20040606T190000
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20031215T110000
+SUMMARY:Joint London Soclal Meetup
+UID:58BE51EC-11D3-11D8-BB30-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030904T180000
+SUMMARY:London.pm Social Meeting\, Venue tbc
+UID:CB6E5BCE-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040328
+DTEND;VALUE=DATE:20040329
+SUMMARY:Austrian Perl Workshop CFP deadline
+URL;VALUE=URI:http://vienna.pm.org/en_workshop.html
+UID:E80736D8-74E1-11D8-AE04-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040220T183000
+STATUS:CONFIRMED
+SUMMARY:BCS Deadline
+UID:57256134-573D-11D8-A079-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+DESCRIPTION:This is the last day you can enter the BCS programming compe
+ tion that's taking place on the 6th
+DURATION:PT0S
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT2H
+LOCATION:Pillars of Hercules\, Greek Street\, Soho\, London
+UID:AD8ADB1C-790F-11D8-8061-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:7
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040320T160000
+SUMMARY:LPM Rugby
+DESCRIPTION:Small gathering to watch the England (and welsh) match
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040327
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040328
+SUMMARY:YAPC::NA CFP deadline
+UID:F24FB0BE-5C77-11D8-B46A-0030654B4FB2-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+URL;VALUE=URI:http://yapc.org/America/cfp.shtml
+SEQUENCE:1
+END:VEVENT
+BEGIN:VEVENT
+DURATION:P2D
+DTSTAMP:20050411T164233Z
+UID:AD5CB28C-AAA8-11D9-B65D-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+URL;VALUE=URI:http://conferences.mongueurs.net/fpw2005/
+DTSTART;VALUE=DATE:20050609
+SUMMARY:French Perl Workshop
+DESCRIPTION:http://conferences.mongueurs.net/fpw2005/
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030618
+DTEND;VALUE=DATE:20030619
+SUMMARY:YAPC::NA
+UID:4CC40656-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030711
+DTEND;VALUE=DATE:20030712
+SUMMARY:OSCon\, day 5
+UID:C2798296-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030403T180000
+SUMMARY:London.pm Social\, venue tbc proabably the windmill
+UID:1CD79EAE-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:18
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030725
+DTEND;VALUE=DATE:20030726
+SUMMARY:YAPC::Europe day 3
+UID:34DC1B72-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041007T180000
+SUMMARY:Social at The Star
+UID:754915CC-1523-11D9-8247-000393DA37B4-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030607
+DTEND;VALUE=DATE:20030608
+SUMMARY:Perl Whirl\, day 7
+UID:08011BD3-5B94-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030603
+DTEND;VALUE=DATE:20030604
+SUMMARY:Perl Whirl\, day 3
+UID:EF636995-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:G08 at the Euston Centre of Westminster University
+DTSTAMP:20040716T134628Z
+UID:58A7D6E0-D72E-11D8-B716-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:7
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040717T143000
+SUMMARY:Gllug Meet
+DTEND;TZID=Europe/London:20040717T170000
+DESCRIPTION:http://www.gllug.org.uk/meeting-20040717.html\n\nDrinks in t
+ he pub after the meeting (see URL)
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030414T190000
+SUMMARY:London.pm Mini-Tech Meet
+UID:4CA880B6-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:13
+DURATION:PT4H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040401T190000
+SUMMARY:London PM new heretics meet
+UID:A0A8C372-790F-11D8-8061-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DURATION:PT4H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040520
+DTEND;VALUE=DATE:20040523
+SUMMARY:Austrian Perl Workshop
+URL;VALUE=URI:http://vienna.pm.org/en_workshop.html
+UID:A29338D8-74E1-11D8-AE04-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040324T180000
+SUMMARY:New HDD going into penderel
+UID:D921F672-7BFD-11D8-BFFB-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT4H
+LOCATION:The Star of Belgravia\, London
+UID:F8094813-5575-11D8-A079-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040304T190000
+SUMMARY:Social Meet @ The Star
+DESCRIPTION:http://london.pm.org/pipermail/london.pm-announce/2004-Janua
+ ry/000083.html
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030516
+DTEND;VALUE=DATE:20030517
+SUMMARY:YAPC::Canada\, day 2
+UID:78695B10-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030614T104500
+SUMMARY:Offical London.pm Flight to Miami
+UID:4AA8136E-6F86-11D7-80D6-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:6
+DURATION:PT13H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030807T180000
+SUMMARY:London.pm Social Meeting\, Venue tbc
+UID:BDCDC274-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT4H
+LOCATION:The Angel Pub\, Nr Old Street
+DTSTAMP:20040506T102348Z
+UID:3F146204-92C1-11D8-AD10-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040527T190000
+SUMMARY:Tech Meet
+DESCRIPTION:Not on the 20th due to the Austrian Perl workshop and becaus
+ e there are three perl meets at the start of the month.
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030708
+DTEND;VALUE=DATE:20030709
+SUMMARY:OSCon\, day 2
+UID:B14B8906-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040226
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040227
+SUMMARY:YAPC::Israel
+UID:17F2C75C-5273-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040419
+DTEND;VALUE=DATE:20040420
+SUMMARY:Les Journées Perl appel participation deadline
+URL;VALUE=URI:http://conferences.mongueurs.net/2004/appel_participation.
+ html
+UID:2D91A96B-74E1-11D8-AE04-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20031002T174500
+SUMMARY:London.pm Social Meeting\, Venue tbc
+UID:DA675BE6-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT1H
+LOCATION:City University\, London
+UID:F599CD4A-5275-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040219T190000
+SUMMARY:Tim O'Reilly Speaking 
+DESCRIPTION:http://www.ukcfug.org/index.cfm?objectid=34A5AE57-0AA2-93EF-
+ B8EE09920B923A51\n\nEntry free\, but you'll have to register beforehand
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030703T180000
+SUMMARY:London.pm Social Meeting\, Venue tbc
+UID:AFA80E86-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:The Star\, Belgravia
+DTSTAMP:20040811T124311Z
+UID:58641B6C-EB92-11D8-8FFD-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm/Week-of-Mon-20040
+ 809/028541.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040814T190000
+SUMMARY:Emergency Meet (Tanja)
+DTEND;TZID=Europe/London:20040814T230000
+DESCRIPTION:Hello\,\n\nI'm going to break from tradition and organise an
+  emergency meet on\nSaturday evening. Tanja\, a valued member of Amsterd
+ am.pm\, will be\nvisiting\, and it will be her 25th birthday. She wouldn
+ 't object to\npresents or balloons.\n\nWhen: Saturday\, 14th August from
+  7pm\nWhere: Star Tavern\nHuh?: http://london.openguides.org/index.cgi?S
+ tar_Tavern\,_SW1X_8HT\nMap: http://www.streetmap.co.uk/streetmap.dll?G2M
+ ?X=528107&Y=179347&A=Y&Z=1\n\nI hear there may be other emergency meets 
+ this week\, hic.\n\nAnyway\, see you there! Leon
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:St Stephen's Tavern
+DTSTAMP:20050228T121108Z
+UID:ADAC4ED3-8981-11D9-87E8-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://london.pm.org/pipermail/london.pm-announce/2005-Feb
+ ruary/000127.html
+DTSTART;TZID=Europe/London:20050303T183000
+SUMMARY:March London.pm Social
+DTEND;TZID=Europe/London:20050303T230000
+DESCRIPTION:http://london.pm.org/pipermail/london.pm-announce/2005-Febru
+ ary/000127.html
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050707T190000
+DTEND;TZID=Europe/London:20050708T230000
+SUMMARY:CANCELLED: London.pm social meet
+UID:729EFFEE-08B5-4CB7-AF93-F1EFA9A4A270-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:8
+DTSTAMP:20050707T121323Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030723
+DTEND;VALUE=DATE:20030724
+SUMMARY:YAPC::Europe\, day 1
+UID:1E4E04B2-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040305
+STATUS:CONFIRMED
+DTEND;VALUE=DATE:20040306
+SUMMARY:Dutch Perl Workshop
+UID:3E87BD46-5273-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:The Star\, Belgravia
+DTSTAMP:20040506T102258Z
+UID:2F287D89-92C1-11D8-AD10-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+URL;VALUE=URI:http://london.pm.org/lpma/2004-April/000091.html
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040506T190000
+SUMMARY:Social Meet
+DTEND;TZID=Europe/London:20040506T230000
+DESCRIPTION:http://london.pm.org/lpma/2004-April/000091.html
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT0S
+LOCATION:FOSDEM\, Brussels
+UID:A3218526-5962-11D8-838E-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:5
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040222T150000
+SUMMARY:Dave Cross Speaking
+DESCRIPTION:The Perl session by Dave Cross . Dave is the co-author of th
+ e newly\npubllished -The Perl Template Toolkit http://www.oreilly.com/ca
+ talog/perltt/
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20041010
+DTEND;VALUE=DATE:20041016
+SUMMARY:Perl Whirl
+UID:38041992-5274-11D8-8085-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DESCRIPTION:Nerds AFLOAT!
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050602T180000
+SUMMARY:London.pm Social @ Venue TBC
+UID:0F616746-A5E7-11D9-9459-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+DTSTAMP:20050405T152619Z
+SEQUENCE:1
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20051003
+DTEND;VALUE=DATE:20051012
+SUMMARY:Perl Whirl
+UID:1DA1036C-6316-11D9-A8C0-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+DESCRIPTION:Nerds AFLOAT!
+SEQUENCE:3
+DTSTAMP:20050110T144429Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20041202T190000
+LOCATION:The Angel @ Old Street
+DTEND;TZID=Europe/London:20041202T230000
+SUMMARY:London.pm Social
+UID:E9843E62-420A-11D9-9150-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+DTSTAMP:20041129T133135Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030501T180000
+SUMMARY:London.pm Heretics Meeting
+UID:690C1B41-5B92-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:11
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040415
+DTEND;VALUE=DATE:20040416
+SUMMARY:Italian Perl Workshop CFP Deadline
+URL;VALUE=URI:http://www.perl.it/workshop/cfp.html
+UID:848D01EE-7460-11D8-A9B7-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20041026
+LOCATION:Santa Clara\, CA\, United States
+DTEND;VALUE=DATE:20041031
+SUMMARY:O'Reilly Mac OS X Conf
+UID:A9C6154E-6C27-11D8-95B1-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20030605
+DTEND;VALUE=DATE:20030606
+SUMMARY:Perl Whirl\, day 5
+UID:FAD8501A-5B93-11D7-BD0B-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20030520T174500
+SUMMARY:YAPC::NA Paper Deadline
+UID:4FC651CA-800A-11D7-B275-000393CB5CEC-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:1
+DURATION:PT1H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040805
+DTEND;VALUE=DATE:20040809
+SUMMARY:UKUUG Technical Conf
+UID:87F595FD-DA68-11D8-B716-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+URL;VALUE=URI:http://www.ukuug.org/events/linux2004/
+SEQUENCE:3
+DTSTAMP:20040720T161943Z
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;VALUE=DATE:20040209
+DTEND;VALUE=DATE:20040210
+SUMMARY:OSCON CFP deadline
+UID:4E06F71A-573A-11D8-A079-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:2
+DESCRIPTION:http://conferences.oreillynet.com/cs/os2004/create/e_sess
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040410T180000
+LOCATION:The Winsor Castle\, Notting Hill
+SUMMARY:Emerg. Social
+UID:F3478B8D-87D8-11D8-A370-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:6
+DESCRIPTION:Abigale is in town\, so we're meeting up with him.
+DURATION:PT5H
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20040421T181500
+SUMMARY:BCS: Should we Open IT?
+URL;VALUE=URI:http://www.nlondon.bcs.org/
+UID:2B5EB297-8233-11D8-A370-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:6
+DESCRIPTION:This is a BCS Meeting\, though it's open to all.\n\nSpeaking
+ :\n\n    * DAVE CROSS\n    * MIKE ROBINSON\n    * RICHARD STEEL\n
+DURATION:PT3H45M
+END:VEVENT
+BEGIN:VEVENT
+LOCATION:London: Business Design Centre\, Upper Street\, Islington
+UID:1B561080-5963-11D8-838E-000393AF6250-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:4
+STATUS:CONFIRMED
+DTSTART;VALUE=DATE:20040223
+SUMMARY:Devweek
+DTEND;VALUE=DATE:20040228
+DESCRIPTION:http://www.devweek.com/new/
+END:VEVENT
+BEGIN:VEVENT
+DURATION:PT5H
+LOCATION:Museum Tavern\, by the Brittish Museum
+DTSTAMP:20040629T083515Z
+UID:24BE666A-BA07-11D8-9276-000A95D05D54-E31211C1-6C87-42FD-9372-1902A4E
+ 902D6
+SEQUENCE:3
+STATUS:CONFIRMED
+DTSTART;TZID=Europe/London:20040701T180000
+SUMMARY:London.pm New Heretics Meet
+DESCRIPTION:Heretics meets are not 'offical' or organised by London.pm. 
+  They're a breakaway bunch of splitters.\n\nDave Cantrell (Deputy Chief 
+ Heretic and Official Trouble Maker) said:\n\nJuly starts on a Thursday\,
+  so by long and ancient tradition we need to go to the pub and drink bee
+ r.  This month's Heretics' Meet will be at the Museum Tavern\, on the ju
+ nction of Museum St and Great Russell St.\n\nNearest tubes are Tottenham
+  Court Rd\, Holborn\, and Russell Sq.\n\nmap: http://www.streetmap.co.uk
+ /streetmap.dll?G2M?X=530129&Y=181578&A=Y&Z=1\n
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050801T090000
+DTEND;TZID=Europe/London:20050801T130000
+SUMMARY:Mailman Day Reminder
+UID:DF51C24D-0408-11DA-A793-000A9599EB44
+SEQUENCE:7
+DTSTAMP:20050803T102342Z
+RRULE:FREQ=MONTHLY;INTERVAL=1;BYMONTHDAY=1
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050804T183000
+DTEND;TZID=Europe/London:20050804T230000
+SUMMARY:London.pm social
+UID:6700873C-0409-11DA-A793-000A9599EB44
+SEQUENCE:7
+DTSTAMP:20050803T102748Z
+RRULE:FREQ=MONTHLY;INTERVAL=1;BYDAY=1TH
+DESCRIPTION:We get drunk and talk crap
+END:VEVENT
+BEGIN:VEVENT
+DTSTART;TZID=Europe/London:20050818T180000
+DTEND;TZID=Europe/London:20050818T210000
+SUMMARY:London.pm tech meet
+UID:670088B6-0409-11DA-A793-000A9599EB44
+SEQUENCE:4
+DTSTAMP:20050803T102833Z
+DESCRIPTION:We don't get drunk but still talk crap
+RRULE:FREQ=MONTHLY;INTERVAL=2;BYDAY=3TH
+END:VEVENT
+END:VCALENDAR

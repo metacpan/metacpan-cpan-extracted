@@ -1,0 +1,26 @@
+---
+abstract: 'Devel::PatchPerl plugin for Cygwin'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.016, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-PatchPerl-Plugin-Cygwin
+requires:
+  Devel::PatchPerl: 0
+  File::pushd: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/yak1ex/Devel-PatchPerl-Plugin-Cygwin
+  repository: https://github.com/yak1ex/Devel-PatchPerl-Plugin-Cygwin.git
+version: v0.0.1

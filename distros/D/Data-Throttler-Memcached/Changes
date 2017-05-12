@@ -1,0 +1,16 @@
+Changes
+=======
+
+0.00003 - 08 Nov 2007
+  - [FIX] 'cache' parameter was not being properly passed to the cache
+    constructor
+  - [FIX] Tests now *really* respect the environment variable
+  - [FIX] Set default expiration to be twice the amount of interval
+
+0.00002 - 09 Oct 2007
+  - Move namespace to "defaults" section
+  - Remove unused (commented out) code
+  - Add documetation about the lack of locking
+
+0.00001 - 09 Oct 2007
+  - Initial release

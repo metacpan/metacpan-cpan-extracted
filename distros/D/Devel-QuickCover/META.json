@@ -1,0 +1,71 @@
+{
+   "abstract" : "Quick & dirty code coverage for Perl",
+   "author" : [
+      "Gonzalo Diethelm (gonzus@cpan.org)",
+      "Andreas GuÃ°mundsson (andreasg@nasarde.org)",
+      "Andrei Vereha (avereha@cpan.org)"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-QuickCover",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "7.10",
+            "File::ShareDir::Install" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Copy" : "0",
+            "File::ShareDir" : "0",
+            "File::Spec" : "0",
+            "IO::Compress::Gzip" : "0",
+            "IPC::Open2" : "0",
+            "JSON::XS" : "0",
+            "Path::Tiny" : "0",
+            "Sereal" : "0",
+            "Text::MicroTemplate" : "0",
+            "XSLoader" : "0",
+            "autodie" : "0",
+            "perl" : "5.008009"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "File::Temp" : "0",
+            "Path::Tiny" : "0",
+            "Test::Builder::Module" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/p5pclub/devel-quickcover"
+      }
+   },
+   "version" : "0.900010",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

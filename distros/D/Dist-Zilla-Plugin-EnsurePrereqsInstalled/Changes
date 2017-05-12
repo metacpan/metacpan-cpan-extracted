@@ -1,0 +1,30 @@
+Revision history for Dist-Zilla-Plugin-EnsurePrereqsInstalled
+
+0.008     2014-10-29 03:18:05Z
+          - use newer Dist::Zilla::Util::AuthorDeps to avoid using Path::Class
+
+0.007     2014-09-27 03:41:56Z
+          - make tests work in the presence of Test::More 1.301001_050
+
+0.006     2014-08-09 03:27:46Z (TRIAL RELEASE)
+          - dump a few more diagnostics on test failure, to try to identify
+            the problem with dev releases of Test::More
+
+0.005     2014-07-22 15:17:05Z
+          - "types" option now also available as "prereq_types", for clarity
+          - fix test regexps that fail when Test::More is a dev release
+
+0.004     2014-06-22 00:04:06Z
+          - fix tests that fail with CPAN::Meta::Check 0.009
+
+0.003     2014-06-12 20:40:33Z
+          - now warning the user at build time if dynamic_config is set, as
+            the prereq specification may be incomplete
+          - added new "build_phase" config, for performing the check at
+            release time rather than build
+
+0.002     2014-05-03 22:57:44Z
+          - bump declared prereq on CPAN::Meta::Prereqs
+
+0.001     2014-04-26 22:39:39Z
+          - Initial release.

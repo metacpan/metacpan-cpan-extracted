@@ -1,0 +1,17 @@
+Changes
+examples/active.pl
+examples/caller-id.pl
+examples/dial.pl
+examples/shell.pl
+examples/xmodem.pl
+lib/Device/Modem.pm
+lib/Device/Modem/FAQ.pod
+lib/Device/Modem/Log/File.pm
+lib/Device/Modem/Log/Syslog.pm
+lib/Device/Modem/Protocol/Xmodem.pm
+lib/Device/Modem/UsRobotics.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+test.pl

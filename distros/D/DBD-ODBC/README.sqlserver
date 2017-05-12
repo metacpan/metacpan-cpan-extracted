@@ -1,0 +1,95 @@
+It is proving near impossible to workaround all the different bugs in
+the various SQL Server ODBC drivers and SQL Server Native Client
+drivers. From here on I am going to try and keep a record or what
+worked and what bugs I found.
+
+There are 5 basic ways I know to connect to SQL Server via ODBC:
+
+1. On Windows via the SQL Server OBDC Driver
+2. On Windows via the SQL Server Native Client
+3. On UNIX via an ODBC driver manager (of which there are 3) and
+   a SQL Server ODBC Driver. There are at least 4 of these:
+     o Easysoft SQL Server ODBC Driver
+     o Data Direct SQL Server Driver
+     o Openlink SQL Server Driver
+     o FreeTDS SQL Server Driver
+4. On Unix via DBD::Proxy
+5. On Unix via an ODBC-ODBC Bridge
+   At least Easysoft and Openlink have these.
+
+Each driver manager and driver has it own bugs and other issues and it
+is exceedingly difficult to keep up with them all. For Windows and the
+various SQL Server drivers the list of bugs and workarounds is growing
+to a point making it difficult to keep track.
+
+Driver: SQL Server
+Version reported in ODBC Administrator: 2000.85.1132.00
+Driver version: 03.85.1132
+Driver name: SQLSRV32.DLL
+Passes all tests in: 1.18_2
+Issues/Notes:
+
+  1. does not support MARS_Connection (see 20SqlServer.t)
+
+  2. needs special workaround when inserting more than 400K into a
+     varxxx(max) field (see rt_38977.t). The workaround is to set the
+     strlen_or_indptr in SQLBindParameter to SQL_LEN_DATA_AT_EXEC(0)
+     and the buffer_length to 0.  Without the workaround the errors
+     produced in rt_38977.t are:
+
+     The insert/update of a text or image column(s) did not succeed.
+     The text, ntext, or image pointer value conflicts with the column name.
+
+  3. Sometimes describes parameters incorrectly. Although the
+     workaround in dbdimp.c to set the column_size to the
+     buffer_length works around most sometimes you need to set the
+     parameter type yourself (see rt_39841.t).
+
+Driver: SQL Native Client
+Version reported in ODBC Administrator: 2005.90.1399.00
+Driver version: 09.00.1399
+Driver Name: SQLNCLI.DLL
+Passes all tests in: 1.18_2
+Issues/Notes:
+
+  1. does support MARS_Connection
+
+  2. Sometimes describes parameters incorrectly. Although the
+     workaround in dbdimp.c to set the column_size to the
+     buffer_length works around most sometimes you need to set the
+     parameter type yourself (see rt_39841.t).
+
+  3. Fails the rt_38977.t test to insert more than 400K into a
+     varxxx(max) field unless column_size is set to 0 in the
+     SQLBindParamter call.
+
+Driver: SQL Server
+Version reported in ODBC Administrator: 6.00.6000.16386
+Driver version: 06.00.6000
+Driver Name: SQLSRV32.DLL
+Passes all tests in: 1.18_2
+Issues/Notes:
+
+  Probably has many of the same issues as other SQL Server ODBC drivers
+  but not individually tested.
+
+Driver: SQL Server
+Version reported in ODBC Administrator: 2000.86.1830.00
+Driver version: 03.86.1830
+Driver Name: SQLSRV32.DLL
+Passes all tests in: 1.18_2
+Issues/Notes:
+
+  Probably has many of the same issues as other SQL Server ODBC drivers
+  but not individually tested.
+
+Driver: SQL Server
+Version reported in ODBC Administrator: 2000.85.1132.00
+Driver version: ??????
+Driver Name: SQLSRV32.DLL
+Passes all tests in: ??
+Issues/Notes:
+
+  There is more than one "driver version" reported for the version the
+  ODBC Administrator reports (2000.85.1132.00) and at least one of them
+  fails rt_38977.t with "Invalid precision value".

@@ -1,0 +1,18 @@
+Revision history for DBIx::InsertHash
+
+0.011 2009-04-27
+    - fixed missing dependency (Class::Accessor)
+    - changed repository to git
+
+0.010 2007-03-09  ### A P I   C H A N G E ###
+    - API change: reversed order of params in insert()
+    - Quoting can be controlled
+    - Optional constructor
+    - update()
+
+0.002 2007-01-17
+    - Fixed Makefile.PL (error without ExtUtils::MakeMaker::Coverage)
+
+0.001 2007-01-16
+    - Initial release
+    - update() is missing (coming soon)

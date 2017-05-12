@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-FixedFormat.t
+lib/Data/FixedFormat.pm
+META.yml                                 Module meta-data (added by MakeMaker)

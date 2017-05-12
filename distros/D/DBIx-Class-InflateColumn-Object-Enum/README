@@ -1,0 +1,104 @@
+NAME
+    DBIx::Class::InflateColumn::Object::Enum - Allows a DBIx::Class user to
+    define a Object::Enum column
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+    Load this module via load_components and utilize is_enum and values
+    property to define Enumuration columns via Object::Enum
+
+        package TableClass;
+    
+        use strict;
+        use warnings;
+        use base 'DBIx::Class';
+    
+        __PACKAGE__->load_components(qw/InflateColumn::Object::Enum Core/);
+        __PACKAGE__->table('testtable');
+        __PACKAGE__->add_columns(
+            color => {
+                data_type => 'varchar',
+                is_enum => 1,
+                extra => {
+                    list => [qw/red green blue/]
+                }
+            }
+            color_native => { # works inline with native enum type
+                data_type => 'enum',
+                is_enum => 1,
+                extra => {
+                    list => [qw/red green blue/]
+                }
+            }
+        );
+    
+        1;
+
+    Now you may treat the column as an Object::Enum object.
+
+        my $table_rs = $db->resultset('TableClass')->create({
+            color => undef
+        });
+    
+        $table_rs->color->set_red; # sets color to red
+        $table_rs->color->is_red; # would return true
+        $table_rs->color->is_green; # would return false
+        print $table_rs->color->value; # would print 'red'
+        $table_rs->color->unset; # set the value to 'undef' or 'null'
+        $table_rs->color->is_red; # returns false now
+
+METHODS
+  register_column
+    Internal chained method with "register_column" in DBIx::Class::Row.
+    Users do not call this directly!
+
+AUTHOR
+    Jason M. Mills, "<jmmills at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dbix-class-inflatecolumn-object-enum at rt.cpan.org", or through
+    the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-InflateColumn
+    -Object-Enum>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+CAVEATS
+    * Please note that when a column definition "is_nullable" then
+      Object::Enum will insist that there be a "default_value" set.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::InflateColumn::Object::Enum
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-InflateColumn-O
+        bject-Enum>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-Class-InflateColumn-Object-Enum>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-Class-InflateColumn-Object-Enum>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-Class-InflateColumn-Object-Enum>
+
+SEE ALSO
+    Object::Enum, DBIx::Class, DBIx::Class::InflateColumn::URI
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Jason M. Mills, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

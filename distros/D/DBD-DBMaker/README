@@ -1,0 +1,221 @@
+DBD::DBMaker -- DBD module interfacing the DBMAKER database.
+
+   $Id: README,v 0.11 1999/01/29 00:34:39 $
+   Copyright (c) 1999 DBMaker team 
+   portions Copyright (c) 1997,1998  Jeff Urlwin
+   portions Copyright (c) 1997, 1998  Thomas K. Wenrich
+   portions Copyright (c) 1994,1995,1996  Tim Bunce
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+   PLEASE READ THE ENTIRE README FILE CAREFULLY !
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (at least 5.004).
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module (at least DBI 1.06).
+    It is very important to TEST it and INSTALL it!
+
+    Remember to *read* the DBI README file!
+
+    Install the DBMaker RDBMS software.
+
+    Install the DBMaker SQL API - libdmapic.a files somewhere.
+	Makefile.PL searches those files
+	   1. below the directory pointed to by the DBMAKER_HOME environment
+	      variable.
+	   On UNIX:
+       2. ~dbmaker/3.x (3.0 or 3.5)
+	   3. below /usr/local.
+       4. to search sql.h and libdmapic.a
+	   On MSWin32 platforms:
+	      2. on drive C:\DBMAKER to search SQLOPT.H and DMAPI35.LIB
+
+BUILDING:
+On UNIX:
+	perl Makefile.PL
+	make
+On MSWin32/Visual C/nmake:
+	REM - set DBMAKERDIR environment (see above)
+	set DBMAKER_HOME=c:\dbmaker
+	perl Makefile.PL
+	REM - ensure the Visual C environment is set:
+	CALL C:\MSDEV\bin\vcvars32 x86
+	REM - build
+	nmake
+
+
+If you have problems see the 'IF YOU HAVE PROBLEMS' section below
+and the "OPERATING SYSTEM NOTES" section at the end of this file.
+
+If it builds without error you can then run the tests. For the
+main test to work it must be able to connect to a DBMaker database.
+
+Don't worry about most warnings, specifically "end-of-loop code not
+reached", "ANSI C forbids braced-groups within expressions", "cast
+increases required alignment of target type".
+
+TESTING
+	
+    The tests will work either with the 'new style' environment
+    variables DBI_DSN, DBI_USER, DBI_PASS introduced with DBI 0.86.
+    See the DBI documentation for details.
+
+    'new style' DBI_DSN examples:
+    	DBI_DSN="dbi:DBMaker:"
+	DBI_DSN="DBI:DBMaker:dbsample"
+
+    If there's no database called "DBSAMPLE" installed in 
+    ~dbmaker/3.x/samples/database.  You can create your own database by the
+    following steps:  
+
+    1. set DBMAKER environment variable to your local path:
+       for example:
+       export DBMAKER=~/config
+
+	2. cd to the path you want to store your datatbase
+
+    3. create a database: 'dbsample'
+	$ dmsqls
+	dmSQL> create db dbsample;
+	dmSQL> quit;
+
+	4. start your 'dbsample' database
+	$ dmserver -u SYSADM dbsample
+
+    Once you can do that then you can test DBD::DBMaker knowing that it
+    should work.
+
+	make test
+	make test TEST_VERBOSE=1   (if any of the t/* tests fail)
+
+	make install 		   (if the tests look okay)
+
+    TEST NOTES:
+	1. Most of the test scripts use a common subroutine (in
+	   t/tests.pm) to obtain information about the database 
+	   connection. To start the tests _without_ running 'make', you 
+	   may either imitate the way a 'make test' calls t/*.t (e.g. 
+	   perl t/02base.t) or modify the scripts so that testenv() 
+	   is not longer used or within the scripts.
+	2. The tests aren't self contained; instead, they rely on the
+	   existance of tables created while running t/02base.t.
+	   Because these test tables are removed by t/99drop.t,
+	   they must be recreated by running t/02base.t before
+	   trying one of the later test scripts.
+
+IF YOU HAVE PROBLEMS:
+
+Do not hand edit the generated Makefile unless you are completely sure you
+understand the implications! Always try to make changes via the Makefile.PL
+command line and/or editing the Makefile.PL.
+
+You should not need to make any changes. If you do *please* let me know so
+that I can try to make it automatic in a later release.
+
+Please don't post problems to comp.lang.perl.misc or perl5-porters. This
+software is supported via the dbi-users mailing list.  For more information
+and to keep informed about progress you can join the a mailing list via
+http://www.fugue.com/dbi (if you are unable to use the web you can subscribe
+by sending a message to dbi-request@fugue.com, it may take a few days to be
+processed).
+
+Please post details of any problems (or changes you needed to make) to
+dbi-users@fugue.com and CC them to me at dbmaker@lion.syscom.com.tw.
+
+** IT IS IMPORTANT TO INCLUDE THE FOLLOWING INFORMATION:
+
+1. A complete log of a all steps of the build, e.g.:
+
+	perl Makefile.PL           (do a make realclean first)
+	make
+	make test
+	make test TEST_VERBOSE=1   (if any tests fail)
+
+2. Full details of which software you are using:
+
+	* Version of the operating system 
+	   (on Linux: Kernel and library versions)
+	* DBMaker versions (of server and development system)
+	* Perl version (the output of perl -V)
+
+It is important to check that you are using the latest version before
+posting. If you're not then I'm *very* likely to simply say "upgrade to
+the latest". You would do yourself a favour by upgrading beforehand.
+
+Please remember that I'm _very_ busy. Try to help yourself first,
+then try to help me help you by following these guidelines carefully.
+
+Regards,
+dbmaker@lion.syscom.com.tw
+
+===============================================================================
+OPERATING SYSTEM NOTES:
+
+It's quite possible that Makefile.PL misses something for the
+special system/perl/dbmaker version combination you use. The
+most common problems are:
+
+Linker problems:
+ (1) The linker barfs at you, saying something about 'unresolved
+     symbols'. 
+       Try to compile and link the examples coming with the
+       client library from DBMaker.
+       When you can't manage to build DBMaker's examples, DBMaker tech 
+       support should be able to help you.
+       When DBMaker's examples are working fine, you may try to
+       modify Makefile.pl, adding the libraries/switches/defines
+       you found while building the examples.
+
+ (2) Perl's Dynloader tells you it "Can't load .../DBMaker.so", 
+     followed [possible] by messages about unresolved symbols 
+     called 'SQLAllocEnv' and other 'SQLxxxx' symbols.
+       This is also a linker problem. You may try to build a
+       static perl binary; if this also fails, try (1).
+
+In general, you may try to use another version of the DBMaker
+client library.
+
+DGUX:
+
+IRIX:
+
+FreeBSD:
+
+Linux:
+
+MITUX:
+
+Solaris:
+
+SCO
+
+
+DBMaker NOTES:
+
+
+===============================================================================
+Examples and other info:
+
+All the tests in the t/ subdirectory ARE examples of DBI usage.
+
+DBMaker Home Page:
+    http://www.dbmaker.com 
+    or
+    http://www.dbmaker.com.tw
+
+DBI Home Page: http://www.hermetica.com/technologia/DBI
+
+$ perldoc DBI
+$ perldoc DBD::DBMaker
+
+Master archive site for Perl DB information:
+    ftp://ftp.demon.co.uk/pub/perl/db/
+
+Searchable index of the dbi-users mailing list:
+	http://www.coe.missouri.edu/~faq/lists/dbiusers/
+
+End.

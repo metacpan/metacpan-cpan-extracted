@@ -1,0 +1,32 @@
+INSTALLATION
+
+The make test portion of the build is interactive.  You are required to 
+supply the path to the tty where your weather station is located.  To install
+this module, just do the usual:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Note that tests 2 and 3 will fail if your weather station is not connected
+and configured for 19200 baud, which is the factory default for the
+Vantage Pro.  If you need a different baud rate for your hardware, you will
+need to modify the Davis.xs file.
+
+ADDITIONAL SOFTWARE
+
+I have also written a  daemon, vanprod, which utilizies this module.
+If you choose to use this daemon, you can get it from 
+http://www.cpan.org/scripts/index.html
+
+BUGS AND LIMITATIONS
+
+I'm not aware of any bugs, but I'd love to hear from you if you find one, 
+or even if you don't but decide to use this module.   
+
+COPYRIGHT AND LICENSE
+
+Copyright 2003-2004 by Stan Sander.  stsander@sblan.net  
+The Davis module is free software.  You may redistribute
+it and/or modify it under the same terms as Perl itself.

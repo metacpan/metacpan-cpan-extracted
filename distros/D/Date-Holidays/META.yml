@@ -1,0 +1,92 @@
+---
+abstract: 'Date::Holidays::* adapter and aggregator for all your holiday needs'
+author:
+  - 'Jonas B. Nielsen <jonasbn@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.30'
+  Module::Load: '0'
+  Test::Class: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays
+provides:
+  Date::Holidays:
+    file: lib/Date/Holidays.pm
+    version: '1.03'
+  Date::Holidays::Adapter:
+    file: lib/Date/Holidays/Adapter.pm
+    version: '1.03'
+  Date::Holidays::Adapter::AU:
+    file: lib/Date/Holidays/Adapter/AU.pm
+    version: '1.03'
+  Date::Holidays::Adapter::BR:
+    file: lib/Date/Holidays/Adapter/BR.pm
+    version: '1.03'
+  Date::Holidays::Adapter::CN:
+    file: lib/Date/Holidays/Adapter/CN.pm
+    version: '1.03'
+  Date::Holidays::Adapter::DE:
+    file: lib/Date/Holidays/Adapter/DE.pm
+    version: '1.03'
+  Date::Holidays::Adapter::DK:
+    file: lib/Date/Holidays/Adapter/DK.pm
+    version: '1.03'
+  Date::Holidays::Adapter::ES:
+    file: lib/Date/Holidays/Adapter/ES.pm
+    version: '1.03'
+  Date::Holidays::Adapter::FR:
+    file: lib/Date/Holidays/Adapter/FR.pm
+    version: '1.03'
+  Date::Holidays::Adapter::GB:
+    file: lib/Date/Holidays/Adapter/GB.pm
+    version: '1.03'
+  Date::Holidays::Adapter::JP:
+    file: lib/Date/Holidays/Adapter/JP.pm
+    version: '1.03'
+  Date::Holidays::Adapter::KR:
+    file: lib/Date/Holidays/Adapter/KR.pm
+    version: '1.03'
+  Date::Holidays::Adapter::LOCAL:
+    file: lib/Date/Holidays/Adapter/LOCAL.pm
+    version: '1.03'
+  Date::Holidays::Adapter::NO:
+    file: lib/Date/Holidays/Adapter/NO.pm
+    version: '1.03'
+  Date::Holidays::Adapter::PL:
+    file: lib/Date/Holidays/Adapter/PL.pm
+    version: '1.03'
+  Date::Holidays::Adapter::PT:
+    file: lib/Date/Holidays/Adapter/PT.pm
+    version: '1.03'
+  Date::Holidays::Adapter::RU:
+    file: lib/Date/Holidays/Adapter/RU.pm
+    version: '1.03'
+requires:
+  Carp: '0'
+  DateTime: '0'
+  Env: '0'
+  File::Slurp: '0'
+  JSON: '0'
+  Locale::Country: '0'
+  Module::Load: '0'
+  Scalar::Util: '0'
+  TryCatch: '0'
+  constant: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/jonasbn/Date-Holidays/issues
+  homepage: http://search.cpan.org/dist/Date-Holidays/
+  repository: git://github.com/jonasbn/Date-Holidays.git
+version: '1.03'

@@ -1,0 +1,9 @@
+Revision history for Domain::Register::TK
+
+2.00    11-August-2009
+        First version as a Perl module, released to API version 2.00
+2.0.1   30-October-2009
+        META.yml altered to reflect module requirements
+2.1     16-July-2010
+        Program now officially called 'Reseller program' instead of 'Partner program'
+

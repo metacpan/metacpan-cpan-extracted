@@ -1,0 +1,105 @@
+Revision history for Perl module Defaults::Modern
+
+0.011001 2016-06-26
+
+  - Add qc, qcw, and qc_to keywords from Quote::Code
+
+0.010001 2016-06-24
+
+  - Deprecate '-with_types' import argument
+    (no longer needed with Type::Tiny-1+)
+
+0.009003 2016-06-23
+
+  - No longer need MooX::late (Moo-2+ provides 'coerce =>' support)
+
+0.009002 2016-06-23
+
+  - Depend on newer Path::Tiny, Function::Parameters,
+    List::Objects::WithUtils, Try::Tiny, Switch::Plain
+
+  - Recommend dependency MooX::TypeTiny
+
+  - Switch to cpanfile packaging, ReadmeAnyFromPod
+
+0.009001 2015-03-11
+
+  - Import 'strictures 2' for saner warnings behavior
+
+  - Depend on Type::Tiny-1+ for saner Type::Registry behavior
+
+0.008001 2014-06-24
+
+  - Allow passing a single string via '-with_types'
+
+  - Depend on newer Type::Tiny
+
+  - Recommend match::simple::XS
+
+0.007002 2014-02-09
+
+  - Disable 'experimental' warnings on perl-5.18+
+
+  - POD fixes
+
+0.007001 2013-12-14
+
+  - Support for automatically registering other type libraries
+
+  - Support for '-foo' style import tags
+
+0.006001 2013-10-04
+
+  - Updated for List::Objects::WithUtils-2;
+    all object constructors are now imported
+
+0.005002 2013-09-15
+
+  - Compat fix wrt. Function::Parameters-1.0301
+    (old 'check_argument_count' is now 'strict')
+
+0.005001 2013-09-06
+
+  - Add hash_of() from latest List::Objects::WithUtils
+
+  - Catch type library import exceptions
+
+0.004001 2013-09-01
+
+  - Add Switch::Plain
+
+0.003002 2013-08-26
+
+  - Fix type registration
+
+  - Fix Function::Parameters import to set Moops-like defaults
+
+0.003001 2013-08-25
+
+  - Add Types::Path::Tiny
+
+  - Add |M| from match::simple
+
+0.002002 2013-08-24
+
+  - Import is_$type / to_$type / assert_$type functions
+
+  - croak on unknown import tags
+
+  - Add 'all' import tag
+
+0.002001 2013-08-24
+
+  - Add 'no indirect'
+
+  - Add 'define' keyword based on PerlX::Define
+
+  - Add 'maybe' and 'provided' from PerlX::Maybe
+
+  - Add optional list autoboxing support via import tag 'autobox_lists'
+
+  - POD/test improvements
+
+0.001001 2013-08-24
+
+  - Initial release

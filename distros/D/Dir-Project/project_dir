@@ -1,0 +1,146 @@
+#!/usr/bin/perl -w
+# See copyright, etc in below POD section.
+######################################################################
+
+use lib 'blib/lib';	# Debugging
+use Pod::Usage;
+use Getopt::Long;
+
+use Dir::Project;
+use strict;
+use vars qw ($Debug $VERSION);
+
+######################################################################
+# configuration
+
+$VERSION = '3.026';
+
+######################################################################
+# main
+
+# read command line
+Getopt::Long::config ("no_auto_abbrev");
+if (!GetOptions (
+		 "help"		=> \&usage,
+		 "debug"	=> \&debug,
+		 "version"	=> sub { print "Version $VERSION\n"; exit(0); },
+		 "cat"		=> \&Dir::Project::makefile_cat,  #debug
+		 "project"	=> sub{
+		   Dir::Project::get_set_all();
+		     if (defined $Project) {
+			 print "$Project\n";
+		     } else {
+			 print "%Error:_Project_not_set\n";
+		     }
+		 },
+		 "makefile"	=> \&Dir::Project::makefile,
+		 )) {
+    die "%Error: Bad usage, try 'project_dir --help'\n";
+}
+exit(0);
+
+######################################################################
+
+sub usage {
+    print "Version $VERSION\n";
+    pod2usage(-verbose=>2, -exitval=>2, -output=>\*STDOUT, -noperldoc=>1);
+    exit (1);
+}
+
+sub debug {
+    $Debug = 1;
+    $Dir::Project::Debug = 1;
+}
+
+######################################################################
+######################################################################
+######################################################################
+
+__END__
+
+=pod
+
+=head1 NAME
+
+project_dir - Determine and query DIRPROJECT environment variables
+
+=head1 SYNOPSIS
+
+    project_dir --project
+    project_dir --makefile
+
+=head1 DESCRIPTION
+
+L<project_dir> reports the status of the Dir::Project variables.  See the
+arguments below for what action is to be performed.
+
+=head1 ARGUMENTS
+
+=over 4
+
+=item --project
+
+Print the current project directory path.  Determined based on a project
+symlink or the current directory, see L<Dir::Project> for details.
+
+=item --makefile
+
+This option is intended to be called from inside a makefile by
+project_dir.mk.  It creates a temporary file with makefile variable
+settings and prints its filename.
+
+=item --cat
+
+Print the contents of what --makefile would create.
+
+=item --help
+
+Displays this message and program version and exits.
+
+=item --version
+
+Displays program version and exits.
+
+=back
+
+=head1 ENVIRONMENT
+
+The following environment variables are set by project_dir via the
+makefile:
+
+=over 4
+
+=item DIRPROJECT
+
+The directory path to the root of the model.
+
+=back
+
+See L<Dir::Project> for other relevant environment variables.
+
+=head1 DISTRIBUTION
+
+Dir-Project is part of the L<http://www.veripool.org/> free EDA software
+tool suite.  The latest version is available from CPAN and from
+L<http://www.veripool.org/>.
+
+Copyright 2001-2017 by Wilson Snyder.  This package is free software; you
+can redistribute it and/or modify it under the terms of either the GNU
+Lesser General Public License Version 3 or the Perl Artistic License Version 2.0.
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+more details.
+
+=head1 AUTHORS
+
+Wilson Snyder <wsnyder@wsnyder.org>
+
+=head1 SEE ALSO
+
+L<Dir::Project>, L<project_bin>
+
+=cut
+
+######################################################################

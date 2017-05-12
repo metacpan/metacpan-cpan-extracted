@@ -1,0 +1,14 @@
+Origin: cpan unstable packages
+Label: CPAN unstable packages
+Suite: unstable
+Codename: cpan
+Architectures: i386 any source
+Components: unofficial
+SignWith: default
+Contents: .bz2
+Uploaders: uploaders
+DebIndices: Packages Release . .gz .bz2
+UDebIndices: Packages . .gz .bz2
+DscIndices: Sources Release .gz .bz2
+Description: Debian repository automaticaly build from CPAN
+ using Debian::Apt::PM

@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.54.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 935a1e52c93aa67c556402fd298b7d81d7e25865 BUGS
+SHA1 30cbc6accf7cab0620753e17145b782823166016 CHANGES
+SHA1 a36a5cbc051c4b47d32406006ff0759b9303538a CREDITS
+SHA1 d962596468dce41ea51b86971d10770ff28eda28 INSTALL
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 28aa288903a7f600fe5f948e290f1a27594c03ba MANIFEST
+SHA1 6b7feb61704c2f49f29f7b3a656960d0f58746bb META.yml
+SHA1 6e32afa681ef49ba3f9b749e39c166ed00e4f755 Makefile.PL
+SHA1 a0df3978047c97b1a63fccfa8cec89aacb92e4d4 README
+SHA1 e59dd8aa43d24c1fb3962904190cf75b20184aee TODO
+SHA1 17e3fcbf981583e30932b23b832467e4cce19bdb examples/bollocks.pl
+SHA1 d1b36fffba0d3cd10e315f48246a433217699942 examples/sig.pl
+SHA1 9b2f9d83bcf77860f53a0c07c90a4a59ad9f5df1 inc/Module/Install.pm
+SHA1 abe32855d75ab13747cf65765af9947b7a8c3057 inc/Module/Install/Base.pm
+SHA1 95b81d1e91bd634467bf633571eff4420e9c04eb inc/Module/Install/Can.pm
+SHA1 1fe98c63cf9d7271c8cb4183ba230f152df69e26 inc/Module/Install/Fetch.pm
+SHA1 2249171a2b72cd73ff2c0a06597d29f86e5df456 inc/Module/Install/Makefile.pm
+SHA1 381bb98ea3877bba49ae85e7a7ea130645fd3dbf inc/Module/Install/Metadata.pm
+SHA1 0c2118868ef82ac517eb6d9c3bd93e6eb9bbf83e inc/Module/Install/Win32.pm
+SHA1 e827d6d43771032fa3df35c0ad5e5698d0e54cda inc/Module/Install/WriteAll.pm
+SHA1 ddb734af5c1ebc45aeb41efb6f8f08939b6d5758 lib/Dev/Bollocks.pm
+SHA1 e2f9b71803c1df7b6cc698368280127627bfc7f0 t/bollox.t
+SHA1 6ffeef94ca4d04dac7798db0de98da3559a7da97 t/pod.t
+SHA1 8912907bd268620134401e89f33a994381dd49fa t/pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2 (GNU/Linux)
+
+iQEVAwUBRUUGZncLPEOTuEwVAQLTuQf9HiMzwpzXZzuUbJM8MWIYcI5xXyTwJMZ/
+jmRtjzPGR+Uo/V3OpmtAWc1hL1DXs88vHcdg56hw2qgAIvw5SOJWKFmp5l8aKN/g
+DoZGdrrK6bgDspbFmUIw1s2HWwhWqDxHZofmeUm/rg5FkRAIaEPXUovFgALFk3o0
+t6NAe5C35n/kP07EhgU5zsJ4Ztl1x9w+AfHoy+HlU3Ni5x1DChf58enS4rYV48DW
+4eEtinxzJv0zpFdtK/7mrwBu6lroZ48GjOJCWeV75qohI6tSHWBgt20KAqi5YhBZ
+vKUFs1I2yz9jR76qGffTWoUpeQMA3Zi+e5jxjDjZ1uxNQ/ijWCeoLg==
+=kKjz
+-----END PGP SIGNATURE-----

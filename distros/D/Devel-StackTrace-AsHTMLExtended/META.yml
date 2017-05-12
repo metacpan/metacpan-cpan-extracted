@@ -1,0 +1,27 @@
+---
+abstract: 'Displays stack trace in HTML'
+author:
+  - 'Rusty Conover <rusty@luckydinosaur.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-StackTrace-AsHTMLExtended
+requires:
+  Data::Dumper: '0'
+  Devel::StackTrace: '0'
+  Scalar::Util: '0'
+  perl: 5.008_001
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/rustyconover/devel-stacktrace-ashtmlextended/issues
+  homepage: http://search.cpan.org/dist/Devel-StackTrace-AsHTMLExtended/
+  repository: git://github.com/rustyconover/devel-stacktrace-ashtmlextended.git
+version: '0.18'

@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+META.yml
+META.json
+README
+t/Data-Mining-Apriori.t
+lib/Data/Mining/Apriori.pm

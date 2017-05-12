@@ -1,0 +1,13 @@
+Revision history for Dist::Zilla::Plugin::NameFromDirectory
+
+0.04  2016-04-23 10:11:24 PDT
+        - switch to Path::Tiny to work with Dist::Zilla v6 (skaji) #1
+
+0.03  2013-04-06 21:45:31 PDT
+        - Bump dzil dependency for NameProvider
+
+0.02  2013-03-24 11:27:56 PDT
+        - use $self->zilla->root instead of cwd (ether)
+
+0.01  2013-03-23 23:11:30 PDT
+        - Initial release

@@ -1,0 +1,26 @@
+TODO:
+    - Allow for preheader... preamble is a special case of preheader: preheader(0)
+
+0.024:
+- Add $Document::TriPart::TriPart option
+- Change prerequisite to Any::Moose
+
+0.023:
+- Deal with empty header ({}) condition
+- Use Any::Moose
+
+0.022 Wednesday June 10 17:28:13 PDT 2009:
+- Fixed setting of the body
+
+0.021 Thursday May 14 20:32:50 PDT 2009:
+- It's File::AtomicWrite, not File::WriteAtomic (in Makefile.PL)
+
+0.020 Monday May 04 22:37:50 PDT 2009:
+- Adapted from Document::Stembolt
+- Better read/write handling
+
+0.011 Friday April 03 18:42:51 PDT 2009:
+- Can now natively read glob references
+
+0.010 Friday April 03 15:42:04 PDT 2009:
+- Initial release, whee!

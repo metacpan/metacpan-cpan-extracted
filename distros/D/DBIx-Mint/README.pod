@@ -1,0 +1,172 @@
+=pod
+
+=head1 NAME
+
+DBIx::Mint - A mostly class-based ORM for Perl
+
+=head1 VERSION
+
+This documentation refers to DBIx::Mint 0.07
+
+=head1 SYNOPSIS
+
+Define your classes, which will play the role L<DBIx::Mint::Table>:
+
+ package Bloodbowl::Team;
+ use Moo;
+ with 'DBIx::Mint::Table';
+ 
+ has id   => (is => 'rw' );
+ has name => (is => 'rw' );
+ ...
+
+Nearby (probably in a module of its own), you define the schema for your classes:
+
+ package Bloodbowl::Schema;
+
+ my $schema = DBIx::Mint->instance->schema;
+ $schema->add_class(
+     class      => 'Bloodbowl::Team',
+     table      => 'teams',
+     pk         => 'id',
+     auto_pk    => 1,
+ );
+ 
+ $schema->add_class(
+     class      => 'Bloodbowl::Player',
+     table      => 'players',
+     pk         => 'id',
+     auto_pk    => 1,
+ );
+ 
+ # This is a one-to-many relationship
+ $schema->one_to_many(
+     conditions     => 
+        ['Bloodbowl::Team', { id => 'team'}, 'Bloodbowl::Player'],
+     method         => 'get_players',
+     inverse_method => 'get_team',
+ );
+
+And in your your scripts:
+ 
+ use DBIx::Mint;
+ use My::Schema;
+ 
+ # Connect to the database
+ DBIx::Mint->connect( $dsn, $user, $passwd, { dbi => 'options'} );
+ 
+ my $team    = Bloodbowl::Team->find(1);
+ my @players = $team->get_players;
+ 
+ # Database modification methods include insert, update, and delete.
+ # They act on a single object when called as instance methods
+ # but over the whole table if called as class methods:
+ $team->name('Los Invencibles');
+ $team->update;
+ 
+ Bloodbowl::Coach->update(
+    { status   => 'suspended' }, 
+    { password => 'blocked' });
+ 
+Declaring the schema allows you to modify the data. To define a schema and to learn about data modification methods, look into L<DBIx::Mint::Schema> and L<DBIx::Mint::Table>. 
+
+If you only need to query the database, no schema is needed. L<DBIx::Mint::ResultSet> objects build database queries and fetch the resulting records:
+  
+ my $rs = DBIx::Mint::ResultSet->new( table => 'coaches' );
+ 
+ # You can perform joins:
+ my @team_players = $rs->search( { 'me.id' => 1 } )
+   ->inner_join( 'teams',   { 'me.id'    => 'coach' })
+   ->inner_join( 'players', { 'teams.id' => 'team'  })
+   ->all;
+ 
+=head1 DESCRIPTION
+
+DBIx::Mint is a mostly class-based, object-relational mapping module for Perl. It tries to be simple and flexible, and it is meant to integrate with your own custom classes.
+
+Since version 0.04, it allows for multiple database connections and it features L<DBIx::Connector> objects under the hood. This should make DBIx::Mint easy to use in persistent environments.
+
+There are many ORMs for Perl. Most notably, you should look at L<DBIx::Class> and L<DBIx::DataModel> which are two robust, proven offerings as of today. L<DBIx::Lite> is another light-weight alternative.
+
+=head1 DOCUMENTATION
+
+The documentation is split into four parts:
+
+=over
+
+=item * The umbrella class DBIx::Mint encapsulates a given database conection and its schema.
+
+=item * L<DBIx::Mint::Schema> documents the mapping between classes and database tables. It shows how to specify table names, primary keys and how to create associations between classes.
+
+=item * L<DBIx::Mint::Table> is a role that allows you to modify or fetch data from a single table. It is meant to be applied to your custom classes using L<Moo> or L<Role::Tiny::With>.
+
+=item * L<DBIx::Mint::ResultSet> performs database queries using chainable methods. It does not know about the schema, so it can be used without one or without any external classes .
+
+=back
+
+=head1 GENERALITIES
+
+The basic idea is that, frequently, a class can be mapped to a database table. Records become objects that can be created, fetched, updated and deleted. With the help of a schema, classes know what database table they represent, as well as their primary keys and the relationships they have with other classes. Relationships between classes are represented as methods that act upon objects from other classes, for example, or that simply return data. Using such a schema and a table-accessing role, classes gain database persistence.
+
+Fetching data from joined tables is different, though. While you can have a class to represent records comming from a join, you cannot create, update or delete directly the objects from such a class. Using L<DBIx::Mint::ResultSet> objects, complex table joins and queries are encapsulated, along with different options to actually fetch data and possibly bless it into full-blown objects. In this case, DBIx::Mint uses the result set approach, as DBIx::Lite does.
+
+Finally, DBIx::Mint objects contain the database connection, the database schema and its SQL syntax details. Because each object encapsulates a database connection, you may create several objects to interact with different databases within your program. Mint objects are kept in a centralized pool so that they remain accessible without the need of passing them through explicitly.
+
+=head1 DEPENDENCIES
+
+This distribution depends on the following external, non-core modules:
+
+=over
+
+=item Moo
+
+=item MooX::Singleton
+
+=item SQL::Abstract::More
+
+=item DBI
+
+=item DBIx::Connector
+
+=item List::MoreUtils
+
+=item Clone
+
+=back
+
+=head1 SEE ALSO
+
+Be sure to see into L<DBIx::Class> and L<DBIx::DataModel>.
+
+You can find more information about usind DBIx::Mint in my blog at L<http://www.7mavida.com>.
+
+=head1 BUGS AND LIMITATIONS
+
+Testing is not complete; in particular, tests look mostly for the expected results and not for edge cases or plain incorrect input. 
+
+Please report problems to the author. Patches are welcome. Tests are welcome also.
+
+=head1 ACKNOWLEDGEMENTS
+
+The ResultSet class was inspired by L<DBIx::Lite>, by Alessandro Ranellucci.
+
+=head1 AUTHOR
+
+Julio Fraire, <julio.fraire@gmail.com>
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2015, Julio Fraire. All rights reserved.
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+
+=cut
+

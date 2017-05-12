@@ -1,0 +1,63 @@
+NAME
+====
+Devel::TraceINC - Trace who is loading which perl modules
+
+VERSION
+=======
+version 1.100851
+
+SYNOPSIS
+========
+    $ perl -MDevel::TraceINC t/01_my_test.t
+    Test/More.pm loaded from package main, file t/01_my_test.t, line 6
+    Test/Builder/Module.pm loaded from package Test::More, file /usr/local/svn/perl/Test/More.pm, line 22
+    Test/Builder.pm loaded from package Test::Builder::Module, file /usr/local/svn/perl/Test/Builder/Module.pm, line 3
+    Exporter/Heavy.pm loaded from package Exporter, file /System/Library/Perl/5.8.6/Exporter.pm, line 17
+    ...
+
+DESCRIPTION
+===========
+I had a situation where a program was loading a module but I couldn't
+find where in the code it was loaded. It turned out that I loaded some
+module, which loaded another module, which loaded the module in
+question. To be able to track down who loads what, I wrote
+Devel::TraceINC.
+
+Just "use()" the module and it will print a warning every time a module
+is searched for in @INC, i.e., loaded.
+
+INSTALLATION
+============
+See perlmodinstall for information and options on installing Perl
+modules.
+
+BUGS AND LIMITATIONS
+====================
+No bugs have been reported.
+
+Please report any bugs or feature requests through the web interface at
+<http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-TraceINC>.
+
+AVAILABILITY
+============
+The latest version of this module is available from the Comprehensive
+Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+CPAN site near you, or see
+<http://search.cpan.org/dist/Devel-TraceINC/>.
+
+The development version lives at
+<http://github.com/marcelgrunauer/Devel-TraceINC/>. Instead of sending
+patches, please fork this project using the standard git and github
+infrastructure.
+
+AUTHOR
+======
+Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+=====================
+This software is copyright (c) 2007 by Marcel Gruenauer.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

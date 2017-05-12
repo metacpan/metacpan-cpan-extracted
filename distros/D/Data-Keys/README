@@ -1,0 +1,84 @@
+NAME
+    Data::Keys - get/set key+value extensible manipulations, base module for
+    Data::Keys::E::*
+
+SYNOPSIS
+        use Date::Keys;
+            my $dk = Data::Keys->new(
+                    'base_dir'    => '/folder/full/of/json/files',
+                    'extend_with' => ['Store::Dir', 'Value::InfDef'],
+                    'inflate'     => sub { JSON::Util->decode($_[0]) },
+                    'deflate'     => sub { JSON::Util->encode($_[0]) },
+            );
+
+            my %data = %{$dk->get('abcd.json')};
+            $dk->set('abcd.json', \%data);
+
+WARNING
+    experimental, use at your own risk :-)
+
+DESCRIPTION
+    Data::Keys is just a base class module that purpose is to allow loading
+    extensions in `Data::Keys::E::*' namespace.
+
+EXTENSIONS
+  storage
+    Data::Keys::E::Store::Dir, Data::Keys::E::Store::Mem
+
+PROPERTIES
+  extend_with
+    Array ref list of extensions to apply to the object.
+
+  BUILD
+    Loads all extensions when Key::Values object is created and calls
+    `$self->init();' which can be used to initialize an extension.
+
+METHODS
+  new()
+    Object constructor.
+
+  init()
+    Called after the object is `BUILD'.
+
+AUTHOR
+    Jozef Kutej
+
+AUTHOR
+    jozef@kutej.net, `<jkutej at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-data-keys at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Keys. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Keys
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Keys
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Keys
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Keys
+
+    * Search CPAN
+        http://search.cpan.org/dist/Data-Keys/
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 jozef@kutej.net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

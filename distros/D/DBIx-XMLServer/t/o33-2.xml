@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>1</id>
+    <seen>2004-09-30T17:30:00</seen>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>3</id>
+    <seen>2004-09-30T17:25:52</seen>
+  </employee>
+</employees>

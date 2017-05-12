@@ -1,0 +1,24 @@
+#! /usr/bin/perl
+
+# ABSTRACT: Sample DZ script
+
+=head1 SYNOPSIS
+
+  script [FILE]...
+
+=cut
+
+use strict;
+use warnings;
+
+use DZT::Sample;
+
+our $VERSION = '0.04';
+
+print "Hello, world!\n";
+
+=for Pod::Loom-omit
+BUGS AND LIMITATIONS
+COPYRIGHT AND LICENSE
+DISCLAIMER OF WARRANTY
+INCOMPATIBILITIES

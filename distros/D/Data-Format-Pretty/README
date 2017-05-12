@@ -1,0 +1,76 @@
+NAME
+    Data::Format::Pretty - Pretty-print data structure
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+    In your program:
+
+     use Data::Format::Pretty qw(format_pretty print_pretty);
+
+     # automatically choose an appropriate formatter
+     print format_pretty($data);
+
+     # explicitly select a formatter
+     print format_pretty($data, {module=>'JSON'});
+
+     # specify formatter option(s)
+     print format_pretty($data, {module=>'Console', interactive=>1});
+
+     # shortcut for printing to output
+     print_pretty($data);
+
+
+     # ppr() is alias for print_pretty(), exported automatically. suitable for when
+     # debugging.
+     use Data::Format::Pretty;
+     ppr [1, 2, 3];
+
+DESCRIPTION
+    Data::Format::Pretty is an extremely simple framework for
+    pretty-printing data structure. Its focus is on "prettiness" and
+    automatic detection of appropriate format to use.
+
+    To develop a formatter, look at one of the formatter modules (like
+    Data::Format::Pretty::JSON) for example. You only need to specify one
+    function, "format_pretty".
+
+FUNCTIONS
+  format_pretty($data, \%opts) => STR
+    Send $data to formatter module (one of Data::Format::Pretty::* modules)
+    and return the result. Options:
+
+    *   module => STR
+
+        Select the formatter module. It will be prefixed with
+        "Data::Format::Pretty::".
+
+        Currently if unspecified the default is 'Console', or 'HTML' if
+        CGI/PSGI/plackup environment is detected. In the future, more
+        sophisticated detection logic will be used.
+
+    The rest of the options will be passed to the formatter module.
+
+  print_pretty($data, \%opts)
+    Just call format_pretty() and print() it.
+
+  ppr($data, \%opts) [EXPORTED BY DEFAULT]
+    Alias for print_pretty().
+
+SEE ALSO
+    One of Data::Format::Pretty::* formatter, like
+    Data::Format::Pretty::Console, Data::Format::Pretty::HTML,
+    Data::Format::Pretty::JSON, Data::Format::Pretty::YAML.
+
+    Alternative data formatting framework/module family: Any::Renderer.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

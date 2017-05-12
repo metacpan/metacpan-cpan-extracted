@@ -1,0 +1,12 @@
+Changes
+lib/Dancer/Template/Ctpp2.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-simple.t
+t/boilerplate.t
+t/index.tmpl
+t/manifest.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

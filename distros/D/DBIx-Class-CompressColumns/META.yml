@@ -1,0 +1,22 @@
+---
+name: DBIx-Class-CompressColumns
+version: 0.01001
+author:
+  - 'Jesse Stay (jessestay) <jesse@staynalive.com>'
+  - |-
+        A SocialToo.com Product
+abstract: Automatic compress columns
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class: 0.06002
+  Compress::Zlib: 2.008
+provides:
+  DBIx::Class::CompressColumns:
+    file: lib/DBIx/Class/CompressColumns.pm
+    version: 0.01000
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

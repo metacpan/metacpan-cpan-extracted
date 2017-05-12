@@ -1,0 +1,797 @@
+
+<html>
+<head>
+<title>Devel::RingBuffer::Ring</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<A HREF='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<A HREF='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Devel::RingBuffer::Ring</h2>
+
+<hr>
+
+A single shared memory ring buffer for diagnosis/debug of Perl scripts.
+Uses IPC::Mmap to create/access/manage a memory mapped file (or namespace
+on Win32) as a ring buffer structure that can be used by "applications
+under test" that use an appropriate debug module (e.g., Devel::STrace)
+along with an external monitoring application
+(e.g., Devel::STrace::Monitor).
+<p>
+Note that significant functionality is written in XS/C in order to minimize
+tracing/debugging overhead.
+<p>
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href='http://perldoc.perl.org/perlartistic.html'>Perl Artistic License</a>
+for details.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.31</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2006-05-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer::Ring'>clone</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allocates a ring buffer, and initializes its header
+and control variables
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer::Ring'>new</a>($ringbuffer, $ringaddr, $baseaddr, $ringnum, $slots, $msgareasz)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allocates a ring buffer, and initializes its header
+and control variables
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer::Ring'>open</a>($ringbuffer, $ringaddr, $baseaddr, $ringnum, $slots, $msgareasz)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Opens an existing ring buffer for read-only access
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#DESTROY'>DESTROY</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Destructor
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#addWatch'>addWatch</a>($expr)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allocate and initialize a watchlist entry
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#checkCommand'>checkCommand</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test if a command is available in the ring's command/message area
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#checkResponse'>checkResponse</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Test if a response is available in the ring's command/message area
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#freeSlot'>freeSlot</a>($address)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Free the current slot and invalidates its contents
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#freeWatch'>freeWatch</a>($watch)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Free a watchlist entry
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getAddress'>getAddress</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ring base address
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getHeader'>getHeader</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ring header values
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getIndex'>getIndex</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ring number (i
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSignal'>getSignal</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ring's signal flag
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSlot'>getSlot</a>($slot)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the contents of the specified slot
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getTrace'>getTrace</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ring's trace flag
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getWatchExpr'>getWatchExpr</a>($watch)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a watchlist expression entry
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getWatchResult'>getWatchResult</a>($watch)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get a watchlist expression entry
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#nextSlot'>nextSlot</a>($address, $entry)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Allocate and initialize the next slot
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#postCommand'>postCommand</a>($command, $msg)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Post a command to the ring's command/message area
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#postResponse'>postResponse</a>($response, $msg)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Post a response to the ring's command/message area
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setSignal'>setSignal</a>($signal)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the ring's signal flag
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setTrace'>setTrace</a>($trace)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the ring's trace flag
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setWatchResult'>setWatchResult</a>($watch, $result, $error)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set a watchlist result entry
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#updateSlot'>updateSlot</a>($address, $linenumber)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Update the current slot
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#waitForCommand'>waitForCommand</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait indefinitely for a command to be posted to the ring's command/message area
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#waitForResponse'>waitForResponse</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Wait indefinitely for a response to be posted to the ring's command/message area
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='open'></a>
+<h3>open</h3>
+<pre>
+open($ringbuffer, $ringaddr, $baseaddr, $ringnum, $slots, $msgareasz)
+</pre><p>
+<dl>
+<dd>Opens an existing ring buffer for read-only access.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$ringbuffer</code> - the Devel::RingBuffer object
+</dd>
+<dd><code>$ringaddr</code> - the base address of this ring
+</dd>
+<dd><code>$baseaddr</code> - base address of the complete ring buffer structure
+</dd>
+<dd><code>$ringnum</code> - the number (i.e., positional index) of this ring
+</dd>
+<dd><code>$slots</code> - number of slots per ring
+</dd>
+<dd><code>$msgareasz</code> - size of the per-thread message area
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer::Ring object on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<a name='clone'></a>
+<h3>clone</h3>
+<pre>
+clone()
+</pre><p>
+<dl>
+<dd>Allocates a ring buffer, and initializes its header
+and control variables. Called when the AUT object (e.g., DB)
+is CLONE'd, so that a new ring can be assigned to the new thread
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the Devel::RingBuffer::Ring object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new'></a>
+<h3>new</h3>
+<pre>
+new($ringbuffer, $ringaddr, $baseaddr, $ringnum, $slots, $msgareasz)
+</pre><p>
+<dl>
+<dd>Allocates a ring buffer, and initializes its header
+and control variables.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$ringbuffer</code> - the Devel::RingBuffer object
+</dd>
+<dd><code>$ringaddr</code> - the base address of this ring
+</dd>
+<dd><code>$baseaddr</code> - base address of the complete ring buffer structure
+</dd>
+<dd><code>$ringnum</code> - the number (i.e., positional index) of this ring
+</dd>
+<dd><code>$slots</code> - number of slots per ring
+</dd>
+<dd><code>$msgareasz</code> - size of the per-thread message area
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer::Ring object on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='DESTROY'></a>
+<h3>DESTROY</h3>
+<pre>
+DESTROY()
+</pre><p>
+<dl>
+<dd>Destructor. Updates the Devel::RingBuffer container object's free ring map,
+<i>but only if executed in the same process/thread that it was allocated'd in.</i>
+(Note that due to threads CLONE, a ring object may be cloned with PID/TID
+of another thread, and thus DESTROY() could cause an invalid destruction)
+<p>
+A future enhancement will add a flag to indicate to preserve
+the ring on exit for post-mortem analysis
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='addWatch'></a>
+<h3>addWatch</h3>
+<pre>
+addWatch($expr)
+</pre><p>
+<dl>
+<dd>Allocate and initialize a watchlist entry. Sets the watch expression.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$expr</code> - expression to set
+
+</dd>
+<dt><b>Returns:</b><dd>allocated watchlist entry number on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<a name='checkCommand'></a>
+<h3>checkCommand</h3>
+<pre>
+checkCommand()
+</pre><p>
+<dl>
+<dd>Test if a command is available in the ring's command/message area.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>if available, the posted command and message; otherwise an empty list
+</dd>
+</dl></dd></dl><hr>
+
+<a name='checkResponse'></a>
+<h3>checkResponse</h3>
+<pre>
+checkResponse()
+</pre><p>
+<dl>
+<dd>Test if a response is available in the ring's command/message area.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>if available, the posted response and message; otherwise an empty list
+</dd>
+</dl></dd></dl><hr>
+
+<a name='freeSlot'></a>
+<h3>freeSlot</h3>
+<pre>
+freeSlot($address)
+</pre><p>
+<dl>
+<dd>
+Free the current slot and invalidates its contents.
+May be called as either object or class method; in the latter case,
+caller must supply the ring's base address <i>(used within DB::sub()
+to optimize access speed)</i>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$address</code> - <b><i>class method calls only</i></b>: base address of the ring
+
+</dd>
+<dt><b>Returns:</b><dd>the stack depth after the slot is freed.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='freeWatch'></a>
+<h3>freeWatch</h3>
+<pre>
+freeWatch($watch)
+</pre><p>
+<dl>
+<dd>Free a watchlist entry.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$watch</code> - the watchlist entry number to free
+
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getAddress'></a>
+<h3>getAddress</h3>
+<pre>
+getAddress()
+</pre><p>
+<dl>
+<dd>Get the ring base address
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the ring base address
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getHeader'></a>
+<h3>getHeader</h3>
+<pre>
+getHeader()
+</pre><p>
+<dl>
+<dd>Get the ring header values. Header fields returned are
+<p>
+<ol>
+<li>pid - PID of the ring owner
+<li>tid - TID of the ring owner
+<li>currSlot - current top slot
+<li>depth - current stack depth
+</ol>
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>list of header values
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getIndex'></a>
+<h3>getIndex</h3>
+<pre>
+getIndex()
+</pre><p>
+<dl>
+<dd>Get the ring number (i.e., positional index)
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the ring number
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSignal'></a>
+<h3>getSignal</h3>
+<pre>
+getSignal()
+</pre><p>
+<dl>
+<dd>Get the ring's signal flag
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the ring's signal flag
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSlot'></a>
+<h3>getSlot</h3>
+<pre>
+getSlot($slot)
+</pre><p>
+<dl>
+<dd>Get the contents of the specified slot.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$slot</code> - the number of the slot to return
+
+</dd>
+<dt><b>Returns:</b><dd>the line number, timestamp, and subroutine name from the slot
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getTrace'></a>
+<h3>getTrace</h3>
+<pre>
+getTrace()
+</pre><p>
+<dl>
+<dd>Get the ring's trace flag
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the ring's trace flag
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getWatchExpr'></a>
+<h3>getWatchExpr</h3>
+<pre>
+getWatchExpr($watch)
+</pre><p>
+<dl>
+<dd>Get a watchlist expression entry.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$watch</code> - the watchlist entry number to get
+
+</dd>
+<dt><b>Returns:</b><dd>the expression in the watchlist entry, if any; undef otherwise
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getWatchResult'></a>
+<h3>getWatchResult</h3>
+<pre>
+getWatchResult($watch)
+</pre><p>
+<dl>
+<dd>Get a watchlist expression entry. If the length of the result exceeds
+the configured message size, the result is truncated. If the result is
+undef, the length will zero, and both the result and error will be undef.
+If the evaluation caused a failure, the length indicates the length of
+the error string, and result will be undef.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$watch</code> - the watchlist entry number to get
+
+</dd>
+<dt><b>Returns:</b><dd>the complete length of the result, the (possibly truncated) result value,
+and the (possibly truncated) error message (if the evaluation failed).
+</dd>
+</dl></dd></dl><hr>
+
+<a name='nextSlot'></a>
+<h3>nextSlot</h3>
+<pre>
+nextSlot($address, $entry)
+</pre><p>
+<dl>
+<dd>
+Allocate and initialize the next slot. If the stack depth is
+greater than the configured number of slots, the oldest
+in-use slot is used, overwriting its current contents.
+May be called as either object or class method; in the latter case,
+caller must supply the ring's base address <i>(used within DB::sub()
+to optimize access speed)</i>
+<p>
+<i>Note: In future, this should return prior contents so we can restore
+on de-wrapping.</i>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$address</code> - <b><i>class method calls only</i></b>: base address of the ring
+</dd>
+<dd><code>$entry</code> - subroutine name (from $DB::sub)
+
+</dd>
+<dt><b>Returns:</b><dd>the stack depth after the slot is allocated.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='postCommand'></a>
+<h3>postCommand</h3>
+<pre>
+postCommand($command, $msg)
+</pre><p>
+<dl>
+<dd>Post a command to the ring's command/message area
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$command</code> - the command value to set; must be no more than 3 bytes
+</dd>
+<dd><code>$msg</code> - an optional message associated with the command; max length
+is determined by configuration settings
+
+</dd>
+<dt><b>Returns:</b><dd>the ring object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='postResponse'></a>
+<h3>postResponse</h3>
+<pre>
+postResponse($response, $msg)
+</pre><p>
+<dl>
+<dd>Post a response to the ring's command/message area
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$response</code> - the response value to set; must be no more than 3 bytes
+</dd>
+<dd><code>$msg</code> - an optional message associated with the response; max length
+is determined by configuration settings
+
+</dd>
+<dt><b>Returns:</b><dd>the ring object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setSignal'></a>
+<h3>setSignal</h3>
+<pre>
+setSignal($signal)
+</pre><p>
+<dl>
+<dd>Set the ring's signal flag
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$signal</code> - the value to set
+
+</dd>
+<dt><b>Returns:</b><dd>the prior value of the ring's signal flag
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setTrace'></a>
+<h3>setTrace</h3>
+<pre>
+setTrace($trace)
+</pre><p>
+<dl>
+<dd>Set the ring's trace flag
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$trace</code> - the value to set
+
+</dd>
+<dt><b>Returns:</b><dd>the prior value of the ring's trace flag
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setWatchResult'></a>
+<h3>setWatchResult</h3>
+<pre>
+setWatchResult($watch, $result, $error)
+</pre><p>
+<dl>
+<dd>Set a watchlist result entry.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$watch</code> - the watchlist entry number to set
+</dd>
+<dd><code>$result</code> - the result of the expression evaluation
+</dd>
+<dd><code>$error</code> - error string if expression evaluation fails
+</dd>
+</dl></dd></dl><hr>
+
+<a name='updateSlot'></a>
+<h3>updateSlot</h3>
+<pre>
+updateSlot($address, $linenumber)
+</pre><p>
+<dl>
+<dd>Update the current slot. Only updates linenumber and timestamp.
+May be called as either object or class method; in the latter case,
+caller must supply the ring's base address <i>(used within DB::DB()
+to optimize access speed)</i>
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$address</code> - <b><i>class method calls only</i></b>: base address of the ring
+</dd>
+<dd><code>$linenumber</code> - linenumber of current statement
+
+</dd>
+<dt><b>Returns:</b><dd>the Devel::RingBuffer::Ring object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='waitForCommand'></a>
+<h3>waitForCommand</h3>
+<pre>
+waitForCommand()
+</pre><p>
+<dl>
+<dd>Wait indefinitely for a command to be posted to the ring's command/message area.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the posted command and message
+</dd>
+</dl></dd></dl><hr>
+
+<a name='waitForResponse'></a>
+<h3>waitForResponse</h3>
+<pre>
+waitForResponse()
+</pre><p>
+<dl>
+<dd>Wait indefinitely for a response to be posted to the ring's command/message area.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the posted response and message
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Sun Aug 13 09:19:17 2006</i>
+</center>
+</small>
+</body>
+</html>

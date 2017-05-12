@@ -1,0 +1,178 @@
+#!/usr/bin/perl
+# Copyright (c) 2007-2009 David Caldwell,  All Rights Reserved. -*- perl -*-
+
+use warnings;
+use strict;
+use Getopt::Long;
+use Darcs::Notify;
+use Pod::Usage;
+
+my $smtp_server = "localhost";
+my $repo = '.';
+GetOptions('smtp-server=s' => \$smtp_server,
+           'r|repo=s'      => \$repo,
+           'h|help'        => sub { pod2usage(0) })
+    and scalar @ARGV or pod2usage();
+
+my @group = @ARGV;
+
+
+Darcs::Notify->new(repo => $repo,
+                   Email => { smtp_server => $smtp_server, to => [@group] })
+    ->notify;
+
+__END__
+
+=head1 NAME
+
+darcs-notify - Report darcs repository changes to an email list
+
+=head1 SYNOPSIS
+
+darcs-notify [options] <email> [<email> ...]
+
+  Options:
+    --smtp-server=<server>    Use a server other than "localhost".
+    -r | --repo=<repo-dir>    Use a repo other than the current directory.
+    -h | --help               Show some help.
+
+=head1 DESCRIPTION
+
+B<darcs-notify> compares the list of patches in a darcs repository
+against a saved backup copy and sends emails about the changes. The
+backup copy is stored in the file
+F<_darcs/third-party/darcs-notify/old-inventory>.
+
+=head1 USAGE
+
+One way to use darcs notify is to just run it periodically. Since it
+just compares the current list of patches against it's stored set it
+can run any time. If there is nothing to report, nothing will happen.
+
+However, typical usage is to install it into your darcs repo's post
+hooks so that it runs automatically when someone pushes, pulls, or
+unpulls some patches. To do this, edit your F<_darcs/prefs/defaults>
+file (you might need to create it if it's not there already) and add
+the following lines:
+
+  apply posthook darcs-notify <email>
+  apply run-posthook
+  pull posthook darcs-notify <email>
+  pull run-posthook
+  unpull posthook darcs-notify <email>
+  unpull run-posthook
+
+That assumes B<darcs-notify> is in your path. If it is not, then put
+its absolute path there. One technique is to place darcs-notify inside
+the F<_darcs/third-party/darcs-notify> directory (you might need to create it if
+you haven't run darcs-notify yet) and then use its relative path in
+the F<_darcs/prefs/defaults> file:
+
+  apply posthook _darcs/third-party/darcs-notify/darcs-notify <email>
+  apply run-posthook
+  pull posthook _darcs/third-party/darcs-notify/darcs-notify <email>
+  pull run-posthook
+  unpull posthook _darcs/third-party/darcs-notify/darcs-notify <email>
+  unpull run-posthook
+
+You should run B<darcs-notify> once manually on a repo before pushing
+or pulling to the repo. It won't do anything but set itself up.
+
+=head1 OPTIONS
+
+=over 4
+
+=item B<--help>
+
+Prints the help for the program and exits.
+
+=item B<--smtp-server>=<server>
+
+Use this option to choose which mailserver gets the notification
+emails. The default is "localhost".
+
+=item B<-r> <repo-dir>
+
+=item B<--repo>=<repo-dir>
+
+Operate on a specific repository. If this option is not specified then
+the current directory is used.
+
+You probably don't want to use this option, it's really only useful
+for testing.
+
+=back
+
+=head1 PATCH NOTIFICATIONS
+
+Currently there are 2 types of email notifications:
+
+=over 4
+
+=item B<New patch notifications>
+
+One email per new patch will be sent to each email address on the
+command line.  This email uses the patch name as a subject and
+contains the darcs patch synopsis (similar to 'darcs changes' output),
+the diffstat, and a universal diff of the patch itself. Here's an
+example from darcs-notify itself:
+
+  Subject: Explicitly skip the "pristine" line for clarity/documentation.
+  
+  Sun Dec 21 06:30:43 PST 2008 David Caldwell <david@porkrind.org>
+    * Explicitly skip the "pristine" line for clarity/documentation.
+  
+   darcs-notify |    1 +
+   1 file changed, 1 insertion(+)
+  
+  Sun Dec 21 06:30:43 PST 2008  David Caldwell <david@porkrind.org>
+    * Explicitly skil the "pristine" line for clarity/documentation.
+  diff -rN -u old-darcs-notify/darcs-notify new-darcs-notify/darcs-notify
+  --- old-darcs-notify/darcs-notify	2008-12-21 06:43:32.000000000 -0800
+  +++ new-darcs-notify/darcs-notify	2008-12-21 06:43:32.000000000 -0800
+  @@ -44,6 +44,7 @@
+       my (@patch, $patch);
+       open INV, "<", $filename or return ();
+       while (<INV>) {
+  +        next if /^pristine:$/ && !defined $patch;
+           $patch[-1] .= "\n$1" if /^(hash: .*)$/ && !defined $patch;
+           (push(@patch, $patch . ($1||"")), undef $patch) if s/^(.*\*[-*]\d{14})?\]//;
+           $patch = '' if s/^\s*\[//;
+
+=item B<Unpull notifications>
+
+A single email with the subject "[Unpulled
+patches]" containing all unpulled patches will be sent to each email
+address on the command line. Only the darcs patch synopsis is
+sent. Here is an example:
+
+  Subject: [Unpulled patches]
+  
+  Unpulled:
+  
+  Sun Dec 21 06:30:43 PST 2008 David Caldwell <david@porkrind.org>
+    * Explicitly skip the "pristine" line for clarity/documentation.
+  
+  Sun Dec 21 06:33:02 PST 2008 David Caldwell <david@porkrind.org>
+    * Add support for darcs-2 and hashed repos.
+
+=back
+
+Each email contains a "X-Darcs-Notify" header set to the name of the repo's
+directory. This allows you to filter it nicely if you so choose.
+
+=head1 COMPATIBILITY
+
+B<darcs-notify> is known to work with darcs-1 and darcs-2
+repositories, including the new "old format but hashed" repositories
+introduced in darcs 2.0.
+
+=head1 AUTHOR
+
+David Caldwell <david@porkrind.org>
+
+=head1 PROJECT HOME
+
+http://porkrind.org/darcs-notify/
+
+=cut

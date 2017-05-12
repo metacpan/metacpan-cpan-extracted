@@ -1,0 +1,49 @@
+---
+abstract: 'Ultra special pretty cute diff generator Mark II'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Difflet
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Difflet:
+    file: lib/Data/Difflet.pm
+    version: '0.11'
+  Test::Difflet:
+    file: lib/Test/Difflet.pm
+requires:
+  Term::ANSIColor: '0'
+  Test::More: '0.96'
+  parent: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/tokuhirom/Data-Difflet/issues
+  homepage: https://github.com/tokuhirom/Data-Difflet
+  repository: git://github.com/tokuhirom/Data-Difflet.git
+version: '0.11'
+x_contributors:
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Kozaki, Tsuneaki <kozaki.tsuneaki@gmail.com>'
+  - 'Takumi Akiyama <t.akiym@gmail.com>'
+  - 'Neil Bowers <neil@bowers.com>'
+  - 'HIROSE Masaaki <hirose31@gmail.com>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'

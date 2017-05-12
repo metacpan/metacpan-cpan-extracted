@@ -1,0 +1,4 @@
+CREATE TABLE posts (id INTEGER PRIMARY KEY AUTOINCREMENT, subject VARCHAR(255), body TEXT);
+INSERT INTO posts values (1, "Hello", "Hello World");
+INSERT INTO posts values (2, "Hello", "Hello, there.");
+INSERT INTO posts values (3, "Re: Hello", "What's up.");

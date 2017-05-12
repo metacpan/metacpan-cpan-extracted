@@ -1,0 +1,48 @@
+{
+   "abstract" : "chip driver for a F<nRF24L01+>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Chip-nRF24L01P",
+   "prereqs" : {
+      "runtime" : {
+         "requires" : {
+            "Data::Bitfield" : "0",
+            "Device::Chip" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::BusPirate::Chip::nRF24L01P" : {
+         "file" : "lib/Device/BusPirate/Chip/nRF24L01P.pm",
+         "version" : "0.03"
+      },
+      "Device::Chip::nRF24L01P" : {
+         "file" : "lib/Device/Chip/nRF24L01P.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

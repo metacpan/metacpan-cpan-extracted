@@ -1,0 +1,59 @@
+{
+   "abstract" : "Add a $AUTHORITY to your packages.",
+   "author" : [
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-PkgAuthority",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "5.006",
+            "Dist::Zilla::Role::FileGatherer" : "5.006",
+            "Dist::Zilla::Role::PrereqSource" : "5.006",
+            "Moose" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::DZil" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "autodie" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::PkgAuthority" : {
+         "file" : "lib/Dist/Zilla/Plugin/PkgAuthority.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Dist-Zilla-Plugin-PkgAuthority.git",
+         "web" : "https://github.com/manwar/Dist-Zilla-Plugin-PkgAuthority"
+      }
+   },
+   "version" : "0.05"
+}
+

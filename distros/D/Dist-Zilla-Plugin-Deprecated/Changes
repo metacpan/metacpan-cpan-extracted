@@ -1,0 +1,27 @@
+Revision history for Dist-Zilla-Plugin-Deprecated
+
+0.007     2016-11-13 07:12:24Z
+          - document some recommended practices when using this plugin
+
+0.006     2016-08-19 00:40:25Z
+          - minor documentation fix
+
+0.005     2016-03-17 03:42:22Z
+          - sort the list of deprecated modules, for repeatable dumped configs
+          - update documentation regarding the necessity of a
+            'provides'-providing plugin for the 'module' option
+
+0.004     2015-04-23 16:26:38Z
+          - fix test that behaves badly due to poor evaluation of "use if eval
+            { ... }", when older Dist::Zilla is present
+
+0.003     2015-04-19 07:34:15Z
+          - new "modules" option, to allow deprecating specific modules rather
+            than the entire distribution
+
+0.002     2015-01-07 23:26:28Z
+          - Added abstract.
+          - Added more info to DESCRIPTION.
+
+0.001     2015-01-07 22:53:06Z
+          - Initial release.

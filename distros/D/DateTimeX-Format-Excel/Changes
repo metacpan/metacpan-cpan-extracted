@@ -1,0 +1,150 @@
+Revision history for DateTimeX-Format-Excel
+
+Uses the change tracking convention
++ New feature.
+- Removed/deprecated feature.
+! Bug fix.
+* Place holder
+
+v0.14.0   2016-05-14 21:00:48-07:00 America/Los_Angeles
+
+	! Fix the commit tag since it was confusing
+
+v0.12.48  2016-05-14 20:23:47-07:00 America/Los_Angeles
+
+	! Fixed a Module::Runtime requirement fail  0.014 from 0.14
+	+ Added 5.22 test coverage to travis.yml
+
+v0.12.46  2016-05-13 16:37:55-07:00 America/Los_Angeles
+
+	+ Changed the dist.ini file back to using [AutoPrereqs]
+	+ Moved the one example to the examples folder
+	! remove string versions from the test requirements (They don't work on older perls)
+
+v0.12.44  2016-02-10 11:54:34-08:00 America/Los_Angeles
+
+	! Bump one more level to clean up tags
+
+v0.12.42  2016-02-10 10:21:07-08:00 America/Los_Angeles
+
+	! Fix the github release badge
+
+v0.12.40  2016-02-10 09:14:31-08:00 America/Los_Angeles
+
+	! Attempting (again) to resolve a final Kwalitee fail
+	+ Changed the Github tag to see if the version will update in MetaCPAN automatically
+	+ Updated the copyright to include 2016
+
+v0.12.38  2016-02-05 14:57:38-08:00 America/Los_Angeles
+
+	! Updates to make Meta.yml pass quality tests
+
+v0.12.36  2016-02-03 11:00:46-08:00 America/Los_Angeles
+
+	! Added Test::More Test::Moose and Test::Most as explicit test requirements
+		http://www.cpantesters.org/cpan/report/9bf81d0e-ca66-11e5-83d0-bbb58fb2e322
+
+v0.12.34  2016-02-02 11:49:23-08:00 America/Los_Angeles
+
+	! Eliminated AutoPrereqs and added a specific build Prereq to see if I can fix cpan testers fails
+		http://www.cpantesters.org/cpan/report/cd2a06fa-6c01-1014-9428-48b8d96804e4
+
+v0.12.32  2016-01-26 13:16:01-08:00 America/Los_Angeles
+
+	! Added test requires Module::Runtime = 0.014 to resolve a CPAN Testers fail
+
+v0.12.28  2015-09-29 09:25:26-07:00 America/Los_Angeles
+
+	! Added the configuration requirement for Moose 2.1213 before test since I got a weird fail for older moose when it was listed as installed
+	+ Additional badge changes
+	+ Changed the height of the kwalitee badge to better match the other badges
+	+ Changed the link in the perl 5.10+ badge to link to www.perl.org
+
+v0.12.26  2015-03-23 22:47:10-07:00 America/Los_Angeles
+
+	+ Added CPANTS and Minimum perl version badges
+	! Removed CPAN version badge
+	! Updated the Type::Tiny requirement to 1.000 from 0.046 to attempt to resolve a CPAN Testers bug
+
+v0.12.24  2015-03-16 14:59:38-07:00 America/Los_Angeles
+
+	+ Added coveralls testing in the .travis.yml file
+	+ Added a .travis.yml file to the github distro
+	+ Added Travis, Coveralls, and CPAN badges
+
+v0.12.22  2015-03-14 09:09:09-07:00 America/Los_Angeles
+
+	! Fixed some POD typos and errors
+
+v0.12.20  2015-03-13 23:26:00-07:00 America/Los_Angeles
+
+	+ Added more information about the date bug in excel based on information
+		that I found includeing correcly assigning the inital bug to VisiCalc
+	+ Added an explanation of how to use Type::Tiny to integrate text dates
+	+ Reordered the change log from newest to oldest (used to be oldest to newest)
+
+v0.12.18  2014-11-26 09:06:00-08:00 America/Los_Angeles
+
+	! explicitly added all the pre-requirements to the test stage to avoid failing a clean build
+
+v0.12.16  2014-11-24 11:32:37-08:00 America/Los_Angeles
+
+	! Fixed the version callout for the Types file in the Excel.pm file
+	! Removed the version module requirement
+
+v0.12.14  2014-11-24 11:10:36-08:00 America/Los_Angeles
+
+	! pushed the 'version' module requirement to 0.9909 in test to
+		see if I can fix some test loading fails
+
+v0.12.12  2014-11-19 11:08:18-08:00 America/Los_Angeles
+
+	+ Updated the minimum List::Util requirement for Test to 1.33
+
+v0.12.10  2014-11-13 15:31:18-08:00 America/Los_Angeles
+
+	! Updated the minimum List::Util requirement to 1.33
+	+ Upgraded the dist.ini and as a consequence the Readme.pod
+
+v0.12.8   2014-10-03 08:54:40-07:00 America/Los_Angeles
+
+	! Updated the minimum Moose requirements to avoid CPAN testers fails
+
+v0.12.6   2014-07-27 08:30:35-07:00 America/Los_Angeles
+
+	! Figured out how to turn off Type::Tiny::XS altogether in testing so that
+		Failures are constrained to issues with this package only (I hope)
+
+v0.12.4   2014-07-26 12:04:06-07:00 America/Los_Angeles
+
+	! Fixed missing test plans
+
+v0.12.2   2014-07-26 00:42:31-07:00 America/Los_Angeles
+
+	! Required Type::Tiny Version 0.046 to settle on error messages
+	! Required Type::Tiny::XS version 0.010 in testing but not installation
+
+v0.10.2   2014-07-24 20:53:24-07:00 America/Los_Angeles
+
+	+ Removed the alpha notice so the software is beta state
+	! The error is actually in Type::Tiny::XS  versions 0.009 and earlier
+
+v0.8.2    2014-07-10 18:57:27-07:00 America/Los_Angeles
+
+	! Fixed the resources links in the META files better
+	! Fixed a bug in the ExcelEpoch type where the empty string was not screened properly
+		This includes a test for the failure now
+
+v0.6.2    2014-07-10 09:17:54-07:00 America/Los_Angeles
+
+	+ Some POD updates
+	! Fixed the resources links in the META files
+
+v0.4.2    2014-04-21 12:43:50-07:00 America/Los_Angeles
+
+	+ Turned on use strict and use warnings - for Kwalitee
+	+ Added the minimum supported perl version at 5.010
+
+v0.2.4    2014-04-17 15:25:11 America/Los_Angeles
+
+	+ Initial release of an alternate calculation to DateTime::Format::Excel

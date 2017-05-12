@@ -1,0 +1,24 @@
+Revision history for Devel-IntelliPerl
+
+0.04    2009-12-12
+        - removed needless prereq
+
+0.03    2009-12-11
+        - applied #52649 (thanks to mgrimes)
+        - switched to Dist::Zilla
+
+0.02    2009-06-16
+        - Added Editor::Vim (thanks to M. Grimes)
+        - fixed infinite loop regarding update_inc (M. Grimes)
+        - works now with untitled documents
+        - changed TextMate script to redirect errors and warnings to /dev/null
+        - fancy context menu for choosing a method
+        - Removed Text::Table dependency (fixes failing tests)
+        - support for Types in Moose attributes
+        - support for MooseX::Method::Signatures' "returns" keyword
+        - Support for Union Types
+        
+
+0.01    2009-06-12
+        - First version, released on an unsuspecting world.
+

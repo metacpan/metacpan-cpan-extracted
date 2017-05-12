@@ -1,0 +1,9 @@
+Revision history for Digest-FNV-PurePerl
+
+0.03    2010-09-11 15:38:00 GMT-07
+        Better tests.  Used bigint where applicable.  Perl had some 32/64 bit math surprises for me.
+0.02    2010-09-04 22:03:21 GMT-07
+        Updated READMEs, PODs, etc. to change the auto-generated stuff to personalized stuff
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

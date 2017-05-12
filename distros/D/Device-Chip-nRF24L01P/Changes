@@ -1,0 +1,17 @@
+Revision history for Device-Chip-nRF24L01P
+
+0.03    2016/12/18 23:30:41
+        [BUGFIXES]
+         * Add Test::Device::Chip::Adapter as a test-time dependency
+
+0.02    2016/12/10 23:05:25
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::nRF24L01P
+         * Changed to implement Device::Chip interface
+         * Use Data::Bitfield to simplify config bit manipulation code
+
+Previously, this distribution was called Device-BusPirate-Chip-nRF24L01P
+
+0.01    2014/09/22
+        First version, released on an unsuspecting world.
+

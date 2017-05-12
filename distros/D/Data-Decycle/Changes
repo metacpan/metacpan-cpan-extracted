@@ -1,0 +1,13 @@
+#
+# $Id: Changes,v 0.2 2010/08/23 09:11:03 dankogai Exp dankogai $
+# 
+$Revision: 0.2 $ $Date: 2010/08/23 09:11:03 $
++ Makefile.PL
+- MANIFEST.skip
+! lib/Data/Decycle.pm
+  * Makefle.PL was missing from distro (ouch!)
+  * POD fixes.
+
+0.01 2010/08/22 19:58:45
++ *
+  First release.

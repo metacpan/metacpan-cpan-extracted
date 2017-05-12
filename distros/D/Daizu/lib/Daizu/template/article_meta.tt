@@ -1,0 +1,3 @@
+<div class="entry-meta">
+ [% INCLUDE 'article_meta/description.tt' %]
+</div>

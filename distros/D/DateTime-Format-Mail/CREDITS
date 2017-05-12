@@ -1,0 +1,31 @@
+CREDITS
+
+Here is a list of people and their CPAN id, extracted from various
+places.  These people have either submitted patches or suggestions,
+or their bug reports or comments have inspired the appropriate
+patches.  Corrections, additions, deletions welcome:
+
+
+By Philippe Bruhat  (BOOK)
+
+* Julian Mehnle (JMEHNLE) for reporting that day name is optional, even
+  with strict parsing. Fixed during Dave Rolsky (DROLSKY) maintainership.
+
+* Neil Bowers (NEILB) for starting a CPAN-curating trend that led me to
+  look for modules to adopt. DateTime::Format::Mail was the first one.
+
+* IKEDA Soji (NEZUMI) for noting the difference between "-0000" and "+0000"
+  in the timezone and that the usual format for days in the RFC examples
+  didn't have a leading "0".
+
+
+By Iain Truskett (SPOON)
+
+* Dave Rolsky (DROLSKY) for kickstarting the DateTime project.
+
+* Roderick A. Anderson for noting where the documentation was incomplete
+  in places.
+
+* Joshua Hoblitt (JHOBLITT) for inspiring me to check what the
+  standard said about interpreting two digit years.
+

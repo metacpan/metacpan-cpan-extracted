@@ -1,0 +1,16 @@
+0.004     2013-12-14 00:06:00 Europe/Helsinki
+    * Flush input to prevent slowing down.
+    * Device as the first param to for example/christmas-blinking.pl
+
+0.003     2013-12-12 22:47:00 Europe/Helsinki
+
+    * Send the show command in a triplet so that BlinkyTape doesn't wait for the next two bytes.
+    * Added a new example and refined the earlier example.
+
+0.002     2013-12-12 00:51:00 Europe/Helsinki
+
+    * Fixes a freeze when bytes were sent too fast.
+
+0.001     2013-07-04 00:30:00 Europe/Helsinki
+
+    * Initial release.

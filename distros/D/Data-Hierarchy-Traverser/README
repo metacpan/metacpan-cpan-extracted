@@ -1,0 +1,29 @@
+Data-Hierarchy-Traverser version 0.01
+=====================================
+
+This module export one recursive function hierarchy_traverse, which traverses a hierarchy structure in the depth-first fashion.
+
+Caution: As it is a recursive function, pay attention of the usage of gobal variables such as $_, <FH>.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Some simple examples are listed in the module. Use perldoc Data::Hierarchy::Traverser
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2007 by Ge Peng
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

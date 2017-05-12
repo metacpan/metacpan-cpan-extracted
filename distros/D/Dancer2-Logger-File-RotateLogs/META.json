@@ -1,0 +1,79 @@
+{
+   "abstract" : "an automated logrotate.",
+   "author" : [
+      "Masaaki Saito <masakyst.public@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Logger-File-RotateLogs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.161000",
+            "File::RotateLogs" : "0.07",
+            "perl" : "5.010_001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Logger::File::RotateLogs" : {
+         "file" : "lib/Dancer2/Logger/File/RotateLogs.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/masakyst/Dancer2-Logger-File-RotateLogs/issues"
+      },
+      "homepage" : "https://github.com/masakyst/Dancer2-Logger-File-RotateLogs",
+      "repository" : {
+         "url" : "git://github.com/masakyst/Dancer2-Logger-File-RotateLogs.git",
+         "web" : "https://github.com/masakyst/Dancer2-Logger-File-RotateLogs"
+      }
+   },
+   "version" : "0.01",
+   "x_authority" : "cpan:MASAKYST",
+   "x_contributors" : [
+      "Masaaki Saito <masakyst.mobile@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

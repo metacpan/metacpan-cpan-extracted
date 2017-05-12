@@ -1,0 +1,11 @@
+Changes
+=======
+
+0.00003 2014-11-05T21:46:53Z
+    - Use Class::Load instead of Class::MOP (#1 and #2)
+
+0.00002
+    - Oops, apparently release without any Changes
+
+0.00001 - Oct 02 2009
+    - Initial release

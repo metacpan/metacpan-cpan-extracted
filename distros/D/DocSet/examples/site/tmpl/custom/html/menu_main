@@ -1,0 +1,66 @@
+[%- # main menu
+    # expects to be set:
+    # nav          - cache navigator object
+    # rel_doc_root - relative docs path (only for chapters!)
+
+    # collect the top level data
+    # first go up to the absolute root
+    l = nav; # remember last valid node 
+    p = nav.up;
+    WHILE p;
+        l = p;
+        p = p.up;
+    END;
+
+    p = l; # last valid node
+    IF p.parent_rel_path.defined;
+        prefix = p.parent_rel_path;
+    ELSE;
+        prefix = ".";
+    END;
+    IF rel_doc_root.defined;
+        prefix = "$prefix/$rel_doc_root";
+    END;
+
+    # walk through the top level nodes
+    count = 0;
+    selected = 0;
+    current = p;
+    buttons = [];
+    p = p.first;
+    WHILE p;
+       count = count + 1;
+       link = INCLUDE link prefix=prefix link=p.meta.link;
+       IF p.id == current.id;
+           style = 'selectedmenuitem';
+           td_style = 'sel-bg';
+       ELSE;
+           style = 'nonselectedmenuitem';
+           td_style = 'non-sel-bg';
+       END;
+       buttons.push({link => link, text => p.meta.stitle, style => style, td_style => td_style});
+       p = p.next; # next node
+    END;
+    -%]
+
+[%- WRAPPER wrap_box 
+        title = '<a href="http://perl.apache.org/">perl.apache.org</a>';
+-%]
+
+[%- FOREACH but = buttons -%]
+
+        <tr>
+            <td class="menu-border"><br></td>
+            <td class="[%- but.td_style -%]">
+                <div class="[%- but.style -%]">
+                    <a href="[%- but.link -%]">[%- but.text -%]</a>
+                </div>
+            </td>
+            <td class="menu-border"><br></td>
+        </tr>
+[%- END -%]
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+[%- END -%]

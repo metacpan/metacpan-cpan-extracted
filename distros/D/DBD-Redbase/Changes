@@ -1,0 +1,11 @@
+Revision history for Perl extension DBD::Redbase.
+
+0.21  Tue Oct 21 2003
+	- Minor changes related to release of driver on CPAN
+
+0.21  Mon Aug 19 2002
+	- Minor, cosmetic changes
+
+0.20  Mon Aug 19 2002
+	- Virst public release
+

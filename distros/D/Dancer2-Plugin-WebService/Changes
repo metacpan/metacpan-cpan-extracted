@@ -1,0 +1,37 @@
+3.014  2017-05-05 01:00:00
+
+  - New code for retrieving Os info for built-in route info/version
+  - Documentation fixes
+  - method  set_data_user  does not return defined keys as hash; it was a useless feature
+  - Add a new INTERNAL authenication method. This does not use external scripts
+  - Authentication 'Always allow login for testing' replaced from the INTERNAL simple
+  - Add support for <any> user and <any> password at INTERNAL simple
+
+3.012  2017-04-21 01:00:00
+
+  - Re-package it using Dist::Zilla instead of ExtUtils::MakeMaker
+    because Somehow CPAN do not show the pod documentation if the
+    modules is build with ExtUtils::MakeMaker
+  - Replacing the                %{ $plugin->data_user }{ @keys }
+    using the two times slower   map {$_, $plugin->data_user->{$_}} @keys
+    only for passing the nosense CPAN auto tests ...
+
+3.000  2016-09-01 20:00:00
+
+  - Re-written as a Dancer2 plugin
+  - login / logout
+  - Plugable authorization scripts
+  - Sessions
+  - Persistent data
+
+2.000  2016-05-01 20:00:00
+
+  - Rewritten using Dancer2
+
+1.000  2012-01-15 20:00:00
+
+  - User can register his own code to executed from the server
+
+0.001  2011-01-15 20:00:00+02:00 Europe/Athens
+
+  - Initial release using the CGI module

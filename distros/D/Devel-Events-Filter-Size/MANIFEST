@@ -1,0 +1,7 @@
+lib/Devel/Events/Filter/Size.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/024_filter_size.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

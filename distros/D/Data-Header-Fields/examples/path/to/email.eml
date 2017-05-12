@@ -1,0 +1,61 @@
+Return-Path: <bratislava-pm-bounces+jozef=kutej.net@pm.org>
+X-Spam-Checker-Version: SpamAssassin 3.2.5 (2008-06-10) on rabbit.int.meon.sk
+X-Spam-Level: 
+X-Spam-Status: No, score=-7.6 required=4.0 tests=AWL,BAYES_00,RCVD_IN_DNSWL_HI
+	autolearn=ham version=3.2.5
+X-Original-To: jozef@kutej.net
+Delivered-To: jkmail@rabbit.int.meon.sk
+Received: from x6.develooper.com (x6.develooper.com [207.171.7.86])
+	by mail.meon.sk (Postfix) with ESMTP id 617D814576
+	for <jozef@kutej.net>; Fri, 12 Nov 2010 09:16:02 +0100 (CET)
+Received: from x6.develooper.com (localhost.localdomain [127.0.0.1])
+	by x6.develooper.com (Postfix) with ESMTP id A95FD1778D
+	for <jozef@kutej.net>; Fri, 12 Nov 2010 00:16:11 -0800 (PST)
+Delivered-To: mailman-bratislava-pm@mailman.pm.dev
+Received: (qmail 6986 invoked from network); 12 Nov 2010 08:16:08 -0000
+Received: from x1.develooper.com (207.171.7.70)
+	by x6.develooper.com with SMTP; 12 Nov 2010 08:16:08 -0000
+Received: (qmail 4214 invoked by uid 225); 12 Nov 2010 08:16:08 -0000
+Delivered-To: bratislava-pm@pm.org
+Received: (qmail 4209 invoked by uid 103); 12 Nov 2010 08:16:08 -0000
+Received: from x16.dev (10.0.100.26)
+	by x1.dev with QMQP; 12 Nov 2010 08:16:08 -0000
+Received: from koala.meon.sk (HELO mail.meon.sk) (109.72.0.66)
+	by 16.mx.develooper.com (qpsmtpd/0.80) with ESMTP;
+	Fri, 12 Nov 2010 00:16:03 -0800
+Received: from [192.168.240.161] (unknown [192.168.240.161])
+	by mail.meon.sk (Postfix) with ESMTP id 9AB6E14576
+	for <bratislava-pm@pm.org>; Fri, 12 Nov 2010 09:15:48 +0100 (CET)
+Message-ID: <4CDCF7BF.20803@kutej.net>
+Date: Fri, 12 Nov 2010 09:15:59 +0100
+From: Jozef Kutej <jozef@kutej.net>
+User-Agent: Mozilla/5.0 (X11; U; Linux i686; en-US;
+	rv:1.9.1.15) Gecko/20101030 Iceowl/1.0b1 Icedove/3.0.10
+MIME-Version: 1.0
+To: "bratislava-pm@pm.org" <bratislava-pm@pm.org>
+X-Enigmail-Version: 1.0.1
+Subject: [Bratislava-pm] Modern Perl by chromatic
+X-BeenThere: bratislava-pm@pm.org
+X-Mailman-Version: 2.1.11
+Precedence: list
+List-Id: <bratislava-pm.pm.org>
+List-Unsubscribe: <http://mail.pm.org/mailman/options/bratislava-pm>,
+	<mailto:bratislava-pm-request@pm.org?subject=unsubscribe>
+List-Archive: <http://mail.pm.org/pipermail/bratislava-pm>
+List-Post: <mailto:bratislava-pm@pm.org>
+List-Help: <mailto:bratislava-pm-request@pm.org?subject=help>
+List-Subscribe: <http://mail.pm.org/mailman/listinfo/bratislava-pm>,
+	<mailto:bratislava-pm-request@pm.org?subject=subscribe>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
+Sender: bratislava-pm-bounces+jozef=kutej.net@pm.org
+Errors-To: bratislava-pm-bounces+jozef=kutej.net@pm.org
+
+QWhvanRlLAoKdnnFoWxhIG5vdsOhIGtuacW+a2EgIk1vZGVybiBQZXJsIiBhIGplIGFqIHZvbG5l
+IGRvc3R1cG7DoSBha28gUERGOgoKaHR0cDovL3d3dy5vbnl4bmVvbi5jb20vYm9va3MvbW9kZXJu
+X3BlcmwvaW5kZXguaHRtbAoKInpkcm9qw6FreSIgayBuZWogc8O6IHR1OgoKaHR0cHM6Ly9naXRo
+dWIuY29tL2Nocm9tYXRpYy9tb2Rlcm5fcGVybF9ib29rCgpQZWtuw70gZGXFiCwKSm96ZWYKCl9f
+X19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fX19fCkJyYXRpc2xhdmEt
+cG0gbWFpbGluZyBsaXN0CkJyYXRpc2xhdmEtcG1AcG0ub3JnCmh0dHA6Ly9tYWlsLnBtLm9yZy9t
+YWlsbWFuL2xpc3RpbmZvL2JyYXRpc2xhdmEtcG0K
+

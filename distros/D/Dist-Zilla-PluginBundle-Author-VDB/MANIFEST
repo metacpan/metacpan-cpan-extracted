@@ -1,0 +1,31 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                                         #                          3rd party file built by ModuleBuildTiny
+COPYING                                          # Dist-Zilla-PluginBundle-Author-VDB file built by GenerateFile
+Changes                                          # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+GPLv3                                            # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+MANIFEST                                         #                           metainfo file built by Manifest::Write
+META.json                                        #                           metainfo file built by MetaJSON
+META.yml                                         #                           metainfo file built by MetaYAML
+README                                           # Dist-Zilla-PluginBundle-Author-VDB file built by GenerateFile
+VERSION                                          # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Hg/Commit.pm    # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Hg/Push.pm      # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Hg/Status.pm    # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Hg/Tag/Add.pm   # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Hg/Tag/Check.pm # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Version/Bump.pm # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Plugin/Author/VDB/Version/Read.pm # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/PluginBundle/Author/VDB.pm        # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Role/Author/VDB/HgRunner.pm       # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+lib/Dist/Zilla/Role/Author/VDB/ProgramRunner.pm  # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/00-compile.t                                   #                          3rd party file built by Test::Compile
+t/build.t                                        # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/hg-commit.t                                    # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/hg-push.t                                      # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/hg-status.t                                    # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/hg-tag-add.t                                   # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/hg-tag-check.t                                 # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/lib/AfterRelease.pm                            # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/lib/BeforeBuild.pm                             # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/version-bump.t                                 # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read
+t/version-read.t                                 # Dist-Zilla-PluginBundle-Author-VDB file added by Manifest::Read

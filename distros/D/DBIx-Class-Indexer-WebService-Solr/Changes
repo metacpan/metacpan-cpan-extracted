@@ -1,0 +1,7 @@
+Revision history for Perl extension DBIx::Class::Indexer::WebService::Solr.
+
+0.02  Thu Nov 19 2009
+    - repackaged with a new version of Module::Install
+
+0.01  Tue Oct 14 2008
+    - original version;

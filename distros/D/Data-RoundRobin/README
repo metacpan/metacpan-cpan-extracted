@@ -1,0 +1,41 @@
+NAME
+      Data::RoundRobin - Serve data in a round robin manner.
+
+SYNOPSIS
+      my @array = qw(a b);
+      # OO Interface
+      my $rr = Data::RoundRobin->new(@array);
+
+      print $rr->next; # a
+      print $rr->next; # b
+      print $rr->next; # a
+      print $rr->next; # b
+      ...
+
+      # Infinite Loop
+      while(my $elem = $rr->next) {
+         ...
+      }
+
+DESCRIPTION
+    This module provides a round roubin object implementation. It is similar
+    to an iterator, only the internal counter is reset to the begining
+    whenever it reaches the end. It might also be considered as a circular
+    iterator.
+
+INSTALLATION
+
+    The way to install this module is just like all other CPAN modules:
+
+    perl Makefile.PL
+    make
+    sudo make install
+
+COPYRIGHT
+    Copyright 2006 by Kang-min Liu <gugod@gugod.org>.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

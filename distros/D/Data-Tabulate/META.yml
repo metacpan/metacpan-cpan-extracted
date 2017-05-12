@@ -1,0 +1,24 @@
+---
+abstract: 'Table generation!'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Tabulate
+requires:
+  Carp: '0'
+  Test::Builder: '0'
+  Test::CheckManifest: '1.22'
+  perl: '5.006001'
+resources:
+  bugtracker: http://github.com/reneeb/Data-Tabulate/issues
+  homepage: http://github.com/reneeb/Data-Tabulate
+  repository: http://github.com/reneeb/Data-Tabulate.git
+version: '0.07'

@@ -1,0 +1,4 @@
+{
+    "foo": "Welcome to [% my %] world.\nIt is a nice [%place %].",
+    "bar": "Welcome to :my world.\nIt is a nice :place."
+}

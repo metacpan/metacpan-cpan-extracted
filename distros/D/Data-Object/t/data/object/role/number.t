@@ -1,0 +1,41 @@
+use strict;
+use warnings;
+use Test::More;
+
+use_ok 'Data::Object::Role::Number';
+
+can_ok 'Data::Object::Role::Number', 'abs';
+can_ok 'Data::Object::Role::Number', 'atan2';
+can_ok 'Data::Object::Role::Number', 'cos';
+can_ok 'Data::Object::Role::Number', 'data';
+can_ok 'Data::Object::Role::Number', 'decr';
+can_ok 'Data::Object::Role::Number', 'defined';
+can_ok 'Data::Object::Role::Number', 'detract';
+can_ok 'Data::Object::Role::Number', 'downto';
+can_ok 'Data::Object::Role::Number', 'dump';
+can_ok 'Data::Object::Role::Number', 'eq';
+can_ok 'Data::Object::Role::Number', 'exp';
+can_ok 'Data::Object::Role::Number', 'ge';
+can_ok 'Data::Object::Role::Number', 'gt';
+can_ok 'Data::Object::Role::Number', 'hex';
+can_ok 'Data::Object::Role::Number', 'incr';
+can_ok 'Data::Object::Role::Number', 'int';
+can_ok 'Data::Object::Role::Number', 'le';
+can_ok 'Data::Object::Role::Number', 'log';
+can_ok 'Data::Object::Role::Number', 'lt';
+can_ok 'Data::Object::Role::Number', 'methods';
+can_ok 'Data::Object::Role::Number', 'mod';
+can_ok 'Data::Object::Role::Number', 'ne';
+can_ok 'Data::Object::Role::Number', 'neg';
+can_ok 'Data::Object::Role::Number', 'pow';
+can_ok 'Data::Object::Role::Number', 'print';
+can_ok 'Data::Object::Role::Number', 'roles';
+can_ok 'Data::Object::Role::Number', 'say';
+can_ok 'Data::Object::Role::Number', 'sin';
+can_ok 'Data::Object::Role::Number', 'sqrt';
+can_ok 'Data::Object::Role::Number', 'throw';
+can_ok 'Data::Object::Role::Number', 'to';
+can_ok 'Data::Object::Role::Number', 'type';
+can_ok 'Data::Object::Role::Number', 'upto';
+
+ok 1 and done_testing;

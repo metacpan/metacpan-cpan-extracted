@@ -1,0 +1,20 @@
+Revision history for Perl extension Data::Validate::Email.
+
+0.05  20170213
+	- Allowed pluses in usernames per request from Adriano Ferreira (https://github.com/aferreira)
+    
+0.04  20061204
+	- added second argument to is_email and is_domain, passing both through to Data::Validate::Domain
+
+0.03  20050708
+	- changed is_email to use is_username and is_domain to do its work
+	they previously had different behaviors when it came to underscores in a domain name.
+	Thanks to Doran for the bug report.
+	- changed is_domain to be a passthrough to Neil Neely's Data::Validate::Domain module
+
+0.02  20050420
+	- fixed error in the POD examples.  Thanks to Philip McCarthy for the bug report.
+
+0.01  20041214
+	- original version
+

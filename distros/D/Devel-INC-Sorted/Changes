@@ -1,0 +1,11 @@
+Revision history for Devel-INC-Sorted
+
+0.03      2016-09-08 03:04:35Z
+              - fix use of Exporter that breaks with newer Test::More in tests
+                (RT#117544)
+
+0.02          2008-06-26
+              - Requires Perl 5.8 and above (stable sort)
+
+0.01          2008-01-29
+              - Initial release

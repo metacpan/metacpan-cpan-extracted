@@ -1,0 +1,14 @@
+Changes
+Digest.pm
+Digest/base.pm
+Digest/file.pm
+digest-bench
+MANIFEST
+Makefile.PL
+README
+t/base.t
+t/digest.t
+t/file.t
+t/lib/Digest/Dummy.pm
+t/security.t
+META.yml                                 Module meta-data (added by MakeMaker)

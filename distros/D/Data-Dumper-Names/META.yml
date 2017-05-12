@@ -1,0 +1,21 @@
+---
+name: Data-Dumper-Names
+version: 0.03
+author:
+  - 'Curtis <ovid@cpan.org>'
+abstract: Dump variables with names (no source filter)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  PadWalker: 0.13
+  Scalar::Util: 0
+  Test::More: 0
+provides:
+  Data::Dumper::Names:
+    file: lib/Data/Dumper/Names.pm
+    version: 0.03
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

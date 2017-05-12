@@ -1,0 +1,249 @@
+{
+   "abstract" : "Template::Alloy wrapper for Dancer",
+   "author" : [
+      "Daniel Pittman <daniel@rimspace.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 3.101461",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://github.com/dagolden/cpan-meta/",
+      "version" : 2
+   },
+   "name" : "Dancer-Template-Alloy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.1801",
+            "Dancer::Config" : "0",
+            "Dancer::FileUtils" : "0",
+            "Dancer::ModuleLoader" : "0",
+            "Dancer::Template::Abstract" : "0",
+            "Template::Alloy" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer" : "1.1801",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "version" : "1.02",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::BumpVersionFromGit",
+            "name" : "@DANIELP/BumpVersionFromGit",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@DANIELP/GatherDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@DANIELP/ExecDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@DANIELP/ShareDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@DANIELP/PruneCruft",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@DANIELP/ManifestSkip",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereq",
+            "name" : "@DANIELP/AutoPrereq",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@DANIELP/PkgVersion",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodVersion",
+            "name" : "@DANIELP/PodVersion",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReportVersions::Tiny",
+            "name" : "@DANIELP/ReportVersions::Tiny",
+            "version" : "1.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CompileTests",
+            "name" : "@DANIELP/CompileTests",
+            "version" : "1.100740"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::HasVersionTests",
+            "name" : "@DANIELP/HasVersionTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaTests",
+            "name" : "@DANIELP/MetaTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MinimumVersionTests",
+            "name" : "@DANIELP/MinimumVersionTests",
+            "version" : "1.101421"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PortabilityTests",
+            "name" : "@DANIELP/PortabilityTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::SynopsisTests",
+            "name" : "@DANIELP/SynopsisTests",
+            "version" : "1.101420"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@DANIELP/PodSyntaxTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UnusedVarsTests",
+            "name" : "@DANIELP/UnusedVarsTests",
+            "version" : "1.100860"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@DANIELP/ExtraTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@DANIELP/MetaConfig",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@DANIELP/MetaYAML",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@DANIELP/MetaJSON",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@DANIELP/License",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@DANIELP/Readme",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@DANIELP/MakeMaker",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ChangelogFromGit",
+            "name" : "@DANIELP/ChangelogFromGit",
+            "version" : "0.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@DANIELP/Manifest",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@DANIELP/Git::Check",
+            "version" : "1.100760"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@DANIELP/TestRelease",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@DANIELP/ConfirmRelease",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@DANIELP/Git::Commit",
+            "version" : "1.100760"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@DANIELP/Git::Tag",
+            "version" : "1.100760"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@DANIELP/UploadToCPAN",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereq",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereq" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereq",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "3.101461"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "3.101461"
+      }
+   }
+}
+

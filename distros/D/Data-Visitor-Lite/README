@@ -1,0 +1,89 @@
+NAME
+    Data::Visitor::Lite - an easy implementation of Data::Visitor::Callback
+
+SYNOPSIS
+        use Data::Visitor::Lite;
+        my $visitor = Data::Visitor::Lite->new(@replacers);
+
+        my $value = $visitor->visit({ 
+          # some structure
+        });
+
+DESCRIPTION
+    Data::Visitor::Lite is an easy implementation of Data::Visitor::Callback
+
+new(@replacers)
+    this is a constructor of Data::Visitor::Lite.
+
+        my $visitor = Data::Visitor::Lite->new(
+            [   -implements => ['to_plain_object'] =>
+                    sub { $_[0]->to_plain_object }
+            ],
+            [ -instance => 'Some::SuperClass' => sub { $_[0]->encode_to_utf8 } ]
+            [ $replacer_type => $converter ]
+        );
+        #or
+
+        my $visitor2 = Data::Visitor::Lite->new(sub{
+            # callback all node of the structure
+        });
+        my $value = $visitor->visit({ something });
+
+replacer type
+    Data::Visitor::Lite has many expressions to make replacer which is
+    applied only specified data type.
+
+  -implements
+    If you want to convert only the objects that implements
+    'to_plain_object', you can write just following :
+
+        my $visitor = Data::Visitor::Lite->new(
+            [   -implements => ['to_plain_object'] => sub {
+                    return $_[0]->to_plain_object;
+                    }
+            ]
+        );
+
+    it means it is easy to convert structures using duck typing.
+
+  -instance
+    "-instance" replacer type is able to create a converter for all
+    instances of some class in the recursive structure.
+
+        my $visitor = Data::Visitor::Lite->new(
+            [ -instance => 'Person' => sub{ $_[0]->nickname }]
+        );
+
+        $visitor->visit({
+            master => Employer->new({ nickname => 'Kenji'}),
+            slave  => Employee->new({ nickname => 'Daichi'});
+        });
+
+        # { master => "Kenji", slave => 'Daichi'}
+
+  -value
+    "-value" means not a reference and/or blessed object.
+
+  -hashkey
+    "-hashkey" means key string of the hash reference in the structure.
+
+  -string
+    "-string" means hash keys and all string value in the structure.
+
+  -object
+    "-object" means a reference and/or blessed object
+
+  other types
+    the origin of other replace types is Data::Util.( e.g. glob_ref ,
+    scalar_ref, invocant , number ,integer and so on )
+
+AUTHOR
+    Daichi Hiroki <hirokidaichi {at} gmail.com>
+
+SEE ALSO
+    Data::Visitor::Callback Data::Util
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

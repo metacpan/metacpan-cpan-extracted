@@ -1,0 +1,8 @@
+*) To make tests
+
+*) Supports Dancer::Plugin::Database for easy multiple connections
+   Now you can use a multiple connections as database('foo')
+   but i want to allow to define a name of connection through
+   this pluging settings and to use in sources as database()
+
+*) To make correct working of Dancer::Plugin::Cache::CHI for this plugin

@@ -1,0 +1,99 @@
+<body xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:daizu="http://www.daizucms.org/ns/html-extension/"
+      xmlns:xi="http://www.w3.org/2001/XInclude"
+      xml:base="daizu:///foo.com/blog/2006/fish-fingers/article-1.html"
+><p>A short paragraph.</p>
+
+
+<p>A long paragraph:
+
+Given an XHTML document (as an L&lt;XML::LibXML::Document&gt; object), find all the attributes in the markup which are relative URLs and turn them
+into absolute URLs relative to C&lt;$base_url&gt;.  This can be used to prepare
+content from an article to be published in a different place with a different
+URL, such as in an RSS feed or on an index page, while ensuring that any links or embedded files continue to work.
+
+</p>
+
+
+	  <p>extra whitespace around it</p>  
+
+<p>Bullet list:</p>
+<ul>
+ <li>List item 1</li>
+  <li>List item 2 
+    <ul><li>List item 2.1</li><li> List item 2.2</li></ul>
+</li>
+<li>List item&#xA0;3</li>
+</ul> 
+
+<p>Numbered list:</p>
+<ol>
+ <li>List item 1</li>
+  <li>List item 2 
+    <ol><li>List item 2.1</li><li> List item 2.2</li></ol>
+</li>
+<li>List item&#xA0;3</li>
+</ol> 
+
+<p>Bullet list containing block markup:</p>
+
+<ul>
+ <li>
+  <p>Here is a nested list:</p>
+  <ul>
+   <li>
+    <p>This indented list item contains quite a lot of text, broken up
+     into two paragraphs.  The second paragraph is just some prose from
+     the Daizu API documentation.</p>
+    <p>Return a <em>string</em> version of the DateTime object, formatted as a
+     W3CDTF date and time.  If $datetime
+     is just a string, it is automatically validated and parsed by
+     validate_date() first.  If the value is invalid
+     or undefined, then <code>undef</code> is returned.</p>
+   </li>
+  </ul>
+  <p>Another paragraph after the nested list.</p>
+ </li>
+</ul>
+
+<p>Special chars should be preserved:
+	&#8216;single quotes&#8217;
+	&#8220;double quotes&#8221;
+	en&#8211;dash
+	em&#8212;dash
+</p>
+
+<blockquote>text inside blockquote element</blockquote>
+
+<blockquote><p>A long paragraph inside a blockquote:
+Most access to Daizu functionality requires a Daizu object.  It provides
+a database handle for access to the 'live' content data, and a L&lt;SVN::Ra&gt;
+object for access to the Subversion repository.
+</p>
+<p>another paragraph</p>
+<blockquote>nested blockquote</blockquote>
+</blockquote>
+
+<p>A pre element containing some code, syntax highlighted (but the extra
+span elements can be safely ignored when converting to text):</p>
+<pre>
+<span class="synStatement">sub</span><span class="synIdentifier"> add_html_dom_filter</span>
+{
+    <span class="synStatement">my</span> (<span class="synIdentifier">$self</span>, <span class="synIdentifier">$object</span>, <span class="synIdentifier">$method</span>) = <span class="synIdentifier">@_</span>;
+    <span class="synStatement">push</span> <span class="synIdentifier">@{$self-&gt;{</span><span class="synConstant">html_dom_filters</span><span class="synIdentifier">}}</span>, [ <span class="synIdentifier">$object</span> =&gt; <span class="synIdentifier">$method</span> ];
+}
+</pre>
+
+<div class="paragraph"><q>quoted text</q></div>
+
+<p>simulated with Unicode chars:<br/>
+ sup: x<sup>123+4567890=(i)</sup>, sub: H<sub>2−γ</sub>O</p>
+
+<p>can't be simulated:<br/>
+ sup: x<sup>%$#123</sup>, sub: H<sub>@</sub>O</p>
+
+<p>Mark<b>up</b> with<em> unusual </em>white<span/>space arrange<u>ment</u>.</p>
+
+<p>Images: alt=[<img src="foo.png" alt=" foo bar " />]
+         noalt=[<img src="bar.png" alt="" />]</p>
+</body>

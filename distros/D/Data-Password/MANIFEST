@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+Password.pm
+t/IsBadPasswordForUNIX.t
+t/IsBadPasswordChar.t
+t/IsBadPassword.t
+t/words					Dummy dictionary for tests
+README
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

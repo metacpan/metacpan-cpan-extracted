@@ -1,0 +1,191 @@
+Revision history for Perl extension Dir::Split.
+
+0.80 Sat Feb 16 13:18:05 CET 2008
+
+ - Added test-file split.t.
+
+ - Revised the code for excluding '.' and '..'.
+
+ - Removed dependency upon a certain perl version.
+
+ - Reformatted scripts/dir-split.pl.
+
+0.79 Thu Dec 20 21:30:14 CET 2007
+
+ - Fixed a bug (don't remove the first two files from the list,
+   assuming we have '.' and '..', use grep instead).
+
+ - Refined documentation (formatting) and code layout.
+
+0.77 Sun Mar 19 22:14:55 CET 2006
+
+ - Both internal routines which are crucial to moving files,
+   _mov_num() and _mov_char(), detect now whether multiple files
+   with the same filename exist; if so, "duplicates" are attached
+   a numeric suffix which starts at 1 and is subsequently auto-
+   incremented.
+
+ - Added INSTALL containing install instructions.
+
+ - Removed now stale testfile Dir-Split.t.
+
+0.75 2005/03/06
+
+ - Merged to method calls/OO.
+
+ - Documentation clean-up.
+
+ - Added further $TRACKING_* options.
+
+0.67 2004/02/01
+
+ - Minor code additions.
+
+0.61 2004/01/18
+
+ - Simplified interface options.
+
+0.60 2004/01/17
+
+ - Minor changes.
+
+0.58 2004/01/16
+
+ - Object constructor removed; functions are exportable.
+
+0.54 2004/01/13
+
+ - File::Find traverses directories.
+
+0.51 2004/01/10
+
+ - bin/split.pl updated.
+
+0.49 2004/01/07
+
+ - Removing directories will be abandoned in traversal mode if
+   a traversal depth has been set or files weren't previously
+   unlinked.
+
+0.48 2004/01/07
+
+ - Traversal processing implemented.
+
+0.42 2004/01/05
+
+ - The constructor new() accepts either a hash ref or a hash dump.
+
+0.40 2004/01/05
+
+ - Non-class data is cleaned up.
+
+0.39 2004/01/04
+
+ - Heavy code refactoring.
+
+ - Added introductional description of numeric & characteristic
+   splitting and faq to documentation.
+
+ - Characteristic suffixes may have a variable length;
+   explanation added.
+
+0.38 2004/01/04
+
+ - Debug data upon existing files / copy & unlink failures available.
+
+ - The script 'bin/split.pl' evaluates the return codes and outputs
+   results accordingly.
+
+ - Warning messages entirely removed.
+
+ - Override interface option simplified.
+
+0.37 2004/01/03
+
+ - split() returns run and error codes.
+
+ - Source files and target dirs/files amounts are counted.
+
+ - _tie_var() runs a var-name lookup and ties accordingly.
+
+0.36 2004/01/02
+
+ - Presets occupy their own sub.
+
+ - Simplified documentation.
+
+0.34 2004/01/01
+
+ - Warning messages upon the encounter of existing files/dirs
+   may be adjusted.
+
+0.33 2004/01/01
+
+ - Prohibits numeric suffix evaluation if only char subdirs
+   are present.
+
+0.32 2004/01/01
+
+ - bin/split.pl added which commits a numeric or characteristic
+   dir splitting by choice.
+
+0.31 2003/12/31
+
+ - Interface input (the behavior hash) is sanity-checked.
+
+0.3 2003/12/31
+
+ - Code refinement; characteristic splitting procedures implemented.
+
+ - Documentation expanded; covers characteristic splitting options
+   and example.
+
+0.2 2003/12/30
+
+ - Further sub ``inventions".
+
+ - Inefficiency clean-up.
+
+0.1 2003/12/29
+
+ - Source files are sorted case-insensitive.
+
+ - Documentation expanded.
+
+0.08 2003/12/29
+
+ - Interface options are embedded as object data.
+
+ - Directories within the source dir are ignored.
+
+ - Lowercasing filenames has been removed (sort distincts
+   between upper-&-lower case).
+
+ - split() returns the amount of files that have been moved;
+   undef if none.
+
+ - Documentation improved.
+
+0.07 2003/12/28
+
+ - Dir-Split.t invokes File::Temp::tmpnam() to obtain a temp dir name.
+
+ - Minor code changes.
+
+0.04 2003/12/25
+
+ - Testfile renamed to 'Dir-Split.t';
+
+   require_ok, use_ok & isa_ok implemented.
+
+0.02 2003/12/24
+
+ - Testfile 'dir_split.t' added.
+
+ - Documentation extended.
+
+ - Minor code changes.
+
+0.01 2003/12/23
+
+ - Initial version.

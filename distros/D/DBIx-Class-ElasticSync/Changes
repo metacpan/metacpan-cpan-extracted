@@ -1,0 +1,31 @@
+Revision history for Perl extension DBIx-Class-ElasticSync
+
+0.06 2017-03-01T16:45:43Z
+
+    - Fix Pod 
+
+0.05 2017-03-01T16:04:13Z
+
+    - Change elastic_connect to same format 
+    
+
+0.04 2015-12-03T12:42:42Z
+
+    - Added base docs to describe the Methods
+    - Fixed POD Errors
+    - Completed cpanfile
+    - fixed compile test
+    - added META data
+
+0.03 2015-12-02T11:51:59Z
+
+    - Rename to DBIx-Class-ElasticSync
+
+0.02 2015-12-01T15:46:05Z
+
+    - Fix path for modules (move into lib/)
+
+0.01 2015-12-01T12:35:14Z
+
+    - original version
+

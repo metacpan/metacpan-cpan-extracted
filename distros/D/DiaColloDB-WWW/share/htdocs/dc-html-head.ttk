@@ -1,0 +1,53 @@
+[% SET dstar_html_head = root_dir _ "html-head.ttk" %]
+[% SET $css_dbcgi = root_dir _ "dbcgi.css" %]
+[% PROCESS $dstar_html_head
+	cssfiles=[$css_dbcgi, "diacollo.css"]
+	jsfiles=["diacollo.js"] #jqcloud.js
+        autocomplete_options=""
+	osdlink=0
+%]
+[% SET
+  src_hicharts  = diacollo_standalone ? '//code.highcharts.com/highcharts.js' : 'highcharts.js';
+  src_hichartsx = diacollo_standalone ? '//code.highcharts.com/modules/exporting.js' : 'highcharts-exporting.js';
+
+  src_d3 = '//d3js.org/d3.v3.min.js';
+  #src_d3 = '//d3js.org/d3.v4.min.js'; ##-- CHANGES to d3 scale, brush, axis APIs brush break diacollo.js
+  src_d3cloud = 'd3.layout.cloud.js';
+%]
+[% IF diacollo_standalone %]  
+  <style type="text/css">
+.loading .icon { background: url("[% root_dir %]images/spinner-blue-32px.gif") !important; }
+.warning .icon { background: url("[% root_dir %]images/warning-32px.png") !important; }
+.warning.loading .icon { background: url("[% root_dir %]images/spinner-orange-32px.gif") !important; }
+.error .icon { background: url("[% root_dir %]images/error-32px.png") !important; }
+.info .icon { background: url("[% root_dir %]images/info-32px.png") !important; }
+  </style>
+[% END %]
+[% IF qformat == "gmotion" %]
+ [%#-- load google motion chart API %]
+ <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+ <script type="text/javascript">
+   google.load("visualization", "1", {packages:["motionchart"]});
+ </script>
+[% ELSIF qformat == "hichart" || qformat == "html" || qformat == "bubble" || qformat == "cloud" %]
+  <script type="text/javascript" src="[% src_d3 %]"></script>
+  [% IF    qformat == "cloud" %]
+    <script src="d3.layout.cloud.js"></script>
+  [% ELSIF qformat == "hichart" %]
+   <script type="text/javascript" src="[% src_hicharts %]"></script>
+   <script type="text/javascript" src="[% src_hichartsx %]"></script>
+  [% END ##--/cloud vs hichart %]
+[% END ##--/if qformat == ... %]
+<script type="text/javascript">
+ dcp_url_base = [% dcp_url_base.json %];
+ dcp_url_local = [% dcp_url_local.json %];
+ ddc_url_root  = [% ddc_url_root.json %];
+ user_query = [% user_query.json %];
+ diacollo_standalone = [% diacollo_standalone.json %];
+</script>
+[%#--
+  # Local Variables:
+  # mode: nxml
+  # coding: utf-8
+  # End:
+--%]

@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::Riak::Fast
+
+0.03    Thu Dec 27 19:53:50 2012
+        - use DNS Cache and ms TimeOut.
+
+0.02    Wed Dec 26 16:39:58 2012
+        - Switch to Furl from LWP
+
+0.01    Thu Nov 15 21:23:07 2012
+        - original version

@@ -1,0 +1,113 @@
+Release history for Dist-Zilla-Plugin-Prereqs-DarkPAN
+
+v0.3.0 2017-03-12T17:49:32Z f9d71ed
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot ( by automatic plugin update )
+ - Replace installer with EUMM ( could break some downstreams, primary reason for v0.3 )
+ - Remove use of Class::Load
+ - Remove useless Moose::Autobox messing up dzil version load time.
+ - Add MetaConfig data
+ - Basic test added.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.4, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +24 ↑3 -14 (recommends: +1, suggests: +2 -1)
+ - runtime: +2 -2 (recommends: +1)
+ - test: +4 ↓1 (recommends: +3)
+
+0.2.4 2013-11-22T09:51:44Z
+ [00 Minor]
+ - Remove hard dep on 5.10
+ - Upgrade deps on Module::Build
+ - Changes tidied up.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.3, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: ↑1
+ - runtime: ↓1
+
+0.2.3 2013-11-19T05:31:25Z
+ [00 Minor/Maintenance]
+ - No significant changes, mostly just a tooling update.
+ - Upgrade Module::Build to 0.4201
+ - Upgrade Test::More to 1.001002
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.2, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +50 -1 (recommends: -1, suggests: +1 -1)
+ - test: ↑1 -2
+
+ [Documentation]
+ - Copyright year updated.
+ - MetaPOD annotations added.
+
+ [Meta]
+ - Bugtracker to github.
+
+ [Packaging]
+ - Use test_requires
+ - Use new merged_prereqs
+
+ [Tests]
+ - Regen Kwalitee
+ - Regen CPAN::Changes
+ - Regen ReportVersions::Tiny to avoid devel deps
+ - Migrate from Test::Compile to Test::Compile::PerFile
+
+0.2.2 2012-07-07T10:27:26Z
+ [00 Bugfixes]
+ - github: closes #2 , listdeps_darkpan syntax error which leads to it not working. Thanks to Tomohiro Hosaka (BOKUTIN)
+   for reporting.
+
+ [00 Minor Changes]
+ - Upgrade Module::Build to 0.4001
+ - Upgrade Test::More to 0.98
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - test: ↑1
+
+ [Misc]
+ - Regenerated 000-report-versions-tiny.t to be custom build of code.
+
+0.2.1 2012-05-24T11:21:00Z
+ [Bugfixes]
+ - github: closes #1 , loading Cached Package DB's fails due to not loading the class. Thanks to Tomohiro
+   Hosaka/BOKUTIN for reporting.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+
+ [Tests::New]
+ - release/minimum-version
+
+0.2.0 2011-10-30T02:30:33Z
+ [API Incompatibile Changes]
+ - now takes PKG = MIRROR notation, and package path is attempted to be discovered automatically using a 02packages
+   file.
+ - the old behaviour can be attained by specifying PKG.uri = with either an absolute uri, or a relative uri.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - runtime: +3
+
+ [New Dependencies]
+ - App::Cache
+ - Parse::CPAN::Packages
+ - URI
+
+ [Packages]
+ - new: Dist::Zilla::Role::xPANResolver which handles fetching/caching/parsing the appropriate 02packages file and
+   providing a qualified resource for a given module.
+
+0.1.0 2011-10-29T23:27:02Z
+ - First version.

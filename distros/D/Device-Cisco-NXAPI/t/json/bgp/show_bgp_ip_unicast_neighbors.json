@@ -1,0 +1,90 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_neighbor": {
+        "ROW_neighbor": {
+          "neighbor": "1.1.1.1",
+          "remoteas": "65001",
+          "localas": "",
+          "link": "ebgp",
+          "index": "1",
+          "version": "4",
+          "remote-id": "0.0.0.0",
+          "state": "Idle",
+          "up": "false",
+          "elapsedtime": "00:05:24",
+          "restarttime": "00:00:01",
+          "remove-privateas": "false",
+          "lastread": "never",
+          "holdtime": "180",
+          "keepalivetime": "60",
+          "lastwrite": "never",
+          "msgrecvd": "0",
+          "notificationsrcvd": "0",
+          "recvbufbytes": "0",
+          "msgsent": "0",
+          "notificationssent": "0",
+          "sentbytesoutstanding": "0",
+          "connsestablished": "0",
+          "connsdropped": "0",
+          "connattempts": "0",
+          "resettime": "never",
+          "resetreason": "No error",
+          "peerresettime": "never",
+          "peerresetreason": "No error",
+          "firstkeepalive": "false",
+          "openssent": "0",
+          "opensrecvd": "0",
+          "notifssent": "0",
+          "notifsrecvd": "0",
+          "updatessent": "0",
+          "updatesrecvd": "0",
+          "keepalivesent": "0",
+          "keepaliverecvd": "0",
+          "rtrefreshsent": "0",
+          "rtrefreshrecvd": "0",
+          "capabilitiessent": "0",
+          "capabilitiesrecvd": "0",
+          "bytessent": "0",
+          "bytesrecvd": "0",
+          "TABLE_peraf": {
+            "ROW_peraf": [
+              {
+                "per-afi": "1",
+                "TABLE_persaf": {
+                  "ROW_persaf": {
+                    "per-safi": "1",
+                    "tableversion": "2",
+                    "neighbortableversion": "0",
+                    "pfxrecvd": "0",
+                    "pfxbytes": "0",
+                    "pfxsent": "0",
+                    "srpermitted": "false",
+                    "rrconfigured": "false"
+                  }
+                }
+              },
+              {
+                "per-afi": "2",
+                "TABLE_persaf": {
+                  "ROW_persaf": {
+                    "per-safi": "1",
+                    "tableversion": "2",
+                    "neighbortableversion": "0",
+                    "pfxrecvd": "0",
+                    "pfxbytes": "0",
+                    "pfxsent": "0",
+                    "srpermitted": "false",
+                    "rrconfigured": "false"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

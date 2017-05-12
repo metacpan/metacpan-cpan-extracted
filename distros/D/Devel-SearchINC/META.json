@@ -1,0 +1,61 @@
+{
+   "abstract" : "Loading Perl modules from their development directories",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102346, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-SearchINC",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : 0,
+            "File::Find" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : 0,
+            "Carp" : 0,
+            "English" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::SearchINC" : {
+         "file" : "lib/Devel/SearchINC.pm",
+         "version" : "2.103460"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-devel-searchinc at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-SearchINC"
+      },
+      "homepage" : "http://search.cpan.org/dist/Devel-SearchINC/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/Devel-SearchINC.git",
+         "web" : "http://github.com/hanekomu/Devel-SearchINC"
+      }
+   },
+   "version" : "2.103460"
+}
+

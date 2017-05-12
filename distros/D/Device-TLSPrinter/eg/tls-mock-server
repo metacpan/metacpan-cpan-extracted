@@ -1,0 +1,159 @@
+#!/usr/bin/perl
+use strict;
+use lib "lib";
+use Data::Hexdumper;
+use Device::TLSPrinter  qw(:DEFAULT SOH STX CR);
+use IO::Socket::INET;
+
+my $CR = CR;
+my $addr = "0.0.0.0";
+my $port = 1243;
+
+my $feedback_enabled = 0;
+my $ic_enabled       = 0;
+my $label_edition    = 0;
+
+my %immediate_command = (
+   "#"  => "Version 03.14 07/17/07$CR",
+    A   => "NYYNNNNN$CR",
+    B   => undef,
+    C   => undef,
+    D   => undef,
+    E   => "0000$CR",
+);
+
+my %system_command = (
+    # cmd => [ has_args, ret_value, ret_code ]
+    A   => [ 0, undef, undef],
+    a   => [ 0, undef, undef],
+    b   => [ 3, undef, FC_OK], 
+    C   => [ 0, undef, FC_OK], 
+    c   => [ 0, undef, FC_OUT_OF_LABELS], 
+    E   => [ 4, undef, FC_OK],
+    F   => [ 0, undef, FC_OUT_OF_LABELS],
+    f   => [ 3, undef, FC_OUT_OF_LABELS],
+    G   => [ 0, undef, FC_OUT_OF_LABELS],
+    H   => [ 0, undef, FC_IMMEDIATE_COMMANDS_ENABLED],
+    I   => [11, undef, FC_OK], 
+    K   => [ 0, undef, undef],
+    L   => [ 0, undef, FC_OK],
+    m   => [ 0, undef, FC_OK],
+    n   => [ 0, undef, FC_OK],
+    O   => [ 3, undef, FC_OK],
+    o   => [ 3, undef, FC_OK],
+    P   => [ 4, undef, FC_OK],
+    Q   => [ 0, undef, FC_OK],
+    S   => [ 4, undef, FC_OK],
+    T   => [ 0, undef, FC_OUT_OF_LABELS],
+    t   => [ 0, undef, FC_OK], # XXX
+    U   => [30, undef, FC_OK],
+    V   => [ 0, "01006500001B00000000005F00C31388640001010102010001C90000000000F9", FC_OK], 
+    v   => [ 0, $immediate_command{"#"}, FC_OK],
+    W   => [ 1, "LOGO1".$CR."LOGO2".$CR."MEM 8C30".$CR, FC_OK],
+    x   => [10, undef, FC_OK],
+    z   => [ 0, undef, FC_OK],
+);
+
+
+$|++;
+
+my $sock = IO::Socket::INET->new(
+        Proto => "tcp",  Listen => 1,  
+        LocalAddr => $addr,  LocalPort => $port, 
+    ) or die "fatal: can't listen on $addr\:$port\: $!\n";
+DEBUG("listening on $addr\:$port...");
+
+while (my $peer = $sock->accept) {
+    my ($peerport, $iaddr) = sockaddr_in($peer->peername);
+    my $peeraddr = inet_ntoa($iaddr);
+
+    DEBUG("accepted a connection from $peeraddr");
+    $peer->autoflush(1);
+
+    while ($peer->connected) {
+        my $cmd  = '';
+        my $args = '';
+        DEBUG("sysread()");
+        $peer->sysread($cmd, 1) or last;
+
+        # === immediate commands =====================================
+        if ($cmd eq SOH) {
+            DEBUG("immediate command -> sysread()");
+            $peer->sysread($cmd, 1);
+
+            if ($ic_enabled) {
+                DEBUG("immediate command <$cmd>");
+                if (exists $immediate_command{$cmd}) {
+                    $ic_enabled = 1 if $cmd eq "D";
+
+                    if (defined $immediate_command{$cmd}) {
+                        $peer->syswrite($immediate_command{$cmd});
+                        DEBUG("  => sending ", length $immediate_command{$cmd}, " bytes");
+                    }
+                }
+                else {
+                    DEBUG("  !!! unknown command")
+                }
+            }
+            else {
+                DEBUG("immediate command <$cmd> ignored");
+            }
+        }
+        # === system commands ========================================
+        elsif ($cmd eq STX) {
+            DEBUG("system command -> sysread()");
+            $peer->sysread($cmd, 1);
+            DEBUG("system command <$cmd>");
+
+            $feedback_enabled = 0 if $cmd eq "A";
+            $feedback_enabled = 1 if $cmd eq "a";
+            $ic_enabled       = 1 if $cmd eq "H";
+            $label_edition    = 1 if $cmd eq "L";
+            DEBUG("feedback_enabled=$feedback_enabled  ic_enabled=$ic_enabled",
+                    "label_edition=$label_edition");
+
+            if (exists $system_command{$cmd}) {
+                my ($has_args, $value, $rc) = @{ $system_command{$cmd} };
+
+                DEBUG("               -> sysread() args");
+                $peer->sysread(my $args, $has_args) if $has_args;
+                DEBUG("               args=<$args>");
+
+                if (defined $value) {
+                    $peer->syswrite($value);
+                    DEBUG("  => sending ", length $value, " bytes");
+                }
+
+                if ($feedback_enabled and defined $rc) {
+                    $peer->syswrite($rc);
+                    DEBUG("  => feedback <$rc>");
+                }
+            }
+            else {
+                DEBUG("  !!! unknown command")
+            }
+        }
+        # === labels commands ========================================
+        elsif ($cmd =~ /^[1234ACERX><^+-]/) {
+            if ($label_edition) {
+                DEBUG("label formatting command '$cmd' -> sysread()");
+                $peer->sysread(my $record, 30);
+                $label_edition = 0 if $cmd eq "E" or $cmd eq "X";
+                $peer->syswrite(FC_OK) if $feedback_enabled;
+            }
+            else {
+                DEBUG("label formatting command outside edition mode")
+            }
+        }
+        else {
+            DEBUG("received unknown/unexpected char: <$cmd>")
+        }
+    }
+
+    DEBUG("closed connection from $peeraddr", $/, " -" x 20);
+}
+
+
+sub DEBUG {
+    print STDERR @_, $/
+}

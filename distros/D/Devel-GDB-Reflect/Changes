@@ -1,0 +1,8 @@
+Revision history for Perl extension Devel::GDB::Reflect.
+
+0.2  Wed Sep 20 05:28:39 PDT 2006
+	- Fixing some really stupid bugs, and making the gdb++ front end a little
+	  more user-friendly
+
+0.1  Tue Sep 19 19:50:40 PDT 2006
+	- original version

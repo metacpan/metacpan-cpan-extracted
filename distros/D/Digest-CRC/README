@@ -1,0 +1,49 @@
+Digest::CRC version 0.22
+========================
+
+NAME
+    Digest::CRC - Generic CRC functions
+
+DESCRIPTION
+    The Digest::CRC module calculates CRC sums of all sorts.  It contains
+    wrapper functions with the correct parameters for CRC-CCITT, CRC-16 and
+    CRC-32.
+
+SYNOPSIS
+    # Functional style
+
+    use Digest::CRC qw(crc32 crc16 crcccitt crc);
+    $crc = crc32("123456789");
+    $crc = crc16("123456789");
+    $crc = crcccitt("123456789");
+
+    $crc = crc($input,$width,$init,$xorout,$poly,$refin,$refout);
+
+    # OO style
+    use Digest::CRC;
+
+    $ctx = Digest::CRC->new(type=>"crc16");
+    $ctx = Digest::CRC->new(width=>16, init=>0x0000, xorout=>0x0000,
+                            poly=>0x8005, refin=>1, refout=>1);
+    $ctx->add($data);
+    $ctx->addfile(*FILE);
+
+    $digest = $ctx->digest;
+    $digest = $ctx->hexdigest;
+    $digest = $ctx->b64digest;
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+   CRC algorithm code taken from "A PAINLESS GUIDE TO CRC ERROR DETECTION
+   ALGORITHMS".
+
+   The author of this package disclaims all copyrights and releases it
+   into the public domain.

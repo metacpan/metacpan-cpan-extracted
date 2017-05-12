@@ -1,0 +1,413 @@
+=head1 TO DO
+
+=head2 Name
+
+=over 4
+
+=item *
+
+Come up with a good name
+
+=item *
+
+YODA (from the image in the talk)?
+
+=item *
+
+"Answers you seek?"
+
+=back
+
+=head2 Pages
+
+=head3 HTTP Manifest
+
+To speed up "loading" of the assets even more, the assets
+should be stored on the client as a HTTP / HTML manifest
+
+=head3 C<robots.txt>
+
+The app should prevent being spidered itself by always providing an
+automatic C<robots.txt> that allows only C</about> and maybe C</> without
+any parameters to be spidered.
+
+This is somewhat ironic as the scrapers currently don't respect any
+C<robots.txt> yet.
+
+=head3 Search page
+
+Autosearch without pressing "Go"
+
+Display entry URL + title in the autocomplete dropdown
+
+=head3 Simple (HTML) Results page
+
+* Search images
+
+=head3 Result fragment / document rendering
+
+Come up with a concept to render different mime types differently.
+
+Ideally, this would avoid the hardcoding we use for C<< audio/mpeg >>
+currently.
+
+This also entails information about things that are not files. Ideally,
+we can render information about a "person" using a different template
+as well, even though a "person" does not have a mime type associated with it.
+
+=head4 Rendering of links into mail applications
+
+Currently, links to mails are hardcoded to use Thunderlink for Thunderbird.
+Lotus Notes mails will need different deep links as outlined in
+L<http://www.wissel.net/blog/d6plinks/SHWL-7PL67C>.
+
+  notes://servername/database/view/documentuniqueid
+
+Basically, this means that for mails, we will need to store more than one
+"unique" ID or alternatively decide on the ID to store in the crawler.
+
+Maybe we should store a (preferred) rendertype for items and render a
+subtemplate based on that rendertype. This would allow different URLs for
+links to Message-ID mails and Lotus Notes mails. It would still mean that
+we need to store more fields for email entries.
+
+Also, for example Perl files should get a Perl syntax highlighter
+or at least a "code" view. The same should likely hold for all other
+(text) files whose more refined type we can recognize.
+
+=head3 Customization
+
+=head4 Auto-session
+
+Refinement using the last search, if the last search was "recently"
+
+Basically, add the new term to the last terms instead of doing a new search
+based only on the new term. Usually, boost the new term, maybe by factor 2
+over the old terms. Provide a link to I<only> search for the new term instead.
+
+=head3 Lock down all pages according to OWASP
+
+Just in case some malicious content gets through our (lame) filters
+or gets inserted by a script that doesn't properly sanitize the input,
+make sure we can't get rehosted in a (non-localhost) iframe and we can't
+run (non-localhost) Javascript.
+
+Also consider reproxying all external resources, thus allowing absolutely
+no outside links at all on our pages.
+
+=head2 Plack
+
+* L<Plack>-hook/example for C</search> to tie up the search application
+into arbitrary websites
+
+=head2 Dancer
+
+* ElasticSearch plugin / configuration through YAML
+
+* Upgrade to Dancer 2
+
+=head2 Mojolicious
+
+* ElasticSearch plugin / configuration through YAML
+
+=head2 Search multiple indices
+
+Having different Elasticsearch clusters available (or not) should
+be recognized and the search results should be combined. For example,
+a work cluster should be searched in addition to the local cluster, if the
+work network is available.
+
+This calls for using the asynchronous API not only for searching but also
+for progressively enhancing the results page as new results become available.
+
+=head2 Recognizing new versions of old documents
+
+How can we/Elasticsearch recognize similarity between two documents?
+
+If two documents live in the same directory, the newest one should take
+precedence and fold the similar documents below it.
+
+=head2 Java ES plugins
+
+Currently better written in Perl
+
+=head2 ES Analyzers
+
+=head3 FS scanner
+
+* Don't rescan/reanalyze elements that already exist in Elasticsearch
+
+* Delete entries that don't exist in the filesystem anymore
+
+=head3 Video data
+
+Which module provides interesting video metadata?
+
+Use L<Video::Subtitle::SRT> for reading subtitle files
+
+How can we find where / on what line search results were found? If we include
+a magic marker (HTML comment?) at the end/start of a line, we could hide it when
+displaying the results to the user while still using it to orient ourselves
+in the document.
+
+=head3 Audio data
+
+* MP3s get imported but could use a nicer body rendering.
+
+* Playback duration should be calculated
+
+* Also import audio lyrics - how could these be linked to their mp3s?
+
+=head3 Playlist data
+
+Playlists should get custom rendering (album art etc.)
+
+Playlists should ideally also hotlink their contents
+
+=head2 Test data
+
+Consider importing a Wikipedia dump
+
+Some other larger, mixed corpus, like http://eur-lex.europa.eu/
+
+Use the Enron mail corpus?
+
+=head2 Synonyms
+
+Find out which one(s) we want:
+
+L<https://www.elastic.co/guide/en/elasticsearch/guide/current/synonyms-expand-or-contract.html>
+
+From first glance, we might want Simple Expansion, but Genre Expansion
+also seems interesting.
+
+We want to treat some synonyms as identical though, like 'MMSR' and its
+German translation 'Geldmarktstatistik'.
+
+=head1 User Introduction
+
+=head2 Videos
+
+Create screencasts using L<http://www.openshot.org/videos/>
+
+=head2 First Start Experience
+
+The first start should be as configuration-free as possible.
+
+=head2 Site walk through
+
+Use one of the fancy Javascript walk-through implementation to offer
+an optional walk-through through the search page and results page.
+
+=head1 Code structure
+
+=head2 Crawlers
+
+=head3 Single URL submitter
+
+Submit HTML and an URL into the index
+
+    submit-url --url 'https://example.com' --html '<html><body>Hello World</body></html>'
+
+    # Remind ourselves when we search for "user list" where it lives:
+    submit-url --file '/etc/passwd' --html '<html><pre>machine user list password</pre></html>'
+
+    submit-url --json '{ url: "", "content" : "", ... }'
+
+This allows for custom handling of single entries
+
+Detect "genre" of web page (forum, product, social, blog, ...)
+
+Detect porn page by using the list of word pairs at
+L<https://github.com/searchdaimon/adult-words>
+
+=head3 File system crawler
+
+Don't import hidden files by default
+
+Have a file C<.search> or C<.index> which contains
+options, like C<no-index> or C<ignore> for this folder and its
+subfolders.
+
+=head3 DBI crawler
+
+Show example C<SELECT> statement
+
+  SELECT
+      product_name as title
+    , 'http://productserver.internal/product/' || convert(varchar,product.id) as url
+    , product_description as content
+  FROM products
+
+=head3 Lotus Notes Crawler
+
+Repurpose L<https://perlmonks.org?node_id=449873> (and its replies)
+for better enterprise integration
+
+=head3 Create Dancer-crawler
+
+Skip the HTTP generation process
+and reuse C<App::Wallflower> for crawling a Dancer website.
+
+=head3 Create tree-structure-importer
+
+Both IMAP and file systems are basically directed graphs and far easier
+to crawl than the cyclic graphs of web pages. Abstract out the crawling
+of a tree into a common module.
+
+* Turn C<index-imap> and C<index-filesystem> into modules so they
+become independent of being called from an outside shell.
+
+This also implies they become runnable directly from the web interface
+without an intermediate shell.
+
+* Add attachment import to the imap crawler
+
+=head3 Calendar crawler
+
+=head3 CardDAV crawler
+
+To pull in information about people you know
+
+=head3 Xing / LinkedIn / Facebook / Google+ crawler
+
+To pull in information about people you know
+
+=head3 LDAP crawler
+
+To pull in information about people you know
+
+=head2 Metasearch
+
+Implement metasearch across multiple ES instances
+
+=head1 Search index structure / data structures
+
+=head2 Elasticsearch index
+
+=head3 Last-verified field
+
+We want a field to store when we last visited an URL so we
+don't always reindex files with every run.
+
+=head2 Index maintenance
+
+=head3 Autocompletion
+
+Autocompletion needs to associate keywords with documents. These could
+come from a local C<.searchapp> file or better be stored per-URL / per-document
+in an SQLite database for easy index reconstruction.
+
+This needs close correlation with synonyms, which also could be (filesystem-)
+local for a (shared) folder or (user-)global in an SQLite database.
+
+=head2 Crawl queue(s)
+
+We want to have queues in which we store URLs to be crawled
+to allow for asynchronous submission of new items. This also
+allows us to be rate limited and restartable.
+
+This could be an SQLite database, or just a flat text
+file if we have a way to store the last position within that text
+file.
+
+=head2 SQL-index into filesystem
+
+Is there any use in reviving FFRIndex?
+
+=head1 System integration
+
+Automatically (re)scan resources by using a notification
+method like the following to be notified about new or changed
+resources.
+
+=head2 Resource modification
+
+=head3 Filesystem watchers
+
+=head3 RSS scanner
+
+=head3 Google Sitemap scanner
+
+=head3 Hibiscus importer
+
+This would immediately make all money transactions from Hibiscus
+available for searching.
+
+Can Hibiscus directly show a single transaction from the outside?
+
+=head2 Interesting additional datasets
+
+Open movie database L<http://omdbapi.com/> - has dumps available
+
+Discogs data dumps - L<http://data.discogs.com/>
+
+=head2 Automatic search
+
+Automatic search should be triggered for incoming phone calls. This
+allows to automatically show relevant emails if the sender is calling
+and has their phone information in their email.
+
+Also, the automatic search should be easily triggered by a command
+line program. This likely needs something like L<HTTP::ServerEvent>
+to keep a channel open so the server can push new information.
+
+=head1 Data portability
+
+Data portability is very important, not at least because of
+seamless index upgrades/rollbacks/backups.
+
+=head2 Export
+
+=head3 Export index to DBI
+
+=head3 Update indices from database
+
+=head2 Share indices
+
+Sharing indices would also be nice in the sense of websites or people
+offering datasets
+
+=head2 DBI connectivity
+
+How can we get L<DBI> and L<Promises> work nicely together?
+
+=head3 Schema migration/update via DBI
+
+=head3 DBI import queue
+
+New items to be imported into Elasticsearch could be stored/read from
+a DBI table. This would allow for a wider distributed set of crawlers
+feeding through DBI to Elasticsearch.
+
+=head1 Index/query quality maintenance
+
+To improve search results, a log of "failed" queries
+should be kept and the user should be offered manual correction
+of the failed queries.
+
+=head2 top 10 failed queries
+
+If a query had no results at all, the user should/could suggest
+some synonyms or even documents to use instead
+
+=head2 top 10 low-score queries
+
+If a query had only low-score results/documents, the results are also
+a candidate for manual improvement. How can we determine a low score?
+
+=head2 top 10 abandoned queries
+
+How will we determine if a query/word was abandoned?
+
+=head2 Keep track of clickthrough
+
+We should keep (server-side) track of click-throughs
+to actually find out which files/documents are viewed and
+rank those higher
+
+Also, we should have a "unrank this" link to give the user
+a way to make the engine forget misclicked "ranked" items
+easily from the results.
+
+=cut

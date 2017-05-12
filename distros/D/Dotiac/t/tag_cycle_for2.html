@@ -1,0 +1,1 @@
+A{% for X in L %}{% cycle "+" "-" %}{{ X }}{% cycle "A" "B" "X" "Y" as foo%}={% cycle foo %}{% endfor %}A

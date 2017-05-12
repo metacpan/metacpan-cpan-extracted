@@ -1,0 +1,388 @@
+#!/usr/bin/env perl
+# PODNAME: data-embed
+# ABSTRACT: embed/extract files to/from container files
+use strict;
+use warnings;
+use Carp;
+use Pod::Usage qw< pod2usage >;
+use Getopt::Long qw< :config gnu_getopt >;
+use English qw< -no_match_vars >;
+
+use Data::Embed qw< :all >;
+use Log::Log4perl::Tiny qw< :easy >;
+Log::Log4perl->easy_init({level => $INFO, layout => '[%d %-5p] %m%n'});
+
+my %config = ();
+GetOptions(
+   \%config,
+   qw<
+     usage! help! man! version!
+     data|text|d=s@
+     filename|file|f=s@
+     name|n=s
+     output|o=s
+     output_from_package|output-from-package|auto-output|a!
+     package|module|p|m=s
+     >
+) or pod2usage(-verbose => 99, -sections => 'USAGE');
+
+if ($config{version}) {
+   local $/;
+   my $pod = <DATA>;
+   my ($version) = $pod =~ m{=head1 \s+ VERSION \s+ version \s+(\S+)}mxs;
+   pod2usage(message => "$0 $version", -verbose => 99, -sections => ' ');
+} ## end if ($config{version})
+pod2usage(-verbose => 99, -sections => 'USAGE') if $config{usage};
+pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+  if $config{help};
+pod2usage(-verbose => 2) if $config{man};
+
+# Script implementation here
+defined(my $action = shift @ARGV)
+or pod2usage(
+   message   => "no action specified",
+   -verbose  => 99,
+   -sections => 'USAGE',
+);
+my $sub = __PACKAGE__->can('action_' . $action)
+  or pod2usage(
+   message   => "action $action is not supported",
+   -verbose  => 99,
+   -sections => 'USAGE',
+  );
+$sub->(\%config, \@ARGV);
+exit 0;
+
+sub action_add {
+   my ($cfg, $argv) = @_;
+
+   defined(my $target = shift @$argv)
+      or pod2usage(
+         message   => "action add requires container file",
+         -verbose  => 99,
+         -sections => 'USAGE',
+      );
+
+   my %args = (output => $target);
+   $args{input} = $target if -e $target;
+   my $writer = writer(%args);
+
+   if (exists $cfg->{data}) {
+      for my $item (@{$cfg->{data}}) {
+         my ($name, $data) = $item =~ m{\A (?: ((?:\\. | [^\\:])*) :)? (.*) \z}mxs;
+         if (defined $name) {
+            $name =~ s{\\(.)}{$1}gmxs;
+         }
+         else {
+            ($name, $data) = ('', $item);
+         }
+         $writer->add_data($name, $data);
+      }
+   }
+   if (exists $cfg->{filename}) {
+      for my $item (@{$cfg->{filename}}) {
+         $writer->add_file($item, $item);
+      }
+   }
+   if (@$argv) {
+      for my $item (@$argv) {
+         $writer->add(name => $item, input => $item);
+      }
+   }
+
+   $writer->write_index();
+   return;
+}
+
+sub action_list {
+   my ($cfg, $argv) = @_;
+
+   defined(my $target = shift @$argv)
+      or pod2usage(
+         message   => "action list requires container file",
+         -verbose  => 99,
+         -sections => 'USAGE',
+      );
+
+   my @files = embedded($target);
+   if (!@files) {
+      WARN "file '$target' does not have any embedded file";
+      return;
+   }
+   my $padding = length(scalar @files);
+   for my $id (0 .. $#files) {
+      printf "[%${padding}d] %s\n", $id, $files[$id]->{name};
+   }
+
+   return;
+}
+
+sub action_extract {
+   my ($cfg, $argv) = @_;
+
+   defined(my $target = shift @$argv)
+      or pod2usage(
+         message   => "action extract requires container file",
+         -verbose  => 99,
+         -sections => 'USAGE',
+      );
+   defined(my $id = shift @$argv)
+      or pod2usage(
+         message   => "action extract requires identifier of wanted file",
+         -verbose  => 99,
+         -sections => 'USAGE',
+      );
+   LOGDIE "invalid identifier '$id'"
+      unless $id =~ m{\A(?: 0 | [1-9]\d* )\z}mxs;
+
+   # get hold of the input
+   my @files = embedded($target);
+   my $max_id = $#files;
+   LOGDIE "invalid identifier $id (greater than $max_id)"
+      if $id > $max_id;
+   my $ifh = $files[$id]->fh();
+
+   # get output channel if defined differently from "-"
+   my $ofh = \*STDOUT;
+   if (defined($cfg->{output}) && ($cfg->{output} ne '-')) {
+      open my $fh, '>', $cfg->{output}
+         or LOGDIE "open('$cfg->{output}'): $OS_ERROR";
+      $ofh = $fh;
+   }
+   binmode $ofh;
+
+   while (! eof $ifh) {
+      defined(my $nread = read $ifh, my $buffer, 4096)
+         or LOGDIE "read(): $OS_ERROR";
+      last unless $nread; # paranoid
+      print {$ofh} $buffer;
+   }
+
+   return;
+}
+
+sub action_modularize {
+   my ($cfg, $argv) = @_;
+
+   defined(my $package = $cfg->{package})
+      or pod2usage(
+         message   => "action modularize requires package name",
+         -verbose  => 99,
+         -sections => 'USAGE',
+      );
+   my %output = exists $cfg->{output} ? (output => $cfg->{output}) : ();
+   $output{output_from_package} = $cfg->{output_from_package};
+
+   my %input;
+   if (exists $cfg->{data}) {
+      $input{data} = $cfg->{data};
+   }
+   elsif (exists $cfg->{file}) {
+      $input{filename} = $cfg->{file};
+   }
+   elsif ((! scalar @$argv) || ($argv->[0] eq '-')) {
+      $input{fh} = \*STDIN;
+      binmode $input{fh};
+   }
+   else {
+      $input{filename} = $argv->[0];
+   }
+
+   return generate_module_from_file(package => $package, %input, %output);
+}
+
+__END__
+
+=head1 USAGE
+
+   data-embed [--usage] [--help] [--man] [--version]
+
+   data-embed add <target>
+      [--data|--text|-d <data>]
+      [--file|--filename|-f <filename>]
+      [--name|-n <name>]
+      [<filename>]
+
+   data-embed list <target>
+
+   data-embed extract <target> <id>
+      [--output|-o <filename>]
+
+   data-embed modularize
+      [--data|--text|-d <data>]
+      [--file|--filename|-f <filename>]
+      [--output|-o <filename>]
+      [--output-from-package|--auto-output|-a]
+      [--package|-p|--module|-m <packagename>]
+      [<filename>]
+
+=head1 EXAMPLES
+
+   # Add one section named "first part" from data on command line
+   shell$ data-embed add container.bin -n 'first part' -d "some data"
+
+   # same things, with data coming from standard input
+   shell$ echo ciao | data-embed add container.bin -n second
+
+   # ditto, data from a file
+   shell$ data-embed add container.bin -n third /path/to/input-file
+
+   # you can be explicit about the file name
+   shell$ data-embed add container.bin -n third -f /path/to/input-file
+
+   # List a file's contents
+   shell$ data-embed list
+
+   # Extract a file
+   shell$ data-embed extract 0
+
+   # Extract a file to a file
+   shell$ data-embed extract 0 -o /path/to/output
+
+   # Create a module with a file as contents
+   shell$ data-embed modularize -p ThePack /path/to/file -o ThePack.pm
+
+   # Read the data in the module
+   shell$ perl -I . -MThePack -e 'print ThePack::get_data()'
+
+   # Read the data in the module, through filehandle
+   shell$ perl -I . -MThePack -e '$fh=ThePack::get_fh(); print while <$fh>'
+
+
+=head1 DESCRIPTION
+
+This program is a wrapper around the functionalities provided by
+L<Data::Embed>. It allows embedding data inside files in two ways:
+
+=over
+
+=item *
+
+multiple data sections in a I<container> file. To read data from that file,
+C<Data::Embed> (or C<data-embed>) will be needed
+
+=item *
+
+one single data section inside a Perl module. The Perl module contains a
+package with the code to read the section directly.
+
+=back
+
+Although similar, these two ways address different use cases. The first one
+is when you want to bring multiple sections in a file - e.g. a Perl
+script - so that you can access it later. In most cases it is redundant
+with respect to any archiving software (e.g. tar, zip, etc.) but it can
+come handy when you want to embed data within some other file.
+
+The second method is when you want to bring some data inside a
+distribution, and then you want e.g. to embed those modules via
+Mobundle or FatPack.
+
+
+=head1 OPTIONS
+
+
+=over
+
+=item --data | --text | -d data
+
+set the data that will be embedded. Works for actions
+C<add> and C<modularize>.
+
+=item --file | --filename | -f filename
+
+set the filename where the data will be taken. Works for actions
+C<add> and C<modularize>.
+
+=item --help
+
+print a somewhat more verbose help, showing usage, this description of
+the options and some examples from the synopsis.
+
+=item --man
+
+print out the full documentation for the script.
+
+=item --name | -n name
+
+set the name of the section to be added. Works for action C<add>.
+
+=item --output | -o filename
+
+set the name of the output file. Works for actions
+C<extract> and C<modularize>.
+
+=item --output-from-package | --auto-output | -a
+
+set the output filename from the package name (overrides any other
+C<output> command line option). Works for action C<modularize>.
+
+=item --package | -p | --module | -m name
+
+set the name of the package for generating a module. Works for action
+C<modularize>.
+
+=item --usage
+
+print a concise usage line and exit.
+
+=item --version
+
+print the version of the script.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+data-embed requires no configuration files or environment variables.
+
+
+=head1 DEPENDENCIES
+
+Nothing that L<Data::Embed> does not already require.
+
+
+=head1 BUGS AND LIMITATIONS
+
+No bugs have been reported.
+
+Please report any bugs or feature requests through http://rt.cpan.org/
+
+
+=head1 AUTHOR
+
+Flavio Poletti C<polettix@cpan.org>
+
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2014-2015 Flavio Poletti C<polettix@cpan.org>.
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>
+and L<perlgpl>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE
+LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL,
+OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE
+THE SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF
+SUCH DAMAGES.
+
+=cut

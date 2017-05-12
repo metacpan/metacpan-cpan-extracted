@@ -1,0 +1,98 @@
+Revision history for Perl extension Devel::SmallProf.
+
+2.02 10 May, 2007
+        - bad format for periods of 10 seconds or longer (bug reported
+          by Daniel B. Boorstein)
+
+2.01  9 Apr, 2007
+        - release as stable version
+        - use modern package layout
+        - some docs improvements
+        - add pods test
+
+2.00_04 10 Sep 2005
+	- reorder some perl sentences to improve accuracy.
+
+2.00_03 28 Oct 2004
+	- require only perl 5.6 (reported by Alex Kapranoff)
+
+2.00_02 2 Nov 2003
+	- do not monitor sb entries
+	- test updated for no subs
+
+2.00_01 1 Nov 2003
+	- use lexicals and our vars
+	- require perl 5.8.0 or newer
+
+1.15   1 Nov 2003
+	- call subs on the right context (void/scalar/array)
+
+1.14  31 Oct 2003
+	- time function from Time::HiRes was not being used!
+	- suppress warning messages
+
+1.13  31 Oct 2003
+	- support for SMALLPROF_CONFIG
+	- add grep-mode output
+	- eliminate DB::sub overhead under perl 5.8.0 or
+	  newer (feature commented out)
+
+1.12  31 Oct 2003
+	- Compensate DB::dub overhead (patch by Chris Sander)
+	- README changed to follow current uses
+
+1.11  19 May 2003
+	- version number bumped to 1.xx because 0.9 > 0.10
+
+0.10  19 May 2003
+	- Fixed to work under perl 5.8.0
+	- test file names changed to be more Windows friendly
+
+0.9   8 Aug 2000
+        - Fixed up test suite to work under 5.6.0.
+
+0.8  26 Jul 2000
+        - Made SmallProf -w-clean (at least so far as I can tell :-)
+
+0.7  28 Jul 1999
+        - Some cleanup on sub profiling and locales
+        - fixed up and added some tests
+
+0.6  11 Jul 1999
+        - Cleanup on part4.t and part1.t (Thanks!)
+        - Removed special Win32 support as Time::HiRes now works on Win32 
+        - Fixed a bug in sub sub where $1 and $2 were getting clobbered.
+        - Increased size of execution count column
+        - Added CPU times
+
+0.5
+        - Added rudimentary subroutine profiling.
+        - Set ref to keep code listings around for non-subroutine-defining
+          evals.
+        - Added support for .smallprof (the options file).
+        - Lots of work to make Win32 stuff work correctly.
+
+0.4  12 Jan 1998
+        - Removed the use vars--fully specifying all non-my variables.
+        - Added $DB::profile flag to turn profiling on and off.
+        - Added %DB::packages support to profile only in certain packages.
+	- Read source lines from @main::_<file instead of from disk files.
+	  This saves having to save eval lines during the run as well.  Still
+          missing some eval code, though.
+        - Better nulltime compensation.
+        - Use formats instead of printf for output.
+        
+0.3  20 Nov 1997
+        - Folded in changes by Geoffry Broadwell ('f) for Win32, creating
+          converter to convert between the two.  Attempted to make that 
+          conversion automatic (see Makefile.PL).
+        - Folded in Paul Ewing's changes to use Time::HiRes instead of 
+          syscall
+        - Removed need for $DB::print_lines
+
+0.2  12 Aug 1997
+	- Better (though still not really good) eval handling.
+
+0.1  Wed Jul 30 13:44:40 1997
+	- original version; created by h2xs 1.18
+

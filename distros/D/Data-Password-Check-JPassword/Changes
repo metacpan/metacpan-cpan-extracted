@@ -1,0 +1,10 @@
+Revision history for Perl extension Data::Password::Check::JPassword.
+
+0.02  Sep 3 2013
+    - Added BUILD_REQUIRES for Data::Dump
+        - Thank you Andreas König
+
+0.01  Jul 8 2013
+	- original version; created by h2xs 1.23 with options
+		-AX Data::Password::Check::JPassword
+

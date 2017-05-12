@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-Plugin-MakeMaker-Highlander
+
+0.004     2016-02-25 16:52:05-05:00 America/New_York
+
+    [CHANGED]
+
+    - Relies on List::Util 1.33 instead of List::AllUtils
+
+0.003     2013-09-23 12:51:10 America/New_York
+
+    [ADDED]
+
+    - The PERL_NO_HIGHLANDER environment variable may be used
+      to disable the UNINST behavior if it would break a build
+      system
+
+0.002     2013-09-23 05:58:30 America/New_York
+
+    [FIXED]
+
+    - Suppressed warnings if PERL_MM_OPT is not set
+
+0.001     2013-09-22 23:30:45 America/New_York
+
+    - First release
+

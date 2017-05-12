@@ -1,0 +1,12 @@
+Revision history for Dezi-Bot
+
+0.003 30 April 2014
+ - fix encoding bug with taking md5 of content in FileCacher handler
+ - pod tests require RELEASE_TESTING=1
+
+0.002 23 Jan 2013
+ - misc doc fixes, Makefile.PL fixes
+
+0.001 19 Jan 2013
+ - Initial release.
+

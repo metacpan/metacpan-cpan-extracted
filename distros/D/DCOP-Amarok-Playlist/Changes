@@ -1,0 +1,13 @@
+Revision history for Perl extension DCOP::Amarok::Playlist.
+
+0.001  Wed Mar 29 2006
+	- original version; created by JCM
+
+0.005	Fri Mar 31 2006
+	fixed an issue with playByIndex
+
+0.008 Thu Feb 28 20:33:34 EST 2008
+	clean up distribution package
+
+0.009 Fri Feb 29 14:44:47 EST 2008
+	add require line

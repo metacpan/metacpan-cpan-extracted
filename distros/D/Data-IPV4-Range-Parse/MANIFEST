@@ -1,0 +1,13 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-IPV4-Range-Parse.t
+t/compute_from_int.t
+t/ip_parse.t
+t/sort.t
+t/range_parse.t
+t/constant.t
+lib/Data/IPV4/Range/Parse.pm
+lib/Data/IPV4/Range/Parse.pod
+META.yml                                 Module meta-data (added by MakeMaker)

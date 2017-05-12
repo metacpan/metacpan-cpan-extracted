@@ -1,0 +1,25 @@
+This is the perl5 DBZ_File distribution, written by Wayne Davison.
+It probably only works with perl version 5.003 and later.
+
+This package allows a perl program to read and write a DBZ database,
+such as the news history file.  It does support the creation of a new
+database if the .pag and .lib files are missing -- just call the tie
+function with a create flag and a mode (see the documentation).
+
+The default Makefile.PL assumes that you've got dbz.h and libdbz.a
+installed on your system.  If you don't, add any needed -I and -L
+directives, or reference the object files directly, as required.
+
+You install the library by running these commands:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Please feel free to send any bug reports, suggestions, etc., to:
+<wayne@clari.net>.
+
+Enjoy!
+
+..wayne..

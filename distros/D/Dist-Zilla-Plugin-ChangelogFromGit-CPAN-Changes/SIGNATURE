@@ -1,0 +1,59 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA512
+
+SHA1 ee94f07f39cb7c0b8a8179bc795d8ba5f0edefc7 Build.PL
+SHA1 0c3ac38451d9ffb9dc9539a7956ee85d6644bc8a CONTRIBUTORS
+SHA1 fa72cbda3fd8b066c6accfc3c1dd45bf4555d0bc Changes
+SHA1 26c5f387969da2d763fd54ac69148f6785850838 LICENSE
+SHA1 58eb0fdbe5d51571cf9b96fe844c8bef28ad52f5 MANIFEST
+SHA1 feeeda17f8c47ac5ca78ec8cda7067e039a7235c META.json
+SHA1 05b4f5e26098907401b956b7c28154b46f1cb68f dist.ini
+SHA1 4c80234d92f1c16fa06a2cddbdec22eb5da5451a lib/Dist/Zilla/Plugin/ChangelogFromGit/CPAN/Changes.pm
+SHA1 7217af7ee03c0952a6426dfe86d12ef8f9fe14eb t/00-check-deps.t
+SHA1 b703410525fe3ab76e35bfee9f880d473873158e t/00-compile.t
+SHA1 bbe317420f098ca8ebcffdf5920976b8e01b7834 t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 fadc6cccb56313dcac4923f60642e0efae997086 t/changes.t
+SHA1 e348cad5f5df6452518a6dee0e548137e751757b t/changes/first_release
+SHA1 bbd403f6950639d26c2f7bcafa1cf325962eb0da t/changes/v1_defaults
+SHA1 45d2552928ea01bb7bde9c27750d3bd7e3eded60 t/changes/v1_email
+SHA1 b0863d96767d904639f8e55eecb305e6d818f6c5 t/changes/v1_group_author
+SHA1 ea5dd6310ff75eec9cb827a37bac4529bccb3d2e t/changes/v1_group_author_email
+SHA1 014626ba89cca35e31a3a5c9835132f736c8cc5c t/changes/v1_no_author
+SHA1 54d6864e3d068a832c1c1d25121b13eb83ac8cdf t/first_release.t
+SHA1 f13c2abeae2a4e459085be50c58d09db57a25740 t/first_release.tar.gz
+SHA1 f292f4f17c91a691a338a9b912d34bbc8cdd900f t/lib/Test/DZP/Changes.pm
+SHA1 0138f47c42d3be8ee17d1424d32e9743f8c8889e t/test_repo.tar.gz
+SHA1 3a706709f4fca9c92079adcb9bc8a0333e3947b3 xt/author/eol.t
+SHA1 f2c40e917e02088703731272f86cbb906ab19eb3 xt/author/mojibake.t
+SHA1 fae7a9531fdd000d4075a378b828a7aa2508491d xt/author/pod-no404s.t
+SHA1 187e6d98759176eb6fd4fb386871b0ebc51cf289 xt/author/test-version.t
+SHA1 cbc5b72710fb645c559b78c8ac8b879f62aff326 xt/release/dist-manifest.t
+SHA1 76b8c97d1394305444a752b2e936d3d12260cce3 xt/release/kwalitee.t
+SHA1 d1d7aad8e90f60da78b7872043c416a032472490 xt/release/meta-json.t
+SHA1 bae663945a4380ca95a6ba5d8f5e42d2946e0629 xt/release/minimum-version.t
+SHA1 4146b75714ac972231d12d4fb93e764817a5eb0b xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQEcBAEBCgAGBQJXbBrgAAoJEBaIEpACW5CULCoIAKf8kyC6bhJT3RPfITc30dJL
+eQQisBXNJmNwHEVA0RUhg65gj//Y9pldBGa8zeOwExqT07ezTrB8gwaL3toOLKQN
+DelQaOsRh5kpnGVaSFMufZaKU7VzHKP/Ml3O70ZGV9gzrF7ryXshOgrdnAWAn5/a
+5fnZ5tWawHsHgwzMNo+0U9vI5N6IQJ5YVQbmql5G0xDijCGaBNprlDbluJhqbD8R
+qi7OV9A4CO0vQwR2LIqkJCKl/GvWeOYkFFmR5K2MUxvLRk7UPWBw60aAvya8FWl4
+veuXLyreDXzole21D/B0RWyd1x7qx7aiaksoc/tg7BjWuWSfO/QCYOUpD9FFrSU=
+=weDE
+-----END PGP SIGNATURE-----

@@ -1,0 +1,3 @@
+Use build-dir.sh $FULCRUM_HOME fultest in the
+dist directory to fill this directory
+(not required, read the docs)

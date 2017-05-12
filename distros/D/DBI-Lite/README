@@ -1,0 +1,20 @@
+NAME
+    DBI::Lite - Blah blah blah
+
+SYNOPSIS
+      use DBI::Lite;
+
+DESCRIPTION
+    DBI::Lite is
+
+AUTHOR
+    isunix <isunix1989@gmail.com>
+
+COPYRIGHT
+    Copyright 2014- isunix
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO

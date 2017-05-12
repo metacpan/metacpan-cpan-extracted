@@ -1,0 +1,32 @@
+---
+abstract: 'Perl DBGp debugger (derived from Komodo remote debugging helper)'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  DBGp::Client: '0.10'
+  ExtUtils::MakeMaker: '0'
+  Test::DBGp: '0.07'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: artistic
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Debug-DBGp
+no_index:
+  directory:
+    - t
+    - inc
+    - DB
+  file:
+    - perl5db.pl
+requires:
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/mbarbon/perl-remote-debugging-client/issues
+  license: http://dev.perl.org/licenses/artistic.html
+  repository: https://github.com/mbarbon/perl-remote-debugging-client
+version: '0.20'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name: DateTime-Calendar-Mayan
+version: 0.0601
+author:
+  - ~
+abstract: ~
+license: perl
+requires:
+  DateTime: 0.15
+  Params::Validate: 0.64
+provides:
+  DateTime::Calendar::Mayan:
+    file: lib/DateTime/Calendar/Mayan.pm
+    version: 0.0601
+generated_by: Module::Build version 0.24

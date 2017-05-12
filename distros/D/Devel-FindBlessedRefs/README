@@ -1,0 +1,9 @@
+
+
+This just about says it all:
+
+    use Devel::FindBlessedRefs qw(find_refs);
+    my @refs = find_refs("PackageName");
+
+
+(GPL)

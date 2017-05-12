@@ -1,0 +1,46 @@
+Revision history for perl module Data::Validate::Image
+
+0.012002 2015-01-22
+    - Improved documentation - j1n3l0
+    - Updated Contributors
+
+0.012001 2014-02-22
+    - Changed repo url
+
+0.012 2013-07-29
+    - Added Changes to MANIFEST
+
+0.011 2013-07-29
+    - Reformatted Changes file as per CPAN::Changes::Spec
+
+0.010 2013-07-28
+    - Updated Makefile.PL with minimum required version of Test::More
+
+0.009 2013-07-27
+    - Added new fake test with JPG magic bytes
+    - Moved repo to github, update Makefile.pl
+
+0.008 2012-04-14
+    - No changes, I accidently deleted the tar.gz from cpan, had to reupload, can't upload same version twice
+
+0.007 2012-08-24
+    - Fixed problem identifying tiff files
+
+0.006 2011-05-16
+    - Added executable check to convert installed check
+
+0.005 2011-05-15
+    - Changed convert installed check (again) to look in each part of the path for 'convert'. should work much more better
+
+0.004 2011-05-14
+    - Changed convert installed check to use which to return path to convert, or assume it's not installed - *should* fix error when convert wasn't installed, probably not on win32 though or other places where there's no which...
+
+0.003 2011-02-09
+    - Fixed `convert` install check (looks for error 127)
+
+0.002 2011-01-09
+    - Added not about convert being needed to POD
+    - Adjusted so still works (reduced functionality) without convert installed 
+
+0.001 2011-01-09
+    - First release

@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w
+###########################################
+# xx -- 
+# Mike Schilli, 2005 (m@perlmeister.com)
+###########################################
+use strict;
+use Sysadm::Install qw(:all);
+use Log::Log4perl qw(:easy);
+Log::Log4perl->easy_init($DEBUG);
+
+use Data::Throttler;
+
+my $throttler = Data::Throttler->new(
+    interval  => 30,
+    max_items => 10,
+);
+
+print $throttler->buckets_dump();
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "barfoo");
+print $throttler->buckets_dump();
+sleep(3);
+$throttler->try_push(key => "foobar");
+$throttler->try_push(key => "barfoo");
+print $throttler->buckets_dump();

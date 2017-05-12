@@ -1,0 +1,225 @@
+#!/usr/bin/perl
+
+use strict;
+use DBR;
+use DBR::Util::Logger;
+use Text::SimpleTable::AutoWidth;
+use Getopt::Std;
+use Getopt::Long qw(GetOptionsFromArray);
+use Switch;
+
+my @CLASSES = qw'master query';
+my @MODULES = qw'Mysql SQLite';
+    
+my %opts;
+getopt('f:', \%opts);
+
+my $conffile = $opts{f} || $ENV{DBR_CONF};
+
+my ( $command, @params ) = @ARGV;
+my $confdb = 'dbrconf';
+$command = lc($command);
+
+my %commands = map{ $_ => 1 } qw'list assert';
+my $ERR;
+
+print "\n";
+if ( !$conffile ){
+    print STDERR " ERROR: DBR conf file must be specified.\n";
+    $ERR = 1;
+}
+
+$command or $ERR = 1;
+
+if( $command && !$commands{$command} ){
+    print STDERR "ERROR: $command is not a valid command\n";
+    $ERR = 1;
+}
+
+my $dbrh;
+if( $conffile && $command ){
+    my $logger = new DBR::Util::Logger(-logpath => 'dbr_schema.log', -logLevel => 'debug3') or die "Failed to create logger";
+    my $dbr    = new DBR( -logger => $logger, -conf   => $conffile ) or die "Failed to create DBR";
+    $dbrh = $dbr->connect( $confdb ) or die "No config found for confdb $confdb";
+    
+    my $sub = \&$command || die "Sanity error";
+    eval { $sub->( @params ) };
+    if ($@){
+        my $ex = $@;
+        $ex = $$ex . "\n" if ( ref $ex eq 'SCALAR' );
+        
+        print STDERR " ERROR: $ex\n";
+        $ERR = 1;
+    }
+}
+
+if ( $ERR ){
+    print STDERR " Usage: \n";
+    print STDERR "  dbr-config [ -f /path/to/my/DBR.conf ] COMMAND [ command options ]\n\n";
+    
+    
+    print STDERR "  Commands:\n\n";
+    
+    print STDERR "   list \n";
+    print STDERR "        schema   # list schemas\n";
+    print STDERR "        instance # list instances\n";
+    print STDERR "   assert \n";
+    print STDERR "          schema 'schema_handle' ['Schema Display Name']  # Create / Update a schema record\n";
+    print STDERR "          instance *params*                               # Create / Update a schema record\n";
+    
+    print STDERR "\n";
+    print STDERR "  Note: DBR conf file may be specied via the -f flag, or the DBR_CONF environment variable\n\n";
+    exit 1;
+}
+print "\n";
+
+sub assert{
+    switch ( lc(shift) ){
+        case 'schema'   { assert_schema   ( @_ ) }
+        case 'instance' { assert_instance ( @_ ) }
+        else            { die \"Invalid assertion type" }
+    };
+}
+sub list{
+    switch ( lc(shift) ){
+        case 'schema'   { list_schema   ( @_ ) }
+        case 'instance' { list_instance ( @_ ) }
+        else            { die \"Invalid list type '$_'" }
+    };
+}
+
+sub assert_schema{
+    my ( $handle, $name ) = @_;
+    $handle || die "Schema handle is required";
+    
+    my $schema = $dbrh->select(
+                               -table => 'dbr_schemas',
+                               -fields => 'schema_id',
+                               -where => { handle => $handle },
+                               -single => 1
+                            );
+    
+    if ($schema){
+        if ($name) {
+            $dbrh->update(
+                    -table => 'dbr_schemas',
+                    -fields => { display_name => $name },
+                    -where => { schema_id => $schema->{schema_id} }
+                );
+        }
+    }else{
+        $dbrh->insert(
+                    -table => 'dbr_schemas',
+                    -fields => { handle => $handle, display_name => $name }
+                );
+    }
+    
+    return list_schema();
+}
+
+sub list_schema{
+    my $schemas = $dbrh->select( -table => 'dbr_schemas', -fields => 'schema_id handle display_name' );
+    return print "\nNo schemas found\n\n" unless @$schemas;
+    
+    my $t1 = Text::SimpleTable::AutoWidth->new( captions => ['ID','Handle','Display Name'] );
+    foreach my $schema ( @$schemas ){
+        $t1->row( map { $_ || '' } @$schema{qw'schema_id handle display_name'} );
+    }
+    
+    print "Schemas:\n";
+    print $t1->draw;
+    
+    return 1;
+}
+sub list_instance{
+    my $instances = $dbrh->select( -table => 'dbr_instances',
+                                -fields => 'instance_id schema_id handle class module dbname dbfile username host readonly' );
+    return print "\nNo instances found\n\n" unless @$instances;
+    
+    my $t1 = Text::SimpleTable::AutoWidth->new( captions => ['ID','Schema ID','Handle', 'Module', 'Connect', 'Class', 'Mode' ] );
+    
+    foreach my $instance ( @$instances ){
+        
+        my $connect;
+        if ($instance->{dbfile}){
+            $connect = $instance->{dbfile};
+        }else{ #if ( $instance->{username} && $instance->{dbname} ){
+            $connect = $instance->{username} . '@' . $instance->{host} . ':' . $instance->{dbname};
+        }
+        
+        $t1->row(
+            map { $_ || '' } @$instance{qw'instance_id schema_id handle module'},
+            $connect,
+            $instance->{class}    || '',
+            $instance->{readonly} ? 'RO' : 'RW',
+        );
+    }
+    
+    print "Instances:\n";
+    print $t1->draw;
+    
+    return 1;
+}
+
+sub assert_instance{
+    my %params = ();
+    my @fields = qw'class dbfile dbname username password host module';
+    
+    GetOptionsFromArray( \@_, \%params,
+        map {"$_=s"} ( @fields, 'schema' ),
+    );
+    
+    my ($class) = grep { lc($_) eq lc($params{class}) } @CLASSES;
+    $class || die \"-class is required, Must be one of @CLASSES";
+    
+    my $schemahandle = lc(delete $params{schema}) || die "-schema handle is required";
+    
+    my $schema = $dbrh->select( -table => 'dbr_schemas', -fields => 'schema_id handle', -where => { handle => $schemahandle }, -single => 1 )
+      or die \"Could not find schema '$schemahandle'";
+    
+    my $instance = $dbrh->select(
+                            -table => 'dbr_instances',
+                            -fields => [@fields,qw'instance_id schema_id'],
+                            -where => {
+                                       schema_id => $schema->{schema_id},
+                                       class     => $class
+                                    },
+                            -single => 1
+                        );
+    if ($instance){
+        map { $params{$_} ||= $instance->{$_} } @fields
+    }
+    
+    my ($module) = grep { lc($_) eq lc($params{module}) } @MODULES;
+    $module || die \"-module is required, Must be one of @MODULES";
+    $params{module} = $module;
+    
+    if (lc $module eq 'sqlite'){
+        $params{dbfile} || die \"-dbfile is required";
+    }else{
+        $params{host}     || die \"-host is required";
+        $params{dbname}   || die \"-dbname is required";
+        $params{username} || die \"-username is required";
+        $params{password} || die \"-password is required";
+    }
+    
+    if($instance){
+        map { delete $params{$_} if $params{$_} eq $instance->{$_} } keys %params;
+        if (%params){
+            $dbrh->update(
+                    -table => 'dbr_instances',
+                    -fields => \%params,
+                    -where => { instance_id => $instance->{instance_id} }
+                );
+        }
+    }else{
+        $params{schema_id} = $schema->{schema_id};
+        $params{handle}    = $schema->{handle};
+        $dbrh->insert(
+                    -table => 'dbr_instances',
+                    -fields => \%params
+                );
+    }
+    
+    return list_instance();
+}

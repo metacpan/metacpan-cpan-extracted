@@ -1,0 +1,155 @@
+# NAME
+
+DateTimeX::Duration::SkipDays - Given a starting date, a number of days and a list of days to be skipped, returns the date X number of days away.
+
+# VERSION
+
+version 0.001
+
+# SYNOPSIS
+
+ #!/usr/bin/perl
+
+ use strict;
+ use warnings;
+
+ use DateTime;
+ use DateTimeX::Duration::SkipDays;
+
+ my $skip_days = q(
+
+ Christmas
+ Christmas Eve
+ RRULE:FREQ=WEEKLY;BYDAY=SA,SU
+
+ );
+
+ my $skip_x_days = 30;
+ my $start_date  = DateTime->new( 'year' => 2011, 'month' => 12, 'day' => 1 );
+
+ my $s = DateTimeX::Duration::SkipDays->new({
+   'parse_dates'  => $skip_days,
+   'start_date'   => $start_date,
+ });
+
+ my ( $span, $skipped ) = $s->add( $skip_x_days );
+
+ printf "\nCalculated Start: %s\nCalculated End:  %s\n", $span->start->ymd, $span->end->ymd;
+
+ my $iter = $skipped->iterator;
+
+ while ( my $dt = $iter->next ) {
+
+   printf "\nSkipped: %s", $dt->min->ymd;
+
+ }
+
+ if ( @{ $s->bad_format } ) {
+
+   print "\n\nUnrecognized formats:";
+   print "\n\t$_" for @{ $s->bad_format };
+
+ }
+
+ # should output
+
+ # Calculated Start: 2011-12-01
+ # Calculated End:  2012-01-12
+
+ # Skipped: 2011-12-03
+ # Skipped: 2011-12-04
+ # Skipped: 2011-12-10
+ # Skipped: 2011-12-11
+ # Skipped: 2011-12-17
+ # Skipped: 2011-12-18
+ # Skipped: 2011-12-24
+ # Skipped: 2011-12-25
+ # Skipped: 2011-12-31
+ # Skipped: 2012-01-01
+ # Skipped: 2012-01-07
+ # Skipped: 2012-01-08
+
+# METHODS
+
+## new( [\%HASH] )
+
+With no arguments an empty object is returned.
+
+This method will croak if a non-hash reference is passed to it.
+
+The possible keys for the constructor are any of the available methods below,
+except for `add`.  The `add` method must be called explicitly. Unknown keys
+will be silently ignored.
+
+The values have the same requirement as the matching methods.
+
+Returns a `DateTimeX::Duration::SkipDays` object.
+
+## start_date( DateTime )
+
+`start_date` is expecting a [DateTime](http://search.cpan.org/perldoc?DateTime) object. This will be used as the
+starting point for calculations.
+
+Returns true on success.
+
+## days_to_skip
+
+`days_to_skip` accepts any object, or array of objects that will be added to the
+current list of days to be skipped.
+
+Currently, [DateTime](http://search.cpan.org/perldoc?DateTime), [DateTime::Span](http://search.cpan.org/perldoc?DateTime::Span), [DateTime::Set](http://search.cpan.org/perldoc?DateTime::Set),
+[DateTime::Set::ICal](http://search.cpan.org/perldoc?DateTime::Set::ICal) and [DateTime::SpanSet](http://search.cpan.org/perldoc?DateTime::SpanSet) are known to work.  Anything
+that can be used with [DateTime::Set](http://search.cpan.org/perldoc?DateTime::Set)'s union method should work.
+
+Returns true on success
+
+## parse_dates( $SCALAR )
+
+`parse_dates` is expecting a scalar that has a newline separated list of
+dates.  The text can contain any of the following:
+
+- A holiday known to [DateTime::Event::Holiday::US](http://search.cpan.org/perldoc?DateTime::Event::Holiday::US)
+- A RRULE -- [DateTime::Format::ICal](http://search.cpan.org/perldoc?DateTime::Format::ICal) is being used to parse this input
+- A formatted, or partially formatted, date string --
+[DateTime::Format::Flexible](http://search.cpan.org/perldoc?DateTime::Format::Flexible) is being used to parse this input.
+
+Returns true on success or false on failure.
+
+Any line that is not recognized is silently ignored.  Check `bad_format` for
+a list of unknown formats.
+
+## bad_format
+
+Returns a reference to an array of unrecognized formats.
+
+## add
+
+`add` expects a single integer (can be positive or negative, or even 0, though
+that would be kind of useless).
+
+This is the number of days into the future or past you are looking for.
+
+The `start_date` and `days_to_skip` values need to have been populated or
+this method will croak.
+
+In array context a reference to a [DateTime::Span](http://search.cpan.org/perldoc?DateTime::Span) object and
+a [DateTime::SpanSet](http://search.cpan.org/perldoc?DateTime::SpanSet) object is returned, otherwise a reference to a hash with
+those objects as values is returned.
+
+X<DateTime>
+X<DateTime::Duration>
+
+# INSTALLATION
+
+See perlmodinstall for information and options on installing Perl modules.
+
+# AUTHOR
+
+Alan Young <harleypig@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010 by Alan Young.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

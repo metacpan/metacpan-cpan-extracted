@@ -1,0 +1,25 @@
+Problems using DBD::Informix with Web Servers
+=============================================
+
+If you have problems using DBD::Informix in conjunction with a web server,
+then abuot 99 times out of 100 the trouble is with the Informix-specific
+environment variables such as INFORMIXDIR and INFORMIXSERVER.  Web servers
+generally control the environment very carefully.  These are typically not
+set by the web server nor passed through by the web server even if they are
+in the web server's environment when you start it.  If you want your
+DBD::Informix script to see the Informix environment variables, set them in
+the web server configuration.
+
+With Apache, study the SetEnv and (less importantly) PassEnv directives.
+Use SetEnv; do not use PassEnv unless you are sure you know what you are
+doing and you know why it might cause you troubles and you understand
+clearly that you won't get much sympathy if it turns out that you have
+used it and it is the cause of the trouble..
+
+The other problem that can occur is with permissions; the web server is
+typically running as a low-privileged user (eg nobody).
+
+---------------------------------------------------------------------------
+
+Author: Jonathan Leffler (jleffler@us.ibm.com)
+@(#)$Id: web.servers,v 100.1 2002/02/08 22:50:04 jleffler Exp $

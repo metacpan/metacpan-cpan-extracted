@@ -1,0 +1,89 @@
+Release history for perl-Dist-Zilla-Role-ErrorLogger:
+
+v0.9.0 @ 2015-10-26 21:04 UTC
+
+    -   `abort` method now throws an exception of class
+        `Dist::Zilla::Role::ErrorLogger::Exception::Abort`, not just string. Being stringified, an
+        exception object returns "Aborting...\n", so visually result would be the same. However,
+        tests checking the exception should be updated.
+
+    -   `abort_if_error` renamed to `abort_if_errors`. Original method name is kept as an alias.
+
+    -   Test code simplified a bit: `run_me` used instead of more generic `run_tests`,
+        `ErrorLoggerTester` role inlined into the test. Helper plugin moved to `t/lib/` directory
+        to separate tests from supporting modules.
+
+v0.8.0 @ 2015-10-24 17:27 UTC
+
+    -   `log_errors_in_file` now accepts both `Str` and `ArrayRef[Str]` as messages. `ArrayRef`
+        allows to specify multiple messages to the same line without repeating line number:
+        `log_errors_in_file( $n => [ $msg1, $msg2 ] );`.
+
+    -   Synopsis fixed a bit to make `Test::Synopsis` happy.
+
+    -   Short license note used in POD.
+
+    -   `aspell.en.pws` file is renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+v0.7.0 @ 2015-09-17 18:18 UTC
+
+    -   Code working with log levels (commented out in 0.004) completely removed.
+
+    -   Required Perl version lowered from v5.10 to v5.6.
+
+    -   'log_fatal` is not actually required from consumer, this requirement dropped.
+
+    -   Documentation improved a bit.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.006 @ 2015-09-16 17:19 UTC
+
+    -   `abort` flushes `STDOUT` before dying. `abort` documentation improved.
+
+    -   `log_errors_in_file` method introduced.
+
+0.005 @ 2015-07-14 19:16 UTC
+
+    -   One of test modules, `DistZillaTester.pm`, uses `Dist::Zilla::Tester::_Builder`.
+        `AutoPrereqs` finds this dependency and adds prerequisite. With such prerequisite, `cpanm`
+        starts downloading, testing and installing `Dist::Zilla`, ignoring the fact that
+        `Dist::Zilla` is already installed. Problem workarounded by hiding
+        `Dist::Zilla::Tester::_Builder` from `AutoPrereqs`.
+
+0.004 @ 2015-07-14 18:48 UTC
+
+    -   Critical bug introduced in v0.002 fixed. Messages were logged with `level => 'error'`.
+        Such messages appeared in logger events, but not on display. `level` argument is commented
+        out.
+
+    -   `abort` method introduced.
+
+    -   Documentation improved.
+
+    -   Required Perl version lowered by eliminating `/r` regexp modifier in test script. Original
+        required Perl version was 5.013, now it should be 5.010.
+
+    -   Bunch of infrastructure changes.
+
+0.003 @ 2015-07-04
+
+    -   One more dependency (this time on `IPC::System::Simple`) was not detected automatically,
+        causing test failure. Fixed.
+
+0.002 @ 2015-07-03
+
+    -   `abort_if_error` accepts arguments and passes them to `log_fatal`.
+
+    -   `log_error` reports messages with `error` level.
+
+    -   Tests for new features added.
+
+    -   Bug in metadata fixed: dependency on `GPL_3::or_later` was not detected automatically, so
+        test could fail due to missed dependency.
+
+0.001 @ 2015-06-28
+
+    -   `error_count`, `log_error`, and `abort_if_error` implemented.
+
+    -   Functional test implemented.

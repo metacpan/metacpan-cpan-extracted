@@ -1,0 +1,7 @@
+Revision history for Data-Page-Pageset
+
+1.02
+       - fix a bug in Chunk.pm sub middle()
+
+1.01  Sat Dec 25 11:34:00 2004
+	- original version; created by manual

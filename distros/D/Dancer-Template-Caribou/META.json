@@ -1,0 +1,86 @@
+{
+   "abstract" : "Template::Caribou wrapper for Dancer",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-Caribou",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer::Config" : "0",
+            "Dancer::Template::Abstract" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moose::Util" : "0",
+            "Template::Caribou" : "v1.2.0",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer" : "0",
+            "Dancer::Test" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moose::Role" : "0",
+            "Template::Caribou" : "v1.2.0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Template::Caribou" : {
+         "file" : "lib/Dancer/Template/Caribou.pm",
+         "version" : "v1.0.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Dancer-Template-Caribou/issues"
+      },
+      "homepage" : "https://github.com/yanick/Dancer-Template-Caribou",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dancer-Template-Caribou.git",
+         "web" : "https://github.com/yanick/Dancer-Template-Caribou"
+      }
+   },
+   "version" : "1.0.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ]
+}
+

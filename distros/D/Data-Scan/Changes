@@ -1,0 +1,106 @@
+Changelog for Data-Scan
+
+0.008 2017-03-10T04:28:55
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Add initial arguments to dsstart()
+
+0.007 2017-02-22T06:12:38Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Added B::Deparse in the SEE ALSO section
+ - Fallback to a "without deparse" mode if deparse of a code ref raise an
+   exception
+
+0.006 2016-02-23T06:23:08Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dist.ini: stopwords = bufferize
+ - Buffered mode, enabled by default, to handle arbitrary large data
+ - Data/Scan.pm: change a comment in the SYNOPSIS
+ - t/printer.t: show how to pass options when using dspp()
+ - POD fixes
+
+0.005 2016-02-20T11:57:05Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Impl/Printer: changed defaults of with_indices_full and with_methods to
+   a false value, clear memory at dsend()
+ - Impl/Printer.pm: Removal of MooX::HandlesVia dependency
+ - Data/Scan.pm: Avoid too many calls to arybase
+ - Impl/Printer.pm MooX::HandlesVia::Simple will be MooX::HandlesVia::Dirty
+ - Impl/Printer.pm: use MooX::HandlesVia::Simple -replace => 1
+ - Impl/Printer.pm: $desc = "\"$desc\"" is fast than $desc = " . $desc . "
+ - Impl/Printer.pm: MooX::HandlesVia::Simple like optim
+ - Impl/Printer.pm: In preparation of MooX::HandlesVia::Simple
+ - Impl/Printer.pm: put Moo first in the use statements
+ - Impl/Printer.pm: bug fix when with_indices_full => 0
+ - Impl/Printer.pm: make _currentIndicePerLevel really current indice
+   instead of next value
+ - Impl/Printer.pm: fix concatenatedLevels string
+ - Impl/Printer.pm: use handles_via
+ - Impl/Printer.pm: colored calls profiling
+ - Impl/Printer.pm: _pushDesc() profiling
+ - Impl/Printer.pm: Profiling bis
+ - Impl/Printer.pm: Profiling
+ - Impl/Printer.pm: Added 0x32 (space) to printable characters
+ - dist.ini: Add Authority
+ - Data/Scan.pm: removed unused import
+ - Data/Scan.pm: Mention of link to Data::Scan::Printer
+ - Scan/Printer.pm: ABSTRACT fix
+
+0.004 2016-02-13T06:33:41Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - dzil xtest && max_depth option for Impl/Printer.pm
+ - A lot of POD
+ - Scan/Printer.pm: Initialize %Option
+ - Impl/Printer.pm: add indices_full option
+ - Scan/Printer.pm: more POD with example of deparse and link to
+   Data::Scan::Impl::Printer
+ - t/printer.t: Add Moo object in test
+ - Impl/Printer.pm: Note on methods introspection
+ - Impl/Printer.pm: Class introspection
+ - Add deparse to dspp and remove logic trying to guess if we can ansicolor
+   or not
+
+0.003 2016-02-12T05:39:54Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Uniformization of required API: everything is prefixed with ds
+ - Removed output from role requirements
+ - Impl/Printer.pm: Removed non neede Data::Dumper dependency
+
+0.002 2016-02-11T19:50:27Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Scan/Printer.pm: more POD
+ - Data/Scan.pm: again ops
+ - for next element in array or hash
+ - Data/Scan.pm: Still less ops
+ - Data/Scan.pm: Again less ops
+ - Data/Scan.pm: One less op at the end
+ - Data/Scan.pm: POD explaining process() signature
+ - Data/Scan.pm: more POD explaining consumer signature calls
+ - Data/Scan.pm: less ops I believe
+ - Data/Scan.pm: move protection in the while() directly
+ - Data/Scan.pm: extra protection when eating internal tags
+ - Data/Scan.pm: removed unused $_read and added some comments
+
+ [Mohammad S Anwar <mohammad.anwar@yahoo.com>]
+ - Fix typo in the pod document.
+
+0.001 2016-02-10T18:31:40Z
+ [Jean-Damien Durand <jeandamiendurand@free.fr>]
+ - Initial release
+ - dzil xtest
+ - dzil compliance
+ - dist.ini: ContributorsFromGit replaced by Git::Contributors
+ - Impl/Printer.pm: show_indice split
+ - Customizations: dev+
+ - Win32::Console::ANSI dependency
+ - Impl/Printer.pm: unknown should be seen as it names indicated
+ - Impl/Printer.pm: colors
+ - Impl/Printer.pm: consider unfolded contents the same in any case
+ - Work on recursion prevention
+ - POD: typo
+ - POD + use an array reference to handle the case of empty unfolded
+   content
+ - t+
+ - changing API: dev+
+ - dev+
+ - dev+: proof of concept ok
+ - Import

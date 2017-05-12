@@ -1,0 +1,14 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PERLANCAR::EnsurePrereqToSpec]
+
+DESCRIPTION
+
+    I like to specify prerequisite to spec modules such as Rinci, Riap,
+    Sah, Setup, etc as DevelopRecommends, to express that a distribution
+    conforms to such specification(s).
+
+    Currently only Rinci is checked.
+

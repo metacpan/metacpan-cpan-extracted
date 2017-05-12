@@ -1,0 +1,15 @@
+Revision history for Perl extension DBIx::Dump.
+
+0.01  Tue Oct  1 11:35:35 2002
+	- original version; created by h2xs 1.21 with options
+		-X -c DBIx::Dump
+
+0.02  Wed Oct  2
+	- Added a CVS transformation interface
+
+0.03  Thur Oct  3
+	- Added an event driven SAX-like interface to allow event handler definition
+
+0.04  Fri Oct 25
+	- Fixed a uninitialized value bug for excelFormat property (thanks to Allen Byington)
+

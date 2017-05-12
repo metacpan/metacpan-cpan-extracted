@@ -1,0 +1,14 @@
+Revision history for Perl extension Devel::PrettyTrace.
+
+0.04  Wed Jun 29 12:08:28 MSD 2011
+	- fix tests on 5.14 and later
+
+0.03  Mon Jun 27 23:39:54 MSD 2011
+	- work around different string eval numbers for tests
+
+0.02  Mon Jun 27 14:04:21 MSD 2011
+	- force indentation of 2 spaces, so tests correctly pass
+
+0.01  Tue Jun 21 22:57:30 MSD 2011
+	- original version; created by h2xs 1.23
+

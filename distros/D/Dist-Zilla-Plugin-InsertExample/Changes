@@ -1,0 +1,23 @@
+Revision history for Dist-Zilla-Plugin-InsertExample
+
+0.07      2017-04-19 13:05:28 -0400
+  - perl 5.26.x compatability
+
+0.06      2016-04-24 19:21:29 -0400
+  - Dist::Zilla 6.x compatability
+
+0.05      2016-03-16 11:00:06 -0400
+  - Search for files in the building dist first
+
+0.04      2015-01-15 06:33:01 -0500
+  - added the remove_boiler option
+
+0.03      2013-12-13 21:19:45 -0500
+  - documentation
+  - support Perl 5.8
+
+0.02      2013-06-17 06:29:14 America/New_York
+  - Fix typo in deps
+
+0.01      2013-06-17 06:27:37 America/New_York
+  - initial version

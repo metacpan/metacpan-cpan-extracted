@@ -1,0 +1,79 @@
+{
+   "abstract" : "extract probable dates from strings *with surprises*",
+   "author" : [
+      "Stephen R. Scaffidi <sscaffidi@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101900, CPAN::Meta::Converter version 2.102160",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Extract-Surprise",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "DateTime::Format::Flexible" : "0.10",
+            "Exporter::Easy" : 0,
+            "Scalar::Util" : 0,
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dumper" : 0,
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Extract::Surprise" : {
+         "file" : "lib/Date/Extract/Surprise.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-date-extract-surprise at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Date-Extract-Surprise"
+      },
+      "homepage" : "http://github.com/Hercynium/Date-Extract-Surprise/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Hercynium/Date-Extract-Surprise.git",
+         "web" : "http://github.com/Hercynium/Date-Extract-Surprise/tree"
+      }
+   },
+   "version" : "0.006",
+   "x_BuiltWith" : {
+      "modules" : {
+         "Carp" : "1.08",
+         "Data::Dumper" : "2.126",
+         "DateTime::Format::Flexible" : "0.15",
+         "Exporter::Easy" : "0.16",
+         "ExtUtils::MakeMaker" : "6.56",
+         "Module::Build" : "0.3607",
+         "Scalar::Util" : "1.23",
+         "Test::More" : "0.94"
+      },
+      "perl" : "5.010000",
+      "platform" : "linux"
+   }
+}
+

@@ -1,0 +1,26 @@
+SYNOPSIS
+
+     use Devel::Util::Caller qw(callers);
+    
+     my @callers = callers();
+
+FUNCTIONS
+
+ callers([ $start=0 [, $with_args] ]) => LIST
+
+    A convenience function to return the whole callers stack, produced by
+    calling caller() repeatedly from frame $start+1 until caller() returns
+    empty. Result will be like:
+
+     (
+         #  0          1           2       3             4          5            6           7             8        9          10
+         [$package1, $filename1, $line1, $subroutine1, $hasargs1, $wantarray1, $evaltext1, $is_require1, $hints1, $bitmask1, $hinthash1],
+         [$package2, $filename2, $line2, ...],
+         ...
+     )
+
+    If $with_args is true, will also return subroutine arguments in the
+    11th element of each frame, produced by retrieving @DB::args.
+
+SEE ALSO
+

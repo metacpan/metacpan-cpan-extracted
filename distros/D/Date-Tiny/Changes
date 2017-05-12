@@ -1,0 +1,26 @@
+Revision history for Date-Tiny
+
+1.07      2016-06-23 09:42:55-04:00 America/New_York
+    - No changes from 1.06
+
+1.06      2016-06-20 14:46:33-04:00 America/New_York (TRIAL RELEASE)
+    - Fix generated LICENSE to be the Perl 5 License
+
+1.05      2016-06-20 14:39:48-04:00 America/New_York (TRIAL RELEASE)
+    - David Golden taking over as maintainer
+    - Fix tests with DateTime::Locale 1.00 and later
+    - Fix documentation typos
+    - Ensure Carp is loaded before using it
+
+1.04 Mon 20 Apr 2009
+        - Makefile.PL will create a better META.yml
+
+1.03 Thu  1 Nov 2007
+	- Converting from Module::Install to EU::MM
+	- Moving to a production version
+
+0.02 Thu 10 May 2007
+	- Adding the missing from_string method
+
+0.01 Sun 27 Aug 2006
+	- original version

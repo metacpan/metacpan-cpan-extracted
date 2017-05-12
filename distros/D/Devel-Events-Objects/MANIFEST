@@ -1,0 +1,11 @@
+Changes
+lib/Devel/Events/Generator/Objects.pm
+lib/Devel/Events/Handler/ObjectTracker.pm
+lib/Devel/Events/Objects.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/010_generator_objects.t
+t/031_handler_objecttracker.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

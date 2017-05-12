@@ -1,0 +1,215 @@
+# NAME
+
+DateTimeX::ISO8601::Interval - Provides a means of parsing and manipulating ISO-8601 intervals and durations.
+
+# VERSION
+
+version 0.003
+
+# SYNOPSIS
+
+        my $interval = DateTimeX::ISO8601::Interval->parse("2013-12-01/15");
+        $interval->contains('2013-12-07'); # true
+        $interval->contains('2013-12-16'); # false
+
+        my $repeating_interval = DateTimeX::ISO8601::Interval->parse("R12/2013-12-01/P1M");
+        my $iterator = $repeating_interval->iterator;
+        while(my $month_interval = $iterator->()){
+                # $month_interval is jan, feb, mar, ..., dec
+        }
+
+# DESCRIPTION
+
+This module provides parsing and iteration functionality for `ISO 8601`
+date/time intervals. The `ISO 8601` standard provides a succinct way of
+representing an interval of time (including the option for the interval
+to repeate).
+
+According to Wikipedia, there are four ways to represent an interval:
+
+- Start and end, such as "2007-03-01T13:00:00Z/2008-05-11T15:30:00Z"
+- Start and duration, such as "2007-03-01T13:00:00Z/P1Y2M10DT2H30M"
+- Duration and end, such as "P1Y2M10DT2H30M/2008-05-11T15:30:00Z"
+- Duration only, such as "P1Y2M10DT2H30M", with additional context information
+
+# METHODS
+
+## parse
+
+This class method will parse the first argument provided as an `ISO 8601` formatted
+date/time interval.  All remaining arguments will be passed through to `/new`. Example
+intervals are show above in the ["SYNOPSIS"](#synopsis) and ["DESCRIPTION"](#description).
+
+## new
+
+The constructor takes a number of arguments and can be used instead of ["parse"](#parse) to create
+a DateTimeX::ISO8601::Interval object.  Those arguments are:
+
+- start - [DateTime](https://metacpan.org/pod/DateTime) object, must be specified if `duration` is not specified
+- end - [DateTime](https://metacpan.org/pod/DateTime) object, must be specified if `duration` is not specified
+- duration - [DateTime::Duration](https://metacpan.org/pod/DateTime::Duration) object, must be specified if either `start` or `end` is missing
+- time\_zone - string or [DateTime::TimeZone](https://metacpan.org/pod/DateTime::TimeZone) object, will be set on underlying [DateTime](https://metacpan.org/pod/DateTime)
+objects if ["start"](#start) or ["end"](#end) values must be parsed.
+- abbreviate - boolean, enable (or disable) abbreviation.  Defaults to `0`
+- repeat - integer, specify the number of times this interval should
+be repeated. A value of `-1` indicates an unbounded nubmer of
+repeats. Defaults to `0`.
+
+## start
+
+Returns a [DateTime](https://metacpan.org/pod/DateTime) object representing the beginning of this
+interval. **Note:** if the interval doesn't include a time component,
+the start time will actually be `00:00:00.000` of the following day
+(since the interval covers the entire day). Intervals **include** the
+`start` value (in contrast to the `end` value).
+
+This interval can be changed by providing a new [DateTime](https://metacpan.org/pod/DateTime) object as
+an argument to this method. If this interval has an explicit ["end"](#end)
+date specified, any existing relative ["duration"](#duration) will be cleared.
+
+## end
+
+Returns a [DateTime](https://metacpan.org/pod/DateTime) object representing the end of this interval. This
+value is **exclusive** meaning that the interval ends at exactly this time
+and does not include this point in time. For instance, an interval that
+is one hour long might begin at `09:38:43` and end at `10:38:43`. The
+`10:38:43` instant is not a part of this interval. Stated another way,
+`$interval->contains($interval->end)` always returns false.
+
+This interval can be changed by providing a new [DateTime](https://metacpan.org/pod/DateTime) object as
+an argument to this method. If this interval has an explicit ["start"](#start)
+date specified, any existing relative ["duration"](#duration) will be cleared.
+
+**Note:** if the interval doesn't include a time component, the end
+time will actually be `00:00:00.000` of the following day (since the
+interval covers the entire day). If [DateTime](https://metacpan.org/pod/DateTime) supported a time of day
+like `24:00:00.000` that would be used instead.
+
+## duration
+
+Returns a [DateTime::Duration](https://metacpan.org/pod/DateTime::Duration) object representing this interval.
+
+## repeat
+
+Returns the number of times this interval should repeat. This value
+can be changed by providing a new value.  A `repeat` value of `0`
+means that the interval is not repeated. A `repeat` value of `-1`
+means that the interval should be repeated indefinitely.
+
+## iterator
+
+Provides an iterator (as a code ref) that returns new
+[DateTimeX::ISO8601::Interval](https://metacpan.org/pod/DateTimeX::ISO8601::Interval) objects for each repitition as defined
+by this interval object. Once all the intervals have been returned, the
+iterator will return `undef` for each subsequent call.
+
+A few arguments may be specified to modify the behavior of the iterator:
+
+- skip - specify the number of intervals to skip for the first
+call to the iterator
+- after - skip all intervals that are before this [DateTime](https://metacpan.org/pod/DateTime)
+object if this [DateTimeX::ISO8601::Interval](https://metacpan.org/pod/DateTimeX::ISO8601::Interval) is defined only by a
+duration (having neither an explicit start or end date) this parameter
+will be used as the start date.
+- until - specify a specific [DateTime](https://metacpan.org/pod/DateTime) to stop returning new
+intervals.  Similar to ["end"](#end), this attribute is **exclusive**.  That is,
+once the iterator reaches a point where the interval being returned
+["contains"](#contains) this value, an `undef` is returned and the iterator stops
+returning new intervals.
+
+The iterator returned optionally accepts a single argument that can be used to indicate the
+number of iterations to skip on that call.  For instance:
+
+        my $monthly = DateTimeX::ISO8601::Interval->parse('R12/2013-01-01/P1M');
+        my $iterator = $monthly->iterator;
+        while(my $month = $iterator->(2)) {
+                # $month would be Feb, Apr, Jun, etc
+        }
+
+## contains
+
+Returns a boolean indicating whether the provided date (either an `ISO
+8601` formatted string or a [DateTime](https://metacpan.org/pod/DateTime) object) is between the ["start"](#start)
+or ["end"](#end) dates as defined by this interval.
+
+## abbreviate
+
+Enables abbreviated formatting where duplicate portions of the interval
+are eliminated in the second half of the formatted string. To disable,
+call `$interval-`abbreviate(0)>.  See the ["format"](#format) method for more information
+
+## format
+
+Returns the string representation of this object.  You may optionally
+specify `abbreviate => 1` to abbreviate the interval if possible.  For
+instance, `2013-12-01/2013-12-10` can be abbreviated to `2013-12-01/10`.
+If the interval does not appear to be eligible for abbreviation, it will be
+returned in its full form.
+
+## set\_time\_zone
+
+Sets the time\_zone on the underlying [DateTime](https://metacpan.org/pod/DateTime) objects contained in
+this interval (see ["set\_time\_zone" in DateTime](https://metacpan.org/pod/DateTime#set_time_zone)). Also stores the time zone
+in `$self` for future use by ["contains"](#contains).
+
+# CAVEATS
+
+### Partial dates and date/times
+
+The `ISO 8601` spec is very complex.  This module relies on
+[DateTime::Format::ISO8601](https://metacpan.org/pod/DateTime::Format::ISO8601) for parsing the necessary date strings and
+should work well in most cases but some specific aspects of `ISO 8601`
+are not well supported, specifically as it relates to partial
+representations of dates.
+
+For example, `2013-01/12` should last from January through December
+of 2013.  This is parsed correctly but since [DateTime](https://metacpan.org/pod/DateTime) defaults
+un-specified portions of a date to the first valid value, the
+actual interval ends up being from 2013-01-01 through 2013-12-01.
+Similarly, `2013/2014` should last from the beginning of the year
+2013 through the entire year of 2014. The interval is actually parsed
+as `2013-01-01/2014-01-01`.
+
+Because of the above, it is recommended that you only use full date
+and date/time representations with this module (i.e. `yyyy-MM-dd`
+or `yyyy-MM-ddTHH:mm::ss`).
+
+### Representing dates with [DateTime](https://metacpan.org/pod/DateTime) objects
+
+The [DateTime](https://metacpan.org/pod/DateTime) set of modules is very robust and a great way of
+handling date/times in Perl. However, one of the ambiguities is
+that there is no way of representing a date without an explicit time
+as well. This is significant when parsing an interval that specifies
+only dates. For instance: `2013-12-01/2013-12-07` should represent an
+interval lasting from `2013-12-01` through the end of `2013-12-07`.
+To accomplish this, the end date is adjusted by one day such that
+`$interval->end` returns the [DateTime](https://metacpan.org/pod/DateTime) object that represents the
+time the interval ends: `2013-12-08T00:00:00`
+
+### Decimal representation of durations
+
+The `ISO 8601` standard allows for durations to be specified using
+decimal notation (i.e. P0.5Y == P6M).  While this works somewhat using
+[DateTime::Duration](https://metacpan.org/pod/DateTime::Duration) it's not robust enough to provide any support for
+this portion of the standard.
+
+### Round-tripping intervals
+
+The `ISO 8601` standard allows for intervals to be abbreviated such that
+`2013-12-01/05` is equivalent to `2013-12-01/2013-12-05`.  Abbreviated
+intervals should be parsed correctly but by default, when string-ified,
+they are output in their expanded form. If you would like an abbreviated
+form (if any abbreviation is determined to be possibile) you can use
+the ["abbreviate"](#abbreviate) method. Even so, the abbreviated form is not
+guaranteed to be identical to what was provided on input.
+
+# AUTHOR
+
+Brian Phillips <bphillips@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Brian Phillips and Shutterstock, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

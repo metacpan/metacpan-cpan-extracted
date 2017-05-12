@@ -1,0 +1,20 @@
+Revision history for Perl extension Dist-Zilla-Plugin-FatPacker
+
+1.161631  2016-06-11
+  - Re-packaged with [@Author::DOHERTY] (fixes rt-115278)
+
+1.161630  2016-06-11 02:03:48-07:00 America/Los_Angeles
+  - Fixed incorrect UTF-8 handling [gh-2]
+  - Copy gathered files into a work directory for fatpacking [gh-3]
+
+1.141200  2014-04-29 22:14:09-03:00 America/Halifax
+  - Handle shebang lines correctly
+  - Add tests
+  - ucfirst ABSTRACT
+  - fixed POD
+
+1.100841  2010-03-25 13:14:45 Europe/Vienna
+  - now properly calls fatpack trace, packlists-for, tree and file
+
+1.100840  2010-03-25 11:48:24 Europe/Vienna
+  - original version

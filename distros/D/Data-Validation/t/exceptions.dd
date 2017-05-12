@@ -1,0 +1,5 @@
+do { my $x = {
+       'virtua.com.br' => '8d89fc60-4298-11e6-aef6-a61663f69d7e'
+     };
+  $x;
+ }

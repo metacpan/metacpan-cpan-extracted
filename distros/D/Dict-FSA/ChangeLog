@@ -1,0 +1,12 @@
+2006-08-22 0.1.2
+
+	* make ExtUtils::MakeMaker::Coverage use conditional
+
+2005-05-25 0.1.1
+	
+	* keep query method public
+	* don't run the test when the binary is missing
+
+2005-05-23 0.1
+	
+	* first release

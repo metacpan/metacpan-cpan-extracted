@@ -1,0 +1,5 @@
+#!/usr/bin/perl
+
+use DBIx::Informix::Perform 'run';
+run $ARGV[0];
+

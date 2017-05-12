@@ -1,0 +1,8 @@
+Revision history for Devel-Trace-Syscall
+
+0.02 June 23 2014
+        - Fix some POD problems
+        - Fix a compiler error on GCC 4.7 (thanks sharyanto!)
+
+0.01 June 18 2014
+        - First version!  Allows tracing of system calls across a program's lifetime

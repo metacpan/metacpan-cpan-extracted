@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Anton Petrusevich"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Struct",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Connector" : "0.52",
+            "Digest::MD5" : "0",
+            "JSON" : "0",
+            "SQL::Abstract" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.014000"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jef-sure/dbix-struct-github/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jef-sure/dbix-struct-github.git",
+         "web" : "https://github.com/jef-sure/dbix-struct-github"
+      }
+   },
+   "version" : "0.17",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

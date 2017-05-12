@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dist-Zilla-Plugin-Authority</name>
+  <shortdesc>Add the $AUTHORITY variable and metadata to your distribution</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Apocalypse</foaf:name>
+      <foaf:mbox rdf:resource="mailto:APOCAL@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Dave Rolsky</foaf:name>
+      <foaf:mbox rdf:resource="mailto:autarch@urth.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Kent Fredric</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kentnl@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Nigel Metheringham</foaf:name>
+      <foaf:mbox rdf:resource="mailto:nigel.metheringham@dev.intechnology.co.uk" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Randy Stauner</foaf:name>
+      <foaf:mbox rdf:resource="mailto:randy@magnificent-tears.com" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="http://search.cpan.org/dist/Dist-Zilla-Plugin-Authority/" />
+  <bug-database rdf:resource="http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Authority" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/apocalypse/perl-dist-zilla-plugin-authority" />
+      <location rdf:resource="git://github.com/apocalypse/perl-dist-zilla-plugin-authority.git" />
+    </GitRepository>
+  </repository>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -1,0 +1,48 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "management",
+          "cnt-total": 5,
+          "TABLE_adj": {
+            "ROW_adj": [
+              {
+                "intf-out": "mgmt0",
+                "ip-addr-out": "10.47.64.4",
+                "time-stamp": "00:01:20",
+                "mac": "0009.0fe9.9b39"
+              },
+              {
+                "intf-out": "mgmt0",
+                "ip-addr-out": "10.47.64.6",
+                "time-stamp": "00:09:59",
+                "mac": "204c.9e53.e6c1"
+              },
+              {
+                "intf-out": "mgmt0",
+                "ip-addr-out": "10.47.64.60",
+                "time-stamp": "00:05:36",
+                "mac": "84b8.020e.cda5"
+              },
+              {
+                "intf-out": "mgmt0",
+                "ip-addr-out": "10.47.64.61",
+                "time-stamp": "00:05:36",
+                "mac": "84b8.020e.d7c7"
+              },
+              {
+                "intf-out": "mgmt0",
+                "ip-addr-out": "10.47.64.62",
+                "time-stamp": "00:13:58",
+                "mac": "0000.0c07.ac00"
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

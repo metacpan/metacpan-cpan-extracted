@@ -1,0 +1,91 @@
+NAME
+    DBIx::Class::DateTime::Epoch - Automatic inflation/deflation of
+    epoch-based columns to/from DateTime objects
+
+SYNOPSIS
+        package MySchema::Foo;
+    
+        use base qw( DBIx::Class );
+    
+        __PACKAGE__->load_components( qw( DateTime::Epoch TimeStamp Core ) );
+        __PACKAGE__->add_columns(
+            name => {
+                data_type => 'varchar',
+                size      => 10,
+            },
+            bar => { # epoch stored as an int
+                data_type        => 'bigint',
+                inflate_datetime => 1,
+            },
+            baz => { # epoch stored as a string
+                data_type        => 'varchar',
+                size             => 50,
+                inflate_datetime => 'epoch',
+            },
+            # working in conjunction with DBIx::Class::TimeStamp
+            creation_time => {
+                data_type        => 'bigint',
+                inflate_datetime => 1,
+                set_on_create    => 1,
+            },
+            modification_time => {
+                data_type        => 'bigint',
+                inflate_datetime => 1,
+                set_on_create    => 1,
+                set_on_update    => 1,
+            }
+        );
+
+DATETIME::FORMAT DEPENDENCY
+    There have been no assumptions made as to what RDBMS you will be using.
+    As per the note in the DBIx::Class::InflateColumn::DateTime
+    documentation, you will need to install the DateTime::Format::* module
+    that matches your RDBMS of choice.
+
+DESCRIPTION
+    This module automatically inflates/deflates DateTime objects from/to
+    epoch values for the specified columns. This module is essentially an
+    extension to DBIx::Class::InflateColumn::DateTime so all of the
+    settings, including "locale" and "timezone", are also valid.
+
+    A column will be recognized as an epoch time given one of the following
+    scenarios:
+
+    *   "data_type" is an "int" of some sort and "inflate_datetime" is also
+        set to a true value
+
+    *   "data_type" is some other value (e.g. "varchar") and
+        "inflate_datetime" is explicitly set to "epoch".
+
+    DBIx::Class::TimeStamp can also be used in conjunction with this module
+    to support epoch-based columns that are automatically set on creation of
+    a row and updated subsequent modifications.
+
+METHODS
+  add_columns( )
+    Provides backwards compatibility with the older DateTime::Epoch API.
+
+  _inflate_to_datetime( )
+    Overrides column inflation to use "Datetime->from_epoch".
+
+  _deflate_from_datetime( )
+    Overrides column deflation to call "epoch()" on the column value.
+
+SEE ALSO
+    *   DBIx::Class
+
+    *   DBIx::Class::TimeStamp
+
+    *   DateTime
+
+AUTHORS
+    Brian Cassidy <bricas@cpan.org>
+
+    Adam Paynter <adapay@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006-2012 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

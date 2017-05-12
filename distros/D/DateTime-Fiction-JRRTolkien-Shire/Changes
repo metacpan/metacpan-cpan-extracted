@@ -1,0 +1,105 @@
+0.902		2017-04-22	T. R. Wyant
+    Bump requirement for Params::ValidationCompiler. DateTime needs
+    0.13, but we need 0.19 for some reason. Also made explicit
+    requirement for Specio::* the same as for Specio (0.180), which is
+    the same as DateTime.
+
+0.901		2017-04-06	T. R. Wyant
+    Fix Specio wierdness under Perl 5.8.9. I hope.
+
+    Use local rather than UTC Rata Die in date calculations. The
+    consequence of using UTC Rata Die was that that strftime() produced
+    universal dates but local times.
+
+    Bring dependencies up to date.
+
+    Add date and duration arithmetic. This leaves format_cldr() as the
+    only known part of the DateTime interface not implemented.
+
+0.900		2017-03-16	T. R. Wyant
+    Conform to the full DateTime interface, with the known exceptions of
+    date and duration arithmetic and format_cldr().
+
+    Add instantiator now_local(), which is a convenience method based on
+    the data returned by the localtime() built-in. It differs from now()
+    in that the zone is floating, not UTC,
+
+    Add argument validation via Params::Validate.
+
+    Use Date::Tolkien::Shire::Data as back end.
+
+0.22		2017-02-15	T. R. Wyant
+    Add tools/ directory. At the moment this contains:
+    - A copy of DateTime::Fiction::JRRTolkien::Shire version 0.02 (the
+      last release by Tom Braun), with deliberate changes back-ported.
+      These changes consist of corrections to the on_date() text, plus a
+      change to the week_number() method to return 0 rather than 26 on
+      Midyear's day and the Overlithe.
+    - Script tools/make-regression to read all accessors for a range of
+      values and turn the output into a regression test.
+
+    Fix regressions from Tom Braun's code:
+    - The month_name(), day_name(), holiday_name(), and trad_day_name()
+      methods were returning undef, not '', in cases where no name could
+      be derived. This was broken in version 0.21.
+    - The week_number() method was broken while making it return 0 for
+      Midyear's day and the Overlithe in version 0.21.
+
+    Add xt/author/regression.t (made from tools/make-regression) to make
+    sure this stuff stays fixed.
+
+0.21		2017-02-06	T. R. Wyant
+    Make week_number() return 0 for Midyear's day and the Overlithe.
+
+    Regularize POD.
+
+    Minor corrections to on_date() text.
+
+    Add time zone accessors time_zone(), time_zone_long_name(), and
+    time_zone_short_name().
+
+    Clean up comments and code (mainly line length, and strip trailing
+    spaces).
+
+    Pull static data out of subroutines.
+
+    Add author tests.
+
+    Bring code up to my usual level of  Perl::Critic compliance.
+
+    Merge branch 'manwar-add-abstract-to-pod'.  This pull request added
+    the one-line abstract that is supposed to appear on the NAME line of
+    the POD. Thanks to Mohammad S Anwar for the patch.
+
+    Add method calendar_name() (returns 'Shire')
+
+    Replace die() with Carp::croak().
+
+    Ditch 'use vars'. Add 'use warnings'.
+
+0.20		2017-01-25	T. R. Wyant
+    Replace LICENSE file with LICENSES/ dir. The new directory contains
+    the licenses as individual files.
+
+    Synch on_date() text with Date::Tolkien::Shire
+
+    Add 'provides' metadata to EUMM output. This happens only if
+    Module::Metadata is installed.
+
+    Update README
+
+    Update author and copyright
+
+    Require Perl 5.8.4 (because DateTime does).
+
+    Correct POD.
+
+    Get metadata up to snuff.
+
+    Make Changes file comply with CPAN::Changes::Spec
+
+0.02			2003-12-07	Tom Braun
+    Doc fix.
+
+0.01			2003-12-07	Tom Braun
+    First release.  Based on Date::Tolkien::Shire 1.12.

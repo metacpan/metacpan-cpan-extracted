@@ -1,0 +1,633 @@
+$Id: CHANGES,v 1.90 2013/04/03 20:16:20 mpeppler Exp $
+
+Release 1.15
+
+    Minor fixes to allow building on Windows.
+    Fixed syntax error at compile time for some compilers
+    Allow database names with special chars in the name.
+    Change to ct_data_info() to flag an error in case the CS_IODESC returned
+    doesn't include a valid text pointer - this happens if the text/image column
+    is nullable and has not been initialized in the database.
+    
+Release 1.14
+
+    Fix bad size handling for unicode data. 
+    Remove default charset setting to utf8 (this had been done in 1.11 as part of
+    improved utf8 handling, but has negative side-effects. If unicode handling is needed
+    then set "charset=utf8" as part of the connection string.
+    Enforce the fact that utf8/unicode handling only works with OpenClient 15.x or later.
+
+Release 1.13
+
+    Fix for incorrect UTF8 handling when retrieving UNICODE data (Jean-Pierre Rupp).
+
+Release 1.12
+
+    Bug/Typo/Compatibility fixes with various versions of OpenClient.
+    Experimental: Handle in/out parameters (Merijn Broeren)
+    
+Release 1.11
+
+    Remove reliance on PERL_POLLUTE.
+    Add better support for utf8 (Dave Rolsky)
+    
+Release 1.10
+
+    Handle 15.x datatypes correctly.
+    Add LONGMS date format symbol to handle microseconds for bigdatetime.
+    Add support for CS_LONGCHAR_TYPE (Mark Aufflick)
+    Document syb_isdead().
+    Handle 64bit builds with FreeTDS (Ian Grant/Hans Kristian Rosbach)
+    Add foreign_key_info & statistics_info (Jim Radford)
+    Change behavior of large fixed precision numeric types (money, bigint)
+    to be converted to a string internally and returned as such to the caller
+    (behavior similar to numeric/decimal). This can be reverted to the old behavior 
+    by defining SYB_NATIVE_NUM.
+
+Release 1.09
+
+    Behavior change: A new connection level attribute (syb_disconnect_in_child)
+    has been added to allow automatical handling of InactiveDestroy across
+    forks. By default in 1.09 a connection will NOT get closed if the process
+    ID of the process that is exiting is not the same as the PID of the
+    process that created the connection.
+    Detect ASE error 5702 (The server is terminating this process) as a fatal
+    error for the connection.
+    
+    Bug Fixes
+    
+    645 - Spurious COMMIT calls sent to the dataserver during the login/connect calls.
+    628 - Increase size of Kerberos Principal string buffer
+    627 - Spurious sigset_t declaration.
+
+Release 1.08
+
+	Detect missing libblk.a library, and disable the BLK api calls
+	if necessary.
+	Added code to force dlopen() to use RTLD_GLOBAL.
+	Corrected ct_option() functionality detection.
+	Fixed incorrect handling of bind_params() (Thanks to Tim Bunce).
+	Added serverType DSN parameter.
+	Added tds_keepalive DSN parameter.
+	Fixed incorrect handling of multiple result sets with DBI
+	1.53 and later.
+	Re-wrote $dbh->ping() in C, it's now four times faster.
+	Allow automated build without prompts.
+	Improved nsql().
+	Added corrected handling of DATE and TIME values (ASE 12.5.2 and later).
+	Added handling of UNSIGNED INT and BIGINT (ASE 15 and later).
+	Added PERL_NO_GET_CONTEXT #define.
+
+        Bug Fixes
+	
+	624 - Empty strings incorrectly passed as NULL.
+	616 - Spurious error message when the login request times out.
+	614 - Documentation improvement for syb_xxx methods.
+	610 - Segfault when using signals with the threaded libraries and
+	      perl >= 5.8.
+
+
+Release 1.07
+
+	Changed the t/xblk.t test to lookup the charset used by the 
+        server and specify this in the connect() string. This should
+        avoid failures when the client and server uses charsets of
+        different sizes (utf8 vs. iso_1, for example).
+	Better error reporting when the connection data is incorrect 
+	for the test scripts.
+	Modified $dbh->ping() slightly.
+
+        Bug Fixes
+
+	604 - Add missing mode parameter to mkdir in t/xblob.t
+	606 - Memory leak in the BLK API.
+
+Release 1.06
+
+	Fix off-by-one error for ISO date format.
+	Clear error/warning when connecting to a Replication Server.
+        Fix AutoCommit "off" behavior when CHAINED mode is turned off.
+        Fix $dbh->begin_work() behavior.
+
+        Note: This version fails 4 tests in t/xblk.t when building
+        against the 15.0 Beta OCS libraries.
+        
+        Bug Fixes
+
+	582 - ISO date formatting off by one for months.
+	591 - NUM_OF_PARAMS isn't handled properly
+        593 - Connection can become unusable due a bug in 
+              get_server_version().
+	597 - Prepared stored procs with placeholders return
+	      corrupted recordset on second fetch.
+        599 - The call to "prepare" also executes the statement.
+        600 - $sth->finish sometimes fails to properly clean up the
+              handle.
+
+Release 1.05
+
+        BEHAVIOR CHANGE - $dbh->{LongReadLen} must now be called
+	before $dbh->prepare(). Previously you could call this after
+	the $dbh->prepare() but before the $sth->execute().
+
+        Install private statement handle methods for TEXT/IMAGE handling
+        to avoid $h->func() calls, and update documentation.
+        Implement experimental BLK API via prepare/execute loop.
+	Change default "AutoCommit" off mode from explicit transactions
+	to using the "chained" mode if it is available.
+	Add $sth->syb_describe() call, taken from Sybase::CTlib's 
+	ct_describe().
+	Add ISO8601 date/time format for output.
+	Fix $sth->finish() behavior when syb_flush_finish is turned on.
+	Changed do { } while($sth->{syb_more_results}); idiom to use
+	redo instead.
+	Better/more consistent handling of multiple sth on a single dbh,
+        and new test file.
+
+	Bugs Fixed:
+
+	580 - Binding binary/varbinary values to placeholders sometimes
+	      fails.
+	575 - Fails three tests under Tru-64.
+	577 - perl Makefile.PL fails if umask is 0.
+        578 - Better warning for calling $dbh->{LongReadLen} if $dbh is busy.
+        572 - Minor documentation update for bind_param().
+
+Release 1.04
+
+	Bugs Fixed:
+
+	566 - $sth->{NAME} fails right after prepare().
+
+Release 1.03
+
+	Added linking of threaded Sybase libs if perl is built with
+	threading turned on.
+	Added CLONE() method.
+	Minor changes to dbdimp.c to be thread-safe.
+	Added t/thread.t test script.
+	Changes to Makefile.PL to make configuration easier.
+	Add support for Kerberos-based network login.
+	Handle new library names (libsybct vs. libct).
+        Make sure that cached statement handle attributes (NAME_lc, etc)
+	are cleared when multiple result sets are processed.
+	Add host and port connection properties, to allow connections
+        to ASE servers that are not defined in the interfaces file
+        (requires OCS 12.5.1)
+	Add ability to dynamically increase the maximum number of 
+	connections (thanks to Ed Avis).
+	Add ability to ignore stored proc return status in nsql() (thanks
+	to Merijn Broeren)
+	Fix Makefile.PL umask() issue on Win32 (thanks to Darin Delegal).
+
+	Bugs Fixed:
+
+	541 - $sth->{NAME} fails right after prepare().
+	551 - Tests fail when using perl 5.6.1.
+	556 - Add support for user-supplied SSL certificate file.
+	557 - type_info_all broken with ASE 11.0.x
+	562 - syb_flush_finish doesn't work during the connect() phase.
+	563 - Memory leak when syb_binary_images is set.
+
+
+Release 1.02
+
+	Added syb_server_version attribute. This is filled in at connect()
+        time with the numeric version number (11.0.3.3, 12.5.1, etc) of the
+        server that you are connected to.
+
+	Bugs Fixed:
+
+	520 - t/exec.t fails on Win32.
+	533 - logic error in deadlock retry in nsql().
+	532 - t/xblob.t test provides false positive for win32.
+	534 - Placeholder prepare() fails with ASE 11.0.x
+
+Release 1.01
+
+	Automatically finish() statement handles if they are re-executed
+        before all the rows have been fetched.
+	Added support for new tables() syntax, thanks to Stephen Wilcoxon.
+	Added support for DATE and TIME datatypes (available in the 
+	ASE 12.5.1 release, currently undergoing beta testing).
+	Allow user to specify a database to use for the tests instead of 
+	using "tempdb" (useful if user does not have SA privileges).
+	
+	Bugs Fixed:
+
+	517 - getpwnam() isn't portable.
+	493 - Second execute on a prepared handle fails.
+	487 - Add connection information to error messages.
+	407 - Second+ statement does not use db from "use database".
+
+Release 1.00
+
+	Added data_sources().
+        Allow "SQL_BINARY" placeholder parameters to be passed either
+        as a hex string (with or without leading 0x), or as raw binary
+        data.
+
+	Bugs Fixed:
+
+	477 - segfault when servermsg_cb is called with a null connection
+	480 - Makefile.PL searches system dirs before PERL5LIB dirs when 
+              looking for DBI installation.
+	485 - Incorrect handling of large varbinary columns on fetches.
+	489 - (same as 497, see below).
+	492 - Can't compile on Win2k.
+	494 - Do not try to use the ocs.cfg file if it exists.
+	495 - Incorrect handling of parameters when using placeholders &
+              stored procs.
+        497 - implicit type conversions with prepared statements often fail
+	503 - Binary placeholders with stored procedures.
+	506 - Default scriptName/hostname connect() params.
+	508 - DBD::Sybase doesn't build under Win2k.
+
+Release 0.95
+
+        Support for building DBD::Sybase in 64 bit mode with the
+        64 bit version of OpenClient on Solaris, HP-UX, AIX, etc.
+        (note that perl itself must also be built in 64 bit
+        mode for this to work!)
+
+	Added column_info() method.
+
+	Added G_EVAL flag to syb_err_handler calls.
+	Improved syb_err_handler handling (thanks to Matthew Persico)
+        Fixed memory leak when opening additional connections for multiple
+        statement handles on a single database handle (thanks to Stefan
+        Harbeck)
+        Applied minor patch by Alex Fridman to get to build on WinNT.
+	Force a ct_cancel() if, due to syb_do_proc_status, we force a 
+	failure on a request that could have more results pending (Blaise 
+	Lepeuple)
+	Added syb_cancel_request_on_error attribute (see bug 471).
+	Warning - the default value for this attribute changes the behavior
+	of $sth->execute() when there is a failure that is detected in
+	multi-statement requests.
+	Added syb_bind_empty_string_as_null attribute (see bug 446) to
+	allow user configurable empty string binding semantics (convert
+	to single space [default] or to NULL).
+
+	Bugs Fixed:
+
+	431 - fetchrow_hashref() has incorrect keys when retrieving
+              multiple result sets.
+        437 - imp_sth->numRows in st_next_result not always set.
+	444 - Incorrect example for ct_get_data(). ct_get_data() SEGV
+              if passed a non-reference for $image.
+        394 - $sth->{CursorName} fails hard.
+	449 - ct_get_data() limited to 32k
+	450 - Fix incorrect NULLABLE handling.
+	452 - Incorrect $sth->finish() handling in syb_flush_finish mode
+              (thanks to Steve Willer).
+        443 - $sth->fetch produces error if called after $sth->execute on
+	      statement that doesn't return any rows.
+	411 - statement handle attributes do not change between result sets.
+	430 - $dbh->prepare can return undef without triggering RaiseError.
+	436 - Problems with make test generating errors creating 
+              Makefile.aperl.
+	441 - amadmin who,sqm fails while in a transaction.
+	446 - Empty string converts to a space (fixed by making this
+	      configurable).
+	448 - define strncasecmp as strnicmp for Win32 systems.
+	454 - syb_err_handler won't catch connect-time error.
+	456 - ping still fails if connection is dead.
+	461 - Memory leak if NOT using placeholders in selects and
+	      calling execute() multiple times.
+	464 - Binding an empty string for a date field causes "1/1/1900"
+              to be inserted (instead of NULL).
+	469 - nsql error handling bug.
+	447 - syb_db_disconnect(): ct_con_drop() failed.
+	471 - Certain class of errors isn't detected by DBD::Sybase.
+
+
+        Documentation changes to explain why 
+         ... WHERE (product_code = ? OR (? IS NULL AND product_code IS NULL))
+        doesn't work with Sybase.
+	
+
+
+Release 0.94
+
+        Added optional SQL buffer argument to syb_err_handler.
+	Interactive setting of user/server/pwd entries in PWD
+	for "make test".
+	Add syb_failed_db_fatal and syb_no_child_con attributes.
+
+	Bugs Fixed:
+
+	408 - Add the YYYYMMDD format to _date_fmt().
+	414 - Binding '' is interpreted as NULL.
+	415 - Fix buffer overlow in syb_db_login().
+	418 - Fix incorrect handing of CS_CANCELED return code in 
+              st_next_result().
+        421 - ActiveState patches.
+
+Release 0.93
+
+	Added password encryption option to connect() request (contributed
+        by Tin Martone)
+        Added initial nsql().
+	Added ct_get_data(), ct_send_data() and friends func().
+	Added ?-style placeholder support for exec proc statements.
+	Changed getExtraLibs() in Makefile.PL to *not* link with -linsck
+	or -ltli (this avoids problems if the $SYBASE/config/libtcl.cfg
+	file has been set to load the threaded version of these
+	libraries.)
+        Added support for primary_key_info().
+        (release 0.92 was never publicly released for various reasons)
+
+        Bugs Fixed:
+	366    ping() fails if connection has been marked dead
+	364    t/fail.t bug.
+
+
+Release 0.91
+
+	Removed artificial 1024 byte limit on char/varchar datatypes in 
+	result sets.
+
+	Bug Fixes:
+
+	213: BLOBs are returned in HEX, not binary.
+
+Release 0.90
+
+        Release number sequence change: I'm dropping the "alpha" qualifier
+        and I expect to release 1.00 fairly soon.
+
+	Small Makefile.PL fix for Sybase 12.0 installation directory 
+	changes.
+	Applied patch from Tim Ayers to allow 0x type formatting for
+	binary data fetches (similar to what Sybase::CTlib and 
+	Sybase::DBlib allow).
+	Fixed some t/ scripts to not fail when run against MS-SQL.
+	Corrected the handling of timeout events in the client
+	callback.
+
+	Bug Fixes:
+
+	349: CS_NUMERIC bindings for ?-style placeholders fails for large 
+             values.
+       	345: Dynamic statement ids get re-used.
+	351: prepared statements with placeholders cause handle to become 
+	     unusable if *first* execute fails.
+	352: ping() doesn't work right in Apache::DBI (thanks to
+	     Kiriakos Georgiou)
+	353: syb_quoted_identifier doesn't work.
+	354: Calling fetch() after prepare() but no execute() fails with 
+	     internal DBI error. This should also fix bug # 278 and 288.
+	297: type_info() returns incorrect or no data.
+	344: timeout doesn't work correctly.
+
+
+Release 0.23
+
+	Bug Fixes:
+
+	331: ? marks in comments are parsed as placeholders.
+	343: Errors in stored procs cause data rows from proc to be
+	     thrown away.
+	255: $dbh->execute does not fail it executing proc without
+	     permissions.
+
+Release 0.22
+
+	Bug Fixes:
+
+	271: execute() does not restart a transaction after a rollback
+             or commit when running multiple execute() calls for the 
+	     same statement handle.
+	294: SEGV on executing a prepared statement with undef values.
+	295: SEGV due to printf w/ null pointer
+	299: Missing dTHR in syb_st_prepare().
+
+
+Release 0.21
+
+	Added constant() function, so that if DBD::Sybase is use'd you 
+	can access some CS_xxx_RESULT constants.
+	Added $sth->func('syb_output_params') to allow for easier
+	retrieval of stored proc OUTPUT parameters.
+	Added syb_do_proc_status database attribute to allow $sth->execute
+	to handle stored procedure return status directly, and to fail if
+	the stored proc has a non-0 return status. This should also fix 
+	bug 255.
+	Errors with severity 10 or below are not stored in $DBI::err 
+	anymore. Use $dbh->{syb_err_handler} to get at those warning
+	messages.
+	Added t/fail.t test script to better test failure modes.
+	Setting AutoCommit on a $dbh with active statement handles is now 
+	a fatal error.
+
+	Bug Fixes:
+
+	255: Memory leak for prepared statements that are not executed.
+	264: make test fails when building DBD::Sybase against
+	     OpenClient 10.x.
+	266: make test fails when building DBD::Sybase with perl 5.004_04
+	     or earlier.
+	268: $sth->execute(x,y,z) (ie executing a prepare'd statment that
+	     has ?-style placeholders) does not return undef if a
+	     constraint violation occurs on the insert/update/delete.
+
+
+Release 0.20
+
+	Fix code to allow prepare, execute, execute, execute... on 
+	statements that don't include ?-style placeholders.
+	Fix LENGTH/PRECISION/SCALE $sth attributes to be closer to the
+	DBI spec.
+	Fix core dump problem when binding undef values and having 
+	trace >= 2.
+	Add syb_quoted_identifier connection/database handle attribute.
+	Add syb_oc_version read-only database handle attribute, returns the 
+	Sybase library version that this binary is currently using.
+	Added the syb_rowcount $dbh attribute.
+	Added $sth->cancel().
+	Call the syb_err_handler (if one is defined) for client-side
+	errors.
+
+Release 0.19
+
+	Setting chained/non-chained mode was still broken. <sigh>
+	syb_flush_finish mode didn't quite work right either.
+	Added more verbose traces.
+
+Release 0.18
+
+	Add $h->{syb_chained_txn} attribute to switch between CHAINED
+	transactions and explicit named transactions for AutoCommit=0
+	mode. The default is for syb_chained_txn to be off (ie 0.13 behaviour).
+	Fixed typo in syb_db_commit() to actually commit instead of doing
+	a rollback.
+	Added an autocommit.t test (which still needs some work).
+	Disable opening new connection for secondary $sth handles off of a
+	single $dbh handle when AutoCommit == 0.
+
+Release 0.17
+
+	Fix AutoCommit = 0 problems introduced with 0.15 for MS-SQL or older
+	Sybase server (ie TDS 4.x protocol connections).
+	Add syb_dynamic_supported $dbh attribute to check whether the 
+	connection supports ?-style placeholders.
+
+Release 0.16
+
+	Added code to define PL_xxx symbols for pre 5.005 perls.
+	New syb_flush_finish attribute (contributed by Steve Miller).
+	Patch to Makefile.PL for VMS systems.
+	Better library detection code in Makefile.PL.
+
+Release 0.15
+
+	Added an error handler callback which can intercept error messages
+	and provide ad-hoc handling of error situations.
+	In AutoCommit == 0 mode, use CS_OPT_CHAINXACTS mode on the 
+	server instead of issuing explicit transactions.
+	$dbh->LongReadLen and LongTruncOK now work.
+	First cut at the type_info() and type_info_all() methods.
+	perl Makefile.PL now attempts to discover the libraries directly
+	based on what it finds in $SYBASE/lib.
+
+Release 0.14
+
+	Added a 'timeout' connection attribute (contributed by Tom May) 
+	to handle timeout errors during normal processing.
+	SQL PRINT statements are now handled by a warn() call (instead
+	a printf() call) so that they can be caught by a __WARN__ handler.
+        Make sure $dbh->do() returns immediately when an error is encountered.
+	Include dbd-sybase.pod (Tim Bunce's Driver Summary for DBD::Sybase).
+
+Release 0.13
+
+	Bug fix release - binding undef (NULL) variables when using
+	? style placeholders didn't work.
+	Incorrect login didn't get flagged properly (this bug was
+	introduced in 0.11.)
+	Added database attribute to the connect() call.
+
+Release 0.12
+
+	Bug fix release - recent versions of DBI make an array that
+	DBD::Sybase uses read-only, causing errors when multiple
+	result sets are retrieved where the second result set is wider 
+	(has more columns) than the first one.
+
+Release 0.11
+
+	Adds support for multiple $sth for a single $dbh (this is done 
+	by openeing a new connection in prepare() if the previously
+	prepared statement is still active.
+	Add support for date formatting via $dbh->func($fmt,
+	'_date_fmt').
+	Added two new connect attributes: scriptName and
+	hostname. Setting these can help identify processes in the
+	Sybase sysprocesses table.
+
+Release 0.10
+
+	Fixes stupid Makefile.PL bug.
+	Fixes incorrect freeing of memory when mixing prepare() 
+	statements with ? placeholders and prepare() statements
+	without them.
+
+Release 0.09
+
+	Features:
+
+	Added $sth->{syb_result_type} which returns the numerical
+	value of the current result set. The values are defined
+	in $SYBASE/include/cspublic.h.
+	Made $sth->{TYPE} compatible with generic DBI values, and
+	added $sth->{syb_types} to get the native Sybase types.
+	Added $dbh->tables and $dbh->table_info.
+
+	Finally got rid of the "Use of uninitialized value" message 
+	in connect() (thanks to Tom May for this)
+
+	Fixed at least some of the memory leaks (thanks to Bryan Mawhinney)
+
+	Added Sybase specific do() sub that will handle multiple result
+	sets.
+
+	Added $dbh->{syb_show_sql} and $dbh->{syb_show_eed} to add more
+	control to error reporting.
+
+	Implemented $dbh->ping() method (first cut - may need improvement!)
+
+	Bug Fixes:
+
+	244: fetch gets infinite loop on sproc error
+	246: extended error messages go to STDOUT.
+
+Release 0.08
+
+	Features:
+
+	Added ? placeholder processing. This is done by calling ct_dynamic() 
+	and friends if the statement being executed includes ? type 
+	placeholders.
+
+	Bug Fixes:
+
+	210: print statements are lost
+	231: error messages are lost
+	238: reformat error messages
+	241: remove the necessity for users to call $sth->finish
+
+Release 0.07
+	
+	Bug fixes:
+
+	204: One form of DBI->connect() fails when specifying the server name.
+	211: $dbh->do("use database") fails with RaiseError is true.
+	230: fetch() does not return correct results for certain stored
+	     procs situations.
+
+Release 0.06
+
+	Added ability to specify interfaces file in the connect() 
+	call.
+	Added eg/dbschema.pl (ported from Sybase::DBlib).
+	Fixed incorrect handling of AutoCommit and PrintError
+	attributes to connect().
+
+	Bugs fixed:
+
+	203: Executing sp_helprotect fails.
+
+Release 0.05
+
+	Added explicit assignement of LDDLFLAGS and LDFLAGS in 
+	Makefile.PL to make sure that -L$SYBASE/lib comes first
+	in the list of -L flags.
+	Added documentation.
+	Added ability to specify character set, language, packet size
+	in the connect() call.
+	Small Win32 portability patch to Makefile.PL from Matt Herbert.
+
+        Bugs fixed:
+
+	198: connect failure does not return undef
+	199: DBD::Sybase interaction with Apache::DBI 0.74
+
+Release 0.04
+
+	Fixed counting of active statement handles.
+	Add implicit rollback of open transactions on disconnect.
+	Add implicit commit when changing AutoCommit from off to on.
+
+Release 0.03
+	
+	First ALPHA release of native DBD::Sybase implementation.
+
+Release 0.02
+
+	Some fixes to the emulation layer.
+
+Release 0.01
+
+	Proof of concept release - built as an emulation layer on top
+	of Sybase::CTlib (part of sybperl 2.x).

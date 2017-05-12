@@ -1,0 +1,5 @@
+{% extends parent_template %}
+
+blahblah
+
+{% block more_text %}Dynamic override{% endblock %}

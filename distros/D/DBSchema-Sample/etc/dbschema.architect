@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<architect-project version="1.0" appversion="0.9.13">
+ <project-name>dbschema</project-name>
+ <print-settings numCopies="1" zoom="1.0" pageNumbersPrinted="true" orientation="1" paperWidth="612.0" paperHeight="792.0" leftBorder="50.0" rightBorder="50.0" topBorder="50.0" bottomBorder="50.0" />
+ <project-data-sources>
+  <data-source id="DS0">
+  </data-source>
+ </project-data-sources>
+ <source-databases>
+ </source-databases>
+ <target-database id="ppdb" dbcs-ref="DS0">
+  <table id="TAB1" populated="true" name="authors" objectType="TABLE" physicalName="authors" remarks="" >
+   <folder id="FOL2" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL3" populated="true" autoIncrement="false" autoIncrementSequenceName="authors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="" precision="10" primaryKeySeq="0" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL4" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL5" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL6" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX7" populated="true" clustered="false" name="authors_pk" physicalName="authors_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC8" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL3" name="au_id" physicalName="au_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB9" populated="true" name="titles" objectType="TABLE" physicalName="titles" remarks="" >
+   <folder id="FOL10" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL11" populated="true" autoIncrement="false" autoIncrementSequenceName="titles_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="" precision="10" primaryKeySeq="0" referenceCount="2" remarks="" scale="0" type="12" />
+    <column id="COL12" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="au_id" precision="10" primaryKeySeq="1" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL13" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL14" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL15" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX16" populated="true" clustered="false" name="titles_pk" physicalName="titles_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC17" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL11" name="title_id" physicalName="title_id" />
+     <index-column id="IDC18" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL12" name="au_id" physicalName="au_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB19" populated="true" name="editors" objectType="TABLE" physicalName="editors" remarks="" >
+   <folder id="FOL20" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL21" populated="true" autoIncrement="false" autoIncrementSequenceName="editors_ed_id_seq" defaultValue="" name="ed_id" nullable="0" physicalName="" precision="10" primaryKeySeq="0" referenceCount="2" remarks="" scale="0" type="12" />
+    <column id="COL22" populated="true" autoIncrement="false" autoIncrementSequenceName="titleditors_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="title_id" precision="10" primaryKeySeq="1" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL23" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL24" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL25" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX26" populated="true" clustered="false" name="editors_pk" physicalName="editors_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC27" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL21" name="ed_id" physicalName="ed_id" />
+     <index-column id="IDC28" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL22" name="title_id" physicalName="title_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB29" populated="true" name="titleauthors" objectType="TABLE" physicalName="titleauthors" remarks="" >
+   <folder id="FOL30" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL31" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="au_id" precision="10" primaryKeySeq="0" referenceCount="2" remarks="" scale="0" type="12" />
+    <column id="COL32" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="title_id" precision="10" primaryKeySeq="1" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL33" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL34" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL35" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX36" populated="true" clustered="false" name="titleauthors_pk" physicalName="titleauthors_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC37" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL31" name="au_id" physicalName="au_id" />
+     <index-column id="IDC38" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL32" name="title_id" physicalName="title_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB39" populated="true" name="titleditors" objectType="TABLE" physicalName="titleditors" remarks="" >
+   <folder id="FOL40" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL41" populated="true" autoIncrement="false" autoIncrementSequenceName="titleditors_ed_id_seq" defaultValue="" name="ed_id" nullable="0" physicalName="ed_id" precision="10" primaryKeySeq="0" referenceCount="1" remarks="" scale="0" type="12" />
+    <column id="COL42" populated="true" autoIncrement="false" autoIncrementSequenceName="titleditors_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="title_id" precision="10" primaryKeySeq="1" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL43" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL44" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL45" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX46" populated="true" clustered="false" name="titleditors_pk" physicalName="titleditors_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC47" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL41" name="ed_id" physicalName="ed_id" />
+     <index-column id="IDC48" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL42" name="title_id" physicalName="title_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB49" populated="true" name="roysched" objectType="TABLE" physicalName="roysched" remarks="" >
+   <folder id="FOL50" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL51" populated="true" autoIncrement="false" autoIncrementSequenceName="roysched_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="title_id" precision="10" primaryKeySeq="0" referenceCount="2" remarks="" scale="0" type="12" />
+    <column id="COL52" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="au_id" precision="10" primaryKeySeq="1" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL53" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL54" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL55" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX56" populated="true" clustered="false" name="roysched_pk" physicalName="roysched_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC57" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL51" name="title_id" physicalName="title_id" />
+     <index-column id="IDC58" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL52" name="au_id" physicalName="au_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB59" populated="true" name="salesdetails" objectType="TABLE" physicalName="salesdetails" remarks="" >
+   <folder id="FOL60" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL61" populated="true" autoIncrement="false" autoIncrementSequenceName="salesdetails_sonm_seq" defaultValue="" name="sonum" nullable="0" physicalName="sonm" precision="10" primaryKeySeq="0" referenceCount="1" remarks="" scale="0" type="4" />
+    <column id="COL62" populated="true" autoIncrement="false" autoIncrementSequenceName="salesdetails_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="title_id" precision="10" primaryKeySeq="1" referenceCount="2" remarks="" scale="0" type="12" />
+    <column id="COL63" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="au_id" precision="10" primaryKeySeq="2" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL64" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL65" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL66" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX67" populated="true" clustered="false" name="salesdetails_pk" physicalName="salesdetails_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC68" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL61" name="sonum" physicalName="sonum" />
+     <index-column id="IDC69" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL62" name="title_id" physicalName="title_id" />
+     <index-column id="IDC70" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL63" name="au_id" physicalName="au_id" />
+    </index>
+   </folder>
+  </table>
+  <table id="TAB71" populated="true" name="publishers" objectType="TABLE" physicalName="publishers" remarks="" >
+   <folder id="FOL72" populated="true" name="Columns" physicalName="Columns" type="1" >
+    <column id="COL73" populated="true" autoIncrement="false" autoIncrementSequenceName="publishers_pub_id_seq" defaultValue="" name="pub_id" nullable="0" physicalName="pub_id" precision="10" primaryKeySeq="0" referenceCount="1" remarks="" scale="0" type="1" />
+    <column id="COL74" populated="true" autoIncrement="false" autoIncrementSequenceName="titles_title_id_seq" defaultValue="" name="title_id" nullable="0" physicalName="" precision="10" referenceCount="1" remarks="" scale="0" type="12" />
+    <column id="COL75" populated="true" autoIncrement="false" autoIncrementSequenceName="titleauthors_au_id_seq" defaultValue="" name="au_id" nullable="0" physicalName="au_id" precision="10" referenceCount="1" remarks="" scale="0" type="12" />
+   </folder>
+   <folder id="FOL76" populated="true" name="Exported Keys" physicalName="Exported Keys" type="3" >
+   </folder>
+   <folder id="FOL77" populated="true" name="Imported Keys" physicalName="Imported Keys" type="2" >
+   </folder>
+   <folder id="FOL78" populated="true" name="Indices" physicalName="Indices" type="4" >
+    <index id="IDX79" populated="true" clustered="false" name="publishers_pk" physicalName="publishers_pk" primaryKeyIndex="true" unique="true" >
+     <index-column id="IDC80" populated="true" ascendingOrDescending="UNSPECIFIED" column-ref="COL73" name="pub_id" physicalName="pub_id" />
+    </index>
+   </folder>
+  </table>
+  <relationships>
+   <relationship id="REL81" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB29" fkCardinality="7" identifying="true" name="authors_titleauthors_fk" physicalName="authors_titleauthors_fk" pk-table-ref="TAB1" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP82" populated="true" fk-column-ref="COL31" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL3" />
+   </relationship>
+   <relationship id="REL83" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB49" fkCardinality="7" identifying="true" name="titles_roysched_fk" physicalName="titles_roysched_fk" pk-table-ref="TAB9" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP84" populated="true" fk-column-ref="COL51" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL11" />
+    <column-mapping id="CMP85" populated="true" fk-column-ref="COL52" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL12" />
+   </relationship>
+   <relationship id="REL86" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB59" fkCardinality="7" identifying="true" name="titles_salesdetails_fk" physicalName="titles_salesdetails_fk" pk-table-ref="TAB9" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP87" populated="true" fk-column-ref="COL62" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL11" />
+    <column-mapping id="CMP88" populated="true" fk-column-ref="COL63" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL12" />
+   </relationship>
+   <relationship id="REL89" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB71" fkCardinality="7" identifying="false" name="titles_publishers_fk" physicalName="titles_publishers_fk" pk-table-ref="TAB9" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP90" populated="true" fk-column-ref="COL74" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL11" />
+    <column-mapping id="CMP91" populated="true" fk-column-ref="COL75" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL12" />
+   </relationship>
+   <relationship id="REL92" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB9" fkCardinality="7" identifying="true" name="titleauthors_titles_fk" physicalName="titleauthors_titles_fk" pk-table-ref="TAB29" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP93" populated="true" fk-column-ref="COL12" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL31" />
+    <column-mapping id="CMP94" populated="true" fk-column-ref="COL11" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL32" />
+   </relationship>
+   <relationship id="REL95" populated="true" deferrability="7" deleteRule="3" fk-table-ref="TAB19" fkCardinality="7" identifying="true" name="titleditors_editors_fk" physicalName="titleditors_editors_fk" pk-table-ref="TAB39" pkCardinality="2" updateRule="3" >
+    <column-mapping id="CMP96" populated="true" fk-column-ref="COL21" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL41" />
+    <column-mapping id="CMP97" populated="true" fk-column-ref="COL22" name="Column Mapping" physicalName="Column Mapping" pk-column-ref="COL42" />
+   </relationship>
+   <reference ref-id="REL92" />
+   <reference ref-id="REL81" />
+   <reference ref-id="REL95" />
+   <reference ref-id="REL83" />
+   <reference ref-id="REL86" />
+   <reference ref-id="REL89" />
+  </relationships>
+ </target-database>
+ <ddl-generator type="ca.sqlpower.architect.ddl.GenericDDLGenerator" allow-connection="true"> </ddl-generator>
+ <create-kettle-job-settings filePath="" jobName="" schemaName="" kettleJoinType="0" savingToFile="true" />
+ <play-pen zoom="1.0" viewportX="0" viewportY="0" relationship-style="rectilinear" names-displayLogicalNames="true" showPrimaryTag="true" showForeignTag="true" showAlternateTag="true" columnVisibility="ALL" relationshipLabelVisibility="true">
+  <table-pane table-ref="TAB1" x="96" y="57" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB9" x="435" y="212" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB19" x="530" y="499" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB29" x="712" y="69" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB39" x="750" y="353" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB49" x="277" y="496" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB59" x="100" y="246" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-pane table-ref="TAB71" x="816" y="233" bgColor="0xf0f0f0" fgColor="0x000000" rounded="false" dashed="false"/>
+  <table-link relationship-ref="" pk-x="115" pk-y="63" fk-x="47" fk-y="0" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="132"/>
+  <table-link relationship-ref="REL81" pk-x="154" pk-y="33" fk-x="0" fk-y="20" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="33"/>
+  <table-link relationship-ref="REL92" pk-x="123" pk-y="63" fk-x="39" fk-y="0" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="132"/>
+  <table-link relationship-ref="REL95" pk-x="16" pk-y="63" fk-x="146" fk-y="0" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="132"/>
+  <table-link relationship-ref="REL83" pk-x="35" pk-y="63" fk-x="130" fk-y="0" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="132"/>
+  <table-link relationship-ref="REL86" pk-x="0" pk-y="52" fk-x="166" fk-y="18" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="18"/>
+  <table-link relationship-ref="REL89" pk-x="166" pk-y="37" fk-x="0" fk-y="33" rLineColor="0x333333" pkLabelText="" fkLabelText="" orientation="33"/>
+ </play-pen>
+ <profiles topNCount="10">
+  </profiles>
+  <olap>
+  </olap>
+  <olap-gui>
+  </olap-gui>
+</architect-project>

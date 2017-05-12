@@ -1,0 +1,36 @@
+Changelog for Device-I2C-ADV7611
+
+0.11 2016-06-25T10:19:30
+ - add total lines functions (sv99)
+
+0.10 2016-06-24T11:22:25Z
+ - add isInterlased ang getTMDSFreq (sv99)
+
+0.09 2016-06-21T15:17:24Z
+ - rename isPower to noPower (sv99)
+
+0.08 2016-06-21T14:22:33Z
+ - add check line state and read input signal params (sv99)
+
+0.07 2016-06-21T09:59:36Z
+ - add readRegister16 (sv99)
+
+0.06 2016-06-17T07:46:14Z
+ - correct test and pod (sv99)
+
+0.05 2016-06-16T19:53:46Z
+ - add initAddressMaps and writeEDIDTable (sv99)
+
+0.04 2016-06-16T12:29:12Z
+ - add isa (sv99)
+
+0.03 2016-06-16T09:58:32Z
+ - add Exporter (sv99)
+
+0.02 2016-06-16T09:46:08Z
+ - v0.02 (sv99)
+ - add I2C subdir (sv99)
+
+0.01 2016-06-15T08:57:26Z
+ - v0.01 (sv99)
+ - first commit (sv99)

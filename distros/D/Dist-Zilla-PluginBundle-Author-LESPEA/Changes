@@ -1,0 +1,68 @@
+Revision history for Dist-Zilla-PluginBundle-Author-LESPEA
+
+1.008000  2014-05-12 18:08:02-05:00 America/Chicago
+    [Enhancement]
+    *  Re-enable Kwalitee
+    *  Update eol & tabs deps
+
+1.007000  2014-03-06 14:43:21-06:00 America/Chicago
+    [Enhancement]
+    *  Improve the skeleton gitignore file
+
+    [Bugfix]
+    *   We can no longer have a "default" key that is an empty array as Config::MVP croaks on it
+
+1.006000  2012-09-07 07:38:46 America/Chicago
+    [Enhancement]
+    *   Pod weaver bundle now collects constants via the 'const' keyword
+
+1.005001  2012-09-05 01:05:27 America/Chicago
+    [Bugfix]
+    *   EOL tests are horribly broken in windows
+
+1.005000  2012-08-31 15:55:48 America/Chicago
+    [Enhancement]
+    *   Remove Kwalitee & unusedvars since they're very buggy
+    *   Removed 'Miscellanea::RequireRcsKeywords' from shared perlcritic.rc since it's removed in:
+    *   Require version 1.118 of Perl::Critic
+
+1.004000  2011-09-22 10:47:24 America/Chicago
+    [Bugfix]
+    *   Change varios test names as they have been deprecated
+    *   Updated test dependencies to the versions that have the new names
+
+1.003000  2011-06-21 00:26:57 America/Chicago
+    [Enhancement]
+    *   Upgrade to the newest version of Perl::Critic::Bangs and remove deprecated modules
+    *   Switch from CPANChangesTests to Test::CPAN::Changes
+    *   Remove unnecessary dependencies -- doesn't build on ActiveState anyway since they have crazy short timeouts
+    *   Fix Perl::Critic errors
+
+1.002001  2011-03-23 11:34:41 America/Chicago
+    [Bugfix]
+    *   More manual dependency additions/rearranging to try and get ActiveState to work
+
+    [Enhancement]
+    *   Tell cpan not to index README.html
+
+
+1.002000  2011-03-17 06:15:00 America/Chicago
+    [Enhancement]
+    *   Add SpellingCommonMistakesTests
+
+
+1.001000  2011-03-17 05:11:54 America/Chicago
+    [Bugfix]
+    *   Add more manual dependencies to try fix the cluster that is ActiveState
+
+    [Enhancement]
+    *   Remove Perl::Tidy plugin (keep tidy config file in template though)
+    *   Switch to ReportVersions::Tiny
+    *   Remove CheckChanges since it breaks ReportVersions::Tiny
+
+    [Minor]
+    *   All option examples should be code formatted to preserve formatting
+
+
+1.000000  2011-02-19 17:35:20 America/Chicago
+    *   Initial version (heavily modified from RTHOMPSON & KENTNL's bundle)

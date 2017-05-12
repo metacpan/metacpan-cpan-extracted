@@ -1,0 +1,59 @@
+==================================================
+Changes from 2012-10-27 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.1 at 2013-10-27 20:54:52 +0000
+----------------------------------------
+
+  Change: 2edde44343f37cbe041e692a3cc4219cd1f313ca
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-27 21:54:45 +0000
+
+    Updated gitignore to ignore release folders from master branch 
+
+  Change: b0892055cdc810f5b126d440a051eb04e3d6524b
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-27 21:53:16 +0000
+
+    Final cleanup and documentation added before first official release. 
+
+  Change: b8f753a9d0ccd418a388e16c93c4847c4166a617
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-27 14:24:17 +0000
+
+    Added programmable device ID 
+
+  Change: f7a923d203e781fd515a0424f16dcd4258fd49a1
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-16 22:39:01 +0000
+
+    Continued development of the module. Bugfix in default baud rate 
+
+  Change: dd99cac6ce13de70cc3e227224adec6e318a16e3
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-05 15:33:46 +0000
+
+    Added basic enumaration and set functionality. Extended the testing. 
+
+  Change: 22a6d245a68fbcf0a19cf7f38ca376361a4f5cc3
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-05 13:03:41 +0000
+
+    Added Eclipse project file 
+
+  Change: aadc288664c986c364cf3b763f4124c2d406b091
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-05 09:40:48 +0000
+
+    Added gitignore 
+
+  Change: 28ff89b67ee6262fde835a2cb7267e2d1884c8de
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-10-05 09:37:10 +0000
+
+    Initial file import 
+
+================
+End of releases.
+================

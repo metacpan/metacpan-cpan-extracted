@@ -1,0 +1,22 @@
+Version History
+---------------
+
+2011.02.19 - 0.08
+  - Bugfix: RT #44431: Correctly handle exception messages containing
+    an "at", thanks to Nils Boysen.
+  - Bugfix: RT #65723: Converted files to UTF-8.
+
+2008.01.13 - 0.07
+  - Tests: Fixed t/03showrefs1.t so it passes under Perl 5.005
+
+2005.07.13 - 0.06
+  - Tests: Modified 03showrefs1.t so that it passes under Perl 5.004
+  - Updated documentation.
+
+2005.07.31 - 0.05
+  - Bugfix: RT#13063: Failing tests for Error->throw (object or structure)
+  - Added import option 'showrefs'.
+  - Added test scripts 03showrefs0.t, 03showrefs1.t
+
+2005.05.18 - 0.04
+  - First release, based on Acme::JavaTrace 0.04. 

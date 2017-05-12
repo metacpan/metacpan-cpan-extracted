@@ -1,0 +1,5 @@
+DBD::IngresII --  an Ingres interface for Perl 5 using DBI.
+
+README is deprecated, see POD documentation in IngresII.pm. You can read it by
+issuing "perldoc IngresII.pm" command or just open IngresII.pm in any text
+editor and scroll down.

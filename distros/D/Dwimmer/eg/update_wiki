@@ -1,0 +1,46 @@
+use 5.010;
+use strict;
+use warnings;
+
+# Sample script to create or update a page from a file
+
+use Dwimmer::Client;
+use Data::Dumper qw(Dumper);
+use File::Slurp   qw(read_file);
+
+my ($version, $srcfile) = @ARGV;
+die "Usage: $0 VERSION FILENAME\n" if not $srcfile;
+
+my $user_name = $ENV{dwimmer_user_name} or die "Need dwimmer_user_name\n";
+my $password  = $ENV{dwimmer_user_pw} or die "Need dwimmer_user_pw\n";
+my $url       = $ENV{dwimmer_url} or die "Need dwimmer_url\n";
+
+my $dw = Dwimmer::Client->new( host => $url );
+$dw->login( username => $user_name, password => $password );
+
+my $filename = "/DSP_v$version";
+my $r = $dw->page( filename => $filename);
+
+#print Dumper $r;
+#exit;
+
+my $body = '';
+my $create = 0;
+
+if ($r->{error}) {
+    $body = "<pre>\n" . scalar(read_file $srcfile) . "</pre>\n";
+    $create = 1;
+} else {
+    $body = "<pre>\n" . scalar(read_file $srcfile) . "</pre>\n" . $r->{page}{body};
+    $create = 0;
+}
+my $c = $dw->save_page(
+            body     => $body,
+            title    => "Version $version",
+            filename => $filename,
+            create   => $create,
+            );
+if (not $c->{success}) {
+    die "Failed " . Dumper $c;
+}
+

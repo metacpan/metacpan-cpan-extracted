@@ -1,0 +1,42 @@
+{
+   "abstract" : "Verify existence of keys hash.",
+   "author" : [
+      "Vitaly Simul <vitalysimul@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4211",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Deep-Hash-Exists",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util" : "1.02"
+         }
+      }
+   },
+   "provides" : {
+      "Deep::Hash::Exists" : {
+         "file" : "lib/Deep/Hash/Exists.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.22",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

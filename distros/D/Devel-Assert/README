@@ -1,0 +1,71 @@
+NAME
+    Devel::Assert - assertions for Perl >= 5.14
+
+SYNOPSIS
+        use Devel::Assert; # release mode, won't perform checks
+
+        assert(3 < 2); 
+
+        use Devel::Assert 'on';
+
+        assert(3 < 2); # oops, check your math
+
+USAGE
+        use Devel::Assert; # import 'assert' function, but doesn't enable it
+        use Devel::Assert 'on'; # import 'assert' function and enable it
+
+        use Devel::Assert 'global'; # import 'assert' function and enable it in all later 'use Devel::Assert' imports
+        use Devel::Assert::Global; # the same, can be used as perl -MDevel::Assert::Global your_program.pl
+
+        use Devel::Assert 'off'; # import 'assert' function, but doesn't enable it, even when in 'global' mode
+
+DESCRIPTION
+    This module provides you with a C-like assert() function. And, like in
+    C, it only is compiled in debug mode - it's completely removed together
+    with it's arguments at compile time in release mode. That's useful to
+    force functions' contracts during development without sacrificing
+    production performance.
+
+    Think of an assert() being a test, but right inside your code:
+
+        sub get_url {
+            my ($self, $url, $cb) = @_;
+
+            assert length $url;
+            assert(ref($cb) eq 'CODE');
+
+            ...
+        }
+
+    Failed assertions are reported by confess with failed test code
+    embedded:
+
+        Assertion 'ref $cb eq 'CODE'' failed at ...
+
+    This module doesn't use source filters or any other form of source text
+    parsing, but instead relies on the generated optree analysis and
+    manipulation.
+
+CHANGES FROM 0.04
+    This version significantly differs from 0.04 release. The main reason
+    behind such radical change was to get rid of the Devel::Declare
+    dependency and to pass all the parsing work to Perl itself (instead of
+    creating own statement parser).
+
+SEE ALSO
+    assertions - uses code attributes
+
+    Carp::Assert - requires annoying 'if DEBUG' suffix
+
+    PerlX::Assert - based on Devel::Declare
+
+AUTHOR
+    Sergey Aleynikov <randir@cpan.org>
+
+COPYRIGHT
+    Copyright (C) 2009, 2015 Sergey Aleynikov
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

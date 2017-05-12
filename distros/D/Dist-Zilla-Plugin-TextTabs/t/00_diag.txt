@@ -1,0 +1,9 @@
+Dist::Zilla::Role::FileFinderUser
+Dist::Zilla::Role::FileMunger
+Dist::Zilla::Role::InstallTool
+ExtUtils::MakeMaker
+Moose
+Test::DZil
+Test::More
+Text::Tabs
+namespace::autoclean

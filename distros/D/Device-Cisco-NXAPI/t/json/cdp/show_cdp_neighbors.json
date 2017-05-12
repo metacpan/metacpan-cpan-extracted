@@ -1,0 +1,20 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "neigh_count": 1,
+      "TABLE_cdp_neighbor_brief_info": {
+        "ROW_cdp_neighbor_brief_info": {
+          "ifindex": 83886080,
+          "device_id": "me-ld8r06-esw02",
+          "intf_id": "mgmt0",
+          "ttl": 179,
+          "capability": "IGMP_cnd_filtering",
+          "platform_id": "cisco WS-C2960X-24TD-L",
+          "port_id": "GigabitEthernet1/0/3"
+        }
+      }
+    }
+  },
+  "id": 1
+}

@@ -1,0 +1,17 @@
+INSTALL file for Date-Holidays-Super
+
+$Id: INSTALL 1347 2004-05-26 09:10:20Z jonasbn $
+
+1. tar -xvzf Date-Holidays-Super-0.01.tar.gz 
+
+2. cd Date-Holidays-Super
+
+3. perl Makefile.PL
+
+4. make
+
+5. make test
+
+6. make install (requires privileged access)
+
+7. make clean  

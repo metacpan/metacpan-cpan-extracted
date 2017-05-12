@@ -1,0 +1,54 @@
+Revision history for Dist::Zilla::Plugin::PodLoom
+
+5.001  2015-07-18
+	- When passing 'module' to Pod::Loom, use the filename if the
+	  package is 'main' or undetermined.  This makes it useful for scripts.
+
+5.00   2013-11-13
+	- Now compatible with Dist::Zilla 5 (but still works with 4)
+	  Fixes RT#90330. (Thanks, Andreas Koenig.)
+
+4.10   2011-12-12
+	*** POTENTIALLY INCOMPATIBLE CHANGE ***
+	- PodLoom is now a FileFinderUser (defaulting to :InstallModules)
+
+	  In most cases, this should not be an issue, but if you had
+	  modules in the root directory, they won't be processed by
+	  PodLoom anymore unless you override :InstallModules.
+
+4.01   2011-10-15
+	- Support custom bugtracker (require Pod::Loom 0.05)
+
+4.00   2011-05-05
+	- Fix compatibility with (and require) Dist::Zilla 4.200001+
+
+3.02   2010-12-11
+	- List Pod::Loom version in dumped config
+	- Require latest Pod::Loom (0.04)
+
+3.01   2010-12-01
+	- For repository, prefer the 'web' key to the 'url' key
+
+3.00   2010-05-22
+	- Now compatible with (and requires) Dist::Zilla 3
+
+0.08   2010-04-14
+	- No longer distributed in Dist-Zilla-PluginBundle-CJM
+
+----------------------------------------------------------------------
+Prior to version 0.08, Dist::Zilla::Plugin::PodLoom was distributed as
+part of Dist-Zilla-PluginBundle-CJM.  This is the relevant history
+from that distribution.  It includes only the changes made to PodLoom.
+
+0.05   2010-03-30
+	- Added SYNOPSIS
+	- Revised compile tests
+
+0.02   2010-03-07
+	- Added POD tests
+	- Use the plugin's log method so the plugin name appears in the log
+	- Define abstract, module, & version only if they
+	  could be determined
+
+0.01   2009-10-11
+	- Initial release

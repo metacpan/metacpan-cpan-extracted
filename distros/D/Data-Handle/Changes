@@ -1,0 +1,175 @@
+Revision history for Data-Handle
+
+1.000001 2017-03-08T11:07:34Z 18a81a7
+ - Bugfix: Avoid test failures on -Ddefault_inc_excludes_dot
+ - Lower Test::More requirements
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +11 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - test: +1 ↓1 (recommends: ↑1 ↓1)
+
+1.000000 2014-10-10T13:04:03Z 3f54592
+ [00 Major - Version Scheme Change]
+ - Migrate to using x.yyyzzz (mantissa=6) instead of x.yyyzzzaa (mantissa=8)
+ - This may affect hand-operated downstreams
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [01 Major - Toolkit Change]
+ - Migrate from using Module::Build to using ExtUtils::MakeMaker as installer toolkit
+ - Make test/toolkit "latest" dependencies merely recommendations.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02001003, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +47 -2 (recommends: -1, suggests: +1 ↑1)
+ - test: +2 ↓1 -2 (recommends: +3)
+
+0.02001003 2013-07-26T09:11:29Z
+ [Bugfixes]
+ - No longer broken on modern Package::Stash's
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02001002, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +6 (suggests: ↑1)
+ - runtime: ↑1
+ - test: +1
+
+ [Documentation]
+ - Updated copyright year
+ - Added README.mkdn
+
+ [Meta]
+ - Bug tracker moved to github
+
+ [Packaging]
+ - use test_requires (mb 0.4004)
+
+0.02001002 2012-08-11T01:59:03Z
+ - Minor Maintenance Release.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.02001001, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - test: ↑1
+
+ [Tests]
+ - Made tests slightly more detailed in the error condition.
+
+0.02001001 2012-06-08T13:30:28Z
+ [00 Important Changes]
+ - Code has been purged of stolen chunks of Carp code, and now instead depends on a minimum Carp of v1.22. This is the
+   first release of Carp that was packaged on CPAN as a Dual Lifed module, upon which I can rely upon the existance and
+   implementation of 'caller_info'. It is hoped this will make bugs smaller and the code easier.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01011704, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +1 ↑1
+
+ [Packaging]
+ - Update LICENSE ( Year, Address, Indent )
+
+ [Tests::New]
+ - minimum version test
+
+0.01011704 2011-10-15T11:05:19Z
+ [Bugs]
+ - Adapted to work with latest Package::Stash ( 0.33 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01011703, see misc/*.deps* for details
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - AUTHORITY data now provided
+ - Versions not set in BEGIN
+ - Tidy step now only 80 chars.
+
+ [Packaging]
+ - Updated LICENSE ( Better indentation, updated address for FSF )
+ - Author/Release tests now say in xt/
+ - Github URL's now all https://
+
+ [Tests]
+ - Refactored some of the exception class testing logic in 04_ for enhanced clarity.
+
+0.01011703 2011-04-24T22:29:18Z
+ - Minor changes release, mostly just dist maintainence.
+ - [Dependencies::Stats]
+ - Dependencies changed since 0.01011702, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01011702, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+
+ [Internals]
+ - Explicitly set $@ to undef ( critic )
+ - Stop setting $DB::VERSION
+
+ [Packaging]
+ - Move from @KENTNL to @Author::KENTNL
+ - Use recent features of @Author::KENTNL
+ - Ship .perltidyrc
+ - Changes file normalized to CPAN::Changes form.
+
+ [Tests]
+ - Add CPAN::Changes tests.
+ - Add release portability tests.
+
+0.01011702 2010-12-21T13:43:35Z
+ - Distribution Change only. Otherwise identical to previous release.
+ - Don't index DB.
+
+0.01011701 2010-12-21T13:29:00Z
+ - Give up on trying to operate with the Carp shipped with 5.6.2. If its not there, and not in Carp::Heavy's
+   injections, use a copy of one we stole and made work.
+ - Have to put a fix in as well, because Term::ANSIColor clobbers $@
+
+0.01011617 2010-12-21T05:46:24Z
+ - Fix "missing parentheses around my ( )" for Perl-5.6
+
+0.01011601 2010-12-20T13:07:01Z
+ - Yuck. The way caller_info is provided is ambiguous. Hopefully this release will get that right.
+
+0.01011501 2010-12-19T13:15:59Z
+ - The method we were borrowing out of Carp wasn't there in old versions, so we've added a bit of magic to try get it
+   from older carps too, so we don't fail on <= 5.10.1 :(
+
+0.01011500 2010-12-19T12:36:06Z
+ - More tests to improve general function coverage.
+ - 'generate_exception' is gone, depercated.
+ - Replace: C< generate_exception($class , $message)->throw() > with C< _gen_tree($full_class)->throw( $message ) >
+ - Coverage testing detected a missing exception class, fixed in this release.
+ - All tied() methods now tested to some degree to work.
+
+0.01011421 2010-12-19T09:52:17Z
+ - Reworked the Exception code to be cleaner at the cost of a slight initialisatin cost.
+ - Reworked code bodies to unify seek/tell calls as _restore_pos and _set_pos.
+ - Added _fh so internal code is less confusing.
+ - Extended tests to cover more scenarios.
+ - Added contributed suggestions as "alternative_techinques" with demonstrations how they *( so far ) don't work. If
+   people can get them to work (on all perls), that'd be great!. ( Seems there are many weird fdup bugs in perl )
+ - Stolen the backtrace code from Carp a bit and augmented it, now produce useful backtraces.
+ - Have some nice code in our exception stringification that highlights lines with colours based on how much we think
+   they're related to the problem. Stuff thats part of DH ( the place the error was detected ) is highlighted green as
+   we think it will be usefull in diagnosis, but its not the source of the problem. Stuff that we know is likely to be
+   infrastructural and not likely to be part of the problem ( ie: code like Try::Tiny and Test::Fatal ) are highlighted
+   yellow because we doubt its useful. Everything else is left white, and you should look for the problem there first.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01011322, see misc/*.deps* for details
+ - runtime: +1
+ - test: +2
+
+0.01011322 2010-12-18T10:14:03Z
+ - First version.

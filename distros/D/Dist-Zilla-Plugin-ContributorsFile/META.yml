@@ -1,0 +1,47 @@
+---
+abstract: 'add a file listing all contributors'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ContributorsFile
+provides:
+  Dist::Zilla::Plugin::ContributorsFile:
+    file: lib/Dist/Zilla/Plugin/ContributorsFile.pm
+    version: v0.3.0
+requires:
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::FilePruner: '0'
+  Dist::Zilla::Role::Plugin: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Moose: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dist-Zilla-Plugin-ContributorsFile/issues
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-ContributorsFile/
+  repository: https://github.com/yanick/Dist-Zilla-Plugin-ContributorsFile.git
+version: 0.3.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Olaf Alders <olaf@wundersolutions.com>'
+  - 'Slaven Rezic <srezic@cpan.org>'

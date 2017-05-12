@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Class::EasyConf::YAML.
+
+0.01  Fri Jul 24 10:53:13 2009
+	- original version; created by h2xs 1.23 with options
+		-A -X --skip-warnings -n DBIx::Class::EasyConf::YAML
+

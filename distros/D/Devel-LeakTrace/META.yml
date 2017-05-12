@@ -1,0 +1,25 @@
+---
+abstract: 'indicate where leaked variables are coming from.'
+author:
+  - "Richard Clamp <richardc@unixbeard.net> with portions of LeakTrace.xs\ntaken from Nick Ing-Simmons' Devel::Leak module."
+build_requires:
+  ExtUtils::CBuilder: 0
+configure_requires:
+  Module::Build: 0.36
+dynamic_config: 1
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-LeakTrace
+provides:
+  Devel::LeakTrace:
+    file: lib/Devel/LeakTrace.pm
+    version: 0.06
+requires:
+  Module::Build: 0.19
+  Test::More: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.06

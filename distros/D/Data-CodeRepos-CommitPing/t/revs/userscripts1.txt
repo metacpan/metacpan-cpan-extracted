@@ -1,0 +1,8 @@
+---
+author: yappo
+comment: dumy
+date: 2008-04-19 21:12:57 +0900
+files:
+  - path: lang/javascript/userscripts/hatena.bookmark.button-search-now.user.js
+    status: U
+rev: userscripts1

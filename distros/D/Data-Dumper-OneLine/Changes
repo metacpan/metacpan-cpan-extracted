@@ -1,0 +1,26 @@
+Revision history for Perl extension Data-Dumper-OneLine
+
+0.06 2014-10-22T09:22:04Z
+
+    - rm neadless dependency
+
+0.05 2014-09-09T06:12:36Z
+
+    - stop dependency to perl 5.10.0
+
+0.04 2014-09-09T05:19:31Z
+
+    - rm unused script
+
+0.03 2014-06-12T06:51:44Z
+
+    - fix cpanfile
+
+0.02 2014-06-12T06:14:31Z
+
+    - rm (\r|\n)
+
+0.01 2014-06-10T12:26:53Z
+
+    - original version
+

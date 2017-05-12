@@ -1,0 +1,47 @@
+DateTime-Fiscal-Retail454 version 0.03
+===================================
+
+NOTE!!! This module has been deprecated!
+Please use DateTimeX::Fiscal::Fiscal5253 instead. That module has better
+methods, more functionality, and support for 52/53 week fiscal years in
+general beyond the NRF 4-5-4 calendar.
+
+Compute dates used to create a 4-5-4 calendar from a DateTime object.
+
+The 4-5-4 calendar is a fiscal calendar standard widely used by merchandisers
+to allow easy comparisons between sales periods from year to year.  The
+calendar is described at the National Retail Federation website.
+
+http://www.nrf.com/content/default.asp?folder=services&file=finance_454.htm
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  DateTime
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Jim Bacon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTIBILITY AND FITNESS FOR A PARTICULAR
+PURPOSE.
+
+The full text of the license can be found in the LICENSE file included
+with this module.

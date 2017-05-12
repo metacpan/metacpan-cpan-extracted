@@ -1,0 +1,25 @@
+Revision history for Dist-Zilla-PluginBundle-Author-RHOELZ
+
+0.07 January 12 2016
+     - Use Git::GatherDir instead of my deprecated plugin
+
+0.06 January 03 2015
+     - Fix bug that prevents this bundle from being used with @Filter
+
+0.05 March 03 2014
+     - Include .perlcriticrc if it exists in a dist
+
+0.04 May 01 2013
+     - Fix bug that prevents one from specifying multiple arguments
+       for a custom plugin section (ex. PruneFiles + filenames)
+
+0.03 August 13 2012
+     - Add ability to omit plugins
+     - Add abliity to specify custom configuration for included plugins
+
+0.02 April 11 2012
+     - Add Git::ExcludeUntracked
+     - Add CheckChangesHasContent
+
+0.01 October 16 2011
+     Initial version.

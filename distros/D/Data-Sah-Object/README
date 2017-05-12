@@ -1,0 +1,38 @@
+SYNOPSIS
+
+     use Data::Sah::Object; # automatically exports sah(), sahn()
+    
+     # sah() creates a normalized copy of schema
+     $osch = sah("array*");
+     $osch = sah(['array*', of => 'str*']);
+    
+     # sahn() assumes you're passing an already-normalized schema and it will not
+     # create a copy
+     $osch = sahn([array => {req=>1, of=>'str*'}, {}]);
+    
+     say $osch->type; # -> array
+     say $osch->clause('req'); # -> 1
+     say $osch->clause('of', 'int'); # set clause
+
+DESCRIPTION
+
+    Sah works using pure data structures, but sometimes it's convenient to
+    have an object-oriented interface (wrapper) for those data. This module
+    provides just that.
+
+FUNCTIONS
+
+ sah $sch => OBJECT
+
+    Exported by default. A shortcut for
+    Data::Sah::Object::Schema->new($sch).
+
+ sahn $sch => OBJECT
+
+    Exported by default. A shortcut for
+    Data::Sah::Object::Schema->new($sch, 1).
+
+SEE ALSO
+
+    Sah, Data::Sah
+

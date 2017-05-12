@@ -1,0 +1,19 @@
+Revision history for Perl extension Device::SerialPort::Xmodem.
+
+1.03  Tue Nov 28 10:22:18 2006
+        - fixed agrument bug in block object, submitted by 
+          Jake W Lee <lemin at sena dot com>
+
+1.02  Wed Sep 14 12:28:37 2005
+        - added send functionality
+	- fixed some block number bugs above 0xFF when receiving
+	- reorganized much
+
+1.01  Mon Sep 12 13:36:59 2005
+	- fixed several namespace issues
+	- improved receive_message to handle timing
+
+1.00  Fri Sep  9 17:36:29 2005
+	- original version; created by h2xs 1.23 with options
+		-cfn Device::SerialPort::Xmodem
+

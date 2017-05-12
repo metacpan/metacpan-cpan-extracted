@@ -1,0 +1,61 @@
+Revision history for Data::FeatureFactory
+
+0.0405 2015-07-26
+        - Adapted for deprecation of defined(@foo)
+        - Removed underscores from version numbers to please PAUSE.
+
+0.04_04 2008-05-31
+        Implemented some optimalizations:
+        - Caching of feature names expansions
+        - Factored out format checking from a regexp to a hash
+        Factored out adding a label to a feature to a subroutine.
+        Moved the documentation beyond the code.
+        Changed the minor version numbering from -rX to _XX.
+
+0.04-r3 2008-03-10
+        t/01-translate.t:
+        Replaced the "qw(YY)x5" construct which seemed to produce a syntax
+        error on perl 5.6
+
+0.04-r2 2008-03-08
+        Lifted requirements on test scripts so they don't place additional
+        dependencies for the distro (List::MoreUtils, File::Temp >= 0.17)
+
+0.04-r1 2008-03-06
+        Expanded the documentation,
+        fixed a memory leak caused by use of List::MoreUtils::each_array
+
+0.04    2008-03-05
+        Added the variable $Data::FeatureFactory::CURRENT_FEATURE.
+        Added conversions between formats.
+        Corrected a bug preventing range to be applied to features with type
+        specified non-canonically.
+        Added explicit values to boolean features.
+        Changed the mapping mechanism to take care of mapping
+        postprocessed values to unpostprocessed categorial ones.
+        Refactored some tasks to subs
+        (expand_names, _values_of, _vector_length
+        Some error messages improved.
+        Other minor bugs and sillinesses disposed of.
+
+0.03-r2 2008-01-24
+        Corrected the test script to no longer fail on older perls.
+
+0.03-r1 
+        Made the :encoding(utf8) directive to open only take place when
+        it is available.
+
+0.03    
+        Changes to @INC have been localized.
+        Removed the disruptive use open(:std :utf8) pragma from test script.
+        Added the method "names".
+
+0.02    2008-01-12
+        A temp file generated during testing will no longer be installed along
+        with the module.
+        The exception package SoftError has been renamed to
+        Data::FeatureFactory::SoftError to prevent name collision.
+
+0.01    2008-01-11
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,152 @@
+=head1 NAME
+
+perl.apache.org Site Help
+
+=head1 Description
+
+This document helps to solve problems you may encounter while using
+perl.apache.org.
+
+=head1 FAQ
+
+Please read this FAQ first.
+
+=head2 Q. The site looks very bad/unusable in the browser that I use.
+
+B<A>. The site was developed using the open standards: HTML
+4.01 and CSS 2.0. Any browser that follows these two standards
+shouldn't have a problem to properly render this site. If you are
+using some very old browser, you should upgrade it.
+
+Text-only browsers are definitely supported.
+
+If you are using a latest stable browser and you still have a problem,
+please L<contact the docs-dev mailing list|/"Contact_Info">. Please
+post to the list a snapshot of the what seems to be looking bad and/or
+unusable along with the name and version of the browser and the
+platform you are running it on. Preferably upload the snapshot
+somewhere and post the URL to the location of the shapshot, especially
+if the snapshot is of a big size.
+
+=head2 Q. Fonts are too small/unreadable.
+
+This is a known problem with Internet Explorer, which comes shipped
+with its Font setting to I<Smaller>. You'll have to set it to
+I<Medium> unless you have extremely good eyes, which can be done by
+going to C<View -E<gt> Text Size> and selecting I<Medium>.
+
+=head2 Q. I cannot read the PDF version of the documents
+
+B<A>. The PDF files require a browser plugin or standalone PDF reader
+to be read: You can get the Adobe Acrobat Reader for many different
+platforms from their website:
+http://www.adobe.com/products/acrobat/readstep2.html .
+
+=head2 Q. How the site search works
+
+B<A>. The search page reachable from the menu includes a complete
+usage documentation. But here is a short description:
+
+In the menu on the left there is a search widget which can search the
+current subset of documents, or the whole site. For example if you are
+reading one of the documents in the mod_perl developers guide the
+search will return hits within this document subset. If you are
+searching at the root of all documentation, all documentation subsets
+will be searched. And finally if you search at the root of the site,
+the whole site will be searched. This widget is not intended to
+replace the I<Find in the current document> feature implemented in
+most web browsers.
+
+The L<dedicated search page|XXX> provides a more flexible search
+options, including the explanation of these options.
+
+
+=head2 Q. The pages take too long to download!
+
+B<A>. Yes, we have a lot of documentation. That is definitely a good
+thing. But, for example, the guide alone takes 735 pages in PDF
+format, so you might be overwhelmed by the size of the files if you're
+downloading them each time from the net. In that case, we suggest that
+you L<download|download::docs> the sources, build the documentaion and
+read it off your hard disk.
+
+Another idea to make it load faster is to adjust your browser's
+caching. By caching the pages, you might not have to download them
+each time.
+
+
+=head2 Q. Why isn't your site running mod_perl?
+
+B<A>. 99% of this site is comprised of a static content, so it doesn't
+make sense to run mod_perl to serve it. You can see mod_perl in action
+L<here|outstanding::index>.
+
+=head2 Q. I can't send an e-mail to the author/maintainer!
+
+To reduce spam problems for our authors, we use a pretty simplistic
+email-address-hiding system which consists of replacing the C<@>
+character with C<(at)>. To send an e-mail, just change it back.
+
+=head2 Q. What is all this about Authors and Maintainers?
+
+It's quite simple. As many sections of our site are documents which
+have been written by individuals, we like to credit our authors and
+guide you to the person to contact. The authors are the original
+authors of a document or someone who has contributed big sections of
+it, but might not be available to contact anymore. In any case, the
+person listed as a I<Maintainer> should be contacted with any changes
+or remarks (you can also CC the L<documentation mailing
+list|maillist::docs-dev>). See the L<download
+documentation|download::docs> section about information on submitting
+patches. If in doubt, contact the L<documentation mailing
+list|maillist::docs-dev>.
+
+However, B<do not> email the maintainer with general questions, even
+if they are related to the material in the doc they maintain, but
+always ask at L<the modperl user list|maillist::modperl>. While we
+make e-mail addresses available, that doesn't mean you should just
+hope for them to answer any questions you might think they have the
+answer to. If you need help, ask your question at the mailing
+list. Otherwise you run a very high risk of your e-mail just being
+deleted immediately without ever being answered. All questions are
+usually answered at the list, so don't worry about asking there.
+
+The rule is:
+
+  If you feel you can help out a document, contact the Maintainer.
+  
+  If you don't understand something or need help, contact the mailing
+  list.
+
+Remember that, and you'll be fine.
+
+=head1 Contact Info
+
+If you've read the L<FAQ|/"FAQ"> and you still have a problem, please
+email L<docs-dev (at) perl.apache.org|maillist::docs-dev> and supply as
+much information as possible to help us solve your problem.
+
+=head1 How this site was created
+
+The site is automatically generated from a collection of HTML and POD
+files, using Perl DocSet Framework, which in turn is based on Template
+Toolkit.
+
+If you are interested in downloading the site sources, please see the
+L<relevant section|download::docs>.
+
+META: add the URL of the DocSet when it gets released.
+
+=for html
+  <table border="0" cellpadding="0" cellspacing="0" width="80%">
+      <tr align="center">
+          <td><a href="http://perl.apache.org/"><img src="../images/logo/mod_perl_logo.jpg" height="31" width="139" border="0" alt="mod_perl logo"></a></td>
+          <td><a href="http://validator.w3.org/check/referer"><img src="../images/logo/valid-html401.png" height="31" width="88" border="0" alt="Valid HTML 4.01"></a></td>
+          <td><a href="http://jigsaw.w3.org/css-validator/"><img src="../images/logo/valid-css.png" height="31" width="88" border="0" alt="Valid CSS"></a></td>
+          <td><a href="http://www.template-toolkit.org/"><img src="../images/logo/tt2power.gif" width="78" height="47" border="0" alt="powered by Template::Toolkit"></a></td>
+      </tr>
+  </table>
+
+=cut
+
+

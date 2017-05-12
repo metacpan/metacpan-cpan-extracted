@@ -1,0 +1,59 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use feature qw( say switch );
+no if $] >= 5.017011, warnings => 'experimental::smartmatch';
+
+use Devel::MAT;
+
+my $df = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" )->dumpfile;
+
+# peeking
+my %roots;
+foreach ( keys %{ $df } ) {
+   next unless m/^(.*)_at$/;
+   my $root = $1;
+   my $addr = $df->{$_} or next;
+
+   $roots{$addr} = $root;
+
+   next if $root eq "stack";
+
+   $df->{heap}{$addr} and next;
+
+   printf "DF has no SV at root %s addr 0x%x\n", $root, $addr;
+}
+
+sub test_ptr
+{
+   my ( $sv, $name, $val ) = @_;
+
+   given( ref $val ) {
+      when([ undef, '' ]) {
+         my $addr = $val or return;     # skip NULL
+         $roots{$addr} and return;      # known root
+         $df->{heap}{$addr} and return; # known heap SV
+
+         printf "SV %s has no %s SV at addr 0x%x\n", $sv->desc_addr, $name, $addr;
+      }
+      when( "ARRAY" ) {
+         foreach my $idx ( 0 .. $#$val ) {
+            test_ptr( $sv, "$name\[$idx]", $val->[$idx] );
+         }
+      }
+      when( "HASH" ) {
+         foreach my $key ( keys %$val ) {
+            test_ptr( $sv, "$name\{$key}", $val->{$key} );
+         }
+      }
+   }
+}
+
+foreach my $sv ( $df->heap ) {
+   foreach ( keys %{ $sv } ) {
+      next unless m/^(.*)_at$/;
+      my $outref = $1;
+      test_ptr( $sv, $outref, $sv->{$_} );
+   }
+}

@@ -1,0 +1,7 @@
+Revision history for Perl extension DBIx::Simple::DataSection
+
+0.02 Mon Oct 25 18:45 2010
+    * added utf8 flag by default
+
+0.01 Wed Oct 20 22:15:50 2010
+    * original version

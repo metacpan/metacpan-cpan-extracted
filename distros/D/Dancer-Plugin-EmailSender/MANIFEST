@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dancer/Plugin/EmailSender.pm
+t/Util.pm
+t/compile.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/simple.t

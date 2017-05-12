@@ -1,0 +1,29 @@
+0.07    2015-09-28
+        * Added the minimum perl requirement of 5.10
+        * Dist::Zilla dist.ini file provided in tarball
+
+0.06    2015-09-24
+        * In Device::ProXR
+          + Added the write_settings() call required to set the serial port
+            settings within Windows
+        * In Device::ProXR::RelayControl
+          + Added the relay_control() method to allow turning on or off 
+            the relay.
+          + Added a "SEE ALSO" section to the POD with a link back to the
+            Device::ProXR class
+          + Corrected the "SYNOPSIS" example
+
+0.05    2015-09-22
+        * In Device::ProXR, corrected a timeout problem in get_response
+        
+0.04    2015-09-17
+        * In Device::ProXR::RelayControl, corrected problem when calling the
+          relay_on() and relay_off() methods with a single parameter
+        * Corrected some POD errors
+
+0.03    2015-08-24
+        * Updated relay_on() and relay_off() methods to accept zero based
+          relay number, or bank and relay numbers as parameters
+
+0.01    2015-08-19
+        * Initial release as trial module

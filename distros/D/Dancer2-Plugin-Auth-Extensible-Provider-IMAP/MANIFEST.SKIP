@@ -1,0 +1,6 @@
+README.md
+.git*
+\.swp$
+bin/*
+.travis.yml
+Makefile.old

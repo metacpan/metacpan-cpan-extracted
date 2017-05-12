@@ -1,0 +1,10 @@
+<form action="/login" method="post">
+    <label for="username">Username</label>
+    <input type="text" value="" name="username" id="signin-username">
+
+    <label for="signin-password">Password</label>
+    <input type="password" name="password" id="signin-password">
+  <button type="submit" id="signin-btn">Login</button>
+</form>
+
+<p>Login Failed: [% params.login_failed %]</p>

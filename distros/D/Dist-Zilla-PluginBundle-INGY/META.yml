@@ -1,0 +1,215 @@
+---
+abstract: 'BeLike::INGY when you build your dists'
+author:
+  - 'Ingy döt Net <ingy@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0.96
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-INGY
+requires:
+  Dist::Zilla: 2.100922
+  Dist::Zilla::Plugin::AutoPrereq: 1.100130
+  Dist::Zilla::Plugin::CheckExtraTests: 0
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: 0
+  Dist::Zilla::Plugin::GithubMeta: 0.12
+  Dist::Zilla::Plugin::ReadmeFromPod: 0
+  Dist::Zilla::Plugin::ReportVersions::Tiny: 0
+  Dist::Zilla::Plugin::Test::ChangesHasContent: 0
+  Dist::Zilla::Plugin::Test::Compile: 0
+  Dist::Zilla::PluginBundle::Basic: 0
+  Dist::Zilla::PluginBundle::Filter: 0
+  Dist::Zilla::PluginBundle::Git: 0
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+  Moose::Autobox: 0
+  Pod::Elemental: 0.092970
+  Pod::Elemental::Transformer::List: 0
+resources:
+  homepage: https://github.com/ingydotnet/dist-zilla-pluginbundle-ingy-pm
+  repository: https://github.com/ingydotnet/dist-zilla-pluginbundle-ingy-pm.git
+version: 0.0.4
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Git::GatherDir
+      name: '@INGY/Git::GatherDir'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::CheckPrereqsIndexed
+      name: '@INGY/CheckPrereqsIndexed'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@INGY/CheckExtraTests'
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@INGY/@Filter/PruneCruft'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@INGY/@Filter/ManifestSkip'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@INGY/@Filter/MetaYAML'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@INGY/@Filter/License'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@INGY/@Filter/Readme'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@INGY/@Filter/ExecDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@INGY/@Filter/ShareDir'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@INGY/@Filter/MakeMaker'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@INGY/@Filter/Manifest'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@INGY/@Filter/TestRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@INGY/@Filter/ConfirmRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@INGY/@Filter/UploadToCPAN'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@INGY/AutoPrereqs'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::ReadmeFromPod
+      name: '@INGY/ReadmeFromPod'
+      version: 0.18
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@INGY/PkgVersion'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@INGY/MetaConfig'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@INGY/MetaJSON'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@INGY/NextRelease'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@INGY/PodSyntaxTests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@INGY/Test::Compile'
+      version: 2.037
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@INGY/ReportVersions::Tiny'
+      version: 1.08
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@INGY/TestMoreWithSubtests'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::GithubMeta
+      name: '@INGY/GithubMeta'
+      version: 0.42
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@INGY/@Git/Check'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@INGY/@Git/Commit'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@INGY/@Git/Tag'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@INGY/@Git/Push'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300039
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300039
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300039

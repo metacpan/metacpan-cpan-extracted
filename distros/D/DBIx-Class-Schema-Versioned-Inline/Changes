@@ -1,0 +1,110 @@
+Revision history for DBIx::Class::Schema::Versioned::Inline
+
+0.204 Thu May 28 17:15:18 CEST 2015
+
+    * Bump SQL::Translator dep since DBIC optional dep features does not
+      pull in a recent enough version
+
+0.203 Fri May 22 17:46:09 CEST 2015
+
+    [TESTS]
+
+    * improve robustness of tmpdir/file usage in SQLite tests so tests pass
+      on Windows
+    * first connect to schema wrapped in lives_ok in tests
+
+0.201 Wed May 20 12:26:48 CEST 2015
+
+    [TESTS]
+
+    * Improve robustness of MySQL and PostgreSQL smoker tests
+
+0.200 Tue May 19 10:14:04 CEST 2015
+
+    [ENHANCEMENTS]
+
+    * Start using Safe::Isa and Types::PerlVersion
+
+    [BUGS]
+
+    * all version comparisons now use Types::PerlVersion coercions to ensure
+      that we handle all version numbers in a uniform fashion.
+
+    [DOCUMENTATION]
+
+    * Add VERSION NUMBERS section to explain the potential dangers with mixed
+      version formats.
+
+0.025 Sun Oct 26 17:18:28 CET 2014
+
+    [TESTS]
+
+    * use Class::Load in db engine tests
+    * move skip_all into sub BUILD
+    * add quote_names => 1 to connect_info for all DBs
+    * add diag on failure to unlink sqlite temp file
+
+0.023 Mon Sep  8 17:58:48 CEST 2014
+
+    [TESTS]
+
+    * try to make ::Candy less likely to croak when DBIx::Class::Candy
+      is not found
+    * reduce test diag verbosity
+
+0.022 Thu Sep  4 14:54:38 CEST 2014
+
+    [ENHANCEMENTS]
+
+    * add $FIRST_VERSION plus schema_first_version method
+
+    [TESTS]
+
+    * hide some useless Test::PostgreSQL warnings
+    * add --no-locale to Pg initdb_args to try and prevent failures
+
+0.021 Thu Sep  4 10:34:54 CEST 2014
+
+    * Fix ::Candy tests to prevent smoker failures
+    * Fix PostgreSQL tests to prevent failure due to LANG ENV problems
+
+0.020 Wed Sep  3 17:14:11 CEST 2014
+
+    * New SQL::Translator release allows upgrades to work for SQLite and Pg.
+      Many thanks to ilmari for assistance in getting patches into SQLT.
+    * Start on TODO list in pod.
+    * Add Candy component along with tests and required changes.
+
+0.011 Mon Aug  4 14:14:39 CEST 2014
+
+    * ignore versions in Upgrade.pm that do not exist in schema definition
+    * better handling of connect_info in upgrade_single_step
+    * move sqlt extra handling into upgrade_single_step
+    * fix tests for DBIC > 0.08270 (thanks to ribasushi)
+    * Pg & SQLite don't like mixed DDL and data changes in since trans
+    * fix class has since but missing on renamed PK
+    * improved role-based testing
+
+0.010 Wed Jul  9 11:39:27 CEST 2014
+
+    * Upgrade.pm 'after' now implemented with basic tests
+
+0.004 Tue Jul  8 13:16:01 CEST 2014
+
+    * rename_from working for classes (though bugs in SQLT mean that it does
+      not work for SQLite and Pg)
+    * SKIP failing tests
+
+0.003 Mon Jul  7 19:47:09 CEST 2014
+
+    * Upgrade.pm 'before' now implemented with basic tests
+
+0.002 Thu Jul  3 10:19:43 CEST 2014
+
+    * Add EXLOCK => 0 to File::Temp creation in upgrade-sqlite.t to prevent
+      BSD/Mac locking (Slaven Rezić (eserte)) fixes GH#1
+
+0.001 Wed Jul  2 19:08:12 CEST 2014
+
+    * Initial release with missing functionality (Upgrade.pm)
+

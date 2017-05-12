@@ -1,0 +1,52 @@
+---
+abstract: 'Discrete management for database changes.'
+author:
+  - 'Grox Pty Ltd <modules@grox.com.au>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  File::ShareDir::Install: 0
+  Test::Exception: 0
+  Test::More: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.92'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Changeset
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+requires:
+  App::Cmd: 0
+  Class::Accessor: 0.31
+  Class::Factory: 0
+  DBI: 0
+  Data::Phrasebook: 0
+  Data::Phrasebook::Loader::YAML: 0
+  Data::UUID: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  Digest::MD5: 0
+  Encode: 0
+  Exception::Class: 0
+  Exception::Class::DBI: 0
+  File::Basename: 0
+  File::ShareDir: 0
+  File::Slurp: 9999.13
+  File::Spec: 0
+  Hash::Merge: 0.07
+  Path::Class: 0
+  Shell: 0
+  Term::Prompt: 1.03
+  Term::Report: 0
+  YAML: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.11

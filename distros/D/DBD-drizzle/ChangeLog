@@ -1,0 +1,56 @@
+2011-11-03 Patrick Galbraith <patg@patg.net> (0.304)
+* Fixed Makefile.PL to be smarter, more convenient in how it obtains include 
+  and library paths, as well as user info
+2011-02-24 Patrick Galbraith <patg@patg.net> (0.303)
+* Fixed various tests that fail due to error "Transactional DDL not supported"
+* Fixed is_auto_increment handle parameter which needed to be interpolated
+  from 'YES' to 1, which is automatically now set to 1
+* Other code cleanups
+
+2010-10-26 Patrick Galbraith <patg@patg.net> (0.302)
+* Bumped version as it was not bumped previously.
+
+2010-09-14 Patrick Galbraith <patg@patg.net> (0.301)
+* Removed drizzle_refresh call from drizzle.xs
+* Removed non-C90 declarations
+* Extensive work on column_info to work with I_S and data_dictionary 
+  instead of using 'describe' or 'show' commands
+* Removed old drop_schema() and create_schema() commands (these are what
+  mysqladmin used to use). These should need to be reimplemented locally
+
+2009-08-05 Patrick Galbraith <patg@patg.net> (0.300)
+
+* Fixed how error is raised in dbd_st_internal_execute. Problem with 
+  drizzle_con_errno(), perhaps to be fixed in later versions 
+  of libdrizzle
+* Fixed warnings in compile
+* Fixed insert test
+
+2009-06-22 Patrick Galbraith <patg@patg.net> (0.200)
+* Fixed broken tests
+* Fixed bind_type_guessing to work as it does in DBD::mysql
+* Added missing insert_id database handle attribute fetching
+* Added several tests that were missing that exist in DBD::mysql
+* Removed extra cruft from lib.pl
+* Fixed hash-key retrieval for connection options
+* Fixed double-free of imp_dbh->result in dbd_st_destroy
+
+2009-04-23 Clint Byrum <clint@fewbar.com>, Patrick Galbraith <patg@patg.net> (0.100)
+* Working with libdrizzle! All tests pass on both Linux and OS X
+
+2009-01-16 Patrick Galbraith <patg@patg.net> (0.003)
+* More tests working, though some give out of memory
+* Last version with this client lib, switchng to Eday's lib next
+* Ripped out even more cruft
+* Major work on types struct from hell
+
+2008-11-19 Patrick Galbraith <patg@patg.net> (0.002)
+
+* Working!
+* Removed all server prepared statement code
+* Changed data types to new DRIZZLE_xx types, removed those that have been chopped
+* Much debugging, cruft cleanage
+
+2008-7-21 Patrick Galbraith <patg@patg.net> (0.001)
+
+* First Version 

@@ -1,0 +1,38 @@
+#/*-*- Mode: C++ -*- */
+%module{DDC::XS};
+
+//======================================================================
+// CQueryCompiler
+%name{DDC::XS::CQueryCompiler} class CQueryCompiler : public %name{DDC::XS::Object} ddcObject
+{
+  %accessors{ %get_style{camelcase}; %set_style{camelcase}; };
+public:
+  %name{Query} CQuery* m_pQuery %get;
+  %name{setQuery} void setQuery(CQuery *query) %code %{ ddcxs_obj_set(m_pQuery, query); %};
+  //%name{CountKeys} CQCountKeyExprList m_qCountKeys %get %set;
+  //%name{CountSample} size_t m_qCountSample %get %set;
+  //%name{CountSort} HitSortEnum m_qCountSort %get %set;
+
+public:
+  CQueryCompiler();
+
+  void CleanParser() %code %{
+      ddcxs_refcnt_dec(THIS->m_pQuery, ddcxs_obj_refcnt(THIS));
+      THIS->DisownChildren();
+      THIS->CleanParser();
+    %};
+
+  %name{ParseQuery_} bool ParseQuery(string QueryStr)
+    %code %{
+      try {
+	ddcxs_refcnt_dec(THIS->m_pQuery, ddcxs_obj_refcnt(THIS));
+	THIS->DisownChildren();
+	RETVAL = THIS->ParseQuery(QueryStr);
+	ddcxs_refcnt_inc(THIS->m_pQuery, ddcxs_obj_refcnt(THIS));
+      } catch (std::exception &e) {
+	croak("DDC::XS::CQueryCompiler::ParseQuery() failed: %s", e.what());
+      };
+    %};
+  string QueryToString();
+  string QueryToJson();
+};

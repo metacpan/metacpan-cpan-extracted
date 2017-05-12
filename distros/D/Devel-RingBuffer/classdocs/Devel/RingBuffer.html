@@ -1,0 +1,699 @@
+
+<html>
+<head>
+<title>Devel::RingBuffer</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;<A HREF='#constructor_summary'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;<A HREF='#constructor_detail'>CONSTR</a>&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Devel::RingBuffer</h2>
+
+<hr>
+
+Shared memory ring buffers for diagnosis/debug of Perl scripts.
+Uses IPC::Mmap to create/access/manage a memory mapped file (or namespace
+on Win32) as a ring buffer structure that can be used by "applications
+under test" that use an appropriate debug module (e.g., Devel::STrace)
+along with an external monitoring application (e.g., Devel::STrace::Monitor).
+<p>
+Note that significant functionality is written in XS/C in order to minimize
+tracing/debugging overhead.
+<p>
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href='http://perldoc.perl.org/perlartistic.html'>Perl Artistic License</a>
+for details.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.31</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2006-05-01
+</dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer'>monitor</a>($file)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Opens an existing mmap'd file for read-only
+access (for simple monitor applications)
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer'>new</a>(File =&gt; <i>value</i>, GlobalSize =&gt; <i>value</i>, MessageSize =&gt; <i>value</i>, Rings =&gt; <i>value</i>, Slots =&gt; <i>value</i>, SlotSize =&gt; <i>value</i>, StopOnCreate =&gt; <i>value</i>, TraceOnCreate =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Using a combination of the optional C<%args> and
+various environment variables, creates and initializes a
+mmap'ed file in read/write mode with the ring buffer structures
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::RingBuffer'>open</a>($file)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Opens an existing mmap'd file for read/write
+access (for interactive debuggers)
+
+
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#allocate'>allocate</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Allocate a ring buffer
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#close'>close</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<B>Deprecated.</B>&nbsp;<i>1
+</i></td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#free'>free</a>($ring)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Free a ring
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getAddress'>getAddress</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get base address of the mmap'ed file
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getCount'>getCount</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the number of configured rings
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getGlobalMsg'>getGlobalMsg</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gets a message from the global message area
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getHeader'>getHeader</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the RingBuffer global header fields
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getMap'>getMap</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the free buffer map
+
+
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getMmap'>getMmap</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the IPC::Mmap object used to store the ringbuffer
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getName'>getName</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the name of the mmap'ed file
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getRing'>getRing</a>($ringnum)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Open and return a Devel::RingBuffer::Ring object
+for the specified ring number
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSingle'>getSingle</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Gets the value of the global single field
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSlotSize'>getSlotSize</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the configured size of slots
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSlots'>getSlots</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the configured number of slots per ring
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getStopOnCreate'>getStopOnCreate</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the value of the stop_on_create field
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getTraceOnCreate'>getTraceOnCreate</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the value of the trace_on_create field
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#reallocate'>reallocate</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Re-allocates a ring buffer
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setGlobalMsg'>setGlobalMsg</a>($msg)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets a message into the global message area
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setSingle'>setSingle</a>(value =&gt; <i>value</i>)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the value of the global single field
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setStopOnCreate'>setStopOnCreate</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the value of the stop_on_create field
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setTraceOnCreate'>setTraceOnCreate</a>($trace_on_create)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Sets the value of the trace_on_create field
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='open'></a>
+<h3>open</h3>
+<pre>
+open($file)
+</pre><p>
+<dl>
+<dd>Opens an existing mmap'd file for read/write
+access (for interactive debuggers)
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$file</code> - optional name of mmap'ed file (or namespace for Win32)
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer object on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<a name='new'></a>
+<h3>new</h3>
+<pre>
+new(File =&gt; <i>value</i>, GlobalSize =&gt; <i>value</i>, MessageSize =&gt; <i>value</i>, Rings =&gt; <i>value</i>, Slots =&gt; <i>value</i>, SlotSize =&gt; <i>value</i>, StopOnCreate =&gt; <i>value</i>, TraceOnCreate =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>Using a combination of the optional C<%args> and
+various environment variables, creates and initializes a
+mmap'ed file in read/write mode with the ring buffer structures.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>File</code> =&gt; name of the file to be created for memory mapping.
+</dd>
+<dd><code>GlobalSize</code> =&gt; size of global monitor <=> AUT message buffer.
+</dd>
+<dd><code>MessageSize</code> =&gt; size of per-thread monitor <=> AUT message buffer.
+</dd>
+<dd><code>Rings</code> =&gt; Number of rings to create in the ring buffer.
+</dd>
+<dd><code>Slots</code> =&gt; Number of slots per ring.
+</dd>
+<dd><code>SlotSize</code> =&gt; Slot size in bytes.
+</dd>
+<dd><code>StopOnCreate</code> =&gt; Initial value for stop_on_create flag.
+</dd>
+<dd><code>TraceOnCreate</code> =&gt; Initial value for trace_on_create flag.
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer object on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<a name='monitor'></a>
+<h3>monitor</h3>
+<pre>
+monitor($file)
+</pre><p>
+<dl>
+<dd>Opens an existing mmap'd file for read-only
+access (for simple monitor applications)
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$file</code> - optional name of mmap'ed file (or namespace for Win32)
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer object on success; undef on failure
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='allocate'></a>
+<h3>allocate</h3>
+<pre>
+allocate()
+</pre><p>
+<dl>
+<dd>Allocate a ring buffer. Should only be used on ringbuffers created with new().
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>a Devel::RingBuffer::Ring object on success.
+If no rings are available, returns undef.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='close'></a>
+<h3>close</h3>
+<pre>
+close()
+</pre><p>
+<dl>
+<dd>Close the ring buffer.
+
+
+<p>
+<dd><dl>
+</dl></dd></dl><hr>
+
+<a name='free'></a>
+<h3>free</h3>
+<pre>
+free($ring)
+</pre><p>
+<dl>
+<dd>Free a ring. Returns a ring to the free list
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$ring</code> - the ring object to be freed
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getAddress'></a>
+<h3>getAddress</h3>
+<pre>
+getAddress()
+</pre><p>
+<dl>
+<dd>Get base address of the mmap'ed file.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the address of the mmap'ed file
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getCount'></a>
+<h3>getCount</h3>
+<pre>
+getCount()
+</pre><p>
+<dl>
+<dd>Get the number of configured rings.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the count of rings
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getGlobalMsg'></a>
+<h3>getGlobalMsg</h3>
+<pre>
+getGlobalMsg()
+</pre><p>
+<dl>
+<dd>Gets a message from the global message area. Note that
+this operation B<does not> lock the entire ring buffer
+header, but instead relies on signalling of the message
+chunk lengths.
+Messages larger than the configured global message size
+will be received in chunks; each chunk must back ACK'd by
+the message receiver.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the re-assembled global message buffer contents
+
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getHeader'></a>
+<h3>getHeader</h3>
+<pre>
+getHeader()
+</pre><p>
+<dl>
+<dd>Get the RingBuffer global header fields. The fields
+returned include:
+<p>
+<ol>
+<li>single	- global control variable
+<li>msgarea_sz - size of per-thread message area
+<li>max_buffer - number of configured rings
+<li>slots - number of slots per ring
+<li>slot_sz - size of each slot (excluding linenumber and timestamp header)
+<li>stop_on_create - 1 => new threads created with signal = 1
+<li>trace_on_create - 1 => new threads created with trace = 1
+<li>global_sz - size of global message buffer
+<li>globmsg_total - size of complete global message contents
+<li>globmsg_sz - size of current global message fragment
+</ol>
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>list of the specified header values
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getMap'></a>
+<h3>getMap</h3>
+<pre>
+getMap()
+</pre><p>
+<dl>
+<dd>Get the free buffer map
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>list of bytes, one per ring; if and element is 'true', the associated
+ring is free; otherwise the ring is in use.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getMmap'></a>
+<h3>getMmap</h3>
+<pre>
+getMmap()
+</pre><p>
+<dl>
+<dd>Get the IPC::Mmap object used to store the ringbuffer.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the IPC::Mmap object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getName'></a>
+<h3>getName</h3>
+<pre>
+getName()
+</pre><p>
+<dl>
+<dd>Get the name of the mmap'ed file.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the name of the mmap'ed file
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getRing'></a>
+<h3>getRing</h3>
+<pre>
+getRing($ringnum)
+</pre><p>
+<dl>
+<dd>Open and return a Devel::RingBuffer::Ring object
+for the specified ring number.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$ringnum</code> - number of ring to be opened
+
+</dd>
+<dt><b>Returns:</b><dd>Devel::RingBuffer::Ring object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSingle'></a>
+<h3>getSingle</h3>
+<pre>
+getSingle()
+</pre><p>
+<dl>
+<dd>Gets the value of the global single field.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the value of the field.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSlotSize'></a>
+<h3>getSlotSize</h3>
+<pre>
+getSlotSize()
+</pre><p>
+<dl>
+<dd>Get the configured size of slots.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the slot size
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSlots'></a>
+<h3>getSlots</h3>
+<pre>
+getSlots()
+</pre><p>
+<dl>
+<dd>Get the configured number of slots per ring.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the number of slots configured for the ring buffer.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getStopOnCreate'></a>
+<h3>getStopOnCreate</h3>
+<pre>
+getStopOnCreate()
+</pre><p>
+<dl>
+<dd>Get the value of the stop_on_create field.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the current value of the field.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getTraceOnCreate'></a>
+<h3>getTraceOnCreate</h3>
+<pre>
+getTraceOnCreate()
+</pre><p>
+<dl>
+<dd>Get the value of the trace_on_create field.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the value of the field
+</dd>
+</dl></dd></dl><hr>
+
+<a name='reallocate'></a>
+<h3>reallocate</h3>
+<pre>
+reallocate()
+</pre><p>
+<dl>
+<dd>Re-allocates a ring buffer. Required to handle threads' CLONE()
+of the existing ring buffer object when a new thread is created.
+C<reallocate()> simply allocates a ring buffer and returns its
+ring number, and its base address; the caller than updates
+an existing ring object with the returned values.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the allocated ring index and address
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setGlobalMsg'></a>
+<h3>setGlobalMsg</h3>
+<pre>
+setGlobalMsg($msg)
+</pre><p>
+<dl>
+<dd>Sets a message into the global message area. Note that
+this operation requires locking the entire ring buffer
+header until the message is completely transfered.
+Messages larger than the configured global message size
+will be transfered in chunks; each chunk must back ACK'd by
+the message receiver.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$msg</code> - the message to send
+
+</dd>
+<dt><b>Returns:</b><dd>the RingBuffer object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setSingle'></a>
+<h3>setSingle</h3>
+<pre>
+setSingle(value =&gt; <i>value</i>)
+</pre><p>
+<dl>
+<dd>Sets the value of the global single field.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>value</code> =&gt; to set
+
+</dd>
+<dt><b>Returns:</b><dd>the prior value of the field.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setStopOnCreate'></a>
+<h3>setStopOnCreate</h3>
+<pre>
+setStopOnCreate()
+</pre><p>
+<dl>
+<dd>Sets the value of the stop_on_create field.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the prior value of the field.
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setTraceOnCreate'></a>
+<h3>setTraceOnCreate</h3>
+<pre>
+setTraceOnCreate($trace_on_create)
+</pre><p>
+<dl>
+<dd>Sets the value of the trace_on_create field.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$trace_on_create</code> - value to set
+</dd>
+<dt><b>Returns:</b><dd>the prior value of the field
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Sun Aug 13 09:19:17 2006</i>
+</center>
+</small>
+</body>
+</html>

@@ -1,0 +1,195 @@
+NAME
+
+    Dist::Zilla::Plugin::ReadmeAnyFromPod - Automatically convert POD to a
+    README in any format for Dist::Zilla
+
+VERSION
+
+    version 0.163250
+
+SYNOPSIS
+
+    In your dist.ini
+
+        [ReadmeAnyFromPod]
+        ; Default is plaintext README in build dir
+    
+        ; Using non-default options: POD format with custom filename in
+        ; dist root, outside of build. Including this README in version
+        ; control makes Github happy.
+        [ReadmeAnyFromPod / ReadmePodInRoot]
+        type = pod
+        filename = README.pod
+        location = root
+    
+        ; Using plugin name autodetection: Produces README.html in root
+        [ ReadmeAnyFromPod / HtmlInRoot ]
+
+DESCRIPTION
+
+    Generates a README for your Dist::Zilla powered dist from its
+    main_module in any of several formats. The generated README can be
+    included in the build or created in the root of your dist for e.g.
+    inclusion into version control.
+
+ PLUGIN NAME AUTODETECTION
+
+    If you give the plugin an appropriate name (a string after the slash)
+    in your dist.ini, it will can parse the type and location attributes
+    from it. The format is "Readme[TYPE]In[LOCATION]". The words "Readme"
+    and "In" are optional, and the whole name is case-insensitive. The
+    SYNOPSIS section above gives one example.
+
+    When run with location = dist, this plugin runs in the FileMunger phase
+    to create the new file. If it runs before another FileMunger plugin
+    does, that happens to modify the input pod (like, say, [PodWeaver]),
+    the README file contents will be recalculated, along with a warning
+    that you should modify your dist.ini by referencing [ReadmeAnyFromPod]
+    lower down in the file (the build still works, but is less efficient).
+
+ATTRIBUTES
+
+ type
+
+    The file format for the readme. Supported types are "text", "markdown",
+    "gfm" (Github-flavored markdown), "pod", and "html". Note that you are
+    not advised to create a .pod file in the dist itself, as
+    ExtUtils::MakeMaker will install that, both into PERL5LIB and MAN3DIR.
+
+ filename
+
+    The file name of the README file to produce. The default depends on the
+    selected format.
+
+ source_filename
+
+    The file from which to extract POD for the content of the README. The
+    default is the file of the main module of the dist. If the main module
+    has a companion ".pod" file with the same basename, that is used as the
+    default instead.
+
+ location
+
+    Where to put the generated README file. Choices are:
+
+    build
+
+      This puts the README in the directory where the dist is currently
+      being built, where it will be incorporated into the dist.
+
+    root
+
+      This puts the README in the root directory (the same directory that
+      contains dist.ini). The README will not be incorporated into the
+      built dist.
+
+    If you want to generate the same README file in both the build
+    directory and the root directory, simply generate it in the build
+    directory and use the [CopyFilesFromBuild] plugin to copy it to the
+    dist root.
+
+ phase
+
+    At what phase to generate the README file. Choices are:
+
+    build
+
+      (Default) This generates the README at 'after build' time. A new
+      README will be generated each time you build the dist.
+
+    release
+
+      This generates the README at 'after release' time. Note that this is
+      too late to get the file into the generated tarball, and is therefore
+      incompatible with location = build. However, this is ideal if you are
+      using location = root and only want to update the README upon each
+      release of your module.
+
+METHODS
+
+ gather_files
+
+    We create the file early, so other plugins that need to have the full
+    list of files are aware of what we will be generating.
+
+ prune_files
+
+    Files with location = root must also be pruned, so that they don't
+    sneak into the next build by virtue of already existing in the root
+    dir. (The alternative is that the user doesn't add them to the build in
+    the first place, with an option to their GatherDir plugin.)
+
+ munge_files
+
+ munge_file
+
+    Edits the content into the requested README file in the dist.
+
+ after_build
+
+    Create the requested README file at build time, if requested.
+
+ after_release
+
+    Create the requested README file at release time, if requested.
+
+ get_readme_content
+
+    Get the content of the README in the desired format.
+
+BUGS AND LIMITATIONS
+
+    Please report any bugs or feature requests to
+    rct+perlbug@thompsonclan.org.
+
+SEE ALSO
+
+      * Dist::Zilla::Plugin::ReadmeFromPod - The base for this module
+
+      * Dist::Zilla::Plugin::ReadmeMarkdownFromPod - Functionality subsumed
+      by this module
+
+      * Dist::Zilla::Plugin::CopyReadmeFromBuild - Functionality partly
+      subsumed by this module
+
+INSTALLATION
+
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHORS
+
+      * Ryan C. Thompson <rct@thompsonclan.org>
+
+      * Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Ryan C. Thompson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

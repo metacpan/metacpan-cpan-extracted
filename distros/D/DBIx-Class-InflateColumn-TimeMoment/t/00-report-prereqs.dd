@@ -1,0 +1,53 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'English' => '0',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'Test::CPAN::Meta' => '0',
+                                      'Test::EOL' => '0',
+                                      'Test::Kwalitee' => '1.21',
+                                      'Test::More' => '0.88',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'blib' => '1.01'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'DBIx::Class' => '0',
+                                      'Try::Tiny' => '0',
+                                      'base' => '0',
+                                      'namespace::clean' => '0',
+                                      'perl' => '5.008',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'DBD::SQLite' => '0',
+                                   'DBIx::Class::Core' => '0',
+                                   'DBIx::Class::Schema' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'SQL::Translator' => '0.11018',
+                                   'Test::More' => '0',
+                                   'Time::Moment' => '0',
+                                   'lib' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

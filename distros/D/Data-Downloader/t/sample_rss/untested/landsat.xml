@@ -1,0 +1,2816 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rss version="2.0"
+ xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+>
+
+<channel>
+<title>Latest Landsat 7 scenes</title>
+<link>http://landsat.usgs.gov</link>
+<description>Newest available Landsat 7 scenes</description>
+<pubDate>Thu, 16 Apr 2009 11:59:04 -0000</pubDate>
+<ttl>60</ttl>
+
+<item>
+<title>Hellhole Palms, California 2009-04-16 at 05:26:11 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71382072009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/138/207/2009/LE71382072009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=138/207/2009/LE71382072009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 138, Row 207, Cloud cover   -1.00%<br/>
+Scene ID: LE71382072009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/138/207/2009/LE71382072009106EDC00.jpg</guid>
+<geo:lat>33.18007</geo:lat>
+<geo:long>-116.35304</geo:long>
+</item>
+<item>
+<title>Xiaying, Anhui, China 2009-04-16 at 02:39:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220372009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/37/2009/LE71220372009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/37/2009/LE71220372009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 37, Cloud cover   81.69%<br/>
+Scene ID: LE71220372009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/37/2009/LE71220372009106EDC00.jpg</guid>
+<geo:lat>33.17315</geo:lat>
+<geo:long>116.09493</geo:long>
+</item>
+<item>
+<title>Xuandimiao, Anhui, China 2009-04-16 at 02:39:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220362009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/36/2009/LE71220362009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/36/2009/LE71220362009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 36, Cloud cover    8.39%<br/>
+Scene ID: LE71220362009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220362009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/36/2009/LE71220362009106EDC00.jpg</guid>
+<geo:lat>34.607</geo:lat>
+<geo:long>116.4951</geo:long>
+</item>
+<item>
+<title>Anjiazhuang, Shandong, China 2009-04-16 at 02:38:39 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220352009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/35/2009/LE71220352009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/35/2009/LE71220352009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 35, Cloud cover    1.11%<br/>
+Scene ID: LE71220352009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220352009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/35/2009/LE71220352009106EDC00.jpg</guid>
+<geo:lat>36.03945</geo:lat>
+<geo:long>116.90469</geo:long>
+</item>
+<item>
+<title>Zhaokuiyuan, Shandong, China 2009-04-16 at 02:38:15 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220342009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/34/2009/LE71220342009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/34/2009/LE71220342009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 34, Cloud cover    0.08%<br/>
+Scene ID: LE71220342009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220342009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/34/2009/LE71220342009106EDC00.jpg</guid>
+<geo:lat>37.4707</geo:lat>
+<geo:long>117.32608</geo:long>
+</item>
+<item>
+<title>Gaoshalingcun, Tianjin, China 2009-04-16 at 02:37:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220332009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/33/2009/LE71220332009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/33/2009/LE71220332009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 33, Cloud cover    0.17%<br/>
+Scene ID: LE71220332009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220332009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/33/2009/LE71220332009106EDC00.jpg</guid>
+<geo:lat>38.90039</geo:lat>
+<geo:long>117.75958</geo:long>
+</item>
+<item>
+<title>Dakuaidi, Hebei, China 2009-04-16 at 02:37:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220322009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/32/2009/LE71220322009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/32/2009/LE71220322009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 32, Cloud cover    0.07%<br/>
+Scene ID: LE71220322009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220322009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/32/2009/LE71220322009106EDC00.jpg</guid>
+<geo:lat>40.32898</geo:lat>
+<geo:long>118.2081</geo:long>
+</item>
+<item>
+<title>Taojiaying, Nei Mongol, China 2009-04-16 at 02:37:04 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220312009106EDC01&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/31/2009/LE71220312009106EDC01.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/31/2009/LE71220312009106EDC01.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 31, Cloud cover    0.03%<br/>
+Scene ID: LE71220312009106EDC01
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220312009106EDC01" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/31/2009/LE71220312009106EDC01.jpg</guid>
+<geo:lat>41.75558</geo:lat>
+<geo:long>118.66914</geo:long>
+</item>
+<item>
+<title>Hurh, Nei Mongol, China 2009-04-16 at 02:36:40 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220302009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/30/2009/LE71220302009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/30/2009/LE71220302009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 30, Cloud cover    0.19%<br/>
+Scene ID: LE71220302009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220302009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/30/2009/LE71220302009106EDC00.jpg</guid>
+<geo:lat>43.18081</geo:lat>
+<geo:long>119.14822</geo:long>
+</item>
+<item>
+<title>Holt, Nei Mongol, China 2009-04-16 at 02:36:16 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220292009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/29/2009/LE71220292009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/29/2009/LE71220292009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 29, Cloud cover    0.04%<br/>
+Scene ID: LE71220292009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220292009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/29/2009/LE71220292009106EDC00.jpg</guid>
+<geo:lat>44.60405</geo:lat>
+<geo:long>119.64563</geo:long>
+</item>
+<item>
+<title>Yujuncun, Nei Mongol, China 2009-04-16 at 02:35:52 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220282009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/28/2009/LE71220282009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/28/2009/LE71220282009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 28, Cloud cover    0.03%<br/>
+Scene ID: LE71220282009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220282009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/28/2009/LE71220282009106EDC00.jpg</guid>
+<geo:lat>46.02544</geo:lat>
+<geo:long>120.16117</geo:long>
+</item>
+<item>
+<title>Wenquan, Nei Mongol, China 2009-04-16 at 02:35:28 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220272009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/27/2009/LE71220272009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/27/2009/LE71220272009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 27, Cloud cover    6.36%<br/>
+Scene ID: LE71220272009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220272009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/27/2009/LE71220272009106EDC00.jpg</guid>
+<geo:lat>47.44492</geo:lat>
+<geo:long>120.69991</geo:long>
+</item>
+<item>
+<title>Onor, Nei Mongol, China 2009-04-16 at 02:35:04 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220262009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/26/2009/LE71220262009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/26/2009/LE71220262009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 26, Cloud cover   38.79%<br/>
+Scene ID: LE71220262009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220262009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/26/2009/LE71220262009106EDC00.jpg</guid>
+<geo:lat>48.86177</geo:lat>
+<geo:long>121.26134</geo:long>
+</item>
+<item>
+<title>Xinzhangfang, Nei Mongol, China 2009-04-16 at 02:34:40 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220252009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/25/2009/LE71220252009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/25/2009/LE71220252009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 25, Cloud cover   24.92%<br/>
+Scene ID: LE71220252009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220252009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/25/2009/LE71220252009106EDC00.jpg</guid>
+<geo:lat>50.27683</geo:lat>
+<geo:long>121.85088</geo:long>
+</item>
+<item>
+<title>Azhong, Nei Mongol, China 2009-04-16 at 02:34:16 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220242009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/24/2009/LE71220242009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/24/2009/LE71220242009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 24, Cloud cover   20.28%<br/>
+Scene ID: LE71220242009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220242009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/24/2009/LE71220242009106EDC00.jpg</guid>
+<geo:lat>51.68869</geo:lat>
+<geo:long>122.46928</geo:long>
+</item>
+<item>
+<title>Zhaohui, Heilongjiang, China 2009-04-16 at 02:33:52 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220232009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/23/2009/LE71220232009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/23/2009/LE71220232009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 23, Cloud cover   12.22%<br/>
+Scene ID: LE71220232009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220232009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/23/2009/LE71220232009106EDC00.jpg</guid>
+<geo:lat>53.09785</geo:lat>
+<geo:long>123.12324</geo:long>
+</item>
+<item>
+<title>Petropavlovskiy, Amur, Russia 2009-04-16 at 02:33:29 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220222009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/22/2009/LE71220222009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/22/2009/LE71220222009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 22, Cloud cover   13.09%<br/>
+Scene ID: LE71220222009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220222009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/22/2009/LE71220222009106EDC00.jpg</guid>
+<geo:lat>54.50375</geo:lat>
+<geo:long>123.81229</geo:long>
+</item>
+<item>
+<title>Apsakan, Amur, Russia 2009-04-16 at 02:33:05 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220212009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/21/2009/LE71220212009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/21/2009/LE71220212009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 21, Cloud cover    5.83%<br/>
+Scene ID: LE71220212009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220212009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/21/2009/LE71220212009106EDC00.jpg</guid>
+<geo:lat>55.9063</geo:lat>
+<geo:long>124.54331</geo:long>
+</item>
+<item>
+<title>Bol'shaya Khatyma, Sakha, Russia 2009-04-16 at 02:32:41 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220202009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/20/2009/LE71220202009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/20/2009/LE71220202009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 20, Cloud cover   23.84%<br/>
+Scene ID: LE71220202009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220202009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/20/2009/LE71220202009106EDC00.jpg</guid>
+<geo:lat>57.30488</geo:lat>
+<geo:long>125.32165</geo:long>
+</item>
+<item>
+<title>Ryabinovyy, Sakha, Russia 2009-04-16 at 02:32:17 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220192009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/19/2009/LE71220192009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/19/2009/LE71220192009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 19, Cloud cover    0.94%<br/>
+Scene ID: LE71220192009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/19/2009/LE71220192009106EDC00.jpg</guid>
+<geo:lat>58.69886</geo:lat>
+<geo:long>126.15305</geo:long>
+</item>
+<item>
+<title>Kurun-Kenkga, Sakha, Russia 2009-04-16 at 02:31:53 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220182009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/18/2009/LE71220182009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/18/2009/LE71220182009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 18, Cloud cover    0.23%<br/>
+Scene ID: LE71220182009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220182009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/18/2009/LE71220182009106EDC00.jpg</guid>
+<geo:lat>60.08836</geo:lat>
+<geo:long>127.04659</geo:long>
+</item>
+<item>
+<title>Yelanka, Sakha, Russia 2009-04-16 at 02:31:29 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220172009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/17/2009/LE71220172009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/17/2009/LE71220172009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 17, Cloud cover    0.27%<br/>
+Scene ID: LE71220172009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/17/2009/LE71220172009106EDC00.jpg</guid>
+<geo:lat>61.47186</geo:lat>
+<geo:long>128.00761</geo:long>
+</item>
+<item>
+<title>Tastatatskiy, Sakha, Russia 2009-04-16 at 02:31:05 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220162009106EDC02&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/16/2009/LE71220162009106EDC02.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/16/2009/LE71220162009106EDC02.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 16, Cloud cover    0.22%<br/>
+Scene ID: LE71220162009106EDC02
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220162009106EDC02" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/16/2009/LE71220162009106EDC02.jpg</guid>
+<geo:lat>62.84938</geo:lat>
+<geo:long>129.05048</geo:long>
+</item>
+<item>
+<title>Nera, Sakha, Russia 2009-04-16 at 02:30:41 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220152009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/15/2009/LE71220152009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/15/2009/LE71220152009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 15, Cloud cover    0.12%<br/>
+Scene ID: LE71220152009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220152009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/15/2009/LE71220152009106EDC00.jpg</guid>
+<geo:lat>64.21927</geo:lat>
+<geo:long>130.18375</geo:long>
+</item>
+<item>
+<title>Enke, Sakha, Russia 2009-04-16 at 02:30:18 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220142009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/14/2009/LE71220142009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/14/2009/LE71220142009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 14, Cloud cover    0.09%<br/>
+Scene ID: LE71220142009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220142009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/14/2009/LE71220142009106EDC00.jpg</guid>
+<geo:lat>65.58103</geo:lat>
+<geo:long>131.42467</geo:long>
+</item>
+<item>
+<title>Yuyettyakh, Sakha, Russia 2009-04-16 at 02:29:54 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220132009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/13/2009/LE71220132009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/13/2009/LE71220132009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 13, Cloud cover    0.07%<br/>
+Scene ID: LE71220132009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220132009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/13/2009/LE71220132009106EDC00.jpg</guid>
+<geo:lat>66.9329</geo:lat>
+<geo:long>132.79124</geo:long>
+</item>
+<item>
+<title>Kytalyktakh, Sakha, Russia 2009-04-16 at 02:29:30 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220122009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/12/2009/LE71220122009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/12/2009/LE71220122009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 12, Cloud cover    0.08%<br/>
+Scene ID: LE71220122009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220122009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/12/2009/LE71220122009106EDC00.jpg</guid>
+<geo:lat>68.27315</geo:lat>
+<geo:long>134.30553</geo:long>
+</item>
+<item>
+<title>Dzhanky, Sakha, Russia 2009-04-16 at 02:29:06 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220112009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/11/2009/LE71220112009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/11/2009/LE71220112009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 11, Cloud cover    0.12%<br/>
+Scene ID: LE71220112009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220112009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/11/2009/LE71220112009106EDC00.jpg</guid>
+<geo:lat>69.59977</geo:lat>
+<geo:long>135.99516</geo:long>
+</item>
+<item>
+<title>Tastakh, Sakha, Russia 2009-04-16 at 02:28:42 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220102009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/10/2009/LE71220102009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/10/2009/LE71220102009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 10, Cloud cover    0.00%<br/>
+Scene ID: LE71220102009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220102009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/10/2009/LE71220102009106EDC00.jpg</guid>
+<geo:lat>70.90945</geo:lat>
+<geo:long>137.89218</geo:long>
+</item>
+<item>
+<title>Van'kina, Sakha, Russia 2009-04-16 at 02:28:18 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71220092009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/122/9/2009/LE71220092009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=122/9/2009/LE71220092009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 122, Row 9, Cloud cover    0.00%<br/>
+Scene ID: LE71220092009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71220092009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/122/9/2009/LE71220092009106EDC00.jpg</guid>
+<geo:lat>72.1994</geo:lat>
+<geo:long>140.04453</geo:long>
+</item>
+<item>
+<title>Tegemana, Indonesia 2009-04-16 at 01:10:07 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060612009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/61/2009/LE71060612009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/61/2009/LE71060612009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 61, Cloud cover   85.29%<br/>
+Scene ID: LE71060612009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/61/2009/LE71060612009106EDC00.jpg</guid>
+<geo:lat>-1.45</geo:lat>
+<geo:long>132.8372</geo:long>
+</item>
+<item>
+<title>Waibeem, Indonesia 2009-04-16 at 01:09:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060602009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/60/2009/LE71060602009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/60/2009/LE71060602009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 60, Cloud cover   98.45%<br/>
+Scene ID: LE71060602009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/60/2009/LE71060602009106EDC00.jpg</guid>
+<geo:lat>-.00374</geo:lat>
+<geo:long>133.14471</geo:long>
+</item>
+<item>
+<title>Tōno, Tōkyō, Japan 2009-04-16 at 01:01:21 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060392009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/39/2009/LE71060392009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/39/2009/LE71060392009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 39, Cloud cover    2.49%<br/>
+Scene ID: LE71060392009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/39/2009/LE71060392009106EDC00.jpg</guid>
+<geo:lat>30.30252</geo:lat>
+<geo:long>140.04535</geo:long>
+</item>
+<item>
+<title>Path 106, row 38 2009-04-16 at 01:00:58 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060382009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/38/2009/LE71060382009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/38/2009/LE71060382009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 38, Cloud cover    1.33%<br/>
+Scene ID: LE71060382009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/38/2009/LE71060382009106EDC00.jpg</guid>
+<geo:lat>31.73835</geo:lat>
+<geo:long>140.42644</geo:long>
+</item>
+<item>
+<title>Sueyoshi, Tōkyō, Japan 2009-04-16 at 01:00:34 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060372009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/37/2009/LE71060372009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/37/2009/LE71060372009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 37, Cloud cover    0.01%<br/>
+Scene ID: LE71060372009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/37/2009/LE71060372009106EDC00.jpg</guid>
+<geo:lat>33.17351</geo:lat>
+<geo:long>140.81648</geo:long>
+</item>
+<item>
+<title>Path 106, row 36 2009-04-16 at 01:00:10 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060362009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/36/2009/LE71060362009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/36/2009/LE71060362009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 36, Cloud cover    0.04%<br/>
+Scene ID: LE71060362009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/36/2009/LE71060362009106EDC00.jpg</guid>
+<geo:lat>34.60678</geo:lat>
+<geo:long>141.21611</geo:long>
+</item>
+<item>
+<title>Sakihama, Iwate, Japan 2009-04-16 at 00:58:58 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060332009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/33/2009/LE71060332009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/33/2009/LE71060332009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 33, Cloud cover   84.63%<br/>
+Scene ID: LE71060332009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/33/2009/LE71060332009106EDC00.jpg</guid>
+<geo:lat>38.90038</geo:lat>
+<geo:long>142.48123</geo:long>
+</item>
+<item>
+<title>Path 106, row 32 2009-04-16 at 00:58:34 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060322009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/32/2009/LE71060322009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/32/2009/LE71060322009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 32, Cloud cover   31.37%<br/>
+Scene ID: LE71060322009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/32/2009/LE71060322009106EDC00.jpg</guid>
+<geo:lat>40.32891</geo:lat>
+<geo:long>142.92943</geo:long>
+</item>
+<item>
+<title>Erimo, Hokkaidō, Japan 2009-04-16 at 00:58:10 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060312009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/31/2009/LE71060312009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/31/2009/LE71060312009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 31, Cloud cover   13.63%<br/>
+Scene ID: LE71060312009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71060312009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/31/2009/LE71060312009106EDC00.jpg</guid>
+<geo:lat>41.75544</geo:lat>
+<geo:long>143.39012</geo:long>
+</item>
+<item>
+<title>Kami-kawakami, Hokkaidō, Japan 2009-04-16 at 00:57:47 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060302009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/30/2009/LE71060302009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/30/2009/LE71060302009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 30, Cloud cover   60.81%<br/>
+Scene ID: LE71060302009106EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/30/2009/LE71060302009106EDC00.jpg</guid>
+<geo:lat>43.18074</geo:lat>
+<geo:long>143.86937</geo:long>
+</item>
+<item>
+<title>Tokoro, Hokkaidō, Japan 2009-04-16 at 00:57:23 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE71060292009106EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/106/29/2009/LE71060292009106EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=106/29/2009/LE71060292009106EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 106, Row 29, Cloud cover   24.53%<br/>
+Scene ID: LE71060292009106EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE71060292009106EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/106/29/2009/LE71060292009106EDC00.jpg</guid>
+<geo:lat>44.60402</geo:lat>
+<geo:long>144.36588</geo:long>
+</item>
+<item>
+<title>Path 90, row 68 2009-04-15 at 23:34:02 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900682009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/68/2009/LE70900682009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/68/2009/LE70900682009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 68, Cloud cover    0.32%<br/>
+Scene ID: LE70900682009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/68/2009/LE70900682009105EDC00.jpg</guid>
+<geo:lat>-11.57131</geo:lat>
+<geo:long>155.38551</geo:long>
+</item>
+<item>
+<title>Path 90, row 67 2009-04-15 at 23:33:38 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900672009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/67/2009/LE70900672009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/67/2009/LE70900672009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 67, Cloud cover    0.48%<br/>
+Scene ID: LE70900672009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/67/2009/LE70900672009105EDC00.jpg</guid>
+<geo:lat>-10.126</geo:lat>
+<geo:long>155.69995</geo:long>
+</item>
+<item>
+<title>Path 90, row 66 2009-04-15 at 23:33:14 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900662009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/66/2009/LE70900662009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/66/2009/LE70900662009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 66, Cloud cover   14.46%<br/>
+Scene ID: LE70900662009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70900662009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/66/2009/LE70900662009105EDC00.jpg</guid>
+<geo:lat>-8.68065</geo:lat>
+<geo:long>156.01283</geo:long>
+</item>
+<item>
+<title>Toumoa, Solomon Islands 2009-04-15 at 23:32:50 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900652009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/65/2009/LE70900652009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/65/2009/LE70900652009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 65, Cloud cover   34.63%<br/>
+Scene ID: LE70900652009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70900652009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/65/2009/LE70900652009105EDC00.jpg</guid>
+<geo:lat>-7.23468</geo:lat>
+<geo:long>156.3242</geo:long>
+</item>
+<item>
+<title>Path 90, row 64 2009-04-15 at 23:32:26 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900642009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/64/2009/LE70900642009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/64/2009/LE70900642009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 64, Cloud cover   64.00%<br/>
+Scene ID: LE70900642009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/64/2009/LE70900642009105EDC00.jpg</guid>
+<geo:lat>-5.78896</geo:lat>
+<geo:long>156.6339</geo:long>
+</item>
+<item>
+<title>Navy Town, Alaska 2009-04-15 at 23:16:06 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900232009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/23/2009/LE70900232009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/23/2009/LE70900232009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 23, Cloud cover    0.22%<br/>
+Scene ID: LE70900232009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70900232009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/23/2009/LE70900232009105EDC00.jpg</guid>
+<geo:lat>53.09773</geo:lat>
+<geo:long>172.56728</geo:long>
+</item>
+<item>
+<title>Val'kelvaam, Chukotskiy Avtonomnyy Okrug, Russia 2009-04-15 at 23:13:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70900162009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/90/16/2009/LE70900162009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=90/16/2009/LE70900162009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 90, Row 16, Cloud cover   65.18%<br/>
+Scene ID: LE70900162009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/90/16/2009/LE70900162009105EDC00.jpg</guid>
+<geo:lat>62.8489</geo:lat>
+<geo:long>178.49568</geo:long>
+</item>
+<item>
+<title>Path 74, row 97 2009-04-15 at 22:06:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740972009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/97/2009/LE70740972009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/97/2009/LE70740972009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 97, Cloud cover   70.81%<br/>
+Scene ID: LE70740972009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/97/2009/LE70740972009105EDC00.jpg</guid>
+<geo:lat>-53.10495</geo:lat>
+<geo:long>167.87769</geo:long>
+</item>
+<item>
+<title>Naumai, New Zealand 2009-04-15 at 22:01:56 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740852009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/85/2009/LE70740852009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/85/2009/LE70740852009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 85, Cloud cover   42.90%<br/>
+Scene ID: LE70740852009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/85/2009/LE70740852009105EDC00.jpg</guid>
+<geo:lat>-36.04686</geo:lat>
+<geo:long>174.10107</geo:long>
+</item>
+<item>
+<title>Purerua, New Zealand 2009-04-15 at 22:01:32 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740842009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/84/2009/LE70740842009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/84/2009/LE70740842009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 84, Cloud cover   28.39%<br/>
+Scene ID: LE70740842009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/84/2009/LE70740842009105EDC00.jpg</guid>
+<geo:lat>-34.6143</geo:lat>
+<geo:long>174.51167</geo:long>
+</item>
+<item>
+<title>Naioti, Fiji 2009-04-15 at 21:57:09 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740732009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/73/2009/LE70740732009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/73/2009/LE70740732009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 73, Cloud cover   11.84%<br/>
+Scene ID: LE70740732009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740732009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/73/2009/LE70740732009105EDC00.jpg</guid>
+<geo:lat>-18.79118</geo:lat>
+<geo:long>178.49326</geo:long>
+</item>
+<item>
+<title>Naingani, Central, Fiji 2009-04-15 at 21:56:45 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740722009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/72/2009/LE70740722009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/72/2009/LE70740722009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 72, Cloud cover   11.11%<br/>
+Scene ID: LE70740722009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740722009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/72/2009/LE70740722009105EDC00.jpg</guid>
+<geo:lat>-17.34794</geo:lat>
+<geo:long>178.82199</geo:long>
+</item>
+<item>
+<title>Path 74, row 67 2009-04-15 at 21:54:45 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740672009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/67/2009/LE70740672009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/67/2009/LE70740672009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 67, Cloud cover   50.72%<br/>
+Scene ID: LE70740672009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/67/2009/LE70740672009105EDC00.jpg</guid>
+<geo:lat>-10.12599</geo:lat>
+<geo:long>-179.57915</geo:long>
+</item>
+<item>
+<title>Path 74, row 42 2009-04-15 at 21:44:47 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740422009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/42/2009/LE70740422009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/42/2009/LE70740422009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 42, Cloud cover    4.23%<br/>
+Scene ID: LE70740422009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/42/2009/LE70740422009105EDC00.jpg</guid>
+<geo:lat>25.98928</geo:lat>
+<geo:long>-171.60986</geo:long>
+</item>
+<item>
+<title>Oskawalik, Alaska 2009-04-15 at 21:34:50 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740172009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/17/2009/LE70740172009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/17/2009/LE70740172009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 17, Cloud cover    0.08%<br/>
+Scene ID: LE70740172009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740172009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/17/2009/LE70740172009105EDC00.jpg</guid>
+<geo:lat>61.47178</geo:lat>
+<geo:long>-157.82565</geo:long>
+</item>
+<item>
+<title>Moore Creek, Alaska 2009-04-15 at 21:34:26 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740162009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/16/2009/LE70740162009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/16/2009/LE70740162009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 16, Cloud cover    0.04%<br/>
+Scene ID: LE70740162009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740162009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/16/2009/LE70740162009105EDC00.jpg</guid>
+<geo:lat>62.84895</geo:lat>
+<geo:long>-156.78456</geo:long>
+</item>
+<item>
+<title>Poorman, Alaska 2009-04-15 at 21:34:02 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740152009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/15/2009/LE70740152009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/15/2009/LE70740152009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 15, Cloud cover    0.23%<br/>
+Scene ID: LE70740152009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740152009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/15/2009/LE70740152009105EDC00.jpg</guid>
+<geo:lat>64.21914</geo:lat>
+<geo:long>-155.65016</geo:long>
+</item>
+<item>
+<title>Hughes, Alaska 2009-04-15 at 21:33:39 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740142009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/14/2009/LE70740142009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/14/2009/LE70740142009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 14, Cloud cover    0.17%<br/>
+Scene ID: LE70740142009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70740142009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/14/2009/LE70740142009105EDC00.jpg</guid>
+<geo:lat>65.58047</geo:lat>
+<geo:long>-154.40947</geo:long>
+</item>
+<item>
+<title>Alatna, Alaska 2009-04-15 at 21:33:15 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740132009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/13/2009/LE70740132009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/13/2009/LE70740132009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 13, Cloud cover   25.95%<br/>
+Scene ID: LE70740132009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/13/2009/LE70740132009105EDC00.jpg</guid>
+<geo:lat>66.93264</geo:lat>
+<geo:long>-153.043</geo:long>
+</item>
+<item>
+<title>Anaktuvuk Pass, Alaska 2009-04-15 at 21:32:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740122009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/12/2009/LE70740122009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/12/2009/LE70740122009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 12, Cloud cover    5.96%<br/>
+Scene ID: LE70740122009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/12/2009/LE70740122009105EDC00.jpg</guid>
+<geo:lat>68.27268</geo:lat>
+<geo:long>-151.52765</geo:long>
+</item>
+<item>
+<title>Nuiqsut, Alaska 2009-04-15 at 21:32:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740112009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/11/2009/LE70740112009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/11/2009/LE70740112009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 11, Cloud cover   91.56%<br/>
+Scene ID: LE70740112009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/11/2009/LE70740112009105EDC00.jpg</guid>
+<geo:lat>69.59922</geo:lat>
+<geo:long>-149.83972</geo:long>
+</item>
+<item>
+<title>Prudhoe Bay, Alaska 2009-04-15 at 21:32:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70740102009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/74/10/2009/LE70740102009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=74/10/2009/LE70740102009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 74, Row 10, Cloud cover   88.98%<br/>
+Scene ID: LE70740102009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/74/10/2009/LE70740102009105EDC00.jpg</guid>
+<geo:lat>70.90927</geo:lat>
+<geo:long>-147.93906</geo:long>
+</item>
+<item>
+<title>Mažiūnai, Lithuania 2009-04-15 at 19:38:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422222009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/222/2009/LE70422222009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/222/2009/LE70422222009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 222, Cloud cover   -1.00%<br/>
+Scene ID: LE70422222009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/222/2009/LE70422222009105EDC00.jpg</guid>
+<geo:lat>54.51016</geo:lat>
+<geo:long>24.25145</geo:long>
+</item>
+<item>
+<title>Lavrinovichi, Belarus 2009-04-15 at 19:38:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422212009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/221/2009/LE70422212009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/221/2009/LE70422212009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 221, Cloud cover   -1.00%<br/>
+Scene ID: LE70422212009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/221/2009/LE70422212009105EDC00.jpg</guid>
+<geo:lat>53.10447</geo:lat>
+<geo:long>24.94119</geo:long>
+</item>
+<item>
+<title>Zaliznitsa, Rivnens'ka Oblast', Ukraine 2009-04-15 at 19:38:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422202009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/220/2009/LE70422202009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/220/2009/LE70422202009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 220, Cloud cover   -1.00%<br/>
+Scene ID: LE70422202009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/220/2009/LE70422202009105EDC00.jpg</guid>
+<geo:lat>51.69537</geo:lat>
+<geo:long>25.59456</geo:long>
+</item>
+<item>
+<title>Khinyuvka, Rivnens'ka Oblast', Ukraine 2009-04-15 at 19:37:39 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422192009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/219/2009/LE70422192009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/219/2009/LE70422192009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 219, Cloud cover   -1.00%<br/>
+Scene ID: LE70422192009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/219/2009/LE70422192009105EDC00.jpg</guid>
+<geo:lat>50.28339</geo:lat>
+<geo:long>26.21301</geo:long>
+</item>
+<item>
+<title>Chan'kov, Khmel'nyts'ka Oblast', Ukraine 2009-04-15 at 19:37:15 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422182009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/218/2009/LE70422182009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/218/2009/LE70422182009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 218, Cloud cover   -1.00%<br/>
+Scene ID: LE70422182009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/218/2009/LE70422182009105EDC00.jpg</guid>
+<geo:lat>48.86842</geo:lat>
+<geo:long>26.80079</geo:long>
+</item>
+<item>
+<title>Broşteni, Romania 2009-04-15 at 19:36:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70422172009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/217/2009/LE70422172009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/217/2009/LE70422172009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 217, Cloud cover   -1.00%<br/>
+Scene ID: LE70422172009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/217/2009/LE70422172009105EDC00.jpg</guid>
+<geo:lat>47.44886</geo:lat>
+<geo:long>27.35742</geo:long>
+</item>
+<item>
+<title>Path 42, row 37 2009-04-15 at 18:25:02 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420372009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/37/2009/LE70420372009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/37/2009/LE70420372009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 37, Cloud cover   11.26%<br/>
+Scene ID: LE70420372009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/37/2009/LE70420372009105EDC00.jpg</guid>
+<geo:lat>33.17323</geo:lat>
+<geo:long>-120.30016</geo:long>
+</item>
+<item>
+<title>Cachuma Village, California 2009-04-15 at 18:24:38 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420362009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/36/2009/LE70420362009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/36/2009/LE70420362009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 36, Cloud cover   19.75%<br/>
+Scene ID: LE70420362009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420362009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/36/2009/LE70420362009105EDC00.jpg</guid>
+<geo:lat>34.60718</geo:lat>
+<geo:long>-119.9009</geo:long>
+</item>
+<item>
+<title>Blanco, California 2009-04-15 at 18:24:14 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420352009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/35/2009/LE70420352009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/35/2009/LE70420352009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 35, Cloud cover   35.28%<br/>
+Scene ID: LE70420352009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420352009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/35/2009/LE70420352009105EDC00.jpg</guid>
+<geo:lat>36.03943</geo:lat>
+<geo:long>-119.49052</geo:long>
+</item>
+<item>
+<title>Snow Bend, California 2009-04-15 at 18:23:50 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420342009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/34/2009/LE70420342009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/34/2009/LE70420342009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 34, Cloud cover   68.95%<br/>
+Scene ID: LE70420342009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/34/2009/LE70420342009105EDC00.jpg</guid>
+<geo:lat>37.47097</geo:lat>
+<geo:long>-119.07003</geo:long>
+</item>
+<item>
+<title>Copper Hill (historical), Nevada 2009-04-15 at 18:23:26 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420332009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/33/2009/LE70420332009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/33/2009/LE70420332009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 33, Cloud cover   95.90%<br/>
+Scene ID: LE70420332009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/33/2009/LE70420332009105EDC00.jpg</guid>
+<geo:lat>38.90036</geo:lat>
+<geo:long>-118.63619</geo:long>
+</item>
+<item>
+<title>Sanborn (historical), Nevada 2009-04-15 at 18:23:02 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420322009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/32/2009/LE70420322009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/32/2009/LE70420322009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 32, Cloud cover   99.90%<br/>
+Scene ID: LE70420322009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/32/2009/LE70420322009105EDC00.jpg</guid>
+<geo:lat>40.32906</geo:lat>
+<geo:long>-118.18876</geo:long>
+</item>
+<item>
+<title>Platora, Nevada 2009-04-15 at 18:22:38 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420312009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/31/2009/LE70420312009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/31/2009/LE70420312009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 31, Cloud cover   99.64%<br/>
+Scene ID: LE70420312009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/31/2009/LE70420312009105EDC00.jpg</guid>
+<geo:lat>41.75573</geo:lat>
+<geo:long>-117.72677</geo:long>
+</item>
+<item>
+<title>Danner, Oregon 2009-04-15 at 18:22:14 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420302009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/30/2009/LE70420302009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/30/2009/LE70420302009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 30, Cloud cover   97.11%<br/>
+Scene ID: LE70420302009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/30/2009/LE70420302009105EDC00.jpg</guid>
+<geo:lat>43.18089</geo:lat>
+<geo:long>-117.24873</geo:long>
+</item>
+<item>
+<title>Mineral, Idaho 2009-04-15 at 18:21:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420292009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/29/2009/LE70420292009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/29/2009/LE70420292009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 29, Cloud cover   78.29%<br/>
+Scene ID: LE70420292009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/29/2009/LE70420292009105EDC00.jpg</guid>
+<geo:lat>44.60443</geo:lat>
+<geo:long>-116.75119</geo:long>
+</item>
+<item>
+<title>Cottonwood, Idaho 2009-04-15 at 18:21:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420282009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/28/2009/LE70420282009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/28/2009/LE70420282009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 28, Cloud cover   78.23%<br/>
+Scene ID: LE70420282009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/28/2009/LE70420282009105EDC00.jpg</guid>
+<geo:lat>46.02559</geo:lat>
+<geo:long>-116.23528</geo:long>
+</item>
+<item>
+<title>Mullan, Idaho 2009-04-15 at 18:21:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420272009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/27/2009/LE70420272009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/27/2009/LE70420272009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 27, Cloud cover   64.71%<br/>
+Scene ID: LE70420272009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/27/2009/LE70420272009105EDC00.jpg</guid>
+<geo:lat>47.44531</geo:lat>
+<geo:long>-115.69689</geo:long>
+</item>
+<item>
+<title>Stonehill (historical), Montana 2009-04-15 at 18:20:39 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420262009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/26/2009/LE70420262009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/26/2009/LE70420262009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 26, Cloud cover   76.57%<br/>
+Scene ID: LE70420262009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/26/2009/LE70420262009105EDC00.jpg</guid>
+<geo:lat>48.86203</geo:lat>
+<geo:long>-115.13452</geo:long>
+</item>
+<item>
+<title>Elkford, British Columbia, Canada 2009-04-15 at 18:20:15 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420252009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/25/2009/LE70420252009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/25/2009/LE70420252009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 25, Cloud cover   71.85%<br/>
+Scene ID: LE70420252009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/25/2009/LE70420252009105EDC00.jpg</guid>
+<geo:lat>50.27691</geo:lat>
+<geo:long>-114.54515</geo:long>
+</item>
+<item>
+<title>Didsbury, Alberta, Canada 2009-04-15 at 18:19:51 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420242009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/24/2009/LE70420242009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/24/2009/LE70420242009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 24, Cloud cover   59.16%<br/>
+Scene ID: LE70420242009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/24/2009/LE70420242009105EDC00.jpg</guid>
+<geo:lat>51.68886</geo:lat>
+<geo:long>-113.92657</geo:long>
+</item>
+<item>
+<title>Millet, Alberta, Canada 2009-04-15 at 18:19:27 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420232009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/23/2009/LE70420232009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/23/2009/LE70420232009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 23, Cloud cover    4.15%<br/>
+Scene ID: LE70420232009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420232009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/23/2009/LE70420232009105EDC00.jpg</guid>
+<geo:lat>53.09805</geo:lat>
+<geo:long>-113.2742</geo:long>
+</item>
+<item>
+<title>Boyle, Alberta, Canada 2009-04-15 at 18:19:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420222009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/22/2009/LE70420222009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/22/2009/LE70420222009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 22, Cloud cover    0.32%<br/>
+Scene ID: LE70420222009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420222009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/22/2009/LE70420222009105EDC00.jpg</guid>
+<geo:lat>54.50412</geo:lat>
+<geo:long>-112.58447</geo:long>
+</item>
+<item>
+<title>Mariana Lake, Alberta, Canada 2009-04-15 at 18:18:40 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420212009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/21/2009/LE70420212009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/21/2009/LE70420212009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 21, Cloud cover    0.49%<br/>
+Scene ID: LE70420212009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420212009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/21/2009/LE70420212009105EDC00.jpg</guid>
+<geo:lat>55.9064</geo:lat>
+<geo:long>-111.85387</geo:long>
+</item>
+<item>
+<title>Bitumount, Alberta, Canada 2009-04-15 at 18:18:16 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420202009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/20/2009/LE70420202009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/20/2009/LE70420202009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 20, Cloud cover    1.00%<br/>
+Scene ID: LE70420202009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70420202009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/20/2009/LE70420202009105EDC00.jpg</guid>
+<geo:lat>57.30524</geo:lat>
+<geo:long>-111.0752</geo:long>
+</item>
+<item>
+<title>Path 42, row 7 2009-04-15 at 18:13:05 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420072009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/7/2009/LE70420072009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/7/2009/LE70420072009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 7, Cloud cover    8.19%<br/>
+Scene ID: LE70420072009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/7/2009/LE70420072009105EDC00.jpg</guid>
+<geo:lat>74.69909</geo:lat>
+<geo:long>-91.07005</geo:long>
+</item>
+<item>
+<title>Path 42, row 6 2009-04-15 at 18:12:41 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70420062009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/42/6/2009/LE70420062009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=42/6/2009/LE70420062009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 42, Row 6, Cloud cover   24.32%<br/>
+Scene ID: LE70420062009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/42/6/2009/LE70420062009105EDC00.jpg</guid>
+<geo:lat>75.89419</geo:lat>
+<geo:long>-87.7813</geo:long>
+</item>
+<item>
+<title>Path 26, row 49 2009-04-15 at 16:50:55 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260492009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/49/2009/LE70260492009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/49/2009/LE70260492009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 49, Cloud cover    0.08%<br/>
+Scene ID: LE70260492009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/49/2009/LE70260492009105EDC00.jpg</guid>
+<geo:lat>15.89742</geo:lat>
+<geo:long>-99.81321</geo:long>
+</item>
+<item>
+<title>Coacoyulillo, Guerrero, Mexico 2009-04-15 at 16:50:31 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260482009105EDC01&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/48/2009/LE70260482009105EDC01.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/48/2009/LE70260482009105EDC01.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 48, Cloud cover    0.24%<br/>
+Scene ID: LE70260482009105EDC01
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260482009105EDC01" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/48/2009/LE70260482009105EDC01.jpg</guid>
+<geo:lat>17.34102</geo:lat>
+<geo:long>-99.48808</geo:long>
+</item>
+<item>
+<title>Alpuyeca, Morelos, Mexico 2009-04-15 at 16:50:08 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260472009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/47/2009/LE70260472009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/47/2009/LE70260472009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 47, Cloud cover    3.41%<br/>
+Scene ID: LE70260472009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260472009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/47/2009/LE70260472009105EDC00.jpg</guid>
+<geo:lat>18.78416</geo:lat>
+<geo:long>-99.15919</geo:long>
+</item>
+<item>
+<title>Tecajique, Hidalgo, Mexico 2009-04-15 at 16:49:44 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260462009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/46/2009/LE70260462009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/46/2009/LE70260462009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 46, Cloud cover   13.42%<br/>
+Scene ID: LE70260462009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260462009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/46/2009/LE70260462009105EDC00.jpg</guid>
+<geo:lat>20.22625</geo:lat>
+<geo:long>-98.82622</geo:long>
+</item>
+<item>
+<title>Basúchil, San Luis Potosí, Mexico 2009-04-15 at 16:49:20 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260452009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/45/2009/LE70260452009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/45/2009/LE70260452009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 45, Cloud cover   45.46%<br/>
+Scene ID: LE70260452009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/45/2009/LE70260452009105EDC00.jpg</guid>
+<geo:lat>21.66828</geo:lat>
+<geo:long>-98.4889</geo:long>
+</item>
+<item>
+<title>San Andrés, Tamaulipas, Mexico 2009-04-15 at 16:48:56 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260442009105EDC02&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/44/2009/LE70260442009105EDC02.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/44/2009/LE70260442009105EDC02.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 44, Cloud cover   36.27%<br/>
+Scene ID: LE70260442009105EDC02
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260442009105EDC02" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/44/2009/LE70260442009105EDC02.jpg</guid>
+<geo:lat>23.10917</geo:lat>
+<geo:long>-98.14772</geo:long>
+</item>
+<item>
+<title>Lavaderos, Tamaulipas, Mexico 2009-04-15 at 16:48:32 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260432009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/43/2009/LE70260432009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/43/2009/LE70260432009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 43, Cloud cover    0.50%<br/>
+Scene ID: LE70260432009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260432009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/43/2009/LE70260432009105EDC00.jpg</guid>
+<geo:lat>24.54962</geo:lat>
+<geo:long>-97.80084</geo:long>
+</item>
+<item>
+<title>Villa Nueva, Texas 2009-04-15 at 16:48:08 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260422009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/42/2009/LE70260422009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/42/2009/LE70260422009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 42, Cloud cover   32.46%<br/>
+Scene ID: LE70260422009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260422009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/42/2009/LE70260422009105EDC00.jpg</guid>
+<geo:lat>25.98919</geo:lat>
+<geo:long>-97.44798</geo:long>
+</item>
+<item>
+<title>Ojo de Angua, Texas 2009-04-15 at 16:47:44 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260412009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/41/2009/LE70260412009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/41/2009/LE70260412009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 41, Cloud cover    0.86%<br/>
+Scene ID: LE70260412009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260412009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/41/2009/LE70260412009105EDC00.jpg</guid>
+<geo:lat>27.42796</geo:lat>
+<geo:long>-97.08918</geo:long>
+</item>
+<item>
+<title>Wood Hi, Texas 2009-04-15 at 16:47:20 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260402009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/40/2009/LE70260402009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/40/2009/LE70260402009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 40, Cloud cover   16.59%<br/>
+Scene ID: LE70260402009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260402009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/40/2009/LE70260402009105EDC00.jpg</guid>
+<geo:lat>28.86603</geo:lat>
+<geo:long>-96.72328</geo:long>
+</item>
+<item>
+<title>Gay Hill, Texas 2009-04-15 at 16:46:56 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260392009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/39/2009/LE70260392009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/39/2009/LE70260392009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 39, Cloud cover   22.47%<br/>
+Scene ID: LE70260392009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260392009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/39/2009/LE70260392009105EDC00.jpg</guid>
+<geo:lat>30.30255</geo:lat>
+<geo:long>-96.35072</geo:long>
+</item>
+<item>
+<title>Turlington, Texas 2009-04-15 at 16:46:32 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260382009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/38/2009/LE70260382009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/38/2009/LE70260382009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 38, Cloud cover   68.78%<br/>
+Scene ID: LE70260382009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/38/2009/LE70260382009105EDC00.jpg</guid>
+<geo:lat>31.73876</geo:lat>
+<geo:long>-95.96964</geo:long>
+</item>
+<item>
+<title>Brashear, Texas 2009-04-15 at 16:46:09 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260372009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/37/2009/LE70260372009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/37/2009/LE70260372009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 37, Cloud cover   62.80%<br/>
+Scene ID: LE70260372009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/37/2009/LE70260372009105EDC00.jpg</guid>
+<geo:lat>33.17336</geo:lat>
+<geo:long>-95.57948</geo:long>
+</item>
+<item>
+<title>Clayton, Oklahoma 2009-04-15 at 16:45:45 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260362009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/36/2009/LE70260362009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/36/2009/LE70260362009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 36, Cloud cover   37.98%<br/>
+Scene ID: LE70260362009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260362009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/36/2009/LE70260362009105EDC00.jpg</guid>
+<geo:lat>34.60729</geo:lat>
+<geo:long>-95.1802</geo:long>
+</item>
+<item>
+<title>Ellerville, Oklahoma 2009-04-15 at 16:45:21 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260352009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/35/2009/LE70260352009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/35/2009/LE70260352009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 35, Cloud cover   37.29%<br/>
+Scene ID: LE70260352009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260352009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/35/2009/LE70260352009105EDC00.jpg</guid>
+<geo:lat>36.03978</geo:lat>
+<geo:long>-94.77036</geo:long>
+</item>
+<item>
+<title>Nashville, Missouri 2009-04-15 at 16:44:57 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260342009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/34/2009/LE70260342009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/34/2009/LE70260342009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 34, Cloud cover   10.23%<br/>
+Scene ID: LE70260342009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260342009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/34/2009/LE70260342009105EDC00.jpg</guid>
+<geo:lat>37.47087</geo:lat>
+<geo:long>-94.34959</geo:long>
+</item>
+<item>
+<title>Elm, Missouri 2009-04-15 at 16:44:33 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260332009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/33/2009/LE70260332009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/33/2009/LE70260332009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 33, Cloud cover   19.74%<br/>
+Scene ID: LE70260332009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260332009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/33/2009/LE70260332009105EDC00.jpg</guid>
+<geo:lat>38.90074</geo:lat>
+<geo:long>-93.9157</geo:long>
+</item>
+<item>
+<title>Mill Grove, Missouri 2009-04-15 at 16:44:09 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260322009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/32/2009/LE70260322009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/32/2009/LE70260322009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 32, Cloud cover    8.88%<br/>
+Scene ID: LE70260322009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260322009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/32/2009/LE70260322009105EDC00.jpg</guid>
+<geo:lat>40.32913</geo:lat>
+<geo:long>-93.46846</geo:long>
+</item>
+<item>
+<title>Goddard, Iowa 2009-04-15 at 16:43:45 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260312009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/31/2009/LE70260312009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/31/2009/LE70260312009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 31, Cloud cover    0.17%<br/>
+Scene ID: LE70260312009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260312009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/31/2009/LE70260312009105EDC00.jpg</guid>
+<geo:lat>41.75621</geo:lat>
+<geo:long>-93.00585</geo:long>
+</item>
+<item>
+<title>Nilesville, Iowa 2009-04-15 at 16:43:21 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260302009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/30/2009/LE70260302009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/30/2009/LE70260302009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 30, Cloud cover    0.03%<br/>
+Scene ID: LE70260302009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260302009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/30/2009/LE70260302009105EDC00.jpg</guid>
+<geo:lat>43.18095</geo:lat>
+<geo:long>-92.52757</geo:long>
+</item>
+<item>
+<title>Nerike, Wisconsin 2009-04-15 at 16:42:57 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260292009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/29/2009/LE70260292009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/29/2009/LE70260292009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 29, Cloud cover    0.03%<br/>
+Scene ID: LE70260292009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260292009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/29/2009/LE70260292009105EDC00.jpg</guid>
+<geo:lat>44.60447</geo:lat>
+<geo:long>-92.03096</geo:long>
+</item>
+<item>
+<title>Stanberry, Wisconsin 2009-04-15 at 16:42:34 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260282009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/28/2009/LE70260282009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/28/2009/LE70260282009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 28, Cloud cover    0.01%<br/>
+Scene ID: LE70260282009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260282009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/28/2009/LE70260282009105EDC00.jpg</guid>
+<geo:lat>46.02577</geo:lat>
+<geo:long>-91.51406</geo:long>
+</item>
+<item>
+<title>Little Marais, Minnesota 2009-04-15 at 16:42:10 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260272009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/27/2009/LE70260272009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/27/2009/LE70260272009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 27, Cloud cover    0.11%<br/>
+Scene ID: LE70260272009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260272009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/27/2009/LE70260272009105EDC00.jpg</guid>
+<geo:lat>47.44527</geo:lat>
+<geo:long>-90.97707</geo:long>
+</item>
+<item>
+<title>Poland, Ontario, Canada 2009-04-15 at 16:41:46 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260262009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/26/2009/LE70260262009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/26/2009/LE70260262009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 26, Cloud cover    0.17%<br/>
+Scene ID: LE70260262009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260262009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/26/2009/LE70260262009105EDC00.jpg</guid>
+<geo:lat>48.86265</geo:lat>
+<geo:long>-90.41386</geo:long>
+</item>
+<item>
+<title>Trapper's Landing, Ontario, Canada 2009-04-15 at 16:41:22 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260252009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/25/2009/LE70260252009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/25/2009/LE70260252009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 25, Cloud cover    0.15%<br/>
+Scene ID: LE70260252009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260252009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/25/2009/LE70260252009105EDC00.jpg</guid>
+<geo:lat>50.27703</geo:lat>
+<geo:long>-89.82478</geo:long>
+</item>
+<item>
+<title>Path 26, row 24 2009-04-15 at 16:40:58 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260242009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/24/2009/LE70260242009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/24/2009/LE70260242009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 24, Cloud cover    2.18%<br/>
+Scene ID: LE70260242009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260242009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/24/2009/LE70260242009105EDC00.jpg</guid>
+<geo:lat>51.68933</geo:lat>
+<geo:long>-89.20566</geo:long>
+</item>
+<item>
+<title>Kasabonika, Ontario, Canada 2009-04-15 at 16:40:34 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260232009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/23/2009/LE70260232009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/23/2009/LE70260232009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 23, Cloud cover    0.25%<br/>
+Scene ID: LE70260232009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260232009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/23/2009/LE70260232009105EDC00.jpg</guid>
+<geo:lat>53.09819</geo:lat>
+<geo:long>-88.55444</geo:long>
+</item>
+<item>
+<title>Path 26, row 22 2009-04-15 at 16:40:10 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260222009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/22/2009/LE70260222009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/22/2009/LE70260222009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 22, Cloud cover    0.36%<br/>
+Scene ID: LE70260222009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260222009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/22/2009/LE70260222009105EDC00.jpg</guid>
+<geo:lat>54.50431</geo:lat>
+<geo:long>-87.86494</geo:long>
+</item>
+<item>
+<title>Fort Severn, Ontario, Canada 2009-04-15 at 16:39:46 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260212009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/21/2009/LE70260212009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/21/2009/LE70260212009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 21, Cloud cover   10.31%<br/>
+Scene ID: LE70260212009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260212009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/21/2009/LE70260212009105EDC00.jpg</guid>
+<geo:lat>55.90666</geo:lat>
+<geo:long>-87.13426</geo:long>
+</item>
+<item>
+<title>Path 26, row 20 2009-04-15 at 16:39:23 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260202009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/20/2009/LE70260202009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/20/2009/LE70260202009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 20, Cloud cover   41.22%<br/>
+Scene ID: LE70260202009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/20/2009/LE70260202009105EDC00.jpg</guid>
+<geo:lat>57.30541</geo:lat>
+<geo:long>-86.35577</geo:long>
+</item>
+<item>
+<title>Path 26, row 19 2009-04-15 at 16:38:59 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260192009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/19/2009/LE70260192009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/19/2009/LE70260192009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 19, Cloud cover   35.14%<br/>
+Scene ID: LE70260192009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/19/2009/LE70260192009105EDC00.jpg</guid>
+<geo:lat>58.69965</geo:lat>
+<geo:long>-85.52341</geo:long>
+</item>
+<item>
+<title>Path 26, row 18 2009-04-15 at 16:38:35 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260182009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/18/2009/LE70260182009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/18/2009/LE70260182009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 18, Cloud cover   25.43%<br/>
+Scene ID: LE70260182009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/18/2009/LE70260182009105EDC00.jpg</guid>
+<geo:lat>60.08885</geo:lat>
+<geo:long>-84.63158</geo:long>
+</item>
+<item>
+<title>Path 26, row 17 2009-04-15 at 16:38:11 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260172009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/17/2009/LE70260172009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/17/2009/LE70260172009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 17, Cloud cover    2.05%<br/>
+Scene ID: LE70260172009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/17/2009/LE70260172009105EDC00.jpg</guid>
+<geo:lat>61.47278</geo:lat>
+<geo:long>-83.6693</geo:long>
+</item>
+<item>
+<title>Path 26, row 16 2009-04-15 at 16:37:47 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260162009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/16/2009/LE70260162009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/16/2009/LE70260162009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 16, Cloud cover    0.08%<br/>
+Scene ID: LE70260162009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/16/2009/LE70260162009105EDC00.jpg</guid>
+<geo:lat>62.84991</geo:lat>
+<geo:long>-82.62845</geo:long>
+</item>
+<item>
+<title>Path 26, row 15 2009-04-15 at 16:37:23 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260152009105EDC02&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/15/2009/LE70260152009105EDC02.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/15/2009/LE70260152009105EDC02.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 15, Cloud cover    0.33%<br/>
+Scene ID: LE70260152009105EDC02
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/15/2009/LE70260152009105EDC02.jpg</guid>
+<geo:lat>64.22026</geo:lat>
+<geo:long>-81.49481</geo:long>
+</item>
+<item>
+<title>Path 26, row 14 2009-04-15 at 16:36:59 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260142009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/14/2009/LE70260142009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/14/2009/LE70260142009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 14, Cloud cover    0.00%<br/>
+Scene ID: LE70260142009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/14/2009/LE70260142009105EDC00.jpg</guid>
+<geo:lat>65.58192</geo:lat>
+<geo:long>-80.25292</geo:long>
+</item>
+<item>
+<title>Path 26, row 13 2009-04-15 at 16:36:35 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260132009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/13/2009/LE70260132009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/13/2009/LE70260132009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 13, Cloud cover    0.01%<br/>
+Scene ID: LE70260132009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/13/2009/LE70260132009105EDC00.jpg</guid>
+<geo:lat>66.93391</geo:lat>
+<geo:long>-78.8881</geo:long>
+</item>
+<item>
+<title>Path 26, row 12 2009-04-15 at 16:36:12 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260122009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/12/2009/LE70260122009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/12/2009/LE70260122009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 12, Cloud cover    0.01%<br/>
+Scene ID: LE70260122009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260122009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/12/2009/LE70260122009105EDC00.jpg</guid>
+<geo:lat>68.27371</geo:lat>
+<geo:long>-77.37335</geo:long>
+</item>
+<item>
+<title>Path 26, row 11 2009-04-15 at 16:35:48 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70260112009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/26/11/2009/LE70260112009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=26/11/2009/LE70260112009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 26, Row 11, Cloud cover    0.30%<br/>
+Scene ID: LE70260112009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70260112009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/26/11/2009/LE70260112009105EDC00.jpg</guid>
+<geo:lat>69.60073</geo:lat>
+<geo:long>-75.68594</geo:long>
+</item>
+<item>
+<title>Santa Elena, Lambayeque, Peru 2009-04-15 at 15:18:25 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100652009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/65/2009/LE70100652009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/65/2009/LE70100652009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 65, Cloud cover   29.88%<br/>
+Scene ID: LE70100652009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100652009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/65/2009/LE70100652009105EDC00.jpg</guid>
+<geo:lat>-7.23503</geo:lat>
+<geo:long>-80.06915</geo:long>
+</item>
+<item>
+<title>La Calera, Lambayeque, Peru 2009-04-15 at 15:18:01 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100642009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/64/2009/LE70100642009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/64/2009/LE70100642009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 64, Cloud cover   61.71%<br/>
+Scene ID: LE70100642009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/64/2009/LE70100642009105EDC00.jpg</guid>
+<geo:lat>-5.7889</geo:lat>
+<geo:long>-79.7595</geo:long>
+</item>
+<item>
+<title>El Toldo, Loja, Ecuador 2009-04-15 at 15:17:37 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100632009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/63/2009/LE70100632009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/63/2009/LE70100632009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 63, Cloud cover   85.43%<br/>
+Scene ID: LE70100632009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/63/2009/LE70100632009105EDC00.jpg</guid>
+<geo:lat>-4.34284</geo:lat>
+<geo:long>-79.45071</geo:long>
+</item>
+<item>
+<title>Soldados, Azuay, Ecuador 2009-04-15 at 15:17:13 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100622009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/62/2009/LE70100622009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/62/2009/LE70100622009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 62, Cloud cover   93.53%<br/>
+Scene ID: LE70100622009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/62/2009/LE70100622009105EDC00.jpg</guid>
+<geo:lat>-2.89645</geo:lat>
+<geo:long>-79.14272</geo:long>
+</item>
+<item>
+<title>Nodeste, GrandʼAnse, Haiti 2009-04-15 at 15:11:14 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100472009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/47/2009/LE70100472009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/47/2009/LE70100472009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 47, Cloud cover   12.16%<br/>
+Scene ID: LE70100472009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100472009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/47/2009/LE70100472009105EDC00.jpg</guid>
+<geo:lat>18.78397</geo:lat>
+<geo:long>-74.43681</geo:long>
+</item>
+<item>
+<title>Hacienda Gran Tierra, Guantánamo, Cuba 2009-04-15 at 15:10:50 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100462009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/46/2009/LE70100462009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/46/2009/LE70100462009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 46, Cloud cover   13.43%<br/>
+Scene ID: LE70100462009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100462009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/46/2009/LE70100462009105EDC00.jpg</guid>
+<geo:lat>20.22632</geo:lat>
+<geo:long>-74.10399</geo:long>
+</item>
+<item>
+<title>True Blue, Acklins and Crooked Islands, Bahamas 2009-04-15 at 15:10:26 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100452009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/45/2009/LE70100452009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/45/2009/LE70100452009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 45, Cloud cover    4.68%<br/>
+Scene ID: LE70100452009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100452009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/45/2009/LE70100452009105EDC00.jpg</guid>
+<geo:lat>21.66817</geo:lat>
+<geo:long>-73.76676</geo:long>
+</item>
+<item>
+<title>Chesters, Acklins and Crooked Islands, Bahamas 2009-04-15 at 15:10:03 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100442009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/44/2009/LE70100442009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/44/2009/LE70100442009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 44, Cloud cover    1.31%<br/>
+Scene ID: LE70100442009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100442009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/44/2009/LE70100442009105EDC00.jpg</guid>
+<geo:lat>23.10913</geo:lat>
+<geo:long>-73.42509</geo:long>
+</item>
+<item>
+<title>Roque Bluffs, Maine 2009-04-15 at 15:04:04 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100292009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/29/2009/LE70100292009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/29/2009/LE70100292009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 29, Cloud cover    0.03%<br/>
+Scene ID: LE70100292009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100292009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/29/2009/LE70100292009105EDC00.jpg</guid>
+<geo:lat>44.60454</geo:lat>
+<geo:long>-67.30768</geo:long>
+</item>
+<item>
+<title>McKeens Corner, New Brunswick, Canada 2009-04-15 at 15:03:40 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100282009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/28/2009/LE70100282009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/28/2009/LE70100282009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 28, Cloud cover    0.19%<br/>
+Scene ID: LE70100282009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100282009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/28/2009/LE70100282009105EDC00.jpg</guid>
+<geo:lat>46.02561</geo:lat>
+<geo:long>-66.79275</geo:long>
+</item>
+<item>
+<title>Beresford, New Brunswick, Canada 2009-04-15 at 15:03:17 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100272009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/27/2009/LE70100272009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/27/2009/LE70100272009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 27, Cloud cover    0.19%<br/>
+Scene ID: LE70100272009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100272009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/27/2009/LE70100272009105EDC00.jpg</guid>
+<geo:lat>47.44547</geo:lat>
+<geo:long>-66.25433</geo:long>
+</item>
+<item>
+<title>Mont-Saint-Pierre, Quebec, Canada 2009-04-15 at 15:02:53 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100262009105EDC02&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/26/2009/LE70100262009105EDC02.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/26/2009/LE70100262009105EDC02.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 26, Cloud cover    3.44%<br/>
+Scene ID: LE70100262009105EDC02
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE70100262009105EDC02" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/26/2009/LE70100262009105EDC02.jpg</guid>
+<geo:lat>48.86214</geo:lat>
+<geo:long>-65.69111</geo:long>
+</item>
+<item>
+<title>Niaqornaarsuk, Vestgrønland, Greenland 2009-04-15 at 14:57:18 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100122009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/12/2009/LE70100122009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/12/2009/LE70100122009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 12, Cloud cover   55.61%<br/>
+Scene ID: LE70100122009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/12/2009/LE70100122009105EDC00.jpg</guid>
+<geo:lat>68.27383</geo:lat>
+<geo:long>-52.65099</geo:long>
+</item>
+<item>
+<title>Ritenbenk, Vestgrønland, Greenland 2009-04-15 at 14:56:55 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100112009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/11/2009/LE70100112009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/11/2009/LE70100112009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 11, Cloud cover   37.27%<br/>
+Scene ID: LE70100112009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/11/2009/LE70100112009105EDC00.jpg</guid>
+<geo:lat>69.60046</geo:lat>
+<geo:long>-50.9603</geo:long>
+</item>
+<item>
+<title>Uummannaq, Vestgrønland, Greenland 2009-04-15 at 14:56:31 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100102009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/10/2009/LE70100102009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/10/2009/LE70100102009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 10, Cloud cover   54.53%<br/>
+Scene ID: LE70100102009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/10/2009/LE70100102009105EDC00.jpg</guid>
+<geo:lat>70.91019</geo:lat>
+<geo:long>-49.06347</geo:long>
+</item>
+<item>
+<title>Path 10, row 7 2009-04-15 at 14:55:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE70100072009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/10/7/2009/LE70100072009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=10/7/2009/LE70100072009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 10, Row 7, Cloud cover   93.83%<br/>
+Scene ID: LE70100072009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/10/7/2009/LE70100072009105EDC00.jpg</guid>
+<geo:lat>74.69922</geo:lat>
+<geo:long>-41.62831</geo:long>
+</item>
+<item>
+<title>Cañadón Once de Septiembre, Santa Cruz, Argentina 2009-04-15 at 13:51:06 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270942009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/94/2009/LE72270942009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/94/2009/LE72270942009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 94, Cloud cover   36.15%<br/>
+Scene ID: LE72270942009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270942009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/94/2009/LE72270942009105EDC00.jpg</guid>
+<geo:lat>-48.86955</geo:lat>
+<geo:long>-66.65068</geo:long>
+</item>
+<item>
+<title>Tellier, Santa Cruz, Argentina 2009-04-15 at 13:50:42 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270932009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/93/2009/LE72270932009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/93/2009/LE72270932009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 93, Cloud cover   34.04%<br/>
+Scene ID: LE72270932009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270932009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/93/2009/LE72270932009105EDC00.jpg</guid>
+<geo:lat>-47.45284</geo:lat>
+<geo:long>-66.0881</geo:long>
+</item>
+<item>
+<title>Path 227, row 92 2009-04-15 at 13:50:18 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270922009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/92/2009/LE72270922009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/92/2009/LE72270922009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 92, Cloud cover   12.39%<br/>
+Scene ID: LE72270922009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/92/2009/LE72270922009105EDC00.jpg</guid>
+<geo:lat>-46.03325</geo:lat>
+<geo:long>-65.54922</geo:long>
+</item>
+<item>
+<title>Cabo Raso, Chubut, Argentina 2009-04-15 at 13:49:54 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270912009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/91/2009/LE72270912009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/91/2009/LE72270912009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 91, Cloud cover   44.07%<br/>
+Scene ID: LE72270912009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/91/2009/LE72270912009105EDC00.jpg</guid>
+<geo:lat>-44.61178</geo:lat>
+<geo:long>-65.03299</geo:long>
+</item>
+<item>
+<title>Playa Unión, Chubut, Argentina 2009-04-15 at 13:49:30 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270902009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/90/2009/LE72270902009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/90/2009/LE72270902009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 90, Cloud cover    0.86%<br/>
+Scene ID: LE72270902009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270902009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/90/2009/LE72270902009105EDC00.jpg</guid>
+<geo:lat>-43.18849</geo:lat>
+<geo:long>-64.53538</geo:long>
+</item>
+<item>
+<title>Path 227, row 89 2009-04-15 at 13:49:06 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270892009105EDC02&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/89/2009/LE72270892009105EDC02.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/89/2009/LE72270892009105EDC02.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 89, Cloud cover   20.53%<br/>
+Scene ID: LE72270892009105EDC02
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270892009105EDC02" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/89/2009/LE72270892009105EDC02.jpg</guid>
+<geo:lat>-41.76305</geo:lat>
+<geo:long>-64.05743</geo:long>
+</item>
+<item>
+<title>Guardia Mitre, Río Negro, Argentina 2009-04-15 at 13:48:42 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270882009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/88/2009/LE72270882009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/88/2009/LE72270882009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 88, Cloud cover   84.62%<br/>
+Scene ID: LE72270882009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/88/2009/LE72270882009105EDC00.jpg</guid>
+<geo:lat>-40.33651</geo:lat>
+<geo:long>-63.59388</geo:long>
+</item>
+<item>
+<title>Montes de Oca, Buenos Aires, Argentina 2009-04-15 at 13:48:18 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270872009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/87/2009/LE72270872009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/87/2009/LE72270872009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 87, Cloud cover   62.95%<br/>
+Scene ID: LE72270872009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/87/2009/LE72270872009105EDC00.jpg</guid>
+<geo:lat>-38.90788</geo:lat>
+<geo:long>-63.1469</geo:long>
+</item>
+<item>
+<title>Puan, Buenos Aires, Argentina 2009-04-15 at 13:47:54 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270862009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/86/2009/LE72270862009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/86/2009/LE72270862009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 86, Cloud cover   20.76%<br/>
+Scene ID: LE72270862009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270862009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/86/2009/LE72270862009105EDC00.jpg</guid>
+<geo:lat>-37.47852</geo:lat>
+<geo:long>-62.71258</geo:long>
+</item>
+<item>
+<title>Corazzi, Buenos Aires, Argentina 2009-04-15 at 13:47:30 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270852009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/85/2009/LE72270852009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/85/2009/LE72270852009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 85, Cloud cover    6.63%<br/>
+Scene ID: LE72270852009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270852009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/85/2009/LE72270852009105EDC00.jpg</guid>
+<geo:lat>-36.04697</geo:lat>
+<geo:long>-62.29131</geo:long>
+</item>
+<item>
+<title>Günther, Buenos Aires, Argentina 2009-04-15 at 13:47:06 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270842009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/84/2009/LE72270842009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/84/2009/LE72270842009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 84, Cloud cover    7.61%<br/>
+Scene ID: LE72270842009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/84/2009/LE72270842009105EDC00.jpg</guid>
+<geo:lat>-34.61451</geo:lat>
+<geo:long>-61.88145</geo:long>
+</item>
+<item>
+<title>La Flor, Santa Fe, Argentina 2009-04-15 at 13:46:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270832009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/83/2009/LE72270832009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/83/2009/LE72270832009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 83, Cloud cover   12.50%<br/>
+Scene ID: LE72270832009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270832009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/83/2009/LE72270832009105EDC00.jpg</guid>
+<geo:lat>-33.1808</geo:lat>
+<geo:long>-61.48139</geo:long>
+</item>
+<item>
+<title>San Carlos Sur, Santa Fe, Argentina 2009-04-15 at 13:46:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270822009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/82/2009/LE72270822009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/82/2009/LE72270822009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 82, Cloud cover    0.15%<br/>
+Scene ID: LE72270822009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270822009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/82/2009/LE72270822009105EDC00.jpg</guid>
+<geo:lat>-31.74591</geo:lat>
+<geo:long>-61.09183</geo:long>
+</item>
+<item>
+<title>María Eugenia, Santa Fe, Argentina 2009-04-15 at 13:45:55 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270812009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/81/2009/LE72270812009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/81/2009/LE72270812009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 81, Cloud cover    0.42%<br/>
+Scene ID: LE72270812009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270812009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/81/2009/LE72270812009105EDC00.jpg</guid>
+<geo:lat>-30.31021</geo:lat>
+<geo:long>-60.70982</geo:long>
+</item>
+<item>
+<title>Garabato, Santa Fe, Argentina 2009-04-15 at 13:45:31 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270802009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/80/2009/LE72270802009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/80/2009/LE72270802009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 80, Cloud cover    0.06%<br/>
+Scene ID: LE72270802009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270802009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/80/2009/LE72270802009105EDC00.jpg</guid>
+<geo:lat>-28.87296</geo:lat>
+<geo:long>-60.3371</geo:long>
+</item>
+<item>
+<title>Oetling, Chaco, Argentina 2009-04-15 at 13:45:07 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270792009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/79/2009/LE72270792009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/79/2009/LE72270792009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 79, Cloud cover    0.01%<br/>
+Scene ID: LE72270792009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270792009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/79/2009/LE72270792009105EDC00.jpg</guid>
+<geo:lat>-27.43538</geo:lat>
+<geo:long>-59.97082</geo:long>
+</item>
+<item>
+<title>Obraje Kilómetro 72, Formosa, Argentina 2009-04-15 at 13:44:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270782009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/78/2009/LE72270782009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/78/2009/LE72270782009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 78, Cloud cover    0.00%<br/>
+Scene ID: LE72270782009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270782009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/78/2009/LE72270782009105EDC00.jpg</guid>
+<geo:lat>-25.99627</geo:lat>
+<geo:long>-59.61241</geo:long>
+</item>
+<item>
+<title>Fortín Sargento Primero Leyes, Formosa, Argentina 2009-04-15 at 13:44:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270772009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/77/2009/LE72270772009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/77/2009/LE72270772009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 77, Cloud cover    0.00%<br/>
+Scene ID: LE72270772009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270772009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/77/2009/LE72270772009105EDC00.jpg</guid>
+<geo:lat>-24.55687</geo:lat>
+<geo:long>-59.25945</geo:long>
+</item>
+<item>
+<title>Puesto San Miguel, Presidente Hayes, Paraguay 2009-04-15 at 13:43:55 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270762009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/76/2009/LE72270762009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/76/2009/LE72270762009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 76, Cloud cover    0.01%<br/>
+Scene ID: LE72270762009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270762009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/76/2009/LE72270762009105EDC00.jpg</guid>
+<geo:lat>-23.11648</geo:lat>
+<geo:long>-58.91187</geo:long>
+</item>
+<item>
+<title>Estancia Coco Laguna, Asunción, Paraguay 2009-04-15 at 13:43:31 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270752009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/75/2009/LE72270752009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/75/2009/LE72270752009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 75, Cloud cover    0.00%<br/>
+Scene ID: LE72270752009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270752009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/75/2009/LE72270752009105EDC00.jpg</guid>
+<geo:lat>-21.67528</geo:lat>
+<geo:long>-58.57046</geo:long>
+</item>
+<item>
+<title>Estancia Cabaraí, Asunción, Paraguay 2009-04-15 at 13:43:07 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270742009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/74/2009/LE72270742009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/74/2009/LE72270742009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 74, Cloud cover    0.00%<br/>
+Scene ID: LE72270742009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270742009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/74/2009/LE72270742009105EDC00.jpg</guid>
+<geo:lat>-20.23367</geo:lat>
+<geo:long>-58.23264</geo:long>
+</item>
+<item>
+<title>Cachorro, Santa Cruz, Bolivia 2009-04-15 at 13:42:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270732009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/73/2009/LE72270732009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/73/2009/LE72270732009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 73, Cloud cover    0.00%<br/>
+Scene ID: LE72270732009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270732009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/73/2009/LE72270732009105EDC00.jpg</guid>
+<geo:lat>-18.79111</geo:lat>
+<geo:long>-57.89995</geo:long>
+</item>
+<item>
+<title>Insua, Mato Grosso, Brazil 2009-04-15 at 13:42:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270722009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/72/2009/LE72270722009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/72/2009/LE72270722009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 72, Cloud cover    0.38%<br/>
+Scene ID: LE72270722009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270722009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/72/2009/LE72270722009105EDC00.jpg</guid>
+<geo:lat>-17.34836</geo:lat>
+<geo:long>-57.57088</geo:long>
+</item>
+<item>
+<title>Flechas, Mato Grosso, Brazil 2009-04-15 at 13:41:55 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270712009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/71/2009/LE72270712009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/71/2009/LE72270712009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 71, Cloud cover   11.11%<br/>
+Scene ID: LE72270712009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270712009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/71/2009/LE72270712009105EDC00.jpg</guid>
+<geo:lat>-15.90461</geo:lat>
+<geo:long>-57.24549</geo:long>
+</item>
+<item>
+<title>Afonso, Mato Grosso, Brazil 2009-04-15 at 13:41:31 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270702009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/70/2009/LE72270702009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/70/2009/LE72270702009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 70, Cloud cover   31.29%<br/>
+Scene ID: LE72270702009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270702009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/70/2009/LE72270702009105EDC00.jpg</guid>
+<geo:lat>-14.46074</geo:lat>
+<geo:long>-56.92313</geo:long>
+</item>
+<item>
+<title>Seringal Rio Verde, Mato Grosso, Brazil 2009-04-15 at 13:41:07 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270692009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/69/2009/LE72270692009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/69/2009/LE72270692009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 69, Cloud cover    0.47%<br/>
+Scene ID: LE72270692009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270692009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/69/2009/LE72270692009105EDC00.jpg</guid>
+<geo:lat>-13.016</geo:lat>
+<geo:long>-56.60376</geo:long>
+</item>
+<item>
+<title>Marape, Mato Grosso, Brazil 2009-04-15 at 13:40:43 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270682009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/68/2009/LE72270682009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/68/2009/LE72270682009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 68, Cloud cover   29.90%<br/>
+Scene ID: LE72270682009105EDC00
+<br/>
+<a href="http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/run-phtml/results/download.phtml?node=GV&dataset_name=LANDSAT_ETM_SLC_OFF_L1T&ordered=LE72270682009105EDC00" target="_blank"><strong>Download</strong></a> (Requires user registration.)</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/68/2009/LE72270682009105EDC00.jpg</guid>
+<geo:lat>-11.5713</geo:lat>
+<geo:long>-56.28703</geo:long>
+</item>
+<item>
+<title>Alta Floresta, Mato Grosso, Brazil 2009-04-15 at 13:40:19 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270672009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/67/2009/LE72270672009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/67/2009/LE72270672009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 67, Cloud cover   86.53%<br/>
+Scene ID: LE72270672009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/67/2009/LE72270672009105EDC00.jpg</guid>
+<geo:lat>-10.12625</geo:lat>
+<geo:long>-55.97217</geo:long>
+</item>
+<item>
+<title>Path 227, row 66 2009-04-15 at 13:39:56 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270662009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/66/2009/LE72270662009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/66/2009/LE72270662009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 66, Cloud cover   94.48%<br/>
+Scene ID: LE72270662009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/66/2009/LE72270662009105EDC00.jpg</guid>
+<geo:lat>-8.68059</geo:lat>
+<geo:long>-55.65955</geo:long>
+</item>
+<item>
+<title>Fagundes, Pará, Brazil 2009-04-15 at 13:39:32 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270652009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/65/2009/LE72270652009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/65/2009/LE72270652009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 65, Cloud cover   92.78%<br/>
+Scene ID: LE72270652009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/65/2009/LE72270652009105EDC00.jpg</guid>
+<geo:lat>-7.23495</geo:lat>
+<geo:long>-55.34827</geo:long>
+</item>
+<item>
+<title>Dilermando Aguiar, Rio Grande do Sul, Brazil 2009-04-15 at 13:38:20 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270622009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/62/2009/LE72270622009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/62/2009/LE72270622009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 62, Cloud cover   75.35%<br/>
+Scene ID: LE72270622009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/62/2009/LE72270622009105EDC00.jpg</guid>
+<geo:lat>-2.89627</geo:lat>
+<geo:long>-54.42167</geo:long>
+</item>
+<item>
+<title>Mulata, Pará, Brazil 2009-04-15 at 13:37:56 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270612009105EDC01&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/61/2009/LE72270612009105EDC01.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/61/2009/LE72270612009105EDC01.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 61, Cloud cover   67.64%<br/>
+Scene ID: LE72270612009105EDC01
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/61/2009/LE72270612009105EDC01.jpg</guid>
+<geo:lat>-1.45008</geo:lat>
+<geo:long>-54.11424</geo:long>
+</item>
+<item>
+<title>Arere, Pará, Brazil 2009-04-15 at 13:37:32 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270602009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/60/2009/LE72270602009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/60/2009/LE72270602009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 60, Cloud cover   60.39%<br/>
+Scene ID: LE72270602009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/60/2009/LE72270602009105EDC00.jpg</guid>
+<geo:lat>-.00368</geo:lat>
+<geo:long>-53.80724</geo:long>
+</item>
+<item>
+<title>Maloca dos Urucuianas, Amapá, Brazil 2009-04-15 at 13:37:08 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270592009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/59/2009/LE72270592009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/59/2009/LE72270592009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 59, Cloud cover   75.74%<br/>
+Scene ID: LE72270592009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/59/2009/LE72270592009105EDC00.jpg</guid>
+<geo:lat>1.4429</geo:lat>
+<geo:long>-53.50001</geo:long>
+</item>
+<item>
+<title>Dégrad Reinald, French Guiana 2009-04-15 at 13:36:44 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270582009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/58/2009/LE72270582009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/58/2009/LE72270582009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 58, Cloud cover   74.35%<br/>
+Scene ID: LE72270582009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/58/2009/LE72270582009105EDC00.jpg</guid>
+<geo:lat>2.8891</geo:lat>
+<geo:long>-53.19249</geo:long>
+</item>
+<item>
+<title>Village Chinois, French Guiana 2009-04-15 at 13:36:20 GMT</title>
+<link>http://edcsns17.cr.usgs.gov/cgi-bin/EarthExplorer/phtml/results/display_full.phtml?cseq=3373&#x26;entity_id=LE72270572009105EDC00&#x26;fgdc=N</link>
+<description><![CDATA[<font face="arial" size="2">
+<a href="http://edcsns17.cr.usgs.gov/browse/etm/227/57/2009/LE72270572009105EDC00.jpg">
+<img src="http://edcsns17.cr.usgs.gov/EarthExplorer/thumbnail.php?ds_id=landsatetm&ds_path=227/57/2009/LE72270572009105EDC00.jpg" align="left" hspace="8" alt="Click for larger view"></a>
+Image from the <a href="http://landsat.usgs.gov/about_landsat7.php">
+Landsat 7 satellite</a><br/>
+Path 227, Row 57, Cloud cover   68.39%<br/>
+Scene ID: LE72270572009105EDC00
+</font>]]></description>
+<guid isPermaLink="false">http://edcsns17.cr.usgs.gov/browse/etm/227/57/2009/LE72270572009105EDC00.jpg</guid>
+<geo:lat>4.33558</geo:lat>
+<geo:long>-52.88441</geo:long>
+</item>
+</channel>
+</rss>

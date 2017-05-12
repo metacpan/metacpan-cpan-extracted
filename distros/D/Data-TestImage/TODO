@@ -1,0 +1,9 @@
+- document installing other parts of the USC SIPI database
+
+  problem: it is not recommended to install after installation is complete as
+  this will not modify the packlist (for uninstalling later)
+
+- sequences, e.g.,
+
+      use Sort::Naturally;
+      nsort grep {  $_->basename =~ /^6\.1\./  } @{ Data::TestImage::DB::USC::SIPI->get_installed_images() }

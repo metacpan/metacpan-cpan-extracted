@@ -1,0 +1,319 @@
+NAME
+    Data::SplitSerializer - Modules that "split serialize" data structures
+
+SYNOPSIS
+        use Data::SplitSerializer;
+ 
+        my $dss = Data::SplitSerializer->new( path_style => 'DZIL' );
+        my $serialized = {
+           'gophers[0].holes'      => 3,
+           'gophers[0].food.type'  => 'grubs',
+           'gophers[0].food.count' => 7,
+ 
+           'gophers[1].holes'      => 1,
+           'gophers[1].food.type'  => 'fruit',
+           'gophers[1].food.count' => 5,
+        };
+        my $deserialized = $dss->deserialize($serialized);
+ 
+        my $more_gophers = [];
+        $more_gophers->[2] = {
+           holes => 2,
+           food  => {
+              type  => 'earthworms',
+              count => 15,
+           },
+        };
+ 
+        $deserialized = $dss->merge( $deserialized, $more_gophers );
+
+DESCRIPTION
+    Split serialization is a unique form of serialization that only
+    serializes part of the data structure (as a path on the left side) and
+    leaves the rest of the data, typically a scalar, untouched (as a value
+    on the right side). Consider the gopher example above:
+
+        my $deserialized = {
+           gophers => [
+              {
+                 holes => 3,
+                 food  => {
+                    type  => 'grubs',
+                    count => 7,
+                 },
+              },
+              {
+                 holes => 1,
+                 food  => {
+                    type  => 'fruit',
+                    count => 5,
+                 },
+              },
+              {
+                 holes => 2,
+                 food  => {
+                    type  => 'earthworms',
+                    count => 15,
+                 },
+              }
+           ],
+        };
+
+    A full serializer, like Data::Serializer or Data::Dumper, would turn the
+    entire object into a string, much like the real code above. Or into
+    JSON, XML, BerkleyDB, etc. But, the end values would be lost in the
+    stream. If you were given an object like this, how would you be able to
+    store the data in an easy-to-access form for a caching module like CHI?
+    It requires key/value pairs. Same goes for KiokuDB or various other
+    storage/ORM modules.
+
+    Data::SplitSerializer uses split serialization to turn the data into a
+    path like this:
+
+        my $serialized = {
+           'gophers[0].holes'      => 3,
+           'gophers[0].food.type'  => 'grubs',
+           'gophers[0].food.count' => 7,
+ 
+           'gophers[1].holes'      => 1,
+           'gophers[1].food.type'  => 'fruit',
+           'gophers[1].food.count' => 5,
+ 
+           'gophers[2].holes'      => 2,
+           'gophers[2].food.type'  => 'earthworms',
+           'gophers[2].food.count' => 15,
+        };
+
+    Now, you can stash the data into whatever storage engine you want... or
+    use just use it as a simple hash.
+
+CONSTRUCTOR
+        # Defaults shown
+        my $stash = Data::Stash->new(
+           path_style   => 'DZIL',
+           path_options => {
+              auto_normalize => 1,
+              auto_cleanup   => 1,
+           },
+        );
+
+    Creates a new serializer object. Accepts the following arguments:
+
+  path_style
+        path_style => 'File::Unix'
+        path_style => '=MyApp::Parse::Path::Foobar'
+
+    Class used to create new path objects for path parsing. With a "="
+    prefix, it will use that as the full class. Otherwise, the class will be
+    intepreted as "Parse::Path::$class".
+
+    Default is DZIL.
+
+  path_options
+        path_options => {
+           auto_normalize => 1,
+           auto_cleanup   => 1,
+        }
+
+    Hash of options to pass to new path objects. Typically, the default set
+    of options are recommended to ensure a more commutative path.
+
+  remove_undefs
+        remove_undefs => 0
+
+    Boolean to indicate whether to remove See "Undefined values" for more
+    information.
+
+    Default is on.
+
+METHODS
+  serialize
+        my $serialized = $dss->serialize($deserialized);
+
+    Serializes/flattens a ref. Returns a serialized hashref of path/value
+    pairs.
+
+  serialize_refpath
+        my $serialized = $dss->serialize_refpath($path_prefix, $deserialized);
+ 
+        # serialize is basically this with some extra sanity checks
+        my $serialized = $dss->serialize_refpath('', $deserialized);
+
+    The real workhorse for "serialize_ref". Recursively dives down the
+    different pieces of the deserialized tree and eventually comes back with
+    the serialized hashref. The path prefix can be used for prepending all
+    of the paths returned in the serialized hashref.
+
+  deserialize
+        my $deserialized = $dss->deserialize($serialized);
+
+    Deserializes/expands a hash of path/data pairs. Returns the expanded
+    object, which is usually a hashref, but might be an arrayref. For
+    example:
+
+        # Starts with an array
+        my $serialized = {
+           '[0].thingy' => 1,
+           '[1].thingy' => 2,
+        };
+        my $deserialized = $dss->deserialize($serialized);
+ 
+        # Returns:
+        $deserialized = [
+           { thingy => 1 },
+           { thingy => 2 },
+        ];
+
+  deserialize_pathval
+        my $deserialized = $dss->deserialize_pathval($path, $value);
+
+    Deserializes/expands a single path/data pair. Returns the expanded
+    object.
+
+  merge
+        my $newhash = $dss->merge($hash1, $hash2);
+
+    Merges two hashes. This is a direct handle to "merge" from an (internal)
+    Hash::Merge object, and is used by "deserialize" to combine individual
+    expanded objects.
+
+  set_merge_behavior
+    Handle to "set_behavior" from the (internal) Hash::Merge object.
+    Advanced usage only!
+
+    Data::SplitSerializer uses a special custom type called
+    "LEFT_PRECEDENT_STRICT_ARRAY_INDEX", which properly handles array
+    indexes and dies on any non-array-or-hash refs.
+
+  specify_merge_behavior
+    Handle to "specify_behavior" from the (internal) Hash::Merge object.
+    Advanced usage only!
+
+CAVEATS
+  Undefined values
+    Flattening will remove path/values if the value is undefined. This is to
+    clean up unused array values that appeared as holes in a sparse array.
+    For example:
+
+        # From one of the basic tests
+        my $round_trip = $dss->serialize( $dss->deserialize_pathval(
+           'a[0][1][1][1][1][2].too' => 'long'
+        ) );
+ 
+        # Without undef removal, this returns:
+        $round_trip = {
+           'a[0][0]'                 => undef,
+           'a[0][1][0]'              => undef,
+           'a[0][1][1][0]'           => undef,
+           'a[0][1][1][1][0]'        => undef,
+           'a[0][1][1][1][1][0]'     => undef,
+           'a[0][1][1][1][1][1]'     => undef,
+           'a[0][1][1][1][1][2].too' => 'long',
+        };
+
+    You can disable this with the "remove_undefs" switch.
+
+  Refs in split serialization
+    Split serialization works by looking for HASH or ARRAY refs and diving
+    further into them, adding path prefixes as it goes down. If it
+    encounters some other ref (like a SCALAR), it will stop and consider
+    that to be the value for that path. In terms of ref parsing, this means
+    two things:
+
+    1.  Only HASH and ARRAYs can be examined deeper.
+
+    2.  If you have a HASH or ARRAY as a "value", serialization cannot tell
+        the difference and it will be included in the path.
+
+    The former isn't that big of a problem, since deeper dives with other
+    kinds of refs are either not possible or dangerous (like CODE).
+
+    The latter could be a problem if you started with a hashref with a
+    path/data pair, expanded it, and tried to flatten it again. This can be
+    solved by protecting the hash with a REF. Consider this example:
+
+        my $round_trip = $dss->serialize( $dss->deserialize_pathval(
+           'a[0]' => { your => 'hash' }
+        ) );
+ 
+        # Returns:
+        $round_trip = {
+           'a[0].your' => 'hash',
+        };
+ 
+        # Now protect the hash
+        my $round_trip = $dss->serialize( $dss->deserialize_pathval(
+           'a[0]' => \{ your => 'hash' }
+        ) );
+ 
+        # Returns:
+        $round_trip = {
+           'a[0]' => \{ your => 'hash' }
+        };
+
+  Sparse arrays and memory usage
+    Since arrays within paths are based on indexes, there's a potential
+    security issue with large indexes causing abnormal memory usage. In
+    Perl, these two arrays would have drastically different memory
+    footprints:
+
+        my @small;
+        $small[0] = 1;
+ 
+        my @large;
+        $large[999999] = 1;
+
+    This can be mitigated by making sure the Path style you use will limit
+    the total digits for array indexes. Parse::Path handles this on all of
+    its paths, but it's something to be aware of if you create your own path
+    classes.
+
+TODO
+    This module might split off into individual split serializers, but so
+    far, this is the only one "out in the wild".
+
+SEE ALSO
+    Parse::Path
+
+ACKNOWLEDGEMENTS
+    Kent Fredric for getting me started on the basic idea.
+
+AVAILABILITY
+    The project homepage is
+    <https://github.com/SineSwiper/Data-SplitSerializer/wiki>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Data::SplitSerializer/>.
+
+SUPPORT
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and talk to this
+        person for help: SineSwiper.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests via
+    <https://github.com/SineSwiper/Data-SplitSerializer/issues>.
+
+AUTHOR
+    Brendan Byrd <BBYRD@CPAN.org>
+
+CONTRIBUTOR
+    Brendan Byrd <bbyrd@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by Brendan Byrd.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

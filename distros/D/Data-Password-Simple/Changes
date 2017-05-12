@@ -1,0 +1,23 @@
+Revision history for Data-Password-Simple
+
+0.01    2013-01-26
+        Initial release
+
+0.02    2013-01-29
+        Sensible default minimum length (6 characters)
+        Actually returns true if the dictionary is set to undef
+        No longer uses stupid sub name 'length' to ruin everyone's day
+        Now matches arrays and only arrays
+        No longer treats folder symlinks as file symlinks
+
+0.03    2013-01-29
+        Refactor check() to be more extensible to new tests
+        Add tests for dictionary checking
+        Add tests for length checking
+
+0.04    2013-01-30
+        No changes - administrative release
+
+00.5    2013-02-01
+        Change this file so the boilerplate tests will pass
+

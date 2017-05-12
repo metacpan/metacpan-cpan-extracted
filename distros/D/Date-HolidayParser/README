@@ -1,0 +1,33 @@
+Date::HolidayParser
+
+Date::HolidayParser is a parser for .holiday files. These are
+files that define holidays in various parts of the world in
+a format that is easy to read and write, but somewhat hard to
+parse due to its flexible and forgiving nature.
+
+DOCUMENTATION
+The documentation is included in the pm file.
+
+	perldoc ./lib/Date/HolidayParser.pm
+or
+	perldoc Date::HolidayParser
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006, 2007, 2010 Eskild Hustvedt
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See the files COPYING, COPYING.gpl and COPYING.artistic that came with
+Date::HolidayParser.

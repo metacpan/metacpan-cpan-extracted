@@ -1,0 +1,87 @@
+{
+   "abstract" : "Remove gathered prereqs from particular phases",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-RemovePhasedPrereqs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "MooseX::Types::Moose" : "0",
+            "MooseX::Types::Perl" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Find" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "JSON" : "2",
+            "List::Util" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::RemovePhasedPrereqs" : {
+         "file" : "lib/Dist/Zilla/Plugin/RemovePhasedPrereqs.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/dist-zilla-plugin-removephasedprereqs/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-RemovePhasedPrereqs",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/dagolden/dist-zilla-plugin-removephasedprereqs.git",
+         "web" : "https://github.com/dagolden/dist-zilla-plugin-removephasedprereqs"
+      }
+   },
+   "version" : "0.002"
+}
+

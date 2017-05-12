@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use DBIx::FileStore;
+
+my $verbose = 0;
+# fdbslurp: slurps file(s) from stdin into the DB
+
+main();
+
+sub Usage {
+    "fdbslurp /fdb/dest [-verbose]: slurp file from stdin into filestore.\n" .
+    "  Example:         fdbslurp /fdb/dest < filename\n" .
+    "  Is the same as:  fdbput --local filename /fdb/dest\n";
+}
+
+sub main {
+    $|++;
+    
+    GetOptions(
+        "verbose!" => \$verbose,
+    ) || die Usage();
+    
+    my $filestore = new DBIx::FileStore( verbose => $verbose );
+    die Usage() unless (@ARGV == 1);
+
+    $filestore->write_from_filehandle_to_db( *STDIN, $ARGV[0] );
+
+
+}
+
+=pod
+            
+=head1 NAME     
+            
+fdbslurp - Slurp from stdin into the DBIx::FileStore filestore. 
+                    
+=head1 SYNOPSIS     
+                
+    % fdbslurp filename.txt < SOMEFILE.txt
+
+or
+
+    % echo "HI THERE" | fdbslurp filename.txt
+
+=head1 DESCRIPTION 
+
+Slurp from stdin into the L<DBIx::FileStore> filestore. 
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbget>, L<fdbls>, L<fdbmv>,  L<fdbput>,  
+L<fdbrm>,  L<fdbstat>
+    
+=cut    
+

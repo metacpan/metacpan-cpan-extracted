@@ -1,0 +1,153 @@
+Revision history for Perl extension DNS::ZoneParse.
+
+1.10 - Wed Sep 22 2010
+      - (je) Add ttl_to_int method.
+      - (je) Use the SOA "minimum" field if no other TTL can be found (and be
+             compatible with BIND in doing so).
+
+1.00 - Fri Jul 02 2010
+      - (je) Improve parsing performance significantly.
+      - (je) Improve parsing of quoted data and data with escape sequences.
+      - (je) Add error message to unparsable line callback.
+      - (je) Catch more errors with invalid data sections (invalid escapes,
+             bad quoting).
+      - (je) Add support for $GENERATE directives.
+      - (je) Add support for $ORIGIN directives.
+      - (je) Add method to help construct FQDNs from record names.
+      - (je) Support reversed CLASS/TTL entries in zonefiles.
+      - (je) Increase the number of unit tests (still incomplete).
+
+0.99 - Tue Oct 20 2009
+      - (je) Support for callback to catch unparsable lines.
+      - (je) Keep a counter of unparsable lines after parsing.
+      - (je) Support new record types (SRV, TXT, RP, HINFO, LOC).
+      - (je) Automatic un/escaping of special characters.
+      - (je) Reformat regular expressions for clarity.
+      - (je) Update file open syntax.
+      - (je) Require Perl 5.6+.
+      - (je) Support for Unicode names (bug 27527).
+      - (je) Support TXT records containing a semicolon (bug 50165).
+      - (je) Support backslashes in zone data (bug 12679).
+      - (je) Support SRV records (bug 24402).
+      - (je) Support names ending in what looks like a record type (bug 39006).
+      - (je) Increase unit test coverage.
+      - (je) Improve parsing for lines containing comments.
+      - (je) Improve parsing for multi-line records.
+
+0.98 - Skipped
+
+0.97 - Skipped
+
+0.96 - Fri Nov 14 2008
+      - (ms) Obtained co-maintainership to apply overdue patches
+      - (ms) Applied SRV patch by Andrew Fresh: 
+             http://rt.cpan.org/Public/Bug/Display.html?id=24402
+
+0.95 - Sun Oct 24 2004
+      - suppress $TTL directive in output() if the zone has no TTL defined
+      - fix bug #7845 - zonefile and origin lost during parse.
+
+0.94 - Thu Sep 2 2004
+      - allow PTR records without an address (carries over from previous
+        record). This doesn't seem to be forbidden by the standards (bug #7546)
+
+0.93 - Wed Sep 1 2004
+      - s/it's/its/ (RT bug #7533, Debian bug #268524)
+
+0.92 - Sat Aug 21 2004
+      - Fix reported bugs #3806, #4283, #7363, #7392 with thanks to
+        Martin (mv <at> pdv-systeme <dot> de)
+
+0.91 - Sun Aug 03 2003
+      - fix bug #3028 - parsing AAAA records
+
+0.90 - Sun May 11 2003
+      - fix bug #2541 - PTR parse/output error
+
+0.89 - Sat May 3 2003
+      - small fix for perl 5.005
+
+0.88 - Wed Apr 27 2003
+      -  fix bug #2440 - parsing ambiguous records improved
+
+0.87 - Wed Mar 26 2003
+      - Bug fixes thanks to Alex Woods
+      - fix bug #2290 - parsing MX records without name
+      - fix bug #2291 - populate 'name' fields with parent name if undef
+
+0.86 - Tue Mar 25 2003
+      - bug fix in 0.85 introduced new bug. FIXED with test. (Thanks Alex Woods)
+      - use opportunity to update API and BUGS sections in POD
+
+0.85 - Mon Mar 24 2003
+      - fix filehandle typo in lib/DNS/ZoneParse.pm
+      - update tests to test object ctor for filename
+      - fix parsing for RRs without CLASS
+
+0.84 - Sun Mar 2 2003
+      - improved test suite
+      - tidy codebase
+      - turn class inside out (http://perlmonks.org/index.pl?node_id=219131)
+      - rename Dump(), newSerial(), PrintZone() methods
+      - dump() now returns a copy of the data
+      - TXT record parsing improved
+
+0.83 - Sat Jan 18 2003
+      - Add patches from anonymous and Kan Sasaki:
+          + parse $TTL
+          + shorten serial number
+          + parse MX records without a name
+          + printZone() tweak
+      - update documentation
+      - move module from <dist>/  to <dist>/lib/DNS
+
+0.82 - Tue Jul 16 2002
+      - Add patches to add support for AAAA records and add TTL to 
+      - zone output. Thanks again to Olivier Poitrey
+
+0.81 - Sun Jul 14 2002, 17:00
+      - Fixed bugs. Thanks to Olivier Poitrey, Brian Ventura,
+	    Ivan Kohler and others. 
+      - Bugs fixed: PTR records not printed, PTR records parsed incorrectly,
+            alphanumeric chars in TTL, underscores in zone data.
+
+0.80  - Wed Sep 26 21:00:00 2001
+      - Big version jump - lots of changes
+      - Removed Prepare method - now call new() with the filename\string reference
+      - Updated newSerial() to give date based serial numbers by default
+      - Fixed missing bracket in SOA of PrintZone() (Thanks to Brian Pellin)
+      - Added more warning messages
+      - More OO approach - try and hide the internals because they will probably change
+      - Added Autoloaded accessors a(), cname(), mx(), ns(), ptr(), soa() etc.
+      - Added a Dump() method to return a Hash of the records (better than using internals directly)
+      - Updated documentation and examples
+      - Added standard perl license
+      - make 'dist' - hope this improves CPAN listing.
+      - Added more serious tests for the CPAN-testers
+
+0.35	Mon May 21 13:01:00 2001
+      - Had some great comments and suggestions from users of the module
+      - Fixed misuse of $VERSION, @ISA
+      - Altered a couple of the regular expressions to match better following some bug reports.
+
+0.30	Wed Apr 05 12:58:11 2001
+      - Now works on versions of Perl prior to 5.6
+
+0.25	Wed Apr 04 01:58:11 2001
+      - Fixed missing "_pre_parse()" method
+      - Renamed "infile" filehandle to "inZONE" to avoid warnings
+
+0.20 	Mon Mar 12 22:07:00 2001
+      - Updated Documentation, plus a nice HTML one.
+      - Slighty Tidier methods
+
+0.15	Mon Mar 12 19:00:00 2001
+      - Ability to pass filename or string reference to DNS Zone File
+
+0.10	Mon Mar 12 14:44:00 2001
+      - First version published to CPAN
+
+0.01  Wed Mar  7 13:46:49 2001
+      - original version; created by h2xs 1.20
+
+# vim:filetype=perl

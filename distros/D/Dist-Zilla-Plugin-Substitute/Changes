@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-Plugin-Substitute
+
+0.006     2015-08-14 00:34:13+02:00 Europe/Amsterdam
+          - fix mangling of whitespace
+          - make "file" option work
+
+0.005     2014-11-09 01:44:33+01:00 Europe/Amsterdam
+          Convert uses of Path::Class to Path::Tiny
+
+0.004     2013-10-27 02:03:23 Europe/Amsterdam
+          Make files an attribute
+          Add finder alias for finders
+
+0.003     2013-07-24 16:34:56 Europe/Amsterdam
+          New config field 'filename_code', for renaming a file
+
+0.002     2013-06-19 22:05:48 Europe/Amsterdam
+          Ask PAUSE not to try to index Foo
+          Switch to MooseX::Types
+
+0.001     2013-06-19 20:48:36 Europe/Amsterdam
+          Initial release

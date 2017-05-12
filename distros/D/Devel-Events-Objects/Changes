@@ -1,0 +1,3 @@
+0.03
+	- add the 'tracked' field to object_bless, to signify whether or not to expect object_destroy
+	- don't track objects which will never get destroyed in ObjectTracker (shared subrefs)

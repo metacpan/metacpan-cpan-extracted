@@ -1,0 +1,53 @@
+{
+   "abstract" : "Rapid creation of RESTful Web Services with sessions and persistent data",
+   "author" : [
+      "George Bouras <george.mpouras@yandex.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-WebService",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0",
+            "Dancer2::Plugin" : "0",
+            "Data::Dumper" : "0",
+            "JSON::XS" : "0",
+            "Moo" : "0",
+            "Plack" : "0",
+            "Plack::Middleware::Deflater" : "0",
+            "Starman" : "0",
+            "Storable" : "0",
+            "XML::Hash::XS" : "0",
+            "YAML::XS" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::WebService" : {
+         "file" : "lib/Dancer2/Plugin/WebService.pm",
+         "version" : "3.014"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.014",
+   "x_serialization_backend" : "JSON::XS version 3.03"
+}
+

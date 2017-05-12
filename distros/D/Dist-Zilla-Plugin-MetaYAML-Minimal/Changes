@@ -1,0 +1,14 @@
+Release history for Dist-Zilla-Plugin-MetaYAML-Minimal
+
+0.001001 2017-03-03T23:45:19Z 2b4473a
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-MetaYAML-Minimal/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +5 ↑2 -1 (suggests: ↑1)
+ - test: ↓1
+
+0.001000 2015-06-21T21:52:24Z 1ec9576
+ - Initial release that demonstrates itself via bootstrap

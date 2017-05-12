@@ -1,0 +1,675 @@
+NAME
+    DotCloud::Environment - easy handling of environment in dotcloud
+
+VERSION
+    version 0.9.4
+
+SYNOPSIS
+       # Most typical usage, suppose you have a shared 'lib' directory
+       # under the root of your dotCloud directory hierarchy
+       use DotCloud::Environment 'path_for';
+       use lib path_for('lib');
+       use My::Shared::Module; # in your project-root/lib directory
+
+       # Most typical usage when you set a default environment.json file
+       # in the root of your project and you need to access the variables
+       # of the 'redis' service
+       use DotCloud::Environment 'dotvars';
+       my $redis_vars = dotvars('redis');
+
+       # Not-very-typical usage examples from now on!
+
+       # get an object, fallback to $path if not in dotCloud deploy
+       my $dcenv = DotCloud::Environment->new(fallback_file => $path);
+
+       # you should now which services make part of your stack!
+       my $nosqldb_conf = $dcenv->service('nosqldb');
+       my $type = $nosqldb_conf->{type}; # e.g. mysql, redis, etc.
+       my $vars = $nosqldb_conf->{vars}; # e.g. login, password, host...
+
+       # suppose your nosqldb service is redis...
+       require Redis;
+       my $redis = Redis->new(server => "$vars->{host}:$vars->{port}");
+       $redis->auth($vars->{password});
+
+       # another service, similar approach
+       my $conf = $dcenv->service('database');
+       die 'not MySQL?!?' unless $conf->{type} eq 'mysql';
+
+       my ($host, $port, $user, $pass)
+          = @{$conf->{vars}}{qw< host port login password >}
+       require DBI;
+       my $dbh = DBI->connect("dbi:mysql:host=$host;port=$port;database=db",
+          $user, $pass, {RaiseError => 1});
+
+DESCRIPTION
+    DotCloud::Environment is useful when you design applications to be
+    deployed in the dotCloud platform. It is assumed that you know what
+    dotCloud is (anyway, see <http://www.dotcloud.com/>).
+
+    In general you will have multiple services in your application, and when
+    you are in one instance inside dotCloud you can access the configuration
+    of the relevant ones reading either /home/dotcloud/environment.yml or
+    /home/dotcloud/environment.json. For example, this lets your frontend or
+    backend applications know where the data services are, e.g. a Redis
+    database or a MySQL one.
+
+    This modules serves to two main goals:
+
+    *   it reads either file to load the configuration of each service, so
+        that you can access this configuration easily as a hash of hashes;
+
+    *   it lets you abstract from the assumption that you're actually in a
+        dotCloud instance, allowing you to use the same interface also in
+        your development environment.
+
+    With respect to the second goal, it should be observed that most of the
+    times in your development environment you don't have the same exact
+    situation as in dotCloud, e.g. it's improbable that you have a
+    /home/dotcloud directory around. With this module you can set a fallback
+    to be used in different ways, e.g.:
+
+    *   providing a fallback file path to be loaded if
+        "/home/dotcloud/environment.json" is not found;
+
+    *   setting up the "DOTCLOUD_ENVIRONMENT_FILE" environment variable to
+        point to the file to be used.
+
+        NOTE: as of version 0.9.1 this variable substitutes
+        "DOTCLOUD_ENVIRONMENT", which DotCloud started using for its own
+        purposes.
+
+  A Note On Available Data
+    Data about DotCloud services is organized according to the structure of
+    the variables set in the relevant files. There are four significant
+    parts:
+
+    application
+        there can be multiple applications you're loading variables from,
+        and DotCloud::Environment lets you distinguish them apart
+
+    service
+        this is the name of a service in DotCloud sense. For example, if you
+        have application whatever like this:
+
+           $ dotcloud list whatever
+           whatever (flavor: legacy):
+             - nosqldb (type: redis; instances: 1)       
+             - sqldb   (type: mysql; instances: 1)       
+             - www     (type: perl; instances: 1)        
+             - backend (type: perl-worker; instances: 1)
+
+        you have four services defined: "nosqldb", "sqldb", "www" and
+        "backend"
+
+    subservice
+        this represents a subgroup of variables in a service. You should
+        always find two subservices: one is named "ssh", the other one has
+        the same name as the service type (e.g. "redis", "mysql",...).
+
+        It makes sense to consider "ssh" some kind of accessory information
+        and the other subservice as the "real" service.
+
+    variable name
+        this is the name of the variable, which is associated to a
+        subservice.
+
+    Values are assigned to variable names.
+
+  Suggested/Typical Usage
+    In order to keep your code clean, you will probably be dividing it
+    depending on the functional block that will be deployed as a service in
+    dotCloud. Suppose that you have a frontend service, a backend service
+    and a database; you probably have the following directory layout:
+
+       project
+       +- dotcloud.yml
+       +- backend
+       |  | ...
+       |  +- lib
+       |     +- Backend.pm
+       +- frontend
+       |  | ...
+       |  +- lib
+       |     +- FrontEnd.pm
+       +- lib
+          +- Shared.pm
+
+    Each service is put into a separate directory and all the code that they
+    both use (e.g. functions to connect to databases) is put in a common
+    "lib" directory.
+
+    How should you use DotCloud::Environment?
+
+    The main goal is to let it find the right "environment.json" (or,
+    equivalently, "environment.yml") depending on the environment you are
+    into. If you are in dotCloud there is actually no problem, because by
+    default the *right* "/home/dotcloud/environment.json" file is selected;
+    for your local development the best thing to do is to put the
+    configuration file in the project's root directory, which becomes like
+    this:
+
+       project
+       +- dotcloud.yml
+       +- backend
+       |  | ...
+       |  +- lib
+       |     +- Backend.pm
+       +- frontend
+       |  | ...
+       |  +- lib
+       |     +- FrontEnd.pm
+       +- lib
+       |  +- Shared.pm
+       |
+       +- environment.json
+
+    Putting the file in that position lets DotCloud::Environment find it by
+    default when no "/home/dotcloud/environment.json" file (or the
+    equivalent YAML file) is found in the system. Which hopefully is the
+    case of your development environment.
+
+    In this case, you would have this in each service:
+
+       # -- in BackEnd.pm and FrontEnd.pm --
+       use DotCloud::Environment 'path_for';
+       use lib path_for('lib');
+       use Shared ...;
+
+    The function "path_for" helps you to set up the right path in @INC so
+    that the module can find the shared code.
+
+    In the shared module you can do this:
+
+       # -- in Shared.pm --
+       use DotCloud::Environment 'dotenv';
+
+       # ... when you need it...
+       my $service = dotenv()->service('service-name');
+       # ... now you have a hash ref which should have at least two
+       # elements: ssh and the real subservice type, e.g. mysql, redis, ...
+       my $redis_host = $service->{redis}{host};
+
+    Most of the time all you need is to access the variables related to a
+    specific service, so there's a shortcut for this:
+
+       use DotCloud::Environment 'dotvars';
+       my %vars = dotvars('service-name');
+
+    The "dotvars" shortcut tries its best to DWIM, i.e. it lets you specify
+    either the name of a service or the name of a subservice.
+
+    For example, suppose that you want to implement a function to connect to
+    a Redis service called "redisdb":
+
+       sub get_redis {
+          my %vars = dotvars('redisdb');
+          # it could also be:
+          #
+          # my %vars = dotvars('redis'); # name of service type
+          #
+          # if there is only one service of type redis
+
+          require Redis;
+          my $redis = Redis->new(server => "$vars{host}:$vars{port}");
+          $redis->auth($vars{password});
+          return $redis;
+       }
+
+    Of course you can use "dotenv"/"dotvars" directly in "FrontEnd.pm" and
+    "BackEnd.pm", but you will probably benefit from refactoring your common
+    code to avoid duplications.
+
+METHODS
+  new
+       $dcenv = DotCloud::Environment->new(%params);
+       $dcenv = DotCloud::Environment->new({%params});
+
+    Create a new object. Parameters are:
+
+    no_load
+        don't attempt to load the configuration
+
+    environment_string
+        unconditionally use the provided string, ignoring everything else;
+
+    environment_file
+        unconditionally use the provided file, ignoring everything else;
+
+    fallback_string
+        use the provided string if other methods fail;
+
+    fallback_file
+        use the provided file if other methods fail.
+
+    backtrack
+        if nothing works and no fallback is set, look for suitable files in
+        filesystem. This option is activated by default, so you can use it
+        to *disable* it (e.g. with "backtrack => 0").
+
+    Unless "no_load" is passed and set to true, the object creation also
+    calls the "load" method.
+
+    Returns the new object or "croak"s if errors occur.
+
+  load
+       $dcenv->load(%params);
+       $dcenv->load({%params});
+
+    Load the configuration for an application. The accepted parameters are
+    "environment_string", "environment_file", "fallback_string",
+    "fallback_file" and "backtrack" with the same meaning as in the
+    constructor (see "new").
+
+    The sequence to get the configuration string is the following:
+
+    environment_string
+        from parameter passed to the method
+
+    environment_file
+        from parameter passed to the method
+
+    environment_string
+        from parameter set in the constructor
+
+    environment_file
+        from parameter set in the constructor
+
+    DOTCLOUD_ENVIRONMENT_FILE
+        environment variable (i.e. $ENV{DOTCLOUD_ENVIRONMENT_FILE}). Note
+        that this was formerly $ENV{DOTCLOUD_ENVIRONMENT} but due to
+        DotCloud starting using this variable it is no longer available.
+
+    $DotCloud::Environment::main_file_path
+        which defaults to /home/dotcloud/environment.json (you SHOULD NOT
+        change this variable unless you really know what you're doing)
+
+    fallback_string
+        from parameter passed to the method
+
+    fallback_file
+        from parameter passed to the method
+
+    fallback_string
+        from parameter set in the constructor
+
+    fallback_file
+        from parameter set in the constructor
+
+    If none of the above works there's still some hope in case there is
+    option "backtrack" (or it was specified to the constructor). In this
+    case, either file is searched recursively starting from the following
+    directories:
+
+    *   the one returned by "find_code_dir" (but as if it were called by the
+        caller of "load", i.e. with a value of "n" equal to 1)
+
+    *   the current working directory
+
+    *   the directory of the file that called us.
+
+    Actually, option "backtrack" is enabled by default, so if you do not
+    want the behaviour above you have to explicitly disable it (e.g. passing
+    "backtrack => 0" in the constructor).
+
+    It is possible to load multiple configuration files from multiple
+    applications.
+
+    Returns a reference to the object itself.
+
+  as_json
+       %json_for = $dcenv->as_json();
+       $json_for = $dcenv->as_json();
+
+    Rebuild the JSON representations of all the applications.
+
+    Returns a hash (in list context) or an anonymous hash (in scalar
+    context) with each application name pointing to the relevant JSON
+    string.
+
+  as_yaml
+       %yaml_for = $dcenv->as_yaml();
+       $yaml_for = $dcenv->as_yaml();
+
+    Rebuild the YAML representations of all the applications.
+
+    Returns a hash (in list context) or an anonymous hash (in scalar
+    context) with each application name pointing to the relevant YAML
+    string.
+
+  merge_json
+       $dcenv->merge_json($json_string);
+
+    Add (or replace) the configuration of an application, provided as JSON
+    string. You should not need to do this explicitly, because this does the
+    same for you with autodetection of the format:
+
+       $dcenv->load(environment_string => $json_or_yaml_string);
+
+    Return a reference to the object itself.
+
+  merge_yaml
+       $dcenv->merge_yaml($yaml_string);
+
+    Add (or replace) the configuration of an application, provided as YAML
+    string. You should not need to do this explicitly, because this does the
+    same for you with autodetection of the format:
+
+       $dcenv->load(environment_string => $json_or_yaml_string);
+
+  application_names
+       my @names = $dcenv->application_names();
+
+    Returns the names of the applications loaded. Generally only one
+    application will be available, i.e. the one of the stack you're working
+    with.
+
+  applications
+       my %conf_for = $dcenv->applications();
+       my $conf_for = $dcenv->applications();
+
+    Get a hash (in list context) or anonymous hash (in scalar context) with
+    the relevant data of all the applications. Example:
+
+       {
+          app1 => {
+             project      => 'app1',
+             environment  => 'default',
+             service_id   => 0,
+             service_name => 'www',
+             services     => {
+                nosqldb => {
+                   redis => {
+                      login    => 'redis',
+                      password => 'wafadsfsdfdsfdas',
+                      host     => 'data.app1.dotcloud.com',
+                      port     => '12345',
+                   }
+                }
+                sqldb => {
+                   mysql => {
+                      login    => 'mysql',
+                      password => 'wafadsfsdfdsfdas',
+                      host     => 'data.app1.dotcloud.com',
+                      port     => '54321',
+                   }
+                }
+             }
+          },
+          app2 => {
+             # ...
+          }
+       }
+
+  application
+       my %conf_for = $dcenv->application($appname);
+       my $conf_for = $dcenv->application($appname);
+
+    Get a hash (in list context) or anonymous hash (in scalar context) with
+    the relevant data for the requested application. Example:
+
+       {
+          project      => 'app1',
+          environment  => 'default',
+          service_id   => 0,
+          service_name => 'www',
+          services     => {
+             nosqldb => {
+                redis => {
+                   login    => 'redis',
+                   password => 'wafadsfsdfdsfdas',
+                   host     => 'data.app1.dotcloud.com',
+                   port     => '12345',
+                }
+             }
+             sqldb => {
+                mysql => {
+                   login    => 'mysql',
+                   password => 'wafadsfsdfdsfdas',
+                   host     => 'data.app1.dotcloud.com',
+                   port     => '54321',
+                }
+             }
+          }
+       }
+
+  service
+       my %conf_for = $dcenv->service(%params); # also with \%params
+       my $conf_for = $dcenv->service(%params); # also with \%params
+
+    Get a hash (in list context) or anonymous hash (in scalar context) with
+    the relevant data for the requested service. Example:
+
+       {
+          ssh => {
+             host     => 'data.app1.dotcloud.com',
+             port     => '12345',
+             url      => 'ssh://data.app1.dotcloud.com:12345/',
+          },
+          redis => {
+             login    => 'redis',
+             password => 'wafadsfsdfdsfdas',
+             host     => 'data.app1.dotcloud.com',
+             port     => '12345',
+          }
+       }
+
+    The parameters are the following:
+
+    service
+        (Required) the name of the service.
+
+    application
+        (Optional) the name of the application.
+
+    The name of the application is optional because in most cases it can be
+    omitted, e.g. because there is only one application. The name can be
+    also provided in the service name, in line with what normally happens in
+    dotCloud where the complete name of a service is something like
+    "application.service".
+
+    This is the algorithm:
+
+    *   if the name of the service is of the form "application.service", the
+        name is split into the two components;
+
+    *   otherwise, if the application parameter is present it is used
+
+    *   otherwise the service is searched among all the services of all the
+        applications.
+
+    If exactly one service is found it is returned, otherwise this method
+    "croak"s.
+
+  subservice
+       my %conf_for = $dcenv->subservice($subservice_name);
+       my %conf_for = $dcenv->subservice(%params); # also with \%params
+       my $conf_for = $dcenv->subservice(%params); # also with \%params
+
+    Get a hash (in list context) or anonymous hash (in scalar context) with
+    the relevant data for the requested subservice. Example:
+
+       redis => {
+          login    => 'redis',
+          password => 'wafadsfsdfdsfdas',
+          host     => 'data.app1.dotcloud.com',
+          port     => '12345',
+       }
+
+    It can be called with a single non-reference scalar that represents the
+    subservice to look for. Otherwise it accepts the following parameters in
+    a hash or a reference to a hash:
+
+    subservice
+        the name of the subservice
+
+    service
+        the name of the service, see "service"
+
+    application
+        the name of the application, see "application"
+
+    with obvious meanings.
+
+    The application and the service name can also be specified in the
+    subservice name with separating dots like in the following examples:
+
+       application.service.subservice
+       service.subservice
+
+    These configurations in the subservice name override parameters of the
+    same name (e.g. specifying "service.subservice" overrides the
+    $params{service} input parameters).
+
+    Croaks if more than one subservice with the given name is found.
+
+  subservice_vars
+       my %vars   = $dcenv->subservice_vars('subservice-name');
+       my $vars   = $dcenv->subservice_vars('subservice-name');
+       my %vars   = $dcenv->subservice_vars(%params); # also \%params
+       my $vars   = $dcenv->subservice_vars(%params); # also \%params
+       my @values = $dcenv->subservice_vars(%params); # also \%params
+       my $values = $dcenv->subservice_vars(%params); # also \%params
+
+    Shorthand to get the configuration variables of a single subservice.
+
+    The input parameter list can be a single string with the name of the
+    subservice, or a hash/anonymous hash with parameters. Depending on the
+    input, the return value might be structured like a hash or like an
+    array:
+
+    subservice
+        the name of the subservice, see "subservice"
+
+    service
+        the name of the service, see "service"
+
+    application
+        the name of the application, see "application"
+
+    list
+        (Optional) if a list is provided, then the values corresponding to
+        each item in order is returned. This allows writing things like
+        this:
+
+           my ($host, $port, $password) = $dcenv->service_list(
+              service => 'nosqldb',
+              list => [ qw< host port password > ],
+           );
+
+        and get directly the values to put into variables. In this case, the
+        return value can be a list of values or an anonymous array with the
+        values.
+
+        If this parameter is not present, the whole name/value hash is
+        returned, either as a list or as an anonymous hash depending on the
+        context.
+
+  service_vars
+       my %vars   = $dcenv->service_vars('service-name');
+       my $vars   = $dcenv->service_vars('service-name');
+       my %vars   = $dcenv->service_vars(%params); # also \%params
+       my $vars   = $dcenv->service_vars(%params); # also \%params
+       my @values = $dcenv->service_vars(%params); # also \%params
+       my $values = $dcenv->service_vars(%params); # also \%params
+
+    Shorthand to get the configuration variables of a single service. This
+    assumes that a *main* subservice can be found in the requested service,
+    according to the following algorithm:
+
+    *   first of all, a service is found with "service"
+
+    *   the *background* service "ssh" is ignored
+
+    *   if only one subservice remains in the service, it is assumed to be
+        the *main* subservice.
+
+    After this, the method behaves as if "subservice_vars" with the *main*
+    subservice were called.
+
+FUNCTIONS
+    Nothing is exported by default, but you can import the following
+    functions. If you need both, you can use the ":all" tag, e.g.:
+
+       use DotCloud::Environment ':all';
+
+    This module uses Sub::Exporter under the hood; this means that if you're
+    not happy with the name of the imported subroutines you can provide your
+    own names, e.g.:
+
+       use DotCloud::Environment
+          dotvars => { -as => 'dotcloud_variables_for' };
+       my $vars = dotcloud_variables_for('my-service');
+
+  dotenv
+       my $singleton = dotenv();
+
+    This function returns a default instance of DotCloud::Environment that
+    should suit the needs for the typical/suggested usage. Subsequent calls
+    to the function always return the same object.
+
+    It can be useful if you don't want a global variable in your code, e.g.:
+
+       my @application_names = dotenv()->application_names();
+       # ...
+       my $vars = dotenv()->service_vars('my-sql-db');
+
+  dotvars
+       my $vars = dotvars('service-name-or-subservice-name');
+
+    This function gets the configuration variables for the provided service
+    using the default singleton instance. Most of the time this is exactly
+    what you want, and nothing more.
+
+    This function actually calls "service_vars" or "subservice_vars" behind
+    the scenes, you can pass all the parameters that the method accepts.
+
+  find_code_dir
+       my $code_directory = find_code_dir(%params);
+
+    This function tries to find the file dotcloud.yml that describes the
+    application backtracking from the current working directory and from the
+    directory containing the file that called us (i.e. what happens to be
+    "(caller($n))[1]").
+
+    Parameters:
+
+    n   an integer, defaulting to 0, that tells how to call "caller()". You
+        shouldn't need to set it, anyway.
+
+    unix
+        when set, the name of the directory will be returned in Unix format,
+        so that you can use it with "use lib". By default the format is the
+        same as the system.
+
+    This should be useful if you want to put a default configuration file
+    there or if you want to set up a shared library directory. If you are
+    interested into this feature, anyway, look at "path_for" which is easier
+    to use.
+
+  path_for
+       use lib path_for('lib');
+
+    This function produces a list of paths that are suitable for "use lib".
+    It uses "find_code_dir" internally, see it for details.
+
+    You should pass a list of subdirectories which will be rebased using the
+    result of "find_code_dir" as a parent directory. If you are actually in
+    the dotCloud enviroment, the example above produces the path
+    "/home/dotcloud/code/lib".
+
+    Returns a list of Unix paths, one element for each input directory.
+
+AUTHOR
+    Flavio Poletti <polettix@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 by Flavio Poletti polettix@cpan.org.
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

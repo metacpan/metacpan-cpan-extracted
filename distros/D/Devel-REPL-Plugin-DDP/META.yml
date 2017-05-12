@@ -1,0 +1,35 @@
+---
+abstract: 'Format return values with Data::Printer'
+author:
+  - 'Thomas Sibley <tsibley@cpan.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.8, Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-REPL-Plugin-DDP
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Data::Printer: 0.17
+  Devel::REPL::Plugin: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/tsibley/Devel-REPL-Plugin-DDP/issues
+  homepage: https://github.com/tsibley/Devel-REPL-Plugin-DDP
+  repository: https://github.com/tsibley/Devel-REPL-Plugin-DDP.git
+version: 0.05
+x_contributors:
+  - 'Andreas Voegele <andreas@andreasvoegele.com>'
+  - 'Thomas Sibley <tsibley@cpan.org>'

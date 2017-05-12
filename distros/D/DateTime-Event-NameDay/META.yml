@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name: DateTime-Event-NameDay
+version: 0.02
+license: perl
+distribution_type: module
+requires:
+  Carp: 0
+  DateTime: 0
+  DateTime::Calendar::Christian: 0
+  DateTime::Set: 0
+  Params::Validate: 0.52
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  DateTime::Event::NameDay:
+    file: lib/DateTime/Event/NameDay.pm
+    version: 0.02
+  DateTime::Event::NameDay::france:
+    file: lib/DateTime/Event/NameDay/france.pm
+    version: ~
+  DateTime::Event::NameDay::greece:
+    file: lib/DateTime/Event/NameDay/greece.pm
+    version: ~
+  DateTime::Event::NameDay::slovakia:
+    file: lib/DateTime/Event/NameDay/slovakia.pm
+    version: ~
+  DateTime::Event::NameDay::sweden:
+    file: lib/DateTime/Event/NameDay/sweden.pm
+    version: ~
+generated_by: Module::Build version 0.18

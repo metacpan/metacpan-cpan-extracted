@@ -1,0 +1,15 @@
+Revision history for DateTimeX-Seinfeld
+
+1.000  2014-01-11
+	- No functional changes
+	- Release tests moved to xt/
+
+0.03   2012-05-05
+	- Minor improvements to documentation
+	- No functional changes
+
+0.02   2012-03-13
+	- API change to allow find_chains to continue where it left off
+
+0.01   2012-03-11
+	- Initial release

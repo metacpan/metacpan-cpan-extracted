@@ -1,0 +1,56 @@
+NAME
+    Dist::Zilla::Plugin::MakeMaker::Highlander - There can be only one
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        # in dist.ini, *after* other MakeMaker plugins
+        [MakeMaker::Highlander]
+
+DESCRIPTION
+    The vast majority of distributions do not need this and should not use
+    it. It is intended for distributions that are bundled with
+    ExtUtils::MakeMaker in order to bootstrap it.
+
+    This plugin sets the "UNINST" attribute to 1, to ensure that any other
+    copies of the module files are removed from @INC. It only runs on Perls
+    before v5.12 when @INC was reordered, and only if there appears to be no
+    use of "INSTALL_BASE" or "PREFIX".
+
+    This will result in warnings from old ExtUtils::MakeMaker, but appears
+    to work nonetheless.
+
+    If a build system already accounts for ExtUtils::MakeMaker's
+    pathological bundling and "UNINST = 1" causes problems, the
+    "PERL_NO_HIGHLANDER" environment variable may be set to a true value.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander/issu
+    es>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   David Golden <xdg@xdg.me>
+
+    *   Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

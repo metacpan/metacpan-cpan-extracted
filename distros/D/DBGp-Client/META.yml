@@ -1,0 +1,30 @@
+---
+abstract: 'simple client for the DBGp debugger protocol'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::DBGp: '0.06'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBGp-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  XML::Parser: '0'
+  XML::Parser::EasyTree: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/mbarbon/dbgp-client/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mbarbon/dbgp-client
+version: '0.12'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

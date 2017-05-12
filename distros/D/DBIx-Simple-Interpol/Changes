@@ -1,0 +1,11 @@
+Release history for DBIx-Simple-Interpol
+
+1.005 Sat 10 Jan 2015
+	- No functional changes
+	- No longer contains INSTALL file with install-as-root instructions
+
+1.004 Tue 30 Dec 2014
+	- Specify minimum Perl version explicitly
+
+1.003 Tue 30 Dec 2014
+	- Split out of SQL-Interpol distribution

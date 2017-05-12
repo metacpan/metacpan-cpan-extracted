@@ -1,0 +1,19 @@
+Revision history for perl module Data::MATFile
+
+0.04 2017-02-21
+
+* Document the mat2json script
+
+0.03 2015-12-28
+
+* Update documentation.
+* Change depending modules to Gzip::Faster and JSON::Create.
+* Remove verbose printing statements
+
+0.02 2014-02-07
+
+* Add "Changes" and "README"
+
+0.01 2012-12-16
+
+* Initial version

@@ -1,0 +1,20 @@
+Revision history for Dancer2-Logger-Syslog
+
+0.5 2017-02-11
+ - Fixed tests for new engine.logger.* hooks in Dancer2 (Peter Mottram)
+
+0.4 2015-06-15
+ - Added host/type/port parameters (Clive Eisen)
+ - Added note about Dancer2::Logger::LogReport
+
+0.3 2015-03-18
+ - Fix problems from CPAN Testers:
+   - Add requirement for Dancer2 v0.151
+   - Change \h to \s in regex tests
+
+0.2 2015-03-17
+ - Added missing pod coverage for log method
+
+0.1 2014-12-30
+ - First version, based on Dancer-Logger-Syslog
+

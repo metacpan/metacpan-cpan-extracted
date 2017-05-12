@@ -1,0 +1,127 @@
+NAME
+    Dancer::Plugin::ElasticModel - Use Elastic::Model in your Dancer
+    application
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+        use Dancer::Plugin::ElasticModel;
+
+        emodel->namespace('myapp')->index->create;
+
+        edomain('myapp')->create( user => { name => 'Joe Bloggs' });
+
+        my $results = eview('users)->search;
+
+DESCRIPTION
+    Easy access to your Elastic::Model-based application from within your
+    Dancer apps.
+
+CONFIG
+        plugins:
+            ElasticModel:
+                model:          MyApp
+                global_scope:   0
+                request_scope:  1
+                es:
+                    servers:    es1.mydomain.com:9200
+                    transport:  http
+                views:
+                    users:
+                        domain: myapp
+                        type:   user
+
+  model
+    The "model" should be the name of your model class (which uses
+    Elastic::Model).
+
+  es
+    Any parameters specified in "es" will be passed directly to "new()" in
+    Search::Elasticsearch::Compat.
+
+  views
+    Optionally, you can predefine named views, eg the "users" view above is
+    the equivalent of:
+
+        $view = $model->view( domain => 'myapp', type => 'user' );
+
+  Scoping
+    Scoping is not enabled by default.
+
+    If you want to automatically create a new scope at the beginning of each
+    request, you can do so with:
+
+        request_scope: 1
+
+    The request scope is cleaned up at the end of the request.
+
+    You can also create a global scope which is not cleaned up until the
+    application exits, with:
+
+        global_scope:   1
+
+    Objects that are loaded in the global scope will remain cached in memory
+    until your application exits. This is useful only for big objects that
+    seldom change. The only way to refresh the object is by restarting your
+    application.
+
+    See Elastic::Manual::Scoping for more.
+
+METHODS
+  emodel()
+    "emodel()" gives you access to the model that you have configured in
+    your "config.yml" file.
+
+  edomain()
+        $domain = edomain('mydomain');
+
+    "edomain()" is a shortcut for:
+
+        $domain = emodel->domain('mydomain');
+
+  eview()
+    Access the "views" that you predefined in your "CONFIG":
+
+        $users = eview('users')->search;
+
+    Or create a new view:
+
+        $users = eview(domain=>'myapp', type => 'user');
+        $users = eview->domain('myapp')->type('user');
+
+SEE ALSO
+    *   Elastic::Model
+
+    *   Dancer
+
+    *   Search::Elasticsearch::Compat
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Plugin::ElasticModel
+
+    You can also look for information at:
+
+    *   GitHub
+
+        <http://github.com/clintongormley/Dancer-Plugin-ElasticModel>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Dancer-Plugin-ElasticModel>
+
+    *   Search MetaCPAN
+
+        <https://metacpan.org/module/Dancer::Plugin::ElasticModel>
+
+AUTHOR
+    Clinton Gormley <drtech@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Clinton Gormley.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

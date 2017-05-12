@@ -1,0 +1,18 @@
+Revision history for Dancer-Plugin-RPC-XML
+
+0.06    2012-11-20/21:04
+        * Added t/10-basic.t
+				* Added t/lib/TestApp.pm
+				* Fixed bugs detected by t/10-basic.t
+				* Made it dependent on RPC::XML 0.69 since thats where RPC::XML::ParserFactory appeared
+
+0.04    2012-11-19/15:02
+        Better README
+
+0.03    2012-11-19/14:58
+        Forgot the RPC::XML dependency. Great when you notice that its the only non-Dancer dep i got ;)
+
+0.02    2012-11-19/12:40
+        First working version. 0.01 was me struggling with Dancer ':syntax' and make test.
+
+

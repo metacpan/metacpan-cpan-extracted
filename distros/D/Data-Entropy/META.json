@@ -1,0 +1,98 @@
+{
+   "abstract" : "entropy (randomness) management",
+   "author" : [
+      "Andrew Main (Zefram) <zefram@fysh.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110580",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Entropy",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Crypt::Rijndael" : 0,
+            "Data::Float" : "0.008",
+            "IO::File" : "1.03",
+            "Module::Build" : 0,
+            "Test::More" : 0,
+            "constant" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      },
+      "runtime" : {
+         "conflicts" : {
+            "Math::BigInt" : 0,
+            "Math::BigRat" : 0
+         },
+         "requires" : {
+            "Carp" : 0,
+            "Crypt::Rijndael" : 0,
+            "Data::Float" : "0.008",
+            "Errno" : "1.00",
+            "Exporter" : 0,
+            "HTTP::Lite" : "2.2",
+            "IO::File" : "1.03",
+            "Params::Classify" : 0,
+            "constant" : 0,
+            "integer" : 0,
+            "parent" : 0,
+            "perl" : "5.006",
+            "strict" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Data::Entropy" : {
+         "file" : "lib/Data/Entropy.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::Algorithms" : {
+         "file" : "lib/Data/Entropy/Algorithms.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::RawSource::CryptCounter" : {
+         "file" : "lib/Data/Entropy/RawSource/CryptCounter.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::RawSource::Local" : {
+         "file" : "lib/Data/Entropy/RawSource/Local.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::RawSource::RandomOrg" : {
+         "file" : "lib/Data/Entropy/RawSource/RandomOrg.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::RawSource::RandomnumbersInfo" : {
+         "file" : "lib/Data/Entropy/RawSource/RandomnumbersInfo.pm",
+         "version" : "0.007"
+      },
+      "Data::Entropy::Source" : {
+         "file" : "lib/Data/Entropy/Source.pm",
+         "version" : "0.007"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.007"
+}

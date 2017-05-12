@@ -1,0 +1,79 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        branch: 
+          caption: Branch
+          class: src
+          f: "%s"
+          fs: "%s"
+        c_false: 
+          caption: 'False'
+          f: "%s"
+          fs: "%.1f"
+        c_true: 
+          caption: 'True'
+          f: "%s"
+          fs: "%.1f"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        percent: 
+          caption: "%"
+          f: "%d"
+          fs: "%.1f"
+      headers_order: 
+        - line
+        - percent
+        - c_true
+        - c_false
+        - branch
+      label: Branch coverage
+      rows: 
+        - 
+          _coverage: 50
+          branch: if ($a) { }
+          c_false: 
+            class: c0
+            v: F
+          c_true: 
+            class: c4
+            v: T
+          line: 19
+          percent: 
+            class: c1
+            v: 50
+        - 
+          _coverage: 50
+          branch: if ($a or $b)
+          c_false: 
+            class: c0
+            v: F
+          c_true: 
+            class: c4
+            v: T
+          line: 18
+          percent: 
+            class: c1
+            v: 50
+        - 
+          _coverage: 100
+          branch: if ($c > 5 and $c < 10)
+          c_false: 
+            class: c4
+            v: F
+          c_true: 
+            class: c4
+            v: T
+          line: 27
+          percent: 
+            class: c4
+            v: 100
+      summary: []
+
+metadata: 
+  title: "Branch coverage: lib/Sample/Simple/Baz.pm"
+  version: 0.05

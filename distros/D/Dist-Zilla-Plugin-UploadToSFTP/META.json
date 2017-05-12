@@ -1,0 +1,63 @@
+{
+   "abstract" : "Upload tarball to my own site",
+   "author" : [
+      "Mark Gardner <mjgardner@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-UploadToSFTP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::Releaser" : 0,
+            "English" : 0,
+            "Moose" : 0,
+            "MooseX::Has::Sugar" : 0,
+            "MooseX::Types::Moose" : 0,
+            "Net::Netrc" : 0,
+            "Net::SFTP::Foreign" : 0,
+            "Try::Tiny" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.008",
+            "strict" : 0,
+            "utf8" : 0,
+            "warnings" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-UploadToSFTP/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP.git",
+         "web" : "https://github.com/mjgardner/Dist-Zilla-Plugin-UploadToSFTP"
+      }
+   },
+   "version" : "0.002"
+}
+

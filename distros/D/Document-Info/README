@@ -1,0 +1,57 @@
+
+Welcome to a new Module!
+
+Document::Info v0.01 - Determine the file type of office documents.
+
+(Currently mainly, cough, supported: MS Excel, MS Powerpoint and MS Word.)
+
+
+DESCRIPTION
+
+The module tries to figure out the document type of Office files. It utilizes
+OLE::Storage to determine the file type of Windows documents. The module is
+in a very early state.
+
+Along with it comes the little demo application "lfile". If Document::Info
+cannot yield the documents type it simply utilizes the well known file(1).
+
+I'd enjoy your feedback about the package hierarchy "Document::Info" and 
+like especially to know if you regard the module being useful at all.
+
+
+EXAMPLE
+
+    use Document::Info;
+
+    if ( $Info=Document::Info->new($fileName) ) {;
+        # $Info constructed, that means something has been determined.
+
+        # Fetch the currently supported properties.
+        $type = $Info -> getType ( );
+        $rev  = $Info -> getRevision ( );
+        $os   = $Info -> getOS ( );
+
+        if ( $type eq $Info->cMSExcel() ) {
+           # Do something. Note: when checking a type or an operating System
+           # always use the string constants like cMSExcel().
+        }
+        if ( !$revision ) {
+            # revision not determined.
+        }
+    } else {
+        # Document type could not be determined.
+    }
+
+
+LOCATION
+
+    Document-Info-0.01.tar.gz 
+    
+    is to be found at your favorite CPAN site in my directory, something:
+
+        CPAN/modules/by-author/Martin_Schwartz/
+
+    or at:
+
+        http://www.cs.tu-berlin.de/~schwartz/perl/
+

@@ -1,0 +1,10 @@
+Changes
+lib/Devel/Unstate.pm
+Makefile.PL
+MANIFEST			This list of files
+Unstate.xs
+README
+t/01_sassign.t
+t/02_padsv.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

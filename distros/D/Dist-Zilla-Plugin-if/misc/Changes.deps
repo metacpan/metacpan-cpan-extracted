@@ -1,0 +1,29 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002002
+ [Added / configure requires]
+ - perl 5.010
+
+ [Added / test requires]
+ - perl 5.010
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+0.002001 2014-08-29T09:56:30Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.001 → 1.003001
+
+0.002000 2014-08-28T01:45:46Z
+ [Added / runtime requires]
+ - Dist::Zilla::Role::PluginLoader::Configurable
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Role::PrereqSource
+ - MooX::Lsub

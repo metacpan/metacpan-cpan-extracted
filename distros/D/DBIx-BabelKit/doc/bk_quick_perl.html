@@ -1,0 +1,156 @@
+<html>
+<head>
+<title>BabelKit Perl API Quick Reference</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+<div align="right">
+[<a href="bk_new_php.html">PHP Handle Creation</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_new_perl.html">Perl Handle Creation</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Perl API Quick Reference</h2></center>
+
+
+<a href="bk_new_perl.html">
+<h4>BabelKit Handle Creation</h4>
+</a>
+
+<pre>
+use DBIx::BabelKit;
+
+$babelkit = new DBIx::BabelKit($dbh,
+                table     =&gt; 'bk_code',
+                getparam  =&gt; \&get_scalar,
+                getparams =&gt; \&get_list
+            ):
+</pre>
+
+
+<a href="bk_read.html#display">
+<h4>Display Methods</h4>
+</a>
+
+<pre>
+$code_desc = $babelkit-&gt;desc(   $code_set, $code_lang, $code_code);
+$Code_desc = $babelkit-&gt;ucfirst($code_set, $code_lang, $code_code);
+$Code_Desc = $babelkit-&gt;ucwords($code_set, $code_lang, $code_code);
+</pre>
+
+
+<a href="bk_read.html#data">
+<h4>Data Methods</h4>
+</a>
+
+<pre>
+$code_desc = $babelkit-&gt;render($code_set, $code_lang, $code_code);
+$code_desc = $babelkit-&gt;data(  $code_set, $code_lang, $code_code);
+$parameter = $babelkit-&gt;param( $code_set, $code_code);
+</pre>
+
+
+<a href="bk_select.html#common">
+<h4>HTML Select Common Options</h4>
+</a>
+
+<pre>
+print $babelkit-&gt;select('day', $lang,
+                        var_name =&gt; 'start_day',
+                        value    =&gt; $start_day,
+                        default  =&gt; 1,
+                        subset   =&gt; [ 1, 2, 3, 4, 5 ],
+                        options  =&gt; 'onchange="submit()"'
+                        );
+</pre>
+
+
+<a href="bk_select.html#single">
+<h4>HTML Select Single Value Methods</h4>
+</a>
+
+<pre>
+$html = $babelkit-&gt;select($code_set, $code_lang,
+                          select_prompt =&gt; 'Code set description?',
+                          blank_prompt  =&gt; 'None'
+                          );
+
+$html = $babelkit-&gt;radio($code_set, $code_lang,
+                         blank_prompt =&gt; 'None'
+                         sep          =&gt; "&lt;br&gt;\n",
+                         );
+</pre>
+
+
+<a href="bk_select.html#multiple">
+<h4>HTML Select Multiple Value Methods</h4>
+</a>
+
+<pre>
+$html = $babelkit-&gt;multiple($code_set, $code_lang,
+                            size =&gt; 10
+                            );
+
+$html = $babelkit-&gt;checkbox($code_set, $code_lang,
+                            sep =&gt; "&lt;br&gt;\n"
+                            );
+</pre>
+
+
+<a href="bk_set.html">
+<h4>Code Set Methods</h4>
+</a>
+
+<pre>
+$rows = $babelkit-&gt;lang_set($code_set, $code_lang);
+$rows = $babelkit-&gt;full_set($code_set, $code_lang);
+</pre>
+
+<a href="bk_update.html">
+<h4>Code Table Update Methods</h4>
+</a>
+
+<pre>
+$babelkit-&gt;slave($code_set, $code_code, $code_desc);
+
+$babelkit-&gt;remove($code_set, $code_code);
+
+( $code_desc, $code_order, $code_flag ) =
+    $babelkit-&gt;get($code_set, $code_lang, $code_code);
+
+$babelkit-&gt;put($code_set,  $code_lang,  $code_code,
+               $code_desc, $code_order, $code_flag);
+</pre>
+
+
+<p>
+<div align="right">
+[<a href="bk_new_php.html">PHP Handle Creation</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_new_perl.html">Perl Handle Creation</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

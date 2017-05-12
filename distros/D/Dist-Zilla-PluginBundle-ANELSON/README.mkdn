@@ -1,0 +1,59 @@
+# NAME
+
+Dist::Zilla::PluginBundle::ANELSON - Dist::Zilla plugins for anelson
+
+# VERSION
+
+version 0.01
+
+# DESCRIPTION
+
+This is the plugin bundle that ANELSON uses.  It's equivalent to:
+
+    [@Basic]
+
+    [Git::NextVersion]
+    first_version   = 0.01
+    version_regexp  = ^(\d+\.\d+)$
+
+    [ReadmeMarkdownFromPod]
+
+    [PkgVersion]
+
+    [AutoPrereqs]
+
+    [NextRelease]
+    format          = %v %{MMM d yyyy}d
+
+    [SynopsisTests]
+
+    [PodSyntaxTests]
+
+    [MetaJSON]
+
+    [GithubMeta]
+    issues = 1
+
+    [CopyFilesFromBuild]
+    copy            = README.mkdn
+
+    [PruneFiles]
+    filenames       = dist.ini
+
+    [Git::Commit]
+
+    [Git::Tag]
+    tag_format      = %v
+
+    [PodWeaver]
+
+# AUTHOR
+
+Andrew Nelson <anelson@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Andrew Nelson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,20 @@
+Revision history for Data-Validate-XSD
+
+0.01    2006-02-02
+        First version, not released.
+1.00    2006-07-13
+        Second version, modularised from Rair
+1.01    2006-11-07
+        Moved file loading into it's own part
+1.02    2007-09-04
+        Got arround to prepping it for cpan
+1.03    2007-09-20
+        Added date/time checking and custom methods
+1.04    2007-11-29
+        Fixed Makefile dependancy, make test now works
+1.05	2008-02-14
+		Added a much more robust test suite
+		Added ability to get data from files, perl
+		Added parser for getting xml data
+		Added definitions parser for getting xsd data
+		Fixed many bugs with debug messages and errors

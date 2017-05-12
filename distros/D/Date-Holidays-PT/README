@@ -1,0 +1,122 @@
+Date::Holidays::PT version 0.02
+===============================
+
+=head1 NAME
+
+Date::Holidays::PT - Determine Portuguese public holidays
+
+=head1 SYNOPSIS
+
+  use Date::Holidays::PT;
+  my ($year, $month, $day) = (localtime)[ 5, 4, 3 ];
+  $year  += 1900;
+  $month += 1;
+  print "Woohoo" if is_pt_holiday( $year, $month, $day );
+
+  my $h = pt_holidays($year);
+  printf "Jan. 1st is named '%s'\n", $h->{'0101'};
+
+=head1 FUNCTIONS
+
+=head2 new
+
+Creates a new Date::Holidays::PT object.
+
+  my $mh = Date::Holidays::PT->new();
+
+=head2 is_holiday
+
+Should at least take three arguments:
+
+year  (four digits)
+month (between 1-12)
+day   (between 1-31)
+
+The return value from is_holiday is either a 1 or a 0 (1 if the
+specified date is a holiday, 0 otherwise).
+
+  if ( $mh->is_holiday( $year, $month, $day ) ) {
+    # it's a holiday
+  }
+
+=head2 is_pt_holiday
+
+Similar to is_holiday, but instead of returning 1 if the date is a
+holiday returns a string comprising the name of the holidays. In the
+event of two or more holidays on the same day (hey, it happens), the
+string will comprise the name of all those holidays separated by a
+semicolon.
+
+  my $todays_holiday = $mh->is_pt_holiday( $year, $month, $day );
+  if ( $todays_holiday ) {
+    print "Today is $todays_holiday.\nDon't bother getting up!\n";
+  }
+
+=head2 holidays
+
+Should take at least one argument:
+
+year  (four digits)
+
+Returns a reference to a hash, where the keys are date represented as
+four digits, the two first representing month (01-12) and the last two
+representing day (01-31).
+
+The value for the key in question is the local name for the holiday
+indicated by the day. In the event of two or more holidays on the same
+day (yes, it happens!), the values will comprise the name of all those
+holidays separated by a semicolon.
+
+  my $years_holidays = holidays( $year );
+  for (keys %$years_holidays) {
+    my ($day, $month) = /(..)(..)/;
+    print "$day/$month - $years_holidays->$_\n";
+  }
+
+=head1 NATIONAL HOLIDAYS
+
+The following Portuguese holidays have fixed dates:
+
+    Jan   1    Ano Novo
+    Apr  25    Dia da Liberdade
+    May   1    Dia do Trabalhador
+    Jun  10    Dia de Portugal, de Camões e das Comunidades
+    Aug  15    Assunção da Virgem
+    Oct   5    Dia da Implantação da República
+    Nov   1    Dia de Todos-os-Santos
+    Dec   1    Dia da Restauração da Independência
+    Dec   8    Imaculada Conceição
+    Dec  25    Natal
+
+The following Portuguese holidays have mobile dates:
+
+    Entrudo (47 days before Páscoa / Easter)
+    Sexta-feira Santa (Friday before Páscoa / Easter)
+    Páscoa (Easter)
+    Corpo de Deus (60 days after Páscoa / Easter)
+
+=head1 ACKNOWLEDGEMENTS
+
+Paulo Rocha, for all his knowledge about holidays and everything else.
+
+Jonas B. Nielsen, for his work regarding the standardization of
+Date::Holidays modules.
+
+=head1 AUTHOR
+
+Jose Castro, C<< <cog@cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to
+C<bug-date-holidays-pt@rt.cpan.org>, or through the web interface at
+L<http://rt.cpan.org>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2004 Jose Castro, All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+

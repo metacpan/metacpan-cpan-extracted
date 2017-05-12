@@ -1,0 +1,89 @@
+{
+   "abstract" : "helper functions for creating Dancer2 AppRole plugins",
+   "author" : [
+      "Christian Walde <walde.christian@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unrestricted"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-AppRole-Helper",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Exporter" : "0",
+            "parent" : "0",
+            "perl" : "5.006",
+            "strictures" : "2"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Test::InDistDir" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::AppRole::Helper" : {
+         "file" : "lib/Dancer2/Plugin/AppRole/Helper.pm",
+         "version" : "1.152121"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dancer2-plugin-approle-helper at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer2-Plugin-AppRole-Helper"
+      },
+      "homepage" : "https://github.com/wchristian/Dancer2-Plugin-AppRole-Helper",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/wchristian/Dancer2-Plugin-AppRole-Helper.git",
+         "web" : "https://github.com/wchristian/Dancer2-Plugin-AppRole-Helper"
+      }
+   },
+   "version" : "1.152121"
+}
+

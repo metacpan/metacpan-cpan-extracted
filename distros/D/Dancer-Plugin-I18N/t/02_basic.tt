@@ -1,0 +1,58 @@
+use strict;
+use warnings;
+
+use Test::More tests => 5;
+
+use HTTP::Request;
+use LWP::UserAgent;
+use Plack::Loader;
+use t::lib::TestApp;
+use Dancer ':syntax';
+use Dancer::Test;
+
+use Test::TCP;
+
+set template => "template_toolkit";
+set plugins => { 
+    I18N => { 
+		directory => path('t', 'lib', 'I18N'),
+		func=> ["N_", "_"],
+		setlocale=> "LC_TIME",
+    } 
+};
+
+my $app = sub {
+    my $env     = shift;
+    my $request = Dancer::Request->new(env => $env);
+    Dancer->dance($request);
+};
+
+Test::TCP::test_tcp(
+    client => sub {
+        my $port = shift;
+        my $req = HTTP::Request->new( GET => "http://127.0.0.1:$port/" );
+        $req->header( 'Accept-Language' => 'fr' );
+        my $ua  = LWP::UserAgent->new;
+        my $res = $ua->request($req);
+		print STDERR $res->content . "\n";
+        like $res->content, qr/string is bonjour/, 'french content';
+        like $res->content, qr/first we got hallo/,'german content';
+        like $res->content, qr/Germany Monday - Montag/,'german test locale';
+        like $res->content, qr/then we have ahoj/, 'czech content';
+        like $res->content, qr/Czech saturday - Sobota/, 'czech test locale';
+
+    },
+    server => sub {
+        my $port = shift;
+
+        use Dancer;
+        use File::Spec;
+        use lib File::Spec->catdir( 't', 'lib' );
+        use TestApp;
+        Dancer::Config->load;
+        set( port         => $port,
+             startup_info => 0 );
+        Dancer->dance();
+    }
+);
+

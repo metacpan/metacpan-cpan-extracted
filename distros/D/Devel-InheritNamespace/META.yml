@@ -1,0 +1,41 @@
+---
+abstract: 'Inherit An Entire Namespace'
+author:
+  - 'Daisuke Maki C<< <daisuke@endeworks.jp> >>'
+build_requires:
+  ExtUtils::MakeMaker: '6.36'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.2.0, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-InheritNamespace
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::InheritNamespace:
+    file: lib/Devel/InheritNamespace.pm
+    version: '0.00003'
+requires:
+  Class::Load: '0'
+  Module::Pluggable: '0'
+  Moose: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/lestrrat/Devel-InheritNamespace/issues
+  homepage: https://github.com/lestrrat/Devel-InheritNamespace
+  repository: git://github.com/lestrrat/Devel-InheritNamespace.git
+version: '0.00003'
+x_contributors:
+  - 'Daisuke Maki <lestrrat+github@gmail.com>'

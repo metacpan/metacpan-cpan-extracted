@@ -1,0 +1,22 @@
+[%- # '<=prev | up | next=>' chapters navigation bar
+   # expects to be set 
+   # nav          - cache navigator object
+   # rel_doc_root - relative docs path
+-%]
+   <table width="100%" border="0" cellspacing="0" cellpadding="0">
+       <tr>
+           <!-- this height must be 1px more than the highest gif ns6/mac -->
+           <td width="195" nowrap height="17">
+               <table width="195" border="0" cellspacing="0" cellpadding="0">
+                   <tr>
+                       <td><small class="nbr"><br class="smallbr"></small></td>
+                   </tr>
+               </table>
+            </td>
+           <td width="1"><br></td>
+           <td align="left" nowrap>[%- INCLUDE top_link -%]</td>
+           <td width="100%"><br></td>
+           <td align="right" nowrap>[%- INCLUDE prev_next_link -%]</td>
+           <td width="1"><br></td>
+        </tr>
+    </table>

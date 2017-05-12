@@ -1,0 +1,45 @@
+Revision history for Perl extension Data-Inherited
+
+1.100860  2010-03-27 10:49:53 Europe/Vienna
+    - require NEXT.pm version 0.64
+
+1.100850  2010-03-26 00:21:49 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+1.07 Wed 2010.02.10 10:46:37 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - removed the patched NEXT.pm and its tests since NEXT 0.64 now works like
+      we want it to (with regards to stringification-overloaded hash keys)
+
+1.06  Mon Oct 20 19:16:05 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - optimized NEXT::ELSEWHERE::ancestors and
+      NEXT::ELSEWHERE::ordered_ancestors
+
+1.05  Thu, 29 May 2008 12:03:16 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+1.04  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+    - added t/perlcriticrc
+
+1.03  Mon, 10 Sep 2007 15:39:09 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - s/Salaryman/Employee/g
+
+1.02  Sun, 09 Sep 2007 22:15:47 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed t/01_defaults.t
+
+1.01  Sat, 08 Sep 2007 14:11:38 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - changed to new-style distribution (ShipIt, Module::Install)
+    - fixed documentation and test file locations
+
+1.00  Wed, 19 Oct 2005 15:14:17 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

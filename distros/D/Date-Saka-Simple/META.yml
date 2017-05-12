@@ -1,0 +1,36 @@
+---
+abstract: 'Represents Saka date.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Saka-Simple
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Date::Saka::Simple:
+    file: lib/Date/Saka/Simple.pm
+    version: '0.18'
+requires:
+  Date::Calc: '5.7'
+  Date::Exception: '0.03'
+  Date::Utils: '0.22'
+  List::Util: '1.41'
+  Moo: '2.000000'
+  Time::localtime: '1.02'
+  namespace::clean: '0.24'
+  perl: '5.006'
+resources:
+  repository: https://github.com/manwar/Date-Saka-Simple.git
+version: '0.18'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

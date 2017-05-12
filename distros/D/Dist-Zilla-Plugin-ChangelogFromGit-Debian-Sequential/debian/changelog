@@ -1,0 +1,37 @@
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.6) saucy; urgency=low
+
+  * Fixed release with empty changes
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Thu, 16 Jan 2014 20:02:44 +0400
+
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.5) saucy; urgency=low
+
+  * Fixed empty changelog
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Tue, 12 Nov 2013 15:17:03 +0400
+
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.4) raring; urgency=low
+
+  * Fixed version compares
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Mon, 16 Sep 2013 15:03:18 +0400
+
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.3-1) raring; urgency=low
+
+  *  Fixed to many process
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Fri, 06 Sep 2013 14:48:10 +0400
+
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.2-1) raring; urgency=low
+
+  * Added ignoring merges
+
+  * Fixed bug with duplicate gathered files
+ 
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 25 Aug 2013 19:29:39 +0400
+
+libdist-zilla-plugin-changelogfromgit-debian-sequential-perl (0.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Sergei Svistunov <sergei-svistunov@yandex.ru>  Sun, 9 Jun 2013 20:36:23 +0400

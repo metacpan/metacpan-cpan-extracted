@@ -1,0 +1,45 @@
+Changelog for Data-Seek
+
+0.09 2015-10-11T05:29:14
+ - Updated build.
+ - Refactored to use Data::Object 0.57
+
+0.08 2015-07-31T00:59:47
+ - v0.08
+ - Updated build.
+ - Fixed miscellaneous typos.
+
+0.07 2015-07-31T00:36:39
+ - v0.07
+ - Updated build.
+ - Completely refactored.
+ - Updated .gitignore.
+
+0.06 2015-04-01T02:32:23
+ - v0.06
+ - Migrated from Mo OO to Data::Object.
+ - Updated weaver.ini.
+ - Started benchmarking and Travis-CI testing.
+
+0.05 2014-08-12T11:55:23
+ - v0.05
+ - Added caching functionality.
+
+0.04 2014-08-11T15:22:00
+ - v0.04
+ - Fixed exception base class throw_subclass issue on Perl 5.18+
+
+0.03 2014-08-09T18:19:10
+ - v0.03
+ - Fixed miscellaneous typos.
+
+0.02 2014-08-09T18:09:36
+ - v0.02
+ - Added documentation.
+ - Added exception tests in t/data/seek.t
+
+0.01 2014-08-08T23:33:09
+ - v0.01
+ - Fixed t/data/seek/exception.t
+ - Miscellaneous refactoring,
+ - Initial commit.

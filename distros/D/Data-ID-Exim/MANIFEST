@@ -1,0 +1,16 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Data/ID/Exim.pm
+t/base62.t
+t/id.t
+t/pod_cvg.t
+t/pod_syn.t
+t/read.t
+t/time.t
+SIGNATURE    Added here by Module::Build

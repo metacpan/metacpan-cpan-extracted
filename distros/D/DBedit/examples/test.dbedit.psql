@@ -1,0 +1,4 @@
+create table test_dbedit (
+item1 int4,
+item2 text
+);

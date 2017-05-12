@@ -1,0 +1,25 @@
+TODO for DBIx::Threaded:
+
+Test w/ more (many more!) DBDs
+
+Test array binding methods
+
+Test driver-specific functions
+
+Test chained DBI subclasses
+
+Support install_method() in client stub
+
+Better trace() support
+
+Optimize marshal/unmarshal buffers for common
+cases (ie, each client stmt stub creates a 
+local shared row buffer and passes it to
+the server side to be filled)
+
+Finish more_results() support
+
+Build helper classes for true async i/f to DBDs that support such
+
+Figure out how to get this working w/ Apache::DBI
+

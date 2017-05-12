@@ -1,0 +1,31 @@
+---
+abstract: 'Update batches of DBIC rows with as few queries as possible'
+author:
+  - 'Johan Lindstrom <johanl@cpan.org>'
+build_requires:
+  Test::Differences: '0'
+  Test::Exception: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-BatchUpdate
+requires:
+  Carp: '0'
+  DBIx::Class: '0'
+  Moo: '0'
+  Storable: '0'
+  autobox::Core: '0'
+  base: '0'
+  strict: '0'
+  'true': '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/jplindstrom/p5-DBIx-Class-BatchUpdate/issues
+version: '1.004'

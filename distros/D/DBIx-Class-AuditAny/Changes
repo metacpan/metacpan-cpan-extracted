@@ -1,0 +1,27 @@
+Revision history for DBIx::Class::AuditAny
+
+0.200100 2017-03-17
+    - Allow multi-col-pk tables to be audited (PR #3) (JROBINSON,TBSLIVER)
+
+0.200004 2017-01-14
+    - Fix driver determination bug (PR #1) (RIBASUSHI)
+
+0.200003 2016-10-16
+    - Old 'init_sources' methods working again
+
+0.200002 2016-10-14
+    - Fix bug throwing exception in CodeRef rel conditions
+    - Coerce new/old values to string in column changes (bugfix)
+
+0.200001 2016-10-12
+    - Env variable DBIX_CLASS_AUDITANY_SKIP can be set to temp
+      turn off tracking (not officially supported/documented)
+
+0.200000 2015-05-09
+    - First CPAN release
+
+0.1 2013-03-02
+    - Initial stand-alone release (GitHub only)
+
+0.0 2012-12-08
+    - Initial development (within the RapidApp codebase)

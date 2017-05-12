@@ -1,0 +1,26 @@
+Revision history for Dist-Zilla-PluginBundle-Author-YAKEX
+
+v0.1.5    2014-05-03 15:38:57JST+0900 Asia/Tokyo
+    - Disable build_prereq_matches_use in Test::Kwalitee::Extra again.
+
+v0.1.4    2013-11-17 23:56:08 Asia/Tokyo
+    - Require Module::CPANTS::Analyse 0.92 (close gh-5).
+
+v0.1.3    2013-11-17 23:22:43 Asia/Tokyo
+    - Require Module::ExtractUse 0.32 (close gh-5).
+
+v0.1.2    2013-11-17 13:11:13 Asia/Tokyo
+    - Add prereqs for POD related modules (close gh-4).
+
+v0.1.1    2013-09-26 16:27:26 Asia/Tokyo
+    - Update the version of DZP::Test::Compile and related modules to avoid possible Win32 hangs.
+
+v0.1.0    2013-09-10 02:19:14 Asia/Tokyo
+    - Specify some plugin versions explicitly (close gh-2).
+    - Enable build_prereq_matches_use in Test::Kwalitee::Extra (close gh-3).
+
+v0.0.2    2013-08-05 07:15:56 Asia/Tokyo
+    - Add a minting profile (gh-1).
+
+v0.0.1    2013-08-03 00:02:49 Asia/Tokyo
+    - Initial release.

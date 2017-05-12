@@ -1,0 +1,50 @@
+{
+   "abstract" : "An Autobox Implementation for Perl 5",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Object-Autobox",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object" : "0.53",
+            "autobox" : "2.82",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Data-Object-Autobox/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Data-Object-Autobox/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Data-Object-Autobox.git",
+         "web" : "https://github.com/alnewkirk/Data-Object-Autobox"
+      }
+   },
+   "version" : "0.14",
+   "x_authority" : "cpan:AWNCORP"
+}
+

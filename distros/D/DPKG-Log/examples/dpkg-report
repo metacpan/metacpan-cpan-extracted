@@ -1,0 +1,238 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use File::Basename;
+use Sys::Hostname;
+use Template;
+use DPKG::Log::Analyse;
+use Params::Validate;
+use Data::Dumper;
+use List::MoreUtils qw(uniq all);
+use DateTime;
+
+# Initialize defaults
+my $hostname = hostname;
+my @logfiles;
+my $template_file = 'dpkg-report.tt2';
+my @template_dirs = (dirname($0), '.', '/etc/dpkg-report/templates' );
+my $merge = 0;
+my $overall_packages;
+my $common_data = { };
+my $data_g = {};
+my @keys = qw(  newly_installed_packages upgraded_packages removed_packages
+                halfinstalled_packages halfconfigured_packages installed_and_removed_packages );
+
+# Time range options
+my $today = 0;
+my $last_two_days = 0;
+my $last_week = 0;
+my $last_month = 0;
+
+GetOptions(
+    "hostname=s" => \$hostname,
+    "log-file=s" => \@logfiles,
+    "template-file=s" => \$template_file,
+    "template-path=s" => \@template_dirs,
+    "merge" => \$merge,
+    "today" => \$today,
+    "last-two-days" => \$last_two_days,
+    "last-week" => \$last_week,
+    "last-month" => \$last_month,
+);
+
+if (not @logfiles) {
+    @logfiles = ('/var/log/dpkg.log');
+}
+
+sub calculate_start_and_endtimes {
+    my $from;
+    my $to;
+    if ($today) {
+        $from = DateTime->now->truncate(to => 'day');
+    } elsif ($last_two_days) {
+        $from = DateTime->now->truncate(to => 'day')->subtract(days => 1);
+    } elsif ($last_week) {
+        $from = DateTime->now->truncate(to => 'day')->subtract(weeks => 1);
+    } elsif ($last_month) {
+        $from = DateTime->now->truncate(to => 'day')->subtract (months => 1);
+    }
+    $to = DateTime->now->truncate(to => 'day')->add( days => 1 )->subtract(seconds => 1);
+
+    return ($from, $to);
+}
+
+sub gather_data {
+    my %params = validate( @_,
+        {
+            logfile => { default => $logfiles[0] },
+            hostname => { default => $hostname }
+        }
+    );
+
+    # Guess right hostname from file name if logfile matches *.dpkg.log
+    if (basename($params{'logfile'}) =~ /(.*).dpkg.log/) {
+        $params{'hostname'} = $1;
+    }
+
+    my $no_data = 0;
+    my ($from, $to) = calculate_start_and_endtimes;
+    my $dpkg_log = DPKG::Log->new(filename => $params{'logfile'},
+        from => $from,
+        to => $to
+    );
+    my $analyser = DPKG::Log::Analyse->new(log_handle => $dpkg_log);
+    eval {
+        $analyser->analyse;
+    };
+    if ($@) {
+        $no_data = 1;
+    }
+
+    # Get data
+    my $data = {
+        hostname => $params{'hostname'},
+        newly_installed_packages => $analyser->newly_installed_packages,
+        upgraded_packages => $analyser->upgraded_packages,
+        removed_packages => $analyser->removed_packages,
+        halfinstalled_packages => $analyser->halfinstalled_packages,
+        halfconfigured_packages => $analyser->halfconfigured_packages,
+        installed_and_removed_packages => $analyser->installed_and_removed_packages,
+        no_data => $no_data
+    };
+
+    foreach my $key (@keys) {
+        if (not $overall_packages->{$key}) {
+            $overall_packages->{$key} = [];
+        }
+        while (my ($package, $package_obj) = (each %{$data->{$key}})) {
+            push(@{$overall_packages->{$key}}, $package_obj);
+        }
+    }
+    return $data;
+}
+
+sub generate_report {
+    my %params = validate( @_,
+        {
+            template_file => { default => $template_file },
+            template_dirs =>  { default => \@template_dirs },
+            data => { default => {} },
+            no_filter => 0,
+            identifier => 1,
+        }
+    );
+    my $template = Template->new(
+        {
+            INCLUDE_PATH    => $params{'template_dirs'},
+            INTERPOLATE     => 1,
+            POST_CHOMP      => 1,
+        }
+    );
+
+
+    my $data = {
+        hostname => $params{'data'}->{hostname},
+        no_data => $params{'data'}->{no_data}
+    };
+
+    # Create simplified datastructure for template toolkit
+    foreach my $key (@keys) {
+            while (my ($package, $package_obj) = each %{$params{'data'}->{$key}}) {
+                next if $common_data->{'all'}->{$key}->{$package}
+                    and $merge
+                    and not $params{'identifier'} eq 'all';
+
+                my $common_host = $params{'data'}->{'hostname'};
+                $common_host =~ s/[0-9]+$//;
+                next if $common_data->{$common_host}->{$key}->{$package}
+                    and $merge
+                    and not $params{'identifier'} eq $common_host;
+
+                if (not $data->{$key}) {
+                    $data->{$key} = [];
+                }
+                push(@{$data->{$key}},
+                    {
+                        name => $package_obj->name,
+                        version => sprintf("%s", $package_obj->version),
+                        old_version => sprintf("%s", $package_obj->previous_version),
+                        status => $package_obj->status
+                    }
+                );
+            }
+    }
+
+    # Set no_data flag if $data has no values (this usually happens,m
+    # if all packages are in one of the common sets)
+    my $no_data = 1;
+    foreach my $key (@keys) {
+        if ($data->{$key} and scalar(@{$data->{$key}})) {
+            $no_data = 0;
+        }
+    }
+
+    $data->{no_data} = $no_data;
+    $data->{merge} = $merge;
+    $template->process($params{template_file}, $data) or die $template->error;
+
+}
+
+foreach my $logfile (@logfiles) {
+    my $data;
+    if (-d $logfile) {
+        map {  $data = gather_data(logfile => $_); $data_g->{$data->{hostname}} = $data } glob($logfile."/*");
+    } else {
+        $data = gather_data(logfile => $logfile); $data_g->{$data->{hostname}} = $data;
+    }
+}
+
+if ($merge) {
+    foreach my $key (@keys) {
+        foreach my $pkg (@{$overall_packages->{$key}}) {
+            my $name = $pkg->name;
+            if (all { $data_g->{$_}->{$key}->{$name} 
+                        and $data_g->{$_}->{$key}->{$name} == $pkg }  (keys %{$data_g})) {
+                                # Package is common to all logfiles
+                                $common_data->{'all'}->{$key}->{$name} = $pkg;
+                            }
+        }
+    }
+    $common_data->{'all'}->{hostname} = 'all';
+
+    # Find common package subsets for "grouped hostnames"
+    my @common_hostnames;
+    foreach my $host (keys %{$data_g}) {
+        if ($host =~ /[0-9]+$/) {
+            $host =~ s/[0-9]+$//;
+            push(@common_hostnames, $host) if not grep(/^$host$/, @common_hostnames);
+        }
+    }
+
+    foreach my $key (@keys) {
+        foreach my $pkg (@{$overall_packages->{$key}}) {
+            my $name = $pkg->name;
+            foreach my $common_host (@common_hostnames) {
+                my @matching_hosts = grep(/^$common_host/, (keys %{$data_g}));
+                if (all { $data_g->{$_}->{$key}->{$name} and $data_g->{$_}->{$key}->{$name} == $pkg }
+                    @matching_hosts) {
+                    $common_data->{$common_host}->{$key}->{$name} = $pkg;
+                }
+                $common_data->{$common_host}->{hostname} = $common_host . "*";
+            }
+        }
+    }
+    # Print report for 'all' systems first
+    foreach my $common_data_identifier (sort keys %{$common_data}) {
+        generate_report(data => $common_data->{$common_data_identifier}, 
+            identifier => $common_data_identifier
+        );
+    }
+}
+
+foreach my $hostname(sort keys %{$data_g}) {
+    my $data = $data_g->{$hostname};
+    generate_report(data => $data, identifier => $hostname);
+}

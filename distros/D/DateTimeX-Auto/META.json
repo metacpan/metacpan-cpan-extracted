@@ -1,0 +1,88 @@
+{
+   "abstract" : "use DateTime without needing to call constructors",
+   "author" : [
+      "Toby Inkster <tobyink@cpan.org>",
+      "TOBYINK <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.016, CPAN::Meta::Converter version 2.140640",
+   "keywords" : [
+      "Date",
+      "DateTime",
+      "DateTimeX",
+      "Perl",
+      "Time",
+      "constant",
+      "overload"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTimeX-Auto",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::Strptime" : "0",
+            "Exporter::Shiny" : "0",
+            "UNIVERSAL::ref" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.61"
+         }
+      }
+   },
+   "provides" : {
+      "DateTimeX::Auto" : {
+         "file" : "lib/DateTimeX/Auto.pm",
+         "version" : "0.008"
+      },
+      "DateTimeX::Auto::DateTime" : {
+         "file" : "lib/DateTimeX/Auto.pm",
+         "version" : "0.008"
+      },
+      "DateTimeX::Auto::Duration" : {
+         "file" : "lib/DateTimeX/Auto.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/DateTimeX-Auto/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=DateTimeX-Auto"
+      },
+      "homepage" : "https://metacpan.org/release/DateTimeX-Auto",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/tobyink/p5-datetimex-auto.git",
+         "web" : "https://github.com/tobyink/p5-datetimex-auto"
+      }
+   },
+   "version" : "0.008"
+}

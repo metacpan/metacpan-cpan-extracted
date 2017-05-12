@@ -1,0 +1,53 @@
+---
+abstract: 'Diamond'
+author:
+  - 'Simon James Odell <simonjamesodell@live.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Diamond
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  CGI::Compile: 0.12
+  CGI::Emulate::PSGI: 0.10
+  CGI::PSGI: 0.11
+  Catalyst::Engine::PSGI: 0.11
+  Corona: 0.1004
+  Devel::StackTrace::WithLexicals: 0.06
+  FCGI: 0.71
+  FCGI::Client: 0.04
+  FCGI::ProcManager: 0.19
+  Flea: 0.02
+  HTTP::Server::Simple::PSGI: 0.14
+  IO::Handle::Util: 0.01
+  Net::FastCGI: 0.12
+  PSGI: 1.03
+  Plack: 0.9945
+  Plack::App::Proxy: 0.15
+  Plack::Handler::AnyEvent::ReverseHTTP: 0.04
+  Plack::Middleware::Auth::Digest: 0.03
+  Plack::Middleware::ConsoleLogger: 0.02
+  Plack::Middleware::Debug: 0.09
+  Plack::Middleware::Deflater: 0.03
+  Plack::Middleware::Header: 0.03
+  Plack::Middleware::ReverseProxy: 0.06
+  Plack::Middleware::Session: 0.12
+  Starlet: 0.10
+  Starman: 0.2006
+  Twiggy: 0.1006
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/DiamondML/Diamond.git
+version: 0.25

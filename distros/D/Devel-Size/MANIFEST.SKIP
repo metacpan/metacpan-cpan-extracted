@@ -1,0 +1,17 @@
+# This file defines regluar expressions that, when matching a file,
+# prevent this file to be added to the MANIFEST during a
+#
+#  make manifest
+#
+# command.
+#
+^Devel-Size.*\.tar\.gz
+^Makefile.old
+^Makefile\z
+^pm_to_blib
+^MANIFEST.(bak|old)
+^Size.(c|o|bs)
+^blib.*
+tmon.out
+\.txt\z
+^\.git

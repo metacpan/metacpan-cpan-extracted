@@ -1,0 +1,72 @@
+#
+#     Example script for DateTime::Calendar::FrenchRevolutionary:
+#     Bistandard clock : Gregorian with 24x60x60 time,
+#                        French Revolutionary with 10x100x100 time.
+#
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016 Jean Forget. All rights reserved.
+#
+#     This program is distributed under the same terms as Perl 5.16.3:
+#     GNU Public License version 1 or later and Perl Artistic License
+#
+#     You can find the text of the licenses in the F<LICENSE> file or at
+#     L<http://www.perlfoundation.org/artistic_license_1_0>
+#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#
+#     Here is the summary of GPL:
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 1, or (at your option)
+#     any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software Foundation,
+#     Inc., <http://www.fsf.org/>.
+#
+
+use strict;
+use warnings;
+use DateTime::Calendar::FrenchRevolutionary;
+use Tk;
+use Tk::Font;
+my $greg;
+my $sexagesimal;
+my $revolutionary;
+my $decimal;
+my $p = MainWindow->new();
+$p->title('Clock');
+
+my $height =  1;
+my $width  = 15;
+my $font   = '-*-helvetica-bold-r-*-*-*-120-*-*-*-*-*-*';
+
+my $l1 = $p->Label(-textvariable => \$greg, -width => $width, -height => $height);
+$l1->configure(-font => $font);
+$l1->pack;
+my $l2 = $p->Label(-textvariable => \$sexagesimal, -width => $width, -height => $height);
+$l2->configure(-font => $font);
+$l2->pack;
+my $l3 = $p->Label(-textvariable => \$revolutionary, -width => $width, -height => $height);
+$l3->configure(-font => $font);
+$l3->pack;
+my $l4 = $p->Label(-textvariable => \$decimal, -width => $width, -height => $height);
+$l4->configure(-font => $font);
+$l4->pack;
+$l4->repeat(864, \&majlabel); # every decimal second
+
+$p->Button(-text => "End", -command => sub { exit })->pack;
+MainLoop;
+
+sub majlabel {
+  my $dg = DateTime::->now;
+  my $dr = DateTime::Calendar::FrenchRevolutionary->from_object(object => $dg);
+  $greg          = $dg->strftime("%a %d %b %Y");
+  $sexagesimal   = $dg->strftime("%H:%M:%S");
+  $revolutionary = $dr->strftime("%a %d %b %Y");
+  $decimal       = $dr->strftime("%H:%M:%S");
+}

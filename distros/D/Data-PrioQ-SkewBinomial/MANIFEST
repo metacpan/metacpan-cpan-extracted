@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+README
+lib/Data/PrioQ/SkewBinomial.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/functionality.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,26 @@
+---
+abstract: 'automatically retry DBI connect() with exponential backoff'
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires:
+  Test::Compile: v1.1.0
+  Test::More: '0.98'
+  Test::Most: '0'
+  Test::Pod: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.022, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-RetryConnect
+requires:
+  DBI: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/timbunce/DBIx-RetryConnect/issues
+  homepage: https://github.com/timbunce/DBIx-RetryConnect
+  repository: https://github.com/timbunce/DBIx-RetryConnect.git
+version: '0.002002'

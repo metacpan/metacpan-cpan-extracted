@@ -1,0 +1,56 @@
+=pod
+
+=begin html
+
+<a href="https://travis-ci.org/ivanwills/Data-Context"><img src="https://travis-ci.org/ivanwills/Data-Context.png" alt="Data-Context"></a>
+
+=head1 Data-Context
+
+Data-Context provides a way for configuration files to be stored hireachly
+in file system paths. It also allows for the content of those configuration
+files to be changed dynamically at runtime.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Context
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Context
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Context
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Context
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Context/
+
+    Source Code
+        git://github.com/ivanwills/Data-Context.git
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2012-2014 Ivan Wills
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut

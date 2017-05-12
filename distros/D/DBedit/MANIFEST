@@ -1,0 +1,16 @@
+Changes
+examples/test.dbedit.cgi
+examples/test.dbedit.dbi.html
+examples/test.dbedit.html
+examples/test.dbedit.psql
+lib/DBedit.pm
+lib/DBfilelock.pm
+lib/DBstorage.pm
+lib/DBstorage/DBI.pm
+lib/DBstorage/RDB.pm
+Makefile.PL
+MANIFEST
+README
+t/dbstorage_rdb.t
+t/dbstorage_dbi.t
+

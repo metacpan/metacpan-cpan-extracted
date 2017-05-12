@@ -1,0 +1,83 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 842745cb706f8f2126506f544492f7a80dbe29b3 COPYING
+SHA1 2c63248c1e1bdf8280df9ad4bbffed675f4a123e Changes
+SHA1 fa4472c908218514d6f954298030e26c28098ca3 MANIFEST
+SHA1 d73f6910c2283dca6aa23a5d820950745dcb76f6 MANIFEST.SKIP
+SHA1 a93caa8361fb34715f2358681881d1d3733b1cf9 META.json
+SHA1 11955b9db657eeaaf3a270d71129a0946cb9fe16 META.yml
+SHA1 27cea570d99c6702e73eacad2d3249aa03541ba6 Makefile.PL
+SHA1 c9ed97db886d05462e41bd522378e9052eb5c1f9 Mallinfo.xs
+SHA1 4f203daee980e17f9beaed6ad828198c140e14e0 README
+SHA1 557989935800817edb7168cd593fff6ff33736c5 config.pl
+SHA1 748caec0669f260b055ee52d4ca6c0e9a988a9b0 debian/changelog
+SHA1 ac3478d69a3c81fa62e60f5c3696165a4e5e6ac4 debian/compat
+SHA1 c94a578133cbd1f8868224de428e40d3a14ba03d debian/control
+SHA1 2f8f7a7f68eec1629ef5c95a06160b2ff56eaa82 debian/copyright
+SHA1 6f14284ecb0afe6089f4202b97fffbf8913c63c7 debian/rules
+SHA1 61652cd1568dcf2614df833eba241755eee34e89 debian/source/format
+SHA1 52e25f4c1a84ae334451211a7ac407f607a7769e debian/watch
+SHA1 dd126f863a472a3a01192d784230588ab315a86b devel/Makefile
+SHA1 428b3208a020d7fe9d32acf76f3589bac91f918f devel/hblk.c
+SHA1 8d3eb951d4a4cef842c4458c6c457d93306cf26a devel/info-string.pl
+SHA1 79f25112cfb5443732ad883a512efe597fbb527b devel/mallopt.c
+SHA1 32dd3c7de251cc15ff60caa65c35222f55c6c588 devel/mallstats.c
+SHA1 e62bcf57ac86188201a29c2aca41472ee475995e devel/malltrim.c
+SHA1 853637c0483504bdec15b82b0a86a5601caace61 devel/mstat.pl
+SHA1 e58b5365024e024868abce6f02e99c97db9dbad6 devel/old-run.pl
+SHA1 86777a577ca0c73cb112053ee9af9be5a93a4bef devel/run.pl
+SHA1 7e73d237ac8b15150ad5bc269c39c6742f9056aa devel/taint.pl
+SHA1 be42b32283a2d9890151aa08079c0557898848ff devel/weaken.pl
+SHA1 2c7a12ac0c0c4395856cf80b7b3b3bded065578e examples/mallinfo.pl
+SHA1 1d4b7fe1b44cacb30cb1911cff9857aaef0314c7 examples/malloc-info-string.pl
+SHA1 8e1c998d790ffd29f1c011eaaa512e3235a13172 examples/malloc-info.pl
+SHA1 68570681efee34021bb4745fd7df3591a9077f73 examples/malloc-stats.pl
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b inc/my_pod2html
+SHA1 199b42f4ecbb47bed321625a04f414c1385a684c lib/Devel/Mallinfo.pm
+SHA1 e2965242503050c505bb13de53735a4f2cc8b06a ppport.h
+SHA1 3855de075da37f5bc4e6a5534b2f00cc14872a98 t/MyTestHelpers.pm
+SHA1 1d0f7cbad139fd3fa09c100e01c705facf7c8756 t/MyWithoutGNU.pm
+SHA1 6babad57c36d572701fa35341ba5b64c8ef3cc69 t/import-all.t
+SHA1 6cd5382f409f5c3ef495e58b893cc482b91385f9 t/import.t
+SHA1 d9ed8a2bb87765ac481afd9da12ef017d4103d64 t/load.t
+SHA1 95955d9de562c1a3971aab86239098fca751cef6 t/malloc-info-string-taint.t
+SHA1 14972152c9323bc01e836eb73196005ff365b6d8 t/malloc-info-string.t
+SHA1 6a5ef0e5d08bb20afea2449e012deee77ba01da3 t/malloc-info.t
+SHA1 54b666741d9581476263ccc0d6c4a6ef8b5e4b6e t/malloc-stats.t
+SHA1 c4b815409f74158711b36778b8f9ccfe405b78ff t/malloc-trim.t
+SHA1 1c06340cbd4cee6f2d13f283e6a37ab405163bcd t/noimport.t
+SHA1 c39acf118ab5e6dd599ef8a61fb2ad080906b31d t/test-weaken.t
+SHA1 f2ceb7bb4bf68bd24728b90918e63d251fd06183 xt/0-META-read.t
+SHA1 c9e7a47e1f397eb5f46d7e4ef21754d9df76e36e xt/0-Test-ConsistentVersion.t
+SHA1 d9e7f38a8dcfdb76c56951e4214be8eeda2e2289 xt/0-Test-DistManifest.t
+SHA1 9496e4a2a2734c7093ab6961900dd7a55800976e xt/0-Test-Pod.t
+SHA1 083242d959c1a9242c874982e4585872a95bec93 xt/0-Test-Synopsis.t
+SHA1 63abbc3297914cd38081e95588fd794f9d1f0306 xt/0-Test-YAML-Meta.t
+SHA1 1cafa4e23b7a691e09161c0927e6920dd663e2ce xt/0-examples-xrefs.t
+SHA1 7bc810750906ae91a13b16c7bd833dd6e1c9741b xt/0-file-is-part-of.t
+SHA1 aeb6f41dfae96d04459448f6c3e3dee44691e722 xt/0-no-debug-left-on.t
+SHA1 92f32aa7a6bba4fe0ce6dc07a9c2581b67070232 xtools/my-check-copyright-years.sh
+SHA1 b12199bcc70c569ff43f8d8e2ea1c896f587c62f xtools/my-check-spelling.sh
+SHA1 fa07c8e559adbd1af5ba613e021991b0819fc7ba xtools/my-deb.sh
+SHA1 2c31f38013695c85f0a75eb2c783989978aa298b xtools/my_pod2html
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iD8DBQFUmmstLFMCIV9q3ToRArDfAJ93i2Ih4oES0RxZvh3VZkPogrWgggCfd80Q
+WYI+vtWTjmbBD5I+b4w5j18=
+=j/mR
+-----END PGP SIGNATURE-----

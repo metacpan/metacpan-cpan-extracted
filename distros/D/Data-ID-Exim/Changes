@@ -1,0 +1,87 @@
+version 0.008; 2011-11-19
+
+  * avoid latent bug of passing magic variables $1 et al into functions
+    where in the future they might unexpectedly change value
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.007; 2010-09-01
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.006; 2009-04-22
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * in documentation, refer to Win32::Guidgen rather than the non-existent
+    Win32::Genguid
+
+  * use full stricture in Build.PL
+
+version 0.005; 2007-09-26
+
+  * use "base" pragma to import Exporter behaviour
+
+  * test POD syntax and coverage, and rename an internal function to
+    satisfy the coverage test
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.004; 2007-02-05
+
+  * bugfix: make exim_mid_time() and base62() work when called in list
+    context (they used to assume that they were called in scalar context)
+
+version 0.003; 2007-02-02
+
+  * export and document functions base62() and read_base62(); these
+    functions previously existed unexported, base62() from version 0.000
+    and read_base62() from version 0.001
+
+version 0.002; 2006-05-17
+
+  * new function exim_mid_time() to construct time part of ID for an
+    arbitrary time
+
+  * more efficient and elegant base 62 conversion code
+
+  * use integer arithmetic
+
+  * put space between number and unit (SI style) in documentation
+
+version 0.001; 2004-10-19
+
+  * new function read_exim_mid() to extract information from an ID
+
+  * mention what Exim is in the documentation
+
+  * versioned dependencies in .pm
+
+  * declare module dependencies in Makefile.PL
+
+  * include Changes file
+
+version 0.000; 2004-04-02
+
+  * initial released version

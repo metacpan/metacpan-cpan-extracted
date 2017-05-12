@@ -1,0 +1,99 @@
+==================================================
+Changes from 2015-05-26 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.008 at 2016-05-25 14:33:25 +0000
+------------------------------------------
+
+  Change: 8a2188ce4e6c747b5c7313130ece225f087903f0
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2016-05-25 15:33:11 +0000
+
+    Added missing dependency for some BSD test. See
+    http://www.cpantesters.org/cpan/report/ec18cae2-f7af-11e5-84e4-6e46ff
+    cb0527 
+
+  Change: ea4f3de35cd20fa8c6cfad15a94707bf1fc5538e
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2016-01-07 12:09:32 +0000
+
+    Merge pull request #4 from stuartskelton/Update_Docs
+
+    Updated the docs and fixed some typos. Such mergin' 
+
+  Change: 8790ae8bd1b2191937b0e25c0c353d8c0a30b1f1
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2016-01-05 19:48:38 +0000
+
+    Bumped the copyright, to the current year. 
+
+  Change: eb1d64b79cc740f4f1c26f100b049325f4671566
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2016-01-05 19:45:28 +0000
+
+    Added Test::Fatal to the cpanfile, to fix some failing tests. 
+
+  Change: 8ea70e65e56facb2fb4fafed036a298532a2c1ce
+  Author: Stuart Skelton <stuarts@broadbean.com>
+  Date : 2016-01-04 17:55:15 +0000
+
+    Updated the docs and fixed some typos. 
+
+------------------------------------------
+version 0.007 at 2015-10-15 12:53:19 +0000
+------------------------------------------
+
+  Change: f27e0d9bdf0f9b3338bcb72f4d16a5cb5c8d582f
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2015-10-15 13:53:19 +0000
+
+    Merge pull request #2 from markhawkes/master
+
+    Decorated DBIx::Class::single() 
+
+  Change: 2e26a9e9e70f8e4381115836ccad8b80c6ca94c0
+  Author: mhawkes <mark.hawkes@broadbean.com>
+  Date : 2015-10-15 11:46:12 +0000
+
+    Added tests for new single() implementation 
+
+  Change: f436c2c0897bc26df9e03cbd84c00fd51cab1538
+  Author: markhawkes <github@markhawkes.com>
+  Date : 2015-10-15 11:08:20 +0000
+
+    Implemented single() 
+
+  Change: 3c36b6e8184e61ccd3c253f937874061397dcaad
+  Author: Jerome Eteve <jerome@broadbean.com>
+  Date : 2015-10-13 14:28:23 +0000
+
+    Testing the original criteria persists in fast_loop_through 
+
+------------------------------------------
+version 0.006 at 2015-07-15 14:50:18 +0000
+------------------------------------------
+
+  Change: 10cafc0f288f15c41e7fd87f046f51a528bd1a61
+  Author: Jerome Eteve <jeteve@users.noreply.github.com>
+  Date : 2015-07-15 15:50:18 +0000
+
+    Merge pull request #1 from patmooney/implement-find_or_new
+
+    implement find or new 
+
+  Change: 90385382951b9e858cfe12f1607ad1243b308b3d
+  Author: Patrick Mooney <patrick@broadbean.com>
+  Date : 2015-07-15 15:41:45 +0000
+
+    make sure we check the storage status of the correct result 
+
+  Change: 2c27422fde7300bd8ffce2dd055cfeb888b52f35
+  Author: Patrick Mooney <patrick@broadbean.com>
+  Date : 2015-07-15 15:34:37 +0000
+
+    implement find or new 
+
+================================================
+Plus 5 releases after 2015-05-26 00:00:00 +0000.
+================================================

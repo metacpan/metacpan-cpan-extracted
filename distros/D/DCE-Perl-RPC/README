@@ -1,0 +1,72 @@
+NAME
+    DCE::Perl::RPC - Perl extension for DCE RPC protocol composer/parser
+
+SYNOPSIS
+    use DCE::Perl::RPC; use constant DCOM_IREMOTEACTIVATION => pack("H32",
+    "B84A9F4D1C7DCF11861E0020AF6E7C57"); use constant DCOM_IF_VERSION =>
+    pack("V", 0); use constant DCOM_XFER_SYNTAX => pack("H32",
+    "045D888AEB1CC9119FE808002B104860"); use constant
+    DCOM_XFER_SYNTAX_VERSION => pack("V", 2);
+
+        $rpc = new DCE::Perl::RPC;
+        $bind_msg = $rpc->rpc_bind(1, DCOM_IREMOTEACTIVATION . DCOM_IF_VERSION,
+            (DCOM_XFER_SYNTAX . DCOM_XFER_SYNTAX_VERSION, $nltm_negotiate_msg);
+        $bind_resp_msg = $rpc->rpc_bind_resp($ntlm_auth_msg);
+        $request_msg = $rpc->rpc_co_request("Hi, there! This is Stub!", 1, 0x0e, DCOM_IREMOTEACTIVATION, "Authentication Credentials");
+        $alt_ctx_msg = $rpc->rpc_alt_ctx(1, DCOM_IREMOTEACTIVATION . DCOM_IF_VERSION,
+            (DCOM_XFER_SYNTAX . DCOM_XFER_SYNTAX_VERSION));
+
+DESCRIPTION
+    The DCE RPC protocol is an application level protocol from OpenGroup
+    that allows applications to do Remote Procedure Calls. It is the
+    underlying wire protocol for DCOM (Distributed Common Object Model) by
+    Microsoft.
+
+    This module was motivated by an reverse-engineering effort on a DCOM
+    client. Therefore, functions that are implemented gear more toward
+    client side implementation. Also, the initial version only supports
+    Connection Oriented version of DCE RPC. It also assumes NTLMSSP as the
+    underlying authentication protocol. This can change based on the input
+    of the users of this modules.
+
+DEPENDENCIES
+    There is no dependencies for this module. However, to build a DCOM
+    client running in Microsoft environment, you may need to install an NTLM
+    module such as Authen::Perl::NTLM.
+
+ASSUMPTIONS
+    1) The version of DCE RPC Connection Oriented protocol supported is 5.0.
+
+    2) NTLM is the authentication scheme of choice.
+
+    3) AUTH_LEVEL_CONNECT is the authentication level of choice.
+
+    4) Network Data Representation (NDR) is assumed to be ASCII for
+    characters, little endian for integers and IEEE for floating points.
+
+    5) Call Id is always zero. It seems to me my client works regardless of
+    the value of call id.
+
+TO-DO
+    1) Support fragmented CO Requests.
+
+    2) Put authentication type as an argument in the constructor.
+
+    3) Implement Connection Oriented server side functions.
+
+    4) Implement Connection-less functions.
+
+    5) Implement the module in C.
+
+BUGS
+    Nothing known.
+
+AUTHOR
+    This implementation was written by Yee Man Chan (ymc@yahoo.com).
+    Copyright (c) 2002 Yee Man Chan. All rights reserved. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+SEE ALSO
+    Authen::Perl::NTLM(3), perl(1), m4(1).
+

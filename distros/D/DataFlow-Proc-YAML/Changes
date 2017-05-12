@@ -1,0 +1,27 @@
+Revision History for DataFlow-Proc-YAML
+=======================================
+
+1.112100
+--------
+
+commit d2a84dfb9b70ff82971e8b0fc7fb76b3d3ffbf41
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+commit 1b3e5b7f26fc75c840df2bc44f48b853f6809864
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+v1.111810 2011-06-29
+--------------------
+
+commit 16a65c850b220250e36a9b25f8b9fd8eacb87540
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose "builder" rather than "default" (almost everywhere)
+
+===================================
+End of changes in the last 365 days
+===================================

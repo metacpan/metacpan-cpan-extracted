@@ -1,0 +1,41 @@
+--- #YAML:1.0
+name:               Date-Maya
+version:            2010011301
+abstract:           Translate between Julian days and Maya days.
+author:
+    - Abigail <date-maya@abigail.be>
+license:            mit
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    warnings:             0
+build_requires:
+    ExtUtils::MakeMaker:  0
+    strict:               0
+    warnings:             0
+requires:
+    constant:  0
+    Exporter:  0
+    integer:   0
+    perl:      5.006
+    strict:    0
+    warnings:  0
+resources:
+    repository:  git://github.com/Abigail/date--maya.git
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - dates
+    - date
+    - Maya
+    - calendar
+test_requires:
+    strict:    0
+    warnings:  0

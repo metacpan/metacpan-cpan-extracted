@@ -1,0 +1,2 @@
+Devel::DTrace::Provider         T_PTROBJ
+Devel::DTrace::Probe            T_PTROBJ

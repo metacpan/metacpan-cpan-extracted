@@ -1,0 +1,43 @@
+Data/Favorites version 1.00
+===========================
+
+A Favorites structure tracks the disposition of various keys.  A key's
+disposition is a measurement of its relative predominance and freshness
+when tallied.  This is a good way to infer favorites or other
+leadership-oriented facts from a historical data stream.
+
+More specifically, this structure measures how often and when various
+keys are triggered by application-defined events.  Those keys that are
+mentioned often will accumulate a higher number of tally points.  Those
+keys that have been mentioned recently will have newer "freshness"
+stamps.  Both of these factors are metered and will affect their
+positioning in a ranking of the keys.
+
+At any time, keys can be culled by freshness or by their current ranking,
+or both.  With these approaches, dispositions can be weighed over the
+whole historical record, rather than providing a simplistic "top events
+in the last N events" rolling count.  Thus, highly popular event keys may
+remain in the set of favorites for some time, even when the key hasn't
+been seen very often recently.  Popular items can be decayed gradually
+rather than cut out of a simple census window.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only stock modules such as warnings, strict and Carp.
+
+COPYRIGHT AND LICENCE
+
+Copyright 1998-2003 by Ed Halley
+
+This library is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

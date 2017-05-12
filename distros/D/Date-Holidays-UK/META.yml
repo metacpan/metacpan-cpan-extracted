@@ -1,0 +1,19 @@
+--- #YAML:1.0
+name: Date-Holidays-UK
+version: 0.01
+author:
+  - |-
+    Richard Clamp <richardc@fotango.com>, Amelie Guyot, Jerome Parfant.
+abstract: Determine UK Public Holidays
+license: perl
+requires:
+  perl: 5.006
+recommends: {}
+build_requires:
+  Test::More: 0
+conflicts: {}
+provides:
+  Date::Holidays::UK:
+    file: lib/Date/Holidays/UK.pm
+    version: 0.01
+generated_by: Module::Build version 0.22

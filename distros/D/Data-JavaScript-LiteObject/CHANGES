@@ -1,0 +1,35 @@
+1.04	Fri Aug  2 23:16:50 UTC 2002
+	Fixed import semantics
+	(reported by theorbtwo)
+
+	Added support for JavaScript1.2 literal arrays,
+	to fix edge condition resulting from unfortunate JavaScript design ;-)
+	See the documentation
+
+1.03	Sat Jul 27 08:25:54 UTC 2002
+	Fixed tests, they were missing the numbers for 2-5
+
+	Reworked an algorythm for picking which object to use as
+	a template when attributes is not specified. This is slightly
+	more expensive, but required for compatability
+	(reported by Jost Krieger, CPANPLUS)
+
+1.02	Sat Jul 27 01:39:21 UTC 2002
+	Ugh, it was old crufty code.
+        It's now had a liberal application of Naval jelly and Bondo
+
+	Documentation fix, changed all references of jsdump to jsodump
+
+	Documentation fix, wrote examples that actually work
+
+	Documentation fix, removed CAVEATS
+
+	Fixed $VERSION
+
+	Robustified test suite
+
+1.01	25-Sep-2000 
+	Added attributes, to explicitly specify what data is dumped
+
+1.00	06-Aug-2000
+	Initial release

@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Device/KeyStroke/Mobile.pm
+t/00_compile.t
+t/01_keystroke.t

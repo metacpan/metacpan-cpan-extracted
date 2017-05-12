@@ -1,0 +1,24 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2003 Julius C. Duque
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::SHA2;
+
+for (my $i = 0; $i < @ARGV; $i++) {
+    my $file = $ARGV[$i];
+    chomp $file;
+
+    if (-f $file) {  # hash only regular files
+        open INFILE, $file;
+        binmode INFILE;  # just in case you're not running UNIX or Plan9
+        my $context = new Digest::SHA2 256;
+        $context->addfile(*INFILE);
+        my $digest = $context->hexdigest;
+        print "$digest  $file\n";
+        close INFILE;
+    }
+}
+

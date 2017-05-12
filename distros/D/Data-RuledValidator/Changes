@@ -1,0 +1,106 @@
+Revision history for Perl extension Data::RuledValidator.
+
+0.13 Wed Jul  31 01:52
+       - fix bug
+         wrong return precedence (https://rt.cpan.org/Public/Bug/Display.html?id=87299)
+         Thanks rurban.
+
+0.12 Tue Jun  15 10:00
+       - fix Makefile.PL. add Module::Pluggable.
+
+0.11 Mon Jun  14 0:44
+       - fix test for Test::Simple 0.95_2
+
+0.10 Thu Apr  5 22:57
+	- add method to access internal class vars.
+        - add method add_condition. use this instead of add_condition_operator.
+
+0.09 Mon Mar 26 02:03
+        - add operator length
+          use it instead of key <= ~ #, key >= ~ # and between #, #
+        - add condition not_null, number
+          number exists in document, but it had not implemented
+          not_null is equal to any
+
+0.08 Sun Mar 25 22:38
+        - fix document
+        - fix typo rigth -> right
+        - fix bug
+          parsing of filer rule was incorrect when setence has 'with'.
+          reset method doesn' clean right and wrong key
+
+0.07 Fri Mar  1 00:05
+        - rename IGNORE_REQUIRED to ALLOW_NO_VALUE
+        - fix document
+        - fix bug
+          inheritance of filter and required is incorrect
+          undefined rule name caused warning
+          GLOBAL is n/a didn't anything on filter and required
+          filter parsing is somewhat incorrect
+        - change spec
+          ID_METHOD values must be separated with comma
+        - add more test
+        - write filter document
+        - filter can take * as key
+        - pass object and values to filter
+        - cache filtered values in object
+        - reset when by_rule or by_sentence is called when auto_reset is true
+        - changed internal structure
+        - improve validator method
+
+0.06 Sun  Feb 11 05:12:00 2007
+        - can use special value for "eq" and "ne"
+          key eq/ne [key]
+          key eq/ne {key}
+        - change for required value
+          add required_alias_name
+          add new syntax
+          required = key1, key2, key3 ...
+        - "match" become faster a bit
+        - Data::RuledValidator::Util is added
+          separate utility functions and flag.
+        - now, "of" and "of-valid" needs alias name.
+        - add filter feature
+          filter ... with filter_name, ...
+          sentence ... with filter_name, ...
+          can replace object method value with filtered value
+        - add import option when using module
+        - use UNIVERSAL::require
+        - use Class::Inspector
+        - change valid method behavior
+        - add test
+        - refactor _validator method
+        - remove strict option
+        - add missing method
+
+0.05  Mon Feb  5 01:13:00 2007
+        - include Data::RuledValidator::Plugin::URL in t/ directory
+          I've forgotten to add this in 0.03 - 0.04
+        - add "in" to operator
+        - change email address
+        - add test
+
+0.04  Sat Feb  3 02:16:00 2007
+        - fix typo
+
+0.03  Sun Jun 14 00:19:00 2006
+        - if rule is changed, re-parse it.
+        - now regex group name can be used.
+        - PATH_INFO group name can be used, easily.
+        - fix bug: comment couldn't be used.
+        - add strict option which effects valid behavior
+          no strict and no failure, it is valid.
+        - add id_method, id_obj method.
+          for using another obj/method to identify GROUP_NAME.
+        - specify multiple methods for nested calling.
+        - change some in doc.
+          id_key_value -> GROUP_NAME, etc.
+        - add test for pod.
+
+0.02  Sat Apr 17 00:53:00 2006
+        - use Module::Pluggable
+        - move Email validation to plugin.
+        - add option import_error when using module.
+
+0.01  Sat Mar 11 21:19:00 2006
+        - original version;

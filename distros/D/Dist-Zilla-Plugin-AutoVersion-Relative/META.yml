@@ -1,0 +1,47 @@
+---
+abstract: 'Time-Relative versioning'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla: '2.10131'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-AutoVersion-Relative
+provides:
+  Dist::Zilla::Plugin::AutoVersion::Relative:
+    file: lib/Dist/Zilla/Plugin/AutoVersion/Relative.pm
+    version: '1.001001'
+recommends:
+  Moose: '2.000'
+requires:
+  Const::Fast: '0'
+  DateTime: '0.50'
+  Dist::Zilla: '2.10131'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Dist::Zilla::Role::VersionProvider: '0'
+  Moose: '1.09'
+  MooseX::StrictConstructor: '0.10'
+  MooseX::Types::DateTime: '0.05'
+  MooseX::Types::Moose: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-AutoVersion-Relative/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-AutoVersion-Relative
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-AutoVersion-Relative.git
+version: '1.001001'

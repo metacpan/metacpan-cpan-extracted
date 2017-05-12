@@ -1,0 +1,36 @@
+NAME
+    Devel::Trace::More - Like Devel::Trace but with more control
+
+SYNOPSIS
+      #!/usr/bin/perl -d:Trace::More
+
+      use Devel::Trace::More qw{ filter_on output_to };
+      
+  filter_on('blah');
+
+      # or
+
+  filter_on(qr/blah/);
+
+      To print to a file:
+
+  output_to('path/to/file')
+
+DESCRIPTION
+    For now look at documentation for Devel::Trace. More features to come!
+
+SEE ALSO
+    Devel::Trace
+
+AUTHOR
+    mburns, <mburns.lungching@gmail.com>
+
+    Also code from Mark Jason Dominus
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2009 by Mike Burns
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.10.0 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,64 @@
+=head1 NAME
+
+Getting Your Feet Wet with mod_perl
+
+=head1 Description
+
+This chapter gives you the bare minimum information to get you started
+with mod_perl.
+
+=head1 A Quick Guide to Getting Started with mod_perl
+
+META: to be written
+
+But for now you have to go through the following steps to get mod_perl
+2.0 running:
+
+=over
+
+=item 1
+
+L<Install mod_perl 2.0|docs::2.0::user::install::install>
+
+=item 2
+
+L<Configure mod_perl 2.0|docs::2.0::user::config::config>
+
+=item 3
+
+If you want to run mod_perl 1.0 code on mod_perl 2.0 server L<enable
+the compatibility layer|docs::2.0::user::compat::compat>.
+
+=item 4
+
+If you have problems L<report
+them|docs::2.0::user::help::help/Reporting_Problems>.
+
+=back
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

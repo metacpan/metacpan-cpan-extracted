@@ -1,0 +1,12 @@
+Revision history for Perl module DateTime::Format::Roman
+
+0.03  xv kal nov anno mmiv
+    - added default pattern
+    - format_datetime() can nnow be used as a class method
+    - more documentation
+
+0.02  ii non iun anno mmiij
+    - added Roman.pm as a prerequisite
+
+0.01  iv non iun anno mmiij
+    - original version, released to CPAN

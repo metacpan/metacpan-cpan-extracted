@@ -1,0 +1,32 @@
+---
+abstract: 'preview munged pod in browser'
+author:
+  - 'Peter Shangov <pshangov@yahoo.com>'
+build_requires:
+  Capture::Tiny: 0
+  Test::More: 0.88
+  blib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-App-Command-podpreview
+requires:
+  App::PodPreview: 0
+  Carp: 0
+  Dist::Zilla::App: 0
+  File::Temp: 0
+  List::Util: 0
+  Moose::Autobox: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-App-Command-podpreview
+  homepage: https://github.com/pshangov/dist-zilla-app-command-podpreview
+  repository: https://github.com/pshangov/dist-zilla-app-command-podpreview.git
+version: 0.004

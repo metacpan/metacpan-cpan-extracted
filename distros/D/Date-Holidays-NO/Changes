@@ -1,0 +1,8 @@
+Revision history for Perl extension Date::Holidays::NO
+
+0.2   Thu Sep 01 10:00:00 2005
+	- Added pod tests
+	- Changed to Module::Build
+	- Fixed documentation.
+0.1   Fri May 28 15:55:00 2004
+	- First public version

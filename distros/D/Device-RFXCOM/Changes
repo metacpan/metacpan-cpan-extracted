@@ -1,0 +1,44 @@
+Revision history for Perl extension Device::RFXCOM.
+
+1.163170  2016-11-12 15:21:59+00:00 Europe/London
+        - Remove unnecessary binmode call. Thanks to @Digicrat.
+
+1.142010  2014-07-20 14:24:46+01:00 Europe/London
+        - Add THWR800 support. Thanks to Clement87 via github.
+        - Use Device::SerialPort for serial device code.
+        - Remove broken link from POD.
+
+1.110800  2011-03-21 20:05:29 Europe/London
+        - Fix some windows test errors.
+
+1.110471  2011-02-16 22:23:50 Europe/London
+        - Fix sensor device name.
+
+1.110470  2011-02-16 22:05:18 Europe/London
+        - Add electrisave battery reporting - thanks to dmb on xpl-perl trac.
+
+1.110440  2011-02-13 20:54:26 Europe/London
+        - Minor test portability fixes.
+        - CM119 channel fixes and more test coverage.
+
+1.110430  2011-02-12 11:21:41 Europe/London
+        - Initial CM119 support.  Thanks to Guigui Abloc and Bert.
+        - Fix serial port setup (issue #1).  Thanks to maxatome.
+        - Fix test error in W800 test script.
+
+1.103390  2010-12-05 21:39:41 Europe/London
+        - Tests improvements and refactoring.
+
+1.103260  2010-11-22 20:51:12 Europe/London
+        - Improve message encoding error messages.
+
+1.103250  2010-11-21 10:40:20 Europe/London
+        - Fix NAME sections in script Pod.
+        - Fix tests on EV event loop.
+        - Add w800-rx example script.
+
+1.103240  2010-11-20 08:18:08 Europe/London
+        - Support for Digimax sensors.
+        - More flexible handling of duplicates.
+	- Initial CPAN release extracted from my code at
+          http://www.xpl-perl.org.uk/

@@ -1,0 +1,47 @@
+;;GLOBAL
+
+ID_KEY page
+
+filter default with trim
+
+;;a
+
+filter * with trim
+
+page is word
+i    is num
+n    is num
+
+;;b
+
+filter * with trim, x
+
+page is word
+i    is num
+n    is num
+
+;;c
+
+filter * with  trim, x2
+
+page is word
+i    is num
+n    is num
+
+;;d
+
+filter * with x2
+
+page is word
+i    is num
+n    is num
+
+;;e
+
+filter i,n with x2
+
+a = all of-valid i, n, page
+
+page is word
+i    is word
+n    is word

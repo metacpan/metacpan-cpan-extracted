@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dancer-Session-Cookie</name>
+  <shortdesc>Encrypted cookie-based session backend for Dancer</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Alex Kapranoff</foaf:name>
+      <foaf:mbox rdf:resource="mailto:kappa@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Alex Sukria</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sukria@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>David Golden</foaf:name>
+      <foaf:mbox rdf:resource="mailto:dagolden@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@cpan.org" />
+    </foaf:Person>
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Breno G. de Oliveira</foaf:name>
+      <foaf:mbox rdf:resource="mailto:garu@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>David Precious</foaf:name>
+      <foaf:mbox rdf:resource="mailto:davidp@preshweb.co.uk" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Michael G. Schwern</foaf:name>
+      <foaf:mbox rdf:resource="mailto:schwern@pobox.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Neil Kirsopp</foaf:name>
+      <foaf:mbox rdf:resource="mailto:neil@broadbean.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Nick S. Knutov</foaf:name>
+      <foaf:mbox rdf:resource="mailto:nick@knutov.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Sawyer X</foaf:name>
+      <foaf:mbox rdf:resource="mailto:xsawyerx@cpan.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/perldancer/Dancer-Session-Cookie" />
+  <bug-database rdf:resource="https://github.com/perldancer/Dancer-Session-Cookie/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/perldancer/Dancer-Session-Cookie" />
+      <location rdf:resource="https://github.com/perldancer/Dancer-Session-Cookie.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.1</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-02-02T17:20:11Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.11</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-02-17T16:12:21Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.12</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-09-16T13:29:09Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.13</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2010-11-28T17:19:58Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.14</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-03-12</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.15</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-05-21</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.16</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-02-01T14:39:14Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.17</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-02-07T15:36:58Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.18</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-02-16T00:16:32Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.19</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-02-24T22:49:14Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.20</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-04-25T11:41:22Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.21</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-05-08T22:33:10Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.22</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#dateTime">2013-05-31T23:38:07Z</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.23</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-07-17</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.24</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-07-29</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.25</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-08-04</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.26</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2015-09-10</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

@@ -1,0 +1,22 @@
+kibana
+
+	https://search-slionbelastic-is5bhgzv3xx7ru6ktm47tkbs4u.eu-central-1.es.amazonaws.com/_plugin/kibana/
+
+redis-commander
+
+	http://ec2-54-93-95-144.eu-central-1.compute.amazonaws.com
+
+
+ldap
+	address       : ec2-54-93-95-144.eu-central-1.compute.amazonaws.com
+	port          : 389
+	Bind DN       : cn=Manager,dc=ec2-54-93-95-144.eu-central-1.compute.amazonaws,dc=com
+	Bind password : 2f@st4us
+	users are here: ou=Users,dc=ec2-54-93-95-144.eu-central-1.compute.amazonaws,dc=com
+
+	my account    : george george
+
+grafana
+	http://ec2-54-93-95-144.eu-central-1.compute.amazonaws.com:3000/
+	admin
+	admin

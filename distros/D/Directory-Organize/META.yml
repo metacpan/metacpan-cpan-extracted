@@ -1,0 +1,23 @@
+---
+abstract: 'Create and Organize Directories'
+author:
+  - 'Mathias Weidner <mathias@weidner.in-bad-schmiedeberg.de>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Directory-Organize
+provides:
+  Directory::Organize:
+    file: lib/Directory/Organize.pm
+    version: v0.9.6
+requires:
+  Getopt::Long: 0
+  Term::ReadKey: 0
+  version: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: v0.9.6

@@ -1,0 +1,45 @@
+Revision history for DateTimeX-Format
+1.03      December 14, 2011
+          Fixed helper method to not use absolute package because of upstream breakage
+          Changed repository to use non-protected-ssh one, added website to meta
+
+1.02      July 16, 2009
+          Fixed role inclusion order / added test
+          Moved to use non-string types internally (deprecated in MX::Types now)
+
+1.01      July 15, 2009
+          Fixed compilation error in CustomPattern role
+
+1.00      April 9, 2009
+          Works under perl 5.08 now. (no 5.10 specific features)
+          fixed a failing test from before (bad test count)
+
+0.01_06   April 8, 2009
+          Finnally forked MooseX::Types::DateTime into
+           MooseX::Types::ButMainted this allowed me to add support for Olson
+           abbreviations via Olson::Abbreviations and drop requirement for
+           Date::Manip, and DateTimeX::Easy
+          Added tests for new coercions
+          Removed all occurances of 'timezone', replaced with 'time_zone', as
+           per convention in DateTime::Format::*
+          Updated POD
+
+0.01_05   Feb 1X, 2009
+          Fixed docs, to show methods required
+
+0.01_04   Feb 18, 2009
+          Fixed doc issues
+          Made composiing classes require format_datetime
+          Made coercions work from runtime call environment
+
+0.01_03   Feb 18, 2009
+          Pulled CustomPattern out into its own role
+
+0.01_02   Feb 17, 2009
+          Made the helper function ->new_datetime, uses ->debug, and
+          supports timeonly DT 
+
+0.01_01   Feb 17, 2009
+          Got something up and working this serves as a role that all modules
+          in DateTimeX::Format should use. 
+

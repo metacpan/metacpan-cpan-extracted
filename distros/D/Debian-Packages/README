@@ -1,0 +1,2 @@
+This module parses a Debian Packages file and turns it into an array ending with
+newlines.

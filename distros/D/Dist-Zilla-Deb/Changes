@@ -1,0 +1,18 @@
+Revision history for Perl distribution Dist-Zilla-Deb
+
+0.04 2013-09-07
+    - Reformatted Changes file as per CPAN::Changes::Spec
+      (thanks to github:neilbowers, PR #4)
+
+0.03 2011-10-28
+    - prune tfiles dir from distribution and prevent xt/packages from indexing.
+      RT#71998.
+
+0.02 2010-11-12
+    - debuild command propagates some options (mostly for the tests)
+    - Deb::VersionFromChangelog plugin implemented
+
+0.01 2010-11-11
+    - Initial release
+    - 'debuild', 'debc', 'debi' and 'debrelease' commands implemented.
+

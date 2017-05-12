@@ -1,0 +1,361 @@
+=encoding utf8
+
+=head1 NAME
+
+Data::DublinCore - DublinCore meta-data access
+
+=head1 INHERITANCE
+
+ Data::DublinCore
+   is a XML::Compile::Cache
+   is a XML::Compile::Schema
+   is a XML::Compile
+
+=head1 SYNOPSIS
+
+  my $dc = Data::DublinCore->new(version => '20080211');
+  my $xml  = $dc->writer($sometype)->($doc, $perldata);
+
+  my ($type, $data) = $dc->from('data.xml');
+  my ($type, $data) = Data::DublinCore->from('data.xml');
+  print "Root type: $type\n";
+  print Dumper $data;    # from Data::Dumper
+
+=head1 DESCRIPTION
+
+This module provides access to the DublinCore metadata specification,
+see F<http://dublincore.org>.
+
+Actually, the dublin-core spec is rather empty: applications
+need to define the content of the supplied containers themselves.
+When this content is RDF defined, it seems not to follow the rules
+of schema's at all. And for other applications I do not know. So...
+the best thing this module can do is call L<XML::LibXML::Simple|XML::LibXML::Simple>.
+In the future, however, this may improve.
+
+Extends L<"DESCRIPTION" in XML::Compile::Cache|XML::Compile::Cache/"DESCRIPTION">.
+ 
+=head1 METHODS
+
+Extends L<"METHODS" in XML::Compile::Cache|XML::Compile::Cache/"METHODS">.
+ 
+=head2 Constructors
+
+Extends L<"Constructors" in XML::Compile::Cache|XML::Compile::Cache/"Constructors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<from>($xmldata, %options)
+
+Read an XML message, in any format supported by L<XML::Compile> method
+C<dataToXML()>: string, file, filehandle, and more.  Returned is a list
+of two: the type of the top-level element plus the data-structure.
+
+When the method is called as class method, then a temporary instance is
+created. Creating an instance is (very) slow: reuse is advised.
+
+  my $dc            = Data::DublinCore->new;
+  my ($type, $data) = $dc->from('data.xml');
+
+or
+
+  my ($type, $data) = Data::DublinCore->from('data.xml');
+
+=item Data::DublinCore-E<gt>B<new>(%options)
+
+ -Option            --Defined in          --Default
+  allow_undeclared    XML::Compile::Cache   <false>
+  any_element         XML::Compile::Cache   'ATTEMPT'
+  any_type                                  <call XML::LibXML::Simple>
+  block_namespace     XML::Compile::Schema  []
+  hook                XML::Compile::Schema  undef
+  hooks               XML::Compile::Schema  []
+  ignore_unused_tags  XML::Compile::Schema  <false>
+  key_rewrite         XML::Compile::Schema  []
+  opts_readers        XML::Compile::Cache   []
+  opts_rw             XML::Compile::Cache   []
+  opts_writers        XML::Compile::Cache   []
+  parser_options      XML::Compile          <many>
+  prefixes            XML::Compile::Cache   <smart>
+  schema_dirs         XML::Compile          undef
+  typemap             XML::Compile::Cache   {}
+  version                                   <newest>
+  xsi_type            XML::Compile::Cache   {}
+
+=over 2
+
+=item allow_undeclared => BOOLEAN
+
+=item any_element => CODE|'TAKE_ALL'|'SKIP_ALL'|'ATTEMPT'|'SLOPPY'
+
+=item any_type => CODE
+
+Passed in the reader to L<XML::Compile::Schema::compile(any_type)|XML::Compile::Schema/"Compilers">.
+Each contained data element which is complex gets passed
+into  XML::LibXML::Simple subroutine XMLin.  This provides easy access
+to for instance rdf data which is stored in there.
+
+=item block_namespace => NAMESPACE|TYPE|HASH|CODE|ARRAY
+
+=item hook => HOOK|ARRAY
+
+=item hooks => ARRAY
+
+=item ignore_unused_tags => BOOLEAN|REGEXP
+
+=item key_rewrite => HASH|CODE|ARRAY
+
+=item opts_readers => HASH|ARRAY-of-PAIRS
+
+=item opts_rw => HASH|ARRAY-of-PAIRS
+
+=item opts_writers => HASH|ARRAY-of-PAIRS
+
+=item parser_options => HASH|ARRAY
+
+=item prefixes => HASH|ARRAY-of-PAIRS
+
+=item schema_dirs => DIRECTORY|ARRAY-OF-DIRECTORIES
+
+=item typemap => HASH|ARRAY
+
+=item version => STRING
+
+=item xsi_type => HASH|ARRAY
+
+=back
+
+=back
+
+=head2 Accessors
+
+Extends L<"Accessors" in XML::Compile::Cache|XML::Compile::Cache/"Accessors">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addHook>($hook|LIST|undef)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addHooks>( $hook, [$hook, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addKeyRewrite>($predef|CODE|HASH, ...)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+=item Data::DublinCore-E<gt>B<addSchemaDirs>(@directories|$filename)
+
+Inherited, see L<XML::Compile/"Accessors">
+
+=item $obj-E<gt>B<addSchemas>($xml, %options)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemap>(PAIR)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addTypemaps>(PAIRS)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<addXsiType>( [HASH|ARRAY|LIST] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<allowUndeclared>( [BOOLEAN] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<anyElement>('ATTEMPT'|'SLOPPY'|'SKIP_ALL'|'TAKE_ALL'|CODE)
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<blockNamespace>($ns|$type|HASH|CODE|ARRAY)
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<hooks>( [<'READER'|'WRITER'>] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<namespace>()
+
+=item $obj-E<gt>B<typemap>( [HASH|ARRAY|PAIRS] )
+
+Inherited, see L<XML::Compile::Cache/"Accessors">
+
+=item $obj-E<gt>B<useSchema>( $schema, [$schema, ...] )
+
+Inherited, see L<XML::Compile::Schema/"Accessors">
+
+=item $obj-E<gt>B<version>()
+
+=back
+
+=head2 Prefix management
+
+Extends L<"Prefix management" in XML::Compile::Cache|XML::Compile::Cache/"Prefix management">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addNicePrefix>(BASE, NAMESPACE)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<addPrefixes>( [PAIRS|ARRAY|HASH] )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<learnPrefixes>($node)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefix>($prefix)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixFor>($uri)
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixed>( $type|<$ns,$local> )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=item $obj-E<gt>B<prefixes>( [$params] )
+
+Inherited, see L<XML::Compile::Cache/"Prefix management">
+
+=back
+
+=head2 Compilers
+
+Extends L<"Compilers" in XML::Compile::Cache|XML::Compile::Cache/"Compilers">.
+ 
+=over 4
+
+=item $obj-E<gt>B<addCompileOptions>( ['READERS'|'WRITERS'|'RW'], %options )
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<compile>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<compileAll>( ['READERS'|'WRITERS'|'RW', [$ns]] )
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<compileType>( <'READER'|'WRITER'>, $type, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+=item Data::DublinCore-E<gt>B<dataToXML>($node|REF-XML|XML-STRING|$filename|$fh|$known)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<initParser>(%options)
+
+=item Data::DublinCore-E<gt>B<initParser>(%options)
+
+Inherited, see L<XML::Compile/"Compilers">
+
+=item $obj-E<gt>B<reader>($type|$name, %options)
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=item $obj-E<gt>B<template>( <'XML'|'PERL'|'TREE'>, $element, %options )
+
+Inherited, see L<XML::Compile::Schema/"Compilers">
+
+=item $obj-E<gt>B<writer>($type|$name)
+
+Inherited, see L<XML::Compile::Cache/"Compilers">
+
+=back
+
+=head2 Administration
+
+Extends L<"Administration" in XML::Compile::Cache|XML::Compile::Cache/"Administration">.
+ 
+=over 4
+
+=item $obj-E<gt>B<declare>( <'READER'|'WRITER'|'RW'>, <$type|ARRAY>, %options )
+
+Inherited, see L<XML::Compile::Cache/"Administration">
+
+=item $obj-E<gt>B<doesExtend>($exttype, $basetype)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<elements>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<findName>($name)
+
+Inherited, see L<XML::Compile::Cache/"Administration">
+
+=item $obj-E<gt>B<findSchemaFile>($filename)
+
+=item Data::DublinCore-E<gt>B<findSchemaFile>($filename)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<importDefinitions>($xmldata, %options)
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<knownNamespace>($ns|PAIRS)
+
+=item Data::DublinCore-E<gt>B<knownNamespace>($ns|PAIRS)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=item $obj-E<gt>B<namespaces>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<printIndex>( [$fh], %options )
+
+Inherited, see L<XML::Compile::Cache/"Administration">
+
+=item $obj-E<gt>B<types>()
+
+Inherited, see L<XML::Compile::Schema/"Administration">
+
+=item $obj-E<gt>B<walkTree>($node, CODE)
+
+Inherited, see L<XML::Compile/"Administration">
+
+=back
+
+=head1 DETAILS
+
+Extends L<"DETAILS" in XML::Compile::Cache|XML::Compile::Cache/"DETAILS">.
+ 
+=head1 DESCRIPTIONS
+
+Extends L<"DESCRIPTIONS" in XML::Compile::Cache|XML::Compile::Cache/"DESCRIPTIONS">.
+ 
+=head1 SEE ALSO
+
+This module is part of Data-DublinCore distribution version 1.00,
+built on juli 21, 2015. Website: F<http://perl.overmeer.net>
+
+=head1 COPYRIGHTS
+
+Copyrights of the perl code and the related documentation by
+2009-2015 by [Mark Overmeer]. For other contributors see ChangeLog.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+See F<http://www.perl.com/perl/misc/Artistic.html>
+

@@ -1,0 +1,28 @@
+---
+name: Devel-Ditto
+version: 0.06
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+abstract: Identify where print output comes from
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-Ditto
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Devel--Ditto.git
+requires:
+  IPC::Run: 0
+  Test::More: 0
+provides:
+  Devel::Ditto:
+    file: lib/Devel/Ditto.pm
+    version: 0.06
+  Devel::Ditto::Color:
+    file: lib/Devel/Ditto/Color.pm
+    version: 0.06
+  Devel::Ditto::Colour:
+    file: lib/Devel/Ditto/Colour.pm
+    version: 0.06
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

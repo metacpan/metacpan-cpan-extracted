@@ -1,0 +1,24 @@
+Revision history for DBIx-Class-Weborama-Validation
+
+0.14    2017-04-21
+        Add some validation function and allow to define validation on schema definition
+
+0.11    2012-02-03
+        Include the name of the class when reporting validation failures
+        Factor out the duplicate try/catch blocks
+
+0.10    2012-02-03
+        A string overloading to the VException
+        Wrap some long POD lines
+        Add github repo to meta information
+
+0.05    2011-03-03, Nicolas Oudard
+        Makefile to Build
+        Update dependencies
+
+0.04    2011-02-09, Nicolas Oudard
+        delete dependencies of sqlite3
+
+0.01    2010-12-01
+        First version
+

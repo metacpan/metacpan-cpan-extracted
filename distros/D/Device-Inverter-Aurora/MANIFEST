@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Device-Inverter-Aurora.t
+lib/Device/Inverter/Aurora.pm
+lib/Device/Inverter/Aurora/Constants.pm
+lib/Device/Inverter/Aurora/Strings.pm
+META.yml                                 Module meta-data (added by MakeMaker)

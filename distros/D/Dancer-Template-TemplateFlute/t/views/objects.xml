@@ -1,0 +1,6 @@
+<specification>
+  <value name="firstobj" field="first.salute" />
+  <value name="secondobj" field="second.salute" />
+  <value name="thirdobj" field="third.salute" />
+  <value name="sessionobj" field="session.salute" />
+</specification>

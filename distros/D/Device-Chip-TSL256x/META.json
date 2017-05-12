@@ -1,0 +1,44 @@
+{
+   "abstract" : "chip driver for F<TSL256x>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Chip-TSL256x",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Bitfield" : "0",
+            "Device::Chip" : "0.03"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::TSL256x" : {
+         "file" : "lib/Device/Chip/TSL256x.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name: DateTime-Format-DateManip
+version: 0.04
+license: perl
+distribution_type: module
+requires:
+  Carp: 0
+  Date::Manip: 0
+  DateTime: 0
+  Test::More: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  DateTime::Format::DateManip:
+    file: lib/DateTime/Format/DateManip.pm
+    version: 0.04
+generated_by: Module::Build version 0.18

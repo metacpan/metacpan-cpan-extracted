@@ -1,0 +1,92 @@
+NAME
+    Data::Comparable - Present your object for comparison purposes
+
+VERSION
+    version 1.100840
+
+SYNOPSIS
+      use base 'Data::Comparable';
+
+      sub prepare_comparable {
+          my $self = shift;
+          $self->SUPER::prepare_comparable(@_);
+          delete $self->{some_temp_value};
+          $self->items;    # autovivify;
+      }
+
+      # in some test file:
+
+      use Test::Differences;
+      my $x = '...';
+      my $y = '...';
+      eq_or_diff($x->comparable, $y->comparable, 'objects are equal');
+
+DESCRIPTION
+    When you define a class, it may not be so straightforward to compare two
+    objects of that class. For example, you want to compare object $x to
+    object $y. You would like to use "is_deeply()" from Test::More, but it
+    complains that some hash keys are undef in one object but completely
+    missing in the other. That is easily solved by autovivifying the keys in
+    question. Also, some hash keys might be irrelevant to comparison - that
+    is, you still consider two objects to be equal even though they differ
+    in some hash keys.
+
+    This is where Data::Comparable can help. It enables you to define how
+    your object wants to look like when it is being passed to some deep
+    comparison function like "Test::More::is_deeply()" or
+    "Test::Differences::eq_or_diff()". If your class inherits from
+    Data::Comparable, it gets a method called "comparable()", which you can
+    call when comparing it. That is, you don't compare the actual objects,
+    but their comparable versions.
+
+    To define the comparable version of your object, your class has to
+    implement the "prepare_comparable()" method. There you can autovivify
+    any hash keys you like or tweak your object in any way you need to make
+    it comparable.
+
+METHODS
+  comparable
+    FIXME
+
+  comparable_scalar
+    FIXME
+
+  dump_comparable
+    FIXME
+
+  prepare_comparable
+    FIXME
+
+  yaml_dump_comparable
+    FIXME
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Comparable>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-Comparable/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Comparable/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

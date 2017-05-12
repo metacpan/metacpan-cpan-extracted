@@ -1,0 +1,18 @@
+lib/Dancer/Plugin/Negotiate.pm
+LICENSE
+config/BuildOptions.pm
+Makefile.PL
+MANIFEST
+README
+INSTALL
+t/00-load.t
+t/01-choose.t
+t/02-apply.t
+t/03-negotiate.t
+t/pod-coverage.t
+t/pod.t
+t/views/index.de.tt
+t/views/index.en.tt
+t/views/index.tt
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,38 @@
+This directory contains a few sample DBI/DBD::Oracle scripts. Some are
+genuinely useful while others are just demonstrations of different things.
+They are adapted from the Oraperl example scripts in ../Oraperl.ex/ to
+show how to do the same things in Perl 5 and DBI.
+
+$dbh->{RaiseError} is set to 1 in all scripts for automatic error checking.
+
+bind.pl     Demonstrates how execute() and fetchrow_array() may be
+            combined to make a simple table lookup program with placeholders.
+
+commit.pl   Demonstrates the use of commit() and rollback().
+
+curref.pl   Demonstrates how to use a cursor bind variable.
+
+ex.pl       Reads data from a table and prints it using a format.
+            Also illustrates how to recognise NULL fields and bind_columns
+            with known column names.
+
+japh        Just another Perl hacker, written for DBI.
+            This is no one-liner, but it demonstrates a few things.
+
+mktable.pl  Creates a table, puts some data into it, drops it.
+            Demonstrates do(), placeholders, inserting and reading NULL values,
+            and bind_columns() with known columns.
+
+oradump.pl  Dumps an Oracle table as a set of INSERT statements.
+            Demonstrates the use of $sth->{TYPE}, $dbh->quote(),
+            and bind_columns() with unknown column names.
+
+proc.pl     Demonstrates how to get values into and out of stored procedures
+            and how to receive result sets.
+
+sql         Demonstrates the use of $sth->{NUM_OF_FIELDS}, $sth->{NAME},
+            $sth->{PRECISION}, and bind_columns() with unknown column names.
+
+tabinfo.pl  Displays the structure of the specified table.
+            Demonstrates the use of $sth->{NAME}, $sth->{PRECISION},
+            $sth->{TYPE}, and type_info_all().

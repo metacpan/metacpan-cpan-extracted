@@ -1,0 +1,17 @@
+
+
+0.02	Sun Aug 20 13:41:11 BST 2006
+
+	* Added credit for Ian Jeffray (C version) and Scott Weston (Python 
+	  version), their code made it much easier to get this working while
+	  I was also trying to grok USB and Device::USB.
+
+	* Added more testing.
+
+	* Added a notice that this version + v0.01 are buggy.
+
+0.03	Tue Aug 22 09:38:36 BST 2006
+
+	* Sending init strings for every command now fixes the bug. Thanks JS!
+
+

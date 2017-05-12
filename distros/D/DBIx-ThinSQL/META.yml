@@ -1,0 +1,53 @@
+---
+abstract: 'A lightweight SQL helper for DBI'
+author:
+  - 'Mark Lawrence <nomad@null.net>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  File::chdir: 0
+  Test::Database: 0
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: gpl3
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-ThinSQL
+no_index:
+  directory:
+    - inc
+    - share
+    - t
+    - xt
+  package:
+    - DBIx::ThinSQL::Driver
+    - DBIx::ThinSQL::Driver::Pg
+    - DBIx::ThinSQL::Driver::SQLite
+    - DBIx::ThinSQL::bind_value
+    - DBIx::ThinSQL::case
+    - DBIx::ThinSQL::db
+    - DBIx::ThinSQL::expr
+    - DBIx::ThinSQL::list
+    - DBIx::ThinSQL::query
+    - DBIx::ThinSQL::quote_identifier
+    - DBIx::ThinSQL::quote_value
+    - DBIx::ThinSQL::st
+    - DBIx::ThinSQL::table
+    - DBIx::ThinSQL::values
+requires:
+  DBI: 0
+  Exporter::Tidy: 0
+  File::ShareDir: 0
+  Log::Any: 0
+  Path::Tiny: 0
+resources:
+  bugtracker: https://github.com/mlawren/p5-DBIx-ThinSQL/issues
+  homepage: https://github.com/mlawren/p5-DBIx-ThinSQL
+  license: http://opensource.org/licenses/gpl-3.0.html
+  repository: git://github.com/mlawren/p5-DBIx-ThinSQL.git
+version: 0.0.48

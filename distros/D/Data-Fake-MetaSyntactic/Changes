@@ -1,0 +1,9 @@
+Revision history for Data::Fake::MetaSyntactic
+
+1.001 Mon Mar 2 2015
+    - added fake_metacategory
+    - added many examples to the documentation
+    - increased test coverage
+
+1.000 Sun Mar 1 2015
+    - Thwack! Zwapp!! Clunk!!!

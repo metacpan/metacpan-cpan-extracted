@@ -1,0 +1,52 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Turtle;
+use Imager;
+
+my ( $width, $height ) = ( 500, 500 );
+
+my $img = Imager->new(
+    xsize => $width,
+    ysize => $height,
+);
+
+$img->box(
+    filled => 1,
+    color  => 'white',
+);
+
+my $turtle = Data::Turtle->new(
+    width  => $width,
+    height => $height,
+);
+
+$turtle->pen_up;
+$turtle->turn(45);
+$turtle->forward(10);
+$turtle->goto( 100, 100 );
+$turtle->mirror;
+$turtle->backward(10);
+#my ( $x, $y, $heading, $pen_status, $pen_color, $pen_size ) = $turtle->get_state;
+#$turtle->set_state( $x, $y, $heading, $pen_status, $pen_color, $pen_size );
+$turtle->pen_down;
+for my $i ( 1 .. 4 ) {
+    my @line = $turtle->forward(50);
+    if ( @line ) {
+        $img->line(
+            x1    => $line[0],
+            y1    => $line[1],
+            x2    => $line[2],
+            y2    => $line[3],
+            color => $line[4],
+            aa    => 1,
+            endp  => 1
+        );
+    }
+    $turtle->right(90);
+}
+
+my $type = 'png';
+$img->write( type => $type, file => "$0.$type")
+    or die( "Can't write to $0.$type ", $img->errstr );

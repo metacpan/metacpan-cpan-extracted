@@ -1,0 +1,14 @@
+plugins:
+    Auth::Extensible:
+        realms:
+            config1:
+                provider: IMAP
+                host: config1
+            config2:
+                provider: IMAP
+                priority: 10
+                host: config2
+            config3:
+                provider: IMAP
+                priority: 2
+                host: config3

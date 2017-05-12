@@ -1,0 +1,411 @@
+NAME
+    Database::Schema::Verification - Perl extension for storing and verifing
+    various levels of information
+
+SYNOPSIS
+      use Database::Schema::Verification;
+
+      my $v = Database::Schema::Verification->new(
+            -dbh => $dbh,
+            -type => 'my_type',
+            -type_id => 22,
+            -msg => $txtVerificationEmailMsg,
+      );
+
+      my $rv = $v->check();
+      my $rv = $v->insert();
+      my $rv = $v->isVerified();
+      my $rv = $v->load();
+      my $rv = $v->requestVerification();
+      my $rv = $v->verifiy(-action => 1);
+      my $rv = $v->remove();
+
+      # returns array of Database::Schema::Verification objects
+      # each of a hardcoded return limit of 500, wich can be overwritten
+      my @ary = $v->returnUnprocessed();
+      my @ary = $v->returnUnverified(); 
+  
+DESCRIPTION
+    The Verification module provides an easy storage interface for keeping
+    track of what data has been verified, what has been surpressed and what
+    needs verification. At it's core it provides a relation between it's
+    master key (vid) and a combination of the type of data you are working
+    with (usually associates with a table within your database) and it's
+    master key. This module also provides you with a simple email tool that
+    provides notification of an event requiring verification.
+
+    Accompanied within this is a 'contrib' directory. In there you'll find a
+    CGI script. The purpose of this script is to allow authors the ability
+    to place embedded links within the email notifications. These links can
+    provide a set of parameters that will trigger any of the verification
+    functions. This allows users to click the links in the email and verify
+    or surpess data as it becomes avalible.
+
+    The basic concept is to allow authors to insert this where ever they
+    need to. This can be it's own verification database where:
+
+      type => 'databaseName.table',
+      type_id => $databaseName.table.keyId
+
+    This would allow you to maintain one verification database for multiple
+    databases or applications
+
+    OR it can be a simple table embeded into your program database
+
+      type => 'table',
+      type_id => $table.keyId
+
+    This allows you to scale it as you need it and apply verification to any
+    level of data you are working with.
+
+    **Note: All string returns are in the format:
+
+     return ('reason we bombed out...',[undef,0]);
+
+    This allows you to extract why the function failed with a:
+
+     my ($str,$rv) = function->check(...);
+     if(!defined($rv)){
+            die($str);
+     }
+
+OBJECT METHODS
+  new()
+    Default constructor
+
+      my $v = Database::Schema::Verification->new(
+            # required
+            -dbh => $dbh,
+            -type => 'my_type',
+            -type_id => 22,
+            -msg => $txtVerificationEmailMsg,
+
+            # optional
+            -vid            => $vid,
+            -dt_added       => $dt_added, [see Time::Timestamp]
+            -dt_updated     => $dt_updated, [see Time::Timestamp]
+            -verified       => $verified, # see verified() for inputs
+            -verified_by    => $verified_by,
+            -verified_by_ip => $verified_by_ip, [see Net::IP]
+            -table          => $table # default is 'verification'
+      );
+
+    dbh [DBI handle]
+        A DBI handle
+
+    vid [int]
+        This pre-specifies the verification id
+
+    type [string]
+        This is the type of data we are verifiying (usually use the database
+        table we are targeting)
+
+    type_id [int]
+        The key id field for the table data we are verifing
+
+    msg [string]
+        Text to be included in the verification message
+
+    dt_added [int|string] (stored as Time::Timestamp obj)
+        Optional: Initial timestamp, automagically inserted if left blank
+
+    dt_updated [int|string] (stored as Time::Timestamp obj)
+        Optional: Last updated timestamp, automagically handled if left
+        blank
+
+    verified [int]
+        Optional: Allows you to auto set the verification status (see
+        verify() for list of inputs
+
+    verified_by [string]
+        Optional: Allows specification of the verifing source (who done did
+        it)
+
+    verified_by_ip [string|int] (stores as Net::IP object)
+        Optional: Allows specification of the source ip who verified the
+        data (who's box done did it)
+
+    table [string]
+        Option: Overrides the default base table definition # default is
+        'verification'
+
+  check()
+    This function checks to see if your key or key pair (type && type_id)
+    already exist in the database. By default $v->vid(), $v->type() and
+    $v->type_id() are taken in the function but can be overwritten with
+    parms.
+
+      $v->check(
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+            -vid => $vid,
+      );
+
+    Returns:
+
+      Errstr on failure
+      1 on KeyExsits
+      0 on keyNotExists
+
+  insert()
+    This function loads a verification object into the database (pre-checks
+    the type && type_id first). By default $v->vid(),$v->type() and
+    $v->type_id() are checked. These can be overwritten with params.
+
+      $v->insert(
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+            -fork => 1,     # forks back a loaded object on insert completion
+
+            # vid can be set manually, but it's usually auto-incremented by the database
+            # all other properties should be set by the new() or their accessors before this is called
+      );
+
+    Returns:
+
+     0 on KeyExists
+     $objectRef [-forkOnExists]
+     Errstr on failure
+     ($vid,1) on success
+     ($objectRef,1) on success [with fork parm]
+
+  requestVerification()
+    Function takes in MIME::Lite parms and submits a notification for
+    review. It can become particularly useful when coupled with a cgi script
+    (see contrib directory). Embedding links into these messages allows you
+    to verify or suppress verification by clicking a link in the email.
+
+      my $msg = 'Please Verify Me!!!!';
+      $v->requestVerification(
+            -to => 'myself@you.com',
+            -from => 'root@localhost',
+            -msg => $msg,
+            -subject => 'Verification required!!',
+
+            # optional
+            -update => 1, # default
+      );
+
+    Returns:
+
+      Errstr on failure
+      1 on success
+
+    update
+        By default, a call to requestVerification() will update our
+        'verified' status in the table to 0 (notified, but unverified). If
+        for some reason we need to suppress it, setting -update => 0 (NOT
+        UNDEF!) will do override it for us.
+
+    debug
+        This will print the email to screen will cause our database to NOT
+        be updated (no matter what).
+
+          $v-requestVerification(
+                ...,
+                ...,
+                -debug => 1,
+          );
+
+    Supported Email Args:
+
+      -to,-from,-cc,-bcc,-subject,-type,-msg
+
+    See MIME::Lite for more info
+
+    Returns:
+
+      Errstr on failure
+      1 on success
+
+  isVerified()
+    Method checks to see the verified status of the VID or keypair (type &&
+    type_id).
+
+      my $rv = $v->isVerified(
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+            -vid => $vid,
+      );
+
+    Returns:
+
+      Errstr on failure
+      verified status on success (see verifiy() for more details)
+
+  returnVid()
+    Returns the vid for a given pair of (type && type_id) assuming $v->vid()
+    is not set.
+
+      my $vid = $v->returnVid(
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+      );
+
+    Returns:
+
+      Errstr on failure
+      vid on succeess
+
+  load()
+    Loads a verification record into our object or returns a fully loaded
+    forked object.
+
+      $v->load(
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+      );
+
+      my $newObject = $v->load(
+            # optional override of object properties
+            -vid => $vid,
+            -fork => 1,
+      );
+
+    Returns:
+
+      Errstr on failure
+      1 on success and not forked
+      New Object if forked
+
+  verify()
+    Sets the verification status of the object.
+
+      $v->verify(
+            # required
+            -action => $action,
+
+            # optional override of object properties
+            -type => $type,
+            -type_id => $type_id,
+            -vid => $vid,
+            -verified_by => $verified_by,
+            -verified_by_ip => $vip,
+      );
+
+    Actions [and or status]:
+
+      0 - UNVERIFIED        # unverified but notification has been sent [set status to 'wait']
+      1 - VERIFY            # duh
+      2 - SUPPRESS          # its what jcmurphy likes to call a 'false positive'
+      3 - UNDEFINE          # reset so the notification can be triggered again
+      4 - REMOVE            # get rid of the evidence
+
+    Actions can be sent as strings or ints, it will figure out which
+    automagically.
+
+    Returns:
+
+      Errstr on failure
+      1 on success
+
+  remove()
+    Removes the record from our table that this object represents.
+
+      $v->remove(
+            # optional override of object properties
+            -vid => $vid,
+            -type => $type,
+            -type_id => $type_id,
+      );
+
+    Returns:
+
+      Errstr on failure
+      1 on success
+
+  returnUnverified()
+    By default this method returns an array of unverified objects from the
+    database. Optionally a parm can override this and force the function to
+    return a raw hashref too. There is a HARD_RETURN_LIMIT on the number of
+    keys that can be accessed. This can also be overridden.
+
+      my @aryOfObjects = $v->returnUnverified(
+            # optional overrides
+            -type => $type
+      );
+
+      my $hashref = $v->returnUnverified(
+            -limit => 1000,
+            -hashref => 1,
+      );
+
+    limit
+        This will override the hard coded limit of 500. Setting -limit => 0
+        will return ALL records (use with caution on large databases).
+        Because of this, if the hard limit is set, the query will return the
+        data in desc order.
+
+    hashref
+        This will return a raw hashref instead of an array of objects (set
+        to 1).
+
+    Returns:
+
+      Errstr on failure
+      HASHREF or OBJECT on success
+
+  returnUnprocessed()
+    See returnUnVerified().
+
+    This returns anything that has verified set to NULL (ie: no
+    notifications have been sent yet).
+
+OBJECT ACCESSORS and MODIFIERS
+  dbh()
+    Sets and Retrieves dbh handle
+
+  table()
+    Sets and Retrieves the default table to use in our lookups
+
+  vid()
+    Sets and Retrieves the Verification ID
+
+  type()
+    Sets and Retrieves the type of data we are working with (usually the
+    other table name).
+
+  type_id()
+    Sets and Retrieves the key id for the type of data we are working with
+    (the key in the other table).
+
+  verified()
+    Sets and Retrieves the objects verification status
+
+  dt_added()
+    Sets and Retrieves the date our vid was added. Returns a Time::Timestamp
+    object
+
+  dt_updated()
+    Sets and Retrieves the date our vid was last updated. Returns a
+    Time::Timestamp object
+
+  verified_by()
+    Sets and Retrieves who last set our verified field
+
+  verified_by_ip()
+    Sets and Retrieves what ip was used to set our last verified field.
+    Returns a Net::IP object. Accepts Big::Int's.
+
+  msg()
+    Sets and Retrieves an optional msg that explains what needs verifying
+    (ie: the body used to be sent in a $self->requestVerification() email.
+
+SEE ALSO
+    Database::Wrapper,MIME::Lite,Time::Timestamp,Net::IP
+
+AUTHOR
+    Wes Young, <saxguard9-cpan@yahoo.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2006 by Wes Young
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.7 or, at
+    your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 1f51299da655a4f1f67b865d945afa349e1c9742 AUTHOR_PLEDGE
+SHA1 0fc94db48abacb452865254bc77046095a4af2db Build.PL
+SHA1 18734e74b7ec1ac21bd11da74d44fa9fa3d2574f Changes
+SHA1 0c07c36a0112c7ce8da64b381cd1d701d2450ed9 CommitLog
+SHA1 5c24409a1a6a77231663ca661b6eba81303cd604 INSTALL
+SHA1 e6514e4bc5abd3d1a8c7bd2a782c2f8737b413e7 LICENSE
+SHA1 30b34f3dd92ad607cb83479b4d7fa87cb7e2c54e MANIFEST
+SHA1 e4ac9ab7a18e5f4fd84cb27d5a1876b805727c8b MANIFEST.SKIP
+SHA1 d2e393980bb74d5b9ffc446afe4b8954edeeb507 META.json
+SHA1 6b0ec39dbf8fb8794ee6e408a58a0497068dff1a META.yml
+SHA1 b8286c7df97c090f850172ea0914945424fe92e8 Makefile.PL
+SHA1 b80de27b25684a52295c9395bd8fa51a67c2fb9a README
+SHA1 330b038fbd58517d88a4d94972d77a6d1e36bad3 cpanfile
+SHA1 315fb56be6813cb165795c2c91c6199e8c858d05 dist.ini
+SHA1 a85c40937e1d569be5b17378f08298b4c7b21b0b doap.xml
+SHA1 8307eb31975caef917cc663e5f5b7c683230a5e7 examples/dist.ini
+SHA1 87689bcade1862f91673192312aa1f2c0248b809 lib/Dist/Zilla/Plugin/DualBuilders.pm
+SHA1 8114805e3f9e988b907254d1b9cfe4ebc0090791 t/00-compile.t
+SHA1 51d06b2e0db98f5a3c225f672122a4ab0a44bbed t/000-report-versions-tiny.t
+SHA1 fe0b44b75cef73ef115160a4c66fd369ab899404 t/apocalypse.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlRP3nIACgkQGfr7vsGKgxzbDgCcCO2j/WAuswdxPeirxzKdU5u+
+8coAn2/VpRj5I6zX368CMorrKBLfNLB3
+=Nbb8
+-----END PGP SIGNATURE-----

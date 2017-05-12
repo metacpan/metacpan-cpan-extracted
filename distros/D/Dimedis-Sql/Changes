@@ -1,0 +1,297 @@
+$Id: Changes,v 1.44 2006/10/20 09:57:50 cvsinst Exp $
+
+Revision history for Perl extension Dimedis::Sql.
+
+0.44 20.10.2006 joern
+        Bugfix:
+        - Dimedis::SqlDriver::mysql: cmpi() funktionierte bei
+          binary Spalten nicht.
+
+0.43 12.09.2006 joern
+        Bugfix:
+        - Bei Nicht-utf-8 Handles Daten mit utf-8 Flag vorm Einfügen
+          in die Datenbank nach windows-1252 konvertieren.
+
+0.42 08.09.2006 joern
+	Feature:
+	- beim Export werden keine Dateien für leere Blobs erzeugt
+
+0.41 16.09.2005 joern
+	Bugfix:
+	- Dimedis::SqlDriver::mysql: blob_read zerstörte Blobdaten
+	  beim Schreiben in ein FilehHandle wenn utf8 Modus aktiviert.
+
+0.40 19.07.2005 joern
+	Bugfix:
+	- Dimedis::SQL::Import: wenn "inserts_per_transaction" gesetzt
+	  wurden "überhängende" INSERT's am Ende nicht committed.
+
+0.39 01.02.2005 joern
+	Bugfix:
+	- Dimedis::SqlDriver::Oracle->db_contains(): Suche nach
+	  Begriffen in Großbuchstaben führte zu einer Oracle
+	  Exception wg. zu komplexer Abfrage.
+
+0.38 09.12.2004 joern
+	Bugfix:
+	- Dimedis::SqlDriver::mysql: die Verwendung von "set
+	  character set latin1" funktionierte nicht, da falsche
+	  collate eingestellt wurde (die System-Collate utf8_general_ci).
+	  Nun werden explizit die Variablen character_set_client,
+	  character_set_connection, character_set_results und
+	  collation_connection entsprechend gesetzt.
+
+0.37 23.11.2004 joern
+	Bugfix:
+	- Dimedis::SqlDriver::Oracle->db_contains(): alle
+	  Sonderzeichen escapen, sonst können immer noch
+	  "DRG-50937: query too complex" Fehler auftreten.
+
+0.36 22.11.2004 joern
+	Bugfix:
+	- Dimedis::SqlDriver::mysql: set_utf8() muß die
+	  Datenbankverbindung entsprechend einstellen.
+
+0.35 12.11.2004 joern
+	Features:
+	- Export Programm kann auch utf8 Datenbanken exportieren
+	- Import Programm kann sowohl latin1 als auch utf8 Daten
+	  importieren. Hierzu gibt es die neue Konfigurations-Option
+	  'recode', die die alte Option 'iso2utf8' ablöst
+	  (siehe Doku von dsql_import). Ein Konvertierung von utf8
+	  nach latin1 ist aber derzeit noch nicht implementiert.
+	- Dimedis::SqlDriver::mysql: bei MySQL Servern >= 4.1 wird
+	  nun die Datenbankverbindung auf CHARACTER SET UTF8
+	  gesetzt, wenn Dimedis::Sql->{utf8} gesetzt ist.
+	- dsql_export: mit der neuen Option 'include_tables' können
+	  ausgewählte Tabellen exportiert werden.
+
+	Bugfix:
+	- Dimedis::SqlDriver::mysql: CLOBs wurden bei einer
+	  utf8 Datenbank doppelt utf8 kodiert ins Filesystem
+	  geschrieben.
+
+0.34 15.09.2004 joern
+	- Bugfix: left_outer_join() funktionierte nicht im
+	  utf8 Modus.
+
+0.33 28.06.2004 joern
+	- Bugfix: Datei I/O mit utf8 Clobs funktionierte nicht
+	  immer, zumindest nicht unter Perl 5.8.2 (welches ein
+	  Bug in join() unter utf8 hat).
+	- Feature: man kann nun auch von Dimedis::Sql erben,
+	  indem die abgeleitete Klasse dynamisch in die
+	  Vererbungslinie der SqlDriver Module eingefügt wird.
+
+0.32 03.02.2004 joern
+	- Feature: Dimedis::SqlDriver::MySQL unterstützt jetzt
+	  auch die contains() Methode, allerdings ohne speziellen
+	  Volltext-Index sondern mit einer einfachen LIKE Suche.
+
+0.31 15.08.2003 joern
+	- Bugfix: leere MySQL Clob's werden nun nicht mehr zu NULL
+	  gemacht. Leere Clob's dürfen grundsätzlich nicht zu NULL
+	  gemacht werden, da dies nicht datenbankübergreifend portabel
+	  ist.
+
+0.30 07.08.2003 joern
+	- Leer-Strings werden beim Einfügen / Updaten zu undef
+	  (bzw. NULL) konvertiert. Das vereinheitlicht die Behandlung
+	  von Leer-Strings bei verschiedenen Datenbanksystemen. Z.B.
+	  konvertiert Oracle Leer-Strings immer zu NULL, während
+	  MySQL diese sehr wohl als Leer-String speichert.
+
+0.29 08.07.2003 gert
+	- ODBC.pm / Microsoft SQL Server: proprietaere Outerjoin-Syntax
+	  mit *= Operator ersetzt durch die ANSI-Outer-Join-On-Notation
+	  in der From-Klausel. Der Code wurde vom MySQL Driver
+	  übernommen.
+
+0.28 30.01.2003, joern
+	- Import: iso2utf8 Option, konvertiert Daten nach Unicode
+	  beim Import.
+
+0.27 15.01.2003, joern
+	- Bugfix, Oracle: Inserts/Updates in Tabellen mit mehreren
+	  CLOB's (oder BLOB's) funktionierten nicht.
+
+0.26 15.11.2002 joern
+	- UTF8 Support
+	- Import/Export Anpassung für Sybase
+
+0.25 15.07.2002 joern
+	- Bugfix: MySQL Treiber unterstützte das explizte Einfügen
+	  von Serial Werten nicht.
+
+0.24 27.06.2002 joern
+	- In der cmpi Methode wurde 'use locale' hinzugefügt,
+	  so daß eine mit setlocale() eingestellte Locale nun
+	  berücksichtigt wird. Dazu mußten folgende SqlDriver
+	  geändert werden:
+	  - ASAny (0.03)
+	  - Informix (0.10)
+	  - Oracle (0.19)
+	  - Pg (0.02)
+	  - Sybase (0.12)
+
+0.23 21.06.2002 joern
+	- SqlDriver::mysql (0.08), SqlDriver::Informix (0.09)
+	  - Bugfix: es wurde eine Exception geworfen, wenn ein
+	    blob_read auf einen leeren bzw. undefinierten
+	    Blob ging, statt einen Leer-String zurückzuliefern.
+	- Dimedis::Sql::Export
+	  - ODBC/MS-SQL Support: $dbh->{odbc_SQL_ROWSET_SIZE} = 2
+	- Sybase:
+	  - automatische Serial-Ermittlung (max(id)+100), wenn
+	    Serial noch nicht existent
+
+0.22 28.04.2002 stefan
+	- SqlDriver::Sybase
+	  - Outer Join warf Fehlermeldung
+
+0.21 26.04.2002 sabine, joern
+	- SqlDriver::Oracle
+	  - lesen von Blobs, die NULL waren, gab eine Exception.
+	    NULL Blobs werden nun als leere Blobs zurückgegeben
+	    (joern)
+	- Dimedis::Sql
+	  - neues Attribut 'serial_write', um gezieltes Setzen von
+	    serial Spalten zu erlauben.
+	- SqlDriver::mysql
+	  - Abfrage des neuen Attributes 'serial_write' beim Insert
+	    in serial Spalten, um gezieltes Setzen von serial
+	    Spalten zu erlauben.
+	- SqlDriver::Sybase
+	  - Abfrage des neuen Attributes 'serial_write' beim Insert
+	    in serial Spalten, um gezieltes Setzen von serial
+	    Spalten zu erlauben.
+	- Import / Export
+
+0.20 12.04.2002 joern
+	- Umstrukturierung der Dimedis::Sql und Dimedis::SqlDriver
+	  Module, allerdings nur die Distribution betreffend.
+	  Die CVS Module für die SqlDriver wurden gelöscht und
+	  die SqlDriver alle unterhalb des Dimedis::Sql Moduls
+	  im lib Ordner eingebettet. D.h. ab jetzt gibt es nur
+ 	  noch eine Dimedis::Sql Distribution, die immer alle
+	  SqlDriver enthält.
+
+0.19 05.06.2001 gert
+	- blob_read versteht nun bind-parameters (lediglich die
+          Doku angepasst).
+
+0.18 27.02.2001 joern
+	- die Methode $sqlh->get() liefert u.a. einen Hash des
+	  eingelesenen Datensatzes zurück. Die Schlüssel im Hash
+	  sind die Spalten des Datensatzes, und werden von nun an
+	  *immer* lower cased zurückgeliefert. Einige Datenbanken
+	  weichen hiervon ab, deshalb muß Dimedis::Sql der
+	  Portabilität halber diese Konvertierung vornehmen.
+
+0.17 23.02.2001 joern
+	- Fehlerausgaben enthalten nun wo möglich den SQL Code,
+	  der zu dem Fehler führte
+
+0.16 23.10.2000 joern
+	- $sqlh->do und $sqlh->get benutzen nun nicht mehr bei jedem
+	  Befehl das DBI Statement Caching. Wenn keine SQL Parameter
+	  übergeben wurden, so wird ohne Caching gearbeitet. Darüber
+	  hinaus ist bei einigen Methoden das Caching durch den
+	  Anwender steuerbar (siehe Dokumentation)
+	- teilweise benötigt das Cache Feauture Support durch die
+	  Dimedis::SqlDriver. Der Sybase Treiber enthält bereits
+	  die entsprechenden Änderungen, die andern Treiber müssen
+	  noch überprüft werden. Nach außen hin ist das Feature aber
+	  transparent, lediglich der Speicherverbrauch kann je nach
+	  Datenbanktyp variieren. Das Funktionsverhalten ist überall
+	  identisch, an der API gab es keine inkompatiblen Änderungen.
+
+0.15 16.03.2000 stefan
+	- im Konstruktor kann ein globales Typehash angegeben werden, 
+	  dass aber immer von einem lokalen ueberspielt werden kann
+
+0.14 03.03.2000 joern
+	- do Methode arbeitet mit prepare_cached. Das bringt
+	  bei Sybase fast den doppelten Durchsatz.
+
+0.13 02.03.2000 joern
+	- neue Methode: db_prefix
+
+0.12 29.02.2000 stefan
+	- neue Datentypen eingefuegt (integer,numeric,varchar,char)
+	- Konstruktor erweitert, damit auch DBD::Proxy verwendet
+	  werden kann
+
+0.11 17.02.2000 joern
+	- Hinweis in Doku, daß $where von left_outer_join immer
+	  zurückgeliefert wird.
+	- neue Methode: use_db zum Wechseln einer Datenbank
+
+0.10 09.11.1999 joern
+	- nun wird auch Sybase supported
+	- Neue Methode: get_features()
+
+0.09 18.10.1999 joern
+	- Dokumentation leicht überarbeitet, einige Beispiele
+	  eingefügt.
+
+0.08 29.07.1999 joern
+	- Die $sqlh->contains Schnittstelle wurde geändert,
+	  entsprechender Code muß leider angepaßt werden. Dafür
+	  kann man jetzt mehrere Suchwörter eingeben, die
+	  mit 'and' oder 'or' verknüpft werden.
+	- Exceptions werden nun mit croak geworfen
+
+0.07 23.07.1999 joern
+	- Volltextsupport durch neue Methode $sqlh->contains.
+
+0.06 16.07.1999 joern
+	- bei Serial Spalten ist die explizite Angabe von Werten
+	  von nun an verboten, da sich das nicht mit allen
+	  Datenbanksystem realisieren läßt (Informix: ja,
+	  Oracle: nein)
+
+0.05 07.07.1999 joern
+	- Windows NT: Filehandles müssen mit binmode behandelt
+	  werden. In der Dokumentation wurde ein entsprechender
+	  Hinweis hinzugefügt, am Code gibt es hierzu keine
+	  Veränderungen, da diese nur in den SqlDrivern
+	  erforderlich waren.
+
+0.04 18.06.1999 joern
+	- Implementation von
+	  - install
+	- die Angabe eines Sequence Namens beim serial Datentyp
+	  ist nicht mehr möglich
+	- den Outer Join Fall II gibt es nicht mehr
+	- Fall III wurde umbenannt zu Fall II
+	- Die SqlDriver::* erben nun von Dimedis::Sql statt ihre
+	  Methoden direkt im Dimedis::Sql Package zu definieren.
+	  Nur so ist es möglich, mehrere Dimedis::Sql Instanzen
+	  für unterschiedlichen Datenbankplattformen parallel
+	  zu erzeugen.
+	  Der Konstruktor gibt nun ein Handle auf die SqlDriver
+	  Klasse zurück, statt eines Handles auf Dimedis::Sql.
+	  Es handelt sich dabei aber nicht um eine imkompatible
+	  Änderung der Schnittstelle. Alle Dimedis::Sql Programme
+	  funktionieren unverändert weiter.
+	- Dokumentation auf den aktuellen Stand gebracht
+
+0.03 17.06.1999 joern
+	- tmp_dir Parameter beim Konstruktor entfernt
+
+0.02 16.06.1999 joern
+	- Implementation von
+	  - cmpi
+	- filehandle Parameter bei blob_read
+
+0.01 12.06.1999 joern
+	- Implementation von
+	  - new
+	  - insert
+	  - update
+	  - blob_read
+	  - do
+	  - get
+	  - outer_join
+

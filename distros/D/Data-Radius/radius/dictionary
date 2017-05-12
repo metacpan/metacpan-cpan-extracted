@@ -1,0 +1,26 @@
+#
+#	Main RADIUS dictionary
+#
+$INCLUDE rfc2865
+$INCLUDE rfc2866
+$INCLUDE rfc2868
+$INCLUDE rfc2869
+$INCLUDE rfc3576
+$INCLUDE rfc4372
+$INCLUDE rfc5090
+$INCLUDE mera # include before cisco
+$INCLUDE cisco
+$INCLUDE mikrotik
+$INCLUDE quintum
+$INCLUDE broadsoft
+$INCLUDE cantata
+$INCLUDE wimax
+$INCLUDE huawei
+$INCLUDE laurel
+$INCLUDE starent
+$INCLUDE portaone
+$INCLUDE 3gpp2
+$INCLUDE digium
+$INCLUDE wispr
+$INCLUDE rfc4679
+$INCLUDE alcatel-lucent

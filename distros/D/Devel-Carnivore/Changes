@@ -1,0 +1,34 @@
+Revision history for Perl extension Devel::Carnivore.
+
+0.01  Fri Jul  5 21:09:00 2002
+	- original version; created by h2xs 1.21 with options
+		-cfn Devel::Carnivore
+		
+0.02  Mon Jul  8 21:09:00 2002
+	- added 50 Tests
+
+0.03  Sam Aug 10 21:09:00 2002
+	- added a test for using this module on hashes which are already tied
+
+0.04  Sam Aug 10 21:09:00 2002
+	- fixed that test :)
+
+0.05  Sam Aug 10 21:09:00 2002
+	- added tests for the unwatch function
+
+0.06  Sam Aug 10 21:09:00 2002
+	- fixed a bug in unwatch. Tests Are Good (tm)
+
+0.07  Sam Aug 10 21:09:00 2002
+	- added even more tests + plus some finishing touches. Well
+	  the docs suck. At least there are some. But I'll write better
+	  ones soon ;).
+	  
+0.08  Son Aug 19 21:09:00 2002
+	- added a test whether an object is tied (not only whether) its tied
+	  to the right class
+	  and added debugging output to the line number tests
+
+0.09  Fri Sep 27 21:09:00 2002
+	- works in Perl 5.8 now (problem with different Carp semantics)
+	  - I dont know about Perl <= 5.6.0, need to test that

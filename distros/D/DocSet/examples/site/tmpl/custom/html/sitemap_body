@@ -1,0 +1,38 @@
+[% # site map
+   # expects to be set:
+   # nav          - cache navigator object
+   # rel_doc_root - relative docs path (only for chapters!)
+-%]
+
+    <!-- content begin -->
+
+<p>[% doc.meta.abstract %]</p>
+
+[% 
+ #   "<p>";
+ #   INCLUDE print_item c = doc;
+ #   "</p>";
+
+   # now recursively render all levels
+    INCLUDE print_node c = doc.nav.first prefix = ".";
+-%]
+
+[% BLOCK print_node;
+       IF c;
+           "<ul class=\"toc\">\n";
+           WHILE c;
+               "<li>\n";
+               INCLUDE print_item;
+               INCLUDE print_node c=c.down.first prefix="$prefix/${c.meta.rel_path}";
+               c = c.next;
+               "</li>\n";
+           END;
+           "</ul>\n";
+       END;
+   END;
+%]
+
+[%- BLOCK print_item -%]
+    [%- link = INCLUDE link prefix=prefix link=c.meta.link -%]
+    <a href="[% link %]">[% c.meta.title %]</a>
+[% END %]

@@ -1,0 +1,86 @@
+SOFTWARE LICENSE AGREEMENT
+
+This Software License Agreement ("Agreement") is made between Bungisoft, Inc.  ("Bungisoft") and you.  You accept the terms and conditions of this Agreement when you click the "Accept" button on the Software set-up screen, or during installation of this software by any available means. Your rights and obligations with respect to the accompanying software ("Software") are as follows: 
+
+
+1. Grant of License:   Subject to your payment in full of the applicable license fee and the terms and conditions below, Bungisoft grants a limited, nonexclusive license to you to use one copy of the Software on one computer or electronic device for the sole purpose of developing and deploying software applications for internal use only in a computing environment.  You may only network the Software or otherwise use the Software in a shared environment if this is a Server product or a license has been purchased for each other user, and you do not violate any other terms of this Agreement.  Title to the Software shall remain with Bungisoft at all times.
+
+
+2. Exclusions:   You shall not:
+
+a) copy any part of the Software except to make customary copies solely for back-up purposes;
+
+b) reverse compile, reverse assemble, make any attempt to discover the source code, or create derivative works from any portion of the Software;
+
+c) distribute, disclose, market, sublicense, rent, lease, or transfer the Software or the license for the Software or use the Software for third-party training; however, you may transfer the license, the copy of the Software, and any written materials associated with the Software on a permanent basis provided 
+
+   (i)   you notify Bungisoft in writing of the transfer,
+
+   (ii)  you provide Bungisoft the same information as is required for ordering the Software from the Bungisoft web site,
+
+   (iii) you retain no copies of the Software or associated documentation,
+
+   (iv)  the transferee agrees to the terms of this Agreement, and
+
+   (v)   you or the transferee pays Bungisoft a reasonable transfer fee in such amount as Bungisoft may establish;
+
+d) export the Software (including any export for your own use) except in compliance with all United States export laws and regulations;
+
+e) disclose benchmarks or other comparisons or evaluations of the Software to any third party without Bungisoft's prior written consent;
+
+f) disclose any confidential information provided by Bungisoft;
+
+g) modify the Software;
+
+h) allow others to make or obtain copies of the Software; or 
+
+i) use the Software in development of a Perl DBI driver.
+
+
+3. Documentation:   Bungisoft makes the Software's documentation available in an electronic format.  You may make one hard copy of the documentation for your personal reference purposes.  The Software documentation is protected by United States and international copyright laws, and all rights are reserved.  In addition, the documentation is  "Confidential Information" of Bungisoft and shall not be disclosed by you to anyone who has not purchased a license.  
+
+
+4. Technical Support:  The Software includes thirty days of installation support via e-mail from the date of registration. Additional technical support is not included in the cost of license, but may be available from Bungisoft for a separate fee.  See Bungisoft's web site. 
+
+
+5. Software Updates: This license does not include the right to receive or use any enhancements or upgrades to the Software.  Licenses for enhancements and upgrades, if available, may be obtained at Bungisoft's then current standard pricing and on Bungisoft's then current terms and conditions.
+
+
+6. Specific Disclaimer of Warranty and Limitation of Liability:  THE SOFTWARE IS PROVIDED WITHOUT WARRANTY OF ANY KIND.  BUNGISOFT DISCLAIMS ALL WARRANTIES, EXPRESSED AND IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  BUNGISOFT WILL NOT BE LIABLE FOR SPECIAL, INCIDENTAL, INDIRECT, OR CONSEQUENTIAL DAMAGES OF ANY KIND, INCLUDING BUT NOT LIMITED TO DAMAGES RELATING TO LOST DATA OR LOST PROFITS, EVEN IF BUNGISOFT HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.  BUNGISOFT'S TOTAL LIABILITY UNDER THIS AGREEMENT IS LIMITED TO THE AMOUNT YOU PAID FOR THE LICENSE.  
+
+
+7. Assignment:   The license for the Software is not assignable by you.  An assignment shall be deemed to occur if you are a business entity and there is a material change in the ultimate beneficial ownership of a majority interest in the entity.
+
+
+8. Indemnification; Restriction on Usage.  You shall indemnify Bungisoft and its officers, directors, employees, and agents, and hold them harmless, from any claim made against Bungisoft arising out of your use of the Software.  You are not licensed to use the Software in connection with applications involving aviation, life-support, or other hazardous activity.
+
+
+9. Termination: You may terminate this license at any time by destroying all copies of the programs. Bungisoft shall have the right at its discretion to terminate your right to use the programs at any time if you fail to comply with any of the terms or conditions of this License Agreement. Upon such termination, you must destroy all copies of the programs.  Termination shall not relieve your obligations specified in paragraphs 3, 4, 5, 7, 8, and 11.
+
+
+10. Miscellaneous:   This License Agreement and all related actions thereto shall be governed by Delaware law. If any provision of this License Agreement is held to be invalid or unenforceable, the remaining provisions of this License Agreement will remain in full force.
+
+
+11. Entire Agreement:   This Agreement constitutes the entire agreement between the parties concerning your use of the Software.  This Agreement supersedes any prior verbal understanding between the parties and any purchase order or other ordering document, regardless of whether such document is received by Bungisoft before or after execution of this Agreement.  This Agreement may be amended on behalf of Bungisoft only by a writing signed by an authorized officer of Bungisoft.
+
+
+12. Trademarks and Logos:  You acknowledge and agree as between you and Bungisoft that Bungisoft owns the REDBASE trademark and all REDBASE-related trademarks, service marks, logos and other brand designations. Any use you make of the Bungisoft's trademarks inures to Bungisoft's benefit.  
+
+
+13.  Source Code:  Software may contain source code that is provided solely for reference purposes pursuant to the terms of this Agreement.  Source code may not be redistributed unless expressly provided for in this Agreement.
+
+
+14.  Copyright: This product contains the following copyrights.
+
+     Copyright (c) 2002 Bungisoft, Inc.
+     All rights reserved
+
+
+For inquiries please contact:
+
+Bungisoft, Inc.
+22216 Victory Blvd.
+Suite C-201
+Woodland Hills, CA 91367
+USA
+

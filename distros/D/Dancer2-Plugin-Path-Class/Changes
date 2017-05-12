@@ -1,0 +1,27 @@
+Revision history for Dancer2-Plugin-Path-Class
+
+0.08	2016-06-10
+	Remove 'deprecated' warnings
+
+0.07	2016-01-27
+	cpantesters on windows use Path::Tiny's canonpath in content tests ( @syspete )
+
+0.06	2016-01-24
+	Make it work for older perls (5.008)
+
+0.05	2016-01-23
+	Add MIME::Types to PREREQ_PM
+	TODO: Fix 'make test' on Windows
+
+0.04	2016-01-22
+	Add tests contibuted by Peter Mottram ( @syspete )
+
+0.03	2015-09-24
+	Remove $dsl->mime , use MIME::Types
+	TODO: remove $dsl->request and $dsl->var
+
+0.02	2015-03-08
+	keyword 'mime' must be called as '$dsl->mime'
+
+0.01    2015-03-05
+        First version, released on an unsuspecting world.

@@ -1,0 +1,32 @@
+Revision History for Dist-Zilla-Plugin-GitFmtChanges
+====================================================
+
+v0.006 2016-11-19
+-----------------
+
+* 2016-11-19 20:07:18 +1100
+  version bump
+* 2016-11-19 20:00:04 +1100
+  Merge pull request #2 from SineSwiper/master
+* 2016-11-03 23:25:32 +0000
+  Fixes for kwalitee issues Namely: has_meta_json, meta_yml_declares_perl_version, meta_yml_has_provides
+* 2015-05-05 11:27:17 +1000
+  Dist::Zilla tweak
+* 2015-05-05 11:25:02 +1000
+  Dist::Zilla fixes
+* 2015-05-05 11:03:17 +1000
+  AutoPrereqs now.
+* 2015-01-22 04:03:05 +1300
+  Remove unneeded dependency on Moose::Autobox
+* 2013-10-25 11:16:26 -0400
+  Add Bootstrap::lib to dist.ini
+* 2013-10-25 11:03:39 -0400
+  Handle initial releases properly
+* 2013-09-14 11:49:00 +1000
+  added [ReportVersions::Tiny]
+* 2012-02-06 00:32:06 +1100
+  added a ConfirmRelease test
+
+===================================
+End of changes in the last 365 days
+===================================

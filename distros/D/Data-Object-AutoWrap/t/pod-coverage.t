@@ -1,0 +1,9 @@
+#!perl -T
+# vim:ts=4:sw=4:et:ft=perl:
+
+use Test::More;
+eval "use Test::Pod::Coverage 1.04";
+plan skip_all =>
+  "Test::Pod::Coverage 1.04 required for testing POD coverage"
+  if $@;
+all_pod_coverage_ok( { private => [ qr{^import$}, qr{^_} ] } );

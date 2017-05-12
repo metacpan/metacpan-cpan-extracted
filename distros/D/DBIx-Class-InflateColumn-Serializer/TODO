@@ -1,0 +1,7 @@
+TODO list for Perl module DBIx::Class::InflateColumn::Serializer
+
+- Make tests detect what serializers you have installed, and test only those
+- Truncation tests now have to manually be executed against a mysql that has the table in t/lib/sqlite.sql
+  created DBICTEST_DSN="dbi:mysql:test" DBICTEST_NODEPLOY=1 perl -I blib/lib/ t/002_serialize.t
+- Let the user select the parameters for serialization modules (via serializer_args, f. ex.)
+

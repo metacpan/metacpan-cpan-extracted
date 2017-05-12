@@ -1,0 +1,67 @@
+Data-FR-Town
+
+This module provides basic data about french towns.
+
+    use Data::FR::Town;
+
+    # Multiple ways to get the same town
+    my $town1 = Data::FR::Town->new( {insee => "01001"});
+    my $town2 = Data::FR::Town->new( {zip => "01400"});
+    my $town3 = Data::FR::Town->find( {insee => "01001"});
+    my $town3 = Data::FR::Town->find( {zip => "01400"});
+
+    Now you can get data about the selected town, using the getters :
+
+    my $zip = $town1->zip();
+    my $name = $town1->name();
+    my $cname = $town1->cname();
+    ...
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::FR::Town
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-FR-Town
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-FR-Town
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-FR-Town
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-FR-Town/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Arnaud (Arhuman) ASSAD
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

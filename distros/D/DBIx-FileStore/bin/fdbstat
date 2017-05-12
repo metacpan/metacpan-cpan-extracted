@@ -1,0 +1,77 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+    #fdbstat: shows stats about files in FileDB
+
+use DBIx::FileStore;
+use DBIx::FileStore::UtilityFunctions qw( convert_bytes_to_human_size );
+
+my $human = 0;
+
+main();
+
+sub Usage {
+    "fdbstat [-human]: show stats about files stored with DBIx::FileStore.\n";
+}
+
+sub main {
+    GetOptions(
+        "human!" => \$human,
+    ) || die Usage();
+
+    my $filestore = new DBIx::FileStore(); 
+
+    # THIS CODE SHOULD BE MOVED INTO A DBIx::FileStore method.
+    
+    # count how many blocks are numbered '0', there's one for each file
+    # also sum up the filesizes
+    my ($files, $bytes) = $filestore->{dbh}->selectrow_array( 
+            "select count(*), sum(c_len) from $filestore->{filetable} where b_num=0", {} );
+    $bytes ||= 0;
+
+    # count the blocks
+    my ($blocks) = $filestore->{dbh}->selectrow_array( "select count(*) from $filestore->{blockstable}" );
+
+    # old way
+    #print "fdbstat: DB has $bytes bytes in $files files stored in $blocks blocks.\n";
+    
+    # new way, respecting --human param
+    printf( "fdbstat: DB has %s in $files files stored in $blocks blocks.\n",
+            $human ? convert_bytes_to_human_size($bytes) : "$bytes bytes" );
+}
+
+=pod
+
+=head1 NAME     
+            
+fdbstat - Show stats about data in DBIx::FileStore 
+                    
+=head1 SYNOPSIS     
+                
+    % fdbstat 
+    fdbstat: DB has 7623 bytes in 2 files stored in 2 blocks.
+
+    % fdbstat -h 
+    fdbstat: DB has 550.2M in 8 files stored in 114 blocks.
+
+=head1 DESCRIPTION 
+
+Shows a line with the size, number of files, and number of blocks
+currently used by L<DBIx::FileStore> tables.
+
+=head1 OPTIONS
+
+=head2 --human or -h
+
+Show size as G, M, K or bytes, for humans.
+                
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbget>, L<fdbls>, L<fdbmv>,  L<fdbput>,  L<fdbrm>,  L<fdbtidy>
+    
+=cut   

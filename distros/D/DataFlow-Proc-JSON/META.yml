@@ -1,0 +1,30 @@
+---
+abstract: 'A JSON converting processor'
+author:
+  - 'Alexei Znamensky <russoz@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0.88
+  Test::UseAllModules: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200012, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DataFlow-Proc-JSON
+requires:
+  DataFlow: 1.112100
+  DataFlow::Proc::Converter: 0
+  JSON: 0
+  Moose: 0
+  namespace::autoclean: 0
+resources:
+  homepage: https://github.com/russoz/DataFlow-Proc-JSON
+  repository: https://github.com/russoz/DataFlow-Proc-JSON
+version: 1.112100

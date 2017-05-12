@@ -1,0 +1,119 @@
+NAME
+    Data::Pulp - Pulp your data into a consistent goop
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Data::Pulp;
+
+        my $pulper = pulper
+            case { $_ eq 'apple' } then { 'APPLE' }
+            case { $_ eq 'banana' }
+            case { $_ eq 'cherry' } then { 'CHERRY' }
+            case { ref eq 'SCALAR' } then { 'SCALAR' }
+            empty { 'empty' }
+            nil { 'nil' }
+            case { m/xyzzy/ } then { 'Nothing happens.' }
+            default { croak "Don't understand $_" }
+        ;
+
+        $pulper->pulp( 'apple' )        # APPLE
+        $pulper->pulp( 'banana' )       # CHERRY
+        $pulper->pulp( 'xyyxyzzyx' )    # Nothing happens.
+        $pulper->pulp( undef )          # nil
+        $pulper->pulp( '' )             # empty
+        $pulper->pulp( '1' )            # Throw an exception: Don't understand 1
+
+        # You can also operate on an array or hash
+
+        my $set = $pulper->prepare( [ qw/apple banana cherry/, '', undef, qw/xyzzy xyyxyzzyx grape/ ] )
+
+        $set->all       # APPLE, CHERRY, CHERRY, empty, nil, Nothing happens ...
+        $set->first     # APPLE
+        $set->last      # Throw an exception: Don't understand grape
+
+DESCRIPTION
+    Data::Pulp is a tool for coercing and/or validating input data. Instead
+    of doing this:
+
+        if ( defined $value ) {
+            if ( ref $value eq ... ) {
+                ...
+            }
+            elsif ( $value =~ m/.../ ) {
+                ...
+            }
+            ...
+        }
+        else {
+        }
+
+    You can do something like this:
+
+        my $pulper = pulper
+            case { $_ eq ... }  then { ... }
+            case { m/.../ }     then { ... }
+            nil { ... # Do action if value is undefined }
+        ;
+
+        $pulper->pulp( $value )
+
+    A pulper can act transparently on a single value, ARRAY, or HASH:
+
+        my $set = $pulper->prepare( $value ) # A single value list
+        my $set = $pulper->prepare( [ $value, ... ] )
+        my $set = $pulper->prepare( { key => $value, ... } ) # Throws away the keys, basically
+
+    So, given a subroutine:
+
+        sub method {
+            my $data = shift;
+            # $data could be a single value, or an array, or even a hash
+            my $set = $pulper->prepare( $data )
+            my @data = $set->all # Get all the data coerced how you want
+                                 # or throw an exception if something bad is encountered
+
+            ...
+        }
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-data-pulp at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Pulp>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Pulp
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Pulp>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-Pulp>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-Pulp>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-Pulp/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

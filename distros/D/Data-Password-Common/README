@@ -1,0 +1,87 @@
+NAME
+    Data::Password::Common - Check a password against a list of common
+    passwords
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      use Data::Password::Common 'found';
+
+      if ( found( $password ) ) {
+        die "'$password' is a common password"
+      }
+
+      # import with aliasing
+      use Data::Password::Common found => { -as => "found_common" };
+
+      # custom common password list
+      use Data::Password::Common found => { list => "/usr/share/dict/words" };
+
+DESCRIPTION
+    This module installs a list of over 557,000 common passwords and
+    provides a function to check a string against the list.
+
+    The password list is taken from InfoSecDaily at
+    <http://www.isdpodcast.com/resources/62k-common-passwords/>. (They claim
+    their list is over 62K, but they must have misread their "wc" output.)
+
+USAGE
+    Functions are provided via Sub::Exporter. Nothing is exported by
+    default.
+
+  found
+      found($password);
+
+    Returns true if the password is in the common passwords list.
+
+CUSTOMIZING
+    You may choose an alternate password list to check by passing a "list"
+    parameter during import:
+
+      use Data::Password::Common found => { list => "/usr/share/dict/words" };
+
+    The file must be sorted.
+
+SEE ALSO
+  Password checkers
+    *   Data::Password
+
+    *   Data::Password::Entropy
+
+    *   Data::Password::BasicCheck
+
+  Lists of common passwords
+    *   InfoSecDaily
+        <http://www.isdpodcast.com/resources/62k-common-passwords/>
+
+    *   Skull Security
+        <http://www.skullsecurity.org/wiki/index.php/Passwords>
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Data-Password-Common/issues>. You will be
+    notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Data-Password-Common>
+
+      git clone https://github.com/dagolden/Data-Password-Common.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    superfly1031 <RavetcoFX@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

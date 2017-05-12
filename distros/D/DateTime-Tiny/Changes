@@ -1,0 +1,23 @@
+Changes for Perl extension DateTime-Tiny
+
+1.06      2016-06-23 09:43:41-04:00 America/New_York
+    - No changes from 1.05
+
+1.05      2016-06-20 11:05:35-04:00 America/New_York (TRIAL RELEASE)
+    - David Golden taking over as maintainer
+    - Fix tests with DateTime::Locale 1.00 and later
+    - Fix documentation typos
+    - Ensure Carp is loaded before using it
+
+1.04 Mon 20 April 2009
+    - Fix 02_main.t fail if DateTime is not available (Alexandr Ciornii)
+    - Tweaks to POD, tests and Makefile.PL
+
+1.03 Sun 29 Mar 2009
+    - Time to stop shirking and do an actual public release
+
+0.02 Thu  1 Nov 2007
+    - Moving from Module::Install to EU:MM
+
+0.01 Wed 24 Jan 2007
+    - original version

@@ -1,0 +1,68 @@
+TODO LIST
+---------
+Most of the items on this list would not be hard to fix, but I have
+little need for the fixes myself. If you use this module and want an
+improvement/change, let me know. 
+
+#1 Perl reacts badly to parantheses!
+
+Or rather, perl reacts badly to left out parantheses.
+
+You easily get paranthesitis if you try to construct say the example
+tree in a single statement. This might not be a big problem, normally
+you would never try to define a multi-level data structure in a single
+statement, and if you do you would expect the statement to be
+complicated.
+
+# 2 Switch!
+
+There is currently at least one bug in Switch.pm I think, and I can
+visualize several changes to Switch.pm which would make this module
+even more useful. Once 0.01 is out the door I will look at that.
+
+# 3 More types needed! Parametric types!
+
+We need to expand the types a bit, so that we can declare things with
+more useful types.
+
+# 4 No exporting of constructors.
+
+This is one of many pragmas that could be useful say that you would write
+use Data::Variant 'nocons' to make sure no constructors are exported. 
+
+# 5 Pragmas
+
+For instance: use Data::Variant 'notypes' to turn off typechecking. 
+
+# 6 OO or not to OO?
+
+Will anyone ever use an OO-approach to this module? It feels neat to
+offer something, but it clutters up the documentation and probably
+confuses people. Maybe I should remove it, or at least remove it from
+the main documentation.
+
+# 7 Uniqueness
+
+When we say that the name of the variant should be unique, or that the
+constructor should be unique, we really mean I<unique within the
+running program>. The module isn't caching them to a file or a website
+or anything (altough a file repository could be potentially useful).
+
+# 8 mkpat
+
+I am not certain this is a good name for the function. Suggestions for
+better names gladly accepted.
+
+# 9 speed
+
+The speed is not too good. This is not a major concern to me, but it
+might be possible to speed some things up quite a bit.
+
+#10 printing
+
+Provide a general routine to print variant data structures.
+
+#11 Tests
+
+This is secretly the number one priority, some simple test cases for
+next release.

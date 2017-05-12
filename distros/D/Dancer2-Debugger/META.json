@@ -1,0 +1,66 @@
+{
+   "abstract" : "Dancer2 panels for Plack::Debugger",
+   "author" : [
+      "Peter Mottram (SysPete) <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Debugger",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.15",
+            "Dancer2::Core::Hook" : "0",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Plugin" : "0",
+            "Data::Dump" : "0",
+            "File::Spec" : "0",
+            "JSON::MaybeXS" : "0",
+            "Module::Find" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2",
+            "Moo::Role" : "2",
+            "Plack::Debugger" : "0",
+            "Plack::Debugger::Panel" : "0",
+            "Time::HiRes" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/SysPete/Dancer2-Debugger/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/SysPete/Dancer2-Debugger.git"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.008",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

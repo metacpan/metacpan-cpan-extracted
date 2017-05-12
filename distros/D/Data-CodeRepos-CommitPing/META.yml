@@ -1,0 +1,17 @@
+abstract: CodeRepos commit ping data handler
+author: Kazuhiro Osawa <ko@yappo.ne.jp>
+build_requires: 
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.640
+license: perl
+name: Data-CodeRepos-CommitPing
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  DateTime: 0
+  DateTime::Format::HTTP: 0
+  YAML: 0
+version: 0.03

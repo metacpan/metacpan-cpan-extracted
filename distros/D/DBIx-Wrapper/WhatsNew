@@ -1,0 +1,146 @@
+Version 0.29
+        * Fixed up POD a bit.
+
+Version 0.28
+        * check for $ENV{AUTOMATED_TESTING} to skip using SQLite under
+          automated testing.
+
+Version 0.27
+        * modify tests in t/01sqlite.t to create temp files in the t
+          directory instead of the default temp directory used by
+          File::Temp, in an attempt to fix problems with automated
+          testing.
+
+Version 0.26
+        * in select_from_hash, allow elements of $cols to be reference
+          to strings, in which case, they are used literally in the
+          query instead of escaping them, e.g., \"UNIXTIMESTAMP(NOW())"
+        * updated formatting in docs
+        * get_field_names(), get_names(), get_names_uc(), and
+          get_names_lc() methods to loop objects
+
+Version 0.25
+	* Fixed docs for nativeSelectLoop() and nativeQuery()
+	* In nativeSelectDynaMapping(), check that the hash keys for
+          the return hash are defined, otherwise, use an empty string
+          as the key
+
+	* Added short aliases for selectFromHash, selectFromHashMulti,
+          nativeSelectMapping, nativeSelectDynaMapping,
+          selectValueFromHash, selectValueFromHashMulti, nativeSelectWithArrayRef
+
+Version 0.24
+	* Added the to_csv() method
+	* Added the to_xml() method
+	* Added bencode() and bdecode()
+
+Version 0.23
+	* Added the connect_from_config() method
+
+Version 0.22
+	* Non native* methods no longer convert undef in values to
+	  empty string before inserting/updating.  So now they are
+	  compatible with DBI's behavior.
+	* Added extra (optional) argument \%args to nativeQuery()
+	* do() method now calls DBIx::Wrapper hooks instead of just
+	  being a pass-through
+	* option for connect() to specify that DBIx::Wrapper should
+	  not use placeholders in queries.
+	* selectAll()
+	* nativeSelectMultiOrOne()
+	* added more method aliases
+	* documented method aliases
+
+Version 0.21
+	* newFromDBI() now returns undef if not passed a DBI object.
+	* exists() method
+	* removed POD documentation for the newCommand() method, as it
+	  has been deprecated for a while now.
+	* tables and fields are now quoted in the resulting SQL query
+	  when calling methods that take Perl datastructures, e.g.,
+	  update()
+	* added literal() as an alias for command()
+
+Version 0.20
+	* added support for named placeholders for native* methods,
+	  except for nativeSelectExecLoop
+
+Version 0.19
+        * fixed delete() to return the number of rows affected instead of 1
+	* now requires Perl 5.6 or later
+	* getting/setting attributes now gets/sets the corresponding
+	  attribute in the underlying DBI object, e.g.,
+	  $num_reconnects = $dbh->{auto_reconnects_ok},
+          $dbh->{mysql_auto_reconnect} = 1, etc.
+	* attempting to access DBIx::Wrapper's internal data directly
+	  will no longer work -- you really shouldn't be doing that
+	  anyway :).  If you need to dump its internal data for
+	  debugging purposes, call the debug_dump() method.  It will
+	  return a string containing a dump using Data::Dumper.
+	* nativeSelectValuesArray()
+	* selectValueFromHash()
+	* selectValueFromHashMulti()
+	* added optional \@cols argument to selectFromHash() and selectFromHashMulti()
+        * smartUpdate now only queries for one column when checking to
+          see if a row exists (previously it did "SELECT *")
+
+Version 0.18
+	* selectFromHashMulti() method
+	* support for OR in selectFromHash() and selectFromHashMulti()
+	  by passing an array ref
+
+Version 0.17
+	* connect_one() method
+	* support for mysql's mysql_connect_timeout parameter
+
+Version 0.16
+        * disconnect() method
+        * documented reconnect() method
+	* update() and smartUpdate() will now ignore (just return a
+	  true value) when called with empty $data
+
+Version 0.15
+        * Documented callbacks
+
+Version 0.14
+        * The data_source argument to connect() can now be a hash
+        * Unknown method calls will be passed to the underlying DBI
+          object.  So now you can make calls like prepare() which
+          makes it easier integrate DBIx::Wrapper into an existing
+          software package.
+
+Version 0.13 (tester release)
+        * Preliminary support for handlers (alpha)
+        * errstr() method
+        * Optional db_style parameter in the \%params parameter to the
+          connect() method.
+        * Check for db_style values mssql, sybase, asa, and asany to
+          determine how getLastInsertId() should be implemented.
+        * Check driver name in the dsn string passed to connect() to
+          determine how getLastInsertId() should be implemented.
+          Values checked are sybase and asany.  The default behaviour
+          is for the mysql driver.
+        * begin_work() method
+        * rollback() method
+
+Version 0.12
+        * New optional parameter \%params in the connect() method
+        * Optional debug and error handlers accepted through the
+          \%params parameter in the connect() method.
+        * command($str) method to return a scalar reference needed to
+          pass to insert(), replace(), etc., to pass literal SQL.
+
+Version 0.11
+        * $db->update() and $db->nativeQuery() now return the number
+          of rows affected by the query, if available.
+
+	* 'make test' no longer breaks when DBI is not installed.
+	  This was causing ActiveState Perl builds to fail and not be
+	  available on their site.
+
+Version 0.10
+	my $rv = $dbh->delete($table, \%keys)
+        my $id = $dbh->getLastInsertId;
+        my $val = $dbh->nativeSelectValue($query, \@exec_args);
+        my $rv = $dbh->smartReplace($table, \%data);
+        my $row = $dbh->selectFromHash($table, \%keys);

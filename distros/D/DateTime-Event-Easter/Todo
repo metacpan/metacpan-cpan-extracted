@@ -1,0 +1,6 @@
+TODO list for Perl module DateTime::Event::Easter
+
+- Code optimization - make it go faster!
+
+- Check if as_list with as_span returns a DateTime::SpanSet :)
+

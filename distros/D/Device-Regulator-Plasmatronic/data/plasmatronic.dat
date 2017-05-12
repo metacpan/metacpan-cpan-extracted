@@ -1,0 +1,456 @@
+# FORMAT =
+# 	name\t+number\t+notes\t+divider\t+multipler\t+units
+#	
+# Parameters = 	
+# 	- Short Name	
+#	- Number	
+#	- Full description	
+#	- Divide by (number)	
+#	- Multiply by (number or BM)	
+#	- Unit	
+#	- ShiftLeft by (other name or NA)	
+#	- Write flag	
+#	- Non NV Backup/Restore (should it be backed up)
+#	
+# Multiplier can be BM (Bat Multipler)	
+#	
+# ------------------------------------------------------------------------------
+# Local stuff
+# ------------------------------------------------------------------------------
+version		20	version number				1	1	NA	NA	0	0
+in		NA	Total input				0	0	Ah	NA	0	0
+out		NA	Total output				0	0	Ah	NA	0	0
+load		NA	Current load				0	0	Ah	NA	0	0
+charge		NA	Current charge				0	0	Ah	NA	0	0
+# ------------------------------------------------------------------------------
+# Some possible calculated fields (an experiment)
+# 	Is this the right way to do it ?
+#	Recursion protection ?
+# ------------------------------------------------------------------------------
+# XXX Some values are only applicable if a flag is on... need an if(x,y) maybe ?
+#	Maybe put them in here correctly, but then just actually write the
+#	methods in the module.
+total_load	lint+lext	Total load output		10	1 	Ah	NA	0	0
+total_charge	cint+cext	Total charge input		10	1	Ah	NA	0	0
+total_in	ceahl+(ceahh*256)+ciahl+(ciahh*255)	IN	10	1	Ah	NA	0	0
+total_out	leahl+(leahh*256)+liahl+(liahh*255)	IN	10	1	Ah	NA	0	0
+# ------------------------------------------------------------------------------
+# Binary things
+# ------------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# From pl_info.doc
+# ------------------------------------------------------------------------------
+vdiv		32	voltage divider control file		1	1	NA	NA	0	0
+#	Bits to shift left for voltage divider.
+bcals		33	msbs of bcal gains and offsets		1	1	NA	NA	0	0
+bcal12		34	gain (lower nib) and offset (upper nib) for 12V batv	1	1	NA	NA	0	0
+bcal24		35	gain (lower nib) and offset (upper nib) for 24V batv	1	1	NA	NA	0	0
+bcal48		36	gain (lower nib) and offset (upper nib) for 48V batv	1	1	NA	NA	0	0
+night		37	counter for night indicator		1	1	NA	NA	0	0
+gendel		38	generator delay counter			1	1	NA	NA	0	0
+dutycyc		39	provides average ton/ton+toff i.e. average duty cycle	1	1	NA	NA	0	0
+lcount		40	counter for load disconnect		1	1	NA	NA	0	0
+dtime		41	display timeout counter			1	1	NA	NA	0	0
+sec		46	2 seconds file, inc at 2 sec intervals	1	1	NA	NA	0	0
+min		47	minutes file				1	1	NA	NA	1	1
+hour		48	hour file, inc at 0.1hr increments	10	1	NA	NA	1	1
+day		49	dayfile					1	1	NA	NA	0	0
+batv		50	battery voltage 0.1V steps scaled to 12V	10	BM	V	NA	0	0
+battemp		52	battery temp msb			1	1	NA	NA	0	0
+solv		53	solar voltage msb			10	BM	V	NA	0	0
+batva		54	raw batv without temp or b- comp.	1	1	NA	NA	0	0
+sercon		55	serial control byte			1	1	NA	NA	0	0
+linkcnt		56	link detect counter			1	1	NA	NA	0	0
+pos1		62	screen position counter for history	1	1	NA	NA	0	0
+bstday		63	counter for days since boost 		1	1	NA	NA	0	0
+#	(settings copied from non volatile memory)
+gon 		64	generator turn on voltage/Ah		1	1	NA	NA	0	0
+goff		65	generator turn off voltage		10	BM	V	NA	0	0
+gdel		66	generator delay time/gen over charge Ah	1	1	NA	NA	0	0
+gexf		67	generator exercise frequency		1	1	NA	NA	0	0
+grun		68	generator run time			1	1	NA	NA	0	0
+loff		69	load disconnect voltage			1	1	NA	NA	0	0
+lon 		70	load reconnect voltage			1	1	NA	NA	0	0
+ldel		71	delay before disconnect			1	1	NA	NA	0	0
+aset		72	alarm setting value			1	1	NA	NA	0	0
+bstfreq		73	days between boost cycles		1	1	NA	NA	0	0
+atim		74	time spent in absorbtion mode		1	1	NA	NA	0	0
+hyst		75	hysterisis				1	1	NA	NA	0	0
+bret		76	boost return voltage			1	1	NA	NA	0	0
+curlim		77	charge current limit			1	1	NA	NA	0	0
+bat2		78	regulation voltage for the 2nd battery	1	1	NA	NA	1	0
+eset1		79	event control settings 1		1	1	NA	NA	0	0
+eset2		80	event control settings 2		1	1	NA	NA	0	0
+eset3		81	event control settings 3		1	NA	NA	0	0
+eqfreq		82	days between equalisations		1	1	NA	NA	0	0
+etim		83	length of equalisation cycle		1	1	NA	NA	0	0
+absv		84	absorbtion voltage			1	1	NA	NA	0	0
+emax		85	equalisation voltage			1	1	NA	NA	0	0
+fltv		86	float voltage				1	1	NA	NA	0	0
+bmax		87	boost voltage				1	1	NA	NA	0	0
+lgset		88	current use of load switch (lsn) & gen output	1	1	NA	NA	0	0
+pwme		89	current regulation method (lsn) and bat sense usage	1	1	NA	NA	0	0
+sstop		90	current start(lsn)and stop modes	1	1	NA	NA	0	0
+etmod		91	current enable modes (emod lsn)		1	1	NA	NA	0	0
+gmod		92	generator mode/tcmp(upper nib)		1	1	NA	NA	0	0
+volt		93	voltage selection (lsn) /prog num	1	1	NA	NA	0	0
+bcap		94	battery capacity in 20/100 Ah chunks 	1	20	NA	NA	0	0
+#	(counters and control bytes)
+#	eg: 44*20 = 880Ah, XXX where is the multiplier stored?	
+#	Therefore I have temporarily set the multiplier to 20	
+eqcnt		95	counter for days since equ		1	1	NA	NA	0	0
+genexd		96	days since last generator exercise/gen run time	1	1	NA	NA	0	0
+extmout		97	time out counter for expansion board	1	1	NA	NA	0	0
+econ		98	event control file  			1	1	NA	NA	0	0
+rmtmout		99	time out for remote control		1	1	NA	NA	0	0
+rcount		100	reg state change counter		1	1	NA	NA	0	0
+rstate		101	regulator state				1	1	NA	NA	0	0
+dstate		102	state of display			1	1	NA	NA	0	0
+rmode		104	state file for charge and load regup routine	1	1	NA	NA	0	0
+vreg		105	current voltage for charge switch to regulate to	1	1	NA	NA	0	0
+erunc		108	event control run timer			1	1	NA	NA	0	0
+ereptc		109	event control repeat time counter	1	1	NA	NA	0	0
+setcnt		111	counter for refresh of setup		1	1	NA	NA	0	0
+ahbalh		113	gen amp hour balance high byte		1	1	NA	NA	0	0
+conout		115	7-pwm active,6-charge,5-shunt,4-alarm,3-bat2, 2-event,1-gen,0-load dis output from control routines to extension & outputs	1	1	NA	NA	0	0
+bminl		124	lower byte of battery min voltage  scaled to 12V	1	1	NA	NA	0	0
+bmaxl		125	lower byte of battery max voltage  scaled to 12V	1	1	NA	NA	0	0
+dtemp		hb4 	current external temperature		1	1	NA	NA	0	0
+dsoc		hb5 	day data state of charge		1	1	%	NA	1	1
+dvmax		hb6 	day data Vmax				1	1	NA	NA	0	0
+dvmin		hb7 	day data Vmin				1	1	NA	NA	0	0
+dfltim		hb8	day time to float 			1	1	NA	NA	0	0
+ciacc1		hb9	charge ah accumulator lsb		10	1	NA	NA	0	0
+ciacc2		hba	charge ah accumulator			10	1	NA	NA	0	0
+ciacc3		hbb	charge ah accumulator msb		10	1	NA	NA	0	0
+ciahl		hbc	charge ah low byte			1	1	NA	NA	1	1
+ciahh		hbd	charge ah high byte			1	1	NA	NA	1	1
+ceacc1		hbe	charge ah accumulator lsb		1	1	NA	NA	0	0
+ceacc2		hbf	charge ah accumulator			10	1	NA	NA	0	0
+ceacc3		hc0	charge ah accumulator msb		10	1	NA	NA	0	0
+ceahl		hc1	charge ah low byte			1	1	NA	NA	1	1
+ceahh		hc2	charge ah high byte			1	1	NA	NA	1	1
+liacc1		hc3	load ah accumulator lsb			10	1	NA	NA	0	0
+liacc2		hc4	load ah accumulator			10	1	NA	NA	0	0
+liacc3		hc5	load ah accumulator msb			10	1	NA	NA	0	0
+liahl		hc6	load ah low byte			1	1	NA	NA	1	1
+liahh		hc7	load ah high byte			1	1	NA	NA	1	1
+leacc1		hc8	load ah accumulator lsb			10	1	NA	NA	0	0
+leacc2		hc9	load ah accumulator			10	1	NA	NA	0	0
+leacc3		hca	load ah accumulator msb			10	1	NA	NA	0	0
+leahl		hcb	load ah low byte			1	1	NA	NA	1	1
+leahh		hcc	load ah high byte			1	1	NA	NA	1	1
+cext		hcd	external charge input			10	1	Ah	NA	0	0
+lext		hce	external load input			10	1	Ah	NA	0	0
+# I think shift left extf on lext to get current value - na, this is wrong !
+extf		hcf	external flag and scale file		1	1	NA	NA	0	0
+vext		hd0	external voltage reading 0-255 volt 1V steps	1	1	NA	NA	0	0
+ahball		hd3	prescaler for genah ah balance counter	1	1	NA	NA	0	0
+chargl		hd4	int charge current lsb			1	1	NA	NA	0	0
+cint		hd5	internal charge msb			10	1	Ah	NA	0	0
+chargg		hd7	charge gain				1	1	NA	NA	0	0
+loadl		hd8	int load current lsb			1	1	NA	NA	0	0
+lint		hd9	int load current msb			10	1	Ah	NA	0	0
+loadg		hdb	load gain				1	1	NA	NA	0	0
+batvl		hdc	battery voltage lsb			1	1	NA	NA	0	0
+vbat		hdd	battery voltage msb			1	1	NA	NA	0	0
+batvg		hdf	bat volts gain				1	1	NA	NA	0	0
+brdteml		he0	board temp lsb				1	1	NA	NA	0	0
+tbrd		he1	board temp msb				1	1	NA	NA	0	0
+brdtemg		he3	board temp gain				1	1	NA	NA	0	0
+batteml		he4	battery temp lsb			1	1	NA	NA	0	0
+tbat		he5	battery temp msb			1	1	NA	NA	0	0
+battemg		he7	battery temp gain			1	1	NA	NA	0	0
+solvl		he8	solar voltage lsb			1	1	NA	NA	0	0
+vsol		he9	solar voltage msb			1	1	NA	NA	0	0
+solvg		heb	solar voltage gain			1	1	NA	NA	0	0
+batsenl		hec	bat- sense input lsb			1	1	NA	NA	0	0
+vsen		hed	sense voltage msb			1	1	NA	NA	0	0
+batseng		hef	sense voltage gain			1	1	NA	NA	0	0
+nv_bcals	0	msbs of voltage cal values		1	1	NA	NA	0	0
+nv_bcal12	1	lsb of 12V gain and offset		1	1	NA	NA	0	0
+nv_bcal24	2	lsb of 24V gain and offset		1	1	NA	NA	0	0
+nv_bcal48	3	lsb of 48V gain and offset		1	1	NA	NA	0	0
+nv_charge_offset	4	NA				1	1	NA	NA	0	0
+nv_charge_gain	5	NA					1	1	NA	NA	0	0
+nv_load_offset	6	NA					1	1	NA	NA	0	0
+nv_load_gain	7	NA					1	1	NA	NA	0	0
+nv_bat_tmp_offset	8	NA				1	1	NA	NA	0	0
+nv_bat_tmp_gain	9	NA					1	1	NA	NA	0	0
+nv_solar_offset	10	NA					1	1	NA	NA	0	0
+nv_solar_gain	11	NA					1	1	NA	NA	0	0
+nv_batsen_offset	12	NA				1	1	NA	NA	0	0
+nv_batsen_gain	13	NA					1	1	NA	NA	0	0
+nv_gon 		14	generator turn on voltage/Ah		1	1	NA	NA	0	0
+nv_goff  	15	generator turn off voltage		1	1	NA	NA	0	0
+nv_gdel 	16	generator delay time/gen over charge Ah	1	1	NA	NA	0	0
+nv_gexf 	17	generator exercise frequency		1	1	NA	NA	0	0
+nv_grun 	18	generator run time			1	1	NA	NA	0	0
+nv_loff 	19	load disconnect voltage			1	1	NA	NA	0	0
+nv_lon 		20	load reconnect voltage			1	1	NA	NA	0	0
+nv_ldel  	21	delay before disconnect			1	1	NA	NA	0	0
+nv_aset		22	alarm setting value			1	1	NA	NA	0	0
+nv_bstfreq	23	days between boost cycles		1	1	NA	NA	0	0
+nv_atim 	24	time spent in absorbtion mode		1	1	NA	NA	0	0
+nv_hyst 	25	hysterisis				1	1	NA	NA	0	0
+nv_bret	 	26 	boost return voltage			1	1	NA	NA	0	0
+nv_curlim	27	charge current limit			1	1	NA	NA	0	0
+nv_bat2 	28	regulation voltage for the second battery	1	1	NA	NA	0	0
+nv_eset1 	29	event control settings 1-3 		1	1	NA	NA	0	0
+nv_eset2 	30 	NA					1	1	NA	NA	0	0
+nv_eset3 	31	NA					1	1	NA	NA	0	0
+nv_eqfreq	32	days between equalisations		1	1	NA	NA	0	0
+nv_etim		33 	length of equalisation cycle		1	1	NA	NA	0	0
+nv_absv 	34	absorbtion voltage			1	1	NA	NA	0	0
+nv_emax 	35	equalisation voltage			1	1	NA	NA	0	0
+nv_fltv 	36	float voltage				1	1	NA	NA	0	0
+nv_bmax 	37	boost voltage				1	1	NA	NA	0	0
+nv_lgset	38	current use of load switch (lsn) & gen output	1	1	NA	NA	0	0
+nv_pwme 	39	current regulation method (lsn) and bat sense usage	1	1	NA	NA	0	0
+nv_sstop 	40	current start(lsn)and stop modes	1	1	NA	NA	0	0
+nv_etmod 	41	current enable modes (emod lsn)		1	1	NA	NA	0	0
+nv_gmod		42	generator control mode			1	1	NA	NA	0	0
+nv_volt 	43	voltage selection(lsn)/prog num		1	1	NA	NA	0	0
+nv_bcap 	44	battery capacity			1	1	NA	NA	0	0
+nv_day_counter	45	used as a pointer to start of last day data record written	1	1	NA	NA	0	0
+#	add 1 to get the nv location below.
+# Day 0
+nv_1_vmax	46	Day 1 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_1_vmin	47	Day 1 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_1_time	48	Day 1 - time went to float		10	1	h	NA	0	0
+nv_1_soc	49	Day 1 - state of charge			1	1	%	NA	0	0
+nv_1_charge	50	Day 1 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_1_load	51	Day 1 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_1_m		52	Day 1 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 2
+nv_2_vmax	53	Day 2 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_2_vmin	54	Day 2 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_2_time	55	Day 2 - time went to float		10	1	h	NA	0	0
+nv_2_soc	56	Day 2 - state of charge			1	1	%	NA	0	0
+nv_2_charge	57	Day 2 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_2_load	58	Day 2 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_2_m		59	Day 2 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 3
+nv_3_vmax	60	Day 3 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_3_vmin	61	Day 3 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_3_time	62	Day 3 - time went to float		10	1	h	NA	0	0
+nv_3_soc	63	Day 3 - state of charge			1	1	%	NA	0	0
+nv_3_charge	64	Day 3 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_3_load	65	Day 3 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_3_m		66	Day 3 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 4
+nv_4_vmax	67	Day 4 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_4_vmin	68	Day 4 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_4_time	69	Day 4 - time went to float		10	1	h	NA	0	0
+nv_4_soc	70	Day 4 - state of charge			1	1	%	NA	0	0
+nv_4_charge	71	Day 4 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_4_load	72	Day 4 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_4_m		73	Day 4 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 5
+nv_5_vmax	74	Day 5 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_5_vmin	75	Day 5 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_5_time	76	Day 5 - time went to float		10	1	h	NA	0	0
+nv_5_soc	77	Day 5 - state of charge			1	1	%	NA	0	0
+nv_5_charge	78	Day 5 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_5_load	79	Day 5 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_5_m		80	Day 5 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 6
+nv_6_vmax	81	Day 6 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_6_vmin	82	Day 6 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_6_time	83	Day 6 - time went to float		10	1	h	NA	0	0
+nv_6_soc	84	Day 6 - state of charge			1	1	%	NA	0	0
+nv_6_charge	85	Day 6 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_6_load	86	Day 6 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_6_m		87	Day 6 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 7
+nv_7_vmax	88	Day 7 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_7_vmin	89	Day 7 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_7_time	90	Day 7 - time went to float		10	1	h	NA	0	0
+nv_7_soc	91	Day 7 - state of charge			1	1	%	NA	0	0
+nv_7_charge	92	Day 7 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_7_load	93	Day 7 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_7_m		94	Day 7 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 8
+nv_8_vmax	95	Day 8 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_8_vmin	96	Day 8 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_8_time	97	Day 8 - time went to float		10	1	h	NA	0	0
+nv_8_soc	98	Day 8 - state of charge			1	1	%	NA	0	0
+nv_8_charge	99	Day 8 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_8_load	100	Day 8 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_8_m		101	Day 8 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 9
+nv_9_vmax	102	Day 9 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_9_vmin	103	Day 9 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_9_time	104	Day 9 - time went to float		10	1	h	NA	0	0
+nv_9_soc	105	Day 9 - state of charge			1	1	%	NA	0	0
+nv_9_charge	106	Day 9 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_9_load	107	Day 9 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_9_m		108	Day 9 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 10
+nv_10_vmax	109	Day 10 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_10_vmin	110	Day 10 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_10_time	111	Day 10 - time went to float		10	1	h	NA	0	0
+nv_10_soc	112	Day 10 - state of charge		1	1	%	NA	0	0
+nv_10_charge	113	Day 10 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_10_load	114	Day 10 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_10_m		115	Day 10 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 10
+nv_11_vmax	116	Day 11 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_11_vmin	117	Day 11 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_11_time	118	Day 11 - time went to float		10	1	h	NA	0	0
+nv_11_soc	119	Day 11 - state of charge		1	1	%	NA	0	0
+nv_11_charge	120	Day 11 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_11_load	121	Day 11 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_11_m		122	Day 11 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 12
+nv_12_vmax	123	Day 12 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_12_vmin	124	Day 12 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_12_time	125	Day 12 - time went to float		10	1	h	NA	0	0
+nv_12_soc	126	Day 12 - state of charge		1	1	%	NA	0	0
+nv_12_charge	127	Day 12 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_12_load	128	Day 12 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_12_m		129	Day 12 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 13
+nv_13_vmax	130	Day 13 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_13_vmin	131	Day 13 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_13_time	132	Day 13 - time went to float		10	1	h	NA	0	0
+nv_13_soc	133	Day 13 - state of charge		1	1	%	NA	0	0
+nv_13_charge	134	Day 13 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_13_load	135	Day 13 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_13_m		136	Day 13 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 14
+nv_14_vmax	137	Day 14 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_14_vmin	138	Day 14 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_14_time	139	Day 14 - time went to float		10	1	h	NA	0	0
+nv_14_soc	140	Day 14 - state of charge		1	1	%	NA	0	0
+nv_14_charge	141	Day 14 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_14_load	142	Day 14 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_14_m		143	Day 14 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 15
+nv_15_vmax	144	Day 15 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_15_vmin	145	Day 15 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_15_time	146	Day 15 - time went to float		10	1	h	NA	0	0
+nv_15_soc	147	Day 15 - state of charge		1	1	%	NA	0	0
+nv_15_charge	148	Day 15 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_15_load	149	Day 15 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_15_m		150	Day 15 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 16
+nv_16_vmax	151	Day 16 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_16_vmin	152	Day 16 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_16_time	153	Day 16 - time went to float		10	1	h	NA	0	0
+nv_16_soc	154	Day 16 - state of charge		1	1	%	NA	0	0
+nv_16_charge	155	Day 16 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_16_load	156	Day 16 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_16_m		157	Day 16 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 17
+nv_17_vmax	158	Day 17 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_17_vmin	159	Day 17 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_17_time	160	Day 17 - time went to float		10	1	h	NA	0	0
+nv_17_soc	161	Day 17 - state of charge		1	1	%	NA	0	0
+nv_17_charge	162	Day 17 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_17_load	163	Day 17 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_17_m		164	Day 17 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 18
+nv_18_vmax	165	Day 18 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_18_vmin	166	Day 18 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_18_time	167	Day 18 - time went to float		10	1	h	NA	0	0
+nv_18_soc	168	Day 18 - state of charge		1	1	%	NA	0	0
+nv_18_charge	169	Day 18 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_18_load	170	Day 18 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_18_m		171	Day 18 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 19
+nv_19_vmax	172	Day 19 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_19_vmin	173	Day 19 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_19_time	174	Day 19 - time went to float		10	1	h	NA	0	0
+nv_19_soc	175	Day 19 - state of charge		1	1	%	NA	0	0
+nv_19_charge	176	Day 19 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_19_load	177	Day 19 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_19_m		178	Day 19 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 20
+nv_20_vmax	179	Day 20 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_20_vmin	180	Day 20 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_20_time	181	Day 20 - time went to float		10	1	h	NA	0	0
+nv_20_soc	182	Day 20 - state of charge		1	1	%	NA	0	0
+nv_20_charge	183	Day 20 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_20_load	184	Day 20 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_20_m		185	Day 20 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 20
+nv_21_vmax	186	Day 21 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_21_vmin	187	Day 21 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_21_time	188	Day 21 - time went to float		10	1	h	NA	0	0
+nv_21_soc	189	Day 21 - state of charge		1	1	%	NA	0	0
+nv_21_charge	190	Day 21 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_21_load	191	Day 21 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_21_m		192	Day 21 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 22
+nv_22_vmax	193	Day 22 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_22_vmin	194	Day 22 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_22_time	195	Day 22 - time went to float		10	1	h	NA	0	0
+nv_22_soc	196	Day 22 - state of charge		1	1	%	NA	0	0
+nv_22_charge	197	Day 22 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_22_load	198	Day 22 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_22_m		199	Day 22 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 23
+nv_23_vmax	200	Day 23 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_23_vmin	201	Day 23 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_23_time	202	Day 23 - time went to float		10	1	h	NA	0	0
+nv_23_soc	203	Day 23 - state of charge		1	1	%	NA	0	0
+nv_23_charge	204	Day 23 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_23_load	205	Day 23 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_23_m		206	Day 23 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 24
+nv_24_vmax	207	Day 24 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_24_vmin	208	Day 24 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_24_time	209	Day 24 - time went to float		10	1	h	NA	0	0
+nv_24_soc	210	Day 24 - state of charge		1	1	%	NA	0	0
+nv_24_charge	211	Day 24 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_24_load	212	Day 24 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_24_m		213	Day 24 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 25
+nv_25_vmax	214	Day 25 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_25_vmin	215	Day 25 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_25_time	216	Day 25 - time went to float		10	1	h	NA	0	0
+nv_25_soc	217	Day 25 - state of charge		1	1	%	NA	0	0
+nv_25_charge	218	Day 25 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_25_load	219	Day 25 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_25_m		220	Day 25 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 26
+nv_26_vmax	221	Day 26 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_26_vmin	222	Day 26 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_26_time	223	Day 26 - time went to float		10	1	h	NA	0	0
+nv_26_soc	224	Day 26 - state of charge		1	1	%	NA	0	0
+nv_26_charge	225	Day 26 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_26_load	226	Day 26 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_26_m		227	Day 26 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 27
+nv_27_vmax	228	Day 27 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_27_vmin	229	Day 27 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_27_time	230	Day 27 - time went to float		10	1	h	NA	0	0
+nv_27_soc	231	Day 27 - state of charge		1	1	%	NA	0	0
+nv_27_charge	232	Day 27 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_27_load	233	Day 27 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_27_m		234	Day 27 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 28
+nv_28_vmax	235	Day 28 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_28_vmin	236	Day 28 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_28_time	237	Day 28 - time went to float		10	1	h	NA	0	0
+nv_28_soc	238	Day 28 - state of charge		1	1	%	NA	0	0
+nv_28_charge	239	Day 28 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_28_load	240	Day 28 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_28_m		241	Day 28 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 29
+nv_29_vmax	242	Day 29 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_29_vmin	243	Day 29 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_29_time	244	Day 29 - time went to float		10	1	h	NA	0	0
+nv_29_soc	245	Day 29 - state of charge		1	1	%	NA	0	0
+nv_29_charge	246	Day 29 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_29_load	247	Day 29 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_29_m		248	Day 29 - msb Charge, msb Load		1	1 	NA	NA	0	0
+# Day 30
+nv_30_vmax	249	Day 30 - vmax scaled relative to 12V 	10	BM	V	NA	0	0
+nv_30_vmin	250	Day 30 - vmin scaled relative to 12V	10	BM	V	NA	0	0
+nv_30_time	251	Day 30 - time went to float		10	1	h	NA	0	0
+nv_30_soc	252	Day 30 - state of charge		1	1	%	NA	0	0
+nv_30_charge	253	Day 30 - lsb of Charge Ah		1	1	Ah	NA	0	0
+nv_30_load	254	Day 30 - lsb of Load Ah			1	1	Ah	NA	0	0
+nv_30_m		255	Day 30 - msb Charge, msb Load		1	1 	NA	NA	0	0

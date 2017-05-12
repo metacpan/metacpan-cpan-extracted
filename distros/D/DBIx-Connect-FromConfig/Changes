@@ -1,0 +1,29 @@
+Revision history for DBIx-Connect-FromConfig
+
+0.07    2013.05.23 (SAPER)
+        [DIST] Add meta-information in Makefile.PL
+        [TESTS] Fix an incorrect number of tests in a skip().
+
+0.06    2012.08.17 (SAPER)
+        [DOC] CPAN-RT #70297: Pipe character not recognised in attributes
+        [DOC] CPAN-RT #79039: Non-ASCII character seen before =encoding
+
+0.05    2010.11.04 (SAPER)
+        [FEATURE] Add support for DBI attributes.
+
+0.04    2008.04.16 (SAPER)
+        [FEATURE] Added support for more DBI drivers. Trying to use an 
+        unsupported driver will result in a exception.
+
+0.03    2008.03.01 (SAPER)
+        [DIST] Changed the name of the module so it can be published on the CPAN.       
+        [CODE] The function is now always a class method, but can be installed in
+        DBI namespace for easier use.
+
+0.02    2007.02.16 (SAPER)
+        [FEATURE] Added support for Config::Simple and Config::Tiny.
+        [FEATURE] Added support for "section" parameter.
+        [TESTS] Several improvments.
+
+0.01    2006.11.09 (SAPER)
+        First version, internal release.

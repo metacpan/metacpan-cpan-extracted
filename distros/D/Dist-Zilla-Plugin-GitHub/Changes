@@ -1,0 +1,209 @@
+Revision history for Dist-Zilla-Plugin-GitHub
+
+0.43      2016-12-25 01:42:31Z
+
+  - avoid undef warnings when the login name cannot be determined from git
+    configs (Mohammad S Anwar, GH#49)
+
+0.42      2016-01-28 02:20:07Z
+
+  - localize locale when fetching repository information (thanks, Jose Luis
+    Perez Diez!)
+
+0.41      2015-08-07 03:36:05Z
+
+  - add configs to metadata in [GitHub::Update]
+  - avoid needless authentication and network calls when no information is
+    being changed (Dave Rolsky, #47)
+
+0.40      2015-01-08 15:00:01-08:00 America/Vancouver
+
+ - fix error in JSON conversion in 0.39 that caused all requests to fail
+   (thanks, Dave Rolsky!)
+
+0.39      2014-12-30 19:44:24+01:00 Europe/Rome
+
+ - Check for _check_response() return value before using it
+ - Switch from JSON.pm to JSON::MaybeXS (GH#44) (thanks, @karenetheridge!)
+
+0.38      2014-06-28 12:38:24+02:00 Europe/Rome
+
+ - Support using tokens with HTTP Basic Auth (GH#36) (thanks, @RsrchBoy!)
+ - Support 2-factor authentication (GH#38) (GH#39) (thanks, @friedo!)
+ - Fix password prompt
+ - Support for creating repos within an organization (GH#40) (thanks, @friedo!)
+
+0.36      2013-12-03 19:25:55 Europe/Rome
+
+ - Require Net::SSLeay for HTTP::Tiny SSL support and check HTTP::Tiny
+   exceptions (GH#33) (thanks, @chorny!)
+
+0.35      2013-07-27 14:58:49 Europe/Rome
+
+ - Change phase for [Github::Update] from Releaser to AfterRelease (GH#27)
+   (thanks, @karenetheridge!)
+ - Add options to enable/disable issues, wiki and downloads when creating a
+   new repository (GH#29)
+
+0.34      2013-05-03 22:17:26 Europe/Rome
+
+ - Fix if/elsif in gh command (GH#26) (thanks, @karenetheridge!)
+
+0.33      2013-05-03 20:17:46 Europe/Rome
+
+ - Do not use given when anymore to avoid new experimental::smartmatch
+   warnings (GH#22)
+
+0.32      2013-03-24 23:50:12 Europe/Rome
+
+ - Support custom provider and profile in the "dzil gh create"
+
+0.31      2013-03-06 15:54:19 Europe/Rome
+
+ - Silence warnings in Create when the repository has no commits (GH#19)
+   (thanks, @rkitover!)
+ - Improve repository name extraction from remote URL (GH#21)
+   (thanks, @doherty!)
+
+0.30      2013-01-13 16:29:12 Europe/Rome
+
+ - Meta and Update now try to extract the GitHub repository name from the URL
+   of the remote pointing to the repository
+ - Set the remote tracking for the current branch to the GitHub remote on
+   create (GH#17) (thanks, @rkitover!)
+ - Create now uses the (optional) 'repo' option from the profile.ini file to
+   decide the name of the GitHub repository to create. This option may also be
+   a template (thanks for the idea, @rkitover!)
+
+0.29      2012-12-22 14:02:45 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+ - Use feature 'switch' instead of v5.10 (GH#16) (thanks, @brianphillips)
+
+0.28      2012-11-30 12:46:33 Europe/Rome
+
+ - Add a proper Changes file
+ - Support user/repository format for 'repo' option (GH#15)
+
+0.27      2012-08-20 11:17:23 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.26      2012-08-05 16:05:45 Europe/Rome
+
+ - Documentation fixes and improvements (no functional changes)
+ - Use dist description when creating a new repo with the dzil gh command
+
+0.25      2012-07-07 18:09:27 Europe/Rome
+
+ - Fix dist name in the META.* homepage
+
+0.24      2012-07-07 12:49:53 Europe/Rome
+
+ - Rebuild to update META.* repository links (no functional changes)
+
+0.23      2012-06-15 17:22:39 Europe/Rome
+
+ - Bump versioned dependency on IO::Socket::SSL (GH#14)
+
+0.22      2012-06-14 18:31:51 Europe/Rome
+
+ - Add proper command and usage description to the dzil gh command
+ - Various fixes related to forked repositories
+
+0.21      2012-06-08 10:53:12 Europe/Rome
+
+ - Add 'gh' command to use the plugins from the dzil command-line
+
+0.20      2012-06-06 19:16:05 Europe/Rome
+
+ - Fix GitHub::Meta plugin on perl 5.8 (GH#13) (thanks, @berekuk!)
+ - Optionally support Config::Identity::GitHub for retrieving credentials
+
+0.19      2012-04-16 19:11:47 Europe/Rome
+
+ - Add meta_home option (GH#12)
+
+0.18      2012-04-10 10:21:09 Europe/Rome
+
+ - Fix default value for fork (GH#10) (thanks, @ioanrogers!)
+ - Switch to GitHub API v3 and discontinue token-based login
+ - Improve error handling
+
+0.17      2012-03-29 11:40:51 Europe/Rome
+
+ - Do nothing if login info is not available
+ - Improve the error message when github.user is not set (GH#9)
+
+0.16      2012-03-11 15:45:47 Europe/Rome
+
+ - Add support for login with password and deprecate token login
+
+0.15      2012-03-07 11:34:27 Europe/Rome
+
+ - GitHub::Meta now works also when offline (GH#8)
+
+0.14      2011-12-20 18:13:00 Europe/Rome
+
+ - Documentation fixes and improvements (no functional changes)
+ - Prompt for confirmation before creating a GitHub repo (GH#7) (thanks, @thaljef!)
+ - Check if the .git dir exists before checking for the remote
+
+0.13      2011-08-19 14:45:36 Europe/Rome
+
+ - Automatically point to original repo if forked (GH#5)
+
+0.12      2011-08-13 12:55:24 Europe/Rome
+
+ - Check for connection errors (GH#4)
+
+0.11      2011-08-07 09:52:34 Europe/Rome
+
+ - Abort on GitHub error (GH#2)
+ - Automatically add a git remote (GH#3)
+
+0.10      2011-06-06 17:41:03 Europe/Rome
+
+ - Support metacpan.org URL in GitHub::Update
+
+0.09      2011-06-03 19:30:35 Europe/Rome
+
+ - Documentation fixes (no functional changes)
+
+0.08      2011-05-05 17:57:07 Europe/Rome
+
+ - Documentation fixes and improvements (no functional changes)
+
+0.07      2011-04-24 21:20:02 Europe/Rome
+
+ - Make classes immutable for performance
+ - Documentation fixes (no functional changes)
+
+0.06      2011-03-13 16:33:24 Europe/Rome
+
+ - Force prereq on IO::Socket::SSL (needed for https GitHub URLs)
+
+0.05      2011-03-13 15:51:33 Europe/Rome
+
+ - Actually implement the 'wiki' option
+ - Check if the GitHub issues tracker is used
+ - Check if the project homepage is set
+
+0.04      2011-02-28 21:39:44 Europe/Rome
+
+ - Fix default values for attributes
+
+0.03      2011-02-28 21:18:03 Europe/Rome
+
+ - Remove 'login' and 'token' paramenters, add 'repo'
+ - Add 'homepage', 'bugs and 'wiki' parameters to GitHub::Meta
+
+0.02      2011-02-27 19:56:39 Europe/Rome
+
+ - Add GitHub::Meta plugin
+ - Add @GitHub plugin bundle
+ - Allow for undef attributes 'login' and 'token'
+
+0.01      2011-02-26 15:20:39 Europe/Rome
+
+ - Initial version

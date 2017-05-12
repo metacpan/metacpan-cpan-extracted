@@ -1,0 +1,25 @@
+---
+abstract: 'Convert from Perl Data Structure to ClearSilver HDF'
+author: 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  Class::Accessor::Fast: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.67'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Data-ClearSilver-HDF
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  ClearSilver: 0
+  Data::Structure::Util: 0
+  File::Slurp: 0
+  File::Temp: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Pod::Usage: 0
+version: 0.03

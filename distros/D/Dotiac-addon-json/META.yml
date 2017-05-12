@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Dotiac-addon-json
+version:             0.1
+abstract: |-
+  Generate JSON data in a Dotiac template
+license:             MIT
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL: 0.5
+    JSON:        2
+build_requires:
+    Test::More: 0
+    Test::Pod:  0
+provides:
+   Dotiac::DTL::Addon::json:
+     file: lib/Dotiac/DTL/Addon/json.pm
+     version: 0.1
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

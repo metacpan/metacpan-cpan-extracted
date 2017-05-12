@@ -1,0 +1,88 @@
+NAME
+    Data::Random::Nucleotides - Generate random nucleotide strings.
+
+VERSION
+    version 0.1
+
+SYNOPSIS
+        use Data::Random::Nucleotides qw/:all/;
+
+        # Generate a string of 200 random A/C/G/T characters.
+        $nucs = rand_nuc ( size => 200 );
+
+        # Generate a string of random A/C/G/T between 20 and 500 characters.
+        $nucs = rand_nuc ( min => 20, max => 500 );
+
+        # Generate a string of 30 random A/C/G/T/N characters.
+        $nucs = rand_nuc ( size => 30, N=>1 );
+
+        # Generate a multi-lined string of 500 random A/C/G/T/N characters.
+        # The 500 characters will be split into lines of 70 characters each.
+        $nucs = rand_wrapped_nuc ( size => 500 );
+
+        # Generate a string containing a single FASTA-like sequence text.
+        $fasta = rand_fasta ( size => 200 ) ;
+
+DESCRIPTION
+    This module is a thin wrapper around Data::Random, providing utility
+    functions to generate nucleotide sequence strings and FASTA-looking
+    strings.
+
+    nucleotide strings contain only A/C/G/T (and possibly N) characters.
+    FASTA strings are multi-lined nucleotide strings, with the first line
+    containing a sequence id (see http://en.wikipedia.org/wiki/FASTA_format)
+    .
+
+METHODS
+  rand_nuc()
+    Returns a string of random nucleotides.
+
+    See `rand_set' in Data::Random for possible parameters (e.g. `size',
+    `min', `max').
+
+    If `N' is set, N will be a possible nucleoide. Otherwise - only A/C/G/T
+    will be returned.
+
+  rand_wrapped_nuc()
+    Returns a multi-lined string of random nucleotides.
+
+    See `rand_nuc' for all possible parameters.
+
+    The returned string will be broken into lines of 70 characeters each.
+
+  rand_fasta()
+    Returns a random FASTA string.
+
+    First line begins with a `>' prefix, and a random sequence ID
+    (alphanumeric).
+
+    The rest of the lines are random nucleotide strings, wrapped at 70
+    characters.
+
+AUTHOR
+    Assaf Gordon, `<gordon at cshl.edu>'
+
+TODO
+    Finer control over nucleotide composition (currently: completely random)
+    Generate FASTQ files
+    Support lower-case nucleotides
+    generate amino-acid codes
+
+BUGS
+    Please report any bugs or feature requests to
+    https://github.com/agordon/Data-Random-Nucleotides/issues
+
+SEE ALSO
+    BioPerl provides similar functionality
+    http://www.bioperl.org/wiki/Random_sequence_generation, but requires
+    installing the BioPerl module.
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Assaf Gordon.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

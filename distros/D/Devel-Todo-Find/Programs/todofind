@@ -1,0 +1,54 @@
+#!perl
+
+# $Id: todofind,v 1.3 2011-01-14 19:21:06 Martin Exp $
+
+use strict;
+use warnings;
+
+use Devel::Todo::Find;
+
+=head1 NAME
+
+todofind - recursively scan Perl source code for TODO comments
+
+=head1 SYNOPSIS
+
+  todofind (no arguments)
+
+=head1 DESCRIPTION
+
+todofind scans files and folders recursively,
+starting in the current working directory.
+Whenever a line of text is found that looks like a Perl comment
+with the keyword "TODO" followed by a colon,
+todofind outputs a line containing the filename, line number, and comment text.
+The output can be processed by the Emacs 'grep' function.
+
+The bottom line is,
+if you are a Perl developer who uses Emacs,
+you can do M-x grep,
+replace the 'grep -nH' with simply 'todofind',
+and then you can browse the resulting TODO items in your code base
+just like any grep results.
+
+=cut
+
+# The default format is suitable for Emacs, ergo no options need to be
+# given:
+my $o = new Devel::Todo::Find;
+# The default is to process Cwd as if it's a Perl module development
+# area:
+my @a = $o->todos;
+print @a;
+
+__END__
+
+=head1 AUTHOR
+
+Martin Thurn
+
+=head1 LICENSE
+
+This software is released under the same license as Perl itself.
+
+=cut

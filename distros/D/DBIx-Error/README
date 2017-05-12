@@ -1,0 +1,24 @@
+DBIx::Error
+===========
+
+See the module documentation for more information
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 Michael Brown <mbrown@fensystems.co.uk>.
+
+This program is free software. You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

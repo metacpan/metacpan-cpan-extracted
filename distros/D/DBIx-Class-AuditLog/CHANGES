@@ -1,0 +1,123 @@
+0.6.3 release - 2016-08-13
+    Fixed:
+    - deploy script generates incorrect audit_log_view #20 - GETTY
+
+0.6.2 release - 2014/08/12
+    Fixed:
+    - issue with the 'created_on' option of get_changes method - DALMER
+
+0.6.1 release - 2014/05/16
+
+    New:
+    - the get_changes method should now always return a resultset
+
+    Fixed:
+    - some tests fixed that were inadvertantly relying on hash order not being random
+
+0.6.0 - 2013/09/03
+
+    New:
+    - new view 'audit_log_view / AuditLogView' added - MOSHEGOOD
+
+0.5.6 - 2013/06/20
+
+    Updated:
+    - alters prefetch for User location in get_changes - MATTP
+
+0.5.5 - 2013/05/24
+
+    Updated:
+    - the get_chagnes method prefetches some extra information that would likely be needed to avoid a mass number of lookups later
+
+0.5.4 - 2013/05/08
+
+    Updated:
+    - set the relationship to User in Changeset to a left join  -- fixes Github issue #15
+
+0.5.2 - 2013/05/06
+
+    - removed utils folder from Manifest.skip so that they would be sent with package -- contains the update_reserved_columns script needed after the column name changes
+
+0.5.1 - 2013/04/30
+
+    Fixed:
+    - issue with update_reserved_columns script in DB2
+
+0.5.0 - 2013/04/29
+
+    Fixed:
+    - quote_names is removed and not enabled by default from Audit Log
+    - user and timestamp in Changeset.pm are reserved words by many databases. They are renamed to user_id and created_on. In order to keep the foreign names consistent, all foreign key columns have suffix id, ex. field_id, action_id, changeset_id and etc.
+
+    Updated:
+    - Version 0.5.0 breaks backward compability, because of the changing column names. An util script is added into the utils/ directory in order to update existing database schemas.
+
+0.4.2 - 2013/03/03
+
+    New:
+    - quote_names from DBIx::Class::Storage is now enabled by the Audit Log
+
+    Fixed:
+    - bug in the way 'order_by' was being used in get_changes method
+
+0.4.1 - 2013/03/02
+
+    New:
+    - ability to load the AuditLog in a resultset class to enable logging when using methods acting upon an entire resultset (eg, DBIx::Class::RecursiveUpdate) -- LUKAST
+    - Shared variable $DBIx::Class::AuditLog::enabled can be set to 0 to disable audit logging. This can be scoped locally so as to disable logging of a single transaction or inside a transaction to disable logging on a particular transaction action. Note: if DBIx::Class::AuditLog isn't used explicitly in the package where this variable is set, a 'used only once' warning may occur, no warnings 'once' can be set to avoid this if desierd.
+
+    Updated:
+    - audited_row in Action.pm is now a varchar(255) instead of an int to allow for multi-column or non-numeric primary keys -- LUKAST
+
+    Fixed:
+    - issue where updates were logging all fields even when they weren't changed -- LUKAST
+
+0.3.1 - 2012/09/10
+
+    Fixed:
+    - issue where 'field = -1' was being added to get_changes queries when no field was passed in the get_changes request -- DPETROV
+
+0.3.0 - 2012/08/31
+
+    New:
+    - new dbic column attribute 'force_audit_log_column': force the value to be logged even if it didn't change (ie, new_value = old_value) -- LUKAST
+    - new dbic column attribute 'modify_audit_value': modify value of column before being stored in audit log -- LUKAST
+
+    Fixed:
+    - when passing a field to get_changes that didn't exist in the audit_log_field table all changes were being returned instead of none
+
+0.2.6 - 2012/08/13
+
+    New:
+    - the AuditLog result classes now inherit from a base class, useful for overriding if need be -- MATTP
+
+0.2.5 - 2012/08/10
+
+    Updated:
+    - after discussions with MATTP, reverting his change to remove the get_columns calls for now
+
+0.2.4 - 2012/08/09
+
+    Updated:
+    - updates README to show extra options for get_changes
+    - removed hard-coded version # from AuditLog.pm
+
+0.2.3 - 2012/08/09
+
+    Updated:
+    - no longer using get_columns to pull data from dbic objects as this pulls from storage and bypasses any filters/inflaters - MATTP
+
+0.2.2 - 2012/07/03
+
+    Updated:
+    - some additions to the README showing how to use get_changes
+    - added acknowledgements to OANDA for supoprting development time
+
+0.2.1 - 2012/06/28
+
+    New:
+    - added get_changes method, used for getting changes related to a row from a specific table
+
+0.1.0 - 2012/06/22
+
+    Initial release

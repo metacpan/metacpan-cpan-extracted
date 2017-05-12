@@ -1,0 +1,77 @@
+# Copyright (c) 2008-2017 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Date::Manip::TZdata -- Internal module for working with the tzdata files
+
+=head1 SYNOPSIS
+
+   use Date::Manip::TZdata;
+
+   $tzd  = new Date::Manip::TZdata($dir);
+
+=head1 DESCRIPTION
+
+This module is not intended for public use. It is used internally by
+the scripts used to analyze the time zone database and generate the
+modules for each time zone. The module is included in the distribution
+solely for the sake of completeness. Currently, no support is offered
+for this module, and it can (and may) change without notice.
+
+This module consists of routines for working with the tzdata files.
+These files are updated several times a year and are the basis for
+time zone descriptions for most computer systems.
+
+=head1 ROUTINES
+
+=over 4
+
+=item B<new>
+
+   use Date::Manip::TZdata;
+
+   $tzd  = new Date::Manip::TZdata($dir);
+
+This finds and reads in all the tzdata. If C<$dir> is passed in, it
+is the directory where a tzdata directory is located. It defaults to
+the current directory.
+
+=back
+
+=head1 KNOWN LIMITATIONS
+
+Some assumptions and limitations are assumed in the logic of this
+module.
+
+When a time change occurs, the time may change backwards or forwards.
+Time changes rules are listed on a per-year basis.  It is assumed that
+time changes will not occur so close to the end or start of the year
+as to cross the year boundary (in other words, the year will not
+change as a result of the time change).  This is not accounted for,
+and it is hoped that this situation will never occur.
+
+Also, because this module is strictly limited to 4 digit positive
+years (regardless of whether it is wall clock or universal time), and
+because various parts of the module switch back and forth, valid times
+for this module are from Jan 2, 0001 to Dec 30, 9999. This ensures
+that conversions from wall clock to universal or vice versa will never
+make dates occur in the year 0000 or 10000.
+
+=head1 KNOWN BUGS
+
+None known.
+
+=head1 BUGS AND QUESTIONS
+
+Please refer to the L<Date::Manip> man page for information on submitting
+bug reports or questions to the author.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

@@ -1,0 +1,37 @@
+DBomb version-0_20
+==================
+
+DBomb (Database Objects) is a mapping from tables to perl objects.
+
+FEATURES
+
+    * supports composite keys
+    * supports unbound objects
+    * one-to-many relationships between objects/tables
+
+SEE ALSO
+
+    Class::DBI - Very similar to DBomb, but different API and approach.
+    Alzabo - Perl schema manager.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  Class::MethodMaker
+  Tie::Array
+  Tie::IxHash
+  Carp::Assert
+
+COPYRIGHT AND LICENSE
+

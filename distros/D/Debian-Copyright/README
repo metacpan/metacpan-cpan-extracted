@@ -1,0 +1,92 @@
+NAME
+    Debian::Copyright - manage Debian copyright files
+
+VERSION
+    This document describes Debian::Copyright version 0.2 .
+
+SYNOPSIS
+        my $c = Debian::Copyright->new();       # construct a new
+        $c->read($file1);                       # parse debian copyright file
+        $c->read($file2);                       # parse a second
+        $c->write($ofile);                      # write to file
+
+DESCRIPTION
+    Debian::Copyright can be used for the representation, manipulation and
+    merging of Debian copyright files in an object-oriented way. It provides
+    easy reading and writing of the debian/copyright file found in Debian
+    source packages. Debian has recently started standardising its copyright
+    files around the machine-readable DEP-5/Format:
+    http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+    format.
+
+  note on terminology
+    The term "Stanza" derives from the dh-make-perl tool. The official term
+    would now be "Paragraph". For the purposes of discussing the DEP-5
+    format the terms are used interchangeably in this documentation.
+
+FIELDS
+  header
+    An instance of Debian::Copyright::Stanza::Header class. Contains the the
+    first stanza of the copyright file. If multiple files were parsed only
+    the first will be retained.
+
+  files
+    A hash reference (actually Tie::IxHash instance) with keys being the
+    values of the `Files' clause and values instances of
+    Debian::Copyright::Stanza::Files class.
+
+  licenses
+    A hash reference (actually Tie::IxHash instance) with keys being the
+    values of the `License' clause and values instances of
+    Debian::Copyright::Stanza::License class.
+
+CONSTRUCTOR
+  new
+    Constructs a new Debian::Copyright instance.
+
+    The `header' field is initialised with an empty string. The
+    `files_block' and `license_block' fields are initialised with an empty
+    instance of Tie::IxHash.
+
+METHODS
+  read *file*
+    Parse debian and accessors.
+
+    *file* can be either a file name, an opened file handle or a string
+    scalar reference.
+
+  write *file*
+    Writes a debian/copyright-like file in *file* with the contents defined
+    in the accessor fields.
+
+    *file* can be either a file name, an opened file handle or a string
+    scalar reference.
+
+LIMITATIONS
+    This module is written with one particular version of DEP-5 in mind.
+    Furthermore version 0.1 of this software was for a draft version the
+    standard. The changes in going from draft to standard were such that it
+    was not worth attempting to maintain backwards compatibility.
+    Test coverage is not yet complete.
+
+INCOMPATIBILITIES
+    This version is not backwards compatible with version 0.1.
+
+ACKNOWLEDGEMENTS
+    Thanks to Charles Plessy for various comments regarding the
+    documentation.
+
+COPYRIGHT & LICENSE
+    Copyright (C) 2011-2012 Nicholas Bamber nicholas@periapt.co.uk
+
+    This module was adapted from Debian::Control. Copyright (C) 2009 Damyan
+    Ivanov dmn@debian.org [Portions]
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License version 2 as published
+    by the Free Software Foundation.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

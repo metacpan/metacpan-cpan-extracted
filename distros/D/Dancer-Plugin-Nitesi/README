@@ -1,0 +1,274 @@
+NAME
+    Dancer::Plugin::Nitesi - Nitesi Shop Machine plugin for Dancer
+
+VERSION
+    Version 0.0099
+
+SYNOPSIS
+        use Dancer::Plugin::Nitesi;
+
+        cart->add({sku => 'ABC', name => 'Foobar', quantity => 1, price => 42});
+        cart->items();
+        cart->clear();
+
+        account->login(username => 'frank@nitesi.com', password => 'nevairbe');
+        account->acl(check => 'view_prices');
+        account->logout();
+
+DESCRIPTION
+    This dancer plugin gives you access to the products, cart and account
+    functions of the Nitesi shop machine.
+
+PRODUCTS
+CARTS
+    The cart keyword returns a Nitesi::Cart object with the corresponding
+    methods.
+
+    You can use multiple carts like that:
+
+        cart('wishlist')->add({sku => 'ABC', name => 'Foobar', quantity => 1, price => 42});
+        cart('wishlist')->total;
+
+    The DBI backend (Dancer::Plugin::Nitesi::Cart::DBI) allows you to load
+    carts of arbitrary users.
+
+        cart('', 123)->items;
+
+PAYMENT
+    Card payments can be processed by one of the various providers supported
+    by Business::OnlinePayment with the charge keyword.
+
+        $tx = charge(provider => 'Braintree',
+                     amount => cart->total,
+                     first_name => 'Test',
+                     last_name => 'Tester',
+                     card_number => '4111111111111111',
+                     expiration => '0714',
+                     cvc => '222');
+
+ACCOUNTS
+    The account keyword returns a Nitesi::Account::Manager object with the
+    corresponding methods.
+
+    Login to an account:
+
+        account->login(username => 'frank@nitesi.com', password => 'nevairbe');
+
+    Logout:
+
+        account->logout();
+
+    Check permissions:
+
+        account->acl(check => 'view_prices');
+
+    Change password for current account:
+
+        account->password('nevairbe');
+
+    Change password for other account:
+
+        account->password(username => 'frank@nitesi.com', password => 'nevairbe');
+
+    Create account:
+
+        account->create(email => 'fina@nitesi.com');
+
+ROUTES
+    Standard routes can be registered by including the
+    Dancer::Plugin::Nitesi::Routes module and calling `shop_set_routes' at
+    the end of your main application module:
+
+        package MyShopApp;
+
+        use Dancer ':syntax';
+        use Dancer::Plugin::Nitesi;
+        use Dancer::Plugin::Nitesi::Routes;
+
+        ...
+
+        shop_setup_routes;
+
+        1;
+
+  VIEWS
+    The following views (template files) are needed for your shopping cart
+    application:
+
+    product
+        Product detail page, with product description, product price and
+        "Add to cart" button.
+
+    cart
+        Cart page.
+
+HOOKS
+    This plugin installs the following hooks:
+
+  Add to cart
+    The functions registered for these hooks receive the cart object and the
+    item to be added as parameters.
+
+    before_cart_add_validate
+        Triggered before item is validated for adding to the cart.
+
+    before_cart_add
+        Triggered before item is added to the cart.
+
+    after_cart_add
+        Triggered after item is added to the cart. Used by DBI backend to
+        save item to the database.
+
+  Update cart
+    The functions registered for these hooks receive the cart object, the
+    current item in the cart and the updated item.
+
+    before_cart_update
+        Triggered before cart item is updated (changing quantity).
+
+    after_cart_update
+        Triggered after cart item is updated (changing quantity). Used by
+        DBI backend to update item to the database.
+
+  Remove from cart
+    The functions registered for these hooks receive the cart object and the
+    item to be added as parameters.
+
+    before_cart_remove_validate
+        Triggered before item is validated for removal. Receives cart object
+        and item SKU.
+
+    before_cart_remove
+        Triggered before item is removed from the cart. Receives cart object
+        and item.
+
+    after_cart_remove
+        Triggered after item is removed from the cart. Used by DBI backend
+        to delete item from the database. Receives cart object and item.
+
+  Clear cart
+    before_cart_clear
+        Triggered before cart is cleared.
+
+    after_cart_clear
+        Triggered after cart is cleared.
+
+  Rename cart
+    The functions registered for these hooks receive the cart object, the
+    old name and the new name.
+
+    before_cart_rename
+        Triggered before cart is renamed.
+
+    after_cart_rename
+        Triggered after cart is renamed.
+
+CONFIGURATION
+    The default configuration is as follows:
+
+        plugins:
+          Nitesi:
+            Account:
+              Session:
+                Key: account
+              Provider: DBI
+            Cart:
+              Backend: Session
+            Product:
+              backend: DBI
+              table: products
+              key: sku
+            Query:
+              log: 0
+
+  ACCOUNT
+    Connection
+    The connection used by Dancer::Plugin::Database can be set as follows:
+
+        plugins:
+          Nitesi:
+            Account:
+              Provider: DBI
+              Connection: shop
+
+    Fields
+    Extra fields can be retrieved from the account provider and put into the
+    session after a successful login:
+
+        plugins:
+          Nitesi:
+            Account:
+              Provider: DBI
+              Fields: first_name,last_name,city
+
+  PRODUCTS
+    If your products table slightly varies from our default schema in
+    Nitesi::Database::Schema, you can adjust this in your configuration:
+
+        plugins:
+          Nitesi:
+            Product:
+              attributes:
+                name: description
+                short_description: comment_short
+
+    This directs Dancer::Plugin::Nitesi to use the description field instead
+    of the name field and the comment_short field instead of the
+    short_description field.
+
+  QUERY
+    DBI queries can be logged with debug level as follows:
+
+        plugins:
+          Nitesi:
+            Query:
+              log: 1
+
+CAVEATS
+    Please anticipate API changes in this early state of development.
+
+AUTHOR
+    Stefan Hornburg (Racke), `racke@linuxia.de'
+
+BUGS
+    Please report any bugs or feature requests to `bug-nitesi at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Plugin-Nitesi. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer-Plugin-Nitesi
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-Nitesi
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-Nitesi
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-Nitesi
+
+    * Search CPAN
+        http://search.cpan.org/dist/Dancer-Plugin-Nitesi/
+
+ACKNOWLEDGEMENTS
+    The Dancer developers and community for their great application
+    framework and for their quick and competent support.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010-2013 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+    Nitesi
+

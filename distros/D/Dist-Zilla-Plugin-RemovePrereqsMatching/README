@@ -1,0 +1,64 @@
+NAME
+    Dist::Zilla::Plugin::RemovePrereqsMatching - A more flexible prereq
+    remover
+
+VERSION
+    This document describes version 0.002 of
+    Dist::Zilla::Plugin::RemovePrereqsMatching - released June 18, 2012 as
+    part of Dist-Zilla-Plugin-RemovePrereqsMatching.
+
+SYNOPSIS
+        ; in your dist.ini
+        [RemovePrereqsMatching]
+        remove_matching = ^Template::Whatever::.*$
+        remove_matching = ^Dist::Zilla.*$
+
+DESCRIPTION
+    This plugin builds on Dist::Zilla::Plugin::RemovePrereqs to allow
+    prerequisites to be removed by regular expression, rather than string
+    equality. This can be useful when you have a "DPAN" package consisting
+    of a bunch of modules under a common namespace, whose installation can
+    be handled by one common prerequisite specification.
+
+METHODS
+  register_prereqs
+    We implement this method to scan the list of prerequisites assembled to
+    date, and remove any tat match any of the expressions given to us.
+
+OPTIONS
+  remove_matching
+    This option defines a regular expression that will be used to test
+    prerequisites for removal. We may be specified multiple times to define
+    multiple expressions to test prerequisites against; a prerequisite needs
+    to match at least one expression to be excluded.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Dist::Zilla::Plugin::RemovePrereqs
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/dist-zilla-plugin-removeprereqsmatching> and
+    may be cloned from
+    <git://github.com/RsrchBoy/dist-zilla-plugin-removeprereqsmatching.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-plugin-removeprereqsmatching/issu
+    es
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

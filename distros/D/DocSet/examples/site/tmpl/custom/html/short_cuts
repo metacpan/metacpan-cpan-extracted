@@ -1,0 +1,35 @@
+[%-# links menu
+   # expects to be set:
+   # nav          - cache navigator object
+   # rel_doc_root - relative docs path (only for chapters!)
+-%]
+[%- SET buttons = [
+    [ "${doc.dir.abs_doc_root}/maillist/modperl.html#Searchable_Archives", 'Maillist Archives'],
+    ["${doc.dir.abs_doc_root}/docs/1.0/guide/index.html", 'The 1.0 guide'],
+    ["${doc.dir.abs_doc_root}/download/source.html#Stable_Source_Distribution", 'The 1.0 source'],
+    ["${doc.dir.abs_doc_root}/docs/2.0/user/intro/start_fast.html#A_Quick_Guide_to_Getting_Started_with_mod_perl", 'Bleeding edge: 2.0'],
+    ["${doc.dir.abs_doc_root}/docs/1.0/guide/help.html#How_to_Report_Problems", 'Report 1.0 Problems'],
+    ["${doc.dir.abs_doc_root}/docs/2.0/user/help/help.html#Reporting_Problems", 'Report 2.0 Problems'],
+       ];  
+-%]
+[%- WRAPPER wrap_box 
+        title = 'Short Cuts'
+-%]
+
+[%- FOREACH but = buttons -%]
+
+        <tr>
+            <td class="menu-border"><br></td>
+            <td class="non-sel-bg">
+                <div class="nonselectedmenuitem">
+                    <a href="[%- but.0 -%]">[%- but.1 -%]</a>
+                </div>
+            </td>
+            <td class="menu-border"><br></td>
+        </tr>
+[%- END -%]
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+[%- END -%]

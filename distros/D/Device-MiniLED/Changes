@@ -1,0 +1,37 @@
+Revision history for Device-MiniLED
+
+1.03    Sat, Aug 31, 2013
+
+  [ENHANCEMENTS]
+
+  * Added support for manually assigning messages to slots (slot parameter to $sign->addMsg) and also selecting which slots to display (showslots paramater to $sign->send)
+
+  * Made the "effect" and "speed" parameters to $sign->addMsg optional, with sane default values
+ 
+  * Better reuse of code between Pix and Icon, particularly in the loaddata method 
+
+  * Documentation: more code examples
+
+  * Documentation: Additional acknowledgements and references to other projects that are similar
+
+  [BUG FIXES]
+
+  * Documentation bug: Added missing documentation for font tags
+
+  * Third attempt at getting both Build.PL and Makefile.PL to inject the right dependency at build time. (Win32::SerialPort for Windows machines, Device::SerialPort for all others)
+
+1.02    Sat, Mar 09, 2013
+ 
+  [BUG FIXES]
+
+  * Second attempt to fix issue with Build.PL, Makefile.PL, and resolving dependencies dynamically for Win32::SerialPort vs Device::Serialport
+
+1.01    Sat, Mar 09, 2013
+ 
+  [BUG FIXES]
+  
+  * attempting to fix issue with Build.PL, Makefile.PL, and resolving dependencies dynamically for Win32::SerialPort vs Device::Serialport
+
+1.00    Fri, Mar 08, 2013     
+
+  Original Release

@@ -1,0 +1,80 @@
+Report the size of multi-level structures (arrays, hashs etc)
+
+(C) Copyright ..--- ----- ----- .---- - ....- by - . .-.. ... .-.-.-
+
+Description
+===========
+
+Use it like this:
+
+        use Devel::Size::Report qw/report_size/;
+
+        my $a = [ \8, \*STDIN, 7,
+                  [ 1, 2, 3,
+                    { a => 'b',
+                      size => 12.2,
+                      h => ['a']
+                    },
+                  'rrr'
+                  ]
+                ];
+        print report_size($a, { indend => "  " } );
+
+This will print something like this:
+
+        Size report v0.08 for 'ARRAY(0x8145e6c)':
+          Array 886 bytes (overhead: 100 bytes, 11.29%)
+            Scalar Ref 32 bytes (overhead: 16 bytes, 50.00%)
+              Read-Only Scalar 16 bytes
+            Glob 266 bytes
+            Scalar 16 bytes
+            Array 472 bytes (overhead: 88 bytes, 18.64%)
+              Scalar 16 bytes
+              Scalar 16 bytes
+              Scalar 16 bytes
+              Hash 308 bytes (overhead: 180 bytes, 58.44%)
+                'h' => Array 82 bytes (overhead: 56 bytes, 68.29%)
+                  Scalar 26 bytes
+                'a' => Scalar 26 bytes
+                'size' => Scalar 20 bytes
+              Scalar 28 bytes
+        Total: 886 bytes in 15 elements
+
+Installation
+============
+
+* untar/ungzip the package (replace 0.10 with the version you got)
+
+        tar -xzf Devel-Size-Report-0.10.tar.gz
+
+* Check the signature. Download my key from http://bloodgate.com/tels.asc or
+  from my CPAN directory. Then do in the build directory (where you unwrapped
+  stuff):
+
+        cpansign -v
+
+* if the signature verifies OK, proceed. Otherwise NOTIFY ME IMMIDIATELY. Do
+  NOT INSTALL THE PACKAGE! Your system might get compromised!
+
+* Build the make file:
+
+        perl Makefile.PL
+
+* Make the project and run the tests:
+
+        make test
+
+* If some tests fail, please notify me. Only if all tests pass, install as
+  root:
+
+        su
+        [enter password]
+        make install
+        exit
+
+See also ./example for some example scripts.
+
+Please send me test-reports, your experiences with this and your ideas - I love
+to hear about my work!
+
+Tels <http://bloodgate.com/>

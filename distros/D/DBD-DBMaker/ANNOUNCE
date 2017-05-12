@@ -1,0 +1,52 @@
+Friends, 
+
+This is DBD::DBMaker 0.13.
+
+DBD::DBMaker is a driver code that enables Perl 5.003 and 5.004 to access
+the DBMaker RDBMS via the DBI module (you will need the code for the latest
+release of DBI and DBD::DBMaker).
+
+Tim Bunce's DBI module is *the* standard way to access a number of different
+databases from perl.
+
+DBMAKER is one of the few SQL/ODBC databases engines available for Linux and
+for other UNIX and non-UNIX platforms.
+
+This version fixes some bugs and DBI compliance problems:
+    IMPORTANT fix: 
+    Minor fixes:
+
+Tested using
+	* RedHat Linux
+	  perl5.005_03
+	  DBMaker 3.5
+
+	* WinNT 4.0
+	  DBMaker Server 3.5 for WinNT
+	  DBMaker 3.5 development system
+	  MS VC 5.0
+	  perl5.5.005_03
+
+The source of DBD::DBMaker is available from
+
+	http://www.dbmaker.com/
+     or from CPAN (authors/id/DBMAKER/DBD-DBMaker-0.13.tar.gz) (not yet)
+
+     You will also need:
+    * Perl (of course!), Version 5.003 or better
+	* the most recent DBI driver module (currently V 1.06)
+	* the DBMaker development system
+	* a DBMaker database server
+
+Information about the DBMaker database can be found via
+
+	http://www.dbmaker.com/
+
+    or
+  
+    http://www.dbmaker.com.tw
+
+Enjoy!!
+
+
+dbmaker@lion.syscom.com.tw

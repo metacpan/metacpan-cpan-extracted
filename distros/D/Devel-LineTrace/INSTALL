@@ -1,0 +1,12 @@
+At the command-line, type:
+
+perl Build.PL
+./Build
+./Build test
+
+To prepare the package for installation and then:
+
+./Build install
+
+to install it.
+

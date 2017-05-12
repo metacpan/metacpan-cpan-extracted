@@ -1,0 +1,89 @@
+This file contains some miscellaneous (and non-comprehensive) notes on
+using Perl and DBD::Informix with Linux.  The messages are prefixed with a
+line like --#1#-- (search pattern /^--#[0-9]*#--/).
+
+Quick Guidelines:
+*   It may be easier to use your own version of Perl than the
+    distributed version (ditto for Apache if you want to extend it).
+*   Not all versions of Linux ESQL/C work on all versions of all
+    distributions of Linux.
+*   The -lcrypt library had to be added to the esql script for early
+    (7.24.UC5) versions of ESQL/C on some distributions (RedHat 5.2).
+
+--#1#--
+Date: Mon, 28 Sep 1998 13:28:18 -0700 (PDT)
+From: Jonathan Leffler <jleffler@informix.com>
+To: Martin Goik <goik@hdm-stuttgart.de>
+
+On Mon, 28 Sep 1998, Martin Goik wrote:
+> Jonathan Leffler wrote:
+> > On Mon, 28 Sep 1998, Martin Goik wrote:
+> > > I recently compiled DBD-Informix-0.60 on a redhat5.1 linux box. There
+> > > might be a little bug in the t/t00basic.t test script. If you regard
+>
+> There is another little trap in building DBD-Informix-0.60: If you do a
+> 'perl Makefile.pl' on linux references to crypt(3) are undefined. Thus
+> the test of the environment fails an no Makefile is generated. I added a
+> '-lcrypt' to Makefile.pl which is apparently inelegant but works. A hint
+> in the README file would be helpful.
+
+Actually, the compile of esqlbasic.ec also fails, pointing out that the problem
+is in the ESQL/C system, and also that you're working on RedHat or some other
+glibc distribution.  You're right, it can be fixed.  The best way to do it is
+to fix the esql script for the machine -- it's what I do.  And you're right,
+I need to put together some Linux hint material, including this and a patch
+to the esql script.
+
+--#2#--
+Date: Mon, 28 Sep 1998 21:02:35 +0000
+From: Martin Goik <goik@hdm-stuttgart.de>
+To: Jonathan Leffler <jleffler@informix.com>
+Subject: annother suggestion
+
+Jonathan Leffler wrote:
+> On Mon, 28 Sep 1998, Martin Goik wrote:
+> > I recently compiled DBD-Informix-0.60 on a redhat5.1 linux box. There
+> > might be a little bug in the t/t00basic.t test script. If you regard
+
+There is another little trap in building DBD-Informix-0.60: If you do a
+'perl Makefile.pl' on linux references to crypt(3) are undefined. Thus
+the test of the environment fails an no Makefile is generated. I added a
+'-lcrypt' to Makefile.pl which is apparently inelegant but works. A hint
+in the README file would be helpful.
+
+--#3#--
+Date: Mon, 05 Apr 1999 13:08:24 -0400
+From: Nitin Mule <nmule@home.com>
+To: jleffler@informix.com
+Subject: [FYI: Buggy Perl in Redhat 5.2!]
+
+Jonathan,
+I'm forwarding a copy of the message I posted to redhat NG. The Perl
+version bundled with Redhat 5.2 is buggy. The Majordomo folks have
+pointed this out in their FAQ:
+
+	http://www.cis.ohio-state.edu/~barr/majordomo-faq.html#4.13
+
+You might wish to make a note of this bug in DBD::Informix README file
+(that is if you find time!). But it will be really helpful for lot of
+folks.
+
+--#4#--
+Date: Mon, 05 Apr 1999 11:23:17 -0400
+From: Nitin Mule <nmule@home.com>
+Subject: Buggy Perl in Redhat 5.2!
+
+This might be a well known fact by now, but let me repeat it as it may
+save someone a lot of time and frustration. I tried compiling
+DBD::Informix on a Redhat 5.2 box (with Perl 5.004_04) and guess what? I
+spent hours tweaking DBD::Informix (Informix driver for DBI perl module)
+without any results. Everything worked fine after I upgraded my Perl.
+Then I looked if anyone else had similar problem and bumped into
+majordomo FAQ which clearly spells out this problem. So upgrade your
+Perl folks, if haven't already. I guess subscribing to Redhat's Bugzilla
+is not such a bad idea.
+
+---------------------------------------------------------------------------
+
+Author: Jonathan Leffler (jleffler@us.ibm.com)
+@(#)$Id: linux,v 100.1 2002/02/08 22:49:57 jleffler Exp $

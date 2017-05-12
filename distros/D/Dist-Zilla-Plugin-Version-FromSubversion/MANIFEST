@@ -1,0 +1,17 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+inc/lib.pm
+lib/Dist/Zilla/Plugin/Version/FromSubversion.pm
+t/00-compile.t
+t/90-pod.t
+t/91-pod-coverage.t
+t/92-kwalitee.t
+t/93-check-version.t
+t/release-kwalitee.t

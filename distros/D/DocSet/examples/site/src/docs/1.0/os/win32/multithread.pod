@@ -1,0 +1,61 @@
+=head1 NAME
+
+Discussion of multithreading on Win32 mod_perl-1.xx
+
+=head1 Description
+
+This document discusses the multithreading limitations of
+mod_perl-1.xx on Win32.
+
+=head1 The problem
+
+On Win32, mod_perl is effectively single threaded. What this
+means is that a single instance of the interpreter is created,
+and this is then protected by a server-wide lock that prevents
+more than one thread from using the interpreter at any one time.
+The fact that this will prevent parallel processing of requests,
+including static requests, can have serious implications for
+production servers that often must handle concurrent or
+long-running requests.
+
+This situation changes with Apache/mod_perl 2.0, which is based on a
+multi-process/multi-thread approach using a native Win32 threads
+implementation See the L<mod_perl 2
+overview|docs::2.0::user::overview::overview> for more details,
+and the discussion of L<modperl-2 in Win32|docs::2.0::os::win32::install>
+on getting modperl-2 for Win32 in particular.
+
+=head1 See Also
+
+http://perl.apache.org and http://httpd.apache.org, especially the
+discussion of Apache-2 and modperl-2.
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item * 
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

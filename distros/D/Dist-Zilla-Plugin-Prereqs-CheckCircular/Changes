@@ -1,0 +1,21 @@
+Revision history for Dist-Zilla-Plugin-Prereqs-CheckCircular
+
+0.003   2016-10-07 (PERLANCAR)
+
+	- Allow skipping checking circular deps via environment variable
+	  DZIL_CHECKCIRCULAR_SKIP.
+
+	- [ux] Show log message (before performing check) at non-debug
+	  level because the check might take several seconds.
+
+
+0.002   2016-09-29 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Rewording of Description.
+
+
+0.001   2016-09-29 (PERLANCAR)
+
+         - First release.

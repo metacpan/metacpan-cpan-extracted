@@ -1,0 +1,6 @@
+---
+objs:
+  PPOtest01:
+    print  : method 
+    func   : members
+    type   : list

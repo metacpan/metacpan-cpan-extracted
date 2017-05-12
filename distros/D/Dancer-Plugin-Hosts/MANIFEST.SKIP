@@ -1,0 +1,7 @@
+\.komodoproject$
+^blib
+^Makefile(\.old)?$
+\.bak$
+.tar.gz$
+^pm_to_blib$
+\.git

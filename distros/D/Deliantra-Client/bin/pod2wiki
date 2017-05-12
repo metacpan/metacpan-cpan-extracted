@@ -1,0 +1,273 @@
+#! perl
+
+# convert given .pod files to wiki style
+
+# base path of arch tree, only used for new arch graphics
+my $ARCH = "/root/src/cf.schmorp.de/arch";
+
+use strict;
+
+use Storable;
+use Pod::POM;
+
+our @result;
+our $indent;
+our $level;
+
+my $MA_BEG = "\x{fcd0}";
+my $MA_SEP = "\x{fcd1}";
+my $MA_END = "\x{fcd2}";
+
+sub asxml($) {
+   local $_ = $_[0];
+
+   s/&/&amp;/g;
+   s/>/&gt;/g;
+   s/</&lt;/g;
+
+   $_
+}
+
+sub flatten($) {
+   local $_ = $_[0];
+
+   s/<[^>]+>//g;
+   s/^\s+//;
+   s/\s+$//;
+   s/\s+/ /g;
+
+   $_
+}
+
+sub special {
+   $MA_BEG . (join $MA_SEP, @_) . $MA_END
+}
+
+package AsParagraphs;
+
+use strict;
+
+use base "Pod::POM::View";
+
+# nodes (order must stay as it is)
+sub N_PARENT (){ 0 }
+sub N_PAR    (){ 1 }
+sub N_LEVEL  (){ 2 }
+sub N_KW     (){ 3 }
+sub N_DOC    (){ 4 }
+
+# paragraphs (order must stay as it is)
+sub P_INDENT (){ 0 }
+sub P_LEVEL  (){ 1 }
+sub P_MARKUP (){ 2 }
+sub P_INDEX  (){ 3 }
+
+*view_seq_file   =
+*view_seq_code   =
+*view_seq_bold   = sub { "<b>$_[1]</b>" };
+*view_seq_italic = sub { "<i>$_[1]</i>" };
+*view_seq_zero   = sub { };
+*view_seq_space  = sub { my $text = $_[1]; $text =~ s/ /&#160;/g; $text };
+*view_seq_index  = sub { push @{ $result[-1][P_INDEX] }, $_[1]; "" };
+
+sub view_seq_text {
+   my $text = $_[1];
+   $text =~ s/\s+/ /g;
+   ::asxml $text
+}
+
+sub view_seq_link {
+   my (undef, $link) = @_;
+
+   $link =~ s/^(.*)\|//
+      or $link =~ /([^\/]*)$/;
+
+   my $text = $1;
+
+   if ($link =~ /http:/) {
+      "<u>" . (::asxml $link) . "</u>"
+   } elsif ($link =~ /^\$ARCH\/(.+\....)$/) {
+      my $file = $1;
+
+      unless (-f "resources/arch/$file.png") {
+         print "ARCHIMG $file is missing, trying to supply... ";
+         my ($path) = split /\x00/, qx<find \Q$ARCH\E -name \Q$file.64x64.png*\E -print0>;
+         -f $path or die "$file: could not find arch image";
+         print "$path\n";
+         system "rsync -a \Q$path\E resources/arch/\Q$file.png"
+            and die "rsync failed: $?";
+         system "cvs add -kb resources/arch/\Q$file.png"
+            and ((unlink "resources/arch/$file.png"), die "cvs add failed: $?");
+      }
+
+      ::special image => "arch/$file.png", 1;
+   } else {
+      ::special link => $text, $link
+   }
+}
+
+sub view_verbatim {
+   push @result, [ $indent * 16, $level, "<tt>" . (::asxml $_[1]) . "</tt>\n" ];
+   ()
+}
+
+sub view_textblock {
+   push @result, [ $indent * 16, $level, "$_[1]\n" ];
+   ()
+}
+
+sub view_head1 {
+   push @result, [ $indent * 16, $level ];
+   my $title = $_[1]->title->present ($_[0]);
+   $result[-1][P_MARKUP] = ::special h1 => $title if length $title;
+   $title = ::flatten $title;
+   unshift @{ $result[-1][P_INDEX] }, $title
+      if !$result[-1][P_INDEX];
+   local $level = $level + 1;
+   $_[1]->content->present ($_[0]);
+   ()
+};
+
+sub view_head2 {
+   push @result, [ $indent * 16, $level ];
+   my $title = $_[1]->title->present ($_[0]);
+   $result[-1][P_MARKUP] = ::special h2 => $title if length $title;
+   $title = ::flatten $title;
+   unshift @{ $result[-1][P_INDEX] }, $title
+      if !$result[-1][P_INDEX];
+   local $level = $level + 1;
+   $_[1]->content->present ($_[0]);
+   ()
+};
+
+sub view_head3 {
+   push @result, [ $indent * 16, $level ];
+   my $title = $_[1]->title->present ($_[0]);
+   $result[-1][P_MARKUP] = ::special h3 => $title if length $title;
+   $title = ::flatten $title;
+   unshift @{ $result[-1][P_INDEX] || [] }, $title
+      if !$result[-1][P_INDEX];
+   local $level = $level + 1;
+   $_[1]->content->present ($_[0]);
+   ()
+};
+
+sub view_over {
+   local $indent = $indent + $_[1]->indent;
+   push @result, [ $indent, $level ];
+   $_[1]->content->present ($_[0]);
+   ()
+}
+
+sub view_item {
+   push @result, [ $indent * 8, $level ];
+   my $title = $_[1]->title->present ($_[0]);
+   $result[-1][P_MARKUP] = "$title\n" if length $title;
+   $title = ::flatten $title;
+   unshift @{ $result[-1][P_INDEX] || [] }, $title
+      if !$result[-1][P_INDEX];
+   local $level = $level + 1;
+   $_[1]->content->present ($_[0]);
+   ()
+}
+
+sub view_for {
+   if ($_[1]->format eq "image") {
+      push @result, [
+         $indent * 16,
+         $level,
+         (::special image => "pod/" . $_->text),
+      ];
+   }
+   ()
+}
+
+sub view_begin {
+   ()
+}
+
+sub view {
+   my ($self, $type, $item) = @_;
+
+   $item->content->present ($self);
+}
+
+#############################################################################
+
+sub as_paragraphs($) {
+   my ($pom) = @_;
+
+   local $indent = 0;
+   local $level  = 2;
+   local @result = ( [] );
+
+   $pom->present ("AsParagraphs");
+
+   [grep $_->[P_INDEX] || defined $_->[P_MARKUP], @result]
+}
+
+#############################################################################
+
+$| = 1;
+
+my %wiki;
+
+sub add_node($) {
+   my ($node) = @_;
+
+   for (@{ $node->[N_KW] || {} }) {
+      push @{$wiki{$_}}, $node;
+   }
+}
+
+my $root;
+$root->[N_KW] = ["Documents", "pod"];
+$root->[N_DOC] = [[0, 0, ::special link => "All Documents", "pod/*"]];
+
+for my $path (@ARGV) {
+   $path =~ /([^\/\\]+)\.pod$/ or die "$path: illegal pathname";
+   my $base = $1;
+   my $pom = Pod::POM->new->parse_text (do {
+      local $/;
+      open my $pod, "<:utf8", $path
+         or die "$path: $!";
+      <$pod>
+   });
+
+   my $para = as_paragraphs $pom;
+
+   my $pod;
+   $pod->[N_PARENT] = $root;
+   $pod->[N_PAR]    = 0;
+   $pod->[N_LEVEL]  = 1;
+   $pod->[N_KW]     = [$base];
+   $pod->[N_DOC]    = $para;
+
+   my @parent = ($pod);
+
+   for my $idx (0 .. $#$para) {
+      my $par = $para->[$idx];
+
+      while ($parent[-1][N_LEVEL] >= $par->[P_LEVEL]) {
+         pop @parent;
+      }
+
+      if ($par->[P_INDEX]) {
+         my $node;
+         $node->[N_PARENT] = $parent[-1];
+         $node->[N_PAR]    = $idx;
+         $node->[N_LEVEL]  = $par->[P_LEVEL];
+         $node->[N_KW]     = $par->[P_INDEX];
+         $node->[N_DOC]    = $para;
+         push @parent, $node;
+         add_node $node;
+      }
+   }
+
+   add_node $pod;
+}
+
+add_node $root;
+
+Storable::nstore \%wiki, "docwiki.pst";
+

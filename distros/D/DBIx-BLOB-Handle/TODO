@@ -1,0 +1,13 @@
+TODO:
+
+1) Write a proper test suite.
+
+2) Make the file position / eof operations aware of the number of lines read
+   from the database instead of following the chunks of data actually read.
+   At the moment the position / eof does not follow the lines read with 
+   READLINE ( <$handle> ) which is a BUG.
+
+3) Implement buffering of the database reads, up to the specified block size.
+   Currently when we do a read, we read those bytes directly from the database.
+   We should do a read of $blocksize bytes but only return the requested number
+   of bytes. This way we can make smaller reads look faster.

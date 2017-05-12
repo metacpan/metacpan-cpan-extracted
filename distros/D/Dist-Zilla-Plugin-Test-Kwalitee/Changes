@@ -1,0 +1,69 @@
+Revision history for Dist-Zilla-Plugin-Test-Kwalitee
+
+2.12      2015-09-30 03:59:46Z
+    - use TODO around tests that fail on perl 5.8.x due to the buggy handling
+      of qr/...$/m
+    - fix licencing metadata
+
+2.11      2014-08-27 01:40:14Z
+    - fix test failures with new metrics added in MCA 0.93_01
+
+2.10      2014-08-23 17:55:26Z
+    - fix pod error (thanks haarg!)
+    - generated test filename is now configurable
+
+2.09      2014-08-23 08:40:01Z
+    - sort the arguments to kwalitee_ok, for smaller diffs between iterations
+    - now again running the generated test during tests, but without
+      attempting to capture its output cleverly
+
+2.08      2014-08-16 04:56:06Z
+    - line numbers in shipped code are now almost the same (within 3) as
+      the repository source, for easier debugging
+    - use kwalitee_ok() interface newly added in Test::Kwalitee 1.21
+
+2.07      2013-10-15 02:18:02Z
+    - include in the generated test the exact version of the plugin that
+      generated the test
+    - warnings tests bypassed during installation
+    - update minimum required version of Test::Kwalitee
+
+2.06      2013-08-17 02:41:24Z
+    - removed old and deprecated Dist::Zilla::Plugin::KwaliteeTests, which is
+      no longer indexed by PAUSE anyway
+    - fixed tests broken on win32
+    - Test::Kwalitee is now required to be present when the test is run (by
+      authors, at release time)
+    - cleaned up prerequisite list
+
+2.05      2013-08-11 21:18:58Z
+    - adjust tests to handle recent changes to Test::Kwalitee and
+      Module::CPANTS::Analyse
+
+2.04      2013-07-26 00:29:10Z
+    - fix installation failures with Test::Kwalitee 1.09 (issue #4,
+      harleypig's repo)
+
+2.03      2011-10-19 14:56:47Z
+
+2.020000  2011-09-08 02:47:05Z
+    - Provide a deprecation warning (Mike Doherty)
+    - Moved switch_namespace branch to master ( HarleyPig )
+    - brought dist.ini up to date ( HarleyPig )
+
+1.112410  2011-08-29 15:57:31Z
+    - Made pod coverage test pass ( HarleyPig )
+    - Fixed error with tests needing 'plan' defined ( Kent Fredric)
+    - Replace 2-phase inject/munge with 1-phase inject ( Kent Fredric )
+    - Add some tests for our test being run ( Kent Fredric )
+
+1.112400  2011-08-28 15:34:37Z
+
+1.112390  2011-08-27 03:11:01Z
+
+1.101420  2010-05-22 15:47:26Z
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - list Test::Kwalitee in dist.ini so we don't use() it anymore
+
+1.100690  2010-03-10 22:43:35Z
+    - original version

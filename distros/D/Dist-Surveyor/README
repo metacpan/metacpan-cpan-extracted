@@ -1,0 +1,90 @@
+NAME
+
+    Dist::Surveyor - Survey installed modules and determine the specific
+    distribution versions they came from
+
+VERSION
+
+    version 0.016
+
+SYNOPSIS
+
+        my $options = {
+            opt_match => $opt_match,
+            opt_perlver => $opt_perlver,
+            opt_remnants => $opt_remnants,
+            distro_key_mod_names => $distro_key_mod_names,
+        };
+        my @installed_releases = determine_installed_releases($options, \@libdirs);
+
+DESCRIPTION
+
+    Surveys your huge ball of Perl modules, jammed together inside a
+    directory, and tells you exactly which module is installed there.
+
+    For quick start, and a fine example of this module usage, see
+    dist_surveyor.
+
+    This module have one exported function - determine_installed_releases
+
+determine_installed_releases($options, $search_dirs)
+
+    $options includes:
+
+    opt_match
+
+      A regex qr//. If exists, will ignore modules that doesn't match this
+      regex
+
+    opt_perlver
+
+      Skip modules that are included as core in this Perl version
+
+    opt_remnants
+
+      If true, output will include old distribution versions that have left
+      old modules behind
+
+    distro_key_mod_names
+
+      A hash-ref, with a list of irregular named releases. i.e.
+      'libwww-perl' => 'LWP'.
+
+    $search_dirs is an array-ref containing the list of directories to
+    survey.
+
+    Returns a list, where each element is a hashref representing one
+    installed distibution. This hashref is what MetaCPAN returns for
+    http://api.metacpan.org/v0/release/$author/$release, with two
+    additional keys:
+
+      * 'url' - that same as 'download_url', but without the hostname. can
+      be used to download the file for your favorite mirror
+
+      * 'dist_data' - Hashref containing info about the release, i.e.
+      percent_installed. (fully installed releases will have '100.00')
+
+OTHERS
+
+    This module checks $::DEBUG and $::VERBOSE for obvious proposes.
+
+    This module uses Dist::Surveyor::Inquiry to communicate with MetaCPAN.
+    Check that module's documentation for options and caching.
+
+    You can use Dist::Surveyor::MakeCpan to take the list of releases and
+    create a mini-cpan containing them.
+
+AUTHOR
+
+    Written by Tim Bunce <Tim.Bunce@pobox.com>
+
+    Maintained by Fomberg Shmuel <shmuelfomberg@gmail.com>, Dan Book
+    <dbook@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2011-2013 by Tim Bunce.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

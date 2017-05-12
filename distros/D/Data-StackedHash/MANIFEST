@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Data/StackedHash.pm
+test.pl
+META.yml                                 Module meta-data (added by MakeMaker)

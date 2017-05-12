@@ -1,0 +1,49 @@
+Drupal-Admin v 0.03
+
+This is a minimal screenscraping interface to the drupal admin
+pages. Its primary purpose (at the moment) is to provide a means to
+automate drupal core upgrades. There is a sample upgrade script at
+examples/drupal-upgrade. 
+
+This is ALPHA quality code. I would NOT recommend using this to
+perform a drupal core upgrade on a production site. Please send along
+patches! 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Drupal::Admin
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Drupal-Admin
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Drupal-Admin
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Drupal-Admin
+
+    Search CPAN
+        http://search.cpan.org/dist/Drupal-Admin/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Dan Urist
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,58 @@
+---
+abstract: 'A simple local search engine'
+author:
+  - 'Max Maischein <corion@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-SearchApp
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Apache::Tika::Async: '0'
+  Cal::DAV: '0'
+  Dancer: '1.3132'
+  Data::Diver: '0'
+  Encode: '0'
+  Exporter: '5'
+  Filter::signatures: '0'
+  HTML::Entities: '0'
+  HTML::Restrict: '0'
+  HTTP::Date: '0'
+  Image::ExifTool: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  MIME::QuotedPrint: '0'
+  MIME::WordDecoder: '0'
+  MP3::Tag: '0'
+  Mail::IMAPClient: '0'
+  Moo: '0'
+  Path::Class: '0'
+  Plack::Middleware::Pod: '0'
+  Promises: '0'
+  Scalar::Util: '0'
+  Search::Elasticsearch: '2.03'
+  Search::Elasticsearch::Async: '2.03'
+  Search::Elasticsearch::Client::2_0: '5.00'
+  Search::Elasticsearch::Client::2_0::Async: '2.03'
+  Search::Elasticsearch::Role::Cxn::HTTP: '2.03'
+  Template: '0'
+  Test::More: '0'
+  Text::Markdown: '0'
+  Time::Piece: '0'
+  URI::Escape: '0'
+  URI::file: '0'
+  YAML: '0'
+resources:
+  repository: https://github.com/Corion/dancer-searchapp
+version: '0.06'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

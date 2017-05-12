@@ -1,0 +1,133 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001002
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001001 2016-04-29T12:17:45Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - Path::Tiny
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+ - Moose::Autobox 0.10
+ - utf8
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+1.001000 2014-09-04T20:16:02Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+ [Removed / test requires]
+ - Path::Tiny 0.018
+
+1.000003 2014-08-15T21:17:57Z
+
+1.000002 2014-08-05T03:20:44Z
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+
+1.000001 2014-07-30T04:06:36Z
+ [Changed / test requires]
+ - Path::Tiny 0 → 0.018
+
+ [Removed / test requires]
+ - version 0.77
+
+1.000000 2014-07-29T10:55:00Z
+ [Added / runtime requires]
+ - Carp
+ - Dist::Zilla::File::FromCode
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - File::Spec::Functions
+ - List::Util
+ - Module::Install 0.90
+ - Path::Tiny
+ - Scalar::Util
+ - Test::DZil
+ - Test::Differences
+ - version 0.77
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.42 → 0
+
+ [Changed / runtime requires]
+ - Dist::Zilla::Role::Tempdir 0.01027622 → 1.001000
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - ExtUtils::MakeMaker 6.42
+
+ [Removed / runtime requires]
+ - Config
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.02000000 2013-04-06T06:45:47Z
+ [Added / runtime requires]
+ - Config
+ - Dist::Zilla::Plugin::MakeMaker::Runner
+ - Dist::Zilla::Role::BuildRunner
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01054021 2012-02-02T19:30:41Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01054020 2011-04-04T15:36:00Z
+ [Added / test requires]
+ - English
+
+ [Removed / runtime requires]
+ - inc::Module::Install
+
+0.01029216 2010-08-04T11:37:06Z
+ [Added / runtime requires]
+ - Dist::Zilla::File::InMemory
+ - Dist::Zilla::Role::InstallTool
+ - Dist::Zilla::Role::PrereqSource
+ - Dist::Zilla::Role::TestRunner
+ - Dist::Zilla::Role::TextTemplate
+ - inc::Module::Install
+ - namespace::autoclean
+
+ [Added / test requires]
+ - File::Find
+ - File::Temp
+ - Test::More 0.88
+
+ [Changed / runtime requires]
+ - Dist::Zilla::Role::Tempdir 0.01000003 → 0.01027622
+
+ [Removed / runtime requires]
+ - Dist::Zilla 1.093140

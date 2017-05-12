@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-DigestColumns-Lite
+
+0.03   2007/02/13 18:36
+        revert. revert. revert....orz...
+
+0.0.2  2007/02/13 16:28
+        Fix: __PACKAGE__->mk_classdata create DBIx-Class-DigestColumns-Lite's class data.
+             The class data is shared when using it by two or more schema.
+             Therefore, it had the class data of each schema. 
+
+0.0.1  Mon Nov 27 15:58:53 2006
+       Initial release.
+

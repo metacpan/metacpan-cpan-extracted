@@ -1,0 +1,70 @@
+Revision history for Distributed-Process
+
+0.20    Fri Jun  3 16:04:04 CEST 2005
+        This release introduces another major change in the architecture. The
+        client side no longer requires threads, which should enable clients to
+        run on Windows machines. The server side workers each run their run()
+        method in a separate thread, communicating with the master when needed
+        through thread-safe queues. Clients can request that a method be run on
+        the server, for instance to get parameters without having their own
+        copy of a configuration file.
+
+0.10    Thu Mar 24 10:35:40 CET 2005
+        The architecture has changed a lot. Now the master worker's run()
+        method will actually call the run() method of the RemoteWorkers,
+        instead of only letting them broadcast their remote __methods.
+        This has some implications: notably, one can no longer call a __method
+        with a coderef as argument to let it run at the master worker level,
+        since the real execution of run() is now done at the remote worker
+        level.
+        Remote methods (__methods) can now return values. The local worker will
+        send the values to the server between the '/begin_return' and the
+        '/end_return' tokens. This allows for the run() method to be more
+        complexe than just running the __methods one after the other (e.g., it
+        can test on the success or failure of one method and decide whether or
+        not to run the others).
+
+0.06    Sun Mar 20 00:09:47 CET 2005
+        The D::P::Client sends a /worker command when it first connects. This
+        allows for initialization tasks to take place on the server side.
+        Notably, the D::P::Master now only considers itself 'ready to run' when
+        all the clients have sent their /worker command, not only when they
+        have connected.
+        D::P::RemoteWorker now has the id() attribute from its Client
+        couterpart (sent through the /worker command), and exposes an
+        is_ready() method, which the D::P::Master queries to know whether it is
+        'ready to run'.
+        D::P::Master::workers() now returns the workers ordered by id().
+        t/10-postpone.t should no longer block like it used to do sometimes.
+        Other tests have been improved, notably t/11-time.t and t/09-session.t
+        which sometimes failed for no obvious reason (was due to the
+        unpredictable order of the D::P::Master::workers list).
+        New INFO, WARN and ERROR message output function to complete the
+        existing DEBUG.
+        D::P::Master::run() now gets the results from D::P::Master::result()
+        instead of getting them directly from its D::P::MasterWorker (this
+        allows for overloading the way results are filtered).
+
+0.05    Thu Mar 17 09:26:54 CET 2005
+        Passing a coderef as argument to a __method now works also when calling
+        it under time().
+        The __methods are now redefined in the worker_class and also in its
+        ancestor classes if any.
+
+0.04    Tue Mar 15 10:48:48 CET 2005
+        Added /reset command to flush the results between two run().
+        Passing a coderef as argument to a __method called within run() will
+        have it executed for each P::D::RemoteWorker, not only once by the
+        P::D::MasterWorker.
+        worker_args() are now passed on to the P::D::MasterWorker also.
+
+0.03    Fri Mar 11 11:23:40 CET 2005
+        Slightly better documentation. First public release (hey, this is very,
+        very alpha code. Use with care!)
+
+0.02    Tue Mar  8 15:31:44 CET 2005
+        Added some documentation. Still no public release.
+
+0.01    Sat Mar  5 01:50:11 CET 2005
+        First version, not even publicly released.
+

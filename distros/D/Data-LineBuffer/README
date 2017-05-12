@@ -1,0 +1,72 @@
+		    =============================
+		    Data::LineBuffer Version 0.01
+		    =============================
+
+NAME
+
+    Data::LineBuffer - provide a line oriented data push back facility
+                       for input sources
+
+DESCRIPTION
+
+     LineBuffer provides a very rudimentary input push back
+     facility.  It provides a layer between the input source and
+     the calling routine which allows data to be pushed back onto
+     the input source for retrieval, as a last in, first out,
+     stack.
+
+     It is only concerned with line-oriented data, and can
+     interface with a filehandle, a subroutine (which returns
+     data), a string containing multiple lines to be parsed, or
+     an array of lines.
+
+DEPENDENCIES
+
+       Test::More
+
+INSTALLATION
+
+    This package has been tested on Perl 5.6.0, Solaris 2.8.
+
+    To compile, test and install:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+CHANGES
+
+    See the Changes file for more details
+
+    0.01
+    ----
+    First Public Release
+
+
+COPYRIGHT
+
+    (C) 2000-2002 Smithsonian Astrophysical Observatory.  
+    All rights reserved.
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation; either version 2 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program; if not, write to the Free Software
+    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA
+    02111-1307 USA
+
+
+AUTHOR
+
+    Diab Jerius (djerius@cpan.org)
+

@@ -1,0 +1,65 @@
+Changes log for Data-Phrasebook-Loader-YAML
+===========================================
+
+0.13    2014-08-27
+        - fixed license fields in META.json to be lists.
+        - added repository link to META.yml.
+        - added cpanminus to INSTALL.
+        - extended test suite.
+
+0.12    2012-10-07
+        - fixed prerequisites in META files (thanks to D Thomas RT#79204).
+        - change file dates changed to meet W3CDTF standards.
+
+0.11    2012-07-29
+        - added Carp as a prerequisite.
+        - added Test::Distribution as a optional test prerequisite.
+        - implemented Perl::Critic suggestions.
+
+0.10    2012-07-29
+        - spelling fix. (thanks to Nicholas Bamber, Florian Schlichting &
+          Gregor Herrmann).
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - removed DSLIP info.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+
+0.09    2007-03-01
+        - Fixed META.yml typos.
+        - Added META.yml test script.
+
+0.08    2007-02-22
+        - Fixed a mistake in the META.yml.
+
+0.07    2007-02-22
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE as *apparently*, to all
+          non-British users of this module, this a bug! I beg to differ -
+          http://dictionary.reference.com/search?q=licence
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+
+0.06    2006-09-27
+        - Added support for dictionaries. This was a major patch submitted
+          by Oliver Gorwits. Thanks Oliver :)
+        - more tests
+        - Devel::Cover - 99.2%
+
+0.05    2005-03-25
+        - Added DSLIP information
+        - Rewrote test scripts
+        - Devel::Cover - 97.6%
+
+0.04    2005-03-03
+        - POD updates.
+
+0.03    2005-03-02
+        - Removed Test::MockObject from tests. No longer needed.
+
+0.02    2005-02-24
+        - revamped and renamed as part of the Data::Phrasebook framework
+
+0.01    2004-01-31
+        - New maintainer - Barbie.
+        - Extracted from main Phrasebook distribution

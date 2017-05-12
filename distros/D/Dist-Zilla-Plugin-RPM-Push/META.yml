@@ -1,0 +1,39 @@
+---
+abstract: 'Dist::Zilla plugin to build RPMs and push them into a repository'
+author:
+  - 'Markus Benning <me@w3r3wolf.de>'
+build_requires:
+  File::Which: 0
+  Test::DZil: 0
+  Test::Differences: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-RPM-Push
+requires:
+  Carp: 0
+  Dist::Zilla: 0
+  Dist::Zilla::App: 0
+  Dist::Zilla::Role::FilePruner: 0
+  Dist::Zilla::Role::Releaser: 0
+  File::Temp: 0
+  IPC::Run: 0
+  Moose: 0
+  Moose::Autobox: 0
+  Moose::Util::TypeConstraints: 0
+  Path::Class: 0
+  Text::Template: 0
+  constant: 0
+  namespace::autoclean: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-RPM-Push
+  repository: https://github.com/benningm/Dist-Zilla-Plugin-RPM-Push
+version: 0.010

@@ -1,0 +1,44 @@
+Revision history for Devel-Spy
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.02
+  - Incremented the version number. That's it.
+  - 275a8237636848a9017918fc6ff54dd6b27143ae 0.02
+
+0.03
+  - Removed Test::Warn as an unmarked pre-req.
+  - Make everything in ::Util be class methods.
+  - 4d7c263ae357cadb5631a8fcd933dc23ec12c0e9 0.03
+
+0.04
+  - Devel::Spy::TieHash:
+    - Streamlined TIEHASH.
+    - Removed uninitialized warning from STORE, FETCH. This is just til I get tests for this.
+    - Implemented remaining methods.
+  - Devel::Spy::TieArray:
+    - Implemented much of the class.
+  - Devel::Spy::_obj
+    - Bug fix: Called method results as functions instead of returning it.
+  - cfa50461ad5bb3a6c35825f59e2230dcb8c3ccfb 0.04
+
+0.05
+  - d1f416223b1d4f0e111a9824ca2b50918998cb88 0.05
+
+0.06
+  - bc6d5485e81db72b65c05e1873e52d995eea2945 Spy on arrays
+
+
+0.07
+  - Now overloading
+      -X file tests
+      atan2 cos sin exp abs log sqrt int
+      readline
+      ~~
+      ++ --
+      =
+      neg ! ~
+  - Shortcutting some execution by also overloading
+    += -= *= /= %= **= <<= >>= x= .=
+  - Maybe now works for REF, LVALUE, REGEXP, VSTRING, BIND references too

@@ -1,0 +1,24 @@
+Revision history for DBIx::Class::Relationship::Predicate
+
+0.07      2013-10-25
+ - Fix release date format
+
+0.06      2013-10-25 11:37:24 UTC
+ - Update dzil setup
+
+0.05      2013-10-16 23:21:19 UTC
+ - Prune local-lib
+
+0.04      2013-10-16 23:16:43 UTC
+ - use Dist::Zilla;
+ - Fix path for test-db
+
+0.03
+  - tests require SQL::Translator => 0.11006
+  - More tests and some dist fixes
+
+0.02    Sun Nov 29, 2009
+  - fixed tests data folder
+
+0.01    Sat, Nov 28, 2009
+  - Initial release

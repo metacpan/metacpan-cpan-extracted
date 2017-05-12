@@ -1,0 +1,18 @@
+Revision history for Perl extension Data::Password::Manager
+
+0.05   Mon Jan 27 13:05:20 PST 2014
+	correct second typo in Makefile.pm
+
+0.04   Mon Jan 27 12:47:58 PST 2014
+        correct typo in Makefile.pm
+
+0.03  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.02  Mon Sep 11 16:25:54 PDT 2006
+	update tests for backwards compatability with perl 5.0503
+
+0.01  Sun Jan  1 16:11:00 PST 2006
+	initial release
+
+	adapteded from Mail::SpamCannibal::Password v0.02

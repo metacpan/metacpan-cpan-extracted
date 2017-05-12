@@ -1,0 +1,346 @@
+Revision history for Perl extension DBD::Sprite.
+
+0.01  Fri Feb 25 13:00:55 2000
+	- original version; created by h2xs 1.18
+0.02  Fri Mar 03, 2000
+	- Fixed single-quote handling on bound parameters.
+0.07  Fri Apr 14, 2000
+	- Refixed test-14 failure (CHAR datatype).  Also create and alter 
+	  table commands should now work properly (save your table 1st! ;)
+0.08  Wed May 03, 2000
+	- Fix Windows glob problem for Perl2EXE
+	- Added missing file "OraSpriteFns.pl" to build
+0.09  Fri Jun 09, 2000
+	- Fix bug in DELETE which occassionally caused infinite loop.
+0.10  Wed Aug 16, 2000
+	- Fix bug involving "like" and field values containing regex-
+	  special characters, ie. ".".
+0.11  Thu Aug 31, 2000
+	- Fix regex bug in Sprite.pm and add error-checking for SQL 
+	- commands wo/space after table-name, ie "update table-name\n...".
+0.12  Tue Sep 05, 2000
+	- Add size fields are truncated to to "-519" error message.
+0.13  Tue Oct 10, 2000
+	- Fix CaseTableNames attribute to "sprite_CaseTableNames.
+	- Minor docs fix.
+0.14  Thu Oct 12, 2000
+	- Added Oracle TO_DATE and CONCAT functions.  Fixed bug now 
+	  allowing more than 1 argument for functions, and minor bug 
+	  which stripped wild-card chars from function results in "LIKE" 
+	  expressions.
+0.15  Thu Nov 02, 2000
+	- Fix bug that caused question marks in bound parameter values to be 
+	  treated as additional parameters.
+0.16  Thu Dec 21, 2000
+	- Fixed bug which would not allow lower-case versions of the "AND" and 
+	  "OR" operators.  Also made field-names used as right-values return 
+	  the appropriate value they represent rather than just a literal 
+	  string of the field name, ie. "update table set FIELD1 = FIELD2" 
+	  should now work properly instead of setting FIELD1 to "FIELD2" in 
+	  every record of "table".
+0.17  Fri Mar 09, 2001
+	- Fixed bug where types not returned for cursor after update, 
+	  Fixed bug where table names not returned if space appeared after 
+	  "table_name"?
+	- Fixed bug in "makesdb.pl" -- was encrypting wrong argument.
+0.18  Wed Mar 13, 2001
+	- Changed comparisens of literal data with "CHAR" fields to first 
+	  pad the literal with appropriate spaces so that eqality tests would 
+	  pass (to work like Oracle and the way DBIx-Recordset expects).
+	  Also added new option "Sprite_StrictCharComp" to force the old behavior.
+	- Fixed bug that occasionally inserted a "0" instead of "" in numeric 
+	  fields when inserting NULL.  To get the proper "old" behavior, 
+	  specify a default of zero for each numeric field, ie.
+	  "NUMFIELD=NUMBER=0" in the top line of your Sprite table files.
+	- Added some code to check syntax of "where" clauses. (for DBIx-
+	  Recordset.
+	- Fixed a couple of other small bugs that DBIx-Recordset tests found.
+0.19  Wed Mar 21, 2001
+	- Fixed problem seeing all Windows file-names due to case-insensitivity 
+	  in Windows.
+0.20  Fri Aug 15, 2001
+	- Fixed bug involving autocommit on statements containing "select" in data. 
+	  Caught by Simon Elliott, Thanks!  Also fixed several other minor glitches.
+	- Fixed bug forbidding sequence files in mixed-case directories unless 
+	  CaseTableNames was set (CaseTableNames only applies to the file-name).
+	  Also added code to display "$@" and "$?" in the error details message on 
+	  -511 errors (could not [over]write file).
+0.21	 Wed Sep 12, 2001
+	- Fixed AutoCommit to actually work.  Caught by Jojo Kamote Escubil, Thanks,
+	  Jojo!  Also fixed another bug affecting quoted value strings containing 
+	  question marks (Caught by me!)
+0.22  Mon Sep 17, 2001
+	- Removed regex optimization (s///o) which caused record and field separators 
+	  to not work right when one opened a database, closed that database, then 
+	  opened a second database with different record and or field separators.
+	  Caught by Larry Yudelson, Thanks!
+0.25  Fri Oct 26, 2001
+	- Added new regex feature to allow one to capture regex matches and update 
+	  field values, ie:  
+	       update MYTABLE set FIELD1 = '$1' where FIELD2 =~ '(\d+)'
+	  This will set FIELD1 to the 1st number found in FIELD2 in the same 
+	  record.  Up to 2 matches for each "where" expression containing "=~" or 
+	  "!~" may be captured.  $1 .. $n correspond to each set of unescaped 
+	  parenthesis from left to right in the "where" clause.
+	- Added TO_CHAR function for converting Perl "time" values to printable 
+	  formats.  Has most date and numeric functions in the two-argument 
+	  form of the Oracle "TO_CHAR" function, which it is designed to emulate.
+	- Added some optimization for mass-updates.
+	- Added many other new Oracle functions (TO_NUMBER, USER, ABS, COS, EXP, 
+	  FLOOR, MOD, POWER, ROUND, SIGN, SIN, TRUNC, CHR, INITCAP, LTRIM, 
+	  REPLACE, RTRIM, TRANSLATE, ASCII, LENGTH, SYSDATE.  All should now 
+	  work when selected from "DUAL".
+0.26  Mon Oct 29, 2001
+	- Fixed bug introduced in 0.24 where tests failed not finding "makesdb.pl".
+	- Fixed test failure on Windows platforms (I think).
+	- Added still more Oraclish functions (CEIL, EXP, INSTR, INSTRB, LAST_DAY, 
+	  LPAD, NVL, RPAD, LAST_DAY, and SQRT.  Fixed FLOOR.
+	- Added date-handling capability to TRUNC.
+	  It should be noted that these functions do almost no error-checking.
+	- Added "AUTONUMBER" datatype to allow autonumbering without sequences.  
+	  This emulates the way M$-Access(ODBC) does things.
+0.27	 Fri Nov 15, 2001
+	- Eliminated "reserved" status of special characters \x02 .. \x06 and \n 
+	  by now using single "reserved" string pattern:  "\x02\^#jSpR1tE\x02", 
+	  where "#" can be any digit 0..9.  The purpose of this is to allow for 
+	  temporarily protecting some strings while performing string searches 
+	  and substitutions, ie. protecting commas within quoted literal values 
+	  while splitting the encompassing string on commas as separators.  \n 
+	  has previously been "flattened" out into spaces in order to treat 
+	  multiline queries as a single line.  This is still done, but numerous 
+	  regices were modified with the "s" option.  Please report anything that 
+	  might be broken by this new release!
+0.30  Thu Jan 10
+	- Fixed bug where specifying a negative number in a "where" clause 
+	  as an unbound constant, returned all records and set the field in all 
+	  records to that number (ouch!)
+	- Fixed bug there double-backslashes in data inserted into a table were 
+	  converted to a single backslash.
+	- Added better "BLOB" support.  BLOB/LONG/MEMO fields no longer have 
+	  default length specified as 5000 and data should no longer be truncated.
+	- ADDED ENCRYPTION OPTION!  If the "Crypt::CBC", and "Crypt::IDEA" or 
+	  "Crypt::DES" are available, you can connect specifying 
+	  "sprite_Crypt => 'IDEA;any_key_string'" (use "DES" in lieu of "IDEA", 
+	  if so inclined).  To read in existing unencrypted tables and write them 
+	  out encrypted, use "sprite_Crypt => 'encrypt=IDEA;your_key_string'".
+	  To read in encrypted databases and write them back unencrypted, use: 
+	  "sprite_Crypt => 'decrypt=IDEA;your_key_string'".  Note:  Any method 
+	  of encryption that Crypt::CBC supports may be used instead of IDEA or 
+	  DES, if you have the module installed.
+0.32  Thu Feb 22
+	- Fixed bug which prevented one from using single-letter field names.
+	  (caught by me).
+	- Fixed bug which caused SELECTs to sometimes fail with psuedo-columns and 
+	  functions, ie. sequence.NEXTVAL (caught by me).
+	- Fixed bug that caused extra "-528:Could not read/write BLOB file" errors 
+	  to be displayed after other errors (caught by me).
+	- Added "sprite_reclimit" option to permit user to limit number of records 
+	  fetched in a single query.
+	- Added code so "darwin" (new Mac-OS) would use unix "/" separator, was 
+	  using WinDOwS separators ("\\") for directories (caught by Thabo).
+	- Changed internal "lock_file" and "lock_try" to "sprite_lock_file" and 
+	  "sprite_lock_try" respectively to allow user to override defaults.  This 
+	  was requested to permit Sprite databases to exist on read-only filesystems.
+	  This is only applicable to os'es originating from a huge corporation 
+	  based in Redmond, VA. that don't support flock.  See the README file for 
+	  more notes about file locking!
+	- Added code to check "Create" command to make sure tables/sequences 
+	  actually get created or else report error (caught by Dave Thorn).
+	- Added RAW datatype (psuedonym for VARCHAR), since in Perl, any valid 
+	  ASCII character can be inserted into a string. NOTE: Oracle requires 
+	  packing and unpacking to hex! 
+0.33  Fri May 5
+	- Added code so "bsdos" (BSD/OS) would use unix "/" separator, was 
+	  being treated as "dos" and using WinDOwS separators ("\\") for 
+	  directories (caught by Sweth Chandramouli), Thanks!
+	- Added ability to specify path and or extension to database names in the 
+	  connect function (The default of ".sdb" and path ($ENV{SPRITE_HOME}/, 
+	  "./", then $ENV{HOME}/ still apply).  If database name contains a dot 
+	  ("."), then the ".sdb" extension is not added.  If the database name 
+	  begins with a "/", then it is assumed to be an absolute path, otherwise, 
+	  the dafault search-paths (described above) are applied.
+0.34  Wed May 22
+	- Added beta (incomplete) XML support!  By specifying 'XML' as your record 
+	  seperator, your tables will be stored in XML format instead of Sprite's 
+	  usual delimited text format.  Special XML characters (<, >, &, and --) 
+	  are escaped to proper XML format, ie. &lt;, etc.  This option requires 
+	  the installation of the Perl module "XML::Simple".  The reason this is 
+	  beta is because I'm a newbe to XML and have not yet been able to get 
+	  all binary data to work correctly, namely high-ascii characters.  If 
+	  you see what I am missing, please feel free to tell me and or send 
+	  patches!
+	- Fixed bug where single-quotes appearing in fields in UPDATE statements 
+	  caused -517 errors.
+	- Added ability to separately specify the field separator string for input 
+	  vs output.  Original Sprite supported this, but I always set them to be 
+	  the same.  By default they still are.  This became useful to me when 
+	  testing XML because I could specify the output field separator as 'XML' 
+	  and the input one as whatever my existing table was, read it in and 
+	  write it right back out as XML!  The new options are:  sprite_read, 
+	  sprite_write, and sprite_field.  The latter sets both to the same thing.
+	  sprite_record sets the record separator.
+0.35  Thu May 30
+	- Made global variable "CBC" an object variable fixing bug which caused 
+	  problems when one used both an encrypted database and an unencrypted one 
+	  in the same program (caught by me).  
+	- Added base-64 encoding to the new XML stuff and fixed up the encoding so 
+	  that binary data should now work properly both in and out.  Encoded 
+	  fields now have a 'xml:encoding="base64"' attribute.  Note:  the 
+	  "MIME::Base64" module is now a prerequisite if using XML.
+	- Restored the "sprite_sizelimit" attribute (alias for the "sprite_reclimit" 
+	  attribute) for backward compatability sake (I once used this in another 
+	  program and DBD::LDAP uses "ldap_sizelimit" - I can't remember why).
+0.36  Thu Jun 6
+	- Removed -402 warning if SELECT finds no records so Sprite will work like 
+	  other DBI databases.  To test if SELECT returned records or not, test the 
+	  return value of $sth->execute().  It will be the number of records 
+	  returned or "0E0" if none, or undef if error!
+	- Initialize "LongReadLen" attribute because regular DBI returns a default 
+	  value of 80, but DBI::PurePerl returns undef (caused Perl warning in test).
+	- Dropping table now returns "0E0" on success instead of 1 (as DBD::Oracle 
+	  does).
+0.37  Tue Jun 11
+	- Fixed bug which prevented Sprite from loading tables with zero or one 
+	  records.
+	- Added new option:  "sprite_xsl" to allow one to specify an xsl template 
+ 	  url to be written into the xml document containing each table.  Default 
+ 	  is none.  Only applies when using the "xml" option!
+0.38  Never released.
+	- Added "rows" attribute to "select" tag in XML-formatted tables.
+0.39  Mon Jun 24
+	- Added "rows" attribute to "select" tag in XML-formatted tables.
+	- Added option "sprite_CaseFieldNames".  Default is zero.  If set, causes 
+	  field names to be case-sensitive, allowing same table to have multiple 
+	  fields with same name and different cases, ie. "field1", and "FIELD1". 
+	  Traditional behavior was to convert all field names to upper-case as 
+	  does Oracle(tm).  This is similar to the "sprite_CaseTableNames" option 
+	  for table names.
+0.40	 Tue Jul 9
+	- Fixed restriction which prevented one from sorting on fields not in the 
+	  selected result-set.
+	- Added multiple ascending/descending selection to the sort "order by" 
+	  clause.  Previously, one could only specify ascending/descending once 
+	  after the last field and all sorts would be in that direction.  Now, one 
+	  can use things like:  "order by field1 desc, field2 asc, field3 desc"
+	  Please note that previous queries like "order by field1, field2 desc" 
+	  WERE broken since both would sort in descending order!  Now it works like 
+	  Oracle where field1 will sort ascending and within that, field2 sorts 
+	  descending.
+0.41	Fri Aug 16
+	- Fixed bug resulting from a missing "require" stmt that returned error 
+	  when unencoding base64-encoded values in XML tables.
+0.42  Thu Sep 5
+	- Added support for DBIx::GeneratedKey.  This ment adding code to save the 
+	  current value of the last sequence or "AUTONUMBER" field incremented.  
+	  The former are incremented by a call to "sequencename".NEXTVAL in a query, 
+	  the latter are incremented by inserting NULL into a "AUTONUMBER" field 
+	  in an "INSERT" query.
+0.43	 Thu Oct 24
+	- Fixed problem with error-handling with DBI when DBI->connect() fails.
+	  Sprite now calls "warn" if "PrintError" is in effect and returns error 
+	  code and string separated by a colon in "$_", if DBI->connect() fails. 
+	  This is due to DBI::set_err() failing when no DBI handle yet created. 
+	- Fixed "create table" to now actually create an XML table when in an XML 
+	  database (previously new tables were always created in text format by 
+	  very old code that predated the XML option.  It now calls "write_file()" 
+	  via "commit()" as it should and as "alter table" does.  Thanks to 
+	  Roland Bauer for catching this embarrassing omission.  I guess I had 
+	  never actually created a "new" XML table, I had just used "sprite_write" 
+	  and sql.pl to change my existing text tables to the new XML format.
+	- Added code to "drop()" (drop table) function to make sure no dangling 
+	  data is left in memory from the dropped table.
+0.44	 Tue Feb 11
+	- Fixed 2 bugs related to the "sprite_CaseFieldNames" option.  First, the 
+	  option did not work with the "xml" option.  Second, the option precedence 
+	  was wrong -- Options specified in the connect() method should override 
+	  any in the database (.sdb) file.  This was not happening.
+0.45  Fri Jun 27
+	- Fixed Makefile.PL bug in Perl 5.8+ where make would fail with something 
+	  like "Can't use string ("*.xsi") as a HASH ref...".  Thanks to everyone 
+	  who reported this.
+0.46  Mon Sep 29
+	- Fixed problem with Windows path separators (changed \\ to / for ActivePerl.  
+	- Added Oracle "Truncate" function.
+0.47  Fri Nov 28 2003
+	- Fixed "_set_fbav"-reported error when sorting field containing a "null" 
+	  element.
+0.50  Fri Mar 5
+	- *JOINS ARE FINALY HERE!*  One can now do very basic two-table inner 
+	  equi-joins using Sprite.  This is based on the pre-Oracle-9 syntax, 
+	  which supports table name aliasing.  The table-name or alias must be 
+	  specified qualifying each fieldname (tablename.fieldname).  See the 
+	  docs for an example.  Test & enjoy! ;)
+	- Fixed small bug that prevented passing bind-arguments containing an 
+	  escaped single-quote to a "like" expression in a where-clause.
+0.51  Thu Apr 22 2004
+	- Added new DBI function "last_insert_id" to return the value of the last 
+	  sequence number used.  Refer to the DBI docs for arguments and how to 
+	  use this function.  The general format is:
+	  $number = $dB->func(undef, undef, 'tablename', 'fieldname', 'last_insert_id')
+	- Added new option "sprite_nocase" to support case-insensitive 
+	  where-clauses like LDAP.  NOTE - only currently for "LIKE/NOT LIKE".  If 
+	  set to a true value, then case is ignored for expressions like:  
+	  "where FIELD like 'abc%'".  Default is false.
+	- Fixed bug which prevented the argument to a "like" expression from working 
+	  if it contained an escaped single-quote.
+0.52	-not released.
+0.53  Wed Sep 29
+	- Fixed a bug affecting joins where selects without fields, ie. select from 
+	  table.. failed.
+	- Fixed another bug affecting joins when queries failed unless both 
+	  CaseTableNames and CaseFieldNames were set if field names were lower-case.
+0.54  Wed Nov 10
+	- Fixed bug involving misinterpretation of the DBI::set_err() function which 
+	  caused a null warning to sometimes be issued by perfectly successfull 
+	  "Prepare" statements.  Changed the 2nd argument to DBI::set_err() from 
+	  zero to undef when clearing error status.  Caught by Steven Bray and me.
+	- Changed all (misspelled) references to the Oracle-ish function "CURVAL"
+	  to "CURRVAL".  Caught by Steven Bray.
+	- Fixed variable declaration buglet which "masked earlier declaration".
+	  Caught by Steven Bray.  Thanks, Steven.
+0.55	 Fri Apr 29 2005
+	- Fixed bug that caused single-quotes enclosed in variables bound to 
+	  placeholders to fail and or seg-fault.
+	- Fixed bug that caused single-quotes in in-line where-cluse values 
+	  (those not bound using placeholders) to be converted to a pair of 
+	  double-quotes, causing condition test to fail.
+0.56  Sat May 14 2005
+	- Fixed bug that prevented sorting from working and returning all records 
+	  when doing a SELECT DISTINCT with ORDER BY on a single column.
+0.57  Tue Jun 14 2006
+	- Fixed bug involving reversal of the increment and start values of 
+	  sequences in the "Create Sequence" command.  Should work now, even 
+	  though the variable names appear reverse in "NEXTVAL" code.
+	- Added code to support DBI's "primary_key_info" query.
+0.58  Thu Jul 20 2006
+	- Fixed bug that prevented empty-strings (two quotes in succession) as 
+	  arguments to functions (caught by me).
+	- Fixed bug that had sequence values and increments reversed.
+	- Added "primary_key_info()" DBI function.
+0.59  Sat Oct 21 2006
+	- Fixed bug that prevented last_insert_id() from working with AUTONUMBER 
+	  fields.
+	- Added MySQL-like "select fn()" capability.  Previously, one had to use 
+	  the Oracle-ish "select fn() from DUAL".
+	- Fixed CaseTableNames bug.
+	- Fixex problem that caused warning message when doing a $dB->disconnect() 
+	  when using AutoCommit.
+	- Added several numeric datatype names and mapped them to the existing 
+	  numeric types.
+	- Added 2 MySQL-ish functions:  CURDATE, NOW (and now).
+0.60  Fri Jan 23 2015
+	- Fixed bug that prevented "sprite_nocase" from working properly in some 
+	  cases.  Also added "o" switch to numerous unchanging regices for 
+	  optimization.
+6.01  Mon Jan 11 2015
+	- Fixed dropping of trailing zeroes in decimal places of scaled numbers,
+	  Changed version number to 6.01 to sync up w/version# in JSprite.pm
+	- Added support for the "LIMIT" clause in SELECT statements.  This differs 
+	  from "sprite_reclimit" option.  That option limited the fetch to the 
+	  first N records in the file UNSORTED before applying any sort.  This 
+	  was added to speed up queries used only to fetch column data 
+	  descriptors, ie. TYPE, PRECISION, etc. without need to read and process 
+	  the entire table.  This new "LIMIT" option limits the RESULTS RETURNED 
+	  to N records AFTER sorting and works as it would in other databases.  
+	  For compatibility, this can also be specified in the options hash in 
+	  PREPARE statements as "sprite_actlimit" ("actual limit").

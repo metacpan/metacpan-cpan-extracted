@@ -1,0 +1,29 @@
+---
+abstract: 'Require that our distribution is running on a particular OS'
+author:
+  - 'Chris Williams <chris@bingosnet.co.uk>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-AssertOS
+requires:
+  Data::Compare: '1.22'
+  Devel::CheckOS: '1.63'
+  Dist::Zilla: '4.101582'
+  Dist::Zilla::Role::MetaProvider: '4.101582'
+  perl: '5.008005'
+resources:
+  homepage: https://github.com/bingos/dist-zilla-plugin-assertos
+  repository: https://github.com/bingos/dist-zilla-plugin-assertos.git
+version: '0.08'
+x_serialization_backend: 'YAML::Tiny version 1.70'

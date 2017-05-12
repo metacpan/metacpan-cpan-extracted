@@ -1,0 +1,64 @@
+use strict;
+use warnings;
+package Device::RFXCOM;
+
+# ABSTRACT: Perl modules for RFXCOM RF receivers and transmitters
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Device::RFXCOM - Perl modules for RFXCOM RF receivers and transmitters
+
+=head1 VERSION
+
+version 1.163170
+
+=head1 SYNOPSIS
+
+  # see Device::RFXCOM::RX (and corresponding example script
+  # rfxcom-rx) and see Device::RFXCOM::TX (and example script
+  # rfxcom-tx)
+
+=head1 DESCRIPTION
+
+Modules to support RF receivers and transmitters produced by RFXCOM,
+L<http://www.rfxcom.com/>.  This code is derived from code written for
+the xPL-Perl project at L<http://www.xpl-perl.org.uk/>.
+
+A bonus module is provided to support W800 RF receivers from
+L<http://www.wgldesigns.com/>.  These receivers recognize fewer RF
+protocols.
+
+These devices are typically used for home automation and sensor
+monitoring applications.
+
+=head1 THANKS
+
+Special thanks to RFXCOM, L<http://www.rfxcom.com/>, for their
+excellent documentation and for giving me permission to use it to help
+me write this code.  I own a number of their products and highly
+recommend them.
+
+=head1 SEE ALSO
+
+L<Device::RFXCOM::RX>, rfxcom-rx(1p), L<Device::RFXCOM::TX>, rfxcom-tx(1p).
+
+RFXCOM website: http://www.rfxcom.com/
+
+=head1 AUTHOR
+
+Mark Hindess <soft-cpan@temporalanomaly.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Mark Hindess.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

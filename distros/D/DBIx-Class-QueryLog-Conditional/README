@@ -1,0 +1,66 @@
+NAME
+    DBIx::Class::QueryLog::Conditional - Disable QueryLogger instead of all
+    query logging
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+     my $ql = DBIx::Class:::QueryLog->new;
+     $schema->storage->debugobj(
+        DBIx::Class:::QueryLog::Tee->new(
+             loggers => {
+                new      => $ql,
+                original => DBIx::Class::QueryLog::Conditional->new(
+                   logger => $self->storage->debugobj,
+                   enabled_method => sub { $ENV{DBIC_TRACE} },
+                ),
+             },
+        ),
+     );
+     $schema->storage->debug(1);
+
+    Now the original storageobj is enabled and disabled based on the
+    standard env var.
+
+DESCRIPTION
+    When you use DBIx::Class::QueryLog::Tee you will likely find that
+    suddenly you are logging everything. Before "::Tee" came along your
+    console was inconsolable, dispondant; you never heard from it again.
+    After using "::Tee" suddenly your silent, morose query log became manic.
+    It woudln't shut up! This was not what you bargained for...
+
+    "DBIx::Class::QueryLog::Conditional" is part of The Final Equation.
+    Instead of no noise, or all noise, "::Conditional" is the bear that
+    gives you just the right amount and temperature of porridge.
+
+METHODS
+  "new"
+    Requires a "logger" that must be a "LOGGER". Can optionally take either
+    "enabled" or "enabled_method".
+
+    "enabled" is a simple bool, defaulting to true.
+
+    "enabled_method" is a code reference called as a method. It defaults to
+    checking "enabled". A good alternate is proposed in the "SYNOPSIS".
+
+  "enabled"
+    A simple helper attribute. Defaults to true, can be set to false to turn
+    off your logger via code.
+
+LOGGER
+    A logger is defined as an object that has the following methods:
+
+       txn_begin txn_commit txn_rollback
+       svp_begin svp_release svp_rollback
+       query_start query_end
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

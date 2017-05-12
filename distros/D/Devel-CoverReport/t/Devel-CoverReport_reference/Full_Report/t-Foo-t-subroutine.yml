@@ -1,0 +1,48 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        hits: 
+          caption: Hits
+          f: "%d"
+          fs: "%d"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        subroutine: 
+          caption: Subroutine
+          class: src
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - line
+        - hits
+        - subroutine
+      label: Subroutine coverage
+      rows: 
+        - 
+          hits: 
+            class: c4
+            v: 1
+          line: 3
+          subroutine: BEGIN
+        - 
+          hits: 
+            class: c4
+            v: 1
+          line: 4
+          subroutine: BEGIN
+        - 
+          hits: 
+            class: c4
+            v: 1
+          line: 6
+          subroutine: BEGIN
+      summary: []
+
+metadata: 
+  title: "Subroutine coverage: t/Foo.t"
+  version: 0.05

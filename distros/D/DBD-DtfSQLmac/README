@@ -1,0 +1,140 @@
+   ===========================================================================
+       DBD::DtfSQLmac Version 0.3201 for MacPerl 5.2.0r4 and MacPerl 5.6.1
+   ===========================================================================
+   
+
+
+Saturday, April 06, 2002
+
+"Spring has arrived over here, the daffodils are out and it's gorgeous."
+
+                                                            [Alan Fry]
+
+
+
+Dear MacPerl Users,
+
+this is the DBD::DtfSQLmac 0.3201 module with shared PPC libraries compiled for 
+MacPerl 5.2.0r4 (5.004) and MacPerl 5.6.1 or higher. The shared libraries provided 
+will only run on PowerPC Macs and with the PPC or Fat versions of MacPerl. It was 
+compiled with MPW's MrC (PPC). Please let me know of any problems you might 
+encounter.
+
+You can download the module and the readme from my CPAN directory
+
+    $CPAN/authors/id/T/TW/TWEGNER/ .
+
+
+
+*NAME
+======
+
+DBD::DtfSQLmac - A DBI driver for the dtF/SQL 2.01 database engine, Macintosh edition
+
+
+*REQUIRES for MacPerl 5.2.0r4
+=============================
+
+  MacPerl 5.2.0r4 (5.004) 
+  DBI 1.08 (Mac build for MacPerl 5.2.0r4)
+  Mac::DtfSQL 0.3201 (part of the distribution)
+  
+
+*REQUIRES for MacPerl 5.6.1 (and higher)
+=========================================
+
+  MacPerl >= 5.6.1
+  DBI >= 1.08 (Mac build for MacPerl 5.6.1)
+  Mac::DtfSQL 0.3201 (part of the distribution)
+
+
+*DESCRIPTION
+=============
+
+DBD::DtfSQLmac is a DBI driver for the dtF/SQL 2.01 database engine, Macintosh edition. 
+dtF/SQL is a relational database engine for MacOS, Windows 95/NT, and several Unix 
+platforms from sLAB Banzhaf & Soltau oHG (http://www.slab.de/), Boeblingen, Germany. The 
+dtF/SQL database engine implements an impressive set of ANSI SQL-92 functionality. It is 
+designed as an embedded database for product developers. Best of all, it's free for 
+non-commercial use. 
+
+The state of free (or nearly free) relational databases on the Macintosh running classic
+Mac OS isn't great, thus dtF/SQL is a remarkable exception. Because of the lack of free 
+relational databases, the number of Perl DBD drivers usable for the Macintosh is limited. 
+This module should help to alleviate the situation, as it is one of the very few useable 
+DBDs for a true database engine on the Mac.
+
+DBD::DtfSQLmac, a pure Perl driver, could not be used stand-alone. It could only be used 
+in conjunction with the Mac::DtfSQL module (part of the distribution), which is the Perl 
+interface to the dtF/SQL database engine. While the Mac::DtfSQL extension module does all 
+the dirty work talking to the dtF/SQL C API, the DBD::DtfSQLmac module offers the 
+standard Perl DBI API to relational databases.
+
+This module should run on a PowerPC Macintosh with MacOS 7.x/8.x/9.x right out of the box. 
+Unfortunately, users of a 68K Mac are a bit out of luck, because I cannot provide a 
+pre-build version of the Mac::DtfSQL extension module for them. One will need a Metrowerks 
+Codewarrior compiler and linker to build a version for CFM 68K Macs running MacPerl 5.2.0r4 
+(see the Mac::DtfSQL module documentation for more information). However, be aware that 
+support for dynamic loading of shared libraries has been dropped for the 68K versions of the 
+new MacPerl 5.6.1 (and higher) tool and application. Hence, you will have to link the 
+Mac::DtfSQL extension statically into your MacPerl 5.6.1 binary.
+
+
+*INSTALLATION
+==============
+
+See the INSTALL.5004 document for old MacPerl 5.2.0.r4.
+
+See the INSTALL.561 document for new MacPerl 5.6.1 (and higher).
+
+
+*HOW TO GET dtF/SQL 2.01
+=========================
+
+Please note that dtF/SQL 2.01 is freely available only for non-commercial use. See sLAB's 
+License Agreement for details.
+
+Downloading dtF/SQL version 2.01 requires registration. Visit sLAB's web site at 
+http://www.slab.de/us/home/, go to the download section and register yourself (your name 
+and email-address are sufficient). Within a few minutes, you will get a user name and 
+password via email. Now, visit their web site again, go straight to the download section, 
+choose 'Non-public Download', wait for the file list to come and choose
+
+ dtF/SQL 2.01 for MacOS
+ 	dtFmac-201.sit	Size: 3395 kByte	Date: 09/14/2000 .
+	
+Then choose "License agreement for non-commercial users", read and agree to the upcoming 
+License Agreement to actually download the file.
+
+There are older versions of dtF/SQL available, and some don't require registration. 
+However, this module was written for version 2.01 and will *not* work with older versions 
+of dtF/SQL. With the 2.0 release of the dtF/SQL database engine, its API has been revamped.
+
+Within the downloaded package, you will find the shared library (PPC only) needed for this 
+module, as well as the static PPC and 68K libraries, the documentation, a tool for 
+administrating a dtF/SQL database (PPC only), the dtF/SQL database server (PPC only), 
+sample source code (in C and C++) and other useful stuff. Please note that this module is 
+useless without the dtF/SQL shared library, as you might guess.
+
+
+*KNOWN BUGS
+============
+
+No known bugs. Please report bugs to the author.
+
+
+*COPYRIGHT
+===========
+
+Copyright (c) 2000-2002 Thomas Wegner.  All rights reserved.  This program is free 
+software. You may redistribute it and/or modify it under the terms of the Artistic 
+License, distributed with Perl.
+
+
+Have fun.
+
+--
+Thomas Wegner
+
+t_wegner@gmx.net,
+TWEGNER@cpan.org

@@ -1,0 +1,22 @@
+Revision history for Dancer-Plugin-Auth-Htpasswd
+
+0.020     2014-04-12
+          Switched to using Dist::Zilla.
+
+0.014     2012-06-16
+          Fixed version number in README files.
+
+0.013     2012-06-16
+          * The REMOTE_USER request variable is now set upon authorization
+          * Static files are now properly protected
+
+0.012     2012-01-15
+          * Fixed the problem with README file generation during build process
+          * Authorization information is now read from a request header, not an
+            environment variable
+
+0.011     2011-11-13
+          Added missing requirements to build script.
+
+0.01      2011-10-10
+          First version, released on an unsuspecting world.

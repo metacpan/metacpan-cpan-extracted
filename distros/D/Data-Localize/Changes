@@ -1,0 +1,169 @@
+Changes
+=======
+
+0.00027 2014-10-18T23:14:16Z
+  * Fix tests and dependency (andk issues #5, #6)
+  * Update travis tests
+
+0.00026 2014-07-01T03:45:18Z
+  * Work with perl 5.20 and up (Karl Williamson)
+  * Changed to use Minilla
+
+0.00025 May 30 2013
+  * Various fixes for rt #83582
+
+0.00024 Feb 12 2013
+  * Fix usage of is => 'lazy' into is => 'rw', lazy => 1, and builder => ...
+
+0.00023 Feb 12 2013
+  * Switch Any::Moose to Moo.
+  * Update benchmarks.
+  * Run tests on Travis CI
+
+0.00022 Nov 07 2011
+  * Very small optimization.
+  * Doc fixes on performance
+
+0.00021 Oct 13 2011
+  * Add a way to insert callbacks that can be used in the formatters (doy)
+
+0.00020 Apr 10 2011
+  * add_localizer($object) was not working (rt #67337). Reported by Klaus Ita
+  * FormFu 0.09 and up were failing (rt #67347). Reported by Andreas Koenig
+  * Tests failed if Config::Any was not installed (rt #67342). Reported by Andreas Koenig
+  * MultiLevel was failing miserably for newer Mooses. Fixed by
+    using method modifiers instead of silly role hacks.
+
+0.00019 Jan 23 2011
+  * Allow loading lexicons from an already existing storage (Stevan Little)
+  * Add volatile attribute in storage (Stevan Little)
+  * Tweak MultiLevel so that it's more storage friendly (Stevan Little)
+  * BDB Storage tweaks (Stevan Little)
+  * Fix bug in calling lazy builder for storage object (Stevan Little)
+  * Store lang in the localizer (Stevan Little)
+
+0.00018 29 Oct 2010
+  * Allow double quotes in localized gettext texts (makamaka)
+
+0.00017 21 Jul 2010
+  * Properly check for isa() instead of does() when coercing
+
+0.00016 21 May 2010
+  * Don't increment load failed count
+
+0.00015 21 May 2010
+  * Remove defined from defined %hash
+
+0.00014 14 Apr 2010
+  * No complaints so far, rolling 0.00014 with the changes from 0.00013_01 to
+    0.00013_04
+
+0.00013_04 12 Apr 2010
+  * Add a few tests
+  * Fix MultiLevel localizer to handle non existent keys
+
+0.00013_03 07 Apr 2010
+  * Fix a problem where Gettext arguments were stringified (Dave Rolsky)
+  * BACKWARDS COMPAT BREAKING CHANGE!
+    * Gettext->allow_empty is now keep_empty (Dave Rolsky)
+
+0.00013_02 30 Mar 2010
+  * BACKWARDS COMPAT BREAKING CHANGE!
+    * The format method for all Formatters now received the language id as
+      its first argument. The auto localizer passes 'auto' as the language id.
+      (Dave Rolsky)
+    * Gettext method arguments are now passed as %1, %2, etc. (Dave Rolsky)
+
+0.00013_01 24 Mar 2010
+  * Added MultiLevel localizer that allows you to write a Rails-ish
+    i18n: $loc->localize('my.key' => {arg => $value});
+  * Fixed tests
+  * BACKWARDS COMPAT BREAKING CHANGE!
+    -> For Data::Localize::Localizer consumers only.
+       End users should see no change.
+    * Data::Localize::Localizer is no longer a role.
+    * 'style' parameter has been deprecated
+    * Message formatting is now pluggable.
+
+0.00013 23 Mar 2010
+  * Change all_* accessors back to what they were in 0.00011
+  * Separate out BerkeleyDB tests, fix them
+  * Namespace.pm no longer attempts to load files which failed to
+    load previously. If you want to reflect changes, you need to
+    recreate the object.
+  * DEPRECATION WARNING!
+    - Gettext.pm
+        * path_add        -> add_path
+        * lexicon_get     -> get_lexicon
+        * lexicon_set     -> set_lexicon
+        * lexicon_merge   -> merge_lexicon
+        * lexicon_map_get -> get_lexicon_map
+        * lexicon_map_set -> set_lexicon_map
+    - Namespace.pm
+        * lexicon_get     -> get_lexicon
+    - Auto.pm
+        * lexicon_get     -> get_lexicon
+
+0.00012 22 Mar 2010
+  * Remove the use of AttributeHelpers -- doing this in Moose/Mouse is a pain
+  * Move POD tests to xt
+  * Factor out Gettext parser (Dave Rolsky)
+  * Only load Gettext lexicons for new paths in path_add (Dave Rolsky)
+  * Protect $_ when loading Gettext lexicons (Dave Rolsky)
+  * Predeclare class_type (Dave Rolsky)
+  * Silence test Warnings (Dave Rolsky)
+
+0.00011 15 Dec 2009
+  * Don't attempt to load Namespace lexicons once we failed to load them.
+  * Allow method calls for Maketext formats (UNTESTED -- will do more hacking)
+
+0.00010 17 Aug 2009
+  * Allow method calls to be made for Gettext formats. For example,
+    %foo(1,2,3) will call $localizer->foo(undef, ['1', '2', '3']), and use
+    its return value as the localized text (UNTESTED -- will do more hacking)
+
+0.00009 05 Aug 2009
+  * Do not allow superfluous entries in the lexicon hash for gettext
+
+0.00008 04 Aug 2009
+  * Add auto_style to determine the auto-fallback style
+
+0.00007 15 Apr 2009
+  * Properly handle BerkeleyDB dependency (it's not required)
+
+0.00006 14 Apr 2009
+  * Properly cleanse $lang before using it as a namespace
+
+0.00006_01 25 Mar 2009
+  * Add a storage backend. This is mainly to cover cases where storing
+    many lexicons on memory is not a practical choice
+  * API change: lexicon_get() now accepts 2 arguments, and expects
+    the translated lexicon back
+
+0.00005 09 Mar 2009
+  * Any::Moose me! Requires MouseX::AttributeHandlers and Mouse 0.19
+
+0.00004 04 Mar 2009
+  * Silence a minor warning
+  * Fix up POD tests
+
+0.00003 25 Feb 2009
+  * format_string() was not properly formatting for cases where the argument
+    was a logical false, such as 0. This has been fixed, but note that undef
+    will not show up on the formatted string.
+
+0.00002 22 Feb 2009
+  * Change the eval call, to see if we can trap failures like this
+    http://www.nntp.perl.org/group/perl.cpan.testers/2009/02/msg3321095.html
+  * Remove Data::Dumper from debug output
+  * Clear %ENV so that I18N::LangTags doesn't pick up the system language
+
+0.00001 20 Feb 2009
+  * Add find_localizers()
+
+0.00001_02 20 Feb 2009
+  * Handle 'localizers' in the constructor
+  * Add (stole) metadata parsing for Gettext
+
+0.00001_01 15 Feb 2009
+  * Initial release

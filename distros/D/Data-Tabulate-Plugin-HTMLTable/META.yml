@@ -1,0 +1,24 @@
+---
+abstract: 'HTML::Table plugin for Data::Tabulate'
+author:
+  - 'Renee Baecker <module@renee-baecker.de>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Tabulate-Plugin-HTMLTable
+requires:
+  Data::Tabulate: '0.06'
+  HTML::Table: '2.08'
+  Test::CheckManifest: '1.22'
+  Test::More: '0'
+resources:
+  bugtracker: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable/issues
+  homepage: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable
+  repository: http://github.com/reneeb/Data-Tabulate-Plugin-HTMLTable.git
+version: '0.04'

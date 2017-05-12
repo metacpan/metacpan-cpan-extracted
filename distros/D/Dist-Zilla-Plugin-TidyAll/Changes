@@ -1,0 +1,15 @@
+** denotes an incompatible change
+
+0.04     2015-06-28
+
+- Fixed a bug in error handling which caused this module to die if tidying
+  produced an error.
+
+- Distributions which use this plugin will have Code::TidyAll added as a
+  develop prereq.
+
+
+0.03  2012-08-21
+
+- Initial version
+

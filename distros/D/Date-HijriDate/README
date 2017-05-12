@@ -1,0 +1,23 @@
+Date::HijriDate version 1.0
+=======================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Dr. Ahmed Amin Elsheshtawy support@mewsoft.com support@islamware.com
+http://www.mewsoft.com, http://www.islamware.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

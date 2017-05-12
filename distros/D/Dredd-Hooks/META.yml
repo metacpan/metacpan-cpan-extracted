@@ -1,0 +1,44 @@
+---
+abstract: 'Handler for running Hook files for Dredd'
+author:
+  - 'Mike Eve <ungrim97@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dredd-Hooks
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Dredd::Hooks:
+    file: lib/Dredd/Hooks.pm
+    version: '0.05'
+  Dredd::Hooks::Methods:
+    file: lib/Dredd/Hooks/Methods.pm
+requires:
+  Hash::Merge: '0.200'
+  IO::All: '0.86'
+  JSON: '2.90'
+  Moo: '2.000002'
+  Sub::Exporter: '0.987'
+  Types::Standard: '1.000005'
+  perl: '5.018002'
+resources:
+  bugtracker: https://github.com/ungrim97/Dredd-Hooks/issues
+  homepage: https://github.com/ungrim97/Dredd-Hooks
+  repository: git://github.com/ungrim97/Dredd-Hooks.git
+version: '0.05'

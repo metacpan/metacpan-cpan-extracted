@@ -1,0 +1,57 @@
+{
+   "abstract" : "Decodes and encodes DOCSIS config files",
+   "author" : [
+      "Jan Henning Thorsen <jhthorsen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DOCSIS-ConfigFile",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.8"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::HMAC_MD5" : "1.00",
+            "Digest::MD5" : "2.30",
+            "Digest::SHA" : "5.00",
+            "Math::BigInt" : "1.80",
+            "Socket" : "1.50",
+            "bytes" : "1.00",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jhthorsen/docsis-configfile/issues"
+      },
+      "homepage" : "https://github.com/jhthorsen/docsis-configfile",
+      "repository" : {
+         "url" : "https://github.com/jhthorsen/docsis-configfile.git"
+      }
+   },
+   "version" : "0.71",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

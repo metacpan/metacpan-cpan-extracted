@@ -1,0 +1,37 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: Dist-Zilla-App-Command-coverh
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010001
+      - Dist::Zilla::App: 5.000
+      - File::chdir
+      - Path::Tiny
+      - File::Temp
+      - DateTime
+      - JSON::MaybeXS
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+  - +extend_plugin: Badges
+    badge:
+     - coverage

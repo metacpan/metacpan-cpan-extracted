@@ -1,0 +1,116 @@
+NAME
+    Device::Microchip::Bootloader - Bootloader host software for Microchip
+    PIC devices
+
+VERSION
+    version 0.7
+
+SYNOPSIS
+    my $loader = Device::Microchip::Bootloader->new(firmware =>
+    'my_firmware.hex', target => '/dev/ttyUSB0');
+
+DESCRIPTION
+    Host software for bootloading a HEX file to a PIC microcontroller that
+    is programmed with the bootloader as described in Microchip AN1310.
+
+    The tool allows bootloading over serial port and over ethernet when the
+    device is connected over a serial to ethernet adapter such as a
+    Lantronix XPort.
+
+METHODS
+  "new(%parameters)"
+    This constructor returns a new Device::Microchip::Bootloader object.
+    Supported parameters are listed below
+
+    firmware
+        The hex file that is to be programmed into the target device. Upon
+        creation of the object, the HEX file will be examined and possible
+        errors will be flagged.
+
+    device
+        The target device where to send the firmware to. This can be either
+        a serial port object (e.g. /dev/ttyUSB0) or a TCP socket (e.g.
+        192.168.1.52:10001).
+
+    baudrate
+        Optional parameter when using a serial port for connecting to the
+        bootloader. Default value is 115200 bps.
+
+    verbose
+        Controls the verbosity of the module. Defaults to 0. Increasing
+        numbers make the module more chatty. 5 is the highest level and
+        probably provides too much information. 3 is a good level to get
+        started.
+
+  "connect_target"
+    Make a connection to the target device. This function will return a hash
+    containing information on the response containing the following
+    elements:
+
+    firmware version
+    type of PIC we're connected to ('PIC16' of 'PIC18')
+
+  "bootloader_version"
+    Reports the version of the bootloader firmware running on the device as
+    [major].[minor].
+
+  "launch_app"
+    Exit the bootloader and launch the application code.
+
+  "erase_flash($stop_address, $pages)"
+    This function erases flash pages. The $stop_address is the base address
+    of the last page to erase. $pages specifies how many pages will be
+    erased. The erasing happend backwards (from the page defined by
+    $stop_address) to lower addresses. See the Microchip application note
+    AN1310 for details.
+
+    Warning: this function will erase the 'goto bootloader' instruction at
+    address 0x0000 too, so ensure to save it before erasing the first page
+    in program memory of the tager device.
+
+  "read_eeprom($start_address, $nr_of_bytes)"
+    Reads a number of bytes from the EEPROM of the device. Returns '05' when
+    no EEPROM is present in the device.
+
+  "read_flash($start_address, $nr_of_bytes)"
+    Reads a number of bytes from the flash memory (= program memory) of the
+    target device.
+
+  "read_flash_crc($start_address, $nr_of_write_blocks)"
+    Read the CRC values of $nr_of_write_blocks flash write blocks (=
+    typically a smaller value than the blocksize of a flash erase block, see
+    the specs of your target device for details).
+
+  "write_flash($start_adress, $data)"
+    Writes the $data to the program memory starting from location
+    $start_address. $start_address should be aligned with the write block
+    size and $data is an ASCII string in hexacdecimal format where a single
+    byte is a readable nibble. So e.g. "10" represents a byte value of 0x10.
+    The first byte of the $data string will be written at $start_address and
+    the address is incremented from that point on.
+
+  "BUILD"
+    An internal function used by Moose to run code after the constructor.
+    Need to document because otherwise Test::Pod::Coverage test fails
+
+  "O_NDELAY"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+  "O_NOCTTY"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+  "O_RDWR"
+    Detected by Pod::Coverage from the sysopen function. Stub documenation
+    to ensure the test does not fail when the module is deployed.
+
+AUTHOR
+    Lieven Hollevoet <hollie@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Lieven Hollevoet.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

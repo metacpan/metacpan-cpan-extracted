@@ -1,0 +1,50 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-ChangeStats-Dependencies-Git
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose: 2.1400
+      - namespace::autoclean: 0.18
+      - Types::Standard: 1.000000
+      - Git::Repository
+      - Module::CPANfile
+      - CPAN::Changes: 0.400002
+      - CPAN::Changes::Group
+      - JSON::MaybeXS
+      - Dist::Zilla::Role::Plugin: 5.000
+      - Dist::Zilla::Role::FileMunger: 5.000
+      - Path::Tiny
+      - Try::Tiny
+
+  test:
+    requires:
+      - Dist::Zilla::Plugin::Prereqs::FromCPANfile
+      - Test::DZil: 5.000
+      - Syntax::Feature::Qi: 1.0000
+
+plugins:
+  - +config: Author::CSSON
+
+  - +remove_plugin: ChangeStats::Dependencies::Git
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile

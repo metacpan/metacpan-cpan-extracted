@@ -1,0 +1,295 @@
+---
+abstract: 'Release tests for common POD spelling mistakes'
+author:
+  - 'Adam Lesperance <lespea@gmail.com>'
+build_requires:
+  Dist::Zilla::Plugin::Bootstrap::lib: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-SpellingCommonMistakesTests
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+    - utils
+    - share
+    - example
+    - examples
+  file:
+    - README.html
+requires:
+  Dist::Zilla::Plugin::InlineFiles: 0
+  Moose: 0
+  Pod::Spell::CommonMistakes: 0
+  Test::Pod::Spelling::CommonMistakes: 0
+  perl: 5.008
+  utf8: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-SpellingCommonMistakesTests
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-SpellingCommonMistakesTests
+  repository: git://github.com/lespea/dist-zilla-plugin-spellingcommonmistakestests.git
+version: 1.001000
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: build
+          type: requires
+      name: BuildRequires
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::LESPEA/GatherDir'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::CopyFilesFromBuild
+      name: '@Author::LESPEA/CopyFilesFromBuild'
+      version: 0.103510
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::LESPEA/UploadToCPAN'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ArchiveRelease
+      name: '@Author::LESPEA/ArchiveRelease'
+      version: 3.01
+    -
+      class: Dist::Zilla::Plugin::AutoMetaResources
+      name: '@Author::LESPEA/AutoMetaResources'
+      version: 1.110050
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::LESPEA/Authority'
+      version: 1.004
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::LESPEA/PkgVersion'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Author::LESPEA/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::LESPEA/NextRelease'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::LESPEA/MinimumPerl'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::LESPEA/AutoPrereqs'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::LESPEA/MetaConfig'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: '@Author::LESPEA/CompileTests'
+      version: 1.103030
+    -
+      class: Dist::Zilla::Plugin::ConsistentVersionTest
+      name: '@Author::LESPEA/ConsistentVersionTest'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::CriticTests
+      name: '@Author::LESPEA/CriticTests'
+      version: 1.102280
+    -
+      class: Dist::Zilla::Plugin::DistManifestTests
+      name: '@Author::LESPEA/DistManifestTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@Author::LESPEA/EOLTests'
+      version: 0.02
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: '@Author::LESPEA/HasVersionTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::KwaliteeTests
+      name: '@Author::LESPEA/KwaliteeTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::LESPEA/MetaTests'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::MinimumVersionTests
+      name: '@Author::LESPEA/MinimumVersionTests'
+      version: 1.101421
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@Author::LESPEA/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::LESPEA/PodCoverageTests'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::LESPEA/PodSyntaxTests'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::PortabilityTests
+      name: '@Author::LESPEA/PortabilityTests'
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::UnusedVarsTests
+      name: '@Author::LESPEA/UnusedVarsTests'
+      version: 1.100860
+    -
+      class: Dist::Zilla::Plugin::CPANChangesTests
+      name: '@Author::LESPEA/CPANChangesTests'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::SpellingCommonMistakesTests
+      name: '@Author::LESPEA/SpellingCommonMistakesTests'
+      version: ~
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::LESPEA/ExtraTests'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::LESPEA/PruneCruft'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::LESPEA/ManifestSkip'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::LESPEA/ExecDir'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::LESPEA/ShareDir'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ReportVersions::Tiny
+      name: '@Author::LESPEA/ReportVersions::Tiny'
+      version: 1.03
+    -
+      class: Dist::Zilla::Plugin::ModuleBuild
+      name: '@Author::LESPEA/ModuleBuild'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::LESPEA/MakeMaker'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::DualBuilders
+      name: '@Author::LESPEA/DualBuilders'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::LESPEA/MetaNoIndex'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::LESPEA/License'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::InstallGuide
+      name: '@Author::LESPEA/InstallGuide'
+      version: 1.101461
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::LESPEA/MetaJSON'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::LESPEA/MetaYAML'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/html.build'
+      version: 0.103522
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/text.build'
+      version: 0.103522
+    -
+      class: Dist::Zilla::Plugin::ReadmeAnyFromPod
+      name: '@Author::LESPEA/pod.root'
+      version: 0.103522
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::LESPEA/Manifest'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::LESPEA/TestRelease'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::LESPEA/ConfirmRelease'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::Signature
+      name: Signature
+      version: 1.100930
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: Git::Check
+      version: 1.110500
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: Commit_Changes
+      version: 1.110500
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: Git::Tag
+      version: 1.110500
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: Git::Push
+      version: 1.110500
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.200004
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.200004
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.200004
+x_authority: cpan:LESPEA

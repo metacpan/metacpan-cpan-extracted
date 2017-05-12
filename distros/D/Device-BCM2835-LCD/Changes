@@ -1,0 +1,11 @@
+Revision history for Device-BCM2835-LCD
+
+0.02	2015-01-17
+	Fixed missing delays in init and ClearDisplay (thanks Tomas)
+	Added RPi B+/Rev2 GPIO scheme (now the default)
+	Better tests
+	Decimal point improvements for BigNum 
+
+0.01    2012-10-29
+        First version
+

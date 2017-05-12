@@ -1,0 +1,5 @@
+Build.PL
+MANIFEST
+README.md
+bin/mydbmunger
+lib/DBIx/MyDatabaseMunger.pm

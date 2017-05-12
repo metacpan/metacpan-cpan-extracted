@@ -1,0 +1,45 @@
+NAME
+    DBIx::Class::Loader::ADO - DBIx::Class::Loader ADO Implementation.
+
+SYNOPSIS
+        use DBIx::Class::Loader;
+
+        # $loader is a DBIx::Class::Loader::ADO
+        my $loader = DBIx::Class::Loader->new(
+            dsn       => "dbi:ADO:$DSN",
+            namespace => "Data",
+        );
+        my $class = $loader->find_class('film'); # $class => Data::Film
+        my $obj = $class->retrieve(1);
+
+DESCRIPTION
+    See DBIx::Class::Loader.
+
+INSTALLATION
+    To install this module via Module::Build:
+
+        perl Build.PL
+        ./Build         # or `perl Build`
+        ./Build test    # or `perl Build test`
+        ./Build install # or `perl Build install`
+
+    To install this module via ExtUtils::MakeMaker:
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+SEE ALSO
+    * DBIx::Class::Loader
+    * DBD::ADO
+
+AUTHOR
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

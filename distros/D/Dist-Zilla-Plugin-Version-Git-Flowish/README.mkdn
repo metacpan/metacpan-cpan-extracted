@@ -1,0 +1,80 @@
+# NAME
+
+Dist::Zilla::Plugin::Version::Git::Flowish - Get a version number via git and a flow-inspired structure.
+
+# VERSION
+
+version 0.09
+
+# SYNOPSIS
+
+    # [Version::Git::Flowish]
+    # master_regexp = ^master$
+    # release_regexp = ^release-(\d+.\d+\.\d+)$
+    # tag_regexp = ^(\d.\d+\.\d+)$
+
+# DESCRIPTION
+
+This plugin consumes the Dist::Zilla VersionProvider role and gleans a version
+number from Git using a structure similar to Vincent Driessen's
+[git flow](http://nvie.com/posts/a-successful-git-branching-model/) model.
+
+The idea is to facilitate automated systems, such as continuous integration,
+to divine version numbers from the branching and release strategies used in
+our repositories.
+
+Note that, by default, the version numbers used as defaults by this plugin
+are in the form of `0.0.0`.  This can be changed by manipulating the options
+shown in the Synopsis.
+
+It works like this:
+
+## Environment Variable #1
+
+The environment variable FLOWISH_VERSION is checked and used if set.
+
+## Branch
+
+The current branch is attained via a call to git branch and grepping for
+the leading *.
+
+    git branch --no-color 2> /dev/null
+
+## Case: Master Branch
+
+If the current branch is master, then the most recent tag is attained
+via:
+
+    git describe --tags --abbrev=0
+
+You can influence how this date is parsed using the `tag_regexp` option.
+
+## Case: Release Branch
+
+If this isn't the master branch, but it begins with "release-" (configurable
+via `master_regexp`) then the version number after the release- will be used.
+
+## Environment Variable #2
+
+The environment variable FLOWISH_EXTRA_VERSION is checked and appending to the
+version with an underscore as a separator.  This lets you create development
+versions of whathaveyou.
+
+## And Then?
+
+At this point we just give up and return nothing.
+
+# CONTRIBUTORS
+
+Mike Eldridge
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

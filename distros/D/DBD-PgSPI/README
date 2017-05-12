@@ -1,0 +1,83 @@
+
+DBD::PgSPI - PostgreSQL server-side database interface using SPI.
+ 
+IF YOU ARE LOOKING FOR A WAY TO ACCESS POSTGRESQL DATABASE FROM A PERL
+SCRIPT RUNNING OUTSIDE OF YOUR DATABASE, LOOK AT DBD::Pg, YOU CANNOT
+USE THIS MODULE. THIS MODULE IS ONLY INTENDED FOR USE BY STORED PROCEDURES
+WRITTEN IN 'plperl' PROGRAMMING LANGUAGE RUNNING INSIDE POSTGRESQL.   
+
+
+DESCRIPTION:
+
+    PostgreSQL allows perl stored procedures to be created. This module
+    will provide access to the PostgreSQL database from inside your stored
+    procedure.
+
+
+NOTES:
+
+*   It exports a dbh named $pg_dbh, which you may use at any time. 
+    You can also explicitly do DBI->connect("dbi:PgSPI:internal"), but it 
+    is essentially a no-op. DBI->disconnect is also not necessary, you will be
+    will disconnected from SPI by plperl handler, when your stored proc ends.
+
+*   It requires DBD::Pg for operation.  DBD::Pg is used to execute 
+    table_info(), tables(), table_attributes(), type_info_all().
+    (No actual access is done using it or libpq, only the queries in DBD::Pg
+    are used, to avoid duplication of code).
+
+*   It can only be used with 'untrusted' perl interpreter (since trusted
+    interpreter will not permit modules or anything like that). 'untrusted'
+    plperl is NOT part of latest (7.1) distribution, you must use HEAD
+    CVS branch or patch on http://www.formenos.org/PgSPI/plperlu.diff
+
+*   Large objects (BLOBs, lo_open style) are not supported, and probably 
+    won't be.
+
+*   Since PostgreSQL (current version) does not support nested
+    transactions, this driver will not let you turn off AutoCommit.
+
+*   Beware of quoting. Remember, all single quotes inside stored procedure 
+    need to be doubled.
+
+EXAMPLE:
+
+create function dbd_pgspi_test() returns varchar as '
+  use DBD::PgSPI;
+  my @ar=$pg_dbh->selectrow_array(''select current_user'');
+  return $ar[0];
+' language 'plperlu';
+
+
+TODO:
+    Actual support for prepare. (Currently, SPI_prepare is never done, 
+    instead, on $pg_dbh->execute(), after all parameters are known, 
+    it will execute whole thing as a statement)
+
+    Use cursors (portals) for SELECT statements (currently the whole 
+    dataset must be retrieved before it execute() will return).
+
+    Support for cursors as input and output values (to be coordinated 
+    with plperl code)
+
+    Support for returning rows and sets of rows (lotsa magic).
+
+    Support for writing trigger handlers.
+
+BUGS:
+    Error handling needs _major_ work.
+
+AUTHOR:
+
+    Alex Pilosov <alex@pilosoft.com>
+
+    Code is based on DBD::Pg (by Edmund Mergl, which is in itself based on 
+    DBD::Oracle by Tim Bunce) and on pltcl and plpgsql programming languages
+    by Jan Wieck.
+
+LICENSE:
+    You may distribute under the terms of either the GNU General Public
+    License or the Artistic License, as specified in the Perl README file.
+
+DISTRIBUTION:
+    http://www.formenos.org/PgSPI/

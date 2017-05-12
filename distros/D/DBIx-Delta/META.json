@@ -1,0 +1,55 @@
+{
+   "abstract" : "a module for applying outstanding database deltas (migrations) to a database instance",
+   "author" : [
+      "Gavin Carr <gavin@openfusion.com.au>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Delta",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "0",
+            "File::Basename" : "0",
+            "File::Path" : "0",
+            "FindBin" : "0",
+            "Getopt::Std" : "0",
+            "IO::Dir" : "0",
+            "IO::File" : "0",
+            "strict" : "0",
+            "vars" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "File::Spec" : "0",
+            "Test::Deep" : "0",
+            "Test::More" : "0",
+            "YAML" : "0",
+            "base" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/gavincarr/DBIx-Delta"
+      }
+   },
+   "version" : "1.0.1"
+}
+

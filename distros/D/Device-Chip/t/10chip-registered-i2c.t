@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Test::More;
+use Test::Device::Chip::Adapter;
+
+use Device::Chip::Base::RegisteredI2C;
+
+{
+   package TestChip;
+   use base qw( Device::Chip::Base::RegisteredI2C );
+}
+
+my $adapter = Test::Device::Chip::Adapter->new;
+
+my $chip = Device::Chip::Base::RegisteredI2C->new;
+$chip->mount( $adapter )->get;
+
+# write
+{
+   $adapter->expect_write( pack "C a", 123, "A" );
+
+   $chip->write_reg( 123, "A" )->get;
+
+   $adapter->check_and_clear( '->write_reg' );
+}
+
+# read
+{
+   $adapter->expect_write_then_read( pack( "C", 123 ), 1 )
+      ->returns( "B" );
+
+   is( $chip->read_reg( 123, 1 )->get, "B", '->read_reg value' );
+
+   $adapter->check_and_clear( '->read_reg' );
+}
+
+# cached read
+{
+   $adapter->expect_write_then_read( pack( "C", 2 ), 1 )
+      ->returns( "\x20" );
+
+   is( $chip->cached_read_reg( 2, 1 )->get, "\x20",
+         '->cached_read_reg the first time' );
+
+   $adapter->check_and_clear( '->cached_read_reg initially' );
+
+
+   is( $chip->cached_read_reg( 2, 1 )->get, "\x20",
+         '->cached_read_reg the second time' );
+
+   $adapter->check_and_clear( '->cached_read_reg again' );
+
+
+   $adapter->expect_write( pack( "C a", 2, "\x25" ) );
+
+   $chip->write_reg( 2, "\x25" )->get;
+   is_deeply( $chip->cached_read_reg( 2, 1 )->get, "\x25",
+         '->cached_read_reg snoops on writes' );
+
+   $adapter->check_and_clear( '->cached_read_reg does not readdress after write snoop' );
+
+
+   $adapter->expect_write_then_read( pack( "C", 2 ), 1 )
+      ->returns( "\x30" );
+
+   $chip->read_reg( 2, 1 )->get;
+   is_deeply( $chip->cached_read_reg( 2, 1 )->get, "\x30",
+         '->cached_read_reg snoops on reads' );
+
+   $adapter->check_and_clear( '->cached_read_reg does not readdress after read snoop' );
+}
+
+# cached write
+{
+   $adapter->expect_write( pack( "C a", 3, "\x40" ) );
+
+   $chip->cached_write_reg( 3, "\x40" )->get;
+
+   $adapter->check_and_clear( '->cached_write_reg writes on cache miss' );
+
+
+   $chip->cached_write_reg( 3, "\x40" )->get;
+
+   $adapter->check_and_clear( '->cached_write_reg does not write a duplicate value' );
+
+
+   $adapter->expect_write( pack( "C a", 3, "\x41" ) );
+
+   $chip->cached_write_reg( 3, "\x41" )->get;
+
+   $adapter->check_and_clear( '->cached_write_reg writes a new value' );
+}
+
+done_testing;

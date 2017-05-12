@@ -1,0 +1,46 @@
+{
+  "schema": {
+    "type": "//rec",
+    "required": {
+      "key": { "type": "//int" }
+    },
+    "rest": {
+      "type": "//map",
+      "values": "//bool"
+    }
+  },
+
+  "pass": {
+    "obj": [ "key-0", "key-1", "key-0-opt-T", "key-0-opt-T-rest-F" ]
+  },
+
+  "fail": {
+    "arr" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "num" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : {
+      "empty": {
+        "data": [ ],
+        "check": [ ],
+        "error": [ "missing" ]
+      },
+      "key-pants": {
+        "data": [ "key" ],
+        "check": [ "required", "key" ],
+        "error": [ "type" ]
+      },
+      "key-0-opt-1"  : {
+        "data": [ "opt" ],
+        "check": [ "rest", "values" ],
+        "error": [ "type" ]
+      },
+      "key-1-unknown": {
+        "data": [ "unknown" ],
+        "check": [ "rest", "values" ],
+        "error": [ "type" ]
+      }
+    },
+    "str" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } }
+  }
+}

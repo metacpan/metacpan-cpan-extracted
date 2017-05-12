@@ -1,0 +1,113 @@
+=head1 NAME
+
+DBIx::Class::Migration::Script::Help::upgrade - Upgrade your existing database
+
+=head1 SYNOPSIS
+
+    dbic-migration upgrade --schema_class MyApp::Schema --to_version 2
+
+=head1 DESCRIPTION
+
+Run upgrade files to either bring the database into sync with the current
+schema version, or stop at an intermediate version specified via L</to_version>
+
+=head1 OPTIONS
+
+This command accepts the following options.  You may learn more about each
+option by typing C<dbic-migration help OPTION>.  The following is a summary.
+
+=head2 includes (I,lib,libs,include)
+
+Optional.
+
+Adds the listed paths to @INC.  Handy during development when you want to use
+a development schema class.
+
+=head2 to_version
+
+aliases:V, Optional
+
+This is the target version of the database we are installing.  The version
+named must be have been previously prepared.  If not specified, we will use
+the current C<Schema> class version.
+
+=head2 schema_class (S)
+
+Accepts Str. Required.
+
+This is the schema we use as the basis for creating, managing and running your
+deployments.  This should be the full package namespace defining your subclass
+of L<DBIx::Class::Schema>.  For example C<MyApp::Schema>.
+
+If the L</schema_class> cannot be loaded, a hard exception will be thrown.
+
+=head2 target_dir (D)
+
+Optional.
+
+When using a C<sandbox_class> for generating developer level database sandboxes,
+you may wish to place the sandbox in a directory other than the default (which
+is under the C<share> directory off the project root).
+
+=head2 sandbox_class
+
+Aliases: T, sb
+
+Accepts: String (default: SqliteSandbox)
+
+The class we use to create a developer level database sandbox.
+
+You can change this to either 'PostgresqlSandbox' or 'MySQLSandbox', which will
+create a sandbox using either L<DBIx::Class::Migration::MySQLSandbox> or 
+L<DBIx::Class::Migration::PostgresqlSandbox>.
+
+=head2 user
+
+Aliases: U
+
+=head2 password
+
+Aliases: P
+
+=head2 dsn
+
+Connection information to an already created and running instance of a database.
+If you don't specify this, we will assume you want a developer level sandbox (
+See L</sandbox>).
+
+=head2 dbic_fixture_class
+
+Accepts: String to a Perl Class.  Defaults to L<DBIx::Class::Fixtures>
+
+Lets you specify a fixture class.
+
+=head2 dbic_fixtures_extra_args
+
+Accepts: HashRef.  Optional
+
+Allows you to pass custom arguments to L<DBIx::Class::Fixtures>.
+
+=head2 dbic_connect_attrs
+
+=head2 dbi_connect_attrs
+
+Accepts: HashRef, Optional
+
+Lets you send custom attributes at C<connect> time to either L<DBIx::Class>
+or the underlying L<DBI> and your storage C<DBD>.
+
+=head1 SEE ALSO
+
+L<DBIx::Class::Migration>, L<DBIx::Class::Migration::Script>,
+L<DBIx::Class::Migration::Features>, L<DBIx::Class::Migration::Tutorial>
+
+=head1 AUTHOR
+
+See L<DBIx::Class::Migration> for author information
+
+=head1 COPYRIGHT & LICENSE
+
+See L<DBIx::Class::Migration> for copyright and license information
+
+=cut
+

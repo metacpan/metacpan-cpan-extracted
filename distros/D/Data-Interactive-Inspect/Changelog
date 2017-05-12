@@ -1,0 +1,34 @@
+0.07
+	added |more support to list and show commands.
+
+0.06
+	fixed crash, which happened when one executed the
+	'list' command if inside an array. now we divert
+	to 'show' in such a case.
+
+0.05
+	signal value matches in search with quotes
+
+0.04
+	fixed drop/append/pop/shift commands to work inside
+	arrays as well.
+
+	fixed the quit command (it literally called 'exit')
+
+0.03
+	re-factored error handling a little
+
+	add 'search' command (alias: /<regex>)
+
+	added [de]serialize methods, which can be overwritten,
+	by default we use YAML for serialization, but this
+	can be changed.
+
+0.02
+	interactive command errors now lead to abort of
+	inspect() if reading from STDIN.
+
+	fixed "get struct"
+
+0.01
+	initial commit

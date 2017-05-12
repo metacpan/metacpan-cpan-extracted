@@ -1,0 +1,54 @@
+---
+abstract: 'Get raw hashrefs from a resultset with utf-8 flag'
+author:
+  - 'Akzhan Abdulin <akzhan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0.98'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.143240'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ResultClass-HashRefInflator-UTF8
+no_index:
+  directory:
+    - corpus
+    - eg
+    - examples
+    - t
+    - xt
+  namespace:
+    - t::lib
+  package:
+    - DB
+provides:
+  DBIx::Class::ResultClass::HashRefInflator::UTF8:
+    file: lib/DBIx/Class/ResultClass/HashRefInflator/UTF8.pm
+    version: '1.000005'
+requires:
+  DBIx::Class: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.010001'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/akzhan/DBIx-Class-ResultClass-HashRefInflator-UTF8/issues
+  homepage: https://metacpan.org/release/DBIx-Class-ResultClass-HashRefInflator-UTF8
+  repository: git://github.com/akzhan/DBIx-Class-ResultClass-HashRefInflator-UTF8.git
+version: '1.000005'
+x_serialization_backend: 'YAML::Tiny version 1.69'

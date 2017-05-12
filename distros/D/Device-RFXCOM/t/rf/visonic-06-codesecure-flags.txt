@@ -1,0 +1,10 @@
+c23ff39b5c01ba68040d
+
+slave visonic c2.3ff39b5c01ba68040d:
+  security/codesecure.01ba680/disarm
+  sensor/codesecure.01ba680[battery]=10%
+
+
+
+
+

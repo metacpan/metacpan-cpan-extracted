@@ -1,0 +1,36 @@
+---
+abstract: 'Moose Roles for building next generation DateTime formats'
+author:
+  - 'Evan Carroll, C<< <me at evancarroll.com> >>'
+  - 'Evan Carroll <me@evancarroll.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTimeX-Format
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  DateTime: 0
+  DateTime::Locale: 0
+  DateTime::TimeZone: 0
+  Moose: 0
+  Moose::Role: 0
+  MooseX::Types::DateTime::ButMaintained: 0.13
+  namespace::clean: 0
+resources:
+  homepage: https://github.com/EvanCarroll/DateTimeX-Format-POSIX-Strptime
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/EvanCarroll/DateTimeX-Format-POSIX-Strptime.git
+version: 1.04

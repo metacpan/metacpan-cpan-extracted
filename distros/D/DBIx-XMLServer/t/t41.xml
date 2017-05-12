@@ -1,0 +1,44 @@
+<sql:spec xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+
+  <sql:type name="text">
+    <sql:module>DBIx::XMLServer::TextField</sql:module>
+  </sql:type>
+
+  <sql:type name="number">
+    <sql:module>DBIx::XMLServer::NumberField</sql:module>
+  </sql:type>
+
+  <sql:table name="employees" sqlname="dbixtest1"/>
+ 
+  <sql:template table="employees">
+    <employees>
+      <sql:record>
+      	<employee>
+      	  <name>
+      	    <sql:field type="text" expr="employees.name"/>
+      	  </name>
+      	  <managerid1>
+      	    <sql:field type="number" expr="employees.manager"/>
+      	  </managerid1>
+      	  <managerid2>
+      	    <sql:field type="number" expr="employees.manager" null="empty"/>
+      	  </managerid2>
+      	  <managerid3>
+      	    <sql:field type="number" expr="employees.manager" null="omit"/>
+      	  </managerid3>
+      	  <managerid4>
+      	    <sql:field type="number" expr="employees.manager" null="nil"/>
+      	  </managerid4>
+      	  <nested sql:omit="true">
+        	  <nested sql:omit="true">
+        	    <managerid>
+        	      <sql:field type="number" expr="employees.manager" null="omit"/>
+        	    </managerid>
+        	  </nested>
+        	</nested>
+      	</employee>
+      </sql:record>
+    </employees>
+  </sql:template>
+	
+</sql:spec>

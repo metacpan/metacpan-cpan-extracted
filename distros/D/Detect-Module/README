@@ -1,0 +1,22 @@
+Detect::Module - Perl module to autodetect/load at runtime other Perl modules.
+
+
+INSTALLATION:
+
+The usual procedure works:
+* unzip the files to some directory
+* perl Makefile.PL
+* make
+* su -c "make install"
+
+
+DOCUMENTATION:
+
+Just type
+  man Detect::Module
+after or
+  perdoc Module.pm
+before installing.
+
+
+(C) 2001 Rudolf Polzer <rpolzer@web.de>

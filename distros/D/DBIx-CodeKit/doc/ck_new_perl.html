@@ -1,0 +1,156 @@
+<html>
+<head>
+<title>CodeKit Perl Handle Creation</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/codekit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="ck_quick_perl.html">Perl API</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_read.html">Code Descriptions</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/codekit">CodeKit</a>
+Perl Handle Creation</h2></center>
+
+How to create a new Perl CodeKit access handle.
+
+<h4>new DBIx::CodeKit()</h4>
+
+<pre>
+use DBIx::CodeKit;
+
+$codekit = new DBIx::CodeKit($dbh,
+                table     =&gt; 'ck_code',
+                getparam  =&gt; \&get_scalar,
+                getparams =&gt; \&get_list
+            ):
+</pre>
+
+<p>
+The new CodeKit() method returns a new CodeKit handle
+object.
+
+<p>
+$dbh is an open DBI connection handle.  If you plan
+to update the code table set it up to autocommit.
+
+<p>
+The optional 'table' parameter can be used to specify
+which of several physical code tables to use.  The default is
+'ck_code'.
+
+<h4>Getting Form Variables in Perl</h4>
+
+<p>
+The 'getparam' and 'getparams' function references
+tell CodeKit where to look for incoming form values
+for the <a href="ck_select.html">HTML Select Methods</a>.
+If this seems complicated you can simply pass in your
+own values to those methods using the 'value' parameter.
+
+<p>
+Here is an example showing how CodeKit can get the
+incoming form values using the popular CGI module:
+
+<pre>
+use DBI;
+use CGI;
+use DBIx::CodeKit;
+
+# Database connection.  Set these.
+my $dbconnect  = "DBI:mysql:webbysoft:localhost";
+my $dbusername = "webbysoft";
+my $dbpassword = "124c41";
+
+my $dbh = DBI-&gt;connect($dbconnect, $dbusername, $dbpassword)
+    or die "connecting : $DBI::errstr\n";
+
+my $cgi = new CGI;
+
+my $codekit = new DBIx::CodeKit($dbh,
+                   getparam  =&gt; sub { $cgi-&gt;param(shift) },
+                   getparams =&gt; sub { $cgi-&gt;param((shift).'[]') }
+               );
+</pre>
+
+<p>
+Notice the 'my $cgi' variable holding a reference to the CGI
+object.  The anonymous sub definitions will use that
+reference when they are called by CodeKit.  You can also
+pass in a reference to a regular named function as
+illustrated below.
+
+<p>
+The 'getparam' sub will be called in a scalar context to return
+single valued HTML form selections.  The name of the form variable
+to return is passed in as the first argument.  It should return
+a scalar value such as a string.
+
+<p>
+The 'getparams' sub will be called in a list context to return
+multivalued HTML form selections.  The name of the form variable
+to return is passed in as the first argument *without* the '[]'
+at the end of the name.  Append '[]' to the name if your
+parameter interface uses that convention.
+
+<p>
+The 'getparams' sub can return a list, a reference to a list,
+a scalar, or a reference to a hash.  If you return a reference
+to a hash, the keys are the selections, and the values
+are true like this:
+
+<pre>
+sub singleparam {
+    my $var_name = shift;       # Ignored for simplicity.
+    return 'friday';            # Look in POST or GET.
+}
+
+sub multiparam {
+    my $var_name = shift;       # Ignored for simplicity.
+    my $values = {              # Look in POST or GET.
+        'new_york'      =&gt; 1,
+        'san_francisco' =&gt; 1,
+        'halifax        =&gt; 1
+    };
+    return $values;             # Return a hash ref.
+}
+
+my $codekit = new DBIx::CodeKit($dbh,
+                   getparam  =&gt; \&singleparam,
+                   getparams =&gt; \&multiparam
+               );
+</pre>
+
+
+<p>
+<div align="right">
+[<a href="ck_quick_perl.html">Perl API</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_read.html">Code Descriptions</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

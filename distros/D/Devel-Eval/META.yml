@@ -1,0 +1,28 @@
+---
+abstract: 'Allows you to debug string evals'
+author:
+  - 'Adam Kennedy <cpan@ali.as>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Devel::Eval
+name: Devel-Eval
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+resources:
+  ChangeLog: http://fisheye2.atlassian.com/changelog/cpan/trunk/Devel-Eval
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.ali.as/cpan/trunk/Devel-Eval
+version: 1.01

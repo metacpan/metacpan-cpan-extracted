@@ -1,0 +1,113 @@
+Revision history for Dist-Zilla-Plugin-ReadmeFromPod
+
+0.35 2016-10-19 22:51:42
+    - Updated to use Path::Tiny API instead of Path::Class (diegok)
+
+0.34 2016-10-08 09:38:53
+    - Auto-detect pod file if present (GH#6, polettix)
+
+0.33 2015-09-10 07:57:55
+    - fix text and defaults by miquelruiz
+
+0.32 2015-02-12 22:24:09
+    - no code changes
+
+0.31 2015-02-12 09:53:04
+    - Remove dependency on Moose::Autobox (GH#4, Kent Fredric)
+
+0.30 2014-12-05 21:34:38
+    - bump from 0.22_03, no code changes
+
+0.22_03 2014-12-05 10:12:58
+    - fix issues
+
+0.22_01 2014-12-04 09:52:02
+    - use Pod::Readme (Robert Rothenberg)
+
+0.21 2013-11-04 15:54:58
+
+    - Prereqs, Pod::Simple = 3.23 (RT 90032)
+
+0.20 2013-11-03 15:45:30
+
+    - formal release for 5.005
+
+0.19_01 2013-10-20 15:30:38
+
+    - Convert using only characters for Dist::Zilla v5 (dagolden)
+
+0.18 2013-02-12 11:08:05
+
+    - apply patch (filename attr) from mitakaa (RT 75272)
+    - regex ^ to match root README
+
+0.14 2010-09-17 20:38:55
+
+    - Set the META repository url to my github repo, as suggested
+      by avar. github user: Hercynium (sscaffidi)
+
+0.13 2010-09-17 16:26:40
+
+   - Fixed failing test as per [CPAN RT: #60569] (sscaffidi)
+
+0.12 2010-06-08 16:47:39
+
+   - Improvements by Kent Fredric to make the POD extraction
+     saner. The need for intermediary files was eliminited, which
+     allowed us to get rid of a call to sync(), which fails on
+     Win32.
+
+	 It still does the right thing with UTF-8, which was the reason
+	 for the odd original code.
+
+0.11 2010-05-26 12:53:27
+
+    - Convert this distro to use @AVAR
+
+    - Remove PodWeaver use in favor of hardcoded POD and improve
+      the documentation.
+
+0.10    2010.05.01
+
+        Re-release due to Makefile.PL breakage caused by Dist::Zilla
+        FAIL: http://github.com/rjbs/dist-zilla/commit/2e47b6c205
+
+0.09    2010.04.28
+
+        Integrate patch by Mark Gardner <mjgardner@cpan.org> to make
+        t/gist-329018.t pass on Win32 and other architectures that
+        don't have IO::Handle::sync()
+
+0.08    2010.04.11
+
+        Accidentally released 0.07 with commit
+        1abffc5f8711ba77cb27c9bda719da4590f0987e which replaced
+        Pod::Text with Pod::Readme. Pod::Readme is too broken to use
+        for the reasons detailed in the Git commit log.
+
+0.07    2010.04.11
+
+        Bumped for re-release to CPAN (was deleted)
+
+0.06    2010.03.11
+        Using in-memory filehandles as commited in 0.05 doesn't work
+        for some unknown reason. There's a TODO test for this
+        t/gist-329018.t now taken from http://gist.github.com/329018
+
+0.05    2010.03.11
+        Using IO::Scalar instead of Perl's built-in open() to open
+        in-memory filehandles breaks in-memory Pod::Text processing of
+        POD documents containing UTF-8 (who knows why) (avar)
+
+0.04    2009.06.16
+        require Pod::Text 3.13
+
+0.03    2009.05.10
+        can override README if it already has [Readme]
+
+0.02	    2009.4.5
+        fix VERSION
+
+0.01    2009.4.5
+        First version, released on an unsuspecting world.
+

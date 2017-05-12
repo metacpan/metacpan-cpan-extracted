@@ -1,0 +1,17 @@
+Revision history for Dist-Data
+
+0.006     2015-05-13 18:02:17+02:00 Europe/Berlin
+
+0.005     2013-11-09 04:55:40 Europe/Berlin
+
+0.004     2013-04-23 05:14:59 Europe/Berlin
+
+0.003     2012-03-03 20:53:03 Europe/Berlin
+	Added dirs
+
+0.002     2012-01-15 06:48:29 Europe/Berlin
+	Introduced namespaces and documentations
+	Added usage of Dist::Metadata for packages
+	Renamed distmeta to cpan_meta (and added cm shortcut)
+
+0.001     2012-01-15 02:42:09 Europe/Berlin

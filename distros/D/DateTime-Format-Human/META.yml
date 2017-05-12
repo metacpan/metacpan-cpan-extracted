@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: DateTime-Format-Human
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  DateTime: 0.22
+  Params::Validate: 0.74
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  DateTime::Format::Human:
+    file: lib/DateTime/Format/Human.pm
+    version: 0.01
+generated_by: Module::Build version 0.21

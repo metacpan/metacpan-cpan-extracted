@@ -1,0 +1,8 @@
+0.003     2016-12-02 19:32:28 EST
+  - Deprecated distribution. JSON::MaybeXS is now used natively by Dancer2::Serializer::JSON.
+
+0.002     2016-06-10 00:55:24 EDT
+  - Fix test failure with Dancer2 0.200000
+
+0.001     2016-01-04 21:44:14 EST
+  - First release

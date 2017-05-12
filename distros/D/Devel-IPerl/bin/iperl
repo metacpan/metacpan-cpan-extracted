@@ -1,0 +1,148 @@
+#!/usr/bin/env perl
+# PODNAME: iperl
+# ABSTRACT: start ipython notebook with an IPerl kernel
+
+use strict;
+use warnings;
+
+use FindBin;
+use File::Spec;
+use Path::Class;
+use Config;
+use File::Copy::Recursive qw(dircopy);
+use File::ShareDir::ProjectDistDir;
+use JSON::MaybeXS qw(encode_json);
+use Env qw(@PERL5LIB);
+
+main();
+
+########################################
+
+sub main {
+	set_lib_path();
+	create_kernel_spec();
+	if( @ARGV >= 1 ) {
+		if( $ARGV[0] eq 'kernel' || $ARGV[0] eq 'nbconvert.iperl' ) {
+			unshift @INC, @PERL5LIB;
+			require Devel::IPerl;
+			return &Devel::IPerl::main();
+		}
+	}
+
+	# To use the --kernel option, we need to have an interface name. I'm not sure
+	# why, since running IPython starts a console if you don't give it any
+	# arguments. Therefore, 'console' is a good default here.
+	push @ARGV, "console" unless ~~@ARGV;
+	my @kernel_args = qw(--kernel iperl);
+
+	# notebook does not take --kernel argument
+	@kernel_args = () if( grep { $_ eq 'notebook' } @ARGV );
+
+	if($ARGV[0] eq '--version') {
+		my $ipython_version = get_ipython_version();
+		my $devel_iperl_version = get_devel_iperl_version();
+		print STDERR "Devel::IPerl ($devel_iperl_version); IPython ($ipython_version)\n";
+		print STDERR "Devel/IPerl.pm: $INC{'Devel/IPerl.pm'}\n";
+		return 0;
+	}
+
+	# start IPython and specify which kernel we want
+	system("ipython", @ARGV, @kernel_args );
+}
+
+sub get_devel_iperl_version {
+	my $devel_iperl_version;
+	{
+		unshift @INC, @PERL5LIB;
+		require Devel::IPerl;
+		$devel_iperl_version = $Devel::IPerl::VERSION;
+		$devel_iperl_version //= '[git]';
+	}
+	$devel_iperl_version;
+}
+
+sub get_ipython_version {
+	chomp( my $ipython_version = `ipython --version` );
+	$ipython_version;
+}
+
+sub get_kernels_template_dir {
+	return dir(dist_dir('Devel-IPerl'))->subdir(qw[ kernels iperl ]);
+}
+
+sub get_ipython_target_dir {
+	my $ipython_dir = `ipython locate`;
+	return if $!; # does not exist
+	chomp $ipython_dir;
+	return unless length $ipython_dir;
+	$ipython_dir;
+}
+
+sub get_kernels_target_dir {
+	my $ipython_dir = get_ipython_target_dir();
+	return unless length $ipython_dir;
+	dir($ipython_dir)->subdir(qw[ kernels iperl ]);
+}
+
+sub create_kernel_spec {
+	my $kernels_dir = get_kernels_target_dir();
+	my $create_directory = 0;
+	$create_directory = 1; # TODO do this properly later by checking the version
+	if( not defined $kernels_dir or not -d $kernels_dir ) {
+		$create_directory = 1;
+		warn "Directory for Perl kernel spec does not exist...\n";
+	} else {
+		my $config_file = dir($kernels_dir)->file('kernel.json');
+		my $config_contents = $config_file->slurp();
+		if( $config_contents !~ /IPerl/s ) {
+			die "IPerl kernel spec does not appear to be set up for Devel::IPerl. Please rename $kernels_dir.\n";
+		}
+	}
+	if( $create_directory ) {
+		my $src = get_kernels_template_dir();
+		my $target = get_kernels_target_dir();
+		#print STDERR "Copying kernel spec directory from $src to $target\n"; # TODO uncomment later
+		dircopy($src, $target);
+		my $kernel_file = dir($target)->file('kernel.json');
+		my $kernel_spec = {
+			display_name => "IPerl @{[get_devel_iperl_version()]}",
+			argv => [ "perl", "-MDevel::IPerl", "-e Devel::IPerl::main", "kernel", "{connection_file}" ],
+			language => "perl",
+			iperl_version => get_devel_iperl_version(),
+		};
+		$kernel_file->spew( encode_json($kernel_spec) );
+	}
+}
+
+# sets PERL5LIB so that Devel::IPerl is available
+sub set_lib_path {
+	my $path_to_lib = dir($FindBin::Bin, qw(.. lib) );
+	unshift @PERL5LIB, "$path_to_lib";
+}
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+iperl - start ipython notebook with an IPerl kernel
+
+=head1 VERSION
+
+version 0.006
+
+=head1 AUTHOR
+
+Zakariyya Mughal <zmughal@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Zakariyya Mughal.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

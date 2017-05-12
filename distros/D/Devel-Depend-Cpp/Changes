@@ -1,0 +1,33 @@
+Revision history for Perl extension Devel::Depend::Cpp.
+
+0.09  Sat Jul 26 2008
+	CHANGED: moved depender.pl to script directory to ease rpm generation (thx rindolf)
+
+0.08  Sun Mar 19 2006
+	CHANGED: export $PreprocessorDepend instead for using globs, this is a synch for pbs 0.40
+	CAHNGED: Documentation to reflect latest changes and made the documentation more attractive
+	
+
+0.07  Sun Nov 27 2005
+	ADDDED: recovered from locally installed version
+
+0.06  lost to svk rm
+
+0.05  Wed Jun 23 23:50:00 2005
+	ADDED: PreprocessorDepend alias
+
+0.04  Tue Feb 1 20:00:00 2005
+	FIXED: do not consider empty output as an error
+
+0.03  Tue Feb 1 19:00:00 2005
+	FIXED: Ignore cpp output to STDOUT
+	
+
+0.02  Mon Nov 10 11:00:00 2003
+	ADDED: possibility to everride which 'cpp' is used (ex: arm-elf-cpp)
+	CHANGED: the returned list
+	
+0.01  Fri Oct  3 16:52:24 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n Devel::Depend::Cpp
+		

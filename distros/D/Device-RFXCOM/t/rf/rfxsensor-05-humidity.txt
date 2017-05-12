@@ -1,0 +1,11 @@
+2001f11ae5
+
+master rfxsensor 20.01f11ae5:
+  sensor/rfxsensor01f1[voltage]=2.15
+  sensor/rfxsensor01f1[humidity]=41.83
+
+
+
+
+
+clear

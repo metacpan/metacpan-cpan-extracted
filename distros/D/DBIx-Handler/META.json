@@ -1,0 +1,89 @@
+{
+   "abstract" : "fork-safe and easy transaction handling DBI handler",
+   "author" : [
+      "Atsushi Kobayashi <nekokak _at_ gmail _dot_ com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Handler",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035",
+            "perl" : "5.008_001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.605",
+            "DBIx::TransactionManager" : "1.09"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Requires" : "0",
+            "Test::SharedFork" : "0.16"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Handler" : {
+         "file" : "lib/DBIx/Handler.pm",
+         "version" : "0.14"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/nekokak/p5-DBIx-Handler/issues"
+      },
+      "homepage" : "https://github.com/nekokak/p5-DBIx-Handler",
+      "repository" : {
+         "url" : "git://github.com/nekokak/p5-DBIx-Handler.git",
+         "web" : "https://github.com/nekokak/p5-DBIx-Handler"
+      }
+   },
+   "version" : "0.14",
+   "x_authority" : "cpan:XAICRON",
+   "x_contributors" : [
+      "Keiji, Yoshimi <walf443@gmail.com>",
+      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-github@titech.ac>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "Atsushi Kobayashi <nekokak@gmail.com>",
+      "soh335 <sugarbabe335@gmail.com>",
+      "xaicron <xaicron@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
+      "karupanerura <karupa@cpan.org>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

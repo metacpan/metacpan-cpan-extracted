@@ -1,0 +1,9 @@
+Revision history for Perl extension Data::ACL.
+
+0.01  Fri Jul 20 01:01:33 2001
+	- original version; created by h2xs 1.19
+
+0.02  Sun Jan 19 00:10:00 2003
+	- major refactoring of module code by new maintainer; rob@cowsnet.com.au
+	- incorporation of module tests; rob@cowsnet.com.au
+

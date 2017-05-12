@@ -1,0 +1,317 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>lib/DBIx/Class/ResultSource/MultipleTableInheritance.pm</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:amiri@akbuntu.(none)" />
+</head>
+
+<body style="background-color: white">
+
+
+<!-- INDEX BEGIN -->
+<div name="index">
+<p><a name="__index__"></a></p>
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#notice">NOTICE</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#why">WHY?</a></li>
+	<li><a href="#how">HOW?</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<ul>
+
+		<li><a href="#contributors">CONTRIBUTORS</a></li>
+	</ul>
+
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#license">LICENSE</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+
+<hr name="index" />
+</div>
+<!-- INDEX END -->
+
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DBIx::Class::ResultSource::MultipleTableInheritance
+Use multiple tables to define your classes</p>
+<p>
+</p>
+<hr />
+<h1><a name="notice">NOTICE</a></h1>
+<p>This only works with PostgreSQL at the moment. It has been tested with
+PostgreSQL 9.0, 9.1 beta, and 9.1.</p>
+<p>There is one additional caveat: the &quot;parent&quot; result classes that you
+defined with this resultsource must have one primary column and it must
+be named &quot;id.&quot;</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+    {
+        package Cafe::Result::Coffee;</pre>
+<pre>
+        use strict;
+        use warnings;
+        use parent 'DBIx::Class::Core';
+        use aliased 'DBIx::Class::ResultSource::MultipleTableInheritance'
+            =&gt; 'MTI';</pre>
+<pre>
+        __PACKAGE__-&gt;table_class(MTI);
+        __PACKAGE__-&gt;table('coffee');
+        __PACKAGE__-&gt;add_columns(
+            &quot;id&quot;, { data_type =&gt; &quot;integer&quot; },
+            &quot;flavor&quot;, {
+                data_type =&gt; &quot;text&quot;,
+                default_value =&gt; &quot;good&quot; },
+        );</pre>
+<pre>
+        __PACKAGE__-&gt;set_primary_key(&quot;id&quot;);</pre>
+<pre>
+        1;
+    }</pre>
+<pre>
+    {
+        package Cafe::Result::Sumatra;</pre>
+<pre>
+        use parent 'Cafe::Result::Coffee';</pre>
+<pre>
+        __PACKAGE__-&gt;table('sumatra');</pre>
+<pre>
+        __PACKAGE__-&gt;add_columns( &quot;aroma&quot;,
+            { data_type =&gt; &quot;text&quot; }
+        );</pre>
+<pre>
+        1;
+    }</pre>
+<pre>
+    ...</pre>
+<pre>
+    my $schema = Cafe-&gt;connect($dsn,$user,$pass);</pre>
+<pre>
+    my $cup = $schema-&gt;resultset('Sumatra');</pre>
+<pre>
+    print STDERR Dwarn $cup-&gt;result_source-&gt;columns;</pre>
+<pre>
+        &quot;id&quot;
+        &quot;flavor&quot;
+        &quot;aroma&quot;
+        ..</pre>
+<p>Inherit from this package and you can make a resultset class from a view, but
+that's more than a little bit misleading: the result is <strong>transparently
+writable</strong>.</p>
+<p>This is accomplished through the use of stored procedures that map changes
+written to the view to changes to the underlying concrete tables.</p>
+<p>
+</p>
+<hr />
+<h1><a name="why">WHY?</a></h1>
+<p>In many applications, many classes are subclasses of others. Let's say you
+have this schema:</p>
+<pre>
+    # Conceptual domain model</pre>
+<pre>
+    class User {
+        has id,
+        has name,
+        has password
+    }</pre>
+<pre>
+    class Investor {
+        has id,
+        has name,
+        has password,
+        has dollars
+    }</pre>
+<p>That's redundant. Hold on a sec...</p>
+<pre>
+    class User {
+        has id,
+        has name,
+        has password
+    }</pre>
+<pre>
+    class Investor extends User {
+        has dollars
+    }</pre>
+<p>Good idea, but how to put this into code?</p>
+<p>One far-too common and absolutely horrendous solution is to have a &quot;checkbox&quot;
+in your database: a nullable &quot;investor&quot; column, which entails a nullable
+&quot;dollars&quot; column, in the user table.</p>
+<pre>
+    create table &quot;user&quot; (
+        &quot;id&quot; integer not null primary key autoincrement,
+        &quot;name&quot; text not null,
+        &quot;password&quot; text not null,
+        &quot;investor&quot; tinyint(1),
+        &quot;dollars&quot; integer
+    );</pre>
+<p>Let's not discuss that further.</p>
+<p>A second, better, solution is to break out the two tables into user and
+investor:</p>
+<pre>
+    create table &quot;user&quot; (
+        &quot;id&quot; integer not null primary key autoincrement,
+        &quot;name&quot; text not null,
+        &quot;password&quot; text not null
+    );</pre>
+<pre>
+    create table &quot;investor&quot; (
+        &quot;id&quot; integer not null references user(&quot;id&quot;),
+        &quot;dollars&quot; integer
+    );</pre>
+<p>So that investor's PK is just an FK to the user. We can clearly see the class
+hierarchy here, in which investor is a subclass of user. In DBIx::Class
+applications, this second strategy looks like:</p>
+<pre>
+    my $user_rs = $schema-&gt;resultset('User');
+    my $new_user = $user_rs-&gt;create(
+        name =&gt; $args-&gt;{name},
+        password =&gt; $args-&gt;{password},
+    );</pre>
+<pre>
+    ...</pre>
+<pre>
+    my $new_investor = $schema-&gt;resultset('Investor')-&gt;create(
+        id =&gt; $new_user-&gt;id,
+        dollars =&gt; $args-&gt;{dollars},
+    );</pre>
+<p>One can cope well with the second strategy, and it seems to be the most popular
+smart choice.</p>
+<p>
+</p>
+<hr />
+<h1><a name="how">HOW?</a></h1>
+<p>There is a third strategy implemented here. Make the database do more of the
+work: hide the nasty bits so we don't have to handle them unless we really want
+to. It'll save us some typing and it'll make for more expressive code. What if
+we could do this:</p>
+<pre>
+    my $new_investor = $schema-&gt;resultset('Investor')-&gt;create(
+        name =&gt; $args-&gt;{name},
+        password =&gt; $args-&gt;{password},
+        dollars =&gt; $args-&gt;{dollars},
+    );</pre>
+<p>And have it Just Work? The user...</p>
+<pre>
+    {
+        name =&gt; $args-&gt;{name},
+        password =&gt; $args-&gt;{password},
+    }</pre>
+<p>should be created behind the scenes, and the use of either user or investor
+in your code should require no special handling. Deleting and updating
+$new_investor should also delete or update the user row.</p>
+<p>It does. User and investor are both views, their concrete tables abstracted
+away behind a set of rules and triggers. You would expect the above DBIC
+create statement to look like this in SQL:</p>
+<pre>
+    INSERT INTO investor (&quot;name&quot;,&quot;password&quot;,&quot;dollars&quot;) VALUES (...);</pre>
+<p>But using MTI, it is really this:</p>
+<pre>
+    INSERT INTO _user_table (&quot;username&quot;,&quot;password&quot;) VALUES (...);
+    INSERT INTO _investor_table (&quot;id&quot;,&quot;dollars&quot;) VALUES (currval('_user_table_id_seq',...) );</pre>
+<p>For deletes, the triggers fire in reverse, to preserve referential integrity
+(foreign key constraints). For instance:</p>
+<pre>
+   my $investor = $schema-&gt;resultset('Investor')-&gt;find({id =&gt; $args-&gt;{id}});
+   $investor-&gt;delete;</pre>
+<p>Becomes:</p>
+<pre>
+    DELETE FROM _investor_table WHERE (&quot;id&quot; = ?);
+    DELETE FROM _user_table WHERE (&quot;id&quot; = ?);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="new" class="item">new</a></strong></dt>
+
+<dd>
+<p>MTI find the parents, if any, of your resultset class and adds them to the
+list of parent_sources for the table.</p>
+</dd>
+<dt><strong><a name="add_additional_parents" class="item">add_additional_parents</a></strong></dt>
+
+<dd>
+<p>Continuing with coffee:</p>
+<pre>
+    __PACKAGE__-&gt;result_source_instance-&gt;add_additional_parents(
+        qw/
+            MyApp::Schema::Result::Beverage
+            MyApp::Schema::Result::Liquid
+        /
+    );</pre>
+<p>This just lets you manually add additional parents beyond the ones MTI finds.</p>
+</dd>
+<dt><strong><a name="add_additional_parent" class="item">add_additional_parent</a></strong></dt>
+
+<dd>
+<pre>
+    __PACKAGE__-&gt;result_source_instance-&gt;add_additional_parent(
+            MyApp::Schema::Result::Beverage
+    );</pre>
+<p>You can also add just one.</p>
+</dd>
+<dt><strong><a name="attach_additional_sources" class="item">attach_additional_sources</a></strong></dt>
+
+<dd>
+<p>MTI takes the parents' sources and relationships, creates a new
+DBIx::Class::Table object from them, and registers this as a new, raw, source
+in the schema, e.g.,</p>
+<pre>
+    use MyApp::Schema;</pre>
+<pre>
+    print STDERR map { &quot;$_\n&quot; } MyApp::Schema-&gt;sources;</pre>
+<pre>
+    # Coffee
+    # Beverage
+    # Liquid
+    # Sumatra
+    # Raw::Sumatra</pre>
+<p>Raw::Sumatra will be used to generate the view.</p>
+</dd>
+<dt><strong><a name="view_definition" class="item">view_definition</a></strong></dt>
+
+<dd>
+<p>This takes the raw table and generates the view (and stored procedures) you will use.</p>
+</dd>
+</dl>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Matt S. Trout, &lt;<a href="mailto:mst@shadowcatsystems.co.uk">mst@shadowcatsystems.co.uk</a>&gt;</p>
+<p>
+</p>
+<h2><a name="contributors">CONTRIBUTORS</a></h2>
+<p>Amiri Barksdale, &lt;<a href="mailto:amiri@roosterpirates.com">amiri@roosterpirates.com</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2011 the DBIx::Class::ResultSource::MultipleTableInheritance
+<a href="#author">AUTHOR</a> and <a href="#contributors">CONTRIBUTORS</a> as listed above.</p>
+<p>
+</p>
+<hr />
+<h1><a name="license">LICENSE</a></h1>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/DBIx/Class.html">the DBIx::Class manpage</a>
+<a href="/DBIx/Class/ResultSource.html">the DBIx::Class::ResultSource manpage</a></p>
+
+</body>
+
+</html>

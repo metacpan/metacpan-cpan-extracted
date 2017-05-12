@@ -1,0 +1,8 @@
+model: Blog::User
+records:
+  first:
+    user_id: 1
+    name: naoya
+  second:
+    user_id: 2
+    name: naomax

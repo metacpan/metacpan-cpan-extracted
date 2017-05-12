@@ -1,0 +1,3 @@
+This is {% include "comment_include.txt" %} checking {% comment Because %}
+And this one too
+{% endcomment %} endit

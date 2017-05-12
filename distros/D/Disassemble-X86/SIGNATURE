@@ -1,0 +1,32 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.05.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It would check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d7b0c073e806942d75db945a55a54a50f45bec4b Changes
+SHA1 0030019b3973dfb4645e14b5a06d580be8c5dd1c MANIFEST
+SHA1 93e68c237c0df93bceb03fe132bd251e1b987af7 Makefile.PL
+SHA1 e0859a4d00fd17d089ff5974260889db91d22cb4 README
+SHA1 1bfc16b692deea649bb7f69c59d6b16829ec8635 X86.pm
+SHA1 b7426b078a85c440f4f73badcf114ba2ac0f56de X86/FormatText.pm
+SHA1 ecb216c35ffd9c3bd3bf4aafef9435ec646cdbf9 X86/FormatTree.pm
+SHA1 fd5282b54159b5a8f8d981db8dc929e9c30f1007 X86/MemRegion.pm
+SHA1 8a95870f0d8db0f68a4d36eff1d5e80d314d97f2 disasm
+SHA1 cf7ccff2b9f9619a3152b39101670ba261e95c88 t/1.t
+-----BEGIN PGP SIGNATURE-----
+
+iD8DBQE9goDDPgDecCrBEpcRApv5AJ9lSdejZR/goCE1dvuSGCY9hA+1zgCgmaOh
+ijQKZXjEEgynzz93ZnlAa6I=
+=Kzwl
+-----END PGP SIGNATURE-----

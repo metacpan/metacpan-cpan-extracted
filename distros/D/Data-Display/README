@@ -1,0 +1,337 @@
+NAME
+    Data::Display - Perl extension for formating and displaying array.
+
+SYNOPSIS
+      use Data::Display;
+
+      $dsp = Data::Display->new($drf, $crf, $ech, %arg);
+      $dsp->skip_first_row;           # i,e. 1st row contains col names
+      $dsp->set_skip_first_row(1);    # is the same as the above       
+      $dsp->set_field_sep($ech);      # default is a space
+      $dsp->set_data_ref($drf);       # ref to an array containing data
+      $dsp->set_cols_ref($crf);       # ref to an array containing col defs
+      $dsp->set_col_width($fld,$wd,$col,$wd,...);
+      $dsp->add_col_def($col,'typ:max:min:dec:dft:req');     # append
+      $dsp->add_col_def($idx,'col:typ:max:min:dec:dft:req'); # isert
+      $dsp->mod_col_def($fld,'typ:max:min:dec:dft:req');
+
+      $rc      = $dsp->get_skip_first_row;
+      $rc      = $dsp->get_first_row; # the same as the above
+
+      $ary_ref = $dsp->get_column_defs_arrayref($drf,$ech);
+      @ary     = $dsp->get_column_defs(\@ary,$ech);  # $yn: display? 
+
+      $str     = $dsp->get_col_width();              # get format string
+      @ary     = $dsp->get_col_width($fld,$col,...); # a list of width
+      ($cfs, $dfs) = $dsp->get_col_width();   
+      ($cfs, $dfs) = $dsp->get_format_string($crf,$sep,$ech);
+
+      $str     = $dsp->get_content($drf,$crf,$typ,$ech); 
+      $str     = $dsp->get_content($typ,$ech);       # use ary refs 
+
+      $rv      = $dsp->get_no_of_fields;
+      $rv      = $dsp->get_no_of_columns;
+      $rv      = $dsp->get_no_of_rows;
+      $rv      = $dsp->get_no_of_records;
+      ($rows, $cols) = $dsp->get_dimension($drf); 
+      ($rows, $cols) = $dsp->get_dimension; 
+
+    Notation and Conventions
+
+       $dsp    a display object
+       $drf    data array reference
+       $crf    column definition array reference
+       $ech    whether to echo messages or contents
+       $cfs    column heading format string 
+       $dfs    data content format string
+       $sep    field separator character
+       $typ    output type, text, html, etc.
+
+       $drh    Driver handle object (rarely seen or used in applications)
+       $h      Any of the $??h handle types above
+       $rc     General Return Code  (boolean: true=ok, false=error)
+       $rv     General Return Value (typically an integer)
+       @ary    List of values returned from the database, typically a row 
+               of data
+       $rows   Number of rows processed (if available, else -1)
+       $fh     A filehandle
+       undef   NULL values are represented by undefined values in perl
+       \%attr  Reference to a hash of attribute values passed to methods
+
+DESCRIPTION
+    This is my first object-oriented Perl program. The Display module will
+    scan through each records and fields in the array to collect information
+    about the content in the array. It creates a column definition array,
+    builds formating strings, and display the contents nicely.
+
+    The column definition array built by the module is actually an array
+    with hash members. It contains these hash elements ('col', 'typ', 'max',
+    'min', 'dec', 'req' and 'dsp') for each column. The subscripts in the
+    array are in the format of $ary[$col_seq]{$hash_ele}. The hash elements
+    are: col - column name typ - column type, 'N' for numeric, 'C' for
+    characters, and 'D' for date max - maximum length of the records in the
+    column (could use 'wid' to record the max length of the records.) min -
+    minimum length of the record in the column (When 'wid' is used, no 'min'
+    is needed.) dft - date format such as YYYY/MM/DD, MON/DD/YYYY, etc. dec
+    - maximun decimal length of the record in the column req - whether there
+    is null or zero length records in the column only 'NOT NULL is shown dsp
+    - description of the columns
+
+    The array passed to the module can have the first row containing column
+    names or have a separate array containing column definitions. It has to
+    be in the same format of the array that we describe in the above if it
+    is referenced to a out side array.
+
+    It also creates and tracks a format information. The format information
+    contains in a separate array, which has exactly the same element as the
+    column definition array.
+
+    It has many "set" and "get" methods to assign and to query data
+    contained in the object. Here is the list of methods:
+
+    the constructor new($drf, $crf, $ech, %arg)
+        Without any input, i.e., new(), the constructor generates an empty
+        object. If any argument is provided, the constructor expects them in
+        the right order.
+
+    skip_first_row/set_first_row(1)
+        This method indicates that the first row in the array contains
+        column names. The default is false.
+
+    get_skip_first_row/get_first_row
+        This method checks the indicator for the first row data, i.e.,
+        whether it contains column names.
+
+    set_field_sep($ech)/get_field_sep
+        This method sets/gets output field separator. The default separator
+        is a space(" ").
+
+    set_data_ref($drf)/get_data_ref
+        This method sets/gets data array reference. The records in the array
+        that the ref points to are used to determine column definitions and
+        to be displayed.
+
+    set_cols_ref($crf)/get_cols_ref
+        This method sets/gets column array reference. The array contains
+        column name, column type, column max length, column min length,
+        column decimal length, and column constraints.
+
+    get_column_defs_arrayref($drf, $ech)
+        This method gets the reference pointing to the column definition
+        array. If new data array reference is specified, it gets the
+        definition for the data array. It does not change the internal
+        attributes defined for the object, so you can pass any data array
+        reference to this method without touching the internal attributes in
+        the object. Actually, all the *get* methods do not change anything
+        in the object.
+
+    get_column_defs($drf, $ech)
+        This method get the contents in the column definition array. If no
+        input column array ref and no column names in the first row, it
+        generates sequential column names such as "FLD001", "FLD002, etc. If
+        $ech is specified, it will display the content of the column
+        definition array.
+
+    disp_col_defs($crf)
+        This method displays the content of column definition array in a
+        nice format.
+
+    set_col_width/get_col_width($cp,$v1,$cn,$v2,...)
+        This method sets/gets the max length of columns based on column
+        position ($cp) or column names ($cn). The column position is zero
+        based. The default is the same as the column definition array. The
+        get method without any argument returns the Perl format string based
+        on modified column max width. If no modification, the returned
+        format string is the same as that from *get_format_ string*.
+
+    get_format_string($crf,$sep,$ech)
+        This method gets the Perl format string. It is created based on the
+        column format array.
+
+    get_content($drf,$crt,$typ,$ech)
+        This method gets the formated contents from the data array. It uses
+        the separator to divide fields. If $drf and $crf are not provided,
+        this method will get them from the attributes in the object. The
+        $typ sepcifies what type of output format will be, currently only
+        "text" is available. If $ech is specified, the content will also be
+        displayed.
+
+    get_no_of_fields/get_no_of_columns
+        This method gets number of fields (columns) in the data array.
+
+    get_no_of_rows/get_no_of_records
+        This method gets number of rows (records) in the data array.
+
+    get_dimension($drf)
+        This method gets number of rows and columns in the data array or the
+        array ref passed to this method.
+
+    add_col_def($fld, $col_def)
+        This method add or construct column definition array. You can either
+        append to the end of the column def array or insert into the
+        position that you specified. It takes two inputs: column name or
+        index and column definitions. If column name is specified in the
+        first input, it will try to append the column and its defintion to
+        the end of the array. If the first input is the column position,
+        then it inserts the definiton after the position specified. You can
+        use two format to define column, i.e., camma delimited values or
+        comma delimited hash assignment. In camma delimited value format,
+        the vlaues have to be in the exact order in
+        'col:typ:max:min:dec:dft:req'. In hash assignment format, order is
+        not an issue. For instance, 'max=>5:typ=D:dft=>YYYY/MM/DD'. The
+        column name or column index are checked before any insertion is
+        commited. You can add as many columns as you like in one run, just
+        be cautious when you insert columns. You may not get the position
+        that you desire since array's index changes once you have inserted
+        column definiton in it.
+
+    mod_col_def($fld, $col_def)
+        This method modifies the existing column definitons in the column
+        definiton array. You can use the same ways and formats described in
+        the *add_col_def* method.
+
+  How to create a display object?
+
+    If you have an array @ary and column array @C, you can create a display
+    object as the following:
+
+      $dsp = Data::Display->new(\@ary,\@C); 
+
+    This is equivalent to
+
+      $dsp = Data::Display->new();
+      $dsp->set_data_ref(\@ary);
+      $dsp->set_cols_ref(\@C);
+
+    If you do not have column array, you can generate it as the following:
+
+      $col_ref = $dsp->get_column_defs_arrayref(\@ary); 
+      $dsp->set_cols_ref($col_ref);
+
+    You can set a hash to define your object attributes and create it as the
+    following:
+
+      %attr = (
+        'field_sep'       => ':',    # output field separator
+         'skip_first_row' => 1,      # 1st row has col names
+         'data_ref'       => \@ary,  # array_ref for data
+         'cols_ref'       => \@C,    # array_ref for col defs
+        );
+      $dsp = Data::Display->new(%attr);
+
+  How is the column definition generated?
+
+    If the first row in the data array contains column names, it uses the
+    column names in the row to define the column definition array. The
+    column type is determined by searching all the records in the data
+    array. If all the records in the column only do not contain non-digits,
+    i.e., only [0-9.], the column is defined as numeric ('N'); otherwise, it
+    is defined as character ('C'). No other data types such as date are
+    searched currently.
+
+    If the first row does not contain column names and no column definition
+    array is provided, the *get_column_defs* or *get_column_defs_arrayref*
+    will generate field names as "FLD###". The "###" is a sequential number
+    starting with 1. If the minimum length of a column is zero, then the
+    value in the column can be null; if the minimum length is greater than
+    zero, then it is a required column.
+
+    The default indicator for the first row is false, i.e., the first row
+    does not contain column names. You can indicate whether the first row in
+    the data array is column names by using *skip_first_row* or
+    *set_skip_first_row* to set it.
+
+      $dsp->skip_first_row;
+      $dsp->set_skip_first_row(1);    # the same as the above
+      $dsp->set_first_row(1);         # the same as the above
+      $dsp->set_skip_first_row('Y');  # the same effect 
+      $dsp->set_first_row('Y');       # the same as the above
+
+    To reverse it, here is how to
+
+      $dsp->set_skip_first_row(0);    # no column in the first row
+      $dsp->set_first_row(0);         # the same as the above
+      $dsp->set_skip_first_row('');   # the same effect 
+      $dsp->set_first_row('');        # the same as the above
+
+  How to change the array references in the display object
+
+    You can pass data and column definition array references to display
+    objects using the object constructor *new* or using the *set* methods:
+
+      $dsp = Data::Display->new($arf, $crf); 
+      $dsp->set_data_ref(\@new_array);
+      $dsp->set_cols_ref(\@new_defs);     
+
+  How to access the object?
+
+    You can get the information from the object through all the *get*
+    methods described above.
+
+  How to add column definitons?
+
+    You can add column definitions to the existing definition array using
+    method *add_col_def* through two ways: append or insert.
+
+      $dsp = Data::Display->new($arf, $crf); 
+      $dsp->add_col_def('ColX','D:18:10::YYYY/MM/DD:NOT NULL');  # append 
+      $dsp->add_col_def(2,'max=>18:col=>ColX:typ=>D');           # insert
+
+    You can use two formats as you already see from the above examples: list
+    or hash. In the value list format, you must follow the order of
+    'col:typ:max:min:dec:dft:req'. You can add multiple columns at once. You
+    can pre-create an array and pass the whole array to the method. Here is
+    an example:
+
+      @cols = ( 'ColX', 'D:18:10::YYYY/MM/DD:NOT NULL',
+                 '2',   'max=>18:col=>ColX:typ=>D',
+                'ColY', 'max=>15:typ=>N:dec=>2',
+                 '4',   'C:20:0::::'
+              );
+      $dsp->add_col_def(@cols);
+
+    The column name and position will be checked before inserting new
+    columns. If the column name exist or the position is out of the range of
+    the existing column definition array, the insertion for the column will
+    be ignored. Please also note that positions are changed based on
+    previous insertions.
+
+  How to modify column definitons?
+
+    You can modify the existing column definitions using method
+    *add_col_def* through two ways (append and insert) and two formats (list
+    and hash) just as described in the adding column definitons section.
+
+  Future Implementation
+
+    Although it seems a simple task, it requires a lot of thinking to get it
+    working in an object-oriented frame. Intented future implementation
+    includes
+
+    * add more output type such as HTML table.
+    * a *sync* method
+        This method will be used to syncronize the data, definition and
+        format array references.
+
+    * a debugger option
+        A method can also be implemented to turn on/off the debugger.
+
+    * a logger option
+        This option will allow output and/or debbuging information to be
+        logged.
+
+AUTHOR
+    Hanming Tu, hanming_tu@yahoo.com
+
+CODING HISTORY
+    * Version 0.02: 12/14/2000 - First enhancement
+          1) added date datatype; 
+          2) added add_col_def method;
+          3) added mod_col_def method; 
+          4) added disp_col_defs method.
+
+    * Version 0.01: 05/10/2000 - Initial coding
+SEE ALSO (some of docs that I check often)
+    perltoot(1), perlobj(1), perlbot(1), perlsub(1), perldata(1),
+    perlsub(1), perlmod(1), perlmodlib(1), perlref(1), perlreftut(1).
+

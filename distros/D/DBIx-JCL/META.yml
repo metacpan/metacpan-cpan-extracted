@@ -1,0 +1,30 @@
+---
+name: DBIx-JCL
+version: 0.12
+author:
+  - 'Brad Adkins <dbijcl@gmail.com>'
+abstract: Job Control Library for database load tasks
+version_from: lib/DBIx/JCL.pm
+requires:
+  English: 0
+  Getopt::Long: 0
+  Config::IniFiles: 0
+  Pod::WikiText: 0
+  IO::File: 0
+  IO::Handle: 0
+  Fcntl: 0
+  IO::LockedFile: 0
+  File::Copy: 0
+  File::Bidirectional: 0
+  File::Basename: 0
+  MIME::Lite: 0
+  Date::Format: 0
+  DBI: 0
+build requires:
+  Test::Harness: 0
+  Test::More: 0
+provides:
+  DBIx::JCL
+    file: lib/DBIx/JCL.pm
+    version: 0.12
+distribution_type: module

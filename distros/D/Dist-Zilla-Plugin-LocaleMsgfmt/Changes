@@ -1,0 +1,18 @@
+Revision history for Dist-Zilla-Plugin-LocaleMsgfmt
+
+1.203     2011-05-20 15:00:07 Europe/Paris
+    * fix issue#1 - support for recursive directory lookup (jérôme quelin)
+    * added test suite (jérôme quelin)
+
+1.202     2010-11-05 23:47:26 America/New_York
+    * Updated to use latest version of Dist::Zilla::PluginBundle::PDONELAN
+
+1.201     2010-10-25 17:50:26 America/New_York
+    * GitHub README
+
+1.200     2010-10-25 16:24:46 America/New_York
+    * Better support for dzil powered releases
+
+1.100970  2010-04-07 14:50:00 EST5EDT
+    * First version
+

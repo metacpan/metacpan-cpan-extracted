@@ -1,0 +1,73 @@
+Revision history for Perl extension Digest::CRC.
+
+0.01  Wed Apr 21 15:12:59 2004
+	- original version; created by h2xs 1.19
+
+0.03  Fri Apr 23 10:57:39 2004
+	- adopted to Digest::
+
+0.04  Fri Apr 23 12:05:18 2004
+	- added _hex functions 
+
+0.05  Fri Apr 23 13:14:04 2004
+	- some bug fixes
+
+0.06  Mon May 03 10:45:12 2004
+	- two bug fixes from Tim Heaney <theaney@cablespeed.com>
+
+0.07  Mon May 17 10:57:12 2004
+	- crc8 bug fixed. Thanks to Mathis Moder <mathis@pixelconcepts.de>
+
+0.08  Sat May 21 22:32:34 2004
+	- crc8 bug fixed. Thanks to Mathis Moder <mathis@pixelconcepts.de>
+
+0.09  Mon Jul 05 23:37:13 2004
+        - major performance improvements by adding optional XS code.
+          Thanks to Marcus Holland-Moritz <mhx-perl@gmx.net>
+
+0.10  Sat Mar 18 21:07:22 2004
+        - adapted behaviour to Digest
+
+0.11  Wed Oct 31 20:26:13 2007
+        - fixed __reflect error
+
+0.12  Sat Nov  3 10:11:42 2007
+        - Debug output removed
+
+0.13  Sun Nov  4 11:22:54 2007
+        - fixed tests
+
+0.14  Mon Nov  5 08:10:11 2007
+        - fixed __reflect error in non XS part
+
+0.15  Sun Sep 12 13:46:13 2010
+        - added crc64 support, #50064
+          Thanks to Anders Ossowicki <aowi@novozymes.com>
+        - added bit reversing per byte, #59575
+          Thanks to Joel Peshkin <joel@peshkin.net>
+        - clone method nwo copies content too
+          Thanks to Stefan Ochs <stefan.ochs@opentext.com>
+
+0.16  Wed Sep 29 08:11:42 2010
+        - fixed crc64 support for non-xs case, #61490, #61491
+
+0.17  Sat Aug 27 13:59:31 2011
+        - fixed non-xs code, #70535
+
+0.18  Sat Nov 12 23:09:05 2011
+        - added convenience wrappers for 'cont', #70672
+        - fixed few issues in xs code, #70674
+        - added openpgparmor support, #72387
+
+0.19  Sun Feb  8 11:30:09 2015
+        - fixed issue with OO crc64, #101999
+        - remove Build.PL as it seems to have some issues with the XS support
+
+0.20  Sun Feb  8 16:45:13 2015
+          - removed debug code
+
+0.21  Sat Feb 21 13:18:25 2015
+          - new() throwing an error if an unsupported type is specified
+
+0.22  Sat Feb 18 17:45:31 2017
+          - added padding for hex encoded digests

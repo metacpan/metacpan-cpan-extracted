@@ -1,0 +1,49 @@
+Revision history for Perl extension DBICx::AutoDoc.
+
+0.08
+    - Handle literal SQL and explicit undef default values RT#65155
+    - Use File::ShareDir to get default template path RT#64697
+
+0.07
+    - Added another patch from Dagfinn Ilmari Mannsåkerin to correctly
+      show multidimentional column sizes.  I should have looked all the
+      way through the queue before releasing...  RT#44843
+
+0.06
+    - Added a patch from Dagfinn Ilmari Mannsåkerin to show ENUM values.
+      RT#44847
+
+0.05
+    - Fixed a bug where comments on columns were not rendered correctly.
+      Reported, and patch supplied, by Dagfinn Ilmari Mannsåkerin RT#44844
+
+0.04
+    - Added Tie::IxHash to the list of requirements.  Reported by
+      Anders Nor Berle.
+    - Added documentation for the undocumented internal methods of
+      DBICx::AutoDoc.
+    - Fixed a bug in get_unique_constraints_for.
+    - Made schema_version return 1 if no version is defined.
+    - Corrected the documentation for the templates.
+    - Added missing footer to the main documentation template.
+    - Added unique constraints to the main documentation template.
+    - Factored out the comments into a separate template, for ease
+      of maintenance.
+
+0.03
+    - Added a -I option to dbicx-autodoc, so you can document schemas that
+      aren't in @INC.
+    - Fixed the argument processing for dbicx-autodoc a bit.
+    - Corrected a dumb bug in DBICx::AutoDoc->output_filename that made
+      output always go to the current directory.
+    - Added examples to the distribution, so they will show up on CPAN.
+    - Added documentation to dbicx-autodoc.
+    - Added some missing dependencies to Makefile.PL
+
+0.02
+    - Fixed the MANIFEST, first time releasing with Module::Install, and
+      the first time I used ShipIt, combined they made me break the release. :)
+    - Fixed a documentation typo
+
+0.01
+	- Initial release

@@ -1,0 +1,61 @@
+1.122720  2012-09-28 17:51:59 Europe/London
+
+  * Add skip_plugin option to remove items from @Basic bundle
+
+1.112770  2011-10-04 07:31:21 Europe/London
+
+  * Add skip_files config option for PruneFiles/match
+
+1.111980  2011-07-17 16:54:53 Europe/London
+
+  * Will this be the final skip_deps fix?
+
+1.111971  2011-07-16 17:22:11 Europe/London
+
+  * Better fix for skip_deps default value
+
+1.111970  2011-07-16 15:10:44 Europe/London
+
+  * Change skip_deps default to be empty arrayref
+
+1.110230  2011-01-23 10:11:17 Europe/London
+
+  * Rename from ::OLIVER to ::Author::OLIVER
+
+1.103640  2010-12-30 20:57:45 Europe/London
+
+  * Add skip_deps configuration option for AutoPrereqs
+
+1.103622  2010-12-28 20:45:51 Europe/London
+
+  * Add MetaJSON Plugin
+
+1.103621  2010-12-28 14:35:19 Europe/London
+
+  * Add major_version configuration option for AutoVersion major
+
+1.103620  2010-12-28 00:13:22 Europe/London
+
+  * Skip addition of POD to any file not containing ABSTRACT statement.
+
+1.103611  2010-12-27 14:12:06 Europe/London
+
+  * Fix parsing of Changes file for CommitBuild message.
+  * Update the POD
+
+1.103610  2010-12-27 13:58:18 Europe/London
+
+  * Change the commit messages to make more sense to me.
+  * Support NO_CPAN environment variable.
+
+1.103592  2010-12-25 01:00:37 Europe/London
+
+  * Switch to using MetaResourcesFromGit
+
+1.103581  2010-12-24 21:25:22 Europe/London
+
+  * Initial release on an unsuspecting CPAN.
+
+1.103580  2010-12-24 21:16:25 Europe/London
+
+  * Initial non-release on an unsuspecting world.

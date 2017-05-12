@@ -1,0 +1,51 @@
+0.014     Sat Apr 29 2017 08:07:38 PM CEST
+- convert deprecated path call to Path::Tiny
+
+0.013     Fri May 27 2016 09:29:40 PM CEST
+- Fix file uploiad on CPAN
+
+0.012     Wed May 25 2016 09:14:40 PM CEST
+- Check if sourcedir exists before trying to use it
+
+0.011     Sat Jan 30 2016 01:42:02 PM CET
+- Add IPC::Run as a dependency
+
+0.010     Fri Nov 13 2015 06:32:25 PM CET
+- Merge with Dist::Zilla::Plugin::RPM::Push
+
+0.009     Mon Sep 28 2015 08:56:39 PM CEST
+- Add the sample file, so tests can use it
+- Updated copyright_holder
+- add a note about the previous maintainer
+
+0.008     Sat Jun 6 2015 11:49:44 AM CEST
+- Various minor changes
+
+0.007     Wed Nov 14 2012 08:00:26 PM CST
+- Ensure that spec file rolled into SRPM has a filename ending in .spec
+  (for tools like mock that care about that)
+
+0.006     Wed Nov 14 2012 07:10:38 PM CST
+- Add option to build source RPM only
+
+0.005     Tue Mar 20 2012 04:19:05 PM CDT
+- Skip tests that call rpmbuild if not on system (tired of getting CPAN
+  tester fail reports from BSD platforms)
+
+0.004     Mon Mar 19 2012 08:26:00 PM CDT
+- Hide test module from PAUSE
+
+0.003     Mon Mar 19 2012 08:18:48 PM CDT
+- Fix to sample spec file doc
+- Use zilla root as base for spec_file path
+- Fixed missing parameter to mk_spec
+- Added some basic unit tests
+
+0.002     Wed Mar 14 2012 04:42:10 PM CDT
+- Added ignore_build_deps option
+- Added dzil mkrpmspec command
+- Documentation fixes
+- Dependency fixes
+
+0.001     Wed Oct 27 2011  3:57:00 PM CDT
+- Initial release

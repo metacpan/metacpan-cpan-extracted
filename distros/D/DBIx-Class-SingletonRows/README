@@ -1,0 +1,5 @@
+$Id: README,v 1.1 2008-06-17 14:54:35 cantrelld Exp $
+
+DBIx::Class::SingletonRows makes database rows returned from DBI::Class
+into singletons so that a change made to a row in one scope is immediately
+reflected everywhere else that you hold a "copy" of that row in memory.

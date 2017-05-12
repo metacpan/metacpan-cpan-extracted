@@ -1,0 +1,64 @@
+Revision history for Devel::XRay
+
+0.95    06/30/2008
+        - perlcritic updates
+            - move pod after __END__
+            - fix useless string interpolation
+            - include /s on quoted regexps and not on quoted regexp execution
+            - use strict/use warnings on tests
+        - touched up pod in a couple places
+            - use trace; should be use Devel::XRay;
+            - fixed two grammar errors
+
+0.941   11/05/2006
+        - No need to update, cpants META.yml fix, needed to update to
+          ExtUtils::MakeMaker 6.31 for META.yml update
+
+0.94    11/01/2006
+        - fix pause error
+
+0.93    11/01/2006
+        - fixed META.yaml for cpants 
+
+0.92    6/20/2006
+        - Fixed all regex
+            - was - our $all_regex = qr/(sub\s+?\w.+?{)
+            - now - our $all_regex = qr/(sub\s+\w.+?{)
+
+0.91    6/5/2006
+        - Fixed _all subroutine called (regression from renameed all)
+        - Added more tests to use skip, only, and none
+        - Fixed spelling of acknowledgements
+
+0.9     6/5/2006
+        - Renamed module Devel::XRay from trace.
+        - Added Perl Best Practices pod framework, Thanks Damian.
+        - Rewrote some of the pod so its not as cheesy
+
+0.51    5/6/2005
+	- Borked the last release.  0.5 is broken :(  Fixed the regex.
+
+0.5     5/5/2005
+        - Fixed regex not to match substr calls per RT bug #12088 
+	- Added t/01.regex.t to test regex varations 
+	  (those included in the bug and some of my own)
+	- Added new import call 'none' so it won't touch the source.
+	- Bumped version to 0.5
+	- Happy Cinco de Mayo!!
+
+0.04    8/12/2004
+        - removed Data::Dumper calls
+
+0.03    8/12/2004
+        - Stupid case insensitive OSX file system...  Time::HiRes...
+	- Also should have used 'require' instead of 'use'...  I wanted
+	  run time and NOT compile time testing of Time::HiRes :)
+
+0.02    8/12/2004
+        - Uploaded to CPAN
+	- fix grammar, spelling in pod
+	- cleaned up testing for Time::HiRes
+
+0.01    8/11/2004
+        First version, released on an unsuspecting world
+	- using Module::Starter after rjbs sold me on cool is it _going_ to be 

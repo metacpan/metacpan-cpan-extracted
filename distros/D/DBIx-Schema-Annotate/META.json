@@ -1,0 +1,86 @@
+{
+   "abstract" : "Add table schema as comment to your ORM file. This module is inspired by annotate_models.",
+   "author" : [
+      "tokubass <tokubass@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Schema-Annotate",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Inspector" : "0.03",
+            "IO::All" : "0",
+            "Smart::Args" : "0",
+            "parent" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Schema::Annotate" : {
+         "file" : "lib/DBIx/Schema/Annotate.pm",
+         "version" : "0.06"
+      },
+      "DBIx::Schema::Annotate::Driver::Base" : {
+         "file" : "lib/DBIx/Schema/Annotate/Driver/Base.pm"
+      },
+      "DBIx::Schema::Annotate::Driver::SQLite" : {
+         "file" : "lib/DBIx/Schema/Annotate/Driver/SQLite.pm"
+      },
+      "DBIx::Schema::Annotate::Driver::mysql" : {
+         "file" : "lib/DBIx/Schema/Annotate/Driver/mysql.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokubass/p5-DBIx-Schema-Annotate/issues"
+      },
+      "homepage" : "https://github.com/tokubass/p5-DBIx-Schema-Annotate",
+      "repository" : {
+         "url" : "git://github.com/tokubass/p5-DBIx-Schema-Annotate.git",
+         "web" : "https://github.com/tokubass/p5-DBIx-Schema-Annotate"
+      }
+   },
+   "version" : "0.06",
+   "x_authority" : "cpan:TOKUBASS"
+}

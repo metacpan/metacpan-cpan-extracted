@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Device/SpaceNavigator.pm
+t/00-load.t
+t/01-simulate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/test_data/buttons_off
+t/test_data/buttons_on
+t/test_data/make_test_data.pl
+t/test_data/move
+t/test_data/move_negative
+META.yml                                 Module meta-data (added by MakeMaker)

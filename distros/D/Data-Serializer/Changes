@@ -1,0 +1,366 @@
+Revision history for Perl extension Data::Serializer
+0.60 Tue Aug 20 2013
+    Move some non-critical tests from t/ to xt/ as they are not needed
+    for verifying functionality of the module, merely ensuring a clean release.
+    No changes to core Data::Serializer functionality with this release.
+
+0.59  Thr Jun  16 2011
+	XML::Simple utf8 testing disabled, looks like XML::SAX works with utf8, but XML::Parser does not
+		Recommend against using XML::Simple if you need to work with utf8 until this is resolved
+		Fixes http://rt.cpan.org/Public/Bug/Display.html?id=68871
+		Thanks to perl testers - Robert Buels rmb32@cornell.edu in particular
+
+0.58  Tue Jun  14 2011
+	- Added utf8 to the decode in the JSON deserializing code.  Fixes https://rt.cpan.org/Public/Bug/Display.html?id=68125
+		Thanks to colink@perldreamer.com for finding the bug and supplying good tests and a suggested fix and to 
+		lp@sunnyspot.org for the suggested ->utf8-> fix (which really was functionally identical to what colink recommended)
+
+0.57  Mon Jan  17 2011
+	- Updated remainder of test suite to armor against XML::Simple dependency problems that I first 
+	  attempted to fix in 0.53.  Only modified tests, no change to module code
+		Thanks to the cpantesters automated reporting for finding this.
+
+0.56  Fri Jan  14 2011
+	- Moved store/retrieve internals to Data::Serializer::Persistent (internals only)
+	  This defers the inclusion of IO::File to happen only if store or retrieve is called
+	- Added store/retireve to Data::Serializer::Raw
+
+0.55  Fri Jan  14 2011
+	- Added support for Bencode, Convert::Bencode, and Convert::Bencode_XS
+	- Documentation updates
+
+0.54  Thu Jan  13 2011
+	- Added Data::Serializer::Raw as a lightweight means of providing a unified raw access to the underlying serializers
+	  also improved caching of serializer object inside of Data::Serializer
+		Thanks to Peter Makholm <peter@makholm.net> for the profiling done by Benchmark::Serialize
+
+0.53  Mon Jan  10 2011
+	- Modified tests for XML::Simple - it has sub-dependencies on either XML::Parser or XML::SAX
+	  the test harness was posting a failure if neither of these were present.  Now it will treat XML::Simple
+	  as if it weren't installed if it is missing it's own depenencies.  This version only modifies the test harness
+	  no modification to module code.
+		Thanks to the cpantesters automated reporting for finding this.
+	
+0.52  Mon Jan   3 2011
+	- Simplfied object by removing %_internal references, base $serializer object is much simpler now.
+	  This eliminated the need for an overridden DESTROY method, and should truly fix the memory leak
+	  problem originally reported by fabrice@dulaunoy.com, essentially it was confusing the Garbage collector  (Fix Bug#39592)
+
+0.51  Wed Dec  29 2010
+	- Modified JSON deserializer to handle corrupt input (Bug#63259)
+		Thanks to neil.whelchel@gmail.com for report and patch
+
+0.50  Wed Dec  29 2010
+	- Modified dedigest function to armor against corrupt input values (Bug#63258)
+		Thanks to neil.whelchel@gmail.com for report and patch
+
+0.49  Tue Apr  15 2009
+	- Modified XML::Simple serializer to support options
+		patch supplied by John Alden <john_a_alden@hotmail.com>
+
+0.48  Tue Aug  20 2008
+	- Cleaned up DESTROY method to not undef _fields (This was my error, not the submitted patch)
+		Thanks to Dulaunoy Fabrice <fabrice@dulaunoy.com> for showing me the error of my ways
+
+0.47  Tue Aug  19 2008
+	- Added explicit DESTROY method to prevent memory leaks in long running applications with circular references
+		patch supplied by Dulaunoy Fabrice <fabrice@dulaunoy.com>
+
+0.46  Wed Apr  23 2008
+	- Fixed Module::Build implementation, will now generate proper META.yml file
+
+0.45  Wed Apr  23 2008
+	- Removed support for Tie::Transient, the module is long gone.  If ever a standard
+	  emerges for tagging data as transient then Data::Serializer will support it.  
+	- Added utf8 call to Data::Serializer::JSON 
+		patch supplied by Makamaka <makamaka@donzoko.net> in response to complex bug discussion 
+		that started under Crypt::CBC http://rt.cpan.org/Public/Bug/Display.html?id=35239 
+
+0.44  Thu Dec  13 2008
+	- Added 'raw' flag to constructor, allows for more convenient
+	  raw access to underlying serializers
+	- retrieve altered to read in full contents of file specified, this change could be disruptive
+	  if you were using retrieve in a non-standard way, so be aware of it.
+	- store and retrieve when the raw flag is set will do what you would expect
+          and store and retrieve serialized data from files in their raw underlying
+          serializer format with no Data::Serializer markup included
+	- Removed last usage of Autoloader (decided it isn't worth the irritation of keeping it)
+	- Updated Data::Serializer::Cookbook to reference the raw flag and de-emphasis the use of raw_ methods.
+
+		Thanks to Charles Gowing <charles.gowing@novainfo.com> for noticing that retrieve with portable set to 0 was quite
+                broken.  That led to revisiting the 'raw' concept and improving it.  Now does work with portable set to 0 (using raw
+		set to a true value is likely a better choice however).
+
+0.43  Wed Dec  19 2007
+	- Converted to utilizing Module::Build to support recommended options
+	- Added recommended module list
+	- Added build_requires list 
+	- Added use warnings calls to all modules
+	- Patched to support JSON 2 by Makamaka <makamaka@donzoko.net> (Thanks Makamaka!)
+	- Removed Autoloader from sub-modules 
+		-sub modules are tiny two method affairs that really don't need autosplit - and Module::Build makes it a pain
+	- Removed 'require Exporter' from sub modules, as they weren't using them in anyway (just cleaning up)
+
+0.42  Fri Oct  26 2007
+	- Added support for Compress::PPMd
+		Thanks to Strzelecki Łukasz <strzelecki@rswsystems.pl> for recommending the addition
+		as well as supplying relevant code samples.
+
+0.41  Wed May  17 2007
+	- Bowing to peer pressure and adding in the Test::Pod stuff in production, this means adding a prereq of Test::More
+	- Updated Data::Serializer::Cookbook
+	- Added an examples/ dir to the distribution
+	- put a copy of the Cookbook in the examples dir via pod2text as README
+	- Would be happy to add user submitted examples (send to neil@neely.cx)
+
+0.40  Wed May  16 2007
+        - Updated contact information to be neil@neely.cx, this is a purely cosmetic change
+
+0.39  Mon Mar  5 10:39:00 MST 2007
+	- Left "use File::Slurp" inside of Serializer.pm from some testing, removed this needless dependency
+
+0.38  Mon Mar  5 09:15:00 MST 2007
+	- Modified Data::Serializer::Storable to always use nfreeze, whether portable flag is set or not
+		Thanks to David Sepiashvili <arribapor@msn.com> for pointing out the original logic wasn't very useful
+	- Removed tests for self references in JSON::Syck, as they are no longer supported - if you try to use them with current
+	  versions of JSON::Syck it will error out.  
+		Thanks to David Cantrell <david@cantrell.org.uk> of the cpan-testers for finding this problem, and helping to track
+		it down.
+
+0.37  Wed Mar 22 11:10:52 MDT 2006
+	- Added use strict statement to Data::Serializer::Cookbook to make CPANTS happy (not really important)
+	- renamed internal transient method to be _transient (should be deprecated completely one of these days)
+        - documented compressor method (noted that it isn't currently supported, just a placeholder) 
+	- Added tests for Test::Pod and Test::Pod::Coverage - test are disabled for
+          distribution as I don't want to add a Test::More dependency to 
+          Data::Serializer at this point.
+	- Nothing important changed, so this version was not publicly released
+
+0.36  Thu Mar 16 10:10:04 MDT 2006
+	- Added support for JSON, JSON::Syck, and YAML::Syck
+
+		Thanks to Naoya Ito <naoya@bloghackers.net> for writing the patch
+		and making my job very easy.
+
+
+0.35  Wed Nov 03 07:37:31 MDT 2005
+	- Anchored token extractor
+  	  When portable was disabled, binary type data could confuse the token extractor and break
+	  the ability to deserialize data.  
+
+		Thanks to Carl Eklof <carleklof@yahoo.com> for reporting this via RT (https://rt.cpan.org/).  
+	 	and also for suggesting the fix	
+
+0.34  Mon Oct 17 12:02:04 MDT 2005
+	- Fixed Serialized scalars from Data::Dumper
+  	  Previously would only serialize scalar references, now will serialize scalars too
+
+		Thanks to Chris <clotho@cpan.org> for reporting this via RT (https://rt.cpan.org/).  
+
+0.33  Wed Sep 28 16:37:50 MDT 2005
+	- Added support for Data::Taxi
+
+	- Minor documentation changes
+	
+0.32  Tue Sep 27 15:49:45 MDT 2005
+	- Fixed bug with declaring 'options' for an underlying serializer
+	
+		Thanks to rk1990@google.com for finding and supplying the
+		patch to fix it.	
+	
+0.31  Tue Sep 27 12:10:11 MDT 2005
+	- Fixed bug in the test suite introduced in .30
+
+		Thanks to the cpan-testers for identifying this quickly
+
+0.30  Thu Sep 15 08:49:28 MDT 2005
+	- Modified call to Digest module to bring it up to current.
+	- Changed default digester to SHA-256
+
+		Thanks to Mark Shelor <mshelor@comcast.net> for sending
+		out the notice that sha1 is now considered vulnerable.
+
+	* If you explicitly want to use SHA1 that will still work, but be
+	  advised that is no longer considered secure.  This only impacts
+          serialization if you are using it with encryption.
+	  
+
+0.29  Mon Feb 07 18:42:14 MDT 2005
+	- Modified constructor to test exists rather then defined allowing 
+	  features to be disabled in the constructor.
+	- Modified deserialize to check if values are true, not just defined 
+		to enable features also fixed a bug in deserialize for tokenless 
+		deserializations where compressor was checked instead of 
+		compress to determine if the data needed to be decompressed
+	- Cleaned up a couple bugs that prevented it from compiling when 
+		autosplit was disabled
+
+		Thanks to John Alden <john.alden@bbc.co.uk> for detailed bug reports, 
+		and excellent recommendations.
+
+0.28  Mon Dec 06 13:08:42 MST 2004
+	- Test qw compatibility bug in older perl versions fixed:
+	  From the 5.6 perldelta:
+		The qw// operator is now evaluated at compile time into a true 
+		list instead of being replaced with a run time call to split(). 
+		This removes the confusing misbehavior of qw// in scalar context, 
+		which had inherited that behavior from split().
+
+	  To keep the module compatible with older version of perl the test was
+	  changed to explicitly return a list and thus circumvent this limitation
+	  of qw in older versions of perl.	
+	    Thanks to nothingmuch@woobling.org for having multiple perl versions in 
+	    the cpan testers results to make finding the compatibility problem possible.
+
+0.27  Mon Dec 06 08:51:53 MST 2004
+	- Fixed version bug in test suite
+	  Routine in test suite that tested storing to open filehandles was
+	  using open() in a fashion incompatible with earlier versions of perl.
+	  Converted it to use IO::File instead.
+	    Thanks to the cpan testers for catching this one, in particular
+	      nothingmuch@woobling.org
+
+0.26  Fri Dec 03 11:49:34 MST 2004
+	- Modified Data::Serializer::Data::Dumper 
+	  removed the '2.08' requirement from use statement, this is handled in
+	  the Makefile.PL so was redundant anyway.  Was causing problems with
+	  build in perl 5.8.6
+	    Thanks to Ian <ian@holsman.net>
+
+      Tue Oct 05 15:30:02 MST 2004
+	- Modified Data::Serializer::Storable to use nfreeze when 
+	  the portable flag is set.  This should help make the use of Storable 
+	  within Data::Serializer actually be portable when you ask it to be.
+	    Thanks to Nick Edwards <nicke@summerleaze.co.uk> for requesting the feature
+
+	-Modified Data::Serializer::Data::Dumper to handle self-references correctly.
+	 Was not correctly handling the serializing of self-referencing data structures.
+	  
+	   Thanks to Ticha <ticha@openelement.co.uk> for finding the bug, and to
+	   Gurusamy Sarathy <gsar@ActiveState.com> (Data::Dumper author) for suggesting
+	   the fix. 
+
+0.25  Sat Jun 01 06:38:13 MST 2004
+	- Fixed misbehaving sloppy reference passing in test harness.
+	  (Bug only visible in win32)  
+            Thanks to =?ISO-8859-1?Q?=22Murat_=DCnalan=22?= <muenalan@cpan.org>
+	    For debugging and providing the patch to get this to work.
+
+0.24  Sat May 29 14:22:42 MST 2004
+	- Fixed bug in new 08-Store-Retrieve.t test
+	    Now using File::Spec to correctly build path for test
+            Thanks to =?ISO-8859-1?Q?=22Murat_=DCnalan=22?= <muenalan@cpan.org>
+	    For being on the ball in catching this bug.
+
+0.23  Fri May 28 17:21:11 MST 2004
+	- Added store and retrieve functions for simple persistence
+	    Thanks to 
+	      Nick Stutterer <nick@tesbo.com>
+		and
+	      =?ISO-8859-1?Q?=22Murat_=DCnalan=22?= <muenalan@cpan.org>
+	     For requesting this useful feature.
+	- Updated cookbook persistence example
+
+0.22  Fri Mar  5 16:39:36 MST 2004
+	- Split up and organized test suite
+	- Added support for XML::Simple
+	- Created Data::Serializer::Cookbook
+
+0.21  Tue Feb 24 16:57:19 MST 2004
+	- Added support for PHP::Serializer
+	- Added support for XML::Dumper
+	- Added raw_serialize and raw_deserialize methods
+	    allows direct access to underlying serializers
+            useful to import/export data between aps that don't
+	    understand Data::Serializer (like say serialized 
+            PHP data)
+	- Added test for serializing scalars
+
+0.20  Fri Feb 13 17:32:02 MST 2004
+	- Improved test suite to test combination of features
+	- cleaned up bug in handing of 'non-portable' serialized data
+
+0.19  Fri Feb 13 14:46:30 MDT 2004
+	- Modified makefile to include dependancy on Digest::SHA1
+		Thanks (again) to Florian Helmberger <fh@laudatio.com>
+                  for finding this discrepancy.
+
+0.18  Fri Feb 13 11:17:24 MDT 2004
+	- Added support for MIME::Base64 for 'ascii armoring' serialized
+	  data.
+	- Minor modifications to pod documentation
+
+0.17  Thu Jul 11 15:10:41 MDT 2002
+	- Added support for YAML as a new serializer
+		Thanks to Florian Helmberger <fhe@inode.at> for writing 
+		  the relevant patch to do this.
+
+0.16  Tue Jul  9 08:33:46 MDT 2002
+	- Added support for Config::General as a new serializer
+ 	- Added method 'options' for passing arguments to underlying serializers
+	  currently only supported for Config::General
+	- Converted installation tests to use ExtUtils::Tbone (included)
+	- Added more robust testing of all serializers and features
+		Thanks to Thomas Linden <tom@daemon.de> who wrote a patch
+	          adding support for Config::General to Data::Serializer
+                  and for suggesting the addition of the options method
+
+0.15  Mon Jul  1 13:32:46 MDT 2002
+	- Correct Makefile.PL testing bug
+          In particular we tested for Crypt::CBC and assumed Crypt::Blowfish
+          would also be installed.  This is obviously not the case.  We do not 
+          want to force this as a dependency as encryption is a feature, not a 
+          requirement for serializing data structures.
+	    Thanks to 'Automated Perl Test Account <perl_test@logicalchaos.org>'
+  
+           
+0.14  Mon Jul  1 08:43:42 MDT 2002
+	- Corrected typo's in pod documentation
+          Thanks to Florian Helmberger <f.helmberger@uptime.at>
+
+0.13  Mon Jan 14 12:49:10 MST 2002
+        - Added support for Tie::Transient
+            Thanks to recomendation from brian moseley <bcm@maz.org>)
+
+0.12  Mon Jan 14 12:23:28 MST 2002
+        - Cleaned up installation tests
+
+0.11  Tue Jan  8 13:28:43 MST 2002
+        - Removed build dependencies for all but Data::Dumper
+            Thanks to recomendation from brian moseley <bcm@maz.org>
+
+0.10  Mon Jan  7 13:00:24 MST 2002
+        - Added Support for Data::Denter
+
+0.09  Fri Nov  2 08:14:07 2001
+	- Cleaned up documentation
+
+0.08  Mon Oct 16 07:54:32 2001
+	- Fixed bug in digest verification 
+        - Fixed 5.005_03 compatibility bug 
+            Thanks to Tatsuhiko Miyagawa <miyagawa@edge.co.jp>
+
+0.07  Wed Oct  5 11:42:20 2001
+	- changed token system to be more flexible
+	- added compression
+	- cleaned up 'portability' option
+	- updated documentation
+	- updated tests
+
+0.06  Wed Oct  4 16:27:02 2001
+	- added Encryption
+
+0.05  Wed Oct  4 14:30:13 2001
+	- added t/ tests
+
+0.04  Wed Oct  4 12:35:44 2001
+	- added documentation
+
+0.03  Wed Oct  4 11:32:10 2001
+	- added serializer_token to assist deserialization
+
+0.02  Tue Oct  3 15:32:19 2001
+	- completed generic serializer/deserializer interface
+
+0.01  Tue Oct  3 11:11:36 2001
+	- original version; created by h2xs 1.19

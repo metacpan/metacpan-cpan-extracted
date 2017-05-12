@@ -1,0 +1,24 @@
+---
+abstract: 'Tiny Dancer interface to Locale::Maketext::Lexicon'
+author:
+  - 'Marco Pessotto <melmothx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-SimpleLexicon
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: '0'
+  Locale::Maketext::Lexicon: '0'
+  perl: '5.010001'
+version: '0.01'

@@ -1,0 +1,13 @@
+:SELECT *
+:FROM 
+  bureau NATURAL JOIN
+  bureau_to_agent NATURAL JOIN
+  agent NATURAL JOIN
+  mission
+:WHERE
+  [bureau.name => &bureau_name&]
+  [agent.agent_code => &agent_code&]
+  [mission.codename => &mcode&]
+:USE NESTING
+  (set(agent(mission)(bureau)))
+//

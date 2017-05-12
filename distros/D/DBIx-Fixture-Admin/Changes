@@ -1,0 +1,53 @@
+Revision history for Perl extension DBIx-Fixture-Admin
+
+0.15 2016-11-01T02:25:18Z
+    - remove name key
+
+0.14 2016-10-27T09:02:35Z
+    - add load_all_external_fixture
+    - ignore no such fixture table
+
+0.13 2016-08-31T02:53:29Z
+    - fix null column warnings
+
+0.12 2016-08-30T03:35:49Z
+    - catch fail table operation
+
+0.11 2016-08-30T02:41:50Z
+    - fix wasteful array nest
+
+0.10 2016-08-24T03:58:18Z
+    - revert 0.09 commit... it's mistake
+
+0.09 2016-08-24T03:34:26Z
+    - sort csv key
+
+0.08 2016-07-27T07:18:07Z
+    - not include a table that does not have a fixture
+
+0.07 2016-07-26T03:10:02Z
+    - add external_fxiture
+
+0.06 2016-07-25T04:01:32Z
+    - support csv
+
+0.05 2016-07-07T08:08:16Z
+    - not create fixture file option
+    - cache Teng::Schema::Loader instance
+
+0.04 2016-06-21T07:01:29Z
+    - fix ignore table when create
+
+0.03 2016-06-21T02:56:13Z
+    - fix synopsis
+    - un require last slash for fixture path in _make_fixture_yaml
+    - skip test when no mysql
+
+0.02 2016-06-20T07:35:05Z
+    - fix README
+    - un require last slash for fixture path
+
+0.01 2016-02-29T14:05:00Z
+
+    - original version
+

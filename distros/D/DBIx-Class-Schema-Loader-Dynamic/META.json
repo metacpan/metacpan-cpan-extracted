@@ -1,0 +1,52 @@
+{
+   "abstract" : "Really Dynamic Schema Generation for DBIx::Class",
+   "author" : [
+      "Frank Carnovale <frankc@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.68, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Schema-Loader-Dynamic",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::Schema::Loader" : "0.07045",
+            "Test::Most" : "0",
+            "perl" : "5.010001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/frank-carnovale/DBIx-Class-Schema-Loader-Dynamic/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/artistic-license-2.0"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frank-carnovale/DBIx-Class-Schema-Loader-Dynamic.git",
+         "web" : "https://github.com/frank-carnovale/DBIx-Class-Schema-Loader-Dynamic"
+      }
+   },
+   "version" : "1.05"
+}

@@ -1,0 +1,212 @@
+# PODNAME: Dist::Zilla::TravisCI::MVDT
+# ABSTRACT: FAQ for Minimum Version Dependency Testing (MVDT)
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::TravisCI::MVDT - FAQ for Minimum Version Dependency Testing (MVDT)
+
+=head1 INTRODUCTION
+
+=head2 What is MVDT?
+
+MVDT stands for "Minimum Version Dependency Testing".  This is a stress test of your prereqs
+that tests the absolute lowest version of your prereqs that they said they would be able
+to use.  This includes all of those un-versioned dependencies.  If your prereqs said that
+it'll work with B<any version> of Moose, then MVDT will test using Moose 0.01.
+
+=head2 Why bother?
+
+Because your prereqs are a commitment to what versions work and what doesn't from within your
+tool.  Far too often, the prereqs end up being un-versioned, and the assumption that B<any
+version> of a module will work is typically inaccurate.
+
+Can you claim that the very first CPAN release of Moose will work just fine with your fairly
+modern module?  No, probably not.  But, that's exactly what your prereqs said, if you used
+Moose and didn't tie a version number to the C<<< use >>> command.
+
+And if the prereqs are inaccurate, you're going to get bug reports that your module doesn't
+work because of some weird error.  And it's likely going to take a lot of debugging before
+you figure out that the user should upgrade module X.
+
+=head2 Why test the lowest version?  Nobody's going to have that!
+
+Probably not, but we can't accurately say what version people will have.  What we can
+accurately say is that a certain percentage of the users will B<NOT> have the latest version.
+In fact, in most cases and especially with popular "release often" modules, a large majority
+won't.
+
+Some may have modules that are 2-5+ years old, since it came with Perl core, or came with
+the operating system's package of Perl (or some other module), or came as a dependency for
+some module they grabbed from CPAN several years ago.  You can't tell.  The only thing we
+can tell is what the prereqs recommend.
+
+=head2 Why not just use LatestPrereqs?
+
+Some users prefer to download as little from CPAN as they need to, and keep their Perl
+requirements in the same place as their OS requirements.  For example, Debian's apt system
+has thousands of Perl modules, with all of the proper requirements and dependencies, thanks
+to the L<Debian Perl Group|http://pkg-perl.alioth.debian.org/>'s work to translate those
+Perl modules to Debian packages.  This keeps OS dependencies clean and makes upgrades
+seemless.
+
+By maintaining accurate minimum prereqs, you can find a good happy medium between making sure
+your module works for the right version ranges, and not promoting overly restrictive version
+requirements.
+
+=head2 Why is this built into a CI module?
+
+Because a CI environment is the perfect testbed to install old versions of modules without
+affecting your work environment or anything else.  Travis CI is an especially good choice
+because of the way they use "throwaway VMs" and Perlbrew.
+
+=head2 Okay, I'm sold.  What am I getting into?
+
+Well, a lot, actually.  I won't lie; MVDT can be a royal PITA.  You will be going through
+a lot of cycles like this:
+
+    * Start a chainsmoke
+    * Wait for TravisCI to start and finish your testing
+    * Try to identify the offending module dep
+    * Try to figure out which version it should be elevated to
+    * Add/change the module version in your code
+    * ...repeat, repeat, repeat...
+
+However, both L<TravisYML|Dist::Zilla::Plugin::TravisYML> and this guide will try to help you
+out as much as possible.
+
+=head2 If it takes a while to get through it, it is really worth the effort?
+
+In the end, yes.  Remember that the hard part is going to be the first time you go through it.
+The real reward is B<AFTER> you finish through that initial stage and finally get a working
+PASS from Travis CI B<WITH> MVDT turned on.  You should keep MVDT on at that point, and it will
+continue to check that your code is working under the bare minimum modules.
+
+Let's say at some point you have a need for the C<<< first_index >>> function from L<List::MoreUtils>.
+Beforehand, you were just using C<<< notall >>> and C<<< uniq >>>.  So, you had your C<<< use >>> statement set to
+C<<< List::MoreUtils 0.10 >>>.  But, L<List::MoreUtils> didn't introduce C<<< first_index >>> (as an alias of
+C<<< firstidx >>>) until C<<< 0.12 >>>.
+
+However, the TravisCI chainsmoking found the problem.  (Provided that you're actually testing that
+portion of the code...)  You get the failure, fix the version problem, and catch it before it's
+released.  And that's probably one less bug report you'll get.
+
+=head1 THE PROCESS
+
+=head2 How do I start?
+
+Your first steps should be as follows:
+
+=over
+
+=item 1.
+
+B<Make sure your branch is clean and passing tests.>  We don't want to any bugs of yours
+throwing you off course.
+
+=item 2.
+
+B<Start a new topic branch!>  As indicated earlier, there will be a lot of testE<sol>change cycles.
+You're better off creating a new topic branch, like C<<< topic/mvdt >>>, rebasing the huge batch of
+commits into one, and then merging it into master.
+
+=item 3.
+
+B<Configure the TravisYML plugin.>  This also includes making sure you L<turn TravisCI on for your distro|http://about.travis-ci.org/docs/user/getting-started/>.
+
+=item 4.
+
+B<Run C<<< dzil chainsmoke --mvdt >>>.>  The C<<< chainsmoke >>> command was practically designed for MVDT.
+
+=item 5.
+
+B<Don't be impatient!>  Don't run the command more than once (until after TravisCI has finished
+and you've adjusted your code).  Remember that L<Travis CI has queues|http://travis-ci.org/>.
+This is a free service, after all.
+
+=item 6.
+
+B<Pray that it works the first time.>  (It won't.  If it does, I would question your test
+platform...)
+
+=back
+
+=head2 Okay, I found a failure.  Now what?
+
+First, identify the module.  The chances are good that the error message is of the C<<< Can't
+locate object method >>> variety.  If not, then something within the module or object will
+complain.  If you don't recognize the module as a prereq of yours, you may want to litter
+your tests with L<Devel::SimpleTrace> or similiar to ensure that the failures give you a
+full path.  Something in that path has to be the module failure point.
+
+Now, you'll need a better version to use.  Check L<BackPAN|http://backpan.perl.org/> and
+L<MetaCPAN|http://metacpan.org/>.  If you're lucky, the module doesn't have that many versions
+and you can just try the next one up.  If not, there are some ways of figure out where to
+go next:
+
+=over
+
+=item *
+
+Some module writers will clearly indicate when a method came into existence.
+L<Module::CoreList> is a good example.
+
+=item *
+
+Sometimes you can find L<various|version/DESCRIPTION> L<clues|https://metacpan.org/source/RJBS/Dist-Zilla-Plugin-Git-1.121820/lib/Dist/Zilla/Plugin/Git.pm#L19>
+showing you a pretty good idea where you should start your minimum version.
+
+=item *
+
+If it's a rather mature module, say, already into major version 2, then start at 1.00.
+
+=item *
+
+The L<MinimumPrereqs|Dist::Zilla::Plugin::MinimumPrereqs> module can at least elevate your
+requirements by year.  This will keep the modules within a certain date threshold.
+
+=item *
+
+In fact, use the whole L<@Prereqs|Dist::Zilla::PluginBundle::Prereqs> bundle.  That will also
+include L<PrereqsClean|Dist::Zilla::Plugin::PrereqsClean>, which will reduce what you actually
+need to test.
+
+=item *
+
+If all else fails, just use the L<binary search method|http://en.wikipedia.org/wiki/Binary_search_algorithm>
+and pick a version in the middle.
+
+=back
+
+Once you have your version, you actually don't need to change it within, say, the L<Prereqs|Dist::Zilla::Plugin::Prereqs>
+plugin.  Just put it in one of your C<<< use >>> statements and L<AutoPrereqs|Dist::Zilla::Plugin::AutoPrereqs>
+will pick up the change.
+
+Commit that change and re-run the C<<< chainsmoke >>> command.
+
+=head1 AVAILABILITY
+
+The project homepage is L<https://github.com/SineSwiper/Dist-Zilla-TravisCI>.
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit L<http://www.perl.com/CPAN/> to find a CPAN
+site near you, or see L<https://metacpan.org/module/Dist::Zilla::TravisCI/>.
+
+=head1 AUTHOR
+
+Brendan Byrd <bbyrd@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2015 by Brendan Byrd.
+
+This is free software, licensed under:
+
+  The Artistic License 2.0 (GPL Compatible)
+
+=cut

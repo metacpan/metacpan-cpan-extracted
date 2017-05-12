@@ -1,0 +1,19 @@
+LICENSE
+README
+Todo
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+lib/DateTime/Event/Easter.pm
+t/00load_pod.t
+t/01basic.t
+t/02match.t
+t/03preset.t
+t/04lists.t
+t/05sets.t
+t/06known.t
+t/07eastknown.t
+t/08as_span.t
+eg/rome_1944
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,17 @@
+
+	* Add SQLite driver (Mark Stosberg)
+
+	* Allow new drivers to published and used without modifying DBIx::DBH (Mark Stosberg)
+
+2004-12-01  Terrence Brannon  <terry@hcoop.net>
+
+	* changed "vendor" key to driver per Cavaletto
+
+	* added docs for form_dsn call.
+
+Revision history for Perl extension DBIx::DBH.
+
+0.01  Mon Nov 22 23:22:31 2004
+	- original version; created by h2xs 1.23 with options
+		-b 5.6.1 -A -X -n DBIx::DBH
+

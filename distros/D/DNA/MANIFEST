@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/DNA.pm
+t/DNA.t
+virus.plx
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,21 @@
+bin/packages.pl
+CHANGES
+inc/Devel/CheckLib.pm
+inc/IO/CaptureOutput.pm
+lib/Data/Structure/Util.pm
+Makefile.PL
+MANIFEST
+NINJA
+README
+t/00pod.t
+t/01compile.t
+t/02circular.t
+t/02circular_off.t
+t/03bless.t
+t/04utf8.t
+t/05refs.t
+t/06signature.t
+Util.xs
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

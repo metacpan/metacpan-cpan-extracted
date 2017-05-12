@@ -1,0 +1,60 @@
+version 0.006; 2013-09-21
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::Tzfile to
+    handle ->offset_for_local_datetime with perpetual-DST ruleset that
+    can arise with a version-3 tzfile
+
+version 0.005; 2013-09-21
+
+  * require newer version of DateTime::TimeZone::Tzfile to support
+    version-3 tzfiles
+
+version 0.004; 2013-07-14
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::Tzfile
+    which handles POSIX-TZ extension rules showing transitions occurring
+    at 24:00
+
+  * add App::olson to "see also" list
+
+  * in META.{yml,json}, change to a longer-lived URL for public git
+    repository
+
+version 0.003; 2012-03-11
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::Tzfile
+    which recognises zone disuse indicator if it comes in the form of
+    the POSIX-TZ extension rule
+
+  * require new version of DateTime::TimeZone::Tzfile which distinguishes
+    between zone disuse and missing data in its error messages
+
+  * in documentation, explicitly describe olson_country_selection()
+    rather than referring to Time::OlsonTZ::Data
+
+  * load DateTime::TimeZone::Tzfile lazily
+
+  * in META.{yml,json}, point to public git repository
+
+  * convert .cvsignore to .gitignore
+
+version 0.002; 2011-09-28
+
+  * avoid latent bug of passing magic variables $1 et al into functions
+    where in the future they might unexpectedly change value
+
+  * require new version of DateTime::TimeZone::Tzfile which provides
+    better error messages
+
+version 0.001; 2011-04-11
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::Tzfile
+    (for reading tzfiles in binary mode)
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.000; 2010-08-31
+
+  * initial released version

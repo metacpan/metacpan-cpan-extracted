@@ -1,0 +1,568 @@
+NAME
+    DBD::PgLite - PostgreSQL emulation mode for SQLite
+
+SUMMARY
+      use DBI;
+      my $dbh = DBI->connect('dbi:PgLite:dbname=file');
+      # The following PostgreSQL-flavoured SQL is invalid 
+      # in SQLite directly, but works using PgLite
+      my $sql = q[
+        SELECT
+          news_id, title, cat_id, cat_name, sc_id sc_name,
+          to_char(news_created,'FMDD.FMMM.YYYY') AS ndate
+        FROM
+          news
+          NATURAL JOIN x_news_cat
+          NATURAL JOIN cat
+          NATURAL JOIN subcat
+        WHERE
+          news_active = TRUE
+          AND news_created > NOW() - INTERVAL '7 days'
+      ];
+      my $res = $dbh->selectall_arrayref($sql,{Columns=>{}});
+      # From v. 0.05 with full sequence function support
+      my $get_nid = "SELECT NEXTVAL('news_news_id_seq')";
+      my $news_id = $dbh->selectrow_array($get_nid);
+
+DESCRIPTION
+    The module automatically and transparently transforms a broad range of
+    SQL statements typical of PostgreSQL into a form suitable for use in
+    SQLite. This involves both (a) parsing and filtering of the SQL; and (b)
+    the addition of several PostgreSQL-compatible functions to SQLite.
+
+    Mainly because of datatype issues, support for many PostgreSQL features
+    simply cannot be provided without elaborate planning and detailed
+    metadata. Since this module is intended to be usable with any SQLite3
+    database, it follows that the emulation is limited in several respects.
+    An overview of what works and what doesn't is given in the following
+    section on PostgreSQL Compatibility.
+
+    DBD::PgLite has support of a sort for stored procedures. This is
+    described in the Extras section below. So are the few database functions
+    defined by this module which are not in PostgreSQL. Finally, the Extras
+    section contains a brief mention of the DBD::PgLite::MirrorPgToSQLite
+    companion module.
+
+    If you do not want SQL filtering to be turned on by default for the
+    entire session, you can connect setting the connection attribute
+    *FilterSQL* to a false value:
+
+      my $dbh = DBI->connect("dbi:PgLite:dbname=$fn",
+                             undef, undef, {FilterSQL=>0});
+
+    To turn filtering off (or on) for a single statement, you can specify
+    *FilterSQL* option as a statement attribute, e.g.:
+
+      $dbh->do($sql, {FilterSQL=>0}, @bind);
+      my $sth = $dbh->prepare($sql, {FilterSQL=>0});
+      $res = $dbh->selectall_arrayref($sql, {FilterSQL=>0}, @bind);
+
+    It is possible to specify user-defined pre- and postfiltering routines,
+    both globally (by specifying them as attributes of the database handle)
+    and locally (by specifying them as statement attributes):
+
+      $dbh = DBI->connect("dbi:PgLite:$file",undef,undef,
+                          {prefilter=>\&prefilter});
+      $res = $dbh->selectall_arrayref($sql,
+                                      {postfilter=>\&postfilter},
+                                      @bind_values);
+
+    The pre-/postfiltering subroutine receives the SQL as parameter and is
+    expected to return the changed SQL.
+
+STATUS OF THE MODULE
+    This module was initially developed using SQLite 3.0 and PostgreSQL 7.3,
+    but it should be fully compatible with newer versions of both SQLite
+    (3.1 and 3.2 have been tested) and PostgreSQL (8.1 has been tested).
+
+    Support for SELECT statements and the WHERE-conditions of DELETE and
+    UPDATE statements is rather good, though still incomplete. The module
+    especially focuses on NATURAL JOIN differences and commonly used,
+    built-in PostgreSQL functions.
+
+    Support for inserted/updated values in INSERT and UPDATE statements
+    could use some improvement but is useable for simple things.
+
+    There is no support for differences in DDL.
+
+    The SQL transformations used are not based on a formal grammar but on
+    applying simple regular expressions. An obvious consequence of this is
+    that they may depend excessively on the author's SQL style. YMMV. (I
+    would however like you to contact me if you come across some SQL
+    statements which you feel should work but that don't).
+
+    The development of this module has been driven by personal needs, and so
+    is likely to be even more one-sided than the above description suggests.
+
+POSTGRESQL COMPATIBILITY
+    In this section, the PostgreSQL functions and operators supported by the
+    module are enumerated.
+
+  Regex operators
+    *   The regex operators "~", "~*", "!~" and "!~*" are transformed into
+        calls to the user-defined function matches(). The regex flavour
+        supported is Perl, not plain vanilla POSIX, so some
+        incompatibilities may arise.
+
+    *   Note that for ease of parsing, whitespace before and after the
+        operator is required for the filtering to succeed. So "col ~ 'pat'"
+        works, but "col~'pat'" doesn't.
+
+    *   "SIMILAR TO" is not supported.
+
+    *   ILIKE is quietly changed to LIKE. LIKE in SQLite is case-insensitive
+        for 7-bit characters. In future, ILIKE will probably be handled more
+        elegantly, and LIKE will be redefined so as to be more like
+        PostgreSQL.
+
+  Math Functions
+    *   Added: abs, cbrt, ceil, degrees, exp, floor, ln, log (1- and
+        2-argument forms), mod, pi, pow, radians, sign, sqrt, trunc (1- and
+        2-argument forms), acos, asin, atan, atan2, cos, cot, sin, tan.
+
+    *   random() exists in SQLite but was redefined to conform better with
+        PostgreSQL in terms of value range. setseed() was also added, but is
+        not entirely compatible with PostgreSQL in the sense that setting
+        the random seed does not engender the same sequence of pseudo-random
+        numbers as it would in PostgreSQL.
+
+    *   SQLite already has a handful of mathematical functions which have
+        been left alone, notably round() (1- and 2-argument forms).
+
+  String Functions
+    The only string functions which are present natively in SQLite are
+    substr(), lower() and upper(). These have been left alone. Added
+    functions are the following:
+
+    *   ascii, bit_length, btrim, char_length, character_length, chr,
+        convert (1- and 2-arg), decode, encode, initcap, length, lpad,
+        ltrim, md5, octet_length, position, pg_client_encoding (always
+        'SQL_ASCII'), quote_ident, quote_literal, repeat, replace, rpad,
+        rtrim, split_part, strpos, substring(string,offset,length),
+        substring(string from pattern), to_ascii (assumes latin-1 input),
+        to_hex, translate, trim.
+
+    Except for convert(), where another input encoding can be specified
+    explicitly, these functions all assume that the strings are in an 8-bit
+    character set, preferably iso-8859-1.
+
+    The little-used idiom "substring(string from pattern for escape)" (where
+    'pattern' is not a POSIX regular expression but a SQL pattern) is not
+    supported. Otherwise support for string functions is pretty complete.
+
+  Data Type Formatting Functions
+    The implementation of these functions is impeded by the sparse type
+    system employed by SQLite. Workarounds are possible, however, so this
+    area will probably be better covered in future.
+
+    *   to_char(timestamp, format) is mostly supported. There is support for
+        most formatting strings (all except 'Y,YYY', 'IYYY', 'IYY', 'IY',
+        'I', 'J', 'TZ', and 'tz'). The FM prefix is supported for 'MM', 'DD'
+        and 'HH*', but not otherwise. Other prefixes are not supported.
+
+    *   to_char(interval, format) and to_char(number, format) are not
+        currently supported. Nor are to_date(), to_timestamp() and
+        to_number() (yet).
+
+  Date/Time Functions
+    Again, SQLite's intrinsically bad support for dates and intervals makes
+    this area somewhat hard to cover properly. Function support is as
+    follows; also note the caveats below:
+
+    *   Supported: now, current_date, current_time, current_datetime,
+        date_part (with timestamps, not intervals), date_trunc, extract
+        (with timestamps, not intervals), localtime, localtimestamp,
+        timeofday.
+
+    *   Not supported: age, isfinite, overlaps.
+
+    Versions of SQLite 3.1 and later support some of these functions, e.g.
+    current_date. In these versions the built-in will be overridden.
+
+    The module makes no distinction between time/timestamp with and without
+    time zone. It is assumed that times and timestamps are either all GMT or
+    all localtime; time zone information is silently discarded. This may
+    change later.
+
+    Support for calculations with dates and intervals is still very limited.
+    Basically, what is supported are expressions of the form "expr +/-
+    interval 'descr'" where expr reduces to a timestamp or date value.
+
+    If a transaction is started with begin_work(), the time as represented
+    by now() and friends is "frozen" in the same way as in PostgreSQL until
+    commit() or rollback() are called. A transaction started by simply
+    running the SQL statement "BEGIN" does not, however, trigger this
+    behaviour. Nor is the time automatically "unfrozen" when an error occurs
+    during a transaction; you need to catch exceptions and call rollback()
+    manually.
+
+  Sequence Manipulation Functions
+    *   There is now full support for all explicit invocations of the
+        sequence functions nextval(), setval(), currval() and lastval().
+        Sequences are emulated using the table pglite_seq. (This works even
+        with multiple connections to the same database file, some of which
+        are using transactions, since SQLite transactions lock the whole
+        database file, luckily eliminating any risk of two connections
+        getting the same value from a nextval() call).
+
+        Please be aware that sequences are autogenerated if they do not
+        exist. Be careful to specify the appropriate sequence names or you
+        will get unexpected results.
+
+        If a sequence being autogenerated ends with '_seq' and has a name
+        which seems to match an existing table + an integer column from that
+        table (tablename_colname_seq), it is given an initial value based on
+        the maximum value in the column in question.
+
+        There is as yet no support for CREATE SEQUENCE statements. Use the
+        autogeneration feature to create sequences.
+
+        Implicit calls to NEXTVAL() by omitting the serial column from the
+        column list in an INSERT are caught in most cases. The main
+        conditions that must be fulfilled for this to work are: (1) that the
+        column in question is an integer column which is the sole primary
+        key on the table; and (2) that the statement is a normal INSERT with
+        a column list and a VALUES clause (and not, e.g., a statement of the
+        form INSERT INTO x SELECT * FROM y).
+
+        There is as yet no interaction with the SQLite builtin
+        autoincrement/last_insert_rowid() functionality in connection with
+        the sequence function support.
+
+  Aggregate Functions
+    *   max(), min(), count() and sum() are already supported by SQLite and
+        have been left alone. Note that the construct "count(distinct
+        colname)" is not supported unless the SQLite version being used
+        supports it (3.2.6 and later).
+
+    *   avg() has been added.
+
+    *   stddev() and variance() are not supported.
+
+  A Note on Casting
+    Casting using the construct "::datatype" is not supported in general.
+    However, "::int", "::date" and "::bool" should work as expected. All
+    other casts are silently discarded.
+
+  A Note on Booleans
+    This module assumes that booleans will be stored as numeric values in
+    the SQLite database. SQLite interprets 0 as false and any non-zero
+    numeric value as true. Accordingly, expressions such as "= TRUE" and "=
+    't'" are simply removed in SELECT and DELETE statements. Likewise, "expr
+    = FALSE" is turned into "NOT expr" before being passed on to SQLite.
+
+    In INSERT and DELETE statements, TRUE and FALSE (as well as 't'::bool
+    and 'f'::bool - but not 't' and 'f' by themselves) are turned into 1 and
+    0.
+
+  Current_user etc.
+    The functions current_user(), session_user() and user() - with or
+    without parentheses - all mean the same thing. They return the username
+    of the effective uid.
+
+  Other Functions
+    The main groups of other functions (not supported by this module at all)
+    are:
+
+    *   Database/user information functions: Aside from
+        current_user/session_user/user, which were mentioned above, no
+        functions in this group are supported. This includes
+        current_database(), current_schema(), all functions with names
+        starting with 'pg_' and 'has_', obj_description and col_description.
+        See
+        http://www.postgresql.org/docs/current/static/functions-misc.html
+
+    *   Array functions are not implemented - see
+        http://www.postgresql.org/docs/current/static/functions-array.html
+
+    *   Binary string (BYTEA) functions are not implemented - see
+        http://www.postgresql.org/docs/current/static/functions-binarystring
+        .html
+
+    *   Geometric functions are not implemented - see
+        http://www.postgresql.org/docs/current/static/functions-geometry.htm
+        l
+
+    *   Network Address Functions are not implemented - see
+        http://www.postgresql.org/docs/current/static/functions-net.html
+
+EXTRAS
+  Stored Procedures
+    If the active database file contains a table called pglite_functions,
+    the module assumes that it will have the following structure:
+
+      CREATE TABLE pglite_functions (
+        name   TEXT,   -- name  of the function
+        argnum INT,    -- number of arguments (-1 means any number)
+        type   TEXT,   -- can be 'sql' or 'perl'
+        sql    TEXT,   -- the body of the function
+        PRIMARY KEY (name, argnum)
+      );
+
+    In the case of a SQL-type function, it can contain syntax supported
+    through the module (and not directly by SQLite). The numeric arguments
+    ($1-$9) customary in PostgreSQL are supported, so that in many cases
+    simple functions will be directly transferrable from pg_proc in a
+    PostgreSQL database.
+
+    An instance of a SQL snippet which would work as a function body both in
+    PostgreSQL and PgLite (e.g. with the function name 'full_price_descr'):
+
+      SELECT TRIM(group_name||': '||price_description) 
+        FROM price_group NATURAL JOIN price 
+        WHERE price_id = $1
+
+    As for perl-type functions, the function body is simply the text of a
+    subroutine. Here is a simple example of a function body for the function
+    'commify', which takes two arguments: the number to be formatted and the
+    desired number of decimal places:
+
+      sub { 
+        my ($num,$dp) = @_;
+        my $format = "%.${dp}f";
+        $num = scalar reverse(sprintf $format, $num);
+        my $rest = $1 if $num =~ s/^(\d+)\.//;
+        $num =~ s/(...)/$1,/g;
+        $num = "$rest.$num" if $rest;
+        return scalar reverse($num);
+      }
+
+  Non-Pg Functions
+    matches(), imatches():
+        These functions are used behind the scenes to implement support for
+        the '~' regex-matching operator and its variants. They take two
+        arguments, a string and a regular expression. matches() is case
+        sensitive, imatches() isn't.
+
+    matches_safe(), imatches_safe():
+        These work in the same way as matches() and imatches() except that
+        metacharacters are escaped in the regex argument. They are therefore
+        in many cases more suitable for user input and other untrusted
+        sources.
+
+    lower_latin1():
+        Depending on platform, lower() and upper() may not transform the
+        case of non-ascii characters despite a proper locale being defined
+        in the environment. This functions assumes that a Latin-1 locale is
+        active and returns a lower-case version of the input given this
+        assumption.
+
+    localeorder():
+        DBD::SQLite does not provide access to defining SQLite collation
+        functions. This is a workaround for a specific case where this
+        limitation can be an issue. Given a Latin-1 encoded string, it
+        returns a string of hex digits which can be ascii-sorted in the
+        ordinary way. The resulting row order will be in accordance with the
+        currently active locele - but only if the locale is Latin-1 based.
+        The sort is case-insensitive.
+
+    locale():
+        An information function simply returning the name of the current
+        locale. The module sets the locale based on the environment
+        variables $ENV{LC_COLLATE}, $ENV{LC_ALL}, $ENV{LANG}, and
+        $ENV{LC_CTYPE}, in that order. Currently it is not possible to use
+        different locales for character type and collation, as far as the
+        module is concerned.
+
+  DBD::PgLite::MirrorPgToSQLite
+    The companion module, DBD::PgLite::MirrorPgToSQLite, may be of use in
+    conjunction with this module. It can be used for easily mirroring
+    specific tables from a PostgreSQL database, moving views and (some)
+    functions as well if desired.
+
+CAVEATS
+    Some functions defined by the module are not suitable for use with UTF-8
+    data and/or in an UTF-8 locale. (This, however, would be rather easy to
+    change if you're willing to sacrifice proper support for 8-bit locales
+    such as iso-8859-1).
+
+    Please do not make the mistake of using this module for an important
+    production system - too much can go wrong. But as a development tool it
+    can be useful, and as a toy it can be fun...
+
+TODO
+    There is a lot left undone. The next step is probably to handle
+    non-SELECT statements better.
+
+SEE ALSO
+    DBI, DBD::SQLite, DBD::Pg, DBD::PgLite::MirrorPgToSQLite;
+
+THANKS TO
+    Johan Vromans, for encouraging me to improve the sequence support.
+
+AUTHOR
+    Baldur Kristinsson (bk@mbl.is), 2006.
+
+     Copyright (c) 2006 Baldur Kristinsson. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+
+===================================
+NAME
+    DBD::PgLite::MirrorPgToSQLite - Mirror tables from PostgreSQL to SQLite
+
+SUMMARY
+     use DBD::PgLite::MirrorPgToSQLite qw(pg_to_sqlite);
+     pg_to_sqlite(
+         sqlite_file => '/var/pg_mirror/news.sqlite',
+         pg_dbh      => $dbh,
+         schema      => 'news',
+         tables      => [ qw(news cat img /^x_news/)],
+         views       => [ 'v_newslist' ],
+         indexes     => 1,
+         verbose     => 1,
+         snapshot    => 1,
+     );
+
+USAGE
+    The purpose of this module is to facilitate mirroring of tables from a
+    PostgreSQL dataabse to a SQLite file. The module has only be tested with
+    PostgreSQL 7.3 and SQLite 3.0-3.2. SQLite 2.x will probably not work; as
+    for PostgreSQL, any version after 7.2 is supposed to work. If it
+    doesn't, please let me know.
+
+    As seen above, options to the pg_to_sqlite() function (which is exported
+    on request) are passed in as a hash. These options are described below.
+    The default values can be changed by overriding the
+    DBD::PgLite::MirrorPgToSQLite::defaults() subroutine.
+
+  Required options
+    Obviously, the mirroring function needs either a PosgtgreSQL database
+    connection or enough information to be able to connect to the database
+    by itself. It also needs the name of a target SQLite file, and a list of
+    tables to copy between the two databases.
+
+    pg_dbh, pg_user, pg_pass, pg_dsn
+        If a database handle is specified in *pg_dbh*, it takes precedence.
+        Otherwise we try to connect using *pg_dsn*, *pg_user*, and *pg_pass*
+        (which are assigned defaults based on the environment variables
+        PGDATABASE, PGUSER and PGPASSWORD, if any of these is present).
+
+    tables
+        The value of the required *tables* option should be an arrayref of
+        strings or a string containing a comma-separated list of tablenames
+        and tablename patterns. A tablename pattern is a string or distinct
+        string portion delimited by forward slashes. To clarify: Suppose
+        that a database contains the tables news, img, img_group, cat,
+        users, comments, news_read_log, x_news_cat, x_news_img, and
+        x_img_group; and that we want to mirror news, img, cat, x_news_img
+        and x_news_cat, leaving the other tables alone. To achieve this, you
+        would set the *tables* option to any of the following (there are of
+        course also other possibilities):
+
+         (1) [qw(news img cat x_news_img x_news_cat)]
+         (2) 'news, img, cat, x_news_img, x_news_cat'
+         (3) [qw(news /img$/ /cat$/)]
+         (4) 'news,/img$/,/cat/'
+
+        The purpose of this seemingly unneccesary flexibility in how the
+        table list is specified is to make the functionality of the module
+        more easily accessible from the command line.
+
+        Please note that the patterns between the slash delimiters are not
+        Perl regular expressions but rather POSIX regular expressions, used
+        to query the PostgreSQL system tables directly.
+
+    sqlite_file
+        This should specify the full path to a SQLite file. While the
+        mirroring takes place, the incoming data is not written directly to
+        this file, but to a file with the same name except for a '.tmp'
+        extension. When the operation has finished, the previous file with
+        the name specified (if any) is renamed with a '.bak' extension, and
+        the .tmp file is renamed to the requested filename. Unless you use
+        the *append* option, the information previously in the file will be
+        totally replaced.
+
+  Other options
+    schema
+        This signifies the schema from which the tables on the PostgreSQL
+        side are to be fetched. Default: 'public'. Only one schema can be
+        specified at a time.
+
+    where
+        A WHERE-condition appended to the SELECT-statement used to get data
+        from the PostgreSQL tables.
+
+    views
+        A list of views, specified in the same manner as the list of tables
+        for the *tables* option. An attempt is made to define corresponding
+        views on the SQLite side (though this functionality is far from
+        reliable).
+
+    indexes
+        A boolean option indicating whether to create indexes for the same
+        columns in SQLite as in PostgreSQL. Default: false. (Normally only
+        the primary key is created).
+
+    functions
+        A boolean indicating whether to attempt to create functions on the
+        SQLite side corresponding to any SQL language (NOT PL/pgSQL or other
+        procedural language) functions in the PostgreSQL database. This is
+        for use with DBD::PgLite only, since these functions are put into
+        the pglite_functions table. Default: false.
+
+    page_limit
+        Normally the information from the PostgreSQL tables is read into
+        memory in one go and transferred directly to the SQLite file. This
+        is, however, obviously not desireable for very large tables. If the
+        PostgreSQL system tables report that the page count for the table is
+        above the limit specified by *page_limit*, the table is instead
+        transferred row-by-row. Default value: 5000; since each page
+        normally is 8K, this represents about 40 MB on disk and perhaps
+        70-100 MB of memory usage by the Perl process. For page_limit to
+        work, the table must have a primary key.
+
+        NB! Do not set this limit lower than necessary: it is orders of
+        magnitude slower than the default "slurp into memory" mode.
+
+    append
+        If this boolean option is true, then instead of creating a new
+        SQLite file, the current contents of the *sqlite_file* are added to.
+        If a table which is being mirrored existed previously in the file,
+        it is dropped and recreated, but any tables not being copied from
+        PostgreSQL in the current run are left alone. (This is primarily
+        useful for mirroring some tables in toto, and others only in part,
+        into the same file). Default: false. Incompatible with the
+        *snapshot* option.
+
+    snapshot
+        If this is true, then the copying from PostgreSQL takes place in
+        serialized mode (transaction isolation level serializable), which
+        should ensure consistency of relations between tables linked by
+        foreign key constraints. Currently, foreign keys are not created on
+        the SQLite side, however. Default: false. Incompatible with the
+        *append* option.
+
+    cachedir
+        The current method for getting information about table structure in
+        PostgreSQL is somewhat slow, especially for databases with very many
+        tables. To offset this, table definitions are cached in a temporary
+        directory so that subsequent mirrorings of the same table will go
+        faster. The downside is, of course, that if the table structure
+        changes, the cache needs to be cleared manually. The cache directory
+        can be specified using this option; the default is
+        /tmp/sqlite_mirror_cache (with separate subdirectories for each
+        user).
+
+    verbose
+        If this is true, a few messages will be output to stderr during the
+        mirroring process.
+
+TODO
+    *   Support for foreign keys is missing.
+
+    *   The method used to read tables bigger than *page_limit* needs to be
+        improved.
+
+    *   It would be nice to have a quick way of telling whether the cached
+        table definition of a specific table is still valid.
+
+    *   Tests.
+
+AUTHOR
+    Baldur Kristinsson (bk@mbl.is), 2004-2006.
+
+     Copyright (c) 2006 Baldur Kristinsson. All rights reserved.
+     This program is free software; you can redistribute it and/or
+     modify it under the same terms as Perl itself.
+

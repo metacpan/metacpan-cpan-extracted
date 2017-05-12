@@ -1,0 +1,20 @@
+Changes
+example/DBI.pm.fake
+example/expected_output.html
+example/output.html
+example/page.pl
+example/template.html
+lib/Data/Page/Pagination.pm
+MANIFEST			This list of files
+META.json
+perltidy.ERR
+README
+t/01_basics.t
+t/02_test_example.t
+t/chars.t
+t/perl_critic.t
+t/pod.t
+t/pod_coverage.t
+t/prereq_build.t
+Makefile.PL
+META.yml

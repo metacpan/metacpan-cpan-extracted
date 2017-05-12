@@ -1,0 +1,11 @@
+Build.PL
+Changes
+lib/DateTimeX/Period.pm
+MANIFEST			This list of files
+LICENSE
+t/00-Load.t
+t/01-Periods.t
+t/10-get_start-get_end.t
+t/11-Boundary.t
+t/30-DST.t
+t/90-bug-1.t

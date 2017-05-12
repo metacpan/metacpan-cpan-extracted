@@ -1,0 +1,16 @@
+Source: libstrange-perl
+Section: perl
+Priority: optional
+Maintainer: Joe Maintainer <joemaint@test.local>
+Build-Depends: debhelper (>= 9)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.6
+Homepage: https://metacpan.org/release/Strange
+
+Package: libstrange-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Perl extension for blah blah blah
+ (no description was found)
+ .
+ This description was automagically extracted from the module by dh-make-perl.

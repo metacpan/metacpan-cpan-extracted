@@ -1,0 +1,3 @@
+.git
+^MYMETA.yml$
+Date-Period-Human-.*\.tar\.gz

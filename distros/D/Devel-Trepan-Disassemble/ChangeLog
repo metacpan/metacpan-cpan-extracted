@@ -1,0 +1,264 @@
+2015-11-24  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm: Get ready for release 2.0.2
+
+2015-11-24  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	t/data/disasm2.cmd: Fix and revise --highlight options.
+	Revise/improve help text.
+
+2015-11-22  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: Default
+	disassemble (no options) is from current line to line + listsize
+
+2015-11-17  rocky <rocky@cpan.org>
+
+	* META.json, META.yml, README.md: Add travis badge
+
+2015-11-17  rocky <rocky@cpan.org>
+
+	* Build.PL, ChangeLog,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm: Add -from -to for tree formats
+
+2015-11-12  rocky <rocky@cpan.org>
+
+	* t/data/disasm2.cmd, t/data/disassemble.cmd: Tests need to be
+	explicit about which format to use
+
+2015-11-12  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm, t/00load.t: 
+	Disassemble.pm: default line style is terse now. Don't need eval
+	anymore. 00load.t: stupid cut-and-paste mistakes
+
+2015-10-31  rocky <rocky@cpan.org>
+
+	* README.md: Revise
+
+2015-10-31  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: Ensure
+	$marked is initialized
+
+2015-10-31  rocky <rocky@cpan.org>
+
+	* META.json, META.yml,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: Improve
+	current-position marker for tree display
+
+2015-10-31  rocky <rocky@cpan.org>
+
+	* ChangeLog, Changes, lib/Devel/Trepan/Disassemble.pm: Get ready for
+	2.0.0
+
+2015-10-31  rocky <rocky@cpan.org>
+
+	* .travis.yml, Build.PL, ChangeLog, META.json, META.yml,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm, t/data/disasm2.right,
+	t/data/disassemble.right: Colorize tree and terse formats. Redo how
+	we mark current line in line via Devel::Callsite and its requirement
+	in Devel::trepan 0.70. Try travis.
+
+2014-05-15  rocky <rocky@cpan.org>
+
+	* Build.PL, ChangeLog, Changes, lib/Devel/Trepan/Disassemble.pm,
+	t/20test-disassemble.t: Upgrade in Devel::Trepan has caused tests to
+	fail. Get ready for release 1.99
+
+2014-05-09  rocky <rocky@cpan.org>
+
+	* : commit 6690fc37e102e6acd43f605a3fc533c44f5c9fb4 Author: rocky
+	<rocky@cpan.org> Date:   Fri May 9 22:45:44 2014 -0400
+
+2013-06-14  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20test-disassemble.t: Small module name typo in comment
+
+2013-06-12  rocky <rocky@cpan.org>
+
+	* Changes, GNUmakefile, META.json, META.yml, t/data/disasm2.right: 
+	Get ready for release 1.9
+
+2013-06-11  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm: Get ready For 1.9 release
+
+2013-01-06  rocky <rocky@cpan.org>
+
+	* gpl-2.0.txt, t/20test-disassemble.t: Forgot to include gpl file.
+	Small commented-out code typo.
+
+2012-12-25  rocky <rocky@cpan.org>
+
+	* : commit 3159d517c1f6a724960b67133d456b27bfca3303 Author: rocky
+	<rocky@cpan.org> Date:   Tue Dec 25 06:46:04 2012 -0500
+
+2012-12-21  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20test-disassemble.t: Less testing if we have B::Concise < 0.83
+
+2012-12-18  rocky <rocky@cpan.org>
+
+	* Build.PL, ChangeLog, Changes, META.json, META.yml,
+	lib/Devel/Trepan/Disassemble.pm, t/data/disasm2.right,
+	t/data/disassemble.right: Get ready for 1.8 release.
+
+2012-10-24  Rocky Bernstein <rocky@cpan.org>
+
+	* t/20test-disassemble.t: See above
+
+2012-10-24  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Devel/Trepan/Disassemble.pm, t/20test-disassemble.t: 
+	20test-disassemble.t: deal with customized Perl's. Build.PL Need
+	Devel::Trepan 0.46 or better. Disassemble.pm: bump version
+
+2012-10-20  rocky <rocky@cpan.org>
+
+	* Changes, lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm: Add -from and -to options to allow
+	limiting output. Get ready for release.
+
+2012-10-20  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: Remove
+	schmutz
+
+2012-10-20  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: Default
+	value of highlight should come from current
+	Devel::Trepan::CmdProcessor setting.
+
+2012-10-20  rocky <rocky@cpan.org>
+
+	* MANIFEST, lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm, t/10test-cmd-complete.t,
+	t/10test-opflags.t, t/Makefile, t/data/disasm2.right,
+	t/data/disassemble.right: Show interpretation of flag bits in -basic
+
+2012-09-18  rocky <rocky@cpan.org>
+
+	* Build.PL, Changes, MANIFEST, META.json, META.yml,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm, t/20test-disassemble.t,
+	t/data/disasm2.cmd, t/data/disasm2.right, t/data/disassemble.right: 
+	Replace source-code line strings -n "-e" invocation, removing
+	"BUGS". Add another test.
+
+2012-09-18  rocky <rocky@cpan.org>
+
+	* Build.PL, lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: 
+	Build.PL: Require Devel::Callsite >= 0.05 and Devel::Trepan version
+	>= 0.40 Disassemble.pm: reset "Here DOC and inside string status".
+
+2012-09-17  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	t/20test-disassemble.t, t/data/disassemble.cmd,
+	t/data/disassemble.right: Add breakpoints in display and colorize
+	source lines and OPS in basic format
+
+2012-09-17  Rocky Bernstein <rocky@cpan.org>
+
+	* Build.PL, lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm: 
+	Start colorizing and marking output. Update Build.PL
+
+2012-08-19  rocky <rocky@cpan.org>
+
+	* Changes, lib/Devel/Trepan/Disassemble.pm: Get ready for release
+	1.4
+
+2012-08-18  rocky <rocky@cpan.org>
+
+	* Build.PL, t/Helper.pm, t/data/disassemble.right: Revise for
+	current Devel::Trepan output
+
+2012-05-28  rocky <rocky@cpan.org>
+
+	* Build.PL, META.json, META.yml: Test::More -> Test::Simple and make
+	it a test-only dependency.
+
+2012-05-27  rocky <rocky@cpan.org>
+
+	* ChangeLog, Changes, lib/Devel/Trepan/Disassemble.pm: Get ready for
+	release 1.3
+
+2012-05-27  rocky <rocky@cpan.org>
+
+	* .gitignore, Build.PL, t/20test-disassemble.t, t/Helper.pm: Redo
+	test so we don't use trepan.pl but instead use only the
+	Devel::Trepan module. We don't know what file we will find with
+	trepan.pl. But we can make sure we get the right stuff uing
+	Devel::Trepan and the right Perl.
+
+2012-05-26  rocky <rocky@cpan.org>
+
+	* META.json, META.yml: Adminstrivia
+
+2012-05-26  rocky <rocky@cpan.org>
+
+	* lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	t/20test-disassemble.t, t/data/disassemble.right: Deal with opcode
+	variations we might get on different systems
+
+2012-05-26  Rocky Bernstein <rocky@cpan.org>
+
+	* ChangeLog: Update ChangeLog
+
+2012-05-26  Rocky Bernstein <rocky@cpan.org>
+
+	* Changes, MANIFEST, META.json, META.yml, example/five.pm,
+	lib/Devel/Trepan/Disassemble.pm, t/20test-disassemble.t,
+	t/20test-disassemble.try, t/data/disassemble.right: Get ready for
+	release 1.2
+
+2012-05-25  rocky <rocky@cpan.org>
+
+	* META.json, META.yml, lib/Devel/Trepan/Disassemble.pm: Typo
+
+2012-05-25  rocky <rocky@cpan.org>
+
+	* : commit a43c3b7e62b947fc3f9ca6921cdc043e8cbbcea0 Author: rocky
+	<rocky@cpan.org> Date:   Fri May 25 16:57:05 2012 -0400
+
+2012-05-22  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, MYMETA.json, MYMETA.yml,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm: Remove Perl5.16 defined(@array)
+	deprecation. Bump version, and avoid DEFAULT_OPTIONS getting defined
+	twice.
+
+2012-01-16  rocky <rocky@cpan.org>
+
+	* Build.PL, MANIFEST, MYMETA.json, MYMETA.yml,
+	lib/Devel/Trepan/Disassemble.pm: Administrivia: version number
+	futzing.
+
+2012-01-16  rocky <rocky@cpan.org>
+
+	* ChangeLog, Changes, MANIFEST, MYMETA.json, MYMETA.yml: Get ready
+	for release 1.0
+
+2012-01-06  Rocky Bernstein <rocky@cpan.org>
+
+	* .gitignore, Build.PL, MANIFEST,
+	lib/Devel/Trepan/CmdProcessor/Command/Disassemble.pm,
+	lib/Devel/Trepan/Disassemble.pm, t/10test-cmd-complete.t,
+	t/data/.gitignore: Allow disassembly of main or packages. Fix
+	completion using cmddir option. This broke when Disassembly was
+	split off.
+
+2012-01-01  Rocky Bernstein <rocky@cpan.org>
+
+	* Moved "disassemble" command of Devel::Trepan to here, a separate
+	package.
+

@@ -1,0 +1,42 @@
+Revision history for Dancer2-Debugger
+
+0.008 Tue  4 Oct 17:48:16 CEST 2016
+
+    * Add injector_ignore_status attribute so that panel can be accessed
+      even if http code is 500. GH#1 (Stefan Hornburg)
+
+0.007 Mon  3 Oct 12:53:59 CEST 2016
+
+    * Fix broken version number in one file. No other changes.
+
+0.006 Mon  3 Oct 12:38:25 CEST 2016
+
+    * Add 'allow_unknown' to JSON serializer constructor so that coderefs
+      don't cause an exception. GH#2 (James Morrison)
+
+0.005 Tue 21 Jun 15:01:25 CEST 2016
+
+    * Don't try to stash data in var if there is no request.
+
+0.004 Mon 13 Jun 12:32:30 CEST 2016
+
+    * switch to findallmod instead of findsubmod in Plugin::Debugger as
+      otherwise some plugins might be missed
+    * add 'allow_blessed' to default JSON serializer so that such things
+      as DBIx::Class objects don't cause the serializer to croak
+
+0.003 Tue 26 Apr 15:27:21 CEST 2016
+
+    * remove dependency on plugin2 to enable use with older Dancer2 versions
+    * remove unused code and reduce dependencies
+    * add meta resources to Makefile.PL
+
+0.002 Tue 26 Apr 14:08:19 CEST 2016
+
+    * add TemplateTimer panel
+    * add notification type and count to Logger panel
+    * make a copy of app config in Settings plugin panel
+
+0.001 Tue 26 Apr 12:42:20 CEST 2016
+
+    * First release

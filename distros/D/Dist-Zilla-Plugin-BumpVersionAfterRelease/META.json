@@ -1,0 +1,124 @@
+{
+   "abstract" : "Bump module versions after distribution release",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-BumpVersionAfterRelease",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.070",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "5.040",
+            "Dist::Zilla::Role::AfterRelease" : "5",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileMunger" : "5",
+            "Dist::Zilla::Role::VersionProvider" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "Path::Tiny" : "0.061",
+            "Version::Next" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "Test::DZil" : "0",
+            "Test::Deep" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008001",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::BumpVersionAfterRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/BumpVersionAfterRelease.pm",
+         "version" : "0.015"
+      },
+      "Dist::Zilla::Plugin::RewriteVersion" : {
+         "file" : "lib/Dist/Zilla/Plugin/RewriteVersion.pm",
+         "version" : "0.015"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease.git",
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionAfterRelease"
+      }
+   },
+   "version" : "0.015",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "Dave Rolsky <autarch@urth.org>",
+      "David Golden <xdg@xdg.me>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Kent Fredric <kentfredric@gmail.com>",
+      "Klaus Eichner <klaus03@gmail.com>"
+   ]
+}
+

@@ -1,0 +1,152 @@
+DWH_File (the Deep 'n' Wide Hash)
+- persistence for complex datastructures and objects in Perl
+
+version 0.24
+
+INSTALLATION:
+
+$ perl Makefile.PL
+$ make
+$ make test
+$ make intall
+
+DWH_File consists of the DWH_File.pm module and a number of modules
+under the DHW_File::* name space. It's all pure perl and every module
+contains one package. Every package defines a perl class.
+
+WHAT IT DOES:
+
+DWH_File is used in a similar manner to NDBM_File, DB_File etc. In fact it
+depends on one of these. DWH_File expands the functionality to save not
+only the hash that is tied but also all the data that this hash contains
+references to - that is it'll save all you list of lists and list of hashes
+and so forth. And what's more, it will save objects as well - if they'll
+comply with some very simple rules which don't impose any limitations to
+their functionality or structure except that they can't themselves be tied
+to anyone else. See the "Models" section of the embedded documentation for
+details.
+
+.pod documentation is included in the DWH_File.pm file.
+
+NOTE:
+
+From version 0.1 on and again from version 0.22, the file format has
+changed.
+
+File conversions should not be that complicated though, but I haven't
+written any converter myself. It wouldn't surprise me if it works to
+dump the contents of at DWH_File-tied hash to a file using Storable
+or the like and then read it back in a hash tied to the new version of
+DWH_File.
+
+The old versions are available from CPAN at
+
+http://www.cpan.org/authors/id/S/SU/SUMUS/
+
+TO DO:
+
+DWH_File does what I need it to do in it's present form, so i can't promise
+to be very eager to develop it further - but here are some of the things I
+have in mind:
+
+    * support for garbage collection despite circular references
+    * support for checking file consistency and repair options
+    * more error checking and recovery generally
+    * make a logging facility (existed in pre-0.1 versions)
+    * make linked-list arrays available as alternative
+    * make different hash-key-registry options available
+      (array, linked list, bulk)
+    * make version-convertion available for archives as new versions appear
+    * test whether 0.1 format is actually more efficient than
+      0.03 format
+    * adding developer-oriented documentation and building a decent
+      DWH_File site under www.orqwood.dk
+
+Moreover I've changed the design in 0.22 in order to be able to support
+distribution of data and behaviour. Actually implementing this
+will probably take me a while...
+
+HISTORY
+
+    0.24 - This release doesn't fix anu bugs or add to the functionality
+           of DWH_File. It only contains techical additions for the
+           benefit of extension libraries (like the DWH_Lib::Harrashy
+           about to be published through www.orqwood.dk):
+           Added value parameter to
+           DWH_File::Tie::Subscripted::handle_new_noded() for DWH_Lib use
+           and subscript memory to nodes
+
+    0.23 - Added a skeleton mechanism for classes who declare themselves
+           "DWH_File::Aware" (by including this abstract class in their
+           heritage) to control the way their data is tied to DWH_File.
+           Also made the internal tieing process more dynamic to
+           promote reuse in special tieing-classes external to DWH_File
+           core. And a bugfix: The return value of delete() operations
+           on hashes was errouneous. This is fixed. Also added a couple
+           of testcases to verify this.
+
+    0.22 - Now references used as keys anywhere in a DWH_Filed structure
+           are real live references (and not just textual representations
+           which are meaningful only in the very first runtime invication
+           of the application using DWH_File). This has certain
+           consequences. See the .pod. Besides there has been an internal
+           change of design and formats. (Registry has changed it's meaning,
+           kernel properties feature added and used by registries and
+           class pools. Tied hashes now identify themselves using
+           URIs (file://....) in stead of by regeistering globally
+           in a (singleton) dictionary. This also has certain consequences
+           which are briefly summarized in the .pod.
+
+    0.21 - Fixed bug in push() to arrays (reference values were stored
+           as flat strings). Also added a digit in version number
+           so we're back on track and comply with CPAN conventions :-)
+
+    0.2  - Slight revision of untie management. Now allows selecting
+           specific DBM-module (a feature, that never came into
+           the rewrite 0.1, though documentation still claimed it
+           was there).
+
+    0.1  - Complete rewrite. New version much more OO-based. New
+           file-format using binary encodings in stead of
+           decimal strings (supposedly more efficient). More
+           comme il faut distribution with MakeFile.pl and 
+           automated tests etc.
+
+    0.03 - Fixed bug introduced in 0.02 which caused wild duplication
+           of blessed references (objects)
+
+    0.02 - Fixed bug which caused deep recursion when storing structures
+           that wich contained reference cycles before storing.
+
+    0.01 - Initially published version
+
+Jakob Schmidt <schmidt@orqwood.dk> 2003 January 25
+Visit http://www.orqwood.dk/perl5/dwh for complete info on
+DWH_File and it's accomplices
+
+LOG
+
+  $Log: README,v $
+  Revision 1.8  2003/03/31 18:08:04  schmidt
+  Ready for release 0.24
+
+  Revision 1.7  2003/01/25 21:12:13  schmidt
+  Changes for 0.23 added, date and version nos updated
+
+  Revision 1.6  2003/01/04 23:29:54  schmidt
+  Updated for version 0.22
+
+  Revision 1.5  2002/11/02 22:51:04  schmidt
+  Update date
+
+  Revision 1.4  2002/11/02 22:49:18  schmidt
+  History and version for 0.21
+
+  Revision 1.3  2002/10/25 20:50:08  schmidt
+  History entry for version 0.2 entered
+
+  Revision 1.2  2002/09/29 23:05:10  schmidt
+  Made a few changes to get ready for release version 0.1 on CPAN
+
+  Revision 1.1.1.1  2002/09/27 22:41:49  schmidt
+  Imported

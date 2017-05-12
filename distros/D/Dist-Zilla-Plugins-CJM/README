@@ -1,0 +1,70 @@
+Dist-Zilla-Plugins-CJM version 4.27, released August 29, 2015
+
+
+Dist-Zilla-Plugins-CJM is a collection of plugins I've written for
+Dist::Zilla.  The plugins here used to be distributed in
+Dist-Zilla-PluginBundle-CJM, but when I actually wrote @CJM, I decided
+that it had too many prerequisites to be distributed with them.  If
+you had previously installed Dist-Zilla-PluginBundle-CJM (and you
+aren't actually using @CJM), you should uninstall that and just
+install this.
+
+I've written some other plugins that are distributed separately,
+because they had different prerequisites.  The ones collected here
+have fairly simple prerequisites, and I didn't want to have to make
+separate distributions for all of them.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                           Minimum Version
+  --------------------------------- ---------------
+  perl                               5.8.0
+  CPAN::Meta::Converter              2.101550
+  CPAN::Meta::Requirements           2.121
+  Data::Dumper                       
+  Dist::Zilla                        4.300009
+  Dist::Zilla::Plugin::InlineFiles   
+  Dist::Zilla::Plugin::MakeMaker     4.300009
+  File::Copy                         
+  File::HomeDir                      0.81
+  File::Temp                         0.19
+  List::Util                         
+  Module::Metadata                   
+  Moose                              
+  Moose::Role                        
+  Path::Class                        
+  Scalar::Util                       
+  autodie                            
+  namespace::autoclean               
+  version                            0.77
+
+
+
+CHANGES
+    Here's what's new in version 4.27 of Dist-Zilla-Plugins-CJM:
+    (See the file "Changes" for the full revision history.)
+
+	[GitVersionCheckCJM]
+	  - Add single_version parameter
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

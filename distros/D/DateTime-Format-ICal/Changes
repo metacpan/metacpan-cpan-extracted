@@ -1,0 +1,75 @@
+0.09     2008-03-07
+
+- The output of format_datetime() always includes the time
+  portion. Without this the module produced what I think was an
+  invalid iCal date. More importantly, this makes the output
+  consistent (always a DATE-TIME). Reported by Bill Moseley.
+
+- removes RRULE: and EXRULE: from ICal string before parsing.
+  Reported by Matt Sisk.
+
+
+0.08     2003-09-04
+
+- Negative durations were formatted as positive with Perl 5.00503.
+  Fixed by Flavio Glock.
+
+
+0.07     2003-09-02
+
+- Added format_recurrence() & docs.  Implemented by Flavio Glock.
+
+- Require DateTime::Event::Recurrence 0.03 to get hints on formatting
+  unbounded recurrences.
+
+- Updated to work with newer versions of DateTime.pm and
+  DateTime::Span.
+
+
+0.06     2003-07-01
+
+- Fix a test where a zero-duration was tested for being "positive".
+
+- Add docs for parse_recurrence.
+
+
+0.05     2003-05-25
+
+- Turned on warnings for tests and tweaked code so there are none.
+
+- Require DateTime::TimeZone 0.17 to fix bug with formatting datetimes
+  that was caused by API change in DT::TZ 0.13.
+
+- Added support for parsing of periods and recurrences, and for
+  formatting of periods.  Implemented by Flavio Glock.
+
+
+0.04     2003-04-22
+
+- Make it work with the latest DateTime::Duration.
+
+- Added newlines to the end of all error messages.  Patch by Jay
+  Lawrence.
+
+
+0.03     2003-04-05
+
+- Handle offset-only time zones without producing garbage output.  Bug
+  report from Iain Truskett.
+
+- Switch to Module::Build.
+
+
+0.02     2003-02-16
+
+- Change docs to show methods as class methods.
+
+
+0.01_01  2003-02-08
+
+- Fix Makefile.PL to list DateTime.pm as a prereq
+
+
+0.01_00  2003-02-08
+
+- First alpha release

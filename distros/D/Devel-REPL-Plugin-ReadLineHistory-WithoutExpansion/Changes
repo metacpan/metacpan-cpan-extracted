@@ -1,0 +1,7 @@
+Revision history for Devel-REPL-Plugin-ReadLineHistory-WithoutExpansion
+
+0.02  2013-07-23 18:58:10 PDT
+        - Fix deps
+
+0.01  2013-07-22 22:26:08 PDT
+        - Initial release

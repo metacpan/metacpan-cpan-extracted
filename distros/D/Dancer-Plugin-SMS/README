@@ -1,0 +1,81 @@
+NAME
+    Dancer::Plugin::SMS - Easy SMS sending from Dancer apps
+
+SYNOPSIS
+    In your Dancer app:
+
+        # Positional params ($to, $message)
+        sms '+44788....', 'Hello there!';
+
+        # Or named params
+        sms to => '+44...', text => 'Hello!';
+
+    In your Dancer `config.yml', provide the SMS::Send::* driver name, and
+    whatever params are appropriate for that driver (see the driver
+    documentation for details) - example configuration for using
+    SMS::Send::AQL:
+
+        plugins:
+            SMS:
+                driver: 'AQL'
+                _login: 'youraqlusername'
+                _password: 'youraqlpassword'
+                _sender: '+4478....'
+
+DESCRIPTION
+    Provides a quick and easy way to send SMS messages using SMS::Send
+    drivers (of which there are many, so chances are the service you want to
+    use is already supported; if not, they're easy to write, and if you want
+    to change providers later, you can simply update a few lines in your
+    config file, and you're done.
+
+Keywords
+  sms
+    Send an SMS message. You can pass the destination and message as
+    positional params:
+
+        sms $to, $message;
+
+    Or, you can use named params:
+
+        sms to => $to, text => $message;
+
+    The latter form may be clearer, and would allow any additional
+    driver-specific parameters to be passed too, but the former is terser.
+    The choice is yours.
+
+  sms_driver
+    Returns the SMS::Send driver object, in case you need to do things with
+    it directly.
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+BUGS
+    Please report any bugs or feature requests, preferably on GitHub, or on
+    rt.cpan.org:
+
+    http://github.com/bigpresh/Dancer-Plugin-SMS/issues
+
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Plugin-SMS
+
+FEEDBACK / SUPPORT
+    The author can usually be found on `#dancer' on `irc.perl.org' - see
+    http://www.perldancer.org/irc for web IRC.
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+SEE ALSO
+    Dancer
+
+    SMS::Send
+
+    http://www.aql.com/
+

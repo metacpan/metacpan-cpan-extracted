@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                DBIx-BulkLoader-Mysql
+version:             1.006
+abstract:            Perl extension for mysql bulk loading
+license:             ~
+author:              
+    - Michael Shipper
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::mysql:                    2.9006
+    DBI:                           1.53
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

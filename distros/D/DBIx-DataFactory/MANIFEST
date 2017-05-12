@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/AuthorTests.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBIx/DataFactory.pm
+lib/DBIx/DataFactory/Type.pm
+lib/DBIx/DataFactory/Type/Int.pm
+lib/DBIx/DataFactory/Type/Num.pm
+lib/DBIx/DataFactory/Type/Set.pm
+lib/DBIx/DataFactory/Type/Str.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-dbix-datafactory.t
+t/02-dbix-datafactory-type.t
+t/test-database.sql
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t

@@ -1,0 +1,45 @@
+NAME
+    Data::Format::Pretty::PHP - Pretty-print data structure as PHP code
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+     use Data::Format::Pretty::PHP qw(format_pretty);
+     print format_pretty($data);
+
+    Some example output:
+
+    *   format_pretty({a=>1, b=>2})
+
+         array( "a" => 1, "b" => 2 )
+
+DESCRIPTION
+    This module uses Data::Dump::PHP to encode data as PHP code.
+
+FUNCTIONS
+  format_pretty($data, \%opts)
+    Return formatted data structure. Currently there are no known formatting
+    options.
+
+SEE ALSO
+    Data::Format::Pretty
+
+    Data::Format::Pretty::PHPSerialized
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+POD ERRORS
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 50:
+        You forgot a '=back' before '=head1'
+

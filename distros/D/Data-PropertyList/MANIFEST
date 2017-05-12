@@ -1,0 +1,7 @@
+MANIFEST
+Makefile.PL
+README
+lib/Data/PropertyList.pm
+t/0_escapes.t
+t/1_basics.t
+t/2_recover.t

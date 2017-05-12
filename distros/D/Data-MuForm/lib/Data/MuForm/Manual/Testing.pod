@@ -1,0 +1,92 @@
+package Data::MuForm::Manual::Testing
+# ABSTRACT: testing forms
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Testing - testing forms
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+One of the big advantages of MuForm (and FormHandler) compared to many other form
+packages is that you can test your forms outside of a controller.
+
+=head1 DESCRIPTION
+
+It's difficult to test forms that are instantiated in controllers with 'add_element'
+calls and from YAML, and that have no form class. It's one of the reasons that
+'dynamic' forms generated with a field_list aren't a good idea for
+anything except the simplest forms. If you have a form class that contains everything
+that is needed for processing the form, it's really really easy to create tests for
+forms. Look in the MuForm 't' directory. It's full of tests for forms.
+
+You can test that the validations work, that the database is getting updated
+correctly, even that the HTML that's being rendered is correct. If something
+isn't working correctly, it's ten times easier to debug in a test case than
+sitting in a controller somewhere. And when you finally start up your application
+and use the form, there should be very few surprises.
+
+MuForm provides a simple function to test whether the HTML output is
+correct, 'is_html' in L<Data::MuForm::Test>, which uses L<HTML::TreeBuilder>.
+If you need to build forms that use the rendering code to produce particular
+output, it can be helpful.
+
+=head1 Example
+
+Here's an example of a test, originally copied from one of the DBIC model tests.
+But you should download the tar.gz or checkout the distribution from github
+and browse through the tests.
+
+   use Test::More;
+   use lib 't/lib';
+
+   use_ok( 'BookDB::Form::Book');
+   use_ok( 'BookDB::Schema::DB');
+
+   my $schema = BookDB::Schema::DB->connect('dbi:SQLite:t/db/book.db');
+   ok($schema, 'get db schema');
+
+   my $form = BookDB::Form::Book->new(schema => $schema);
+
+   my $params = {
+       'title' => 'How to Test Perl Form Processors',
+       'author' => 'I.M. Author',
+       'genres' => [2, 4],
+       'format'       => 2,
+       'isbn'   => '123-02345-0502-2' ,
+       'publisher' => 'EreWhon Publishing',
+   };
+   ok( $form->process( params => $params ), 'Good data' );
+
+   my $book = $form->item;
+   END { $book->delete };
+   ok ($book, 'get book object from form');
+   my $num_genres = $book->genres->count;
+   is( $num_genres, 2, 'multiple select list updated ok');
+   is( $form->field('format')->value, 2, 'get value for format' );
+
+   done_testing;
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

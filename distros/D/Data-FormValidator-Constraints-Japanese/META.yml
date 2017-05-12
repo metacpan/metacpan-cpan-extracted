@@ -1,0 +1,24 @@
+---
+name: Data-FormValidator-Constraints-Japanese
+version: 0.03
+author:
+  - |-
+    Copyright (c) 2006 Daisuke Maki <dmaki@cpan.org>
+    All rights reserved.
+abstract: Japan-Specific Constraints For Data::FormValidator
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Data::FormValidator: 0
+  Encode: 0
+  Encode::Detect: 0
+  Mail::Address::MobileJp: 0
+provides:
+  Data::FormValidator::Constraints::Japanese:
+    file: lib/Data/FormValidator/Constraints/Japanese.pm
+    version: 0.03
+generated_by: Module::Build version 0.28
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

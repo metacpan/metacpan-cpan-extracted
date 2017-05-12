@@ -1,0 +1,22 @@
+Revision History for Dist-Zilla-Plugin-FileKeywords
+===================================================
+
+v0.02 2013-02-13
+----------------
+
+* Date: 2013-02-13 12:39:13 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 3d4a728141333d0a8bfeaa9fac9054ae316808cc
+
+    Updated to latest Dzil standards
+
+* Date: 2013-02-13 12:00:27 -0500
+  Commit: Stirling Westrup <stirling@userful.ca>
+  Hash: 66ebf994f73a2027553dffccab099bc515ce876f
+
+    Moved .pm files into lib
+
+
+===================================
+End of changes in the last 365 days
+===================================

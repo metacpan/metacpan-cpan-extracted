@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Devel-Caller-Perl
+version: 1.3
+license: perl
+distribution_type: module
+requires: {}
+recommends: {}
+build_requires:
+  Module::Build: 0
+  Test::More: 0
+conflicts: {}
+generated_by: Module::Build version 0.16

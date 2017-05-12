@@ -1,0 +1,55 @@
+[% INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget" 
+%]
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<div align=center><font size="7"><b>[% doc.meta.title %]</b></font></div>
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+[%- IF doc.meta.abstract -%]
+<table align="center" width="60%">
+  <tr>
+    <td>
+        [% doc.meta.abstract %]
+    </td>
+  </tr>
+</table>
+[% END -%]
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+<p align="center">Last modified [% doc.last_modified %]</p>
+
+<hr class="PAGE-BREAK">
+
+
+[%-
+    IF doc.body.top;
+        "${doc.body.top}\n";
+    END;
+
+    PROCESS index_toc toc=doc.toc;
+
+    IF doc.body.bot;
+        "${doc.body.bot}\n";
+    END;
+
+-%]
+
+
+[% INCLUDE tail %]
+

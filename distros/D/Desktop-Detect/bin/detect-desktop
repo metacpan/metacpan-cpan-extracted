@@ -1,0 +1,82 @@
+#!perl
+
+our $DATE = '2016-10-07'; # DATE
+our $VERSION = '0.06'; # VERSION
+
+use strict;
+use warnings;
+
+use Data::Dumper;
+use Desktop::Detect qw(detect_desktop);
+
+my $res = detect_desktop();
+{
+    local $Data::Dumper::Terse = 1;
+    print Dumper $res;
+}
+exit($res->{desktop} ? 0 : 1);
+
+# ABSTRACT: Detect desktop (CLI)
+# PODNAME: detect-desktop
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+detect-desktop - Detect desktop (CLI)
+
+=head1 VERSION
+
+This document describes version 0.06 of detect-desktop (from Perl distribution Desktop-Detect), released on 2016-10-07.
+
+=head1 SYNOPSIS
+
+ % detect-desktop
+
+=head1 DESCRIPTION
+
+This is a simple CLI to detect desktop. It essentially just dumps the
+information returned by L<Desktop::Detect>.
+
+=head1 EXIT CODES
+
+0 if desktop can be detected.
+
+1 if otherwise.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Desktop-Detect>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Desktop-Detect>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Desktop-Detect>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+L<Desktop::Detect>
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

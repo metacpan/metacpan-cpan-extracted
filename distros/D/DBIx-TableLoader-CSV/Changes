@@ -1,0 +1,49 @@
+Revision history for DBIx-TableLoader-CSV
+
+1.102     2013-01-04T05:35:16Z
+
+  - Add 'file_encoding' and 'file_open_layers' options
+    for customizing the way the csv file is opened.
+
+1.101     2012-12-07T00:51:02Z
+
+  - Bump DBIx::TableLoader prereq to 1.100 to ensure rollback after error.
+
+1.100     2012-11-23T22:23:04Z
+
+  [Backward Incompatible Bug Fix]
+  - Text::CSV errors are now explicitly checked when creating the object
+    and after the last row is returned to ensure the whole file was read.
+    This was an unfortunate oversight and deemed a dangerous bug since
+    a CSV parse failure simply stops returning rows early.
+    Now instead this will die with the message from Text::CSV->error_diag.
+    This was deemed an acceptable backward incompatibility since only
+    parsing half of the CSV would not usually be desired
+    and there are other ways the module could die()
+    (and so you should be ready to handle exceptions appropriately).
+    Example errors include failure to open the file
+    and if the parser is misconfigured or the CSV malformed
+    and the wrong number of columns was returned.
+    If you don't want this behavior (die on parser error)
+    and are willing to accept only a portion of the CSV
+    you can set (ignore_csv_errors => 1) in the constructor.
+
+1.003     2011-07-14T23:35:33Z
+
+  - Make SQLite test a regular test rather than an author test
+  - Superficial dist/release changes
+
+1.002     2011-03-02T14:11:30Z
+
+  - No module changes
+  - Bug fix in test scripts: skip subtest if csv_class does not load
+
+1.001     2011-03-01T14:14:08Z
+
+  - No module changes
+  - Bug fix in test scripts: Use globref instead of arrayref in mocked object
+    and confirm that we are testing with Text::CSV_XS and Text::CSV_PP
+
+1.000     2011-02-28T04:16:28Z
+
+  - Initial release

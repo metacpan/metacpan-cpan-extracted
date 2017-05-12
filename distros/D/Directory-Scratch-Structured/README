@@ -1,0 +1,16 @@
+Structured
+==========
+
+creates temporary files and directories from a structured description
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

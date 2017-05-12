@@ -1,0 +1,9 @@
+2853454e0010
+
+master rfxsensor 28.53454e0010
+
+RFXSensor SEN0, type 10 (unknown)
+
+
+
+

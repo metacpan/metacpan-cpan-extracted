@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+META.yml # Will be created by "make dist"
+README
+lib/Data/Record.pm
+t/00-load.t
+t/10record.t
+t/pod-coverage.t
+t/pod.t

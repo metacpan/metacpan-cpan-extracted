@@ -1,0 +1,131 @@
+2.04     2014 December 1
+
+         The 2.03 release claimed in META.yml that it was 2.00, and we
+         were including MYMETA* files in the distribution tarball. Fix
+         both of these, reported in RT #99322.
+
+         Include a reply I got from Paulo S.L.M. Barreto in
+         upstream/README. I.e. he wasn't interested in applying the
+         minor patches I had to the upstream code since it's entirely
+         of historical interest at this point.
+
+         Added a link to the GitHub repository & bugtracker to
+         META.yml.
+
+2.03     2014 October 5
+
+         Get rid of redundant NEED_newRV_noinc macro. This was added
+         when I updated ppport.h in 1.0.9 but the subsequent release
+         (1.0.10) I stopped using the newRV_noinc() function. After
+         bisecting on a ppc64 machine calling that function turned out
+         to be the reason for the segfaults reported in RT #84143.
+
+2.02     2014 October 5
+
+         Fix some C compilation warnings due to upstream/nessie.h
+         redifining a macro that was defined in hv_func.h. Most of
+         these macros & typedefs weren't used at all, so I've just
+         removed them.
+
+         Get rid of warnings about unused variables with selective use
+         of PERL_UNUSED_VAR. I could also just move to PPCODE for some
+         of this stuff, but meh..
+
+2.01     2014 October 4
+
+         Get rid of M::I autoinstall cancer which requires
+         CPAN.pm. I'd just nuke M::I entirely if it wasn't Saturday
+         night...
+
+2.00     2014 October 4
+
+         Apparently I suck at version numbering. 1.0.10 is sorted as
+         less recent than 1.0.9 by PAUSE. Just bumping to 2.00 and
+         using more CPAN-ish versions to fix this. No other changes.
+
+1.0.10   2014 October 4
+
+         Fix warnings both in the upstream code and our own code,
+         mainly to do with casts.
+
+         Remove an unused call to newRV_noinc() from the "new"
+         function.
+
+1.0.9    2014 October 4
+
+         Now includes the upstream Whirlpool.c and nessie.h
+         as-is. There should be no functional changes, but this makes
+         the module easier to maintain.
+
+         Also moved the loading of the C code to BEGIN time, again,
+         should have no functional changes.
+
+         The ppport.h file was updated to the latest upstream release
+         and suggested changes applied to Whirlpool.xs.
+
+         Bump Module::Install to the latest upstream version.
+
+1.0.8    2009 October 18
+
+         Like 1.0.7 but with an updated MANIFEST
+
+1.0.7    2009 October 18
+
+         Fixed RT#50620 reported by KENTNL. The Digest.pm standard
+         says that on ->hexdigest the checksum must be reset. But this
+         module wasn't doing that. Oops!
+
+1.0.6    2007 July 07
+         Fixed typo in script/whirlpoolsum POD
+
+         use utf8 for author name in Makefile.PL
+
+         inc/: Upgraded to M::I 0.67
+
+         Fixed release dates in release by avar, released in 2007, not 2006
+
+1.0.5    2007 January 30
+         Fixed typo in pod (oops!)
+
+         Changed to a Module::Install-based build system
+
+         Updated README file
+
+         PODed INSTALL
+
+         whirlpoolsum(1) utility
+
+         removed examples/ directory, the Digest docs and t/ should be more than enough
+
+         Updater ppport.h with Devel::PPPort
+
+         Relicensed from GPL => GPL/Artistic, see COPYING for rationale.
+
+1.0.4    2007 January 24
+         - Added a clone() method that clones the state of the current object and
+         - returns the cloned object.
+
+         add and addfile now return current the object so ->add( "foo" )->digest
+         works like it does in other digest modules.
+
+         Added a b64digest method that is an alias for the base64digest method.
+
+         Removed (add addfile reset) from @EXPORT_OK, 
+
+         Updated the LICENSE section to the recommended FSF GPL notice
+
+         b64digest no longer returns a trailing ==
+
+1.0.3    2004 August 18
+         Modified hashsize() to return number of bits, instead of bytes
+         (to become consistent with Digest::SHA of Mark Shelor)
+
+1.0.2    2003 July 29
+         Minor code cleanup
+
+1.0.1    Optimized even more
+         Refined "files.pl" example script by including error-checking
+
+1.0.0    2003 June 07
+         Initial release
+

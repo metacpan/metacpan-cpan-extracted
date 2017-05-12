@@ -1,0 +1,47 @@
+---
+abstract: 'Defer messages or data across redirections'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+  - 'Deluxaran <deluxaran@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Plack::Test: '0'
+  Test::More: '0.96'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Deferred
+provides:
+  Dancer2::Plugin::Deferred:
+    file: lib/Dancer2/Plugin/Deferred.pm
+    version: '0.007017'
+requires:
+  Dancer2::Plugin: '0.200000'
+  URI: '0'
+  URI::QueryParam: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perldancer/Dancer2-Plugin-Deferred/issues
+  homepage: https://github.com/perldancer/Dancer2-Plugin-Deferred
+  repository: https://github.com/perldancer/Dancer2-Plugin-Deferred.git
+version: '0.007017'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Damien Krotkine <dams@zarb.org>'
+  - 'Peter Mottram <peter@sysnix.com>'
+  - 'Sawyer X <xsawyerx@cpan.org>'

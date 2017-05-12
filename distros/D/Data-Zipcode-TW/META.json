@@ -1,0 +1,53 @@
+{
+   "abstract" : "Taiwan zipcode data in a box.",
+   "author" : [
+      "Kang-min Liu <gugod@gugod.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Zipcode-TW",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "strict" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0,
+            "warnings" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gugod/Data-Zipcode-TW/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/gugod/Data-Zipcode-TW.git",
+         "web" : "https://github.com/gugod/Data-Zipcode-TW"
+      }
+   },
+   "version" : "1.0"
+}
+

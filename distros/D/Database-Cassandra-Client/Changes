@@ -1,0 +1,51 @@
+1.0	  Fri Jun 19 2015 17:13:17 GMT+0300
+	  сompatible with libcassandra version 1.0.x
+	  fixed and update API
+	  update docs
+
+0.71	  Thu Jan 29 2015 14:34:17 GMT+0300
+	  Changed Simple methods
+	  rename sm_select_query_by_future to sm_result_from_future
+	  now, method sm_prepare return CassPrepared, not CassStatement
+	  now, method sm_finish_query aka prepared_free
+	  changed Future callback
+	  
+0.63	  Tue Jan 27 2015 18:07:17 GMT+0300
+	  add methods sm_select_query_by_future
+
+0.62	  Mon Jan 12 2015 17:17:17 GMT+0300
+	  add methods sm_get_session, sm_execute_query_no_wait, sm_create_prepare
+
+0.61	  Mon Jan 12 2015 17:17:17 GMT+0300
+	  sync with current version libcassandra RC 1
+	
+0.57	  Thu Dec 25 2014 18:54:18 GMT+0300
+	  fix problem with counter int32 => int64
+
+0.56	  Tue Dec 09 2014 19:44:00 GMT+0300
+	  fix problem with counter
+
+0.55	  Wed Nov 27 2014 17:33:09 GMT+0300
+	  fixed problem with empty strings
+
+0.54	  Wed Nov 26 2014 18:02:09 GMT+0300
+	+ add support really utf8 :)
+
+0.53	  Wed Nov 26 2014 16:43:44 GMT+0300
+	+ add support utf8
+	+ add new method sm_finish_query
+
+0.52	  Tue Nov 25 2014 18:23:12 GMT+0300
+	  TIMESTAMP int32 => int64
+
+0.51	  Fri Nov 21 2014 16:09:30 GMT+0300
+	+ added support MAP, SET and LIST for sm_select_query method
+	+ migrate to libcassandra 1.0 (release beta5)
+
+0.4	  Thu Nov 20 2014 09:18:30 GMT+0300 
+	+ Add simple API
+	+ Fix Makefile.PL
+
+0.3	 Sat Nov 15 2014 20:00:37 GMT+0300
+	+ First glue for libcassandra beta5
+

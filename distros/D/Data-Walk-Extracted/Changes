@@ -1,0 +1,243 @@
+Revision history for Data-Walk-Extracted
+
+	Uses the change tracking convention
+	+ New feature.
+	- Removed/deprecated feature.
+	! Bug fix.
+	* Place holder
+
+v0.28.0   2016-08-16 10:22:01-07:00 America/Los_Angeles
+
+	+ Integrated with Log::Shiras::Unhide
+	! Moved back to MooseX::Types::Moose Types so the Exporter works better
+
+v0.26.18  2016-07-05 13:03:08-07:00 America/Los_Angeles
+
+	! Added test plans for all the tests
+
+v0.26.16  2016-06-01 15:16:04-07:00 America/Los_Angeles
+
+	! Updated the contributors section
+	+ Added installation instructions
+
+v0.26.14  2016-05-31 18:42:08-07:00 America/Los_Angeles
+
+	! Really bump the Moose requirement to 2.1803 this time
+		closes #2 in github
+
+v0.26.12  2016-05-31 18:27:58-07:00 America/Los_Angeles
+
+	! Rolled the version again to handle the duplicate version release
+
+v0.26.10  2016-05-31 17:47:47-07:00 America/Los_Angeles
+
+	+ Update travis.yml to build and test against 5.22 as well
+	+ Add the full Dist::Zilla build stuff
+	+ Changed the github reported version to pull from sheilds.io github tags
+	! bumped the minimum Moose requirement to 2.1803
+		https://github.com/jandrew/Data-Walk-Extracted/issues/2
+		closes issue #2 in github
+
+v0.26.10  2015-11-12 17:40:46-08:00 America/Los_Angeles
+
+	+ Fixed deprecated regex matching in the print.t test
+	+ Changed the way the version is labeled
+	+ Added additional badges for user assessment
+
+v0.26.8   2015-03-30 07:16:37-07:00 America/Los_Angeles
+
+	! Fixed a test fail for regex mismatch in print.t
+
+v0.26.6   2015-03-24 17:48:11-07:00 America/Los_Angeles
+
+	+ Fixed a broken 03-tap_harness_tests.t for the Travis builds
+	+ Resized the kwalitee badge
+	! Repointed the perl badge hyperlink at www.perl.org
+
+v0.26.4   2015-03-24 08:49:48-07:00 America/Los_Angeles
+
+	+ Adding the convention
+		+ New feature.
+		- Removed/deprecated feature.
+		! Bug fix.
+		* Place holder
+	+ Updated version reporting
+	+ Converted from MooseX::Types to Type::Tiny
+	+ Re-organized the test suit
+	- Removed Pod testing from the distribution (I still test before release)
+	! fixed the resources links through the dist.ini file
+	+ Added badges
+	+ Re-ordered the changelog to newest to oldest
+
+0.024.004 2013-08-31 08:02:53 America/Los_Angeles
+
+	Removed all of the overly tricky POD self references to mid paragraph points
+
+0.024.002 2013-08-30 07:46:54 America/Los_Angeles
+
+	Updated/tested all the POD links
+	Skipped Test::Pod altogether since there is a weird linux vs Windows space thing
+	Brought all versions to the same level for Kwalitee
+
+0.022.006 2013-08-28 08:38:17 America/Los_Angeles
+
+	Updated Test::Pod to require v1.48 to see if that fixes some linux test fails
+	Also removed a return prior to a | in one url to see if that helps
+
+0.022.004 2013-08-27 20:31:58 America/Los_Angeles
+
+	Escaped the # in the url links
+
+0.020.004 2013-08-27 07:29:16 America/Los_Angeles
+
+	Updated the Readme POD
+
+0.022.002 2013-08-27 20:17:30 America/Los_Angeles
+
+	Removed the requirement for use Moose::Role from the Types library
+	Fixed a digit width that was causing perl on bsdunix to fail
+	Fixed some POD that was causing some linux perl to fail
+
+0.020.002 2013-08-27 07:18:43 America/Los_Angeles
+
+	Final changes to the POD and prep for release to CPAN
+
+0.020.001 2013-08-26 07:40:41 America/Los_Angeles
+
+	Removed MooseX::ShortCut::BuildInstance again.
+	added a 'to_string' attribute for Data::Walk::Print'
+	Cleaned up some of the documentation
+
+v0.019_007 2013-01-17 11:50:12 America/Los_Angeles
+
+	Fixed the META files to include MooseX::ShortCut::BuildInstance for testing and Building requirements
+
+v0.019_005 2013-01-13 21:51:49 America/Los_Angeles
+
+	A minor change to the dist.ini file
+
+v0.019_005 2013-01-13 21:48:27 America/Los_Angeles
+
+	Major update of the POD's.
+
+v0.019_003 2013-01-08 09:18:18 America/Los_Angeles
+
+	Removed the dispatch table and type tables to their own modules
+
+v0.017_001 2012-10-04 12:21:56 America/Los_Angeles
+
+	Changed print_data to print out the scalar data pointer for skipped nodes instead of the word SKIPPED
+
+	Move all the node skipping to Data::Walk::Extracted from the various roles and then added a skip flag to the $passed_ref for tracking by the roles.   This includes a rewrite of all skipping attributes with their callouts (breaks backwards compatibility!):
+
+	Moved the dispatch method off to it's own role for portability.
+
+	Changed the test suit to use MooseX::ShortCut::BuildInstance
+
+	Rewrote the passed ref to track skip, primary_type, and secondary_type rather than testing for it each time. (also breaks backwards compatibility)
+
+	changed the base state to SCALAR and UNDEF rather than going past SCALAR and UNDEF to END. (also breaks backwards compatibility)
+
+v0.015_005 2012-08-29 12:05:41 America/Los_Angeles
+
+	Removed the (bad) fixed primary call in Data::Walk:Clone - I don't remember how it got there.
+
+v0.015_003 2012-08-28 17:22:53 America/Los_Angeles
+
+	changed the _extracted_ref_type to use hash key lookups rather than if then statements.
+	This isn't really a standard disptach table since the ref type hasn't been determined
+	yet.
+
+	Added multilayer support to one-shot attributes.  This allows the one shot attribute to stay
+	in force for complete method call from a Role if the role makes a nested walking call to
+	another Role.
+
+	Another re-write of the guts of Data::Walk::Extracted to untangle the path of recursion.
+
+	The re-write of Data::Walk::Extracted includes the addition of a "Zeroth" branch_ref element.
+
+	The re-write of Data::Walk::Extracted prompted the addition of some dispatch tables to
+	Data::Walk::Print.
+
+	Added a DEFAULT failover to the dispatch method choices
+
+	Added a Graft memory to Data::Walk::Graft
+
+v0.013_001 2012-07-09 21:59:29 America/Los_Angeles
+
+	added recognition of a 'name' key in the '_dispatch_method' for Data::Walk::Extracted (Meta data for dispatch methods)
+
+	Fixed a failure to seed empty hash refs and array refs in the deep_clone method
+
+v0.011_001 2012-07-09 14:14:53 America/Los_Angeles
+
+	Changes includes additions to use this package in Log::Shiras
+
+	Added a method for tracking actual subtractions
+	in the prune_data method.  This includes a 'remember_prune_items' attribute
+	and a 'get_pruned_positions' method.  See the POD for Data::Walk::Prune for
+	more details.
+
+	Added another role Data::Walk::Clone to allow for targeted cloning of data
+	structures.
+
+	moved the _dispatch_method to Data::Walk::Extracted so that dispatch tables by
+	Role could be added without duplicating that code.
+
+	Changed the graft_data function to clone the reference and allow for clone
+	definition (Using Data::Walk::Clone)
+
+	built in a 'Single shot settings' processor of attributes passed in the method call for
+	the _process_the_data method in Data::Walk::Extracted.  This will allow for possible
+	attribute calls in the method that will only affect that one pass of the method call.
+
+	Added graft memory like the prune memory
+
+	created the private method _build_branch in Data::Walk::Extracted to build the branch
+	to the current branchref point if requested.   This is used by Data::Walk::Graft and
+	Data::Walk::Prune
+
+	Refactored Data::Walk::Extracted to use dispatch tables
+
+	Improved the Data::Walk::Prune documentation and changed the prune memory attribute name
+
+	Added the ability of the sort_XXX attributes to take sort CodeRefs ex. sub{ $b cmp $a }
+
+v0.007_005 2012-05-17 08:24:20 America/Los_Angeles
+
+	Updated the POD to be consistent.
+
+	Switched testing from Test::And::Ouput to use Capture::Tiny.
+
+v0.007_001 2012-04-19 08:46:23 America/Los_Angeles
+
+	Reworked the guts to allow multiple Rolls to be added to the same base class .
+	This is a major re-write to the ::Extracted class interface to support this but
+	only a minor changes to the Role interfaces.  Among other changes the ::Extracted
+	class does not add a default role anymore.  The ::Extracted class no longer has
+	public method for processing data either.  Additionally the MooseX::StrictConstructor
+	(Module/Pragma) was added to the class.
+
+	Data::Walk::Graft is added to the package
+
+	Testing for Data::Walk::Print is switched from Test::Output to Test::And::Output.
+
+v0.05_07  2012-04-04 11:34:36 America/Los_Angeles
+
+	Removed YAML from the test files since it was an
+	unnessesary dependancy that caused test fails.
+
+	Also updated some links in the POD and included
+	Data::ModeMerge in the See Also section
+
+v0.05_03  2012-04-03 13:54:29 America/Los_Angeles
+
+	First Release to CPAN
+
+v0.05_01  2012-03-21 20:03:17 America/Los_Angeles
+
+	Adding functionality to support Data::Walk::Prune
+
+v0.03_01  2012-02-10 16:07:16 America/Los_Angeles
+
+	Initial Release

@@ -1,0 +1,124 @@
+---
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      name: imagine_someone_uniq
+      unique:
+      - dbuser
+      - user_1
+      - user_2
+    name: imagine_someone
+    type: altertable
+  - addconstraint:
+      name: topic_post_number
+      unique:
+      - number
+      - topic
+    name: forum_post
+    type: altertable
+  - addconstraint:
+      name: uniq_forum_post_bleaks
+      unique:
+      - user_id
+      - bleak_post
+    name: forum_post_bleaks
+    type: altertable
+  - addconstraint:
+      name: uniq_forum_post_hits
+      unique:
+      - dbuser
+      - post
+    name: forum_post_hits
+    type: altertable
+  - addconstraint:
+      name: uniq_forum_topic_bleaks
+      unique:
+      - user_id
+      - bleak_topic
+    name: forum_topic_bleaks
+    type: altertable
+  - addconstraint:
+      name: uniq_forum_topic_hits
+      unique:
+      - hit_user
+      - hit_topic
+    name: forum_topic_hits
+    type: altertable
+  - addconstraint:
+      name: uniq_friend_request
+      unique:
+      - dbuser
+      - friend
+    name: user_friends_request
+    type: altertable
+  - addconstraint:
+      name: uniq_msg_session_member_report
+      unique:
+      - msg_user
+      - created_by
+    name: msg_session_member_report
+    type: altertable
+  - addconstraint:
+      name: uniq_msg_session_msg_report
+      unique:
+      - session_message
+      - created_by
+    name: msg_session_msg_report
+    type: altertable
+  - addconstraint:
+      name: uniq_user_for_post
+      unique:
+      - dbuser
+      - result_post
+    name: forum_post_reports
+    type: altertable
+  - addconstraint:
+      name: uniq_user_for_topics
+      unique:
+      - dbuser
+      - result_topics
+    name: forum_topics_reports
+    type: altertable
+  - addconstraint:
+      name: unique_dbuser_adress
+      unique:
+      - dbuser
+    name: address_information
+    type: altertable
+  - addconstraint:
+      name: unique_events_name
+      unique:
+      - name
+    name: events
+    type: altertable
+  - addconstraint:
+      name: unique_profile_dashboard_widgets
+      unique:
+      - dbuser
+    name: profile_dashboard_widgets
+    type: altertable
+  - addconstraint:
+      name: unique_user_localvalue
+      unique:
+      - dbuser
+    name: localvalues
+    type: altertable
+  - addconstraint:
+      name: unique_user_settings
+      unique:
+      - dbuser
+    name: profile_settings_attributes
+    type: altertable
+  - addconstraint:
+      name: unique_users_mail
+      unique:
+      - mail
+    name: users
+    type: altertable
+  - addconstraint:
+      name: unique_users_nickname
+      unique:
+      - nickname
+    name: users
+    type: altertable
+  id: 004-maz

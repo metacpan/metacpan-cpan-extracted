@@ -1,0 +1,4 @@
+o Could use DBD::Sponge for testing
+
+o document DBI Callbacks which is a much easier way of just outputting
+  SQL passed to prepare.

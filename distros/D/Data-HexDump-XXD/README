@@ -1,0 +1,37 @@
+Data-HexDump-XXD version 0.0.1
+
+This module provides some functions to have hex dumps equal to those generated
+by the B<xxd> application (the one used by B<vim> for hex dumps). At the moment
+only basic dump and re-packing are supported, so no funny option.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+Non-core C<version>, and C<Test::More> if you want to run the tiny test suite.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Flavio Poletti
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

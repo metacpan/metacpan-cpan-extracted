@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 65f4bd5dd23f9198bbd373b7be9892c2f19bddaf Changes
+SHA1 18eb7d8f62bc8122366f9b99b53d5198ebaff7d9 INSTALL
+SHA1 c64b935d9ce4c94e47ea9f9c6d8abde7eade155b LICENSE
+SHA1 f7ce16d5c64c7158863e3368e0b8a706e8c25790 MANIFEST
+SHA1 1f48f04ee95955772937b48085c25eb25d17ea0b MANIFEST.SKIP
+SHA1 3c24429d7ae93e24a24b1d9c0481d5082076ca78 META.json
+SHA1 f6076904a4f9de738ee012fb4e7ae24f00cacf51 META.yml
+SHA1 e7ade1fa1a1fc7bfd983d8b6bffcdda098fb965a Makefile.PL
+SHA1 5c63b7de86e5d308cbff2856dd652cb47d681dbd README.md
+SHA1 2983bf86cf77ee523331c2d7dbd48bca8621eba2 dist.ini
+SHA1 7bc626a5f8b70d5ef89e1bd00869416457a9ed31 lib/Dist/Zilla/MintingProfile/IDOPEREL.pm
+SHA1 51b538a0d578f51bfa76f88d89e2c6f61f7546bd lib/Dist/Zilla/PluginBundle/IDOPEREL.pm
+SHA1 1db07061798fc1704c33c779bbcec2f57b775ff9 profiles/default/Module.pm
+SHA1 a98d82d84d72a6ab87f5835fd4909448033d2ef0 profiles/default/plugins.ini
+SHA1 95a3d109144f582d2664aac27301e7bb73a338be profiles/default/profile.ini
+SHA1 2a68feb661cc9c29d1cfbdf408fac7ee326303d4 profiles/default/skel/Changes
+SHA1 4c92d40aabf20f935ec1909d276c5880e179fc63 profiles/default/skel/t/00-load.t
+SHA1 4bdabb4d6dfa34d57f531508e90d2e4cb99d446f t/00-load.t
+SHA1 560bc7c1ce955fdadf9d04b117f7e9db8c9220ff t/release-dist-manifest.t
+-----BEGIN PGP SIGNATURE-----
+
+iF4EAREIAAYFAlgOFB0ACgkQa4OHQAFM10cwlQD/Y5+PI8rhmejTYOxxU/zmbOjf
+5C0xhBvDYNfHESuwVuEA/jCQt9zOMPw9Wqrcmh1cuWTxqHV7GPvYSLTSe1qbQ+DW
+=2XTF
+-----END PGP SIGNATURE-----

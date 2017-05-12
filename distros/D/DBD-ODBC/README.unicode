@@ -1,0 +1,40 @@
+#
+# Author Martin J. Evans (mjevans at cpan dot org)
+#
+
+This document is historical now. If all you want to know is what Unicode
+is supported by DBD::ODBC read the DBD::ODBC pod.
+
+The original Unicode support was written by Alexander Foken and posted
+as a patch. You can find Alexander's original README document in
+README.af (some of this is directly taken from that document).  Around
+DBD::ODBC 1.14 Alexander's original patch was adapted to include
+optional Unicode support for UNIX and introduced into DBD::ODBC.
+
+In DBD::ODBC 1.17 the Unicode support in DBD::ODBC on both Windows and
+Unix was enhanced considerably to support unicode SQL strings, column
+names and connection strings (although see caveat below).
+
+Most of the unicode documentation that was here has now moved to the main
+DBD::ODBC pod.
+
+Attributions
+============
+
+A substantial part of the code to translate between UTF8 and UTF16
+came from the unicode web site (Unicode Inc) and was authored by Mark
+E. Davis and updated by various (see ConvertUTF.c). This code was
+modified in minor ways to allow ConvertUTF16toUTF8 and
+ConvertUTF8toUTF16 to accept NULL target pointers and return the
+number of bytes required in the target string for the conversion.
+
+A substantial part (most in fact) of the original Unicode support in
+DBD::ODBC for wide bound columns and parameters was written by
+Alexander Foken and simply changed to support UNIX as well as Windows
+by me.
+
+Patches/Problems
+================
+
+Please see the main README. The best place to discuss DBD::ODBC is on
+the dbi-users mailing list.

@@ -1,0 +1,46 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Dennis Spera <asaag@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120351",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Animator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+		    "Tk" : "0",
+		    "Tk::StatusBar" : "0",
+		    "Tk::Table" : "0",
+		    "Tk::BrowseEntry" : "0",
+		    "Tk::Balloon" : "0",
+		    "File::stat" : "0"
+		 }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "2.30"
+}

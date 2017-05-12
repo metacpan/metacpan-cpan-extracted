@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+README
+XMLMessage.pm
+XMLMessage.html
+sybase.t.removed
+t/nodbh.t
+

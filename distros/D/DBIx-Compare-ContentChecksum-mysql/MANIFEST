@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx_Compare_ContentChecksum_mysql.t
+lib/DBIx/Compare/ContentChecksum/mysql.pm

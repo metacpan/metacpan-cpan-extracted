@@ -1,0 +1,204 @@
+
+=pod
+
+package Data::IPV4::Range::Parse;
+
+=head1 NAME
+
+Data::IPV4::Range::Parse - Perl extension parsing ipv4 ranges
+
+=head1 SYNOPSIS
+
+  use Data::IPV4::Range::Parse;
+  ($stat_int,$end_int)=auto_parse_ipv4_range('10/24');
+  ($stat_int,$end_int)=auto_parse_ipv4_range('10.0.0 - 11');
+  ($stat_int,$end_int)=auto_parse_ipv4_range('9');
+
+  unless(($stat_int,$end_int)=auto_parse_ipv4_range('10/')) {
+    print "failed to parse 10/\n";
+  }
+
+
+=head1 DESCRIPTION
+
+Simple Interface for getting start and ending address of ranges as integers.
+
+=head2 EXPORT
+
+:CONSTANTS
+
+ ALL_BITS
+ MAX_CIDR
+ MIN_CIDR
+
+:PARSE_IP
+
+ int_to_ip
+ ip_to_int
+
+:SORT
+
+ sort_quad
+ sort_notations
+
+:COMPUTE_FROM_INT
+
+ broadcast_int
+ base_int
+ size_from_mask
+ hostmask
+ cidr_to_int
+
+:PARSE_RANGE
+
+ parse_ipv4_cidr
+ parse_ipv4_range
+ parse_ipv4_ip
+ auto_parse_ipv4_range
+
+=head2 CONSTANTS
+
+This section explains the Exportable constants.
+
+=over 4
+
+=item * ALL_BITS
+
+Same as 0xffffffff
+
+=item * MAX_CIDR
+
+Same as 32
+
+=item * MIN_CIDR
+
+Same as 0
+
+=back
+
+=head2 PARSE_IP
+
+This section covers the parse ipv4 address functions.
+
+=over 4
+
+=item * my $int=ip_to_int('10.0.0.1');
+
+=item * my $int=Data::IPV4::Range::Parse->ip_to_int('10.0.0.1');
+
+Returns a perl usable integer ipv4 representation of the ipv4 quad notation.
+
+=item * my $ip=int_to_ip($int);
+
+=item * my $ip=Data::IPV4::Range::Parse->int_to_ip($int);
+
+Returns the integer formated in the standard quad notation.
+
+=back
+
+=head2 SORT
+
+This section covers the Exportable sort functions.
+
+=over 4
+
+=item * my @ips=sort sort_quad @usorted_ips
+
+Low level sort function used to sort ipv4 addresses in quad notation.
+
+=item * my @ranges=sort sort_notations @unsorted_notations
+
+Low level sort function used to sort ipv4 ranges.  This function will croak if a range cannot be parsed.
+
+=back
+
+=head2 COMPUTE_FROM_INT
+
+This section covers the Exportable integer computation functions
+
+=over 4
+
+=item * my $broadcast_int=broadcast_int($ip_int,$mask_int);
+
+=item * my $broadcast_int=Data::IPV4::Range::Parse->broadcast_int( $ip_int, $mask_int );
+
+Returns an integer representing the broadcast address from 2 integers.
+
+=item * my $base_int=base_int($ip_int,$mask_int);
+
+=item * my $base_int=Data::IPV4::Range::Parse->base_int( $ip_int, $mask_int );
+
+Returns an integer representing the base address from 2 integers.
+
+=item * my $size=size_from_mask($mask_int)
+
+=item * my $size=Data::IPV4::Range::Parse->size_from_mask($mask_int)
+
+Returns an integer representing the size of a network.
+
+=item * my $hostmask_int=hostmask($ip_int,$mask_int);
+
+=item * my $hostmask_int=Data::IPV4::Range::Parse->hostmask( $ip_int, $mask_int );
+
+Returns an integer representing the hostmask from 2 integers.
+
+=item * my $mask_int=cidr_to_int(0-32);
+
+=item * my $mask_int=Data::IPV4::Range::Parse->cidr_to_int( 0-32 );
+
+Returns an integer representing netmask from a given cidr size.
+
+=back
+
+=head2 PARSE_RANGE
+
+This section covers the Exportable range parser functions. An empty set is returned when the range cannot be parsed.
+
+=over 4
+
+=item * my ($start,$end)=parse_ipv4_cidr('10/23');
+
+=item * my ($start,$end)=Data::IPV4::Range::Parse->parse_ipv4_cidr( '10/23' );
+
+Returns 2 integers representing the base and broadcast of a CIDR.
+
+=item * my ($start,$end)=parse_ipv4_range( '10 - 11' );
+
+=item * my ($start,$end)=Data::IPV4::Range::Parse->parse_ipv4_range( '10 - 11' );
+
+Returns 2 integers representing the start and end of a ip range.
+
+=item * my ($start,$end)=parse_ipv4_ip('10.0.0.1')
+
+=item * my ($start,$end)=Data::IPV4::Range::Parse->parse_ipv4_ip( '10.0.0.1' )
+
+Returns 2 integers representing the input ip as a /32 range
+
+=item * my ($start,$end)=auto_parse_ipv4_range('10');
+
+=item * my ($start,$end)= Data::IPV4::Range::Parse->auto_parse_ipv4_range( '10' );
+
+Attempts to figure out what type of range notation and calls the corresponding parse_ipv4_xxx function, returning an empty set on failure or 2 integers representing the start and end of the range.
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 SourceForge Project
+
+As of version 1.04 the Project has been moved to SourceForge.net
+
+L<Data IPV4 Range Parse|https://sourceforge.net/projects/data-ipv4-range/>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Michael Shipper
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut
+

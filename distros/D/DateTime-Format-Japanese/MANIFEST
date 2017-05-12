@@ -1,0 +1,24 @@
+CHANGES
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DateTime/Format/Japanese.pm
+lib/DateTime/Format/Japanese/Common.pm
+lib/DateTime/Format/Japanese/Traditional.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01_load.t
+t/02_parse_modern.t
+t/03_format_modern.t
+t/04_format_modern_eucjp.t
+t/05_parse_traditional.t
+t/06_format_traditional.t
+t/99_pod.t
+t/99_pod_coverage.t

@@ -1,0 +1,25 @@
+---
+abstract: 'Generate Dpkg files for your perl module'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Dpkg
+requires:
+  Dist::Zilla::File::InMemory: 0
+  Dist::Zilla::Role::InstallTool: 0
+  Moose: 0
+  Text::Template: 0
+resources:
+  bugtracker: https://github.com/tripside/dist-zilla-plugin-dpkg/issues
+  homepage: https://github.com/tripside/dist-zilla-plugin-dpkg
+  repository: https://github.com/tripside/dist-zilla-plugin-dpkg.git
+version: 0.05

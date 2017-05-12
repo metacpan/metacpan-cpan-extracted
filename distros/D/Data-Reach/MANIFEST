@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Data/Reach.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-reach.t
+t/02-import_as.t
+t/03-no_import.t
+t/04-import_empty.t
+t/05-regular_import.t
+t/99-pod.t
+META.yml
+META.json

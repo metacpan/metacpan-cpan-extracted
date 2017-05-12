@@ -1,0 +1,70 @@
+{
+   "abstract" : "display the Schwartz ratio of the distribution upon release",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-SchwartzRatio",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::AfterRelease" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "LWP::Simple" : "0",
+            "Moose" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0.94",
+            "perl" : "5.004"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::SchwartzRatio" : {
+         "file" : "lib/Dist/Zilla/Plugin/SchwartzRatio.pm",
+         "version" : "v0.2.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-schwartzratio at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-SchwartzRatio"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-SchwartzRatio/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio.git",
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio"
+      }
+   },
+   "version" : "0.2.0",
+   "x_authority" : "cpan:YANICK"
+}
+

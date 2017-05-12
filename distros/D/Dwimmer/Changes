@@ -1,0 +1,101 @@
+Changes to the Dwimmer system.
+
+0.32 2014.10.01
+    - Prereq added.
+    - Disabled forking web tests for now.
+
+0.31 2014.03.20
+    - Eliminate some warnigs.
+    - Skip test if web server cannot be launched.
+
+0.30 2012.12.30
+    Feed collector issues:
+
+    - Show number of post each day and on the front page.
+    - Expose the errors from the database on the web site
+    - Link to archive from main page.
+    - Allow updating the title and the url as well.
+    - Report failures via e-mail when --mailreport is given.
+    - Add --verbose flag to feed collector and print the LOG
+      only if --verbose was used.
+
+0.29 2012.09.26
+    - fix sendmail
+
+0.28 2012.09.26
+    - in the feed collector allow multiple sites to be in one database
+
+    - rename dwimmer_setup to dwimmer_admin
+    - lots of additional features to dwimmer_admin
+
+0.27 2012.03.11
+
+    - rename /change_password  to /change_my_password
+    - add new /change_password to change the password
+      of another user
+    - fix command line adding user
+    - add command line listing all the users
+    - set the minimum perl to 5.12
+
+0.26 2012.02.16
+
+    - Add minimal search capability
+    - The special links now need [[ ]] instead of [ ]
+    - Preview button
+    - Table editor
+    - Fix show history and allow user to promote older version.
+
+v0.25 2011.12.11
+    - use File::Find::Rule to chmod 0644 files before trying
+      to overwrite them during installation
+
+v0.24 2011.12.08
+
+    - Add RSS feed with basic testing (#30)
+    - integrated the CLEditor Javascript based html editor (#15)
+
+v0.23 2011.11.20
+
+    - Eliminate duplicate files from distribution
+    - Fix a syntax typo (alanhaggai)
+    - Allow only lower case usernames (#5)
+
+v0.22 2011.11.20
+
+    - Move the site checking to the 'before' hook to eliminate duplication.
+    - Use the _clean_params function instaed of manual implementations.
+    - Allow changing password. #21
+    - Show old version when clicking on link in history #18
+    - Add pagination to the list of pages #14
+    - dwimmer_setup.pl can now set the password of any user #25
+    - by default display login form when not logged in #26
+    - and allow the admin to change this setting per site #26
+    - by default hide experimental features, allow admin to show them #27
+    - add link to be able to manege current site  #28
+    - add sitemap.xml listing all the pages #23
+
+v0.20 2011.10.25
+
+    - Add jquery.a-tools-1.5.2 plugin.
+    - Add B(old) and I(talic) buttons to editor.
+    - Add jquery-ui-1.8.16.custom.min.js
+
+    - Enable [http://address] and [https://address].
+
+    - Add script/dwimmer to enable adding user from the command line.
+    - Enable some special characters in the filename:
+      space ( ), dot (.), $, @ and %.
+    - Eliminate cache from the Ajax get requests as IE (both 8 and 9)
+      would cache by default.
+
+    - Replace several methods in the Dwimmer::Client or change their APIs
+      most importantly 'login', 'get_page',
+    - Add site_config table
+    - Add Google Analytics and GetClicky
+
+    - Probably lots of other things I forgot to add to the Changes file.
+
+v0.11 2011.09.10
+
+    - Release of the first interesting version.
+

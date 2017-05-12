@@ -1,0 +1,46 @@
+---
+abstract: 'Generate font subsets on-the-fly'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Dancer::Plugin::Cache::CHI: 0
+  Dancer::Test: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+  strict: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-FontSubset
+provides:
+  Dancer::Plugin::FontSubset:
+    file: lib/Dancer/Plugin/FontSubset.pm
+    version: v0.1.2
+requires:
+  Dancer: 0
+  Dancer::Plugin: 0
+  Font::TTF::Font: 0
+  Font::TTF::Scripts::Name: 0
+  List::AllUtils: 0
+  Moo: 0
+  MooX::Singleton: 0
+  perl: v5.12.0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-FontSubset
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-FontSubset/
+  repository: https://github.com/yanick/Dancer-Plugin-FontSubset.git
+version: 0.1.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Andreas Koenig <andreas.koenig@(none)>'
+  - 'Yanick Champoux <yanick@cpan.org>'

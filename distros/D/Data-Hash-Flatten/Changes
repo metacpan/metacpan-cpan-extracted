@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::Hash::Flatten.
+
+0.01  Fri Jun 28 11:54:30 2002
+	- original version; created by h2xs 1.1.1.4 with options
+		-A -X -n Data::Hash::Flatten
+

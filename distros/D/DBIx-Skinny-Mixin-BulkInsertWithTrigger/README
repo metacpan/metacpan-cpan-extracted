@@ -1,0 +1,29 @@
+NAME
+    DBIx::Skinny::Mixin::BulkInsertWithTrigger -
+
+SYNOPSIS
+        package YourProj::DB;
+        use DBIx::Skinny;
+        use DBIx::Skinny::Mixin modules => [ 'BulkInsertWithTrigger'];
+
+        package main;
+
+        YourProj::DB->bulk_insert_with_pre_insert_trigger(your_table => [
+            { id => 1, name => 'foo' },
+            { id => 2, name => 'bar' },
+        ]);
+
+    pre_insert trigger is executed for each item before bulk_insert.
+
+DESCRIPTION
+    DBIx::Skinny::Mixin::BulkInsertWithTrigger is for bulk_inserting data
+    with pre_insert trigger.
+
+AUTHOR
+    Keiji Yoshimi <walf443 at gmail dot com>
+
+SEE ALSO
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

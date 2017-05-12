@@ -1,0 +1,34 @@
+Revision history for Dist::Zilla::Role::Stash::Plugins
+
+1.006     2012-12-06T03:58:23Z
+
+  [Bug Fixes]
+  - Fix missing 'lazy' specification for slicer attribute
+    made evident by hash randomization in perl 5.17.6.
+    Thanks to Andreas König for the very helpful report [rt-81716].
+
+  [Tests]
+  - Fix a bug in the tests causing failures in some 5.8 perls.
+
+1.005     2012-06-18T17:56:42Z
+
+  - Unanchor the default argument_separator regexp so that array subscript
+    config lines work.  Thanks to Keedi Kim for reporting this bug.
+
+1.004     2011-10-19T23:36:58Z
+
+  - Move much of the logic out to Config::MVP::Slicer
+
+  [Incompatible Changes]
+  - Drop the default 'join' functionality which probably wasn't a good idea.
+    DZ Stash PodWeaver is the only dist declaring this role as a prereq
+    and that has no attributes that could use it (no plain Str attributes).
+
+1.003     2011-07-15T00:41:43Z
+
+  - Superficial dist/release changes
+  - Extra debug output in tests
+
+1.002005  2010-12-16T16:37:12Z
+
+  - Initial release

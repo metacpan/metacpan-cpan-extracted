@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 fc309a2126fbbee9d88db2a151c802e6ee11bf5d Changes
+SHA1 8e1b2f8d0d13c6e266d735b33d7575393f69fcb7 INSTALL
+SHA1 6e7bb500dc8b55faaa11daa64e16fa164e069a1e MANIFEST
+SHA1 e7f4606a49438e7261de5fdae939582a12a8906e META.json
+SHA1 ce8d81925624a2a7fabfbb2fdb2000a1c1c25869 META.yml
+SHA1 6ca2e47658fb608a58f00ec4f51aa27ebb2026ad Makefile.PL
+SHA1 19eb00e51f5cf2dc8b36c271fc8f2ec631f59058 README
+SHA1 fd3934770331af8305170c278a91e194d3efcb1e dist.ini
+SHA1 d435df4a2a4a33316277feaef13238d1feeaa444 lib/Dist/Zilla/Stash/PAUSE/Encrypted.pm
+SHA1 7e06d71415071ec987eeb4c06e72a1f034090ea4 t/00-compile.t
+SHA1 5efb311cdd7cdaefff9835f0446f43f11d5fa627 t/000-report-versions-tiny.t
+SHA1 8d9443adf9dd660b886192158b5af0c55bfacf9f t/author-pod-spell.t
+SHA1 9c3627ff37f4fd5bddc34bf46cf3359eaf76a060 t/release-consistent-version.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 011d4c9b220d6ec7292fd2a77cd3578edb344e83 t/release-has-version.t
+SHA1 5339300ce8506e9aad181c85f20a1ac26668fab7 t/release-no-smart-comments.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 6b1a65da83d245f67cffd74515ea53fa70a29c20 t/release-pod-coverage.t
+SHA1 a2e41163f9a0e5ef495c3a4f12b8d3a563311786 t/release-pod-syntax.t
+SHA1 c7325bdcd20c9729339a5d22bf04a19e7a051ece t/release-portability.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJQAGwiAAoJEOd5N1CvIgQkfAIH+wdCOladczTekaZsn0lodS9h
+1TJNpYTn4/ZYSR+0/gJJkHw7cQQi2oYh2J1gek5O11iQOvxnXI4tvgRhCUS5MjF9
+9YYuHrv2NX5+jyyph8zvtpT4G+2TmVM8elIHsG29Wqq+Xjuk3PD4zooyefASerLy
+7vM0lxfwuTgm8/SzJohy6BWJ/eutK1lxoEiKjl5tAN0RISRPh3hwYZ0FRiznfIh+
+7Dzk4sCSPfV8FrsPhcz7Ky+yZh2nFqueuPd8mGThD9Niv3u7ZTIpOJ5G6jfapBFD
+hJmWuIl8STpq5JcaIbsLoM2WyvivvPrD/tXPvneNnJ+Ubig4/vhEendA1w4GvPM=
+=Q8KY
+-----END PGP SIGNATURE-----

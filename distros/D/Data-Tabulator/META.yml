@@ -1,0 +1,24 @@
+---
+name: Data-Tabulator
+version: 0.03
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+abstract: Create a table (two-dimensional array) from a list (one-dimensional array)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor::Fast: 0
+  POSIX: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+build_requires:
+  Test::More: 0
+provides:
+  Data::Tabulator:
+    file: lib/Data/Tabulator.pm
+    version: 0.03
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

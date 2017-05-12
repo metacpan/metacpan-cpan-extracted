@@ -1,0 +1,37 @@
+Data-FormValidator-Filters-HTMLScrubber version 0.02
+====================================================
+
+Data-FormValidator-Filters-HTMLScrubber is a Data-FormValidator
+filter that allows to scrub/sanitize html form field values.
+
+CHANGES FROM PREVIOUS VERSION
+
+	+ Added docs and test
+	
+See 'Changes' file in this distribution for complete history revision.
+
+INSTALLATION
+
+To install this module type the following:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+- Data::FormValidator
+- HTML::Scrubber
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Enrico Sorcinelli. All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

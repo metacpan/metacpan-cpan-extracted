@@ -1,0 +1,36 @@
+---
+abstract: 'DBI handler specialized in Amazon Aurora'
+author:
+  - 'punytan <punytan@gmail.com>'
+build_requires:
+  Test::Docker::MySQL: '0.02'
+  Test::More: '0.96'
+  Test::Pod: '1.51'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Aurora
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  DBD::mysql: '4.037'
+  DBIx::Handler: '0.09'
+  List::Util: '1.47'
+  perl: '5.022000'
+resources:
+  bugtracker: https://github.com/punytan/p5-DBIx-Aurora/issues
+  homepage: https://github.com/punytan/p5-DBIx-Aurora
+  repository: https://github.com/punytan/p5-DBIx-Aurora.git
+version: '0.01'
+x_serialization_backend: 'YAML::Tiny version 1.70'

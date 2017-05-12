@@ -1,0 +1,14 @@
+Revision history for Data-Sah-Coerce-perl-duration-str_alami_en
+
+0.002   2016-06-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - Bump prereq version DateTime::Format::Alami::EN to 0.13 [CT]. And make
+          it a RuntimeRequires prereq to make sure the minimum version is
+          installed.
+
+
+0.001   2016-06-29 (PERLANCAR)
+
+        - First release.

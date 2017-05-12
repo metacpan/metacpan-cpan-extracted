@@ -1,0 +1,19 @@
+# This does not run, but it shows 4 structures which appear in code.html
+# These examples are taken from the test suite.  It has other examples.
+
+my $list = [ 'phil', 'crow', 'programmer' ];
+
+my $name = { 'name' => 'phil', id => 'pcrow' };
+
+my $phone = { 'phil' => [ { 'type' => 'desk' },
+                          { 'type' => 'home' },
+                          { 'type' => 'pager' }
+                        ]
+            };
+
+my $obj_list = [
+    'phil',
+    'crow',
+    'programmer',
+    bless( { 'attribute' => 'value', 'property' => 5 }, 'Trivial' )
+];

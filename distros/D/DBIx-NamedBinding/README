@@ -1,0 +1,43 @@
+DBI-NamedBinding
+
+This module attempts to provide arbitrary "bind" query parameters using names
+instead of positions.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBI::NamedBinding
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBI-NamedBinding
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBI-NamedBinding
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBI-NamedBinding
+
+    Search CPAN
+        http://search.cpan.org/dist/DBI-NamedBinding
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Andrew Sweger
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

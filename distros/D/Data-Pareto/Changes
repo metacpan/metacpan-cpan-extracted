@@ -1,0 +1,23 @@
+Revision history for Data-Pareto
+
+0.05	2009-12-29
+        * Converted build process to Module::Build.
+        * Changed license to Artistic License 2.0.
+        * POD corrections to links.
+
+0.04    2009-06-03
+        * Added a few built-in dominators.
+
+0.03    2009-06-01
+        * Examples and documentation fixes (#45220).
+        * Dominator subs for custom comparison introduced.
+
+0.02    2009-04-21
+        * Added invalid values concept.
+        * Corrected licensing generation in META.yml.
+        * More elaborated testing.
+
+0.01    2009-02-03 10:45
+        First version, released on an unsuspecting world.
+
+

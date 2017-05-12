@@ -1,0 +1,45 @@
+*** STDOUT ***
+<TABLE align=center BORDER=1 CELLPADDING=1 CELLSPACING=1>
+<TR>
+ <TH ALIGN=CENTER WIDTH=7%><b><i>Index</i></b></TH>
+ <TH ALIGN=CENTER WIDTH=21%><b><i>Name</i></b></TH>
+ <TH ALIGN=CENTER WIDTH=20%><b><i>Phone</i></b></TH>
+ <TH ALIGN=CENTER WIDTH=36%><b><i>Address</i></b></TH>
+ <TH ALIGN=CENTER WIDTH=14%><b><i>Date</i></b></TH>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><tt>1</tt></TD>
+<TD ALIGN=LEFT><tt>Alan Stebbens</tt></TD>
+<TD ALIGN=LEFT><tt>555-1234</tt></TD>
+<TD ALIGN=LEFT><tt>1234 Something St., CA</tt></TD>
+<TD ALIGN=RIGHT><tt>1998-10-22</tt></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><tt>2</tt></TD>
+<TD ALIGN=LEFT><tt>Bob Frankel</tt></TD>
+<TD ALIGN=LEFT><tt>555-1235</tt></TD>
+<TD ALIGN=LEFT><tt>9234 Nowhere Way, WA</tt></TD>
+<TD ALIGN=RIGHT><tt>2001-01-02</tt></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><tt>3</tt></TD>
+<TD ALIGN=LEFT><tt>Mr. Goodwrench</tt></TD>
+<TD ALIGN=LEFT><tt>555-9432</tt></TD>
+<TD ALIGN=LEFT><tt>1238 Car Lane Pl., NY</tt></TD>
+<TD ALIGN=RIGHT><tt>2004-04-20</tt></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><tt>4</tt></TD>
+<TD ALIGN=LEFT><tt>Mr. Ed</tt></TD>
+<TD ALIGN=LEFT><tt>555-3215</tt></TD>
+<TD ALIGN=LEFT><tt>9876 Cowbarn Home, VA</tt></TD>
+<TD ALIGN=RIGHT><tt>2008-09-12</tt></TD>
+</TR>
+<TR> 
+<TD ALIGN=RIGHT><tt>5</tt></TD>
+<TD ALIGN=LEFT><tt>Gunther Sveborg</tt></TD>
+<TD ALIGN=LEFT><tt>44-55-555-5555</tt></TD>
+<TD ALIGN=LEFT><tt>Kartophelhause 345, Munich, Germany</tt></TD>
+<TD ALIGN=RIGHT><tt>2013.10.22</tt></TD>
+</TR>
+</TABLE>

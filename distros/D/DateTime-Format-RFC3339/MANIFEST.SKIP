@@ -1,0 +1,13 @@
+^.git/
+^.gitignore$
+^Makefile.old$
+^pm_to_blib$
+^blib/
+^DateTime-Format-RFC3339-
+.releaserc
+cover_db
+MYMETA.*
+pod2htmd.tmp
+pod2htmi.tmp
+~$
+.bak$

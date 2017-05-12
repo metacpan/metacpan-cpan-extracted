@@ -1,0 +1,78 @@
+NAME
+
+    Devel::JSON - Easy JSON output for one-liners
+
+SYNOPSIS
+
+        $ perl -d:JSON -e '[ 1..3 ]'
+        [
+            1,
+            2,
+            3
+        ]
+    
+        $ perl -d:JSON -e '{b => 2, c => 4}'
+        {
+            "b": 2,
+            "c": 4
+        }
+
+    Default output encoding is UTF-x if this is the charset of the locale:
+
+        $ perl -d:JSON -e "qq<\N{SNOWMAN}>"
+        "☃"
+
+    Force ASCII output:
+
+        $ perl -d:JSON=ascii -e "qq<\N{SNOWMAN}>"
+        "\u2603"
+
+DESCRIPTION
+
+    If you use this module from the command-line, the last value of your
+    one-liner (-e) code will be serialized as JSON data. The expression is
+    evaluated in scalar context.
+
+    The output will be either UTF-x (UTF-8, UTF-16...) or just ASCII,
+    depending on your locale (check LC_CTYPE on Unix or GNU).
+
+    As a convenience (because you may want to deal with non-ASCII content
+    in your -e source), your code is converted from bytes using the current
+    locale.
+
+    The following JSON options are enabled by default:
+
+    pretty
+
+    canonical
+
+    allow_nonref
+
+    You can enable more options by giving import arguments (a '-' prefix
+    disables the option):
+
+        # Force ASCII output
+        $ perl -d:JSON=ascii -e '[1..3]'
+    
+        # Disable pretty (note '-' before the name)
+        $ perl -d:JSON=-pretty -e '[1..3]'
+    
+        # Non-ASCII in -e
+        $ perl -d:JSON=ascii -e '"Mengué"'
+        "Mengu\u00e9"
+
+SEE ALSO
+
+    JSON, JSON::MaybeXS, json-to (App::JSON::to).
+
+AUTHOR
+
+    Olivier Mengué, mailto:dolmen@cpan.org.
+
+COPYRIGHT & LICENSE
+
+    Copyright © 2015 Olivier Mengué.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

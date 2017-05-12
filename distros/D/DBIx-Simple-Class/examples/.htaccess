@@ -1,0 +1,21 @@
+
+
+
+
+#disable generating directory indexes, automatically( mod_autoindex )
+IndexOptions -FancyIndexing
+
+IndexOptions Charset=UTF-8
+
+# Make sure that directory listings are disabled.
+# Execution of CGI scripts using mod_cgi is permitted.
+Options -Indexes +ExecCGI
+
+# Uncomment "<IfModule> !mod_fastcgi.c/!mod_fcgid </IfModule>" to prefer fastcgi
+# Do not forget that your scripts must be suitable to run under FastCGI
+#<IfModule !mod_fcgid.c>
+#set explicitly filenames as cgi scripts
+  <Files ~ "\.(cgi)$">
+    SetHandler  cgi-script
+  </Files>
+#</IfModule>

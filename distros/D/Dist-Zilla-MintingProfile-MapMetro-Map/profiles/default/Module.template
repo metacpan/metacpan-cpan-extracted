@@ -1,0 +1,48 @@
+use 5.14.0;
+
+package Map::Metro::Plugin::Map::{{ $name =~ s{Map::Metro::Plugin::Map::}{}g; $name }};
+
+# VERSION
+# ABSTRACT: Map::Metro map for {{ $name =~ s{Map::Metro::Plugin::Map::}{}g; $name }}
+
+use Moose;
+with 'Map::Metro::Plugin::Map';
+
+has '+mapfile' => (
+    default => 'map-{{ $name =~ s{Map::Metro::Plugin::Map::}{}g; lc $name }}.metro',
+);
+sub map_version {
+    return $VERSION;
+}
+sub map_package {
+    return __PACKAGE__;
+}
+
+1;
+
+__END__
+
+=pod
+
+=encoding utf-8
+
+=head1 SYNOPSIS
+
+    use Map::Metro;
+    my $graph = Map::Metro->new('{{ $name =~ s{Map::Metro::Plugin::Map::}{}g; $name }}')->parse;
+
+Or
+
+	$ map-metro.pl route {{ $name =~ s{Map::Metro::Plugin::Map::}{}g; $name }} 1 4 
+
+=head1 DESCRIPTION
+
+See L<Map::Metro> for usage information.
+
+=head1 Status
+
+L<Map::Metro::Plugin::Map::{{ $name =~ s{Map::Metro::Plugin::Map::}{}g; $name }}::Lines>
+
+...
+
+=cut

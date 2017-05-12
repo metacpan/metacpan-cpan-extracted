@@ -1,0 +1,155 @@
+NAME
+    DublinCore::Record - Container for Dublin Core metadata elements
+
+SYNOPSIS
+        use DublinCore::Record;
+    
+        my $record = DublinCore::Record->new();
+    
+        # later ...
+
+        # print the title
+        print $record->element( 'title' )->content;
+
+        ## list context will retrieve all of a particular element 
+        foreach my $element ( $record->element( 'Creator' ) ) {
+            print "creator: ", $element->content(), "\n";
+        }
+
+        ## qualified dublin core
+        my $creation = $record->element( 'Date.created' )->content();
+
+DESCRIPTION
+    DublinCore::Record is an abstract class for manipulating DublinCore
+    metadata. The Dublin Core is a small set of metadata elements for
+    describing information resources. For more information on embedding
+    DublinCore in HTML see RFC 2731 <http://www.ietf.org/rfc/rfc2731> or
+    <http://www.dublincore.org/documents/dces/>
+
+METHODS
+  new()
+    The constructor. Takes no arguments.
+
+        $record = DublinCore::Record->new();
+
+  add( @elements )
+    Adds valid DublinCore::Element objects to the record.
+
+  remove( @elements )
+    Removes valid DublinCore::Element object from the record.
+
+  element()
+    This method will return a relevant DublinCore::Element object. When
+    called in a scalar context element() will return the first relevant
+    element found, and when called in a list context it will return all the
+    relevant elements (since Dublin Core elements are repeatable).
+
+        ## retrieve first title element
+        my $element = $record->element( 'Title' );
+        my $title = $element->content();
+    
+        ## shorthand object chaining to extract element content
+        my $title = $record->element( 'Title' )->content();
+    
+        ## retrieve all creator elements
+        @creators = $record->element( 'Creator' );
+
+    You can also retrieve qualified elements in a similar fashion.
+
+        my $date = $record->element( 'Date.created' )->content();
+
+    In order to fascilitate chaining element() will return an empty
+    DublinCore::Element object when the requested element does not exist.
+    You can check if you're getting an empty empty back by using the
+    is_empty() method.
+
+        if( $record->element( 'title' )->is_empty ) {
+            # no title
+        }
+
+  elements()
+    Returns all the Dublin Core elements found as DublinCore::Element
+    objects which you can then manipulate further.
+
+        foreach my $element ( $record->elements() ) {
+            print "name=", $element->name(), "\n";
+            print "content=", $element->content(), "\n";
+        }
+
+  title()
+    Returns a DublinCore::Element object for the title element. You can then
+    retrieve content, qualifier, scheme, lang attributes like so.
+
+        my $title = $record->title();
+        print "content:   ", $title->content(), "\n";
+        print "qualifier: ", $title->qualifier(), "\n";
+        print "scheme:    ", $title->scheme(), "\n";
+        print "language:  ", $title->language(), "\n";
+
+    Since there can be multiple instances of a particular element type
+    (title, creator, subject, etc) you can retrieve multiple title elements
+    by calling title() in a list context.
+
+        my @titles = $record->title();
+        foreach my $title ( @titles ) {
+            print "title: ", $title->content(), "\n";
+        }
+
+  creator()
+    Retrieve creator information in the same manner as title().
+
+  subject()
+    Retrieve subject information in the same manner as title().
+
+  description()
+    Retrieve description information in the same manner as title().
+
+  publisher()
+    Retrieve publisher information in the same manner as title().
+
+  contributor()
+    Retrieve contributor information in the same manner as title().
+
+  date()
+    Retrieve date information in the same manner as title().
+
+  type()
+    Retrieve type information in the same manner as title().
+
+  format()
+    Retrieve format information in the same manner as title().
+
+  identifier()
+    Retrieve identifier information in the same manner as title().
+
+  source()
+    Retrieve source information in the same manner as title().
+
+  language()
+    Retrieve language information in the same manner as title().
+
+  relation()
+    Retrieve relation information in the same manner as title().
+
+  coverage()
+    Retrieve coverage information in the same manner as title().
+
+  rights()
+    Retrieve rights information in the same manner as title().
+
+SEE ALSO
+    * DublinCore::Element
+    * Dublin Core <http://www.dublincore.org/>
+    * RFC 2731 <http://www.ietf.org/rfc/rfc2731>
+    * perl4lib <http://www.rice.edu/perl4lib>
+
+AUTHOR
+    * Ed Summers <ehs@pobox.com>
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007 by Ed Summers, Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

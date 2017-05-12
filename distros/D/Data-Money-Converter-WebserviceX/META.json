@@ -1,0 +1,60 @@
+{
+   "abstract" : "WebserviceX currency conversion implementation.",
+   "author" : [
+      "Corey Watson <gphat@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Money-Converter-WebserviceX",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "1.001014"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Money::Converter" : "0.03",
+            "Finance::Currency::Convert::WebserviceX" : "0",
+            "Locale::Currency" : "2.07",
+            "Moo" : "2.000000",
+            "namespace::clean" : "0.24",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Money::Converter::WebserviceX" : {
+         "file" : "lib/Data/Money/Converter/WebserviceX.pm",
+         "version" : "0.07"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/manwar/Data-Money-Converter-WebserviceX.git",
+         "web" : "https://github.com/manwar/Data-Money-Converter-WebserviceX"
+      }
+   },
+   "version" : "0.07",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

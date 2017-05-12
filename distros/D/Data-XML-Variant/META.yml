@@ -1,0 +1,25 @@
+---
+name: Data-XML-Variant
+version: 0.02
+author:
+  - Curtis "Ovid" Poe <ovid@cpan.org>
+abstract: Output XML 'variants'
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  HTML::Entities: 1.29
+  Test::More: 0
+  Test::XML: 0.07
+  aliased: 0.1
+provides:
+  Data::XML::Variant:
+    file: lib/Data/XML/Variant.pm
+    version: 0.02
+  Data::XML::Variant::Build:
+    file: lib/Data/XML/Variant/Build.pm
+    version: 0.01
+  Data::XML::Variant::Output:
+    file: lib/Data/XML/Variant/Output.pm
+    version: 0.01
+generated_by: Module::Build version 0.2702

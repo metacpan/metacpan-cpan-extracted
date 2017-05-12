@@ -1,0 +1,14 @@
+Revision history for Data::Tabulate::Plugin::ASCIITable
+
+0.03    2014-07-15
+
+          * fix prereq list
+
+0.02    2014-07-14
+
+          * switch to Dist::Zilla
+          * use Text::Table::Tiny instead of Text::ASCIITable
+
+0.01    2006-12-27
+        First version, released on an unsuspecting world.
+

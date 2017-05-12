@@ -1,0 +1,29 @@
+NAME
+    Data::Persist - an easy-to-use data-to-disk dumper
+
+METHODS
+  write
+    Takes two arguments: an data structure and an filename.
+
+    Serializes that data structure and writes to the given filename.
+
+  read
+    Takes one argument: an filename to read from.
+
+    Unserializes this data structure and returns it.
+
+  BUILD
+    Make sure given filename is accessible.
+
+NAME
+    Data::Persist - an easy-to-use data-to-disk dumper
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

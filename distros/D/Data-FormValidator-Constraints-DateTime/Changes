@@ -1,0 +1,79 @@
+Revision history for Perl extension Data::FormValidator::Constraints::DateTime
+
+1.11 (Jun 01, 2010)
+    - Added missing copyright and license notification.
+
+1.10 (May 13, 2010)
+    - Fixed test failures that relied on hard coded future dates. [RT #57456, from iarnell]
+
+1.09 (Dec. 19, 2005)
+    - now using Scalar::Util::blessed to check if the $dfv is really an object before calling
+        isa() to provide better diagnostics if the user does something they aren't supposed to
+    - more doc improvements
+
+1.08 (Dec. 12, 2005)
+    - added DateTime::Format::Builder to 'build_requires'
+    - no code changes
+
+1.07 (Nov. 08, 2005)
+    - added support for DateTime::Format objects where ever strptime(3) format strings are allowed
+    - removed unnecessary dereferencing check
+
+1.06 (Oct. 28, 2005)
+    - minor doc fixes
+    - fixed new higher-order constraints to work with CGI.pm instead of just a hashref
+    - fixed new higher-order tests to be skipped if we are using D::FV 3.x
+
+1.05 (Oct. 04, 2005)
+    - fixed docs to use 'ref-less' parameters
+    - other minor doc fixes
+    - same code as 1.04
+
+1.04 (Sep. 20, 2005)
+    - fixed failing test when DateTime::Format::Pg is not installed
+
+1.03 (Aug. 24, 2005)
+    - added 4.0 style of higher-order constraints
+    - removed examples of older styles
+
+1.02 (Jul. 26, 2005)
+    - added ymd_before_today() and ymd_after_today() routines
+
+1.01 (Jul. 25, 2005)
+    - added before_today() and after_today() routines
+
+1.00 (Mar. 03, 2005)
+    - added before_datetime(), after_datetime(), and between_datetimes()
+        routines
+    - 100% coverage tests
+    - minor doc cleanups
+
+0.06 (Feb. 22, 2005)
+    - ymd_to_datetime() routine will now not accept
+        empty strings as valid date portions
+
+0.05 (Feb. 21, 2005)
+    - added Changes to MANIFEST
+    - added ymd_to_datetime() validation routine
+    - more tests
+    - minor doc corrections
+    
+0.04 (Feb. 19, 2005)
+    - all routines can be used as either a 'constraint' 
+        or 'constraint_method'
+    - more docs
+
+0.03 (Feb. 18, 2005)
+    - more tests added
+    - database formats no longer require format params but will use
+        the DateTime::Format::*->parse_*() methods if no format is given
+    - minor doc corrections
+
+0.02 (Feb. 18, 2005)
+    - more tests added
+    - DateTime::Format::MySQL and DateTime::Format::Pg are
+      now not required, but recommended and only loaded
+      when needed
+
+0.01 (Feb. 17, 2005)
+    - Initial Release

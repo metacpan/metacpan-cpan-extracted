@@ -1,0 +1,992 @@
+#! /usr/bin/env perl
+
+# Copyright (C) 1999-2012 Stefan Hornburg
+
+# Author: Stefan Hornburg (Racke) <racke@linuxia.de>
+# Maintainer: Stefan Hornburg (Racke) <racke@linuxia.de>
+# Version: 0.19
+
+# This file is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the
+# Free Software Foundation; either version 2, or (at your option) any
+# later version.
+
+# This file is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty
+# of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+
+# You should have received a copy of the GNU General Public License
+# along with this file; see the file COPYING.  If not, write to the Free
+# Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+use strict;
+use warnings;
+
+use DBIx::Easy;
+use Getopt::Long;
+use Term::ReadKey;
+
+# process commandline parameters
+my %opts;
+$opts{'keys'} = 1;
+my $whandler = $SIG{__WARN__};
+$SIG{__WARN__} = sub {print STDERR "$0: @_";};
+unless (GetOptions (\%opts, 'cleanse', 'columns|c=s',
+                    'file|f=s', 'format=s', 'headline|h', 'insert-only|i',
+					'rows=s', 'keys|k=s',
+					'map|m=s', 'map-filter=s', 'match-sql=s', 'routine|r=s',
+					'skipbadlines',
+					'table|t=s', 'update-only|o')) {
+    exit 1;
+}
+$SIG{__WARN__} = $whandler;
+
+# sanity checks
+my $format = 'TAB';
+my %inforef = ();
+my %funcref = (CSV => {get_columns => \&get_columns_csv},
+			   TAB => {get_columns => \&get_columns_tab},
+			   XLS => {get_columns => \&get_columns_xls});
+my %mfref = (lc => sub {lc(shift)});
+my $sep_char = ',';
+my $mfsub;
+
+if ($opts{'cleanse'} || $opts{'headline'}) {
+    unless ($opts{'table'}) {
+        die ("$0: missing table name\n");
+    }
+}
+if ($opts{'map-filter'}) {
+	unless (exists($mfref{$opts{'map-filter'}})) {
+		die qq{$0: unknown column name filter "$opts{'map-filter'}"}, "\n";
+	}
+	$mfsub = $mfref{$opts{'map-filter'}};
+}
+
+if ($opts{'format'}) {
+	$format = uc($opts{'format'});
+
+	if ($format =~ /^CSV/) {
+	  	$format = 'CSV';
+		if ($') {
+			$sep_char = $';
+			$sep_char =~ s/^\s+//;
+			$sep_char =~ s/\s+$//;
+		}
+		eval {
+			require Text::CSV_XS;
+		};
+		if ($@) {
+			die "$0: couldn't load module Text::CSV_XS\n";
+		}
+		$inforef{object} = new Text::CSV_XS ({'binary' => 1, 'sep_char' => $sep_char});
+	} elsif ($format eq 'XLS') {
+		eval {
+			require Spreadsheet::ParseExcel;
+		};
+		if ($@) {
+			die "$0: couldn't load module Spreadsheet::ParseExcel\n";
+		}
+		$inforef{object} = new Spreadsheet::ParseExcel;
+	} else {
+		die ("$0: unknown format \"" . $opts{'format'} . "\"\n");
+	}
+}
+
+my %fieldmap;
+my $fd_input;
+
+my ($sth, $keyfield, $update, $msg);
+my ($table, $fieldnames, @values, $headline);
+my (@columns, $routine, %colmap);
+my $linebuf = '';
+
+# whether to consider column
+my $colflag = 1;
+my %usecol;
+# whether to consider rows
+my $rowflag;
+my %userow;
+# current row
+my $currow = 0;
+# input with table as first field may specify start column
+my $startcol;
+# variables for --match-sql option
+my (%matchmap, $matchcol);
+
+if ($opts{'columns'}) {
+    $colflag = ! ($opts{'columns'} =~ s/\s*[\!^]//);
+
+    # setup positive/negative list for columns
+    for (@columns = split(/\s*,\s*/, $opts{'columns'})) {
+        $usecol{$_} = $colflag;
+    }
+}
+
+if ($opts{'rows'}) {
+    my @rows;
+    
+    $rowflag = ! ($opts{'rows'} =~ s/\s*[^\!]//);
+
+    # setup positive/negative list for rows
+    for (@rows = split(/\s*,\s*/, $opts{'rows'})) {
+        unless (/^\d+$/) {
+            die "$0: row number \"$_\" is not numeric\n";
+        }
+        $userow{$_} = $rowflag;
+    }
+}
+
+if ($opts{'file'}) {
+    # read input from file
+	require IO::File;
+	$fd_input = new IO::File;
+    $fd_input->open($opts{'file'})
+        || die "$0: couldn't open $opts{'file'}: $!\n";
+} else {
+	# read input from standard input
+	require IO::Handle;
+	$fd_input = new IO::Handle;
+	$fd_input->fdopen(fileno(STDIN),'r');
+}
+
+if ($opts{'map'}) {
+    # parse column name mapping
+    my ($head, $name);
+    foreach (split (/;/, $opts{'map'})) {
+        ($head, $name) = split /=/;
+        $colmap{$head} = $name;
+    }
+}
+
+my $csv;
+
+if ($opts{'headline'}) {
+    my %hcolmap;
+    
+    # the first row consists of the column names
+#    unless (defined ($headline = <$fd_input>)) {
+#        die ("$0: empty input file\n");
+#    }
+	my @columns;
+	if ($funcref{$format}->{get_columns}(\%inforef, $fd_input,\@columns) <= 0)  {
+		die "$0: couldn't find headline\n";
+	}
+
+	if ($opts{'map-filter'}) {
+		@columns = map {$mfsub->($_)} @columns;
+	}
+
+	# remove whitespace from column names and mark them
+	map {s/^\s+//; s/\s+$//; $hcolmap{$_} = 1;} @columns;
+
+    if ($opts{'map'}) {
+        my @newcolumns;
+        
+        # filter column names
+        foreach (@columns) {
+            if (exists $colmap{$_}) {
+                push (@newcolumns, $colmap{$_});
+				$hcolmap{$colmap{$_}} = 1;
+            } else {
+                push (@newcolumns, $_);
+            }
+        }
+        @columns = @newcolumns;
+    }
+
+    # add any other columns explicitly selected
+    for (sort (keys %usecol)) {
+        next if $hcolmap{$_};
+        next unless exists $usecol{$_};
+        next unless $usecol{$_};
+        push (@columns, $_);
+    }
+    
+    # fixed table name 
+    $table = $opts{'table'};
+    $fieldmap{$table} = \@columns;
+}
+
+if ($opts{'routine'}) {
+    # read Perl subroutine for filtering the input
+    $routine = eval $opts{'routine'};
+
+    if ($@) {
+        die "$0: invalid filter routine: $@: \n";
+    }
+
+    if (ref($routine) ne 'CODE') {
+        die "$0: invalid filter routine\n";
+    }
+}
+
+if ($opts{'table'}) {
+    # set fixed table name
+    $table = $opts{'table'};
+	# use defined columns
+	if (! $opts{'headline'} && $opts{'columns'}) {
+		$fieldmap{$table} = \@columns;
+	}
+}
+
+my $dbif;
+my $pwdused = 0;
+
+my ($driver, $database, $user) = @ARGV;
+
+$dbif = new DBIx::Easy ($driver, $database, $user);
+
+# handler for DBI error messages and missing password
+$dbif -> install_handler (\&fatal);
+
+# we need to explicitly establish the connection
+# for the case that a password is needed
+$dbif -> connect;
+
+my (@keys, @cleansekeys, %cleansemap, $numkeysleft, %recmap, @names);
+
+if ($opts{'cleanse'}) {
+    # determine column names
+    @names = &column_names ($dbif, $table);
+    $fieldnames = \@names;
+
+    # determine keys
+    %cleansemap = &key_names ($dbif, $table, $opts{'keys'}, 1);
+    @cleansekeys = sort (keys %cleansemap);
+	
+	# get records
+    my ($row, $href, $i);
+
+    $sth = $dbif -> process ('SELECT ' . join(', ', @cleansekeys)
+							 . " FROM $table");
+
+    while ($row = $sth -> fetch()) {
+        # build chain of all keys but the last
+        $href = \%recmap;
+        for ($i = 0; $i < $#cleansekeys; $i++) {
+            unless (exists $href->{$$row[$i]}) {
+                $href->{$$row[$i]} = {};
+            }
+            $href = $href->{$$row[$i]};
+        }
+        # stop if key kombination occurs multiple
+        if (exists $href->{$$row[$i]}) {
+            die "$0: duplicate key: ", join (",", @$row), "\n";
+        }
+        # record last key
+		if (defined $$row[$i]) {
+			$href->{$$row[$i]} = 1;
+		} else {
+			$href->{$$row[$i]} = '';
+		}
+    }
+}
+
+if ($opts{'match-sql'}) {
+	unless ($opts{'match-sql'} =~ /^(.*?):\{(.*?)\}$/) {
+		die "$0: invalid format for option --match-sql: $opts{'match-sql'}\n";
+	}
+	$matchcol = $1;
+	$sth = $dbif -> process ($2);
+	
+	my $row;
+	while ($row = $sth->fetch()) {
+		$matchmap{$$row[0]} = 1;
+	}
+}
+
+my $gcsub = $funcref{$format}->{get_columns};
+
+MAIN: while ($gcsub->(\%inforef, $fd_input, \@columns)) {
+    my (@data);
+
+    if ($opts{'headline'} || $opts{'table'}) {
+        # table name already known
+		@values = @columns;
+    } else {
+        # table name is the first column
+		if ($format eq 'TAB') {
+			($table, @values) = split /\t/;
+		} elsif ($format eq 'CSV') {
+			next unless csv_parseline ($csv, \$linebuf, $_, [$table, @values]);
+        }
+    
+        # extract optional start column parameter
+        if ($table =~ /(.+?)\.(.+)/) {
+            $table = $1; $startcol = $2;
+            
+            unless ($startcol =~ /^\d+$/) {
+                $msg = "$0: $.: start column not a number: \""
+                    . $startcol . "\"\n";
+                if ($opts{'skipbadlines'}) {
+                    warn ($msg);
+                    next;
+                } else {
+                    die ($msg);
+                }
+            }
+        }
+        
+        # sanity check on the table name
+        if ($table =~ /\s/) {
+            warn ("$0: $.: skipping record (\"$table\" not accepted as table name)\n");
+            next;
+        }
+    }
+
+    # check for row ex/inclusion
+    $currow++;
+    if (defined $rowflag) {
+        if ($rowflag && ! exists $userow{$currow}) {
+#            print "Skipping row $currow due to inclusion\n";
+            next;
+        }
+        if (! $rowflag && exists $userow{$currow}) {
+#            print "Skipping row $currow due to exclusion\n";
+            next;
+        }
+    }
+    
+    # determine column names
+    @names = &column_names ($dbif, $table, $startcol);
+    $fieldnames = \@names;
+
+    if ($opts{'routine'}) {
+        # filter input first
+        next unless filter_input ($routine, $table, $fieldnames, \@values);
+    }
+
+	# filter out non-matching rows
+	MATCHSQL: {
+			if ($opts{'match-sql'}) {
+				for (my $i = 0; $i < @$fieldnames; $i++) {
+					if ($$fieldnames[$i] eq $matchcol) {
+						last MATCHSQL if $matchmap{$values[$i]};
+						print "Not accepted record @values\n";
+						next MAIN;
+					}
+				}
+			}
+		}
+
+    # sanity checks on input data
+    my $typeref = $dbif -> typemap ($table);
+    my $sizeref = $dbif -> sizemap ($table);
+
+    for (my $i = 0; $i <= $#$fieldnames; $i++) {
+        # check for column exclusion
+        if (keys %usecol) {
+            # note: we do not check the actual value !!
+            if ($colflag && ! exists $usecol{$$fieldnames[$i]}) {
+                next;
+            }
+            if (! $colflag && exists $usecol{$$fieldnames[$i]}) {
+                next;
+            }
+        }
+		# expand newlines and tabulators
+		if (defined $values[$i]) {
+			$values[$i] =~ s/\\n/\n/g;
+			$values[$i] =~ s/\\t/\t/g;
+		}
+        
+        # check if input exceeds column capacity
+		unless (exists $$typeref{$$fieldnames[$i]}) {
+			warn ("$0: No type information for column $$fieldnames[$i] found\n");
+			next;
+		}
+		unless (exists $$sizeref{$$fieldnames[$i]}) {
+			warn ("$0: No size information for column $$fieldnames[$i] found\n");
+			next;
+		}
+        if ($$typeref{$$fieldnames[$i]} == DBI::SQL_CHAR) {
+            if (defined $values[$i]) {
+                if (length($values[$i]) > $$sizeref{$$fieldnames[$i]}) {
+					warn (prefix() . "Data for field $$fieldnames[$i] truncated: $values[$i]\n");
+					$values[$i] = substr($values[$i], 0,
+										 $$sizeref{$$fieldnames[$i]});
+				}
+			} else {
+				# avoid insertion of NULL values
+				$values[$i] = '';
+			}	
+        } elsif ($$typeref{$$fieldnames[$i]} == DBI::SQL_VARCHAR) {
+            if (defined $values[$i]) {
+                if (length($values[$i]) > $$sizeref{$$fieldnames[$i]}) {
+					warn (prefix() . "Data for field $$fieldnames[$i] truncated: $values[$i]\n");
+					$values[$i] = substr($values[$i], 0,
+										 $$sizeref{$$fieldnames[$i]});
+				}
+			} else {
+				# avoid insertion of NULL values
+				$values[$i] = '';
+			}
+        }
+#        push (@data, $$fieldnames[$i], $values[$i]);
+    }
+
+    # check if record exists
+    my %keymap = &key_names ($dbif, $table, $opts{'keys'}, 1);
+    @keys = (keys(%keymap));
+    my @terms = map {$_ . ' = ' . $dbif->quote($values[$keymap{$_}])}
+        (@keys);
+    $sth = $dbif -> process ('SELECT ' . join(', ', @keys)
+							 . " FROM $table WHERE "
+							 . join (' AND ', @terms));
+    while ($sth -> fetch) {}
+
+    if ($sth -> rows () > 1) {
+        $" = ', ';
+        die ("$0: duplicate key(s) @keys in table $table\n");
+    }
+
+    $update = $sth -> rows ();
+    $sth -> finish ();
+    
+    # generate SQL statement
+    for (my $i = 0; $i <= $#$fieldnames; $i++) {
+        # check for column exclusion
+        if (keys %usecol) {
+            # note: we do not check the actual value !!
+            if ($colflag && ! exists $usecol{$$fieldnames[$i]}) {
+                next;
+            }
+            if (! $colflag && exists $usecol{$$fieldnames[$i]}) {
+                next;
+            }
+        }
+		# expand newlines
+		if (defined $values[$i]) {
+			$values[$i] =~ s/\\n/\n/g;
+		}
+        push (@data, $$fieldnames[$i], $values[$i]);
+    }
+
+    if ($update) {
+	if ($opts{'insert-only'}) {
+#	    print "SKIP UPDATING $.\n";
+	    next;
+	}
+#        print "UPDATING $.\n";
+        $dbif -> update ($table, join (' AND ', @terms), @data);
+    } else {
+        if ($opts{'update-only'}) {
+#	    print "SKIP INSERTING $.\n";
+	    next;
+        }
+#        print "INSERTING $.\n";
+        $dbif -> insert ($table, @data);
+    }
+
+    if ($opts{'cleanse'} && $update) {
+        my ($href, $i);
+        
+        # now unregister key combination
+        $href = \%recmap;
+        # Mysql strips trailing blanks from VARCHAR fields, so we do
+        if ($dbif->{DRIVER} eq 'mysql') {
+            for ($i = 0; $i < @cleansekeys; $i++) {
+                if ($$typeref{$cleansekeys[$i]}
+                    == DBI::SQL_VARCHAR) {
+                    $values[$cleansemap{$cleansekeys[$i]}] =~ s/\s+$//;
+                }
+            }
+        }
+		# data from input file may exceed column capacity
+		for ($i = 0; $i < @cleansekeys; $i++) {
+			if ($$typeref{$cleansekeys[$i]} == DBI::SQL_CHAR) {
+				$values[$cleansemap{$cleansekeys[$i]}]
+                  = substr($values[$cleansemap{$cleansekeys[$i]}],
+                           0,$$sizeref{$cleansekeys[$i]});
+			}
+		}
+        for ($i = 0; $i < $#cleansekeys; $i++) {
+            unless (exists $href->{$values[$cleansemap{$cleansekeys[$i]}]}) {
+                die ("$0: internal error: key $cleansekeys[$i] not found: ",
+                     join (",", @values), "\n");
+            }
+            $href = $href->{$values[$cleansemap{$cleansekeys[$i]}]};
+        }
+
+        unless (exists $href->{$values[$cleansemap{$cleansekeys[$i]}]}) {
+            die ("$0: internal error: key $cleansekeys[$i] not found: ",
+                 join (",", @values), "\n");
+        }
+		if ($href->{$values[$cleansemap{$cleansekeys[$i]}]} == 0) {
+            my $j = 0;
+			warn (prefix () . "duplicate key(s) in input: ",
+				  join (", ", map {"$_ = \"" . $values[$cleansemap{$cleansekeys[$j++]}] . "\""} @cleansekeys) . "\n");
+		}
+        $href->{$values[$cleansemap{$cleansekeys[$i]}]} = 0;
+    }
+}
+
+if ($opts{'cleanse'} && ! $opts{'insert-only'}) {
+    my $href;
+    
+    # now start to eliminate old records
+    $href = \%recmap;
+
+    my @keylist = keys %recmap;
+    my (@tmpkeys, @reckeys, $thiskey, $keyval, @conds);
+
+    for (keys %recmap) {
+        push (@reckeys, [$recmap{$_}, $_]);
+    }
+
+    for (my $i = 1; $i < @cleansekeys; $i++) {
+        @tmpkeys = @reckeys;
+        undef @reckeys;
+        for $thiskey (@tmpkeys) {
+            $href = shift @$thiskey;
+            for (keys %$href) {
+                push (@reckeys, [$href->{$_}, @$thiskey, $_]);
+            }
+        }
+    }
+    for (@reckeys) {
+        undef @conds;
+            
+        # finally delete the record
+        next unless shift (@$_);
+
+        for (my $i = 0; $i < @cleansekeys; $i++) {
+            push (@conds, $cleansekeys[$i] . ' = ' . $dbif->quote ($_->[$i]));
+        }
+
+        $dbif -> process ("DELETE FROM $table WHERE " . join (' AND ', @conds));
+    }
+}
+
+if (length $linebuf) {
+	if ($opts{'skipbadlines'}) {
+		warn ("$0: unexpected EOF");
+	} else {
+		die ("$0: unexpected EOF");
+	}
+}
+
+undef $dbif;
+
+if ($opts{'file'}) {
+    $fd_input->close;
+}
+
+# ----------------------------------------
+# FUNCTION: get_columns_tab IREF FD COLREF
+#
+# Get columns from a tab separated file.
+# ----------------------------------------
+
+sub get_columns_tab {
+	my ($iref, $fd, $colref) = @_;
+	my $line;
+	
+	while (defined ($line = <$fd>)) {
+		# skip empty/blank/comment lines
+		next if $line =~ /^\#/; next if $line =~ /^\s*$/;
+		# remove newlines and carriage returns
+		chomp ($line);
+		$line =~ s/\r$//;
+
+		@$colref = split (/\t/, $line);
+		return @$colref;
+	}
+}
+
+# ----------------------------------------
+# FUNCTION: get_columns_csv IREF FD COLREF
+#
+# Get columns from a CSV file.
+# ----------------------------------------
+
+sub get_columns_csv {
+    my ($iref, $fd, $colref) = @_;
+    my ($line, $buffer);
+
+    unless ($iref->{parser}) {
+	$iref->{parser} = Text::CSV_XS->new ({'binary' => 1, 'sep_char' => ','});
+    }
+
+    while (defined ($line = <$fd>)) {
+	if ($iref->{parser}->parse($line)) {
+	    # csv line completed, delete buffer
+	    @$colref = $iref->{parser}->fields();
+	    $buffer = '';
+	    return @$colref;
+	} 
+
+	if (($line =~ tr/"/"/) % 2) {
+	    # odd number of quotes, try again with next line
+	    $buffer = $line;
+	} else {
+	    $msg = "$0: $.: line not in CSV format: " . $iref->{parser}->error_input() . "\n";
+	    die ($msg);
+	}
+    }
+}
+
+# ----------------------------------------
+# FUNCTION: get_columns_xls IREF FD COLREF
+#
+# Get columns from a XLS spreadsheet.
+# ----------------------------------------
+
+sub get_columns_xls {
+	my ($iref, $fd, $colref) = @_;
+
+	unless ($iref->{workbook}) {
+		# parse the spreadsheet once
+		$iref->{workbook} = $iref->{object}->Parse($fd);
+		unless ($iref->{workbook}) {
+			die "$0: couldn't parse spreadsheet\n";
+		}
+		$iref->{worksheet} = $iref->{workbook}->{Worksheet}[0];
+		$iref->{row} = 0;
+	}
+
+	if ($iref->{row} <= $iref->{worksheet}->{MaxRow}) {
+		@$colref = map {defined $_ ? $_->{Val} : undef}
+			@{$iref->{worksheet}->{Cells}[$iref->{row}++]};
+		return @$colref;
+	}
+}
+
+# -------------------------------------------------
+# FUNCTION: column_names DBIF TABLE [START]
+#
+# Returns array with column names from table TABLE
+# using database connection DBIF.
+# Optional parameter START specifies column where
+# the array should start with.
+# -------------------------------------------------
+
+sub column_names ($$) {
+    my ($dbif, $table, $start) = @_;    
+    my ($names, $sth);
+
+    $start = 0 unless $start;
+    
+    if (exists $fieldmap{$table}) {
+        $names = $fieldmap{$table};
+    } else {
+        $sth = $dbif -> process ("SELECT * FROM $table WHERE 0 = 1");
+        $names = $fieldmap{$table} = $sth -> {NAME};
+        $sth -> finish ();
+    }
+
+    @$names[$start .. $#$names];
+}
+
+# --------------------------------------------------
+# FUNCTION: key_names DBIF TABLE KEYSPEC [HASH]
+#
+# Returns array with key names for table TABLE.
+# Database connection DBIF may be used to
+# retrieve necessary information.
+# KEYSPEC contains desired keys, either a numeric
+# value or a comma-separated list of keys.
+# If HASH is set, a mapping between key name
+# and position is returned.
+# --------------------------------------------------
+
+sub key_names () {
+    my ($dbif, $table, $keyspec, $hash) = @_;
+    
+    my ($numkeysleft, $i);
+    my @columns = column_names ($dbif, $table);
+    my (@keys, %kmap);
+    
+    $keyspec =~ s/^\s+//; $keyspec =~ s/\s+$//;
+
+    if ($keyspec =~ /^\d+$/) {
+        #
+        # passed keys are numeric, figure out the names
+        #
+
+        $numkeysleft = $keyspec;
+
+        for ($i = 0; $i < $numkeysleft && $i < @columns; $i++) {
+            if (keys %usecol) {
+                # note: we do not check the actual value !!
+                if ($colflag && ! exists $usecol{$columns[$i]}) {
+                    $numkeysleft++;
+                    next;
+                }
+                if (! $colflag && exists $usecol{$columns[$i]}) {
+                    $numkeysleft++;
+                    next;
+                }
+            }
+            if ($hash) {
+                $kmap{$columns[$i]} = $i;
+            } else {
+                push (@keys, $columns[$i]);
+            }
+        }
+	} else {
+        #
+        # key names are passed explicitly
+        #
+
+        my %colmap;
+        
+        for ($i = 0; $i < @columns; $i++) {
+            $colmap{$columns[$i]} = $i;
+        }
+        
+        for (split (/\s*,\s*/, $keyspec)) {
+            # sanity check
+            unless (exists $colmap{$_}) {
+                die "$0: key \"$_\" appears not in column list\n";
+            }
+            
+            if ($hash) {
+                $kmap{$_} = $colmap{$_};
+            } else {
+                push (@keys, $_);
+            }
+        }
+    }
+
+    return $hash ? %kmap : @keys;
+}
+
+# ---------------------------------------------------------
+# FUNCTION: filter_input ROUTINE TABLE FIELDNAMES VALREF
+#
+# Filters data input with ROUTINE. Produces first a mapping
+# between FIELDNAMES and the data pointed to by VALREF
+# and passes the table name TABLE and the mapping to the
+# ROUTINE.
+# ---------------------------------------------------------
+
+sub filter_input {
+    my ($routine, $table, $fieldnames, $valref) = @_;
+    my (%colmap, $ret);
+
+    # produce mapping
+    for (my $i = 0; $i <= $#$fieldnames; $i++) {
+        $colmap{$$fieldnames[$i]} = $$valref[$i];
+    }
+
+    # apply filter routine
+    $ret = &$routine ($table, \%colmap);
+    
+    # write new values
+    for (my $i = 0; $i <= $#$fieldnames; $i++) {
+        $$valref[$i] = $colmap{$$fieldnames[$i]};
+    }
+
+    $ret;
+}
+
+# ------------------------------------
+# FUNCTION: prefix
+#
+# Generates prefix for error messages.
+# ------------------------------------
+
+sub prefix {
+    my @frags = ($0);
+
+    if ($.) {
+        if ($opts{'file'}) {
+            push (@frags, $opts{'file'});
+        }
+        push (@frags, $.);
+    }
+    join (': ', @frags, '');
+}
+
+# -----------------------------------
+# FUNCTION: fatal
+#
+# Error handler called by DBIx::Easy.
+# -----------------------------------
+
+sub fatal {
+  my ($statement, $err, $msg) = @_;
+  my $pwd;
+  my $prefix = prefix ();
+  
+  if ($dbif->is_auth_error ($err)) {
+    unless ($pwdused) {
+      print "We need a password.\n";
+      $pwd = querypwd();
+      $pwdused = 1;
+    
+      # retry the connection
+      if (length ($pwd)) {
+        $dbif = new DBIx::Easy ($driver, $database, $user, $pwd);
+        $dbif -> install_handler (\&fatal);
+        $dbif -> connect ();
+        return;
+      } else {
+        die ("$prefix$statement: $msg\n");
+      }
+    }
+  }
+  die ("$prefix$statement: $msg\n");
+}
+
+# ----------------------------
+# FUNCTION: querypwd
+#
+# Queries user for a password.
+# ----------------------------
+
+sub querypwd () {
+  my $pwd;
+
+  print "Password: ";
+  ReadMode ('noecho');  # turn echo off
+  $pwd = ReadLine (0);
+  ReadMode ('restore'); # restore terminal
+  print "\n";
+  chomp ($pwd);
+  $pwd;
+}
+
+# script documentation (POD style)
+
+=head1 NAME
+
+dbs_update - Update SQL Databases
+
+=head1 DESCRIPTION
+
+dbs_update is an utility to update SQL databases from text files.
+
+=head2 FORMAT OF THE TEXT FILES
+
+dbs_update assumes that each line of the input contains a data record
+and that the field within the records are separated by tabulators.
+You can tell dbs_update about the input format with the B<--format>
+option.
+
+The first field of the data record is used as table specification.
+These consists of the table name and optionally the index of starting
+column, separated by a dot.
+
+Alternatively dbs_update can read the column names from the first line
+of input (see the B<-h>/B<--headline> option). These can even be aliases
+for the real column names (see the B<-m>/B<--map> option).
+
+=head1 COMMAND LINE PARAMETERS
+
+Required command line parameters are the DBI driver
+(C<Pg> for Postgres or C<mysql> for MySQL)
+and the database name. The third parameter is optionally
+and specifies the database user and/or the host where the
+database resides (C<racke>, C<racke@linuxia.de> or C<@linuxia.de>).
+
+=head1 OPTIONS
+
+=head2 B<--cleanse>
+
+I<Removes> all records which remain unaffected from the update
+process. The same result as deleting all records from the table
+first and then running dbs_update, but the table is not empty
+in the meantime.
+
+=head2 B<-c> I<COLUMN,COLUMN,...>, B<--columns>=I<COLUMN,COLUMN,...>
+
+Update only the table columns given by the I<COLUMN> parameters.
+To exclude columns from the update prepend C<!> or C<^> to the
+parameters.
+
+=head2 B<--rows>=I<ROW,ROW,...>
+
+Update only the input rows given by the I<ROW> parameters.
+The first row is 1 where headlines doesn't count.
+To exclude rows from the update prepend C<!> or C<^> to the
+parameters.
+
+=head2 B<-f> I<FILE>, B<--file>=I<FILE>
+
+Reads records from file I<FILE> instead of from standard input.
+
+=head2 B<--format>=I<FORMAT[SEPCHAR]>
+
+Assumes I<FORMAT> as format for the input. Only B<CSV> can be
+specified for now, default is B<TAB>. The default field
+separator for B<CSV> is a comma, you may change this by
+appending the separator to the format.
+
+=head2 B<-h>, B<--headline>
+
+Reads the column names from the first line of the input instead
+of dedicting them from the database layout. Requires the
+B<-t/--table> option.
+
+=head2 B<-i>, B<--insert-only>
+
+Insert new database entries only, skip others.
+
+=head2 B<-k> I<COUNT>, B<-k> I<KEY,KEY,...>, B<--keys>=I<COUNT>, B<--keys>=I<KEY,KEY,...>
+
+Specifies the keys for the table(s) either as the number of columns
+used as keys or by specifying them explicitly as comma separated
+arguments to the option.
+This is used for the detection of existing records.
+
+=head2 B<-m> I<ALIASDEF>, B<--map>=I<ALIASDEF>
+
+Maps the names found in the first line of input to the actual column
+names in the database. The alias and the column name are separated
+with C<=> signs and the different entries are separated by C<;> signs,
+e.g. C<Art-No.=code;Short Description=shortdescr'>.
+
+=head2 B<--map-filter>=I<FILTER>
+
+Applies a filter to the column names read from the input file.
+Currently there is only the C<lc> filter available.
+
+=head2 B<--match-sql>=I<FIELD:{STATEMENT}>
+
+Updates only records where the value of the column I<FIELD> is in
+the result set of the SQL statement I<STATEMENT>,
+e.g. C<category:{select distinct name from categories}>.
+
+=head2 B<-o>, B<--update-only>
+
+Updates existing database entries only, stops if it detects
+new ones.
+
+=head2 B<-r> I<ROUTINE>, B<--routine>=I<ROUTINE>
+
+Applies I<ROUTINE> to any data record. I<ROUTINE> must be a subroutine.
+dbs_update passes the table name and a hash reference to this subroutine.
+The keys of the hash are the column names and the values are the
+corresponding field values. If the return value of I<ROUTINE> is not
+a truth value, the data record will be skipped.
+
+C<sub {my ($table, $valref) = @_;
+    unless (defined $$valref{country} && $$valref{country} !~ /\S/) {
+        $$valref{country} = "Germany";
+    }
+    1;
+}>
+
+=head2 B<--skipbadlines>
+
+Lines not matching the assumed format are ignored. Without this
+option, dbs_update simply stops.
+
+=head2 B<-t> I<TABLE>, B<--table>=I<TABLE>
+
+Uses I<TABLE> as table name for all records instead of the
+first field name.
+
+=head1 AUTHOR
+
+Stefan Hornburg (Racke), racke@linuxia.de
+
+=head1 SEE ALSO
+
+perl(1), DBIx::Easy(3)
+
+=cut    

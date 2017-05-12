@@ -1,0 +1,26 @@
+ChangeLog		Change history
+README			Docs
+MANIFEST		This file
+CONTRIBUTING.md		Guide in how to contribute
+Peek.pm			Perl part of the module
+Peek.xs			C part of the module
+Makefile.PL		Makefile generator
+ppport.h		Compatability layer
+typemap			Define PerlIO for non-PerlIO perl
+t/00_pod.t		Check if pod is valid
+t/01_pod.t		Check if pod covers all
+t/10_DDumper.t		Tests for DDumper ()
+t/11_DDumper.t		Tests for DDumper () using Perl::Tidy
+t/20_DPeek.t		Tests for DPeek ()
+t/21_DDisplay.t		Tests for DDisplay ()
+t/22_DHexDump.t		Tests for DHexDump ()
+t/30_DDump-s.t		Tests for DDump () returning string using _XS
+t/31_DDump-s.t		Tests for DDump () returning string using _IO
+t/40_DDump-h.t		Tests for DDump () returning hash   using _XS
+t/41_DDump-h.t		Tests for DDump () returning hash   using _IO
+t/50_DDual.t		Tests for DDual ()
+t/51_triplevar.t	Tests for triplevar ()
+t/52_DGrow.t		Tests for DGrow ()
+examples/ddumper.pl	show the use
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

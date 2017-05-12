@@ -1,0 +1,69 @@
+{
+   "abstract" : "Human readable date periods",
+   "author" : [
+      "Peter Stuifzand <peter@stuifzand.eu>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.3, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Period-Human",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.039"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Calc" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DateTime::Format::MySQL" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/pstuifzand/date-period-human/issues"
+      },
+      "homepage" : "https://github.com/pstuifzand/date-period-human",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/pstuifzand/date-period-human.git",
+         "web" : "https://github.com/pstuifzand/date-period-human"
+      }
+   },
+   "version" : "0.4.5",
+   "x_contributors" : [
+      "MAJESTIC <majestic@cpan.org>",
+      "Peter Stuifzand <peter.stuifzand@gmail.com>",
+      "isync <O.Zucker@web.de>"
+   ]
+}
+

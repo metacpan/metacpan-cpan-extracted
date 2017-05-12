@@ -1,0 +1,19 @@
+FUTURE:
+ - Support the overlapping?
+ - Allow minimum row/column size
+
+0.03 Wednesday August 29 02:33:18 PDT 2007:
+ - Complete documentation
+ - Module is fully functional with complete documentation
+
+0.03 Monday August 27 22:55:13 PDT 2007:
+ - More documentation
+
+0.02 Friday August 17 19:03:19 PDT 2007:
+ - Minor interface change to exported rows and columns functions
+
+0.01 Thursday August 09 13:27:24 PDT 2007:
+ - Row major/column major selectable implementation
+
+0.01 Saturday August 04 20:52:56 PDT 2007:
+ - Initial version

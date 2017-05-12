@@ -1,0 +1,20 @@
+Revision history for Dezi-UI
+
+0.001005 05 Nov 2015
+ - fix packaging error https://rt.cpan.org/Ticket/Display.html?id=108442
+
+0.001004 27 April 2015
+ - fix css link protocol so it works under secure browsers
+
+0.001003 17 Aug 2012
+ - add 'base_uri' arg to constructor
+
+0.001002 12 July 2012
+ - switch to lightweight jQuery example
+
+0.001001 22 May 2012
+ - fix POD synopsis
+
+0.001000 16 March 2012
+ - First version, released on an unsuspecting world.
+

@@ -1,0 +1,38 @@
+0.06     2016-03-26
+
+- The generated tests are now added as "xt/author/pp-*". This lets other
+  Dist::Zilla plugins which handle tests under xt do the right thing.
+
+- The generated tests no longer include their own "only run under
+  RELEASE_TESTING" block. This is handled by whatever plugin you might use to
+  handle tests in xt/.
+
+
+0.05     2015-03-21
+
+- Removed use of Moose::Autobox
+
+
+0.04     2014-11-15
+
+- When making pure Perl copies of test files, this plugin now skips
+  Dist::Zilla::File::InMemory objects. These are typically added by other
+  plugins like Test::EOL or Test::Compile, and there's no usually no point in
+  testing them twice. Some plugins (like Test::Compile) are implemented in a
+  way that copying the test file ends up generating a broken test, and this
+  avoid that problem.
+
+
+0.03     2011-04-19
+
+- When rewriting tests, the shbang line is preserved, if one exists.
+
+
+0.02    2010-06-28
+
+- Switched to running the extra tests as release tests, not author tests.
+
+
+0.01    2010-06-28
+
+- First release

@@ -1,0 +1,1394 @@
+<!DOCTYPE article PUBLIC "-//OASIS//DTD DocBook V3.1//EN">
+<article>
+  <articleinfo>
+    <title></title>
+    <author>
+      <firstname>Chris</firstname>
+      <surname>Mungall</surname>
+      <affiliation>
+        <orgname>
+	  <ulink url="http://www.fruitfly.org">BDGP</ulink>
+        </orgname>
+        <address>
+	  <email>cjm@fruitfly.org</email>
+        </address>
+      </affiliation>
+    </author>
+
+    <pubdate>2004-04-24</pubdate>
+    
+    <revhistory>
+      <revision>
+        <revnumber>$Id: dbstag-tutorial.sgml,v 1.8 2004/06/10 18:30:53 cmungall Exp $</revnumber>
+        <date>$Date: 2004/06/10 18:30:53 $</date>
+        <authorinitials>cjm</authorinitials>
+      </revision>
+    </revhistory>
+
+
+    <abstract>
+      <para>
+
+      </para>
+    </abstract>
+
+  </articleinfo>
+
+  <sect1 id="intro">
+    <title>Introduction</title> 
+    <para>
+    </para>
+  </sect1>
+
+  <sect1 id="setup">
+    <title>Setting up DBStag</title>
+    <para>
+      This section describes how you set up your environment to use
+      DBStag. You will need to set up some environment variables
+      telling stag where to find certain configuration
+      directories. You will need to download the appropriate databases
+      if they are not already installed on your system.
+    </para>
+
+    <sect2 id="setup_bdgp">
+      <title>Setting up (For use within BDGP)</title>
+      <para>
+	There are two environment variables DBStag needs to know
+	about - one is the config file specifying which databases are
+	available to BDGP users, the other specifies the location(s)
+	of the actual Stag Templates themselves
+
+	<programlisting>
+setenv DBSTAG_DBIMAP_FILE "/data/bioconf/bioresources.conf"
+setenv DBSTAG_TEMPLATE_DIRS ".:/data/bioconf/templates"
+	</programlisting>
+
+	You may wish to add these to your .aliases file so they are
+	permanently available. You may also wish to change these
+	later on; for ple, if you start writing your own templates
+	you may wish to place your local development template
+	directory first on the path
+      </para>
+
+      <para>
+	Stag requires certain executables and perl libraries - the
+	most p to date version should be installed BDGP-wide, if not
+	speak to me. You may also wish to add the "live templates" to
+	your PATH; there are a lot of executables here (one for every
+	template) which is why they n't go in /usr/local/bin
+	<programlisting>
+setenv PATH "${PATH}:/usr/local/bdgp/stagbin"
+	</programlisting>
+	
+	Now you're ready to go!
+      </para>
+    </sect2>
+    <sect2 id="setup_nonlocal">
+      <title>Setting up (For use outside BDGP)</title>
+      <para>
+	You have a bit more work to do if you want to follow this
+	tutorial for example on your laptop. The steps should be
+	simple d require minimum hacking
+      </para>
+      <sect3 id="setup_perlmod">
+	<title>Perl modules</title>
+	<para>
+          First you need to install two perl modules which can be
+	  done with the CPAN installer
+
+	  <programlisting>
+perl -MCPAN -e shell
+install Data::Stag
+install DBIx::DBStag
+	  </programlisting>
+
+	  Depending on which other modules you have installed, you
+	  may be asked to install other dependencies (eg DBI)
+	</para>
+      </sect3>
+      <sect3 id="setup_db">
+	<title>Obtaining the demo database</title>
+	<para>
+	  This tutorial uses the GO database as an example - download
+	  this from <ulink
+	    url="http://www.godatabase.org/dev">http://www.godatabase.org/dev</ulink>.
+	  You should follow the instructions and create a MySQL
+	  installation of a GO DB (not a termdb - this has only the
+	  ontology).
+	</para>
+	<para>
+	  You should also download a copy of the go-dev distribution
+	  which contains the stag templates; alternatively you can
+	  get these from <ulink
+	    url="http://www.godatabase.org/dev/sql/stag-templates">http://www.godatabase.org/dev/sql/stag-templates</ulink>. You
+	  should put these somewhere on your filesystem and set the
+	  DBSTAG_TEMPLATE_DIRS to point to them (see BDGP
+	  instructions above)
+	</para>
+      </sect3>
+    </sect2>
+  </sect1>
+  <sect1 id="go">
+    <title>Basic Querying - GO Database</title>
+    <para>Assuming you're already set up, you can now start querying the
+      GO database using one of the predefined templates. Each
+      template has been turned into an executable, and each template
+      is named according to the <emphasis>schema</emphasis> of the
+      database. The schema for GO is simply called "go". Of course, you can
+      have multiple databases with the same schema. At present, DBStag cannot
+      deal with overlapping or inherited schemas.</para>
+    <para>
+      Thanks to unix TAB-completion we can see the stag template executables
+      available to us by simply typing go-<emphasis>TAB</emphasis>. You should
+      see something like this:
+      <programlisting>
+go-child_term                    go-geneproduct-by-term-and-evidence
+go-common_ancestor               go-peptide_motif-by-term
+go-correlations                  go-seq-by-term
+go-correlations-summary          go-term
+go-descendent_term               go-term-by-direct-relationship
+go-geneproduct                   go-term-by-geneproduct-or-synonym
+go-geneproduct-by-direct-term    go-term-with-direct-associations
+go-geneproduct-by-species        go-transitive_correlations
+go-geneproduct-by-term           go-transitive_correlations-summary
+      </programlisting>
+    </para>
+    <para>
+      Depending on what stag SQL templates are available on your system, you
+      may be able to query other databases. For example, at BDGP the databases
+      ag_enscore, hs_enscore etc all have schema <emphasis>enscore</emphasis>
+      (Ensembl core schema). These are the templates available for ensembl
+      (again, accessible by typing enscore-<emphasis>TAB</emphasis>.
+      <programlisting>
+enscore-contigdna  enscore-genemodel-all-laminins  enscore-spliced3utr
+enscore-genemodel  enscore-intron                  enscore-transcriptseq
+      </programlisting>
+      For now, let's focus on the GO database.
+    </para>
+    <sect2 id="go-term">
+      <title>The <emphasis>go-term</emphasis> template</title>
+      <para>
+        A stag SQL template should give some rough indication of what
+        data is fetched by the name. The <emphasis>go-term</emphasis>
+        template fetches ontology <emphasis>terms</emphasis> from a
+        database with the GO schema.
+      </para>
+      <para>
+        A stag template is also capable of describing itself - just
+        pass it the <emphasis>-h</emphasis> command line option:
+
+	<programlisting>
+go-term -h
+DESC:
+  Fetches a metadata about a GO term - synonyms, comments, definition,
+  dbxref links to analogous terms in other ontologies.
+
+  Does NOT fetch graph/relationship data
+PARAMETERS:
+  term_acc
+  term_name
+  term_type
+  term_is_obsolete
+  term_id
+  term_definition
+QUERY RESULT STRUCTURE (NESTING):
+'(set
+  (term
+    (term_dbxref
+      (dbxref ""))
+    (term_synonym "")
+    (term_definition "")))
+	</programlisting>
+	
+	The autodescription is split into 3 parts
+	<itemizedlist>
+	  <listitem><para>Brief textual description of template</para></listitem>
+	  <listitem><para>Parameters/Query Constraints</para></listitem>
+	  <listitem><para>Tree structure describing how to turn the
+	      results of the query into XML</para></listitem>
+	</itemizedlist>
+	Let's try a query. We will fetch the GO term with accession no
+	<emphasis role="bold">GO:0005658</emphasis> using the
+	following command line:
+	<programlisting>
+go-term -d go term_acc=GO:0005658
+	</programlisting>
+	Note that because <emphasis>term_acc</emphasis> is the first
+	parameter listed above, it is also the default parameter. This
+	means we can also issue the following query:
+	<programlisting>
+go-term -d go GO:0005658
+	</programlisting>
+	And get the same results.
+      </para>
+
+      <para>
+	You always need to specify the <emphasis>-d</emphasis>
+	switch. This gives either the short logical name of the db
+	(see the DBSTAG_DBIMAP_FILE) or a full DBI locator. More on
+	this later.
+      </para>
+
+      <para>
+	If you execute the above command (you may wish to pipe to a
+	file) you will get the following XML data back:
+	<programlisting>
+<![CDATA[
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+  <term>
+    <id>15663</id>
+    <name>alpha DNA polymerase:primase complex</name>
+    <term_type>cellular_component</term_type>
+    <acc>GO:0005658</acc>
+    <is_obsolete>0</is_obsolete>
+    <is_root>0</is_root>
+    <term_dbxref>
+      <term_id>15663</term_id>
+      <dbxref_id>25029</dbxref_id>
+      <is_for_definition>0</is_for_definition>
+      <dbxref>
+        <id>25029</id>
+        <xref_key>Primosome</xref_key>
+        <xref_dbname>SP_KW</xref_dbname>
+      </dbxref>
+    </term_dbxref>
+    <term_dbxref>
+      <term_id>15663</term_id>
+      <dbxref_id>25545</dbxref_id>
+      <is_for_definition>0</is_for_definition>
+      <dbxref>
+        <id>25545</id>
+        <xref_key>TIGR00335 DNA primase, eukaryotic-type, small subunit, putative</xref_key>
+        <xref_dbname>TIGR_TIGRFAMS</xref_dbname>
+      </dbxref>
+    </term_dbxref>
+    <term_dbxref>
+      <term_id>15663</term_id>
+      <dbxref_id>25720</dbxref_id>
+      <is_for_definition>0</is_for_definition>
+      <dbxref>
+        <id>25720</id>
+        <xref_key>TIGR00595 primosomal protein N'</xref_key>
+        <xref_dbname>TIGR_TIGRFAMS</xref_dbname>
+      </dbxref>
+    </term_dbxref>
+    <term_synonym>
+      <term_id>15663</term_id>
+      <term_synonym>primosome</term_synonym>
+    </term_synonym>
+  </term>
+</set>
+]]>
+	</programlisting>
+      </para>
+      
+    </sect2>
+    <sect2 id="go-term-xml">
+      <title>go-term XML</title>
+      <para>
+	Now you may be thinking - hold on, what is an SQL query doing
+	giving back XML? Well, this is part of the magic that is DBStag.
+      </para>
+      <para>
+	If you look at the XML we got back, you will see that the root
+	of the document is the <emphasis>set</emphasis> element, under
+	which we have a <emphasis>term</emphasis> element. These can
+	contain <emphasis>term_synonym</emphasis> elements,
+	<emphasis>term_dbxref</emphasis> elements and
+	<emphasis>term_definition</emphasis> elements (although this
+	particular example term does not yet have a definition).
+      </para>
+      <para>
+	Where is the DTD for this XML? There isn't one. The XML
+	elements are derived <emphasis>dynamically</emphasis> from the
+	SQL query and the tables and columns in the database. Note
+	that the nesting of the XML elements above corresponds to the
+	tree structure we saw in the autodescription above.
+      </para>
+      <para>
+	At the moment there is no option to generate a DTD for a
+	particular template as a side effect, although this would be
+	nice thing to have one day.
+      </para>
+      <para>
+	Now the XML we got back may not correspond to a particular DTD
+	standard. However, one of the nice things about XML is that it
+	is easy to manipulate and transform. Later on we will also see
+	how to get perl <emphasis>objects</emphasis> from the database.
+      </para>
+    </sect2>
+    <sect2 id="go-term-rows">
+      <title>Returning rows from queries</title>
+      <para>
+	XML is nice and is particularly well suited to nested
+	hierarchical data. However, some data is better presented and
+	manipulated in tabular form. You can always use the
+	<emphasis>-rows</emphasis> option to get the data back in
+	tabular format. This bypasses the DBStag XML generation
+	procedure and just gives you back the actual SQL query results
+      </para>
+      <para>
+	For example:
+	<programlisting>
+go-term -rows -d go term_GO:0005658
+	</programlisting>
+	This generates the following tab-delimited row data:
+	<programlisting>
+15663   alpha DNA polymerase:primase complex    cellular_component      GO:0005658      0       0       15663      25029   0       25029   Primosome       \NULL   SP_KW   \NULL   15663   primosome       \NULL   \NULL      \NULL   \NULL   \NULL   \NULL
+15663   alpha DNA polymerase:primase complex    cellular_component      GO:0005658      0       0       15663      25545   0       25545   TIGR00335 DNA primase, eukaryotic-type, small subunit, putative \NULL   TIGR_TIGRFAMS      \NULL   15663   primosome       \NULL   \NULL   \NULL   \NULL   \NULL   \NULL
+15663   alpha DNA polymerase:primase complex    cellular_component      GO:0005658      0       0       15663      25720   0       25720   TIGR00595 primosomal protein N' \NULL   TIGR_TIGRFAMS   \NULL   15663   primosome  \NULL   \NULL   \NULL   \NULL   \NULL   \NULL
+	</programlisting>
+	This is the actual SQL query results. Because this is the
+	results of a multi-table join there are repeating column
+	values (for example the <emphasis>term.name</emphasis> appears
+	3 times). These repeating column values are collapsed when
+	DBStag decomposes this into XML.
+      </para>
+    </sect2>
+    <sect2 id="go-term-constraints">
+      <title>Multiple Query Constraints</title>
+      <para>
+	You can pass in multiple query constraints - these will be
+	ANDed together. Recall from the autodescription (obtained with
+	the <emphasis>-h</emphasis> switch) that the constraints are:
+      </para>
+      <para>
+	<itemizedlist>
+	  <listitem><para>term_acc</para></listitem>
+	  <listitem><para>term_name</para></listitem>
+	  <listitem><para>term_type</para></listitem>
+	  <listitem><para>term_is_obsolete</para></listitem>
+	  <listitem><para>term_id</para></listitem>
+	  <listitem><para>term_definition</para></listitem>
+	</itemizedlist>
+      </para>
+      <para>
+	We can combine these like this:
+	<programlisting>
+go-term -d go term_type=biological_process term_is_obsolete=0
+	</programlisting>
+	This fetches all biological process terms that are not
+	obsolete. This query may take a little longer, and the
+	resulting XML will be quite lengthy so you may wish to
+	redirect this to a file.
+      </para>
+      <para>
+	You can also leave out all the query constraints in order to
+	fetch everything:
+	<programlisting>
+go-term -d go
+	</programlisting>
+      </para>
+      <para>
+	You can also use wildcards for pattern matching. SQL uses
+	<emphasis>%</emphasis> as a wildcard
+	<programlisting>
+go-term -d go term_name=photoreceptor%
+	</programlisting>
+      </para>
+    </sect2>
+    <sect2 id="go-term-complex">
+      <title>Complex Queries</title>
+      <para>
+	At the moment there is no facility for combining constraints
+	other than ANDing them together. For example, you can't say
+	<emphasis>fetch all terms that are of type molecular_function
+	  OR are obsolete</emphasis>. This may come in a future
+	version of DBStag. However, it is possible to override the
+	<emphasis>WHERE</emphasis> altogether:
+	<programlisting>
+go-term -d go -where\
+"(term_type='molecular_function' OR is_obsolete=1)"
+	</programlisting>
+	  Not a particularly useful query, but it illustrates how to
+	  give arbitrary boolean combinations of constraints using SQL
+      </para>
+    </sect2>
+    <sect2 id="other-go-templates">
+      <title>Other GO SQL Templates</title>
+      <para>
+	As we saw earlier, there are plenty of other templates
+	available for a GO database. Some deal specifically with the
+	graph structure of the ontology (for example,
+	<emphasis>go-child_term</emphasis>). Others deal with gene
+	products (e.g. <emphasis>go-geneproduct</emphasis>). Some deal
+	with the placement/annotation of gene products in the context
+	of the GO graph of terms
+	(e.g. <emphasis>go-term-by-geneproduct-or-synonym</emphasis>). Others
+	are more complex - for example,
+	<emphasis>go-transitive-correlations</emphasis> deals with
+	terms that are correlated via common gene products.
+      </para>
+      <para>
+	Try experimenting with some of these; as an exercise see if
+	you can answer the following questions:
+	<itemizedlist>
+	  <listitem>
+	    <para>
+	      What are the biological process annotations for the
+	      drosophila gene <emphasis>dpp</emphasis>?
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      What are the direct children of the GO term
+	      <emphasis>transmembrane receptor activity</emphasis>?
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      What are the direct parents of the GO term
+	      <emphasis>DNA Helicase</emphasis>?
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      What are the ancestors (i.e. parents and parents of
+	      parents) of the GO term <emphasis>DNA
+	      Helicase</emphasis>?
+	    </para>
+	  </listitem>
+	  <listitem>
+	    <para>
+	      What gene products are annotated to BOTH
+	      <emphasis>immune response</emphasis> and <emphasis>GTP
+	      Binding</emphasis>?
+	    </para>
+	  </listitem>
+	</itemizedlist>
+      </para>
+    </sect2>
+    <sect2 id="selectall-xml">
+      <title>The <emphasis>selectall_xml</emphasis> script</title>
+      <para>
+	A stag template executable is really just a redirection
+	command which calls the selectall_xml.pl script.
+	<programlisting>
+cat `which go-term`
+	</programlisting>
+	We can see that this is just an alias for:
+	<programlisting>
+#!/bin/sh
+selectall_xml.pl -t go-term $@
+	</programlisting>
+	This script can be used with any template by using the
+	<emphasis>-t</emphasis> switch, or the following shorthand:
+	<programlisting>
+selectall_xml.pl -d go /go-term GO:0008045
+	</programlisting>
+	This script will also list ALL templates allowed for a
+	particular database like this:
+	<programlisting>
+selectall_xml.pl -d go -h
+	</programlisting>
+	This lists all GO templates, and shows the description of each
+	one
+      </para>
+    </sect2>
+  </sect1>
+  <sect1 id="arbitrary_queries">
+    <title>Querying without Templates</title>
+    <para>
+      You can use the selectall_xml command to launch an arbitrary SQL
+      query, not using templates at all. The main reason for doing
+      this would be to get hierarchical XML data from your SQL query
+      results.
+      <programlisting>
+selectall_xml.pl -d go\
+ "SELECT *\
+  FROM term\
+  INNER JOIN term_synonym ON (term.id=term_synonym.term_id)\
+  WHERE is_obsolete = 0"	
+      </programlisting>
+      This will generate XML with <emphasis>term_synonym</emphasis>
+      nested under <emphasis>term</emphasis> (we will see how to
+      influence the nesting in the nest section).
+    </para>
+    <para>
+      If your query is to long to fit on the command line you can put
+      it in a file and use the <emphasis>-f</emphasis> option.
+      <programlisting>
+selectall_xml.pl -d go -f my-query.sql
+      </programlisting>
+    </para>
+  </sect1> 
+  <sect1 id="template_anatomy">
+    <title>Anatomy of a DBStag SQL Template</title>
+    <para>
+      At this point you should be armed to go into any database for
+      which some predefined templates exist and ask questions. However
+      it may be interesting to peek under the hood into the internals
+      of a template. This is useful for when you start to write your
+      own templates. It is also a good way of learning about SQL in
+      general and how to construct SQL queries against your favourite
+      database.
+    </para>
+    <para>
+      A stag SQL template is nothing more than a specially formatted
+      file with a <emphasis>.stg</emphasis> suffix. You can look at
+      the actual files themselves in the $DBSTAG_TEMPLATE_DIRS
+      directories (remember, we set this environment variable earlier)
+      or you can run the template executable with the
+      <emphasis>-h</emphasis> and <emphasis>-v</emphasis> (verbose)
+      options; the latter gives you coloured syntax highlighting.
+    </para>
+    <para>
+      We can examine the <emphasis>go-term</emphasis> template:
+      <programlisting>
+go-term -h -v
+      </programlisting>
+      Which gives us this:
+      <programlisting>
+<![CDATA[
+SELECT *
+FROM term
+  LEFT OUTER JOIN term_dbxref     ON (term.id = term_dbxref.term_id)
+  LEFT OUTER JOIN dbxref          ON (term_dbxref.dbxref_id = dbxref.id)
+  LEFT OUTER JOIN term_synonym    ON (term.id = term_synonym.term_id)
+  LEFT OUTER JOIN term_definition ON (term.id = term_definition.term_id)
+WHERE [term.acc => &term_acc&]
+    [term.name => &term_name&]
+    [term.term_type => &term_type&]
+    [term.is_obsolete => &term_is_obsolete&]
+    [term.id => &term_id&]
+    [term_definition.term_definition => &term_definition&]
+ORDER BY term.name
+USE NESTING (set(term(term_dbxref(dbxref))(term_synonym)(term_definition)))
+// -- METADATA --
+schema: go
+desc: Fetches a metadata about a GO term - synonyms, comments, definition,
+  dbxref links to analogous terms in other ontologies.
+
+  Does not fetch graph/relationship data
+example_input: term_acc => SELECT DISTINCT term.acc FROM term INNER JOIN term2term ON (term.id = term2term.term1_id) ORDER BY term.acc DESC
+example_input: term_name => SELECT DISTINCT term.name FROM term INNER JOIN term2term ON (term.id = term2term.term1_id) WHERE name like '%binding%' ORDER BY term.name DESC
+]]>
+      </programlisting>
+      The template is in two parts - SQL and metadata (i.e. data about
+      the template itself). 
+    </para>
+    <para>
+      The SQL portion of the query resembles normal SQL, with two
+      diifferences - a SQL template is
+      <emphasis>parameterized</emphasis>, and DBStag allows an
+      extension for building XML from query results - the
+      <emphasis>USE NESTING</emphasis> clause.
+    </para>
+    <sect2 id="template-parameters">
+      <title>Template Parameters</title>
+      <para>
+	Any part of an SQL query can be parametrized - but this is
+	typically in the WHERE clause
+	<programlisting>
+<![CDATA[
+WHERE [term.acc => &term_acc&]
+]]>
+	</programlisting>
+	The parameter is surrounded by &amp; symbols; in this
+	case the parameter name is term_acc. We saw how to use this in
+	the previous section. Note the use of the DBStag specific
+	=&gt; operator. This actually gets translated to a '='
+	(equality) operator, UNLESS a wildcard is used, in which case
+	it gets translated into the SQL <emphasis>LIKE</emphasis>
+	operator.
+      </para>
+      <para>
+	If the parameter in the boolean expression between the square
+	braces is not specified as a constraint by the user, then
+	everything between the braces is omitted. If the parameter is
+	specified, then it is replaced by the value the user
+	specifies. In either case, the square braces disappear - they
+	are purely a template construct.
+      </para>
+    </sect2>
+    <sect2 id="use-nesting">
+      <title>The USE NESTING clause</title>
+      <para>
+	SQL in templates, or any SQL issued via DBStag may contain an
+	optional <emphasis>USE NESTING</emphasis> clause. This
+	indicates how the final XML is to be structured - the clause
+	describes a tree of tables and table aliases.
+      </para>
+      <para>
+	The following clause describes the XML that is generated from
+	the <emphasis>go-term</emphasis> template. Note that the
+	indentation and whitespace is irrelevant - it is the brackets
+	that determine the tree structure.
+	<programlisting>
+USE NESTING (set
+              (term
+                (term_dbxref
+                  (dbxref))
+                (term_synonym)
+                (term_definition)))
+	</programlisting>
+	The resulting XML will be rooted at 'set', with 'terms'
+	underneath. Everything is nested under 'term', with the
+	exception of 'dbxref' which is nested under term_dbxref. Note
+	that we could actually eliminate the term_dbxref linking table
+	from the XML and have dbxrefs contained directly be
+	terms. However, we would then lose the field
+	<emphasis>term_dbxref.is_for_definition</emphasis> which is
+	useful for knowing if this dbxref pertains to the term or to
+	its definition (see GO docs for full details).
+      </para>
+    </sect2>
+  </sect1>
+
+  <sect1 id="objects">
+    <title>Fetching Stag <emphasis>auto</emphasis> objects</title>
+    <para>
+      The basic Stag library can be used for querying and manipulating
+      XML. In fact, using Stag an XML structure is equivalent to a set
+      of nested objects. Just as there is no DTD for the XML, there is
+      no Object Model other than the implicit one.
+    </para>
+    <para>
+      <programlisting>
+use DBIx::DBStag;
+
+my $sym = shift;
+my $dbh = DBIx::DBStag->connect("go");
+my $gpset =
+  $dbh->selectall_stag(-template=>"go-term-by-geneproduct-or-synonym",
+		       -bind=>{product_symbol=>$sym,
+			      term_is_obsolete=>0});
+
+foreach my $gp ($gpset->get_gene_product) {
+    printf "Gene Product symbol=%s accession=%s species=%s\n",
+      $gp->get_symbol, $gp->get_dbxref->get_xref_key, $gp->get_species->get_common_name;
+    my @assocs = $gp->get_association;
+    foreach my $assoc (@assocs) {
+	print "  ";
+	my $is_not = $assoc->get_is_not;
+	if ($is_not) {
+	    print "[NEGATED] ";
+	}
+	my $term = $assoc->get_term;
+	printf "Term: %s %s\n", $term->get_acc, $term->get_name;
+    }
+}
+      </programlisting>
+    </para>
+  </sect1>
+
+  <sect1 id="kerosene">
+    <title>Kerosene Templates</title>
+    <para>
+      Kerosene is the name for an internal BDGP database for storing
+      comparative intron data, and downstream analyses, such as repeat
+      analyses. The kerosene schema is very specific to this kind of
+      data, unlike Chado which is a generic database for storing all
+      kinds of biological data. We could have used Chado, but many of
+      the analysis queries would be difficuly to express.
+    </para>
+    <para>
+      The kerosene schema is currently two modular parts: kerosene
+      (for intron_pairs) and rr (for repeat_runner_outputs). These
+      parts are linked by the bioseq table. bioseq is uniquely keyed
+      by the md5 checksum of the sequence. One consequence is that two
+      introns with the same sequence will share the same repeat_runner
+      results.
+    </para>
+    <sect2 id="kerosene_schema">
+      <title>Kerosene Schema; Main Module</title>
+      <para>
+	The kerosene schema and associated files can be found in the
+	BDGP CVS in the "cabal" project, in cabal/sql/kerosene.
+	  <programlisting>
+cvs -d /usr/local/develop/public-CVS co scratch/cabal
+cd cabal/sql/kerosene
+more k-schema.sql
+	  </programlisting>
+	The raw CREATE TABLE statements look like this (it may be
+	informative to look at the diagram that follows). Yes, the
+	documentation is extremely minimal; these tables were actually
+	created almost automatically from the normalised kerosene XML
+	(see later section on BUILDING DATABASES)
+	<programlisting>
+CREATE TABLE KEROSENE2 (
+    KEROSENE2_id serial PRIMARY KEY NOT NULL,
+    q_org VARCHAR(32),
+    s_org VARCHAR(32)
+);
+
+CREATE TABLE bioseq (
+    bioseq_id serial PRIMARY KEY NOT NULL,
+    md5 CHAR(32) NOT NULL,
+    residues TEXT,
+    seqlen INTEGER,
+
+    UNIQUE(md5)
+);
+
+CREATE TABLE transcript (
+    transcript_id serial PRIMARY KEY NOT NULL,
+    tid VARCHAR(64) NOT NULL,
+    pid VARCHAR(64) NOT NULL,
+    gid VARCHAR(64) NOT NULL,
+    cid VARCHAR(64),
+    gene_name VARCHAR(255),
+    org VARCHAR(32)  NOT NULL,
+
+    UNIQUE(tid)
+);
+
+CREATE TABLE transcript_pair (
+    transcript_pair_id serial PRIMARY KEY NOT NULL,
+    tpid VARCHAR(128) NOT NULL,
+    KEROSENE2_id INT,
+    FOREIGN KEY (KEROSENE2_id) REFERENCES KEROSENE2(KEROSENE2_id) ON DELETE CASCADE,
+    antype CHAR(2),
+    antime CHAR(10),
+    andata VARCHAR(255),
+    query_transcript_id INT REFERENCES transcript(transcript_id) ON DELETE CASCADE,
+    sbjct_transcript_id INT REFERENCES transcript(transcript_id) ON DELETE CASCADE,
+
+    UNIQUE(tpid)
+);
+
+CREATE TABLE intron (
+    intron_id serial PRIMARY KEY NOT NULL,
+    iid VARCHAR(64) NOT NULL,
+    splice_junction INT,
+    position_in_protein_of_junction FLOAT,
+    AA_at_junction VARCHAR(16),
+    codon_at_junction CHAR(3),
+    AA_triad_at_junction CHAR(3),
+    codon_triad_at_junction CHAR(12),
+    upstream_intron_flank VARCHAR(32),
+    dnstream_intron_flank VARCHAR(32),
+    org VARCHAR(32),
+    orgdb VARCHAR(32),
+    md5 CHAR(32),
+    bioseq_id INT REFERENCES bioseq(bioseq_id) ON DELETE CASCADE,
+
+    UNIQUE(iid)
+);
+
+CREATE TABLE intron_pair (
+    intron_pair_id serial PRIMARY KEY NOT NULL,
+    ipid VARCHAR(128),
+    transcript_pair_id INT,
+    FOREIGN KEY (transcript_pair_id) REFERENCES transcript_pair(transcript_pair_id) ON DELETE CASCADE,
+    query_intron_id INT REFERENCES intron(intron_id) ON DELETE CASCADE,
+    sbjct_intron_id INT REFERENCES intron(intron_id) ON DELETE CASCADE
+);
+
+CREATE TABLE gene_data (
+    gene_data_id serial PRIMARY KEY NOT NULL,
+    tid VARCHAR(64),
+    pid VARCHAR(64),
+    gid VARCHAR(64),
+    cid VARCHAR(64),
+    gene_name VARCHAR(255),
+    org VARCHAR(32),
+    intron_id INT,
+    FOREIGN KEY (intron_id) REFERENCES intron(intron_id) ON DELETE CASCADE,
+
+    UNIQUE (intron_id,tid)
+);
+	</programlisting>
+	Visually, the schema looks like this
+	<figure>
+	  <title>Kerosene Schema</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/k-schema-diagram.png" format="PNG">
+
+	      </imagedata>
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+      </para>
+      
+    </sect2>
+    <sect2 id="repeatrunner_schema">
+      <title>Kerosene Schema; Repeat Runner (rr) Module</title>
+      <para>
+	This module can also be found in the cabal project;
+	<programlisting>
+cd cabal/sql/repeatrunner
+more rr-schema.sql
+	</programlisting>
+	The raw CREATE TABLE statements look like this; again,
+	documentation is currently minimal
+	<programlisting>
+CREATE TABLE bioseq (
+    bioseq_id serial PRIMARY KEY NOT NULL,
+    md5 CHAR(32) NOT NULL,
+    residues TEXT,
+    seqlen INTEGER,
+
+    UNIQUE(md5)
+);
+
+CREATE TABLE repeat_runner (
+    repeat_runner_id serial PRIMARY KEY NOT NULL
+);
+
+CREATE TABLE repeat_runner_output (
+    repeat_runner_output_id serial PRIMARY KEY NOT NULL,
+    qid VARCHAR(128) NOT NULL,
+    description TEXT,
+    org VARCHAR(64),
+    blast_db VARCHAR(255),
+    repeat_runner_id INT,
+    FOREIGN KEY (repeat_runner_id) REFERENCES repeat_runner(repeat_runner_id) ON DELETE CASCADE,
+    query_seq_id INT NOT NULL,
+    FOREIGN KEY (query_seq_id) REFERENCES bioseq(bioseq_id) ON DELETE CASCADE,
+    masked_query_seq_id INT NOT NULL,
+    FOREIGN KEY (masked_query_seq_id) REFERENCES bioseq(bioseq_id) ON DELETE CASCADE,
+ 
+    UNIQUE(qid)
+);
+
+CREATE TABLE family (
+    family_id serial PRIMARY KEY NOT NULL,
+    name VARCHAR(64) NOT NULL,
+    species VARCHAR(64) NOT NULL,
+    genus VARCHAR(64) NOT NULL,
+    sp1 VARCHAR(64) NOT NULL,
+    sp2 VARCHAR(64) NOT NULL,
+    gen1 VARCHAR(64) NOT NULL,
+    gen2 VARCHAR(64) NOT NULL,
+
+    UNIQUE(name),
+    UNIQUE(species,genus),
+    UNIQUE(sp1,sp2,gen1,gen2)
+);
+
+CREATE TABLE segment (
+    segment_id serial PRIMARY KEY NOT NULL,
+    segment_number INT NOT NULL,
+    source VARCHAR(128),
+    name VARCHAR(128) NOT NULL,
+    family_id INT NOT NULL,
+    FOREIGN KEY (family_id) REFERENCES family(family_id) ON DELETE CASCADE,
+    score INT,
+    significance FLOAT,
+    nbeg INT NOT NULL,
+    nend INT NOT NULL,
+    repeat_runner_output_id INT NOT NULL,
+    FOREIGN KEY (repeat_runner_output_id) REFERENCES repeat_runner_output(repeat_runner_output_id) ON DELETE CASCADE,
+
+    UNIQUE (repeat_runner_output_id, segment_number),
+    UNIQUE (repeat_runner_output_id, nbeg, nend)
+);
+
+CREATE TABLE repeat (
+    repeat_id serial PRIMARY KEY NOT NULL,
+    source VARCHAR(128),
+    name VARCHAR(128) NOT NULL,
+    family_id INT NOT NULL,
+    FOREIGN KEY (family_id) REFERENCES family(family_id) ON DELETE CASCADE,
+    score INT,
+    significance FLOAT,
+    nbeg INT NOT NULL,
+    hit_nbeg INT NOT NULL,
+    nend INT NOT NULL,
+    hit_nend INT NOT NULL,
+    repeat_runner_output_id INT NOT NULL,
+    FOREIGN KEY (repeat_runner_output_id) REFERENCES repeat_runner_output(repeat_runner_output_id) ON DELETE CASCADE,
+
+    UNIQUE(repeat_runner_output_id,nbeg,nend,family_id)
+);
+	</programlisting>
+	Visually, the schema looks like this
+	<figure>
+	  <title>Kerosene Schema</title>
+	  <mediaobject>
+	    <imageobject>
+	      <imagedata fileref="images/rr-schema-diagram.png" format="PNG">
+
+	      </imagedata>
+	    </imageobject>
+	  </mediaobject>
+	</figure>
+	Note that both modules contain the bioseq table; it is
+	included twice because it may be desirable to use the rr
+	module without the main kerosene module (eg for
+	non-comparative repeat finding)
+      </para>
+      
+    </sect2>
+    <sect2 id="kerosene_setup">
+      <title>Kerosene Setup</title>
+      <para>
+	You have to be on a BDGP machine to query a kerosene db right
+	now. See the setup instructions for using GO. To find out
+	which kerosene databases are available, just look for dbs with
+	the schema kerosene in the BDGP bioresources file
+	<programlisting>
+grep -B 1 kerosene /data/bioconf/bioresources.conf
+# kerosene and repeat runner results; dmel vs dpse   admin:CJM
+!kdpse            rdb   Pg:kdpse@reaper                schema=kerosene
+	</programlisting>
+      </para>
+      <para>
+	If you have set yourself up for using GO (see above), you're
+	ready to use the kerosene templates too. If you wish to
+	modify/add templates, read the next subsection, otherwise skip
+	it.
+      </para>
+      <sect3 id="kerosene_template_dir">
+	<title>Primary Storage/Management area</title>
+	<para>
+	  Kerosene templates are kept (along with various others) in
+	  the BDGP public CVS repository in the "chai" project
+	  <programlisting>
+cvs -d /usr/local/develop/public-CVS co chai
+cd chai/sql-templates
+ls kerosene-*
+	  </programlisting>
+	  You don't actually need to do this, since the templates and
+	  template executable are kept in the main shared area
+	  (/data/bioconf/templates and /usr/local/bdgp/stagbin
+	  respectively). However, if you wish to add new templates or
+	  modify existing ones, this is the primary storage
+	  area. Check in any changes you make, and use the makefile to
+	  make public/share any changes.
+	  <programlisting>
+cd chai/sql-templates
+vim kerosene-my-template.stg
+cvs add kerosene-my-template.stg
+cvs commit
+make all
+	  </programlisting>
+	  This will make your template available to all of BDGP. Note
+	  that if you are testing this out on a non-BDGP machine, you
+	  may have to specify different makefile parameters on the
+	  command line.
+	</para>
+      </sect3>
+    </sect2>
+
+    <sect2 id="kerosene_templates">
+      <title>Kerosene SQL Templates</title>
+      <para>
+	To list available kerosene templates, type kerosene-[TAB], or
+	execute the following command (which finds the templates that
+	can be used with database kdpse):
+      </para>
+      <programlisting>
+selectall_xml.pl -d kdpse -h
+      </programlisting>
+      <para>
+	This gives names and descriptions of all kerosene
+	templates. Here are some of them (there may be more by the
+	time you read this)
+      <programlisting>
+selectall_xml.pl -d kdpse -h | grep ^NAME | cut -f2 -d ' '
+
+kerosene-family-repeat_count
+kerosene-intron-repeatfamily-summary-by-org
+kerosene-intron-repeatfamily
+kerosene-intron-with-bioseq
+kerosene-intron
+kerosene-intron_pair-repeatfamily-correlations-by-genus
+kerosene-intron_pair-repeatfamily-correlations-by-name
+kerosene-intron_pair-repeatfamily-summary
+kerosene-intron_pair-repeatfamily
+kerosene-intron_pair-with-bioseq
+kerosene-intron_pair
+kerosene-repeatfamily-summary-by-genus
+kerosene-transcript_pair-with-bioseq
+kerosene-transcript_pair
+	</programlisting>
+	the first part of the template name is always the name of the
+	schema - in this case <emphasis>kerosene</emphasis>, which
+	also covers the repeatrunner module. Some of the queries will
+	work on a database with only the kerosene (comparative intron)
+	part populated; some require both kerosene and repeatrunner
+	portions to be populated.
+      </para>
+      <sect3 id="kerosene_repeatfamily">
+	<title>Repeat Family Summaries</title>
+	<para>
+	  Let's look at one of templates in more details. Recall that
+	  <emphasis>-v -h</emphasis> gives a detailed description of the
+	  template
+	  <programlisting>
+<![CDATA[
+kerosene-repeatfamily-summary-by-genus -h -v
+
+SELECT family.genus,
+       count(repeat.repeat_id) AS repeat_count,
+       avg(abs(nend-nbeg))       AS avg_length,
+       max(abs(nend-nbeg))       AS max_length,
+       min(abs(nend-nbeg))       AS min_length
+FROM repeat INNER JOIN family USING (family_id)
+WHERE [ repeat_id in (SELECT repeat_id FROM intron_and_repeat WHERE org => &intron_org&) ]
+GROUP BY genus
+ORDER BY genus
+// -- METADATA --
+schema: kerosene
+desc: for every repeat family "genus", gives statistics on how many
+  occurrences there are of that repeat, the avergae max and min sizes
+
+  if unconstrained, will report for the whole database. it can be
+  constrained by organism.
+
+example_input: intron_org => SELECT DISTINCT org FROM intron
+
+PARAMETERS:
+  intron_org
+]]>
+	  </programlisting>
+
+	  We can see there is only one parameter,
+	  <emphasis>intron_org</emphasis>. In the metadata there is a
+	  tag <emphasis>example_input</emphasis> which specifies how to
+	  generate example values for this parameter (it isn't always
+	  obvious what the values should be). We can find some sensible
+	  values for a particular database like this:
+	  <programlisting>
+selectall_xml.pl -d kmmus -rows "SELECT DISTINCT org FROM intron"
+
+H_sapiens
+M_musculus
+	  </programlisting>
+	  Using the <emphasis>selectall_xml</emphasis> script in this
+	  way (with the <emphasis>-rows</emphasis> switch, and without a
+	  template) is equivalent to using the native database SQL
+	  interactive interface. It is convenient to use the dbstag
+	  tools here, even though we aren't using much of the dbstag
+	  functionality, it gives a uniform way of accessing databases
+	  without caring if the underlying DBMS is Pg or MySQL (it
+	  happens to be Pg for this db - note that MySQL can't do
+	  subselects, as we are doing in the query above).
+	</para>
+	<para>
+	  Now we know what the sensible values are for
+	  <emphasis>intron_org</emphasis>, we can plug them into the
+	  template, or leave the unconstrained.
+	</para>
+	<para>
+	  As you can see from the SQL above, there is no <emphasis>USE
+	    NESTING</emphasis> clause - this query is more for summarising
+	  data rather than providing complex hierarchical data in all
+	  it's glory. As such, we are better off getting the data in
+	  tabular form, with the <emphasis>-rows</emphasis> switch.
+	  <programlisting>
+kerosene-repeatfamily-summary-by-genus -rows -d kmmus -order 'repeat_count\ DESC' intron_org=H_sapiens
+
+SINE/Alu        31068   257.2501931247585941    490     10
+LINE/L1 16873   439.8779114561725834    7422    10
+SINE/MIR        14200   137.3043661971830986    394     10
+LINE/L2 8856    217.6514227642276423    2482    10
+Simple_repeat   7880    58.8263959390862944     966     5
+Low_complexity  7045    43.1927608232789212     616     10
+DNA/MER1_type   4887    176.0566809903826478    2394    10
+LTR/MaLR        3884    307.3558187435633368    1752    10
+...
+	  </programlisting>
+	  We are setting/overriding the <emphasis>ORDER BY</emphasis>
+	  clause. Notice that if you want to pass an argument that
+	  includes a space (in this case we want to sort by
+	  repeat_count, DESCending) then you need to enclose the
+	  argument in quotes, AND backslash-escape the space. This
+	  appears to be a limitation of the command line interpreter and
+	  I'm not sure if there is a better way of doing this (in fact I
+	  needed a hacky bit of preprocessing before using the
+	  Getopt::Long module - see the script if you're interested). If
+	  anyone has any ideas, let me know!
+	</para>
+	<sect3 id="kerosene_intron">
+	  <title>Intron Queries</title>
+	  <para>
+	    All intron-centric queries start with
+	    <emphasis>kerosene-intron</emphasis>. Let's look at one:
+	    <programlisting>
+<![CDATA[
+kerosene-intron-repeatfamily -h -v
+
+SELECT family.family_id, family.species, family.genus,
+  repeat.*,
+  intron.*
+FROM family
+  INNER JOIN repeat USING (family_id)
+  INNER JOIN repeat_runner_output USING (repeat_runner_output_id)
+  INNER JOIN intron ON (intron.bioseq_id=repeat_runner_output.query_seq_id)
+WHERE [ intron.iid => &iid& ]
+  [ intron_id IN (SELECT intron_id FROM bioseq WHERE bioseq.md5 => &bioseq_md5&) ]
+  [ intron_id IN (SELECT intron_id FROM bioseq WHERE bioseq.residues => &bioseq_residues&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.repeat_id => &repeat_repeat_id&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.source => &repeat_source&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.name => &repeat_name&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.family_id => &repeat_family_id&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.score => &repeat_score&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.nbeg => &repeat_nbeg&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.hit_nbeg => &repeat_hit_nbeg&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.nend => &repeat_nend&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.hit_nend => &repeat_hit_nend&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat WHERE repeat.repeat_runner_output_id => &repeat_repeat_runner_output_id&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat INNER JOIN family USING (family_id) WHERE family.family_id => &family_family_id&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat INNER JOIN family USING (family_id) WHERE family.species => &family_species&) ]
+  [ intron_id IN (SELECT intron_id FROM intron_and_repeat INNER JOIN family USING (family_id) WHERE family.genus => &family_genus&) ]
+USE NESTING
+ (set
+   (intron
+     (repeat
+       (family))))
+// -- METADATA --
+schema: kerosene
+desc:
+
+   introns have a number of repeat repeats attached to them; each
+   repeat repeat belongs to a family.
+
+   this intron-centric templates will fetch introns with the families
+   attached to them
+
+   note that if an intron had no repeats, that intron will not be fetched
+PARAMETERS:
+  iid
+  bioseq_md5
+  bioseq_residues
+  repeat_repeat_id
+  repeat_source
+  repeat_name
+  repeat_family_id
+  repeat_score
+  repeat_nbeg
+  repeat_hit_nbeg
+  repeat_nend
+  repeat_hit_nend
+  repeat_repeat_runner_output_id
+  family_family_id
+  family_species
+  family_genus
+QUERY RESULT STRUCTURE (NESTING):
+'(set
+  (intron
+    (repeat
+      (family " "))))
+]]>
+	    </programlisting>
+	    If you examine the USE NESTING clause you will see that
+	    this is an intron-centric query, with repeat elements
+	    nested inside repeats, and (repeat)family elements nested
+	    inside repeats.
+	  </para>
+	  <para>
+	    There are a lot of parameters available for this template
+	    - you can constrain introns either directly by intron
+	    columns (like <emphasis>iid</emphasis>), or by columns of
+	    the repeats of the introns. Note that the lengthy set of
+	    parameters in the WHERE clause was generated
+	    automatically, and uses a SQL VIEW,
+	    <emphasis>intron_and_repeat</emphasis> -- this is a view
+	    that is the cartesian product of the intron and repeat
+	    tables (joined via repeat_runner_output). But anyway, you
+	    don't need to do this to launch a query. For example,
+	    <emphasis>find all introns that contain a DNA/Merlin
+	    repeat</emphasis>:
+	    <programlisting>
+<![CDATA[
+kerosene-intron-repeatfamily -d kmmus family_genus=DNA/Merlin > merlin.xml
+more merlin.xml
+
+<?xml version="1.0" encoding="UTF-8"?>
+<set>
+  <intron>
+    <intron_id>1213</intron_id>
+    <iid>contig-NRLN1-500-500:4215:33495</iid>
+    <splice_junction>1</splice_junction>
+    <position_in_protein_of_junction>25.3333333333333</position_in_protein_of_junction>
+    <aa_at_junction>H</aa_at_junction>
+    <codon_at_junction>CAT</codon_at_junction>
+    <aa_triad_at_junction>KHS</aa_triad_at_junction>
+    <codon_triad_at_junction>AAA|C^AT|TCA</codon_triad_at_junction>
+    <upstream_intron_flank>LEGGKTEQVK</upstream_intron_flank>
+    <dnstream_intron_flank>HSETYCMFQD</dnstream_intron_flank>
+    <org>H_sapiens</org>
+    <orgdb>H_sapiens.4_3_7_04</orgdb>
+    <md5>9ef647d9761ac732b5645f387593cbde</md5>
+    <bioseq_id>1213</bioseq_id>
+    <repeat>
+      <repeat_id>85794</repeat_id>
+      <source>Bio::Search::HSP::GenericHSP::repeatmasker::PhatHsp</source>
+      <name>species:L1ME4a genus:LINE/L1</name>
+      <family_id>938</family_id>
+      <score>315</score>
+      <nbeg>2054</nbeg>
+      <hit_nbeg>5717</hit_nbeg>
+      <nend>2206</nend>
+      <hit_nend>5877</hit_nend>
+      <repeat_runner_output_id>6782</repeat_runner_output_id>
+      <family>
+        <family_id>938</family_id>
+        <species>L1ME4a</species>
+        <genus>LINE/L1</genus>
+      </family>
+    </repeat>
+    <repeat>
+      <repeat_id>85795</repeat_id>
+      <source>Bio::Search::HSP::GenericHSP::repeatmasker::PhatHsp</source>
+      <name>species:L1ME4a genus:LINE/L1</name>
+      <family_id>938</family_id>
+      <score>467</score>
+      <nbeg>2299</nbeg>
+      <hit_nbeg>5338</hit_nbeg>
+      <nend>2932</nend>
+      <hit_nend>6026</hit_nend>
+      <repeat_runner_output_id>6782</repeat_runner_output_id>
+      <family>
+        <family_id>938</family_id>
+        <species>L1ME4a</species>
+        <genus>LINE/L1</genus>
+      </family>
+    </repeat>
+...
+]]>
+	    </programlisting>
+	    The report is truncated, so you can't actually see any
+	    DNA/Merlin repeats, but they are there further down the
+	    report.
+	  </para>
+	  <para>
+	    The advantage of using XML in this query is that each
+	    intron is only listed once; multiple repeats per intron
+	    are listed beneath each intron element.
+	  </para>
+	</sect3>
+
+    </sect2>
+
+  </sect1>
+
+  <sect1 id="making_dbs">
+    <title>Creating Relational Databases from XML</title>
+    <para>
+      This section deals with creating an entirely new database schema
+      based on some XML data. This step only needs to be done once per
+      schema. It requires some relational database and XML
+      knowledge. If you only care about storing XML data in an
+      existing schema (and the mapping/transformation between the XML
+      and schema has already been defined) you may wish to skip to the
+      next section.
+    </para>
+    <para>
+      The example data which follows uses kerosene XML, a BDGP format
+      for the results of comparative intron data. The motivation here
+      is to get custom relational databases up, running and
+      <emphasis>usable</emphasis> with a very fast turnaround. These
+      databases are tuned for answering some specific research
+      questions; they are not necessarily designed to have long
+      lifetimes, or to conform to some standard by which it would be
+      possible to hook up a variety of middleware and applications
+      such as Apollo. If this is the goal, then a standard generic
+      extensible database such as Chado should be used. The goal here
+      is "quick and dirty" bioinformatics databases.
+    </para>
+    <para>
+      Before dealing with transformation of XML and generating a
+      normalised schema (see "Making a normalised relational
+      database") we will look at a quick indexing solution.
+    </para>
+    <sect2 id="making_dbs_easy">
+      <title>Making a simple index database</title>
+      <para>
+        This section deals with making a simple denormalised index
+        database; this treats entire XML elements as undecomposable
+        chunks that can be accessed via some ID field.
+      </para>
+      <sect3 id="stag_ir">
+        <title>The <emphasis>stag-ir</emphasis> script</title>
+        <para>
+<programlisting>
+stag-ir.pl -h
+</programlisting>
+        </para>
+      </sect3>
+    </sect2>
+    <sect2 id="making_dbs_relational">
+      <title>Making a normalised relational database</title>
+      <para>
+        This section deals with creating a de-novo relational database
+        from some kind of consistent XML format. There does not need
+        to be an explicit DTD or XML Schema for the XML.
+      </para>
+      <para>
+        This is a two-step process - first you have to transform the
+        XML into XML that is relational-friendly (this includes
+        getting rid of attributes, making sure that the use of all
+        element names is consistent, and that elements are nested in
+        such a way as they correspond to the foreign keys in the
+        resulting schema). This step requires some knowledge of XML
+        and SQL. The second step is automatically deriving a schema
+        from the transformed XML.
+      </para>
+      <sect3 id="xml_transformation">
+        <title>XML Transformation</title>
+        <para>
+          You can do your XML transformation using any paradigm you
+          like - for example, you can use XSLT or you can write a perl
+          script that uses one of the many XML libraries. The
+          following example uses perl modules that utilise the stag
+          transformation paradigm. This is similar to SAX. For full
+          details see
+<programlisting>
+man Data::Stag
+man Data::Stag::BaseHandler
+</programlisting>
+          We will look at one particular example - transforming
+          kerosene XML (currently an internal BDGP analysis output
+          format for comparative intron data) to an XML format
+          (ksimple) that will mirror the resulting SQL Schema.
+        </para>
+      </sect3>
+      <sect3 id="k1_to_ksimple">
+        <title>Example transformation: k1_to_ksimple</title>
+        <para>
+          Presuming you have already obtained the
+          <emphasis>cabal</emphasis> package (see above), have a look
+          at <emphasis
+          role="bold">Bio::Transformer::k1_to_ksimple</emphasis>.
+
+        </para>
+        <para>
+         This is a transformer stag module - it takes in XML/stag
+         events and spits out XML/stag events. It can be used from the
+         command line like this:
+<programlisting>
+stag-handle.pl -w xml -m Bio::Transformer::kerosene1_to_ksimple\
+    -u gene dyak.kerosene1.xml | more
+</programlisting>
+          This is both the format of the XML we will use to
+          autogenerate the SQL schema, and also the format of the XML
+          we will use to load the database
+        </para>
+      </sect3>
+      <sect3 id="schema_generation">
+        <title>Auto-deriving SQL Schemas from XML</title>
+        <para>
+<programlisting>
+stag-handle.pl -w xml -m Bio::Transformer::kerosene1_to_ksimple\
+    -u gene dyak.kerosene1.xml > sample.xml
+stag-autoddl.pl -l query_transcript -l sbjct_transcript\
+                -l query_intron -l sbjct_intron\
+                 sample.xml > k-autoschema.sql
+</programlisting>
+        </para>
+      </sect3>
+    </sect2>
+  </sect1>
+  <sect1 id="storing_data">
+    <title>Storing XML data in a Relational Database</title>
+    <para>
+      This section assumes you have a transformation defined for your
+      XML to map it to the SQL schema; if not, see the next section
+      for hints on how to build a whole SQL schema very quickly for
+      XML data
+    </para>
+    <para>
+</para>
+  </sect1>
+</article>
+
+
+
+
+

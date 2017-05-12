@@ -1,0 +1,53 @@
+{
+   "abstract" : "Generate random contact data",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Random-Contact",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : 0,
+            "DateTime" : 0,
+            "Moose" : 0,
+            "MooseX::Types" : 0,
+            "autodie" : 0,
+            "namespace::autoclean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-random-contact@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Random-Contact"
+      },
+      "repository" : {
+         "type" : "hg",
+         "url" : "http://hg.urth.org/hg/Data-Random-Contact",
+         "web" : "http://hg.urth.org/hg/Data-Random-Contact"
+      }
+   },
+   "version" : "0.05"
+}
+

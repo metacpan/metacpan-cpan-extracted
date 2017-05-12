@@ -1,0 +1,25 @@
+Revision history for Perl extension Data::FormValidator::Filters::Image.
+
+0.40  Mon Mar 23 23:29:09 EST 2009
+
+    - Fix breakage on newer Perls; we now work on Perl 5.10
+      (gtermars@cpan.org)
+    - Rewrote test suite; now easier to follow
+      (gtermars@cpan.org)
+    - Bug #40969; "Resizes image, even if not required"
+      If image is already within the maximum limits, don't resize it
+      (gtermars@cpan.org)
+
+0.30  Sat Oct 29 13:32:17 EDT 2005
+
+    - Add Pod coverage tests
+    - Add credits and disclaimer to docs
+
+0.20  Thu Aug  4 23:10:43 EDT 2005
+
+    - IE sends full paths with a file upload and that was
+      causing ImageMagick to fail to read the image properly
+
+0.10  Thu Mar 31 19:05:33 EST 2005
+
+    - original version

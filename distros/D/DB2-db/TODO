@@ -1,0 +1,13 @@
+TODO
+
+  + Rather than creating Table types, start with something simpler. (XML?)
+    Then transform the XML into Table types.  This is not something I want
+    to do "on-the-fly", but something that can probably help get a database
+    going faster.
+
+  + Perhaps a Gtk GUI for managing Table types?
+
+  + A new module: DB2::View for creating views on other tables.
+
+  + More options to DB2::Table::SELECT
+    * orderby option

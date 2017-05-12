@@ -1,0 +1,34 @@
+---
+abstract: 'Generates flickr-like navigation links'
+author:
+  - 'Masayoshi Sekimura <sekimura@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Page-FlickrLike
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Data::Page: 0
+  Exporter::Lite: 0
+  perl: 5.8.1
+resources:
+  homepage: https://github.com/sekimura/data-page-flickrlike/tree
+  license: http://dev.perl.org/licenses/
+  repository:
+    type: git
+    url: git://github.com/sekimura/data-page-flickrlike.git
+    web: https://github.com/sekimura/data-page-flickrlike/tree
+version: 2.03

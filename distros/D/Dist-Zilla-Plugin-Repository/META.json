@@ -1,0 +1,59 @@
+{
+   "abstract" : "Automatically sets repository URL from svn/svk/Git checkout for Dist::Zilla",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Ricardo SIGNES <rjbs@cpan.org>",
+      "Moritz Onken <onken@netcubed.de>",
+      "Christopher J. Madsen <perl@cjmweb.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Repository",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.102340"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::Tester" : "4.102340",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fayland/dist-zilla-plugin-repository.git",
+         "web" : "https://github.com/fayland/dist-zilla-plugin-repository"
+      }
+   },
+   "version" : "0.20"
+}
+

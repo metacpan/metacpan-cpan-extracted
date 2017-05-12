@@ -1,0 +1,135 @@
+-- CREATE usergroepdb with sqlite
+
+PRAGMA legacy_file_format = off;
+PRAGMA encoding = "UTF-8";
+PRAGMA foreign_keys = on;
+
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY,
+  login_name TEXT UNIQUE NOT NULL,
+  passphrase TEXT NOT NULL,
+  real_name TEXT,
+  email_address TEXT,
+  language TEXT,
+  confirmed INTEGER,
+  created INTEGER,
+  activated INTEGER
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS login_name ON users (login_name);
+CREATE INDEX IF NOT EXIST email_address ON users (email_address);
+
+CREATE TABLE IF NOT EXISTS grouptypes (
+  id INTEGER PRIMARY KEY,
+  group_type TEXT UNIQUE NOT NULL,
+  public INTEGER,
+  unmoderated INTEGER,
+  open_for_subscribtion INTEGER,
+  hidden_members INTEGER,
+  member_can_post INTEGER,
+  others_can_post INTEGER
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS group_type ON grouptypes (group_type);
+
+CREATE TABLE IF NOT EXISTS groups (
+  id INTEGER PRIMARY KEY,
+  group_name TEXT UNIQUE NOT NULL,
+  description TEXT,
+  grouptype_id INTEGER REFERENCES grouptypes (id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS group_name ON groups (group_name);
+
+CREATE TABLE IF NOT EXISTS memberships (
+  id INTEGER PRIMARY KEY,
+  user_id INTEGER NOT NULL REFERENCES users (id),
+  group_id INTEGER NOT NULL REFERENCES groups (id)
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS user_group ON memberships (user_id, group_id);
+CREATE INDEX IF NOT EXISTS member_user ON memberships (user_id);
+CREATE INDEX IF NOT EXISTS member_group ON memberships (group_id);
+
+INSERT OR IGNORE INTO users (id, login_name, passphrase, real_name, language, activated)
+  VALUES (0, 'root', 'login to change', 'Admin', 'en', 1);
+INSERT OR IGNORE INTO grouptypes (id, group_type, public, unmoderated, open_for_subscribtion,
+  hidden_members, member_can_post, others_can_post)
+  VALUES (0, 'role', 0, 0, 0, 0, 0, 0);
+INSERT OR IGNORE INTO groups (id, group_name, description, grouptype_id)
+  VALUES (0, 'wheel', 'Administators', 0);
+INSERT OR IGNORE INTO memberships (id, user_id, group_id)
+  VALUES (0, 0, 0);
+
+SELECT * FROM users;
+SELECT * FROM groups;
+SELECT * FROM memberships;
+
+CREATE VIEW IF NOT EXISTS roles AS
+SELECT login_name, group_name AS role
+  FROM users
+  LEFT JOIN memberships ON memberships.user_id = users.id
+  LEFT JOIN groups ON groups.id = memberships.group_id
+;
+
+SELECT * FROM roles;
+
+CREATE VIEW IF NOT EXISTS mygroups AS
+SELECT users.id AS user_id, groups.id AS group_id,
+       login_name, group_name, description,
+       group_type, public, unmoderated, open_for_subscribtion,
+       hidden_members, member_can_post, others_can_post
+  FROM users
+  LEFT JOIN memberships ON memberships.user_id = users.id
+  LEFT JOIN groups ON groups.id = memberships.group_id
+  LEFT JOIN grouptypes ON grouptypes.id = groups.grouptype_id
+;
+
+SELECT * FROM mygroups;
+
+CREATE VIEW IF NOT EXISTS usergroups AS
+SELECT users.id AS user_id, groups.id AS group_id, login_name, real_name,
+       email_address, language, confirmed, activated,
+       group_name, description
+  FROM users
+  LEFT JOIN memberships ON memberships.user_id = users.id
+  LEFT JOIN groups ON groups.id = memberships.group_id
+;
+
+SELECT * FROM usergroups;
+
+-- EXPLAIN SELECT * FROM usergroups WHERE login_name = 'root';
+
+CREATE VIEW IF NOT EXISTS groupusers AS
+SELECT users.id AS user_id, groups.id AS group_id, login_name, real_name,
+       email_address, language, confirmed, activated,
+       group_name, description
+  FROM groups
+  LEFT JOIN memberships ON memberships.group_id = groups.id
+  LEFT JOIN users ON users.id = memberships.user_id
+;
+
+SELECT * FROM groupusers;
+
+-- EXPLAIN SELECT * FROM groupusers WHERE group_name = 'wheel';
+
+CREATE VIEW IF NOT EXISTS typedgroups AS
+SELECT groups.id AS group_id, group_name, description, grouptype_id,
+       group_type, public, unmoderated, open_for_subscribtion,
+       hidden_members, member_can_post, others_can_post
+  FROM groups
+  LEFT JOIN grouptypes ON grouptypes.id = grouptype_id
+;
+
+SELECT * FROM typedgroups;
+
+CREATE TABLE IF NOT EXISTS one_time_keys (
+  id INTEGER PRIMARY KEY,
+  otk TEXT UNIQUE NOT NULL,
+  login_name TEXT,
+  action TEXT,
+  issued INTEGER,
+  done INTEGER
+);
+
+CREATE UNIQUE INDEX IF NOT EXISTS otk ON one_time_keys (otk);

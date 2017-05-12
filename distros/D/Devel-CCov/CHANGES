@@ -1,0 +1,13 @@
+** 01-15-98 RELEASE 0.05
+
+- Fixed overlap report: sort by uniqueness instead of sameness &
+average by test, not by file.
+
+
+** 01-13-98 RELEASE 0.04
+
+- General integration with Test::Harness.
+
+- Initially targeted at the perl core.  See the ./patch directory.
+
+- Coverage analyzer is housed within an interactive perl shell.

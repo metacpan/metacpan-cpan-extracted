@@ -1,0 +1,61 @@
+Revision history for Perl module DateTime::Format::Baby.
+
+Note on version conventions:
+0.0000
+|  | |
+|  | +-- Minor Decimal
+|  +---- Major Decimal
++------- Whole Number
+
+* Whole numbers are rewrite releases. They contain major rewrites
+  or alterations to the API. Read the docs before using them.
+* Major decimal number is patch release. Some coding has changed
+  but the API remains the same (or is extended). Upgrading to 
+  these should not change any expected behaviour, however it
+  will alter buggy behaviour. Read the docs and check if you've
+  been using work-arounds before using them.
+* Minor decimal number is a doc or installer patch only. If you have
+  the module installed and understand how it works, you don't need
+  this release.
+-----------------------------------------------------------------------------
+
+0.01  Mon Feb 24 10:08:21 2003
+	- original version; created by h2xs 1.19
+	
+0.01-0.13: Developer releases only
+
+0.14  Tue Feb 25 19:09:26 2003
+ 	- First release on an unsuspecting world. Mwahhahahah
+
+0.15  Mon Mar  3 06:58:39 2003
+    - Fixed German 3 (Drei)
+    - Fixed broken synopsis for format_datetime
+
+      0.15.1  Tue Mar  4 08:48:44 2003
+          - Fixed Makefile.PL to include prerequisites
+            (lost between 0.14 and 0.15 somewhere)
+
+      0.15.2  Thu Mar  6 15:44:05 2003
+          - Fixed Makefile.PL to include more prerequisites
+            seems I might have to tell it about Carp.pm
+            despite same being in the core.
+
+      0.15.3  Fri Mar  7 16:02:53 2003
+          - Fixed syntax error in Makefile.PL
+          - Felt like an idiot for leaving said error there
+          - Thanks to CPAN tester Jeroen for pointing it out
+          - Also made sure the module uploads with UNIX linebreaks
+         
+1.0100 Sat Jun 28, 2003
+	- Changed versioning to only use one decimal point. Stops poor CPAN
+	  from getting confused!
+	- Updated installation to use preferred lib/ and t/ system
+	- Fixed parser to handle new DateTime sanity checks. (We were
+	  returning 7:60 rather then 8:00, which used to work but doesn't
+	  anymore!)   
+
+1.0200 Wed 2016-01-27
+        - Prevent warnings about assignments to $[
+        - POD fix
+        - convert to utf-8
+        - fix some spelling mistakes, following Abgail's Acme::Time::Baby 2010090301.

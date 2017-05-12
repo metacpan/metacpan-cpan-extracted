@@ -1,0 +1,35 @@
+---
+abstract: 'Validates user input (usually from an HTML form) based on input profile.'
+author:
+  - 'David Farrell <dfarrell@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1001, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-FormValidator
+no_index:
+  directory:
+    - t
+    - inc
+  package:
+    - Data::FormValidator::Constraints::RegexpCommon
+requires:
+  Date::Calc: '5'
+  Email::Valid: '0'
+  File::MMagic: '1.17'
+  Image::Size: '0'
+  MIME::Types: '1.005'
+  Regexp::Common: '0.03'
+  Scalar::Util: '0'
+  Test::More: '0'
+  perl: '5.008'
+resources:
+  repository: https://github.com/dnmfarrell/Data-FormValidator
+version: 4.86
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

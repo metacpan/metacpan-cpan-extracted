@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Danga-Socket
+version:      1.61
+version_from: lib/Danga/Socket.pm
+installdirs:  site
+requires:
+    fields:                        0
+    IO::Poll:                      0
+    POSIX:                         0
+    Socket:                        0
+    Sys::Syscall:                  0
+    Test::More:                    0
+    Time::HiRes:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

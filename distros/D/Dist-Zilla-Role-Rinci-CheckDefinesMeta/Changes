@@ -1,0 +1,23 @@
+Revision history for Dist-Zilla-Role-Rinci-CheckDefinesMeta
+
+0.04    2016-01-17 (PERLANCAR)
+
+	- [Bugfix] We need to always create a tempfile from a DZF
+	  regardless of the file being a DZF:OnDisk because of things like
+	  DZP:AddFile::FromFS.
+
+
+0.03    2015-09-25 (PERLANCAR)
+
+	- Exclude .pod from checking.
+
+
+0.02    2015-09-22 (PERLANCAR)
+
+	- Also check scripts by using PPI, checking for assignment to
+	  $SPEC{...}.
+
+
+0.01    2015-09-11 (PERLANCAR)
+
+        - First release.

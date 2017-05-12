@@ -1,0 +1,26 @@
+NAME
+    Dist::Zilla::PluginBundle::PDONELAN - Dist::Zilla pre-wired for PDONELAN
+
+VERSION
+    version 1.201
+
+DESCRIPTION
+    This is a Dist::Zilla plugin bundle.
+
+    Please see the (nicely commented) source code to see which plugins this
+    module bundles - I already have to list them twice in the source just to
+    make this work - three times would drive me nuts.
+
+METHODS
+  configure
+    Adds the list of plugins (and bundles) in order
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

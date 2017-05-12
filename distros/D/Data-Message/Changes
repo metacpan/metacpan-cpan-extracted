@@ -1,0 +1,17 @@
+Revision history for Data-Message
+
+1.104     2013-12-13 08:29:53 America/New_York
+        - update bugtracker and repo links
+        - update test file to use UTF-8, to keep life simpler
+
+1.103     2013-07-05 21:53:58 America/New_York
+          update bug tracker, repackage
+
+1.012     2009-11-20
+          re-upped to force reindexing; nothing has changed
+
+1.011     2007-04-10
+          temporarily reduce functionality to make tests pass
+
+1.01      2004-12-22
+          Initial revision.

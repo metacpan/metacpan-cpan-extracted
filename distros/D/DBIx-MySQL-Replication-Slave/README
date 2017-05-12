@@ -1,0 +1,179 @@
+NAME
+    DBIx::MySQL::Replication::Slave - Stop, start and monitor your slaves.
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+    This module gives you an OO interface for stopping, starting and
+    monitoring the status and health of your MySQL slaves. It doesn't do
+    anything you can't already do for yourself, but it makes some basic
+    tasks just a little bit easier.
+
+        use DBIx::MySQL::Replication::Slave;
+
+        my $slave = DBIx::MySQL::Replication::Slave->new( dbh => $dbh );
+
+        if ( $slave->is_stopped ) {
+    
+            $slave->start;
+    
+            if ( $slave->is_running ) {
+                print "slave now running\n";
+            }
+            else {
+                print "cannot start stopped slave.\n";
+            }
+    
+        }
+
+    If you need a quick monitor script:
+
+        $slave->max_seconds_behind_master( 30 );
+
+        if ( !$slave->slave_ok ) {
+            # send an alert to the administrator...
+        }
+
+    For some quick debugging:
+
+        use Data::Dump qw( dump );
+        print dump( $slave->status );
+
+        print "seconds behind: " . $slave->status->{seconds_behind_master};
+
+CONSTRUCTOR AND STARTUP
+  new( dbh => $dbh )
+    Creates and returns a new DBIx::MySQL::Replication::Slave object.
+
+        my $slave = DBIx::MySQL::Replication::Slave->new( dbh => $dbh );
+
+    *   "dbh => $dbh"
+
+        A valid database handle to your slave server is required. You'll
+        need to pass it to the constructor:
+
+            my $slave = DBIx::MySQL::Replication::Slave->new( dbh => $dbh );
+
+        Generally, the user will need to have the following MySQL
+        privileges:
+
+        SUPER,REPLICATION CLIENT
+
+    *   "lc => 0|1"
+
+        By default, the status variables returned by MySQL are converted to
+        lower case. This is for readability. You may turn this off if you
+        wish, by explicitly turning it off when you create the object:
+
+            my $slave = DBIx::MySQL::Replication::Slave->new( dbh => $dbh, lc => 0 );
+
+    *   "max_seconds_behind_master => $seconds"
+
+        By default this is set to a very generous number (86400 seconds).
+        Set this value if you'd like to take a shorter amount of time into
+        account when checking on your health. This is strongly recommended:
+
+            # Anything longer than 30 seconds is not acceptable
+            my $slave = DBIx::MySQL::Replication::Slave->new(
+                dbh => $dbh,
+                seconds_behind_master => 30
+            );
+
+        If you think it's cleaner, you can also set this value *after*
+        object creation.
+
+            $slave->max_seconds_behind_master(30);
+
+SUBROUTINES/METHODS
+  status
+    Returns a HASHREF of the MySQL slave status variables. These vars will,
+    by default, be converted to lower case, unless you have turned this off
+    when you construct the object. See the lc option to new() for more info.
+
+  refresh_status
+    Issues a fresh "SLOW SLAVE STATUS" query and returns the new results of
+    $slave->status to you.
+
+  start
+    Issues a "START SLAVE" query and returns DBI's raw return value directly
+    to you.
+
+  stop
+    Issues a "STOP SLAVE" query and returns DBI's raw return value directly
+    to you.
+
+  slave_ok
+    This method returns true if slave_io_running and slave_sql_running are
+    both equal to 'Yes' AND if seconds_behind_master is <=
+    max_seconds_behind master.
+
+  is_running
+    Returns true if both slave_io_running and slave_sql_running are set to
+    'Yes'
+
+  is_stopped
+    Returns true if both slave_io_running and slave_sql_running are set to
+    'No'. If only one of these values returns 'Yes', it's probably fair to
+    say that the slave is in some transitional state. Neither stopped nor
+    running may be an accurate description in this case.
+
+AUTHOR
+    Olaf Alders, "<olaf at wundercounter.com>"
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "bug-dbix-mysql-replication-slave at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-MySQL-Replication-S
+    lave>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+TESTING
+    Have a look at the source of t/connect.t if you'd like to do more
+    extensive testing of your install. This will require that you already
+    have a fully functional slave set up in order for the tests to pass.
+    These tests are skipped by default, but you are encouraged to run them
+    as part of your install process.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::MySQL::Replication::Slave
+
+    You can also look for information at:
+
+    *   GitHub Source Repository
+
+        <http://github.com/oalders/dbix-mysql-replication-slave>
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-MySQL-Replication-Sla
+        ve>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DBIx-MySQL-Replication-Slave>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DBIx-MySQL-Replication-Slave>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DBIx-MySQL-Replication-Slave/>
+
+ACKNOWLEDGEMENTS
+    Thanks to Raybec Communications <http://www.raybec.com> for funding my
+    work on this module and for releasing it to the world.
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Olaf Alders.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

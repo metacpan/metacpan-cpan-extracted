@@ -1,0 +1,108 @@
+Revision history for DBIx-MultiStatementDo
+
+1.00009       2011-02-09 10:41:02 Europe/Rome
+
+* POD formatting fixes to obtain a better (automatically generated) README.mkdn.
+
+* Minimum SQL::SplitStatement required version bumped to 1.00009
+
+1.00000       2011-02-09 01:50:43 Europe/Rome
+
+* Doc updates about the new placeholders types now recognized
+  (/dollar sign numbers/ and /named parameters/).
+
+* Minimum SQL::SplitStatement required version bumped to 1.00000
+
+* Markdown README added (via Dist::Zilla::Plugin::ReadmeMarkdownFromPod).
+
+0.30000       2011-01-23 11:03:12 Europe/Rome
+
+* Minimum SQL::SplitStatement required version bumped to 0.30000
+
+* Minor cosmetic doc fixes.
+
+0.20000       2011-01-21 19:14:03 Europe/Rome
+
+* Missing DBD::SQLite dependence for testing fixed.
+
+* Minimum SQL::SplitStatement required version has been bumped to 0.20000
+
+0.10000       2011-01-20 07:00:00 Europe/Rome
+
+* Minimum SQL::SplitStatement required version has been bumped to 0.10000
+
+* Clarified the difference between bind values as a list reference and as a flat
+  list.
+
+* Tests for this.
+
+* _split_with_placeholders removed for good (end of deprecation cycle).
+
+* Various code refactorings.
+
+0.06001       2010-06-23 06:10:00 Europe/Rome
+
+ * Simply a bug in this Changes file!
+   (The method "split_with_placeholders" described below, was called
+   "splitter_with_placeholders").
+
+0.06000       2010-06-23 06:00:00 Europe/Rome
+
+ * By an unfortunate accident, the advertised "split_with_placeholders"
+   (instance) method did not exist, since it had been renamed to the
+   (undocumented) "_split_with_placeholders". Now
+   "split_with_placeholders" has been restored (and works exaclty as
+   documented), while "_split_with_placeholders" has been left just in case
+   someone who did not find the public method was using it.
+ 
+ * Minimum SQL::SplitStatement required version has been bumped to 0.05003.
+ 
+ * Minor docs and tests additions.
+
+ * End of deprecation cycle on "split" as a class method.
+
+0.05000       2010-06-17 05:00:00 Europe/Rome
+
+ * "do()" can now take also a list of (already split) statements as its first
+   parameter, in which case no split is performed.
+ 
+  * Now SQL-SplitStatement-0.05000 is required, which has many enhancements.
+
+0.03000       2010-05-30 04:00:00 Europe/Rome # NEVER RELEASED TO CPAN
+
+ * "do()" can now take /flat/ "@bind_values" exaclty as DBI's "do()".
+ 
+ * Tests and docs for this.
+ 
+ * SQL-SplitStatement-0.03000 is now required, which has the
+   "split_with_placeholders" method.
+ 
+ * Assorted minor code and docs enhancements.
+
+0.02000       2010-05-29 05:00:00 Europe/Rome
+
+ * "do()" can now take "\%attr" and "\@bind_values" as optional arguments, like
+   DBI's "do()".
+ 
+ * Added tests and docs for this.
+
+0.01002       2010-05-28 19:15:00 Europe/Rome
+
+ * Now SQL-SplitStatement-0.01001 is required, which has the ability to discard
+   comments.
+ 
+ * Added tests and docs for this.
+
+0.01001       2010-05-27 08:20:00 Europe/Rome
+
+ * Removed "use strict" and "use warnings" from MultiStatementDo.pm, as Moose
+   already activates them.
+ 
+ * The splitting functionality has been extracted and put in a standalone
+   module (SQL::SplitStatement).
+   - Tests and POD modified accordingly.
+   - Starting of deprecation cycle of DBIx::MultiStatementDo->split.
+
+0.01000       2010-05-22 02:55:00 Europe/Rome
+
+ * Initial release (renamed from DBIx-DoMore).

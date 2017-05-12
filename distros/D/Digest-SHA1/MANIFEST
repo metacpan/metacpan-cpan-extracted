@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SHA1.pm
+SHA1.xs
+fip180-1.gif
+fip180-1.html
+hints/irix_6.pl
+t/badfile.t
+t/bits.t
+t/sha1.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

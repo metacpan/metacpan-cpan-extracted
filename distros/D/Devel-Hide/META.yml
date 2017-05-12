@@ -1,0 +1,27 @@
+---
+abstract: 'Forces the unavailability of specified Perl modules (for testing)'
+author:
+  - 'A. R. Ferreira <ferreira@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Hide
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Test::Pod: 1.18
+  Test::Pod::Coverage: 1.04
+requires:
+  Test::More: 0
+resources:
+  repository: https://github.com/aferreira/cpan-Devel-Hide
+version: 0.0009

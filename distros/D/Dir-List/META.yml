@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Dir-List
+version:      1.4
+version_from: lib/Dir/List.pm
+installdirs:  site
+requires:
+    Cache::File:                   0
+    Clone:                         0
+    Date::Format:                  0
+    File::Type:                    0
+    Filesys::DiskUsage:            0
+    FreezeThaw:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

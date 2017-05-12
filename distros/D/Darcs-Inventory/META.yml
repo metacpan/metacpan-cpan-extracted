@@ -1,0 +1,28 @@
+---
+abstract: 'Read and parse a darcs version 1 or 2 inventory file'
+author:
+  - 'David Caldwell <david@porkrind.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Darcs-Inventory
+provides:
+  Darcs::Inventory:
+    file: lib/Darcs/Inventory.pm
+    version: 1.7
+  Darcs::Inventory::Diff:
+    file: lib/Darcs/Inventory/Diff.pm
+  Darcs::Inventory::Patch:
+    file: lib/Darcs/Inventory/Patch.pm
+requires:
+  Class::Accessor::Fast: 0
+  Digest::SHA: 0
+  IPC::Run: 0
+  Time::Local: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.7

@@ -1,0 +1,117 @@
+NAME
+    Device::Onkyo - Perl module to control Onkyo/Integra AV equipment
+
+VERSION
+    version 1.143640
+
+SYNOPSIS
+      my $onkyo = Device::Onkyo->new(device => 'discover');
+      $onkyo->power('on'); # switch on
+
+      $onkyo = Device::Onkyo->new(device => '/dev/ttyS0');
+      $onkyo->write('PWR01'); # switch on
+      while (1) {
+        my $message = $onkyo->read();
+        print $message, "\n";
+      }
+
+      $onkyo = Device::Onkyo->new(device => 'hostname:port');
+      $onkyo->write('PWR01'); # switch on
+
+DESCRIPTION
+    Module for controlling Onkyo/Intregra AV equipment.
+
+    IMPORTANT: This is an early release and the API is still subject to
+    change. The serial port usage is entirely untested.
+
+METHODS
+  "new(%parameters)"
+    This constructor returns a new Device::Onkyo object. The supported
+    parameters are:
+
+    device
+        The name of the device to connect to. The value can be a tty device
+        name or "hostname:port" for TCP. It may also be the string
+        'discover' in which case automatic discovery will be attempted. This
+        value defaults to 'discover'.
+
+    filehandle
+        The name of an existing filehandle to be used instead of the
+        'device' parameter.
+
+    type
+        Whether the protocol should be 'ISCP' or 'eISCP'. The default is
+        'ISCP' if a tty device was given as the 'device' parameter or
+        'eISCP' otherwise.
+
+    baud
+        The baud rate for the tty device. The default is 9600.
+
+    port
+        The port for a TCP device. The default is 60128.
+
+    broadcast_source_ip
+        The source IP address that the discovery process uses for its
+        broadcast. The default, '0.0.0.0', should work in most cases but
+        multi-homed hosts might need to specify the correct local interface
+        address.
+
+    broadcast_dest_ip
+        The IP address that the discovery process uses for its broadcast.
+        The default, '255.255.255.255', should work in most cases.
+
+  "device()"
+    Returns the device used to connect to the equipment. If a filehandle was
+    provided this method will return undef.
+
+  "type()"
+    Returns the type of the device - either 'ISCP' or 'eISCP'.
+
+  "baud()"
+    Returns the baud rate only makes sense for 'ISCP'-type devices.
+
+  "port()"
+    Returns the TCP port for the device only makes sense for 'eISCP'-type
+    devices.
+
+  "filehandle()"
+    This method returns the file handle for the device.
+
+  "read([$timeout])"
+    This method blocks until a new message has been received by the device.
+    When a message is received the message string is returned. An optional
+    timeout (in seconds) may be provided.
+
+  "read_one(\$buffer)"
+    This method attempts to remove a single message from the buffer passed
+    in via the scalar reference. When a message is removed a data structure
+    is returned that represents the data received. If insufficient data is
+    available then undef is returned.
+
+  "discover()"
+    This method attempts to discover available equipment. It returns a list
+    reference of list references of ip and port pairs.
+
+    Currently only the first responding device is returned.
+
+  "write($command, $callback)"
+    This method queues a command for sending to the connected device. The
+    first write will be written immediately, subsequent writes are queued
+    until a response to the previous message is received.
+
+  "pack($command)"
+    This method takes a command and formats it for sending to the device.
+    The format depends on the device type.
+
+  "command($command, [$callback])"
+    This method takes a command and queues it for sending to the device.
+
+AUTHOR
+    Mark Hindess <soft-cpan@temporalanomaly.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Mark Hindess.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

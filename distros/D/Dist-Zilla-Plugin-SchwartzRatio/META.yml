@@ -1,0 +1,38 @@
+---
+abstract: 'display the Schwartz ratio of the distribution upon release'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Carp: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Scalar::Util: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300009, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-SchwartzRatio
+provides:
+  Dist::Zilla::Plugin::SchwartzRatio:
+    file: lib/Dist/Zilla/Plugin/SchwartzRatio.pm
+    version: v0.2.0
+requires:
+  Dist::Zilla::Role::AfterRelease: 0
+  Dist::Zilla::Role::Plugin: 0
+  LWP::Simple: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-SchwartzRatio
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-SchwartzRatio/
+  repository: https://github.com/yanick/Dist-Zilla-Plugin-SchwartzRatio.git
+version: 0.2.0
+x_authority: cpan:YANICK

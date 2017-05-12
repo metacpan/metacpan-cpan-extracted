@@ -1,0 +1,73 @@
+NAME
+    DB::Pluggable::Plugin::StackTraceAsHTML - Add debugger command to see
+    stack trace as HTML
+
+VERSION
+    version 1.111750
+
+SYNOPSIS
+        $ cat ~/.perldb
+        use DB::Pluggable;
+        DB::Pluggable->run_with_config(\<<EOINI)
+        [StackTraceAsHTML]
+        EOINI
+
+        $ perl -d foo.pl
+
+        Loading DB routines from perl5db.pl version 1.28
+        Editor support available.
+
+        Enter h or `h h' for help, or `man perldebug' for more help.
+
+        1..9
+        ...
+          DB<1> c
+          ...
+          DB<2> Th
+
+DESCRIPTION
+    This plugin for DB::Pluggable adds the "Th" command to the debugger,
+    which displays a stack trace in HTML format, with lexical variables,
+    using Devel::StackTrace::AsHTML. It then opens the page in the default
+    browser using Browser::Open.
+
+    The command name "Th" was chosen because the "T" command shows a plain
+    text stack trace and "h" indicates that the output is HTML.
+
+METHODS
+  initialize
+    Adds the "Th" command to the Perl debugger.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=DB-Pluggable-StackTrac
+    eAsHTML>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/DB-Pluggable-StackTraceAsHTML/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/DB-Pluggable-StackTraceAsHTML> and may be
+    cloned from
+    <git://github.com/hanekomu/DB-Pluggable-StackTraceAsHTML.git>. Instead
+    of sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2009 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

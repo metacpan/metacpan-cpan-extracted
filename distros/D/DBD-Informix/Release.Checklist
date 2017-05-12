@@ -1,0 +1,56 @@
+Checklist for Releasing a New Version of DBD::Informix
+======================================================
+
+*   Announce
+    - Up to date email addresses
+    - Up to date summary of ChangeLog
+    - Up to date summary of future directions
+*   Makefile.PL
+    - Up to date information
+*   lib/DBD/Informix/Configure.pm
+    - Correct pre-requisite version of Perl
+    - Correct pre-requisite version of DBI
+    - Correct latest version of DBI
+    - Correct latest version of Perl
+*   Informix.pm
+    - Correct version number
+    - Correct pre-requisite version of DBI
+*   ChangeLog
+    - All details up to date.
+    - Release date annotated.
+*   Notes/Working.Versions
+    - Current working versions
+*   README
+    - Correct information
+    - Correct pre-requisites
+    - Correct cross-references
+*   lib/DBD/Informix/TechSupport.pm
+    - Up to date email addresses
+    - Correct pre-requisite version of DBI
+    - Correct version information, generally
+*   Notes/FAQ
+    - Up to date versions, etc.
+    - Up to date emails.
+*   QA Tests
+    - Run some tests specifying username and password via
+      DBD_INFORMIX_USERNAME and DBD_INFORMIX_PASSWORD environment
+      variables.
+    - Run some tests (especially on HP-UX) with
+      DBD_INFORMIX_RELOCATABLE_INFORMIXDIR set.
+    - Ensure that username and password are not always the same to spot
+      test failures better.
+    - Run regression tests from regression sub-directory.
+*   Make the release using:
+    - jdcrelease -F -N $PWD/apply.setminref
+    - Send the announcement with PTS and checksum information to the
+      names listed in the Announce file (dbi-dev is overkill).
+    - Upload to pause.cpan.org
+*   META.yml
+    - Correct pre-requisite version number
+    - Up to date email address
+*   lib/DBD/Informix/TechHarness.pm
+    - Correct pre-requisite version of DBI
+
+--
+
+@(#)$Id: Release.Checklist,v 2015.3 2015/11/01 06:40:19 jleffler Exp $

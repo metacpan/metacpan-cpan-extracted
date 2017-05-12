@@ -1,0 +1,30 @@
+---
+abstract: 'Check password strength and generate password using passwdqc'
+author:
+  - 'Sherwin Daganato <sherwin@daganato.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Password-passwdqc
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  List::MoreUtils: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: https://github.com/sherwind/Data-Password-passwdqc/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/sherwind/Data-Password-passwdqc.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

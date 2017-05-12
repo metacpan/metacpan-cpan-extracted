@@ -1,0 +1,39 @@
+---
+abstract: 'RFC7234 Caching'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  Data::Dumper: '0'
+  Exporter: '0'
+  HTTP::Request::Common: '0'
+  Import::Into: '0'
+  Plack::Test: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-ConditionalCaching
+requires:
+  Dancer2::Plugin: '0'
+  HTTP::Date: '0'
+  HTTP::Exception: '0'
+  HTTP::Headers::Fancy: '0'
+  Math::Round: '0'
+  Scalar::Util: '0'
+  Time::HiRes: '0'
+  perl: '5.010'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer2-plugin-conditionalcaching-perl/issues
+  homepage: https://github.com/zurborg/libdancer2-plugin-conditionalcaching-perl
+  repository: https://github.com/zurborg/libdancer2-plugin-conditionalcaching-perl.git
+version: '0.001'

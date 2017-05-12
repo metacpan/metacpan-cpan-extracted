@@ -1,0 +1,26 @@
+---
+abstract: 'gather all files from MANIFEST'
+author:
+  - 'Serguei Trouchelle <stro@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-GatherFromManifest
+requires:
+  Dist::Zilla::Role::FileGatherer: 0
+  ExtUtils::Manifest: 0
+  File::Find::Rule: 0
+  File::HomeDir: 0
+  File::Spec: 0
+  Moose: 0
+  Moose::Autobox: 0
+  MooseX::Types::Path::Class: 0
+  Path::Class: 0
+  namespace::autoclean: 0
+version: 1.001

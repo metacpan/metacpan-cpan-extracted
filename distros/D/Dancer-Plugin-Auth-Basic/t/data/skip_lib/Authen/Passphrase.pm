@@ -1,0 +1,1 @@
+# I'm just an empty file to simulate that Authen::Passphrase is missing

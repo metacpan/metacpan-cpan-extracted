@@ -1,0 +1,43 @@
+---
+abstract: 'Parameterized Moose role which provides accessor methods for values stored in a hash-like structure'
+author:
+  - 'Manfred Stock <mstock@cpan.org>'
+build_requires:
+  DBICx::TestDatabase: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::InflateColumn::Serializer: 0
+  DBIx::Class::InflateColumn::Serializer::Hstore: 0
+  DBIx::Class::InflateColumn::Serializer::JSON: 0
+  DBIx::Class::Schema: 0
+  File::Find: 0
+  File::Temp: 0
+  JSON::MaybeXS: 0
+  Module::Build: 0.3601
+  Moose: 0
+  MooseX::MarkAsMethods: 0
+  MooseX::NonMoose: 0
+  Pg::hstore: 0
+  Test::Class: 0
+  Test::Exception: 0
+  Test::More: 0.88
+  parent: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor
+no_index:
+  file:
+    - perlcritic.rc
+requires:
+  Carp: 0
+  MooseX::Role::Parameterized: 0
+resources:
+  repository: git://github.com/mstock/DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor
+version: 0.001000

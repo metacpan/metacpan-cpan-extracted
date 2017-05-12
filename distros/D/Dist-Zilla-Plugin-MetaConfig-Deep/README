@@ -1,0 +1,69 @@
+Dist::Zilla::Plugin::MetaConfig::Deep
+
+This module serves as an experimental space for features I think the
+core MetaConfig *should* provide, but in a state of uncertainty about
+how they should be implemented.
+
+The objective is to extract more metadata about plugins without plugins
+having to percolate hand-written adjustments system-wide to get a useful
+interface.
+
+  Composition Data
+
+This exposes data about the roles and parent classes, and their
+respective versions in play on a given plugin, to give greater depth for
+problem diagnosis.
+
+  {
+    "class" : "Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING",
+    "config" : {...},
+    "name" : "@Author::KENTNL/Author::KENTNL::CONTRIBUTING",
+    "version" : "0.001005",
+    "x_composes" : {
+      "Dist::Zilla::Plugin::GenerateFile::FromShareDir" : "0.009",
+      "Dist::Zilla::Role::AfterBuild"                   : "5.041",
+      "Dist::Zilla::Role::AfterRelease"                 : "5.041",
+      "Dist::Zilla::Role::ConfigDumper"                 : "5.041",
+      "Dist::Zilla::Role::FileGatherer"                 : "5.041",
+      "Dist::Zilla::Role::FileInjector"                 : "5.041",
+      "Dist::Zilla::Role::FileMunger"                   : "5.041",
+      "Dist::Zilla::Role::Plugin"                       : "5.041",
+      "Dist::Zilla::Role::RepoFileInjector"             : "0.005",
+      "Dist::Zilla::Role::TextTemplate"                 : "5.041",
+      "Moose::Object"                                   : "2.1604",
+      "MooseX::SlurpyConstructor::Role::Object"         : "1.2"
+    }
+  }
+
+@ETHER has already made excellent inroads into making this sort of
+metadata exposed via exporting "version" in all "metaconfig" plugin's
+she has access to, and this is an attempt at providing the same level of
+insight without requiring so much explicit buy-in from plugin authors.
+
+This also has the neat side effect of showing what phases a plug-in is
+subscribed to.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

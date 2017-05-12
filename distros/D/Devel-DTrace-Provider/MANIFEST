@@ -1,0 +1,40 @@
+Av_CharPtrPtr.c
+Av_CharPtrPtr.h
+Changes
+lib/Devel/DTrace/Provider.pm
+lib/Devel/DTrace/Provider/Builder.pm
+libusdt/LICENCE
+libusdt/Makefile
+libusdt/README.md
+libusdt/test.pl
+libusdt/test_mem_usage.c
+libusdt/test_usdt.c
+libusdt/usdt.c
+libusdt/usdt.h
+libusdt/usdt_dof.c
+libusdt/usdt_dof_file.c
+libusdt/usdt_dof_sections.c
+libusdt/usdt_internal.h
+libusdt/usdt_probe.c
+libusdt/usdt_tracepoints_i386.s
+libusdt/usdt_tracepoints_x86_64.s
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+ppport.h
+Provider.xs
+README.md
+t/author/extend.t
+t/author/mem_usage.t
+t/builder.t
+t/imported.t
+t/imported2.t
+t/json.t
+t/lib/TestProvider.pm
+t/lib/TestProvider2.pm
+t/noargs.t
+t/provider.t
+t/unavailable.t
+typemap
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

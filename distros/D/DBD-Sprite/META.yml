@@ -1,0 +1,22 @@
+---
+abstract: 'Perl extension for DBI, providing database emmulation via flat files.  '
+author:
+  - 'Jim Turner'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-Sprite
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '0'
+version: '6.11'

@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+our $VERSION = '0.0.8'; # VERSION
+
+use Device::Temperature::TMP102;
+
+my $device = shift @ARGV || '/dev/i2c-1';
+
+my $dev = Device::Temperature::TMP102->new( I2CBusDevicePath => $device );
+
+my $temp = $dev->getTemp();
+
+print "Temp:\n";
+printf ( "\t%2.2f °C\n", $temp );
+printf ( "\t%2.2f °F\n", $temp * 1.8 + 32 );

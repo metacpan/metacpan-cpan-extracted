@@ -1,0 +1,30 @@
+NAME
+
+Data::ID::Exim - generate Exim message IDs
+
+DESCRIPTION
+
+This module supplies a function which generates IDs using the algorithm
+that the Exim MTA uses to generate message IDs.  It also supplies
+functions to manipulate such IDs, and the base 62 encoding in isolation.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2004, 2006, 2007, 2009, 2010, 2011
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

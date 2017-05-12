@@ -1,0 +1,38 @@
+---
+abstract: 'Rsync fOr baCKup and Roll'
+author:
+  - 'Jacquelin Charbonnel <jacquelin.charbonnel at math.cnrs.fr>'
+build_requires:
+  Config::General: 0
+  Config::General::Extended: 0
+  Dir::Which: 0
+  DirHandle: 0
+  File::Basename: 0
+  File::Path::Tiny: 0
+  File::stat: 0
+  FileHandle: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Net::SMTP: 0
+  Pod::Perldoc: 0
+  Sys::Hostname: 0
+  Sys::Syslog: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dir-Rocknroll
+provides:
+  Dir::Rocknroll:
+    file: lib/Dir/Rocknroll.pm
+    version: 0.34
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.34

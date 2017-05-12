@@ -1,0 +1,24 @@
+Create middle management bullshit whenever the voices tell you
+
+(C) ..--- ----- ----- .---- by - . .-.. ... .-.-.-  All rights reserved.
+
+You need Math::String, and thus the new Math::BigInt and Math::BigFloat
+versions of at least v1.33 as they can be found on CPAN or in Perl newer than
+v5.7.1.
+
+To install, untar, unzip and then run
+
+	perl Makefile.PL
+	make
+	make test
+
+If all tests pass, you might do:
+
+	make install
+
+to install this package.
+
+Please send me test-reports, your experiences with this and your ideas - or
+maybe this time not. >8+}=
+
+Tels <http://bloodgate.com/>

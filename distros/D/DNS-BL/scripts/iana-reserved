@@ -1,0 +1,73 @@
+# This script illustrates the creation of a very simple database. 
+# Entries consisting of currently invalid IP space are added to this
+# same database.
+
+# Although entries in this file are suitable for most operations,
+# please review carefully the included IP space if you're using this
+# script for production purposes.
+
+# Start by connecting to the database file. You can choose here the
+# name of the database.
+
+connect db file "test.db"
+
+#
+# Add RFC-1700 / loopback IP space to the database
+#
+
+add ip 127/8 text "RFC-1700 - Loopback IP space is always listed" \
+    code 127.0.0.1 without checking
+
+#
+# Now, add RFC-1918 space to the database
+#
+
+add ip 10/8 text "RFC-1918 non-routable space" code 127.0.0.2\
+    without checking
+add ip 172.16/12 text "RFC-1918 non-routable space" code 127.0.0.2\
+     without checking
+add ip 192.168/16 text "RFC-1918 non-routable space" code 127.0.0.2\
+    without checking
+
+#
+# 39.0.0.0/8 - RFC-1797 space, currently unassigned
+#
+
+add ip 39.0.0.0/8 text "RFC-1797 space is not assigned" code 127.0.0.2\
+    without checking
+
+#
+# IP space reserved by IANA for classfullness reasons, currently
+# unallocated
+#
+
+add ip 128.0/16 code 127.0.0.2 without checking\
+    text "RFC-3330 - Reserved by IANA, Currently unassigned"
+add ip 191.255.0/16 code 127.0.0.2 without checking\
+    text "RFC-3330 - Reserved by IANA, Currently unassigned"
+add ip 192.0.0.0/24 code 127.0.0.2 without checking\
+    text "RFC-3330 - Reserved by IANA, Currently unassigned"
+add ip 223.255.255.0/24 code 127.0.0.2 without checking\
+    text "RFC-3330 - Reserved by IANA, Currently unassigned"
+
+#
+# IP space set forth for testing and documentation purposes
+#
+
+add ip 192.0.2.0/24 code 127.0.0.2 without checking\
+    text "RFC-3330 - Reserved by IANA (TEST-NET), Unassigned"
+add ip 198.18.0.0/15 code 127.0.0.2 without checking\
+    text "RFC-2544 - Reserved by IANA for tests and benchmarking"
+
+#
+# 169.254/16 - Link local addresses should not reach any public
+# mail server
+#
+
+add ip 169.254.0.0/16 text "Link local addresses" code 127.0.0.2\
+    without checking 
+
+# Finally, commit the operation. This is not needed with DB, but it
+# is a good idea to always commit
+
+commit

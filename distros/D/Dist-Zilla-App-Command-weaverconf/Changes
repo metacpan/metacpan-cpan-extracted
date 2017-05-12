@@ -1,0 +1,19 @@
+Revision history for Dist-Zilla-App-Command-weaverconf
+
+0.05      2015-01-03 20:58:58Z
+          - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.04      2014-12-20 02:47:50Z
+          - dump JSON in a more human-readable format
+
+0.03      2014-10-31 06:05:16Z
+          - use JSON::MaybeXS instead of JSON::Any
+          - reduce the number of prereqs used
+
+0.02      2013-01-22 00:22:47Z
+          - Dist::Zilla::App::Command::weaverconf::SExpGen renamed to
+            Dist::Zilla::App::CommandHelper::weaverconf::SExpGen to resolve various
+            warnings (RT#67379)
+
+0.01      2010-05-30 21:35:51Z
+          - Initial release.

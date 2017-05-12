@@ -1,0 +1,5 @@
+
+DirDB::Storable is a fork of DirDB that uses Storable to
+store and retreive perl objects besides scalars and simple hash references.
+
+

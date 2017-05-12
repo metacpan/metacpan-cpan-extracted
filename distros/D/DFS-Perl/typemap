@@ -1,0 +1,5 @@
+DCE::DFS::fid T_PTROBJ
+DCE::DFS::flserver T_PTROBJ
+DCE::DFS::ftserver T_PTROBJ
+DCE::DFS::aggregate T_PTROBJ
+DCE::DFS::fileset T_PTROBJ

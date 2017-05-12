@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+lib/DBIx/SimpleMigration.pm
+lib/DBIx/SimpleMigration/Client.pm
+lib/DBIx/SimpleMigration/Client/Pg.pm
+lib/DBIx/SimpleMigration/Client/SQLite.pm
+lib/DBIx/SimpleMigration/Migration.pm
+minil.toml
+t/01-use.t
+t/02-apply.t
+META.yml
+MANIFEST

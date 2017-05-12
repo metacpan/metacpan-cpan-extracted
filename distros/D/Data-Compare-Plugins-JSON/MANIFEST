@@ -1,0 +1,19 @@
+Changes
+lib/Data/Compare/Plugins/JSON.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-use.t
+t/01-require.t
+t/02-compare-json-pp.t
+t/03-compare-json-xs.t
+t/04-compare-json-uses-pp.t
+t/05-compare-json-uses-xs.t
+t/06-compare-json-uses-backportpp.t
+t/90-pod.t
+t/91-pod-coverage.t
+t/92-manifest.t
+t/93-changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

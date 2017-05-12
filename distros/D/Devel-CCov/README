@@ -1,0 +1,51 @@
+Scans C/C++ source (before cpp) and inserts trip-wires in each code
+path to record execution.
+
+=> Requires no special compiler support.
+
+=> Careful use can help you eliminate _all_ bugs from your code.
+
+
+Name           DSLI  Description                                  Info
+-----------    ----  -------------------------------------------- -----
+Devel::CCov    bdcO  Fun Test Coverage Analysis for C/C++         JPRIT
+
+Get it via http://www.perl.com/CPAN/authors/id/JPRIT/ !
+
+
+##################
+# RECENT CHAN@ES #
+##################
+
+
+** 04-03-98 RELEASE 0.20
+
+- No changes.  Seems to work correctly.
+
+
+** 01-18-98 RELEASE 0.07
+
+- Minor tweaks.
+
+- Switch statements are instrumented with less overkill when possible.
+
+- Fixed release dates time-warp.
+
+
+** 01-17-98 RELEASE 0.06
+
+- Exceptional/fatal cases are ignored by default, but can be enabled
+with a command line switch (-f).
+
+- Fixed C++ support and stats overlap.
+
+- Added a patch for Makefile.PLs.
+
+
+-------------------------------------------------------------------
+Copyright © 1998 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)

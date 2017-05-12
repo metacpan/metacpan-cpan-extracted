@@ -1,0 +1,30 @@
+NAME
+
+DynaLoader::Functions - deconstructed dynamic C library loading
+
+DESCRIPTION
+
+This module provides a function-based interface to dynamic loading as used
+by Perl.  Some details of dynamic loading are very platform-dependent,
+so correct use of these functions requires the programmer to be mindful
+of the space of platform variations.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2011, 2012, 2013 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,126 @@
+Release history for Dist-Zilla-Plugin-Bootstrap-ShareDir-Module
+
+1.001002 2017-03-06T05:56:08Z c383b1c
+ [Bugfix]
+ - Avoid testing issues under -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Bootstrap-ShareDir-Module/issues/1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +7 ↑4 -3 (suggests: ↑2)
+ - runtime: ↓1 -2
+ - test: ↓2
+
+ [Internals]
+ - Remove use of ConfigDumper
+
+1.001001 2015-01-21T16:26:20Z af98f22
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +10 ↑2 -2 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +2)
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Documentation]
+ - It has some now.
+
+ [Internals]
+ - Removed use of MooseX::AttributeShortcuts to remove indirect dependency on autobox.
+
+1.001000 2014-08-31T14:00:46Z
+ [00 Minor]
+ - Tests refactored
+ - Internals changed.
+ - Metadata fixes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +1 -2
+
+ [Internals]
+ - dump_config now implemented with ConfigDumper
+
+ [Metadata]
+ - author = kentnl
+
+ [Tests]
+ - Refactor all tests in terms of dztest util.
+
+1.000000 2014-08-02T14:44:12Z
+ [00 Major]
+ - Changes that affect hand-operated downstream.
+
+ [01 Toolkit Changes]
+ - Switched to EUMM for install
+ - "latest" dependencies now only recommended, not required.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [02 Version Scheme]
+ - Switched from x.y.z to x.yyyyyy
+ - This is the primary reason for the 1.x on the box
+ - https://questhub.io/realm/perl/quest/5388d3a9bbd0be2224000129
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.2.0, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 -11 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +2 ↓1 -2 (recommends: +3)
+
+ [Misc]
+ - Path::FindDev no longer needlessly used for tests
+
+0.2.0 2013-11-21T07:22:18Z
+ [00 Minor]
+ - Reimplement in terms of T:F:SD:O:M
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.3, see misc/*.deps* for details
+ - runtime: +1 -1
+
+0.1.3 2013-11-20T09:44:25Z
+ [00 Minor]
+ - Drop 5.10 requirement
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.2, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: ↓1
+ - test: ↑1 -3
+
+ [Packaging]
+ - Use new fallback stuff
+
+ [Tests]
+ - Regen ReportPrereqs to not report devel deps
+ - Move from Test::Compile to Test::Compile::PerFile
+
+0.1.2 2013-09-24T23:49:46Z
+ [Bugfix]
+ - use Test::DZil internally instead of calling dzil
+ - log bootstrapping of modules instead of silence
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - test: +3
+
+0.1.1 2013-09-08T11:23:50Z
+ [Bugfix]
+ - Need Bootstrap::lib for tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - test: +1
+
+ [Docs]
+ - Add metapod data.
+
+0.1.0 2013-09-04T22:01:12Z
+ - First version.

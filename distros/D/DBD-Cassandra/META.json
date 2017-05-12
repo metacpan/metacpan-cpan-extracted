@@ -1,0 +1,50 @@
+{
+   "abstract" : "Database driver for Cassandra's CQL3",
+   "author" : [
+      "Tom van der Woerdt <tvdw@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBD-Cassandra",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cassandra::Client" : "0.10",
+            "DBI" : "1.621",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/tvdw/perl-DBD-Cassandra.git",
+         "web" : "https://github.com/tvdw/perl-DBD-Cassandra"
+      }
+   },
+   "version" : "0.56"
+}

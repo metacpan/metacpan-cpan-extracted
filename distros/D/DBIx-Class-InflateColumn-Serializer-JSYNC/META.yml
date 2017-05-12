@@ -1,0 +1,43 @@
+---
+abstract: 'Basic JSON Object Serialization Support for DBIx::Class.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  DBIx::Class::Core: '0'
+  DBIx::Class::InflateColumn::Serializer: '0'
+  DBIx::Class::Schema: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  parent: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-InflateColumn-Serializer-JSYNC
+provides:
+  DBIx::Class::InflateColumn::Serializer::JSYNC:
+    file: lib/DBIx/Class/InflateColumn/Serializer/JSYNC.pm
+    version: '0.002001'
+requires:
+  Carp: '0'
+  DBIx::Class::InflateColumn::Serializer: '0'
+  JSYNC: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/DBIx-Class-InflateColumn-Serializer-JSYNC/issues
+  homepage: https://github.com/kentnl/DBIx-Class-InflateColumn-Serializer-JSYNC
+  repository: https://github.com/kentnl/DBIx-Class-InflateColumn-Serializer-JSYNC.git
+version: '0.002001'

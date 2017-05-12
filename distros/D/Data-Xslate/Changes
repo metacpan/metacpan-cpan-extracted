@@ -1,0 +1,27 @@
+Revision history for Perl extension Data::Xslate.
+
+0.03 2016-10-05
+
+ - Stop modifying the passed in data structure, and add a test
+   which verifies this.
+ - Fix shabang lines in .t files.
+
+0.02 2016-10-04
+
+ - Fixed a bunch of nasty little bugs found by creating a new test
+   which checks permutations of nested_key_tag, substitution_tag,
+   and key_separator.
+ - Changed the default nested_key_tag and substitution_tag to
+   a plane old equals sign.  This may not work great in all situations,
+   but its simple and easy to change.
+ - Add a key_separator argument so the character used between
+   keys in a key path can be customized.
+ - Make the nested keys syntax more explicit by supporting a
+   nested_key_tag argument.
+ - Stop CPAN from indexing an internal package.
+ - Add Text::Xslate to dependencies.
+
+0.01 2016-10-03
+
+ - First release.
+

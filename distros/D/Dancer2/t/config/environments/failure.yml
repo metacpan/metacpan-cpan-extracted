@@ -1,0 +1,3 @@
+not valid YAML - inconsistent indentation
+foo: 42
+  bar: baz

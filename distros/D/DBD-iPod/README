@@ -1,0 +1,195 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBD::iPod - Connect to an iPod via DBI</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#the_ipod_table">THE iPod TABLE</a></li>
+		<li><a href="#partial_sql_select_support">PARTIAL SQL SELECT SUPPORT</a></li>
+	</ul>
+
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#bugs___todo">BUGS / TODO</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+	<li><a href="#appendix">APPENDIX</a></li>
+	<ul>
+
+		<li><a href="#driver__"><code>driver()</code></a></li>
+	</ul>
+
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DBD::iPod - Connect to an iPod via DBI</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+ use DBI;
+ my $dbh = DBI-&gt;connect('dbi:iPod:');</pre>
+<pre>
+ #or explicitly give mount path, /mnt/ipod is the default
+ #my $dbh = DBI-&gt;connect('dbi:iPod:/mnt/ipod');</pre>
+<pre>
+ #not mounted at /mnt/ipod ?  do this:
+ #my $dbh = DBI-&gt;connect('dbi:iPod:/mnt/ipod2');</pre>
+<pre>
+ my $sth = $dbh-&gt;prepare(&quot;SELECT * FROM iPod&quot;);
+ $sth-&gt;execute();</pre>
+<pre>
+ my(%artist,$c,$count);</pre>
+<pre>
+ print STDERR &quot;\nGenerating stats from iPod, this may take a few minutes...\n&quot;;</pre>
+<pre>
+ while(my $row = $sth-&gt;fetchrow_hashref){
+   $artist{ $row-&gt;{artist} }++;
+   $c += $row-&gt;{time};
+   $count++;
+ }</pre>
+<pre>
+ my($h,$m,$s,$u) = (0,0,0,0);</pre>
+<pre>
+ $c /= 1000; #milliseconds to seconds
+ $cs = $c;
+ $cm = int($c / 60);
+ $cs %= 60;
+ $ch = int($cm / 60);
+ $cm %= 60;
+ $cu = $c % 1;</pre>
+<pre>
+ $cs += $cu;
+ $cs = sprintf(&quot;%.3f&quot;,$cs);
+ $cs = '0'.$cs if $cs &lt; 10;
+ my $hmsu = sprintf('%02d:%02d:%s',$ch,$cm,$cs);</pre>
+<pre>
+ print &quot;\n\n&quot;.
+ &quot;=======================================\n&quot;.
+ &quot;         This iPod contains:\n&quot;.
+ &quot;  Artists:         &quot;.scalar(keys(%artist)).&quot;\n&quot;.
+ &quot;  Tracks:          &quot;.$count.&quot;\n&quot;.
+ &quot;  Total Play Time: &quot;.$hmsu.&quot;\n&quot;.
+ &quot;=======================================\n\n&quot;;</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Connect to the iPod using Mac::iPod::GNUpod and present the iTunes
+database as a DBD datasource.  You query the iPod's iTunesDB database
+using a subset of SQL.  iTunesDB is currently <em>read only</em>, and thus
+only supports the SQL SELECT statement.</p>
+<p>We expect the iPod to be mounted at <code>/mnt/ipod</code>.  If you've mounted
+elsewhere (or have multiple iPodia mounted), use an alternate system
+path.  <a href="#synopsis">SYNOPSIS</a>.</p>
+<p>
+</p>
+<h2><a name="the_ipod_table">THE iPod TABLE</a></h2>
+<p>There isn't really a table in the iPod.  But we can make it look that
+way thanks to the wonderful GNUpod project.  It might look like this:</p>
+<pre>
+    Column    |     Type
+ -------------+--------------
+   bitrate    | kb/s
+   time       | milliseonds
+   stoptime   | milliseconds
+   songs      | ?
+   fdesc      | text
+   srate      | Hertz
+   rating     | integer
+   cdnum      | ?
+   cds        | ?
+   starttime  | milliseconds
+   playcount  | integer
+   id         | GUID
+   prerating  | ?
+   volume     | integer
+   songnum    | integer
+   path       | filepath
+   genre      | genre
+   filesize   | bytes
+   artist     | text
+   album      | album name
+   comment    | comment
+   title      | track name
+   uniq       | GUID</pre>
+<p>
+</p>
+<h2><a name="partial_sql_select_support">PARTIAL SQL SELECT SUPPORT</a></h2>
+<p>Not all SELECT functionality is implemented.  Actually, almost none of
+it is implemented.  Here are some examples of what you <em>can</em> do:</p>
+<pre>
+ SELECT * FROM iPod;
+ SELECT artist,title FROM iPod;
+ SELECT * FROM iPod LIMIT 10,20;
+ SELECT * FROM iPod WHERE artist LIKE 'something%';
+ SELECT * FROM iPod WHERE artist LIKE 'something else%'
+   OR (bitrate = 1024 AND playcount &gt;= 1);</pre>
+<p>If you need more SQL functionality, please send me a patch.  I'd really
+like to get DISTINCT(), COUNT(), and GROUP BY working.</p>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Allen Day &lt;<a href="mailto:allenday@ucla.edu">allenday@ucla.edu</a>&gt;</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="/Mac/iPod/GNUpod.html">the Mac::iPod::GNUpod manpage</a>, <em>DBI</em>.</p>
+<p>GNUpod - <a href="http://www.gnu.org/software/gnupod/">http://www.gnu.org/software/gnupod/</a></p>
+<p>iPodLinux - <a href="http://www.ipodlinux.org/index.php/Main_Page">http://www.ipodlinux.org/index.php/Main_Page</a></p>
+<p>
+</p>
+<hr />
+<h1><a name="bugs___todo">BUGS / TODO</a></h1>
+<p>* Add playlist support.  Should be implemented in Mac::iPod::GNUpod, it
+is in the original GNUpod project.</p>
+<p>* Add more SELECT clause and function support.  Especially ``GROUP BY'',
+``DISTINCT()'', and ``COUNT()''.</p>
+<p>* Add INSERT and UPDATE support.</p>
+<p>* Some fields are missing, e.g. BPM (beats/minute) that are present in
+the iTunesDB.  I've also read at iPodLinux, but not personally observed yet,
+that track ratings may be borked given what I understand about GNUpod.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>GPL</p>
+<p>
+</p>
+<hr />
+<h1><a name="appendix">APPENDIX</a></h1>
+<p>The rest of the documentation details each of the object methods.
+Internal methods are usually preceded with a '_'.  Methods are
+in alphabetical order for the most part.</p>
+<p>
+</p>
+<h2><a name="driver__"><code>driver()</code></a></h2>
+<pre>
+ Usage   :
+ Function: Creates a new driver handle, which will be a singleton.
+ Example :
+ Returns : 
+ Args    :</pre>
+
+</body>
+
+</html>

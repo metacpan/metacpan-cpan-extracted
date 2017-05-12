@@ -1,0 +1,52 @@
+{
+   "abstract" : "Detect what database you are connected to",
+   "author" : [
+      "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Introspector",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.628",
+            "Moo" : "1.003001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.4",
+            "Test::More" : "0.99",
+            "Test::Roo" : "1.002"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/frioux/DBIx-Introspector",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frioux/DBIx-Introspector.git",
+         "web" : "https://github.com/frioux/DBIx-Introspector"
+      }
+   },
+   "version" : "0.001005"
+}
+

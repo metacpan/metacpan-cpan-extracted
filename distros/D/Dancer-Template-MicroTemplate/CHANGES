@@ -1,0 +1,23 @@
+1.0.0   2012-01-11
+
+    [BUG FIXES]
+    * Allow all options of Text::MicroTemplate to be specified in config.
+        Fixes: https://rt.cpan.org/Public/Bug/Display.html?id=70512
+    
+    [ENHANCEMENTS]
+    * Use semver.org versioning practices
+    * Changed format of changelog to reflect current best practices.
+    * Modernized tests
+    * Use Dist::Zilla to manage releases
+    * Co-maintainership of module between franckc and jaitken
+        Documentation modified to reflect this.
+
+
+0.0.2   2010-03-11
+
+    Use start and end tag from config
+
+
+0.0.1   2010-02-02
+
+    Original Version

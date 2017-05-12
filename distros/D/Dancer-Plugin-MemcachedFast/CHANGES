@@ -1,0 +1,21 @@
+0.161360 - 2016-05-15
+    * memcached_get_or_sat now transfers key lifetime
+
+0.150740 - 2015-03-15
+    * Added ABSTRACT, CONTRIBUTORS, DESCRIPTION & LICENSE
+      thanks to Nikolay Mishin <mi@ya.ru>
+    * Fixed gitignore
+    * Due to adding DESCRIPTION, re-releasing so Metacpan can better index this
+
+0.130500 - 2013-02-19
+    * Fixed cache expiry bug
+    * Updated docs re: setting cache to never expire
+
+0.110770 - 2011-03-18
+    * Fixed minimum Dancer version
+
+0.110620 - 2011-03-03
+    * fixed memcached_get_or_set to return the set value
+
+0.110570 - 2011-02-25
+    * Initial version

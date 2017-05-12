@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Table.pm
+t/test.t
+t/test1.t
+aaa.csv
+aaa.tsv
+bbb.csv
+ccc.csv
+t_dos.csv
+t_dos2.csv
+t_unix.csv
+t_unix_noheader.csv
+t_mac.csv
+colon.csv
+ttt.tsv
+ttt.csv
+Category.csv
+Product.csv
+Table.html
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

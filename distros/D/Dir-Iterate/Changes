@@ -1,0 +1,8 @@
+Revision history for Perl module Dir::Iterate
+
+0.01 Thu Oct 22 19:00:06 2009
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.02 Tue Nov  3 23:55:30 2015
+	- updated tests to read MANIFEST through ExtUtils::Manifest
+	  (fixes failing tests)

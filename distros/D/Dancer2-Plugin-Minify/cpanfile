@@ -1,0 +1,28 @@
+requires "CSS::Packer" => "0";
+requires "Dancer2::Plugin" => "0";
+requires "HTML::Packer" => "0";
+requires "JavaScript::Packer" => "0";
+requires "perl" => "5.010";
+requires "strictures" => "0";
+
+on 'build' => sub {
+  requires "Module::Build" => "0.28";
+};
+
+on 'test' => sub {
+  requires "Dancer2" => "0";
+  requires "HTTP::Request::Common" => "0";
+  requires "Plack::Test" => "0";
+  requires "Test::Most" => "0";
+  requires "perl" => "5.010";
+};
+
+on 'configure' => sub {
+  requires "Module::Build" => "0.28";
+  requires "perl" => "5.010";
+};
+
+on 'develop' => sub {
+  requires "Test::CPAN::Changes" => "0.19";
+  requires "Test::Pod" => "1.41";
+};

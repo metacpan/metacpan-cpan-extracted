@@ -1,0 +1,196 @@
+NAME
+    INSTALL - How to install and configure DBD::MaxDB version 7.6.0
+    BUILD 016-121-109-428
+
+SYNOPSIS
+      perl Makefile.PL [options]
+      make
+      make test
+      make install
+
+DESCRIPTION
+    This documentation describes how you install the DBD::MaxDB, the
+    Perl DBI driver for the MaxDB by MySQL database.
+
+COPYRIGHT
+    Copyright 2000-2005 by SAP AG
+
+    This program is free software; you can redistribute it and/or
+    modify it under the terms of either the Artistic License, as
+    specified in the Perl README file or the GNU General Public
+    License as published by the Free Software Foundation; either
+    version 2 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public
+    License along with this program; if not, write to the Free
+    Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+    MA 02111-1307, USA.
+
+IF YOU HAVE PROBLEMS:
+    This module is maintained and supported on a mailing list,
+
+    maxdb@lists.mysql.com
+
+    Please send comments and bug-reports to this list. Please
+    include the output of perl -v [-V], the version of the MaxDB
+    database, the version of the MaxDB SQLDBC-SDK, the version of
+    DBI, and details about your platform in your bug report.
+
+    Mailing list archives are available at:
+
+    the section on "/lists.mysql.com/maxdb" in the http: manpage
+
+    Additionally you might try the dbi-user mailing list for
+    questions about DBI and its modules in general.
+
+HOW TO GET THE LATEST VERSION:
+    Use the following URL to look for new versions of this module:
+
+    the section on "/search.cpan.org/~maxdb" in the http: manpage
+
+PREREQUISITES
+    Before installing the driver make sure that you have the
+    following prerequisites available.
+
+    Perl
+        Build, test and install Perl 5 (at least 5.6.1). It is very
+        important to TEST it and INSTALL it!
+
+    DBI Build, test and install DBI (at least 1.21). Since DBD::MaxDB is
+        a DBI driver, you need DBI. It is available at:
+
+        the section on "/search.cpan.org" in the http: manpage
+
+    C compiler
+        A C compiler is required, since currently you can only
+        install from source. Maybe a binary version will be
+        available in future releases.
+
+        Make sure, that the C compiler you use is the same C
+        compiler that was used for compiling Perl! Otherwise you
+        will almost definitely encounter problems because of
+        differences in the underlying C runtime libraries.
+
+    MaxDB SQLDBC-SDK
+        The DBD::MaxDB driver needs to link with MaxDB's common
+        database interface SQLDBC which is not included in this
+        distribution. You need at least the version 7.5.00.12. But
+        you should use a newer version of SQLDBC from release
+        7.6.00. For details about SQLDBC see:
+
+        the section on
+        "/www.mysql.com/products/maxdb/pdf/sqldbc_eng.pdf" in the
+        http: manpage
+
+        You can download the SQLDBC software development kit from
+        the MySQL homepage at:
+
+        the section on "/www.mysql.com/maxdb" in the http: manpage
+
+            There are different ways to install the SQLDBC software
+            development kit.
+
+    Install using SDBINST
+            You need to download and unpack the MaxDB standard
+            installation package (maxdb-all-<os>-[32 or 64]bit-
+            <arch>-<version>_<build>.<tgz>)
+
+            Go to the directory into which you unpacked the
+            installation package. Enter the following commands:
+
+              ./SDBINST -package Base
+              ./SDBINST -package "Database Connectivity"
+
+            The Base package is required for SQLDBC SDK. If you have
+            already installed it, you can skip the first command.
+
+    Install from tarball
+            Download the latest version of the SQLDBC SDK from the
+            MySQL homepage or the ftp server. Choose the SQLDBC
+            package that matches your operating system architecture.
+            Platform Package name ----------------------------------
+            -------------------------------------- Microsoft Windows
+            (x86) maxdb-sqldbc-win-32bit-i386-7_6_00_16.zip
+            Microsoft Windows (IA64) maxdb-sqldbc-win-64bit-ia64-
+            7_6_00_16.zip Linux (x86) maxdb-sqldbc-linux-32bit-i386-
+            7_6_00_16.zip Linux (IA64) maxdb-sqldbc-linux-64bit-
+            ia64-7_6_00_16.zip IBM AIX 5 (PowerPC, 64-bit) maxdb-
+            sqldbc-aix5-64bit-ppc-7_6_00_16.zip HP-UX (HPPA, 64-bit)
+            maxdb-sqldbc-hpux-64bit-hppa-7_6_00_16.zip Sun Solaris
+            (Sparc, 64-bit) maxdb-sqldbc-sun-64bit-sparc-
+            7_6_00_16.zip Tru64 (Alpha, 64-bit) maxdb-sqldbc-tru64-
+            64bit-alpha-7_6_00_16.zip
+
+            Unpack the tarball to a local directory of your choice
+            with the following command:
+
+             tar xvzf maxdb-all-<os>-32|64bit-<arch>-<version>_<build>
+
+    MaxDB database server
+        Of course you will need a MaxDB database instance. The
+        DBD::MaxDB driver supports all available versions of MaxDB
+        (SAP DB) at least 7.3. The MaxDB software and documentation
+        can be found at:
+
+        the section on "/www.mysql.com/maxdb" in the http: manpage
+
+INSTALLATION
+    By default Makefile.PL uses the MaxDB global configuration file
+    (/etc/opt/sdb) on Unix/Linux platforms or the registry (requires
+    Win32API::Registry) on Windows platforms for retrieving the
+    location of `SQLDBC-SDK'.
+
+    If the location of `SQLDBC-SDK' cannot be found or if you want
+    to control it yourself, define the environment variables
+    `SQLDBCSDK' or set the option `< -o <path' >> when calling `
+    perl Makefile.PL '
+
+    Since the tests will connect to a live database, you need to set
+    the following environment variables for the tests to run:
+
+      DBI_DSN=dbi:MaxDB:<host>/<dbname>
+      DBI_USER=<username>
+      DBI_PASS=<password>
+      
+    E.g. Definition of the parameter url for a connection to the database TST on 
+    the computer REMOTESERVER C< dbi:MaxDB:REMOTESERVER/TST >
+
+    Now you are ready, to make and install DBD::MaxDB. The final
+    steps are:
+
+      1.   perl Makefile.PL
+      2.   make              (or nmake, if VC++ on windows)
+      3.   make test         (or nmake, if VC++ on windows)
+      4.   make install      (or nmake, if VC++ on windows)
+
+    Note that you should execute steps 1 to 3 as a normal user, not
+    as root!
+
+TESTING
+    You need to set the following environment variables for the
+    tests to run:
+
+      DBI_DSN=dbi:MaxDB:<host>/<dbname>
+      DBI_USER=<username>
+      DBI_PASS=<password>
+
+    Execute the command:
+
+    `make test' or `make test TEST_VERBOSE=1'
+
+    to run the test suite. Running the test suite should not show
+    any errors.
+
+    Since DBD::MaxDB uses the shared library `libSQLDBC_C.so'
+    (`libSQLDBC_C.dll' on windows), you have to ensure that this
+    library can be found by the operating system. On windows you
+    should add the `libSQLDBC_C.dll' to you `PATH' environment
+    variable. On Unix/Linux you will normally add the path of
+    `libSQLDBC_C.[so|sl]' to the environment variable
+    `LD_LIBRARY_PATH'.
+

@@ -1,0 +1,40 @@
+---
+abstract: 'Implicit uuid columns'
+author:
+  - 'Chia-liang Kao <clkao@clkao.org>'
+build_requires:
+  DBD::SQLite: 1.11
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-UUIDColumns
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  APR::UUID: 0
+  Data::UUID: 0
+  Data::Uniqid: 0
+  UUID: 0
+  UUID::Random: 0
+  Win32::Guidgen: 0
+  Win32API::GUID: 0
+requires:
+  Class::Accessor::Grouped: 0
+  DBIx::Class: 0.07005
+  perl: 5.8.1
+resources:
+  IRC: irc://irc.perl.org/#dbix-class
+  MailingList: http://lists.scsys.co.uk/cgi-bin/mailman/listinfo/dbix-class
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-UUIDColumns
+  homepage: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=dbsrgits/DBIx-Class-UUIDColumns.git
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/dbsrgits/DBIx-Class-UUIDColumns.git
+version: 0.02006

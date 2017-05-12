@@ -1,0 +1,34 @@
+# This is a list of regular expressions of files to skip when rebuilding 
+# the MANIFEST file. See the documention for the ExtUtils::Manifest module for more detail. -mls
+\bCVS\b
+^MANIFEST\.bak$
+^Makefile$
+~$
+\.old$
+\.bak$
+^blib/
+^pm_to_blib$
+^MakeMaker-\d
+.tar.gz$
+^notes
+^releases
+\.tgz$
+\.tmp$
+\.swp$
+\.swm$
+\.swn$
+\.swo$
+\.patch$
+\.orig$
+\.diff$
+\.rej$
+_darcs
+_build
+patches
+lib/Perl6
+rejects
+^Build$
+\.svn
+
+
+^MYMETA.yml$

@@ -1,0 +1,9 @@
+v0.900
+
+ * Add some documentation (courtesy of David Bartle <captindave@gmail.com>)
+ * Promptly obsolete it by doing a comprehensive rewrite.
+ * Add some tests.
+
+v0.001
+
+ * Initial release, very simple.

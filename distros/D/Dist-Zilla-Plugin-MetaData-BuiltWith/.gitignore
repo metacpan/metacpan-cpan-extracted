@@ -1,0 +1,11 @@
+/Dist-Zilla-Plugin-MetaData-BuiltWith-*
+/.build
+/tmp/
+/pm_to_blib
+/META.yml
+/MYMETA.yml
+/META.json
+/MYMETA.json
+/Makefile
+/Makefile.old
+/blib/

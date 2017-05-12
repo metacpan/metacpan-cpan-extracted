@@ -1,0 +1,6 @@
+Revision history for Perl extension {{$dist->name}}
+
+{{$NEXT}}
+
+0.103521  2010-12-18 00:03:22 EST5EDT
+    - Initial release

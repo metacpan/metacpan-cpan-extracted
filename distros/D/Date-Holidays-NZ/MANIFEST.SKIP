@@ -1,0 +1,8 @@
+^.git
+Date-Holidays-NZ-.*
+\.tar(\.gz)?$
+~$
+^blib\b
+Makefile$
+pm_to_blib
+MANIFEST.bak

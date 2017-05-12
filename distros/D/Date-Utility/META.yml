@@ -1,0 +1,40 @@
+---
+abstract: 'A class that represents a datetime in various format'
+author:
+  - 'binary.com <cpan@binary.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::CheckDeps: '0.010'
+  Test::Exception: '0'
+  Test::MockTime: '0.15'
+  Test::More: '0.94'
+  Test::NoWarnings: '0'
+  perl: '5.010000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Utility
+requires:
+  Carp: '0'
+  DateTime: '0'
+  Moose: '0'
+  POSIX: '0'
+  Scalar::Util: '0'
+  Tie::Hash::LRU: '0'
+  Time::Duration::Concise::Localize: '2.5'
+  Time::Local: '0'
+  Time::Piece: '0'
+  Try::Tiny: '0'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Date-Utility/issues
+  repository: git://github.com/binary-com/perl-Date-Utility.git
+version: '1.07'
+x_serialization_backend: 'YAML::Tiny version 1.66'

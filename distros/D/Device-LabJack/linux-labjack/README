@@ -1,0 +1,58 @@
+LabJack U12 for Linux
+8/18/2005
+support@labjack.com
+
+Most, but not all, U12 functionality is supported by this Linux driver.  Most
+notably, stream mode is not supported.  See the 'Function Status' text file
+for the status of each function.  Please use the LabJack forum for questions,
+comments, or if you have a modification/addition to this open source code which
+fixes a problem or adds functionality.
+
+Currently the package contains these components:
+
+	o) Linux Labjack device drivers for the Linux Kernel v2.4 and v2.6.
+	o) A port of the Windows API (based upon Eric Sorton modified ljackv112.c 
+	and ljackuw.c v1.18).
+	o) Test application to read the firmware revision, set analog-outs, and 
+	list all the LabJacks connected to your system.
+
+Installation instructions are provided in the INSTALL file.
+
+The Labjack driver is heavily (about 95% code reuse) based upon the device driver 
+for the LegoUSB tower provided in leJOS.  The LegoUSB tower, the Labjack U12, and 
+several other devices all use Interrupt endpoints (both In and Out) to communicate 
+over the USB bus.  The device driver simply maps the two endpoints to the read() 
+and write() system calls.  At this time, there is no generic capability within the 
+Linux USB subsystem to support generic read/writes using Interrupt endpoints.  
+Possibly, in the future, such a capability will be provided by the Linux 
+kernel and the device drivers will no longer be necessary.
+
+The Windows API code (v1.12 and v1.18) has been modified to work under Linux.
+There are some notes within the code.  
+There are a few restrictions:
+
+	o)At this time, there is support for up to 16 LabJacks.  They are accessed 
+	the same way as under the Windows API (by their local id).
+	o)The state of the discretes are not persistent across applications(in the 
+	windows DLL they are).
+	o)Feature requests (turbo mode) are now supported, but only work with the AIBurst
+	function.  The stream functions have not been ported to Linux.
+	o)InitLabjack() must be called at the start of your application (before any of 
+	the API functions are called).
+
+The test application, analogs-out, will change the value of the analogs out.  You can 
+read these with a voltmeter to verify that everything is working.
+
+Refer to Section 4 of the LabJack U12 User's Guide for a list of the API's functions 
+and how to use them.  Note that not all functions have been tested or are working. Refer 
+to the 'Function Status' text file for the status of each function.
+
+At this time most of the functions under Linux take 30 ms as opposed to the 20 ms 
+that the Windows documentation states.
+
+The programs in this package are distributed under GPL.  A copy of the license can be 
+found in the COPYING file.
+ 
+For comments/questions/suggestions use the forums where suitable, otherwise e-mail 
+support@labjack.com.  Original package and documentation provided by Eric Sorton, 
+erics@cfl.rr.com.

@@ -1,0 +1,15 @@
+Source: libdr-money-perl
+Section: perl
+Priority: optional
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.3
+Homepage: http://search.cpan.org/dist/DR-Money/
+
+Package: libdr-money-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: module to manipulate by money in perl scripts
+ The module allows You to manipulate by money in Your scripts. Module
+ supports positive and negative money.

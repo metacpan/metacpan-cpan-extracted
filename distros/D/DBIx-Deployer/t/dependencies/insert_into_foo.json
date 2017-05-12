@@ -1,0 +1,11 @@
+[
+  {
+    "name":"insert into foo",
+    "deploy_sql":"INSERT INTO foo VALUES (?, ?)",
+    "deploy_sql_args":[ 1, 2 ],
+    "verify_sql":"SELECT COUNT(*) FROM foo WHERE a = ? AND b = ?",
+    "verify_sql_args":[ 1, 2 ],
+    "verify_expects":[ [1] ],
+    "dependencies": [ "create table foo" ]
+ }
+]

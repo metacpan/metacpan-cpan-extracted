@@ -1,0 +1,31 @@
+Revision history for Perl extension Dist-Zilla-PluginBundle-Author-ZOFFIX
+
+1.001008   2015-03-09
+    - Fixed Issue #7: Deprecated 'NoTabsTests' plugin
+    - Added Pod::Spiffy and Test::Kwalitee to prereqs (Fixes Issue #6)
+    - Removed Test::Kwalitee::Extra that is
+      no longer used from prereqs (Fixes Issue #6)
+
+1.001007   2015-03-05
+    - Resolve conflict between GithubMeta and AutoMetaResources that came up
+        during the lastest Dist::Zilla update
+
+1.001006   2014-02-14
+    - Fixed #4 and #5
+
+1.001005   2014-02-14
+    - Added Pod::Spiffy in the list of included plugins
+
+1.001003   2014-02-01
+    - Fixes Issue #1 (Missing prepreqs for plugins in the bundle)
+       https://github.com/zoffixznet/Dist-Zilla-PluginBundle-Author-ZOFFIX/issues/1
+    - Fixes Issue #2 (PromptIfStale -> core stuff)
+       https://github.com/zoffixznet/Dist-Zilla-PluginBundle-Author-ZOFFIX/issues/2
+
+1.001002   2014-01-26
+    - Removed 'fatal' option from PromptIfStale plugin
+    - Removed CopyFilesFromRelease's LICENSE and CONTRIBUTING, as it
+      was causing some conflicts I don't wanna mess around with right now
+
+1.001001   2014-01-26
+    - First version, released on an unsuspecting world

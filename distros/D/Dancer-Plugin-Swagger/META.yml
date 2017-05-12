@@ -1,0 +1,63 @@
+---
+abstract: 'create Swagger documentation of the app REST interface '
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::Deep: '0'
+  Test::More: '0'
+  Test::WWW::Mechanize::PSGI: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Swagger
+provides:
+  Dancer::Plugin::Swagger:
+    file: lib/Dancer/Plugin/Swagger.pm
+    version: v0.2.0
+  Dancer::Plugin::Swagger::Path:
+    file: lib/Dancer/Plugin/Swagger/Path.pm
+    version: v0.2.0
+  Dancer::Plugin::Swagger::Response:
+    file: lib/Dancer/Plugin/Swagger/Response.pm
+    version: v0.2.0
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Clone: '0'
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Dancer::Plugin::REST: '0'
+  Dancer::Response: '0'
+  File::ShareDir::Tarball: '0'
+  Hash::Merge: '0'
+  JSON: '0'
+  List::AllUtils: '0'
+  Moo: '0'
+  MooX::Singleton: '0'
+  MooseX::MungeHas: '0'
+  Path::Tiny: '0'
+  PerlX::Maybe: '0'
+  overload: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer-Plugin-Swagger/issues
+  homepage: https://github.com/yanick/Dancer-Plugin-Swagger
+  repository: https://github.com/yanick/Dancer-Plugin-Swagger.git
+version: 0.2.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'moltar <moltar@moltar.net>'

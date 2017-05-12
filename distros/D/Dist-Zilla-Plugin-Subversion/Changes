@@ -1,0 +1,29 @@
+Revision history for Dist-Zilla-Plugin-Subversion
+
+1.101590  2010-06-08 11:37:13 America/New_York
+    Minor update to tighten up dist.ini and use DZ Git plugin for release.
+1.101580  2010-06-07 16:45:16 America/New_York
+    Updates for Dist::Zilla 4.
+    Recommend rather than require Alien::SVN for those who install Subversion
+    bindings some other way (e.g., OS package manager or from svn sources).
+1.100910  2010-04-01 11:45:12 America/New_York
+    Many small changes for better Perl::Critic compliance.
+    Remove dependency on Modern::Perl.
+    Require Alien::SVN so that CPAN clients can install Subversion API.
+1.100900  2010-03-31 13:52:03 America/New_York
+    Dist::Zilla 2 changes:
+        Don't get Subversion username/password from global DZ config, as the
+        interface is still unstable.
+        Update dist.ini to Dist::Zilla 2 plugin names.
+1.100890  2010-03-30 11:16:10 America/New_York
+    fix: use actual plugin called when committing to Subversion
+    fix: change maintainer email address to @cpan.org
+1.100880  2010-03-29 14:09:57 America/New_York
+    Refactor to a main role and separate Releaser and AfterRelease plugins.
+    Migrate to GitHub so others can contribute.
+1.100770  2010-03-18 15:00:44 America/New_York
+    Change license & copyright to Perl and me, respectively.
+1.100770  2010-03-18 13:59:47 America/New_York
+    fix: determination of tags and dists repository directories
+1.100770  2010-03-18 12:27:39 America/New_York
+    Initial release using Dist::Zilla.

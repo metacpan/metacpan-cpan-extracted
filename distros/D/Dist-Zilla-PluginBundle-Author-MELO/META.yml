@@ -1,0 +1,341 @@
+---
+abstract: 'MELO is lazy, this are his rules'
+author:
+  - 'Pedro Melo <melo@simplicidade.org>'
+build_requires:
+  File::Temp: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Author-MELO
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+  namespace:
+    - Local
+    - t::lib
+  package:
+    - DB
+provides:
+  Dist::Zilla::PluginBundle::Author::MELO:
+    file: lib/Dist/Zilla/PluginBundle/Author/MELO.pm
+    version: 0.012
+  Pod::Weaver::PluginBundle::Author::MELO:
+    file: lib/Pod/Weaver/PluginBundle/Author/MELO.pm
+    version: 0.012
+requires:
+  Dist::Zilla: 4.300002
+  Dist::Zilla::Plugin::Authority: 1.005
+  Dist::Zilla::Plugin::Bootstrap::lib: 0.01023600
+  Dist::Zilla::Plugin::Bugtracker: 1.111080
+  Dist::Zilla::Plugin::CheckChangesHasContent: 0.003
+  Dist::Zilla::Plugin::CheckExtraTests: 0.004
+  Dist::Zilla::Plugin::Clean: 0.02
+  Dist::Zilla::Plugin::Git::NextVersion: 0
+  Dist::Zilla::Plugin::InstallRelease: 0.007
+  Dist::Zilla::Plugin::MetaProvides::Package: 1.12060501
+  Dist::Zilla::Plugin::MinimumPerl: 1.003
+  Dist::Zilla::Plugin::OurPkgVersion: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::PrereqsClean: 0
+  Dist::Zilla::Plugin::ReportVersions::Tiny: 1.03
+  Dist::Zilla::Plugin::Repository: 0.18
+  Dist::Zilla::Plugin::Test::Pod::No404s: 1.001
+  Dist::Zilla::PluginBundle::Git: 1.112510
+  Dist::Zilla::PluginBundle::GitHub: 0.30
+  Dist::Zilla::PluginBundle::TestingMania: 0.014
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: 0
+  List::Util: 0
+  Method::Signatures: 20111020
+  Moose: 1.01
+  Pod::Elemental: 0.102360
+  Pod::Elemental::Transformer::List: 0
+  Pod::Weaver: 3.101633
+  Pod::Weaver::Plugin::Encoding: 0
+  Pod::Weaver::Plugin::StopWords: 1.001005
+  Pod::Weaver::Plugin::WikiDoc: 0.093002
+  Pod::Weaver::Section::Support: 1.001
+  Test::CPAN::Meta::JSON: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/melo/Dist-Zilla-PluginBundle-Author-Melo/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-Melo
+  repository: git://github.com/melo/Dist-Zilla-PluginBundle-Author-Melo.git
+version: 0.012
+x_Dist_Zilla:
+  perl:
+    version: 5.014002
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: RuntimeRequires
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::GitHub::Meta
+      name: '@Author::MELO/@GitHub/GitHub::Meta'
+      version: 0.30
+    -
+      class: Dist::Zilla::Plugin::GitHub::Update
+      name: '@Author::MELO/@GitHub/GitHub::Update'
+      version: 0.30
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Author::MELO/Git::NextVersion'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::GenerateFile
+      name: '@Author::MELO/GenerateManifestSkip'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::GenerateFile
+      name: '@Author::MELO/GenerateTravisCfg'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::MELO/GatherDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::MELO/PruneCruft'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::MELO/ManifestSkip'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: '@Author::MELO/PruneRepoMetaFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@Author::MELO/Authority'
+      version: 1.006
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::MELO/NextRelease'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: '@Author::MELO/OurPkgVersion'
+      version: 0.004000
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@Author::MELO/PodWeaver'
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::MELO/License'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::MELO/Readme'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::MELO/AutoPrereqs'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: '@Author::MELO/MetaNoIndex'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaProvides::Package
+      name: '@Author::MELO/MetaProvides::Package'
+      version: 1.14000001
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: '@Author::MELO/MinimumPerl'
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::MELO/MetaConfig'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::MELO/MetaYAML'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::MELO/MetaJSON'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: '@Author::MELO/TestMoreWithSubtests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::MELO/ExecDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::MELO/ShareDir'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::MELO/MakeMaker'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::No404s
+      name: '@Author::MELO/Test::Pod::No404s'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: '@Author::MELO/@TestingMania/Test::UnusedVars'
+      version: 2.000003
+    -
+      class: Dist::Zilla::Plugin::Test::Version
+      name: '@Author::MELO/@TestingMania/Test::Version'
+      version: 0.002004
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@Author::MELO/@TestingMania/PodCoverageTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Changes
+      name: '@Author::MELO/@TestingMania/Test::CPAN::Changes'
+      version: 0.005
+    -
+      class: Dist::Zilla::Plugin::Test::CPAN::Meta::JSON
+      name: '@Author::MELO/@TestingMania/Test::CPAN::Meta::JSON'
+      version: 0.003
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: '@Author::MELO/@TestingMania/Test::DistManifest'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::MetaTests
+      name: '@Author::MELO/@TestingMania/MetaTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: '@Author::MELO/@TestingMania/Test::Compile'
+      version: 1.112820
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@Author::MELO/@TestingMania/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::Test::MinimumVersion
+      name: '@Author::MELO/@TestingMania/Test::MinimumVersion'
+      version: 2.000002
+    -
+      class: Dist::Zilla::Plugin::Test::Pod::LinkCheck
+      name: '@Author::MELO/@TestingMania/Test::Pod::LinkCheck'
+      version: 1.001
+    -
+      class: Dist::Zilla::Plugin::Test::EOL
+      name: '@Author::MELO/@TestingMania/Test::EOL'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::MELO/@TestingMania/PodSyntaxTests'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::MojibakeTests
+      name: '@Author::MELO/@TestingMania/MojibakeTests'
+      version: 0.3
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::MELO/Manifest'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::CheckExtraTests
+      name: '@Author::MELO/CheckExtraTests'
+      version: 0.007
+    -
+      class: Dist::Zilla::Plugin::CheckChangesHasContent
+      name: '@Author::MELO/CheckChangesHasContent'
+      version: 0.006
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::MELO/TestRelease'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::MELO/ConfirmRelease'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::MELO/UploadToCPAN'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::Git::CommitBuild
+      name: '@Author::MELO/Git::CommitBuild'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Author::MELO/@Git/Check'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::MELO/@Git/Commit'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::MELO/@Git/Tag'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Author::MELO/@Git/Push'
+      version: 2.006
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::MELO/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::PrereqsClean
+      name: '@Author::MELO/PrereqsClean'
+      version: 0.92
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: '@Author::MELO/Clean'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300028
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300028
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300028
+x_authority: cpan:MELO

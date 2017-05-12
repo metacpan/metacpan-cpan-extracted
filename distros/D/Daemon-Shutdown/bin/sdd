@@ -1,0 +1,114 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+sdd - Shutdown Daemon
+
+=head1 SYNOPSIS
+
+  sdd [-config <config file>] 
+
+
+=head1 DESCRIPTION
+
+Monitors varios system status and decides whether to shutdown the host or not.
+
+=head1 OPTIONS
+
+=over 4
+
+=item --log_file <Str>
+
+Log file path.
+Default: /var/log/sdd.log
+
+=item --log_level [DEBUG|INFO|WARN|ERROR]
+
+The log level to be used.
+Default: INFO
+
+=item --sleep_before_run <Int>
+
+Number of seconds to sleep before starting the monitors.
+Default: 3600
+
+=item --loop_sleep <Int>
+
+Number of seconds to sleep between each check.
+Default: 60
+
+=item --config
+
+Custom configuration.  Default is in YAML format at
+
+  /etc/sdd.conf
+
+=item --help or -h
+
+Print a simple help message letting you know how to use get_sap_files
+and then exit.
+If you are reading this, --help will probably not help you much
+further.
+
+=item --verbose or -v
+
+Be verbose - print log output to screen too.
+
+=item --test
+
+Run in test mode (don't actually shutdown)
+
+=item --version
+
+Print out the version and exit
+
+=back
+
+=head1 COPYRIGHT
+
+Copyright 2011, Robin Clarke
+
+=head1 AUTHOR
+
+Robin Clarke <perl@robinclarke.net>
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Daemon::Shutdown;
+
+my %cli_args;
+my $result = GetOptions(
+    "log_file=s"         => \$cli_args{log_file},
+    "log_level=s"        => \$cli_args{log_level},
+    "config=s"           => \$cli_args{config},
+    "sleep_before_run=i" => \$cli_args{sleep_before_run},
+    "loop_sleep=i"       => \$cli_args{loop_sleep},
+    "use_sudo"           => \$cli_args{use_sudo},
+    "h|help"             => \$cli_args{help},
+    "v|verbose"          => \$cli_args{verbose},
+    "version"            => \$cli_args{version},
+    "test"               => \$cli_args{test},
+);
+
+# If something invalid defined, show usage
+if ( not $result ) {
+    pod2usage( { -verbose => 1, } );
+}
+
+# Show help if requested
+if ( $cli_args{help} ) {
+    pod2usage( { -verbose => 2, } );
+}
+
+if ( $cli_args{version} ) {
+    print $Daemon::Shutdown::VERSION . "\n";
+    exit;
+}
+
+my $sdd = Daemon::Shutdown->new( %cli_args );
+$sdd->start();
+exit;

@@ -1,0 +1,188 @@
+<mset>
+  <movie>
+    <name>actor wars</name>
+    <genre>sci-fi</genre>
+    <director>
+      <lname>lucas</lname>
+      <fname>george</fname>
+      <country>US</country>
+    </director>
+    <movie_char>
+      <name>han solo</name>
+      <actor>
+        <lname>ford</lname>
+        <fname>harrison</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>princess leia</name>
+      <actor>
+        <lname>fisher</lname>
+        <fname>carrie</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>luke skywalker</name>
+      <actor>
+        <lname>hamill</lname>
+        <fname>mark</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>darth vader</name>
+      <actor>
+        <lname>earl-jones</lname>
+        <fname>james</fname>
+      </actor>
+      <actor>
+        <lname>prowse</lname>
+        <fname>david</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>obi-wan kenobi</name>
+      <actor>
+        <lname>guiness</lname>
+        <fname>alec</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>attack of the clones</name>
+    <genre>sci-fi</genre>
+    <director>
+      <lname>lucas</lname>
+      <fname>george</fname>
+      <country>US</country>
+    </director>
+    <movie_char>
+      <name>obi-wan kenobi</name>
+      <actor>
+        <lname>mcgregor</lname>
+        <fname>ewan</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>princess amigdala</name>
+      <actor>
+        <lname>portman</lname>
+        <fname>natalie</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>braindead</name>
+    <genre>horror</genre>
+    <director>
+      <lname>jackson</lname>
+      <fname>peter</fname>
+      <country>new zealand</country>
+    </director>
+    <movie_char>
+      <name>-</name>
+      <actor>
+        <lname>-</lname>
+        <fname>-</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>lord of the rings</name>
+    <genre>fantasy</genre>
+    <director>
+      <lname>jackson</lname>
+      <fname>peter</fname>
+      <country>new zealand</country>
+    </director>
+    <movie_char>
+      <name>saruman</name>
+      <actor>
+        <lname>lee</lname>
+        <fname>christopher</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>gandalf</name>
+      <actor>
+        <lname>kellan</lname>
+        <fname>ian</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>seven samurai</name>
+    <genre>samurai</genre>
+    <director>
+      <lname>kurosawa</lname>
+      <fname>akira</fname>
+      <country>japan</country>
+    </director>
+    <movie_char>
+      <name>Kikuchiyo</name>
+      <actor>
+        <lname>mifune</lname>
+        <fname>toshiro</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>terminator</name>
+    <genre>sci-fi</genre>
+    <director>
+      <lname>cameron</lname>
+      <fname>john</fname>
+      <country>US</country>
+    </director>
+    <movie_char>
+      <name>terminator</name>
+      <actor>
+        <lname>schwarzenegger</lname>
+        <fname>arnold</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>terminator2</name>
+    <genre>sci-fi</genre>
+    <director>
+      <lname>cameron</lname>
+      <fname>john</fname>
+      <country>US</country>
+    </director>
+    <movie_char>
+      <name>terminator</name>
+      <actor>
+        <lname>schwarzenegger</lname>
+        <fname>arnold</fname>
+      </actor>
+    </movie_char>
+  </movie>
+  <movie>
+    <name>barton fink</name>
+    <genre>odd</genre>
+    <director>
+      <lname>coen</lname>
+      <fname>joel</fname>
+      <country>US</country>
+    </director>
+    <director>
+      <lname>coen</lname>
+      <fname>ethan</fname>
+      <country>US</country>
+    </director>
+    <movie_char>
+      <name>barton fink</name>
+      <actor>
+        <lname>turturro</lname>
+        <fname>john</fname>
+      </actor>
+    </movie_char>
+    <movie_char>
+      <name>charlie meadows</name>
+      <actor>
+        <lname>goodman</lname>
+        <fname>john</fname>
+      </actor>
+    </movie_char>
+  </movie>
+</mset>

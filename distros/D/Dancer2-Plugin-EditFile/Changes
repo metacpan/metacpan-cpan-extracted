@@ -1,0 +1,18 @@
+Revision history for Dancer2-Plugin-EditFile
+
+0.005   Sat Feb 18 11:13:34 GMT 2017
+        Save code with backups
+
+0.004   Sat Feb 18 10:25:06 GMT 2017
+        First build
+
+0.003   Fri Jan 27 01:08:37 GMT 2017
+        Added cpanfile
+
+0.002   Wed Jan 25 00:37:01 GMT 2017
+        Edited POD information
+        New Config Entries
+
+0.001   2016-07-07
+        Initial version
+

@@ -1,0 +1,26 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PatchModule]
+
+DESCRIPTION
+
+    This plugin is to be used when building patch modules (modules that use
+    Module::Patch to bundle a set of monkey patches, for example
+    File::Which::Patch::Hide or LWP::UserAgent::Patch::FilterMirror). It
+    currently does the following:
+
+      * Check that distribution name is <TARGET_MODULE>-Patch-<DESCRIPTION>
+
+      * Check that a dependency to Module::Patch (at least 0.12) has been
+      specified
+
+      * Check that a dependency to target module has been specified
+
+SEE ALSO
+
+    Module::Patch
+
+    Pod::Weaver::Plugin::PatchModule
+

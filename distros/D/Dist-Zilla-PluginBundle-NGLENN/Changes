@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-PluginBundle-NGLENN
+
+0.03      2015-06-03 21:53:18+09:00 Asia/Tokyo
+    Commit bin folder after bumping version
+    Add Pod::Markdown to prerequisites
+0.02      2015-01-26 17:30:31+09:00 Asia/Tokyo
+    Added TravisCI::StatusBadge
+0.01      2014-10-18 22:07:21+09:00 Asia/Tokyo
+    Forked from Dist-Zilla-PluginBundle-DAGOLDEN version 0.072
+    Removed Git::CheckFor::CorrectBranch for Windows compatibility

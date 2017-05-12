@@ -1,0 +1,25 @@
+---
+abstract: 'simple implementation for using CircularList data structure.'
+author:
+  - 'shinchit <shinchi.xx@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-CircularList
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '1.26'
+  Class::Accessor: '0.34'
+  Scalar::Util: '1.23'
+  perl: '5.006'
+version: '0.03'

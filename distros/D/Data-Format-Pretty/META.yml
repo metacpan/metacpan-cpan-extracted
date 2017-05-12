@@ -1,0 +1,25 @@
+---
+abstract: 'Pretty-print data structure'
+author:
+  - 'Steven Haryanto <stevenharyanto@gmail.com>'
+build_requires:
+  Data::Format::Pretty::JSON: 0
+  Module::Build: 0.3601
+  Test::More: 0.96
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Format-Pretty
+requires:
+  Data::Format::Pretty::Console: 0
+  Data::Format::Pretty::HTML: 0.06
+  perl: 5.010001
+resources:
+  homepage: http://search.cpan.org/dist/Data-Format-Pretty/
+  repository: http://github.com/sharyanto/perl-Data-Format-Pretty
+version: 0.04

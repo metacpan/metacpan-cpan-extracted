@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Status.pm
+Status/Factory.pm
+t/01-new.t
+t/02-get.t
+t/03-factory.t

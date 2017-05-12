@@ -1,0 +1,133 @@
+#!/usr/bin/perl -w
+#
+# access
+#
+# example program for DBIx::FileSystem access class
+#
+# before running 
+#   - please create the sample database. See README how to do this
+#   - configure the database parameters $DBCONN, $DBUSER, $DBPWD, see below
+#
+# Dec 2007	Alexander Haderer
+#
+# Last Update:            $Author: marvin $
+# Update Date:            $Date: 2007/12/07 17:15:21 $
+# Source File:            $Source: /home/cvsroot/tools/FileSystem/examples/access,v $
+# CVS/RCS Revision:       $Revision: 1.1 $
+# Status:                 $State: Exp $
+#
+
+use strict;
+use DBIx::FileSystem qw( :symbols );
+
+###
+### NOTE: change these three vars to so that they are 'pointing' to the 
+###	  test database created with 'pawactl recreatedb'. Use the same 
+###	  settings like in 'pawactl'.
+###
+my $DBCONN = "dbi:Pg:dbname=warehouse;host=vinmari";
+my $DBUSER = "marvin";
+my $DBPWD  = undef;
+
+my $PROGDBVER = "0002";
+
+
+
+
+my $r;
+my %vars;
+my %searchvars;
+
+# connect
+my $fs = new DBIx::FileSystem( dbconn => $DBCONN,
+			       dbuser => $DBUSER,
+			       dbpasswd => $DBPWD,
+			       progdbver => $PROGDBVER );
+
+# check
+die $fs->get_err() if $fs->database_bad();
+
+
+# query 1
+%vars = ( fname   => undef,	# the variables / columns we want to read
+	  delay1  => undef,
+	  comment => undef    );
+
+%searchvars = ( delay1  => 33,
+		comment => [ "LIKE", '%red%' ] );
+
+$r = $fs->get_conf_by_var( "dest", undef, "fname", \%vars, \%searchvars );
+
+print_result( $fs, "dest", \%searchvars, \%vars, $r, "compare, without default" );
+
+
+# query 2
+%vars = ( fname  => undef,	# the variables / columns we want to read
+	  code   => undef,
+	  dist   => undef,
+	  prop   => undef,
+	  sendto => undef,
+	  speed  => undef  );
+
+%searchvars = ( code => 'D',
+		dist => 2000 );
+
+$r = $fs->get_conf_by_var( "source", "generic","fname", \%vars, \%searchvars );
+
+print_result( $fs, "source", \%searchvars, \%vars, $r, "with default" );
+
+
+
+
+########################################################################
+sub print_result {
+  my $fs  = shift;
+  my $dir = shift;
+  my $sv  = shift;
+  my $v   = shift;
+  my $r   = shift;
+  my $com = shift;
+
+  print "----------------------------------------------------------------\n";
+  print "comment: $com\n";
+  print "status: ";
+  if(    $r == OK ) 	{ print "Ok\n"; }
+  elsif( $r == NOFILE ) { print "NoFile\n"; }
+  elsif( $r == NFOUND ) { print "NFound\n"; }
+  else{  
+    print "Error\n" . $fs->get_err() . "\n";
+  }
+
+  print "dir: $dir\n";
+  print "query parameter:\n";
+  foreach my $k (sort keys( %$sv ) ) {
+    print "  $k";
+    if( defined $sv->{$k} ) {
+      if( ref( $sv->{$k} ) eq 'ARRAY' ) {
+	print " $sv->{$k}->[0] ";
+	if( defined $sv->{$k}->[1] ) {
+	  print "$sv->{$k}->[1]\n";
+	}else{
+	  print "NULL\n";
+	}
+      }else{
+	print " = $sv->{$k}\n";
+      }
+    }else{
+      print " = NULL\n";
+    }
+  }
+
+  print "result:\n";
+  foreach my $k (sort keys( %$v ) ) {
+    print "  $k = ";
+    if( defined $v->{$k} ) {
+      print "$v->{$k}\n";
+    }else{
+      print "NULL\n";
+    }
+  }
+
+  return;
+}
+

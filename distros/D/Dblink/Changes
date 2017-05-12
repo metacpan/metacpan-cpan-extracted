@@ -1,0 +1,20 @@
+Revision history for Perl extension Dblink.
+
+1.0  Tue Feb 17 13:36:47 2004
+
+
+Dblink version 1.0
+==================
+
+Perl module to create dblink views to return results from a remote database.
+
+RELEASE NOTES
+
+  Version 1.0
+    - User defined configuration file (default: ~/.pgpass)
+    - Enable/Disable application debug (debug & stdin)
+    - Auto detection of data type of the fields of source table
+
+  Version 0.2
+    - initial release
+

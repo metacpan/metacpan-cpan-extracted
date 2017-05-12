@@ -1,0 +1,302 @@
+NAME
+    DBICx::AutoDoc - Generate automatic documentation of DBIx::Class::Schema
+    objects
+
+SYNOPSIS
+    The recommended way to use this package is with the command-line tool
+    dbicx-autodoc. You should check it's documentation for more details.
+
+      use DBICx:::AutoDoc;
+  
+      my $ad = DBICx:::AutoDoc->new(
+        schema  => 'MyApp::DB',
+        output  => '/tmp',
+      );
+      $ad->fill_template( 'html' );
+
+DESCRIPTION
+    DBICx::AutoDoc is a utility that can automatically generate
+    documentation for your DBIx::Class schemas. It works by collecting
+    information from several sources and arranging it into a format that
+    makes it easier to deal with from templates.
+
+CONFIGURATION METHODS
+  new( %configuration )
+    Create a new DBICx::AutoDoc object. Most of the methods below can also
+    be passed to the constructor as configuration options. Which means that
+    these two techniques are identical:
+
+      # pass options to constructor
+      my $ad = DBICx::AutoDoc->new( schema => 'MyApp::DB' );
+  
+      # create object, then configure it
+      my $ad = DBICx::AutoDoc->new();
+      $ad->schema( 'MyApp::DB' );
+
+  schema( $schema );
+    Retrieve or set the class name of the DBIx::Class::Schema class you want
+    to document.
+
+  output( $directory );
+    Retrieve or change the directory where the generated documentation will
+    be placed. This directory will be created for you if it doesn't exist.
+    The default is to put the output files in the current directory.
+
+  connect( $true_or_false);
+    The connect method allows you to specify whether an attempt will be made
+    to connect to the actual database. If given a false value (the default)
+    the documentation will be generated from only the code of your packages.
+    If true, then "$schema-"connect> will be called before the documentation
+    process begins (which means you may also have to set the "dsn", "user"
+    and/or "pass" options.)
+
+    The default is not to attempt to connect, which gives you documentation
+    of the classes, rather than the database itself.
+
+    Note that there are several parts of the documentation which may change,
+    depending on whether you are connected or not, as some parts of your
+    code may get modified by the database. As an example, when deploying to
+    a PostgreSQL database, you might specify the data_type for your columns
+    as 'varchar', but if you use the "connect" option, then the value
+    reported by the database will probably be 'character varying' instead.
+
+  dsn( $dsn );
+    Retrieve or change the DSN for the database. Might be included in the
+    documenation (some templates display this value, some don't) but if
+    "connect" is false, then it won't be used for anything other than
+    displaying in the documentation.
+
+  user( $username );
+    Get or set the username used to connect to the database. Ignored if
+    "connect" is false.
+
+  pass( $password );
+    Get or set the password used to connect to the database. Ignored if
+    "connect" is false.
+
+  include_path( $scalar_or_array_ref );
+    Get or set the value passed to Template's INCLUDE_PATH option. Unless
+    you are making your own templates, you probably don't need to change
+    this.
+
+    The default is to look in the DBICx::AutoDoc 'auto' directory, which is
+    where they get installed by Module::Install, and if not found there, to
+    look in "$FindBin::Bin/templates", which allows you to use the
+    dbicx-autodoc tool from an uninstalled copy of the package.
+
+METHODS
+  filename_base
+    Returns a base filename for the output files. By default this is based
+    on the class name and version number of your schema. For example, if you
+    schema looks like this:
+
+      package MyApp::DB::Schema;
+      use base qw( DBIx::Class::Schema );
+      our $VERSION = 42;
+
+    Then filename_base will return 'MyApp-DB-Schema-42'.
+
+    When a template is processed, the extension for the template is appended
+    to the output from this method to determine the output filename.
+
+  output_filename( $extension );
+    Given an extension, this method returns the filename that should be used
+    for storing the output of the template associated with that extension.
+    For example, using the previous example schema, if "output_filename(
+    'html' )" is called, it would return 'MyApp-DB-Schema-42.html'. When
+    processing a template, this filename will be created in the directory
+    specified by the "output" option.
+
+  fill_template( $extension );
+    The "fill_template" method takes an argument of the file extension
+    (which is also the template name) and renders that template into an
+    appropriately named file in the output directory.
+
+  fill_templates( @templates );
+    This is simply a convenience method that calls fill_template for each of
+    the templates indicated.
+
+  fill_all_templates
+    Calling the "fill_all_templates" method is simply a convenience wrapper
+    that calls "list_templates" to determine what templates are available,
+    and then calls "fill_template" for each one in turn, thereby generating
+    all the possible documentation for your schema.
+
+  list_templates
+    Returns a list of all the templates that are found in the
+    "include_path". Names from this list can be passed to "fill_template" to
+    genrate that documentation.
+
+INTERNAL METHODS
+    These methods are generally used only internally, but are documented for
+    completeness.
+
+  byname
+    A sort routine for sorting an array of hashrefs by the 'name' key.
+
+  default_include_path
+    A class method that calculates and returns the default value for the
+    include_path.
+
+  find_template_file
+    Given the name of a template, returns the full path to the file
+    containing that template.
+
+  generated
+    Returns a timestamp that is used for the 'Generated at' line at the
+    bottom of the html output files.
+
+  get_columns_for( $source )
+    Given a source name, returns the column information for the columns
+    associated with that source (as an array of hashrefs.)
+
+  get_relationships_for( $source )
+    Given a source name, returns the relationship information for the
+    relations associated with that source (as an array of hashrefs.)
+
+  get_simple_moniker_for( $source )
+    Given a source name, this method simply returns a simplified version of
+    the name that has runs of non-word characters replaced with an
+    underscore ("s/\W+/_/g") and has a number appended if two source names
+    would otherwise reduce to the same (such as Foo-Bar and Foo::Bar.) The
+    simplified moniker is used in some places where the non-word characters
+    would otherwise cause problems (primarily in the GraphViz object names.)
+
+  get_unique_constraints_for( $source )
+    Given a source name, returns the unique constraints for that source (as
+    an array of hashrefs.)
+
+  get_vars
+    Assembles the output of all the data collection methods into a structure
+    suitable for passing to Template.
+
+  inheritance
+    Returns a structure indicating the inheritance heirarchy of the classes
+    used in the schema.
+
+  relationship_map
+    Assembles the output from the various relationship collecting methods
+    into a format more useful for charting and graphing. Returns an arrayref
+    of hashrefs.
+
+  schema_class
+    Returns the name of the DBIx::Class::Schema subclass.
+
+  schema_version
+    Returns the version of the DBIx::Class::Schema subclass. If the package
+    doesn't define a version, it is assumed to be version 1.
+
+  software_versions
+    Returns a hashref of packages and their versions, mostly useful for
+    debugging. Includes the versions of DBICx::AutoDoc,
+    DBICx::AutoDoc::Magic, DBIx::Class, and Template.
+
+  sources
+    Returns an arrayref of hashrefs containing information about each source
+    defined in the schema.
+
+TEMPLATES
+    The templates used by this module are processed with the Template
+    package. The template filename is the name the output file should have,
+    with the word 'AUTODOC' in place of the generated name. Templates found
+    in the "include_path" that start with 'AUTODOC' are assumed to be
+    top-level templates, and can be passed to "fill_template" and will be
+    included in the list returned by "list_templates". Templates that do not
+    begin with 'AUTODOC' are assumed to be supporting templates that will be
+    included by top-level templates.
+
+    It is important to note that templates beginning with the two characters
+    '#!' are treated differently than other templates. A normal template
+    will be processed by Template directly into the appropriate output file.
+    If the template begins with '#!' however, it will be processed into a
+    script file, and then run. The script is expected to produce the
+    appropriate output. See the AUTODOC-graph.png and
+    AUTODOC-inheritance.png templates for examples of this.
+
+  INCLUDED TEMPLATES
+    Top-level templates included with the distribution are listed below.
+    Examples of the output of the included templates can be found in the
+    distribution's examples directory.
+
+   AUTODOC-dump.txt
+    This is a very simple template that just gets the generated data
+    structure dumped using Data::Dump. The output is useful if you are
+    creating your own templates, as you can use it to see what data has been
+    collected from your schema, but if you are not creating templates then
+    it isn't all that valuable. Note that there is not an example of this
+    output in the distributions example directory, as it contains
+    environmental information which may be sensitive.
+
+   AUTODOC-graph.dot, AUTODOC-graph.html, AUTODOC-graph.png
+    These templates are used to produce a GraphViz graph showing the
+    relationships between the classes. The AUTODOC-graph.dot file produces a
+    GraphViz .dot file that can be used by command-line utilities such as
+    'dot' or 'fdp' to produce various types of output. The AUTODOC-graph.png
+    template runs fdp to produce a .png output file. The AUTODOC-graph.html
+    template produces an HTML output file which includes a client-side image
+    map, linking various parts of the diagram to the main html
+    documentation.
+
+   AUTODOC-inheritance.dot, AUTODOC-inheritance.html, AUTODOC-inheritance.png
+    Similar to the AUTODOC-graph.* templates, these are used to generate
+    GraphViz documentation of the inheritance heirarchy of the classes,
+    rather than the relationships of the data.
+
+   AUTODOC.html
+    This is the main documentation template, that generates an html page
+    which documents each classes source name, table name, column
+    information, keys, unique constraints and relationships.
+
+KNOWN BUGS / LIMITATIONS
+    These are the known bugs and/or limitations in the current version of
+    this package.
+
+  Not Windows compatible?
+    There are probably some windows-incompatibilities in the code, I've
+    tried to keep everything portable, but I'd be surprised if it works on
+    Windows on the first try. Patches welcome.
+
+  Having problems with GraphViz and fonts?
+    If you get an error from fdp that says something like:
+
+      Error: Could not find/open font : Times-Roman
+
+    Then you probably need to do the following:
+
+    Locate a truetype font on your system to use (or download one)
+          [jason@critter ~ 0]$ locate .ttf
+          ...
+          /Library/Fonts/Arial.ttf
+          ...
+
+    Add a -Gfontpath option with the directory to the font
+          fdp -Gfontpath="/Library/Fonts" (other options from above)
+
+    Add fontname options for the Graph as well as for Nodes and Edges
+          -Gfontname=Arial -Nfontname=Arial -Efontname=Arial
+
+    So your final command line looks something like this:
+          fdp -Gfontpath=/Library/Fonts -Gfontname=Arial \
+            -Nfontname=Arial -Efontname=Arial
+
+        Then use this value as the c<--graphviz-command> option to
+        dbicx-autodoc, or as the "graphviz_command" option to
+        DBICx::AutoDoc.
+
+          % dbicx-autodoc --schema=MyApp::DB --graphviz-command='fdp \
+            -Gfontpath=/Library/Fonts -Gfontname=Arial -Nfontname=Arial \
+            -Efontname=Arial' --output=./docs
+
+SEE ALSO
+    dbicx-autodoc, DBICx::AutoDoc, DBIx::Class, DBIx::Class::Schema,
+    Template
+
+AUTHOR
+    Jason Kohles, <email@jasonkohles.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Jason Kohles
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

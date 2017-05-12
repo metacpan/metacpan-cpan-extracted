@@ -1,0 +1,83 @@
+0.10
+	o fixed RT#101884
+	  - _trim() only removed 1st whitespace
+	  - optional checks were ineffective if the value was undef
+0.09
+	o Added AUTHOR, LICENSE and ABSTRACT fields to Makefile.PL
+
+	o Fixed 'Artistic' typo in Makefile.PL
+
+	o fixed cached errors bug - if a validator object has
+	  been used multiple times and if during the first
+	  run some errors occured, subsequent runs would show
+	  the same error again and again.
+
+0.08
+	o applied patches by Per Carlson:
+	  - don't die on 1st error, rather collect them and
+	    issue a full report
+	  - use errors() to retrieve all those collected errors
+	  - enhanced unit tests
+	  - proper utf8 handling
+	  - lots of minor tweaks (typos, ambiguities and such)
+
+	o added support for dynamic arguments to validators,
+	  which is used by the new range type, see below.
+	  arguments passed to coderefs: val, unparsed args, array
+	  of args tokenized by , or -.
+
+	o added new builtin validator type: range(start-end),
+	  use it like: { loginport => range(22-23) }.
+
+	o export a class method add_validators() [only if requested],
+	  which can be used to add validator types globally.
+
+0.07
+	o lost [updated 11/2014]
+
+0.06
+	o fixed t/run.t, it used still the old name, all tests
+	  failed therefore.
+
+	o replaced some of the built-in regexes with methods
+	  of Data::Validate(the real one :-) ).
+
+	o added 2 new types: hex and oct.
+
+
+0.05
+	o well, against renamed it to Data::Validate::Struct,
+	  because Data::Validate already exists.
+
+	o removed check for 'resolvablehost' because some cpantesters
+	  failed to run it.
+
+
+0.04
+        o renamed Config::General::Validate to Data::Validate
+          because this tells much better what it does.
+
+	o started with 0.x version numbering to show the
+	  early stage of the module.
+
+	o added ipv6 type
+
+	o fixed several bugs with existing types. Thanks to
+	  David Cantrell for some very useful hints.
+
+	o added more documentation.
+
+--------------
+       Original Config::General::Validate Changelog:
+	1.03
+		o oops - forgot to increase version number, therefore CPAN
+	  	didn't get it.
+
+	1.02
+		o removed inheritance of Config::General, which is senceless
+
+	1.01
+		o added Regex::Common support
+
+	1.00
+		o initial release

@@ -1,0 +1,53 @@
+NAME
+    DBIx::Web - Active Web Database Layer
+
+DESCRIPTION
+    This is a database layer for Perl scripts, implementing triggers, record
+    versioning, access control at the record level, file attachments to
+    records, materialised views. There is a web user interface also.
+
+    Based on DBI and DB_File data engines. Based on CGI for user interface.
+
+    Examples included:
+    - Groupware Organizer and Notes,
+      remake of CGI::Bus examples with CGI::Bus compatibility
+    - Service Desk and CMDB application
+
+AUTHOR
+    Andrew V Makarow "makarow at mail.com", thanks to Anton Uemlyanin
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify 
+    it under the same terms as Perl itself.
+
+    Without specially written agreement prohibited to use completely,
+    partially or in ideas for impairing nature industries in Archangel
+    region (wood and timber, geological and mining, space and war); Russian
+    procrastination structures and kgbists.
+
+    A help in the revival of Pomor'e will be good:
+    http://www.pomor-rus.org
+    http://pomorland.narod.ru
+
+PREREQUISITES
+    Currently implemented and tested on Win32 Active Perl 5.6/5.8, Apache, IIS.
+
+HOW TO BUILD AND INSTALL
+
+    Type:
+	
+	perl Makefile.PL
+	make
+	make install
+    Or:
+	copy ./lib/DBIx/* into perl/site/lib/DBIx
+
+    See examples, which should be configured and installed manually:
+	- copy scripts to 'cgi-bin' directory.
+	- edit 'script.cgi' source, set appropriate '-path', '-url', '-urf', 
+	  another settings.
+	- create '-icons' by downloading Apache icons if Microsoft IIS
+	- start 'script.cgi -setup'. File store path and 
+	  sample web server configuration will be created.
+	- chmod o+rw,g+rw,a+rw '-path'
+	- configure web server according to '-path' files.

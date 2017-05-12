@@ -1,0 +1,14 @@
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/Digest/HMAC_MD6.pm
+MANIFEST			This list of files
+README
+rfc2104.txt
+t/00.load.t
+t/hmac.t
+xt/author/manifest.t
+xt/author/pod-coverage.t
+xt/author/pod.t
+xt/author/preflight.t
+META.yml

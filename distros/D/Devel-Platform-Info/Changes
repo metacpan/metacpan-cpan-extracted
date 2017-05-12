@@ -1,0 +1,85 @@
+Revision history for Devel-Platform-Info
+========================================
+
+0.16    2016-04-22
+        - Codename updates for Linux & Mac OSX.
+
+0.15    2014-10-06
+        - fixed license fields in META.json to be lists.
+        - added latest Mac OS X release.
+        - fixed Linux release notes.
+
+0.14    2014-05-09
+        - last two release missed updating DPI::Mac. #RT95491 (thanks to Kent 
+          Fredric).
+        - fixed META tests to catch version differences.
+
+0.13    2014-05-07
+        - parse out OpenIndiana variant of Solaris (thanks to Graham Ollis,
+          sorry it got missed out of the last release).
+        - added experimental support for BeOS.
+        - more Linux based OSes.
+
+0.12    2014-05-06
+        - fixed distribution name in META.
+        - added LICENSE file.
+        - in the event of error, return the message in the data returned.
+        - Linux codenames update.
+        - Mac OSX codenames update.
+
+0.11    2012-10-03
+        - fixed require
+        - added Test::MockObject::Extends prerequisite.
+        - added Colin's PAUSE id.
+        - change file dates changed to meet W3CDTF standards.
+        - implemented Perl::Critic suggestions.
+
+0.10    2012-06-05
+        - updated BSD derivative list.
+        - fixed OpenSolaris/Solaris oslabel/osvers elements.
+        - added Red Hat Enterprise Linux & Red Hat Linux codenames.
+        - added CrunchBang Linux codenames.
+        - updated versions and codenames.
+        - META tests no longer require specific versions.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - Test-JSON-Meta => Test-CPAN-Meta-JSON.
+
+0.09    2011-05-25
+        - remove trailing newlines from Mac command results (JJ)
+
+0.08    2011-04-01
+        - added Scientific Linux distro (as suggested by Norbert Gruener).
+
+0.07    2011-01-13
+        - updated several distribution codenames (Linux & Mac).
+        - documentation update.
+
+0.06    2010-07-15
+        - added requirement for Test-JSON-Meta-0.08 due to issues with old
+          versions of JSON not implementing the current API.
+            - better 32/64 detection for BSD (thanks to Chris Williams for help)
+            - upped version check of Test-JSON-Meta to ensure we have JSON v2.
+
+0.05    2010-07-12
+        - updated Mac version check (Colin Newell).
+        - added Mac tests (Colin Newell).
+        - updated diag reference test (Colin Newell).
+
+0.04    2010-07-04
+        - fixed Solaris internal references.
+        - fixed BSD kernel version formatting.
+        - changed 'source' to be a hash not a string. (Colin's suggestion).
+
+0.03    2010-07-02
+        - added support for more known Linux distributions.
+        - better pattern matching for osvers and oslabel in Linux.pm
+        - added reference links.
+        - reimplemented use tests for plugins.
+        - added specific support plugin for Solaris family.
+
+0.02    2010-07-01
+        - added support for Irix and the BSD family.
+
+0.01    2010-06-30
+        - initial release.

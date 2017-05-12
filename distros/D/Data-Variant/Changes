@@ -1,0 +1,20 @@
+0.01 Sat Oct  2 17:32:26 MEST 2004
+  - First release.
+
+0.02 Sat Oct 30 13:35:22 MEST 2004	
+  - Cleanup
+     * Documentation patches
+     * Improved the lambda.pl example.
+
+0.03 Sat Oct 30 18:03:52 MEST 2004
+  - Added a few simple test cases.
+    CPAN testers is a good idea.
+    This is my first released module ever, I promise this will go more
+stable now.
+
+0.04 Sat Oct 30 23:54:55 WEST 2004
+  - Woops. I should have changed the MANIFEST to include the tests.
+  
+0.05 Thu Mar 27 19:15:22 CET 2014
+  - Updated to follow the proper metadata convention.
+  - Removed UNIVERSAL

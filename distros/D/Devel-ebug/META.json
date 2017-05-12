@@ -1,0 +1,176 @@
+{
+   "abstract" : "A simple, extensible Perl debugger",
+   "author" : [
+      "Brock Wilcox <awwaiid@thelackthereof.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-ebug",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.008"
+         },
+         "suggests" : {
+            "JSON::PP" : "2.27300"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Accessor::Chained::Fast" : "0",
+            "Devel::StackTrace" : "2.00",
+            "Exporter" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Getopt::Long" : "0",
+            "IO::Socket::INET" : "0",
+            "Module::Pluggable" : "0",
+            "PadWalker" : "0",
+            "Proc::Background" : "0",
+            "Scalar::Util" : "0",
+            "String::Koremutake" : "0",
+            "Term::ReadLine" : "0",
+            "YAML" : "0",
+            "base" : "0",
+            "lib" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "vars" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "provides" : {
+      "DB::fake" : {
+         "file" : "lib/Devel/ebug/Backend.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug" : {
+         "file" : "lib/Devel/ebug.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::ActionPoints" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/ActionPoints.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Basic" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Basic.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Codelines" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Codelines.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Commands" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Commands.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Eval" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Eval.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Filenames" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Filenames.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Output" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Output.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Pad" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Pad.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Ping" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Ping.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::Run" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/Run.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Backend::Plugin::StackTrace" : {
+         "file" : "lib/Devel/ebug/Backend/Plugin/StackTrace.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Console" : {
+         "file" : "lib/Devel/ebug/Console.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::ActionPoints" : {
+         "file" : "lib/Devel/ebug/Plugin/ActionPoints.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Basic" : {
+         "file" : "lib/Devel/ebug/Plugin/Basic.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Codelines" : {
+         "file" : "lib/Devel/ebug/Plugin/Codelines.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Eval" : {
+         "file" : "lib/Devel/ebug/Plugin/Eval.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Filenames" : {
+         "file" : "lib/Devel/ebug/Plugin/Filenames.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Output" : {
+         "file" : "lib/Devel/ebug/Plugin/Output.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Pad" : {
+         "file" : "lib/Devel/ebug/Plugin/Pad.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::Run" : {
+         "file" : "lib/Devel/ebug/Plugin/Run.pm",
+         "version" : "0.59"
+      },
+      "Devel::ebug::Plugin::StackTrace" : {
+         "file" : "lib/Devel/ebug/Plugin/StackTrace.pm",
+         "version" : "0.59"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/awwaiid/devel-ebug/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Devel-ebug",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/awwaiid/devel-ebug.git",
+         "web" : "https://github.com/awwaiid/devel-ebug"
+      }
+   },
+   "version" : "0.59",
+   "x_contributors" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Hobbestigrou <hobbestigrou@erakis.eu>",
+      "jchassler <jhassler@free.fr>",
+      "Kivanc Yazan <kivancyazan@gmail.com>",
+      "Paulo Custodio <pauloscustodio@gmail.com>",
+      "Pawe\u0142 Murias <pawelmurias@gmail.com>",
+      "simbabque <simbabque@cpan.org>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

@@ -1,0 +1,77 @@
+#!/home/ben/software/install/bin/perl
+use warnings;
+use strict;
+use lib '/home/ben/projects/Data-MATFile/lib';
+use Data::MATFile 'read_matfile';
+use JSON::Create;
+use Getopt::Long;
+
+my $ok = GetOptions (
+    "verbose" => \my $verbose,
+    "help|?" => \my $help,
+);
+
+if (! $ok || $help) {
+    usage ();
+}
+
+if ($verbose) {
+    print "Verbose.\n";
+    $Data::MATFile::VERBOSE = 1;
+}
+
+my $file_name = $ARGV[0];
+
+my $matfile = read_matfile ($file_name);
+
+my $json = JSON::Create->new ();
+my $out = $json->run ($matfile->{data});
+
+print "$out\n";
+
+exit;
+
+sub usage
+{
+    print <<EOF;
+This program converts MATLAB MAT-Files into JSON. 
+
+Usage:
+
+    $0 file.mat > file.json
+
+Options:
+
+--verbose	Print messages about the parsing of the MAT-File.
+--help		Print this message.
+
+EOF
+    exit;
+}
+
+=head1 NAME
+
+mat2json - convert a MATLAB MAT-File into JSON
+
+=head1 USAGE
+
+Usage:
+
+    $0 file.mat > file.json
+
+Options:
+
+--verbose	Print messages about the parsing of the MAT-File.
+--help		Print this message.
+
+=head1 SEE ALSO
+
+For full information, see the documentation for the associated Perl
+module, L<Data::MATFile>.
+
+=cut
+
+# Local variables:
+# mode: perl
+# End:
+

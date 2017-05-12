@@ -1,0 +1,3 @@
+The current test is almost a fake, I couldn't figure out yet how to
+test this module. It should probably be integrated into DJabberd to be
+possible to do a real test.

@@ -1,0 +1,48 @@
+SYNOPSIS
+
+    In your dist.ini:
+
+     [ShareDir]
+    
+     [ShareDir::Clean]
+     ;dir=share
+
+DESCRIPTION
+
+    WARNING: This plugin will add a code in Makefile.PL to *DELETE* (rm
+    -rf) a directory in the installation target, which might have severe
+    consequences. Don't use this plugin unless you know exactly what you're
+    doing.
+
+    This plugin is an alternative to using
+    Dist::Zilla::Plugin::ShareDir::Tarball (please read the documentation
+    of that module first for the rationale). With this plugin, you can keep
+    using Dist::Zilla::Plugin::ShareDir, but eliminate the problem of
+    lingering old files.
+
+    What this plugin does is delete the current per-dist share directory in
+    the installation target before installation.
+
+    Some caveats/current limitations:
+
+      * Only Makefile.PL is currently supported.
+
+      * Windows (or other non-POSIX) installation target system is not yet
+      tested.
+
+    All in all, I think Yanick's ShareDir::Tarball plugin is a slightly
+    more elegant hack and I use it. But when it's more appropriate, I use
+    this plugin too.
+
+CONFIGURATION
+
+ dir => str (default: share)
+
+    Name of shared directory.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::ShareDir
+
+    Dist::Zilla::Plugin::ShareDir::Tarball
+

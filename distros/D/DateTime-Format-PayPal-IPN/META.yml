@@ -1,0 +1,36 @@
+---
+abstract: 'Parse PayPal IPN timestamps'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  Module::Build: '0.28'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-PayPal-IPN
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+requires:
+  Carp: '0'
+  DateTime::Format::Strptime: '0'
+  DateTime::TimeZone: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://github.com/oalders/datetime-format-paypal-ipn/issues
+  homepage: https://github.com/oalders/datetime-format-paypal-ipn
+  repository: https://github.com/oalders/datetime-format-paypal-ipn.git
+version: '0.000001'
+x_contributors:
+  - 'Olaf Alders <olaf@wundersolutions.com>'

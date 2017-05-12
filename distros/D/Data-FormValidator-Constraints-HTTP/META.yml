@@ -1,0 +1,9 @@
+--- #YAML:1.0
+name: Data-FormValidator-Constraints-HTTP
+version: 0.01
+author:
+  - Adam Paynter <adapay@cpan.org>
+abstract: Simple Data::FormValidator 
+constraint methods for checking various HTTP methods.
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

@@ -1,0 +1,17 @@
+Changes
+ignore.txt
+lib/Data/Random/Nucleotides.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/01-nucs.t
+t/02-wrapped_nucs.t
+t/03-fasta.t
+t/04-all.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

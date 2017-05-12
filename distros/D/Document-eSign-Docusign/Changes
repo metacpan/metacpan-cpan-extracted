@@ -1,0 +1,22 @@
+Revision history for Document-eSign-Docusign
+0.06    2017-03-17 14:01 GMT
+    * Examples looks funny. Fixed.
+0.05    2017-03-17 11:54 GMT
+    * Build was missing new classes listed in 0.0.4.
+0.04    2017-03-06 16:16 GMT
+    * Added getListOfEnvelopesInFolders, getEnvelopeRecipients, getRecipientTabs. This
+      allows someone to search in any folder, i.e. completed, then get all those envelopes
+      and recipients, then get all the Tabs to retrieve the data they entered. My use case
+      is completed Direct Debit signup forms in the UK for SureVoIP - https://surevoip.co.uk
+
+0.03    2015-02-18 20:57 GMT
+    * Fixed barewords in Makefile.PL - https://rt.cpan.org/Ticket/Display.html?id=102175
+    * Updated docs - https://rt.cpan.org/Public/Bug/Display.html?id=102176
+
+0.02    2013-09-08 08:38 AM PST
+    * Issues with Test::Pod::Coverage, Makefile.PL, and MANIFEST 
+      addressed.
+        
+0.01    Date/time
+    * First version, released on an unsuspecting world.
+

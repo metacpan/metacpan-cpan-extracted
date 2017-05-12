@@ -1,0 +1,37 @@
+Changes
+=======
+
+0.06001 02 Nov 2007
+  - Add missing dependency to DT::Event::Sunrise
+
+0.06000 02 Nov 2007 ("Wow, Has It Been That Long?" Release)
+  - Apply fixes from kdaiba
+  - Add regression tests
+  - Migrate to Module::Install
+  - Add POD, Kwalitee tests
+
+0.05 08 Feb 2004
+  - Fixed buglet when specifying hour < 6
+
+0.04 05 Feb 2004
+  - Bad boy Daisuke used an internal method from DateTime::Event::Sunrise,
+    and didn't fix the dependencies for new interfacein DT::E::Sunrise 0.05
+
+0.03 04 Feb 2004
+  - Fix constructing with, and setting Japanese time components.
+    (previously from_*() constructors would correctly calculate the
+    time, but setting it or creating DT::C::Japanese with the time
+    components didn't force a re-calculation of the underlying time)
+  - Accomodate for fixes in DateTime::Calendar::Japanese::Era 0.04
+  - Doc tweaks
+
+0.02 24 Jan 2004
+  - Set default time zone to "Asia/Tokyo"
+  - Require DateTime::Calendar::Chinese 0.02, which fixes a lot of bugs
+    and has elapsed_years()
+  - Require DateTime::Calendar::Japanese::Era 0.02, which fixes edge case
+  - Redo era math.
+  - Add/fix documentation
+
+0.01 12 Jan 2004
+  - initial release

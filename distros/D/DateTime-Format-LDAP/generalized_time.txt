@@ -1,0 +1,67 @@
+http://www.ietf.org/rfc/rfc4517.txt
+
+3.3.13.  Generalized Time
+
+   A value of the Generalized Time syntax is a character string
+   representing a date and time.  The LDAP-specific encoding of a value
+   of this syntax is a restriction of the format defined in [ISO8601],
+   and is described by the following ABNF:
+
+      GeneralizedTime = century year month day hour
+                           [ minute [ second / leap-second ] ]
+                           [ fraction ]
+                           g-time-zone
+
+      century = 2(%x30-39) ; "00" to "99"
+      year    = 2(%x30-39) ; "00" to "99"
+      month   =   ( %x30 %x31-39 ) ; "01" (January) to "09"
+                / ( %x31 %x30-32 ) ; "10" to "12"
+      day     =   ( %x30 %x31-39 )    ; "01" to "09"
+                / ( %x31-32 %x30-39 ) ; "10" to "29"
+                / ( %x33 %x30-31 )    ; "30" to "31"
+      hour    = ( %x30-31 %x30-39 ) / ( %x32 %x30-33 ) ; "00" to "23"
+      minute  = %x30-35 %x30-39                        ; "00" to "59"
+
+      second      = ( %x30-35 %x30-39 ) ; "00" to "59"
+      leap-second = ( %x36 %x30 )       ; "60"
+
+      fraction        = ( DOT / COMMA ) 1*(%x30-39)
+      g-time-zone     = %x5A  ; "Z"
+                        / g-differential
+      g-differential  = ( MINUS / PLUS ) hour [ minute ]
+      MINUS           = %x2D  ; minus sign ("-")
+
+   The <DOT>, <COMMA>, and <PLUS> rules are defined in [RFC4512].
+
+   The above ABNF allows character strings that do not represent valid
+   dates (in the Gregorian calendar) and/or valid times (e.g., February
+   31, 1994).  Such character strings SHOULD be considered invalid for
+   this syntax.
+
+   The time value represents coordinated universal time (equivalent to
+   Greenwich Mean Time) if the "Z" form of <g-time-zone> is used;
+   otherwise, the value represents a local time in the time zone
+   indicated by <g-differential>.  In the latter case, coordinated
+   universal time can be calculated by subtracting the differential from
+   the local time.  The "Z" form of <g-time-zone> SHOULD be used in
+   preference to <g-differential>.
+
+   If <minute> is omitted, then <fraction> represents a fraction of an
+   hour; otherwise, if <second> and <leap-second> are omitted, then
+   <fraction> represents a fraction of a minute; otherwise, <fraction>
+   represents a fraction of a second.
+
+      Examples:
+         199412161032Z
+         199412160532-0500
+
+   Both example values represent the same coordinated universal time:
+   10:32 AM, December 16, 1994.
+
+   The LDAP definition for the Generalized Time syntax is:
+
+      ( 1.3.6.1.4.1.1466.115.121.1.24 DESC 'Generalized Time' )
+
+   This syntax corresponds to the GeneralizedTime ASN.1 type from
+   [ASN.1], with the constraint that local time without a differential
+   SHALL NOT be used.

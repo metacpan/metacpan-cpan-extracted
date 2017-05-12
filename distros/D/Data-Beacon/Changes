@@ -1,0 +1,32 @@
+Revision history for Perl package Data::Beacon
+==============================================
+'*' indicates a revision also published at CPAN.
+
+0.3.1 2014-03-22*
+    - Added abstract to pod, so tools like MetaCPAN can find it
+    - Added author and copyright/license sections to pod
+    - Specified 5.8.0 as min version of perl
+    - Added [AutoPrereqs] to dist.ini so Makefile.PL will get PREREQ_PM
+    - Added =encoding utf8 to pod, since the pod now contains UTF-8 chars
+
+0.3.0 2012-12-04*
+    - removed BEACON collection handling
+
+0.2.7 2012-04-10*
+    - fixed testing bug at *BSD and migrated to dist::Zilla
+
+0.2.5 2010-12-03*
+    - refactored
+
+0.2.3 2010-11-24
+    - added simple Beacon collections with DBI
+
+0.2.1 2010-11-02*
+    - minor fixes and extensions
+
+0.2 2010-11-02
+    - first full-featured version
+
+0.1 2010-10-27
+    - first public developer version at github
+

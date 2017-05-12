@@ -1,0 +1,79 @@
+---
+doctype: dist
+
+header:
+  name: {{ $dist->name }}
+  author:
+{{ join "\n" => map { "    - $_" } @{ $dist->authors} }}
+  license: Perl_5
+  copyright_holder: {{ $dist->copyright_holder }}
+  copyright_year: {{ (localtime)[5] + 1900 }}
+
+plugins:
+ - +plugin: DistIller::MetaGeneratedBy
+ - +plugin: AutoVersion
+ - +plugin: GatherDir
+ - +plugin: PruneCruft
+ - +plugin: ManifestSkip
+ - +plugin: MetaYAML
+ - +plugin: License
+ - +plugin: Readme
+ - +plugin: ExtraTests
+ - +plugin: ExecDir
+ - +plugin: ShareDir
+ - +plugin: MakeMaker
+ - +plugin: Manifest
+ - +plugin: TestRelease
+ - +plugin: ConfirmRelease
+ - +plugin: UploadToCPAN
+
+---
+doctype: weaver
+
+plugins:
+ - +plugin: '@CorePrep'
+
+ - +plugin: -SingleEncoding
+
+ - +plugin: Name
+
+ - +plugin: Version
+   format: Version %v, released %{YYYY-MM-dd}d.
+
+ - +plugin: prelude
+   +base:  Region
+
+ - +plugin: Synopsis
+   +base:  Generic
+
+ - +plugin: Description
+   +base:  Generic
+
+ - +plugin: Overview
+   +base:  Generic
+
+ - +plugin: Attributes
+   +base:  Collect
+   command: attr
+
+ - +plugin: Methods
+   +base:  Collect
+   command: method
+
+ - +plugin: Functions
+   +base:  Collect
+   command: func
+
+ - +plugin: Leftovers
+
+ - +plugin: postlude
+   +base:  Region
+
+ - +plugin: Authors
+
+ - +plugin: Legal
+
+ - +plugin: List
+   +base: -Transformer
+   +in: Elemental
+   transformer: List

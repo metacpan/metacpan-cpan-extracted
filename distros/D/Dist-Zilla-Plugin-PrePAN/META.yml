@@ -1,0 +1,33 @@
+---
+abstract: 'Automatically set PrePAN author and module URLs'
+author:
+  - 'Olaf Alders <olaf@wundercounter.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-PrePAN
+requires:
+  Dist::Zilla::Role::MetaProvider: '0'
+  Moose: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  Prepan_author: http://prepan.org/user/3Yz7PYrBzQ
+  Prepan_module: http://prepan.org/module/429En4oFdp
+  bugtracker: http://github.com/oalders/dist-zilla-plugin-prepan/issues
+  homepage: https://github.com/oalders/dist-zilla-plugin-prepan
+  repository: https://github.com/oalders/dist-zilla-plugin-prepan.git
+version: '0.02'

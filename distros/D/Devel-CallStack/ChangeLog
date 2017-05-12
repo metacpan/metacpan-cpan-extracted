@@ -1,0 +1,90 @@
+2005-01-27  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Just minor documentation tweaks, no functional changes.
+	
+	* Release 0.19.
+
+2004-12-19  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Undef (by localizing) $ENV{PERL5OPT} when running the tests.
+	  [rt.cpan.org: Bug #8702 Devel::CallStack's tests fail when PERL5OPT is loading modules]
+	  (affects especially CPANPLUS)
+	
+	* Add the "in" option.
+	
+	* Release 0.18.
+
+2004-12-12  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Cleanup the tests and MANIFEST.
+
+	* Give hints on how to proceed with the findings of Devel::CallStack
+	  (section POSSIBILITIES).
+	
+	* Release 0.17.
+
+2004-12-11  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Require 5.6.1 or newer, unfortunately.
+	
+	* Release 0.16.
+
+2004-12-09  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Add the Append option.
+	
+	* Add set() and write() to allow partial profiling.
+	
+	* Test that callstack.out gets created even after bare 'use' -
+	  and remember to remove it.
+	
+	* Release 0.15.
+
+2004-11-29  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Broken permissions in CallStack.pm.
+	
+	* Release 0.14.
+
+2004-11-29  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Make file_equal() use lc() in its testing so that places with
+	  case-confused filenames can play, too.
+	
+	* Alias the Devel::CallStack variable names in to the DB package
+	  for imaginary speedups.
+
+	* Separate the $Full branch into its own for some tangible speedups.
+
+	* One could get more speed by unrolling the $Full and $Reverse
+	  but the code would become quite ugly, unmaintainable,
+	  and error-prone for any future modifications.
+	
+	* Try to find and use the exactly same Perl that was used to run
+	  the Makefile.PL (by looking at the generated Makefile).
+	
+	* Add the standard license.
+
+	* Release 0.13.
+
+2004-11-25  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Make tests more verbose in case of failure.
+	
+	* Add a test for a bad import.
+
+	* Remove unimplemented cruft from the .pm.
+
+	* Clean up and verbosify the tests.
+	
+	* Document the Jaguar problem.
+	
+	* Release 0.12.
+
+2004-11-24  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Release 0.11: forgot to package the tests in 0.10.
+
+2004-11-23  Jarkko Hietaniemi  <jhi@iki.fi>
+
+	* Initial release 0.10.

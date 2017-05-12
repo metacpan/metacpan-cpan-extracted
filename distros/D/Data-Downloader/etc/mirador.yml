@@ -1,0 +1,28 @@
+name: mirador
+storage_root: /tmp/dado/mirador/store
+file_url_template: ''
+cache_strategy: Keep
+
+feeds:
+  name: mirador
+  feed_template: 'http://mirador.gsfc.nasa.gov/cgi-bin/mirador/granlist.pl?dataSet=<dataSet>&page=1&maxgranules=<maxgranules>&pointLocation=<pointLocation>&startTime=<starttime>&endTime=<endtime>&format=atom'
+  feed_parameters: [
+     { name: dataSet,       default_value: 'AIRX2RET.005'   },
+     { name: pointLocation, default_value: '-120,20,-90,50' },
+     { name: starttime,     default_value: '2006-06-01T00:00:00Z' },
+     { name: endtime,       default_value: '2006-06-11T00:00:00Z' },
+     { name: maxgranules,   default_value: 2 },
+    ]
+  file_source:
+    filename_xpath: default:title
+    url_xpath: default:id
+  metadata_sources:
+    - name: start_time
+      xpath: time:start
+    - name: stop_time
+      xpath: time:stop
+
+linktrees:
+    - root: /tmp/dado/mirador/data
+      path_template: <start_time:%Y/%m/%d>
+

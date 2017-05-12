@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-IO.t
+IO.pm
+LICENSE
+IO/GenLib.pm
+IO/Mask.pm
+IO/mysqlIO.pm
+IO/mysqlLib.pm
+IO/OracleIO.pm
+IO/OracleLib.pm
+IO/Search.pm
+IO/Table.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-SQLCrosstab
+version:      1.17
+version_from: SQLCrosstab.pm
+installdirs:  site
+requires:
+    DBI:                           1.2
+    Tree::DAG_Node:                1.04
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

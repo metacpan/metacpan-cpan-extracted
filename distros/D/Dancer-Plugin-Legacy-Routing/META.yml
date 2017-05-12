@@ -1,0 +1,33 @@
+---
+abstract: 'Dancer Plugin for Deprecating Existing Routes'
+author:
+  - 'Robert Stone <drzigman@cpan.org>'
+build_requires:
+  Dancer::Config: 0
+  Dancer::Test: 0
+  Data::Dumper: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Most: 0
+  YAML: 0.88
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Legacy-Routing
+requires:
+  Dancer: 0
+  Dancer::Plugin: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/drzigman/dancer-plugin-legacy-routing/issues
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-Legacy-Routing
+  repository: git://github.com/drzigman/dancer-plugin-legacy-routing.git
+version: 0.0.4

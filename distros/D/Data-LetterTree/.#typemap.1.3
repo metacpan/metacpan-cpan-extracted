@@ -1,0 +1,17 @@
+TYPEMAP
+# Standard T_PTROBJ force the name of the C type as Perl Class
+# which is quite ugly
+Node *  T_PTROBJ
+
+INPUT
+T_MYPTROBJ
+    if (sv_derived_from($arg, \"${Package}\")) {
+        IV tmp = SvIV((SV*)SvRV($arg));
+        $var = INT2PTR($type,tmp);
+    }
+    else
+        Perl_croak(aTHX_ \"$var is not of type ${Package}\")
+
+OUTPUT
+T_MYPTROBJ
+        sv_setref_pv($arg, \"${Package}\", (void*)$var);

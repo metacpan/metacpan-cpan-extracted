@@ -1,0 +1,47 @@
+WindowsXP Pro SP2 32bit
+Athlon64 3000 @1.8GHz, 1 GB RAM
+Seagate ST3200826A IDE 7200RPM
+
+PostgreSQL 8.2.5 on i686-pc-mingw32, compiled by GCC gcc.exe (GCC) 3.4.2 (mingw-special)
+shared_buffers = 64MB
+work_mem = 32MB
+maintenance_work_mem = 64MB
+fsync = on
+checkpoint_segments = 10
+effective_cache_size = 600MB
+stats_row_level = on
+
+
+Perl v5.8.8 built for MSWin32-x86-multi-thread
+DBI 1.54
+DBD::Pg 1.49
+Moose 0.32
+
+--------------------------------------------------------------------------
+
+
+Performance test
+insert 100_000 rows in single transaction
+
+  SQL (generate_series), no trigger          :   13s
+  external perl script, DBI, no trigger      :   66s
+  DBIx::PgLink::Local, no trigger            :   67s
+  plperlu function, DBI, no trigger          :   66s
+  plperlu function, DBIx::PgLink, no trigger :   69s
+  accessor view, shadow trigger              :  113s  <-- !!! excluding startup time
+
+trigger overhead
+   empty plpgsql trigger                     :  0.9s
+   empty plperlu trigger                     :  6.1s
+
+
+
+Memory consumption
+
+               | fresh  | simple   | PgLink
+               |session | plperlu  | 
+               |        | function | 
+---------------+--------+----------+-----------
+private, KB    | 2492   |   4252   | 16708
+working set, KB| 4900   |   8332   | 23212
+-----------------------------------------------

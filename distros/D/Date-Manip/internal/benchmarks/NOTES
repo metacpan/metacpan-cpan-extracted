@@ -1,0 +1,115 @@
+Common date formats:
+
+
+Date::Calc
+Date::Parse
+Date::Parser
+DateTime
+Time::ParseDate
+TimeDate        (only a few hardcoded timezones) (does support languages)
+                (does not do parsing of arbitrary dates)
+
+
+Parsing
+Calculations
+Business days
+Foreign parsing
+Recurrences
+Timezones
+
+
+
+
+Parse 10,000 dates
+
+Date::Manip 5          8.6 sec
+Date::Manip 6          4.1 sec
+            format     3.0 sec
+            'no' opts  3.8 sec
+
+Date::Parse            0.6 sec     handles multilingual dates
+                                   limited number of formats
+                                   active development
+Date::Time             0.7 sec     (wrapper around Date::Parse)
+
+-------------------
+
+
+These files are used for running benchmarks and performance testing of Date::Manip.
+They are not generally useful, and are not installed anywhere.
+
+Date::Calc    no parsing
+              no timezones
+              almost no time handling (primarily Y/M/D)
+
+Date::Pcalc   same as Date::Calc
+
+TimeDate      no calculations
+  Date::Parse
+  Time::Zone
+
+
+
+
+DateTime
+DateTime-TimeZone
+DateTime-Format
+
+Date::Components
+
+Date::Handler
+
+Time::Format
+
+
+perl -d:NYTProf parse-1.dm.pl
+nytprofhtml
+
+============
+
+time parse-1.dt.pl
+parse-1.dt.pl  0.51s user 0.01s system 83% cpu 0.626 total
+
+time ./parse-1.dm_no.pl
+./parse-1.dm_no.pl  3.36s user 0.01s system 100% cpu 3.366 total
+
+time ./parse-1.dm5.pl
+./parse-1.dm5.pl  6.21s user 0.03s system 100% cpu 6.233 total
+
+time ./parse-1.dm_fo.pl
+./parse-1.dm_fo.pl  5.09s user 0.03s system 99% cpu 5.123 total
+
+time ./parse-1.dm.pl
+./parse-1.dm.pl  3.64s user 0.04s system 99% cpu 3.706 total
+
+perl -d:NYTProf parse-1.dm6.pl
+nytprofhtml
+
+11323   613ms   Date::::_parse_time Date::Manip::Date::_parse_time
+11323   442ms   Date::::parse Date::Manip::Date::parse
+11324   419ms   TZ::::date_period Date::Manip::TZ::date_period
+11323   399ms   Date::::_parse_date_common Date::Manip::Date::_parse_date_common
+11323   378ms   Date::::set Date::Manip::Date::set
+11324   298ms   TZ::::_all_periods Date::Manip::TZ::_all_periods
+11323   248ms   Date::::_parse_date Date::Manip::Date::_parse_date
+22646   233ms   Base::::check Date::Manip::Base::check
+11323   207ms   Date::::_parse_check Date::Manip::Date::_parse_check
+11323   174ms   Date::::_parse_datetime_iso8601 Date::Manip::Date::_parse_datetime_iso8601
+11324   163ms   Base::::_now Date::Manip::Base::_now
+11323   162ms   Date::::_parse_dow Date::Manip::Date::_parse_dow
+22646   159ms   Base::::check_time Date::Manip::Base::check_time
+22662   158ms   Base::::_is_int Date::Manip::Base::_is_int
+
+==============
+
+mkdir tz
+cd tz
+perl -d:NYTProf ../dm5dm6_ex3 6o ../dateset3.txt
+nytprofhtml
+
+cd ..
+mkdir notz
+cd notz
+perl -d:NYTProf ../dm5dm6_ex3 6o ../dateset3_notz.txt
+nytprofhtml
+

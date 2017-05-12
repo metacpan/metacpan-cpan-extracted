@@ -1,0 +1,54 @@
+---
+abstract: 'Dancer 2 session storage in files with JSON'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Basename: '0'
+  File::Spec: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+  YAML: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Session-JSON
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dancer2::Session::JSON:
+    file: lib/Dancer2/Session/JSON.pm
+    version: '0.002'
+requires:
+  Dancer2: '0'
+  Dancer2::Core::Role::SessionFactory::File: '0'
+  Dancer2::Core::Types: '0'
+  JSON: '0'
+  Moo: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/dancer2-session-json/issues
+  homepage: https://github.com/PerlDancer/dancer2-session-json
+  repository: https://github.com/PerlDancer/dancer2-session-json.git
+version: '0.002'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Jason A. Crome <jason@crome-plated.com>'

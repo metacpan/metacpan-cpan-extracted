@@ -1,0 +1,17 @@
+Revision history for Devel-Caller-Util
+
+0.03    2015-07-26 (PERLANCAR)
+
+	- No functional changes.
+
+	- [refactor] Reduce code duplication.
+
+
+0.02    2015-07-26 (PERLANCAR)
+
+	- Add second arg 'with_args' to retrieve sub arguments, add doc.
+
+
+0.01    2015-07-26 (PERLANCAR)
+
+        - First release.

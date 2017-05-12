@@ -1,0 +1,59 @@
+DateTimeX-Auto
+==============
+
+Created:      2011-07-06
+Home page:    <https://metacpan.org/release/DateTimeX-Auto>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=DateTimeX-Auto>
+Maintainer:   Toby Inkster <tobyink@cpan.org>
+
+0.008	2014-09-12
+
+ - Remove Role::Commons dependency.
+ - Split OO stuff and exporter stuff into different packages.
+ - Use Exporter::Shiny instead of Exporter.pm.
+
+0.007	2014-09-10
+
+ [ Packaging ]
+ - Switch to Dist::Inkt.
+
+0.006	2013-04-21
+
+ [ Packaging ]
+ - Stop bundling old version of Scalar::Util.
+
+0.005	2012-05-20	The 'Why You No Upgrade?' Release
+
+ [ Bug Fixes ]
+ - Replace a few uses of the defined-or operator (//) with
+   defined($foo)?$foo:$bar, for back-compat with Perl 5.8.
+
+0.004	2012-05-18
+
+ - Added: Support DateTime::Durations.
+
+0.003	2011-12-08
+
+ [ Bug Fixes ]
+ - Make $dt->from_object work, which is used internally by a lot of
+   DateTime maths.
+
+ [ Packaging ]
+ - Improved test cases.
+ - Module::Package::RDF
+
+ [ Other ]
+ - Allow constructor to be called with traditional DateTime->new arguments.
+ - Support UTC timezone.
+
+0.002	2011-07-20
+
+ [ Documentation ]
+ - Document object-oriented constructor.
+ - Provide more examples.
+
+ [ Other ]
+ - The overloaded q() function is now less enthusiastic. For example, it
+   won't try to handle parts of qq() interpolated strings.
+
+0.001	2011-07-16	First release

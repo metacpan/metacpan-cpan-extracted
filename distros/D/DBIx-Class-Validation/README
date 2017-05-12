@@ -1,0 +1,131 @@
+NAME
+    DBIx::Class::Validation - Validate all data before submitting to your
+    database.
+
+SYNOPSIS
+    In your base "DBIx::Class" package:
+
+      __PACKAGE__->load_components(qw/... Validation/);
+
+    And in your subclasses:
+
+      __PACKAGE__->validation(
+        module => 'FormValidator::Simple',
+        profile => { ... },
+        filter => 0,
+        auto => 1,
+      );
+
+    And then somewhere else:
+
+      eval{ $obj->validate() };
+      if( my $results = $EVAL_ERROR ){
+        ...
+      }
+
+METHODS
+  validation
+      __PACKAGE__->validation(
+        module => 'FormValidator::Simple',
+        profile => { ... },
+        filter => 0,
+        auto => 1,
+      );
+
+    Calls "validation_module", "validation_profile" and "validation_auto" if
+    the corresponding argument is defined.
+
+  validation_module
+      __PACKAGE__->validation_module('Data::FormValidator');
+
+    Sets the validation module to use. Any module that supports a check()
+    method just like "Data::FormValidator"'s can be used here, such as
+    "FormValidator::Simple".
+
+    Defaults to FormValidator::Simple.
+
+  validation_profile
+      __PACKAGE__->validation_profile(
+        { ... }
+      );
+
+    Sets the profile that will be passed to the validation module. Expects
+    either a HASHREF or a reference to a subroutine. If it's a subref it
+    will be passed the result row object as it's first parameter so that you
+    can perform complex data validation for cases when you'd like to have
+    access to the actual result.
+
+    For example, you could use the following to return an error if the named
+    field is not unique in the table:
+
+        my $profile = sub {
+            my $result = shift @_;
+    
+            return {
+                required => [qw/email/],
+                constraint_methods => {
+                    email => sub {
+                        my ($dvf, $val) = @_;
+                        return $result->result_source->resultset->find({email=>$val}) ? 0:1;
+                    },
+                },
+            };
+        };
+
+    Please note that the subref needs to return a hashref/arrayref suitable
+    for use in the validation module you have chosen.
+
+  validation_auto
+      __PACKAGE__->validation_auto( 1 );
+
+    Turns on and off auto-validation. This feature makes all UPDATEs and
+    INSERTs call the "validate" method before doing anything.
+
+    The default is for validation_auto is to be on.
+
+  validation_filter
+      __PACKAGE__->validation_filter( 1 );
+
+    Turns on and off validation filters. When on, this feature will make all
+    UPDATEs and INSERTs modify your data to that of the values returned by
+    your validation modules "check" method. This is primarily meant for use
+    with "Data::FormValidator" but may be used with any validation module
+    that returns a results object that supports a "valid()" method just like
+    "Data::FormValidator::Results".
+
+    Filters modify your data, so use them carefully.
+
+    The default is for validation_filter is to be off.
+
+  validate
+      $obj->validate();
+
+    Validates all the data in the object against the pre-defined validation
+    module and profile. If there is a problem then a hard error will be
+    thrown. If you put the validation in an eval you can capture whatever
+    the module's check() method returned.
+
+EXTENDED METHODS
+    The following "DBIx::Class::Row" methods are extended by this module:-
+
+    insert
+    update
+
+SEE ALSO
+    "DBIx::Class", "FormValidator::Simple", "Data::FormValidator"
+
+AUTHOR
+    Aran C. Deltac <bluefeet@cpan.org>
+
+CONTRIBUTORS
+    Tom Kirkpatrick <tkp@cpan.org>
+
+    Christopher Laco <claco@cpan.org>
+
+    John Napiorkowski <jjn1056@yahoo.com>
+
+    Sergio Salvi <sergio@developerl.com>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

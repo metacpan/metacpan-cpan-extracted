@@ -1,0 +1,2 @@
+TYPEMAP
+GtmEnv *	T_PTROBJ

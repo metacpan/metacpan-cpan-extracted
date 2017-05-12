@@ -1,0 +1,76 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.06'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dist::Zilla' => '0',
+                                      'Dist::Zilla::Plugin::Authority' => '0',
+                                      'Dist::Zilla::Plugin::CPANFile' => '0',
+                                      'Dist::Zilla::Plugin::ChangeStats::Git' => 'v0.2.1',
+                                      'Dist::Zilla::Plugin::CheckChangesHasContent' => '0',
+                                      'Dist::Zilla::Plugin::CoalescePod' => '0',
+                                      'Dist::Zilla::Plugin::CoderwallEndorse' => '0',
+                                      'Dist::Zilla::Plugin::ContributorsFile' => '0',
+                                      'Dist::Zilla::Plugin::Covenant' => '0',
+                                      'Dist::Zilla::Plugin::DOAP' => '0',
+                                      'Dist::Zilla::Plugin::Git' => '0',
+                                      'Dist::Zilla::Plugin::Git::Contributors' => '0',
+                                      'Dist::Zilla::Plugin::GithubMeta' => '0',
+                                      'Dist::Zilla::Plugin::HelpWanted' => '0',
+                                      'Dist::Zilla::Plugin::InstallGuide' => '1.200000',
+                                      'Dist::Zilla::Plugin::InstallRelease' => '0',
+                                      'Dist::Zilla::Plugin::License' => '0',
+                                      'Dist::Zilla::Plugin::MatchManifest' => '0',
+                                      'Dist::Zilla::Plugin::MetaJSON' => '0',
+                                      'Dist::Zilla::Plugin::MetaProvides::Package' => '0',
+                                      'Dist::Zilla::Plugin::MetaYAML' => '0',
+                                      'Dist::Zilla::Plugin::ModuleBuild' => '0',
+                                      'Dist::Zilla::Plugin::NextRelease' => '0',
+                                      'Dist::Zilla::Plugin::NextVersion::Semantic' => 'v0.1.2',
+                                      'Dist::Zilla::Plugin::PodWeaver' => '0',
+                                      'Dist::Zilla::Plugin::PreviousVersion::Changelog' => '0',
+                                      'Dist::Zilla::Plugin::ReadmeAnyFromPod' => '0',
+                                      'Dist::Zilla::Plugin::ReportVersions::Tiny' => '0',
+                                      'Dist::Zilla::Plugin::RunExtraTests' => '0',
+                                      'Dist::Zilla::Plugin::SchwartzRatio' => '0',
+                                      'Dist::Zilla::Plugin::Signature' => '0',
+                                      'Dist::Zilla::Plugin::Test::Compile' => '2.033',
+                                      'Dist::Zilla::Plugin::Test::PAUSE::Permissions' => '0',
+                                      'Dist::Zilla::Plugin::Test::ReportPrereqs' => '0',
+                                      'Dist::Zilla::Plugin::Test::UnusedVars' => '0',
+                                      'Dist::Zilla::Plugin::Twitter' => '0.025',
+                                      'Dist::Zilla::Plugin::VerifyPhases' => '0',
+                                      'Dist::Zilla::Role::MintingProfile::ShareDir' => '0',
+                                      'Dist::Zilla::Role::PluginBundle::Config::Slicer' => '0',
+                                      'Dist::Zilla::Role::PluginBundle::Easy' => '0',
+                                      'Moose' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,22 @@
+Revision history for DBIx-MultiDB
+
+0.06    2010-11-23
+        Removed the "prefix" parameter from left_join; now we have to add the prefix explicitly in the query.
+        Added VERBOSE parameter to left_join.
+
+0.05    2010-11-22
+        Fixed undeclared dependencies (thanks, ANDK).
+        Use "left_join" instead of "join".
+
+0.04    2010-05-31
+        Fixed bug in fetchrow_hasref; don't delete attached key.
+
+0.03    2010-05-30
+        Attached table may specify keys as "foreign_key"/"references".
+        Accept "join" as an alias to "attach".
+
+0.02    2010-05-29
+        Added "prepare" method, so you don't have to specify the base query in the constructor.
+
+0.01    2010-05-29
+        First version, released on an unsuspecting world!

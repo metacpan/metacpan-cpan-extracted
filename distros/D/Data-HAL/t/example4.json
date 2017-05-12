@@ -1,0 +1,6 @@
+{
+    "_links": {
+        "self": { "href": "/orders" },
+        "profile": { "href": "http://example.com/shop/documentation" }
+    }
+}

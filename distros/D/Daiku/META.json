@@ -1,0 +1,113 @@
+{
+   "abstract" : "Make for Perl",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.3.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Daiku",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Getopt::Long" : "2.39",
+            "IPC::System::Simple" : "0",
+            "Mouse" : "0.92",
+            "Mouse::Role" : "0",
+            "Parse::CommandLine" : "0",
+            "Pod::Usage" : "0",
+            "Scalar::Util" : "0",
+            "Tie::IxHash" : "0",
+            "Time::HiRes" : "1.9701",
+            "autodie" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Fatal" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.98",
+            "parent" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Daiku" : {
+         "file" : "lib/Daiku.pm",
+         "version" : "1.004"
+      },
+      "Daiku::CLI" : {
+         "file" : "lib/Daiku/CLI.pm"
+      },
+      "Daiku::Daikufile" : {
+         "file" : "lib/Daiku/Daikufile.pm"
+      },
+      "Daiku::File" : {
+         "file" : "lib/Daiku/File.pm"
+      },
+      "Daiku::Registry" : {
+         "file" : "lib/Daiku/Registry.pm"
+      },
+      "Daiku::Role" : {
+         "file" : "lib/Daiku/Role.pm"
+      },
+      "Daiku::SuffixRule" : {
+         "file" : "lib/Daiku/SuffixRule.pm"
+      },
+      "Daiku::Task" : {
+         "file" : "lib/Daiku/Task.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/Daiku/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/Daiku",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/Daiku.git",
+         "web" : "https://github.com/tokuhirom/Daiku"
+      }
+   },
+   "version" : "1.004",
+   "x_contributors" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>",
+      "Shoichi Kaji <skaji@cpan.org>",
+      "Toshio Ito <debug.ito@gmail.com>",
+      "Songmu <y.songmu@gmail.com>"
+   ]
+}

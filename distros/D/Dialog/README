@@ -1,0 +1,20 @@
+                            BAD NEWS
+
+This module is dirty approximation to the features of FreeBSD's
+libdialog. It's poor and nasty. Please, don't consider it works
+at all.
+
+                            GOOD NEWS
+
+It really works. Volgalink Co. (http://www.vlink.ru/) uses it
+for it's own purposes for three or even more years
+
+                          BAD NEWS AGAIN
+
+It's being compiled on FreeBSD only. Linux and others are
+coming.
+
+                            MAYBE GOOD
+
+If somebody ported libdialog to, say, Linux, it would mean that
+you got this OS supported.

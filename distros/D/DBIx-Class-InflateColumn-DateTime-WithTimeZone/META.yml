@@ -1,0 +1,36 @@
+---
+abstract: 'Store time zones with DateTimes in database'
+author:
+  - 'Noel Maddy <zhtwnpanta@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.46'
+  DateTime: '1.18'
+  DateTime::Format::SQLite: '0.11'
+  SQL::Translator: '0.11018'
+  Test::Fatal: '0.014'
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-InflateColumn-DateTime-WithTimeZone
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  DBIx::Class: '0.082820'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone/issues
+  homepage: https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone
+  repository: https://github.com/Zhtwn/DBIx-Class-InflateColumn-DateTime-WithTimeZone.git
+version: '0.03'

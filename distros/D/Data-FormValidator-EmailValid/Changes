@@ -1,0 +1,22 @@
+Revision history for Perl extension Data::FormValidator::EmailValid:
+
+0.05    Wed Nov 25 09:59 PST 2015
+    - rewrite tests to be more resilient to possible DNS/mxcheck issues
+    - move POD tests into "xt/"
+
+0.04    Thu Nov 12 16:18 PST 2015
+    - update tests to use "@cpan.org" instead of "@example.com"; example.com no
+      longer has a published MX record and so tests were failing
+    - Move to GitHub
+
+0.03    Fri Apr 23 16:57 PDT 2010
+    - Switch to Git
+
+0.02    Tue Jan 08 14:26 PST 2007
+    - first public release
+    - renamed methods to 'FV_email_filter' and 'FV_email'
+    - updated 'FV_email_filter' so it now auto-mangles all e-mail addresses to
+      lower-case (can be disabled, but default is to lc() the e-mail)
+
+0.01    Wed Jun 13  4:02pm 2007
+    - initial version

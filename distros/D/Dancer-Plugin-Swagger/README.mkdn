@@ -1,0 +1,338 @@
+# NAME
+
+Dancer::Plugin::Swagger - create Swagger documentation of the app REST interface 
+
+# VERSION
+
+version 0.2.0
+
+# SYNOPSIS
+
+    package MyApp;
+
+    use Dancer;
+    use Dancer::Plugin::Swagger;
+
+    our $VERSION = "0.1";
+
+    get '/choreograph/:name' => sub { ... };
+
+    1;
+
+# DESCRIPTION
+
+This plugin provides tools to create and access a [Swagger](http://swagger.io/) specification file for a
+Dancer REST web service.
+
+Overview of `Dancer::Plugin::Swagger`'s features:
+
+- Can create a `/swagger.json` REST specification file.
+- Can auto-discover routes and add them to the swagger file.
+- Can provide a Swagger UI version of the swagger documentation.
+
+# CONFIGURATION
+
+    plugins:
+        Swagger:
+           main_api_module: MyApp
+           show_ui: 1
+           ui_url: /doc
+           ui_dir: /path/to/files
+           auto_discover_skip:
+            - /swagger.json
+            - qr#^/doc/#
+
+## main\_api\_module
+
+If not provided explicitly, the Swagger document's title and version will be set
+to the abstract and version of this module. 
+
+Defaults to the first
+module to import [Dancer::Plugin::Swagger](https://metacpan.org/pod/Dancer::Plugin::Swagger).
+
+## show\_ui
+
+If `true`, a route will be created for the Swagger UI (see [http://swagger.io/swagger-ui/](http://swagger.io/swagger-ui/)).
+
+Defaults to `true`.
+
+## ui\_url
+
+Path of the swagger ui route. Will also be the prefix for all the CSS/JS dependencies of the page.
+
+Defaults to `/doc`.
+
+## ui\_dir
+
+Filesystem path to the directory holding the assets for the Swagger UI page.
+
+Defaults to a copy of the Swagger UI code bundled with the [Dancer::Plugin::Swagger](https://metacpan.org/pod/Dancer::Plugin::Swagger) distribution.
+
+## auto\_discover\_skip
+
+List of urls that should not be added to the Swagger document by `swagger_auto_discover`.
+If an url begins with `qr`, it will be compiled as a regular expression.
+
+Defauls to `/swagger.json` and, if `show_ui` is `true`, all the urls under `ui_url`.
+
+## validate\_response 
+
+If set to `true`, calls to `swagger_response` will verify if a schema is defined 
+for the response, and if so validate against it. [JSON::Schema::AsType](https://metacpan.org/pod/JSON::Schema::AsType) is used for the
+validation (and this required if this option is used).
+
+Defaults to `false`.
+
+## strict\_validation
+
+If set to `true`, dies if a call to `swagger_response` doesn't find a schema for its response.
+
+Defaults to `false`.
+
+# PLUGIN KEYWORDS
+
+## swagger\_path $description, \\%args, $route
+
+    swagger_path {
+        description => 'Returns info about a judge',
+    },
+    get '/judge/:judge_name' => sub {
+        ...;
+    };
+
+Registers a route as a swagger path item in the swagger document.
+
+`%args` is optional.
+
+The `$description` is optional as well, and can also be defined as part of the 
+`%args`.
+
+    # equivalent to the main example
+    swagger_path 'Returns info about a judge',
+    get '/judge/:judge_name' => sub {
+        ...;
+    };
+
+If the `$description` spans many lines, it will be left-trimmed.
+
+    swagger_path q{ 
+        Returns info about a judge.
+
+        Some more documentation can go here.
+
+            And this will be seen as a performatted block
+            by swagger.
+    }, 
+    get '/judge/:judge_name' => sub {
+        ...;
+    };
+
+### Supported arguments
+
+- method
+
+    The HTTP method (GET, POST, etc) for the path item.
+
+    Defaults to the route's method.
+
+- path
+
+    The url for the path item.
+
+    Defaults to the route's path.
+
+- description
+
+    The path item's description.
+
+- tags
+
+    Optional arrayref of tags assigned to the path.
+
+- parameters
+
+    List of parameters for the path item. Must be an arrayref or a hashref.
+
+    Route parameters are automatically populated. E.g., 
+
+        swagger_path
+        get '/judge/:judge_name' => { ... };
+
+    is equivalent to
+
+        swagger_path {
+            parameters => [
+                { name => 'judge_name', in => 'path', required => 1, type => 'string' },
+            ] 
+        },
+        get '/judge/:judge_name' => { ... };
+
+    If the parameters are passed as a hashref, the keys are the names of the parameters, and they will
+    appear in the swagger document following their alphabetical order.
+
+    If the parameters are passed as an arrayref, they will appear in the document in the order
+    in which they are passed. Additionally, each parameter can be given as a hashref, or can be a 
+    `name => arguments` pair. 
+
+    In both format, for the key/value pairs, a string value is considered to be the 
+    `description` of the parameter.
+
+    Finally, if not specified explicitly, the `in` argument of a parameter defaults to `query`,
+    and its type to `string`.
+
+        parameters => [
+            { name => 'bar', in => 'path', required => 1, type => 'string' },
+            { name => 'foo', in => 'query', type => 'string', description => 'yadah' },
+        ],
+
+        # equivalent arrayref with mixed pairs/non-pairs
+
+        parameters => [
+            { name => 'bar', in => 'path', required => 1, type => 'string' },
+            foo => { in => 'query', type => 'string', description => 'yadah' },
+        ],
+
+        # equivalent hashref format 
+        
+        parameters => {
+            bar => { in => 'path', required => 1, type => 'string' },
+            foo => { in => 'query', type => 'string', description => 'yadah' },
+        },
+
+        # equivalent, using defaults
+        parameters => {
+            bar => { in => 'path', required => 1 },
+            foo => 'yadah',
+        },
+
+- responses
+
+    Possible responses from the path. Must be a hashref.
+
+        swagger_path {
+            responses => {
+                default => { description => 'The judge information' }
+            },
+        },
+        get '/judge/:judge_name' => { ... };
+
+    If the key `example` is given (instead of `examples` as defined by the Swagger specs), 
+    and the serializer used by the application is [Dancer::Serializer::JSON](https://metacpan.org/pod/Dancer::Serializer::JSON) or [Dancer::Serializer::YAML](https://metacpan.org/pod/Dancer::Serializer::YAML),
+    the example will be expanded to have the right content-type key.
+
+        swagger_path {
+            responses => {
+                default => { example => { fullname => 'Mary Ann Murphy' } }
+            },
+        },
+        get '/judge/:judge_name' => { ... };
+
+        # equivalent to
+
+        swagger_path {
+            responses => {
+                default => { examples => { 'application/json' => { fullname => 'Mary Ann Murphy' } } }
+            },
+        },
+        get '/judge/:judge_name' => { ... };
+
+    The special key `template` will not appear in the Swagger doc, but will be
+    used by the `swagger_template` plugin keyword.
+
+## swagger\_template $code, $args
+
+    swagger_path {
+        responses => {
+            404 => { template => sub { +{ error => "judge '$_[0]' not found" } }  
+        },
+    },
+    get '/judge/:judge_name' => {  
+        my $name = param('judge_name');
+        return swagger_template 404, $name unless in_db($name);
+        ...;
+    };
+
+Calls the template for the `$code` response, passing it `$args`. If `$code` is numerical, also set
+the response's status to that value. 
+
+## swagger\_auto\_discover skip => \\@list
+
+Populates the Swagger document with information of all
+the routes of the application.
+
+Accepts an optional `skip` parameter that takes an arrayref of
+routes that shouldn't be added to the Swagger document. The routes
+can be specified as-is, or via regular expressions. If no skip list is given, defaults to 
+the c<auto\_discover\_skip> configuration value.
+
+    swagger_auto_discover skip => [ '/swagger.json', qr#^/doc/# ];
+
+The information of a route won't be altered if it's 
+already present in the document.
+
+If a route has path parameters, they will be automatically
+added as such in the `parameters` section.
+
+Routes defined as regexes are skipped, as there is no clean way
+to automatically make them look nice.
+
+        # will be picked up
+    get '/user' => ...;
+
+        # ditto, as '/user/{user_id}'
+    get '/user/:user_id => ...;
+
+        # won't be picked up
+    get qr#/user/(\d+)# => ...;
+
+Note that routes defined after `swagger_auto_discover` has been called won't 
+be added to the Swagger document. Typically, you'll want `swagger_auto_discover`
+to be called at the very end of your module. Alternatively, `swagger_auto_discover`
+can be called more than once safely -- which can be useful if an application creates
+routes dynamically.
+
+## swagger\_definition $name => $definition, ...
+
+Adds a schema (or more) to the definition section of the Swagger document.
+
+    swagger_definition 'Judge' => {
+        type => 'object',
+        required => [ 'fullname' ],
+        properties => {
+            fullname => { type => 'string' },
+            seasons => { type => 'array', items => { type => 'integer' } },
+        }
+    };
+
+The function returns the reference to the definition that can be then used where
+schemas are used.
+
+    my $Judge = swagger_definition 'Judge' => { ... };
+    # $Judge is now the hashref '{ '$ref' => '#/definitions/Judge' }'
+    
+    # later on...
+    swagger_path {
+        responses => {
+            default => { schema => $Judge },
+        },
+    },
+    get '/judge/:name' => sub { ... };
+
+# EXAMPLES
+
+See the `examples/` directory of the distribution for a working example.
+
+# SEE ALSO
+
+- [http://swagger.io/|Swagger](http://swagger.io/|Swagger)
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

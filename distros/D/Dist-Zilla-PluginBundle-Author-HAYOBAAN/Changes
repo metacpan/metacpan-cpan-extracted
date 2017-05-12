@@ -1,0 +1,53 @@
+Revision history for Perl module Dist-Zilla-PluginBundle-Author-HAYOBAAN
+
+0.012     2016-11-17
+  * Fixed missing files in copy files from build [GH #4]
+  * Added Travis and AppVeyor testing
+  * Added Travis and CPAN badges to README.mkdn for GitHub hosted
+    CPAN distributions
+
+0.011     2016-08-10
+  * Removed Build.PL (as should have been done as of v0.009...)
+  * Updated author e-mail address
+
+0.010     2016-07-26
+  * Changes file added to test environment for Dist::Zilla 6.005 and
+    newer
+
+0.009     2015-05-23
+  * Made use of MakeMaker (default) and/or Module::Build optional [GH #1]
+
+0.008     2015-04-19
+  * Corrected --keep-version option, added --keep as synonym
+
+0.007     2015-04-19
+  * Added own (configurable) plugin to provide next version
+  * Added own version of the pod BUGS section plugin
+  * Documentation enhancements and corrections
+  * New author e-mail address
+
+0.006     2015-04-10
+  * Added missing requirement (Pod::Coverage::TrustPod)
+  * Corrected default max_target_perl (now 5.006)
+  * Corrected version requirement of pluginbundle itself (5.010)
+
+0.005     2015-03-27
+  * Corrected adding tests with a config (e.g., Test::MinimumVersion)
+  * Moved the Variables and Functions pod sections to the front
+
+0.004     2015-01-24
+  * Added missing requirements
+  * Updated the documentation
+
+0.003     2015-01-11
+  * Added ability to use SurgicalPodWeaver instead of the normal
+    Podweaver plugin
+
+0.002     2015-01-04
+  * Added requirements for the non-core Dist::Zilla and Pod::Weaver
+    plugins
+  * Load "CheckMetaResources" and "CheckPrereqsIndexed" only for CPAN
+    distros
+
+0.001     2015-01-03
+  * Initial release

@@ -1,0 +1,48 @@
+Revision history for Perl module Dist::Zilla::Plugin::TravisCI::StatusBadge.
+
+0.006   Sat Dec 27 19:22:41 2014 +0000
+
+    [ FEATURES ]
+    - guess target filename and use it when not passed via option
+
+    [ TESTS ]
+    - added tests for anyreadme feature
+
+0.005   Wed Nov 5 11:44:54 2014 +0000
+
+    [ FEATURES ]
+    - user/repo might be obtained from meta resources (gh #2)
+
+    [ TESTS ]
+    - using Test::Spec now
+    - excluded [ReadmeAnyFromPod] from tests
+
+0.004   Fri Jul 11 18:20:17 2014 +0000
+
+    [ BUGFIXES ]
+    - support for dzil-v5
+
+    [ FEATURES ]
+    - select desired branch to show build status
+    - support both raster and vector images
+
+0.003   Sat Oct 5 18:43:14 2013 +0000
+
+    [ DOCUMENTATION ]
+    - fixed user/repo name in the pod
+    - fixed links to Dist::Zilla::Plugin::ReadmeAnyFromPod
+
+    [ TESTS ]
+    - added feature testing
+
+    [ META ]
+    - start using groups in Changes
+
+0.002   Mon Sep 23 18:39:31 2013 +0000
+
+    [ DOCUMENTATION ]
+    - fixed badge placement description
+
+0.001   Mon Sep 23 15:32:24 2013 +0000
+
+    - initial release

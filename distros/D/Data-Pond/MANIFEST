@@ -1,0 +1,21 @@
+.gitignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Data/Pond.pm
+lib/Data/Pond.xs
+t/error.t
+t/error_pp.t
+t/expr.t
+t/expr_pp.t
+t/pod_cvg.t
+t/pod_cvg_pp.t
+t/pod_syn.t
+t/setup_pp.pl
+t/undef.t
+t/undef_pp.t
+SIGNATURE    Added here by Module::Build

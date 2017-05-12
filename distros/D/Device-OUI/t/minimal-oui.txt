@@ -1,0 +1,34 @@
+
+OUI				Organization
+company_id			Organization
+				Address
+
+
+00-17-F2   (hex)		Apple Computer
+0017F2     (base 16)		Apple Computer
+				1 Infinite Loop MS:35GPO
+				Cupertino CA 95014
+				UNITED STATES
+
+00-19-E3   (hex)		Apple Computers
+0019E3     (base 16)		Apple Computers
+				1 Infinite Loop
+				Cupertino California 94538
+				UNITED STATES
+
+00-1C-42   (hex)		Parallels, Inc.
+001C42     (base 16)		Parallels, Inc.
+				660 SW 39h Street
+				Suite 205
+				Renton WA 98057
+				UNITED STATES
+
+00-50-56   (hex)		VMWare, Inc.
+005056     (base 16)		VMWare, Inc.
+				44 ENCINA AVENUE
+				PALO ALTO CA 94301
+				UNITED STATES
+
+AC-DE-48   (hex)		PRIVATE
+ACDE48     (base 16)		
+				

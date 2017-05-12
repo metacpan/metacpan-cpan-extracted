@@ -1,0 +1,43 @@
+---
+abstract: 'A simple xs-file-from-template plugin'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Path::Class: 0
+  Test::DZil: 0
+  Test::File::ShareDir: 0
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build::Tiny: 0.030
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.009, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-TemplateXS
+provides:
+  Dist::Zilla::Plugin::TemplateXS:
+    file: lib/Dist/Zilla/Plugin/TemplateXS.pm
+    version: 0.002
+requires:
+  Data::Section: 0.200002
+  Dist::Zilla::File::InMemory: 0
+  Dist::Zilla::Role::FileGatherer: 0
+  Dist::Zilla::Role::TextTemplate: 0
+  Moose: 0
+  Moose::Util::TypeConstraints: 0
+  Path::Tiny: 0
+  Sub::Exporter::ForMethods: 0
+  namespace::autoclean: 0
+  perl: 5.006
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-TemplateXS
+  repository: git://github.com/Leont/dist-zilla-plugin-templatexs.git
+version: 0.002

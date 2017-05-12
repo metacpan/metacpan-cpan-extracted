@@ -1,0 +1,8 @@
+Revision history for Dancer-Plugin-ProxyPath
+
+0.01    Sat Feb  5 15:53:23 GMT 2011
+        First version: provides uri_for functionality
+
+0.02    Thu May 12 16:29:46 BST 2011
+        Fixed double '/' bug in some routes
+

@@ -1,0 +1,86 @@
+---
+- author: Mario Zieschang
+  entries:
+  - name: address_information_number_seq
+    type: createsequence
+  - name: blog_comments_number_seq
+    type: createsequence
+  - name: profile_blog_number_seq
+    type: createsequence
+  - name: blog_entry_typenumber_seq
+    type: createsequence
+  - name: clendar_attributes_seq
+    type: createsequence
+  - name: forum_categories_number_seq
+    type: createsequence
+  - name: forum_head_categories_number_seq
+    type: createsequence
+  - name: forum_post_answers_number_seq
+    type: createsequence
+  - name: forum_post_number_seq
+    type: createsequence
+  - name: forum_topics_number_seq
+    type: createsequence
+  - name: imagine_someone_number_seq
+    type: createsequence
+  - name: message_session_seq
+    type: createsequence
+  - name: message_system_seq
+    type: createsequence
+  - name: messages_number_seq
+    type: createsequence
+  - name: profile_gallery_number_seq
+    type: createsequence
+  - name: profile_gb_number_seq
+    type: createsequence
+  - name: profile_interv_quest_inta_numb_seq
+    type: createsequence
+  - name: profile_interv_quest_self_numb_seq
+    type: createsequence
+  - name: profile_interv_quest_surr_numb_seq
+    type: createsequence
+  - name: profile_interv_recom_inta_numb_seq
+    type: createsequence
+  - name: profile_interv_recom_self_numb_seq
+    type: createsequence
+  - name: profile_interv_recom_surr_numb_seq
+    type: createsequence
+  - name: profile_preferences_categories_number_seq
+    type: createsequence
+  - name: profile_preferences_number_seq
+    type: createsequence
+  - name: profile_quest_base_numb_seq
+    type: createsequence
+  - name: profile_quest_character_numb_seq
+    type: createsequence
+  - name: profile_quest_ext_app_numb_seq
+    type: createsequence
+  - name: profile_quest_personal_numb_seq
+    type: createsequence
+  - name: profile_recom_base_numb_seq
+    type: createsequence
+  - name: profile_recom_character_numb_seq
+    type: createsequence
+  - name: profile_recom_ext_app_numb_seq
+    type: createsequence
+  - name: profile_recom_personal_numb_seq
+    type: createsequence
+  - name: profile_service_number_seq
+    type: createsequence
+  - name: profile_settings_attributes_number_seq
+    type: createsequence
+  - name: users_number_seq
+    type: createsequence
+  - name: system_news_seq
+    type: createsequence
+  - name: user_permissions_number_seq
+    type: createsequence
+  - name: user_roles_number_seq
+    type: createsequence
+  - name: venues_seq
+    type: createsequence
+  - name: gallery_categories_number_seq
+    type: createsequence
+  - name: gallery_images_number_seq
+    type: createsequence
+  id: 001-maz

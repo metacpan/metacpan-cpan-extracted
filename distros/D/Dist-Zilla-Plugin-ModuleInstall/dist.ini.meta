@@ -1,0 +1,36 @@
+; vim: syntax=dosini
+name    = Dist-Zilla-Plugin-ModuleInstall
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+
+[Bootstrap::lib]
+try_built = 1
+
+[@Author::KENTNL]
+:version = 2.020
+normal_form  = numify
+mantissa     = 6
+twitter_extra_hash_tags = #distzilla
+auto_prereqs_skip = ^inc::
+bumpversions = 1
+toolkit          = eumm
+toolkit_hardness = soft
+srcreadme        = mkdn
+
+;version_major  = 00
+;version_minor  = 01
+;version_rel_year = 2009
+;version_rel_month = 10
+;version_rel_day = 22
+;version_rel_hour = 08
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+Module::Install = 0.90
+Dist::Zilla::Role::PrereqSource = 0
+Moose = 0.92
+Dist::Zilla::Role::Tempdir = 0.01027622
+
+[Deprecated]

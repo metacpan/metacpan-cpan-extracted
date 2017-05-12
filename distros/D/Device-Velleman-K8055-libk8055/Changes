@@ -1,0 +1,14 @@
+Revision history for Perl extension Device::Velleman::K8055::libk8055.
+
+0.04  Wed Jan 13 08:45:23 2010
+	- added support for META_TAGS
+	- added github repository support
+	- removed some placeholders
+0.03  Mon Mar 30 23:49:02 2009
+	- added descriptions
+0.02  Mon Mar 30 18:41:48 2009
+	- bugfixes
+0.01  Mon Mar 30 13:43:27 2009
+	- original version; created by h2xs 1.23 with options
+	-b 5.8.0 -n Device::Velleman::K8055::libk8055 -x k8055.h -lk8055 -lusb
+

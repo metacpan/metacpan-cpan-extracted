@@ -1,0 +1,31 @@
+---
+abstract: 'Base classes wrapping fundamental Perl data types.'
+author:
+  - 'Matthew Phillips <mattp@cpan.org>'
+build_requires:
+  Test::Deep: 0
+  Test::Fatal: 0
+  Test::Output: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Perl
+requires:
+  Class::Method::Modifiers: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  Module::Runtime: 0
+  Role::Tiny: 0
+  Scalar::Util: 0
+  parent: 0
+  strictures: 0
+resources:
+  bugtracker: https://github.com/mattp-/Data-Perl/issues
+  homepage: https://github.com/mattp-/Data-Perl
+  repository: https://github.com/mattp-/Data-Perl.git
+version: 0.002009

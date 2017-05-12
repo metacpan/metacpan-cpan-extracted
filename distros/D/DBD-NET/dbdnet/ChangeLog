@@ -1,0 +1,58 @@
+DBD::Informix for DBI - Written by Alligator Descartes <descarte@mcqueen.com>
+
+18/08/95:	Started. 
+
+		Version 0.0.0 ( Totally pre-alpha! )
+
+17/10/95:15:39	After a good break of about a month and a half, back in the
+		saddle.
+
+		We have data from SELECTs coming back from the database!
+
+		Released 0.20pl0 Disney on ftp.mcqueen.com. Limited hacker
+		release.
+
+14/04/96:18:04	Added support for CREATE, DROP, INSERT, UPDATE and DELETE.
+		Fixed $DBI::errnum and $DBI::errstr problems
+		Fixed Informix.pm to stop reporting MSQL_HOME errors
+		Fixed Makefile.PL
+		Removed hacky 'build' file and uses Makefile.PL exclusively
+		now.
+
+0.21
+----
+
+01/09/95: 	Fixed truncated INTEGER bug. Other numerical types still
+		screwed. Patch on the way.
+
+0.22
+----
+
+09/09/96:	Added @ary = $drh->func( '_ListDBs' ); method for getting
+		a list of extant databases on the local Informix server.
+		( From original code and suggestion by 
+                  George.Vicherek@Sciatl.COM )
+
+10/09/96:	Fixed all numeric types to return correctly. CHAR fields don't
+		quite behave as planned, or perhaps they do. Added 'multicursor'
+		test which proves that simultanous multiple cursors fails
+		miserably.
+
+		0.23 release.
+
+17/09/96:	Added patch for bad column names as show in George Vicherek's
+		splendid test case. ( extratests/primitives.pl exercises this )
+
+18/09/96:	Wrapped in a patch to Makefile.PL from Christophe Martin.
+		Added some other Makefile.PL patches of my own. It should now
+		support cleaner builds on HP-UX ( spit! ) and correctly detect
+		when dbdimp.ec has changed.
+
+18/09/96:	Wrapped in patches by Terry Nightingale based on Bill Hailes'
+		isqlperl for supporting multi-cursors. Cleaned the type 
+		handling code again.
+
+		0.24 release.
+
+26/09/96:	Patches from Terry arrived. This'll be the 0.25 release. Seems
+		to work.

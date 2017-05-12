@@ -1,0 +1,14 @@
+README
+Changes
+lib/Device/ParallelPort.pm
+lib/Device/ParallelPort/Printer.pm
+lib/Device/ParallelPort/drv.pm
+lib/Device/ParallelPort/drv/auto.pm
+lib/Device/ParallelPort/drv/script.pm
+lib/Device/ParallelPort/drv/dummy_bit.pm
+lib/Device/ParallelPort/drv/dummy_byte.pm
+LICENSE
+MANIFEST
+Makefile.PL
+test/dummy
+META.yml                                 Module meta-data (added by MakeMaker)

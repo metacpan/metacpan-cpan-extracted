@@ -1,0 +1,12 @@
+Revision history for Dist-Zilla-Plugin-Test-DiagINC
+
+0.002     2016-12-21 23:51:45-05:00 America/New_York
+
+    [Changes]
+
+    - Munges test file without modifying line numbers.
+
+0.001     2014-02-04 22:19:50-05:00 America/New_York
+
+    - First release
+

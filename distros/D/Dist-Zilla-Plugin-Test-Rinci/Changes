@@ -1,0 +1,18 @@
+Revision history for Dist-Zilla-Test-Rinci
+
+0.03    2015-09-11 (PERLANCAR)
+
+	- Only adds xt/release/rinci.t if dist defines Rinci metadata, this
+	  avoids needless dependencies to Test::Rinci when there is no
+	  Rinci metadata to test.
+
+
+0.02    2015-03-25 (PERLANCAR)
+
+	- Add comment in the produced test script about the file being
+	  automatically generated.
+
+
+0.01     2012-10-31 (SHARYANTO)
+
+         - First release.

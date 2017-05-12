@@ -1,0 +1,18 @@
+Revision history for Data::UUID::Concise
+
+0.121240  2012-05-03 10:11:50 America/Chicago
+
+	- We actually support changing the alphabet now.
+
+0.121082  2012-04-17 05:13:05 America/Chicago
+
+	- Yet another test release, now with more feeling.
+
+0.121081  2012-04-17 05:12:03 America/Chicago
+
+	- A test release.
+
+0.121080
+	Released: 2012-04-17 02:14:42
+
+	- Initial release.

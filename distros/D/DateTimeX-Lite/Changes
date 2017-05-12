@@ -1,0 +1,35 @@
+Changes
+=======
+
+0.00004 Jul 13 2011
+  * Fix use of qw() for 5.14 deprecation (rt #69431)
+
+0.00003 Jul 24 2010
+  * Fix dependency for File::ShareDir
+
+0.00002 Jul 24 2010
+  * Remove unnecessary dependency from Makefile.PL
+  * Fix docs
+
+0.00001 Jul 23 2010
+  * Has it been that long? wow... (deja vu)
+  * Prodded by an unexpected OSCON mention
+    (http://www.slideshare.net/Tim.Bunce/develnytprof-v4-at-oscon-201007)
+    here's the real release!
+  * Time zones have been updated with olsondb 2010j
+
+0.00001_04 Jul 22 2009
+  * Has it been that long? wow...
+  * Require installation of all locales and timezones. It was a mess.
+  * Pass tests
+
+0.00001_03 Feb 19 2009
+  * Explicitly require Carp
+  * Add List::MoreUtils requirement
+
+0.00001_02 Feb 14 2009
+  * Change name to DateTimeX::Lite, full support for timezones and locales.
+  * I'm sure there are still lots of holes. Please let me know.
+
+0.00001_01
+  * Initial release.

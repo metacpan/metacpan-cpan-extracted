@@ -1,0 +1,33 @@
+Revision history for Perl extension Data::Queue::Persistent.
+
+0.09
+        - allow get in reverse order
+
+0.08
+        - allow max_size option
+        - add accessor with offset and length
+
+0.07
+        - improve efficiency - don't keep shifting indices around
+
+0.06
+        - add 'noload' option for constructor
+
+0.05
+        - better support for mysql, fixing table_exists for quoted
+          tables
+
+0.04
+        - more docs
+
+0.03
+        - more tests
+        - making caching an option
+
+0.02
+        - add option to pass in dbh
+
+0.01  Wed Aug  8 17:48:39 2007
+	- original version; created by h2xs 1.23 with options
+		-X Data::Queue::Persistent
+

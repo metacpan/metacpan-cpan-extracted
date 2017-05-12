@@ -1,0 +1,59 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'perl' => '5.006'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Code::TidyAll' => '0.24',
+                                      'Exception::Class' => '1.40',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Mojolicious' => '6.55',
+                                      'Moose::Exception' => '2.1605',
+                                      'Perl::Critic' => '1.123',
+                                      'Perl::Tidy' => '20140711',
+                                      'Pod::Coverage::TrustPod' => '0',
+                                      'StackTrace::Auto' => '0.200013',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.24',
+                                      'Test::EOL' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Pod::Coverage' => '1.08',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Synopsis' => '0',
+                                      'Test::Version' => '1',
+                                      'Throwable::Error' => '0.200013'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Devel::StackTrace' => '0',
+                                      'Devel::StackTrace::Frame' => '0',
+                                      'Exporter' => '0',
+                                      'Scalar::Util' => '0',
+                                      'base' => '0',
+                                      'perl' => '5.006',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

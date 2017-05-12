@@ -1,0 +1,358 @@
+Revision history for Dist-Zilla-Plugin-Test-Compile
+
+2.056     2016-10-26 06:15:40Z
+  - fix test failure on older perls
+
+2.055     2016-10-24 01:39:56Z
+  - verbose diagnostics can now be enabled in the test with
+    the PERL_COMPILE_TEST_DEBUG environment variable.
+  - added "switch" option, for passing additional command-line switches
+
+2.054     2015-08-16 00:17:17Z
+  - load blib as needed during tests, to check its $VERSION
+  - use the :PerlExecFiles filefinder, when available (requires Dist::Zilla
+    5.038)
+
+2.053     2015-06-01 03:33:51Z
+  - filter out "Using .../lib" warning emitted by older blib when checking for
+    warnings (reported by preaction)
+
+2.052     2015-03-28 06:09:55Z
+ - always test for warnings if fail_on_warning=author and the generated test
+   is in xt/author, without AUTHOR_TESTING having to be set
+
+2.051     2014-10-18 01:51:02Z
+ - fix needs_display tests failing on MSWin32 since 2.048
+
+2.050     2014-10-15 23:57:04Z
+ - fix test (in our own test suite) that will break with an upcoming
+   Test::More release
+
+2.049     2014-10-14 04:46:44Z
+ - use documented Test::Builder interface to examine test details
+
+2.048     2014-10-11 21:54:16Z
+ - make tests (and generated test) run when needs_display=1 and $DISPLAY is
+   not set
+
+2.047     2014-10-10 05:19:20Z
+ - avoid use of Test::More::explain in generated test when version is too old
+
+2.046     2014-08-20 15:10:15Z
+ - When warnings occur under fail_on_warning, diag them. (GH #9, Kent Fredric)
+
+2.045     2014-08-07 04:25:14Z
+ - re-release to remove README.pod from shipped dist
+
+2.044     2014-08-03 01:11:31Z
+ - clean up dynamic prerequisite calculations
+ - munge the file properly even if [ExtraTests] has already moved it
+
+2.043     2014-06-13 21:00:24Z
+ - fix remaining failures on 5.10.0 (due to buggy -C flags) introduced in
+   2.041
+
+2.042     2014-06-04 02:28:25Z
+ - fix test failures on older perls introduced in 2.041
+
+2.041     2014-05-30 17:54:57Z
+ - properly handle scripts with shebang lines with dashes in the path name, or
+   extra whitespace, or comments (RT#95897)
+
+2.040     2014-04-06 18:54:08Z
+ - fix bad x_breaks metadata
+ - line numbers in shipped code are now almost the same (within 3) as the
+   repository source, for easier debugging
+
+2.039     2013-12-02 05:23:01Z
+ - fix bad handling of $stderr handle on win32 (from v2.038)
+
+2.038     2013-11-29 18:20:37Z
+ - test now reuses the same $stdin and $stderr handles across all processes
+ - now asserting minimum perl version required (5.6) in the generated test
+ - new 'file' option, for adding extra files to be checked
+
+2.037     2013-10-18 01:18:15Z
+ - files are loaded from lib/ if blib/ does not exist
+ - now properly falling back to lib/ for scripts too
+
+2.036     2013-10-12 21:32:51Z
+ - new "xt_mode" option (thanks, David Golden!)
+
+2.035     2013-10-12 17:35:49Z
+ - new "phase" option, for selecting how prereqs are injected (thanks, David
+   Golden!)
+
+2.034     2013-10-06 06:24:12Z
+ - now checking the full, unshifted value of $? (thanks, ribasushi!)
+ - fixed incomplete prerequisite specification on Test::Warnings
+
+2.033     2013-09-20 23:52:40Z
+ - revert to IPC::Open3 implementation from v2.031 and earlier, but with
+   waitpid ordering fixed so we never hang (thanks haarg!)
+ - now bootstrapping ourselves so our own compile test is generated with the
+   version of code we are shipping, rather than version N-1
+
+2.032     2013-09-20 01:02:20Z
+ - add missing prereq injection for File::Spec, when scripts are being tested
+ - redo entire implementation, reverting from IPC::Open3 back to a capture{},
+   using an inlined form of the guts of Capture::Tiny courtesy of David
+   Golden, to address ongoing occasional hang issues on win32 (see RT#88783
+   for the longer version)
+
+2.031     2013-09-19 04:49:51Z
+ - bypass cmd.exe on win32 to try to avoid occasional hang issue (RT#88783)
+
+2.030     2013-09-11 05:01:26Z
+ - depend on fixed Test::Warnings, where ':no_end_test' also covers the
+   done_testing case (which turned out to be a red herring)
+
+2.029     2013-09-10 01:19:46Z
+ - fix test failures for non-authors (oops)
+
+2.028     2013-09-10 01:12:53Z
+ - fix binmode issue on win32 (introduced in 2.026)
+ - warnings tests bypassed during installation, to prevent installation issues
+   in the presence of deprecation warnings from upstream dependencies (in this
+   case, via Moose 2.1100)
+ - new 'filename' option, for creating the compile test in a different
+   location
+
+2.027     2013-09-08 16:36:45Z
+ - promise in documentation that the generated test requires no non-core
+   modules, and is compatible with perl 5.6.2
+ - re-release with properly encoded META.yml
+
+2.026     2013-09-07 00:47:15Z
+ - more fixes (hopefully the last) for script checking on win32
+
+2.025     2013-09-04 01:32:34Z
+ - more thoroughly test the generated test that no non-core modules are
+   required, and syntax does not require a perl later than 5.8.8
+ - fix use of regex syntax in script checking that required perl 5.9.5
+ - properly screen out expected warnings from perl -c on older perls
+
+2.024     2013-09-03 00:02:21Z
+ - update warning regexp in test yet again, due to win32 failures (does not
+   concern the generated test)
+
+2.023     2013-08-30 01:27:54Z
+ - now routing subprocesses' stdout to our stderr rather than throwing it
+   away, for greater visibility into any side effects caused by loading
+   modules
+ - removed use of Test::Script entirely for testing scripts - now instead we
+   call perl -c ourselves
+ - we can now properly test scripts using special flags such as -T
+ - now skipping non-perl scripts, by checking shebang lines
+ - now any version of Test::More can be used (if the bail_out_on_fail option
+   is not set)
+
+2.022     2013-08-29 02:04:55Z
+ - documentation fixes and cleanup
+ - added missing test prereq on Test::Script (but still not injected into the
+   built dist unless scripts are being shipped)
+ - stop looking for newlines during install-time testing, to avoid needless
+   failure on win32 (does not concern the generated test)
+
+2.021     2013-08-27 00:59:49Z
+ - fix incomplete prereq declaration on Test::Warnings
+ - work around dubious install-time test failure on win32 with absolute
+   filenames in tests (does not concern the generated test)
+
+2.020     2013-08-24 18:06:49Z
+ - fixed test prereq for Module::CoreList (thanks ambs!)
+ - removed long-deprecated [CompileTests]
+
+2.019     2013-08-24 04:09:07Z
+ - now properly handling filenames with non-ascii characters
+ - use IPC::Open3 for each subprocess, rather than Capture::Tiny; test added
+   to confirm that no non-core prereqs are used (except sometimes
+   Test::Script)
+
+2.018     2013-08-04 02:25:37Z
+ - delay inserting the list of modules to check until after all plugins have
+   had an opportunity to add files (found via RT#87562)
+ - fail_on_warning setting now also takes into consideration the results of
+   script compilation checks
+
+2.017     2013-08-03 18:06:44Z
+ - fix conflicts metadata entry for Test::Kwalitee::Extra (I misinterpreted
+   the metaspec as to what conflicts actually means!)
+
+2.016     2013-08-02 18:48:44Z
+ - convert Foo\Bar.pm to Foo/Bar.pm for proper %INC retrieval on win32
+   (thanks, haarg!)
+
+2.015     2013-08-02 18:22:28Z
+ - fix double-quoting of file paths in require statement, introduced in v2.006
+   (thanks, Peter Shangov!)
+
+2.014     2013-08-01 02:37:00Z
+ - fix install tests on win32, broken since 2.011 (RT#84781)
+ - properly munge filenames on win32 (broken since 2.013)
+
+2.013     2013-07-30 19:54:52Z
+ - .pm files are tested with -Mblib again; 2.012 was a mistake.
+ - now require()ing files without the leading lib/, to avoid potentially
+   loading files twice (a problem since 2.009) - thanks dolmen and haarg!
+
+2.012     2013-07-30 19:12:53Z
+ - .pm files are once again tested with -Ilib, instead of -Mblib, to avoid
+   potentially loading files twice (this was changed in 2.009).
+
+2.011     2013-07-28 22:45:53Z
+ - .pod files are now always omitted from the list of found modules in the
+   dist (thanks for the report, Alberto Simões!)
+
+2.010     2013-07-27 00:45:51Z
+ - add conflicts metadata for Test::Kwalitee::Extra, which does not like the
+   require() syntax we use
+ - all changes since 2.002 now as a stable release:
+
+   [FEATURES]
+   - new fail_on_warning option
+   - the 'skip' option can now be provided multiple times
+   - calculate the list of files to check at build time, rather than using
+     File::Find at runtime; the filefinders used are configurable.
+
+   [IMPLEMENTATION DETAILS]
+   - include a comment in the generated test indicating how it was generated
+   - modules used by the test are injected as test requires dependencies.
+   - avoid trying to load Test::Script if there are no scripts to check
+   - we now load the .pm file, rather than attempting to calculate the module
+     name and then loading that
+   - if there are scripts to be tested, Test::Script is now mandatory;
+     accurate prerequisites are injected into the dist in all cases
+   - properly inject all used modules as test prerequisites
+   - now using Text::Template to generate the test, for simpler munging code
+
+2.009     2013-07-20 17:40:25Z (TRIAL RELEASE)
+ - the 'skip' option can now be provided multiple times
+ - now using Text::Template to generate the test, for simpler munging code
+ - properly inject all used modules as test prerequisites
+
+2.008     2013-07-20 01:40:11Z (TRIAL RELEASE)
+ - screen out skipped files at test generation time, rather than at runtime
+   (and make skips work again - broken in 2.007-TRIAL)
+
+2.007     2013-07-20 01:14:30Z (TRIAL RELEASE)
+ - if there are scripts to be tested, Test::Script is now mandatory; accurate
+   prerequisites are injected into the dist in all cases
+
+2.006     2013-07-17 19:38:55Z (TRIAL RELEASE)
+ - we now load the .pm file, rather than attempting to calculate the module
+   name and then loading that
+ - avoid trying to load Test::Script if there are no scripts to check
+ - calculate the list of files to check at build time, rather than using
+   File::Find at runtime; the filefinders used are configurable.
+ - modules used by the test are injected as test requires dependencies.
+
+2.005     2013-07-14 19:54:24Z (TRIAL RELEASE)
+ - fixed use of quoting in shell command to resolve mswin32 issues (introduced
+   in 2.003)
+ - include a comment in the generated test indicating how it was generated
+
+2.004     2013-07-01 05:17:25Z (TRIAL RELEASE)
+ - fixed typo in fail_on_warning=author
+
+2.003     2013-07-01 04:39:31Z (TRIAL RELEASE)
+ - new fail_on_warning option (Karen Etheridge)
+
+2.002     2013-04-28 16:19:00Z
+ - require version of Test::More that added is_passing()
+   (RT#84904, Karen Etheridge)
+
+2.001     2013-02-12 12:03:37Z
+ - fix EOL in generated test (Olivier Mengué)
+
+2.000     2013-02-11 12:52:18Z
+ - new bail_out_on_fail option (Karen Etheridge)
+ - dzil migrated to @Author::JQUELIN
+
+1.112820  2011-10-09 09:31:56Z
+ - look for scripts in scripts/ too (chris weyl)
+
+1.112400  2011-08-28 12:41:01Z
+ - fix breakage introduced by __END__ markers (randy stauner)
+ - added test suite (randy stauner)
+
+1.112392  2011-08-27 10:56:36Z
+ - examples/ updated to use new module name
+
+1.112391  2011-08-27 10:50:33Z
+ - more aggressive deprecation in documentation
+ - minimum date before DZP::CompileTests removal: 2012-08-27
+ - github repository renamed to match new dist name
+
+1.112390  2011-08-27 10:40:32Z
+ - renamed to Dist::Zilla::Plugin::Test::Compile. DZP::CompileTests,
+   although deprecated, continues to work (fredric kent)
+ - eliminate multiple phases work (fredric kent)
+
+1.112380  2011-08-26 12:28:44Z
+ - skip non-perl scripts in bin directory (harley pig)
+
+1.110930  2011-04-03 10:19:08Z
+ - fix rt#67183 - do not fail if no bin directory exists
+
+1.110870  2011-03-28 11:44:54Z
+ - allow regex skip of script files (jesse luehrs)
+
+1.103030  2010-10-30 14:00:24Z
+ - Removed reuse of Test::NeedsDisplay. It fails when DISPLAY is not
+   set! (ahmad m. zawawi)
+
+1.103010  2010-10-28 16:26:19Z
+ - no_display is now called needs_display and it reuses
+   Test::NeedsDisplay (ahmad m. zawawi)
+
+1.103000  2010-10-27 08:16:26Z
+ - new option no_display to skip tests on non win32 systems when
+   $ENV{DISPLAY} is not set (ahmad m. zawawi)
+
+1.101800  2010-06-29 17:42:20Z
+ - skip all if no test are to be run (jesse luehrs)
+ - require module instead of use, to test only compilation (jesse luehrs)
+
+1.101600  2010-06-09 12:01:21Z
+ - fix #55957: strip leading white spaces in module output
+
+1.101500  2010-05-30 16:55:12Z
+ - fix #57974: test::script 1.05 changed its interface
+
+1.100740  2010-03-15 17:29:52Z
+ - allow PERL5OPT to get a chance to be respected (marcel gruenauer)
+
+1.100220  2010-01-22 15:26:16Z
+ - new param fake_home to control $ENV{HOME} faking
+
+1.100160  2010-01-16 13:43:14Z
+ - requiring perl 5.8.x
+ - faking $ENV{HOME} for cpantesters
+
+1.092870  2009-10-14 09:10:00
+ - fix: skip did not update test count
+
+1.092840  2009-10-11 19:12:32
+ - support for skip parameter
+
+1.092460  2009-09-03 17:26:23
+ - using less magical load test (as kentnl reported)
+
+1.092370  2009-08-25 16:57:16
+ - using plain File::Find which is core (rjbs)
+ - moving to autoversion: 1.yydddn
+
+0.1.3   2009-08-11 15:58:19 CEST
+ - automatically add File::Find::Rule to prereqs (fix #48602)
+
+0.1.2   2009-08-07 10:26:31
+ - skip script tests if test::script isn't installed
+
+0.1.1   2009-08-06 15:43:34
+ - fix manifest
+
+0.1.0   2009-08-06 15:34:26
+ - original release
+ - basic compilation tests
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-InflateColumn-Authen-Passphrase,
+version 0.01:
+
+  Inflate/deflate columns to Authen::Passphrase instances
+
+This software is copyright (c) 2010 by Florian Ragwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

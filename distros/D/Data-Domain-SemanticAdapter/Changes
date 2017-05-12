@@ -1,0 +1,30 @@
+Revision history for Perl extension Data-Domain-SemanticAdapter
+
+1.100840  2010-03-25 23:42:51 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.03  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+
+0.02  Thu, 29 May 2008 12:03:05 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.02
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+
+0.01  Wed, 21 Nov 2007 18:21:50 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version
+     - Makefile.PL: fixed requirements
+     - Data::Domain::SemanticAdapter::Test: complete rewrite as it is now a
+       subclass of Data::Semantic::Test
+     - Data::Domain::SemanticAdapter: also inherit from Data::Inherited, new()
+       gets every_list('OPTIONS')
+     - updated MANIFEST
+     - deleted t/01_misc.t
+     - getting rid of the distinction between well-formedness and validity.
+       Only validity remains
+     - Data::Domain::SemanticAdapter::Test: refactored is_valid(), is_invalid()
+     - all classes: added documentation
+     - updated t/perlcriticrc

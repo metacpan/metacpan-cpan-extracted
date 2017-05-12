@@ -1,0 +1,32 @@
+---
+abstract: 'Chained and minimal ORM'
+author:
+  - 'Alessandro Ranellucci <aar@cpan.org>'
+build_requires:
+  DBD::SQLite: 1.29
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Moo: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Lite
+requires:
+  Carp: 0
+  Clone: 0
+  DBI: 1.38
+  DBIx::Connector: 0
+  Data::Page: 0
+  List::MoreUtils: 0
+  SQL::Abstract::More: 0
+resources:
+  bugtracker: https://github.com/alexrj/DBIx-Lite/issues
+  repository: git://github.com/alexrj/DBIx-Lite.git
+version: 0.31

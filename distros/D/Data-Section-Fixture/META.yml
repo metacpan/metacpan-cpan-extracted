@@ -1,0 +1,42 @@
+---
+abstract: 'data section as a fixture'
+author:
+  - 'Yuuki Furuyama <addsict@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::mysqld: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Section-Fixture
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Section::Fixture:
+    file: lib/Data/Section/Fixture.pm
+    version: '0.01'
+requires:
+  Data::Section::Simple: '0'
+  Scope::Guard: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/addsict/Data-Section-Fixture/issues
+  homepage: https://github.com/addsict/Data-Section-Fixture
+  repository: git://github.com/addsict/Data-Section-Fixture.git
+version: '0.01'
+x_authority: cpan:ADDSICT

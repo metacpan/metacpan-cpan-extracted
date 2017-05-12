@@ -1,0 +1,7 @@
+# Created 3/30/03
+
+$rooms_file              = "C:/My Documents/AAAPerl/data/prep/room.sample.data";
+$timeslots_file          = "C:/My Documents/AAAPerl/data/prep/timeslot.sample.data";
+$instructors_file        = "C:/My Documents/AAAPerl/data/prep/instructor.sample.data";
+$ward_departments_file   = "C:/My Documents/AAAPerl/data/prep/unit_department.sample.data";
+$disciplines_file        = "C:/My Documents/AAAPerl/data/prep/discipline.sample.data";

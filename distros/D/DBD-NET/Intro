@@ -1,0 +1,20 @@
+DBD::NET is a perl module for remote database access. Some OS( like Linux)
+doesn't have DB client support (Informix's I-NET, Orcale's SQLNET). Or you
+don't want to pay extra money for DB client.
+
+DBD::NET module consists of two components;
+		- DBD::NET  module : A perl module follows DBI::DBD standard
+		- DBD_NET agent : An agent process running on your DB server.
+
+Currently, DBD::NET only have Informix agent. It should be easy to write
+DB agent for other DBs. You only need to write 5-6 functoins.
+
+
+File name:
+	DBD-NET-????.tgz
+
+
+Have a nice CGI hacking,
+
+Edward Liu, Taiwan
+dhliu@solar.csie.ntu.edu.tw

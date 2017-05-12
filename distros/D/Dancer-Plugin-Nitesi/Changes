@@ -1,0 +1,272 @@
+Revision history for Dancer::Plugin::Nitesi
+
+0.0099 Fri Nov 22 21:03:35 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Add Connection configuration setting for cart.
+
+    [BUG FIXES]
+
+    * Skip fallback route for flypage and navigation on /.
+
+    [TESTS]
+
+    * Add tests for DBI cart backend.
+
+0.0098 Sun Oct  6 13:19:46 2013 EDT
+
+    [ENHANCEMENTS]
+
+    * Move generic part of _api_object function to Nitesi::Provider::Object.
+    * Let cart route recognize parameter for cart name.
+    * Use proper navigation object in default routes.
+
+    [DOCUMENTATION]
+
+    * Add description of routes to Dancer::Plugin::Nitesi::Routes' POD.
+
+0.0097 Tue Sep 24 22:05:15 2013 CEST
+ 
+    [ENHANCEMENTS]
+
+    * Add before_navigation_display hook to Routes plugin.
+
+0.0096 Sat Sep 21 13:55:24 2013 CEST
+
+    [API CHANGES]
+
+    * Add support for anonymous DBI carts (session_id field in carts).
+
+0.0095 Thu Sep 19 10:27:16 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add before_product_display hook to Routes plugin.
+    * Add provider to log message in case of rejected card.
+
+    [DOCUMENTATION]
+
+    * Add list of hooks to the documentation of the Routes plugin.
+    * Add configuration example for AuthorizeNet payment provider.
+
+0.0094 Sun Aug 25 16:50:46 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add charge keyword to support card payments through
+      Business::OnlinePayment.
+
+0.0093 Wed Aug 21 11:34:36 2013 CEST 
+
+    [BUG FIXES]
+
+    * Use proper object for products loaded by uri in product route.
+    * Add price to the list of fields to retrieve from the database.
+    * Fix problem with fallback to navigation.
+
+    [ENHANCEMENTS]
+
+    * Add configuration option for product listing template.
+    * Add stub routes for checkout.
+    * Add code for adding single items and also display values to cart route.
+
+0.0092 Thu Jun 27 19:25:18 2013 CEST
+
+    [BUG FIXES]
+
+    * Fix spurious error with empty settings due to autovivification (Marco
+      Pessotto) 
+
+0.0091 Thu Jun 20 11:23:45 2013 CEST
+
+    [BUG FIXES]
+
+    * Fix condition on number of tests for DBI account provider.
+
+0.0090 Thu Jun 20 09:59:11 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Apply log_queries function to Nitesi objects as well.
+
+    [TESTING]
+
+    * Add support for testing of account keyword with DBI provider.
+
+    [DOCUMENTATION]
+
+    * Add section about views needed for a shop application.
+
+0.0080 Sun May 26 12:47:18 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add default routes for products, navigation and carts through
+      shop_setup_routes keyword.
+    * Save only modified carts in after hook.
+    * Pass attributes from plugin settings to API classes.
+    * Add debug feature to query keyword.
+    * Add Git repository to Makefile.PL.
+
+    [BUG FIXES]
+
+    * Execute POD tests only during release testing.
+
+    [DOCUMENTATION]
+
+    * Extend POD hooks section with missing validate hooks and subsections.
+      Fix missing underscore in after_cart_rename hook.
+
+0.0060 Mon Oct 29 08:10:31 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add new keywords shop_product, shop_navigation, shop_media,
+      shop_merchandising and shop_transaction.
+    * Use new Dancer keywords register_hook and execute_hook.
+
+    [BUG FIXES]
+
+    * Add support for other account providers than DBI.
+
+    [TESTS]
+
+    * Add tests for account keyword.
+    * Add tests for cart keyword.
+    * Remove -T commandline switch from load test to prevent test failures
+      in some environments.        
+
+    [DOCUMENTATION]
+
+    * Add description section to the main POD.
+    * Add create account example to the main POD.
+
+0.0051 Wed Jul 25 11:08:37 2012 CEST
+
+    [BUG FIXES]
+
+    * Exclude inactive products from DBI carts.
+
+0.0050 Wed Jul 11 14:37:01 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add before_cart_update and after_cart_update hooks.
+    * Force cart creation and cart selection by identifier.
+
+    [BUG FIXES]
+
+    * Fix a quirk retrieving a database handle.
+
+    * Load plugin settings from the functions defining the keywords
+      instead of using before hook. This fixes problems caused by
+      using Dancer::Plugin::Nitesi within a commandline script. 
+
+    * Disregard undefined identifiers for cart tokens.
+
+0.0032 Sun Nov 13 16:41:59 2011 CET
+
+    [BUG FIXES]
+
+    * Set PATH environment variable to fixed system directories to
+      avoid test breakage with Crypt::Password 0.06.
+
+    [ENHANCEMENTS]
+
+    * Pass inactive setting for accounts to manager object.
+
+    [DOCUMENTATION]
+
+    * Add "Accounts" section to main POD
+
+0.0031 Mon Nov  7 08:58:23 2011 CET
+
+    [BUG FIXES]
+
+    * Raise minimum version for Nitesi::DBI requisite
+
+    [ENHANCEMENTS]
+
+    * Add before_cart_clear and after_cart_clear hooks.
+    * Add before_cart_rename and after_cart_rename hooks.
+
+0.0030 Sat Oct 29 13:54:31 2011 CEST
+
+    [API CHANGES]
+
+    * Retract cart() syntax change which allowed addressing carts by id.
+
+    [BUG FIXES]
+
+    * Fix spurious bug in DBI backend caused by multiple invocations of cart hooks.
+    * Fix wrong hash key used in query for removing items from the cart.
+    * Fix messed up cart items caused by empty cart name.
+    * Fix cart name in cart subroutine.
+    * Replace deprecated Dancer keywords before and after with hooks.
+    * Fix Perl warning in cart subroutine.
+
+0.0020 Thu Oct 27 08:20:56 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Allow loading carts from different users (only DBI backend).
+    * Extend cart syntax to allow addressing carts by id.
+
+    [BUG FIXES]
+
+    * Let load method initialize id as zero if database record hasn't been created yet.
+    * Fix split in Dancer::Plugin::Nitesi's _config_to_array function.
+
+0.0012 Sun Oct 23 10:54:31 2011 CEST
+
+    [BUG FIXES]
+
+    * Add Dancer::Plugin::Database to dependencies.
+
+0.0011 Wed Oct 19 15:34:13 2011 CEST
+
+    [BUG FIXES]
+
+    * Add missing hooks before_cart_add_validate and
+      before_cart_remove_validate.
+    * Fix setup of account providers with empty value for extra fields.
+
+0.0010 Thu Oct 13 09:25:25 2011 EDT
+
+    [ENHANCEMENTS]
+
+    * Add query keyword to Dancer::Plugin::Nitesi.
+    * Add setting for extra fields to be stored into the session after
+      successful login. 
+    * Use connnection configuration parameter for DBI account
+      provider.
+
+    [BUG FIXES]
+
+    * Fix Perl warning due to undefined $function in _update_session function.
+
+0.0003 Sat Sep 24 19:53:59 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add DBI cart backend.
+    * Pass specific cart settings by cart name to backends.
+
+    [DOCUMENTATION]
+
+    * Add documentation about hooks installed by Dancer::Plugin::Nitesi.
+
+0.0002 Thu Sep 22 11:22:46 2011 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for multiple carts.
+
+    [DOCUMENTATION]
+
+    * Fix references to this package in the "BUGS" and "SUPPORT" POD sections.
+
+0.0001 Wed Sep 21 09:39:37 2011 CEST
+ 
+    * Initial release

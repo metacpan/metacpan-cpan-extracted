@@ -1,0 +1,13 @@
+INPATIENTS - JULY 26, 2001 - C O N F I D E N T I A L                                   PAGE    1
+SHRED WHEN NEW LIST IS RECEIVED!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
+ C. NO NAME                       HAIRCOLOR NUMBER
+ 
+456791  HERNANDEZ      HECTOR     BROWN     11
+458732  HERNAN         THOMSON    SILVER    23
+456792  VASQUEZ        ADALBERTO  BLACK      9
+906786  VASQUEZ        ALBERTO    BLOND     72 
+456787  VASQUEZ        JORGE      BLACK      8
+456789  VASQUEZ        JOAQUIN    RED       16
+456788  VASQUEZ        LEONARDO   BLACK      3
+456790  VAZQUEZ        TOMASINA   SILVER     7
+498703  WILSON         SYLVESTER  GRAY      99

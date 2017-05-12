@@ -1,0 +1,14 @@
+Build.PL
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+dist.ini
+lib/Dist/Zilla/PluginBundle/Author/WOLVERIAN.pm
+t/release-distmeta.t
+t/release-eol.t
+t/release-minimum-version.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

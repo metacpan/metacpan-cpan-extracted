@@ -1,0 +1,2 @@
+- able to limit user by jid, ie people cannot connect more than X times using the same account
+- send a meaningful error message to user ( may requires some patch on DJabberd side )

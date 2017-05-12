@@ -1,0 +1,7 @@
+Revision history for Perl extension DBIx::Dumper
+
+0.02 2013-08-13T13:15:59Z
+    - fix dependencies (test only)
+
+0.01 2013-08-08T12:27:50Z
+    - original version

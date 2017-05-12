@@ -1,0 +1,157 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Date::Transform - Efficiently transform dates.</title>
+<link rev="made" href="mailto:" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#methods">METHODS</a></li>
+	<li><a href="#supported_formats">SUPPORTED FORMATS</a></li>
+	<li><a href="#notes">NOTES</a></li>
+	<li><a href="#export">EXPORT</a></li>
+	<li><a href="#todo">TODO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<hr />
+<h1><a name="name">NAME</a></h1>
+<p>Date::Transform - Efficiently transform dates.</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use Date::Transform;
+  
+  $input_format         = '%x';        # e.g. 01/01/2001
+  $output_format        = '%b %d, %Y'; # e.g. January 1, 2001 
+  
+  $dt = new Date::Transform( 
+                $input_format,
+                $output_format
+  )</pre>
+<pre>
+  $input_1   = '04/15/2001';  
+  $input_2   = '10/31/2001';</pre>
+<pre>
+  $output_1  = $dt-&gt;transform($input_1); # Apr 15, 2001 
+  $output_2  = $dt-&gt;transform($input_2); # Oct 31, 2001</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>Sullivan Beck's <a href="/Date/Manip.html">Date::Manip</a> is an excellent module for performing 
+operations involving dates.  However, because of its extraordinary flexibility, 
+it is slow when much date parsing is needed.</p>
+<p>I found that more than 95% of my operations using dates required repeated 
+operations of going from YYYY-mm-dd to mm/dd/YYYY.  This occurs often
+when changing an array or column of dates from one format to another.  While 
+<a href="/Date/Manip.html">Date::Manip</a> <code>UnixDate</code> function can do this, its flexibility nature causes it to be slower than
+often needed.</p>
+<p>When the input format is specified beforehand, parsing of the input date becomes much
+easier and the speed of the transformation can be greatly enhanced.  <strong>Date::Transform</strong> 
+provides this by writing a custom algorithm maximized to the specific operation.  
+While a considerable initialization is required to creation the transformation code,
+the resultant transformation are typically 300-500% faster than <code>UnixDate</code>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="methods">METHODS</a></h1>
+<dl>
+<dt><strong><a name="item_new">new( $input_format, $output_format )</a></strong><br />
+</dt>
+<dd>
+Creates a new <strong>Date::Manip::Transform</strong> object and initializes the <a href="#item_transform"><code>transform</code></a> function.
+</dd>
+<dd>
+<p><code>$input_format</code> is treated as a regular expression for matching. Thus,</p>
+</dd>
+<dd>
+<p>new('%b %d, %Y', '%Y-%m-%d') matches and transforms:
+</p>
+</dd>
+<dd>
+<pre>
+
+'I came to California on Oct 15, 1992' ==&gt; 'I came to California on 1992-10-15.</pre>
+</dd>
+<dd>
+<p>See <a href="#supported_formats">SUPPORTED FORMATS</a> for details on the supported format types.</p>
+</dd>
+<dd>
+<p>All formats must be proceeded by <code>%</code>.</p>
+</dd>
+<p></p>
+<dt><strong><a name="item_transform">transform( $date )</a></strong><br />
+</dt>
+<dd>
+Transforms supplied <code>$date</code> value in the $input_format to the <code>$output_format</code> as 
+specified when the Date::Transform object was created.
+</dd>
+<p></p></dl>
+<p>
+</p>
+<hr />
+<h1><a name="supported_formats">SUPPORTED FORMATS</a></h1>
+<pre>
+ %[A a B b c d H I J M m p S U w W x X Y Z]</pre>
+<p>Please see <a href="/Date/Manip.html#unixdate">UnixDate in the Date::Manip manpage</a> or <em>Posix</em>.</p>
+<p>
+</p>
+<hr />
+<h1><a name="notes">NOTES</a></h1>
+<p>I would be happy to have this incorporated directly into Sullivan Beck's Date::Manip module.</p>
+<p>
+</p>
+<hr />
+<h1><a name="export">EXPORT</a></h1>
+<p>None by default.</p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TODO</a></h1>
+<pre>
+  + Speed transformation where a rearrangement of numbers is the only thing necessary
+  + Implement a default using user parameters or localtime()
+  + Multiple language support.
+  + Incoporate %l format.
+  + Allow specification of whether the date is to be replaced or simple extracted and transformed.
+  + Specify Date Constants</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Christopher Brown, <em><a href="mailto:chris.brown@cal.berkeley.edu">chris.brown@cal.berkeley.edu</a></em></p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2003 Christopher T. Brown.</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><em>perl</em>, 
+<a href="/Date/Manip.html">the Date::Manip manpage</a>, 
+<em>Switch</em>, 
+<em>Posix</em></p>
+
+</body>
+
+</html>

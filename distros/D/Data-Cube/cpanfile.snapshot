@@ -1,0 +1,12 @@
+# carton snapshot format: version 1.0
+DISTRIBUTIONS
+  Data-Nest-0.03
+    pathname: M/MU/MUDDYDIXN/Data-Nest-0.03.tar.gz
+    provides:
+      Data::Nest 0.03
+    requirements:
+      CPAN::Meta 0
+      CPAN::Meta::Prereqs 0
+      ExtUtils::CBuilder 0
+      Module::Build 0.38
+      perl 5.008005

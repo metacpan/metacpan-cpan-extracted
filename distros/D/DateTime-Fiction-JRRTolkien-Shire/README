@@ -1,0 +1,28 @@
+DateTime-Fiction-JRRTolkien-Shire is Copyright (C) 2003 by Tom Braun,
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This is a DateTime implementation of the Shire Calendar as described in
+The Lord of the Rings by J. R. R. Tolkien. It is a follow-on to the
+Date::Tolkien::Shire module.
+
+The Shire Calendar is a rationalized calendar consisting of 12 months of
+30 days each, plus 5 holidays (6 in leap years) that are not part of any
+month. One of the holidays (two in leap years) are also not part of any
+week. This causes every year to start on the same day of the week.
+
+INSTALLATION
+
+This pure-Perl module is installable using any of the usual
+incantations.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. For more details, see the full text
+of the licenses in the LICENSES directory.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

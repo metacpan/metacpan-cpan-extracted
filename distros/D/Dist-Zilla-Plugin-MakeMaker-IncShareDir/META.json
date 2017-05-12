@@ -1,0 +1,64 @@
+{
+   "abstract" : "MakeMaker subclass that bundles File::ShareDir::Install in inc/",
+   "author" : [
+      "Tatsuhiko Miyagawa <miyagawa@bulknews.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Milla version v1.0.2, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-MakeMaker-IncShareDir",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.025"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::ModuleIncluder" : "0",
+            "File::ShareDir::Install" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir/issues"
+      },
+      "homepage" : "https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir.git",
+         "web" : "https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir"
+      }
+   },
+   "version" : "0.01"
+}
+

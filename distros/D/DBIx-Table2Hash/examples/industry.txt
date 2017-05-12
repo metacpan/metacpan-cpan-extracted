@@ -1,0 +1,17 @@
+A	Agriculture, Forestry and Fishing 
+B	Mining  
+C	Manufacturing  
+D	Electricity, Gas and Water Supply  
+E	Construction  
+F	Wholesale Trade  
+G	Retail Trade  
+H	Accommodation, Cafes and Restaurants  
+I	Transport and Storage  
+J	Communication Services  
+K	Finance and Insurance  
+L	Property and Business Services  
+M	Government Administration and Defence  
+N	Education  
+O	Health and Community Services  
+P	Cultural and Recreational Services  
+Q	Personal and Other Services  

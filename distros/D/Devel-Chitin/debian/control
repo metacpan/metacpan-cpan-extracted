@@ -1,0 +1,14 @@
+Source: libdevel-chitin-perl
+Section: perl
+Priority: optional
+Build-Depends: debhelper (>= 7)
+Build-Depends-Indep: perl, libpadwalker-perl
+Maintainer: Anthony Brummett <brummett@cpan.org>
+Homepage: http://search.cpan.org/dist/Devel-Chitin/
+Vcs-Git: git://github.com/amb43790/Devel-Chitin.git
+
+Package: libdevel-chitin-perl
+Architecture: all
+Depends: perl, libpadwalker-perl
+Description: Programmatic interface to the Perl debugging API
+

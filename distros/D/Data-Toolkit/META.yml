@@ -1,0 +1,28 @@
+---
+abstract: 'Toolkit for manipulating attribute-value data. Useful in directory synchronisation systems and other data‐pump applications.'
+author:
+  - 'Andrew Findlay <andrew.findlay@skills-1st.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Toolkit
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Clone: 0
+  DBD::SQLite: 0
+  Data::Dumper: 0
+  Data::MultiValuedHash: 0
+  Net::LDAP::Entry: 0
+  Text::CSV_XS: 0
+version: 1.1

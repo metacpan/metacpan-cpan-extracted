@@ -1,0 +1,7 @@
+password: TESTPASS
+master:
+    name: myaddress.io
+    ip: 127.0.0.1
+replica:
+  name: localhost
+  ip: 127.0.0.1

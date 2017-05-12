@@ -1,0 +1,32 @@
+---
+abstract: 'Compress CSS files'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Test::DZil: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CSS-Compressor
+no_index:
+  directory:
+    - corpus
+requires:
+  CSS::Compressor: 0
+  Dist::Zilla::File::FromCode: 0
+  Dist::Zilla::Role::FileGatherer: 0
+  Dist::Zilla::Role::FileInjector: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/plicease/dist-zilla-plugin-css-compressor/issues
+  homepage: http://perl.wdlabs.com/Dist-Zilla-Plugin-CSS-Compressor/
+  repository: git://github.com/plicease/dist-zilla-plugin-css-compressor.git
+version: 0.02

@@ -1,0 +1,14 @@
+Revision history for Perl extension Validator.
+
+0.01  Sat Oct 19 23:55:51 2002
+	- original version; created by h2xs 1.21 with options
+		-Ac -n Validator
+
+0.5   Mon Oct 28 18:00:00 2002
+	- First released version TO-DO re-write put() and validate() using eval()
+
+0.7   Mon Dec 29 20:12:00 2002
+	- Happy New Year release - various bugs fixed error() and match() now work
+
+0.75	Wed Jan 1 22:00 2003
+	- Minor typos fixed - notably the package name sorry!

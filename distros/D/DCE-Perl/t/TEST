@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl
+
+# First we check if we already are within the "t" directory
+unless (-d "rgy") {
+    # try to move into test directory
+    chdir "t" or die "Can't chdir: $!";
+
+    # fix all relative library locations
+    foreach (@INC) {
+	$_ = "../$_" unless m,^/,;
+    }
+}
+# Pick up the library files from the ../blib directory
+unshift(@INC, "../blib/lib", "../blib/arch");
+#print "@INC\n";
+
+#use ExtUtils::testlib;
+use Test::Harness;
+$Test::Harness::verbose = $ENV{DCE_PERL_TRACE} = shift
+  if $ARGV[0] =~ /^\d+$/ || $ARGV[0] eq "-v";
+
+#$Test::Harness::switches .= " -MDCE::test";
+
+
+if (@ARGV) {
+    for (@ARGV) {
+	if (-d $_) {
+	    push(@tests, <$_/*.t>);
+	} else {
+            $_ .= ".t" unless /\.t$/;
+	    push(@tests, $_);
+	}
+    }
+} else {
+    @tests = (<rgy/*.t>, <login/*.t>, <acl/*.t>, <uuid/*.t>, <status/*.t>);
+}
+#print STDERR "running tests: \n", join $/,@tests,"";
+
+runtests @tests;
+
+
+
+
+
+
+

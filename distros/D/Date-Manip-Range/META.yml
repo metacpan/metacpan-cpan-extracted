@@ -1,0 +1,32 @@
+---
+abstract: 'Parses and holds a date range'
+author:
+  - 'Robert Wohlfarth <rbwohlfarth@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.42'
+  Test::Pod: '1.51'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install::AutoManifest: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Manip-Range
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Date::Manip: 0
+  Moose: 0
+  String::Util: 0
+  perl: 5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/rbwohlfarth/Date-Manip-Range
+version: '1.21'

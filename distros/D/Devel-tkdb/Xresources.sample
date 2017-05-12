@@ -1,0 +1,43 @@
+/* Sample .Xresources for ptkdb */
+ /*
+  * Perl Tk Debugger XResources.  
+  * Note... These resources are subject to change.  
+  *
+  * Use 'xfontsel' to select different fonts.
+  *
+  * Append these resource to ~/.Xdefaults | ~/.Xresources
+  * and use xrdb -override ~/.Xdefaults | ~/.Xresources
+  * to activate them.  
+  */
+
+ptkdb.frame*font: fixed                           /* Menu Bar */
+ptkdb.frame2.frame1.rotext.font: fixed            /* Code Pane */
+             
+ptkdb.toplevel.frame.textundo.font: fixed         /* Eval Expression Entry Window */
+ptkdb.toplevel.frame1.text.font: fixed            /* Eval Expression Results Window */
+ptkdb.toplevel.button.font:  fixed                /* "Eval..." Button */
+ptkdb.toplevel.button1.font: fixed                /* "Clear Eval" Button */
+ptkdb.toplevel.button2.font: fixed                /* "Clear Results" Button */
+ptkdb.toplevel.button3.font: fixed                /* "Clear Dismiss" Button */
+
+
+/*
+ * Background color for where the debugger has stopped 
+ */  
+ptkdb*stopcolor: blue
+
+/*
+ * Background color for set breakpoints  
+ */
+ptkdb*breaktagcolor: red
+
+/*
+ * Font for where the debugger has stopped
+ */
+ptkdb*stopfont: -*-fixed-bold-*-*-*-*-*-*-*-*-*-*-*
+
+/*
+ * Background color for the search tag
+ */  
+ptkdb*searchtagcolor: green
+

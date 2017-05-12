@@ -1,0 +1,19 @@
+Build.PL
+Changes
+ignore.txt
+lib/DBIx/Class/Result/Validation.pm
+lib/DBIx/Class/Result/Validation/VException.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-validate.t
+t/02-insert_and_update.t
+t/app/Main.pm
+t/app/Main/Result/Object.pm
+t/boilerplate.t
+t/lib/Utils.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

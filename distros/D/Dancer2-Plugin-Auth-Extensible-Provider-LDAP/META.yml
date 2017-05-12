@@ -1,0 +1,36 @@
+---
+abstract: 'LDAP authentication provider for Dancer2::Plugin::Auth::Extensible'
+author:
+  - 'Peter Mottram <peter@sysnix.com>'
+build_requires:
+  Test::More: '0'
+  Test::Net::LDAP: '0.07'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-Extensible-Provider-LDAP
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin::Auth::Extensible: '0.620'
+  Moo: '2.000000'
+  Net::LDAP: '0'
+  YAML: '0'
+  namespace::clean: '0'
+  perl: '5.006000'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  bugtracker: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/issues
+  homepage: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP/
+  repository: https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-LDAP
+version: '0.702'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

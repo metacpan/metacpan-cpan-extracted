@@ -1,0 +1,42 @@
+---
+abstract: 'Generate a reductionist YAML META file for compatibility only'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MetaYAML-Minimal
+provides:
+  Dist::Zilla::Plugin::MetaYAML::Minimal:
+    file: lib/Dist/Zilla/Plugin/MetaYAML/Minimal.pm
+    version: '0.001001'
+recommends:
+  Moose: '2.000'
+requires:
+  CPAN::Meta::Converter: '2.101550'
+  CPAN::Meta::Validator: '2.101550'
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Util::ConfigDumper: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  YAML::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-MetaYAML-Minimal/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-MetaYAML-Minimal
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-MetaYAML-Minimal.git
+version: '0.001001'

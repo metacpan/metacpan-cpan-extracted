@@ -1,0 +1,40 @@
+Revision history for Dist-Zilla-PluginBundle-HARTZELL
+
+0.008     2013-01-30 15:01:13 America/Los_Angeles
+
+  * add a POD section for Roles Consumed to the @HARTZELL weaver
+    bundle.
+
+0.007     2013-01-24 15:50:47 America/Los_Angeles
+
+  * add Pod::Weaver::PluginBundle::HARTZELL
+
+0.006     2013-01-10 16:13:56 America/Los_Angeles
+
+  * compose both the Easy and Config::Slicer roles in
+    a single with statement, better Best Practice.
+
+0.005     2012-12-18 14:11:22 America/Los_Angeles
+
+  * make some prereq recommendations for testing phase
+  * touch up abstract
+
+0.004     2012-12-18 10:31:53 America/Los_Angeles
+
+  * make a real cpan release (removed fake_release from dist.ini)
+
+0.003     2012-12-18 10:16:29 America/Los_Angeles
+
+  * no changes, screwed up the last github commit
+
+0.002     2012-12-18 10:14:59 America/Los_Angeles
+
+  * list dependencies in dist.ini, don't 'use' them in
+    the bundle.
+
+  * set up stopwords so that the spelling test passes
+
+0.001     2012-12-16 17:33:00 America/Los_Angeles
+
+  * Initial release, basically a fork of DAGOLDEN's bundle with some of
+    my personal preferences asserted.

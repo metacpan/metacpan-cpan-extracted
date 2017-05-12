@@ -1,0 +1,78 @@
+{
+   "abstract" : "Encode/Decode Values In A Structure",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.2.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Recursive-Encode",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "JSON" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Recursive::Encode" : {
+         "file" : "lib/Data/Recursive/Encode.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/p5-data-recursive-encode/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/p5-data-recursive-encode",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/p5-data-recursive-encode.git",
+         "web" : "https://github.com/tokuhirom/p5-data-recursive-encode"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "gfx <gfuji@cpan.org>",
+      "Hiroki Honda <cside.story@gmail.com>",
+      "Hiroyoshi Houchi <git@hixi-hyi.com>",
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ]
+}

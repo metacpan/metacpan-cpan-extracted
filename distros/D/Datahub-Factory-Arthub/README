@@ -1,0 +1,36 @@
+NAME
+
+    Datahub::Factory::Arthub - modules for the VKC Arthub
+
+DESCRIPTION
+
+    This modules contains packages that the VKC Arthub uses to extract data
+    from project-specific sources.
+
+    It contains the following packages:
+
+    Datahub::Factory::Importer::KMSKA
+
+    Datahub::Factory::Importer::MSK
+
+    Datahub::Factory::Module::PID
+
+    Datahub::Factory::Importer::VKC
+
+AUTHOR
+
+    Pieter De Praetere <pieter at packed.be >
+
+COPYRIGHT
+
+    Copyright 2017- PACKED vzw
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Datahub::Factory Catmandu
+

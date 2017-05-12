@@ -1,0 +1,6 @@
+
+{% extends "_missing_parent.txt" %}
+
+blahblah
+
+{% block main_text %}Child main text{% endblock %}

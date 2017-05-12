@@ -1,0 +1,68 @@
+Revision history for DateTime-Format-Human-Duration
+
+0.64   Thu Jul 21 13:55:00 CDT 2016
+       * Updated to reflect recommendation in comment on pull #7
+
+0.63   Thu Jul 21 13:47:16 CDT 2016
+       * Added compatibility with newer DateTime::Locale versions,
+         for RT #108601
+         via https://github.com/mstratman/DateTime-Format-Human-Duration/pull/7
+
+0.62   Thu Feb  5 03:45:30 CST 2015
+       * Added 'ko' localization (Keedi Kim <keedi@cpan.org>)
+         https://github.com/mstratman/DateTime-Format-Human-Duration/pull/4
+       * Added 'ja' localization (Tomohiro Hosaka <bokutin@bokut.in>)
+         https://github.com/mstratman/DateTime-Format-Human-Duration/pull/3
+
+0.61   Tue Jan 15 12:51:07 CST 2013
+       * Added 'significant_units' parameter (Tom Hukins).
+         https://github.com/mstratman/DateTime-Format-Human-Duration/pull/2
+
+0.60   Tue Jul 31 13:42:37 CDT 2012
+       * Added 'units' and 'precision' arguments (Stephan <au@hcsd.de>)
+         https://rt.cpan.org/Ticket/Display.html?id=76497
+       * Deprecated get_human_span_from_units_array()
+       * Added get_human_span_from_units(), which should provide an
+         alternative to get_human_span_from_units_array(), allowing you
+         to determine whether the duration is positive or negative.
+         https://rt.cpan.org/Ticket/Display.html?id=74923
+         It also works correctly with 'units' and 'precision' whereas
+         get_human_span_from_units_array() would not.
+
+0.52   Mon Jul 30 15:20:21 CDT 2012
+       * Skip one of the 01.methods.t tests until we can figure
+         out a way to properly test it.
+
+0.51   Thu Jul  5 08:35:45 CDT 2012
+       * Moved author tests to xt to avoid failed installations.
+
+0.50   Tue Jul  3 14:22:49 CDT 2012
+       * Added 'it' localization (Aldo Calpini <dada@perl.it>)
+         https://rt.cpan.org/Ticket/Display.html?id=76503
+
+0.40   Wed Apr 11 21:46:08 CDT 2012
+       * Simplified version number scheme to ordinary decimal.
+       * Minor POD changes
+       * Fixed 02.array.t (hopefully) to actually use nb.pm and to 
+         pass when DateTime is not installed.
+
+0.0.3  Tue Apr 10 20:37:18 CDT 2012
+       * Updated manifest - 0.0.2 was missing some needed files. Big whoops!
+
+0.0.2  Tue Apr 10 20:08:34 2012
+       * Put the project on github so others can more easily add new locales
+         or fix issues:
+         https://github.com/mstratman/DateTime-Format-Human-Duration
+       * Added .de locale (stefanos@cpan.org)
+         https://rt.cpan.org/Ticket/Display.html?id=66248
+       * Fix for bad second counting in test (david.storrs@gmail.com)
+         https://rt.cpan.org/Ticket/Display.html?id=66973
+       * Workaround applied to tests for counting issue:
+         https://rt.cpan.org/Ticket/Display.html?id=52920
+         https://rt.cpan.org/Ticket/Display.html?id=71260
+       * Added failing TODO test for outstanding issue:
+         https://rt.cpan.org/Ticket/Display.html?id=74923
+
+0.0.1  Sun Mar 16 10:54:08 2008
+       * Initial release.
+

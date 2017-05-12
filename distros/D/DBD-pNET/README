@@ -1,0 +1,67 @@
+NAME
+    DBD::pNET - Perl network database driver for the DBI module
+
+    pNETagent - DBI proxy server
+
+SYNOPSIS
+    use DBI;
+    $dbh = DBI->connect("dbi:pNET:hostname=$host:port=$port:dsn=$db",
+                        $user, $passwd);
+    # See the DBI module documentation for full details
+
+    pNETagent --port <port> [other options]
+
+DESCRIPTION
+    DBD::pNET is a Perl module for connecting to a database via a remote DBI
+    driver. This is of course not needed for DBI drivers which already
+    support connecting to a remote database, but there are DBI drivers which
+    work with local databases only, for example DBD::ODBC.
+
+    pNETagent is the DBI proxy server usually running on the same machine
+    than the DBMS. It may run on other machines, if the DBMS itself supports
+    access over the network. This can be useful in a firewalled environment.
+
+    pNETagent supports security features like host and user based
+    authorization, encryption and query restrictions: You can create a
+    set of queries that the client may execute and restrict access to
+    these. Again, this is of special importance in a firewalled
+    environment.
+
+REQUIREMENTS
+    DBD::pNET is based on the pRPC-modules (Perl RPC) a package for aiding
+    the development of Perl based client/server applications. You find the
+    this module on any CPAN mirror, for example
+
+	ftp://ftp.funet.fi/pub/languages/perl/CPAN/authors/id/JWIED
+
+    pRPC is in turn is based on the "Storable" module. This is available
+    from CPAN too, see
+
+	ftp://ftp.funet.fi/pub/languages/perl/CPAN/authors/id/RAP
+
+SEE ALSO
+    the DBD::pNET(3) manpage, the pNETagent(1) manpage, the DBI(3) manpage,
+    the RPC::pClient(3) manpage, the IO::Serialize(3) manpage
+
+AUTHOR
+    Jochen Wiedmann
+    Am Eisteich 9
+    72555 Metzingen
+    Germany
+
+    Email: wiedmann@neckar-alb.de
+    Phone: +49 7123 14881
+
+COPYRIGHT
+    The DBD::pNET module is Copyright (c) 1997 Jochen Wiedmann. Parts of the
+    sources are based on the DBD::Oracle module. The DBD::Oracle module is
+    Copyright (c) 1995,1996,1997 Tim Bunce. England.
+
+    The DBD::pNET module is free software; you can redistribute it and/or
+    modify it under the same terms as Perl itself, with the exception that
+    it cannot be placed on a CD-ROM or similar media for commercial
+    distribution without the prior approval of the author.
+
+ACKNOWLEDGEMENTS
+    See also the "ACKNOWLEDGEMENTS" entry in the DBI manpage.
+

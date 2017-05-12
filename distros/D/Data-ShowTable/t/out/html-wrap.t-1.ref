@@ -1,0 +1,27 @@
+*** STDOUT ***
+<TABLE BORDER=2 CELLPADDING=1 CELLSPACING=1>
+<TR>
+ <TH ALIGN=CENTER WIDTH=13%>Name</TH>
+ <TH ALIGN=CENTER WIDTH=86%>Biography</TH>
+</TR>
+<TR> 
+<TD ALIGN=LEFT>Alan</TD>
+<TD ALIGN=LEFT>This is a very long line of text which simulates a text string which is supposed to wrap in its field width.</TD>
+</TR>
+<TR> 
+<TD ALIGN=LEFT>Kevin</TD>
+<TD ALIGN=LEFT>This is another long line of text which will also wrap so I can see if this part of ShowTable really works as designed.  If not it's back to the drawing board.</TD>
+</TR>
+<TR> 
+<TD ALIGN=LEFT>Toad</TD>
+<TD ALIGN=LEFT>This is a short line</TD>
+</TR>
+<TR> 
+<TD ALIGN=LEFT>Monica</TD>
+<TD ALIGN=LEFT>This is another short line</TD>
+</TR>
+<TR> 
+<TD ALIGN=LEFT>Stu</TD>
+<TD ALIGN=LEFT>Finally, here is another long line which shold wrap but maybe not</TD>
+</TR>
+</TABLE>

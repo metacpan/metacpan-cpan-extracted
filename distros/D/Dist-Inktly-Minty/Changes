@@ -1,0 +1,15 @@
+Dist-Inktly-Minty
+=================
+
+Created:      2013-08-09
+Home page:    <https://metacpan.org/release/Dist-Inktly-Minty>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inktly-Minty>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.002	2013-08-13
+
+ - (Bugfix) The `--version` option should accept a string; it is not a
+   boolean.
+
+0.001	2013-08-09	Initial release
+

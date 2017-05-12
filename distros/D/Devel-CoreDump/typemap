@@ -1,0 +1,8 @@
+TYPEMAP
+
+fd_t  T_IO_HANDLE
+
+OUTPUT
+
+T_IO_HANDLE
+	${arg} = handle_from_fd(${var});

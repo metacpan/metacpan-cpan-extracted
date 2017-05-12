@@ -1,0 +1,15 @@
+Changes
+dists/Disque-0.01.tar.gz
+dists/Disque-0.02.tar.gz
+dists/Disque-0.03.tar.gz
+examples/addjob_and_show.pl
+examples/consumer.pl
+examples/producer.pl
+lib/Disque.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.md
+t/.gitkeep
+META.json                                Module JSON meta-data (added by MakeMaker)

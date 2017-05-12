@@ -1,0 +1,33 @@
+Revision history for Perl extension Data-NestedParams
+
+0.07 2014-07-27T23:09:34Z
+
+    - Allow numeric characters in hash key.
+      (tokuhirom)
+
+0.06 2014-03-26T11:18:51Z
+
+    - Allow _ and - in hash key.
+      (tokuhirom)
+
+0.05 2014-03-21T03:03:24Z
+
+    - Added collapse_nested_query
+
+0.04 2014-03-20T01:24:45Z
+
+    - More rack compatiblity.
+    - Documentation.
+
+0.03 2014-03-13T07:49:03Z
+
+    - s/convert_nested_query/expand_nested_params/g
+
+0.02 2014-03-13T07:43:20Z
+
+    - Rename to NestedParams.
+
+0.01 2014-03-13T07:29:00Z
+
+    - original version
+

@@ -1,0 +1,86 @@
+{
+   "abstract" : "Redis backend for Dancer Session Engine",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Session-Redis",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.26",
+            "Dancer" : "1.3072",
+            "Redis" : "1.955",
+            "Storable" : "2.27",
+            "parent" : "0",
+            "perl" : "5.008009",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Pod" : "1.22"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Session::Redis" : {
+         "file" : "lib/Dancer/Session/Redis.pm",
+         "version" : "0.22"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Dancer-Session-Redis/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dancer-Session-Redis",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/Wu-Wu/Dancer-Session-Redis.git",
+         "web" : "https://github.com/Wu-Wu/Dancer-Session-Redis"
+      }
+   },
+   "version" : "0.22",
+   "x_authority" : "cpan:CHIM"
+}
+

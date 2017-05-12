@@ -1,0 +1,12 @@
+FILE DESCRIPTONS
+
+../testdata/encantadas.txt: The Encantadas, by Herman Melville.  From http://www.melville.org/.
+
+load_sample.pl: Breaks the above file into separate paragraphs, and loads each paragraph as a row in the database 'test', tablename 'textindex_doc'.  Run this first.
+
+index.pl: Creates an index called 'encantadas' on the textindex_doc table.
+
+search.pl: A simple search application.
+
+search.cgi: A sample CGI search application.
+

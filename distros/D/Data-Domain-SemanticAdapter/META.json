@@ -1,0 +1,51 @@
+{
+   "resources" : {
+      "homepage" : "http://search.cpan.org/dist/Data-Domain-SemanticAdapter/",
+      "repository" : "http://github.com/hanekomu/Data-Domain-SemanticAdapter",
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Domain-SemanticAdapter"
+   },
+   "generated_by" : "Dist::Zilla version 1.100711",
+   "meta-spec" : {
+      "version" : 1.4,
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html"
+   },
+   "version" : "1.100840",
+   "name" : "Data-Domain-SemanticAdapter",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "license" : "perl",
+   "build_requires" : {},
+   "provides" : {
+      "Data::Domain::SemanticAdapter" : {
+         "version" : "1.100840",
+         "file" : "lib/Data/Domain/SemanticAdapter.pm"
+      },
+      "Data::Domain::SemanticAdapter::Test" : {
+         "version" : "1.100840",
+         "file" : "lib/Data/Domain/SemanticAdapter/Test.pm"
+      }
+   },
+   "requires" : {
+      "Class::Accessor::Complex" : "0",
+      "Scalar::Util" : "0",
+      "parent" : "0",
+      "English" : "0",
+      "Data::Semantic::Test" : "0",
+      "constant" : "0",
+      "Data::Domain" : "0",
+      "Hash::Rename" : "0",
+      "Carp" : "0",
+      "perl" : "5.008",
+      "Test::More" : "0.88",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Data::Inherited" : "0",
+      "UNIVERSAL::require" : "0"
+   },
+   "abstract" : "Adapter for Data::Semantic objects",
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.11"
+   }
+}
+

@@ -1,0 +1,25 @@
+---
+abstract: 'More reliable benchmarking with the least amount of thinking'
+author:
+  - 'Steffen Mueller <smueller@cpan.org>'
+build_requires: {}
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dumbbench
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+    - inc
+    - simulator
+    - xt
+resources:
+  bugtracker: https://github.com/briandfoy/dumbbench/issues
+  homepage: https://github.com/briandfoy/dumbbench
+  repository: https://github.com/briandfoy/dumbbench.git
+version: '0.10'

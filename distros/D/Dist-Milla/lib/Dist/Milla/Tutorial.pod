@@ -1,0 +1,279 @@
+=head1 NAME
+
+Dist::Milla::Tutorial - Milla HOW TO
+
+=head1 WORKFLOW
+
+See also L<the
+screencast|http://weblog.bulknews.net/post/46471116934/introducing-milla>
+explaining how to setup and create a new distribution with Milla.
+
+=head2 Setup
+
+Install Milla and setup your profile.
+
+  > cpanm Dist::Milla
+  > milla setup
+
+Setup command will ask you a simple question to make a basic
+profile. If you already have set up C<dzil> before, this is common and
+you can skip the process.
+
+=head2 Making a new distribution
+
+Now it's time to make a new distribution.
+
+  > milla new Dist-Name
+  > cd Dist-Name
+
+At this point, you will have a really simple C<Dist-Name> directory
+that contains your module file with as minimum boilerplate as
+possible.
+
+It is recommended to track your repository under git as soon as
+possible, even before releasing to CPAN.
+
+  # git is already initialized and files are added for you
+  > git commit -m "initial commit"
+
+Now start writing your code, edit the docs, tests and manage CPAN
+dependencies with L<cpanfile>.
+
+  > $EDITOR lib/Dist/Name.pm t/dist-name.t cpanfile
+
+You can test your code with a simple C<prove -l t>.
+
+For the first time build only, you can make a test build to get some
+boilerplate you want to keep in the git repository so that your github
+repository looks great with README, as well as installable from git
+using C<cpanm> or testable with C<Travis CI>.
+
+  > milla build
+  > git add Build.PL META.json README.md && git commit -m "git stuff"
+
+=head2 Making the first release
+
+When you get confident and it's about time to ship to CPAN, use the
+test and release command. Before doing so, make sure your git
+directory is not dirty i.e. all changes are committed.
+
+  > git commit -a -m "Done initial version"
+
+Milla assumes you have a git remote setup so that you can push all
+your changes to. I recommend you to use either
+L<hub gem|https://rubygems.org/gems/hub> or L<App::ph> to create a new
+github repository.
+
+  # Use hub rubygem
+  > hub create
+
+  # Use App::ph
+  > ph import
+
+Now, make sure you have C<Changes> file ready and have a new entry
+under C<{{$NEXT}}>, which will be expanded to the next version of your
+module.
+
+  > $EDITOR Changes
+  > milla test
+  > milla release
+
+And your first release is done. The release is tagged on git and all
+the changes atomatically made are committed to git as well.
+
+If this is your first conversion to Milla and want to make sure you're
+not going to mess CPAN with a bad archive when something goes wrong,
+you can run the release command with C<FAKE_RELEASE> environment
+variable. This will run all the other release process, except the
+UploadToCPAN step.
+
+  > FAKE_RELEASE=1 milla release
+
+Wait for PAUSE processing it and your module showing up on MetaCPAN in
+a few minutes. Congratulations!
+
+=head2 Making a maintainance release
+
+You have new features, bugs, pull requests and get ready to make a next
+version of your module. Great, making a new release is equally easy.
+
+First, make sure all your code has been committed to git and there are
+no dirty files in the working directory.
+
+Then make sure to edit C<Changes> file and contain entries for the
+next release under C<{{$NEXT}}>. You don't need to commit the change
+to the C<Changes> file, yet.
+
+Now, make a release!
+
+  > milla test
+  > milla release
+
+The release command will automatically bump the version for you - if
+you have C<0.10>, the next version will be C<0.11> by default, but you
+will be prompted to confirm that version in case you need a major
+bump.
+
+This will update C<Changes>, C<META.json> and bump C<$VERSION> in your
+main module. These changes made by Milla will be automatically
+committed, tagged and pushed to the remote.
+
+=head1 MIGRATING
+
+This section describes how to migrate your current authoring process
+to Milla.
+
+=head2 Automatic migration
+
+Sister project L<Minilla> provides a wonderful conversion tool to
+migrate your existing distribution to Milla, which happens to be
+compatible to Milla as well.
+
+As an author of Milla, I use Minilla's migrate command all the time to
+get the most of conversion done.
+
+To run Minilla migration tool, install L<Minilla> from CPAN and run
+the C<minil migrate> command in the project root.
+
+    > cpanm Minilla
+    > minil migrate && git rm -f minil.toml
+
+The command will output the migration process, and C<git add> all the
+changed files for you. Once the migrate command is complete, all you
+have to do is to create C<dist.ini> file, and run the build command.
+
+    > echo "[@Milla]" > dist.ini
+    > milla build
+
+If one of the command has failed, you might need to reset to the
+original state and run the manual migration. Read on to see how to do
+that.
+
+=head2 Manually migrating from other build tools
+
+=head3 Module Dependencies to cpanfile
+
+First, move the prereq declaration from C<Makefile.PL> or C<Build.PL>
+to C<cpanfile>.
+
+The easiest way to convert existing dependencies to cpanfile is to use
+the command line tool C<mymeta-cpanfile>, which is installed with
+L<Module::CPANfile>. Run the configuration with C<Makefile.PL> for the
+one last time, then run the C<mymeta-cpanfile> command:
+
+  > perl Makefile.PL
+  > mymeta-cpanfile --no-configure
+  requires 'DBI', '1.000';
+  
+  on test => sub {
+      requires 'Test::More', '0.86';
+  }
+  
+  ...
+
+You can redirect the output to C<cpanfile> if you like. It is
+important to pass C<--no-configure> option here, since otherwise
+modules like ExtUtils::MakeMaker will be included. It is not required
+with Milla setup, since Milla knows which configuration tool
+(installer) to use and include them in META files upon the
+releases. You can leave that out from the C<cpanfile>.
+
+If you decide to manually construct a new cpanfile, the format is mostly
+compatible to L<Module::Install>'s requirement DSL.
+
+  # Makefile.PL
+  test_requires 'Test::More', 0.90;
+  requires 'Plack', '1.000';
+
+becomes:
+
+  # cpanfile
+  test_requires 'Test::More', 0.90;
+  requires 'Plack', '1.000';
+
+which is exactly the same. If you use L<Module::Build> or
+L<ExtUtils::MakeMaker>, that will be more manual process, but
+basically the same thing. See L<cpanfile> for the available syntax.
+
+=head3 Remove boilerplate 
+
+Next, remove unnecessary boilerplate files.
+
+  > git rm {Makefile,Build}.PL MANIFEST MANIFEST.SKIP README .shipit
+
+=head3 Create a new ini and edit configurations
+
+Next, create a new C<dist.ini> with the following two lines:
+
+  name = Dist-Name
+  [@Milla]
+
+the C<name = > line is optional.
+
+If your work directory is named C<Dist-Name>, Milla will be able to
+figure out that is your distribution name, so you can omit that line.
+
+Next, Edit C<.gitignore> and add the following lines:
+
+  /Dist-Name-*
+  /.build
+  !META.json
+
+You're almost done, and your directory will look like:
+
+  cpanfile
+  dist.ini
+  lib/Dist/Name.pm
+  t/...
+
+C<git add> the newly created files and commit it.
+
+=head3 Make a new build
+
+Now you're ready to make the first build.
+
+  > milla build
+
+and if it was successful, you get a build in a directory called
+C<Dist-Name-v0.1.0> under your current directory. They can be later
+removed with C<milla clean> command.
+
+Also, new C<Build.PL>, C<META.json> and C<README.md> are added in your
+working directory for git-friendliness. C<git add> them and commit it.
+
+  > git add Build.PL META.json README.md && git commit -m "git stuff"
+
+Now you're ready to roll a new release with Milla. Before doing so,
+convert your C<Changes> file format a little bit, and make sure you
+have a following header in the top:
+
+  {{$NEXT}}
+          - Change log entry for the next version
+
+The C<{{$NEXT}}> is a template variable that gets replaced with the
+version and date string, when you make a next release. This is almost
+the I<only> change you're required to make in your code base.
+
+Now, run the release command:
+
+  > milla release
+
+to make a new release, in the same way described above for a new Milla
+setup. You can set C<FAKE_RELEASE> environment variable if this is
+your first conversion and want to double check what happens, before
+uploading to CPAN.
+
+When this is not your first release, the version number gets
+automatically bumped by Milla, but you will be prompted if that is
+exactly the version you want, and if you want a major version up, you
+can specify to do so.
+
+=head1 AUTHOR
+
+Tatsuhiko Miyagawa
+
+=head1 SEE ALSO
+
+L<Dist::Milla>
+
+=cut

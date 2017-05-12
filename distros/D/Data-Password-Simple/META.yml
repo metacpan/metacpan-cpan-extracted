@@ -1,0 +1,24 @@
+--- #YAML:1.0
+name:               Data-Password-Simple
+version:            0.05
+abstract:           ~
+author:
+    - Ross Hayes <ross@abablabab.co.uk>
+license:            Artistic_2_0
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    Test::Deep:  0
+    Test::More:  0
+requires:
+    Carp:  0
+    perl:  5.006
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

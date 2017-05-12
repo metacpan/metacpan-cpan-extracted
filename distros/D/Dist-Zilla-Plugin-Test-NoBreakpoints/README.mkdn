@@ -1,0 +1,58 @@
+# NAME
+
+Dist::Zilla::Plugin::Test::NoBreakpoints - Author tests making sure no debugger breakpoints make it to 'released'
+
+# VERSION
+
+version 0.0.2
+
+# DESCRIPTION
+
+Generate an author [Test::NoBreakpoints](https://metacpan.org/pod/Test::NoBreakpoints).
+
+This is an extension of [Dist::Zilla::Plugin::InlineFiles](https://metacpan.org/pod/Dist::Zilla::Plugin::InlineFiles), providing
+the file `xt/author/no-breakpoints.t`, a standard [Test::NoBreakpoints](https://metacpan.org/pod/Test::NoBreakpoints) test.
+
+# CONFIGURATION OPTIONS
+
+This plugin accepts the following options:
+
+## `finder`
+
+This is the name of a [FileFinder](https://metacpan.org/pod/Dist::Zilla::Role::FileFinder) for finding
+files to check.  The default value is `:InstallModules`,
+`:ExecFiles` (see also [Dist::Zilla::Plugin::ExecDir](https://metacpan.org/pod/Dist::Zilla::Plugin::ExecDir)) and `:TestFiles`;
+this option can be used more than once.
+
+Other predefined finders are listed in
+["default\_finders" in Dist::Zilla::Role::FileFinderUser](https://metacpan.org/pod/Dist::Zilla::Role::FileFinderUser#default_finders).
+You can define your own with the
+[\[FileFinder::ByName\]](https://metacpan.org/pod/Dist::Zilla::Plugin::FileFinder::ByName) plugin.
+
+## `file`
+
+a filename to also test, in addition to any files found
+earlier. This option can be repeated to specify multiple additional files.
+
+## `filename`
+
+The filename of the test to add - defaults to `xt/author/test-eol.t`.
+
+# ACKNOWLEDGMENTS
+
+This module was **heavily** cribbed from [Dist::Zilla::Plugin::Test::EOL](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::EOL).
+
+# SEE ALSO
+
+- Test::NoBreakpoints
+
+# AUTHOR
+
+Chisel <chisel@chizography.net>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Chisel Wright.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

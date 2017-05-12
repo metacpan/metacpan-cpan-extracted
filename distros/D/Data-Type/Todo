@@ -1,0 +1,171 @@
+todo
+{
+	Write a Class::Maker extension for verifying if the attributes match its types (This can be done
+	with a flexible (reflex-inspecting) bouncer).
+}
+
+todo
+{
+	- Implement decision table for bouncer-like (bouncer is far too simple for the new possibilities)
+	scenarios. This can be done via Decision::Table after Data::Type::Guard gave us his opinion.
+}
+
+todo
+{
+	overify() / Data::Type::Guard should report which member failed
+}
+
+todo
+{
+	Filter::'s should also have delayed calls via AUTOLOAD like Type::
+}
+
+todo
+{
+	Add some localization. Like DE::PHONE which is Type::DE::phone etc.
+	
+	Should use Locale::Maketext
+}
+
+todo
+{
+	Pay a round of usefull ->usage information to the types.
+}
+
+todo
+{
+	Prepare api for casting of types. 
+	Suggestion: my $a_castedto_b = TYPE_A->cast( TYPE_B );
+}
+step
+{
+	added Type::UNIVERSAL::cast()
+}
+
+todo
+{
+	More types
+	
+use Business::ISSN qw( is_valid_checksum );
+        
+  #verify the checksum
+  if( is_valid_checksum('01234567') ) { ... }
+
+use Business::ISBN;
+
+isbn = Business::ISBN->new( $BAD_CHECKSUM_ISBN );
+isa_ok( $isbn, 'Business::ISBN' );
+is( $isbn->is_valid
+
+use Business::ISMN;
+my $ismn = Business::ISMN->new( $GOOD_ISMN );
+isa_ok( $ismn, 'Business::ISMN' );
+is( $ismn->is_valid
+
+use Business::DE::Konto;
+  my $konto = Business::DE::Konto->new(BLZ => 12345678, KONTO => 1234567890));
+  $konto->check();
+  
+use Business::ISIN;
+
+    my $isin = new Business::ISIN 'US459056DG91';
+
+    if ( $isin->is_valid ) {
+	print "$isin is valid!\n";
+	# or: print $isin->get() . " is valid!\n";
+    } else {
+	print "Invalid ISIN: " . $isin->error() . "\n";
+	print "The check digit I was expecting is ";
+	print Business::ISIN::check_digit('US459056DG9') . "\n";
+    }
+
+use Business::UPC;
+
+   # Constructors:
+   # create a UPC object using standard (type-A) UPC
+   $upc = new Business::UPC('012345678905');
+   # create a UPC object using zero-supressed (type-E) UPC
+   $upc = type_e Business::UPC('01201303');
+
+   # is the UPC valid (correct check digit)?
+   $upc->is_valid;
+
+use Business::CINS;
+  $cn = Business::CINS->new('035231AH2');
+  print "Looks good.\n" if $cn->is_valid;
+  
+use Business::IBAN;
+  use Locale::Country;
+  my $cc = country2code('Germany');
+  my $iban = Business::IBAN->new();
+  my $ib = $iban->getIBAN(
+  {
+    ISO => $cc, # or "DE", etc.
+    BIC => 12345678, # Bank Identifier Code, meaning the BLZ
+                     # in Germany
+    AC => "1234567890",
+  });
+  # or
+  my $ib = $iban->getIBAN(
+  {
+    ISO => "DE",
+    BBAN => 123456781234567890,
+  });
+  if ($ib) {
+    print "IBAN is $ib\n";
+  }
+  else {
+    $iban->printError();
+    # or
+    my @errors = $iban->getError();
+    # print your own error messages (for description of error-
+    # codes see section ERROR-CODES
+  }
+  if ($iban->valid($ib)) {
+    print "$iban is valid\n";
+  }
+  else {
+    $iban->printError();
+  }
+
+MARKUP( XML; HTML )
+SOURCE( Perl, Java etc. )
+}
+
+todo
+{
+	refactor names to terminus technicii from http://www.w3.org/TR/2001/REC-xmlschema-2-20010502/#datatype
+}
+
+bug
+{
+	Type::Exception's new isn't called when Failure::Type is thrown/created ?
+}
+
+todo( DOCU )
+{
+	Write Tutorial/FAQ
+	  * 'How to add new types' or 'How to add my custom types'
+	  * How could i use D::T to assure valid function parameters
+	    - with Params::Validate
+		
+		  validate( @_, { foo => { type => REF( 'ARRAY' ) } );
+
+}
+
+todo
+{
+	catalog/toc with grouping for localization
+}
+
+todo
+{
+	recognize new types via their VERSION in release.pl, so we could place them via templates
+}
+done
+
+todo
+{
+	_translate should really translate "back and forth" type pkgname <> imported name (respecting
+	export).
+}

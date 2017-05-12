@@ -1,0 +1,34 @@
+---
+abstract: 'Credential Management for DBIx::Class'
+author:
+  - 'Kaitlyn Parkhurst (SymKat) I<<symkat@symkat.com>> ( Blog: L<http://symkat.com/> )'
+build_requires:
+  Config::Any: '0.23'
+  DBD::SQLite: 0
+  ExtUtils::MakeMaker: 6.36
+  Test::More: '0.42'
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.10'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Schema-Config
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Config::Any: '0.23'
+  DBIx::Class: '0.08100'
+  File::HomeDir: 0
+  Hash::Merge: 0
+  Storable: 0
+  namespace::clean: 0
+  perl: '5.005'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.001011'

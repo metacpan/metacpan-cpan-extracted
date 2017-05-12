@@ -1,0 +1,49 @@
+- Consider use of SQL::Splitstatement in Deploy
+
+- Convert all exported subs into non-anonymous package subs
+
+- check for nothing returned from select statements: what should be
+  returned by hashes, arrays, etc?
+
+- implelent qi() for quote_identifier.
+
+- Use the {Statement} attribute for recent SQL sentence
+
+- Handle this properly:
+
+    where => [
+        { status => [ 'Active', 'Expansion', 'Greenfield' ] },
+        ' OR ', { status => undef }
+      ],
+
+    WHERE
+        status IN (?,?,?) OR status IS NULL
+
+- drop_tables() should be done with "DROP TABLE" statements
+
+- Create a FAQ section based on the questions you (or the typical
+  first-time viewer) might have about this module. Obviously you
+  wouldn't have all the answers, but I would be happy to accept a pull
+  request of questions and then fill it out myself as needed
+  afterwards.
+  
+- Audit the documentation for missing, wrongly-named, or removed
+  methods and functions. I know that all of the sql_* functions for
+  example have had the "sql_" part removed. Once again, I wouldn't
+  expect you to write the actual documentation unless you really have
+  nothing else to do, but it would certainly help me to know what to
+  edit next.
+
+- Make the examples in the SYNOPSIS section more consistent, or with
+  better variable names, or with an example of your own, or perhaps
+  with examples borrowed/stolen from other DBIx modules, depending on
+  your taste.
+
+- Refactor _ejoin() and _query() functions to remove the duplication
+  that exists between them. Not an easy task I will admit, and to make
+  it worse I am also sorely missing some tests here to reliably detect
+  input/output combinations.
+  
+- Perhaps run Devel::Cover on the tests and see what isn't covered. I
+  know that the transaction stuff definately needs some work. [Not
+  something for a pull-request I admit]

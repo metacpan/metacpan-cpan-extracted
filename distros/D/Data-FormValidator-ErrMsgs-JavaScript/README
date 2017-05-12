@@ -1,0 +1,76 @@
+NAME
+    Data::FormValidator::ErrMsgs::JavaScript - Let JavaScript handle DFV
+    error presentation.
+
+SYNOPSIS
+     use Data::FormValidator::ErrMsgs::JavaScript (qw/&dfv_js_error_msgs/);
+
+     # In a DFV profile:
+     msgs => \&dfv_js_error_msgs,
+
+    Now your error messages will come out like this:
+
+     <script type="text/javascript">dfv_error_msg('field_name');</script>
+
+FUNCTIONS
+  dfv_js_error_msgs
+    See SYNOPSIS above for syntax.
+
+    It's up to you define the "dfv_error_msg" function in JavaScript to do
+    something interesting.
+
+    This function respects the following "msgs" configuration directives,
+    which are documented more in Data::FormValidator:
+
+     prefix
+     any_errors
+
+    Of course, these can't be set directly in the profile anymore because
+    the callback is there. They can still be set through the defaults system
+    documented in Data::FormValidator.
+
+LIMITATIONS
+    More detail could be passed through to the JavaScript function about the
+    failure. This may change in the future, perhaps in an incompatible way.
+
+    It is not currently possible to use a format string other than the one
+    provided.
+
+    Workarounds included sending a patch or using this routine as the basis
+    for your own.
+
+    That workaround might look like this:
+
+     msgs => dfv_js_error_msgs({
+        format => 'foo: %';
+     });
+
+    A closure could then be created which passing in the arguments you want.
+
+FUTURE
+    If you like this extension to Data::FormValidator, give me some feedback
+    on the Data::FormValidator list and we'll work out a stable interface.
+
+    <http://lists.sourceforge.net/lists/listinfo/cascade-dataform>
+
+AUTHOR
+    Mark Stosberg, "<mark at summersault.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-data-formvalidator-errmsgs-javascript at rt.cpan.org", or through
+    the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-FormValidator-ErrMs
+    gs-JavaScript>. I will be notified, and then you'll automatically be
+    notified of progress on your bug as I make changes.
+
+SEE ALSO
+    Data::FormValidator
+    <http://search.cpan.org/dist/Data-FormValidator-ErrMsgs-JavaScript>
+
+COPYRIGHT & LICENSE
+    Copyright 2005 Mark Stosberg, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

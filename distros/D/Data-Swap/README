@@ -1,0 +1,72 @@
+Data::Swap 0.08
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+Module documentation:
+
+NAME
+    Data::Swap - Swap type and contents of variables
+
+SYNOPSIS
+        use Data::Swap;
+
+        my $p = [];
+        my $q = {};
+        print "$p $q\n";            # ARRAY(0x965cc) HASH(0x966b0)
+        swap $p, $q;                # swap referenced variables
+        print "$p $q\n";            # HASH(0x965cc) ARRAY(0x966b0)
+
+        my $x = {};
+        my $y = $x;                 # $x and $y reference same var
+        swap $x, [1, 2, 3];         # swap referenced var with an array
+        print "@$y\n";              # 1 2 3
+
+        use Data::Swap 'deref';
+
+        my @refs = (\$x, \@y);
+        $_++ for deref @refs;       # dereference a list of references
+
+        # Note that I omitted \%z from the @refs because $_++ would fail 
+        # on a key, but deref does work on hash-refs too of course.
+
+DESCRIPTION
+    This module allows you to swap the contents of two referenced variables,
+    even if they have different types.
+
+    The main application is to change the base type of an object after it
+    has been created, for example for dynamic loading of data structures:
+
+        swap $self, bless $replacement, $newclass;
+
+    This module additionally contain the function "deref" which acts like a
+    generic list-dereferencing operator.
+
+FUNCTIONS
+  swap REF1, REF2
+    Swaps the contents (and if necessary, type) of two referenced variables.
+
+  deref LIST
+    Dereferences a list of scalar refs, array refs and hash refs. Mainly
+    exists because you can't use "map" for this application, as it makes
+    copies of the dereferenced values.
+
+KNOWN ISSUES
+    You can't "swap" an overloaded object with a non-overloaded one, unless
+    you use Perl 5.10 or later.
+
+    Also, don't use "swap" to change the type of a directly accessible
+    variable -- like "swap \$x, \@y". That's just asking for segfaults.
+    Unfortunately there is no good way for me to detect and prevent this.
+
+AUTHOR
+    Matthijs van Duin <xmath@cpan.org>
+
+    Copyright (C) 2003, 2004, 2007, 2008 Matthijs van Duin. This program is
+    free software; you can redistribute it and/or modify it under the same
+    terms as Perl itself.

@@ -1,0 +1,15 @@
+[
+  {
+    "name":"insert into foo",
+    "deploy_sql":"INSERT INTO foo VALUES (1, 2)",
+    "verify_sql":"SELECT COUNT(*) FROM foo",
+    "verify_expects":[ [1] ],
+    "dependencies": [ "create table foo" ]
+  },
+  {
+    "name":"create table foo",
+    "deploy_sql":"CREATE TABLE foo(a,b)",
+    "verify_sql":"PRAGMA table_info(foo)",
+    "verify_expects":[ [ 0, "a", "", 0, null, 0 ], [ 1, "b", "", 0, null, 0 ] ]
+  }
+]

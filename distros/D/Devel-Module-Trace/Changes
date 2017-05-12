@@ -1,0 +1,7 @@
+This file documents the revision history for the Devel::Module::Trace module
+
+0.02     Fri May  1 12:07:50 CEST 2015
+          - add result web app to display statistics and results
+
+0.01     Tue Apr 28 12:51:10 CEST 2015
+          - initial release

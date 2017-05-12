@@ -1,0 +1,43 @@
+---
+abstract: 'Dancer plugin to cache response content (and anything else)'
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Dancer::Test: 0
+  File::Find: 0
+  Module::Build: 0.3601
+  Test::More: 0.88
+  perl: v5.10.0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Cache-CHI
+provides:
+  Dancer::Plugin::Cache::CHI:
+    file: lib/Dancer/Plugin/Cache/CHI.pm
+    version: v1.4.0
+requires:
+  CHI: 0
+  Carp: 0
+  Dancer: 1.1904
+  Dancer::Factory::Hook: 0
+  Dancer::Hook: 0
+  Dancer::Plugin: 0
+  Dancer::Response: 0
+  Dancer::SharedData: 0
+  Moo: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Cache-CHI
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-Cache-CHI/
+  repository: https://github.com/yanick/Dancer-Plugin-Cache-CHI.git
+version: 1.4.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

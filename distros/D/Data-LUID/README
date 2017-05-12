@@ -1,0 +1,90 @@
+NAME
+    Data::LUID - Generate guaranteed unique local identifiers
+
+VERSION
+    Version 0.014
+
+SYNOPSIS
+        use Data::LUID::Table
+
+        my $table = Data::LUID::Table->new( path => 'luid' )
+
+        $luid = $table->make
+
+    A sample run:
+
+        8bqwv1
+        kb3c6e
+        9tah65
+        5fd7rd
+        tss74z
+        7rxk5s
+        3mv3qb
+        2ad9qj
+
+DESCRIPTION
+    On each call to "->make", Data::LUID::Table will generate a guaranteed
+    unique local identifier. Guaranteed because once each identifier is
+    generated, it will be stored in a table for future lookup (collision
+    avoidance)
+
+    The current backend is BerkeleyDB
+
+USAGE
+  $table = Data::LUID::Table->new( path => <path> )
+    Create a new Data::LUID::Table, saving the table to disk at the given
+    <path>
+
+    The <path> argument (default: "./luid") is the location of the table on
+    disk
+
+  $luid = $table->make
+  $luid = $table->next
+    Generate the next luid in the sequence
+
+    The current generator is Data::TUID, so there is no real "sequence" per
+    se
+
+SEE ALSO
+    Data::TUID
+
+AUTHOR
+    Robert Krimen, "<rkrimen at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-data-luid at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-LUID>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::LUID
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-LUID>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Data-LUID>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Data-LUID>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Data-LUID/>
+
+ACKNOWLEDGEMENTS
+COPYRIGHT & LICENSE
+    Copyright 2009 Robert Krimen, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

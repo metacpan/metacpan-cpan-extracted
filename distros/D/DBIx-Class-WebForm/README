@@ -1,0 +1,28 @@
+NAME
+    DBIx::Class::WebForm - CRUD Methods For DBIx::Class
+
+SYNOPSIS
+        use base 'DBIx::Class::WebForm';
+
+        my $results = Data::FormValidator->check( ... );
+        my $film = Film->retrieve('Fahrenheit 911');
+        $film->update_from_form($results);
+        my $new_film = Film->create_from_form($results);
+
+DESCRIPTION
+    CRUD Methods For DBIx::Class.
+
+METHODS
+    $class->create_from_form($form)
+    $self->update_from_form($form)
+    $class->to_cgi
+    $self->to_field( $field, $how )
+    $class->column_type($col)
+
+AUTHOR
+    Matt S. Trout Sebastian Riedel, "sri@oook.de"
+
+LICENSE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,59 @@
+==================================================
+Changes from 2014-09-07 00:00:00 +0000 to present.
+==================================================
+
+---------------------------------------------
+version 0.000001 at 2016-09-06 07:56:43 +0000
+---------------------------------------------
+
+  Change: 229d620427d31626ddef9157700e1d4da1542355
+  Author: Charlie Garrison <cngarrison@gmail.com>
+  Date : 2016-09-06 17:56:40 +0000
+
+    Disabled failing automated release tests
+
+    Signed-off-by: Charlie Garrison <cngarrison@gmail.com> 
+
+  Change: 1abc46ee43d84af610fdc8454b567b616e3a7e69
+  Author: Charlie Garrison <cngarrison@gmail.com>
+  Date : 2016-09-06 17:56:13 +0000
+
+    Remove unused var
+
+    Signed-off-by: Charlie Garrison <cngarrison@gmail.com> 
+
+  Change: d1cf8cce15e986d56f8c64618d1ae79bed351af4
+  Author: Charlie Garrison <cngarrison@gmail.com>
+  Date : 2016-09-06 17:52:06 +0000
+
+    Modified dist.ini and got first `README.md`
+
+    Signed-off-by: Charlie Garrison <cngarrison@gmail.com> 
+
+  Change: ae41d3547687be3da930378910b158d32dc89c34
+  Author: Charlie Garrison <cngarrison@gmail.com>
+  Date : 2016-09-06 17:41:16 +0000
+
+    Added passing tests
+
+    Signed-off-by: Charlie Garrison <cngarrison@gmail.com> 
+
+  Change: dfba97f2a72968e5ea219a87764621cf8f20a9bd
+  Author: Charlie Garrison <cngarrison@gmail.com>
+  Date : 2016-09-06 16:39:20 +0000
+
+    initial commit 
+
+================
+End of releases.
+================
+
+0.000002 2016-09-07T03:31:45
+ - Added missing dep (Charlie Garrison)
+ - v0.000001 (Charlie Garrison)
+ - Added deps for testing, and updated Changes (Charlie Garrison)
+ - Changed to `ChangelogFromGit::CPAN::Changes` (Charlie Garrison)
+ - Reneabled release test for `Changes` (Charlie Garrison)
+
+0.000001 2016-09-06T07:56:40
+ - No changes found

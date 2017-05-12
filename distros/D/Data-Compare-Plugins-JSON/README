@@ -1,0 +1,53 @@
+NAME
+
+Data::Compare::Plugins::JSON - plugin for Data::Compare to handle JSON::PP and
+JSON::XS boolean constants.
+
+DESCRIPTION
+
+JSON::PP and JSON::XS provides instances of JSON::PP::Boolean and
+JSON::XS::Boolean classes. It's JSON::PP::true, JSON::PP::false,
+JSON::XS::true, and JSON::XS::false. This plugin enables Data::Compare to
+compare this values.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+    perldoc Data::Compare::Plugins::JSON
+
+You can also look for information at:
+
+    Repository
+        http://github.com/dionys/data-compare-plugins-json
+    Bug tracker
+        http://github.com/dionys/data-compare-plugins-json/issues
+    Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Compare-Plugins-JSON
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Compare-Plugins-JSON
+    Search CPAN
+        http://search.cpan.org/dist/Data-Compare-Plugins-JSON/
+
+AUTHOR
+
+Denis Ibaev, dionys@cpan.org for Setup.ru.
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2013-2014, Denis Ibaev.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.

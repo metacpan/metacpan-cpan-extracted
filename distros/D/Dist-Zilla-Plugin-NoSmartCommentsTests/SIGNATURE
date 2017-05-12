@@ -1,0 +1,62 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 007d9eadef38d89600c372861a631e950cadab7e .travis.yml
+SHA1 240530ec7d2934c16ee9188838bac9cadd569c58 Changes
+SHA1 8296b113a1ae1c52d13f12a3d158b9b156538410 Changes~
+SHA1 62c6886b1f14e9e9a39f6bf00f5490057d3c2885 LICENSE
+SHA1 9d844b8520bb65759a60936b51cb7ff648866953 MANIFEST
+SHA1 2bf7990362b72814547a02c7535d232c0dfe1177 META.json
+SHA1 57e0a3141805d647f5c6e028a1593654aca8307a META.yml
+SHA1 95a591ccf99ded35957d11cbd52d68a32b1a4c50 Makefile.PL
+SHA1 e683d3d82acf0c21fe61f439f2369a22129a1ea8 README
+SHA1 9dd2d699447630f1368198ba2294821bf7991f8c corpus/DZ1/dist.ini
+SHA1 5841581ce95b879802347fa0b42b799cf9ab0e19 corpus/DZ1/lib/DZ1.pm
+SHA1 7848207ea4220ee5ccdefea17f0b0a92344488aa cpanfile
+SHA1 d7e88f4727d926d30422177b98d1ac5a0b1a82d5 dist.ini
+SHA1 1e8dc5cd18d3bb1bf21626343ea96382f080813d lib/Dist/Zilla/Plugin/NoSmartCommentsTests.pm
+SHA1 789b05017e75743fbe24877e46000e2a55fd2508 lib/Dist/Zilla/Plugin/NoSmartCommentsTests.pm~
+SHA1 4a5d77082f9df543d6692cad13ec823b85445955 lib/Dist/Zilla/Plugin/Test/NoSmartComments.pm
+SHA1 4bdb7637c377a4563e26e887313ef118c1d1a22d t/00-check-deps.t
+SHA1 d4db3e2a75bd4448c36afd19fe654911c701fa3d t/00-compile.t
+SHA1 52b0fdbc3e75451e6b1ea10f755d1dfb61e891c7 t/00-load.t
+SHA1 fbe6c66f2652f4c3d8812ba00b27b0b64cf56f62 t/00-report-prereqs.dd
+SHA1 f6e7d6a57072e33775dbf1c683586e46172106ef t/00-report-prereqs.t
+SHA1 e10fd1d9d4447a7eb9cf24b1d60933bc51cca481 t/develop-requires.t
+SHA1 e4ce485b5ebca2acc9daedd50a047b4efe4a7801 t/develop-requires.t~
+SHA1 4b7e5cb175cd23623813b780eb91f713f90c5db2 t/file-is-generated.t
+SHA1 4b7e5cb175cd23623813b780eb91f713f90c5db2 t/file-is-generated.t~
+SHA1 25cb1062a51070d96556213a866a96dc1957369a xt/author/eol.t
+SHA1 aaa941b15dd9692093ba41c1e214173f98dbca8b xt/author/no-tabs.t
+SHA1 b4f6c3240f9dd6233be72ab062041b74683ad733 xt/author/pod-coverage.t
+SHA1 63c16314923f6a197800f4603ebd2571a87b27ba xt/author/pod-spell.t
+SHA1 e51a885e2b14290ea93d770f1b4e314311fa53b6 xt/author/pod-syntax.t
+SHA1 a7948d34cfaad400286ea5d5fa6206c4c7e2552c xt/release/consistent-version.t
+SHA1 d5f326d621b88d3097e90ee03ab976c1a7f4901a xt/release/has-version.t
+SHA1 857702dd027d38bd6cb79c6fb191a62ee0a12a07 xt/release/minimum-version.t
+SHA1 c23a1a32db701191eaf772be99aae2451c5ce834 xt/release/no-smart-comments.t
+SHA1 68a9eed30e004d64cb71f5755a60f804ee96dca5 xt/release/pod-linkcheck.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJX+ttiAAoJEJP6zjPp4XX4KNcIAMYL0XxjiWMJmRwc79RqA6EO
+lyWACJm9IvRBjwGfc7TMn5DAkZNCBiP/spC7CTxEkBBdgaCI8JfH2XXpF5CsLYbe
+CFAo7dYcI5xz8WNaPKUObsDOEP5hoIKVJiDq/y35s+Mpt3IF1kmrCv0CQVUnFQ/j
+8EsXlgspw5ZHzaJ2aBgYGh4L/1gm2wNndkywi2tn+dsuyzgG+qOwwj3DLg5gL5NT
+A2XCOwX02z3UWwkyZ45EK2Uyvbh8viHe8cKxqDLATgshAm1p1XXkvAkOrppPmI+d
+qanKlfOka1rOg6dI2ePP/d+Z5FpiCGI9sjIATzR+gtmq7eJtzXEYyJkuhZbYHew=
+=VcKa
+-----END PGP SIGNATURE-----

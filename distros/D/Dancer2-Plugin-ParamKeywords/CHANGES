@@ -1,0 +1,101 @@
+==================================================
+Changes from 2015-01-13 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version v0.1.5 at 2016-01-13 16:21:00 +0000
+-------------------------------------------
+
+  Change: c15c74d93c20deb46354f7e833248db475cd1849
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2016-01-13 09:19:40 +0000
+
+    Move deprecation notice to module desc 
+
+  Change: 182d972e819ee4c3232504b2b7588a4664f6a0a7
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2016-01-13 09:15:41 +0000
+
+    Version bump 
+
+  Change: cd3dab2c970d85bffe791a181e09a94fe25bd17b
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2016-01-13 09:11:20 +0000
+
+    Deprecation notice 
+
+  Change: 54422fbf2773cdf1035b3377fe9e97fff1c2b87e
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-13 15:38:50 +0000
+
+    Increase kwalitee by listing strict/warnings as dependencies :| 
+
+  Change: 367896498ad486a6aa9a52c7788fb3c70e91772b
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-13 15:30:40 +0000
+
+    Version bump 
+
+  Change: d258c94ee265c8f6ee84cf6b23531dddc03609c4
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-13 15:29:57 +0000
+
+    Require latest Dancer2 for test 
+
+  Change: 7ea23ced967b1741cc71dcf1ab96c50e2fc05989
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-13 09:11:19 +0000
+
+    Add munged_param keyword 
+
+  Change: 4b540b92b812da5688aeed229e49675fe46e20e9
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 20:25:12 +0000
+
+    Clean up distro 
+
+  Change: 01984fcecd78ab8afd762e6091794dff51d36cf8
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 16:07:51 +0000
+
+    Eliminate Data::Printer dependency :| 
+
+  Change: 78e86b7087ca1b07b8363d28333bd7a98d0d9065
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 16:01:34 +0000
+
+    Fix pod 
+
+  Change: 58d8794bb025abef2878efacaae705f1b4131670
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 15:58:04 +0000
+
+    Tests and bugfix 
+
+  Change: ed296575c44482e8c4cfaa5a8dba85a815da8942
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 15:16:59 +0000
+
+    Fix markdown 
+
+  Change: 6b02b6e08ad5f9e4c2b08b7bc96c8ec0c757de37
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 15:15:38 +0000
+
+    Fix repo name, pod 
+
+  Change: 62ad5e37b3cc6b3179e8d7380867d52143208c4a
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 15:08:59 +0000
+
+    Fix bug, add minimal test 
+
+  Change: 52fb359cb4f55598aa835f6526e0d5c89cc24162
+  Author: Chris Tijerina <amarus18@hotmail.com>
+  Date : 2015-06-11 15:03:48 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

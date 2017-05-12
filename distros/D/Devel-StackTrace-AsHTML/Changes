@@ -1,0 +1,49 @@
+Revision history for Perl extension Devel::StackTrace::AsHTML
+
+0.15  2016-04-01 12:23:25 PDT
+        - Switch to Milla (haarg)
+
+0.14  Mon Feb 18 11:40:53 PST 2013
+        - Fix test for Win32 (RickFord)
+
+0.13  Mon Feb 11 11:52:15 PST 2013
+        - Get subroutine arguments from the next frame too
+
+0.12  Mon Feb 11 11:25:50 PST 2013
+        - Fixed the use of $frame->subroutine since it returns a subroutine that is *invoked* on that
+          call frame, rather than what the frame is *in*. Fixed to peek the next frame to get the
+          current subroutine. (Caelum)
+
+0.11  Mon Jan 24 23:08:04 PST 2011
+        - You should now pass the error message in 'message' parameter explicitly to display as an error
+        - Use the first frame, not the second frame to capture error message
+
+0.10  Mon Jan 24 16:29:08 PST 2011
+        - Don't ignore the top frame. This should be donw using the ignore_package option (Jonathan Swartz)
+
+0.09  Sun Mar 28 23:04:05 PDT 2010
+        - no warnings about # in qw()
+
+0.08  Sun Mar 28 20:35:26 PDT 2010
+        - Encode high bit characters as HTML entities.
+
+0.07  Sat Mar 27 06:31:23 PDT 2010
+        - Hide the WithLexical recommendation from HTML
+
+0.06  Thu Mar 25 11:22:44 PDT 2010
+        - Wrap rhe raw error message with <pre> (tokuhirom)
+
+0.05  Thu Dec 10 17:53:48 PST 2009
+        - remove debug prints
+
+0.04  Thu Dec 10 12:12:50 PST 2009
+        - Improved lexical variables display (Sartak)
+
+0.03  Fri Oct  9 02:11:46 PDT 2009
+        - use Data::Dumper and deparse for better code reference output (gfx)
+
+0.02  Fri Oct  9 00:17:33 PDT 2009
+        - Fixed HTML generation code
+
+0.01  Thu Oct  8 23:08:44 2009
+        - original version

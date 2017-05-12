@@ -1,0 +1,65 @@
+{
+   "abstract" : "Perl implementation of Django templating language.",
+   "author" : [
+      "Alexandr Evstigneev <hurricup@evstigneev.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DTL-Fast",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Harness" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Compress::Zlib" : "0",
+            "Date::Format" : "0",
+            "Digest::MD5" : "0",
+            "Module::Load" : "0",
+            "POSIX" : "0",
+            "Storable" : "0",
+            "URI::Escape::XS" : "0.12",
+            "XSLoader" : "0",
+            "parent" : "0",
+            "perl" : "5.01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hurricup/DTL-Fast/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hurricup/DTL-Fast.git",
+         "web" : "https://github.com/hurricup/DTL-Fast"
+      }
+   },
+   "version" : "1.623",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

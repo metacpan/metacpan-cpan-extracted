@@ -1,0 +1,42 @@
+Revision history for Perl extension Dist::Maker
+
+0.10 2013-07-07 00:35:20-0700
+    - Fix a warning (@shiba_yu36)
+
+0.09 2013-07-06 12:20:22-0700
+    - Allow user-defined configuration (@shiba_yu36)
+
+0.08 2013-03-25 14:42:00
+    - Fix a miss-spelling s/extention/extension/
+
+0.07 2013-02-14 23:07:39
+    - Add DefaultMB template (Songmu)
+
+0.06 2012-11-26 14:56:12
+    - Fix a problem that 'template.default' of user_config was ignored
+      (Songmu)
+
+0.05 2011-10-05 10:21:06
+    - Add inc/ to default .gitignore
+    - Requires Module::Install::XSUtil 0.41 in XS flavor
+
+0.04 2011-08-25 16:28:38
+    - Fix typo in the pod template
+
+0.03 2011-07-27 10:38:48
+    - Re-packaging for missing M::I::Repository
+
+0.02 2011-07-24 13:52:29
+    - No code changes from 0.01_03
+
+0.01_03 2011-07-18 17:59:49
+    - Config template.dist_init to control dist_init
+
+0.01_02 2011-07-18 15:13:58
+    - Initialize the dist with `perl Makefile.PL && make manifest`
+
+0.01_01 2011-07-18 14:37:30
+    - Initial CPAN version
+
+0.001 Mon Mar 15 22:55:27 2010
+    - original version; created by Module::Setup

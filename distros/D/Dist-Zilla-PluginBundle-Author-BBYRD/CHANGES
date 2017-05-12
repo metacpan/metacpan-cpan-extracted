@@ -1,0 +1,71 @@
+Changelog for Dist-Zilla-PluginBundle-Author-BBYRD
+
+1.06 2015-10-16T02:41:21
+ - No changes found
+
+1.05 2015-02-09T03:36:35
+ - Add Test::EOL to MVP list (Brendan Byrd)
+ - Improved Changelogs (Brendan Byrd)
+
+1.04 2014-10-19T14:36:14
+ - Add support for x_IRC (Brendan Byrd)
+
+1.03 2014-08-02T04:47:58
+ - Add PluginBundle requirements (Brendan Byrd)
+
+1.02 2014-05-03T23:50:55
+ - Add open_status_url option to Travis::TestRelease (Brendan Byrd)
+ - Use ::Role::BundleDeps (Brendan Byrd)
+ - Add authority (Brendan Byrd)
+ - Add Travis::TestRelease and other Travis changes (Brendan Byrd)
+
+1.01 2014-05-02T02:40:38
+ - Change NoTabsTests to Test::NoTabs (Brendan Byrd)
+ - Add in Prereqs for module changes from v1.00 (Brendan Byrd)
+
+1.00 2013-11-26T05:04:49
+ - Change around a few modules (Brendan Byrd)
+ - change PWP::Encoding to PWP::SingleEncoding (Sergey Romanov)
+
+0.99 2013-09-10T12:17:32
+ - Fix ModuleShareDirs, notify_irc, and .mailmap (Brendan Byrd)
+
+0.98 2013-06-27T23:19:21
+ - Fix bundle to work with new version of Merged + PluginRemover (some
+   profile changes) (Brendan Byrd)
+
+0.97 2013-06-21T09:38:17
+ - Add some extra TravisYML options (Brendan Byrd)
+
+0.96 2013-06-05T01:55:28
+ - Replace ReportVersions::Tiny with Test::ReportPrereqs Remove dupe
+   profile.ini in SEE ALSO section (Brendan Byrd)
+
+0.95 2013-05-16T22:36:34
+ - Add new .mailmap Add dep to Stash::PAUSE::Encrypted (Brendan Byrd)
+ - Fix new dependency changes (Brendan Byrd)
+ - Add Author minting profile (Brendan Byrd)
+ - Remove IRC room name from Support section Remove Test::UseAllModules
+   (redundant with Test::Compile) Fix README.pod to not end up in build
+   (was installing in lib/) Add support for Contributors (via Git) (Brendan
+   Byrd)
+ - Be more explicit with push master:master Fix CommitBuild to not create
+   random builds Fix .travis.yml to run through deps faster (Brendan Byrd)
+
+0.94 2013-04-22T20:27:31
+ - Update .travis.yml with new DZIL:P:TCI defaults (Brendan Byrd)
+ - Add new Pod::Weaver::PluginBundle::Author::BBYRD (Brendan Byrd)
+
+0.93 2012-10-17T17:58:00
+ - Add [MetaYAML] back in (Brendan Byrd)
+
+0.92 2012-10-02T15:30:59
+ - Fix MetaResourcesFromGit call (Brendan Byrd)
+
+0.91 2012-10-02T14:56:11
+ - Fix POD (Brendan Byrd)
+
+0.90 2012-10-01T21:15:35
+ - Add "optional" test modules as requires (Brendan Byrd)
+ - Complete; ready for release (Brendan Byrd)
+ - Initial commit (Brendan Byrd)

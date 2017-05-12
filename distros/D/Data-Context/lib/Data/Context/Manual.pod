@@ -1,0 +1,195 @@
+=head1 NAME
+
+Data::Context::Manual
+
+=head1 SYNOPSIS
+
+    # The config files (all produce the same data structures)
+    # JSON relaxed : data.dc.js
+    {
+        # shell/perl style comments ok
+        "PARENT": "other/path",
+        "hash" : {
+            "key" : "value", # allows trailing commas
+            "action" : {
+                "MODULE" : "My::Module",
+                "METHOD" : "my_action",
+            },
+        },
+    }
+
+    # JSON strict : data.dc.json
+    {
+        "PARENT": "other/path",
+        "hash" : {
+            "key" : "value"
+            "action" : {
+                "MODULE" : "My::Module",
+                "METHOD" : "my_action"
+            }
+        }
+    }
+
+    # YAML : data.dc.yml
+    PARENT: other/path
+    hash:
+        key : value
+        action:
+            MODULE: My::Module
+            METHOD: my_action
+
+    # XML : data.dc.xml
+    <config>
+        <PARENT>other/path</PARENT>
+        <hash>
+            <key>value</key>
+            <action>
+                <MODULE>My:Module</MODULE>
+                <METHOD>my_action</METHOD>
+            </action>
+        </hash>
+    </config>
+
+    # in perl
+    use Data::Context;
+    my $dc = Data::Context->new(
+        path => [qw{ /path/one /paht/two }],
+        fallback => 1,
+        actions  => {
+            do_something => sub { ... },
+        },
+    );
+    my $data = $dc->get('data', { some => 'vars' });
+
+=head1 DESCRIPTION
+
+The power of L<Data::Context> is it's simple handling of many configuration
+files. It supports configuration files in JSON format (strict & relaxed
+variants), YAML and XML (via XML::Simple). Basically the aim is to support
+any format that allows arbitrary depth data structures (eg not ini style files).
+
+=head2 Inheritance
+
+Each config file can specify a C<PARENT> config file, the raw data of the
+parent file is merged (via L<Hash::Merge>) into the current config's raw
+data. This is done recursively so the current config parent can itself
+inherit another file. No checking is done circular references.
+
+=head2 Variable substitutions
+
+Config files may contain markers for data to be substituted the specified
+position at run time.This consists of a dot separated list of hash keys or
+array indexes surrounded by hashes (#).
+
+ eg #my.path.3.value.0#
+
+This would be the equivalent to accessing the data as
+
+ $data->{my}{path}[3]{value}[0]
+
+Checking is done along the path to access the data correctly, if an element
+is a blessed object the path position will be attempted to be used as an
+accessor.
+
+ eg if my is an object
+ $data->my->path()->[3]{value}[0]
+
+If at any point in the expansion of the path no data is found undef is
+returned for that value.
+
+=head2 Actions
+
+Variable expansion is actually a special case of an action. An action (in
+the general form) is called by the config by specifying either C<METHOD>
+and/or C<MODULE> keys.
+
+If only C<METHOD> is specified the method is called against the C<action_class>
+parameter of the L<Data::Context> object which by default is
+L<Data::Context::Action>. Any actions passed into the L<Data::Context>
+object are made available this way.
+
+If only C<MODULE> is specified then the C<action_method> (by default get_data)
+is used to call against C<MODULE>.
+
+If both C<MODULE> and C<METHOD> are specified then C<MODULE>->C<METHOD> is
+used.
+
+The contents of the hash containing C<MODULE> and/or C<METHOD> are passed to
+the method, along with the C<vars> the request was called with, the dotted
+path thought the config and a reference to the L<Data::Context::Instance>
+object. The return value of the call is used to replace the original hash
+value. That is unless the returned value is an L<AnyEvent::CondVar> variable.
+If the result is a condvar then it will be recv()ed allowing for multiple
+longer running events to occur. The result of the recv() (ie what is passed
+to the ->send) is used to replace the original hash.
+
+=head3 Ordering
+
+The default order that actions are called is the reverse of the order that
+they are encountered. This allows an action to include the output of
+another action. If this ordering is not what the application requires, the
+hash where the action is defined can specify C<ORDER> to overwrite the
+default order. If C<ORDER> is a positive integer (including 0) then the
+method will be called before other non ordered methods (but in increasing
+numerical order by C<ORDER>). If the value is negative then it will be
+run after all non ordered actions (again negative C<ORDER>s will be run in
+increasing numerical order ie most negative to lease negative).
+
+    eg data.dc.yml
+    actions:
+        -
+            METHOD: get_unordered_second
+        -
+            METHOD: get_second
+            ORDER: 1
+        -
+            METHOD: get_first
+            ORDER: 0
+        -
+            METHOD: get_unordered_first
+        -
+            METHOD: get_last
+            ORDER: -1
+        -
+            METHOD: get_last_but1
+            ORDER: -2
+
+    This will execute in order
+        get_first
+        get_second
+        get_unordered_first
+        get_unordered_second
+        get_last_but1
+        get_last
+
+=head3 How Actions are called
+
+=head3 NEW
+
+Still to be implemented. Currently all method calls are class calls but the
+C<NEW> key will be used to specify creating an object.
+
+=head1 BUGS AND LIMITATIONS
+
+There are no known bugs in this module.
+
+Please report problems to Ivan Wills (ivan.wills@gmail.com).
+
+Patches are welcome.
+
+=head1 AUTHOR
+
+Ivan Wills - (ivan.wills@gmail.com)
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (c) 2012 Ivan Wills (14 Mullion Close, Hornsby Heights, NSW Australia 2077).
+All rights reserved.
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself. See L<perlartistic>.  This program is
+distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.
+
+=cut

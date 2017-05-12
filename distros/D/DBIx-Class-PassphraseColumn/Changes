@@ -1,0 +1,7 @@
+0.02  Fri, 13 May 2011 11:34:27 +0200
+  * Stop hashed passphrases from being overwritten by plain-text
+    passphrases. Thanks, Gareth Harper <spansh@gmail.com> for finding this and
+    suggesting a fix.
+
+0.01  Thu, 09 Dec 2010 16:12:39 +0100
+  * Initial release.

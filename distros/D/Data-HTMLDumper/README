@@ -1,0 +1,35 @@
+Data/HTMLDumper version 0.01
+============================
+
+This is like Data::Dumper, but makes html tables instead of pretty
+printing with whitespace.  It can be used in any Perl that is generating
+output destined for a browser.
+
+Starting with version 0.04 regex substitutions were replaced with a
+Parse::RecDescent scheme.  The main difference for casual users is that
+the tables produced look different in many cases.  They are actually more
+consistent.  So I think they are better.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires only:
+
+  Data::Dumper
+  Parse::RecDescent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-4 Phil Crow
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl 5.8.0 itself. 
+

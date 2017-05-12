@@ -1,0 +1,7 @@
+{
+  my $want_pp;
+  sub want_pp {
+    return $want_pp if defined $want_pp;
+    $want_pp = parse_args()->{PUREPERL_ONLY} ? 1 : 0
+  }
+}

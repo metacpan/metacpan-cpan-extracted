@@ -1,0 +1,104 @@
+#!/usr/bin/perl
+
+# http://perlmonks.org/?node_id=1084067
+# Script by Jim
+#use v5.10;
+use strict;
+use warnings;
+use utf8;
+
+use Encode qw( encode_utf8 );
+use Unicode::UCD qw( charblock );
+
+binmode STDOUT, ':encoding(UTF-8)';
+
+while (my $word = <DATA>) {
+    chomp $word;
+
+    my $length_in_bytes       = length_in_bytes($word);
+    my $length_in_code_points = length_in_code_points($word);
+    my $length_in_graphemes   = length_in_graphemes($word);
+    my $code_points_in_blocks = code_points_in_blocks($word);
+
+    printf "%-12s | Bytes: %2d | Code Points: %2d | Graphemes: %2d | Blocks: %s\n",
+        $word,
+        $length_in_bytes,
+        $length_in_code_points,
+        $length_in_graphemes,
+        $code_points_in_blocks;
+}
+
+exit 0;
+
+sub length_in_bytes {
+    my $word = shift;
+
+    my $length = length encode_utf8($word);
+
+    return $length;
+}
+
+sub length_in_code_points {
+    my $word = shift;
+
+    my $length = length $word;
+
+    return $length;
+}
+
+sub length_in_graphemes {
+    my $word = shift;
+
+    my $length = () = $word =~ m/\X/g;
+
+    return $length;
+}
+
+sub code_points_in_blocks {
+    my $word = shift;
+
+    my %total_code_points_by;
+    my $blocks = '';
+
+    for my $character (split m//, $word) {
+        my $block = charblock(ord $character);
+
+        $total_code_points_by{$block}++;
+    }
+
+    for my $block (sort keys %total_code_points_by) {
+        my $total = $total_code_points_by{$block};
+
+        $blocks .= sprintf "%s%s (%d)",
+                   (length $blocks ? ', ' : ''), $block, $total;
+    }
+
+    return $blocks;
+}
+
+__DATA__
+æ
+æð
+æða
+æðaber
+æðahnútur
+æðakölkun
+æðardúnn
+æðarfugl
+æðarkolla
+æðarkóngur
+æðarvarp
+æði
+æðimargur
+æðisgenginn
+æðiskast
+æðislegur
+æðrast
+æðri
+æðrulaus
+æðruleysi
+æðruorð
+æðrutónn
+æðstur
+æður
+æfa

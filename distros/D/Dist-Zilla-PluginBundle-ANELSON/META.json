@@ -1,0 +1,58 @@
+{
+   "abstract" : "Dist::Zilla plugins for anelson",
+   "author" : [
+      "Andrew Nelson <anelson@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-ANELSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::AutoMetaResources" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::Git" : "0",
+            "Dist::Zilla::Plugin::Git::NextVersion" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::ReadmeMarkdownFromPod" : "0",
+            "Dist::Zilla::Plugin::SynopsisTests" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/holophrastic/dist-zilla-pluginbundle-anelson/issues"
+      },
+      "homepage" : "https://github.com/holophrastic/dist-zilla-pluginbundle-anelson",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/holophrastic/dist-zilla-pluginbundle-anelson.git",
+         "web" : "https://github.com/holophrastic/dist-zilla-pluginbundle-anelson"
+      }
+   },
+   "version" : "0.01"
+}
+

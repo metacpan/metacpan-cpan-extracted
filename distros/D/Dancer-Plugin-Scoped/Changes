@@ -1,0 +1,8 @@
+Revision history for Dancer-Plugin-Scoped
+
+0.02    2012-01-26
+        Fixed Pod::Coverage
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

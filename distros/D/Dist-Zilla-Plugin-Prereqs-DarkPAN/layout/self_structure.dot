@@ -1,0 +1,20 @@
+strict digraph Perl {
+	graph [compound=1, concentrate=1, overlap=false, rankdir=LR, ranksep=1, smoothing=triangle, splines=spline];
+	node [label="\N", shape=record, style=dotted];
+	edge [minlen=1];
+	"Dist::Zilla::App::Command" [label="Dist::Zilla::App::Command"];
+	"Dist::Zilla::App::Command::listdeps_darkpan" [label="Dist::Zilla::App::Command::listdeps_darkpan", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Dist::Zilla::ExternalPrereq" [label="Dist::Zilla::ExternalPrereq", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Dist::Zilla::Plugin::Prereqs::DarkPAN" [label="Dist::Zilla::Plugin::Prereqs::DarkPAN", shape=Mrecord, style=solid, color="#7e1e9c", fontsize=7, height="0.1"];
+	"Dist::Zilla::Role::Plugin" [label="Dist::Zilla::Role::Plugin"];
+	"Dist::Zilla::Role::PrereqSource::External" [label="Dist::Zilla::Role::PrereqSource::External", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"Dist::Zilla::Role::xPANResolver" [label="Dist::Zilla::Role::xPANResolver", shape=Mrecord, style=solid, color="#15b01a", fontsize=7, height="0.1"];
+	"Moose::Object" [label="Moose::Object"];
+	"Moose::Object" -> "Dist::Zilla::ExternalPrereq" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Dist::Zilla::Role::Plugin" -> "Dist::Zilla::ExternalPrereq" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"Dist::Zilla::Role::xPANResolver" -> "Dist::Zilla::ExternalPrereq" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"Dist::Zilla::App::Command" -> "Dist::Zilla::App::Command::listdeps_darkpan" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Moose::Object" -> "Dist::Zilla::Plugin::Prereqs::DarkPAN" [arrowhead=open, arrowsize="0.5", color="#ff81c0", dir=forward, fontsize=6, headclip=1, label="inherited by", samehead=head, tailclip=1, weight=10];
+	"Dist::Zilla::Role::PrereqSource::External" -> "Dist::Zilla::Plugin::Prereqs::DarkPAN" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+	"Dist::Zilla::Role::Plugin" -> "Dist::Zilla::Role::PrereqSource::External" [arrowhead=open, arrowsize="0.5", color="#653700", dir=forward, fontsize=6, headclip=1, label="consumed by", samehead=head, tailclip=1, weight=5];
+}

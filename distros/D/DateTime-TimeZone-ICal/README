@@ -1,0 +1,179 @@
+NAME
+    DateTime::TimeZone::ICal - iCal VTIMEZONE entry to DateTime::TimeZone
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+        use Data::ICal;
+        use DateTime::Format::ICal;
+        use DateTime::TimeZone::ICal;
+
+        my $ical = Data::ICal->new(filename => 'foo.ics');
+
+        # generate a table of time zones
+        my (%tz, @events);
+        for my $entry (@{$ical->entries}) {
+            my $type = $entry->ical_entry_type;
+            if ($type eq 'VTIMEZONE') {
+                my $dtz = DateTime::TimeZone::ICal->from_ical_entry($entry);
+                $tz{$dtz->name} = $dtz;
+            }
+            elsif ($type eq 'VEVENT') {
+                push @events, $entry;
+            }
+            # ... handle other iCal objects ...
+         }
+
+         # now we can use this dictionary of time zones elsewhere:
+
+         for my $event (@events) {
+             # get a property that is a date
+             my ($dtstart) = @{$event->property('dtstart')};
+
+             # get the time zone key from the property parameters
+             my $tzid = $dtstart->parameters->{TZID};
+
+             # convert the date in the ordinary fashion
+             my $dt = DateTime::Format::ICal->parse_datetime($dtstart->value);
+
+             # the datetime will be 'floating', therefore unaffected
+             $dt->set_time_zone($tz{$tzid}) if $tzid and $tz{$tzid};
+
+             # ... do other processing ...
+         }
+
+DESCRIPTION
+    Conforming iCal documents (RFC 5545
+    <https://tools.ietf.org/html/rfc5545>) have three ways to represent
+    "DATE-TIME" values: UTC, local, and specified through the "TZID"
+    mechanism. "TZID" *parameters* in relevant properties are references to
+    the same "TZID" *property* in one of a list of "VTIMEZONE" objects,
+    where the information about UTC offsets and their recurrence is embedded
+    in the document.
+
+    In practice, many generators of iCal documents use, as "TZID" keys,
+    valid labels from the Olson database <http://www.iana.org/time-zones>,
+    but others, notably Microsoft Outlook, do not. RFC 5545 explicitly
+    declines to specify a naming convention, so it is sometimes necessary to
+    construct the time zone offsets and daylight savings changes from the
+    "VTIMEZONE" data itself, rather than just inferring it from the name.
+    That's where this module comes in.
+
+METHODS
+    The only differences in interface for this module are its constructor
+    and one method, "from_ical_entry". The rest of the interface should work
+    exactly the same way as DateTime::TimeZone, so please consult its
+    documentation for other functionality.
+
+    This module overrides the following methods:
+
+    *   name
+
+    *   category
+
+    *   is_floating
+
+    *   is_olson
+
+    *   offset_for_datetime
+
+    *   offset_for_local_datetime
+
+    *   is_dst_for_datetime
+
+    *   short_name_for_datetime
+
+    *   is_utc
+
+    *   has_dst_changes
+
+  new %PARAMS
+    The constructor has been modified to permit the assembly of a time zone
+    specification from piecemeal data. These are the following
+    initialization parameters:
+
+    tzid
+        This is the "TZID" of the iCal entry. Note that the accessor to
+        retrieve the value from an instantiated object is "name", for
+        congruence with DateTime::TimeZone.
+
+    standard
+        This is an "ARRAY" reference of DateTime::TimeZone::ICal::Spec
+        instances, or otherwise of "HASH" references congruent to that
+        module's constructor, which will be coerced into said objects. This
+        parameter is *required*, and there must be *at least* one member in
+        the "ARRAY".
+
+    daylight
+        Same deal but for Daylight Savings Time. This parameter is optional,
+        as is its contents.
+
+    In practice you may not need to ever use this constructor directly, but
+    it may come in handy for instances where you need to compose
+    non-standard time zone behaviour from scratch.
+
+  from_ical_entry $ENTRY [, $USE_DATA ]
+    This class method converts a Data::ICal::Entry object of type
+    "VTIMEZONE" into a DateTime::TimeZone::ICal object. It will "croak" if
+    the input is malformed, so wrap it in an "eval" or equivalent if you
+    expect that possibility.
+
+    This method attempts to check if an existing DateTime::TimeZone can be
+    instantiated from the "TZID", thus skipping over any local processing.
+    This behaviour can be overridden with the $USE_DATA flag.
+
+AUTHOR
+    Dorian Taylor, "<dorian at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-datetime-timezone-ical at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-TimeZone-ICal>.
+    I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DateTime::TimeZone::ICal
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker (report bugs here)
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-TimeZone-ICal>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DateTime-TimeZone-ICal>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DateTime-TimeZone-ICal>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DateTime-TimeZone-ICal/>
+
+SEE ALSO
+    DateTime::TimeZone
+    DateTime::Format::ICal
+    Data::ICal
+    RFC 5545 <https://tools.ietf.org/html/rfc5545>
+    IANA Time Zones (Olson Database) <http://www.iana.org/time-zones>
+
+LICENSE AND COPYRIGHT
+    Copyright 2015 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at <http://www.apache.org/licenses/LICENSE-2.0>
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

@@ -1,0 +1,13 @@
+encpassw.pl
+Makefile.PL
+MANIFEST			This list of files
+PasswordIniFile.pm
+README
+t/1-tests.t
+t/2-password.t
+t/3-new_deprecated.t
+t/4-connect_deprecated.t
+t/5-odbc_deprecated.t
+t/6-encpassw_pl.t
+Changes
+META.yml                                 Module meta-data (added by MakeMaker)

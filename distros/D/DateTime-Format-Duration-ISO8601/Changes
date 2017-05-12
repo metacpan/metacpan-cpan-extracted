@@ -1,0 +1,11 @@
+Revision history for DateTime-Format-Duration-ISO8601
+
+0.002   2016-06-29 (PERLANCAR)
+
+	- [Bugfix] Handle zero duration correctly, it should not be
+	  formatted as 'P' but 'PT0H0M0S'.
+
+
+0.001   2016-06-29 (PERLANCAR)
+
+        - First release.

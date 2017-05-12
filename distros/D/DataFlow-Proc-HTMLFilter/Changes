@@ -1,0 +1,40 @@
+Revision History for DataFlow-Proc-HTMLFilter
+=============================================
+
+1.112100
+--------
+
+commit 5bc34468def588516cd3a3120d89cd8d3738bc67
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+commit 0b6b97841a8f1e25b0c1911ac67e9912ef4aa2dd
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    fix in POD
+
+commit fbd1525260fc40bf0e80794728eaebe9cdf933ed
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+v1.111810 2011-06-29
+--------------------
+
+commit 0ed13844c4c8552ec9db6034307ead827ef41d7f
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose "builder" rather than "default" (almost everywhere)
+
+v1.111762 2011-06-25
+--------------------
+
+commit b67e819a7ed0aa510c8e3449c96c76c19b3f8ec9
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    subtype definition must come together
+
+===================================
+End of changes in the last 365 days
+===================================

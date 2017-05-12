@@ -1,0 +1,10 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+RelaisControl.pm
+test.pl
+RelaisCard.pm
+Frame.pm
+cardtest.pl
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               DBIx-Simple
+version:            1.35
+abstract:           Very complete easy-to-use OO interface to DBI
+author:
+    - Juerd Waalboer <juerd@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBI:  1.21
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

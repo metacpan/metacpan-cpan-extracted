@@ -1,0 +1,14 @@
+---
+name: Devel-TraceMethods
+version: 1.00
+author:
+  - chromatic <chromatic@wgz.org>
+abstract: Perl module for tracing module calls
+license: perl
+build_requires:
+  Test::Simple: 0.60
+provides:
+  Devel::TraceMethods:
+    file: lib/Devel/TraceMethods.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

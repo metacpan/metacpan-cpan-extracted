@@ -1,0 +1,8 @@
+Revision history for Perl extension Devel::GDB::Breakpoint.
+
+0.02  Mon Sep 30 07:37:13 2013
+    - Add alternative documentation
+    - Fix Makefile to include -g so module actually works
+
+0.01  Mon Sep 23 18:20:18 2013
+    - Original version

@@ -1,0 +1,8 @@
+Changes
+lib/Data/RunningTotal.pm
+lib/Data/RunningTotal/Item.pm
+Makefile.PL
+MANIFEST
+README
+t/Data-RunningTotal.t
+META.yml                                 Module meta-data (added by MakeMaker)

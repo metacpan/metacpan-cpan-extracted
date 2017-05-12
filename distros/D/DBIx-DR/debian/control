@@ -1,0 +1,23 @@
+Source: libdbix-dr-perl
+Section: perl
+Homepage: http://search.cpan.org/dist/DBIx-DR/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 7), cdbs,
+ libdbi-perl,
+ libdbd-sqlite3-perl,
+ libmouse-perl
+Standards-Version: 3.9.6
+Priority: extra
+VCS-Browser: https://github.com/unera/dbix-dr
+
+Package: libdbix-dr-perl
+Depends: ${perl:Depends}, ${misc:Depends}, libdbi-perl, libmouse-perl
+Architecture: all
+Description: easy DBI helper
+ The package extends DBI and allows You:
+ .
+  * to use perl inside Your SQL requests;
+  * to bless resultsets into Your package;
+  * to place Your SQL's into dedicated directory;
+  * to use usual DBI methods.
+

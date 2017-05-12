@@ -1,0 +1,17 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-PhraseBook
+version:      1.003
+version_from: lib/DBIx/PhraseBook.pm
+installdirs:  site
+requires:
+    Benchmark::Timer:              0.5
+    Carp::Assert:                  0.17
+    Class::Phrasebook:             0.88
+    Config::PropertiesSequence:    1
+    DBI:                           1.3
+    Log::Log4perl:                 0.4
+    XML::XPath:                    1
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

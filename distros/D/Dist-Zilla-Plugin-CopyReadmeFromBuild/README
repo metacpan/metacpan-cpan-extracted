@@ -1,0 +1,41 @@
+NAME
+    Dist::Zilla::Plugin::CopyReadmeFromBuild - Copy README after building
+    (for SCM inclusion, etc.)
+
+VERSION
+    version 0.0019
+
+SYNOPSIS
+    In your Dist::Zilla "dist.ini":
+
+        [CopyReadmeFromBuild]
+
+DESCRIPTION
+    CopyReadmeFromBuild will automatically copy the README from the build
+    directory into the distribution directory. This is so you can commit the
+    README to version control. GitHub, for example, likes to see a README
+
+    Dist::Zilla::Plugin::Readme will not like it if you already have a
+    README, so you'll have to disable that plugin, an example of which is:
+
+        [@Filter]
+        bundle = @Basic
+        remove = Readme
+
+AfterBuild/AfterRelease
+    With the release of 0.0016, this plugin changed to performing the copy
+    during the AfterRelease stage instead of the AfterBuild stage. To enable
+    the old behavior, set the environment variable
+    DZIL_CopyFromBuildAfterBuild to 1:
+
+        $ DZIL_CopyFromBuildAfterBuild=1 dzil build
+
+AUTHOR
+    Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

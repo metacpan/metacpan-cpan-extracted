@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<!-- extracted example from http://dublincore.org/documents/usageguide/
+ -->
+<rdf:RDF 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:dc="http://purl.org/dc/elements/1.1/">
+
+   <rdf:Description rdf:about="http://media.example.com/audio/guide.ra">
+
+      <dc:creator>Rose Bush</dc:creator>
+      <dc:title>A Guide to Growing Roses</dc:title>
+      <dc:description>Describes process for planting and nurturing different kinds of rose bushes.</dc:description> 
+      <dc:date>2001-01-20</dc:date>
+
+   </rdf:Description> 
+</rdf:RDF>

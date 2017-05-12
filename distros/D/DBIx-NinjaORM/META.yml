@@ -1,0 +1,58 @@
+---
+abstract: 'Flexible Perl ORM for easy transitions from inline SQL to objects.'
+author:
+  - 'Guillaume Aubert <aubertg@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  DBI: '0'
+  Test::Deep: '0'
+  Test::Exception: '0'
+  Test::FailWarnings: '0'
+  Test::More: '0.94'
+  Test::Type: '0'
+  Test::Warn: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-NinjaORM
+no_index:
+  file:
+    - t/lib/LocalTest.pm
+  namespace:
+    - TestSubclass
+provides:
+  DBIx::NinjaORM:
+    file: lib/DBIx/NinjaORM.pm
+    version: v3.1.0
+  DBIx::NinjaORM::Schema::Table:
+    file: lib/DBIx/NinjaORM/Schema/Table.pm
+    version: v3.1.0
+  DBIx::NinjaORM::StaticClassInfo:
+    file: lib/DBIx/NinjaORM/StaticClassInfo.pm
+    version: v3.1.0
+  DBIx::NinjaORM::Utils:
+    file: lib/DBIx/NinjaORM/Utils.pm
+    version: v3.1.0
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  DBIx::Inspector: '0'
+  Data::Dumper: '0'
+  Data::Validate::Type: '0'
+  Digest::SHA1: '0'
+  Log::Any: '0'
+  MIME::Base64: '0'
+  Storable: '0'
+  Try::Tiny: '0'
+  perl: '5.01'
+resources:
+  bugtracker: https://github.com/guillaumeaubert/DBIx-NinjaORM/issues
+  homepage: https://metacpan.org/release/DBIx-NinjaORM
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/guillaumeaubert/DBIx-NinjaORM
+version: v3.1.0

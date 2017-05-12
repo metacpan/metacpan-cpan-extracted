@@ -1,0 +1,28 @@
+0.06 (2016-10-03)
+
+    Enhancements:
+        - Small documentation fixes.
+
+    Bug Fixes:
+        - [rt.cpan.org #117925] t/test.t fails (with DateTime 1.38?)
+
+Sun Jun 27 10:56:12 CEST 2010
+
+    Add bugtracker and repo information to Makefile.PL.
+    Allow caller to specify what -b value was given to remind.
+    Uploaded to CPAN as v0.04.
+
+Sat Jun 26 22:27:27 CEST 2010
+
+    Removed META.yml from git control.
+    Add .git to MANIFEST.SKIP
+    Small cleanups to Date::Remind::Event.
+    More small cleanups, tests, and doc improvements.
+    Better handle various inputs for different -b values.
+    Rename dur() to duration()
+    Uploaded to CPAN as v0.03.
+
+Sat Jun 26 17:59:36 CEST 2010
+
+    Initial Release.
+

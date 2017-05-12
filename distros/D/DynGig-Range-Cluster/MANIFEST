@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DynGig/Range/Cluster/Cache.pm
+lib/DynGig/Range/Cluster/Client.pm
+lib/DynGig/Range/Cluster/Config.pm
+lib/DynGig/Range/Cluster/EZDB.pm
+lib/DynGig/Range/Cluster/Interface.pm
+lib/DynGig/Range/Cluster/Server.pm
+lib/DynGig/Range/Cluster.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

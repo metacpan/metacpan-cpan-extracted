@@ -1,0 +1,7 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/Plugin/GitObtain.pm
+t/01-simple.t

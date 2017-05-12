@@ -1,0 +1,9 @@
+lib/DJabberd/Delivery/OfflineStorage.pm
+lib/DJabberd/Delivery/OfflineStorage/SQLite.pm
+lib/DJabberd/Delivery/OfflineStorage/InMemoryOnly.pm
+Makefile.PL
+README
+Changes
+MANIFEST			This list of files
+t/00-use.t
+META.yml                                 Module meta-data (added by MakeMaker)

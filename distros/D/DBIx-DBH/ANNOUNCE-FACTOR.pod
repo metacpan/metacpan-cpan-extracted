@@ -1,0 +1,122 @@
+=head1 Refactoring Alzabo's _make_dbh() for Easier DBI Connection Configuration
+
+I have factored out the relevant code from
+Alzabo::Driver::(MySQL|Postgres)::_make_dbh(). I preserved the usage
+of Params::Validate but replaced the use of Exception::Class with
+plain Perl die calls. The module is standalone and is called
+DBIx::DBH. 
+
+
+=head1 ABSTRACT
+
+Composing a syntactically valid DBI DSN is a bit time-consuming and
+troublesome. Part of the reason for this is that the syntax varies from
+driver to driver. Another reason is that the DSN string is compound
+data, representing the complex of a minimum of 3 entities. Since 2001,
+3 modules have entered CPAN with the sole and express intent to store
+DBI database connection information and use this information to
+provide DBI database handles with ease. However, none of these modules
+assemble the components of the DSN string into a DSN string --- they
+all expect completely perfect DSN strings, a non-trivial task.
+
+Recently, I noticed that Alzabo's polymorphic _make_dbh() method could
+assemble syntactically correct DSN strings from simple-to-supply
+scalar data items for both Postgres and MySQL. In other words, instead
+of having to provide a well-formed DSN string like this:
+
+ dbi:mysql:database=mysqldb;host=rt.tg.allswell.com;port=3312;mysql_local_infile=1
+
+we leave the hard work to _make_dbh by calling it like this
+
+ $s->_make_dbh(
+   name => 'mysqldb', 
+   host => 'rt.tg.allswell.com', 
+   port => 3312,
+   user => 'carlos',
+   pass => 'santana',
+   mysql_local_infile => 1
+ );
+
+The C<_make_dbh()> usage is much easier to read. And much easier to
+create directly from HTTP form data or configuration files. No doubt
+everyone has their pet _make_dbh() in the tech stack at their
+company. 
+
+=head1 The refactoring
+
+The module DBIx::DBH represents my refactoring of Dave's code. The
+hash elements have slightly different naming:
+
+=over
+
+=item * the database driver must be supplied
+
+The C<driver> key is used to supply the database
+
+=item * the name key is dbname
+
+=item * the pass key is passed
+
+=back
+
+Another difference is that _make_dbh() called C<< DBI->connect() >> with a
+fixed set of DBI attributes. The refactoring allows for any attributes
+to be used, both from DBI and from the driver's driver.
+
+=head1 Database Connection Modules, Past and Present
+
+The very first module on CPAN for database connection may have been
+C<DBIx::Password> by Brian Aker.  I sent him patches so he could
+return a hash of data or array of data for use with supra-DBI tools
+like L<Alzabo> and L<DBix::AnyDBD> but he refused them. L<Ima::DBI>
+was also available around this time, but it simply slipped my mind.
+
+So in 2002, I created DBIx::Connect, a Perl module which would 
+use L<AppConfig> configuration files to provide either DBI database handles
+or a data structure with connection information. This was nice because I could
+flit from database tool to database tool but only have to catalog my
+connection information once.
+
+However, DBIx::Connect was based on AppConfig, which was proving itself
+hard to use - it was not easy to have global data and overwrite it
+in sub-blocks. I noted these shortcomings here:
+
+   http://perlmonks.org/?node_id=299749
+
+and based on suggestions rewrote DBIx::Connect from the bottom up using
+Sam Tregar's excellent L<Config::ApacheFormat>. Now, I could do
+anything with config files that you could do with an Apache one. Also, 
+I had much better validation of the config file.
+
+L<Config::DBI> is OK except for two things
+
+=over
+
+=item 1  DSN strings are entered as one composite value. 
+
+When using an Apache-like configuration file, one thing you find
+immensely useful is the ability to build up your data in layers,
+inheriting and over-writing values as necessary.
+
+It is difficult to create such an inheritance hiearchy
+describing each database when the DSN is specified as a string.
+
+=item 2 Config::DBI has rigid expectations of the config file
+
+Software organizations should be entitled to develop configuration
+files in any manner they desire. Config::DBI expects the file to have
+a certain structure which may not accord with how the organization
+wants to describe their database setup
+
+=back
+
+The way around both of these problems was handled by Alzabo's
+make_dbh() function a long time ago. To handle item 1, you simply run
+through the hash, looking for keys that can be used in the DSN and
+assemble them into the DSN string. To handle item 2, you simply expect
+a hash whose keys are limited to the values in the DBI and driver
+documentation. How a particular software organization transforms their
+internal configuration information to this generic hash is their concern.
+
+
+

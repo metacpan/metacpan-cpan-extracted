@@ -1,0 +1,55 @@
+Revision history for Dancer::Plugin::PageHistory
+
+0.102 Mon 21 Sep 10:58:40 CEST 2015
+
+    * return empty list instead of undef for method calls with no history
+
+0.101 Fri Jun 12 19:57:59 CEST 2015
+
+    * update Plack build dep since older Plack::Test has no create method
+
+0.100 Sat May 30 12:01:45 CEST 2015
+
+    * cache history in var for request duration
+
+0.006 Fri May 29 12:30:40 CEST 2015
+
+    * improve robustness of memcache and DBIC tests
+
+0.005 Thu May 28 16:25:50 CEST 2015
+
+    * bugfix: page objects not unblessed when other code saves to session
+    
+0.004 Wed May 27 18:26:16 CEST 2015
+
+    [ENHANCEMENTS]
+
+    * Additional sessions engine: PSGI
+
+    [TESTS]
+
+    * switch from Dancer::Test to Plack::Test for plugin.t
+
+
+0.003 Tue May 26 16:44:39 CEST 2015
+
+    [ENHANCEMENTS]
+
+    * Additional sessions engines: CHI, Memcached, Memcached::Fast, MongoDB
+
+    [MISC]
+
+    * Simplify deflation by using Data::Structure::Util::unbless to simplify
+      support for additional session engines
+
+    [TESTS]
+
+    * Cleanup use of try_load_class in plugin.t
+
+0.002 Tue May 26 10:29:09 CEST 2015
+
+    * cleanup tests that caused smoker failures
+
+0.001 Mon May 25 19:39:00 CEST 2015
+
+    * Initial release

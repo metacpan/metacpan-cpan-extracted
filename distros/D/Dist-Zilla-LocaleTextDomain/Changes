@@ -1,0 +1,66 @@
+Revision history for Perl extension Dist-Zilla-LocaleTextDomain
+
+0.90  2014-09-22T21:48:12Z
+     - Updated docs to reflect proper ShareDir support in Locale::TextDomain
+       v1.21 and higher.
+     - Various documentation corrections.
+     - Added `finder` attribute to customize the files that are searched for
+       localization strings. Previously, only `*.pm` files were searched, but
+       now will be extracted from files below `lib/` and the files in the
+       directory configured for the `ExecDir` plug-in (if loaded). Edit the
+       `finder` attribute in the `LocaleTextDomain` section of `dist.ini` to
+       change this behavior. Thanks to Manfred Stock for the patch!
+
+0.87  2013-11-24T04:46:40Z
+     - Updated file gathering to suport Dist::Zilla 5.0's improved character
+       encoding support.
+     - Fixed Pod link to actually link.
+
+0.86  2013-04-09T00:32:43Z
+     - Added diagnostic output to some tests to help figure out why they fail
+       on some platforms.
+     - Added code to the installer to throw an error if the version of GNU
+       gettext appears to be less then v0.17.0. v0.17.0 is required for the
+       `--package-name` and `--package-version` options.
+
+0.85  2013-01-08T23:07:42Z
+     - Changed `msg-compile` to take a list of file names, rather than
+       language codes. This brings it in line with the interface of
+       `msg-merge`.
+     - Added a section for translators to the documentation.
+
+0.84  2013-01-08T20:24:42Z
+     - Changed some logging output to be prefixed with `[LocalTextDomain]`
+       rather than `[DZ]`.
+     - Added the `msg-compile` command, which allows one to arbitrarily
+       compile one or more language catalogs. This should be useful for
+       translators who want to test a catalog as they translate it.
+
+0.83  2012-12-04T23:54:12Z
+     - Added improved failure message when GNU gettext cannot be found, as
+       well as slightly improved detection of the fact that it's not
+       installed. Thanks to Jeff Lavallee for the box to test it on.
+
+0.82  2012-12-03T19:06:03Z
+     - Fixed broken call to `log_fatal` in the `msg-init` command that caused
+       the actual error to be lost in favor of a bad method call error. Thanks
+       Joenio Costa for the patch.
+     - Added a note on how to get Locale::TextDomain to return character
+       strings instead of byte strings.
+     - Now refuse to build if `gettext --version` does not work at build time.
+
+0.81  2012-10-02T16:25:43Z
+      - Removed tests for the `add_lang` command, which was never shipped,
+        but renamed `msg_init`.
+
+0.80  2012-10-01T19:00:55Z
+      - Switched from `system()` to IPC::Run3, so that STDOUT and STDERR
+        messages can be passed to the Dist::Zilla logger.
+      - Added new `dzil` commands:
+        + `msg-scan` - Scan modules for messages to create translation template file
+        + `msg-init` - Create a new language translation file
+        + `msg-merge` - Merge message changes into translation files
+      - Added short tutorial as main documentation, Dist::Zilla::LocaleTextDomain.
+      
+0.10  2012-09-06T22:12:48Z
+      - Initial release with just the LocaleTextDomain plugin.

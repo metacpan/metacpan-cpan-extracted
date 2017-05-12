@@ -1,0 +1,17 @@
+#!/usr/bin/env perl
+
+print "Hello, world!\n";
+
+__END__
+
+=head1 SYNOPSIS
+
+This is the script synopsis in I<italic>.
+
+=head1 DESCRIPTION
+
+This is the script description in B<bold>.
+
+=head1 FUNCTIONS
+
+Some script functions are listed here

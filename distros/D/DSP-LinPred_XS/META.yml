@@ -1,0 +1,40 @@
+---
+abstract: 'Linear Prediction'
+author:
+  - 'Toshiaki Yokoda <>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DSP-LinPred_XS
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DSP::LinPred_XS:
+    file: lib/DSP/LinPred_XS.pm
+    version: '0.03'
+requires:
+  Mouse: v2.1.0
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/adokoy001/DSP-LinPred_XS/issues
+  homepage: https://github.com/adokoy001/DSP-LinPred_XS
+  repository: git://github.com/adokoy001/DSP-LinPred_XS.git
+version: '0.03'
+x_contributors:
+  - 'Toshiaki Yokoda <yokoda@ub12.04svr>'
+  - 'Toshiaki_Yokoda <adokoy001@gmail.com>'

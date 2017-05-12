@@ -1,0 +1,14 @@
+# The format here is simple:  Add your email as you'd like to see it in the
+# credits, etc, as the key; then an array of your other name/email pairings.
+---
+Chris Weyl <rsrchboy@cpan.org>:
+   - Chris Weyl <cweyl@alumni.drew.edu>
+   - Chris Weyl <cweyl@campusexplorer.com>
+   - Chris Weyl <chris.weyl@wps.io>
+   - Chris Weyl <cweyl@whitepointstarllc.com>
+Mike Greb <mikegrb@cpan.org>:
+   - mikegrb <mgreb@linode.com>
+   - Michael Greb <mgreb@linode.com>
+   - mikegrb <michael@thegrebs.com>
+   - Michael Greb <michael@thegrebs.com>
+   - Michael Greb <michael@orion.thegrebs.com>

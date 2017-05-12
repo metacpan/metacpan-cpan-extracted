@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+use Data::Faker;
+use Getopt::Long;
+
+my $faker = Data::Faker->new();
+
+my $help = 0;
+my @methods = $faker->methods;
+my @todo = ();
+GetOptions(
+	'help|h'	=> sub { print <DATA> },
+	'datatypes'	=> sub { print join("\n",@methods) },
+);
+unless(@ARGV) { print <DATA>; exit; }
+
+print join(' ',map { $faker->$_() } @ARGV)."\n";
+
+__END__
+Usage: datafaker [options] datatypes...
+
+  Available Options:
+    --help          Show help information
+    --datatypes     List the available datatypes
+

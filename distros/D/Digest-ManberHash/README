@@ -1,0 +1,13 @@
+README of Digest::ManberHash;
+
+
+
+This module can be used to calculate Manber Hashes for files
+(see http://citeseer.nj.nec.com/manber94finding.html).
+
+
+For usage please see ManberHash.pm.
+
+
+
+License: the GPL as available under http://www.gnu.org/copyleft/gpl.txt

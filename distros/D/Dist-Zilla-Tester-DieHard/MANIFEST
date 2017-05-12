@@ -1,0 +1,14 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.7.
+Build.PL                         #                 3rd party file built by ModuleBuildTiny
+COPYING                          # Dist-Zilla-Tester-DieHard file built by GenerateFile
+Changes                          # Dist-Zilla-Tester-DieHard file added by Manifest::Read
+GPLv3                            # Dist-Zilla-Tester-DieHard file added by Manifest::Read
+MANIFEST                         #                  metainfo file built by Manifest::Write
+META.json                        #                  metainfo file built by MetaJSON
+META.yml                         #                  metainfo file built by MetaYAML
+README                           # Dist-Zilla-Tester-DieHard file built by GenerateFile
+VERSION                          # Dist-Zilla-Tester-DieHard file added by Manifest::Read
+lib/Dist/Zilla/Tester/DieHard.pm # Dist-Zilla-Tester-DieHard file added by Manifest::Read
+t/00-compile.t                   #                 3rd party file built by Test::Compile
+t/die-hard.t                     # Dist-Zilla-Tester-DieHard file added by Manifest::Read
+t/lib/DistZillaPlugin.pm         # Dist-Zilla-Tester-DieHard file added by Manifest::Read

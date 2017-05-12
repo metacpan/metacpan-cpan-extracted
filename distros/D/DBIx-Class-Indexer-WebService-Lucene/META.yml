@@ -1,0 +1,25 @@
+---
+name: DBIx-Class-Indexer-WebService-Lucene
+version: 0.02
+author:
+  - 'Adam Paynter <adapay@cpan.org>'
+abstract: |-
+  Automatic indexing of DBIx::Class objects via 
+  WebService::Lucene
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class::Indexed: 0
+  Scalar::Util: 0
+  WebService::Lucene: 0
+build_requires:
+  Test::More: 0
+provides:
+  DBIx::Class::Indexer::WebService::Lucene:
+    file: lib/DBIx/Class/Indexer/WebService/Lucene.pm
+    version: 0.02
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

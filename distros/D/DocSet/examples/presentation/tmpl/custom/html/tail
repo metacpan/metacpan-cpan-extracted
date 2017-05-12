@@ -1,0 +1,9 @@
+
+    <!-- footer (tail )-->
+    <div class="tail">
+        <center>
+        <p>Last modified [% doc.last_modified %]</p>
+    </div>
+    <!-- end footer (tail)-->
+
+    <br><br>

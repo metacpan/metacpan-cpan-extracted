@@ -1,0 +1,38 @@
+Revision history for Perl extension Data::Password::BasicCheck.
+
+2.03  Tue Apr 23 11:19:46 CEST 2013
+        - fixing bug 84736: spelling error in documentation
+
+2.02  Sat Feb  2 15:09:20 CET 2013
+        - fixing bug 83036: BasicCheck.pm returns incorrect error code
+	  when there are not enough different symbols.
+	  See https://rt.cpan.org/Ticket/Display.html?id=83036 for details
+	  So strange to get a bug report nearly 9 years after the last
+	  release of the module!!!
+
+2.01  Released on March 8, 2004
+        - fixed some oddities in new()
+
+2.00  Thu Sep 18 22:10:24 CEST 2003
+        - 1.00 was too stupid! Now you can check your password against
+	  an arbitrary amount of user's data. This imposed a change in
+	  module's interface and, therefore, documentation.
+	  A part about the difference between Data::Password and
+	  Data::Password::BasicCheck was missing, hopefully this has
+  	  been fixed
+
+1.00  Wed Aug 13 19:06:38 CEST 2003
+        - updated the documentation for publication on CPAN,
+          a great thank to dree (Andrea Maestrutti) for his
+          help.
+
+0.03  Sun Aug 10 17:18:59 CEST 2003
+        - added some documentation
+
+0.02  Fri Aug  8 18:04:24 CEST 2003
+        - this is better :-)
+
+0.01  Fri Aug  8 10:54:17 2003
+	- original version; created by h2xs 1.22 with options
+		-aX Data::Password::BasicCheck
+

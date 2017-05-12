@@ -1,0 +1,221 @@
+0.0.48 (2016-11-01)
+
+    New Features:
+        - New xprepare_cached() method that maps to the underlying
+          DBI prepare_cached one.
+
+0.0.46 (2016-10-16)
+
+    No changes from v0.0.45_2.
+
+0.0.45_2 (2016-07-29)
+
+    Bug Fixes:
+        - Remove debugging print statement
+
+0.0.45_1 (2016-07-28)
+
+    Enhancements:
+        - Indent JOIN and ON statements by two spaces.
+        - Log SQL statements when the prepare() step fails
+
+    Bug Fixes:
+        - Remove support for empty { col => [] } constructs
+
+    Dependencies:
+        - Don't use "//" for perl 5.6 support
+
+0.0.44 (2016-05-20)
+
+    Bug Fixes:
+        - Don't index new non-public packages
+        - Fix Deploy under App::staticperl builds
+
+0.0.42 (2016-02-29)
+
+    New Features:
+        - New throw_error() method for overriding database errors
+
+    Enhancements:
+        - Ignore { col => [] } constructs
+
+    Bug Fixes:
+        - Only test with DBD::SQLite as DBD::DBM is fragile
+
+0.0.41_1 (2015-12-28)
+
+    Enhancements:
+        - Major refactoring
+
+0.0.40 (2015-06-26)
+
+    Enhancements:
+        - Support use of >, >=, < and <= in WHERE/ON conditions.
+
+0.0.38 (2015-06-24)
+
+    Bug Fixes:
+        - NULL conditions in WHERE statements would cause any following
+          values to also be NULL.
+
+0.0.36 (2015-06-19)
+
+    Enhancements:
+        - Upgrade included Module::Install to 1.16
+
+0.0.34 (2015-06-16)
+
+    New Features:
+        - New "log_warn" method for "warn"ing output of statements.
+          This will be used by DBIx::ThinSQL::SQLite.
+
+    Enhancements:
+        - Move driver modules into seperate files (thanks to reneeb via
+          CPAN Challenge).
+        - Fleshed out the TODO file.
+        - Cleaned up share directory handling
+        - New development branch naming scheme documented in
+          README.development
+        - Cleaned up this file to remove lots of empty noise lines.
+
+    Bug Fixes:
+        - Write NULLs out explicitly instead of binding them. Lets
+          "where => {col => undef}" work on PostgreSQL.
+
+0.0.32 (2014-10-30)
+
+    New Features:
+        - New db->xvals() and sth->vals() methods.
+        - LIKE / NOT LIKE support in HASHrefs.
+
+    Bug Fixes:
+        - Do not attempt to ROLLBACK or RELEASE inside a transaction.
+
+0.0.30 (2014-09-26)
+
+    Bug Fixes:
+        - Make xarrayref() and xhashref() return an empty list () in
+          list context when there are no rows.
+
+0.0.28 (2014-09-23)
+
+    Enhancements:
+       - HASHref columns (for VALUES or SET or WHERE) are now sorted
+         so that statements are consistent between runs.
+
+0.0.26 (2014-09-10)
+
+    New Features:
+        - Accept "column !" in hashref keys to simulate not-equals.
+
+0.0.24 (2014-08-30)
+
+   API Changes:
+       - Methods RENAMED:
+            xarray() -> xarrayref()
+            xarrays() -> xarrayrefs()
+            xhash() -> xhashref()
+            xhashes() -> xhashrefs()
+       - xarrayref() no longer returns a list. Functionality replaced
+         by the new xlist() method.
+
+   New Features:
+      - New methods:
+            xval() returns a single scalar
+            xlist() returns first row as a list
+
+0.0.22 (2014-06-30)
+
+   API Changes:
+       - $sth->xarrays in scalar context now returns undef on empty
+         rows. Callers can check for definedness if need be before
+         looping.
+
+0.0.20 (2014-06-13)
+
+    Bug Fixes:
+        - Translate arrayrefs as "IN (?,?)" for ON hashrefs
+
+0.0.18 (2014-04-10)
+
+    Enhancements:
+        - Remove unecessary subtest() calls in tests
+
+    Bug Fixes:
+        - Make drop_everything() independent of individual drop methods
+        - SQLite: drop_tables() also needs to drop indexes & triggers
+
+0.0.16 (2014-04-07)
+
+    Bug Fixes:
+        - Include a proper MANIFEST (0.0.14 was broken).
+
+0.0.14 (2014-04-07)
+
+    Enhancements:
+        - Add UPDATE ... SET support
+        - Split drop_everything() into individual methods
+        - Call DBI->do() from xdo() when no bind values required
+
+    Bug Fixes:
+        - Ensure VALUES appears when argument is not an ARRAY or HASH
+          reference.
+        - Correctly handle SCALAR refs in VALUES hashrefs
+
+0.0.12 (2013-12-26)
+
+    Enhancements:
+        - Insert DEFAULT VALUES when given empty structures
+
+    Bug Fixes:
+        - Stop "shift" warnings on earlier Perls.
+        - Do not include trailing ";" in prepare statements
+
+0.0.10 (2013-12-14)
+
+    API Changes:
+        - Consistent naming of DBIx::ThinSQL::Deploy::* methods
+
+    New Features:
+        - New methods:
+            DBIx::ThinSQL::Deploy->run_sql
+            DBIx::ThinSQL::Deploy->run_arrayref
+            DBIx::ThinSQL::Deploy->deploy_sql
+
+    Enhancements:
+        - Remove redundant logging where DBI's trace works better
+        - Remove hack to make SQLite sequences work, replaced by
+          "create_sqlite_sequence" function in DBIx::ThinSQL::SQLite.
+
+0.0.8 (2013-06-11)
+
+    New Features:
+        - New log_debug() method for SELECTing straight to Log::Any
+
+    Enhancements:
+        - Convert HASH arguments to functions as 'KEY = bv(VAL)'
+        - Support for [insert_info => ARRAYREF] constructs
+        - Interpret SCALAR references in HASH values as raw SQL
+
+0.0.6 (2013-05-27)
+
+    New Features:
+        - Sub-query support via the sq() function
+        - dump() and xdump() methods for debugging
+
+    Enhancements:
+        - Handle UNION [ALL] statements
+        - Warn on unknown deployment file type
+
+    Bug Fixes:
+        - Only rollback if error doesn't occur on commit.
+        - Skip tests in Deploy.t when no valid handles available
+
+0.0.4 (2013-05-20)
+
+    Bug Fixes:
+        - Don't include a blib/ directory in the distribution.
+
+0.0.2 (2013-04-06)
+
+    Initial Release

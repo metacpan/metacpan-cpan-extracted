@@ -1,0 +1,49 @@
+NAME
+    Dist::Zilla::Plugin::SetScriptShebang - Set script shebang to #!perl
+
+VERSION
+    This document describes version 0.01 of
+    Dist::Zilla::Plugin::SetScriptShebang (from Perl distribution
+    Dist-Zilla-Plugin-SetScriptShebang), released on 2014-08-16.
+
+SYNOPSIS
+    In "dist.ini":
+
+     [SetScriptShebang]
+
+DESCRIPTION
+    This plugin sets all script's shebang line to "#!perl". Some shebang
+    lines like "#!/usr/bin/env perl" are problematic because they do not get
+    converted to the path of installed perl during installation. This
+    sometimes happens when I package one of my Perl scripts (which uses
+    "#!/usr/bin/env perl") into a Perl distribution, and forget to update
+    the shebang line.
+
+SEE ALSO
+    Dist::Zilla
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Dist-Zilla-Plugin-SetScriptShebang>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Dist-Zilla-Plugin-SetScriptShebang>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Set
+    ScriptShebang>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

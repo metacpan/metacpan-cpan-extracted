@@ -1,0 +1,129 @@
+t_delete:
+
+delete from BUG
+
+;;
+
+
+t_insert:
+
+# comment here
+
+insert into BUG (
+       bugid,
+       groupset,
+       assigned_to,
+       bug_severity,
+       bug_status,
+       creation_ts,
+       op_sys,
+#embedded comment
+       priority,
+       product,
+       reporter,
+       version,
+       component,
+       resolution
+) values (
+  5,
+  42,
+  3,
+  "HIGH",
+  "NEW",
+  current_timestamp,
+  "RH",
+  "HIGH",
+  "DBIx::Librarian",
+  3,
+  "0.1",
+  "Statement",
+  ""
+)
+
+select1	bugid
+from	BUG
+where	groupset = 42
+
+;;
+
+
+t_insert_bind:
+
+insert into BUG (
+       bugid,
+       groupset,
+       assigned_to,
+       bug_severity,
+       bug_status,
+       creation_ts,
+       op_sys,
+       priority,
+       product,
+       reporter,
+       version,
+       component,
+       resolution
+) values (
+  7,
+  :groupset,
+  :assigned_to,
+  "HIGH",
+  "NEW",
+  current_timestamp,
+  "RH",
+  "HIGH",
+  :product,
+  3,
+  "0.1",
+  "Statement",
+  ""
+)
+
+select1	bugid
+from	BUG
+where	groupset = :groupset
+
+;;
+
+
+t_select_all:
+
+select	bugid "bug.bugid"
+from	BUG
+
+;;
+
+
+t_select_bug:
+
+select1	reporter,
+	version,
+	product
+from	BUG
+where	bugid = :bugid;
+
+;;
+
+
+t_select_row:
+
+select1	bugid,
+	product,
+	assigned_to,
+	version
+from	BUG
+where	groupset = :groupset;
+
+;;
+
+
+t_select_row2:
+
+select1	bugid "foo.bugid",
+	product "foo.prodnum",
+	assigned_to "foo.assignee",
+	version "foo.version"
+from	BUG
+where	groupset = :groupset;
+
+;;

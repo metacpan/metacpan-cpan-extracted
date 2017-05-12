@@ -1,0 +1,139 @@
+{
+   "abstract" : "A pure perl multi-level hash/array DBM that supports transactions",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4214",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBM-Deep",
+   "no_index" : {
+      "directory" : [
+         "utils"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Path" : "0.01",
+            "File::Temp" : "0.01",
+            "Pod::Usage" : "1.3",
+            "Test::Deep" : "0.095",
+            "Test::Exception" : "0.21",
+            "Test::More" : "0.88",
+            "Test::Warn" : "0.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Digest::MD5" : "1.00",
+            "Fcntl" : "0.01",
+            "Scalar::Util" : "1.14",
+            "perl" : "5.008_004"
+         }
+      }
+   },
+   "provides" : {
+      "DBM::Deep" : {
+         "file" : "lib/DBM/Deep.pm",
+         "version" : "2.0013"
+      },
+      "DBM::Deep::Array" : {
+         "file" : "lib/DBM/Deep/Array.pm"
+      },
+      "DBM::Deep::Engine" : {
+         "file" : "lib/DBM/Deep/Engine.pm"
+      },
+      "DBM::Deep::Engine::DBI" : {
+         "file" : "lib/DBM/Deep/Engine/DBI.pm"
+      },
+      "DBM::Deep::Engine::File" : {
+         "file" : "lib/DBM/Deep/Engine/File.pm"
+      },
+      "DBM::Deep::Hash" : {
+         "file" : "lib/DBM/Deep/Hash.pm"
+      },
+      "DBM::Deep::Iterator" : {
+         "file" : "lib/DBM/Deep/Iterator.pm"
+      },
+      "DBM::Deep::Iterator::DBI" : {
+         "file" : "lib/DBM/Deep/Iterator/DBI.pm"
+      },
+      "DBM::Deep::Iterator::File" : {
+         "file" : "lib/DBM/Deep/Iterator/File.pm"
+      },
+      "DBM::Deep::Iterator::File::BucketList" : {
+         "file" : "lib/DBM/Deep/Iterator/File/BucketList.pm"
+      },
+      "DBM::Deep::Iterator::File::Index" : {
+         "file" : "lib/DBM/Deep/Iterator/File/Index.pm"
+      },
+      "DBM::Deep::Null" : {
+         "file" : "lib/DBM/Deep/Null.pm"
+      },
+      "DBM::Deep::Sector" : {
+         "file" : "lib/DBM/Deep/Sector.pm"
+      },
+      "DBM::Deep::Sector::DBI" : {
+         "file" : "lib/DBM/Deep/Sector/DBI.pm"
+      },
+      "DBM::Deep::Sector::DBI::Reference" : {
+         "file" : "lib/DBM/Deep/Sector/DBI/Reference.pm"
+      },
+      "DBM::Deep::Sector::DBI::Scalar" : {
+         "file" : "lib/DBM/Deep/Sector/DBI/Scalar.pm"
+      },
+      "DBM::Deep::Sector::File" : {
+         "file" : "lib/DBM/Deep/Sector/File.pm"
+      },
+      "DBM::Deep::Sector::File::BucketList" : {
+         "file" : "lib/DBM/Deep/Sector/File/BucketList.pm"
+      },
+      "DBM::Deep::Sector::File::Data" : {
+         "file" : "lib/DBM/Deep/Sector/File/Data.pm"
+      },
+      "DBM::Deep::Sector::File::Index" : {
+         "file" : "lib/DBM/Deep/Sector/File/Index.pm"
+      },
+      "DBM::Deep::Sector::File::Null" : {
+         "file" : "lib/DBM/Deep/Sector/File/Null.pm"
+      },
+      "DBM::Deep::Sector::File::Reference" : {
+         "file" : "lib/DBM/Deep/Sector/File/Reference.pm"
+      },
+      "DBM::Deep::Sector::File::Scalar" : {
+         "file" : "lib/DBM/Deep/Sector/File/Scalar.pm"
+      },
+      "DBM::Deep::Storage" : {
+         "file" : "lib/DBM/Deep/Storage.pm"
+      },
+      "DBM::Deep::Storage::DBI" : {
+         "file" : "lib/DBM/Deep/Storage/DBI.pm"
+      },
+      "DBM::Deep::Storage::File" : {
+         "file" : "lib/DBM/Deep/Storage/File.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/robkinyon/dbm-deep"
+      }
+   },
+   "version" : "2.0013",
+   "x_serialization_backend" : "JSON::PP version 2.27202"
+}

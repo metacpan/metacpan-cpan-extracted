@@ -1,0 +1,141 @@
+;;GLOBAL
+
+ID_KEY page
+# multiple method test
+ID_METHOD self , self , p
+
+page is alpha
+
+first_name  is alpha
+last_name   is alpha
+age         is num with trim
+sex         in "male","female"
+mail        is mail
+mail2       eq [mail]
+mail3       ne [mail]
+mail3       eq [mail4]
+password    is alphanum
+password2   eq [password]
+same_data   eq {same_data}
+require   = all of-valid first_name, last_name, age, sex, mail, mail2, password, password2
+required  = first_name, last_name, age, sex, mail, mail2, password, password2
+
+birth_year  is num
+birth_month is num
+birth_day   is num
+birthdate = all of-valid birth_year, birth_month, birth_day
+
+hobby          in "programming","outdoor", "camp"
+favorite       in "books","music"
+favorite_books is words
+favorite_music is words
+
+must_select3 has 3
+must_select1 has 1
+must_gt_1000 > 1000
+must_lt_1000 < 1000
+must_in_1_10 between 1,10
+
+length_in_10 <= ~ 10
+length_in_10 length 10
+
+regex        match ^abc, def$, ^abcdef$
+filter first_name, last_name with trim
+hogehoge     eq hogehoge
+hogehoge2     eq hogehoge
+
+;;registration
+
+;;registration2
+
+GLOBAL is n/a
+
+;;registrationNoRequired
+
+require  = all of-valid first_name, last_name, age, sex, password, password2
+required = n/a
+
+;;registrationNoRequired2
+
+page is alphanum
+
+require  = all of-valid hogehoge
+required = n/a
+
+;;registration_no_required
+
+required = n/a
+page is word
+
+;;filter
+
+GLOBAL is n/a
+
+filter name with trim
+filter zip  with no_dash
+
+name is alphanum
+zip  is num
+
+;;no_filter
+
+GLOBAL is n/a
+
+name is alphanum
+zip  is num
+
+
+;;filter2
+
+GLOBAL is n/a
+
+name is alphanum with trim
+zip  is num with no_dash
+
+
+;;filter3
+
+GLOBAL is n/a
+
+filter name with trim
+filter zip  with no_dash
+
+name is alpha with no_filter
+zip  is num
+
+;;filter4
+
+GLOBAL is n/a
+
+filter name with trim
+filter zip  with no_dash
+
+name is alpha with n/a
+zip  is num
+
+;;specialfilter
+
+GLOBAL is n/a
+
+birth_year_is_1777 eq 1 with birth_year_check
+
+;;filter5
+
+GLOBAL is n/a
+
+filter * with trim
+
+name is alpha
+zip is num
+
+;;order_test
+
+GLOBAL is n/a
+
+filter * with trim
+
+name is alpha
+zip is num
+
+all_valid = all of name, zip
+all_v = all of-valid all_valid

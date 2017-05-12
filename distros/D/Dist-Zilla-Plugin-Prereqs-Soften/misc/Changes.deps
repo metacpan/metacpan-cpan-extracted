@@ -1,0 +1,72 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.006003
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.006002 2016-05-01T18:03:38Z
+ [Added / test requires]
+ - Path::Tiny
+ - Test::Differences
+
+ [Removed / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+
+0.006001 2015-10-03T10:40:00Z
+
+0.006000 2015-02-28T05:31:26Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+0.005001 2014-09-29T14:03:18Z
+
+0.005000 2014-09-10T22:29:32Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util::ConfigDumper
+
+ [Added / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003002
+
+ [Removed / test requires]
+ - Path::Tiny
+ - Test::Fatal
+ - lib
+
+0.004002 2014-08-15T21:18:48Z
+
+0.004001 2014-08-15T02:20:05Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - JSON
+ - List::Util
+ - version
+
+0.004000 2014-03-23T13:16:51Z
+ [Added / test requires]
+ - JSON
+ - Path::Tiny
+ - Test::DZil
+ - Test::Fatal
+ - Test::Requires
+ - lib
+
+0.003000 2014-03-22T18:23:49Z
+
+0.002000 2014-02-18T04:54:36Z
+ [Added / runtime requires]
+ - Moose::Util::TypeConstraints

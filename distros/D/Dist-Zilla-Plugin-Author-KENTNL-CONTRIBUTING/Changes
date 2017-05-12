@@ -1,0 +1,65 @@
+Release history for Dist-Zilla-Plugin-Author-KENTNL-CONTRIBUTING
+
+0.001006 2017-03-04T01:21:44Z 48557a0
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-CONTRIBUTING/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001005, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑1)
+ - runtime: -1
+ - test: ↓1
+
+ [Internals]
+ - Drop ConfigDumper
+
+0.001005 2015-11-14T04:44:40Z 09c7edb
+ - switched from [GenerateFile::ShareDir] to [GenerateFile::FromShareDir], closes #1
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001004, see misc/*.deps* for details
+ - develop: +3 ↑1 -1 (suggests: ↑1)
+ - runtime: +1 -3 (recommends: -1)
+
+0.001004 2015-07-05T06:07:52Z 0f96d87
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: ↑1 -2
+
+ [Features]
+ - Reimplemented some remaning parts to just use new features in GenerateFile::ShareDir 0.006
+
+ [Todo]
+ - Eliminate need for this module at some point without needing my bundle also somehow with some intermediary magic
+   that will just call GF:SD outside the normal dzil things(!??)
+
+0.001003 2015-06-30T05:57:29Z 56a04ee
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - runtime: +2 -3
+
+ [Features]
+ - Reimplement in terms of GenerateFile::ShareDir
+
+0.001002 2015-06-30T02:08:26Z 473269e
+ [Bugfix]
+ - Turns out to be useful to actually install files intended for a sharedir
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - configure: +1 (recommends: +1)
+ - develop: +1
+
+0.001001 2015-06-30T00:24:44Z 24a9a5d
+ [Content]
+ - Credit original author in emitted file.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +1 -1
+
+0.001000 2015-06-29T23:35:19Z 9e726b2
+ - First version.

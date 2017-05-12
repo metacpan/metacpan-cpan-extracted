@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+README.md
+cpanfile
+lib/Dancer2/Template/Mason2.pm
+minil.toml
+t/00_compile.t
+t/01_reponse_content.t
+t/02_pod.t
+t/views/index.mc
+t/views/layouts/main.mc
+META.json
+META.yml
+MANIFEST

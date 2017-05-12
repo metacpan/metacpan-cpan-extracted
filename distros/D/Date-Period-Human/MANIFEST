@@ -1,0 +1,17 @@
+Build.PL
+CONTRIBUTORS
+Changes
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+cpanfile
+dist.ini
+lib/Date/Period/Human.pm
+t/datetime.t
+t/parse.t
+t/readable.t
+t/release-pod-syntax.t
+t/use.t

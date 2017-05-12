@@ -1,0 +1,49 @@
+NAME
+
+Date::Darian::Mars - the Darian calendar for Mars
+
+DESCRIPTION
+
+The Darian calendar for Mars is a mechanism by which Martian solar days
+(also known as "sols") can be labelled in a manner useful to inhabitants
+of Mars.  This module provides functions to convert dates between the
+Darian calendar and Chronological Mars Solar Day Numbers, which is a
+suitable format to do arithmetic with.  It also supplies functions that
+describe the shape of the Darian calendar, to assist in calendrical
+calculations.  It also supplies functions to represent Darian dates
+textually in a conventional format.
+
+The Darian calendar divides time up into years, months, and days.
+This module also supports dividing the Darian year directly into days,
+with no months.
+
+The Chronological Mars Solar Day Number is an integral number labelling
+each Martian day, where the day extends from midnight to midnight in
+whatever time zone is of interest.  It is a linear count of days, where
+each day's number is one greater than the previous day's number.
+
+This module places no limit on the range of dates to which it may be
+applied.  All function arguments are permitted to be "Math::BigInt" or
+"Math::BigRat" objects in order to achieve arbitrary range.  Native Perl
+integers are also permitted, as a convenience when the range of dates
+being handled is known to be sufficiently small.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2007, 2009, 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

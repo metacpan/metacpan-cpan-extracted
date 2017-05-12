@@ -1,0 +1,7 @@
+Build.PL
+Changes
+lib/Devel/RemoteTrace.pm
+LICENSE
+MANIFEST			This list of files
+META.yml
+trace-test.pl

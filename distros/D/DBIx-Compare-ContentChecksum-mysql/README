@@ -1,0 +1,36 @@
+DBIx::Compare::ContentChecksum::mysql version 1.3
+=================================================
+
+DBIx::Compare::ContentChecksum::mysql enables the rapid low-level comparison of MySQL databases using MySQL's built in MD5 and GROUP_CONCAT functions to create an MD5 checksum of the contents of each table field. It was developed to compare databases before and after table optimisation, but would be useful in any scenario where you need to check that two databases are identical. 
+
+Testing requires two existing databases, test and test2, and a user 'test' with a blank password and create table, insert, update and select privileges. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  DBD::mysql
+  DBIx::Compare
+
+The test scripts accompanying the modules require the following modules and libraries:
+
+  Test::More
+  Test::Group
+  Test::Differences
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Christopher Jones
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself

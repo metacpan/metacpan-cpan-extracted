@@ -1,0 +1,14 @@
+Changes
+lib/Dancer/OO/Dancer.pm
+lib/Dancer/OO/Object.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/Sample.pm
+t/Sample/Base.pm
+t/Sample/Root.pm
+t/Sample/Demo.pm
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t

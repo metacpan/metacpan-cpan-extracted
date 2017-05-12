@@ -1,0 +1,99 @@
+{
+   "abstract" : "Author Test::Version tests",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>",
+      "Caleb Cushing <xenoterracide@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Test-Version",
+   "no_index" : {
+      "file" : [
+         "perlcritic.rc"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::Pod" : "1.41",
+            "Test::Version" : "1"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Section" : "0.004",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Sub::Exporter::ForMethods" : "0",
+            "Test::Version" : "1",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dist::Zilla" : "5.036",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::chdir" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Path::Tiny" : "0",
+            "Test::DZil" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Script" : "1.12",
+            "Test::Version" : "1",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/dist-zilla-plugin-test-version/issues"
+      },
+      "homepage" : "https://metacpan.org/dist/Dist-Zilla-Plugin-Test-Version",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/dist-zilla-plugin-test-version.git",
+         "web" : "https://github.com/plicease/dist-zilla-plugin-test-version"
+      }
+   },
+   "version" : "1.09",
+   "x_contributors" : [
+      "Dave Rolsky <autarch@urth.org>",
+      "Graham Ollis <perl@wdlabs.com>",
+      "Karen Etheridge <ether@cpan.org>",
+      "Mike Doherty <doherty@cs.dal.ca>"
+   ]
+}
+

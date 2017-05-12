@@ -1,0 +1,28 @@
+Deep-Hash-Utils version 0.02
+============================
+
+NAME
+
+Deep::Hash::Utils - Functions for reading and writing deeply nested hashes
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+HISTORY
+
+	0.01 initial release
+
+	0.02 documentation updates & uploaded to github
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Chris Becker
+
+
+

@@ -1,0 +1,132 @@
+# NAME
+
+Dancer::Plugin::Chain - Chained actions for Dancer
+
+# VERSION
+
+version 0.1.0
+
+# SYNOPSIS
+
+    use Dancer;
+    use Dancer::Plugin::Chain;
+
+    my $country = chain '/country/:country' => sub {
+        # silly example. Typically much more work would 
+        # go on in here
+        var 'site' => param('country');
+    };
+
+    my $event = chain '/event/:event' => sub {
+        var 'event' => param('event');
+    };
+
+    # will match /country/usa/event/yapc
+    get chain $country, $event, '/schedule' => sub {
+        return sprintf "schedule of %s in %s\n", map { var $_ } 
+                       qw/ event site /;
+    };
+
+    my $continent = chain '/continent/:continent' => sub {
+        var 'site' => param('continent');
+    };
+
+    my $continent_event = chain $continent, $event;
+
+    # will match /continent/europe/event/yapc
+    get chain $continent_event, '/schedule' => sub {
+        return sprintf "schedule of %s in %s\n", map { var $_ } qw/ event site /;
+    };
+
+    # will match /continent/asia/country/japan/event/yapc
+    # and will do special munging in-between!
+
+    get chain $continent, 
+            sub { var temp => var 'site' },
+            $country, 
+            sub {
+                var 'site' => join ', ', map { var $_ } qw/ site temp /
+            },
+            $event, 
+            '/schedule' 
+                => sub {
+                    return sprintf "schedule of %s in %s\n", map { var $_ } 
+                                qw/ event site /;
+            };
+
+# DESCRIPTION
+
+Implementation of Catalyst-like chained routes.
+
+The plugin exports a single keyword, `chain`, which creates the chained
+routes. 
+
+## KNOWN CAVEATS
+
+The plugin does not support `prefix` yet, and only support string-based urls
+(so no regexes).
+
+# EXPORTED FUNCTIONS
+
+## chain @chain\_items, $coderef
+
+Create a chain out of the items provided, and assign it the final action coderef.
+
+Each chain item can be
+a string representing a path segment, a previously defined chain or an
+anonymous function. The chain's final path and action will be the aggregate of
+its parts. 
+
+For example, the final route declaration of the  SYNOPSIS,
+
+    get chain $continent, 
+            sub { var temp => var 'site' },
+            $country, 
+            sub {
+                var 'site' => join ', ', map { var $_ } qw/ site temp /
+            },
+            $event, 
+            '/schedule' 
+                => sub {
+                    return sprintf "schedule of %s in %s\n", map { var $_ } 
+                                qw/ event site /;
+            };
+
+would be is equivalent to 
+
+    get '/continent/:continent/country/:country/event/:event/schedule' => sub {
+        var 'site' => param('continent');
+        var temp => var 'site';
+        var 'site' => param('country');
+        var 'site' => join ', ', map { var $_ } qw/ site temp /
+        var 'event' => param('event');
+
+        return sprintf "schedule of %s in %s\n", map { var $_ } 
+                        qw/ event site /;
+    }
+
+In scalar context, `chain` returns its underlying object. 
+In list context, it returns a route / action pair of values (). That's how it
+can work transparently with `get`, `post` and friends.
+
+    # returns the object, that can be used to forge longer chains.
+    my $foo_chain = chain '/foo', sub { ... };
+
+    # returns the pair that makes 'get' happy
+    get chain $foo_chain;
+
+# SEE ALSO
+
+- Original blog entry: [http://techblog.babyl.ca/entry/dancer-in-chains](http://techblog.babyl.ca/entry/dancer-in-chains)
+- [Dancer-Plugin-Dispatcher](http://search.cpan.org/perldoc?Dancer-Plugin-Dispatcher)
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

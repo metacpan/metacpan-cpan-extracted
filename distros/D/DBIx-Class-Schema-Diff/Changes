@@ -1,0 +1,19 @@
+Revision history for perl module DBIx::Class::Schema::Diff
+
+1.04 2016-05-30
+    - Fix test failures due to upcoming DBIC @ISA changes (RIBASUSHI) #4
+
+1.03 2015-04-27
+    - Drop JSON::DWIW for Windows support [Michael Lackhoff] (#3)
+
+1.02 2014-08-09
+    - Support attr changes in upcoming DBIC release (~0.08280)
+    - Travis tweaks, added 5.20 worker
+    - Coveralls support + coveralls badge in README.md
+
+1.01 2014-04-27
+    - Setup for TravisCI
+    - Replaced 'JSON' with 'JSON::DWIW' for json encode/decode
+
+1.00 2014-04-22
+    - Initial release

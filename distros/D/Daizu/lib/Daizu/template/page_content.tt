@@ -1,0 +1,10 @@
+<div class="hentry">
+ <h2 class="entry-title">[% file.title |encode |html %]</h2>
+ [% INCLUDE article_meta.tt entry = file %]
+ [% INCLUDE article_retired.tt entry = file %]
+ <div class="entry-content" id="entry-content">
+  [% file.article_content_html4(url.argument) %]
+ </div>
+ [% INCLUDE article_tags.tt %]
+ [% INCLUDE prev_next_nav.tt %]
+</div>

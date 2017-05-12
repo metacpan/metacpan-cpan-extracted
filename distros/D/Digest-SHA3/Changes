@@ -1,0 +1,118 @@
+Revision history for Perl extension Digest::SHA3.
+
+0.25  Wed Jul 27 20:04:40 MST 2016
+	- prevented sha3sum from possibly running malicious code
+		-- remove '.' from @INC before module loading
+		-- ref. rt.cpan.org #116513
+	- namespace cleanup (ref. rt.cpan.org #105371 and #105372)
+	- minor code and documentation tweaks
+
+0.24  Sat Jan 10 00:45:34 MST 2015
+	- simplified shabits() routine (bitwise input buffering)
+		-- slightly less efficient but easier to understand
+	- minor documentation tweaks and additions
+
+0.23  Sun Jan  4 05:36:30 MST 2015
+	- updated to reflect Draft FIPS 202
+		-- append domain separation bits to message
+		-- implement SHAKE128 and SHAKE256 Extendable-Output
+			Functions (XOFs)
+
+0.22  Sun Jun  1 00:15:46 MST 2014
+	- fixed reserved-word clash when compiling with C++
+		-- use 'classname' instead of 'class'
+			-- ref. SHA3.xs (rt.cpan.org #96090)
+
+0.21  Fri May 16 10:21:46 MST 2014
+	- restored original 'addfile' for use on opened file handles
+		-- allows callbacks in place of actual files
+			-- ref. IO::Callback (rt.cpan.org #95643)
+	- re-established inheritance from Digest::base
+		-- to pick up future Digest enhancements automatically
+	- cleaned up documentation
+
+0.20  Wed May  7 07:57:10 MST 2014
+	- consolidated all dynamic memory allocation into XSUBs
+		-- streamlines referencing of SHA3 objects
+		-- simplifies DESTROYing of objects
+	- enhanced Makefile.PL to allow 'use warnings'
+		-- automatically reverts to $^W for early Perls
+	- scrubbed C and Perl code to remove all compiler warnings
+
+0.12  Sat Apr 19 05:14:50 MST 2014
+	- added universal newlines mode ("U") to addfile and sha3sum
+		-- based on Python Universal Newlines concept
+			-- newlines identical across MacOS, DOS, and UNIX
+		-- will deprecate portable mode ("p") in future
+			-- "U" mode is cleaner and more efficient
+	- enhanced performance
+		-- reduced number of dynamic memory allocations
+		-- sped up addfile method with use of C code
+			-- ref. SHA3.xs (_addfilebin and _addfileuniv)
+	- changed text file test (-T) to act on filehandles
+		-- improves consistency when reading from STDIN
+		-- still must act on filenames for early Perls (< 5.6)
+	- sealed memory leak in SHA3.xs
+		-- arose only with SvPVbyte exceptions during eval
+	- patched inheritence bug (ref: rt.cpan.org #94830)
+		-- use sv_isobject/sv_derived_from instead of sv_isa
+	- added 'allocated' flag to SHA3 structure (ref. src/sha3.h)
+		-- to guard against Perl double frees
+
+0.11  Mon Feb 17 16:42:04 MST 2014
+	- tightened code in SHA3.xs
+		-- added sv_isa checks when invoking methods
+
+0.10  Thu Jan 30 08:24:30 MST 2014
+	- improved the performance of hexadecimal output functions
+		-- ref. 'shahex' in src/sha3.c
+		-- thanks to Thomas Drugeon for ideas and test script
+
+0.09  Sun Jan  5 19:08:32 MST 2014
+	- added a 'squeeze' method for SHA3-0 objects
+		-- to construct SHA3-0 digests of any desired length
+
+0.08  Wed Jun 26 04:32:06 MST 2013
+	- workaround for repeated calls to shaclose
+		-- ref. Bug #86295 (posted at Digest::SHA)
+		-- need to explicitly reset internal pointer to NULL
+			ref. shaclose() in SHA3.xs
+	- corrected typos in sha3sum script
+		-- ref. Bug #85430 (posted at Digest::SHA)
+
+0.07  Sat Mar  9 17:36:14 MST 2013
+	- untweaked Makefile.PL to remove dependencies of SHA3.c
+		-- dependencies were breaking builds on VMS
+		-- retaining dependencies provides too little benefit
+			for cost of portable workaround
+
+0.06  Mon Mar  4 08:12:04 MST 2013
+	- removed code for standalone C operation (no longer used)
+		-- eliminates need for external symbols
+		-- reduces size of object files
+		-- thanks to Marc Lehmann for suggestions
+	- tweaked Makefile.PL to show dependencies of SHA3.c
+
+0.05  Thu Jan 24 04:54:14 MST 2013
+	- accommodated Unicode string input
+		-- by using SvPVbyte instead of SvPV in SHA3.xs
+			-- provided workaround for Perl 5.6
+		-- added new test script t/unicode.t
+	- provided documentation to describe Unicode handling
+	- obtained slight speedup on Intel/gcc
+		-- by setting -O1 and -fomit-frame-pointer
+	- adopted (from Digest::SHA) workaround for DEC compiler bug
+
+0.04  Sun Nov 11 19:20:06 MST 2012
+	- enhanced performance
+		-- typically 10-15% faster than 0.03
+		-- code is still easy to read and modify
+	- filled in a few documentation omissions
+
+0.03  Mon Oct 29 04:01:06 MST 2012
+	- attained a 2.5x performance increase through loop unrolling
+		-- code is still easy to follow
+			-- clearly traceable to Keccak pseudo code
+
+0.02  Thu Oct 25 19:18:58 MST 2012
+	- original version: adapted from Digest::SHA version 5.72

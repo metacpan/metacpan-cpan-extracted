@@ -1,0 +1,47 @@
+---
+abstract: 'upload your dist to Google Code (deprecated)'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-UploadToGoogleCode
+no_index:
+  directory:
+    - corpus
+    - inc
+    - examples
+requires:
+  CPAN::Changes: '0'
+  Config::Identity: '0'
+  Dist::Zilla::File::OnDisk: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::Releaser: '0'
+  File::pushd: '0'
+  Google::Code::Upload: '0.006'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  Try::Tiny: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-Plugin-UploadToGoogleCode/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-UploadToGoogleCode/
+  repository: git://github.com/doherty/Dist-Zilla-Plugin-UploadToGoogleCode.git
+version: '0.004'
+x_deprecated: 1

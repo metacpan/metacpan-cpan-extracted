@@ -1,0 +1,9 @@
+INSTALLATION
+
+To install Digest::Haval256, type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+

@@ -1,0 +1,418 @@
+<HTML>
+<HEAD>
+<TITLE>DBD::LDAP - Perl extension for DBI, providing an SQL/Perl DBI interface 
+     to LDAP databases.  LDAP stands for the "Lightweight Directory Access 
+     Protocol".  For more information, see:  http://www.ogre.com/ldap/docs.html</TITLE>
+<LINK REV="made" HREF="mailto:flepied@debris.mandrakesoft.com">
+</HEAD>
+
+<BODY>
+	<CENTER>
+	</CENTER>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#prerequisites">PREREQUISITES</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#installation">INSTALLATION</A></LI>
+	<LI><A HREF="#getting started:">GETTING STARTED:</A></LI>
+	<LI><A HREF="#inserting, fetching and modifying data">INSERTING, FETCHING AND MODIFYING DATA</A></LI>
+	<LI><A HREF="#metadata">METADATA</A></LI>
+	<LI><A HREF="#other supporting utilities">OTHER SUPPORTING UTILITIES</A></LI>
+	<LI><A HREF="#restrictions">RESTRICTIONS</A></LI>
+	<LI><A HREF="#todo">TODO</A></LI>
+	<LI><A HREF="#known bugs">KNOWN BUGS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<PRE>
+     DBD::LDAP - Perl extension for DBI, providing an SQL/Perl DBI interface 
+     to LDAP databases.  LDAP stands for the &quot;Lightweight Directory Access 
+     Protocol&quot;.  For more information, see:  <A HREF="http://www.ogre.com/ldap/docs.html">http://www.ogre.com/ldap/docs.html</A></PRE>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<PRE>
+    This module is Copyright (C) 2000-2004 by</PRE>
+<PRE>
+                Jim Turner
+</PRE>
+<PRE>
+
+        Email:  <A "mailto:turnerjw@wwol.com">turnerjw@wwol.com</A></PRE>
+<PRE>
+    All rights reserved Without Prejudice.</PRE>
+<PRE>
+    You may distribute this module under the terms of either the GNU General
+    Public License or the Artistic License, as specified in the Perl README
+    file.</PRE>
+<P>
+<HR>
+<H1><A NAME="prerequisites">PREREQUISITES</A></H1>
+<PRE>
+        Convert::ANS1   (required by Net::LDAP)
+        Net::LDAP
+        DBI
+        - an LDAP database to connect to.</PRE>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+     use DBI;
+     $dbh = DBI-&gt;connect(&quot;DBI:LDAP:ldapdb&quot;,'user','password')  #USER LOGIN.
+         or die &quot;Cannot connect as user: &quot; . $DBI::errstr;</PRE>
+<PRE>
+     $dbh = DBI-&gt;connect(&quot;DBI:LDAP:ldapdb&quot;)  #ANONYMOUS LOGIN (Read-only).
+         or die &quot;Cannot connect as guest (readonly): &quot; . $DBI::errstr;</PRE>
+<PRE>
+     $sth = $dbh-&gt;prepare(&quot;select * from people where (cn like 'Smith%')&quot;)
+         or die &quot;Cannot prepare: &quot; . $dbh-&gt;errstr();
+     $sth-&gt;execute() or die &quot;Cannot execute: &quot; . $sth-&gt;errstr();
+         while ((@results) = $sth-&gt;fetchrow_array)
+         {
+                 print &quot;--------------------------------------------------------\n&quot;;
+                 ++$cnt;
+                 while (@results)
+                 {
+                         print &quot;------&gt;&quot;.join('|',split(/\0/, shift(@results))).&quot;\n&quot;;
+                 }
+         }
+     $sth-&gt;finish();
+     $dbh-&gt;disconnect();</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>DBD::LDAP is a DBI extension module adding an SQL database interface to 
+standard LDAP databases to Perl's database-independent database interface.  
+You will need access to an existing LDAP database or set up your own using 
+an LDAP server, ie. ``OpenLDAP'', see (http://www.openldap.org).</P>
+<P>JLdap.pm is included in this module as a separate file, and is required.</P>
+<P>The main advantage of DBD::LDAP is the ability to query LDAP databases via 
+standard SQL queries in leu of cryptic LDAP ``filters''.  LDAP is optimized for 
+quick lookup of existing data, but DBD::LDAP does support entry inserts, 
+updates, and deletes with commit/rollback via the standard SQL commands!</P>
+<P>LDAP databases are ``heirarchical'' in structure, whereas other DBD-supported 
+databases are ``relational'' and there is no LDAP-equivalent to SQL ``tables'', so   
+DBD::LDAP maps a ``table'' interface over the LDAP ``tree'' via a configuration 
+file you must set up.  Each ``table'' is mapped to a common ``base DN''.  For 
+example, consider a typical LDAP database of employees within different 
+departments within a company.  You might have a ``company'' names ``Acme'' and 
+the root ``dn'' of ``dc=Acme, dc=com'' (Acme.com).  Below the company level, are 
+divisions, ie. ``Widgets'', and ``Blivets''.  Each division would have an entry 
+with a ``dn'' of ``ou=Widgets, dc=Acme, dc=com''.  Employees within each division 
+could have a ``dn'' of ``cn=John Doe, ou=Widgets, dc=Acme, dc=com''.  
+With DBD::LDAP, we could create tables to access these different levels, 
+ie. ``top'', which would have a ``DN'' of ``dc=Acme, dc=com'', ``WidgetDivision'' for 
+``dc=Acme, dc=com''.  Tables can also be constained by additional 
+attribute specifications (filters), ie constraining by ``objectclass'', ie. 
+``(objectclass=person)''.  Then, doing a ``select * from WidgetDivision'' would 
+display all ``person''s with a ``dn'' containing ``''ou=Widgets, dc=Acme, dc=com``.</P>
+<P>
+<HR>
+<H1><A NAME="installation">INSTALLATION</A></H1>
+<PRE>
+    Installing this module (and the prerequisites from above) is quite
+    simple. You just fetch the archive, extract it with</PRE>
+<PRE>
+        gzip -cd DBD-LDAP-0.1000.tar.gz | tar xf -</PRE>
+<PRE>
+    (this is for Unix users, Windows users would prefer WinZip or something
+    similar) and then enter the following:</PRE>
+<PRE>
+        cd DBD-LDAP-#.###
+        perl Makefile.PL
+        make
+        make test</PRE>
+<PRE>
+    If any tests fail, let me know. Otherwise go on with</PRE>
+<PRE>
+        make install</PRE>
+<PRE>
+    Note that you almost definitely need root or administrator permissions.
+    If you don't have them, read the ExtUtils::MakeMaker man page for
+    details on installing in your own directories. </PRE>
+<P>
+<HR>
+<H1><A NAME="getting started:">GETTING STARTED:</A></H1>
+<PRE>
+        1) Create a &quot;database&quot;, ie. &quot;foo&quot; by creating a text file &quot;foo.ldb&quot;.  The 
+        general format of this file is:
+</PRE>
+<PRE>
+
+----------------------------------------------------------
+hostname[;port][:[root-dn][:[loginrule]]]
+tablename1:[basedn]:[basefilter]:dnattrs:[visableattrs]:[insertattrs]:[ldap_options]
+tablename2:[basedn]:[basefilter]:dnattrs:[visableattrs]:[insertattrs]:[ldap_options]
+...
+----------------------------------------------------------</PRE>
+<PRE>
+        &lt;hostname&gt;              represents the ldap server host name.
+        &lt;port&gt;                  represents the server's port, default is 389.
+        &lt;root-dn&gt;                       if specified, is appended to the end of each tablename's 
+                                base-dn.
+        &lt;loginrule&gt;     if specified, converts single word &quot;usernames&quot; to the 
+                                appropriate DN, ie:</PRE>
+<PRE>
+                        &quot;cn=*,&lt;ROOT&gt;&quot; would convert user name &quot;foo&quot; to &quot;cn=foo, &quot; and 
+                        append the &quot;&lt;root-dn&gt;&quot; onto that.  The asterisk is converted to 
+                        the user-name specified in the &quot;connect&quot; method.  If not specified, 
+                        the username specified in the &quot;connect&quot; method must be a full DN.
+                        If the &quot;&lt;root-dn&gt;&quot; is not specified, then the &quot;&lt;loginrule&gt;&quot; would 
+                        need to be a full DN.</PRE>
+<PRE>
+        tablename       -       represents the name to be used in SQL statements for a given 
+                        set of entries which make up a virtual &quot;table&quot;.
+        basedn - if specified, is appended to the &quot;&lt;root-dn&gt;&quot; to make up the 
+                        common base DN for all entries in this table.  If &quot;&lt;root-dn&gt;&quot; is 
+                        not specified, then a full DN must be specified; otherwise, the 
+                        default is the root-dn.
+        basefilter      - if specified, specifies a filter to be used if no &quot;where&quot;-
+                        clause is specified in SQL queries.  If a &quot;where&quot;-clause is 
+                        specified, the resulting filter is &quot;and&quot;-ed with this one.  The 
+                        default is &quot;(objectclass=*)&quot;.
+        dnattrs - specifies which attributes that values for which are to be 
+                        appended to the left of the basedn to create DNs for new entries 
+                        being inserted into the table.
+        visableattrs - if specified, one or more attributes separated by commas 
+                        which will be sought when the SQL statement does not specify 
+                        attributes, ie. &quot;select * from tablename&quot;.  If not specified, the 
+                        attributes of the first matching entry are returned and used for 
+                        all entries matching a given query.
+        insertattrs - if specified, one or more attribute/value combinations to be 
+                        added to any new entry inserted into the table, usually needed for 
+                        objectclass values.  The attributes and values usually correspond 
+                        to those specivied in the &quot;&lt;basefilter&gt;&quot;.  The general format is: 
+                        attr1=value1[|value2...],attr2=value1...,...
+                        These attributes and values will be joined with any user-specified 
+                        values for these attributes.
+        ldap_options - if specified, can be any one or more of the following:</PRE>
+<PRE>
+                ldap_sizelimit - Limit the number of entries fetch by a query to this 
+                                number (0 = no limit) - default:  0.
+                ldap_timelimit - Limit the search to this number of seconds per query. 
+                                (0 = no limit) - default:  0.
+                ldap_scope - specify the &quot;scope&quot; of the search.  Values are:  &quot;base&quot;, 
+                                &quot;one&quot;, and &quot;sub&quot;, see Net::LDAP docs.  Default is &quot;one&quot;, 
+                                meaning the set of records one level below the basedn.  &quot;base&quot; 
+                                means search only the basedn, and &quot;sub&quot; means the union 
+                                of entries at the &quot;base&quot; level and &quot;one&quot; level below.
+                ldap_inseparator - specify the separator character/string to be used 
+                                in queries to separate multiple values being specified for 
+                                a given attribute.  Default is &quot;|&quot;.
+                ldap_outseparator - specify the separator character/string to be used 
+                                in queryies to separate multiple values displayed as a result 
+                                of a query.  Default is &quot;|&quot;.
+                ldap_firstonly - only display the 1st value fetched for each attribute 
+                                per entry.  This makes &quot;ldap_outseparator&quot; unnecessary.</PRE>
+<PRE>
+        2) write your script to use DBI, ie:
+</PRE>
+<PRE>
+
+                #!/usr/bin/perl
+                use DBI;</PRE>
+<PRE>
+
+                $dbh = DBI-&gt;connect('DBD:LDAP:mydb','me','mypassword') || 
+                                die &quot;Could not connect (&quot;.$DBI-&gt;err.':'.$DBI-&gt;errstr.&quot;)!&quot;;
+                ...
+                #CREATE A TABLE, INSERT SOME RECORDS, HAVE SOME FUN!</PRE>
+<PRE>
+
+        3) get your application working.</PRE>
+<P>
+<HR>
+<H1><A NAME="inserting, fetching and modifying data">INSERTING, FETCHING AND MODIFYING DATA</A></H1>
+<PRE>
+        1st, we'll create a database called &quot;ldapdb&quot; with the tables previously 
+        mentioned in the example in the DESCRIPTION section:
+</PRE>
+<PRE>
+
+----------------- file &quot;ldapdb.ldb&quot; ----------------
+ldapserver:dc=Acme, dc=com:cn=*,&lt;ROOT&gt;
+top:::dc
+WidgetDivision:ou=Widgets, :&amp;(objectclass=top)(objectclass=person):cn:cn,sn,ou,title,telephonenumber,description,objectclass,dn:objectclass=top|person|organizationalPerson:ldap_outseparator =&gt; &quot;:&quot;
+----------------------------------------------------</PRE>
+<PRE>
+    The following examples insert some data in a table and fetch it back:
+    First all data in the string:</PRE>
+<PRE>
+        $dbh-&gt;do(&lt;&lt;END_SQL);
+        INSERT INTO top (ou, cn, objectclass)  
+        VALUES ('Widgets', 'WidgetDivision', 'top|organizationalUnit')
+END_SQL</PRE>
+<PRE>
+    Next an example using parameters:</PRE>
+<PRE>
+        $dbh-&gt;do(&quot;INSERT INTO WidgetDivision (cn,sn,title,telephonenumber) VALUES (?, ?, ?, ?)&quot;,
+        'John Doe','DoeJ','Manager','123-1111');
+END_SQL
+        $dbh-&gt;commit();</PRE>
+<PRE>
+        NOTE:  Unlike most other DBD modules which support transactions, changes 
+                made do NOT show up until the &quot;commit&quot; function is called, unless 
+                &quot;AutoCommit&quot; is set.  This is due to the fact that fetches are done 
+                from the LDAP server and changes do not take effect there until the 
+                Net::LDAP &quot;update&quot; function is called, which is called by &quot;commit&quot;.</PRE>
+<PRE>
+        NOTE: The &quot;dn&quot; field is generated automatically from the base &quot;dn&quot; and the 
+                dn component fields specified by &quot;dnattrs&quot;, If you try to insert a 
+                value directly into it, it will be ignored.  Also, if not specified, 
+                any attribute/value combinations specified in the &quot;insertattrs&quot; 
+                option will be added automatically.</PRE>
+<PRE>
+    To retrieve data, you can use the following:</PRE>
+<PRE>
+        my($query) = &quot;SELECT * FROM WidgetDivision WHERE cn like 'John%' ORDER BY cn&quot;;
+        my($sth) = $dbh-&gt;prepare($query);
+        $sth-&gt;execute();
+        while (my $entry = $sth-&gt;fetchrow_hashref) {
+            print(&quot;Found result record: cn = &quot;, $entry-&gt;{'cn'},
+                  &quot;, phone = &quot;, $row-&gt;{'telephonenumber'});
+        }
+        $sth-&gt;finish();</PRE>
+<PRE>
+        The SQL &quot;SELECT&quot; statement above (combined with the table information 
+        in the &quot;ldapdb.ldb&quot; database file would generate and execute the following 
+        equivalent LDAP Search:</PRE>
+<PRE>
+                base =&gt; 'ou=Widgets, dc=Acme, dc=com',
+                filter =&gt; '(&amp;(&amp;(objectclass=top)(objectclass=person))(cn=John*))',
+                scope =&gt; 'one',
+                attrs =&gt; 'cn,sn,ou,title,telephonenumber,description,objectclass,dn'</PRE>
+<PRE>
+    See the DBI(3) manpage for details on these methods. See the</PRE>
+<PRE>
+    Data rows are modified with the UPDATE statement:</PRE>
+<PRE>
+        $dbh-&gt;do(&quot;UPDATE WidgetDivision SET description = 'Outstanding Employee' WHERE cn = 'John Doe'&quot;);</PRE>
+<PRE>
+        NOTE:  You can NOT change the &quot;dn&quot; field directly - direct changes will be 
+                ignored.  You change the &quot;rdn&quot; component of the &quot;dn&quot; field by changing 
+                the value of the other field(s) which are appended to the base &quot;dn&quot;.
+                Also, if not specified, any attribute/value combinations specified in 
+                the &quot;insertattrs&quot; option will be added automatically.</PRE>
+<PRE>
+    Likewise you use the DELETE statement for removing entries:</PRE>
+<PRE>
+        $dbh-&gt;do(&quot;DELETE FROM WidgetDivision WHERE description = 'Outstanding Employee'&quot;);</PRE>
+<P>
+<HR>
+<H1><A NAME="metadata">METADATA</A></H1>
+<PRE>
+    The following attributes are handled by DBI itself and not by DBD::LDAP,
+    thus they should all work as expected.</PRE>
+<PRE>
+        PrintError
+        RaiseError
+        Warn</PRE>
+<PRE>
+    The following DBI attributes are handled by DBD::LDAP:</PRE>
+<PRE>
+    AutoCommit
+        Works</PRE>
+<PRE>
+    NUM_OF_FIELDS
+        Valid after '$sth-&gt;execute'</PRE>
+<PRE>
+    NUM_OF_PARAMS
+        Valid after '$sth-&gt;prepare'</PRE>
+<PRE>
+    NAME
+        Valid after '$sth-&gt;execute'; undef for Non-Select statements.</PRE>
+<PRE>
+    NULLABLE
+        Not really working. Always returns an array ref of one's, as
+        DBD::LDAP always allows NULL (handled as an empty string). 
+        Valid after `$sth-&gt;execute'.</PRE>
+<PRE>
+    LongReadLen
+                Should work</PRE>
+<PRE>
+    LongTruncOk
+                Should work</PRE>
+<PRE>
+    These attributes and methods are not supported:</PRE>
+<PRE>
+        bind_param_inout
+        CursorName</PRE>
+<PRE>
+    In addition to the DBI attributes, you can use the following dbh
+    attributes.  These attributes are read-only after &quot;connect&quot;.</PRE>
+<PRE>
+        ldap_dbuser
+                Current database user.
+</PRE>
+<PRE>
+
+        ldap_HOME
+                Environment variable specifying a path to search for LDAP 
+                databases (*.sdb) files.</PRE>
+<P></P>
+<PRE>
+
+=head1 DRIVER PRIVATE METHODS</PRE>
+<PRE>
+    DBI-&gt;data_sources()
+        The `data_sources' method returns a list of &quot;databases&quot; (.ldb files) 
+        found in the current directory and, if specified, the path in 
+        the ldap_HOME environment variable.
+</PRE>
+<PRE>
+
+    $dbh-&gt;tables()
+        This method returns a list of table names specified in the current 
+        database.
+        Example:</PRE>
+<PRE>
+            my($dbh) = DBI-&gt;connect(&quot;DBI:LDAP:mydatabase&quot;,'me','mypswd');
+            my(@list) = $dbh-&gt;func('tables');</PRE>
+<P>
+<HR>
+<H1><A NAME="other supporting utilities">OTHER SUPPORTING UTILITIES</A></H1>
+<P>
+<HR>
+<H1><A NAME="restrictions">RESTRICTIONS</A></H1>
+<PRE>
+        DBD::LDAP currently treats all data as strings and all fields as 
+        VARCHAR(255).</PRE>
+<PRE>
+        Currently, you must define tables manually in the &quot;&lt;database&gt;.ldb&quot; file 
+        using your favorite text editor.  I hope to add support for the SQL 
+        &quot;Create Table&quot;, &quot;Alter Table&quot;, and &quot;Drop Table&quot; functions to handle this 
+        eventually.</PRE>
+<P>
+<HR>
+<H1><A NAME="todo">TODO</A></H1>
+<PRE>
+        &quot;Create Table&quot;, &quot;Alter Table&quot;, and &quot;Drop Table&quot; SQL functions for 
+        creating, altering, and deleting the tables defined in the 
+        &quot;&lt;database&gt;.ldb&quot; file.</PRE>
+<PRE>
+        Some kind of datatype support, ie. numeric (for sorting), CHAR for padding, 
+        Long/Blob - for &gt;255 chars per field, etc.</PRE>
+<P>
+<HR>
+<H1><A NAME="known bugs">KNOWN BUGS</A></H1>
+<PRE>
+        none - (yet).
+</PRE>
+<PRE>
+
+=head1 SEE ALSO</PRE>
+<PRE>
+        Net::LDAP(3), DBI(3), perl(1)</PRE>
+<IMG SRC="http://turnerville.wwol.com/cgi-bin/access_log.pl?DBDLdap">
+</BODY>
+</HTML>

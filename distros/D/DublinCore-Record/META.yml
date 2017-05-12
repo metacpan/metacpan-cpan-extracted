@@ -1,0 +1,24 @@
+---
+name: DublinCore-Record
+version: 0.03
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+abstract: Container for Dublin Core metadata elements
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Class::Accessor: 0
+build_requires:
+  Test::More: 0
+provides:
+  DublinCore::Element:
+    file: lib/DublinCore/Element.pm
+    version: 0.03
+  DublinCore::Record:
+    file: lib/DublinCore/Record.pm
+    version: 0.03
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

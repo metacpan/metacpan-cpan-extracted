@@ -1,0 +1,18 @@
+Build.PL
+Changes
+ignore.txt
+lib/DBIx/Class/Result/ExternalAttribute.pm
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/01-external_attribute.t
+t/app/Main.pm
+t/app/Main/Result/Artist.pm
+t/app/Main/Result/ArtistAttribute.pm
+t/boilerplate.t
+t/lib/Utils.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.json

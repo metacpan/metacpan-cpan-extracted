@@ -1,0 +1,49 @@
+Devel-Kit version 0.81
+
+DOCUMENTATION
+
+See POD for documentation.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+DEPENDENCIES
+
+See DEPENDENCIES section in POD, 'requires' key in Build.PL, 
+or 'PREREQ_PM' key in Makefile.PL
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+Note to self about building:
+
+    perltidy -b t/00.load.t t/01.import.t t/02.functions.t
+    rm -f t/00.load.t.bak t/01.import.t.bak t/02.functions.t.bak
+
+    cp t/00.load.t t/00.load-TAP.t
+    cp t/00.load.t t/00.load-cPanel.t
+
+    cp t/01.import.t t/01.import-TAP.t
+    cp t/01.import.t t/01.import-cPanel.t
+
+    perl -pi -e 's{Devel::Kit}{Devel::Kit::TAP}g'  t/00.load-TAP.t  t/01.import-TAP.t
+    perl -pi -e 's{Devel::Kit}{Devel::Kit::cPanel}g'  t/00.load-cPanel.t  t/01.import-cPanel.t
+
+    perl -pi -e 's{(use\s*Test::More.*)}{$1\nBEGIN { eval "require Cpanel::Logger;";plan skip_all => "tests irrelevant on non-cPanel environment" if \$@; };\n}g'  t/00.load-cPanel.t  t/01.import-cPanel.t

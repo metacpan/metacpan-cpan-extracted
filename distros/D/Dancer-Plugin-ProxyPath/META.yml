@@ -1,0 +1,28 @@
+---
+abstract: 'Provides user-perspective paths'
+author:
+  - 'Alex Kalderimis <alex kalderimis at gmail dot com>'
+build_requires:
+  Test::MockObject: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-ProxyPath
+provides:
+  Dancer::Plugin::ProxyPath:
+    file: lib/Dancer/Plugin/ProxyPath.pm
+    version: 0.03
+  Dancer::Plugin::ProxyPath::Proxy:
+    file: lib/Dancer/Plugin/ProxyPath/Proxy.pm
+    version: 0.03
+requires:
+  Dancer: 1.2
+  Dancer::Plugin: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

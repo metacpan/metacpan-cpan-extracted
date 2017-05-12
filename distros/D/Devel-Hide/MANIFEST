@@ -1,0 +1,23 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+
+t/001use.t
+t/002basic.t
+t/003user.t
+t/004env.t
+t/005lib.t
+t/006before.t
+t/050child-processes.t                   Tests -from:children
+t/child.pl
+t/090pod.t                               Tests POD for errors
+t/098pod-coverage.t                      Tests for POD coverage
+
+t/P.pm                                   Dummy module used in tests (002-006, 050)
+t/Q.pm                                   "
+t/R.pm                                   "
+
+lib/Devel/Hide.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

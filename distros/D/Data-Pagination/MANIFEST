@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-Pagination.t
+lib/Data/Pagination.pm

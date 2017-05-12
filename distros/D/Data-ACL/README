@@ -1,0 +1,71 @@
+NAME
+    Data::ACL - Perl extension for simple ACL lists
+
+SYNOPSIS
+     use Data::ACL;
+     use Set::NestedGroups;  #   See Set::NestedGroups documentation
+
+     my $groups = Set::NestedGroups->new;
+     $groups->add( 'root', 'wheel' );
+     $groups->add( 'wheel', 'staff' );
+     $groups->add( 'webmaster', 'staff' );
+
+     my $acl = Data::ACL->new( $groups );
+     my $web = $acl->Realm( 'web' );
+     $web->Deny( 'all' );
+     $web->Allow( 'staff' );
+
+     &DenyAccess unless $acl->IsAuthorized( $user, 'web' );
+
+DESCRIPTION
+    This module implements a series of allowed and denied access control
+    lists for permissive controls. The Set::NestedGroups module is used to
+    define users and nested permissive groups.
+
+METHODS
+    The following methods are available through this module for use in the
+    creation and manipulation of access control lists. No methods of this
+    module may be exported into the calling namespace.
+
+    new
+         my $acl = Data::ACL->new( $groups );
+
+        The method creates a new access control list module and requires the
+        Set::NestedGroups object of defined users and nested permissive
+        groups to be passed to this object constructor.
+
+    Realm
+         my $realm = $acl->Realm( $name );
+
+        This method creates a new authentication realm to which users and
+        groups can be assigned access rights via the Allow and Deny methods.
+
+    Allow
+         $realm->Allow( $group );
+
+        This method grants access rights to the user or group passed as an
+        argument to this method within the authentication realm object
+        defined previously by the $acl->Realm method.
+
+    Deny
+         $realm->Deny( $group );
+
+        This method denies access rights to the user or group passed as an
+        argument to this method within the authentication realm object
+        defined previously by the $acl->Realm method.
+
+    IsAuthorized
+         if ( $acl->IsAuthorized( $user, $name ) ) { ... }
+
+        This method is used to test the access rights of a user or group to
+        the authentication realm defined by $name.
+
+SEE ALSO
+    Set::NestedGroups
+
+VERSION
+    0.02
+
+AUTHOR
+    Ariel Brosh, schop@cpan.org (Inactive); Rob Casey, robau@cpan.org
+

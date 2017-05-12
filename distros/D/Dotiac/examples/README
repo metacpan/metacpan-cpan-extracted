@@ -1,0 +1,15 @@
+These are some small examples that use Dotiac::DTL.
+
+All of the examples use DBI for storage, so it has to be installed. 
+
+You will also need a nice DBD module for this to work. 
+(Modify the DataAccess.pm with your settings)
+The default is DBD::CSV.
+
+Since the Focus of Django and Dotiac is Web programming, these examples are all CGI-scripts. And I left out the user management, since it would be a lot of boring code.
+
+Directories: (If you want to change them, change ConfigPathes.pm as well)
+
+cgi-bin: the example-scripts, DataAccess.pm and ConfigPathes.pm
+persistent: When using a local DBI module, the data is saved here.
+templates: the templates. They shouldn't be in the same folder as the scripts, since that one is readable from the internet.

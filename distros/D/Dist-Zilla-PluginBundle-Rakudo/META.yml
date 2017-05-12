@@ -1,0 +1,26 @@
+---
+abstract: 'Bundle of plugins needed for building a rakudo distribution'
+author:
+  - 'Jonathan Scott Duff <duff@pobox.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102221, CPAN::Meta::Converter version 2.102160'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Rakudo
+requires:
+  Dist::Zilla::Plugin::AutoVersion: 0
+  Dist::Zilla::Plugin::GatherDir: 0
+  Dist::Zilla::Plugin::GitObtain: 0
+  Dist::Zilla::Plugin::License: 0
+  Dist::Zilla::Plugin::Manifest: 0
+  Dist::Zilla::Plugin::PruneCruft: 0
+  Dist::Zilla::Plugin::PruneFiles: 0
+  Dist::Zilla::Plugin::SvnObtain: 0
+  Dist::Zilla::Plugin::TemplateFiles: 0
+  Dist::Zilla::PluginBundle::Git: 0
+version: 0.01

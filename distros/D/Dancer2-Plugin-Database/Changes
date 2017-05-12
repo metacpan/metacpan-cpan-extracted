@@ -1,0 +1,75 @@
+Revision history for Dancer2-Plugin-Database
+
+2.17    2016-08-13
+
+        [ BUG FIXES ]
+        - Require core 0.16, as 0.15 had a bug
+
+        [ ENHANCEMENTS ]
+        - Add the use of warnings. (Thanks to Mohammad S Anwar)
+
+2.16    2016-03-30
+        - Further fixes for Dancer2 Plugin2 system.
+          (Thanks to Peter Mottram)
+
+2.15    2016-01-24
+
+        [ ENHANCEMENTS ]
+        - Bump required Dancer2 version to 0.166001 given some
+          bug regressions.
+        - skip author tests (thanks to Stefan Hornburg)          
+
+2.14    2016-01-20
+
+        [ ENHANCEMENTS ]
+        - Add support for new Dancer2 plugin system.
+          (Thanks to Peter Mottram)
+
+2.13    2015-10-02
+
+        [ BUG FIXES ]
+        - Require Dancer::Plugin::Database::Core v0.12, that
+          fixes logging problems        
+
+2.12    2014-10-13
+
+        [ BUG FIXES ]
+        - Fixed dependency for Plack::Test.
+
+2.11    2014-10-13
+
+        [ BUG FIXES ]
+        - Changed test process to Plack::Test.
+
+        [ ENHANCEMENTS ]
+        - Support dsn_extra option (Thanks to Michael J South)
+
+2.10    Wed Sep  4 16:13:14 WEST 2013
+
+        [ BUG FIXES ]
+        - Dancer2 v0.9 no longer includes 'lib' by default;
+
+2.09    Sun Sep  1 13:56:18 WEST 2013
+
+        [ BUG FIXES ]
+        - Remove ':syntax' on test case (Dancer2 0.08)
+
+        [ ENHANCEMENTS ]
+        - Add quick_count method (Thanks to Colin Ewen)
+
+2.08    Tue Jul 30 18:59:30 WEST 2013
+        - Fix test with wrong base class (part 2)
+
+2.07    Tue Jul 30 18:49:37 WEST 2013
+        - Fix test with wrong base class.
+
+2.06    Tue Jul 30 16:14:28 WEST 2013
+        - Require recent Dancer2 0.06 as 0.05 was broken.
+
+2.05    Mon Jul 29 12:08:21 WEST 2013
+        - Fix dependency with Dancer 2.
+
+2.04    Sat Jul 27 18:21:48 WEST 2013
+        - First version, released together with
+          Dancer::Plugin::Database::Core version 0.01 with
+          same features as Dancer::Plugin::Database 2.04.

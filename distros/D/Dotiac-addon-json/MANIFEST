@@ -1,0 +1,14 @@
+lib/Dotiac/DTL/Addon/json.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+META.yml
+README
+t/2_filter_json.t
+t/4_pod.t
+t/filter_json.html
+t/filter_json_pretty.html
+t/filter_json_ascii.html
+t/filter_json_ascii_pretty.html
+t/Dtest.pm

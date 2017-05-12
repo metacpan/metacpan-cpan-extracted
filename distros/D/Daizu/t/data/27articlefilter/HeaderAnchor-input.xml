@@ -1,0 +1,41 @@
+<body xmlns="http://www.w3.org/1999/xhtml" xmlns:daizu="http://www.daizucms.org/ns/html-extension/" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="daizu:///daizucms.org/_index.html">
+
+<p id="sec-foo" name="sec-foo">This <span id="wont-clash">paragraph</span>
+ has some IDs <em xml:id="sec-foo-bar">already</em> in use, which
+ of course the HeaderAnchor plugin shouldn't reuse.</p>
+
+<h3 id="already-1">Already got an ID in the heading element</h3>
+
+<h3><a name="already-2"></a>Got one in anchor with 'name' attribute</h3>
+<h3><a id="already-3"></a>Got one in anchor with 'id' attribute</h3>
+<h3><a xml:id="already-4"></a>Got one in anchor with 'xml:id' attribute, but that's not good enough</h3>
+
+<h4>No ID provided</h4>
+<h5>WORDS
+with
+	 whitespace
+</h5>
+
+<p>Ignore this</p>
+
+<h1>... %%% %^&amp; ((( ))) []</h1>
+
+<h2>foo.bar and foo-bar are OK as words</h2>
+<h2>separate_words</h2>
+
+<h3>The articles and short prepositions shouldn't be at the end of the ID</h3>
+
+<h4>baz</h4>
+<h5>baz</h5>
+<h4>foo</h4>
+<h5>foo</h5>
+<h4>foo bar</h4>
+<h5>foo bar</h5>
+
+<h5>‘Funny’ characters—in UTF-8</h5>
+
+<hoohaa>Skip this even though it's name starts with 'h'</hoohaa>
+
+<h7>Skip this because there's no 'h7' element in HTML</h7>
+
+</body>

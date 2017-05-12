@@ -1,0 +1,68 @@
+This patch for Text::Template 1.45 adds support for the STRICT option.
+This automatically prepends 'use strict' to your template code, but
+still allows you to use variables defined by the HASH option.
+
+--- lib/Text/Template.pm	2008-04-16 18:38:08.000000000 -0500
++++ lib/Text/Template.pm	2010-03-12 12:21:31.416024029 -0600
+@@ -255,6 +255,7 @@
+   my $fi_eval_package;
+   my $fi_scrub_package = 0;
+   my $fi_filename = _param('filename') || $fi_self->{FILENAME} || 'template';
++  my $fi_strict = _param('strict', %fi_a);
+ 
+   my $fi_prepend = _param('prepend', %fi_a);
+   unless (defined $fi_prepend) {
+@@ -272,6 +273,7 @@
+     $fi_eval_package = caller;
+   }
+ 
++  my @fi_varlist;
+   my $fi_install_package;
+   if (defined $fi_varhash) {
+     if (defined $fi_package) {
+@@ -281,7 +283,12 @@
+     } else {
+       $fi_install_package = $fi_eval_package; # The gensymmed one
+     }
+-    _install_hash($fi_varhash => $fi_install_package);
++    @fi_varlist = _install_hash($fi_varhash => $fi_install_package);
++  }
++
++  if ($fi_strict) {
++    $fi_prepend = "use vars qw(@fi_varlist);$fi_prepend" if @fi_varlist;
++    $fi_prepend = "use strict;$fi_prepend";
+   }
+ 
+   if (defined $fi_package && defined $fi_safe) {
+@@ -441,6 +448,7 @@
+     $hashlist = [$hashlist];
+   }
+   my $hash;
++  my @varlist;
+   foreach $hash (@$hashlist) {
+     my $name;
+     foreach $name (keys %$hash) {
+@@ -449,13 +457,23 @@
+       local *SYM = *{"$ {dest}::$name"};
+       if (! defined $val) {
+ 	delete ${"$ {dest}::"}{$name};
++	my $match = qr/^.\Q$name\E$/;
++	@varlist = grep { $_ !~ $match } @varlist;
+       } elsif (ref $val) {
+ 	*SYM = $val;
++        push @varlist, do {
++          if    (UNIVERSAL::isa($val, 'ARRAY')) { '@' }
++          elsif (UNIVERSAL::isa($val, 'HASH'))  { '%' }
++          else                                  { '$' }
++        } . $name;
+       } else {
+  	*SYM = \$val;
++	push @varlist, '$' . $name;
+       }
+     }
+   }
++
++  @varlist;
+ }
+ 
+ sub TTerror { $ERROR }

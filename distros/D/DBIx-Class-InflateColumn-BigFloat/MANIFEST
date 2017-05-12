@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+ignore.txt
+lib/DBIx/Class/InflateColumn/BigFloat.pm
+t/00-compile.t
+t/boilerplate.t
+t/manifest.t
+t/release-eol.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

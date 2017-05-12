@@ -1,0 +1,8 @@
+Revision history for Perl extension DBIx::BLOB::Handle
+
+0.1  Wed Apr 17 13:15 2002
+     First release.
+
+0.2  Thu Apr 18 19:37 2002
+     Second release. Now does line based reading with the <$handle> operator
+     and implements a much larger subset of the Tied Handle interface.

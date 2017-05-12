@@ -1,0 +1,45 @@
+{
+   "abstract" : "log arbitrary messages into a database from within your Dancer application.",
+   "author" : [
+      "Nikolay Aviltsev <navi@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Log-DB",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Dancer" : "1.0",
+            "Dancer::Plugin::Database" : "0",
+            "Test::More" : "0",
+            "Time::Piece" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.04"
+}

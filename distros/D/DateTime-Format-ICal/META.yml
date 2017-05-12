@@ -1,0 +1,27 @@
+---
+name: DateTime-Format-ICal
+version: 0.09
+author:
+  - |-
+    Dave Rolsky <autarch@urth.org> and Flavio Soibelmann Glock
+    <fglock@pucrs.br>
+abstract: Parse and format iCal datetime and duration strings
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0.17
+  DateTime::Event::ICal: 0.03
+  DateTime::Set: 0.1
+  DateTime::TimeZone: 0.22
+  Params::Validate: 0.59
+build_requires:
+  Module::Build: 0
+provides:
+  DateTime::Format::ICal:
+    file: lib/DateTime/Format/ICal.pm
+    version: 0.09
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

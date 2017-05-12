@@ -1,0 +1,6 @@
+name = "DateTime-Calendar-Japanese-Era"
+badges = ["travis"]
+authority="cpan:DMAKI"
+
+module_maker="ModuleBuildTiny"
+

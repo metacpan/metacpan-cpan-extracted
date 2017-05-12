@@ -1,0 +1,18 @@
+Revision history for DBIx::Safe
+
+1.2.5 
+    Break test into three files, handle no db connection more gracefully.
+
+1.2.4 September 2007
+    Public release
+
+1.2.0
+    Change to a pseudo-inside-out structure
+
+1.1.9
+    Fully functioning version, Postgres support only
+
+1.0.0
+    Original design by Jon Jensen <jon@endpoint.com>
+    and Greg Sabino Mullane <greg@endpoint.com>
+

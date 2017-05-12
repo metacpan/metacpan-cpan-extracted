@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/DBIx/ResultSet.pm
+lib/DBIx/ResultSet/Connector.pm
+lib/DBIx/ResultSet/Cookbook.pod
+t/00-compile.t
+t/abstract.t
+t/auto_pk.t
+t/connector.t
+t/date_time_format.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

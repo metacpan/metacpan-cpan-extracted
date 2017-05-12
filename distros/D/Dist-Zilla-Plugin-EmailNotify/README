@@ -1,0 +1,85 @@
+DESCRIPTION
+
+    This plugin allows one to send an email when releasing.
+
+FIELDS
+
+ from
+
+    Who is sending the email?
+
+        [EmailNotify]
+        from = xsawyerx@cpan.org
+
+ recipient
+
+    Multiple single recipients. These will compose the 'to' field.
+
+        [EmailNotify]
+        recipient = jack@myemail.com
+        recipient = jill@myemail.com
+
+ to
+
+    Direct recipients string. This should be comma separated.
+
+        [EmailNotify]
+        to = jack@myemail.com, jill@myemail.com
+
+ cc
+
+    Any CC you may want. This should be comma separated.
+
+        [EmailNotify]
+        cc = myboss@myemail.com, jacksboss@myemail.com
+
+ bcc
+
+    Any BCC you may want. This should be comma separated.
+
+        [EmailNotify]
+        bcc = topgun@myemail.com
+
+ATTRIBUTES
+
+ to(Str)
+
+    The 'to' email field.
+
+ recipient(ArrayRef[Str])
+
+    This array reference of strings will be used to compose the 'to' email
+    field.
+
+    It is used in case you want to comfortably write down the recipients
+    instead of one long string. This is not provided for other fields.
+
+ from(Str)
+
+    The 'from' email field.
+
+ cc(Str)
+
+    The 'cc' email field.
+
+ bcc(Str)
+
+    The 'bcc' email field.
+
+METHODS/SUBROUTINES
+
+ after_release
+
+    Method to actually send the email right after the 'release' process.
+    Takes all the arguments, creates a body message text using last change
+    log entry and sends the email using Email::Stuff.
+
+ _build_to
+
+    Builder to take all the recipient attribute values and create a single
+    string.
+
+ mvp_multivalue_args
+
+    Internal, Config::MVP related. Creates a multivalue argument.
+

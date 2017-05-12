@@ -1,0 +1,13 @@
+README
+MANIFEST
+Makefile.PL
+INSTALL
+Changes
+t/Endpoints_week.t
+t/Endpoints_unittest.t
+t/Endpoints_nonweek.t
+t/Endpoints_monthofyear.t
+t/Endpoints_dayofmonth.t
+t/Endpoints_class_test.t
+lib/Date/Calc/Endpoints.pm
+lib/Date/Calc/Endpoints.pod

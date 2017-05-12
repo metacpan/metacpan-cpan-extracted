@@ -1,0 +1,10 @@
+use strict;
+use DBIx::MyParse;
+use Data::Dumper;
+my $parser = DBIx::MyParse->new( database => 'test' );
+my $query = $parser->parse($ARGV[0]);
+print "Dumped:\n";
+print Dumper $query;
+print "\nPrinted:\n";
+print $query->print();
+print "\n";

@@ -1,0 +1,13 @@
+lib/Dotiac/DTL/Addon/markup.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+META.yml
+README
+t/2_filter_markup.t
+t/4_pod.t
+t/filter_textile.html
+t/filter_markdown.html
+t/filter_restructuredtext.html
+t/Dtest.pm

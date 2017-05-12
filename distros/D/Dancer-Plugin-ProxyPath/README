@@ -1,0 +1,62 @@
+Dancer-Plugin-ProxyPath
+
+If you deploy a Dancer app behind a proxy using Apache's mod_proxy, 
+it is likely that anything in your public directory will break 
+(images, javascripts, etc). To prevent this you can use mod_proxy_html, 
+which rewrites links inside html. But this has limitations related to stylesheets,
+scripts and element style declarations. To get around this, this module
+provides a proxy object which knows how to write paths from the 
+user's perspective. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+CONFIGURATION
+
+you will need to pass a header along to the proxied server
+telling it what the base path was. If you are running apache the 
+following is along the right lines:
+
+    RequestHeader append Request-Base /application-root
+
+You can choose any other header, but don't then forget to 
+set the name of the header in the webapp's config.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Plugin::ProxyPath
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-ProxyPath
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-ProxyPath
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-ProxyPath
+
+    Search CPAN
+        http://search.cpan.org/dist/Dancer-Plugin-ProxyPath/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2011 Alex Kalderimis
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

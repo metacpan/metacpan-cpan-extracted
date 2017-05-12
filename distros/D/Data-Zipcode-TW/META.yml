@@ -1,0 +1,24 @@
+---
+abstract: 'Taiwan zipcode data in a box.'
+author:
+  - 'Kang-min Liu <gugod@gugod.org>'
+build_requires:
+  Module::Build: 0.3601
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300000, CPAN::Meta::Converter version 2.112150'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Zipcode-TW
+requires:
+  strict: 0
+resources:
+  bugtracker: https://github.com/gugod/Data-Zipcode-TW/issues
+  repository: git://github.com/gugod/Data-Zipcode-TW.git
+version: 1.0

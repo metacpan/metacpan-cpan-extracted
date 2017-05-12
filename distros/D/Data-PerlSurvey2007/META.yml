@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Data-PerlSurvey2007
+version:             1.00
+abstract:            Data results and simple code for the results of Perl Survey 2007
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Lester <andy@petdance.com>

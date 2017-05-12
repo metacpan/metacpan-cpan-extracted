@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 785c1455ed0fb9bcec72f5f9c979f1339c6f887c Build.PL
+SHA1 27ec72b77360c00b85cfa44451c117f3baec5ff1 Changes
+SHA1 9043479b5a95bee535cd4d126f5e8a09edae9716 INSTALL
+SHA1 33260abc93b43a44581b0b6263d7e4318f4122bb LICENSE
+SHA1 e86a86ad29261f94968f905e3d10148d5e86bd39 MANIFEST
+SHA1 3da861a860595300cadbe86a572103e075d891ad MANIFEST.SKIP
+SHA1 cecbebeb9f3fb903be2da67def067a4eb25da65e META.json
+SHA1 b747b8db83efcb888be988af2dc3169ea3cf1ab5 META.yml
+SHA1 d99f677d4f2982725c511d95f6893aeb411b97b5 README
+SHA1 39dbb45cf7edfe11a1dba67b16e0685e2da66b32 README.mkdn
+SHA1 fc3a83f39f4012cf6e731ec66f184dc8bcc9730d a
+SHA1 189663e6966fade31535c50fde167f1ccea301fb dist.ini
+SHA1 b16ddc5b310e598601e5ab1b0015dc087c46b96a lib/Dist/Zilla/Plugin/SchwartzRatio.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 473906254ecd96009795d4b7fbc82fac48c03ecd t/000-report-versions.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAk9n0RoACgkQ34Hwf+GwC4zL2gCfcjmwykGC+7k3+KQfgmuXAfjl
+fHcAoId9M94zGwrAjJeotnqWN7aADdho
+=oRAs
+-----END PGP SIGNATURE-----

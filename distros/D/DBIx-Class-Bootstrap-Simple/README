@@ -1,0 +1,24 @@
+DBIx::Class::Bootstrap::Simple
+
+====================
+
+Simplistic bootstrapping for DBIx::Class.
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    DBIx::Class
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Ohio-Pennsylvania Software, LLC. All rights reserved.

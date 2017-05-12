@@ -1,0 +1,107 @@
+//-*- Mode: C++ -*-
+// partially auto-generated from C++ header file(s) by h2xspp.perl;
+//  + command-line: h2xspp.perl -prefix 'DDC::XS::' Query.h.in '-vt=^[mb]_' -o out '-dn=free' '-dt=Node|Compiler|Options
+
+//======================================================================
+// Object Types
+
+//-- QueryCompiler.h
+%typemap{CQueryCompiler*}{simple};
+
+//-- Query.h
+%typemap{CQuery*}{simple};
+%typemap{CQNegatable*}{simple};
+%typemap{CQAtomic*}{simple};
+%typemap{CQBinOp*}{simple};
+%typemap{CQAnd*}{simple};
+%typemap{CQOr*}{simple};
+%typemap{CQWith*}{simple};
+%typemap{CQWithout*}{simple};
+%typemap{CQWithor*}{simple};
+%typemap{CQToken*}{simple};
+%typemap{CQTokExact*}{simple};
+%typemap{CQTokAny*}{simple};
+%typemap{CQTokAnchor*}{simple};
+%typemap{CQTokRegex*}{simple};
+%typemap{CQTokSet*}{simple};
+%typemap{CQTokInfl*}{simple};
+%typemap{CQTokSetInfl*}{simple};
+%typemap{CQTokPrefix*}{simple};
+%typemap{CQTokSuffix*}{simple};
+%typemap{CQTokInfix*}{simple};
+%typemap{CQTokPrefixSet*}{simple};
+%typemap{CQTokSuffixSet*}{simple};
+%typemap{CQTokInfixSet*}{simple};
+%typemap{CQTokMorph*}{simple};
+%typemap{CQTokLemma*}{simple};
+%typemap{CQTokThes*}{simple};
+%typemap{CQTokChunk*}{simple};
+%typemap{CQTokFile*}{simple};
+%typemap{CQNear*}{simple};
+%typemap{CQSeq*}{simple};
+
+//-- %typemap{TxChain}; //-- TODO
+
+//-- QCount.h
+%typemap{CQCountKeyExpr*}{simple};
+%typemap{CQCountKeyExprConstant*}{simple};
+%typemap{CQCountKeyExprMeta*}{simple};
+%typemap{CQCountKeyExprFileId*}{simple};
+%typemap{CQCountKeyExprIndexed*}{simple};
+%typemap{CQCountKeyExprFileName*}{simple};
+%typemap{CQCountKeyExprDate*}{simple};
+%typemap{CQCountKeyExprDateSlice*}{simple};
+%typemap{CQCountKeyExprBibl*}{simple};
+%typemap{CQCountKeyExprRegex*}{simple};
+%typemap{CQCountKeyExprToken*}{simple};
+%typemap{CQCountKeyExprList*}{simple};
+%typemap{CQCount*}{simple};
+%typemap{CQKeys*}{simple};
+
+//-- QueryFilter.h
+%typemap{CQFilter*}{simple};
+%typemap{CQFSort*}{simple};
+%typemap{CQFRankSort*}{simple};
+%typemap{CQFDateSort*}{simple};
+%typemap{CQFSizeSort*}{simple};
+%typemap{CQFRandomSort*}{simple};
+%typemap{CQFBiblSort*}{simple};
+%typemap{CQFContextSort*}{simple};
+%typemap{CQFHasField*}{simple};
+%typemap{CQFHasFieldValue*}{simple};
+%typemap{CQFHasFieldRegex*}{simple};
+%typemap{CQFHasFieldPrefix*}{simple};
+%typemap{CQFHasFieldSuffix*}{simple};
+%typemap{CQFHasFieldInfix*}{simple};
+%typemap{CQFHasFieldSet*}{simple};
+
+//-- QueryOptions.h
+%typemap{CQueryOptions*}{simple};
+
+
+//======================================================================
+// Data Types
+
+//-- data types: simple
+%typemap{DWORD};
+%typemap{BYTE};
+%typemap{bool};
+%typemap{int};
+%typemap{size_t};
+%typemap{unsigned};
+%typemap{HitSortEnum};
+
+
+//-- data types: stl
+%typemap{size_t};
+%typemap{string};
+%typemap{set_string};
+%typemap{vector_string};
+%typemap{vector_BYTE};		//-- array of integer values in (0..255) ~ vector<BYTE>
+%typemap{vector_BYTEasCHAR};	//-- array of single-character strings   ~ vector<BYTE>
+%typemap{vector_char};		//-- array of single-character strings   ~ vector<char>
+%typemap{vector_CQTokenPtr};
+%typemap{vector_CQCountKeyExprPtr};
+%typemap{CQFilterList};
+%typemap{CQSubcorpusList};
+%typemap{ddcObjectList};

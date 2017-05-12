@@ -1,0 +1,26 @@
+DCOP version 0.01
+=================
+
+This is a base class to talk to the system's dcop server, using the system's
+dcop client.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+	Kde.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Juan C. Müller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

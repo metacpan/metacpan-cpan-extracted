@@ -1,0 +1,6 @@
+do { my $x = {
+       'cpantest.antelope.net' => '28580308-8a62-11e5-bac6-d11fe29420dd',
+       'vm-debian-001' => '04fd9956-2ca5-11e5-8be5-d039436f2841'
+     };
+  $x;
+ }

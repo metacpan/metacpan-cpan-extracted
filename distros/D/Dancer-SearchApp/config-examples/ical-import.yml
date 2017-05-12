@@ -1,0 +1,11 @@
+elastic_search:
+    index: dancer-searchapp
+calendars:
+    - calendar: "t/documents/timetable.gpw2016.ics"
+      name: 'gpw2016'
+      exclude:
+         - ".git"
+    - calendar: "t/documents/timetable.yapce2016.ics"
+      name: 'ye2016'
+      exclude:
+         - ".git"

@@ -1,0 +1,32 @@
+Date-Tolkien-Shire is Copyright (C) 2001-2003, 2006 by Tom Braun,
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This is an object-oriented module to convert dates into the Shire
+Calender as presented in the Lord of the Rings by J. R. R. Tolkien. It
+includes converting epoch time to the Shire Calendar (you can also get
+epoch time back), comparison operators, and a method to print a
+formatted string containing that does something to the effect of on this
+date in history -- pulling events from the Lord of the Rings.
+
+The biggest use I can see in this thing is in a startup script or
+possible to keep yourself entertained in an otherwise boring app that
+includes a date. If you have any other ideas/suggestions/uses, etc.,
+please let me know. I am curious to see how this gets used (if it gets
+used that is).
+
+INSTALLATION
+
+This pure-Perl module is installable using any of the usual
+incantations.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

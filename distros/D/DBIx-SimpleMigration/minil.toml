@@ -1,0 +1,3 @@
+name = "DBIx-SimpleMigration"
+badges = ["travis", "metacpan"]
+module_maker="ModuleBuildTiny"

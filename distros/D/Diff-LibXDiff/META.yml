@@ -1,0 +1,32 @@
+--- #YAML:1.0
+name:               Diff-LibXDiff
+version:            0.05
+abstract:           Calculate a diff with LibXDiff (via XS)
+author:
+    - Robert Krimen <rkrimen@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  6.48
+build_requires:
+    ExtUtils::MakeMaker:  0
+    Test::More:           0.42
+    Test::Most:           0
+requires:
+    Carp::Clan:  0
+    perl:        5.006
+    Test::More:  0.42
+    Test::Most:  0
+resources:
+    repository:  http://github.com/robertkrimen/Diff-LibXDiff/tree/master
+no_index:
+    directory:
+        - t
+        - inc
+        - t
+        - inc
+        - util
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

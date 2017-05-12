@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Device-Conrad-RelaisControl
+version:      0.12
+version_from: RelaisControl.pm
+installdirs:  site
+requires:
+    Device::SerialPort:            
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

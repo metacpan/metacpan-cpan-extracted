@@ -1,0 +1,10 @@
+CAVEAT!!!
+
+If you are using a C compiler that does not support 64-bit operations,
+i.e., does not understand "long long" types, please comment out the
+line
+
+    'DEFINE' => '-DSHA2_USE_INTTYPES_H',
+
+in the Makefile.PL.
+

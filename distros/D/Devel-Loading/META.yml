@@ -1,0 +1,10 @@
+--- 
+abstract: Run code before each module is loaded
+author: 
+  - Shawn M Moore <sartak@bestpractical.com>
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: Devel-Loading
+requires: {}
+
+version: 0.01

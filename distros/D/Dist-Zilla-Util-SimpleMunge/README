@@ -1,0 +1,101 @@
+Dist::Zilla::Util::SimpleMunge
+
+  NOTE: STOPGAP
+
+This module is mostly a stopgap and a implementation experiment in lieu
+of something better in Dist::Zilla eventually transpiring.
+
+  BASIC USAGE
+
+Munging files in Dist::Zilla can be a pain.
+
+Its mostly the same:
+
+  $file->content( substr( $file->content, 0, 10 ) ); # etc.
+
+Except when you come to "CodeRef"s, that all changes.
+
+  my $orig_code = $file->code();
+  $file->code( sub {
+      $file->$orig_code() =~ s/foo/bar/
+  });
+
+Which quickly gets messy.
+
+So this module is as simple as I think I can get it without hacking
+Dist::Zilla directly.
+
+  auto_munge_file $file, sub {
+     my ( $thefile, $content, $encoding ) = @_;
+  };
+
+The callback will be called as appropriate.
+
+*   $content will contain the content, *decoded if possible*
+
+*   $encoding will be either "text" or "bytes", the latter if decoding
+    is not possible.
+
+*   "InMemory" will apply the code immediately
+
+*   "FromCode" will take your code and create a chained system so your
+    code will be evaluated when the file itself is written out.
+
+And this is the most useful and straight forward interface that doesn't
+invoke any weird re-blessing magic.
+
+  ADVANCED USAGE
+
+There are a few less simple utilities that may also prove useful.
+
+*   "munge_InMemory" - trusts you know what you're dealing with and
+    munges an "InMemory" instance via the callback.
+
+*   "munge_FromCode" - trusts you when you say you have a "FromCode",
+    and munges with "CodeRef" chaining.
+
+*   "inplace_replace" - A bit of magic to replace an object in-place
+    without modifying any containers that point to it and without
+    changing the reference address.
+
+*   "to_InMemory" - returns a "FromCode" represented as a new "InMemory"
+    object.
+
+*   "to_FromCode" - returns an "InMemory" represented as a new
+    "FromCode" object.
+
+*   "inplace_to_InMemory" - like "to_InMemory", but replaces the object
+    in-place.
+
+*   "inplace_to_FromCode" - like "to_FromCode", but replaces the object
+    in-place.
+
+*   "munge_file" - combines all of the above behaviors based on
+    configuration values.
+
+*   "munge_files" - applies a single configuration and callback to a
+    collection of files.
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric <kentnl@cpan.org>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

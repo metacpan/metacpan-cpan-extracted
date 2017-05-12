@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Device-SCSI,
+version 1.004:
+
+  Perl module to control SCSI devices
+
+This software is copyright (c) 2011 by Peter Corlett.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

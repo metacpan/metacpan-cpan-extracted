@@ -1,0 +1,25 @@
+Version 2.01 - 16 May 2016
+
+* Fixed copyright date.
+* Fixed contact information.
+
+Version 2.00 - 13 Apr 2016
+
+* All bugs from rt.cpan.org fixed.
+* Removed option 'copy' because it was mostly useless.
+* Bumped version number to 2.x because of incompatible changes.
+* New variables $Data::Walk::index and $Data::Walk::key.
+
+Version 1.00 - 11 May 2006
+
+* The API is now considered stable.
+* New global variable $Data::Walk::depth.
+* Section "EXAMPLES" with some recipies in the pod Data::Walk(3).
+
+Version 0.02 - 06 Dec 2005
+
+* Renamed from Data::Traverse to Data::Walk.
+
+Version 0.01 - 15 Nov 2005
+
+* First version.

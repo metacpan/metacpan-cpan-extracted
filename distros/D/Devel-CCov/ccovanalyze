@@ -1,0 +1,500 @@
+#!/nw/dev/usr/bin/perl -w
+
+# This is like a mini-version of posh (Perl - ObjectStore Shell).
+# ObjectStore adds seemless, easy, database-strength persistence to
+# perl.  Check it out!  http://www.perl.com/CPAN/authors/id/JPRIT/
+
+# Too bad Storable can't store Bit::Vectors (or I couldn't figure it
+# out!).
+
+use strict;
+
+package FakeTerm;
+
+sub new {bless [], shift}
+sub readline {
+    my ($o, $pr) = @_;
+    $|=1;
+    print($pr);
+    $|=0;
+    scalar(<>);
+}
+sub addhistory {}
+
+package input;
+use Bit::Vector;
+use Storable;
+
+use vars qw($DB $LOG $TOP @PATH $at);
+$LOG = $ENV{CCOV_LOG} || '/tmp/ccov.log';
+$DB = $ENV{CCOV_DB} || './ccov.db';
+
+$TOP = {};
+$TOP = retrieve($DB)
+    if -e $DB;
+
+sub help {
+    print '
+cd ..              - move back
+cd key             - change location
+ls                 - dump the current hash
+pwd
+tm qw(34bbb8b8)    - translates hex times into local time
+
+load               - load new data from $LOG
+swapin             - load new data and cd to it
+stats [sub-report] - stats help for a listing
+
+copy               - copyright
+checkpoint         - called automatically upon exit
+';
+    ()
+}
+
+sub copy {
+    print('Copyright © 1998 Joshua Nathaniel Pritikin.  All rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the terms of the Perl Artistic License (see
+http://www.perl.com/perl/misc/Artistic.html)
+
+');
+	      ()
+}
+
+sub cd {
+    my ($k) = @_;
+    if ($k eq '..') {
+	pop @PATH;
+    } else {
+	push(@PATH,$k);
+    }
+    ()
+}
+sub ls { print join(' ', sort keys %$at)."\n"; () }
+sub pwd { print "(".join(', ', map {"'$_'"} @PATH).")\n"; () }
+
+sub debug {
+    'Carp'->import('verbose');
+    ()
+}
+
+sub load {
+    my $fh = new IO::File;
+    $fh->open($LOG) or die "open $LOG: $!";
+    my $count=0;
+    my $buildcnt = keys %$TOP;
+    while (defined(my $l=<$fh>)) {
+	my @l = split(/\s+/, $l);
+	my %d = map { split(/\=/, $_) } @l;
+
+	my $b = $TOP->{ $d{build} } ||= {};
+	my $t = $b->{ $d{test} } ||= {};
+	my $f = $t->{ $d{file} } ||= {};
+	if ($d{tm} gt ($f->{tm} or 0)) {
+	    if ($f->{tm}) {
+		# never loose ground on the same build
+		my $v1 = new Bit::Vector($f->{max});
+		$v1->from_hex($f->{hits});
+		my $v2 = new Bit::Vector($d{max});
+		$v2->from_hex($d{hits});
+		$v1 |= $v2;
+		$f->{hits} = $v1->to_Hex();
+	    } else {
+		$f->{max} = $d{max};
+		$f->{hits} = $d{hits};
+	    }
+	    $f->{tm} = $d{tm};
+	    ++$count;
+	}
+    }
+    $fh->close;
+    unlink $LOG or warn "unlink $LOG: $!";
+    if ($buildcnt < keys %$TOP) {
+	warn "[** A NEW BUILD is available! **]\n";
+    }
+    $count;
+}
+
+sub prune {
+    my ($keep) = @_;
+    $keep ||= 4;
+    my @b = sort keys %$TOP;
+    for (1..$keep) { pop @b };
+    for (@b) { delete $TOP->{$_}; }
+    ()
+}
+
+sub checkpoint {
+    print "[checkpointing to $DB]\n";
+    prune();
+    store $TOP, "$DB.new";
+    rename "$DB.new", $DB or warn "rename: $!";
+    ()
+}
+
+sub swapin {
+    load();
+    my @b = sort keys %$TOP;
+    @PATH = ($b[$#b]);
+    ();
+}
+
+sub tm {
+    for (@_) {
+	print "$_ => ".localtime(hex($_))."\n";
+    }
+}
+
+sub count_bits {
+    my ($v) = @_;
+    my ($h,$m) = (0,0);
+    for (my $b=0; $b < $v->Size; $b++) {
+	if ($v->bit_test($b)) { $h++; } else { $m++; }
+    }
+    ($h,$m);
+}
+
+sub count_on {
+    my ($v) = @_;
+    my $on=0;
+    for (my $b=0; $b < $v->Size; $b++) {
+	$on++ if $v->bit_test($b);
+    }
+    $on;
+}
+
+sub stats {
+    my $report = shift;
+    $report ||= '';
+    my $level = @PATH;
+    if ($level == 0) {
+	print "Pick a build first!\n";
+    } elsif ($level == 1) {
+	if ($report eq 'help') {
+	    print "stats                      - hit & miss for all tests\n";
+	    print "stats 'overlap'            - show cases hit by all tests\n";
+	    print "stats qw(overlap tests...) - show cases hit by all tests\n";
+	    print "stats 'orthog'             - analyze test orthogonality\n";
+	    print "stats qw(orthog tests...)  - analyze test orthogonality\n";
+	    print "stats qw(cmp t1 t2)        - show overlap between t1 and t2\n";
+	    return;
+
+	} elsif ($report eq 'cmp') {
+	    my ($t1,$t2) = @_;
+	    my @m1 = sort grep(m{\Q$t1\E}, keys %$input::at);
+	    die "$t1: ambiguous: (".join(' ', @m1).")\n" if @m1 != 1;
+	    $t1 = $at->{$m1[0]};
+	    my @m2 = sort grep(m{\Q$t2\E}, keys %$input::at);
+	    die "$t2: ambiguous: (".join(' ', @m2).")\n" if @m2 != 1;
+	    $t2 = $at->{$m2[0]};
+	    my %files;
+	    for (keys %$t1, keys %$t2) { $files{$_}=1; }
+	    for my $file (sort keys %files) {
+		my $f1 = $t1->{$file};
+		next if !$f1;
+		my $v1 = new Bit::Vector($f1->{max});
+		$v1->from_hex($f1->{hits});
+
+		my $f2 = $t2->{$file};
+		next if !$f2;
+		my $v2 = new Bit::Vector($f2->{max});
+		$v2->from_hex($f2->{hits});
+
+		my $vboth = $v1 & $v2;
+		$v1->Difference($v1,$vboth);
+		$v2->Difference($v2,$vboth);
+		
+		my $both = count_on($vboth);
+		printf("%20s[ %4d %4d %4d ] ", $file, 
+		       count_on($v1), $both, count_on($v2));
+		for (my $b=0; $b < $vboth->Size; $b++) {
+		    print "$b " if $vboth->bit_test($b);
+		}
+		print "\n";
+	    }
+	    return;
+	}
+	if ($report eq 'overlap') {
+	    my @tests = sort keys %$input::at;
+	    if (@_) {
+		@tests =();
+		for my $z (@_) {
+		    my @m = sort grep(m{\Q$z\E}, keys %$input::at);
+		    push(@tests, @m);
+		}
+		print "test set: ".join(' ', @tests)."\n";
+	    }
+	    my $overlap;
+	    my %zip;
+	    my %files;
+	    for my $test (@tests) {
+		my $t = $at->{$test};
+		for (keys %$t) { $files{$_} = 1 }
+	    }
+	    for my $test (@tests) {
+		my $t = $at->{$test};
+		for my $file (keys %files) {
+		    my $f = $t->{$file};
+		    if (!$f) {
+			$zip{$file} = 1;
+		    } else {
+			if (!$overlap->{$file}) {
+			    my $v = new Bit::Vector($f->{max});
+			    $v->Complement($v->Shadow);
+			    $overlap->{$file} = $v;
+			}
+			my $v = new Bit::Vector($f->{max});
+			$v->from_hex($f->{hits});
+			$overlap->{$file} &= $v;
+		    }
+		}
+	    }
+	    for my $file (sort keys %$overlap) {
+		next if $zip{$file};
+		my $v = $overlap->{$file};
+		my ($o1, $o2) = count_bits($v);
+		printf("%20s: %d (%d%%): ", $file, $o1, 100*$o1/($o1+$o2));
+		for (my $b=0; $b < $v->Size; $b++) {
+		    print "$b " if $v->bit_test($b);
+		}
+		print "\n";
+	    }
+	    # & total overlap?
+
+	} elsif ($report eq 'orthog') {
+	    # any graph theory guy/gal know how to do this faster?
+	    my @tests = sort keys %$input::at;
+	    if (@_) {
+		@tests =();
+		for my $z (@_) {
+		    my @m = sort grep(m{\Q$z\E}, keys %$input::at);
+		    push(@tests, @m);
+		}
+		print "test set: ".join(' ', @tests)."\n";
+	    }
+	    $|=1;
+	    my $r;
+	    eval {   #eval for partial results :-)
+		for my $test (@tests) {
+		    my $targ = $at->{$test};
+		    my $tot_share=0;
+		    my $uniq=0;
+		    my $count=0;
+		    my $test2;
+		    printf("%20s: comparing", $test);
+		    for my $test2 (@tests) {
+			next if $test2 eq $test; #oops
+			print ".";
+			for my $file (sort keys %$targ) {
+			    my $t = $at->{$test2}{$file};
+			    next if !$t; #no overlap
+			    
+			    my $v = new Bit::Vector($t->{max});
+			    $v->from_hex($t->{hits});
+			    
+			    my $targf = $targ->{$file};
+			    my $vtarg = new Bit::Vector($targf->{max});
+			    $vtarg->from_hex($targf->{hits});
+			    
+			    my $vshared = $vtarg & $v;
+			    my $share=0;
+			    for (my $b=0; $b < $vshared->Size; $b++) {
+				++$share if $vshared->bit_test($b);
+			    }
+			    $tot_share += $share;
+
+			    $vtarg->Difference($vtarg, $v);
+			    for (my $b=0; $b < $vtarg->Size; $b++) {
+				++$uniq if $vtarg->bit_test($b);
+			    }
+			}
+			$count++;
+		    }
+		    print "\n";
+		    $r->{$test}{test} = $test;
+		    $r->{$test}{avg} = $tot_share / $count;
+		    $r->{$test}{uniq} = $uniq / $count;
+		}
+	    };
+	    warn if $@;
+	    print "\nAverage number of cases (not) shared with other tests:\n";
+	    for my $z (sort { $a->{uniq} <=> $b->{uniq} } values %$r) {
+		printf("%20s: %f (%f)\n", $z->{test}, $z->{avg}, $z->{uniq});
+	    }
+	    print "Lower is better (higher is better): maximize orthogonality!\n";
+	    $|=0;
+	    return;
+	} else {
+	    my @tests = sort keys %$at;
+	    my $union;
+	    for my $test (@tests) {
+		my $t = $at->{$test};
+		for my $file (keys %$t) {
+		    my $f = $t->{$file};
+		    if (!$union->{$file}) {
+			$union->{$file} = new Bit::Vector($f->{max});
+		    }
+		    my $v = new Bit::Vector($f->{max});
+		    $v->from_hex($f->{hits});
+		    $union->{$file} |= $v;
+		}
+	    }
+	    my ($h,$m) = (0,0);
+	    for my $file (keys %$union) {
+		print "$file: ";
+		my $v = $union->{$file};
+		for (my $b=0; $b < $v->Size; $b++) {
+		    if ($v->bit_test($b)) { $h++; } else {
+			$m++; print "$b ";
+		    }
+		}
+		print "\n";
+	    }
+	    printf("\nHIT %d (%3d%%) MISSED %d (%3d%%) TOTAL %d\n", 
+		   $h, 100*$h/($h+$m), $m, 100*$m/($h+$m), $h+$m);
+	}
+	    
+    } elsif ($level == 2) {
+	my ($hit,$mis) = (0,0);
+	for my $file (sort keys %$at) {
+	    my ($h,$m) = (0,0);
+	    my $f = $at->{$file};
+	    my $v = new Bit::Vector($f->{max});
+	    $v->from_hex($f->{hits});
+	    for (my $b=0; $b < $f->{max}; $b++) {
+		if ($v->bit_test($b)) { $h++; } else { $m++; }
+	    }
+	    printf("%20s: HIT %4d (%3d%%) MISSED %4d (%3d%%) TOTAL %4d\n",
+		   $file, $h, 100*$h/($h+$m), $m, 100*$m/($h+$m), $h+$m);
+	    $hit+=$h;
+	    $mis+=$m;
+	}
+	printf("HIT %d (%3d%%) MISSED %d (%3d%%) TOTAL %d\n", 
+	       $hit, 100*$hit/($hit+$mis), $mis, 100*$mis/($hit+$mis), $hit+$mis);
+    } elsif ($level == 3) {
+	my $v = new Bit::Vector($at->{max});
+	$v->from_hex($at->{hits});
+	my ($h,$m) = (0,0);
+	print "HIT: ";
+	for (my $b=0; $b < $at->{max}; $b++) {
+	    ++$h, print "$b " if $v->bit_test($b);
+	}
+	print "\n";
+	print "MISSED: ";
+	for (my $b=0; $b < $at->{max}; $b++) {
+	    ++$m, print "$b " if !$v->bit_test($b);
+	}
+	print "\n";
+	printf("HIT %d (%3d%%) MISSED %d (%3d%%) TOTAL %d\n", 
+	       $h, 100*$h/($h+$m), $m, 100*$m/($h+$m), $h+$m);
+    }
+    ()
+}
+
+package main;
+
+use Devel::CCov qw($VERSION);
+use IO::File;
+use Data::Dumper;
+use Carp;
+use vars qw($term $newdata);
+
+$newdata = 1;
+
+sub notice_data {
+    # is this silly or what?
+    if (-e $input::LOG) {
+	print "[You have new data!  Type 'load' to load it!]\n"
+	    if !$newdata;
+	$newdata = 1;
+    } else {
+	$newdata = 0;
+    }
+}
+
+sub resolve {
+    # easy: everything is a hashref!
+    $input::at = $input::TOP;
+    my @p = @input::PATH;
+    @input::PATH = ();
+    for my $k (@p) {
+	my $n = $input::at->{$k};
+	last if !ref $n || ref $n ne 'HASH';
+	$input::at = $n;
+	push(@input::PATH, $k);
+    }
+}
+
+sub run {
+    my ($o) = @_;
+    print("CCov Analyzer $VERSION (Perl $])\n");
+
+    while (1) {
+	&notice_data;
+	&resolve;
+	my $prompt;
+	if (@input::PATH) {
+	    $prompt = '$at = '.$input::PATH[$#input::PATH]." ";
+	} else {
+	    $prompt = '';
+	}
+	my $input = $term->readline("$prompt\$ ");
+	last if (!defined $input or $input =~ m/^\s*exit\s*$/);
+
+	$input =~ s/^\s*//;
+	if ($input =~ s/^\!//) {
+	    my $st = system($input);
+	    print "(status=$st)\n" if $st;
+	    next;
+	}
+	if ($input =~ m/^cd \s* (\S*) /x) {
+	    my $to = $1;
+	    if (length($to) == 0) {
+		@input::PATH = ();
+	    } elsif ($to eq '..') {
+		pop @input::PATH;
+	    } else {
+		my @m = sort grep(m{\Q$to\E}, keys %$input::at);
+		if (@m == 1) {
+		    push(@input::PATH, @m);
+		} else {
+		    print "cd $to: ambiguous: (".join(' ', @m).")\n";
+		}
+	    }
+	    next;
+	}
+
+	eval {
+	    my @r = eval "no strict; package input;\n#line 1 \"input\"\n".$input;
+	    if ($@) {
+		warn $@;
+		warn "** Type 'help' for help!\n";
+	    }
+	    for my $r (@r) {
+		print Dumper($r);
+	    }
+	    $@=undef;
+	    $term->addhistory($input) if (!$@ and $input =~ /\S/);
+	};
+	warn if $@;
+	$@=undef;
+    }
+    input::checkpoint();
+}
+
+eval {
+    use Term::ReadLine;
+    $term = new Term::ReadLine('posh');
+    $term->ornaments(1);
+    # do completion on perl syntax?  :-)
+};
+if ($@) {
+    print "** warning: Module 'Term::ReadLine' could not be loaded.\n";
+    $term = new FakeTerm;
+}
+$|=0;
+$SIG{INT} = sub { die "ABORT" };
+&run;
+

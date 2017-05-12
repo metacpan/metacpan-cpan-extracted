@@ -1,0 +1,24 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Document/Writer.pm
+lib/Document/Writer/Page.pm
+lib/Document/Writer/TextArea.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00-load.t
+t/001-document.t
+t/002-flowing.t
+t/002-layout.t
+t/lib/MockDriver.pm
+t/lib/MockLayout.pm
+t/pod-coverage.t
+t/pod.t

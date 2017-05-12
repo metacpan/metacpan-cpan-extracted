@@ -1,0 +1,31 @@
+---
+name: Dir-Split
+version: 0.80
+author:
+  - 'Steven Schubiger <schubiger@cpan.org>'
+abstract: Split files of a directory to subdirectories
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  File::Basename: 0
+  File::Copy: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  SelfLoader: 0
+build_requires:
+  File::Temp: 0
+  Test::More: 0
+recommends:
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+provides:
+  Dir::Split:
+    file: lib/Dir/Split.pm
+    version: 0.80
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

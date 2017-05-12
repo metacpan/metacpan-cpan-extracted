@@ -1,0 +1,6 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-Stack.t
+lib/Data/Stack.pm

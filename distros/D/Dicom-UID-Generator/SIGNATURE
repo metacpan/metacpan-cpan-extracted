@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2c4fae4020f71f8ac610c26a1b98bfffe3014c7c Changes
+SHA1 d736c95cfe4647ee36e4772b5372921e8408722d Generator.pm
+SHA1 f6f99b50ddf40ff89a85a50ceaef1acd9756d898 LICENSE
+SHA1 9123dd0c8a5576b180001368e02ca11bb81733fa MANIFEST
+SHA1 d2929edd7a7c575c2e37bb1a3cc767f275c1c150 META.yml
+SHA1 8825afe3b865f7b97b4e1e07f9215d8752b680f7 Makefile.PL
+SHA1 0abb69d7db87488393d705e0698b1707a6fdcbda README
+SHA1 bf0cd2c6f8ed2a346f5cbeae65a3dfb44d6ed8a2 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 38e92359d3e5d02d3105e7ba1a16aebea8c9a167 t/Dicom-UID-Generator/01-use.t
+SHA1 81b26125c1be5a2e1bfbb0fe7120e6f4ac84e9e4 t/Dicom-UID-Generator/02-version.t
+SHA1 020942bb87d9e4e3bdbdb29227b28b9ab3328d05 xt/Dicom-UID-Generator/01-pod_coverage.t
+SHA1 82efecc33032f9d49c450c4d97c1dd7cfc188bbb xt/Dicom-UID-Generator/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJXvrl0AAoJEJe+XXKaIuTlKiMIAJA7Ny29cAJPntXvDsq4c5wZ
+xujUAOamrKnunQfbSiulJ/eK3CC15FcRDRk9CuzSOVt01y2NMjzS6NUbhl8FfmIN
+uGSoeYNS8O7ukYcVA2BONii49FM4/+Z5FLp0Eag0T4NP1uI6xsMuhCxjEPC+VbWY
+bRc6QUwjDnAQXnpjIHtRrD4A9zSgIIcXGjlg3sq5bEuZKj+pl+rwpIb2yXSm6Jkm
+fTWd7TWy+S72Evfbqk37SI3ODk5Cua4//BGREY7gmFWDynlk8UL3IZg5Hfxb2AHI
+Tlxtkrq44UaA6jZ/ysejWyRiKaN5Jd6osUatGsv/X2iaBRxLb5mVzGpAofZMcq4=
+=ZSJ1
+-----END PGP SIGNATURE-----

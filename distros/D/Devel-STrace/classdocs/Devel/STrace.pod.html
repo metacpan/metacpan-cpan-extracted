@@ -1,0 +1,166 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+	<title>Devel::STrace</title>
+<link rel="stylesheet" type="text/css" href="../podstyle.css" /><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<div class="box">
+  <h1 class="t1">Devel::STrace</h1>
+  <table>
+    <tr>
+      <td class="label">Description</td>
+      <td class="cell">strace for Perl scripts</td>
+    </tr>
+  </table>
+</div>
+<div class="path">
+  <a href="../index.html">Devel::STrace</a> &gt; Package Manuals &gt;
+  Devel-STrace
+</div>
+<div>
+<a href="../src/Devel/STrace.pod">Source</a>
+</div>
+
+
+<div class="pod">
+<!-- INDEX START -->
+<h3 id="TOP">Index</h3>
+<ul>
+	<li><a href="#NAME">NAME</a></li>
+	<li><a href="#SYNOPSIS">SYNOPSIS</a></li>
+	<li><a href="#DESCRIPTION">DESCRIPTION</a></li>
+	<li><a href="#Application_Notes">Application Notes</a></li>
+	<li><a href="#TO_DO">TO DO</a></li>
+	<li><a href="#SEE_ALSO">SEE ALSO</a></li>
+	<li><a href="#AUTHOR_COPYRIGHT_AND_LICENSE">AUTHOR, COPYRIGHT, AND LICENSE</a></li>
+</ul>
+<hr />
+<!-- INDEX END -->
+
+<h1 id="NAME">NAME <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Devel::STrace - strace-like runtime call trace for Perl applications</p>
+
+<h1 id="SYNOPSIS">SYNOPSIS <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<pre>    #
+    #    setup environment variables to control
+    #    configuration of Devel::RingBuffer's mmap'ed
+    #    memory
+    #
+    export DEVEL_RINGBUF_SLOTS=10
+    export DEVEL_RINGBUF_BUFFERS=50
+    export DEVEL_RINGBUF_FILE='somescript.prof'
+    #
+    #    run the script under STrace
+    perl -d:STrace somescript
+    #
+    #    use another terminal to view the
+    #    contents of the ringbuffers
+    #
+    plstrace.pl -f $DEVEL_RINGBUF_FILE -s 10 -d 100
+
+</pre><h1 id="DESCRIPTION">DESCRIPTION <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Provides a strace/truss-like runtime call monitor for Perl applications.
+Note that, while strace/truss only dumps system calls, Devel::STrace
+dumps <strong>all</strong> calls to Perl subs on the application's stack. Also note
+that Devel::STrace cannot trace non-Perl calls (e.g., calls inside
+XS/C modules), so an additional external strace/truss monitor may
+be needed to fully diagnose a misbehaving Perl script.</p>
+
+<p>Devel::STrace captures each subroutine call (via <code>DB::sub()</code>)
+using ring buffers in a memory mapped file using
+<a href="http://search.cpan.org/perldoc?Devel%3A%3ARingBuffer">Devel::RingBuffer</a> and <a href="http://search.cpan.org/perldoc?IPC%3A%3AMmap">IPC::Mmap</a>. Refer to <a href="http://search.cpan.org/perldoc?Devel%3A%3ARingBuffer">Devel::RingBuffer</a>
+for configuration details.</p>
+
+<p>As each subroutine is entered (ie, when <code>DB::sub()</code> is called),
+the next available ring buffer slot is allocated (possibly overwriting
+the oldest in-use slot) and <code>$DB::sub</code> is written to the slot - possibly suffixed
+by the $AUTOLOAD value if the call is an AUTOLOAD - and the line number
+and timestamp (as returned by Time::HiRes) are set to -1, 0, respectively.
+The line number and timestamp are filled in by <code>DB::DB()</code> as each
+Perl statement is executed.</p>
+
+<p>Note that no explicit locks are used during the slot updates,
+in order to minimize the profiling overhead,</p>
+
+<p>Also note that exit timings are not provided, as this tool is intended for
+debugging, rather than profiling, purposes.</p>
+
+<p>The <a href="STrace/Monitor.pm.html">Devel::STrace::Monitor</a> module provides a minimal
+set of functions for external applications to</p>
+
+<ul>
+	<li>open the mmap()'d ringbuffer file</li>
+	<li>monitor the runtime Perl call stack, including package, routine name,
+statement linenumber and timestamp of the monitored script</li>
+	<li>set or clear the single, trace, or signal flags</li>
+	<li>submit commands to either a single thread, all threads of a single
+process, or globally</li>
+	<li>wait for and collect responses to such commands</li>
+</ul>
+
+<p>The included plstrace.pl script implements a simple command line monitoring
+view using Devel::STrace::Monitor. More feature rich debugging applications
+(esp. GUI based) are planned.</p>
+
+<h1 id="Application_Notes">Application Notes <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Implements DB::DB and DB::sub. The ringbuffer is created
+by the Devel::RingBuffer class, which also acts as a factory
+for individual Devel::RingBuffer::Ring objects
+(representing a single ring buffer).</p>
+
+<p>On POSIX-based systems, a file must be physically created
+to be mmap()'ed and read by a separate monitoring process.
+While this possibly permits post-mortem
+analysis of the execution when things die (though not guaranteed
+due to file flushing issues), it is possible to accumulate trace
+files in the /tmp directory if a trace file is not explicitly
+defined via <code>DEVEL_RINGBUF_FILE</code>, as Devel::STrace doesn't currently
+know when to safely unlink such files.</p>
+
+<h1 id="TO_DO">TO DO <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<ul>
+	<li>Rewrite in XS/C to further minimize its impact on the monitored
+application.</li>
+	<li>A better solution might work just like the real strace,
+i.e., open the /proc/&lt;pid&gt; pseudofile (or the Win32 equivalent),
+and chase pointers to find the the real stacks of the threads.
+<i>But thats soooo haaarrrd...</i>.</li>
+	<li>Provide an interface to turn <code>$DB::single</code> on/off, so that more general,
+lower overhead tracing can be performed (ie, just logs subroutine
+entry/exit, no per-statement logging).</li>
+	<li>Extend with a profiler capability <i>ala</i> <a href="http://search.cpan.org/perldoc?Devel%3A%3ADprof">Devel::Dprof</a>.</li>
+	<li>Provide an area to map the ::{_&lt;$file} hashes, so an external app
+can locate the files being used.</li>
+</ul>
+
+<h1 id="SEE_ALSO">SEE ALSO <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p><a href="http://search.cpan.org/perldoc?Devel%3A%3ARingBuffer">Devel::RingBuffer</a></p>
+
+<p><a href="STrace/Monitor.pm.html">Devel::STrace::Monitor</a></p>
+
+<p><a href="http://search.cpan.org/perldoc?IPC%3A%3AMmap">IPC::Mmap</a></p>
+
+<p><a href="http://search.cpan.org/perldoc?perldebguts">perldebguts</a></p>
+
+<p>strace(1) <i>(or truss(1))</i></p>
+
+<h1 id="AUTHOR_COPYRIGHT_AND_LICENSE">AUTHOR, COPYRIGHT, AND LICENSE <a href="#TOP" class="toplink"><img alt="^" src="../up.gif" /></a></h1>
+
+<p>Dean Arnold <a href="mailto:darnold@presicient.com">mailto:darnold@presicient.com</a></p>
+
+<p>Copyright(C) 2006, Dean Arnold, Presicient Corp., USA.
+All rights reserved.</p>
+
+<p>Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href="http://search.cpan.org/perldoc?perlartistic">Perl Artistic License</a> for details.</p>
+
+
+</div><div class="footer">generated by <a href="http://search.cpan.org/perldoc?Pod%3A%3AProjectDocs">Pod::ProjectDocs</a></div></body>
+</html>

@@ -1,0 +1,15 @@
+Revision history for Perl extension DBIx::Browse.
+
+2.09  Tue Oct  8 10:16:17 2002  
+	- Test suite uses Test::More facilities.
+
+2.00  Tue Mar  5 19:20:00 2002
+	- The code has been splitted into two separate classes. 
+	- The test can now perform more tests than simple class loading.
+
+1.23  Tue Feb 26 13:54:00 2002
+	- First release to CPAN
+
+0.01  Mon Sep  4 15:34:52 2000
+	- original version; created by h2xs 1.19
+

@@ -1,0 +1,5 @@
+[% FOR var IN varlist.sort %]
+##### [% var %] #####
+[% dumper( $var ) %]
+
+[% END %]

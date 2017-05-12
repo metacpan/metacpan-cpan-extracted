@@ -1,0 +1,15 @@
+Changes
+lib/Data/Dump/XML.pm
+lib/Data/Dump/XML/Parser.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/000-basic-dump.t
+t/001-key_info.t
+t/002-ref_info.t
+t/003-large.t
+t/005-blessed.t
+t/benchmark.pl
+t/xml.xml
+XML.xs

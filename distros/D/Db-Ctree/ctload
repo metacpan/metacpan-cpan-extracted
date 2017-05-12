@@ -1,0 +1,122 @@
+#!/opt/perl/bin/perl
+#
+# ctload ctree_file <input_file
+#
+# This script reads data from STDIN and adds records to an existing CTREE table
+#
+# Notes:
+#	.DAT is appended to the filename if needed
+#       if the file is not in the current directory, PPLUS_MASTER is used.
+#
+# STDIN format:
+#   Line 1 : field names separated by vertical bar (|)
+#   Line 2 : field types separated by verital bar (|) (not currently used)
+#   Line 3+: record to add (fields separated by vertical bar)
+#
+# Author:
+#        Robert Eden 2/26/98 rmeden@yahoo.com
+#
+
+use Db::Ctree qw(:ALL);
+my $filename = shift;
+
+my $SPACEPAD=0;
+$SPACEPAD = shift if $ARGV[0] == 1;
+
+die "ctload <tablename> infile\n" unless $filename;
+
+#
+# check input file
+#
+$filename .= ".dat" unless $filename =~ /\.dat$/;
+unless (-e $filename)
+{
+   $filename = "/appl/plexar/master/$filename"
+}
+
+die "$filename not found "     unless -e $filename;
+
+#
+# open database
+#
+InitISAM(10,10,4);
+$dbptr = tie %table,"Db::Ctree", 0, $filename, &Db::Ctree::SHARED;
+
+#
+# build schema record
+#
+$dbptr -> build_schema();
+
+@fname = @{$dbptr -> {FNAME}};
+@ftype = @{$dbptr -> {FTYPE}};
+$fmask = $dbptr -> {FMASK};
+$fmask =~ s/A/a/g unless $SPACEPAD;  # pack with nulls instead of spaces
+print "fields $fmask\n";
+
+$_=<>; chomp;
+@inp_fields = split(/\|/,uc($_));
+
+$_=<>; chomp;
+@inp_types = split(/\|/,$_);
+
+#
+# validate input fields (make sure all input fields exist in DB)
+#
+%rec = ();
+foreach $_ (@inp_fields)
+{
+  $rec{$_} = 0;
+}
+foreach $_ (@fname)
+{
+  $_=uc($_);
+  die "field $_ missing from input file!\n" unless exists($rec{$_});
+  $rec{$_} = 1;
+}
+foreach $_ (@inp_fields)
+{
+  die "field $_ not in database!\n" unless $rec{$_};
+}
+
+#
+# process new records
+#
+Begin( &TRNLOG | & ENABLE );
+while(<>)
+{
+  chomp;
+  next unless length($_);
+  @DATA=split(/\|/,$_);
+  %rec = ();
+  foreach (@inp_fields)
+  {
+     $rec{$_} = shift @DATA;
+  }
+  
+  @DATA= ();
+  foreach (@fname)
+  {
+     push @DATA,$rec{$_};
+  }
+  $record = pack($fmask,@DATA);
+  $status = 0;
+
+  print "Adding $record\n";
+  $status = &AddRecord($dbptr->{DBNO},$record);
+  print "add = $status\n";
+  if ($status == 2)
+  {
+     print join("|",@DATA)." <<< dup detected \n";
+     $status = 0;
+  }
+  else
+  {
+    print join("|",@DATA)."\n";
+  }
+  if ($status)
+  {
+     print "Error on $record\n";
+     die "Error $status\nadding record!\n";
+  }
+}
+Commit(&FREE);

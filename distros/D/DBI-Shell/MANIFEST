@@ -1,0 +1,77 @@
+Changes
+MANIFEST						This file.
+Makefile.PL						The Makefile generator
+README
+ToDo							Occasional random notes about what's missing
+dbish.PL						Frontend for DBI::Shell
+dbish_config
+lib/DBI/Format.pm				Class for formatting rows of data
+lib/DBI/Format/SQLMinus.pm		Support format subclass for SQLMinus plugin
+lib/DBI/Format/CSV.pm			Class for csv formatting rows of data
+lib/DBI/Shell/Completion.pm		Provide Tab Completion
+lib/DBI/Shell/FindSqlFile.pm	Locate a sql file in path
+lib/DBI/Shell.pm				The DBI interactive shell
+lib/DBI/Shell/Spool.pm			Spool
+lib/DBI/Shell/SQLMinus.pm		SQLMinus, allow formating
+lib/DBI/Shell/Timing.pm			Module for timing queries.
+t/batch.t						Test script for DBI::Shell in batch mode.
+t/core.t						Test script for DBI::Shell for core dump.
+t/csv.t							Test script for DBI::Shell::Format::CSV.
+t/func.t						Test script for DBI::Shell DBI function usage.
+t/shell.t						Test script for DBI::Shell in interactive mode.
+t/spool.t
+t/sqlminus.t					Test script for DBI::Shell sqlminus plugin
+t/timing.t						Test script for DBI::Shell timing plugin
+testsql.sql	Simple select statement used to test load and execute.
+testsqlminus.sql	Simple select statement for testing sqlminus module.
+testtiming.sql	Simple select statement for testing timing module.
+#
+# $Rev$
+#
+# $Log: MANIFEST,v $
+# Revision 11.92  2003/09/22 18:37:39  tlowery
+# Changes including fix for eol_csv
+#
+# Revision 11.91  2002/12/13 23:44:56  tlowery
+# Fixed version numbers
+#
+# Revision 11.6  2002/10/28 02:17:26  tlowery
+# Continued clean up
+#
+# Revision 11.5.1.1  2002/04/17 15:09:48  tlowery
+# Added FindSqlFile.pm
+#
+# Revision 11.5  2002/04/17 15:03:15  tlowery
+# Added the begining of column_info support.
+#
+# Revision 11.4  2002/04/09 10:52:12  tlowery
+# Continued to improve support for formatting.  Added more tests.
+#
+# Revision 11.3  2002/01/02 03:14:59  tlowery
+# Modified to include new formats.
+#
+# Changed displaymode to format.
+#
+# Cleaned up a number of "undefined" messages.
+#
+# Revision 11.2  2001/10/29 15:56:00  tlowery
+# Added timing tests.
+# Added go with empty buffer gets the last command and executes.
+# Added support for negative numbers with get.
+# Fixed undef warnings from histories.
+#
+# Revision 1.8  2001/05/31 04:21:32  tlowery
+# Continue to modify to support SQLMinus
+#
+# Revision 1.7  2001/05/29 22:59:52  tlowery
+# *** empty log message ***
+#
+# Revision 1.6  2001/04/09 23:53:24  tlowery
+# Modified to include DBI::Format::SQLMinus
+#
+# Revision 1.5  2001/04/06 09:32:22  tlowery
+#
+# Added CVS tags.
+#
+#
+META.yml                                Module meta-data (added by MakeMaker)

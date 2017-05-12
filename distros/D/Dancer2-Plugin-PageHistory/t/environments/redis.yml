@@ -1,0 +1,13 @@
+session: Redis
+engines:
+    session:
+        Redis:
+            cookie_name: session_id
+            cookie_duration: 604800
+            session_duration: 86400
+            is_secure: 0
+            is_http_only: 0
+            redis_server: 127.0.0.1:6379
+            redis_serialization:
+                module: "Dancer2::Session::Redis::Serialization::Sereal"
+                compression: snappy

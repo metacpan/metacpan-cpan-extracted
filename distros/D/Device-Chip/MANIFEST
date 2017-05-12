@@ -1,0 +1,24 @@
+Build.PL
+Changes
+examples/gpio-tickit-ui.pl
+examples/read-gpios.pl
+examples/write-gpios.pl
+lib/Device/Chip.pm
+lib/Device/Chip/Adapter.pm
+lib/Device/Chip/Authoring.pod
+lib/Device/Chip/Base/RegisteredI2C.pm
+lib/Device/Chip/Ex/GPIOTickitUI.pm
+lib/Test/Device/Chip/Adapter.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00use.t
+t/01adapter-new.t
+t/10chip-registered-i2c.t
+t/50test-gpio.t
+t/51test-spi.t
+t/52test-i2c.t
+t/99pod.t

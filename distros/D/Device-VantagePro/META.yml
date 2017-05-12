@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Device-VantagePro
+version:            0.24
+abstract:           Perl module to request data in real-time or archive and configure 
+author:
+    - TROXEL <troxel@cpan.org>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Device::SerialPort:  1.04
+    DateTime::TimeZone:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

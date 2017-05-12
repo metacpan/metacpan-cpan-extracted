@@ -1,0 +1,4 @@
+engines:
+  template:
+    template_flute:
+      disable_check_dangling: 1

@@ -1,0 +1,51 @@
+---
+abstract: 'a framework for checking data validity'
+author:
+  - 'Sullivan Beck (sbeck@cpan.org)'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::Inter: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Checker
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Data::Checker:
+    file: Checker.pm
+    version: '1.08'
+  Data::Checker::DNS:
+    file: DNS.pm
+    version: '1.08'
+  Data::Checker::Date:
+    file: Date.pm
+    version: '1.08'
+  Data::Checker::IP:
+    file: IP.pm
+    version: '1.08'
+  Data::Checker::Ping:
+    file: Ping.pm
+    version: '1.08'
+requires:
+  Date::Manip: '0'
+  Module::Loaded: '0'
+  Net::DNS: '0'
+  Net::Ping: '0'
+  Net::Ping::External: '0'
+  NetAddr::IP: '4.073'
+  NetAddr::IP::Lite: '0'
+  Parallel::ForkManager: '0'
+  perl: '5.008'
+resources:
+  repository: git://github.com/SBECK-github/Data-Checker.git
+version: '1.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

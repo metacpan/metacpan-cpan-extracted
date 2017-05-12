@@ -1,0 +1,44 @@
+Revision history for Perl extension Password::Check.
+
+0.08 Thu Jul 12 10:26:53 BST 2007
+	- fixed MANIFEST to prevent "Warning: the following files are missing in
+	  your kit:" error
+
+0.07 Wed Jul 11 17:15:59 BST 2007
+	- fixed up borked mix-up of Data::Dump/Data::Dumper in the
+	  diverse_characters test
+
+0.06 Wed Jul 11 12:14:36 BST 2007
+	- added diverse_characters (from: Dermot McNally)
+	- added tests for diverse_characters
+	- modified POD: author email changed, added CONTRIBUTORS and PROJECT HOMEPAGE
+
+0.05 Sun Oct  9 17:54:12 BST 2005
+    - fixed test cases that don't appear to be working
+    - 'retabbed' Check.pm file
+
+0.04 Tue May 12 18:48:26 BST 2004
+    - fixed example in synopsis
+    - added alphanumeric_only and alphanumeric checks
+    - added mixed_case check
+    - added test cases for new checks
+    - added examples directory
+    - added example to show how to write and use your own pasword checks to Data::Password::Check
+    - added append_tests as an option to check()
+
+0.03 Thu Apr  8 12:57:40 BST 2004
+    - renamed package to Data::Password::Check, this fits with the similar
+      module in CPAN Data::Password::BasicCheck
+    - changes to docs and code to reflect this change
+
+0.02 Fri Apr  2 18:25:13 BST 2004
+    - added tests to t/ directory
+    - return value is now checked when calling the _check_XXX() functions, and
+      used to populate the list of skipped tests where appropriate
+    - added _skipped_test() function to enable some extra tests
+    - when checking for sensible lengths, undef is now considered silly
+
+0.01  Thu Apr  1 17:49:15 2004
+    - original version; created by h2xs 1.23 with options
+        -AX -b 5.6.0 --use-new-tests -n Password::Check
+

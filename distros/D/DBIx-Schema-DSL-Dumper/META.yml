@@ -1,0 +1,42 @@
+---
+abstract: 'DBIx::Schema::DSL generator'
+author:
+  - 'Kenta, Kobayashi <kentafly88@gmail.com>'
+build_requires:
+  DBD::mysql: '0'
+  DBI: '0'
+  DBIx::Schema::DSL: '0'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::mysqld: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Schema-DSL-Dumper
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Schema::DSL::Dumper:
+    file: lib/DBIx/Schema/DSL/Dumper.pm
+    version: '0.07'
+requires:
+  DBIx::Inspector: '0.12'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kfly8/DBIx-Schema-DSL-Dumper/issues
+  homepage: https://github.com/kfly8/DBIx-Schema-DSL-Dumper
+  repository: git://github.com/kfly8/DBIx-Schema-DSL-Dumper.git
+version: '0.07'

@@ -1,0 +1,17 @@
+sub can_run {
+  my ($cmd) = @_;
+
+  return $cmd if -x $cmd;
+  if (my $found_cmd = MM->maybe_command($cmd)) {
+    return $found_cmd;
+  }
+
+  for my $dir ((split /$Config::Config{path_sep}/, $ENV{PATH}), '.') {
+    next if $dir eq '';
+    require File::Spec;
+    my $abs = File::Spec->catfile($dir, $cmd);
+    return $abs if (-x $abs or $abs = MM->maybe_command($abs));
+  }
+
+  return;
+}

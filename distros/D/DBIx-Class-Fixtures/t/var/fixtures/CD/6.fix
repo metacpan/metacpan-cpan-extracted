@@ -1,0 +1,6 @@
+$HASH1 = {
+           artist => 3,
+           cdid   => 6,
+           title  => "\334bertreibung \344lterer Umlaute with us",
+           year   => 1998
+         };

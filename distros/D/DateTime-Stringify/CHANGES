@@ -1,0 +1,13 @@
+CHANGES file for DateTime::Stringify
+
+4.11 Wed Oct  8 15:10:42 BST 2008
+  - add human-readable license to the documentation
+  - add use warnings
+  - add POD test
+
+4.10 Tue Apr 27 11:22:35 BST 2004
+  - DateTime 0.21 now stringifies dates, so this module is no longer
+    needed
+
+4.08 Fri Feb 13 18:42:57 GMT 2004
+  - first release

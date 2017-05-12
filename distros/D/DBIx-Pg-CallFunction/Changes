@@ -1,0 +1,129 @@
+=head1 NAME
+
+Changes - List of significant changes to DBIx::Pg::CallFunction
+
+=head2 Changes in 0.019
+  Fix bug preventing calling a function with default input args
+  when skipping some of the default args in the beginning, but
+  specifying some default args later in the list of args.
+  (Joel Jacobson)
+
+=head2 Changes in 0.018
+  Do mapping of default arguments in SQL instead of Perl,
+  as Perl returns arrays in different unpredictable ways.
+  (Joel Jacobson)
+
+=head2 Changes in 0.017
+  Fix META.json, remove tailing comma.
+  (Joel Jacobson)
+
+=head2 Changes in 0.016
+  Fix META.json, remove tailing newline.
+  (Joel Jacobson)
+
+=head2 Changes in 0.015
+  Fix Makefile.PL, require Test::Exception 0.32.
+  (Matthew Musgrove)
+
+  Add initial support for handling default values.
+  (Steeve Lennmark)
+
+=head2 Changes in 0.014
+  Correctly use an error object in JSON-RPC versions 1.1 and 2.0 in
+  pg_proc_jsonrpc.
+
+  Support retrying a function call in some error cases.
+  (Marko Tiikkaja)
+
+  Retry on serialization failures and deadlocks in pg_proc_jsonrpc.
+  (Marko Tiikkaja)
+
+  Introduce an optional cache for function lookups and make pg_proc_jsonrpc use
+  it.
+  (Marko Tiikkaja)
+
+=head2 Changes in 0.013
+  Use the correct datatype for comparisons against pg_proc.proname and
+  pg_namespace.nspname, allowing indexes on said tables to be used.
+  (Marko Tiikkaja)
+
+=head2 Changes in 0.012
+  Use croak to report execute failures from the caller's perspective
+  with the name of the Pg function that was called. (Matthew Musgrove)
+
+=head2 Changes in 0.011
+  Added ALTER DEFAULT PRIVILEGES REVOKE ALL ON FUNCTIONS FROM PUBLIC; to documentation,
+    to avoid granting access to stored procedures by default, which is not good when
+    you have functions with SECURITY DEFINER, better to grant execute rights
+    explicity for all functions.
+  Included inc/, necessary for users without Module::Install.
+
+=head2 Changes in 0.010
+  Updated Documentation.
+
+=head2 Changes in 0.009
+  Updated Documentation.
+
+=head2 Changes in 0.008
+  Updated Documentation and made the call method private,
+    renamed to _call.
+
+=head2 Changes in 0.007
+  Changed pg_proc_jsonrpcd into a plain PSGI App
+    to let for e.g. Apache2, mod_perl and Plack::Handler::Apache2
+    handle the server task.
+  Added how-to on how to setup pg_proc_jsonrpc.psgi.
+
+=head2 Changes in 0.006
+  Optimized _proretset SQL query
+  Makefile.PL format changed to Module::Install
+  Add script pg_proc_jsonrpc, starting a JSON-RPC daemon
+
+=head2 Changes in 0.005
+
+  Added Plack PSGI example on how to create a JSON-RPC server,
+  exposing the PostgreSQL database as a JSON-RPC service.
+  Added support for functions with no arguments.
+
+=head2 Changes in 0.004
+
+  Added test-case to check if error is thrown when multiple functions
+  matches.
+  Moved entire proretset check to SQL. Before the SQL only selected
+    candidate functions matching the arguments, while Perl filtered
+    out the OUT arguments and compared the arguments. Now it is all
+    done using SQL only.
+  Updated documentation, mention DBIx::ProcedureCall under SEE ALSO.
+
+=head2 Changes in 0.003
+
+  No changes, but had to change version number to upload to PAUSE,
+    as you cannot upload the same file twice.
+
+=head2 Changes in 0.002
+
+  Changed license to MIT
+  Various indentation and regex fixes
+  Added description of the pg_catalog.pg_proc.proretset column
+  Make sure we get the proretset value for the right function,
+    the WHERE statement could possibly match other functions
+    sharing the only part of the arguments, as some of the
+    arguments could be OUT arguments. This is now fixed
+    by comparing only the IN arguments.
+    If two functions matches exactly the same IN argument
+    names, an error is thrown.
+    Thus, overloading of functions with the same argument
+    names is not possible. Would be possible to implement,
+    but that would make the interface more cumbersome,
+    as you would need to specify the data types of all
+    input arguments. Perhaps this could be added as an
+    optional third argument to the call() function.
+    I don't need this now, so I'll put it on the TODO
+    until someone needs it and complains. Better to keep it
+    simple for now.
+
+=head2 Changes in 0.001
+
+  First version.
+
+=cut

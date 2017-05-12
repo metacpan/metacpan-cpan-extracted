@@ -1,0 +1,99 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc - Consolidates Adjacent, Duplicate and Overlapping ranges
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc;
+
+  my $iterator=Data::Range::Compare::Stream::Iterator::Array->new(
+    new_from=>'Data::Range::Compare::Stream',
+  );
+
+  # create a new range and add it to the iterator
+  $iterator->create_range(0,0);
+
+  my $range=Data::Range::Compare::Stream->new(0,1);
+
+  # add a new range from the existing one
+  $iterator->add_range($range);
+
+  $iterator->prepare_for_consolidate_asc;
+  my $processor=Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc->new($iterator);
+
+  while($processor->has_next) {
+    
+    # Result objects are instances of: Data::Range::Compare::Stream::Iterator::Consolidate::Result
+    my $result=$iterator->get_next;
+  }
+
+=head1 DESCRIPTION
+
+This module extends Data::Range::Compare::Stream::Iterator::Consolidate the consolidation engine and consolidates adjacent ranges.  Data::Range::Compare::Stream::Iterator::Consolidate can consolidate ranges sorted in the following order: Consolidation Asc range_start asc,range_end desc.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $processor=Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc->new($iterator);
+
+=item * my $processor=Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc->new($iterator,factory_instance=>$obj);
+
+Required arguments: 
+
+  $iterator
+
+    # object must implement Data::Range::Compare::Stream::Iterator::Base
+
+Optional arguments
+
+      factory_instance =>$obj
+        
+        # defines the object that implements the $obj->factory($start,$end,$data).
+        # new ranges are constructed from the factory interfcae.  If a factory interface
+        # is not created an instance of Data::Range::Compare::Stream is assumed.
+
+=item * while($processor->has_next) { ...  }
+
+Returns true when the there are more ranges to consolidate.consolidate.
+
+=item * my $range=$processor->get_next;
+
+If $processor->has_next returns true Returns a instance of Data::Range::Compare::Stream::Iterator::Consolidate::Result
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Iterator::Consolidate
+
+Data::Range::Compare::Stream::Iterator::Consolidate::Result
+
+Data::Range::Compare::Stream::Iterator::Base
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

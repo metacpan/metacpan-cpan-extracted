@@ -1,0 +1,86 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+our $VERSION = '0.08';
+
+use Getopt::Long;
+use Pod::Usage;
+use Debian::Apt::PM;
+use JSON::Util;
+use List::MoreUtils 'uniq';
+use IO::Uncompress::Gunzip;
+use CPAN;
+use CPAN::Module;
+
+our $apm = Debian::Apt::PM->new();
+
+exit main();
+
+sub main {
+	my $help;
+	my $packages_file = $apm->packages_dependencies;
+	my $simulate;
+	my $force_all = 0;
+	my $use_sudo;
+	my $print_version;
+	GetOptions(
+		'help|h'            => \$help,
+		'packages-file|p=s' => \$packages_file,
+		'dummy|n'           => \$simulate,
+		'force-all|a'       => \$force_all,
+		'sudo|s'            => \$use_sudo,
+		'version|V'         => \$print_version,
+	) or pod2usage;
+	pod2usage if $help;
+	print_version() if $print_version;
+	pod2usage
+		unless shift @ARGV eq 'install';
+	
+	die 'no such file '.$packages_file.' (`apt-pm update`?)'
+		unless -r $packages_file;
+	$apm->packages_dependencies($packages_file);
+
+	my ($debs_to_install, $modules_to_install) = $apm->resolve_install_depends($force_all, @ARGV);
+	
+	my @cmds;
+	push @cmds, [ ($use_sudo ? 'sudo' : ()), 'apt-get', 'install',  @$debs_to_install ]
+		if @$debs_to_install;
+	push @cmds, [ ($use_sudo ? 'sudo' : ()), 'cpan', '-i', @$modules_to_install ]
+		if @$modules_to_install;
+	
+	foreach my $cmd (@cmds) {
+		print join(" ",@{$cmd}), "\n";
+		system(@{$cmd})
+			unless $simulate;
+	}
+	
+	return 0;
+}
+
+sub print_version {
+	print "$0 $VERSION, Debian::Apt::PM $Debian::Apt::PM::VERSION\n";
+	exit 0;
+}
+
+__END__
+
+=head1 NAME
+
+apt-cpan - installs CPAN modules from Debian repository if possible
+
+=head1 SYNOPSIS
+
+	apt-cpan install Data::asXML
+	
+		--dummy|n         dummy run, just display what is going to be done
+		--packages-file|p path to 02packages.dependencies.txt.gz
+		--force-all|a     print out all Debian packages and Perl modules needed
+
+=head1 DESCRIPTION
+
+Installs module and it's (recursive) dependencies from Debian repository
+if available, if not then fallback to CPAN shell.
+
+=cut

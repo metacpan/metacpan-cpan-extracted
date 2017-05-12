@@ -1,0 +1,9 @@
+Changes
+README
+Makefile.PL
+META.yml
+Build.PL
+lib/Date/Holidays/UK.pm
+MANIFEST
+MANIFEST.SKIP
+t/holidays.t

@@ -1,0 +1,12 @@
+Revision history for Perl extension DateTime::Format::WindowsFileTime.
+
+0.01  Mon Jan 17 10:09:37 2005
+	- original version; created by h2xs 1.23 with options
+		-X DateTime::Format::WindowsFileTime
+
+0.02  Fri Apr 22 19:55:23 2005
+	- Robert A. Lerche notified us that there was a bug in the code leading
+		to returned times being 5 hours off the mark.  Robert was also
+		kind enough to include a better explanation than the one we had
+		on hand.  Thanks Robert!  And sorry for any inconvenience this
+		might've caused anybody.

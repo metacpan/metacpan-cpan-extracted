@@ -1,0 +1,377 @@
+# vim: ts=8 sw=2 sts=0 noexpandtab:
+
+HACKING Devel::NYTProf
+======================
+
+We encourage hacking Devel::NYTProf!
+
+OBTAINING THE CURRENT RELEASE
+-----------------------------
+The current official release can be obtained from CPAN
+http://metacpan.org/release/Devel-NYTProf/
+
+OBTAINING THE LATEST DEVELOPMENT CODE
+-------------------------------------
+You can grab the head of the latest trunk code from the Google Code repository, see
+http://code.google.com/p/perl-devel-nytprof/source/checkout
+
+CONTRIBUTING
+------------
+Please work with the latest code from the repository - see above.
+
+Small patches can be uploaded via the issue tracker at
+http://code.google.com/p/perl-devel-nytprof/issues/list
+
+For larger changes please talk to us first via the mailing list at
+http://code.google.com/p/perl-devel-nytprof/source/checkout
+
+When developing, please ensure that no new compiler warnings are output.
+
+TESTING
+-------
+Please try to add tests covering any changes you make.
+
+You can run individual tests like this:
+
+  perl -Mblib t/30-util.t
+
+Most tests include some underlying perl code that's being profiled.
+Either as a .p file, which can be profiled like this:
+
+  perl -Mblib -MDevel::NYTProf t/test01.p
+
+or embedded at the end of a t/*.t file, which can be profiled like this:
+
+  perl -Mblib -MDevel::NYTProf -x t/70-subname
+
+The output will be in the ./nytprof.out file.
+
+RESOURCES
+---------
+Google Code:
+http://code.google.com/p/perl-devel-nytprof/
+
+Google Devel Group (must subscribe here):
+http://groups.google.com/group/develnytprof-dev
+
+NYTimes Open Code Blog:
+http://open.nytimes.com/
+
+TODO (unsorted, unprioritized, unconsidered, even unreasonable and daft :)
+----
+
+*** For build/test
+
+Add (very) basic nytprofhtml test (ie it runs and produces output)
+
+Add tests for evals in regex: s/.../ ...perl code... /e
+
+Add tests for -block and -sub csv reports.
+
+Add tests with various kinds of blocks and loops (if, do, while, until, etc).
+
+Add mechanism to specify inside the .p file that NYTProf
+should not be loaded via the command line. That's needed to test
+behaviors in environments where perl is init'd first. Such as mod_perl.
+Then we can test things like not having the sub line range for some subs.
+
+*** For core only
+
+See MemoryProfiling.pod file
+
+Store raw NYTPROF option string in the data file. 
+Include parsed version in report index page.
+
+Add actual size and mtime of fid to data file. (Already in data file as zero,
+just needs the stat() call.) Don't alter errno.
+
+Add help option which would print a summary of the options and exit.
+Could also print list of available clocks for the clock=N option
+(using a set of #ifdef's)
+
+The subroutine profiler could calculate the running variance of the samples
+using this logic http://www.johndcook.com/standard_deviation.html
+so the reports can display the standard deviation.
+
+Replace DB::enable_profiling() and DB::disable_profiling() with $DB::profile = 1|0;
+That a more consistent API with $DB::single etc., but more importantly it lets
+users leave the code in place when NYTProf is not loaded. It'll just do nothing,
+whereas currently the user will get a fatal error if NYTProf isn't loaded.
+It also allows smart things like use of local() for temporary overrides.
+
+Combine current profile_* globals into a single global int using bit fields.
+That way assigning to $DB::profile can offer a finer degree of control.
+Specifically to enable/disable the sub or statement profiler separately.
+
+Add mechanism to enable control of profiling on a per-sub-name and/or
+per-package-name basis. For example, specify a regex and whenever a sub is
+entered (for the first time, to make it cheap) check if the sub name matches
+the regex. If it does then save the current $DB::profile value and set a new one.
+When the sub exits restore the previous $DB::profile value.
+
+Work around OP_UNSTACK bug (http://rt.perl.org/rt3/Ticket/Display.html?id=60954)
+  while ( foo() ) {  # all calls to foo should be from here
+      ...
+      ... # no calls to foo() should appear here
+  }
+
+*** For core and reports
+
+Add @INC to data file so reports can be made more readable by removing
+(possibly very long) library paths where appropriate.
+Tricky thing is that @INC can change during the life of the program.
+One approach might be to output it whenever we assign a new fid
+but only if different to the last @INC that was ouput.
+
+Add marker with timestamp for phases BEGIN, CHECK, INIT, END
+(could combine with pid marker)
+Add marker with timestamp for enable_profile and disable_profile.
+Could also dump-and-zero the sub profiler data so we could report per-phase timing.
+The goals here are to
+a) know how long the different phases of execution took mostly for general interest, and
+b) know how much time was spent with the profiler enabled to calculate accurate
+percentages and also be able to spot 'leaks' in the data processing (e.g. if
+the sum of the statement times don't match the time spent with the profiler
+enabled, due to nested string evals for example).
+
+Add flags to sub call info to indicate what phase (BEGIN, etc) the call
+happened in. That'll allow call graphs to ignore BEGIN-time calls
+(which tend to make graphviz output too noisy to be useful).
+
+*** For reports only
+
+::Reader and its data structures need to be refactored to death.
+The whole reporting framework needs a rewrite to use a single 'thin' command
+line and classes for the Model (lines, files, subs), View (html, csv etc),
+and Controller (composing views to form reports).
+Dependent on a richer data model.
+
+Then rework bin/ntyprof* to use the new subclasses
+Ideally end up with a single nytprof command that just sets up the appropriate
+classes to do the work.
+
+Trim leading @INC portion from filename in __ANON__[/very/long/path/...]
+in report output. (Keep full path in link/tooltip/title as it may be ambiguous when shortened).
+
+Add help link in reports. Could go to docs page on search.cpan.org.
+
+Add a 'permalink' icon (eg infinity symbol) to the right of lines that define
+subs to make it easer to email/IM links to particular places in the code.
+
+Report could track which subs it has reported caller info for
+and so be able to identify subs that were called but haven't been included
+in the report because we didn't know where the sub was.
+They could them be included in a separate 'miscellaneous' page.
+This is a more general way to view the problem of xsubs in packages
+for which we don't have any perl source code.
+
+Consider restoring inclusive-time treemap with an appropriate description
+to explain how to interpret it.
+
+*** Other - mostly unsorted - stuff ***
+
+Intercept all opcodes that may fork and run perl code in the child
+  ie fork, open, entersub (ie xs), others?
+  and fflush before executing the op (so fpurge isn't strictly required)
+  and reinit_if_forked() afterwards
+  add option to force reinit_if_forked check per stmt just-in-case
+Alternatively it might be better to use pthread_atfork() [if available] with a
+child handler. The man page says "Remember: only async-cancel-safe functions
+are allowed on the child side of fork()" so it seems that the safe thing to do
+is to use a volatile flag variable, and change its value in the handler to
+signal to the main code.
+
+Support profiling programs which use threads:
+  - move all relevant globals into a structure
+  - add lock around output to file
+
+Set options via import so perl -d:NYTProf=... works. Very handy. May need
+alternative option syntax. Also perl gives special meaning to 't' option
+(threads) so we should reserve the same for eventual thread support.
+Problem with this is that the import() call happens after init_profiler()
+so limits the usefulness. So we'd need to limit it to certain options
+(trace would certainly be useful).
+
+Add resolution of __ANON__ sub names (eg imported 'constants') where possible.
+[I can't recall what I meant by that now. I think this means where an anon sub
+has been imported, if the refcnt is 1 then use the imported name instead of the
+__ANON__ name.]
+
+The appending of an @line to BEGIN subs should also be applied to END subs.
+
+Record $AUTOLOAD when AUTOLOAD() called. Perhaps as ...::AUTOLOAD[$AUTOLOAD]
+Or perhaps just use the original name if the 'resolved' one is AUTOLOAD.
+Could be argued either way.
+
+More generally, consider the problem of code where one code path is fast 
+and just sets $sql = ... (for example) and another code path executes the
+sql. Some $sql may be fast and others slow. The profile can't separate the
+timings based on what was in $sql because the code path was the same in both
+cases. (For sql DBI::Profile can be used, but the underlying issue is general.)
+
+The sub_caller information is currently one level deep. It would be good to
+make it two levels. Especially because it would allow you to "see through"
+AUTOLOADs and other kinds of 'dispatch' subs.
+
+Refactor this HACKING file!
+
+The data file includes the information mapping a line-level line to the
+corresponding block-level and sub-level lines. This should be added to the data
+structure. It would enable a much richer visualization of which lines have
+contributed to the 'rolled up' counts. That's especially tricky to work out
+with the block level view.
+
+Following on from that I have a totally crazy idea that the browsers css engine
+could be used to highlight the corresponding rollup line when hovering over a
+source line, and/or the opposite. Needs lots of thought, but it's an interesting idea.
+
+Profile and optimize report generation
+
+Bug or limitation?: sub calls in a continue { ... } block of a while () get
+associated with the 'next;' within the loop. Fixed by perl change 33710?
+
+Investigate style.css problem when using --outfile=some/other/dir
+
+Class::MOP should update %DB::sub (if $^P & 0x10 set) when it creates methods.
+Sub::Name should do same (extracting the file and line from the ANON[...:...])
+
+Profile should report _both_ the 'raw original' filename (possibly relative)
+used by the application being profiled, plus an absolute filename determined
+ASAP (to avoid problems with scripts that chdir).
+
+Add (very) basic nytprofhtml test (ie it runs and produces output) so we check the VERSION has been updated.
+
+In the called by list in html: "by $subname line $line of $file"
+make the file not include the @INC portion
+
+Monitor and report when method cache is invalidated. Watch generation number
+and output a tag when it changes. Report locations of changes. Highlight those
+that happen after INIT phase.
+
+Fix testing of t/*.pm_x files which are currently being ignored.
+
+The autosplit handling doesn't address the naming of pseudo-fids from string evals
+inside autoloaded subs, like "(eval 0)[test14.pm (autosplit into auto/test14/bar.al):17]"
+The 'file name' for the eval fid needs to be edited when read in to remove the
+' (autosplit...', but care should be taken to not remove the text for evals in
+autosplit files for which we've not been able to alias to the parent.
+
+Add a FID_ATTRIB tag to allow additional info about fids to be generated after
+the initial fid info is output.
+
+Use FID_ATTRIB tag to record autoload fids being aliases to a fid so that
+reports can include a list of autoloaded subs.
+
+Check if pp_leavegiven and pp_leavewhen need handling in init_profiler().
+
+Copy the nytprof.out file into the output report dir, so a report is more
+'self-contained' and can be archived and thrown around as a tarball/zip and
+still used for further analysis.
+
+To stress-test NYTProf using perl's own test suite, set env vars:
+  NYTPROF='file=/tmp/nytprof.out:addpid=1:nameanonsubs=0:nameevals=0'
+  PERL5OPT='-d:NYTProf'
+and hack t/TEST to not delete the PERL5OPT env var.
+
+The findcaller option doesn't notice if the caller is an opcode.
+Opcodes that call subs (like subst calling utf8::SWASHGET) probably shouldn't
+appear as the caller in the call-tree because, while strictly accurate, it's
+probably less useful from the users perspective.
+Fixing that part is easy but handling incl/excl time needs more thought.
+
+For xsubs and opcodes that call perl subs:
+In the subroutine prologue that currently lists where the sub was called from,
+for xsubs & opcodes, add a list of subs that it called (typically none).
+That would be handy because currently calls from xsubs & opcodes appear in the
+reports at the line of the last _perl_ statement executed, and not in the fake
+'stub' that we add to the end of the package source.
+
+Use gethrtime() on platforms that support it.
+http://developers.sun.com/solaris/articles/time_stamp.html
+http://www.informit.com/guides/content.aspx?g=cplusplus&seqNum=332
+
+Currently lvalue subs aren't profiled when use_db_sub is in effect.
+http://www.xray.mpe.mpg.de/mailing-lists/perl5-porters/2010-02/msg00824.html
+
+Idle conjecture: perhaps loading the profile data into an SQLite database
+would be a better approach to reporting.
+(An nytprofimport utility could read an nytprof.out and write an nytprof.db)
+Then, rather than hand-crafting inflexible data structures we could use SQL
+(or, say, DBIx::Class) to return relevant data. Would also provide another
+route for other data sources (languages/tools) to be included in a report.
+Could also simplify: comparing profiles, merging profiles, ...
+Also 'pipelines' of plugin db-to-db transformations could be developed.
+Any volunteers to explore writing an nytprofimport for SQLite?
+
+Option to add sub call and return events into the data file as they happen.
+Would enable a dprofpp -T like output. See https://rt.cpan.org/Ticket/Display.html?id=50766
+Especially relevant as DProf is being removed from the code and this is
+something NYTProf still doesn't do.
+
+String evals could/should be tied into the subroutine profiler.
+That would give inclusive timings which we don't have at the moment.
+The evals appear in the html report as if they're calls but the timings are
+statement timings of the eval fid that don't include time spent in subs defined
+elsewhere but called from the string eval. The inconsistency is confusing.
+
+Modify csv output to optionally include extra metadata lines. Use for testing.
+
+In html report where sub callers are shown (called N times by S from F at line L)
+also show in compact form links to the callers of the caller, if there aren't too many.
+This makes it faster to climb the call stack. A simple mouseover will show the
+filename of the caller (perhaps a tooltip could give the file and sub).
+Also needed for modules that take shortcuts calling XS functions (*cough DBI*).
+And/or, add a simple up arrow that'll just to the calling sub. Typically that'll
+be the surrounding "sub foo { ..." (which'll be handy for big subs) but for
+cases where the call to that sub wasn't recorded (eg pre 5.8.9 or the DBI's
+xs calling optimization) it'll be the most recent sub entry that was recorded.
+
+Generate extra report pages for xsubs in packages that don't have source code.
+They're currently all dumped into the 'main' file.
+
+Docs describing how the subroutine profiler works need updating.
+Add 'u' key to treemap to trigger moving 'up' a level.
+Add "calls N subs" to treemap mouseover box
+Upgrade treemap to JIT version 2 (which has transition animations).
+
+Sub profiler should avoid sv_setpvf(subname_sv, "%s::%s", stash_name, GvNAME(gv));
+because it's expensive (Perl_sv_setpvf_nocontext accounts for 29% of pp_entersub_profiler).
+Use a two level hash: HvNAME(GvSTASH(gv)) then GvNAME(gv).
+Should then also be able to avoid newSV/free for subname_sv (which accounts for 50% of its time).
+
+The subroutine profiler spends a lot of its time allocating the two
+calle[rd]_subname_sv SVs in subr_entry_setup and freeing them in subr_entry_destroy.
+If, instead of freeing the SVs they were chained into a freelist that
+subr_entry_setup could pull from, we'd get a significant boost in performance
+for the subroutine profiler. It would also greatly reduce the risk of
+NYTProf overwriting a recently freed but still on the stack SV.
+
+Would be good to be able to measure the time spent in require. The easy way
+would be to treat it as a slowop.  I recall enabling this in the early days
+of slowop support but running into problems. It would be good to revisit.
+This would help with profiling issues like:
+http://blog.moose.perl.org/2010/08/moose-110-and-classmop-105-now-compiling-10-faster.html
+
+We need a start=runtime option to start at the _end_ of any INIT subs.
+(The current start=init option is the closest we have but it's not very
+useful if lots of other work is done in INIT blocks.)
+
+We need an option to discount the time spent in specific subs, like we do for
+CORE:accept so that time pure-perl webservers spend waiting for the next
+request doesn't distort the profile. Probably just needs a hash lookup.
+http://stackoverflow.com/questions/4132270/how-to-ignore-some-subroutine-calls-in-nytprof-reporting/14085984#14085984
+
+Remove nytprofcsv
+
+Add "goto skip_sub_profile;" to this?: (and/or figure out why already_counted++ isn't enough)
+    /* catch profile_subs being turned off by disable_profile call */
+    if (!profile_subs)
+        subr_entry->already_counted++;
+
+study http://www.postgresql.org/docs/9.2/static/pgtesttiming.html
+See pg contrib/pg_test_timing/pg_test_timing.c
+
+Show /sys/devices/system/clocksource/clocksource0/available_clocksource
+and /sys/devices/system/clocksource/clocksource0/current_clocksource
+in the Makefile.PL and test output, if present
+

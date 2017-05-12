@@ -1,0 +1,58 @@
+{
+   "abstract" : "Creates db_util command line for DB_File management",
+   "author" : [
+      "Alberto Simoes <ambs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DB_File-Utils",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19",
+            "Test::More" : "0.96"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Cmd::Setup" : "0",
+            "DB_File" : "0",
+            "Encode" : "0",
+            "Fcntl" : "0",
+            "File::Slurp" : "0",
+            "perl" : "v5.20.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "App::Cmd::Tester" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/ambs/DB_File-Utils.git",
+         "web" : "https://github.com/ambs/DB_File-Utils"
+      }
+   },
+   "version" : "0.006"
+}
+

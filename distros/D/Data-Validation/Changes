@@ -1,0 +1,89 @@
+Revision history for Data::Validation
+
+0.28.1    2017-01-08 16:12:48
+          - Adds explain method to exceptions
+          - Toolchain update
+          - Exceptions thrown from check_form use self level
+
+0.27.1    2016-11-02 15:15:20
+          - Solely numeric passwords not allowed
+
+0.26.1    2016-09-06 01:18:12
+          - Loads Class::Usul::Time at runtime
+            Changes to CPANTs now ignore prereqs / recommends
+          - Better value range checking in valid time
+
+0.25.1    2016-03-11 19:41:44
+          - Added isValidText
+          - Value in error messages was making them too long
+          - Added isValidTime
+
+0.24.1    2016-03-01 13:01:42
+          - Added filterUCFirst and filterTitleCase
+          - Fixed bug in validating non mandatory fields
+          - Added or option to constraints
+          - Dropped dependency on Regexp::Common
+            That module has had installation and indexing problems for
+            some time 249f54a8-b08e-11e5-9304-6ec2af845ad4 and RT#110771
+
+0.23.1    2016-01-01 11:08:17
+          - Added List::Util as a dependency
+            Even newish versions of Perl ship with too old copies
+            of the core module
+
+0.22.1    2016-01-01 00:11:07
+          - Added coverage badge and coverage report posting
+          - Added isAllowed constraint
+          - Upstream toolchain update
+          - Renamed Constraint exception to InvalidParameter
+            and removed the incorrect error message
+
+0.21.1    2015-07-22 08:45:30
+          - Refactored factory patterns
+          - Added matching types
+          - Removed deprecated fhelp field
+          - POD updates
+
+0.20.1    2015-05-18 02:02:49
+          - Fixed bad repository URI in metadata
+
+0.19.1    2015-05-17 22:27:52
+          - Added badges and public repository
+          - Switched to HTTP::Tiny from LWP::UserAgent
+          - Renamed filter factory subclass API method to filter
+          - Renamed constraint factory subclass API method to validate
+          - Renamed Filtes filter to filter_value
+          - Renamed Constraints validate to validate_value
+          - Switched to lexical subroutines
+          - Improved test coverage
+
+0.18.1    2014-10-19 20:31:23
+          - Added test for URL. Fixed RT#99585 (pterjan++)
+
+0.17.1    2014-10-03 19:35:04
+          - Yes. Just the one smoker
+          - Disabling CPAN Testing on k83 - see if it's just one smoker
+          - Random test failures
+            c814fcba-4a81-11e4-be14-86252c6f0924
+            a1baa998-4a81-11e4-9414-c7952c6f0924
+
+0.16.1    2014-10-02 23:09:07
+          - Updated prereqs
+          - Added level attribute to adjust check_field exception frame
+          - Replaced namespace::sweep with autoclean
+
+0.15.1    2014-01-31 23:36:09
+          - Added exception classes
+          - Removed Ident lines
+          - Removed VERSION except in main module
+          - Dropped dependency on Class::Load
+
+0.14.1    2013-08-15 16:26:32
+          - Switched to Dist::Zilla
+
+0.13.5    2013-08-11 01:12:00
+          - Toolchain update. Attempt to filter out residual noise
+          - WTF? 099f04b9-6c8d-1014-9814-a1ae5cf4dae8. Updated toolchain
+          - Reset min perl testing to original behaviour
+          - Raised min Perl ver to v5.10.1
+

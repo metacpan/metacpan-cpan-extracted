@@ -1,0 +1,519 @@
+---
+abstract: 'Stage-based conveyor-belt-like ticket handling system'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+  - 'Florian Helmberger <fh@univie.ac.at>'
+  - 'Achim Adam <ac@univie.ac.at>'
+  - 'Mark Hofstetter <mh@univie.ac.at>'
+  - 'Heinz Ekker <ek@univie.ac.at>'
+build_requires:
+  Carp: 0
+  Class::Scaffold::App::Test::Classes: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::More: 0.94
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Conveyor
+provides:
+  Data::Conveyor:
+    file: lib/Data/Conveyor.pm
+    version: 1.103130
+  Data::Conveyor::App::Dispatch:
+    file: lib/Data/Conveyor/App/Dispatch.pm
+    version: 1.103130
+  Data::Conveyor::App::Exported::Launcher:
+    file: lib/Data/Conveyor/App/Exported/Launcher.pm
+    version: 1.103130
+  Data::Conveyor::App::Mutex:
+    file: lib/Data/Conveyor/App/Mutex.pm
+    version: 1.103130
+  Data::Conveyor::App::Shell:
+    file: lib/Data/Conveyor/App/Shell.pm
+    version: 1.103130
+  Data::Conveyor::App::Test::SIF::Unit:
+    file: lib/Data/Conveyor/App/Test/SIF/Unit.pm
+    version: 1.103130
+  Data::Conveyor::App::Test::Stage:
+    file: lib/Data/Conveyor/App/Test/Stage.pm
+    version: 1.103130
+  Data::Conveyor::App::Test::Stage::Integration:
+    file: lib/Data/Conveyor/App/Test/Stage/Integration.pm
+    version: 1.103130
+  Data::Conveyor::App::Test::Stage::TxSelector:
+    file: lib/Data/Conveyor/App/Test/Stage/TxSelector.pm
+    version: 1.103130
+  Data::Conveyor::App::Webserver:
+    file: lib/Data/Conveyor/App/Webserver.pm
+    version: 1.103130
+  Data::Conveyor::Charset:
+    file: lib/Data/Conveyor/Charset.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ASCII:
+    file: lib/Data/Conveyor/Charset/ASCII.pm
+    version: 1.103130
+  Data::Conveyor::Charset::UTF8:
+    file: lib/Data/Conveyor/Charset/UTF8.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash:
+    file: lib/Data/Conveyor/Charset/ViaHash.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::ASCIILinefeed:
+    file: lib/Data/Conveyor/Charset/ViaHash/ASCIILinefeed.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::ASCIIPunctuation:
+    file: lib/Data/Conveyor/Charset/ViaHash/ASCIIPunctuation.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::Digits:
+    file: lib/Data/Conveyor/Charset/ViaHash/Digits.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::LatinCapitalLetters:
+    file: lib/Data/Conveyor/Charset/ViaHash/LatinCapitalLetters.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::LatinSmallLetters:
+    file: lib/Data/Conveyor/Charset/ViaHash/LatinSmallLetters.pm
+    version: 1.103130
+  Data::Conveyor::Charset::ViaHash::LatinSmallLetters_TEST:
+    file: lib/Data/Conveyor/Charset/ViaHash/LatinSmallLetters_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Control:
+    file: lib/Data/Conveyor/Control.pm
+    version: 1.103130
+  Data::Conveyor::Control::File:
+    file: lib/Data/Conveyor/Control/File.pm
+    version: 1.103130
+  Data::Conveyor::Delegate::Stage:
+    file: lib/Data/Conveyor/Delegate/Stage.pm
+    version: 1.103130
+  Data::Conveyor::Environment:
+    file: lib/Data/Conveyor/Environment.pm
+    version: 1.103130
+  Data::Conveyor::Environment_TEST:
+    file: lib/Data/Conveyor/Environment_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Exception:
+    file: lib/Data/Conveyor/Exception.pm
+    version: 1.103130
+  Data::Conveyor::Exception::CommandDenied:
+    file: lib/Data/Conveyor/Exception/CommandDenied.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Container:
+    file: lib/Data/Conveyor/Exception/Container.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Handler:
+    file: lib/Data/Conveyor/Exception/Handler.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Internal::NoSuchTemplateHandler:
+    file: lib/Data/Conveyor/Exception/Internal/NoSuchTemplateHandler.pm
+    version: 1.103130
+  Data::Conveyor::Exception::NoSuchCommand:
+    file: lib/Data/Conveyor/Exception/NoSuchCommand.pm
+    version: 1.103130
+  Data::Conveyor::Exception::NoSuchLockType:
+    file: lib/Data/Conveyor/Exception/NoSuchLockType.pm
+    version: 1.103130
+  Data::Conveyor::Exception::ObjectLimitExceeded:
+    file: lib/Data/Conveyor/Exception/ObjectLimitExceeded.pm
+    version: 1.103130
+  Data::Conveyor::Exception::ServiceMethodHelp:
+    file: lib/Data/Conveyor/Exception/ServiceMethodHelp.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Template:
+    file: lib/Data/Conveyor/Exception/Template.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket:
+    file: lib/Data/Conveyor/Exception/Ticket.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::GenFailed:
+    file: lib/Data/Conveyor/Exception/Ticket/GenFailed.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::HandleNotFound:
+    file: lib/Data/Conveyor/Exception/Ticket/HandleNotFound.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::InvalidStage:
+    file: lib/Data/Conveyor/Exception/Ticket/InvalidStage.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::MissingLock:
+    file: lib/Data/Conveyor/Exception/Ticket/MissingLock.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::NoSuchId:
+    file: lib/Data/Conveyor/Exception/Ticket/NoSuchId.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::NoSuchRC:
+    file: lib/Data/Conveyor/Exception/Ticket/NoSuchRC.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::NoSuchStatus:
+    file: lib/Data/Conveyor/Exception/Ticket/NoSuchStatus.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Ticket::NoSuchTicket:
+    file: lib/Data/Conveyor/Exception/Ticket/NoSuchTicket.pm
+    version: 1.103130
+  Data::Conveyor::Exception::Transaction:
+    file: lib/Data/Conveyor/Exception/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::Lock:
+    file: lib/Data/Conveyor/Lock.pm
+    version: 1.103130
+  Data::Conveyor::Lock::Dispatcher:
+    file: lib/Data/Conveyor/Lock/Dispatcher.pm
+    version: 1.103130
+  Data::Conveyor::Manual::Instruction:
+    file: lib/Data/Conveyor/Manual/Instructions.pod
+    version: 1.103130
+  Data::Conveyor::Manual::NewStage:
+    file: lib/Data/Conveyor/Manual/NewStage.pod
+    version: 1.103130
+  Data::Conveyor::Monitor:
+    file: lib/Data/Conveyor/Monitor.pm
+    version: 1.103130
+  Data::Conveyor::Mutex:
+    file: lib/Data/Conveyor/Mutex.pm
+    version: 1.103130
+  Data::Conveyor::Service:
+    file: lib/Data/Conveyor/Service.pm
+    version: 1.103130
+  Data::Conveyor::Service::Interface:
+    file: lib/Data/Conveyor/Service/Interface.pm
+    version: 1.103130
+  Data::Conveyor::Service::Interface::SOAP:
+    file: lib/Data/Conveyor/Service/Interface/SOAP.pm
+    version: 1.103130
+  Data::Conveyor::Service::Interface::Script:
+    file: lib/Data/Conveyor/Service/Interface/Script.pm
+    version: 1.103130
+  Data::Conveyor::Service::Interface::Shell:
+    file: lib/Data/Conveyor/Service/Interface/Shell.pm
+    version: 1.103130
+  Data::Conveyor::Service::Methods:
+    file: lib/Data/Conveyor/Service/Methods.pm
+    version: 1.103130
+  Data::Conveyor::Service::Result:
+    file: lib/Data/Conveyor/Service/Result.pm
+    version: 1.103130
+  Data::Conveyor::Service::Result::Container:
+    file: lib/Data/Conveyor/Service/Result/Container.pm
+    version: 1.103130
+  Data::Conveyor::Service::Result::Scalar:
+    file: lib/Data/Conveyor/Service/Result/Scalar.pm
+    version: 1.103130
+  Data::Conveyor::Service::Result::Tabular:
+    file: lib/Data/Conveyor/Service/Result/Tabular.pm
+    version: 1.103130
+  Data::Conveyor::Service::Result::Tabular_TEST:
+    file: lib/Data/Conveyor/Service/Result/Tabular_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Service::Util:
+    file: lib/Data/Conveyor/Service/Util.pm
+    version: 1.103130
+  Data::Conveyor::Stage:
+    file: lib/Data/Conveyor/Stage.pm
+    version: 1.103130
+  Data::Conveyor::Stage::SingleTicket:
+    file: lib/Data/Conveyor/Stage/SingleTicket.pm
+    version: 1.103130
+  Data::Conveyor::Stage::TransactionIterator:
+    file: lib/Data/Conveyor/Stage/TransactionIterator.pm
+    version: 1.103130
+  Data::Conveyor::Stage::TxSelector:
+    file: lib/Data/Conveyor/Stage/TxSelector.pm
+    version: 1.103130
+  Data::Conveyor::Stage_TEST:
+    file: lib/Data/Conveyor/Stage_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Storage:
+    file: lib/Data/Conveyor/Storage.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI:
+    file: lib/Data/Conveyor/Storage/DBI.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI::Core::Setup:
+    file: lib/Data/Conveyor/Storage/DBI/Core/Setup.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI::Mock:
+    file: lib/Data/Conveyor/Storage/DBI/Mock.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI::Oracle:
+    file: lib/Data/Conveyor/Storage/DBI/Oracle.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI::Pg:
+    file: lib/Data/Conveyor/Storage/DBI/Pg.pm
+    version: 1.103130
+  Data::Conveyor::Storage::DBI::SQLite:
+    file: lib/Data/Conveyor/Storage/DBI/SQLite.pm
+    version: 1.103130
+  Data::Conveyor::Storage::Memory:
+    file: lib/Data/Conveyor/Storage/Memory.pm
+    version: 1.103130
+  Data::Conveyor::Storage::Null:
+    file: lib/Data/Conveyor/Storage/Null.pm
+    version: 1.103130
+  Data::Conveyor::Temp001:
+    file: lib/Data/Conveyor/Service/Result/Tabular_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Temp002:
+    file: lib/Data/Conveyor/Service/Result/Tabular_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Template::Factory:
+    file: lib/Data/Conveyor/Template/Factory.pm
+    version: 1.103130
+  Data::Conveyor::Template::Handler:
+    file: lib/Data/Conveyor/Template/Handler.pm
+    version: 1.103130
+  Data::Conveyor::Test:
+    file: lib/Data/Conveyor/Test.pm
+    version: 1.103130
+  Data::Conveyor::Test::Inherited:
+    file: lib/Data/Conveyor/Test/Inherited.pm
+    version: 1.103130
+  Data::Conveyor::Test::Stage:
+    file: lib/Data/Conveyor/Test/Stage.pm
+    version: 1.103130
+  Data::Conveyor::Test::Ticket:
+    file: lib/Data/Conveyor/Test/Ticket.pm
+    version: 1.103130
+  Data::Conveyor::Test::UtilLoader:
+    file: lib/Data/Conveyor/Test/UtilLoader.pm
+    version: 1.103130
+  Data::Conveyor::Ticket:
+    file: lib/Data/Conveyor/Ticket.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Dispatcher:
+    file: lib/Data/Conveyor/Ticket/Dispatcher.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Dispatcher::Test:
+    file: lib/Data/Conveyor/Ticket/Dispatcher/Test.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Facets:
+    file: lib/Data/Conveyor/Ticket/Facets.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Lock:
+    file: lib/Data/Conveyor/Ticket/Lock.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload:
+    file: lib/Data/Conveyor/Ticket/Payload.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::BusinessObject:
+    file: lib/Data/Conveyor/Ticket/Payload/BusinessObject.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Common:
+    file: lib/Data/Conveyor/Ticket/Payload/Common.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Common_TEST:
+    file: lib/Data/Conveyor/Ticket/Payload/Common_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Instruction:
+    file: lib/Data/Conveyor/Ticket/Payload/Instruction.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Instruction::Clear:
+    file: lib/Data/Conveyor/Ticket/Payload/Instruction/Clear.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Instruction::Container:
+    file: lib/Data/Conveyor/Ticket/Payload/Instruction/Container.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Instruction::Container_TEST:
+    file: lib/Data/Conveyor/Ticket/Payload/Instruction/Container_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Instruction::Factory:
+    file: lib/Data/Conveyor/Ticket/Payload/Instruction/Factory.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Item:
+    file: lib/Data/Conveyor/Ticket/Payload/Item.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Lock:
+    file: lib/Data/Conveyor/Ticket/Payload/Lock.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Payload::Transaction:
+    file: lib/Data/Conveyor/Ticket/Payload/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Processor::Conveyor:
+    file: lib/Data/Conveyor/Ticket/Processor/Conveyor.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Provider:
+    file: lib/Data/Conveyor/Ticket/Provider.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Transaction:
+    file: lib/Data/Conveyor/Ticket/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::Ticket::Transition:
+    file: lib/Data/Conveyor/Ticket/Transition.pm
+    version: 1.103130
+  Data::Conveyor::Transaction:
+    file: lib/Data/Conveyor/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::Transaction::Factory:
+    file: lib/Data/Conveyor/Transaction/Factory.pm
+    version: 1.103130
+  Data::Conveyor::TxSelector:
+    file: lib/Data/Conveyor/TxSelector.pm
+    version: 1.103130
+  Data::Conveyor::Value::Command:
+    file: lib/Data/Conveyor/Value/Command.pm
+    version: 1.103130
+  Data::Conveyor::Value::Enum:
+    file: lib/Data/Conveyor/Value/Enum.pm
+    version: 1.103130
+  Data::Conveyor::Value::LockType:
+    file: lib/Data/Conveyor/Value/LockType.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::Number:
+    file: lib/Data/Conveyor/Value/Ticket/Number.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::RC:
+    file: lib/Data/Conveyor/Value/Ticket/RC.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::RC_TEST:
+    file: lib/Data/Conveyor/Value/Ticket/RC_TEST.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::Stage:
+    file: lib/Data/Conveyor/Value/Ticket/Stage.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::Status:
+    file: lib/Data/Conveyor/Value/Ticket/Status.pm
+    version: 1.103130
+  Data::Conveyor::Value::Ticket::Status_TEST:
+    file: lib/Data/Conveyor/Value/Ticket/Status_TEST.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::CurrentDateYYYYMMDD:
+    file: lib/Data/Conveyor/YAML/Active/CurrentDateYYYYMMDD.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::GenTempTicketNo:
+    file: lib/Data/Conveyor/YAML/Active/GenTempTicketNo.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::MakeWholeTicketBlock:
+    file: lib/Data/Conveyor/YAML/Active/MakeWholeTicketBlock.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload:
+    file: lib/Data/Conveyor/YAML/Active/Payload.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload::Common:
+    file: lib/Data/Conveyor/YAML/Active/Payload/Common.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload::Instruction::Container:
+    file: lib/Data/Conveyor/YAML/Active/Payload/Instruction/Container.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload::Item:
+    file: lib/Data/Conveyor/YAML/Active/Payload/Item.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload::Lock:
+    file: lib/Data/Conveyor/YAML/Active/Payload/Lock.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Payload::Transaction:
+    file: lib/Data/Conveyor/YAML/Active/Payload/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::Tx:
+    file: lib/Data/Conveyor/YAML/Active/Tx.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Active::WriteTicket:
+    file: lib/Data/Conveyor/YAML/Active/WriteTicket.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Payload:
+    file: lib/Data/Conveyor/YAML/Marshall/Payload.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Payload::Common:
+    file: lib/Data/Conveyor/YAML/Marshall/Payload/Common.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Payload::InstructionContainer:
+    file: lib/Data/Conveyor/YAML/Marshall/Payload/InstructionContainer.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Payload::Lock:
+    file: lib/Data/Conveyor/YAML/Marshall/Payload/Lock.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Payload::Transaction:
+    file: lib/Data/Conveyor/YAML/Marshall/Payload/Transaction.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::Ticket:
+    file: lib/Data/Conveyor/YAML/Marshall/Ticket.pm
+    version: 1.103130
+  Data::Conveyor::YAML::Marshall::TicketNumber:
+    file: lib/Data/Conveyor/YAML/Marshall/TicketNumber.pm
+    version: 1.103130
+requires:
+  Class::Accessor::Complex: 0
+  Class::Scaffold::Accessor: 0
+  Class::Scaffold::App::CommandLine: 0
+  Class::Scaffold::App::Test::YAMLDriven: 0
+  Class::Scaffold::Base: 0
+  Class::Scaffold::ConstantImporter: 0
+  Class::Scaffold::Delegate::Mixin: 0
+  Class::Scaffold::Environment: 0
+  Class::Scaffold::Exception: 0
+  Class::Scaffold::Exception::Business: 0
+  Class::Scaffold::Exception::Container: 0
+  Class::Scaffold::Exception::Util: 0
+  Class::Scaffold::Factory: 0
+  Class::Scaffold::Factory::Type: 0
+  Class::Scaffold::HierarchicalDirty: 0
+  Class::Scaffold::Log: 0
+  Class::Scaffold::Storable: 0
+  Class::Scaffold::Test: 0
+  Class::Scaffold::Test::Inherited: 0
+  Class::Scaffold::Test::UtilLoader: 0
+  Class::Scaffold::Util: 0
+  Class::Scaffold::YAML::Active: 0
+  Class::Scaffold::YAML::Active::Hash: 0
+  Class::Scaffold::YAML::Marshall: 0
+  Class::Value: 0
+  Class::Value::Enum: 0
+  Class::Value::Exception::Base: 0
+  Class::Value::Exception::NotWellFormedValue: 0
+  Class::Value::String: 0
+  Compress::Zlib: 0
+  DBI: 0
+  Data::Container: 0
+  Data::Dumper: 0
+  Data::Inherited: 0
+  Data::Miscellany: 0
+  Data::Storage::DBI::Mock: 0
+  Data::Storage::DBI::Oracle: 0
+  Data::Storage::DBI::Pg: 0
+  Data::Storage::DBI::SQLite: 0
+  Data::Storage::Memory: 0
+  Data::Storage::Null: 0
+  Date::Calc: 0
+  Error: 0
+  Error::Hierarchy: 0
+  Error::Hierarchy::Internal: 0
+  Error::Hierarchy::Internal::CustomMessage: 0
+  Error::Hierarchy::Internal::DBI::STH: 0
+  Error::Hierarchy::Test: 0
+  Error::Hierarchy::Util: 0
+  Exporter: 0
+  Fcntl: 0
+  FindBin: 0
+  Getopt::Long: 0
+  Hash::Flatten: 0
+  Hook::Modular: 0
+  IO::Handle: 0
+  IO::Pager: 0
+  Pod::Text: 0
+  Storable: 0
+  String::FlexMatch::Test: 0
+  Sys::Hostname: 0
+  Term::Shell::Enhanced: 0
+  Test::Builder: 0
+  Test::Class: 0
+  Test::More: 0
+  Text::Table: 0
+  Time::HiRes: 0
+  YAML: 0
+  YAML::Active: 0
+  YAML::Marshall: 0
+  charnames: 0
+  constant: 0
+  once: 0
+  overload: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Conveyor
+  homepage: http://search.cpan.org/dist/Data-Conveyor/
+  repository: http://github.com/hanekomu/Data-Conveyor
+version: 1.103130

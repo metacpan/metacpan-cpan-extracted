@@ -1,0 +1,21 @@
+Changelog for Device-PCA9685
+
+0.004 2016-04-07T06:33:37
+ - bump version (Shantanu Bhadoria)
+ - Added travis (Shantanu Bhadoria)
+
+0.003 2015-03-25T07:33:12
+ - v0.003 (Shantanu Bhadoria)
+ - fixed extends (Shantanu Bhadoria)
+
+0.002 2013-12-15T02:37:02
+ - v0.002 (Shantanu)
+ - Fixed pod spellings (Shantanu)
+ - Fixed POD (Shantanu)
+
+0.001 2013-09-27T11:07:52
+ - v0.001 (Shantanu)
+ - Possibly first release (Shantanu)
+ - Refactoring Submodule to allow easy loading of similar subdevices as
+   plugins using a common prefix in MOP (Shantanu Bhadoria)
+ - First Commit (Shantanu Bhadoria)

@@ -1,0 +1,32 @@
+---
+abstract: 'Control a BlinkStick (http://blinkstick.com/)'
+author:
+  - 'Kevin Mulholland <moodfarm@cpan.org>'
+build_requires:
+  Test::More: 0
+  perl: 5.014
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-BlinkStick
+requires:
+  App::Basis: 0
+  Data::Hexdumper: 0
+  Data::Printer: 0
+  Device::USB: 0
+  Moo: 0
+  Path::Tiny: 0
+  Time::HiRes: 0
+  WebColors: 0
+  constant: 0
+  perl: 5.014
+  strict: 0
+  warnings: 0
+resources:
+  repository: git://github.com/27escape/Device-BlinkStick.git
+version: 0.4.0

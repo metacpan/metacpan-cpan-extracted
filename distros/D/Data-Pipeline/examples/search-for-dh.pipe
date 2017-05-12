@@ -1,0 +1,67 @@
+#! /usr/local/bin/data-pipeline
+
+IN: FetchPage UrlBuilder
+OUT: CSV
+USE: Rename Regex Filter
+
+FROM: q: $q//'foo bar'
+TO: FILE $out//STDOUT
+
+PIPELINE DOES IN ORDER:
+    FetchPage DOES:
+        cut_start: '<p class="g">'
+        cut_end: '</div><center>'
+        split: '<p class="g">'
+        url: UrlBuilder DOES:
+            base: 'http://search.tamu.edu/search'
+            query DOES:
+                q: q//'digital humanities'
+
+                site: 'default_collection'
+                client: 'TAMU_frontend'
+                output: 'xml_no_dtd'
+                proxystylesheet: 'TAMU_frontend'
+                proxycustom: '/HOME/~'
+                btnG: 'Search'
+                entqr: '3'
+                sort: 'date:D:L:d1'
+                entsp: '0'
+                ud: '1'
+                oe: 'UTF-8'
+                ie: 'UTF-8'
+            DONE
+        DONE
+    DONE
+    => Rename DOES:
+        copies DOES IN ORDER:
+            content: 'description'
+            content: 'title'
+        DONE
+        renames DOES IN ORDER:
+            content: 'link'
+        DONE
+    DONE
+    => Regex DOES:
+        rules DOES IN ORDER:
+            title: s{^.*?<span class="l">(.+?)</span>.*$}{$1}
+            link: s{^.*?http://(.+?)".*$}{http://$1}
+            title: s/<.+?>//
+            title: s/&nbsp;//
+            title: s/\s+/ /
+            description: s{.+?<td class="s">(.+?)<font.*$}{$1}
+            description: s{<.+?>}{}
+            description: s/\s+/ /
+        DONE
+    DONE
+    => Filter DOES:
+        reject_matching: TRUE
+        filters: title: qr/^\s*$/
+    DONE
+    => CSV DOES:
+        column_names: [qw(title link description)]
+        file_has_header: TRUE
+    DONE
+DONE
+
+
+#comment

@@ -1,0 +1,47 @@
+Revision history for Perl extension Devel::Cycle.
+1.12 Fri Nov 14 08:56:23 EST 2014
+     - Moved to GitHub at https://github.com/lstein/Devel-Cycle
+
+1.11 Mon Aug 24 08:50:25 EDT 2009
+     - Florian Ragwitz fixed bug 47389
+
+1.10 Tue Jul  8 21:27:20 EDT 2008
+     - Slaven Rezic fixed bug 35825.
+
+1.09 Mon Apr 14 12:54:56 EDT 2008
+     	 -Dave Rolsky identified and fixed bug 25360.
+
+1.08 Fri Apr 11 17:55:59 EDT 2008
+     	- Peter Brakemeier identified and patched bug in which stringified objects could
+           create false positives. Thanks Peter!
+
+1.07 Tue May 23 22:28:03 EDT 2006
+	- Fixed export_to_level() problem so that Test::Memory::Cycle works again.
+
+1.06 Tue May 23 17:08:22 EDT 2006
+	- Removed debugging warning.
+	- Only checks CODErefs if PadWalker version >= 1.0.
+
+1.05 May 18 2006
+	- Added ability to detect cycles in CODErefs courtesy Yuval Kogman.
+
+1.04
+	- Added ability to detect weakened cycles courtesy Stevan Little
+
+1.03 Fri Jan 21 13:47:50 EST 2005
+	- Sort the hash keys so that the cycle path is more deterministic
+	(avoids test failures in Test::Memory::Cycle)
+
+1.02 Mon Jan 12 09:04:58 EST 2004
+	- Formats anonymous memory references by default as \%A, \@B, etc,
+	rather than using hex form.
+	- Options to control memory reference formatting.
+
+1.01 Sun Dec 14 16:57:58 EST 2003
+        - Added code to skip weak refs created with Scalar::Util's
+          weaken(). (Sam Tregar)
+	- Improved formatting in output.
+
+1.00  Sat Dec 13 11:04:57 2003
+	- original version
+

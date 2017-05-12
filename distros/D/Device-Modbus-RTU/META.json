@@ -1,0 +1,51 @@
+{
+   "abstract" : "Perl distribution to implement Modbus RTU communications",
+   "author" : [
+      "Julio Fraire <julio.fraire@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.02, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Modbus-RTU",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Modbus" : "0.02",
+            "Device::SerialPort" : "1.04",
+            "Role::Tiny" : "2"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jfraire/Device-Modbus-RTU.git",
+         "web" : "https://github.com/jfraire/Device-Modbus-RTU"
+      }
+   },
+   "version" : "0.022",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

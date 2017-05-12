@@ -1,0 +1,15 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+examples/example-1.pl
+lib/Devel/XRay.pm
+t/00-load.t
+t/01-use.t
+t/02-use-ignore.t
+t/03-use-only.t
+t/04-use-none.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,26 @@
+---
+abstract: "Database driver for Cassandra's CQL3"
+author:
+  - 'Tom van der Woerdt <tvdw@cpan.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-Cassandra
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Cassandra::Client: '0.10'
+  DBI: '1.621'
+  perl: '5.01'
+resources:
+  repository: https://github.com/tvdw/perl-DBD-Cassandra.git
+version: '0.56'

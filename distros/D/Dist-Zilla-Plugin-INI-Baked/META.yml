@@ -1,0 +1,44 @@
+---
+abstract: 'Add a baked version of your configuration to tree automatically'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-INI-Baked
+provides:
+  Dist::Zilla::Plugin::INI::Baked:
+    file: lib/Dist/Zilla/Plugin/INI/Baked.pm
+    version: '0.002002'
+recommends:
+  Moose: '2.000'
+  Path::Tiny: '0.058'
+requires:
+  Dist::Zilla::File::FromCode: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Util::CurrentCmd: '0.002000'
+  Dist::Zilla::Util::ExpandINI: '0.001001'
+  MooX::Lsub: '0'
+  Moose: '0'
+  Path::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-INI-Baked/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-INI-Baked
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-INI-Baked.git
+version: '0.002002'

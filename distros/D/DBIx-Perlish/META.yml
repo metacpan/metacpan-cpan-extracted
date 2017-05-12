@@ -1,0 +1,20 @@
+---
+name: DBIx-Perlish
+version: 0.64
+author:
+  - 'Anton Berezin <tobez@tobez.org>'
+abstract: a perlish interface to SQL databases
+license: bsd
+requires:
+  Test::More: 0
+  version: 0
+provides:
+  DBIx::Perlish:
+    file: lib/DBIx/Perlish.pm
+    version: 0.64
+  DBIx::Perlish::Parse:
+    file: lib/DBIx/Perlish/Parse.pm
+generated_by: hand
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

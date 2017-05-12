@@ -1,0 +1,40 @@
+Revision history for Perl extension Devel::tkdb.
+ 
+2.2	2011-02-24
+	name change
+	event loop (main_loop) is much better: it does not cycle eating CPU, instead waits
+	implement another way of instant expression browsing (TBD)
+
+2.1     2011-02-22
+	no more $ENV{PTKDB_EVAL_DUMP_INDENT}, it is now 2
+	removed tricks to make perl/Tk faster which no more matter (e.g. in sub set_file)
+	fix pod a bit
+
+2.0	2011-01-01 - 2011-02-20
+	fork from ptkdb.pm and significant rework:
+	- pretend Data::Dumper is available
+	- many cleanup of code
+	- get rid of Tix
+	- remove many of obsolete code: get_notebook_widget,
+	  register_user_DB_entry, register_user_window_init, setTabs, etc,
+	  code that eval's chunks in ptkdbrc file to support changing colors
+	  of text widget, etc.
+	- removed all code about configurung scrollbars of tcltkdb
+	- removed $Devel::tcltkdb::add_expr_depth;
+	- removed $Devel::tcltkdb::expr_depth = -1 ;
+	- $self->{DisableOnLeave} never used, remove (List of Widgets 
+	  to disable when leaving the debugger)
+	- removed sub get_entry_text
+	- no more need for sub fixExprPath
+	- $Devel::tcltkdb::pathSepReplacement = "\0x01" ;
+	- $Devel::tcltkdb::pathSep = '\x00' ;
+	- removed sub setup_options
+	- modernized menus
+	- no more use Config and user config file from 
+	  "$Config{'installprivlib'}/Devel/ptkdbrc", only config in home dir
+	  matters
+	Readme file clean and better
+        moved changelog from PM file to Changes, only have in one place
+        moved license from PM file to README
+        moved sample Xresources from PM
+	removed 'package DB;' at top that used to workaround bug in 5.8.0

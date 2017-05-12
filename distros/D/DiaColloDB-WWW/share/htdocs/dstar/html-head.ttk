@@ -1,0 +1,37 @@
+[%- DEFAULT
+    root_dir = ""
+    osdlink  = 1
+    cssfiles = []
+    jsfiles  = []
+    jslocal  = ""
+    html_title = root_title
+    
+    src_jquery = diacollo_standalone ? "http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js" : (root_dir _ "jquery.js")
+    src_jquery_ui = diacollo_standalone ? "http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js" : (root_dir _ "jquery-ui.js")
+    css_jquery_ui = diacollo_standalone ? "http://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css" : (root_dir _ "jquery-ui.css")
+    src_purl = root_dir _ "purl.js"
+    src_dstar = root_dir _ "dstar.js"
+-%]
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="ROBOTS"    content="NOINDEX, NOFOLLOW" />
+[% IF favicon_url %]
+  <link rel="icon"       type="image/png" href="[% favicon_url %]"/>
+[% END %]
+  <link rel="stylesheet" type="text/css" href="[% css_jquery_ui %]"/>
+  <link rel="stylesheet" type="text/css" href="[% root_dir %]dstar.css"/>
+[% FOREACH cssfile IN cssfiles %]
+  <link rel="stylesheet" type="text/css" href="[% cssfile |html %]"/>
+[% END ##--/FOREACH cssfile IN cssfiles %]
+<script type="text/javascript" src="[% src_jquery %]"></script>
+<script type="text/javascript" src="[% src_jquery_ui %]"></script>
+<script type="text/javascript" src="[% src_purl %]"></script><!-- url parser, for \$.url() -->
+<script type="text/javascript" src="[% root_dir %]dstar.js"></script>
+[% FOREACH jsfile IN jsfiles %]
+  <script type="text/javascript" src="[% jsfile  |html %]"></script>
+[% END ##--/FOREACH jsfile IN jsfiles %]
+[%#--
+  # Local Variables:
+  # mode: nxml
+  # coding: utf-8
+  # End:
+--%]

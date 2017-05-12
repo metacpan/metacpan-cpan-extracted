@@ -1,0 +1,96 @@
+Revision history for DateTime-TimeZone-HPUX
+
+1.04    2009-11-18 19:05:00 +0100 (MET)
+        Fixing my local YAML.pm to make Module::Build create an UTF-8 valid
+          META.yml. Hopefully Adam K. will soon release my fix.
+        Build.PL: dropped Makefile.PL as suggested by ANDK in RT#51589.
+        Updated README.
+        Build.PL: added 'dynamic_config' for META.yml
+        Bumped DateTime::TimeZone requirement to the latest (1.05).
+
+1.03    2009-11-12 19:10:00 +0100 (MET)
+        Bumped version number.
+        Bumped DateTime::TimeZone requirement to the latest (1.04).
+        Announcing unmaintained mode as I won't have access to an HP-UX system
+          after 2009-11-30, so this is probably the last release.
+
+1.02_91 2009-11-06 21:32:00 +0100 (MET)
+        Improved failure capture in local-METDST.t.
+        Made Java bin path detection result available for tests.
+        Renamed @DateTime::TimeZone::HPUX::JAVA_PATHS to @JAVA_HOMES.
+
+1.02_90 2009-11-05 20:35:00 +0100 (MET)
+        Added DateTime::TimeZone to build_requires.
+        Increased DateTime::TimeZone requirement to the latest version (0.99).
+        JavaMap.PL: improved diagnostics.
+        More release tests in t/version.t.
+        Marked tests local-METDST.t as TODO as they are failing on many
+          non-HPUX platforms and this test makes the assumption to be able to
+          fake the HP-UX environment.
+        Added built-in mappings for CST6CDT#Indiana, EST5EDT#Indiana,
+          MXST6MXDT, MXST6MXDT#Mexico, AST4ADT#Canada, CSM6CDM,
+          CSM6CDM#Mexico, MSM7MDM#Mexico, NST3:30NDT#Canada, PSM8PDM,
+          PST8PDT#Mexico, and WST-8WDT.
+        t/local-java.t is now run if JAVA_HOME is set.
+
+1.02    2009-10-15 19:55:00 +0200 (METDST)
+        JavaMap.PL: fixed DefaultMap loading. Now tests pass on Win32 too.
+
+1.01    2009-10-15 19:33:00 +0200 (METDST)
+        Renammed private module DT::TZ::HPUX::JavaMap to DT::TZ::HPUX::Map.
+        Added POD to DT::TZ::HPUX::Map.
+        Improved documentation.
+        Fixed POD coverage test.
+        Fixed my build environment to get an UTF-8 META.yml.
+
+1.00    2009-10-14 19:37:00 +0200 (METDST)
+        Now using Java to retrieve an hopefully complete mapping of tztab(4)
+          names to Olson DB. See the 'Implementation' section in
+          DateTime::TimeZone::HPUX for details.
+        Added JavaMap.PL which extracts the mapping from the JRE at module
+          build time. A default map is bundled in case no JRE is found.
+        In extreme cases, Java may be called at runtime for timezones which
+          were not known at build time.
+        Added code to DT::TZ::HPUX to provide a TimeZone factory interface.
+        This version was released on CPAN but not indexed due to an UTF-8
+          problem in META.yml (due to bug #25434 in the YAML module for
+          which I posted a patch 2 months ago). 
+
+0.09    2009-05-24
+        Changed tests:
+        - removed t/boilerplate.t (used only to help the author to fix
+          Module::Starter generated content)
+        - t/local-METDST.t: moved environment setting to a BEGIN block
+          (this may fix CPAN testers failures on some perls)
+        Not released on CPAN.
+
+0.08    2009-05-13 16:15:00 +0200 (METDST)
+        Fixed issue with _FromEtcTimeZone on HP-UX.
+        Reporting result with diag() in t/local-*.t.
+        Added tests to check that local TZ can be rebuilt from name.
+
+0.07    2009-05-10 14:21:21 +0200 (METDST)
+        Fixed pod to make pod-coverage.t pass.
+        Added tests.
+        Removed DateTime from dependencies.
+
+0.06    2009-05-07 19:39:05 +0200 (METDST)
+        Fixed t/boilerplate.t.
+
+0.05    2009-05-07 11:26:28 +0200 (METDST)
+        Switching to Module::Build from Module::Install due to archive
+        creation problems on Win32. See http://use.perl.org/~bart/journal/38127
+        This should fix CPAN indexing.
+
+0.04    2009-04-22 11:45:56 +0200 (METDST)
+        Documentation fixes.
+
+0.03    2009-04-21 19:23:53 +0200 (METDST)
+        Removed the special case for "GMT+x" as it does not match the OS behavior.
+
+0.02    2009-04-21 18:59:22 +0200 (METDST)
+        Added parsing of GMT based offset such as "GMT+3" => +0300.
+        Fixed parsing of unknown offset such as "SAT4" => -0400.
+
+0.01    2009-04-21 15:02:33 +0200 (METDST)
+        First version, released on an unsuspecting world.

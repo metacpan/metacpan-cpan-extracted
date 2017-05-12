@@ -1,0 +1,229 @@
+{
+   "abstract" : "Build your modules like CJFIELDS (not sure that's a recommendation)",
+   "author" : [
+      "Chris Fields <cjfields@bioperl.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-CJFIELDS",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::ModuleBuild::Custom" : 0,
+            "Dist::Zilla::Plugin::OurPkgVersion" : 0,
+            "Dist::Zilla::Plugin::Test::Compile" : 0,
+            "Dist::Zilla::PluginBundle::FLORA" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-PluginBundle-CJFIELDS@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-CJFIELDS"
+      },
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-PluginBundle-CJFIELDS",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/cjfields/dist-zilla-pluginbundle-cjfields.git",
+         "web" : "http://github.com/cjfields/dist-zilla-pluginbundle-cjfields"
+      }
+   },
+   "version" : "0.06",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@CJFIELDS/@Filter/GatherDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@CJFIELDS/@Filter/PruneCruft",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@CJFIELDS/@Filter/ManifestSkip",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@CJFIELDS/@Filter/MetaYAML",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@CJFIELDS/@Filter/License",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@CJFIELDS/@Filter/Readme",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@CJFIELDS/@Filter/ExtraTests",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@CJFIELDS/@Filter/ExecDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@CJFIELDS/@Filter/ShareDir",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@CJFIELDS/@Filter/Manifest",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@CJFIELDS/@Filter/TestRelease",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@CJFIELDS/@Filter/ConfirmRelease",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@CJFIELDS/@Filter/UploadToCPAN",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuild",
+            "name" : "@CJFIELDS/ModuleBuild",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@CJFIELDS/NextRelease",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@CJFIELDS/MetaJSON",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::OurPkgVersion",
+            "name" : "@CJFIELDS/OurPkgVersion",
+            "version" : "0.003002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@CJFIELDS/MetaConfig",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Compile",
+            "name" : "@CJFIELDS/Test::Compile",
+            "version" : "1.112820"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@CJFIELDS/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@CJFIELDS/PodSyntaxTests",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@CJFIELDS/MetaResources",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@CJFIELDS/Authority",
+            "version" : "1.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@CJFIELDS/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@CJFIELDS/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.300006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.300006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "4.300006"
+      }
+   },
+   "x_authority" : "cpan:CJFIELDS"
+}
+

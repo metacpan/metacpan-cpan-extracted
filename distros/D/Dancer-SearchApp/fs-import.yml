@@ -1,0 +1,17 @@
+elastic_search:
+    index: dancer-searchapp
+fs:
+    exclude_files:
+        - ".tar.gz"
+    directories:
+        - folder: "C:\\Users\\Corion\\Projekte\\App-StarTraders"
+          recurse: true
+          exclude:
+             - ".git"
+        - folder: "t\\documents"
+          recurse: true
+        - folder: "C:\\Users\\Corion\\Talks"
+          recurse: true
+          exclude:
+             - ".tar.gz"
+             - ".git"

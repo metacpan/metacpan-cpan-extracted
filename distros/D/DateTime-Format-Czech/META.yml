@@ -1,0 +1,23 @@
+---
+abstract: 'Format date and time as usual in Czech.'
+author:
+  - 'Tomáš Znamenáček <zoul@fleuron.cz>'
+build_requires:
+  DateTime: 0
+  Module::Build: 0.3601
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 2.101310'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-Czech
+recommends: {}
+requires:
+  Moose: 0
+  utf8: 0
+resources:
+  repository: http://github.com/zoul/DateTime-Format-Czech
+version: 0.2

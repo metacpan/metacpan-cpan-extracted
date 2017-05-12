@@ -1,0 +1,42 @@
+Revision history for Digest-MD6
+
+0.01    2009-06-15
+        - Initial release.
+
+0.02    2009-06-15
+        - Ship the right README, Changes
+
+0.03    2009-06-17
+        - Fix Base64 encoding
+        - Fix buffer overrun with hash > 256 bits
+
+0.04    2009-06-17
+        - Add convience aliases
+
+0.05    2009-06-17
+        - Remove spurious use of Data::Hexdumper
+
+0.06    2009-06-17
+        - Recode base64, hex encoding routines to handle arbitrary
+          bit counts
+
+0.07    2009-06-17
+        - Documentation fixes
+        - Test coverage for 1, 2, 4 bit hashes
+        - Disable -g optimisation
+
+0.08    2009-06-18
+        - Override Digest::base::reset so that it preserves hash size.
+
+0.09    2009-06-24
+        - Use Devel::CheckLib (DrHyde++) to test for availability
+          of compiler.
+
+0.10    2009-06-24
+        - Oops. Add inc to Makefile.PL @INC.
+
+0.11    2010-11-08
+        - Make it possible to supply bit strings that are not a multiple
+          of eight bits to add_bits.
+        - Add test against published reference data.
+        - Avoid non-portable use of wildcards in Makefile.

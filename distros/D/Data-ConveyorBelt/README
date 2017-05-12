@@ -1,0 +1,84 @@
+NAME
+    Data::ConveyorBelt
+
+SYNOPSIS
+        my @data = ( 1 .. 15 );
+
+        my $machine = Data::ConveyorBelt->new;
+        $machine->getter( sub {
+            my( $limit, $offset ) = @_;
+            $offset ||= 0;
+            return [ @data[ $offset .. $offset + $limit ] ];
+        } );
+
+        $machine->add_filter( sub {
+            my( $data ) = @_;
+            return [ grep { $_ % 2 == 1 } @$data ];
+        } );
+    
+        my $data = $machine->fetch( limit => 5 );
+
+DESCRIPTION
+USAGE
+  Data::ConveyorBelt->new
+    Returns a new *Data::ConveyorBelt* instance.
+
+  $machine->getter( [ \&getter ] )
+    Gets/sets the getter subroutine *\&getter* that represents the list of
+    items in your data source. Required before calling *fetch*.
+
+    A getter subroutine will be passed two arguments: the number of items to
+    return, and the offset into the list (0-based). It must return a
+    reference to the matching list of items.
+
+  $machine->add_filter( \&filter )
+    Adds a filter subroutine *\&filter* to your chain of filters.
+
+    A filter will be passed a reference to a list of items as returned
+    either from your getter or from a previous filter in the chain. A filter
+    must return a reference to a list of items.
+
+    A filter can alter the size of the list of items, either removing or
+    expanding items in the list. It can also transform the items in the
+    list.
+
+  $machine->fetch( %param )
+    Fetches a list of items from your data source, passes them through your
+    filters, and returns a reference to a list of items.
+
+    You must install a *getter* before calling *fetch*, but you don't have
+    to install any filters. Running *fetch* without any filters does what
+    you'd expect: it returns the values directly from your data source,
+    unmodified and unfiltered.
+
+    *%param* can contain:
+
+    *   limit
+
+        The number of items to return. Required.
+
+    *   offset
+
+        The offset into the full list of items (0-based). Optional; defaults
+        to 0.
+
+    *   chunk_size
+
+        The number of items to request at a time from your getter function.
+
+        For example, if your getter has high latency (reading from a network
+        resource, for example), and if you suspect that your filters will be
+        fairly aggressive--and will end up removing a good percentage of the
+        items returned from the getter--you may want to fetch larger chunks
+        of data at a time.
+
+        Optional; defaults to the same value as *limit*.
+
+LICENSE
+    *Data::ConveyorBelt* is free software; you may redistribute it and/or
+    modify it under the same terms as Perl itself.
+
+AUTHOR & COPYRIGHT
+    Except where otherwise noted, *Data::ConveyorBelt* is Copyright 2007 Six
+    Apart, cpan@sixapart.com.
+

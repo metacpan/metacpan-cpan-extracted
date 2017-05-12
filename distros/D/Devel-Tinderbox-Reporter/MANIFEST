@@ -1,0 +1,5 @@
+Changes
+MANIFEST
+Makefile.PL
+lib/Devel/Tinderbox/Reporter.pm
+t/Tinderbox.t

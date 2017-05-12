@@ -1,0 +1,49 @@
+0.12 2014-07-01
+ - Default to using modules@bestpractical.com as the author, not the
+   individual author
+ - Add a github repository pointer to the generated META.yml
+
+0.11 2014-06-27
+ - Actually default to 4.0 compat; version 0.10 documented installation
+   steps for 4.0, but the Makefile.PL required 4.2.0 or higher.
+
+0.10 2014-06-26
+ - Remove mentions of RT 3.8, which is no longer supported
+ - Default to being compat with >= 4.0, < 4.4
+ - Force bugtracking links to not wrap
+ - Omit all_from and readme_from, which Module::Install::RTx 0.34_04 and
+   above include in RTx() by default
+
+0.09 2014-03-13
+ - Include a default Changes file
+
+0.08 2014-02-07
+ - Suggest Plugin() for 4.2 installs
+ - Encourage the author to write a SYNOPSIS and some VERSION information
+
+0.07
+ - Wrap formatting codes around the installation steps
+
+0.06
+ - Stop ignoring README because it makes github prettier
+ - Fix the mailto: bug link (and make it the preferred reporting method)
+ - Ignore more test cruft
+
+0.05
+ - Ignore MYMETA files
+ - We use GPLv2 by default because it is RT's license
+ - Add a secondary profile that includes initdb instructions
+
+0.04
+ - Anchor the dist-name tarball ignore so it doesn't catch Callbacks
+ - Include links to rt.cpan.org
+
+0.03
+ - PODify the Module->README step
+
+0.02
+ - Update dependencies
+
+0.01
+ - Initial Release
+

@@ -1,0 +1,196 @@
+DBD::Redbase version 0.22
+=======================
+Copyright (C) 2002-2003 Bungisoft, Inc. All rights reserved.
+
+This is a DBD driver for a Pure Java database - RedBase that could be found at:
+
+http://www.bungisoft.com/html/products/redbase/redbase.html
+
+Please note that this driver currently supports RedBase version 1.5 and above.
+Support for older versions is not implemented. The only mode of RedBase
+operation that this driver supports is "Server" currently this driver does not
+support "webserver" or "servlet" modes. This driver was build to support DBI
+Version 1.30 and above.
+
+This driver support DNS connection syntax:
+
+dbi:Redbase:host=hostname;port=6238
+
+Support for exotic featues:
+
+BLOBS can be received from DB, this version of the driver does not allow to 
+store BLOBS however.
+
+This release has limited Unicode and non-ASCII support due to the limitations
+of Perl.
+
+This driver currently support the following functions and attributes broken
+down by various DBI handle types:
+
++---------------+---------+------------------+---------+----------------------+
+|DBI Handle Type|Type     |Name              |Supported|Note:                 |
++---------------+---------+------------------+---------+----------------------+
+|drh            |function |connect           |yes      |Using DNS style string|
+|               |         |                  |         | (port is optional): d|
+|               |         |                  |         |bi:Redbase:host=localh|
+|               |         |                  |         |ost:port=9001         |
++---------------+---------+------------------+---------+----------------------+
+|drh            |function |connect_cached    |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|drh            |function |available_drivers |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|drh            |function |data_sources      |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|drh            |function |trace             |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|               |         |                  |         |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |do                |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectrow_array   |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectrow_arrayref|yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectrow_hashref |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectall_arrayref|yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectall_hashref |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |selectcol_arrayref|yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |prepare           |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |prepare_cached    |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |commit            |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |rollback          |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |begin_work        |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |disconnect        |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |ping              |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |get_info          |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |table_info        |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |column_info       |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |primary_key_info  |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |primary_key       |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |foreign_key_info  |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |tables            |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |type_info_all     |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |type_info         |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |quote             |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |function |quote_identifier  |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |attribute|AutoCommit        |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|dbh            |attribute|Statement         |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|               |         |                  |         |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |bind_param        |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |bind_param_inout  |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |bind_param_array  |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |execute           |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |execute_array     |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |fetchrow_arrayref |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |fetchrow_array    |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |fetchrow_hashref  |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |fetchall_arrayref |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |fetchall_hashref  |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |finish            |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |rows              |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |bind_col          |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |bind_columns      |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |function |dump_results      |yes      |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|NUM_OF_FIELDS     |yes      |Read-Only             |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|NUM_OF_PARAMS     |yes      |Read-Only             |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|NAME              |yes      |Read-Only             |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|TYPE              |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|PRECISION         |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|SCALE             |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|NULLABLE          |yes      |Supported, but returns|
+|               |         |                  |         | 2 = unknown for every|
+|               |         |                  |         | column               |
++---------------+---------+------------------+---------+----------------------+
+|sth            |attribute|CursorName        |no       |                      |
++---------------+---------+------------------+---------+----------------------+
+
+
+*******************************************************************************
+*  YOU ARE REQUIRED TO READ LICENSE AGREEMENT BEFORE INSTALLING THIS MODULE!  *
+*******************************************************************************
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   DBI v.1.30
+   Unicode::String v.2.06,
+   Bit::Vector v.6.1,
+   Bit::Vector::Overload v.6.1
+
+The following is the list of url's where these modules can be downloaded from:
+
+http://www.bungisoft.com/downloads/perl-modules/Bit-Vector-6.1.tar.gz
+http://www.bungisoft.com/downloads/perl-modules/DBI-1.30.tar.gz
+http://www.bungisoft.com/downloads/perl-modules/Unicode-String-2.06.tar.gz
+
+Otherwise they can be obtained from CPAN network.
+
+LICENCE
+
+Software License can be found in file LICENSE accompanying this distribution.
+
+SUPPORT
+
+Please direct any support question to support@bungisoft.com or visit our
+support forums at:
+
+http://www.bungisoft.com/html/forum-frames.html
+
+Please note: Installation support will only be available on case-by-case basis
+due to the ammount of different systems and configuration options under which
+this driver can be installed.

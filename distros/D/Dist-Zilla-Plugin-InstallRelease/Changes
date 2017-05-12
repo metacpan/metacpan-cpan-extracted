@@ -1,0 +1,23 @@
+Revision history for Perl module Dist-Zilla-Plugin-InstallRelease
+
+0.008     2012-03-03
+    * Document that this must come before DZP::Clean [GH#2, xenoterracide]
+
+0.007     2011-04-22
+    * Internal refactoring
+
+0.006     2011-01-24
+    * Attempt to detect failed installation better
+
+0.005     2011-01-18
+    * Attempt to detect failed installation
+
+0.003     2010-11-28
+    * Use Perl_5 license
+
+0.002     2010-11-13
+    * Renamed from LocalInstall to InstallRelease
+
+0.001     2010-10-18
+    * Initial version
+    * Added support for specifying the install command

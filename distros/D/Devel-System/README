@@ -1,0 +1,59 @@
+README for Devel::System 0.01
+
+=head1 NAME
+
+Devel::System - intercept calls to C<system> to add extra diagnostics
+
+=head1 SYNOPSIS
+
+  use Devel::System;
+  $Devel::System::dry_run = 1; # don't really do it
+
+  system qw( rm -rf / );
+
+or from the command line:
+
+  perl -MDevel::System=dry_run -e'system qw( rm -rf / )'
+
+
+=head1 DEPENDENCIES
+
+This module has external dependencies on the following modules:
+
+ String::ShellQuote
+
+=head1 INSTALLATION
+
+ perl Build.PL
+ perl Build test
+
+and if all goes well
+
+ perl Build install
+
+=head1 HISTORY
+
+What changed over the last 3 revisions
+
+=over
+
+=item 0.01	Friday 3rd October, 2003
+
+	Initial CPAN release
+=back
+
+=head1 AUTHOR
+
+Richard Clamp <richardc@unixbeard.net>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2003 Richard Clamp. All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+L<perlfunc/system>
+

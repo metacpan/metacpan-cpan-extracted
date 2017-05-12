@@ -1,0 +1,22 @@
+---
+name: DBIx-Class-GeomColumns
+version: 0.0.2
+author:
+  - 'OHTSUKA Ko-hei <nene@kokogiko.net>'
+abstract: Filter of geometry columns to access with WKT
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class: 0
+  Geo::Converter::WKT2KML: 0
+  Test::More: 0
+  version: 0
+provides:
+  DBIx::Class::GeomColumns:
+    file: lib/DBIx/Class/GeomColumns.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

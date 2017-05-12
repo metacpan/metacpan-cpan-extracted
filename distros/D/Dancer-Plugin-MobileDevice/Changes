@@ -1,0 +1,28 @@
+Revision history for Dancer-Plugin-MobileDevice
+
+0.05    2013-09-28
+        * Fix links to the bug tracker. (RT#89016)
+
+0.04   2012-11-25
+        * Make the plugin Dancer 2-ready.
+
+0.03    2011-04-10
+        [ Alberto Simões ]
+        * Fix access to setting on a test
+		* Add support to iPad/iPod
+
+0.02	2010-12-13, Alexis Sukrieh
+		[ Franck Cuny ]
+		* Fix failing tests under Win32 environments
+
+		[ David Precious ]
+		* Make mobile layout configurable. 
+		* Massive update of the documentation (POD and README)
+
+		[ Alexis Sukrieh ]
+		* Add a dependency to Dancer in Makefile.PL
+		  (FIX RT issue #63844)
+
+0.01    2010-12-03, Alexis Sukrieh
+        First version, released for the Perl Dancer Advent Calendar 2010
+

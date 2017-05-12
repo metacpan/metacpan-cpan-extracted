@@ -1,0 +1,15 @@
+--- #YAML:1.0
+name:                Date-Spoken-German
+version:             0.05
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36_01
+distribution_type:   module
+requires:     
+    Exporter:                      0
+    POSIX:                         0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Chr. Winter <chrwin@cpan.org>

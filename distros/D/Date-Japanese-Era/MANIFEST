@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Date/Japanese/Era.pm
+lib/Date/Japanese/Era/Table.pm
+lib/Date/Japanese/Era/Table/JIS_X0301.pm
+t/00_Era.t
+t/01_Jis.t
+META.yml                                 Module meta-data (added by MakeMaker)

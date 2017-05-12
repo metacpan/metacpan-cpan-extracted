@@ -1,0 +1,9 @@
+requires 'utf8';
+requires 'strict';
+requires 'warnings';
+requires 'Moo';
+requires 'Dancer2::Core::Types';
+requires 'Dancer2::FileUtils';
+requires 'Dancer2::Core::Role::Template';
+requires 'Carp';
+requires 'Text::Haml';

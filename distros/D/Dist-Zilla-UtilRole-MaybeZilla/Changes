@@ -1,0 +1,15 @@
+Release history for Dist-Zilla-UtilRole-MaybeZilla
+
+0.002000 2017-03-12T13:51:12Z ee87409
+ - Tooling updates fix -Ddefault_inc_excludes_dot test failures
+ - Switch to ExtUtils::MakeMaker for installer (Major version bump reason)
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +22 ↑3 -11 (recommends: +1, suggests: +2 -1)
+ - test: +3 ↓1 (recommends: +4)
+
+0.001000 2013-12-14T12:03:59Z
+ - First version.

@@ -1,0 +1,32 @@
+Devel::Scooby version 4.12
+==========================
+
+The Devel::Scooby debugger (supports relocation).
+
+See: http://glasnost.itcarlow.ie/~scooby/ for more details.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+
+then as root:
+
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Crypt::RSA, PadWalker, Storable, Data::Dumper, and libwww-perl.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2003, Paul Barry.  All Rights Reserved.
+
+This module is free software.  It may be used, redistributed 
+and/or modified under the same terms as Perl itself.
+

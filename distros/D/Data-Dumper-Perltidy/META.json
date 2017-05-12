@@ -1,0 +1,52 @@
+{
+   "abstract" : "Dump and pretty print Perl data structures.",
+   "author" : [
+      "John McNamara <jmcnamara@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-Perltidy",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Perl::Tidy" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jmcnamara/data-dumper-perltidy/issues"
+      },
+      "homepage" : "http://jmcnamara.github.com/data-dumper-perltidy/",
+      "repository" : {
+         "url" : "http://github.com/jmcnamara/data-dumper-perltidy"
+      }
+   },
+   "version" : "0.03"
+}

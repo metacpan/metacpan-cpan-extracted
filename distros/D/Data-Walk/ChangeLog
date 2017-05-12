@@ -1,0 +1,181 @@
+2006-05-11 17:11  Guido Flohr <guido.flohr@cantanea.com>
+
+	* x-changelog.sh: search cvs2cl in $PATH
+
+2006-05-11 17:10  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm: bumped version number to 1.00
+
+2006-05-11 17:10  Guido Flohr <guido.flohr@cantanea.com>
+
+	* NEWS, ReleaseNotes, ChangeLog: updated
+
+2006-05-11 17:10  Guido Flohr <guido.flohr@cantanea.com>
+
+	* MANIFEST: fixed typo
+
+2006-05-11 16:56  Guido Flohr <guido.flohr@cantanea.com>
+
+	* Build.PL, Makefile.PL, lib/Data/Walk.pm, t/TC_Basic.pm,
+	  t/TC_Bugs.pm, t/TC_ByDepth.pm, t/TC_Copy.pm, t/TC_Follow.pm,
+	  t/TC_PostProcess.pm, t/TC_PreProcess.pm, t/TS_All.pm,
+	  t/TS_Basic.pm, t/TS_Options.pm, t/testrunner.t: changed copyright
+	  year
+
+2006-05-11 16:50  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/: TC_Basic.pm, TC_ByDepth.pm: test for new variable
+	  $Data::Walk::depth
+
+2006-05-11 16:50  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm: added example code to pod
+
+2006-05-11 16:49  Guido Flohr <guido.flohr@cantanea.com>
+
+	* MANIFEST, t/TC_Examples.pm, t/TS_All.pm: tests for example code
+	  added
+
+2006-05-11 12:42  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm: Use UNIVERSAL::isa for determining the base
+	  data type of references.
+
+2005-12-06 18:42  Guido Flohr <guido.flohr@cantanea.com>
+
+	* ChangeLog: re-generated
+
+2005-12-06 18:42  Guido Flohr <guido.flohr@cantanea.com>
+
+	* NEWS, ReleaseNotes, lib/Data/Walk.pm: bumped version number to
+	  0.02
+
+2005-12-06 18:41  Guido Flohr <guido.flohr@cantanea.com>
+
+	* README: concise README
+
+2005-12-06 18:41  Guido Flohr <guido.flohr@cantanea.com>
+
+	* Makefile.PL: README is no longer generated
+
+2005-11-15 13:19  Guido Flohr <guido.flohr@cantanea.com>
+
+	* Build.PL, MANIFEST, MANIFEST.SKIP, META.yml, Makefile.PL, README,
+	  lib/Data/Walk.pm, t/TC_Basic.pm, t/TC_Bugs.pm, t/TC_ByDepth.pm,
+	  t/TC_Copy.pm, t/TC_Follow.pm, t/TC_PostProcess.pm,
+	  t/TC_PreProcess.pm, t/TS_All.pm, t/TS_Basic.pm, t/TS_Options.pm:
+	  renamed from Data::Traverse to Data::Walk
+
+2005-11-15 01:58  Guido Flohr <guido.flohr@cantanea.com>
+
+	* ChangeLog: re-generated
+
+2005-11-15 01:58  Guido Flohr <guido.flohr@cantanea.com>
+
+	* META.yml: author
+
+2005-11-15 01:56  Guido Flohr <guido.flohr@cantanea.com>
+
+	* MANIFEST, META.yml: added META.yml
+
+2005-11-15 01:53  Guido Flohr <guido.flohr@cantanea.com>
+
+	* ChangeLog: re-generated
+
+2005-11-15 01:52  Guido Flohr <guido.flohr@cantanea.com>
+
+	* NEWS, ReleaseNotes: first release
+
+2005-11-15 01:39  Guido Flohr <guido.flohr@cantanea.com>
+
+	* README: re-generated
+
+2005-11-15 01:38  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm:
+	  - handle blessed structures
+	  - code cleaned up
+	  - pod corrected
+
+2005-11-15 01:33  Guido Flohr <guido.flohr@cantanea.com>
+
+	* MANIFEST.SKIP: renamed Data-Find to Data-Traverse
+
+2005-11-15 01:32  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/TC_Basic.pm: test blessed structures
+
+2005-11-15 01:31  Guido Flohr <guido.flohr@cantanea.com>
+
+	* MANIFEST: restructured test suites
+
+2005-11-15 01:29  Guido Flohr <guido.flohr@cantanea.com>
+
+	* Makefile.PL: added license information
+
+2005-11-15 00:31  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/: TC_Bugs.pm, TS_All.pm, TS_Basic.pm, TS_Options.pm:
+	  restructured test suite
+
+2005-11-15 00:18  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm, t/TC_Bugs.pm, t/TS_All.pm: do not bless
+	  unblessed references
+
+2005-11-14 19:23  Guido Flohr <guido.flohr@cantanea.com>
+
+	* README, lib/Data/Walk.pm, t/TC_Copy.pm, t/TS_All.pm: implemented
+	  call-by-reference for preprocessing callbacks
+
+2005-11-14 18:35  Guido Flohr <guido.flohr@cantanea.com>
+
+	* README, lib/Data/Walk.pm, t/TC_Follow.pm, t/TS_All.pm: handle
+	  cyclic references correctly
+
+2005-11-11 13:07  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm: comment about untainting
+
+2005-11-11 12:50  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/TC_PostProcess.pm, lib/Data/Walk.pm, t/TS_All.pm: implemented
+	  postprocessing
+
+2005-11-11 12:50  Guido Flohr <guido.flohr@cantanea.com>
+
+	* README: fixed typo
+
+2005-11-10 23:29  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/TC_PreProcess.pm: avoid warning
+
+2005-11-10 23:10  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm, t/TC_PreProcess.pm, t/TS_All.pm: implemented
+	  preprocessing
+
+2005-11-10 23:06  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/TC_ByDepth.pm: removed debugging noise
+
+2005-11-10 22:06  Guido Flohr <guido.flohr@cantanea.com>
+
+	* Build.PL, ChangeLog, MANIFEST, Makefile.PL, NEWS, README,
+	  ReleaseNotes, USERS, x-changelog.sh: cpanification
+
+2005-11-10 21:26  Guido Flohr <guido.flohr@cantanea.com>
+
+	* lib/Data/Walk.pm, t/TC_Basic.pm, t/TC_ByDepth.pm, t/TS_All.pm:
+	  traverse and traversedepth basically work
+
+2005-11-10 21:24  Guido Flohr <guido.flohr@cantanea.com>
+
+	* t/testrunner.t: fixed intentional syntax error
+
+2005-11-10 13:01  Guido Flohr <guido.flohr@cantanea.com>
+
+	* COPYING.LESSER, MANIFEST, MANIFEST.SKIP, Makefile.PL,
+	  lib/Data/Walk.pm, t/TC_Basic.pm, t/TS_All.pm, t/testrunner.t:
+	  Initial revision
+

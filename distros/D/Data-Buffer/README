@@ -1,0 +1,30 @@
+$Id: README,v 1.2 2001/03/22 20:23:03 btrott Exp $
+
+This is Data::Buffer.
+
+PREREQUISITES
+
+None.
+
+INSTALLATION
+
+Data::Buffer installation is straightforward. If your cpan shell
+is set up, you should just be able to do
+
+    % perl -MCPAN -e 'install Data::Buffer'
+
+If you don't like that, you can download the distribution; the
+latest version on CPAN can be found in
+
+    ftp://ftp.cpan.org/pub/CPAN/authors/id/B/BT/BTROTT/
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Benjamin Trott / ben@rhumba.pair.com

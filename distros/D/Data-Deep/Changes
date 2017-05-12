@@ -1,0 +1,49 @@
+Revision history for Perl extension Data::DeepManip.
+
+0.01 Sat Nov 12 17:53:19 RST 2011
+	- original version; created by Matthieu Damerose
+
+0.02 Sun Dec 11 21:00:00 RST 2011
+	- MANIFEST missing travel.t correction; Matthieu Damerose
+
+0.03 Mon Dec 26 22:14:30 RST 2011
+	- seems auto-tests are not passing (Local OK); Matthieu Damerose
+
+0.04 Sun Jan 1 18:22:57 RST 2012
+	- Successfull correction on auto-test; Matthieu Damerose
+
+0.05 Sun Feb 19 20:56:43 RST 2012
+	- perl licence in Makefile.PL ; Matthieu Damerose
+
+0.06 
+	- Changes file update ; Matthieu Damerose
+	- Infinite loop detection 
+
+0.07
+	- change argument call ref to array in internal &$matchPath() and &$isKey()
+	this was made for better usage in function travel, search and compare
+	- header changed for rt.cpan.org giving an error 
+	(thanks to Thomas Sibley and David Muir Sharnoff)
+	- DISABLED function : complex key compare (to use o_key as nodes priority searching) 
+	disabled as no test created on this very experimental, rewrited anyway ...
+
+0.08
+	Bug #83259 : https://rt.cpan.org/Public/Bug/Display.html?id=83259
+	=> function _escape_path removed as it is useless
+
+0.09	remove space after \ in reference to hash or arry in deep.t test	
+
+0.10 dim.  9 juin 2013 11:01:26
+	deep.t : compare loop (for(0..1) removed) for clearest view on errors related to tests in both complex or not (o_complex)
+	also add warn if failure occurs instead of keeping in debug mode (o_debug/bug) which is verbose and not helping for FAILS tests
+
+0.11 
+	add argument of the visitor for open/closing ARRAY/HASH in travel() crossing
+	travel() results append using internal function __appendVisitorResult()
+	quotation from " to ' modification in patch text format
+	Key optimisation :
+	   - Key usage is used in Text patch format and removed from Dom (previous $isKey() computations search/compare/travel ...)
+	   - correct DomPatch2Text() & TextPatch2Dom() for Key handling
+	add public functions patternDom2Text() & patternText2Dom() (redesigned from previous internal function)
+
+0.12    Warning purify

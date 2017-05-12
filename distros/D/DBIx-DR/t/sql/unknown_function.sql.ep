@@ -1,0 +1,10 @@
+SELECT
+
+    % unknown_function;  #### UNKNOWN_FUNCTION ####
+
+FROM
+    table
+
+WHERE
+    1 <> 1
+

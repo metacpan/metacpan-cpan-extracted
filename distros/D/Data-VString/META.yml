@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Data-VString
+version:             0.000004
+abstract:            Perl extension to handle v-strings (often used as version strings)
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - A. R. Ferreira <ferreira@cpan.org>
+recommends:
+    Test::Pod:  1.18

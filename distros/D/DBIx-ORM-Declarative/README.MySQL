@@ -1,0 +1,19 @@
+In order to test DBIx::ORM::Declarative against a MySQL database, you need
+to install the tables in the files t/dod_test.mysql.sql and
+t/join_test.mysql.sql into a database, and update t/mysqlinfo.pl to reflect
+the appropriate access credentials.  For example, if you set up a database
+with a name of 'dod_test' on your local machine, and give access to the
+'dod_test' user with a password of 'dod_test', just uncommenting the
+declarations in t/mysqlinfo.pl should do the trick.
+
+You can install the tables by giving t/dod_test.mysql.sql and
+t/join_test.mysql.sql to the mysql command line utility with the appropriate
+parameters.  For example, if you are installing the tables as the previously
+mentioned 'dod_test' user, you can just say this:
+
+  cat t/dod_test.mysql.sql t/join_test.mysql.sql | mysql -udod_test \
+  -pdod_test dod_test
+
+You shouldn't need to reinstall the tables to re-run the MySQL test
+scripts.  Reinstalling the tables can be accomplished by just rerunning the
+install scripts.

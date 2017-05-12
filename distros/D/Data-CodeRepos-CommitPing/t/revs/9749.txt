@@ -1,0 +1,66 @@
+---
+author: hanekomu
+comment: |-2
+   r6065@nbgr:  marcel | 2008-04-18 16:26:21 +0200
+   lang/perl/Class-Value-SemanticAdapter: initial commit
+date: 2008-04-18 23:26:34 +0900
+files:
+  - path: lang/perl/
+    status: _U
+  - path: lang/perl/Class-Value-SemanticAdapter/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/.shipit
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/Changes
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/MANIFEST
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/Makefile.PL
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/README
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/lib/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/lib/Class/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/lib/Class/Value/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/lib/Class/Value/SemanticAdapter.pm
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/t/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/tags/Class-Value-SemanticAdapter-0.01/t/perlcriticrc
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/.shipit
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/Changes
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/MANIFEST
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/Makefile.PL
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/README
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/lib/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/lib/Class/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/lib/Class/Value/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/lib/Class/Value/SemanticAdapter.pm
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/t/
+    status: A
+  - path: lang/perl/Class-Value-SemanticAdapter/trunk/t/perlcriticrc
+    status: A
+rev: 9749

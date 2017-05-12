@@ -1,0 +1,240 @@
+NAME
+    Dist::Zilla::PluginBundle::Author::RUSSOZ - configure Dist::Zilla like
+    RUSSOZ
+
+VERSION
+    version 0.022
+
+SYNOPSIS
+            # in dist.ini
+            [@Author::RUSSOZ]
+            ; fake = 0
+            ; version = none | auto | gitnext
+            ; auto_prereqs = 1
+            ; github = 1
+            ; use_no404 = 0
+            ; task_weaver = 0
+            ; signature = 1
+            ; report = 0
+
+DESCRIPTION
+    "Dist::Zilla::PluginBundle::Author::RUSSOZ" provides shorthand for a
+    Dist::Zilla configuration approximately like:
+
+            [@Basic]
+
+            [MetaJSON]
+            [ReadmeFromPod]
+            [InstallGuide]
+            [GitFmtChanges]
+            max_age    = 365
+            tag_regexp = ^.*$
+            file_name  = Changes
+            log_format = short
+
+            [OurPkgVersion]
+            [GithubMeta]                        ; if github = 1
+            [AutoPrereqs]                       ; unless auto_prereqs = 0
+
+            [ReportVersions::Tiny]
+            [PodWeaver]
+            config_plugin = @Author::RUSSOZ
+
+            ; if task_weaver =1
+            [TaskWeaver]
+
+            ; else (task_weaver = 0)
+            [@TestingMania]
+            disable = Test::CPAN::Changes, SynopsisTests
+            ; [Test::Pod::No404]
+
+            ; endif
+
+            [Signature]                         ; if signature = 1
+            [ReportPhase]                       ; if report = 1
+            [@Git]
+
+USAGE
+    Just put "[@Author::RUSSOZ]" in your dist.ini. You can supply the
+    following options:
+
+    *   version
+
+        How to handle version numbering. Possible values: none, auto (will
+        use Dist::Zilla::Plugin::AutoVersion), gitnext (will use
+        Dist::Zilla::Plugin::Git::NextVersion). Default = none.
+
+    *   auto_prereqs
+
+        Whether the module will use "AutoPrereqs" or not. Default = 1.
+
+    *   github
+
+        If using github, enable "[GithubMeta]". Default = 1.
+
+    *   use_no404
+
+        Whether to use "[Test::Pod::No404]" in the distribution. Default =
+        0.
+
+    *   task_weaver
+
+        Set to 1 if this is a "Task::" distribution. It will enable
+        "[TaskWeaver]" while disabling "[PodWeaver]" and all release tests.
+        Default = 0.
+
+    *   fake
+
+        Set to 1 if this is a fake release. It will disable [UploadToCPAN]
+        and enable [FakeRelease]. It can also be enabled by setting the
+        environemnt variable "FAKE". Default = 0.
+
+    *   signature
+
+        Whether to GPG sign the module or not. Default = 1.
+
+    *   report
+
+        Whether to report the Dist::Zilla building phases. Default = 0.
+
+ACKNOWLEDGMENTS
+    Much of the first implementation was shamelessly copied from
+    "Dist::Zilla::PluginBundle::Author::DOHERTY".
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   "Dist::Zilla"
+
+SUPPORT
+  Perldoc
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Dist::Zilla::PluginBundle::Author::RUSSOZ
+
+  Websites
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+    *   Search CPAN
+
+        The default CPAN search engine, useful to view POD in HTML format.
+
+        <http://search.cpan.org/dist/Dist-Zilla-PluginBundle-Author-RUSSOZ>
+
+    *   AnnoCPAN
+
+        The AnnoCPAN is a website that allows community annotations of Perl
+        module documentation.
+
+        <http://annocpan.org/dist/Dist-Zilla-PluginBundle-Author-RUSSOZ>
+
+    *   CPAN Ratings
+
+        The CPAN Ratings is a website that allows community ratings and
+        reviews of Perl modules.
+
+        <http://cpanratings.perl.org/d/Dist-Zilla-PluginBundle-Author-RUSSOZ
+        >
+
+    *   CPAN Forum
+
+        The CPAN Forum is a web forum for discussing Perl modules.
+
+        <http://cpanforum.com/dist/Dist-Zilla-PluginBundle-Author-RUSSOZ>
+
+    *   CPANTS
+
+        The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+        of a distribution.
+
+        <http://cpants.perl.org/dist/overview/Dist-Zilla-PluginBundle-Author
+        -RUSSOZ>
+
+    *   CPAN Testers
+
+        The CPAN Testers is a network of smokers who run automated tests on
+        uploaded CPAN distributions.
+
+        <http://www.cpantesters.org/distro/D/Dist-Zilla-PluginBundle-Author-
+        RUSSOZ>
+
+    *   CPAN Testers Matrix
+
+        The CPAN Testers Matrix is a website that provides a visual overview
+        of the test results for a distribution on various Perls/platforms.
+
+        <http://matrix.cpantesters.org/?dist=Dist-Zilla-PluginBundle-Author-
+        RUSSOZ>
+
+  Email
+    You can email the author of this module at "RUSSOZ at cpan.org" asking
+    for help with any problems you have.
+
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and join this
+        channel: #sao-paulo.pm then talk to this person for help: russoz.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests by email to
+    "bug-dist-zilla-pluginbundle-author-russoz at rt.cpan.org", or through
+    the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-Zilla-PluginBundle-
+    Author-RUSSOZ>. You will be automatically notified of any progress on
+    the request by the system.
+
+  Source Code
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    <https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ>
+
+      git clone https://github.com/russoz/Dist-Zilla-PluginBundle-Author-RUSSOZ.git
+
+AUTHOR
+    Alexei Znamensky <russoz@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Alexei Znamensky.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at <http://rt.cpan.org>.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

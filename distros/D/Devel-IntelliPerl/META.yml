@@ -1,0 +1,19 @@
+---
+abstract: 'Auto-completion for Perl'
+author:
+  - 'Moritz Onken <onken@netcubed.de>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-IntelliPerl
+requires:
+  Devel::Declare: 0.005011
+  Moose: 0.81
+  MooseX::Method::Signatures: 0.29
+  PPI: 1.203
+  Path::Class: 0
+resources:
+  repository: http://github.com/monken/Devel-IntelliPerl
+version: 0.04

@@ -1,0 +1,6 @@
+# $Id: MANIFEST.SKIP 2 2007-10-27 22:08:58Z kim $
+
+^Makefile$
+^\.cvsignore$
+^\.svn$
+^\.DS_Store$

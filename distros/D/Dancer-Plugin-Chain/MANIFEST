@@ -1,0 +1,17 @@
+AUTHOR_PLEDGE
+Build.PL
+CONTRIBUTORS
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+README
+README.mkdn
+SIGNATURE
+lib/Dancer/Plugin/Chain.pm
+t/00-compile.t
+t/000-report-versions-tiny.t
+t/synopsis.t
+xt/release/unused-vars.t

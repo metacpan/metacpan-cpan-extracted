@@ -1,0 +1,15 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+TODO
+dist.ini
+eg/processes.html
+eg/processes.psgi
+lib/Data/Google/Visualization/DataSource.pm
+t/010_basic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

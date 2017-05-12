@@ -1,0 +1,97 @@
+{
+   "abstract" : "a Database-agnostic driven Event Emitter",
+   "author" : [
+      "mudler <mudler@dark-lab.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Deeme",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "feature" : "0"
+         },
+         "requires" : {
+            "MIME::Base64" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Deeme" : {
+         "file" : "lib/Deeme.pm",
+         "version" : "0.05"
+      },
+      "Deeme::Backend" : {
+         "file" : "lib/Deeme/Backend.pm"
+      },
+      "Deeme::Backend::Memory" : {
+         "file" : "lib/Deeme/Backend/Memory.pm",
+         "version" : "0.05"
+      },
+      "Deeme::Job" : {
+         "file" : "lib/Deeme/Job.pm"
+      },
+      "Deeme::Obj" : {
+         "file" : "lib/Deeme/Obj.pm"
+      },
+      "Deeme::Utils" : {
+         "file" : "lib/Deeme/Utils.pm"
+      },
+      "Deeme::Worker" : {
+         "file" : "lib/Deeme/Worker.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mudler/p5-Deeme/issues"
+      },
+      "homepage" : "https://github.com/mudler/p5-Deeme",
+      "repository" : {
+         "url" : "git://github.com/mudler/p5-Deeme.git",
+         "web" : "https://github.com/mudler/p5-Deeme"
+      }
+   },
+   "version" : "0.05"
+}

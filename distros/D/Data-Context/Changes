@@ -1,0 +1,158 @@
+Revision history for Data-Context
+
+0.2   2016-02-07
+        Updating for release of version 0.2
+        Updated date (Ivan Wills)
+        Fixed up documentation for D::C::Loader (Ivan Wills)
+        Cleaned up (Ivan Wills)
+        Added checking that the method can be called (Ivan Wills)
+        Added checking for path to be defined (Ivan Wills)
+        Added more tests to improve code coverage (Ivan Wills)
+        Putting real documentation in (Ivan Wills)
+        Added missing files (Ivan Wills)
+        Added handles to log is easy to access (Ivan Wills)
+        Added ability to replace whole data block if nessesary (Ivan Wills)
+        Added protection from bad data (Ivan Wills)
+        More tests of actions (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Adding default load method (Ivan Wills)
+
+0.1.10   2015-08-20
+        Updating for release of version 0.1.10
+        Removed creation of makefile (Ivan Wills)
+
+0.1.9   2015-07-14
+        Updating for release of version 0.1.9
+        Converted to Path::Tiny (Ivan Wills)
+        Added Perl 5.22 to list of perl versions to build with (Ivan Wills)
+
+0.1.8   2015-05-29
+        Updating for release of version 0.1.8
+        Added tests for do_require (Ivan Wills)
+        Added further coverage (Ivan Wills)
+        Added tests for default log object (Ivan Wills)
+
+0.1.7   2015-05-26
+        Updating for release of version 0.1.7
+        Some refactoring to try to get better coverage (Ivan Wills)
+        Improving code coverage of log function (Ivan Wills)
+        Fixed the version number in the modules (Ivan Wills)
+        Set Test::More minimum version (Ivan Wills)
+        Removed unneeded tag (Ivan Wills)
+
+0.1.6   2015-01-18
+        Updating for release of version 0.1.6
+        Applied same changes to other tests (Ivan Wills)
+        Cleaned up error reporting (Ivan Wills)
+
+0.1.5   2015-01-11
+        Updating for release of version 0.1.5
+        Updated dependencies (Ivan Wills)
+        Updated License (Ivan Wills)
+        Added missing tests (Ivan Wills)
+        Updated manifest (Ivan Wills)
+        Lots of new tests (Ivan Wills)
+        Changed to test README.pod (Ivan Wills)
+        Changed README to POD syntax (Ivan Wills)
+        Updated (Ivan Wills)
+        New test data (Ivan Wills)
+
+0.1.4   2014-08-19
+        Added recommends for JSON::XS (Ivan Wills)
+        Added extra logic to skip test if XML::Simple isn't installed (Ivan Wills)
+        Trying to get better test diagnostics (Ivan Wills)
+        Updated for next release (Ivan Wills)
+        Added more details to test to try to diagnose CPAN Testers issues (Ivan Wills)
+
+
+0.1.3   2014-08-19
+        Added more details to test to try to diagnose CPAN Testers issues (Ivan Wills)
+        Fixed travis-ci config (Ivan Wills)
+        Added travis config (Ivan Wills)
+        Merge branch 'master' of github.com:ivanwills/Data-Context (Ivan Wills)
+        Updating version for next release (Ivan Wills)
+        Added version to file (Ivan Wills)
+        Updating version for next release (Ivan Wills)
+
+0.1.2   2014-08-15
+        Added version to file
+
+0.1.1   2014-08-15
+        Adding more test info to diagnose CPAN Testers reports (Ivan Wills)
+
+0.1.0   2014-01-01
+        Added missing dependencies (Ivan Wills)
+        Added missing lib tests (Ivan Wills)
+        Fixed spelling (Ivan Wills)
+        Fix critic issue (Ivan Wills)
+        Updated manifests (Ivan Wills)
+        Added missing method documentation (Ivan Wills)
+        Updating for release of version 0.1.0 (Ivan Wills)
+        Adding tag files (Ivan Wills)
+        Changed to storing the merger object so that it can be changed by caller/child class (Ivan Wills)
+        Made log store the last created version so it can be called with the class name (Ivan Wills)
+        Added showing stack trace for warn, error and fatal. Added dumping references if first element is a reference (Ivan Wills)
+        Split log test to it's own file and fixed to work with the fact that D::C::Log nolonger warns but prints to a file handle or STDERR (Ivan Wills)
+        Changed lol_iterate so that the whole object is called before processing the next level (if no path is set) (Ivan Wills)
+        Made the default log able to write to a file handle rather than just STDERR (Ivan Wills)
+        Added missing POD coverage (Ivan Wills)
+        best practice work (Ivan Wills)
+        Fixed not checking if a parent instance's data had changed (Ivan Wills)
+        Fixed type name (Ivan Wills)
+        Changed so that the instance class can be changed by user (Ivan Wills)
+        Cleaned up POD (Ivan Wills)
+        Added missing method description (Ivan Wills)
+        Added index handling (Ivan Wills)
+        Split indiviual type loading into seperate modules (Ivan Wills)
+        Added more tests (Ivan Wills)
+        Added description (Ivan Wills)
+        Added D::C::Log and sorted (Ivan Wills)
+        Added documentation about D::C::Log (Ivan Wills)
+        Added default critic config (Ivan Wills)
+        Reduced Perl::Critic violations (Ivan Wills)
+        Fixed not getting self correctly (Ivan Wills)
+        Sepperated out quick log class to make Perl::Critic happier (Ivan Wills)
+        Critic schmitic (Ivan Wills)
+        Added documentation (Ivan Wills)
+        Fixed typo (Ivan Wills)
+        Added missing documentation (Ivan Wills)
+        Reorganised test to better follow pattern (Ivan Wills)
+        Updated SKIPs (Ivan Wills)
+        Added in new files (Ivan Wills)
+        Removed TODOs (Ivan Wills)
+        Removed debugging statement (Ivan Wills)
+        Fixed test (Ivan Wills)
+        Moved loading into seperate libs (Ivan Wills)
+        Added new files to test (Ivan Wills)
+        Refactoring loading parts into seperate files (Ivan Wills)
+        Removed non-moosey variables (Ivan Wills)
+
+0.0.5   2013-06-23
+        Fixed skip argument order
+        Fixed timing issue when stat is initted before file is set
+        Added check that XML::Simple is actually installed
+        Clean white space
+        Moved to direct use_ok tests
+        Added configure requires section
+
+0.0.4   2013-05-21
+        Added more detailed debugging
+        Fixed warning?
+        Changed to work on Windows systems
+        Fixed so test works better in Windows
+        RT 79134: Added missing dependencies
+        Added more recommended modules
+
+0.0.3   2012-07-19
+        Fixed Kwalitee test
+        Upped version number
+        Added some example code
+        Added "use warnings"
+
+0.0.2   2012-05-03
+        #76915: Fixed test dependency on JSON (and other optional dependencies) - added checks to see if optional modules are installed and skip tests if they are not
+        Improved tests, increased test coverage
+
+0.0.1   2012-04-16
+        Basic functionality, variable substitutions and event actions all implemented
+        First version, released on an unsuspecting world.

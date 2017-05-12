@@ -1,0 +1,30 @@
+---
+abstract: 'Validate all data before submitting to your database.'
+author:
+  - 'Aran C. Deltac <bluefeet@cpan.org>'
+build_requires:
+  DBD::SQLite: 1.11
+  DateTime::Format::SQLite: 0
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Validation
+no_index:
+  directory:
+    - inc
+    - t
+recommends:
+  Data::FormValidator: 0
+requires:
+  DBIx::Class: 0.07005
+  FormValidator::Simple: 0.17
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.02005

@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use 5.010;
+use strict;
+use experimental 'smartmatch';
+use warnings;
+use FindBin '$Bin';
+
+#use Tie::IxHash;
+use String::Escape qw(backslash);
+
+die "Usage: $0 <lang1> <lang2>\n" unless @ARGV == 2;
+my ($lang1, $lang2) = @ARGV;
+
+require "$Bin/../lib/Data/Sah/Lang/$lang1.pm";
+require "$Bin/../lib/Data/Sah/Lang/$lang2.pm";
+
+my ($xlt1, $xlt2);
+{
+    no strict 'refs';
+    $xlt1 = \%{"Data::Sah::Lang::$lang1\::translations"};
+    $xlt2 = \%{"Data::Sah::Lang::$lang2\::translations"};
+}
+
+my @kxlt1 = keys %$xlt1;
+my @kxlt2 = keys %$xlt2;
+
+say "Translations in $lang1 not found in $lang2:";
+my $found;
+for (@kxlt1) {
+    next if $_ ~~ @kxlt2;
+    $found++;
+    say "q[", backslash($_), "]";
+}
+
+exit $found ? 1:0;

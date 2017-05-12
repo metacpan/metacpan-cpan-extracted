@@ -1,0 +1,7 @@
+---
+foo: >
+   Welcome to [% my %] world.
+   It is a nice [%place %].
+bar: >
+   Welcome to :my world.
+   It is a nice :place.

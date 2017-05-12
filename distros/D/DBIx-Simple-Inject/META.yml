@@ -1,0 +1,35 @@
+---
+abstract: 'Injects DBIx::Simple methods into DBI'
+author:
+  - 'Naoki Tomita <tomita@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: DBIx::Simple::Inject
+name: DBIx-Simple-Inject
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Class::Load: 0
+  DBI: 0
+  DBIx::Simple: 0
+  SQL::Abstract: 0
+  Scalar::Util: 0
+  parent: 0
+  perl: 5.8.1
+resources:
+  bugtracker: http://github.com/tomi-ru/DBIx-Simple-Inject/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/tomi-ru/DBIx-Simple-Inject
+version: 0.04

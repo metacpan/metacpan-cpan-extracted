@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Version.
+
+0.01  Mon Jan 26 20:29:16 2004
+	- original version; created by h2xs 1.21 with options
+		-X -n DBIx::Version
+

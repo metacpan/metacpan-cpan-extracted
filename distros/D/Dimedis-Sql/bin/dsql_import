@@ -1,0 +1,266 @@
+#!/usr/local/bin/perl
+
+use strict;
+use lib 'lib';
+
+use DBI 1.21;
+use Getopt::Std;
+use File::Path;
+
+use Dimedis::Sql::Import;
+
+my $VERSION = "1.02";
+
+my $COPYRIGHT = <<__EOT;
+dsql_import, version $VERSION, Copyright 2002-2004 dimedis GmbH
+__EOT
+
+my $USAGE = <<__EOT;
+Usage:dsql_import [-V] config-filename
+      dsql_export -c
+		
+  -V         suppress verbose output
+  -c         print example config file to STDOUT
+
+__EOT
+
+
+my $EXAMPLE_CONFIG = <<__EOT;
+#  data_source              -- Data-Source der Zieldatenbank, in die die Daten
+#                              importiert werden
+#  username                 -- Schema-Name der Zieldatenbank, in die die Daten
+#                              importiert werden
+#  password                 -- DB-Passwort
+#  directory                -- kompletter Pfad des Verzeichnisses, in dem die
+#                              zu importierenden abgelegt sind
+#  type_hash_file           -- kompletter Pfad der Datei, in der das Type-Hash
+#                              für die zu importierenden Tabellen abgelegt ist
+#
+# OPTIONAL:
+#  inserts_per_transaction  -- Anzahl von INSERT Befehlen, die in einer
+#			       Transaktion zusammengefasst werden sollen.
+#			       Ein Wert von 1 entspricht AUTOCOMMIT ON.
+#  recode		    -- Zeichensatzkonvertierung, im Formt
+#			       CHARSET..CHARSET, z.B. latin1..utf8 für
+#			       den Import ISO-8859-1 kodierter Daten in eine
+#			       UTF8 Datenbank. Default ist latin1..latin1.
+
+{
+  data_source    	  => 'dbi:Oracle:',
+  username                => 'usr',
+  password       	  => 'passwd',
+  directory               => '/tmp/export',
+  type_hash_file 	  => './prod/config/lib.install.sql.general.all_tables.config',
+  inserts_per_transaction => 1000,
+  recode	  	  => 'latin1..utf8',
+}
+  
+__EOT
+
+
+main: {
+  my %opt;
+  my $opt_ok = getopts ('Vc', \%opt);
+
+  #--- Beispiel-Config-File ausgeben	
+  if ( $opt{c} ) {
+    print $EXAMPLE_CONFIG;
+    exit 1;
+  }
+
+  my $config_filename = shift @ARGV;
+
+  if ( not $opt_ok or not $config_filename or @ARGV ) {
+    print $COPYRIGHT, "\n";
+    print $USAGE;
+    exit 1;
+  }
+
+  if ( not -f $config_filename ) {
+    print "Invalid config filename!\n";
+    exit 1;
+  }
+
+  #--- get config file
+  my $config = do $config_filename;
+
+  if ( $config ->{data_source} =~ /oracle/i ) {
+    #--- check version of DBD::Oracle (must be at least 1.12)
+    eval "use DBD::Oracle 1.12";
+    die $@ if $@;
+  }
+
+  #--- check if import directory exists
+  if ( not -d "$config->{directory}" ) {
+    print "Directory $config->{directory} not found!\n";
+    exit 1;
+  }
+
+  #--- connect to database
+  my $dbh = DBI->connect (
+  	$config->{data_source},
+	$config->{username},
+	$config->{password},
+	{
+		AutoCommit => 0,
+		RaiseError => 1,
+	}
+  );
+
+  print "\nImporting data...\n";
+
+  #--- execute database import
+  my $import = Dimedis::Sql::Import->new(
+	dbh		=> $dbh,
+	config		=> $config,
+	quiet_mode	=> $opt{V},
+  );
+	
+  $import->do_import();
+
+  print "\n\nDone.\n\n";
+
+  END { $dbh->rollback if $dbh;
+  	$dbh->disconnect if $dbh
+  }
+}
+
+__END__
+
+=head1 NAME
+
+dsql_import - Kommandozeilen-Tool für datenbankunabhängige DB-Imports
+
+=head1 SYNOPSIS
+
+  dsql_import [-V] Konfigurationsdatei-Name
+  dsql_import -c
+		
+  -V    keine Statusmeldungen auf STDOUT ausgeben
+  -c    Muster-Konfigurationsdatei auf STDOUT ausgeben
+
+=head1 DESCRIPTION
+
+Dieses Tool ermöglicht einen Import von Daten aus einem bestimmten
+Verzeichnis im Filesystem in ein bestehendes Datenbank-Schema
+(Oracle, MySQL oder mSQL).
+
+Es werden alle Daten aus dem angegebenen Verzeichnis importiert,
+für die es einen Eintrag im übergebenen Type-Hash gibt
+(siehe Abschnitt 'KONFIGURATIONSDATEI').
+
+Das angegebene Verzeichnis enthält für jede zu importierende Tabelle ein
+Unterverzeichnis mit dem Namen der entsprechenden Tabelle. Dort sind die
+zugehörigen Dateien abgelegt:
+
+=over 4
+
+=item B<format.conf>
+
+Enthält Informationen (Spaltenname, Typ und maximale Länge) zu den zugehörigen
+Tabellen-Spalten.
+
+=item B<data.dump>
+
+Enthält die eigentlichen Daten, wobei die einzelnen Spalten durch Tabulatoren
+voneinander getrennt sind.
+
+=item B<blob_1.bin - blob_n.bin>
+
+Enthält eine Tabelle BLOB- oder CLOB-Spalten, sind die Inhalte dieser Spalten
+in separaten Dateien gespeichert. In der CSV-Datei ist dann für diese
+Spalten nur der Name der zugehörigen Datei abgelegt.
+
+=back
+
+Die Start- und Endzeit des Imports, sowie die übergebenen Parameter
+und die Statusmeldungen, die während des Imports ausgegeben werden,
+werden in eine Meta-Datei im angegebenen Verzeichnis geschrieben.
+
+Für jeden Import wird eine neue Meta-Datei erzeugt.
+
+=head1 KONFIGURATIONSDATEI
+
+Die Konfigurationsdatei für das Import-Tool muss folgende Einträge enthalten:
+
+=over 4
+
+=item B<data_source>
+
+Data-Source der Zieldatenbank, in die die Daten importiert werden
+
+=item B<username>
+
+Schema-Name der Zieldatenbank, in die die Daten importiert werden
+
+=item B<password>
+
+DB-Passwort
+
+=item B<directory>
+
+kompletter Pfad des Verzeichnisses, in dem die zu importierenden Daten liegen
+
+=item B<type_hash_file>
+
+kompletter Pfad der Datei, in der das Type-Hash für die zu importierenden
+Tabellen abgelegt ist
+
+=back
+
+Zusätzlich gibt es die folgenden optionalen Parameter:
+
+=over 4
+
+=item B<inserts_per_transaction>
+
+Anzahl der DB-Inserts, nach denen jeweils ein Commit erfolgen soll
+
+Beispiel: inserts_per_transaction => 1 gibt an, dass nach jedem
+eingefügten Datensatz committed wird.
+
+Wird der B<inserts_per_transaction>-Parameter nicht angegeben,
+erfolgt jeweils ein Commit pro Tabelle. 
+
+=item B<recode>
+
+Zeichensatzkonvertierung, im Formt CHARSET..CHARSET. Folgende Angaben
+sind hier möglich:
+
+  latin1..utf8
+  latin1..latin1
+  utf8..utf8
+
+Default ist latin1..latin1.
+
+=back 
+
+=head1 TYPE-HASH
+
+Die im Konfigurationsdatei angegebene Type-Hash-Datei muss folgenden
+Aufbau haben (siehe auch B<Dimedis::Sql>):
+
+  $type_hash_ref = {
+    'table_name_x'    => {
+      'column_name_i' => 'serial',
+      'column_name_j' => 'varchar(999)',
+      'column_name_k' => 'clob',
+      'column_name_l' => 'blob' ,   
+    },
+    'table_name_y'    => {
+      'column_name_i' => 'numeric(2)',
+      'column_name_j' => 'blob',
+      'column_name_k' => 'char(16)',
+    },
+  };
+
+=head1 AUTOREN
+
+  Sabine Tonn, sabine AT dimedis.de
+  Jörn Reder, joern AT dimedis.de
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002-2004 dimedis GmbH, All Rights Reserved
+
+=cut

@@ -1,0 +1,46 @@
+#!/usr/local/bin/perl -w
+
+use 5.01;
+use strict;
+use utf8;
+use warnings;
+
+use Device::Inverter::KOSTAL::PIKO;
+use Getopt::Long qw(GetOptions);
+
+my %piko_opt = ( max_attempts => \( my $max_attempts = 42 ) );
+GetOptions( \%piko_opt, qw(host=s name=s number=i) ) or exit 1;
+
+my $piko = Device::Inverter::KOSTAL::PIKO->new(%piko_opt);
+
+my $tty;
+if   ( open $tty, '>', '/dev/tty' ) { $tty->autoflush }
+else                                { undef $tty }
+sub progress($) { print $tty shift if defined $tty }
+
+my $data;
+Fetch: {
+    for ( my $remaining_attempts = $max_attempts ; $remaining_attempts-- ; ) {
+        $data = $piko->fetch_logdata( progress_to => $tty );
+        last Fetch if $data->logdata_records > 1;
+    }
+    die "Giving up after $max_attempts attempt"
+      . ( $max_attempts != 1 && 's' ) . ".\n";
+}
+progress( 'Fetched '
+      . $data->logdata_records
+      . ' records from '
+      . $piko->name
+      . ".\n" );
+
+for (@ARGV) {
+    my $file = Device::Inverter::KOSTAL::PIKO->load($_);
+    progress( 'Read '
+          . $file->logdata_records
+          . ' records from '
+          . $file->filename
+          . "\n" );
+    $data->merge($file);
+}
+
+$data->print;

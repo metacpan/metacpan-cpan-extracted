@@ -1,0 +1,35 @@
+---
+abstract: 'hook of DBIx::TransactionManager commit'
+author:
+  - 'Soh Kitahara <sugarbabe335@gmail.com>'
+build_requires:
+  DBD::SQLite: 0
+  DBI: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::More: 0.88
+  Test::Requires: 0.06
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: DBIx::TransactionManager::EndHook
+name: DBIx-TransactionManager-EndHook
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBIx::TransactionManager: 0
+  Try::Tiny: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/soh335/DBIx-TransactionManager-EndHook.git
+version: 0.02

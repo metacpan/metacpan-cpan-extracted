@@ -1,0 +1,81 @@
+{
+   "abstract" : "A plugin for writing RESTful apps with Dancer",
+   "author" : [
+      "Alexis Sukrieh <sukria@sukria.net>",
+      "Franck Cuny <franckc@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-REST",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer" : "1.3111",
+            "Dancer::Plugin" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::ModuleLoader" : "0",
+            "Dancer::Test" : "0",
+            "File::Spec" : "0",
+            "HTTP::Headers" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Plugin::REST" : {
+         "file" : "lib/Dancer/Plugin/REST.pm",
+         "version" : "0.11"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perldancer/Dancer-Plugin-REST/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dancer-Plugin-REST/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perldancer/Dancer-Plugin-REST.git",
+         "web" : "https://github.com/perldancer/Dancer-Plugin-REST"
+      }
+   },
+   "version" : "0.11",
+   "x_authority" : "cpan:SUKRIA",
+   "x_contributors" : [
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "James Aitken <loonypandora@gmail.com>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

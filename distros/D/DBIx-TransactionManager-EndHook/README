@@ -1,0 +1,52 @@
+NAME
+    DBIx::TransactionManager::EndHook - hook of DBIx::TransactionManager
+    commit
+
+VERSION
+    This document describes DBIx::TransactionManager::EndHook version 0.02.
+
+SYNOPSIS
+        use DBIx::TransactionManager;
+        use DBIx::TransactionManager::EndHook;
+
+        my $txn = $tm->txn_scope;
+
+        $dbh->do('...');
+        $tm->add_end_hook(sub {
+            # do something
+        });
+
+        $txn->commit;
+
+DESCRIPTION
+    DBIx::TransactionManager::EndHook propide hook point that all
+    transactions handled by DBIx::TransactionManager are excuted
+    successfully.
+
+METHODS
+  $tm->add_end_hook(sub{});
+    Add hook subroutine to DBIx::TransactionManager. If call it without
+    transactions, it throw Exception. And these hooks are executed only all
+    transactions are executed successfully. If some transactions are failed,
+    these aren't executed.
+
+DEPENDENCIES
+    Perl 5.8.1 or later.
+
+BUGS
+    All complex software has bugs lurking in it, and this module is no
+    exception. If you find a bug please either email me, or add the bug to
+    cpan-RT.
+
+SEE ALSO
+    DBIx::TransactionManager
+
+AUTHOR
+    Soh Kitahara <sugarbabe335@gmail.com>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2013, Soh Kitahara. All rights reserved.
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

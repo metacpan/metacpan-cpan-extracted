@@ -1,0 +1,239 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_ctx": {
+        "ROW_ctx": [
+          {
+            "rid": "1.2.3.4",
+            "ptag": "1",
+            "cname": "default",
+            "TABLE_db2_lsa": {
+              "ROW_db2_lsa": [
+                {
+                  "name": "Router",
+                  "area": "0.0.0.0",
+                  "TABLE_lsdb": {
+                    "ROW_lsdb": {
+                      "age": "44",
+                      "maxage": "false",
+                      "options": "0x2",
+                      "options_str": "No TOS-capability, No DC",
+                      "wrapping": "false",
+                      "dummy": "false",
+                      "flush_pending": "false",
+                      "type": "Router Links",
+                      "id": "1.2.3.4",
+                      "id_str": "",
+                      "advrtr": "1.2.3.4",
+                      "seqno": "80000008",
+                      "cksum": "96ff",
+                      "len": "48",
+                      "rtr_abr": "true",
+                      "rtr_asbr": "true",
+                      "rtr_num_links": "2",
+                      "TABLE_rlsa": {
+                        "ROW_rlsa": [
+                          {
+                            "rtr_link_type": "a Stub Network",
+                            "rtr_link_id_str": " (Link ID) Network/Subnet Number:",
+                            "rtr_link_id": "1.2.3.4",
+                            "rtr_link_data_str": " (Link Data) Network Mask:",
+                            "rtr_link_data": "255.255.255.255",
+                            "rtr_link_num_tos": "0",
+                            "rtr_link_metric": "1"
+                          },
+                          {
+                            "rtr_link_type": "a Stub Network",
+                            "rtr_link_id_str": " (Link ID) Network/Subnet Number:",
+                            "rtr_link_id": "192.168.24.1",
+                            "rtr_link_data_str": " (Link Data) Network Mask:",
+                            "rtr_link_data": "255.255.255.255",
+                            "rtr_link_num_tos": "0",
+                            "rtr_link_metric": "1"
+                          }
+                        ]
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "Summary Network",
+                  "area": "0.0.0.0",
+                  "TABLE_lsdb": {
+                    "ROW_lsdb": {
+                      "age": "44",
+                      "maxage": "false",
+                      "options": "0x2",
+                      "options_str": "No TOS-capability, No DC",
+                      "wrapping": "false",
+                      "dummy": "false",
+                      "flush_pending": "false",
+                      "type": "Network Summary",
+                      "id": "192.168.25.0",
+                      "id_str": "(Network address)",
+                      "advrtr": "1.2.3.4",
+                      "seqno": "80000002",
+                      "cksum": "8546",
+                      "len": "28",
+                      "sum_mask": "24",
+                      "sum_metric": "4"
+                    }
+                  }
+                },
+                {
+                  "name": "Router",
+                  "area": "0.0.0.1",
+                  "TABLE_lsdb": {
+                    "ROW_lsdb": {
+                      "age": "44",
+                      "maxage": "false",
+                      "options": "0x2",
+                      "options_str": "No TOS-capability, No DC",
+                      "wrapping": "false",
+                      "dummy": "false",
+                      "flush_pending": "false",
+                      "type": "Router Links",
+                      "id": "1.2.3.4",
+                      "id_str": "",
+                      "advrtr": "1.2.3.4",
+                      "seqno": "80000002",
+                      "cksum": "d1e2",
+                      "len": "36",
+                      "rtr_abr": "true",
+                      "rtr_asbr": "true",
+                      "rtr_num_links": "1",
+                      "TABLE_rlsa": {
+                        "ROW_rlsa": {
+                          "rtr_link_type": "a Stub Network",
+                          "rtr_link_id_str": " (Link ID) Network/Subnet Number:",
+                          "rtr_link_id": "192.168.25.0",
+                          "rtr_link_data_str": " (Link Data) Network Mask:",
+                          "rtr_link_data": "255.255.255.0",
+                          "rtr_link_num_tos": "0",
+                          "rtr_link_metric": "4"
+                        }
+                      }
+                    }
+                  }
+                },
+                {
+                  "name": "Summary Network",
+                  "area": "0.0.0.1",
+                  "TABLE_lsdb": {
+                    "ROW_lsdb": [
+                      {
+                        "age": "44",
+                        "maxage": "false",
+                        "options": "0x2",
+                        "options_str": "No TOS-capability, No DC",
+                        "wrapping": "false",
+                        "dummy": "false",
+                        "flush_pending": "false",
+                        "type": "Network Summary",
+                        "id": "1.2.3.4",
+                        "id_str": "(Network address)",
+                        "advrtr": "1.2.3.4",
+                        "seqno": "80000002",
+                        "cksum": "be88",
+                        "len": "28",
+                        "sum_mask": "32",
+                        "sum_metric": "1"
+                      },
+                      {
+                        "age": "44",
+                        "maxage": "false",
+                        "options": "0x2",
+                        "options_str": "No TOS-capability, No DC",
+                        "wrapping": "false",
+                        "dummy": "false",
+                        "flush_pending": "false",
+                        "type": "Network Summary",
+                        "id": "192.168.24.1",
+                        "id_str": "(Network address)",
+                        "advrtr": "1.2.3.4",
+                        "seqno": "80000002",
+                        "cksum": "6866",
+                        "len": "28",
+                        "sum_mask": "32",
+                        "sum_metric": "1"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": "Type-5 AS External",
+                  "TABLE_lsdb": {
+                    "ROW_lsdb": {
+                      "age": "162",
+                      "maxage": "false",
+                      "options": "0x2",
+                      "options_str": "No TOS-capability, No DC",
+                      "wrapping": "false",
+                      "dummy": "false",
+                      "flush_pending": "false",
+                      "type": "Type-5 AS-External",
+                      "id": "8.8.8.0",
+                      "id_str": "(Network address)",
+                      "advrtr": "1.2.3.4",
+                      "seqno": "80000004",
+                      "cksum": "3e5b",
+                      "len": "36",
+                      "asext_mask": "24",
+                      "asext_metric_type2": "true",
+                      "asext_metric": "20",
+                      "asext_fwd_addr": "0.0.0.0",
+                      "asext_tag": "0"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "rid": "1.2.3.4",
+            "ptag": "2",
+            "cname": "default",
+            "TABLE_db2_lsa": {
+              "ROW_db2_lsa": {
+                "name": "Router",
+                "area": "0.0.0.0",
+                "TABLE_lsdb": {
+                  "ROW_lsdb": {
+                    "age": "353",
+                    "maxage": "false",
+                    "options": "0x2",
+                    "options_str": "No TOS-capability, No DC",
+                    "wrapping": "false",
+                    "dummy": "false",
+                    "flush_pending": "false",
+                    "type": "Router Links",
+                    "id": "1.2.3.4",
+                    "id_str": "",
+                    "advrtr": "1.2.3.4",
+                    "seqno": "80000002",
+                    "cksum": "e1ec",
+                    "len": "36",
+                    "rtr_num_links": "1",
+                    "TABLE_rlsa": {
+                      "ROW_rlsa": {
+                        "rtr_link_type": "a Stub Network",
+                        "rtr_link_id_str": " (Link ID) Network/Subnet Number:",
+                        "rtr_link_id": "192.168.1.4",
+                        "rtr_link_data_str": " (Link Data) Network Mask:",
+                        "rtr_link_data": "255.255.255.255",
+                        "rtr_link_num_tos": "0",
+                        "rtr_link_metric": "1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    }
+  },
+  "id": 1
+}

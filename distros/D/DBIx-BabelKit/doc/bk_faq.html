@@ -1,0 +1,136 @@
+<html>
+<head>
+<title>BabelKit Requirements and FAQ</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+<div align="right">
+[<a href="bk_overview.html">Overview</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_schema.html">Code Table Setup</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Requirements and FAQ</h2></center>
+
+
+<h4>Q.  What are the requirements to run BabelKit?</h4>
+
+BabelKit should run anywhere that PHP or Perl run,
+on Unix, Linux or Windows.
+
+<p>
+BabelKit will run on any database management system
+with an SQL interface.  A sample MySQL schema is provided.
+If you use BabelKit with another database send me
+your schema and I will add it to the next release.
+
+<p>
+The Perl version needs the DBI.pm package.  You can
+use any CGI library such as CGI.pm.
+
+<p>
+The PHP version will work out of the box using the
+PEAR, ADODB or phplib database libraries.  Porting
+to a new database library is trivial.  Let me know
+if you need another one.
+
+<p>
+CodeKit is licensed as free software which means
+that you can use it for any project.
+If you do, send me a note saying how it went!
+
+
+<h4>Q.  We are developing a multilanguage portal at the moment.
+How could I take advantage of this utility?</h4>
+
+BabelKit was originally developed for a multilanguage portal.
+They do user surveys in multiple languages and keep registered
+user demographics.  The answers to those questions are kept
+in database tables as coded fields.  "1" means "Programmer",
+"2" means "Web Designer", etc.
+
+<p>
+The multiple choice questions are displayed to the users
+in their browser display language as HTML web page select
+elements.  The resulting data is also presented in any
+language using BabelKit method calls to look up the
+appropriate description translation.
+
+<p>
+BabelKit is made for any database application which
+keeps coded values in database fields and needs to
+be able to display the descriptions of those codes
+in multiple languages.  It takes all the programming
+work away from that part of the project :-)
+
+
+<h4>Will BabelKit work with a templating system?</h4>
+
+The BabelKit.php class file will generate very nice user
+language sensitive HTML select elements.  You should be
+able to call $babelkit->select(...) from within the
+templating system.  It returns the select element as
+a string which you can print or insert into the page:
+
+<pre>
+$str = $babelkit->select('offered_courses', $user_lang);
+
+print $str;
+</pre>
+
+Even if you do not use BabelKit to generate HTML, it
+is still useful as the interface to enter, translate
+and maintain all of your database the codes and their
+multilanguage descriptions.
+
+
+<h4>When is English a good choice for the 'native' language?</h4>
+
+There are two primary issues to consider:
+
+<p>
+1.  You only want to translate code descriptions once
+from a single source language rather than provide translations
+of translations which may become less accurate.  So if possible
+choose a source language which will ease the translation process.
+You many find it easier to find English to Chinese
+translators for example than Finnish to Chinese translators.
+
+<p>
+2.  When a translation set is incomplete the missing
+language descriptions will be filled in with the
+'native' language.  English may be a good choice for
+the 'native' backup display language because many people
+can understand it.
+
+
+<p>
+<div align="right">
+[<a href="bk_overview.html">Overview</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_schema.html">Code Table Setup</a>]
+</div>
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

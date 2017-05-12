@@ -1,0 +1,200 @@
+Notes on Submitting Bug Reports for DBD::Informix
+=================================================
+
+EMAIL ADDRESS FOR REPORTING PROBLEMS WITH DBD::INFORMIX
+
+	dbd.informix@gmail.com
+
+IF YOU HAVE PROBLEMS BUILDING DBD::INFORMIX
+
+First, read the README file and other documentation in the DBD::Informix
+distribution area.  This includes the Notes sub-directory and the various
+documentation files in there, such as the FAQ file and the various specific
+platform files and even the Working.Versions file.  You are apt to get curt
+responses to your questions if the information you need is available in the
+documentation.  Since you're reading this file, there is a good chance you
+either are doing this or already have done this.  Thank you!
+
+Next, check the Frequently Asked Questions, Known Bugs and any other
+pertinent documents at:
+
+    http://dbi.perl.org/
+
+At one time, the version numbers recorded at this site were out of date
+at times, but they are now (since September 1999) usually correct.  The
+other information there is valuable, though.  In case of doubt, go to
+CPAN (http://www.perl.com/CPAN/modules/by-module) for the latest
+versions of any of the DBI or DBD files.
+
+If this does *not* resolve your problem, please post the details of your
+problem to dbi-users@perl.org and CC them to the maintainer(s) at
+dbd.informix@gmail.com, using one of the two methods outlined below.
+For information on how to subscribe to (and unsubscribe from) the
+dbi-users mailing list, send a message to dbi-users-help@perl.org.
+
+Please ensure that any email message has DBD::Informix in the subject line.
+Thanks!
+
+FAILURE CLASSES
+
+There are 4 classes of failures which you might encounter:
+
+    A.  A configuration failure (perl Makefile.PL does not work)
+    B.  A build failure (the Makefile was generated but there were problems
+        during the build proper so that no test worked at all)
+    C.  A general test failure (although the build appeared OK, every
+        single test fails, or almost all of them fail).
+    D.  A selective test failure (the build appeared OK and most of the
+        tests pass, but a few (say 1 to 5) of them fail).
+
+You need to classify your failure into one of these four classes, and then
+follow either the STANDARD FAILURE REPORT METHOD or the MANUAL FAILURE
+REPORTING METHOD.
+
+STANDARD FAILURE REPORTING METHOD
+
+You need to classify your failure report as class A, B, C, or D -- see
+the description of FAILURE CLASSES above.  Let's suppose you've got a
+problem with the test t/t75blob.t (only), so it is a Class D failure.
+If you use a civilized (Bourne, Korn, Born-Again) shell, then you use:
+
+	perl BugReport D t/t75blob.t 2>&1 | tee bugreport.out
+
+If you're a C shell die-hard, then you use:
+
+	perl BugReport D t/t75blob.t |& tee bugreport.out
+
+You can then submit the output file bugreport.out as the supporting
+material for your bug report.
+
+Note that if you specify a failure class, the BugReport script assumes
+it is OK to redo the complete configuration, build and test of
+DBD::Informix.  If this is not a valid assumption, then you need to
+follow the manual failure reporting method.  If you do not specify a
+failure class, it simply reports the environment and version numbers.
+Also note that the script deliberately hides the passwords in the
+environment.  The actual values are not of any interest in bug
+reporting, though their presence or absence can be important.  This
+saves you having to edit the environment (see step 2 of the manual
+failure reporting method).
+
+Also note that the BugReport script does not attempt to create a stack
+trace from a core dump.  If you have a core dump, please do that
+manually.
+
+MANUAL FAILURE REPORTING METHOD
+
+This section describes the information that is generated automatically by
+the BugReport Perl script.  This clarifies what the BugReport script does.
+
+Please include:
+
+1. Full details of which version of Informix ESQL/C and Perl you're using.
+   The output of "perl -V" gives the Perl information; running "esql -V"
+   gives the Informix ESQL/C information.  Also, please give the version of
+   the Informix database engine which you are using.  This is usually most
+   easily done using "dbaccess -V".  More authoritative answers are got by
+   running "$INFORMIXDIR/lib/sqlexec -V" for SE, "tbstat -V" for OnLine
+   5.0x, or "onstat -V" for other versions of OnLine or for IUS.  The
+   software serial number is of little or no use for debugging problems.
+
+   New requirement (v0.62): please include the line or lines from the
+   sqlhosts file which applies to the database(s) you are using.
+
+2. A complete, sorted dump of your environment:
+
+    env | sort
+
+   Before sending the output, replace the value of DBD_INFORMIX_PASSWORD or
+   DBD_INFORMIX_PASSWORD2 with a string of 8 X's.
+
+3. A log of a complete build:
+
+    # Before doing anything, please either re-extract the source from the
+    # compressed tar file you retrieved from CPAN into an empty directory
+    # or make sure that the build area is really clean:
+    [ -f Makefile ] && make realclean
+    rm -f esql esqlvrsn.h
+
+    # Send this output for all failure types (A, B, C, D)
+    perl Makefile.PL
+
+    # Send this output for failure types B, C, D.
+    make
+
+    # Send this output for failure types C, D
+    # If the output is more than about 30 lines, then just send the first
+    # 30 lines or so of the output -- anything more is unlikely to give any
+    # extra information.
+    make test
+
+    # Send this output for failure types C, D
+    # Then, taking the first test which fails (typically t00basic.t) send
+    # the output from:
+    test.one.sh t/t00basic.t
+
+    # Send this output for failure type D
+    # If the failing tests are failing in distinctly different ways
+    # (different error messages, or one is a core dump, or ...) then send
+    # the test output for each of the different outputs, but do not send
+    # more than 5 sets of test results unless requested to do so.
+    test.one.sh t/t05dbase.t
+
+    If you use a Bourne or Korn Shell (or any work-alikes), you can also
+    use the following command to get a lot more debug information, but
+    don't send this unless asked to do so:
+
+    DBI_TRACE=9 test.one t/t00basic.t
+
+    Use this to verify that the problems you are reporting as different for
+    failure type D really are different, but still don't send the output
+    unless asked to do so.
+
+4. If you get a core dump, try to include a stack trace from it.  If the
+   stack trace mentions XS_DynaLoader_dl_load_file then rerun make test
+   after setting the environment variable PERL_DL_DEBUG to 2.  Similarly,
+   get the Devel::CoreStack module and use it.  Do not send a stack trace
+   if it does not contain function names.
+
+WHERE TO SEND FAILURE REPORTS
+
+For information on Informix Technical Support, please run:
+
+	perldoc DBD::Informix::TechSupport
+
+If you are not currently subscribed to the DBI users' mailing list, then
+please subscribe via http://dbi.perl.org/, or for information on how to
+subscribe via email, send email to dbi-users-help@perl.org.
+There are 3 mailing lists:
+
+       dbi-announce@perl.org
+       dbi-users@perl.org
+       dbi-dev@perl.org
+
+You should probably subscribe to dbi-users and probably do not need to
+subscribe to dbi-dev unless you are planning to write your own DBD driver.
+(If you want to take over the maintenance of DBD::Informix, let me know!)
+
+Please don't post problems with DBD::Informix to comp.lang.perl.misc or
+perl5-porters because they probably will not be seen by anyone able to
+answer them (but comp.lang.perl.modules might provide an answer).
+
+Questions asked in the comp.databases.informix news group will usually
+be answered.
+
+Please don't try to email Tim Bunce directly, either.  He's an expert in
+many fields, but Informix is not one of those fields.
+
+Go through the proper channels, which means the dbi-users@perl.org
+mailing list or the dbd.informix@gmail.com mail alias.
+
+---------------------------------------------------------------------------
+
+Copyright 1999 Jonathan Leffler
+Copyright 2000 Informix Software Inc
+Copyright 2002 IBM
+Copyright 2005 Jonathan Leffler
+
+Jonathan Leffler (jleffler@us.ibm.com)
+
+@(#)$Id: bug.reports,v 100.7 2005/07/06 20:13:27 jleffler Exp $

@@ -1,0 +1,89 @@
+{
+   "abstract" : "easy dates with Time::Piece compatibility",
+   "author" : [
+      "Buddy Burden <barefootcoder@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Date-Easy",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Date::Parse" : "1.17",
+            "Exporter" : "0",
+            "Scalar::Util" : "0",
+            "Time::Local" : "0",
+            "Time::ParseDate" : "2015.0925",
+            "Time::Piece" : "1.30",
+            "autodie" : "0",
+            "overload" : "0",
+            "parent" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Basename" : "0",
+            "File::Spec" : "0",
+            "List::Util" : "1.39",
+            "POSIX" : "0",
+            "Test::Builder" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0.25",
+            "Time::DaysInMonth" : "0",
+            "Time::JulianDay" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Easy" : {
+         "file" : "lib/Date/Easy.pm",
+         "version" : "0.03"
+      },
+      "Date::Easy::Date" : {
+         "file" : "lib/Date/Easy/Date.pm",
+         "version" : "0.03"
+      },
+      "Date::Easy::Datetime" : {
+         "file" : "lib/Date/Easy/Datetime.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/barefootcoder/date-easy/issues"
+      },
+      "homepage" : "https://github.com/barefootcoder/date-easy",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/barefootcoder/date-easy.git",
+         "web" : "https://github.com/barefootcoder/date-easy"
+      }
+   },
+   "version" : "0.03"
+}
+

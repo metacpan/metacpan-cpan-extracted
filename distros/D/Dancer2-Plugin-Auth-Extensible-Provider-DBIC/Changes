@@ -1,0 +1,97 @@
+Revision history for Dancer2-Plugin-Auth-Extensible-Provider-DBIC
+
+0.623 Mon 23 Jan 19:19:51 CET 2017
+
+    * deprecate *_source settings (GH#16, simbabque)
+
+0.622 Mon 12 Dec 14:30:55 CET 2016
+
+    * Add a LICENSE file (Kwalitee+GitHub) + more skips (GH#15, Shlomi Fish).
+    * Updates for latest test changes in D2PAE.
+
+0.621 Tue  8 Nov 17:05:00 CET 2016
+
+    * logged_in_user_lastlogin now stored in session as epoch
+    * add record_lastlogin to main test provider options
+
+0.620 Thu  3 Nov 16:25:17 CET 2016
+
+    * Reinstate removed roles_key
+    * Update for full compatibility with plugin version 0.620
+
+0.603 Tue 18 Oct 17:08:36 CEST 2016
+
+    [ENHANCEMENTS]
+
+    * Add user_as_object attribute. This allows config to determine whether
+      get_user_details and thus also logged_in_user will return a hash
+      reference (the default) or an inflated DBIC row object (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Remove README.pod (GH#11)
+
+0.602 Fri 30 Sep 11:00:57 CEST 2016
+
+    * Add example schema to POD + improve simple config example (Ben Kaufman).
+
+0.601 Fri 26 Aug 12:09:54 CEST 2016
+
+    * Remove ambiguity from username search in `_user_rset` sub. This prevents
+      search from failing with certain schema designs.
+
+0.600 Tue 31 May 15:46:22 CEST 2016
+
+    * Provider is now a Moo class and has been rehacked to be compatible
+      with Plugin2. This means thus provider is not compatible with Dancer2
+      releases <= v0.166001.
+    * allow password check to be performed by a DBIC result class method - see
+      users_password_check configuration attribute.
+
+
+0.502 Sun Mar 6 17:00:00 2016 GMT
+    * Allow disable_roles to be used
+
+0.501 Wed Jan 20 12:00:00 2016 GMT
+    * Fix build deps (Peter Mottram)
+
+0.500 Tue Jan 19 16:00:00 2015 GMT
+    * Add default password reset code column
+    * Add tests (Peter Mottram)
+    * Fix hard-coded name of role column
+    * Fix update error when creating user with non-standard username key
+    * Update configuration option names for clarity
+    * Auto-detect relationships from schema (Peter Mottram)
+    * Minor doc updates
+
+0.401 Wed Jun 17 15:00:00 2015 GMT
+    * Fix user not being returned in update if username changed
+
+0.400 Sat Jun 6 20:00:00 2015 GMT
+
+    * Die if username not specified for create_user
+    * Prevent exceptions if lastlogin date missing
+    * Add password_expired functionality
+    * Add option to record time of password change
+    * Add lastlogin functionality
+    * Prefetch roles for better performance
+    * Add create_user handler
+    * Updates to support password functionality in DPAE
+    * Check for valid user before attempting DB update
+    * Add option schema_name to choose which DBIC schema to use
+    * Add set_user_details function to allow users to be updated
+    * Add better documentation for config options
+    * Add option to return user roles in user hash
+    * Add option to specify additional search criteria for user 
+
+0.306 Sat Feb 21 10:12:00 2015 GMT
+
+    * Add META files
+
+0.305 Fri Feb 20 15:45:00 2015 GMT
+
+    * Fix incorrect dependencies
+
+0.304 Thu Feb 19 17:00:00 2015 GMT
+
+    * Initial release, version based on DPAE

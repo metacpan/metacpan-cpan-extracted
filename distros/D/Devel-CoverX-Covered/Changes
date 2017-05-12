@@ -1,0 +1,148 @@
+
+Feature oriented Revision history for Devel-CoverX-Covered
+==========================================================
+
+0.016 -- 2014-10-11 12:36:44 UTC
+
+* Add SQL::Abstract to deps, since it causes CPANTESTERS fails
+
+* Bump the Devel::Cover db version file to 14 and dep to 1.17
+
+
+
+0.015 -- 2013-08-25 15:29:21 UTC
+
+* Release to sync up with what's on CPAN
+
+
+
+0.014 -- 2013-08-25 15:26:57 UTC
+
+* Mention vim-covered in the POD
+
+
+
+0.014 -- 2013-08-23 14:39:33 UTC
+
+* Build cleanup to get the version number correct, etc.
+
+
+
+0.013 -- 2012-07-23 16:39:33 UTC
+
+* Bumped Cover version to 13
+
+* Fixed problem highlighted by more recent Moose
+
+
+
+0.012
+-----
+
+* Fixed memory leak.
+
+
+
+0.011
+-----
+
+* Db schema versioned separately from the app, since that changes a
+  _lot_ less often.
+
+* Fixed http://rt.cpan.org/Public/Bug/Display.html?id=36164
+  Doc patch for "covered info" from Martin Kutter. Thanks for that!
+
+* New feature "covered covering --source_file=FILE --sub=SUB"
+
+
+
+
+0.010
+-----
+
+* Fixed a rather stupid bug in "covered" script.
+
+
+
+0.009
+-----
+
+* Added option --rex_skip_source_file to specify (multiple) regexes to
+  skip reporting on source files.
+
+* New query feature "covered subs --source_file=FILE"
+
+
+
+0.008
+-----
+
+* "covered info" now outputs version
+
+* Moved storage of metric types to its own table in order to save disk
+  space.
+
+* Memoized lookup tables
+
+
+
+0.007
+-----
+
+* Avoid collection information for the "prove" program (or calling
+  files matching --rex_skip_calling_file).
+
+
+
+0.006
+-----
+
+* Moved storage of file names to its own table in order to save disk
+  space.
+
+* Moved covered database from cover_db/covered to ./covered
+
+
+
+0.005
+-----
+
+* Fixed bug
+
+
+
+0.004
+-----
+
+* Store db size and time by only storing subroutine coverage
+
+* File progress during "covered run"
+
+
+
+0.003
+-----
+
+* covered by --test_file=FILE
+
+
+
+0.002
+-----
+
+* Misc basic things like portable tests, deps in Build.PL, etc.
+
+* covered info -- List all known files for easy reference
+
+
+
+0.001
+-----
+
+* covered runs
+
+* covered coverage --source_file=FILE
+
+* First release. The first basic feature done, let's see how a release looks like on
+  CPAN.
+

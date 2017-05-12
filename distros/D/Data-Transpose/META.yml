@@ -1,0 +1,34 @@
+---
+abstract: 'iterate, filter and validate data, and transpose to different field names'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Transpose
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Business::CreditCard: '0.32'
+  Email::Valid: '0'
+  Module::Load: '0'
+  Moo: '0'
+  MooX::Types::MooseLike: '0'
+  Scalar::Util: '0'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  bugtracker: https://github.com/racke/Data-Transpose/issues
+  repository: https://github.com/racke/Data-Transpose
+version: '0.0023'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

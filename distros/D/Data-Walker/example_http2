@@ -1,0 +1,66 @@
+#!/usr/bin/perl -w
+#-------------------------------------------------------
+# sample_http2
+#
+# Here we demonstrate walker_http.pl. 
+#
+# As an example, we set up an LWP client and fetch
+# a web page.  We need to create UserAgent, Request
+# and Response objects. Using the function 
+# walk_via_HTTP_daemon(), we can walk these objects 
+# from a Web browser.
+#
+# This script requires that you have the LWP and the HTTP
+# bundles installed.  
+#-------------------------------------------------------
+
+use HTTP::Request;
+use LWP::UserAgent;
+use Getopt::Std;
+use Sys::Hostname;
+use Data::Walker;
+
+require 'walker_http.pl';
+
+use strict;
+
+use vars qw( $opt_p $opt_t );
+
+getopts('p:t:');
+
+my $PORT      = (defined $opt_p ? $opt_p :    0 );
+my $TIMEOUT   = (defined $opt_t ? $opt_t :  180 );
+my $HOST      = hostname(); 
+
+
+#----------------------------------------------
+# Create a sample object which we want to walk.
+# In this case, we are creating an HTTP client 
+# using LWP. 
+#
+
+my $url = "http://news.perl.org";
+my $ua  = new LWP::UserAgent;
+my $req = HTTP::Request->new (GET => $url);
+my $res = $ua->request($req);
+
+
+#---------------------------------------
+# Now we set up the Data::Walker object,
+# and then launch the HTTP daemon.
+#
+my $walk_target = {
+
+	url => $url,
+	ua  => $ua,
+	req => $req,
+	res => $res,
+};
+
+my $w = new Data::Walker;
+$w->warning(0);   # Disable warnings
+$w->walk( $walk_target );
+
+
+walk_via_HTTP_daemon($w,$TIMEOUT,$PORT,$HOST);
+

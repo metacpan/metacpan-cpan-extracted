@@ -1,0 +1,7 @@
+Revision history for Perl extension Decision::ACL.
+
+0.01  Mon Jul  9 13:34:25 2001
+	- original version; created by h2xs 1.19
+	- official CPAN release
+0.02  Fri Jul 27 21:27:12 2001
+	- Documentation fix in ACL.pod

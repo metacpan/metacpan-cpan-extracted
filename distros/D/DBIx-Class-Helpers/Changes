@@ -1,0 +1,399 @@
+Revision history for DBIx-Class-Helpers
+
+2.033003  2017-03-12 12:14:51-07:00 America/Los_Angeles
+ - Stop depending on String::CamelCase (closes GH#81)
+
+2.033002  2016-10-31 16:03:23-07:00 America/Los_Angeles
+ - Fix ::ProxyResultSetMethod to work when calling ->update
+   (Thanks for the report Ryan Voots!)
+ - Fix a number of warnings induced by upcoming DBIC (Thanks ribasushi!)
+
+2.033001  2016-08-22 22:09:34-07:00 America/Los_Angeles
+ - Fix a strictness error in a deprecated module (Thanks Niko Tyni!)
+
+2.033000  2016-07-03 22:02:03-07:00 America/Los_Angeles
+ - Add ::Schema::Verifier::ColumnInfo (Thanks Wes Malone!) (Closes GH#67)
+ - Uninserted rows do not set their storage value anymore
+   (Thanks for the report Wes Malone!) (Closes GH#69)
+
+2.032002  2016-05-24 10:00:16-07:00 America/Los_Angeles
+ - Fix variation in list context when using ::OnColumnMissing
+   (Thanks to David Farrell for the bug report!)
+   (Closes GH#63)
+
+2.032001  2016-04-13 22:01:03-07:00 America/Los_Angeles
+ - Fix simple deletion and updates for ::DateMethods1
+   (Thanks for the report Wes Malone and Erland Injerd, and the help to fix the
+   actual bug ribasushi!)
+
+2.032000  2015-11-07 10:34:14-08:00 America/Los_Angeles
+ - Add ::ResultClass::Tee
+
+2.031000  2015-07-25 01:20:40-07:00 America/Los_Angeles
+ - Add ::ResultSet::Bare (Closes GH#53)
+
+2.030002  2015-07-14 13:43:47-07:00 America/Los_Angeles
+ - Clarify docs for ::ResultSet::OneRow (Thanks for the tips Aran Deltac!)
+   (Closes GH#48)
+ - Add abstract to ::Row::JoinTable (Thanks Gregor Herrmann!)
+   (Closes GH#49)
+
+2.030001  2015-07-10 22:38:58-07:00 America/Los_Angeles
+ - Make ::Schema::Verifier aggregate errors instead of dying on first one
+
+2.030000  2015-07-01 10:11:42-07:00 America/Los_Angeles
+ - Add ::Row::OnColumnMissing (Thanks ZipRecruiter!)
+
+2.029000  2015-06-27 14:16:31-07:00 America/Los_Angeles
+ - Add ::ResultSet::OneRow (Thanks Aran Deltac!)
+
+2.028000  2015-05-30 17:06:01-05:00 America/Chicago
+ - Add ::Verifier::RelationshipColumnName (Thanks for the idea mcsnolte!)
+ - Add ::ResultSet::Shortcut::Search (Closes GH#44 and GH#47) (Thanks moltar!)
+
+2.027001  2015-05-16 11:47:15-05:00 America/Chicago
+ - Fix missing POD in ::ResultSet::Explain
+
+2.027000  2015-05-08 19:35:13-05:00 America/Chicago
+ - Add ::Verifier::Parent
+
+2.026000  2015-05-02 00:27:28-05:00 America/Chicago
+ - Add new ::Schema::Verifier framework
+ - ... including inaugural ::Verifier::C3
+
+2.025003  2015-04-06 16:28:20-05:00 America/Chicago
+ - Make ::OnColumnChange always allow mutating values before update
+ - Fix documented args for `after_column_change`
+ - Document ::OnColumnChange semantics a little bit more clearly
+
+2.025002  2015-03-21 00:03:43-05:00 America/Chicago
+ - Migrate ::RS::CorelateRelationship to an importable Util
+ - Correctly set a parent class for all helpers
+
+2.025001  2015-02-28 09:53:36-06:00 America/Chicago
+ - fix ::RS::Errors test on Windows
+
+2.025000  2015-02-20 22:50:47-06:00 America/Chicago
+ - Add ::Helper::ResultSet::Errors to help when calling Result methods on an RS
+
+2.024001  2014-11-25 19:16:41-06:00 America/Chicago
+ - Fix ::DidYouMean to override source instead of resultset (Thanks ribasushi
+   for the bug report!)
+
+2.024000  2014-11-02 09:02:44-06:00 America/Chicago
+ - Add ::Helper::Schema::DidYouMean to help with typos when calling ->resultset
+
+2.023007  2014-09-16 19:48:34-05:00 America/Chicago
+ - Fix ::Helper::ResultSet::DateMethods1 for Oracle (thanks Alexander Hartmaier!)
+ - Fix yet another issue with ->copy and proxied ResultSet methods (thanks again
+   moltar!)
+
+2.023006  2014-09-03 17:44:34-05:00 America/Chicago
+ - Fix a few ::DateMethods1 methods when using a bound date (vs a column)
+
+2.023005  2014-08-10 11:05:27-05:00 America/Chicago
+ - Fix ::Row::SelfResultSet to correctly include CSA (Thanks Steve Kleiman!)
+
+2.023004  2014-08-01 18:27:54-05:00 America/Chicago
+ - Fix implementation of ::Row::SelfResultSet (fixes GH#34, thanks ribasushi for
+   the heads up!)
+
+2.023003  2014-07-21 21:22:27-05:00 America/Chicago
+ - Fix ToJSON to use accessors if it needs to (Thanks Kevin Benson!)
+ - Fix silly typo in ::Explain (Good catch Jonathan W. Taylor!)
+
+2.023002  2014-06-28 15:04:15-05:00 America/Chicago
+ - Remove silly layer of subtesting (thanks to new features in Test::Roo)
+ - Remove silly sub wrapper in Explain internals (should moderately increase
+   performance)
+
+2.023001  2014-06-14 12:39:08-05:00 America/Chicago
+ - Add handy SYNOPSIS to ::DateMethods1 (thanks for asking rjbs!)
+
+2.023000  2014-05-26 19:33:01-05:00 America/Chicago
+ - Add ::Shortcut::Explain RS helper
+
+2.022000  2014-05-03 10:39:30-05:00 CST6CDT
+ - Add ::Shortcut::ResultsExist RS helper (Olaf Alders)
+ - Add abstract to ::DateMethods1::Announcement (Gregor Herrmann)
+
+2.021001  2014-04-06 11:43:36-05:00 America/Chicago
+ - Fix ::RemoveColumns to work with a specified `columns` (Anthony DeRobertis)
+   (Fixes GH#27) Also fixes RT#91977/GH#24)
+
+2.021000  2014-04-01 20:12:40-05:00 America/Chicago
+ - Create Shortcut::Page and Shortcut::LimitedPage ResultSet helpers (wreis)
+
+2.020001  2014-03-05 10:33:46CST-0600 America/Chicago
+ - Make ::DateMethods1 tests paralellizable (thanks Alexander Hartmaier!)
+ - fix ::Helper::ResultSet::DateMethods1 for Oracle (thanks Alexander Hartmaier!)
+ - fix ABSTRACT on ::Helper::ResultSet::DateMethods1
+
+2.020000  2014-03-04 08:31:39-06:00 America/Chicago
+ - Add ::Helper::ResultSet::DateMethods1
+ - Add abstract to ::Schema::LintContents
+
+2.019004  2014-02-14 07:53:19 America/Chicago
+ - Make IgnoreWantarray's search die in void context
+
+2.019003  2014-02-07 22:21:47-06:00 America/Chicago
+ - Fix ->copy on rows with proxied ResultSet methods (thanks moltar for the
+   test!) (NOTE: This fix is what requires upgrading to DBIC 0.08260)
+
+2.019002  2014-01-12 09:40:41 America/Chicago
+ - Pick SQL for random row selection in a cleaner way
+ - Stop using Class::MOP::load_class (RT#91035)
+ - Really stop using RT
+
+2.019001  2013-11-23 10:19:28 America/Chicago
+ - Fix typo in ::CorrelateRelationship (Getty)
+
+2.019000  2013-10-17 20:36:45 America/Chicago
+
+ - Create clean_rs row shortcut (wreis)
+ - Create DateTime schema helper (wreis)
+
+2.018004  2013-10-07 15:23:39 America/Chicago
+ - fix dep marked as test but actually runtime
+
+2.018003  2013-09-26 08:06:03 America/Chicago
+ - fix method shadowing with some helpers for ::Shortcut
+ - ::OrderByMagic now correctly passes through arrayrefs (moltar)
+ - ::OrderByMagic only prefixes with CSA when needed (moltar)
+
+2.018002  2013-07-30 18:45:10 CST6CDT
+ - ::Helper::ResultSet correctly uses all Helpers (reported by moltar)
+   Note that some deprecated helpers were removed from ::ResultSet, so check
+   your code to see if you use the as_virtual_view method.  If you do, replace
+   it with as_subselect_rs and you'll be fine.
+ - Fix return precedence in test (Reini Urban)
+
+2.018001  2013-07-02 20:40:18 CST6CDT
+ - Fix bug related to inheriting from ::Shortcut
+
+2.018000  2013-06-22 17:03:29 CST6CDT
+ - Add ::ResultSet::Shortcut::OrderByMagic (moltar)
+ - Add ::ResultSet::Shortcut::Prefetch (Wallas Reis)
+ - Add ::ResultSet::Shortcut::HasRows (Wallas Reis)
+ - Add ::ResultSet::Shortcut::Limit (Wallas Reis)
+ - make ::ResultSet::Me more flexible (moltar)
+ - Fix some warnings (when using deprecated modules) (good catch Bill
+   Mosely)
+ - Fix lots of docs (moltar, Gregor Herrmann, mauke)
+
+2.017000  2013-04-20 10:37:04 CST6CDT
+ - Add ::Schema::QuoteNames to force quote_names on
+ - Add normalize_connect_info utilitiy
+
+2.016006  2013-04-12 09:14:23 CST6CDT
+ - Remove use of a private method, thus fixing Helpers on v0.08210
+ - Remove the last vestige of non-in-memory SQLite
+ - Stop using RT for bugtracking
+
+2.016005  2013-01-23 19:00:09 CST6CDT
+ - Fix hash order dependency bug (Thanks Fitz Elliott!)
+
+2.016004  2013-01-09 20:05:57 CST6CDT
+ - Add more storages for ::ResultSet::Random (Thanks José Diaz Seng!)
+
+2.016003  2012-12-07 15:54:29 CST6CDT
+ - Fix bug in dup_check_source_auto and fk_check_source_auto.  If
+   any of the broken things were multiple they explode in the hashref.
+   The solution is to force the values to be resultsets, which is how
+   the helper is documented anyway. (thanks MST for finding this)
+
+2.016002  2012-11-17 15:31:12 CST6CDT
+ - Put MetaYAML back in dist
+
+2.016001  2012-11-02 17:52:43 CST6CDT
+ - fix OnColumnChange to work with relationship based updates
+   so $artist->update({ cd => $cd_obj }) now correctly triggers
+   a change.  Thanks David Schmidt for the test
+ - validate number of arguments to _change_column (David Schmidt)
+ - fix name of Helper::ResultSet::Shortcut in SYNOPSIS
+
+2.016000  2012-10-25 21:35:05 CST6CDT
+ - Add Helper::ResultSet::Shortcut (Wes Malone)
+
+2.015001  2012-09-13 21:19:40 America/Chicago
+ - Correctly dep on Sub::Exporter::Progressive 0.001006
+
+2.015000  2012-08-01 18:00:31 America/Chicago
+ - Add order_by_visitor ::Util
+
+2.014003  2012-07-28 14:21:26 America/Chicago
+ - Add EXAMPLES to CorrelateRelationship
+
+2.014002  2012-07-10 21:41:17 America/Chicago
+ - Tests are fully in memory for speed and parallelization
+
+2.014001  2012-07-03 08:34:21 America/Chicago
+ - Stop breaking ::IgnoreWantarray with ::CorrelatedRelationship
+
+2.014000  2012-06-30 00:16:13 America/Chicago
+ - Add ::Row::ProxyResultSetUpdate helper
+ - fully qualify columns in ::SelfResultSet
+
+2.013003  2012-06-28 08:04:13 America/Chicago
+ - Redist due to broken release
+
+2.013002  2012-06-17 22:22:45 America/Chicago
+ - Lots of misc documentation cleanup
+
+2.013001  2012-06-11 17:40:04 America/Chicago
+ - fix Changes (left off only change in 2.013000)
+
+2.013000  2012-06-07 20:41:13 America/Chicago
+ - Add Helper::Row::ProxyResultSetMethod
+
+2.012000  2012-06-05 21:23:16 America/Chicago
+ - Add Helper::ResultSet::NoColumns
+
+2.011000  2012-06-03 16:12:54 America/Chicago
+ - Add Helper::Row::SelfResultSet
+
+2.010001  2012-05-26 10:58:50 America/Chicago
+ - Make ::Schema::LintContents marginally more useful in that it no
+   longer needlessly limits your sources to one moniker only
+
+2.010000  2012-05-17 21:26:47 America/Chicago
+ - Add Helper::Schema::LintContents
+
+2.009001  2012-05-11 11:00:51 America/Chicago
+ - Stupid doc fix
+
+2.009000  2012-05-11 10:45:15 America/Chicago
+ - add Helper::ResultSet::SearchOr component to avoid Union when possible
+ - Simplify implementation of CorrelatedRelationship to work with more
+   versions of DBIx::Class
+
+2.008000  2012-05-09 13:36:28 America/Chicago
+ - Add Helper::ResultSet::CorrelatedRelationship for easy correlated
+   subqueries
+
+2.007004  2012-04-11 19:53:51 America/Chicago
+ - Fix ::OnColumnChange to not obliviate args passed to update
+
+2.007003  2012-02-29 19:56:57 CST6CDT
+ - Fix ::Row::NumifyGet breaking when using select/as or columns
+
+2.007002  2012-01-09 16:23:08 CST6CDT
+ - Fix POD in AutoRemoveColumns (mattp)
+ - Fix multiple level deep Result namespaces (Siddhartha Basu)
+
+2.007001  2011-08-17 22:34:54 CST6CDT
+ - Fix dependency (add Carp::Clan)
+
+2.007000  2011-03-14 21:43:20 CST6CDT
+ - Add Helper::Row::RelationshipDWIM for handy definition of relationships
+ - Significantly simplify implementation of ResultSet::ResultClassDWIM
+   (thanks ribasushi)
+
+2.006000  2011-01-31 18:06:56 CST6CDT
+ - Add ResultSet::ResultClassDWIM to allow ::HashRefInflator (or ::HRI)
+ - Add Schema::GenerateSource for handy addition of subclassed results
+
+2.005000  2010-10-13 19:39:56 CST6CDT
+ - Add ResultSet::Me to define predefined searches a more nicely
+ - Fix DBIx::Class::Helper::ResultSet::Random to not base off Union
+ - Fix DBIx::Class::Helper::ResultSet::Random for MSSQL
+
+2.004000  2010-07-29 21:06:58 CST6CDT
+ - Add Row::StorageValues
+ - Add Row::OnColumnChange
+ - Add Candy exports
+
+2.003002  2010-03-24 23:48:52 CST6CDT
+ - Give up on generating test database; I need to test this out
+   with development releases
+
+2.003001  2010-03-23 18:41:04 CST6CDT
+ - Try again to correctly generate test database
+
+2.003000  2010-03-22 21:27:14 CST6CDT
+ - Fix tests to correctly generate test database
+ - Stop bundling sqlite database with distribution!
+ - Change DBICH::Union into DBICH::SetOperations (nothingmuch)
+
+2.002002  2010-03-14 20:18:59 CST6CDT
+ - DBIx::Class::Helper::ResultSet::Random declared RAND() as the
+   random function for PostgreSQL when Pg uses RANDOM(). This
+   broke any use of that resultset on PostgreSQL. -avar
+
+2.002001  2010-03-13 00:46:30 CST6CDT
+ - Fix my silly Union code
+ - Fix error message from Util for incorrectly design namespace
+ - Fix SYNOPSES to point to correct Components
+ - Change as_virtual_view to just pass through to the cored version, as_subselect_rs
+
+2.00200   2010-02-05 14:15:06 CST6CDT
+ - Allow multiple levels for result in namespace for get_namespace_parts
+   (aka, Foo::Schema::Result::Baz::Biff) (for melo)
+ - Add Helper::Row::ToJSON
+ - Autopopulate is_numeric correcly with NumifyGet
+ - Fix mssql Random to use RAND() (pldoh, #RT53885)
+
+2.00102   2010-01-15 21:50:20 CST6CDT
+ - Better performance for some cases in NumifyGet
+ - _determine_driver is better than _ensure_connected ( Random )
+
+2.00101   2010-01-15 02:14:55 CST6CDT
+ - fix bug in Random where if a user calls random and schema isn't
+   connected yet we get false storage type (thanks jnap)
+ - fix NumifyGet for nullable and autoinc columns
+
+2.00100   2010-01-13 23:37:34 CST6CDT
+ - fix 'me' in RS::Union
+ - change order in RS::Union so Unioning RS is first instead of last
+ - add Row::NumifyGet
+ - add docs to RS::Union to clarify some of the awesomeness that can be had
+ - fixed union because it didn't actually work before (!!!)
+
+2.00000   2009-12-30 13:02:23 CST6CDT
+ - No new changes since dev release
+
+2.00000_2 2009-12-29 18:45:15 CST6CDT
+ - note added to SubClass disambiguating it from
+   DBIx::Class::DynamicSubclass (thanks jnap)
+ - random_order_by is now private (_random_order_by)
+ - Depend on String::CamelCase now that it's fixed
+
+2.00000_1 2009-12-28 11:40:43 CST6CDT
+ - No longer depend on SQLT
+ - Switch to more user friendly versioning
+ - Allow multiple random rows from Random
+ - Add the most excellent Helper::ResultSet::Union
+ - namespace helpers
+
+1.093501  2009-12-16 16:32:55 CST6CDT
+ - Fix deps list
+
+1.093500  2009-12-16 16:12:00 CST6CDT
+ - Add IgnoreWantarray helper
+ - Pull column def information from foreign tables
+   for JoinTable helper, see pod in helper for details
+
+0.093270 Mon Nov 23 10:45 2009
+ - Add Random helper
+ - Clean up as_virtual_view with recommendation from ijw and ribasushi
+
+0.093140 Tue Nov 10 09:32 2009
+ - Fix DBIC version dep
+ - Get rid of some warnings from the test suite
+
+0.093071 Tue Nov 03 20:53 2009
+ - Fix package of VirtualView
+ - Add test so that won't happen again
+
+0.093070 Mon Nov 02 23:16 2009
+ - Add virtual view method to clean SQL namespace
+ - Add methods to generate has_many and many_to_many for join tables
+ - Hopefully fix deps for real
+
+0.093000 Sat Oct 26 19:40 2009
+ - Add parent as a dependency
+ - Super basic POD cleanup
+ - Tighter Restrictions on the namespaces of parent classes
+
+0.092970 Sat Oct 24 02:41 2009
+ - Initial Release

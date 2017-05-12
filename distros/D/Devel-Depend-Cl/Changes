@@ -1,0 +1,14 @@
+Revision history for Perl extension Devel::Depend::Cpp.
+
+0.04  Sun Mar 19 2006
+	CHANGED: export $PreprocessorDepend instead for using globs, this is a synch for pbs 0.40
+	CHANGED: Documentation to reflect latest changes and made the documentation more attractive
+
+0.03  Sun Nov 27
+	ADDED: recovered from locally installed module after svk rm adventure
+
+0.02  lost to svk rm bug
+
+0.01  Wed Jun 15 14:21:00
+	Created distribution from module
+	

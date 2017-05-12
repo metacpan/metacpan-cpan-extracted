@@ -1,0 +1,18 @@
+Revision history for Devel::DidYouMean
+
+0.04    2014-10-26=9
+        - Skips adding AUTOLOAD sub to namespaces that already have one defined
+        - Removed 5.014 dependency
+
+0.03    2014-10-26
+        - Added CHECK block to ensure AUTOLOADING code is run after all modules are loaded
+        - Added Perl::Builtins dependency for function list
+        - Updated Pod
+
+0.02    2014-10-25
+        - Changed method to return list of matching subs in case there is more than one "best" match
+        - Added code to ignore sub calls for INIT, DESTROY etc
+
+0.01    2014-10-25
+        - Initial experimental build
+

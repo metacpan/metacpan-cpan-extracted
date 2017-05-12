@@ -1,0 +1,33 @@
+DMTF-CIM-MOF version 0.05
+
+This module parses MOF files as defined by the DMTF's DSP0004 into a complex
+perl datastructure.  This module is mostly intended for use via DMTF::CIM
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+DMTF::CIM::MOF depends on the DMTF::CIM and Storable module.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Broadcom Corporation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

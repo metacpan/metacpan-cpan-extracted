@@ -1,0 +1,42 @@
+---
+abstract: 'Code coverage metrics, with history'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1203, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-coverh
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Zilla::App::Command::coverh:
+    file: lib/Dist/Zilla/App/Command/coverh.pm
+    version: '0.0100'
+requires:
+  DateTime: '0'
+  Dist::Zilla::App: '5.000'
+  File::Temp: '0'
+  File::chdir: '0'
+  JSON::MaybeXS: '0'
+  Path::Tiny: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Zilla-App-Command-coverh/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-App-Command-coverh
+  repository: https://github.com/Csson/p5-Dist-Zilla-App-Command-coverh.git
+version: '0.0100'

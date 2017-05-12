@@ -1,0 +1,11 @@
+use strict; use warnings;
+use Test::More tests => 9;
+use_ok qw(Devel::WxProf::Treemap::Squarified);
+use_ok qw(Devel::WxProf::Treemap::Output::Imager);
+use_ok qw(Devel::WxProf::Preferences);
+use_ok qw(Devel::WxProf::Treemap);
+use_ok qw(Devel::WxProf::Grid);
+use_ok qw(Devel::WxProf::Reader::WxProf);
+use_ok qw(Devel::WxProf::Reader::DProf);
+use_ok qw(Devel::WxProf::Data);
+use_ok qw(Devel::WxProf);

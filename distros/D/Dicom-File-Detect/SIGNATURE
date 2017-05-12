@@ -1,0 +1,54 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 803d2c12ed2c1cfc35d96315a14e3a2330064a08 Changes
+SHA1 50b835c5a91f2ef9a9f048f9c6ccddc127e71fd8 Detect.pm
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 301bba1fd81d4b5e3e75ae1f0b1945b84d6aa2c7 MANIFEST
+SHA1 2db0b850287f3e22f49246a11231417f53e06edb META.yml
+SHA1 c64dd013d152f85cfa8199dcc5c06e0d36479d46 Makefile.PL
+SHA1 e9f358e9368cb350032d4b308aa128a5fe0f0a31 README
+SHA1 23200c18bf10a4ab2ccffbd56a7956205885ea93 examples/ex1.pl
+SHA1 9afbed59fa1fdae4fd34f4cec7e445348c1926ee examples/ex2.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 10bcdaed8136f2bc943c3d209bf713fc48f3230a t/Dicom-File-Detect/01-use.t
+SHA1 632bc45aee03aa04b5af27a13fb24a4b8ba7ec66 t/Dicom-File-Detect/02-version.t
+SHA1 fe66caaadcac669100684bc479a5833d83c2cab5 t/Dicom-File-Detect/03-dicom_detect_file.t
+SHA1 f1d2d2f924e986ac86fdf7b36c94bcdf32beec15 t/data/ex1.dcm
+SHA1 8ec8a417e409f0941a842ebc7e202fd409669979 t/data/ex2.dcm
+SHA1 b0198a9cd6a203058aabbb34b76548f7bfd3d169 xt/Dicom-File-Detect/01-pod_coverage.t
+SHA1 b2b746a9f62ebca2fda8eb788b6c4011b8e4de0e xt/Dicom-File-Detect/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWHXiKAAoJEJe+XXKaIuTlqp8H/2+wnXIF0U0/nNA1BF1YDIe0
+14UfZ+Jy+e0Iu9SWX22ZogeK1/V+ZeJqOUxuDnPCqf/dhD19mIDGSPOhv6GpfjGI
+VE33jS6eM1crFF8P8IY/JG1MbeBjK/ormgfN50j5tQZk24kMUm/baq97PS5SEPA+
+9tvsF8Oy0KKin9m+MYmY88fxvdYY1CnlET45nVlPkrYJrC35Y/KHNdqLZdkNFLDf
+wh/fTLopF/FPGsAEcDWrcVLNb8MGjlQtUgfsqC+aLWnLPyamD83RW44D0kbr4zIg
+Mak5TdPVb18rj8yXDirs95M4sT/ITF3rRon5R4Oo55pjtPsRsLLpbwmZPYF79fs=
+=ARej
+-----END PGP SIGNATURE-----

@@ -1,0 +1,9 @@
+logger: file
+log: info
+warnings: 1
+show_errors: 1
+auto_reload: 0
+
+plugins:
+  Legacy::Routing:
+    log: 1

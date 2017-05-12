@@ -1,0 +1,127 @@
+#!/usr/local/bin/perl -w
+use strict;
+use warnings;
+use FindBin qw( $Bin );
+use lib "$Bin/lib";
+use Getopt::Long;
+use Pod::Usage;
+use DBICx::AutoDoc;
+our $VERSION = '0.03';
+
+Getopt::Long::Configure( "bundling" );
+
+my ( %config );
+GetOptions(
+    'help'                  => \my $help,
+    'list'                  => \my $list,
+    'template=s'            => \my @templates,
+    'include|I=s'           => \my @lib,
+    'lib|l'                 => sub { lib->import( 'lib' ) },
+    'blib|b'                => sub { require blib; blib->import },
+    'connect!'              => \$config{ 'connect' },
+    'schema|S=s'            => \$config{ 'schema' },
+    'dsn=s'                 => \$config{ 'dsn' },
+    'user=s'                => \$config{ 'user' },
+    'pass=s'                => \$config{ 'pass' },
+    'output=s'              => \$config{ 'output' },
+    'graphviz_command=s'    => \$config{ 'graphviz_command' },
+    'graphviz-command=s'    => \$config{ 'graphviz_command' },
+    'include_path=s'        => \$config{ 'include_path' },
+    'include-path=s'        => \$config{ 'include_path' },
+);
+lib->import( @lib ) if @lib;
+
+for my $key ( keys %config ) {
+    if ( ! defined $config{ $key } ) { delete $config{ $key } }
+}
+for my $x (qw( graphviz_command )) {
+    if ( $config{ $x } ) {
+        $config{ $x } = [ split( ' ', $config{ $x } ) ];
+    }
+}
+
+if ( $help ) { pod2usage( 0 ) }
+
+pod2usage( "$0: Need the schema to document!" ) unless $config{ 'schema' };
+
+my $autodoc = DBICx::AutoDoc->new( %config );
+
+if ( $list ) {
+    for ( $autodoc->list_templates ) { print "$_\n" }
+    exit;
+}
+
+if ( @templates ) {
+    $autodoc->fill_templates( @templates );
+} else {
+    $autodoc->fill_all_templates;
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+dbicx-autodoc - Document a DBIx::Class::Schema object
+
+=head1 SYNOPSIS
+
+Document the ExampleDB schema into the current directory:
+
+    dbicx-autodoc --schema=ExampleDB
+
+Document the ExampleDB schema, but put the output files into /tmp:
+
+    dbicx-autodoc --schema=ExampleDB --output=/tmp
+
+See C<perldoc dbicx-autodoc> for more information.
+
+=head1 OPTIONS
+
+See L<DBICx::AutoDoc> for more detailed explanation of some of these options.
+
+=head2 --help
+
+=head2 --list
+
+=head2 --template=<template>
+
+=head2 --include=<path> or -I <path>
+
+=head2 --lib or -l
+
+=head2 --blib or -b
+
+=head2 --connect
+
+=head2 --schema=<class>
+
+=head2 --dsn=<dsn>
+
+=head2 --user=<user>
+
+=head2 --pass=<password>
+
+=head2 --output=<directory>
+
+=head2 --graphviz-command=<command>
+
+=head2 --include-path=<directory>
+
+=head1 SEE ALSO
+
+L<DBICx::AutoDoc|DBICx::AutoDoc>,
+L<http://www.jasonkohles.com/projects/DBICx-AutoDoc>.
+
+=head1 AUTHOR
+
+Jason Kohles C<< <email@jasonkohles.com> >>
+
+=head1 LICENSE
+
+This program is free software.  You can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+

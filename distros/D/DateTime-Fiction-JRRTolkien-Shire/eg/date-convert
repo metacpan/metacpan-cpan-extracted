@@ -1,0 +1,142 @@
+#!/usr/bin/env perl
+
+use 5.008004;
+
+use strict;
+use warnings;
+
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+
+our $VERSION = '0.902';
+
+my %opt = (
+    from	=> 'DateTime',
+    to		=> 'DateTime::Fiction::JRRTolkien::Shire',
+);
+
+GetOptions( \%opt,
+    qw{ from=s reverse! to=s },
+    'instantiater=s'	=> \( my $instantiater = 'new' ),
+    'serializer=s'	=> \( my $serializer ),
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+$opt{reverse}
+    and @opt{ qw< to from > } = @opt{ qw< from to > };
+
+foreach my $key ( qw{ from to } ) {
+    local $@ = undef;
+    eval "require $opt{$key}; 1"
+	or die $@;
+}
+
+my $from = $opt{from}->$instantiater( @ARGV );
+
+my $to = $opt{to}->from_object( object => $from );
+
+my $calendar;
+if ( my $code = $to->can( 'calendar_name' ) ) {
+    $calendar = $code->( $to );
+} else {
+    ( $calendar = $opt{to} ) =~ s/ .* :: //smx
+	or $calendar = 'Gregorian';
+}
+
+if ( $serializer ) {
+    print $to->$serializer(), " $calendar\n";
+} else {
+    print "$to $calendar\n";
+}
+
+__END__
+
+=head1 TITLE
+
+date-convert - Convert dates from one calendar to another.
+
+=head1 SYNOPSIS
+
+ date-convert year 2016 month 4 day 1
+ date-convert -reverse year 1419 holiday 3
+ date-convert -help
+ date-convert -version
+
+=head1 OPTIONS
+
+=head2 -from
+
+This option specifies the class to be converted from.
+
+The default is C<-from=DateTime>.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -instantiater
+
+This option specifies the name of the method used to instantiate the
+object to be converted from.
+
+The default is C<'new'>.
+
+=head2 -reverse
+
+If asserted, this Boolean option specifies that a reverse conversion is
+to be done. It works by swapping the values of the C<-from> and C<-to>
+options, whether specified or defaulted.
+
+The default is C<-noreverse>.
+
+=head2 serializer
+
+This option specifies the name of the method to be used to serialize the
+object converted to. This method must not take any arguments. If a false
+value, the object is stringified.
+
+The default is C<undef>.
+
+=head2 -to
+
+This option specifies the class to be converted to.
+
+The default is C<-to=DateTime::Fiction::JRRTolkien::Shire>.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script uses L<DateTime|DateTime> modules to convert from one
+calendar to another.
+
+The command-line arguments are passed verbatim to the C<-from> class'
+C<new()> method. The resultant object is passed to the C<-to> class'
+C<from_object()> method, and the result of that method is stringified.
+
+By default, this script converts from C<DateTime> to
+C<DateTime::Fiction::JRRTolkien::Shire>, thus converting the given date
+from Gregorian to Shire Reckoning.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

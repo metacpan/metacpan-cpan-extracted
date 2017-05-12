@@ -1,0 +1,90 @@
+=head1 NAME
+
+C<Devel::MAT::Tool> - extend the ability of C<Devel::MAT>
+
+=head1 DESCRIPTION
+
+The C<Devel::MAT::Tool::> namespace provides a place to store plugins that
+extend the abilities of L<Devel::MAT>. Such tools can be used to provide extra
+analysis or display capabilities on the UI. It can interact with the UI by
+calling methods in the L<Devel::MAT::UI> package.
+
+A tool should be placed in the namespace and provide an object class. It does
+not need to inherit from anything specific. Tools will be constructed lazily
+by the UI as requested by the user.
+
+=head1 METHODS
+
+The following methods should provided on a tool class.
+
+=head2 FOR_UI
+
+  $display = CLASS->FOR_UI
+
+If the tool should be displayed on the UI's C<Tools> menu, this constant
+method should be provided to return a true value.
+
+=head2 CMD
+
+  $cname = CLASS->CMD
+
+If the tool provides a named command for the commandline, this constant method
+should be provided to return its name.
+
+=head2 AUTOLOAD_TOOL
+
+  $load = CLASS->AUTOLOAD_TOOL( $pmat )
+
+If the tool should be automatically loaded for the given file, this method
+should be provided to return a true value. This might be useful to provide
+extra analysis if the tool detects it can provide something useful; for
+example when the tool peeks inside objects of specific classes, and those
+classes are found in the file.
+
+=head2 new
+
+  $tool = CLASS->new( $pmat, %args )
+
+Constructs the instance of the tool. If the tool does not need to store any
+instance data, this may instead simply return the class name.
+
+This will be passed the L<Devel::MAT> object itself, and additional arguments
+as named parameters.
+
+=over 4
+
+=item progress => CODE
+
+If provided, the tool should call this function occasionally if it has to
+perform a long-running task, such as a calculation across the entire heap,
+that may take some time. The function should be passed a status string to
+indicate progress on the UI; the UI will display it and flush pending input
+events to ensure the interface remains moderately responsive to user input.
+
+=back
+
+=head2 init_ui
+
+  $tool->init_ui( $ui )
+
+Asks the tool to initialise any UI elements it may require, by calling methods
+on the given C<$ui>. This may be an object, or the package name
+C<Devel::MAT::UI> directly.
+
+=cut
+
+=head1 SVs
+
+Tools may, and are encouraged to where appropriate, add methods to the
+C<Devel::MAT::SV> package to access results of analysis or perform other
+related activities. All SVs are implemented as blessed HASH references, and
+tools may use keys beginning C<tool_...> in it. Key and method names should be
+namespaced appropriately according to the tool name, to avoid collisions.
+
+=cut
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

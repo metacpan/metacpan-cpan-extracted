@@ -1,0 +1,32 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertCodeOutput]
+     ;make_verbatim=1
+
+    In your POD:
+
+     # CODE: require MyLib; MyLib::gen_stuff("some", "param");
+
+DESCRIPTION
+
+    This module finds # CODE: ... directives in your POD, evals the
+    specified Perl code while capturing the output using Capture::Tiny's
+    capture_merged (which means STDOUT and STDERR output are both
+    captured), and insert the output to your POD as verbatim paragraph
+    (indented with a whitespace), unless when make_verbatim is set to 0
+    then it is inserted as-is. If eval fails ($@ is true), build will be
+    aborted.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertCodeResult which is similar and uses the
+    same # CODE directive, but instead of inserting output, will insert the
+    result of the code (which can be a reference, in which case will be
+    dumped using Data::Dump).
+
+    Dist::Zilla::Plugin::InsertCommandOutput
+
+    Dist::Zilla::Plugin::InsertExample
+

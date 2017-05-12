@@ -1,0 +1,6 @@
+sub is_os {
+  foreach my $os (@_) {
+    return 1 if $os eq $^O;
+  }
+  return 0;
+}

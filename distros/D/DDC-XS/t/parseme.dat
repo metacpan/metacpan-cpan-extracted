@@ -1,0 +1,36 @@
+#-*- Mode: Shell-Script; coding: utf-8; -*-
+#
+# File: t/parseme.dat
+# Description: query-parsing test data
+# Format:
+#  + comment lines begin with "#"
+#  + data lines are TAB-separated with 2 or 3 fields: QUERY1 "\t" QUERY2 ("\t" COMMENT)?
+#  + QUERY1->toJson() should be identical to QUERY2->toJson()
+#  + by convention, QUERY1 are "naive" or "bareword" queries, and QUERY2 are explicitly constructed and/or quoted
+
+#-- basic
+foo	'foo'
+etc.	'etc.'
+etc.	etc\.
+
+##-- match-ids
+foo=1	'foo' =1
+$l=foo=1	$l='foo' =1
+
+##-- mantis #17708: implicit conjunction regexes
+/foo/ /bar/	/foo/ && /bar/
+
+#-- mantis #14812: numeric prefixes
+19*	'19'*
+
+#-- mantis #19051: hyphenated symbols
+80er	'80er'
+6-er	'6-er'
+1-2-3	'1-2-3'
+2+4-Vertrag	'2+4-Vertrag'
+
+#-- mantis #19051: count-by
+count(x) #by[$w=1+1]	count(x) #by[$w =1 +1]
+count(x) #by[$w=1-1]	count(x) #by[$w =1 -1]
+count(x) #by[$w+1]	count(x) #by[$w +1]
+count(x) #by[$w-1]	count(x) #by[$w -1]

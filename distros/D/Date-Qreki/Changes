@@ -1,0 +1,33 @@
+Revision history for perl module Date::Qreki
+
+0.07 2017-01-31
+
+* Documentation
+* Added Japanese documentation as separate document
+* Export check_24sekki
+
+0.06 2017-01-31
+
+* Documentation
+* Internals to Unicode
+
+0.05 2014-02-12
+
+* Licence terms rewrite
+
+0.04 2014-02-11
+
+* Fix problem with POD encoding.
+* Add note on module's lack of documentation.
+
+0.03 2014-02-11
+
+* Add licence conditions to POD in Japanese and translated.
+* Add original files to distribution as per licence conditions.
+
+0.02 2014-02-07
+
+* Add "Changes" and "README" to distribution.
+
+0.01 2013-03-09
+

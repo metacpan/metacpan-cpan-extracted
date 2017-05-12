@@ -1,0 +1,66 @@
+{
+   "abstract" : "Code coverage metrics for your distribution",
+   "author" : [
+      "Marcel Gr\u00c3\u00bcnauer <marcel@cpan.org>",
+      "Mike Doherty <doherty@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300016, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-App-Command-cover",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Cover" : "0",
+            "Dist::Zilla::App" : "0",
+            "File::Temp" : "0",
+            "File::chdir" : "0",
+            "Path::Class" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/doherty/Dist-Zilla-App-Command-cover/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/doherty/Dist-Zilla-App-Command-cover.git",
+         "web" : "https://github.com/doherty/Dist-Zilla-App-Command-cover"
+      }
+   },
+   "version" : "1.101001"
+}
+

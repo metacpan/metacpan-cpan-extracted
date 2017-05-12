@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<employees xmlns="http://my.name.space/" xmlns:ns1="http://your.name.space/" ns1:total="0">
+  <a:employee xmlns:a="http://my.name.space/" xmlns:m="http://my.name.space/" xmlns:sql="http://boojum.org.uk/NS/XMLServer" xmlns:y="http://your.name.space/" id="1">
+    <a:name>John Smith</a:name>
+    <y:login>john</y:login>
+  </a:employee>
+</employees>

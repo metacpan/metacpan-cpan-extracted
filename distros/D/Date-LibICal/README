@@ -1,0 +1,27 @@
+Date-LibICal version 0.01
+=========================
+
+Date::LibICal is a non-complete interface for libical. Currently
+it is only useful to convert implicit icals into a list of explicit
+timeslots.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module only works under Perl 5.12.4 or later.
+It requires libical.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Andreas 'ac0v' Specht
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

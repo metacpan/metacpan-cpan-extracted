@@ -1,0 +1,141 @@
+Revision history for Dancer2::Plugin::PageHistory
+
+0.210 Thu  6 Oct 18:45:13 CEST 2016
+
+    [TESTS]
+
+    * use DBIx::Class::Optional::Dependencies for SQLT deps in session-dbic.t
+      so that tests will be skipped if deploy deps are not sufficient. Fixes:
+      http://www.cpantesters.org/cpan/report/ef622608-7095-11e6-b0d4-db1a5d222160
+
+    * Switch from JSON to JSON::MaybeXS in tests
+
+0.209 Thu  6 Oct 17:39:11 CEST 2016
+
+    [ENHANCEMENTS]
+
+    * Add request_path attribute and request_uri method to Page object. This
+      allows the full request path to be retrieved when app is not mounted
+      on '/' since path and request_path will be different in that case.
+
+0.208 Fri 26 Aug 15:04:11 CEST 2016
+
+    [TESTS]
+
+    * Session::Redis must be at least 0.008 for tests.
+      This is due to D2 flipping from MooX::Types::MooseLike to Type::Tiny
+      and then back again.
+
+    * Session::Cookie test had wrong 'session' setting closes GH #4.
+      Somehow managed to set session to 'DBIC' so were not actually testing
+      against Session::Cookie but actually against Session::DBIC.
+      Thanks to andk for heads up.
+
+0.207 Mon 22 Aug 18:06:34 CEST 2016
+
+    [TESTS]
+
+    * Improve check for non-running MongoDB server (GH#3, Slaven Rezić)
+
+0.206 Sun 21 Aug 13:21:27 CEST 2016
+
+    [TESTS]
+
+    * Update type check tests to cope with Dancer2 switch back to
+      MooX::Types::MooseLike
+
+0.205 Mon 25 Jul 16:40:40 CEST 2016
+
+    [TESTS]
+
+    * Session::Redis tests need Sereal::Decoder and Sereal::Encoder
+
+0.204 Thu 21 Jul 10:51:01 CEST 2016
+
+    [TESTS]
+
+    * Skip tests if connection to redis fails in session-redis.t instead
+      of having tests fail.
+
+    [MISC]
+
+    * use strict and warnings (kwalitee)
+    * set pod encoding to utf8
+
+0.203 Wed 20 Jul 14:17:53 CEST 2016
+
+    [TESTS]
+
+    * have session tests diag the engine version
+    * Make sure we have a working memcached server in tests. Closes GH#1.
+
+0.202 Mon  6 Jun 13:56:57 CEST 2016
+
+    [ENHANCEMENTS]
+
+    * Support added (with tests) for the following Session engines:
+      CGISession, Memcached, MongoDB, PSGI, Sereal
+
+0.201 Fri  3 Jun 20:49:34 CEST 2016
+
+    * Add support for Dancer2::Session::Redis
+
+0.200 Fri  3 Jun 18:50:28 CEST 2016
+
+    ** First release for Dancer2 **
+
+    Older changelog entries refer to the original Dancer1 plugin
+
+0.102 Mon 21 Sep 10:58:40 CEST 2015
+
+    * return empty list instead of undef for method calls with no history
+
+0.101 Fri Jun 12 19:57:59 CEST 2015
+
+    * update Plack build dep since older Plack::Test has no create method
+
+0.100 Sat May 30 12:01:45 CEST 2015
+
+    * cache history in var for request duration
+
+0.006 Fri May 29 12:30:40 CEST 2015
+
+    * improve robustness of memcache and DBIC tests
+
+0.005 Thu May 28 16:25:50 CEST 2015
+
+    * bugfix: page objects not unblessed when other code saves to session
+    
+0.004 Wed May 27 18:26:16 CEST 2015
+
+    [ENHANCEMENTS]
+
+    * Additional sessions engine: PSGI
+
+    [TESTS]
+
+    * switch from Dancer::Test to Plack::Test for plugin.t
+
+
+0.003 Tue May 26 16:44:39 CEST 2015
+
+    [ENHANCEMENTS]
+
+    * Additional sessions engines: CHI, Memcached, Memcached::Fast, MongoDB
+
+    [MISC]
+
+    * Simplify deflation by using Data::Structure::Util::unbless to simplify
+      support for additional session engines
+
+    [TESTS]
+
+    * Cleanup use of try_load_class in plugin.t
+
+0.002 Tue May 26 10:29:09 CEST 2015
+
+    * cleanup tests that caused smoker failures
+
+0.001 Mon May 25 19:39:00 CEST 2015
+
+    * Initial release

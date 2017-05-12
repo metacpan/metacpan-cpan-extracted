@@ -1,0 +1,5 @@
+- more tests
+- pure-Perl version
+- simplify Skein.xs by using the SHA3_api_ref.h only?
+- fix compilation on Solaris
+- get rid of libskein.a

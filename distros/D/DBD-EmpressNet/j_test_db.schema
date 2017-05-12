@@ -1,0 +1,6 @@
+create table テスト_テーブル (
+	名前	nlschar,
+	名字	nlschar,
+	年齢	integer,
+	識別子	longinteger);
+create unique index on テスト_テーブル (識別子);

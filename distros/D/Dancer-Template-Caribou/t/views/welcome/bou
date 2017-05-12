@@ -1,0 +1,14 @@
+use Template::Caribou::Tags::HTML ':all';
+
+has name => ( is => 'ro' );
+
+template page => sub {
+    my $self = shift;
+
+    html {
+        head { title { 'My App' } };
+        body {
+            h1 { 'hello ' . $self->name .'!' };
+        };
+    }
+};

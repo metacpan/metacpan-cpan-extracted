@@ -1,0 +1,17 @@
+.+\.swp
+\*\~
+\.prove/
+perltidy.LOG
+local/
+build/
+cover_db/
+\.build/
+Dancer-Plugin-BeforeRoute-.+
+cpanfile.*
+dist\.ini
+tools/
+config/
+docker-compose.yml
+Dockerfile
+Vagrantfile
+README.md

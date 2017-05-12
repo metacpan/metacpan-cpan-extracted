@@ -1,0 +1,8 @@
+Revision history for Dancer2::Plugin::Articulate
+
+v0.002 2015-02-22
+ - Documentation fixes
+ - skip_all on t/pod-coverage.t unless Test::POD::Coverage is installed
+
+v0.001 2015-02-21
+ - First release to CPAN. It's all very alpha.

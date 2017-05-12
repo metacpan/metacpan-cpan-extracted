@@ -1,0 +1,8 @@
+Revision history for Data-Stream-Bulk-AnyEvent
+
+v0.0.2    2012-11-12 22:43:10 Asia/Tokyo
+    [Non-functional change]
+        * Avoid each ARRAY to loosen minimum perl requirement.
+
+v0.0.1    2012-11-10 13:46:28 Asia/Tokyo
+    * Initial release.

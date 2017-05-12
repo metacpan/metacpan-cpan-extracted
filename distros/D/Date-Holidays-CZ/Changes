@@ -1,0 +1,41 @@
+Revision history for Perl extension Date::Holidays::CZ
+
+0.01 First version, based on Date::Holidays::DK
+0.02 Up version number to get rid of warning
+0.03 Correct error in SYNOPSIS 
+0.04 Add detailed workflow to README.packaging
+0.05 Change 'use parent' to 'use base' for compatibility with 5.010
+0.06 - Simplify use of Exporter (neither 'use parent', nor 'use base' is required)
+     - Uncomment tests in t/01-code-paces.t
+     - Get rid of pod.t because it demands a 'lib' directory in the
+       distribution
+0.07 Removed auto-added docu-cruft from CZ.pm
+
+0.08
+- complete rewrite based on Date::Holidays::DE
+
+0.09
+- Add release and pre-release scripts
+- Build.PL: do not auto-generate README
+- CZ.pm: POD cleanup
+- Require perl 5.010 and later, instead of 5.012
+- Build.PL: do not require a particular version of Module::Build
+- t/00-load.t: use done_testing() instead of bareword
+- t/00-load.t: support SLE_11_SP3
+
+0.10 2016-03-23
+- CZ.pm: support Good Friday
+- META.{json,yml}: add META files to git repo
+- release.sh: fix brokenness in release script
+
+0.11 2016-03-23 11:23 CET
+- Update prerelease and release scripts to latest upstream
+- prerelease.sh: adapt to two significant digits in version number
+
+0.12 2016-04-23 11:26 CEST
+- release.sh: adapt to only two significant digits in version
+- Good Friday only from 2016 on
+
+0.13 2016-04-23 11:28 CEST
+- MANIFEST: add t/basic.t
+

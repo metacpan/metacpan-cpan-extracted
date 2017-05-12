@@ -1,0 +1,481 @@
+NAME
+    Dancer2::Plugin::FlashNote - support notifications in your Dancer2 web
+    application
+
+SYNOPSIS
+       # In the configuration you choose a "flash style", e.g.
+       # notifications stored in an array and automatically
+       # removed from the session when used
+       plugins:
+          FlashNote:
+             queue:   multiple
+             dequeue: when_used
+
+
+       # In the application you generate flash notifications
+       package MyWebService;
+
+       use Dancer2;
+       use Dancer2::Plugin::FlashNote;
+
+       get '/hello/:id/:who' => sub {
+          flash 'A first error message'
+             unless params->{id} =~ /\A\d+\z/mxs;
+          flash 'A second error message'
+             unless params->{who} =~ /\A(?: you | me )\z/mxs;
+          # ...
+          template 'index';
+       };
+
+
+       # Then, in the layout you consume them and they are flushed
+       <% IF flash %>
+          <ul class="error">
+          <% FOR notice = flash %>
+             <li><% notice | html %></li>
+          <% END %>
+          </ul>
+       <% END %>
+
+DESCRIPTION
+    This plugin helps you display temporary messages, so called "flash
+    messages". It provides a "flash()" method to define the message. The
+    plugin then takes care of attaching the content to the session,
+    propagating it to the templating system, and then removing it from the
+    session. On the other hand, you still have to take care to find a
+    suitable place to put the messages. Code and docs based largely on work
+    done by Flavio Poletti in Dancer::Plugin::FlashNote
+
+  Styles
+    Dancer2::Plugin::FlashNote lets you decide the *style* of how you want
+    to handle your flash notifications. Different applications - in
+    particular when the difference is in their size - might need different
+    styles, e.g.:
+
+    *   a small application that you want to use in a restricted group of
+        friends has little needs. In this case, all you probably need is
+        some way to generate a notification message in your application and
+        get it written somewhere in the page:
+
+           flash 'hey mate, you made an error! Check your inputs'
+              unless params_are_ok();
+
+    *   a big application with internationalisation needs a more
+        sophisticated flash message approach. Generating feedback messages
+        directly in the controller is not a good idea, especially if you are
+        giving feedback about wrong values provided by the User and you want
+        to display these values within your message. In other terms, if you
+        put this in the controller:
+
+           my $value = params->{id};
+           flash "The id value '$value' is not allowed"
+              unless $value =~ /\A\d+\z/mxs;
+
+        you'll have a hard time to translate the message. The best approach
+        in this case is to set a message identifier that can possibly select
+        a template or a string, and provide the parameters:
+
+           # In the controller
+           my $value = params->{id};
+           flash value_not_allowed => id => $value;
+
+           # In the template, probably the layout
+           <%
+              FOR note = flash;
+                 type = note.0;
+                 INCLUDE "flash/$lang/$type.tt", note = note;
+              END;
+           %>
+
+           # flash/en/value_not_allowed.tt
+           The [% note.1 %] value '[% note.2 | html %]' is not allowed
+
+           # flash/it/value_not_allowed.tt
+           Il parametro [% note.1 %] non ammette il
+           valore '[% note.2 | html %]'
+
+    *   an application might want to keep separate "channels" for different
+        kind of notifications (e.g. warnings, errors, simple info), while
+        still keeping a list of messages for each channel;
+
+    and so forth.
+
+    The different needs addressed by this module deal with three areas:
+
+    *   how flash messages are queued for later usage from the template.
+        This can be decided through the "queue" configuration, and changes
+        the semantics of the "flash()" function and how its parameters are
+        used;
+
+    *   how multiple parameters to any single call to the "flash()" function
+        are handled;
+
+    *   how flash messages are flushed away. Messages are stored in a
+        session in order to "survive" redirections and be still there when a
+        template has the occasion to display them, but at that point you can
+        decide that the module can get rid of them (automatically, of
+        course).
+
+    By default, messages are kept as a plain list in the order they are
+    queued by the controller, i.e. in the same order of each call to the
+    "flash()" function. Multiple parameters are simply joined together using
+    $, (i.e. like "warn()", "die()" etc.) and all the messages are flushed
+    away after they get the occasion to be displayed.
+
+INTERFACE
+  flash
+      # sets the flash message for the warning key
+      flash warning => 'some warning message';
+
+    This method inserts a flash message in the cache. What it puts inside
+    and in what manner depends on the queueing method, see below "Queueing
+    Styles". By default, it accepts one or more parameters and they are
+    queued inside an array as a scalar (in case of one parameter) or as an
+    array reference.
+
+    The method always returns the provided message.
+
+  flash_flush
+    Flush the flash messages.
+
+       # flushes the whole flash cache, returning it
+       my $flash = flash_flush();
+
+       # if queuing method is a "key_*", flushes selected keys
+       my @values = flash_flush(qw( warning error ));
+
+    You should not need to use this function if you set a proper dequeue
+    style and display the messages.
+
+CONFIGURATION
+    Configurations are used only when the module is loaded, so take care to
+    place them in a configuration file or before "use"-ing the module.
+
+  Configuration Default Values
+    The module works also without configurations, the following sample
+    configuration includes all the default values:
+
+      plugins:
+        FlashNote:
+          token_name:       flash
+          session_hash_key: _flash
+          queue:            multiple
+          arguments:        auto
+          dequeue:          when_used
+
+    See the following section for an explanation of the keys.
+
+  Options
+    token_name
+        The name of the template token that will contain the hash of flash
+        messages. Default: "flash".
+
+    session_hash_key
+        You probably don't need that, but this setting allows you to change
+        the name of the session key used to store the hash of flash
+        messages. It may be useful in the unlikely case where you have key
+        name conflicts in your session. Default: "_flash".
+
+    queue
+        Sets the queueing style to one of the following allowed values:
+
+        -   single
+
+        -   multiple
+
+        -   key_single
+
+        -   key_multiple
+
+        See "Queueing Styles" below for the details. Default: "multiple".
+
+    arguments
+        Sets how multiple values in a call to "flash" should be handled. The
+        allowed values for this options are the following:
+
+        -   single
+
+        -   join
+
+        -   auto
+
+        -   array
+
+        See "Multiple Parameters" below for the details. Default: "auto".
+
+    dequeue
+        Sets the dequeuing style to one of the following allowed values:
+
+        -   never
+
+        -   always
+
+        -   when_used
+
+        -   by_key
+
+        See "Dequeueing Styles" below for the details. Default: "when_used".
+
+  Queueing Styles
+    There are various styles for setting flash messages, which are explained
+    in the following list. The assumption in the documentation is that the
+    "token_name" configuration is equal to the default "flash", otherwise
+    you have to substitute "flash" with what you actually set.
+
+    The queueing style can be set with the "queue" configuration, with the
+    following allowed values:
+
+    single
+           flash $message;
+
+        this is the simplest style, one single message can be hold at any
+        time. The following call:
+
+           flash 'hey you!';
+           # ... later on...
+           flash 'foo! bar!';
+
+        will replace any previously set message. In the template, you will
+        be able to get the latest set value with the "flash" token:
+
+           flash => 'foo! bar!'
+
+    multiple
+           flash $message;
+           flash $other_message;
+
+        multiple messages are queued in the same order as they are put. The
+        following call:
+
+           flash 'hey you!';
+           # ... later on...
+           flash 'foo! bar!';
+
+        will add $message to the queue, and what you get in the template is
+        a reference to an array containing all the messages:
+
+           flash => [
+              'hey you!',
+              'foo! bar!',
+           ]
+
+    key_single
+           flash key1 => $message;
+           flash key2 => $other_message;
+
+        you can have messages of different *types* by providing a key, but
+        only one for each type. For example, you can set a *warning* and an
+        *error*:
+
+           flash warning => 'beware!';
+           # ... later on...
+           flash error => 'you made an error...';
+           # ... and then...
+           flash warning => 'ouch!';
+
+        Any further call to "flash" with an already used key substitutes the
+        previous message with the new one.
+
+        In this case, the "flash" token in the template returns an hash with
+        the keys you set and the last message introduced for each key:
+
+           flash => {
+              error   => 'you made an error...',
+              warning => 'ouch!',
+           }
+
+    key_multiple
+           flash key1 => $message;
+           flash key2 => $other_message;
+           flash key1 => $yet_another_message; # note key1 again
+
+        you can have messages of different *types* by providing a key, and
+        all of them are saved. In the following example:
+
+           flash warning => 'beware!';
+           # ... later on...
+           flash error => 'you made an error...';
+           # ... and then...
+           flash warning => 'ouch!';
+
+        In this case, the "flash" token in the template returns an hash of
+        arrays, each containing the full queue for the particular key:
+
+           flash => {
+              error   => [ 'you made an error...' ],
+              warning => [
+                 'beware!',
+                 'ouch!'
+              ],
+           }
+
+        In your template:
+
+           <% IF flash %>
+              <ul class="messages">
+              <% FOR message = flash.pairs %>
+                <% FOR text = message.value %>
+                 <li class="[% message.key | html %]"><% text | html %></li>
+                <% END %>
+              <% END %>
+              </ul>
+           <% END %>
+
+        Becomes:
+
+            <ul class="messages">
+                <li class="error">you made an error...</li>
+                <li class="warning">beware!</li>
+                <li class="warning">ouch!</li>
+            </ul>
+
+    The default queueing style is *multiple*.
+
+  Multiple Parameters
+    The queueing style is not the entire story, anyway. If you provide more
+    parameters after the $message, this and all the following parameters are
+    put in an anonymous array and this is set as the new $message. Assuming
+    the "simple" queueing style, the following call:
+
+       flash qw( whatever you want );
+
+    actually gives you this in the template token:
+
+       flash => [ 'whatever', 'you', 'want' ];
+
+    This is useful if you don't want to provide a *message*, but only
+    parameters to be used in the template to build up a message, which can
+    be handy if you plan to make translations of your templates. Consider
+    the case that you have a parameter in a form that does not pass the
+    validation, and you want to flash a message about it; the simplest case
+    is to use this:
+
+       flash "error in the email parameter: '$input' is not valid"
+
+    but this ties you to English. On the other hand, you could call:
+
+       flash email => $input;
+
+    and then, in the template, put something like this:
+
+       error in the <% flash.0 %> parameter: '<% flash.1 %>' is not valid
+
+    which lets you handle translations easily, e.g.:
+
+       errore nel parametro <% flash.0 %>: '<% flash.1 %>' non valido
+
+    If you choose to use this, you might find the "arguments" configuration
+    handy. Assuming the "multiple" queueing style and the following calls in
+    the code:
+
+       # in the code
+       flash 'whatever';
+       flash hey => 'you!';
+
+    you can set "arguments" in the following ways:
+
+    single
+        this always ignores parameters after the first one. In the template,
+        you get:
+
+           flash => [
+              'whatever',
+              'hey',       # 'you!' was ignored
+           ]
+
+    join
+        this merges the parameters using $, before enqueueing the message.
+        In the example, you get this in the template:
+
+           flash => [
+              'whatever',
+              'heyyou!',   # join with $,
+           ]
+
+    auto
+        this auto-selects the best option, i.e. it puts the single argument
+        as-is if there is only one, otherwise generates an anonymous array
+        with all of them. In the template you get:
+
+           flash => [
+              'whatever',
+              [ 'hey', 'you!' ],
+           ]
+
+    array
+        this always set the array mode, i.e. you get an array also when
+        there is only one parameter. This is probably your best choice if
+        you plan to use multiple parameters, because you always get the same
+        structure in the template:
+
+           flash => [
+              [ 'whatever' ],
+              [ 'hey', 'you!' ],
+           ]
+
+    The default handling style is *auto*.
+
+  Dequeueing Styles
+    When you put a message in the queue, it is kept in the User's session
+    until it is eventually dequeued. You can control how the message is
+    deleted from the session with the "dequeue" parameter, with the
+    following possibilities:
+
+    never
+        items are never deleted automatically, but they will be flushed in
+        the code by calling "flash_flush()";
+
+    always
+        items are always deleted from the session within the same call.
+        Technically speaking, using the session in this case is a bit
+        overkill, because the session is only used as a mean to pass data
+        from the code to the template;
+
+    when_used
+        items are all deleted when any of them is used in some way from the
+        template. The underlying semantics here is that if you get the
+        chance to show a flash message in the template, you can show them
+        all so they are removed from the session. If for some reason you
+        don't get this chance (e.g. because you are returning a redirection,
+        and the template rendering will happen in the next call) the
+        messages are kept in the session so that you can display them at the
+        next call that actually makes use of a template;
+
+    by_key
+        this style only applies if the queueing style is either "key_single"
+        or "key_multiple". It is an extension of the "when_used" case, but
+        only used keys are deleted and the unused ones are kept in the
+        session for usage at some later call.
+
+    The default dequeuing style is *when_used*.
+
+DEPENDENCIES
+    Dancer2
+
+BUGS AND LIMITATIONS
+    Curious about active bugs or want to report one? The bug tracking system
+    can be found at
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer2-Plugin-FlashN
+    ote>.
+
+SEE ALSO
+    If you want to contribute, check this module out in GitHub at
+    <https://github.com/smith153/Dancer2-Plugin-FlashNote>.
+
+    This module is a conversion from the original Dancer::Plugin::FlashNote
+    by Flavio Poletti If you find a bug in Dancer2::Plugin::FlashNote, it
+    may very likely be in Dancer::Plugin::FlashNote as well.
+
+AUTHOR
+    Samuel Smith <esaym@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2017 by Samuel Smith esaym@cpan.org.
+
+    This module is free software. You can redistribute it and/or modify it
+    under the terms of the Artistic License 2.0.
+
+    This program is distributed in the hope that it will be useful, but
+    without any warranty; without even the implied warranty of
+    merchantability or fitness for a particular purpose.
+

@@ -1,0 +1,305 @@
+%%
+
+input:
+    TYPE EQUALS TypeDefn { $_[3] };
+
+TypeDefn:
+    BasicType ClassSpec
+    {{
+        fullname  => $_[1]->{fullname},
+        shortname => $_[1]->{shortname},
+        quotename => $_[1]->{quotename},
+        parent    => $_[1]->{parent},
+        members   => $_[2],
+    }}
+  | BasicType;
+
+BasicType:
+    TypePrefixes ClassPrefix SimpleType ClassSuffix TypeSuffix { BasicType(@_[1..$#_]) }
+  |              ClassPrefix SimpleType ClassSuffix TypeSuffix { BasicType("", @_[1..$#_]) }
+  | TypePrefixes             SimpleType ClassSuffix TypeSuffix { BasicType($_[1], "", @_[2..$#_]) }
+  |                          SimpleType ClassSuffix TypeSuffix { BasicType("", "", @_[1..$#_]) };
+
+TypePrefixes:
+    TypePrefix
+  | TypePrefixes TypePrefix
+        { trim(join(' ', @_[1..$#_])) };
+
+TypePrefix:
+    CONST
+  | MUTABLE
+  | STATIC
+  | STAR
+  | AMP;
+
+TypeSuffix:
+    CONST TypeSuffix
+        { trim(join(' ', @_[1..$#_])) }
+  | STAR TypeSuffix
+        { trim(join(' ', @_[1..$#_])) }
+  | AMP TypeSuffix
+        { trim(join(' ', @_[1..$#_])) }
+  | OPENBRACKET NUMBER CLOSEBRACKET TypeSuffix
+        { trim(join(' ', @_[1..$#_])) }
+  | /* empty */
+        { trim(join(' ', @_[1..$#_])) };
+
+ClassPrefix:
+    CLASS | STRUCT | UNION;
+
+ClassSuffix:
+    COLON ClassAccess ClassPrefix SimpleType { $_[4] }
+  | COLON             ClassPrefix SimpleType { $_[3] }
+  | COLON ClassAccess             SimpleType { $_[3] }
+  | COLON                         SimpleType { $_[3] }
+  | /* empty */                              { undef };
+
+ClassAccess:
+    PUBLIC
+  | PRIVATE
+  | PROTECTED;
+
+TemplatedIdentifier:
+    IDENTIFIER TemplateSpec
+    {{
+        fullname  => join('', $_[1], '< ', join(',', @{$_[2]}), ' >'),
+        shortname => $_[1],
+        template  => $_[2]
+    }}
+  | IDENTIFIER
+    {{
+        fullname  => join(' ', @_[1..$#_]),
+        shortname => $_[1],
+    }};
+
+SimpleType:
+    Namespace TemplatedIdentifier
+    {{
+        fullname  => join('', $_[1], $_[2]->{fullname}),
+        shortname => $_[2]->{shortname},
+        template  => $_[2]->{template},
+    }}
+  | TemplatedIdentifier
+  | BuiltinType
+    {{
+        fullname  => $_[1],
+        shortname => $_[1],
+    }};
+
+Namespace:
+    Namespace TemplatedIdentifier DOUBLE_COLON
+        { join('', $_[1], $_[2]->{fullname}, $_[3]) }
+  | TemplatedIdentifier DOUBLE_COLON
+        { join('', $_[1]->{fullname}, $_[2]) };
+
+BasicTypeList:
+    BasicTypeList_NonEmpty
+  | /* empty */
+        { [] };
+
+BasicTypeList_NonEmpty:
+    BasicType
+        { [$_[1]->{fullname}] }
+  | BasicType COMMA BasicTypeList
+        { [$_[1]->{fullname}, @{$_[3]}] };
+
+TemplateSpec:
+    OPENANGLE BasicTypeList_NonEmpty CLOSEANGLE
+        { $_[2] };
+
+ClassSpec:
+    OPENBRACE ClassMembers CLOSEBRACE
+        { $_[2] };
+
+ClassMembers:
+    ClassMember ClassMembers
+        { defined($_[1]) ? [$_[1], @{$_[2]}] : $_[2] }
+  | /* empty */
+        { [] };
+
+ClassMember:
+    ClassAccess COLON
+        { undef }
+  | FunctionDecl SEMICOLON
+  | VarDecl SEMICOLON;
+
+/* Only destructors have a missing type; constructors are called 'void' */
+FunctionDecl:
+    BasicType IDENTIFIER TemplateSpec OPENPAREN BasicTypeList CLOSEPAREN TypeSuffix
+    {{
+        function => $_[2],
+        type     => $_[1],
+        params   => $_[5],
+    }}
+  | BasicType IDENTIFIER OPENPAREN BasicTypeList CLOSEPAREN TypeSuffix
+    {{
+        function => $_[2],
+        type     => $_[1],
+        params   => $_[4],
+    }}
+  | IDENTIFIER OPENPAREN BasicTypeList CLOSEPAREN TypeSuffix
+    {{
+        function => $_[1] . $_[2],
+        type     => undef,
+        params   => $_[4],
+    }};
+
+VarDecl:
+    BasicType IDENTIFIER TypeSuffix
+    {{
+        variable => $_[2],
+        type     => $_[1],
+    }};
+
+BuiltinType:
+    VOID
+  | LONG INT
+  | INT
+  | LONG UNSIGNED INT
+  | UNSIGNED INT
+  | FLOAT
+  | DOUBLE
+  | CHAR
+  | UNSIGNED CHAR
+  | SIZE_T
+  | SSIZE_T
+  | UNSIGNED
+  | LONG
+  | LONG LONG
+  | UNSIGNED LONG
+  | LONG UNSIGNED;
+
+%%
+
+sub BasicType
+{
+	unshift @_, undef;
+
+	my $t = {
+		fullname  => trim(join(' ', $_[1], $_[2], $_[3]->{fullname}, $_[5])),
+		shortname => trim($_[3]->{shortname}),
+		quotename => trim(join(' ', $_[1], $_[2], q(').$_[3]->{fullname}.q('), $_[5])),
+		template  => $_[3]->{template},
+	};
+
+	if(defined $_[4])
+	{
+		$t->{parent} = 
+			{
+				fullname  => $_[4]->{fullname},
+				shortname => $_[4]->{shortname},
+				quotename => q(').$_[4]->{fullname}.q('),
+			};
+	}
+
+	$t;
+};
+
+sub trim($)
+{
+	$_ = shift @_;
+	s/^\s*//s;
+	s/\s*$//s;
+	return $_;
+}
+
+sub _Lexer {
+	my($parser)=shift;
+
+	$parser->YYData->{DATA} =~ s/^\s+//s;
+
+	$parser->YYData->{DATA}
+		or return('',undef);
+
+	for ($parser->YYData->{DATA}) {
+		s/^(operator[<>\[\]=+!-]+)//s
+			and return('IDENTIFIER', $1);
+		s/^(==)//s
+			and return('DOUBLE_EQUALS', $1);
+		s/^(=)//s
+			and return('EQUALS', $1);
+		s/^(\*)//s
+			and return('STAR', $1);
+		s/^(&)//s
+			and return('AMP', $1);
+		s/^(\[)//s
+			and return('OPENBRACKET', $1);
+		s/^(\])//s
+			and return('CLOSEBRACKET', $1);
+		s/^(<)//s
+			and return('OPENANGLE', $1);
+		s/^(>)//s
+			and return('CLOSEANGLE', $1);
+		s/^(::)//s
+			and return('DOUBLE_COLON', $1);
+		s/^(,)//s
+			and return('COMMA', $1);
+		s/^(:)//s
+			and return('COLON', $1);
+		s/^(;)//s
+			and return('SEMICOLON', $1);
+		s/^({)//s
+			and return('OPENBRACE', $1);
+		s/^(})//s
+			and return('CLOSEBRACE', $1);
+		s/^(\()//s
+			and return('OPENPAREN', $1);
+		s/^(\))//s
+			and return('CLOSEPAREN', $1);
+		s/^(type\b)//s
+			and return('TYPE', $1);
+		s/^(void\b)//s
+			and return('VOID', $1);
+		s/^(int\b)//s
+			and return('INT', $1);
+		s/^(float\b)//s
+			and return('FLOAT', $1);
+		s/^(double\b)//s
+			and return('DOUBLE', $1);
+		s/^(char\b)//s
+			and return('CHAR', $1);
+		s/^(size_t\b)//s
+			and return('SIZE_T', $1);
+		s/^(ssize_t\b)//s
+			and return('SSIZE_T', $1);
+		s/^(unsigned\b)//s
+			and return('UNSIGNED', $1);
+		s/^(long\b)//s
+			and return('LONG', $1);
+		s/^(mutable\b)//s
+			and return('MUTABLE', $1);
+		s/^(const\b)//s
+			and return('CONST', $1);
+		s/^(static\b)//s
+			and return('STATIC', $1);
+		s/^(class\b)//s
+			and return('CLASS', $1);
+		s/^(struct\b)//s
+			and return('STRUCT', $1);
+		s/^(union\b)//s
+			and return('UNION', $1);
+		s/^(private\b)//s
+			and return('PRIVATE', $1);
+		s/^(protected\b)//s
+			and return('PROTECTED', $1);
+		s/^(public)//s
+			and return('PUBLIC', $1);
+		s/^([0-9]+)//s
+			and return('NUMBER', $1);
+		s/^([A-Za-z_~][A-Za-z0-9_~]*)//s
+			and return('IDENTIFIER', $1);
+		s/^(.)//s
+			and return($1, $1);
+	}
+}
+
+sub parse($)
+{
+	my $self = shift;
+
+	$self->YYData->{DATA} = shift;
+	my $result = $self->YYParse( yylex => \&_Lexer, yyerror => sub {} );
+	$self->YYData->{DATA} = undef;
+
+	return $result;
+}

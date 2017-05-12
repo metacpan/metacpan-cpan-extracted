@@ -1,0 +1,16 @@
+abstract: Implements the TransformPath concept
+author: Adam Kennedy <cpan@ali.as>, L<http://ali.as/>
+build_requires: 
+  Test::More: 0.47
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: Digest-TransformPath
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Digest::MD5: 2.00
+  perl: 5.005
+version: 1.00

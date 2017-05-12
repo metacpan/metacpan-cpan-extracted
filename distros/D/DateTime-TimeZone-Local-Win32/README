@@ -1,0 +1,75 @@
+NAME
+
+    DateTime::TimeZone::Local::Win32 - Determine the local system's time
+    zone on Windows
+
+VERSION
+
+    version 1.98
+
+SYNOPSIS
+
+      my $tz = DateTime::TimeZone->new( name => 'local' );
+    
+      my $tz = DateTime::TimeZone::Local->TimeZone();
+
+DESCRIPTION
+
+    This module provides methods for determining the local time zone on a
+    Windows platform.
+
+NAME
+
+    DateTime::TimeZone::Local::Win32 - Determine the local system's time
+    zone on Windows
+
+HOW THE TIME ZONE IS DETERMINED
+
+    This class tries the following methods of determining the local time
+    zone:
+
+      * $ENV{TZ}
+
+      It checks $ENV{TZ} for a valid time zone name.
+
+      * Windows Registry
+
+      When using the registry, we look for the Windows time zone and use a
+      mapping to translate this to an IANA time zone name.
+
+	* Windows Vista, 2008 Server and newer Windows operating systems
+
+	We look in "SYSTEM/CurrentControlSet/Control/TimeZoneInformation/"
+	for a node named "/TimeZoneKeyName". If this exists, we use this
+	key to look up the IANA time zone name in our mapping.
+
+	* Windows NT, Windows 2000, Windows XP, Windows 2003 Server
+
+	We look in "SOFTWARE/Microsoft/Windows NT/CurrentVersion/Time
+	Zones/" and loop through all of its sub keys.
+
+	For each sub key, we compare the value of the key with "/Std"
+	appended to the end to the value of
+	"SYSTEM/CurrentControlSet/Control/TimeZoneInformation/StandardName"
+	. This gives us the English name of the Windows time zone, which we
+	use to look up the IANA time zone name.
+
+	* Windows 95, Windows 98, Windows Millenium Edition
+
+	The algorithm is the same as for NT, but we loop through the sub
+	keys of "SOFTWARE/Microsoft/Windows/CurrentVersion/Time Zones/"
+
+AUTHORS
+
+      * David Pinkowitz <dapink@cpan.org>
+
+      * Dave Rolsky <autarch@urth.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright (C) 2007-2014 Dave Rolsky <autarch@urth.org> Copyright (C)
+    2014-2017 by David Pinkowitz <dapink@cpan.org>
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

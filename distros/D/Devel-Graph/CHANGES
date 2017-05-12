@@ -1,0 +1,91 @@
+Revision history for Perl extension Devel::Graph.
+
+0.12 2007-12-15 Tels 53 tests
+  * require Graph::Easy v0.60
+  * fix false fails on outdated Perl (less than 5.8.1)
+  * fix pod_cov.t to work with Perl v5.10.x
+  * fixup Makefile.PL (use test_requires, quote versions)
+
+0.11 2007-09-15 Tels 53 tests
+  * require Graph::Easy v0.59
+  * fix bug #29346 (closures and for loops not recognized, thanx moghroth)
+
+0.10 2007-01-30 Tels 45 tests
+  * require Graph::Easy v0.52
+  * fix failing tests
+
+0.09 2006-11-04 Tels 45 tests
+  * require Graph::Easy v0.49
+  * require PPI 1.118
+  * use a SYNOPSIS that actually works :)
+  * require Perl 5.8.1 for Unicode support
+  * workaround for PPI bug #16831 is no longer nec.
+  * workaround for PPI problem: type() returns 'while' for 'until'
+    (this fixes until loops to have the correct connections *sigh*)
+  * add t/parse.t - parse example snippets and compare to expected output
+  * else-blocks are now properly added
+    'if ($a == 9) { $b++; } else { $b--; }'
+  + parse "if $a == 9 { $b++; }" results in syntax error (no () around condition)
+  * use error() instead of _croak() to report errors
+  * fix graph() to not clobber up $self for $grapher->graph($code)
+  * use Module::Install to indicate what the test suite requires
+  * set flow and start/end attributes on edges on loops to help the layouter
+  * add a debug() method
+  * add a Build.PL file
+
+0.08 2006-01-09 Tels 16 tests
+  * fix Makefile.PL to work with newer YAML
+  * require Graph::Flowchart v0.09
+
+0.07 2006-01-08 Tels 16 tests
+  * work around bug in PPI returning type() 'if' for 'unless'
+  * combine the _parse_unless() and _parse_if() functions, removing
+    duplicate code
+  * an additional 'word' (like print) on conditional statements would
+    confuse the code. Now the following constructs work:
+	print $foo if ($a == 0);
+	print $foo unless ($a == 0);
+	print $foo while ($a == 0);
+	print $foo until ($a == 0);
+  * normalize output on trailing conditionals to not contain a ";":
+ 	"$a++ if ($a == 0);" versus "$a++ if ($a == 0)"
+  * fix _parse_break() to work
+  * add option()
+  * add the option 'strip_pod' to new, default it to yes, strip pod if true
+  * don't use the convienence methods from Graph::Flowchart, but construct
+    nested blocks manually - this makes things recursively work, like
+    an if-statement inside a for-loop-body etc.
+
+0.06 2006-01-01 Tels 15 tests
+  * require PPI v1.09
+  * require Graph::Flowchart v0.07
+  * check argument to decompose() and croak on errors
+  * allow $graph->graph($code); calling style
+  * added "while" and until" loop support (both w/ and w/o continue blocks)
+  * support: "for (@list) { ... } continue { ... }"
+ 
+0.05 2005-12-27 Tels 5 tests
+  * require PPI v1.08
+  * require Graph::Flowchart v0.06
+  * implement graph(), decompose()
+  * graph() and decompose() can take code ref or filename
+  * can export graph()
+  * add: reset()
+  * add documentation about customizing the Graph::Easy object
+
+0.04 2005-12-07 Tels 5 tests
+  * relocate flowchart code to Graph::Flowchart
+
+0.03 2005-11-13 Tels 17 tests
+  * require Graph::Easy v0.33
+  * require PPI v1.04
+  * require Perl v5.8.0
+  * update POD with examples and note that decomposing is not implemented yet
+  * add: add_while()
+
+0.02 2005-11-06 Tels 18 tests
+  * require Graph::Easy 0.32
+
+0.01 2005-11-06 Tels 18 tests
+  * first version
+

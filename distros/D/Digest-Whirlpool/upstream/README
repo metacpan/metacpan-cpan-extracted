@@ -1,0 +1,34 @@
+This directory contains files copied as-is from the whirlpool.zip[1]
+implementation hosted at
+http://www.larc.usp.br/~pbarreto/WhirlpoolPage.html and retrieved on
+2014-10-04.
+
+I've only copied the Whirlpool.c[2] and nessie.h[3] files from that
+zip file. The Whirlpool.c has had some minor patches (sent
+upstream[4]) to fix warnings. That's all in the testing code that
+isn't actually used by this module.
+
+The nessie.h file has had a lot of unused code removed (presumably
+copied from some generic compatibility library) because e.g. the
+ROTL32 macro clashed with hv_func.h in Perl itself. Since it and some
+typedefs weren't being used at all I just removed them.
+
+-- Ævar Arnfjörð Bjarmason <avar@cpan.org>
+
+1. sha1sum: 44f26b75ef37145324f4b3c0cd1966f5779a5d11, 632415 bytes in
+   size.
+2. sha1sum: 552965a5b88297f7c649778f5a44aa1319a12179, 135357 bytes in
+   size.
+3. sha1sum: 33935f3c237f49855dec5579ce6ccb6a533bd0bb, 3884 bytes in
+   size.
+4. I got this reply from Paulo S.L.M. Barreto after sending him the
+   patch:
+
+       This problem has been related before, but there's not really
+       much I can do. It was a "feature" of the NESSIE project
+       standard interface and test modules, and since the NESSIE
+       project ended some 11 years ago (the code itself is 14 years
+       old), all that stuff is more of historical interest. Also, that
+       implementation uses large tables; there are better ways to
+       implement Whirlpool (lookup e.g. WhirlBob for some recent
+       ideas).

@@ -1,0 +1,241 @@
+######################################################################
+    Data::Throttler 0.08
+######################################################################
+
+NAME
+    Data::Throttler - Limit data throughput
+
+SYNOPSIS
+        use Data::Throttler;
+
+        ### Simple: Limit throughput to 100 per hour
+
+        my $throttler = Data::Throttler->new(
+            max_items => 100,
+            interval  => 3600,
+        );
+
+        if($throttler->try_push()) {
+            print "Item can be pushed\n";
+        } else {
+            print "Item needs to wait\n";
+        }
+
+        ### Advanced: Use a persistent data store and throttle by key:
+
+        my $throttler = Data::Throttler->new(
+            max_items => 100,
+            interval  => 3600,
+            backend   => "YAML",
+            backend_options => {
+                db_file => "/tmp/mythrottle.yml",
+            },
+        );
+
+        if($throttler->try_push(key => "somekey")) {
+            print "Item can be pushed\n";
+        }
+
+DESCRIPTION
+    "Data::Throttler" helps solving throttling tasks like "allow a single IP
+    only to send 100 emails per hour". It provides an optionally persistent
+    data store to keep track of what happened before and offers a simple
+    yes/no interface to an application, which can then focus on performing
+    the actual task (like sending email) or suppressing/postponing it.
+
+    When defining a throttler, you can tell it to keep its internal data
+    structures in memory:
+
+          # in-memory throttler
+        my $throttler = Data::Throttler->new(
+            max_items => 100,
+            interval  => 3600,
+        );
+
+    However, if the data structures need to be maintained across different
+    invocations of a script or several instances of scripts using the
+    throttler, using a persistent database is required:
+
+          # persistent throttler
+        my $throttler = Data::Throttler->new(
+            max_items => 100,
+            interval  => 3600,
+            backend   => "YAML",
+            backend_options => {
+                db_file => "/tmp/mythrottle.yml",
+            },
+        );
+
+    The call above will reuse an existing backend store, given that the
+    "max_items" and "interval" settings are compatible and leave the stored
+    counter bucket chain contained therein intact. To specify that the
+    backend store should be rebuilt and all counters be reset, use the
+    "reset => 1" option of the Data::Throttler object constructor.
+
+    In the simplest case, "Data::Throttler" just keeps track of single
+    events. It allows a certain number of events per time frame to succeed
+    and it recommends to block the rest:
+
+        if($throttler->try_push()) {
+            print "Item can be pushed\n";
+        } else {
+            print "Item needs to wait\n";
+        }
+
+    the "force => 1" option of the try_push() method will cause the counter
+    to be incremented regardless of threshold for use in scenarios where
+    max_items is a threshold rather than throttle condition:
+
+        if($throttler->try_push('force' => 1)) {
+            print "Item can be pushed\n";
+        } else {
+            print "Counter incremented, Item needs to wait\n";
+        }
+
+    When throttling different categories of items, like attempts to send
+    emails by IP address of the sender, a key can be used:
+
+        if($throttler->try_push( key => "192.168.0.1" )) {
+            print "Item can be pushed\n";
+        } else {
+            print "Item needs to wait\n";
+        }
+
+    In this case, each key will be tracked separately, even if the quota for
+    one key is maxed out, other keys will still succeed until their quota is
+    reached.
+
+  HOW IT WORKS
+    To keep track of what happened within the specified time frame,
+    "Data::Throttler" maintains a round-robin data store, either in memory
+    or on disk. It splits up the controlled time interval into buckets and
+    maintains counters in each bucket:
+
+        1 hour ago                     Now
+          +-----------------------------+
+          | 3  | 7  | 0  | 0  | 4  | 1  |
+          +-----------------------------+
+           4:10 4:20 4:30 4:40 4:50 5:00
+
+    To decide whether to allow a new event to happen or not,
+    "Data::Throttler" adds up all counters (3+7+4+1 = 15) and then compares
+    the result to the defined threshold. If the event is allowed, the
+    corresponding counter is increased (last column):
+
+        1 hour ago                     Now
+          +-----------------------------+
+          | 3  | 7  | 0  | 0  | 4  | 2  |
+          +-----------------------------+
+           4:10 4:20 4:30 4:40 4:50 5:00
+
+    While time progresses, old buckets are expired and then reused for new
+    data. 10 minutes later, the bucket layout would look like this:
+
+        1 hour ago                     Now
+          +-----------------------------+
+          | 7  | 0  | 0  | 4  | 2  | 0  |
+          +-----------------------------+
+           4:20 4:30 4:40 4:50 5:00 5:10
+
+  LOCKING
+    When used with a persistent data store, "Data::Throttler" protects
+    competing applications from clobbering the database by using the locking
+    mechanism offered with "DBM::Deep". Both the "try_push()" and the
+    "buckets_dump" function already perform locking behind the scenes.
+
+    If you see a need to lock the data store yourself, i.e. when trying to
+    push counters for several keys simultaneously, use
+
+        $throttler->lock();
+
+    and
+
+        $throttler->unlock();
+
+    to protect the data store against competing applications.
+
+  RESETTING
+    Sometimes, you may need to reset a specific counter, e.g. if an IP
+    address has been unintentionally throttled:
+
+        my $count = $throttler->reset_key(key => "192.168.0.1");
+
+    The "reset_key" method returns the total number of attempts so far.
+
+  ADVANCED USAGE
+    By default, "Data::Throttler" will decide on the number of buckets by
+    dividing the time interval by 10. It won't handle sub-seconds, though,
+    so if the time interval is less then 10 seconds, the number of buckets
+    will be equal to the number of seconds in the time interval.
+
+    If the default bucket allocation is unsatisfactory, you can specify it
+    yourself:
+
+        my $throttler = Data::Throttler->new(
+            max_items   => 100,
+            interval    => 3600,
+            nof_buckets => 42,
+        );
+
+    Mainly for debugging and testing purposes, you can specify a different
+    time than *now* when trying to push an item:
+
+        if($throttler->try_push(
+              key  => "somekey",
+              time => time() - 600 )) {
+            print "Item can be pushed in the past\n";
+        }
+
+    Also for debugging and testing purposes, you can obtain the current
+    value of an item:
+
+        my $val = $throttler->current_value(key => "somekey");
+
+    Speaking of debugging, there's a utility method "buckets_dump" which
+    returns a string containing a formatted representation of what's in each
+    bucket. It requires the CPAN module Text::ASCIITable, so make sure to
+    have it installed before calling the method. The module is not a
+    requirement for Data::Throttler on purpose.
+
+    So the code
+
+        use Data::Throttler;
+    
+        my $throttler = Data::Throttler->new(
+            interval  => 3600,
+            max_items => 10,
+        );
+
+        $throttler->try_push(key => "foobar");
+        $throttler->try_push(key => "foobar");
+        $throttler->try_push(key => "barfoo");
+        print $throttler->buckets_dump();
+
+    will print out something like
+
+        .----+-----+---------------------+--------+-------.
+        | #  | idx | Time: 14:43:00      | Key    | Count |
+        |=---+-----+---------------------+--------+------=|
+        |  1 |   0 | 13:49:00 - 13:54:59 |        |       |
+        |  2 |   1 | 13:55:00 - 14:00:59 |        |       |
+        |  3 |   2 | 14:01:00 - 14:06:59 |        |       |
+        |  4 |   3 | 14:07:00 - 14:12:59 |        |       |
+        |  5 |   4 | 14:13:00 - 14:18:59 |        |       |
+        |  6 |   5 | 14:19:00 - 14:24:59 |        |       |
+        |  7 |   6 | 14:25:00 - 14:30:59 |        |       |
+        |  8 |   7 | 14:31:00 - 14:36:59 |        |       |
+        |  9 |   8 | 14:37:00 - 14:42:59 |        |       |
+        | 10 |   9 | 14:43:00 - 14:48:59 | barfoo |     1 |
+        |    |     |                     | foobar |     2 |
+        '----+-----+---------------------+--------+-------'
+
+    and allow for further investigation.
+
+LICENSE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <cpan@perlmeister.com>
+

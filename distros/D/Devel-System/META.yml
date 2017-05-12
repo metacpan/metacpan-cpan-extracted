@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name: Devel-System
+version: 0.01
+license: perl
+distribution_type: module
+requires:
+  String::ShellQuote: 0
+recommends: {}
+build_requires:
+  IO::Scalar: 0
+  Test::More: 0
+conflicts: {}
+provides:
+  Devel::System:
+    file: lib/Devel/System.pm
+    version: 0.01
+generated_by: Module::Build version 0.20

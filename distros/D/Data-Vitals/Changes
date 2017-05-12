@@ -1,0 +1,24 @@
+Changes for Perl extension Data::Vitals
+
+1.06 Sat 10 May 2008
+	- Updating to Module::Install 0.75
+	- Updating to new author tests and cleaning Makefile.PL
+	- Cleaning up some POD issues
+
+0.05 Mon 18 Oct 2004
+	- Adding missing Test::ClassAPI dependency
+
+0.04 Sun 17 Oct 2004
+	- First production release
+	- Added full and comprehensive documentation
+	- More complete unit testing, although without full coverage
+
+0.00_03 Sat 16 Oct 2004
+	- Added Data::Vitals::Underarm
+	- Added Data::Vitals::Height
+
+0.00_02 Sat 16 Oct 2004
+	- Added Data::Vitals::Frame
+
+0.00_01 Sat 16 Oct 2004
+	- Created the initial implementation

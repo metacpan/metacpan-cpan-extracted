@@ -1,0 +1,72 @@
+The file is the README for Data::PowerSet version 0.05
+
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+
+TESTING
+
+This module requires the following modules for thorough testing:
+
+    Test::More
+    Test::Pod
+    Test::Pod::Coverage
+
+But really, only Test::More is necessary. It can also make use of
+Devel::Cover if available. While the tests might not run on perl
+5.005_04, the code itself appears to work correctly.
+
+UNINSTALLATION
+
+This is a pure-Perl module. The following one-liner should print
+out the canonical path of the file:
+
+  perl -MData::PowerSet -le 'print $INC{"Data/PowerSet.pm"}'
+
+Just delete this file. There is also the question of the man page.
+Finding that is left as an exercise to the reader.
+
+USAGE
+
+  use Data::PowerSet;
+
+  my $d = Data::PowerSet->new( 3, 1, 4 );
+  while (my $r = $d->next) {
+    print "@$r\n";
+  }
+
+  # prints
+  3 1 4
+  1 4
+  3 4
+  4
+  3 1
+  1
+  3
+
+STATUS
+
+This module is considered mature, further development is not a
+high priority.
+
+ACKNOWLEDGEMENTS
+
+This module is dedicated to Estelle Souche, who pointed out the very
+elegant and obvious algorithm.
+
+AUTHOR
+
+David Landgren
+
+COPYRIGHT
+
+This module is copyright (C) David Landgren 2005-2008.
+All rights reserved.
+
+LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

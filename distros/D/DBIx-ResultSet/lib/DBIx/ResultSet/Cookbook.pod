@@ -1,0 +1,142 @@
+
+=head1 NAME
+
+DBIx::ResultSet::Cookbook - Common recipes for DBIx::ResultSet.
+
+=head1 RECIPES
+
+=head2 JOINing
+
+Joins are currently not supported.  This is mostly because L<SQL::Abstract>
+does not support them, and I've yet to have the time or impetus to try
+and dig in to how L<DBIx::Class::ResultSet> does it.  Also, in many cases
+a L<subselect|Subselects> is a better choice.
+
+Another option is to use L<DBIx::ResultSet>'s where_sql() to produce the WHERE
+portion of the SQL while still being able to write the FROM/JOIN portion of the SQL
+with raw SQL.  For example:
+
+    my ($where_sql, @bind) = $users_rs->search({ 'u.status' => 1})->where_sql();
+    
+    my $sth = $dbh->prepare(qq[
+        SELECT u.user_id, e.sent_date
+        FROM users u
+        JOIN emails e ON (e.user_id = u.user_id)
+        $where_sql
+    ]);
+    
+    $sth->execute( @bind );
+
+=head2 Subselects
+
+L<SQL::Abstract> supports subselects natively, and L<DBIx::ResultSet> provides
+a very elegant way to use them:
+
+    my $emailed_users_rs = $users_rs->search({
+        user_id => {-in => \[
+            $emails_rs->select_sql(['user_id'])
+        ]},
+    });
+
+The above example builds a SQL query like this:
+
+    SELECT *
+    FROM users
+    WHERE user_id IN (
+        SELECT user_id FROM emails
+    );
+
+The L<SQL::Abstract> documentation gives a few more examples
+of this.  Searching for a backslash and an opening square brace "\["
+will give you the examples.
+
+=head2 bind_param
+
+See L<bindtype|SQL::Abstract/bindtype> in SQL::Abstract docs.  A way to easly integrate this
+with L<DBIx::ResultSet> has not yet been developed.
+
+=head2 Auto PKs
+
+Automatically inrementing primary key values may be retrieved after
+an insert by calling:
+
+    my $user_id = $users_rs->auto_pk();
+
+This is only supported by a couple database at the moment (MySQL, and
+SQLte), and more are planned in the future.  If you're database isn't yet
+supported an exception will be thrown.
+
+=head2 Transactions
+
+The L<DBIx::ResultSet::Connector> class provides an interface to
+facilitate robust transaction management.  This is done by using
+L<DBIx::Connector>, which is available via the L<dbix_connector|DBIx::ResultSet::Connector/dbix_connector>
+attribute.  Several of DBIx::Connector's methods are made available
+directly on the DBIx::ResultSet::Connector object.
+
+So, let's get some data and update a record within a transation:
+
+    my $connector = DBIx::ResultSet->connect( ... );
+    $connector->txn(sub{
+        my $users = $connector->resultset('users');
+        my $user_permissionis = $connector->resultset('user_permissions');
+        my $admin_permissions = $user_permissions->search({ perm => 'ADMIN' });
+
+        my $admin_users = $users->search({ user_id => { -in => [
+            $admin_permissions->select_sql('user_id')
+        ] } });
+
+        $admin_users->update({ is_admin => 1 });
+        # Executes: UPDATE users SET is_admin = ?
+        #   WHERE user_id IN (SELECT user_id FROM user_permissions WHERE perm = ?);
+    });
+
+L<DBIx::Connector> will rollback the transaction if there are any errors
+and then throw the error, otherwise the transaction will be commited.
+
+Take a closer look at the L<DBIx::Connector> docs to get an idea of what
+you can do.
+
+=head2 Connection Handling
+
+All methods in L<DBIx::ResultSet> that need a DBI database handle get it
+via DBIx::Connector's L<run()|DBIx::Connector/run> method.  It is highly
+recommended that you acquire a solid understanding of how DBIx::Connector
+works and how to use it properly.  Once you have, you'll find that there
+are many ways in which you can control database pings, transactions, and
+lost connection handling.
+
+By default the underlying L<DBIx::Connector> object will be set with a
+connection mode of 'fixup'.  This is typically what most people want.  In
+this setup if the connection is disconnected from the database then it
+will be automatically re-connected and the code that the run block was
+attempting to execute will be re-executed.  This means that in the
+following:
+
+    $connector->run(sub{
+        send_email( ... );
+        $connector->resultset('email_log')->insert(...);
+    });
+
+It is possible that the e-mail would get sent TWICE if the database connection
+is lost.  This is because the lost database connection isn't deteceted until we
+actually try to do something with the database, in this case an INSERT.  So,
+when under the 'fixup' connection mode one solution is to change the order of
+your code to first insert the log, then send the e-mail.
+
+Another solution is to use the 'ping' connection mode which will validate that
+the database connection is healthy before executing the code block.  But, this
+still isn't 100% reliable because a database connection could potentially be
+lost at any time.
+
+More details on all this can be found in the L<DBIx::Connector> docs.
+
+=head1 AUTHOR
+
+Aran Clary Deltac <bluefeet@gmail.com>
+
+=head1 LICENSE
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

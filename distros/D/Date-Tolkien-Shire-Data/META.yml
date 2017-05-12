@@ -1,0 +1,37 @@
+---
+abstract: 'Data functionality for Shire calendars.'
+author:
+  - 'Thomas R. Wyant, III F<wyant at cpan dot org>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4222, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Tolkien-Shire-Data
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+provides:
+  Date::Tolkien::Shire::Data:
+    file: lib/Date/Tolkien/Shire/Data.pm
+    version: '0.003'
+requires:
+  Carp: '0'
+  Exporter: '0'
+  POSIX: '0'
+  Text::Abbrev: '0'
+  charnames: '0'
+  constant: '0'
+  perl: '5.006002'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Date-Tolkien-Shire-Data
+  license: http://dev.perl.org/licenses/
+version: '0.003'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

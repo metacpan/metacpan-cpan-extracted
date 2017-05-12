@@ -1,0 +1,46 @@
+# PODNAME: Dallycot::Manual::Libraries
+# ABSTRACT: Creating Linked Open Code libraries
+
+=encoding utf8
+
+=head1 DESCRIPTION
+
+Every language has libraries of some kind. Dallycot is no exception.
+Libraries come in two flavors: Perl, and linked open code.
+
+This document describes the latter case of publishing linked open code
+as a library. See L<Dallycot::Library> for how to create a Perl-based
+library.
+
+For our purposes, we'll assume that you are publishing to a JSON-LD
+document. This makes the examples easier to write. There's no reason
+you can't publish as RDF/XML or some other serialization that supports
+RDF.
+
+Dallycot allows you to embed code in a JSON document, making libraries
+even easier to write:
+
+   {
+     "@context": [
+       <https://www.dhdata.org/ns/linked-code/1.0.json>,
+       {
+         ns:l := <http://www.example.com/our-library#>,
+         @base: <http://www.example.com/our-library#>,
+       }
+     ],
+     "id": <http://www.example.com/our-library>,
+     "a": "lc:Library",
+     "label": "Example Library",
+     "members": [
+       repeated := (
+         f(ff, s) :> [ s, ff(ff,s) ];
+         f(f, _)
+       ),
+       ones := repeated(1)
+     ]
+   }
+
+Essentially, any assignments made in the scope of the array will become
+JSON objects with the identifier as the C<@id>. If the scope  were a JSON
+object instead of an array, then the same JSON objects would be made, but
+the C<@id> would also be the property name in the JSON object.

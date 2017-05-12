@@ -1,0 +1,9 @@
+Revision history for DateTime-Event-Holiday-US
+
+0.02    2011-12-06
+        Fix doc error (https://rt.cpan.org/Public/Bug/Display.html?id=73059)
+        Convert repo to DistZilla
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

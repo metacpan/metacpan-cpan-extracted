@@ -1,0 +1,81 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::ArgvFile home => 1, current => 1, resolveEnvVars => 1;
+use Getopt::Long qw[:config permute bundling no_ignore_case no_auto_abbrev];
+
+my %options;
+
+GetOptions(\%options,
+	'abstract|A=s',
+	'author|a=s%',
+	'backpan=s',
+	'copyright|c=s%',
+	'destination|d=s',
+	'help|usage|h',
+	'licence_class|l=s',
+	'maker|m=s',
+	'version|v=s',
+);
+
+$options{maker} ||= '+Minty';
+$options{maker} =~ s/^\+/Dist::Inktly::/;
+
+if ($options{help} || !@ARGV)
+{
+	print <<'HELP' and exit(1);
+distinkt-mint [options] dist_name1 dist_name2 ...
+
+Options:
+
+	--abstract=S, -A=S       Short description for distribution
+	--author k=v, -a k=v     Set author data.
+	--backpan=S              URL for archives.
+	--copyright k=v, -c k=v  Set copyright data.
+	--destination=S, -d=S    Output directory.
+	--help, -h               Show this help.
+	--licence_class=S, -l=S  Perl class with licensing data.
+	--maker=S, -m=S          Class to use to create distribution.
+	--version=S, -v=S        Initial version number.
+
+Author data keys:
+
+	cpanid            Author's CPAN ID
+	mbox              Author's email address
+	name              Author's full name
+
+Copyright data keys:
+
+	holder            Copyright holder
+	year              Copyright year
+
+license_class defaults to 'Software::License::Perl_5'.
+
+maker defaults to 'Dist::Inktly::Minty', but any package that provides the
+same API should work.
+
+Example:
+
+	distinkt-mint \
+		--author name="Toby Inkster" \
+		--author cpanid="tobyink" \
+		--copyright year=2010 \
+		--abstract="does something useful" \
+		"Local::Example::Useful"
+
+Frequently used settings can be kept in ~/.distinkt-mint
+
+HELP
+}
+
+my $class = delete $options{maker};
+eval "require $class" or die "Could not load maker '$class': $@.\n";
+
+while (my $dist = shift @ARGV)
+{
+	print STDERR "Using $class to create $dist...\n";
+	$class->create($dist, %options);
+}
+
+exit(0);

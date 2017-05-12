@@ -1,0 +1,2 @@
+$ENV{PERL_ONLY} = 1;
+

@@ -1,0 +1,88 @@
+This module is for managing sets of benchmark results (averaging across runs,
+tossing high and low values, finding the range of scores, etc) and comparing
+sets of runs to one another.  My main use of this has been with IOZone results
+testing various filesystems under Mac OS X.  I have included my badly done,
+not well documented benchmark automation scripts to show how this module
+can be used to automate benchmarking with IOZone (http://www.iozone.org/).
+They can be found in the examples directory.
+
+Check out my results page if you want to see what kind of information it produces -
+http://jason.tiltastech.com/performance/Mac_OS_X_Filesystem_Performance_Comparison.html
+
+If people find this useful I will polish it a bit and add in some features (perhaps HTML
+and GNUplot output..)
+
+Here is the current state of the documentation.  Sorry, I know it is pretty minimal.
+Look at the example code if you can't follow this.
+
+NAME
+       Data::BenchmarkResults - Perl extension for averaging and
+       comparing multiple benchmark runs.
+
+SYNOPSIS
+         use Data::BenchmarkResults;
+         $conditionA_results = new Data::BenchmarkResults;
+         $conditionB_results = new Data::BenchmarkResults;
+
+         #Load test result runs for the first condition
+         $conditionA_results->add_result_set("test1","run1",\@data1);
+         $conditionA_results->add_result_set("test2","run1",\@data2);
+         $conditionA_results->add_result_set("test1","run2",\@data3);
+         $conditionA_results->add_result_set("test2","run2",\@data4);
+
+         #Load test result runs for the second condition
+         $conditionB_results->add_result_set("test1","run1",\@data5);
+         $conditionB_results->add_result_set("test2","run2",\@data6);
+         $conditionB_results->add_result_set("test1","run1",\@data7);
+         $conditionB_results->add_result_set("test2","run2",\@data8);
+
+         #Average (mean average) the results of all the the runs of 'test1'
+         # w/o tossing the highest and lowest values (replace the '0' with '1'to
+         # toss the highest and lowest values
+
+         my $computed = $conditionA_results->process_result_set("test1","mean",0);
+         my $computed2 = $conditionB_results->process_result_set("test1","mean",0);
+
+         #OR process all of the tests at once (tossing the highest and lowest value) :
+
+         $conditionA_results->process_all_result_sets("mean",1);
+         $conditionB_results->process_all_result_sets("mean",1);
+
+         #Print out all of the processed test results
+         print "Condition A results.... \n\n"
+         $conditionA_results->print_calculated_sets;
+         print "Condition B results.... \n\n"
+         $conditionB_results->print_calculated_sets;
+
+         #Compare results of 'test1' of condition B against those with condition A
+         # as a percentage change from A to B
+
+         my $compared = $conditionB_results->compare_result_set($conditionA_results,"test1");
+
+         #OR compare all the processed test results from one condition to those of another
+         my $total_comparison = $conditionB_results->compare_all_result_sets($conditionA_results);
+
+
+DESCRIPTION
+       new
+
+       add_result_set
+
+       add_computed_set
+
+       process_result_set
+
+       process_all_result_sets
+
+       compare_result_set
+
+       compare_all_result_sets
+
+       print_calculated_sets
+
+       EXPORT
+
+       None by default.
+
+AUTHOR
+       Jason Titus, jasontitus@tiltastech.com

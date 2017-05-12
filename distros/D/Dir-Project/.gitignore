@@ -1,0 +1,13 @@
+README
+blib
+Makefile
+pm_to_blib
+*.c
+*.bs
+*.old
+*.tmp
+*.bak
+i386-linux
+sparc-solaris
+test_dir
+MYMETA.*

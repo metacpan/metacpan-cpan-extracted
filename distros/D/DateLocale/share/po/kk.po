@@ -1,0 +1,145 @@
+# Translation of perl-DateLocale to Russian
+# Copyright (C) 2014 Nikolas Shulyakovskiy
+# This file is distributed under the same license as the perl-DateLocale package.
+#
+# Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: perl-DateLocale\n"
+"Report-Msgid-Bugs-To: shulyakovskiy@mail.ru\n"
+"PO-Revision-Date: 2014-08-12 17:04+0400\n"
+"Last-Translator: Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>\n"
+"Language: kk\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "day"
+msgstr "күн"
+
+msgid "min"
+msgstr "минут"
+
+msgid "min_ago"
+msgstr "минут бұрын"
+
+msgid "shortmin"
+msgstr "мин"
+
+msgid "weekdaywithtime"
+msgstr "%A, %H:%M"
+
+msgid "monthdaywithtime"
+msgstr "%e %B, %H:%M"
+
+msgid "yeardaywithtime"
+msgstr "%e %B %Y, %H:%M"
+
+msgid "weekdaywithouttime"
+msgstr "%A"
+
+msgid "monthdaywithouttime"
+msgstr "%e %B"
+
+msgid "yeardaywithouttime"
+msgstr "%e %B %Y"
+
+msgid "hour"
+msgstr "сағат"
+
+msgid "hour_ago"
+msgstr "сағат бұрын"
+
+msgid "fmtdateoccured"
+msgstr "%e %B %Y жылдың"
+
+msgid "today"
+msgstr "бүгін, %H:%M"
+
+msgid "yesterday"
+msgstr "кеше, %H:%M"
+
+msgid "yesterday_short"
+msgstr "кеше"
+
+msgid "tommorow"
+msgstr "ертең, %H:%M"
+
+msgid "datommorow"
+msgstr "бүрсігүні, %H:%M"
+
+msgid "mon1g"
+msgstr "қаңтары"
+
+msgid "mon2g"
+msgstr "ақпаны"
+
+msgid "mon3g"
+msgstr "наурызы"
+
+msgid "mon4g"
+msgstr "сәуірі"
+
+msgid "mon5g"
+msgstr "мамыры"
+
+msgid "mon6g"
+msgstr "маусымы"
+
+msgid "mon7g"
+msgstr "шілдесі"
+
+msgid "mon8g"
+msgstr "тамызы"
+
+msgid "mon9g"
+msgstr "қыркүйегі"
+
+msgid "mon10g"
+msgstr "қазаны"
+
+msgid "mon11g"
+msgstr "қарашасы"
+
+msgid "mon12g"
+msgstr "желтоқсаны"
+
+msgid "mon1"
+msgstr "қаңтар"
+
+msgid "mon2"
+msgstr "ақпан"
+
+msgid "mon3"
+msgstr "наурыз"
+
+msgid "mon4"
+msgstr "сәуір"
+
+msgid "mon5"
+msgstr "мамыр"
+
+msgid "mon6"
+msgstr "маусым"
+
+msgid "mon7"
+msgstr "шілде"
+
+msgid "mon8"
+msgstr "тамыз"
+
+msgid "mon9"
+msgstr "қыркүйек"
+
+msgid "mon10"
+msgstr "қазан"
+
+msgid "mon11"
+msgstr "қараша"
+
+msgid "mon12"
+msgstr "желтоқсан"
+
+msgid "recent"
+msgstr "жаңа ғана"
+

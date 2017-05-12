@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dist-Zilla-Plugin-ModuleBuild-OptionalXS,
+version 0.01:
+
+  Build a module that has an XS component that only optionally needs to be built.
+
+This software is copyright (c) 2011 by Andrew Rodland.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,225 @@
+NAME
+    Dist::Zilla::Stash::Store::Git - A common place to store and interface
+    with git
+
+VERSION
+    This document describes version 0.000005 of
+    Dist::Zilla::Stash::Store::Git - released May 14, 2014 as part of
+    Dist-Zilla-Stash-Store-Git.
+
+SYNOPSIS
+DESCRIPTION
+    This is a Dist::Zilla Store providing a common place to store, fetch and
+    share configuration information as to your distribution's git
+    repository, as well as your own preferences (e.g. git tag versioning
+    scheme).
+
+ATTRIBUTES
+  dynamic_config
+    This attribute contains all the configuration information provided to
+    the store by the plugins performing the
+    Dist::Zilla::Role::GitStore::ConfigProvider. Any values specified herein
+    override those in the "default_config", and anything set by the store
+    configuration (aka "store_config") similarly overrides anything here.
+
+  store_config
+    This attribute contains all the information passed to the store via the
+    store's configuration, e.g. in the distribution's "dist.ini". Any values
+    specified herein override those in the "default_config", and anything
+    returned by a plugin (aka "dynamic_config") similarly overrides anything
+    here.
+
+    This is a read-only accessor to the "store_config" attribute.
+
+  config
+    This attribute contains a HashRef of all the known configuration values,
+    from all sources (default, stash and plugins aka dynamic). It merges the
+    "dynamic_config" into "store_config", and that result into
+    "default_config", each time giving the hash being merged precedence.
+
+    If you're looking for "The Right Place to Find Configuration Values",
+    this is it. :)
+
+  repo_wrapper
+    Contains a lazily-constructed Git::Wrapper instance for our repository.
+
+  repo_raw
+    Contains a lazily-constructed Git::Raw::Repository instance for our
+    repository.
+
+  repo_root
+    Stores the repository root; by default this is the current directory.
+
+  tags
+    An ArrayRef of all existing tags in the repository.
+
+  previous_versions
+    A sorted ArrayRef of all previous versions of this distribution, as
+    derived from the repository tags filtered through the regular expression
+    given in the "version.regexp".
+
+METHODS
+  stash_from_config()
+    This method wraps "stash_from_config" in Dist::Zilla::Role::Stash to
+    capture our Dist::Zilla instance and funnel all our stash configuration
+    options into the "store_config" attribute.
+
+  default_config
+    This method provides a HashRef of all the default settings we know
+    about. At the moment, this is:
+
+        version.regexp => '^v(.+)$'
+        version.first  => '0.001'
+
+    You should never need to mess with this -- note that "store_config"
+    (values passed to the store via configuration) and "dynamic_config"
+    (values returned by the plugins performing the
+    Dist::Zilla::Role::GitStore::ConfigProvider), respectively, override
+    this.
+
+  dynamic_config
+    This is a read-only accessor to the "dynamic_config" attribute.
+
+  has_dynamic_config
+    True if we have been provided any configuration by plugins.
+
+    This is a read-only accessor to the "dynamic_config" attribute.
+
+  has_dynamic_config_for
+    True if plugin configuration has been provided for a given key, e.g.
+
+        do { ... } if $store->has_dynamic_config_for('version.first');
+
+    This is a read-only accessor to the "dynamic_config" attribute.
+
+  store_config
+    A read-only accessor to the store_config attribute.
+
+    This is a read-only accessor to the "store_config" attribute.
+
+  has_store_config
+    True if we have been provided any static configuration.
+
+    This is a read-only accessor to the "store_config" attribute.
+
+  has_store_config_for
+    True if static configuration has been provided for a given key, e.g.
+
+        do { ... } if $store->has_store_config_for('version.first');
+
+    This is a read-only accessor to the "store_config" attribute.
+
+  config()
+    A read-only accessor returning the config HashRef.
+
+    This is a read-only accessor to the "config" attribute.
+
+  has_config
+    True if we have any configuration stored; false if not.
+
+    This is a read-only accessor to the "config" attribute.
+
+  has_no_config
+    The inverse of "has_config".
+
+    This is a read-only accessor to the "config" attribute.
+
+  has_config_for($key)
+    Returns true if we have configuration information for a given key.
+
+    This is a read-only accessor to the "config" attribute.
+
+  get_config_for($key)
+    Returns the value we have for a given key; returns "undef" if we have no
+    configuration information for that key.
+
+    This is a read-only accessor to the "config" attribute.
+
+  repo_wrapper()
+    This is a read-only accessor to the "repo_wrapper" attribute.
+
+  repo_raw()
+    This is a read-only accessor to the "repo_raw" attribute.
+
+  repo_root
+    Returns the path to the repository root; this may be a relative path.
+
+    This is a read-only accessor to the "repo_root" attribute.
+
+  tags()
+    A read-only accessor to the "tags" attribute.
+
+  previous_versions()
+    A read-only accessor to the "previous_versions" attribute.
+
+  has_previous_versions
+    True if this distribution has any previous versions; that is, if any git
+    tags match the version regular expression.
+
+    This is a read-only accessor to the "previous_versions" attribute.
+
+  earliest_version
+    Returns the earliest version known; "undef" if no such version exists.
+
+    This is a read-only accessor to the "previous_versions" attribute.
+
+  latest_version
+    Returns the latest version known; "undef" if no such version exists.
+
+    This is a read-only accessor to the "previous_versions" attribute.
+
+ATCHUNG!
+    This is VERY EARLY CODE UNDER ACTIVE DEVELOPMENT! It's being used by
+    this author's plugin bundle, and as such is being released as a
+    non-TRIAL / non-development (e.g. x.xxx_01) release to make that easier.
+    The interface is likely to change. Stability (as it is) should be
+    expected when this section is removed and the version = 0.001 (aka
+    0.001000).
+
+    Contributions, issues and the like are welcome and encouraged.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Dist::Zilla::Role::Store
+
+    *   Dist::Zilla::Role::Stash
+
+SOURCE
+    The development version is on github at
+    <http://https://github.com/RsrchBoy/dist-zilla-stash-store-git> and may
+    be cloned from
+    <git://https://github.com/RsrchBoy/dist-zilla-stash-store-git.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-stash-store-git/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+  I'm a material boy in a material world
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr this
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithu
+    b.com%2FRsrchBoy%2Fdist-zilla-stash-store-git&title=RsrchBoy's%20CPAN%20
+    Dist-Zilla-Stash-Store-Git&tags=%22RsrchBoy's%20Dist-Zilla-Stash-Store-G
+    it%20in%20the%20CPAN%22>, gittip me <https://www.gittip.com/RsrchBoy/>,
+    or indulge my Amazon Wishlist <http://bit.ly/rsrchboys-wishlist>... If
+    you so desire.
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

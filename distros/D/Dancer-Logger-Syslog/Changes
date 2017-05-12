@@ -1,0 +1,27 @@
+Revision history for Dancer-Logger-Syslog
+
+0.6 2014-03-11
+ - Logger was ignoring 'logger_format'. (GH#6, report by giustoo, fix by
+   Yanick Champoux)
+ - Wrong number of skipped tests. (RT79875, report by devin, fix by Yanick
+   Champoux)
+
+ [STATISTICS]
+ - code churn: 11 files changed, 93 insertions(+), 81 deletions(-)
+
+0.5 2013-07-27
+ - Add repository and bugtracker information to META. 
+ - Normalize changelog (GH#5, Sergey Romanov)
+
+0.4 2013-04-22
+ - Call 'openlog()' in all child processes. (GH#4, Sam Crawley)
+
+0.3 2013-04-14
+ - Add 'info' in the log levels. (GH#2, Sam Crawley)
+ - Facility can be set via config. (GH#1, Sam Crawley)
+
+0.2 2010-10-05
+
+0.1 2010-01-29
+ - First version, released on an unsuspecting world.
+

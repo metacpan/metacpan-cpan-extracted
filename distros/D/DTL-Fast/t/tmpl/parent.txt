@@ -1,0 +1,3 @@
+{% block main_text %}This is a parent main text{% endblock %}
+
+{% block more_text %}This is a parent more text{% endblock %}

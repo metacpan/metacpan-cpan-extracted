@@ -1,0 +1,8 @@
+lib/Daemon/Mplayer.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-pod.t
+t/02-pod-coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

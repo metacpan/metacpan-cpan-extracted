@@ -1,0 +1,18 @@
+DESCRIPTION
+
+    By default will format all values that are regarded as true by Perl
+    with "yes", and all false values as "no". Undef will be left undef. The
+    true string and false string can be set using the formatter arguments
+    true_str and false_str, or you can choose from a set of predefined
+    styles.
+
+FORMATTER ARGUMENTS
+
+ true_str => str
+
+ false_str => str
+
+ style => str (default: yes_no)
+
+    Can be: yes_no, Y_N, true_false, T_F, 1_0, on_off.
+

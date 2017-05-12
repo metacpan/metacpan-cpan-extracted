@@ -1,0 +1,39 @@
+---
+abstract: 'A Dancer2 plugin to easily add Google Analytics code.'
+author:
+  - 'Cesare Gargano <garcer@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer2-Plugin-GoogleAnalytics
+provides:
+  Dancer2::Plugin::GoogleAnalytics:
+    file: lib/Dancer2/Plugin/GoogleAnalytics.pm
+    version: 0.002
+requires:
+  Dancer2: 0
+  Dancer2::Core::Hook: 0
+  Dancer2::Plugin: 0
+  Moo::Role: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/garcer/Dancer2-Plugin-GoogleAnalytics
+  repository: https://github.com/garcer/Dancer2-Plugin-GoogleAnalytics.git
+version: 0.002

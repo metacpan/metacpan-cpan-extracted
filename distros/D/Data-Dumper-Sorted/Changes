@@ -1,0 +1,12 @@
+Revision history for Perl extension Data::Dumper::Sorted
+
+1.12  Mon Jan 27 12:47:58 PST 2014
+        correct typo in Makefile.pm
+
+1.11  Mon Jan 27 11:59:58 PST 2014
+        modify Makefile.PL to bypass missing 'pod2text'
+
+0.01  Sat May 25 16:35:52 PDT 2013
+	initial release
+
+

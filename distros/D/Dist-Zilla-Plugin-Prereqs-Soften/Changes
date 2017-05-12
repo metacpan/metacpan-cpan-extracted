@@ -1,0 +1,147 @@
+Release history for Dist-Zilla-Plugin-Prereqs-Soften
+
+0.006003 2017-03-06T04:53:19Z f764946
+ [Bugfix]
+ - Avoid testing issues under -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Soften/issues/6
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.006002, see misc/*.deps* for details
+ - develop: +2 ↑1 -1 (suggests: ↑2)
+ - test: ↓1
+
+ [Internals]
+ - Add much more extensive logging about decision making, including outcomes of each decision
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Prereqs-Soften/issues/5
+
+0.006002 2016-05-01T18:03:38Z f9ed7c0
+ - Remove usage of dztest. Ironic, seeing this module is where I invented that. So many regrets.
+ - Fix test failure with newer OptionalFeature due to injected depedencies.
+ - Don't use my Config::Dumper magic, hardcode logic simply.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.006001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: -1
+ - test: +2 -1 (recommends: +1)
+
+0.006001 2015-10-03T10:40:00Z f0f58f0
+ [Bugfix]
+ - Fix Lack of validation in copy_to leads to silently dead code paths. ( closes GH #4 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.006000, see misc/*.deps* for details
+ - develop: +5 ↑3 -2 (suggests: ↑2)
+
+0.006000 2015-02-28T05:31:26Z e430196
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +10 ↑2 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 (recommends: +1 -1)
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Features]
+ - Can now specify to_relationship = none. This is useful in conjunction with copy_to to move phases. Its admittedly
+   awkward syntax, but I need to re-write half the internals now because YAGNI made them too simple earlier, and now
+   IGNI.
+
+0.005001 2014-09-29T14:03:18Z
+ [Bugfix]
+ - Dont fail with newer OptionalFaetures due to test subsequently needing a Makefile.PL to work
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005000, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: (recommends: +1)
+
+0.005000 2014-09-10T22:29:32Z
+ [00 Minor]
+ - Internals tweaked to be more modern
+ - Metadata updated
+ - Tests simplified.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004002, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +1 -3 (recommends: ↑1)
+
+ [Internals]
+ - dump_config implemented with DZU:ConfigDumper
+
+ [Metadata]
+ - Author = kentnl
+
+ [Tests]
+ - internal lib/dztest now nuked in favour of DZPT:KENTNL:dztest, which was inspired by this code.
+
+0.004002 2014-08-15T21:18:48Z
+ [00 Trivial]
+ - CPANDAY!
+ - whitespace adjusted
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+0.004001 2014-08-15T02:20:05Z
+ [00 Trivial]
+ - Testing code reworked to avoid need for a hard dependency on any JSON module.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004000, see misc/*.deps* for details
+ - configure: ↓1 (recommends: ↑1)
+ - develop: +4 -3 (suggests: +2 -1)
+ - test: +1 -4 (recommends: ↑2 -1)
+
+ [Misc]
+ - Repository moved to kentnl org
+
+ [Tests]
+ - use dzil distmeta for prereqs instead of sloshing through JSON ( GH #2, reported by ETHER )
+ - most tests cleaned slightly
+ - report versions test updated.
+
+0.004000 2014-03-23T13:16:51Z
+ [00 Minor]
+ - Add modules_from_features attribute that automatically adds all modules specified in all feature grades to the list
+   of modules to soften dependencies on.
+ - Added tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - develop: +1
+ - test: +6 (recommends: +1 ↑1)
+
+0.003000 2014-03-22T18:23:49Z
+ [00 Minor]
+ - add copy_to attribute.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 ↑1
+ - test: (recommends: ↑1)
+
+0.002000 2014-02-18T04:54:36Z
+ [00 Minor]
+ - Add property `to_relationship` that specifies the target relationship kind to map to.
+
+ [Bugfixes]
+ - Changed order of application so target == source results in no-op as opposed to removal.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +1
+
+0.001000 2014-02-18T02:43:56Z
+ - First version.
+
+ [Dependencies::Aggregate]
+ - 5.008 : 201
+ - 5.010 : 180
+ - 5.019 : 161

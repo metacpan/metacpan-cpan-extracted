@@ -1,0 +1,55 @@
+Revision history for Dist::Zilla::Plugin::Authority
+
+1.009	2014-10-28 03:40:27 UTC
+
+	Fix code style which caused perls < 5.14 to blow up - unshift ARRAYREF ( thanks CPANTESTERS! )
+
+1.008	2014-10-27 21:33:09 UTC
+
+	Made sure that we cannot be loaded with different authorities via RT#86710 ( thanks ETHER! )
+
+1.007	2014-10-27 20:42:01 UTC
+
+	Rewrote how we assign the $AUTHORITY variable to use 'our' instead of the crufty pkg declaration format via gh-5 and gh-6 and RT#86611 ( thanks KENTNL + ETHER )
+
+1.006	2012-01-03 04:14:27 UTC
+
+	Use the new PPI role in Dist::Zilla 4.300001 to make this plugin faster ( thanks DROLSKY! )
+
+1.005	2011-04-14 17:05:17 UTC
+
+	Added locate_comment which finds a # AUTHORITY comment and puts authority there ( thanks NIGELM! )
+
+1.004	2011-02-21 17:55:27 UTC
+
+	Tweak the authority regex to be a bit more liberal ( thanks RWSTAUNER! )
+
+1.003	2011-02-04 07:24:46 UTC
+
+	Tweaked the ABSTRACT section ( thanks FLORA + GETTY )
+	Add ability to read from ~/.pause file for the authority ( thanks WOLVERIAN )
+
+1.002	2010-12-14 01:32:18 UTC
+
+	Added the "do_munging" attr to control the variable declarations in packages ( thanks FLORA )
+
+1.001	2010-12-08 02:36:12 UTC
+
+	Updated to require Dist::Zilla v4 ( so we can access the %PAUSE stash )
+	The "authority" attr is not required anymore ( defaults to the %PAUSE username )
+	Backported some code from Dist::Zilla::Plugin::PkgVersion v4 ( as usual, thanks RJBS )
+	Add $AUTHORITY to script files too ( if they have a package declaration )
+	Make do_metadata default to true ( thanks FLORA )
+
+1.000	2010-05-30 17:43:51 UTC
+
+	added the patch from Dave Rolsky for "monkeypatch package declaration" fix
+	Converted to Dist::Zilla for the release process!
+
+0.02	0000-00-00 00:00:00 UTC
+
+	added the patch from Dist::Zilla::Plugin::PkgVer v2.101310 for multi-package declarations
+
+0.01	0000-00-00 00:00:00 UTC
+
+	initial release

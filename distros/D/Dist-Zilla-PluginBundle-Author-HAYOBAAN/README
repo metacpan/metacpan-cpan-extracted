@@ -1,0 +1,453 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla
+    configuration
+
+VERSION
+
+    version 0.012
+
+DESCRIPTION
+
+    This is a Dist::Zilla PluginBundle. It installs and configures
+    Dist::Zilla plugins according to HAYOBAAN's preferences. The following
+    plugins are (conditionally) installed and configured:
+
+      * AutoVersion
+
+      * Author::HAYOBAAN::NextVersion
+
+      * OurPkgVersion
+
+      * GatherDir
+
+      * Git::GatherDir
+
+      * PruneCruft
+
+      * ManifestSkip
+
+      * PodWeaver (or SurgicalPodWeaver when enabled)
+
+      * ReadmeAnyFromPod (both Text and Markdown generation are configured)
+
+      * License
+
+      * InstallGuide
+
+      * MinimumPerl
+
+      * AutoPrereqs
+
+      * MetaNoIndex
+
+      * GitHub::Meta
+
+      * MetaJSON
+
+      * MetaYAML
+
+      * MetaProvides::Package
+
+      * MetaProvides::Class
+
+      * ExecDir
+
+      * ShareDir
+
+      * MakeMaker (default)
+
+      * ModuleBuild (optional)
+
+      * Manifest
+
+      * CopyFilesFromBuild
+
+      * Run::AfterBuild
+
+      * GitHubREADME::Badge
+
+      * CheckChangesHasContent
+
+      * Git::CheckFor::CorrectBranch
+
+      * Git::Check
+
+      * CheckMetaResources
+
+      * CheckPrereqsIndexed
+
+      * Test::Compile
+
+      * Test::Perl::Critic
+
+      * Test::EOL
+
+      * Test::NoTabs
+
+      * Test::Version
+
+      * Test::MinimumVersion
+
+      * MojibakeTests
+
+      * Test::Kwalitee
+
+      * Test::Portability
+
+      * Test::UnusedVars
+
+      * Test::CPAN::Changes
+
+      * Test::DistManifest
+
+      * Test::CPAN::Meta::JSON
+
+      * MetaTests
+
+      * PodSyntaxTests
+
+      * PodCoverageTests
+
+      * Test::Pod::LinkCheck
+
+      * Test::Synopsis
+
+      * TestRelease
+
+      * RunExtraTests
+
+      * ConfirmRelease
+
+      * UploadToCPAN
+
+      * SchwartzRatio
+
+      * FakeRelease
+
+      * NextRelease
+
+      * Git::Commit
+
+      * Git::Tag
+
+      * Git::Push
+
+      * GitHub::Update
+
+      * Run::AfterRelease
+
+      * Clean
+
+USAGE
+
+      # In dist.ini
+      [@Author::HAYOBAAN]
+
+OPTIONS
+
+    The following additional command-line option is available for the dzil
+    command.
+
+ --local-release-only
+
+    Adding this option to the dzil command will set the
+    "local_release_only" attribute to true.
+
+    --local, --local-only, and --local-release are synonyms for this
+    option.
+
+ --make-minor-release
+
+    Adding this option to the dzil command will set the
+    "make_minor_release" attribute to true.
+
+    --minor, --minor-release, and --make-minor are synonyms for this
+    option.
+
+    Note: Implied with "--local-release-only", overriden by
+    "--make-major-release".
+
+ --make-major-release
+
+    Adding this option to the dzil command will set the
+    "make_major_release" attribute to true.
+
+    --major, --major-release, and --make-major are synonyms for this
+    option.
+
+    Note: Overrides --make-minor-release.
+
+ --keep-version
+
+    Adding this option will force keep the version number the same
+    (regardless of the other settings above!).
+
+    --keep is a synonym for this option.
+
+ATTRIBUTES
+
+ is_cpan
+
+    Specifies that this is a distribution that is destined for CPAN. When
+    true, releases are uploaded to CPAN using UploadToCPAN. If false,
+    releases are made using FakeRelease.
+
+    Default: false.
+
+ is_github_hosted
+
+    Specifies that the distribution's repository is hosted on GitHub.
+
+    Default: false (note: setting "is_cpan" enforces "is_github_hosted" to
+    true)
+
+ git_remote
+
+    Specifies where to push the distribution on GitHub. Can be used
+    multiple times to upload to multiple branches.
+
+    Default: origin
+
+ no_git
+
+    Specifies that the distribution is not under git version control.
+
+    Default: false (note: setting "is_github_hosted" enforces this setting
+    to false)
+
+ local_release_only
+
+    Setting this to true will:
+
+      * inhibit uploading to CPAN,
+
+      * inhibit git checking, tagging, commiting, and pushing,
+
+      * inhibit checking the Changes file,
+
+      * include a minor version number (e.g., _001) in the version string
+      (see "make_minor_release").
+
+    When releasing, the "run_after_release" code is still run so you can
+    use this flag to release a development version locally for further use
+    or testing, without e.g., fixing a new major version number.
+
+    local, local_only, and local_release are synonyms for this setting.
+
+    Default: false
+
+ make_minor_release
+
+    If the version string does not yet have a minor release number, this
+    will add one with the value of _001.
+
+    minor, minor_release, and make_minor are synonyms for this setting.
+
+    Default: value of "local_release_only"
+
+    Note: Overridden by "make_major_release".
+
+ make_major_release
+
+    Removes any minor version from the version string.
+
+    major, major_release, and make_major are synonyms for this setting.
+
+    Default: false
+
+    Note: Overrides "make_minor_release".
+
+ keep_version
+
+    Will keep the current version number the same when building/releasing.
+
+ use_makemaker
+
+    Uses MakeMaker as build method.
+
+    Default: true
+
+    Note: When both use_makemaker and use_modulebuild are false, MakeMaker
+    will be used!
+
+ use_modulebuild
+
+    Uses Module::Build as build method.
+
+    Default: false
+
+ run_after_build
+
+    Specifies commands to run after the release has been built (but not yet
+    released). Multiple "run_after_build" commands can be specified.
+
+    The commands are run from the root of your development tree and has the
+    following special symbols available:
+
+      * %d the directory in which the distribution was built
+
+      * %n the name of the distribution
+
+      * %p path separator ('/' on Unix, '\\' on Win32... useful for
+      cross-platform dist.ini files)
+
+      * %v the version of the distribution
+
+      * %t -TRIAL if the release is a trial release, otherwise the empty
+      string
+
+      * %x full path to the current perl interpreter (like $^X but from
+      Config)
+
+    Default: nothing
+
+ run_after_release
+
+    Specifies commands to run after the release has been made. Use it to
+    e.g., automatically install your distibution after releasing. Multiple
+    run_after_release commands can be specified.
+
+    The commands are run from the root of your development tree and has the
+    same symbols available as the "run_after_build", plus the following:
+
+      * %a the archive of the release
+
+    Default: cpanm './%d'
+
+  Examples:
+
+    To install using cpanm (this is the default):
+
+      run_after_release = cpanm './%d'
+
+    To install using cpan:
+
+      run_after_release = %x -MCPAN -einstall './%d'
+
+    To not do anything:
+
+      run_after_release =
+
+ additional_test
+
+    Additional test plugin to use. Can be used multiple times to add more
+    than one additional test.
+
+    By default the following tests are executed:
+
+      * Test::Compile -- Checks if perl code compiles correctly
+
+      * Test::Perl::Critic -- Checks Perl source code for best-practices
+
+      * Test::EOL -- Checks line endings
+
+      * Test::NoTabs -- Checks for the use of tabs
+
+      * Test::Version -- Checks to see if each module has the correct
+      version set
+
+      * Test::MinimumVersion -- Checks the minimum perl version, using
+      "max_target_perl"
+
+      * MojibakeTests -- Checks source encoding
+
+      * Test::Kwalitee -- Checks the Kwalitee
+
+      * Test::Portability -- Checks portability of code
+
+      * Test::UnusedVars -- Checks for unused variables
+
+      * Test::CPAN::Changes -- Validation of the Changes file
+
+      * Test::DistManifest -- Validation of the MANIFEST file
+
+      * Test::CPAN::Meta::JSON -- Validation of the META.json file -- only
+      when hosted on GitHub
+
+      * MetaTests -- Validation of the META.yml file -- only when hosted on
+      GitHub
+
+      * PodSyntaxTests -- Checks pod syntax
+
+      * PodCoverageTests -- Checks pod coverage
+
+      * Test::Pod::LinkCheck -- Checks pod links
+
+      * Test::Synopsis -- Checks the pod synopsis
+
+ disable_test
+
+    Specifies the test you don't want to be run. Can bu used more than once
+    to disable multiple tests.
+
+    Default: none (i.e., run all default and "additional_test" tests).
+
+ max_target_perl
+
+    Defines the highest minimum version of perl you intend to require. This
+    is passed to Test::MinimumVersion, which generates a minimum-version.t
+    test that'll warn you if you accidentally used features from a higher
+    version of perl than you wanted. (Having a lower required version of
+    perl is okay.)
+
+    Default: 5.006
+
+ surgical
+
+    If this is set to true, SurgicalPodWeaver is used instead of the
+    standard PodWeaver plugin. SurgicalPodWeaver only munges files that
+    contain either a # ABSTRACT or a # Dist::Zilla: +PodWeaver line.
+
+    Default: false
+
+ weaver_config
+
+    Specifies the configuration for Pod::Weaver.
+
+    Default: @Author::HAYOBAAN.
+
+ tag_format
+
+    Specifies the format for tagging a release (see Git::Tag for details).
+
+    Default: v%v%t
+
+ version_regexp
+
+    Specifies the regexp for versions (see Git::NextVersion for details).
+
+    Default: ^v?([\d.]+(?:_\d+)?)(?:-TRIAL)?$
+
+    Note: Only used in case of git version controlled repositories
+    (AutoVersion is used in case of non-git version controlled
+    repositories).
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    <https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/issues>.
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+CREDITS
+
+    I took inspiration from many people's Dist::Zilla and Pod::Weaver
+    PluginBundles. Most notably from:
+
+      * David Golden DAGOLDEN
+
+      * Mike Doherty DOHERTY
+
+AUTHOR
+
+    Hayo Baan <info@hayobaan.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Hayo Baan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

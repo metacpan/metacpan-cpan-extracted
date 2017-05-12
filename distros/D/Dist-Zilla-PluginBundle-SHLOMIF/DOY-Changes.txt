@@ -1,0 +1,58 @@
+Revision history for Dist-Zilla-PluginBundle-DOY
+
+{{$NEXT}}
+
+0.15  2014-07-04
+      - replace [NoTabsTests] with [Test::NoTabs] (madsen, #1)
+
+0.14  2013-09-03
+      - enabling [AutoPrereqs] by default breaks too much stuff, remove it
+
+0.13  2013-09-03
+      - add [AutoPrereqs], [ContributorsFromGit], and [MetaProvides::Package]
+      - default to github issues for bugtracker
+
+0.12  2013-07-04
+      - allow suppressing the done_testing test dep
+
+0.11  2013-06-26
+      - fix previous fix
+
+0.10  2013-06-26
+      - disable bugtracker.mailto warning
+
+0.09  2012-05-17
+      - switch from [ExtraTests] to [CheckExtraTests]
+
+0.08  2012-02-13
+      - missed a few deps
+
+0.07  2012-02-12
+      - fix Test::Compile warnings
+      - start using Git::Commit and Authority
+      - allow specifying dynamic_config = 1 in dist.ini
+      - use explicit MetaResources rather than inferring things via Repository
+        and locally-run git commands
+
+0.06  2011-02-16
+      - use Git::NextVersion instead of BumpVersionFromGit
+      - use web and clone urls in Repository, and actually get the repo to use
+        from git
+      - allow testing release by setting $ENV{DZIL_FAKE_RELEASE}
+      - always dep on Test::More 0.88 for done_testing
+
+0.05  2010-10-27
+      - allow using MakeMaker::Awesome if requested
+
+0.04  2010-09-03
+      - allow passing options through to @Basic plugins
+
+0.03  2010-06-15
+      - allow dist.ini configuration of the included plugins
+
+0.02  2010-06-13
+      - a few small fixes
+      - add CheckChangesHasContent
+
+0.01  2010-06-13
+      - Initial release

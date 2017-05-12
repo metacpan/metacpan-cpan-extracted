@@ -1,0 +1,20 @@
+Revision history for Date-CommonFormats
+
+0.05    Wed Jun 22 14:00:00 PDT 2011
+        - Fixed bug in RSS Date Format
+
+0.04    Mon Jun 13 17:00:00 PDT 2011
+        - Added DateTime::Format::MySQL for format checking
+	- Fixed bug in w3c year - was not padding 4 spaces
+	- STarting to use DateTime object instead of splitting by hand for most functions
+
+0.03    Mon Jun 13 14:00:00 PDT 2011
+        - Fixed undefined time values when only passed a date
+	- Added Carp croak on bad date/datetime instead of returning ""
+
+0.02    Sun Jun 5 12:00:00 PDT 2011
+        - Fixed Makefile.PL dependencies
+
+0.01    Tue May 31 11:17:02 PDT 2011
+        - First version, released on an unsuspecting world.
+

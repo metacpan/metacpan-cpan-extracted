@@ -1,0 +1,27 @@
+Data/Diff version 0.01
+======================
+
+This is the first version of Data::Diff hopefully you'll find it
+useful.  Its a pure perl module with no dependencies at the moment.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+At the moment there are no dependencies but there are future plans
+to link in Algorithm::Diff to help with the comparing of arrays.
+
+COPYRIGHT AND LICENCE
+
+Data::Diff and associated files are licensed under the same terms
+as Perl itself.
+
+Copyright (C) 2004 George Campbell
+

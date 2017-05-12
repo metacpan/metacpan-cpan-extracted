@@ -1,0 +1,33 @@
+---
+abstract: 'Override existing VERSION in a module'
+author:
+  - 'Graham Knop <haarg@haarg.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-OverridePkgVersion
+requires:
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Moose: '0'
+  MooseX::Types::Perl: '0'
+  PPI: '0'
+  namespace::autoclean: '0'
+  perl: '5.008'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Dist/Display.html?Name=Dist-Zilla-Plugin-OverridePkgVersion
+  repository: https://github.com/haarg/Dist-Zilla-Plugin-OverridePkgVersion.git
+version: '0.002'

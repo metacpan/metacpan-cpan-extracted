@@ -1,0 +1,81 @@
+============================================================================
+                                  DBIx-JCL
+============================================================================
+
+NAME 
+
+DBIx:JCL - Job Control Library for Data Management Tasks
+
+SYNOPSIS
+
+    # file: test_job.pl
+    use strict;
+    use warnings;
+    use DBIx::JCL qw( :all );
+
+    my $jobname = 'name_of_job';
+    sys_init( $jobname );
+
+    # perform database tasks calling DBIx-JCL functions
+    # ...
+
+    sys_end();
+    exit sys_get_errorlevel();
+
+OPTIONS
+
+Options are many, please see both the POD documentation, and the WikiText 
+documentation in the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    - strict
+    - warnings
+    - English
+    - Getopt::Long
+    - Config::IniFiles
+    - Pod::WikiText
+    - IO::File
+    - IO::Handle
+    - IO::LockedFile
+    - Fcntl
+    - File::Copy
+    - File::Bidirectional
+    - File::Basename
+    - MIME::Lite
+    - Date::Format
+    - DBI
+
+RATIONALE
+
+Provide a suite of standard functions that can be shared across all batch
+job scripts used to support database back end tasks. Provide a standardized
+approach for the development of all back end database job scripts. 
+Centralize the administration and access to configuration data. Enforce 
+coding standards and documentation. Abstract the sql used to support back 
+end processes from the task processing logic, by placing all sqlinto an sql 
+library. This will make maintenance of back end sql a trivial task. Provide 
+generalized logging, notification, and system information functions.
+
+AUTHOR
+
+Brad Adkins <dbijcl@gmail.com>
+
+COPYRIGHT
+
+Copyright (c) 2008, Brad Adkins. Rights Reserved. This module is free 
+software. It may be used, redistributed and/or modified under the terms of 
+the Perl Artistic License (see http://www.perl.com/perl/misc/Artistic.html).
+
+============================================================================

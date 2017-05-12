@@ -1,0 +1,25 @@
+---
+abstract: 'Gregorian calendar date calculations'
+author:
+  - 'Steffen Beyer <STBEY@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Calc
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Date::Calc::XS: '6.4'
+requires:
+  Bit::Vector: '7.4'
+  Carp::Clan: '6.04'
+version: '6.4'

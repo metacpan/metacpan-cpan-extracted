@@ -1,0 +1,17 @@
+Things I'm going to do some day:
+
+* Finish fixing Makefile.PL so it does not do  minor bothersome things. =)
+
+*  Multiply Cursor support
+
+* Clean up and document this beast
+
+* Get help on fixing Perl5.x or my software to correctly beable to do
+	dynamic loading of ObjC code.
+
+* Command known to be currently broken:
+    * commit
+    * rollback
+    * readblob
+    * bind_param
+  

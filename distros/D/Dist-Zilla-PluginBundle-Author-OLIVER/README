@@ -1,0 +1,91 @@
+NAME
+    Dist::Zilla::PluginBundle::Author::OLIVER - Dists like OLIVER's
+
+VERSION
+    version 1.122720
+
+DESCRIPTION
+    This is the plugin bundle that OLIVER uses. It is equivalent to:
+
+     [MetaResourcesFromGit]
+  
+     [ReadmeFromPod]
+     [@Filter]
+     -bundle = @Basic
+     -remove = Readme
+  
+     [AutoVersion]
+     [NextRelease]
+     [PkgVersion]
+     [PickyPodWeaver]
+     [AutoPrereqs]
+     [MetaJSON]
+
+     [PruneFiles]
+     filenames = dist.ini
+  
+     [Git::CommitBuild]
+     branch =
+     release_branch = master
+     message = <changelog section content>
+  
+     [@Git]
+     commit_msg = Bumped changelog following rel. v%v
+
+RATIONALE
+    The intention is to have a sane <http://github.com> layout and at the
+    same time supporting CPAN upload.
+
+    Development take place on a "devel" branch at GitHub and then releases
+    are committed to the "master" branch which is the default for user
+    access. Commit messages to the "master" are the content of the latest
+    section in the "Changes" file.
+
+    Use of the Dist::Zilla::Plugin::MetaResourcesFromGit plugin creates
+    links at CPAN which point to the GitHub pages (the wiki page is used as
+    the default Homepage).
+
+    A minor customization to the Pod::Weaver plugin restricts POD munging
+    only to those files containing an "ABSTRACT" statement.
+
+CONFIGURATION
+    If you provide the "no_cpan" option with a true value to the bundle, or
+    set the environment variable "NO_CPAN" to a true value, then the upload
+    to CPAN will be suppressed.
+
+    If you provide a value to the "major_version" option then it will be
+    passed to the "AutoVersion" Plugin as the "major" attribute.
+
+    If you provide a value to the "skip_deps" option then it will be passed
+    to the "AutoPrereqs" Plugin as the "skip" attribute.
+
+    If you provide a value to the "skip_files" option then it will be passed
+    to the "PruneFiles" Plugin as the "match" attribute.
+
+    If you provide one or more instaces of the "skip_plugin" option, then
+    the values will be removed from the list of plugins imported from the
+    @Basic Plugin Bundle.
+
+TIPS
+    Do not include a "NAME", "VERSION", "AUTHOR" or "LICENSE" POD section in
+    your code, they will be provided automatically. However please do
+    include an abstract for documented libraries via a comment like so:
+
+     # ABSTRACT: here is my abstract statement
+
+    The bundle is desgined for projects which are hosted on "github". More
+    so, the project should have a "master" branch which is where the *built*
+    code is committed, and a *separate* branch where you do code
+    development. The module author uses a "devel" branch for this purpose.
+    On "github" you can then leave the "master" branch as the default branch
+    for web browsing.
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Oliver Gorwits.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

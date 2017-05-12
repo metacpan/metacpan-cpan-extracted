@@ -1,0 +1,662 @@
+NAME
+
+    Devel::Examine::Subs - Get info about, search/replace and inject code
+    into Perl files and subs.
+
+SYNOPSIS
+
+        use Devel::Examine::Subs;
+    
+        # examine a file
+    
+        my $des = Devel::Examine::Subs->new( file => 'perl.pl' );
+    
+        # examine all the Perl files in a directory
+    
+        my $des = Devel::Examine::Subs->new( file => '/path/to/directory' );
+    
+        # load a module by name. Uses %INC to find the path after loading it
+    
+        my $des = Devel::Examine::Subs->new( file => 'Some::Module::Name' );
+
+    Get all sub names in a file
+
+        my $aref = $des->all;
+
+    Get all the subs as objects
+
+        $subs = $des->objects;
+    
+        for my $sub (@$subs){
+            $sub->name;       # name of sub
+            $sub->start;      # first line number of sub in file
+            $sub->end;        # last line number of sub in file
+            $sub->line_count; # number of lines in sub
+            $sub->code;       # entire sub code from file
+            $sub->lines;      # lines that match search term
+        }
+
+    Get the sub objects within a hash
+
+        my $subs = $des->objects( objects_in_hash => 1 );
+    
+        for my $sub_name (keys %$subs) {
+    
+            print "$sub_name\n";
+    
+            my $sub = $subs->{$sub_name};
+    
+            print $sub->start . "\n" .
+                  $sub->end . "\n";
+                  ...
+        }
+
+    Get all subs containing "string" in the body
+
+        my $search = 'string';
+        my $aref = $des->has( search => $search );
+
+    Search and replace code in subs
+
+        $des->search_replace( exec => sub { $_[0] =~ s/this/that/g; } );
+
+    Inject code into sub after a search term (preserves previous line's
+    indenting)
+
+        my @code = <DATA>;
+    
+        $des->inject_after(
+                        search => 'this',
+                        code => \@code,
+                      );
+    
+        __DATA__
+    
+        # previously uncaught issue
+    
+        if ($foo eq "bar"){
+            confess 'big bad error';
+        }
+
+    Print out all lines in all subs that contain a search term
+
+        my $subs = $des->lines(search => 'this');
+    
+        for my $sub (keys %$subs){
+    
+            print "\nSub: $sub\n";
+    
+            for my $line (@{ $subs->{$sub} }){
+                my ($line_num, $text) = each %$line;
+                say "Line num: $line_num";
+                say "Code: $text\n";
+            }
+        }
+
+    The structures look a bit differently when 'file' is a directory. You
+    need to add one more layer of extraction.
+
+        my $files = $des->objects;
+    
+        for my $file (keys %$files){
+            for my $sub (@{$files->{$file}}){
+                ...
+            }
+        }
+
+    Print all subs within each Perl file under a directory
+
+        my $files = $des->all( file => 'lib/Devel/Examine' );
+    
+        for my $file (keys %$files){
+            print "$file\n";
+            print join('\t', @{$files->{$file}});
+        }
+
+    Most methods can include or exclude specific subs
+
+        my $has = $des->has( include => ['dump', 'private'] );
+    
+        my $missing = $des->missing( exclude => ['this', 'that'] );
+    
+        # note that 'exclude' param renders 'include' invalid
+
+DESCRIPTION
+
+    Gather information about subroutines in Perl files (and in-memory
+    modules), with the ability to search/replace code, inject new code, get
+    line counts, get start and end line numbers, access the sub's code and
+    a myriad of other options. Files are parsed using PPI, not by
+    inspecting packages or coderefs.
+
+METHODS
+
+    See the "PARAMETERS" for the full list of params, and which ones are
+    persistent across runs using the same object.
+
+ new
+
+    Mandatory parameters: file => $filename
+
+    Instantiates a new object. If $filename is a directory, we'll iterate
+    through it finding all Perl files. If $filename is a module name (eg:
+    Data::Dump), we'll attempt to load the module, extract the file for the
+    module, and load the file. CAUTION: this will be a production %INC file
+    so be careful.
+
+    Only specific params are guaranteed to stay persistent throughout a run
+    on the same object, and are best set in new(). These parameters are
+    file, extensions, maxdepth, cache, regex, copy, no_indent, backup and
+    diff.
+
+    Note: omit the file parameter if all you'll be using is the module()
+    method.
+
+ all
+
+    Mandatory parameters: None
+
+    Returns an array reference containing the names of all subroutines
+    found in the file, listed in the order they appear in the file.
+
+ has
+
+    Mandatory parameters: search => 'term'
+
+    Returns an array reference containing the names of the subs where the
+    subroutine contains the search text.
+
+ missing
+
+    Mandatory parameters: search => 'term'
+
+    The exact opposite of has.
+
+ lines
+
+    Mandatory parameters: search => 'text'
+
+    Gathers together all line text and line number of all subs where the
+    subroutine contains lines matching the search term.
+
+    Returns a hash reference with the subroutine name as the key, the value
+    being an array reference which contains a hash reference in the format
+    line_number => line_text.
+
+ objects
+
+    Mandatory parameters: None
+
+    Optional parameters: objects_in_hash => 1
+
+    Returns an array reference of subroutine objects. If the optional
+    objects_in_hash is sent in with a true value, the objects will be
+    returned in a hash reference where the key is the sub's name, and the
+    value is the sub object.
+
+    See "SYNOPSIS" for the structure of each object.
+
+ module('Module::Name')
+
+    Mandatory parameters: 'Module::Name'. Note that this is one public
+    method that takes its parameter in string format (as opposed to hash
+    format).
+
+    Note that this method pulls the subroutine names from the namespace
+    (which may include includeed subs. If you only want a list of subs
+    within the actual module file, send the module name as the value to the
+    file parameter, and use the common methods (all, has, missing etc) to
+    extract the names.
+
+    Returns an array reference containing the names of all subs found in
+    the module's namespace symbol table.
+
+ order
+
+    After one of the other user methods are called, call this method to get
+    returned to you an array of the names of subs you collected, in the
+    order that they appear in the file. By default, because we use hashes
+    internally, subs aren't ever in proper order.
+
+ search_replace
+
+    Mandatory parameters: exec => $cref
+
+    Core optional parameter: copy => 'filename.txt'
+
+    Coderef should be created in the form sub { $_[0] =~ s/search/replace/;
+    };. This allows us to avoid string eval, and allows us to use any regex
+    modifiers you choose. The $_[0] element represents each line in the
+    file, as we loop over them.
+
+ replace
+
+    Parameters: exec => $cref, limit => 1
+
+    This is the entire file brother to the sub-only search_replace(). The
+    limit parameter specifies how many successful replacements to do,
+    starting at the top of the file. Set to a negative integer for
+    unlimited (this is the default).
+
+    The exec parameter is a code reference, eg: my $cref = sub {$_[0] =~
+    s/this/that/;}. All standard Perl regular expressions apply, along with
+    their modifiers. The $_[0] element represents each line in the file, as
+    we loop over them.
+
+    Returns the number of lines changed in file mode, and an empty hashref
+    in directory mode.
+
+ inject_after
+
+    Mandatory parameters: search => 'this', code => \@code
+
+    Injects the code in @code into the sub within the file, where the sub
+    contains the search term. The same indentation level of the line that
+    contains the search term is used for any new code injected. Set
+    no_indent parameter to a true value to disable this feature.
+
+    By default, an injection only happens after the first time a search
+    term is found. Use the injects parameter (see "PARAMETERS") to change
+    this behaviour. Setting to a positive integer beyond 1 will inject
+    after that many finds. Set to a negative integer will inject after all
+    finds.
+
+    The code array should contain one line of code (or blank line) per each
+    element. (See "SYNOPSIS" for an example). The code is not manipulated
+    prior to injection, it is inserted exactly as typed. Best to use a
+    heredoc, __DATA__ section or an external text file for the code.
+
+    Optional parameters:
+
+    copy
+
+      See search_replace() for a description of how this parameter is used.
+
+    injects
+
+      How many injections do you want to do per sub? See "PARAMETERS" for
+      more details.
+
+ inject
+
+    Parameters (all are mutually exclusive, use only one):
+
+    line_num => 33 with code => \@code or, inject_use => ['use
+    Module::Name', 'use Module2::Name'] or, inject_after_sub_def => ['code
+    line 1;', 'code line 2;']
+
+    line_num will inject the block of code in the array reference
+    immediately after the line number specified.
+
+    inject_use will inject the statements prior to all existing use
+    statements that already exist in the file(s). If none are found, will
+    inject the statements right after a Package statement if found.
+
+    Technically, you don't have to inject a use statement, but I'd advise
+    it.
+
+    inject_after_sub_def will inject the lines of code within the array
+    reference value immediately following all sub definitions in a file.
+    Next line indenting is used, and sub definitions with their opening
+    brace on a separate line than the definition itself is caught.
+
+ remove
+
+    Parameters: delete => ['string1', 'string2']
+
+    Deletes from the file(s) the entire lines that contain the search
+    terms.
+
+    This method is file based... the work happens prior to digging up subs,
+    hence exclude, include and other sub-based parameters have no effect.
+
+ backup(Bool)
+
+    Configure whether to make a filename.bak copy of all files read by DES.
+    A true value sent in will enable this feature, a false value will
+    disable it. Returns 1 (true) if this feature is enabled, and 0 (false)
+    if not.
+
+    Disabled by default.
+
+DEVELOPER METHODS
+
+ valid_params
+
+    Returns a hash where the keys are valid parameter names, and the value
+    is a bool where if true, the parameter is persistent (remains between
+    calls on the same object) and if false, the param is transient, and
+    will be made undef after each method call finishes.
+
+ run
+
+    Parameter format: Hash reference
+
+    All public methods call this method internally. This is the only public
+    method that takes its parameters as a single hash reference. The public
+    methods set certain variables (filters, engines etc). You can get the
+    same effect programatically by using run(). Here's an example that
+    performs the same operation as the has() public method:
+
+        my $params = {
+                search => 'text',
+                post_proc => 'file_lines_contain',
+                engine => 'has',
+        };
+    
+        my $return = $des->run($params);
+
+    This allows for very fine-grained interaction with the application, and
+    makes it easy to write new engines and for testing.
+
+ add_functionality
+
+    WARNING!: This method is for development of this distribution only!
+
+    While writing new processors, set the processor type to a callback
+    within the local working file. When the code performs the actions you
+    want it to, put a comment line before the code with #<des> and a line
+    following the code with #</des>. DES will slurp in all of that code
+    live-time, inject it into the specified processor, and configure it for
+    use. See examples/write_new_engine.pl for an example of creating a new
+    'engine' processor.
+
+    Returns 1 on success.
+
+    Parameters:
+
+    add_functionality
+
+      Informs the system which type of processor to inject and configure.
+      Permitted values are 'pre_proc', 'post_proc' and 'engine'.
+
+    add_functionality_prod
+
+      Set to a true value, will update the code in the actual installed
+      Perl module file, instead of a local copy.
+
+    Optional parameters:
+
+    copy
+
+      Set it to a new file name which will be a copy of the specified file,
+      and only change the copy. Useful for verifying the changes took
+      properly.
+
+ pre_procs, post_procs, engines
+
+    For development. Returns the list of the respective built-in callbacks.
+
+PARAMETERS
+
+    There are various parameters that can be used to change the behaviour
+    of the application. Some are persistent across calls, and others
+    aren't. You can change or null any/all parameters in any call, but some
+    should be set in the new() method (set it and forget it).
+
+    The following list are persistent parameters, which need to be manually
+    changed or nulled. Consider setting these in new().
+
+    file
+
+      State: Persistent
+
+      Default: None
+
+      The name of a file, directory or module name. Will convert module
+      name to a file name if the module is installed on the system. It'll
+      require the module temporarily and then 'un'-require it immediately
+      after use.
+
+      If set in new(), you can omit it from all subsequent method calls
+      until you want it changed. Once changed in a call, the updated value
+      will remain persistent until changed again.
+
+    backup
+
+      State: Persistent
+
+      Default: Disabled
+
+      Set this to a true value to have a .bak file copy created on all file
+      reads. The .bak file will be created in the directory the script is
+      run in.
+
+    extensions
+
+      State: Persistent
+
+      Default: ['*.pm', '*.pl')]
+
+      By default, we load only *.pm and *.pl files. Use this parameter to
+      load different files. Only useful when a directory is passed in as
+      opposed to a file. This parameter is persistent until manually reset
+      and should be set in new().
+
+      Values: Array reference where each element is the names of files to
+      find. Any wildcard or regex that are valid in File::Find::Rule's
+      <http://search.cpan.org/~rclamp/File-Find-Rule-0.33/lib/File/Find/Rul
+      e.pm> are valid here. For example, [qw(*.pm *.pl)] is the default.
+
+    maxdepth
+
+      When running in directory mode, how many levels deep do you want to
+      traverse? Default is unlimited. Set to a positive integer to set.
+
+    cache
+
+      State: Persistent
+
+      Default: Undefined
+
+      If multiple calls on the same object are made, caching will save the
+      file/directory/sub information, saving tremendous work for subsequent
+      calls. This is dependant on certain parameters not changing between
+      calls.
+
+      Set to a true value (1) to enable. Best to call in the new method.
+
+    copy
+
+      State: Persistent
+
+      Default: None
+
+      For methods that write to files, you can optionally work on a copy
+      that you specify in order to review the changes before modifying a
+      production file.
+
+      Set this parameter to the name of an output file. The original file
+      will be copied to this name, and we'll work on this copy.
+
+    regex
+
+      State: Persistent
+
+      Default: Enabled
+
+      Set to a true value, all values in the 'search' parameter become
+      regexes. For example with regex on, /thi?s/ will match "this", but
+      without regex, it won't. Without 'regex' enabled, all characters that
+      perl treats as special must be escaped. This parameter is persistent;
+      it remains until reset manually.
+
+    no_indent
+
+      State: Persistent
+
+      Default: Disabled
+
+      In the processes that write new code to files, the indentation level
+      of the line the search term was found on is used for inserting the
+      new code by default. Set this parameter to a true value to disable
+      this feature and set the new code at the beginning column of the
+      file.
+
+    diff
+
+      State: Persistent
+
+      Not yet implemented.
+
+      Compiles a diff after each edit using the methods that edit files.
+
+    The following parameters are not persistent, ie. they get reset before
+    entering the next call on the DES object. They must be passed in to
+    each subsequent call if the effect is still desired.
+
+    include
+
+      State: Transient
+
+      Default: None
+
+      An array reference containing the names of subs to include. This (and
+      exclude) tell the Processor phase to generate only these subs,
+      significantly reducing the work that needs to be done in subsequent
+      method calls.
+
+    exclude
+
+      State: Transient
+
+      Default: None
+
+      An array reference of the names of subs to exclude. See include for
+      further details.
+
+      Note that exclude renders include useless.
+
+    injects
+
+      State: Transient
+
+      Default: 1
+
+      Informs inject_after() how many injections to perform. For instance,
+      if a search term is found five times in a sub, how many of those do
+      you want to inject the code after?
+
+      Default is 1. Set to a higher value to achieve more injects. Set to a
+      negative integer to inject after all.
+
+    pre_proc_dump, post_proc_dump, engine_dump, cache_dump, core_dump
+
+      State: Transient
+
+      Default: Disabled
+
+      Set to 1 to activate, exit()s after completion.
+
+      Print to STDOUT using Data::Dumper the structure of the data
+      following the respective phase. The core_dump will print the state of
+      the data, as well as the current state of the entire DES object.
+
+      NOTE: The 'post_proc' phase is run in such a way that the filters can
+      be daisy-chained. Due to this reason, the value of post_proc_dump
+      works a little differently. For example:
+
+          post_proc => ['one', 'two'];
+
+      ...will execute filter 'one' first, then filter 'two' with the data
+      that came out of filter 'one'. Simply set the value to the number
+      that coincides with the location of the filter. For instance,
+      post_proc_dump => 2; will dump the output from the second filter and
+      likewise, 1 will dump after the first.
+
+      For cache_dump, if it is set to one, it'll dump cache but the
+      application will continue. Set this parameter to an integer larger
+      than one to have the application exit immediately after dumping the
+      cache to STDOUT.
+
+    pre_proc_return, post_proc_return, engine_return
+
+      State: Transient
+
+      Default: Disabled
+
+      Returns the structure of data immediately after being processed by
+      the respective phase. Useful for writing new 'phases'. (See "SEE
+      ALSO" for details).
+
+      NOTE: post_proc_return does not behave like post_proc_dump. It will
+      only return after all post_procs have executed.
+
+    config_dump
+
+      State: Transient
+
+      Default: Disabled
+
+      Prints to STDOUT with Data::Dumper the current state of all loaded
+      configuration parameters.
+
+    pre_proc, post_proc, engine
+
+      State: Transient
+
+      Default: undef
+
+      These are mainly used to set up the public methods with the proper
+      callbacks used by the run() command.
+
+      engine and pre_proc take either a single string that contains a valid
+      built-in callback, or a single code reference of a custom callback.
+
+      post_proc works a lot differently. These modules can be
+      daisy-chained. Like engine and pre_proc, you can send in a string or
+      cref, or to chain, send in an aref where each element is either a
+      string or cref. The filters will be executed based on their order in
+      the array reference.
+
+REPOSITORY
+
+    https://github.com/stevieb9/devel-examine-subs
+
+BUILD REPORTS
+
+    CPAN Testers: http://matrix.cpantesters.org/?dist=Devel-Examine-Subs
+
+DEBUGGING
+
+    If Devel::Trace::Subs is installed, you can configure stack tracing.
+
+    In your calling script, set $ENV{DES_TRACE} = 1.
+
+    See perldoc Devel::Trace::Subs for information on how to access the
+    traces.
+
+SEE ALSO
+
+    perldoc Devel::Examine::Subs::Preprocessor
+
+      Information related to the 'pre_proc' phase core modules.
+
+    perldoc Devel::Examine::Subs::Postprocessor
+
+      Information related to the 'post_proc' phase core modules.
+
+    perldoc Devel::Examine::Subs::Engine
+
+      Information related to the 'engine' phase core modules.
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::Examine::Subs
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

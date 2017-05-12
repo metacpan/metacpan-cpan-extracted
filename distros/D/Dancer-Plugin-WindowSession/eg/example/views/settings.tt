@@ -1,0 +1,76 @@
+<div class="container">
+
+<h1>Dancer::Plugin::WindowSession Example</h1>
+
+<br/>
+
+<h2>Change Settings</h2>
+
+<form class="form-horizontal" method="post">
+<fieldset>
+	<legend>Global Settings <small>(session variables)</small></legend>
+
+	<input type="hidden" name="winsid" value="[%=winsid%]"/>
+
+	<!-- Text-Entry Control -->
+	<div class="control-group">
+		<label class="control-label" for="username">Your name</label>
+		<div class="controls">
+			<input type="text" id="username" name="username" value="[% session.username | html%]">
+			<span class="help-inline"></span>
+		</div>
+	</div>
+
+	<legend>Per-Window Settings <small>(window-session variables)</small></legend>
+
+	<!-- List box control -->
+	<div class="control-group">
+		<label class="control-label" for="plottype">Plot Type</label>
+		<div class="controls">
+			<select id="plot_type" name="plot_type">
+[% FOREACH plot IN [ "area", "points", "lines", "bars" ] %]
+				<option [% IF window_session.plot_type == plot %]selected[% END %]>[% plot %]</option>
+[% END %]
+			</select>
+		</div>
+	</div>
+
+
+	<!-- Radio Buttons Controls -->
+	<div class="control-group">
+		<label class="control-label">Plot color</label>
+		<div class="controls">
+[% FOREACH color IN [ "red", "blue", "green", "yellow", "black" ] %]
+			<label class="radio">
+				<input type="radio" name="plot_color"value="[% color %]"
+					[% IF window_session.plot_color == color %] checked [% END %]>
+				<span style="color: [% color %];">[% color %]</span>
+			</label>
+[% END %]
+		</div>
+	</div>
+
+	<div class="control-group">
+		<label class="control-label" for="plot_width">Plot Width</label>
+		<div class="controls">
+			<input type="text" id="plot_width" name="plot_width" value="[% window_session.plot_width | html%]">
+			<span class="help-inline"></span>
+		</div>
+	</div>
+	<div class="control-group">
+		<label class="control-label" for="plot_height">Plot Height</label>
+		<div class="controls">
+			<input type="text" id="plot_height" name="plot_height" value="[% window_session.plot_height | html%]">
+			<span class="help-inline"></span>
+		</div>
+	</div>
+
+
+	<!-- The Submit buttons -->
+	<div class="form-actions">
+		<button type="submit" class="btn btn-primary">Save Settings</button>
+	</div>
+</fieldset>
+</form>
+
+</div> <!-- container -->

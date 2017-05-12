@@ -1,0 +1,30 @@
+---
+abstract: 'PostgreSQL connection for Dancer2'
+author:
+  - 'Lucas Tiago de Moraes <lucastiagodemoraes@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4216, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Pg
+provides:
+  Dancer2::Plugin::Pg:
+    file: lib/Dancer2/Plugin/Pg.pm
+    version: '0.07'
+  Dancer2::Plugin::Pg::Core:
+    file: lib/Dancer2/Plugin/Pg/Core.pm
+requires:
+  DBI: '0'
+  Dancer2: '0'
+  Moo: '0'
+resources:
+  bugtracker: https://github.com/lucas1/Dancer2-Plugin-Pg/issues
+  homepage: https://github.com/lucas1/Dancer2-Plugin-Pg
+  repository: git://github.com/lucas1/Dancer2-Plugin-Pg.git
+version: '0.07'

@@ -1,0 +1,42 @@
+Distributed-Process
+
+This module provides a framework for running a process simultaneously on
+several machines.
+
+It was first designed to conduct stress tests session, where several computers
+would send queries to a server at the same time, but it might prove useful for
+other purposes.
+
+This distribution provides code to run server to conduct the "workers", and to
+run the clients that do the actual work.
+
+The task to distribute must be implemented in a subclass of
+Distributed::Process::Worker, by overloading its run() method.
+
+Please read the documentation for Distributed::Process for further details, and
+remember that this is still alpha code.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Cédric Bouvier
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

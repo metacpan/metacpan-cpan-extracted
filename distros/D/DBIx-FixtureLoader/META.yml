@@ -1,0 +1,50 @@
+---
+abstract: 'Loading fixtures and inserting to your database'
+author:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  CPAN::Meta: '0'
+  CPAN::Meta::Prereqs: '0'
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.3.0, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-FixtureLoader
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::FixtureLoader:
+    file: lib/DBIx/FixtureLoader.pm
+    version: '0.12'
+requires:
+  DBI: '0'
+  DBIx::TransactionManager: '0'
+  JSON: '0'
+  Moo: '0'
+  SQL::Maker: '1.09'
+  Text::CSV: '0'
+  YAML::Tiny: '0'
+  parent: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/Songmu/p5-DBIx-FixtureLoader/issues
+  homepage: https://github.com/Songmu/p5-DBIx-FixtureLoader
+  repository: git://github.com/Songmu/p5-DBIx-FixtureLoader.git
+version: '0.12'
+x_contributors:
+  - 'taiyoh <sun.basix@gmail.com>'
+  - 'Motonobu Ichimura <ichimuram@intellilink.co.jp>'

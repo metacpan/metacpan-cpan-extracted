@@ -1,0 +1,10 @@
+---
+author: yappo
+comment: dumy
+date: 2008-04-19 21:12:57 +0900
+files:
+  - path: lang/perl/misc/
+    status: _U
+  - path: lang/perl/misc/dumy.pl
+    status: A
+rev: dumy1

@@ -1,0 +1,11 @@
+Revision history for Perl extension DateTime-Format-JavaScript
+
+0.02 2014-07-27T13:52:44Z
+
+    - Support modern browsers.
+    - Added test cases.
+    - Documented a bit.
+
+0.01    Wed Jun 13 16:08:40 2007
+
+    - First version.

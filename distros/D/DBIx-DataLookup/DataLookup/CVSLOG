@@ -1,0 +1,79 @@
+
+RCS file: /rep/dev/apps/weather/perl/TableHash.pm,v
+Working file: TableHash.pm
+head: 1.11
+branch:
+locks: strict
+access list:
+symbolic names:
+keyword substitution: kv
+total revisions: 11;	selected revisions: 11
+description:
+----------------------------
+revision 1.11
+date: 2002/04/24 03:38:21;  author: vlad;  state: Exp;  lines: +19 -8
+*** empty log message ***
+----------------------------
+revision 1.10
+date: 2002/04/23 20:37:32;  author: vlad;  state: Exp;  lines: +12 -5
+
+fixed serious flaw in get_hashref whereby hash keys would not be assigned
+correct values.
+----------------------------
+revision 1.9
+date: 2002/04/22 22:38:03;  author: vlad;  state: Exp;  lines: +18 -6
+
+release
+----------------------------
+revision 1.8
+date: 2002/04/22 20:00:12;  author: vlad;  state: Exp;  lines: +39 -11
+
+with add_key_mapping() existing keys may be mapped to existing records
+via additional/alternative key values.  For example, in my weather
+city analyzer script, I had to add this line:
+
+$lookup{countryname_code}->add_key_mapping(countryname => 'England', 'UNITED KINGDOM');
+
+to also make 'UNITED KINGDOM' (country name used by our vendor) point to
+all records that 'England' (our name for the same country) key points to.
+----------------------------
+revision 1.7
+date: 2002/04/22 19:40:57;  author: vlad;  state: Exp;  lines: +33 -11
+
+new subroutine add_record() may now be used to add a record to the table.
+----------------------------
+revision 1.6
+date: 2002/04/22 19:17:21;  author: vlad;  state: Exp;  lines: +50 -16
+
+added get_hashref to return records as hashes with keys being column
+names and values.. err.. their respective values ;).  Also, it is
+now possible to look for multiple key values (not multiple keys just
+yet).
+----------------------------
+revision 1.5
+date: 2002/04/19 22:28:34;  author: vlad;  state: Exp;  lines: +17 -3
+
+minor
+----------------------------
+revision 1.4
+date: 2002/04/19 22:13:09;  author: vlad;  state: Exp;  lines: +106 -54
+
+First working release.
+----------------------------
+revision 1.3
+date: 2002/04/19 20:51:21;  author: vlad;  state: Exp;  lines: +21 -17
+
+fixed a few bugs. Rearranged code flow.
+----------------------------
+revision 1.2
+date: 2002/04/19 20:45:56;  author: vlad;  state: Exp;  lines: +50 -4
+
+beta.
+----------------------------
+revision 1.1
+date: 2002/04/19 17:46:52;  author: vlad;  state: Exp;
+
+a simple module to store table data into a hash (for quicker access).
+The hash also could be dumped into a static file (using Data::Dumper)
+for use on consequent runs of the same script.
+=============================================================================

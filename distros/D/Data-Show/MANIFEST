@@ -1,0 +1,11 @@
+Build.PL
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Data/Show.pm
+t/00.load.t
+t/pod.t
+t/show.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

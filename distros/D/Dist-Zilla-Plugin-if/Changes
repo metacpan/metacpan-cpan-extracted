@@ -1,0 +1,33 @@
+Release history for Dist-Zilla-Plugin-if
+
+0.002002 2017-03-09T10:10:27Z b99280b
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Remove use of ConfigDumper util
+ - Remove use of Test::KENTNL/dztest
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +14 ↑4 -3 (recommends: +1, suggests: ↑2)
+ - runtime: -1 (recommends: +1)
+ - test: +1 ↓1 -1 (recommends: ↑1 ↓1)
+
+0.002001 2014-08-29T09:56:30Z
+ [Bugfix]
+ - Avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - test: ↑1
+
+0.002000 2014-08-28T01:45:46Z
+ [00 Minor]
+ - Rewrite internals in terms of Role::PluginLoader
+ - Add if::not
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - runtime: +1 -2
+
+0.001000 2014-08-26T07:55:43Z
+ - First version.

@@ -1,0 +1,16 @@
+Revision history for Device-USB-Win32Async
+
+0.35  Set Jan 16 12:43:00 2010
+       Documentation cleanup and pod test correction.
+0.34  Thu Jan 7 22:25:00 2010
+       Fix the Build.PL logic for installing on Windows.
+       Extend pre-build testing to match Device::USB.
+       Add a little more testing.
+0.33   Wed Dec 30 20:55:00 2009
+       Attempt to reconcile Inline::C with adding subroutines to a different
+       package.
+0.31   Wed Dec 16 20:22:00 2009
+       Re-release to fix indexing.
+0.30   Wed Dec 2 22:19:08 2009
+       Initial release.
+

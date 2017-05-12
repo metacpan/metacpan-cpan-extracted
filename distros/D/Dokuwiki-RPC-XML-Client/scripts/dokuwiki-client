@@ -1,0 +1,123 @@
+#! /usr/bin/perl
+use Dokuwiki::RPC::XML::Client;
+use Modern::Perl;
+use Net::Netrc;
+require YAML;
+no warnings qw( once qw );
+
+=head1 SYNOPSIS
+
+dokuwiki-client is as cli wrapper to the XML::RPC perl client.
+
+    dokuwiki-client show getVersion
+    # prints the dokuwiki version
+   
+    dokuwiki-client show getPageHTML page:in:your:namespace 
+    # show the rendered version of page:in:your:namespace 
+    
+    dokuwiki-client ls your:namespace
+    # list the ids of pages in your:namespace 
+
+=head1 Configure
+
+configure a machine (the name isn't related to the dokuwiki base url) to store
+the credentials 
+
+    machine personnal.wiki
+        login me
+        password Ih4v3S3cr3ts
+
+then, setup 2 environement variables
+
+    export DOKUWIKI_CLIENT_BASE=http://my.wiki.example.com
+    export DOKUWIKI_CLIENT_MACHINE=personal.wiki
+
+=head1 Available subcommand
+
+=cut
+
+my $wiki = Dokuwiki::RPC::XML::Client->reach( $ENV{DOKUWIKI_CLIENT_BASE} || die );
+my $credentials = Net::Netrc->lookup( $ENV{DOKUWIKI_CLIENT_MACHINE} || die  )
+    or die "please add a fake $ENV{DW_MACHINE} machine in your ~/.netrc"; 
+my ( $l, $p ) = $credentials->lpa; 
+$wiki->login( $l, $p ) or die;
+
+=head2 call
+
+call an XML::RPC method and dump the result as a YAML in stdout
+
+    dokuwiki-client call getPagelist your:namespace
+
+=cut
+
+sub call {
+    my $method = shift;
+    say YAML::Dump $wiki->$method( @_ );
+}
+
+=head2 show
+
+call an XML::RPC method and print the result in stdout
+
+    dokuwiki-client show getVersion
+
+=cut
+
+sub show {
+    my $method = shift;
+    say $wiki->$method( @_ );
+} 
+
+=head2 ls
+
+list the entries of a namespace
+
+    # dokuwiki-client ls my:namespace
+    page1
+    page2
+    page3
+    ...
+
+=cut
+
+sub ids_of { map { $$_{id} } @{ (shift) } }   
+sub _ls    { ids_of getPagelist $wiki, @_ }
+sub  ls    { say for &_ls }
+
+=head2 page and html
+
+are shortcuts for 
+
+    dokuwiki-client show getPage foo
+    dokuwiki-client show getPageHTML foo
+
+=cut
+
+sub page  { show getPage     => @_ } 
+sub html  { show getPageHTML => @_ }
+
+# untested! maybe a nicer more generic each: 
+# dokuwiki-client each 'print $$_{id} if $$_{id} ~~ /foo/' getPagelist my:namespace 
+#
+# sub find {
+#     my $when = do {
+#         my $code = shift or die "invalid filter";
+#         my $sub  = eval "sub {$code}";
+#         $@ and die "can't eval ($code) : $@";
+#         $sub;
+#     }; 
+#     map { say if &$when } _ls @_;
+# }
+
+# Also: the hashes must be wrapped. How to do: 
+# say for ls $wiki,'/metiers', { depth => 2 };
+# say for grep /duprej/, find $wiki;
+# my @files = ls $wiki,'/', { depth => 1 };   
+
+
+my $cmd = shift or exit;
+my $sub = __PACKAGE__->can( $cmd )
+    or die "$cmd isn't a valid command";
+$sub->( @ARGV );
+
+

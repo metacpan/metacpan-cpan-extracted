@@ -1,0 +1,28 @@
+bin/dumbbench
+Changes
+examples/TryPackage.pm
+INSTALL.SKIP
+lib/Benchmark/Dumb.pm
+lib/Dumbbench.pm
+lib/Dumbbench/BoxPlot.pm
+lib/Dumbbench/CPUFrequencyPinner.pm
+lib/Dumbbench/Instance.pm
+lib/Dumbbench/Instance/Cmd.pm
+lib/Dumbbench/Instance/PerlEval.pm
+lib/Dumbbench/Instance/PerlSub.pm
+lib/Dumbbench/Result.pm
+lib/Dumbbench/Stats.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+r/boxplot.r
+README.pod
+t/000_load.t
+t/010_stats.t
+t/100_bdumb.t
+xt/at_000_eval_vs_sub.t
+xt/at_000_external_vs_eval.t
+xt/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

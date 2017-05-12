@@ -1,0 +1,97 @@
+NAME
+    Data::Apple::PriceTier - Utility for Apple (App|Mac) Store's price tier.
+
+SYNOPSIS
+        # class interface
+        my $price = Data::Apple::PriceTier->price_for(
+            currency => 'Euro',
+            tier     => 1,
+        ); # => 0.79
+    
+        my $proceed = Data::Apple::PriceTier->proceed_for(
+            country => 'Japan',
+            tier    => 1,
+        ); # => 60
+    
+        # object interface
+        my $us_tier = Data::Apple::PriceTier->new( country => 'U.S.' );
+        my $price   = $us_tier->price_for_tier(1); # => 0.99
+
+DESCRIPTION
+    Data::Apple::PriceTier is a simple utility module that helps you to
+    convert Apple's price tier to real currencies. It's useful to create
+    server-side implementation of In-App purchases that supports multiple
+    currencies.
+
+CLASS METHODS
+  $price = Data::Apple::PriceTier->price_for(%args);
+        $price = Data::Apple::PriceTier->price_for( currency => 'US$', tier => 1 );
+
+    Return customer price for %args
+
+    Supported %args is:
+
+    *   currency
+
+    *   country
+
+        Specify target country or currency. Either country or currency is
+        required.
+
+    *   tier
+
+        Specify target price tier. Required.
+
+  $proceed = Data::Apple::PriceTier->proceed_for(%args);
+        $proceed = Data::Apple::PriceTier->proceed_for( currency => 'Yen', tier => 1 );
+
+    Return your proceed for %args. Supported args is same as above
+    "price_for" method.
+
+  @prices = Data::Apple::PriceTier->prices(%country_or_currency);
+        my @prices = Data::Apple::PriceTier->prices( country => 'Japan' );
+        my @prices = Data::Apple::PriceTier->prices( currency => 'Yen' );
+
+    Return customer price list for given country or currency.
+
+    Note: this list start with tier 1. $prices[0] represent tier 1 price not
+    Free price.
+
+  @proceeds = Data::Apple::PriceTier->proceeds(%country_or_currency);
+        my @proceeds = Data::Apple::PriceTier->proceeds( country => 'Japan' );
+        my @proceeds = Data::Apple::PriceTier->proceeds( currency => 'Yen' );
+
+    Return your proceed list for given country or currency.
+
+  $obj = Data::Apple::PriceTier->new(%country_or_currency);
+    Create Data::Apple::PriceTier object and return it. See "INSTANCE
+    METHODS" showed below for more detail.
+
+  @countries = Data::Apple::PriceTier->supported_countries;
+    List of countries that Apple (and this module) supports.
+
+  @currencies = Data::Apple::PriceTier->supported_currencies;
+    List of currencies that Apple (and this module) supports.
+
+  %countries_and_currencies = Data::Apple::PriceTier->supported_countries_and_currencies;
+    Return list of supported countries and currencies at once.
+
+INSTANCE METHODS
+  $price = $obj->price_for_tier($tier);
+    Return customer price for $tier with $obj's country.
+
+  $proceed = $obj->proceed_for_tier($tier);
+    Return your proceed for $tier with $obj's country.
+
+AUTHOR
+    Daisuke Murase <typester@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2012 KAYAC Inc. All rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

@@ -1,0 +1,91 @@
+Date::Gregorian - Gregorian calendar
+====================================
+
+Copyright (c) 1999-2007, Martin Becker <hasch-cpan-dg@cozap.com>.
+All rights reserved.
+
+Version
+-------
+
+This is Version 0.12 of Date::Gregorian.
+
+DSLIP status
+------------
+
+bdpOp (beta, developer, perl, object-oriented, Standard-Perl)
+
+License
+-------
+
+This package is free software; you can distribute it and/or modify
+it under the same terms as Perl itself.
+
+This package is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+license information that came with your Perl kit for more details.
+
+Description
+-----------
+
+Date::Gregorian performs date calculations, similar to Date::Calc
+by Steffen Beyer.  However, it has a pure object-oriented interface,
+it does not use C code, and it extends the Gregorian calendar beyond
+some configurable date in the past by its predecessor, the Julian
+calendar.  See the inline POD documentation for more details.
+
+Y2K compliance
+--------------
+
+This package does not use nor permit two-digit abbreviations for
+four-digit year numbers anywhere.  In fact, it is designed to deal
+with dates in many different centuries.
+
+Prerequisites
+-------------
+
+Perl 5.
+
+Installation
+------------
+
+perl Makefile.PL
+make
+make test
+make install
+
+Test customization
+------------------
+
+Some tests depend on assumptions about the current local timezone
+during testing and will not always be meaningful.  These tests can
+be disabled by setting WITHOUT_DATE_GREGORIAN_LOCALTIME_TESTS=1 in
+the environment or on the make test command line.
+
+Changes
+-------
+
+Since its first release, no major changes have been made to the
+module's basic interface.  Version 0.07 finally introduced the
+Date::Gregorian::Business extension.  Version 0.09 introduced
+iterators.  Version 0.10 introduced limited DateTime interoperability.
+For a detailed history of changes, see the Changes file.
+
+Ongoing development
+-------------------
+
+The oversimplifying Date::Gregorian::Exact extension has been
+abandoned.  Look into the DateTime suite of modules for a more
+comprehensive approach to handling timestamps and localization.
+
+More samples of business calendars and better ways to define even
+more of them will be added in the future.
+
+Fractional business days are an experimental feature so far.
+Their semantics are subject to further scrutiny.
+
+Eventually, the essentials of Date::Gregorian::Business might
+be put to work in a proper DateTime extension.
+
+More suggestions are welcome.
+

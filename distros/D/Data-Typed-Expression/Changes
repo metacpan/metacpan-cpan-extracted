@@ -1,0 +1,18 @@
+Revision history for Data-Typed-Expression
+
+0.005   2013-08-07
+        Fix: Forgotten test prerequisite.
+
+0.004   2013-08-06
+        Cleanup: tests and Dist::Zilla's dist.ini
+
+0.003   2010-10-28
+        Test requirements correction.
+
+0.002   2009-12-29
+        POD corrections.
+
+0.001   2009-11-20
+        First version, released on an unsuspecting world.
+
+

@@ -1,0 +1,11 @@
+lib/DBD/Log.pm
+lib/DBD/Log/Sth.pm
+Makefile.PL
+MANIFEST			This list of files
+Changes                         The revision history
+LICENSE                         GNU/Artistic 
+README                          short howto install
+t/01_basics.t                   basic loading tests
+t/02_DBD-Log.t                  simple logging tests
+t/runtest.pl                    use this to run the tests
+META.yml                                 Module meta-data (added by MakeMaker)

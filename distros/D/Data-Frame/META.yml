@@ -1,0 +1,46 @@
+---
+abstract: 'data frame implementation'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Math::BigInt: 0
+  Test::Most: 0
+  perl: 5.012
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.012
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Frame
+requires:
+  Carp: 0
+  Data::Perl: 0
+  Data::Rmap: 0
+  Exporter: 0
+  List::AllUtils: 0
+  Moo: 0
+  Moo::Role: 0
+  MooX::InsideOut: 0
+  MooX::Traits: 0
+  PDL: 2.007
+  PDL::Lite: 0
+  Scalar::Util: 0
+  Storable: 0
+  Test::Deep::NoTest: 0
+  Text::Table::Tiny: 0
+  Tie::IxHash: 0
+  Try::Tiny: 0
+  constant: 0
+  overload: 0
+  perl: 5.012
+  strict: 0
+  warnings: 0
+resources:
+  IRC: irc://irc.perl.org/#pdl
+  homepage: https://github.com/zmughal/p5-Data-Frame
+  repository: https://github.com/zmughal/p5-Data-Frame.git
+version: 0.003

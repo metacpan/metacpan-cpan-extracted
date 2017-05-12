@@ -1,0 +1,39 @@
+/* vim:syntax=dot */
+digraph dbixclass {
+    graph [overlap=false,sep=.1,splines=true,model=subset,ratio=auto];
+    node [shape=plaintext];
+    edge [];
+
+    [% SET href = output_filename( 'AUTODOC.html' ) %]
+
+[% FOR source IN sources %]
+[% FILTER collapse %]
+    [% source.simple_moniker %]
+    [ label=<
+        <TABLE>
+        <TR><TD COLSPAN="3" HREF="[% href %]#[% source.moniker %]">[% source.moniker %] ([% source.table %])</TD></TR>
+        [% FOR col IN source.columns %]
+            <TR>
+            <TD PORT="[% col.name %]">[% INCLUDE column_name.tt2 %]</TD>
+            <TD>[% INCLUDE column_type.tt2 %]</TD>
+            <TD>[% INCLUDE column_info.tt2 %]</TD>
+            </TR>
+        [% END %]
+        </TABLE> >
+    ]
+[% END %]
+[% END %]
+
+[% FOR rel IN relationship_map %]
+    [% SET sid = simplify( rel.self ) %]
+    [% SET fid = simplify( rel.foreign ) %]
+    [% FOR cond IN rel.cond %]
+        [% FILTER collapse %]
+            [% sid %]:[% cond.self %] -> [% fid %]:[% cond.foreign %]
+            [
+                label = "[% rel.name %] ([% rel.type %])"
+            ];
+        [% END %]
+    [% END %]
+[% END %]
+}

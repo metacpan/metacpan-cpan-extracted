@@ -1,0 +1,52 @@
+NAME
+    Date::Japanese::Era::Table::Builder - conversion table builder for
+    Date::Japanese::Era
+
+SYNOPSIS
+      use Date::Japanese::Era 'Builder';
+
+      # Sets the table up as JIS_X0301
+      Date::Japanese::Era::Table::Builder::build_table(
+        ["\x{660E}\x{6CBB}", 'meiji',   1868,  9,  8],
+        ["\x{5927}\x{6B63}", 'taishou', 1912,  7, 31],
+        ["\x{662D}\x{548C}", 'shouwa',  1926, 12, 26],
+        ["\x{5E73}\x{6210}", 'heisei',  1989,  1,  8],
+      );
+
+DESCRIPTION
+    This module is used to define the conversion table used by
+    Date::Japanese::Era, unfettered by concepts such as
+    "post-gregorian-calender", "past eras only" and "factually correct".
+
+    The module has three primary uses: The (far) past, the (far) future, and
+    the (alternate) present, and was written as a writing aid when dealing
+    with stories relating to future eras of Japan, although it's equally
+    useful for quick conversion of old eras in a selected range, or
+    accessing the calendar as it would look with alternate era names.
+
+METHODS
+    build_table
+        The module has one subroutine:
+        Date::Japanese::Era::Table::Builder::build_table(), which takes a
+        list of eras in contiguous order of earliest to latest, each an
+        array reference containing, in order, the proper era name, the ASCII
+        era name, and the gregorian year, month and day that constitutes the
+        first day of the era. (See example under SYNOPSIS.)
+
+        When using this module, it is critical that this subroutine is
+        called before any calls to Date::Japanese::Era, unless you really
+        know what you are doing.
+
+AUTHOR
+    Williham Totland <williham.totland@gmail.com>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+HISTORY
+    Developed as an extension to Date::Japanese::Era by Tatsuhiko Miyagawa
+    <miyagawa@bulknews.net>.
+
+SEE ALSO
+    Date::Japanese::Era
+

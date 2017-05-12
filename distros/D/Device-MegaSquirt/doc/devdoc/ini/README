@@ -1,0 +1,14 @@
+
+Stored here are the ini files from the Megasquirt, MS2Exra releases.
+The ini file defines many of version specific variables needed to
+communicate with a Megasquirt ecu.
+
+megasquirt-ii.ini.ms2extra
+  downloaded: ???
+  url: ???
+
+megasquirt-ii.ms2extra.alpha_3.0.3u_20100522.ini
+  downloaded: 23 July 2010
+  url: http://www.msextra.com/doc/ms2extra/files/alpha/ms2extra_alpha_303u_20100522.zip
+
+

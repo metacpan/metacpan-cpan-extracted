@@ -1,0 +1,100 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:develop-recommendation [ doap-deps:on "Dist::Inkt 0.001"^^doap-deps:CpanId ];
+	doap-deps:runtime-requirement [ doap-deps:on "CPAN::Uploader"^^doap-deps:CpanId ], [ doap-deps:on "Dist::Inkt"^^doap-deps:CpanId ], [ doap-deps:on "Moose::Role"^^doap-deps:CpanId ], [ doap-deps:on "Types::Standard"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean"^^doap-deps:CpanId;
+	], [ doap-deps:on "Path::Tiny"^^doap-deps:CpanId ], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Release>;
+	doap:created         "2014-09-14"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Dist-Inkt-Role-Release>;
+	doap:homepage        <https://metacpan.org/release/Dist-Inkt-Role-Release>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Dist-Inkt-Role-Release";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-dist-inkt-role-release>;
+	];
+	doap:shortdesc       "automatically upload a distribution to the CPAN".
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Dist-Inkt-Role-Release-0.001"^^xsd:string;
+	dc:issued            "2014-09-14"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-Role-Release-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-Role-Release-0.002"^^xsd:string;
+	dc:issued            "2014-09-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Add prerelease_action and postrelease_action hooks.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-Role-Release-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-Role-Release-0.003"^^xsd:string;
+	dc:issued            "2014-09-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add repo link.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-Role-Release-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Release/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-Role-Release-0.004"^^xsd:string;
+	dc:issued            "2014-10-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix, doap-changeset:Documentation;
+			rdfs:label "fixed typo in abstract";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/jonass>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-Role-Release-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/jonass>
+	a                    foaf:Person;
+	foaf:name            "Jonas Smedegaard";
+	foaf:nick            "JONASS";
+	foaf:page            <https://metacpan.org/author/JONASS>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

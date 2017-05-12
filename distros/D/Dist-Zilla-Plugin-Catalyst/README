@@ -1,0 +1,36 @@
+NAME
+    Dist::Zilla::Plugin::Catalyst - set of plugins for working with Catalyst
+
+VERSION
+    version 0.15
+
+SYNOPSIS
+    for quick start
+
+            dzil new -P Catalyst <ProjectName>
+
+DESCRIPTION
+    The following is a list of plugins in this distribution to help you
+    integrate Catalyst and Dist::Zilla
+
+    *   Dist::Zilla::Plugin::MinterProfile::Catalyst Default Minting profile
+
+    *   Dist::Zilla::Plugin::Catalyst::New Create a new Catalyst Project
+
+PATCHES
+    Please read the SubmittingPatches file included with this Distribution.
+    Patches that are of sufficient quality, within the goals of the project
+    and pass the checklist will probably be accepted.
+
+AUTHORS
+    *   Caleb Cushing <xenoterracide@gmail.com>
+
+    *   Tomas Doran <bobtfish@bobtfish.net>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2010 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,0 +1,77 @@
+NAME
+
+    Datahub::Factory::Importer::KMSKA - Import data from the TMS
+    <http://www.gallerysystems.com/products-and-services/tms/> instance of
+    the KMSKA <http://kmska.be/nl/>
+
+SYNOPSIS
+
+        use Datahub::Factory::Importer::KMSKA;
+        use Data::Dumper qw(Dumper);
+    
+        my $kmska = Datahub::Factory::Importer::KMSKA->new(
+            db_host     => 'localhost',
+            db_name     => 'kmska',
+            db_user     => 'kmska',
+            db_password => 'kmska'
+        );
+    
+        $kmska->importer->each(sub {
+            my $item = shift;
+            print Dumper($item);
+        });
+
+DESCRIPTION
+
+    Datahub::Factory::Importer::KMSKA uses Catmandu
+    <http://librecat.org/Catmandu/> to fetch a list of records from a local
+    instance of TMS
+    <http://www.gallerysystems.com/products-and-services/tms/> as it is
+    configured in the KMSKA <http://kmska.be/nl/>. This module does not
+    give you access to the database of the museum, but allows you to pull
+    and parse data from it if you already have access. For a more generic
+    interface to TMS, see Datahub::Factory::Importer::TMS. Both modules
+    require however that the TMS database is stored in a MySQL (or
+    equivalent) system. It will not work with MS SQL (which TMS uses).
+
+PARAMETERS
+
+    db_host
+
+      Host (IP or FQDN) of the MySQL database.
+
+    db_name
+
+      Name of the MySQL database.
+
+    db_user
+
+      Username to connect to the database.
+
+    db_password
+
+      Password for the user.
+
+ATTRIBUTES
+
+    importer
+
+      A Importer that can be used in your script.
+
+AUTHOR
+
+    Pieter De Praetere <pieter at packed.be >
+
+COPYRIGHT
+
+    Copyright 2017- PACKED vzw
+
+LICENSE
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+
+    Datahub::Factory Datahub::Factory::Importer::TMS Catmandu
+

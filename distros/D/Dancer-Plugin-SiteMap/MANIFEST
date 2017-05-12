@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Dancer/Plugin/SiteMap.pm
+t/00-load.t
+t/01-usage.t
+t/02-config.t
+t/03-robots.t
+t/04-undefined_routes.t
+t/boilerplate.t
+t/robots.txt
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

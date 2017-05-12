@@ -1,0 +1,11 @@
+Revision history for Perl module Dist-Zilla-Plugin-FFI-CheckLib
+
+0.002001 2015-03-21
+
+  - Support 'systempath' and 'recursive' options from FFI::CheckLib-0.11
+
+  - Fix dist repo META
+
+0.001001 2014-11-08
+
+  - Initial release

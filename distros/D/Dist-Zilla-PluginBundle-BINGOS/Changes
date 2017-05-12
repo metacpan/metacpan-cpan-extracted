@@ -1,0 +1,99 @@
+==================================================
+Changes from 2010-08-20 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.20 at 2015-08-19 09:18:02 +0000
+-----------------------------------------
+
+  Change: 38dd30af8db2dc0c688124e3acb573a257003dc8
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-08-19 10:18:02 +0000
+
+    Switch to ReadmeAnyFromPod 
+
+-----------------------------------------
+version 0.18 at 2013-08-01 09:02:03 +0000
+-----------------------------------------
+
+  Change: 9fa28fd8d7f17d24ef10f34918d48e0bede67804
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-01 10:02:03 +0000
+
+    Add 'Dist::Zilla::Role::PluginBundle::PluginRemover' support 
+
+-----------------------------------------
+version 0.16 at 2013-01-10 15:12:36 +0000
+-----------------------------------------
+
+  Change: 8cd0bc661aa11e8a5b89857dbacc381208400ed2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-01-10 15:12:36 +0000
+
+    ChangelogFromGit's behaviour has changed, update to support 
+
+-----------------------------------------
+version 0.14 at 2011-09-19 13:58:17 +0000
+-----------------------------------------
+
+  Change: fd41f1fe5d1c4e39219cee7855a2e5eb970d5af7
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-09-19 14:58:17 +0000
+
+    Switch CompileTests to Test::Compile 
+
+-----------------------------------------
+version 0.12 at 2011-08-05 17:20:45 +0000
+-----------------------------------------
+
+  Change: 1d5aa1c8c1d79538d428ff2d081091faa8c7e40d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-05 18:20:45 +0000
+
+    [rt.cpan.org #70053] DZP::ChangelogFromGit not listed as a dependency
+
+    reported by Dave Golden 
+
+-----------------------------------------
+version 0.10 at 2011-05-03 12:45:28 +0000
+-----------------------------------------
+
+  Change: 656a38dfe915f3a08edf0752bb8bfce9e3a0f70d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-03 13:45:28 +0000
+
+    Update prereqs. Thanks rjbs for spotting a missing one 
+
+-----------------------------------------
+version 0.08 at 2011-04-29 16:40:17 +0000
+-----------------------------------------
+
+  Change: 34c1b1164519f346a12444d4039ebaa65c275d65
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-04-29 17:40:17 +0000
+
+    Add ::Clean plugin for auto-cleaning after 'release' 
+
+-----------------------------------------
+version 0.06 at 2011-02-22 23:13:37 +0000
+-----------------------------------------
+
+  Change: cd07fa8abd3dc131abd3201603c46ab0fcd47d09
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-02-22 23:13:37 +0000
+
+    Fix mistake in POD, spotted by Glenn Fowler (CEBJYRE) 
+
+-----------------------------------------
+version 0.04 at 2010-11-23 00:14:58 +0000
+-----------------------------------------
+
+  Change: 4e1e013e9cc91c555365f05db5158ecab0380f61
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2010-11-23 00:14:58 +0000
+
+    Bump max_age for ChangesFromGit to 1825 ( 5 years ) 
+
+===============================================
+Plus 1 release after 2010-08-20 00:00:00 +0000.
+===============================================

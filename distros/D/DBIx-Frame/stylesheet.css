@@ -1,0 +1,100 @@
+/* BODY { background-color: #bbbbbb; } */
+
+div.basetable {
+	background-color: lightgrey;	color: black;
+  	float: center; text-align: center; 
+        margin-top: 3px; margin-bottom: 3px; display: table;
+}
+
+div.submitbar {
+	clear: both;  float: right; 
+      	margin-left: 10px; margin-right: 10px;
+	margin-top:  10px; margin-bottom: 5px;
+}
+
+div.modbox {
+	float: right; margin-left: 20px;  clear: right;
+	margin-top:  10px; margin-bottom: 0px;  margin-right: 20px;
+}
+
+table.modbox {
+	background-color: darkgrey; color: black; 
+	display: table; border-color: lightgrey; 
+}
+
+h3.tablehead {
+	text-align: center;  font-weight: bold;  font-size: normal;
+        margin-bottom: 0px;  margin-top: 10px; clear: both;
+}
+
+div.rowfloat {
+  clear: left;
+  padding-top: 5px;
+}
+
+div.row1 {
+  clear: both;
+  padding-top: 10px;
+}
+
+div.row1 span.label {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  width: 100px;
+  text-align: center;
+}
+
+div.row1 span.formw {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  /* width: 335px; */
+  text-align: left;
+} 
+
+div.row2 {
+  clear: both;
+  padding-top: 10px;
+}
+
+div.row2 span.label {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  width: 100px;
+  text-align: center;
+}
+
+div.row2 span.formw {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  /* width: 335px; */
+  text-align: left;
+} 
+
+div.row3 {
+  clear: both;
+  padding-top: 10px;
+}
+
+div.row3 span.label {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  width: 75px;
+  text-align: center;
+}
+
+div.row3 span.formw {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  /* width: 335px; */
+  text-align: left;
+} 
+
+div.row4 {
+  clear: both;
+  padding-top: 10px;
+}
+
+div.row4 span.label {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  text-align: center;
+}
+
+div.row4 span.formw {
+  float: left;  margin-left: 5px; margin-right: 5px;
+  /* width: 335px; */
+  text-align: left;
+} 

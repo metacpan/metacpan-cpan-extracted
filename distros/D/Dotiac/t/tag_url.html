@@ -1,0 +1,1 @@
+{% autoescape on %}{% url "A",B,C=D,"E"="F" %} {% url "A",B,C=D,"E"="F" as foo %}{{ foo|upper|safe }}{% endautoescape %} {% autoescape off %}{% url "A",B,C=D,"E"="F" %} {% url "A",B,C=D,"E"="F" as foo %}{{ foo|upper|escape }}{% endautoescape %}

@@ -1,0 +1,12 @@
+Changes
+lib/Devel/Command/Tdump.pm
+LICENSE
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/001_load.t
+t/002_is_a_test.t
+t/003_is_a_sub.t
+t/004_get_test_names.t
+t/005_tdump.t

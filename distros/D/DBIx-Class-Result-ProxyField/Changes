@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-Result-ProxyField
+
+0.03    2011-03-03, Nicolas Oudard
+        makefile to build
+        correct tests
+        update dependancies
+
+0.02    2011-02-09, Nicolas Oudard
+        delete dependencies to sqlite3
+
+0.01    2010-12-01, Nicolas Oudard
+        First version
+

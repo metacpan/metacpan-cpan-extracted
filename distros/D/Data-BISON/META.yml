@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                Data-BISON
+version:             v0.0.3
+abstract:            Encode or decode a BISON stream
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Config:                        0
+    Encode:                        0
+    Scalar::Util:                  0
+    Scalar::Util::Numeric:         0.02
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Andy Armstrong <andy@hexten.net>

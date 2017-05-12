@@ -1,0 +1,170 @@
+
+	 Core Dump called...
+
+
+
+	 Dumping data... 
+
+$VAR1 = [
+          'one',
+          'one_inner',
+          'one_inner_two',
+          'two',
+          'three',
+          'four',
+          'function',
+          'five',
+          'six',
+          'seven',
+          'eight'
+        ];
+
+
+	 Dumping instance...
+
+$VAR1 = bless( {
+                 'previous_run_config' => {
+                                            'engine' => 'all',
+                                            'regex' => 1,
+                                            'file' => 't/sample.data',
+                                            'backup' => 0
+                                          },
+                 'valid_params' => {
+                                     'core_dump' => 0,
+                                     'engine_dump' => 0,
+                                     'search' => 0,
+                                     'add_functionality_prod' => 0,
+                                     'post_proc' => 1,
+                                     'file' => 1,
+                                     'directory' => 0,
+                                     'copy' => 1,
+                                     'maxdepth' => 1,
+                                     'order' => 0,
+                                     'exec' => 0,
+                                     'code' => 0,
+                                     'cache_dump' => 0,
+                                     'objects_in_hash' => 0,
+                                     'no_indent' => 1,
+                                     'engine_return' => 0,
+                                     'pre_proc_dump' => 0,
+                                     'file_contents' => 0,
+                                     'replace' => 0,
+                                     'engine' => 1,
+                                     'post_proc_dump' => 0,
+                                     'regex' => 1,
+                                     'delete' => 0,
+                                     'diff' => 1,
+                                     'inject_after_sub_def' => 0,
+                                     'include' => 0,
+                                     'injects' => 0,
+                                     'lines' => 0,
+                                     'post_proc_return' => 0,
+                                     'pre_proc' => 1,
+                                     'extensions' => 1,
+                                     'line_num' => 0,
+                                     'limit' => 0,
+                                     'backup' => 1,
+                                     'module' => 0,
+                                     'config_dump' => 0,
+                                     'add_functionality' => 0,
+                                     'pre_proc_return' => 0,
+                                     'cache' => 1,
+                                     'exclude' => 0,
+                                     'inject_use' => 0
+                                   },
+                 'params' => {
+                               'core_dump' => 1,
+                               'file_contents' => [
+                                                    '# sample data file',
+                                                    'package This::That 0.01;',
+                                                    '#package This::Those 0.01;',
+                                                    '',
+                                                    '#',
+                                                    'sub one {',
+                                                    '    # one',
+                                                    'sub one_inner {',
+                                                    '        sub one_inner_two {',
+                                                    '            # nothing ',
+                                                    '        }',
+                                                    '        return 0;',
+                                                    '    }',
+                                                    '    # two',
+                                                    '    # three',
+                                                    '}',
+                                                    'sub two {',
+                                                    '    my $x = 0;',
+                                                    '    my $y = 0;',
+                                                    '    my $result = function( $x, $y );',
+                                                    '}',
+                                                    'sub three {',
+                                                    '',
+                                                    '    # four',
+                                                    '    # five',
+                                                    '    my $str = \'this\';',
+                                                    '    # six',
+                                                    '',
+                                                    '}',
+                                                    'sub four {',
+                                                    '    # hello',
+                                                    '    # there',
+                                                    '    # wonderful',
+                                                    '    # world',
+                                                    '}',
+                                                    'sub function {',
+                                                    '    my ( $x, $y ) = @_;',
+                                                    '    return $x * $y;',
+                                                    '}',
+                                                    '    sub five {',
+                                                    '        my $str = this;',
+                                                    '}',
+                                                    'sub six {',
+                                                    '    my $str = \'this\';',
+                                                    '}',
+                                                    'sub seven {',
+                                                    '    my $str = this;',
+                                                    '    }',
+                                                    'sub eight {',
+                                                    '    my $str = this;',
+                                                    '}'
+                                                  ],
+                               'engine' => 'all',
+                               'order' => [
+                                            'one',
+                                            'one_inner',
+                                            'one_inner_two',
+                                            'two',
+                                            'three',
+                                            'four',
+                                            'function',
+                                            'five',
+                                            'six',
+                                            'seven',
+                                            'eight'
+                                          ],
+                               'regex' => 1,
+                               'file' => 't/sample.data',
+                               'backup' => 0
+                             },
+                 'write_file_contents' => undef,
+                 'run_end' => 0,
+                 'namespace' => 'Devel::Examine::Subs',
+                 'order' => [
+                              'one',
+                              'one_inner',
+                              'one_inner_two',
+                              'two',
+                              'three',
+                              'four',
+                              'function',
+                              'five',
+                              'six',
+                              'seven',
+                              'eight'
+                            ],
+                 'rw' => bless( {
+                                  'recsep' => '
+',
+                                  'platform_recsep' => '
+'
+                                }, 'File::Edit::Portable' )
+               }, 'Devel::Examine::Subs' );

@@ -1,0 +1,19 @@
+########################################################
+########################################################
+##                 I M P O R T A N T                  ##
+########################################################
+########################################################
+
+$Id: README,v 1.1 2000/09/24 23:53:13 mbm Exp $
+
+*** THIS CODE IS NOT FINISHED ***
+
+This doesn't implement anything like the same interface
+that the previous version did. In fact a large amount of
+the interface and API code remains unwritten because it's
+been sitting on my hard disc for the last 6 months. I have
+been persuaded to release unfinished code to the community
+(yes, greg, you managed to persuade me). So here it is if
+you want to play with it.
+
+Please email me: matthew@codix.net with all your patches etc.

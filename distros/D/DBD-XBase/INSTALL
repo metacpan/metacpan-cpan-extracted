@@ -1,0 +1,109 @@
+
+		------------------------------------
+		Installation of	XBase and DBD::XBase
+		------------------------------------
+
+To use the XBase.pm module, perl version 5.004 is required. To use
+the DBD::XBase driver, you need a DBI module version 1.0 or higher.
+
+Installation is the same as for any Perl module, so if you have some
+obscure platform, check instructions that came with perl for that
+platform -- I won't be able to help you because I probably do not use
+your platform.
+
+The generic way is: download the DBD-XBase-x.xxx.tar.gz, unpack it,
+change to the DBD-XBase-x.xxx directory. Then do
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You can also use the CPAN.pm module to do these steps for you
+
+	$ perl -MCPAN -e shell
+	cpan> install DBD::XBase
+
+If you do not have root access on that machine and/or cannot install
+into standard Perl library directories, you can specify alternate
+location with
+
+	$ perl Makefile.PL LIB=/your/directory \
+		INSTALLMAN1DIR=/path/for/man1 \
+		INSTALLMAN3DIR=/path/for/man3
+
+instead of just perl Makefile.PL, and in your scripts do
+				   
+	use lib '/your/directory';
+	use XBase;
+or
+	use lib '/your/directory';
+	use DBI;
+
+If you do not have make or you cannot run it (do you really want to
+use Perl on that machine?), just copy the content of the
+DBD-XBase-x.xxx/lib directory to wherever you want to have it. That
+should work, even if it won't give you man pages and dbfdump/indexdump
+scripts.
+
+If you use a platform supported by ActiveState and run ActiveState
+perl, you can use ppm to install the module. Please note that I have
+no way of influencing what version of XBase.pm/DBD::XBase ActiveState
+offers on their site -- contact them if you need newer version which
+is only on CPAN. Cygwin does a good job of providing make on Windows
+platform, so you can always install any needed version using the
+generic approach described above.
+
+If you have case insensitive filesystem, make sure you do not have an
+old module named Xbase.pm installed -- remove it prior to using
+XBase.pm, otherwise bad things will happen.
+
+
+		------------------------------------
+		Problems and bug reporting for XBase
+		------------------------------------
+
+If anything goes wrong when installing/make test, please send me
+output of your installation messages and of
+
+	$ make test TEST_VERBOSE=1
+
+Each version of the module is tested on multiple systems and multiple
+versions of perl before releasing but surely there might be situation
+where something is corrupted on other platforms. So please, send me
+reasonable output and it is a bug of XBase.pm/DBD::XBase, I'll try to
+get it fixed.
+
+If there are errors when actually using the module on your data,
+please check first that it's really a XBase/DBD::XBase problem (for
+example, did you FTP your files using binary mode?). If so, please
+send me example of your script, the errstr messages you get and (if
+possible) your data files that cause the problems and description
+of what output you expected. If there is problem with writing the
+data, send me the file before and after the action and also describe
+what you expect and what you got. Add info about your OS, version of
+Perl and other modules that might be relevant. You can of course
+also send patches to actual bugs. I may respond with requests for
+particular tests and actions to try on your machine.
+
+Mention the word "XBase" in the Subject line, otherwise your post
+will probably just slip through my xxx MB daily email load without
+even being read. Please note that I'm _very_ busy, so try to help me
+to help you by using the latest version of the module, minimalizing
+the script code that causes you problems, providing me with tiny
+sample datafile, anything that might be related. Detailed description
+and small examples are the best.
+	
+For general Perl issues, use the comp.lang.perl.* newsgroups, for DBI
+issues, look at http://dbi.perl.org/ or use dbi-users-help@perl.org.
+
+Available:
+	http://www.adelton.com/perl/DBD-XBase/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+Copyright: (c) 1997--2011 Jan Pazdziora.
+	All rights reserved. This package is free software; you can
+	redistribute it and/or modify it under the same terms as Perl
+	itself.
+
+

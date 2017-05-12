@@ -1,0 +1,6 @@
+Revision history for Perl extension Debug::Runopt.
+
+1.01  Mon Apr 29 21:49:54 2013
+	- original version; created by h2xs 1.23 with options
+		-e -n Debug::Runopt
+

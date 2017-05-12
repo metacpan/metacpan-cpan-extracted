@@ -1,0 +1,147 @@
+NAME
+    Data::Dump::PHP - Pretty printing of data structures as PHP code
+
+VERSION
+    version 0.10
+
+SYNOPSIS
+     use Data::Dump::PHP qw(dump_php ddx_php);
+
+     # in Perl
+     $str = dump_php($var);
+     $str2 = dump_php(@list);
+
+     # in PHP
+     $var = eval("return $str;");
+     $array = eval("return $str2;");
+
+     # or use it for easy debug printout
+     ddx_php localtime;
+
+DESCRIPTION
+    This module provide functions that takes a list of values as their
+    argument and produces a string as its result. The string contains PHP
+    code that, when "eval"ed, produces a deep copy of the original
+    arguments.
+
+    The main feature of the module is that it strives to produce output that
+    is easy to read. Example:
+
+        @a = (1, [2, 3], {4 => 5});
+        dump_php(@a);
+
+    Produces:
+
+        array(1, array(2, 3), array( 4 => 5 ))
+
+    If you dump just a little data, it is output on a single line. If you
+    dump data that is more complex or there is a lot of it, line breaks are
+    automatically added to keep it easy to read.
+
+    The following functions are provided (only the dd* functions are
+    exported by default):
+
+    dump_php( ... )
+    pp_php( ... )
+        Returns a string containing a PHP expression/code. If you pass this
+        string to PHP's built-in eval() function like this: eval("return
+        $res;") or eval("\$a = $res;"), it should return a copy of the
+        arguments you passed to dump_php().
+
+        If you call the function with multiple arguments then the output
+        will be wrapped in an outer array "array( ..., ... )". If you call
+        the function with a single argument the output will not have the
+        wrapping. If you call the function with a single scalar
+        (non-reference) argument it will just return the scalar quoted if
+        needed, but never break it into multiple lines. If you pass multiple
+        arguments or references to arrays of hashes then the return value
+        might contain line breaks to format it for easier reading. The
+        returned string will never be "\n" terminated, even if contains
+        multiple lines. This allows PHP code like this to place the
+        semicolon in the expected place:
+
+           echo print '$obj = ', dump_php($obj), ";\n";
+
+        If dump_php() is called in void context, then the dump is printed on
+        STDERR and then "\n" terminated. You might find this useful for
+        quick debug printouts, but the dd*() functions might be better
+        alternatives for this.
+
+        There is no difference between dump_php() and pp_php().
+
+    quote_php( $string )
+        Returns a quoted version of the provided string.
+
+        It differs from "dd_php($string)" in that it will quote even numbers
+        and not try to come up with clever expressions that might shorten
+        the output.
+
+    dd_php( ... )
+    ddx_php( ... )
+        These functions will call dump_php() on their argument and print the
+        result to STDOUT (actually, it's the currently selected output
+        handle, but STDOUT is the default for that).
+
+        The difference between them is only that ddx_php() will prefix the
+        lines it prints with "# " and mark the first line with the file and
+        line number where it was called. This is meant to be useful for
+        debug printouts of state within programs.
+
+FUNCTIONS
+    None are exported by default, but they are exportable.
+
+OPTIONS
+    $Data::Dump::PHP::USE_LAMBDA (default 0) can be set to 1 to generate PHP
+    code that uses lambda functions instead of create_function(), which is
+    nicer and faster but requires PHP 5.3 or later.
+
+LIMITATIONS
+    Code references will be displayed as simply "create_function('', '')"
+    (or "function(){}}") when dumped. Thus, "eval"ing them will not
+    reproduce the original routine.
+
+    Regex objects in Perl will become string in PHP. If you want to use this
+    string in PHP's PCRE functions, you need to make sure that the regex
+    will be compatible.
+
+SEE ALSO
+    Data::Dump (from which this codebase is based)
+
+    PHP::Var (I tried this first before hacking up Data::Dump::PHP, but it
+    has bugs, doesn't do scalars, and doesn't handle recursion.)
+
+    JSON, YAML - Another alternative to exchange data with PHP (and other
+    languages) is to export/import via YAML and JSON.
+
+    PHP::Serializer - Yet another way to exchange data with PHP using PHP
+    serialization format.
+
+ACKNOWLEDGEMENTS
+    Data::Dump::PHP is a quick hack (as I needed it for
+    Data::Schema::Emitter::PHP). I simply copied the code from Gisle Ass'
+    wonderful "Data::Dump" and changed only whatever is necessary.
+
+HOMEPAGE
+    Please visit the project's homepage at
+    <https://metacpan.org/release/Data-Dump-PHP>.
+
+SOURCE
+    Source repository is at
+    <https://github.com/sharyanto/perl-Data-Dump-PHP>.
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    <https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-PHP>
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Steven Haryanto <stevenharyanto@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Steven Haryanto.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

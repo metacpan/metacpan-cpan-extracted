@@ -1,0 +1,7 @@
+Revision history for Device-MindWave
+
+0.02    31 August 2014
+        - Add licence and repository information to Makefile.PL.
+
+0.01    31 August 2014
+        - Initial release.

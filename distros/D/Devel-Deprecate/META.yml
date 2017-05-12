@@ -1,0 +1,23 @@
+---
+name: Devel-Deprecate
+version: 0.01
+author:
+  - 'Curtis "Ovid" Poe <ovid@cpan.org>'
+abstract: Create deprecation schedules in your code
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0.3
+  Scalar::Util: 1.14
+build_requires:
+  Sub::Override: 0.08
+  Test::More: 0
+provides:
+  Devel::Deprecate:
+    file: lib/Devel/Deprecate.pm
+    version: 0.01
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

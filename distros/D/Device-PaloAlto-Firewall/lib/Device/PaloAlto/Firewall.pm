@@ -1,0 +1,418 @@
+package Device::PaloAlto::Firewall;
+
+use 5.006;
+use strict;
+use warnings;
+
+use Device::PaloAlto::Firewall::Test;
+
+use Moose;
+use Modern::Perl;
+use LWP::UserAgent;
+use HTTP::Request;
+use Carp;
+use Params::Validate qw(:all);
+use URI;
+use XML::Twig;
+use Memoize qw{memoize unmemoize};
+
+use Data::Dumper;
+
+=head1 NAME
+
+Device::PaloAlto::Firewall - Interact with the Palo Alto firewall API
+
+=head1 VERSION
+
+Version 0.01
+
+=cut
+
+our $VERSION = '0.01';
+
+
+=head1 SYNOPSIS
+
+=cut
+
+=head1 CONSTRUCTOR
+
+=cut
+
+has 'user_agent'    => ( is => 'ro', isa => 'LWP::UserAgent', init_arg => undef, default => sub { LWP::UserAgent->new } );
+has 'http_request'  => ( is => 'rw', isa => 'HTTP::Request', init_arg => undef, default => sub { HTTP::Request->new } ); 
+has 'uri'           => ( is => 'ro', writer => '_uri', required => 1);
+
+has 'username'      => ( is => 'ro', isa => 'Str', required => 1 );
+has 'password'      => ( is => 'ro', isa => 'Str', required => 1 );
+has '_api_key'       => ( is => 'rw', init_arg => undef, default => undef );
+
+has 'debug'         => ( is => 'rw', isa => 'Bool', default => 0);
+
+
+sub BUILD {
+    my $self = shift;
+    
+    #URI string gets changed into a URI object 
+    my $uri_obj = URI->new($self->uri);
+    if (!$uri_obj->has_recognized_scheme) {
+        croak "Unrecognised URI passed to constructor";
+    }
+
+    #Set the path to API located
+    $uri_obj->path("/api/");
+    $self->_uri( $uri_obj );
+
+    # Request method is always GET
+    $self->http_request->method( 'GET' );
+
+    return;
+}
+
+=head1 METHODS
+
+=head2 verify_hostname 
+
+=cut
+
+sub verify_hostname {
+    my $self = shift;
+    my $verify_bool = shift;
+    my $verify_mode = $verify_bool ? 
+        0x01        # 'SSL_VERIFY_PEER' 
+        :
+        0x00;       # 'SSL_VERIFY_NONE'
+
+    $self->user_agent->ssl_opts( verify_hostname => $verify_bool, SSL_verify_mode => $verify_mode );
+
+    return;
+}
+
+=head2 optimise 
+
+=cut
+
+sub optimise {
+    my $self = shift;
+    my $bool = shift;
+   
+    if ($bool) { 
+        memoize('Device::PaloAlto::Firewall::_send_request');
+    } else {
+        unmemoize('Device::PaloAlto::Firewall::_send_request');
+    }
+
+    return;
+}
+
+=head2 tester
+
+=cut
+
+sub tester {
+    my $self = shift;
+
+    return Device::PaloAlto::Firewall::Test->new(firewall => $self);
+}
+
+
+=head2 system_info
+
+=cut
+
+sub system_info {
+    my $self = shift;
+    return $self->_send_request(command => "<show><system><info></info></system></show>");
+}
+
+=head2 interfaces
+
+=cut 
+
+sub interfaces {
+    my $self = shift;
+    return $self->_send_request(command => "<show><interface>all</interface></show>");
+}
+
+=head2 high_availability
+
+=cut
+
+sub high_availability {
+    my $self = shift;
+    return $self->_send_request(command => "<show><high-availability><all></all></high-availability></show>");
+}
+
+=head2 ntp
+
+=cut
+
+sub ntp {
+    my $self = shift;
+    return $self->_send_request(command => "<show><ntp></ntp></show>");
+}
+
+=head2 routing_table
+
+=cut
+
+sub routing_table {
+    my $self = shift;
+    my %args = validate(@_,
+        {
+            vrouter => { default => 'default', type => SCALAR | UNDEF },
+        }
+    );
+
+    # TODO: Have a look at sanitising the argument passed to the firewall.
+    return $self->_send_request(command => "<show><routing><route><virtual-router>$args{vrouter}</virtual-router></route></routing></show>");
+}
+
+=head2 bgp_peers 
+
+=cut
+
+sub bgp_peers {
+    my $self = shift;
+    my %args = validate(@_,
+        {
+            vrouter => { default => 'default', type => SCALAR | UNDEF },
+        }
+    );
+
+    # TODO: Have a look at sanitising the argument passed to the firewall.
+    my $bgp_peer_response = $self->_send_request(command => 
+        "<show><routing><protocol><bgp><peer><virtual-router>$args{vrouter}</virtual-router></peer></bgp></protocol></routing></show>"
+    );
+
+
+    return if !defined $bgp_peer_response; 
+
+    # If there's one peer, we get a HASH. Rap it up as a one member array to align with the multiple peer scenario
+    if (defined $bgp_peer_response->{entry} && ref $bgp_peer_response->{entry} eq 'HASH') {
+        $bgp_peer_response->{entry} = [ $bgp_peer_response->{entry} ];
+    }
+
+    return $bgp_peer_response;
+}
+
+=head2 panorama_status
+
+=cut
+
+sub panorama_status {
+    my $self = shift;
+
+    return $self->_send_request(command => '<show><panorama-status></panorama-status></show>');
+}
+
+
+sub _send_request {
+    my $self = shift;
+    my %args = validate(@_,
+        {
+            command => 1,
+        }
+    );
+
+    # Is the API key defined? If not, request one.
+    if (!defined $self->_api_key) {
+        $self->uri->query( "type=keygen&user=".$self->username."&password=".$self->password );
+        $self->_debug_print("[REQUEST] ".$self->uri->as_string);
+        $self->http_request->uri( $self->uri->as_string );
+
+        # Clear the query
+        $self->uri->query(undef);
+
+        my $api_key_response = $self->user_agent->request( $self->http_request );
+        my $api_key_struct = $self->_validate_and_return_response( $api_key_response ); 
+
+        return if !$api_key_struct; # Already carped within _validate_and_return_response 
+
+        $self->_api_key( $api_key_struct->{result}->{key} );
+    }
+   
+    $self->uri->query( "type=op&cmd=$args{command}&key=".$self->_api_key );
+    $self->http_request->uri( $self->uri->as_string );
+    $self->_debug_print("[REQUEST] ".$self->uri->as_string);
+    $self->uri->query(undef);
+
+    # Send the request
+    my $http_response = $self->user_agent->request( $self->http_request );
+    
+    my $structure_response = $self->_validate_and_return_response($http_response);
+    return (defined $structure_response ? $structure_response->{result} : $structure_response);
+}
+
+
+# _validate_and_return_response($self, $http_response)
+#   * Checks for HTTP error codes
+#   * Converts from XML to a Perl reference
+#   * Checks the API error codes
+#   * If successful, returns the reference
+#   * If there's an error, carps and returns undef.
+
+sub _validate_and_return_response {
+    my $self = shift;
+    my $http_response = shift;
+    my $xml_parser = XML::Twig->new();
+
+    # Check the HTTP response codes
+    if ($http_response->is_error) {
+        carp "HTTP Error ($http_response->code)";
+        return;
+    }
+
+    $self->_debug_print("[RESPONSE]: ".$http_response->decoded_content);
+
+    my $response_structure = $xml_parser->safe_parse( $http_response->decoded_content )->simplify();
+
+    # Check the API response codes
+    if ($response_structure->{status} eq 'error') {
+        if (!defined $response_structure->{code}) {
+            carp "Unknown API error";
+        } else {
+            carp "API Error ($response_structure->{code}) - ".$self->_api_error_to_string($response_structure->{code});
+        }
+        return;
+    }
+
+    return $response_structure;
+}
+
+
+sub _api_error_to_string {
+    my $self = shift;
+    my $code = shift;
+
+	my %code_map = (
+		400 => 'Bad request', 
+		403 => 'Forbidden',
+		1 => 'Unknown command',
+		2 => 'Internal error (2)',
+		3 => 'Internal error (3)',
+		4 => 'Internal error (4)',
+		5 => 'Internal error (5)',
+		6 => 'Bad Xpath', 
+		7 => 'Object not present', 
+		8 => 'Object not unique', 
+		10 => 'Reference count not zero', 
+		11 => 'Internal error',
+		12 => 'Invalid object',
+		14 => 'Operation not possible',
+		15 => 'Operation denied',
+		16 => 'Unauthorized', 
+		17 => 'Invalid command',
+		18 => 'Malformed', 
+		19 => 'Success (19)',
+		20 => 'Success (20)',
+		21 => 'Internal error',
+		22 => 'Session timed out',
+	);
+
+    return "" if !defined $code_map{$code};
+
+	return $code_map{$code};
+}
+
+
+sub _debug_print {
+    my $self = shift;
+    my $debug_msg = shift;
+
+    print STDERR $debug_msg."\n" if $self->debug == 1;
+
+    return;
+}
+
+
+=head1 AUTHOR
+
+Greg Foletta, C<< <greg at foletta.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-device-paloalto at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Device-PaloAlto>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+
+
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Device::PaloAlto::Firewall
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker (report bugs here)
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-PaloAlto>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Device-PaloAlto>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Device-PaloAlto>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Device-PaloAlto/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2017 Greg Foletta.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, tradename, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut
+
+1; # End of Device::PaloAlto::Firewall

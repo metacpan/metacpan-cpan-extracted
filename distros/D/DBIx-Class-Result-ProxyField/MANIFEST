@@ -1,0 +1,27 @@
+Build.PL
+Changes
+ignore.txt
+lib/DBIx/Class/Result/ProxyField.pm
+lib/DBIx/Class/ResultSet/ProxyField.pm
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-mapping_hash.t
+t/02-accessor.t
+t/03-result.t
+t/04-resultset.t
+t/05-data_column.t
+t/app/Main.pm
+t/app/Main/Result/Artist.pm
+t/app/Main/Result/Cd.pm
+t/app/Main/Result/M2MArtist.pm
+t/app/Main/Result/M2MCd.pm
+t/app/Main/Result/M2MCdsM2MArtist.pm
+t/app/Main/Result/Track.pm
+t/app/Main/ResultSet/Track.pm
+t/boilerplate.t
+t/lib/Utils.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml

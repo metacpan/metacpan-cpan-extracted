@@ -1,0 +1,19 @@
+CHANGES
+dbdimp.sc
+IngresII.pm
+IngresII.sh
+IngresII.xs
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/bool.t
+t/datatypes.t
+t/dbi.t
+t/event.t
+t/exec.t
+t/nchar.t
+t/null.t
+t/quote.t
+t/utf8.t
+META.json                                Module JSON meta-data (added by MakeMaker)

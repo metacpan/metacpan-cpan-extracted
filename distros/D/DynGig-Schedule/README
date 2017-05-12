@@ -1,0 +1,87 @@
+DynGig-Schedule
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the README
+file from a module distribution so that people browsing the archive
+can use it to get an idea of the module's uses. It is usually a good idea
+to provide version information here so that people can decide whether
+fixes for the module are worth downloading.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DynGig::Schedule
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DynGig-Schedule
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DynGig-Schedule
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DynGig-Schedule
+
+    Search CPAN
+        http://search.cpan.org/dist/DynGig-Schedule/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Kan Liu
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+SAMPLE CONFIG
+
+Policy:
+---
+default:
+  epoch: 2001-12-3
+  queue:
+  - lead1
+  - lead2
+
+day:
+  timezone: Asia/Shanghai
+  period: 07:00 ~ 19:00
+  epoch: 2012-01-12
+  queue:
+  - admin1
+  - admin2
+  - admin3
+  - admin4
+  redirect:
+    3: default:3
+
+override:
+---
+day:2:
+  - replace: admin8,admin9
+    timezone: Asia/Shanghai
+
+lead1:
+  - insert: admin7,lead3
+    timezone: Asia/Shanghai
+    period: 2012-07-03 ~ 2012-07-05 & 9:00 ~ 14:00

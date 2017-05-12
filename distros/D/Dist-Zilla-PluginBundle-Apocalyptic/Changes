@@ -1,0 +1,29 @@
+Revision history for Dist::Zilla::PluginBundle::Apocalyptic
+
+0.005	2014-10-28 18:09:23 UTC
+
+	Dropped the use of the DualBuilders plugin in favor of MakeMaker::Fallback and ModuleBuildTiny ( thanks ETHER! )
+	Dropped the use of the ContributorsFromGit plugin in favor of Git::Contributors RT#99083 ( thanks ETHER! )
+
+0.004	2014-10-25 20:25:39 UTC
+
+	Added a bunch of plugins! wheee :)
+	Tweaked the Changes format to be CPAN::Changes::Spec compatible!
+	Changed to DZP::ReadmeAnyFromPod instead of DZP::ReadmeFromPod as we now generate a README.pod in the root for github, thanks RT#85019
+	Enabled ConfigSlicer and PluginRemover for easier bundle manipulation, thanks DAGOLDEN
+	Enabled the Pod::Weaver options to preserve original source code line numbering on munging, thanks DAGOLDEN
+
+0.003	2012-01-03 05:42:19 UTC
+
+	Use Dist::Zilla::Plugin::LocaleMsgfmt
+	Use Dist::Zilla::Plugin::CheckPrereqsIndexed
+	Clarified the POD with output from dzil dumpphases
+
+0.002	2012-01-03 01:34:43 UTC
+
+	Use Dist::Zilla::Plugin::Clean
+	Replace Dist::Zilla::Plugin::CompileTests with DZP::Test::Compile as it was deprecated
+
+0.001	2011-03-06 02:21:36 UTC
+
+	initial release

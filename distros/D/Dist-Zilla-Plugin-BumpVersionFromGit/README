@@ -1,0 +1,46 @@
+NAME
+    Dist::Zilla::Plugin::BumpVersionFromGit - DEPRECATED -- use
+    Dist::Zilla::Plugin::Git::NextVersion instead
+
+VERSION
+    version 0.010
+
+SYNOPSIS
+    In your dist.ini:
+
+        [BumpVersionFromGit]
+        first_version = 0.001       ; this is the default
+        version_regexp  = ^v(.+)$   ; this is the default
+
+DESCRIPTION
+    NOTE This distribution is deprecated. The module has been reborn as
+    Dist::Zilla::Plugin::Git::NextVersion and included in the
+    Dist::Zilla::Plugin::Git distribution.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit/issues
+    >. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-BumpVersionFromGit.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTOR
+    Karen Etheridge <ether@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2015 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

@@ -1,0 +1,92 @@
+Release history for Dist-Zilla-Plugin-Prereqs-SyncVersions
+
+0.003002 2017-03-07T15:53:19Z 8f10a03
+ - Bugfix: Avoid test failures under -Ddefault_inc_excludes_dot
+ - Remove use of ConfigDumper util
+ - Remove use of Test::KENTNL/dztest in tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - configure: (suggests: +1)
+ - develop: +5 ↑4 -1 (suggests: ↑2)
+ - runtime: -1
+ - test: ↓1 -1
+
+0.003001 2015-02-04T09:48:39Z ae594be
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +10 ↑2 -2 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1 (recommends: +1)
+ - test: +1 (recommends: ↑1 ↓1)
+
+ [Meta]
+ - Add x_deprecated field
+
+0.003000 2014-09-11T04:07:09Z
+ [00 Minor]
+ - use dump_config
+ - metadata -> author = kentnl
+ - Add tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - develop: +2 (suggests: ↑1)
+ - runtime: +1
+ - test: +2 (recommends: ↑1)
+
+ [Tests]
+ - Basic functionality tests added.
+ - Tests confirmed to keep behaviour consistent on 4.x
+
+0.002001 2014-08-16T20:14:31Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests updated.
+ - metadata updated.
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 ↑1 (suggests: ↑2)
+ - test: +1 -2 (recommends: ↑1 -1)
+
+ [Metadata]
+ - move to kentnl org.
+ - show 1x contributor.
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.002000 2014-06-03T06:53:36Z
+ [00 Major]
+ - Toolkit moved to EUMM and using Soft dependencies
+ - dist.ini now baked.
+ - Distribution now deprecated.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +41 ↑1 -2 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +3 ↓1 -3 (recommends: +4)
+
+0.001001 2013-10-12T07:07:17Z
+ [00 Minor]
+ - Typo in documentation ( thanks haarg ).
+
+ [Dependencies::Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.9.0 → 2.000000
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: ↑1
+
+0.001000 2013-10-12T04:50:38Z
+ - First version.

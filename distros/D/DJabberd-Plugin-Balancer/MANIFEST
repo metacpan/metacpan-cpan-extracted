@@ -1,0 +1,8 @@
+example.conf
+lib/DJabberd/Plugin/Balancer.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/compiles.t
+test_notes.txt

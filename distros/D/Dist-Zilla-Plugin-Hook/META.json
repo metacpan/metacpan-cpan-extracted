@@ -1,0 +1,230 @@
+{
+   "abstract" : "Write C<Dist::Zilla> plugin directly in F<dist.ini>",
+   "author" : [
+      "Van de Bugger <van.de.bugger@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Hook",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Capture::Tiny" : "0",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::VDB" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "File::chdir" : "0",
+            "HTTP::Tiny" : "0",
+            "IPC::System::Simple" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Path::Tiny" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::GPL_3::or_later" : "0",
+            "Test::Builder" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::Deep" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Routine" : "0",
+            "Test::Routine::Util" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "Try::Tiny" : "0",
+            "autodie" : "0",
+            "strict" : "0",
+            "version" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::AfterBuild" : "0",
+            "Dist::Zilla::Role::AfterMint" : "0",
+            "Dist::Zilla::Role::AfterRelease" : "0",
+            "Dist::Zilla::Role::BeforeArchive" : "0",
+            "Dist::Zilla::Role::BeforeBuild" : "0",
+            "Dist::Zilla::Role::BeforeMint" : "0",
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::FilePruner" : "0",
+            "Dist::Zilla::Role::InstallTool" : "0",
+            "Dist::Zilla::Role::LicenseProvider" : "0",
+            "Dist::Zilla::Role::MetaProvider" : "0",
+            "Dist::Zilla::Role::ModuleMaker" : "0",
+            "Dist::Zilla::Role::NameProvider" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Dist::Zilla::Role::ReleaseStatusProvider" : "0",
+            "Dist::Zilla::Role::Releaser" : "0",
+            "Dist::Zilla::Role::VersionProvider" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006",
+            "version" : "0.77"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "IPC::System::Simple" : "0",
+            "Test::Deep" : "0",
+            "Test::DiagINC" : "0.002",
+            "Test::Dist::Zilla::Build" : "0",
+            "Test::More" : "0",
+            "Test::Routine" : "0",
+            "Test::Routine::Util" : "0",
+            "autodie" : "0",
+            "blib" : "1.01",
+            "if" : "0",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Hook" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::AfterBuild" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/AfterBuild.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::AfterMint" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/AfterMint.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::AfterRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/AfterRelease.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::BeforeArchive" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/BeforeArchive.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::BeforeBuild" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/BeforeBuild.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::BeforeMint" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/BeforeMint.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::BeforeRelease" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/BeforeRelease.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::FileGatherer" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/FileGatherer.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::FileMunger" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/FileMunger.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::FilePruner" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/FilePruner.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::Init" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/Init.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::InstallTool" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/InstallTool.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::LicenseProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/LicenseProvider.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::MetaProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/MetaProvider.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::ModuleMaker" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/ModuleMaker.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::NameProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/NameProvider.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::PrereqSource" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/PrereqSource.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::ReleaseStatusProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/ReleaseStatusProvider.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::Releaser" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/Releaser.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Plugin::Hook::VersionProvider" : {
+         "file" : "lib/Dist/Zilla/Plugin/Hook/VersionProvider.pm",
+         "version" : "v0.8.3"
+      },
+      "Dist::Zilla::Role::Hooker" : {
+         "file" : "lib/Dist/Zilla/Role/Hooker.pm",
+         "version" : "v0.8.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "mailto:bug-Dist-Zilla-Plugin-Hook@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Hook"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-Hook",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-Hook"
+      }
+   },
+   "version" : "v0.8.3",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

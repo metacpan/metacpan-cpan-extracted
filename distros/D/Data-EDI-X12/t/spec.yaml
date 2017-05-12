@@ -1,0 +1,106 @@
+850:
+    structure:
+        header:
+            - BEG
+            - DTM
+            - N9
+            - N1
+        detail:
+            - PO1
+            - PID
+        footer:
+            - CTT
+    segments:
+        BEG:
+            definition:
+                - name: purpose_codse
+                  min: 2
+                  max: 2
+                - name: type_code
+                  min: 2
+                  max: 2
+                - name: order_number 
+                  min: 1
+                  max: 22
+                - type: filler
+                - name: date
+                  min: 8
+                  max: 8
+        DTM:
+            definition:
+                - name: qualifier
+                  min: 3
+                  max: 3
+                - name: date
+                  min: 8
+                  max: 8
+        N9:
+            definition:
+                - name: qualifier
+                  min: 2
+                  max: 3
+                - name: identification
+                  min: 1
+                  max: 50
+        N1:
+            definition:
+                - name: identifier
+                  min: 2
+                  max: 3
+                - name: name
+                  min: 1
+                  max: 60
+                - name: identification_code_qualifier
+                  min: 1
+                  max: 2
+                - name: identification_code
+                  min: 2
+                  max: 80
+        PO1:
+            definition:
+                - type: filler
+                - name: quantity
+                  min: 1
+                  max: 15
+                - name: unit_of_measure
+                  min: 2
+                  max: 2
+                - name: unit_price
+                  min: 1
+                  max: 17
+                - type: filler
+                - name: id_qualifier
+                  min: 2
+                  max: 2
+                - name: product_id
+                  min: 1
+                  max: 48
+                - name: id_qualifier_2
+                  min: 2
+                  max: 2
+                - name: product_id_2
+                  min: 1
+                  max: 48
+                - name: id_qualifier_3
+                  min: 2
+                  max: 2
+                - name: product_id_3
+                  min: 1
+                  max: 48
+        PID:
+            definition:
+                - name: type
+                - type: filler
+                - type: filler
+                - type: filler
+                - name: description
+                  min: 1
+                  max: 80
+        CTT:
+            definition:
+                - name: total_items
+                  min: 1
+                  max: 6
+                - name: hash_total
+                  min: 1
+                  max: 10

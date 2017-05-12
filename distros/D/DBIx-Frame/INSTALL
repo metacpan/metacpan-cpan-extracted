@@ -1,0 +1,56 @@
+Installing DBIx::Frame
+======================
+
+Installing this software is easy:
+
+  perl Makefile.pl
+  make
+  make test
+  make install
+
+Creating a DBIx::Frame Database
+===============================
+
+(Assuming you're working with mysql, anyway, which is all that this
+presently supports.)
+
+0.  Install the database software
+
+	Refer to http://www.mysql.com, or ask your local system
+	administrator.
+
+1.  Create the database
+
+	This is probably best done with 'mysql_setpermission'.  Read the
+	manual pages before you start.  You will need:
+
+		- A database name
+		- A username that can connect to it administratively
+		- A username that can connect to it as a guest
+
+2.  Design your tables.
+
+	Documentation for this is explained in the DBIx::Frame manual
+	pages (or 'pod2text Frame.pm | less')
+
+3.  Create the tables.
+
+	- Use 'dbixframe_create.pl' to create the tables.
+	  - Edit the options to use the proper class
+	  - Run the script - 'dbixframe_create.pl -c -a'
+
+4.  Create the administration interface.
+
+	'dbixframe.cgi' is the actual script to do the administration, but
+	you'll want to populate your html() functions in order to make
+	this useful.  Just keep in mind a) usability and b) offering
+	everything you might conceivably want to change.
+
+5.  Create the user interface.
+
+	This is outside the scope of the actual documentation, except in
+	as much as you've pretty much got an API for it.  Just write some
+	scripts and programs to choose print what information you want, 
+	and reterive it with the admin API.
+
+	(You'll want to use the 'guest' user for this one.)

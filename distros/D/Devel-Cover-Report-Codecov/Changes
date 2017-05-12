@@ -1,0 +1,56 @@
+Revision history for Perl extension Devel-Cover-Report-Codecov
+
+0.17 2016-12-15T09:13:52Z
+    - fix support CI list in the readme
+
+0.16 2016-12-15T03:19:15Z
+    - fix bugs that file name is invalid
+
+0.15 2016-12-15T03:14:55Z
+    - support GitLab CI (thank you @melo)
+
+0.14 2016-05-01T18:09:10Z
+    - fix a bug that can't parse Codecov's response
+
+0.13 2016-03-04T13:58:51Z
+    - support branch
+
+0.12 2016-01-01T00:30:58Z
+    - update documents
+
+0.11 2015-12-20T12:45:28Z
+    - fix tests
+
+0.10 2015-09-27T08:56:26Z
+    - fix tests
+
+0.09 2015-08-24T15:04:21Z
+    - support Shippable
+
+0.08 2015-08-23T09:42:01Z
+    - support local git and mercurial repository
+    - add Devel::Cover to dependencies
+
+0.07 2015-08-15T14:16:59Z
+    - support Magnum CI
+    - fix API parameters from CI environment variables
+
+0.06 2015-08-15T04:37:07Z
+    - support blib directory
+
+0.05 2015-08-12T16:42:59Z
+    - fix bugs that doesn't work in Perl 5.8.x
+
+0.04 2015-08-08T07:36:33Z
+    - support Snap CI
+    - support Semaphore
+
+0.03 2015-08-05T15:34:50Z
+    - fix tests
+
+0.02 2015-08-01T15:56:27Z
+    - fix documents
+
+0.01 2015-08-01T15:03:15Z
+    - original version
+

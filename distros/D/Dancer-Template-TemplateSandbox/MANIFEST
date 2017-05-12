@@ -1,0 +1,19 @@
+Build.PL
+Changes
+ignore.txt
+lib/Dancer/Template/TemplateSandbox.pm
+MANIFEST
+README
+t/00-load.t
+t/05_template_sandbox.t
+t/index.txt
+t/lib/EasyMocker.pm
+xt/release/check-changes.t
+xt/release/fixme.t
+xt/release/hasversion.t
+xt/release/meta.t
+xt/release/minimumversion.t
+xt/release/pod-coverage.t
+xt/release/pod.t
+META.yml
+SIGNATURE    Added here by Module::Build

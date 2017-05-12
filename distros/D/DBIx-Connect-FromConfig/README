@@ -1,0 +1,57 @@
+NAME
+
+    DBIx::Connect::FromConfig - Creates a DB connection from a configuration file
+
+
+DESCRIPTION
+
+    DBIx::Connect::FromConfig provides a generic way to connect to a
+    database using settings from a configuration object.
+
+
+INSTALLATION
+
+    To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+    Alternatively, to install with Module::Build, you can use the 
+    following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc DBIx::Connect::FromConfig
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Connect-FromConfig
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/DBIx-Connect-FromConfig
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/DBIx-Connect-FromConfig
+
+        Search CPAN
+            http://search.cpan.org/dist/DBIx-Connect-FromConfig
+
+
+COPYRIGHT AND LICENCE
+
+    Copyright (C) 2008-2012 Sebastien Aperghis-Tramoni
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.

@@ -1,0 +1,61 @@
+Dancer-Plugin-SiteMap
+
+Plugin module for the Dancer web framwork that automagically adds sitemap
+routes to the webapp. Currently adds /sitemap and /sitemap.xml where the
+former is a basic HTML list and the latter is an XML document of URLS.
+
+Currently it only adds staticly defined routes for the GET method.
+
+Using the module is literally that simple... 'use' it and your app will
+have a site map.
+
+The HTML site map list can be styled throught the CSS class 'sitemap'
+
+Optionally, the omission list can be populated by way of the robots.txt file,
+both the HTML and XML sitemap URLs can be customised (or omitted) and a custom
+HTML sitemap template can be specified.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Plugin::SiteMap
+
+You can also look for information at:
+
+    Github's Issue Tracker
+        https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues
+
+    CPAN RT Tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-SiteMap
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Plugin-SiteMap
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Plugin-SiteMap
+
+    MetaCPAN
+        http://metacpan.org/pod/Dancer::Plugin::SiteMap
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010-2014 James Ronan
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

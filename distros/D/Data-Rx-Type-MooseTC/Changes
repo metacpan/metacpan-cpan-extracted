@@ -1,0 +1,20 @@
+Revision history for Data-Rx-Type-MooseTC
+
+0.006     2013-12-22 21:50:19-0500 America/New_York
+          update bugtracker and repo links
+
+0.005     2013-07-05 22:13:07 America/New_York
+          hide use of "package Moose::Util::TypeConstraints" from PAUSE indexer
+
+0.004     2013-07-05 22:04:58 America/New_York
+          repackage, update bug tracker
+
+0.003     2012-09-18 10:59:05 America/New_York
+          update for structured failures and Data::Rx 0.200
+
+0.002     2008-10-04
+          add explicit 'true' return to avoid confusion
+
+0.001     2008-10-04
+          first revision
+

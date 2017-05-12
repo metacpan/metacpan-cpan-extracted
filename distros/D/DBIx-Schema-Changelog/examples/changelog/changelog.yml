@@ -1,0 +1,9 @@
+---
+changelogs:
+- 001-sequences
+- 002-tables
+- 003-primaries
+- 004-uniques
+- 005-foreigns
+- 006-indiezes
+- 007-views

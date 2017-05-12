@@ -1,0 +1,63 @@
+NAME
+    Dist::Zilla::Plugin::FindDirByRegex - A regex-based FileFinder plugin
+
+VERSION
+    version 1.102640
+
+SYNOPSIS
+    In "dist.ini":
+
+        [FindDirByRegex / MyExecFiles]
+        skip = \.sh$
+
+        [PodWeaver]
+        finder = :InstallModules
+        finder = MyExecFiles
+
+DESCRIPTION
+    This plugin finds files in a directory and skips them if they match a
+    regular expression.
+
+METHODS
+  dir
+    The directory in which to find files. Defaults to "bin".
+
+  skip
+    The regular expression that determines whether or not a file will be
+    skipped.
+
+  find_files
+    Finds files by matching them against the "skip" regular expression.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Dist-Zilla-Plugin-FindDirByRegex/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Dist-Zilla-Plugin-FindDirByRegex> and may be
+    cloned from
+    <git://github.com/hanekomu/Dist-Zilla-Plugin-FindDirByRegex>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+    Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

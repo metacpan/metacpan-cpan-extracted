@@ -1,0 +1,40 @@
+Device-MindWave - Read data from a NeuroSky MindWave headset
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Device::MindWave
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Device-MindWave
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Device-MindWave
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Device-MindWave
+
+    Search CPAN
+        http://search.cpan.org/dist/Device-MindWave/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2014 Tom Harrison
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,32 @@
+---
+abstract: 'Include jQuery in your distribution'
+author:
+  - 'Graham Ollis <perl@wdlabs.com>'
+build_requires:
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-jQuery
+requires:
+  Dist::Zilla::Role::FileGatherer: '0'
+  File::HomeDir: '0.91'
+  File::Temp: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  Path::Class: '0.26'
+  Resource::Pack::jQuery: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/plicease/Dist-Zilla-Plugin-jQuery/issues
+  homepage: http://perl.wdlabs.com/Dist-Zilla-Plugin-jQuery
+  repository: git://github.com/plicease/Dist-Zilla-Plugin-jQuery.git
+version: '0.04'

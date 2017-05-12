@@ -1,0 +1,56 @@
+{
+   "abstract" : "Authenticate with Facebook OAuth",
+   "author" : [
+      "Prajith <prajith@ndimensionz.com, prajithpalakkuda@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Auth-Facebook",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer" : "0",
+            "Dancer::Plugin" : "0",
+            "Net::Facebook::Oauth2" : "0.1"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Prajithp/Dancer-Plugin-Auth-Facebook/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/Prajithp/Dancer-Plugin-Auth-Facebook"
+      }
+   },
+   "version" : "0.06",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

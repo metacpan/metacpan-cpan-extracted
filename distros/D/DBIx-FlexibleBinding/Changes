@@ -1,0 +1,145 @@
+2.0.4     2015-10-01 22:50:25+01:00 Europe/London
+    - Fix broken mysql test that should skip on connection failure but does
+      not. 
+      
+2.0.3     2015-10-01 20:18:14+01:00 Europe/London
+    - Maintenance release.
+    
+    - Improved test coverage.
+    
+    - Pretty much every function has been cleaned up a little.
+    
+    - A lot of cruft associated with injected function representing db and st
+      objects (proxies) has now been swept away.
+    
+    - General improvements but no earth-shattering new features.
+    
+2.0.2     2015-09-27 19:02:59+01:00 Europe/London
+    - Problems with some of the tests when MySQL driver is loaded but MySQL
+    connection not possible.
+
+    - Some depenencies not automatically being picked up by Dist::Zilla,
+    and needed to add [Prereqs / TestRequires] section to dist.ini, and then
+    rebuild.
+
+2.0.1     2015-09-13 20:38:14+01:00 Europe/London
+    - Use of MRO::Compat, like other package non-specific pragmata moved to
+      very top of module.
+    
+    - Since we're using c3 MRO, let's **NOT** use SUPER:: when we should 
+      rather be using next::method!
+      
+2.0.0     2015-09-12 09:25:03+01:00 Europe/London
+    - No functional changes. Recent move back to Semantic Versioning has caused 
+      some problems resulting in bug report 107048. Upon advice received, issuing
+      a new release with an uptick in major version number.
+      
+1.8.4     2015-09-11 18:23:21+01:00 Europe/London
+    - The extension's private statement handle attributes now consolidated under
+      a single statement handle private attribute key {private_dbix_flexbind} per
+      recommendations in DBI documentation.
+      
+    - Eliminated extension's statement handle private method _set_err.
+    
+    - Code in "prepare" used to initialise private statement handle attributes
+      factored-out to "_init_private_attributes" into DBIx::FlexibleBinding::st
+      and practically all of the implementation code and calls that are anything
+      to do with these attributes have been re-factored to make them tidier and
+      clearer.
+      
+    - DBIx::FlexibleBinding::st::auto_bind public method now private _auto_bind
+    
+    - DBIx::FlexibleBinding::st::bind public method now private _bind
+    
+    - DBIx::FlexibleBinding::db::prepare cleaned up
+    
+    - DBIx::FlexibleBinding::st::_bind_hashref cleaned up
+
+    - DBIx::FlexibleBinding::st::bind_param cleaned up
+
+    - DBIx::FlexibleBinding::st::execute cleaned up
+    
+    - $DBIx::FlexibleBinding::GETROWS_USING package global eliminated and code
+      re-factored to use "getrows" method alias.
+    
+    - $DBIx::FlexibleBinding::GETROW_USING package global eliminated and code
+      re-factored to use "getrow" method alias.
+      
+    - The "getrow" and "getrows" methods have been eliminated in favour of 
+      method aliases which perform better.
+      
+    - Add a "new" method to iterator implementation and called it.
+    
+1.8.3     2015-09-10 09:54:11+01:00 Europe/London
+    - POD corrections for "getrows" and "getrow"
+    
+    - No functional changes.
+    
+1.8.2     2015-09-08 20:54:47+01:00 Europe/London
+    - $DBIx::FlexibleBinding::GETROW_USING now documented in relevant section of
+      POD.
+    
+    - Returning to Semantic Versioning.
+
+1.152511  2015-09-08 20:30:10+01:00 Europe/London
+    - Package rebuilt using Dist::Zilla::Plugin::OurPkgVersion in an attempt to
+      fix a failing Kwalitee metric. Grumble.
+      
+1.152510  2015-09-08 20:09:15+01:00 Europe/London
+    - Methods with names matching /^getall_.*$/ now have names starting 
+      with "getrows_". I wasn't happy with "getall_" because, to those with
+      less experience may be left wondering "get all what?" At least this is 
+      a little more self explanatory.
+      
+    - $DBIx::FlexibleBinding::PROXIES_GETALL_USING is now simply
+      $DBIx::FlexibleBinding::GETROWS_USING and is now also used by "getrows"
+      methods.
+      
+    - $DBIx::FlexibleBinding::GETROW_USING has been introduced and is used by 
+      "getrow" methods.
+    
+    - Database handles and statement handles now implement methods called "getrow"
+      and "getrows" which do their thing by fetching rows as hashrefs by default,
+      unless the caller change the following package globals:
+      
+        * $DBIx::FlexibleBinding::GETROW_USING
+        * $DBIx::FlexibleBinding::GETROWS_USING
+    
+    - Functional Iterator pattern implemented with it's own for_each method.
+    
+    - Numerous POD changes with more example code added.
+    
+    - Numerous non-functional changes to some routines (local $_ moved to another
+      scope in some places).
+      
+    - Tests made less noisey.
+    
+    - More test coverage, but there could always be more, more, more.
+    
+1.152501  2015-09-07 22:37:38+01:00 Europe/London
+    - No functional changes; just refactoring to use Sub::Install instead of the
+      shonky pattern I was using to squirrel my methods in others' namespaces.
+    
+    - # ABSTRACT: added
+    
+1.152500  2015-09-07 20:27:24+01:00 Europe/London
+    - Some minor structural improvements to method implementations here and there.
+    
+    - Some POD expansion and corrections.
+    
+    - Methods with names that match /^processrow_.*$/ now have names beginning 
+      with "getrow_".
+    
+    - Methods with names that match /^processall_.*$/ now have names beginning 
+      with "getall_".
+
+1.152491  2015-09-06 20:30:55+01:00 Europe/London
+    - Guess who forgot to hide embedded packages from PAUSE?
+    
+1.152490  2015-09-06 20:22:54+01:00 Europe/London
+    - Code producing database connection and statement proxies has been completely
+      refactored.
+    - POD corrections and additions.
+    
+1.152461  2015-09-03 21:02:06+01:00 Europe/London
+    - Module now managed using Dist::Zilla and version numbers are auto generated

@@ -1,0 +1,47 @@
+---
+abstract: 'BeforeRelease plugin to check for a strict version number'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0.96'
+  Version::Next: '0'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CheckStrictVersion
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::CheckStrictVersion:
+    file: lib/Dist/Zilla/Plugin/CheckStrictVersion.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Moose: '2'
+  perl: '5.008001'
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-CheckStrictVersion/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-CheckStrictVersion
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-CheckStrictVersion.git
+version: '0.001'
+x_authority: cpan:DAGOLDEN

@@ -1,0 +1,40 @@
+
+Data::Maker - Simple, flexibile and extensible generation of realistic data
+
+Data::Maker does not know why kind of data you need, but it will help you make lots of it.
+
+And if you happen to need one of the various types of data that is available as predefined field types,
+it can be made even easier.
+
+The big difference between Data::Maker and modules you may have seen before is that Data::Maker 
+is specifically designed to make it easy for you to generate realistic random data.
+
+ROADMAP
+
+* Some type of "Person" class that would automatically `use` all of the 
+  Person subclasses and generate all fields related to one Person while taking into account
+  other fields of the same person (if that makes sense)
+* Data::Maker::Field::Company: to generate realistic, but not necessarily real, company
+  names, based on multiple word lists
+* Data::Maker::Field::Address::Street:  to generate realistic street names, based on multiple
+  word lists
+* Data::Maker::Field::PhoneNumber: to generate realistic phone numbers, preferably for multiple locales 
+* I wonder why most of the code needed by the Format class is in Data::Maker::Field?  I need to answer
+  that question of fix the problem.
+* I also wonder why I made the decision to make fields() take a list of hashrefs instead of list
+  of blessed Field objects.   I'm pretty sure my first stab at this took blessed objects and there
+  was some reason that I went to this.  But I'm sure somebody will eventually ask the question, so I would
+  like to know the answer.  This is something I should maybe get to the bottom of.
+* There is likely some usefulness in the ability to have Data::Maker generate something other than
+  perfectly-clean data.  A defined amount (or a random amount) of dirty or incomplete data is something
+  that might make some sense, for the purpose of testing scripts whose job is to identify bad data.
+* I would like to make Data::Maker::Field::Person a separate distribution, particularly because of the
+  Gender class's dependency on Text::GenderFromName.  I think a reasonable rule of thumb about what to 
+  include as a built-in field and what to make a separate package is any field class that has an
+  external CPAN dependency.  For example, Data::Maker::Field::Currency is a perfectly-valid built-in
+  class, but when I decided to outsource the work to Data::Money and its dependencies, I had to 
+  either commit all Data::Maker users to currency dependencies or commit myself to maintaining a separate
+  distribution (and inconveniencing Data::Maker users who want to use the Currency field by making them
+  download a seperate distribution).  Obviously there's a lot of philosophy involved here.
+* Using that same rule of thumb, Data::Maker::Field::DateTime should also be a separate distribution.
+

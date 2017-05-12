@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Devel-REPL-Plugin-LazyLoad,
+version 0.01:
+
+  Lazily load packages into your REPL
+
+This software is copyright (c) 2012 by Rob Hoelz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

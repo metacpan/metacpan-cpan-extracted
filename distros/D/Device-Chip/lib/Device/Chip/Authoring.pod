@@ -1,0 +1,68 @@
+=head1 NAME
+
+C<Device::Chip::Authoring> - guidance on writing a C<Device::Chip> class
+
+=head1 DESCRIPTION
+
+This file documents the L<Device::Chip> interface from the perspective of an
+author of a C<Device::Chip> driver class; explaining how to actually write a
+driver instance.
+
+It is suggested that a driver for a particular hardware chip or module
+provides a concrete class named within the C<Device::Chip> heirarchy, adding
+the basic name of the chip or module as a suffix; for example the driver for
+a I<Maxim> I<MAX7219> LED driver would be called:
+
+   package Device::Chip::MAX7219;
+
+The L<Device::Class> package provides a base class that such a specific
+implementation class could use as a superclass, but it is not required to.
+The important detail is that it provides the interface described by the main
+L<Device::Class> documentation. The documentation in this file mostly concerns
+itself with the abilities and utilities provided by the base class 
+implementation.
+
+=head1 METADATA METHODS
+
+The following class-level methods provide information about the chip and how
+to drive it. They will be invoked by methods in the base classes to perform
+the common boilerplate configuration steps required to set up the adapter to
+communicate with the chip.
+
+=head2 PROTOCOL
+
+  $pname = Device::Chip->PROTOCOL
+
+This method is invoked by L<Device::Chip/mount> to enquire which protocol the
+chip wishes to use, as the first stage of configuring the adapter. This method
+should return a protocol name suitable for
+L<Device::Chip::Adapter/make_protocol>.
+
+=head2 I<PNAME>_options
+
+  %options = $chip->PNAME_options( %params )
+
+Optional methods of this general form (where I<PNAME> is the protocol name
+being used) will be called by L<Device::Chip/mount> once the protocol instance
+is available. If such a method exists, the values it returns will be used to
+invoke the protocol's C<configure> method. It is passed a copy of the
+parameters that were given to the C<mount> method.
+
+=head1 BASE CLASS METHODS
+
+The following methods are provided by the L<Device::Chip> base class itself as
+a convenience to chip driver authors.
+
+=head2 adapter
+
+  $adapter = $chip->adapter
+
+Returns the current adapter that the chip is mounted on. This will be some
+instance implementing the companion interface, L<Device::Chip::Adapter>.
+
+=head2 protocol
+
+  $protocol = $chip->protocol
+
+Returns the adapter protocol module that the chip driver code will use to
+actually communicate with the chip.

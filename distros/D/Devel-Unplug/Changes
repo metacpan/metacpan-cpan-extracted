@@ -1,0 +1,9 @@
+Revision history for Devel-Unplug
+
+0.01    2007-11-12
+        - Initial release.
+
+0.02    2007-11-14
+        - Added OO interface
+        - Allow regex module names
+        - Work even if import isn't called

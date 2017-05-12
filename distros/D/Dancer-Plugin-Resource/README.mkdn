@@ -1,0 +1,263 @@
+# NAME
+
+Dancer::Plugin::Resource - A plugin for writing declarative RESTful apps with Dancer
+
+# VERSION
+
+version 1.131120
+
+# SYNOPSIS
+
+    package MyWebService;
+
+    use Dancer;
+    use Dancer::Plugin::Resource;
+
+    prepare_serializer_for_format;
+
+    resource 'users';
+
+    # generates '/users/:user_id' and '/users/:user_id.:format'
+    sub user_GET {
+        User->find(params->{user_id});
+        ...
+    }
+
+    # curl http://mywebservice/user/42.json
+    { "id": 42, "name": "John Foo", email: "john.foo@example.com"}
+
+    # curl http://mywebservice/user/42.yml
+    --
+    id: 42
+    name: "John Foo"
+    email: "john.foo@example.com"
+
+# DESCRIPTION
+
+Dancer::Plugin::Resource is a dancer plugin aimed at simplifying and aiding in
+writing RESTful web services and applications in Dancer. It borrows ideas from
+both Ruby on Rails and Catalyst::Action::REST, while adding some new ones to
+boot. At its core it is used to combine two things:
+
+- 1
+
+generate routes automatically for a 'resource' and map them to easily named functions.
+
+- 2
+
+handle automatic serialization based off of what the user requests.
+
+# KEYWORDS
+
+## resource
+
+This keyword is the meat of Dancer::Plugin::Resource. It lets you declare
+a resource your application will handle.
+
+By default, you can pass in a mapping of CRUD actions to subrefs that will
+align to auto-generated routes: At its simplest, you can call it with no
+arguments. This will create the following routes, and try to map them to
+functions in the namespace you called it from.
+
+    resource 'users';
+
+    # this defines the following routes:
+
+    # POST /user
+    # POST /user.:format
+    sub user_POST { ... }
+
+    # GET /user/:id
+    # GET /user/:id.:format
+    sub user_GET { ... }
+
+    # PUT /user/:id
+    # PUT /user/:id.:format
+    sub user_PUT { ... }
+
+    # DELETE /user/:id
+    # DELETE /user/:id.:format
+    sub user_DELETE { ... }
+
+    # GET /user
+    # GET /user.:format
+    sub user_INDEX { ... }
+
+The optional :format param is used by the prepare\_serializer\_for\_format 'after'
+hook, which is described in more detail below. In short, it allows '.xml' or
+'.json' suffixes to control the format of data returned by the route.
+
+An example of more complicated usage:
+
+    use Dancer::Plugin::Resource;
+
+    resource 'users',
+        member => [qw/posts/],
+        collection => [qw/log/],
+        load => sub { schema->User->find(param 'user_id'); },
+        load_all => sub { schema->User->all; };
+
+    resource 'accounts',
+        parent => 'user',
+        params => [qw/composite key/];
+
+    # HTTP $resource_VERB is mapped automatically for actions on the resource
+
+    # GET /users
+    sub users_INDEX {
+        my ($users) = @_;   # returnval of load_all is passed in
+    }
+
+    # HTTP $VERB_$SINGULAR is mapped automatically for actions on elements of the resource
+
+    # POST /users
+    sub user_POST {
+        # ...
+    }
+
+    # GET /users/:user_id
+    sub user_GET {
+        my ($user) = @_;    # returnval of load is passed in
+        # ...
+    }
+
+    # param id is inflected from the plural resource
+    # PUT /users/:user_id
+    sub user_PUT { my ($user) = @_; }
+
+    # DELETE /users/:user_id
+    sub user_DELETE { my ($user) = @_; }
+
+    # The member collection is attached to the members of the resource
+    # All CRUD verbs are automatically mapped
+    # GET /users/:user_id/posts
+    sub user_posts_GET { }
+
+    # likewise for collection methods
+    # POST /users/logs
+    sub users_logs_POST { }
+
+    # The accounts resource nests underneath user with the parent keyword
+    # the params keyword overrides the default params set by the route
+    # POST /users/:user_id/accounts
+    sub account_CREATE { }
+
+    # GET /users/:user_id/accounts/:composite/:key
+    sub account_GET { }
+
+Mapping CRUD methods to routes is done automatically by inspecting the symbol table.
+
+A full list of keywords that can be passed to resource is listed below. All are
+optional.
+
+### params
+
+Defines the list of params that the given resource takes in its part of the
+path. Takes scalar or arrayref for 1 or multiple params.
+
+    resource 'users', params => [qw/foo bar/]; # /users/:foo/:bar
+
+### load/load\_all
+
+Takes a coderef. Methods called on element of the resource (read/update/delete)
+will receive load returnval in @\_.  Methods on the resource itself (index) will
+receive load\_all in @\_. Create does not receive any arguments. An alternative
+to @\_ would be to use Dancers's 'vars' functionality for scope outside of the
+given route.
+
+### member
+
+Declares additional methods attached to the given resource. Takes either a
+scalar or an arrayref.
+
+    resource 'users', member => 'posts';
+    sub read_users_posts { } # GET /users/:user_id/posts
+
+### collection
+
+Like member methods, but attached to the root resource, and not the instance.
+
+    resource 'users', collection => [qw/posts/];
+    sub create_users_posts { } # POST /users/posts
+
+### parent
+
+Each time a resource is declared its prefix and route is stored internally. If
+you declare a resource as a child of an already defined resource, the parents
+resource will be set as a prefix automatically, and the old prefix will be
+restored when done.
+
+    resource 'users';
+    resource 'posts', parent => 'users';
+    resource 'comments', parent => 'posts';
+
+    # /users/:user_id
+    # /users/:user_id/posts/:post_id
+    # /users/:user_id/posts/:post_id/comments/:comment_id
+
+## helpers
+
+Some helpers are available. This helper will set an appropriate HTTP status for you.
+
+### status\_ok
+
+    status_ok({users => {...}});
+
+Set the HTTP status to 200
+
+### status\_created
+
+    status_created({users => {...}});
+
+Set the HTTP status to 201
+
+### status\_accepted
+
+    status_accepted({users => {...}});
+
+Set the HTTP status to 202
+
+### status\_bad\_request
+
+    status_bad_request("user foo can't be found");
+
+Set the HTTP status to 400. This function as for argument a scalar that will be
+used under the key __error__.
+
+### status\_not\_found
+
+    status_not_found("users doesn't exists");
+
+Set the HTTP status to 404. This function as for argument a scalar that will be
+used under the key __error__.
+
+## prepare\_serializer\_for\_format
+
+When this pragma is used, a before filter is set by the plugin to automatically
+change the serializer when a format is detected in the URI.
+
+That means that each route you define with a __:format__ token will trigger
+a serializer definition, if the format is known.
+
+This lets you define all the REST actions you like as regular Dancer route
+handlers, without explicitly handling the outgoing data format.
+
+# LICENCE
+
+This module is released under the same terms as Perl itself.
+This module is a fork of Dancer::Plugin::REST written by Alexis Sukrieh `<sukria@sukria.net>` and Franck Cuny.
+
+# SEE ALSO
+
+[Dancer](http://search.cpan.org/perldoc?Dancer) [Dancer::Plugin::REST](http://search.cpan.org/perldoc?Dancer::Plugin::REST) [http://en.wikipedia.org/wiki/Representational\_State\_Transfer](http://en.wikipedia.org/wiki/Representational\_State\_Transfer)
+
+# AUTHOR
+
+Matthew Phillips <mattp@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Matthew Phillips.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

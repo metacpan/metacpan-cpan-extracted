@@ -1,0 +1,13 @@
+\bRCS\b
+^MANIFEST\.
+^Makefile$
+~$
+\.html$
+\.old$
+^blib/
+^WIN32/
+^install.bat$
+^DBD-\d
+^tags$
+\.rej$
+\.orig$

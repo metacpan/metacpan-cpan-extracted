@@ -1,0 +1,28 @@
+Revision history for Data::Importer
+
+0.006     2014-09-14 07:43:43+02:00 Europe/Copenhagen
+ - Ods: Correct encoding. Now it always returns utf-8 values
+ - Csv: Open the file using the given encoding.
+
+0.005     2014-09-02 19:44:28+02:00 Europe/Copenhagen
+ - Add a Makefile.PL
+ - Option to encode values
+ - Use Spreadsheet::ReadSXC for ods
+
+0.004     2014-07-30 16:49:58+02:00 Europe/Copenhagen
+ - Pod
+ - Specify overridable methods
+ - Add mandatory and optional attributes. Mandatory fields are used to check with the actual file to see if
+   it contains the necessary columns.
+   For now the optional attribute is, well, optional.
+ - Make xls iterator more failsafe
+
+0.003     2014-07-10 22:38:00+02:00 Europe/Copenhagen
+ - Rework the import part to also be row based, like the validate step.
+
+0.002     2014-07-10 18:38:49CEST+0200 Europe/Copenhagen
+ - Add missing dependencies to the makefile
+ - Apparantly csv->fields is not consistent over Perl releases. Fixed
+
+0.001     2014-07-09 19:32:50CEST+0200 Europe/Copenhagen
+ - Initial release

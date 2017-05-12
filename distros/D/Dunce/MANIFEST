@@ -1,0 +1,6 @@
+Makefile.PL
+MANIFEST
+lib/Dunce/Files.pm
+t/Files.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

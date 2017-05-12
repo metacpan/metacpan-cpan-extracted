@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+RunBlock.xs
+SIGNATURE
+inc/ExtUtils/MY_Metafile.pm
+lib/Devel/RunBlock.mlpod
+lib/Devel/RunBlock.pm
+t/00-load.t
+t/01-runblock.t
+t/02-long-wantarray.t
+t/03-long-return.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t

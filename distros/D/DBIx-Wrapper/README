@@ -1,0 +1,846 @@
+NAME
+    DBIx::Wrapper - A wrapper around the DBI
+
+SYNOPSIS
+     use DBIx::Wrapper;
+     
+ my $db = DBIx::Wrapper->connect($dsn, $user, $auth, \%attr);
+     
+ my $db = DBIx::Wrapper->connect($dsn, $user, $auth, \%attr,
+              { error_handler => sub { print $DBI::errstr },
+                debug_handler => sub { print $DBI::errstr },
+              });
+     
+ my $db = DBIx::Wrapper->connect_from_config($db_key, $config_file,
+              { error_handler => sub { print $DBI::errstr },
+                debug_handler => sub { print $DBI::errstr },
+              });
+              
+ 
+ my $dbi_obj = DBI->connect(...)
+     my $db = DBIx::Wrapper->newFromDBI($dbi_obj);
+     
+ my $dbi_obj = $db->getDBI;
+     
+ my $rv = $db->insert($table, { id => 5, val => "myval",
+                                    the_date => \"NOW()",
+                                  });
+     my $rv = $db->insert($table, { id => 5, val => "myval",
+                                    the_date => $db->command("NOW()"),
+                                  });
+     
+ my $rv = $db->replace($table, \%data);
+     my $rv = $db->smartReplace($table, \%data)
+     my $rv = $db->delete($table, \%keys);
+     my $rv = $db->update($table, \%keys, \%data);
+     my $rv = $db->smartUpdate($table, \%keys, \%data);
+     
+ my $row = $db->selectFromHash($table, \%keys, \@cols);
+     my $row = $db->selectFromHashMulti($table, \%keys, \@cols);
+     my $val = $db->selectValueFromHash($table, \%keys, $col);
+     my $vals = $db->selectValueFromHashMulti($table, \%keys, \@cols);
+     my $rows = $db->selectAll($table, \@cols);
+     
+ my $row = $db->nativeSelect($query, \@exec_args);
+     
+ my $loop = $db->nativeSelectExecLoop($query);
+     foreach my $val (@vals) {
+         my $row = $loop->next([ $val ]);
+     }
+     
+ my $row = $db->nativeSelectWithArrayRef($query, \@exec_args);
+     
+ my $rows = $db->nativeSelectMulti($query, \@exec_args);
+     my $rows = $db->nativeSelectMultiOrOne($query, \@exec_args);
+     
+ my $loop = $db->nativeSelectMultiExecLoop($query)
+     foreach my $val (@vals) {
+         my $rows = $loop->next([ $val ]);
+     }
+     
+ my $rows = $db->nativeSelectMultiWithArrayRef($query, \@exec_args);
+     
+ my $hash = $db->nativeSelectMapping($query, \@exec_args);
+     my $hash = $db->nativeSelectDynaMapping($query, \@cols, \@exec_args);
+     
+ my $hash = $db->nativeSelectRecordMapping($query, \@exec_args);
+     my $hash = $db->nativeSelectRecordDynaMapping($query, $col, \@exec_args);
+     
+ my $val = $db->nativeSelectValue($query, \@exec_args);
+     my $vals = $db->nativeSelectValuesArray($query, \@exec_args);
+     
+ my $row = $db->abstractSelect($table, \@fields, \%where, \@order);
+     my $rows = $db->abstractSelectMulti($table, \@fields, \%where, \@order);
+     
+ my $loop = $db->nativeSelectLoop($query, \@exec_args);
+     while (my $row = $loop->next) {
+         my $id = $$row{id};
+     }
+     
+ my $rv = $db->nativeQuery($query, \@exec_args);
+     
+ my $loop = $db->nativeQueryLoop("UPDATE my_table SET value=? WHERE id=?");
+     $loop->next([ 'one', 1]);
+     $loop->next([ 'two', 2]);
+     
+ my $id = $db->getLastInsertId;
+     
+ $db->debugOn(\*FILE_HANDLE);
+     
+ $db->setNameArg($arg)
+     
+ $db->commit();
+     $db->ping();
+     $db->err();
+     
+ my $str = $db->to_csv($rows);
+     my $xml = $db->to_xml($rows);
+     my $bencoded = $db->bencode($rows);
+
+  Attributes
+    Attributes accessed in "DBIx::Wrapper" object via hash access are passed
+    on or retrieved from the underlying DBI object, e.g.,
+
+     $dbi_obj->{RaiseError} = 1
+
+  Named Placeholders
+    All native* methods (except for "nativeSelectExecLoop()") support named
+    placeholders. That is, instead of using ? as a placeholder, you can use
+    :name, where name is the name of a key in the hash passed to the method.
+    To use named placeholders, pass a hash reference containing the values
+    in place of the @exec_args argument. E.g.,
+
+     my $row = $db->nativeSelect("SELECT * FROM test_table WHERE id=:id", { id => 1 });
+
+    :: in the query string gets converted to : so you can include literal
+    colons in the query. :"var name" and :'var name' are also supported so
+    you can use variable names containing spaces.
+
+    The implementation uses ? as placeholders under the hood so that quoting
+    is done properly. So if your database driver does not support
+    placeholders, named placeholders will not help you.
+
+DESCRIPTION
+    "DBIx::Wrapper" provides a wrapper around the DBI that makes it a bit
+    easier on the programmer. This module allows you to execute a query with
+    a single method call as well as make inserts easier, etc. It also
+    supports running hooks at various stages of processing a query (see the
+    section on "Hooks").
+
+METHODS
+    Following are "DBIx::Wrapper" methods. Any undocumented methods should
+    be considered private.
+
+  "connect($data_source, $username, $auth, \%attr, \%params)"
+    Connects to the given database. The first four parameters are the same
+    parameters you would pass to the connect call when using DBI directly.
+    If $data_source is a hash, it will generate the dsn for DBI using the
+    values for the keys driver, database, host, port.
+
+    The %params hash is optional and contains extra parameters to control
+    the behaviour of "DBIx::Wrapper" itself. Following are the valid
+    parameters.
+
+    error_handler and debug_handler
+        These values should either be a reference to a subroutine, or a
+        reference to an array whose first element is an object and whose
+        second element is a method name to call on that object. The
+        parameters passed to the error_handler callback are the current
+        "DBIx::Wrapper" object and an error string, usually the query if
+        appropriate. The parameters passed to the debug_handler callback are
+        the current "DBIx::Wrapper" object, an error string, and the
+        filehandle passed to the "debugOn()" method (defaults to "STDERR").
+        E.g.,
+
+          sub do_error {
+              my ($db, $str) = @_;
+              print $DBI::errstr;
+          }
+          sub do_debug {
+              my ($db, $str, $fh) = @_;
+              print $fh "query was: $str\n";
+          }
+         
+  my $db = DBIx::Wrapper->connect($ds, $un, $auth, \%attr,
+                                          { error_handler => \&do_error,
+                                            debug_handler => \&do_debug,
+                                          });
+
+    db_style
+        Used to control some database specific logic. The default value is
+        'mysql'. Currently, this is only used for the "getLastInsertId()"
+        method. MSSQL is supported with a value of mssql for this parameter.
+
+    heavy
+        If set to a true value, any hashes returned will actually be objects
+        on which you can call methods to get the values back. E.g.,
+
+          my $row = $db->nativeSelect($query);
+          my $id = $row->id;
+          # or
+          my $id = $row->{id};
+
+    no_placeholders
+        If you are unfortunate enough to be using a database that does not
+        support placeholders, you can set no_placeholders to a true value
+        here. For non native* methods that generate SQL on their own,
+        placeholders are normally used to ensure proper quoting of values.
+        If you set no_placeholders to a true value, DBI's "quote()" method
+        will be used to quote the values instead of using placeholders.
+
+  "new($data_source, $username, $auth, \%attr, \%params)"
+     An alias for connect().
+
+  "connect_from_config($db_key, $config_file, \%params)"
+    Like "connect()", but the parameters used to connect are taken from the
+    given configuration file. The Config::General module must be present for
+    this method to work (it is loaded as needed). $config_file should be the
+    path to a configuration file in an Apache-style format. $db_key is the
+    name of the container with the database connection information you wish
+    to use. The %params hash is optional and contains extra parameters to
+    control the behaviour of "DBIx::Wrapper" itself.
+
+    Following is an example configuration file. Note that the dsn can be
+    specified either as a container with each piece named separately, or as
+    an option whose value is the full dsn that should be based to the
+    underlying DBI object. Each db container specifies one database
+    connection. Note that, unlike Apache, the containers and option names
+    are case-sensitive.
+
+        <db test_db_key>
+            <dsn>
+                driver mysql
+                database test_db
+                host example.com
+                port 3306
+            </dsn>
+     
+        user test_user
+            password test_pwd
+     
+        <attributes>
+                RaiseError 0
+                PrintError 1
+            </attributes>
+        </db>
+     
+    <db test_db_key2>
+            dsn "dbi:mysql:database=test_db;host=example.com;port=3306"
+     
+        user test_user
+            password test_pwd
+        </db>
+
+    Configuration features from Config::General supported:
+
+    *   Perl style comments
+
+    *   C-style comments
+
+    *   Here-documents
+
+    *   Apache style Include directive
+
+    *   Variable interpolation (see docs for Config::General::Interpolated)
+
+  "reconnect()"
+    Reconnect to the database using the same parameters that were given to
+    the "connect()" method. It does not try to disconnect before attempting
+    to connect again.
+
+  "disconnect()"
+    Disconnect from the database. This disconnects and frees up the
+    underlying "DBI" object.
+
+  "connectOne(\@cfg_list, \%attr)"
+    Connects to a random database out of the list. This is useful for
+    connecting to a slave database out of a group for read-only access. Ths
+    list should look similar to the following:
+
+        my $cfg_list = [ { driver => 'mysql',
+                           host => 'db0.example.com',
+                           port => 3306,
+                           database => 'MyDB',
+                           user => 'dbuser',
+                           auth => 'dbpwd',
+                           attr => { RaiseError => 1 },
+                           weight => 1,
+                         },
+                         { driver => 'mysql',
+                           host => 'db1.example.com',
+                           port => 3306,
+                           database => 'MyDB',
+                           user => 'dbuser',
+                           auth => 'dbpwd',
+                           attr => { RaiseError => 1 },
+                           weight => 2,
+                         },
+                       ];
+
+    where the weight fields are optional (defaulting to 1). The attr field
+    is also optional and corresponds to the 4th argument to DBI's
+    "connect()" method. The "\%attr" passed to this method is an optional
+    parameter specifying the defaults for "\%attr" to be passed to the
+    "connect()" method. The attr field in the config for each database in
+    the list overrides any in the "\%attr" parameter passed into the method.
+
+    You may also pass the DSN string for the connect() method as the 'dsn'
+    field in each config instead of the separate driver, host, port, and
+    database fields, e.g.,
+
+        my $cfg_list = [ { dsn => 'dbi:mysql:host=db0.example.com;database=MyDB;port=3306',
+                           user => 'dbuser',
+                           auth => 'dbpwd',
+                           attr => { RaiseError => 1 },
+                           weight => 1,
+                         },
+                       ];
+
+    Aliases: connect_one
+
+  "newFromDBI($dbh)"
+    Returns a new DBIx::Wrapper object from a DBI object that has already
+    been created. Note that when created this way, disconnect() will not be
+    called automatically on the underlying DBI object when the DBIx::Wrapper
+    object goes out of scope.
+
+    Aliases: new_from_dbi
+
+  "getDBI()"
+    Return the underlying DBI object used to query the database.
+
+    Aliases: get_dbi, getDbi
+
+  "insert($table, \%data)"
+    Insert the provided row into the database. $table is the name of the
+    table you want to insert into. %data is the data you want to insert -- a
+    hash with key/value pairs representing a row to be insert into the
+    database.
+
+  "replace($table, \%data)"
+    Same as "insert()", except does a "REPLACE" instead of an "INSERT" for
+    databases which support it.
+
+  "smartReplace($table, \%data)"
+    This method is MySQL specific. If $table has an auto_increment column,
+    the return value will be the value of the auto_increment column. So if
+    that column was specified in "\%data", that value will be returned,
+    otherwise, an insert will be performed and the value of
+    "LAST_INSERT_ID()" will be returned. If there is no auto_increment
+    column, but primary keys are provided, the row containing the primary
+    keys will be returned. Otherwise, a true value will be returned upon
+    success.
+
+    Aliases: smart_replace
+
+  "delete($table, \%keys), delete($table, \@keys)"
+    Delete rows from table $table using the key/value pairs in %keys to
+    specify the "WHERE" clause of the query. Multiple key/value pairs are
+    joined with "AND" in the "WHERE" clause. The "cols" parameter can
+    optionally be an array ref instead of a hashref. E.g.
+
+         $db->delete($table, [ key1 => $val1, key2 => $val2 ])
+
+    This is so that the order of the parameters in the "WHERE" clause are
+    kept in the same order. This is required to use the correct multi field
+    indexes in some databases.
+
+  "update($table, \%keys, \%data), update($table, \@keys, \%data)"
+    Update the table using the key/value pairs in %keys to specify the
+    "WHERE" clause of the query. %data contains the new values for the
+    row(s) in the database. The keys parameter can optionally be an array
+    ref instead of a hashref. E.g.,
+
+         $db->update($table, [ key1 => $val1, key2 => $val2 ], \%data);
+
+    This is so that the order of the parameters in the "WHERE" clause are
+    kept in the same order. This is required to use the correct multi field
+    indexes in some databases.
+
+  "exists($table, \%keys)"
+    Returns true if one or more records exist with the given column values
+    in %keys. %keys can be recursive as in the "selectFromHash()" method.
+
+  "selectFromHash($table, \%keys, \@cols);"
+    Select from table $table using the key/value pairs in %keys to specify
+    the "WHERE" clause of the query. Multiple key/value pairs are joined
+    with "AND" in the "WHERE" clause. Returns a single row as a hashref. If
+    %keys is empty or not passed, it is treated as "SELECT * FROM $table"
+    with no "WHERE" clause. @cols is a list of columns you want back. If
+    nothing is passed in @cols, all columns will be returned.
+
+    If a value in the %keys hash is an array ref, the resulting query will
+    search for records with any of those values. E.g.,
+
+       my $row = $db->selectFromHash('the_table', { id => [ 5, 6, 7 ] });
+
+    will result in a query like
+
+       SELECT * FROM the_table WHERE (id=5 OR id=6 OR id=7)
+
+    The call
+
+       my $row = $db->selectFromHash('the_table', { id => [ 5, 6, 7 ], the_val => 'ten' });
+
+    will result in a query like
+
+       SELECT * FROM the_table WHERE (id=5 OR id=6 OR id=7) AND the_val="ten"
+
+    or, if a value was passed in for "\@cols", e.g.,
+
+       my $row = $db->selectFromHash('the_table', { id => [ 5, 6, 7 ], the_val => 'ten' }, [ 'id' ]);
+
+    the resulting query would be
+
+       SELECT id FROM the_table WHERE (id=5 OR id=6 OR id=7) AND the_val="ten"
+
+    Aliases: select_from_hash, sfh
+
+  "selectFromHashMulti($table, \%keys, \@cols)"
+    Like "selectFromHash()", but returns all rows in the result. Returns a
+    reference to an array of hashrefs.
+
+    Aliases: select_from_hash_multi, sfhm
+
+  "selectAll($table, \@cols)"
+    Selects every row in the given table. Equivalent to leaving out %keys
+    when calling "selectFromHashMulti()", e.g.,
+    "$dbh->selectFromHashMulti($table, undef, \@cols)". The simplest case of
+    "$dbh->selectAll($table)" gets turned into something like "SELECT * FROM
+    '$table'"
+
+    Aliases: select_from_all
+
+  "selectValueFromHash($table, \%keys, $col)"
+    Combination of "nativeSelectValue()" and "selectFromHash()". Returns the
+    first column from the result of a query given by $table and %keys, as in
+    "selectFromHash()". $col is the column to return.
+
+    Aliases: select_value_from_hash, svfh
+
+  "selectValueFromHashMulti($table, \%keys, \@cols)"
+    Like "selectValueFromHash()", but returns the first column of all rows
+    in the result.
+
+    Aliases: select_value_from_hash_multi, svfhm
+
+  "smartUpdate($table, \%keys, \%data)"
+    Same as "update()", except that a check is first made to see if there
+    are any rows matching the data in %keys. If so, "update()" is called,
+    otherwise, "insert()" is called.
+
+    Aliases: smart_update
+
+  "nativeSelect($query, \@exec_args)"
+    Executes the query in $query and returns a single row result (as a hash
+    ref). If there are multiple rows in the result, the rest get silently
+    dropped. @exec_args are the same arguments you would pass to an
+    "execute()" called on a DBI object. Returns undef on error.
+
+    Aliases: native_select
+
+  "nativeSelectExecLoop($query)"
+    Like "nativeSelect()", but returns a loop object that can be used to
+    execute the same query over and over with different bind parameters.
+    This does a single DBI "prepare()" instead of a new "prepare()" for
+    select.
+
+    E.g.,
+
+         my $loop = $db->nativeSelectExecLoop("SELECT * FROM mytable WHERE id=?");
+         foreach my $id (@ids) {
+             my $row = $loop->next([ $id ]);
+         }
+
+    To get the column names in the order returned from your query:
+
+     # returns the names with their character case the same as when
+     # calling $loop->next, i.e., the case set with $db->setNameArg
+     my $cols = $loop->get_field_names;
+     
+ # returns the names with their character case unmodified
+     my $cols = $loop->get_names;
+     
+ # returns the names in all upper-case
+     my $cols = $loop->get_names_uc;
+     
+ # returns the names in all lower-case
+     my $cols = $loop->get_names_lc;
+
+    Aliases: native_select_exec_loop
+
+  "nativeSelectWithArrayRef($query, \@exec_args)"
+    Like "nativeSelect()", but return a reference to an array instead of a
+    hash. Returns undef on error. If there are no results from the query, a
+    reference to an empty array is returned.
+
+    Aliases: native_select_with_array_ref, nswar
+
+  "nativeSelectMulti($query, \@exec_args)"
+    Executes the query in $query and returns an array of rows, where each
+    row is a hash representing a row of the result. Returns "undef" on
+    error. If there are no results for the query, an empty array ref is
+    returned.
+
+    Aliases: native_select_multi
+
+  "nativeSelectMultiOrOne($query, \@exec_args)"
+    Like "nativeSelectMulti()", but if there is only one row in the result,
+    that row (a hash ref) is returned. If there are zero rows, undef is
+    returned. Otherwise, an array ref is returned.
+
+    Aliases: native_select_multi_or_one
+
+  "nativeSelectMultiExecLoop($query)"
+    Like "nativeSelectExecLoop()", but returns an array of rows, where each
+    row is a hash representing a row of the result.
+
+    Aliases: native_select_multi_exec_loop
+
+  "nativeSelectMultiWithArrayRef($query, \@exec_args)"
+    Like "nativeSelectMulti()", but return a reference to an array of arrays
+    instead of to an array of hashes. Returns undef on error.
+
+    Aliases: native_select_multi_with_array_ref
+
+  "nativeSelectMapping($query, \@exec_args)"
+    Executes the given query and returns a reference to a hash containing
+    the first and second columns of the results as key/value pairs.
+
+    Aliases: native_select_mapping, nsm
+
+  "nativeSelectDynaMapping($query, \@cols, \@exec_args)"
+    Similar to "nativeSelectMapping()" except you specify which columns to
+    use for the key/value pairs in the return hash. If the first element of
+    @cols starts with a digit, then @cols is assumed to contain indexes for
+    the two columns you wish to use. Otherwise, @cols is assumed to contain
+    the field names for the two columns you wish to use.
+
+    For example,
+
+         nativeSelectMapping($query, \@exec_args) is
+
+    equivalent (and in fact calls) to
+
+         nativeSelectDynaMapping($query, [ 0, 1 ], $exec_args).
+
+    Aliases: native_select_dyna_mapping, nsdm
+
+  "nativeSelectRecordMapping($query, \@exec_args)"
+    Similar to "nativeSelectMapping()", except the values in the hash are
+    references to the corresponding record (as a hash).
+
+    Aliases: native_select_record_mapping
+
+  "nativeSelectRecordDynaMapping($query, $col, \@exec_args)"
+    Similar to "nativeSelectRecordMapping()", except you specify which
+    column is the key in each key/value pair in the hash. If $col starts
+    with a digit, then it is assumed to contain the index for the column you
+    wish to use. Otherwise, $col is assumed to contain the field name for
+    the two columns you wish to use.
+
+  "nativeSelectValue($query, \@exec_args)"
+    Returns a single value, the first column from the first row of the
+    result. Returns undef on error or if there are no rows in the result.
+    Note this may be the same value returned for a "NULL" value in the
+    result.
+
+    Aliases: native_select_value
+
+  "nativeSelectValuesArray($query, \@exec_args)"
+    Like "nativeSelectValue()", but return multiple values, e.g., return an
+    array of ids for the query
+
+     SELECT id FROM WHERE color_pref='red'
+
+    Aliases: native_select_values_array
+
+  "abstractSelect($table, \@fields, \%where, \@order)"
+    Same as "nativeSelect()" except uses SQL::Abstract to generate the SQL.
+    See the POD for SQL::Abstract for usage. You must have SQL::Abstract
+    installed for this method to work.
+
+    Aliases: abstract_select
+
+  "abstractSelectMulti($table, \@fields, \%where, \@order)"
+    Same as "nativeSelectMulti()" except uses SQL::Abstract to generate the
+    SQL. See the POD for SQL::Abstract for usage. You must have
+    SQL::Abstract installed for this method to work.
+
+    Aliases: abstract_select_multi
+
+  "nativeSelectLoop($query, @exec_args)"
+    Executes the query in $query, then returns an object that allows you to
+    loop through one result at a time, e.g.,
+
+        my $loop = $db->nativeSelectLoop("SELECT * FROM my_table");
+        while (my $row = $loop->next) {
+            my $id = $$row{id};
+        }
+
+    To get the number of rows selected, you can call the "rowCountCurrent()"
+    method on the loop object, e.g.,
+
+        my $loop = $db->nativeSelectLoop("SELECT * FROM my_table");
+        my $rows_in_result = $loop->rowCountCurrent;
+
+    The "count()" method is an alias for "rowCountCurrent()".
+
+    To get the number of rows returned by "next()" so far, use the
+    "rowCountTotal()" method.
+
+    To get the column names in the order returned from your query:
+
+     # returns the names with their character case the same as when
+     # calling $loop->next, i.e., the case set with $db->setNameArg
+     my $cols = $loop->get_field_names;
+     
+ # returns the names with their character case unmodified
+     my $cols = $loop->get_names;
+     
+ # returns the names in all upper-case
+     my $cols = $loop->get_names_uc;
+     
+ # returns the names in all lower-case
+     my $cols = $loop->get_names_lc;
+
+    Aliases: native_select_loop
+
+  "nativeQuery($query, \@exec_args, \%attr)"
+    Executes the query in $query and returns true if successful. This is
+    typically used for deletes and is a catchall for anything the methods
+    provided by this module don't take into account.
+
+    Aliases: native_query
+
+  "nativeQueryLoop($query)"
+    A loop on nativeQuery, where any placeholders you have put in your query
+    are bound each time you call "next()". E.g.,
+
+        my $loop = $db->nativeQueryLoop("UPDATE my_table SET value=? WHERE id=?");
+        $loop->next([ 'one', 1]);
+        $loop->next([ 'two', 2]);
+
+    Aliases: native_query_loop
+
+  "command($cmd_string)"
+    This creates a literal SQL command for use in "insert()", "update()",
+    and related methods, since if you simply put something like "CUR_DATE()"
+    as a value in the %data parameter passed to insert, the function will
+    get quoted, and so will not work as expected. Instead, do something like
+    this:
+
+        my $data = { file => 'my_document.txt',
+                     the_date => $db->command('CUR_DATE()')
+                   };
+        $db->insert('my_doc_table', $data);
+
+    This can also be done by passing a reference to a string with the SQL
+    command, e.g.,
+
+        my $data = { file => 'my_document.txt',
+                     the_date => \'CUR_DATE()'
+                   };
+        $db->insert('my_doc_table', $data);
+
+    This is currently how "command()" is implemented.
+
+    Aliases: literal, sql_literal
+
+  "debugOn(\*FILE_HANDLE)"
+    Turns on debugging output. Debugging information will be printed to the
+    given filehandle.
+
+  "debugOff()"
+    Turns off debugging output.
+
+  "setNameArg($arg)"
+    This is the argument to pass to the "fetchrow_hashref()" call on the
+    underlying DBI object. By default, this is 'NAME_lc', so that all field
+    names returned are all lowercase to provide for portable code. If you
+    want to make all the field names return be uppercase, call
+    "$db->setNameArg('NAME_uc')" after the "connect()" call. And if you
+    really want the case of the field names to be what the underlying
+    database driver returns them as, call "$db->setNameArg('NAME')".
+
+    Aliases: set_name_arg
+
+  "err()"
+    Calls "err()" on the underlying DBI object, which returns the native
+    database engine error code from the last driver method called.
+
+  "errstr()"
+    Calls "errstr()" on the underlying DBI object, which returns the native
+    database engine error message from the last driver method called.
+
+  DBI-compatible methods
+    The following method calls use the same interface as the DBI method.
+    However, these are not simply passed through to DBI (see DBI methods
+    below), so any hooks you have defined for "DBIx::Wrapper" will be
+    called.
+
+    "do"
+
+  DBI methods
+    The following method calls are just passed through to the underlying DBI
+    object for convenience. See the documentation for DBI for details.
+
+    "prepare"
+        This method may call hooks in the future. Use "prepare_no_hooks()"
+        if you want to ensure that it will be a simple DBI call.
+
+    "selectrow_arrayref"
+
+    "selectrow_hashref"
+
+    "selectall_arrayref"
+
+    "selectall_hashref"
+
+    "selectcol_arrayref"
+
+    "quote"
+
+    "commit"
+
+    "begin_work"
+
+    "rollback"
+
+    "ping"
+
+  "getLastInsertId()", "get_last_insert_id()", "last_insert_id()"
+    Returns the last_insert_id. The default is to be MySQL specific. It just
+    runs the query "SELECT LAST_INSERT_ID()". However, it will also work
+    with MSSQL with the right parameters (see the db_style parameter in the
+    section explaining the "connect()" method).
+
+  Hooks
+    "DBIx::Wrapper" supports hooks that get called just before and just
+    after various query operations. The add*Hook methods take a single
+    argument that is either a code reference (e.g., anonymous subroutine
+    reference), or an array whose first element is an object and whose
+    second element is the name of a method to call on that object.
+
+    The hooks will be called with a request object as the first argument.
+    See DBIx::Wrapper::Request.
+
+    The two expected return values are "$request->OK" and
+    "$request->DECLINED". The first tells "DBIx::Wrapper" that the current
+    hook has done everything that needs to be done and doesn't call any
+    other hooks in the stack for the current request. "DECLINED" tells
+    "DBIx::Wrapper" to continue down the hook stack as if the current
+    handler was never invoked.
+
+    See DBIx::Wrapper::Request for example hooks.
+
+   "addPrePrepareHook($hook)"
+    Specifies a hook to be called just before any SQL statement is
+    prepare()'d.
+
+   "addPostPrepareHook($hook)"
+    Specifies a hook to be called just after any SQL statement is
+    prepare()'d.
+
+   "addPreExecHook($hook)"
+    Specifies a hook to be called just before any SQL statement is
+    execute()'d.
+
+   "addPostExecHook($hook)"
+    Adds a hook to be called just after a statement is execute()'d.
+
+   "addPreFetchHook($hook)"
+    Adds a hook to be called just before data is fetch()'d from the server.
+
+   "addPostFetchHook($hook)"
+    Adds a hook to be called just after data is fetch()'d from the server.
+
+  Convenience methods
+   "to_csv($rows, \%params);"
+    Convert the given query result rows in @rows to a CSV string. If each
+    row is a hash, a header row will be included by the default giving the
+    column names. This method also supports rows as arrays, as well as $rows
+    itself being a hash ref.
+
+    Valid parameters in %params:
+
+    "sep"
+        The separator to use between columns.
+
+    "quote"
+        The quote to use in cases where values contain the separator. If a
+        quote is found in a value, it is converted to two quotes and then
+        the whole value is quoted.
+
+    "no_header"
+        If set to a true value, do not output the header row containing the
+        column names.
+
+    Aliases: toCsv()
+
+   "to_xml($data, \%params)"
+    Converts $data to xml. $data is expected to be either a hash ref or a
+    reference to an array of hash refs. If $data is an array ref, enclosing
+    tags are put around each record. The tags are named "record" by default
+    but can be changed by specifying record_tag in %params. If
+    $params{indent} is set to a true value, tags will be indented and unix
+    newlines inserted. This method does not output an encoding
+    specification, e.g.,
+
+         <?xml version="1.0" encoding="utf-8"?>
+
+    Aliases: toXml()
+
+   "bencode($data)"
+    Returns the bencoded representation of $data (arbitrary datastructure --
+    but not objects). This module extends the bencode scheme to support
+    undef. See <http://en.wikipedia.org/wiki/Bencode> for details on the
+    bencode encoding.
+
+    Aliases: bEncode()
+
+   "bdecode($encoded_str)"
+    The opposite of "bencode()". Returns the deserialized data from the
+    bencoded string.
+
+    Aliases: bDecode()
+
+   "to_json($data)"
+    Returns the JSON representation of $data (arbitrary datastructure -- but
+    not objects). See http://www.json.org/ or
+    http://en.wikipedia.org/wiki/JSON for details. In this implementation,
+    hash keys are sorted so that the output is consistent.
+
+  There are also underscore_separated versions of these methods.
+    E.g., "nativeSelectLoop()" becomes "native_select_loop()"
+
+DEPENDENCIES
+    DBI
+
+ACKNOWLEDGEMENTS
+    Others who have contributed ideas and/or code for this module:
+
+    Kevin Wilson
+    Mark Stosberg
+    David Bushong
+
+AUTHOR
+    Don Owens <don@regexguy.com>
+
+LICENSE AND COPYRIGHT
+    Copyright (c) 2003-2012 Don Owens (don@regexguy.com). All rights
+    reserved.
+
+    This free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself. See perlartistic.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+SEE ALSO
+    DBI, perl
+
+VERSION
+    0.29
+

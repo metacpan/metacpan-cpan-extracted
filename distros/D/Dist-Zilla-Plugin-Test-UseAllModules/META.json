@@ -1,0 +1,54 @@
+{
+   "abstract" : "Release tests making sure all MANIFEST'ed modules pass use_oK()",
+   "author" : [
+      "Alexei Znamensky <russoz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200015, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Test-UseAllModules",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::InlineFiles" : 0,
+            "Dist::Zilla::Role::PrereqSource" : 0,
+            "Moose" : 0,
+            "Test::UseAllModules" : "0.13",
+            "namespace::autoclean" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : 0,
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "https://github.com/russoz/Dist-Zilla-Plugin-Test-UseAllModules",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/russoz/Dist-Zilla-Plugin-Test-UseAllModules.git",
+         "web" : "https://github.com/russoz/Dist-Zilla-Plugin-Test-UseAllModules"
+      }
+   },
+   "version" : "0.002"
+}
+

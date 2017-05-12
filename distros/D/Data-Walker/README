@@ -1,0 +1,408 @@
+
+README file for Data::Walker 1.05 
+
+
+NAME
+    Data::Walker - A tool for navigating through Perl data
+    structures
+
+SYNOPSIS
+    Without any explicit objects:
+
+      use Data::Walker;
+      Data::Walker->cli( $data_structure );
+
+    Object-style invocation:
+
+      use Data::Walker;
+      my $w = new Data::Walker;
+      $w->walk( $data_structure );
+      $w->ls("-al");
+      $w->pwd;
+      $w->cli;
+
+    Importing methods into the current package:
+
+      use Data::Walker qw(:direct);
+      walk $data_structure;
+      ls "-al";
+      pwd;
+      cli;
+
+DESCRIPTION
+    This module allows you to "walk" an arbitrary Perl data
+    structure in the same way that you can walk a directory tree
+    from a UNIX command line. It reuses familiar unix commands (such
+    as "ls", "cd", "pwd") and applies these to data structures.
+
+    It has a command-line interface which behaves like a UNIX shell.
+    You can also use object-style sytax to invoke the CLI commands
+    from outside the CLI. Data::Walker objects are encapsulated, so
+    that you can hop into and out of a CLI without losing state, and
+    you can have several Data::Walker objects pointing at different
+    structures.
+
+    The main functions can also be imported and used directly from
+    within the Perl debugger's CLI.
+
+INSTALLATION
+    To install this package, just into the directory which you
+    created by untarring the package, and type the following:
+
+            perl Makefile.PL
+            make test
+            make
+            make install
+
+    This will copy Walker.pm to your perl library directory for use
+    by all perl scripts. You probably must be root to do this,
+    unless you have installed a personal copy of perl or you have
+    write access to a Perl lib directory.
+
+USAGE
+    You open a command-line interface by invoking the cli()
+    function.
+
+            use Data::Walker;
+            Data::Walker->cli( $data_structure );
+
+    You can customize certain features, like so:
+
+            use Data::Walker;
+            $Data::Walker::Config{'skipdoublerefs'} = 0;
+            Data::Walker->cli( $data_structure );
+
+    If you prefer to use object-style notation, then you can use
+    this syntax to customize the settings. You can invoke the walk()
+    method directly, our you can let the cli() method call walk()
+    implicitly:
+
+            use Data::Walker;
+            my $w1 = new Data::Walker;
+            $w1->walk( $data_structure );
+            $w1->cli;
+
+            my $w2 = new Data::Walker;
+            $w2->cli( $data_structure );
+
+            my $w3 = new Data::Walker( 'skipdoublerefs' => 0 );
+            $w3->walk( $data_structure );
+            $w3->cli();
+            
+            $w3->showrecursion(0);
+            $w3->cli();
+
+    You can also import most of the functions directly into the
+    current package. This is especially useful from within the
+    debugger (see the example below).
+
+            use Data::Walker qw(:direct);
+            walk $data_structure;
+            ls "-al";
+            pwd;
+            cli;
+
+    When you use the :direct pragma and invoke the walk() function,
+    a Data::Walker object is implicitly created, and is available as
+    $Data::Walker::WALKER.
+
+    Imagine a data structure like so:
+
+            my $s = {
+
+            a => [ 10, 20, "thirty" ],
+            b => {
+                    "w" => "forty",
+                    "x" => "fifty",
+                    "y" => 60,
+                    "z" => \70,
+            },
+            c => sub { print "I'm a data structure!\n"; },
+            d => 80,
+            };
+            $s->{e} = \$s->{d};
+
+    Here is a sample CLI session examining this structure ('/>' is
+    the prompt):
+
+            /> 
+            /> ls -l
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE                      
+            d               scalar                    80
+            e               SCALAR                    80
+            /> cd a
+            /->{a}> ls -al
+            ..              HASH                      (5)
+            .               ARRAY                     (3)
+            0               scalar                    10
+            1               scalar                    20
+            2               scalar                    'thirty'
+            /->{a}> cd ../b
+            /->{b}> ls -al
+            ..              HASH                      (5)
+            .               HASH                      (4)
+            w               scalar                    'forty'
+            x               scalar                    'fifty'
+            y               scalar                    60
+            z               SCALAR                    70
+            /->{b}> cd ..
+            /> dump b
+            dump--> 'b'
+            $b = {
+              'x' => 'fifty',
+              'y' => 60,
+              'z' => \70,
+              'w' => 'forty'
+            };
+            /> ls -al
+            ..              HASH                      (5)
+            .               HASH                      (5)
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE                      
+            d               scalar                    80
+            e               SCALAR                    80
+            /> ! $cur->{d} += 3
+            eval--> $cur->{d} += 3
+            retv--> 83
+            /> ls -al
+            ..              HASH                      (5)
+            .               HASH                      (5)
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE                      
+            d               scalar                    83
+            e               SCALAR                    83
+            /> 
+
+    Below is a sample debugger session examining this structure.
+
+    Note that the walk() function returns a reference to the
+    "cursor", which is itself a reference to whatever is the
+    "current directory," so to speak. The actual Data::Walker object
+    iself is managed implicitly, and is available as
+    $Data::Walker::WALKER. When you are finished, you can undef this
+    object directly, or use the unwalk() function, which does this
+    for you. But if you saved a copy of the cursor, then you will
+    need to undef this on your own.
+
+            (violet) ~/perl/walker/Data-Walker-0.18 > perl -d sample_db
+
+            Loading DB routines from perl5db.pl version 1.0401
+            Emacs support available.
+
+            Enter h or `h h' for help.
+
+            main::(sample:19):              d => 80,
+              DB<1> n
+            main::(sample:22):      $s->{e}      = \$s->{d};
+              DB<1> n
+            main::(sample:30):      1;
+              DB<1> use Data::Walker qw(:direct)
+
+              DB<2> $cur = walk $s
+
+              DB<3> pwd
+            /
+              DB<4> ls
+            a       b       c       d       e
+              DB<5> lal
+            ..              HASH                      (5)
+            .               HASH                      (5)
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE
+            d               scalar                    80
+            e               SCALAR                    80
+              DB<6> cd a
+            /->{a}        
+              DB<7> ll
+            0               scalar                    10
+            1               scalar                    20
+            2               scalar                    'thirty'      
+              DB<8> cd '../b'
+            /->{b}
+              DB<9> lal
+            ..              HASH                      (5)
+            .               HASH                      (4)
+            w               scalar                    'forty'
+            x               scalar                    'fifty'
+            y               scalar                    60
+            z               SCALAR                    70       
+              DB<10> cd '..'
+            /
+              DB<11> dump b
+            dump--> 'b'
+            $b = {
+              'x' => 'fifty',
+              'y' => 60,
+              'z' => \70,
+              'w' => 'forty'
+            };                  
+              DB<12> ll
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE
+            d               scalar                    80
+            e               SCALAR                    80
+              DB<13> $$cur->{d} += 3
+
+              DB<14> ll
+            a               ARRAY                     (3)
+            b               HASH                      (4)
+            c               CODE
+            d               scalar                    83
+            e               SCALAR                    83
+              DB<15>                   
+              DB<16> pwd
+            /
+              DB<17> cli
+            /> cd b
+            /->{b}> ls -l
+            w               scalar                    'forty'
+            x               scalar                    'fifty'
+            y               scalar                    60
+            z               SCALAR                    70     
+            /->{b}> print y
+            60
+            /->{b}> print x
+            fifty
+            /->{b}> exit
+
+              DB<18> pwd
+            /->{b}
+              DB<19> ll
+            w               scalar                    'forty'
+            x               scalar                    'fifty'
+            y               scalar                    60
+            z               SCALAR                    70
+              DB<20> unwalk
+
+              DB<21> undef $cur
+
+              DB<22> 
+
+    The following commands are available from within the CLI. With
+    these commands, you can navigate around the data structure as if
+    it were a directory tree.
+
+            cd <target>          like UNIX cd
+            ls                   like UNIX ls (also respects options -a, -l)
+            print <target>       prints the item as a scalar
+            dump <target>        invokes Data::Dumper
+            set <key> <value>    set configuration variables
+            show <key>           show configuration variables
+            ! or eval            eval arbitrary perl (careful!)
+            help                 this help message
+            help set             lists the available config variables
+
+    For each session (or object) the following items can be
+    configured:
+
+            rootname        (default:  '/'    )  displays the root node 
+            refname         (default:  'ref'  )  displays embedded refs
+            scalarname      (default: 'scalar')  displays simple scalars
+            undefname       (default: 'undef' )  displays undefined scalars
+
+            maxdepth        (default:   1 )  maximum dump-depth (Data::Dumper)
+            indent          (default:   1 )  amount of indent (Data::Dumper)
+            lscol1width     (default:  15 )  column widths for 'ls' displays
+            lscol2width     (default:  25 )  column widths for 'ls' displays
+
+            showrecursion   (default:   1 )  note recursion in the prompt
+            showids         (default:   0 )  show ref id numbers in ls lists
+            skipdoublerefs  (default:   1 )  hop over ref-to-refs during walks
+            skipwarning     (default:   1 )  warn when hopping over ref-to-refs
+            truncatescalars (default:  37 )  truncate scalars in 'ls' displays
+            autoprint       (default:   1 )  print directory after chdir when not in CLI
+
+            promptchar      (default:  '>')  customize the session prompt
+            arrowshaft      (default:  '-')  ('-' in '->')
+            arrowhead       (default:  '>')  ('>' in '->')
+
+            curname         (default:  'cur'  )  how to refer to the cursor for evals
+            parname         (default:  'par'  )  how to refer to the parent ref for evals
+
+CHANGES
+    * Version 1.05
+                Patch to the test scripts for compatibility with 
+                perl 5.8.0,  which stringifies references-to-references 
+                differently.  In previous versions of perl, 
+                references-to-references were stringified
+                as 'SCALAR(0x???)', but perl 5.8.0 stringifies
+                them as 'REF(0x???)'. 
+
+                All versions of perl's 'ref' function return 
+                'REF' for references-to-references. 
+
+    * Version 1.02-1.04
+                Minor changes to installer tests.
+
+    * Version 1.01
+                Minor changes to the documentation.
+                Added walker_http.pl, which is a library for using 
+                Data::Walker together with HTTP::Daemon to view objects 
+                with a Web browser.  Two example scripts are also included. 
+
+    * Version 0.21
+                Minor changes to the documentation
+
+    * Version 0.19-0.20
+                Added new tests and updated the documentation.
+
+    * Version 0.18
+                Completely separated the CLI loop, command-parsing regexes, 
+                and the functions which implement the commands.  AUTOLOAD is now
+                set up to handle any commands that the CLI can parse (except
+                for eval() ).  
+
+                By using the :direct pragma, you can now import AUTOLOADed functions 
+                into the current package, so that you can easily invoke them 
+                from the perl debugger.
+
+    * Version 0.16-0.17
+                The Data::Walker objects are now fully encapsulated. 
+
+                NOTE:  The walk() function has been separated into two functions, 
+                namely walk() and cli(). The usage instructions have changed.  
+                Please have a look.
+
+    * Version 0.15
+                Reorganized the installation tests.  
+                A few minor changes to the module itself.
+
+    * Version 0.13-0.14
+                Moved some functionality from the CLI-loop
+                into distinct functions.
+
+    * Version 0.12
+                Blessed references to non-hashes are now handled correctly.
+                Modified the output of "ls" commands (looks different).
+                Added new options:  
+                   showids, lscol2width, scalarname, undefname,
+                   skipwarning
+                Numerous internal changes.
+
+    * Version 0.11
+                Fixed some misspellings in the help information.
+                Modified the pretty-print format of scalars.
+                Added some new comments to the source code.
+                Various other small updates.
+
+THANKS
+    Thanks to Gurusamy Sarathy for writing Data::Dumper, and to
+    Dominique Dumont for writing Tk::ObjScanner.
+
+    Thanks to Matthew Persico for sending some ideas on how this
+    module might be useful in the debugger.
+
+    Thanks to Scott Lindsey for pointing out that this module is
+    useful for reading files created with the Storable module, and
+    for sending a sample script to do this.
+
+AUTHOR
+    John Nolan jpnolan@sonic.net 1999,2000. A copyright statment is
+    contained within the source code itself.
+

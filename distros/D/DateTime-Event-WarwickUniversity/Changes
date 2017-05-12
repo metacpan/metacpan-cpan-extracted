@@ -1,0 +1,29 @@
+Revision history for Perl extension DateTime::Event::WarwickUniversity.
+
+0.05  Sat Nov 01 22:41:19 2008
+        - Factor out _new_year_dt_from_gregorian_year copy from
+          new_year_for_gregorian_year.
+        - Fix tests for lowest/highest supported years.
+        - Update future term dates to 2017.
+
+0.04  Mon Nov 19 23:34:22 2007
+	- Correct 0.02 Changes date again. It really was today.
+	- Change/add dependencies on test modules to build_requires.
+	- Small changes to pod to let dh-make-perl parse copyright.
+	- Fix build instructions in README.
+
+0.03  Mon Nov 19 22:48:04 2007
+	- Correct date of last Changes entry.
+	- Switch to Module::Build to get nicer META.yml
+	- Add explicit Test::Exception and Test::More dependencies.
+	- Add Test::Pod and Test::Pod::Coverage tests.
+
+0.02  Mon Nov 19 00:12:35 2007
+	- Update future term dates from Warwick website.
+	- Change tests to use 'Europe/London' time zone.
+	- Use floating time zone for calculations.
+
+0.01  Tue Aug 22 23:12:48 2006
+	- original version; created by h2xs 1.23 with options
+		-AXn DateTime::Event::WarwickUniversity
+

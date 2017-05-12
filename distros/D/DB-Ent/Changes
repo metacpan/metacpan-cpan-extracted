@@ -1,0 +1,5 @@
+Revision history for Perl extension DB::Ent.
+
+revision 1.63
+date: 2003/06/24 03:58:11;  author: ekkis;  state: Exp;  lines: +29 -5
+- first release to CPAN

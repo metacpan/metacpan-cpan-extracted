@@ -1,0 +1,34 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 e3cfed000a63c0a470e84774a505985c98a2397a Build.PL
+SHA1 b896e3edbfe5383837e0ff1c10ab7a8c2a1ac0d0 ChangeLog
+SHA1 b896e3edbfe5383837e0ff1c10ab7a8c2a1ac0d0 Changes
+SHA1 10ca0bf75e039e5a20f2a3b7333628254f330cf9 MANIFEST
+SHA1 810f5bfcf4566eebdee86d075add05872d0f56be META.yml
+SHA1 acfe312b13a9325785a9c2932589066e086a1cbf Makefile.PL
+SHA1 3ef554f1ccb3d7d3184c68e8f73eb4f9cc68ea8c NEWS
+SHA1 d1297cf3af2799726a4bc75ec9544f6e9ac95992 README
+SHA1 3ef554f1ccb3d7d3184c68e8f73eb4f9cc68ea8c ReleaseNotes
+SHA1 2e7852e19531de292b4402065d8b39004d16bc7d lib/Devel/throttle.pm
+SHA1 f5d95736f81d7727894945fdfeac43cbf1c66fec t/01throttle.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2.0.11 (GNU/Linux)
+
+iEYEARECAAYFAkrVu2QACgkQOo0HNPWNDz0C/ACfSt3iIMsUbHiifGy41KbMStMm
+3UYAnjFJashZPsUkjteydYX7iaFFJz5m
+=UD1Y
+-----END PGP SIGNATURE-----

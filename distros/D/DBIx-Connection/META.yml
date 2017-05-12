@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:                DBIx-Connection
+version:             0.08
+author:
+  - 'Adrian Witas <adrian@webapp.strefa.pl>'
+abstract: Simple database interface.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+generated_by:        ExtUtils::MakeMaker version 6.3201
+distribution_type:   module
+requires:
+    perl:                          5.6.1    
+    Abstract::Meta::Class:         0
+    Carp:                          0
+    DBI:                           0
+    Test::Pod:                     0
+    Test::Pod::Coverage:           0
+    Time::HiRes:                   0
+tests: t/*.t
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

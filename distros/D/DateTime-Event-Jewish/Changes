@@ -1,0 +1,17 @@
+Revision history for DateTime-Event-Jewish
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+
+0.03 Fixed DST correction.
+
+0.04 Corrected Param::Validate to Params::Validate
+
+0.05 Fixed bug in Vayakhel vs Vayahkhel/Pekudei
+
+0.06 Fixed pod-coverage moaning on a data file.
+ 
+0.07 Corrected typo in Declinatiion.pm that caused calculations
+    for 9 Feb to fail.
+
+0.08 Corrected more typos. Added a test to check for them.

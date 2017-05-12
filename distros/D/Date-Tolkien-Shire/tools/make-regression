@@ -1,0 +1,181 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use lib qw{ tools/lib };
+
+use Date::Tolkien::Shire;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use Time::Local;
+
+our $VERSION = '1.901';
+
+my %opt;
+
+GetOptions( \%opt,
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) or pod2usage( { -verbose => 0 } );
+
+my @test_years = (	# [ start, finish ] with interval open on right
+    [ 1999, 2003 ],	# January 1 1999 through December 31 2002
+    [ 2035, 2039 ],	# January 1 2035 through December 31 2038
+);
+
+my $count = 0;
+foreach my $interval ( @test_years ) {
+    $count += test_years( @{ $interval } );
+}
+
+my $dts_version = Date::Tolkien::Shire->VERSION();
+
+print <<"EOD";
+package main;
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Date::Tolkien::Shire;
+use Test::More 0.47;	# The best we can do with 5.6.2.
+use Time::Local;
+
+plan tests => $count;
+
+print <<'EOT';
+# Created @{[ scalar gmtime ]} UT
+# using Date::Tolkien::Shire $dts_version
+EOT
+
+my ( \$dts, \$epoch );
+EOD
+
+foreach my $interval ( @test_years ) {
+    test_years( @{ $interval }, 1 );
+}
+
+print <<'EOD';
+
+1;
+
+# ex: set textwidth=72 :
+EOD
+
+sub test_years {
+    my ( $start_year, $finish_year, $emit ) = @_;
+
+    my $count = 0;
+
+    my $epoch = timelocal( 0, 0, 12, 1, 0, $start_year );
+    my $last = timelocal( 0, 0, 12, 1, 0, $finish_year );
+
+    $emit
+	or return ( $last - $epoch ) / 86400 * 9;
+
+    while ( $epoch < $last ) {
+	my ( undef, undef, undef, $day, $mon, $yr ) = localtime $epoch;
+	$yr += 1900;
+
+	my $date = sprintf '%04d-%02d-%02d Gregorian', $yr, $mon + 1, $day;
+
+	my $dts = Date::Tolkien::Shire->new( $epoch );
+
+	print <<"EOD";
+
+\$epoch = timelocal( 0, 0, 0, $day, $mon, $yr );
+\$dts = Date::Tolkien::Shire->new( \$epoch );
+cmp_ok( \$dts->time_in_seconds(), '==', \$epoch, 'epoch() on $date' );
+EOD
+
+	foreach my $method ( qw{
+	    weekday trad_weekday month day holiday year
+	    as_string on_date
+	} ) {
+	my $title = "$method() on $date";
+	    my $rslt = $dts->$method();
+	    if ( ! defined $rslt ) {
+		print <<"EOD";
+is( \$dts->$method(), undef, '$title' );
+EOD
+	    } elsif ( $rslt =~ m/ \A [0-9]+ \z /smx ) {
+		print <<"EOD";
+cmp_ok( \$dts->$method(), '==', $rslt, '$title' );
+EOD
+	    } elsif ( $rslt =~ s/ \n \z //smx ) {
+		print <<"EOD";
+cmp_ok( \$dts->$method(), 'eq', <<'EOT', '$title' );
+$rslt
+EOT
+EOD
+	    } else {
+		$rslt =~ s/ (?= ['] ) /\\/smxg;
+		print <<"EOD";
+cmp_ok( \$dts->$method(), 'eq', '$rslt', '$title' );
+EOD
+	    }
+	}
+
+	$epoch += 86400;
+	$count++;
+    }
+
+    return $count;
+}
+
+__END__
+
+=head1 TITLE
+
+make-regression - Generate a regression test
+
+=head1 SYNOPSIS
+
+ make-regression >xt/author/regression.t
+ make-regression -help
+ make-regression -version
+
+=head1 OPTIONS
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script generates a regression test to detect any change in
+behaviour of the L<Date::Tolkien::Shire|Date::Tolkien::Shire> module.
+This test consists of calling each method for each day in the intervals
+1999-01-01 to 2002-12-31 inclusive, and 2035-01-01 to 2038-12-31
+inclusive, and verifying that all calls produce the same results as when
+the regression test was generated.
+
+The test is written to standard out.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

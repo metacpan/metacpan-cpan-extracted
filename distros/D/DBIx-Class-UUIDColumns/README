@@ -1,0 +1,79 @@
+NAME
+    DBIx::Class::UUIDColumns - Implicit uuid columns
+
+SYNOPSIS
+    In your DBIx::Class table class:
+
+      __PACKAGE__->load_components(qw/UUIDColumns ... Core/);
+      __PACKAGE__->uuid_columns('artist_id');
+
+    Note: The component needs to be loaded *before* Core.
+
+DESCRIPTION
+    This DBIx::Class component resembles the behaviour of Class::DBI::UUID,
+    to make some columns implicitly created as uuid.
+
+    When loaded, "UUIDColumns" will search for a suitable uuid generation
+    module from the following list of supported modules:
+
+      Data::UUID
+      APR::UUID*
+      UUID
+      Win32::Guidgen
+      Win32API::GUID
+
+    If no supporting module can be found, an exception will be thrown.
+
+    *APR::UUID will not be loaded under OpenBSD due to an as yet
+    unidentified XS issue.
+
+    If you would like to use a specific module, you can set "uuid_class":
+
+      __PACKAGE__->uuid_class('::Data::UUID');
+      __PACKAGE__->uuid_class('MyUUIDGenerator');
+
+METHODS
+  get_uuid
+    Returns a uuid string from the current uuid_maker.
+
+  insert
+    Inserts a new uuid string into each column in "uuid_columns".
+
+  uuid_columns
+    Gets/sets the list of columns to be filled with uuids during insert.
+
+      __PACKAGE__->uuid_columns('artist_id');
+
+  uuid_class
+    Takes the name of a UUIDMaker subclass to be used for uuid value
+    generation. This can be a fully qualified class name, or a shortcut name
+    starting with :: that matches one of the available
+    DBIx::Class::UUIDColumns::UUIDMaker subclasses:
+
+      __PACKAGE__->uuid_class('CustomUUIDGenerator');
+      # loads CustomeUUIDGenerator
+
+      __PACKAGE__->uuid_class('::Data::UUID');
+      # loads DBIx::Class::UUIDMaker::Data::UUID;
+
+    Note that "uuid_class" checks to see that the specified class isa
+    DBIx::Class::UUIDColumns::UUIDMaker subclass and throws and exception if
+    it isn't.
+
+  uuid_maker
+    Returns the current UUIDMaker instance for the given module.
+
+      my $uuid = __PACKAGE__->uuid_maker->as_string;
+
+SEE ALSO
+    DBIx::Class::UUIDColumns::UUIDMaker
+
+AUTHOR
+    Chia-liang Kao <clkao@clkao.org>
+
+CONTRIBUTERS
+    Chris Laco <claco@chrislaco.com>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

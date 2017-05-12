@@ -1,0 +1,194 @@
+Revision history for Perl extension Device::Modem.
+
+1.57  Sun Jan 26 11:36:11 CET 2014
+    - Added a "handshake" option to the connect() method.
+      Allowed values are "xoff", "rts" or "none" (default).
+      Thanks to Ezio Bonsi for suggesting the idea.
+
+1.56  Thu Sep 29 13:43:31 CEST 2011
+    - [RT#71330] Unbroken the MANIFEST file. 1.55 was non functional.
+      Thanks to Vita Cizek for reporting.
+
+1.55  [BROKEN RELEASE. AVOID] Fri Sep 23 22:01:31 CEST 2011
+    - Performance improvements by Ed Wildgoose, long time user. Thanks Ed!
+      Windows users, please test this release!
+
+1.54  Sun May 29 20:53:23 AEST 2011
+    - Removed uninitialized warning on $obj->{'CONNECTED'}.
+      Fixes RT #68504.
+
+1.53  Thu Apr 01 13:49:00 CET  2010
+    - ***CHANGED*** default log file position
+      from /var/log/modem.log to /tmp/modem.log.
+      Too many failed tests and user reports made me
+      reconsider my poor default choice.
+    - Added voice dialing. Just dialing though.
+      You can't perform real voice calls through Device::Modem (yet :)
+      Thanks to Marek Jaros.
+    - Added ';' (voice dialing) and 'p' (pause) as valid values
+      for dial() number.
+
+1.52  Sun Mar 28 15:50:00 CET  2010
+	- Added automatic port reconnection in the port() method.
+	  This should improve connection reliability and reduce risk
+	  of "Can't call method XXXXXX on undefined value YYYYYY" errors.
+
+1.51  Sun Jul  5 09:46:08 CEST 2009
+    - Fixed documentation for answer() method, timeout was declared
+	  to be in seconds instead of milliseconds. Thanks to Mikko Puisto for reporting.
+
+1.50  Tue Sep 30 22:59:00 CEST 2008
+    - Fixed use of wrong 'error' loglevel for SysLog plugin
+
+1.49  Sat May 31 22:38:00 CEST 2008
+    - Changed default wait cycles and timeout to be more reliable with slow
+      devices after several user reports.
+    - Fixed man page for Xmodem.pm module. Incorporated fix from the debian package.
+
+1.48  Sun Jun 24 09:30:16 CEST 2007
+    - atsend() method made more reliable with longer commands (ex. longer sms messages).
+      Thanks to Ben Knight for his bug report and patch.
+
+1.47  Thu Apr 20 22:16:17 CET 2006
+    - Sensible speedup in the command/response cycle.
+      Thanks to Ed Wildgoose for his contribution.
+
+1.46
+1.45  Tue Nov 15 23:29:40 CET 2005
+    - Fixed dial() now it does not wait for timeout in presence of a valid
+      remote response (NO CARRIER, BUSY, ...)
+    - Fine tuned answer read cycle times
+    - Added constant $Device::Modem::WAITCMD for wait time before issuing commands (atsend)
+    - Added patch to make Xmodem work from Aaron Mitti <amitti at 10east dot com>.
+    - Now dial() accepts also '#' sign in numbers (thanks to Pierre Hilson).
+
+1.44  Sat Apr 30 23:29:03 CET 2005
+    - (again) now cygwin and darwin platforms should be detected correctly.
+      (thanks to Rob Johnson for reporting)
+    - added a preliminary version of Device::Modem::UsRobotics module,
+      that allows to access voice/fax messages stored on your UsRobotics
+      message modem. Read the (incomplete) docs for more details.
+
+1.42  Sun Sep 19 21:12:10 CET 2004
+    - little fix for correct MacOSX os detection and SerialPort inclusion
+      (thanks to Lidie Steve for reporting)
+
+1.39
+1.38
+1.37  Wed Aug 18 09:21:50 CET 2004
+    - parse_answer() now in scalar context (string) returns *all* modem
+      answer instead of removing the last string (OK/ERROR/...)
+    - documented new example scripts: caller-id.pl and xmodem.pl
+
+1.36
+1.35
+1.34  Sun Feb 22 18:12:54 CET 2004
+    - fixed  CPAN bug #5131 (https://rt.cpan.org/Ticket/Display.html?id=5131)
+    - closed CPAN bug #5134 (https://rt.cpan.org/Ticket/Display.html?id=5134)
+    - dial() now should return correctly after a successful connect,
+      without unnecessarily waiting for timeout
+    - updated changes file missing in 1.35
+
+1.33
+1.32
+1.31  Fri Jan 23 01:14:01 CET 2004
+    - Improved reliability in answer() method (sempre lui!),
+	  that was more unstable due to recent changes.
+	- Documented _answer() internal function to get the raw modem reponse
+	  instead of response string stripped of all cr/lf chars.
+
+1.29
+1.30  Sat Nov  8 18:23:02 CET 2003
+    - improved answer() method speed. Now it runs sensibly faster, but needs
+	  explicit timeout parameter if you want to wait for answers (dialing
+	  a remote modem, for example)
+	- implemented a basic xmodem file transfer. *DON'T KNOW IF IT WORKS*
+	- documentation now stays only in docs/ folder, separate from main module
+	- now there is a way to get the raw modem answers (internal _answer() method)
+
+1.25
+1.26
+1.27
+1.28  Sun May 18 17:19:23 CET 2003
+	- dial() now works as expected, returning the `CONNECT' or `BUSY'
+          or whatever message without hanging for minutes;
+	- answer() routine now is definitely more reliable than before:
+          now everytime the buffer receives input from modem, it does
+          not restart counting the timeout. Removed also the possibility
+          of infinite loop if modem always receives garbage chars (like
+          on a RAW PPP link);
+        - Added full documentation for every method;
+        - Added a FAQ document in new "docs/" folder;
+	- new(): added possibility to pass a custom log object as `log'
+          property;
+	- fixed log levels for File and Syslog plugins. Implemented
+	  correct log level masking also for Syslog.
+
+1.23  Wed Dec  4 00:34:52 CET 2002
+        - little documentation adjustments in main Modem.pm class;
+        - removed use of `warnings.pm' 
+        - now File log class opens the log file once and writes
+          on already opened file handle, until final close().
+        - Thanks to Joerg Neuberger for spotting out a problem with
+          older perls (5.005_xx) and `use warnings'
+
+1.19
+1.20  Thu Sep 12 00:19:11 CEST 2002
+1.22  Thu Sep 26 00:16:49 CEST 2002
+	- improved command/response cycle with proper handling of timeout
+          and idle/data cycles. Now it is more reliable also with fairly
+	  big serial messages (removed this from TODO list).
+	- removed warnings on undefined answer strings.
+
+
+1.17
+1.18  Tue Sep  3 21:57:11 CEST 2002
+	- removed some warnings and error in regexp pattern, slight changes in
+          documentation
+
+
+1.16  Mon Jun 17 21:58:22 CEST 2002
+	- added S_register() method to read/write S-registers;
+	- store_number() to store an address-book number (cannot retrieve yet);
+	- restore_factory_settings() now accepts a number of profile (default=0);
+	- dial() now dials also address book numbers (only if supplied number
+	  is composed of 1 digit: the address book position, from 0 to 9).
+        - status() method added, which looks up CTS, DSR, RLSD and RING signals;
+
+1.15  Tue Jun 04 23:20:12 CEST 2002
+	- modified makefile/test procedure to pass automated cpan tests
+
+
+1.14  Mon Jun 03 21:53:05 CEST 2002
+        - added is_active() method to test if modem ... (guess :-)
+        - tested, now seems to work, dial() method
+        - fixed a *bad* bug in modem answer parsing routine
+        - better timing and less waits in AT commands
+        - moved "PRE-ALPHA" to "ALPHA" :-)
+
+1.10  Wed Apr 10 00:11:35 CEST 2002
+	- modified docs, license details
+	- fixed wrong hangup() call
+
+1.08  Wed Apr  3 23:31:58 CEST 2002
+	- fixed logging classes auto-load mechanism
+	- added parse_answer() function, to easily retrieve
+	  informational responses
+	- added TO-DO list to pod
+
+1.07  Wed Apr  3 22:05:00 CEST 2002
+	- renamed `serial' parameter as `port', syncing with
+	  existent docs
+	- removed some warnings on parameters passing
+
+1.05  Sat Mar 30 16:19:40 CET 2002
+	- added and documented dial() and repeat(), still
+      to be tested!
+
+1.04  Mon Mar 25 07:37:20 CET 2002
+    - cleaned up docs and some of source code
+
+0.01  Tue Feb 26 22:15:22 CET 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n Device::Modem -v 0.01
+

@@ -1,0 +1,20 @@
+1.002001 2016-09-22
+ - Updated changes document
+
+1.002 2016-09-22
+ - Fixed some typos (simpler -> simplish)
+
+1.001 2016-09-21
+ - Added call method (for MySQL)
+
+1.000_001 2016-09-20
+ - Added plugins for higher Kwalitee
+
+1.000 2016-09-13
+ - Added error method
+ - PrintError defaults to false, RaiseError defaults to true. Like
+   DBIx::Simple
+ - Cosmetics
+
+0.001 2016-09-12
+ - Initial version

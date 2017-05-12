@@ -1,0 +1,7 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Date/Object.hploo
+lib/Date/Object.pm
+test.pl

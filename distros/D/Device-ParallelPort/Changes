@@ -1,0 +1,24 @@
+Revision history for Perl extension Device::ParallelPort.
+
+0.01  Mon May  1 22:52:02 EST 2002
+	- Initial non working pre-alpha version
+
+0.02  Mon May  4 22:52:02 EST 2002
+	- First alpha release
+
+0.03  Mon May  6 22:52:02 EST 2002
+	- Include more POD and LICENSE
+
+0.04  Mon Aug  19 22:12:13 EST 2002
+	- Many improvements for release
+
+0.06  Wed Oct  16 11:14:07 EST 2002
+	- Minor bug fixes
+	- Improve testing
+
+1.00  Sun Nov  9 11:25:09 EST 2003
+	- Rewrite of auto driver to work with linux and windows
+	  also reports to the user what they should be using
+	- Updates to main module to be just a factory
+	- Automatically use auto driver if nothing supplied
+	- Automatically use deivce 0 if nothing supplied

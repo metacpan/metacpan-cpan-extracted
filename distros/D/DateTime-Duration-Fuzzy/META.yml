@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: DateTime::Duration::Fuzzy
+abstract: 'Express time intervals in fuzzy, human-friendly strings'
+version: 0.06
+author:
+    - Jan Oldrich Kruza <sixtease@cpan.org>
+license: perl
+distribution_type: module
+requires:
+    DateTime: 0
+build_requires:
+    Test::More: 0

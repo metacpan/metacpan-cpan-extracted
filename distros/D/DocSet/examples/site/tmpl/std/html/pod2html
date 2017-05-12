@@ -1,0 +1,51 @@
+[%  USE pod; 
+    pom = pod.parse_text("\n$content");
+
+    UNLESS pom;
+	"   ! Pod error: $pod.error\n" | stderr;
+	RETURN;
+    END;
+
+    FOREACH w = pod.warnings;
+	"   ! Pod warning: $w\n" | stderr;
+    END;
+
+    VIEW v prefix='pod/html/';
+	BLOCK list;
+	    view.print(i) FOREACH i = item;
+	END;
+    END;
+    VIEW vq base=v prefix='pod/html/quote_';
+    END;
+
+    PROCESS toc1;
+
+    v.print(pom);
+-%]
+
+[% BLOCK toc1 %]
+
+<h3>Table of Contents</h3>
+    <div class="toc">
+
+    <ul>
+    [% FOREACH sec = pom.head1;
+        title = vq.print(sec.title) or sec.title;
+        NEXT IF title == 'NAME';
+    %]
+    <li><a href="#[% PROCESS pod/html/a_name -%]">[% title -%]</a>
+    <ul>
+
+	    [% FOREACH sub = sec.head2;
+        title = vq.print(sub.title) or sub.title;
+        %]
+        <li><a href="#[% PROCESS pod/html/a_name -%]">[% title -%]</a>
+        [% END %]
+    </ul>
+
+    [% END %]
+    </ul>
+      [% #doc.toc %]
+    </div>
+
+[% END %]

@@ -1,0 +1,31 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        code: 
+          caption: Condition
+          class: src
+          f: "%s"
+          fs: "%s"
+        cover: 
+          caption: "%"
+          f: "%d"
+          fs: "%d"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+      headers_order: 
+        - line
+        - cover
+        - code
+      label: Condition coverage
+      rows: []
+
+      summary: []
+
+metadata: 
+  title: "Condition coverage: t/Foo.t"
+  version: '0.05'

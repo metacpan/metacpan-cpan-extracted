@@ -1,0 +1,26 @@
+---
+abstract: 'Validate data based on Perl data structure templates'
+author:
+  - 'Nicholas Perez <nperez@cpan.org>'
+build_requires:
+  Module::Build: 0.35
+configure_requires:
+  Module::Build: 0.35
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-DPath-Validator
+requires:
+  Data::DPath: 0.32
+  Data::Visitor: 0.26
+  Moose: 0.93
+  MooseX::Role::BuildInstanceOf: 0.02
+  MooseX::Types: 0.20
+  Scalar::Util: 1.22
+  Test::More: 0.92
+  namespace::autoclean: 0.09
+resources:
+  repository: git://github.com/nperez/data-dpath-validator.git
+version: 0.093411

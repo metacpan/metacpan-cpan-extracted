@@ -1,0 +1,12 @@
+Changes
+lib/DBIx/Class/ForceUTF8.pm
+Makefile.PL
+MANIFEST			This list of files
+t/00_compile.t
+t/01_utf8.t
+t/lib/DBICTest.pm
+t/lib/sqlite.sql
+t/lib/DBICTest/Schema.pm
+t/lib/DBICTest/Schema/CD.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

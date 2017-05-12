@@ -1,0 +1,5 @@
+[% FOREACH url = file.article_urls -%]
+ [% IF url.type == 'text/x-perl' %]
+  <p class="daizu-source-code-link"><a href="[% url.url |html %]" rel="alternate" type="text/x-perl">Source code</a></p>
+ [% END %]
+[%- END -%]

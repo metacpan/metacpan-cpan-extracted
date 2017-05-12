@@ -1,0 +1,78 @@
+Changes
+=======
+
+0.00015 - 06 Jul 2011
+  - Fix perl 5.14 qw() deprecation warnings (theory)
+  - Add extract_node_values() to access arbitrary node values (LibXML only) (theory)
+  - Fix stupid typo in Item class
+
+0.00014 - 22 Jun 2010
+  - Added `icon()` accessor to the feed classes. (theory)
+  - Added `base()` accessor to the feed classes (requires XML::RSS::LibXML
+    0.3006 for RSS support). (theory)
+  - Missing descriptions and contents from parsed RSS feeds are now set to
+    empty strings instead of throwing an exception. Such was already the case
+    for parsed Atom feeds. (theory)
+  - Missing type attributes in parsed enclosures no longer trigger an
+    exception, but are set to an empty string. (theory)
+
+0.00013 - 3 Jun 2010
+  - Made RSS enclosure parsing more tolerant of empty length values, as was
+    already the case with Atom enclosure parsing. (theory)
+  - 'feed' and 'entry' attributes are now moved down to the actual implementors,
+    so that the interaction is a bit cleaner.
+  - Remove List::Util dependency
+
+0.00012 - 3 Jun 2010
+  - Added `parse_datetime()`, `parse_w3cdtf_date()`, and `parse_mail_date()`.
+    These methods are used to parse dates from the feeds. (theory)
+
+0.00011 - 18 Feb 2010
+  - Tweak regexp (franckcuny)
+  - Use LWP instead of URI::Fetch (franckcuny)
+  - Moose-y fixes (franckcuny)
+
+0.00010 - 31 Jul 2009
+  - Allow initialization of fields feed/item
+
+0.00009 - 20 Mar 2009
+  - No changes to code, just use newer M::I::Any::Moose
+
+0.00008 - 19 Mar 2009
+  - Any::Moose me!
+
+0.00007 - 21 Oct 2008
+  - Fix a bunch of minor problems.
+    * as_xml() properly implemented
+    * Creating feeds is now much more functional
+    * Add tagline()
+  - Added selected tests fro XML::Feed 0.21 for more coverage
+
+0.00006 - 08 Sep 2008
+  - Recent versions of Moose (properly) unimport blessed() and confess(), 
+    which breaks my code depending on it.
+
+0.00005 - 06 Aug 2008
+  - Attempt to fix tests by using Test::UseAllModules (rt #38233)
+
+0.00004 - 06 Aug 2008
+  - Make XML::RSS::LibXML a hard dependency (rt #38173)
+    While CPAN will force you to install XML::RSS::LibXML, you /can/
+    use XML::RSS as the backend parser. However, some features,
+    such as enclosures, will not properly work.
+  - Allow specification of RSS parser via DATA_FEED_RSS_PARSERS
+    environment variable
+  - Fix bugs calling methods from a previous life that no longer exist
+  - Make tests not rely on slow network connection
+
+0.00003 - 28 Jul 2008
+  - Add media_contents() so that MediaRSS can be handled (33rpm)
+  - Tweak the tests to make network-dependent tests more reliable
+  - Silence potential warnings
+
+0.00002 - 25 Jul 2008
+  - Update dependencies
+  - Fix network detection
+
+0.00001 - 24 Jul 2008
+  - Initial release

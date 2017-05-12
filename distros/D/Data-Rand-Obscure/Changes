@@ -1,0 +1,9 @@
+0.021 Tuesday January 22 21:29:42 PST 2008:
+ - Fixed up some of the documentation
+
+0.020 Tuesday January 22 00:34:58 PST 2008:
+ - Object-orientated the package
+ - Added Data::Rand::Obscure::Generator, which you can customize to fill your own needs
+
+0.01 Tuesday December 25 12:10:35 MST 2007:
+ - Initial release, Merry Christmas! :)

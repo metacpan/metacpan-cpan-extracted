@@ -1,0 +1,469 @@
+#!/usr/local/bin/perl -w
+
+=head1 NAME 
+
+ubiq
+
+=head1 SYNOPSIS
+
+  ubiq [-d <dbi>] [-f file of sql] [-nesting|n <nesting>] SQL
+
+=head1 DESCRIPTION
+
+Example:
+  ubiq -d "dbi:Pg:dbname=mydb;host=localhost"\
+        "SELECT * FROM a NATURAL JOIN b"
+
+
+=head1 ARGUMENTS
+
+=cut
+
+
+
+use strict;
+
+use Carp;
+use DBIx::DBStag;
+use Data::Dumper;
+use Getopt::Long;
+use Curses::UI;
+
+my $debug;
+my $help;
+my $dbname;
+my $nesting;
+my $show;
+my $file;
+my $user;
+my $pass;
+my $template_name;
+my $where;
+GetOptions(
+           "help|h"=>\$help,
+	   "dbname|d=s"=>\$dbname,
+           "show"=>\$show,
+	   "nesting|n=s"=>\$nesting,
+	   "file|f=s"=>\$file,
+	   "user|u=s"=>\$user,
+	   "pass|p=s"=>\$pass,
+	   "template|t=s"=>\$template_name,
+	   "where|w=s"=>\$where,
+          );
+if ($help) {
+    system("perldoc $0");
+    exit 0;
+}
+
+my @C =
+  (config=>[
+	    setting=>[
+		      name => 'output_format',
+		      default => 'xml',
+		      allowed => 'xml',
+		      allowed => 'sxpr',
+		      allowed => 'itext',
+		     ],
+	   ]);
+
+
+my $config =
+  Data::Stag->unflatten(@C);
+
+my %confset =
+  map {
+      $_->get_name => $_->get_default
+  } $config->get_setting;
+
+my $sdbh = 
+  DBIx::DBStag->new;
+my $dbh;
+my $resources = $sdbh->resources_list;
+my $resources_hash = $sdbh->resources_hash;
+my @dbresl = grep {$_->{type} eq 'rdb'} @$resources;
+my @dbnames = (map {$_->{name}} @dbresl);
+my $templates = [];
+my $template;
+
+if (1) {
+
+    my $cui = Curses::UI->new;
+
+    my $schema = '';
+    my $loc = '';
+    my $screen = 'select_db';
+    my %w = ();
+    my $varnames = [];
+    my %exec_argh = ();
+    my $qr_obj;
+
+    my $file_menu = [
+                     { -label => 'Quit program',       -value => sub {exit(0)}        },
+                    ];
+    my $select_menu = 
+      [
+       { -label => 'Choose Database',  -value => sub{select_screen('select_db')}},
+       { -label => 'Choose Template',  -value => sub{select_screen('select_template')}},
+       { -label => 'Query',  -value => sub{select_screen('query')}},
+      ];
+    my $menu = [
+                { -label => 'File',               -submenu => $file_menu         },
+                { -label => 'Select',        -submenu => $select_menu         },
+               ];
+
+    $cui->add('menu', 'Menubar', -menu => $menu);
+
+    my $w0 = $cui->add(
+                       'w0', 'Window', 
+                       -border        => 1, 
+                       -y             => -1, 
+                       -height        => 3,
+                      );
+
+    $w0->add('explain', 'Label', 
+             -text => "CTRL+P: previous demo  CTRL+N: next demo  "
+             . "CTRL+X: menu  CTRL+Q: quit"
+            );
+
+    my $w1 = $cui->add(
+                       'w1', 'Window', 
+                       -border        => 1, 
+                       -y             => -4, 
+                       -height        => 5,
+                      );
+    $w1->add('label_varwin', 'Label', 
+             -text => "ho\nho",
+             -width => 60,
+             -height => 3,
+            );
+
+    my $w2 = $cui->add(
+                       'w2', 'Window', 
+                       -border        => 1, 
+                       -y             => -9, 
+                       -height        => 6,
+                      );
+    $w2->add('label_detailwin', 'Label', 
+             -text => "hello",
+             -width => 60,
+             -height => 4,
+	     -wrapping=>1,
+            );
+
+    my $button_template =
+      {
+       -label => '[ Select a template ]',
+       -value => 'template',
+       -onpress=> sub {
+           select_screen('select_template');
+       },
+      };
+
+    my $button_query =
+      {
+       -label => '[ Create Query ]',
+       -value => 'query',
+       -onpress=> sub {
+           select_screen('query');
+       },
+      };
+
+    my $button_exec_query =
+      {
+       -label => '[ Execute Query ]',
+       -value => 'exec_query',
+       -onpress=> sub {
+	   execute_query();
+       },
+      };
+
+    my %args = (
+                -border       => 1, 
+                -titlereverse => 0, 
+                -padtop       => 2, 
+                -padbottom    => 14, 
+                -ipad         => 1,
+               );
+
+    $w{select_db} = $cui->add(
+                              'window_select_db', 'Window', 
+                              -title => "Select Database",
+                              %args
+                             );
+
+    my $chooser_select_db =
+      $w{select_db}->add(
+                         'chooser_select_db', 'Listbox',
+                         -height => 10,
+                         -values => [sort @dbnames],
+                         -vscrollbar => 'right',
+                         -onchange=> sub {
+#                             my $pop = shift->parent->getobj('chooser_select_db');
+                             set_dbname(shift->get);
+                             #                           print "D=$dbname\n";
+                             return;
+                         },
+                        );
+#    $chooser_select_db->set_binding(sub {
+#                                        my $pop = shift;
+#                                        my $db = $pop->get;
+#                                        my $res = $resources_hash->{$db};
+#                                        if ($res) {
+#                                            $cui->dialog("DB: $db\n".
+#                                                         "LOC: $res->{loc}\n".
+#                                                         "SCHENA: $res->{schema}\n");
+#                                        }
+#                                        else {
+#                                            $cui->dialog("No data for $db");
+#                                        }
+#                                    },
+#                                    '?');
+    $w{select_db}->add(undef, 'Buttonbox',
+                       -y => -3,
+                       -buttons => [
+                                    $button_template,
+                                    $button_query,
+                                   ]
+                      );
+
+    $w{select_template} = $cui->add(
+                                    'window_select_template', 'Window', 
+                                    -title => "Select Template",
+                                    %args
+                                   );
+
+    my $chooser_select_template =
+    $w{select_template}->add(
+                             'chooser_select_template', 'Listbox',
+                             -y=>5,
+                             -height => 8,
+                             -values => [1, 2],
+                             -onchange=> sub {
+                                 my $pop = shift;
+                                 set_template($pop->get);
+                                 return;
+                             },
+                            );
+    $chooser_select_template->set_binding(\&dialog_template, '?');
+
+    $w{select_template}->add(undef, 'Buttonbox',
+                             -y => -3,
+                             -buttons => [
+                                          $button_query,
+                                   ]
+                      );
+    $w{query} = $cui->add(
+                          'window_query', 'Window', 
+                          -title => "Query Database Using Template",
+                          %args
+                         );
+    
+    $w{query} = $cui->add(
+                          'window_exec_query', 'Window', 
+                          -title => "Query Results",
+                          %args
+                         );
+    
+    $w{query}->add(undef, 'Buttonbox',
+		   -y => -3,
+		   -buttons => [
+				$button_exec_query,
+			       ]
+		  );
+    $w{qr} = $cui->add(
+		       'window_qr', 'Window', 
+		       -title => "Query Results",
+		       %args
+		      );
+
+
+    $w{select_db}->focus;
+    $cui->set_binding( sub{ exit }, "\cQ" );
+    # Bind <CTRL+X> to menubar.
+    $cui->set_binding( sub{ shift()->root->focus('menu') }, "\cX" );
+
+    if ($dbname) {
+        set_dbname($dbname);
+    }
+    if ($template_name) {
+        set_template($template_name);
+    }
+
+    update_varwin();
+    setup_query_options();
+
+    $cui->MainLoop;
+    $cui->dialog("ubiq quitting!");
+
+    sub set_template {
+        my $tn = shift;
+        $template = $sdbh->find_template($tn);
+        if ($template) {
+            $varnames = $template->get_varnames;
+            update_varwin();
+            setup_query_options();
+            $w{query}->intellidraw;
+	    my $detail = $w2->getobj('label_detailwin');
+	    my $sp = $template->stag_props;
+	    my $desc = $sp->get_desc;
+	    $detail->text($desc);
+	    $w2->intellidraw;
+        }
+        else {
+            $cui->dialog("no such template $tn");
+        }
+        update_varwin();
+    }
+
+    sub set_dbname {
+        my $set = shift;
+        $dbname = $set;
+        my $res = $resources_hash->{$dbname};
+        if ($res) {
+            $schema = $res->{schema} || '';
+            $loc = $res->{loc} || '';
+            if ($schema) {
+                $templates = $sdbh->find_templates_by_schema($schema);
+            }
+            else {
+                $templates = $sdbh->template_list;
+            }
+        }
+        else {
+            $cui->dialog("Unknown $dbname");
+        }
+	$dbh = DBIx::DBStag->connect($dbname);
+        my $w = $cui->getobj('window_select_template');
+        my $chooser = $w->getobj('chooser_select_template');        
+        my @tnames = map {$_->name} @$templates;
+        $chooser->values(\@tnames);
+        update_varwin();
+    }
+    sub update_varwin {
+        my $label = $w1->getobj('label_varwin');
+        
+        $label->text(sprintf("DBNAME:%-20s SCHEMA:%-20s\nLOC:%-20s    TMPL:%-20s",
+                             $dbname || '', $schema, $loc,
+                             $template ? $template->name : ''));
+        $w1->intellidraw;
+    }
+    sub setup_query_options {
+        for (my $i=0; $i<@$varnames; $i++) {
+            my $y = $i;
+            my $vn = $varnames->[$i];
+#            replace_widg($w{query},
+#                         "query_label$i", 'TextViewer',
+#                         -readonly => 1,
+#                         -singleline => 1,
+#                         -x => 1,
+#                         -y => $y,
+#                         -text => $vn,
+#                         -width => 20,
+#                         -sbborder => 1, 
+#                      );
+            my $label =
+            replace_widg($w{query},
+                         "query_label$i", 'Label',
+                         -x => 1,
+                         -y => $y,
+                         -width => 40,
+                         -height => 1,
+                         -bold => 1,
+                      );
+            $label->text($vn);
+
+            replace_widg($w{query},
+			 "query_val_popup$i", 'TextEntry',
+			 -x => 42,
+			 -y => $y,
+			 -width => 30,
+			 -sbborder => 1, 
+                         -onchange=> sub {
+			     my $v = shift->get;
+			     $exec_argh{$vn} = $v;
+			     if (!$v) {
+				 delete $exec_argh{$vn};
+			     }
+			 }
+                      );
+            
+        }
+    }
+    sub execute_query {
+	$qr_obj =
+	  $dbh->selectall_stag(-template=>$template,
+			       -bind=>\%exec_argh);
+	show_qr();
+    }
+    sub show_qr {
+	my $txt = $qr_obj->xml;
+	open(F, ">z");
+	print F $txt;
+	close(F);
+#	$txt = substr($txt, 0, 100);
+	replace_widg($w{qr},
+		     "qr_textviewer", "TextViewer",
+		     -sbborder=>1,
+#		     -text=>"x\ny\n z\n  123\n",
+		     -text=>$txt,
+		     -wrapping=>1,
+		     -showoverflow=>0,
+		    );
+	$w{qr}->draw;
+	$w{qr}->focus;
+    }
+    sub setup_complex_query_options {
+        for (my $i=0; $i<10; $i++) {
+            my $y = $i;
+            replace_widg($w{cquery},
+                         "cquery_att_popup$i", 'Popupmenu',
+                         -y => $y,
+                         -sbborder => 1, 
+                         -values => $varnames,
+                      );
+
+            replace_widg($w{cquery},
+                       "cquery_val_popup$i", 'TextEntry',
+                       -x => 20,
+                       -y => $y,
+                       -width => 20,
+                       -sbborder => 1, 
+                      );
+        
+            replace_widg($w{cquery},
+                       "cquery_bool_popup$i", 'Popupmenu',
+                       -x => 50,
+                       -y => $y,
+                       -sbborder => 1, 
+                       -values => [ qw(AND OR) ],
+                      );
+        }
+    }
+    sub replace_widg {
+        my $w = shift;
+        my $id = shift;
+        my @args = @_;
+        my $obj = $w->getobj($id);
+        if ($obj) {
+            $w->delete($id);
+        }
+        $w->add($id, @args);
+        return $w->getobj($id);
+    }
+
+    sub select_screen {
+        my $screen = shift;
+        $w{$screen}->focus;
+    }
+    sub dialog_template {
+        my $pop = shift;
+        my $tn = $pop->get_active_value;
+        my $t = $sdbh->find_template($tn);
+        if ($t) {
+            $cui->dialog("TEMPLATE: $tn\n");
+        }
+        else {
+            $cui->dialog("No data");
+        }
+    }
+}

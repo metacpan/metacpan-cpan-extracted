@@ -1,0 +1,57 @@
+NAME
+    Dist::Zilla::Plugin::Prereqs::Floor - Dist::Zilla plugin to set a
+    minimum allowed version for prerequisites
+
+VERSION
+    version 0.001
+
+SYNOPSIS
+        ; in dist.ini
+
+        [Prereqs::Floor]
+        File::Temp = 0.19
+        Test::More = 0.86
+
+DESCRIPTION
+    This prereq provider sets a minimum allowed version for the specified
+    modules.
+
+    If the module has been listed as a prerequisite for any phase
+    ('runtime', 'test', etc.) or type ('requires', 'recommends', etc.), the
+    listed minimum version will be applied to that phase and type.
+
+    The prereqs will only be applied if they already exist. This will not
+    add any new prerequisites.
+
+    This prereq provider should run last. Any prerequisites added after it
+    runs won't be updated.
+
+SEE ALSO
+    *   Prereqs::Upgrade – similar concept with very flexible phase and type
+        mapping, but harder to apply universally across all phases/types at
+        once
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor/issues>.
+    You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2015 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

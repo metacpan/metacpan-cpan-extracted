@@ -1,0 +1,41 @@
+{
+        "might_have": {
+            "fetch": 0
+        },
+        "has_many": {
+            "fetch": 0
+        },
+        "sets": [{
+            "class": "User",
+            "cond": { "photo_count": { "<": 5 } },
+            "quantity": 3,
+            "datetime_relative": today,
+            "fetch": [{ 
+                "rel": comments,
+                "cond": { "comments": { "!=": "faks" }},
+                "quantity": 2
+            }]
+        }, {
+            "class": "User",
+            "cond": { "photo_count": { ">=": 5 } },
+            "quantity": 3
+        }, {
+            "class": "Video",
+            "quantity": 3
+        }, {
+            "class": "FeaturedVideo",
+            "quantity": 3
+        }],
+        "rules": {
+            "User": {
+                "cond": { "video_count": { ">=": 5 } }
+            },
+            "Video": {
+                "fetch": [{
+                    "rel": user_videos,
+                    "cond": { me."fk_user_id": "\= video.fk_owner_id" },
+                    "join": "video"
+                }]
+            }
+        }
+}

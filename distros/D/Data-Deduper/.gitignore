@@ -1,0 +1,15 @@
+cover_db
+META.yml
+Makefile
+blib
+inc
+pm_to_blib
+MANIFEST
+Makefile.old
+nytprof.out
+/Data-Deduper-*
+/.build
+/_build_params
+/Build
+!Build/
+!META.json

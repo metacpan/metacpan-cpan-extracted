@@ -1,0 +1,8 @@
+Revision history for Device-SpaceNavigator
+0.02    04-18-2010
+        - Updated the POD so it looks better.
+        - Added some tests
+
+0.01    04-18-2010
+        First version, released on an unsuspecting world.
+

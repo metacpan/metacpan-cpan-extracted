@@ -1,0 +1,52 @@
+DBIx::SimpleQuery is designed for anyone who wants to run specific SQL
+commands against a database with as little surrounding structure as
+possible.
+
+It exports two functions, query and qs (quote-string), which allow you
+to include SQL in your code without needing to deal with database
+handlers, DSNs, and the like.
+
+qs() escapes a string and surrounds it with single quotes, so that it
+can be safely embedded in a query.  Whenever possible, it uses the
+appropriate DBD module to do this.
+
+query() runs one or more queries against a database, and returns a
+value or a structure that can be evaluated in a number of ways,
+depending on your need.
+
+
+Example 1:
+
+use DBIx::SimpleQuery;
+
+sub get_name {
+  my $user_id = qs(shift());
+  return query "SELECT name FROM users WHERE user_id = $user_id";
+}
+
+print get_name("mo'connor") . "\n";
+
+
+Example 2:
+
+use DBIx::SimpleQuery;
+
+foreach my $name (query "SELECT name FROM users ORDER BY name") {
+    print $name . "\n";
+}
+
+
+Example 3:
+
+use DBIx::SimpleQuery;
+
+foreach my $row (query "SELECT user_id, name FROM users") {
+    print $row->{"user_id"} . "\t" . $row->{"name"} . "\n";
+}
+
+
+Database connection information can be set using environment
+variables, through a DBIx::SimpleQuery::setDefaults() call, or through
+arguments to new or query.  If a particular web application will
+always be using the same database connection, they can be set in
+apache/conf/httpd.conf, for instance.

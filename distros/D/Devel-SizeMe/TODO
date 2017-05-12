@@ -1,0 +1,110 @@
+Add flags arg to sv_size:
+    flag to use link label as sv label
+Move addr out of attr.
+Add db transform to hide RV's (though check for addrs pointing to it first)
+Split db into separate node and link tables
+Sort out naming:
+    id vs name vs label
+    descriptive: Foo::, {keystr}, [42], *GLOB, etc (longer)
+    pass-thru enogh info to perform 'decoration' on output
+Better handling of pads
+    especially padtmp
+    eg add scope, or ideally line range when emiting pad names
+    Perhaps add general flags UV attr that contains flags appropriate to the node (eg SV or pad)
+Review general SV and attribute handling
+    Emit more raw info
+Add global attributes, especially perl version
+PL_strtab sizing
+    See hek_size()
+    Long unique keys show up as bloat in PL_strtab even though they've been seen before PL_strtab is sized?
+    make && SIZEME_HIDE=7 SIZEME='|bin/sizeme_store.pl --db sizeme.db --gexf sizeme.gexf' perl -Mblib -MDevel::SizeMe=:all -e '$k="k" x 10_000; push @a, { $k.scalar(@a) => 1 } while @a<1_000; perl_size()'
+Fix spelling of leafs!
+
+*** Random TODOs:
+
+See https://github.com/timbunce/devel-sizeme/issues
+
+Integrate changes back into Devel::Size so we can share a common core.
+
+Restructure:
+    Devel::SizeMe::Core - loads XS and sets options
+    Devel::SizeMe - loads Devel::SizeMe::Core
+        -d:SizeMe=opts?
+    Devel::SizeMe::Stream - parse raw stream
+    Devel::SizeMe::Store - db write
+    Devel::SizeMe::Data - db read / orlite?
+    Devel::SizeMe::Graph - data reading/processing for sizeme_graph
+    sizeme_store - script wrapper for Devel::SizeMe::Store
+    sizeme_graph - Mojolicious app wrapper using Devel::SizeMe::Graph
+Move Devel::SizeMe::Graph and co out to separate distro.
+
+Link and item names should match perlguts/perlapi names.
+
+Tests!
+hv placeholders
+[ 1 => [] ]
+$x=[]; push @$x, $x; total_size($x); # loop
+
+
+Reduce data volume to optimize usage and visualizations
+    ideally as an optional post-processing on the db tables
+    drop SV(RV) detail?
+        for cases where there's only a single ref to the SV(RV)
+    prune
+        bottom up delete nodes below a certain size, add size to parent
+        only if the parent is the only node refering to it
+
+Docs
+    note TARG effect on total_size([[]]) not counting the inner ref due to refcnt
+    note issues around sizing of hash keys (re shared string table)
+    note won't recurse into a struct that holds a ref to itself, by default
+
+Random References:
+http://cpansearch.perl.org/src/RURBAN/illguts-0.42/index.html
+http://www.html5rocks.com/en/tutorials/memory/effectivemanagement/
+
+Graph file formats:
+    dot (graphviz)
+    graphml
+        http://en.wikipedia.org/wiki/GraphML
+        http://graphml.graphdrawing.org/primer/graphml-primer.html
+    gexf - http://gexf.net/format/
+        http://gexf.net/1.2draft/gexf-12draft-primer.pdf
+    gml - https://gephi.org/users/supported-graph-formats/gml-format/
+    gdf - https://gephi.org/users/supported-graph-formats/gdf-format/
+    net (Pajek)
+    vna (netdraw)
+    https://gephi.org/users/supported-graph-formats/
+    Suitable: gexf, gml, graphml (also gdf)
+
+Useful techniques:
+    Treemap (switch to d3, eg http://jasonlally.github.io/data-portal-treemap/)
+    Hypergraph - hides distant detail
+
+Network Visualization tools:
+
+https://gephi.org
+    http://gephi.org/tutorials/gephi-tutorial-visualization.pdf
+    Import: dot, gml, gdf, graphml, net, vna, tlp
+    Export: dl, gdf, gexf, gml, graphml, net, vna
+        https://marketplace.gephi.org/plugin/sigmajs-exporter/
+    http://stackoverflow.com/questions/tagged/gephi
+    Opt-click-drag on mac trackpad to alter 3d view
+    http://wiki.gephi.org/index.php/Scripting_Plugin
+
+http://www.cytoscape.org
+    http://cytoscape.org/manual/Cytoscape2_8Manual.html#Supported%20Network%20File%20Formats
+    Import: gml, xgmml, sbml, biopax, psi-mi, sif, nnf
+    Export: xgmml, psi-mi, sif, nnf
+
+http://zvtm.sourceforge.net/zgrviewer.html
+    Java app. Import: dot
+http://sourceforge.net/projects/hypergraph/
+    Java Applet.
+https://github.com/uskudnik/GraphGL
+    JS. Designed for rendering massive graphs. Immature.
+http://tulip.labri.fr/TulipDrupal/
+    Import: dot, gml, gexf, net, tlp
+    Export: gml, tlp
+Graphviz - sfdp
+http://ophid.utoronto.ca/navigator/

@@ -1,0 +1,71 @@
+Revision history for Dist-Zilla-Plugin-ShareDir-Tarball
+
+0.6.0 2015-04-01
+ [ENHANCEMENTS]
+ - Use 'encoded_content' instead of 'content', which should work around the
+   encoding messes.
+
+ [STATISTICS]
+ - code churn: 3 files changed, 11 insertions(+), 3 deletions(-)
+
+0.5.0 2015-01-09
+ [ENHANCEMENTS]
+ - Move actions in right phases (encoding phase was causing issues).
+
+ [STATISTICS]
+ - code churn: 4 files changed, 47 insertions(+), 15 deletions(-)
+
+0.4.2 2013-11-20
+ [BUG FIXES]
+ - Fix the encoding for Dzil 5.0+. (RT90536, bug report by Steven Haryanto)
+
+ [STATISTICS]
+ - code churn: 5 files changed, 18 insertions(+), 2 deletions(-)
+
+0.4.1 2013-03-16
+ [BUG FIXES]
+ - Remove PodWeaver from the basic test
+
+ [STATISTICS]
+ - code churn: 4 files changed, 48 insertions(+), 7 deletions(-)
+
+0.4.0 2013-03-14
+ [BUG FIXES]
+ - Use the right directory for the output shared dir.
+
+ [ENHANCEMENTS]
+ - add tests w/ D::Z::P::ModuleBuild
+ - Move the generation of the archive in the GatherFiles phase (instead of
+   MungeFiles) (RT83777, thanks to Nathan Gary for the troubleshooting
+   help)
+
+ [STATISTICS]
+ - code churn: 35 files changed, 336 insertions(+), 73 deletions(-)
+
+0.3.1 2013-03-07
+ [STATISTICS]
+ - code churn: 5 files changed, 58 insertions(+), 13 deletions(-)
+
+0.3.0 2013-03-05
+ [ENHANCEMENTS]
+ - Add option 'dir' for custom source dir location. (RT83773)
+
+ [STATISTICS]
+ - code churn: 13 files changed, 110 insertions(+), 11 deletions(-)
+
+0.2.1 2012-11-03
+ [DOCUMENTATION]
+ - Add mention to Module::Build::CleanInstall
+
+ [STATISTICS]
+ - code churn: 13 files changed, 197 insertions(+), 2 deletions(-)
+
+0.2.0 2012-10-18
+ - Compression was done wrong. Ooops.
+
+ [STATISTICS]
+ - code churn: 13 files changed, 173 insertions(+), 1 deletion(-)
+
+0.1.0 2012-10-18
+ - First version, unleashed on an unsuspecting world.
+

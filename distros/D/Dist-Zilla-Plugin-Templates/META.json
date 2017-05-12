@@ -1,0 +1,132 @@
+{
+   "abstract" : "Treat source files as templates",
+   "author" : [
+      "Van de Bugger <van.de.bugger@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_3"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-Templates",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "CPAN::Meta" : "2.120920",
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::PluginBundle::Author::VDB" : "0",
+            "Encode" : "0",
+            "English" : "0",
+            "HTTP::Tiny" : "0",
+            "JSON" : "0",
+            "List::Util" : "0",
+            "Module::Metadata" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::GPL_3::or_later" : "0",
+            "Test::CPAN::Changes" : "0.19",
+            "Test::CPAN::Meta" : "0",
+            "Test::CPAN::Meta::JSON" : "0.16",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0",
+            "Test::Kwalitee" : "1.21",
+            "Test::Mojibake" : "0",
+            "Test::More" : "0.96",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "Test::Portability::Files" : "0",
+            "Test::Spelling" : "0.12",
+            "Test::Synopsis" : "0",
+            "Test::Version" : "1",
+            "strict" : "0",
+            "version" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::File::OnDisk" : "0",
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "Dist::Zilla::Role::FileFinderUser" : "0",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::TextTemplater" : "v0.8.0",
+            "Moose" : "0",
+            "Pod::Text" : "0",
+            "namespace::autoclean" : "0.16",
+            "overload" : "0",
+            "perl" : "5.008",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla" : "5.000",
+            "Dist::Zilla::Plugin::GatherDir" : "0",
+            "Dist::Zilla::Role::ErrorLogger" : "v0.9.0",
+            "Dist::Zilla::Role::TextTemplater" : "v0.8.0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "POSIX" : "0",
+            "Pod::Simple" : "0",
+            "Test::Deep" : "0",
+            "Test::DiagINC" : "0.002",
+            "Test::Dist::Zilla::Build" : "0",
+            "Test::Dist::Zilla::BuiltFiles" : "0",
+            "Test::More" : "0",
+            "Test::Routine" : "0",
+            "Test::Routine::Util" : "0",
+            "blib" : "1.01",
+            "if" : "0",
+            "lib" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "utf8" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Templates" : {
+         "file" : "lib/Dist/Zilla/Plugin/Templates.pm",
+         "version" : "v0.6.4"
+      },
+      "Dist::Zilla::Plugin::Templates::File" : {
+         "file" : "lib/Dist/Zilla/Plugin/Templates/File.pm",
+         "version" : "v0.6.4"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "mailto:bug-Dist-Zilla-Plugin-Templates@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Templates"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-Templates",
+      "license" : [
+         "http://www.gnu.org/licenses/gpl-3.0.txt"
+      ],
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-Templates"
+      }
+   },
+   "version" : "v0.6.4",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0213"
+}
+

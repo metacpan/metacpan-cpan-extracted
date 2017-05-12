@@ -1,0 +1,27 @@
+---
+abstract: 'DBIx::Class::InflateColumn::Serializer::CompressJSON - JSON compressed Inflator'
+author:
+  - 'Baptiste Fosse <baptiste@weborama.com>'
+build_requires:
+  DBIx::Class::InflateColumn::Serializer: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: restrictive
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-InflateColumn-Serializer-CompressJSON
+provides:
+  DBIx::Class::InflateColumn::Serializer::CompressJSON:
+    file: lib/DBIx/Class/InflateColumn/Serializer/CompressJSON.pm
+    version: 0.004
+requires:
+  Carp: 0
+  Compress::Zlib: 0
+  DBIx::Class::InflateColumn::Serializer: 0
+  JSON: 0
+  strict: 0
+  warnings: 0
+version: 0.004

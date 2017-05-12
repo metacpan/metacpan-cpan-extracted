@@ -1,0 +1,23 @@
+Revision history for Perl extension Data::Validate::URI
+
+0.07 20160119
+    - Adding Josef Toman's underscore patch
+
+0.06  20120211
+	- Adding David Dick's is_tel_uri patch
+
+0.04  20080408
+	- Checking that hex escapes include two characters.  Thanks to Steve West.
+
+0.04  20071125
+	- Allowing IPs in authority section of http/https URLs
+	
+0.03  20071029
+	- fixed hex encoding bug.  Thanks to Frank Wiles.
+
+0.02  20071016
+	- fixed typo in POD.  Thanks to Tadghe Danu.
+
+0.01  20050915
+	- original version
+

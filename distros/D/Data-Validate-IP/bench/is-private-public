@@ -1,0 +1,47 @@
+use strict;
+use warnings;
+
+use Benchmark qw( timethese );
+
+use Data::Validate::IP;
+
+my @bad = ('a' .. 'z', undef, 0);
+
+my @ipv4 = @bad;
+for (1 .. 500) {
+    push @ipv4, _random_ipv4();
+}
+
+my @ipv6 = @bad;
+push @ipv6, '::', '::0';
+for (1 .. 500) {
+    push @ipv6, _random_ipv6();
+}
+
+timethese(
+    2000,
+    {
+        'is_public_ipv4' =>
+            sub { Data::Validate::IP::is_public_ipv4($_) for @ipv4 },
+        'is_private_ipv4' =>
+            sub { Data::Validate::IP::is_private_ipv4($_) for @ipv4 },
+    }
+);
+
+timethese(
+    2000,
+    {
+        'is_public_ipv6' =>
+            sub { Data::Validate::IP::is_public_ipv6($_) for @ipv6 },
+        'is_private_ipv6' =>
+            sub { Data::Validate::IP::is_private_ipv6($_) for @ipv6 },
+    }
+);
+
+sub _random_ipv4 {
+    return join '.', map { int(rand(256)) } 1 .. 4;
+}
+
+sub _random_ipv6 {
+    return join '::', map { sprintf('%4x', int(rand(2**16))) } 1 .. 8;
+}

@@ -1,0 +1,5 @@
+2002-05-15 18:00  vlad
+
+	* Changes, DataLookup.pm, MANIFEST, Makefile.PL, README, test.pl: 
+	working copy. (originally TableHash.pm)
+

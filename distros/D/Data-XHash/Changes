@@ -1,0 +1,31 @@
+Revision history for Data-XHash
+
+0.09	2012-09-27
+	Reimplement SCALAR to pass Perl 5.6.2 testing.
+
+0.08	2012-09-21
+0.07	2012-09-21
+0.06	2012-09-21
+	Finding and fixing silly typos. Triple ugh!
+
+0.05	2012-09-21
+	Updated data structure and code for performance enhancement.
+	Added previous_key method. FIRSTKEY and NEXTKEY are now implemented
+	separately from first_key and next_key and use an internal iterator
+	for faster keys(%$tiedhref).
+
+0.04	2012-09-01
+	Added missing TIEHASH methods (DELETE, EXISTS, etc.) to POD.
+	No code changes.
+
+0.03	2012-08-31
+	Added missing store() alias for STORE() and can_ok tests for all
+	methods. Added merge() method, tests, and docs.
+
+0.02	2012-08-27
+	Made some small changes to the documentation and added the
+	foreach method and associated tests.
+
+0.01    2012-08-26
+        First version, released on an unsuspecting world.
+

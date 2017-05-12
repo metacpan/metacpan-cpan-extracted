@@ -1,0 +1,27 @@
+ChangeLog
+DBI-TEST.SKIP
+DESIGN.md
+lib/DBI/Mock.pm
+lib/DBI/Test.pm
+lib/DBI/Test/Case.pm
+lib/DBI/Test/Case/attributes/PrintError.pm
+lib/DBI/Test/Case/attributes/Warn.pm
+lib/DBI/Test/Case/basic/bind_columns.pm
+lib/DBI/Test/Case/basic/connect.pm
+lib/DBI/Test/Case/basic/disconnect.pm
+lib/DBI/Test/Case/basic/do.pm
+lib/DBI/Test/Case/basic/execute.pm
+lib/DBI/Test/Case/basic/prepare.pm
+lib/DBI/Test/Case/basic/type_info.pm
+lib/DBI/Test/Conf.pm
+lib/DBI/Test/DSN/Provider.pm
+lib/DBI/Test/DSN/Provider/Base.pm
+lib/DBI/Test/DSN/Provider/Config.pm
+lib/DBI/Test/DSN/Provider/Dir.pm
+lib/DBI/Test/DSN/Provider/File.pm
+lib/DBI/Test/List.pm
+Makefile.PL
+MANIFEST
+README.md
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

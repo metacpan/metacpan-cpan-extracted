@@ -1,0 +1,67 @@
+{
+   "abstract" : "Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.",
+   "author" : [
+      "Michael Wayne Arnold <marmanold@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "lectionary",
+      "christian",
+      "liturgical"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Lectionary-Time",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::CheckManifest" : "0.9",
+            "Test::Exception" : "0.43",
+            "Test::More" : "1.302040"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.38",
+            "Exporter::Easy" : "0.18",
+            "Time::Piece" : "1.31",
+            "Time::Seconds" : "1.31",
+            "Try::Tiny" : "0.24",
+            "perl" : "5.022"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Lectionary::Time" : {
+         "file" : "lib/Date/Lectionary/Time.pm",
+         "version" : "1.20170311"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/marmanold/Date-Lectionary-Time.git",
+         "web" : "https://github.com/marmanold/Date-Lectionary-Time"
+      }
+   },
+   "version" : "1.20170311",
+   "x_twitter" : "https://www.twitter.com/marmanold/"
+}

@@ -1,0 +1,17 @@
+{
+        "might_have": {
+            "fetch": 0
+        },
+        "has_many": {
+            "fetch": 0
+        },
+        "sets": [{
+            "class": "Artist",
+            "cond": { "me.name": "\\= \"We Are Goth\"" },
+            "quantity": "all",
+            "fetch": [{ 
+                "rel": "cds",
+                "cond": { "me.title": "\\LIKE \"%with us\"" }
+            }]
+        }]
+}

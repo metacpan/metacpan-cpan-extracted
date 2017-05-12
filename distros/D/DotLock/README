@@ -1,0 +1,30 @@
+DotLock (1.00)
+Copyright (c) 1999, Ken Barber
+
+DotLock is a multipurpose queing locking system.
+Originally designed to take some of the pain away from
+locking on NFS filesystems.
+
+This module allows script writers to develop on multiple
+hosts when locking between these hosts is an issue. It
+allows queing - scary but true. It also provides an atomic
+method of locking by using the "link" function between
+files.
+
+The locking/queing method provided is purely on a file
+manipulation level. Also note that this object does not
+handle signals. If the program is interrupted, any open
+lockfiles will be left behind.
+
+This is considered alpha software, use at your own risk.
+
+INSTALLATION
+
+After untarring the package, its as easy as:
+
+1. perl Makefile.PL
+2. make
+3. make test
+4. make install
+
+Enjoy.

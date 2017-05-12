@@ -1,0 +1,40 @@
+name: modaps
+storage_root: /tmp/dado/modaps/store
+file_url_template: 'ftp://ladsweb.nascom.nasa.gov/allData/<collection>/<product>/<year>/<daynum>/<filename>'
+cache_strategy: Keep
+
+feeds:
+  name: modaps
+  feed_template: 'http://modwebsrv.modaps.eosdis.nasa.gov/axis2/services/MODAPSservices/getOpenSearch?products=<product>&collection=<collection>&start=<start>&stop=<stop>&bbox=<bbox>&coordsOrTiles=<coordsOrTiles>&dayNightBoth=<dayNightBoth>'
+  feed_parameters: [
+    { name: product,       default_value: 'MOD021KM'   },
+    { name: collection,    default_value: 5            },
+    { name: start,         default_value: '2009-09-01' },
+    { name: stop,          default_value: '2009-09-02' },
+    { name: bbox,          default_value: '10,17,35,0' },
+    { name: coordsOrTiles, default_value: 'tiles'      }, 
+    { name: dayNightBoth,  default_value: 'DNB'        }]
+  file_source:
+    filename_xpath: title
+    url_xpath: id
+  metadata_sources:
+    - name: summary
+      xpath: summary
+
+metadata_transformations:
+    - input: summary
+      output: starttime
+      function_name: extract
+      function_params: 'startTime (\d{4}-\d{2}-\d{2})'
+      order_key: 100
+    - input: summary
+      output: product
+      function_name: extract
+      function_params: '(\S+) format'
+      order_key: 200
+
+linktrees:
+    - root: /tmp/dado/modaps/data
+      path_template: <starttime:%Y/%m/%d>
+      condition: ~
+

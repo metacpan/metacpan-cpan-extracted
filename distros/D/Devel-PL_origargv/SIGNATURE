@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.70.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 294505f858f11dd062e9916e3f50d88210a9ef54 CONTRIBUTING
+SHA1 71c3bb67245769f45debf662ac63c69518cff8d0 COPYRIGHT
+SHA1 143e25f87126b406986688ecee8a1522a8eb7068 CREDITS
+SHA1 5f8dea980443d1752dd15e257b647ad0207234fc Changes
+SHA1 cbacc1f0147bb74faec3a5ad0e00c1c5644a170f INSTALL
+SHA1 47870123f373f5185d6893cb98bf06a8a05510aa LICENSE
+SHA1 f590a9c26238da424822c8815d840ce038e7c91c MANIFEST
+SHA1 71d18297347797857fe71b95f682e0a6369fbb1c META.json
+SHA1 83e15a5a3a8c2eadfa18ce2b885fcba26ad72c43 META.yml
+SHA1 9682de53c22d76c7f415c53614bd825c3fb50211 Makefile.PL
+SHA1 6e42dd9844c8f002b28c237aa4541a9fa3b7e139 PL_origargv.xs
+SHA1 e3934f22e777561ec779aad26914e4466d27ab5f README
+SHA1 a3228464dd2283262b37a3ff1354e27e0d168557 dist.ini
+SHA1 77168a69c41082c2112eeb00c12b8d232561df8a doap.ttl
+SHA1 490ea82bcf1334472d29e3c56fb66507cdcf2429 examples/show-command-line.pl
+SHA1 037656ec927a29414e5a45189d0154b7f7b34d91 lib/Devel/PL_origargv.pm
+SHA1 748e2ffda0b7f20c380466652709e788e97ff420 t/01basic.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.14 (GNU/Linux)
+
+iEYEARECAAYFAlNcNtAACgkQzr+BKGoqfTkFhQCeJ7hJh+Mz2fjIxJZ5h1hWiPPe
+JP8AmQEvW5Y+uVE8HoNBiBUZ/3EK3mhm
+=a51W
+-----END PGP SIGNATURE-----

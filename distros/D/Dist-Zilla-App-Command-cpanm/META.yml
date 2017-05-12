@@ -1,0 +1,22 @@
+---
+abstract: 'install your dist using cpanminus'
+author:
+  - 'Iain Campbell <cpanic@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-cpanm
+requires:
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Role::Stash: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+version: 1.0.2

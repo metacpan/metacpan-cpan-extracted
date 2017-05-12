@@ -1,0 +1,362 @@
+=head1 NAME
+
+Decision::ACL - Manage and Build Access Control Lists 
+
+=head1 SYNOPSIS
+
+  use Decision::ACL;
+  use Decision::ACL::Rule;
+  use Decision::ACL::Constants qw(:rule);
+
+  my $Acl = Decision::ACL->new();
+
+  my $rule = Decision::ACL::Rule({
+					action => 'allow',
+					now => 0,
+					fields =>
+					{
+						field1 => 'field1val',
+						field2 => 'field2val',
+						...
+					}
+				});
+
+   ...
+
+
+   $Acl->PushRule($rule);
+
+   my $return_status = $Acl->RunACL({
+					field1 => 'testfield1value',
+					field2 => 'testfield2value',
+					...
+					});
+
+   if($return_status == ACL_RULE_ALLOW)
+   {
+	print "testfield1value, testfield2value allowed!\n";
+   }
+
+
+   $Acl->PushRule($rule);		Push a rule onto the Decision::ACL rule list.
+   $Acl->PopRule();			Pop a rule from the Decision::ACL rule list.
+   $Acl->ShiftRule();			Shift a rule from the Decision::ACL rule list.
+   $Acl->UnshiftRule($rule);		Unshift a rule onto the Decision::ACL rule list.
+   $Acl->Rules();			Return an arrayref of the rule objects in this rule list.
+   $Acl->RunACL({ args });		Run the list, Returns ACL_RULE_ALLOW or ACL_RULE_DENY.
+   
+   $rule->Fields();			Returns a has reference of the fields and values for this rule.
+   $rule->Now();			Wether this rule has to be applied now or not. 1 or 0.
+   $rule->Action();			Returns the action for this rule, either ALLOW or DENY.
+   $rule->Concerned({});		Is rule concerned by data ? Returns ACL_RULE_CONCERNED or ACL_RULE_UNCONCERNED
+   $rule->Control({});			Test rule against data, returns status of rule.
+
+
+=head1 DESCRIPTION
+
+This module's purpose is to provide an already implemented ACL logic for programmers. Most of the time
+writing access control list scripts is long and boring. This set of modules has all the convenient logic
+behind access control lists and provide an easy interface to it. It allows you to build custom ACL's,
+and provide the mechanisms to run the ACL against data.
+
+=head1 INSTALLATION
+
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+=head1 IMPLEMENTATION
+
+The Decision::ACL set of modules is implemented in pure perl, with very simple behaviour. 
+The main idea behind it is that a ACL object tests each rule in it's list against the target
+data. Each rule, if concerned applies it's action. 
+
+=head2 Decision::ACL Implementation
+
+This class is simply is a list of Decision::ACL::Rule objects, in a particular order.  Once the rules have 
+been "pushed" onto the ACL, the RunACL() methods will take the arguments defined in the rule objects and 
+execute each rule in order and get their return values. The final return value of the RunACL() method
+is determined if there are no denying rule, and that an explicit allowing rule has been encountered. 
+If no rules are concerned by the data, the ACL will deny automatically.
+
+=head2 Decision::ACL::Rule Implementation
+
+This module implements a basic rule. It holds a list of fields, (wich will be propagated up to the ACL)
+and a list of values for each fields. It also contains an "action" (ALLOW | DENY). The logic behind the
+rule is that when the Control() method is called with arguments, the rule will check first it is CONCERNED
+by the data. If it is, it applies it's action (ALLOW | DENY). If not, it return UNCONCERNED and the ACL 
+RunACL() method continues to the next rule.
+
+=head1 Basic Usage
+
+					
+Here is a description of a basic use of this module set.
+
+=head2 Decision::ACL
+
+To create an initial empty rule list, simply use the new() constructor.
+
+	my $Acl = Decision::ACL->new();
+
+This build an empty Decision::ACL rule list ready to receive rule objects. You can also
+directly pass an anonymous array of rule objects to new() like this:
+
+	my $Acl = Decision::ACL->new([ $rule1, $rule2, $rule3 ]);
+
+The list now needs to be populated with rules so that it can become useful. To do this, you can
+either write yourself a small parser, get your rules from a database, a DBM file or any way you want.
+The only thing you need to know, is how to put these in the rule list and manage that rule list. The 
+Decision::ACL module provides multiple methods to deal with the list of rules:
+
+	$Acl->PushRule($rule);			Push a rule onto the Decision::ACL rule list.
+	$Acl->PopRule();			Pop a rule from the Decision::ACL rule list.
+	$Acl->ShiftRule();			Shift a rule from the Decision::ACL rule list.
+	$Acl->UnshiftRule($rule);		Unshift a rule onto the Decision::ACL rule list.
+
+The last step is to run the ACL and ask each rule if they are concerned by the data you pass to them.
+
+	my $return_status = $Acl->RunACL({
+						field1 => 'testf1val',
+						field2 => 'testd2val',
+					});
+
+The arguments passed to RunACL() are checked to see if they are consistent with the fields defined
+in the rules themselves. When the first rule is "pushed" onto the rule list, Decision::ACL will scan
+it's Fields() and keep a list of them internally. When RunACL() is ranned, each parameter has to be
+present, and no unknown parameters can be passed. This is true only if DIE_ON_BAD_PARAMETERS is set
+to 1 in the class. The same applies for PushRule(), the Fields() of the rules consequent to the first
+rule are checked for inconsistencies. This behaviour is controlled by the DIE_ON_MALFORMED_RULES, set
+either to 1 or 0 in the class.
+
+The return status are defined in the Decision::ACL::Constants package under the keyword "rule".
+They are ACL_RULE_ALLOW or ACL_RULE_DENY, so you can test the return of the run and deal with it 
+accordingly in your application.
+
+I suggest you import the constants in your namespace when dealing with this suite.
+
+	use Decision::ACL::Constants qw(:rule);
+
+=head2 Decision::ACL::Rule
+
+Rules objects are created using the new() constructor.
+
+	my $rule = Decision::ACL::Rule->new({
+						action => 'deny',
+						now => 1,
+						fields  =>
+						{
+							fieldname => 'fieldvalue',
+							fieldname2 => 'field2value',
+						},
+					});
+
+The arguments passed to the new() constructor are as follows:
+
+=over 3
+
+=item * action, Action to be applied when rule is concerned, allow, deny, permit or block.
+
+=item * now, Wether rule should act when encountered and concerned.
+
+=item * fields, The fields of the rule with their values for this rule. To be tested against data.
+
+=back
+
+Once the rule object has been created, it can be pushed onto an ACL for execution. This object has mainly
+4 methods to access and modify the object at runtime.
+
+   $rule->Fields();			Returns a has reference of the fields and values for this rule.
+   $rule->Now();			Wether this rule has to be applied now or not. 1 or 0.
+   $rule->Action();			Returns the action for this rule, either ALLOW or DENY.
+   $rule->Concerned({});		Is rule concerned by data ? Returns ACL_RULE_CONCERNED or ACL_RULE_UNCONCERNED
+   $rule->Control({});			Test rule against data, returns status of rule.
+
+The Fields() method is used to store and retrieve the fields specified for this rule and their associated 
+values. The Now() method return or sets the value of the "now" parameter of the rule. When a rule
+is set to act "now", the ACL will stop the RunACL() at this level and directly return the Action() of the
+rule. Concerned({}) will tell wether the rule is concerned by the data that is passed to it. It will
+test each field data against the values of the same fields in Fields() and return 1 or 0/undef.
+
+The Control({}) method is what is called by the ACL in RunACL() to get the status of the rule on a certain set
+of the fields passed. Control() will first call Concerned({}) to see if the rule is concerned by the dataset,
+if not Control() exits with status of ACL_RULE_UNCONCERNED. If it is concerned, the Control() method will
+return the status matching the Action() of the rule.
+
+
+=head1 Real life example
+
+Ok, this all sounds nice and fun, but let's see how we really can use this in real life.
+This example is a script I wrote to use as a "precommit" script for CVS. It implements an
+advanced rule system for CVS repository access. This script gets called everytime someone commits
+to CVS and gets the username, repository and file in wich the person wants to commit.
+The script simply parses a rule file that contains a very simple rule language, creates the rule objects, 
+pushes them in the ACL and runs the ACL with the values passed by CVS. It then will permit or deny
+the commit.
+
+
+=head2 commitcheck script 
+
+	#!/usr/bin/perl
+	# commitcheck using Decision::ACL.
+	#
+	#Copyright (c) 2001 Benoit Beausejour <bbeausej@pobox.com> All rights reserved. This program is
+	#free software, you can redistribute it and/or modify it under the same terms as Perl itself.
+	#
+		
+	use strict;
+	use Data::Dumper;
+	
+	use Decision::ACL;
+	use Decision::ACL::Rule;
+	use Decision::ACL::Constants qw(:rule);
+	
+	
+	#The user's CVSROOT.
+	my $cvsroot = $ENV{'CVSROOT'};
+	$cvsroot .= "/";
+	
+	#The username of the current user.
+	my $username = system('id -un');
+	chomp $username;
+
+	#The repository being commited into.
+	my $repository = shift;
+	$repository =~ s/$cvsroot//g;
+	
+	#The file being commited.
+	my $module = shift;
+	
+	my $rule_file = $cvsroot."CVSROOT/commit_acl";
+	
+	open(RULES, $rule_file) || &failed("Cant open $rule_file: $!\n");
+
+	#Create the ACL list object.	
+	my $ACL = new Decision::ACL();
+	
+	my @rules = <RULES>;
+	foreach (reverse @rules)
+	{
+		next if substr($_,0,1) eq '#' || !$_;
+	
+		chomp $_;
+	
+		my ($rule_base, $rule_spec) = split(/to/i, $_);
+	
+		my ($action, $target);
+		my $nowflag = 0;
+	
+		if($rule_base =~ /now/i)
+		{
+			($action, $target) = split(/now/i, $rule_base);
+			$nowflag++;
+		}
+		else
+		{
+			($action, $target) = split(/ /i, $rule_base);
+		}
+	
+		
+		my ($repository, $module) = split(/in/i, $rule_spec);
+	
+	
+	
+	
+		$module = '' if not defined $module;
+		$action = uc $action;
+		$action =~ s/ //g;
+		$repository =~ s/ //g;
+		$module =~ s/ //g if defined $module;
+		$target =~ s/ //g;
+		$repository = uc $repository if $repository =~ /^all$/i;
+		$module = uc $module if $module =~ /^all$/i;
+		$target = uc $target if $target =~ /^all$/i;
+
+		#Create a Decision::ACL::Rule object from the data parsed in the rule file.	
+		my $rule = new Decision::ACL::Rule({
+						now => $nowflag, 
+						action => $action,
+						fields =>
+						{
+							repository => $repository,	
+							component => $module,
+							username => $target,
+						}
+					});
+
+		#Push that rule onto the ACL.
+		$ACL->PushRule($rule);	
+	}
+
+	#Run the ACL, get the return and give it back to CVS.	
+	my $return_status = $ACL->RunACL({
+			repository => $repository, 
+			component => $module, 
+			username =>  $username,
+		});
+	
+	if($return_status == ACL_RULE_ALLOW)
+	{
+		exit(0);
+	}
+	else
+	{
+		print STDERR "Commit to $repository in module $module DENIED for user $username\n";
+		exit(1);
+	}
+	exit(1);
+	
+	
+	sub failed
+	{
+		my $message = shift;
+		print STDERR $message;
+		exit(1);
+	}
+
+=head2 Sample rule file for commitcheck
+Here is an example rule file for this script:
+
+	deny all to all in all
+	allow root to CVSROOT in all
+	allow bbeausej to CVSROOT in commit_acl
+	allow fred to Decision-ACL in LICENSE
+
+This script is usable, if you find it useful don't be afraid to use it in your daily CVS  uses.
+To use it, simply put this line in your $CVSROOT/CVSROOT/commitinfo file:
+
+	DEFAULT	/path/to/commitcheck
+
+Then create your rulefile named $CVSROOT/CVSROOT/commit_acl. 
+
+I hope this example shows you how simple it is to use Decision::ACL in real life examples.
+
+=head1 TODO
+
+This module is evolving rapidly. I am already writing version 1.0 of it wich will contain a RecDescent
+parser for ACL files with a generic dynamic grammar. So, be prepared for the next versions as the
+module called Decision::ACL::Parser will be released along with the package.
+
+I can see many other things go in this module, generic parsers for specific types of ACL, passing them
+through the 2 main classes, many ideas on the table. If you have anything idea that you want to implement, 
+please do and let me know about it. I'll be glad to integrate your work here if needed.
+
+=head1 AUTHOR	
+	
+Benoit, "SaKa"  Beausejour, <bbeausej@pobox.com>
+
+=head1 NOTES
+
+This module was made possible by the help of individuals:
+
+- #perl (ers) for their help and support.
+
+=head1 COPYRIGHT
+
+Copyright (c) 2001 Benoit Beausejour <bbeausej@pobox.com> All rights reserved. This program is
+free software, you can redistribute it and/or modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+perl(1), 
+Solaris::ACL(1),	

@@ -1,0 +1,89 @@
+README FILE FOR PERL MODULE -- DBD::RAM
+
+WHY USE IT?
+
+     This module lets you quickly create and test databases 
+     using SQL (Structured Query Language) and DBI 
+     (the Perl Database Interface).
+
+     Beginners can learn some basics of SQL and DBI without
+     needing to install or learn a database management system
+     like mySQL or Oracle.
+
+     Advanced users can prototype new databases; test queries
+     on existing data; combine data from multiple DBI-accessible
+     databases or various kinds of storage such as fixed-width 
+     records, comma-separated values files, .ini files, XML files,
+     and other flat (ascii) files; pull in arrays and hashes from 
+     other scripts; and use it when in-memory processing is an 
+     advantage.
+
+WHAT ELSE DO I NEED?
+
+     * An operating system that can run DBI
+       (unix, linux, mac, windows, many others).
+
+     * Perl and these modules:  DBI, DBD::File, SQL::Statement.
+       (DBD::File is part of the DBD::CSV distibution)
+
+     Windows users: get Perl and the modules at 
+     www.activestate.com.
+
+     Others: get perl at www.perl.com and the modules at 
+     www.cpan.org.
+
+HOW DO I INSTALL IT?
+
+     1.  Install Perl and the modules DBI, DBD::CSV, and 
+         SQL::Statement (if you don't already have them).
+
+     2.  Unpack the compressed files.
+         (DBD-RAM-version.tar.gz or DBD-RAM-version.zip)
+
+     3a. If you are not familiar with the standard Perl
+         makefile method, you can simply copy the file 
+         RAM.pm into your DBD directory.
+  
+     3b. If you are familiar with the standard Perl make 
+         installation, just do as always (perl Makefile.PL; 
+         make; make test; make install) this should also 
+         work with dmake or nmake. 
+
+HOW DO I USE IT?
+
+     First you might like to try this simple script which 
+     creates a database and inserts the string "hello new world"
+     into a record  and then uses SQL to retrieve the record and 
+     print it:
+
+     #!perl -w
+     use strict;
+     use DBI;
+     my $dbh = DBI->connect('DBI:RAM:');
+     $dbh->do("CREATE TABLE table1 ( message TEXT )");
+     $dbh->do("INSERT INTO table1 VALUES ('Hello new world!')");
+     print $dbh->selectrow_array("SELECT message FROM table1");
+
+
+WHERE CAN I GET MORE INFO?
+
+     After installing the module, type "perldoc DBD::RAM" at 
+     the command prompt, or just read the documentation at 
+     the bottom of the RAM.pm file.
+
+     For help on the use of DBD::RAM, see the DBI users 
+     mailing list:
+
+          http://www.isc.org/dbi-lists.html
+
+     For general information on DBI see
+
+          http://www.symbolstone.org/technology/perl/DBI
+
+WHO DUNNIT?
+
+  Jeff Zucker <jeff@vpservices.com>
+
+  Feel free to email me comments and suggestions, but please
+  post questions requiring a response to the dbi-users mailing
+  list(see above).

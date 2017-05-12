@@ -1,0 +1,27 @@
+build/regen_parser.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Data/SExpression.pm
+lib/Data/SExpression/Cons.pm
+lib/Data/SExpression/Parser.pm
+lib/Data/SExpression/Parser.yp
+lib/Data/SExpression/Symbol.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-basic.t
+t/01-lexer.t
+t/02-scalars.t
+t/03-lists.t
+t/04-folding.t
+t/05-special.t
+t/06-read-multi.t
+t/07-symbols.t
+t/08-read-options.t
+t/09-memleak.t

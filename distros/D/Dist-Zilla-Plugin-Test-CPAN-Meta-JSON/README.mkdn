@@ -1,0 +1,51 @@
+# NAME
+
+Dist::Zilla::Plugin::Test::CPAN::Meta::JSON - release tests for your META.json
+
+# VERSION
+
+version 0.004
+
+# SYNOPSIS
+
+In `dist.ini`:
+
+    [Test::CPAN::Meta::JSON]
+
+# DESCRIPTION
+
+This is an extension of [Dist::Zilla::Plugin::InlineFiles](https://metacpan.org/pod/Dist::Zilla::Plugin::InlineFiles), providing the
+following file if `META.json` is in your dist:
+
+    xt/release/meta-json.t - a standard Test::CPAN::Meta::JSON test
+
+See [Test::CPAN::Meta::JSON](https://metacpan.org/pod/Test::CPAN::Meta::JSON) for what this test does.
+
+# AVAILABILITY
+
+The project homepage is [http://p3rl.org/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON](http://p3rl.org/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON/](https://metacpan.org/module/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON](http://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON)
+and may be cloned from [git://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON.git](git://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON/issues](https://github.com/doherty/Dist-Zilla-Plugin-Test-CPAN-Meta-JSON/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

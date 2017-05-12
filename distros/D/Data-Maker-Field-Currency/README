@@ -1,0 +1,6 @@
+
+Data::Maker::Field::Currency - A currency field for Data::Maker.
+
+It doesn't have to do much on its own, because is stands on the shoulders of
+Data::Money, which uses Locale::Currency::Format
+

@@ -1,0 +1,19 @@
+Changes
+=======
+
+0.03000 - 18 Jun 2008
+  - Fix format_datetime()
+  - Add version parameter, which will affect the output of format_datetime
+
+0.02001 - 10 Dec 2007
+  - Kwalitee & miscellaneous cleanup release. No need to upgrade.
+  - Fix deps.
+  - Use warnings.
+  - Make POD tests optional.
+  - Update Module::Install.
+
+0.02 - 26 Mar 2007
+  - Fix typos
+
+0.01 - 21 Mar 2006
+  - Initial release.

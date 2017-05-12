@@ -1,0 +1,19 @@
+Changes
+MANIFEST
+README
+LIESMICH
+Easy.pm
+Easy/Import.pm
+Makefile.PL
+debian/changelog
+debian/compat
+debian/rules
+debian/control
+debian/copyright
+scripts/dbs_dumptabdata
+scripts/dbs_dumptabstruct
+scripts/dbs_empty
+scripts/dbs_printtab
+scripts/dbs_update
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

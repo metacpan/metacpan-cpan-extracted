@@ -1,0 +1,12 @@
+Dist::Zilla::File::InMemory
+Dist::Zilla::Role::FileGatherer
+Dist::Zilla::Role::FileInjector
+Dist::Zilla::Role::FileMunger
+Dist::Zilla::Role::FilePruner
+ExtUtils::MakeMaker
+List::Util
+Moose
+Template::Tiny
+Test::DZil
+Test::More
+namespace::autoclean

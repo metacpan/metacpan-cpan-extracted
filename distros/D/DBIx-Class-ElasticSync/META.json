@@ -1,0 +1,99 @@
+{
+   "abstract" : "Helps keep your data in sync with elasticsearch",
+   "author" : [
+      "=over"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.10",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-ElasticSync",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "DBIx::Class::ResultClass::HashRefInflator" : "0",
+            "DateTime::Format::MySQL" : "0",
+            "Moose::Role" : "0",
+            "Search::Elasticsearch" : "0",
+            "Search::Elasticsearch::Compat::QueryParser" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::ElasticSync" : {
+         "file" : "lib/DBIx/Class/ElasticSync.pm",
+         "version" : "0.06"
+      },
+      "DBIx::Class::ElasticSync::ResultSet" : {
+         "file" : "lib/DBIx/Class/ElasticSync/ResultSet.pm"
+      },
+      "DBIx::Class::ElasticSync::Role::ElasticBlackholeResult" : {
+         "file" : "lib/DBIx/Class/ElasticSync/Role/ElasticBlackholeResult.pm"
+      },
+      "DBIx::Class::ElasticSync::Role::ElasticResult" : {
+         "file" : "lib/DBIx/Class/ElasticSync/Role/ElasticResult.pm"
+      },
+      "DBIx::Class::ElasticSync::Role::ElasticSchema" : {
+         "file" : "lib/DBIx/Class/ElasticSync/Role/ElasticSchema.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/itnode/DBIx-Class-Elasticsearch/issues"
+      },
+      "homepage" : "https://github.com/itnode/DBIx-Class-Elasticsearch",
+      "repository" : {
+         "url" : "git://github.com/itnode/DBIx-Class-Elasticsearch.git",
+         "web" : "https://github.com/itnode/DBIx-Class-Elasticsearch"
+      }
+   },
+   "version" : "0.06",
+   "x_contributors" : [
+      "Sales User <sales@nydsosweb6.(none)>",
+      "Chris Shepherd <cshepherd@about.com>",
+      "Patrick Simon <info@webentwicklung-ruhr.de>",
+      "Patrick Kilter <pas.freelance@googlemail.com>",
+      "Jens Gassmann <jens.gassmann@atomix.de>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

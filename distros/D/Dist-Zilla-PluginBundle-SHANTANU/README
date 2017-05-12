@@ -1,0 +1,199 @@
+NAME
+
+    Dist::Zilla::PluginBundle::SHANTANU - Dist Zilla Plugin Bundle the way
+    I like to use it
+
+VERSION
+
+    version 0.43
+
+SYNOPSIS
+
+       # in dist.ini
+         [@SHANTANU]
+
+DESCRIPTION
+
+    This is a Dist::Zilla PluginBundle. The way I use it. While this bundle
+    is customized to my needs, others might be better of forking this
+    repository and modifying it to their own needs or using the more mature
+    Plugin bundles that this is derived from like the one by David Golden.
+
+ATTRIBUTES
+
+ makemaker
+
+    makemaker attribute By default uses [MakeMaker::Awesome] This can be
+    overriden by defining this attribute
+
+ skip_makemaker
+
+    Skip Default Makemaker option to add your own plugin for generating
+    makefile
+
+ no_git
+
+    no_git attribute
+
+ no_commitbuild
+
+    no_commitbuild attribute, do not create a build branch
+
+ version_regexp
+
+    version_regexp attribute
+
+ is_task
+
+    Use Taskweaver in lieu of PodWeaver
+
+ weaver_config
+
+    PodWeaver config_plugin attribute
+
+ no_spellcheck
+
+    Skip spelling checks
+
+ exclude_filename
+
+    list of filenames to exclude e.g. exclude_filename=dist.ini
+    exclude_filename=META.json exclude_filename=META.yml
+
+ stopwords
+
+    Stopwords to exclude for spell checks in pod
+
+ no_critic
+
+    Skip Perl Critic Checks
+
+ no_coverage
+
+    Skip Pod Coverage tests
+
+ test_kwalitee
+
+    Create kwalitee tests.
+
+ test_compile
+
+    Create compile tests.
+
+ auto_prereq
+
+    Automatically get prerequisites(default 1)
+
+ fake_release
+
+ tag_regexp
+
+    Regex for obtaining the version number from git tag
+
+ compile_for_debian
+
+    generate debian specific files like control etc. Useful if you are
+    using dh-make-perl for building .deb files from your package
+
+ tag_format
+
+    Git Tag format
+
+ git_remote
+
+USAGE
+
+    To use this PluginBundle, just add it to your dist.ini. You can provide
+    the following options:
+
+      * is_task -- this indicates whether TaskWeaver or PodWeaver should be
+      used. Default is 0.
+
+      * auto_prereq -- this indicates whether AutoPrereq should be used or
+      not. Default is 1.
+
+      * tag_format -- given to Git::Tag. Default is 'release-%v' to be more
+      robust than just the version number when parsing versions for
+      Git::NextVersion
+
+      * version_regexp -- given to Git::NextVersion. Default is
+      '^release-(.+)$'
+
+      * fake_release -- swaps FakeRelease for UploadToCPAN. Mostly useful
+      for testing a dist.ini without risking a real release.
+
+      * weaver_config -- specifies a Pod::Weaver bundle. Defaults to
+      @SHANTANU.
+
+      * stopwords -- add stopword for Test::PodSpelling (can be repeated)
+
+      * no_git -- bypass all git-dependent plugins
+
+      * no_critic -- omit Test::Perl::Critic tests
+
+      * no_spellcheck -- omit Test::PodSpelling tests
+
+      * no_coverage -- omit Pod Coverage tests
+
+    When running without git, C<GatherDir> is used instead of
+    C<Git::GatherDir>, C<AutoVersion> is used instead of
+    C<Git::NextVersion>, and all git check and commit operations are
+    disabled.
+
+    This PluginBundle now supports ConfigSlicer, so you can pass in options
+    to the plugins used like this:
+
+       [@SHANTANU]
+       ExecDir.dir = scripts ; overrides ExecDir
+
+COMMON PATTERNS
+
+ use github instead of RT
+
+       [@SHANTANU]
+       :version = 0.32
+       AutoMetaResourcesPrefixed.bugtracker.github = user:shantanu
+       AutoMetaResourcesPrefixed.bugtracker.rt = 0
+
+SEE ALSO
+
+      * Dist::Zilla
+
+      * Dist::Zilla::Plugin::PodWeaver
+
+      * Dist::Zilla::Plugin::TaskWeaver
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through github at
+    https://github.com/shantanubhadoria/perl-dist-zilla-pluginbundle-shantanu/issues.
+    You will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/shantanubhadoria/perl-dist-zilla-pluginbundle-shantanu
+
+      git clone git://github.com/shantanubhadoria/perl-dist-zilla-pluginbundle-shantanu.git
+
+AUTHOR
+
+    Shantanu Bhadoria <shantanu@cpan.org> https://www.shantanubhadoria.com
+
+CONTRIBUTORS
+
+      * Karen Etheridge <ether@cpan.org>
+
+      * Shantanu Bhadoria <shantanu att cpan dott org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

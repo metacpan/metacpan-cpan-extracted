@@ -1,0 +1,42 @@
+{
+   "abstract" : "Perl extension to test if an OS is supported by Siebel CRM",
+   "author" : [
+      "Alceu Rodrigues de Freitas Junior <arfreitas@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.130880",
+   "license" : [
+      "open_source"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-AssertOS-OSFeatures-SupportsSiebel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0",
+            "Test::Pod" : "1.22"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::CheckOS" : "1.71"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.01"
+}

@@ -1,0 +1,14 @@
+Revision history for Perl module Data::Transformer
+
+0.01 Thu Feb  2 23:15:39 2006
+    - original version; created by ExtUtils::ModuleMaker 0.44
+
+0.02 Fri Feb  3 23:54:11 2006
+    - fix for circular data structures
+    - updated documentation
+
+0.03 Sat Feb  4 00:25:11 2006
+    - small bug fix of changes in 0.02
+
+0.04 Sun Feb  5 03:56:44 GMT 2006
+    - support for object nodes

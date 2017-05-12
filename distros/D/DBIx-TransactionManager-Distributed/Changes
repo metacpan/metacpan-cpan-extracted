@@ -1,0 +1,6 @@
+Revision history for DBIx-TransactionManager-Distributed
+
+0.01    2016-10-03
+        First version, released on an unsuspecting world.
+0.02    2016-10-14
+        Fix some problems in POD, tests, etc. Code not touched.

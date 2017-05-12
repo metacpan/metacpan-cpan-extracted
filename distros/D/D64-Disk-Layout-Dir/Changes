@@ -1,0 +1,9 @@
+Revision history for Perl extension D64::Disk::Layout::Dir.
+
+0.02  2013-03-24
+    - bug fixed: invalid version number of dependency on D64::Disk::Dir::Item
+      has been corrected
+
+0.01  2013-03-02
+    - initial version (provides miscellaneous procedures to access and modify
+      entire directories of D64/D71/D81 disk images)

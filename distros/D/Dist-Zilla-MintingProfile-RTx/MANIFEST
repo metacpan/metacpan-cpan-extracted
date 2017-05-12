@@ -1,0 +1,26 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Share.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Dist/Zilla/MintingProfile/RTx.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+profiles/db/Module.pm
+profiles/db/profile.ini
+profiles/db/skel/Changes
+profiles/db/skel/gitignore
+profiles/db/skel/Makefile.PL
+profiles/default/Module.pm
+profiles/default/profile.ini
+profiles/default/skel/Changes
+profiles/default/skel/gitignore
+profiles/default/skel/Makefile.PL
+README

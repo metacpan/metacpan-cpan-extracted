@@ -1,0 +1,80 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use DBIx::FileStore;
+
+my $verbose = 0;
+# fdbput: copies a file (or files) into the db
+
+main();
+
+sub Usage {
+    "fdbput [-local=filename] FILENAME [FILENAMES...]\n" .
+    "  Copies files into of the filestore from the filesystem.\n" .
+    "  --local=filename specifies source on the filesystem different\n".
+    "  from target name in filestore and can only be used with a\n" .
+    "  single filename\n" . 
+    "  NOTE: currently will place dup files into the filestore!\n";
+}
+
+sub main {
+    my $localname = "";
+    GetOptions( "verbose!" => \$verbose,
+                "localname=s" => \$localname ) || die Usage();
+    my $filestore = new DBIx::FileStore();
+
+    die "fdbput: pass files to copy into DB\n" unless @ARGV;
+    die "fdbput: can't use --local option with multiple files\n" if (@ARGV > 1 && $localname);
+
+    for my $filename (@ARGV) {
+        print "fdbput: writing to filestore: $filename\n" if $verbose;
+        my $file_to_read = $localname || $filename;
+        unless(-e $file_to_read) {
+            warn "fdbput: file doesn't exist on fs: $file_to_read\n" && next;
+        } 
+        eval { $filestore->write_to_db($file_to_read, $filename); }; 
+        # read it from $localname if set, otherwise look in the same name they call it
+        
+        warn "fdbput: Error writing $filename: $@" if $@;
+    }
+}
+
+=pod
+
+=head1 NAME     
+            
+fdbput - Copies files from filesystem to DBIx::FileStore tables
+                    
+=head1 SYNOPSIS     
+                
+    % fdbput filename.txt
+
+writes filename.txt from filesystem to filestore
+
+    % fdbput filename.txt filename2.txt
+
+puts named files into filestore
+
+    % fdbput filename.txt -local=/tmp/filename-now.txt
+
+puts contents of file /tmp/filename-now.txt into filestore
+under the name 'filename.txt'.
+
+=head1 DESCRIPTION 
+
+Copies files from the filesystem to DBIx::Filestore. 
+
+--local option allows user to specify a different name 
+in the filestore from the name used in the filesystem.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbls>, L<fdbmv>,  L<fdbget>,  L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+    
+=cut    
+

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Decision-ParseTree
+version:             0.041
+abstract:            Replacing waterfall IF-ELSIF-ELSE blocks
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Carp::Assert::More:            0
+    Test::More:                    0
+    YAML:                          0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - ben hengst <notbenh@cpan.org>

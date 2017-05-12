@@ -1,0 +1,11 @@
+# date +"%F %T %z"
+
+0.002 2010-12-20 13:10:31 +0100
+    Update POD
+    Use PluginBundle RBO
+    Fixed github username
+    Added PodVersion
+    Added PkgVersion
+
+0.001 2010-12-20 10:21:17 +0100
+    Initial Version

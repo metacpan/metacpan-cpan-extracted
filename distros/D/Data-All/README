@@ -1,0 +1,28 @@
+------------------------------------------------------------
+Data::All - Access to data in many formats from many places
+------------------------------------------------------------
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+File::Spec
+Regexp::Common
+Text::Parsewords
+Class::Factory
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2009 by Delano Mandelbaum, delano@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.3 or,
+at your option, any later version of Perl 5 you may have available.

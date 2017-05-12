@@ -1,0 +1,38 @@
+DBIx::Class::NestedSet::ResultSet version 0.10
+==============================================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    DBIx::Class
+
+TODO
+
+There are some issues about the current implementation that need consideration
+
+    Is it possible to support multiple key indexes? Yes but we need to specify the root value when we create the root node
+    Also search_related currently only works with single key PK
+    In the event that a root column is not defined, should we default to using the primary key
+        One reason why not, because we may want to add a new node as the new root or to add one tree to another
+    Is the 'CASE' sql in NestedSet.pm compatible with all databases?
+    What do we do if we have several objects (e.g. root) instances when we add new nodes. Do we 'discard_changes'?
+    delete method seems to be ineficient for deleting a sub-tree
+    I am not quite sure what 'has_descendent' should do.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010-2011 by Ian Docherty
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.

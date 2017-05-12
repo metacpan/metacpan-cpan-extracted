@@ -1,0 +1,38 @@
+Data-BiaB
+
+This module provides methods to read Band-in-a-Box data files and extract
+some useful information from them.
+
+Band-in-a-Box is an excellent tool for creating professional music and
+accompanying tracks. I've been using it for many years but had to abandon
+it when I phased out Microsoft Windows PCs.
+
+Example:
+
+    use Data::BiaB;
+
+    # Load an existing song.
+    my $biab = Data::BiaB->new();
+    $biab->load("Vaya_Con_Dios.mgu");
+
+    # This will show what was gathered.
+    use Data::Dumper;
+    print Dumper($biab);
+
+An associated Data::BiaB::MIDI module is capable of generating a MIDI
+file from the parsed data.
+
+NOTE: Many BiaB files fail loading and parsing. If you have a recent
+version of Band-in-a-Box its MusicXML export feature will be a much
+better alternative.
+
+This is a hobby project. It is pre-alpha, under development, works for me,
+caveat emptor and so on. Have fun!
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2016 Johan Vromans
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

@@ -1,0 +1,8 @@
+--- #YAML:1.0
+name: Data-Sync
+version: 0.03
+author:
+  - charlesc@g0n.net
+abstract: A simple metadirectory/datapump module
+license: perl
+generated_by: Module::Build version 0.2611, without YAML.pm

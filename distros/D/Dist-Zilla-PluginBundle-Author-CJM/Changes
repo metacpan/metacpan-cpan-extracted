@@ -1,0 +1,188 @@
+Revision history for Dist-Zilla-PluginBundle-Author-CJM
+
+4.37   2015-11-21
+	- No functional changes
+	- Make tests compatible with Dist::Zilla 5.040 and up
+
+4.36   2015-09-05
+	- Pass single_version param to GitVersionCheckCJM
+	- Require GitVersionCheckCJM version 4.27 (adds single_version)
+
+4.35   2015-08-08
+	- No functional changes
+	- Add 10-build.t
+
+4.34   2015-07-25
+	- Update prerequisites for better support of POD in scripts
+	- Require PodLoom version 5.001 (uses filename instead of 'main')
+	- Require TemplateCJM version 4.23 (adds $filename & $pathname)
+
+4.33   2015-02-07
+	- Remove Moose::Autobox from prerequisites
+	  (While 4.32 stopped using it, it was still erroneously
+	  listed as a prerequisite.)
+
+4.32   2015-01-31
+	- Don't use Moose::Autobox
+	- Require @Git version 2.027 (supports %c in Git::Tag)
+	- Require GitVersionCheckCJM version 4.26 (latest version)
+	- Require MatchManifest version 4.01 (safety check)
+	- Require PodLoom version 5.00 (Dzil 5 compatible)
+	- Require TemplateCJM version 4.22 (latest version)
+	- Require Test::PrereqsFromMeta 4.23 (latest version)
+
+4.31   2013-12-21
+	- Pass check_recommend_tests param to RecommendedPrereqs
+	- 4.30 neglected to list RunExtraTests as a prerequisite
+
+4.30   2013-09-21
+	- Use RunExtraTests instead of ExtraTests.  Unfortunately,
+	  this means that the MANIFEST will change, and MatchManifest
+	  will complain about that.
+
+	  If you're working with one of my dists and run into this issue,
+	  please add ":version = 4.30 ; use RunExtraTests" to dist.ini
+	  under [@Author::CJM], and commit dist.ini and MANIFEST in a
+	  separate commit before committing any of your changes.  The
+	  commit message should be:
+
+	    Update to Author::CJM 4.30
+
+	      Release tests are now in xt/
+
+4.20   2013-08-24
+	- Pass template_date_format param to TemplateCJM (as date_format)
+	  Default value is "MMMM d, y".  This allows Changes to follow
+	  CPAN::Changes::Spec while still using English dates elsewhere.
+	- Require TemplateCJM version 4.20 (supports date_format)
+	- Require Test::PrereqsFromMeta 4.20 (latest version)
+
+4.13   2012-03-21
+	- Pass mb_class param to builder plugin
+	- Require RecommendedPrereqs version 4.06 (latest version)
+
+4.12   2011-12-12
+	- Add Test::PrereqsFromMeta
+	- Pass pod_finder param to PodLoom and TemplateCJM (as finder)
+	- Pass template_file param to TemplateCJM (as file)
+	- The @CJM bundle has been removed.  You should replace [@CJM]
+	  with [@Author::CJM / CJM] in your dist.ini
+
+4.11   2011-11-11
+	- Add CheckPrereqsIndexed
+	- Pass check_recommend param to RecommendedPrereqs
+	- Add remove_plugin param (Can't pass multivalue params to @Filter)
+	- Improve documentation
+
+4.10   2011-11-01
+	- Rename bundle from @CJM to @Author::CJM.  This dist still
+	  contains a @CJM bundle, but it just issues a deprecation
+	  warning and loads @Author::CJM.  It will be removed soon.
+	- Add RecommendedPrereqs
+	- Pass check_files param to GitVersionCheckCJM
+	- Pass changelog_re param to TemplateCJM
+	- Require PodLoom version 4.01 (latest version)
+
+4.02   2011-05-05
+	- Specify master branch in push_to, so it can push to a new repository
+	- Require PodLoom version 4.00 (compatible with current dzil).
+	- Require TemplateCJM version 3.05 (latest version)
+
+4.01   2010-12-20
+	- Use %t to indicate a trial release
+	- Require @Git version 1.103520 (supports %t in Tag & Commit)
+	- Require TemplateCJM version 3.04 (latest version)
+
+4.00   2010-12-07
+	- Require PodLoom version 3.01 (prefer web URL for repository).
+	- Require MatchManifest version 4.00 (works on Windows).
+	- Require TemplateCJM version 3.03 (more selective processing).
+	- Change major version to 4, because Dist::Zilla 4 is required.
+
+0.10   2010-11-11
+	- Require GitVersionCheckCJM version 3.02 and Git::Wrapper.
+	  Don't require Git.pm anymore.
+	- Require Repository version 0.16 so github_http is unnecessary.
+	- Require MatchManifest version 0.04 (latest version).
+
+0.09   2010-11-05
+	- Add MetaJSON (while keeping MetaYAML for v1.4 support)
+	- Add github_http = 0 for Repository (Meta 2 has url & web)
+
+0.08   2010-04-14
+	@CJM is now a working PluginBundle.
+	The plugins are now distributed separately from @CJM.
+
+	If you previously installed this bundle to get one of the
+	plugins, you should uninstall this bundle, and install
+	Dist-Zilla-Plugins-CJM instead.  Sorry for any confusion this
+	causes.
+
+	Dist::Zilla::Plugin::PodLoom
+	  - distributed in Dist-Zilla-Plugin-PodLoom
+
+	All other plugins and Role::ModuleInfo
+	  - distributed in Dist-Zilla-Plugins-CJM
+
+0.07   2010-04-01
+	- added tests
+
+0.06   2010-04-01
+	Dist::Zilla::Plugin::ArchiveRelease
+	  - add FilePruner for archive directory (Michael Schout)
+
+	Dist::Zilla::Plugin::GitVersionCheckCJM
+	Dist::Zilla::Plugin::TemplateCJM
+	  - are now FileFinderUsers
+
+0.05   2010-03-30
+	- All plugins now have a SYNOPSIS
+	- Revised compile tests
+
+0.04   2010-03-29
+	- Now requires Dist::Zilla 2
+	- Added compile tests
+
+	Dist::Zilla::Plugin::ArchiveRelease
+	  - Added a BeforeRelease check to ensure the directory exists
+	    (creating it if necessary) and this release hasn't already
+	    been archived
+
+0.03   2010-03-15
+	- Includes a new version of Template_strict.patch that
+	  supports scalar references properly
+
+	Dist::Zilla::Plugin::ArchiveRelease
+	  - Shortened log message
+
+	Dist::Zilla::Plugin::ModuleBuild::Custom
+	  - New plugin
+
+	Dist::Zilla::Plugin::TemplateCJM
+	  - Is now an InstallTool instead of a FileMunger, because
+	    prerequisites have not been calculated at FileMunger time
+	  - Added the dependency_link & dependency_list methods
+	  - Added a BeforeRelease check to ensure the release date is
+	    not just an uppercase word
+
+0.02   2010-03-07
+	- Added POD tests
+	- Use the plugin's log method so the plugin name appears in the log
+
+	Dist::Zilla::Plugin::ArchiveRelease
+	Dist::Zilla::Plugin::GitVersionCheckCJM
+	  - New plugins
+
+	Dist::Zilla::Plugin::PodLoom
+	  - Define abstract, module, & version only if they
+	    could be determined
+
+	Dist::Zilla::Plugin::TemplateCJM
+	  - Also process comments that start at beginning of line
+
+0.01   2009-10-11
+	- Initial release includes:
+	    Dist::Zilla::Plugin::PodLoom
+	    Dist::Zilla::Plugin::TemplateCJM
+	    Dist::Zilla::Plugin::VersionFromModule
+	    Dist::Zilla::Role::ModuleInfo

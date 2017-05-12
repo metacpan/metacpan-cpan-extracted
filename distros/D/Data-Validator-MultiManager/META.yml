@@ -1,0 +1,43 @@
+---
+abstract: 'to manage a multiple validation for Data::Validator'
+author:
+  - 'Hiroyoshi Houchi <hixi@cpan.org>'
+build_requires:
+  Data::Validator::Recursive: 0
+  Test::Deep: 0
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validator-MultiManager
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Data::Validator::MultiManager:
+    file: lib/Data/Validator/MultiManager.pm
+    version: 0.01
+requires:
+  Clone: 0
+  Data::Validator: 1.03
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/hixi-hyi/p5-Data-Validator-MultiManager/issues
+  homepage: https://github.com/hixi-hyi/p5-Data-Validator-MultiManager
+  repository: git://github.com/hixi-hyi/p5-Data-Validator-MultiManager.git
+version: 0.01
+x_contributors:
+  - 'Hiroyoshi Houchi <git@hixi-hyi.com>'

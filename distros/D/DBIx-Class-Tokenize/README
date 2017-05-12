@@ -1,0 +1,85 @@
+DBIx::Class::Tokenize(3U)ser Contributed Perl DocumentatiDoBnIx::Class::Tokenize(3)
+
+
+
+NNAAMMEE
+       DBIx::Class::Tokenize - Automatically tokenize a column on creation
+
+DDEESSCCRRIIPPTTIIOONN
+       This component simply creates a clean token based on a field on inser‐
+       tion.  The simple use case is having a long name that is displayable,
+       like "Catalyst Book" that you want to change to "catalyst_book".
+       Rather than do that by hand every time you create a record, this compo‐
+       nent does it for you.
+
+SSYYNNOOPPSSIISS
+        package MyApp::Schema::Book;
+
+        __PACKAGE__->load_components( qw(Tokenize ... Core) );
+        __PACKAGE__->add_columns(
+            id   => { data_type => 'integer', is_auto_increment => 1 },
+            name => { data_type => 'varchar', size => 128,
+               # Update the 'token' field on create
+               token_field => 'token' },
+            token => { data_type => 'varchar', size => 128, is_nullable => 0 }
+        );
+
+        ...
+
+        my $row = $schema->resultset('Book')->create({ name => "Catalyst Book" });
+
+        print $row->token; # Prints "catalyst_book
+
+MMEETTHHOODDSS
+       ttookkeenniizzee
+
+       This method is what performs the actual conversion to the tokenized
+       form.  It is easy to override so that you can change things around to
+       suit your particular table.  Whatever is returned is inserted into the
+       configured "token_field".
+
+       An example of extending this method would be to traverse a tree in a
+       row that uses DBIx::Class::Tree::AdjacencyList and tokenize the parents
+       as well.
+
+AAUUTTHHOORR
+       J. Shirley, "<jshirley at coldhardcode.com>"
+
+BBUUGGSS
+       Please report any bugs or feature requests to "bug-catalyst-con‐
+       troller-rest-dbi c-item at rt.cpan.org", or through the web interface
+       at <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-Tok‐
+       enize>.  I will be notified, and then you’ll automatically be notified
+       of progress on your bug as I make changes.
+
+SSUUPPPPOORRTT
+       You can find documentation for this module with the perldoc command.
+
+           perldoc DBIx::Class::Tokenize
+
+       You can also look for information at:
+
+       * RT: CPAN’s request tracker
+           <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-Tokenize>
+
+       * AnnoCPAN: Annotated CPAN documentation
+           <http://annocpan.org/dist/DBIx-Class-Tokenize>
+
+       * CPAN Ratings
+           <http://cpanratings.perl.org/d/DBIx-Class-Tokenize>
+
+       * Search CPAN
+           <http://search.cpan.org/dist/DBIx-Class-Tokenize>
+
+AACCKKNNOOWWLLEEDDGGEEMMEENNTTSS
+       This is a Cold Hard Code, LLC module - http://www.coldhardcode.com
+
+CCOOPPYYRRIIGGHHTT && LLIICCEENNSSEE
+       Copyright 2008 Cold Hard Code, LLC, all rights reserved.
+
+       This program is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.
+
+
+
+perl v5.8.8                       2008-04-30          DBIx::Class::Tokenize(3)

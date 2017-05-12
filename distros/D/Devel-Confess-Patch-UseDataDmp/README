@@ -1,0 +1,8 @@
+SYNOPSIS
+
+     % PERL5OPT=-MDevel::Confess::Patch::UseDataDmp -MDevel::Confess=dump yourscript.pl
+
+DESCRIPTION
+
+SEE ALSO
+

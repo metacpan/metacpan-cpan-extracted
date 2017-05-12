@@ -1,0 +1,51 @@
+---
+abstract: 'base class for protocol abstractions'
+author:
+  - 'Martijn van Beers  <martijn@cpan.org>'
+build_requires:
+  Storable: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Transform
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Data::Transform:
+    file: lib/Data/Transform.pm
+    version: 0.06
+  Data::Transform::Block:
+    file: lib/Data/Transform/Block.pm
+    version: 0.01
+  Data::Transform::Grep:
+    file: lib/Data/Transform/Grep.pm
+    version: 0.01
+  Data::Transform::Identity:
+    file: lib/Data/Transform/Identity.pm
+    version: 0.01
+  Data::Transform::Line:
+    file: lib/Data/Transform/Line.pm
+    version: 0.01
+  Data::Transform::Map:
+    file: lib/Data/Transform/Map.pm
+    version: 0.01
+  Data::Transform::Meta:
+    file: lib/Data/Transform/Meta.pm
+  Data::Transform::Reference:
+    file: lib/Data/Transform/Reference.pm
+    version: 0.01
+  Data::Transform::Stackable:
+    file: lib/Data/Transform/Stackable.pm
+    version: 0.01
+requires:
+  Carp: 0
+  perl: 5.005
+resources:
+  repository: git://martijn.at/data-transform.git
+version: 0.06

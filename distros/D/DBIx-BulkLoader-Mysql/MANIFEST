@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-BulkLoader-Mysql.t
+lib/DBIx/BulkLoader/Mysql.pm
+META.yml                                 Module meta-data (added by MakeMaker)

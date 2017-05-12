@@ -1,0 +1,43 @@
+Devel-Hide version 0.0008
+=========================
+
+Simple tool for developers which allows to hide
+installed Perl modules. Used like this:
+
+    perl -MDevel::Hide=Module/ToHide.pm script.pl
+
+
+INSTALLATION
+
+To install this module type the following:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module requires
+
+    File::Temp (for perls older than 5.8.0)
+
+and
+
+    Test::More
+
+for the testing part and recommends
+
+    Test::Pod 1.18
+    Test::Pod::Coverage 1.04
+
+also for testing - the POD part.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005-2007 by Adriano R. Ferreira
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

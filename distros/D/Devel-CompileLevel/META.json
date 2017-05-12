@@ -1,0 +1,57 @@
+{
+   "abstract" : "Detect caller level of compiling code",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-CompileLevel",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {}
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-CompileLevel@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-CompileLevel"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/haarg/Devel-CompileLevel.git",
+         "web" : "https://github.com/haarg/Devel-CompileLevel"
+      }
+   },
+   "version" : "0.001002",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

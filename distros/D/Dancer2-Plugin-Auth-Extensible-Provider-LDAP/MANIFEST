@@ -1,0 +1,13 @@
+README
+t/plugin-provider-ldap.t
+t/environments/provider-ldap.yml
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+lib/Dancer2/Plugin/Auth/Extensible/Provider/LDAP.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,33 @@
+Data::Pensieve
+====================
+
+Simple tool for interacting with revisioned data
+
+INSTALLATION
+
+To install this module, type the following:
+
+perl Makefile.pl
+make
+make test
+make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+    Carp>
+    DateTime
+    DateTime::Format::MySQL
+    DBI
+    DBIx::Class
+    List::Util
+    List::MoreUtils
+    Moose
+    Storable
+    Text::Diff
+
+COPYRIGHT AND LICENSE
+
+Copyright (C) 2012 Michael Aquilina. All rights reserved.
+

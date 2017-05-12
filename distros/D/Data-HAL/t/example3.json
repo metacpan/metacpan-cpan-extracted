@@ -1,0 +1,6 @@
+{
+    "_links": {
+        "self": { "href": "/orders" },
+        "widgets": { "href": "/widgets", "deprecation": "http://example.com/blog/2013/09/no-more-widgets" }
+    }
+}

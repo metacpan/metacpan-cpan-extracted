@@ -1,0 +1,21 @@
+Blue.h
+Blue.xs
+lib/DBM/Deep/Blue.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+ppport.h
+t/base.t
+t/blessed.t
+t/clear.t
+t/dataDump.t
+t/DBM-Deep-Blue.t
+t/destroy.t
+t/file.t
+t/load1.t
+t/load2.t
+t/rollback.t
+t/scan.t
+test.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

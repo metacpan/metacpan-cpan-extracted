@@ -1,0 +1,201 @@
+DBD::SearchServer  --  a Fulcrum SearchServer interface for Perl 5
+(previously known as DBD::Fulcrum)
+
+   Copyright (c) 1996-1999  Davide Migliavacca and Inferentia, Milano ITALY
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+   If you modify this, and are willing to share, please let me know so that
+   I may fold the changes in for the immense benefit of other people.
+
+   PLEASE READ THE ENTIRE README FILE CAREFULLY !
+
+   You can now run perldoc DBD::SearchServer to read the docs.
+   In fact, most of the documentation previously found here is now relocated in pod format...
+
+NEWS:
+ Version 0.21: Very Important Changes.
+	First, the driver name has changed to DBD::SearchServer. It was previously
+	known as DBD::Fulcrum, but this was wrong.
+ 	Most notable changes:
+	- support for table_info and dbish
+	- ss_maxhitsinternalcolumns becomes a database-handle attribute
+	- general cleanup of tests
+	- reorganization of docs.
+	You will not be able to upgrade from DBD::Fulcrum without touching your code.
+
+ Version 0.20: Introducing ss_maxhitsinternalcolumns.
+
+ Version 0.19_03: released as 0.20
+	Support for CursorName (statement attribute). Contributed by
+	Peter Wyngaard <peterw@anecdote.com>
+
+ Version 0.19_02: Not released.
+	Minor fixes.
+
+ Version 0.19_01: Not released.
+	Minor doc changes. Tested on HP-UX 10.20 after some time.
+	Added $dbh->table_info method for DBI::Shell.
+
+ Version 0.19: Released.
+	BE CAREFUL, this version is SUBSTANTIALLY DIFFERENT from the latest
+	released (0.12). Check your seat belts before installing _AND_
+	keep a DBD-Fulcrum-0.12.tar.gz around for sometime.
+	You've been warned.
+	Multiple connects bug fixed with info from Loic Dachary.
+
+ Version 0.18: Not released.
+
+	Added $sth->{ful_last_row_id}, contributed by Loic Dachary
+	<loic@ceic.com>
+	Clean up for test.pl (just a little).
+
+ Version 0.17: prereleased (never on CPAN)
+	final polishing before release.
+
+ Version 0.16: mostly rewritten to take advantage of the new DBI
+	'xst' templates.
+	Truncation behaviour is now rationalized.
+	Added DBD::Fulcrum::ful_maxhitsinternalcolumns to allow for
+	larger buffers when data truncated is not desired (see docs)
+
+
+ Version 0.15: minor packaging details. This should be the last version
+	not using Driver.xst.
+
+ Version 0.14: Bug fix WRT allocation of buffers for "normal" fields
+	(not APVARCHAR) where SET SHOW_MATCHES 'TRUE'.
+	Thanks to Roberto Bianchettin <roberto@pisa.iol.it> for finding it.
+
+ Version 0.13: Just README changes, not released.
+
+ Version 0.12: Builds and tests fine under Windows NT 4.0sp3,
+	SearchServer 3.5c, DBI 0.92, perl 5.004_57
+
+ Version 0.01-0.11: History.
+
+PLATFORMS:
+  Known to work on: SearchServer 2.x and beyond (lately tested only on 3.5)
+  on IBM AIX 3.2.5, 4.1.5; Digital OSF/1 3.2c, Digital Unix 4.0c, Solaris 2.5.1/2.6 Sparc,
+  Solaris 2.4 (reported from user), Windows NT 4.0sp3, HP-UX 10.20-11.00.
+
+*BEFORE* BUILDING, TESTING AND INSTALLING this you will need to:
+
+    Build, test and install Perl 5 (5.005_02 recommended)
+    It is very important to TEST it and INSTALL it!
+
+    Build, test and install the DBI module (DBI 1.02 or later - this version developed with 1.02).
+    It is very important to TEST it and INSTALL it!
+    I have built under NT using perl5.004_57, DBI 0.92, and SearchServer 3.5c.
+    Read the platform-specific notes using 'perldoc DBD::SearchServer'
+
+    Remember to *read* the DBI README file!
+
+    Install enough Fulcrum SearchServer software to enable DBD::SearchServer to build.
+    That includes the C Software Development Kit.
+    Set FULCRUM_HOME to the base of your installation. You'll need FULCRUM_HOME
+    both for building and for running DBD::SearchServer.
+    This is not required by SearchServer itself, just by this driver!
+    (But it _is_ required).
+    
+    Contact PCDOCS (http://www.pcdocs.com) for any information about their products
+    and Fulcrum SearchServer.
+
+
+BUILDING:
+
+	perl Makefile.PL
+	make
+
+If it builds without error you can then proceed to test. For the
+main test to work it must be able to connect to a Fulcrum SearchServer table.
+To avoid unforseeable problems with a real, production table, following these simple
+instructions to build your own brand-new use-it-once table.
+
+Copy the following files from Fulcrum SearchServer installation directories (usually $ENV{'FULCRUM_HOME'}/fultext)
+to your new directory (you can use fultest under the DBD-Fulcrum dist,
+that's exactly what it's there for).
+	fultext.ftc
+	fultext.eft
+	ftpdf.ini (sometimes)
+	*mess files 
+
+Set FULCRUM_HOME to your Fulcrum SearchServer installation directory (e.g. /usr/fulcrum).
+Set FULCREATE, FULSEARCH and FULTEMP to the brand-new directory (thus avoiding the risk
+of leaving files around at the end of the process).
+Create the table test using the script test.fte:
+   	execsql -0 test.fte
+
+If execsql is not found, try $FULCRUM_HOME/bin/execsql.
+
+Starting with version 0.11, this distribution provides an handy build-dir.sh script. Fed with
+$FULCRUM_HOME and the test directory name as parameters on command line, it will create
+the directory, initialize it with Fulcrum files, and build the test table. 
+	./build-dir.sh $FULCRUM_HOME fultest
+is as good an example as any (and you'll have to set FULCRUM_HOME before, too, so it might be considered actually healthy).
+Output of the script goes to build-dir.log for later perusal.
+
+
+	make test
+
+	make install (if the tests look okay)
+
+As of this release, building on DEC OSF/1 requires static linking and hand-editing of the Makefile
+midway through the build. Sorry, I haven't had enough time to clean things up yet.
+Anyway, this should be working and is being used in a number of production systems.
+Refer to README.dec_osf for detailed instructions.
+
+It is frequent to have and invalid or unreasonable FULTEMP variable. Usually you'll get cryptic 
+messages about memory not being enough. Be sure FULTEMP is valid and is readable/writable to whom
+must execute the program using DBD::SearchServer.
+
+IF YOU HAVE PROBLEMS:
+
+Do not hand edit the generated Makefile unless you are completely sure
+you understand the implications! Always try to make changes via the
+Makefile.PL command line and/or editing the Makefile.PL.
+
+You should not need to make any changes. If you do *please* let me
+know so that I can try to make it automatic in a later release.
+
+DBI resources:
+	DBI home page:
+	http://www.arcana.co.uk/technologia/perl/DBI
+	dbi mailing lists:
+	http://www.fugue.com/dbi for subscriptions
+
+Please post details of any problems (or changes you needed to make) to
+dbi-users@fugue.com and CC them to me at Davide.Migliavacca@inferentia.it. But note...
+
+** IT IS IMPORTANT TO INCLUDE THE FOLLOWING INFORMATION:
+
+1. A complete log of a all steps of the build, e.g.:
+
+	perl Makefile.PL           (do a make realclean first)
+	make
+	make test
+	make test TEST_VERBOSE=1   (only if any of the t/* tests fail)
+
+2. Full details of which version of Fulcrum SearchServer, Perl and OS you're using.
+
+3. The output of perl -V
+
+_Always_ have the appropriate amount of fun,
+Davide.
+
+
+===============================================================================
+DBI 'home page': http://www.arcana.co.uk/technologia/perl/DBI
+
+Searchable index of the dbi-users mailing list:
+-- please consult the DBI home page. Pointers sometimes change, 
+-- those pages will always offer the current URLs 
+
+Fulcrum home page: http://www.fulcrum.com
+Davide's home page: http://ttt.inferentia.it/users/shari
+
+
+===============================================================================
+===============================================================================
+
+End.

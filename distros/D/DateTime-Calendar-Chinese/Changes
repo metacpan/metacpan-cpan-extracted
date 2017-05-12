@@ -1,0 +1,56 @@
+Changes
+=======
+
+1.00 29 Nov 2011
+    * Work around 5.14 qw() deprecation
+    * Tweak test
+    * Update dependency
+
+0.99999_01 19 Aug 2010
+    * Migrate to using XS backend (DateTime::Astro)
+    * Migrate to github
+    * Solar terms on 2020 and 2028 are known to be broken at this moment
+
+0.07 - 29 May 2007
+  - Migrate to Module::Install
+  - Require new version of DateTime::Event::Chinese
+
+0.06 (never released)
+  - Add POD tests.
+
+0.05 - 28 Jun 2005
+  - Fix Build.PL create_makefile_pl to create 'traditional' Makefile.PL
+  - Update dependency (require newer modules). This fixes problems reported
+    by Dave Rolsky where make test fails.
+  - Slightly modify test
+
+0.04 - 30 Jan 2004
+  - Was missing the time_zone() method, which makes a difference when
+    you pass a DT::C::Chinese to a from_object() method for other
+    calendards
+  - Add test
+
+0.03 - 24 Jan 2004
+  - It's good to be able to access CVS.
+  - Added methods to get the Chinese year name, as well as just the
+    celestial stem or the terrestrial branch.  Dave Rolsky.
+  - Added a method to return the zodiac animal for the year.  Dave Rolsky.
+
+0.02 - 24 Jan 2004
+[ The "Darn, Astronomical Calendars Are Hard" Release ]
+  - Now the time_zone parameter defaults to Asia/Shanghai, so that
+    dates by default align with Chinese Calendar
+  - Added elapsed_years()
+  - Fixed MANIFEST
+  - Fixed really nasty bug in the edge case for going from a non-leap
+    year to a leap year by requiring DateTime::Event::SolarTerm 0.02,
+    which fixes no_major_term_on.
+  - Fixed another really nasty bug caused by operator precedence of ? :
+  - Fixed _calc_gregorian_components() which was triggered from set()
+  - Fixed set() to correctly set the time components
+  - Fixed new()'s validation args (missing defaults)
+  - Fixed now()
+  - Require DateTime::Event::Chinese 0.02
+
+0.01 - 12 Jan 2004
+  - initial release

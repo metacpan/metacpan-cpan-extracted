@@ -1,0 +1,10 @@
+/* Dezi::Admin::UI CSS */
+
+#about {
+    font-size: 110%;
+    margin: 1em;
+}
+
+#about p {
+    padding-top: 1em;
+}

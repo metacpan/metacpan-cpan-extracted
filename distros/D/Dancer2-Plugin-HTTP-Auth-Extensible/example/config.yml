@@ -1,0 +1,31 @@
+appname: authextest
+
+session: simple
+logger: console
+log: core
+
+plugins:
+    'HTTP::Auth::Extensible':
+        default_realm: config
+        realms:
+            example:
+                provider: Example
+            config:
+                provider: Config
+                users:
+                    - user: 'beerdrinker'
+                      pass: 'password'
+                      name: 'Beer drinker'
+                      roles:
+                        - BeerDrinker
+                    - user: 'vodkadrinker'
+                      pass: 'password'
+                      name: 'Vodka drinker'
+                      roles:
+                        - VodkaDrinker
+
+
+
+
+show_errors: 1
+

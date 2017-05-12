@@ -1,0 +1,13 @@
+---
+swagger: "2.0"
+info:
+  title: MyApp's API
+  version: "1.0"
+basePath: /api
+paths:
+  /welcome:
+    get:
+      operationId: my_controller
+      responses:
+        200:
+          description: success

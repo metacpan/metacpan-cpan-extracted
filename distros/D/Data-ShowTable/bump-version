@@ -1,0 +1,260 @@
+#!/usr/bin/env perl
+# bump-version [options] [VERSION] file ...
+#
+# read one or more files and increment the given version
+
+$VERSION = '0.1';
+
+=pod
+
+=head1 USAGE
+
+bump-version [options] [VERSION] file ...
+
+=head1 DESCRIPTION
+
+The C<bump-version> script increments the version number in the 
+given file.
+
+If VERSION is given, it must be in the format of "C<num.num>".
+
+Use the C<--list> option to see which files have a VERSION string.
+
+=head1 OPTIONS
+
+=over 
+
+=item C<--list, -l>
+
+List the files that reference version numbers.
+
+=item C<--man>
+
+Show the entire man page.
+
+=item C<--major, -M>
+
+Bump the major version
+
+=item C<--minor, -m>
+
+Bump the minor version
+
+=item C<--verbose, -v>
+
+Be verbose.
+
+=item C<--version, -V>
+
+Show the current version and exit.
+
+=item C<--norun, -n>
+
+Show the comands but do not actually make any changes.
+
+=back
+
+
+=head1 AUTHOR
+
+Alan K. Stebbens <aks@stebbens.org>
+
+=cut
+
+use Getopt::Long qw(VersionMessage :config bundling no_ignore_case auto_version );
+use Pod::Usage;
+
+my $verbose = '';
+my $norun = '';
+my $help = '';
+my $version = '';
+my $man = '';
+my $bump_major = '';
+my $bump_minor = 1;
+my $major = '';
+my $minor = '';
+
+
+sub chatf($@) {
+  &talkf if $verbose;
+}
+
+sub chat($) {
+  chatf '', shift;
+}
+
+sub talkf($@) {
+  my $fmt = shift;
+  $fmt = "%s\n" unless $fmt ne '';
+  printf STDERR $fmt, @_;
+}
+
+sub talk($) {
+  talkf '', shift;
+}
+
+sub nvtalkf($@) {
+  &talkf unless $verbose;
+}
+
+# runcmd COMMAND
+#
+#    In $norun mode, print COMMAND prefixed with "(norun) ", and do nothing
+#    else.
+#
+#    In $verbose mode, print COMMAND prefixed with "--> " before invoking the
+#    command.
+#    
+# runcmd COMMANDTEXT { BLOCK ; }
+#
+#    COMMANDTEXT is displayed for either $norun and $verbose modes, but
+#    BLOCK is executed.
+#
+
+sub runcmd($;&) {
+  my $cmd = shift;
+  my $code = shift;
+  if ($norun) {
+    talkf "(norun) %s\n", $cmd;
+  } else {
+    chatf  "--> %s\n", $cmd;
+    if ($code) {
+      unless (&$code) {
+        nvtalkf "--> %s\n", $cmd;
+        die "Command block failed: $!\n";
+      }
+    } else {
+      STDERR->flush;
+      unless (system($cmd)) {
+        nvtalkf "--> %s\n", $cmd;
+        die "Command failed: $!\n";
+      }
+    }
+  }
+}
+
+sub update_version($) {
+  my $file = shift;
+  $new_file = "$file.new";
+  chatf "Scanning %s for \$VERSION..\n", $file;
+  my($in, $out);
+  if (open($in, "<", $file)) {
+    if (!$norun) {
+      chatf "Opening %s for output..\n", $new_file;
+      open($out, ">", $new_file) or die("Cannot open $out for output: $!\n");
+    }
+    my $done = '';
+    my $changes = '';
+    while (<$in>) {
+      talkf "%03d: %s", $., $_ if $verbose > 1;
+      if (/^(\s*)\$VERSION\s*=\s*['"]?(\d+)\.(\d+)['"]?[\s;]/) {
+        my ($prefix, $cur_major, $cur_minor) = ($1, $2, $3);
+        talkf "%20s: ", $file if $many_files && !$verbose;
+        talkf "Found version: %s.%s\n", $cur_major, $cur_minor;
+        ($new_major, $new_minor) = bump_version($cur_major, $cur_minor);
+        if ($new_major ne $cur_major or $new_minor ne $cur_minor) {
+          talkf "%20s: ", $file if $many_files && !$verbose;
+          talkf "  New version: %s.%s\n", $new_major, $new_minor;
+          $_ = sprintf("%s\$VERSION = '%s.%s';\n", $prefix, $new_major, $new_minor);
+          $changes = 1;
+        }
+        print $out $_ if $out ne '';
+        last;
+      }
+      print $out $_ if $out ne '';
+    }
+    # finish up reading & writing
+    if ($out ne '') {
+      while (<$in>) { print $out $_; }      # write the rest of the file
+      close($out) or die "Close $out failed: $!\n";
+    }
+    close($in);
+    if ($changes && !$norun) {
+      talk "Saving changes..";
+      runcmd "mv $file $file.old", sub {
+        rename($file, $file.'.old') or die "mv $file $file.old failed: $!";
+      };
+      runcmd "mv $new_file $file", sub {
+        rename($new_file, $file)    or die "mv $new_file $file: $!";
+      };
+      talkf "%s updated.\n", $file;
+    } elsif (!$changes) {
+      talk "No changes.";
+    }
+
+  } else {
+    warn "Cannot open and read $file: $!";
+  }
+}
+
+# bump_version($input_major_version, $input_minor_version)
+#
+# Increment the version numbers, according to $bump_major or $bump_minor.
+#
+# if $major and $minor are already set (by option), they override.
+
+sub bump_version($$) {
+  if ($major eq '' || $minor eq '') {
+    ($major, $minor) = (shift, shift);
+    if ($bump_major) {
+      $major += 1;
+      $minor = 0;
+    } elsif ($bump_minor) {
+      $minor += 1;
+    }
+  }
+  return ($major, $minor);
+}
+
+##############
+# main program
+
+GetOptions('verbose|v+'  => \$verbose,
+           'help|h'      => sub { pod2usage(1); },
+           'list|l'      => \$list,
+           'man'         => sub { pod2usage(-exitval => 0, -verbose => 2); },
+           'major|M'     => \$bump_major,
+           'minor|m'     => \$bump_minor,
+           'norun|n'     => \$norun,
+           'version|V'   => sub { VersionMessage(); }
+          ) or pod2usage(2);
+
+$bump_minor = '' if $bump_major;
+
+chomp($out = `echo Makefile.PL README* *.pm`);
+@files = split(' ', $out);
+
+# list?
+
+if ($list) {
+  unshift(@ARGV, @files) unless $#ARGV >= 0;
+  my $cmd = "egrep '\\<\\d+\\.\\d+\\>' " . join(' ', @ARGV);
+  talkf "--> %s\n", $cmd;
+  system $cmd;
+  exit;
+}
+
+# process optional version argument
+
+if ($#ARGV >= 0) {
+  if ($ARGV[0] =~ /^(\d+)\.(\d+)$/) {
+    ($major, $minor) = ($1, $2);
+    shift(@ARGV);
+    talkf "Using version: %s.%s\n", $major, $minor;
+  }
+}
+
+# if there are no file arguments, and only a version given, show the syntax
+
+$#ARGV >=0 or pod2usage(1);
+
+# process each file argument
+
+$many_files = 1 if $#ARGV > 0;
+
+foreach my $file (@ARGV) {
+  update_version($file);
+}
+
+exit;
+

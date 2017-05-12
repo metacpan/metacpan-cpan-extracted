@@ -1,0 +1,46 @@
+NAME
+
+    Dist::Zooky - converts a distribution to Dist::Zilla
+
+VERSION
+
+    version 0.22
+
+SYNOPSIS
+
+      use Dist::Zooky;
+    
+      my $dzooky = Dist::Zooky->new();
+    
+      $dzooky->examine;
+
+DESCRIPTION
+
+    Dist::Zooky is Dist::Zilla's nephew. He has the ability to summon his
+    uncle.
+
+    It will try its best to convert a distribution to use Dist::Zilla. It
+    supports ExtUtils::MakeMaker, Module::Install and Module::Build based
+    distributions, with certain limitations.
+
+    The main documentation for this is under dzooky.
+
+ METHODS
+
+    examine
+
+      This does all the heavy-lifting of determining if a distribution is
+      ExtUtils::MakeMaker, Module::Install and Module::Build based, gathers
+      meta data and generates a dist.ini.
+
+AUTHOR
+
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2017 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

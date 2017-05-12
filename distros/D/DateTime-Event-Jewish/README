@@ -1,0 +1,85 @@
+DateTime-Event-Jewish
+
+This modules does two jobs:
+1. To enable you to find the leyning
+for any Shabbat in the year. Given a Gregorian date, it returns
+the either a parshah name or a yom tov name.
+2. To calculate the time of Shabbat and other halachically
+interesting times.
+
+BUGS
+
+This module uses DateTime::Calendar::Hebrew. This module does not
+quite live up to its documentation and, at least at version
+0.04, does not even install cleanly. You need to do a little bit
+of hacking.
+
+Fixes to DateTime-Calendar-Hebrew-0.04/Hebrew.pm:
+
+1. Install the module by hand using 'force install' in the CPAN command.
+
+2. Locate Hebrew.pm in your installed library and edit it as below:
+
+sub utc_rd_values {
+        my $self = shift;
+-       return @{$self}{ qw/rd_days rd_secs rd_nanosecs/ };
++       my @res = @{$self}{ qw/rd_days rd_secs rd_nanosecs/ };
++       $res[2] ||= 0;
++       return @res;
+}
+
+-sub time_zone { 'floating' } 
++use DateTime::TimeZone::Floating qw( );
++sub time_zone { DateTime::TimeZone::Floating->new() } 
+
+Version 0.05 should be OK.
+
+87009 22/8/2013  Error in calculating VaYakhel vs VaYakhel/Pekudei
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SAMPLE CODE
+
+There is sample code, showing you how to use this module, in the
+samples/ directory.
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DateTime::Event::Jewish
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Event-Jewish
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DateTime-Event-Jewish
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DateTime-Event-Jewish
+
+    Search CPAN
+        http://search.cpan.org/dist/DateTime-Event-Jewish/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Raphael Mankin
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,52 @@
+
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Cookbook - Tutorials and Recipes
+
+=head1 DESCRIPTION
+
+This Data::Range::Compare Cookbook shows various solutions to common range manipulation problems.
+
+=head1 RECIPES
+
+=head2 Basic examples
+
+=over 4
+
+=item L<Data::Range::Compare::Cookbook::Recipe_a_to_z> - the "a to z" example
+
+This recipe is a basic tutorial on how to use the Data::Range::Compare framework to manipulate ranges using a .. z as the range example.
+
+=item L<Data::Range::Compare::Cookbook::Recipe_subclass_a_to_z> - subclassing "a to z"
+
+This recipe builds on Data::Range::Compare::Cookbook::Recipe_a_to_z and demonstrates how to subclass Data::Range::Compare in a new module and provides a demo script explaining how to use the new module.
+
+=item L<Data::Range::Compare::Cookbook::Instance_and_Constants> - Look inside the instance
+
+This recipe explains how to extend an instance of Data::Range::Compare in a module that sublclasses it.
+
+=item L<Data::Range::Compare::Cookbook::Recipe_DateTime> - DateTime Range HOWTO
+
+This recipe explains how to manipulate DateTime ranges.
+
+=back
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 COPYRIGHT
+
+Copyright 2010 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 SEE ALSO
+
+Data::Range::Compare
+
+=cut
+

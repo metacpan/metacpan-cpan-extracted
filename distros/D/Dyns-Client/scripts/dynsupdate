@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+
+use Dyns::Client;
+
+my $Ip;
+my $Interface = "eth0";
+my $Domain;
+my $Help;
+
+GetOptions(	"ip=s" => \$Ip,
+            "interface=s" => \$Interface,
+            "domain=s" => \$Domain,
+			"help" => \$Help
+            ) || pod2usage(-verbose => 1);
+
+pod2usage(-verbose => 2) if $Help;
+
+pod2usage(-verbose => 1) unless (@ARGV == 3);
+
+my($Username, $Password, $Hostname) = @ARGV;
+
+my $d = Dyns::Client->new;
+
+if (!defined $Ip) {
+    $Ip = $d->get_ip($Interface);
+}
+
+$d->update(-username => $Username,
+                -password => $Password,
+                -hostname => $Hostname,
+                (defined $Domain ? ('-domain' => $Domain) : ()),
+                (defined $Ip ? ('-ip' => $Ip) : ()),
+               );
+exit;
+
+__END__
+
+=head1 NAME
+
+dynsupdate - Update your dynamic gost name
+
+=head1 SYNOPSIS
+
+dynsupdate [-ip x.x.x.x] [-interface if] [-domain domain] username password host
+
+ Options:
+   -ip        Your IP address. If omitted we try to identify your IP address.
+   -interface Your network interface connected to the outside world.
+   -domain    The domain name you want to update.
+   -help      Documentation.
+
+=head1 DESCRIPTION
+
+B<dynsupdate> is an update tool for the http://www.dyns.cx dynamic domain name system.
+
+=head1 AUTHOR
+
+  Johan Van den Brande <johan@vandenbrande.com>
+  Slaven
+
+=cut
+ 

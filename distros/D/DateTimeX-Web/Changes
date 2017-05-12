@@ -1,0 +1,30 @@
+Revision history for DateTimeX-Web
+
+0.08 2016/09/25
+  - fixed tests to support new DateTime modules that use Specio framework (SREZIC++)
+
+0.07 2015/10/05
+  - fixed tests and code to work with upcoming DateTime::Locale (currently in
+    trial releases) (DROLSKY++)
+
+0.06 2015/03/30
+  - fixed a test to support newer DateTime::Format::Mail (SREZIC++)
+
+0.05 2012/04/20
+  - added some constructors. today, last_day_of_month, from_day_of_year and from_object. (BOKUTIN++)
+
+0.04 2008/08/17
+  - added (from|for)_http
+  - support formats without 'new'
+
+0.03 2008/07/09
+  - added (from|for)_rss20 as an alias for (from|for)_mail
+  - a bit more robust isa handling
+  - constructors get looser and accept array/hash references now
+
+0.02 2008/07/05
+  - slightly better error handling (no more misguiding isa errors)
+  - updated MANIFEST to add tests that were only in the repository
+
+0.01 2008/02/28
+  - initial release

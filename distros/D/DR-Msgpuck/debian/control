@@ -1,0 +1,16 @@
+Source: libdr-msgpuck-perl
+Section: perl
+Priority: optional
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+Build-Depends: debhelper (>= 9.20120312~),
+ perl,
+ libtest-requires-perl
+Standards-Version: 3.9.8
+Homepage: https://metacpan.org/release/DR-Msgpuck
+
+Package: libdr-msgpuck-perl
+Architecture: any
+Depends: ${misc:Depends}, ${perl:Depends}, ${shlibs:Depends}
+Description: Perl bindings for tarantool msgpuck library.
+ msgpuck is a simple and efficient msgpack binary
+ serialization library in a self-contained header file.

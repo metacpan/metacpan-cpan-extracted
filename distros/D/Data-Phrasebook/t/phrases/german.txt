@@ -1,0 +1,2 @@
+foo=diese ist Deutsche
+baz=Guten Tag

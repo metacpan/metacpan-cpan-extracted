@@ -1,0 +1,26 @@
+Revision history for Data::Money::Converter
+
+0.07   2016-03-26 MANWAR
+       - Added test scripts t/meta-json.t and t/meta-yml.t
+
+0.06   2016-03-10 MANWAR
+       - Added standard test t/pod.t and t/manifest.t scripts.
+
+0.05   2016-03-07 MANWAR
+       - Added key 'provides' to the Makefile.PL script.
+       - Upgraded to use Data::Money v0.17.
+
+0.04   2016-03-04 MANWAR
+       - Added section "SEE ALSO".
+       - Fixed typo in the pod document.
+
+0.03   2016-03-03 MANWAR
+       - Added LICENSE file.
+
+0.02   2016-03-01 MANWAR
+       - Coverted to Moo role instead of Moose.
+       - Added standard load test.
+       - Fixed RT #112529 (raised by SREZIC).
+
+0.01   2010-03-28 GPHAT
+       - First version, released on an unsuspecting world.

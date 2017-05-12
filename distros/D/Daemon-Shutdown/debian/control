@@ -1,0 +1,33 @@
+Source: daemon-shutdown
+Section: perl
+Priority: optional
+Maintainer: Ioan Rogers <ioan.rogers@gmail.com>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: libanyevent-perl,
+ libipc-run-perl,
+ liblog-log4perl-perl,
+ libparams-validate-perl,
+ libuser-perl,
+ libyaml-perl,
+ libtry-tiny-perl,
+ perl
+Standards-Version: 3.9.2
+Homepage: https://metacpan.org/dist/Daemon-Shutdown/
+
+Package: daemon-shutdown
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libanyevent-perl,
+ libipc-run-perl,
+ liblog-log4perl-perl,
+ libparams-validate-perl,
+ libuser-perl,
+ libyaml-perl,
+ libtry-tiny-perl,
+ perl
+Recommends: hdparm, samba
+Description: Service to shut down server as soon as it can (to save power).
+ It is a Linux service to shut down a server down as soon as it can, typically
+ used for a home NAS which is turned on when needed, manually or by wakeonlan
+ but should shut down automatically when no users are using it any more.
+

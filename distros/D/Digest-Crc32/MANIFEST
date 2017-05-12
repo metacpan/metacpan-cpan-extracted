@@ -1,0 +1,8 @@
+MANIFEST
+Makefile.PL
+Crc32.pm
+README
+META.yml
+t/use.t
+
+

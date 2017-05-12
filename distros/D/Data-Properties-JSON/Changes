@@ -1,0 +1,17 @@
+
+Changelog for Data::Properties::JSON
+
+2012-05-07    v0.004
+  - DEPRECATED
+
+2011-12-28    v0.003
+  - A test was still using 'JSON' and this was causing tests to fail on machines
+    without the 'JSON' module already installed.
+
+2011-12-23    v0.002
+  - Now using JSON::XS instead of just 'JSON' since if you're installing ASP4
+    then you only need JSON::XS.
+
+2011-11-05    v0.001
+  - Initial release.
+

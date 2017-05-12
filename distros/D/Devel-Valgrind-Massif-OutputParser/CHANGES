@@ -1,0 +1,53 @@
+==================================================
+Changes from 2011-04-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.004 at 2012-04-03 20:07:47 +0000
+------------------------------------------
+
+  Change: 37ccea329b3be1afbfa197ef1bd19176707ce0fb
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-04-03 16:07:47 +0000
+
+    including details in output data 
+
+  Change: 21d2cf85b8e239de6ca3bd6d4575d9688d6ee1ee
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-06 08:22:31 +0000
+
+    not sure what I might have done 
+
+  Change: 8d9599057c6c1692d0eb83a94e8c2e0367bd409e
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-06 08:01:42 +0000
+
+    making dzil be even more awesome for this dist 
+
+  Change: ac28c3d62178bdbf5db53c889dcbf080ac04e79a
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-06 07:28:06 +0000
+
+    updated POD and dist/weaver.ini 
+
+  Change: e06cccee9465bb4fac65636110018ada7aa5f91b
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-05 23:39:15 +0000
+
+    making dzil sit up adn bark 
+
+  Change: d1f20a4b8ca5e90e32db6a125431bb279ff8cd6d
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-05 21:02:53 +0000
+
+    initial working version of code (I think) 
+
+  Change: 4333ac6dfc4f4c96bade041b118748f726a3eca9
+  Author: Stephen R. Scaffidi <sscaffid@akamai.com>
+  Date : 2012-03-05 20:53:43 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

@@ -1,0 +1,60 @@
+NAME
+
+    Devel::PatchPerl::Plugin::BenchmarkVirtualError - Avoid failures on
+    Benchmark.t when building under certain virtual machines
+
+VERSION
+
+    This document describes version 0.001 of
+    Devel::PatchPerl::Plugin::BenchmarkVirtualError - released December 10,
+    2015 as part of Devel-PatchPerl-Plugin-BenchmarkVirtualError.
+
+SYNOPSIS
+
+        $ export PERL5_PATCHPERL_PLUGIN=BenchmarkVirtualError
+        $ perl-build ...
+
+DESCRIPTION
+
+    See RT #122003 <https://rt.perl.org/Public/Bug/Display.html?id=122003>
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * https://rt.perl.org/Public/Bug/Display.html?id=122003
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/devel-patchperl-plugin-benchmarkvirtualerror/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <chris.weyl@dreamhost.com>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdevel-patchperl-plugin-benchmarkvirtualerror&title=RsrchBoy's%20CPAN%20Devel-PatchPerl-Plugin-BenchmarkVirtualError&tags=%22RsrchBoy's%20Devel-PatchPerl-Plugin-BenchmarkVirtualError%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by DreamHost, Inc.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

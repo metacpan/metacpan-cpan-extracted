@@ -1,0 +1,66 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use 5.010;
+
+use Device::AVR;
+
+use Getopt::Long;
+use List::UtilsBy qw( nsort_by );
+
+GetOptions(
+   'v|verbose+' => \( my $VERBOSE = 0 ),
+) or exit 1;
+
+my $avr = Device::AVR->new_from_file( shift @ARGV )
+   or die "Can't load\n";
+
+printf "Device: %s (%s, %s)\n", $avr->name, $avr->family, $avr->architecture;
+printf "  Signature %s\n", $avr->signature;
+say "";
+
+say "Has interfaces:";
+say "  ${\$_->name} (${\$_->type})" for $avr->interfaces;
+say "";
+
+say "Memories:";
+foreach my $mem ( $avr->memories ) {
+   printf "  %-20s: (%s)\n", $mem->name, $mem->id;
+
+   next unless $VERBOSE;
+   foreach my $seg ( $mem->segments ) {
+      printf "    [0x%06x-%06x](%s%s%s) %-20s (%s)\n",
+         $seg->start, $seg->start + $seg->size - 1,
+         ( $seg->can_read  ? 'R' : '-' ),
+         ( $seg->can_write ? 'W' : '-' ),
+         ( $seg->can_exec  ? 'X' : '-' ),
+         $seg->name,
+         $seg->type;
+   }
+}
+say "";
+
+say "Peripherals:";
+foreach my $p ( $avr->peripherals ) {
+   printf "  %s (%s) in %s space\n", $p->name, $p->module->name, $p->regspace->name;
+   next unless $VERBOSE;
+
+   foreach my $reg ( $p->registers ) {
+      printf "    [%04x] %10s: %s\n", $reg->offset, $reg->name, $reg->caption;
+
+      next unless $VERBOSE > 1;
+      foreach my $field ( $reg->bitfields ) {
+         my $mask = $field->mask;
+         my $maskbits = join "", map { $mask & 1<<$_ ? "$_" : "-" } reverse 0 .. 7;
+         printf "      bits(%s) %10s: %s\n", $maskbits, $field->name, $field->caption;
+
+         next unless $VERBOSE > 2;
+
+         foreach my $value ( nsort_by { $_->value } $field->values ) {
+            printf "        0x%02x = %s\n", $value->value, $value->caption;
+         }
+      }
+   }
+   say "";
+}

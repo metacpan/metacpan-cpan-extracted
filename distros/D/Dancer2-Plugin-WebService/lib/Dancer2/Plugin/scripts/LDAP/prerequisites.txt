@@ -1,0 +1,4 @@
+At Perl install the modules
+
+	cpanm Net::LDAP
+	cpanm IO::Socket::SSL

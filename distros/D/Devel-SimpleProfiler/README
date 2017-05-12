@@ -1,0 +1,6 @@
+Found out this doesn't work well with dynamically created methods.
+The profiler sort of 'fixes' those methods and gets their sub 
+references confused.
+
+Good news though, with fork it works fine as long as a start is
+called.

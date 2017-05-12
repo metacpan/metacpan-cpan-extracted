@@ -1,0 +1,260 @@
+NAME
+    DBIx::Class::ResultSource::MultipleTableInheritance Use multiple tables
+    to define your classes
+
+NOTICE
+    This only works with PostgreSQL at the moment. It has been tested with
+    PostgreSQL 9.0, 9.1 beta, and 9.1.
+
+    There is one additional caveat: the "parent" result classes that you
+    defined with this resultsource must have one primary column and it must
+    be named "id."
+
+SYNOPSIS
+        {
+            package Cafe::Result::Coffee;
+
+            use strict;
+            use warnings;
+            use parent 'DBIx::Class::Core';
+            use aliased 'DBIx::Class::ResultSource::MultipleTableInheritance'
+                => 'MTI';
+
+            __PACKAGE__->table_class(MTI);
+            __PACKAGE__->table('coffee');
+            __PACKAGE__->add_columns(
+                "id", { data_type => "integer" },
+                "flavor", {
+                    data_type => "text",
+                    default_value => "good" },
+            );
+
+            __PACKAGE__->set_primary_key("id");
+
+            1;
+        }
+
+        {
+            package Cafe::Result::Sumatra;
+
+            use parent 'Cafe::Result::Coffee';
+
+            __PACKAGE__->table('sumatra');
+
+            __PACKAGE__->add_columns( "aroma",
+                { data_type => "text" }
+            );
+
+            1;
+        }
+
+        ...
+
+        my $schema = Cafe->connect($dsn,$user,$pass);
+
+        my $cup = $schema->resultset('Sumatra');
+
+        print STDERR Dwarn $cup->result_source->columns;
+
+            "id"
+            "flavor"
+            "aroma"
+            ..
+
+    Inherit from this package and you can make a resultset class from a
+    view, but that's more than a little bit misleading: the result is
+    transparently writable.
+
+    This is accomplished through the use of stored procedures that map
+    changes written to the view to changes to the underlying concrete
+    tables.
+
+WHY?
+    In many applications, many classes are subclasses of others. Let's say
+    you have this schema:
+
+        # Conceptual domain model
+
+        class User {
+            has id,
+            has name,
+            has password
+        }
+
+        class Investor {
+            has id,
+            has name,
+            has password,
+            has dollars
+        }
+
+    That's redundant. Hold on a sec...
+
+        class User {
+            has id,
+            has name,
+            has password
+        }
+
+        class Investor extends User {
+            has dollars
+        }
+
+    Good idea, but how to put this into code?
+
+    One far-too common and absolutely horrendous solution is to have a
+    "checkbox" in your database: a nullable "investor" column, which entails
+    a nullable "dollars" column, in the user table.
+
+        create table "user" (
+            "id" integer not null primary key autoincrement,
+            "name" text not null,
+            "password" text not null,
+            "investor" tinyint(1),
+            "dollars" integer
+        );
+
+    Let's not discuss that further.
+
+    A second, better, solution is to break out the two tables into user and
+    investor:
+
+        create table "user" (
+            "id" integer not null primary key autoincrement,
+            "name" text not null,
+            "password" text not null
+        );
+
+        create table "investor" (
+            "id" integer not null references user("id"),
+            "dollars" integer
+        );
+
+    So that investor's PK is just an FK to the user. We can clearly see the
+    class hierarchy here, in which investor is a subclass of user. In
+    DBIx::Class applications, this second strategy looks like:
+
+        my $user_rs = $schema->resultset('User');
+        my $new_user = $user_rs->create(
+            name => $args->{name},
+            password => $args->{password},
+        );
+
+        ...
+
+        my $new_investor = $schema->resultset('Investor')->create(
+            id => $new_user->id,
+            dollars => $args->{dollars},
+        );
+
+    One can cope well with the second strategy, and it seems to be the most
+    popular smart choice.
+
+HOW?
+    There is a third strategy implemented here. Make the database do more of
+    the work: hide the nasty bits so we don't have to handle them unless we
+    really want to. It'll save us some typing and it'll make for more
+    expressive code. What if we could do this:
+
+        my $new_investor = $schema->resultset('Investor')->create(
+            name => $args->{name},
+            password => $args->{password},
+            dollars => $args->{dollars},
+        );
+
+    And have it Just Work? The user...
+
+        {
+            name => $args->{name},
+            password => $args->{password},
+        }
+
+    should be created behind the scenes, and the use of either user or
+    investor in your code should require no special handling. Deleting and
+    updating $new_investor should also delete or update the user row.
+
+    It does. User and investor are both views, their concrete tables
+    abstracted away behind a set of rules and triggers. You would expect the
+    above DBIC create statement to look like this in SQL:
+
+        INSERT INTO investor ("name","password","dollars") VALUES (...);
+
+    But using MTI, it is really this:
+
+        INSERT INTO _user_table ("username","password") VALUES (...);
+        INSERT INTO _investor_table ("id","dollars") VALUES (currval('_user_table_id_seq',...) );
+
+    For deletes, the triggers fire in reverse, to preserve referential
+    integrity (foreign key constraints). For instance:
+
+       my $investor = $schema->resultset('Investor')->find({id => $args->{id}});
+       $investor->delete;
+
+    Becomes:
+
+        DELETE FROM _investor_table WHERE ("id" = ?);
+        DELETE FROM _user_table WHERE ("id" = ?);
+
+METHODS
+    new MTI find the parents, if any, of your resultset class and adds them
+        to the list of parent_sources for the table.
+
+    add_additional_parents
+        Continuing with coffee:
+
+            __PACKAGE__->result_source_instance->add_additional_parents(
+                qw/
+                    MyApp::Schema::Result::Beverage
+                    MyApp::Schema::Result::Liquid
+                /
+            );
+
+        This just lets you manually add additional parents beyond the ones
+        MTI finds.
+
+    add_additional_parent
+            __PACKAGE__->result_source_instance->add_additional_parent(
+                    MyApp::Schema::Result::Beverage
+            );
+
+        You can also add just one.
+
+    attach_additional_sources
+        MTI takes the parents' sources and relationships, creates a new
+        DBIx::Class::Table object from them, and registers this as a new,
+        raw, source in the schema, e.g.,
+
+            use MyApp::Schema;
+
+            print STDERR map { "$_\n" } MyApp::Schema->sources;
+
+            # Coffee
+            # Beverage
+            # Liquid
+            # Sumatra
+            # Raw::Sumatra
+
+        Raw::Sumatra will be used to generate the view.
+
+    view_definition
+        This takes the raw table and generates the view (and stored
+        procedures) you will use.
+
+AUTHOR
+    Matt S. Trout, <mst@shadowcatsystems.co.uk>
+
+  CONTRIBUTORS
+    Amiri Barksdale, <amiri@roosterpirates.com>
+
+COPYRIGHT
+    Copyright (c) 2011 the
+    DBIx::Class::ResultSource::MultipleTableInheritance "AUTHOR" and
+    "CONTRIBUTORS" as listed above.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    DBIx::Class DBIx::Class::ResultSource
+

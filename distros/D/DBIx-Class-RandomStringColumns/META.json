@@ -1,0 +1,81 @@
+{
+   "abstract" : "Implicit random string columns",
+   "author" : [
+      "Kan Fushihara  C<< <kan __at__ mobilefactory.jp> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-RandomStringColumns",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36",
+            "Perl::Critic" : "1.118",
+            "Test::Perl::Critic" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.08009",
+            "Filter::Util::Call" : "0",
+            "String::Random" : "0.2"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::RandomStringColumns" : {
+         "file" : "lib/DBIx/Class/RandomStringColumns.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kan/p5-dbic-random-string-columns/issues"
+      },
+      "homepage" : "https://github.com/kan/p5-dbic-random-string-columns",
+      "repository" : {
+         "url" : "git://github.com/kan/p5-dbic-random-string-columns.git",
+         "web" : "https://github.com/kan/p5-dbic-random-string-columns"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "kan <kan@d0d07461-0603-4401-acd4-de1884942a52>",
+      "tomi-ru <tomi-ru@d0d07461-0603-4401-acd4-de1884942a52>",
+      "Kan Fushihara <kan.fushihara@gmail.com>"
+   ]
+}

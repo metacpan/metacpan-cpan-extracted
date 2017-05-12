@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Devel-Events-Objects
+version:             0.05
+abstract:            ~
+license:             ~
+author:              ~
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Devel::Events:                 0.03
+    Task::Weaken:                  0
+    Test::use::ok:                 0
+    Tie::RefHash::Weak:            0.07
+    Variable::Magic:               0.04
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

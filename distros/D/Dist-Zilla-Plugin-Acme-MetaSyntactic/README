@@ -1,0 +1,19 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Acme::MetaSyntactic]
+
+DESCRIPTION
+
+    This plugin can be used when building Acme-MetaSyntactic-* theme
+    distribution. It currently does the following:
+
+      * Add a test script xt/release/meta.t (which will become
+      t/release-meta.t) unless t/meta.t or t/meta.t already exists
+
+      The test script is something like:
+
+       use Test::MetaSyntactic;
+       all_themes_ok();
+

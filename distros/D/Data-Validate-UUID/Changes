@@ -1,0 +1,6 @@
+0.1.1     2015-01-06 18:05:35-06:00 America/Chicago
+    - Added acknowldgement for the source of the Regular
+      Expression used.
+
+0.1.0     2015-01-06 17:48:32-06:00 America/Chicago
+    - Initial implementation, includes is_uuid

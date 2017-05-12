@@ -1,0 +1,17 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/download-binary.pl
+eg/download-source.pl
+lib/Debian/Snapshot.pm
+lib/Debian/Snapshot/Binary.pm
+lib/Debian/Snapshot/File.pm
+lib/Debian/Snapshot/Package.pm
+t/100_snapshot.t
+t/200_package.t
+t/300_binary.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

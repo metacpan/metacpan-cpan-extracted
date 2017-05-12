@@ -1,0 +1,75 @@
+Revision history for Data-SearchEngine-Solr
+
+0.20 Dec 3 2011
+  * Add die for find_by_id
+
+0.19 Oct 22 2011
+  * Dist::Zilla
+  * Bump dependency on Data::SearchEngine
+  * Honor debug attribute of Query
+  * Populate raw attribute of Result
+
+0.18
+  * Add Clone as a dependency so we can…
+  * Fix case where setting a query's page to !1, searching, then setting
+    the page to 1 would do nothing.  Do this by cloning the options hashref.
+
+0.17
+  * Optimize is no longer called as a part of each add.
+  * optimize added as a separate method
+
+0.16
+  * Add remove_by_id
+
+0.15
+  * Manifest fixes
+
+0.14
+  * POD fixes
+
+0.13
+  * Change search to return array of values instead of last value from array,
+    and a test to prove it works (Craig Hall)
+  * Bump WebService::Solr dep to 0.11
+
+0.12
+  * Undo last change
+
+0.11
+  * Use WebService::Solr get_values instead of get_value so that
+    multiple values work (Craig Hall)
+
+0.10
+  * POD fix (Craig Hall)
+
+0.09
+  * Remove some accidental debugging.
+
+0.08
+  * Document Spellcheck role and add support for spelled_correctly.
+
+0.07
+  * Add Modifiable role and implement methods that Solr can be updated!
+
+0.06
+  * Spellchecking support
+
+0.05    November 30th, 2009
+  * Fix paginator requirements
+  * Fix missing include
+  * Bump Data::SearchEngine dep
+
+0.04    November 25th, 2009
+  * Use Data::SearchEngine::Results::Faceted
+
+0.03    November 24th, 2009
+  * Honor Query's order attribute.
+  * Pagination now works (Query page & rows)
+  * Bump deps
+
+0.02    November 23rd, 2009
+  * Correct missing dependency on Data::SearchEngine (duh, Thanks Andreas Keonig)
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,100 @@
+Revision history for DBIx-DBO
+
+0.40	Jan 14, 2014
+	- Added new subquery capabilities.
+	- Implemented ROWNUM pagging for Oracle. (Victor)
+	- Bug fixes.
+
+0.35	Oct 22, 2013
+	- Minor bug fixes.
+
+0.34	Mar 5, 2013
+	- Add the Query->update method.
+	- Add OnRowUpdate config option, and ability to reload Row on update.
+
+0.33	Jan 7, 2013
+	- Add the HookSQL config.
+	- Accept complex expressions for columns in Table methods.
+
+0.32	Nov 26, 2012
+	- Improve MySQL schema logic.
+	- Better diag messages during testing.
+	- Storable freeze/thaw bug fixes.
+
+0.31	Nov 19, 2012
+	- Fix detaching of Rows with Storable v2.38 only.
+	- Better testing output.
+
+0.30	Nov 6, 2012
+	- Fixed AutoReconnect issues.
+	- Fixed the having() and unhaving() methods.
+	- Better test coverage, with a few other bug fixes.
+
+0.20	Jun 28, 2012
+	- New DBD enigine, replaces Common (faster & simpler).
+	- Add support for Storable.
+	- Removed "RowClass" option.
+
+0.14	Feb 27, 2012
+	- Fixes to POD, minor bug fixes.
+
+0.13	Dec 13, 2011
+	- Added the Table bulk_insert() method.
+	- Remove duplicate columns in insert().
+	- Replace "!=" for the valid SQL op "<>".
+
+0.12	Jun 23, 2011
+	- Added the *->columns() methods.
+	- Lots of performance improvements.
+	- Renamed StoreRows to CacheQuery.
+	- Fixes to POD, table name unquoting and install_driver errors.
+
+0.11	Apr 12, 2011
+	- Improved/simplified inheritance and subclassing, and updated POD.
+	- Replaced the RowClass config option with the _row_class method.
+	- Added the _query_class and _table_class methods.
+
+0.10	Jan 27, 2011
+	- Added the table truncate() method.
+	- A Query can now store it's data for re-use (StoreRows config option).
+
+0.09	Dec 30, 2010
+	- More alias improvements and tests.
+	- Added the AutoReconnect config option.
+
+0.08	Nov 2, 2010
+	- Improve checking for aliases.
+	- Fix broken Query column bindings when its Row is modified.
+	- Added the DBIx::DBO::Table->last_insert_id method.
+
+0.07	Oct 18, 2010
+	- Improved POD for subclassing.
+	- Minor bugfix when creating a new table.
+	- Obscure the ConnectArgs and ConnectReadOnlyArgs in the DBO.
+
+0.06	Aug 23, 2010
+	- Included missing Oracle files in MANIFEST.
+	- Added DISTINCT queries.
+	- Added COLLATE option.
+
+0.05	May 27, 2010
+	- Added support for Oracle.
+	- Improved Query clause removal methods.
+	- Added a HAVING clause.
+	- Improved inheritance for subclasses under 5.8.x.
+	- Added the DBIx::DBO->new method.
+
+0.04	Mar 7, 2010
+	- Improved POD docs, tests and compatibility with other platforms.
+	- Added the DBIx::DBO::Query->open_bracket method.
+	- Added the UseHandle config option.
+
+0.03	Feb 12, 2010
+	- Make it compatible with perl 5.8.x.
+
+0.02	Feb 8, 2010
+	- First public release version.
+
+0.01	Feb 1, 2010
+	- First public (development) version.
+

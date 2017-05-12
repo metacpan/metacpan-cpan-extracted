@@ -1,0 +1,35 @@
+#!perl -w
+use strict;
+use Dist::Maker;
+Dist::Maker->run(@ARGV);
+__END__
+
+=head1 NAME
+
+dim - Distribution Maker
+
+=head1 SYNOPSIS
+
+    # set your name and email address first
+    dim config user.name 'foo bar'
+    dim config user.email 'foo at example.com'
+    # or import user info from $HOME/.gitconfig
+    dim config --import-from-gitconfig
+
+    # then make distributions
+    dim init Foo::Bar             # creates a distribution
+    dim init Foo::Bar Default     # ditto
+    dim init Foo::Bar::XS XS      # using D::M::Template::XS
+    dim --verbose=4 init Foo::Bar # with verbosity
+    dim init --force Foo::Bar     # do `rm -rf Foo-Bar` before init
+    dim init --dry-run Foo::Bar   # don't actially init the dist
+
+    # cd and do something important
+    cd Foo-Bar/
+
+    # add new files
+    dim new Baz.pm               # creates lib/Foo/Bar/Baz.pm
+    dim new t/001-basic.t        # creates a test file
+    dim new xs/Foo-Bar-Baz.xs XS # creates a file with D::M::Template::XS
+
+=cut

@@ -1,0 +1,39 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-PodnameFromClassname
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - namespace::autoclean
+      - Dist::Zilla::Role::FileMunger: 5.000
+      - Dist::Zilla::Role::FileFinderUser: 5.000
+  test:
+    requires:
+     - Path::Tiny
+     - Test::DZil: 5.000
+     - Test::Differences: 0.50
+
+plugins:
+  - +config: Author::CSSON
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+config: Author::CSSON
+always:
+ - /Dist-Zilla-Plugin-PodnameFromClassname-*

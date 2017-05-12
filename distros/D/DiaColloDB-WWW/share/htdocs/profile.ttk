@@ -1,0 +1,138 @@
+[% FILTER null %]
+[%#------------------------------------------------------------
+  # globals
+ %]
+[% IF !dc_common_loaded ; PROCESS "dc-common.ttk" ; END %]
+[% PROCESS opendb %]
+[% END ##--/filter null %]
+[% RAWPERL %]
+#------------------------------------------------------------
+# db profile
+
+  ##-- get profile
+  my $dbcli = $stash->get('dbcli');
+  my $qrel  = $stash->get('qprofile');
+
+  ##-- sanity check(s)
+  die("term-document index required for profile type '$qrel' unavailable for this collection") 
+    if ($qrel =~ /tdf/ && !$stash->get('tdf_enabled'));
+
+  ##-- bash options
+  my $onepass = $stash->get('qonepass');
+  #my $onepass = 1;
+
+  my ($mp);
+  if ($qrel =~ s/^(?:d(?!dc)(?:iff)?|co?mp(?:are)?)[:\-\/_\.\:]//) {
+    $mp = $dbcli->compare($qrel,
+			  ##
+			  aquery=>$stash->get('qquery'),
+			  adate=>$stash->get('qdate'),
+			  aslice=>$stash->get('qslice'),
+			  ##
+			  bquery=>$stash->get('qbquery'),
+			  bdate=>$stash->get('qbdate'),
+			  bslice=>$stash->get('qbslice'),
+			  ##
+			  groupby=>$stash->get('qgroupby'),
+			  score=>$stash->get('qscore'),
+			  kbest=>$stash->get('qkbest') // 10,
+			  cutoff=>$stash->get('qcutoff'),
+			  diff=>$stash->get('qdiff'),
+			  global=>$stash->get('qglobal'),
+			  onepass=>$onepass,
+			  eps=>$stash->get('qeps'),
+			 );
+  }
+  elsif ($qrel =~ s{^ext(?:end)?[\-\/\.\:]?}{}) {
+    $mp = $dbcli->extend($qrel,
+			 query=>$stash->get('qquery'),
+			 date=>$stash->get('qdate'),
+			 slice=>$stash->get('qslice'),
+			 groupby=>$stash->get('qgroupby'),
+			 slice2keys=>$stash->get('qslice2keys'),
+			 onepass=>$onepass,
+			 eps=>$stash->get('qeps'),
+			);
+  }
+  else {
+    $mp = $dbcli->profile($qrel,
+			  query=>$stash->get('qquery'),
+			  date=>$stash->get('qdate'),
+			  slice=>$stash->get('qslice'),
+			  groupby=>$stash->get('qgroupby'),
+			  score=>$stash->get('qscore'),
+			  kbest=>$stash->get('qkbest') // 10,
+			  cutoff=>$stash->get('qcutoff'),
+			  global=>$stash->get('qglobal'),
+			  onepass=>$onepass,
+			  eps=>$stash->get('qeps'),
+			 );
+  }
+  die("$0: failed to retrieve profile: ", $dbcli->{error}//$@) if (!$mp);
+  $dbcli->close();
+
+  ##-- dump profile
+  my $cdb = $stash->get('cdb');
+  my $dbg = $stash->get('qdebug');
+  my $fmt = $stash->get('qformat') || 'text';
+  my $outbuf = '';
+  open(my $outfh, ">>:raw", \$outbuf);
+  if ($fmt =~ m/^(?:te?xt|[ct]sv)$/i) {
+    ##-- dump: text
+    $cdb->cgi('charset','utf8');
+    print $outfh $cdb->cgi('header',
+			   '-type'=>'text/plain',
+			   #($dbg ? qw() : ('-Content-Disposition'=>"inline; filename=\"profile.txt\"")),
+			  );
+    $mp->saveTextFile($outfh);
+  }
+  elsif ($fmt =~ m/^(?:json|bubble|cloud|gmotion|hichart)/i) {
+    ##-- dump: json
+    $cdb->cgi('charset','utf8');
+    #binmode($outfh,':raw');
+    print $outfh $cdb->cgi('header',
+			   '-type'=>($dbg ? 'text/plain' : 'application/json'),
+			   #($dbg ? qw() : ('-Content-Disposition'=>"inline; filename=\"profile.json\"")),
+			  );
+    print $outfh DiaColloDB::Utils::saveJsonString($mp, pretty=>$dbg, canonical=>$dbg);
+  }
+  elsif ($fmt =~ m/^(?:sto)/i) {
+    ##-- dump: storable
+    use Storable;
+    $cdb->{charset} = undef;
+    $cdb->cgi('charset','');
+    #binmode($outfh,':raw');
+    print $outfh $cdb->cgi('header',
+			   '-type'=>($dbg ? 'text/plain' : 'application/perl-storable'),
+			   #($dbg ? qw() :
+			   ('-Content-Disposition'=>"inline; filename=\"profile.sto\";")
+			   #),
+			  );
+    Storable::nstore_fd($mp, $outfh);
+  }
+  elsif ($fmt =~ m/^(?:html)/i) {
+    ##-- dump: html
+    $cdb->cgi('charset','utf8');
+    print $outfh $cdb->cgi('header', '-type'=>($dbg ? 'text/plain' : 'text/html'));
+    $mp->saveHtmlFile($outfh, verbose=>$stash->get('qdebug'));
+  }
+  else {
+    die "$0: unknown output format '$fmt'";
+  }
+
+  ##-- detect and recode utf8 (ugly)
+  my $fh_utf8 = (grep {$_ eq 'utf8'} PerlIO::get_layers($outfh)) ? 1 : 0;
+  #print STDERR "outfh.utf8 = $fh_utf8\n";
+  #print STDERR "outbuf.utf8 = ", (utf8::is_utf8($outbuf) || 0), "\n";
+  #print STDERR "output.utf8 = ", (utf8::is_utf8($output) || 0), "\n";
+  close($outfh);
+  utf8::encode($outbuf) if ($fh_utf8 && utf8::is_utf8($outbuf));
+  $output .= $outbuf;	 ##-- append to Template Toolkit output buffer
+
+[% END ##--/RAWPERL %]
+[%#--
+ ;; Local Variables:
+ ;; mode: CPerl
+ ;; coding: utf-8
+ ;; End:
+%]

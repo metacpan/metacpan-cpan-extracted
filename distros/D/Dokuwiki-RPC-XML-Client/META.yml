@@ -1,0 +1,27 @@
+---
+abstract: 'Dokuwiki::RPC::XML::Client - A RPC::XML::Client for dokuwiki (https://www.dokuwiki.org)'
+author:
+  - 'Marc Chantreux <khatar@phear.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dokuwiki-RPC-XML-Client
+requires:
+  Modern::Perl: 0
+  Net::Netrc: 0
+  RPC::XML::Client: 0
+  YAML: 0
+  parent: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/eiro/p5-dokuwiki-rpc-xml-client
+  repository: https://github.com/eiro/p5-dokuwiki-rpc-xml-client.git
+version: 0.2

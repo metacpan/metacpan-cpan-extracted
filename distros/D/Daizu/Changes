@@ -1,0 +1,244 @@
+0.3     2006-11-26      r656
+
+ * Allow Perl modules to be loaded from the '_lib' directory in the
+   content repository.  r557
+
+ * Publishing feature to bring live sites up to date:
+    - Do publishing work automatically, and change the 'daizu' commands
+      for publishing in different ways to be easier to understand.  r612
+    - Methods in generators to figure out what additional publishing
+      work to do.  r575, r587, r588, r589, r591, r597, r599, r600, r618
+    - Track changes to URLs.  r596, r638
+    - Track changes to content.  r597, r598, r600, r613
+    - Output files are atomically moved into place, and old ones are only
+      overwritten if the content has changed, to preserve modification
+      times.  r614, r615
+    - Output files now have the execute permission if the file in the
+      content repository is marked as executable.  r593
+
+ * Allow connection to remote content repository with 'svn:' URL.
+   r626, r630, r639, r643
+
+ * Plugin changes:
+    - Daizu::Plugin::PictureArticle correctly encodes 'alt'.  r620
+    - PictureArticle output is prettier and more accessible.  r606
+    - Articles are reloaded if any properties change, because plugins
+      might depend on their values.  r622
+    - Daizu::Plugin::HeaderAnchor, various small bug fixes.  r635
+
+ * New plugins:
+    - Article filter plugins can now add information as well as modifying
+      the content.  r577, r640
+    - Daizu::Plugin::DisplayPicture.  r577, r620, r628, r646
+    - Daizu::Plugin::ImageMetadata.  r631, r636
+    - Daizu::Plugin::RelatedLinks.  r640
+
+ * Blog generator:
+    - Refactoring to make it easier to subclass.  r569
+    - Correctly ignore blog articles hidden in '_hide' directories.  r562
+    - Number of articles shown on the homepage is configurable.  r590
+
+ * Correct use of 'xml:base' in blog feeds.  This fixes relative links and
+   images in blog articles, at least for Bloglines and Google Reader.  See
+   http://www.daizucms.org/blog/2006/10/xml-base/ for details.  r605, r624
+
+ * Google sitemaps:
+    - Use the new XML namespace.  r629
+    - Rename URL method and configuration element to 'xml_sitemap'
+      and 'xml-sitemap' respectively, since they are no longer
+      specific to Google.  r650
+
+ * Do simple SSI processing when previewing output, in case your templates
+   use SSIs to implement part of the site design.  r560
+
+ * Article loading:
+    - Preserve comments in loaded article content.  r567
+    - Don't save unnecessary XML and DOCTYPE declarations.  r633
+
+ * Fix a bug which caused a database constraint breakage sometimes when
+   an active URL changes from one file to another.  Preserve redirects
+   where the target URL is 'gone' in case it comes back.  r581, r596
+
+ * Bug fix for 'url-content' command.  r558
+
+ * Fix UTF-8 encoding bug in preview script.  r568
+
+ * Work around bug in Encode module in Perl 5.8.4.  r627
+
+ * Make the 'update-all-articles' command work if no working copy ID
+   is specified.  r632
+
+ * Avoid unnecessary dependencies on other CPAN modules:
+    - Data::Validate::URI is no longer required (but the same checks are
+      done internally now).  r571
+    - IO::Scalar wasn't being used anyway.  r585
+
+ * Don't unnecessarily use a temporary file when parsing XHTML.  r564
+
+ * Rewrite maps:
+    - Fix bug affecting content of the map files.  r579
+    - Factor out the code for generating them.  r583
+    - Make it an error to use the same map filename more than once.  r595
+
+ * Template and style changes:
+    - Fix layout problem in IE 6.  r578
+    - Navigation menu is more flexible about which of 'title' and
+      'short title' are available.  r561
+    - Show a link to the homepage of a blog in its navigation menu.  r563
+    - The links in the <head> of blog pages are now generated using the
+      standard 'head/meta.tt' template, and they are passed to it in a
+      more flexible format.  Blog pages which aren't articles no longer
+      have bad previous or next links in.  r566
+    - New (by default empty) template for adding extra HTML at the end
+      of the file, like Google Analytics code.  r594
+    - Include description and tags ('keywords') metadata in <meta>
+      elements in the output.  r602, r611
+    - Only one set of next/previous links need to be provided on blog
+      articles.  r607
+    - Data tables in articles are centered, and table captions are styled
+      better.  r608
+
+ * Upgrade and downgrade scripts:
+    - All now stored under the 'upgrade' directory.  r603, r609
+    - The new upgrade script removes some unnecessary tables, and fixes
+      an index.  r604, r619
+ 
+
+   http://www.daizucms.org/blog/2006/11/release-0.3/
+
+
+0.2     2006-10-03      r554
+
+ * Test suite:
+    - Use a configuration file to find out how to access the 'template1'
+      and test databases, so that the tests can be run even if your
+      PostgreSQL setup requires a username and password.  r532, r539
+    - the broken tests in 't/40template.t' which shipped with Daizu 0.1
+      are now fixed.  r529
+
+ * The generator class to use for each file is now tracked (not just
+   for the ones which actually have a 'daizu:generator' property).
+   The 'root file' is also tracked in a new database column
+   'root_file_id', except that root files themselves (the ones with
+   the property one) have it as null.  This makes some publishing code
+   simpler and allows the blog pages to restrict lists of articles to
+   blog articles, which means you can now publish non-blog articles
+   'inside' a blog article, like the documentation for the upgrade and
+   downgrade scripts is for the release notes for this release on the
+   Daizu blog.  r544, r545
+
+ * Article loading:
+    - Articles are loaded (using an article loader plugin) whenever they
+      are updated in the database working copies, and the results are
+      stored in the database.  This makes publishing much faster, and a
+      lot of code simpler, because for example the true article title
+      (which may be supplied by the plugin if the user hasn't supplied
+      one) is available in the 'wc_file' table.  r503
+    - A permalink URL for articles ('article_pages_url') is stored when
+      an article is loaded, so that it can be used by index pages or
+      whatever to link to the article's first page.  r518
+    - The XHTML article loading has been separated out into a plugin.  This
+      means you can now provide an alternative plugin for 'text/html' files
+      if you don't like my one, but you have to load at least one article
+      loader plugin in the config file.  r502
+    - The content from an article loader now has XInclude processing done,
+      not just for XHTML content.  Other loader plugins could make use of
+      that if they want to provide a file inclusion feature.  XInclude is
+      now restricted to 'daizu:' URLs, since there may be security issues
+      with other URL schemes.  r505
+    - Various pieces of code which previously got article metadata and
+      permalink URLs from a Daizu::File object now get it directly from
+      the 'wc_file' table when that would save a query.  r513, r518
+
+ * Output files are closed properly to check for last-minute errors.  r496
+
+ * Several things are now done inside a database transaction where they
+   weren't before, using the new 'transactionally' utility function.  r508
+
+ * HTML anchors (<a> elements without 'href' attributes) are removed from
+   content before it is added to feeds because they can screw up the
+   display in Bloglines.  Any 'name' and 'id' attributes on other elements
+   are also removed to avoid namespace pollution.  r509
+
+ * Daizu::File:
+    - Subversion properties are now consistently treated as text by the
+      Daizu API.  The 'wc_property' table still stores the proper values
+      (modulo the bug in the Subversion Perl API which screws up binary
+      values), but the property retrieving methods in Daizu::File all do
+      whitespace trimming and UTF-8 decoding.  r526
+    - The 'title' and 'short_title' methods no longer inherit values from
+      parent directories, and the full title isn't used as a fall back for
+      the short title.  This is to be consistent with bits of code which
+      get these values directly from the 'wc_file' table.  r526
+    - The 'tags' method now returns a reference to an array instead of a
+      list, to make it usable from TT.  r521, r525
+
+ * Revision loading doesn't fail when a file is updated on a branch
+   which doesn't also exist on the trunk.  r497
+
+ * Working copy updates don't break the database when a file in a
+   non-live working copy has its content changed.  r498
+
+ * The 'update_all_file_urls' function now deals with the URLs for files
+   which no longer exist in the working copy, marking them as 'gone'.  r550
+
+ * 'daizu:flags' property:
+    - The 'daizu:status' property has been renamed to 'daizu:flags', and
+      a new flag 'no-index' can be used to prevent a file from appearing
+      in Google sitemaps.  r527
+    - Implement the 'retired' flag by showing a message warning at the top
+      of the article page warning that it is out of date, and use a new
+      property 'daizu:reason-retired' to allow a different message to be
+      displayed instead of the default one.  r524
+
+ * HeaderAnchor plugin wasn't correctly removing all bad characters from
+   titles before using IDs.  It now also allows dots to remain.  r523
+
+ * PodArticle plugin now uses <h3> instead of <h2> for top-level headings,
+   because the default templates use <h2> for the article title.  r541
+
+ * Daizu::Gen:
+    - Fixed temp file leak for thumbnails from PictureArticle plugin.  r500
+    - Google sitemaps now only contain URLs from the correct working copy,
+      and only ones with MIME types which Google will want.  r515
+    - Navigation menu now shows only articles, which reduces the chance
+      of random things popping up in it.  Unfortunately this means blog
+      homepages are no longer included, so I've also added a new property
+      'daizu:nav-menu' to override the default navigation menu.  r518, r528
+
+ * Daizu::Gen::Blog:
+    - Fix navigation menu to not include too many months, as was originally
+      intended, and sort the months in ascending order.  r499
+
+ * Previewing no longer tries to do UTF-8 decoding and encoding, so it
+   should work with content in ISO-8859-* and some other encodings.  r516
+
+ * Optimize 'db_select_col' by using 'selectcol_arrayref' rather than
+   looping through all the results from the query myself.  r546, r547
+
+ * Changes in terminology:
+    - 'wc_file.base_url' is now 'wc_file.custom_url', because 'base_url' is
+      used to mean other things in other contexts.  r548
+    - Plugins which load articles are now 'article loader plugins' rather
+      than 'article parser plugins', because there might not be any actual
+      parsing involved.  The ones supplied now all register a method called
+      'load_article' for consistency.  The Daizu method for registering
+      them has been renamed from 'add_article_parser' to
+      'add_article_loader'.  r549
+
+ * The default stylesheet now has additional styling, and some class names
+   have been changed.  r510, r514, r538, r551
+
+ * Templates:
+    - The navigation menu's heading is now <h4> instead of <h2>.  r517
+    - The HTML doctype declaration is in a separate template.  r520
+
+   http://www.daizucms.org/blog/2006/10/release-0.2/
+
+
+0.1     2006-09-22      r491
+
+ * Initial release.  This is experimental code, and not suitable for
+   production use yet.
+
+   http://www.daizucms.org/blog/2006/09/release-0.1/

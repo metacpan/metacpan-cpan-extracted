@@ -1,0 +1,14 @@
+---
+abstract: 'Date::EzDate - Date and time manipulation made easy'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Date-EzDate
+provides:
+    Date::EzDate:
+        file: lib/Date/EzDate.pm
+        version: 1.16
+requires:
+    perl: 5.003
+version: 1.16

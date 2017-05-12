@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 612b85cd314887eeaccd6f843cd4f0ecbd7c880f Build.PL
+SHA1 f8174b050791231c15448f49c515234d9eea8dee Changes
+SHA1 39ffddf5f225f81aea4beecf7824084599aef5d7 LICENSE
+SHA1 59295c1e7a3d10d1d6828878a8294dfa9da086d5 MANIFEST
+SHA1 067401a9bf14fbae8355eb159c9446dae1bd967e META.yml
+SHA1 8786324b3c9f84e0996adcd41332e7c44e536202 README
+SHA1 797c40737fea256080c2072f7021ae794c7fe7f1 cpanfile
+SHA1 7102212019516caeb4cda4d80dd5352759617539 lib/Dist/Zilla/Plugin/GitHub/UploadRelease.pm
+SHA1 1aa22866215fb8bb0211939910115fb62be8c96b perlcritic.rc
+SHA1 fa45d6e6ab1cd421349dea4ef527bfd5cdc8a09e t/author-critic.t
+SHA1 d361ce075754a8cc9307cfdd64e2729986714579 t/author-pod-coverage.t
+SHA1 d2eebabfd34d330bd59043a4b6879faf4de7229d t/author-pod-syntax.t
+SHA1 c019f763f1afade90b7f6f24628af4d8fde358fa t/release-cpan-changes.t
+SHA1 d8a904a35375aca0e02c9150fb1945c53bdeb7e0 t/release-kwalitee.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQIcBAEBAgAGBQJXJhukAAoJEJVzeMw4kNooOZUQAKP3ZSemE7CLPAoo0Rfezv0s
+ioyT3zaDWQjgxlbsm+2c3Ttd85OpcrjYtmwYFYG91wV5mtUGDM8c1kGQgZukvKwq
+YhN/h0g4F4up0aJoo4+ko62HonDQFFrrsWTb1zsEWrruxYEIusON9n2wHt0gW/oM
+GSmJh88ebXAHvUg2BK2Jn9NUvADAoddCAHNoFKk16aJQ3gvqvP6rVamtQcfIL9yq
+6QdZR98WfcVGOm/Rh7G9nIhcKT24AADnGt1Ec7FQ8+fWSrYrYyxNEIrB/ppWt40t
+goHXQKgPMUyqsdc6nXbb6n6EUhHhW00FMicJv1ZrerBvcbOkYnFg2DuNUfb8xkpH
+ztuBxjHBuQA7gMWnVC3kWvt/ccJ11KnUc8KdYu8wopbkoNXy8F8dC0k/pbUuZfty
+JcRhSCLth2aQvTQ2afX57ktZrGSHpu+J9nhgnI8FJJsujYCiBkI0hvFWVfFMuat8
+DAbZepvYeF79hs+Mh8d8sWKJiZ1dCAFfnDWIQc/5pvdWPRlyGoRy6rkvWmROALlS
+atIDWfvcev8HjdMWp6R5MgQoH6awpcH/iaS4iHZeCvg8g1o3lROrOGrORU2L2F2P
+id/+tEtblA1UmqhqAIkGXap/4Mpf8Ft3qj6FC3nJ+CQoSqxIHExcxdU8rptTmoPk
+K3KuA4Rra6MXX3yju+HP
+=8y8U
+-----END PGP SIGNATURE-----

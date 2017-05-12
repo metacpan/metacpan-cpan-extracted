@@ -1,0 +1,789 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Plugin::Parser
+
+=head1 DESCRIPTION
+
+This module contains factory functions to generate I<tubes> that ease
+parsing of input records.
+
+Each of the generated tubes has the following contract:
+
+=over
+
+=item *
+
+the input record MUST be a hash reference;
+
+=item *
+
+one field in the hash (according to factory argument C<input>, set to
+C<raw> by default) points to the input text that has to be parsed;
+
+=item *
+
+one field in the hash (according to factory argument C<output>, set to
+C<structured> by default) is set to the output of the parsing operation.
+
+=back
+
+The factory functions below have two names, one starting with C<parse_>
+and the other without this prefix. They are perfectly equivalent to each
+other, whereas the short version can be handier e.g. when using C<tube>
+or C<pipeline> from L<Data::Tubes>.
+
+=head1 FUNCTIONS
+
+=head2 B<< by_format >>
+
+   my $tube = by_format($format, %args); # OR
+   my $tube = by_format(%args); # OR
+   my $tube = by_format(\%args);
+
+parse the input text according to a template format string (passed via
+factory argument C<format> or through first unnamed parameter
+C<$format>). This string is supposed to be composed of word and non-word
+sequences, where each word sequence is assumed to be the name of a
+field, and each non-word sequence is a separator. Example:
+
+   $format = 'foo;bar;baz';
+
+is interpreted as follows:
+
+   @field_names = ('foo', 'bar', 'baz');
+   @separators  = (';', ';');
+
+Example:
+
+   $format = 'foo;bar~~~baz';
+
+is interpreted as follows:
+
+   @field_names = ('foo', 'bar', 'baz');
+   @separators  = (';', '~~~');
+
+In the first case, i.e. when all separators are equal to each other,
+L</by_split> will be called, as it is (arguably) slightly more
+efficient. Otherwise, L</by_separators> will be called. Whatever
+these two factories return will be returned back.
+
+All C<@field_names> MUST be different from one another.
+
+The following arguments are supported:
+
+=over
+
+=item C<allow_missing>
+
+set to the number of missing trailing elements that you are fine to
+lose, in case the format is only compound of a single separator and
+L</by_split> is used behind the scenes. This allows you setting an
+optional I<catchall> trailing parameter to collect whatever you are not
+really interested into, also allowing for its absence.
+
+As an example, consider the following input lines:
+
+   FOO0,BAR0,BAZ0,WHATEVER
+   FOO1,BAR1,BAZ1
+   FOO2,BAR2,BAZ2,WHAT2,EVER2,
+
+Assuming that you're really interested into the first three parameter,
+disregarding whatever comes after, you can set the following format:
+
+   foo,bar,baz,rest
+
+and also set C<allow_missing> to 1, indicating that you can sustain the
+lack of C<rest> (which you really don't care about);
+
+=item C<format>
+
+the format to use for splitting the inputs. This parameter is the
+I<main> one, so it can also be passed as the first, unnamed parameter
+(see third calling convention);
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=item C<trim>
+
+remove leading and trailing whitespaces from the extracted values;
+
+=item C<value>
+
+set how you are going to accept input values, e.g. escaped or quoted.
+See L</by_separators> for details.
+
+=back
+
+
+=head2 B<< by_regex >>
+
+   my $tube = by_regex($regex, %args); # OR
+   my $tube = by_regex(%args); # OR
+   my $tube = by_regex(\%args);
+
+parse the input text based on a regular expression, passed as argument
+C<regex> or C<$regex> as unnamed first parameter. The regular expression
+is supposed to have named captures, that will eventually be used to
+populate the rendered output.
+
+The following arguments are supported:
+
+=over
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=item C<regex>
+
+the regular expression to use for splitting the inputs. This is the
+I<main> argument, and can be passed also as the first unnamed one in the
+argument list.
+
+=back
+
+=head2 B<< by_separators >>
+
+   my $tube = by_separators($separators, %args); # OR
+   my $tube = by_separators(%args); # OR
+   my $tube = by_separators(\%args);
+
+parse the input according to a series of separators, that will be
+applied in sequence. For example, if the list of separators is the
+following:
+
+   @separators = (';', '~~');
+
+the following input:
+
+   $text = 'foo;bar~~/baz/';
+
+will be split as:
+
+   @split = ('foo', 'bar', '/baz/');
+
+The following arguments are supported:
+
+=over
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<keys>
+
+a reference to an array containing the list of keys to be associated to
+the values from the split;
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=item C<separators>
+
+a reference to an array containing the list of separators to be used for
+splitting the input. This parameter can also be passed as the first,
+unnamed argument.
+
+Each separator can be:
+
+=over
+
+=item *
+
+a I<sub reference>, that is invoked once with a reference to the arguments,
+and must return either of the following forms;
+
+=item *
+
+a I<regular expression reference>, that will be used as-is at the right
+place;
+
+=item *
+
+a I<plain string>, that will be matched verbatim (through a regular
+expression matching the string after passing it through
+C<CORE::quotemeta>);
+
+=back
+
+=item C<trim>
+
+remove leading and trailing whitespaces from the extracted values.
+Example:
+
+   @seps  = qw< : ; , >;
+   $input = ' what : ever    ;you,do  ';
+   @elements = ('what', 'ever', 'you', 'do');
+
+=item C<value>
+
+this is how you provide a description of what you consider a
+I<valid value>. It can be multiple things:
+
+=over
+
+=item *
+
+a I<sub reference>, that is called and MUST provide back one of the
+following alternatives;
+
+=item *
+
+a I<regular expression reference>, that is used directly;
+
+=item *
+
+a I<plain string>, that is turned into an array reference by creating an
+anonymous array with the string as its only element, then processed as
+in the following bullet;
+
+=item *
+
+an I<array reference> with elements inside, that will be described in
+the following list.
+
+=back
+
+If you end up with an I<array reference>, each element will be put in a
+big regular expression that is the C<OR> of all elements. Each can be:
+
+=over
+
+=item *
+
+a I<regular expression reference>, that is fit as-is in the big regular
+expression;
+
+=item *
+
+the string C<specials>, that is the same as having put the three string
+C<escaped>, C<single-quoted> and C<double-quoted>;
+
+=item *
+
+the string C<quoted>, that is the same as having put the three string
+C<single-quoted> and C<double-quoted>;
+
+=item *
+
+the string C<single-quoted> (or C<single_quoted>), that allows you to
+match a string that is delimited by single quotes, with no escaping
+inside. This is always put at the beginning of the big regular
+expression (although C<double-quoted> strings can be fit before
+actually);
+
+=item *
+
+the string C<double-quoted> (or C<double_quoted>), that allows you to
+match a string that is delimited by double quotes, also allowing escaped
+elements inside (via backslashes). This is always put at the beginning
+of the big regular expression;
+
+=item *
+
+the string C<escaped>, that allows you to match a non-greedy sequence of
+escaped characters (via backslash). If C<single-quoted> is also
+specified, single quotes need to be escaped too. If C<double-quoted> is
+also specified, double quotes need to be escaped too. This is always set
+at the end of the big regular expression (except for C<whatever>, that
+might appear after it);
+
+=item *
+
+the string C<whatever>, that allows you to match a non-greedy sequence
+of characters, i.e. it is a synonym of regular expression C<(?ms:.*?)>.
+If present, it is always set at the end of the big regular expression.
+
+=back
+
+For example, if you want to accept single quoted, double quoted and
+unquoted strings, you might provide the following:
+
+   [qw< single-quoted double-quoted whatever >]
+
+=back
+
+=head2 B<< by_split >>
+
+   my $tube = by_split(%args); # OR
+   my $tube = by_split(\%args); # OR
+   my $tube = by_split($separator, %args);
+
+split the input according to a separator string, passed either as the
+first unnamed parameter C<$separator> or as hash options C<separator>.
+
+The following arguments are supported:
+
+=over
+
+=item C<allow_missing>
+
+set to the number of missing trailing elements that you are fine to
+lose, in case you also provide C<keys> (see below). This is particularly
+important when this function is called behind the scenes by
+L</parse_by_format>, because I<that> sets C<keys>.
+
+In practice, suppose that you set the following C<keys>:
+
+   [qw< foo bar baz whatever >]
+
+A normal parsing will expect to find at least four elements, so the
+following input would fail:
+
+   FOO,BAR,BAZ
+
+On the other hand, if you set C<allow_missing> to 1, you are accepting
+that there might be a missing value for C<whatever>, that will be filled
+with the undefined value.
+
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<keys>
+
+optional reference to an array containing a list of keys to be
+associated to the split data. If present, it will be used as such; if
+absent, a reference to an array will be set as output.
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=item C<separator>
+
+the separator to be used for C<CORE::split>. If it is a code reference,
+it is invoked once with the provided arguments to get the separator
+back. After this, it can be either a regular expression, used as-is, or
+a string that is passed through C<CORE::quotemeta> before being used;
+
+=item C<trim>
+
+remove leading and trailing whitespaces from the extracted values. As
+you might expect, if the C<separator> is a colon, the following input:
+
+   $input = ' what : ever    :you:do  ';
+
+would be split into the following elements:
+
+   @elements = ('what', 'ever', 'you', 'do');
+
+=back
+
+=head2 B<< by_value_separator >>
+
+   $tube = by_value_separator($separator, %args); # OR
+   $tube = by_value_separator(%args); # OR
+   $tube = by_value_separator(\%args);
+
+parse a sequence of value-and-separator. This is a generalization of
+L</by_split>, where you can provide a way to specify what you consider
+I<valid> values, e.g. to allow for escaping or quoting (hence also
+allowing having the separator inside your values).
+
+B<CAVEAT>: this function uses the regular expression construct
+C<(?{...})> internally. While it is supported as of perl 5.10, this has
+evolved in time, up to perl 5.18 where it was stabilized. In particular,
+before perl 5.18 it was not possible to use lexical variables in the
+construct, so for older perls C<by_value_separator> uses a package
+variable for collecting values. This should not be a problem, but might
+be.
+
+Just to make an example, suppose that you are using semicolons as
+separators. C<by_value_separator> would allow you to take this:
+
+   'some;thing';  what\;ever ; "this;\"goes\";fine"
+
+and turn it into this:
+
+   ['some;thing', 'what;ever', 'this:"goes";fine']
+
+As noted, it is similar to L</by_split>; as a matter of fact, this might
+be re-implemented (less efficiently) through L<by_value_separator>.
+Unless there are bugs, of course. Like L</by_split>, you can provide a
+C<separator> parameter (also via the first, unnamed parameter) that can
+be either a sub reference, a string or a regular expression.
+
+Additionally, you can provide a C<value> parameter that tells what is
+considered an I<acceptable> input value. A value can be different things
+(see below), but it boils down to providing regular expressions,
+indication of pre-canned matching expressions, or a combination.
+
+When you match values, you can then I<decode> them. For example, if you
+specify that you want to accept double-quoted strings, it makes sense to
+remove the quotes and un-escape the remaining sequence before using it.
+Depending on what you pass as a definition for a valid C<value>, your
+decoding approach might vary. Decoding can happen in two ways: either
+you provide a C<decode> function that will be applied to each value, or
+a C<decode_values> that is applied to the whole values array. You might
+want to choose the latter for improving performance (1 sub call against
+N).
+
+Normally, an input would be split and an array reference would populate
+the C<output> field (that is, the field indicated by the C<output>
+argument). If you would rather get a hash, you can pass C<keys> to use,
+in order. If this is the case, you can also accept getting more values
+than you have keys for with C<allow_surplus>, or less of them with
+C<allow_missing>.
+
+Last, you might want to take advantage of C<trim> if your values
+shouldn't have leading/trailing spaces. Be sure to read the fine prints
+about trimming quoted strings, though.
+
+Accepted arguments are:
+
+=over
+
+=item C<allow_missing>
+
+=item C<allow_surplus>
+
+these are integer values that set how much less/more values you are
+willing to admit with respect to the provided C<keys> (see below).
+Hence, they only work when C<keys> is set.
+
+By default they are set to 0, meaning that you expect to have exactly
+the same number of values as there are keys. Allowing I<missing> means
+that you accept getting less values than there are keys, that will be
+associated to C<undef>. Allowing I<surplus> means that you're willing to
+ditch that number of exceeding values;
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<keys>
+
+an array reference with the keys to be associated (one-by-one, in order)
+to the extracted values;
+
+=item C<name>
+
+name of the tube, useful for debugging. Defaults to
+C<parse by value and separator>;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=item C<separator>
+
+the separator to be used between two consecutive valid I<value>s. It can
+be one of the following:
+
+=over
+
+=item *
+
+a I<sub reference>, that is called with whatever arguments provided (as
+a hash reference) and MUST return one of the following two alternatives;
+
+=item *
+
+a I<regular expression reference>, that will be matched for the
+separator;
+
+=item *
+
+a I<plain string>, that will be matched verbatim.
+
+=back
+
+There is no default, you MUST provide one either as the first, unnamed
+parameter or as argument C<separator>;
+
+=item C<trim>
+
+remove leading and trailing whitespaces from the extracted values. This
+is applied I<before> decoding is applied, which means that
+leading/trailing whitespaces I<inside> quoted strings will be kept.
+Defaults to a I<false> value, meaning that no trimming is performed;
+
+=item C<value>
+
+this is how you provide a description of what you consider a
+I<valid value>. It can be multiple things:
+
+=over
+
+=item *
+
+a I<sub reference>, that is called and MUST provide back one of the
+following alternatives;
+
+=item *
+
+a I<regular expression reference>, that is used directly;
+
+=item *
+
+a I<plain string>, that is turned into an array reference by creating an
+anonymous array with the string as its only element, then processed as
+in the following bullet;
+
+=item *
+
+an I<array reference> with elements inside, that will be described in
+the following list.
+
+=back
+
+If you end up with an I<array reference>, each element will be put in a
+big regular expression that is the C<OR> of all elements. Each can be:
+
+=over
+
+=item *
+
+a I<regular expression reference>, that is fit as-is in the big regular
+expression;
+
+=item *
+
+the string C<specials>, that is the same as having put the three string
+C<escaped>, C<single-quoted> and C<double-quoted>;
+
+=item *
+
+the string C<quoted>, that is the same as having put the three string
+C<single-quoted> and C<double-quoted>;
+
+=item *
+
+the string C<single-quoted> (or C<single_quoted>), that allows you to
+match a string that is delimited by single quotes, with no escaping
+inside. This is always put at the beginning of the big regular
+expression (although C<double-quoted> strings can be fit before
+actually);
+
+=item *
+
+the string C<double-quoted> (or C<double_quoted>), that allows you to
+match a string that is delimited by double quotes, also allowing escaped
+elements inside (via backslashes). This is always put at the beginning
+of the big regular expression;
+
+=item *
+
+the string C<escaped>, that allows you to match a non-greedy sequence of
+escaped characters (via backslash). If C<single-quoted> is also
+specified, single quotes need to be escaped too. If C<double-quoted> is
+also specified, double quotes need to be escaped too. This is always set
+at the end of the big regular expression (except for C<whatever>, that
+might appear after it);
+
+=item *
+
+the string C<whatever>, that allows you to match a non-greedy sequence
+of characters, i.e. it is a synonym of regular expression C<(?ms:.*?)>.
+If present, it is always set at the end of the big regular expression.
+
+=back
+
+For example, if you want to accept single quoted, double quoted and
+unquoted strings, you might provide the following:
+
+   [qw< single-quoted double-quoted whatever >]
+
+=back
+
+
+=head2 B<< ghashy >>
+
+   my $tube = ghashy(%args); # OR
+   my $tube = ghashy(\%args);
+
+parse the input thext as a hash, generalized. The algorithm used is the
+same as L<Data::Tubes::Util/generalized_hashy>. It is a generalization of
+L</hashy> below.
+
+Accepts all arguments as L<Data::Tubes::Util/generalized_hashy>, with the
+same default values except for C<default_key> that is set to the empty
+string (as opposed to not being defined). This means that stand-alone
+values will always be accepted. This setting is in line with L</hashy>
+and has been set for backwards/mutual compatibility.
+
+The following arguements are recognised too:
+
+=over
+
+=item C<defaults>
+
+a hash reference with default values for the output;
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<name>
+
+name of the tube, useful for debugging. Defaults to C<parse ghashy>;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=back
+
+=head2 B<< hashy >>
+
+   my $tube = hashy(%args); # OR
+   my $tube = hashy(\%args);
+
+parse the input text as a hash. The algorithm used is the same as
+L<Data::Tubes::Util/metadata>.
+
+=over
+
+=item C<chunks_separator>
+
+character used to divide chunks in the input, defaults to a space
+character (ASCII 0x20);
+
+=item C<default_key>
+
+the default key to be used when a key is not present in a chunk,
+defaults to the empty string;
+
+=item C<defaults>
+
+a hash reference with default values for the output;
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<key_value_separator>
+
+character used to divide the key from the value in a chunk, defaults to
+the equal sign C<=>;
+
+=item C<name>
+
+name of the tube, useful for debugging. Defaults to C<parse hashy>;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=back
+
+This tube factory is strict in what accepts as inputs, in that the
+separators MUST be single characters and there is no escaping mechanism.
+If you need something more flexible, see L</ghashy> above.
+
+=head2 B<< parse_by_format >>
+
+Alias for L</by_format>.
+
+=head2 B<< parse_by_regex >>
+
+Alias for L</by_regex>.
+
+=head2 B<< parse_by_separators >>
+
+Alias for L</by_separators>.
+
+=head2 B<< parse_by_split >>
+
+Alias for L</by_split>.
+
+=head2 B<< parse_by_value_separator >>
+
+Alias for L</by_value_separator>.
+
+=head2 B<< parse_ghashy >>
+
+Alias for L</ghashy>.
+
+=head2 B<< parse_hashy >>
+
+Alias for L</hashy>.
+
+=head2 B<< parse_single >>
+
+Alias for L</single>.
+
+=head2 B<< single >>
+
+   my $tube = single(%args); # OR
+   my $tube = single(\%args);
+
+consider the input text as already parsed, and generate as output a hash
+reference where the text is associated to a key.
+
+=over
+
+=item C<input>
+
+name of the input field, defaults to C<raw>;
+
+=item C<key>
+
+key to use for associating the input text;
+
+=item C<name>
+
+name of the tube, useful for debugging;
+
+=item C<output>
+
+name of the output field, defaults to C<structured>;
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+Report bugs either through RT or GitHub (patches welcome).
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

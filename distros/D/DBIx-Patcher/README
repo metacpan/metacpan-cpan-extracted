@@ -1,0 +1,75 @@
+NAME
+    DBIx::Patcher - store history of patches applied in database schema
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+        # add patches already run on an existing db
+        patcher -h db-server -u bob -d my_db sql/0.01 --add
+
+        # running from within the location where the app/sql lives
+        patcher -h db-server -u bob -d my_db sql/0.01
+
+        # run patcher from anywhere and store filename correctly
+        patcher -h db-server -u bob -d my_db /opt/app/sql/0.01 -c /opt/app
+
+        # to retry previously failed patches
+        patcher -h db-server -u bob -d my_db sql/0.01 --retry
+
+DESCRIPTION
+OPTIONS
+  --install
+    TBA - install the patcher schema before doing anything else
+
+  --host -h
+    Host of the database. Defaults to localhost
+
+  --user -u
+    User for connecting to the database. Defaults to www
+
+  --database -d
+    Name of the database
+
+  --chop -c
+    When patching remove this from the absolute path of the patch file to
+    make the logging of patches relative from a certain point. Defaults to
+    $PWD
+
+  --retry
+    For patches that have failed retry
+
+  --add -a
+    Any files found that haven't been run, just add them as if they run
+    successfully
+
+  --plugin
+    TBA - specify a plugin to load and provide defaults/custom handling
+
+AUTHOR
+    Jason Tang, "<tang.jason.ch at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dbix-patch at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Patcher>. I will be
+    notified, and then you'll automatically be notified of progress on your
+    bug as I make changes.
+
+SEE ALSO
+    DBIx::Class
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBix::Patcher
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Jason Tang.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

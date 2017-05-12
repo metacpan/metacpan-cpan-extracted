@@ -1,0 +1,9 @@
+Revision history for Perl extension Data::ChipsChallenge.
+
+1.0.0  Wed Oct  5 2016
+- Updated the documentation, added a copy of the CHIPS.DAT format docs,
+started hosting on GitHub: https://github.com/kirsle/Data-ChipsChallenge
+- Switched to semantic versioning.
+
+0.01  Wed Jan 28 2009
+- Initial release.

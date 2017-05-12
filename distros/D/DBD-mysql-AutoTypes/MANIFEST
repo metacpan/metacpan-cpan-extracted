@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+lib/DBD/mysql/AutoTypes.pm
+META.yml                                 Module meta-data (added by MakeMaker)

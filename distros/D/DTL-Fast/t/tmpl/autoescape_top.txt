@@ -1,0 +1,10 @@
+Autoescape testing
+Escaped:
+{% include "autoescape_sample.txt" %}
+{% autoescape off %}
+Not escaped:
+{% include "autoescape_sample.txt" %}
+{% include "autoescape_included.txt" %}
+{% endautoescape %}
+Escaped:
+{% include "autoescape_sample.txt" %}

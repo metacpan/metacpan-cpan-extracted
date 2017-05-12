@@ -1,0 +1,18 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-Passphrase
+version:      0.0.7
+version_from: lib/Data/Passphrase.pm
+installdirs:  site
+requires:
+    Apache::Request:               1.2
+    Bloom::Filter:                 0.03
+    HTTP::Status:                  1.26
+    List::MoreUtils:               0.19
+    Object::InsideOut:             1.33
+    Readonly:                      1.03
+    Test::More:                    0.54
+    version:                       0.53
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

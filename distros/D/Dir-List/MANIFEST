@@ -1,0 +1,7 @@
+Makefile.PL
+MANIFEST
+README
+t/Dir-List.t
+lib/Dir/List.pm
+doc/example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

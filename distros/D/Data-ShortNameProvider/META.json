@@ -1,0 +1,68 @@
+{
+   "abstract" : "Generate short names with style",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-ShortNameProvider",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "POSIX" : "0",
+            "Sub::Quote" : "0",
+            "Time::Local" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-shortnameprovider@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-ShortNameProvider"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/Data-ShortNameProvider.git",
+         "web" : "http://github.com/book/Data-ShortNameProvider"
+      }
+   },
+   "version" : "1.001",
+   "x_contributors" : [
+      "Tim Bunce <timb@cpan.org>"
+   ]
+}
+

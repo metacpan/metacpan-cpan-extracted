@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+LICENSE
+README
+t/DBIx-Knowledge.t
+lib/DBIx/Knowledge.pm
+lib/DBIx/Knowledge/Report.pm
+lib/DBIx/Knowledge/OracleSQL.pm
+lib/DBIx/Knowledge/Output.pm
+lib/DBIx/Knowledge/SQL.pm
+META.yml                                 Module meta-data (added by MakeMaker)

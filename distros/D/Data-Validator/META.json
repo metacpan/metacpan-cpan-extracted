@@ -1,0 +1,109 @@
+{
+   "abstract" : "Rule based validator on type constraint system",
+   "author" : [
+      "Fuji, Goro (gfx) <gfuji@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.1.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Validator",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Mouse" : "0.93",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validator" : {
+         "file" : "lib/Data/Validator.pm",
+         "version" : "1.07"
+      },
+      "Data::Validator::Role::AllowExtra" : {
+         "file" : "lib/Data/Validator/Role/AllowExtra.pm"
+      },
+      "Data::Validator::Role::Croak" : {
+         "file" : "lib/Data/Validator/Role/Croak.pm"
+      },
+      "Data::Validator::Role::Method" : {
+         "file" : "lib/Data/Validator/Role/Method.pm"
+      },
+      "Data::Validator::Role::NoRestricted" : {
+         "file" : "lib/Data/Validator/Role/NoRestricted.pm"
+      },
+      "Data::Validator::Role::NoThrow" : {
+         "file" : "lib/Data/Validator/Role/NoThrow.pm"
+      },
+      "Data::Validator::Role::Sequenced" : {
+         "file" : "lib/Data/Validator/Role/Sequenced.pm"
+      },
+      "Data::Validator::Role::SmartSequenced" : {
+         "file" : "lib/Data/Validator/Role/SmartSequenced.pm"
+      },
+      "Data::Validator::Role::StrictSequenced" : {
+         "file" : "lib/Data/Validator/Role/StrictSequenced.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/gfx/p5-Data-Validator/issues"
+      },
+      "homepage" : "https://github.com/gfx/p5-Data-Validator",
+      "repository" : {
+         "url" : "git://github.com/gfx/p5-Data-Validator.git",
+         "web" : "https://github.com/gfx/p5-Data-Validator"
+      }
+   },
+   "version" : "1.07",
+   "x_contributors" : [
+      "karupanerura <karupa@cpan.org>",
+      "Fuji, Goro <fuji.goro@dena.jp>",
+      "Fuji, Goro <g.psy.va@gmail.com>",
+      "robario <webmaster@robario.com>"
+   ]
+}

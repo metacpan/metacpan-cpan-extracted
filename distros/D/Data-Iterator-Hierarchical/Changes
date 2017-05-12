@@ -1,0 +1,32 @@
+Revision history for Data-Iterator-Hierarchical
+
+0.01    Wed Aug 19 14:04 2008
+        First version, released on an unsuspecting world.
+
+0.02    Sat Aug 23 00:18 2008
+        Corrected initial release date and dist name in ChangeLog.
+	Fix some really stupid bugs in want.t
+	Made example.t more verbose to figure out where it is failing.
+	Use %INC in example.t to find module source.
+	Cosmetic changes to documentation.
+	Remove boilerplate.t as it is more trouble that it is worth.
+	Release input on exhaustion.
+	Skip timely destruction test in destroy.t pre-5.10.
+
+0.03	Mon Aug 25 15:30 2008
+	Change EOL to Unix.
+	Fix example.t to be more resilient to EOL.
+
+0.04	Sun Aug 31 15:00 2008
+	Skip test example.t pre Perl 5.8
+
+0.05	Sun Nov 2 12:50 2008
+	Clean up spelling and grammar in POD.
+	Added constuctor new().
+	Added slurp() method.
+
+0.06	Sun Nov 2 13:00 2008
+	Same as 0.05 - problem with building the dist
+
+0.07	Sun Nov 2 14:00 2008
+	Still same as 0.05 - this time as a ZIP

@@ -1,0 +1,84 @@
+{
+   "abstract" : "a simple starter kit for any module",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "keywords" : [
+      "automate",
+      "begin",
+      "cpan",
+      "cpan-distro",
+      "cpan package",
+      "cpan-package",
+      "dist",
+      "distribution",
+      "distro",
+      "generate",
+      "man",
+      "manager",
+      "module",
+      "package",
+      "scaffolding",
+      "starter"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Man",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "ExtUtils::Command" : "0",
+            "File::Spec" : "0",
+            "Getopt::Long" : "0",
+            "Pod::Usage" : "0",
+            "Test::More" : "0",
+            "perl" : "v5.8.1"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Man" : {
+         "file" : "lib/Dist/Man.pm",
+         "version" : "v0.0.7"
+      },
+      "Dist::Man::App" : {
+         "file" : "lib/Dist/Man/App.pm",
+         "version" : "v0.0.7"
+      },
+      "Dist::Man::BuilderSet" : {
+         "file" : "lib/Dist/Man/BuilderSet.pm",
+         "version" : "v0.0.7"
+      },
+      "Dist::Man::Plugin::Template" : {
+         "file" : "lib/Dist/Man/Plugin/Template.pm",
+         "version" : "v0.0.7"
+      },
+      "Dist::Man::Simple" : {
+         "file" : "lib/Dist/Man/Simple.pm",
+         "version" : "v0.0.7"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://web-cpan.berlios.de/modules/Dist-Man/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://bitbucket.org/shlomif/web-cpan"
+      }
+   },
+   "version" : "v0.0.7"
+}

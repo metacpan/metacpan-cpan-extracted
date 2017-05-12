@@ -1,0 +1,31 @@
+Solid::DBD long support
+=======================
+
+There are two methods to handle LONG data:
+
+1. You may use the LONG fields like the normal ones, provided you have 
+   enough memory to fetch them.
+   This can be done by giving an attribute value when preparing
+   the statement:
+   	$sth = $dbh->prepare("select * from foo",
+		             { 'LongReadLen' => 4096, }
+		             );
+   
+
+2. Additional, starting with v0.04, you may read the data out of 
+   a LONG column using the function blob_read(). 
+   This allows to read the whole data in the LONG field from 
+   a fetched row; each subsequent call to blob_read returns 
+   another part of the data within the LONG column.
+   
+   Example: After executing this code fragment you will have the
+            entire contents of column 34 of a fetched row in $data.
+   
+   my $data = "";
+   my $offset = 0;
+   my $chunk = "";
+   while ($chunk = $sth->blob_read(34, $offset, 4096))
+   	{
+	$offset += length($chunk);
+	$data .= $chunk;
+	}

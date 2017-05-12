@@ -1,0 +1,8 @@
+2000f007cd
+
+master rfxsensor 20.00f007cd: sensor/rfxsensor00f0[temp]=7.75
+
+
+
+
+

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 0a84aa0211d11c21e3a150b79305a12f5bcf60ef AUTHOR_PLEDGE
+SHA1 f026731ed2d72cadb768083c1a9aff3743be6ec9 Build.PL
+SHA1 74018a1cada958ed8774b350423f3f11d6f6d437 Changes
+SHA1 a09ad54a8b08c0f682e6667fd57cff91372e99ad INSTALL
+SHA1 42a9b278ca94a31df654fec186efe74ba9565d7e LICENSE
+SHA1 206f17723b55017a7136bc2d3f1223ff11ae4afe MANIFEST
+SHA1 5541b4c9bf59a1fb4e0ec6a0c8856f047ceea3a7 META.json
+SHA1 78a7449c145a7ed6e788d02d65d238f0b65e348d META.yml
+SHA1 94aa66d38ea1e2c8139d41b64c031e02ea8d90b7 README
+SHA1 e437c366082ac34ef1af08dc8c82a33298cc8d67 README.mkdn
+SHA1 18b0c6e78e1fa7018aa2187123a858a76a317f95 lib/DBIx/NoSQL/Store/Manager.pm
+SHA1 59f7e822f3d35319cbd239b2f0113322c59f8657 lib/DBIx/NoSQL/Store/Manager/Model.pm
+SHA1 4a4bc728464ab4b51cba96424fb7232980c9cd2a lib/DBIx/NoSQL/Store/Manager/StoreIndex.pm
+SHA1 93d46691749be7331fd73f33429f59aa6982161b lib/DBIx/NoSQL/Store/Manager/StoreKey.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 bcaaa4341975f780acee25a01ff5a79c9e2554dd t/000-report-versions-tiny.t
+SHA1 35d1e16852cc450fc0dcf36b4b46639609cfccd7 t/basic.t
+SHA1 a5d5b61aa8a61b7d9d765e1daf971a9a578f1cfa t/db/dummy
+SHA1 a89f17388cc3c939e0d112a23feae539f15c9269 t/lib/MyComics.pm
+SHA1 76abbd31c6deecaf0ea779f3387b3a95bb81daa1 t/lib/MyComics/Model/Comic.pm
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlEJzk8ACgkQ34Hwf+GwC4xTvACfaZLMobY42Q+zDEXvNGRm9Xii
+l0wAnilInylCtH9YTKrNcK3KWBMUj1aZ
+=Tsla
+-----END PGP SIGNATURE-----

@@ -1,0 +1,6 @@
+use v5.22;
+
+use FindBin::libs;
+use Devel::SharedLibs qw( ./test-output );
+
+__END__

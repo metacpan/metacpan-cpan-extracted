@@ -1,0 +1,27 @@
+
+This is the Perl distribution Data-Timeline.
+
+## Installation
+
+Data-Timeline installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Data::Timeline
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Data-Timeline documentation is available as in POD.
+So you can do:
+
+    % perldoc Data::Timeline
+
+to read the documentation with your favorite pager.

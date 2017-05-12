@@ -1,0 +1,517 @@
+==================================================
+Changes from 2010-07-08 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 0.54 at 2015-07-07 18:01:28 +0000
+-----------------------------------------
+
+  Change: 747703a1c0a34230632296b22fb6f58b3ccdc8f2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-07-07 19:01:28 +0000
+
+    Release 0.54 
+
+  Change: 3554ce3ae938f78ed07c93ea70ad54e1bd99807a
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-07-06 12:09:38 +0000
+
+    Merge pull request #12 from haarg/msysgit
+
+    clean up version properly when it contains .msysgit. 
+
+  Change: 0e478565cf57f3b10a66df85f4a0877da777d996
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2015-07-06 00:22:18 +0000
+
+    clean up version properly when it contains .msysgit. 
+
+-----------------------------------------
+version 0.52 at 2015-06-21 11:20:31 +0000
+-----------------------------------------
+
+  Change: 1b0c40003721d838885dcdc3687f1c055671bc36
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-06-21 12:20:31 +0000
+
+    Sanitise git version strings more aggressively
+
+    Because 'git version 2.4.3.573.g4eafbef' doh! 
+
+  Change: 22025b929618e2e4d7c70012893dd67c6dd1de3f
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2015-06-21 12:16:54 +0000
+
+    Avoid meta validation issues by testing the data directly, not the
+    json rendering
+
+    When CPAN::Meta and Dist::Zilla versions are out of sync, we can get
+    errors like this:
+
+    [MetaJSON] Invalid META structure. Errors found: [MetaJSON] Expected
+    a list structure (license) [Validation: 2] at
+    /Volumes/amaretto/Users/ether/.perlbrew/libs/20.0@std/lib/perl5/darwi
+    n-2level/Moose/Meta/Method/Delegation.pm line 110. t/basic.t ..
+    Dubious, test returned 25 (wstat 6400, 0x1900)
+
+    ...which aren't your problem. Avoid all this by just testing
+    $tzil->distmeta directly.
+
+    Signed-off-by: Chris 'BinGOs' Williams <chris@bingosnet.co.uk> 
+
+-----------------------------------------
+version 0.50 at 2015-05-14 08:46:03 +0000
+-----------------------------------------
+
+  Change: 07e8ddfe498e8c37c84ae5e63e9136d3959c2d3b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-05-14 09:46:03 +0000
+
+    Release 0.50 
+
+  Change: 59db6a0d33016f7c8f8e9d2da6026cd3cdf28f31
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-05-14 09:42:52 +0000
+
+    Merge pull request #11 from wchristian/test_msysgit_compatibility
+
+    upgrade basic.t to handle msysgit versions (1.9.5.msysgit.0) 
+
+  Change: f6d82b59f3648ba3fad35cdebc4ff2418e31ea16
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2015-05-14 10:38:56 +0000
+
+    upgrade basic.t to handle msysgit versions (1.9.5.msysgit.0)
+
+    This change was made in .pm, but i neglected to run the test, so it
+    remained faulty. This commit fixes that. 
+
+-----------------------------------------
+version 0.48 at 2015-03-21 15:53:16 +0000
+-----------------------------------------
+
+  Change: b7ac21aff607d06371264bf68e2085e881037593
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-21 15:53:16 +0000
+
+    Release 0.48 
+
+  Change: 70280d5532bc8bce437be937266bae7e093978bf
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2015-03-21 15:51:17 +0000
+
+    Merge pull request #9 from wchristian/msysgit_compatibility
+
+    msysgit compatibility 
+
+  Change: 99589e9197967e4c628f362d9c273a8b0cafbf85
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2015-02-20 04:36:15 +0000
+
+    handle msysgit versions (1.9.5.msysgit.0) so version.pm doesn't choke 
+
+  Change: 2de4972403ed15b714b112c261c62c1b296fdcdc
+  Author: Christian Walde <walde.christian@googlemail.com>
+  Date : 2015-02-20 04:27:07 +0000
+
+    throw useful errors on git version parse errors 
+
+-----------------------------------------
+version 0.46 at 2014-05-12 21:18:44 +0000
+-----------------------------------------
+
+  Change: e3eb032ff0241d18f79a4b73288e4b43a46df9da
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-12 22:18:44 +0000
+
+    Set LC_ALL to C as well as LANG
+
+    Reported by Slaven ReziÄ as RT#95587 
+
+-----------------------------------------
+version 0.44 at 2014-05-09 17:46:15 +0000
+-----------------------------------------
+
+  Change: e705f5151f7a44479b09dc05c07ad28011b72518
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-09 18:46:15 +0000
+
+    Release engineering for 0.44 
+
+  Change: 5ac089e9d43e366621507f6ac9ded5b241535281
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2014-05-09 18:42:34 +0000
+
+    Merge pull request #7 from dsteinbrunner/patch-1
+
+    typo fix 
+
+  Change: 97bcc799c9b52cfc22158bf7741cfa1af7e9af1c
+  Author: David Steinbrunner <dsteinbrunner@pobox.com>
+  Date : 2014-03-23 17:24:32 +0000
+
+    typo fix 
+
+-----------------------------------------
+version 0.42 at 2013-09-30 11:03:50 +0000
+-----------------------------------------
+
+  Change: 6c90717d27f8938ac462040b97ebec25b420bd31
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-30 12:03:50 +0000
+
+    Work around ancient git versions
+
+    git remote wasn't available until 1.5.0
+
+    The output from git remote changed sometime after 1.6.x 
+
+-----------------------------------------
+version 0.40 at 2013-09-27 18:04:49 +0000
+-----------------------------------------
+
+  Change: 9880215eff857762840f431e3e9c37f1231ff23b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-27 19:04:49 +0000
+
+    Bump version to fix compile test 
+
+-----------------------------------------
+version 0.38 at 2013-09-09 08:53:35 +0000
+-----------------------------------------
+
+  Change: bb85bd8d712ff12b2fd2bea2a8495f279099fc9b
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-09 09:53:35 +0000
+
+    Change LANG env var to 'C' before calling 'git'
+
+    The plugin fails if locale is set for instance to LANG=de_DE.UTF-8,
+    so git output is German:
+
+    > LANG=de_DE.UTF-8 git remote show -n origin * externes Projektarchiv
+    origin
+
+    URL zum Abholen: ...
+
+    URL zum Versenden: ...
+
+    Reported by Jakob Voss 
+
+  Change: 5a14672775dcf0379138fafc090101655742982d
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-09 01:47:54 +0000
+
+    Merge pull request #6 from haarg/remote-not-config
+
+    use git remote command to fetch remote urls 
+
+  Change: 6be9e72b39608d991438052f38ff1e4146e897b8
+  Author: Graham Knop <haarg@haarg.org>
+  Date : 2013-09-09 01:37:27 +0000
+
+    use git remote command to fetch remote urls
+
+    If the git url.<base>.insteadOf or url.<base>.pushInsteadOf options
+    are used, the URL listed in the config directly may not be the real
+    URL used for fetching. The remote command will resolve the real URLs
+    git will be using, so use that instead. 
+
+-----------------------------------------
+version 0.36 at 2013-09-05 12:14:13 +0000
+-----------------------------------------
+
+  Change: 18fd642e7b403a75f2a2638cf7657f70c680cfeb
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-05 13:14:13 +0000
+
+    Version bump because CPAN/PAUSE has lost the 0.34 tarball 
+
+-----------------------------------------
+version 0.34 at 2013-09-02 09:18:21 +0000
+-----------------------------------------
+
+  Change: 12957cd7f8868e44b4981663580c3c515bf8f26c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-09-02 10:18:21 +0000
+
+    Report the version of git being used in the test output 
+
+-----------------------------------------
+version 0.32 at 2013-08-23 20:44:13 +0000
+-----------------------------------------
+
+  Change: 0405192af204ea9abc3b974c56ba2120fc1e24c4
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-08-23 21:44:13 +0000
+
+    Bump to version 0.32 
+
+  Change: c250a4496a910ac1fc851f303425d9100fb423b3
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-18 00:04:55 +0000
+
+    Merge pull request #4 from dolmen/optimize/url_for_remote
+
+    Optimize _url_for_remote 
+
+  Change: 5d555a1a0fb6b8a514e524b87889b90bfee2c851
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-18 00:32:46 +0000
+
+    Optimize _url_for_remote: use git plumbing command 
+
+  Change: 964ed6b1cdf759c98d3d6f22cb2e022c83d8273f
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-18 00:32:45 +0000
+
+    Use [Bootstrap::lib]
+
+    To eat our own food. 
+
+-----------------------------------------
+version 0.30 at 2013-07-17 22:50:24 +0000
+-----------------------------------------
+
+  Change: e05fee83d15cef137af091181bdab5d260471a6c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-17 23:50:24 +0000
+
+    Bump to version 0.30 
+
+  Change: e36a578d02b3d72295afab625c81860f9e3f1e48
+  Author: Chris Williams <chris@bingosnet.co.uk>
+  Date : 2013-07-17 15:18:52 +0000
+
+    Merge pull request #3 from dolmen/lazy-load
+
+    Lazy load IPC::Cmd 
+
+  Change: 96bfad240045ff88e9b79e6233cdda1c418b8b4f
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-17 23:47:30 +0000
+
+    Lazy load IPC::Cmd 
+
+-----------------------------------------
+version 0.28 at 2011-11-17 21:22:40 +0000
+-----------------------------------------
+
+  Change: de8fcf692ab356de6d8799c9c0165d49c41be967
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-11-17 21:22:40 +0000
+
+    Bump the required version of MooseX::Types::URI 
+
+-----------------------------------------
+version 0.26 at 2011-10-23 18:30:32 +0000
+-----------------------------------------
+
+  Change: 2d465f4b76f37adf1068f4b84e49446e97db0513
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-23 19:30:32 +0000
+
+    Fluffed the last release 
+
+-----------------------------------------
+version 0.24 at 2011-10-23 18:27:49 +0000
+-----------------------------------------
+
+  Change: 9c1d3c60d8cbc83b8b3f6c4a06b2c6b1a2b42070
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-23 19:27:49 +0000
+
+    Lower the required version of IPC::Cmd 
+
+-----------------------------------------
+version 0.22 at 2011-10-07 20:35:38 +0000
+-----------------------------------------
+
+  Change: 59df70866c19c4262fa8d72befb0061be270d04f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-10-07 21:35:38 +0000
+
+    Bump to version 0.22 
+
+  Change: a6a33014c1a4bea5159fe8a305298512d828b784
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2011-10-08 04:32:23 +0000
+
+    Warn when a remote is specified, but is not found.
+
+    This scenario can cause some rather nasty problems, and have some
+    hidden side effects, especially if the user has other plugins that
+    are relying on GithubMeta to populate the metadata-stash , but it
+    silently does not.
+
+    Instead of just silently trucking along and failing to populate
+    metadata, it now does:
+
+    [@Filter/GithubMeta] A remote named 'github' was specified, but does
+    not appear to exist.
+
+    [@Filter/GithubMeta] skipping meta.resources.repository creation
+
+    Which will be a bit more helpful if something goes wrong because of
+    this. ( And its incredibly likely that remote names for new clones
+    wont match the remote names used somewhere else )
+
+    Have to add an explict `undef` before `next` too.
+
+    Otherwise, for the last item that fails, "next" jumps past the undef,
+
+    causing the code to try parsing a user and repo out of the whatever
+
+    the result of the last call to `_url_for_remote` returned.
+
+    And this could be either nothing, complete garbage, or the remote
+    name itself, ( the remote name itself appears in the output of `git
+    remote
+
+    show -n foobar` when that remote doesn't even exist:
+
+    > git remote show -n foobar
+
+    * remote foobar
+
+    Fetch URL: foobar
+
+    Push URL: foobar
+
+    HEAD branch: (not queried)
+
+    Local ref configured for 'git push' (status not queried):
+
+    (matching) pushes to (matching)
+
+    This is unessecary effort, and makes further error
+    reporting/diagnostics needlessly noisy. 
+
+-----------------------------------------
+version 0.20 at 2011-08-13 12:50:03 +0000
+-----------------------------------------
+
+  Change: 3a080347f8fdb4b57f3dd57f664270aa6e86c997
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-13 13:50:03 +0000
+
+    Bump to version 0.20, remember to build the release with -Ilib this
+    time 
+
+-----------------------------------------
+version 0.18 at 2011-08-13 12:45:42 +0000
+-----------------------------------------
+
+  Change: e131e006db3d902f6caa78a3137e04ca3af6b7f1
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-08-13 13:45:42 +0000
+
+    Bumped version to 0.18 
+
+  Change: 8ca18e5a9de4c694b00c534a9b08c60c4440dbf2
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2011-08-13 20:40:40 +0000
+
+    .gitignore: Dist-Zilla-... 
+
+  Change: f5a1a81428622523623a0aaea782d1a44e468ef9
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2011-08-13 20:40:39 +0000
+
+    Add ".git" to repo URL 
+
+-----------------------------------------
+version 0.16 at 2011-07-14 22:13:06 +0000
+-----------------------------------------
+
+  Change: 2daa340a29e3bf1d281047309d229578076511f2
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-07-14 23:13:06 +0000
+
+    Resolve [rt.cpan.org #69412] "Github URLs are now https"
+
+    Reported by Olivier 'dolmen' MenguÃ© 
+
+-----------------------------------------
+version 0.14 at 2011-06-28 18:12:05 +0000
+-----------------------------------------
+
+  Change: 22f613bacc1aac2a8a0b6853b9b7f64764ae5b8c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-06-28 19:12:05 +0000
+
+    Skip the basic tests if 'git' is not installed. 
+
+-----------------------------------------
+version 0.12 at 2011-05-03 11:23:18 +0000
+-----------------------------------------
+
+  Change: 51b3763c0dff834f10a64a9e38e951e51d2dea1d
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-03 12:23:18 +0000
+
+    Add POD::Coverage exemption 
+
+  Change: 2041e9982d30681b9b3a2f9bd815e118079d3c9c
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-03 12:19:09 +0000
+
+    Bumpity version 
+
+  Change: b253fb3122e24a310796c4260397d712fdce1c0f
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-03 11:47:04 +0000
+
+    Remove trailing whitespace 
+
+  Change: b91e4c56debfddc0fcd89a6bece5b34258d8bc79
+  Author: Chris 'BinGOs' Williams <chris@bingosnet.co.uk>
+  Date : 2011-05-03 11:45:26 +0000
+
+    Updated authors and copyright in dist.ini 
+
+  Change: 9d98e255a295e95e0fe171c177756060ffbcf6d6
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:29:27 +0000
+
+    rename to-be-obsoleted [Prereq] 
+
+  Change: 5fa24d00e674e2344e5d58c6280c63a34cc5a56d
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:29:27 +0000
+
+    documentation for the changes 
+
+  Change: 6dfef49bb85848df102485913d888cd2e9c4dff4
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:29:27 +0000
+
+    add a small but non-trivial set of tests 
+
+  Change: bb4c0dcbf6734a150b8a0444a739efd08f109faa
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:28:59 +0000
+
+    rework how we figure out urls; add user/repo args 
+
+  Change: b66a1c9b8416815ccce7ea14b5cfdffac0b2f16c
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:28:47 +0000
+
+    allow checking multiple remotes; use smart urls 
+
+  Change: c5641f0a7a8a7a446b2b97b8de9eec70ed912f5a
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:28:32 +0000
+
+    clean up unneded symbols with namespace::autoclean 
+
+  Change: 165196049f7aff5a953dea0ec6cc74de21b42001
+  Author: Ricardo Signes <rjbs@cpan.org>
+  Date : 2011-05-03 06:27:24 +0000
+
+    keep git status clean with a .gitignore 
+
+================================================
+Plus 5 releases after 2010-07-08 00:00:00 +0000.
+================================================

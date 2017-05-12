@@ -1,0 +1,43 @@
+---
+abstract: 'Automatically extract prereqs from your modules, but faster'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Slurper: '0'
+  JSON::PP: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: v5.5.3
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-AutoPrereqsFast
+provides:
+  Dist::Zilla::Plugin::AutoPrereqsFast:
+    file: lib/Dist/Zilla/Plugin/AutoPrereqsFast.pm
+    version: '0.003'
+requires:
+  CPAN::Meta::Requirements: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::PrereqSource: '0'
+  List::Util: '1.45'
+  Moose: '0'
+  Perl::PrereqScanner::Lite: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-AutoPrereqsFast
+  repository: git://github.com/Leont/dist-zilla-plugin-autoprereqsfast.git
+version: '0.003'
+x_contributors:
+  - 'Chris Reinhardt <creinhardt@liquidweb.com>'
+  - 'Leon Timmermans <fawaka@gmail.com>'
+  - 'Philippe Bruhat (BooK) <book@cpan.org>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

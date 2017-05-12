@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name:                Devel-SmallProf
+version:             2.02
+abstract:            per-line Perl profiler
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Time::HiRes:                   1.20
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

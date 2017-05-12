@@ -1,0 +1,32 @@
+---
+abstract: 'A Perl DBI extension module to let you fetch data with CSS query syntax.'
+author:
+  - 'Kang-min Liu  C<< <gugod@gugod.org> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: DBIx::CSSQuery
+name: DBIx-CSSQuery
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  DBD::SQLite: 0
+  DBI: 0
+  Sub::Exporter: 0
+  perl: 5.8.0
+  self: 0.32
+resources:
+  license: http://opensource.org/licenses/mit-license.php
+  repository: http://github.com/gugod/dbix-cssquery
+version: 0.04

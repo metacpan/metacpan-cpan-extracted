@@ -1,0 +1,88 @@
+NAME
+    Devel::Leak::Cb - Detect leaked callbacks
+
+VERSION
+    Version 0.04
+
+SYNOPSIS
+        use Devel::Leak::Cb;
+
+        AnyEvent->timer( after => 1, cb => cb {
+        ...
+        });
+
+        # If $ENV{DEBUG_CB} is true and callback not destroyed till END, the you'll be noticed
+
+DESCRIPTION
+    By default, cb { .. } will be rewritten as sub { .. } using
+    Devel::Declare and will give no additional cost at runtime
+
+    When $ENV{DEBUG_CB} will be set, then all cb {} declarations will be
+    counted, and if some of them will not be destroyed till the END stage,
+    you'll be warned
+
+EXPORT
+    Exports a single function: cb {}, which would be rewritten as sub {}
+    when $ENV{DEBUG_CB} is not in effect
+
+    If "DEBUG_CB" > 1 and Devel::FindRef is installed, then output will
+    include reference tree of leaked callbacks
+
+FUNCTIONS
+  cb {}
+    Create anonymous callback
+
+        my $cb = cb {};
+
+  cb name {}
+    Create named callback with static name (Have no effect without
+    $ENV{DEBUG_CB})
+
+        my $cb = cb mycallback {};
+
+  cb $name {}
+    Create named callback with dynamic name (Have no effect without
+    $ENV{DEBUG_CB}) $name could me only simple scalar identifier, without
+    any special symbols
+
+        my $cb = cb $name {};
+        my $cb = cb $full::name {};
+
+  cb 'name' {}
+    Create named callback with dynamic name (Have no effect without
+    $ENV{DEBUG_CB}) Currently supported only ' and ". Quote-like operators
+    support will be later
+
+        my $cb = cb 'name' {};
+        my $cb = cb "name.$val" {};
+
+  COUNT
+        You may call C<Devel::Leak::Cb::COUNT()> Manually to check state. All leaked callbacks will be warned. Noop without C<$ENV{DEBUG_CB}>
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-leak-cb at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-Leak-Cb>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::Leak::Cb
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-Leak-Cb>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

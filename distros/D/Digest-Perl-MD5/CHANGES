@@ -1,0 +1,36 @@
+1.8:	Workaround for older perl
+	- Josh Clark suggested substr workaround needed by 5.004
+
+1.7:	Optimisation Release:
+	- increased speed by 17% (on i386, FreeBSD, Perl 5.8.2)
+	- re-enabled speed test (set number of counts with $ENV{MD5_SPEED_TEST})
+
+1.6:	Reworked OOP Interface:
+	- added reset() and clone() (to be compatible with Digest::MD5)
+	- add() and addfile() now save memory
+	- added more tests
+	- added tools/md5 (BSD compatible md5(1))
+	
+1.5:    Don't rely on (1 << 32) being 1 on 32 bit machines.
+	Get rid of ``no integer'' pragma and inline rotate left
+	function.
+	Version 1.5 outperforms version 1.4 approximately by
+	factor 2.
+
+1.4:	Removed obsolete sum() function (hint from Guido Flohr)
+	round() function is now dynamically generated,
+	different code for 32bit and 64bit architechtures.
+	Global 'use integer' (except for rotate_left()).
+	Faster than 1.3.	
+
+1.3:	Patch for the object interface from Gisle Aas.
+	The module works as a fallback for Digest::MD5 now.
+	Replaced 'use constant' with inline functions.
+	
+1.2:	Fixed a bug in the padding routine.
+	Different sum routines, so Perl 5.6.0 works now.
+	Using 'use integer'.
+	
+1.0:	Fix for big endian machines.
+	Performancetuning.
+

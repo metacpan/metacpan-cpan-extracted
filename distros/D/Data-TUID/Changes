@@ -1,0 +1,27 @@
+0.0122 Monday September 20 09:24:09 PDT 2010:
+    - Fix broken documentation
+
+0.0121 Sunday September 19 22:13:57 PDT 2010:
+    - Non-development release
+
+0.0111_6 Friday September 17 12:30:47 PDT 2010:
+    - Make sure tests can deal with missing prerequisites
+
+0.0111_5 Friday September 17 09:31:53 PDT 2010:
+    - Data::UUID->new->create_str not just ->create
+
+0.0111_4 Thursday September 16 22:41:04 PDT 2010:
+    - Now with prerequisites
+
+0.0111_3 Thursday September 16 10:21:03 PDT 2010:
+    - New uuid canonicalizing/conversion scheme
+
+0.0111_2 Sunday September 12 15:47:19 PDT 2010:
+    - Fix + test for absence of LibUUID causing an exception
+
+0.0111_1 Friday September 10 13:59:04 PDT 2010:
+    - Data::TUID uses Data::UUID if Data::LibUUID is not available (thanks wchristian)
+    - Should now install and work on non-*nix systems
+
+0.0110 Wednesday June 10 09:52:38 PDT 2009:
+    - Initial release

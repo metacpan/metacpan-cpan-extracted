@@ -1,0 +1,115 @@
+=pod
+
+=head1 NAME
+
+DateTime::Format::Human - Format times in "spoken language"
+
+=head1 SYNOPSIS
+
+    use DateTime;
+    use DateTime::Format::Human;
+
+    my $dtfh = DateTime::Format::Human->new(
+        evening => 19,
+        night   => 23,
+    );
+
+    my $spoken_time = $dtfh->format_datetime( DateTime->now );
+
+    print "The time is now $spoken_time\n";
+
+=head1 DESCRIPTION
+
+This module provides a "vague" rendering of the time into natural
+language; it's originally intended for text-to-speech applications
+and other speech-based interfaces. 
+
+=head1 USAGE
+
+=head2 Import Parameters
+
+This module accepts no arguments to it's C<import> method and exports no
+I<symbols>.
+
+=head2 Methods
+
+=head3 Constructors
+
+=over 4
+
+=item * new(...)
+
+Accepts a optional hash and returns a L<DateTime::Format::Human> object.
+
+    my $dtfh = DateTime::Format::Human->new(
+        evening => 19,
+        night   => 23,
+    );
+
+=over 4
+
+=item * evening
+
+Sets the hour at which afternoon turns to evening.
+
+This key defaults to the value of 18.
+
+=item * night
+
+Sets the hour at which evening turns to night.
+
+This key defaults to the value of 22.
+
+=back
+
+=back
+
+=head3 Object Methods
+
+=over 4
+
+=item * format_datetime
+
+Accepts a L<DateTime> object.
+
+Returns a string representing the time in spoken human language.
+
+=back
+
+=head1 CREDITS
+
+Simon Cozens (SIMON) who wrote L<Time::Human> from which this module is a
+genetic descendant.
+
+Everyone at the DateTime C<Asylum>.
+
+=head1 SUPPORT
+
+Support for this module is provided via the datetime@perl.org email list. See
+http://lists.perl.org/ for more details
+
+=head1 AUTHOR
+
+Joshua Hoblitt <jhoblitt@cpan.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004  Joshua Hoblitt.  All rights reserved.  Sections of the code
+and documentation are Copyright (C) 2001  Simon Cozens.
+
+This program is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+The full text of the license can be found in the LICENSE file included with
+this module, or in L<perlartistic> and L<perlgpl> Pods as supplied with Perl
+5.8.1 and later.
+
+=head1 SEE ALSO
+
+datetime@perl.org mailing list
+
+http://datetime.perl.org/
+
+L<DateTime>
+
+=cut

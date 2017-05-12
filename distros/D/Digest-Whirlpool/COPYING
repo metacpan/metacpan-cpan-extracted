@@ -1,0 +1,23 @@
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+---
+
+Note:
+
+This module was originally licensed under the GPL by the original
+author. In January 2007 after taking over maintainership of it I begun
+by rewriting the much-lacking test suite, removed the out-of-date
+F<examples> directory, completely rewrote the documentation, removed
+what Perl code there was and subclassed L<Digest::base> instead. And
+added to/rewrote the XS code. When I was done the only lines that were
+left was the XS code for the B<add> and B<digest> subroutines, which
+are both cases where the implementation is trivial and the only way to
+achieve the task (see add SHA.xs in Digest-SHA for reference).
+
+Since the code as a whole is a wrapper around a public domain library
+and the only parts of the codebase that are left are things which'll
+be seen in any XS, Perl, Digest module I felt it was safe to
+re-license the work under the same terms as Perl itself.
+
+-Ævar

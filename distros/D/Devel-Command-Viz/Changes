@@ -1,0 +1,10 @@
+Revision history for Devel-Command-Viz
+
+0.02  Mon Nov 28 13:58:24 2005
+	- Added GraphViz::Data::Structure as prereq (oops).
+
+0.01  Wed Aug 31 11:59:39 2005
+       Initial independent release.
+       Extracted from Devel-Command to make installation
+       of that module simpler.
+

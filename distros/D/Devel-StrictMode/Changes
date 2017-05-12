@@ -1,0 +1,19 @@
+Devel-StrictMode
+================
+
+Created:      2014-05-10
+Home page:    <https://metacpan.org/release/Devel-StrictMode>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Devel-StrictMode>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.003	2014-09-15
+
+ [ Packaging ]
+ - Fix repo link.
+
+0.002	2014-05-10
+
+ [ Documentation ]
+ - Minor fix in pragmata example.
+
+0.001	2014-05-10	Initial release

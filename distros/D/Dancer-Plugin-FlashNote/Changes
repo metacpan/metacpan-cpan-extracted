@@ -1,0 +1,29 @@
+1.0.4     2012-09-23 17:45:24 Europe/Rome
+   - corrected Changes entry for previous developer release
+   - release
+
+1.0.3_1   2012-09-22 21:13:21 Europe/Rome
+   - fixed what appears to be a bug when using Dancer::Session::Storable
+
+1.0.3     2011-12-28 09:49:27 Europe/Rome
+   - change deprecated "before_template" to "hook before_template" (thanks to Tom Heady)
+     merges https://github.com/polettix/Dancer-Plugin-FlashNote/pull/2
+   - change deprecated "after" to "hook after"
+
+1.0.2     2011-07-26 00:53:49 Europe/Rome
+   - worked around bug in Dancer 1.3070
+
+1.0.1     2011-05-20 02:02:38 Europe/Rome
+   - fixed bugs in documentation (thanks to Tom Heady)
+     solves https://rt.cpan.org/Public/Bug/Display.html?id=68323
+
+1.0.0     2011-02-16 23:16:49 Europe/Rome
+   - released
+
+0.9.0_02  2011-02-14 00:13:19 Europe/Rome
+   - published on GitHub
+   - added standard DEPENDENCIES and BUGS AND LIMITATIONS doc sections
+   - added instructions for contributing
+
+0.9.0_01  2011-02-10 01:47:02 Europe/Rome
+   - first package, developer version for CPAN Testers

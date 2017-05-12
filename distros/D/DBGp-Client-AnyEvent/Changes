@@ -1,0 +1,23 @@
+Revision history for DBGp-Client-AnyEvent
+
+0.05     2016-07-09 18:40:29 CEST
+
+    - Optionally force permissions for Unix-domain sockets
+    - Add support for stream and notification messages
+
+0.04     2016-05-26 11:58:49 CEST
+
+    - Typo fix
+
+0.03     2016-05-26 11:39:26 CEST
+
+    - Packaging fix
+
+0.02     2016-05-26 10:33:34 CEST
+
+    - Misc bug fixes
+
+0.01     2016-05-01 19:47:53 CEST
+
+    - First public release
+

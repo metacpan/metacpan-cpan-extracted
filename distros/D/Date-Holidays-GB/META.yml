@@ -1,0 +1,61 @@
+---
+abstract: 'Determine British holidays - Current UK public and bank holiday dates up to 2016'
+author:
+  - 'Michael Jemmeson <mjemmeson@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec::Functions: '0'
+  List::Util: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  version: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  File::ShareDir::Install: '0.03'
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-GB
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Date::Holidays::GB:
+    file: lib/Date/Holidays/GB.pm
+    version: '0.008'
+  Date::Holidays::GB::EAW:
+    file: lib/Date/Holidays/GB/EAW.pm
+    version: '0.008'
+  Date::Holidays::GB::NIR:
+    file: lib/Date/Holidays/GB/NIR.pm
+    version: '0.008'
+  Date::Holidays::GB::SCT:
+    file: lib/Date/Holidays/GB/SCT.pm
+    version: '0.008'
+requires:
+  Date::Holidays::Super: '0'
+  Exporter: '0'
+  base: '0'
+  constant: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mjemmeson/Date-Holidays-GB/issues
+  homepage: https://github.com/mjemmeson/Date-Holidays-GB
+  repository: https://github.com/mjemmeson/Date-Holidays-GB.git
+version: '0.008'
+x_contributors:
+  - 'Michael Jemmeson <michael.jemmeson@cpan.org>'
+  - 'Peter Newman <peternewman@users.noreply.github.com>'

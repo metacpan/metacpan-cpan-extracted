@@ -1,0 +1,11 @@
+<p>[% SET authors = entry.authors -%]
+ [%- IF authors.size %]By
+  [% FOR author = authors -%]
+   <span class="author vcard"><span class="fn">[% IF author.homepage
+    %]<a href="[% author.homepage |html %]">[% author.name || author.username |encode |html %]</a>[% ELSE
+    %][% author.name || author.username |encode |html %][% END
+   %]</span></span>,
+  [% END -%]
+ [% END -%]
+ [% INCLUDE article_pubdatetime.tt datetime = entry.issued_at %]
+</p>

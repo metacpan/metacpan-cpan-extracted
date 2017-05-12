@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with Dezi::Indexer::Config ver2_to_ver3()  -->
+<swish>
+ <FollowSymLinks>yes</FollowSymLinks>
+ <!-- WARNING: SourceDir ignored by Swish3 -->
+ <SourceDir>docs /home/otherdocs</SourceDir>
+ <!-- WARNING: SourceOnly ignored by Swish3 -->
+ <SourceOnly>.htm .html</SourceOnly>
+ <UndefinedMetaTags>ignore</UndefinedMetaTags>
+ <MetaNames>
+  <author />
+  <description />
+ </MetaNames>
+ <Index>
+  <File>/home/indexfiles/docs.index</File>
+  <Format>Native</Format>
+ </Index>
+</swish>

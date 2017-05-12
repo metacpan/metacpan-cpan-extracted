@@ -1,0 +1,29 @@
+---
+abstract: 'Use Log::Any to control logging from your Dancer app'
+author:
+  - 'Michael Alan Dorman <mdorman@ironicdesign.com>'
+build_requires:
+  Dancer: '0'
+  Dancer::Test: '0'
+  Log::Any::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Logger-LogAny
+requires:
+  Dancer::Config: '0'
+  Dancer::Logger::Abstract: '0'
+  Log::Any: '0'
+  Log::Any::Adapter: '0'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  repository: https://github.com/mdorman/Dancer-Logger-LogAny.git
+version: '0.003'

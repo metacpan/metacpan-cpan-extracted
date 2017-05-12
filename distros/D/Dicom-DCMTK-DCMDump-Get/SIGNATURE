@@ -1,0 +1,51 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 163748b6d7c8e98a4639285653b5eff469981f54 Changes
+SHA1 aea2f35da26a4887674aeac806da053bd929d381 Get.pm
+SHA1 507a10efa92555ddddfbe72be27964d9e3eef80f LICENSE
+SHA1 d944fa860a117fc282d31869209b30e7efb0d903 MANIFEST
+SHA1 4c8850f68da40017f1a7c3b41779ab5ca5728966 META.yml
+SHA1 d529e8a8c39ba75539fc442fb06317ef03357190 Makefile.PL
+SHA1 1be6c5d8682e2ee156b829af70e6daefb0d5e532 README
+SHA1 0de8a8043a0fda7a15e9d87f44ea4483cbd54c70 examples/ex1.pl
+SHA1 bce3c51bb369419603298064b78e14077b93af66 inc/Module/Install.pm
+SHA1 5c1a9d3a384a5262cbc105ab76d446047904c7fa inc/Module/Install/AuthorRequires.pm
+SHA1 d001b4b9a48395a8c4134b234a0e1789138427c5 inc/Module/Install/AuthorTests.pm
+SHA1 fe220f215f645500ce8f14ff5e19d9a28692af56 inc/Module/Install/Base.pm
+SHA1 b56ed8e42c600e08007d152cf0b1438a7c3b7f6e inc/Module/Install/Can.pm
+SHA1 99c531a17a67ce5250df2ae151cc48c80d914cde inc/Module/Install/Fetch.pm
+SHA1 76efdca3603159e0ae0e18f19fe72a0211a69529 inc/Module/Install/Makefile.pm
+SHA1 2e33e87882d60db3913da6284dd5295e5315e18a inc/Module/Install/Metadata.pm
+SHA1 79f5b4199f622e8b05aac266b0c39f6a85bb303f inc/Module/Install/ReadmeFromPod.pm
+SHA1 c830b819e61bda5eca077c6291293bba61b3b9f2 inc/Module/Install/Win32.pm
+SHA1 cb52b9d6f88d512d448a6f35ed0af0d1201a134b inc/Module/Install/WriteAll.pm
+SHA1 20c53b90b3409cb5aa552fab3924b06c0247a9a3 t/Dicom-DCMTK-DCMDump-Get/01-use.t
+SHA1 da728d41aa0f487799ffdca3d28abdf29098f5d3 t/Dicom-DCMTK-DCMDump-Get/02-version.t
+SHA1 8d029b95a97bd198c427c15d0db12eafc0819ade t/Dicom-DCMTK-DCMDump-Get/03-new.t
+SHA1 f63ec5e731fd51d18c1a54a4dda75e84e1ca358d xt/Dicom-DCMTK-DCMDump-Get/01-pod_coverage.t
+SHA1 980af22a77617b7c383a3b1810d0cfb198220bfa xt/Dicom-DCMTK-DCMDump-Get/02-pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJWFs2XAAoJEJe+XXKaIuTlSckIAKeTwTKwqq7ondLfE4D9VJVr
+GO+sHo/PJqjtvTkFD+bWK5fHzAFcZtg+CfSWet36CLt9Nm7y8zyvvSsql8qr+usj
+n2RlKAp2P6nGlwuWW3YyowZproF4OGF3+L9uFcUCVDJZ7/wZNDx9z0ScfJsA/QYy
+0gSx/DTms2CkFK9y3f1WacGOv4FFzF5jvE37Raf9e9IlXwvzU7r6FytN8cCNJgnF
+NoZ6aZ+42bVExfBvsrlO3icWfraV96buUzMySKK3MOyw3PCgsd0ST+x1IoRh7Wv8
+vBTun9j2C++cka9qTtta1rd7xJuChXHXBz4Rev3wHP20TlNoVNVjV1ADZa1cnQM=
+=I81H
+-----END PGP SIGNATURE-----

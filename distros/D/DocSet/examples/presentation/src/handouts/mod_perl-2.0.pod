@@ -1,0 +1,143 @@
+=head1 NAME
+
+Handouts: The Next Generation: mod_perl 2.0
+
+=head1 About
+
+1. What's new in Apache 2.0
+
+2. What's new in Perl 5.6.0 - 5.8.0
+
+3. What's new in mod_perl 2.0
+
+4. Installing mod_perl 2.0
+
+5. Configuring mod_perl 2.0
+
+6. Working Examples
+
+7. Migrating from 1.x to 2.0
+
+=head1 Why mod_perl, the Next Generation
+
+Here and in the rest of this document we refer to mod_perl 1.x series
+as mod_perl 1.0 and, 2.0.x as mod_perl 2.0 to keep things
+simple. Similarly we call Apache 1.3.x series as Apache 1.3 and 2.0.x
+as Apache 2.0
+
+Since Doug MacEachern has introduced mod_perl 1.0 in 1996, he had to
+adjust source code to the many changes Apache and Perl went through,
+while staying compatible with the older versions, leading to a very
+complex source code, with hundreds of C<#ifdefs> and workarounds for
+various incompatibilities in older Perl and Apache versions. When
+Apache 2.0 development was underway, the new threads design was
+introduced, which couldn't be supported by the existing Perl version,
+since it required thread-safe Perl interpreters.
+
+Think of it as a conspiracy or just a lucky coincidence, on March 10,
+2002, the first Apache 2.0 alpha version was released. 13 days later,
+on March 23, 2002, Perl 5.6.0 has been released. And guess what, Perl
+5.6.0 was the first Perl version to support the internal
+thread-safeness across multiple interpreters.
+
+Since Perl 5.6.0 and Apache 2.0 were the very minimum requirements
+there was no need to support older version and it was a great idea to
+start mod_perl 2.0 code base from scratch, incorporating the lessons
+learned during the 5 years of mod_perl's existence.
+
+The new version includes a mechanism for an automatic building of the
+Perl interface to Apache API, which allowed us to easily adjust
+mod_perl 2.0 to ever changing Apache 2.0 API, during its development
+period. Another important feature is the C<Apache::Test> framework,
+which was originally developed for mod_perl 2.0, but then was adopted
+by Apache 2.0 developers to test the core server features and third
+party modules. Moreover the tests written using the C<Apache::Test>
+framework could be run with Apache 1.0 and 2.0, assuming that both
+supported the same features.
+
+There are multiple other interesting changes that have already
+happened to mod_perl in version 2.0 and more will be developed in the
+future. Some of these will be covered in this document and some you
+will discover on your own while reading mod_perl documentation.
+
+=head1 What's new in Apache 2.0
+
+Apache 2.0 has introduces numerous new features and enhancements. Here
+are the most important new features:
+
+=for html <img src="../figures/top_view.png" width="659" height="529">
+
+=over
+
+=item * I<Apache Portable Runtime> (APR)
+
+The APR presents a standard API for server applications, covering file
+I/O, logging, shared memory, threads, managing child processes and
+many other functionalities needed for developing the Apache core and
+third party modules in a portable and effective way. One of the
+important effects is that it significantly simplifies the code that
+uses the APR making it much easier to review and understand the Apache
+code, increasing the number of revealed bugs and contributed patches.
+
+The APR uses the concept of memory pools, which significantly
+simplifies the memory management code and reduces the possibility of
+having memory leaks, which always haunt C programmers.
+
+=item * I/O Filtering
+
+Apache 2.0 allows multiple modules to filter both the request and the
+response. Now one module can pipe its output as an input to another
+module as if another module was receiving the data directly from the
+TCP stream. The same mechanism works with the generated response.
+
+=for html <img src="../figures/bucket_brigades.png" width="570" height="377">
+
+With I/O filtering in place, things like SSL, data (de-)compression
+and other manipulations are done very easily.
+
+The I/O filtering is based on the concept of bucket brigades and
+implemented in the APR.
+
+=back
+
+[CUT OFF A LOT OF STUFF]
+
+=head2 C<Apache::StatINC> Replacement
+
+C<Apache::StatINC> has been replaced by C<Apache::Reload>, which works
+for both mod_perl generations. To migrate to C<Apache::Reload> simply
+replace:
+
+  PerlInitHandler Apache::StatINC
+
+with:
+
+  PerlInitHandler Apache::Reload
+
+However C<Apache::Reload> provides an extra functionality, covered in
+the module's manpage.
+
+=head1 A shameless plug
+
+=for html <img src="../figures/practical_mod_perl_comp.gif" width="504" height="661">
+
+
+
+=head1 Important Links
+
+=over
+
+=item *
+
+All the updated docs are at http://perl.apache.org/docs/
+
+=item *
+
+If you have any questions please ask at the mod_perl mailing list:
+modperl@perl.apache.org
+
+
+=back
+
+=cut
+

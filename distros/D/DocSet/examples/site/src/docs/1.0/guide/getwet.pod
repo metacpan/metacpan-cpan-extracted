@@ -1,0 +1,101 @@
+=head1 NAME
+
+Getting Your Feet Wet
+
+=head1 Description
+
+This chapter gives you step-by-step instructions to get a basic
+statically-compiled mod_perl-enabled Apache server up and
+running. Having a running server allows you to experiment with
+mod_perl as you learn more about it.
+
+(Of course, you'll be experimenting on a private machine, not on a
+production server, right?)  The remainder of the guide, along with the
+documentation supplied with mod_perl, gives the detailed information
+required for fine-tuning your mod_perl-enabled server to deliver the
+best possible performance.
+
+Although there are binary distributions of mod_perl-enabled Apache
+servers available for various platforms, we recommend that you always
+build mod_perl from source.  It's simple to do (provided you have all
+the proper tools on your machine), and building from source
+circumvents possible problems with the binary distributions (such as
+the reported bugs with the RPM packages built for RedHat Linux).
+
+The mod_perl installation that follows has been tested on many
+mainstream Unix and Linux platforms.  Unless you're using a very
+non-standard system, you should have no problems when building the
+basic mod_perl server.
+
+For Windows users, the simplest solution is to use the L<binary
+package|download::binaries>. Windows users may skip to the
+L<Installing mod_perl for Windows|/Installing_mod_perl_for_Windows>.
+
+
+=head1 Installing mod_perl in Three Steps
+
+You can install mod_perl in three easy steps: Obtaining the source
+files required to build mod_perl, building mod_perl, and installing
+it.
+
+Building mod_perl from source requires a machine with basic
+development tools.  In particular, you will need an ANSI-compliant C
+compiler (such as I<gcc>) and the I<make> utility. All standard
+Unix-like distributions include these tools. If a required tool is not
+already installed, then use the package manager that is provided with
+the system (I<rpm>, I<apt>, I<yast>, etc.)  to install them.
+
+A recent version of Perl is also required, at least version 5.004.
+Perl is available as an installable package, although most Unix-like
+distributions will have installed Perl by default. To check that the
+tools are available and learn about their version numbers, try:
+
+  % make -v
+  % gcc -v
+  % perl -v
+
+If any of these responds with C<Command not found>, it will need to be
+installed.
+
+Once all the tools are in place the installation process can begin.
+Experienced Unix users will need no explanation of the commands that
+follow and can simply copy and paste them into a terminal window to
+get the server installed.
+
+Acquire the source code distrubutions of Apache and mod_perl from the
+Internet, using your favorite web browser or one of the command line
+clients like I<wget>, I<lwp-download>, etc. These two distributions
+are available from I<http://www.apache.org/dist/httpd/> and
+I<http://perl.apache.org/dist/>.
+
+The two packages are named I<apache_x.x.x.tar.gz> and
+I<mod_perl-x.xx.tar.gz>, where I<x.x.x> should be replaced with the
+real version numbers of mod_perl and Apache.
+
+Move the downloaded packages into a directory of your choice, I<e.g.>,
+I</home/stas/src/>, proceed with the described steps and you will have
+mod_perl installed:
+
+  % cd /home/stas/src
+  % tar -zvxf apache_x.x.x.tar.gz
+  % tar -zvxf mod_perl-x.xx.tar.gz
+  % cd mod_perl-x.xx
+  % perl Makefile.PL APACHE_SRC=../apache_x.x.x/src \
+      APACHE_PREFIX=/home/httpd DO_HTTPD=1 USE_APACI=1 EVERYTHING=1
+  % make && make test
+  % su
+  # make install
+
+That's all!
+
+All that remains is to add a few configuration lines to the Apache
+configuration file, (I</usr/local/apache/conf/httpd.conf>), start the
+server, and enjoy mod_perl.
+
+The following detailed explanation of each step should help you solve
+any problems that may have arisen when executing the commands above.
+
+
+
+
+=cut

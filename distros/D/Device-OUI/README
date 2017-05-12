@@ -1,0 +1,403 @@
+NAME
+    Device::OUI - Resolve an Organizationally Unique Identifier
+
+SYNOPSIS
+        use Device::OUI;
+    
+        my $oui = Device::OUI->new( '00:17:F2' );
+        printf( "Organization: %s\n", $oui->organization );
+
+DESCRIPTION
+    This module provides an interface to the IEEE OUI (Organizationally
+    Unique Identifier) registry. The registry contains information on what
+    company an OUI is assigned to. OUIs are used in various networking
+    devices as part of a unique ID method (network MAC addresses and Fiber
+    Channel WWNs in particular, see the Device::MAC and Device::WWN modules
+    for more information).
+
+CONFIGURATION
+    This module has a handful of configuration options, mostly dealing with
+    where to get the source for the registry data, and where to store the
+    cache.
+
+    These configuration options are inherited, and you can change them for
+    the main class, a subclass, or a specific object. Note that changing a
+    configuration option for an object does not change it for other objects
+    of that class (see Class::Accessor::Grouped/get_inherited).
+
+        use Device::OUI;
+        Device::OUI->cache_db( '/tmp/oui_cache' );
+
+  Device::OUI->cache_db( $db )
+    Returns the filename where the cache database should be stored. If given
+    an argument you can change the file to store the cache database in.
+
+    The default is "C:\device_oui" on windows, and "/var/cache/device_oui"
+    on everything else. Set this to undef to disable the cache database.
+    ("Device::OUI->cache_db( undef )").
+
+    Note that AnyDBM_File may append an extension (usually '.db') to
+    whatever you use as the filename, depending on which *DBM_File classes
+    are available on your machine.
+
+  Device::OUI->cache_file( $filename )
+    Returns the filename where the oui.txt file should be stored when
+    downloaded from the internet, or where the file can be found if you are
+    downloading it by some other means.
+
+    The default is "C:\device_oui.txt" on windows, and
+    "/var/cache/device_oui.txt" on everything else. Set this to undef to
+    disable the cache file. ("Device::OUI->cache_file( undef )").
+
+  Device::OUI->search_url( $url )
+    The URL for the OUI search page. Normally you don't need to change this,
+    but it is provided as a configuration option in case the page is
+    relocated. You can also set this to undef to disable runtime searches.
+
+    This value is used by /search_url_for to create a search url for a
+    specific OUI. The default implementation allows you to include a '%s'
+    token in the URL, in which case the URL will be formatted with
+    perlfunc/sprintf, using the OUI as an argument. If the url provided does
+    not contain a '%s' token, then the OUI will simply be appended to the
+    end (in which case, the URL provided should probably end with something
+    like: "?arg=").
+
+  Device::OUI->file_url( $url );
+    The URL to download the entire oui.txt registry file. Normally you don't
+    need to change this either, but you can set it to undef to disable
+    registry downloading.
+
+CLASS METHODS
+  my $oui = Device::OUI->new( $oui );
+    Creates and returns a new Device::OUI object. If an OUI is provided, it
+    will be passed to the oui method detailed below. Creating an object
+    without an oui is not an error, but any method that should return data
+    will croak when you call it if no oui has been provided either at
+    construction time or by calling the /oui method.
+
+  Device::OUI->load_cache_from_file( $file );
+    The /load_cache_from_file method is used to load up the cache database
+    with data from an OUI registry file. If no filename is provided, then
+    the value returned by /cache_file will be used. If /cache_file is not
+    defined and you don't provide a filename when you call this method, then
+    it will simply return without doing anything.
+
+    Returns the number of records processed into the cache database, if no
+    cache file can be located, then it will return.
+
+  Device::OUI->load_cache_from_web( $url, $file );
+    The /load_cache_from_web method attempts to download an updated version
+    of the indicated file and load it into the cache database. If no url is
+    provided then the value returned by /file_url will be used. If /file_url
+    is not defined, then either you must provide a url when calling this
+    method, or it will return without doing anything.
+
+    This method uses the LWP::Simple/mirror method from LWP::Simple to
+    update the cache file, so it will not download a new registry file if it
+    already has the latest version. This makes it easy to have a cron job
+    that updates the registry file using a command like:
+
+        perl -MDevice::OUI -e 'Device::OUI->load_cache_from_web'
+
+    Returns undef if the update failed, or no update was necessary. Returns
+    the number of records inserted into the cache database if successful.
+    This method also will not update the cache database if a new file wasn't
+    downloaded. If you want to update the cache database regardless of
+    whether a new file was downloaded or not, try this:
+
+        use Device::OUI;
+        if ( defined Device::OUI->mirror_file ) {
+            Device::OUI->load_cache_from_file();
+        }
+
+  cache_handle( $new );
+    Called with an argument, sets a new object for the cache handle. This
+    object will be treated like a hash, so it either needs to be a hash
+    reference, or a tied hash reference, or something along those lines.
+
+    If called without an argument, returns the current cache handle, making
+    a new one if necessary. If it's necessary to create a new handle and
+    /cache_db is set, then a new hash will be created and tied to
+    AnyDBM_File.
+
+    If it's necessary to create a new handle and /cache_db is not defined
+    (or the attempt to tie to AnyDBM_File fails), then a new anonymous hash
+    will be used to create an in-memory cache that only lasts for the life
+    of the program.
+
+OBJECT METHODS
+  $oui->oui( $oui )
+    Called with no arguments, this returns the OUI that the object
+    represents (in the same format it was originally provided to the
+    object). If given an argument of an OUI, sets or changes the OUI
+    represented by this object.
+
+    Any reasonable OUI format should be accepted by this method. The most
+    common formats (00:17:F2, 00-17-f2, 0017f2, 0:17:f2, etc) should be fine
+    with any delimiter between the bytes. If no delimiter is provided (as in
+    the case of '08001B', the argument must be exactly 6 characters long.
+
+  $oui->normalized()
+    Returns a normalized form of the OUI, with upper-case hex bytes
+    zero-padded and separated with dashes (as in 00-17-F2). Also available
+    as "$oui->norm".
+
+  $oui->norm()
+    This is an alias for /normalized;
+
+  $oui->is_private()
+    Returns a true value if the OUI is privately registered (in this case no
+    information is available on the organization that owns it, they are
+    simply listed in the registry file as 'PRIVATE').
+
+  $oui->organization()
+    Returns the organization the OUI is registered to. For private
+    registrations, the organization is set to 'PRIVATE'.
+
+  $oui->company_id()
+    Returns the 'company_id' from the registry file. This is really just the
+    OUI in a slightly different format (0019E3 instead of 00-19-E3).
+
+  $oui->address()
+    Returns the organization address from the registry file as a multiline
+    string.
+
+FUNCTIONS / EXPORTS
+    Although this module is entirely object oriented, there are a handful of
+    utility functions that you can import from this module if you find a
+    need for them. Nothing is exported by default, so if you want to import
+    any of these, you need to say so explicitly:
+
+        use Device::OUI qw( ... );
+
+    You can get all of them by importing the ':all' tag:
+
+        use Device::OUI ':all';
+
+  my $oui = normalize_oui( $input );
+    Given an OUI, normalizes it into an upper-case, zero padded, dash
+    separated format and returns the normalized OUI.
+
+    This method only uses the last argument provided to it, so it can safely
+    be called as a class method as well.
+
+  oui_cmp( $oui, $oui );
+    This is a convenience method, given two Device::OUI objects, or two OUIs
+    (in any acceptable format) or one of each, will return -1, 0, or 1,
+    depending on whether the first OUI is less than, equal to, or greater
+    than the second one.
+
+    Device::OUI objects have "cmp" and "<=>" overloaded so that simply
+    comparing them will work as expected.
+
+    This method only uses the last two arguments that it is provided, so it
+    can safely be called as a class method, an instance method, or a
+    function, as long as it is given two Device::OUI objects or OUIs.
+
+        $oui->oui_cmp( $oui2 );
+        Device::OUI->oui_cmp( $oui1, $oui2 );
+        Device::OUI::oui_cmp( $oui1, $oui2 );
+    
+        my @sorted = sort Device::OUI::oui_cmp @ouis;
+
+        use Device::OUI qw( oui_cmp );
+        my @sorted = sort oui_cmp @ouis;
+
+  parse_oui_entry( $entry );
+    Given a text representation of a single entry from the OUI registry
+    file, this method extracts the information from it and returns a data
+    structure that looks like this:
+
+        {
+            oui          => '00-17-F2',
+            company_id   => '0017F2',
+            organization => 'Apple Computer',
+            address      => [
+                '1 Infinite Loop MS:35GPO',
+                'Cupertino CA 95014',
+                'UNITED STATES',
+            ],
+        }
+
+    This method only uses the last argument provided to it, so it can safely
+    be called as a class method as well.
+
+  my @parts = oui_to_integers( $oui );
+    Given an OUI in any acceptable format, returns an array of three
+    integers representing the values of the three bytes of the OUI.
+
+    This method only uses the last argument provided to it, so it can safely
+    be called as a class method as well.
+
+INTERNAL METHODS
+    These are methods used internally, that you shouldn't need to mess with.
+
+  $oui->lookup();
+    Attempts to retireve information from the OUI registry. If another
+    lookup method has already retrieved the information, then that saved
+    structure will simply be returned. If not, then an attempt will be made
+    to load the data from the /cache_db, from the /cache_file or from the
+    internet, using the search interface indicated by /search_url. As a last
+    resort, if /file_url is defined, it will attempt to download it and use
+    it for searching.
+
+    Returns a hash reference of the data found, or an empty hash reference
+    if all these things failed.
+
+  Device::OUI->cache( $oui, $data )
+    This method is the main interface to the cache database.
+
+    If called with one argument, then it returns the cached data for the OUI
+    provided. If called with two arguments it replaces the existing cached
+    data with the new data provided.
+
+  $oui->cache( $data )
+    If /cache is called as an object method, you don't have to include the
+    OUI as an argument. If there are no arguments, then the OUI of the
+    invocant will be used as the OUI. If there is one argument and it is a
+    reference, then it will be assumed to be $data. If there is one argument
+    and it is not a reference, then it will be assumed to be an OUI. If
+    there are two arguments, then it behaves the same as when called as a
+    class method.
+
+  $oui->update_from_web()
+    This method searches the OUI registry (using the URL configured in
+    /search_url) for it's own OUI, and if successful, updates the cache with
+    the information found.
+
+    If a /cache_db is in use, this method will update the cache database.
+
+    If the search is successful, this method also returns the data that was
+    found.
+
+  $oui->update_from_file()
+    This method searches the OUI registry file, if you have one and it can
+    be located with /cache_file.
+
+    If a /cache_db is in use, this method will update the cache database.
+
+    If the search is successful, this method also returns the data that was
+    found.
+
+  Device::OUI->dump_cache( $sort )
+    This method is mostly for debugging purposes. When called, it will dump
+    (to "STDOUT") the contents of the cache database in the same format as
+    the entries appear in the OUI registry file.
+
+    Takes one optional argument, if called with a true value, then the
+    entries will be dumped in order, sorted by their OUIs. With sorting
+    turned off, this method runs much faster and returns sooner, but if you
+    turn sorting on then the output file should be round-trippable, meaning
+    you can do this:
+
+        # curl -O http://standards.ieee.org/regauth/oui/oui.txt
+        ... Downloading ...
+        # perl -MDevice::OUI -e 'Device::OUI->load_cache_from_file( "oui.txt" );'
+        # perl -MDevice::OUI -e 'Device::OUI->dump_cache' > new-oui.txt
+        # diff oui.txt new-oui.txt
+        ( no differences )
+
+  $oui->search_url_for( $oui )
+    Fills in the URL indicated by /search_url with either the OUI provided
+    as an argument, or the invocants OUI, if called as an object method and
+    no argument is provided.
+
+  Device::OUI->have_lwp_simple()
+    This methods returns true if LWP::Simple is available and false if it is
+    not available. The first time this method is called, an attempt will be
+    made to "require LWP::Simple", and a warning will be issued if the
+    "require" is not successful. This method is used internally by the web
+    access features.
+
+  Device::OUI->mirror_file( $url, $file )
+    This method is a wrapper around LWP::Simple/mirror. It returns 1 if the
+    file was mirrored successfully, 0 if the file was not mirrored because
+    the web server reported that the version of the file already in
+    "cache_file" was the latest version, and undef if no file was
+    downloaded.
+
+    If $file is not provided, then the value from /cache_file will be used.
+    If $url is not provided, then the value from /file_url will be used.
+
+  Device::OUI->get_url( $url )
+    This method is a wrapper around LWP::Simple/get. It attempts to load the
+    provided $url and returns the contents of the page if successful. It
+    returns undef if unsucessful or if no URL is provided
+
+  overload_cmp
+    This is just a little wrapper that calls /oui_cmp, rearranging the order
+    of the arguments if necessary.
+
+CACHING INFORMATION
+  LAZY CACHE LOADING
+    There are a couple of ways you can use the cache features in this
+    module. If you are only going to lookup a handful of OUIs and don't want
+    to download and process the whole registry file at one time, you can
+    simply let the module create a cache database for you, and populate it
+    with entries one at a time as objects are created that are not already
+    in the cache.
+
+  PRE-POPULATING THE CACHE
+    If you are going to be looking up a lot of OUIs (where a lot should
+    probably be defined as "more than 4 or 5") then you would probably be
+    better off pre-populating the cache, using either the
+    /load_cache_from_web method or the /load_cache_from_file method. The
+    first is the easiest, assuming the machine you are running it on has web
+    access, you can simply run:
+
+        perl -MDevice::OUI -e 'Device::OUI->load_cache_from_web'
+
+    If you don't have web access, you can transfer the file in whatever
+    manner works for you, and then use it to populate the cache with:
+
+        perl -MDevice::OUI -e 'Device::OUI->load_cache_file_file( "filename" )'
+
+  PREVENTING CACHING
+    To keep the module from creating a cache database, set /cache_db to
+    undef before creating any Device::OUI objects:
+
+        use Device::OUI;
+        Device::OUI->cache_db( undef );
+
+    If you don't have a cache database, but you do have a cache file, then
+    the caching module will simply look each OUI up in the file every time.
+    This is much slower than having a cache database, but may be necessary
+    in some situations.
+
+  PREVENTING NETWORK ACCESS
+    To keep Device::OUI from attempting to access the network, set the URL
+    configuration options to undef before creating any "Device::OUI"
+    objects:
+
+        use Device::OUI;
+        Device::OUI->search_url( undef );
+        Device::OUI->file_url( undef );
+
+    Even with these two values set to undef, /load_cache_from_web will still
+    work (and still attempt to access the internet) if you give it a URL as
+    an argument when you call it.
+
+    Network access will also be disabled if LWP::Simple is not available.
+
+MODULE HOME PAGE
+    The home page of this module is
+    <http://www.jasonkohles.com/software/device-oui>. This is where you can
+    always find the latest version, development versions, and bug reports.
+    You will also find a link there to report bugs.
+
+SEE ALSO
+    <http://www.jasonkohles.com/software/device-oui>
+
+    <http://en.wikipedia.org/wiki/Organizationally_Unique_Identifier>
+
+    <http://standards.ieee.org/regauth/oui/index.shtml>
+
+AUTHOR
+    Jason Kohles "<email@jasonkohles.com>"
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008, 2009 Jason Kohles
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

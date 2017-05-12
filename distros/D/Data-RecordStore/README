@@ -1,0 +1,189 @@
+NAME
+    Data::RecordStore - Simple and fast record based data store
+
+SYNPOSIS
+    use Data::RecordStore;
+
+    my $data = "TEXT DATA OR BYTES";
+
+    my $store = Data::RecordStore->open( $directory );
+
+    my $id = $store->stow( $data, $optionalID );
+
+    my $val = $store->fetch( $id );
+
+    $store->recycle( $id );
+
+    my $new_id = $store->next_id;
+
+    $store->stow( "MORE DATA", $new_id );
+
+DESCRIPTION
+    A simple and fast way to store arbitrary text or byte data. It is
+    written entirely in perl with no non-core dependencies. It is designed
+    to be both easy to set up and easy to use.
+
+LIMITATIONS
+    Data::RecordStore is not meant to store huge amounts of data. It will fail
+    if it tries to create a file size greater than the max allowed by the
+    filesystem. This limitation will be removed in subsequent versions. This
+    limitation is most important when working with sets of data that
+    approach the max file size of the system in question.
+
+    This is not written with thread safety in mind, so unexpected behavior
+    can occur when multiple Data::RecordStore objects open the same directory.
+
+METHODS
+  open( directory )
+    Takes a single argument - a directory, and constructs the data store in
+    it. The directory must be writeable or creatible. If a RecordStore already
+    exists there, it opens it, otherwise it creates a new one.
+
+  entry_count
+    Returns how many entries are in this store. Recycling ids does _not_
+    decrement this entry_count.
+
+  ensure_entry_count( min_count )
+    This makes sure there there are at least min_count entries in this
+    RecordStore. This creates empty records if needed.
+
+  next_id
+    This sets up a new empty record and returns the id for it.
+
+  stow( data, optionalID )
+    This saves the text or byte data to the RecordStore. If an id is passed
+    in, this saves the data to the record for that id, overwriting what was
+    there. If an id is not passed in, it creates a new RecordStore.
+
+    Returns the id of the record written to.
+
+  fetch( id )
+    Returns the record associated with the ID. If the ID has no record
+    associated with it, undef is returned.
+
+  recycle( $id )
+    This marks that the record associated with the id may be reused. Calling
+    this does not decrement the number of entries reported by the RecordStore.
+
+HELPER PACKAGES
+    Data::RecordStore relies on two helper packages that are useful in their own
+    right and are documented here.
+
+HELPER PACKAGE
+    Data::RecordStore::FixedStore
+
+DESCRIPTION
+    A fixed record store that uses perl pack and unpack templates to store
+    identically sized sets of data and uses a single file to do so.
+
+SYNOPSIS
+    my $template = "LII"; # perl pack template. See perl pack/unpack.
+
+    my $size; #required if the template does not have a definite size, like
+    A*
+
+    my $store = Data::RecordStore::FixedStore->open( $template, $filename, $size
+    );
+
+    my $new_id = $store->next_id;
+
+    $store->put_record( $id, [ 321421424243, 12, 345 ] );
+
+    my $more_data = $store->get_record( $other_id );
+
+    my $removed_last = $store->pop;
+
+    my $last_id = $store->push( $data_at_the_end );
+
+    my $entries = $store->entry_count;
+
+    if( $entries < $min ) {
+
+        $store->ensure_empty_count( $min );
+
+    }
+
+    $store->emtpy;
+
+    $store->unlink_store;
+
+METHODS
+  open( template, filename, size )
+    Opens or creates the file given as a fixed record length data store. If
+    a size is not given, it calculates the size from the template, if it
+    can. This will die if a zero byte record size is determined.
+
+  empty
+    This empties out the database, setting it to zero records.
+
+  ensure_entry_count( count )
+    Makes sure the data store has at least as many entries as the count
+    given. This creates empty records if needed to rearch the target record
+    count.
+
+  
+    Returns the number of entries in this store. This is the same as the
+    size of the file divided by the record size.
+
+  get_record( idx )
+    Returns an arrayref representing the record with the given id. The array
+    in question is the unpacked template.
+
+  next_id
+    adds an empty record and returns its id, starting with 1
+
+  pop
+    Remove the last record and return it.
+
+  push( data )
+    Add a record to the end of this store. Returns the id assigned to that
+    record. The data must be a scalar or list reference. If a list
+    reference, it should conform to the pack template assigned to this
+    store.
+
+  push( idx, data )
+    Saves the data to the record and the record to the filesystem. The data
+    must be a scalar or list reference. If a list reference, it should
+    conform to the pack template assigned to this store.
+
+  unlink_store
+    Removes the file for this record store entirely from the file system.
+
+HELPER PACKAGE
+    Data::RecordStore::FixedRecycleStore
+
+SYNOPSIS
+    A subclass Data::RecordStore::FixedRecycleStore. This allows indexes to be
+    recycled and their record space reclaimed.
+
+    my $store = Data::RecordStore::FixedRecycleStore->open( $template,
+    $filename, $size );
+
+    my $id = $store->next_id;
+
+    $store->put_record( $id, ["SOMEDATA","FOR","PACK" ] );
+
+    my $id2 = $store->next_id; # == 2
+
+    $store->recycle( $id );
+
+    my $avail_ids = $store->get_recycled_ids; # [ 1 ]
+
+    my $id3 = $store->next_id;
+
+    $id3 == $id;
+
+METHODS
+  recycle( $idx )
+    Recycles the given id and reclaims its space.
+
+  get_recycled_ids
+    Returns a list reference of ids that are available to be reused.
+
+AUTHOR
+       Eric Wolf        coyocanid@gmail.com
+           Copyright (c) 2015 Eric Wolf. All rights reserved.  This program is free software; you can redistribute it and/or modify it
+           under the same terms as Perl itself.
+
+VERSION
+       Version 1.0  (October 10, 2015))

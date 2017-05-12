@@ -1,0 +1,94 @@
+Revision history for Perl module DateTime::Format::CLDR
+
+1.18 Sat Dec 31 2016
+    - Fix failing tests rt118286
+    - Various cleanups
+
+1.17 Fri Oct 16 2015
+    - Improve parsing various date formats rt107389
+    - Fix failing tests with the upcoming DateTime::Locale release
+
+1.16 Tue Oct 6 2015
+    - Fix incorrect interpretation of hour "24" for the k patterns. This
+      should be treated as equivalent to "00", not as "00" _on the next
+      day_ (fixed by Dave Rolsky)
+    - Make all tests pass with both the current DateTime::Locale and the
+      upcoming new version (currently still in trial releases) (fixed by Dave
+      Rolsky)
+    - Clarify/test the handling of kk patterns rt89846
+    - Fix typo in POD (fixed by Philippe Bruhat)
+
+1.15 Thu Aug 15 2013
+    - Fix failing tests
+    - Fix bad parsing of HH:mm:ss -> 24:00:00, rt87550 (reported by Gonzalo Mateo)
+    - Dist housekeeping
+    - Descriptive error messages
+
+1.14 Sat Nov 17 2011
+    - Do not use indirect object notation, rt80571 (reported by Timo Grodzinski)
+    - Fix failing tests on perl < 5.10
+    - Dist housekeeping
+
+1.13 Thu Oct 13 2011
+    - Fixed documentation for timezone patterns, rt71602 (reported by Christopher J. Madsen)
+    - Make tests more verbose
+
+1.12 Wed Oct 27 2010
+    - Fix broken Makefile.PL
+
+1.11 Mon Oct 25 2010
+    - Case insensitive pattern matching (reported & fixed by Andrew Rodland)
+
+1.10 Thu Jan 21 2010
+    - Fixed bug rt53849 (reported by Ozum Eldogan)
+
+1.09 Fri Sep 18 2008
+    - Added support for non 4-digit years and BC dates
+    - More tests
+    - Fixed bug rt49605 (reported by Bernhard Graf)
+    - Require latest DateTime::TimeZone to avoid test fails
+    - Handle era, throw error if things go really wrong
+
+1.08 Sun May 10 2009
+    - Show more information if tests fail
+    - Run less extended tests (reported by Adam Kennedy)
+    - Updated DateTime module dependencies
+    - More testcases: Export, Exeption, Timezone
+    - Fixed bugs in 'c','e' and 'ZZZZ' patterns
+    - Total Test coverage is 90% (statement coverage 97%)
+
+1.07 Sun Mar 12 2009
+    - Show more info in test output
+    - Updated module dependencies
+
+1.06 Sun Mar 1 2009
+    - Fixed error in exception handling
+    - Tests for S{1,} pattern
+    - Changed interface to be more consistent with DateTime::Format::Strptime
+
+1.05 Sun Mar 1 2009
+    - Updated documentation
+    - Fixed some parsing rules
+    - Adding parsing rule for S{1,} and j{1,2}
+    - More tests
+    - Fixed some quoting issues
+
+1.04 Wed Feb 25 2009
+    - Added missing build dependency to Makefile.PL
+
+1.03 Thu Feb 24 2009
+    - Fixed bug RT43381 (reported by Evan Carroll)
+    - Customizable handling of incomplete formats
+    - Some more tests
+
+1.02 Thu Dec 05 2008
+    - Fixed bug RT41392 (reported by Senthilvel Rangaswamy)
+    - Better and customizable exception handling
+
+1.01 Wed Jul 16 2008
+    - Fixed some time zone issues
+    - Added README file
+    - Extended documentation
+
+1.00 Tue Jul 15 2008
+    - original version

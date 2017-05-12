@@ -1,0 +1,17 @@
+[% USE related_links = Class('Daizu::Plugin::RelatedLinks') -%]
+<div class="extras-box" id="box-related-links">
+ <h2>Related Links</h2>
+ <ul>
+  [%- FOR link = related_links.links_for_file(file) %]
+  <li>
+   [%- IF link.url == link.source_url -%]
+   <a href="[% link.url |html %]">[% link.title |encode |html %]</a>
+   [% ELSE %]
+   <cite><a href="[% link.source_url |html %]">[% link.source_title |encode |html %]</a></cite>:<br>
+   <a href="[% link.url |html %]">[% link.title |encode |html %]</a>
+   [%- END -%]
+   [%- IF link.format %]&nbsp;([% link.format |html %])[% END -%]
+  </li>
+  [%- END %]
+ </ul>
+</div>

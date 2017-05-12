@@ -1,0 +1,32 @@
+---
+abstract: 'FFI::CheckLib alternative to Dist::Zilla::Plugin::CheckLib'
+author:
+  - 'Jon Portnoy <avenj@cobaltirc.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  Path::Tiny: 0
+  Test::DZil: 0
+  Test::Deep: 0
+  Test::Fatal: 0
+  Test::More: 0.88
+  Test::Requires: 0
+  Test::Warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-FFI-CheckLib
+requires:
+  Dist::Zilla: 5
+  FFI::CheckLib: 0.11
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.008
+resources:
+  repository: git://github.com/avenj/dzil-ffi-checklib.git
+version: 0.002001

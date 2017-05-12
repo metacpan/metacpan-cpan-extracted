@@ -1,0 +1,12 @@
+Changes
+Digest-FP56x1xor.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+random56x256.h
+mkrandomtable.pl
+test.pl
+t/Digest-FP56x1xor.t
+lib/Digest/FP56x1xor.pm
+META.yml                                 Module meta-data (added by MakeMaker)

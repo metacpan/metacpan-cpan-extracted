@@ -1,0 +1,14 @@
+lib/Dotiac/DTL/Addon/importloop.pm
+lib/Dotiac/DTL/Tag/importloop.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+META.yml
+README
+t/4_pod.t
+t/1_tag_importloop.t
+t/tag_importloop.html
+t/tag_importloop_contextvars.html
+t/tag_importloop_merge.html
+t/Dtest.pm

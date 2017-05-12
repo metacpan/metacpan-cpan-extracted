@@ -1,0 +1,78 @@
+NAME
+    Date::Range::Birth - range of birthday for an age
+
+SYNOPSIS
+      use Date::Range::Birth;
+
+      # birthday for those who are 24 years old now
+      my $range = Date::Range::Birth->new(24);
+
+      # birthday for those who are 24 years old in 2001-01-01
+      my $date   = Date::Simple->new(2001, 1, 1);
+      my $range2 = Date::Range::Birth->new(24, $date);
+
+      # birthday for those who are between 20 and 30 yeard old now
+      my $range3 = Date::Range::Birth->new([ 20, 30 ]);
+
+DESCRIPTION
+    Date::Range::Birth is a subclass of Date::Range, which provides a way to
+    construct range of dates for birthday.
+
+METHODS
+    new $range = Date::Range::Birth->new($age); $range = Date::Range::Birth-
+        >new($age, $date); $range = Date::Range::Birth->new([ $young, $old
+        ]); $range = Date::Range::Birth->new([ $young, $old ], $date);
+
+        returns Date::Range::Birth object for birthday of the age. If
+        `$date' (Date::Simple object) provided, returns range of birthday
+        for those who are `$age' years old in `$date'. Default is today
+        (now).
+
+        If the age is provided as array reference (like `[ $young, $old ]'),
+        returns range of birthday for those who are between `$young' -
+        `$old' years old. It may be handy for searching teenagers, etc.
+
+    Other methods are inherited from Date::Range. See the Date::Range
+    manpage for details.
+
+EXAMPLE
+    Your customer database schema:
+
+      CREATE TABLE customer (
+          name     varchar(64) NOT NULL,
+          birthday date NOT NULL
+      );
+
+    What you should do is to select name and birthday of the customers who
+    are 2X years old (between 20 and 29).
+
+      use DBI;
+      use Date::Range::Birth;
+
+      my $dbh = DBI->connect( ... );
+      my $range = Date::Range::Birth->new([ 20, 29 ]);
+
+      my $sth = $dbh->prepare(<<'SQL')
+      SELECT name, birthday FROM customer WHERE birthday >= ? AND birthday <= ?
+      SQL
+
+      # Date::Simple overloads to 'yyyy-mm-dd'!
+      $sth->execute($range->start, $range->end);
+
+      while (my $data = $sth->fetchrow_arrayref) {
+          print "name: $data->[0] birthday: $data->[1]\n";
+      }
+      $dbh->disconnect;
+
+AUTHOR
+    Original idea by ikechin <ikebe@cpan.org>
+
+    Code implemented by Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Date::Range manpage, the Date::Simple manpage, the Date::Calc
+    manpage
+

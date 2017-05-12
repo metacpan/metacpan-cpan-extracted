@@ -1,0 +1,28 @@
+---
+abstract: 'Parses ISO8601 formats'
+author:
+  - 'Joshua Hoblitt <jhoblitt@cpan.org>'
+build_requires: {}
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-ISO8601
+provides:
+  DateTime::Format::ISO8601:
+    file: lib/DateTime/Format/ISO8601.pm
+    version: 0.08
+recommends:
+  File::Find::Rule: 0.24
+  Test::Distribution: 1.22
+  Test::Pod: 0.95
+requires:
+  DateTime: 0.18
+  DateTime::Format::Builder: 0.77
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

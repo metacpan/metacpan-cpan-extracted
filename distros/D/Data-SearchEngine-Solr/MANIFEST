@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+ignore.txt
+lib/Data/SearchEngine/Solr.pm
+lib/Data/SearchEngine/Solr/Results.pm
+t/00-load.t
+t/01-search-results.t
+t/release-pod-syntax.t
+t/release-synopsis.t

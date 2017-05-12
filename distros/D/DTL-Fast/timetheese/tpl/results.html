@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Results</title>
+</head>
+<body>
+    <h3>Versions</h3>
+    <table border="1">
+        <thead>
+            <th>Name</th>
+            <th>Version</th>
+        </thead>
+        <tbody>
+            {% for name,value in platform %}
+                <tr>
+                    <td>{{ name }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <hr/>
+    <h3>Results</h3>
+
+    <table border="1">
+        <thead>
+            <th>Name</th>
+            <th>Time</th>
+            <th>Per call</th>
+            <th>Profile</th>
+        </thead>
+        <tbody>
+            {% for name,value in results %}
+            <tr>
+                <td><b>{{ name }}</b> </td>
+                <td>{{ value.time_taken }}</td>
+                <td>{{ value.per_call }}</td>
+                <td><pre>{{ value.profile|safe }}</pre></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

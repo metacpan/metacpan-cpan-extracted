@@ -1,0 +1,35 @@
+NAME
+    Devel::InterpreterSize - Get rough sizes for the memory useage of perl
+
+SYNOPIS
+        use Devel::InterpreterSize;
+        my ($total, $shared, $unshared) = Devel::InterpreterSize->new->check_size;
+
+DESCRIPTION
+    Gives you back some simple figures for how much memory your perl us
+    using, in kilobytes.
+
+ORIGINAL AUTHOR
+    Most of the code was stolen from Apache2::SizeLimit with slight tweaks.
+
+THIS MODULES AUTHOR
+    Tomas (t0m) Doran "<bobtfish@bobtfish.net">
+
+AUTHORS
+    All code taken from mod_perl is copyright the authors llisted in
+    Apache2::SizeLimit.
+
+    And below:
+
+    Doug Bagley <doug+modperl bagley.org>, channeling Procrustes.
+        -item Brian Moseley <ix maz.org>: Solaris 2.6 support
+
+    Doug Steinwand and Perrin Harkins <perrin elem.com>: added support for
+    shared memory and additional diagnostic info
+    Matt Phillips <mphillips virage.com> and Mohamed Hendawi <mhendawi
+    virage.com>: Win32 support
+    Torsten Foertsch <torsten.foertsch gmx.net>: Linux::Smaps support
+
+LICENSE
+    The Apache Software License, Version 2.0.
+

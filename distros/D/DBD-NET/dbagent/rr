@@ -1,0 +1,9 @@
+#!/bin/ksh
+
+INFORMIXDIR=/app/info70
+PATH=/usr/local/bin:$INFORMIXDIR/bin:$PATH
+PATH=~/bin:$PATH:.
+INFORMIXSERVER=wsm12_r
+export TERM EDITOR INFORMIXDIR PATH ONCONFIG INFORMIXSERVER
+
+./dbagent $1

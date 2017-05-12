@@ -1,0 +1,43 @@
+libdevice-onkyo-perl (1.143260-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Sat, 22 Nov 2014 19:00:59 +0000
+
+libdevice-onkyo-perl (1.143250-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Fri, 21 Nov 2014 23:00:56 +0000
+
+libdevice-onkyo-perl (1.130211-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 21 Jan 2013 22:27:32 +0000
+
+libdevice-onkyo-perl (1.130210-1) unstable; urgency=low
+
+  * New upstream release.
+  * Add Device::SerialPort dependency.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Mon, 21 Jan 2013 21:39:36 +0000
+
+libdevice-onkyo-perl (1.120811-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed, 21 Mar 2012 21:42:54 +0000
+
+libdevice-onkyo-perl (1.120810-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Wed, 21 Mar 2012 21:19:52 +0000
+
+libdevice-onkyo-perl (1.120800-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Mark Hindess <soft-debian@temporalanomaly.com>  Tue, 20 Mar 2012 20:58:38 +0000
+

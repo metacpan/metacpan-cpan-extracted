@@ -1,0 +1,19 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Data/Bvec.pm
+t/000-data-bvec.t
+t/001-set_bit.t
+t/002-bit2str.t
+t/003-str2bit.t
+t/004-num2bit.t
+t/005-bit2num.t
+t/006-compress.t
+t/007-uncompress.t
+t/008-howmany.t
+t/009-new.t
+t/010-get_bvec.t
+t/011-get_bstr.t
+t/012-get_nums.t
+META.yml                                 Module meta-data (added by MakeMaker)

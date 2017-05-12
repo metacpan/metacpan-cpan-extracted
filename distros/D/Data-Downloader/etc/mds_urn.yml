@@ -1,0 +1,70 @@
+#
+# This file describes the OMI SIPS repository --
+# how to get files, data, and metadata from rss feeds or urls,
+# and where to store the files and the symlinks to the files.
+#
+#  NB: this file is used by the test suite; be sure to
+#  modify the paths below.
+#
+---
+name: mds
+storage_root: /tmp/data_downloader_test/dd_store/store
+file_url_template: 'https://omisips1.omisips.eosdis.nasa.gov:8000/data/<md5>/<filename>'
+cache_strategy: LRU
+# 1G == 1073741824
+cache_max_size: 1073741824
+disks:
+  - root: disk1/
+  - root: disk2/
+  - root: disk3/
+
+# These are the feeds for this repository (only one).
+feeds:
+  name: georss
+  feed_template: 'https://omisips1.omisips.eosdis.nasa.gov:8201/service/georss?esdt=<esdt>&startdate=<startdate:%Y-%m-%d>&as=<archiveset>&count=<count>&email=<email>&password=<password>&met=0'
+  feed_parameters:
+    - name: email
+      default_value: ''
+    - name: password
+      default_value: ''
+  file_source:
+    filename_xpath: datacasting:filename
+    md5_xpath: datacasting:md5
+    url_xpath: default:link
+    urn_xpath: datacasting:unique_identifier
+  metadata_sources:
+    - name: archivesets
+      xpath: datacasting:archivesets
+    - name: starttime
+      xpath: datacasting:starttime
+    - name: endtime
+      xpath: datacasting:endtime
+    - name: esdt
+      xpath: datacasting:esdt
+    - name: orbit
+      xpath: datacasting:orbit
+
+# This is the location of the symbolic links that will be generated.
+linktrees:
+  - root: /tmp/data_downloader_test/dd_store/linktree_default
+    condition: ~
+    path_template: '<archiveset>/<esdt>/<starttime:%Y/%m/%d>'
+  - root: '/tmp/data_downloader_test/dd_store/linktree_OMT03'
+    condition: '{ esdt => "OMTO3" }'
+    path_template: '<archiveset>/<esdt>/<starttime:%Y>'
+
+metadata_transformations:
+    - input: archivesets
+      output: archiveset_one
+      function_name: split
+      order_key: 1
+    - input: archiveset_one
+      output: archiveset
+      function_name: match
+      function_params: "10003|70003|19993"
+      order_key: 2
+
+# add more repositories here
+# ---
+# name: somethingelse
+# ...

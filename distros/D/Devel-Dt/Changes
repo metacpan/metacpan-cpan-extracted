@@ -1,0 +1,15 @@
+Revision history for Devel-Dt
+
+0.01    Thu Jun 19, 6:32:50 PM
+        - YAPC::NA 2008 hackathon
+
+0.02
+        - Update docs
+
+0.03
+        - Require perl-5.6+
+        - Cleaning
+
+0.04
+        - Add .gitignore
+        - Build with Dist::Zilla

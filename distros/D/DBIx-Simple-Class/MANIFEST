@@ -1,0 +1,28 @@
+Changes
+examples/.htaccess
+examples/dsc_dump_schema.pl
+examples/lib/My.pm
+examples/lib/My/App.pm
+examples/lib/My/Group.pm
+examples/lib/My/Groups.pm
+examples/lib/My/User.pm
+examples/users.cgi
+ignore.txt
+lib/DBIx/Simple/Class.pm
+lib/DBIx/Simple/Class.pod
+lib/DBIx/Simple/Class/Schema.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-common.t
+t/01-dbix-simple-class-schema-mysql.t
+t/01-dbix-simple-class-schema-sqlite.t
+t/01-dbix-simple-class-sqlite.t
+t/02-dbix-simple-class-mysql.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

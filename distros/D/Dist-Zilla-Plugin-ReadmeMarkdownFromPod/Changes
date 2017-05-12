@@ -1,0 +1,17 @@
+Revision history for Perl extension Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+
+0.141140  2014-04-23 20:13:19 America/Los_Angeles
+    - Update for new behavior of Pod::Markdown, which now uses
+      asterisks for bold formatting.
+
+0.120120  2012-01-11 22:48:09 PST8PDT
+    - Added tests
+    - Reimplemented as a subclass of ReadmeAnyFromPod
+    - Migrated dist.ini to @RTHOMPSON bundle
+    - Bring Changes file up to spec
+
+0.103510 2010-12-17
+    - Fixed incompatibility with Dist::Zilla::Plugin::PodWeaver
+
+0.100700 2010-03-11
+    - Initial CPAN release

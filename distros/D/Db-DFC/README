@@ -1,0 +1,211 @@
+DFC README
+==========
+Alpha Release 4
+February 27, 2001
+
+
+QUICK INSTALL
+=============
+1. Install Documentum's DFC 4.1
+2. Install a JDK (1.3 preferred)
+3. Install JPL
+4. Install Db::DFC
+
+
+ABSTRACT
+=========
+Db::DFC is a set of Perl 5 modules that enable the use of Documentum's
+Foundation Classes (DFC) in Perl.  It relies on JPL (Java-Perl Lingo
+module) to facilitate the connection between Perl and the Java-based DFC.
+
+The following paragraphs discuss:
+  1. JPL - getting and installing
+  2. dm_JCast - what it is, how it works, and why it's needed
+  3. Db::DFC - installing, using, documentation
+
+
+1. JPL
+======
+JPL is a critical part of Db::DFC.  You can obtain it two ways.  The first
+is to download the Perl source code (either from www.activestate.com, or
+www.cpan.org).  The second -- and better -- way is to get it from the JPL
+CVS archive.
+
+The latest version of the JPL module can be obtained from the CVS archive.
+Free CVS clients can be downloaded from www.cyclic.com.  The latest version
+of JPL in CVS has been updated to operate with Sun's JDK 1.3.  If you don't
+have a Java Developer's Kit (JDK) installed, download one from
+www.javasoft.com.
+
+You can check out the latest version of JPL using the following CVS settings:
+
+  set CVSROOT=:pserver:anoncvs@as220.org:/home/cvsroot
+  cvs login    # use blank password
+  cvs checkout jpl
+
+You can check out the previous version of JPL using the following CVS settings:
+
+  export CVSROOT=:pserver:anoncvs@as220.org:/home/cvsroot
+  cvs login    # use blank password
+  cvs checkout -rsnap-10212000 jpl
+
+I have also created a PPM-installable version of JPL and posted it at:
+
+  http://www.erols.com/theroths/perl_stuff.html
+
+This version was created on NT 4, using JDK 1.3 and Perl 5.6.  You can install it
+by typing:
+
+  ppm install JPL-Class.ppd
+  ppm install JNI.ppd
+
+Follow the directions packaged with JPL to install it.  We are particularly
+interested in the JNI (Java Native Interface) portion of the installation.
+I will warn you, this install is not trivial!  Make sure you set jpldebug = 0
+in the JNI.xs file or you will get lots of debug stuff on STDOUT.
+
+
+2. DM_JCAST
+===========
+The dm_JCast Java file included with Db::DFC is used to cast Java objects
+from Perl.  In particular, it casts IDfPersistentObjects to sub-
+interfaces.  The install routine will copy the dm_JCast.class file to the
+<perl>/lib/site directory.
+
+Examine this Java file -- you may need/want to modify it.  Also, examine
+the methods in the DFC.pm file.  These methods will need to be updated to
+reflect any changes made in the dm_JCast Java file.
+
+This file and the accompanying methods in the DFC.pm file are necessary
+because the DFC relies on Java's ability to cast object types as part of
+its implementation. For example, to create a new dm_document, the DFC
+forces you to create a IDfPersistentObject and then cast it to an IDfDocument.
+
+In Java:
+
+  IDfDocument document = null;
+  document =(IDfDocument)session.newObject("dm_document");
+  document.setObjectName( "doc1" );
+
+This type of casting is not possible in Perl, yet is necessary because the
+setObjectName method is only available through the IDfDocument interface.
+session.newObject() returns an IDfPersistentObject by default, regardless of
+what object type you pass to it.  The solution is to use the methods of the
+DFC.pm which use the dm_JCast Java class file.
+
+In Perl:
+
+  $dfc = Db::DFC->new();
+  $doc = $session->newObject("dm_document");
+  $doc = $dfc->castToIDfDocument($doc);
+  $doc->setObjectName("doc1");
+
+castToIDfDocument is a method of DFC.pm.  You must instantiate an instance
+of Db::DFC in every script that requires casting.  Db::DFC automatically
+instantiates a dm_JCast object. This is an awkward solution but until
+someone has a better one, this one works.
+
+
+3. Db::DFC
+==========
+Db::DFC is a set of Perl 5 modules that enable the use of Documentum's
+Foundation Classes (DFC) in Perl.  It relies on JPL (Java-Perl Lingo
+module) to facilitate the connection between Perl and the Java-based DFC.
+
+Documentum's DFC Java files must be installed on the machine running Db::DFC.
+
+Db::DFC consists of 92 Perl modules, 1 test script, 2 examples, and
+documentation.
+
+
+3.1 INSTALL Db::DFC
+==================
+After installing JPL, do the usual to install Db::DFC:
+
+  perl makefile.pl
+  nmake
+  nmake test      ** you will need to edit the test script to insert
+                     your Docbase, user, and password
+                  ** the test script reports false negatives for methods
+                     that return VOID
+  nmake install
+
+
+3.2 USING Db::DFC
+================
+To use Db::DFC, simply use it in your Perl program.
+
+Example:
+
+  use Db::DFC;
+  $dfc = Db::DFC->new();
+
+  $DOCBASE = "docbase";
+  $USER = "user";
+  $PASSWORD = "passwd";
+  $DOMAIN = "domain";
+  $FILE = $0;
+
+  $dfclient = DfClient->new();
+  $idfclient = $dfclient->getLocalClient();
+  $idflogininfo = DfLoginInfo->new();
+
+  $idflogininfo->setUser($USER);
+  $idflogininfo->setPassword($PASSWORD);
+  $idflogininfo->setDomain($DOMAIN);
+
+  $idfsession = $idfclient->newSession($DOCBASE,$idflogininfo);
+
+  $pobj = $idfsession->newObject("dm_document");
+  $doc = $dfc->castToIDfDocument($pobj);
+
+  $doc->setObjectName("this file");
+  $doc->setContentType("crtext");
+  $doc->setFile($FILE);
+  $doc->save();
+
+  print "\nDocument Id:" . $doc->getObjectId()->toString() . " created.\n";
+
+  $query = DfQuery->new();
+  $query->setDQL("select object_name,r_object_id from dm_document where
+                                    object_name = 'this file'");
+  $col = $query->execute($session,0);
+  while ($col->next()) {
+      $row = $col->getTypedObject();
+      print $row->getString("object_name") . " has Id: " .
+                                $row->getString("r_object_id") . "\n";
+  }
+
+  $col->close();
+  $session->disconnect();
+
+
+3.3 OBJECT/METHOD SUMMARY
+=========================
+A summary of the objects and methods implemented by this version of Db::DFC
+can be found in the Db-DFC.html file included with this archive.  This
+module was created with DFC v4.1.2.79.  Most classes and methods have been
+implemented.  The exceptions are:  DfClientX and IDfClientX (these classes
+are only used in a COM/DCOM environment); DfObject and IDfObject (these
+classes are the root classes of the DFC and are not instantiated; therefore
+there should never be a need to access them); and DfRegistry and IDfRegistry
+(these classes are only valid in Microsoft Windows and rely upon Microsoft
+Java classes not present by default).
+
+
+3.4 KNOWN ISSUES
+================
+Casting.  The fact that casting is required is not ideal and I think the
+implementation in Db::DFC is clunky.  But, it's all I can come up with at
+the moment.
+
+Exceptions.  Java exceptions are reported but not trapped.  Fatal Java
+exceptions (i.e. could not logon) will kill your script but others
+(i.e., could not create a new object) will not.
+
+
+4.0 SUPPORT
+===========
+Db::DFC is authored and support by me, M. Scott Roth (michael.s.roth@saic.com).
+Please feel free to contact me.
+

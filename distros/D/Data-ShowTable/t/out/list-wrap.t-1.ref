@@ -1,0 +1,19 @@
+*** STDOUT ***
+Name      : Alan
+Biography : This is a very long line of text which simulates a text string which is 
+          : supposed to wrap in its field width.
+
+Name      : Kevin
+Biography : This is another long line of text which will also wrap so I can see if this 
+          : part of ShowTable really works as designed.  If not it's back to the drawing 
+          : board.
+
+Name      : Toad
+Biography : This is a short line
+
+Name      : Monica
+Biography : This is another short line
+
+Name      : Stu
+Biography : Finally, here is another long line which shold wrap but maybe not
+

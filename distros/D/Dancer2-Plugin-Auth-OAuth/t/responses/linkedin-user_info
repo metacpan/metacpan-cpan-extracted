@@ -1,0 +1,9 @@
+HTTP/1.1 200 OK                                                                                                                                                                           [31/100]
+Content-Type: application/json; charset=UTF-8
+
+{
+ "id": "someStr1ng",
+ "emailAddress": "blom@cpan.org",
+ "formattedName": "Menno Blom",
+ "pictureUrl": "https://media.licdn.com/mpr/mprx/hash"
+}

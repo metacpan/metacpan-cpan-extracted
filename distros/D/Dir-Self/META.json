@@ -1,0 +1,49 @@
+{
+   "abstract" : "a __DIR__ constant for the directory your source file is in",
+   "author" : [
+      "Lukas Mai <l.mai@web.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.74, CPAN::Meta::Converter version 2.132140",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dir-Self",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "File::Spec" : "0",
+            "strict" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mauke/Dir-Self.git",
+         "web" : "https://github.com/mauke/Dir-Self"
+      }
+   },
+   "version" : "0.11"
+}

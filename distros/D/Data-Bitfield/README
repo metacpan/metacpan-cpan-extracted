@@ -1,0 +1,72 @@
+NAME
+    `Data::Bitfield' - manage integers containing multiple bit fields
+
+DESCRIPTION
+    This module provides a single primary function, `bitfield', which
+    creates helper functions in the package that calls it, to assist in
+    managing integers that encode sets of bits, called bitfields. This may
+    be useful when interacting with a low-level networking protocol, binary
+    file format, hardware devices, or similar purposes.
+
+  bitfield
+     bitfield $name, %fields
+
+    Creates two new functions in the calling package whose names are derived
+    from the string `$name' passed here. These functions will be symmetric
+    opposites, which convert between a key/value list of field values, and
+    their packed binary integer representation.
+
+     $binary_value = pack_$name( %field_values )
+
+     %field_values = unpack_$name( $binary_value )
+
+    These two functions will work to a set of field names that match those
+    field definitions given to the `bitfield' function that declared them.
+
+    Each field has a name and a definition. Its definition comes from one of
+    the following field-declaration functions.
+
+    Additional options may be passed by giving a `HASH' reference as the
+    first argument, before the structure name.
+
+     bitfield { %options }, $name, %fields
+
+    Recognised options are:
+
+    unrecognised_ok => BOOL
+        If true, the `pack_' function will not complain about unrecognised
+        field names; they will simply be ignored.
+
+FIELD TYPES
+  boolfield
+     boolfield( $bitnum )
+
+    Declares a single bit-wide field at the given bit index, whose value is
+    a simple boolean truth.
+
+  intfield
+     intfield( $bitnum, $width )
+
+    Declares a field of `$width' bits wide, starting at the given bit index,
+    whose value is an integer. It will be shifted appropriately.
+
+  enumfield
+     enumfield( $bitnum, @values )
+
+    Declares a field some number of bits wide, sufficient to store an
+    integer big enough to act as an index into the list of values, starting
+    at the given bit index. Its value will be automatically converted to or
+    from one of the values given, which should act sensibly as strings for
+    comparison purposes. Holes can be placed in the range of supported
+    values by using `undef'.
+
+TODO
+    *   More flexible error-handling - missing/extra values to `pack_',
+        extra bits to `unpack_'.
+
+    *   Allow truely-custom field handling, including code to support
+        discontiguous fields.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

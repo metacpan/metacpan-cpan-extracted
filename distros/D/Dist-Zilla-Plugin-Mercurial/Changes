@@ -1,0 +1,41 @@
+0.08    2015-06-14
+
+- Fix RT #105188: If something is wrong with hg, Mercurial::Check does not
+generate an error.
+    - Thanks to VDB (Van de Bugger) for the report and proposed fix.
+- Add a check for trailing whitespace.
+- Add a check for valid CPAN::Changes.
+
+0.07    2014-01-27
+
+- Kwalitee deps.
+
+0.06    2014-01-05
+
+- New release to get rid of stray files in the previous release.
+
+0.05    2014-01-03
+
+- New release to sort out the problems with the mis-upload of this
+distribution. No substantial changes.
+
+
+0.04    2013-12-23
+
+- Update the repository URL in the Meta Resources.
+
+
+0.03    2010-05-23
+
+- Fixed to work with the latest Dist::Zilla
+
+
+0.02    2010-05-18
+
+- Add missing prereq on Dist::Zilla
+
+
+0.01    2010-05-17
+
+- Initial release
+

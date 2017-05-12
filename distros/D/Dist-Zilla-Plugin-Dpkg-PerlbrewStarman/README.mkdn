@@ -1,0 +1,188 @@
+# NAME
+
+Dist::Zilla::Plugin::Dpkg::PerlbrewStarman - Generate dpkg files for your perlbrew-backed, starman-based perl app
+
+# VERSION
+
+version 0.16
+
+# SYNOPSIS
+
+A minimal directory structure for application foo:
+
+    lib/
+    root/
+    script/foo.psgi
+    config/nginx/foo.conf
+    perlbrew/bin/starman
+
+A minimal configuration:
+
+    [Dpkg::PerlbrewStarman]
+    web_server      = nginx
+    starman_port    = 6000
+
+A configuration showing optional attributes and their defaults:
+
+    [Dpkg::PerlbrewStarman]
+    web_server      = nginx
+    starman_port    = 6000
+    psgi_script     = script/foo.psgi
+    starman_workers = 5
+    startup_time    = 30
+
+A configuration showing optional attributes that have no defaults:
+
+    [Dpkg::PerlbrewStarman]
+    web_server      = apache
+    starman_port    = 6000
+    apache_modules  = ldap ssl
+    uid             = 782
+
+# DESCRIPTION
+
+This [Dist::Zilla](http://search.cpan.org/perldoc?Dist::Zilla) plugin generates Debian control files that are
+suitable for packaging a self-contained Plack application utilizing the
+Starman preforking PSGI HTTP server.  Key features include supporting an
+independent perl environment and the generation and installation of init
+scripts to manage the service.
+
+Dist::Zilla::Plugin::Dpkg::PerlbrewStarman is an implementation of
+[Dist::Zilla::Plugin::Dpkg](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::Dpkg), which itself is an abstract base class
+more than anything.  It provides the basic framework by which this
+Dist::Zilla plugin builds the Debian control files.  If the desired
+functionality cannot be achieved by PerlbrewStarman, check there for
+other control templates that may be overridden.
+
+Dist::Zilla::Plugin::Dpkg::PerlbrewStarman provides defaults for the
+following [Dist::Zilla::Plugin::Dpkg](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::Dpkg) stubs:
+
+- conffiles\_template\_default
+- control\_template\_default
+- default\_template\_default
+- init\_template\_default
+- install\_template\_default
+- postinst\_template\_default
+- postrm\_template\_default
+
+PerlbrewStarman is intended to be used to deploy applications that meet
+the following requirements:
+
+- [perlbrew](http://search.cpan.org/perldoc?perlbrew) -- others have reported using PerlbrewStarman under other systems (e.g., [Carton](http://search.cpan.org/perldoc?Carton))
+- Plack/PSGI using the [Starman](http://search.cpan.org/perldoc?Starman) preforking HTTP server listening on localhost
+- Apache and/or nginx are utilized as front-end HTTP proxies
+- Application may be preloaded (using Starman's --preload-app)
+- Application does not require root privileges
+
+## Directory structure
+
+The package is installed under `/srv/$PACKAGE`.  Though Debian policy
+generally forbids packages from installing into /srv, PerlbrewStarman
+was written for third-party distribution, not for inclusion into Debian.
+This may change.
+
+By default, your application must conform to the following directory
+structure:
+
+- perl environment in `perlbrew`
+- application configuration in `config`
+- Apache and/or nginx configuration in `config/apache/$PACKAGE.conf` and/or `config/nginx/$PACKAGE.conf`
+- PSGI and other application scripts in `script`
+- application libraries in `lib`
+- application templates in `root`
+
+Only files located in these directories will be installed.  Additional
+files may be added to the is list by specifying a path to an alternative
+install control file using `install_template`.  The default install
+template looks like this:
+
+    config/* srv/{$package_name}/config
+    lib/* srv/{$package_name}/lib
+    root/* srv/{$package_name}/root
+    script/* srv/{$package_name}/script
+    perlbrew/* srv/{$package_name}/perlbrew
+
+The package name is substituted for {$package\_name} by Text::Template
+via [Dist::Zilla::Plugin::Dpkg](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::Dpkg).
+
+Paths may also be removed, but note that the only path in the default
+directory structure that is not utilized elsewhere by PerlbrewStarman
+is `root/*`.
+
+## Other paths
+
+PerlbrewStarman creates a number of files under `/etc` in order to
+integrate with init as well as the front-end HTTP proxy.  The directory
+`/var/log/$PACKAGE` and the link `/etc/$PACKAGE` are created as
+normalized locations for log files and app configuration, respectively.
+These paths should be intuitively familiar for most UNIX administrators.
+
+Following is a complete list of files and symlinks created:
+
+- /etc/init.d/$PACKAGE
+- /etc/default/$PACKAGE
+- /var/log/$PACKAGE
+- /etc/apache2/sites-available/$PACKAGE => /srv/$PACKAGE/config/apache/$PACKAGE.conf
+- /etc/nginx/sites-available/$PACKAGE => /srv/$PACKAGE/config/nginx/$PACKAGE.conf
+- /etc/$PACKAGE => /srv/$PACKAGE/config
+
+## Environment
+
+By default, `/srv/$PACKAGE/perlbrew/bin` is prepended to the `PATH` by
+way of the `PERLBREW_PATH` variable in `/etc/default/$PACKAGE`.  The
+`starman` binary must be present in the path, else the service will
+fail to start.
+
+The application runs as user $PACKAGE by way of the --user argument to
+[Starman](http://search.cpan.org/perldoc?Starman).  Starman flags are specified by the `DAEMON_ARGS` variable
+in `/etc/default/$PACKAGE`.
+
+# SEE ALSO
+
+\* [Dist::Zilla::Plugin::ChangelogFromGit::Debian](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::ChangelogFromGit::Debian)
+\* [Dist::Zilla::Deb](http://search.cpan.org/perldoc?Dist::Zilla::Deb)
+
+# ATTRIBUTES
+
+## starman\_port
+
+The port to use for starman (required).
+
+## starman\_workers
+
+The number of starman workers (5 by default).
+
+## psgi\_script
+
+Location of the psgi script started by starman. By default this is
+`script/$PACKAGE.psgi`.
+
+## startup\_time
+
+The amount of time (in seconds) that the init script will wait on startup. Some
+applications may require more than the default amount of time (30 seconds).
+
+## uid
+
+The UID of the user we're adding for the package. This is helpful for syncing
+UIDs across multiple installations
+
+## web\_server
+
+Set the web server we'll be working with for this package (required).
+Supported values are `apache`, `nginx`, and `all` for both..
+
+## apache\_modules
+
+Set any additional Apache modules that will need to be enabled.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

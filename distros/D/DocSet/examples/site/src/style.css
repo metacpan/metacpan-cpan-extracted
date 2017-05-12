@@ -1,0 +1,529 @@
+/*** main elements ***/
+
+/* body specs */
+
+div.logobox {
+    position: relative;
+}
+
+.body-margins {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+
+    /* this border MUST be _0px_ for ns4 and others */
+    border: 0px;
+
+    padding: 0px 0px 0px 0px;
+    margin: 0px 15px 0px 0px;
+}
+
+/* opera */
+body[class="body-margins"] {
+    width: auto !important;
+}
+
+p, dl, ul, ol  {
+    font-family: helvetica, arial, verdana, sans-serif;
+    /*font-size: 1.0em; */
+}
+
+code {
+    font-family: courier new, courier, monospace;
+    /*font-size: 1.0em;*/
+}
+
+.pre-section {
+    font-family: courier new, courier, monospace;
+    /*font-size: 1.0em;*/
+    border-style: solid;
+    border-width: 0px 0px 0px 1px;
+    white-space: pre;
+    border-color: #004080;
+}
+
+
+/*** headers ***/
+
+h1, h2, h3, h4 {
+    font-family: helvetica, arial, verdana, sans-serif;
+    color: #000000;
+    background-color: transparent;
+}
+h1 { font-size: 1.3em; }
+h2 { font-size: 1.2em; }
+h3 { font-size: 1.1em; }
+h4 { font-size: 1.0em; }
+
+
+
+
+
+/*** links ***/
+
+/* hidden links */
+h1 a:link,    h2 a:link,    h3 a:link,    h4 a:link,
+h1 a:visited, h2 a:visited, h3 a:visited, h4 a:visited,
+h1 a:hover,   h2 a:hover,   h3 a:hover,   h4 a:hover  {
+    background-color: transparent;
+    color: #000000;
+    text-decoration: none;
+}
+
+a.more {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.8em;
+    background-color: transparent;
+    color: #993333;
+    text-decoration: none;
+}
+
+/*ul a{
+    text-decoration: none;
+}*/
+
+ul.toc a, dl.toc a {
+    text-decoration: none;
+}
+
+ul a:hover, ul.toc a:hover, dl.toc a:hover {
+    text-decoration: underline;
+}
+
+
+div.nonselectedmenuitem a:link,
+div.nonselectedmenuitem a:visited,
+div.nonselectedmenuitem a:active {
+    background-color: transparent;
+    color: #525d76;
+    text-decoration: none;
+}
+div.nonselectedmenuitem a:hover {
+    text-decoration: underline;
+}
+
+div.selectedmenuitem a,
+div.selectedmenuitem a:link,
+div.selectedmenuitem a:visited,
+div.selectedmenuitem a:active {
+    background-color: transparent;
+    color: #ffffff;
+    text-decoration: none;
+}
+div.selectedmenuitem a:hover {
+    text-decoration: underline;
+}
+
+div.menu-title a:link,
+div.menu-title a:visited,
+div.menu-title a:active,
+div.menu-title a:hover {
+    background-color: transparent;
+    color: #000000;
+    text-decoration: none;
+}
+
+
+
+
+/*** main boxes ***/
+
+div.leftbox {
+    position: absolute;
+    top: 57px;
+    left: 0px;
+
+    width: 174px;
+    /* this border MUST be _1px_ for ns4 */
+    border: 1px;
+}
+
+
+div.rightbox {
+    position: inherit; /*this can not be relative, absolute or unspecifed*/
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 196px;
+    border: 1px; /* this border MUST be _1px_ for ns4 */
+    background-color: #ffffff;
+    color: #000000;
+}
+
+div.footer {
+    position: inherit; 
+    top: 0px;
+    left: 0px;
+    padding: 40px 50px 20px 50px;
+    margin: 0px 0px 0px 196px;
+    border: 1px; /* this border MUST be _1px_ for ns4 */
+    text-align: center;
+    background-color: #ffffff;
+    color: #000000;
+}
+
+div.adtext {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.8em;
+    text-align: center;
+    padding: 5px;
+}
+
+p.modified {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.85em;
+    text-align: center;
+}
+
+p.copyright {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.60em;
+    text-align: center;
+}
+
+td.headline {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+
+
+
+/*** breadcrumb ***/
+td.navbarglobal {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.85em;
+    background-color: #ffffff;
+    color: #525d76;
+}
+
+td.navbarglobal a:link, td.navbarglobal a:visited, td.navbarglobal a:active {
+    font-family: verdana, arial, helvetica, sans-serif;
+    text-decoration: none;
+    color: #828da6;
+    background-color: #ffffff;
+}
+
+td.navbarglobal a:hover {
+    font-family: verdana, arial, helvetica, sans-serif;
+    text-decoration: none;
+    color: #666666;
+    background-color: #ffffff;
+}
+
+
+
+
+
+
+/*** menu styles ***/
+
+/* light blue bg-color for menu-titles */
+td.menu-title-bg {
+    background-color: #828da6;
+    color: #ffffff;
+}
+
+/* white bg-color for non-selected menu-items */
+td.non-sel-bg {
+    background-color: #ffffff;
+    color: #525d76;
+}
+
+/* dark blue bg-color for selected menu-items */
+td.sel-bg {
+    background-color: #525d76;
+    color: #ffffff;
+}
+
+div.nonselectedmenuitem {
+    padding: 2px 3px 2px 3px;
+    background-color: #ffffff;
+    color: #525d76;
+    font-size: 0.9em;
+    font-family: verdana, arial, helvetica, sans-serif;
+}
+
+
+div.selectedmenuitem {
+    background-color: #525d76;
+    color: #ffffff;
+    padding: 2px 3px 2px 3px;
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 0.9em;
+}
+
+div.menu-title {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px 3px 2px 3px;
+    background-color: #828da6;
+    color: #000000;
+}
+
+
+/* dark blue border color for menu-boxes */
+td.menu-border {
+    background-color: #333333;
+    color: #ffffff;
+}
+
+
+/* Wrapped around each section of content */
+div.index-section {
+    font-family: helvetica, arial, verdana, sans-serif;
+    /*font-size: 1.0em;*/
+}
+
+
+
+
+/*** swish-e search stuff ***/
+
+/* Wrapped around the entire search form in src/search/search.tt */
+div.search-form {
+    font-family: helvetica, arial, verdana, sans-serif;
+    /*font-size: 1.0em;  */
+    background-color: white;
+    color: #000000;
+}
+
+.search-text{
+    font-size: 12px;
+    font-family: helvetica, arial, verdana, sans-serif;
+/*    width: 80px; */
+/*     margin: 0px 0px 2px 0px; */
+}
+
+/* "Results for" line in search results search.tt */
+td.search-header {
+    background-color: #525d76;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #ffffff;
+    font-size: 0.9em;
+}
+
+/* Shows search time */
+td.search-times {
+    background-color: #525d76;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #ffffff;
+    font-size: 0.7em;
+}
+
+/* Prev|Next page in search results */
+td.search-nav {
+    background-color: #eeeeee;
+    font-family: verdana, arial, helvetica, sans-serif;
+    color: #000000;
+    font-size: 0.8em;
+}
+
+
+/* title line for a search result */
+span.search-result-title {
+    font-family: helvetica, arial, verdana, sans-serif;
+   /* font-size: 1.0em;*/
+    background-color: transparent;
+    color: #000000;
+}
+
+
+/* context in search result */
+div.search-summary {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.8em;
+}
+
+/* a search result's properties */
+div.search-props {
+    margin-top: 0.4em;
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.80em;
+    color: #009999;
+    background-color: transparent
+}
+
+/* swish.cgi */
+span.searchhighlight {
+    background-color: #ffff99;
+    color: #000000; /* please triple check this!!!!*/
+}
+
+/* indention on checkboxes on search results */
+div.level {
+    margin-left: 25px;
+}
+
+/*** end of swish-e search stuff ***/
+
+
+
+/*** misc ***/
+
+/* general border-color for ad-images */
+.img-border {
+    color: #000000;
+    border-color: #000000;
+    background-color: transparent;
+}
+
+/* dark-blue bg-color */
+td.blue-bg {
+    background-color: #525d76;
+    color: #000000; /* please triple check this!!!!*/
+}
+
+/* light gray/white bg-color for ad-sec */
+td.ad-bg {
+    background-color: #ffffff;
+    color: #000000; /* please triple check this!!!!*/
+}
+
+
+/* lines for camel */
+td.camel-line-top {
+    background-color: #bfcfe7;
+    color: #000000; /* please triple check this!!!!*/
+}
+td.camel-line-bottom {
+    background-color: #525d76;
+    color: #000000; /* please triple check this!!!!*/
+}
+
+
+.hr {
+    height: 1px;
+}
+
+div.changes {
+   text-align: center;
+}
+
+/*** quotations, mainly for the first page ***/
+
+div.quotation {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 0.9em;
+    color: #004080;
+    background-color: transparent;
+    text-align: justify;
+    padding-top: 10px;
+    padding-right: 40px;
+    padding-bottom: 0px;
+    padding-left: 40px;
+    margin-right: 20px;
+    margin-left: 20px;
+    border-width: 0;
+    border-style: solid;
+}
+
+/* Used to cite the author */
+div.quote-details {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-weight: normal;
+    font-size: 0.85em;
+    color: #004080;
+    background-color: transparent;
+    text-align: right;
+    margin-top: 5px;
+    margin-right: 60px;
+}
+
+
+
+/* Search box styles */
+
+form.search-wrap {
+    margin: 2px 0px 2px 0px;
+    font-size: 1px;
+    font-family: helvetica, arial, verdana, sans-serif;
+}
+
+div.search-box {
+    padding: 2px 0px 2px 0px;
+}
+
+td.search-box-bg {
+    padding: 2px 0px 2px 0px;
+    background-color: #ffffff;
+    color: #525d76;
+}
+
+.inp-text{
+    font-size: 11px;
+    font-family: helvetica, arial, verdana, sans-serif;
+    width: 80px;
+    margin: 0px 0px 2px 0px;
+    display: block;
+}
+
+.inp-select{
+    font-size: 11px;
+    font-family: helvetica, arial, verdana, sans-serif;
+    width: 120px;
+    margin: 0px 0px 2px 0px;
+}
+
+.inp-submit{
+    font-size: 11px;
+    font-family: helvetica, arial, verdana, sans-serif;
+}
+
+
+
+/*** notorious space gif feat ***/
+/*
+we use the html tag <small> for this feat, hence that tag wont work as normal
+we can [probably] use any non block tag we want
+*/
+
+small.nbr{
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 1px ;
+    line-height: 1px;
+    display: run-in ;  /* must _not_ be "inline" */
+}
+
+br.smallbr {
+    font-family: helvetica, arial, verdana, sans-serif;
+    font-size: 1px ;
+    line-height: 1px;
+    display: run-in ;
+}
+
+/* opera, ns6 display inline if you meet <small class="nbr"> , display must not be #inline" for opera*/
+small[class="nbr"] {
+    display: block;
+}
+
+/* for internet explorer 5.5 windows nt/2000, others? */
+small {
+    display: none;
+}
+
+/*** table styles, make them fit with the general design ***/
+/* mostly stolen from menu though */
+
+/* light blue bg-color for titles */
+td.table-title-bg,
+th.table-title-bg {
+    background-color: #828da6;
+    color: #ffffff;
+}
+
+div.table-title {
+    font-family: verdana, arial, helvetica, sans-serif;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    padding: 2px 3px 2px 3px;
+    background-color: #828da6;
+    color: #000000;
+}
+
+td.table-bg {
+    background-color: #eeeeee;
+    color: #000000;
+}

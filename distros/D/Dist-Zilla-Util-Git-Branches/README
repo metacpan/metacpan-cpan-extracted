@@ -1,0 +1,71 @@
+NAME
+    Dist::Zilla::Util::Git::Branches - Extract branches from Git
+
+VERSION
+    version 0.001000
+
+SYNOPSIS
+    This module aims to do what you want when you think you want to parse
+    the output of
+
+        git branch
+
+    Except it works the right way, and uses
+
+        git for-each-ref
+
+    So
+
+        use Dist::Zilla::Util::Git::Branches;
+
+        my $branches = Dist::Zilla::Util::Git::Branches->new(
+            zilla => $self->zilla
+        );
+        for my $branch ( $branches->branches ) {
+            printf "%s %s", $branch->name, $branch->sha1;
+        }
+
+METHODS
+  "branches"
+    Returns a "::Branch" object for each local branch.
+
+  get_branch
+    Get branch info about master
+
+        my $branch = $branches->get_branch('master');
+
+    Note: This can easily return multiple values.
+
+    For instance, "branches" is implemented as
+
+        my ( @branches ) = $branches->get_branch('**');
+
+    Mostly, because the underlying mechanism is implemented in terms of
+    fnmatch(3)
+
+    If the branch does not exist, or no branches match the expression,
+    "get_branch" will return an empty list.
+
+    So in the top example, $branch is "undef" if "master" does not exist.
+
+  "current_branch"
+    Returns a "::Branch" object if currently on a "branch", "undef"
+    otherwise.
+
+        my $b = $branches->current_branch;
+        if ( defined $b ) {
+            printf "Currently on: %s", $b->name;
+        } else {
+            print "Detached HEAD";
+        }
+
+AUTHOR
+    Kent Fredric <kentfredric@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Kent Fredric
+    <kentfredric@gmail.com>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

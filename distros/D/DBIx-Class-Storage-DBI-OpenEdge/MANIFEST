@@ -1,0 +1,11 @@
+Changes
+lib/DBIx/Class/Storage/DBI/OpenEdge.pm
+Build.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

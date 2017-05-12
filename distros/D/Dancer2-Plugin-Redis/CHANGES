@@ -1,0 +1,5 @@
+Revision history for Dancer2::Plugin::Redis
+
+0.007 Wed 10 Aug 15:45:02 CEST 2016
+
+	* Switch back to using Types::Standard

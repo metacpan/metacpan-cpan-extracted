@@ -1,0 +1,12 @@
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.mkdn
+dist.ini
+lib/DateTime/Format/Diotek.pm
+t/parse.t
+weaver.ini

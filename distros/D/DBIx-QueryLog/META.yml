@@ -1,0 +1,57 @@
+---
+abstract: 'Logging queries for DBI'
+author:
+  - 'xaicron <xaicron {at} cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::More: '0.96'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-QueryLog
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::QueryLog:
+    file: lib/DBIx/QueryLog.pm
+    version: '0.41'
+recommends:
+  DBD::Pg: '0'
+  DBD::SQLite: '0'
+  DBD::mysql: '0'
+requires:
+  DBI: '0'
+  Data::Dumper: '0'
+  Term::ANSIColor: '0'
+  Text::ASCIITable: '0'
+  Time::HiRes: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/xaicron/p5-DBIx-QueryLog/issues
+  homepage: https://github.com/xaicron/p5-DBIx-QueryLog
+  repository: git://github.com/xaicron/p5-DBIx-QueryLog.git
+version: '0.41'
+x_contributors:
+  - 'Yuki Ibe <yibe@yibe.org>'
+  - 'tokuhirom <tokuhirom@gmail.com>'
+  - 'cho45 <cho45@lowreal.net>'
+  - 'Syohei YOSHIDA <syohex@gmail.com>'
+  - 'makamaka <makamaka.donzoko@gmail.com>'
+  - 'Ryuta Kamizono <kamipo@gmail.com>'
+  - 'Kenichi Ishigaki <ishigaki@cpan.org>'
+  - 'xaicron <xaicron@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

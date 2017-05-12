@@ -1,0 +1,5 @@
+plugins:
+    Auth::Extensible:
+        realms:
+            config1:
+                priority: 2

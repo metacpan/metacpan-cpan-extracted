@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Digest-FP56x1xor
+version:             0.15
+abstract:            A 64bit fingerprint algorithm that features arithmetics.
+license:             ~
+author:              
+    - Juergen Weigert <jw@suse.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

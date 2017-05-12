@@ -1,0 +1,91 @@
+[% IF modinfo.module.parent_classes.first %]
+=head2 Parent Classes
+
+=over 4
+
+[% FOREACH parent_class = modinfo.module.parent_classes %]
+=item [% parent_class.name %]
+[% END %]
+=back
+[% END %]
+
+[% IF modinfo.properties.first %]
+=head2 Properties
+
+=over 4
+
+[% FOREACH property = modinfo.properties %]
+=item [% property.name %] as [% property.data_type  %]
+[% property.short_description %]
+
+[% END %]
+=back
+[% END %]
+
+[% IF modinfo.constructors.first %]
+=head2 Constructors
+[% functions = modinfo.constructors %]
+[% INCLUDE function %]
+[% END %]
+
+[% IF modinfo.methods.first %]
+=head2 Methods
+[% functions = modinfo.methods %]
+[% INCLUDE function %]
+[% END %]
+
+[% IF modinfo.functions.first %]
+=head2 Functions
+[% functions = modinfo.functions %]
+[% INCLUDE function %]
+[% END %]
+
+[% IF modinfo.module.dependencies.first %]
+=head2 Dependencies
+
+=over 4
+[% FOREACH dependency = modinfo.module.dependencies %]
+=item [% dependency.type %] [% dependency.target  %]
+[% END -%]
+=back
+[% END -%]
+
+
+[% BLOCK function %]
+[% IF functions.first %]
+=over 4
+[% END %]
+[% FOREACH function = functions %]
+
+=item sub [% function.name %] returns [[% function.data_type or 'VOID'  %]]
+[% IF function.parameters.first -%]
+
+=over 4
+
+[% FOREACH param = function.parameters -%]
+[% IF param.data_type == 'HASH' -%]
+=item [% param.name %] as [% param.data_type %]
+
+[% IF param.keys.first -%]
+=over 4
+[% FOREACH pkey = param.keys %]
+=item [% pkey.name %] as [% pkey.data_type %]
+[% END -%]		
+
+=back
+[% END -%]
+[% ELSE -%]
+=item [% param.name %] as [% param.data_type %]
+[% END -%]
+[% END -%]
+
+=back
+[% END -%]
+
+[% function.short_description %]
+[% END %]
+[% IF functions.first %]
+
+=back
+[% END %]
+[% END %]

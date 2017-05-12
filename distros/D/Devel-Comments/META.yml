@@ -1,0 +1,49 @@
+---
+abstract: 'Debug with executable smart comments to logs'
+author:
+  - 'Xiong Changnian <XIONG@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+keywords:
+  - 'source filter'
+  - 'smart comments'
+  - 'perl debugging'
+  - development
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Comments
+provides:
+  Devel::Comments:
+    file: lib/Devel/Comments.pm
+    version: v1.1.4
+  IO::Capture::Sayfix:
+    file: lib/IO/Capture/Sayfix.pm
+    version: 0.05
+  IO::Capture::Tellfix:
+    file: lib/IO/Capture/Tellfix.pm
+    version: 0.05
+recommends:
+  IO::Capture::Sayfix: 0
+  IO::Capture::Stderr::Extended: 0
+  IO::Capture::Stdout::Extended: 0
+  IO::Capture::Tellfix: 0
+  Test::Deep: 0
+  Test::More: 0.94
+  Try::Tiny: 0
+  perl: 5.010001
+requires:
+  Data::Dumper: 0
+  Filter::Simple: 0.8
+  List::Util: 0
+  Text::Balanced: 2
+  perl: 5.008
+  version: 0.77
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/Xiong/devel-comments
+version: v1.1.4

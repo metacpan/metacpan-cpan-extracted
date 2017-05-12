@@ -1,0 +1,7 @@
+Changes
+lib/DateTime/Format/XSD.pm
+Makefile.PL
+MANIFEST
+README
+t/01-basics.t
+META.yml                                 Module meta-data (added by MakeMaker)

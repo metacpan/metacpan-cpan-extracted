@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Devel-Events-Generator-ClassPublisher
+version:             0.01
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Class::Publisher:              0
+    Devel::Events:                 0.03
+    Test::use::ok:                 0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

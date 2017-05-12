@@ -1,0 +1,25 @@
+DateTime-Calendar-Hijri
+=======================
+
+This module parses Islamic dates in the Hijri calendar. This calendar
+starts at the Hijrah, the flight of Mohammed to Medina in the year 622
+Gregorian.
+
+Compared to some other DateTime calendar modules,
+DateTime::Calendar::Hijri has only very limited functionality. This is
+because I am not very familiar with this calendar. The module is a thin
+wrapper around the Date::Hijri module by Alex Pleiner.
+
+If you are familiar with the Hijri calendar, and if you want to take
+over the maintainership of this module, please mail me at the address
+included in the module documentation, or contact the datetime@perl.org
+mailing list.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL
+make
+make test
+make install

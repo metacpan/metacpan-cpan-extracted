@@ -1,0 +1,11 @@
+Version 0.02: 2014-09-03
+	* Correct the name of the module in the SYNOPSIS
+
+Version 0.01: 2014-09-03
+	* Improved examples and documentation.
+	* Optimized property access, 33% throughput increase in a simple benchmark.
+	* Supported accessing multiple properties of a descendent property:
+	  foo/bar/baz(one,two,three)
+
+Version 0.00_01: 2014-09-03
+	* Initial beta release.

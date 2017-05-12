@@ -1,0 +1,12 @@
+_Inline.*
+.*\.svn.*
+.*\.old
+.*\.bak
+.*\.swp
+.*\.inl
+blib/.*
+\.git.*
+^Makefile$
+^Build$
+^Build\.bat$
+^Device-USB-Win32Async-.*\.tar\.gz$

@@ -1,0 +1,9 @@
+Revision history for DBIx-Iterator
+
+0.0.2     2013-03-24 12:02:22 Europe/Oslo
+    - Updated test requirements. It seems SQL::Statement older than 1.401
+      has problems with our very trivial queries. Thanks Slaven Rezić and
+      CPAN Testers for the automated report.
+
+0.0.1     2013-03-22 15:29:11 Europe/Oslo
+    - Initial version

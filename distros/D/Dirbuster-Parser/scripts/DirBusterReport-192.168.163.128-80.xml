@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<DirBusterResults>
+<Result type="Dir" path="/" responseCode="200" />
+<Result type="Dir" path="/cgi-bin/" responseCode="403" />
+<Result type="Dir" path="/icons/" responseCode="200" />
+<Result type="Dir" path="/doc/" responseCode="403" />
+<Result type="Dir" path="/icons/small/" responseCode="200" />
+<Result type="Dir" path="/base/" responseCode="302" />
+<Result type="Dir" path="/base/index/" responseCode="302" />
+<Result type="File" path="/base/index.php" responseCode="302" />
+<Result type="Dir" path="/base/images/" responseCode="200" />
+<Result type="Dir" path="/base/help/" responseCode="200" />
+<Result type="File" path="/base/help/base_app_faq.php" responseCode="200" />
+<Result type="Dir" path="/base/docs/" responseCode="200" />
+<Result type="File" path="/base/help/base_help.php" responseCode="200" />
+<Result type="File" path="/base/help/base_setup_help.php" responseCode="200" />
+<Result type="File" path="/base/docs/CHANGELOG" responseCode="200" />
+<Result type="File" path="/base/docs/CREDITS" responseCode="200" />
+<Result type="File" path="/base/docs/GPL" responseCode="200" />
+<Result type="File" path="/base/docs/INSTALL" responseCode="200" />
+<Result type="File" path="/base/docs/INSTALL.rtf" responseCode="200" />
+<Result type="File" path="/base/docs/README" responseCode="200" />
+<Result type="File" path="/base/docs/README.country_support" responseCode="200" />
+<Result type="File" path="/base/docs/README.graph_alert_data" responseCode="200" />
+<Result type="File" path="/base/docs/README.mssql" responseCode="200" />
+<Result type="File" path="/base/docs/README.rpm" responseCode="200" />
+<Result type="File" path="/base/docs/TODO" responseCode="200" />
+<Result type="File" path="/base/docs/UPGRADE" responseCode="200" />
+<Result type="File" path="/base/docs/base_faq.rtf" responseCode="200" />
+<Result type="Dir" path="/base/docs/contrib/" responseCode="200" />
+<Result type="File" path="/base/docs/contrib/Snort,%20Apache,%20MYSQL,%20PHP,%20and%20BASE%20instalacio%cc%81n%20en%20Slackware.pdf" responseCode="200" />
+<Result type="Dir" path="/base/admin/" responseCode="200" />
+<Result type="Dir" path="/base/admin/index/" responseCode="200" />
+<Result type="File" path="/base/admin/index.php" responseCode="200" />
+<Result type="Dir" path="/base/scripts/" responseCode="200" />
+<Result type="File" path="/base/scripts/base_maintenance.pl" responseCode="200" />
+<Result type="Dir" path="/base/includes/" responseCode="200" />
+<Result type="Dir" path="/base/includes/templates/" responseCode="200" />
+<Result type="Dir" path="/base/includes/templates/default/" responseCode="200" />
+</DirBusterResults>

@@ -1,0 +1,60 @@
+NAME
+    Dist::Zilla::Plugin::Pod2Readme - Generate README from Pod, as simply as
+    possible
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+        # in dist.ini
+        [Pod2Readme]
+
+DESCRIPTION
+    This module generates a text README file from the POD of your main
+    module.
+
+ATTRIBUTES
+  filename
+    Name for the generated README. Defaults to 'README'.
+
+  source_filename
+    The file from which to extract POD for the content of the README.
+    Defaults to the main module of the distribution.
+
+SEE ALSO
+    *   Dist::Zilla::Plugin::Readme - bare bones boilerplate README
+
+    *   Dist::Zilla::Plugin::ReadmeFromPod - overly complex version of this
+
+    *   Dist::Zilla::Plugin::ReadmeAnyFromPod - overly complex, but does
+        multiple file types
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme>
+
+      git clone https://github.com/dagolden/Dist-Zilla-Plugin-Pod2Readme.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Dan Book <grinnz@grinnz.com>
+
+    *   David Golden <xdg@xdg.me>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

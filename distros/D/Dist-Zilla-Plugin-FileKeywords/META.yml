@@ -1,0 +1,22 @@
+---
+abstract: 'Expand $$Keywords$$ in your files.'
+author:
+  - 'Stirling Westrup <swestrup@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-FileKeywords
+requires:
+  Data::Dumper: 0
+  Dist::Zilla::Role::FileFinderUser: 0
+  Dist::Zilla::Role::FileMunger: 0
+  Moose: 0
+  Moose::Autobox: 0
+  perl: 5.006
+version: 0.02

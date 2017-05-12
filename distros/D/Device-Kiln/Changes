@@ -1,0 +1,8 @@
+Revision history for Perl module Device::Kiln
+
+0.01 Mon May  3 18:27:15 2010
+    - original version; created by ExtUtils::ModuleMaker 0.51
+
+0.02 Sat 5 June 2010
+   - Removed some old references to Device::Q1573::Plotter
+

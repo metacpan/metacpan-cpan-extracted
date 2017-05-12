@@ -1,0 +1,164 @@
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Kanji::Tomoe - parse the data files of the Tomoe project
+
+=head1 SYNOPSIS
+
+    my $tomoe = Data::Kanji::Tomoe->new (
+        tomoe_data_file => '/path/to/data/file',
+        character_callback => \& user_callback,
+    );
+    $tomoe->parse ();
+
+=head1 VERSION
+
+This documents Data::Kanji::Tomoe version 0.05
+corresponding to git commit L<00597f0d29d6219cfd038cacac393c4c64b4fbe2|https://github.com/benkasminbullock/Data-Kanji-Tomoe/commit/00597f0d29d6219cfd038cacac393c4c64b4fbe2> released on Wed Jan 11 09:17:37 2017 +0900.
+
+=head1 DESCRIPTION
+
+This Perl module parses the kanji or hanzi data files supplied with
+L<the Tomoe "handwriting recognition engine"|/Tomoe>.
+
+The data itself is not supplied with this module.
+
+The parsing is based on L<XML::Parser>. It breaks the Tomoe data into
+individual characters, and calls a subroutine supplied by the user
+with the data for each character.
+
+=head1 METHODS
+
+=head2 new
+
+    
+    use Data::Kanji::Tomoe;
+    my $obj = Data::Kanji::Tomoe->new (
+        tomoe_data_file => '/path/to/data/file',
+        character_callback => \& user_callback,
+    );
+
+
+Create the object. The argument is a hash. The name of the data file
+to be parsed, under the key C<tomoe_data_file>, must be supplied.
+
+=cut
+
+=head2 parse
+
+    $tomoe->parse ();
+
+Parse the XML in the Tomoe data file.
+
+As the XML tags <character>...</character> are parsed from the file,
+the callback specified by C<character_callback> is called back in the
+form
+
+    &{$callback} ($obj, $character);
+
+where C<$character> is a hash reference with the following keys and
+values.
+
+=over
+
+=item utf8
+
+Value: the character itself.
+
+=item strokes
+
+Value: an array reference containing the strokes of the
+character. Each element of the array reference is a reference to an
+array of the points of the line. Each of these points is another
+reference. So, for example, if the original Tomoe data consists of
+
+    <strokes>
+        <stroke>
+            <point x="1" y="2"/>
+            <point x="3" y="4"/>
+        </stroke>
+        <stroke>
+            <point x="5" y="6"/>
+        </stroke>
+    </strokes>
+
+then C<< $character->{strokes} >> contains something like
+
+    [[[1, 2], [3, 4]], [[5, 6]]]
+
+=back
+
+Any data which the user wishes to send can be transmitted through the
+object itself:
+
+    
+    use Data::Kanji::Tomoe;
+    my $obj = Data::Kanji::Tomoe->new (
+        tomoe_data_file => '/path/to/data/file',
+        character_callback => \& user_callback,
+        data_I_wish_to_send => {some => 'data'},
+    );
+    
+    $obj->parse ();
+    
+    sub user_callback
+    {
+        my ($obj, $c) = @_;
+        my $data = $obj->{data_I_wish_to_send};
+    }
+
+
+=head1 SEE ALSO
+
+=head2 Tomoe
+
+The Tomoe data is located at
+L<https://sourceforge.net/projects/tomoe/>. As of version 0.05 of Data::Kanji::Tomoe, the most recent update of the
+software, version 0.6.0, dates from 29 June 2007.
+
+=head2 Other sources of kanji shape data
+
+The Tomoe data for the Japanese kanji contains many errors. Users who
+do not specifically know what data to use are recommended not to use
+the Tomoe data.
+
+The following projects contain alternative data.
+
+=over
+
+=item KanjiVG
+
+A better set of data for most purposes is the data of L<the KanjiVG
+project|http://kanjivg.tagaini.net/>. This is XML data using SVG
+(Scalar Vector Graphics) for kanji line data.
+
+=item Kanji Database / CJKVI-IDS
+
+Another project containing visual kanji data is
+L<http://kanji-database.sourceforge.net/>, which contains "Ideographic
+Description Sequences" (IDS) rather than line data. See also
+L<https://github.com/cjkvi/cjkvi-ids> for the Github version of this
+project. CJKVI-IDS uses a simple text format. This is related to
+L<GlyphWiki|http://glyphwiki.org>.
+
+=back
+
+
+=head1 AUTHOR
+
+Ben Bullock, <bkb@cpan.org>
+
+=head1 COPYRIGHT & LICENCE
+
+This package and associated files are copyright (C) 
+2012-2017
+Ben Bullock.
+
+You can use, copy, modify and redistribute this package and associated
+files under the Perl Artistic Licence or the GNU General Public
+Licence.
+
+
+

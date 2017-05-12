@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/App/Command/shell.pm
+lib/Dist/Zilla/Shell.pm
+t/00-compile.t
+t/90-pod.t
+t/91-pod-coverage.t
+t/release-kwalitee.t

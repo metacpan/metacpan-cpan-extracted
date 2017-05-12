@@ -1,0 +1,8 @@
+Changes
+MANIFEST
+META.yml
+META.json
+Makefile.PL
+LexAlias.pm
+LexAlias.xs
+t/Devel-LexAlias.t

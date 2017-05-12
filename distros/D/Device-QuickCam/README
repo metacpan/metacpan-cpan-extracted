@@ -1,0 +1,163 @@
+Device/QuickCam version 0.02
+============================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  libcqcam
+  
+  libjpeg
+
+SYNOPSIS
+
+ use Device::QuickCam;
+
+ my $cam = Device::QuickCam->new();
+ $cam->set_quality(50); #Set JPEG Quality in %
+ $cam->set_bpp(24); #Set bits per pixel (24 or 32)
+ $cam->set_width(320); #Set image width
+ $cam->set_height(240); #Set image height
+ for(1..10)
+ { $cam->set_file("foo-$_.jpg"); #Use filename
+   $cam->grab(); #Grab it
+ }
+
+ #HTTP Example
+
+ use Device::QuickCam;
+
+ my $cam = Device::QuickCam->new();
+ $cam->set_quality(100);
+ $cam->set_bpp(32);
+ $cam->set_width(640);
+ $cam->set_height(480);
+ #No file set - dump to STDOUT
+ $cam->set_http(1);
+ #Enable HTTP Support
+ $cam->grab();
+ #This dumps JPEG Data to STDOUT
+ 
+DESCRIPTION
+This module allows access to the Connectix/Logitech QuickCam. This
+module uses libcqcam and expects the user to play around with it.
+libcqcam isn't installed as library during a default cqcam installation
+(altho Debian does appear to provide it as a package).
+
+REQUIREMENTS
+You'll need :
+
+ * root
+   Root access or similar permissions to access the port.
+
+ * libcqcam
+   libcqcam installed and headers nearby. You will need them while building
+   the C++ code. Location of libcqcam can be found below.
+
+ * libjpeg
+   libcqcam and this module output images in JPEG. You will need libjpeg
+   installed.
+
+ * a Connectix/Logitech QuickCam
+   Well, obviously a QuickCam. These cameras were first manufactured by
+   Connectix. Logitech later bought the company and same webcams were
+   then/now sold under the Logitech brand. There are FAQs on how to get
+   these cameras working in Linux.
+
+ * Linux
+   Well, It helps anyway. I have no idea how this might work on other
+   platforms altho libcqcam supports a few.
+
+FUNCTIONS
+ grab()
+ This function grabs image data, using settings defined beforehand.
+
+ set_quality(int)
+ This function can be used to set JPEG Quality. Values range from 0 to
+ 100. Default is 50.
+
+ set_bpp(int)
+ This function can be used to set a bits per pixel rate. Valid values are
+ 24 and 32. Default is 24.
+
+ set_width(int)
+ This function can be used to set the output image width. Values range
+ from 0 to 640. Default is 320.
+
+ set_height(int)
+ This function can be used to set the output image height. Values range
+ from 0 to 480. Default is 240.
+
+ set_red(int)
+ This function can be used to set the red level of the output image.
+ Values range from 0 to 255.
+
+ set_green(int)
+ This function can be used to set the green level of the output image.
+ Values range from 0 to 255.
+
+ set_blue(int)
+ This function can be used to set the blue level of the output image.
+ Values range from 0 to 255.
+
+ set_decimation(int)
+ This function can be used to set scaling of the image. Valid values are
+ 1, 2 and 4. Default is 1.
+
+ set_autoadj(int)
+ This function can be used to toggle auto adjusting. Set 0 for off, 1 for
+ on. Default is on.
+
+ set_port(int)
+ This function can be used to set a camera port. Default value is 0 for
+ autoprobe. Valid values are 0x378, 0x278 and 0x3bc. If unsure, leave
+ this at 0.
+
+ set_debug(int)
+ This function allows you to toggle debug info. 0 is off, 1 is on.
+ Default is off.
+
+ set_file(string)
+ This functions allows you to set a filename for output.
+ By not setting a filename, you force output to STDOUT.
+
+EXPORT
+None by default.
+
+AUTHOR
+Hendrik Van Belleghem, 
+<beatnik - at - quickndirty - dot - org>
+
+Based on code by Patrick Reynolds 
+<reynolds - at - cs - dot - duke - dot - edu>
+
+SEE ALSO
+
+libcqcam, part of cqcam. http://www.cs.duke.edu/~reynolds/cqcam/
+
+COPYRIGHT AND LICENCE
+
+See COPYING and COPYRIGHT for more information
+
+Copyright (C) 2003 Hendrik Van Belleghem
+Portions Copyright (C) 1998 Patrick Reynolds 

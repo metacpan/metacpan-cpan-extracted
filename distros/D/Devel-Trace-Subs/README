@@ -1,0 +1,202 @@
+NAME
+
+    Devel::Trace::Subs - Generate, track, store and print code flow and
+    stack traces.
+
+SYNOPSIS
+
+        use Devel::Trace::Subs qw(trace trace_dump install_trace remove_trace);
+
+    Add a trace() call to the top of all your subs
+
+        trace(); # or even better: $trace() if $ENV{DTS_ENABLE};
+
+    Enable the module anywhere in the stack (preferably the calling script)
+
+        $ENV{DTS_ENABLE} = 1;
+
+    From anywhere (typically near the end of the calling script) dump the
+    output
+
+        trace_dump();
+
+    Automate the installation into a file (or all files in a directory)
+
+        install_trace(file => 'filename'); # or directory, or 'Module::Name'
+
+    Remove the effects of install_trace()
+
+        remove_trace(file => 'filename')
+
+    See EXAMPLES for further details.
+
+DESCRIPTION
+
+    This module facilitates keeping track of a project's code flow and
+    stack trace information in calls between subroutines.
+
+    Optionally, you can use this module to automatically inject the
+    appropriate trace() calls into all subs in individual files, all Perl
+    files within a directory structure, or even in production files by
+    specifying its Module::Name.
+
+    It also has the facility to undo what was done by the automatic
+    installation mentioned above.
+
+EXPORT
+
+    None by default. See EXPORT_OK.
+
+EXPORT_OK
+
+    trace, trace_dump, install_trace, remove_trace
+
+FUNCTIONS
+
+ trace
+
+    Parameters: None
+
+    In order to enable tracing, you must set $ENV{DTS_ENABLE} to a true
+    value somewhere in the call stack (preferably in the calling script).
+    Simply set to a false value (or remove it) to disable this module.
+
+    Puts the call onto the stack trace. Call it in scalar context to
+    retrieve the data structure as it currently sits.
+
+    Note: It is best to write the call to this function within an if
+    statement, eg: trace() if $ENV{DTS_ENABLE};. That way, if you decide to
+    disable tracing, you'll short circuit the process of having the
+    module's trace() function being loaded and doing this for you.
+
+    If you set $ENV{DTS_FLUSH_FLOW} to a true value, we'll print to STDOUT
+    a single line of code flow during each trace() call. This helps in
+    figuring out where a program is having trouble, but the program itself
+    isn't outputting anything useful.
+
+ trace_dump
+
+    Dumps the output of the collected data.
+
+    All of the following parameters are optional.
+
+    want => 'string', type => 'html', file => 'file.ext'
+
+    want: Takes either 'flow' or 'stack', and will output the respective
+    data collection. If this parameter is omitted, both code flow and stack
+    trace information is dumped.
+
+    type: Has only a single value, 'html'. This will dump the output in
+    HTML format.
+
+    file: Takes the name of a file as a parameter. The dump will write
+    output to the file specified. The program will die if the file can not
+    be opened for writing.
+
+ install_trace
+
+    Automatically injects the necessary code into Perl files to facilitate
+    stack tracing.
+
+    Parameters:
+
+    file => 'filename' - Mandatory: 'filename' can be the name of a single
+    file, a directory, or even a 'Module::Name'. If the filename is a
+    directory, we'll iterate recursively through the directory, and make
+    the changes to all .pl and .pm files underneath of it (by default). If
+    filename is a 'Module::Name', we'll load the file for that module
+    dynamically, and modify it. CAUTION: this will edit live production
+    files.
+
+    extensions => ['*.pl', '*.pm'] - Optional: By default, we change all
+    *.pm and *.pl files. Specify only the extensions you want by adding
+    them into this array reference. Anything that File::Find::Rule::name()
+    accepts can be passed in here.
+
+    inject => ['your code here;', 'more code;'] - The lines of code
+    supplied here will override the default. Note that remove_trace() will
+    not remove these lines, and for uninstall, you'll have to manually
+    delete them.
+
+ remove_trace
+
+    Automatically remove all remnants of this module from a file or files,
+    that were added by this module's install_trace() function.
+
+    Parameters: file => 'filename'
+
+    Where 'filename' can be the name of a file, a directory or a
+    'Module::Name'.
+
+EXAMPLES
+
+    One-liner to install into a live module:
+
+        sudo perl -MDevel::Trace::Subs=install_trace -e 'install_trace(file => "Data::Dump");'
+
+    One-liner to test that it worked:
+
+        perl -MData::Dump -MDevel::Trace::Subs=trace_dump -e '$ENV{DTS_TRACE}=1; dd {a=>1}; trace_dump();'
+
+    One-liner to uninstall:
+
+        sudo perl -MDevel::Trace::Subs=remove_trace -e 'remove_trace(file => "Data::Dump");'
+
+    Install into all *.pm files in a directory structure:
+
+        use warnings;
+        use strict;
+    
+        use Devel::Trace::Subs qw(install_trace);
+    
+        install_trace(
+                    file => '/path/to/files/',
+                    extensions => ['*.pm'],
+                 );
+
+AUTHOR
+
+    Steve Bertrand, <steveb at cpan.org>
+
+BUGS
+
+    Please report any bugs or feature requests to bug-devel-trace-flow at
+    rt.cpan.org, or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-Trace-Subs. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+REPOSITORY
+
+    https://github.com/stevieb9/devel-trace-subs
+
+BUILD REPORTS
+
+    CPAN Testers: http://matrix.cpantesters.org/?dist=Devel-Trace-Subs
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::Trace::Subs
+
+    You can also look for information at:
+
+      * RT: CPAN's request tracker (report bugs here)
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-Trace-Subs
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Devel-Trace-Subs/
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2016 Steve Bertrand.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

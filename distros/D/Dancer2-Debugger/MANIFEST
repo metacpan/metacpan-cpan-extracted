@@ -1,0 +1,26 @@
+Changes
+lib/Dancer2/Debugger.pm
+lib/Dancer2/Plugin/Debugger.pm
+lib/Dancer2/Plugin/Debugger/Panel/Logger.pm
+lib/Dancer2/Plugin/Debugger/Panel/Routes.pm
+lib/Dancer2/Plugin/Debugger/Panel/Session.pm
+lib/Dancer2/Plugin/Debugger/Panel/Settings.pm
+lib/Dancer2/Plugin/Debugger/Panel/TemplateTimer.pm
+lib/Dancer2/Plugin/Debugger/Panel/TemplateVariables.pm
+lib/Plack/Debugger/Panel/Dancer2/Logger.pm
+lib/Dancer2/Plugin/Debugger/Role/Panel.pm
+lib/Plack/Debugger/Panel/Dancer2/Session.pm
+lib/Plack/Debugger/Panel/Dancer2/Settings.pm
+lib/Plack/Debugger/Panel/Dancer2/Routes.pm
+lib/Plack/Debugger/Panel/Dancer2/TemplateTimer.pm
+lib/Plack/Debugger/Panel/Dancer2/TemplateVariables.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

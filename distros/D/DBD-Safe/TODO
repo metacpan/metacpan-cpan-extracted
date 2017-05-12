@@ -1,0 +1,7 @@
+- PrintError/RaiseError
+- AutoCommit on/off
+- named transactions
+- ping mode
+- DBD::Safe::st
+- try to use threads in real
+- mod_perl support?

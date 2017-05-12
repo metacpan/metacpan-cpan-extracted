@@ -1,0 +1,51 @@
+{
+   "abstract" : "Driver for the PCD8544 LCD controller (aka Nokia 5110)",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-PCD8544",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Imager" : "1.001"
+         },
+         "requires" : {
+            "Device::WebIO" : "0.009",
+            "Exception::Tiny" : "v0.2.1",
+            "Moo" : "1.006001",
+            "Time::HiRes" : "1.9726",
+            "namespace::clean" : "0.25"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/Device-PCD8544.git",
+         "web" : "https://github.com/frezik/Device-PCD8544"
+      }
+   },
+   "version" : "0.0268329147520525"
+}
+

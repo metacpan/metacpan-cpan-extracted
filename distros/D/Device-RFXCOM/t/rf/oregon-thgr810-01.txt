@@ -1,0 +1,11 @@
+50fa2814e6802450444d09
+
+master oregon 50.fa2814e6802450444d09:
+  sensor/thgr810.e6[temp]=24.8
+  sensor/thgr810.e6[humidity]=45
+  sensor/thgr810.e6[battery]=90%
+
+
+
+
+

@@ -1,0 +1,43 @@
+Revision history for Perl module Data::Tumbler
+
+0.010	2015-03-27
+    - release 0.009_002 with a stable version number
+
+0.009_002	2015-03-23
+    - fix tests for $] < 5.008
+    - fix typo in newly added pod sections
+
+0.009_001	2015-03-19
+    - relax minimum perl to 5.6 since it runs fine in LMU on 5.6
+    - add POD sections for author, support, copyright, ...
+
+0.008	2014-12-26
+    - reflect rt#100805 recommendation in LICENSE
+
+0.007	2014-12-12
+    - add GPL-1 license text as it's fulfilling basic requirements
+
+0.006	2014-12-08
+    - Improve Kwalitee
+    - deploy correct licenses
+    - rewrite Changes aacording to CPAN::Changes::Spec
+    - add rough documentation in Pod (based on Tim's source comments)
+
+0.005	2014-03-25
+    - Rename README.md to README
+    - Tweak MANIFEST.SKIP
+    - Add LICENCE
+
+0.004	2014-03-22
+    - Improve the docs with a more detailed example.
+
+0.003	2014-03-16
+    - Added dependency on Test::Most.
+    - Tweak the example in the docs.
+
+0.002	2014-03-15
+    - Remove Class::Tiny
+    - Add TODO and .travis.yml
+
+0.001	2014-03-15
+    - Initial release based on work in https://github.com/perl5-dbi/DBI-Test

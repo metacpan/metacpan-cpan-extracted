@@ -1,0 +1,10 @@
+DNS::WorldWideDns is a module that allows you to remotely manipulate domains hosted at worldwidedns.net.
+
+Use the standard incantation to install DNS::WorldWideDns:
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

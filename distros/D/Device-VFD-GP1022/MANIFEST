@@ -1,0 +1,12 @@
+Changes
+examples/dsl_test.pl
+examples/feed2vfd.pl
+examples/user_font.pl
+lib/Device/VFD/GP1022.pm
+lib/Device/VFD/GP1022/Encode.pm
+lib/Device/VFD/GP1022/Message.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/00_compile.t

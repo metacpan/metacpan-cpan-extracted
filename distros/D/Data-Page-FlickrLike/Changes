@@ -1,0 +1,20 @@
+Revision history for Data-Page-FlickrLike
+
+2.03  Tue Apr 10 10:37:22 PDT 2012
+	removed MYMETA from manifest
+
+2.02  Mon Apr  9 14:35:19 PDT 2012
+	fixed Bareword "githubmeta" issue. (Yann Kerherve)
+
+2.01  Mon Apr  9 14:35:19 PDT 2012
+	cuz I was stupid
+
+2.00  Tue Aug  4 12:00:00 PDT 2009
+	Complete reimplementation to fix drastic performance issues when
+	there are a lot of pages. (Yann Kerherve)
+
+1.02  Wed Feb  4 13:53:09 PST 2009
+	re-tagged with 'inc' dir for Module::Install.
+
+1.01  Wed Feb  4 13:39:26 PST 2009
+	Initial release.

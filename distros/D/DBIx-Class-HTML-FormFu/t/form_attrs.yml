@@ -1,0 +1,45 @@
+---
+indicator: attrs_hidden_col
+auto_fieldset: 1
+
+elements:
+  - type: Hidden
+    name: attrs_hidden_col
+    
+  - type: Text
+    name: attrs_text_col
+    
+  - type: Password
+    name: attrs_password_col
+    
+  - type: Checkbox
+    name: attrs_checkbox_col
+    value: foo
+    
+  - type: Select
+    name: attrs_select_col
+    options:
+      - [1, one]
+      - [2, two]
+      - [3, three]
+      
+  - type: Radio
+    name: attrs_radio_col
+    value: yes
+    
+  - type: Radio
+    name: attrs_radio_col
+    value: no
+    
+  - type: Radiogroup
+    name: attrs_radiogroup_col
+    values: [1, 2, 3]
+    
+  - type: Text
+    name: attrs_date_col
+    
+  - type: Text
+    name: attrs_unknown_col
+    
+  - type: Submit
+    name: submit

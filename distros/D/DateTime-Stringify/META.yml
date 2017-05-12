@@ -1,0 +1,20 @@
+---
+name: DateTime-Stringify
+version: 4.11
+author:
+  - 'Leon Brocard <acme@astray.com>'
+abstract: DateTime objects (no longer needed)
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DateTime: 0.21
+  Test::More: 0
+provides:
+  DateTime::Stringify:
+    file: lib/DateTime/Stringify.pm
+    version: 4.11
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

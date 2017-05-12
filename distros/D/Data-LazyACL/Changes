@@ -1,0 +1,15 @@
+0.05 2008/05/30
+    - no more Readonly module.
+
+0.04 2007/05/29
+    - add retrieve_access_keys_in_hash_for method
+    - bug fixed: now has_privilege( 'admin' ) work correctly.
+
+0.03 2006/08/05
+    - add get_all_access_keys method
+
+0.02 2006/08/05
+    - add retrieve_access_keys_for method
+
+0.01 2006/07/05
+    - created.

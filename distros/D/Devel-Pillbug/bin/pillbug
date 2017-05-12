@@ -1,0 +1,57 @@
+#!/usr/local/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::Pillbug;
+use Sys::Hostname;
+
+sub usage {
+  my $msg = shift;
+  print "$msg\n\n" if $msg;
+
+  print "Devel::Pillbug $Devel::Pillbug::VERSION\n";
+  print "\n";
+  print "Usage:\n";
+  print "$0 \n";
+  print "  [-host <hostname>]      ### Server name\n";
+  print "  [-port <port>]          ### Port number\n";
+  print "  [-docroot <path>]       ### Override document root\n";
+  print "  [-index_name <prefix>]  ### Override index name (index)\n";
+  print "  [-comp_ext <suffix>]    ### Component extension (html)\n";
+  print "  [-allow_index <0|1>]    ### Permit directory listings\n";
+  print "\n";
+  print "perldoc Devel::Pillbug for more help.\n";
+  print "\n";
+
+  exit 2;
+}
+
+sub main {
+  my ( $host, $port, $docroot, $index_name, $allow_index, $comp_ext );
+
+  while ( my $arg = shift @ARGV ) {
+    if    ( $arg =~ /host/ )        { $host        = shift @ARGV }
+    elsif ( $arg =~ /port/ )        { $port        = shift @ARGV }
+    elsif ( $arg =~ /docroot/ )     { $docroot     = shift @ARGV }
+    elsif ( $arg =~ /index_name/ )  { $index_name  = shift @ARGV }
+    elsif ( $arg =~ /comp_ext/ )    { $comp_ext    = shift @ARGV }
+    elsif ( $arg =~ /allow_index/ ) { $allow_index = shift @ARGV }
+    elsif ( $arg =~ /h/ )           { usage(); }
+    else                            { usage("Unrecognized arg: $arg") }
+  }
+
+  my $server = Devel::Pillbug->new($port);
+
+  $host ||= hostname();
+
+  $server->host($host);
+  $server->docroot($docroot)         if $docroot;
+  $server->index_name($index_name)   if $index_name;
+  $server->comp_ext($comp_ext)       if $comp_ext;
+  $server->allow_index($allow_index) if defined $allow_index;
+
+  $server->run;
+}
+
+main();

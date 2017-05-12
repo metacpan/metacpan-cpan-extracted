@@ -1,0 +1,79 @@
+#!/usr/bin/perl
+#
+# Danga's Distributed Lock Daemon
+#
+# Copyright 2004, Danga Interactive
+# Copyright 2005-2006, Six Apart, Ltd.
+#
+# Authors:
+#   Brad Fitzpatrick <brad@danga.com>
+#   Jonathan Steinert <jsteinert@sixapart.com>
+#
+# License:
+#   terms of Perl itself.
+#
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Carp;
+use POSIX ();
+
+use DDLock::Server;
+
+my %args;
+
+Getopt::Long::GetOptions(
+    'd|daemon'       => \(my $daemonize),
+    'p|port=i'       => sub { $args{port} = $_[1] },
+    'n|no-keepalive' => sub { $args{nokeepalive}++ },
+    'e|engine=s'     => sub { $args{engine} = $_[1] },
+    'h|hostname=s'   => sub { $args{hostname} = $_[1] },
+    'T|table=s'      => sub { $args{table} = $_[1] },
+   );
+
+daemonize() if $daemonize;
+
+$SIG{'PIPE'} = "IGNORE";  # handled manually
+
+my $ddlock = DDLock::Server->new(%args);
+
+$ddlock->EventLoop();
+
+sub daemonize {
+    my($pid, $sess_id, $i);
+
+    ## Fork and exit parent
+    if ($pid = fork) { exit 0; }
+
+    ## Detach ourselves from the terminal
+    croak "Cannot detach from controlling terminal"
+        unless $sess_id = POSIX::setsid();
+
+    ## Prevent possibility of acquiring a controling terminal
+    $SIG{'HUP'} = 'IGNORE';
+    if ($pid = fork) { exit 0; }
+
+    ## Change working directory
+    chdir "/";
+
+    ## Clear file creation mask
+    umask 0;
+
+    ## Close open file descriptors
+    close(STDIN);
+    close(STDOUT);
+    close(STDERR);
+
+    ## Reopen stderr, stdout, stdin to /dev/null
+    open(STDIN,  "+>/dev/null");
+    open(STDOUT, "+>&STDIN");
+    open(STDERR, "+>&STDIN");
+}
+
+# Local Variables:
+# mode: perl
+# c-basic-indent: 4
+# indent-tabs-mode: nil
+# End:

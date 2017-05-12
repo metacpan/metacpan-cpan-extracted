@@ -1,0 +1,96 @@
+{
+   "abstract" : "pagination helper for view",
+   "author" : [
+      "@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Paging",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Lite" : "0",
+            "UNIVERSAL::require" : "0",
+            "common::sense" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Find::Lib" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.98",
+            "Test::More::Hooks" : "0",
+            "Test::Pretty" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Paging" : {
+         "file" : "lib/Data/Paging.pm",
+         "version" : "0.01"
+      },
+      "Data::Paging::Collection" : {
+         "file" : "lib/Data/Paging/Collection.pm"
+      },
+      "Data::Paging::Renderer::Base" : {
+         "file" : "lib/Data/Paging/Renderer/Base.pm"
+      },
+      "Data::Paging::Renderer::NavigationBar" : {
+         "file" : "lib/Data/Paging/Renderer/NavigationBar.pm"
+      },
+      "Data::Paging::Renderer::NeighborLink" : {
+         "file" : "lib/Data/Paging/Renderer/NeighborLink.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ainame/p5-Data-Paging/issues"
+      },
+      "homepage" : "https://github.com/ainame/p5-Data-Paging",
+      "repository" : {
+         "url" : "git://github.com/ainame/p5-Data-Paging.git",
+         "web" : "https://github.com/ainame/p5-Data-Paging"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "ainame <s.namai.2012@gmail.com>",
+      "satoshi.namai <satoshi.namai@mixi.co.jp>"
+   ]
+}

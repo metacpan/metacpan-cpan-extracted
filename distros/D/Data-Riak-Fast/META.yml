@@ -1,0 +1,38 @@
+---
+abstract: 'more fast interface to a Riak Server'
+author:
+  - 'Tatsuro Hisamori <myfinder@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Riak-Fast
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Cache::LRU: 0
+  Digest::MD5: 0
+  Furl: 0
+  HTTP::Headers::ActionPack: 0
+  HTTP::Message: 0
+  JSON::XS: 0
+  Mouse: 0
+  Net::DNS::Lite: 0
+  Sub::Exporter: 0
+  Try::Tiny: 0
+  URI: 0
+  URL::Encode: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/myfinder/p5-data-riak-fast.git
+version: 0.03

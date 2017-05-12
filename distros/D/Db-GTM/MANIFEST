@@ -1,0 +1,21 @@
+Changes         -- changelog
+GTM.h	        -- function prototypes, structure definitions
+GTM.pm		-- PERL functions & package documentation
+GTM.xs		-- Module source code
+Makefile.PL	-- Makefile
+MANIFEST	-- This file
+ppport.h	-- PERL portability headers
+README		-- Installation instructions
+calltab.ci	-- Call-in translations for GT.M
+extapi.m	-- M source code for extracting data
+typemap	        -- definition for GtmEnv object, used in GTM.xs
+t/1_init.t	-- Testing routine: database initalization
+t/2_set_get.t   -- Testing routine: basic data store/retrieve
+t/3_order.t     -- Testing routine: cursor movement
+t/4_query.t     -- Testing routine: cursor movement, ignoring depth
+t/5_kill.t      -- Testing routine: delete data
+t/6_merge.t     -- Testing routine: merge data nodes
+t/7_transactions.t  -- Testing routine: atomic transactions
+t/8_locks.t     -- Testing routine: locks
+t/Z_restore_term.t  -- Fix the terminal after GTM hoses it
+

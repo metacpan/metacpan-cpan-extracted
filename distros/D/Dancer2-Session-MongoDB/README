@@ -1,0 +1,62 @@
+NAME
+    Dancer2::Session::MongoDB - Dancer 2 session storage with MongoDB
+
+VERSION
+    version 0.004
+
+SYNOPSIS
+      # In Dancer 2 config.yml file
+
+      session: MongoDB
+      engines:
+        session:
+          MongoDB:
+            database_name: myapp_db
+            client_options:
+              host: mongodb://localhost:27017
+
+DESCRIPTION
+    This module implements a session factory for Dancer 2 that stores
+    session state within MongoDB.
+
+ATTRIBUTES
+  database_name (required)
+    Name of the database to hold the sessions collection.
+
+  collection_name
+    Collection name for storing session data. Defaults to 'dancer_sessions'.
+
+  client_options
+    Hash reference of configuration options to pass through to
+    MongoDB::MongoClient constructor. See that module for details on
+    configuring authentication, replication, etc.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/PerlDancer/dancer2-session-mongodb/issues>. You will
+    be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/PerlDancer/dancer2-session-mongodb>
+
+      git clone https://github.com/PerlDancer/dancer2-session-mongodb.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+CONTRIBUTORS
+    *   Jason A. Crome <jason@crome-plated.com>
+
+    *   Peter Mottram <peter@sysnix.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

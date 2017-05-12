@@ -1,0 +1,35 @@
+Revision history for Perl extension Data::Match.
+
+0.01  Sun Dec 23 16:00:56 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n Data::Match
+
+0.02  2001/12/23
+	- Added subarray and subhash support for slice side-effects.
+	  Added side-effecting slices for REST and EACH.
+          Added LENGTH, EXPR, ALL, NOT pattern operators.
+          Added more tests.
+          Standard pattern operators are AUTOLOADED.
+	  Use Data::Compare for BIND test.
+
+0.03  2001/12/27
+	- Traversal is based on UNIVERSAL::isa($x, ...) instead of ref($x).
+	- Path element type generation is based on UNIVERSAL::isa.
+	- Added DEPTH pattern.
+	- Added REF pattern.
+	- MATCH has circular visitation guard.
+	- Added match_path_DRef_path().
+	- Better matching of circular data.
+	- Added object-oriented inteface.
+	- Added visitor adaptors.
+	- SEE ALSO Array::PatternMatcher.
+
+0.04  2001/12/28
+	- 'wantarray' not 'wantsarray'!
+	- Added prelimiary RANG operators for '*', '+', '?' and '{}'.
+	- match_path_*() now use object interface.
+	- Cleaned up documentation.
+	- use String::Escape::printable for quoting instead of quotemeta.
+	- Added emacs local variable blocks.
+
+$Id: Changes,v 1.8 2002/04/22 06:36:58 stephens Exp $

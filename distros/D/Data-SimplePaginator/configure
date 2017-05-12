@@ -1,0 +1,11 @@
+#!/bin/sh
+if ( perl -MModule::Build -e 'print "found Module::Build\n"' >/dev/null 2>&1 ) ; then
+	echo "found Module::Build"
+	perl Build.PL
+elif ( perl -MExtUtils::MakeMaker -e 'print "found ExtUtils::MakeMaker\n"' >/dev/null 2>&1 ) ; then
+	echo "found ExtUtils::MakeMaker"
+	perl Makefile.PL
+else
+	echo "cannot find an installer (Module::Build or ExtUtils::MakeMaker)"
+	echo "visit http://search.cpan.org to download"
+fi

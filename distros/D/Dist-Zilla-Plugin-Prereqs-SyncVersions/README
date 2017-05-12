@@ -1,0 +1,50 @@
+Dist::Zilla::Plugin::Prereqs::SyncVersions
+
+This module exists to pose mostly as a workaround for potential bugs in
+downstream tool-chains.
+
+Namely, "CPAN.pm" is confused when it sees:
+
+    runtime.requires : Foo >= 5.0
+    test.requires    : Foo >= 6.0
+
+It doesn't know what to do.
+
+This is an easy enough problem to solve if you're using "[Prereqs]"
+directly, and "[AutoPrereqs]" already does the right thing, but it gets
+messier when you're working with plugins that inject their own
+prerequisites
+<https://github.com/dagolden/Path-Tiny/commit/c620171db96597456a182ea608
+8a24d8de5debf6>
+
+So this plugin will homogenize dependencies to be the same version in
+all phases which infer the dependency, matching the largest one found,
+so the above becomes:
+
+    runtime.requires : Foo >= 6.0
+    test.requires    : Foo >= 6.0
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

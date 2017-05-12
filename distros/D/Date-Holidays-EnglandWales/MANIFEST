@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Date-Holidays-EnglandWales.t
+lib/Date/Holidays/EnglandWales.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,75 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [IfBuilt]
+     [InsertBlock::FromModule]
+
+    In lib/Foo.pm:
+
+     ...
+     # IFUNBUILT
+     use warnings;
+     # END IFUNBUILT
+    
+     # IFBUILT
+     ##INSERT_BLOCK Function::Embeddable uniq
+     # END IFBUILT
+     # IFUNBUILT
+     use List::MoreUtils 'uniq';
+     # END IFUNBUILT
+     ...
+
+    After build, the above section will become:
+
+     ...
+     # IFUNBUILT
+     # use warnings;
+     # END IFUNBUILT
+    
+     # IFBUILT
+     sub uniq (@) {
+         my %seen = ();
+         my $k;
+         my $seen_undef;
+         grep { defined $_ ? not $seen{ $k = $_ }++ : not $seen_undef++ } @_;
+     }
+     # END IFBUILT
+     # IFUNBUILT
+     # use List::MoreUtils 'uniq';
+     # END IFBUILT
+     ...
+
+DESCRIPTION
+
+    This plugin finds blocks like this:
+
+     # IFBUILT
+     # ...
+     # END IFBUILT
+
+    or this:
+
+     # IFUNBUILT
+     ...
+     # END IFBUILT
+
+    in your modules and scripts. All the lines inside # IFBUILT ... # END
+    IFBUILT must all be commented-out, and they will be uncommented (one
+    character # removed from each line) in the built version. On the other
+    hand, all the lines inside # IFUNBUILT ... # END IFUNBUILT will be
+    commented (one character # added to each line) in the built version.
+
+    This plugin is useful when you want to have code that is only present
+    in the built/unbuilt version. One use-case is when you want to replace
+    a routine with an inlined version in the built edition, like the
+    example in Synopsis. In the unbuilt/raw version, the routine is
+    retrieved from a module. This allows testing to work either with the
+    unbuilt version (e.g. using prove -l) or the built version (e.g. using
+    dzil test).
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertBlock,
+    Dist::Zilla::Plugin::InsertBlock::FromModule
+

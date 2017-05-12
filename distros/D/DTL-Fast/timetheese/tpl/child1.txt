@@ -1,0 +1,12 @@
+{% extends "parent.txt" %}
+
+{% block "block1" %}
+Inherited block 1
+
+{{ var1 }}
+
+{% for v in array1|slice:"1:4" %}
+<list>{{ v|title }} </list>
+{% endfor %}
+
+{% endblock %}

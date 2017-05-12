@@ -1,0 +1,54 @@
+Dancer-Template-TemplateSandbox
+
+A template engine plugin to use Template::Sandbox with the
+web-appication framework Dancer.
+
+Install Dancer::Template::TemplateSandbox and Template::Sandbox then
+in your dancer setting file:
+
+template: template_sandbox
+
+Template::Sandbox will then be used in Template::Toolkit-compat mode
+with Dancer's default delimiters of <% and %> for directives.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Dancer::Template::TemplateSandbox
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Template-TemplateSandbox
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Dancer-Template-TemplateSandbox
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Dancer-Template-TemplateSandbox
+
+    Search CPAN
+        http://search.cpan.org/dist/Dancer-Template-TemplateSandbox/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Sam Graham.
+Portions derived from work copright Alexis Sukrieh.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+See http://dev.perl.org/licenses/ for more information.
+

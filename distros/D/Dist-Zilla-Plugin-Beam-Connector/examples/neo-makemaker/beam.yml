@@ -1,0 +1,9 @@
+---
+dyninject_g:
+  class: inc::My::NeoDynDepsLite
+  args:
+    letter: G
+dyninject_m:
+  $class: inc::My::NeoDynDepsLite
+  letter: M
+

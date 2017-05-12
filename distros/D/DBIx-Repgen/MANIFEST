@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile
+Makefile.PL
+README
+Repgen.pm
+Repgen.ru.pod
+test.pl

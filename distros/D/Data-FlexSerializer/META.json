@@ -1,0 +1,59 @@
+{
+   "abstract" : "Pluggable (de-)serialization to/from compressed/uncompressed JSON/Storable/Sereal/Whatever",
+   "author" : [
+      "Steffen Mueller <smueller@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-FlexSerializer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {}
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Compress::Zlib" : "0",
+            "Constant::FromGlobal" : "0",
+            "File::Spec" : "0",
+            "IO::Uncompress::AnyInflate" : "0",
+            "JSON::XS" : "0",
+            "List::Util" : "0",
+            "Moose" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::Structured" : "0",
+            "Sereal::Decoder" : "0.15",
+            "Sereal::Encoder" : "0.17",
+            "Storable" : "0",
+            "Test::More" : "0.88",
+            "autodie" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/tsee/Data-FlexSerializer"
+      }
+   },
+   "version" : "1.10"
+}

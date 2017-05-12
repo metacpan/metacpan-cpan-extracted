@@ -1,0 +1,9 @@
+Revision history for Perl extension DBIx::Class::FormatColumns.
+
+0.2  06.11.2006 22:11
+    - format_datatype_columns_only added
+
+0.1  04.11.2006 05:02
+	- initial version
+
+

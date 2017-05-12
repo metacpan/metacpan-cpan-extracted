@@ -1,0 +1,17 @@
+
+lib/Data/Dumper/Again.pm
+lib/Data/Dumper/Again.pod
+
+Makefile.PL
+MANIFEST			This list of files
+Changes
+README
+
+t/01use.t
+t/02basic.t
+t/03named.t
+t/10new.t
+t/98pod-coverage.t
+t/99pod.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

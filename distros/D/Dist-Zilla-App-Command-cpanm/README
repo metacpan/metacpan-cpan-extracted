@@ -1,0 +1,70 @@
+NAME
+    Dist::Zilla::App::Command::cpanm - installs your dist using cpanminus
+
+VERSION
+    version 1.0.2
+
+SYNOPSIS
+        $ dzil cpanm
+
+DESCRIPTION
+    Installs your distribution as if you had typed:
+
+        dzil install --install-command="cpanm ."    # Really no fun at all!
+
+    Options that will be passed to the cpanm script can come in via
+    environment (DZ_CPANM_OPTIONS), or your Dist::Zilla configuration
+    (~/.dzil/config.ini):
+
+        [%CPANMinus]
+        options = --interactive --verbose --sudo
+
+    The environment variable supersedes any setting in the config; that is
+    unless it is prefixed with a "+", in which case it will be appended to
+    the value pulled from the configuration file.
+
+    Examples
+
+    As simple as it gets:
+            $ dzil cpanm
+
+    You may want cpanm to use these options:
+            $ export DZ_CPANM_OPTIONS='--verbose --interactive'
+            $ dzil cpanm
+
+        These options will override any you have in the configuration file.
+
+    You may just want to add "--sudo" to your "config.ini" options:
+            $ DZ_CPANM_OPTIONS='+--sudo' dzil cpanm
+
+        The "--sudo" option is appended to those in the configuration file.
+
+SEE ALSO
+    * "install" in Dist::Zilla::Dist::Builder
+
+REPOSITORY
+    * <https://github.com/cpanic/Dist-Zilla-App-Command-cpanm>
+
+    * <http://search.cpan.org/dist/Dist-Zilla-App-Command-cpanm/lib/Dist/Zil
+      la/App/Command/cpan.pm>
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dist::Zilla::App::Command::cpanm
+
+ACKNOWLEDGEMENTS
+    Shamelessly butchered Richard Signes Dist::Zilla::App::Command::install
+    code.
+
+    The need was great.
+
+AUTHOR
+    Iain Campbell <cpanic@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Iain Campbell.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

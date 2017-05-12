@@ -1,0 +1,24 @@
+---
+abstract: 'silence Data::Printer except in a controlled scope'
+author:
+  - 'Matthew Phillips <mattp@cpan.org>'
+build_requires:
+  File::HomeDir::Test: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Printer-Scoped
+requires:
+  Class::Method::Modifiers: 0
+  Context::Preserve: 0
+  Data::Printer: 0
+  Import::Into: 0
+resources:
+  repository: git://github.com/mattp-/Data-Printer-Scoped.git
+version: 0.001004

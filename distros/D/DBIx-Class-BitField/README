@@ -1,0 +1,156 @@
+NAME
+    DBIx::Class::BitField - Store multiple boolean fields in one integer
+    field
+
+VERSION
+    version 0.13
+
+SYNOPSIS
+      package MySchema::Item;
+
+      use base 'DBIx::Class';
+
+      __PACKAGE__->load_components(qw(BitField Core));
+
+      __PACKAGE__->table('item');
+
+      __PACKAGE__->add_columns(
+        id     =>   { data_type => 'integer' },
+        status =>   { data_type => 'integer', 
+                      bitfield => [qw(active inactive foo bar)],
+        },
+        advanced_status => { data_type => 'integer', 
+                             bitfield => [qw(1 2 3 4)], 
+                             bitfield_prefix => 'status_', 
+                             accessor => '_foobar',
+                             is_nullable => 1,
+        },
+
+      );
+
+      __PACKAGE__->set_primary_key('id');
+
+      __PACKAGE__->resultset_class('DBIx::Class::ResultSet::BitField');
+
+      1;
+
+    Somewhere in your code:
+
+      my $rs = $schema->resultset('Item');
+      my $item = $rs->create({
+          status          => [qw(active foo)],
+          advanced_status => [qw(status_1 status_3)],
+      });
+
+      $item2 = $rs->create({
+            active   => 1,
+            foo      => 1,
+            status_1 => 1,
+            status_3 => 1,
+      });
+
+      # $item->active   == 1
+      # $item->foo      == 1
+      # $item->status   == ['active', 'foo']
+      # $item->_status  == 5
+      # $item->status_1 == 1
+      # $item->status_3 == 1
+
+      $item->foo(0);
+      $item->update;
+
+DESCRIPTION
+    This module is useful if you manage data which has a lot of on/off
+    attributes like *active, inactive, deleted, important, etc.*. If you do
+    not want to add an extra column for each of those attributes you can
+    easily specify them in one "integer" column.
+
+    A bit field is a way to store multiple bit values on one integer field.
+
+    The main benefit from this module is that you can add additional
+    attributes to your result class whithout the need to deploy or change
+    the schema on the data base.
+
+    This module encourages to not normalize your schema. You should consider
+    a "has_many" relationship to a table which holds all the flags instead
+    of this module.
+
+  Example
+    A bit field "status" with "data_type" set to "int" or "integer" (case
+    insensitive) and "active, inactive, deleted" will create the following
+    accessors:
+
+    "$row->status"
+        This is not the value which is stored in the database. This accessor
+        returns the status as an array ref. The array ref is empty if no
+        status is applied.
+
+        You can use this method to set the value as well:
+
+          $row->status(['active', 'inactive']);
+          # $row->status == ['active', 'inactive']
+
+    "$row->active", "$row->inactive", "$row->deleted"
+        These accessors return either 1 or 0. If you add a parameter they
+        will act like normal column accessors by returning that value.
+
+          my $foo = $row->active(1);
+          # $foo         == 1
+          # $row->active == 1
+          # $row->status == ['active']
+
+    "$row->_status"
+        This accessor will hold the internal integer representation of the
+        bit field.
+
+          $row->status(['active', 'inactive']);
+          # $row->_status == 3
+
+        You can change the name of the accessor via the "accessor"
+        attribute:
+
+          __PACKAGE__->add_columns(
+              status =>   { data_type => 'integer', 
+                            bitfield  => [qw(active inactive deleted)],
+                            accessor  => '_status_accessor',
+              },
+          );
+
+  ResultSet operations
+    In order to use result set operations like "search" or "update" you need
+    to set the result set class to "DBIx::Class::ResultSet::BitField" or to
+    a class which inherits from it.
+
+      __PACKAGE__->resultset_class('DBIx::Class::ResultSet::BitField');
+
+   update
+      $rs->update({ status => ['active'] });
+
+    This will update the status of all items in the result to "active". This
+    is done in a single SQL query.
+
+   search_bitfield
+    To search a result set for a specific value of the bitfield use
+    "search_bitfield".
+
+    You can either make a OR search:
+
+      my $new_rs = $rs->search_bitfield([ status2 => 1, status3 => 1 ]);
+
+    or AND:
+
+      my $new_rs = $rs->search_bitfield({ status2 => 1, status3 => 1 });
+
+    This method uses bitwise operators in SQL. Depending on your database it
+    is possible to create an index so the search is as fast as using a
+    single boolean column. =head1 AUTHOR
+
+      Moritz Onken <onken@netcubed.de>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2009 by Moritz Onken.
+
+    This is free software, licensed under:
+
+      The (three-clause) BSD License
+

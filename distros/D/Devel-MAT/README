@@ -1,0 +1,119 @@
+NAME
+
+    Devel::MAT - Perl Memory Analysis Tool
+
+USER GUIDE
+
+    NEW USERS:
+
+    If you are new to the Devel::MAT set of tools, this is probably not the
+    document you want to start with. If you are interested in using
+    Devel::MAT to help diagnose memory-related problems in a perl program
+    you instead want to read the user guide, at Devel::MAT::UserGuide.
+
+    If you are writing tooling modules to extend the abilities of
+    Devel::MAT then this may indeed by the document for you; read on...
+
+DESCRIPTION
+
+    A Devel::MAT instance loads a heapdump file, and provides a container
+    to store analysis tools to work on it. Tools may be provided that
+    conform to the Devel::MAT::Tool API, which can help analyse the data
+    and interact with the explorer user interface by using the methods in
+    the Devel::MAT::UI package.
+
+ File Format
+
+    The dump file format is still under development, so at present no
+    guarantees are made on whether files can be loaded over mismatching
+    versions of Devel::MAT. However, as of version 0.11 the format should
+    be more extensible, allowing new SV fields to be added without breaking
+    loading - older tools will ignore new fields and newer tools will just
+    load undef for fields absent in older files. As the distribution
+    approaches maturity the format will be made more stable.
+
+CONSTRUCTOR
+
+ load
+
+       $pmat = Devel::MAT->load( $path, %args )
+
+    Loads a heap dump file from the given path, and returns a new
+    Devel::MAT instance wrapping it.
+
+METHODS
+
+ dumpfile
+
+       $df = $pmat->dumpfile
+
+    Returns the underlying Devel::MAT::Dumpfile instance backing this
+    analysis object.
+
+ available_tools
+
+       @tools = $pmat->available_tools
+
+    Lists the Devel::MAT::Tool classes that are installed and available.
+
+ load_tool
+
+       $tool = $pmat->load_tool( $name )
+
+    Loads the named Devel::MAT::Tool class.
+
+ inref_graph
+
+       $node = $pmat->inref_graph( $sv, %opts )
+
+    Traces the tree of inrefs from $sv back towards the known roots,
+    returning a Devel::MAT::Graph node object representing it, within a
+    graph of reverse references back to the known roots.
+
+    This method will load Devel::MAT::Tool::Inrefs if it isn't yet loaded.
+
+    The following named options are recognised:
+
+    depth => INT
+
+      If specified, stop recursing after the specified count. A depth of 1
+      will only include immediately referring SVs, 2 will print the
+      referrers of those, etc. Nodes with inrefs that were trimmed because
+      of this limit will appear to be roots with a special name of EDEPTH.
+
+    strong => BOOL
+
+    direct => BOOL
+
+      Specifies the type of inrefs followed. By default all inrefs are
+      followed. Passing strong will follow only strong direct inrefs.
+      Passing direct will follow only direct inrefs.
+
+    elide => BOOL
+
+      If true, attempt to neaten up the output by skipping over REF()-type
+      SVs which occur a lot in perl data structures.
+
+ find_symbol
+
+       $sv = $pmat->find_symbol( $name )
+
+    Attempts to walk the symbol table looking for a symbol of the given
+    name, which must include the sigil.
+
+       $Package::Name::symbol_name => to return a SCALAR SV
+       @Package::Name::symbol_name => to return an ARRAY SV
+       %Package::Name::symbol_name => to return a HASH SV
+       &Package::Name::symbol_name => to return a CODE SV
+
+ find_glob
+
+       $gv = $pmat->find_glob( $name )
+
+    Attempts to walk to the symbol table looking for a symbol of the given
+    name, returning the GLOB object if found.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

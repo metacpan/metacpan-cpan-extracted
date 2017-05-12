@@ -1,0 +1,7 @@
+README
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+lib/Data/Eacherator.pm
+t/test.t
+META.yml                                Module meta-data (added by MakeMaker)

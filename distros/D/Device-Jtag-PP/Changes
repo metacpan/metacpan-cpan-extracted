@@ -1,0 +1,9 @@
+Revision history for Perl extension Device::Jtag::PP.
+
+0.01  Tue May 22 05:51:34 2007
+    - original version; created by h2xs 1.23 with options
+        -AXn Device::Jtag::PP
+
+0.02  Fri June 1 2007
+    - commented out "use 5.008008" in Makefile.PL and PP.pm
+    - changed archive type to tar.gz rather than zip

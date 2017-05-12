@@ -1,0 +1,9 @@
+Revision history for Perl extension Devel::Comment::Output
+
+0.02    Sat Aug 18 16:29:19 2012 +0900
+        - added inline option
+        - suppress warnings
+        - use IPC::Run for testing
+
+0.01    Wed Aug 15 19:04:41 2012
+        - original version

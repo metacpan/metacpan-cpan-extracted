@@ -1,0 +1,35 @@
+Devel/Refactor version 0.04
+=========================
+
+The Devel::Refactor module is for code refactoring.  Pass it a
+a snippet of Perl code that belongs in its own subroutine as
+well as a name for that sub.  It figures out which variables
+need to be passed into the sub, and which variables might be
+passed back.  It then produces the sub along with a call to
+the sub.
+
+Included in this module is an example script that pulls the
+snippet of code from the KDE clipboard in Linux and passes 
+back the transformed code the same way.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+None.
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2005 Scott Sotka
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

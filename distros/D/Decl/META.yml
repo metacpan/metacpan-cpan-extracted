@@ -1,0 +1,29 @@
+--- #YAML:1.0
+name:               Decl
+version:            0.11
+abstract:           Provides a declarative framework for Perl
+author:
+    - Michael Roberts <michael@vivtek.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    DBD::CSV:          0
+    DBI:               0
+    FSA::Rules:        0
+    Getopt::Lucid:     0
+    Iterator::Simple:  0
+    Term::Shell:       0
+    Test::More:        0
+    Text::ParseWords:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

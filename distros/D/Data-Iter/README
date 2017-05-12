@@ -1,0 +1,40 @@
+Data::Iter
+=======
+
+Data::Iter provides functions for comfortably iterating over perl data
+structures.
+
+EXAMPLE
+
+ use Data::Iter qw(:all);
+   
+     # as 'loop' functions
+	 
+   foreach ( iter [qw/Mon Tue Wnd Thr Fr Su So/] )
+   {		
+     printf "Day: %s [%s]\n", VALUE, COUNTER;
+   }
+
+   foreach ( iter { 1 => 'one', 2 => 'two', 3 => 'three', 4 => 'four' } )
+   {	
+     printf "%10s [%10s] %10d\n", KEY, VALUE, COUNTER;
+		 
+     print "End.\n" if COUNTER == LAST_COUNTER;
+   }
+	
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 M. Uenalan
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

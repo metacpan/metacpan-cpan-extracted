@@ -1,0 +1,31 @@
+Revision history for Perl extension Data::MessagePack::Stream
+
+1.01 2016-09-06T0:00:00+09:00
+     - Fix packaging issue which causes build error on other than Linux
+
+1.00 2016-09-04T16:00:00+09:00
+     [Incompatible Changes]
+     - Support new MessagePack specification
+
+0.07 2012-07-25T10:15:01+09:00
+     - fix a bug #3 failing to decode empty string (Reported by maxatome)
+     - add a regression test case fails with Data::MessagePack (by Olivier Mengué)
+
+0.06 2012-06-25T13:22:46+09:00
+     - fix memory allocation checks
+
+0.05 2012-06-21T16:29:36+09:00
+     - fix build issue on x86_64 again
+     - fix some HV/AV leaks (Reported by gleeco)
+
+0.04 2012-06-18T10:34:33+09:00
+     - enable -fPIC on x86_64 environment
+
+0.03 2012-06-08T20:06:35+09:00
+     - bundle msgpack 0.5.7 release tar data instead of git submodule
+
+0.02 2012-06-03T11:21:13+09:00
+     - try to fix build on some environment
+
+0.01 2012-06-01T18:25:36+09:00
+     - initial version

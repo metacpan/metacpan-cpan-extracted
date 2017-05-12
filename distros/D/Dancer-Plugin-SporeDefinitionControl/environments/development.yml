@@ -1,0 +1,27 @@
+log: "debug"
+warnings: 1
+show_errors: 1
+
+# auto_reload is a development feature
+# you should enable it by yourself if you want it
+# Module::Refresh is needed
+auto_reload: 0
+
+
+plugins:
+  SporeDefinitionControl:
+    spore_spec_path: route_config.yaml
+  DBIC:
+    stats:
+      schema_class: "Weborama::StatsModel"
+      dsn: "DBI:mysql:mysql;mysql_socket=/tmp/webo-mysql-stats.sock:dbname=performance_info"
+      user: 'root'
+      options:
+        AutoCommit: 1
+    base:
+      schema_class: "Weborama::BaseModel"
+      dsn: "DBI:mysql:mysql;mysql_socket=/tmp/webo-mysql-base.sock:dbname=labase"
+      user: 'root'
+      options:
+        AutoCommit: 1
+

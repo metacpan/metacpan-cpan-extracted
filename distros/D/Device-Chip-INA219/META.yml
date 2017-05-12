@@ -1,0 +1,24 @@
+---
+abstract: 'chip driver for an F<INA219>'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4218, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Chip-INA219
+provides:
+  Device::Chip::INA219:
+    file: lib/Device/Chip/INA219.pm
+    version: '0.04'
+requires:
+  Data::Bitfield: '0'
+  Device::Chip: '0.04'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

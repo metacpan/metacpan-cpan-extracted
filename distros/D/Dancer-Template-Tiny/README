@@ -1,0 +1,91 @@
+NAME
+    Dancer::Template::Tiny - Template::Tiny backend to Dancer
+
+VERSION
+    version 0.03
+
+SYNOPSIS
+    This template engine allows you to use Template::Tiny in Dancer.
+
+    Template::Tiny is an implementation of a subset of Template::Toolkit
+    (the major parts) which takes much less memory and is faster. If you're
+    only using the main functions of Template::Toolkit, you could use
+    Template::Tiny. You can also seemlessly move back to Template::Toolkit
+    whenver you want.
+
+    You can read more on Template::Tiny.
+
+    To use this engine, all you need to configure in your Dancer's
+    "config.yaml":
+
+        template: "tiny"
+
+    Of course, you can also set this while working using "set":
+
+        # code code code
+        set template => 'tiny';
+
+    Since Dancer has internal support for a wrapper-like option with the
+    "layout" configuration option, you have a WRAPPER like with
+    Template::Toolkit even though Template::Tiny doesn't really support it.
+    :)
+
+SUBROUTINES/METHODS
+  render
+    Renders the template. Accepts a string to a file or a reference to a
+    string of the template.
+
+AUTHOR
+    Sawyer X, "<xsawyerx at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-dancer-template-tiny
+    at rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Template-Tiny>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Template::Tiny
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Template-Tiny>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Dancer-Template-Tiny>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Dancer-Template-Tiny>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Dancer-Template-Tiny/>
+
+ACKNOWLEDGEMENTS
+    Dancer
+
+LICENSE AND COPYRIGHT
+    Copyright 2010 Sawyer X.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+AUTHOR
+      Sawyer X <xsawyerx@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

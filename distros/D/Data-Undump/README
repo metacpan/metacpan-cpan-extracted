@@ -1,0 +1,29 @@
+NAME
+    Data::Undump - Perl extension for securely and quickly deserializing
+    simple Data::Dumper dumps
+
+SYNOPSIS
+      use Data::Undump qw(undump);
+  
+      my $dump= Data::Dumper->new([$simple_thing])->Terse(1)->Dump();
+      undump($dump);
+
+DESCRIPTION
+    Securely and quickly deserialize simple Data::Dumper dumps.
+
+  EXPORT
+    By default exports the undump subroutine.
+
+SEE ALSO
+    Data::Dumper eval
+
+AUTHOR
+    Yves Orton, <demerphq@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Yves Orton
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+

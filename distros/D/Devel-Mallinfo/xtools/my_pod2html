@@ -1,0 +1,124 @@
+#!/usr/bin/perl
+
+# my_pod2html -- convert POD to HTML, with some mangling
+
+# Copyright 2009, 2010, 2011, 2013 Kevin Ryde
+
+# my_pod2html is shared by several distributions.
+#
+# my_pod2html is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+#
+# my_pod2html is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+# more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this file.  If not, see <http://www.gnu.org/licenses/>.
+
+use strict;
+use warnings;
+
+#use Smart::Comments;
+
+
+my $pod2html = MyPod2HTML->new;
+
+# <h1> and <h2> both too big, in mozilla at least
+$pod2html->html_h_level(3);
+
+$pod2html->parse_from_file(@ARGV);
+exit 0;
+
+
+
+package MyPod2HTML;
+use base 'Pod::Simple::HTML';
+
+our $VERSION = 1;
+
+use constant DEBUG => 0;
+
+my %table =
+  ('apt-file'     => 'http://packages.debian.org/apt-file',
+   'apt-cache'    => 'http://packages.debian.org/apt',
+   'apt-rdepends' => 'http://packages.debian.org/apt-rdepends',
+   'gtk-options'  => 'http://manpages.ubuntu.com/manpages/jaunty/man7/gtk-options.7.html',
+   'xsetroot'     => 'http://www.x.org/archive/X1'.'1R7.5/doc/man/man1/xsetroot.1.html',
+   'leafnode'     => 'http://leafnode.sourceforge.net',
+   'lynx'         => 'http://lynx.isc.org/',
+   'feed2imap'    => 'http://home.gna.org/feed2imap',
+   # disguise from grep
+   'rss'.'2email' => 'http://rss'.'2email.infogami.com',
+   'rssdrop'      => 'http://search.cpan.org/dist/rssdrop/',
+   'toursst'      => 'http://packages.debian.org/etch/toursst',
+   'netrc'        => 'http://linux.die.net/man/5/netrc',
+
+   # no online man pages apparently at http://man-db.nongnu.org/
+   'man'      => 'http://ftp.parisc-linux.org/cgi-bin/man/man2html?man+1',
+   'lexgrog'  => 'http://ftp.parisc-linux.org/cgi-bin/man/man2html?lexgrog+1',
+   'apropos'  => 'http://ftp.parisc-linux.org/cgi-bin/man/man2html?apropos+1',
+  );
+
+sub resolve_man_page_link {
+  my ($self, $to, $frag) = @_;
+  $to = "$to";  # Pod::Simple::LinkSection object
+  ### $to
+  if (my ($page, $section) = ($to =~ /(.*)\(\d+\)$/)) {
+    ### $page
+    if (my $url = $table{$page}) {
+      return $url;
+    }
+  }
+  return shift->SUPER::resolve_man_page_link (@_);
+}
+
+sub resolve_pod_link_by_table {
+  my ($self, $to, $section) = @_;
+
+  my $url;
+  if (defined $to) {
+    if ($to eq 'AptPkg') {
+      $url = 'http://packages.debian.org/libapt-pkg-perl';
+    }
+    if ($to =~ /^Glib::Ex::(SourceIds|SignalIds|FreezeNotify|TieProperties)/) {
+      $url = "http://user42.tuxfamily.org/glib-ex-ob"."jectbits/$1.html";
+    }
+    if ($to eq 'Gtk2::Ex::Widget'.'Cursor') {
+      $url = 'http://user42.tuxfamily.org/gtk2-ex-widget'.'cursor/Widget'.'Cursor.html';
+    }
+    if ($to eq 'Ti'.'e:'.':TZ') {
+      $url = 'http://user42.tuxfamily.org/ti'.'e-'.'tz/TZ.html';
+    }
+    if ($to eq 'Time:'.':TZ') {
+      $url = 'http://user42.tuxfamily.org/ti'.'e-'.'tz/Time-'.'TZ.html';
+    }
+
+    if ($to =~ /^(Glib|Gtk2)($|::(?!Ex::))/) {
+      $to =~ s{::}{/};
+      $url = "http://gtk2-perl.sourceforge.net/doc/pod/$to.html"
+    }
+
+    if (defined $url) {
+      return ($url . (defined $section && $section ne '' ? "#$section" : ''));
+    }
+  }
+  return $self->SUPER::resolve_pod_link_by_table($to, $section);
+}
+
+
+# sub do_pod_link {
+#   my($self, $link) = @_;
+#   if (DEBUG) {
+#     print "\nlink tag=",$link->tagname," type=",$link->attr('type'),"\n";
+#     print "  to=",$link->attr('to')||'[none]',"\n";
+#     print "  section=",$link->attr('section')||'[none]',"\n";
+#   }
+# 
+#   my $to = $link->attr('to') || '';  # undef if internal link
+# 
+#   return $self->SUPER::do_pod_link($link);
+# }

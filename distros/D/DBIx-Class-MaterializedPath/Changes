@@ -1,0 +1,17 @@
+Revision history for DBIx-Class-MaterializedPath
+
+0.002001  2014-01-12 10:29:07 America/Chicago
+  - Pick SQL for appending in a cleaner way
+  - Ditch RT
+
+0.002000  2013-01-21 15:30:32 CST6CDT
+  - Add support for non-5.16 Perls (Jason McIntosh)
+  - Add MySQL Compatibility (|| is not supported by default as concat)
+      (Jason McIntosh)
+
+0.001001  2012-11-17 17:07:03 CST6CDT
+  - Put MetaYAML back in dist
+
+0.001000  2012-06-28 22:05:16 America/Chicago
+  - Initial Release
+

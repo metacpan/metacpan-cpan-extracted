@@ -1,0 +1,49 @@
+---
+abstract: 'This is an empty subclass, you wanted Mojo::DOM58'
+author:
+  - 'Dan Book <dbook@cpan.org>'
+build_requires:
+  Encode: 0
+  JSON::PP: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DOM-Tiny
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+  package:
+    - DOM::Tiny::_CSS
+    - DOM::Tiny::_Collection
+    - DOM::Tiny::_HTML
+provides:
+  DOM::Tiny:
+    file: lib/DOM/Tiny.pm
+    version: 0.005
+  DOM::Tiny::Entities:
+    file: lib/DOM/Tiny/Entities.pm
+    version: 0.005
+requires:
+  Carp: 0
+  Exporter: 0
+  List::Util: 0
+  Mojo::DOM58: 0
+  Scalar::Util: 0
+  perl: 5.008001
+resources:
+  repository: git://git.shadowcat.co.uk/catagits/DOM-Tiny.git
+version: 0.005
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Matt S Trout <mst@shadowcat.co.uk>'

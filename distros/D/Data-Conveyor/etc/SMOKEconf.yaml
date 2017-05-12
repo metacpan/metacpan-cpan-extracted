@@ -1,0 +1,6 @@
+--- #YAML:1.0
+#
+# Use this configuration file for development of Data-Conveyor
+#
+environment: Data::Conveyor::Environment
+core_storage_name: STG_DC_NULL

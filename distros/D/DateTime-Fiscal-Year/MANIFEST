@@ -1,0 +1,12 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/DateTime/Fiscal/Year.pm
+t/01load.t
+t/02basic.t
+t/03advance.t
+t/04periods.t

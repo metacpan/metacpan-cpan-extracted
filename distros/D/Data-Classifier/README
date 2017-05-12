@@ -1,0 +1,65 @@
+Data-Classifier version 0.01
+============================
+
+This module provides tools to classify sets of data contained in hashes
+against a predefined class hierarchy. Testing against a class is per-
+formed using regular expressions stored in the class hierarchy. It is
+also possible to modify the behavior of the system by subclassing and
+overloading a few methods.
+
+Note that this module may not be particularly usefull on its own. It is
+designed to be used as a base class for implementing other systems,
+such as Config::BuildHelper.
+
+EXAMPLE
+
+use strict;
+use warnings;
+
+use Data::Classifier;
+
+my $yaml = <<EOY;
+---
+name: Root
+children:
+    - name: BMW
+      children:
+          - name: Diesel
+            match:
+                  model: "d\$"
+          - name: Sports
+            match:
+                  model: "i\$"
+                  seats: 2
+          - name: Really Expensive
+            match:
+                  model: "^M"
+EOY
+
+my $classifier = Data::Classifier->new(yaml => $yaml);
+my $attributes1 = { model => '325i', seats => 4 };
+my $class1 = $classifier->process($attributes1);
+my $attributes2 = { model => '535d', seats => 4 };
+my $class2 = $classifier->process($attributes2);
+my $attributes3 = { model => 'M3', seats => 2 };
+my $class3 = $classifier->process($attributes3);
+print "$attributes2->{model}: ", $class2->fqn, "\n";
+print "$attributes3->{model}: ", $class3->fqn, "\n";
+#no real sports car has 4 seats
+print "$attributes1->{model}: ", $class1->fqn, "\n";
+
+__END__
+
+Which will output:
+
+535d: Root::BMW::Diesel
+M3: Root::BMW::Really Expensive
+325i:
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 by Tyler Riddle <triddle@gmail.com>.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.5 or,
+at your option, any later version of Perl 5 you may have available.

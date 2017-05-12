@@ -1,0 +1,12 @@
+#!/usr/bin/env perl
+
+sub main {
+    my $branch = grep { $_ =~ /abbrev-ref/ } @ARGV;
+
+    print $branch ? 'master' : '3713ace1c825f6626e439e3cb72e2ce37f0cd63e';
+    print "\n";
+}
+
+main unless caller;
+
+# vim: se et ts=4 sw=4 sts=4 ft=perl :

@@ -1,0 +1,30 @@
+2.0.3     2016-05-06 16:28:48+01:00 Europe/London
+    - Fixed buggy encoding on machines giving 20-bit process ids, though
+      I fear I may need to do more work here (for now it's ok).
+    - The count loses a nybble to accommodate the wider PIDs, keeping the
+      id to 96 bits.
+    - Added new base64 method for 16-character GUIDs.
+2.0.2     2015-10-05 22:50:51+01:00 Europe/London
+    - Removed threads dependency. CPANTS failures were from test nodes
+      built without threads.
+      
+    - Allow dev to specify _machine_ident bytes as an alternative to letting
+      Net::Address::Ethernet work them out from the machine's MAC address.
+      That feature is still there and the default option if the id bytes are
+      not already set when _machine_ident is called. Net::Address::Ethernet
+      is hamstrung by buggy Net::Ifconfig::Wrapper which doesn't appear to
+      be maintained, which is unfortunately a problem on the Travis CI 
+      testing resource I use. Bummer!
+      
+2.0.1     2015-10-04 10:19:01+01:00 Europe/London
+    - No functional changes.
+    
+    - POD relocated.
+    
+    - Code cleaned-up a little.
+    
+2.0.0     2015-09-12 09:37:23+01:00 Europe/London
+
+1.0.20    2015-09-08 21:10:25+01:00 Europe/London
+
+    - Returning to Semantic Versioning.

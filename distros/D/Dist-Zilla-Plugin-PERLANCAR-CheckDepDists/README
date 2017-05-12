@@ -1,0 +1,37 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PERLANCAR::CheckDepDists]
+
+DESCRIPTION
+
+    This plugin notifies you, in the after_build phase, of dists that might
+    need to be rebuild too, because those dists depend on the dist you're
+    building. Currently what it does:
+
+      * Search your local installation for all lump dists (via searching
+      all modules whose name ends with ::Lumped). Inside each of these
+      modules, there is a @LUMPED_DISTS array which lists all the dists
+      that the lump dist includes. When the current dist you're building is
+      listed in @LUMPED_DISTS, the plugin will issue a notification that
+      you will also need to rebuild the associated lump dist.
+
+      * Search your local installation for all packed dists (via searching
+      all modules whose name ends with ::Packed, ::Fatpacked,
+      ::DataPacked). Inside each of these modules, there is a @PACKED_DISTS
+      array which lists all the dists that the packed dist includes. When
+      the current dist you're building is listed in @PACKED_DISTS, the
+      plugin will issue a notification that you will also need to rebuild
+      the associated packed dist.
+
+      * Search ../ (XXX probably should be configurable) for all repos
+      (dirs) that contains tag file .tag-requires-dist-DISTNAME where
+      DISTNAME is the current distribution's name.
+
+SEE ALSO
+
+    For more information about lump dists: Dist::Zilla::Plugin::Lump
+
+    For more information about packed dists: Dist::Zilla::Plugin::Depak
+

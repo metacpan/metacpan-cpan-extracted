@@ -1,0 +1,220 @@
+NAME
+    Devel::TakeHashArgs - make a hash from @_ and set defaults in subs while
+    checking that all mandatory arguments are present
+
+SYNOPSIS
+        use Devel::TakeHashArgs;
+        use Carp;
+        sub foos {
+            get_args_as_hash( \@_, \ my %args,
+                { foos => 'bars' },     # these are optional with defaults
+                [ qw(ber1 ber2) ],      # these are mandatory
+                [ qw(ber1 ber2 foos) ], # only these args are valid ones
+            )
+                or croak $@;
+
+            print map { "$_ => $args{$_}\n" } keys %args;
+        }
+
+DESCRIPTION
+    The module is a short utility I made after being sick and tired of
+    writing redundant code to make a hash out of args when they are passed
+    as key/value pairs including setting their defaults and checking for
+    mandatory arguments.
+
+EXPORT DEFAULT
+    The module has only one sub and it's exported by default.
+
+  "get_args_as_hash"
+        sub foos {
+            get_args_as_hash( \@_, \my %args, {
+                    some => 'defaults',
+                    more => 'defaults2!',
+                },
+                [ qw(mandatory1 mandatory2) ],
+                [ qw(only these are valid arguments) ],
+            )
+                or croak $@;
+        }
+
+    The sub makes out a hash out of @_, checks that all mandatory arguments
+    were provided (if any), assigns optional defaults (if any) and fills the
+    passed hashref. Returns 1 for success and 0 for failure, upon failure
+    the reason for it will be available in $@ variable...
+
+    The sub takes two mandatory arguments: the reference to an array (the @_
+    but it can be any array) and a reference to a hash where you want your
+    args to go. The other three optional arguments are a hashref which would
+    contain the defaults to assign unless the argument is present in the
+    passed array. Following the hashref is an arrayref of mandatory
+    arguments. Following it is an arrayref which lists valid arguments. If
+    you want to specify mandatory arguments without providing any defaults
+    just pass in an empty hashref as a third argument, i.e.
+    "get_args_as_hash( \@_, \ my %args, {}, [ qw(mandatory1 mandatory2) ])"
+
+    Same goes for "no defaults" and "no mandatory" but "only these are
+    valid" i.e.: "get_args_as_hash( \@_, \ my %args, {}, [], [ 'valid' ] )"
+
+EXPORT OPTIONAL
+  "set_self_args_as_hash"
+        use Carp;
+        use Devel::TakeHashArgs 'set_self_args_as_hash';
+
+        sub new {
+            my $self = set_self_args_as_hash( \@_, {
+                    default => 'value',
+                },
+                [ qw(these  are  mandatory) ],
+                [ qw(only  these  are  valid  arguments) ],
+        }
+
+    This sub is not exported by default. It is to be used in constructors.
+    The accepted arguments are the same as for "get_args_as_hash" except for
+    the "missing" second argument - just skip the "\ my %args".
+
+    Returns a blessed hashref with provieded arguments filled in using
+    accessors/mutators. In other words the following two snippets are
+    equivalent.
+
+        # using get_args_as_hash()
+
+        use Devel::TakeHashArgs;
+        sub new {
+            my $class = shift;
+            get_args_as_hash( \@_, \ my %args, {
+                    optional => 'value',
+                },
+                [ 'mandatory' ],
+                [ qw(optional mandatory) ],
+            ) or croak $@;
+
+            my $self = bless {}, $class;
+            $self->$_( $args{ $_ } ) for keys %args;
+            return $self;
+        }
+
+        # ...is the same as...
+
+        use Devel::TakeHashArgs 'set_self_args_as_hash';
+        sub new {
+            my $self = set_self_args_as_hash( \@_, {
+                    optional => 'value',
+                },
+                [ 'mandatory' ],
+                [ qw(optional mandatory) ],
+            ) or croak $@;
+
+            return $self;
+        }
+
+EXAMPLES
+  example 1
+        sub foo {
+            my $self = shift;
+            get_args_as_hash( \@_, \ my %args, { foos => 'bars' } )
+                or croak $@;
+
+            if ( $args{foos} eq 'bars' ) {
+                print "User did not specify anything for 'foos' argument\n";
+            }
+            else {
+                print "User specified $args{foos} as value for 'foos'\n";
+            }
+        }
+
+    This subroutine will first remove the object which foo() is a method of.
+    Then it will stuff any key/value paired args into hash %args and will
+    set key "foo" to value "bars" unless user specified that argument.
+
+  example 2
+        sub foo {
+            get_args_as_hash( \@_, \ my %args, {}, [ 'foos' ] )
+                or croak $@;
+
+            print "User specified $args{foos} as a mandatory argument\n";
+        }
+
+    This subroutine will not set any default args but will make argument
+    "foos" a mandatory one and will eat the user if he/she won't specify
+    that argument. Note: user may pass as many other arguments as he/she
+    wants
+
+  example 3
+        sub foo {
+            get_args_as_hash( \@_, \ my %args, {}, [], [ 'foos' ] )
+                or croak $@;
+
+            if ( keys %args ) {
+                print "User set `foos` to $args{foos} and that's the only argument\n";
+            }
+            else {
+                print "User chose not to set any arguments\n";
+            }
+        }
+
+    This sub will not set any defaults and will not claim any arguments
+    mandatory but the only argument it will allow is argument named "foos"
+    (thus the assumption in the code that if %args got any keys then it must
+    be "foos" and no others)
+
+  example 4
+        sub foo {
+            get_args_as_hash( \@_, \ my %args,
+                { foos  => 'bars' },
+                [ qw(bar beer) ],
+                [ qw(foos bar beer) ],
+            ) or croak $@;
+        }
+
+    This is full action: user may specify only "foos", "bar" and "beer"
+    arguments, out of which "bar" and "beer" and mandatory and argument
+    "foos" will be set to value "bars" if not specified. Note: setting
+    mandatory argument arrayref to "[ qw(foos bar beer) ]" would have the
+    same effect, because we are setting default for "foos" thus it will
+    always be present no matter what.
+
+CAVEATS AND LIMITATIONS
+    All argument names (the hash keys) will be lowercased therefore when
+    setting defaults and mandatory arguments you can only use all lowercase
+    names. On a plus side, user can use whatever case they want :)
+
+AUTHOR
+    Zoffix Znet, "<zoffix at cpan.org>" (<http://zoffix.com>,
+    <http://haslayout.net>)
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-takehashargs at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-TakeHashArgs>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::TakeHashArgs
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-TakeHashArgs>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Devel-TakeHashArgs>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Devel-TakeHashArgs>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Devel-TakeHashArgs>
+
+COPYRIGHT & LICENSE
+    Copyright 2008 Zoffix Znet, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

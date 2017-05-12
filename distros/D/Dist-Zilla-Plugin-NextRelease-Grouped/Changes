@@ -1,0 +1,43 @@
+Revision history for Dist-Zilla-Plugin-Changelog-Grouped
+
+0.0200 2016-02-15 12:17:23 UTC
+ [Breaking Changes]
+ - auto_order now defaults to true, due to the changelog munging that
+   happens if it is false.
+
+ [Bug Fixes]
+ - Fixed a bug where groups in earlier releases were completely removed.
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 65 insertions(+), 20 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) ~ Dist::Iller 0.1404 --> 0.1405
+
+0.0102 2016-02-12T01:41:47Z UTC
+ [New Feature]
+ - Added 'auto_order' attribute.
+
+ [Bug Fixes]
+ - Fixed bug where %t output "\n".
+
+ [Documentation]
+ - Fix a couple of typos in attribute names.
+
+0.0101 2016-02-08T20:51:20Z UTC
+ [Breaking Changes]
+ - Attribute 'change_file' renamed to 'filename'.
+
+ [Enhancements]
+ - Make (almost) compatible with [NextRelease].
+
+ [Requirements]
+ - Add missing test prereq: Dist::Zilla::Plugin::RewriteVersion.
+
+ [Other Changes]
+ - Changed name from Dist::Zilla::Plugin::Changelog::Grouped.
+
+0.0100 2016-02-06T23:01:02Z UTC
+ - Initial release

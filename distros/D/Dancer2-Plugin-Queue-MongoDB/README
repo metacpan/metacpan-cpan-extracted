@@ -1,0 +1,81 @@
+NAME
+    Dancer2::Plugin::Queue::MongoDB - Dancer2::Plugin::Queue backend using
+    MongoDB
+
+VERSION
+    version 0.003
+
+SYNOPSIS
+      # in config.yml
+
+      plugins:
+        Queue:
+          default:
+            class: MongoDB
+            options:
+              db_name: dancer_test
+              queue_name: msg_queue
+              connection_options:
+                host: mongodb://localhost:27017
+
+      # in Dancer2 app
+
+      use Dancer2::Plugin::Queue::MongoDB;
+
+      get '/' => sub {
+        queue->add_msg( $data );
+      };
+
+DESCRIPTION
+    This module implements a Dancer2::Plugin::Queue using MongoDBx::Queue.
+
+ATTRIBUTES
+  db_name
+    Name of the database to hold the queue collection. Required.
+
+  queue_name
+    Name of the collection that defines the queue. Defaults to 'queue'.
+
+  connection_options
+    MongoDB::Connection options hash to create the connection to the
+    database holding the queue. Empty by default, which means connecting to
+    localhost on the default port.
+
+  queue
+    The MongoDBX::Queue object that manages the queue. Built on demand from
+    other attributes.
+
+USAGE
+    See documentation for Dancer2::Plugin::Queue.
+
+SEE ALSO
+    *   Dancer2::Plugin::Queue
+
+    *   MongoDBx::Queue
+
+    *   MongoDB::Connection
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/dancer2-plugin-queue-mongodb/issues>. You
+    will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dancer2-plugin-queue-mongodb>
+
+      git clone git://github.com/dagolden/dancer2-plugin-queue-mongodb.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

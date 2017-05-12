@@ -1,0 +1,226 @@
+Revision history for DBIx::Class::Sims (ordered by revision number).
+
+0.300800 Apr 21 2017 19:00:00 PDT
+   - Use a hashref instead of a hashrefref when setting a sims-spec within a
+     column.
+     - This does not conflict with describing a parent's attributes.
+
+0.300700 Apr 10 2017 11:00:00 PDT
+   - Allow sim types authors to use a regex to match multiple strings to the same
+     type handler.
+   - Pass the calculated sims specification into the sim types generator.
+      - This will enable types to get access to any overriden sims specification.
+
+0.300600 Mar 05 2017 11:00:00 PDT
+   - Pass the runner into the sim types generator.
+      - This will enable types to get access to the schema and storage objects.
+
+0.300501 Dec 29 2016 11:00:00 PDT
+   - Ensure we are specifying at least one column when inserting into Oracle.
+
+0.300500 Dec 17 2016 18:00:00 PDT
+   - Many more column types have default values set when not null.
+      - If a column type is unknown, an error will be thrown instead of silently
+        failing over to the INSERT statement.
+
+0.300406 Dec 12 2016 18:00:00 PDT
+   - Applied pull/26 (Thanks, manwar!)
+   - Added a check for accidental recursive creation (aka, self-referential tables).
+
+0.300405 Dec 02 2016 12:00:00 PDT
+   - Re-fixed RT#118518 (Thanks SREZIC!)
+
+0.300404 Dec 01 2016 12:00:00 PDT
+   - Support arrays for the "value" sim option
+     - "values" is now synonymous with "value"
+   - Fixed RT#118517, RT#118518 (Thanks SREZIC!)
+
+0.300403 Nov 09 2016 12:00:00 PDT
+   - Add a sim_types() method that returns the list of all registered types.
+
+0.300402 Oct 26 2016 19:00:00 PDT
+   - Change the default length for not-null varchar from 255 to 1.
+   - Check $info->{size} as well as $info->{data_length}.
+
+0.300401 Oct 25 2016 19:00:00 PDT
+   - Add a minimum requirement on Data::Printer for np()
+
+0.300400 Oct 24 2016 20:00:00 PDT
+   - THIS RELEASE CONTAINS A POTENTIALLY BREAKING CHANGE.
+   - NOT NULL columns are now populated, not just those with a sims setting.
+       - This no longer throws an error if the column wasn't populated.
+       - This will skip columns in PK and UK declarations.
+   - Move the "our $VERSION" declaration to within the first 10 lines of lib/DBIx/Class/Sims.pm
+       - CPAN hasn't been indexing new versions since 0.300004.
+   - Use our own clone() function instead of Clone::Any
+       - Clone::Any may disconnect the schema if a Result object is passed in.
+   - Reporting of duplicates returns a copy of the row, not the row itself.
+
+0.300300 Sep 04 2016 14:00:00 PDT
+   - Tests no longer output randomness (Apparently, p() != np() ... who knew?!)
+   - Can provide a number or a hashref for a has_many relationship
+   - Can provide the \"Table[idx]" back-reference syntax for belongs_to rels.
+
+0.300204 Aug 05 2016 14:00:00 PDT
+   - Support nested relationships when finding existing rows
+
+0.300203 May 24 2016 14:00:00 PDT
+   - Add basic capability to follow relationships for finding parentage
+   - Add detection of DateTime objects when searching across unique constraints
+
+0.300202 Apr 30 2016 14:00:00 PDT
+   - Add missing MANIFEST files (stupid me!)
+
+0.300201 Apr 27 2016 14:00:00 PDT
+   - Add a die_on_failure option (defaulting to 1) and returning the error when
+     it is not set.
+
+0.300200 Apr 27 2016 08:00:00 PDT
+   - Refactor the codebase into a prepper and a runner. The runner will make it
+     easier to extend the codebase and add more functionality.
+   - Count what is created and return that as $additional->{created}.
+
+0.300102 Apr 05 2016 08:00:00 PDT
+   - Fix bug where the check to ensure different parents specifying the same
+     child will link to it was too expansive.
+   - Warn the seed used when a failure throws an error.
+   - Improve test suite output to not show the outputted warning on failure.
+
+0.300101 Apr 01 2016 11:30:00 PDT
+   - Fix mistake where I used "limit" instead of "rows" (Thanks gtermars!)
+
+0.300100 Mar 21 2016 09:00:00 PDT
+   - THIS RELEASE UPGRADES THE MINIMUM PERL VERSION
+   - Upgrade Perl minimum version from 5.8.4 to 5.10.2
+     - CPANTS was claiming breakage on 5.8.x and no need to support it
+   - Clone the provided arguments because we handle them destructively
+   - Enable forcing creation of parents with a __META__ field
+   - Use {limit => 1} when searching for the first parent
+
+0.300009 Mar 17 2016 09:00:00 PDT
+   - Hoist DateTime-ish strings into DateTime objects as needed.
+
+0.300008 Mar 15 2016 14:00:00 PDT
+   - Force a reload from database of all rows returned by load_sims()
+   - format all DateTime-like values that are passed in per the storage's
+     datetime_parser().
+
+0.300007 Mar 15 2016 12:00:00 PDT
+   - Finalize the ordering within create_item.
+   - Properly handle the case where a child row specifies a parent that has
+     rows of a different child table. (Previously, the child rows would have
+     been part of the search for the parent, resulting in a wonky search.)
+
+0.300006 Mar 10 2016 06:00:00 PDT
+   - Move the preprocess hook back. This was a horrible change.
+
+0.300005 Mar 09 2016 19:00:00 PDT
+   - Move the preprocess hook to before the handling of FKs. This allows for the
+     horribly hacky disabling of a FK if your data model requires such things.
+
+0.300004 Mar 05 2016 19:00:00 PDT
+   - Add support for looking things up by unique constraints (Thanks, Bluefeet!)
+
+0.300003 Dec 08 2015 19:00:00 PDT
+   - Remove MYMETA.yml (RT#108552)
+
+0.300002 Feb 28 2014 06:45:00 PDT
+   - Move the null_chance test into xt/ because the way the test is structured
+     causes spurious failures.
+   - Account for a change in DBD::SQLite's reporting of a NULL constraint
+     violation starting in 1.41_01.
+
+0.300001 Feb 27 2014 06:45:00 PDT
+   - Upgrade the minimum DBD::SQLite requirement for building because CPANTS is
+     throwing failures.
+
+0.300000 Feb 25 2014 08:15:00 PDT
+   - THIS RELEASE CONTAINS A BREAKING API CHANGE.
+   - The random seed is returned as part of a new optional second value.
+      - It may be specified in the call to load_sims.
+
+0.200100 Feb 25 2014 08:15:00 PDT
+   - Call toposort as a class method of TopoSort, not as a component method.
+   - Allow the load_sims method to be called as a class method of Sims
+      - This allows using this class without requiring it as a component.
+       (Thanks, Ovid!)
+
+0.200020 Feb 25 2014 08:15:00 PDT
+   - Add the ability to set sim info at any time (not just at compile-time).
+     (Thanks, Ovid!)
+
+0.200010 Feb 25 2014 08:15:00 PDT
+   - Fix a bug where multiply-specified children were not linked properly.
+
+0.200001 Jan 07 2014 14:15:00 PDT
+   - Add the missing us_firstname and us_lastname to the ::Types export list
+     (Thanks, moltar!)
+   - Moved to the proper version numbering (per mst)
+
+0.20 Dec 25 2013 20:00:00 PDT
+   - THIS RELEASE CONTAINS A BREAKING API CHANGE.
+   - All of these changes are due bug reports from moltar on github.
+   - You can now specify the values of the primary key. (Issue #1)
+   - The second and third options to load_sims() have been merged into a single
+     second option of "options".
+     - The constraints parameter is now $options->{constraints}
+     - The hooks parameter is now $options->{hooks}
+   - There is now a new $options->{toposort} which allows passing options to the
+     underlying TopoSort implementation. This is primarily useful for self-
+     referential tables.
+
+0.10 Oct 17 2013 19:00:00 PDT
+   - THIS RELEASE CONTAINS A BREAKING API CHANGE.
+   - The return value from load_sims() now contains the whole $row object, not
+     just a hashref of the primary keys.
+   - You can now pass in things other than an array of hashes for a resultsource
+     in the sim specification.
+       - A number, if all you're willing to accept the defaults and sims.
+       - A hashref, if you just want one thing.
+       - An arrayref (this was the previous API)
+       - If you pass in anything else, that resultsource will be skipped.
+   - You can now pass in a sim entry instead of a value for a given column.
+
+0.06 Oct 06 2013 08:15:00 PDT
+   - Fixed a bug where specifying an auto-generated parent's columns didn't
+     actually set the values on the parent.
+
+0.05 Sep 20 2013 17:30:00 PDT
+   - Better documentation of the "sim" entry in the column_info
+   - Added nullable frequency.
+      - This allows control over when a nullable column is null vs. populated.
+   - Added the following column types:
+      - ip_address
+
+0.04 Sep 20 2013 14:30:00 PDT
+   - Split out the included types documentation into its own POD
+   - Added "value" as an sim option.
+      - This behaves like default_value without requiring a default_value on
+        the column.
+   - Added the following column types:
+      - us_firstname
+      - us_lastname
+      - email_address
+   - us_name uses us_firstname and us_lastname, plus sometimes provides a middle
+     initial.
+
+0.03 Sep 20 2013 08:00:00 PDT
+   - Added missing files to the MANIFEST
+      - Which included this file
+   - Added the following column types:
+      - us_city
+
+0.02 Sep 19 2013 17:30:00 PDT
+   - Removed unneeded import of Data::Dumper
+   - set_sim_type() now takes a hashref, not a hash.
+      - The documentation in 0.01 was correct, the code was not.
+   - Added the following column types:
+      - us_address
+      - us_county
+      - us_name
+      - us_phone
+      - us_ssntin
+      - us_state
+
+0.01 Sep 18 2013 20:00:00 PDT
+   - Initial version

@@ -1,0 +1,78 @@
+Dist-Zilla-PluginBundle-Author-CJM version 4.37, released November 21, 2015
+
+
+Dist::Zilla::PluginBundle::Author::CJM (which was previously called
+Dist::Zilla::PluginBundle::CJM) is the basic configuration I use when
+building CPAN modules with Dist::Zilla.  This distribution used to
+include a collection of plugins I've written, but those are now
+distributed separately (in Dist-Zilla-Plugins-CJM), so that you don't
+have to install every single plugin I use and all their prerequisites.
+
+If you previously installed this bundle to get one of the plugins, you
+should uninstall this bundle, and install Dist-Zilla-Plugins-CJM instead.
+Sorry for any confusion this causes.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                                     Minimum Version
+  ------------------------------------------- ---------------
+  Dist::Zilla                                  4.200001
+  Dist::Zilla::Plugin::ArchiveRelease          0.08
+  Dist::Zilla::Plugin::CheckPrereqsIndexed     0.006
+  Dist::Zilla::Plugin::ExtraTests              
+  Dist::Zilla::Plugin::GatherDir               
+  Dist::Zilla::Plugin::GitVersionCheckCJM      4.27
+  Dist::Zilla::Plugin::License                 
+  Dist::Zilla::Plugin::MakeMaker               
+  Dist::Zilla::Plugin::ManifestSkip            
+  Dist::Zilla::Plugin::MatchManifest           4.01
+  Dist::Zilla::Plugin::MetaConfig              
+  Dist::Zilla::Plugin::MetaJSON                
+  Dist::Zilla::Plugin::MetaYAML                
+  Dist::Zilla::Plugin::PodCoverageTests        
+  Dist::Zilla::Plugin::PodLoom                 5.001
+  Dist::Zilla::Plugin::PodSyntaxTests          
+  Dist::Zilla::Plugin::PruneCruft              
+  Dist::Zilla::Plugin::RecommendedPrereqs      4.06
+  Dist::Zilla::Plugin::Repository              0.16
+  Dist::Zilla::Plugin::RunExtraTests           
+  Dist::Zilla::Plugin::TemplateCJM             4.23
+  Dist::Zilla::Plugin::Test::PrereqsFromMeta   4.23
+  Dist::Zilla::Plugin::TestRelease             
+  Dist::Zilla::Plugin::UploadToCPAN            
+  Dist::Zilla::Plugin::VersionFromModule       0.08
+  Dist::Zilla::PluginBundle::Git               2.027
+  Dist::Zilla::Role::PluginBundle::Easy        
+  Git::Wrapper                                 
+  Moose                                        0.65
+
+
+
+CHANGES
+    Here's what's new in version 4.37 of Dist-Zilla-PluginBundle-Author-CJM:
+    (See the file "Changes" for the full revision history.)
+
+	- No functional changes
+	- Make tests compatible with Dist::Zilla 5.040 and up
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

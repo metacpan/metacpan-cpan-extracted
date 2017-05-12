@@ -1,0 +1,46 @@
+{
+   "abstract" : "create a temporary database from a DBIx::Class::Schema",
+   "author" : [
+      "Jonathan Rockway C<< <jrockway@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBICx-TestDatabase",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "ExtUtils::MakeMaker" : "6.36",
+            "Test::More" : "0",
+            "ok" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.29",
+            "File::Temp" : "0",
+            "SQL::Translator" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

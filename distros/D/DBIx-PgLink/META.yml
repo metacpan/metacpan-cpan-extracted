@@ -1,0 +1,127 @@
+---
+name: DBIx-PgLink
+version: 0.01
+author:
+  - 'Alexey Sharafutdinov <alexey.s.v.br@gmail.com>'
+abstract: external database access from PostgreSQL backend using Perl DBI
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Cwd: 0
+  DBI: 1.47
+  Data::Dumper: 0
+  Hash::Util: 0
+  Memoize: 1.01
+  Moose: 0.33
+  MooseX::Method: 0.39
+  Scalar::Util: 0
+  Tie::Cache::LRU: 0.21
+build_requires:
+  DBD::Pg: 1.47
+  Test::Deep: 0.096
+  Test::Exception: 0.25
+  Test::More: 0.7
+  YAML: 0
+provides:
+  DBIx::PgLink:
+    file: lib/DBIx/PgLink.pm
+    version: 0.01
+  DBIx::PgLink::Accessor:
+    file: lib/DBIx/PgLink/Accessor.pm
+  DBIx::PgLink::Accessor::BaseAccessor:
+    file: lib/DBIx/PgLink/Accessor/BaseAccessor.pm
+  DBIx::PgLink::Accessor::BaseColumns:
+    file: lib/DBIx/PgLink/Accessor/BaseColumns.pm
+    version: 0.01
+  DBIx::PgLink::Accessor::HasColumns:
+    file: lib/DBIx/PgLink/Accessor/HasColumns.pm
+  DBIx::PgLink::Accessor::HasQueries:
+    file: lib/DBIx/PgLink/Accessor/HasQueries.pm
+  DBIx::PgLink::Accessor::Query:
+    file: lib/DBIx/PgLink/Accessor/Query.pm
+    version: 0.01
+  DBIx::PgLink::Accessor::Routine:
+    file: lib/DBIx/PgLink/Accessor/Routine.pm
+    version: 0.01
+  DBIx::PgLink::Accessor::RoutineColumns:
+    file: lib/DBIx/PgLink/Accessor/RoutineColumns.pm
+    version: 0.01
+  DBIx::PgLink::Accessor::Table:
+    file: lib/DBIx/PgLink/Accessor/Table.pm
+    version: 0.01
+  DBIx::PgLink::Accessor::TableColumns:
+    file: lib/DBIx/PgLink/Accessor/TableColumns.pm
+    version: 0.01
+  DBIx::PgLink::Adapter:
+    file: lib/DBIx/PgLink/Adapter.pm
+    version: 0.01
+  DBIx::PgLink::Adapter::MSSQL:
+    file: lib/DBIx/PgLink/Adapter/MSSQL.pm
+  DBIx::PgLink::Adapter::Pg:
+    file: lib/DBIx/PgLink/Adapter/Pg.pm
+  DBIx::PgLink::Adapter::Roles::CheckWhereClause:
+    file: lib/DBIx/PgLink/Adapter/Roles/CheckWhereClause.pm
+  DBIx::PgLink::Adapter::Roles::EmulateColumnInfo:
+    file: lib/DBIx/PgLink/Adapter/Roles/EmulateColumnInfo.pm
+  DBIx::PgLink::Adapter::Roles::Encoding:
+    file: lib/DBIx/PgLink/Adapter/Roles/Encoding.pm
+  DBIx::PgLink::Adapter::Roles::Encoding::st:
+    file: lib/DBIx/PgLink/Adapter/Roles/Encoding.pm
+  DBIx::PgLink::Adapter::Roles::InitSession:
+    file: lib/DBIx/PgLink/Adapter/Roles/InitSession.pm
+  DBIx::PgLink::Adapter::Roles::NestedTransaction:
+    file: lib/DBIx/PgLink/Adapter/Roles/NestedTransaction.pm
+  DBIx::PgLink::Adapter::Roles::Reconnect:
+    file: lib/DBIx/PgLink/Adapter/Roles/Reconnect.pm
+    version: 0.01
+  DBIx::PgLink::Adapter::Roles::Safe:
+    file: lib/DBIx/PgLink/Adapter/Roles/Safe.pm
+  DBIx::PgLink::Adapter::Roles::StatementCache:
+    file: lib/DBIx/PgLink/Adapter/Roles/StatementCache.pm
+  DBIx::PgLink::Adapter::Roles::TraceDBI:
+    file: lib/DBIx/PgLink/Adapter/Roles/TraceDBI.pm
+  DBIx::PgLink::Adapter::SQLServer:
+    file: lib/DBIx/PgLink/Adapter/SQLServer.pm
+  DBIx::PgLink::Adapter::SQLite:
+    file: lib/DBIx/PgLink/Adapter/SQLite.pm
+  DBIx::PgLink::Adapter::SybaseASE:
+    file: lib/DBIx/PgLink/Adapter/SybaseASE.pm
+  DBIx::PgLink::Adapter::SybaseASE::PreparedProcedure:
+    file: lib/DBIx/PgLink/Adapter/SybaseASE.pm
+  DBIx::PgLink::Adapter::XBase:
+    file: lib/DBIx/PgLink/Adapter/XBase.pm
+  DBIx::PgLink::Adapter::st:
+    file: lib/DBIx/PgLink/Adapter.pm
+    version: 0.01
+  DBIx::PgLink::Connector:
+    file: lib/DBIx/PgLink/Connector.pm
+    version: 0.01
+  DBIx::PgLink::Connector::Roles::Environment:
+    file: lib/DBIx/PgLink/Connector/Roles/Environment.pm
+  DBIx::PgLink::Connector::Roles::SQLServerProc:
+    file: lib/DBIx/PgLink/Connector/Roles/SQLServerProc.pm
+  DBIx::PgLink::Local:
+    file: lib/DBIx/PgLink/Local.pm
+    version: 0.01
+  DBIx::PgLink::Local::st:
+    file: lib/DBIx/PgLink/Local.pm
+  DBIx::PgLink::Logger:
+    file: lib/DBIx/PgLink/Logger.pm
+  DBIx::PgLink::RemoteAction:
+    file: lib/DBIx/PgLink/RemoteAction.pm
+  DBIx::PgLink::RoleInstaller:
+    file: lib/DBIx/PgLink/RoleInstaller.pm
+  DBIx::PgLink::Roles::TraceDBI::IOLayer:
+    file: lib/DBIx/PgLink/Adapter/Roles/TraceDBI.pm
+  DBIx::PgLink::Roles::TraceDBI::Logger:
+    file: lib/DBIx/PgLink/Adapter/Roles/TraceDBI.pm
+  DBIx::PgLink::TypeMapper:
+    file: lib/DBIx/PgLink/TypeMapper.pm
+  DBIx::PgLink::Types:
+    file: lib/DBIx/PgLink/Types.pm
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

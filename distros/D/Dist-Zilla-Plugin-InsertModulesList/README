@@ -1,0 +1,63 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertModulesList]
+
+    In lib/Foo.pm:
+
+     ...
+    
+     =head1 DESCRIPTION
+    
+     This distribution contains the following modules:
+    
+     #INSERT_MODULES_LIST
+    
+     ...
+
+    After build, lib/Foo.pm will contain:
+
+     ...
+    
+     =head1 DESCRIPTION
+    
+     This distribution contains the following modules:
+    
+     =over
+    
+     =item * L<Foo>
+    
+     =item * L<Foo::Bar>
+    
+     =item * L<Foo::Baz>
+    
+     =back
+    
+     ...
+
+DESCRIPTION
+
+    This plugin finds # INSERT_MODULES_LIST directive in your POD/code and
+    replace it with a POD containing list of modules in the distribution.
+
+    To exclude a module from the generated list, use:
+
+     # INSERT_MODULES_LIST -Foo::Bar -Baz ...
+
+    To exclude modules matching a regex, use:
+
+     # INSERT_MODULES_LIST -/^Foo::Bar::(Helper|Util)/
+
+    To only include modules matching a regex, use:
+
+     Below are the included plugins in this distribution"
+    
+     # INSERT_MODULES_LIST /^Foo::Plugin::/
+
+    Excludes and includes can be combined.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertExecsList
+

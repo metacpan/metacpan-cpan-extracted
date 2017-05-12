@@ -1,0 +1,26 @@
+0.08    2014-03-17
+        Added test dependency on YAML
+
+0.07    2014-03-14
+        Use Search::Elasticsearch::Compat
+        See https://github.com/elasticsearch/elasticsearch-perl/issues/20
+
+0.06    2013-10-30
+        Use Elasticsearch::Compat
+
+0.05    2012-08-04
+        eview() can now generate custom views as well as predefined views
+        Added request_scope and global_scope config options
+
+0.04    2012-07-31
+        Don't run t/04_good.t if no ES server available
+
+0.03    2012-07-30
+        Added eview() and edomain() exports
+
+0.02    2012-07-25
+        Add loc() to allow passing of @args
+
+0.01    2012-07-24
+        First release
+

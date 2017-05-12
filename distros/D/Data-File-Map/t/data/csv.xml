@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+    <format>csv</format> <!-- csv text -->
+    <separator>\t</separator> <!-- regular expression -->
+    <fields>
+        <field>id</field>
+        <field>fname</field>
+        <field>lname</field>
+        <field>birthdate</field>
+        <field>phone</field>
+        <field>email</field>
+    </fields>
+</map>

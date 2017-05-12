@@ -1,0 +1,30 @@
+---
+abstract: 'Builds an object rebuilder.'
+author:
+  - 'lieutar <lieutar@1dk.jp>'
+build_requires:
+  IO::String: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Data-Rebuilder
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  B: 0
+  B::Deparse: 0
+  Carp: 0
+  Data::Polymorph: 0
+  Lexical::Alias: 0
+  PadWalker: 0
+  Path::Class: 0
+  Scalar::Util: 0
+  Sub::Name: 0
+  UNIVERSAL: 0
+version: 0.01

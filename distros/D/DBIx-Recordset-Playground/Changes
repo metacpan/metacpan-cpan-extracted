@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Recordset::Cookbook.
+
+0.01  Sat Aug 23 14:07:24 2003
+	- original version; created by h2xs 1.22 with options
+		-A -X -n DBIx::Recordset::Cookbook
+

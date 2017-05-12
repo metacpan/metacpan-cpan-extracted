@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::Search.
+
+0.03  Wed Jun  9 19:48:33 PDT 2004
+        - No real need for perl 5.8, change requirement to perl 5.6 instead
+0.02  Wed Jun  9 19:01:01 PDT 2004
+        - Make DATA and FIND required arguments.
+        - Documentation updates
+0.01  Mon Jun  7 23:44:24 2004
+	- original version; created by h2xs 1.22 with options
+		-AX -n Data::Search
+

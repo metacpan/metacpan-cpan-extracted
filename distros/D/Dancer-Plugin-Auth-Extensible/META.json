@@ -1,0 +1,53 @@
+{
+   "abstract" : "extensible authentication framework for Dancer apps",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Auth-Extensible",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Authen::Simple::PAM" : "0",
+            "Dancer::Plugin::Database" : "0",
+            "Unix::Passwd::File" : "0"
+         },
+         "requires" : {
+            "Crypt::SaltedHash" : "0",
+            "Dancer" : "1.3118",
+            "Test::More" : "0",
+            "YAML" : "0",
+            "perl" : "5.006001"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bigpresh/Dancer-Plugin-Auth-Extensible/"
+   },
+   "version" : "1.00"
+}

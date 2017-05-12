@@ -1,0 +1,82 @@
+Release history for Dist-Zilla-Util-Git-Wrapper
+
+0.004002 2017-03-07T17:16:31Z 3b203aa
+ - Bugfix: Fix test failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004001, see misc/*.deps* for details
+ - configure: +1 (suggests: +1)
+ - develop: +8 ↑4 -2 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +1 ↓1 (recommends: +1 ↓1)
+
+0.004001 2014-10-26T09:36:03Z 9dbf8d8
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +5 ↑1 -1 (recommends: +1, suggests: ↑2)
+ - test: (recommends: ↑2)
+
+ [Metadata]
+ - Author = kentnl
+
+ [Tests]
+ - Avoid locale issues entirely by avoiding them being in regex.
+ - This should close #3 ( Thanks Slaven Rezić )
+
+0.004000 2014-08-27T14:16:46Z
+ [00 Major]
+ - Changes that may affect hand-operated downstreams
+ - Tooling Changes.
+ - Misc test and metadata fixes.
+
+ [01 Tookit Change]
+ - Toolkit switched from Module::Build to EUMM
+ - Toolkit upgrade policy softened to recommendations.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 ↑1 -8 (suggests: +2 -1)
+ - test: +2 ↓1 (recommends: +3)
+
+ [Metadata]
+ - Olivier Mengué is now an x_contributor
+ - Migrated to kentnl org
+
+ [Tests]
+ - Migrate from ReportVersions::Tiny to Test::ReportPrereqs
+ - Fix locale specific test ( closes #1, via pull #2, thanks to Olivier Mengué )
+
+0.003000 2013-12-20T13:14:46Z
+ - Add UtilRole for easier making of Plugins with a git property.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - runtime: +2 ↑1
+ - test: +2
+
+0.002000 2013-12-14T13:15:29Z
+ - Make tests pass on Git 1.4
+ - Reimplement some parts in terms of UtilRole::MaybeZilla
+
+ [Depedencies::Noteworthy]
+ - Drop MooseX::LazyRequire for UtilRole::MaybeZilla
+ - add Sort::Versions for Git 1.4 tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - runtime: +1 -1
+ - test: +1
+
+0.001002 2013-12-09T04:09:39Z
+ - Report Git Versions
+ - Make basic test more resilient
+
+0.001001 2013-12-06T21:46:53Z
+ - Make tests more resilient to env indifference.
+
+0.001000 2013-12-06T18:44:46Z
+ - First version.

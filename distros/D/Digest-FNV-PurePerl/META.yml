@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                Digest-FNV-PurePerl
+version:             0.03
+abstract:            PurePerl implementation of Digest::FNV hashing algorithm.
+license:             perl
+author:              
+    - Jeffrey Webster <jeff.webster@zogmedia.com>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

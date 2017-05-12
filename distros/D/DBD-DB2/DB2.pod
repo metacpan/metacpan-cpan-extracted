@@ -1,0 +1,617 @@
+=head1 NAME
+
+DBD::DB2 - DataBase Driver for DB2 UDB
+
+
+=head1 DESCRIPTION
+
+DBD::DB2 is a Perl5 module which when used in conjunction with DBI
+allows Perl5 to communicate with IBM's DB2 Universal Database.
+
+In the generic sense, most of the functionality provided by any of
+the available DBDs is accessed indirectly through the DBI.
+
+=head1 SYNOPSIS
+
+  use DBI;
+  use DBD::DB2::Constants;
+  use DBD::DB2;
+
+  $dbh = DBI->connect("dbi:DB2:db_name", $username, $password);
+
+See L<DBI> for more information.
+
+The DBD::DB2 driver is supported by DB2 UDB V9 and later. See 
+http://www.software.ibm.com/data/db2/perl for more information on
+supported environments.
+
+The DB2 Information Center is available at:
+http://publib.boulder.ibm.com/infocenter/db2help/index.jsp
+
+=head1 EXAMPLE
+
+  #!/usr/local/bin/perl
+
+  use DBI;
+  use DBD::DB2::Constants;
+  use DBD::DB2 qw($attrib_int $attrib_char $attrib_float
+                  $attrib_date $attrib_ts);
+
+  # an extraneous example of the syntax for creating a new
+  # attribute type
+  $attrib_dec = { %$attrib_int,
+                 'db2_type'  => SQL_DECIMAL,
+                 'SCALE'     => 2,
+                 'PRECISION' => 31 };
+
+  #$DBI::dbi_debug=9; # increase the debug output
+
+  # Open a connection and set LongReadLen to maximum size of column
+  $dbh = DBI->connect("dbi:DB2:sample","","", { LongReadLen => 102400 } );
+  if (!defined($dbh)) { exit; }
+
+  # Note in the following sequence, that the statement contains
+  # no parameter markers, which makes the execution sequence
+  # just prepare and execute.
+  $stmt = "SELECT empno, photo_format FROM emp_photo WHERE
+            photo_format = 'gif';";
+  $sth = $dbh->prepare($stmt);
+
+  $sth->execute();
+
+  # $row[0] is the empno from the database and $row[1] is the
+  # image type.  In this case, the type will always be "gif".
+  $stmt = "SELECT picture FROM emp_photo WHERE empno = ? AND
+              photo_format = ? ;" ;
+  # prepare statement, which contains two parameter markers
+  $pict_sth = $dbh->prepare($stmt);
+  while( @row = $sth->fetchrow ) {
+    # create an output file named empno.type in the current directory
+    open(OUTPUT,">$row[0].$row[1]") || die "Can't open $row[0].$row[1]";
+    binmode OUTPUT;
+
+    # use bind_param to tell the DB2 code where to find the variables
+    # containing the values for the parameters.  Additionally,
+    # tell DB2 how to convert a perl value to a DB2 value based
+    # on the contents of the $attrib_* hash.  One bind_param
+    # call per parameter per execution.
+    $pict_sth->bind_param(1,$row[0]);
+    $pict_sth->bind_param(2,$row[1]);
+    $pict_sth->execute();
+
+    # do a fetch to get the blob
+    @row = $pict_sth->fetchrow;
+
+    print OUTPUT $row[0];
+    @row = "";
+
+    close(OUTPUT);
+    # close the blob cursor
+    $pict_sth->finish();
+  }
+  # redundantly close the blob cursor -- should be harmless
+  $pict_sth->finish();
+  # close selection criteria cursor
+  $sth->finish();
+  $dbh->disconnect();
+
+=head1 Connection Attributes
+
+The following DB2 connection attributes are supported.  (For
+information on setting and querying connection attributes see the
+DBI guide.)  Supported values are also shown: boolean refers to Perl
+true or false, tokens listed in uppercase are DB2 constants (be sure
+to include 'use DBD::DB2::Constants').
+
+  db2_access_mode      SQL_MODE_READ_ONLY or SQL_MODE_READ_WRITE
+  db2_clischema        Character string
+  db2_close_behavior   SQL_CC_NO_RELEASE or SQL_CC_RELEASE
+  db2_connect_node     Integer (must be set in DBI->connect method;
+                       it cannot be modified afterwards)
+  db2_set_schema       Character string
+  db2_db2estimate      Integer
+  db2_db2explain       One of:
+                         SQL_DB2EXPLAIN_OFF
+                         SQL_DB2EXPLAIN_SNAPSHOT_ON
+                         SQL_DB2EXPLAIN_MODE_ON
+                         SQL_DB2EXPLAIN_SNAPSHOT_MODE_ON
+  db2_info_acctstr     Character string
+  db2_info_applname    Character string
+  db2_info_programname Character string
+  db2_info_userid      Character string
+  db2_info_wrkstnname  Character string
+  db2_longdata_compat  Boolean
+  db2_quiet_mode       Integer
+  db2_sqlerrp          Character string (read only)
+  db2_txn_isolation    One of the following:
+                         SQL_TXN_READ_UNCOMMITTED
+                         SQL_TXN_READ_COMMITTED
+                         SQL_TXN_REPEATABLE_READ
+                         SQL_TXN_SERIALIZABLE
+                         SQL_TXN_NOCOMMIT
+
+Not all the attributes are available in older versions of DB2.  For
+further information on these attributes, refer to the DB2 Call Level
+Interface Guide and Reference, Chapter 5.  CLI Functions,
+SQLSetConnectAttr.  The attribute names listed above are similar to
+the CLI attributes documented (e.g.  db2_access_mode is equivalent to
+SQL_ATTR_ACCESS_MODE).
+
+Note: db2_set_schema can be used to set the current schema when
+setting up a connection.
+
+=head1 Statement Attributes
+
+The following DB2 statement attributes are supported.  (For
+information on setting and querying statement attributes see the
+DBI guide.)  Supported values are also shown: boolean refers to Perl
+true or false.
+
+  db2_concurrency               One of:
+                                  SQL_CONCUR_READ_ONLY
+                                  SQL_CONCUR_LOCK
+                                  SQL_CONCUR_VALUES
+  db2_cursor_hold               Boolean
+  db2_deferred_prepare          Boolean
+  db2_earlyclose                Boolean
+  db2_max_length                Integer
+  db2_call_return		Integer
+  db2_max_rows                  Integer
+  db2_more_results              Boolean (read only, see the section
+                                  below: Multiple Result Sets)
+  db2_noscan                    Boolean
+  db2_optimize_for_nrows        Integer
+  db2_prefetch                  Boolean
+  db2_rowcount_prefetch		Boolean
+  db2_query_optimization_level  Integer
+  db2_query_timeout             Integer (see note below)
+  db2_retrieve_data             Boolean
+  db2_row_number                Integer (read only)
+  db2_txn_isolation             One of the following:
+                                  SQL_TXN_READ_UNCOMMITTED
+                                  SQL_TXN_READ_COMMITTED
+                                  SQL_TXN_REPEATABLE_READ
+                                  SQL_TXN_SERIALIZABLE
+                                  SQL_TXN_NOCOMMIT
+
+For further information on these attributes, refer to the DB2 Call
+Level Interface Guide and Reference, Chapter 5. CLI Functions,
+SQLSetStmtAttr.  The attribute names listed above are similar to the
+CLI attributes documented (e.g.  db2_deferred_prepare is equivalent
+to SQL_ATTR_DEFERRED_PREPARE).
+
+Note: that some versions of the CLI Guide say SQL_ATTR_QUERY_TIMEOUT
+applies to Windows 3.1 only.  This is incorrect, it works on all
+platforms.  Later versions of the book have been corrected.
+
+=head1 Data Source Names (DSNs)
+
+Connection using the DBI->connect() method can be done in two
+different fashions.  
+
+Uncataloged database connections can be done by using the full
+connection string.  For example:
+
+  my $string = "dbi:DB2:DATABASE=$db; HOSTNAME=$hostname; PORT=$port; PROTOCOL=TCPIP; UID=$user; PWD=$pass;";
+  my $dbh = DBI->connect($string, $user, $pass) || die "Connection failed with error: $DBI::errstr";
+
+Cataloged database connections can be done by passing the database
+alias, username, and password as parameters.  This method does
+not allow entering the host name, port number, etc but will
+require you to catalog the database (local or remote) through DB2.
+For example:
+
+  my $string = "cataloged_db_alias";
+  my $dbh = DBI->connect($string, $user, $pass) || die "Connection failed with error: $DBI::errstr";
+
+To access a remote database, catalog the remote node, the DCS database
+(for AS/400, MVS and VM/VSE databases) and the database alias.  See
+the DB2 Installation and Configuration Supplement for help with
+configuring client-to-server communications.  For information on
+accessing host databases, see the DB2 Connect User's Guide.
+
+DBI->data_sources('DB2') returns a list of all cataloged databases.
+
+=head1 Binding Parameters
+
+DBD::DB2 supports the following methods of binding parameters:
+
+  For input-only parameters:
+  $rc = $sth->bind_param($p_num, $bind_value);
+  $rc = $sth->bind_param($p_num, $bind_value, $bind_type);
+  $rc = $sth->bind_param($p_num, $bind_value, \%attr);
+
+  For input/output, output or input by reference:
+  $rc = $sth->bind_param_inout($p_num, \$bind_value, $max_len);
+  $rc = $sth->bind_param_inout($p_num, \$bind_value, $max_len, $bind_type);
+  $rc = $sth->bind_param_inout($p_num, \$bind_value, $max_len, \%attr)
+
+=head2 Attributes
+
+An attribute hash is
+a collection of information about particular types of data.  Each
+attribute can be determined at compile time (see DB2.pm for a list
+of predefined attribute hashes), created at run time, or modified
+at run time.
+
+The following attributes are supported by DBD::DB2:
+
+  TYPE            SQL_CHAR, SQL_BINARY, SQL_INTEGER etc.
+  PRECISION       Size of column
+  SCALE           Decimal digits
+  db2_param_type  SQL_PARAM_INPUT, SQL_PARAM_OUTPUT etc.
+  db2_c_type      SQL_C_CHAR or SQL_C_BINARY
+  db2_type        synonym for TYPE: SQL_CHAR, SQL_BINARY, SQL_INTEGER etc.
+  db2_file        Boolean value, see below
+
+For backward compatibility, the following old attribute names are
+still supported.  Note that these may not be supported in future
+releases of DBD::DB2 so it's a good idea to start using the new
+attribute names:
+
+  Stype   Same as db2_type
+  Prec    Same as PRECISION
+  Scale   Same as SCALE
+  ParamT  Same as db2_param_type
+  Ctype   Same as db2_c_type
+  File    Same as db2_file
+
+The easiest method of creating a new attribute hash is to
+change an existing hash:
+
+  $new_type = { %$existing_type, 'db2_type' => SQL_"NewTYPE" };
+
+or you can create a complete new type:
+
+  $attrib_char = { 'db2_param_type' => SQL_PARAM_INPUT,
+                   'db2_c_type'     => SQL_C_CHAR,
+                   'db2_type'       => SQL_CHAR,
+                   'PRECISION'      => 254,
+                   'SCALE'          => 0,
+                 };
+
+Attributes are not generally required as the statement will be
+"described" and appropriate values will be used.  However, attributes
+are required under the
+following conditions:
+
+  - Database server does not support SQLDescribeParam:
+      - DB2 for MVS, versions earlier than 5.1.2
+      - DB2 for VM
+      - DB2 for AS/400
+  - Statement is a CALL to an unregistered stored procedure
+  - You desire non-default behaviour such as:
+      - binding a file directly to a LOB parameter
+      - binding an output-only parameter
+
+Even though attributes are not always required, providing them can
+improve performance as it may make the "describe" step unnecessary.
+Specifically, 'db2_type' and 'SCALE' must either
+be provided in the attributes or must be obtained automatically
+via SQLDescribeParam.
+
+=head2 Parameter Type (Input, Ouput and Input/Output)
+
+bind_param() can only be used for input-only parameters and therefore
+the db2_param_type attribute is ignored.  bind_param_inout() assumes
+input/output but a parameter can be designated as input-only or
+output-only via db2_param_type in the attribute hash:
+
+  db2_param_type => SQL_PARAM_INPUT
+
+or
+
+  db2_param_type => SQL_PARAM_OUTPUT
+
+Note that
+the 'maxlen' value provided to bind_param_inout() must be large
+enough for all possible input values as well as output values.
+
+=head2 Binding Input Values By Reference using bind_param_inout()
+
+This function - despite its name - can also be used to bind an
+input parameter variable once to allow repeated execution without
+rebinding.  Consider the following example using bind_param():
+
+  $sth->prepare( "INSERT INTO MYTABLE (INTCOL) VALUES(?)" );
+  for(...)
+  {
+    $int = ...;                  # get a new value
+    $sth->bind_param( 1, $int ); # value set at bind time
+    $sth->execute();
+  }
+
+Each iteration binds a new value.  This can be made more
+efficient as follows:
+
+  $sth->prepare( "INSERT INTO MYTABLE (INTCOL) VALUES(?)" );
+  $sth->bind_param_inout( 1,
+                          \$input,
+                          20, # 20 bytes is enough for any integer
+                          { db2_param_type => SQL_PARAM_INPUT } );
+  for(...)
+  {
+    $input = ...     # set a new value
+    $sth->execute(); # new value read at execution time
+  }
+
+Note that since the variable is bound by reference, the input value
+is deferred until execute time unlike bind_param() where the value
+is copied at bind time.  The 'maxlen' value must be big enough for
+all expected input values.
+
+=head2 Binding a File to an Input LOB Parameter
+
+A file can be bound directly to a LOB parameter by specifying the
+attribute:
+
+  db2_file => 1
+
+In this case the value passed to bind_param() is the file name.
+
+  For example, to insert a blob file "sample" into database blobtest:
+
+  my $stmt = "CREATE TABLE blobTest (id INTEGER, data BLOB)";
+  my $sth = $dbh->prepare($stmt);
+  $sth->execute();
+
+  $stmt = "INSERT INTO blobTest (id, data) values (?,?)";
+  my $sth = $dbh->prepare($stmt);
+  
+  $sth->bind_param(1,1);
+  $sth->bind_param(2,sample,{'db2_file' => 1});
+  $sth->execute();
+
+
+This is only valid for input and only for LOB parameters.  The
+following predefined attribute hashes have been provided for
+convenience:
+
+  $attrib_blobfile
+  $attrib_clobfile
+  $attrib_dbclobfile
+
+  Example:
+
+  my $stmt = "CREATE TABLE blobTest (id INTEGER, data BLOB)";
+  my $sth = $dbh->prepare($stmt);
+  $sth->execute();
+
+  $stmt = "INSERT INTO blobTest (id, data) values (?,?)";
+  my $sth = $dbh->prepare($stmt);
+
+  $sth->bind_param(1,1);
+  $sth->bind_param(2,sample,$attrib_blobfile);
+  $sth->execute();
+
+
+=head1 LongReadLen
+
+The default value for LongReadLen is 32700, equivalent to the maximum
+size for SQL_LONG types.  It only applies to fetched columns; it does
+not apply to output parameters.
+This option applies to the following column types:
+
+  SQL_LONGVARBINARY
+  SQL_LONGVARCHAR
+  SQL_LONGVARGRAPHIC
+  SQL_BLOB
+  SQL_CLOB
+  SQL_DBCLOB
+  SQL_XML
+
+To change the value, provide it in the connection attributes:
+
+  $dbh = DBI->connect( $db, $user, $pw, { LongReadLen => 100 } );
+
+or set it at any time after connecting:
+
+  $dbh->{LongReadLen} = 100;
+
+=head1 Fetching LOB Data in Pieces
+
+While LOB columns are fully supported by the normal methods of
+retrieving data, it can take a lot of memory as the whole LOB
+is retrieved at once (subject to the LongReadLen setting).  An
+alternate method is to use:
+
+  $buf = $sth->blob_read( $field, $offset, $len );
+
+  Example:
+
+  $stmt =  "SELECT data FROM blobTest";
+  my $sth = $dbh->prepare($stmt);
+  $sth->execute();
+
+  my $offset = 0;
+  my $buff="";
+  $sth->fetch();
+  while( $buff = $sth->blob_read(1,$offset,1000000)){
+         print $buff;
+         $offset+=length($buff);
+         $buff="";
+  }
+
+This will return up to $len bytes from the given LOB field.
+'undef' is returned when no more data is left to read.
+Despite the name this function works for all LOB types
+(BLOB, CLOB and DBCLOB).  For maximum efficiency, set
+LongReadLen to 0 prior to execution so no LOB data is
+retrieved at all on the initial fetch (but remember that
+LongReadLen will affect all long fields).
+
+The $offset parameter is currently ignored by DB2.  Note that
+this function isn't officially documented in DBI yet so it is
+subject to change.
+
+=head1 Multiple Result Sets
+
+Multiple result sets can be processed using the db2_more_results
+statement attribute as follows:
+
+  do
+  {
+    while( @row = $sth->fetchrow_array )
+    {
+      # process row data
+    }
+  } while( $sth->{db2_more_results} );
+
+Accessing this attribute closes the current result set and opens
+the new one.  If there are no more result sets, the attribute
+returns false and sets the state to 02000.
+
+=head1 Getting Table information
+
+Both $dbh->tables and $dbh->table_info are supported.  The table
+names returned by $dbh->tables are qualified, i.e. they are in the
+form <schema>.<table>. With DBI 1.14 or later, the following
+attributes can be used to narrow down the list:
+
+  TABLE_SCHEM  Schema name pattern, default is all schemas
+  TABLE_NAME   Table name pattern, default is all tables
+  TABLE_TYPE   Table type; one or more of the following,
+               separated by commas, default is all types:
+                 TABLE, VIEW, SYSTEM TABLE, ALIAS, SYNONYM
+
+Each pattern-value argument can contain:
+
+  - The underscore (_) character which stands for any single character.
+  - The percent (%) character which stands for any sequence of zero or
+    more characters. Note that providing a pattern-value containing a
+    single % is equivalent to passing an empty string for that argument.
+  - Characters which stand for themselves. The case of a letter is
+    significant.
+
+To treat the metadata characters (_, %) as themselves, precede the
+character with a backslash (\).  The escape character itself can be
+specified as part of the pattern by including it twice in succession.
+
+For example, to get a list of all tables and views for the schema
+'CHOMSKY':
+
+  @tables = $dbh->tables( { 'TABLE_SCHEM' => 'CHOMSKY',
+                            'TABLE_TYPE'  => 'TABLE,VIEW',
+                            'TABLE_NAME'  => '%'} );
+			or
+  @tables = $dbh->tables(undef, 'CHOMSKY', '%', 'TABLE,VIEW');
+
+=head2 Getting a List of Schemas
+
+To obtain a list of all schemas, the following special
+semantics can be used:
+
+  @schemas = $dbh->tables( {'TABLE_SCHEM' => '%',
+                           'TABLE_TYPE' => '',
+                           'TABLE_NAME' => ''} );
+
+or
+
+  $sth = $dbh->table_info( undef, '%', '', '');
+
+The result contains all the valid schemas in the data source.
+DBI 1.14 or later is required.
+
+=head2 Getting a List of Table Types
+
+To obtain a list of supported table types, the following special
+semantics can be used:
+
+  $sth = $dbh->table_info( { 'TABLE_TYPE'  => '%',
+                             'TABLE_SCHEM' => '',
+                             'TABLE_NAME'  => '' } );
+
+The result contains all the valid table types for the data source.
+DBI 1.14 or later is required.
+
+=head1 Getting Primary and Foreign Key information
+
+The $dbh->primary_key, $dbh->primary_key_info, and $dbh->foreign_key_info
+are supported. Search patterns cannot be used to specify any of the arguments.
+Please see the DBI documentation for usage information.
+
+To obtain the primary keys for the table HOYMICH.MYTABLE:
+
+$sth = $dbh->primary_key_info( undef, 'HOYMICH', 'MYTABLE' );
+
+To obtain all the primary key column names:
+
+@key_column_names = $dbh->primary_key( $catalog, $schema, $table );
+
+=head1 Getting Type information
+
+Both $dbh->type_info_all and $dbh->type_info are supported.
+Please see the DBI documentation for usage information.
+
+=head1 Getting driver and database system information (GetInfo)
+
+The $dbh->get_info is supported.
+Please see the DBI documentation for usage information.
+Please see the CLI function, SQLGetInfo (link is available in
+the CAVEATS file), for the supported information types.
+
+To obtain the name of the DBMS product being accessed:
+
+$v = $dbh->get_info( SQL_DBMS_NAME );
+
+To obtain the name of the DBMS product version being accessed:
+
+$v = $dbh->get_info( SQL_DBMS_VER );
+
+If information regarding an unsupported InfoType is requested,
+undef is returned.  For a full list of supported InfoType codes,
+you may visit:
+http://publib.boulder.ibm.com/infocenter/db2luw/v8/index.jsp?topic=/com.ibm.db2.udb.doc/ad/r0000615.htm
+
+=head1 Native XML support
+
+DBD::DB2 version 0.9a supports native XML. The datatype
+xml is mapped to the sqltype SQL_XML and is stored in the database
+in a hierarchical structure. For all data manipulation purposes
+XML data is treated as a BLOB.
+
+To create a table with XML data:
+
+$stmt = "CREATE TABLE xmlTest (id INTEGER, data XML)";
+
+To insert an XML file:
+
+$stmt = "INSERT INTO xmlTest (id, data) values (?,?)";
+my $sth = $dbh->prepare($stmt);
+
+open(SAMPLE,"<sample") or die "Cannot open $path: $!";
+binmode SAMPLE;
+while(my $record = <SAMPLE>){
+      $input = $input.$record;
+}
+close(SAMPLE);
+
+$sth->bind_param(1,123456789);
+$sth->bind_param(2,$input);
+$sth->execute();
+
+XML data can be retrieved in two ways:
+
+1. As a BLOB:
+
+$stmt =  "SELECT data FROM xmlTest";
+my $sth = $dbh->prepare($stmt);
+$sth->execute();
+
+my $offset = 0;
+my $buff="";
+$sth->fetch();
+while( $buff = $sth->blob_read(1,$offset,1000000)){
+       print $buff;
+       $buff="";
+       $offset+=length($buff);
+}
+
+2. As a record:
+
+$stmt =  "SELECT data FROM xmlTest";
+my $sth = $dbh->prepare($stmt);
+$sth->execute();
+while( @row = $sth->fetchrow ) {
+      print $row[0] . "\n";
+}

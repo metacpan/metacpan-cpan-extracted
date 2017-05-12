@@ -1,0 +1,6 @@
+Revision history for DBIx::Placeholder::Named
+
+0.07
+		Added 'PlaceholderPrefix' and 'PlaceholderSuffix' parameters.
+
+

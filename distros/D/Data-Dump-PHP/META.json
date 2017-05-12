@@ -1,0 +1,59 @@
+{
+   "abstract" : "Pretty printing of data structures as PHP code",
+   "author" : [
+      "Steven Haryanto <stevenharyanto@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dump-PHP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Rinci" : "0.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Data::Dump" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Dump-PHP"
+      },
+      "homepage" : "https://metacpan.org/release/Data-Dump-PHP",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/sharyanto/perl-Data-Dump-PHP.git",
+         "web" : "https://github.com/sharyanto/perl-Data-Dump-PHP"
+      }
+   },
+   "version" : "0.10"
+}
+

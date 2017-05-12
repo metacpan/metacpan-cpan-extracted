@@ -1,0 +1,13 @@
+Build.PL
+ChangeLog
+Makefile.PL
+META.yml
+MANIFEST
+MANIFEST.SKIP
+README
+lib/Data/Phrasebook/Loader/JSON/Syck.pm
+t/000_load.t
+t/001_basic.t
+t/basic.json
+t/pod.t
+t/pod_coverage.t

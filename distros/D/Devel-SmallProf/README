@@ -1,0 +1,37 @@
+Devel/SmallProf
+===============
+
+
+The Devel::SmallProf profiler is focused on the time taken for a
+program run on a line-by-line basis. It is intended to be as "small"
+in terms of impact on the speed and memory usage of the profiled
+program as possible and also in terms of being simple to use.
+
+
+INSTALLATION
+
+Just the usual
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+and should install fine via the CPAN module.
+
+
+DEPENDENCIES
+
+   Time::Hires will be used if available.
+
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 1997-2000 Ted Ashton
+
+Copyright (c) 2003-2007 Salvador Fandiño García
+
+This module is free software and can be redistributed and/or modified
+under the same terms as Perl itself.
+
+

@@ -1,0 +1,98 @@
+NAME
+    Dist::Zilla::Plugin::MetaResourcesFromGit - Metadata resource URLs from
+    Git configuration
+
+VERSION
+    version 1.103620
+
+SYNOPSIS
+    In your "dist.ini" or "profile.ini":
+
+     [MetaResourcesFromGit]
+
+DESCRIPTION
+    This plugin is a drop-in replacement for
+    Dist::Zilla::Plugin::MetaResources for users of Git. It *automatically*
+    provides three resource links to your distribution metadata, based on
+    the name of the distribution and the remote URL of the Git repository
+    you are working from.
+
+    The default links are equivalent to:
+
+     homepage        = https://github.com/%a/%r/wiki
+     bugtracker.web  = https://rt.cpan.org/Public/Dist/Display.html?Name=%N
+     repository.url  = git://github.com/%a/%r.git
+     repository.web  = https://github.com/%a/%r
+     repository.type = git
+
+    Any other resources provided to this Plugin are passed through to the
+    "MetaResources" Plugin as-is. If you wish to override one of the above,
+    use the formatting options below. If you wish to suppress the appearance
+    of one of the above resources, set an empty or false value in
+    "dist.ini".
+
+CONFIGURATION
+  Plugin Options
+    "name"
+        The name of your Perl distribution in the format used by CPAN. It
+        defaults to the "name" option you have provided in "dist.ini".
+
+    "remote"
+        The alias of the Git remote URL from which the working repository is
+        cloned. It defaults to "origin".
+
+    "homepage"
+        A link on the CPAN page of your distribution, defaulting to the wiki
+        page of a constructed <http://github.com> repository for your code.
+        You can use the formatting options below when overriding this value.
+
+    "bugtracker.web"
+        A link on the CPAN page of your distribution, defaulting to its
+        corresponding <http://rt.cpan.org> homepage. You can use the
+        formatting options below when overriding this value.
+
+    "repository.url"
+        A link on the CPAN page of your distribution, defaulting to the
+        read-only clone URL belonging to a contructed <http://github.com>
+        repository for your code. You can use the formatting options below
+        when overriding this value.
+
+    "repository.web"
+        A link on the CPAN page of your distribution, defaulting to the web
+        based source browsing page for at <http://github.com> for the
+        "repository.url". You can use the formatting options below when
+        overriding this value.
+
+  Formatting Options
+    The following codes may be used when overriding the "homepage",
+    "bugtracker.web", <repository.url> and "repository.web" configuration
+    options.
+
+    %a  The "account" (username) as parsed from the remote repository URL in
+        the local Git configuration. This is currently (probably)
+        GitHub-centric.
+
+    %r  The "repository" (or, project name) as parsed from the remote
+        repiository URL in the local Git configuration. This is currently
+        (probably) GitHub-centric.
+
+    %N  The name of the distribution as given to the "name" option in your
+        "dist.ini" file. You can also use "%{lc}N" or "%{uc}N" to get the
+        name in lower or upper case respectively, or "%{deb}N" to get the
+        name in a Debian GNU/Linux package-name format ("libfoo-bar-perl").
+
+TODO
+    *   Make things less GitHub-centric.
+
+THANKS
+    To "cjm" from IRC for suggesting this as a better way to meet my needs.
+
+AUTHOR
+    Oliver Gorwits <oliver@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Oliver Gorwits.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

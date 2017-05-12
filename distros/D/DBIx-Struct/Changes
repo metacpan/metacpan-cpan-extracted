@@ -1,0 +1,51 @@
+0.17 Fri May 05 15:30:00 CEST 2017
+         - added findBy
+         - fixed -distinct
+         
+0.16 Wed May 03 20:14:00 CEST 2017
+         - added -distinct, -count and -all
+         
+0.15 Wed Feb 15 01:33:00 CEST 2017
+         - fix multithreading update on the same row object
+         
+0.14 Sun Dec 26 19:50:00 CEST 2016
+         - fix column identifier quote
+         - document column identifying function
+         
+0.13 Sun Dec 26 19:05:00 CEST 2016
+         - croak on misspelled directives
+         - quote column names that are scalar references
+         
+0.12 Thu Aug 22 11:45:00 CEST 2016
+         - remove 'redefine' warning
+         
+0.11 Thu Aug 04 11:57:00 CEST 2016
+         - little cleanup
+         
+0.10 Thu Aug 04 11:57:00 CEST 2016
+         - fixed error_message function
+         
+0.09 Mon Jul 11 20:43:00 CEST 2016
+         - added external connectors pool support
+         - added -sql and -dry_run keys
+         - added markUpdated($column)
+
+0.08 Mon Apr 18 09:00:00 CEST 2016
+         - fix insert with only default values
+
+0.07 Tue Feb 16 15:00:49 CEST 2016
+         - added JSON support
+         - fixed group by with column names
+
+0.06 Thu Oct  1 20:25:49 CEST 2015
+         - fixed distribution content
+
+0.05 Thu Oct  1 14:48:49 CEST 2015
+         - fixed distribution content
+
+0.04 Wed Sep 30 15:29:11 CEST 2015
+         - fixed distribution content
+
+0.03 Tue Sep 29 17:55:09 CEST 2015
+         - first CPAN distribution
+

@@ -1,0 +1,41 @@
+=head1 NAME
+
+Configure Apache with Perl Example
+
+=head1  Configure virtual hosts
+
+With mod_perl, Perl code can be embedded directly in the Apache
+configuration file.  Perl in httpd.conf is commonly used to
+dynamically configure Apache, but anything from URL translation to
+content generation can be accomplished directly in the configuation
+file within E<lt>PerlE<gt> sections.
+
+This example reads configuration settings from a text file and
+configures Apache's virtual hosts.
+
+The I<httpd.conf> setup:
+
+  NameVirtualHost 192.168.0.1:80
+  <Perl>
+      my $config = "/etc/apache/vhosts.txt";
+      open HOSTS, $config or die "Failed to open $config: $!";
+  
+      while (<HOSTS>) {
+          my %config;
+          my @params = qw/ServerName DocumentRoot ErrorLog TransferLog ServerAdmin/;
+          @config{ @params } = split /\t/;
+          $config{ Directory }{ $config{DocumentRoot} } = { Allow => 'from all' };
+  
+          push @{ $VirtualHost{'192.168.0.1:80'} }, \%config;
+      }
+      close HOSTS;
+  
+  </Perl>
+
+See L<The Guide|guide::config/Apache_Configuration_in_Perl> for other
+examples of configuring Apache with mod_perl.
+
+=for html
+<a class="more" href="../index.html#config">&#171&nbsp;back</a>
+
+

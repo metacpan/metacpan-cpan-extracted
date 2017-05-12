@@ -1,0 +1,265 @@
+#!/usr/bin/perl
+
+# Copyright (C) 2006 Eric L. Wilhelm
+
+use warnings;
+use strict;
+
+=head1 NAME
+
+day - print a formatted date
+
+=head1 Synopsis
+
+Some of these may work.
+
+  day today
+  day tomorrow
+  day yesterday
+  day next th
+  day next thursday
+  day last wednesday
+
+  day last week
+  day this week
+  day last month
+  day last mo-fr
+
+  day next first tu
+  day next last th
+
+  day 2 weeks away
+  day 2 weeks from tomorrow
+
+=cut
+
+package bin::day;
+
+use warnings;
+use strict;
+
+use Carp;
+
+use Date::Piece qw(today date days weeks months);
+
+use File::Basename ();
+
+use constant {I => __PACKAGE__};
+
+my $now;
+
+my %links = (
+  map({$_ => $_} qw(today yesterday tomorrow)),
+);
+
+sub main {
+  my (@args) = @_;
+
+  # XXX do some option parsing for format and stuff
+  my $name = File::Basename::basename($0);
+  if(my $link = $links{$name}) {
+    unshift(@args, $link);
+  }
+  print_date(@args);
+}
+########################################################################
+########################################################################
+
+=head2 print_date
+
+  print_date(@stuff);
+
+=cut
+sub print_date {
+  print join("\n", string_dates(@_)), "\n";
+} # end subroutine print_date definition
+########################################################################
+
+=head2 string_dates
+
+  string_dates(@stuff);
+
+=cut
+sub string_dates {
+  my (@args) = @_;
+
+  my $spec;
+  if($args[0] eq '-s') {
+    $spec = shift(@args);
+  }
+  $now = today;
+  my @dates = make_date($now, @args);
+  if($spec and $#dates) {
+    @dates = ($dates[0], 'thru', $dates[-1]);
+  }
+  return(@dates);
+} # end subroutine string_dates definition
+########################################################################
+
+=head2 make_date
+
+  $date = make_date(@stuff);
+
+=cut
+sub make_date {
+  my ($date, @args) = @_;
+
+  @args or return($date); # today or we're done
+  my %dispatch = (
+    'today'     => sub {$date},
+    'tomorrow'  => sub {$date + 1*days},
+    'yesterday' => sub {$date - 1*days},
+    'last'      => sub {next_last('last', @_)},
+    'this'      => sub {next_last('this', @_)},
+    'next'      => sub {next_last('next', @_)},
+    'from'      => sub {shift(@_); from($date, @_)},
+  );
+  my $cmd = shift(@args);
+  if($cmd =~ m/^\d+$/) {
+    my $lookup = join("_", @args);
+    if(my $sub = I->can($lookup)) {
+      return($sub->($cmd));
+    }
+    else {
+      die "don't know what to do with '$cmd @args'";
+    }
+  }
+  if($dispatch{$cmd}) {
+    return($dispatch{$cmd}->($date, @args));
+  }
+  die "the rest is unfinished"
+} # end subroutine make_date definition
+########################################################################
+
+=head2 days_ago
+
+  my $date = days_ago($number);
+
+=cut
+
+sub days_ago {
+  my ($number) = @_;
+  return($now - $number*days);
+} # end subroutine days_ago definition
+########################################################################
+
+=head2 next_last
+
+Will eventually do more.
+
+  my @list = next_last('next|last', $date_obj, 'week');
+
+=cut
+
+sub next_last {
+  my ($dir, $date, @args) = @_;
+  my $cmd = shift(@args);
+
+  my %dirmap = ('this' => 0, 'next' => 1, 'last' => -1);
+  my %dispatch = (
+    iso_week => sub {
+      my ($date, $count) = @_;
+      $count ||= 1;
+      $date += $dirmap{$dir}*$count*weeks;
+      my $diff = 1 - $date->iso_dow;
+      $date += $diff*days;
+      my @days = map({$date+$_*days} 0..6);
+      @days = grep({$_ <= $now} @days) if ($dir eq 'this');
+      return(@days);
+    },
+    'week' => sub {
+        my ($date, $count) = @_;
+        $count ||= 1;
+        $date += $dirmap{$dir}*$count*weeks;
+        # XXX hack: rewind to monday
+        my $diff = 1 - $date->day_of_week;
+        $date += $diff*days;
+        my @days = map({$date+$_*days} 0..6);
+        @days = grep({$_ <= $now} @days) if ($dir eq 'this');
+        return(@days);
+    },
+    'work' => sub {
+        my ($date, $count) = @_;
+        $count ||= 1;
+        $date += $dirmap{$dir}*$count*weeks;
+        # rewind to base
+        my $base = -2;
+        my $dow = $date->day_of_week;
+        my $diff = 1 + $base - $dow;
+        #warn "diff: $diff";
+        $diff += 7 unless($diff > -7);
+        $date+= $diff*days;
+        my @days = map({$date+$_*days} 0..6);
+        @days = grep({$_ <= $now} @days) if ($dir eq 'this');
+        return(@days);
+    },
+    month => sub {
+      my ($date, $count) = @_;
+      $count ||= 1;
+      my $start = $date + $dirmap{$dir}*$count*months;
+      $start = $start->start_of_month;
+      my $end = $start->end_of_month;
+      return($start->thru($end));
+    },
+  );
+  my @dow = qw(mo tu we th fr sa su);
+
+  if($dispatch{$cmd}) {
+    return($dispatch{$cmd}->($date, @args));
+  }
+  elsif(my ($dow) = grep({$cmd =~ m/^$dow[$_-1]/i} 1..@dow)) {
+    # last tuesday
+    my $ndow = $now->day_of_week;
+    # NOTE next is broken and count doesn't work here
+    if($dir eq 'this') {
+      # XXX how do we define 'this monday'?  It depends on the boundary.
+      # ISO or not?
+    }
+    else {
+      #$date += 1*weeks if($dir eq 'next');
+      $dow += 7 * $dirmap{$dir} if($ndow <= $dow);
+      return($date - ($ndow - $dow)*days);
+    }
+  }
+  die "the rest is unfinished"
+} # end subroutine next_last definition
+########################################################################
+
+=head2 from
+
+Returns all of the days (inclusive) between $day1 and $day2 (or $now) if
+$day2 is omitted.
+
+  from($now, $day1, to => $day2);
+
+=cut
+
+sub from {
+  my ($now, $from, @opt) = @_;
+
+  my %args;
+  if(@opt) {
+    unless(@opt % 2) {
+      %args = @opt;
+    }
+    else {
+      (@opt == 1) or croak("odd number of arguments");
+      $args{to} = shift(@opt);
+    }
+  }
+  else {
+    $args{to} = $now;
+  }
+
+  return sort(date($from)->thru($args{to}));
+} # end subroutine from definition
+########################################################################
+
+package main;
+
+if($0 eq __FILE__) {
+  bin::day::main(@ARGV);
+}
+
+# vi:ts=2:sw=2:et:sta
+my $package = 'bin::day';

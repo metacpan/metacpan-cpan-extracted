@@ -1,0 +1,43 @@
+Device-WS2500PC version 0.99
+============================
+
+
+
+The Device::WS2500PC is a library for reading data from the interface
+WS2500PC distributed by the German company ELV (http://www.elv.de).
+This interface collects data from various sensors (temperature, wind,
+rain, etc), and stores them in a buffer. This buffer can be read with
+the serial interface.
+
+The library implements all documented commands with complete wrappers,
+so that all data returned can easily be processed.
+
+
+
+INSTALLATION
+To install this module type the following:
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+
+DEPENDENCIES
+This module requires these other modules and libraries:
+  Device::SerialPort
+  Time::HiRes
+  Time::Local
+
+
+
+COPYRIGHT AND LICENCE
+Copyright (C) 2004 by Magnus Schmidt (ws2500@27b-6.de) 
+http://ducts.27b-6.de/ws2500pc
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+
+

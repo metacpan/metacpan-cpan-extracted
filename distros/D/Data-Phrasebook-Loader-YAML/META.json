@@ -1,0 +1,67 @@
+{
+    "name": "Data-Phrasebook-Loader-YAML",
+    "version": "0.13",
+    "abstract": "Loader class for phrasebook implementations using YAML files",
+    "author": [
+        "Barbie (BARBIE) <barbie@cpan.org>"
+    ],
+
+    "license": [ "artistic_2" ],
+    "dynamic_config" : 0,
+    "release_status" : "stable",
+    "meta-spec": {
+        "version": "2",
+        "url": "http://search.cpan.org/dist/CPAN-Meta/lib/CPAN/Meta/Spec.pm"
+    },
+    "generated_by": "Hand 1.0",
+    "keywords" : [
+        "abstract",
+        "data",
+        "design pattern",
+        "phrasebook"
+    ],
+
+    "prereqs" : {
+        "runtime" : {
+            "requires" : {
+                "perl": "5.006",
+                "Carp": "0",
+                "Data::Phrasebook": "0.24",
+                "YAML": "0.35"
+            }
+        },
+        "test" : {
+            "requires": {
+                "IO::File": "0",
+                "Test::More": "0.70"
+            },
+            "recommends": {
+                "Test::CPAN::Meta": "0",
+                "Test::CPAN::Meta::JSON": "0",
+                "Test::Distribution": "0",
+                "Test::Pod": "1.00",
+                "Test::Pod::Coverage": "0.08"
+            }
+        }
+    },
+
+    "provides": {
+        "Data::Phrasebook::Loader::YAML": {
+            "file": "lib/Data/Phrasebook/Loader/YAML.pm",
+            "version": "0.13"
+        }
+    },
+    "no_index": {
+        "directory": ["t","examples"]
+    },
+
+    "resources": {
+        "license": [ "http://dev.perl.org/licenses/" ],
+        "bugtracker": { "web": "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Phrasebook-Loader-YAML" },
+        "repository": {
+            "url": "git://github.com/barbie/data-phrasebook-loader-yaml.git",
+            "web": "http://github.com/barbie/data-phrasebook-loader-yaml",
+            "type": "git"
+        }
+    }
+}

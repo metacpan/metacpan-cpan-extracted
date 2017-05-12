@@ -1,0 +1,33 @@
+
+Romani is SQL and database abstraction layer that was inspired by Creole [1]
+for PHP (part of the Propel [2] project) and portions of JDBC for Java [3].
+
+What makes libraries like Creole and Romani unique, is that there isn't just an
+attempt to address API differences between databases, but an attempt is made
+to adapt for the differences in SQL dialects as well.  So it is more than just
+another JDBC or DBI (in fact, DBI is used under the hood in the Perl version).
+
+Creole accomplishes this by adding some utility functions for some of the more
+tricky corners of SQL.  Romani provides all those same functions, but goes a
+step further by providing an object oriented SQL abstraction.  This
+abstraction is rather difficult for a human to use, but allows SQL statements
+to be created, analyzed and modified by code --- which was key in implementing
+Xmldoom [4].
+
+Beyond this, Romani borrows a number of interface design concepts from JDBC
+which improve efficiency and easy-of-use in a number of situations (ie.
+prepared statement objects, return sets, etc...).
+
+That said, Romani is still a work in progress very early in its life.  There is
+still alot that needs filling out.
+
+Enjoy!
+ - David Snopek
+
+REFERENCES:
+
+ [1] Creole: http://creole.phpdb.org/trac/
+ [2] Propel: http://propel.phpdb.org/trac/
+ [3] JDBC: http://java.sun.com/products/jdbc/
+ [4] Xmldoom: http://gna.org/projects/xmldoom/
+

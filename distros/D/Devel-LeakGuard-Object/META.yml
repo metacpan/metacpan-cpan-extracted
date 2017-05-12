@@ -1,0 +1,36 @@
+---
+abstract: 'Scoped checks for object leaks'
+author:
+  - 'Andy Armstrong <andy@hexten.net>'
+build_requires:
+  Class::Load: '0'
+  File::Find: '0'
+  Test::Differences: '0'
+  Test::Kwalitee: '0'
+  Test::More: '0.42'
+  latest: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.64, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-LeakGuard-Object
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Data::Dumper: '0'
+  Devel::Peek: '0'
+  List::Util: '1.19'
+  Scalar::Util: '1.19'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/AndyA/Devel--LeakGuard--Object/issues
+  repository: https://github.com/AndyA/Devel--LeakGuard--Object.git
+version: '0.08'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

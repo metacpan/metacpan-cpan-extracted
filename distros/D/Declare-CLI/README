@@ -1,0 +1,340 @@
+NAME
+    Declare::CLI - Declarative command line interface builder.
+
+DESCRIPTION
+    This module can be used to build command line utilities. It will handle
+    option and argument parsing according to your declarations. It also
+    provides tools for usage statements.
+
+SYNOPSIS
+    your_prog.pl
+
+        #!/usr/bin/perl
+        use strict;
+        use warnings;
+        use Your::Prog;
+
+        my @results = Your::Prog->new->handle_cli( @ARGV );
+
+        print join "\n", @results;
+
+    Your/Prog.pl
+
+        package Your::Prog;
+        use strict;
+        use warnings;
+
+        use Declare::CLI;
+
+        opt 'enable-X' => (
+            bool => 1,
+            description => "Include X"
+        );
+        opt config => (
+            default => "$ENV{HOME}/.config/your_prog.conf"
+            validate => 'file',
+            description => 'the config file'
+        );
+        opt types => (
+            list => 1,
+            default => sub { [ 'txt', 'rtf', 'doc' ] },
+            description => "File types on which to act",
+        );
+
+        arg filter => sub {
+            my $self = shift;
+            my ( $cmd, $opts, @args ) = @_;
+            my $types = { map { $_ => 1 } @{ $opts->{types}} };
+            return grep {
+                m/\.(.{3,4})$/;
+                $1 && $types->{$1} ? 1 : 0;
+            } @args;
+        };
+
+        # Descriptions are displayed in usage.
+        describe_arg filter => "Filters args to only show those specified in types";
+
+        arg sort => (
+            description => "sort args",
+            handler => sub {
+                my $self = shift;
+                my ( $cmd, $opts, @args ) = @_;
+                return sort @args;
+            },
+        );
+
+        arg help => sub {
+            my $self = shift;
+            my ( $cmd, $opts, @args ) = @_;
+
+            return (
+                "Usage: $0 [OPTS] [COMMAND] [FILES]\n",
+                $self->usage
+            );
+        };
+
+    Using it:
+
+    Note: not all options are used here. Other options are for example only
+    and not really useful.
+
+        # Show all options and args
+        $ your_prod.pl help
+
+        # Find all txt, jpg, and gif files in the current dir
+        $ your_prog.pl -types txt,jpg,gif filter ./*
+
+        # Sort files in the current dir
+        $ your_prog.pl sort ./*
+
+        # Options and arguments can be short form as well, the shortest unambiguous
+        # match will be used. For instance if you have options tyaaaa and tybbbbb
+        # you could use -tya and -tyb to set them. just -ty is ambiguous and will
+        # fail.
+        $ your_prog.pl -t txt,jpg,gif filt ./*
+
+EXPORTS
+    $meta = CLI_META()
+    $meta = $CLASS->CLI_META()
+    $meta = $obj->CLI_META()
+        Get the meta oject. Meta object will be returned in any usage,
+        method on class, method on object, or function.
+
+    arg 'NAME' => ( %PROPERTIES )
+    $obj->arg( 'NAME' => %PROPERTIES )
+        Can be used as function in class, or method on class/object.
+
+        Declare a new argument. See the "ARGUMENT PROPERTIES" section for
+        more details.
+
+    opt 'NAME' => ( %PROPERTIES )
+    $obj->opt( 'NAME' => %PROPERTIES )
+        Can be used as function in class, or method on class/object.
+
+        Declare a new option. See the "OPTION PROPERTIES" section for more
+        details.
+
+    describe_opt 'NAME' => "DESCRIPTION"
+    $obj->describe_opt( 'NAME' => "DESCRIPTION" )
+        Can be used as function in class, or method on class/object.
+
+        Used to add a description to an option that is already defined.
+
+    describe_arg 'NAME' => "DESCRIPTION
+    $obj->describe_arg( 'NAME' => "DESCRIPTION" )
+        Can be used as function in class, or method on class/object.
+
+        Used to add a description to an argument that is already defined.
+
+    $usage = usage()
+    $usage = $obj->usage()
+        Can be used as function in class, or method on class/object.
+
+        Get a usage string listing all options and arguments.
+
+    ( $opts, $args ) = preparse_cli( @cli )
+        Pre-process the command line. No triggers or transforms are called.
+        Only recognised options will be added to $opts. $args will contain
+        everything else. The primary use of this method is if you have an
+        option to specify a config file which may add additional options.
+        This lets you get the config file, then use the real parse() method
+        once everything is loaded from the config.
+
+    ( $opts, $args ) = $obj->parse_cli( @cli )
+        Must be used as an object method.
+
+        Process the command line in @cli. Methods for options (default, etc)
+        will be run against the $consumer object.
+
+    $result = $obj->run_cli( $opts, $args )
+        Must be used as an object method.
+
+        Run the provided opts and args combination. Handler methods will be
+        run on the $consumer object.
+
+    $result = $obj->handle_cli( @ARGS )
+        Must be used as an object method.
+
+        Combines parse() and run(). Replacement for "process_cli".
+
+    $result = $obj->process_cli( @ARGS )
+        Note: Deprecated this functions interface was offensive. See
+        handle_cli() instead.
+
+        Must be used as an object method.
+
+        Process some command line input. If an argument is provided as input
+        the result of it will be returned. If no argument is specified, the
+        options hash is returned.
+
+OPTION PROPERTIES
+    alias => "ALIAS_NAME"
+    alias => [ "ALIAS_NAME", ... ]
+        Set aliases for the option. Any alias can be used to set the option.
+        Aliases can be used for partial matches (short form)
+
+    list => $FLAG
+        If true the option will hold a list of values. Values can be comma
+        seperated, or you can provide the option multiple times and each
+        value will be added to the others.
+
+    bool => $FLAG
+        If true the option can only have a true or false value, and will not
+        accept an argument in the '-option value' form. You can specify a
+        true or false value using the '-option=VAL' form. Normally however
+        simply specifying the option '-option' will set it to true. If you
+        provide a default value that is true, specifying the opton will
+        negate that so that specifying the option on the command line turns
+        it off.
+
+    default => $VALUE
+    default => sub { [ @VALUES ] }
+        Specify the value that will be used by default when the option is
+        not listed on the command line. The default sub is called as a
+        function with no arguments.
+
+    description => $STRING
+        Provide a description for the option. This is used in the 'usage'
+        output.
+
+    trigger => sub { ... }
+        This gets called when the option is set, even if it is set to the
+        default value. The the sub is called as a method on your instance.
+        The method receives 3 arguments, the name of the option, the value
+        set, and the hashref of "{ option =" value } of all options
+        processed so far. The return value is ignored.
+
+            trigger => sub {
+                my $self = shift;
+                my ( $name, $value, $opts ) = @_;
+                ...
+            },
+
+    transform => sub { ... }
+        This is called whenever the value is set, before any triggers. This
+        sub allows you to modify the value before it is assigned. For list
+        params each value is passed to the transform sub seperately. This
+        sub is called as a method on the instance. This method receives the
+        value as its only argument.
+
+    check => ...
+        See "OPTION "check" PROPERTY"
+
+  OPTION "check" PROPERTY
+    The "check" option is used to validate inputs to options. You can
+    provide a regex, a coderef, or a couple of premade options.
+
+    check => qr/.../
+        Validate the value(s) against a regex.
+
+    check => sub { ... }
+        Validate the value against the sub. The sub is called as a function,
+        not a method. The function receives only one argument, the value to
+        be checked. In list options each item is checked seperately.
+
+    check => 'file'
+        Validate that the value(s) are all valid files. (-f check)
+
+    check => 'dir'
+        Validate that the value(s) are all valid directories. (-f check)
+
+    check => 'number'
+        Validate that the value(s) are all numerical. (rejects values that
+        contain a character matched by qr/\D/).
+
+ARGUMENT PROPERTIES
+    alias => "ALIAS_NAME"
+    alias => [ "ALIAS_NAME", ... ]
+        Set aliases for the argument. Any alias can be used to set the
+        argument. Aliases can be used for partial matches (short form)
+
+    description => "The Description"
+        Provide a description for the argument. This is used in the 'usage'
+        output.
+
+    handler => sub { ... }
+        This is the sub that gets called if the argument is provided on the
+        command line. The sub is called as a method on your instance. This
+        method is called with 2+ argument, the name of the arg, the { option
+        => value } hash, and the rest of the arguments from the command line
+        are the remaining arguments.
+
+            handler => sub {
+                my $self = shift;
+                my ( $name, $options, @args ) = @_;
+                ...
+            },
+
+META OBJECT METHODS
+    You should rarely if ever need to access these directly.
+
+    $meta = $meta_class->new( opts => {...}, args => {...} )
+        Create a new meta object.
+
+    $class = $meta->class
+        Get the class for which the meta object was constructed.
+
+    $args = $meta->args
+        Get the hashref of { arg => \%config }
+
+    $opts = $meta->opts
+        Get the hashref of { opt => \%config }
+
+    $regex = $meta->valid_arg_params
+        Get a regex that can be used to validate the options available for
+        args.
+
+    $regex = $meta->valid_opt_params
+        Get a regex that can be used to validate the options available for
+        opts.
+
+    $usage = $meta->usage
+        Get the usage information.
+
+    ( $opts, $args ) = $meta->preparse( @cli )
+        Pre-process the command line. No triggers or transforms are called.
+        Only recognised options will be added to $opts. $args will contain
+        everything else. The primary use of this method is if you have an
+        option to specify a config file which may add additional options.
+        This lets you get the config file, then use the real parse() method
+        once everything is loaded from the config.
+
+    ( $opts, $args ) = $meta->parse( $INSTANCE, @cli )
+        Process the command line in @cli. Methods for options (default, etc)
+        will be run against the $INSTANCE object.
+
+    $result = $meta->run( $INSTANCE, $opts, $args )
+        Run the provided opts and args combination. Handler methods will be
+        run on the $INSTANCE object.
+
+    $result = $meta->handle( $INSTANCE, @cli )
+        Combines parse() and run(). Replacement for "process_cli".
+
+    $result = $meta->process( $INSTANCE, @ARGS )
+    $result = $meta->process_cli( $INSTANCE, @ARGS )
+        Note: Deprecated This interface was offensive. See handle() instead.
+
+        Process the command line arguments on $INSTANCE.
+
+    $meta->describe( $TYPE, $NAME, $DESCRIPTION )
+        Add a description to an argument or option.
+
+    $meta->add_arg( $NAME => %PROPERTIES )
+        Add an argument.
+
+    $meta->add_opt( $NAME => %PROPERTIES )
+        Add an option.
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2012 Chad Granum
+
+    Declare-Opts is free software; Standard perl licence.
+
+    Declare-Opts is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

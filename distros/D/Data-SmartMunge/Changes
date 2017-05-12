@@ -1,0 +1,10 @@
+Revision history for Perl extension Data-SmartMunge
+
+1.101612  2010-06-10 23:18:27 Europe/Vienna
+    - added delete_matching()
+
+1.101611  2010-06-10 15:46:57 Europe/Vienna
+    - improved handling and added tests for when the munger is undefined
+
+1.101610  2010-06-10 13:40:34 Europe/Vienna
+    - original version

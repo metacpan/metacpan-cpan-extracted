@@ -1,0 +1,129 @@
+--- #YAML:1.0
+name:    Dotiac
+version: 0.8
+generated_by: hand
+abstract: |-
+  Render Django Templates in Perl
+license: mit
+author:              
+  - Marc Lucksch <perl@marc-s.de>
+distribution_type: module
+requires:
+    perl:                5.6     
+    Scalar::Util:        0
+    Data::Dumper:        0
+    File::Temp:          0
+    Carp:                0
+    File::Spec:          0
+    File::Basename:      0
+    Digest::MD5:         0
+recommends:
+    POSIX:               0
+build_requires:
+    Test::More:          0
+    Test::Pod:           0
+    Test::Pod::Coverage: 0
+    Test::NoWarnings:    0
+provides:
+   Dotiac::DTL:
+     file:    lib/Dotiac/DTL.pm
+     version: 0.8
+   Dotiac::DTL::Addon:
+     file:    lib/Dotiac/DTL/Addon.pm
+     version: 0.8
+   Dotiac::DTL::Comment:
+     file:    lib/Dotiac/DTL/Comment.pm
+     version: 0.8
+   Dotiac::DTL::Compiled:
+     file:    lib/Dotiac/DTL/Compiled.pm
+     version: 0.8
+   Dotiac::DTL::Filter:
+     file:    lib/Dotiac/DTL/Filter.pm
+     version: 0.8
+   Dotiac::DTL::Reduced:
+     file:    lib/Dotiac/DTL/Reduced.pm
+     version: 0.8
+   Dotiac::DTL::Tag:
+     file:    lib/Dotiac/DTL/Tag.pm
+     version: 0.8
+   Dotiac::DTL::Tag::autoescape:
+     file:    lib/Dotiac/DTL/Tag/autoescape.pm
+     version: 0.8
+   Dotiac::DTL::Tag::block:
+     file:    lib/Dotiac/DTL/Tag/block.pm
+     version: 0.8
+   Dotiac::DTL::Tag::comment:
+     file:    lib/Dotiac/DTL/Tag/comment.pm
+     version: 0.8
+   Dotiac::DTL::Tag::cycle:
+     file:    lib/Dotiac/DTL/Tag/cycle.pm
+     version: 0.8
+   Dotiac::DTL::Tag::debug:
+     file:    lib/Dotiac/DTL/Tag/debug.pm
+     version: 0.8
+   Dotiac::DTL::Tag::extends:
+     file:    lib/Dotiac/DTL/Tag/extends.pm
+     version: 0.8
+   Dotiac::DTL::Tag::filter:
+     file:    lib/Dotiac/DTL/Tag/filter.pm
+     version: 0.8
+   Dotiac::DTL::Tag::firstof:
+     file:    lib/Dotiac/DTL/Tag/firstof.pm
+     version: 0.8
+   Dotiac::DTL::Tag::for:
+     file:    lib/Dotiac/DTL/Tag/for.pm
+     version: 0.8
+   Dotiac::DTL::Tag::if:
+     file:    lib/Dotiac/DTL/Tag/if.pm
+     version: 0.8
+   Dotiac::DTL::Tag::ifchanged:
+     file:    lib/Dotiac/DTL/Tag/ifchanged.pm
+     version: 0.8
+   Dotiac::DTL::Tag::ifequal:
+     file:    lib/Dotiac/DTL/Tag/ifequal.pm
+     version: 0.8
+   Dotiac::DTL::Tag::ifnotequal:
+     file:    lib/Dotiac/DTL/Tag/ifnotequal.pm
+     version: 0.8
+   Dotiac::DTL::Tag::include:
+     file:    lib/Dotiac/DTL/Tag/include.pm
+     version: 0.8
+   Dotiac::DTL::Tag::load:
+     file:    lib/Dotiac/DTL/Tag/load.pm
+     version: 0.8
+   Dotiac::DTL::Tag::now:
+     file:    lib/Dotiac/DTL/Tag/now.pm
+     version: 0.8
+   Dotiac::DTL::Tag::regroup:
+     file:    lib/Dotiac/DTL/Tag/regroup.pm
+     version: 0.8
+   Dotiac::DTL::Tag::spaceless:
+     file:    lib/Dotiac/DTL/Tag/spaceless.pm
+     version: 0.8
+   Dotiac::DTL::Tag::ssi:
+     file:    lib/Dotiac/DTL/Tag/ssi.pm
+     version: 0.8
+   Dotiac::DTL::Tag::templatetag:
+     file:    lib/Dotiac/DTL/Tag/templatetag.pm
+     version: 0.8
+   Dotiac::DTL::Tag::unparsed:
+     file:    lib/Dotiac/DTL/Tag/unparsed.pm
+     version: 0.8
+   Dotiac::DTL::Tag::url:
+     file:    lib/Dotiac/DTL/Tag/url.pm
+     version: 0.8
+   Dotiac::DTL::Tag::widthratio:
+     file:    lib/Dotiac/DTL/Tag/widthratio.pm
+     version: 0.8
+   Dotiac::DTL::Tag::with:
+     file:    lib/Dotiac/DTL/Tag/with.pm
+     version: 0.8
+   Dotiac::DTL::Value:
+     file:    lib/Dotiac/DTL/Value.pm
+     version: 0.8
+   Dotiac::DTL::Variable:
+     file:    lib/Dotiac/DTL/Variable.pm
+     version: 0.8
+meta-spec:
+   version: 1.4
+   url: http://module-build.sourceforge.net/META-spec-v1.4.html

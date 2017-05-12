@@ -1,0 +1,16 @@
+To install ModInfo, use the standard Perl installation sequence:
+
+perl Makefile.PL
+make
+make install
+
+ModInfo is a system for documenting your Perl modules without creating runtime overhead.  Some of the concepts are based on the JavaBean BeanInfo API, but the implementation is specific to Perl, and does not require extra coding.  Fore more info, enter
+
+perldoc Devel::ModInfo::Tutorial
+
+Bugs or problems can be posted on our SourceForge site:
+http://guido.sf.net/
+
+I hope you find ModInfo useful and usable.
+
+jpt

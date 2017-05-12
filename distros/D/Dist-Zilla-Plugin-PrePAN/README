@@ -1,0 +1,46 @@
+NAME
+    Dist::Zilla::Plugin::PrePAN - Automatically set PrePAN author and module
+    URLs
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+    In "dist.ini":
+
+        [PrePAN]
+        author = http://prepan.org/user/3Yz7PYrBzQ
+        module = http://prepan.org/module/429En4oFdp
+
+DESCRIPTION
+    This plugin sets a PrePAN.org author and module URL for a distribution.
+
+METHODS
+  author
+    This is the author URL. You'll need to create an account at PrePAN and
+    copy/paste it from there. We can't infer the URL because it's not
+    guessable.
+
+        [PrePAN]
+        author = http://prepan.org/user/3Yz7PYrBzQ
+
+  module
+    This is the module URL. After you've created an account, you'll need to
+    post your module description on PrePAN and copy/paste the URL from
+    there. We can't infer the URL because it's not guessable.
+
+        [PrePAN]
+        module = http://prepan.org/module/429En4oFdp
+
+  metadata
+    Sets the author and/or module urls in the distribution's META file(s).
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Olaf Alders.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

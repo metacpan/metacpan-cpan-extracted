@@ -1,0 +1,7 @@
+do { my $x = {
+       'cpantest.antelope.net' => 'a55d0d42-89ab-11e5-b49b-b909e29420dd',
+       'w5050029' => 'b6c8672d-6bf5-1014-99ad-e1a5890cd912',
+       'w5139020' => '85ab240c-6bfd-1014-828b-aa2bd4cf89d2'
+     };
+  $x;
+ }

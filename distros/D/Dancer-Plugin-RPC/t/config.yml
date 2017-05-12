@@ -1,0 +1,25 @@
+appname: 'TestProject'
+
+charset: 'UTF-8'
+
+logger: 'console'
+log: 'core'
+warnings: 1
+show_errors: 1
+
+plugins:
+    'RPC::XMLRPC':
+        '/config/system':
+            'TestProject::SystemCalls':
+                system.ping: do_ping
+                system.version: do_version
+        '/config/api':
+            'TestProject::ApiCalls':
+                api.uppercase: do_uppercase
+    'RPC::JSONRPC':
+        '/jsonrpc/admin':
+            'TestProject::SystemCalls':
+                ping:    do_ping
+                version: do_version
+            'TestProject::ApiCalls':
+                uppercase: do_uppercase

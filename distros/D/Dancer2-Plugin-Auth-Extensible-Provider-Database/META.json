@@ -1,0 +1,61 @@
+{
+   "abstract" : "authenticate via a database",
+   "author" : [
+      "David Precious <davidp@preshweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Auth-Extensible-Provider-Database",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Dancer2::Plugin::Auth::Extensible::Test" : "0",
+            "Path::Tiny" : "0.016",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2" : "0.200000",
+            "Dancer2::Plugin::Auth::Extensible" : "0.620",
+            "Dancer2::Plugin::Database" : "2.16",
+            "Moo" : "2.000000",
+            "YAML" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-Database/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-Database/",
+      "repository" : {
+         "url" : "https://github.com/PerlDancer/Dancer2-Plugin-Auth-Extensible-Provider-Database"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.620",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

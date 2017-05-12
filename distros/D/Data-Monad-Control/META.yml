@@ -1,0 +1,39 @@
+---
+abstract: 'Exception handling with Monad'
+author:
+  - 'aereal <aereal@aereal.org>'
+build_requires:
+  Devel::Cover: '0'
+  Devel::Cover::Report::Coveralls: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Monad-Control
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Monad::Control:
+    file: lib/Data/Monad/Control.pm
+    version: '0.01'
+requires:
+  Data::Monad: '0.08'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/aereal/Data-Monad-Control/issues
+  homepage: https://github.com/aereal/Data-Monad-Control
+  repository: git://github.com/aereal/Data-Monad-Control.git
+version: '0.01'

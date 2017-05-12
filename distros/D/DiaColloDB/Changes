@@ -1,0 +1,349 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution DiaColloDB
+
+v0.12.004 Wed, 15 Mar 2017 16:04:39 +0100 moocow
+	* fix for extend() on list-URLs where all target attributes are missing from DB
+	* removed some painful global debug code in Profile::Multi::trim()
+	* made default eps=0 more consistent (dcdb-query.perl, DiaColloDB::profileOptions(), Profile::compile_xyz())
+	* added Profile::compile_clean() method as workaround for infinite score values (JSON module inserts e.g. '-inf', but browser can't parse it)
+	* added divide-by-zero checks to Profile::compile_SCORE() methods (for list URLs)
+	* fixed list-client global trimming
+	* added DiaColloDB::Client::dbOptions() hack to pass down logXYZ options through rcfile:// and list:// client-URLs
+
+v0.12.003 Wed, 01 Mar 2017 15:47:02 +0100 moocow
+	* fixed default match-id =2 in ddc groupby
+
+v0.12.002 Mon, 27 Feb 2017 10:44:04 +0100 moocow
+	* fixed f1 acquisition bug when using DDC back-end for "macro-event" diffs using e.g. -groupby='[@constant]'
+
+v0.12.001 Tue, 24 Jan 2017 15:01:24 +0100 moocow
+	* made profile parameter N dependent on epoch size (fixes mantis bug #17036)
+	* adapted Profile::Multi::sumover() to heuristically guess whether to sum sub-profile N for diacollo <= v0.11 compatibility
+	* reverse-order from DDC::PP Descendants() fixed in DDC::Concordance v0.33
+
+v0.11.002 Wed, 30 Nov 2016 15:38:39 +0100 moocow
+	* fixed bogus repsitory in Makefile.PL
+	* fixed meta-attribute parsing "doc.ATTR", "doc.ATTR=VAL" for native query syntax
+	* fixed buglet calling DDC::Any::Object::new() with temporary $1 argument (quote it to save it)
+	* TODO: figure out why DDC::PP Descendants() returns in reverse order vs. DDC::XS::Descendants() (--> diacollo item tuple order)
+
+v0.11.001 Tue, 20 Sep 2016 14:14:18 +0200 moocow
+	* added DiaColloDB::Relation::extend() and wrappers DiaColloDB::extend(), DiaColloDB::Client::extend()
+	  - high-level interface to independent f2 acquisition, e.g. for list-clients
+	  - DDC-relation extend() support still experimental: large batch queries can cause server to choke
+	* fixed Client::list incorrect f2 acquisition bug
+	* added support for parallel sub-client processing in Client::list (requires 'forks' module)
+	* added dcdb-create.perl -lazy option for "lazy union" list-client creation
+	* renamed 'mi' score function to more accurate 'milf'
+	* added 'mi1' score function (raw PMI)
+	  - not too useful without pre-filtered corpus: too sensitive to low-frequency outliers
+
+v0.10.009 Thu, 25 Aug 2016 09:51:34 +0200 moocow
+	* updated Tie::File::Indexed dependency to v0.08
+	* updated DDC::Concordance dependency to v0.28
+
+v0.10.008 Wed, 24 Aug 2016 14:12:21 +0200 moocow
+	* merged in debugging changes from v0.10.004 debugging branch (_v0.10.004_0[123])
+	  - conditionally enabled by new dcdb-create.perl -debug option
+	* added Utils::fh_flush() and Utils::fh_reopen() methods
+	  - fh_reopen() should simulate flush() even on systems which don't support flush()
+	* updated Persistent subclasses to call fh_reopen() from their flush() methods:
+	  - EnumFile(+FixedLen +FixedMap +MMap), MultiMapFile(+MMap), PackedFile(+MMap)
+
+v0.10.007 Wed, 24 Aug 2016 08:59:10 +0200 moocow
+	* removed "hard" pdl dependencies, moved to 'recommends'
+	* fixed default option inheritance for dcdb-create.perl hash-valued options -tdf-option, -option
+	* added use_ok(DiaColloDB::Upgrade) test: weird errors w/ DDC::Any
+	* fixed import DiaColloDB::Utils::packsize() in Relation.pm
+	* fixed native query-parsing for TDF, DDC relations
+	  - direct ddc-parsing can be forced with "[QUERY]" or "(QUERY)"
+
+v0.10.006 Mon, 11 Jul 2016 11:03:01 +0200 moocow
+	* better version dependency for v5.10.0
+
+v0.10.005 Thu, 07 Jul 2016 14:40:04 +0200 moocow
+	* replaced DDC::XS query-parsing and -manipulation with DDC::Any from DDC::Concordance >= v0.25
+	  - obviates troublesome Alien::DDC::Concordance dependency
+	  - still only expected to run correctly on *NIX systems due to runtime calls to sort etc.
+	* commented out DiaColloDB::create() debugging code from v0.10.004_01
+
+v0.10.004_03 Thu, 21 Jul 2016 13:43:49 +0200 moocow
+	* added dcdb-create -nommap option: see if mmap use in VirtualBox/MacOS is causing errors
+
+v0.10.004_02 2017-07-15 moocow
+	* debugging test for PackedFile::MMap -- no joy
+
+v0.10.004_01 Tue, 05 Jul 2016 09:27:52 +0200 moocow
+	* debugging release for un-reproducible 'undefined value' errors on Birmingham data
+
+v0.10.004 Tue, 28 Jun 2016 09:30:42 +0100 moocow
+	* updated -nofilters option to dcdb-create.perl (alias -use-all-the-data, a la Mark Lauersdorf)
+	* added DDCTabs 'foreign' option (-dO=foreign=1)
+	* added (p|w|l)(good|bad)file options to DiaColloDB::create (stoplist files)
+
+v0.10.003 Tue, 21 Jun 2016 15:37:23 +0200 moocow
+	* added -subclient-option to dcdb-query.perl (common options for list:// sub-clients)
+	* fixed stringification bug for ddc-diff queries introduced in v0.09.002
+	  'Can't use string ("l") as a HASH ref while "strict refs" in use at DiaColloDB/Relation.pm line 281.'
+
+v0.10.002 Mon, 13 Jun 2016 15:51:42 +0200 moocow
+	* native query syntax fix: identify CQOr queries and throw an error
+
+v0.10.001 Thu, 12 May 2016 16:57:56 +0200 moocow
+	* added -log-level option to dcdb-info.perl
+	* removed dates from generic term-tuple vocabulary ("x-tuples" -> "t-tuples"), a la tdf relation
+	* changed db structure for more efficient 2-pass Cofreqs queries (f2 bug-fix)
+	  - Cofreqs now 3-level (id1 -> (date -> (id2->f)))
+	  - Unigrams now 2-level (id1 -> (date -> f))
+	  - Relation::subprofile1() and subprofile2() calling conventions changed
+	  - changed temporary file format for "tokens.dat" used by DiaColloDB::create(): added dates
+	* changed export text file formats
+	  - Unigrams: added dates
+	  - Cofreqs: added dates and un-collocated f1 lines
+	  - "x-tuple" exports replaced by corresponding "t-tuple" exports xenum->tenum, ATTR_2x.*->ATTR_2t, etc.
+	* added upgrade package v0_10_x2t
+	  - added compatibility wrappers Compat::v0_09::* for transparent use of old indices
+	* added auto-backup of changed files to upgrade framework
+	  - upgraders are now instantiated as objects, not just packages: cache header & options
+	* added DiaColloDB::Upgrade::Base::revert() method and -revert option to dcdb-upgrade.perl
+	  - default implementation relies on subclass revert_created() and revert_updated() methods
+	* added dcdb-upgrade.perl options -keep, -[no]backup
+	* added DiaColloDB::Utils functions copyto(), moveto(), copyto_a(), cp_a()
+	* added DiaColloDB::Persistent method-wrappers copyto(), moveto(), copyto_a()
+	* added optimized PackedFile::MMap::bsearch() method
+	  - for faster v0.10.x Cofreqs 'onepass' mode; still not as fast as v0.09.x 1-pass but it's incorrect anyways
+	* removed unused methods Cofreqs::f1(), Cofreqs::f12()
+	* removed obsolete method DiaColloDB::xidsByDate()
+	* re-factored compatibility wrappers into DiaColloDB::Compat::vX_Y_Z::*
+
+v0.09.004 Tue, 03 May 2016 14:03:13 +0200 moocow
+	* devel only, no CPAN release
+	* cofreqs (load|save)TextFh() idempotency tweaks for un-collocated f1
+	* mmap optimization for Cofreqs::subprofile2(): ca. 26% improvement
+	* PackedFile dump tweaks: better handling of non-singleton pack formats
+	* added Utils::packsingle(): better check for singleton pack formats
+
+v0.09.003 Wed, 27 Apr 2016 09:55:14 +0200 moocow
+	* fixed 'undefined value in vec' warning in DiaColloDB/Relation.pm
+
+v0.09.002 Tue, 26 Apr 2016 15:46:17 +0200 moocow
+	* fixed comparison profile stringification for new pack()-encoded profiles,
+	  regression for v0.09.001 "f2 bug" fix
+
+v0.09.001 Tue, 26 Apr 2016 14:49:29 +0200 moocow
+	* fixed double-counting f2 for multiple item1 targets with shared item2 collocates in Cofreqs::subprofile1() 1-pass mode
+	* added auto-upgrade framework
+	  - DiaColloDB::Upgrade - top-level API
+	  - DiaColloDB::Upgrade::Base - subclass API & defaults
+	  - added subclass ::v0_08_to_v0_09_multimap for v0.09.x multimap format change
+	  - dcdb-upgrade.perl : top-level auto-upgrade script
+	* added compatiblity mode for multimaps as DiaColloDB::MultiMapFile::v0_08
+	* fixed -nokeep option to dcdb-create.perl
+	* TDF union: avoid storage of non-persistent object keys qw(docmeta wdmfile logas reusedir)
+	* TDF union: fixed 'bus error' resulting from attempt to mmap() temporary data beyond EOF
+	  - arose in dta+dwds trying to include 'pnd' metadata only indexed in dta
+	  - temporary PackedFile tdf.d/mvals_pnd.pf had no entries for dwds data (pnd not indexed)
+	  - readPdlFile(...,Dims=>[$NC]) choked with 'bus error'
+	* Client::list overhaul
+	  - new default fudge=>10 should be safe (but rather expensive)
+	  - re-factored Client::list::profile() and compare() methods
+	* improved Client and Client::list documentation
+	  - added "incorrect independent collocate frequencies" section to Client::list documentation
+	  - milder form of this bug applies even to single native CoFreqs indices ("f2 bug", see below)
+	* workaround for incorrect independent collocate frequency acquisition code in Cofreqs ("f2 bug")
+	  - f2 were computed as marginals only over those (x1,x2,date) triples with f(x1,x2,date) > 0,
+	    rather than over all (*,x2,date \in slice)
+	  - result were in general underestimates of f2
+	  - fix uses 2-pass acquisition strategy, ca. 10x slower for frequent targets (e.g. 'Mann')
+	    ~ old subprofile() method refactored into subprofile1() and subprofile2()
+	  - todo: possibly re-factor db structure to use tdf-style {tenum} rather than {xenum},
+	    minimize group-key lookup & optimize for serial cofreqs dba2 file access
+	  - added 'onepass' query option for fast, old, incorrect f2 frequency acquisition (Cofreqs only)
+
+v0.08.006 Thu, 10 Mar 2016 16:52:19 +0100 moocow
+	* added dbexport() support for TDF relations
+	* allow option pass-through for Profile::Multi::compile()
+	* fixed utf8 handling in TDF::qinfo() query templates
+
+v0.08.005 Mon, 07 Mar 2016 10:02:12 +0100 moocow
+	* fixed pod =encoding typo in Profile.pod
+	* added 'verbose' option to Profile::(Multi)Diff::saveHtmlFile
+	  - include sub-profile frequencies in diff html output, used by www wrappers if 'debug' flag is set.
+	* updated module-list and installation sketch in README
+
+v0.08.004 Fri, 04 Mar 2016 13:25:20 +0100 moocow
+	* remove temporary PDL headers created by DiaColloDB::PackedFile::toPdl(), used by TDF::union()
+	* fixed buggy Profile::trim() call on undefined (empty) profiles in Profile::Diff::pretrim()
+	* updated PODs for command-line utilities
+	* updated & improved API module documentation
+
+v0.08.003 Fri, 26 Feb 2016 15:14:43 +0100 moocow
+	* added missing PODs to MANIFEST
+	* added more DiaColloDB::Document subclasses:
+	  - DiaColloDB::Document::JSON - raw JSON dump
+	  - DiaColloDB::Document::TCF - CLARIN-D TCF (attributes {w,p,l} only; metadata from abused <source> element)
+	  - DiaColloDB::Document::TEI - basic TEI-like XML (flexible but slow)
+
+v0.08.002 Tue, 23 Feb 2016 10:51:02 +0100 moocow
+	* added Document::DDCTabs options trimGenre, trimAuthor
+	* added explicit PDL dependency in CONFIGURE_REQUIRES + PREREQ_PM: try to be cpantesters-friendly (see RT bug #112321)
+	* added manual check for PDL in Makefile.PL: disable PDL-Utils/ subdir build if PDL isn't installed
+
+v0.08.001 Fri, 29 Jan 2016 12:35:44 +0100 moocow
+	* added co-occurrence profiles over (term x document) frequency matrix via DiaColloDB::Relation::TDF
+	  - requires PDL, PDL::CCS, etc.: should be safe to omit, only loaded on demand
+	* re-worked compile-time filtering; new options to dcdb-create.perl:
+            -tfmin TFMIN : minimum global term frequency, regardless of DATE component (default=5)
+            -lfmin LFMIN : minimum global lemma frequency (default=5)
+	  - prunes enums too, which keeps them smaller and speeds up access
+
+v0.07.015 Wed, 04 Nov 2015 14:18:20 +0100 moocow
+	* added mi3 profiles a la Rychlý (2008)
+	* report log-log-likelihood scores (extra log() for better scaling)
+	* singularity checking for log-likelihood computations
+
+v0.07.014 Tue, 03 Nov 2015 11:42:26 +0100 moocow
+	* added 1-sided log-likelihood ratio profiles a la Evert (2008)
+
+v0.07.013 2015-11-02 12:52:56 +0100 moocow
+	* fix for Profile::empty(): a profile is empty if it contains no collocates, even if it has nonzero f1
+
+v0.07.012 Wed, 28 Oct 2015 13:04:20 +0100 moocow
+	* omit {pgood},{pbad} restrictions in Relation::qinfoData()
+	  - these are too expensive for large corpora, resulting in timeouts for KWIC-links
+
+v0.07.011 Tue, 29 Sep 2015 09:10:33 +0200 moocow
+	* require perl >= v5.10.0 (for // operator)
+
+v0.07.010 2015-09-24  moocow
+	* moved DDC dependency and include to new CPAN-friendly DDC::Concordance
+	* updated README
+	* distcheck fixes
+	* fixed fill/trim/alignment bug in ddc-diff ('fill' option wasn't being properly honored)
+
+v0.07.009 2015-08-03  moocow
+	* relation-wise dbinfo
+	  - merged -r 15066:15067 diacollo-0.07.006+vsem into DiaColloDB.pm, DiaColloDB/Relation.pm
+
+v0.07.008 2015-07-31  moocow
+	* honor {xdmin},{xdmax} in DiaColloDB::xidsByDate()
+	  - fixes 'cannot align non-trivial multi-profiles of unequal size' bug in corpora with bogus dates (e.g. zeitungen)
+	* ignore Makefile.old
+
+v0.07.007 2015-07-23  moocow
+	* merged -r15021:15022 branch diacollo-0.07.006+vsem into Relation/DDC.pm
+	  - fix for e.g. author-profiles
+	* allow ddc queries without primary targets (=1), for 'subcorpus comparison'
+	* merged -r 15013:15014 diacollo-0.07.006+vsem into DDC.pm
+	  - fixes for pseudo-corpus comparison
+
+v0.07.006 2015-07-20  moocow
+	* plots/*: pretty diff- and score-function plots
+	* documented -diff option to dcdb-query.perl
+	* Profile/Diff.pm pre-trimming tweaks, lavg fix
+	* doc fixes; lf, lfm score-funcs
+	* more diff documentation
+	* added, documented -diff=OP option (adiff,diff,sum,min,max,avg,havg)
+
+v0.07.005 2015-07-08  moocow
+	* ddc groupby-request parsing tweak
+	* groupby without token attributes
+	* ddc tweak for groupby without a token field -- still not working (keys()-queries fail)
+
+v0.07.004 2015-07-02  moocow
+	* fixed bogus $DiaColloDB::MMCLASS = "DiaColloDB::MultiMapFile::MMap" (not yet written)
+	* readme fixes
+	* distribution, docs, readme, htmlifypods
+	* fix mantis bug #804 : don't trim empty sub-profiles in diff mode
+
+v0.07.003 2015-06-01  moocow
+	* renamed 'local' profiling option to 'global' (for better web-wrapper transparency and defaults)
+
+v0.07.002 2015-05-29  moocow
+	* missing profile fix for diff (argh)
+	* added misc/ddc-sample.txt: notes on #SAMPLE keyword
+	* merged -r14464:HEAD diacollo-0.06+ddc intro trunk
+
+v0.05.002 2015-04-23  moocow
+	* reverted trunk to current state of diacollo-0.05.001-pre-vsem branch
+	* benchmark -iters for dcdb-query.perl
+	* started trying to add DocClassify-based DSem to DiaColloDB: stuck on questions of modularity
+	* 'logwhich' option: log multiple sub-classes
+
+v0.05.001 2015-03-24  moocow
+	* EnumFile fixes for missing keys
+	* EnumFile::Tied : tied interface to EnumFile
+	  - EnumFile and friends (except for FixedLen::MMap) now allow in-memory cache to override file contents for i2s(), s2i()
+
+v0.05 2015-03-23  moocow
+	* more verbose union messages
+	* added wvi-doc2terms.perl: not very encouraging
+	* woe is me: additive term-identities don't look kosher with word2vec
+	* work on topic-doc matrix (WAY TOO BIG  sentence-based model with k=200)
+	* word2vec tweaks: a bit further along...
+	* union tweaks
+	* union() now uses temporary  objects to map attribute indices (ai2u, xi2u)
+	  - should improve memory usage a bit
+	  - individual maps are still loaded to memory on a per-db basis
+	    (at most 1 at any time) in Cofreqs::union and Unigrams::union
+	* stricter request handling (die on unsupported attributes)
+	* groupby and generic requests working via web-wrapper
+	  - thought: should we model the query language on ddc (maybe even
+	    use DDC::XS or similar) for max compatibility?
+	* updated MANIFEST
+	* parseRequest() for user queries working
+	* added {maxExpand} option to kludge memory-hogging queries
+	* factored out parseRequest() from groupby()
+	  + TODO: implement generic target query using parseRequest() rather than named parameters
+	* dbinfo for http (add url), list, file, http
+	* dbinfo, timestamp, disk usage
+	* remove MYMETA.yml from svn; ignore some other stuff
+	* EnumFile: more fixes for perl 5.18.2
+	* more groupby fixes
+	* attrs/groupby hack for shared arrays
+	* removed 'use bytes' pragmas almost everywhere
+	  - deprecated in perl 5.18.2 (ubuntu 14.04.1 / kira)
+	  - workaround is to use utf8::encode() and length(), if needed on a temporary
+	* delete empty records for test-check-enum
+	* added test-check-enum.perl
+	* buggy diacollo : taz
+
+v0.04 2015-03-09  moocow
+	* 'having' filters, wip
+	* adopt xdmin,xdmax for union
+	* use lib qw(lib) for update-header
+	* merged -r r14008:14041 branch diacollo-0.03+attrs intro trunk : compile-time user-defined attributes
+
+v0.03 2015-03-04  moocow
+	* metadata parsing for Document/DDCTabs.pm
+	* w2v test functionality now in w2v-compile.perl + w2v-query.perl
+	* removed cofreqs debugging log stuff
+	* utf8 parsing mode (improved filter regex matching)
+	* removed generated Makefile from svn
+	* tweaks for d* integration
+	* added dump.mak from old Makefile r13904
+	* export tweaks
+	* cofreqs loading tweaks, timing
+	* union tweaks and woes : seems basically working now
+	* dump DiaColloDB::Persistent subclass files
+	  - toArray(), fromArray() for PackedFile
+	  - work-in-progress: DiaColloDB::union()
+	* Client layer working and pretty much tested
+	* dcdb-query.perl added to MANIFEST
+	* added dcdb-query.perl : replaces dcdb-(profile|compare).perl
+	* moved Client/Distributed.pm -> Client/list.pm
+
+v0.02 2015-02-24  moocow
+	* DiaColloDB/Client/Distributed.pm: error pass-through
+	* distributed client stuff
+	  - functionality is basically in place, but NOT CORRECT
+	  - getting (fudge*k)-best items from sub-corpora wonks up the
+	  results (e.g. 'gnädig' doesn't appear for Mann vs Frau in
+	  distributed kern), other frequencies and scores are off too
+	* Diff improvements: trimming via absolute value, add() support
+	* utf8 tweaks
+	* DiaColloDB::compare(): basically working ("diff" profiles)
+
+v0.01 2015-02-20  moocow
+	* initial version

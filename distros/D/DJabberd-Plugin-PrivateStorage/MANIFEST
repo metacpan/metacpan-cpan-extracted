@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/DJabberd/Plugin/PrivateStorage.pm
+lib/DJabberd/Plugin/PrivateStorage/InMemoryOnly.pm
+lib/DJabberd/Plugin/PrivateStorage/SpoolDirectory.pm
+lib/DJabberd/Plugin/PrivateStorage/DBI.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/server.t
+t/lib/djabberd-test.pl
+t/kwalitee.t

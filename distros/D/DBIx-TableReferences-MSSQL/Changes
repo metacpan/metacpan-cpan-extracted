@@ -1,0 +1,11 @@
+Revision history for Perl extension DBIx::TableReferences::MSSQL.
+
+0.01  Wed Jul 21 08:48:37 2004
+	- original version; created by h2xs 1.23 with options
+		-A -X -n DBIx::TableReferences::MSSQL
+
+0.02  Wed Jul 28 12:12:03 2004
+    - Now handles three optional clauses in FOREIGN KEY declarations
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+        NOT FOR REPLICATION

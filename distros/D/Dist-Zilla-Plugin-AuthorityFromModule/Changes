@@ -1,0 +1,32 @@
+Revision history for Dist-Zilla-Plugin-AuthorityFromModule
+
+0.007     2016-06-12 01:19:15Z
+          - this module is now deprecated, having declared Mission
+            Accomplished \o/
+
+0.006     2015-03-30 04:18:37Z
+          - fix tests broken at a distance by ModuleMetadata role
+
+0.005     2015-03-29 22:46:06Z
+          - now using Dist::Zilla::Role::ModuleMetadata to use a cached object
+            for efficiency
+
+0.004     2014-11-28 18:43:48Z
+          - allow tests to pass under older Dist::Zilla by skipping testing
+            non-ascii module names there
+
+0.003     2014-10-31 06:54:58Z
+          - fix case where authority module is not the first namespace in a
+            file
+
+0.002     2014-09-06 01:29:49Z
+          - make one of the code paths more efficient
+          - add more diagnostic messages
+          - add missing version to prereq specification
+          - extract the proper package name from a module when there are
+            statements in the 'main' namespace
+          - add more detailed documentation explaining the rationale behind
+            this new metadata
+
+0.001     2014-08-29 03:43:33Z
+          - Initial release.

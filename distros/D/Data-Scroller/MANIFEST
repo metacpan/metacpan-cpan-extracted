@@ -1,0 +1,8 @@
+Makefile.PL
+lib/Data/Scroller.pm
+t/scroller.t
+t/constructs.t
+Changes
+README
+INSTALL
+MANIFEST

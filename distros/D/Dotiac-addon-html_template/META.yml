@@ -1,0 +1,44 @@
+--- #YAML:1.0
+name:                Dotiac-addon-html_template
+version:             0.3
+abstract: |-
+  Makes Dotiac parse HTML-Template templates, 
+  either pure or combined with Django template code
+  It can also convert HTML-Template templates.
+license:             mit
+generated_by: Marc Lucksch
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL:                          0.5
+    File::Spec:                           0
+    Carp:                                 0
+    Scalar::Util:                         0
+    File::Basename:                       0
+    Dotiac::DTL::Addon::case_insensitive: 0.3
+    Dotiac::DTL::Addon::importloop:       0.2
+recommends:
+    Dotiac::DTL:                          0.8
+build_requires:
+    Test::More: 0
+    Test::Pod:  0
+provides:
+   Dotiac::DTL::Addon::html_template:
+     file: lib/Dotiac/DTL/Addon/html_template.pm
+     version: 0.3
+   Dotiac::DTL::Addon::html_template_pure:
+     file: lib/Dotiac/DTL/Addon/html_template_pure.pm
+     version: 0.3
+   Dotiac::DTL::Addon::html_template::Convert:
+     file: lib/Dotiac/DTL/Tag/html_template/Convert.pm
+     version: 0.3
+   Dotiac::DTL::Addon::html_template::Replace:
+     file: lib/Dotiac/DTL/Tag/html_template/Replace.pm
+     version: 0.3
+no_index:
+   package:
+   - HTML::Template
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

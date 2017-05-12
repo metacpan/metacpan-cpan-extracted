@@ -1,0 +1,12 @@
+Changes
+lib/Devel/GDB.pm
+lib/Devel/GDB/LowLevel.pm
+Makefile.PL
+MANIFEST
+README
+t/expect.t
+t/pod-coverage.t
+t/pod.t
+t/with-threads.t
+t/without-threads.t
+META.yml                                 Module meta-data (added by MakeMaker)

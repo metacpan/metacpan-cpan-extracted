@@ -1,0 +1,85 @@
+A short paragraph.
+
+A long paragraph: Given an XHTML document (as an
+L<XML::LibXML::Document> object), find all the attributes in the markup
+which are relative URLs and turn them into absolute URLs relative to
+C<$base_url>. This can be used to prepare content from an article to be
+published in a different place with a different URL, such as in an RSS
+feed or on an index page, while ensuring that any links or embedded
+files continue to work.
+
+extra whitespace around it
+
+Bullet list:
+
+ * List item 1
+
+ * List item 2
+
+    * List item 2.1
+
+    * List item 2.2
+
+ * List item 3
+
+Numbered list:
+
+ 1. List item 1
+
+ 2. List item 2
+
+     1. List item 2.1
+
+     2. List item 2.2
+
+ 3. List item 3
+
+Bullet list containing block markup:
+
+ * Here is a nested list:
+
+    * This indented list item contains quite a lot of text, broken up
+      into two paragraphs. The second paragraph is just some prose from
+      the Daizu API documentation.
+
+      Return a string version of the DateTime object, formatted as a
+      W3CDTF date and time. If $datetime is just a string, it is
+      automatically validated and parsed by validate_date() first. If
+      the value is invalid or undefined, then undef is returned.
+
+   Another paragraph after the nested list.
+
+Special chars should be preserved: ‘single quotes’ “double quotes”
+en–dash em—dash
+
+    text inside blockquote element
+
+    A long paragraph inside a blockquote: Most access to Daizu
+    functionality requires a Daizu object. It provides a database handle
+    for access to the 'live' content data, and a L<SVN::Ra> object for
+    access to the Subversion repository.
+
+    another paragraph
+
+        nested blockquote
+
+A pre element containing some code, syntax highlighted (but the extra
+span elements can be safely ignored when converting to text):
+
+    sub add_html_dom_filter
+    {
+        my ($self, $object, $method) = @_;
+        push @{$self->{html_dom_filters}}, [ $object => $method ];
+    }
+
+“quoted text”
+
+simulated with Unicode chars:
+sup: x¹²³⁺⁴⁵⁶⁷⁸⁹⁰⁼⁽ⁱ⁾, sub: H₂₋ᵧO
+
+can't be simulated:
+sup: x%$#123, sub: H@O
+
+Markup with unusual whitespace arrangement.
+
+Images: alt=[foo bar] noalt=[]

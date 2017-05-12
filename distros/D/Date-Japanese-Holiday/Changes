@@ -1,0 +1,16 @@
+2003-09-25  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* added Date::Simple MixIn interface. (Tatsuhiko Miyagawa)
+	* modified equinox algorithm (based on Ruby's holiday.rb)
+
+2003-09-16  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* Date::Japanese::Holiday is-a Date::Simple.
+	* includes Sunday, substitute holiday and special holiday.
+	* some internal method names are changed.
+	* added functional interface.
+
+2002-12-05  IKEBE Tomohiro  <ikebe@edge.co.jp>
+
+	* 0.01 original version
+	* 0.02 fixed Happy Monday calculation.

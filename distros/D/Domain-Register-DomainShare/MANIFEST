@@ -1,0 +1,5 @@
+MANIFEST
+lib/Domain/Register/DomainShare.pm
+META.yml
+README
+Makefile.PL

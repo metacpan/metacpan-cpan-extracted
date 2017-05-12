@@ -1,0 +1,59 @@
+{
+   "abstract" : "a Perl module for parsing and formatting date fields in chess game databases in PGN format",
+   "author" : [
+      "Ingram Braun <ibraun@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DateTime-Format-PGN",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Incomplete" : "0.08",
+            "Params::Validate" : "1.23",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Chess::PGN::Parse" : "0.20",
+            "Test::More" : "1.001014",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=DateTime-Format-PGN"
+      },
+      "homepage" : "https://ingram-braun.net/public/programming/perl/chess-databases-pgn-date-format-parser/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/CarlOrff/DateTime-Format-PGN.git",
+         "web" : "https://github.com/CarlOrff/DateTime-Format-PGN"
+      }
+   },
+   "version" : "0.05"
+}
+

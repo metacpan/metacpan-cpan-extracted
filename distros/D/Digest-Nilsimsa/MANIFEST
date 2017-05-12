@@ -1,0 +1,14 @@
+COPYING
+MANIFEST
+Makefile.PL
+Nilsimsa.pm
+Nilsimsa.xs
+README
+_nilsimsa.c
+nilsimsa.h
+t/00_load.t
+t/a.txt
+t/b.txt
+t/d.txt
+t/chad.jpg
+typemap

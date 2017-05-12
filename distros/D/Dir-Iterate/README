@@ -1,0 +1,11 @@
+Dir::Iterate implements equivalents to the built-in C<map> and C<grep> functions
+which traverse directories instead of arrays.  The block will be called for 
+each file and directory below the given list of directories.  It acts as a 
+more usable layer on top of File::Find.
+
+Install it by following the standard steps:
+
+    perl Makefile.PL
+    make
+    make test
+    make install

@@ -1,0 +1,22 @@
+=head2 C<Test::Version> adaptive strictness
+
+C<Test::Version> is a great plugin. It creates a test which checks modules in distribution: every
+module must have C<$VERSION> variable defined, and its value must be a valid version string.
+There are two notion of "validity": I<lax> and I<strict>. (See L<version::Internals/"Regular
+Expressions for Version Parsing"> for definitions of lax and strict).
+
+I want to use strict check:
+
+    [Test::Version]
+        is_strict = 1
+
+Unfortunately, this does not work for trial releases: any trial release definitely fails the test,
+because strict check does not allow underscore in version string. Thus, before every trial release
+I have to reset C<is_strict> option to zero, and return it back to one after release. This is
+boring and error-prone. I want to have "adaptive strictness": use lax check in case of trial
+release and strict check otherwise.
+
+C<Test::Version> maintainer Graham Ollis said: L<This is a good idea! I'll see if I can implement
+it.|https://github.com/plicease/Dist-Zilla-Plugin-Test-Version/issues/5> However, implementation
+may take some time. With a little help from C<Hook>, I can easily get achieve adaptive strictness
+right now.

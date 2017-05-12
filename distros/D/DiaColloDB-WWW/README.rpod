@@ -1,0 +1,162 @@
+=pod
+
+README for DiaColloDB::WWW
+
+=head1 ABSTRACT
+
+DiaColloDB::WWW - www wrapper scripts and utitilties for DiaColloDB diachronic collocation database
+
+
+=head1 REQUIREMENTS
+
+
+=head2 Perl Modules
+
+The following non-core perl modules are required,
+and should be available from L<CPAN|http://www.cpan.org>.
+
+=over 4
+
+=item DiaColloDB
+
+=item File::Copy::Recursive
+
+=item File::ShareDir
+
+=item File::ShareDir::Install
+
+=item File::chmod::Recursive
+
+=item HTTP::Daemon
+
+=item HTTP::Message
+
+=item MIME::Types
+
+=item Template
+
+=item URI
+
+=item URI::Escape
+
+=back
+
+=head2 Additional Requirements
+
+In order to make use of this module,
+you will also need
+an existing DiaCollo index to query.
+See L<dcdb-create.perl(1)|dcdb-create.perl>
+from the L<DiaColloDB|DiaColloDB> distribution
+for details.
+
+
+
+=head1 DESCRIPTION
+
+The DiaColloDB::WWW package provides a set of Perl modules
+and wrapper scripts implementing a simple webservice API
+for L<DiaColloDB|DiaColloDB> indices, including a simple
+user interface and online visualization.
+
+=head1 INSTALLATION
+
+Issue the following commands to the shell:
+
+ bash$ cd DiaColloDB-WWW-0.01 # (or wherever you unpacked this distribution)
+ bash$ perl Makefile.PL       # check requirements, etc.
+ bash$ make                   # build the module
+ bash$ make test              # (optional): test module before installing
+ bash$ make install           # install the module on your system
+
+See L<perlmodinstall> for details.
+
+=head1 USAGE
+
+Assuming you have a raw text corpus you would like to access via this module,
+the following steps will be required:
+
+=head2 Corpus Annotation and Conversion
+
+Your corpus must be tokenized and annotated with whatever word-level attributes and/or
+document-level metadata you wish to be able to query; in particular document date is
+required. See L<DiaColloDB::Document/SUBCLASSES> for a list of currently supported
+corpus formats.
+
+=head2 DiaCollo Index Creation
+
+You will need to compile a L<DiaColloDB|DiaColloDB> index for your corpus.
+This can be accomplished using the L<dcdb-create.perl(1)|dcdb-create.perl>
+script from the L<DiaColloDB|DiaColloDB> distribution.
+
+=head2 WWW Wrappers
+
+The proper domain of this distribution is to mediate between
+a high-level user interface running in a web browser and
+the L<DiaColloDB|DiaColloDB> index API itself.
+Utilities are provided for accomplishing this task in the following
+two ways:
+
+=head3 ... as a Standalone Server
+
+Once you have a DiaCollo index, you can access it by running the standalone
+server script L<dcdb-www-server.perl(1)|dcdb-www-server.perl>
+included in this distribution.
+
+=head3 ... or via an External HTTP Server
+
+Alternately, you can use the L<dcdb-www-create.perl(1)|dcdb-www-create.perl>
+script from this distribution to bootstrap a wrapper directory for
+use with an external webserver such as L<apache|http://httpd.apache.org/>.
+You will need to manually configure your webserver for the directory thus created.
+
+In either case, additional configuration will be necessary if you wish to
+have access to the corpus KWIC-link function, which requires a running
+L<DDC Server|http://sourceforge.net/projects/ddc-concordance/> and corresponding
+web wrappers for corpus searching.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+The user help page for the L<DiaColloDB::WWW|DiaColloDB::WWW> wrappers
+at L<http://kaskade.dwds.de/diacollo/help.perl>.
+
+=item *
+
+The CLARIN-D DiaCollo Showcase
+at L<http://clarin-d.de/de/kollokationsanalyse-in-diachroner-perspektive>
+contains a brief example-driven tutorial on using the web-service
+implemented by the DiaColloDB::WWW wrappers
+(in German).
+
+=item *
+
+The L<DiaColloDB::WWW|DiaColloDB::WWW>
+and L<DiaColloDB|DiaColloDB> documentation.
+
+=back
+
+=head1 THIRD PARTY LIBRARIES
+
+Includes F<d3.layout.cloud.js> by Jason Davies,
+see L<https://github.com/jasondavies/d3-cloud> for details.
+
+Includes F<purl.js> by Mark Perkins,
+see L<https://github.com/allmarkedup/purl> for details.
+
+Online time-series visualization via the "highcharts" format
+dynamically loads client-side JavaScript libraries not included in this distribution from
+L<http://www.highcharts.com/>.
+The Highcharts JavaScript libraries are available free of cost for non-commercial use;
+see L<http://www.highcharts.com/products/highcharts/#non-commercial>
+for details.
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+wrote and maintains the DiaColloDB::WWW distribution.
+
+=cut

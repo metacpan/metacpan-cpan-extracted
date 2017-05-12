@@ -1,0 +1,24 @@
+abstract: Failover and Load Balancing of DBI Handles
+author: 'Dan Wright <dwright@cpan.org>'
+build_requires:
+  DBD::SQLite: 1.09
+  Pod::Simple: 0
+  Test::Exception: 0.21
+  Test::More: 0
+  Test::Pod: 1.14
+  Test::Pod::Coverage: 1.04
+distribution_type: module
+generated_by: Module::Install version 0.63
+license: perl
+name: DBD-Multi
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Class::Accessor::Fast: 0.19
+  DBI: 0
+  List::Util: 1.18
+  Sys::SigAction: 0.1
+  perl: 5.8.0
+version: 0.14

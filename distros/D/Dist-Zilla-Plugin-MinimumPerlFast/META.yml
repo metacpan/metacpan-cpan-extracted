@@ -1,0 +1,38 @@
+---
+abstract: 'Quickly detects the minimum version of Perl required for your dist'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  Module::Build::Tiny: '0.039'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MinimumPerlFast
+provides:
+  Dist::Zilla::Plugin::MinimumPerlFast:
+    file: lib/Dist/Zilla/Plugin/MinimumPerlFast.pm
+    version: '0.003'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::FileFinderUser: '4.102345'
+  Dist::Zilla::Role::PrereqSource: '4.102345'
+  List::Util: '0'
+  Moose: '0'
+  MooseX::Types::Perl: '0.101340'
+  Perl::MinimumVersion::Fast: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MinimumPerlFast
+  repository: git://github.com/Leont/dist-zilla-plugin-minimumperlfast.git
+version: '0.003'

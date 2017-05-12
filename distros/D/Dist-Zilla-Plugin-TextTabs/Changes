@@ -1,0 +1,10 @@
+Revision history for Dist-Zilla-Plugin-TextTabs
+
+0.03      2013-12-13 21:36:35 -0500
+  - Support Perl 5.8
+
+0.02      2013-09-18 11:24:34 -0400
+  - add installer attribute
+
+0.01      2013-09-18 10:22:53 -0400
+  - initial version

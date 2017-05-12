@@ -1,0 +1,17 @@
+Revision history for DBIx-Class-Stash
+
+0.07 2009-08-17
+       FIX: inc/ dir (RT#39304)
+
+0.06 2008-11-11
+       FIX: Makefile.pl
+
+0.05 2008-11-07
+       FIX: MANIFEST etc...
+
+0.04 2008-11-07
+       FIX: test code.
+
+0.0.1 Fri May 18 16:46:53 2007
+       Initial release.
+

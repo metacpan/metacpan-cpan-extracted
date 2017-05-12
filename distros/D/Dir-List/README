@@ -1,0 +1,28 @@
+Dir-List version 0.1
+=====================
+
+Dir::List is a simple module, that will provide you with various
+information about a specified directory. Eg user/group, size of
+sub-directory (using du), the filetype, accessible/inaccessible, etc.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 by Oliver Falk
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

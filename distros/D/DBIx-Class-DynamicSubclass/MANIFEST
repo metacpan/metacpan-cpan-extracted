@@ -1,0 +1,25 @@
+Changes
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBIx/Class/DynamicSubclass.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/DBIx-Class-DynamicSubclass.t
+t/lib/DSCTest.pm
+t/lib/DSCTest/Schema.pm
+t/lib/DSCTest/Schema/SourceDynamic.pm
+t/lib/DSCTest/Schema/SourceDynamic/Type1.pm
+t/lib/DSCTest/Schema/SourceDynamic/Type2.pm
+t/lib/DSCTest/Schema/SourceStatic.pm
+t/lib/DSCTest/Schema/SourceStatic/Type1.pm
+t/lib/DSCTest/Schema/SourceStatic/Type2.pm

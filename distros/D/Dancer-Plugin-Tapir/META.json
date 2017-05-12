@@ -1,0 +1,63 @@
+{
+   "abstract" : "Associate a Tapir handler with Dancer routes",
+   "author" : [
+      "Eric Waters <ewaters@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Tapir",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::Exception" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Capture::Tiny" : "0",
+            "Dancer" : "1.31",
+            "JSON" : "0",
+            "JSON::XS" : "0",
+            "Tapir" : "0.03",
+            "Thrift::Parser" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::LoggerMockObject" : {
+         "file" : "lib/Dancer/Plugin/Tapir.pm",
+         "version" : 0
+      },
+      "Dancer::Plugin::Tapir" : {
+         "file" : "lib/Dancer/Plugin/Tapir.pm",
+         "version" : "0.05"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/ewaters/dancer-plugin-tapir/issues?labels=bug"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/ewaters/dancer-plugin-tapir"
+      }
+   },
+   "version" : "0.05"
+}

@@ -1,0 +1,93 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.000001
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0
+
+1.000000 2014-10-10T13:04:03Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.96
+
+ [Removed / build requires]
+ - Module::Build 0.4005
+
+ [Removed / configure requires]
+ - Module::Build 0.4005
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.02001003 2013-07-26T09:11:29Z
+ [Added / test requires]
+ - lib
+
+ [Changed / build requires]
+ - Module::Build 0.4002 → 0.4005
+
+ [Changed / configure requires]
+ - Module::Build 0.4002 → 0.4005
+
+ [Changed / runtime requires]
+ - Package::Stash 0 → 0.15
+
+0.02001002 2012-08-11T01:59:03Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4002
+
+ [Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+0.02001001 2012-06-08T13:30:28Z
+ [Added / runtime requires]
+ - perl 5.008
+
+ [Changed / runtime requires]
+ - Carp 0 → 1.22
+
+0.01011704 2011-10-15T11:05:19Z
+ [Added / runtime requires]
+ - Try::Tiny
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01011703 2011-04-24T22:29:18Z
+
+0.01011702 2010-12-21T13:43:35Z
+
+0.01011701 2010-12-21T13:29:00Z
+
+0.01011617 2010-12-21T05:46:24Z
+
+0.01011601 2010-12-20T13:07:01Z
+
+0.01011501 2010-12-19T13:15:59Z
+
+0.01011500 2010-12-19T12:36:06Z
+
+0.01011421 2010-12-19T09:52:17Z
+ [Added / runtime requires]
+ - Term::ANSIColor
+
+ [Added / test requires]
+ - Data::Dumper
+ - IO::Handle

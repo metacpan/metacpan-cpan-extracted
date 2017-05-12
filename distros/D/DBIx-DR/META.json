@@ -1,0 +1,51 @@
+{
+   "abstract" : "easy DBI helper (perl inside SQL and blessed results)",
+   "author" : [
+      "Dmitry E. Oboukhov <unera@debian.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1002, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-DR",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBD::SQLite" : "1"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.4",
+            "Mouse" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dr-co/dbix-dr/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/dr-co/dbix-dr"
+      }
+   },
+   "version" : "0.32",
+   "x_serialization_backend" : "JSON::PP version 2.27300_01"
+}

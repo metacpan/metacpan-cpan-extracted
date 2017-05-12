@@ -1,0 +1,13 @@
+Source: libdist-zilla-plugin-control-debian-perl
+Section: perl
+Priority: optional
+Maintainer: Shantanu Bhadoria <shantanu@cpan.org>
+Build-Depends: debhelper (>= 8)
+Build-Depends-Indep: perl
+Standards-Version: 3.9.2
+Homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-Control-Debian/
+
+Package: libdist-zilla-plugin-control-debian-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends}
+Description: Add a debian/control file to your distribution 

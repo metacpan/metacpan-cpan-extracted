@@ -1,0 +1,13 @@
+Changes
+LICENSE
+META.json
+Makefile.PL
+README.md
+cpanfile
+lib/Devel/CheckBin.pm
+minil.toml
+t/00_compile.t
+t/01_can_run.t
+t/02_can_run.t
+META.yml
+MANIFEST

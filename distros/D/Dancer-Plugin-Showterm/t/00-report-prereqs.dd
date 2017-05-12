@@ -1,0 +1,35 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0',
+                                        'File::ShareDir::Install' => '0.06'
+                                      }
+                      },
+       'runtime' => {
+                      'requires' => {
+                                      'Dancer' => '0',
+                                      'Dancer::Plugin' => '0',
+                                      'File::ShareDir::Tarball' => '0',
+                                      'Moo' => '0',
+                                      'MooX::Singleton' => '0',
+                                      'Path::Tiny' => '0',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'Test::More' => '0',
+                                   'perl' => '5.006'
+                                 }
+                 }
+     };
+  $x;
+ }

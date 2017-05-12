@@ -1,0 +1,3496 @@
+$PABX = {
+  '90496' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090713',
+    'KSGM' => 1,
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '36499' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Fifteen',
+    'V' => '001',
+    'CS' => '16',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '122805',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '72583' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031306',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '45458' => {
+    'CS' => '31',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'ACD' => 'QUEUE',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '42041' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Eighteen',
+    'V' => '001',
+    'CS' => '25',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '132902',
+    'KSGM' => 1,
+    'TA' => '16',
+    'number_type' => 'DN'
+  },
+  '64535' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050616',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '48474' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081102',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '37393' => {
+    'RI' => '59361',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141701',
+    'TA' => '07',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '11004' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021713',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '48394' => {
+    'RI' => '51242',
+    'MOH' => '000',
+    'BE' => 1,
+    'V' => '001',
+    'RE' => 1,
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '112804',
+    'KSGM' => 1,
+    'TA' => '10',
+    'BI' => 1,
+    'number_type' => 'DN'
+  },
+  '42068' => {
+    'CS' => '26',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '042115',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '65084' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091907',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '52709' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040501',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '80841' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041101',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82983' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082804',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98178' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '110513',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82772' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031710',
+    'TA' => '15',
+    'number_type' => 'EN'
+  },
+  '74539' => {
+    'MOH' => '000',
+    '#' => '54872',
+    'BE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '100808',
+    'KSGM' => 1,
+    'TA' => '12',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '72393' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091309',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98529' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083203',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '27377' => {
+    'RI' => '54115',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141309',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '65026' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '123014',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '18487' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051207',
+    'KSGM' => 1,
+    'TA' => '11',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '26861' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091903',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '66183' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083202',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '74163' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073006',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '40133' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142107',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '83050' => {
+    'CS' => '00',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '00',
+    'number_type' => 'VN',
+    'II' => '26026'
+  },
+  '40625' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041501',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '49298' => {
+    'CS' => '31',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '05',
+    'number_type' => 'VN',
+    'II' => '26026'
+  },
+  '26379' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '111702',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Twelve'
+  },
+  '83114' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040301',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '70141' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073215',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '94390' => {
+    'RI' => '51115',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '012106',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '94967' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083204',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '81900' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083206',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '63787' => {
+    'RI' => '55038',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141903',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '85290' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141303',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '70736' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '043014',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '60226' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011512',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '42620' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Fourteen',
+    'V' => '001',
+    'CS' => '11',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '132811',
+    'TA' => '11',
+    'number_type' => 'DN'
+  },
+  '70458' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '132513',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '54898' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142306',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Seventeen'
+  },
+  '18878' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Sixteen',
+    'V' => '001',
+    'CS' => '16',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '113011',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'DN'
+  },
+  '21142' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073007',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '16540' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141901',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '47064' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141705',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '21533' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073213',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98901' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050614',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '23944' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031308',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '14767' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142313',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '19522' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082813',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52624' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140516',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '70596' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082814',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '58645' => {
+    'CS' => '08',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073216',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '58953' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080308',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '74969' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140716',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '91052' => {
+    'RI' => '51114',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142315',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '39157' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '032801',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82400' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073008',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '22433' => {
+    'RI' => '54103',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141702',
+    'KSGM' => 1,
+    'TA' => '07',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '55175' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040708',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '43041' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090712',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '43728' => {
+    'CS' => '31',
+    'HG' => 1,
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '26858' => {
+    'RI' => '68813',
+    'MOH' => '000',
+    'BE' => 1,
+    'ksgm_id' => 'Eleven',Warning. Service: 38629. Duplicate records for service at C:\Perl-modules\Data-PABX-ParseLex-1.00\examples\test-parse.pl line 14
+Warning. Service: 77828. Duplicate records for service at C:\Perl-modules\Data-PABX-ParseLex-1.00\examples\test-parse.pl line 14
+
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082801',
+    'TA' => '00',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '98571' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031903',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '51898' => {
+    'RI' => '51114',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091911',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '66476' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083008',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '88943' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141311',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '89868' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '110706',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '11096' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '142806',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '98751' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073204',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '69723' => {
+    'MOH' => '000',
+    '#' => '51419',
+    'BE' => 1,
+    'ksgm_id' => 'Twenty',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '113009',
+    'KSGM' => 1,
+    'TA' => '16',
+    'BI' => 1,
+    'number_type' => 'DN'
+  },
+  '44192' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140715',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '87713' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081708',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '94461' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141703',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '14257' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080901',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '71026' => {
+    'RI' => '55200',
+    'MOH' => '000',
+    'ksgm_id' => 'Nineteen',
+    'CS' => '16',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083209',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '27728' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Thirteen',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '112813',
+    'KSGM' => 1,
+    'TA' => '31',
+    'number_type' => 'DN'
+  }
+};
+$PABX = {
+  '23666' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092512',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '90496' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090713',
+    'KSGM' => 1,
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '47296' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060403',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '71325' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090909',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '35159' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '072112',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '88916' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '101015',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '64535' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050616',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '48474' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081102',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67526' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022708',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '13531' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '56311' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041503',
+    'TA' => '06',
+    'number_type' => 'EN'
+  },
+  '28915' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083002',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '48239' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041904',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '22491' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011304',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '69589' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122610',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '75305' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041903',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '53338' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '103014',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '10275' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030503',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '83682' => {
+    'MOH' => '000',
+    'V' => '001',
+    'CS' => '11',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '062601',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '25372' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031705',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '80841' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041101',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82983' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082804',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67712' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040304',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '48571' => {
+    'RI' => '52156',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '16',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061402',
+    'TA' => '06',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '98178' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '110513',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98544' => {
+    'CS' => '15',
+    'MOH' => '000',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '052407',
+    'TA' => '07',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '27413' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040303',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '98269' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040706',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '45629' => {
+    'CS' => '11',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '16',
+    'number_type' => 'VN',
+    'II' => '55110'
+  },
+  '86166' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021505',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '22882' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080910',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '32821' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '110314',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '97805' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050701',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '64358' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041307',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '32556' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040308',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '70080' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '033003',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '41976' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011505',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '60644' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '070507',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '34381' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041115',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '59536' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080509',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67257' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083211',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '83050' => {
+    'CS' => '00',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '00',
+    'number_type' => 'VN',
+    'II' => '26026'
+  },
+  '49298' => {
+    'CS' => '31',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '05',
+    'number_type' => 'VN',
+    'II' => '26026'
+  },
+  '42126' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051306',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '76910' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051906',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '66217' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '033007',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '11300' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '010905',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '49618' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031105',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '85290' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141303',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '77001' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021913',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '11105' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050303',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '54898' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142306',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Seventeen'
+  },
+  '54061' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041708',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '18878' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Sixteen',
+    'V' => '001',
+    'CS' => '16',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '113011',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'DN'
+  },
+  '94793' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051716',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '60787' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061616',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98901' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050614',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '84896' => {
+    'CS' => '00',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '043214',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '23889' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Nine',
+    'V' => '001',
+    'CS' => '15',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '042503',
+    'KSGM' => 1,
+    'TA' => '12',
+    'number_type' => 'DN'
+  },
+  '45620' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022304',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52423' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073009',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '25460' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021302',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '62731' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '052107',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '10775' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081107',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '93218' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '072312',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '22494' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082116',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '99435' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021304',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52743' => {
+    'CS' => '06',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041302',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '36593' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '071702',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '80374' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031514',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '30706' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '101303',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '92745' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '112811',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '70596' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082814',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '57522' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '010904',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '74969' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140716',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '39157' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '032801',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '18731' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030703',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '25616' => {
+    'RI' => '65495',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '020903',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '89715' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031507',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67916' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030305',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '58581' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061404',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '55175' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040708',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '24530' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040901',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '86886' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030904',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '30429' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083210',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '79040' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031315',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98571' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031903',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '53607' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050504',
+    'TA' => '06',
+    'number_type' => 'EN'
+  },
+  '23251' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040916',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '51898' => {
+    'RI' => '51114',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091911',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '25213' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022106',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Ten'
+  },
+  '42001' => {
+    'CS' => '31',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'ACD' => 'QUEUE',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '30364' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040702',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '88943' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141311',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '24645' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091110',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '10925' => {
+    'CS' => '00',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'ACD' => 'QUEUE',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '94934' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090501',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '27859' => {
+    'CS' => '07',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011701',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '44192' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140715',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '31121' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060816',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '36557' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021703',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '27728' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Thirteen',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '112813',
+    'KSGM' => 1,
+    'TA' => '31',
+    'number_type' => 'DN'
+  },
+  '82513' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141014',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '75296' => {
+    'RI' => '52682',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081903',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '59655' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061006',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '49200' => {
+    'RI' => '52929',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '121404',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '46554' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030304',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '44168' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060402',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '64865' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061403',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '75451' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Three',
+    'V' => '001',
+    'CS' => '15',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '032602',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '65084' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091907',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '52673' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '042402',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '52709' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040501',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '78121' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092516',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '30065' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011104',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '44732' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041104',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '30780' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061803',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '72393' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091309',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '74539' => {
+    'MOH' => '000',
+    '#' => '54872',
+    'BE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '100808',
+    'KSGM' => 1,
+    'TA' => '12',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '20095' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '101914',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '53790' => {
+    'RE' => 1,
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051304',
+    '#' => '65457',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '18487' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051207',
+    'KSGM' => 1,
+    'TA' => '11',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '65026' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '123014',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '14114' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050505',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '81732' => {
+    'CS' => '00',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041301',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '36453' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092510',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '26861' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '091903',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '63409' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '130311',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52334' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '020705',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '76660' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092704',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '23416' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092515',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '74163' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073006',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '40133' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142107',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '63000' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031505',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '70141' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073215',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '39086' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '010701',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '63787' => {
+    'RI' => '55038',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141903',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '81900' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083206',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '60580' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050904',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '42620' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Fourteen',
+    'V' => '001',
+    'CS' => '11',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '132811',
+    'TA' => '11',
+    'number_type' => 'DN'
+  },
+  '70458' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '132513',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '61944' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051715',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '16540' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141901',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '69677' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073215',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '47064' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141705',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '21533' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073213',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '79199' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '012116',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '80560' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011103',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '83139' => {
+    'MOH' => '000',
+    '#' => '65085',
+    'BE' => 1,
+    'ksgm_id' => 'One',
+    'V' => '001',
+    'CS' => '13',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '103015',
+    'KSGM' => 1,
+    'TA' => '13',
+    'BI' => 1,
+    'number_type' => 'DN'
+  },
+  '11831' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061602',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '81881' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030905',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '86853' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051703',
+    'KSGM' => 1,
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '19522' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082813',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '42709' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060603',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52624' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '140516',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '58645' => {
+    'CS' => '08',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073216',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '61798' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021516',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '38049' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051502',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '80218' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061802',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '91052' => {
+    'RI' => '51114',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142315',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '21520' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022907',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '42803' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022308',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '81927' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022701',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '43041' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090712',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '43728' => {
+    'CS' => '31',
+    'HG' => 1,
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '70007' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060802',
+    'KSGM' => 1,
+    'TA' => '06',
+    'number_type' => 'EN'
+  },
+  '32339' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021705',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82739' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050503',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '66476' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083008',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '11096' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '142806',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '73947' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062002',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '85620' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041102',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '20050' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '070909',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '87713' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081708',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '44573' => {
+    'MOH' => '000',
+    'V' => '001',
+    'CS' => '15',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '062602',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '94461' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141703',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '30328' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '101605',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '14257' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080901',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52249' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'V' => '001',
+    'RE' => 1,
+    'CS' => '15',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '032605',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '15615' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030505',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '36499' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Fifteen',
+    'V' => '001',
+    'CS' => '16',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '122805',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '45458' => {
+    'CS' => '31',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'ACD' => 'QUEUE',
+    'TA' => '00',
+    'number_type' => 'EN'
+  },
+  '77264' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040915',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '42041' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Eighteen',
+    'V' => '001',
+    'CS' => '25',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '132902',
+    'KSGM' => 1,
+    'TA' => '16',
+    'number_type' => 'DN'
+  },
+  '11004' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021713',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '37393' => {
+    'RI' => '59361',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141701',
+    'TA' => '07',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '92199' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030507',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '42068' => {
+    'CS' => '26',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '042115',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '43389' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022914',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '91586' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051904',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '56274' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041704',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '27377' => {
+    'RI' => '54115',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141309',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '42715' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061202',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '54913' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031901',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '31066' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061807',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '30670' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '130913',
+    'TA' => '16',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '46844' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '032114',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '73937' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060602',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '52658' => {
+    'RI' => '52164',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050703',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '32180' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011105',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '66183' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083202',
+    'TA' => '16',
+    'number_type' => 'EN'
+  },
+  '74517' => {
+    'CS' => '06',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041502',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '80657' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Seven',
+    'V' => '001',
+    'CS' => '16',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '032316',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'DN'
+  },
+  '40625' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041501',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '24911' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '032702',
+    'TA' => '10',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '92233' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062207',
+    'TA' => '06',
+    'number_type' => 'EN'
+  },
+  '29467' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031304',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '99517' => {
+    'RI' => '52206',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060803',
+    'KSGM' => 1,
+    'TA' => '10',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '31320' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021504',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '59487' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021903',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '24981' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '090706',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '14767' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142313',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '76440' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122112',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '69281' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '020905',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '77603' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021103',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '78256' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122616',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '42294' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062210',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '87976' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040504',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '85610' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'VN',
+    'ksgm_id' => 'Two'
+  },
+  '58953' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080308',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '63455' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061406',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '78497' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022104',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '43060' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060604',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82400' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073008',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '29650' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092708',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '68737' => {
+    'CS' => '13',
+    'MOH' => '000',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '032703',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '30352' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '26953' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031303',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '16601' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '26858' => {
+    'RI' => '68813',
+    'MOH' => '000',
+    'BE' => 1,
+    'ksgm_id' => 'Eleven',
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082801',
+    'TA' => '00',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '63879' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011503',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '53997' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040502',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '30191' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '61010' => {
+    'CS' => '13',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '102712',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '36181' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '082110',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '43792' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061016',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '29095' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051302',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '98751' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073204',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '57809' => {
+    'MOH' => '000',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '052316',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'DN'
+  },
+  '42660' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '102116',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '45553' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092703',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '79882' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092511',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '12615' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051902',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '20068' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '87139' => {
+    'RI' => '54102',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '071505',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '71026' => {
+    'RI' => '55200',
+    'MOH' => '000',
+    'ksgm_id' => 'Nineteen',
+    'CS' => '16',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083209',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '41961' => {
+    'A' => '01',
+    'MOH' => '000',
+    'ksgm_id' => 'Four',
+    'V' => '001',
+    'CS' => '31',
+    'TP' => '00',
+    'MULT' => 1,
+    'pabx_card_type' => 'DI',
+    'pabx_port' => '1316',
+    'KSGM' => 1,
+    'TA' => '31',
+    'number_type' => 'DN'
+  },
+  '64587' => {
+    'MOH' => '000',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '102714',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '25921' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060804',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '72583' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031306',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '68423' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081904',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '19592' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031504',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '46228' => {
+    'CS' => '00',
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '00',
+    'number_type' => 'VN'
+  },
+  '21463' => {
+    'CS' => '31',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '120514',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '48394' => {
+    'RI' => '51242',
+    'MOH' => '000',
+    'BE' => 1,
+    'V' => '001',
+    'RE' => 1,
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '112804',
+    'KSGM' => 1,
+    'TA' => '10',
+    'BI' => 1,
+    'number_type' => 'DN'
+  },
+  '12045' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '120316',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '56283' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061204',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67437' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050302',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '77828' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040903',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '71063' => {
+    'RI' => '52238',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '16',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050304',
+    'TA' => '06',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '37664' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '142616',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '91317' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011705',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '67840' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '131215',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '65603' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122113',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '82772' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031710',
+    'TA' => '15',
+    'number_type' => 'EN'
+  },
+  '75897' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022305',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '98529' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083203',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '93359' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041303',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '82257' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011509',
+    'KSGM' => 1,
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '12121' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '092513',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '92422' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '041506',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '52877' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '050315',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '99688' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062003',
+    'KSGM' => 1,
+    'TA' => '13',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '26379' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '111702',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Twelve'
+  },
+  '83114' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '040301',
+    'TA' => '13',
+    'number_type' => 'EN'
+  },
+  '94390' => {
+    'RI' => '51115',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '012106',
+    'TA' => '05',
+    'number_type' => 'EN',
+    'BI' => 1
+  },
+  '94967' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083204',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '29586' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031704',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '70736' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '043014',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '60226' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '011512',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '70782' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '030705',
+    'KSGM' => 1,
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '65322' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060416',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '27758' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '102108',
+    'TA' => '11',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '11981' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081901',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Five'
+  },
+  '59060' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '112116',
+    'TA' => '12',
+    'number_type' => 'EN'
+  },
+  '51629' => {
+    'RI' => '52172',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '061203',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '87557' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '111411',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '21142' => {
+    'RI' => '54879',
+    'MOH' => '000',
+    'CS' => '11',
+    'RE' => 1,
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '073007',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '76425' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122402',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '46466' => {
+    'CS' => '15',
+    'MOH' => '000',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '042403',
+    'TA' => '13',
+    'number_type' => 'DN',
+    'V' => '001'
+  },
+  '23944' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '031308',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '67141' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141207',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '85186' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122416',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '27416' => {
+    'CS' => '11',
+    'IE' => 1,
+    'MOH' => '000',
+    'pabx_card_type' => '-',
+    'pabx_port' => '-',
+    'TA' => '05',
+    'number_type' => 'VN',
+    'II' => '26026'
+  },
+  '37686' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022311',
+    'TA' => '02',
+    'number_type' => 'EN'
+  },
+  '66140' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '112416',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '22433' => {
+    'RI' => '54103',
+    'MOH' => '000',
+    'BE' => 1,
+    'RE' => 1,
+    'CS' => '11',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '141702',
+    'KSGM' => 1,
+    'TA' => '07',
+    'BI' => 1,
+    'number_type' => 'EN'
+  },
+  '79895' => {
+    'CS' => '16',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '083207',
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '78152' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '081702',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '33724' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '070911',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '82965' => {
+    'MOH' => '000',
+    'ksgm_id' => 'Eight',
+    'V' => '001',
+    'CS' => '13',
+    'pabx_card_type' => 'IC',
+    'pabx_port' => '012303',
+    'TA' => '05',
+    'number_type' => 'DN'
+  },
+  '65798' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021104',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '32537' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062001',
+    'KSGM' => 1,
+    'TA' => '07',
+    'number_type' => 'EN'
+  },
+  '66165' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '080704',
+    'KSGM' => 1,
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '57217' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '012103',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '38977' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '022712',
+    'TA' => '11',
+    'number_type' => 'EN',
+    'ksgm_id' => 'Six'
+  },
+  '75955' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '051104',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '66421' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '060404',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '38629' => {
+    'MOH' => '000',
+    'V' => '001',
+    'CS' => '16',
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '100902',
+    'KSGM' => 1,
+    'TA' => '13',
+    'number_type' => 'DN'
+  },
+  '21850' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '021503',
+    'TA' => '05',
+    'number_type' => 'EN'
+  },
+  '89868' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '110706',
+    'TA' => '11',
+    'number_type' => 'EN'
+  },
+  '52609' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '122801',
+    'TA' => '10',
+    'number_type' => 'EN'
+  },
+  '69723' => {
+    'MOH' => '000',
+    '#' => '51419',
+    'BE' => 1,
+    'ksgm_id' => 'Twenty',
+    'V' => '001',
+    'CS' => '11',
+    'MULT' => 1,
+    'pabx_card_type' => 'AC',
+    'pabx_port' => '113009',
+    'KSGM' => 1,
+    'TA' => '16',
+    'BI' => 1,
+    'number_type' => 'DN'
+  },
+  '24093' => {
+    'CS' => '11',
+    'MOH' => '000',
+    'pabx_card_type' => 'EC',
+    'pabx_port' => '062208',
+    'TA' => '05',
+    'number_type' => 'EN'
+  }
+};

@@ -1,0 +1,23 @@
+0.01005 2008-06-19
+
+    - Deprecated - use HTML::FormFu::Model::DBIC instead
+
+0.01004 2007-10-03
+
+	- Changed back to using named methods, as get_column / set_column 
+	  doesn't call the DBIC inflators / deflators.
+	- Added a CAVEATS section to docs, explaining the issues.
+
+0.01003 2007-09-24
+
+	- Use has_column() and set_column() instead of can() to ensure we don't 
+	  delete a record, instead of updating a column named 'delete'!
+
+0.01002 2007-09-21
+
+	- Fix for Checkboxes for NOT NULL columns
+	- Copy Form->params(), so it's not changed
+
+0.01001	2007-08-22
+
+	- First CPAN release

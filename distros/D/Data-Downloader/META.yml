@@ -1,0 +1,104 @@
+---
+abstract: 'Download data and maintain a cache of files and links'
+author:
+  - 'Brian Duggan <brian.duggan@nasa.gov>'
+build_requires:
+  File::Compare: 0
+  File::Slurp: 0
+  FindBin: 0
+  IO::File: 0
+  Parallel::ForkManager: 0
+configure_requires:
+  Module::Build: 0.40
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Downloader
+provides:
+  Data::Downloader:
+    file: lib/Data/Downloader.pm
+    version: 0.9907
+  Data::Downloader::Cache:
+    file: lib/Data/Downloader/Cache.pm
+    version: 0
+  Data::Downloader::Cache::Keep:
+    file: lib/Data/Downloader/Cache/Keep.pm
+    version: 0
+  Data::Downloader::Cache::LRU:
+    file: lib/Data/Downloader/Cache/LRU.pm
+    version: 0
+  Data::Downloader::Config:
+    file: lib/Data/Downloader/Config.pm
+    version: 0
+  Data::Downloader::DB:
+    file: lib/Data/Downloader/DB.pm
+    version: 0
+  Data::Downloader::DB::Object:
+    file: lib/Data/Downloader/DB/Object.pm
+    version: 0
+  Data::Downloader::DB::Object::Cached:
+    file: lib/Data/Downloader/DB/Object/Cached.pm
+    version: 0
+  Data::Downloader::Disk:
+    file: lib/Data/Downloader/Disk.pm
+    version: 0
+  Data::Downloader::Feed:
+    file: lib/Data/Downloader/Feed.pm
+    version: 0
+  Data::Downloader::File:
+    file: lib/Data/Downloader/File.pm
+    version: 0
+  Data::Downloader::FileMetadata:
+    file: lib/Data/Downloader/FileMetadata.pm
+    version: 0
+  Data::Downloader::Linktree:
+    file: lib/Data/Downloader/Linktree.pm
+    version: 0
+  Data::Downloader::MetadataPivot:
+    file: lib/Data/Downloader/MetadataPivot.pm
+    version: 0
+  Data::Downloader::MetadataTransformation:
+    file: lib/Data/Downloader/MetadataTransformation.pm
+    version: 0
+  Data::Downloader::Repository:
+    file: lib/Data/Downloader/Repository.pm
+    version: 0
+  Data::Downloader::Utils:
+    file: lib/Data/Downloader/Utils.pm
+    version: 0
+requires:
+  DBD::SQLite: 1.33
+  DBIx::Simple: 1.32
+  Digest::MD5::File: 0
+  Fcntl: 0
+  File::Basename: 0
+  File::Path: 0
+  File::Spec: 0
+  File::Temp: 0
+  File::stat: 0
+  Filesys::Df: 0
+  Lingua::EN::Inflect: 0
+  List::MoreUtils: 0
+  Log::Log4perl: 1.23
+  Log::Log4perl::CommandLine: 0
+  Number::Format: 0
+  Params::Validate: 0
+  Pod::Usage::CommandLine: 0
+  Rose::DB: 0
+  Rose::DB::Object: 0
+  Rose::DateTime: 0
+  SQL::Abstract: 0
+  Scalar::Util: 0
+  Smart::Comments: 0
+  String::Template: 0.06
+  Sub::Exporter: 0
+  Time::HiRes: 0
+  XML::LibXML: 0
+  YAML::XS: 0
+  if: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.9907

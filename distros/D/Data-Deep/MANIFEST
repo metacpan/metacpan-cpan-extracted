@@ -1,0 +1,12 @@
+MANIFEST            	- this file
+Makefile.PL         	- "perl Makefile.PL" to get things started
+
+README              	- read this first
+Changes	            	- revision history
+
+lib/Data/Deep.pm        - the main module
+
+
+t/deep.t                - the tests and test functions
+
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,58 @@
+Date-Tolkien-Shire-Data is Copyright (C) 2017 by Thomas R. Wyant, III
+
+DESCRIPTION
+
+This Perl module contains common or near-common code factored out of
+Date::Tolkien::Shire and DateTime::Fiction::JRRTolkien::Shire. This is
+mostly data and calculations common to the two modules, but there is
+also a piece of new functionality: an output formatter for Shire dates
+analogous to strftime(). All functionality is provided by subroutines.
+
+Because of its nature, you probably do not want to use this module directly.
+At least, not without looking into Date::Tolkien::Shire which is a semi-thin
+object-oriented front end to this module, or
+DateTime::Fiction::JRRTolkien::Shire which is a somewhat-quirky member of the
+DateTime family.
+
+INSTALLATION
+
+This module is best installed using your favorite CPAN client: cpan,
+cpanp, or cpanm. ActivePerl users can try their ppm.
+
+Failing that, you can use one of the two usual incantations:
+
+    gunzip Date-Tolkien-Shire-Data-9.999.tar.gz
+    tar -xf Date-Tolkien-Shire-Data-9.999.tar
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+or
+
+    gunzip Date-Tolkien-Shire-Data-9.999.tar.gz
+    tar -xf Date-Tolkien-Shire-Data-9.999.tar
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+You should substitute the appropriate program name for 'make', eg nmake
+(typically) under MSWin32, or mms or mmk under VMS. See
+ftp://ftp.microsoft.com/Softlib/MSLFILES/nmake15.exe for a copy of
+nmake for MSWin32 if you need it.
+
+Of course, since it's pure Perl, you can just expand the kit and drop
+SpaceTrack.pm and the SpaceTrack folder into the Astro directory
+(creating it if necessary) in the appropriate place in your @INC
+directories.
+
+LICENSING INFORMATION
+
+This package is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.

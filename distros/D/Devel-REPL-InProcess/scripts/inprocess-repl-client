@@ -1,0 +1,53 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+use Devel::REPL::Client::Select;
+use Getopt::Long;
+
+GetOptions(
+    'help'      => \(my $help),
+    'port=i'    => \(my $port),
+    'path=s'    => \(my $path),
+    'once'      => \(my $once),
+) or help();
+
+if ($help) {
+    help();
+    exit 0;
+}
+if (!$port && !$path) {
+    print STDERR <<'EOT';
+Specify either --port or --path
+EOT
+    exit 1;
+}
+
+my $client = Devel::REPL::Client::Select->new(
+    port => $port,
+    path => $path,
+);
+
+$client->listen;
+if ($once) {
+    $client->accept_and_process;
+} else {
+    $client->accept_and_process while 1;
+}
+
+exit 0;
+
+sub help {
+    print <<'EOT';
+Usage: inprocess-repl-client [--port <port>] [--path <unix socket path>]
+
+  --port <port>     Listen on this TCP port
+  --path <path>     Listen on this UNIX-domain socket path
+
+  --once            Exit after the first shell is closed
+
+  --help            This help text
+
+EOT
+}

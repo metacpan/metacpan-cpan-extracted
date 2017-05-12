@@ -1,0 +1,7 @@
+Revision history for Datify.
+
+0.14.163  2014-06-12
+
+ - Updated to use several Dist::Zilla features and plugins.
+ - Improved documentation.
+

@@ -1,0 +1,15 @@
+COPYRIGHT
+Changes
+INSTALL
+MANIFEST
+Makefile.PL
+README
+dbixframe.cgi
+dbixframe_create.pl
+test.pl
+DBIx/Frame.pm
+DBIx/Frame/CGI.pm
+HTML-FormRemove-0.3a.tar.gz
+TODO
+Version.pm
+stylesheet.css

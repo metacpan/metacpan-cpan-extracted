@@ -1,0 +1,60 @@
+
+This is the README file for dms, a Document Management System.
+
+This package implements a backend document system, implemented in
+layers.  
+
+Document::Repository is the foundation of the application.  It provides
+low level access to the document repository itself, performing the file
+operations to add, get, and update entries in the repository's file
+system.  It is not intended to be used directly, however administration
+scripts are provided for operating directly on the files.  These scripts
+are repo_*.
+
+Document::Manager is a mid-level interface, that wrappers
+Document::Repository.  It provides an API that can be used by clients
+for interacting with the system.
+
+dmsd is a SOAP-based daemon that provides access to Document::Manager as
+a service on port 8012.  It provides access for clients to any routine
+in Document::Manager via the SOAP protocol.
+
+submit_clipart is a client tool for scanning a directory structure and
+submitting any *.svg files it finds there to the central repository.
+
+ls_docs is another client tool for listing the document id's in the
+repository. 
+
+There are 2 environmental variables which can be set before running scripts 
+in the scripts folder.
+
+    * DMS_SERVER
+    * DMS_RESOURCE
+
+For example, to run ls_docs not on the default localhost, do this:
+
+    $ DMS_SERVER="http://SOMEOTHERMACHINE.org:8012/" ./ls_docs
+
+This is assuming that dmsd is running and is accessible on SOMEOTHERMACHINE.org
+
+One could also do this:
+
+    $ export DMS_SERVER="http://SOMEOTHERMACHINE.org:8012/"
+    $ ./ls_docs
+
+And also, since DMS_SERVER is set, then any commands that use DMS_SERVER will
+use this value you have exported.
+
+
+For instructions on how to install this application, see the
+file INSTALL.
+
+Problems, questions, etc. may be sent to bryce@bryceharrington.org
+
+dms is Copyright (c) 2004, by Bryce W. Harrington. 
+All rights reserved. You may distribute this code under the terms 
+of either the GNU General Public License or the Artistic License, 
+as specified in the Perl README file.
+
+
+

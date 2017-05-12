@@ -1,0 +1,20 @@
+Revision history for Dist-Zilla-Plugin-ReversionOnRelease
+
+0.06  2016-07-10 11:30:37 PDT
+        - Support package NAME VERSION syntax (skaji)
+        - Doc improvements
+
+0.05  2013-08-27 15:51:28 PDT
+        - Fix minor typo in SYNOPSIS
+
+0.04  2013-04-06 21:55:47 PDT
+        - Undo the use of 5.16+ regex feature by inlining Perl::Version regexp
+
+0.03  2013-04-01 20:31:48 PDT
+        - Use Version::Next instead of Perl::Version
+
+0.02  2013-03-26 12:34:45 PDT
+        - Specify minimum perl version
+
+0.01  2013-03-26 11:23:36 PDT
+        - Initial release

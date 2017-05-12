@@ -1,0 +1,10 @@
+Revision history for Perl module DBD::Neo4p
+0.0010 2015-04-25
+    - Corrected user,pass handling
+    - Works with Neo4j v2.2 basic auth
+    - Depends on REST::Neo4p 0.3010
+    - Depends on DBI >1.632 ('neo' prefix now vaild)
+    - x_neo4j_version() now neo_neo4j_version()
+    - added Github repo
+0.0001 2013-12-06
+    - First release to CPAN

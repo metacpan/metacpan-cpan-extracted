@@ -1,0 +1,23 @@
+0.06  Wed, 21 Mar 2012 08:24:59 +0100
+  * Produce stack traces for all threads.
+
+0.05  Wed, 08 Sep 2010 10:13:42 +0200
+  * Improve compatibility with old perl versions.
+
+0.04  Wed, 08 Sep 2010 04:33:22 +0200
+  * Avoid infinite recursions caused by errors in the signal handler itself by
+    unregistering our handlers as early as possible.
+
+0.03  Wed, 08 Sep 2010 04:00:54 +0200
+  * abort() after generating the stack trace. exit(0) after a fatal error was
+    just wrong.
+
+0.02  Tue, 07 Sep 2010 23:12:34 +0200
+  * Properly detach gdb from the process it's tracing.
+    Do a fork+exit+setsid to stop the spawned gdb process from being a child
+    process of the process it's supposed to attach to. Some operating systems,
+    notably OpenBSD, forbid ptrace()ing parent processes. ptrace() is what gdb
+    needs to attach to a running process.
+
+0.01  Sat, 04 Sep 2010 22:23:08 +0200
+  * Initial release.

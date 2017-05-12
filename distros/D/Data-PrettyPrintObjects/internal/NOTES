@@ -1,0 +1,38 @@
+#########################################################################
+Before every release, spellcheck the documents:
+
+   for i in `find lib -type f -name \*.pod` ;do
+      podspell $i > $i.txt
+      ispell -p internal/ispell.isp $i.txt
+      rm -f $i.txt $i.txt.bak
+   done
+
+#########################################################################
+Set the release version
+
+   v=`cat internal/VERSION`
+   for i in \
+       Makefile.PL \
+       Build.PL \
+       `find lib -name \*.pm` \
+   ;do
+      sed -e "s,VERSION *=.*;,VERSION='$v';," $i > z
+      mv z $i
+   done
+
+#########################################################################
+Update the history file with the date
+
+#########################################################################
+Update the copyright
+
+   y=`date '+%Y'`
+   for i in `find . -type f | xargs egrep -l 'Copyright \(c\) ....\-.... Sullivan Beck'` ;do
+     sed -e "s,\(Copyright (c) ....\)\-.... \(Sullivan Beck\),\1-$y \2," $i > z
+     mv z $i
+   done
+
+#########################################################################
+Regenerate the MANIFEST, Build.PL, Makefile.PL
+Run the kwalitee tests
+

@@ -1,0 +1,127 @@
+0.14    2017-04-25 (PERLANCAR)
+
+	- Add pattern: p_dateym.
+
+
+0.13    2016-06-30 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Forgot to exclude nytprof* files/dirs from the build.
+
+
+0.12    2016-06-30 (PERLANCAR)
+
+        - Improve compliance with DateTime::Format API: allow calling
+          parse_datetime() and parse_datetime_duration() as static method, and
+          die on parse failure.
+
+        - Bump minimum required perl 5.14 because it fails on 5.10 (out of
+          memory) and 5.12 due to use of (?{ ... }) code blocks inside regex
+          which is only safe on 5.14+ [CT].
+
+        - EN: Support cardinal suffix e.g. 'June 23rd'
+
+        - EN: p_dur_later: recognize 'in <dur>' e.g. 'in 2h'.
+
+        - Add patterns: p_which_dow (e.g. "this monday", "last sat").
+
+        - [Bugfix] Fix when to apply /o modifier so it does not clobber between
+          subclasses (this bug manifested itself when we instantiate both DFA:EN
+          and DFA:ID and tries to parse with both; the first subclass wins).
+
+        - [doc] Mention and compare with DateTime::Format::Flexible.
+
+        - [Internal] Rename _time_zone attribute to time_zone (but the old name
+          is currently still supported).
+
+
+0.11    2016-06-29 (PERLANCAR)
+
+        - Support parsing duration.
+
+        - Allow comma in duration expression, e.g. "2 hours, 3 minutes" in
+          addition to "2 hours 3 minutes".
+
+
+0.10    2016-06-28 (PERLANCAR)
+
+        - Add patterns: p_time (e.g. "10pm", "at 10:00"), p_date_time (e.g.
+          "yesterday at 10pm").
+
+        - [Internal] Generate recursive regex to be able to use another p_*
+          pattern inside p_* pattern. For example, see p_date_time.
+
+        - [Bugfix] Ordering of p_* patterns in the final pattern should use
+          topological sorting.
+
+
+0.09    2016-05-05 (PERLANCAR)
+
+	- No functional changes.
+
+	- [dist] Bump prereq Parse::Number::ID to 0.06 [RT#114165].
+
+
+0.08    2016-05-04 (PERLANCAR)
+
+	- [Bugfix] Fix ordering of set_month() and set_day(), e.g. when day
+	  is 30 we cannot set month to February [RT#114108].
+
+	- [Test] Enable testing of H:M:D being truncated to 0 when unnecessary.
+
+
+0.07    2016-04-13 (PERLANCAR)
+
+        - Add options: time_zone, format, returns (like in Date::Extract). Now
+          this module can return DateTime object as well as verbatim/original
+          text or epoch, and can return additional information (like position of
+          match, name of pattern that matches, etc).
+
+        - [Bugfix] Properly truncate DateTime to day (i.e. truncate
+          hour/minute/second to 0) when time of day is not needed.
+
+        - Recognize 2-digit year.
+
+        - Add more sanity checks.
+
+        - [doc] Mention more related modules.
+
+
+0.06    2016-04-06 (PERLANCAR)
+
+	- Use /x and /i for the whole regex, fixes/updates (a_tomorrow()
+	  was missing), add test suite.
+
+
+0.05    2014-10-03 (PERLANCAR)
+
+        - No functional changes.
+
+        - Some POD rewording.
+
+
+0.04    2014-10-03 (PERLANCAR)
+
+        - Use /o modifier for faster speed.
+
+        - Rebuild using updated modules to create more compact $RE & $MAPS.
+
+
+0.03    2014-10-03 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Forgot to precompute $MAPS.
+
+
+0.02    2014-10-03 (PERLANCAR)
+
+        - Add FAQ item about the name.
+
+        - Add pattern: date_wo_year (date without year), e.g. May 28, 5/28.
+
+
+0.01    2014-10-02 (PERLANCAR)
+
+        - First release.

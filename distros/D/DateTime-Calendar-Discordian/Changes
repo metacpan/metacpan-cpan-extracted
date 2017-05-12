@@ -1,0 +1,44 @@
+Revision history for Perl extension DateTime::Calendar::Discordian.
+
+1.0   Tue Jun 12 14:40:37 EDT 2012
+    - Fixed improper conversion from object on December 31.  (RT #77696)
+    - second and nanosecond parameters in constructor instead of rd_secs,
+      rd_nanosecs for better DateTime compatability.
+    - Updated tests for current best practices.  100% test coverage.
+
+0.9.7 Fri Aug  6 14:00:49 EDT 2010
+    - Miscapitalization of days_till_x fixed in one place.
+    
+0.9.6 Thu Mar  6 07:39:24 2008
+    - Fixed t/4-perl-critic.t so it deals properly with the absence of 
+      Test::Perl::Critic.  Thanks to haoess and thospell on Perl Monks
+      for the solution.
+      
+0.9.5 Mon Mar  3 23:20:20 2008
+    - Ran the module through Perl::Critic
+    - Sign the package with a valid public key
+    
+0.9.4 Sat Sep 02 04:46:23 2006
+    - Fixed Debian bug# 381793 where the module was giving 0 as the day 
+      number around season boundaries and added tests.
+      
+0.9.3 Fri Jan 27 16:09:45 2006
+	- Patch from Philippe Bruhat to fix rt.cpan.org bug #17233:  
+	  %{ and %} do not work as the documentation says they should.
+
+0.9.2 Wed Oct  6 16:02:28 2004
+	- Corrected an off by one error in the conversion of St. Tib's 
+	  day to an RD date.  Found by Adrian Irving-Beer.
+
+0.9.1 Sat Jun 12 13:55:00 2004
+    - Uploaded to Debian and CPAN.
+
+0.9.0 Fri Jun 11 16:19:00 2004
+    - At Dave Rolskys suggestion, days_till_x renamed to days_until_x
+    - Constructor doesn't take rd_secs, rd_nanosecs, or locale parameters.
+    - README file tidied up.
+
+0.8   Thu Jun 10 05:17:12 2004
+	- original version; created by h2xs 1.23 with options
+      -AX -n DateTime::Calendar::Discordian
+

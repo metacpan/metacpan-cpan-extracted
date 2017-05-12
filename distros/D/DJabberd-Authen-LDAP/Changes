@@ -1,0 +1,13 @@
+Revision history for DJabberd-Authen-LDAP
+
+0.04	2010-02-15
+	Fix LDAP binding issues in RT #39077
+	Add ldap version configuration RT #54101
+	Include RPM spec file
+
+0.02    2007-08-23
+	Implement substituting vhost in auth filter
+
+0.01    2007-07-26
+        Initial Revision. Only supports rebinding
+

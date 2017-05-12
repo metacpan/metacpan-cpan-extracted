@@ -1,0 +1,7 @@
+Revision history for Perl extension DBIx::AssertIndex
+
+0.02    2013/03/01
+        - change repository uri in META.yml.
+
+0.01    Tue Oct 16 13:31:32 2012
+        - original version

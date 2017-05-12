@@ -1,0 +1,52 @@
+0.1.6   2014-02-09
+
+    [ BUGFIX ]      
+    * Specify the minimum_year as 2007 to get perl v5.10 rather than v5.1.0.1
+        Some linux distros patch the base version themselves (Oliver Gorwits)
+
+
+0.1.5   2013-04-23
+
+    [ FEATURE ]      
+    * Add D::Z::P::NameFromDirectory because it's really useful
+
+    [ TESTS ]
+    * This is a personal module, I don't need to test it on every perl version ever
+
+
+0.1.3   2013-01-16
+
+    [ BUGFIX ]      
+    * A minimum year of 2010 forces Perl v5.12 - which is not my intention.
+
+
+0.1.2   2012-09-18
+
+    [ BUGFIX ]      
+    * Correctly specify minimum_perl version as a v-string.
+
+
+0.1.1   2012-09-17
+
+    [ FEATURE ]      
+    * Add D::Z::P::PrereqsClean defaulting to perl v5.10
+        Perl v5.10 is the minimum version I can reasonably support
+
+    * Add D::Z::P::MinimumPrereqs defaulting to 2010
+        This is the year Perl v5.12 was released
+
+
+0.1.0   2012-06-11
+
+    ** First Public Release **
+
+    [ DOCUMENTATION ]
+    * Added Documentation
+
+    [ TESTS ]
+    * Added Test Suite
+
+
+0.0.1   2012-06-10
+
+    ** First Draft **

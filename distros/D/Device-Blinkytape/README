@@ -1,0 +1,92 @@
+NAME
+    Device::BlinkyTape - Control a BlinkyTape led strip
+
+SYNOPSIS
+        use Device::BlinkyTape::WS2811; # BlinkyTape uses WS2811
+        my $bb = Device::BlinkyTape::WS2811->new(dev => '/dev/tty.usbmodem');
+        # Set all led pixels on full white
+        $bb->all_on();
+        # Set all led pixels off
+        $bb->all_off();
+
+        # Send a white pixel (RGB 255/255/255).
+        # Pixels are sent one by one from left to right.
+        $bb->send_pixel(255,255,255);
+        $bb->send_pixel(5,5,5);
+        # Show all sent pixels and reset send_pixel to the first pixel.
+        $bb->show();
+
+  dev
+    The device where your usb ledstrip is at. Defaults to /dev/tty.usbmodem.
+
+  port
+    Instead of giving the device you can create the instance of this module
+    by directly giving it a Device:SerialPort object. By default the
+    Device::SerialPort object is created from the device given in the 'dev'
+    parameter.
+
+  gamma
+    Specify the gamma correction. Defaults to [1,1,1]
+
+  led_count
+    Specify the led count, counting from 1. The default is 60.
+
+  simulate
+    Specify if the module should simulate a BlinkyTape onscreen instead of
+    using one in the usb port. Defaults to 0 (false). If this is true then
+    the port and dev parameters have no effect.
+
+  sleeptime
+    Sending data too fast freezes the BlinkyTape. Sleeping for 30
+    microseconds between each byte makes sure the atmega processor of the
+    BlinkyTape can keep up with the incoming data.
+
+  all_on
+    Turns all leds on.
+
+  all_off
+    Turns all leds off.
+
+  send_pixel(r,g,b)
+    Send the RGB value for the next pixel. Values 0-254 are sent as is,
+    value 255 is converted to 254.
+
+  show
+    Shows the sent pixels and resets the send_pixel to the first led pixel
+    of the strip. This is done by sending a single 255 value byte to the led
+    strip.
+
+ABOUT BLINKYTAPE
+    Blinkytape is a controllable led strip available at
+    http://blinkiverse.com/blinkytape/
+
+USING THE MODULE ON OS X WITHOUT OWNING A BLINKYTAPE
+    This module comes with a BlinkyTape simulator. Install X11 server to use
+    the simulator: http://xquartz.macosforge.org/landing/
+
+BUGS
+    The device is not yet available so the module has been implemented by
+    inspecting partly undocumented and unfinished code in other languages.
+    Feel free to file any bug reports in Github, patches welcome.
+
+REFERENCE READING
+    Communicating with the Arduino in Perl
+    http://playground.arduino.cc/interfacing/PERL
+
+    Perl communication to Arduino over serial USB
+    http://www.windmeadow.com/node/38
+
+AUTHOR
+    Oskari Okko Ojala <okko@cpan.org>
+
+    Based on exampls/Blinkyboard.py in Blinkiverse's BlinkyTape repository
+    at https://github.com/blinkiverse/BlinkyTape/ by Max Henstell
+    (mhenstell) and Marty McGuire (martymcguire).
+
+COPYRIGHT AND LICENSE
+    Copyright (C) Oskari Okko Ojala 2013
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl you may have available.
+

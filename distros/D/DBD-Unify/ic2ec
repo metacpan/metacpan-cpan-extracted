@@ -1,0 +1,10 @@
+#!/usr/bin/perl -pw
+
+use strict;
+
+# No changes (yet)
+
+# This will change dbdimp.ic to dbdimp.ec
+#
+
+1;

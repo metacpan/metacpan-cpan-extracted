@@ -1,0 +1,51 @@
+Revision history for DBIx-Class-Result-ColumnData
+
+0.16    2014-12-30, Nicolas Oudard
+        integration of pull request G-Demurger/handle_virtual_columns, 
+          get_column_data function is now able to return virtual column
+          declared with the module DBIx::Class::VirtualColumns
+
+0.15    2012-02-27, Nicolas Oudard
+        manage column list in get_column_data as options (Fred)
+
+0.13    2011-10-25, Nicolas Oudard
+        use get_column insteed of {_column_data}
+
+0.12    2011-06-23, Nicolas Oudard
+        Add VirtualColumns compatibility
+
+0.11    2011-03-14, Nicolas Oudard
+        Integrate hide field notion
+
+0.10    2011-03-14, Nicolas Oudard
+        Add comment to pod coverage tests
+
+0.09    2011-03-14, Nicolas Oudard
+        Change columns_data to get_column_data
+        Keep deprecated functions
+
+0.08    2011-03-14, Nicolas Oudard
+        Update dependencies
+
+0.07    2011-03-03, Nicolas Oudard
+        Makefile to Build
+        Update dependencies
+
+0.06    2011-02-10, Nicolas Oudard
+        Correct bug of date formating
+
+0.05    2011-02-09, Nicolas Oudard
+        Update Changes
+
+0.04    2011-02-09, Nicolas Oudard
+        delete dependencies of sqlite3
+
+0.03    2010-12-23, Nicolas Oudard
+        manage columns_data to many to many association with components IntrospectableM2M
+
+0.02    2010-12-01, Nicolas Oudard
+        add tests, add compatibility with component result::Validation
+
+0.01    2010-12-01, Nicolas Oudard
+        First version
+

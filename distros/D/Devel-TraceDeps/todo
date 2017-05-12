@@ -1,0 +1,4 @@
+o replace CORE::GLOBAL::caller and pretend I'm not here?
+o proxy DynaLoader/XSLoader bits
+  o DynaLoader => Cairo, Date::Simple
+  o XSLoader   => Cwd

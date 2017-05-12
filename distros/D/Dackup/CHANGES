@@ -1,0 +1,42 @@
+Revision history for Perl module Dackup:
+
+0.44 Mon Jan 11 12:06:16 IST 2010
+     - add a file test (patch by Leo Lapworth)
+     - do not backup the cache file (patch by Leo Lapworth)
+     - note in documentation that S3 bucket must already exist
+       (patch by Leo Lapworth)
+     - add prefix to S3 and CloudFiles documentation (patch by Leo
+       Lapworth)
+
+0.43 Sat Jan  5 10:56:50 GMT 2010
+     - Minor doc patch for 'prefix' from leo
+
+0.42 Tue May  5 16:44:23 BST 2009
+     - fix bug with ssh transport and directories containing spaces
+     - when given a directory that does not exist, Dackup now mkpaths
+       the directory (suggested by Alias)
+     - when not passed a directory, defaults to using .perl/Dackup
+       or Perl/Dackup in home directory (suggested by Alias)
+     - add new throttle option throttle => '1MBps' (only SSH for now)
+
+0.41 Tue Mar 17 14:54:02 GMT 2009
+     - remove error when nothing is to be updated
+
+0.40 Tue Mar 17 11:49:54 GMT 2009
+     - allow copying from SSH to Filesystem
+     - ignore symbolic links when copying from SSH
+     - require new release of CloudFiles
+     - more accurate progress bar
+
+0.34 Thu Feb 26 08:05:20 GMT 2009
+     - add README file
+     - add dry_run option
+     - put messages in the progressbar instead of warning
+     - fix bug where no new files over ssh would cause hang
+     - add verbose option
+     - fix bug with ssh transport and filenames containing spaces 
+       and quotes
+     - for ssh transport, use Perl instead of stat / find / xargs
+
+0.33 Tue Feb 17 21:07:34 CST 2009
+     - initial release

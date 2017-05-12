@@ -1,0 +1,3 @@
+(A) Make (configurable) use of Text::Template's "PREPEND". "use strict"?
+
+(B) Make all template be interpolated in a Safe. Lifetime?

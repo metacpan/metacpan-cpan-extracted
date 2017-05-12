@@ -1,0 +1,93 @@
+Release history for Dist-Zilla-App-Command-bakeini
+
+0.002006 2017-03-04T05:46:16Z 0c7ac74
+ [BugFix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-App-Command-bakeini/issues/3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002005, see misc/*.deps* for details
+ - develop: +5 ↑2 -1 (suggests: ↑1 -1)
+ - test: ↓1
+
+0.002005 2015-04-12T06:49:58Z e518885
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +3 ↑3 -1 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: +3 -1 (recommends: ↓2)
+
+ [Minor]
+ - Tests rearchitected in dztest
+
+0.002000 2014-11-08T15:20:00Z 4fbaf17
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001004, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: ↑1
+ - test: (recommends: ↑2)
+
+ [Features]
+ - Now Supports --comments=all|authordeps|none ( default is all )
+ - Thanks to Alan Young (AYOUNG), #1 and #2
+
+0.001004 2014-10-30T23:29:28Z 6170f9a
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001003, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +3 -1 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1
+ - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - stop requiring utf8 ( optimisation )
+ - 5.006 is now minimum.
+
+0.001003 2014-10-14T17:57:42Z 203f4a7
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - develop: +3 ↑1 (suggests: ↑2)
+ - test: (recommends: ↑1)
+
+ [Metadata]
+ - Set Author=kentnl@cpan.org
+
+0.001002 2014-08-16T05:19:57Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests updated.
+ - metadata updated.
+ - whitespace reduced.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +2 ↑1 (suggests: ↑2)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Metadata]
+ - move to kentnl org
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update Test::ReportPrereqs
+
+0.001001 2014-07-12T15:21:03Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: -1 (suggests: +2 -1)
+ - test: +2
+
+ [Documentation]
+ - Add tips and tricks section indicating how to make bakeini-specific plugins.
+
+ [Tests]
+ - Added basic application test.
+
+0.001000 2014-06-03T02:49:50Z
+ - First version.

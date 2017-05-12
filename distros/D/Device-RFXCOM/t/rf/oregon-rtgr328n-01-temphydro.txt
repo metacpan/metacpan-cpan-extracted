@@ -1,0 +1,11 @@
+50dacc134d312220644e32
+
+master oregon 50.dacc134d312220644e32:
+  sensor/rtgr328n.4d[temp]=22.3
+  sensor/rtgr328n.4d[humidity]=42
+  sensor/rtgr328n.4d[battery]=90%
+
+
+
+
+

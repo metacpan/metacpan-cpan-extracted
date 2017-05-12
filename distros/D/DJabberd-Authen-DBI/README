@@ -1,0 +1,55 @@
+NAME
+    DJabberd::Authen::DBI - Check users and passwords using a simple sql
+    query
+
+SYNOPSIS
+        <VHost mydomain.com>
+
+            [...]
+
+            <Plugin DJabberd::Authen::DBI>
+                dsn     dbi:Pg:dbname=foo
+                user    foo
+                pass    bar
+                query   SELECT * FROM user WHERE login=? AND password=?
+                args    login,password
+            </Plugin>
+        </VHost>
+
+DESCRIPTION
+    This module implements the "check_cleartext" method of the Authen module
+    in DJabberd. Your database schema should support checking the
+    credentials in one query.
+
+CONFIGURATION
+    The following keys are used in the configuration.
+
+    dsn This is the DBI data source string, first parameter to DBI->connect.
+        This option is mandatory.
+
+    user
+        The database user name, second parameter to DBI->connect.
+
+    pass
+        The database password, third parameter to DBI->connect.
+
+    query
+        The SQL query that will be prepared for each authentication. You
+        should use the standard placeholder mark (?) to send the arguments.
+        The connection will be accepted if this query returns at least one
+        row and will be rejected if no rows are returned.
+
+    args
+        This allows you to define the order of the arguments for your
+        prepared statement. You can even use an argument more than once. The
+        following keys are accepted and will be replaced by the correct
+        value: login, password, password_sha1_hex, password_sha1_base64,
+        password_md5_hex, password_md5_base64.
+
+BUGS
+    If you find any bug, please contact the author.
+
+COPYRIGHT
+    This module was created by "Daniel Ruoso" <daniel@ruoso.com>. It is
+    licensed under both the GNU GPL and the Artistic License.
+

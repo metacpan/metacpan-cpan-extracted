@@ -1,0 +1,33 @@
+--- ../labjack.c	2005-01-17 12:48:28.000000000 -0700
++++ labjack.c	2005-07-05 13:56:52.440069088 -0600
+@@ -1,5 +1,5 @@
+ /*
+- * Labjack USB driver - 0.3
++ * Labjack USB driver - 0.32
+  *
+  * Copyright (c) 2003 Eric Sorton <erics@cfl.rr.com>
+  *
+@@ -29,6 +29,8 @@
+  * - added labjack_get_feature function
+  * - labjack_get_feature called when 128 bytes (count == 128) want 
+  *   to be read from labjack_read
++ * 2005-07-05 - 0.32
++ * - replaced usb_unlink_urb with usb_kill_urb
+  */
+ 
+ #include <linux/config.h>
+@@ -357,12 +359,12 @@
+                 dev->interrupt_in_running = 0;
+                 mb();
+                 if (dev->interrupt_in_urb != NULL && dev->udev) {
+-                        usb_unlink_urb (dev->interrupt_in_urb);
++                        usb_kill_urb (dev->interrupt_in_urb);
+                 }	
+         }
+   	if (dev->interrupt_out_busy) {
+                 if (dev->interrupt_out_urb != NULL && dev->udev) {
+-                        usb_unlink_urb (dev->interrupt_out_urb);
++                        usb_kill_urb (dev->interrupt_out_urb);
+                 }
+ 	}
+ 

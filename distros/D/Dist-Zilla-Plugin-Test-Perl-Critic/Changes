@@ -1,0 +1,40 @@
+Revision history for Dist::Zilla::Plugin::Test::Perl::Critic
+
+3.000     2015-01-21 14:13:17+01:00 Europe/Paris
+ - added missing prereq (Karen Etheridge / Gryphon Shafer)
+ - fix gh#6 - Remove need of MooseX::Autobox for tests. (Kent Fredric)
+ - fix rt#70846 - better doc (Gryphon Shafer)
+
+**
+
+2.112410  2011-08-29 14:00:34 Europe/Paris
+ - Renamed distribution to .*-Test-Perl-Critic, previous name
+   marked as deprecated, but still works. ( Kent Fredric )
+
+**
+
+1.111450  2011-05-25 09:42:23 Europe/Paris
+ - fix rt#68451 - undef critic_config should be treated as '' (mike doherty)
+
+1.102280  2010-08-16 19:28:00 Europe/Paris
+ - fix rt#60360 - Eliminated 2-phase inject/munge in favour of one-phase
+    filegatherer templating. Eliminates ordering confusion
+    when placed after ExtraTests. (Kent Fredric)
+
+1.102270  2010-08-15 10:07:55 Europe/Paris
+ - pod update
+
+1.102250  2010-08-13 19:06:51 Europe/Paris
+ - ability to provide your own perlcriticrc (stephen r. scaffidi)
+
+1.100140  2010-01-14 18:17:53 Europe/Paris
+ - requiring perl 5.8.x
+ - moving to a 1.yydddn versioning scheme
+ - using strict & warnings in added test
+
+**
+
+0.1.0 Mon Aug 17 09:22:13 2009
+ - original release
+ - basic critic tests
+

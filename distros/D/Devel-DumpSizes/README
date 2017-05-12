@@ -1,0 +1,34 @@
+Devel::DumpSizes version 0.01
+=====================
+
+Devel::DumpSizes - Dumps the name and size in bytes (in increasing order) of variables that
+are available at a give point in a script.
+This module was written while debugging a huge long running script. The main use being
+to understand how variable sizes were fluctuating during script execution.
+
+This is the README file for the first version of the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  PadWalker
+  Devel::Size
+  Devel::Symdump
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 by Gautam Chekuri (gautam.chekuri@gmail.com)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,37 @@
+-- main::(-e remapped -e:1)
+use Devel::Trepan;
+Package Main
+------------
+    main program:
+=>  LISTOP (0x1234567)
+    	op_next		0
+    	op_sibling	0
+    	op_ppaddr	PL_ppaddr[OP_LEAVE]
+    	op_type		1955
+    	op_flags	0001101: parenthesized, want kids, want void
+    	op_private 1027
+    	op_first	0x7654321
+    	op_last		0x7654321
+    OP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0x7654321
+    	op_ppaddr	PL_ppaddr[OP_ENTER]
+    	op_type		1955
+    	op_flags	0000000
+    	op_private 1027
+    # 1: use Devel::Trepan;
+    COP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0x7654321
+    	op_ppaddr	PL_ppaddr[OP_DBSTATE]
+    	op_type		1955
+    	op_flags	0000001: want void
+    	op_private 1027
+    OP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0
+    	op_ppaddr	PL_ppaddr[OP_NULL]
+    	op_type		1955
+    	op_flags	0000001: want void
+    	op_private 1027
+trepan.pl: That's all, folks...

@@ -1,0 +1,10 @@
+Revision history for Perl extension Dancer::Debug
+
+0.03    Mon 02 Aug 2010 09:24:43 PM CEST
+        - don't render log panel if no log is available
+
+0.02    Mon 02 Aug 2010 12:14:27 PM CEST
+        - add new panel : Routes
+
+0.01    Sun Apr 18 11:28:06 2010
+        - original version

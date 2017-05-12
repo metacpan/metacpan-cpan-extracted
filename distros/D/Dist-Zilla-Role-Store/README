@@ -1,0 +1,44 @@
+NAME
+    Dist::Zilla::Role::Store - A dynamic stash^Wstore of common data
+
+VERSION
+    This document describes version 0.000002 of Dist::Zilla::Role::Store -
+    released April 26, 2014 as part of Dist-Zilla-Role-Store.
+
+SYNOPSIS
+DESCRIPTION
+ATTRIBUTES
+  zilla
+    A read-only attribute storing a reference to our Dist::Zilla overlord.
+
+    I, for one, welcome our Dist::Zilla overlord.
+
+METHODS
+  register_component
+    We wrap "register_component" in Dist::Zilla::Role::Stash such that our
+    "zilla" attribute is populated when an instance of a class composed with
+    us is created.
+
+SOURCE
+    The development version is on github at
+    <http://https://github.com/RsrchBoy/dist-zilla-role-store> and may be
+    cloned from
+    <git://https://github.com/RsrchBoy/dist-zilla-role-store.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-role-store/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

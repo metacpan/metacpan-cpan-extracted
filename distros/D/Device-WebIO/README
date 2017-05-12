@@ -1,0 +1,22 @@
+Device::WebIO - Glue for the Internet of Things
+
+Perl-based implementation of WebIOPi.  Device::WebIO aims for a few 
+improvements over the original:
+
+* Abstracted backends for implementing on more than just Raspberry Pi
+* Support for video camera streams
+* Written in Perl :)
+
+Implementation is broken into several packages (as of 2014-07-23, not 
+all of these are implemented yet):
+
+* Device::WebIO -- Basic framework
+* Device::WebIO::Dancer -- REST interface
+* Device::WebIO::RaspberryPi -- Raspberry Pi backend
+* Device::WebIO::PCDuino -- pcDuino backend
+* Device::WebIO::Firmata --  Firmata backend
+
+The goal is to be able to mix and match backends in the same runtime.  For 
+instance, you might have a Raspberry Pi connected to an Arduino using 
+Firmata.  In this case, you should be able to control both the Rpi and 
+Arduino pins using the same REST calls to the Rpi.

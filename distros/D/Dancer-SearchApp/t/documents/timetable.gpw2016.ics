@@ -1,0 +1,1097 @@
+BEGIN:VCALENDAR
+CALSCALE:GREGORIAN
+PRODID:-//Act//Data::ICal 0.16//EN
+VERSION:2.0
+X-WR-CALNAME:German Perl Workshop 2016
+X-WR-TIMEZONE:Europe/Berlin
+BEGIN:VTIMEZONE
+TZID:Europe/Berlin
+X-LIC-LOCATION:Europe/Berlin
+BEGIN:DAYLIGHT
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+TZNAME:CEST
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+END:DAYLIGHT
+BEGIN:STANDARD
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+TZNAME:CET
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+DESCRIPTION:Restaurant Barfüßer\, klicke den Link für weitere Informationen
+ .\n\nRestaurant Barfüßer\, see link for further information.
+DTEND;TZID=Europe/Berlin:20160308T230000
+DTSTART;TZID=Europe/Berlin:20160308T180000
+LOCATION:
+SUMMARY:Preconference Meeting
+UID:http://act.yapc.eu/gpw2016/event/1830
+URL:http://act.yapc.eu/gpw2016/event/1830
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160309T112000
+DTSTART;TZID=Europe/Berlin:20160309T105000
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1838
+URL:http://act.yapc.eu/gpw2016/event/1838
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Lunch in canteen
+DTEND;TZID=Europe/Berlin:20160309T140000
+DTSTART;TZID=Europe/Berlin:20160309T130000
+LOCATION:
+SUMMARY:Lunch
+UID:http://act.yapc.eu/gpw2016/event/1839
+URL:http://act.yapc.eu/gpw2016/event/1839
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160309T154500
+DTSTART;TZID=Europe/Berlin:20160309T151500
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1842
+URL:http://act.yapc.eu/gpw2016/event/1842
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Trattoria bei Emilio\nSchnieglinger Str. 39
+DTEND;TZID=Europe/Berlin:20160309T210000
+DTSTART;TZID=Europe/Berlin:20160309T190000
+LOCATION:
+SUMMARY:Individual dinner
+UID:http://act.yapc.eu/gpw2016/event/1834
+URL:http://act.yapc.eu/gpw2016/event/1834
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160310T112000
+DTSTART;TZID=Europe/Berlin:20160310T105000
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1837
+URL:http://act.yapc.eu/gpw2016/event/1837
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Lunch in canteen
+DTEND;TZID=Europe/Berlin:20160310T140000
+DTSTART;TZID=Europe/Berlin:20160310T130000
+LOCATION:
+SUMMARY:Lunch
+UID:http://act.yapc.eu/gpw2016/event/1840
+URL:http://act.yapc.eu/gpw2016/event/1840
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160310T154500
+DTSTART;TZID=Europe/Berlin:20160310T151500
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1843
+URL:http://act.yapc.eu/gpw2016/event/1843
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Essen\, trinken und miteinander Kommunizieren. Das ist das\, wa
+ s wir dort tun werden. Klicke den Link für weitere Informationen.\n\nEatin
+ g\, drinking and communication between participants. That is what we are d
+ oing there. See link for further information.
+DTEND;TZID=Europe/Berlin:20160310T230000
+DTSTART;TZID=Europe/Berlin:20160310T190000
+LOCATION:
+SUMMARY:Social Event
+UID:http://act.yapc.eu/gpw2016/event/1831
+URL:http://act.yapc.eu/gpw2016/event/1831
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160311T112000
+DTSTART;TZID=Europe/Berlin:20160311T105000
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1836
+URL:http://act.yapc.eu/gpw2016/event/1836
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Lunch in canteen
+DTEND;TZID=Europe/Berlin:20160311T140000
+DTSTART;TZID=Europe/Berlin:20160311T130000
+LOCATION:
+SUMMARY:Lunch
+UID:http://act.yapc.eu/gpw2016/event/1841
+URL:http://act.yapc.eu/gpw2016/event/1841
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Coffee break in foyer
+DTEND;TZID=Europe/Berlin:20160311T154500
+DTSTART;TZID=Europe/Berlin:20160311T151500
+LOCATION:
+SUMMARY:Coffee break
+UID:http://act.yapc.eu/gpw2016/event/1845
+URL:http://act.yapc.eu/gpw2016/event/1845
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Recommendations/Empfehlungen:\n* Wirtshaus Frankenstube\n* http
+ ://www.frankenstube.com/\n* U3 bis Friedrich-Ebert-Platz
+DTEND;TZID=Europe/Berlin:20160311T210000
+DTSTART;TZID=Europe/Berlin:20160311T190000
+LOCATION:
+SUMMARY:Individual dinner
+UID:http://act.yapc.eu/gpw2016/event/1835
+URL:http://act.yapc.eu/gpw2016/event/1835
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:Hackathon bei/at https://www.noris.de/\n\nnoris network AG\nTho
+ mas-Mann-Straße 16-20\n90471 Nürnberg
+DTEND;TZID=Europe/Berlin:20160312T170000
+DTSTART;TZID=Europe/Berlin:20160312T100000
+LOCATION:
+SUMMARY:Hackathon at noris network AG\, 10:00H - 17:00H
+UID:http://act.yapc.eu/gpw2016/event/1832
+URL:http://act.yapc.eu/gpw2016/event/1832
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:https://www.historische-felsengaenge.de/fuehrungen/historische-
+ felsengaenge.html\n\nBuche Dein kostenfreies Ticket für Dich und Deinen Pa
+ rtner (wenn mitreisend). Sende eine E-Mail an orga-gpw2016@list.cluster-te
+ am.com mit dem vollständigen Namen der teilnehmenden Personen. Die Tickets
+  sind limitiert.\n\nBook your free ticket for participants and partner (if
+  joins you). Send an email to orga-gpw2016@list.cluster-team.com with the 
+ full name of this persons. There is a limitation of tickets.\n\nHausbrauer
+ ei Altstadthof\nBergstraße 19\n90403 Nürnberg\n+49 911 2449859\nhttp://www
+ .hausbrauerei-altstadthof.de/
+DTEND;TZID=Europe/Berlin:20160312T113000
+DTSTART;TZID=Europe/Berlin:20160312T100000
+LOCATION:
+SUMMARY:Nuremberg city special (Ticket needed)
+UID:http://act.yapc.eu/gpw2016/event/1833
+URL:http://act.yapc.eu/gpw2016/event/1833
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:10 attendees
+DESCRIPTION:Das Pflichtenheft einer KI ist lang: planen\, schlussfolgern\, 
+ Analogien erkennen\, Zusammenhänge verstehen\, lernen uvm. Diese Funktiona
+ lität läuft in der Regel in Form von Inferenzalgorithmen über semantischen
+  Netzen ab. Die Daten in solchen Wissensrepräsentationen sind hochgradig m
+ iteinander verflochten\, praktisch jede Änderung oder Erweiterung hat Einf
+ luss auf alle anderen Daten. Tests sind ein probates Mittel um die Entwick
+ lung der Inferenzalgorithmen vor Regression zu schützen.
+DTEND;TZID=Europe/Berlin:20160311T142000
+DTSTART;TZID=Europe/Berlin:20160311T140000
+LOCATION:DATEV
+ORGANIZER:Richard Jelinek
+SUMMARY:KI: Wie testet man ein Hirn?
+UID:http://act.yapc.eu/gpw2016/talk/6433
+URL:http://act.yapc.eu/gpw2016/talk/6433
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:steve mynott
+ATTENDEE:Martin Kutter
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:15 attendees
+DESCRIPTION:Contents:\n * What is Continuous Delivery?\n * Why bother?\n * 
+ Requirements\n * The Deployment Pipeline\n * Real-World implementation usi
+ ng GoCD\n * Challenges
+DTEND;TZID=Europe/Berlin:20160310T095000
+DTSTART;TZID=Europe/Berlin:20160310T091000
+LOCATION:Booking.com
+ORGANIZER:Moritz Lenz
+SUMMARY:Continuous Delivery: Pipe dreams and reality
+UID:http://act.yapc.eu/gpw2016/talk/6437
+URL:http://act.yapc.eu/gpw2016/talk/6437
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Michael Lang
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:14 attendees
+DESCRIPTION:Gestartet als kleine Seite für den persönlichen Gebrauch\, wurd
+ e es zu einer nützlichen Seite für mehrere Personen und zur Quelle für übe
+ r eine Millionen Tests...\n\nIch will in dem Vortrag  vorrangig auf die "L
+ essons Learned" eingehen zu den Themen:\n\n * perlbrew\n * local::lib\n * 
+ CPANTester\n * Mojolicious\n * SQLite / Postgres\n * PullRequests auf Gith
+ ub
+DTEND;TZID=Europe/Berlin:20160309T104500
+DTSTART;TZID=Europe/Berlin:20160309T102500
+LOCATION:DATEV
+ORGANIZER:Renee Bäcker
+SUMMARY:Der Weg zu meiner ersten Million...
+UID:http://act.yapc.eu/gpw2016/talk/6495
+URL:http://act.yapc.eu/gpw2016/talk/6495
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Helmut Wollmersdorfer
+COMMENT:9 attendees
+DESCRIPTION:This is a talk about how an experimental playground for explori
+ ng macros in Perl 6 turned into a small language of its own.\n\nThe talk w
+ ill discuss the lessons of language design\, bootstrapping\, user-definabl
+ e operators\, unit testing\, code coverage\, yak shaving and\, yes\, macro
+ s.
+DTEND;TZID=Europe/Berlin:20160310T144000
+DTSTART;TZID=Europe/Berlin:20160310T140000
+LOCATION:Booking.com
+ORGANIZER:Carl Mäsak
+SUMMARY:Big hairy yaks
+UID:http://act.yapc.eu/gpw2016/talk/6496
+URL:http://act.yapc.eu/gpw2016/talk/6496
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Martin Becker
+ATTENDEE:Stefan Hornburg
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Theo van Hoesel
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:11 attendees
+DESCRIPTION:Heutzutage ist es schon schwierig\, eine REST-API zu entwerfen.
+  Die Ausführung in Dancer2 sollte leicht und einfach sein.\n\nEs gibt scho
+ n einige Plugins\, wie z.B. MultiLang oder REST... aber sind die wirklich 
+ entsprechend den HTTP Spezifikation umgesetzt?
+DTEND;TZID=Europe/Berlin:20160310T104000
+DTSTART;TZID=Europe/Berlin:20160310T100000
+LOCATION:DATEV
+ORGANIZER:Theo van Hoesel
+SUMMARY:REST API mit Dancer2
+UID:http://act.yapc.eu/gpw2016/talk/6500
+URL:http://act.yapc.eu/gpw2016/talk/6500
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:13 attendees
+DESCRIPTION:Dieser Vortrag beginnt mit einer kurzen Einführung in DBIx::Cla
+ ss.\n\nIm Mittelpunkt steht die Nutzung der "ResultSet"-Klasse.\n\n - Verk
+ ettung\n - Vordefinierte Suche\n - Subqueries\n - Relationship Traversal\n
+ \nDazu werden diverse Erweiterungsmöglichkeiten vorgestellt und mit prakti
+ schen Beispielen erklärt\, z.B.\n\n- Komponenten\n- DBIx::Class Helpers\n-
+  "Vererbung" von Schemas\n- Zusatzattribute\n\nFür das Deployment und Upgr
+ ade von Datenbanken bietet sich\nDBIx::Class::DeploymentHandler an. Wir st
+ ellen das Modul vor\nund eine passende Skriptsammlung.
+DTEND;TZID=Europe/Berlin:20160311T125000
+DTSTART;TZID=Europe/Berlin:20160311T121000
+LOCATION:DATEV
+ORGANIZER:Stefan Hornburg
+SUMMARY:DBIx::Class effektiv nutzen
+UID:http://act.yapc.eu/gpw2016/talk/6501
+URL:http://act.yapc.eu/gpw2016/talk/6501
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Michael Lang
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:14 attendees
+DESCRIPTION:Ich möchte einen Überblick über die Grundprinzipien der "neuen"
+  Sprache Perl 6 geben\, aber auch auf Features\, idiomatischen Code und Lö
+ sungsansätze eingehen.\nEs wird viel Code zu sehen sein\, und ich erhoffe 
+ mir viele Fragen.
+DTEND;TZID=Europe/Berlin:20160309T125000
+DTSTART;TZID=Europe/Berlin:20160309T121000
+LOCATION:DATEV
+ORGANIZER:Tobias Leich
+SUMMARY:Perl 6 - Eine Einführung
+UID:http://act.yapc.eu/gpw2016/talk/6502
+URL:http://act.yapc.eu/gpw2016/talk/6502
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:7 attendees
+DESCRIPTION:Heutzutage sind eine hohe Anzahl an professionellen und leistun
+ gsfähigen JavaScript-Frameworks\, -Tools und –Klassenbibliotheken erhältli
+ ch. Das zeigt uns\, dass die JavaScript Entwicklung immer mehr an Bedeutun
+ g gewinnt. Bei diesem Vortrag\, stellt Gregor Biswanger seine Top 5 Hilfsm
+ ittel vor. Dazu zählt zum Beispiel TypeScript für mehr Kontrolle bei der E
+ ntwicklung im Team und der Planung der Architektur\, RxJS für eine perform
+ ante asynchrone Programmierung\, Visual Studio Code als Alternative zum No
+ de Inspector\, die ein effektiveres Debuggen von NodeJS-Anwendungen ermögl
+ icht und vieles mehr.
+DTEND;TZID=Europe/Berlin:20160310T162500
+DTSTART;TZID=Europe/Berlin:20160310T154500
+LOCATION:DATEV
+ORGANIZER:Gregor Biswanger
+SUMMARY:Top 5 JavaScript Tools und Best Practices – mit Microsoft\, aber oh
+ ne Internet Explorer
+UID:http://act.yapc.eu/gpw2016/talk/6503
+URL:http://act.yapc.eu/gpw2016/talk/6503
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Alexander Becker
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:7 attendees
+DESCRIPTION:Der erste Teil des Vortrags beschreibt die Aufgaben der Interne
+ n Revision in Abgrenzung zu Controlling und Compliance. Er erklärt Prüfung
+ sziele und -methodiken.\n\nDie Arbeit der Internen Revision besteht mit zu
+ nehmender Tendenz aus der Analyse von betrieblichen Daten. Diese können Be
+ standsdaten\, Geschäftsvorgänge\, kaufmännische Buchungen und mehr umfasse
+ n. Der Vortrag gibt einen einen Überblick über Prozesse und auswertbare Da
+ tenbestände.
+DTEND;TZID=Europe/Berlin:20160310T125000
+DTSTART;TZID=Europe/Berlin:20160310T121000
+LOCATION:DATEV
+ORGANIZER:Jörg Meyer
+SUMMARY:Perl in der Internen Revision - Teil 1
+UID:http://act.yapc.eu/gpw2016/talk/6504
+URL:http://act.yapc.eu/gpw2016/talk/6504
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Alexander Becker
+ATTENDEE:Christian Frömmel
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:7 attendees
+DESCRIPTION:Der zweite Teil des Vortrags beschreibt die Herausforderungen u
+ nd Schwierigkeiten der Auswertung betrieblicher Daten. Es werden die folge
+ nden Themen besprochen: Datenselektion und -gewinnung\, Aufbereitung und N
+ ormierung\, Auswertung anhand standardisierter Query-Sets\, Visualisierung
+  von Ergebnissen und visuelle Datenanalyse. Hierbei kann Perl seine Stärke
+ n ausspielen und eine große Hilfe sein.\n\nDer Vortrag ist eine Einführung
+  in das Themengebiet. Weiterführende Informationen sind zB hier zu finden:
+ \nhttp://www.buecher.de/shop/datenbanken/forensische-datenanalyse/meyer-jo
+ erg/products_products/detail/prod_id/36156331
+DTEND;TZID=Europe/Berlin:20160310T144000
+DTSTART;TZID=Europe/Berlin:20160310T140000
+LOCATION:DATEV
+ORGANIZER:Jörg Meyer
+SUMMARY:Perl in der Internen Revision - Teil 2
+UID:http://act.yapc.eu/gpw2016/talk/6505
+URL:http://act.yapc.eu/gpw2016/talk/6505
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Martin Becker
+ATTENDEE:Michael Lang
+ATTENDEE:steve mynott
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:14 attendees
+DESCRIPTION:You will learn about the current status of Inline::Perl5 and In
+ line::Perl6 which allow you to combine Perl 5 and Perl 6 in the same progr
+ am. No need to leave CPAN behind when making your first steps in Perl 6 an
+ d no need to switch away from Perl 5 when all you need is some great parsi
+ ng library that happens to be written in Perl 6.
+DTEND;TZID=Europe/Berlin:20160309T144000
+DTSTART;TZID=Europe/Berlin:20160309T140000
+LOCATION:DATEV
+ORGANIZER:Stefan Seifert
+SUMMARY:Perl 5 and Perl 6 - a great team
+UID:http://act.yapc.eu/gpw2016/talk/6506
+URL:http://act.yapc.eu/gpw2016/talk/6506
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+COMMENT:9 attendees
+DESCRIPTION:Rakudo's CompUnit architecture was designed to master the many 
+ challenges Perl 6' features pose. Even more\, it provides entry points whe
+ re user code can do very interesting things without resorting to black mag
+ ic. This talk will give you a look behind the curtains on how it was imple
+ mented and how it can be used for more than just plain "use" statements.
+DTEND;TZID=Europe/Berlin:20160310T151000
+DTSTART;TZID=Europe/Berlin:20160310T145000
+LOCATION:DATEV
+ORGANIZER:Stefan Seifert
+SUMMARY:A look behind the curtains - module loading in Perl 6
+UID:http://act.yapc.eu/gpw2016/talk/6507
+URL:http://act.yapc.eu/gpw2016/talk/6507
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Igor Fayngold
+COMMENT:8 attendees
+DESCRIPTION:Since the talk at German Perl Workshop 2015 there was further p
+ rogress. Focus is now on the implementation in C/XS\, and the limits of Pe
+ rl5 compared to Perl6.
+DTEND;TZID=Europe/Berlin:20160311T150000
+DTSTART;TZID=Europe/Berlin:20160311T145000
+LOCATION:DATEV
+ORGANIZER:Helmut Wollmersdorfer
+SUMMARY:Tuning Algorithm::Diff revisited
+UID:http://act.yapc.eu/gpw2016/talk/6508
+URL:http://act.yapc.eu/gpw2016/talk/6508
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:steve mynott
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Ralf Peine
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:12 attendees
+DESCRIPTION:Methods and available CPAN modules for fuzzy matching\, overvie
+ w and examples.\n\nVideo: https://youtu.be/Gkrn45EHNiY
+DTEND;TZID=Europe/Berlin:20160309T163000
+DTSTART;TZID=Europe/Berlin:20160309T161000
+LOCATION:DATEV
+ORGANIZER:Helmut Wollmersdorfer
+SUMMARY:Fuzzy matching in Perl
+UID:http://act.yapc.eu/gpw2016/talk/6509
+URL:http://act.yapc.eu/gpw2016/talk/6509
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Martin Becker
+ATTENDEE:Michael Lang
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:11 attendees
+DESCRIPTION:Die Erlangen Perl Mongers veranstalten 2016 ihren 3. Deutschen 
+ Perl Workshop. Wir geben Euch einen Überblick.
+DTEND;TZID=Europe/Berlin:20160309T095500
+DTSTART;TZID=Europe/Berlin:20160309T093500
+LOCATION:DATEV
+ORGANIZER:Steffen Winkler
+SUMMARY:Eröffnung gpw2016 durch Erlangen PM
+UID:http://act.yapc.eu/gpw2016/talk/6510
+URL:http://act.yapc.eu/gpw2016/talk/6510
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Martin Kutter
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:14 attendees
+DESCRIPTION:In der Vergangenheit habe ich öfter komplexe Module nachimpleme
+ ntieren müssen\, weil diese Module starr auf blockierenden Ein/Ausgabe bzw
+ . blockierende DNS-Anfragen bestanden. Da diese Abhängigkeiten tief in der
+  Struktur der Module verankert waren\, war es mir nicht möglich sie in eve
+ ntbasierte Programme zu benutzen.\n\nDer Vortrag beleuchtet eine alternati
+ ves Design für Module\, welches frei von derartigen Abhängkeiten ist und w
+ omit sich die Module flexibler in die verschiedensten Umgebungen einbetten
+  lassen.
+DTEND;TZID=Europe/Berlin:20160311T104000
+DTSTART;TZID=Europe/Berlin:20160311T100000
+LOCATION:DATEV
+ORGANIZER:Steffen Ullrich
+SUMMARY:Statemachine für bessere Wiederverwendbarkeit von Modulen
+UID:http://act.yapc.eu/gpw2016/talk/6511
+URL:http://act.yapc.eu/gpw2016/talk/6511
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Martin Becker
+ATTENDEE:steve mynott
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:13 attendees
+DESCRIPTION:How to write command line tools with a good user experience\n\n
+ Write a specification and get nested subcommands\, option and parameter sp
+ ecification and validation\, help\, documentation\, and advanced shell tab
+  completion.\n\nTalk can be held in german also.\n\nVideo: https://youtu.b
+ e/_PHI_oSk9Zo\n\nGood commandline tools\n* give good usage error messages\
+ n* have good usage output\n* have useful shell tab completion\n* have good
+  man pages\n\nYour CLI framework should do that work for you\, and you sho
+ uld not have to write duplicate code/pod.\nI'll show a framework that trie
+ s to implement all these things.
+DTEND;TZID=Europe/Berlin:20160309T160500
+DTSTART;TZID=Europe/Berlin:20160309T154500
+LOCATION:DATEV
+ORGANIZER:Tina Müller
+SUMMARY:Writing command line tools made easy
+UID:http://act.yapc.eu/gpw2016/talk/6512
+URL:http://act.yapc.eu/gpw2016/talk/6512
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:10 attendees
+DESCRIPTION:Transforming a table (for example a spreadsheet) into PDF is tr
+ ivial\, usually you just have to print it as PDF. Getting the same data ou
+ t of the PDF in a structured\, reusable way is quite another story. Using 
+ a real-life example (cafeteria menu) I will try to not end up with a jumbl
+ ed mess of a word salad.
+DTEND;TZID=Europe/Berlin:20160311T114000
+DTSTART;TZID=Europe/Berlin:20160311T112000
+LOCATION:DATEV
+ORGANIZER:Wolfgang Schemmel
+SUMMARY:Extracting table data from PDF
+UID:http://act.yapc.eu/gpw2016/talk/6513
+URL:http://act.yapc.eu/gpw2016/talk/6513
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:10 attendees
+DESCRIPTION:In diesem "Vortrag" möchte ich einen Rückblick auf den GPW2016 
+ aus Sicht eines Teilnehmers und einen Ausblick auf den GPW2017 geben...
+DTEND;TZID=Europe/Berlin:20160311T151000
+DTSTART;TZID=Europe/Berlin:20160311T150000
+LOCATION:DATEV
+ORGANIZER:Renee Bäcker
+SUMMARY:Rückblick und Ausblick
+UID:http://act.yapc.eu/gpw2016/talk/6514
+URL:http://act.yapc.eu/gpw2016/talk/6514
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Martin Becker
+ATTENDEE:Martin Kutter
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+COMMENT:12 attendees
+DESCRIPTION:PostgreSQL ist eine sehr mächtige Datenbank mit vielen Features
+ .\n\nIn diesem Talk zeigen ich einige davon\, die ich gerne schon früher g
+ ekannt hätte.\n\n(enthält auch Perl\, aber eben nur auch)
+DTEND;TZID=Europe/Berlin:20160310T162500
+DTSTART;TZID=Europe/Berlin:20160310T154500
+LOCATION:Booking.com
+ORGANIZER:Thomas Klausner
+SUMMARY:9 PostgreSQL features I wish I learned earlier
+UID:http://act.yapc.eu/gpw2016/talk/6515
+URL:http://act.yapc.eu/gpw2016/talk/6515
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:9 attendees
+DESCRIPTION:Wie man mit meinem neuen Modul Measure::Everything leicht Stati
+ stiken erfassen und zB an InfluxDB schicken kann.
+DTEND;TZID=Europe/Berlin:20160311T144500
+DTSTART;TZID=Europe/Berlin:20160311T142500
+LOCATION:DATEV
+ORGANIZER:Thomas Klausner
+SUMMARY:Measure::Everything
+UID:http://act.yapc.eu/gpw2016/talk/6516
+URL:http://act.yapc.eu/gpw2016/talk/6516
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:steve mynott
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+COMMENT:9 attendees
+DESCRIPTION:Models are intangible little worlds inside your program. Thinki
+ ng in terms of models helps make the act of programming clearer. The separ
+ ation between models and not-models allows many other useful patterns\, su
+ ch as MVC and unit testing.\n\nCreating models is a skill and a craft. We 
+ show three representative examples of this: domain events\, Unix pipelines
+ \, and Git commits.\n\nModels are great. They exist somewhere out in the P
+ latonic realm\, in the Hylean Theoric World. Computers are very good at de
+ aling with them. Yay!\n\nBut... the real world is messy\, unpredictable\, 
+ and just a teeny bit sadistic. It seems like whenever we build a big produ
+ ction system\, our models lose their footing somewhat\, and all kinds of b
+ ad crap happens. (Don't worry\, we'll do examples of this too.)\n\nSo the 
+ question becomes: who will win? Beauty\, or Chaos? Are we forever cursed w
+ ith brokenness and non-determinism\, or is there a silver lining\, however
+  thin?\n\nCome to the talk\, for more hope and despair in the same vein.
+DTEND;TZID=Europe/Berlin:20160309T120000
+DTSTART;TZID=Europe/Berlin:20160309T112000
+LOCATION:DATEV
+ORGANIZER:Carl Mäsak
+SUMMARY:Domain modeling and the real world
+UID:http://act.yapc.eu/gpw2016/talk/6517
+URL:http://act.yapc.eu/gpw2016/talk/6517
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Melanie Pegelow
+COMMENT:10 attendees
+DESCRIPTION:Perl wird vielfach genutzt zu Verarbeitung potentiell schädlich
+ er Inhalte\, z.B. bei der Erkennung von Spam (SpamAssasin)\, Erkennung von
+  Viren (Amavisd) oder dem Zugriff auf Websites (LWP\, Mojo...). Allerdings
+  sind die in diesem Zusammenhang benutzten Perl-Module oft ncht für diesen
+  Einsatzzweck geeignet\, da sie nicht von möglicherweise kaputtem oder gar
+  bösartigem Input ausgehen.\n\nDer Vortrag untersucht exemplarisch\, wie e
+ in Angreifer beim Einsatz typischer Perl-Module Probleme in der Verarbeitu
+ ng ausnutzen kann\, um so z.B. Inhalte an der Analyse vorbeizuschleusen. Z
+ iel ist es\, dass Bewusstsein für\nderartige Probleme zu erhöhen um beim n
+ ächsten Mal das richtige Tool für die Analyse zu benutzen.
+DTEND;TZID=Europe/Berlin:20160310T120000
+DTSTART;TZID=Europe/Berlin:20160310T112000
+LOCATION:Booking.com
+ORGANIZER:Steffen Ullrich
+SUMMARY:Probleme bei der Inhaltsanalyse mit typischen Perl-Modulen
+UID:http://act.yapc.eu/gpw2016/talk/6518
+URL:http://act.yapc.eu/gpw2016/talk/6518
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Christian Frömmel
+ATTENDEE:Igor Fayngold
+COMMENT:7 attendees
+DESCRIPTION:Perl 5 wird noch aktiv weiterentwickelt\, wenn auch weitaus vor
+ sichtiger als die kapriziöse kleine Schwester Perl 6. Dieser Vortrag stell
+ t eine Reihe kleiner Erweiterungen von Perl 5 vor\, die schon verschiedent
+ lich diskutiert aber letztlich noch nicht beschlossen wurden.\n\nEhe ein n
+ eues Feature etabliert wird\, müssen sich nicht nur Programmierer finden\,
+  die die es implementieren können\, ohne dabei Schaden im bestehenden Kern
+  anzurichten\, sondern auch die Gralshüter P5P müssen dazu gebracht werden
+ \, vom zunächst unvermeidlichen Veto langsam abzurücken. Ein besonders gro
+ ßes Hindernis kann dabei die vorgesehene Syntax sein. Perl 5 hat eine reic
+ hhaltige Syntax\, aber kaum eine Erweiterung fügt sich "völlig einleuchten
+ d" und nahtlos ein.\n\nNicht weniger problematisch ist das Aufgeben obsole
+ t gewordener Konstrukte und Sonderfälle. Bestehender Code\, mag er auch vo
+ n vornherein hässlich\, fragil und unintuitiv sein\, soll möglichst weiter
+ hin das Gleiche tun.\n\nMit Pragmatismus und Findigkeit werden solche Hind
+ ernisse von Zeit zu Zeit überwunden\, und Perl 5 bewegt sich doch. Auf ein
+ e nicht offizielle Hitliste von kleinen Änderungen\, die es vielleicht in 
+ den übernächsten Release schaffen könnten\, folgt Gelegenheit zur Diskussi
+ on und weiteren Anregungen.
+DTEND;TZID=Europe/Berlin:20160310T120000
+DTSTART;TZID=Europe/Berlin:20160310T112000
+LOCATION:DATEV
+ORGANIZER:Martin Becker
+SUMMARY:Perl 5.26 - Ideen für die große Schwester von Perl 6
+UID:http://act.yapc.eu/gpw2016/talk/6519
+URL:http://act.yapc.eu/gpw2016/talk/6519
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Johann Rolschewski
+COMMENT:7 attendees
+DESCRIPTION:"ref($ref) eq $ref_type" is a very common idiom but inexact.\n\
+ nInstead\, I wrote some functions in XS to do it accurately. What? XS? How
+ ? Let me show you.\n\nProbably worse\, though... I implemented using optio
+ nal opcodes!
+DTEND;TZID=Europe/Berlin:20160310T125000
+DTSTART;TZID=Europe/Berlin:20160310T121000
+LOCATION:Booking.com
+ORGANIZER:Sawyer X
+SUMMARY:Ref::Util: accurate functions in XS for checking references
+UID:http://act.yapc.eu/gpw2016/talk/6521
+URL:http://act.yapc.eu/gpw2016/talk/6521
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Alexander Becker
+ATTENDEE:Christian Frömmel
+ATTENDEE:Igor Fayngold
+ATTENDEE:Melanie Pegelow
+COMMENT:10 attendees
+DESCRIPTION:Wie in vielen Produkten steckt auch in DATEV-Software OpenSourc
+ e.\n\nDabei stellt die Verwendung von OpenSource-Produkten für kommerziell
+ e Software-Anbieter einige Herausforderungen:\n\n- wie funktioniert die Wa
+ rtung?\n- was passiert\, wenn eine Komponente nicht weiterentwickelt wird?
+ \n- wie können OpenSource-Komponenten lizenzkonform eingesetzt werden?\n\n
+ Der Vortrag stellt vor wie die DATEV den Einsatz von OpenSource-Komponente
+ n in der Entwicklung gestaltet.
+DTEND;TZID=Europe/Berlin:20160311T093000
+DTSTART;TZID=Europe/Berlin:20160311T091000
+LOCATION:DATEV
+ORGANIZER:Martin Kutter
+SUMMARY:Open Source in der DATEV-Entwicklung
+UID:http://act.yapc.eu/gpw2016/talk/6523
+URL:http://act.yapc.eu/gpw2016/talk/6523
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Alexander Becker
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:8 attendees
+DESCRIPTION:Frau Jutta Rößner von der DATEV wird zur Eröffnung sprechen.
+DTEND;TZID=Europe/Berlin:20160309T102000
+DTSTART;TZID=Europe/Berlin:20160309T100000
+LOCATION:DATEV
+ORGANIZER:Steffen Winkler
+SUMMARY:DATEV - Der Platin-Sponsor stellt sich vor
+UID:http://act.yapc.eu/gpw2016/talk/6527
+URL:http://act.yapc.eu/gpw2016/talk/6527
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:12 attendees
+DESCRIPTION:{json:api} is a protocol that defines how REST APIs should be d
+ efined (JSON formats\, statuses\, etc.).\nPONAPI is a JSON-API compatiable
+  Perl implementation s for both a client and a server that can be used to 
+ save you a lot of time when building APIs.
+DTEND;TZID=Europe/Berlin:20160311T120000
+DTSTART;TZID=Europe/Berlin:20160311T114000
+LOCATION:DATEV
+ORGANIZER:Mickey Nasriachi
+SUMMARY:PONAPI: Let's REST
+UID:http://act.yapc.eu/gpw2016/talk/6528
+URL:http://act.yapc.eu/gpw2016/talk/6528
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:11 attendees
+DESCRIPTION:Der Vortrag stellt die Implementation einer lokalen Suchmaschin
+ e mit Dancer und Elasticsearch vor. Die drei Bestandteile einer Suchmaschi
+ ne und die Implementationen werden vorgestellt:\n\n1. Crawler\n2. Indexer 
+ + Elasticsearch\n3. Suchmaske
+DTEND;TZID=Europe/Berlin:20160309T151000
+DTSTART;TZID=Europe/Berlin:20160309T145000
+LOCATION:DATEV
+ORGANIZER:Max Maischein
+SUMMARY:Eine lokale Suchmaschine mit Dancer und Elasticsearch
+UID:http://act.yapc.eu/gpw2016/talk/6532
+URL:http://act.yapc.eu/gpw2016/talk/6532
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:steve mynott
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Christian Frömmel
+ATTENDEE:Igor Fayngold
+COMMENT:10 attendees
+DESCRIPTION:A beginners guide to fractals and  speeding up via perl 6 concu
+ rrency.
+DTEND;TZID=Europe/Berlin:20160311T095500
+DTSTART;TZID=Europe/Berlin:20160311T093500
+LOCATION:DATEV
+ORGANIZER:steve mynott
+SUMMARY:Simple Perl 6 Fractals and Concurrency
+UID:http://act.yapc.eu/gpw2016/talk/6534
+URL:http://act.yapc.eu/gpw2016/talk/6534
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Martin Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Igor Fayngold
+COMMENT:6 attendees
+DESCRIPTION:Um perl6 besser kennen zu lernen habe ich bei ein paar kleinen 
+ online Contests mitgemacht und war von den syntaktischen Möglichkeiten beg
+ eistert.\n\nMeine Favoriten aus den Contests und ein paar die sonst noch i
+ m Netz kursieren...
+DTEND;TZID=Europe/Berlin:20160310T151000
+DTSTART;TZID=Europe/Berlin:20160310T145000
+LOCATION:Booking.com
+ORGANIZER:Bernhard Specht
+SUMMARY:the beauty of perl6
+UID:http://act.yapc.eu/gpw2016/talk/6546
+URL:http://act.yapc.eu/gpw2016/talk/6546
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Nicholas Clark
+ATTENDEE:Max Maischein
+ATTENDEE:Tina Müller
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Martin Becker
+ATTENDEE:Yvonne Fitzgerald
+ATTENDEE:Johann Rolschewski
+ATTENDEE:Helmut Wollmersdorfer
+COMMENT:10 attendees
+DESCRIPTION:You know those age-old trite sayings in (and outside) the Perl 
+ community?\n\nPerl is a write-only language.\nMake an effort to write read
+ able code.\nYou can use your own style\, as long as you're consistent.\n\n
+ It seems these have been repeated ad nauseam for years\, especially by dil
+ ettantes and non-practitioners. As far as the speaker is concerned\, it's 
+ well pst time to resist these notions. In fact\, it's time to step up our 
+ game\, because Perl 6 is in town!\n                                       
+                             \nIn this presentation\, Salve J. Nilsen will 
+ be ranting about our jobs\, Open Source\, culture and how well considered 
+ habits and principles can help us shape the code and people that make us r
+ epeatedly return to our community.\n\nSalve is one of the regulars of Oslo
+  Perl Mongers\, severely brain-damaged by years of organizing events and i
+ n general not making a fuss out of his opinions. But not any more\, dammit
+ ! Now he's just mad. :)
+DTEND;TZID=Europe/Berlin:20160310T104000
+DTSTART;TZID=Europe/Berlin:20160310T100000
+LOCATION:Booking.com
+ORGANIZER:Salve J. Nilsen
+SUMMARY:Ranting for Perl Lepidopterologists – Made Easy
+UID:http://act.yapc.eu/gpw2016/talk/6547
+URL:http://act.yapc.eu/gpw2016/talk/6547
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:8 attendees
+DESCRIPTION:Kurzvorträge (max. 5 Minuten) in Deutsch oder Englisch.\n\nShor
+ t talks (at most 5 minutes) in English or German.
+DTEND;TZID=Europe/Berlin:20160309T172500
+DTSTART;TZID=Europe/Berlin:20160309T163500
+LOCATION:DATEV
+ORGANIZER:Moritz Lenz
+SUMMARY:Lightning Talks
+UID:http://act.yapc.eu/gpw2016/talk/6657
+URL:http://act.yapc.eu/gpw2016/talk/6657
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Max Maischein
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Renee Bäcker
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Steffen Ullrich
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Christian Frömmel
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:11 attendees
+DESCRIPTION:Kurzvorträge (max. 5 Minuten) in Deutsch oder Englisch.\n\nShor
+ t talks (at most 5 minutes) in English or German.\n\nGregor Biswanger - Ja
+ vascript\nSteffen Ulrich - Kaputtes HTTP\nChristian Frömmel - Perl im Kran
+ kenhausnetzwerk\nTadeusz Sośnierz - Dancing with Perl 6
+DTEND;TZID=Europe/Berlin:20160310T172500
+DTSTART;TZID=Europe/Berlin:20160310T163500
+LOCATION:DATEV
+ORGANIZER:Moritz Lenz
+SUMMARY:Lightning Talks
+UID:http://act.yapc.eu/gpw2016/talk/6658
+URL:http://act.yapc.eu/gpw2016/talk/6658
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:7 attendees
+DESCRIPTION:Rückblick auf die Konferenz\, Ausblick auf den Hackathon.\n\nWo
+ rkshop retrospective\, and looking forward to the Hackathon.
+DTEND;TZID=Europe/Berlin:20160311T163000
+DTSTART;TZID=Europe/Berlin:20160311T161000
+LOCATION:DATEV
+ORGANIZER:Moritz Lenz
+SUMMARY:Veranstaltungsende / Closing of Conference
+UID:http://act.yapc.eu/gpw2016/talk/6659
+URL:http://act.yapc.eu/gpw2016/talk/6659
+END:VEVENT
+BEGIN:VEVENT
+ATTENDEE:Sören Laird Sörries
+ATTENDEE:Wolfgang Schemmel
+ATTENDEE:Aristotle
+ATTENDEE:Alexander Becker
+ATTENDEE:Sören Kornetzki
+ATTENDEE:Helmut Wollmersdorfer
+ATTENDEE:Igor Fayngold
+COMMENT:7 attendees
+DESCRIPTION:Kurzvorträge (max. 5 Minuten) in Deutsch oder Englisch.\n\nShor
+ t talks (at most 5 minutes) in English or German.
+DTEND;TZID=Europe/Berlin:20160311T161000
+DTSTART;TZID=Europe/Berlin:20160311T154500
+LOCATION:DATEV
+ORGANIZER:Moritz Lenz
+SUMMARY:Lightning Talks
+UID:http://act.yapc.eu/gpw2016/talk/6660
+URL:http://act.yapc.eu/gpw2016/talk/6660
+END:VEVENT
+END:VCALENDAR

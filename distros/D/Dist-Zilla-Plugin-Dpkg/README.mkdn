@@ -1,0 +1,247 @@
+# NAME
+
+Dist::Zilla::Plugin::Dpkg - Generate Dpkg files for your perl module
+
+# VERSION
+
+version 0.05
+
+# SYNOPSIS
+
+    #  [Dpkg]
+    #  architecture = amd64
+    #  default_template = package/debian/default
+
+# DESCRIPTION
+
+Dist::Zilla::Plugin::Dpkg generates Debian' controls files that you can use
+with debhelper to generate packages of your perl module.
+
+There are a handful of tools that provide similar functionality. Most of
+them expect your perl module to have a standard installation mechanism.  This
+module was born of a need for customization. It's projects used per-package
+perlbrews and all manner of custom bits.
+
+# TEMPLATES
+
+This plugin uses [Text::Template](http://search.cpan.org/perldoc?Text::Template).  The following variables will be passed
+to any templates that are processed, using attributes as values:
+
+- architecture
+- author (first in authors list)
+- name
+- package\_binary\_depends
+- package\_depends
+- package\_description
+- package\_name
+- package\_section
+- package\_shell\_name
+- version
+
+# SUBCLASSING
+
+Each of the aforementioned template methods has an accompanying method that
+provides a default template.  Most of these are undefined and therefore
+unused.  This subclassing behavior allows you to create subclasses of
+Dist::Zilla::Plugin::Dpkg that provide default templates for many of the files.
+
+The idea is to allow the easy creation of something like a
+Dist::Zilla::Plugin::Dpkg::Starman that provides boilerplate code for a
+[Starman](http://search.cpan.org/perldoc?Starman)\-based application.
+
+# ATTRIBUTES
+
+## architecture
+
+The architecture of the package we're building. Defaults to `any`.
+
+## compat\_template
+
+If set, the specified file is used as a template for the `compat` file.
+
+## compat\_template\_default
+
+A default compat file template that will be used it a template isn't provided
+to `compat_template`.
+
+## conffiles\_template
+
+If set, the specified file is used as a template for the `conffiles` file.
+
+## conffiles\_template\_default
+
+A default conffiles file template that will be used it a template isn't
+provided to `conffiles_template`.
+
+## config\_template
+
+If set, the specified file is used as a template for the `config` file.
+
+## config\_template\_default
+
+A default config file template that will be used it a template isn't provided
+to `config_template`.
+
+## control\_template
+
+If set, the specified file is used as a template for the `control` file.
+If not set uses an internal default.
+
+## control\_template\_default
+
+A default control file template that will be used it a template isn't provided
+to `control_template`.
+
+## default\_template
+
+If set, the specified file is used as a template for the `default` file.
+
+## default\_template\_default
+
+A default default file template that will be used it a template isn't provided
+to `default_template`.
+
+## init\_template
+
+If set, the specified file is used as a template for the `init` file.
+
+## init\_template\_default
+
+A default init file template that will be used it a template isn't provided
+to `init_template`.
+
+## install\_template
+
+If set, the specified file is used as a template for the `install` file.
+
+## install\_template\_default
+
+A default install file template that will be used it a template isn't provided
+to `install_template`.
+
+## package\_depends
+
+Source binary dependencies. Defaults to `debhelper (`= 7.0.50~)>.
+
+http://www.debian.org/doc/debian-policy/ch-relationships.html\#s-sourcebinarydeps
+
+## package\_binary\_depends
+
+Binary dependencies. Defaults to <C${misc:Depends}, ${shlibs:Depends}, ${perl:Depends}>.
+
+http://www.debian.org/doc/debian-policy/ch-relationships.html\#s-binarydeps
+
+## package\_description
+
+The description of the package we're making. Should use the form of:
+
+Synopsis
+Multi-line description
+tacked on the end
+
+[http://www.debian.org/doc/debian-policy/ch-controlfields.html\#s-f-Description](http://www.debian.org/doc/debian-policy/ch-controlfields.html\#s-f-Description).
+
+## package\_name
+
+The name of the package we're making.  Defaults to the lowercased version of
+the package name. Uses Dist::Zilla's `name` attribute.
+
+## package\_priority
+
+The priority of the package we're making. Defaults to `extra`.
+
+[http://www.debian.org/doc/debian-policy/ch-archive.html\#s-priorities](http://www.debian.org/doc/debian-policy/ch-archive.html\#s-priorities).
+
+## 
+
+The section of the package we're making. Defaults to `lib`.
+
+[http://www.debian.org/doc/debian-policy/ch-archive.html\#s-subsections](http://www.debian.org/doc/debian-policy/ch-archive.html\#s-subsections).
+
+## package\_shell\_name
+
+The name of this package converted to a form suitable for environment variable
+use. Foo-Bar becomes FOO\_BAR.  Defaults to `name` upper-cased with hyphens
+converted to underscores.
+
+## postinst\_template
+
+If set, the specified file is used as a template for the `postinst` file.
+
+## postinst\_template\_default
+
+A default postinst file template that will be used it a template isn't provided
+to `postinst_template`.
+
+## postrm\_template
+
+If set, the specified file is used as a template for the `postrm` file.
+
+## postrm\_template\_default
+
+A default postrm file template that will be used it a template isn't provided
+to `postrm_template`.
+
+## rules\_template
+
+If set, the specified file is used as a template for the `rules` file.
+
+## rules\_template\_default
+
+A default rules file template that will be used it a template isn't provided
+to `rules_template`.
+
+# METHODS
+
+## has\_compat\_template
+
+## has\_compat\_template\_default
+
+## has\_conffiles\_template
+
+Predicate that is true if there is a conffiles\_template
+
+## has\_conffiles\_template\_template
+
+## has\_config\_template
+
+## has\_config\_template\_default
+
+## has\_control\_template
+
+## has\_control\_template\_default
+
+## has\_default\_template
+
+## has\_default\_template\_default
+
+## has\_init\_template
+
+## has\_init\_template\_default
+
+## has\_install\_template
+
+## has\_install\_template\_default
+
+## has\_postinst\_template
+
+## has\_postinst\_template\_default
+
+## has\_postrm\_template
+
+## has\_postrm\_template\_default
+
+## has\_rules\_template
+
+## has\_rules\_template\_default
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive, Inc.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

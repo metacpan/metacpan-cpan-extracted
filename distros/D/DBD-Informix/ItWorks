@@ -1,0 +1,12 @@
+#!/usr/bin/perl -w
+#
+#   @(#)$Id: ItWorks,v 100.5 2002/12/15 00:31:03 jleffler Exp $
+#
+#   Generate a report that Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) works
+#
+#   Copyright 1999 Jonathan Leffler
+#   Copyright 2000 Informix Software Inc
+#   Copyright 2002 IBM
+
+use DBD::Informix::TechSupport;
+it_works;

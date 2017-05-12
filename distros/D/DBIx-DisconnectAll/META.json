@@ -1,0 +1,57 @@
+{
+   "abstract" : "disconnect all databases",
+   "author" : [
+      "Masahiro Nagano E<lt>kazeburo AAJKLFJEF@ gmail.comE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-DisconnectAll",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.33",
+            "DBI" : "1.604",
+            "parent" : "0",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::DisconnectAll" : {
+         "file" : "lib/DBIx/DisconnectAll.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.03"
+}

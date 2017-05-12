@@ -1,0 +1,2 @@
+To instrument the perl core, you need to apply these patches after
+doing the Configure -S substitutions (and make depend).

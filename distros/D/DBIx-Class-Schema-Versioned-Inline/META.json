@@ -1,0 +1,57 @@
+{
+   "abstract" : "Defined multiple schema versions within resultset classes",
+   "author" : [
+      "Peter Mottram (SysPete) <peter@sysnix.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Schema-Versioned-Inline",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "DBD::SQLite" : "1.40",
+            "DBIx::Class::Schema::Loader" : "0.07040",
+            "File::Spec" : "3.47",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::Roo" : "1.003"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "DBIx::Class" : "0.082820",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.082820",
+            "SQL::Translator" : "0.11018",
+            "Safe::Isa" : "0",
+            "Set::Equivalence" : "0.003",
+            "Try::Tiny" : "0.18",
+            "Types::PerlVersion" : "0.002",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "x_IRC" : "irc://irc.perl.org/#dbix-class"
+   },
+   "version" : "0.204"
+}

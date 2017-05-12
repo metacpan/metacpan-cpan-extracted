@@ -1,0 +1,15 @@
+README
+MANIFEST
+Makefile.PL
+Scripts.PL
+code/dirgest.cgi
+code/dirgest.pl
+lib/Digest/Directory/API.pm
+lib/Digest/Directory/BASE.pm
+t/test_config.pl
+t/test_utils.pl
+t/00-BASE.t
+t/01-API.t
+t/02-CLI.t
+t/03-CGI.t
+t/04-CLIandCGI.t

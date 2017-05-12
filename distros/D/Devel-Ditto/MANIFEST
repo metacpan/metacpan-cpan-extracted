@@ -1,0 +1,15 @@
+Build.PL
+Changes
+inc/MyBuilder.pm
+lib/Devel/Ditto.pm
+lib/Devel/Ditto/Color.pm
+lib/Devel/Ditto/Colour.pm
+MANIFEST
+META.yml
+README
+t/00.load.t
+t/lib/MyPrinter.pm
+t/manifest.t
+t/myprog.pl
+t/output.t
+t/pod.t

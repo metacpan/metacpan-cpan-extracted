@@ -1,0 +1,14 @@
+--- #YAML:1.0
+name:                D-oh-Year
+version:             0.06
+abstract:            ~
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.34
+distribution_type:   module
+requires:     
+    fields:                        1.02
+    overload:                      0
+    Test::More:                    0.47
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2

@@ -1,0 +1,127 @@
+Revision history for Dist-Zilla-Plugin-Git-Contributors
+
+0.029     2016-10-14 01:12:15Z
+          - also include empty (file-less) commits; broken since 0.010
+
+0.028     2016-09-27 01:26:54Z
+          - add Unicode::Normalize to prereqs -- needed by Unicode::Collate
+            when performing normalizations
+
+0.027     2016-09-24 04:27:18Z
+          - fix failures on 5.016000 (broken CORE::* subs; see perl RT#113044)
+
+0.026     2016-09-22 17:36:27Z
+          - fall back to lc() when casefolding is not available, which removes
+            the new perl 5.016 requirement.
+
+0.025     2016-09-22 00:28:04Z
+          - uniqueness tests for email addresses are now done
+            case-insensitively (Matthew Horsfall); minimum perl version raised
+            to 5.016.
+
+0.024     2016-08-09 01:55:19Z
+          - include the git version in metadata
+
+0.023     2016-05-07 03:01:07Z
+          - fix tests to avoid any user-configured pre-commit hooks
+
+0.022     2016-04-22 12:52:07Z
+          - the JSON::PP injection is back - we also need to care about what
+            CPAN::Meta does with MYMETA.json, which is beyond our ability to
+            check for at build time.
+
+0.021     2016-04-21 17:25:55Z
+          - removed JSON::PP injection if [MetaJSON] is new enough to be
+            rendering META.json in ascii mode (5.045)
+
+0.020     2016-02-21 04:17:13Z
+          - JSON::PP injection is back, as a harmless configure-suggests
+
+0.019     2016-02-19 05:44:15Z
+          - JSON::PP logic is refined to check for dynamically-configured
+            distributions and those requiring Dist::Zilla
+          - remove conditional JSON::PP injection, and replace it with a
+            warning message (RT#112147)
+
+0.018     2016-01-27 02:34:58Z
+          - improved testing of git directories under MSWin32 (Klaus Eichner)
+
+0.017     2016-01-10 01:23:36Z
+          - no changes since 0.016
+
+0.016     2015-12-23 07:42:21Z (TRIAL RELEASE)
+          - inject a prerequisite on JSON::PP 2.27300 if non-ascii characters
+            are found in contributor data, to allow for (future) correct
+            parsing of META.json
+
+0.015     2015-10-30 02:23:31Z
+          - duplicates entries are removed, using the email address as the
+            unique key
+
+0.014     2015-07-29 02:33:55Z
+          - when include_releaser = 0, utf8-decode the releaser name before
+            matching it against the list of contributors
+
+0.013     2015-07-21 01:55:31Z
+          - use quotemeta() in regular expressions, to avoid choking when a
+            contributor name contains special characters
+
+0.012     2015-07-06 23:35:19Z
+          - log a warning if user configs are missing
+
+0.011     2015-03-21 18:10:36Z
+          - new "remove" option, to specify patterns to match for exclusion
+
+0.010     2015-02-14 22:01:43Z
+          - match authors against committers using email address, rather than
+            using a full exact string match
+
+0.009     2015-01-19 18:42:40Z
+          - avoid fatal error when there are no git commits
+
+0.008     2014-10-22 03:30:59Z
+          - fix test that broke with changes in Dist::Zilla::Tester 5.021 (it
+            was my own patch, even!)
+
+0.007     2014-08-16 06:31:41Z
+          - added the new "path" configuration option, for help in building
+            dists contained within a subdirectory of a repository
+
+0.006     2014-08-15 01:44:00Z
+          - increase the minimum required version of Unicode::Collate
+          - increase the minimum required version of Git::Wrapper
+          - avoid doubly-encoded committer strings on older perls by avoiding
+            encoding the string before we send it to IPC::Open3
+          - make sure not to crash doing "dzil build" when a user has no
+            user.name and include_releaser = 0 (Kent Fredric, #1)
+
+0.005     2014-08-13 00:46:11Z
+          - basic tests are now ascii-only; unicode tests are marked as TODO
+            on MSWin32 for now (see (github) genehack/Git-Wrapper#52 for the
+            gory details)
+          - now properly sorting names using case-insensitive unicode collation
+
+0.004     2014-08-08 01:29:08Z
+          - when on MSWin32, check for mysysgit version and also set
+            appropriate config options for proper unicode support
+          - new "order_by" configuration option, to allow sorting contributors
+            by number of commits made, rather than alphabetically
+          - mark "include_releaser" option as experimental, as it will likely
+            get removed if CPAN-API/metacpan-web#1270 gets resolved
+
+0.003     2014-08-07 02:32:19Z
+          - new 'include_releaser' option, for filtering the releaser user out
+            of the contributor list after 'include_authors' has been applied
+            (include_authors = 1, include_releaser = 0 recommended)
+
+0.002     2014-08-06 05:21:51Z
+          - do not add an empty x_contributors key if there are no
+            (non-author) contributors to report
+          - fix test failures when run on a system where git has not been
+            configured
+          - warn at runtime if Pod::Weaver::Section::Contributors is too old
+            to pull data from distmeta on its own
+          - do not blow up if run in a directory that is not tracked by git
+
+0.001     2014-07-31 01:42:08Z
+          - Initial release.

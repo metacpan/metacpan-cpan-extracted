@@ -1,0 +1,84 @@
+
+1.12 Wed Aug  7 18:51:30 MET DST 2002
+	Added prerequsite for RPC::PlClient.
+
+1.1 Wed Aug  7 16:53:23 MET DST 2002
+	Installation changed to keep the configuration of the previous
+	install, if possible.
+
+1.0 Mon Jan 28 19:55:48 MET 2002
+	Regexp in docclient.pl for xls2txt symlinks done right, patch
+	by Pavel Smerk.
+
+0.999 Fri Jan 25 15:40:02 MET 2002
+	The in in loops were missing, patch by Pavel Smerk.
+
+0.988 Mon Jan 21 18:54:33 MET 2002
+	Another merge with Pavel Smerk: fixup of Debug messages,
+	writing out, clearing pagenumbers.
+
+0.992 Mon Jan 14 15:02:13 MET 2002
+	Polished installation instruction. Added more tweaks from
+	Pavel Smerk.
+
+0.982 Thu Nov  1 13:43:25 MET 2001
+	More generic format2format name resolution.
+
+0.981 Sat Sep  1 14:59:52 MET DST 2001
+	Documentation polished. Installation description by Pavel
+	Smerk translated to English and included in INSTALL.
+
+0.98 Fri Aug 31 20:06:47 MET DST 2001
+	Added test suite for remote side. More options move to
+	Config.pm files.
+
+0.97 Fri Aug 31 19:21:43 MET DST 2001
+	Added test suite for the Windows (server) side.	
+
+0.96 Fri Aug 31 11:10:08 MET DST 2001
+	Merge of 0.892 and 0.93.
+
+0.93 Thu Aug 30 15:38 MET DST 2001
+	Branch with fixes of handling of the temporary files and code
+	cleanup.
+
+0.892 Thu Aug 30 16:08:54 MET DST 2001
+	Branch by Pavel Smerk with many improvements on the server
+	side -- handling windows and converters.
+
+0.891 Wed Jul 25 20:32 MET DST 2001
+	Merged bugfixed from Milan Sorm -- prn, Excel.
+
+0.86 Oct 29 1999
+	Documentation improved.
+
+0.85 Jan 26  1999
+	Docserver.pm: changes names of the txt formats: txt is now
+	wdFormatText, txt1 stays wdFormatTextLineBreaks and the
+	original txt (value 9) is not supported anymore.
+
+0.84 Tue Dec 15 10:42:47 MET 1998
+	docclient.pl: fixed problem with ends of lines.
+
+0.83 Tue Dec 15 09:47:10 MET 1998
+	docclient.pl: fixed handling long lines what cannot be compressed.
+
+0.82 Mon Dec 14 1998
+	docclient.pl: fixed compressing long lines.
+
+0.81 Mon Dec 14 1998
+	Merge of 0.55 and 0.80.
+
+0.80 December 1998
+	docclient.pl: cleaning and transformation code by Michal
+	Brandejs.
+
+0.55 November 1998
+	Docserver.pm: added xls and output html code by
+	-- Pavel Smerk.
+
+0.50 October 1998
+	First unofficial release, includes doc(server|client).pl,
+	Doc(server|client).pm. Handles doc to txt, no cleanup of
+	the output data.
+

@@ -1,0 +1,86 @@
+# INSTRUCTIONS FOR BUILDING THE DtfSQL SHARED LIBRARY
+	
+
+
+# (1) Copy the expanded DBD-DtfSQLmac-0.3201 folder into the :MacPerl_Src:perl:ext 
+#     folder of the MacPerl source distribution.
+#  
+#     and then
+#
+#     Set the current directory to the DBD-DtfSQLmac-0.3201 folder.
+
+
+
+# (2a) Set the MPW variable 'MPSrc' to the path to your MacPerl_Src folder, for example     
+
+Set MPSrc "MacintoshHD:MacPerl_Src_5.004"     # (change the path accordingly)
+
+
+
+# (2b) Set the MPW variable'dtFSrc' to the path to your dtF/SQL 2.01 distribution folder
+
+Set dtFSrc "MacintoshHD:dtF_SQL"     # (change the path accordingly)
+
+
+
+# (3) Run the XSUBpp compiler for DtfSQL.xs 
+#     (Credits to Dean Roehrich for the perlobject.map typemap.)
+
+perl :::lib:ExtUtils:xsubpp -typemap :::lib:ExtUtils:typemap -typemap :typemap -typemap :perlobject.map DtfSQL.xs >DtfSQL.tc && Rename -y DtfSQL.tc DtfSQL.c
+
+
+
+
+# (4) If you like, take a look at the resulting C source file DtfSQL.c
+
+open DtfSQL.c
+
+
+
+# (5) Compile DtfSQL.c (with symbol export for shared lib):
+
+MrC -inclpath ignoresys -sym off -d __STD_C -d MULTIPLICITY -d DTFMAC -w off -opt size -t -fatext ¶
+-i {MPSrc}:sfio:include: ¶
+-i {MPSrc}:GUSI:include: ¶
+-i {MPSrc}:perl: ¶
+-i {dtFSrc}:Includes: ¶
+-i : -shared_lib_export on ¶
+-export_list "DtfSQL".exp "DtfSQL".c
+
+
+
+
+# (6) Open the file which contains a list of the shared library's exported entry points (symbols).
+#     Delete every line except the last, which is:
+#      
+#	  boot_Mac__DtfSQL
+#
+#     Be sure to save your changes.
+
+open DtfSQL.exp
+
+
+
+
+# (7) Link DtfSQL.o as shared lib
+
+
+PPCLink -w -xm sharedlibrary -sym on -@export DtfSQL.exp DtfSQL.c.PPC.o ¶
+	{MPSrc}:perl:PerlStub ¶
+	{SharedLibraries}InterfaceLib ¶
+	{SharedLibraries}StdCLib ¶
+	{SharedLibraries}MathLib ¶
+	{dtFSrc}:Libraries:dtFPPCSV2.8K.shlb ¶
+	-c cfmg -fragname "DtfSQL" -o DtfSQL.shlb.PPC
+	
+
+# (8) Rename the shared library 'DtfSQL.shlb.PPC' to 'DtfSQL'
+
+Rename -y DtfSQL.shlb.PPC DtfSQL
+
+
+
+
+#  Done. The shared library 'DtfSQL' must be installed in the ':site_perl:MacPPC:auto:Mac:DtfSQL' folder.
+
+

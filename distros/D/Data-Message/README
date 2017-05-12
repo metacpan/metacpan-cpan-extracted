@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Data-Message,
+version 1.104:
+
+  parse and build header-and-body messages (kinda like email)
+
+This software is copyright (c) 2004 by Casey West.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

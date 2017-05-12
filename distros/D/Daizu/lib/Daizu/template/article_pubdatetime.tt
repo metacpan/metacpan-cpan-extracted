@@ -1,0 +1,1 @@
+<abbr class="published" title="[% datetime.ymd %]T[% datetime.hms %]Z">[% datetime.strftime('%Y %b %e at %H:%M') %]</abbr>

@@ -1,0 +1,43 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002001
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002000 2014-10-06T02:56:09Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / test requires]
+ - DBD::SQLite
+ - DBI
+ - DBIx::Class::Core
+ - DBIx::Class::InflateColumn::Serializer
+ - DBIx::Class::Schema
+ - ExtUtils::MakeMaker
+ - File::Spec
+ - Path::Tiny
+ - Test::Fatal
+ - parent
+
+ [Changed / test requires]
+ - Test::More 0.98 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4003
+
+ [Removed / configure requires]
+ - Module::Build 0.4003
+
+ [Removed / runtime requires]
+ - Pegex::Base
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp

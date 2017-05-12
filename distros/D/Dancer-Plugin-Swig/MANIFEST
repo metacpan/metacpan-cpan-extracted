@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+README.pod
+carton.lock
+cpanfile
+dist.ini
+lib/Dancer/Plugin/Swig.pm
+t/basic.t

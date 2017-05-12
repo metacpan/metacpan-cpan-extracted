@@ -1,0 +1,79 @@
+=head1 NAME
+
+mod_perl 2.0 Server Configuration
+
+
+
+=head1 Description
+
+This chapter provides an indepth mod_perl 2.0 configuration details.
+
+
+
+
+
+
+
+=head1 mod_perl configuration directives
+
+Similar to mod_perl 1.0, in order to use mod_perl 2.0 a few
+configuration settings should be added to I<httpd.conf>. They are
+quite similar to 1.0 settings but some directives were renamed and new
+directives were added.
+
+
+
+
+
+
+
+
+
+=head1 Enabling mod_perl
+
+To enable mod_perl built as DSO add to I<httpd.conf>:
+
+  LoadModule perl_module modules/mod_perl.so
+
+This setting specifies the location of the mod_perl module relative to
+the C<ServerRoot> setting, therefore you should put it somewhere after
+C<ServerRoot> is specified.
+
+If mod_perl has been statically linked it's automatically enabled.
+
+Win32 users need to make sure that the path to the Perl binary (e.g.,
+I<C:\Perl\bin>) is in the C<PATH> environment variable.
+
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Doug MacEachern E<lt>dougm (at) covalent.netE<gt>
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+=head1 Authors
+
+=over
+
+=item *
+
+Doug MacEachern E<lt>dougm (at) covalent.netE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+=cut

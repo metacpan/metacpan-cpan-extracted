@@ -1,0 +1,95 @@
+#!/usr/bin/perl -w
+
+=head1 NAME
+
+pl-dist-man - command line interface for Dist-Man's functionality
+
+=cut
+
+use warnings;
+use strict;
+
+use Dist::Man::App;
+
+Dist::Man::App->run;
+
+=head1 SYNOPSIS
+
+    pl-dist-man create [options]
+    pl-dist-man setup [options]
+
+Options:
+
+    --module=module  Module name (required, repeatable)
+    --distro=name    Distribution name (optional)
+    --dir=dirname    Directory name to create new module in (optional)
+
+    --builder=module Build with 'ExtUtils::MakeMaker' or 'Module::Build'
+    --eumm           Same as --builder=ExtUtils::MakeMaker
+    --mb             Same as --builder=Module::Build
+    --mi             Same as --builder=Module::Install
+
+    --author=name    Author's name (required)
+    --email=email    Author's email (required)
+    --license=type   License under which the module will be distributed
+                     (default is the same license as perl)
+
+    --verbose        Print progress messages while working
+    --force          Delete pre-existing files if needed
+
+    --help           Show this message
+
+Available Licenses:
+    perl, bsd, gpl, lgpl, mit
+
+Example:
+
+    pl-dist-man --module=Foo::Bar,Foo::Bat \
+        --author="Andy Lester" --email=andy@petdance.com
+
+=head1 DESCRIPTION
+
+C<pl-dist-man> is a command-line interface to L<Dist::Man>, which it
+uses to perform all the work of creating distributions.  An alternate backend
+for C<pl-dist-man> can be specified with the C<--class> option.  Plugins to
+the standard Dist::Man module can be specified with one or more
+C<--plugin> options.
+
+If no directory name is supplied, the distribution name will be used for the
+directory.  If no distribution name is supplied, the first listed module name
+will be used as the distribution name.
+
+Multiple --builder options may be supplied to produce the files for multiple
+builders.
+
+=head1 CONFIGURATION
+
+pl-dist-man will look for a configuration file before reading its command
+line parameters.  The default location is C<$HOME/.pl-dist-man/config> but
+if the MODULE_STARTER_DIR environment variable is set, pl-dist-man will look
+for C<config> in that directory.
+
+The configuration file is just a list of names and values, separated by colons.
+Values that take lists are just space separated.  A sample configuration file
+might read:
+
+ author: Ricardo SIGNES
+ email:  rjbs@cpan.org
+ plugins: Dist::Man::Simple Dist::Man::Plugin::XYZ
+ xyz_option: red green blue
+
+This format may become more elaborate in the future, but a file of this type
+should remain valid.
+
+=head1 COPYRIGHT & LICENSE
+
+=head2 module-starter
+
+Unknown.
+
+=head2 pl-dist-man
+
+Same terms as module-starter with same code ownership.
+
+=cut
+

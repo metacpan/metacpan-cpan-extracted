@@ -1,0 +1,33 @@
+SYNOPSIS
+
+      use Digest::MurmurHash2::Neutral qw(murmur_hash2_neutral);
+      murmur_hash2_neutral($data_to_hash);
+
+    OR
+
+      use Digest::MurmurHash2::Neutral;
+      Digest::MurmurHash2::murmur_hash2_neutral($data_to_hash);
+
+DESCRIPTION
+
+    This is an implementation of the endian neutral MurmurHash2 algorithm
+    by Austin Appleby. This module was originally written for ZipRecruiter
+    <https://www.ziprecruiter.com/hiring/technology> using code from nginx
+    <https://github.com/nginx/nginx/blob/42f1e1cb96b510d1fa1abad99a5294a37b750d99/src/core/ngx_murmurhash.c>.
+    I used Digest::MurmurHash as a template.
+
+WHY
+
+    As stated above, this module is implemented to compatible with nginx's
+    MurmurHash2 implementation, used in the split_clients directive.
+    MurmurHash3 would be faster, but compatibility is the goal here.
+
+SEE ALSO
+
+      * Digest::MurmurHash
+
+      * Digest::MurmurHash3
+
+      * Austin Appleby's algorithm description page
+      <http://murmurhash.googlepages.com/>
+

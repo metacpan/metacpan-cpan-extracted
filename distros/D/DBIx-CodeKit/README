@@ -1,0 +1,39 @@
+
+CodeKit Universal Database Code Table
+-------------------------------------
+
+CodeKit Version 1.07 released 2003.05.12.
+
+CodeKit is an interface to a universal database code table.
+CodeKit takes all of the programming work out of maintaining
+multiple database code definition sets.
+
+The code administration page lets you define new virtual
+code tables and enter all codes and their descriptions.
+Perl and PHP classes retrieve the code descriptions and
+automatically generate HTML code selection elements. 
+
+For news and updates visit the CodeKit home page:
+
+http://www.webbysoft.com/codekit
+
+For a full featured multilingual universal code table
+visit the BabelKit home page:
+
+http://www.webbysoft.com/babelkit
+
+Setup:
+
+1. Read doc/ck_overview.html and doc/ck_schema.html first.
+   Get your universal code table schema and sample data loaded.
+
+2. See doc/ck_setup_perl.html and doc/ck_setup_php.html
+   for Perl and PHP source code setup instructions.
+
+Contact John Gorman at http://www.webbysoft.com
+to report bugs, request features, or for database
+design and programming assistance.
+
+Copyright (C) 2003 John Gorman.  All rights reserved.
+This program is free software; you can redistribute it
+and/or modify it under the same terms as Perl or the LGPL.

@@ -1,0 +1,1995 @@
+/* Copyright (c) 1999-2015  H.Merijn Brand <h.m.brand@xs4all.nl>
+ *
+ * You may distribute under the terms of either the GNU General Public
+ * License or the Artistic License, as specified in the Perl README file.
+ *
+ * Large parts of this file are shamelesly copied from other DBD drivers,
+ * after which they are formatted to be readable, stripped and modified
+ * to reflect the way UNIFY can work with it.
+ *
+ * Much effort has been put in keeping this driver as clean as possible.
+ * It consists entirely of E/SQL statements. ufchmsg () in the sqlError ()
+ * function is the *ONLY* HLI call.
+ *
+ * Main sources were Oracle (1.03), FreeTDS (0.02) and Ingres (0.24, 0.25)
+ * whose writers seem to have copied from other sources too ;-)
+ *
+ * Thanks to Tim Bunce for valuable input in his tutorials on O'Reilly's
+ * Open Source Conference 2000 in Monterey, and his code review.
+ *
+ * Thanks to all other DBD writers for making DBI such a success ;-)
+ */
+
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+
+/* Get this from previously installed DBI module ...
+ * Makefile.PL will find it's include path
+ */
+#define NEED_DBIXS_VERSION 7
+
+#include <DBIXS.h>
+#include <config.h>	/* perl's config, I hope */
+#include <dbd_xsh.h>
+
+#define NEED_sv_2pv_flags
+#define UEXTERN static
+#define UINIT0 =0
+#include "dbdimp.h"
+
+DBISTATE_DECLARE;
+
+/* Unify stuff off here */
+
+#include <sqle_usr.h>
+#include <sqlerr.h>
+#include <dbtypes.h>
+#ifndef SQLCURRENCY
+#  define SQLCURRENCY	-18
+#  endif
+#ifndef SQLDATETIME
+#  define SQLDATETIME 0xDEADBEAF
+#  endif
+
+extern int      rangchk (int, int);
+extern int      sqlalcr (char    *, SQLCRCB *,                   SQLDBGST *);
+extern int      sqlald2 (SQLDACB *, int, int,                    SQLDBGST *);
+extern int      sqlcldb (                                        SQLDBGST *);
+extern int      sqlcls  (CRSCB   *,                              SQLDBGST *);
+extern SQLCRCB *sqlcrnm (char    *, int,                         SQLDBGST *);
+extern SQLDACB *sqldanm (char    *, int,                         SQLDBGST *);
+extern int      sqldcls (SQLCRCB *,                              SQLDBGST *);
+extern int      sqldesc (SQLDSCRB, SQLSTCB *, SQLDACB *,         SQLDBGST *);
+extern int      sqldlda (SQLDACB *,                              SQLDBGST *);
+extern int      sqldfch (SQLCRCB *, int, HVDS *, SQLFCHDIR, int, SQLDBGST *);
+extern int      sqldlst (SQLSTCB *,                              SQLDBGST *);
+extern int      sqldopn (SQLCRCB *, int, HVDS *, int,            SQLDBGST *);
+extern int      sqldxec (SQLSTCB *, int, HVDS *, int, HVDS *,    SQLDBGST *);
+extern int      sqlfch  (CRSCB   *,              SQLFCHDIR, int, SQLDBGST *);
+extern int      sqlgtd2 (SQLDACB *, int, int, int, long, int *,
+				    void *, int,                 SQLDBGST *);
+extern int      sqlopdb (char    *,                              SQLDBGST *);
+extern int      sqlopn  (CRSCB   *,                              SQLDBGST *);
+extern int      sqlprep (char    *, SQLSTCB  *,                  SQLDBGST *);
+extern int      sqlstcd (int);
+extern int      sqlstd2 (SQLDACB *, int, int, SQLDA_FIELD *,
+				    HVDS *, int,                 SQLDBGST *);
+extern SQLSTCB *sqlstnm (char    *, int,                         SQLDBGST *);
+extern int      sqltxop (int, int,                               SQLDBGST *);
+extern int      sqlxec  (CRSCB   *,                              SQLDBGST *);
+
+extern char    *basename (const char *path);
+
+#define MAX_SQL_LEN	4096
+#define Max(a,b)	((a)>=(b)?(a):(b))
+
+static	byte		*sth_id_on;
+static	short		n_sth_id = 4;	/* Start with max 32 $sth's */
+static	int		dbd_verbose = 0;
+
+/* forward references */
+int	dbd_st_finish	(SV *, imp_sth_t *);
+int	dbd_st_rows	(SV *, imp_sth_t *);
+
+EXEC SQL BEGIN DECLARE SECTION;
+char	u_sql_do[4096];
+char	u_sql_st[4096];
+char	u_sql_nm[16];
+char	c_sql_nm[16];
+char	o_sql_nm[16];	/* Output descriptor area	*/
+char	i_sql_nm[16];	/* Input  descriptor area	*/
+int	n_sql_st;
+
+int	fix, fln, fic, ftp, fpr, fsc, fnl;
+char	fnm[48], fdC[1028];
+utxtptr	fdB;
+ubinptr	fdX;
+short	fdS;
+int	fdL;
+float	fdF;
+double	fdD;
+utime	fdT;
+udate	fdDT;
+uhdate	fdHDT;
+char	fdDTTM[24];
+EXEC SQL END   DECLARE SECTION;
+
+#define DBI_debug	(dbis->debug & DBIc_TRACE_LEVEL_MASK)
+
+/* For more info about error handling, read
+ * http://search.cpan.org/dist/DBI/lib/DBI/DBD.pm#The_dbd_drv_error_method
+ */
+
+#ifdef I_STDARG
+static void dbg (int level, char *fmt, ...)
+#endif
+#ifdef I_VARARGS
+/* VARARGS2 */
+static void dbg (level, fmt, va_alist)
+int  level;
+char *fmt;
+va_dcl
+#endif
+{
+    auto	va_list	args;
+
+    if (level > Max (dbd_verbose, DBI_debug))
+	return;
+
+#ifdef I_STDARG
+    va_start (args, fmt);
+#endif
+#ifdef I_VARARGS
+    va_start (args);
+#endif
+
+    /* DBILOGFP should ideally be replaced with DBIc_LOGPIO (imp_xxh)
+     * but dbg doesn't get a handle (yet) */
+    (void)PerlIO_vprintf (DBILOGFP, fmt, args);
+    (void)PerlIO_flush   (DBILOGFP);
+    va_end (args);
+    } /* dbg */
+
+#ifdef I_STDARG
+static void st_dbg (int level, imp_sth_t *sth, char *fmt, ...)
+#endif
+#ifdef I_VARARGS
+/* VARARGS2 */
+static void st_dbg (level, sth, fmt, va_alist)
+int       level;
+imp_sth_t *sth;
+char      *fmt;
+va_dcl
+#endif
+{
+    auto	va_list	args;
+
+    if (level > Max (sth->dbd_verbose, Max (dbd_verbose, DBI_debug)))
+	return;
+
+#ifdef I_STDARG
+    va_start (args, fmt);
+#endif
+#ifdef I_VARARGS
+    va_start (args);
+#endif
+
+    (void)PerlIO_vprintf (DBIc_LOGPIO (sth), fmt, args);
+    (void)PerlIO_flush   (DBIc_LOGPIO (sth));
+    va_end (args);
+    } /* st_dbg */
+
+/* ##### Unify misc stuff ################################################## */
+
+static void NYI (char *func)
+{
+    auto	char	die_msg[128];
+
+    (void)sprintf (die_msg, "DBD::UNIFY::%s () is not (yet) implemented", func);
+    die (die_msg);
+    } /* NYI */
+
+void dbd_init (dbistate_t *dbistate)
+{
+    dTHX;
+    DBIS = dbistate;
+    (void)memset (fnm, 0, sizeof (fnm));
+    /* dbis->debug = 9; */
+    } /* dbd_init */
+
+/* Error */
+static void error   (SV *h, int error_num, char *text)
+{
+    D_imp_xxh (h);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, NULL, error_num, text, SQLSTATE, NULL);
+    } /* error */
+
+/* Warning */
+static void warning (SV *h, int error_num, char *text)
+{
+    D_imp_xxh (h);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "0",    error_num, text, SQLSTATE, NULL);
+    } /* error */
+
+/* Success with information */
+static void info    (SV *h, int error_num, char *text)
+{
+    D_imp_xxh (h);
+    DBIh_SET_ERR_CHAR (h, imp_xxh, "",     error_num, text, SQLSTATE, NULL);
+    } /* error */
+
+static int sqlError (SV *h)
+{
+    auto	USTATUS	status;
+
+    if (SQLCODE >= 0) {
+	if (SQLWARN < 0) {
+	    dbg (4, "DBD::Unify::sqlError: SQLWARN = %d", SQLWARN);
+	    warning (h, SQLWARN, ufchmsg (SQLWARN, &status));
+	    }
+	return (1);
+	}
+
+    dbg (4, "DBD::Unify::sqlError: SQLCODE = %d", SQLCODE);
+
+    error (h, SQLCODE, ufchmsg (SQLCODE, &status));
+    dbg (4, ", returning\n");
+    return (0);
+    } /* sqlError */
+
+/* ##### Unify DB stuff #################################################### */
+
+int dbd_db_login (SV *dbh, imp_dbh_t *imp_dbh,
+	char *dbname, char *user, char *auth)
+{
+    EXEC SQL BEGIN DECLARE SECTION;
+    char statement[128];
+    EXEC SQL END   DECLARE SECTION;
+    dTHX;
+    char *opt;
+
+    PL_use_safe_putenv = 1;
+
+    if ((opt = getenv ("DBD_TRACE"))) {
+	auto int i = 0;
+	while (*opt) {
+	    if (isdigit (*opt)) {
+		i = 10 * i + *opt - '0';
+		}
+	    else {
+		i = -100;
+		}
+	    opt++;
+	    }
+	if (i >= 0 && i <= 99) {
+	    dbd_verbose = i;
+	    dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
+	    }
+	}
+    if ((opt = getenv ("DBD_VERBOSE"))) {
+	auto int i = 0;
+	while (*opt) {
+	    unless (isdigit (*opt))
+		break;
+	    i = 10 * i + *opt - '0';
+	    opt++;
+	    }
+	if (!*opt && i >= 0 && i <= 99) {
+	    dbd_verbose = i;
+	    dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
+	    }
+	}
+
+    dbg (3, "DBD::Unify::db_login: dbname: %s\n", dbname);
+
+    /* CONNECT [db_name];
+     *
+     *	db_name:	[[dbhost]:[dbuser]:][dbpath] [dbname]
+     *		$DBHOST, $DBUSER, DBPATH, $DBNAME
+     *
+     *	Users are implicitly checked by grants
+     *
+     * SET CURRENT SCHEMA TO 'USCHEMA';
+     *
+     *		$USCHEMA	(passed as $auth)
+     */
+
+    opt = dbname;
+    /* look for options in dbname. Syntax: dbname;options */
+    while (*opt && *opt != ';')
+	++opt;
+    if (*opt == ';') {
+	*opt = 0;	/* terminate dbname */
+	opt++;		/* point to options */
+	}
+
+    if (user && *user && *user != '/') {
+	/* we have a username */
+	dbg (4, "    user = '%s', opt = '%s' (ignored)\n", user, opt);
+	}
+
+    if (dbname && *dbname) {
+	(void)sprintf (statement, "DBPATH=%s", dbname);
+	(void)putenv (statement);
+	}
+
+    {	/* Register program to monitor system, must be done BEFORE connect */
+	char   *pgm = basename (SvPV_nolen (get_sv ("0", 0)));
+	USTATUS ustatus;
+	(void)uinimsg (pgm, &ustatus);
+	dbg (4, "    After uinimsg ('%s'), status = %ld\n", pgm, ustatus);
+	}
+
+    EXEC SQL
+	CONNECT;
+    dbg (4, "    After connect,    sqlcode = %d\n", SQLCODE);
+
+    /* Problem number 22960: 2nd Connect to same database fails */
+    if (SQLCODE == -254) SQLCODE = 0;
+
+    DBIc_IMPSET_on (imp_dbh);	/* imp_dbh set up now                   */
+    DBIc_ACTIVE_on (imp_dbh);	/* call disconnect before freeing       */
+
+    unless (sqlError (dbh))
+	return (0);
+
+    DBIc_set (imp_dbh, DBIcf_AutoCommit, 0);
+    DBIc_set (imp_dbh, DBIcf_ChopBlanks, 1);
+
+    imp_dbh->id			= n_dbh++;
+    imp_dbh->children		= (imp_sth_t **)0;
+    imp_dbh->nchildren		= 0;
+    imp_dbh->unicode		= 0;
+
+    unless (auth && *auth)
+	auth = getenv ("USCHEMA");
+    if ((!user || !*user) && auth && *auth) {
+	(void)sprintf (statement, "set current schema to \"%s\"", auth);
+	dbg (3, "    %s\n", statement);
+	EXEC SQL
+	    EXECUTE IMMEDIATE :statement;
+	dbg (4, "    After schema,  sqlcode = %d\n", SQLCODE);
+	unless (sqlError (dbh))
+	    return (0);
+	}
+
+    unless (sth_id_on || (sth_id_on = (byte *)calloc (n_sth_id, 8))) {
+	error (dbh, errno, "Cannot allocate space for STH's");
+	return (0);
+	}
+
+    return (1);
+    } /* dbd_db_login */
+
+void dbd_st_destroy (SV *, imp_sth_t *);	/* Forward ref */
+
+/* Until those babys are able to change their own dirty nappies ... */
+static void change_offspring (SV *dbh, imp_dbh_t *imp_dbh)
+{
+    imp_sth_t **children;
+    int       i, n;
+
+    /* Make this function extremely precautious ;-P */
+    unless (imp_dbh)                      return;
+    unless (children = imp_dbh->children) return;
+    unless ((n = imp_dbh->nchildren) > 0) return;
+
+    for (i = 0; i < n; i++) {
+	imp_sth_t *imp_sth = children[i];
+	if (!imp_sth || imp_sth->stat > ST_STAT_OPEN
+		     || imp_sth->stat & ST_STAT_OPEN) continue;
+	if (2 > DBIc_TRACE_LEVEL (imp_sth) && 2 > dbd_verbose) {
+	    dbg (3, "-- %03d/%03d 0x%08X %02X",
+		i + 1, n, imp_sth, imp_sth ? imp_sth->stat : 0);
+	    if (imp_sth && imp_sth->statement)
+		dbg (3, " '%s'", imp_sth->statement);
+	    dbg (3, "\n");
+	    }
+	dbd_st_destroy (dbh, imp_sth);
+	}
+    } /* change_offspring */
+
+static void dbd_st_diaper (imp_dbh_t *imp_dbh, imp_sth_t *imp_sth)
+{
+    imp_sth_t **children = imp_dbh->children;
+    int       i, n = imp_dbh->nchildren;
+
+    for (i = 0; i < n; i++) {
+	if (children[i]) continue;
+	children[i] = imp_sth;
+	return;
+	}
+    if (n) imp_dbh->children = (imp_sth_t **)realloc ((void *)imp_dbh->children, (imp_dbh->nchildren + 1) * sizeof (imp_sth_t *));
+    else   imp_dbh->children = (imp_sth_t **) malloc (sizeof (imp_sth_t *));
+    if    (imp_dbh->children) imp_dbh->children[imp_dbh->nchildren++] = imp_sth;
+    else  imp_dbh->nchildren = 0;
+    } /* dbd_st_diaper */
+
+static void dbd_st_growup (imp_dbh_t *imp_dbh, imp_sth_t *imp_sth)
+{
+    imp_sth_t **children = imp_dbh->children;
+    int       i, n = imp_dbh->nchildren;
+
+    for (i = 0; i <= n; i++) {
+	unless (children[i] == imp_sth) continue;
+	imp_dbh->children[i] = 0;
+	return;
+	}
+    } /* dbd_st_growup */
+
+int dbd_db_commit (SV *dbh, imp_dbh_t *imp_dbh)
+{
+    dTHX;
+    dbg (3, "DBD::Unify::db_commit\n");
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    change_offspring (dbh, imp_dbh);
+
+    /* Check for commit () being called whilst refs to cursors
+     * still exists. This needs some more thought.
+     */
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
+	warn ("DBD::Unify::db_commit (%s) invalidates %d active cursor(s)",
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	}
+
+    EXEC SQL
+	COMMIT WORK;
+    return (sqlError (dbh));
+    } /* dbd_db_commit */
+
+int dbd_db_rollback (SV *dbh, imp_dbh_t *imp_dbh)
+{
+    dTHX;
+    dbg (3, "DBD::Unify::db_rollback\n");
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    change_offspring (dbh, imp_dbh);
+
+    /* Check for rollback () being called whilst refs to cursors
+     * still exists. See dbd_db_commit ()
+     */
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
+	warn ("DBD::Unify::db_rollback (%s) invalidates %d active cursor(s)",
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	}
+
+    EXEC SQL
+	ROLLBACK WORK;
+    return (sqlError (dbh));
+    } /* dbd_db_rollback */
+
+int dbd_db_do (SV *dbh, char *statement)
+{
+    dTHX;
+    D_imp_dbh (dbh);
+
+    dbg (3, "DBD::Unify::db_do (\"%s\")\n", statement);
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    if (strlen (statement) >= MAX_SQL_LEN) {
+	warn ("DBD::Unify::db_do (\"%.40s ...\") statement too long", statement);
+	return (0);
+	}
+
+    (void)strcpy (u_sql_do, statement);
+
+    EXEC SQL
+	EXECUTE IMMEDIATE :u_sql_do;
+    dbg (4, "    After execute,  sqlcode = %d\n", SQLCODE);
+    unless (sqlError (dbh))
+	return (0);
+
+    return (1);
+    } /* dbd_db_do */
+
+int dbd_db_disconnect (SV *dbh, imp_dbh_t *imp_dbh)
+{
+    dTHX;
+
+    dbg (3, "DBD::Unify::db_disconnect\n");
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    change_offspring (dbh, imp_dbh);
+    if (imp_dbh->nchildren) {
+	if (imp_dbh->children) free ((void *)imp_dbh->children);
+	imp_dbh->children  = (imp_sth_t **)0;
+	imp_dbh->nchildren = 0;
+	}
+
+    if (DBIc_ACTIVE_KIDS (imp_dbh) && DBIc_WARN (imp_dbh) && !PL_dirty) {
+	warn ("DBD::Unify::db_disconnect (%s) invalidates %d active cursor(s)",
+	    SvPV_nolen (dbh), (int)DBIc_ACTIVE_KIDS (imp_dbh));
+	}
+    DBIc_ACTIVE_off (imp_dbh);
+
+    EXEC SQL
+	DISCONNECT;
+    dbg (4, "    After disconn,  sqlcode = %d\n", SQLCODE);
+
+    imp_dbh->id  = 0;
+    /* We assume that disconnect will always work
+     * since most errors imply already disconnected.
+     */
+    return (sqlError (dbh));
+    } /* dbd_db_disconnect */
+
+int dbd_discon_all (SV *drh, imp_drh_t *imp_drh)
+{
+    dTHX;
+    if (!PL_dirty && !SvTRUE (perl_get_sv ("DBI::PERL_ENDING", 0))) {
+	sv_setiv (DBIc_ERR (imp_drh), (IV)1);
+	sv_setpv (DBIc_ERRSTR (imp_drh), "disconnect_all not implemented");
+	(void)DBIh_EVENT2 (drh, ERROR_event, DBIc_ERR (imp_drh), DBIc_ERRSTR (imp_drh));
+	return (FALSE);
+	}
+    if (PL_perl_destruct_level)
+	PL_perl_destruct_level = 0;
+    return (FALSE);
+    } /* dbd_discon_all */
+
+void dbd_db_destroy (SV *dbh, imp_dbh_t *imp_dbh)
+{
+    dTHX;
+    dbg (3, "DBD::Unify::db_destroy\n");
+
+    if (DBIc_ACTIVE (imp_dbh))
+	dbd_db_disconnect (dbh, imp_dbh);
+    DBIc_IMPSET_off (imp_dbh);
+
+    /* No, share it among all DB handles
+    (void)free (sth_id_on);
+    */
+    } /* dbd_db_destroy */
+
+int dbd_db_STORE_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv, SV *valuesv)
+{
+    dTHX;
+    STRLEN kl;
+    char   *key = SvPV (keysv, kl);
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose"))) {
+	dbd_verbose = SvIV (valuesv); /* dbd_verbose in DBD::Oracle since 1.22 :) */
+	dbg (2, "Set DBD_VERBOSE = %d\n", dbd_verbose);
+	return (TRUE);
+	}
+    if (kl == 10 && strEQ (key, "AutoCommit")) {
+	DBIc_set (imp_dbh, DBIcf_AutoCommit, 0);	/* Allways off	*/
+	return (TRUE);
+	}
+    if (kl == 11 && strEQ (key, "uni_unicode")) {
+	imp_dbh->unicode = SvOK (valuesv) && SvTRUE (valuesv) ? 1 : 0;
+	return (TRUE);
+	}
+    if ((kl == 13 && strEQ (key, "uni_scanlevel")) ||
+	(kl ==  9 && strEQ (key, "ScanLevel"))) {
+	auto int val = SvIV (valuesv);
+	dbg (3, "DBD::Unify::dbd_db_STORE (ScanLevel = %d)\n", val);
+	if (val < 1 || val > 16)
+	    return (FALSE);
+	(void)sprintf (u_sql_do, "set transaction scan level %d", val);
+	EXEC SQL
+	    EXECUTE IMMEDIATE :u_sql_do;
+	dbg (4, "    After SCANLVL,  sqlcode = %d\n", SQLCODE);
+	unless (sqlError (dbh))
+	    return (FALSE);
+	return (TRUE);
+	}
+
+    return (FALSE);
+    } /* dbd_db_STORE_attrib */
+
+SV *dbd_db_FETCH_attrib (SV *dbh, imp_dbh_t *imp_dbh, SV *keysv)
+{
+    dTHX;
+    STRLEN kl;
+    char   *key = SvPV (keysv, kl);
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (NULL);
+
+    if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose")))
+	return (newSViv (dbd_verbose));
+    if (kl == 11 && strEQ (key, "uni_unicode"))
+	return (newSViv (imp_dbh->unicode));
+    if (kl == 10 && strEQ (key, "AutoCommit"))
+	return (newSVsv (boolSV (0)));
+
+    return (NULL);
+    } /* dbd_db_FETCH_attrib */
+
+/* ##### Unify ST stuff #################################################### */
+
+static short new_sth_id (SV *dbh)
+{
+    register	short	i;
+    register	short	b;
+
+    for (i = 0; i < n_sth_id; i++) {
+	for (b = 0; b < 7; b++) {
+	    unless (sth_id_on[i] & (1 << b)) {
+		sth_id_on[i] |= (1 << b);
+		return (i * 8 + b + 1);
+		}
+	    }
+	}
+    i = n_sth_id + 4;
+    if ((sth_id_on = realloc (sth_id_on, i * 8))) {
+	b = n_sth_id * 8 + 1;
+	sth_id_on[n_sth_id++] = (byte)1;
+	sth_id_on[n_sth_id++] = (byte)0;
+	sth_id_on[n_sth_id++] = (byte)0;
+	sth_id_on[n_sth_id++] = (byte)0;
+	return (b);
+	}
+    error (dbh, errno, "Cannot allocate extra space for STH's");
+    return (0);
+    } /* new_sth_id */
+
+static short clr_sth_id (SV *dbh, short id)
+{
+    if (id <= 0 || id > n_sth_id * 8) {
+	error (dbh, 0, "Cannot clr invalid statement ID");
+	return (0);
+	}
+    id--;
+    unless (sth_id_on[id / 8] & (1 << (id % 8))) {
+	error (dbh, 0, "Cannot clr statement ID already cleared (threading?)");
+	return (0);
+	}
+    sth_id_on[id / 8] &= ~(1 << (id % 8));
+    return (1);
+    } /* set_sth_id */
+
+static int use_sth_id (SV *dbh, short dbhid, short id)
+{
+    if (id <= 0 || id > n_sth_id * 8) {
+	error (dbh, 0, "Cannot use invalid statement ID");
+	return (0);
+	}
+    id--;
+    unless (sth_id_on[id / 8] & (1 << (id % 8))) {
+	error (dbh, 0, "Cannot use statement ID");
+	return (0);
+	}
+    (void)sprintf (u_sql_nm, "u_sql_%02d_%06d", dbhid, id);
+    (void)sprintf (c_sql_nm, "c_sql_%02d_%06d", dbhid, id);
+    (void)sprintf (o_sql_nm, "o_sql_%02d_%06d", dbhid, id);
+    (void)sprintf (i_sql_nm, "i_sql_%02d_%06d", dbhid, id);
+    return (1);
+    } /* use_sth_id */
+
+int dbd_fld_describe (SV *dbh, imp_sth_t *imp_sth, int num_fields)
+{
+    dTHX;
+    register	imp_fld_t	*f;
+    register	int		i;
+
+    st_dbg (4, imp_sth, "DBD::Unify::fld_describe %s (%d fields)\n", o_sql_nm, num_fields);
+
+    unless (num_fields > 0 &&
+           (imp_sth->fld = (imp_fld_t *)calloc (num_fields, sizeof (imp_fld_t))))
+	return (0);
+
+    for (fix = 1; fix <= num_fields; fix++) {
+	f = &imp_sth->fld[fix - 1];
+	EXEC SQL
+	    GET DESCRIPTOR :o_sql_nm
+	    VALUE :fix
+		  :ftp = TYPE,
+		  :fln = LENGTH,
+		  :fpr = PRECISION,
+		  :fic = INDICATOR,
+		  :fsc = SCALE,
+		  :fnl = NULLABLE,
+		  :fnm = NAME;
+	st_dbg (4, imp_sth, "    After get,      sqlcode = %d\n", SQLCODE);
+	unless (sqlError (dbh))
+	    return (0);
+
+	i = sizeof (fnm);
+	while (i && (!fnm[i - 1] || fnm[i - 1] == ' '))
+	    i--;
+	fnm[i] = (char)0;
+	(void)strncpy (f->fnm, fnm, sizeof (fnm));
+
+	if (ftp == SQLNUMERIC && fln > 0 && fln <= 4)
+	    ftp = SQLSMINT;
+
+	f->ftp = ftp;
+	f->fln = fln;
+	f->fpr = fpr;
+	f->fic = fic;
+	f->fsc = fsc;
+	f->fnl = fnl;
+
+	st_dbg (5, imp_sth, "     Field %3d: ", fix);
+	st_dbg (6, imp_sth, "[%02X %02X %02X %02X %02X] ",
+	    (unsigned char)ftp, fln, fpr, fsc, fic);
+	st_dbg (5, imp_sth, "%-.8s\n", fnm);
+	}
+    return (num_fields);
+    } /* dbd_fld_describe */
+
+int dbd_prm_describe (SV *dbh, imp_sth_t *imp_sth, int num_params)
+{
+    dTHX;
+    register	imp_fld_t	*f;
+    register	int		i;
+
+    st_dbg (4, imp_sth, "DBD::Unify::prm_describe %s (%d params)\n", i_sql_nm, num_params);
+
+    unless (num_params > 0 &&
+           (imp_sth->prm = (imp_fld_t *)calloc (num_params, sizeof (imp_fld_t))))
+	return (0);
+
+    for (fix = 1; fix <= num_params; fix++) {
+	f = &imp_sth->prm[fix - 1];
+	EXEC SQL
+	    GET DESCRIPTOR :i_sql_nm
+	    VALUE :fix
+		  :ftp = TYPE,
+		  :fln = LENGTH,
+		  :fpr = PRECISION,
+		  :fic = INDICATOR,
+		  :fsc = SCALE,
+		  :fnl = NULLABLE/*, Core dump on OSF/1 & Solaris
+		  :fnm = NAME     */;
+	unless (sqlError (dbh))
+	    return (0);
+
+	i = sizeof (fnm);
+	while (i && (!fnm[i - 1] || fnm[i - 1] == ' '))
+	    i--;
+	fnm[i] = (char)0;
+	(void)strncpy (f->fnm, fnm, sizeof (fnm));
+
+	if (ftp == SQLNUMERIC && fln > 0 && fln <= 4)
+	    ftp = SQLSMINT;
+
+	f->ftp = ftp;
+	f->fln = fln;
+	f->fpr = fpr;
+	f->fic = fic;
+	f->fsc = fsc;
+	f->fnl = fnl;
+	f->val = &PL_sv_undef;
+	st_dbg (5, imp_sth, "     Field %3d: ", fix);
+	st_dbg (6, imp_sth, "[%02X %02X %02X %02X %02X]",
+	    (unsigned char)ftp, fln, fpr, fsc, fic);
+	st_dbg (5, imp_sth, "\n");
+	}
+    return (num_params);
+    } /* dbd_prm_describe */
+
+int dbd_st_prepare (SV *sth, imp_sth_t *imp_sth, char *statement, SV *attribs)
+{
+    dTHX;
+    SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
+    D_imp_dbh_from_sth;
+
+    unless (DBIc_ACTIVE (imp_dbh))
+	return (0);
+
+    if (strlen (statement) >= MAX_SQL_LEN) {
+	warn ("DBD::Unify::st_prepare (\"%.40s ...\") statement too long",
+	    statement);
+	return (0);
+	}
+
+    unless (imp_sth->id = new_sth_id (dbh))
+	return (0);
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return (0);
+
+    if ((imp_sth->statement = (char *)malloc (strlen (statement) + 2)))
+	(void)strcpy (imp_sth->statement, statement);
+    imp_sth->stat	 = 0;
+    imp_sth->dbd_verbose = dbd_verbose;
+    imp_sth->fld	 = (imp_fld_t *)0;
+    imp_sth->prm	 = (imp_fld_t *)0;
+    imp_sth->unicode     = imp_dbh->unicode;
+
+    if (attribs) {
+	SV **svp;
+	DBD_ATTRIB_GET_IV (attribs, "dbd_verbose", 11, svp, imp_sth->dbd_verbose);
+	DBD_ATTRIB_GET_IV (attribs, "uni_verbose", 11, svp, imp_sth->dbd_verbose);
+	}
+
+    st_dbg (3, imp_sth, "DBD::Unify::st_prepare %s (\"%s\")\n", u_sql_nm, statement);
+
+    dbd_st_diaper (imp_dbh, imp_sth);
+    DBIc_IMPSET_on (imp_sth);
+
+    EXEC SQL
+	ALLOCATE   :c_sql_nm
+	CURSOR FOR :u_sql_nm;
+    if (SQLCODE == -2061)	/* Cannot deallocate allocated cursor, so  */
+	SQLCODE = 0;		/* re-use it (it'll be the same context)   */
+    st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
+    unless (sqlError (sth))
+	return (0);
+    imp_sth->stat |= ST_STAT_ALLOCC;
+
+    (void)strcpy (u_sql_st, statement);
+    EXEC SQL
+	PREPARE :u_sql_nm
+	FROM    :u_sql_st;
+    st_dbg (4, imp_sth, "    After prepare,  sqlcode = %d\n", SQLCODE);
+    unless (sqlError (sth))
+	return (0);
+    imp_sth->stat |= ST_STAT_ALLOCP;
+
+    EXEC SQL
+	ALLOCATE SQL DESCRIPTOR :o_sql_nm
+	WITH MAX 128;
+    st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
+    unless (sqlError (sth))
+	return (0);
+    imp_sth->stat |= ST_STAT_ALLOCO;
+
+    EXEC SQL
+	DESCRIBE OUTPUT      :u_sql_nm
+	USING SQL DESCRIPTOR :o_sql_nm;
+    st_dbg (4, imp_sth, "    After describe, sqlcode = %d\n", SQLCODE);
+    unless (sqlError (sth))
+	return (0);
+
+    EXEC SQL
+	GET   SQL DESCRIPTOR :o_sql_nm
+	:n_sql_st = COUNT;
+    st_dbg (4, imp_sth, "    After count,    sqlcode = %d, count = %d\n", SQLCODE, n_sql_st);
+    unless (sqlError (sth))
+	return (0);
+    DBIc_NUM_FIELDS (imp_sth) = n_sql_st;
+    dbd_fld_describe (dbh, imp_sth, n_sql_st);
+
+    /* Check for positional parameters */
+    {   register char	*src = statement;
+        auto	 int	in_lit = 0;	/* inside "..."		*/
+        auto	 int	in_str = 0;	/* inside '...'		*/
+        auto	 int	in_cmt = 0;	/* inside comment	*/
+        while (*src) {
+            if (*src == '"'  && !in_str && !in_cmt)
+                in_lit = ~in_lit;
+            else
+            if (*src == '\'' && !in_lit && !in_cmt)
+                in_str = ~in_str;
+            else
+            if (*src == '/' && src[1] == '*' && !in_lit && !in_str)
+                in_cmt = 1;
+            else
+            if (in_cmt && *src == '*' && src[1] == '/')
+                in_cmt = 0;
+            if ((*src == '?') && !in_lit && !in_str && !in_cmt)
+                DBIc_NUM_PARAMS (imp_sth)++;
+            src++;
+	    }
+	}
+    if ((n_sql_st = DBIc_NUM_PARAMS (imp_sth)) > 0) {
+	EXEC SQL
+	    ALLOCATE SQL DESCRIPTOR :i_sql_nm
+	    WITH MAX                :n_sql_st;
+	st_dbg (4, imp_sth, "    After allocate, sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+	imp_sth->stat |= ST_STAT_ALLOCI;
+
+	EXEC SQL
+	    DESCRIBE INPUT          :u_sql_nm
+	    USING    SQL DESCRIPTOR :i_sql_nm;
+	st_dbg (4, imp_sth, "    After describe, sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+
+	dbd_prm_describe (dbh, imp_sth, n_sql_st);
+	}
+
+    st_dbg (3, imp_sth, "DBD::Unify::st_prepare %s (<= %d, => %d)\n", u_sql_nm,
+	DBIc_NUM_FIELDS (imp_sth), DBIc_NUM_PARAMS (imp_sth));
+
+    return (1);
+    } /* dbd_st_prepare */
+
+int dbd_bind_ph (SV *sth, imp_sth_t *imp_sth, SV *param, SV *value,
+	IV sql_type, SV *attribs, int is_inout, IV maxlen)
+{
+    dTHX;
+    SV	*dbh = (SV *)DBIc_PARENT_H (imp_sth);
+    D_imp_dbh_from_sth;
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return (0);
+    st_dbg (3, imp_sth, "DBD::Unify::st_bind %s\n", u_sql_nm);
+
+    unless (SvNIOK (param))
+        croak ("DBD::Unify::st_bind: parameter not a number");
+
+    fix = (int)SvIV (param);
+    if (fix < 1 || fix > DBIc_NUM_PARAMS (imp_sth))
+        croak ("DBD::Unify::st_bind: parameter outside range 1..%d",
+            DBIc_NUM_PARAMS (imp_sth));
+
+    st_dbg (3, imp_sth, "\tActive: %d, stat: %04X\n", DBIc_ACTIVE (imp_sth), imp_sth->stat);
+    if (DBIc_ACTIVE (imp_sth) && imp_sth->stat & ST_STAT_OPEN) { /* Re-execute	*/
+	EXEC SQL
+	    CLOSE :c_sql_nm;
+	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+	imp_sth->stat &= ~ST_STAT_OPEN;
+	}
+
+    unless (imp_sth->prm || dbd_prm_describe (dbh, imp_sth, DBIc_NUM_PARAMS (imp_sth))) {
+	croak ("Describe failed during %s->BIND ()", SvPV_nolen (sth));
+	return (0);
+	}
+
+    st_dbg (4, imp_sth, "     Field %3d: ", fix);
+    (void)strcpy (fnm, imp_sth->prm[fix - 1].fnm);
+    fln = imp_sth->prm[fix - 1].fln;
+    ftp = imp_sth->prm[fix - 1].ftp;
+    fln = imp_sth->prm[fix - 1].fln;
+    fpr = imp_sth->prm[fix - 1].fpr;
+    fsc = imp_sth->prm[fix - 1].fsc;
+    fnl = imp_sth->prm[fix - 1].fnl;
+
+    imp_sth->prm[fix - 1].val = value;
+
+    st_dbg (5, imp_sth, "[%02X %02X %02X %02X %02X] ",
+	(unsigned char)ftp, fln, fpr, fsc, fic);
+    st_dbg (4, imp_sth, "%-.8s: ", fnm);
+
+    if (!SvOK (value)) {	/* NULL		*/
+	st_dbg (4, imp_sth, "NULL");
+	EXEC SQL
+	    SET SQL DESCRIPTOR :i_sql_nm
+	    VALUE :fix
+		INDICATOR = -1;
+	st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+	}
+    else {
+	auto	STRLEN	l;
+	switch (ftp) {
+	    case SQLBYTE:
+	    case SQLCHAR: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "%s%6d: ", ftp == SQLBYTE ? "BYTE" : "CHAR", fln);
+		s = SvPV (value, l);
+		if (l > fln)
+		    croak ("DBD::Unify::st_bind: index %d: "
+			"string too long (%d > %d)", fix, (int)l, fln);
+
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen (s), s);
+		(void)memset (fdC, 0x20202020, sizeof (fdC));
+		(void)memcpy (fdC, s, l); fdC[fln] = (char)0;
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdC,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+		}
+
+	    case SQLFLOAT:
+		st_dbg (4, imp_sth, "FLOAT %2d.%1d.%02d: ", fln, fpr, fsc);
+		/* unless looks_like_number (...) carp (...) */
+		fdF = (float)SvNV (value);
+		st_dbg (4, imp_sth, "%8.4f", fdF);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdF,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLCURRENCY:
+	    case SQLREAL:
+	    case SQLDBLPREC:
+		st_dbg (4, imp_sth, "DOUBL %1d.%2d.%02d: ", fln, fpr, fsc);
+		/* unless looks_like_number (...) carp (...) */
+		fdD = (double)SvNV (value);
+		st_dbg (4, imp_sth, "%g", fdD);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdD,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLAMOUNT:
+		st_dbg (4, imp_sth, "AMNT   %d.%d: ", fpr, fsc);
+		fdF = (float)SvNV (value);
+		st_dbg (4, imp_sth, "%8.4f", fdF);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdF,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLHUGEAMT:
+		st_dbg (4, imp_sth, "HAMNT  %d.%d: ", fpr, fsc);
+		fdD = (double)SvNV (value);
+		st_dbg (4, imp_sth, "%8.4f", fdD);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdD,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLSMTIME: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "TIME %2d: ", fpr);
+
+		s = SvPV (value, l);
+		if (strchr (s, ':')) {
+		    if (l > HRLEN)
+			croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, HRLEN, s);
+		    unless (atotime (s, &fdT))
+			croak ("DBD::Unify::st_bind: atotime ('%s') failed", s);
+		    st_dbg (4, imp_sth, "atotime (): (%d) '%s' => %8d", strlen (s), s, fdT);
+		    }
+		else {
+		    /* possible check for SvIV (value) == atoi (s), now that we
+		     * allow differences between striung value and numeric value
+		     */
+		    fdT = (short)SvIV (value);
+		    }
+
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdT,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		}
+		break;
+
+	    case SQLDATE: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "DATE %2d: ", fpr);
+
+		/* trim any surrounding whitespace? */
+		s = SvPV (value, l);
+		if (l > LDATELEN)
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, LDATELEN, s);
+		unless (atold (s, &fdHDT))
+		    croak ("DBD::Unify::st_bind: atold (): bad date: %s", s);
+		if (fdHDT & 0xFFFF0000)
+		    croak ("DBD::Unify::st_bind: atold (): short date overflow: %s", s);
+		fdDT = (UTP_DATE)fdHDT;
+		/*fdDT = (short)SvIV (value);*/
+		st_dbg (4, imp_sth, "atold (): (%d) '%s' => %8d", strlen (s), s, fdDT);
+
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdDT,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		}
+		break;
+
+	    case SQLHDATE: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "HDATE %2d: ", fpr);
+
+		/* trim any surrounding whitespace? */
+		s = SvPV (value, l);
+		if (l > LDATELEN)
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, (int)l, LDATELEN, s);
+		unless (atold (s, &fdHDT))
+		    croak ("DBD::Unify::st_bind: atold (): bad date: %s", s);
+		/*fdHDT = (long)SvIV (value);*/
+		st_dbg (4, imp_sth, "atold (): (%d) '%s' => %8ld", strlen (s), s, fdHDT);
+
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdHDT,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		}
+		break;
+
+	    case SQLDATETIME: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "DATETIME %2d: ", fpr);
+
+		/* trim any surrounding whitespace? */
+		s = SvPV (value, l);
+		if (l > sizeof(fdDTTM) - 1)
+		    croak ("DBD::Unify::st_bind: index %d: string too long (%d > %d) '%s'", fix, l, sizeof (fdDTTM) - 1, s);
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen (s), s);
+		(void)memset (fdDTTM, 0x20202020, sizeof (fdDTTM));
+		(void)memcpy (fdDTTM, s, l); fdDTTM[sizeof (fdDTTM) - 1] = (char)0;
+
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdDTTM,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		}
+		break;
+
+	    case SQLTEXT: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "TEXT: ");
+		s = SvPV (value, l);
+		st_dbg (4, imp_sth, "(%d) '%s'", l, s);
+		fdB.curlen  = l;
+		fdB.dataptr = s;
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdB,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+		}
+
+	    case SQLBINARY: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "BINARY: ");
+		s = SvPV (value, l);
+		st_dbg (4, imp_sth, "(%d) %8X ...", l, s);
+		fdX.curlen  = l;
+		fdX.dataptr = s;
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdX,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+		}
+
+	    case SQLNUMERIC:
+	    case SQLDECIMAL:
+	    case SQLINTEGER:
+		st_dbg (4, imp_sth, "NUMERIC %2d: ", fpr);
+		/* unless looks_like_number (...) carp (...) */
+		fdL = (int)SvIV (value);
+		st_dbg (4, imp_sth, "%8d", fdL);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdL,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLSMINT:
+		st_dbg (4, imp_sth, "NUMERIC %2d: ", fpr);
+		/* unless looks_like_number (...) carp (...) */
+		fdS = (short)SvIV (value);
+		/* Should I warn if integer > 32767 ? */
+		st_dbg (4, imp_sth, "%8d", fdS);
+		EXEC SQL
+		    SET SQL DESCRIPTOR :i_sql_nm
+		    VALUE :fix
+			DATA      = :fdS,
+			INDICATOR = 0;
+		st_dbg (4, imp_sth, "    After set,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (0);
+		break;
+
+	    case SQLNOTYPE:
+		st_dbg (4, imp_sth, "NO TYPE");
+		break;
+
+	    default:
+		croak ("DBD::Unify::st_bind: index %d: "
+		    "unknown field type %d for field '%s'\n", fix, ftp, fnm);
+	    }
+	}
+    st_dbg (4, imp_sth, " ==\n");
+    return (1);
+    } /* dbd_bind_ph */
+
+int dbd_st_execute (SV *sth, imp_sth_t *imp_sth)
+{
+    dTHX;
+    SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
+
+    D_imp_dbh_from_sth;
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return (0);
+    st_dbg (3, imp_sth, "DBD::Unify::st_execute %s\n", u_sql_nm);
+
+    if (DBIc_ACTIVE (imp_sth) && imp_sth->stat & ST_STAT_OPEN) { /* Re-execute	*/
+	EXEC SQL
+	    CLOSE :c_sql_nm;
+	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+	imp_sth->stat &= ~ST_STAT_OPEN;
+	}
+
+    if (DBIc_NUM_FIELDS (imp_sth) == 0) {
+	/* non-select statement: just execute it */
+	st_dbg (3, imp_sth, "DBD::Unify::st_execute - non-select (<= %d, => %d)\n",
+	    DBIc_NUM_FIELDS (imp_sth), DBIc_NUM_PARAMS (imp_sth));
+
+	if (DBIc_NUM_PARAMS (imp_sth) > 0) {
+	    EXEC SQL
+		EXECUTE              :u_sql_nm
+		USING SQL DESCRIPTOR :i_sql_nm;
+	    }
+	else {
+	    EXEC SQL
+		EXECUTE              :u_sql_nm;
+	    }
+	st_dbg (4, imp_sth, "    After execute,  sqlcode = %d (=> %d)\n",
+	    SQLCODE, DBIc_NUM_PARAMS (imp_sth));
+	return (sqlError (sth) ? dbd_st_rows (sth, imp_sth) : -2);
+	}
+
+    if (DBIc_NUM_PARAMS (imp_sth) > 0) {
+	EXEC SQL
+	    OPEN                 :c_sql_nm
+	    USING SQL DESCRIPTOR :i_sql_nm;
+	}
+    else {
+	EXEC SQL
+	    OPEN                 :c_sql_nm;
+	}
+    st_dbg (4, imp_sth, "    After open,     sqlcode = %d (=> %d)\n",
+	SQLCODE, DBIc_NUM_PARAMS (imp_sth));
+    unless (sqlError (sth))
+	return (0);
+    imp_sth->stat |= ST_STAT_OPEN;
+
+    DBIc_ACTIVE_on (imp_sth);
+    return (1);
+    } /* dbd_st_execute */
+
+AV *dbd_st_fetch (SV *sth, imp_sth_t *imp_sth)
+{
+    dTHX;
+    int    num_fields, i;
+    AV     *av;
+    SV     *dbh = (SV *)DBIc_PARENT_H (imp_sth);
+
+    D_imp_dbh_from_sth;
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return (NULL);
+    st_dbg (3, imp_sth, "DBD::Unify::st_fetch %s\n", u_sql_nm);
+
+    unless (DBIc_ACTIVE (imp_sth)) {
+	error (sth, -7, "fetch without open cursor");
+	return (NULL);
+	}
+
+    /* In the next E/SQL a statement like
+     *     "select code from table where field SHLIKE 'v_ab*'"
+     * will dump core in sqldfch ()
+     * affirmed for 6.3AB and 6.3BE
+     */
+    EXEC SQL
+	FETCH                :c_sql_nm
+	USING SQL DESCRIPTOR :o_sql_nm;
+
+    av = DBIc_DBISTATE (imp_sth)->get_fbav (imp_sth);
+    num_fields = AvFILL (av) + 1;
+
+    st_dbg (4, imp_sth, "    Fetched         sqlcode = %d, fields = %d\n",
+	SQLCODE, num_fields);
+
+    if (SQLCODE == UEEOSCN || SQLCODE == -UEEOSCN) {
+	st_dbg (4, imp_sth, "     Fetch done (end of scan)\n");
+	(void)dbd_st_finish (sth, imp_sth);
+	return (NULL);
+	}
+
+    unless (sqlError (sth))
+	return (NULL);
+
+    unless (av_len (av) + 1 == num_fields) {
+	int ro = SvREADONLY (av);
+	if (ro)
+	    SvREADONLY_off (av);
+	for (i = av_len (av) + 1; i < num_fields; i++)
+	    av_store (av, i, newSV (0));
+	if (ro)
+	    SvREADONLY_on (av);
+	}
+
+    unless (imp_sth->fld || dbd_fld_describe (dbh, imp_sth, num_fields)) {
+	croak ("Describe failed during %s->FETCH ()", SvPV_nolen (sth));
+	return (NULL);
+	}
+
+    for (fix = 1; fix <= num_fields; fix++) {
+	auto	imp_fld_t *f  = &imp_sth->fld[fix - 1];
+	auto	SV        *sv = AvARRAY (av)[fix - 1];
+
+	SvREADONLY_off (sv);
+
+	(void)strcpy (fnm, f->fnm);
+	fln = f->fln;
+	ftp = f->ftp;
+	fln = f->fln;
+	fpr = f->fpr;
+	fsc = f->fsc;
+	fnl = f->fnl;
+	EXEC SQL
+	    GET DESCRIPTOR :o_sql_nm
+	    VALUE :fix
+		  :fic = INDICATOR;
+	st_dbg (4, imp_sth, "    After get,      sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (NULL);
+	f->fic = fic;
+	st_dbg (4, imp_sth, "     Field %3d: ", fix);
+	st_dbg (5, imp_sth, "[%02X %02X %02X %02X %02X] ",
+	    (unsigned char)ftp, fln, fpr, fsc, fic);
+	st_dbg (4, imp_sth, "%-.8s: ", fnm);
+	if (fic == -1) {	/* NULL		*/
+	    (void)SvOK_off (sv);
+	    st_dbg (4, imp_sth, "NULL ==\n");
+	    continue;
+	    }
+
+	switch (ftp) {
+	    case SQLBYTE:
+	    case SQLCHAR:
+		st_dbg (4, imp_sth, "%s%6d: ", ftp == SQLBYTE ? "BYTE" : "CHAR", fln);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdC = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		i = fln;
+		if (DBIc_has (imp_sth, DBIcf_ChopBlanks)) {
+		    while (i && (!fdC[i - 1] || fdC[i - 1] == ' '))
+			i--;
+		    }
+		fdC[i] = (char)0;
+		sv_setpvn (sv, fdC, i);
+		if (imp_sth->unicode && is_utf8_string ((U8 *)fdC, i)) {
+		    st_dbg (5, imp_sth, "is UTF8 ");
+		    SvUTF8_on (sv);
+		    }
+		st_dbg (4, imp_sth, "(%d) '%s'", i, SvPVX (sv));
+		break;
+
+	    case SQLFLOAT:
+		st_dbg (4, imp_sth, "FLOAT %2d.%1d.%02d: ", fln, fpr, fsc);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdF = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+#ifdef SET_PV_FOR_NV
+		(void)sprintf (fdC, "%.*f", fsc, fdF);
+		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
+		sv_setnv (sv, (double)fdF);
+		st_dbg (4, imp_sth, "%lf", SvNV (sv));
+		break;
+
+	    case SQLCURRENCY:
+	    case SQLREAL:	/* fpr = 32	*/
+	    case SQLDBLPREC:	/* fpr = 64	*/
+		st_dbg (4, imp_sth, "DOUBL %1d.%02d.%02d: ", fln, fpr, fsc);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdD = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+#ifdef SET_PV_FOR_NV
+		(void)sprintf (fdC, "%f", fdD);
+		{   char *s = strchr (fdC, '.');
+		    if (s) {	/* ".00000" => "", ".125000" => ".125" */
+			int i = strlen (s);
+			while (i > 1 && s[i - 1] == '0') s[--i] = (char)0;
+			if (s[--i] == '.') s[i] = (char)0;
+			}
+		    }
+		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
+		sv_setnv  (sv, fdD);
+		st_dbg (4, imp_sth, "%g (%s)", SvNV (sv), fdC);
+		break;
+
+	    case SQLAMOUNT:
+		st_dbg (4, imp_sth, "AMNT   %d.%d: ", fpr, fsc);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdF = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+#ifdef SET_PV_FOR_NV
+		(void)sprintf (fdC, "%.*f", fsc, fdF);
+		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
+	        sv_setnv  (sv, (double)fdF);
+		st_dbg (4, imp_sth, "%lf (%s)", SvNV (sv), fdC);
+		break;
+
+	    case SQLHUGEAMT:
+		st_dbg (4, imp_sth, "HAMNT  %d.%d: ", fpr, fsc);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdD = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+#ifdef SET_PV_FOR_NV
+		(void)sprintf (fdC, "%.*lf", fsc, fdD);
+		sv_setpvn (sv, fdC, strlen (fdC));
+#endif
+		sv_setnv (sv, fdD);
+		st_dbg (4, imp_sth, "%lf", SvNV (sv));
+		break;
+
+	    case SQLSMTIME: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "TIME %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdT = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		st_dbg (4, imp_sth, "(%d) ", fdT);
+		unless (s = timetoa (fdT))
+		    croak ("DBD::Unify::st_fetch: timetoa (%d) failed", fdT);
+		st_dbg (4, imp_sth, "(%s) ", s);
+		sv_setpvn (sv, s, HRLEN);
+		sv_setiv  (sv, (IV)fdT);
+		SvPOK_on  (sv);
+		SvIOK_on  (sv);
+		st_dbg (4, imp_sth, "(%d) '%s' (%d)", HRLEN, SvPVX (sv), fdT);
+		}
+		break;
+
+	    case SQLDATE:
+		st_dbg (4, imp_sth, "DATE %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdDT = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		st_dbg (4, imp_sth, "(%d) ", fdDT);
+		if (ldtoa ((UTP_HDTE)fdDT, fdC))
+		    croak ("DBD::Unify::st_fetch: ldtoa (%d) failed", fdDT);
+		sv_setpvn (sv, fdC, strlen (fdC));
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen (fdC), SvPVX (sv));
+		/*sv_setiv (sv, (int)fdDT);*/
+		/*st_dbg (4, imp_sth, "%ld", SvIV (sv));*/
+		break;
+
+	    case SQLHDATE:
+		st_dbg (4, imp_sth, "HDATE %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdHDT = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		st_dbg (4, imp_sth, "(%ld) ", (long)fdHDT);
+		if (ldtoa (fdHDT, fdC))
+		    croak ("DBD::Unify::st_fetch: ldtoa (%d) failed", fdHDT);
+		sv_setpvn (sv, fdC, strlen (fdC));
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen (fdC), SvPVX (sv));
+		/*sv_setiv (sv, (long)fdHDT);*/
+		/*st_dbg (4, imp_sth, "%ld", SvIV (sv));*/
+		break;
+
+	    case SQLDATETIME:
+		st_dbg (4, imp_sth, "DATETIME %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdDTTM = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		sv_setpvn (sv, fdDTTM, strlen(fdDTTM));
+		st_dbg (4, imp_sth, "(%d) '%s'", strlen(fdDTTM), SvPVX (sv));
+		break;
+
+	    case SQLTEXT: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "TEXT %2d: ", ftp);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdB = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		i = fdB.curlen;
+		s = fdB.dataptr;
+		if (i && s) {
+#ifdef CHOP_BLANKS_TEXT
+		    if (DBIc_has (imp_sth, DBIcf_ChopBlanks)) {
+			while (i && (!s[i - 1] || s[i - 1] == ' '))
+			    i--;
+			}
+		    s[i] = (char)0;
+#endif
+		    }
+		else {
+		    s = "";
+		    i = 0;
+		    }
+		sv_setpvn (sv, s, i);
+		if (imp_sth->unicode && is_utf8_string ((U8 *)s, i)) {
+		    st_dbg (5, imp_sth, "is UTF8 ");
+		    SvUTF8_on (sv);
+		    }
+		st_dbg (4, imp_sth, "(%d) '%s'", i, SvPVX (sv));
+		break;
+		}
+
+	    case SQLBINARY: {
+		auto	char	*s;
+
+		st_dbg (4, imp_sth, "BINARY %2d: ", ftp);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdX = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		i = fdX.curlen;
+		s = fdX.dataptr;
+		unless (i && s) {
+		    s = "";
+		    i = 0;
+		    }
+		sv_setpvn (sv, s, i);
+		st_dbg (4, imp_sth, "(%d) %8X ...", i, SvPVX (sv));
+		break;
+		}
+
+	    case SQLNUMERIC:
+	    case SQLDECIMAL:
+	    case SQLINTEGER:
+		st_dbg (4, imp_sth, "NUMERIC %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdL = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		st_dbg (4, imp_sth, "(%ld) ", fdL);
+		sv_setiv (sv, fdL);
+		st_dbg (4, imp_sth, "%ld", SvIV (sv));
+		break;
+
+	    case SQLSMINT:
+		st_dbg (4, imp_sth, "NUMERIC %2d: ", fpr);
+		EXEC SQL
+		    GET DESCRIPTOR :o_sql_nm
+		    VALUE :fix
+			  :fdS = DATA;
+		st_dbg (6, imp_sth, "\r\n    After get,      sqlcode = %d\n", SQLCODE);
+		unless (sqlError (sth))
+		    return (NULL);
+		st_dbg (4, imp_sth, "(%d) ", fdS);
+		sv_setiv (sv, (int)fdS);
+		st_dbg (4, imp_sth, "%ld", SvIV (sv));
+		break;
+
+	    case SQLNOTYPE:
+		st_dbg (4, imp_sth, "NO TYPE");
+		(void)SvOK_off (sv);
+		break;
+
+	    default:
+		croak ("DBD::Unify::st_fetch: "
+		    "unknown field type %d for field '%s'\n",
+			ftp, fnm);
+	    }
+	st_dbg (4, imp_sth, " ==\n");
+	}
+
+    st_dbg (4, imp_sth, "     Fetch done\n");
+    return (av);
+    } /* dbd_st_fetch */
+
+int dbd_st_rows (SV *sth, imp_sth_t *imp_sth)
+{
+    dTHX;
+
+    if (SQLCA_HAS (SQL_NROWS))	/* After insert, delete, update ...	*/
+	return (sqlca.nrows);
+    return (0);
+    } /* dbd_st_rows */
+
+int dbd_st_finish (SV *sth, imp_sth_t *imp_sth)
+{
+    dTHX;
+    SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
+
+    D_imp_dbh_from_sth;
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return (0);
+    st_dbg (4, imp_sth, "DBD::Unify::st_finish %s\n", u_sql_nm);
+
+    if (DBIc_ACTIVE (imp_sth)) {
+	EXEC SQL
+	    CLOSE :c_sql_nm;
+	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return (0);
+
+	imp_sth->stat &= ~ST_STAT_OPEN;
+	DBIc_ACTIVE_off (imp_sth);
+	}
+
+    return (1);
+    } /* dbd_st_finish */
+
+void dbd_st_destroy (SV *sth, imp_sth_t *imp_sth)
+{
+    dTHX;
+    SV *dbh = (SV *)DBIc_PARENT_H (imp_sth);
+    D_imp_dbh_from_sth;
+
+    st_dbg (3, imp_sth, "DBD::Unify::st_destroy '%s'\n", imp_sth->statement);
+
+    unless (use_sth_id (dbh, imp_dbh->id, imp_sth->id))
+	return;
+
+    st_dbg (3, imp_sth, "DBD::Unify::st_free %s\n", u_sql_nm);
+
+    if (DBIc_ACTIVE (imp_sth) || imp_sth->stat & ST_STAT_OPEN) {
+     /* warn ("DBD::Unify::st_destroy: Handle still active, will finish first\n");
+	*/
+	EXEC SQL
+	    CLOSE :c_sql_nm;
+	st_dbg (4, imp_sth, "    After close,    sqlcode = %d\n", SQLCODE);
+	unless (sqlError (sth))
+	    return;
+	imp_sth->stat &= ~ST_STAT_OPEN;
+	}
+    st_dbg (7, imp_sth, " destroy allocc");
+    if (imp_sth->stat & ST_STAT_ALLOCC) {
+	/*	UNIFY design flaw? (method doesn't exist)
+	EXEC SQL
+	    DEALLOCATE PREPARE    :c_sql_nm;
+	st_dbg (4, imp_sth, "    After deallocC, sqlcode = %d\n", SQLCODE);
+	if (SQLCODE == -22) SQLCODE = 0;
+	unless (sqlError (sth))
+	    return;
+	*/
+	imp_sth->stat &= ~ST_STAT_ALLOCC;
+	}
+
+    st_dbg (7, imp_sth, " destroy alloco");
+    if (imp_sth->stat & ST_STAT_ALLOCO) {
+	EXEC SQL
+	    DEALLOCATE DESCRIPTOR :o_sql_nm;
+	st_dbg (4, imp_sth, "    After deallocO, sqlcode = %d\n", SQLCODE);
+	if (SQLCODE == -22) SQLCODE = 0;
+	unless (sqlError (sth))
+	    return;
+	imp_sth->stat &= ~ST_STAT_ALLOCO;
+	}
+
+    st_dbg (7, imp_sth, " destroy alloci");
+    if (DBIc_NUM_PARAMS (imp_sth) > 0) {
+	if (imp_sth->stat & ST_STAT_ALLOCI) {
+	    EXEC SQL
+		DEALLOCATE DESCRIPTOR :i_sql_nm;
+	    st_dbg (4, imp_sth, "    After deallocI, sqlcode = %d\n", SQLCODE);
+	    if (SQLCODE == -22) SQLCODE = 0;
+	    unless (sqlError (sth))
+		return;
+	    imp_sth->stat &= ~ST_STAT_ALLOCI;
+	    }
+	DBIc_NUM_PARAMS (imp_sth) = 0;
+	}
+
+    st_dbg (7, imp_sth, " destroy allocp");
+    if (imp_sth->stat & ST_STAT_ALLOCP) {
+	EXEC SQL
+	    DEALLOCATE PREPARE    :u_sql_nm;
+	st_dbg (4, imp_sth, "    After deallocU, sqlcode = %d\n", SQLCODE);
+	if (SQLCODE == -2124) SQLCODE = 0;
+	unless (sqlError (sth))
+	    return;
+	imp_sth->stat &= ~ST_STAT_ALLOCP;
+	}
+
+    st_dbg (7, imp_sth, " destroy stat");
+    if (imp_sth->stat)
+	warn ("DBD::Unify::st_free: Handle stat not clear: 0x%02X\n", imp_sth->stat);
+    else {
+	clr_sth_id (dbh, imp_sth->id);
+	imp_sth->id  = 0;
+	}
+
+    if (imp_sth->statement) {
+	(void)free (imp_sth->statement);
+	imp_sth->statement = (char *)0;
+	}
+    if (imp_sth->fld) {
+	(void)free (imp_sth->fld);
+	imp_sth->fld = (imp_fld_t *)0;
+	}
+    if (imp_sth->prm) {
+	(void)free (imp_sth->prm);
+	imp_sth->prm = (imp_fld_t *)0;
+	}
+
+    st_dbg (7, imp_sth, " destroy growup");
+    dbd_st_growup (imp_dbh, imp_sth);
+
+    st_dbg (7, imp_sth, " destroy impset\n");
+    if (DBIc_has (imp_sth, DBIcf_IMPSET))
+	DBIc_IMPSET_off (imp_sth);
+
+    st_dbg (3, imp_sth, "DBD::Unify::st 0x%08X 0x%04x 0x%04X 0x%08X 0x%08X 0x%08X\n",
+	imp_sth->com, imp_sth->id, imp_sth->stat, imp_sth->statement,
+	imp_sth->fld, imp_sth->prm);
+    st_dbg (3, imp_sth, "DBD::Unify::st destroyed\n");
+    } /* dbd_st_destroy */
+
+int dbd_st_blob_read (SV *sth, imp_sth_t *imp_sth, int field,
+	long offset, long len, SV *destrv, long destoffset)
+{
+    dTHX;
+    NYI ("st_blob_read");
+    return (0);
+    } /* dbd_st_blob_read */
+
+int dbd_st_STORE_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv, SV *valuesv)
+{
+    dTHX;
+    STRLEN kl;
+    char   *key = SvPV (keysv, kl);
+
+    /*
+    st_dbg (4, imp_sth, "DBD::Unify::st_STORE (%s)->{%s}\n", imp_sth->name, key);
+    */
+    if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose"))) {
+	imp_sth->dbd_verbose = SvIV (valuesv);
+	dbg (2, "Set DBD_VERBOSE for STH = %d\n", dbd_verbose);
+	return (TRUE);
+	}
+    if (kl == 11 && strEQ (key, "uni_unicode")) {
+	imp_sth->unicode = SvOK (valuesv) && SvTRUE (valuesv) ? 1 : 0;
+	return (TRUE);
+	}
+
+    return (FALSE); /* no values to store */
+    } /* dbd_st_STORE_attrib */
+
+int uni2sql_type (SQLCOLTYPE t)
+{
+    /* see also perl5/site_perl/5.10.1/x86_64-linux/auto/DBI/dbi_sql.h
+     * and $UNIFY/../include/sqle_usr.h */
+    switch (t) {      /*      ANSI/ODBC  Column type       DBI               */
+	case SQLNOTYPE:  return ( 0); /* -                                   */
+	case SQLCHAR:    return ( 1); /* character, char   SQL_CHAR          */
+	case SQLNUMERIC: return ( 2); /* numeric           SQL_NUMERIC       */
+	case SQLDECIMAL: return ( 3); /* decimal, dec      SQL_DECIMAL       */
+	case SQLCURRENCY:return ( 3); /* currency          SQL_DECIMAL       */
+	case SQLINTEGER: return ( 4); /* integer, int      SQL_INTEGER       */
+	case SQLSMINT:   return ( 5); /* smallint          SQL_SMALLINT      */
+	case SQLFLOAT:   return ( 6); /* float             SQL_FLOAT         */
+	case SQLAMOUNT:  return ( 6); /* amount            -                 */
+	case SQLREAL:    return ( 7); /* real              SQL_REAL          */
+	case SQLHUGEAMT: return ( 7); /* huge amount       -                 */
+	case SQLDBLPREC: return ( 8); /* double precision  SQL_DOUBLE        */
+
+	case SQLDATE:    return ( 9); /* date              SQL_DATE          */
+	case SQLHDATE:   return ( 9); /* huge date         SQL_DATE          */
+	case SQLSMTIME:  return (10); /* time              SQL_TIME          */
+	case SQLDATETIME:return (11); /* datetime          SQL_TIMESTAMP     */
+	              /*         12                        SQL_VARCHAR       */
+	              /*         16                        SQL_BOOLEAN       */
+	case SQLTEXT:    return (-1); /* text              SQL_LONGVARCHAR   */
+	case SQLBYTE:    return (-2); /* byte              SQL_BINARY        */
+	case SQLBINARY:  return (-3); /* binary            SQL_VARBINARY     */
+		      /*         -4                        SQL_LONGVARBINARY */
+	case SQLINT64:   return (-5); /* huge integer      SQL_BIGINT        */
+		      /*         -6                        SQL_TINYINT       */
+	              /*         -7                        SQL_BIT           */
+	}
+    dbg (4, "No ANSI support for type %d\n", t);
+    /* No (official) support for
+     * -18 SQLAMT64  CURRENCY, GIANT AMOUNTS
+     * -17 SQLINT64  HUGE INTEGER (on 32bit systems)
+     */
+    return (0);       /*                 -                 SQL_UNKNOWN_TYPE  */
+    } /* uni2sql_type */
+
+SV *dbd_st_FETCH_attrib (SV *sth, imp_sth_t *imp_sth, SV *keysv)
+{
+    dTHX;
+    STRLEN kl;
+    char   *key = SvPV (keysv, kl);
+    int    i, p;
+    SV     *retsv = NULL;
+    int    cacheit = TRUE;
+
+    if (kl == 13 && strEQ (key, "NUM_OF_PARAMS"))	/* handled by DBI */
+	return (NULL);
+
+    unless (imp_sth->fld)
+	return (NULL);
+
+    i = DBIc_NUM_FIELDS (imp_sth);
+    p = DBIc_NUM_PARAMS (imp_sth);
+
+    if (kl == 11 && (strEQ (key, "uni_verbose") || strEQ (key, "dbd_verbose"))) {
+	retsv = newSViv (imp_sth->dbd_verbose);
+	}
+    else
+    if (kl == 11 && strEQ (key, "uni_unicode")) {
+	retsv = newSViv (imp_sth->unicode);
+	}
+    else
+    if (kl == 4 && strEQ (key, "NAME")) {
+	AV *av = newAV ();
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
+	while (--i >= 0)
+	    av_store (av, i, newSVpv (imp_sth->fld[i].fnm, 0));
+	}
+    else
+    if (kl == 4 && strEQ (key, "TYPE")) {
+	AV *av = newAV ();
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
+	while (--i >= 0)
+	    av_store (av, i, newSViv (uni2sql_type (imp_sth->fld[i].ftp)));
+	}
+    else
+    if (kl == 8 && strEQ (key, "uni_type")) {
+	AV *av = newAV ();
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
+	while (--i >= 0)
+	    av_store (av, i, newSViv (imp_sth->fld[i].ftp));
+	}
+    else
+    if (kl == 9 && strEQ (key, "PRECISION")) {
+	AV *av = newAV ();
+	retsv  = newRV_inc (sv_2mortal ((SV *)av));
+	while (--i >= 0)
+	    av_store (av, i, newSViv (imp_sth->fld[i].ftp == 1
+				    ? imp_sth->fld[i].fln
+				    : imp_sth->fld[i].fpr));
+	}
+    else
+    if (kl == 5 && strEQ (key, "SCALE")) {
+	AV *av = newAV ();
+	retsv  = newRV (sv_2mortal ((SV *)av));
+	while (--i >= 0)
+	    av_store (av, i, newSViv (imp_sth->fld[i].fsc));
+	}
+    else
+    if (kl == 8 && strEQ (key, "NULLABLE")) {
+	AV *av = newAV ();
+	retsv  = newRV (sv_2mortal ((SV *)av));
+	while (--i >= 0)	/* Completely unreliable */
+	    av_store (av, i, newSViv (2 /* imp_sth->fld[i].fnl */));
+	}
+    else
+    if (kl == 10 && strEQ (key, "CursorName")) {
+	char c_nm[16];
+
+	D_imp_dbh_from_sth;
+	(void)sprintf (c_nm, "c_sql_%02d_%06d", imp_dbh->id, imp_sth->id);
+	retsv = newSVpv (c_nm, 0);
+	}
+    else
+    if (kl == 11 && strEQ (key, "RowsInCache")) {
+	retsv = newSViv (0);
+	}
+    else
+    if (kl == 11 && strEQ (key, "ParamValues")) {
+	HV *hv = newHV ();
+	retsv  = newRV (sv_2mortal ((SV *)hv));
+	while (--p >= 0) {
+	    char key[8];
+	    SV *sv = imp_sth->prm[p].val;
+	    sprintf (key, "%d", p + 1);
+	    if (SvOK (sv))	SvREFCNT_inc (sv);
+	    else		sv = &PL_sv_undef;
+	    (void)hv_store (hv, key, strlen (key), sv, 0);
+	    }
+	}
+    else
+    if (kl == 10 && strEQ (key, "ParamTypes")) {
+	HV *hv = newHV ();
+	retsv  = newRV (sv_2mortal ((SV *)hv));
+	while (--p >= 0) {
+	    char key[8];
+	    sprintf (key, "%d", p + 1);
+	    (void)hv_store (hv, key, strlen (key), newSViv (imp_sth->prm[p].ftp), 0);
+	    }
+	}
+    else
+	return (NULL);
+
+    if (cacheit) { /* cache for next time (via DBI quick_FETCH)	*/
+	SV **svp = hv_fetch ((HV *)SvRV (sth), key, kl, 1);
+	sv_free (*svp);
+	*svp = retsv;
+	(void)SvREFCNT_inc (retsv);	/* so sv_2mortal won't free it	*/
+	}
+    return (sv_2mortal (retsv));
+    } /* dbd_st_FETCH_attrib */

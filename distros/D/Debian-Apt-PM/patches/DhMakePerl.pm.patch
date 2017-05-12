@@ -1,0 +1,27 @@
+diff -Naur DhMakePerl.orig/DhMakePerl.pm DhMakePerl/DhMakePerl.pm
+--- DhMakePerl.orig/DhMakePerl.pm	2010-02-19 13:36:58.000000000 +0100
++++ DhMakePerl/DhMakePerl.pm	2010-02-22 18:40:12.000000000 +0100
+@@ -65,6 +65,8 @@
+ use WWW::Mechanize ();
+ use YAML           ();
+ use version qw( qv );
++use Debian::Apt::PM;
++our $aptpm = Debian::Apt::PM->new();
+ 
+ # TODO:
+ # * get more info from the package (maybe using CPAN methods)
+@@ -1131,9 +1133,11 @@
+             $dep = Debian::Dependency->new( 'perl',
+                 $self->nice_perl_ver( $dep_hash->{$module} ) );
+         }
+-        elsif ($apt_contents) {
+-            $dep = $apt_contents->find_perl_module_package( $module,
+-                $dep_hash->{$module} );
++        else {
++            my $info = $aptpm->find($module, $dep_hash->{$module});
++            if ($info and $info->{'min'}) {
++                $dep = Debian::Dependency->new( $info->{'min'}->{'package'}, $info->{'min'}->{'version'} );
++            }
+         }
+ 
+         if ($dep) {

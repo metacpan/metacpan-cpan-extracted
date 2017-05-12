@@ -1,0 +1,122 @@
+code_set	country	country	0	
+code_set	currency	currency	0	
+code_set	day	day	0	
+code_set	month	month	0	
+country	ae	United Arab Emirates	0	
+country	ag	Antigua and Barbuda	0	
+country	an	Netherlands Antilles	0	
+country	ar	Argentina	0	
+country	at	Austria	0	
+country	au	Australia	0	
+country	bb	Barbados	0	
+country	be	Belgium	0	
+country	bm	Bermuda	0	
+country	br	Brazil	0	
+country	bs	Bahamas	0	
+country	ca	Canada	0	
+country	ch	Switzerland	0	
+country	cl	Chile	0	
+country	cn	China	0	
+country	co	Colombia	0	
+country	cr	Costa Rica	0	
+country	cu	Cuba	0	
+country	cz	Czech Republic	0	
+country	de	Germany	0	
+country	dk	Denmark	0	
+country	do	Dominican Republic	0	
+country	ec	Ecuador	0	
+country	eg	Egypt	0	
+country	es	Spain	0	
+country	et	Ethiopia	0	
+country	fi	Finland	0	
+country	fr	France	0	
+country	gb	United Kingdom	0	
+country	gd	Grenada	0	
+country	gp	Guadeloupe	0	
+country	gr	Greece	0	
+country	gt	Guatemala	0	
+country	gu	Guam	0	
+country	hk	Hong Kong SAR, PRC	0	
+country	hn	Honduras	0	
+country	hu	Hungary	0	
+country	id	Indonesia	0	
+country	ie	Republic of Ireland	0	
+country	il	Israel	0	
+country	is	Iceland	0	
+country	it	Italy	0	
+country	jm	Jamaica	0	
+country	jp	Japan	0	
+country	ke	Kenya	0	
+country	kh	Cambodia	0	
+country	kn	Saint Kitts and Nevis	0	
+country	kr	South Korea	0	
+country	kw	Kuwait	0	
+country	la	Laos	0	
+country	lb	Lebanon	0	
+country	lk	Sri Lanka	0	
+country	lu	Luxembourg	0	
+country	ma	Morocco	0	
+country	mc	Monaco	0	
+country	mo	Macau	0	
+country	ms	Montserrat	0	
+country	mw	Malawi	0	
+country	mx	Mexico	0	
+country	my	Malaysia	0	
+country	ng	Nigeria	0	
+country	ni	Nicaragua	0	
+country	nl	Netherlands, The	0	
+country	no	Norway	0	
+country	nz	New Zealand	0	
+country	pe	Peru	0	
+country	ph	Philippines	0	
+country	pl	Poland	0	
+country	pr	Puerto Rico	0	
+country	pt	Portugal	0	
+country	ru	Russian Federation	0	
+country	se	Sweden	0	
+country	sg	Singapore	0	
+country	tc	Turks and Caicos Islands	0	
+country	th	Thailand	0	
+country	tr	Turkey	0	
+country	tt	Trinidad and Tobago	0	
+country	tw	Taiwan Region	0	
+country	tz	Tanzania	0	
+country	us	United States	0	
+country	uy	Uruguay	0	
+country	vc	Saint Vincent and the Grenadines	0	
+country	ve	Venezuela	0	
+country	vg	Virgin Islands (British)	0	
+country	vi	Virgin Islands (US)	0	
+country	vn	Vietnam	0	
+country	za	South Africa	0	
+currency	ats	Austrian Schillings	0	
+currency	bef	Belgian Francs	0	
+currency	cad	Canadian Dollars	0	
+currency	dem	Deutsche Marks	0	
+currency	esp	Spanish Pesetas	0	
+currency	frf	French Francs	0	
+currency	gbp	United Kingdom Pounds	0	
+currency	iep	Irish Punts	0	
+currency	itl	Italian Lire	0	
+currency	jpy	Japanese Yen	0	
+currency	nlg	Dutch Guilders	0	
+currency	usd	United States Dollars	0	
+day	1	Monday	1	
+day	2	Tuesday	2	
+day	3	Wednesday	3	
+day	4	Thursday	4	
+day	5	Friday	5	
+day	6	Saturday	6	
+day	7	Sunday	7	
+month	1	January	1	
+month	10	October	10	
+month	11	November	11	
+month	12	December	12	
+month	2	February	2	
+month	3	March	3	
+month	4	April	4	
+month	5	May	5	
+month	6	June	6	
+month	7	July	7	
+month	8	August	8	
+month	9	September	9	

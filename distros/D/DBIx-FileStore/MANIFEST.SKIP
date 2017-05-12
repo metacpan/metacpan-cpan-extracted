@@ -1,0 +1,9 @@
+tags
+CVS
+mkmanifest
+MANIFEST.SKIP
+RELEASE_CHECKLIST
+.*\.bak # backup files
+.*\.gz  # tarballs
+\..*    # dotfiles
+

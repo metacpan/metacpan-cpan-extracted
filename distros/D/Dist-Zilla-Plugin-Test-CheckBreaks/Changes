@@ -1,0 +1,69 @@
+Revision history for Dist-Zilla-Plugin-Test-CheckBreaks
+
+0.018     2017-04-17 00:24:22Z
+          - fixed use of skip(..., 0) so messages are properly displayed
+
+0.017     2016-10-17 05:49:20Z
+          - the 'conflicts_module' option can now be used more than once.
+
+0.016     2016-01-28 03:25:40Z
+          - use TODO around tests that fail on perl 5.8.x due to the buggy
+            handling of qr/...$/m
+
+0.015     2016-01-27 02:44:24Z
+          - fix missing check for required version of CPAN::Meta::Check when
+            using "no_forced_deps" option
+          - tests are now quieter to avoid causing confusion, by suppressing
+            the output of faked breakage tests
+
+0.014     2015-12-24 22:32:26Z
+          - new configuration option "no_forced_deps", suitable for
+            distributions with restricted prerequisites
+          - removed need for Test::More 0.88 in generated test
+
+0.013     2015-10-08 00:21:04Z
+          - bump up the prerequisite for CPAN::Meta::Check, to get fixes for
+            its prereq specifications
+
+0.012     2015-03-29 23:46:18Z
+          - now using Dist::Zilla::Role::ModuleMetadata to use a cached object
+            for efficiency
+
+0.011     2014-08-30 03:04:56Z
+          - removed bunk test prereqs from version 0.010
+
+0.010     2014-08-27 03:06:27Z
+          - inject more accurate test prerequisites into the distribution
+          - improved tests and metadata
+
+0.009     2014-07-02 03:25:05Z
+          - define a specific version needed for Module::Metadata, for the
+            interfaces we use
+
+0.008     2014-06-27 16:35:50Z
+          - minor documentation fixes and metadata tweaks
+
+0.007     2014-02-23 00:39:22Z
+          - avoid adding an empty x_breaks field to metadata
+
+0.006     2014-02-16 03:02:30Z
+          - compatibility fix for older Dist::Zilla (that lacks knowledge of
+            file encodings)
+
+0.005     2014-02-12 05:12:42Z
+          - fix failing test with old Test::More
+          - fix invalid munging of bare version numbers in metadata
+
+0.004     2014-02-11 06:28:29Z
+          - keep usage of ::Conflicts module inside an eval to protect against
+            blowing up when a conflicting module fails to compile
+
+0.003     2014-02-11 06:13:34Z
+          - remove invalid assumption that [Breaks] is installed by inlining a
+            stripped down version into the necessary test
+
+0.002     2014-02-10 02:14:48Z
+          - fix error in how conflicts module was being loaded in the test
+
+0.001     2014-02-10 01:21:15Z
+          - Initial release.

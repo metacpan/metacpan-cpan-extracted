@@ -1,0 +1,39 @@
+DateTimeX-ymdhms version 0.0.2
+
+Adds the methods ymdhms and ymdhm to DateTime objects so that you can
+now easily do $dt->ymdhms to produce "date time"
+presentations. (Basically ISO-8601 without the T).
+
+Its a bit long - 6 chars - but its easy to remember because its the
+combination of "ymd" and "hms"
+
+Also adds ymdhm, same as above only without seconds.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Torbjørn Lindahl
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

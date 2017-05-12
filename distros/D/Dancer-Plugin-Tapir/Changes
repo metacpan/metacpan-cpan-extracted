@@ -1,0 +1,29 @@
+Revision history for Dancer-Plugin-Tapir
+
+v0.04  Tue, 9 Oct 2012 23:35:42 -0400
+
+ - Bump version
+ - Remove whitespace from the route
+ - Rename setup_thrift_handler to setup_tapir_handler
+ - Convert indentation from tabs to spaces
+
+v0.03  Tue, 2 Oct 2012 14:51:31 -0400
+
+ - New version
+ - Update tests to reflect error codes
+ - Better exception handling
+ - Better error handling; actually decode the JSON payload
+
+v0.02  Mon, 1 Oct 2012 09:58:23 -0400
+
+ - New build
+ - Lots of improvements
+ - Merge branch 'master' of github.com:ewaters/dancer-plugin-tapir
+ - Use Capture::Tiny instead of IO::Capture
+ - More test work
+ - Move tests around
+ - More build files
+ - Build files
+ - Remove mention of LICENSE file
+ - Initial commit; brought over from tapir repo
+

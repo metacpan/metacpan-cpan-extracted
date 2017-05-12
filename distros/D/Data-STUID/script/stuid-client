@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+use strict;
+use Data::STUID::Client;
+use Getopt::Long;
+
+my $p = Getopt::Long::Parser->new;
+$p->configure(qw(
+    posix_default
+    no_ignore_case
+    auto_help
+));
+my %opts;
+my @optspec = qw(
+    server=s@
+);
+
+if (! $p->getoptions(\%opts, @optspec)) {
+    exit 1;
+}
+
+$opts{servers} = delete $opts{server};
+my $client = Data::STUID::Client->new(%opts);
+print $client->fetch_id, "\n";
+
+__END__
+
+=head1 NAME
+
+stuid-server - STUID ID Generator Client
+
+=head1 SYNOPSIS
+
+    stuid-client --server=... --server=...
+
+=cut
+

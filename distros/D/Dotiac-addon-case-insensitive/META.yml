@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Dotiac-addon-case-insensitive
+version:             0.4
+abstract: |-
+  Make all variablenames in Dotiac case-insensitive.
+license:             mit
+generated_by:        hand
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL: 0.5
+build_requires:
+    Test::More: 0
+    Test::Pod:  0
+provides:
+   Dotiac::DTL::Addon::case_insensitive:
+     file: lib/Dotiac/DTL/Addon/case_insensitive.pm
+     version: 0.4
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

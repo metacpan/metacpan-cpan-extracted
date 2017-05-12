@@ -1,0 +1,6 @@
+name = "Devel-Mutator"
+# badges = ["travis"]
+authority="cpan:VTI"
+
+module_maker="ModuleBuildTiny"
+

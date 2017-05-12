@@ -1,0 +1,9 @@
+#!/usr/bin/perl
+
+my $class = 'Distribution::Cooker';
+
+eval "require $class";
+
+$class->run( @ARGV );
+
+1;

@@ -1,0 +1,172 @@
+Revision history for DBIx-SecureCGI
+
+v3.0.0  2016-02-19 16:51:53 EET
+	- Switch to Dist::Milla.
+	- Use Test::Database.
+
+2.0.7   2014-12-24 11:42:03 EET
+	- fix dependencies, closes RT #85724
+
+2.0.6   2014-11-26 07:02:54 EET
+	- fix tests portability
+
+2.0.5   2013-05-20 18:51:55 EEST
+	- improve compatibility with CPAN Testers
+
+2.0.4   2013-05-10 15:07:07 EEST
+	- fix tests
+
+2.0.3	2013-04-30 02:52:19 EEST
+	- improve doc
+
+2.0.2	2013-04-30 00:32:33 EEST
+	- improve doc
+
+2.0.1	2013-04-29 14:23:44 EEST
+	- fix test
+	- fix Build.PL
+
+2.0.0	2013-04-26 21:43:13 EEST
+	- Initial public release.
+	- Module renamed to DBIx::SecureCGI.
+	- A lot of incompatible API changes, renames.
+	- Removed _cdate and _mdate magic.
+	- Errors returned in usual for DBI way.
+	- Added support for AnyEvent::DBI::MySQL.
+	- Added LEFT JOIN support.
+	- Added LIMIT support.
+	- Added tests.
+
+1.70.3	2013-03-26 03:59:35 EET
+	- convert POD to utf-8
+
+1.70.1	2009-11-14 21:00:45 EET
+	- bugfix: memory leak when $dbh disconnected
+
+1.70.0  2006-06-02 02:13:39 EEST
+        - bugfix: table and field names now properly escaped
+        - bugfix: field names ended with "_" used with "__function"
+          now detected corectly
+
+	[INCOMPATIBLE CHANGES]
+	- table/field names in {INNER}, {FieldList}, etc. now looks like
+	    " `table`.`field` "
+	  instead of
+	    " table.field "
+
+1.61    2005-12-20 13:57:41 EET
+        - replaced die() with croak()
+
+1.60    2005-11-02 01:32:00 EET
+        - switched from POWER::lib to POWER::Utils
+
+1.52    2005-10-30 04:08:17 EET
+        - update for POWER::lib 2.51.0
+
+1.51    2005-01-20 16:59:57 EET
+        - InsertIgnore() doesn't return LAST_INSERT_ID() anymore
+          because MySQL doesn't correctly set it after INSERT IGNORE
+
+1.50    2005-01-08 17:58:01 EET
+        - added InsertIgnore()
+        - SELECT LAST_INSERT_ID() replaced by $dbh->{mysql_insertid}
+
+1.42    2005-01-08 00:25:24 EET
+        - minor fix to support 'use strict;'
+
+1.41    2004-09-26 16:49:52 EEST
+        - bugfix in ID()
+
+1.40    2003-09-17 19:36:12 EEST
+        - __eq and __ne for ARRAYREF now correctly handle
+          undef inside that ARRAY
+        - add BUGS section to doc
+
+        [INCOMPATIBLE CHANGES]
+        - field__ne=>["Y"] now will also select records with
+          field IS NULL
+
+1.33    2003-05-25 01:54:32 EEST
+        - minor fixes for `perl -w` mode
+
+1.32    2002-11-11 04:31:49 EET
+        - Delete() теперь возвращает кол-во удаленных записей
+          как это делает $dbh->do()
+          (первая версия с багом - 1.00)
+        - Исправлен баг приводящий к появлению в {DB} таблицы ''
+          (первая версия с багом - 1.31)
+        - Возвращаемый P2SQL() хеш теперь не содержит указателей
+          на содержимое глобального %DESC, так что его теперь можно
+          безопасно изменять
+
+1.31    2002-11-10 18:11:22 EET
+        - поддержка TEMPORARY таблиц
+
+1.30    2002-06-15 05:15:18 EEST
+        - НЕСОВМЕСТИМОСТЬ: ссылка на массив в значении ключа недопустима
+          для ключей "имяполя"
+        - НЕСОВМЕСТИМОСТЬ: требуется ключ -force для выполнения Update()
+          и Delete() с пустой частью WHERE
+        - при ошибке вместо продолжения работы вызывается die()
+        - исправлен список соглашений
+        - дополнена pod документация
+        - minor bugfix: функция __inc попадала в часть WHERE в Delete() и
+          всех Select()
+
+1.20    2002-04-16 12:27:53 EEST
+        - обновлена документация
+        - добавлены тесты
+
+1.11    2002-04-02 18:45:41 EEST
+        - в {FieldAND} и {Update} правильно = NULL и != NULL
+          заменяется на IS NULL и IS NOT NULL
+
+1.10    2002-03-30 23:53:42 EET
+        - новый ключ {Select} в P2SQL
+        - в Select() поля выбираются не по "*", а по {Select},
+          это дает ГАРАНТИЮ, что если поле с одинаковым именем
+          встречается в нескольких таблицах, это поле будет
+          взято из первой из этих таблиц.
+
+1.08    2002-03-30 16:52:13 EET
+        - добавлена функция __B<setdate> для установки даты
+          относительно NOW() в Insert() или Update()
+
+1.07    2002-03-27 02:25:18 EET
+        - все операторы "not" заменены на "!" - для совместимости с
+          perl 5.005_03
+
+1.06    2002-03-25 15:54:53 EET
+        - исправлены функции __B<eq> и __B<ne> для корректной работы
+          при передаче в них ссылки на пустой список
+        - исправлена ошибка из-за которой иногда определялись не все
+          нужные таблицы при Delete(undef, $P)
+        - сделано уточнение имени таблицы для полей из -order и -group
+          для избежания неоднозначности
+
+1.05    2002-03-24 01:31:32 EET
+        - теперь нельзя передать значение для _cdate и _mdate
+
+1.04    2002-03-23 16:24:16 EET
+        - исправлена ошибка из-за которой не проходили проверку типа
+          и отбрасывались все проверки даты
+
+1.03    2002-03-22 16:48:19 EET
+        - добавлена фукнция __B<inc>
+
+1.02    2002-03-20 13:50:16 EET
+        - удалена функция __B<btw>
+        - реализован IN на базе __B<eq> и __B<ne>
+        - передача ссылки на список во все фукнции кроме __B<eq>
+          и __B<ne> преобразуется в обработку функцией по очереди
+          всех элементов списка
+
+1.01    2002-03-17 23:19:20 EET
+        - bugfix: игнорировались значения -order и -group без ASC|DESC
+        - bugfix: принимались значения -order и -group
+          для несуществующих полей
+        - добавлены функции __B<like> и __B<notlike>
+        - добавлены функции __B<contain> и __B<notcontain>
+
+1.00    2002-03-15 16:52:30 EET
+        - first release

@@ -1,0 +1,11 @@
+/.build
+/Dist-Zilla-Plugin-Readme-Brief-*
+/tmp/
+/MYMETA.json
+/MYMETA.yml
+/META.json
+/META.yml
+/Makefile
+/Makefile.old
+/blib/
+/pm_to_blib

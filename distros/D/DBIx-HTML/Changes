@@ -1,0 +1,71 @@
+Revision history for DBIx-HTML
+
+1.03
+    - update copyright date
+    - require minimum Spreadsheet::HTML v1.20
+
+1.02
+    - update copyright date
+    - fix bug tracker location
+    - fixed test s/animate/scroll/
+    - require minimum Spreadsheet::HTML v1.16
+
+1.01
+    - fix 1.00 tarball name mistake
+
+1.00
+    - replace AUTLOAD with literal subs
+    - replaced carp with croak where applicable
+    - require minimum Spreadsheet::HTML v1.02
+
+0.15
+    - more tests (ensure presets work)
+    - require minimum Spreadsheet::HTML v0.42
+
+0.14
+    - updated slug
+    - updated pod structure
+    - require minimum Spreadsheet::HTML v0.39
+
+0.13
+    - added github info to Makefile
+    - depend on minimum Spreadsheet::HTML version of 0.37
+
+0.12
+    - removed tests that used deprecated Spreadsheet::HTML methods
+
+0.11
+    - depend on minimum Spreadsheet::HTML version of 0.17
+    - tests require DBD::CSV 0.48 but build does not
+
+0.10
+    - corrected Makefile dependencies
+
+0.09
+    - auto cache => 1
+    - auto format headers
+    - using AUTOLOAD to delegate Spreadsheet::HTML methods
+
+0.08
+    - able to pass attrs to Spreadsheet::HTML
+
+0.07
+    - fixed Makefile; generate() delegates tag attrs
+
+0.06
+    - fixed distro tests/manifest  
+
+0.05
+    - moving install test out of distro
+
+0.04
+    - fixed tardist manifest
+
+0.03
+    - now stands alone (uses only DBI and Spreadsheet::HTML)
+
+0.02
+    - merge DBIx::XHTML and Spreadsheet:HTML
+
+0.01
+    - First version, released on an unsuspecting world.

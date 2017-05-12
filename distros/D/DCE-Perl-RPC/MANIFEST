@@ -1,0 +1,5 @@
+MANIFEST
+README
+Makefile.PL
+lib/DCE/Perl/RPC.pm
+t/RPC.t

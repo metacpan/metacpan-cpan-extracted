@@ -1,0 +1,4 @@
+use FindBin::libs;
+use Devel::SharedLibs;
+
+__END__

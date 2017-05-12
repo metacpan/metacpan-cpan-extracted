@@ -1,0 +1,39 @@
+---
+abstract: 'Substitutions for files in dzil'
+author:
+  - 'Leon Timmermans <leont@cpan.org>'
+build_requires:
+  Path::Tiny: '0'
+  Test::DZil: '0'
+  Test::More: '0.88'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.007'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Substitute
+provides:
+  Dist::Zilla::Plugin::Substitute:
+    file: lib/Dist/Zilla/Plugin/Substitute.pm
+    version: '0.006'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::FileFinderUser: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  List::Util: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  MooseX::Types::Moose: '0'
+  perl: '5.006'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Substitute
+  repository: git://github.com/Leont/dist-zilla-plugin-substitute.git
+version: '0.006'
+x_contributors:
+  - 'Karen Etheridge <ether@cpan.org>'
+  - 'Leon Timmermans <fawaka@gmail.com>'

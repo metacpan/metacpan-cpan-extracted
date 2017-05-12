@@ -1,0 +1,79 @@
+Revision history for Date-Easy
+
+0.03      2017-02-21 19:45:46-08:00 America/Los_Angeles
+
+	[Promote to Full Version]
+
+0.02_01   2017-02-09 15:27:17-08:00 America/Los_Angeles (TRIAL RELEASE)
+
+    [New Features]
+    * New `add_months` method
+    * New `iso8601` method (and `iso` alias)
+
+    [Interface Changes]
+    * Have `as` able to recognize a string like '-Ymd'
+      (same as `strftime('%Y-%m-%d')`)
+
+    [Docs]
+    * Make all method headers consistent (show arguments)
+
+0.02      2016-06-25 02:00:48-07:00 America/Los_Angeles
+
+    [New Features]
+    * New `time_zone` method
+
+    [Interface Changes]
+    * Make `add` and `subtract` in ::Date private methods
+      (this fixes POD coverage tests)
+
+    [Distro Fixes]
+    * Stop using `\h` in test regexen because 5.8 doesn't recognize it
+
+    [Docs]
+    * Added basic POD
+
+0.01_03   2016-05-25 22:43:31PDT-0700 America/Los_Angeles (TRIAL RELEASE)
+
+    [Bug Fixes]
+    * The "%s" format specifier now always returns the same value as the
+      epoch method, regardless of what the underlying implementation thinks
+
+    [Distro Fixes]
+    * Fixed `strftime` unit tests being locked to the author's timezone
+      github #6 (thx Slaven Rezić (SREZIC))
+    * Removed check for "%p" in `strftime` test because it's locale-specific
+      github #7 (thx Slaven Rezić (SREZIC))
+
+0.01_02   2016-05-22 01:48:55PDT-0700 America/Los_Angeles (TRIAL RELEASE)
+
+    [Interface Changes]
+    * ::Date and ::Datetime now have accessors that follow the UI of
+      DateTime rather than Time::Piece
+    * ::Date and ::Datetime no longer inherit from Time::Piece
+
+    [Distro Fixes]
+    * Fixed multiple cases of datetimes not matching due to clock rolling over
+      github #4 (thx Slaven Rezić (SREZIC))
+    * Fixed out-of-range tests on 32-bit machines
+      github #3 (thx Slaven Rezić (SREZIC))
+    * Fixed bug where List::Util might be too low a version during testing
+      github #5 (thx Slaven Rezić (SREZIC))
+
+0.01_01   2016-04-16 18:52:35-07:00 America/Los_Angeles (TRIAL RELEASE)
+
+    [Bug Fixes]
+    * Correct the bug whereby handing off to Time::ParseDate::parsedate
+      used the wrong DST flag
+
+    [Distro Fixes]
+    * Incorrect issues link fixed
+    * Now prints timezone info to help identify smoker problems
+      (thx Andreas Koenig (ANDK)!)
+    * Added author test for parsing dates in all timezones
+      (should provide better test coverage on release)
+    * Marked bogusly failing datetime test as TODO
+      (see also: https://github.com/muir/Time-modules/issues/8)
+
+0.01      2016-03-07 01:22:16PST-0800 America/Los_Angeles
+
+    * initial version

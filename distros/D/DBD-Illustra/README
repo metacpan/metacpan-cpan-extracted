@@ -1,0 +1,54 @@
+################################################################################
+#
+#   File name: README
+#   Project: DBD::Illustra
+#   Description: README file
+#
+#   Author: Peter Haworth
+#   Date created: 11/08/1998
+#
+#   sccs version: 1.9    last changed: 10/13/99
+#
+#   Copyright (c) 1998 Institute of Physics Publishing
+#   You may distribute under the terms of the Artistic License,
+#   as distributed with perl, with the exception that it cannot be placed
+#   on a CD-ROM or similar media for commercial distribution without the
+#   prior approval of the author.
+#
+################################################################################
+
+This is version 0.04 of DBD::Illustra.
+
+Changes from version 0.03:
+  * Included dbd-illustra.pod. This is the text describing Illustra from
+    Tim Bunce and Alligator Descartes' book about DBI, although it's not
+    going to be included now, due to Illustra's unpopularity
+  * Support for bind parameters
+  * Support for reading large objects
+  * Return correct number of rows in all cases
+  * Partial $sth->{TYPE} support
+
+INSTALLING
+
+What you need to install this module:
+	Perl version 5.004 or later
+	DBI version 1.0 or later
+	Illustra client library and include files
+	An ANSI C compiler
+
+If the environment variable $MI_HOME is not set, Makefile.PL will look in a
+couple of likely places (currently /opt/illustra and /usr/local/illustra). It
+is looking for the directories $MI_HOME/lib/ and $MI_HOME/h/ for libraries
+and include files, respectively. If these directories aren't found, you won't
+be able to compile the module.
+
+With $MI_HOME set or using the default, type 'perl Makefile.PL' to build
+the makefile and 'make' to build the module. 'make install' will install.
+
+TESTING
+
+DBD::Illustra uses Jochen Wiedmann's test suite. Before running the test you
+should set the environment variables DBI_DSN, DBI_USER and DBI_PASS to give
+write access to a database on your system.
+DBI_DSN defaults to dbi:Illustra:test
+

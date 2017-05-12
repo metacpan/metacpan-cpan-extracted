@@ -1,0 +1,37 @@
+NAME
+
+Devel::CallParser - custom parsing attached to subroutines
+
+DESCRIPTION
+
+This module provides a C API, for XS modules, concerned with custom
+parsing.  It is centred around the function "cv_set_call_parser", which
+allows XS code to attach a magical annotation to a Perl subroutine,
+resulting in resolvable calls to that subroutine having their arguments
+parsed by arbitrary C code.  (This is a more conveniently structured
+facility than the core's "PL_keyword_plugin" API.)  This module makes
+"cv_set_call_parser" and several supporting functions available.
+
+This module provides the implementation of the functions at runtime,
+and also at compile time supplies the C header file which provides access
+to the functions.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2011, 2013 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

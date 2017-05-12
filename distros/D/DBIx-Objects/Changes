@@ -1,0 +1,13 @@
+Revision history for Perl extension DB::Objects.
+
+0.01  Thu May 22 13:26:39 2003
+	- original version; created by h2xs 1.22 with options
+		-X DB::Objects
+0.02
+  * Major bug fixes  
+  * Added documentation
+  * Added read support for embedded objects
+  * Added some support for object arrays
+
+0.04 - Sep 14 2004
+  * Moved to namespace DBIx:: to make everyone happy

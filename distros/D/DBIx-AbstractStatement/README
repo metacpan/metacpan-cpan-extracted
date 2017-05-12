@@ -1,0 +1,168 @@
+NAME
+    DBIx::AbstractStatement - SQL command kept together with the bindings
+
+SYNOPSIS
+      use DBIx::AbstractStatement qw(sql sql_join);
+
+      my $statement = sql('
+        SELECT * FROM customer c WHERE c.deleted is null');
+      # ordinary binding
+      if ($customer_id){
+          $statement->append(' AND c.id = :customer_id')
+            ->bind_param(':customer_id', $customer_id);
+      }
+
+      # binding with sql
+      $statement->append(' AND :dt_created > :created')
+      $statement->bind_param(':created', $created || sql('sysdate'));
+ 
+      # execute  
+      $statement->dbh($dbh)->execute;
+      while(my @ary = $statement->sth->fetchrow_array){
+      }
+      ...
+
+      # join
+      my $where = sql_join(
+        ($customer_name
+          ? sql('customer_name = :value')->bind_param(':value', $customer_name)
+          : ()),
+        ($from
+          ? sql('created >= :value')->bind_param(':value', $from)
+          : ()),
+        map {
+            sql("$_ = :$_")->bind_param(":$_", $args{$_})
+        } keys %args);
+
+DESCRIPTION
+    The purpose of DBIx::AbstractStatement is to keep together the SQL
+    command and host variables bindings so you can compose your SQL and bind
+    host variables simultaneously before DBH->prepare is called.
+
+    A database handle to a statement can be supplied anytime before execute
+    is called or never if the particular statement is not about to be
+    executed but just used as a part of another statement.
+
+    When execute is called on DBIx::AbstractStatement object, the statement
+    handle is prepared, all stored bindings performed on it, and execute is
+    called.
+
+  FUNCTIONS IMPORTED ON DEMAND
+    sql($TEXT, %PARAMS)
+          my $statement = DBIx::AbstractStatement->new("SELECT * FROM customer");
+          # or with imported sql 
+          my $statement = sql("SELECT * FROM customer", 'numbered_params' => 1);
+  
+        A constructor (shortcut of Akar::DBI::Staement->new). The $TEXT
+        parameter is by no means required to be a valid SQL statement.
+
+        The parameters can be 'dbh' or 'numbered_params' described as
+        setter-getters further.
+
+    sql_join($SEPARATOR, $SQL1, $SQL2, ...)
+            my $sql = sql("SELECT * FROM customer WHERE ")->append(
+              sql_join(" AND ", map {
+                 sql("$_ => :$_")->bind_param(":$_", $params{$_}) 
+                } keys(%params)));
+
+        Returns a new sql. Joins both the texts and the bindings.
+
+METHODS
+    bind_param($NAME, $VALUE)
+    bind_param_inout($NAME, $VALUEREF, $SIZE)
+          $statement->bind_param(':customer_id', $this->customer_id); 
+
+          # Oracle piece of PL/SQL decomposing an object into individual items
+          # Can be inserted into more complicated SQL statements
+          my $statement = sql("
+              :customer_id := l_payload.customer_id;
+              :action      := l_payload.action;\n)
+            ->bind_param_inout(':customer_id', \$$this{'customer_id'}, 12)
+            ->bind_param_inout(':action', \$$this{'action'}, 128)
+
+          # binding with statement 
+          my $sql = sql("SELECT * FROM customer WHERE inserted > :inserted");
+          $sql->bind_param(':inserted', sql('sysdate'));
+
+          # or even
+          $sql->bind_param(':inserted', 
+            sql('sysdate - :days')->bind_param('days', $days));
+
+        Stores an input or output binding for later usage. Both methods
+        accept the same parameters as their "$sth->bind_param",
+        "$sth->bind_param_inout" DBI counterparts. Both methods return the
+        invocant.
+
+        The name has to be :IDENTIFIER not :NUMBER.
+
+        Value to bind can be DBIx::AbstractStatement object. In this case
+        every occurence of this parameter is replaced by the text of the
+        value.
+
+        When parameter is bound an unique suffix is prepended to its name to
+        prevent name clash.
+
+    has_param($NAME)
+          $sql->bind_param(':created', sql('sysdate')) if $sql->has_param(':created');
+
+        Returns true if statement contains the parameter.
+
+    get_param_name($NAME)
+          my $suffixed = $sql->get_param_name('customer_id');
+
+        Simillar to has_param, but returns the name of the parameter -
+        suffixed if the parameter has already been bound.
+
+    dbh
+          $statement->dbh($dbh); # setter
+          my $dbh = $statement->dbh; # getter
+
+        Setter/getter for a database handle.
+
+    sth
+          my @ary = $this->sth->fetchrow_array
+
+        Returns prepared (or prepared and executed) statement handle. Calls
+        dbh->prepare when called for the first time.
+
+    execute
+          $statement->execute
+
+        Prepares statement handle, performs all bindings and calls execute
+        on the handle.
+
+    numbered_params
+          $sql->numbered_params(1);
+
+        Setter-getter. If set to true, parameters in text and bindings are
+        modified from :IDENTIFIER style to "?" and :NUMBER style right
+        before the statement is prepared.
+
+    append
+          $statement->append($text, $text2, ...);
+          $statement->append($statement, $statement, ...);
+
+        Joins the statement. Accepts a list of statements or strings (which
+        are turned into statements). The SQLs and bindings of these
+        statements are appended to the invocant's SQL and bindings. Returns
+        the modified invocant.
+
+    prepend
+          $statement->prepend($text, $text2, ...);
+          $statement->prepend($statement, $statement, ...);
+
+        Simillar to append. The SQLs of statements are joined together and
+        prepended before the invocant's SQL. Returns the modified invocant.
+
+    sprintf
+          $statement->sprintf($text, $text2, ...);
+          $statement->sprintf($statement, $statement, ...);
+
+        Simillar to append and prepend. The bindings of statements are
+        appended to the bindings of the invocant, while the invocant's new
+        SQL code is composed using sprintf with old SQL being the format.
+        Returns the modified invocant.
+
+AUTHOR
+    Roman Daniel <roman.daniel@gtsnovera.cz>
+

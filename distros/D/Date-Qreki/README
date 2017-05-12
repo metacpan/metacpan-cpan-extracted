@@ -1,0 +1,97 @@
+   ____        _                ___           _    _ 
+  |  _ \  __ _| |_ ___   _ _   / _ \ _ __ ___| | _(_)
+  | | | |/ _` | __/ _ \ (_|_) | | | | '__/ _ \ |/ / |
+  | |_| | (_| | ||  __/  _ _  | |_| | | |  __/   <| |
+  |____/ \__,_|\__\___| (_|_)  \__\_\_|  \___|_|\_\_|
+                                                     
+
+
+This is the README for Date::Qreki version 0.07.
+
+Date::Qreki is a "module" for the Perl computer programming language, a
+library of computer code to install on a computer.  This document contains
+four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Date::Qreki - convert Gregorian to Japanese "kyureki" dates.
+
+This module contains functions related to the old Japanese lunar
+calendar.  Convert Western dates to old Japanese lunar calendar dates
+with "calc_kyureki". Get the fortune-telling day with
+"get_rokuyou" or "rokuyou_unicode". Check if a date is a solar
+term with "check_24sekki".
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Date::Qreki
+    * http://metacpan.org/release/Date-Qreki
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Date::Qreki
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.6.0 or later.
+
+To install the module from CPAN, use
+
+    cpan Date::Qreki
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Date::Qreki
+
+To install the module from the source file, Date-Qreki-0.07.tar.gz, follow
+this sequence of commands:
+
+    tar xfz Date-Qreki-0.07.tar.gz
+    cd Date-Qreki-0.07
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Date-Qreki/issues>,
+
+or if you want to alter the source code of Date::Qreki, try the public
+repository on github at 
+
+<https://github.com/benkasminbullock/Date-Qreki>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Tue Jan 31 12:11:32 2017.
+
+-----------------------------------------------------------------------------

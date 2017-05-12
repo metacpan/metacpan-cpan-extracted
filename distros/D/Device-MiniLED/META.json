@@ -1,0 +1,76 @@
+{
+   "abstract" : "send text and graphics to small LED badges and signs",
+   "author" : [
+      "Kerry Schwab <sales@brightledsigns.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.112621",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-MiniLED",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Device::SerialPort" : 0,
+            "POSIX" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Device::MiniLED" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : "1.03"
+      },
+      "Device::MiniLED::Clipart" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::Factory" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::Icon" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::Image" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::Msg" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::Pixmap" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      },
+      "Device::MiniLED::SerialTest" : {
+         "file" : "lib/Device/MiniLED.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://www.perlfoundation.org/artistic_license_2_0"
+      ]
+   },
+   "version" : "1.03"
+}

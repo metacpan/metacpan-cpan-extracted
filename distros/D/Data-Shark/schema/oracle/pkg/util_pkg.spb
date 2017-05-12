@@ -1,0 +1,27 @@
+create or replace package body sharkapi2.util_pkg is
+
+/*
+** Procedure:   get_seqkey()
+**
+** Description: Return the next key from seqkey table
+**
+*/
+procedure get_seqkey(table_name in varchar2, new_key in out number) is
+  v_new_key number;
+  begin
+    select lastkey + 1
+      into v_new_key
+      from sharkapi2.seqkey
+     where tablename = table_name;
+
+    update sharkapi2.seqkey
+       set lastkey = v_new_key
+     where tablename = table_name;
+
+    new_key := v_new_key;
+  end;
+
+end util_pkg;
+/
+
+show errors;

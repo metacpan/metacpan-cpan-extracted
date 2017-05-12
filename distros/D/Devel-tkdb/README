@@ -1,0 +1,71 @@
+NAME
+       tkdb perl Debugger
+
+DESCRIPTION
+
+    This is tkdb, a debugger for perl that uses the Tcl/Tk for user
+    interface. It features pushbutton controls for run, step-in, step-out,
+    return, controls for breakpoints, expression evaluation and package
+    browsing.
+
+    Highly efficient.
+
+    Have such a file:
+      use strict;
+      $a = 'qwerty';
+      $a++;
+      print $a;
+      $a++;
+      print $a;
+      $a++;
+      print $a;
+      $a++;
+      (.... following 150_000 (!) such lines of code)
+
+    Loads and debugs within 4 sec - i.e. breakpoints, expressions in such
+    a huge file - runs just like usual file. 10_000 line files start
+    instantly.
+
+
+Installation:
+
+    use the MakeMaker interface:
+
+    perl Makefile.PL
+    make
+    make install
+
+    If worse comes to worse you can simply copy the tkdb.pm file into 
+    cp tkdb.pm /usr/local/lib/perl5/5.xxx/Devel/tkdb.pm
+
+    On Windows:
+
+    copy tkdb.pm C:\perl\5.x\lib\Devel\tkdb.pm
+
+    To Test:
+
+    perl -d:tkdb -e 1
+
+Prerequisites:
+   you must have Tcl::Tk module installed, which in turn requires Tcl
+   module, which in turn requires Tcl/Tk. no more dependencies, follow
+   instructions from those modules and you're done.
+
+LICENSE
+
+   This program is free software; you can redistribute it and/or modify
+   it under the terms of either:
+
+   a) the GNU General Public License as published by the Free
+   Software Foundation; either version 1, or (at your option) any
+   later version, or
+
+   b) the "Artistic License" which comes with this Kit.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See either
+   the GNU General Public License or the Artistic License for more details.
+
+      Copyright 1998, 2003 by Andrew E. Page, 2010, 2011 Vadim Konovalov.
+        All rights reserved.

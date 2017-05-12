@@ -1,0 +1,67 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "default",
+          "TABLE_afi": {
+            "ROW_afi": {
+              "afi": "1",
+              "TABLE_safi": {
+                "ROW_safi": {
+                  "safi": "1",
+                  "table-version": "4",
+                  "router-id": "1.2.3.4",
+                  "TABLE_rd": {
+                    "ROW_rd": {
+                      "TABLE_prefix": {
+                        "ROW_prefix": [
+                          {
+                            "ipprefix": "1.2.3.0/24",
+                            "TABLE_path": {
+                              "ROW_path": {
+                                "pathnr": "0",
+                                "best": ">",
+                                "status": "*",
+                                "type": "l",
+                                "ipnexthop": "0.0.0.0",
+                                "metric": "",
+                                "localpref": "100",
+                                "weight": "32768",
+                                "aspath": "",
+                                "origin": "i"
+                              }
+                            }
+                          },
+                          {
+                            "ipprefix": "192.168.1.0/24",
+                            "TABLE_path": {
+                              "ROW_path": {
+                                "pathnr": "0",
+                                "best": ">",
+                                "status": "*",
+                                "type": "l",
+                                "ipnexthop": "0.0.0.0",
+                                "metric": "",
+                                "localpref": "100",
+                                "weight": "32768",
+                                "aspath": "",
+                                "origin": "i"
+                              }
+                            }
+                          }
+                        ]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

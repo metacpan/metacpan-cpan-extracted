@@ -1,0 +1,7 @@
+Changes
+META.yml
+Makefile.PL
+MANIFEST
+README
+t/dansguardian.t
+lib/dansguardian.pm

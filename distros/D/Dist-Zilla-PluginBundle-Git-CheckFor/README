@@ -1,0 +1,78 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Git::CheckFor - All Git::CheckFor plugins at
+    once
+
+VERSION
+
+    This document describes version 0.014 of
+    Dist::Zilla::PluginBundle::Git::CheckFor - released October 10, 2016 as
+    part of Dist-Zilla-PluginBundle-Git-CheckFor.
+
+SYNOPSIS
+
+        ; in dist.ini
+        [@Git::CheckFor]
+
+DESCRIPTION
+
+    This bundles several plugins that do some sanity/lint checking of your
+    git repository; namely: you're on the right branch and you haven't
+    forgotten any autosquash commits (fixup! or squash!).
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Dist::Zilla::Plugin::Git::CheckFor::Fixups
+
+      * Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch
+
+      * Dist::Zilla::Plugin::Git::CheckFor::MergeConflicts
+
+      * Dist::Zilla::PluginBundle::Git
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-pluginbundle-git-checkfor/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-pluginbundle-git-checkfor&title=RsrchBoy's%20CPAN%20Dist-Zilla-PluginBundle-Git-CheckFor&tags=%22RsrchBoy's%20Dist-Zilla-PluginBundle-Git-CheckFor%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+CONTRIBUTORS
+
+      * Christian Walde <walde.christian@googlemail.com>
+
+      * Karen Etheridge <ether@cpan.org>
+
+      * Mike Doherty <doherty@cs.dal.ca>
+
+      * Olivier Mengué <dolmen@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

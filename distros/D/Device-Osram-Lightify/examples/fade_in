@@ -1,0 +1,79 @@
+#!/usr/bin/perl -Ilib/
+#
+# Simple script to fade-in a light over a period of time.
+#
+# Usage:
+#
+#   fade_in --hub=192.168.10.11 --name=hall --sleep=10
+#
+# Steve
+# --
+
+
+use strict;
+use warnings;
+
+use Device::Osram::Lightify::Hub;
+use Getopt::Long;
+
+my %CONFIG;
+
+#
+# Defaults
+#
+$CONFIG{ 'sleep' } = 5;
+$CONFIG{ 'hub' }   = "192.168.10.136";
+
+
+#
+# Parse command-line
+#
+exit
+  unless (
+           Getopt::Long::GetOptions( "hub=s",   \$CONFIG{ 'hub' },
+                                     "name=s",  \$CONFIG{ 'name' },
+                                     "sleep=s", \$CONFIG{ 'sleep' },
+                                   ) );
+
+#
+#  Ensure we got a name
+#
+if ( !$CONFIG{ 'name' } )
+{
+    print "Usage: $0 --hub=1.2.3.4 --name=name [--sleep=10]\n";
+    print "Missing name parameter - which bulb did you want to fade in?\n";
+    exit(1);
+}
+
+#
+#  Create the object.
+#
+my $x = Device::Osram::Lightify::Hub->new( host => $CONFIG{ 'hub' } );
+
+#
+#  Look for the right light
+#
+foreach my $light ( $x->lights() )
+{
+    if ( $light->name() eq $CONFIG{ 'name' } )
+    {
+
+        my $step = 5;
+        while ( $step <= 100 )
+        {
+
+            print "Setting brightness level : $step\n";
+            $light->set_brightness($step);
+            $light->set_on();
+
+            print "\tSleeping for $CONFIG{'sleep'} seconds\n";
+            sleep( $CONFIG{ 'sleep' } );
+
+            # Bump brighness
+            $step += 5;
+        }
+        exit(0);
+    }
+}
+
+print "Failed to find light with name $CONFIG{'name'}\n";

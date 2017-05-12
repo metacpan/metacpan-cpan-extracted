@@ -1,0 +1,87 @@
+PERL GTM module version 1.26
+============================
+
+This module allows a PERL programmer to access the GT.M globals database.
+GT.M is a fast and flexible hierarchical database system.
+
+It is assumed that the user has already installed GT.M, set up a database
+and has the appropriate environment variables defined to allow GT.M to run.
+
+A hierarchical database (also called an object database) allows data to be
+stored at different levels of depth.  It behaves differently than either
+of the two common database types; "Relational" and "Flat File".  The most
+widely used hierarchical database is the registry in Microsoft Windows.
+
+Instead of a simple key, each database node name is defined as a PERL 
+list.  One example could be 
+  ["Clients","Auto Dealerships","ACME Auto","Phone Number"]
+
+If you're thinking of objects and object properties, this would be
+analagous to:
+  clients.auto_dealerships.acme_auto.phone_num
+
+Data can be stored at any levels, and any level can also have sub-levels (also
+called children, sub-nodes or child nodes).  Hierarchical databases can be 
+treated as a collection of flat files, or a relational database, or a post-
+relational or object-relational database with minimal effort.
+
+Your mileage may vary, but hierarchical databases can outperform relational
+databases in many cases, especially for certain types of queries.
+
+INSTALLATION
+
+Prior to installation, you probably want to modify the default settings in
+GTM.h that govern environment variable settings.  This will allow you to
+use Db::GTM without having to define environment variables in advance or
+use the environment that GTM uses.  See the "DEFAULT LOCATIONS" section 
+below.
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+  Now you need to copy 'extapi.m' somewhere that GT.M will find it, and
+  move the file 'calltab.ci' to /usr/local/gtm/xc/calltab.ci
+
+DEFAULT LOCATIONS 
+
+  The locations that GTM will search for the extapi.m file are defined
+  in the 'gtmroutines' environment variable.  There is a default location
+  defined in GTM.h (/home/vmacs/rtn-obj and /home/vmacs/rtn-cvs/misc),
+  but this is unlikely to be useful to you if you aren't one of my 
+  co-workers.  GTM will always look in the current folder for extapi.m,
+  and this will take precedence over anything in 'gtmroutines'.
+
+  If you'd prefer a different location for the calltab.ci file, you can
+  change the location in GTM.h and recompile, or specify a new location
+  in the environment variable 'GTMCI' when using the database.  The
+  environment variable always takes precedence over the hard-coded location.
+
+  The default environment variable settings are at the top of the GTM.h
+  file, named _GT_ .. _LOC.
+
+DEPENDENCIES
+
+  This module does not requires any other modules.
+
+RECENT CHANGES
+
+1.27  Mon Sep 12 19:15:43 2005
+        - Transaction support added 
+        - Support for the M locking system
+        - Bugfix to using a $db->node as the 2nd argument to copy()
+1.21  Mon Apr 4 14:34:02 2005
+        - order/first/last/next/prev etc.. return the full name as a
+          list when called in list context
+        - Get/Order/Children/Query will short-circuit exit when called
+          in void context (they won't call-in to GTM at all)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 -- Regents of the University of California
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

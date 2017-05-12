@@ -1,0 +1,98 @@
+SYNOPSIS
+
+        use Dancer2;
+        use Dancer2::Plugin::ParamKeywords;
+    
+        any '/:some_named_parameter' => sub {
+            my $route_param = route_param('some_named_parameter');
+            my $get_param   = query_param('some_named_parameter');
+            my $post_param  = body_param('some_named_parameter');
+        };
+
+DESCRIPTION
+
+    This module is deprecated with the release of Dancer2's
+    Hash::MultiValue parameter keywords: route_parameters,
+    query_parameters, and body_parameters. Use this plugin only if you are
+    unable to upgrade your installation of Dancer2.
+
+    The default Dancer2::Core::Request params accessor munges parameters in
+    the following precedence from highest to lowest: POST parameters, named
+    route parameters, and GET parameters.
+
+    Consider the following route:
+
+        post '/people/:person_id' => sub {
+            my $person_id = param('person_id');
+            ...
+            # Perform some operation using $person_id as a key
+        };
+
+    In the above example, if the browser/client sends a parameter person_id
+    with a value of 2 in the POST body to route /people/1, $person_id will
+    equal 2 while still matching the route /people/1.
+
+    This plugin provides keywords that wrap around params($source) for
+    convenience to fetch parameter values from specific sources.
+
+ CONFIGURATION
+
+    The "munged_params" and "munged_param" keywords require you to
+    configure an order of precedence by which to prefer parameter sources.
+    Please see Dancer2::Core::Request params accessor for a list of valid
+    sources.
+
+        # In config.yml
+        plugins:
+          ParamKeywords:
+            munge_precedence:
+              - route
+              - body
+              - query
+
+    If you won't be using the munged_* keywords, you don't need to bother
+    configuring this plugin.
+
+KEYWORDS
+
+ munged_param(Str)
+
+    Returns the value of a given parameter from the "munged_params" hash.
+
+ munged_params
+
+    Returns a hash in list context or a hash reference in scalar context of
+    parameters munged according to the precedence provided in the
+    configuration file (from highest to lowest).
+
+ query_param(Str)
+
+    Returns the value supplied for a given parameter in the query string.
+
+ query_params
+
+    Returns the arguments and values supplied by query string. Returns a
+    hash in list context or a hasref in scalar context.
+
+ body_param(Str)
+
+    Returns the value supplied for a given parameter in the POST arguments.
+
+ body_params
+
+    Returns arguments and values supplied by a POST request. Returns a hash
+    in list context or a hasref in scalar context.
+
+ route_param(Str)
+
+    Returns the value supplied for a given named parameter in the route.
+
+ route_params
+
+    Returns the arguments and values suppled by the route. Returns a hash
+    in list context or a hasref in scalar context.
+
+VERSIONING
+
+    This module follows semantic versioning (http://www.semver.org).
+

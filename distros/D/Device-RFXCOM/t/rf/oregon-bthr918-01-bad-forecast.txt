@@ -1,0 +1,12 @@
+585a5d00c230216044ce0154
+
+master oregon 58.5a5d00c230216044ce0154:
+  sensor/bthr918.c2[temp]=21.3
+  sensor/bthr918.c2[humidity]=46
+  sensor/bthr918.c2[pressure]=1001hPa
+  sensor/bthr918.c2[battery]=90%
+
+
+
+
+

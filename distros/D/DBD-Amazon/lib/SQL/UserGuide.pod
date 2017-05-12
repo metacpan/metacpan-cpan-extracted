@@ -1,0 +1,286 @@
+=pod
+
+=head1 NAME
+
+SQL::Amazon::UserGuide - User Guide for DBD/SQL::Amazon
+
+=head1 SQL::Amazon SYNOPSIS
+
+	#
+	#	create the parser, passing in the current Amazon metadata
+	#
+	my $parser = SQL::Amazon::Parser->new(\%attrs);
+
+	#
+	#	parse a SQL statement, returning a SQL::Amazon::Statement
+	#
+	my $stmt = $parser->parse($sql_stmt)
+		or die "Parse failed: " . $parser->errstr;
+	#
+	#	evaluate the parse tree, using an evaluation object
+	#	for driver specific evaluation
+	#	returns either a scalar rowcount for write operations,
+	#		or a SQL::Amazon::Table object for SELECT
+	#		or undef on error
+	#
+	my $results = $stmt->execute($params)
+		or die "Evaluation failed: " . $stmt->errstr;
+
+=head1 DESCRIPTION
+
+SQL::Amazon provides the various components required by
+B<DBD::Amazon> L<http://www.presicient.com/dbdamzn> to query the 
+Amazon E-Commerce Service 4.0 I<aka ECS> using SQL. 
+
+B<Be advised this is ALPHA release software>.
+
+The suite includes the following components:
+
+=over 4
+
+=item B<SQL::Amazon::Parser>
+
+provides SQL parsing and query plan generation. Implemented as a 
+subclass of L<SQL::Parser>, part of the L<SQL::Statement> bundle.
+
+=item B<SQL::Amazon::Statement>
+
+provides SQL query plan execution. Implemented as a subclass of
+L<SQL::Statement>.
+
+=item B<SQL::Amazon::Functions>
+
+provides SQL::Amazon-specific predicate functions, including 
+B<MATCHES ANY, MATCHES ALL, MATCHES TEXT, POWER_SEARCH,
+IN, and NOT IN>.
+
+=item B<SQL::Amazon::ReqFactory>
+
+provides a factory class for generating SQL::Amazon::Request::Request
+objects based on the predicates in a query's WHERE clause.
+
+=item B<SQL::Amazon::Spool>
+
+provides a temporary storage object for intermediate results
+extracted from the base table cache objects. Acts as a 
+L<SQL::Eval::Table> object for L<SQL::Statement> processing.
+
+=item B<SQL::Amazon::StorageEngine>
+
+provides a global storage engine for managing data caching and
+retrieval.
+
+=item B<SQL::Amazon::Request::Request>
+
+provides a base class for all ECS request objects, including numerous
+default method implementations for building and sending requests,
+and processing the responses into the base table cache objects.
+
+=item B<SQL::Amazon::Request::ItemLookup>
+
+a subclass of SQL::Amazon::Request::Request for the ItemLookup
+request; also acts as a base class for the ItemSearch request.
+
+=item B<SQL::Amazon::Request::ItemSearch>
+
+a subclass of SQL::Amazon::Request::ItemLookup for the ItemSearch request
+
+=item B<SQL::Amazon::Tables::Table>
+
+provides a base class for table cache objects, including methods
+for data type conversion, keyed lookup, and cache management.
+
+=item B<SQL::Amazon::Tables::><B<tablename>>
+
+provides table-specific implementations of the Table base class.
+
+=back
+
+=head2 Prerequisites
+
+Perl 5.8.0
+
+L<SQL::Statement> 1.10
+
+L<Clone> 0.15
+
+L<DBI> 1.47
+
+L<XML::Simple> 2.09
+
+L<LWP> I<from of libwww-perl 5.803>>
+
+=head2 SQL Dialect
+
+SQL::Amazon::Parser currently supports the same subset of standard 
+SQL as supported by L<SQL::Statement>, using the 
+L<SQL::Dialects::Amazon> dialect, with the following additional
+predicate functions for keyword searches:
+
+=over 4
+
+=item B<MATCHES [ ANY | ALL | TEXT] (>E<lt>I<keyword-list>E<gt>B<)>
+
+Results in generation of an ECS ItemSearch request, with either the
+Keywords parameter (for MATCHES ALL), Power parameter (for MATCHES ANY),
+or TextStream parameter (for MATCHES TEXT).
+
+=item B<POWER_SEARCH(>E<lt>I<power-search-list>E<gt>B<)>
+
+Results in generation of an ECS ItemSearch request, with either
+Power parameters. Individual items in the I<power-search-list> are
+wrapped in parentheses, and joined with 'and' operators.
+
+=back
+
+=head2 Special SQL Considerations
+
+=head4 Mapping ECS Hierarchical Response Data to Relational Structures
+
+The hierarchical structure of the data returned by the Amazon ECS requires
+some manipulation by SQL::Amazon to conform to a flattened relational model. 
+As a result, queries against the B<Books> table may cause multiple tables 
+to be populated, e.g., 
+B<Offers, CustomerReviews, EditorialReviews, ListManiaLists>, etc. 
+This behavior is especially true when the B<ResponseGroup> parameter is set to 
+B<Large> I<(the default)>, in which case all detail information about 
+matching books is returned. 
+
+As a result, some queries require the use of JOINs to properly
+reflect the data model abstraction. E.g., When searching for only New books,
+the B<Condition> ECS request parameter must be applied; however, B<Condition>
+is a column in the B<Offers> table, B<not> the B<Books> table. Hence, a JOIN
+between the B<Books> table and B<Offers> table on the B<ASIN> column is
+required, along with a predicate test for B<Offers.Condition = 'New'>. 
+The JOIN is required, even though the returned B<SELECT> column list may not 
+contain any B<Offers> columns. Unfortunately, this requirement can have 
+undesirable effects when the B<ResponseGroup> parameter has been set to 
+'Small' or 'Medium' I<(via the DBD::Amazon amzn_resp_group attribute)>, as 
+those response groups do not populate the B<Offers> table. In that situation, 
+L<SQL::Statement>'s eventual application of INNER JOIN logic will result in no
+JOIN'ed rows, and thus no results. In such cases, a LEFT JOIN may be required,
+and, due to limitations of the current SQL::Statement JOIN logic,
+the JOIN predicate must be placed within an B<ON> clause I<aka, an EXPLICIT JOIN>,
+rather than within the B<WHERE> clause I<aka, an IMPLICIT JOIN>.
+
+=head4 "Pseudo" Columns
+
+Another special consideration is the support for some "pseudo" columns within
+WHERE clauses that are not available for inclusion in the SELECT column list.
+These pseudo-columns are used to generate some ECS request parameters which
+do not have a direct element mappings in the ECS response data. The following
+pseudo-columns are currently available for predicates, but not the SELECT
+column list:
+
+=over 4
+
+=item Subject - subject area fo the book; used for power searches
+
+=item Language - the language of the book; used for power searches
+
+=back
+
+=head4 Handling NULL Values for Request-mapped Columns
+
+Under some circumstances I<usually when the ResponseGroup is set
+to 'Medium' or 'Small'>, some fields are not returned in the
+response, resulting in NULL values for those columns, which can create
+an issue for filtering the results in the WHERE clause, as NULL
+values in the usual comparison operators always evaluate to FALSE.
+While adding an "...OR <column> IS NULL..." predicate may seem
+a reasonable solution, the additional disjunction generated by
+this addition can result in extraneous ECS requests, thereby greatly
+increasing the processing time required. The best alternative in these
+cases is to create either a B<COALESCE()> or B<DECODE()> alias for
+the column in the SELECT returned column list.
+
+=head4 Author Elements Combined Into a Single Authors Column
+
+A single book item returned by ECS may include multiple Author elements.
+Rather than flattening these elements into a separate table, multiple Author
+elements are joined into a single string, using "; " as a separator, and
+placed in the Authors column of the Books table.
+
+=head4 Cached Versions of Tables
+
+SQL::Amazon maintains a cache of ECS results, keyed by the request identifier
+returned in each ECS response message. Normally, SQL::Amazon requires that
+a SELECT statement includes a WHERE clause that provides sufficient 
+predicates to form an ECS request, in order to retrieve data on which
+the SELECT statement can further operate. In some instances, however,
+it may be desirable to use the existing data returned for a prior 
+SELECT statement, e.g., to do further drill-down on the results of
+a prior SELECT during an ad-hoc query session. In support of this,
+alternate named tables, prefixed with the word "Cached", can be used
+to force the SELECT statement to operate only on the data currently in 
+the cache for the specified table. E.g.,
+
+	SELECT * FROM CachedBooks WHERE PublicationDate > '2002-01-01';
+	
+would return all the cached rows from Books with a 
+PublicationDate > 2002-01-01, without issuing any further ECS requests.
+
+B<Note> that using cached tables may result in duplicate rows in the
+result set. Furthermore, due to the cache time limit requirements 
+imposed by Amazon, rows may spoil out of the cache between consecutive 
+references to a cached table.
+
+=head2 Internals
+
+Each statement handle created by B<DBD::Amazon> 
+L<http://www.presicient.com/dbdamzn> creates its own 
+SQL::Amazon::Statement object. All SQL::Amazon:Statement instances 
+share a single L<SQL::Amazon::StorageEngine> object, which manages the 
+service request and table abstraction processing, and maintains the 
+cache of previously retrieved results (subject to the Amazon ECS 
+license's caching rules), in order to limit the number of requests 
+required to satisfy a request.
+
+=head1 ACKNOWLEDGEMENTS
+
+Many thanks to Jeff Zucker for his assistance/guidance/patience on using,
+and accepting patches for, SQL::Statement.
+
+=head1 FOR MORE INFO
+
+L<http://www.presicient.com/dbdamzn>
+
+=head1 AUTHOR AND COPYRIGHT
+
+Copyright (C) 2005 by Presicient Corporation, USA
+
+L<mailto:darnold@presicient.com>
+
+L<http://www.presicient.com>
+
+Permission is granted to use this software according to the terms of the
+Artistic License, as specified in the Perl README file,
+with the exception that commercial redistribution, either 
+electronic or via physical media, as either a standalone package, 
+or incorporated into a third party product, requires prior 
+written approval of the author.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Presicient Corp. reserves the right to provide support for this software
+to individual sites under a separate (possibly fee-based)
+agreement.
+
+=head1 SEE ALSO
+
+L<SQL::Statement> for the supported SQL syntax, and how to subclass
+L<SQL::Parser>.
+
+B<DBD::Amazon> L<http://www.presicient.com/dbdamzn> for general usage 
+instructions for the DBI interface to the Amazon ECS.
+
+L<http://dbi.perl.org> for general information on DBI
+  
+L<http://www.amazon.com/gp> for information about the Amazon ECS API.
+
+The DBI users mailing list L<mailto:dbi-users-subscribe@perl.org> for 
+help on the use of DBI.
+
+=cut

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map>
+    <format>text</format> 
+    <fields>
+        <field position="1.5">id</field>
+        <field position="6.20">fname</field>
+        <field position="26.20">lname</field>
+        <field position="46.10">birthdate</field>
+        <field position="56.12">phone</field>
+        <field position="68.40">email</field>
+    </fields>
+</map>

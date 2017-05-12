@@ -1,0 +1,235 @@
+==================================================
+Changes from 2013-02-18 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2014-02-18 08:08:33 +0000
+------------------------------------------
+
+  Change: 26e4078618cd16afec30c3dc69cc63f018546e6e
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-18 09:06:56 +0000
+
+    -fixed test not generating a tar.gz archive 
+
+  Change: e4efab7166cb6687d4002e7013113ec7209490e4
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2014-02-18 07:58:43 +0000
+
+    Merge pull request #1 from neilbowers/master
+
+    Added abstract to pod 
+
+  Change: 3b30729c684cb9d0657e8e7770a95d6e4bf0adbd
+  Author: Neil Bowers <neil@bowers.com>
+  Date : 2014-02-17 21:35:24 +0000
+
+    Added abstract to pod 
+
+------------------------------------------
+version 0.009 at 2013-11-19 11:56:07 +0000
+------------------------------------------
+
+  Change: 81c4791c1f01f3714ddac98c97c5138baa2b1219
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-11-19 12:56:07 +0000
+
+    -fix test suite 
+
+------------------------------------------
+version 0.008 at 2013-11-13 13:05:16 +0000
+------------------------------------------
+
+  Change: 4f517d66796466d0aa59bf89a9a14a1e46dc93c2
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-11-13 14:05:16 +0000
+
+    -rename dzil command 
+
+------------------------------------------
+version 0.007 at 2013-11-13 12:41:14 +0000
+------------------------------------------
+
+  Change: bd1f14e45231429adb462b44e48bb763e0493686
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-11-13 13:41:14 +0000
+
+    -adjust package names to RPM::Push 
+
+  Change: b2efaf090faf7fc7f3ab408ca8299427e5d25f9c
+  Author: Markus Benning <me@w3r3wolf.de>
+  Date : 2013-11-13 13:37:49 +0000
+
+    -adjust tests to RPM::Push 
+
+  Change: 4439f94182eab76425e33299ba66c257ca73259b
+  Author: Markus Benning <benning@hochfeiler.localdomain>
+  Date : 2013-11-12 20:38:56 +0000
+
+    -fix POD 
+
+  Change: 25bed54844aab6f4ce7c8b79a61ae0a35cef781e
+  Author: Markus Benning <benning@hochfeiler.localdomain>
+  Date : 2013-11-12 20:34:03 +0000
+
+    -adjust dist-zilla settings and rename forked package to RPM::Push 
+
+  Change: 0be723f24f9fdf85dc5e2503d4d4e29c52e3a8ad
+  Author: Markus Benning <benning@hochfeiler.localdomain>
+  Date : 2013-08-29 16:00:58 +0000
+
+    -update POD 
+
+  Change: 063b62171bfe79846256e747012def1de55396f3
+  Author: Markus Benning <benning@hochfeiler.localdomain>
+  Date : 2013-08-29 15:48:47 +0000
+
+    -added support for pushing packages 
+
+  Change: 6cd207c8b2792a2ed1aa81a30201ecb0bb73fb3c
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-11-14 20:01:03 +0000
+
+    Release 0.007 
+
+  Change: e9921a0722efb399e45dc0a94df44a43c9b28d95
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-11-14 20:00:10 +0000
+
+    Ensure that spec file rolled into SRPM has a filename ending in .spec 
+
+  Change: 61f2d89ea8d1894e6502e7f8b15fec5a9d65e6d0
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-11-14 19:58:56 +0000
+
+    Release 0.006 
+
+  Change: 44e45adab31814b1123084f5ba38ec7c52256cc6
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-11-14 19:10:13 +0000
+
+    Add option to build source RPM only 
+
+  Change: b5fe796b260606cb77a308e3642feae465f159c4
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-20 16:22:58 +0000
+
+    Release 0.005 
+
+  Change: 8b0bb4393c0177cb904fb56db57d3782dfb77fcc
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-20 16:18:54 +0000
+
+    Skip tests that call rpmbuild if not on system 
+
+  Change: 2cf49e3c579eaf7260294e2bd9473fb75534ba61
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-20 15:52:56 +0000
+
+    Update copyright year 
+
+  Change: 09aca2a060cbe15279a416cee1ce510f29356174
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:26:30 +0000
+
+    Release 0.004 
+
+  Change: 22bbd21c0ed8833f975af88b04edaf9e91b7ad16
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:25:55 +0000
+
+    Update changelog 
+
+  Change: 15aa0ffbc5356e8de9a29d3651346b5c4aaee042
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:25:27 +0000
+
+    Hide test module from PAUSE 
+
+  Change: 4cced37744289dcd9dd13d104d66655dc40814c3
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:19:22 +0000
+
+    Release 0.003 
+
+  Change: 22878b80badc19e0d67503b6c4ed8488deb310b4
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:18:38 +0000
+
+    Update changelog 
+
+  Change: 4e541042154ca9a9ade8d56db4852eab8397c7ce
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:15:45 +0000
+
+    Added some basic unit tests 
+
+  Change: 49a2c4a881e72f6792e362c5e28fe1471dd8d1c6
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:13:08 +0000
+
+    Fix to sample spec file doc 
+
+  Change: b4668ded3222ea8c8fc8bd0737f01ef0b9fb3211
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:12:15 +0000
+
+    Use zilla root as base for spec_file path 
+
+  Change: 8763e07763b4d04bab381f862837572b2639a5e2
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-19 20:11:36 +0000
+
+    Fixed missing parameter to mk_spec 
+
+  Change: 7ec922564b365a56b8e97d4e4921043964561bb5
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:42:51 +0000
+
+    Release 0.002 
+
+  Change: 88ac850e53d136db1b77c57f42377fe5bab92f30
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:41:46 +0000
+
+    Added Changes file 
+
+  Change: e4549c7006f8fcea4466124f03a72e31956951a4
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:41:38 +0000
+
+    Dependency fixes 
+
+  Change: 76257129ae6c9b8c61c6c85a0548054d8026707c
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:41:22 +0000
+
+    Documentation fixes 
+
+  Change: 9f38ab968cf2624b3584454b3c466868b1709e3a
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:41:02 +0000
+
+    Added dzil mkrpmspec command 
+
+  Change: f9cb37735333fcc11949497d324aa637202d69dc
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2012-03-14 16:40:01 +0000
+
+    Added ignore_build_deps option 
+
+  Change: 1d4d38e215b0ee9f1fcb798356ceff6bc957baff
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2011-10-27 15:57:11 +0000
+
+    Added .gitignore 
+
+  Change: 7ed2f8b0f06f570b3dd0c7d6676c35517357019c
+  Author: Stephen Clouse <stephenclouse@gmail.com>
+  Date : 2011-10-27 15:54:55 +0000
+
+    Initial commit 
+
+================
+End of releases.
+================

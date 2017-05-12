@@ -1,0 +1,9 @@
+blibdirs
+ChangeLog
+Changes
+lib/Data/Iter.pm
+Makefile.PL
+MANIFEST
+README
+t/Data-Iter.t
+META.yml                                 Module meta-data (added by MakeMaker)

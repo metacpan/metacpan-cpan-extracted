@@ -1,0 +1,39 @@
+DMTF-CIM-WSMan version 0.09
+
+This module binds the DMTF::WSMan module with DMTF::CIM to provide for CIM
+over WS-Management access as defined in various DMTF standards.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+URI
+URI::Escape
+DMTF::WSMan
+DMTF::CIM
+DMTF::CIM::Instance (currently part of DMTF::CIM)
+XML::Twig
+DateTime::Duration
+MIME::Base64
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Broadcom Corporation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

@@ -1,0 +1,32 @@
+---
+abstract: 'Helps to fine control your DBI profiling without hassles'
+author:
+  - 'Toru Yamaguchi <zigorou@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::Requires: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-ProfileManager
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+recommends:
+  DBD::SQLite: 0
+  File::Temp: 0
+requires:
+  DBI: 0
+  DBI::Profile: 0
+  Filter::Util::Call: 0
+  Scalar::Util: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

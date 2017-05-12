@@ -1,0 +1,135 @@
+=head1 NAME
+
+Application Servers and Toolkits based on mod_perl
+
+=head1 Description
+
+There are several application servers and toolkits available designed
+to run under mod_perl, which might provide you with inline-Perl
+coding, or MVC (Model/View/Controller) frameworks.
+
+You probably want to look at L<Choosing a Templating
+system|docs::tutorials::tmpl::comparison::comparison> for more
+information and in-depth analysis of some of the ones listed here.
+
+The following frameworks are sorted alphabetically.
+
+=head1 Apache::ASP
+
+C<Apache::ASP> (http://www.apache-asp.org/) provides an Active Server
+Pages port to the Apache Web Server with Perl scripting only, and
+enables developing of dynamic web applications with session management
+and embedded perl code. There are also many powerful extensions,
+including XML taglibs, XSLT rendering, and new events not originally
+part of the ASP API
+
+=head1 Apache::PageKit
+
+C<Apache::PageKit> (http://pagekit.org/) is a web application
+framework that uses C<HTML::Template> and XML to separate the Model,
+View, Content and Controller. Provides elegant solutions to many
+difficult web programming problems, including session management,
+language localization, authentication, form validation, and
+co-branding.
+
+=head1 AxKit
+
+C<AxKit> (http://axkit.org/) is an XML Application Server for
+Apache. It provides on-the-fly conversion from XML to any format, such
+as HTML, WAP or text using either W3C standard techniques, or flexible
+custom code. C<AxKit> also uses a built-in Perl interpreter to provide
+some amazingly powerful techniques for XML transformation.
+
+=head1 The bivio OLTP Platform (bOP)
+
+The bivio OLTP Platform (http://www.bivio.biz/hm/why-bOP) (bOP) is a
+declarative, multi-layered Perl application development framework.
+Adapters have been written for Apache/mod_perl, sendmail, Oracle, and
+Postgres.  The Model layer generates SQL for CRUD, lists, and HTTP
+forms.  Views are content-independent hierarchies of widgets.  Tasks
+control security, execution order, and state transitions.  Facades map
+qualified names to URLs, strings, fonts, colors, icons, files, and
+views.  bOP provides a full-suite of services including dynamic
+tracing, configuration, logging, class loading, type hierarchy, unit
+testing, and acceptance testing.
+
+=head1 DataBreeze Web Database Platform
+
+DataBreeze is written entirely in Perl and utilizes mod_perl within
+Apache to speed performance. Feedback from the Perl/mod_perl/Apache
+community is important. You may download the software for evaluation
+at http://www.databreeze.com or simply logon and try DataBreeze
+directly online.
+
+DataBreeze is very different from typical development tools because it
+utilizes a pre-built application framework that requires no
+programming.  DataBreeze provides a template environment for building
+database applications that list, search, explore and edit relational
+data. The system includes integrated menus, forms, tree-views,
+security, session/state management and more, all in a Web
+Browser. DataBreeze can also be extended through the use of Event
+programs using Perl.
+
+This is not free software but nothing is hidden, the complete Perl
+source code is included so that you may explore how it works.
+
+=head1 Embperl
+
+C<Embperl> (http://perl.apache.org/embperl/) is a system for building
+dynamic websites with Perl.  It gives you the power to embed Perl code
+in your HTML documents and the ability to build your Web site out of
+small reusable objects in an object-oriented style. You can also take
+advantage of all the usual Perl modules, (including C<DBI> for
+database access) use their functionality and easily include their
+output in your web pages.  Embperl has several features which are
+especially useful for creating HTML, including dynamic tables, form
+field processing, URL escaping/unescaping, session handling, and more.
+
+=head1 Mason
+
+C<Mason> (http://www.masonhq.com/) is a powerful Perl-based web site
+development and delivery engine.  With C<Mason> you can embed Perl
+code in your HTML and construct pages from shared, reusable
+components.  C<Mason> solves the common problems of site development:
+caching, debugging, templating, simulating browser conditions,
+maintaining development and production sites, and more
+
+=head1  OpenInteract
+
+C<OpenInteract> (http://www.openinteract.org/) is a web application
+environment written in perl and geared to run on the Apache web server
+using the mod_perl plugin module. The environment is built to be not
+only friendly to people editing and changing a website's content, but
+also for the developers who can write code (or complex templates) and
+create entire applications.
+
+=head1 OpenFrame
+
+C<OpenFrame> (http://openframe.fotango.com/) is an open source
+application framework for distributed media applications. What all
+this buzzword-compliant mumbo-jumbo really means is that with
+OpenFrame you can write a single application for multiple downstream
+clients (ie, Web, WAP, iDTV, Email) and not have to worry about much
+except the presentation.
+
+=head1 The Template Toolkit
+
+The Template Toolkit (http://template-toolkit.org/) is a fast,
+powerful and easily extensible template processing system written in
+Perl. It is ideally suited (but not limited) to the creation of static
+and dynamic web content. The C<Apache::Template> module provides an
+Apache/mod_perl interface to the Template Toolkit, providing a quick
+and simple way to integrate its processing power into your web site.
+
+
+=head1 Uttu
+
+C<Uttu> (http://uttu.tamu.edu/) is a web-application driver that
+provides support for writing application frameworks.  This support
+includes configuration, database connectivity, caching,
+uri-to-filename translation, and application installation.  Uttu makes
+working with multiple virtual hosts and C<HTML::Mason>, Template
+Toolkit, or C<AxKit> almost trivial.
+
+=cut
+

@@ -1,0 +1,1610 @@
+NAME
+    Data::SecsPack - pack and unpack numbers in accordance with SEMI E5-94
+
+SYNOPSIS
+     #####
+     # Subroutine interface
+     #  
+     use Data::SecsPack qw(bytes2int config float2binary 
+                        ifloat2binary int2bytes   
+                        pack_float pack_int pack_num  
+                        str2float str2int 
+                        unpack_float unpack_int unpack_num);
+
+     $big_integer = bytes2int( @bytes );
+
+     $old_value = config( $option );
+     $old_value = config( $option => $new_value);
+
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
+ 
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
+
+     @bytes = int2bytes( $big_integer );
+
+     ($format, $floats) = pack_float($format, @string_floats, [@options]);
+
+     ($format, $integers) = pack_int($format, @string_integers, [@options]);
+
+     ($format, $numbers, @string) = pack_num($format, @strings, [@options]);
+
+     $float = str2float($string, [@options]);
+     (\@strings, @floats) = str2float(@strings, [@options]);
+
+     $integer = str2int($string, [@options]);
+     (\@strings, @integers) = str2int(@strings, [@options]);
+
+     \@ingegers = unpack_int($format, $integer_string, @options);
+
+     \@floats   = unpack_float($format, $float_string, @options); 
+
+     \@numbers  = unpack_num($format, $number_string), @options; 
+
+     #####
+     # Class, Object interface
+     #
+     # For class interface, use Data::SecsPack instead of $self
+     #
+     use Data::SecsPack;
+
+     $secspack = 'Data::SecsPack';  # uses built-in config object
+
+     $secspack = new Data::SecsPack(@options);
+
+     $big_integer = bytes2int( @bytes );
+
+     ($binary_magnitude, $binary_exponent) = $secspack->float2binary($magnitude, $exponent, @options); 
+
+     ($binary_magnitude, $binary_exponent) = $secspack->ifloat2binary($imagnitude, $iexponent, @options);
+
+     @bytes = $secspack->int2bytes( $big_integer );
+
+     ($format, $floats) = $secspack->pack_float($format, @string_integers, [@options]);
+
+     ($format, $integers) = $secspack->pack_int($format, @string_integers, [@options]);
+ 
+     ($format, $numbers, @strings) = $secspack->pack_num($format, @strings, [@options]);
+
+     $integer = $secspack->str2int($string, [@options])
+     (\@strings, @integers) = $secspack->str2int(@strings, [@options]);
+
+     $float = $secspack->str2float($string, [@options]);
+     (\@strings, @floats) = $secspack->str2float(@strings, [@options]);
+
+     \@ingegers = $secspack->unpack_int($format, $integer_string, @options); 
+
+     \@floats   = $secspack->unpack_float($format, $float_string, @options); 
+
+     \@numbers  = $secspack->unpack_num($format, $number_string, @options); 
+ 
+    Generally, if a subroutine will process a list of options, "@options",
+    that subroutine will also process an array reference, "\@options",
+    "[@options]", or hash reference, "\%options", "{@options}". If a
+    subroutine will process an array reference, "\@options", "[@options]",
+    that subroutine will also process a hash reference, "\%options",
+    "{@options}". See the description for a subroutine for details and
+    exceptions.
+
+DESCRIPTION
+    The subroutines in the "Data::SecsPack" module packs and unpacks numbers
+    in accordance with SEMI E5-94. The E5-94 establishes the standard for
+    communication between the equipment used to fabricate semiconductors and
+    the host computer that controls the fabrication. The equipment in a
+    semiconductor factory (fab) or any other fab contains every conceivable
+    known microprocessor and operating system known to man. And there are a
+    lot of specialize real-time embedded processors and speciallize
+    real-time embedded operating systems in addition to the those in the PC
+    world.
+
+    The communcication between host and equipment used packed nested list
+    data structures that include arrays of characters, integers and floats.
+    The standard has been in place and widely used in China, Germany, Korea,
+    Japan, France, Italy and the most remote corners on this planent for
+    decades. The basic data structure and packed data formats have not
+    changed for decades.
+
+    This stands in direct contradiction to the common conceptions of many in
+    the Perl community and most other communities. The following quote is
+    taken from page 761, *Programming Perl* third edition, discussing the
+    "pack" subroutine:
+
+    "Floating-point numbers are in the native machine format only. Because
+    of the variety of floating format and lack of a standard "network"
+    represenation, no facility for interchange has been made. This means
+    that packed floating-point data written on one machine may not be
+    readable on another. That is a problem even when both machines use IEEE
+    floating-point arithmetic, because the endian-ness of memory
+    representation is not part of the IEEE spec."
+
+    There are a lot of things that go over the net that have industry or
+    military standards but no RFCs. So unless you dig them out, you will
+    never know they exist. While RFC and military standards may be freely
+    copyied, industry standards are usually copyrighted. This means if you
+    want to read the standard, you have to pay whatever the market bears.
+    ISO standards, SEMI stardards, American National Standards, IEEE
+    standards beside being boring are expensive. In other words, you do not
+    see them flying out the door at the local Barnes and Nobles. In fact,
+    you will not even find them inside the door.
+
+    It very easy to run these non RFC standard protocols over the net. Out
+    of 64,000 ports, pick a port of opportunity (hopefully not one of those
+    low RFC preassigned ports) and configure the equipment and host to the
+    same IP and port. Many times the software will allow a remote console
+    that is watch only. The watch console may even be a web server on port
+    80. If there is a remote soft console, you can call up or e-mail the
+    equipment manufacturer's engineer in say Glouster, MA, USA and tell him
+    the IP and port so he can watch his manchine mangle a cassette of wafers
+    with a potential retail value of half million dollars.
+
+    SEMI E5-94 and their precessors do standardize the endian-ness of
+    floating point, the packing of nested data, used in many programming
+    languages, and much, much more. The endian-ness of SEMI E5-94 is the
+    first MSB byte, floats sign bit first. Maybe this is because it makes it
+    easy to spot numbers in a packed data structure.
+
+    The nested data has many performance advantages over the common SQL
+    culture of viewing and representing data as tables. The automated fabs
+    of the world make use of SEMI E5-94 nested data not only for real-time
+    communication (TCP/IP RS-2332 etc) between machines but also for
+    snail-time processing as such things as logs and performance data.
+
+    Does this standard communications protocol ensure that everything goes
+    smoothly without any glitches with this wild mixture of hardware and
+    software talking to each other in real time? Of course not. Bytes get
+    reverse. Data gets jumbled from point A to point B. Machine time to test
+    software is non-existance. Big ticket, multi-million dollar fab
+    equipment has to work to earn its keep. And, then there is the everyday
+    business of suiting up, with humblizing hair nets, going through air and
+    other showers with your favorite or not so favorite co-worker just to
+    get into the clean room. And make sure not to do anything that will
+    scatch a wafer with a lot of Intel Pentiums on them. It is totally
+    amazing that the product does get out the door.
+
+  SECSII Format
+
+    The Data::SecsPack suroutines packs and unpacks numbers in accordance
+    with SEMI, http://www.semi.org, E5-94, Semiconductor Equipment
+    Communications Standard 2 (SECS-II), avaiable from
+
+     Semiconductor Equipment and Materials International
+     805 East Middlefield Road,
+     Mountain View, CA 94043-4080 USA
+     (415) 964-5111
+     Easylink: 62819945
+     http://www.semi.org
+ 
+    The format of SEMI E5-94 numbers are established by below Table 1.
+
+                   Table 1 Item Format Codes
+
+     unpacked   binary  octal  hex   description
+     ---------------------------------------------------------
+     T          001001   11    0x24  Boolean
+     S8         011000   30    0x60  8-byte integer (signed)
+     S1         011001   31    0x62  1-byte integer (signed)
+     S2         011010   32    0x64  2-byte integer (signed)
+     S4         011100   34    0x70  4-byte integer (signed)
+     F8         100000   40    0x80  8-byte floating
+     F4         100100   44    0x90  4-byte floating
+     U8         101000   50    0xA0  8-byte integer (unsigned)
+     U1         101001   51    0xA4  1-byte integer (unsigned)
+     U2         101010   52    0xA8  2-byte integer (unsigned)
+     U4         101100   54    0xB0  4-byte integer (unsigned)
+
+    Table 1 complies to SEMI E5-94 Table 1, p.94, with an unpack text symbol
+    and hex columns added. The hex column is the upper Most Significant Bits
+    (MSB) 6 bits of the format code in the SEMI E5-94 item header (IH)
+
+    In accordance with SEMI E5-94 6.2.2,
+
+    1   the Most Significat Byte (MSB) of numbers for formats S2, S4, S8,
+        U2, U4, U8 is sent first
+
+    2   the signed bit for formats F4 and F8 are sent first.
+
+    3   Signed integer formats S1, S2, S4, S8 are two's complement
+
+    The memory layout for Data::SecsPack is the SEMI E5-94 "byte sent first"
+    has the lowest memory address.
+
+  IEEE 754-1985 Standard
+
+    The SEMI E5-94 F4 format complies to IEEE 754-1985 float and the F8
+    format complies to IEEE 754-1985 double. The IEEE 754-1985 standard is
+    available from:
+
+     IEEE Service Center
+     445 Hoe Lane,
+     Piscataway, NJ 08854
+  
+    The SEMI E5-94 F4, IEEE 754-1985 float, is 32 bits with the bits
+    assigned follows:
+
+     S EEE EEEE EMMM MMMM MMMM MMMM MMMM MMMM
+
+    where S = sign bit, E = 8 exponent bits M = 23 mantissa bits
+
+    The format of the float S, E, and M are as follows:
+
+    Sign of the number
+        The sign is one bit, 0 for positive and 1 for negative.
+
+    exponent
+        The exponent is 8 bits and may be positive or negative. The IEEE 754
+        exponent uses excess-127 format. The excess-127 format adds 127 to
+        the exponent. The exponent is re-created by subtracting 127 from the
+        exponent.
+
+    Magnitude of the number
+        The magnitude or mantissa is a 23 bit unsigned binary number where
+        the radix is adjusted to make the magnitude fall between 1 and 2.
+        The magnitude is stored ignoring the 1 and filling in the trailing
+        bits until there are 23 of them.
+
+    The SEMI E5-94 F4, IEEE 754-1985 double, is 64 bits with S,E,M as
+    follows: S = sign bit, E = 11 exponent bits M = 52 mantissa bits
+
+    The format of the float S, E, and M are as follows:
+
+    Sign of the number
+        The sign is one bit, 0 for positive and 1 for negative.
+
+    exponent
+        The exponent is 8 bits and may be positive or negative. The IEEE 754
+        exponent uses excess-1027 format. The excess-1027 format adds 1027
+        to the exponent. The exponent is re-created by subtracting 1027 from
+        the exponent.
+
+    Magnitude of the number
+        The magnitude or mantissa is a 52 bit unsigned binary number where
+        the radix is adjusted to make the magnitude fall between 1 and 2.
+        The magnitude is stored ignoring the 1 and filling in the trailing
+        bits until there are 52 of them.
+
+    For example, to find the IEEE 754-1985 float of -10.5
+
+    *   Convert -10.5 decimal to -1010.1 binary
+
+    *   Move the radix so magitude is between 1 and 2, -1010. binary to
+        -1.0101 * 2^ +3
+
+    *   IEEE 754-1985 sign is 1
+
+    *   The magnitude dropping the one and filling in with 23 bits is
+
+         01010000000000000000000
+
+    *   Add 127 to the exponent of 3 to get
+
+         130 decimal converted to 8 bit binary 
+
+         10000010
+
+    *   Combining into IEEE 754-1985 format:
+
+         11000001001010000000000000000000
+
+         1100 0001 0010 1000 0000 0000 0000 0000
+
+         C128 0000 hex
+
+SUBROUTINES
+  bytes2int
+
+     $big_integer = bytes2int( @bytes );
+
+    The "bytes2int" subroutine counvers a "@bytes" binary number with the
+    Most Significant Byte (MSB) $byte[0] to a decimal string number
+    "$big_integer" using the "Data::BigInt" program module. As such, the
+    only limitations on the number of binary bytes and decimal digits is the
+    resources of the computer.
+
+  config
+
+     $old_value = config( $option );
+     $old_value = config( $option => $new_value);
+     (@all_options) = config( );
+
+    When Perl loads the "Data::SecsPack" program module, Perl creates the
+    "Data::SecsPack" subroutine "Data::SecsPack" object
+    "$Data::SecsPack::subroutine_secs" using the "new" method. Using the
+    "config" subroutine writes and reads the
+    "$Data::SecsPack::subroutine_secs" object.
+
+    Using the "config" as a class method,
+
+     Data::SecsPack->config( @_ )
+
+    also writes and reads the "$Data::SecsPack::subroutine_secs" object.
+
+    Using the "config" as an object method writes and reads that object.
+
+    The "Data:SecsPack" subroutines used as methods for that object will use
+    the object underlying data for their startup (default options) instead
+    of the "$Data::SecsPack::subroutine_secs" object. It goes without saying
+    that that object should have been created using one of the following:
+
+     $object = $class->Data::SecsPack::new(@_)
+     $object = Data::SecsPack::new(@_)
+     $object = new Data::SecsPack(@_)
+
+    The underlying object data for the "Data::SecsPack" options defaults is
+    the class "Data::Startup" object "$Data::SecsPack::default_options". For
+    object oriented conservative purist, the "config" subroutine is the
+    accessor function for the underlying object hash.
+
+    Since the data are all options whose names and usage is frozen as part
+    of the "Data::SecsPack" interface, the more liberal minded, may avoid
+    the "config" accessor function layer, and access the object data
+    directly by a statement such as
+
+     $Data::SecsPack::default_options->{version};
+
+    The options are as follows:
+
+     used by                                     values default  
+     subroutine    option                        value 1st
+     ----------------------------------------------------------
+                   big_float_version              \d+\.\d+
+                   big_int_version                \d+\.\d+
+                   version                        \d+\.\d+
+
+                   warnings                        0 1
+                   die                             0 1
+
+     bytes2int 
+
+     float2binary  decimal_integer_digits          20 \d+
+                   extra_decimal_fraction_digits    5 \d+
+                   decimal_fraction_digits       
+                   binary_fraction_bytes
+
+     ifloat2binary decimal_fraction_digits         25 \d+
+                   binary_fraction_bytes           10 \d+
+
+     int2bytes
+   
+     pack_float    decimal_integer_digits          
+                   extra_decimal_fraction_digits   
+                   decimal_fraction_digits       
+                   binary_fraction_bytes
+
+     pack_int 
+
+     pack_num      nomix                            0 1
+                   decimal_integer_digits          
+                   extra_decimal_fraction_digits   
+                   decimal_fraction_digits       
+                   binary_fraction_bytes
+
+     unpack_float
+     unpack_int
+     unpack_num
+
+    For options with a default value and subroutine, see the subroutine for
+    a description of the option. Each subroutine that uses an option or uses
+    a subroutine that uses an option has an option input. The option input
+    overrides the startup option from the <Data::SecsPack> object.
+
+    The description of the options without a subroutine are as follows:
+
+     option              description
+     --------------------------------------------------------------
+     big_float_version   Math::BigFloat version
+     big_int_version     Math::BigInt version
+     version             Data::SecsPack version
+
+     warnings            issue a warning on subroutine events
+     die                 die on subroutine events
+
+    They really versions should not be changed unless the intend is to
+    provided fraudulent versions.
+
+  float2binary
+
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent); 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, @options); 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, [@options]); 
+     ($binary_magnitude, $binary_exponent) = float2binary($magnitude, $exponent, {@options}); 
+
+    The "ifloat2binary" subroutine converts a decimal float with a base ten
+    "$magnitude" and "$exponent" to a binary float with a base two
+    "$binary_magnitude" and "$binary_exponent".
+
+    The "ifloat2binary" assumes that the decimal point is set by "iexponent"
+    so that there is one decimal integer digit in "imagnitude" The
+    "ifloat2binary" produces a "$binary_exponent" so that the first byte of
+    "$binary_magnitude" is 1 and the rest of the bytes are a base 2
+    fraction.
+
+    The "float2binary" subroutine uses the "ifloat2binary" for the small
+    "$exponent" part and the "Math::BigFloat" subroutines to correct the
+    "ifloat2binary" for the remaing exponent factor outside the range of the
+    "ifloat2binary" subroutine.
+
+    The "float2binary" subroutine uses the options "decimal_integer_digits",
+    "$decial_fraction_digits", "extra_decimal_fraction_digits" in
+    determining the "$iexponent" passed to the "ifloat2binary" subroutine.
+    The option "decimal_integer_digits" is the largest positive base ten
+    "$iexponent" while smallest "$ixponent" is the half
+    "$decial_fraction_digits" + "extra_decimal_fraction_digits". The
+    "float2binary" subroutine "extra_decimal_fraction_digits" only for
+    negative "$iexponent". The "float2binary" subroutine uses any base ten
+    "$exponent" from "$iexponent" breakout to adjust the "ifloat2binary"
+    subroutine results using native float arith.
+
+    If the "float2binary" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      (undef,$event)
+
+    The events are as follows:
+
+     "No inputs\n\tData::SecsPack::float2binary-1\n"
+ 
+    The "float2binary" also passes on any "ifloat2binary" events. Check the
+    "$binary_magnitude" for an "undef", to see if the subroutine cannot
+    process the decimal exponent.
+
+  ifloat2binary
+
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent);
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, @options);
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, [@options]);
+     ($binary_magnitude, $binary_exponent) = ifloat2binary($imagnitude, $iexponent, {@options});
+
+    The "$ifloat2binary" subroutine converts a decimal float with a base ten
+    "$imagnitude" and "$iexponent" using the "Math::BigInt" program module
+    to a binary float with a base two "$binary_magnitude" and a base two
+    "$binary_exponent". The "$ifloat2binary" assumes that the decimal point
+    is set by "iexponent" so that there is one decimal integer digit in
+    "imagnitude" The "ifloat2binary" produces a "$binary_exponent" so that
+    the first byte of "$binary_magnitude" is 1 and the rest of the bytes are
+    a base 2 fraction.
+
+    Since all the calculations use basic integer arith, there are practical
+    limits on the computer resources. Basically the limit is that with a
+    zero exponent, the decimal point is within the significant "imagnitude"
+    digits. Within these limitations, the accuracy, by chosen large enough
+    limits for the binary fraction, is perfect.
+
+    If the "ifloat2binary" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      (undef,$event)
+
+    The events are as follows:
+
+     "No inputs\n\tData::SecsPack::ifloat2binary-1\n"
+     "The exponent, $exponent, is out of range for $magnitude.\n\tData::SecsPack::ifloat2binary-2\n"
+
+    Check the "$binary_magnitude" for an "undef", to see if the subroutine
+    cannot process the decimal exponent.
+
+    The first step of the "ifloat2binary" subroutine is zero out "iexponent"
+    by breaking up the "imagnitude" into an integer part "integer" and
+    fractional part "fraction" consist with the "iexponent". The
+    c<ifloat2binary> will add as many significant decimal zeros to the right
+    of "integer" in order to zero out "iexponent"; likewise it will add as
+    many decimal zeros to the left of "integer" to zero out "exponent"
+    within the limit set by the option "decimal_fraction_digits". If
+    "ifloat2binary" cannot zero out "iexponent" without violating the
+    "decimal_fraction_digits", "ifloat2binary" will discontinue processing
+    and return an "undef" "$binary_magnitude" with and error message in
+    "$binary_exponent".
+
+    This design is based on the fact that the conversion of integer decimal
+    to binary decimal is one to one, while the conversion of fractional
+    decimal to binary decimal is not. When converting from decimal fractions
+    with finite digits to binary fractions repeating binary fractions of
+    infinity size are possible, and do happen quite frequently. An unlimited
+    repeating binary fraction will quickly use all computer resources. The
+    "binary_fraction_bytes" option provides this ungraceful event by
+    limiting the number of fractional binary bytes. The default limits of 20
+    "decimal_fraction_digits" and "binary_fraction_bytes" 10 bytes provides
+    a full range of 0 - 255 for each binary byte. The ten bytes are three
+    more bytes then are ever used in the largest F8 SEMI float format.
+
+    The the following example illustrates the method used by "ifloat2binary"
+    to convert decimal fracional digits to binary fractional bytes. Convert
+    a 6 digit decimal fraction string into a binary fraction as follows:
+
+     N[0-999999]      
+     -----------  =  
+       10^6          
+
+     byte0    byte1   byte2    256         R2
+     ----- +  ----- + ----- + ----- * ------------
+     256^1    256^2   256^3   256^4     10 ^ 6
+
+    Six digits was chosen so that the integer arith, using a 256 base, does
+    not over flow 32 bit signed integer arith
+
+     256 *   99999     =   25599744
+     256 *  999999     =  255999744
+     signed 32 bit max = 2147483648 / 256 = 8377608
+     256 * 9999999     = 2559999744
+
+    Note with quad arith this technique would yield 16 decimal fractional
+    digits as follows:
+
+     256 * 9999999999999999  =  2559999999999999744
+     signed 64 bit max       =  9223372036854775808 / 256 = 36028797018963868
+     256 * 99999999999999999 = 25599999999999999744
+
+     Thus, need to get quad arith running.
+
+     Basic step
+
+      1      256 * N[0-999999]     1                     R0[0-999744]
+     --- *   ----------------  =  ---- ( byte0[0-255] + ------------ ) 
+     256         10 ^ 6           256                     10^6
+
+    The results will have a range of
+
+      1
+     ---- ( 0.000000 to 255.999744)
+     256 
+
+    The fractional part, R0 is a six-digit decimal. Repeating the basic step
+    three types gives the desired results. QED.
+
+     2nd Iteration
+
+      1      256 * R0[0-999744]       1                   R1[0-934464]
+     --- *   --------------      =  ---- ( byte1[0-255] + ------------) 
+     256         10 ^ 6              256                    10^6
+
+     3rd Iteration
+
+      1      256 * R1[0-934464]       1                   R2[0-222784]
+     --- *   --------------      =  ---- ( byte2[0-239] + ------------) 
+     256         10 ^ 6              256                    10^6
+
+    Taking this out to ten bytes the first six decimal digits N[0-999999]
+    yields bytes in the following ranges:
+
+     byte    power      range    10^6 remainder
+     ------------------------------------------ 
+       0     256^-1     0-255    [0-999744]
+       1     256^-2     0-255    [0-934464]
+       2     256^-3     0-239    [0-222784]
+       3     256^-4     0-57     [0-032704]
+       4     256^-5     0-8      [0-372224]
+       5     256^-6     0-95     [0-293440]
+       6     256^-7     0-75     [0-120640]
+       7     256^-8     0-30     [0-883840]
+       8     256^-9     0-226    [0-263040]
+       9     256^-10    0-67     [0-338249]
+
+    The first two binary fractional bytes have full range. The rest except
+    for byte 9 are not very close. This makes one wonder about the accuracy
+    loss in translating from binary fractions to decimal fractions. One
+    wonders just why have all theses problems with not just binary and
+    decimal factions but fractions in general. Isn't mathematics wonderful.
+
+    For example in convert from decimal to binary fractions there is no
+    clean one to one conversion as for integers. For example, look at the
+    below table of conversions:
+
+     -1    -2     -3     -4     -5     binary power as a decimal   
+     0.5   0.25  0.125 0.0625 0.03125  decimal power 
+                                       decimal 
+      0     0      0      0      0     0.00000
+      0     0      0      0      1     0.03125
+      0     0      0      1      1     0.0625
+      0     0      1      0      0     0.125
+      0     0      1      0      1     0.15625
+      0     0      1      1      0     0.1875
+      0     0      1      1      1     0.21875
+      1     0      0      0      0     0.50000
+
+  int2bytes
+
+     @bytes = int2bytes( $big_integer );
+
+    The "int2bytes" subroutine uses the "Data:BigInt" program module to
+    convert an integer text string "$bit_integer" into a byte array,
+    "@bytes", the Most Significant Byte (MSB) being "$bytes[0]". There is no
+    limits on the size of "$big_integer" or "@bytes" except for the
+    resources of the computer.
+
+  new
+
+     $secspack = new Data::Secs2( @options );
+     $secspack = new Data::Secs2( [@options] );
+     $secspack = new Data::Secs2( {options} );
+
+    The "new" subroutine provides a method to set local options once for any
+    of the other subroutines. The options may be modified at any time by
+    "$secspack-"config($option => $new_value)>. Calling any of the
+    subroutines as a "$secspack" method will perform that subroutine with
+    the options saved in "secspack".
+
+  pack_float
+
+     ($format, $floats) = pack_float($format, @string_integers);
+     ($format, $floats) = pack_float($format, @string_integers, [@options]);
+     ($format, $floats) = pack_float($format, @string_integersm {@options});
+
+    The "pack_float" subroutine takes an array of strings,
+    <@string_integers>, and a float format code, as specifed in the above
+    "Item Format Code Table", and packs all the integers, decimals and
+    floats as a float the "$format" in accordance with "SEMI E5-94". The
+    "pack_int" subroutine also accepts the format code "F" and format codes
+    with out the bytes-per-element number and packs the numbers in the
+    format using the less space. In any case, the "pack_int" subroutine
+    returns the correct "$format" of the packed "$integers".
+
+    If the "pack_float" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      (undef,$event)
+
+    The events are as follows:
+
+     "No inputs.\n\tData::SecsPack::pack_float-1\n"
+     "Format $format is not a floating point format.\n\tData::SecsPack::pack_float-2\n"
+     "F4 exponent overflow.\n\tData::SecsPack::pack_float-3\n"
+     "F4 xponent underflow.\n\tData::SecsPack::pack_float-4\n"
+     "F8 exponent overflow.\n\tData::SecsPack::pack_float-5\n"
+     "F8 xponent underflow.\n\tData::SecsPack::pack_float-6\n"
+
+    The "float2binary" also passes on any "float2binary" and "ifloat2binary"
+    events. Check the "$format" for an "undef", to see if the subroutine
+    cannot continue processing.
+
+  pack_int
+
+     ($format, $integers) = pack_int($format, @string_integers);
+     ($format, $integers) = pack_int($format, @string_integers, [@options]);
+     ($format, $integers) = pack_int($format, @string_integers, {options});
+
+    The "pack_int" subroutine takes an array of strings, <@string_integers>,
+    and a format code, as specifed in the above "Item Format Code Table" and
+    packs the integers, "$integers" in the "$format" in accordance with
+    "SEMI E5-94". The "pack_int" subroutine also accepts the format code "I
+    I1 I2 I8" and format codes with out the bytes-per-element number and
+    packs the numbers in the format using the less space, with unsigned
+    preferred over signed. In any case, the "pack_int" subroutine returns
+    the correct "$format" of the packed "$integers".
+
+    If the "pack_int" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      (undef,$event)
+
+    The events are as follows:
+
+     "No inputs.\n\tData::SecsPack::pack_int-1\n"
+     "Format $format is not an integer format.\ntData::SecsPack::pack_int-2\n"
+     "No integers in the input.\ntData::SecsPack::pack_int-3\n"
+     "Signed number encountered when unsigned specified.\ntData::SecsPack::pack_int-4\n"
+     "Integer bigger than format length of $max_bytes bytes.\ntData::SecsPack::pack_int-5\n"
+
+    Check the "$format" for an "undef", to see if the subroutine cannot
+    continue processing.
+
+  pack_num
+
+     ($format, $numbers, @strings) = pack_num($format, @strings);
+     ($format, $numbers, @strings) = pack_num($format, @strings, [@options]);
+     ($format, $numbers, @strings) = pack_num($format, @strings, {@options});
+
+    The "pack_num" subroutine takes leading numbers in "@strings" and packs
+    them in the "$format" in accordance with "SEMI E5-94". The "pack_num"
+    subroutine returns the stripped "@strings" data naked of all leading
+    numbers in "$format".
+
+    The "pack_num" subroutine also accepts "$format" of "I I1 I2 I4 F" For
+    these format codes, "pack_num" is extremely liberal and accepts
+    processes all numbers consistence with the "$format" and packs one or
+    more numbers in the "SEMI E5-94" format that takes the least space. In
+    this case, the return $format is changed to the "SEMI E5-94" from the
+    "Item FOrmat Code Table" of the packed numbers.
+
+    For the "I" "$format", if the "nomix" option is set, the "pack_num"
+    subroutine will pack all leading, integers, decimals and floats as
+    multicell float with the smallest space; otherwise, it will stop at the
+    first decimal or float encountered and just pack the integers.
+
+    The "pack_num" subroutine processes "@strings" in two steps. In the
+    first step, the "pack_num" subroutine uses "str2int" and/or "str2float"
+    subroutines to parse the leading numbers from the "@strings" as follows:
+
+     ([@strings], @integers) = str2int(@strings); 
+     ([@strings], @floats) = str2float(@strings); 
+
+    In the second step, the "pack_num" subroutine uses "pack_int" and/or
+    "pacK_float" to pack the parsed numbers.
+
+    If the "pack_nym" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      (undef,$event)
+
+    The events are as follows:
+
+     "No inputs.\n\tData::SecsPack::pack_num-1\n"
+     "Format $format is not an integer or floating point format.\ntData::SecsPack::pack_num-2\n"
+     "No numbers in the input.\ntData::SecsPack::pack_num-3\n"
+
+    The "float2binary" also passes on any "float2binary" "ifloat2binary"
+    "pack_int" "pack_float" events. Check the "$format" for an "undef", to
+    see if the subroutine cannot continue processing.
+
+  str2float
+
+     $float = str2float($string);
+     $float = str2float($string, [@options]);
+     $float = str2float($string, {@options});
+
+     (\@strings, @floats) = str2float(@strings);
+     (\@strings, @floats) = str2float(@strings, [@options]);
+     (\@strings, @floats) = str2float(@strings, {@options});
+
+    Obsoleted and superceded by the "Data::Str2Num-"str2float> subroutine in
+    the Data::Str2Num package.
+
+  str2int
+
+     $integer = str2int($string);
+     $integer = str2int($string, [@options]);
+     $integer = str2int($string, {@options});
+
+     (\@strings, @integers) = str2int(@strings); 
+     (\@strings, @integers) = str2int(@strings, [@options]); 
+     (\@strings, @integers) = str2int(@strings, {@options}); 
+
+    Obsoleted and superceded by the "Data::Str2Num-"str2integer> subroutine
+    in the Data::Str2Num package.
+
+  unpack_float
+
+     \@floats   = unpack_float($format, $float_string);
+     \@floats   = unpack_float($format, $float_string, @options);
+     \@floats   = unpack_float($format, $float_string, [@options]);
+     \@floats   = unpack_float($format, $float_string, {@options});
+
+    The "unpack_num" subroutine unpacks an array of floats "$float_string"
+    packed in accordance with SEMI-E5 "$format". A valid "$format", in
+    accordance with the above "Item Format Code Table", is "F4 F8".
+
+    If the "unpack_float" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+     $event
+
+    The events are as follows:
+
+     "No inputs\ntData::SecsPack::unpack_float-1\n"
+     "Format $format_in not supported.\n"tData::SecsPack::unpack_float-2\n"
+
+    The "unpack_num" subroutine, thus, returns a reference, "\@floats", to
+    the unpacked float array or scalar error message "$event". To determine
+    a valid return or an error, check that "ref" of the return exists or is
+    '"ARRAY"'.
+
+  unpack_int
+
+     \@integers = unpack_int($format, $integer_string); 
+     \@integers = unpack_int($format, $integer_string, @options); 
+     \@integers = unpack_int($format, $integer_string, [@options]); 
+     \@integers = unpack_int($format, $integer_string, {@options}); 
+
+    The "unpack_num" subroutine unpacks an array of numbers
+    "$string_numbers" packed in accordance with SEMI-E5 "$format". A valid
+    "$format", in accordance with the above "Item Format Code Table", is "S1
+    S2 S4 U1 U2 U4 T".
+
+    The "unpack_num" returns a reference, "\@integers", to the unpacked
+    integer array or scalar error message "$error". To determine a valid
+    return or an error, check that "ref" of the return exists or is
+    '"ARRAY"'.
+
+    If the "unpack_float" subroutine encounters an event where it cannot
+    continue, it halts processing, and returns the event as
+
+      $event
+
+    The events are as follows:
+
+     "No inputs\ntData::SecsPack::unpack_int-1\n"
+     "Format $format_in not supported.\n"tData::SecsPack::unpack_int-2\n"
+
+    The "unpack_num" subroutine, thus, returns a reference, "\@floats", to
+    the unpacked float array or scalar error message "$event". To determine
+    a valid return or an error, check that "ref" of the return exists or is
+    '"ARRAY"'.
+
+  unpack_num
+
+     \@numbers  = unpack_num($format, $number_string); 
+     \@numbers  = unpack_num($format, $number_string, @options); 
+     \@numbers  = unpack_num($format, $number_string, [@options]); 
+     \@numbers  = unpack_num($format, $number_string, {@options}); 
+
+    The "unpack_num" subroutine unpacks an array of numbers "$number_string"
+    packed in accordance with SEMI E5-94 "$format". A valid "$format", in
+    accordance with the above "Item Format Code Table", is "S1 S2 S4 U1 U2
+    U4 F4 F8 T". The "unpack_num" subroutine uses either "unpack_float" or
+    "unpack_int" depending upon "$format".
+
+    The "pack_num" subroutine does not generate any events but the
+    subroutine does pass on any "pack_int" and "pack_float" events,
+    returning them as a string. The "unpack_num" subroutine, thus, returns a
+    reference, "\@numbers", to the unpacked number array or scalar error
+    message "$event". To determine a valid return or an error, check that
+    "ref" of the return exists or is '"ARRAY"'.
+
+REQUIREMENTS
+    Coming.
+
+DEMONSTRATION
+     #########
+     # perl SecsPack.d
+     ###
+
+    ~~~~~~ Demonstration overview ~~~~~
+
+    The results from executing the Perl Code follow on the next lines as
+    comments. For example,
+
+     2 + 2
+     # 4
+
+    ~~~~~~ The demonstration follows ~~~~~
+
+         use File::Package;
+         my $fp = 'File::Package';
+
+         my $uut = 'Data::SecsPack';
+         my $loaded;
+
+         #####
+         # Provide a scalar or array context.
+         #
+         my ($result,@result);
+
+     ##################
+     # UUT Loaded
+     # 
+
+        my $errors = $fp->load_package($uut, 
+            qw(bytes2int float2binary 
+               ifloat2binary int2bytes   
+               pack_float pack_int pack_num  
+               str2float str2int 
+               unpack_float unpack_int unpack_num) );
+     $errors
+
+     # ''
+     #
+
+     ##################
+     # str2int('0xFF')
+     # 
+
+     $result = $uut->str2int('0xFF')
+
+     # '255'
+     #
+
+     ##################
+     # str2int('255')
+     # 
+
+     $result = $uut->str2int('255')
+
+     # '255'
+     #
+
+     ##################
+     # str2int('hello')
+     # 
+
+     $result = $uut->str2int('hello')
+
+     # undef
+     #
+
+     ##################
+     # str2int(1E20)
+     # 
+
+     $result = $uut->str2int(1E20)
+
+     # undef
+     #
+
+     ##################
+     # str2int(' 78 45 25', ' 512E4 1024 hello world') @numbers
+     # 
+
+     my ($strings, @numbers) = str2int(' 78 45 25', ' 512E4 1024 hello world')
+     [@numbers]
+
+     # [
+     #          '78',
+     #          '45',
+     #          '25'
+     #        ]
+     #
+
+     ##################
+     # str2int(' 78 45 25', ' 512E4 1024 hello world') @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # '512E4 1024 hello world'
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') numbers
+     # 
+
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025  0', ' 512E4 hello world')
+     [@numbers]
+
+     # [
+     #          [
+     #            '78',
+     #            '1'
+     #          ],
+     #          [
+     #            '-24',
+     #            '-6'
+     #          ],
+     #          [
+     #            '25',
+     #            -3
+     #          ],
+     #          [
+     #            '0',
+     #            -1
+     #          ],
+     #          [
+     #            '512',
+     #            '6'
+     #          ]
+     #        ]
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0', ' 512E4 hello world') @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # 'hello world'
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) numbers
+     # 
+
+     ($strings, @numbers) = str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1})
+     [@numbers]
+
+     # [
+     #          '78',
+     #          '-2.4E-6',
+     #          '0.0025',
+     #          '255',
+     #          '63',
+     #          '0',
+     #          '512E4'
+     #        ]
+     #
+
+     ##################
+     # str2float(' 78 -2.4E-6 0.0025 0xFF 077 0', ' 512E4 hello world', {ascii_float => 1}) @strings
+     # 
+
+     join( ' ', @$strings)
+
+     # 'hello world'
+     #
+          my @test_strings = ('78 45 25', '512 1024 100000 hello world');
+          my $test_string_text = join ' ',@test_strings;
+          my $test_format = 'I';
+          my $expected_format = 'U4';
+          my $expected_numbers = '0000004e0000002d000000190000020000000400000186a0';
+          my $expected_strings = ['hello world'];
+          my $expected_unpack = [78, 45, 25, 512, 1024, 100000];
+
+          my ($format, $numbers, @strings) = pack_num('I',@test_strings);
+
+     ##################
+     # pack_num(I, 78 45 25 512 1024 100000 hello world) format
+     # 
+
+     $format
+
+     # 'U4'
+     #
+
+     ##################
+     # pack_num(I, 78 45 25 512 1024 100000 hello world) numbers
+     # 
+
+     unpack('H*',$numbers)
+
+     # '0000004e0000002d000000190000020000000400000186a0'
+     #
+
+     ##################
+     # pack_num(I, 78 45 25 512 1024 100000 hello world) @strings
+     # 
+
+     [@strings]
+
+     # [
+     #          'hello world'
+     #        ]
+     #
+
+     ##################
+     # unpack_num(U4, 78 45 25 512 1024 100000 hello world) error check
+     # 
+
+     ref(my $unpack_numbers = unpack_num($expected_format,$numbers))
+
+     # 'ARRAY'
+     #
+
+     ##################
+     # unpack_num(U4, 78 45 25 512 1024 100000 hello world) numbers
+     # 
+
+     $unpack_numbers
+
+     # [
+     #          '78',
+     #          '45',
+     #          '25',
+     #          '512',
+     #          '1024',
+     #          '100000'
+     #        ]
+     #
+
+          @test_strings = ('78 4.5 .25', '6.45E10 hello world');
+          $test_string_text = join ' ',@test_strings;
+          $test_format = 'I';
+          $expected_format = 'F8';
+          $expected_numbers = '405380000000000040120000000000003fd0000000000000422e08ffca000000';
+          $expected_strings = ['hello world'];
+          my @expected_unpack = (
+               '7.800000000000017486E1', 
+               '4.500000000000006245E0',
+               '2.5E-1',
+               '6.4500000000000376452E10'
+          );
+
+          ($format, $numbers, @strings) = pack_num('I',@test_strings);
+
+     ##################
+     # pack_num(I, 78 4.5 .25 6.45E10 hello world) format
+     # 
+
+     $format
+
+     # 'F8'
+     #
+
+     ##################
+     # pack_num(I, 78 4.5 .25 6.45E10 hello world) numbers
+     # 
+
+     unpack('H*',$numbers)
+
+     # '405380000000000040120000000000003fd0000000000000422e08ffca000000'
+     #
+
+     ##################
+     # pack_num(I, 78 4.5 .25 6.45E10 hello world) @strings
+     # 
+
+     [@strings]
+
+     # [
+     #          'hello world'
+     #        ]
+     #
+
+     ##################
+     # unpack_num(F8, 78 4.5 .25 6.45E10 hello world) error check
+     # 
+
+     ref($unpack_numbers = unpack_num($expected_format,$numbers))
+
+     # 'ARRAY'
+     #
+
+     ##################
+     # unpack_num(F8, 78 4.5 .25 6.45E10 hello world) numbers
+     # 
+
+     $unpack_numbers
+
+     # [
+     #          '7.800000000000017486E1',
+     #          '4.500000000000006245E0',
+     #          '2.5E-1',
+     #          '6.4500000000000376452E10'
+     #        ]
+     #
+
+QUALITY ASSURANCE
+    Running the test script "SecsPack.t" and "SecsPackStress.t" verifies the
+    requirements for this module. The "tmake.pl" cover script for
+    "Test::STDmaker|Test::STDmaker" automatically generated the "SecsPack.t"
+    and "SecsPackStress.t" test scripts, the "SecsPack.d" and
+    "SecsPackStress.d" demo scripts, and the "t::Data::SecsPack" and
+    "t::Data::SecsPackStress" STD program module PODs, from the
+    "t::Data::SecsPack" and "t::Data::SecsPackStress" program module's
+    content. The "t::Data::SecsPack" and "t::Data::SecsPackStress" program
+    modules are in the distribution file Data-SecsPack-$VERSION.tar.gz.
+
+NOTES
+  AUTHOR
+
+    The holder of the copyright and maintainer is
+
+    <support@SoftwareDiamonds.com>
+
+  COPYRIGHT NOTICE
+
+    Copyrighted (c) 2002 Software Diamonds
+
+    All Rights Reserved
+
+  BINDING REQUIREMENTS NOTICE
+
+    Binding requirements are indexed with the pharse 'shall[dd]' where dd is
+    an unique number for each header section. This conforms to standard
+    federal government practices, STD490A 3.2.3.6. In accordance with the
+    License, Software Diamonds is not liable for any requirement, binding or
+    otherwise.
+
+  LICENSE
+
+    Software Diamonds permits the redistribution and use in source and
+    binary forms, with or without modification, provided that the following
+    conditions are met:
+
+    1   Redistributions of source code must retain the above copyright
+        notice, this list of conditions and the following disclaimer.
+
+    2   Redistributions in binary form must reproduce the above copyright
+        notice, this list of conditions and the following disclaimer in the
+        documentation and/or other materials provided with the distribution.
+
+    3   Commercial installation of the binary or source must visually
+        present to the installer the above copyright notice, this list of
+        conditions intact, that the original source is available at
+        http://softwarediamonds.com and provide means for the installer to
+        actively accept the list of conditions; otherwise, a license fee
+        must be paid to Softwareware Diamonds.
+
+    SOFTWARE DIAMONDS, http://www.softwarediamonds.com, PROVIDES THIS
+    SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT
+    NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL SOFTWARE
+    DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+    SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+    TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,DATA, OR
+    PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+    LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING USE
+    OF THIS SOFTWARE, EVEN IF ADVISED OF NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE POSSIBILITY OF SUCH DAMAGE.
+
+SEE_ALSO:
+    SEMI, http://www.semi.org
+    Math::BigInt
+    Math::BigFloat
+    Data::Secs2
+    Docs::Site_SVD::Data_SecsPack
+    Test::STDmaker
+    Data::Str2Num
+NAME
+    Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance
+    with SEMI E5-94
+
+Title Page
+     Software Version Description
+
+     for
+
+     Docs::Site_SVD::Data_SecsPack - pack and unpack numbers in accordance with SEMI E5-94
+
+     Revision: E
+
+     Version: 0.06
+
+     Date: 2004/05/21
+
+     Prepared for: General Public 
+
+     Prepared by:  SoftwareDiamonds.com E<lt>support@SoftwareDiamonds.comE<gt>
+
+     Copyright: copyright © 2003 Software Diamonds
+
+     Classification: NONE
+
+1.0 SCOPE
+    This paragraph identifies and provides an overview of the released
+    files.
+
+  1.1 Identification
+
+    This release, identified in 3.2, is a collection of Perl modules that
+    extend the capabilities of the Perl language.
+
+  1.2 System overview
+
+    The "Data::SecsPack" module extends the Perl language (the system).
+
+    The subroutines in the "Data::SecsPack" module packs and unpacks numbers
+    in accordance with SEMI E5-94. The E5-94 establishes the standard for
+    communication between the equipment used to fabricate semiconductors and
+    the host computer that controls the fabrication. The equipment in a
+    semiconductor factory (fab) or any other fab contains every conceivable
+    known microprocessor and operating system known to man. And there are a
+    lot of specialize real-time embedded processors and speciallize
+    real-time embedded operating systems in addition to the those in the PC
+    world.
+
+    The communcication between host and equipment used packed nested list
+    data structures that include arrays of characters, integers and floats.
+    The standard has been in place and widely used in China, Germany, Korea,
+    Japan, France, Italy and the most remote places on this planent for
+    decades. The SEMI E5 standard was first finalized in 1985 and has not
+    changed much over the decades. The basic data structure and packed data
+    formats have not changed for decades. This stands in direct
+    contradiction to common conceptions of many in the Perl snail-time
+    community that there is no standard for transferring such things as
+    binary floats between machines little less sending nested list data as
+    small compact binary.
+
+    The "Data::Str2int" module translates an scalar string to a scalar
+    integer. Perl itself has a documented function, '0+$x', that converts a
+    scalar to so that its internal storage is an integer (See p.351, 3rd
+    Edition of Programming Perl). If it cannot perform the conversion, it
+    leaves the integer 0. Surprising not all Perls, some Microsoft Perls in
+    particular, may leave the internal storage as a scalar string.
+
+    The <str2int> function is basically the same except if it cannot perform
+    the conversion to an integer, it returns an "undef" instead of a 0.
+    Also, if the string is a decimal or floating point, it will return an
+    undef. This makes it not only useful for forcing an integer conversion
+    but also for testing a scalar to see if it is in fact an integer scalar.
+
+  1.3 Document overview.
+
+    This document releases Data::SecsPack version 0.06 providing a
+    description of the inventory, installation instructions and other
+    information necessary to utilize and track this release.
+
+3.0 VERSION DESCRIPTION
+    All file specifications in this SVD use the Unix operating system file
+    specification.
+
+  3.1 Inventory of materials released.
+
+    This document releases the file
+
+     Data-SecsPack-0.06.tar.gz
+
+    found at the following repository(s):
+
+      http://www.softwarediamonds/packages/
+      http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+    Restrictions regarding duplication and license provisions are as
+    follows:
+
+    Copyright.
+        copyright © 2003 Software Diamonds
+
+    Copyright holder contact.
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+    License.
+        Software Diamonds permits the redistribution and use in source and
+        binary forms, with or without modification, provided that the
+        following conditions are met:
+
+        1   Redistributions of source code, modified or unmodified must
+            retain the above copyright notice, this list of conditions and
+            the following disclaimer.
+
+        2   Redistributions in binary form must reproduce the above
+            copyright notice, this list of conditions and the following
+            disclaimer in the documentation and/or other materials provided
+            with the distribution.
+
+        3   Commercial installation of the binary or source must visually
+            present to the installer the above copyright notice, this list
+            of conditions intact, that the original source is available at
+            http://softwarediamonds.com and provide means for the installer
+            to actively accept the list of conditions; otherwise, a license
+            fee must be paid to Softwareware Diamonds.
+
+        SOFTWARE DIAMONDS, http://www.SoftwareDiamonds.com, PROVIDES THIS
+        SOFTWARE 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING,
+        BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
+        FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL
+        SOFTWARE DIAMONDS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+        SPECIAL,EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+        LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
+        USE,DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+        ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+        OR TORT (INCLUDING USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+        NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE POSSIBILITY
+        OF SUCH DAMAGE.
+
+  3.2 Inventory of software contents
+
+    The content of the released, compressed, archieve file, consists of the
+    following files:
+
+     file                                                         version date       comment
+     ------------------------------------------------------------ ------- ---------- ------------------------
+     lib/Docs/Site_SVD/Data_SecsPack.pm                           0.06    2004/05/21 revised 0.05
+     MANIFEST                                                     0.06    2004/05/21 generated, replaces 0.05
+     Makefile.PL                                                  0.06    2004/05/21 generated, replaces 0.05
+     README                                                       0.06    2004/05/21 generated, replaces 0.05
+     lib/Data/SecsPack.pm                                         0.08    2004/05/21 revised 0.06
+     t/Data/SecsPack.d                                            0.04    2004/05/10 unchanged
+     t/Data/SecsPack.pm                                           0.04    2004/05/10 unchanged
+     t/Data/SecsPack.t                                            0.04    2004/05/10 unchanged
+     t/Data/SecsPackStress.d                                      0.02    2004/05/01 unchanged
+     t/Data/SecsPackStress.pm                                     0.02    2004/05/01 unchanged
+     t/Data/SecsPackStress.t                                      0.02    2004/05/01 unchanged
+     t/Data/File/Package.pm                                       1.17    2004/05/21 unchanged
+     t/Data/Test/Tech.pm                                          1.26    2004/05/21 revised 1.23
+     t/Data/Data/Secs2.pm                                         1.26    2004/05/21 revised 1.21
+     t/Data/Data/Startup.pm                                       0.07    2004/05/21 revised 0.05
+     t/Data/Data/Str2Num.pm                                       0.07    2004/05/21 new
+
+  3.3 Changes
+
+    Changes are as follows:
+
+    Data::SecsPack 0.01
+        Originated
+
+    Data::SecsPack 0.02
+        Adding support for packing and unpacking floats and flushing out to
+        provide full support for packing and unpacking all SEMI E5-94 SECSII
+        numeric formats.
+
+    Data::SecsPack 0.03
+        There were the same test software failures and Unit Under Test (UUT)
+        failures for the following platforms:
+
+         Subject: FAIL Data-SecsPack-0.02 ppc-darwin-thread-multi 7.2.0 
+         From: nothingmuch@woobling.org 
+         perl5: (revision 5.0 version 8 subversion 3) configuration:
+         Platform: osname=darwin, osvers=7.2.0, archname=ppc-darwin-thread-multi
+
+         From: "Thurn, Martin" <martin.thurn@ngc.com> 
+         Subject: FAIL Data-SecsPack-0.02 sun4-solaris-thread-multi 2.8
+         perl5: (revision 5.0 version 9 subversion 0)
+         Platform: osname=solaris, osvers=2.8, archname=sun4-solaris-thread-multi
+
+        The test software failures were caused by invalid data from the UUT
+        failure. The UUT failures caused non-numeric data for
+        "pass_fail_tolerance" in "SecsPackStress.t". Corrected
+        "pass_fail_tolerance" by detecting non-numeric data and returning a
+        failure. Failure of UUT "unpack_float" caused a "undef" passed to
+        "binary2hex". Corrected "binary2hex" by detecting and changing
+        "undef" to to "''".
+
+        There were two groups of UUT failures.
+
+        In the first group the test results were as the test results was two
+        member array of "Math::BigInt" number hash while the test was
+        expecting just two simple Perl numbers. The numbers in the
+        "Data::BigInt" hash were correct just in a different format. For
+        example,
+
+         t/Data/SecsPackStress....# Test 2 got: 'U1[1] 80
+         L[4]
+           A[0]
+           A[5] ARRAY
+           L[6]
+             A[12] Math::BigInt
+             A[4] HASH
+             A[4] sign
+             A[1] +
+             A[5] value
+             U1[1] 128
+           L[6]
+             A[12] Math::BigInt
+             A[4] HASH
+             A[4] sign
+             A[1] +
+             A[5] value
+             U1[1] 0
+         ' (t/Data/SecsPackStress.t at line 184)
+         #   Expected: 'U1[1] 80
+         U1[2] 128 0
+         '
+
+        The second group of failures the UUT "unpack_float" subroutine is
+        always returning a NaN. This subroutine heavily uses the native
+        floating point for calcuations and it appears to be limiting out
+        with "Not a Number" type error.
+
+         # Test 27 got: '0' (t/Data/SecsPackStress.t at line 396 fail #2)
+         #    Expected: '1' (got: NaN, expected: -10.5
+         # actual tolerance: NaN, expected tolerance: 0.0001)
+
+        Check version of "Math::BigInt" in the ActiveState Perl 5.06
+        distribution to those on CPAN. ActiveState "Math::BigInt" was 0.01
+        while CPAN was 1.70. The difference between the two is night and
+        day. Install "Math::BigInt" 1.70. Tests fails the same as above.
+
+        Corrected all "Data::SecsPack" subroutines to use new features and
+        intefaces of "Math::BigInt" 1.70 including a load "die" if the
+        "Math::BitInt" version is not 1.70 or greater
+
+        Replaced as many native float operations as possible with many new
+        "Math::BigInt" subroutines in Version 1.70 as possible. Removed work
+        arounds for subroutines such as "rsft" do not not work completely in
+        1.0 but do in 1.70. The "unpack_float" subroutine does not depend
+        heavily on native float which comes in a different flavor for each
+        and every site. There may be exceptions to this statement but if
+        they are, they a few and far between.
+
+    Data::SecsPack 0.04
+        The anticipation was that there would be minor differences in
+        floating point numbers due to different native floating point
+        implementations. This concern did not materialize. In addition,
+        "Data::BigFloat" replaced all native floating points. Since floating
+        point differences are no longer anticipation, removed all tolerance
+        criteria from the test scripts. To pass the tests, the results will
+        now have to be exactly as expected.
+
+        Added the formats U8 and S8 to allowable formats for "unpack_int".
+        This was an oversight, a mistake.
+
+        Added the "ascii_float" option to the "str2float" subroutine. This
+        is a new feature.
+
+        Switch to "Data::Startup" for handling options.
+
+    Data::SecsPack 0.05
+        The "str2float" subroutine did not recognize 0 as a number. Added 0
+        to tests for "str2float".
+
+    Data::SecsPack 0.06
+        Changed the required version for "Math::BigFloat" from 1.40 to 1.39.
+        Somehow the perquisites have some mysterious behaviors.
+
+        Failure:
+
+         From: mhoyt@houston.rr.com 
+         Subject: FAIL Tie-Layers-0.04 darwin-thread-multi-2level 7.0 
+
+        PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-e"
+        "test_harness(0, 'blib/lib', 'blib/arch')" t/Tie/Layers.t
+        t/Tie/Layers....Math::BigFloat version 1.4 required--this is only
+        version 1.39
+
+        Documentation woes. The SEMI link does not work on. Changed to SEMI,
+        http://www.semi.org.
+
+        Moved the "str2int" and "str2float" subroutines to the
+        "Data::Str2Num" package. This allows the used of these subroutines
+        without include all of the E5 SEMI packing and unpacking of the
+        "Data::SecsPack" package. This isolate the problems of getting the
+        required versions of "Math::BigFloat" and "Math::BigInt" support
+        packages greatly reduced number of situations.
+
+  3.4 Adaptation data.
+
+    This installation requires that the installation site has the Perl
+    programming language installed. There are no other additional
+    requirements or tailoring needed of configurations files, adaptation
+    data or other software needed for this installation particular to any
+    installation site.
+
+  3.5 Related documents.
+
+    There are no related documents needed for the installation and test of
+    this release.
+
+  3.6 Installation instructions.
+
+    Instructions for installation, installation tests and installation
+    support are as follows:
+
+    Installation Instructions.
+        To installed the release file, use the CPAN module pr PPM module in
+        the Perl release or the INSTALL.PL script at the following web site:
+
+         http://packages.SoftwareDiamonds.com
+
+        Follow the instructions for the the chosen installation software.
+
+        If all else fails, the file may be manually installed. Enter one of
+        the following repositories in a web browser:
+
+          http://www.softwarediamonds/packages/
+          http://www.perl.com/CPAN/authors/id/S/SO/SOFTDIA/
+
+        Right click on 'Data-SecsPack-0.06.tar.gz' and download to a
+        temporary installation directory. Enter the following where $make is
+        'nmake' for microsoft windows; otherwise 'make'.
+
+         gunzip Data-SecsPack-0.06.tar.gz
+         tar -xf Data-SecsPack-0.06.tar
+         perl Makefile.PL
+         $make test
+         $make install
+
+        On Microsoft operating system, nmake, tar, and gunzip must be in the
+        exeuction path. If tar and gunzip are not install, download and
+        install unxutils from
+
+         http://packages.softwarediamonds.com
+
+    Prerequistes.
+         'Math::BigInt' => '1.50',
+         'Math::BigFloat' => '1.39',
+         'Data::Startup' => '0.02',
+         'Data::Str2Num' => '0.05'
+
+    Security, privacy, or safety precautions.
+        None.
+
+    Installation Tests.
+        Most Perl installation software will run the following test
+        script(s) as part of the installation:
+
+         t/Data/SecsPack.t
+         t/Data/SecsPackStress.t
+
+    Installation support.
+        If there are installation problems or questions with the
+        installation contact
+
+         603 882-0846 E<lt>support@SoftwareDiamonds.comE<gt>
+
+  3.7 Possible problems and known errors
+
+    There is still much work needed to ensure the quality of this module as
+    follows:
+
+    *   Increase the accuracy of packing floats with large exponents and
+        unpacking floats.
+
+    *   State the functional requirements for each method including not only
+        the GO paths but also what to expect for the NOGO paths
+
+    *   Most of the tests are GO path tests. Should add some more NOGO tests
+        and review the test to see if they test each and every execution
+        path.
+
+    *   Add requirements and trace between requirements and the test that
+        verifies the requirement.
+
+4.0 NOTES
+    The following are useful acronyms:
+
+    .d  extension for a Perl demo script file
+
+    .pm extension for a Perl Library Module
+
+    .t  extension for a Perl test script file
+
+2.0 SEE ALSO
+    SEMI, http://www.semi.org
+    Data::Startup
+    Data::SecsPack
+    Docs::US_DOD::SVD

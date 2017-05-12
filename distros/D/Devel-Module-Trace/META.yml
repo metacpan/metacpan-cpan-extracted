@@ -1,0 +1,36 @@
+---
+abstract: 'Trace module origins'
+author:
+  - 'Sven Nierlein, C<< <nierlein at cpan.org> >>'
+  - 'Sven Nierlein <nierlein@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.15'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Module-Trace
+no_index:
+  directory:
+    - inc
+    - t
+  package:
+    - DB
+requires:
+  Devel::OverrideGlobalRequire: 0
+  JSON::XS: 0
+  Mojolicious::Lite: 0
+  POSIX: 0
+  Template: 0
+  Time::HiRes: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/sni/perl-devel-module-trace
+version: 0.02

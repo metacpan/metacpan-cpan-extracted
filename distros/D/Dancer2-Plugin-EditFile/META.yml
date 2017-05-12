@@ -1,0 +1,37 @@
+---
+abstract: 'Edit a text file from Dancer2'
+author:
+  - 'Hagop "Jack" Bilemjian <jck000@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-EditFile
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Dancer2: '0'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin: '0'
+  File::Copy: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Session::Token: '0'
+  Try::Tiny: '0'
+  YAML: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/jck000/Dancer2-Plugin-EditFile/issues
+  homepage: https://github.com/jck000/Dancer2-Plugin-EditFile/
+  repository: https://github.com/jck000/Dancer2-Plugin-EditFile
+version: '0.005'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.016'

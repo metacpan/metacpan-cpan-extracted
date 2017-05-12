@@ -1,0 +1,58 @@
+{
+   "abstract" : "Dancer I18N plugins using Locale::TextDomain",
+   "author" : [
+      "Nicolas Steenlant <nicolas.steenlant@ugent.be>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Locale",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Software::License" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3050",
+            "Locale::TextDomain" : "1.23",
+            "Locale::Util" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Plugin::Locale" : {
+         "file" : "lib/Dancer/Plugin/Locale.pm",
+         "version" : "0.0103"
+      },
+      "Dancer::Plugin::Locale::Detect" : {
+         "file" : "lib/Dancer/Plugin/Locale/Detect.pm",
+         "version" : "0.0103"
+      },
+      "Dancer::Plugin::Locale::TextDomain" : {
+         "file" : "lib/Dancer/Plugin/Locale/TextDomain.pm",
+         "version" : "0.0103"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.0103"
+}

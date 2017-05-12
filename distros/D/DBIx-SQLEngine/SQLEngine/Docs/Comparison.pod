@@ -1,0 +1,97 @@
+=head1 NAME
+
+DBIx::SQLEngine::Docs::Comparison - Entry for poop-comparison
+
+
+=head1 DESCRIPTION
+
+Numerous modules on CPAN provide some type of system to map objects to and from SQL databases, including L<Class::DBI>, L<Alzabo>, and L<Tangram>.
+
+Dave Rolsky and the Poop-Group discussion list have assembled a very useful comparison of several such CPAN modules at http://poop.sourceforge.net/.
+
+For comparison purposes, this document reviews some of the points of comparison used by the Poop-Group summary and their answers for this module.
+
+
+=head1 COMPARISON
+
+=over 4
+
+=item * DBIx::SQLEngine
+
+ Author:         M. Simon Cavalletto <simonm@cavalletto.org>
+ Homepage:       http://www.evoscript.org/DBIx-SQLEngine/
+ Latest Version: 0.022 - April 10th, 2004
+ First Release:  22nd January 2002
+
+=back
+
+=head2 Supported databases
+
+Any database supported by one of the following: DBD::AnyData, DBD::CSV, DBD::Informix, DBD::MySQL, DBD::Oracle, DBD::Pg, DBD::SQLite, DBD::Sybase, or DBD::XBase.
+
+Providing support for other drivers involves creating a DBD-specific subclass of DBIx::SQLEngine::Driver (which will be loaded via DBIx::AnyDBD when appropriate), and should only require a limited amount of coding.
+
+=head2 SQL Abstraction
+
+This module supports moderately complex selects, inserts, updates, and deletes. It is possible to apply order by and group by clauses to operations, as well as limits.
+
+Inserts with sequences are supported, with the driver classes providing a workaround with sequence table logic for DBDs which don't have native sequence/auto_increment equivalents.
+
+The base Record class does not support joins, although the underlying DBIx::SQLEngine does, and it is possible to provide your own query logic in a subclass. 
+
+=head2 Invalid SQL
+
+The automated SQL generation should produce valid SQL, but if you pass in incorrect information, such as explicitly requesting a column name which does not exist in the database, or if you pass in a SQL snippet as part of a query, it is not validated prior to actually executing the query and receiving an error from the DBMS.
+
+=head2 Deferred/Preloaded data retrieval
+
+There is not yet any way to defer the loading of given columns for a select. However, it always possible to easily specify only those columns which are needed at a given point in your code. (Deferred loading of additional columns is expected in an upcoming release.)
+
+=head2 Table Relationships
+
+DBIx::SQLEngine does not yet provide any automatic support for relationships. 
+
+=head2 Multiple rows and cursors
+
+DBIx::SQLEngine can return all matching records at once, or accept a code ref which will be called on each one in turn, or return a code ref that will incrementally return available rows. 
+
+A RecordSet object similar to a cursor is also used but it does not yet handle incremental retrieval. (Support for richer cursors is expected in an upcoming release.)
+
+=head2 Caching
+
+Basic caching support has recently been added and may be enabled on a class-by-class basis. (Support for LRU caching and ensuring that there is only a single instance of a given object in memory at any time are both expected in an upcoming release.)
+
+=head2 Transactions
+
+DBIx::SQLEngine provides basic support for transactions.
+
+=head2 Auto-generated methods
+
+Auto-generation of basic accessor methods is available and may be enabled on a class-by-class basis.
+
+=head2 Documentation
+
+The documentation for the object-mapping portions of this framework is still fairly rough, although efforts are continuing to improve this.
+
+=head2 License
+
+GPL/Artistic disjunction. The same as Perl itself.
+
+=head2 Support
+
+Support for this module is available from the author (evo@cpan.org). (The author is also available for support contracts or consulting engagements.)
+
+=head2 Status
+
+Actively developed and supported by the author. Underlying features being used by other CPAN modules, but not the recently-released object-mapping capability.
+
+=head2 Other
+
+A callback mechanism allows you to specify method names or arbitrary subroutines to be called immediately before or after each record is retrieved, inserted, updated, or deleted. You can add these callbacks to all record classes, to a particular class, or even to a particular object instance. 
+
+
+=head1 SEE ALSO
+
+See L<DBIx::SQLEngine> for an overview of this framework.
+
+=cut

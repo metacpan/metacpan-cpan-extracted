@@ -1,0 +1,35 @@
+---
+abstract: 'Import data from the L<TMS|http://www.gallerysystems.com/products-and-services/tms/> instance of the L<KMSKA|http://kmska.be/nl/>'
+author:
+  - 'Pieter De Praetere <pieter at packed.be >'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Datahub-Factory-KMSKA
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Datahub::Factory: '0'
+  Datahub::Factory::Importer::PIDS: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/thedatahub/Datahub-Factory-KMSKA/issues
+  homepage: https://github.com/thedatahub/Datahub-Factory-KMSKA
+  repository: https://github.com/thedatahub/Datahub-Factory-KMSKA.git
+version: '0.01'
+x_contributors:
+  - 'Pieter De Praetere <pieter@packed.be>'
+x_serialization_backend: 'YAML::Tiny version 1.69'

@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Stream/Bulk/AnyEvent.pm
+t/01-blocking.t
+t/02-callback.t
+t/03-mode_change.t
+t/04-inherit.t
+t/author-critic.t
+t/release-kwalitee.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+weaver.ini

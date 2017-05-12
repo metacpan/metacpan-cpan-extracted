@@ -1,0 +1,55 @@
+DBIx-PgLink version 0.01
+========================
+
+NAME
+    DBIx::PgLink - external database access from PostgreSQL backend using
+    Perl DBI
+
+DESCRIPTION
+    *PgLink* is based on *DBI-Link* project for accessing external data
+    sources from PostgreSQL backend.
+
+    This module can be used only in untrusted PL/Perl function.
+
+INSTALLATION
+
+To install this module type the following:
+
+     perl Makefile.PL
+     make
+     make install
+
+or
+
+     perl Build.PL
+     ./Build
+     ./Build install
+
+Testing of module requires extra setup of PostgreSQL database and environment,
+described in <Install.html>
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Moose
+  MooseX::Method
+  DBI
+  DBD::xxx (for your database)
+  Tie::Cache::LRU
+
+
+AUTHOR
+    Alexey Sharafutdinov <alexey.s.v.br@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2007 by Alexey Sharafutdinov
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.8 or, at
+    your option, any later version of Perl 5 you may have available.
+
+
+    DBI-Link project by David Fetter under BSD License
+    http://pgfoundry.org/projects/dbi-link/

@@ -1,0 +1,5 @@
+#!/bin/sh
+# $Id$
+echo "Psst... This package is is build via 'perl Build.PL'"
+echo "Just a moment while I transfer your call."
+perl ./Build.PL

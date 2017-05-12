@@ -1,0 +1,11 @@
+> 1: "cool" changed from "" to "Perl"  at test.pl line 38
+> 1: "neat" changed from "" to "Perl"  at test.pl line 39
+> 1: "cool" changed from "Perl" to "Larry"  at test.pl line 38
+> 1: "neat" changed from "Perl" to "Larry"  at test.pl line 39
+> 1: "cool" changed from "Larry" to "HASH(0x48264)"  at test.pl line 38
+> 1: "neat" changed from "Larry" to "HASH(0x48264)"  at test.pl line 39
+> 1: "cool" changed from "HASH(0x48264)" to "ARRAY(0x48180)"  at test.pl line 38
+> 1: "neat" changed from "HASH(0x48264)" to "ARRAY(0x48180)"  at test.pl line 39
+# mission completed
+# variable is now under observation
+# variable is now under observation

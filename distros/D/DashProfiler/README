@@ -1,0 +1,32 @@
+DashProfiler
+
+The DashProfiler modules enable you to efficiently collect performance data
+by adding just a line of code to the functions or objects you want to monitor.
+
+Data is aggregated by context and optionally also by a granular time axis.
+
+See DashProfiler::UserGuide for a general introduction.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+DEPENDENCIES
+
+    DBI >= 1.57
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007-2008, Tim Bunce, Ireland
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+

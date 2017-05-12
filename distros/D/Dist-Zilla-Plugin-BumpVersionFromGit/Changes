@@ -1,0 +1,44 @@
+Revision history for Dist-Zilla-Plugin-BumpVersionFromGit
+
+0.010     2015-03-24 07:09:59-04:00 America/New_York
+
+    - mark DEPRECATED in META.*
+
+0.009     2011-07-21 11:41:51 America/New_York
+
+    - fixed typo in link to DZP::Git::NextVersion
+
+0.008     2010-10-10 22:53:07 EST5EDT
+
+    - marked this distribution as DEPRECATED
+
+0.007     2010-07-13 14:50:54 EST5EDT
+
+    - fixed tests for changes in Dist::Zilla::Tester API
+
+0.006     2010-04-28 14:01:18 EST5EDT
+
+    - fixed tests for changes in Dist::Zilla chrome API
+
+0.005     2010-04-08 14:56:20 EST5EDT
+
+    - specify prereqs manually instead of relying
+      on automatic detection to work around a
+      Dist::Zilla bug
+
+0.004     2010-04-07 14:23:39 EST5EDT
+
+    - fix tests for new Dist::Zilla 2.0
+
+0.003     2010-03-20 14:00:58 EST5EDT
+
+    - add 'first_version' attribute to initialize version when no tags
+      exist in the repository (defaults to 0.001)
+
+0.002     2010-03-19 18:00:57 EST5EDT
+
+    - add prerequisites list (whoops!  not automated yet!)
+
+0.001     2010-03-19 16:07:20 EST5EDT
+
+    - first release to CPAN

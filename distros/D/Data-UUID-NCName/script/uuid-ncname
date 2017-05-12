@@ -1,0 +1,123 @@
+#!perl
+
+=head1 NAME
+
+uuid-ncname - Command-line converter for UUIDs <-> NCNames
+
+=head1 SYNOPSIS
+
+    uuid-ncname [-r|-n|-i FILE ...]  [uuid-or-ncname, ...]
+
+    uuid-ncname < file
+
+=head1 OPTIONS
+
+Default behaviour: Convert the UUIDs, or Base32 NCNames passed in as
+arguments or via pipe, into Base64, one per line of output. Any Base64
+NCNames pass through unchanged. If no arguments are passed and no
+input is piped in, generate a single new NCName, based on a V4 UUID.
+
+=over 4
+
+=item -r --reverse
+
+Convert input I<from> UUID-NCName identifiers, I<back> into an ordinary
+UUID.
+
+=item -n --nocase --nc --32
+
+Generate Base32 UUID-NCNames, rather than Base64.
+
+=item -i --input FILE
+
+Take input from the specified file. Can be passed in several times.
+
+=back
+
+=cut
+
+use strict;
+use warnings FATAL => 'all';
+
+use Data::UUID::NCName ();
+use UUID::Tiny         ();
+use Getopt::Long       ();
+use Pod::Usage         ();
+use Carp               ();
+
+Getopt::Long::Configure(qw(bundling no_ignore_case));
+
+my $UUID = qr/^\s*(?i:urn:uuid:)?
+              ([0-9A-Fa-f]{8}(?:-?[0-9A-Fa-f]{4}){4}[0-9A-Fa-f]{8})\s*$/x;
+my $B64  = qr/^\s*([A-Pa-p][0-9A-Za-z_-]{21})\s*$/;
+my $B32  = qr/^\s*([A-Pa-p][2-7A-Za-z]{25})\s*$/;
+my $ALL  = qr/$UUID|$B64|$B32/;
+
+my %p = (
+    input => [],
+);
+
+Getopt::Long::GetOptions(
+    'i|input=s'      => $p{input},
+    'r|reverse'      => \$p{reverse},
+    'n|nocase|nc|32' => \$p{nc},
+    'u|urn'          => \$p{urn},
+    'h|help'         => \$p{help},
+);
+
+exit Pod::Usage::pod2usage(0) if $p{help};
+
+my @input;
+
+if (@{$p{input}}) {
+    for my $file (@{$p{input}}) {
+        open my $fh, $file or Carp::croak("$0: Could not read input $file: $!");
+        while (my $line = <$fh>) {
+            chomp $line;
+            unless ($line =~ $ALL) {
+                print STDERR "$0: Don't know what to do with $line\n";
+                next;
+            }
+            push @input, $line;
+        }
+    }
+}
+elsif (@ARGV) {
+    for my $x (@ARGV) {
+        unless ($x =~ $ALL) {
+            print STDERR "$0: Don't know what to do with $x\n";
+            next;
+        }
+        push @input, $x;
+    }
+}
+# elsif (-t STDIN) {
+#     while (my $line = <>) {
+#         chomp $line;
+#         unless ($line =~ $ALL) {
+#             print STDERR "$0: Don't know what to do with $line\n";
+#             next;
+#         }
+#         push @input, $line;
+#     }
+# }
+else {
+    push @input, lc UUID::Tiny::create_uuid_as_string(&UUID::Tiny::UUID_V4);
+}
+
+for my $in (@input) {
+
+    if (my ($x) = ($in =~ $UUID)) {
+        print $p{reverse} ? "$x\n" :
+            Data::UUID::NCName::to_ncname($x, $p{nc} ? 32 : 64) . "\n";
+    }
+    elsif (($x) = ($in =~ $B64)) {
+        $x = Data::UUID::NCName::from_ncname($x);
+        print $p{nc} && !$p{reverse} ?
+            Data::UUID::NCName::to_ncname($x, 32) . "\n" : "$x\n";
+    }
+    elsif (($x) = ($in =~ $B32)) {
+        $x = Data::UUID::NCName::from_ncname($x);
+        print $p{reverse} ? "$x\n" : Data::UUID::NCName::to_ncname($x) . "\n";
+    }
+}

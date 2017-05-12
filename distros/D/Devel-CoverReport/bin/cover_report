@@ -1,0 +1,209 @@
+#!/usr/bin/perl
+
+# Copyright 2009-2012, Bartłomiej Syguła (perl@bs502.pl)
+#
+# This is free software. It is licensed, and can be distributed under the same terms as Perl itself.
+#
+# For more, see my website: http://bs502.pl/
+
+require 5.6.1;
+
+use strict;
+use warnings;
+
+our $VERSION = "0.05";
+
+use Devel::CoverReport::App::CoverReport 0.05;
+
+exit Devel::CoverReport::App::CoverReport::main(@ARGV);
+
+=head1 NAME
+
+cover_report - Advanced coverage reports based on Devel::Cover (cover_db) databases.
+
+=head1 USAGE
+
+ cover_report [options]
+
+=head1 OPTIONS
+
+ -h --help      Display short usage description.
+ -V --version   Display version information.
+
+ -v --verbose   Be extra verbose. (default: off)
+ -q --quiet     Be extra quiet.   (default: off)
+ -s --summary   Display summary.  (default: auto)
+
+ -j --jobs N    Run N test jobs in parallel (try 4) (default: off)
+
+ -d --cover_db  dir        Location of the database directory.      (default: cover_db)
+ -f --formatter formatter  What format to use, when saving reports. (default: Html)
+ -o --output    dir        Output directory.                        (default: cover_db)
+ -c --criterion criterion  Include criterion in the report.         (default: include all)
+ -r --report    report     Include report of given type.            (default: include all)
+
+    Excluded files will not appear in the report (default: none)
+
+ --exclude     glob Exclude file(s) in the report
+ --exclude_dir dir  Exclude files under the directory
+ --exclude_re  RE   Exclude files matching regexp
+
+    Included files will appear in report (default: all user modules)
+
+ --include     glob Include file(s) in the report
+ --include_dir dir  Include files under the directory
+ --include_re  RE   Include files matching regexp
+
+    Mentioned files will appear, but will not affect stats (default: system modules)
+
+ --mention     glob Mention file in the report
+ --mention_dir dir  Mention files under the directory
+ --mention_re  RE   Mention files matching regexp
+
+ Formatter should be one from the list bellow:
+   Html   HTML with CSS
+   YAML   YAML data dumps
+
+ Criterion can be one, or more, from the list bellow:
+   statement      statement coverage
+   branch         branch coverage
+   condition      condition coverage
+   path           path coverage
+   subroutine     subroutine coverage
+   pod            pod coverage
+   time           time spent
+   all
+
+ Report can be one, or more, from the list bellow:
+   summary        coverage summary.
+   index          index of covered files.
+   coverage       coverage information, per each covered file.
+   runs           coverage summary, per each file/run combination.
+   run-details    coverage details, per each file/run combination.
+   cvs            include commit information from VCS
+   all            default setting - include all.
+
+=head1 SELECTING FILES TO COVER
+
+You may want to decide, how each covered file should be treated.
+
+Unless specified, no file is excluded, all files from Perl's include directories are mentioned, and the rest is included.
+
+=head2 Exclude
+
+Files classified as 'Exclude' will be ignored, as if they never existed.
+
+This is the first check, so file WILL be excluded, even if it could be Mentioned or Selected.
+
+=head2 Mention
+
+Files classified as 'Mention' will be included in the report, in separate list, and will not be taken into account when making statistical summaries.
+
+This feature allows the developer to see what external modules - and which parts of them - his code uses.
+Since their (most probably incomplete) coverage is usually not important, they will not make the overall test coverage seem lower, then it actually is.
+
+This is the second test, so the file will be Mentioned, even if could be Selected, as long, as it is not Excluded.
+
+=head2 Include
+
+Files classified as 'Include' will be included in the report, and information about them will be used while making overall statistics.
+
+This is the third check, so file - if matched - will be Selected, unless it was either Excluded or Mentioned.
+
+=head1 FEATURES
+
+=over
+
+=item Per-directory coverage summary
+
+Average coverage, maesured per directory (with sub-directories).
+Since Perl packages rely on directory structure, this could provide useful in bigger projects.
+
+Sub-summaries include module, that has the same package name as the directory. 
+Some example may describe this better:
+ /Foo/Bar.pm
+ /Foo/Baz.pm
+ /Foo.pm
+ /Foo <-- summary, contains /Foo/*.pm and /Foo.pm
+ /Bzz/Brr/Doo.pm
+ /Bzz.pm
+ /Bzz <-- summary, contains /Bzz/Brr/Doo.pm and /Bzz.pm
+In the above example, there is not summary for F</Bzz/Bzz>, as it contains just one file,
+thus it would not introduce any new infromation, and just double some figures.
+
+=back
+
+=head1 TODO
+
+=over
+
+=item File by test cross summary
+
+Displays table with tests/scripts/sources as columns, and modules as rows.
+Intersections show how much ocverage a module receives from the source.
+
+=item Shortening path
+
+When all file paths start with the same prefix, such prefix could be removed to increase redability.
+
+ --basedir_strip       Enable file path shortening
+ --nobasedir_strip     Enable file path shortening
+ --basedir         dir Set directory, that should be stripped from file paths
+
+=back
+
+=head1 REQUIREMENTS
+
+=over
+
+=item Devel::Cover
+
+This is not always a strict requirement. Since Devel::CoverReport is primary a reporting tool,
+You probably need some way of creating the coverage database in the first place.
+
+An example use-case, where You will NOT need having Devel::Cover along, is if You just want
+to make report from database, that was generated on another maching/by someone else.
+
+=back
+
+=head1 BUGS
+
+Condition handling is broken - it will I<probably> work on summaries,
+but is ultimtely broken on detail pages. Will fix that in next release.
+
+=head1 KNOWN ISSUES
+
+=head2 Paralell runs
+
+I have observed many times, that when running many tests at once can corrupt Devel::Cover database and thus produce false statistics.
+
+Running with C<prove -j 1 ...> (default) should be a safe bet.
+
+=head2 Devel::Cover and Devel::CoverReport reports
+
+It seems, that running 'cover' removes contents of cover_db/runs directory.
+Due to this issue, Devel::CoverReport has to be used before running 'cover'.
+
+=head1 AUTHOR
+
+Bartłomiej Syguła <perl@bs502.pl>
+
+=head1 ACKNOWLEDGEMENTS
+
+This module was inspired by work of:
+
+Paul Johnson (Devel::Cover)
+
+Johan Lindström (Devel::CoverX::Covered)
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+Copyright 2009-2012, Bartłomiej Syguła
+
+This is free software. It is licensed, and can be distributed under the same terms as Perl itself.
+
+This script was inspired by L<Devel::Cover> by Paul Johnson.
+
+=cut
+
+# vim: fdm=marker

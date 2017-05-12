@@ -1,0 +1,17 @@
+#FORMAT: BEACON
+#FOO= bar doz
+
+#TARGET: http://example.com/{ID}
+#PREFIX: x:
+#EXAMPLES:
+0|1
+ 1  | 099 
+2|0
+|this is a comment
+ |this is also a comment
+foo
+bar||doz||http://another.example.com/
+
+b|7a
+c| 7|
+

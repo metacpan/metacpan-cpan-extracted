@@ -1,0 +1,63 @@
+Revision history for Perl extension Dist-Zilla-Plugin-Repository
+
+0.20    2013-02-25
+        $ENV{LC_ALL} = "C"; from jquelin
+
+0.19    2012.10.17
+        Use https:// URLs for Github. (DOLMEN)
+
+0.18    2011.04.23
+        Match github urls using git: http: or https: schemes (magnificent-tears)
+
+0.17    2011.01.06
+        Guard against invalid github remote (dagolden)
+        Guard tests against a user's ~/.svk directory (dagolden)
+
+0.16    2010.11.11
+        detect repository type even if unable to determine URL (cjm)
+
+        deprecate github_http.  It now defaults to false, warns if
+        it's turned on, and works by deleting the "url" key. (cjm)
+
+        If you want search.cpan.org to show a link to the Github
+        repository browser, leave github_http false and use the
+        MetaJSON plugin.  The CPAN Meta 2 standard allows for links to
+        both the git clone URL and a web front-end.  You can continue
+        to use the MetaYAML plugin to provide a v1.4 META.yml for
+        CPAN clients that don't yet handle the v2 standard.
+
+0.15    2010.11.05
+        better Meta 2 support: added type & web attrs (cjm)
+
+0.14    2010.09.01
+        make repository attr, lazy, changeable (Sawyer X)
+
+0.13    2010.05.19
+        bare minimum change for META 2 generation (rjbs)
+
+0.12    2010.05.03
+        make filtering github urls to http configurable (doy)
+
+0.11    2009.09.26
+        fix POD
+
+0.10    2009.09.26
+        git_remote attribute (madsen)
+
+0.09    2009.08.10
+        Change private googlecode repository url to the public one (Moritz Onken)
+
+0.08    2009.05.14
+        Added Mercurial support From Module-Install-Repository-0.05
+
+0.07    2009.05.13
+        fix use of git-remote show to work offline (rjbs)
+
+0.06    2009.05.11
+        fix version, fix authors
+
+0.02    2009.04.21
+        use http instead of git for github.com
+
+0.01    2009.04.20
+        a start

@@ -1,0 +1,18 @@
+Revision history for Dancer-Plugin-Transformator
+
+0.002 2015-07-09
+ - bump Net::NodeTransformator
+
+0.001 2014-12-18
+ - allow standalone service
+
+ [API CHANGES]
+
+ [BUG FIXES]
+
+ [DOCUMENTATION]
+
+ [ENHANCEMENTS]
+
+0.000 0000-00-00
+

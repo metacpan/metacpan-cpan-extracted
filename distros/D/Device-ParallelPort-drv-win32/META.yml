@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Device-ParallelPort-drv-win32
+version:      1.3
+version_from: win32.pm
+installdirs:  site
+requires:
+    Device::ParallelPort:          0
+    Win32::API:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

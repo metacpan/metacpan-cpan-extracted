@@ -1,0 +1,22 @@
+Changes
+datafaker
+lib/Data/Faker.pm
+lib/Data/Faker/Company.pm
+lib/Data/Faker/DateTime.pm
+lib/Data/Faker/Internet.pm
+lib/Data/Faker/Name.pm
+lib/Data/Faker/PhoneNumber.pm
+lib/Data/Faker/StreetAddress.pm
+Makefile.PL
+MANIFEST
+README
+t/datafaker.t
+t/Data-Faker-Company.t
+t/Data-Faker-DateTime.t
+t/Data-Faker-Internet.t
+t/Data-Faker-Name.t
+t/Data-Faker-PhoneNumber.t
+t/Data-Faker-StreetAddress.t
+t/Data-Faker.t
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,136 @@
+Revision history for Perl extension Decision::Depends.
+
+0.21	2016-02-17T09:48:09-0500
+
+   * no changes from 0.20_02
+
+0.20_02	2016-02-16T11:53:32-0500
+
+   [ BUILD ]
+      * tests assumed availability of rm executable and POSIX style shell. Oops.
+
+0.20_01  2016-02-14T12:22:04-0500
+
+   [ BUILD ]
+      * t/parse.t relied upon hash order
+      * modernized build infrastructure to use cpanfile
+      * author tests moved to xt/
+
+
+0.20  2008-08-29T17:16:46-0500
+        - work around feature in Test::More 0.80 which caused variable
+	  hash test to fail.
+
+0.19  2008-03-04T09:49:55-0500
+        - new variable dependency code didn't work; fix it and tests
+	  which didn't show failure.
+
+0.18  2008-03-03T-14:44:09-0500
+        - Variable dependencies may now be hashes and arrays as well
+	  as scalars.
+
+0.17  2005-09-20T15:46:20-0500
+        - Test::More::eq_hash (v0.6) is more thorough than v0.47,
+	  which broke t/sig.t
+	- useless (and incorrect) deletion of attributes in t/traverse.t
+	  led to warning
+
+0.16  2003-07-13T16:15:43-0500
+
+        - verbose output is sent to STDOUT now.
+
+0.15  2003-06-26T13:32:43-0500
+
+        - added hash ref means of associating attribute values and
+	  ordinary values
+	- modified variable dependencies so can find name of variable
+	  in attribute value.  this allows easy specification of
+	  variable names and values via the hashref method above.
+
+0.14  2003-01-22T00:17:32-0500
+
+        - AutoSave option was undocumented and no longer needed.
+	- Added warning about absolute path for dependency file to docs.
+
+0.13  2003-01-21T13:54:33-0500
+
+        - needed to bump up Carp::CarpLevel at the Depends.pm level.
+
+0.12  2003-01-11T00:39:02-0500
+
+        - Force had no effect if a target had no dependencies.
+	- added force attribute to targets
+
+0.11  2002-12-31T10:56:58-0500
+
+        - Yikes. was developing with older version of YAML;
+	  latest version has DumpFile, not StoreFile.
+	  require YAML 0.35
+
+0.10  2002-12-31T10:21:56-0500
+
+        - release to CPAN.  Now called Decision::Depends.
+	  no more 'use Depends'. awww.
+
+0.09  2002-04-10T10:20:48-0500
+
+        - variable dependencies now try to guess if the value is a
+	  number and perform a numeric comparison.  This may be
+	  forced or overridden with the new -numcmp and -strcmp attributes.
+	- documented variable dep. -case attribute.
+	- added Depends::renew() for testing purposes.
+	- removed dependency Attr hashes; they should all use State
+	  Attrs via State methods.
+
+
+0.08  2002-04-02T01:08:18-0500
+
+        - test for dependency existance in Time->new didn't
+	  check the State cache (good when Pretend => 1 ).
+	  it seems to be a duplicate check, as it's also done
+	  (correctly) in Time->depends.  So, yank the check in new().
+
+0.07  2002-04-01T00:00:00-0500
+        - configure is more flexible in regards to the form of its
+	  arguments
+	- OO::new was calling (via configure) $self->{State}->SetAttr
+	  before $self->{State} was created.
+	- Target::mkSFile wasn't correctly updating the modify time
+	  if the sfile already existed.
+
+0.06  2002-03-27T20:24:27-0500
+        - State->getVar was incorrectly treating variables
+	  with values of 0 as being undefined.  oops.
+
+0.05  2002-03-25T13:22:33-0500
+
+        - first recasting of top level Depends interface into OO
+          module by moving most of the front end code into Depends::OO.
+          Depends.pm now is just a wrapper around Depends::OO.
+
+	- Depends::init superceded by Depends::Configure.
+
+	- added Force and -force global and local attributes to force
+	  dependencies to be out of date.
+
+	- no longer use File::stat, as it causes conniptions for
+	  testing under 5.6.1.
+
+0.04  2002-03-21T19:48:11-0500
+        - added test_dep()
+
+0.03  2002-03-07T16:45:04-0500
+        - further message tweaks.
+	- Verbose > 4 gives object creation messages.
+	- must have broken non-existant signature and variable code,
+	  cause it didn't work.  does now.
+
+0.02  2002-03-06T12:07:20-0500
+        - uses YAML instead of Data::Denter, as had corruption
+	  problems with the latter
+        - minor error message tweaks
+
+0.01  2002-02-04T11:26:18-0500
+	- original version; created by h2xs 1.20 with options
+		-n Depends -A -X
+

@@ -1,0 +1,248 @@
+=head1 NAME
+
+DataWarehouse - Perl Data Warehouse Toolkit
+
+=head1 DESCRIPTION
+
+Perl is a language optimized for scanning arbitrary text files, extracting
+information from those text files, and generating reports based on that
+information. It's also a good language for many system management tasks.
+The language is intended to be practical (easy to use, efficient,
+complete) rather than beautiful (tiny, elegant, minimal).
+
+A Data Warehouse (DW) is a repository of an organization's data, designed
+to facilitate reporting and analysis at different levels of aggregation.
+
+The main source of the data is extracted, cleaned, transformed, and made
+available to managers and other business professionals for data mining,
+online analytical processing, market research and decision support. This
+process is called ETL (Extract/Transform/Load).
+
+The Perl Data Warehouse Toolkit is a generic set of tools created to
+manage Data Warehouses meta-information, making simple ETL and DW tasks
+easy, and complex tasks possible.
+
+=head2 ETL
+
+The ETL ("Extract/Transform/Load") process consists of 3 steps:
+
+=head3 Extract
+
+Download information from Source Systems, and save locally. It
+is important that the information is saved locally to avoid multiple
+accesses to the Source Systems, if the ETL process needs to be restarted
+for any reason.
+
+=head3 Transform
+
+The data from the Source Systems may be inconsistent. The good news
+is that, in many cases, that can be fixed! Data should be verified and
+cleaned. Again, the output should be saved locally, to avoid duplicate
+work. It also helps to document any transformations that may have been
+performed.
+
+=head3 Load
+
+That's the final step, and the goal of the ETL process: publish the data!
+We start loading the Dimension Tables, paying special attention to the 
+Slowly Changing Dimensions -- the changes for which we want keep history.
+After the dimensions are loaded, we can proceed with the Fact Tables.
+
+Once the data is published, users should be able to generate dynamic
+reports using the Data Warehouse Navigator.
+
+=head2 DATA WAREHOUSE NAVIGATOR
+
+The Data Warehouse Navigator is a simple web interface to the Data
+Warehouse.
+
+It uses the Data Warehouse Metadata (information about facts and 
+dimensions) to present a simple user interface, which can be used
+to generate dynamic reports.
+
+Ideally, it should present a kind of pivot-table functionality, and
+the capacity to produce tables and charts.
+
+But, before we can really put the Data Warehouse in production, we
+need to address the performance problem.
+
+If your Data Warehouse grow past several millions of rows, you'll
+start to notice some performance degradation. Simple queries can take
+minutes to complete. That makes the Data Warehouse harder to use.
+
+People expect instant responses.
+
+Fortunatelly, there is a simple solution for that!
+
+=head2 AGGREGATES
+
+Aggregate tables can improve the performance of a data warehouse by
+hundreds or thousands of times. A query that took 10 minutes to
+complete, could finish in less than one second.
+
+The trick consists in storing the information in pre-calculated,
+summarized tables, so you have to access much less information.
+
+We're trading disk space for speed: the typical Data Warehouse will
+store almost its size in aggregate tables.
+
+Here's a simple example.
+
+Imagine that you need a report of "sales by month in 2010". This is
+the original pseudo-query:
+
+    SELECT
+        month,
+        SUM(sales)
+    FROM Sales
+    WHERE year=2010
+    GROUP BY month;
+
+If your company makes 100,000 transactions a month, that simple query
+will have to query over 1,200,000 rows to produce a simple sum.
+
+Now, imagine that we have a pre-calculated table, Sales_by_day:
+
+    SELECT
+        month,
+        SUM(sales)
+    FROM Sales_by_day
+    WHERE year=2010
+    GROUP BY month;
+
+Now, you're going to get the exact same response by querying 365 rows,
+instead of 1.2 million. That's a huge improvement!
+
+The only problem is that you can't predict all the possible queries
+that will be made; that's the very nature of a data warehouse. So,
+you'll end up with several aggregate tables for each base fact table:
+
+=over
+
+=item Sales_by_day
+
+=item Sales_by_month
+
+=item Sales_by_year
+
+=item Sales_by_product
+
+=item Sales_by_brand
+
+=item Sales_by_user
+
+=item Sales_by_region
+
+=item and so on...
+
+=back
+
+Moreover, you depend on the end users (or programmers) to actually *use*
+these tables, instead of the base fact table.
+
+And you know -- users will always query the base fact table, because it
+is easier.
+
+=head1 AGGREGATE NAVIGATOR
+
+The solution to this problem is to make the aggregates invisible: we
+will create an intermediate layer, above DBI, that will intercept each
+query made against the base fact table, and rewrite it so it will use
+the best aggregate table available.
+
+For example:
+
+    ----------------------------------------------------------
+    User SQL...                 Becomes...
+    ----------------------------------------------------------
+    SELECT                      SELECT
+        month,                      month,
+        SUM(sales)                  SUM(sales)
+    FROM                        FROM
+        Sales                       Sales_by_month
+    WHERE                       WHERE
+        year=2010                   year=2010
+    GROUP BY                    GROUP BY
+        month                       month
+    ----------------------------------------------------------
+    SELECT                      SELECT
+        brand,                      brand,
+        SUM(sales)                  SUM(sales)
+    FROM                        FROM
+        Sales                       Sales_by_brand
+    WHERE                       WHERE
+        year=2010                   year=2010
+    GROUP BY                    GROUP BY
+        brand                       brand 
+    ----------------------------------------------------------
+    SELECT                      SELECT
+        month,                      month,
+        brand,                      brand,
+        SUM(sales)                  SUM(sales)
+    FROM                        FROM
+        Sales                       Sales_by_brand_by_month
+    WHERE                       WHERE
+        year=2010                   year=2010
+    GROUP BY                    GROUP BY
+        month,                      month,
+        brand                       brand 
+    ----------------------------------------------------------
+
+The aggregate navigator, which performs this transformation, will improve
+the performance of the data warehouse transparently.
+
+=head1 WARNING
+
+THIS IS ALPHA SOFTWARE. It could drink your beer and eat your hamster!
+
+=head1 AUTHOR
+
+Nelson Ferraz, C<< <nferraz at gmail.com> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dw at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DataWarehouse>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc DataWarehouse::Fact
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=DataWarehouse>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/DataWarehouse>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/DataWarehouse>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/DataWarehouse/>
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Nelson Ferraz.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

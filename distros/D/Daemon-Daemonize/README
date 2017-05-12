@@ -1,0 +1,153 @@
+NAME
+    Daemon::Daemonize - An easy-to-use daemon(izing) toolkit
+
+VERSION
+    version 0.0052
+
+SYNOPSIS
+        use Daemon::Daemonize qw/ :all /
+
+        daemonize( %options, run => sub {
+
+            # Daemon code in here...
+
+        } )
+
+        # Do some non-daemon stuff here...
+
+    You can also use it in the traditional way, daemonizing the current
+    process:
+
+        daemonize( %options )
+
+        # Daemon code in here...
+
+    and use it to check up on your daemon:
+
+        # In your daemon
+
+        use Daemon::Daemonize qw/ :all /
+
+        write_pidfile( $pidfile )
+        $SIG{INT} = sub { delete_pidfile( $pidfile ) }
+
+        ... Elsewhere ...
+
+        use Daemon::Daemonize qw/ :all /
+
+        # Return the pid from $pidfile if it contains a pid AND
+        # the process is running (even if you don't own it), 0 otherwise
+        my $pid = check_pidfile( $pidfile )
+
+        # Return the pid from $pidfile, or undef if the
+        # file doesn't exist, is unreadable, etc.
+        # This will return the pid regardless of if the process is running
+        my $pid = read_pidfile( $pidfile )
+
+DESCRIPTION
+    Daemon::Daemonize is a toolkit for daemonizing processes and checking up
+    on them. It takes inspiration from
+    <http://www.clapper.org/software/daemonize/>, MooseX::Daemon,
+    Net::Server::Daemon
+
+  A note about the "close" option
+    If you're having trouble with IPC in a daemon, try closing only STD*
+    instead of everything:
+
+        daemonize( ..., close => std, ... )
+
+    This is a workaround for a problem with using "Net::Server" and
+    "IPC::Open3" in a daemonized process
+
+USAGE
+    You can use the following functions in two ways, by either importing
+    them:
+
+        use Daemon::Daemonize qw/ daemonize /
+
+        daemonize( ... )
+
+    or calling them as a class method:
+
+        use Daemon::Daemonize
+
+        Daemon::Daemonize->daemonize
+
+  daemonize( %options )
+    Daemonize the current process, according to %options:
+
+        chdir <dir>         Change to <dir> when daemonizing. Pass undef for *no* chdir.
+                            Default is '/' (to prevent a umount conflict)
+
+        close <option>      Automatically close opened files when daemonizing:
+
+                                1     Close STDIN, STDOUT, STDERR (usually redirected
+                                      from/to /dev/null). In addition, close any other
+                                      opened files (up to POSIX::_SC_OPEN_MAX)
+
+                                0     Don't close anything
+
+                                std   Only close STD{IN,OUT,ERR} (as in 1)
+
+                            Default is 1 (close everything)
+
+        stdout <file>       Open up STDOUT of the process to <file>. This will override any
+                            closing of STDOUT
+
+        stderr <file>       Open up STDERR of the process to <file>. This will override any
+                            closing of STDERR
+
+        run <code>          After daemonizing, run the given code and then exit
+
+  read_pidfile( $pidfile )
+    Return the pid from $pidfile. Return undef if the file doesn't exist, is
+    unreadable, etc. This will return the pid regardless of if the process
+    is running
+
+    For an alternative, see "check_pidfile"
+
+  check_pidfile( $pidfile )
+    Return the pid from $pidfile if it contains a pid AND the process is
+    running (even if you don't own it), and 0 otherwise
+
+    This method will always return a number
+
+  write_pidfile( $pidfile, [ $pid ] )
+    Write the given pid to $pidfile, creating/overwriting any existing file.
+    The second argument is optional, and will default to $$ (the current
+    process number)
+
+  delete_pidfile( $pidfile )
+    Unconditionally delete (unlink) $pidfile
+
+  does_process_exist( $pid )
+    Using "kill", attempts to determine if $pid exists (is running).
+
+    If you don't own $pid, this method will still return true (by examining
+    "errno" for EPERM).
+
+    For an alternative, see "can_signal_process"
+
+  can_signal_process( $pid )
+    Using "kill", attempts to determine if $pid exists (is running) and is
+    owned (signable) by the user.
+
+  check_port( $port )
+    Returns true if $port on the localhost is accepting connections.
+
+SEE ALSO
+    MooseX::Daemonize
+
+    Proc::Daemon
+
+    Net::Server::Daemonize
+
+AUTHOR
+      Robert Krimen <robertkrimen@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Robert Krimen.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

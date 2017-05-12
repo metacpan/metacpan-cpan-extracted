@@ -1,0 +1,8 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: mysql.mtest 1.1 Tue, 30 Sep 1997 01:28:08 +0200 joe $
+#
+# module specific definitions for a 'mysql' database
+
+
+1;

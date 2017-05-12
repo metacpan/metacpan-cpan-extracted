@@ -1,0 +1,35 @@
+Device-Inverter-Aurora version 0.02
+====================================
+
+Based on Curt Blank's Aurora program (http://www.curtronics.com/Solar/AuroraData.html)
+which is in turn based on Power One's 'Aurora Inverter Series - Communication Protocol -'
+document, Rel. 4.6 25/02/09.
+
+Having not so far been able to obtain a copy of this document from Power One I've had to
+make some educated guesses as to some things, but for the most part this library should
+be functional to the point the original Aurora program is.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::SerialPort (or Win32::SerialPort for windows users)
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Shannon Wynter (http://fremnet.net/contact)
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,203 @@
+NAME
+
+    Device::Chip::nRF24L01P - chip driver for a nRF24L01+
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Nordic
+    Semiconductor nRF24L01+ chip attached to a computer via an SPI adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ ce
+
+    The name of the GPIO line on the adapter that is connected to the Chip
+    Enable (CE) pin. This module defaults to using the AUX line on a Bus
+    Pirate, or D4 on an FTDI FT232H; for other adapter types the parameter
+    will have to be supplied.
+
+METHODS
+
+ clear_caches
+
+       $nrf->clear_caches
+
+    The chip object stores a cache of the register values it last read or
+    wrote, so it can optimise updates of configuration. This method clears
+    these caches, ensuring a fresh SPI transfer next time the register
+    needs to be read.
+
+    This should not normally be necessary, other than for debugging.
+
+ latest_status
+
+       $status = $nrf->latest_status
+
+    Returns the latest cached copy of the status register from the most
+    recent SPI interaction. As this method does not perform any IO, it
+    returns its result immediately rather than via a Future.
+
+    Returns a HASH reference containing the following boolean fields
+
+     RX_DR TX_DS MAX_RT TX_FULL
+
+    Also returned is a field called RX_P_NO, which is either a pipe number
+    (0 to 5) or undef.
+
+ reset_interrupt
+
+       $nrf->reset_interrupt->get
+
+    Clears the interrupt flags in the STATUS register.
+
+ read_status
+
+       $status = $nrf->read_status->get
+
+    Reads and returns the current content of the status register as a HASH
+    reference as per latest_status.
+
+ read_config
+
+       $config = $nrf->read_config->get
+
+ change_config
+
+       $nrf->change_config( %config )->get
+
+    Reads or writes the chip-wide configuration. This is an amalgamation of
+    all the non-pipe-specific configuration registers; CONFIG, SETUP_AW,
+    SETUP_RETR, RF_CH, RF_SETUP, TX_ADDR and FEATURE.
+
+    When reading, the fields are returned in a HASH reference whose names
+    are the original bitfield names found in the Nordic Semiconductor data
+    sheet. When writing, these fields are accepted as named parameters to
+    the change_config method directly.
+
+    Some of the fields have special processing for convenience. They are:
+
+      * CRCO
+
+      Gives the CRC length in bytes, as either 1 or 2.
+
+      * AW
+
+      Gives the full address width in bytes, between 3 and 5.
+
+      * ARD
+
+      Gives the auto retransmit delay in microseconds directly; a multiple
+      of 250 between 250 and 4000.
+
+      * RF_DR
+
+      Gives the RF data rate in bytes/sec; omits the RF_DR_LOW and
+      RF_DR_HIGH fields; as 250000, 1000000 or 2000000
+
+      * RF_PWR
+
+      Gives the RF output power in dBm directly, as -18, -12, -6 or 0.
+
+      * TX_ADDR
+
+      Gives the PTX address as a string of 5 capital hexadecimal encoded
+      octets, separated by colons.
+
+    Whenever the config is read it is cached within the $chip instance.
+    Whenever it is written, any missing fields in the passed configuration
+    are pre-filled by the cached config, and only those registers that need
+    writing will be written.
+
+ read_rx_config
+
+       $config = $nrf->read_rx_config( $pipeno )->get
+
+ change_rx_config
+
+       $nrf->change_rx_config( $pipeno, %config )->get
+
+    Reads or writes the per-pipe RX configuration. This is composed of the
+    per-pipe bits of the EN_AA and EN_RXADDR registers and its RX_ADDR_Pn
+    register.
+
+    Addresses are given as a string of 5 octets in capitalised hexadecimal
+    notation, separated by colons.
+
+    When reading an address from pipes 2 to 5, the address of pipe 1 is
+    used to build a complete address string to return. When writing and
+    address to these pipes, all but the final byte is ignored.
+
+ observe_tx_counts
+
+       $counts = $nrf->observe_tx_counts->get
+
+    Reads the OBSERVE_TX register and returns the two counts from it.
+
+ rpd
+
+       $rpd = $nrf->rpd->get
+
+    Reads the RPD register
+
+ fifo_status
+
+       $status = $nrf->fifo_status->get
+
+    Reads the FIFO_STATUS register and returns the five bit fields from it.
+
+ pwr_up
+
+       $nrf->pwr_up( $pwr )->get
+
+    A convenient shortcut to setting the PWR_UP configuration bit.
+
+ chip_enable
+
+       $nrf->chip_enable( $ce )->get
+
+    Controls the Chip Enable (CE) pin of the chip.
+
+ read_rx_payload_width
+
+       $len = $nrf->read_rx_payload_width->get
+
+    Returns the width of the most recently received payload, when in DPL
+    mode. Remember that DPL needs to be enabled (using EN_DPL) on both the
+    transmitter and receiver before this will work.
+
+ read_rx_payload
+
+       $data = $nrf->read_rx_payload( $len )->get
+
+    Reads the most recently received RX FIFO payload buffer.
+
+ write_tx_payload
+
+       $nrf->write_tx_payload( $data, %opts )->get
+
+    Writes the next TX FIFO payload buffer. Takes the following options:
+
+    no_ack => BOOL
+
+      If true, uses the W_TX_PAYLOAD_NO_ACK command, requesting that this
+      payload does not requre auto-ACK.
+
+ flush_rx_fifo
+
+       $nrf->flush_rx_fifo->get
+
+ flush_tx_fifo
+
+       $nrf->flush_tx_fifo->get
+
+    Flush the RX or TX FIFOs, discarding all their contents.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

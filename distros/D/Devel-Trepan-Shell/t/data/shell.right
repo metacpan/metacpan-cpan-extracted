@@ -1,0 +1,4 @@
+-- (five.pm:4)
+my $x = "Something simple to demo";
+To issue a debugger command inside the shell start the line with a '%'
+To leave the shell enter a single '%'

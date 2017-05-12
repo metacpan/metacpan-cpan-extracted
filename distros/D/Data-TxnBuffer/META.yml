@@ -1,0 +1,33 @@
+---
+abstract: 'binary read/write buffer supporting transaction read'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+  ExtUtils::ParseXS: 2.21
+  Test::More: 0.88
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-TxnBuffer
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Try::Tiny: 0
+  XSLoader: 0.1
+  parent: 0
+  perl: 5.8.0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/typester/data-txnbuffer-perl.git
+version: 0.05

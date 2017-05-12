@@ -1,0 +1,142 @@
+NAME
+
+    Dancer::Session::DBIC - DBIx::Class session engine for Dancer
+
+VERSION
+
+    0.006
+
+DESCRIPTION
+
+    This module implements a session engine for Dancer by serializing the
+    session, and storing it in a database via DBIx::Class. The default
+    serialization method is JSON, though one can specify any serialization
+    format you want. YAML and Storable are viable alternatives.
+
+    JSON was chosen as the default serialization format, as it is fast,
+    terse, and portable.
+
+SYNOPSIS
+
+    Example configuration:
+
+        session: "DBIC"
+        session_options:
+          dsn:      "DBI:mysql:database=testing;host=127.0.0.1;port=3306" # DBI Data Source Name
+          schema_class:    "Interchange6::Schema"  # DBIx::Class schema
+          user:     "user"      # Username used to connect to the database
+          pass: "password"  # Password to connect to the database
+          resultset: "MySession" # DBIx::Class resultset, defaults to Session
+          id_column: "my_session_id" # defaults to sessions_id
+          data_column: "my_session_data" # defaults to session_data
+
+    In conjunction with Dancer::Plugin::DBIC, you can simply use the schema
+    object provided by this plugin in your application, either by providing
+    the name of the schema used by the plugin in the config:
+
+        session_options:
+            schema: default
+
+    Or by passing the schema object directly in the code:
+
+        set session_options => {schema => schema};
+
+    Custom serializer / deserializer can be specified as follows:
+
+        set 'session_options' => {
+            schema       => schema,
+            serializer   => sub { YAML::Dump(@_); },
+            deserializer => sub { YAML::Load(@_); },
+        };
+
+SESSION EXPIRATION
+
+    A timestamp field that updates when a session is updated is
+    recommended, so you can expire sessions server-side as well as
+    client-side.
+
+    This session engine will not automagically remove expired sessions on
+    the server, but with a timestamp field as above, you should be able to
+    to do this manually.
+
+RESULT CLASS EXAMPLE
+
+    This result class would work as-is with the default values of
+    session_options. It uses DBIx::Class::TimeStamp to auto-set the created
+    and last_modified timestamps.
+
+        package MySchema::Result::Session;
+    
+        use strict;
+        use warnings;
+    
+        use base 'DBIx::Class::Core';
+    
+        __PACKAGE__->load_components(qw(TimeStamp));
+    
+        __PACKAGE__->table('sessions');
+    
+        __PACKAGE__->add_columns(
+            sessions_id => {
+                data_type => 'varchar', size => 255
+            },
+            session_data => {
+                data_type => 'text'
+            },
+            created => {
+                data_type => 'datetime', set_on_create => 1
+            },
+            last_modified => {
+                data_type => 'datetime', set_on_create => 1, set_on_update => 1
+            },
+        );
+    
+        __PACKAGE__->set_primary_key('sessions_id');
+    
+        1;
+
+METHODS
+
+ create()
+
+    Creates a new session. Returns the session object.
+
+ flush()
+
+    Write the session to the database. Returns the session object.
+
+ retrieve($id)
+
+    Look for a session with the given id.
+
+    Returns the session object if found, undef if not. Logs a debug-level
+    warning if the session was found, but could not be deserialized.
+
+ destroy()
+
+    Remove the current session object from the database.
+
+SEE ALSO
+
+    Dancer, Dancer::Session
+
+AUTHOR
+
+    Stefan Hornburg (Racke) <racke@linuxia.de>
+
+ACKNOWLEDGEMENTS
+
+    Based on code from Dancer::Session::DBI written by James Aitken and
+    code from Dancer::Plugin::DBIC written by Naveed Massjouni.
+
+    Enhancements provided by:
+
+    Yanick Champoux (GH #6, #7). Peter Mottram (GH #5, #8).
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) Stefan Hornburg.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

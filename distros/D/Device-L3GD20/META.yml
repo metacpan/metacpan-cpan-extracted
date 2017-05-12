@@ -1,0 +1,55 @@
+---
+abstract: 'I2C interface to L3GD20 3 axis GyroScope using Device::SMBus'
+author:
+  - 'Shantanu Bhadoria <shantanu at cpan dott org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  blib: 1.01
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.010
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-L3GD20
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Device::Gyroscope::L3GD20:
+    file: lib/Device/Gyroscope/L3GD20.pm
+    version: 0.010
+  Device::L3GD20:
+    file: lib/Device/L3GD20.pm
+    version: 0.010
+requires:
+  Device::SMBus: 0
+  Math::Trig: 0
+  Moose: 0
+  POSIX: 0
+  constant: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-device-l3gd20/issues
+  homepage: https://metacpan.org/release/Device-L3GD20
+  repository: git://github.com/shantanubhadoria/perl-device-l3gd20.git
+version: 0.010
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'

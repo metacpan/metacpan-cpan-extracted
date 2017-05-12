@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <id>2</id>
+    <name>Fred Bloggs</name>
+  </employee>
+</employees>

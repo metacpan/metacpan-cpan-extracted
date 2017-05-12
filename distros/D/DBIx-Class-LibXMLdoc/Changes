@@ -1,0 +1,41 @@
+Revision history for DBIx-Class-LibXMLdoc
+
+0.05 Mon Jun 30 11:36:41 PDT 2008
+     - Added DBIx::Class to prereqs... derrrrrrrrr...
+     - Corrected attribute "docversion" to reflect Pod, "version."
+
+0.04 Sun Jun 29 21:05:50 PDT 2008
+     - Swapped id --> ID for parser error feedback.
+     - Renamed parser_settings --> libXMLdoc_parser_settings.
+     - Started live tests with SQLite but they aren't going well so
+       they have to wait.
+     - Pod spelling mistakes.
+
+0.03_a Sat Jun 28 23:02:11 PDT 2008
+     - Doing an "_a" release because I think I might have broken
+       things but want it available for testing.
+     - Moved perlcritic.t to /xt. It was causing errors on systems
+       with different Perl::Critic extras installed.
+     - base --> parent.
+     - A little more sanity checking in initialization.
+     - Added the parser_settings method.
+     - Switched Makefile to Module::Install.
+     - Changed wrapper to "doc" with attributes for "table," "column,"
+       and version of the module.
+     - Made parse instantiation only happen once; still only on first
+       demand. This might be a tiny speed-up in certain cases.
+
+0.03 2006-12-21
+     - 0.02 still listed 0.01 as version in POD; uh, now it's 0.03 anyway.
+     - I think there was a stupid error in the perl critic test file;
+       not "use"ing Test::More that was causing test failures on the CPAN.
+
+0.02 2006-11-28 22:12
+     - It was putting the _Doc methods into the top space instead of
+       the calling space.
+     - Spelling fix.
+     - Added note about UTF8Columns.
+
+0.01 2006-11-28 21:24
+     - Initial version from module-starter.
+     - Needs better tests.

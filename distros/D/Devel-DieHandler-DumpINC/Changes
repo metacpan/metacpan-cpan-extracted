@@ -1,0 +1,10 @@
+Revision history for Devel-DieHandler-DumpINC
+
+0.002   2016-05-09 (PERLANCAR)
+
+	- [Bugfix] Forgot to pass die argument.
+
+
+0.001   2016-05-09 (PERLANCAR)
+
+        - First release.

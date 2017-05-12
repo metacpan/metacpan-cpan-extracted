@@ -1,0 +1,55 @@
+Revision history for DBIx::Class::Validation
+
+0.02005 Sat Jul 11 11:20:03 2009
+    - Fix bug that skipped validation when setting values while doing an
+        update() like this: $row->update($hashref) (Sergio Salvi) (RT#47709)
+    - Added .git, t/var to MANIFEST.SKIP and manifest.t (CLACO)
+    - Various spelling fixes (CLACO)
+    - Fixed SYNOPSIS examples (frioux, RT#47712)
+
+0.02004 Mon Jun 22 12:52:00 2009
+    - Switch dependency to DateTime::Format::SQLite
+
+0.02003 Mon Apr 22 21:41:23 2008
+    - Fix test failure under SQL::Translator <= 0.07
+    - Removed Build.PL now that Module::Install no longer supports it
+    - Removed bogus tests entry in Makefile.PL
+
+0.02002 Fri Mar 7 19:38:12 2008
+    - Quick fix for CPANTS META/author
+
+0.02001 Tue July 17 10:26:34 2007
+    - Added build_requires for DateTime::Format::MySQL
+    - Added WriteAll/DIST/PREOP for README
+    - Fixed spelling test failure
+
+0.02000 Sun June 24 20:04:11 2007
+    - Converted to Class::Accessor::Grouped after mk_classdata
+        snafu in DBIC 0.08
+    - Validate now croaks instead of throw_exception to play
+        well with DBIx::Class::Exception
+
+0.01004 Sat May 12 10:45:23 2007
+    - Use column accessors to set columns instead of set_column
+        (John Napiorkowski)
+
+0.01003 Tue May 08 18:49:11 2007
+    - Fixed DBIC::Test comment snafu
+    - Profiles can now be a subref that will dynamically generate the
+        profile (John Napiorkowski)
+
+0.01002 Sat May 05 11:38:16 2007
+    - Converted to Module::Install
+    - RT#25356 (bokutin): validation now sets filter
+    - Converted tests away from deprecated compose_connection
+    - Jockey cargo tests, TEST_AUTHOR, DBICTest
+    - Much improved test coverage
+    - Build/test no longer requires SQL::Translator
+
+0.01001 Tue Sep 05 17:54:13 2006
+    - FormValidator::Simple 0.17 is now required to fix profile destruction
+        on first use
+    - Removed Storable::dclone code since it's no longer needed
+
+0.01000
+    - initial release

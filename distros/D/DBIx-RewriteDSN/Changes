@@ -1,0 +1,26 @@
+2011-12-16  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.05:
+	impl prepend_rules method.
+
+2010-10-19  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.04:
+	fix treating backslash.
+	fix test problems.
+
+2010-10-18  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.03:
+	fix test problem.
+
+2009-12-07  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.02:
+	suppress warning mode by default.
+	warn if DBI_REWRITE_DSN=verbose
+
+2009-07-07  SATOH Hiroh <cho45@lowreal.net>
+
+	* 0.01:
+	original

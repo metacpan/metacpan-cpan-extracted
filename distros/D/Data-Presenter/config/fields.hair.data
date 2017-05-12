@@ -1,0 +1,26 @@
+# fields.hair.data
+
+@fields = qw(
+    cno
+    lastname
+    firstname
+    haircolor
+    number
+);
+
+%parameters = (
+    $fields[0]         => [ 6, 'U', 'n', 'C No.'],
+    $fields[1]         => [14, 'U', 'a', 'Last Name'],
+    $fields[2]         => [10, 'U', 'a', 'First Name'],
+    $fields[3]         => [ 9, 'U', 'a', 'Haircolor'],
+    $fields[4]         => [ 2, 'U', 'n', 'Number'],
+);
+
+#	                     ^   ^    ^
+#                            width of field in output
+#                                U:  sort ascending (up); D: sort descending (down)
+#                                     a:  alphabetical (case-insensitive)
+#                                     n:  numerical
+#                                     s:  ASCII-betical (case-sensitive)
+
+$index = 0;

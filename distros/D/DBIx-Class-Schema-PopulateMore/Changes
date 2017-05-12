@@ -1,0 +1,86 @@
+Revision history for Perl extension DBIx-Class-Schema-PopulateMore.
+
+0.19 Thursday, October 9, 2014
+    - increase some dependency minimum version to solve some reported
+      test fails.
+
+0.18 Wednesday, June 4, 2014
+    - Port to Moo
+    - documentation typo fixes
+    - fixed a bug ...::Command where some code was not immutable
+
+0.17 Monday, May 9, 2011
+    - Changed column definition from integer to varchar since that column takes
+      characters as well as numbers and the newest DBIC enforces this.
+
+0.16 Thursday, February 24, 2011
+    - update copyright info
+    - migration to new Module::Install maint tools
+    - Updated dependencies to modern and supportable versions
+    - modernized some schema code practices
+
+0.15 Tuesday, August 24, 2010
+    - Use more modern Moose stuff and updated to modern dependencies.
+    - formatting changes (no tabs, etc.)
+    - fixed some author only test failures
+
+0.14 Monday, August 17, 2009
+    - Increased the flexibility of allowed incoming arguments and documented
+      this change.  Added test for this format.
+
+0.13 Monday, July 6, 2009
+    - Fix an error with the way we parse command inflators so that if a source
+      string contains '::' it won't give us the wrong lookup index
+    - Changed from using 'confess' to using the DBIC throw exception method
+    - More minor documentation updates.
+
+0.12 Tuesday, June 30, 2009
+    - More tweaks to try and fix my broken local Module::Install
+
+0.11 Monday, June 29, 2009
+    - Minor doc changes and dependency tweaks to fix more cpan fails
+
+0.10 Sunday, June 28,  2009
+    - changed the find inflator to allow multikey finds
+    - more Makefile.PL tweaks to solve some cpan reported errors
+
+0.09 Friday, June 26, 2009
+    - Added a Find inflator, with docs and a test case
+
+0.08 Friday, June 26, 2009
+    - Fixed some documentation issues
+    - fixed the copyright
+    - arguments now allowed to be both array and arrayref.  This should reduce
+      some line noise in some config file types or if you are just using a perl
+      structure.
+
+0.07 Friday, June 26, 2009
+    - Add a placeholder to make sure the t/var directory is around at test
+      time.
+
+0.06 Thursday, June 25, 2009
+    - Added SQLT to the build recommends, otherwise tests fail
+
+0.05 Thursday, June 25, 2009
+    - Updated all the required versions to more recent items, since that
+      is what I can test on, plus most of that older stuff has known
+      compatibility issues.
+    - Requires Perl 5.8.8 since I can't test this on 5.8.6 anywhere (patches
+      or test cases welcomed.)
+    - changed the way we set default timestamp on sqlite.  this fixes a lot of
+      failed test cases.  Now all tests pass for me and I cleared most of the
+      types of test failues I see in the backlog.
+    - Updated Docs a bit.
+0.04 Friday, June 04, 2008
+    - Moved namespace of component from DBIx-Class-PopulateMore
+    - Minor documentation updates
+
+0.03 Friday, May 29, 2008
+    - Fixed missing dependencies from Makefile.PL
+    - Documentation and example improvements
+
+0.02 Friday, May 29, 2008
+    - Fix for messed up POD and missing Makefile.PL
+
+0.01 Friday, May 29, 2008
+    - Initial release

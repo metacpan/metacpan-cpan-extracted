@@ -1,0 +1,3 @@
+version=3
+    http://search.cpan.org/dist/DBIx-DR/ \
+        /CPAN/authors/id/U/UN/UNERA/DBIx-DR-(\d+(?:\.\d+)+).tar.gz

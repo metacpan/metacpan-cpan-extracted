@@ -1,0 +1,8 @@
+Revision history for Device-Inverter-KOSTAL-PIKO
+
+0.03    2017-01-03
+        - Fixed test suite
+        - added sample script for cron job
+
+0.02    2017-01-02
+        First version, released on an unsuspecting world.

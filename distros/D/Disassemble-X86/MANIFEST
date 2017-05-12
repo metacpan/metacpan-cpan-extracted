@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+SIGNATURE
+X86.pm
+X86/FormatText.pm
+X86/FormatTree.pm
+X86/MemRegion.pm
+disasm
+t/1.t

@@ -1,0 +1,15 @@
+
+* handle things like:
+  + "$a == 9 ? $b ++ : $c++;"
+  + "$a++ for ($a == 9)"
+  + "$a++ until $a == 9"
+  + "$a++ while $a < 9;"
+  + "$c = 5 if $a == 8;"
+  + "$c = 5 unless $a == 8;"
+  + "do { $a == 9 } while ($b == 9);"
+  + "do { $a == 9 } until ($b == 9);"
+  + elsif
+
+* the following should not have a connection from N_RETURN:
+  if ( $a == 5 ) { return 1; } print $a; 
+

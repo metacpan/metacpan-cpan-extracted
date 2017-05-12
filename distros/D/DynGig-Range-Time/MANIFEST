@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DynGig/Range/Time/Date.pm
+lib/DynGig/Range/Time/Day.pm
+lib/DynGig/Range/Time/Object.pm
+lib/DynGig/Range/Time/Parse.pm
+lib/DynGig/Range/Time.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

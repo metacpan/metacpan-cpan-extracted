@@ -1,0 +1,302 @@
+==================================================
+Changes from 2012-09-24 00:00:00 +0000 to present.
+==================================================
+
+----------------------------------------
+version 0.7 at 2013-09-24 20:19:49 +0000
+----------------------------------------
+
+  Change: 09a8323427afb6392abc07c1488a99618beede78
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-24 22:18:57 +0000
+
+    Bugfix: ploader contained a typo causing it to fail when being
+    executed. 
+
+  Change: 882b424543aed7f36ac2606d5b3623ab166a9722
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-20 19:31:25 +0000
+
+    Line endings fixed before release 
+
+  Change: a1742efccf9cd195809dd52860a77bf3d85f3c87
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-19 17:32:26 +0000
+
+    Added safety check on hexfile input
+
+    Added an extra safety check on the input data coming from the HEX
+    file. When the user presents an input file containing instructions at
+    locations where the bootloader resides those instructions were
+    silently dropped up to now. The safety check informs the user of the
+    fact that the hexfile contains invalid input. 
+
+  Change: d79bf708871c81ccfa9f29ff433a678589cee466
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-19 17:02:44 +0000
+
+    Added baudrate option for serial port connections.
+
+    Closes #2. 
+
+  Change: 221cb419e02702275243089864bfd6d10899ba8f
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-14 11:46:47 +0000
+
+    Merge branch 'master' of
+    github.com:hollie/device-microchip-bootloader 
+
+  Change: ecb2c6375bd00890994ec889b5b4522b9b75fbf5
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-10 22:45:21 +0000
+
+    v0.5 
+
+  Change: d298bc50f1b9e93090d23b6988254d385e981e6f
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-10 22:42:23 +0000
+
+    Bugfix: application launch failure fixed
+
+    Launching an application from the bootloader sometimes failed due to
+    closing the port handle too soon (before the string was sent
+    completely). Added a 1 second delay to work around this. 
+
+  Change: b5362b7ae927f25138625124e2e083419bb80efa
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-26 22:34:05 +0000
+
+    Typo fix in POD doc 
+
+  Change: 537eed7f67dff2010c31f28b883648168c68c575
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-26 22:06:24 +0000
+
+    v0.4 
+
+  Change: 1b9598407197ec83dbe2ce9e4db2066df3330915
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-13 22:14:39 +0000
+
+    Fix for Perl 5.12.x, bumped to v0.3
+
+    An error showed up when trying to fetch keys from a hash that was
+    actually a reference in older versions of Perl. Explicitly added the
+    cast. 
+
+  Change: 3413f67f84ed00a487b96d4e86010cb2c1a4b047
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-12 23:32:48 +0000
+
+    Ensure testing passes, upped to 0.2
+
+    Test were failing due to missing require for Test::Exception 
+
+  Change: e30c2b73a5b5d100675c65a782fdb82c77cc6347
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-10 10:59:10 +0000
+
+    Removed FakeRelease from dist.ini 
+
+  Change: 42a606f1c5b0e6f4567ef75aeee3ea28482a9b79
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-10 10:57:55 +0000
+
+    Set version number to 0.1 
+
+  Change: 1ae6d24cc6539053a88a33ed99e6a9e587d364fe
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-10 10:57:40 +0000
+
+    Extended documentation before first release 
+
+  Change: 966090a2b04703ef6b92779e73ceeec7a4ae9cbb
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-08 22:07:42 +0000
+
+    Application launching is now working fine. Bootloader ready for first
+    release 
+
+  Change: 4eb66cafa51a4a19310142873e6b24018b24dae4
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-05 22:52:25 +0000
+
+    Formatting changes to be in line with Perl best practices 
+
+  Change: 65add679967ff97a2b4e76914980e850c2e9b490
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-05 22:38:00 +0000
+
+    Added programming functionality 
+
+  Change: 6c9bcb4b658511b4aa64f294731545da252d811a
+  Author: Lieven Hollevoet <lieven@likatronix.be>
+  Date : 2013-07-25 21:46:21 +0000
+
+    Added support for replacing the entry points for the bootloader and
+    the application before programming, and added a function to get the
+    next page to write from the program memory 
+
+  Change: e2cd4133e2e8a40b656bbc5b11e06e5802798b91
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-07-17 22:20:33 +0000
+
+    Additional testing to ensure we can't erase or overwrite the boot
+    loader. 
+
+  Change: a2581374a8f5559f316bae42423b855a884e9c3b
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-07-17 11:33:02 +0000
+
+    Writing a flash block works fine now. 
+
+  Change: 0256f496e8fc233690c7c78bc821ecbae8709139
+  Author: Lieven Hollevoet <lieven@likatronix.be>
+  Date : 2013-07-17 09:44:08 +0000
+
+    Added CRC checking of program flash support 
+
+  Change: 4222592281c5b37a6150d58d0912959173a07c41
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-07-03 22:54:20 +0000
+
+    Fixed references after fixung the CRC 
+
+  Change: c2bfe2ff4955dd43e05fbe62105b514b3057256f
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-07-03 22:44:31 +0000
+
+    Fixed CRC, basic communication over serial port to bootloader v5.1
+    verified. 
+
+  Change: 64b55b2bc9042e6e2ae34db74ca02c637131cc97
+  Author: Lieven Hollevoet <lieven@likatronix.be>
+  Date : 2013-07-02 22:05:01 +0000
+
+    Added flash erase/read commands and cleaned up the code further 
+
+  Change: 6da310ec5906d715e5ed85aedd2a2e86ec2d85e5
+  Author: Lieven Hollevoet <lieven@likatronix.be>
+  Date : 2013-06-10 19:23:31 +0000
+
+    Software side ready for reading out EEPROm location 
+
+  Change: 38e6d263cb2643755b273ecb7809ab3b4e5d5f4d
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-03-21 22:30:32 +0000
+
+    Added lots of functional code and added a first test for the TCP
+    connection 
+
+  Change: d706b996025880f261326dfa675a6d6d891f0bed
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-03-18 13:42:31 +0000
+
+    Completely Moose-ified and ready for release 
+
+  Change: 221ddf07570b365b24e029e10c6a9fa6361eaae4
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-03-18 11:46:14 +0000
+
+    Merge branch 'master' of
+    file:///media/sf_perl/Device-Microchip-Bootloader 
+
+  Change: b781559b1cc34fe2e7a291162184aedb3c9d4814
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-03-18 11:44:37 +0000
+
+    Moose-ified the module 
+
+  Change: 7bb90717a216d87fb7e98ea5f2c050632481c713
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-02-28 09:15:08 +0000
+
+    Added tests for basic error messages 
+
+  Change: 14a0116d64975475209e70ac758bc4ca62b93617
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-02-28 08:41:28 +0000
+
+    We can read a hexfile now. 
+
+  Change: 95d45aada0e949bfc7417eba0dbd92ad83da34bf
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-02-28 08:37:00 +0000
+
+    Disabled github integration until we're ready for primetime 
+
+  Change: 059211da0b05239508988087f9a0bcfd5e2aed9d
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-02-25 14:22:15 +0000
+
+    Skeleton in place 
+
+  Change: 807fe37d858347836f1d24f756df1bc31f6501d5
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-02-14 09:20:13 +0000
+
+    Initial commit 
+
+----------------------------------------
+version 0.6 at 2013-09-20 17:32:04 +0000
+----------------------------------------
+
+  Change: 08bd08ae748660f9fa2b7e3c7e14235cbcaac78e
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-20 19:32:04 +0000
+
+    Build results of 882b424 (on master) 
+
+----------------------------------------
+version 0.5 at 2013-09-10 20:45:21 +0000
+----------------------------------------
+
+  Change: 6fff0990cece7509c80cdcd01e7a8bb5c08ff1e1
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-09-10 22:45:21 +0000
+
+    Build results of ecb2c63 (on master) 
+
+----------------------------------------
+version 0.4 at 2013-08-26 20:06:24 +0000
+----------------------------------------
+
+  Change: b19502bb429e7e64a589ead25f7a3acad0801884
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-26 22:06:24 +0000
+
+    Build results of 537eed7 (on master) 
+
+----------------------------------------
+version 0.3 at 2013-08-13 20:15:11 +0000
+----------------------------------------
+
+  Change: f83de970d250ad1ea7d30be44bd111ce56cb9229
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-13 22:15:11 +0000
+
+    Build results of 1b95984 (on master) 
+
+----------------------------------------
+version 0.2 at 2013-08-12 21:33:49 +0000
+----------------------------------------
+
+  Change: d3809e99ffa860ffbe5744458f958c2d11d7011d
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-12 23:33:49 +0000
+
+    Build results of 3413f67 (on master) 
+
+----------------------------------------
+version 0.1 at 2013-08-10 08:59:30 +0000
+----------------------------------------
+
+  Change: a25c25be4b47d1900d587599c5ff1ffc6574cf45
+  Author: Lieven Hollevoet <hollie@lika.be>
+  Date : 2013-08-10 10:59:30 +0000
+
+    Build results of e30c2b7 (on master) 
+
+================
+End of releases.
+================

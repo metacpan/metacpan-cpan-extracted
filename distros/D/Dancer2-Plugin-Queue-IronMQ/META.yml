@@ -1,0 +1,54 @@
+---
+abstract: 'Dancer2::Plugin::Queue backend using IronMQ'
+author:
+  - 'Mikko Koivunalho <mikkoi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  Test::More: '0'
+  Test::Roo: '0'
+  Test::TCP: '0'
+  perl: '5.008001'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.143240'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Queue-IronMQ
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::Queue::IronMQ:
+    file: lib/Dancer2/Plugin/Queue/IronMQ.pm
+    version: '0.002'
+requires:
+  Const::Fast: '0'
+  Dancer2::Plugin::Queue: '0.006'
+  Dancer2::Plugin::Queue::Role::Queue: '0'
+  IO::Iron::IronMQ::Client: '0.12'
+  IO::Iron::IronMQ::Message: '0.12'
+  IO::Iron::IronMQ::Queue: '0.12'
+  Moose: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/mikkoi/dancer2-plugin-queue-ironmq/issues
+  homepage: https://github.com/mikkoi/dancer2-plugin-queue-ironmq
+  repository: https://github.com/mikkoi/dancer2-plugin-queue-ironmq.git
+version: '0.002'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

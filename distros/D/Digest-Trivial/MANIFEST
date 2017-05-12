@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+Trivial.xs
+const-c.inc
+const-xs.inc
+lib/Digest/Trivial.pm
+t/001_trivial.t
+t/101_trivial_x.t
+t/301_random.t
+t/950_pod.t
+t/960_pod_coverage.t
+META.yml                                 Module meta-data (added by MakeMaker)

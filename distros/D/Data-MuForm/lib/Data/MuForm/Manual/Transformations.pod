@@ -1,0 +1,102 @@
+package Data::MuForm::Manual::Transformations;
+# ABSTRACT: Transformation of field inputs and values
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Transformations - Transformation of field inputs and values
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+Various transformations on the input and value.
+
+=head2 DESCRIPTION
+
+In order to understand which transform you want to use, it helps to understand
+how data is moved in MuForm.
+
+Data from the 'model' or 'init_values' initially fills in the field 'value' attributes.
+If there are params/data to be be processed, they fill in the 'input' attributes.
+When validation is performed, the input is copied to the value.
+
+=head2 Transforms
+
+There are a number of methods to provide finely tuned transformation of the
+input or value.
+
+=over 4
+
+=item transform_param_to_input
+
+Transform the param when it's copied into 'input'. Will change what the user sees
+in a re-presented form.
+
+=item transform_input_to_value
+
+Transforms the string that when it's copied from 'input' to 'value' during
+validation.
+
+(In FH was 'inflate_method'.)
+
+=item transform_value_to_fif
+
+The 'fif' (fill-in-form) values is used in rendering. If the form was submitted
+with params, the 'input' is used for 'fif', but when there is no input, the 'value'
+is used. This happens when the form is initially presented and has been filled
+with values from the 'model', 'init_values', or the field 'default'.
+This transforms the 'value' to a string suitable for filling in a form field.
+
+(In FH was 'deflate_method'.)
+
+=item transform_default_to_value
+
+Transform the 'default' provided by an 'model' or 'init_values' or 'default' when it's stored
+in the 'value'.
+
+(In FH was inflate_default_method.)
+
+=item transform_value_after_validate
+
+Transform the value after validation has been performs, in order to return
+a different form in C<< $form->value >>.
+
+(In FH was 'deflate_value_method'.)
+
+=item trim
+
+A transform to trim the field. The default 'trim' sub
+strips beginning and trailing spaces.
+Set this attribute to null to skip trimming, or supply a different
+sub. This method is called right after 'transform_input_to_value'.
+
+=back
+
+=head2 Transform during validation
+
+You can also transform during validation, in a field validation sub or in
+an 'apply' action. There is a 'transform' flavor of apply action. See the
+L<Data::MuForm::Manual::Validation>.
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

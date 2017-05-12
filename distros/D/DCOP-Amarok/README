@@ -1,0 +1,31 @@
+DCOP/Amarok version 0.01
+===============================
+
+This module enables an user to talk directly to amaroK.
+It requires a dcop system.
+
+First version.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module depends on:
+
+	DCOP;
+	
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Juan C. Müller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

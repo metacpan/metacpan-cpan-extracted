@@ -1,0 +1,48 @@
+Revision history for Perl extension DestructAssign.
+
+0.2.7    2016.8.27
+      Restrict perl version on 5.8.9 up
+
+0.2.6    2016.8.27
+      Fix bug by version 0.2.5
+
+0.2.5    2016.8.26
+      Compatible with newer (5.25 up) perl
+
+0.2.4    2015.5.25
+      Move '-std=gnu99' from CCFLAGS to DEFINE in Makefile.PL to avoid Perl 5.22 XS module handshake problem.
+
+0.2.3    2014.12.10
+      Compatible with Perl 5.21.7.
+      Patched by Father Chrysostomos (sprout@cpan.org)
+
+0.2.2    2014.12.8
+      Compatible with the op tree of Perl 5.21.6.
+      More informative warning message when matching against in-compatible value type.
+
+0.2.1    2014.11.17
+      Fix bug, which occurs when using variable name as key
+      at the first element of a hash pattern
+
+0.2      2014.11.3
+      Bump version
+
+0.1.4    2014.11.3
+      Now we can use hash pattern to match against a array reference
+      Use names of variables in hash patterns as keys when not specified keys for them.
+      Use previously used key when not specified a key for a sub-pattern in a hash pattern.
+
+0.1.3    2014.10.20
+      Fix bug when use pattern in a recursive sub
+
+0.1.2    2014.8.21
+      Fix bug when the first element of an anonlist or an anonhash pattern
+      is a pattern.
+
+0.1.1    2014.8.12
+      Fix document
+
+0.1  Tue Aug  5 15:11:47 2014
+	- original version; created by h2xs 1.23 with options
+		-n DestructAssign
+

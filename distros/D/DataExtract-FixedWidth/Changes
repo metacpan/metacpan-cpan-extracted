@@ -1,0 +1,36 @@
+Revision history for DataExtract-FixedWidth
+
+0.08    Added verbose option for constructor, helps out a we' bit
+        Bug fix: long standing error on trailing spaces with empty cols generated.
+				  no longer generated. Added Tests
+        minor optimization
+        reenabled immutable
+
+0.07    Bug fix: No longer have to have the first row the longest when
+        using euristic test provided t/11
+
+0.06    Lots of internet rewrites
+        Accept heuristic with undef header and supplied columns
+        New tests
+        Now we clean up namespace (no Moose)
+        Faster with class made immutable (no on because of Moose bug)
+
+0.05    Updated pod
+        New test structure -- sample tests outside of __DATA__ into ./t/data
+        Major updates on heuristic, and header_row/cols assumptions
+        new option ->skip_header_data(*1|0)
+
+0.04    Better pod -- almost a complete overhaul
+        Constructor tests
+
+0.03    Speed fixes
+        Pods fixes
+        And, BrowserUK's heuristic algo in the constructor by opt in
+
+0.02    Speed fix per uri's suggestion
+        Fixed pod
+        Fixed default for ->fix_overlay
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

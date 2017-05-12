@@ -1,0 +1,100 @@
+{
+   "abstract" : "Dist::Zilla configuration the way BAREFOOT does it",
+   "author" : [
+      "Buddy Burden <barefoot@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-BAREFOOT",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.3",
+            "Dist::Zilla::Plugin::Bugtracker" : "1.102670",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::CheckExtraTests" : "0",
+            "Dist::Zilla::Plugin::CheckPrereqsIndexed" : "0.002",
+            "Dist::Zilla::Plugin::CheckVersionIncrement" : "0.121750",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0.10",
+            "Dist::Zilla::Plugin::InsertCopyright" : "0.001",
+            "Dist::Zilla::Plugin::MetaNoIndex" : "0",
+            "Dist::Zilla::Plugin::MetaProvides::Class" : "2.001",
+            "Dist::Zilla::Plugin::MinimumPerl" : "0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0.001008",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::PodnameFromClassname" : "0",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.120051",
+            "Dist::Zilla::Plugin::ReadmeFromPod" : "0",
+            "Dist::Zilla::Plugin::Test::PodSpelling" : "2.001002",
+            "Dist::Zilla::Plugin::Test::Version" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "2.013",
+            "List::MoreUtils" : "0",
+            "Method::Signatures::Modifiers" : "0",
+            "MooseX::ClassAttribute" : "0",
+            "MooseX::Declare" : "0",
+            "MooseX::Has::Sugar" : "0",
+            "MooseX::Types::Moose" : "0",
+            "PerlX::Maybe" : "0.003",
+            "Pod::Elemental::Transformer::List" : "0.101620",
+            "Pod::Weaver" : "3.101635",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Plugin::WikiDoc" : "0",
+            "Pod::Weaver::Section::Support" : "1.001",
+            "Pod::Wordlist::hanekomu" : "1.113620",
+            "autodie" : "2.00",
+            "perl" : "5.012"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dist::Zilla::App" : "0",
+            "File::Temp" : "0",
+            "Path::Class" : "0",
+            "Path::Tiny" : "0",
+            "Test::Command" : "0.10",
+            "Test::Most" : "0.25"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::BAREFOOT" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/BAREFOOT.pm",
+         "version" : "0.06"
+      },
+      "Pod::Weaver::PluginBundle::BAREFOOT" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/BAREFOOT.pm",
+         "version" : "0.06"
+      },
+      "Pod::Weaver::Section::LegalWithAddendum" : {
+         "file" : "lib/Pod/Weaver/Section/LegalWithAddendum.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/barefootcoder/dist-zilla-pluginbundle-barefoot/issues"
+      },
+      "homepage" : "https://github.com/barefootcoder/dist-zilla-pluginbundle-barefoot",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/barefootcoder/dist-zilla-pluginbundle-barefoot.git",
+         "web" : "https://github.com/barefootcoder/dist-zilla-pluginbundle-barefoot"
+      }
+   },
+   "version" : "0.06"
+}
+

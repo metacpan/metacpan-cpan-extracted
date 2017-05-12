@@ -1,0 +1,33 @@
+---
+abstract: 'AnyEvent-based client for the DBGp debugger protocol'
+author:
+  - 'Mattia Barbon <mbarbon@cpan.org>'
+build_requires:
+  Test::DBGp: '0.05'
+configure_requires:
+  Module::Build: '0.42'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4214, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBGp-Client-AnyEvent
+provides:
+  DBGp::Client::AnyEvent:
+    file: lib/DBGp/Client/AnyEvent.pm
+    version: '0.05'
+  DBGp::Client::AnyEvent::Connection:
+    file: lib/DBGp/Client/AnyEvent/Connection.pm
+  DBGp::Client::AnyEvent::Listener:
+    file: lib/DBGp/Client/AnyEvent/Listener.pm
+requires:
+  AnyEvent: '1.0031'
+  DBGp::Client: '0.09'
+  perl: v5.10.0
+resources:
+  bugtracker: https://github.com/mbarbon/dbgp-client-anyevent/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/mbarbon/dbgp-client-anyevent.git
+version: '0.05'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

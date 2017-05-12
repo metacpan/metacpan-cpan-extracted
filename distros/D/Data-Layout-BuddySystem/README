@@ -1,0 +1,205 @@
+Name
+    Data::Layout::BuddySystem - Layout data in memory allocated via a buddy
+    system
+
+Synopsis
+     use Test::More tests=>10;
+     use Data::Layout::BuddySystem;
+     use utf8;
+
+     my $b = Data::Layout::BuddySystem::new;                                        # Create a new buddy system
+
+     $b->allocField(@$_) for                                                        # Allocate fields in the buddy system
+       [𝝳=>6], [𝝰=>0], [𝝙=>6],[𝝱=>0],[𝞈 =>4], [𝝺=>5], [𝝲=>0], [𝝖=>3], [𝝗=>3];       # Name and log2 size of each field
+
+     my $s = $b->generateStructureFields('Struct');                                 # Generate structure definition
+
+     ok nws($s->()) eq nws(<<'END');                                                # String representation of methods associated with generated structure
+    package Struct;
+    use utf8;
+    sub 𝝰    :lvalue {vec($_[1],   0,    1  )}
+    sub 𝝱    :lvalue {vec($_[1],   1,    1  )}
+    sub 𝝲    :lvalue {vec($_[1],   2,    1  )}
+    sub 𝝖    :lvalue {vec($_[1],   1,    8  )}
+    sub 𝝗    :lvalue {vec($_[1],   2,    8  )}
+    sub 𝞈   :lvalue {vec($_[1],   2,   16  )}
+    sub 𝝺    :lvalue {vec($_[1],   2,   32  )}
+    sub 𝝳    :lvalue {vec($_[1],   2,   64  )}
+    sub 𝝙    :lvalue {vec($_[1],   3,   64  )}
+    END
+
+      if (1)                                                                        # Set fields
+       {$s->𝝰(my $𝕄) = 1; ok $𝕄 eq "\1";
+        $s->𝝱(   $𝕄) = 0; ok $𝕄 eq "\1";
+        $s->𝝲(   $𝕄) = 1; ok $𝕄 eq "\5";
+        $s->𝝖(   $𝕄) = 3; ok $𝕄 eq "\x05\x03";                                      # Byte fields
+        $s->𝝗(   $𝕄) = 7; ok $𝕄 eq "\x05\x03\x07";
+        $s->𝞈(   $𝕄) = 9; ok $𝕄 eq "\x05\x03\x07\x00\x00\x09";                      # Word field
+       }
+
+      if (1)                                                                        # Set and get an integer field
+       {$s->𝝺(my $𝕄) = 2; ok $s->𝝺($𝕄) == 2;                                        # Set field
+        $s->𝝺(   $𝕄)++;   ok $s->𝝺($𝕄) == 3;                                        # Increment field
+        ok $𝕄 eq "\0\0\0\0\0\0\0\0\0\0\0\3";                                        # Dump the memory organised by the buddy system
+       }
+
+Description
+    Implements the buddy system described at
+    <https://en.wikipedia.org/wiki/Buddy_memory_allocation> in 100% Pure
+    Perl. Blocks can be identified by names or addresses which remain
+    invariant even after one buddy system has been copied to a new one to
+    compact free space. Each named allocation can be accessed via a
+    generated method which identifies an lvalue area of a "vec" in perlfunc
+    string used to back the memory organised by the buddy system.
+
+Methods
+  new()
+    Create a new Buddy system
+
+  allocField($buddySystem, $name, $size)
+    Allocate a block in the buddy system, give it a name that is invariant
+    even after this buddy system has been copied to a new buddy system to
+    compact its storage, and return the address of its location in the buddy
+    system
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $name         name of block
+      3  $size         integer log2(size of allocation)
+
+  alloc($buddySystem, $size)
+    Allocate a block and return its address
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $size         integer log2(size of allocation)
+
+  locateAddress($buddySystem, $alloc)
+    Find the current location of a block by its original address after it
+    has been copied to a new buddy system
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $alloc        address at which the block was originally located
+
+  locateName($buddySystem, $name)
+    Find the current location of a named block after it has been copied to a
+    new buddy system
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $name         name of the block
+
+  freeName($buddySystem, $name)
+    Free an allocated block via its name
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $name         name used to allocate block
+
+  free($buddySystem, $alloc)
+    Free an allocation via its original allocation address
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $alloc        original allocation address
+
+  Statistics
+    These methods provide statistics on memory usage in the buddy system
+
+   usedSpace($buddySystem)
+    Total allocated space in this buddy system
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+
+   freeSpace($buddySystem)
+    Total free space that can still be allocated in this buddy system
+    without changing its size
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+
+   totalSpace($buddySystem)
+    Total space currently occupied by this buddy system
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+
+  Relocation
+    These methods copy one buddy system to another compacting free space in
+    the process.
+
+   copy($buddySystem, $order, $copy)
+    Copy a buddy system to compact its free space, the largest blocks are
+    placed in (0) - ascending, (1) - descending order of size, blocks that
+    get relocated to new positions in the new buddy system will still be
+    accessible by their original address or name
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $order        order
+      3  $copy         optional copy method to copy an old allocation into its corresponding new allocation
+
+   copyLargestLast($buddySystem, $copy)
+    Copy a buddy system, compacting free space, the new addresses of
+    allocations can be found in wentTo, the largest blocks are placed last
+
+         Parameter     Description
+      1  $buddySystem  BuddySystem
+      2  $copy         copy method to copy an old allocation into a new allocation
+
+   copyLargestFirst($buddySystem, $copy)
+    Copy a buddy system, compacting free space, the new addresses of
+    allocations can be found in wentTo, the largest blocks are placed first
+
+         Parameter     Description
+      1  $buddySystem  BuddySystem
+      2  $copy         copy method to copy an old allocation into a new allocation
+
+  Structure
+    This method generates a blessed sub whose methods provide named access
+    to allocations backed by a "vec" in perlfunc string
+
+   generateStructureFields($buddySystem, $package)
+    Return a blessed sub whose methods access the named blocks in the buddy
+    system. The blessed sub returns a text representation of the method
+    definitions
+
+         Parameter     Description
+      1  $buddySystem  Buddy system
+      2  $package      structure name
+
+Index
+    The following methods will be exported by the :all tag
+
+    "alloc($buddySystem, $size)" "allocField($buddySystem, $name, $size)"
+    "copy($buddySystem, $order, $copy)" "copyLargestFirst($buddySystem,
+    $copy)" "copyLargestLast($buddySystem, $copy)" "free($buddySystem,
+    $alloc)" "freeName($buddySystem, $name)" "freeSpace($buddySystem)"
+    "generateStructureFields($buddySystem, $package)"
+    "locateAddress($buddySystem, $alloc)" "locateName($buddySystem, $name)"
+    "new()" "totalSpace($buddySystem)" "usedSpace($buddySystem)"
+
+Installation
+    This module is written in 100% Pure Perl and is thus easy to read,
+    modify and install.
+
+    Standard Module::Build process for building and installing modules:
+
+      perl Build.PL
+      ./Build
+      ./Build test
+      ./Build install
+
+Author
+    philiprbrenan@gmail.com
+
+    http://www.appaapps.com
+
+Copyright
+    Copyright (c) 2016 Philip R Brenan.
+
+    This module is free software. It may be used, redistributed and/or
+    modified under the same terms as Perl itself.
+

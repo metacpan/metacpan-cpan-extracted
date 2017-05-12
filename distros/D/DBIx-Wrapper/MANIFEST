@@ -1,0 +1,18 @@
+MANIFEST
+README
+INSTALL
+Makefile.PL
+lib/DBIx/Wrapper.pm
+lib/DBIx/Wrapper/Request.pm
+lib/DBIx/Wrapper/SelectLoop.pm
+lib/DBIx/Wrapper/SelectExecLoop.pm
+lib/DBIx/Wrapper/SQLCommand.pm
+lib/DBIx/Wrapper/StatementLoop.pm
+lib/DBIx/Wrapper/Statement.pm
+lib/DBIx/Wrapper/Delegator.pm
+lib/DBIx/Wrapper/DBIDelegator.pm
+lib/DBIx/Wrapper/Changes.pm
+t/00use.t
+t/01sqlite.t
+WhatsNew
+META.yml                                 Module meta-data (added by MakeMaker)

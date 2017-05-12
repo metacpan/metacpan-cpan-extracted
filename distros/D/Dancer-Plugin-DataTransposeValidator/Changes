@@ -1,0 +1,43 @@
+Revision history for Dancer::Plugin::DataTransposeValidator
+
+0.010 Mon 31 Oct 11:31:29 CET 2016
+
+    * Dancer2 plugin removed from distro
+
+0.009 Thu 21 Apr 12:57:26 CEST 2016
+
+    * stop using aliased
+
+0.008 Thu 29 Oct 17:40:31 CET 2015
+
+    * validate email address in tests using String closes GH #2
+    * bump smoker dependency on Dancer2 within tests to 0.15
+    * add diag explain on deeply compare fail to help debug GH #2
+
+0.007 Thu  1 Oct 19:17:35 CEST 2015
+
+    * small test changes
+
+0.006 Tue 29 Sep 10:02:49 CEST 2015
+
+    * skip D2 tests if D2 version is not >= 0.15
+
+0.005 Sun 27 Sep 20:13:56 CEST 2015
+ 
+    * don't supply ':syntax' to use Dancer2
+
+0.004 Sat 12 Sep 12:07:46 CEST 2015
+
+    * Tests skip cleanly if D1 or D2 not installed
+
+0.003 Tue  1 Sep 16:31:53 CEST 2015
+
+    * rules files can now contain a code reference to which args can be passed
+
+0.002 Tue  1 Sep 11:43:06 CEST 2015
+
+    * Add Dancer2 plugin
+
+0.001 Mon 31 Aug 19:23:52 CEST 2015
+
+    * Initial release

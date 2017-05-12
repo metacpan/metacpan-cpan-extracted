@@ -1,0 +1,5 @@
+1.1	27 March 2009
+	Rewritten Hebrew algorithms. Previous one did not use delay days(?). Current algorithm is taken from http://calendarhome.com/converter/calendar.js
+	
+1.01	26 March 2009
+	Call of undefined year_length_hebrew subroutine in Hebrew.pm could raise error for certain dates.

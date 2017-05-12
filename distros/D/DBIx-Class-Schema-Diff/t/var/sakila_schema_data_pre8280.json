@@ -1,0 +1,2507 @@
+{
+   "schema_class" : "TestSchema::Sakila",
+   "sources" : {
+      "ActorInfo" : {
+         "constraints" : {},
+         "columns" : {
+            "film_info" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 341
+            },
+            "actor_id" : {
+               "data_type" : "smallint",
+               "default_value" : 0,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "first_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            },
+            "last_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::ActorInfo",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "actor_info"
+      },
+      "Rental" : {
+         "constraints" : {
+            "rental_date" : {
+               "columns" : [
+                  "rental_date",
+                  "inventory_id",
+                  "customer_id"
+               ]
+            },
+            "primary" : {
+               "columns" : [
+                  "rental_id"
+               ]
+            }
+         },
+         "columns" : {
+            "rental_id" : {
+               "data_type" : "integer",
+               "is_auto_increment" : 1,
+               "is_nullable" : 0
+            },
+            "rental_date" : {
+               "_ic_dt_method" : "datetime",
+               "data_type" : "datetime",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "customer_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "return_date" : {
+               "_ic_dt_method" : "datetime",
+               "data_type" : "datetime",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 1
+            },
+            "inventory_id" : {
+               "data_type" : "mediumint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "staff_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Rental",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "inventory" : {
+               "cond" : {
+                  "foreign.inventory_id" : "self.inventory_id"
+               },
+               "source" : "{schema_class}::Result::Inventory",
+               "attrs" : {
+                  "fk_columns" : {
+                     "inventory_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Inventory"
+            },
+            "payments" : {
+               "cond" : {
+                  "foreign.rental_id" : "self.rental_id"
+               },
+               "source" : "{schema_class}::Result::Payment",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Payment"
+            },
+            "customer" : {
+               "cond" : {
+                  "foreign.customer_id" : "self.customer_id"
+               },
+               "source" : "{schema_class}::Result::Customer",
+               "attrs" : {
+                  "fk_columns" : {
+                     "customer_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Customer"
+            },
+            "staff" : {
+               "cond" : {
+                  "foreign.staff_id" : "self.staff_id"
+               },
+               "source" : "{schema_class}::Result::Staff",
+               "attrs" : {
+                  "fk_columns" : {
+                     "staff_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Staff"
+            }
+         },
+         "table_name" : "rental"
+      },
+      "Film" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "film_id"
+               ]
+            }
+         },
+         "columns" : {
+            "release_year" : {
+               "data_type" : "year",
+               "is_nullable" : 1
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "special_features" : {
+               "data_type" : "set",
+               "extra" : {
+                  "list" : [
+                     "Trailers",
+                     "Commentaries",
+                     "Deleted Scenes",
+                     "Behind the Scenes"
+                  ]
+               },
+               "is_nullable" : 1
+            },
+            "rental_rate" : {
+               "data_type" : "decimal",
+               "default_value" : "4.99",
+               "is_nullable" : 0,
+               "size" : [
+                  4,
+                  2
+               ]
+            },
+            "description" : {
+               "data_type" : "text",
+               "is_nullable" : 1
+            },
+            "rating" : {
+               "data_type" : "enum",
+               "default_value" : "G",
+               "extra" : {
+                  "list" : [
+                     "G",
+                     "PG",
+                     "PG-13",
+                     "R",
+                     "NC-17"
+                  ]
+               },
+               "is_nullable" : 1
+            },
+            "rental_duration" : {
+               "data_type" : "tinyint",
+               "default_value" : 3,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "language_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "length" : {
+               "data_type" : "smallint",
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "original_language_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "replacement_cost" : {
+               "data_type" : "decimal",
+               "default_value" : "19.99",
+               "is_nullable" : 0,
+               "size" : [
+                  5,
+                  2
+               ]
+            },
+            "title" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 255
+            },
+            "film_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Film",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "original_language" : {
+               "cond" : {
+                  "foreign.language_id" : "self.original_language_id"
+               },
+               "source" : "{schema_class}::Result::Language",
+               "attrs" : {
+                  "is_foreign_key_constraint" : 1,
+                  "on_update" : "CASCADE",
+                  "accessor" : "single",
+                  "is_deferrable" : 1,
+                  "fk_columns" : {
+                     "original_language_id" : 1
+                  },
+                  "on_delete" : "CASCADE",
+                  "join_type" : "LEFT",
+                  "undef_on_null_fk" : 1
+               },
+               "class" : "{schema_class}::Result::Language"
+            },
+            "language" : {
+               "cond" : {
+                  "foreign.language_id" : "self.language_id"
+               },
+               "source" : "{schema_class}::Result::Language",
+               "attrs" : {
+                  "fk_columns" : {
+                     "language_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Language"
+            },
+            "film_categories" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::FilmCategory",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::FilmCategory"
+            },
+            "film_actors" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::FilmActor",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::FilmActor"
+            },
+            "inventories" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::Inventory",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Inventory"
+            }
+         },
+         "table_name" : "film"
+      },
+      "Address" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "address_id"
+               ]
+            }
+         },
+         "columns" : {
+            "address_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "district" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 20
+            },
+            "city_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "postal_code" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 10
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "address" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "phone" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 20
+            },
+            "address2" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 50
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Address",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "city" : {
+               "cond" : {
+                  "foreign.city_id" : "self.city_id"
+               },
+               "source" : "{schema_class}::Result::City",
+               "attrs" : {
+                  "fk_columns" : {
+                     "city_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::City"
+            },
+            "stores" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Store",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Store"
+            },
+            "staffs" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Staff",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Staff"
+            },
+            "customers" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Customer",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Customer"
+            }
+         },
+         "table_name" : "address"
+      },
+      "CustomerList" : {
+         "constraints" : {},
+         "columns" : {
+            "country" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "sid" : {
+               "data_type" : "tinyint",
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "name" : {
+               "data_type" : "varchar",
+               "default_value" : "",
+               "is_nullable" : 0,
+               "size" : 91
+            },
+            "phone" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 20
+            },
+            "zip code" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "accessor" : "zip_code",
+               "size" : 10
+            },
+            "city" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "notes" : {
+               "data_type" : "varchar",
+               "default_value" : "",
+               "is_nullable" : 0,
+               "size" : 6
+            },
+            "address" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "id" : {
+               "data_type" : "smallint",
+               "default_value" : 0,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::CustomerList",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "customer_list"
+      },
+      "City" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "city_id"
+               ]
+            }
+         },
+         "columns" : {
+            "city" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "city_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "country_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::City",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "country" : {
+               "cond" : {
+                  "foreign.country_id" : "self.country_id"
+               },
+               "source" : "{schema_class}::Result::Country",
+               "attrs" : {
+                  "fk_columns" : {
+                     "country_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Country"
+            },
+            "addresses" : {
+               "cond" : {
+                  "foreign.city_id" : "self.city_id"
+               },
+               "source" : "{schema_class}::Result::Address",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Address"
+            }
+         },
+         "table_name" : "city"
+      },
+      "SaleByFilmCategory" : {
+         "constraints" : {},
+         "columns" : {
+            "total_sales" : {
+               "data_type" : "decimal",
+               "is_nullable" : 1,
+               "size" : [
+                  27,
+                  2
+               ]
+            },
+            "category" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 25
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::SaleByFilmCategory",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "sales_by_film_category"
+      },
+      "FilmActor" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "actor_id",
+                  "film_id"
+               ]
+            }
+         },
+         "columns" : {
+            "actor_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "film_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::FilmActor",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "film" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::Film",
+               "attrs" : {
+                  "fk_columns" : {
+                     "film_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Film"
+            },
+            "actor" : {
+               "cond" : {
+                  "foreign.actor_id" : "self.actor_id"
+               },
+               "source" : "{schema_class}::Result::Actor",
+               "attrs" : {
+                  "fk_columns" : {
+                     "actor_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Actor"
+            }
+         },
+         "table_name" : "film_actor"
+      },
+      "SaleByStore" : {
+         "constraints" : {},
+         "columns" : {
+            "total_sales" : {
+               "data_type" : "decimal",
+               "is_nullable" : 1,
+               "size" : [
+                  27,
+                  2
+               ]
+            },
+            "store" : {
+               "data_type" : "varchar",
+               "default_value" : "",
+               "is_nullable" : 0,
+               "size" : 101
+            },
+            "manager" : {
+               "data_type" : "varchar",
+               "default_value" : "",
+               "is_nullable" : 0,
+               "size" : 91
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::SaleByStore",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "sales_by_store"
+      },
+      "Staff" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "staff_id"
+               ]
+            }
+         },
+         "columns" : {
+            "store_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "active" : {
+               "data_type" : "tinyint",
+               "default_value" : 1,
+               "is_nullable" : 0
+            },
+            "staff_id" : {
+               "data_type" : "tinyint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            },
+            "username" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 16
+            },
+            "address_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "email" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 50
+            },
+            "password" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 40
+            },
+            "picture" : {
+               "data_type" : "blob",
+               "is_nullable" : 1
+            },
+            "first_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Staff",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "payments" : {
+               "cond" : {
+                  "foreign.staff_id" : "self.staff_id"
+               },
+               "source" : "{schema_class}::Result::Payment",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Payment"
+            },
+            "store" : {
+               "cond" : {
+                  "foreign.manager_staff_id" : "self.staff_id"
+               },
+               "source" : "{schema_class}::Result::Store",
+               "attrs" : {
+                  "cascade_update" : 1,
+                  "join_type" : "LEFT",
+                  "accessor" : "single",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Store"
+            },
+            "address" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Address",
+               "attrs" : {
+                  "fk_columns" : {
+                     "address_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Address"
+            },
+            "rentals" : {
+               "cond" : {
+                  "foreign.staff_id" : "self.staff_id"
+               },
+               "source" : "{schema_class}::Result::Rental",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Rental"
+            }
+         },
+         "table_name" : "staff"
+      },
+      "Store" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "store_id"
+               ]
+            },
+            "idx_unique_manager" : {
+               "columns" : [
+                  "manager_staff_id"
+               ]
+            }
+         },
+         "columns" : {
+            "address_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "store_id" : {
+               "data_type" : "tinyint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "manager_staff_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Store",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "manager_staff" : {
+               "cond" : {
+                  "foreign.staff_id" : "self.manager_staff_id"
+               },
+               "source" : "{schema_class}::Result::Staff",
+               "attrs" : {
+                  "fk_columns" : {
+                     "manager_staff_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Staff"
+            },
+            "staffs" : {
+               "cond" : {
+                  "foreign.store_id" : "self.store_id"
+               },
+               "source" : "{schema_class}::Result::Staff",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Staff"
+            },
+            "inventories" : {
+               "cond" : {
+                  "foreign.store_id" : "self.store_id"
+               },
+               "source" : "{schema_class}::Result::Inventory",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Inventory"
+            },
+            "address" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Address",
+               "attrs" : {
+                  "fk_columns" : {
+                     "address_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Address"
+            },
+            "customers" : {
+               "cond" : {
+                  "foreign.store_id" : "self.store_id"
+               },
+               "source" : "{schema_class}::Result::Customer",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Customer"
+            }
+         },
+         "table_name" : "store"
+      },
+      "Language" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "language_id"
+               ]
+            }
+         },
+         "columns" : {
+            "language_id" : {
+               "data_type" : "tinyint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "name" : {
+               "data_type" : "char",
+               "is_nullable" : 0,
+               "size" : 20
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Language",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "film_original_languages" : {
+               "cond" : {
+                  "foreign.original_language_id" : "self.language_id"
+               },
+               "source" : "{schema_class}::Result::Film",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Film"
+            },
+            "film_languages" : {
+               "cond" : {
+                  "foreign.language_id" : "self.language_id"
+               },
+               "source" : "{schema_class}::Result::Film",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Film"
+            }
+         },
+         "table_name" : "language"
+      },
+      "Actor" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "actor_id"
+               ]
+            }
+         },
+         "columns" : {
+            "actor_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "first_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            },
+            "last_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Actor",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "film_actors" : {
+               "cond" : {
+                  "foreign.actor_id" : "self.actor_id"
+               },
+               "source" : "{schema_class}::Result::FilmActor",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::FilmActor"
+            }
+         },
+         "table_name" : "actor"
+      },
+      "FilmList" : {
+         "constraints" : {},
+         "columns" : {
+            "description" : {
+               "data_type" : "text",
+               "is_nullable" : 1
+            },
+            "rating" : {
+               "data_type" : "enum",
+               "default_value" : "G",
+               "extra" : {
+                  "list" : [
+                     "G",
+                     "PG",
+                     "PG-13",
+                     "R",
+                     "NC-17"
+                  ]
+               },
+               "is_nullable" : 1
+            },
+            "length" : {
+               "data_type" : "smallint",
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "fid" : {
+               "data_type" : "smallint",
+               "default_value" : 0,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "category" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 25
+            },
+            "price" : {
+               "data_type" : "decimal",
+               "default_value" : "4.99",
+               "is_nullable" : 1,
+               "size" : [
+                  4,
+                  2
+               ]
+            },
+            "title" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 255
+            },
+            "actors" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 341
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::FilmList",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "film_list"
+      },
+      "FilmText" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "film_id"
+               ]
+            }
+         },
+         "columns" : {
+            "title" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 255
+            },
+            "description" : {
+               "data_type" : "text",
+               "is_nullable" : 1
+            },
+            "film_id" : {
+               "data_type" : "smallint",
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::FilmText",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "film_text"
+      },
+      "Inventory" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "inventory_id"
+               ]
+            }
+         },
+         "columns" : {
+            "store_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "inventory_id" : {
+               "data_type" : "mediumint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "film_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Inventory",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "store" : {
+               "cond" : {
+                  "foreign.store_id" : "self.store_id"
+               },
+               "source" : "{schema_class}::Result::Store",
+               "attrs" : {
+                  "fk_columns" : {
+                     "store_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Store"
+            },
+            "film" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::Film",
+               "attrs" : {
+                  "fk_columns" : {
+                     "film_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Film"
+            },
+            "rentals" : {
+               "cond" : {
+                  "foreign.inventory_id" : "self.inventory_id"
+               },
+               "source" : "{schema_class}::Result::Rental",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Rental"
+            }
+         },
+         "table_name" : "inventory"
+      },
+      "Country" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "country_id"
+               ]
+            }
+         },
+         "columns" : {
+            "country" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "country_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Country",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "cities" : {
+               "cond" : {
+                  "foreign.country_id" : "self.country_id"
+               },
+               "source" : "{schema_class}::Result::City",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::City"
+            }
+         },
+         "table_name" : "country"
+      },
+      "Customer" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "customer_id"
+               ]
+            }
+         },
+         "columns" : {
+            "store_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "active" : {
+               "data_type" : "tinyint",
+               "default_value" : 1,
+               "is_nullable" : 0
+            },
+            "create_date" : {
+               "_ic_dt_method" : "datetime",
+               "data_type" : "datetime",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "last_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            },
+            "email" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 50
+            },
+            "address_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "customer_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "first_name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 45
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Customer",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "payments" : {
+               "cond" : {
+                  "foreign.customer_id" : "self.customer_id"
+               },
+               "source" : "{schema_class}::Result::Payment",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Payment"
+            },
+            "store" : {
+               "cond" : {
+                  "foreign.store_id" : "self.store_id"
+               },
+               "source" : "{schema_class}::Result::Store",
+               "attrs" : {
+                  "fk_columns" : {
+                     "store_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Store"
+            },
+            "address" : {
+               "cond" : {
+                  "foreign.address_id" : "self.address_id"
+               },
+               "source" : "{schema_class}::Result::Address",
+               "attrs" : {
+                  "fk_columns" : {
+                     "address_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Address"
+            },
+            "rentals" : {
+               "cond" : {
+                  "foreign.customer_id" : "self.customer_id"
+               },
+               "source" : "{schema_class}::Result::Rental",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::Rental"
+            }
+         },
+         "table_name" : "customer"
+      },
+      "Payment" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "payment_id"
+               ]
+            }
+         },
+         "columns" : {
+            "rental_id" : {
+               "data_type" : "integer",
+               "is_foreign_key" : 1,
+               "is_nullable" : 1
+            },
+            "amount" : {
+               "data_type" : "decimal",
+               "is_nullable" : 0,
+               "size" : [
+                  5,
+                  2
+               ]
+            },
+            "customer_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "payment_id" : {
+               "data_type" : "smallint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "staff_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "payment_date" : {
+               "_ic_dt_method" : "datetime",
+               "data_type" : "datetime",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Payment",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "customer" : {
+               "cond" : {
+                  "foreign.customer_id" : "self.customer_id"
+               },
+               "source" : "{schema_class}::Result::Customer",
+               "attrs" : {
+                  "fk_columns" : {
+                     "customer_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Customer"
+            },
+            "rental" : {
+               "cond" : {
+                  "foreign.rental_id" : "self.rental_id"
+               },
+               "source" : "{schema_class}::Result::Rental",
+               "attrs" : {
+                  "is_foreign_key_constraint" : 1,
+                  "on_update" : "CASCADE",
+                  "accessor" : "single",
+                  "is_deferrable" : 1,
+                  "fk_columns" : {
+                     "rental_id" : 1
+                  },
+                  "on_delete" : "CASCADE",
+                  "join_type" : "LEFT",
+                  "undef_on_null_fk" : 1
+               },
+               "class" : "{schema_class}::Result::Rental"
+            },
+            "staff" : {
+               "cond" : {
+                  "foreign.staff_id" : "self.staff_id"
+               },
+               "source" : "{schema_class}::Result::Staff",
+               "attrs" : {
+                  "fk_columns" : {
+                     "staff_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Staff"
+            }
+         },
+         "table_name" : "payment"
+      },
+      "NicerButSlowerFilmList" : {
+         "constraints" : {},
+         "columns" : {
+            "description" : {
+               "data_type" : "text",
+               "is_nullable" : 1
+            },
+            "rating" : {
+               "data_type" : "enum",
+               "default_value" : "G",
+               "extra" : {
+                  "list" : [
+                     "G",
+                     "PG",
+                     "PG-13",
+                     "R",
+                     "NC-17"
+                  ]
+               },
+               "is_nullable" : 1
+            },
+            "length" : {
+               "data_type" : "smallint",
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "fid" : {
+               "data_type" : "smallint",
+               "default_value" : 0,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 1
+            },
+            "category" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 25
+            },
+            "price" : {
+               "data_type" : "decimal",
+               "default_value" : "4.99",
+               "is_nullable" : 1,
+               "size" : [
+                  4,
+                  2
+               ]
+            },
+            "title" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 255
+            },
+            "actors" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "size" : 341
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::NicerButSlowerFilmList",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "nicer_but_slower_film_list"
+      },
+      "FilmCategory" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "film_id",
+                  "category_id"
+               ]
+            }
+         },
+         "columns" : {
+            "category_id" : {
+               "data_type" : "tinyint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "film_id" : {
+               "data_type" : "smallint",
+               "is_foreign_key" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::FilmCategory",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "film" : {
+               "cond" : {
+                  "foreign.film_id" : "self.film_id"
+               },
+               "source" : "{schema_class}::Result::Film",
+               "attrs" : {
+                  "fk_columns" : {
+                     "film_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Film"
+            },
+            "category" : {
+               "cond" : {
+                  "foreign.category_id" : "self.category_id"
+               },
+               "source" : "{schema_class}::Result::Category",
+               "attrs" : {
+                  "fk_columns" : {
+                     "category_id" : 1
+                  },
+                  "is_foreign_key_constraint" : 1,
+                  "on_delete" : "CASCADE",
+                  "on_update" : "CASCADE",
+                  "undef_on_null_fk" : 1,
+                  "accessor" : "single",
+                  "is_deferrable" : 1
+               },
+               "class" : "{schema_class}::Result::Category"
+            }
+         },
+         "table_name" : "film_category"
+      },
+      "StaffList" : {
+         "constraints" : {},
+         "columns" : {
+            "country" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "sid" : {
+               "data_type" : "tinyint",
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "name" : {
+               "data_type" : "varchar",
+               "default_value" : "",
+               "is_nullable" : 0,
+               "size" : 91
+            },
+            "phone" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 20
+            },
+            "zip code" : {
+               "data_type" : "varchar",
+               "is_nullable" : 1,
+               "accessor" : "zip_code",
+               "size" : 10
+            },
+            "city" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "address" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 50
+            },
+            "id" : {
+               "data_type" : "tinyint",
+               "default_value" : 0,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::StaffList",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {},
+         "table_name" : "staff_list"
+      },
+      "Category" : {
+         "constraints" : {
+            "primary" : {
+               "columns" : [
+                  "category_id"
+               ]
+            }
+         },
+         "columns" : {
+            "category_id" : {
+               "data_type" : "tinyint",
+               "is_auto_increment" : 1,
+               "extra" : {
+                  "unsigned" : 1
+               },
+               "is_nullable" : 0
+            },
+            "last_update" : {
+               "_ic_dt_method" : "timestamp",
+               "data_type" : "timestamp",
+               "default_value" : "\\\"current_timestamp\"",
+               "_inflate_info" : {
+                  "inflate" : "sub { \"DUMMY\" }",
+                  "deflate" : "sub { \"DUMMY\" }"
+               },
+               "datetime_undef_if_invalid" : 1,
+               "is_nullable" : 0
+            },
+            "name" : {
+               "data_type" : "varchar",
+               "is_nullable" : 0,
+               "size" : 25
+            }
+         },
+         "isa" : [
+            "{schema_class}::Result::Category",
+            "DBIx::Class::InflateColumn::DateTime",
+            "DBIx::Class::Core",
+            "DBIx::Class::Relationship",
+            "DBIx::Class::Relationship::Helpers",
+            "DBIx::Class::Relationship::HasMany",
+            "DBIx::Class::Relationship::HasOne",
+            "DBIx::Class::Relationship::BelongsTo",
+            "DBIx::Class::Relationship::ManyToMany",
+            "DBIx::Class::Relationship::Accessor",
+            "DBIx::Class::Relationship::CascadeActions",
+            "DBIx::Class::Relationship::ProxyMethods",
+            "DBIx::Class::Relationship::Base",
+            "DBIx::Class::InflateColumn",
+            "DBIx::Class::PK::Auto",
+            "DBIx::Class::PK",
+            "DBIx::Class::Row",
+            "DBIx::Class::ResultSourceProxy::Table",
+            "DBIx::Class::ResultSourceProxy",
+            "DBIx::Class",
+            "DBIx::Class::Componentised",
+            "Class::C3::Componentised",
+            "DBIx::Class::AccessorGroup",
+            "Class::Accessor::Grouped"
+         ],
+         "relationships" : {
+            "film_categories" : {
+               "cond" : {
+                  "foreign.category_id" : "self.category_id"
+               },
+               "source" : "{schema_class}::Result::FilmCategory",
+               "attrs" : {
+                  "join_type" : "LEFT",
+                  "accessor" : "multi",
+                  "cascade_copy" : 0,
+                  "cascade_delete" : 0
+               },
+               "class" : "{schema_class}::Result::FilmCategory"
+            }
+         },
+         "table_name" : "category"
+      }
+   }
+}

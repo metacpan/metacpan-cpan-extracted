@@ -1,0 +1,29 @@
+Revision history for Perl module DateTime::Functions
+
+0.12 2016-07-03 NEILB
+    - Still had $VERSION hard-coded in the module, instead of letting
+      DZ set it for me. Thanks to MANWAR who pointed this out.
+
+0.12 2016-03-08 NEILB
+    - ASCIIfied Audrey's name in dist.ini, so it will end up as ASCII
+      in Makefile.PL. The kanji was causing a panic on an old Perl.
+      I should fix this properly, but Audrey++ was ok with me ASCII'ing
+      her name, which was the quicker route to all green on CPAN Testers.
+
+0.11 2016-01-11 NEILB
+    - Added "use warnings", changed "use vars" to use our variables,
+      and changed from "use base" to "use parent".
+    - Updated Changes file to follow format in CPAN::Changes::Spec
+    - Changed license section in doc to have expected head1 text
+    - Switched to Dist::Zilla
+
+0.10 2010-12-08 AUDREYT
+    - LICENSING CHANGE: This compilation and all individual files in it
+      are now under the nullary CC0 1.0 Universal terms:
+      To the extent possible under law, 唐鳳 has waived all copyright and
+      related or neighboring rights to Module-Signature.
+    - Updated Module::Install to 1.00.
+
+0.01 2003-11-01 AUTRIJUS
+    - Initial CPAN release
+

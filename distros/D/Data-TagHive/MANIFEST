@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/TagHive.pm
+t/000-report-versions-tiny.t
+t/bitmasked.t
+t/delete.t
+t/lib/Test/TagHive.pm
+t/taghive.t
+xt/release/changes_has_content.t
+xt/release/pod-syntax.t

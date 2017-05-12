@@ -1,0 +1,77 @@
+{
+   "abstract" : "Hstore Inflator",
+   "author" : [
+      "Jeen Lee"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.6.7",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-InflateColumn-Serializer-Hstore",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class::InflateColumn::Serializer" : "0",
+            "Pg::hstore" : "0",
+            "perl" : "5.008005"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::InflateColumn::Serializer::Hstore" : {
+         "file" : "lib/DBIx/Class/InflateColumn/Serializer/Hstore.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore/issues"
+      },
+      "homepage" : "https://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore",
+      "repository" : {
+         "url" : "git://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore.git",
+         "web" : "https://github.com/JEEN/p5-DBIx-Class-InflateColumn-Serializer-Hstore"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Jeen Lee <aiatejin@gmail.com>"
+   ]
+}

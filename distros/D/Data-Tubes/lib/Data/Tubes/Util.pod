@@ -1,0 +1,849 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Util
+
+=head1 DESCRIPTION
+
+Helper functions for automatic management of argument lists and other.
+
+=head1 FUNCTIONS
+
+=head2 B<< args_array_with_options >>
+
+    my ($aref, $args) = args_array_with_options(@list, \%defaults); # OR
+    my ($aref, $args) = args_array_with_options(@list, \%args, \%defaults);
+
+helper function to ease parsing of input parameters. This is mostly
+useful when your function I<usually> takes a list as input, but you want
+to be able to provide an optional hash of arguments.
+
+The function returns an array reference with the list of parameters, and
+a hash reference of arguments for I<less common> things.
+
+When calling this function, you are always supposed to pass a hash
+reference of options, which will act as a default. If the element
+immediately before is a hash reference itself, it will be considered the
+input for overriding arguments. Their combination (a simple overriding
+at the highest hash level) is then returned as $<$args>.
+
+The typical way to invoke this function is like this:
+
+   function foo {
+      my ($list, $args) = args_array_with_options(@_, {bar => 'baz'});
+      ...
+   }
+
+so that the function C<foo> can be called with an optional trailing hash
+reference containing the arguments, like this:
+
+   foo(qw< this and that >, {bar => 'galook!'});
+
+In case your list might actually contain hash references, you will have
+to take this into consideration.
+
+=head2 B<< assert_all_different >>
+
+   $bool = assert_all_different(@strings);
+
+checks that all strings in C<@strings> are different. Returns C<1> if
+the check is successful, throws an exception otherwise. The exception is
+a hash reference with a key C<message> set to the first string that is
+found repeated.
+
+=head2 B<< generalized_hashy >>
+
+   $outcome = generalized_hashy($text, %args); # OR
+   $outcome = generalized_hashy(%args);        # OR
+   $outcome = generalized_hashy(\%args);
+
+very generic parsing function that tries to figure out a hash out of an
+input text.
+
+The default settings are optimezed for I<whipuptitude> and I<DWIMmery>.
+This means that a lot of strings that you would hardly consider I<sane>
+are parsed anyway, just to give you something fast. If you need to be
+precise instead, you can either customize the different C<%args>, use a
+different parsing function or... roll your own.
+
+The returned value is a hash with the following keys:
+
+=over
+
+=item C<failpos>
+
+in case of failure, it reports the C<pos>ition in the input text where
+the parsing was unsuccessful. It is absent when the parsing succeeds;
+
+=item C<failure>
+
+in case of failure, it reports an error message. It is absent when the
+parsing succeeds;
+
+=item C<hash>
+
+the parsed hash. It is absent when the parsing fails;
+
+=item C<pos>
+
+the position at which the parsing ended, because the L</close> sequence
+was found;
+
+=item C<res>
+
+the number of characters in the input text that were not parsed;
+
+=back
+
+The model is the following:
+
+=over
+
+=item *
+
+the string is considered a sequence of I<chunks>, optionally marked at
+the beginning by an C<open> sequence, and at the end by a C<close>
+sequence. I<Chunks> are separated by a I<chunk separator>;
+
+=item *
+
+each I<chunk> can be either a stand-alone I<value> or a I<key>/I<value>
+pair. In the latter case, I<key> and I<value> are separated by a
+I<key-value separator>
+
+=item *
+
+there is something that defines what a valid I<key> and I<value> looks
+like.
+
+=back
+
+This gives you the following options via C<%args>:
+
+=over
+
+=item C<capture>
+
+the regular expression that dominates all the other ones. You normally
+don't want to set it directly, but you can if you look at how the code
+uses it.
+
+You can use this input argument using something that has already been
+compiled in a previous invocation of C<generalized_hashy>, because it is
+returned at every invocation. So, the typical idiom for avoiding the
+recompilation of this regular expression every time is:
+
+   # get the capture, set text to undef to avoid any parsing
+   $args{capture} = generalized_hashy(undef, %args)->{capture};
+
+From now on, C<$args{capture}> contains the regular expression and
+C<generalized_hashy> will not need to compute it again when called with
+this C<%args> list.
+
+It has no default value.
+
+=item C<chunks_separator>
+
+a regular expression for telling I<chunks> apart. Defaults to:
+
+   chunks_separator => qr{(?mxs: \s* [\s,;\|/] \s*)}
+
+i.e. it eats up surrounding spaces, and can be a space, comma,
+semicolon, pipe or slash character;
+
+=item C<close>
+
+a regular expression for stating that the hash ends. Defaults to:
+
+   close => qr{(?mxs: \s*\z)}
+
+i.e. it eats up optional trailing whitespace and expects to find the end
+of the string;
+
+=item C<key>
+
+a regular expression for valid keys. This allows you to be quite
+I<precise> as to what you admit for keys, but be sure to take a look at
+L</key_admitted> below for a quicker way to set this parameter.
+
+It does not have a default value as it relies upon L</key_admitted>'s
+one.
+
+=item C<key_admitted>
+
+a specification for valid, unquoted keys. When specifying this parameter
+and not setting a L</key>, the key is computed according to the
+algorithm explained below for I<admitted sequences>.
+
+This parameter can be either a regular expression, or a plain string
+containing the admitted characters. Defaults to:
+
+   key_admitted => qr{[^\\'":=\s,;\|/]};
+
+i.e. whatever cannot fit in either separator.
+
+=item C<key_decoder>
+
+a decoding function for a parsed key. You might want to set it when you
+allow quoting and/or escape sequences in your keys.
+
+By default, it removes quotes and escaping characters related to
+L</key_admitted>;
+
+=item C<key_default>
+
+=item C<default_key>
+
+a default key to use when there is a stand-alone value. The
+C<default_key> variant is provided for compatibility with L</metadata>
+and L<Data::Dumper::Plugin::Parser/hashy>.
+
+When not set and a stand-alone value is found, the parsing fails and an
+error is returned.
+
+There is no default. Note that this is different from the default
+setting/behaviour of L<Data::Dumper::Plugin::Parser/ghashy>, although
+that function used C<generalized_hashy> behind the scenes. Again, this
+is for similarity with C<hashy> and backwards compatibility.
+
+=item C<key_duplicated>
+
+a sub reference that will be called whenever a key is already present in
+the output hash. This allows you to e.g. complain loudly in case your
+input has a duplicated key.
+
+By default, when a duplicate key is found for the first time the current
+value is transformed into an array reference whose first element is the
+old value and the second one is the new value. Any following value for
+that key is appended to the array;
+
+=item C<key_value_separator>
+
+a regular expression for telling a I<key> from a I<value>. Defaults to:
+
+   key_value_separator => qr{(?mxs: \s* [:=] \s*)}
+
+i.e. it eats up surrounding spaces, and can be a colon or an equal sign;
+
+=item C<open>
+
+a regular expression for the hash beginning. Defaults to:
+
+   open => qr{(?mxs: \s* )}
+
+i.e. it eats up optional leading whitespace;
+
+=item C<pos>
+
+an integer value to set the initial position for parsing the input
+string. Default to 0, i.e. the start of the string;
+
+=item C<text>
+
+the text to parse. This can also appear as the first unnamed parameter
+in the argument list;
+
+=item C<value>
+
+a regular expression for valid values. This allows you to be quite
+I<precise> as to what you admit for values, but be sure to take a look
+at L</value_admitted> below for a quicker way to set this parameter.
+
+It does not have a default value as it relies upon L</value_admitted>'s
+one.
+
+=item C<value_admitted>
+
+a specification for valid, unquoted values. When specifying this
+parameter and not setting a L</value>, the key is computed according to
+the algorithm explained below for I<admitted sequences>.
+
+This parameter can be either a regular expression, or a plain string
+containing the admitted characters. Defaults to:
+
+   value_admitted => qr{[^\\'":=\s,;\|/]};
+
+i.e. whatever cannot fit in either separator.
+
+=item C<value_decoder>
+
+a decoding function for a parsed value. You might want to set it when
+you allow quoting and/or escape sequences in your values.
+
+By default, it removes quotes and escaping characters related to
+L</value_admitted>;
+
+=back
+
+When using either L</key_admitted> or L</value_admitted>, the L</key>
+and L</value> regular expressions will be computed automatically
+allowing for single and double quoted strings. This is what we refer to
+as I<admitted sequences>. In this case, the admitted regular expression
+(we will call it C<$admitted>) is used as follows:
+
+   allowed_sequence => qr{(?mxs:
+      (?mxs:
+         (?: "(?: [^\\"]+ | \\. )*") # double quotes
+         | (?: '[^']*')              # single quotes
+      )
+      | (?: (?: $admitted | \\.)+? ) # unquoted sequence, with escapes
+   )}
+
+In case C<$admitted> is not a regular expression, it is transformed into
+one like this:
+
+   $admitted = qr{[\Q$admitted\E]}
+
+i.e. it is considered a set of valid characters and transformed into a
+characters class.
+
+One I<admitted sequence> can then be either of the following:
+
+=over
+
+=item I<double-quoted>
+
+in this case, it is bound by double quotes characters, and can contain
+any character, including the double quotes themselves, by escaping using
+the backslash. As a matter of fact, every sequence of a backslash and a
+character is accepted whatever the second character is (including the
+backslash itself and the quoting character);
+
+=item I<single-quoted>
+
+in this case, it is bound by single quote characters, and can contain
+any character I<except> the single quote itself. This differs from what
+Perl accepts in single-quoted strings, and is more in line with what
+happens in other languages (e.g. the shell);
+
+=item I<unquoted>
+
+in this case, no quotation character is considered, and the C<$admitted>
+characters are used, with a twist: you can still escape otherwise
+invalid characters with the backslash.
+
+=back
+
+If you don't like all this I<DWIMmery> you can set L</key> and L</value>
+independently, of course.
+
+Some examples are due. The following inputs all produce the same output
+in the default settings, ranging from I<mostly OK> to
+I<definitely weird>:
+
+    input text -> q< what:ever you:do >
+    input text -> q< what: ever you: do >
+    input text -> q< what: ever you= do | wow: yay >
+    input text -> q< what: ever , you= do | wow: yay >
+   output hash -> {what => 'ever', you => 'do', wow => 'yay'}
+
+This shows you that you can do some escaping in the keys and values:
+
+    input text -> q< what: ever\ \"\,\"\ you\=\ do | wow: yay >
+    input text -> q< what: 'ever "," you= do'      | wow: yay >
+    input text -> q< what: "ever \",\" you= do"    | wow: yay >
+   output hash -> {what => 'ever "," you= do', wow => 'yay'}
+
+
+=head2 B<< load_module >>
+
+   my $module = load_module($locator); # OR
+   my $module = load_module($locator, $prefix);
+
+loads a module automatically. There are a lot of modules on CPAN that do
+this, probably much better, but this should do for these module's needs.
+
+The C<$locator> is resolved into a full module name through
+L</resolve_module>; the resulting name is then C<require>d and the
+resolved name returned back.
+
+Example:
+
+   my $module = load_module('Reader');
+
+loads module L<Data::Tubes::Plugin::Reader> and returns the string
+C<Data::Tubes::Plugin::Reader>, while:
+
+   my $other_module = load_module('Foo::Bar');
+
+loads module C<Foo::Bar> and returns string C<Foo::Bar>.
+
+You can optionally pass a C<$prefix> that will be passed to
+L</resolve_module>, see there for further information.
+
+=head2 B<< load_sub >>
+
+   my $sub = load_sub($locator); # OR
+   my $sub = load_sub($locator, $prefix);
+
+loads a sub automatically. There are a lot of modules on CPAN that do
+this, probably much better, but this should do for these module's needs.
+
+The C<$locator> is split into a pair of module and subroutine name. The
+module is loaded through L</load_module>; the subroutine referenc3 is then
+returned from that module.
+
+Example:
+
+   my $sub = load_module('Reader::by_line');
+
+loads subroutine C<Data::Tubes::Plugin::Reader::by_line> and returns a
+reference to it, while:
+
+   my $other_sub = load_module('Foo::Bar::baz');
+
+returns a reference to subroutine C<Foo::Bar::baz> after loading module
+C<Foo::Bar>.
+
+You can optionally pass a C<$prefix> that will be passed to
+L</resolve_module>, see there for further information.
+
+=head2 B<< metadata >>
+
+   my $href = metadata($input, %args); # OR
+   my $href = metadata($input, \%args);
+
+parse input string C<$string> according to rules exposed below, that can
+be controlled through C<%args>.
+
+The string is split on the base of two separators, a I<chunks> separator
+and a I<key/value> separator. The first one isolates what should be
+key/value pairs, the second allows separating the key from the value in
+each of these chunks. Whenever a chunk is not actually a key/value pair,
+it is considered a value and associated to a I<default key>.
+
+The following items can be set in C<%args>:
+
+=over
+
+=item C<chunks_separator>
+
+what allows separating chunks, it MUST be a single character;
+
+=item C<default_key>
+
+a string used as the key when a chunk cannot be split into a pair;
+
+=item C<key_value_separator>
+
+what allows separating the key from the value in a chunk, it MUST be a
+single character.
+
+=back
+
+Examples:
+
+   # use defaults
+   my $input = 'foo=bar baz=galook booom!';
+   my $href = metadata($input);
+   # $href = {
+   #    foo => 'bar',
+   #    baz => 'galook',
+   #    ''  => 'booom!'
+   # }
+
+   # use defaults
+   my $input = 'foo=bar baz=galook booom!';
+   my $href = metadata($input, default_key => 'name');
+   # $href = {
+   #    foo  => 'bar',
+   #    baz  => 'galook',
+   #    name => 'booom!'
+   # }
+
+   # use alternative separators
+   my $input = 'foo:bar & bar|baz:galook booom!|whatever';
+   my $href = metadata($input,
+      default_key => 'name',
+      chunks_separator => '|',
+      key_value_separator => ':'
+   );
+   # $href = {
+   #    foo  => 'bar & bar',
+   #    baz  => 'galook booom!',
+   #    name => 'whatever'
+   # }
+
+=head2 B<< normalize_args >>
+
+   my $args = normalize_args( %args, \%defaults); # OR
+   my $args = normalize_args(\%args, \%defaults); # OR
+   my $args = normalize_args($value, %args, [\%defaults, $key]);
+
+helper function to handle input parameters, with some defaults. Allows
+accepting both a series of key/value pairs, or a hash reference with
+these pairs, while at the same time providing default values.
+
+A typical usage is as follows:
+
+   sub foo {
+      my $args = normalize_args(@_, {bar => 'baz'});
+      ...
+   }
+
+The last version allows you to accept an initial C<$value> without a key
+in your functions, because you pass the I<default> C<$key> during the
+call to C<normalize_args>. A typical usage is as follows:
+
+   sub foo {
+      my $args = normalize_args(@_, [{bar => 'baz'}, 'aargh']);
+      ...
+   }
+
+In this case, you can accept calling C<foo> like this:
+
+   foo('some value', salutation => 'aloha');
+
+and C<$args> will be populated as follows:
+
+   $args = {
+      aargh => 'some value', # thanks to the default $key
+      salutation => 'aloha', # passed as %args
+      bar => 'baz',          # from defaults
+   };
+
+
+=head2 B<< normalize_filename >>
+
+   my $name_or_handle = normalize_filename($name, $default_handle);
+
+helper function to I<normalize> a file name according to some rules. In
+particular, depending on C<$filename>:
+
+=over
+
+=item *
+
+if it is a filehandle, it is returned directly;
+
+=item *
+
+if it is the string C<->, the C<$default_handle> is returned. This
+allows you to use C<STDIN> or C<STDOUT> as input/output handles in case
+the filename is C<-> (like many applications support);
+
+=item *
+
+if it starts with the string C<file:>, this prefix is stripped away and
+the rest is used as a filename. This allows you to actually use C<-> as
+a real file name, avoiding the automatic handle management described in
+the bullet above. If your filename may start with the string C<file:>,
+then you should always put this prefix, e.g.:
+
+   file:whatever   -- should be passed as -->  file:file:whatever
+
+=item *
+
+if it starts with the string C<handle:>, this prefix is stripped and the
+rest is used to get one of the standard filehandles. The allowed
+remaining parts are (case-insensitive):
+
+=over
+
+=item C<in>
+
+=item C<stdin>
+
+=item C<out>
+
+=item C<stdout>
+
+=item C<err>
+
+=item C<stderr>
+
+=back
+
+Any other remaining part causes an exception to be thrown.
+
+Again, if you actually need to create a file whose name is e.g.
+C<handle:whatever>, you have to prefix it with C<file:>:
+
+   handle:whatever   -- should be passed as -->  file:handle:whatever
+
+=item *
+
+otherwise, the provided C<$filename> will be returned as-is.
+
+=back
+
+=head2 B<< pump >>
+
+   pull($iterator);
+   my $records = pull($iterator);
+   my @records = pull($iterator);
+   pull($iterator, $sink);
+
+exhaust an C<$iterator>, depending on the conditions;
+
+=over
+
+=item *
+
+if a C<$sink> is present, it MUST be a sub reference. For each item
+extracted from the iterator, this sub reference will be called with the
+items as argument;
+
+=item *
+
+otherwise, if called in void context, the iterator is simply exhausted,
+without any kind of accumulation of the records generated;
+
+=item *
+
+otherwise, depending on scalar context or list context, an array
+reference or a list of generated records is returned.
+
+=back
+
+=head2 B<< read_file >>
+
+   my $contents = read_file($filename, %args); # OR
+   my $contents = read_file(%args); # OR
+   my $contents = read_file(\%args);
+
+a slurping facility. The following options are available:
+
+=over
+
+=item C<binmode>
+
+parameter for C<CORE::binmode>, defaults to C<:encoding(UTF-8)>;
+
+=item C<filename>
+
+the filename (or reference to a string, if you really need it) to slurp
+data from.
+
+=back
+
+You can optionally pass the filename standalone as the first argument
+without pre-pending it with the string C<filename>. In this case, it
+MUST appear as the first item in the argument list.
+
+=head2 B<< read_file_maybe >>
+
+   my $text = read_file_maybe(\@aref);
+   my $x    = read_file_maybe($x); # where ref($x) ne 'ARRAY'
+
+helper function that expands the input argument with L</read_file> if it
+is an array reference, while returning the input argument unchanged
+otherwise.
+
+This can be useful if you want to overload an input parameter with
+either a straight text or something that should be loaded from a file,
+like a template:
+
+   my $template = read_file_maybe($args{template});
+
+In this case, if C<$args{template}> is a text, it will be returned
+unchanged. Otherwise, if it is an array reference, it will be expanded
+in a list passed to L</read_file>, and the contents of the file returned
+back.
+
+Examples:
+
+   $text = read_file_maybe('this goes straight');  # direct text
+   # $text contains 'this goes straight' now
+
+   $text = read_file_maybe(['/path/to/text.txt']);
+   # $text has the contents of file /path/to/text.txt now
+
+   $text = read_file_maybe(['/path/to/text.txt', binmode => ':raw']);
+   # ditto, but read as raw text instead of default utf-8
+
+
+=head2 B<< resolve_module >>
+
+   my $full_module_name = resolve_module($module_name); # OR
+   my $full_module_name = resolve_module($module_name, $prefix);
+
+possibly expand a module's name according to a prefix. These are the
+rules as of release C<0.736>:
+
+=over
+
+=item *
+
+if C<$module_name> starts with either a plus sign character C<+> or a
+caret character C<^>, this initial character will be stripped away and
+the rest will be used as the package name. C<$prefix> will be ignored in
+this case;
+
+=item *
+
+otherwise, C<${prefix}::${module_name}> will be returned (where
+C<$prefix> defaults to the string C<Data::Tubes::Plugin>).
+
+=back
+
+The change is related to simplification of interface and better
+conformance to what other modules do in similar situations (principle of
+I<least surprise>).
+
+Examples:
+
+   module_name('^SimplePack'); # SimplePack
+   module_name('+Some::Pack'); # Some::Pack
+   module_name('SimplePack');  # Data::Tubes::Plugin::SimplePack
+   module_name('Some::Pack');  # Data::Tubes::Plugin::Some::Pack
+   module_name('Pack', 'Some::Thing'); # Some::Thing::Pack
+   module_name('Some::Pack', 'Some::Thing'); # Some::Thing::Some::Pack
+
+B<API Versioning Note>: behaviour of this function changed between
+version C<0.734> and C<0.736>. The previous behaviour, described below,
+is still available when C<$Data::Tubes::API_VERSION> (see
+L<Data::Tubes/API Versioning>) is (lexicographically) less than, or
+equal to, C<0.734>. Here's what the function does with the older
+interface:
+
+=over
+
+=over
+
+=item *
+
+if C<$module_name> starts with an exclamation point C<!>, this initial
+character will be stripped away and the rest will be used as the package
+name. C<$prefix> will be ignored in this case;
+
+=item *
+
+otherwise, if C<$module_name> starts with a plus sign C<+>, this first
+character will be stripped away and the C<$prefix> will be used
+(defaulting to C<Data::Tubes::Plugin>);
+
+=item *
+
+otherwise, if C<$module_name> does I<not> contain sub-packages (i.e. the
+sequence C<::>), then the C<$prefix> will be used as in the previous
+bullet;
+
+=item *
+
+otherwise, the provide name is used.
+
+=back
+
+Examples (in the same order as the bullet above):
+
+   module_name('!SimplePack'); # SimplePack
+   module_name('+Some::Pack'); # Data::Tubes::Plugin::Some::Pack
+   module_name('SimplePack');  # Data::Tubes::Plugin::SimplePack
+   module_name('Some::Pack');  # Some::Pack
+   module_name('Pack', 'Some::Thing'); # Some::Thing::Pack
+   module_name('Some::Pack', 'Some::Thing'); # Some::Pack
+
+=back
+
+=head2 B<< shorter_sub_names >>
+
+   shorter_sub_names($package_name);
+
+this helper is used in plugins to generate alternative versions of the
+implemented functions, with shorter names.
+
+The basic rationale is that functions are usually named after the area
+they cover, e.g. the function in L<Data::Tubes::Plugin::Reader> that
+reads a filehandle line-by-line is called C<read_by_line>. In this way,
+when you use e.g. C<summon> from L<Data::Tubes>, you end up with a
+function C<read_by_line> that is much clearer than simply C<by_line>.
+
+On the other hand, when you rely upon automatic running of factory
+functions like in C<tube> or C<pipeline> (again, in L<Data::Tubes>),
+some parts are redundant. In the example, you would end up using
+C<Reader::read_by_line>, where C<read_> is actually redundant as you
+already have the last part of the plugin package name to tell you what
+this C<by_line> thing is about.
+
+C<shorter_sub_names> comes to the rescue to generate alternative names
+by analysing the current namespace for a package and generating new
+functions by removing a prefix. In the L<Data::Tubes::Plugin::Reader>
+case, for example, it is called like this at the end of the module:
+
+   shorter_sub_names(__PACKAGE__);
+
+and it generates, among the others, C<by_line> and C<by_paragraph>.
+
+Consider using this if you generate new plugins.
+
+=head2 B<< sprintffy >>
+
+   my $string = sprintffy($template, \@substitutions);
+
+expand a C<$template> string a-la C<sprintf>, based on a list of
+C<@substitutions>.
+
+The template targets are C<sprintf>-like, i.e. sequences that start with
+a percent sign followed by... something.
+
+Each substitution is supposed to be an array reference with two items
+inside: a regular expression and a value specifier. The regular
+expression is used to match what comes after the percent sign, while the
+value part can be either a straight value, or a subroutine reference
+that will be run to get the real value for the substitution.
+
+There is always an implicit, high priority substitution that matches a
+single percent sign and expands to a percent sign, so that the string
+C<%%> will be I<unescaped> to C<%> as you would expect in something that
+is C<sprintf>-like.
+
+=head2 B<< test_all_equal >>
+
+   my $bool = test_all_equal(@list);
+
+test whether all elements in C<@list> are equal to one another or not,
+and return test output as a boolean value (i.e. something that Perl
+considers true or false).
+
+=head2 B<< trim >>
+
+   trim(@strings);
+
+remove leading/trailing whitespaces from input C<@strings>, in-place.
+
+=head2 B<< traverse >>
+
+   my $item = traverse($data, @keys);
+
+Assuming that C<$data> is an array or hash reference, traverse it using
+items in C<@keys> at each step in the descent.
+
+=head2 B<< tube >>
+
+see C<tube> in L<Data::Tubes>, this is the same function.
+
+=head2 B<< unzip >>
+
+   my ($even, $odds) = unzip(@list); # OR
+   my ($even, $odds) = unzip(\@list);
+
+separates even and odd items in the input C<@list> and returns them as
+two references to arrays.
+
+=head1 SEE ALSO
+
+L<Data::Tubes> is a valid entry point of all of this.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

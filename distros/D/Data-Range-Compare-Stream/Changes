@@ -1,0 +1,170 @@
+Revision history for Perl extension Data::Range::Compare::Stream.
+
+0.01  Thu Dec  8 17:10:58 2011
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Data::Range::Compare::Stream
+
+0.04  Thu Dec  22 
+  -- Beteen 0.002 and 0.004 pod pod pod
+
+0.05 Thu Dec 22
+  -- More pod changes
+
+0.06 Thu Dec 22
+  -- More pod changes
+
+0.07
+  -- bug fix
+    Consolidate results start and end values were invalid
+  -- Pod Updates
+  -- Added new Feature/Example
+    Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc
+
+1.008
+  -- No longer in the Alpha Stage, now considerd developed
+  -- Pod changes most of the pod change are complete
+  -- added more examples
+
+2.009
+  -- Changed the perl version required from perl 5.10 to 5.6.1
+  -- added the layer cake example and modules
+   -- Bug fix/Major change to internals for Compare
+     -- get_next no longer makes calls to has_next
+       This caused a race contition when sub classing the the compare interface.
+  -- Added major documentation improvements, 
+    what this package does should now be very clear ( I hope )
+  -- Added to_string operator for Compare Result object
+
+2.010
+  -- Documentaion clean up.. still trying to explain things, more pod clean ups to come.
+
+2.011 More pod clean ups.. more to come I'm sure.
+
+2.012 More pod changes, should make sense now.. had a bunch of people review the docs and give input.
+
+2.013 Cleaned up a long standing oops in the CookBook
+
+2.014 
+  -- added missing example MyIterator.pm in the examples folder...
+
+2.015
+  -- Fixed prototype missmatch warning showing in tests versions of perl 5.6.2
+
+2.016
+  -- Pod fix ups
+  -- Added 2 file iterator interfaces taken from the example folder as a base starting point
+    1. Consolidator
+    2. Iterator
+
+2.017
+  -- More pod fix ups.. more to come
+  -- updated Data-Range-Compare-Stream-Sort.t  the code wasn't broken the tests were..
+   perl versions prior to 5.8 used quick sort: The unit tests have been updated to reflect this.
+
+2.018
+  -- Updated some examples
+  -- More pod fixups
+  -- Added new Consolidate class
+    The new class dynamically adds columns to the iterator object based on column overlaps!
+  -- Added new Compare package
+  -- Added new support classe(s)
+  -- added new result sub classe(s)
+  -- Most classes and pods have been extended and or updated, no compatibility changes, just added alot of what was missing
+
+2.019
+  -- More pod Fopas cleaned up.
+  -- bug fix: AdjacentAsc.pm did not call on_consolidate, this has been fixed
+
+2.020
+  -- More pod clean ups..
+    SOME OME SAVE ME FROM THIS MONSTER KNOWN AS DOCUMENTATION!!!!  It feeds on my time, so much time!
+  -- Bug fix: implemented the column id related interfaces in Compare::Base.pm
+  -- Added a true LayerCake example in the examples folder.
+     -- Will make cookbook pod in a future release explaining it.
+
+3.021
+  -- added callback Data::Range::Compare::Stream* to support knowing when a range has been generated
+  -- Changed the constructor arguments Compare/Result.pm
+  -- added ColumnRelations Features to Compare/Result.pm
+  -- Added several optimizations to the Comapre::Asc that should help when dealing with large numbers of columns
+  -- Resovled race condition preventing root_id from being set in iterators when columns were auto generated
+  -- Consolidate objects no longer support set_root_column_id
+  -- Added a consolidator->consolidator fill missnig class
+  -- Added support to Compare/Asc.pm to allow for deletion of iterator objects.
+  -- created new result base class
+  -- updated iterator base classes and pods
+  -- ColumnRelations.pm has been removed!
+  -- Consolidate/Result.pm has 2 new is_missing is_generated along with an updated set of constructor arguments
+  -- Add generated state for existing consolidator objects!
+
+3.022
+  -- all Consolidate iterators have been updated to allow any iterator as their argument
+  -- added autosort option to Iterator/Array.pm
+  -- Stream.pod More updates
+  -- FillMissing.pod updated
+  -- Sort.pod updated
+  -- So it seems Test::More has had some major changes made to it....
+    most of the tests had to be updated to work around this.
+
+3.023
+  -- Added an on disk only merge sort iterator package
+    this means you can sort massive files on distk now!
+
+  -- Iterator::Base now supports call back handlers
+    as a result all iterator objects now support thse call back handlers
+  -- Iterator::File updates
+    -- Now supports passing in the NEW_FROM class argument to the constructor
+    -- also gains all the nifty new features from the base class!
+  -- Added an iterator stack interface.
+  -- added an on disck stack allowing for uber big work flows to be handled in temp files.
+    why a 2nd stack objects? one is for iterators the other is for files..
+  -- Compare::Asc 
+     -- added on dead callback 
+     --  added set_raw_result
+     --  add get_raw_result
+     --  delete_iterator bug fix( required for new interface Compare::Asc.pm->iterator_is_dead($id) ), no longer resets dead column
+     --  add iterator_is_dead($id)
+    
+3.024
+  -- Bug fix for windows: File.pm and MergeSortAsc.pm resolved race condition that prevented temp files from being deleted!
+  -- Pod clean ups for Compare::Result
+  -- Added a BigFile Example to the examples folder
+
+3.025
+  -- Minor tweak to Iterator::File.pm now only tries to close file handles it creates
+  -- Added a base tempfile class
+  -- Added tmpdir constructor argument to all classes that support temp files
+  -- Cookook additions! YAY very long time in the making!
+  -- Some pod clean ups 
+  -- Finally implemented the Data::Range::Compare::Stream->boolean interface
+  -- Added an Iterator::Validate package
+  -- Added a ValidateRanges.pl to the examples folder.
+  -- added OutagesDurringBusinessDays.pl to the examples folder
+    The example shows how to compute events durring regular business hours excluding holidays.
+  -- LayerCake added a new constructor argument filter=>undef|code_ref
+   LayerCake may acutally get some use now.. who knows.
+
+3.026
+  -- Cookbook clean ups
+
+4.027  
+-- In general, standardized the NEW_FROM new_from iterator interface options to factory_instance
+  This fundimental change, can break compatibility with older code, so as a fair warning the version
+  is being shifted to a 4.x generation release
+  -- Added how to compare date ranges for overlaps example
+    See the examples folder
+  -- Added common argument to all iterator and compare objects factory_instance=>$instance
+    This superceeds NEW_FROM and all of its misc incarnations.
+  -- Added Data::Range::Compare::Stream::CallBack
+    Supports using a callback hash in the constructor much like the original Data::Range::Compare.
+
+4.028
+-- Bug fishing?
+   -- This release was added to help track down some odd unit test deaths on cpan for the new Dynamic range compare object
+
+4.029
+-- README and TODO updates ( wish list completed! )
+
+4.030
+-- Fixed rt.cpan.org bug  https://rt.cpan.org/Ticket/Display.html?id=99946 
+  -- fixed: example code showing up in the pause index.

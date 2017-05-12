@@ -1,0 +1,28 @@
+---
+abstract: 'Less indentation and newlines plus sub deparsing'
+author:
+  - 'mst - Matt S. Trout <mst@shadowcat.co.uk>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Data::Dumper::Concise
+name: Data-Dumper-Concise
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.6.0
+resources:
+  homepage: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Data-Dumper-Concise.git;a=summary
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/p5sagit/Data-Dumper-Concise
+version: '2.022'

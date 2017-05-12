@@ -1,0 +1,16 @@
+$ENV{PERL5OPT} = "-Mlib=lib -MDevel::Cover=+ignore,\\.t";
+system "rm -rf cover_db";
+$ENV{DATA_POSTPONED_DEBUG} = "";
+for ( sort glob "t/*.t" ) {
+    print "$_\n";
+#    $ENV{PERLDB_OPTS} = "AutoTrace NonStop LineInfo stderr";
+    system "$^X $_";
+    print "\n" x 2;
+}
+delete $ENV{PERL5OPT};
+system "/home/josh/perl5.8.6/bin/cover";
+system "firefox cover_db/coverage.html";
+
+# Methodist
+# 100 Excelsior
+# Meadowbrooke 

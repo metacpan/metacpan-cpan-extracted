@@ -1,0 +1,5 @@
+main::bar 1 200
+main::bar,main::foo 2 800
+main::foo 1 800
+main::zog,main::bar 2 171
+main::zog,main::bar,main::foo 3 686

@@ -1,0 +1,10 @@
+44ca4834d11029908300
+
+master oregon 44.ca4834d11029908300:
+  sensor/thwr800.d1[temp]=29.1
+  sensor/thwr800.d1[battery]=90%
+
+
+
+
+

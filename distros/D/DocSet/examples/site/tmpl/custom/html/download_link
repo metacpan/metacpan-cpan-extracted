@@ -1,0 +1,25 @@
+[%- # link to the pdf, source and other variants of the doc
+
+    links = [];
+
+
+    IF doc.pdf_doc.link;
+        pdf = PROCESS pdf_doc;
+        links.push( pdf );
+    END;
+
+
+    IF doc.src_doc.link;
+        src = PROCESS src_doc;
+        links.push( src );
+    END;
+
+
+    IF links.join;
+        links.join('');
+    ELSE;
+        "<br>";
+    END;
+    
+-%]
+[%- BLOCK src_doc -%]<a href="[%- doc.src_doc.link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_src.gif" height="15" width="40" border="0" alt=""></a>[%- END -%][%- BLOCK pdf_doc -%]<a href="[%- doc.pdf_doc.link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_pdf.gif" height="15" width="40" border="0" alt=""></a>[%- END -%]

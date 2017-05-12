@@ -1,0 +1,199 @@
+package Data::MuForm::Manual::FormHandlerDiff;
+# ABSTRACT: Changes from FormHandler to MuForm
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::FormHandlerDiff - Changes from FormHandler to MuForm
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+This documents the differences between FormHandler and MuForm, in order to
+assist converting forms or deciding which package to use.
+
+Since this is an entirely new package I have taken the opportunity to
+make all of the changes and improvements that you can't do when you
+have actual users, including renaming things, removing features, changing
+behavior, and removing cruft. A very large part of the core FormHandler
+code and functionality has stood the test of time and use very well,
+and has been moved to MuForm with only minor changes.
+
+Form construction is substantially faster in MuForm, for a number of reasons:
+Moo instead of Moose, fewer attributes, no results, and dropped some complicated
+only marginally helpful features. Processing is somewhat faster. Rendering
+takes about the same amount of time (most of the extra rendering related time in FH is
+actually at form construction time).
+
+Note: this is still a work in process, so please contact me if your
+favorite feature has gone missing. Some features may be supplied via
+roles.
+
+In your MuForm classes do;
+
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+instead of:
+
+    use HTML::FormHandler::Moose;
+    extends 'HTML::FormHandler';
+
+In your MuForm roles do:
+
+    use Moo::Role;
+    use Data::MuForm::Meta;
+
+instead of:
+
+    use HTML::FormHandler::Moose::Role;
+
+The 'result' objects have been removed because there was too much overhead
+and complication for low payout. Some rendering tasks were practically
+impossible to support using the results.
+
+The 'item', 'item_id', and 'item_class' have been renamed to 'model', 'model_id',
+'model_class'. The 'model' is now cleared on process like the other attributes.
+
+When a DBIC row created with 'new_result' is used as a model, it will not be used
+for defaults unless explicitly overridden in the form with a 'use_model_for_defaults' sub.
+
+The 'init_object' has been renamed to 'init_values'.
+
+Note: the rendering is entirely different, so much that there's no point in
+documenting the individual differences here. No more widgets. I found that the rendering
+of form elements hardly changed at all, and that trying to have one wrapper
+method that handled everything ended up with a large mess. Attributes that
+were rendering specific have been mostly moved into a render_args hashref
+that will be passed to a renderer, in order to allow more flexibility and reduce
+the overhead of form construction. I attempted to make it easier to render
+in templates with 'render_element' while still allowing full-automatic rendering.
+There are 'layouts' for some form controls.
+
+In particular, the defaults for wrapping fields have changed, for compound and
+repeatable fields, etc. I advise you to make a test case, like the ones in the
+t/render directory, and ensure that the output matches, if you are converting
+from FormHandler to MuForm. Compounds and repeatables have wrappers and labels
+by default. Repeatable instances do not have labels but do have wrappers.
+
+See L<Data::MuForm::Manual::Rendering> for more rendering information.
+
+Renamed 'init_contains' to 'init_instance' which is more accurate.
+
+Set options attributes directly in the 'options' hashrefs, instead of in a separate
+'attributes' hashref, i.e. { value => 1, label => 'one', class => 'xxx' }
+
+No 'has_block', since that's purely a rendering thing. There will be some way of
+doing something similar in the renderer.
+
+Localization now uses a gettext style .po file and a gettext type localizer,
+with named parameters.
+Users can supply their own localizer as long as it can use the translation
+files and supports the calls that the internal add_error* methods use.
+Gettext has more complicated methods for localizing, so a few additional
+add_error* methods have been added, but shouldn't be needed very often.
+
+Added 'check' method for validation, which doesn't do 'update_model', for
+non-form type validation.
+
+Added 'data' alias for 'params', for better naming when doing simple validation
+
+Renamed 'field_name_space' to 'field_namespace'. ('widget_name_space' is gone)
+
+Standardized returns from attributes to arrayref, instead of array. If an array return
+is available it will be in the 'all_' version. The important ones are 'options' and 'fields'.
+A field 'options' returns an arrayref of options. 'all_options' returns an array. The 'fields'
+attribute returns an arrayref of fields, 'all_fields' returns an array.
+
+The trim method is a separate coderef and is not added to the apply actions. Needs to
+be defined as a simple coderef instead of an apply-style action.
+
+The 'render_filter_method' has been removed. The 'html_filter' is defined in the Renderer.
+If you want a different filter, create your own renderer (recommended anyway) and replace it.
+
+The active => [] and inactive => [] no longer have a permanent build (on new) effect.
+Do in your own form code if you want this. They still work the same on ->process.
+The 'active' and 'inactive' flags are implemented slightly differently, but shouldn't affect
+field definitions.
+
+The 'posted' flag has been renamed to 'submitted', because you also need on a 'get'. Also
+a params hashref with no field name keys will not need the submitted => 0 flag.
+
+You no longer need to use C<< $field->_set_value($value) >> or C<< $field->_set_input($input) >>.
+Just use C<< $field->value($value) >> and C<< $field->input($input) >>
+
+Removed 'update_subfields'. The code was complicated and not worth the overhead. If you
+want to do something like this, see the cookbook.
+
+Removed 'use_fields_for_input_without_param'. Happens normally now, since the default is to
+process all active fields unless the 'skip_fields_without_input' flag is set.
+
+Removed flag 'use_init_obj_when_no_accessor_in_item'. This should happen automatically now.
+
+Removed flag 'use_init_obj_over_item'. Just use init_values in your process call instead. Also
+a 'new_result' model will not be used for defaults now, so it's not as likely to be necessary.
+
+Removed flag 'use_defaults_over_obj'. Use transform_default_to_value instead.
+
+Removed 'no_update' flag on form. Use 'check' method instead.
+
+Removed 'update_field_list'. Can be implemented easily via user code if needed.
+
+Removed 'defaults' on 'process'. Use init_values instead or implement via user code.
+
+The inflate/deflate transforms have been renamed: 'inflate_method' = 'transform_input_to_value',
+'deflate_method' = 'tranform_value_to_fif', 'inflate_default_method' = 'transform_default_to_value',
+'deflate_value_method' = 'transform_value_after_validate'. Added new transform: 'transform_param_to_input'.
+
+Removed 'deflation'. Many other ways of doing this.
+
+Removed 'missing'. I never used this. Did anybody?
+
+Various methods that could be set in a field definition have been moved into a 'methods' hashref:
+'build_id', 'build_options', 'build_label', 'validate', 'default'.
+
+TextArea field renamed to Textarea for consistency.
+
+A number of trivial fields are no longer supplied by the distribution. If you need these fields
+it should be pretty easy to create your own. Some fields not supplied: Hour, Minute, Month,
+MonthDay, MonthName, Second, Weekday, Year, BoolSelect, DateMDY, PosInteger, Duration,
+PasswordConf, IntRange. The DateTime field has been renamed to 'CompoundDateTime'.
+
+Renamed html_prefix to field_prefix and it should be set to the string used to prefix fields.
+
+Renamed field 'noupdate' to 'no_update'.
+
+Added 'build_field_id' as a possible form method to build field ids.
+
+Renamed push_errors and push_form_errors to push_error and push_form_error.
+
+Internal method 'validate_field' (sometimes used for field tests) renamed to 'field_validate'
+
+Removed internal method 'base_validate', added 'normalize_input' instead (for handling multiple/non-multiple, etc)
+
+Renamed 'html5_type_attr' to 'html5_input_type'.
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

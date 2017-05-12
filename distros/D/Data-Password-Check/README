@@ -1,0 +1,175 @@
+Data-Password-Check version 0.04
+===========================
+
+NAME
+    Data::Password::Check - sanity check passwords
+
+DESCRIPTION
+    Users can be lazy. If you're a perl programmer this is a good thing. If
+    you're choosing a password this is a bad thing.
+
+    This module performs some sanity checks on passwords. Details on checks
+    than can be performed are described below.
+
+SYNOPSIS
+    Basic use of the module is as follows:
+
+      use Data::Password::Check;
+
+      # check a password
+      my $pwcheck = Data::Password::Check->check({
+        'password' => $some_password
+      });
+
+      # did we have any errors?
+      if ($pwcheck->has_errors) {
+        # print the errors
+          print(
+           join("\n", @{ $pwcheck->error_list }),
+           "\n"
+          );
+      }
+
+PUBLIC METHODS
+    These methods are publically available. Use them to your heart's
+    content.
+
+  check($proto,$options)
+    This is the main function for this module. You must pass one mandatory
+    value in the $options hash-reference - a password:
+
+      # check a password
+      $result = Data::Password::Check->check({'password' => $pwd_to_check});
+
+    There are other options that may be passed to invoke further password
+    tests if required:
+
+    * tests
+        set this to a list of test names to replace the list of tests
+        performed by the module
+
+        e.g. tests => [ 'length' ] will make the module perfoem the length
+        check only
+
+    * tests_append
+        set this to a list of additional tests to perform. This is useful if
+        you want to call more tests than are in the default list, or to
+        include your own tests when inheriting from this module.
+
+        e.g. test => [ 'mytest1', 'mytest2' ] will make the module perform
+        two extra tests (assuming they exist) mytest1 and mytest2.
+
+  has_errors($class)
+    This function is used to determine if there were any errors found while
+    sanity checking the supplied password. It does not return the errors
+    themselves.
+
+    Returns 1 if there were errors, 0 otherwise
+
+  error_list($class)
+    This function returns an array-reference to a list of the error
+    messages. If there are no errors undef is returned.
+
+AVAILABLE CHECKS
+    By default the module will perform all checks listed below. You can
+    limit the number of checks by passing a list of desired tests via the
+    tests option when calling check(). e.g.
+
+      Data::Password::Check->check({
+        ...
+        'tests' => [ 'length' ], # check only that the password meets a minimum-length requirement
+        ...
+      });
+
+  alphanumeric_only
+    Make sure the password only contains a-z, A-Z and 0-9 characters.
+
+  alphanumeric
+    Make sure the password contains one of each from the following sets:
+    a-z, A-Z and 0-9
+
+  length
+    Make sure the password it at least 6 characters long. If min_length was
+    passed as an option to check(), this value will be used instead,
+    assuming it's a positive integer.
+
+  mixed_case
+    Make sure the password is mixes case, i.e. not all lower case, nor all
+    upper case
+
+  silly
+    Make sure the password isn't a known silly word (e.g 'password' is a bad
+    choice for a password).
+
+    The default list contains *qwerty*, and *password* only. You may choose
+    to replace this list of words or to add your own to the end of the list.
+
+    If you wish to replace the list of silly-words, you should pass them in
+    via the options when calling check(), as 'silly_words'. e.g.
+
+      Data::Password::Check->check({
+            ...
+        'silly_words' => [ 'my', 'silly', 'words' ],
+            ...
+      });
+
+    If you would like to add words to the existing list, you should pass
+    them in via the 'silly_words_append' option when calling check(). e.g.
+
+      Data::Password::Check->check({
+            ...
+        'silly_words_append' => [ 'more', 'silly', 'words' ],
+            ...
+      });
+
+    All matching is case-insensitive, and if you choose to append words,
+    duplicates will be omitted.
+
+  repeated
+    Make sure the password isn't a single character repeated, e.g.
+    'aaaaaaaaaa'.
+
+PRIVATE METHODS
+    These methods are private to this module. If you choose to use them
+    outside the module, all bets are off.
+
+  _do_checks($self)
+    This function calls each required test in turn. It's an internal
+    function called within check().
+
+  _add_error($class,$message)
+    This function is used to add an error message to the internal store. The
+    errors can later be retrieved using the error_list() method.
+
+  _skipped_test($class,$testname)
+    This function exists so that it's possible to work out if a test was
+    skipped because "something went wrong" - usually because of an invalid
+    option passed in via the check() options.
+
+    This function was written to enable some tests in the "make test" phase
+    of installing the module.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Chisel Wright
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.8.2 or, at your option,
+any later version of Perl 5 you may have available.
+
+

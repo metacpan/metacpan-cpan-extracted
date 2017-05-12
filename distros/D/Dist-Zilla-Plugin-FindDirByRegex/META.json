@@ -1,0 +1,61 @@
+{
+   "abstract" : "A regex-based FileFinder plugin",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-FindDirByRegex",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::FileFinder" : 0,
+            "Moose" : 0,
+            "Moose::Autobox" : 0,
+            "namespace::autoclean" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::FindDirByRegex" : {
+         "file" : "lib/Dist/Zilla/Plugin/FindDirByRegex.pm",
+         "version" : "1.102640"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-finddirbyregex at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-FindDirByRegex"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dist-Zilla-Plugin-FindDirByRegex/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Dist-Zilla-Plugin-FindDirByRegex"
+      }
+   },
+   "version" : "1.102640"
+}
+

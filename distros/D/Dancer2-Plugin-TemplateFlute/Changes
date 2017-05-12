@@ -1,0 +1,18 @@
+Revision history for Perl module Dancer2::Plugin::TemplateFlute
+
+0.202 Thu  4 Aug 12:41:22 CEST 2016
+
+    * form 'fill' method can now be passed a list (hash) as an alternative
+      to a hash reference.
+
+0.201 Mon  6 Jun 18:41:52 CEST 2016
+
+    * Add in form tests from Dancer2::Template::TemplateFlute
+    * Add dependency on Dancer2::Template::TemplateFlute
+
+0.200 Thu 26 May 18:28:34 CEST 2016
+
+    * First CPAN release using some code from unreleased Dancer2::Plugin::Form
+
+0.01 Wed Apr  8 12:02:09 2015
+    - original version; created by ExtUtils::ModuleMaker 0.52

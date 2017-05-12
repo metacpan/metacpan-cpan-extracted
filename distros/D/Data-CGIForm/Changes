@@ -1,0 +1,34 @@
+$Id: Changes 2 2010-06-25 14:41:40Z twilde $
+
+0.5   11/09/2007 twilde
+	Well, it didn't go away or die, and has in fact had releases sine
+	that last changelog entry...
+	
+	Added "length" error type for length options, with reasonable
+	default error message.
+	
+	Minor doc cleanups.
+
+0.03  9/29/2003 ctriv
+
+	With any luck, this will be the last release of Data::CGIForm.  It's
+	main reason for existance is going away soon.
+
+	Added length options.
+	
+	Added started() method, which return boolean based of is the
+	start_param has been seen.
+	
+	Various documentation fixes.
+	
+	Optimized the storage of the default error strings.
+
+0.02  12/2/2002 ctriv
+
+	First public release.
+
+0.01  11/1/2002 ctriv
+	
+	Original version; created by h2xs 1.21 with options -X -n
+	Data::CGIForm
+

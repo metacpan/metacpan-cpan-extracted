@@ -1,0 +1,38 @@
+---
+abstract: entry[title]=foo&tags[]=art&tags[]=modern
+author:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+build_requires:
+  Test::Base::Less: '0.12'
+  Test::Deep: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.0, CPAN::Meta::Converter version 2.141520'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-NestedParams
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::NestedParams:
+    file: lib/Data/NestedParams.pm
+    version: '0.07'
+requires:
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/tokuhirom/Data-NestedParams/issues
+  homepage: https://github.com/tokuhirom/Data-NestedParams
+  repository: git://github.com/tokuhirom/Data-NestedParams.git
+version: '0.07'

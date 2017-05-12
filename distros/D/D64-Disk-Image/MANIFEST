@@ -1,0 +1,14 @@
+Changes
+Image.xs
+MANIFEST
+Makefile.PL
+README
+diskimage.c
+diskimage.h
+lib/D64/Disk/Image.pm
+lib/D64/Disk/Image/File.pm
+typemap
+t/01-basic.t
+t/02-new.t
+t/03-format.t
+t/04-open.t

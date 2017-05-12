@@ -1,0 +1,31 @@
+DateTime-Format-Duration-XSD version 0.01
+=========================================
+
+DESCRIPTION
+
+DateTime::Format::Duration::XSD - Formats and parses DateTime::Duration
+according to xs:duration
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime - 0.30
+  DateTime::Format::Duration - 1.03
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 by Smal D A
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.

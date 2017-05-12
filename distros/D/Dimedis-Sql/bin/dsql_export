@@ -1,0 +1,308 @@
+#!/usr/local/bin/perl
+
+use strict;
+use lib 'lib';
+
+use DBI 1.21;
+use Getopt::Std;
+use File::Path;
+
+use Dimedis::Sql::Export;
+
+my $VERSION = "1.02";
+
+my $COPYRIGHT = <<__EOT;
+dsql_export, version $VERSION, Copyright 2002-2004 dimedis GmbH
+__EOT
+
+my $USAGE = <<__EOT;
+Usage:dsql_export [-V] config-filename
+      dsql_export -c
+		
+  -V         suppress verbose output
+  -c         print example config file to STDOUT
+  
+__EOT
+
+
+my $EXAMPLE_CONFIG = <<__EOT;
+#  data_source     -- Data-Source der Quelldatenbank, aus der die Daten
+#                     exportiert werden
+#  username        -- Schema-Name der Quelldatenbank, aus der die Daten
+#                     exportiert werden
+#  password        -- DB-Passwort
+#  directory       -- kompletter Pfad des Verzeichnisses, in dem die
+#                     exportierten Daten abgelegt werden
+#  type_hash_file  -- kompletter Pfad der Datei, in der das Type-Hash für
+#                     die zu exportierenden Tabellen abgelegt ist
+#
+# OPTIONAL:
+#  utf8		   -- Wenn die Datenbank in UTF8 kodiert ist, muß hier
+#		      eine 1 gesetzt werden.
+#  include_tables  -- Liste der Tabellen, die exportiert werden sollen
+#                     (Angabe von regulären Ausdrücken möglich, es wird immer
+#                      nach Tabellen gesucht, deren Name mit dem angegebenen
+#                      Ausdruck beginnt!)
+#  exclude_tables  -- Liste der Tabellen, die nicht exportiert werden sollen
+#		      Wird auf Tabellen, die ggf. include_tables passiert
+#		      haben angewendet.
+#                     (Angabe von regulären Ausdrücken möglich, es wird immer
+#                      nach Tabellen gesucht, deren Name mit dem angegebenen
+#                      Ausdruck beginnt!).
+#                      
+#                     Default: Exportiert werden alle Tabellen, die einen
+#                              Eintrag in der angegebenen Type-Hash-Datei
+#                              haben.
+#                              Tabellen ohne Type-Hash-Eintrag werden generell
+#                              vom Export ausgeschlossen!
+{
+  data_source    => 'dbi:Oracle:',
+  username       => 'usr',
+  password       => 'passwd',
+  directory      => '/tmp/export',
+  type_hash_file => './prod/config/lib.install.sql.general.all_tables.config',
+  include_tables => ['it.*'],
+  exclude_tables => ['it_test'],
+}
+  
+__EOT
+
+
+main: {
+	my %opt;
+	my $opt_ok = getopts ('Vc', \%opt);
+
+   #--- Beispiel-Config-File ausgeben	
+	if ( $opt{c} ) {
+		print $EXAMPLE_CONFIG;
+		exit 1;
+	}
+
+	my $config_filename = shift @ARGV;
+
+	if ( not $opt_ok or not $config_filename or @ARGV ) {
+		print $COPYRIGHT, "\n";
+		print $USAGE;
+		exit 1;
+	}
+
+	if ( not -f $config_filename ) {
+		print "Invalid config filename!\n";
+		exit 1;
+	}
+
+	#--- get config file
+	my $config = do $config_filename;
+	
+	if ( $config ->{data_source} =~ /oracle/i ) {
+	  #--- check version of DBD::Oracle (must be at least 1.12)
+     eval "use DBD::Oracle 1.12";
+     die $@ if $@;
+	}
+
+	#--- check if export directory already contains exported data
+	if ( -e "$config->{directory}/export.meta" ) {
+
+	  my $overwrite;
+	  my $delete;
+
+	  while ( $overwrite !~ /(^y$|^n$)/i ) {
+		  
+       print "Export directory $config->{directory} already contains " .
+		       "exported data. Overwrite? (y/n) ";
+
+	    $overwrite = <STDIN>;
+	  
+	    #--- cancel export if existing data shall not be overwritten
+  	    exit 1  if $overwrite =~ /^n$/i;
+	  }
+		 
+	  while ( $delete !~ /(^y$|^n$)/i ) {
+		  
+       print "Delete existing data from directory $config->{directory} " .
+		       "before starting new export? (y/n) ";
+				 
+       $delete = <STDIN>;
+		 
+		 #--- delete export directory before starting new export
+		 File::Path::rmtree ( $config->{directory} )
+		 	if $delete =~ /^y$/i
+	  }
+	}
+
+	#--- connect to database
+	my $dbh = DBI->connect (
+		$config->{data_source},
+		$config->{username},
+		$config->{password},
+		{
+			AutoCommit => 1,
+			RaiseError => 1,
+		}
+	);
+	
+	print "\nExporting data...\n";
+	
+	#--- execute database export
+	my $export = Dimedis::Sql::Export->new(
+		dbh			=> $dbh,
+		config 		=> $config,
+		quiet_mode	=> $opt{V},
+	);
+	
+	$export->do_export();
+   
+	print "\n\nDone.\n\n";
+
+	END { $dbh->disconnect if $dbh }
+}
+
+__END__
+
+=head1 NAME
+
+dsql_export - Kommandozeilen-Tool für datenbankunabhängige DB-Exports
+
+=head1 SYNOPSIS
+
+  dsql_export [-V] Konfigurationsdatei-Name
+  dsql_export -c
+		
+  -V    keine Statusmeldungen auf STDOUT ausgeben
+  -c    Muster-Konfigurationsdatei auf STDOUT ausgeben
+
+=head1 DESCRIPTION
+
+Dieses Tool ermöglicht einen Export von Daten aus einer bestimmten
+Datenbank (Oracle, MySQL oder mSQL) in ein angegebenes Export-Verzeichnis
+im Filesystem.
+
+Es werden alle bestehenden Tabellen der Quelldatenbank exportiert, die nicht
+explizit über den Parameter B<exclude_tables> vom Export ausgeschlossen werden,
+und für die es einen Eintrag in der angegebenen Type-Hash-Datei gibt 
+(siehe Abschnitt 'KONFIGURATIONSDATEI').
+
+Tabellen ohne Type-Hash-Eintrag werden grundsätzlich
+vom Export ausgeschlossen!
+
+Im angegebenen Export-Verzeichnis wird für jede exportierte Tabelle ein
+Unterverzeichnis mit dem Namen der entsprechenden Tabelle angelegt. Dort werden
+dann die zugehörigen Dateien abgelegt:
+
+=over 4
+
+=item B<format.conf>
+
+Enthält Informationen (Spaltenname, Typ und maximale Länge) zu den zugehörigen
+Tabellen-Spalten.
+
+=item B<data.dump>
+
+Enthält die eigentlichen Daten, wobei die einzelnen Spalten durch Tabulatoren
+voneinander getrennt sind.
+
+=item B<blob_1.bin - blob_n.bin>
+
+Enthält eine Tabelle BLOB- oder CLOB-Spalten, werden die Inhalte dieser Spalten
+in separaten Dateien gespeichert. In der CSV-Datei wird dann für diese
+Spalten nur der Name der zugehörigen Datei abgelegt.
+
+=back
+
+Die Start- und Endzeit des Exports, sowie die übergebenen Parameter
+und die Statusmeldungen, die während des Exports ausgegeben werden,
+werden in die Datei B<export.meta> im Export-Verzeichnis geschrieben.
+
+Wenn ein DB-Export in ein bereits vorhandenes Export-Verzeichnis
+gemacht wird, dann wird die bestehende B<export.meta>-Datei überschrieben. Die
+Unterverzeichnisse der Tabellen, die neu exportiert werden, werden vorher
+komplett gelöscht. Bereits existierende Unterverzeichnisse von Tabellen,
+die beim neuen Export nicht berücksichtigt werden, bleiben bestehen.
+
+=head1 KONFIGURATIONSDATEI
+
+Die Konfigurationsdatei für das Export-Tool muss folgende Einträge enthalten:
+
+=over 4
+
+=item B<data_source>
+
+Data-Source der Quelldatenbank, aus der die Daten exportiert werden
+
+=item B<username>
+
+Schema-Name der Quelldatenbank, aus der die Daten exportiert werden
+
+=item B<password>
+
+DB-Passwort
+
+=item B<directory>
+
+kompletter Pfad des Verzeichnisses, in dem die exportierten Daten abgelegt
+werden
+
+=item B<type_hash_file>
+
+kompletter Pfad der Datei, in der das Type-Hash für die zu exportierenden
+Tabellen abgelegt ist
+
+=back
+
+Zusätzlich gibt es optionale Parameter:
+
+=over 4
+
+=item B<utf8>
+
+Wenn die Datenbank in UTF8 kodiert ist, muß hier eine 1 gesetzt werden.
+
+=item B<include_tables>
+
+Liste der Tabellen, die ausschließlich exportiert werden sollen.
+
+Bei der Angabe der Tabellennamen können auch reguläre Ausdrücke verwendet
+werden. Es wird immer nach nach Tabellen gesucht, deren Name mit dem
+angegebenen Ausdruck beginnt!
+
+=item B<exclude_tables>
+
+Liste der Tabellen, die nicht exportiert werden sollen. Wird angewendet
+auf die Tabellen, die B<include_tables> passiert haben.
+
+Bei der Angabe der Tabellennamen können auch reguläre Ausdrücke verwendet
+werden. Es wird immer nach nach Tabellen gesucht, deren Name mit dem
+angegebenen Ausdruck beginnt!
+
+=back 
+
+=head1 TYPE-HASH
+
+Die im Konfigurationsdatei angegebene Type-Hash-Datei muss folgenden
+Aufbau haben (siehe auch B<Dimedis::Sql>):
+
+B<$type_hash_ref> = {
+  'table_name_x'    => {
+    'column_name_i' => 'serial',
+    'column_name_j' => 'varchar(999)',
+    'column_name_k' => 'clob',
+    'column_name_l' => 'blob' ,   
+  },
+  'table_name_y'    => {
+    'column_name_i' => 'numeric(2)',
+    'column_name_j' => 'blob',
+    'column_name_k' => 'char(16)',
+  },
+};
+
+Hier muss ein Eintrag für jede zu exportierende DB-Tabelle vorhanden sein.
+
+=head1 AUTOR
+
+Sabine Tonn, sabine@dimedis.de
+
+=head1 COPYRIGHT
+
+Copyright (c) 2002 dimedis GmbH, All Rights Reserved
+
+=cut

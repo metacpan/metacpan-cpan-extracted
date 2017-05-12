@@ -1,0 +1,46 @@
+Data-Rlist version 1.42
+=======================
+
+$Writestamp: 2008-07-20 23:23:53 andreas$
+
+ABOUT
+
+A lightweight data format language for Perl, Python and C++.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+If <Rlist.pm> cannot be installed regularily, the file may be installed
+locally.  The module is self-contained and depends only on standard modules
+
+1.) Copy <Rlist.pm> to your <$HOME/bin> (recommended), or the same directory as
+	the scripts that use it.
+
+2.) At the begin of each script, use
+
+	BEGIN {
+		$0 =~ /[^\/]+$/;
+		push @INC, $`||'.', "$ENV{HOME}/bin";
+		require Rlist;
+		Data::Rlist->import();
+	}
+
+The Rlist C/C++ library can be downloaded from <http://www.visualco.de>.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 1998-2008 by Andreas Spindler
+
+Mail to <rlist@visualco.de>
+
+Maintained at <http://www.visualco.de>
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself, either Perl version 5.6.0 or, at your option,
+any later version of Perl 5 you may have available.

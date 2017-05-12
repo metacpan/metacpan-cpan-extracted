@@ -1,0 +1,35 @@
+<% IF URLs %>
+	<% FOREACH i IN URLs %>
+		 <a href="<% i %>" target=right ><% i %></a><br />
+	<% END %>
+
+<% ELSE %>
+	<a href="/test_1" target=right >Standart CGI</a><br />
+	<a href="/test_2" target=right >OOP CGI</a><br />
+	<a href="/test_3" target=right >CGI file</a><br />
+	<a href="/test_4" target=right >Redirect</a><br />
+	<a href="/test_5" target=right >Enviroment</a><br />
+	<a href="/test_6" target=right >Mocking</a><br />
+	<a href="/test_7" target=right >Cookie</a><br />
+	<a href="/test_8" target=right >Bash script - test</a><br />
+	<a href="/test_9" target=right >Bash script - run</a><br />
+
+	<br /><br />CGI<br />
+
+	<a href="/CGI_pm_clickable_image.pl" target=right >clickable_image</a><br />
+	<a href="/CGI_pm_cookie.pl" target=right >cookie</a><br />
+	<a href="/CGI_pm_crash.pl" target=right >crash</a><br />
+	<a href="/CGI_pm_customize.pl" target=right >customize</a><br />
+	<a href="/CGI_pm_diff_upload.pl" target=right >diff_upload</a><br />
+	<a href="/CGI_pm_file_upload.pl" target=right >file_upload</a><br />
+	<a href="/CGI_pm_frameset.pl" target=right >frameset</a><br />
+	<a href="/CGI_pm_internal_links.pl" target=right >internal_links</a><br />
+	<a href="/CGI_pm_javascript.pl" target=right >javascript</a><br />
+	<a href="/CGI_pm_monty.pl" target=right >monty</a><br />
+	<a href="/CGI_pm_multiple_forms.pl" target=right >multiple_forms</a><br />
+	<a href="/CGI_pm_nph-clock.pl" target=right >nph-clock</a><br />
+	<a href="/CGI_pm_nph-multipart.pl" target=right >nph-multipart</a><br />
+	<a href="/CGI_pm_popup.pl" target=right >popup</a><br />
+	<a href="/CGI_pm_save_state.pl" target=right >save_state</a><br />
+	<a href="/CGI_pm_tryit.pl" target=right >tryit</a><br />
+<% END %>

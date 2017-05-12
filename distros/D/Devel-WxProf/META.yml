@@ -1,0 +1,63 @@
+---
+name: Devel-WxProf
+version: 0.0.1
+author:
+  - 'Martin Kutter <martin.kutter@fen-net.de>'
+abstract: heavy-weight subroutine profiler and graphical profile analyzer
+license: artistic
+resources:
+  license: http://opensource.org/licenses/artistic-license.php
+requires:
+  Class::Std::Fast: 0.0.5
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  Imager: 0
+  List::Util: 0
+  Time::HiRes: 0
+  Wx: 0
+  YAML: 0
+  perl: 5.8.0
+build_requires:
+  Class::Std::Fast: 0.0.5
+  File::Basename: 0
+  File::Path: 0
+  Getopt::Long: 0
+  Imager: 0
+  List::Util: 0
+  Test::More: 0
+  Time::HiRes: 0
+  Wx: 0
+  YAML: 0
+provides:
+  DB:
+    file: lib/Devel/WxProf.pm
+  Devel::WxProf:
+    file: lib/Devel/WxProf.pm
+    version: v0.0.1
+  Devel::WxProf::Data:
+    file: lib/Devel/WxProf/Data.pm
+    version: v0.0.1
+  Devel::WxProf::Grid:
+    file: lib/Devel/WxProf/Grid.pm
+    version: v0.0.1
+  Devel::WxProf::Preferences:
+    file: lib/Devel/WxProf/Preferences.pm
+    version: v0.0.1
+  Devel::WxProf::Reader::DProf:
+    file: lib/Devel/WxProf/Reader/DProf.pm
+  Devel::WxProf::Reader::WxProf:
+    file: lib/Devel/WxProf/Reader/WxProf.pm
+  Devel::WxProf::Treemap:
+    file: lib/Devel/WxProf/Treemap.pm
+    version: v0.0.1
+  Devel::WxProf::Treemap::Output::Imager:
+    file: lib/Devel/WxProf/Treemap/Output/Imager.pm
+    version: v0.0.1
+  Devel::WxProf::Treemap::Squarified:
+    file: lib/Devel/WxProf/Treemap/Squarified.pm
+    version: v0.0.1
+generated_by: Module::Build version 0.2808
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

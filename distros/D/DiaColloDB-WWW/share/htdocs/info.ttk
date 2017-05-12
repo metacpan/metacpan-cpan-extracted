@@ -1,0 +1,21 @@
+[% FILTER null %]
+[%#------------------------------------------------------------
+  # globals
+%]
+[% PROCESS "dc-common.ttk" %]
+[% PROCESS opendb ; SET dbinfo = dbcli.dbinfo; dbcli.close %]
+[% END ##--/filter null %]
+[% cdb.cgi('header','-type'=>'application/json') %]
+[% PERL %]
+  #my $dbcli = $stash->get('dbcli');
+  #my $dbinfo = $dbcli->dbinfo();
+  my $dbinfo = $stash->get('dbinfo');
+  print DiaColloDB::Utils::saveJsonString($dbinfo,pretty=>1,canonical=>1);
+[% END %]
+[%# dbcli.close %]
+[%#--
+ ;; Local Variables:
+ ;; mode: CPerl
+ ;; coding: utf-8
+ ;; End:
+%]

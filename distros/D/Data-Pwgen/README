@@ -1,0 +1,103 @@
+NAME
+    Data::Pwgen - simple password generation and assessment
+
+SYNOPSIS
+      use Data::Pwgen qw(pwgen pwstrength);
+      my $pass = pwgen(12);
+      my $str  = pwstrength($pass);
+
+DESCRIPTION
+    This is a simple module that implements generation and assesment of
+    secure passwords.
+
+FUNCTIONS
+  pwgen($length, $charclass)
+    Generate a password with the (optional) given length and (also optional)
+    given character class. The default length is 16. If specified, the
+    character class must be one of the following:
+
+    lower
+        Lower-case letters.
+
+    upper
+        Upper-case letters.
+
+    chars
+        Lower- and upper-case letters.
+
+    nums
+        The digits 0 through 9.
+
+    signs
+        The following characters: % $ _ - + * & / = ! #
+
+    alphanum
+        Lower- and upper-case letters and digits.
+
+    alphasym
+        *alphanum* plus *signs*.
+
+    If you pass anything other than one of the above, it will fall back to
+    the default, which is *alphanum*.
+
+  pwstrength
+    Returns a numeric rating of the quality of the supplied (password)
+    string.
+
+  strength
+    An alias for pwstrength(), retained for backwards compatibility. At some
+    point this alias will go away.
+
+SEE ALSO
+    The following modules provide similar capabilities: App::Genpass,
+    Crypt::GeneratePassword, String::Random, Data::Random, String::MkPasswd.
+
+    <http://neilb.org/reviews/passwords.html>: a review of CPAN modules for
+    generating passwords.
+
+REASONING
+    There are many modules for generating random strings or passwords.
+
+    This section explains my reason for writing this module and why you
+    wouldn't want to use it in some cases.
+
+  WHY USE THIS MODULE?
+    Use this module if you need code which is easy to comprehend and review.
+
+    Use this module if you do not have strict constraints on cryptographic
+    security and you don't need passwords/strings which are easy to
+    remember.
+
+    These strings are made to be used by machines, not for humans.
+
+    This module is rather fast. It doesn't use fancy tricks to cut the time,
+    but the approach used for generating the passwords is simple and thus
+    this module won't block for a long time.
+
+    The runtime complexity is about O(n*m) where n is the length of the
+    chosen character class and m is the requested length of the password.
+
+  WHY NOT USE THIS MODULE?
+    If you need either pronounceable password or have high requirements for
+    the cryptographic properties of the generated strings you should not use
+    this module. In this case please have a look at those listed above or
+    Neils' great review.
+
+  WHY WAS THIS MODULE WRITTEN?
+    When looking for suiteable modules on CPAN I found that those present
+    were either unmaintained, had a very bad worst-case runtime or were
+    completely unreadable.
+
+    Please not that this code was written some time ago for use in VBoxAdm
+    <http://www.vboxadm.net/> some time ago, but refactored and released on
+    its own just now.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

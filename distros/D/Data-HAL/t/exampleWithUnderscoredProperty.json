@@ -1,0 +1,8 @@
+{
+  "_links" : {
+    "self" : {
+      "href" : "https://example.com/api/customer/123456"
+    }
+  },
+  "_name" : "Example Resource"
+}

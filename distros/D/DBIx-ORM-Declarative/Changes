@@ -1,0 +1,106 @@
+Revision history for Perl extension DBIx::ORM::Declarative.
+
+0.01  Thu Feb  2 19:36:25 2006
+	- original version; created by h2xs 1.23 with options
+		-AOX -b 5.6.0 -n DB::Access --use-old-tests --skip-exporter
+
+0.03  Thu Mar  9 21:17:20 2006
+    - Added support for joins and sequences
+
+0.04  Sat Mar 11 18:12:47 2006
+    - Renamed to DBIx::Class::Simple
+    - Added support for using scalar refs to signify column names in
+      search() and delete() methods.
+
+0.05  Sun Mar 12 12:21:11 2006
+    - Added support for group_by and order_by clauses
+    - Added explicit aliases to generated SQL SELECT statements
+    - Added support for limits on searches.
+
+0.06  Tue Mar 14 19:23:19 2006
+    - Added size() table method.
+    - Moved to DBIx::ORM::Declarative name.  This is the final name.
+
+0.07  Mon Apr 10 18:40:01 2006
+    - Fixed a typo in __create_where so that multiple clause construction
+      actually works.
+
+0.08  Mon Apr 10 20:49:01 2006
+    - Fixed another typo.
+
+0.09  Sun Jul  2 10:06:17 2006
+    - Fixed 'Use of uninitialized value in string ne' warning message.
+    - Fixed missing name in automagic columns created from unique declarations.
+
+0.10  Thu Sep 14 18:37:06 2006
+    - Removed perl 5.6 specific code.
+    - Changed warning suppression code to use "local ($SIG{__WARN__})"
+    - Added create_only method, which creates one or more rows without
+      validating the input or returning row objects.
+    - Added WHERE clause handling to the size method.
+
+0.11  Fri Sep 15 14:26:33 2006
+    - Fixed bug in WHERE clause handing in size() method.
+
+0.12  Sun Nov  5 20:32:47 2006
+    - Fixed missed case in apply_method; now, coderefs also work as methods.
+
+0.13  Mon Nov  6 20:53:10 2006
+    - Added subselect processing for 'IN'/'NOT IN' WHERE clauses.
+
+0.14  Fri Jun  1 22:37:01 2007
+    Good grief, what *didn't* change?  There's more than 1500 new lines!
+    - Reorganized and annotated the code extensively
+    - Added the beginnings of a real test suite
+    - Added methods to handle creating lots of rows at once
+    - Added classes and methods to better deal with joins; not perfect, but
+      it's better than the earlier join objects.
+    - Added Module::Build-based Build.PL file.  The Makefile.PL file is
+      deprecated, and may be removed in the future.
+
+0.15  Tue Jul  3 20:16:29 2007
+    - Changed table/join creation to better support tables with column names
+      that match the table name.
+
+0.16  Wed Jul 25 21:29:55 2007
+    - Fixed table aliases bug introduced with 0.15; aliases now update the
+      table_methods hash
+    - Added implicit subclassing - now, when you do this:
+
+    package Foo;
+    use DBIx::ORM::Declarative
+    (
+        {
+            schema => 'fooschema',
+            # The rest of the declaration...
+        },
+    ) ;
+
+    you can just do this:
+
+    my $db = new Foo handle => $dbh;
+
+    and $db is a schema object.  Note that if you have multiple schemas,
+    Foo will be added as a subclass to all of them.
+
+0.17  Sat Aug 18 10:22:26 2007
+    - Fixed schema class magic to work better with classes that provide
+      an AUTOLOAD function
+
+0.18  Mon Aug 20 18:57:21 2007
+    - Added support for extensive joins; now you can do joins across sets of
+      tables where no single table has references to all of the others.
+
+0.19  Sat Sep  1 09:30:06 2007
+    - Added functionality to automatically connect to a database.
+
+0.20  Wed Sep  5 08:50:43 2007
+    - Expanded bulk_create to account for all of the unique keys - not just the
+      primary keys.
+
+0.21  Wed Sep  5 09:17:07 2007
+    - Fixed a couple of typos
+
+0.22  Fri Mar  7 15:05:46 2008
+    - Changed import logic to use $pkg->isa, rather than grovelling over
+      @{$pkg . '::ISA'} directly.

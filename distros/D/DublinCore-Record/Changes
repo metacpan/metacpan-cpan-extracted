@@ -1,0 +1,13 @@
+Revision history for Perl extension DublinCore::Record
+
+0.03  Mon Feb 26 2007
+    - repackaged -- no functional changes
+
+0.02  Tue Mar 08 2005
+    - pod fixes
+    - added pod_coverage test
+    - increased coverage
+
+0.01  Fri Nov 12 11:06:45 2004
+    - original version
+

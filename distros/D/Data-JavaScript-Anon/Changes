@@ -1,0 +1,55 @@
+Revision history for Perl extension Data-JavaScript-Anon
+
+1.03 Thu 20 Nov 2008
+	- Upgrading to Module::Install::DSL 0.83
+	- Upgrading Perl dependency to a cleaner 5.006
+	- Corrected minimum Perl dependency to 5.005_03
+
+1.02 Tue 14 Oct 2008
+	- Added ability to change default quote character using Class::Default
+
+1.01 Thu 17 Apr 2008
+	- Incremental release to flush out an index bug (PUDGE)
+	- Upgrading Module::Install and bundled tests
+
+1.00 Sun 17 Jun 2006
+	- Patch from ARC@cpan.org to fix a variety of small bugs including
+	  CPAN #19915
+
+0.9  Sun  3 Jun 2006
+	- Fixed #15640 (Missing param in method call)
+
+0.8  Sat 15 Apr 2006
+	- Forgot to add a dependency on Params::Util
+
+0.7  Sat 15 Apr 2006
+	- No functional changes
+	- Moved from old CVS repository to new SVN one
+	- Direct use of UNIVERSAL::isa considered bad, moved to Params::Util
+	- Upgraded extremely old Module::Install 0.34 to 0.62
+
+0.6  Tue Jul 26 2005
+	- Merged in patch from ARC@cpan.org to quote keywords.
+
+0.5  Sat Jul 23 2005
+	- Merged in patch from John Alden at the BBC to handle various escaping things
+
+0.4  Fri Mar 25 2005
+	- Escape forward slashes correctly in strings (CPAN #11882)
+	- Removed SGML comments from script_wrap (CPAN #11646)
+	- Upgrade unit tests to current style
+	- Upgrade Makefile.PL to Module::Install
+
+0.3  Wed Aug  4 2004
+	- Converted word regex to something that actually detects words
+	- Fixed some minor error string bug to use Data::JavaScript::Anon
+	  instead of Serlialize::JavaScript (the original name)
+
+0.2  Thu Nov 20 2003
+	- Added a highly robust and more accurate regex test for numbers.
+	- Added the is_a_number method.
+	- Fixed the bug from #CPAN 4056
+	- Did a clean up and shrink of the code. Possibly saved enough bytes
+	  to cover the addition of the regex code.
+
+0.1  Sun May  4 8:30:23 2003 - original version

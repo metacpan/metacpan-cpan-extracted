@@ -1,0 +1,19 @@
+Revision history for Data-Fake
+
+0.003     2016-08-20 21:25:58-04:00 America/New_York
+
+    [DOCS]
+
+    - Improved description of escaping # in fake_digits
+
+0.002     2015-02-05 18:54:46-05:00 America/New_York
+
+    [FIXES]
+
+    - Work around Time::Piece portability problems; requires
+      Time::Piece 1.27
+
+0.001     2015-01-21 16:08:10-05:00 America/New_York
+
+    - First release
+

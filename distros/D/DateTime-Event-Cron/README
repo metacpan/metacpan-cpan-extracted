@@ -1,0 +1,40 @@
+DateTime::Event::Cron
+=====================
+
+This module generates DateTime and DateTime::Set objects based
+on crontab-style entries. The crontab formats are the extended
+V7 standard as described in crontab(5) on linux systems and
+as noted in the documentation for Set::Crontab.
+
+Note that the module is still alpha status. Methods provided
+are likely to change in the future.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DateTime
+  DateTime::Duration
+  DateTime::Set
+  Set::Crontab
+
+SUPPORT
+
+Contact the author <sisk@mojotoad.com> directly, or query
+the DateTime mailing list at <datetime@perl.org>. To subscribe
+to the list, send an empty message to <datetime-subscribe@perl.org>.
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2003 Matthew P. Sisk. All rights reserved. All wrongs
+revenged. This program is free software; you can distribute it and/or
+modify it under the same terms as Perl itself.

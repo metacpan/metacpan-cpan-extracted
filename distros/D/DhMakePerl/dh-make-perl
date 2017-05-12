@@ -1,0 +1,548 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DhMakePerl;
+
+print "== dh-make-perl $DhMakePerl::VERSION ==\n";
+
+exit DhMakePerl->run;
+
+__END__
+
+=head1 NAME
+
+dh-make-perl - Create debian source packages from Perl modules
+
+=head1 SYNOPSIS
+
+=over
+
+=item dh-make-perl [make] {I<SOURCE_DIR> | --cpan I<MODULE>|I<DIST>} I<options...>
+
+=item dh-make-perl refresh {I<--only ...>} [directory]
+
+=item dh-make-perl locate Foo::Bar ...
+
+=item dh-make-perl refresh-cache
+
+=item dh-make-perl dump-config
+
+=item dh-make-perl help
+
+=item cpan2deb I<MODULE>|I<DIST> I<options...>
+
+=item cpan2dsc I<MODULE>|I<DIST> I<options...>
+
+=back
+
+=head1 DESCRIPTION
+
+B<dh-make-perl> will create the files required to build
+a debian source package out of a Perl module or CPAN distribution.
+This works for most simple packages and is also useful
+for getting started with packaging Perl modules.
+
+You can specify a module or distribution name with the L<--cpan>
+switch and B<dh-make-perl> will download it for you from a CPAN mirror, or you
+can specify the directory with the already unpacked sources. If neither
+L<--cpan> nor a directory is given as argument, B<dh-make-perl>
+tries to create a Perl package from the data in the current directory.
+
+You can build and install the debian binary package using the
+L</--build> and L</--install> command line switches.
+
+If B<dh-make-perl> is called as
+
+    cpan2deb <options...> Foo::Bar
+
+it behaves like
+
+    dh-make-perl make <options...> --build --cpan Foo::Bar
+
+If B<dh-make-perl> is called as
+
+    cpan2dsc <options...> Foo::Bar
+
+it behaves like
+
+    dh-make-perl make <options...> --build-source --cpan Foo::Bar
+
+Using this program is no excuse for not reading the
+debian developer documentation, including the Debian policy,
+the Debian Perl policy, the packaging manual and so on.
+
+=head2 COMMANDS
+
+=over
+
+=item make
+
+Default command if no command is given. Creates debianisation from scratch.
+Fails with an error if F<debian/> directory already exists.
+
+=item refresh [directory]
+
+For refreshing a package. C<directory> defaults to the current working
+directory. Rebuilds F<debian/copyright>, F<debian/rules>, F<debian/compat>
+using the current templates. Before any changes are made to these files, a
+backup copy is created with a .bak suffix.
+
+This is useful when F<debian/rules> was created using older templates and
+doesn't contain much customisations. As always, you're strongly encouraged to
+verify if F<debian/rules> looks sane.
+
+C<refresh> also tries to update dependency lists in F<debian/control> from
+F<META.yml>. It hooks L<quilt(1)> into F<debian/rules> and creates
+F<debian/README.source>
+
+When updating F<debian/copyright> dh-make-perl tries to be clever about
+remembering email addresses. It gets the list of copyright holders and their
+emails for F<debian/*> from the sign off lines in F<debian/changelog>.
+However to allow for email addresses changing, it looks for change lines
+of the form
+
+      * Email change: Debbie Devlin -> devlin@debian.org
+
+So now C<Debbie Devlin E<lt>devlin@debian.orgE<gt>> will be used in the copyright
+instead of C<Debbie Devlin E<lt>debbie@devlin.orgE<gt>>.
+
+=item B<--only> | B<-o> I<control|copyright|docs|examples|rules>
+
+This option allows one to update only one or more file(s) in the debian/
+directory when B<dh-make-perl> is run in L</refresh> mode. Filenames are
+separated by a comma. The option can be given multiple times, accumulating
+arguments.
+
+=item locate I<MODULE> ...
+
+Tries to locate the package that conains the given Perl I<MODULE>s.
+
+Example:
+
+    dh-make-perl locate IPC::Run3 XML::Tidy
+
+=item refresh-cache
+
+B<dh-make-perl> parses the Contents files, fetched by L<apt-file(1)> and stores
+the result in a cache. The cache is refreshed automatically if it is older than
+any Contents file. However, if you run L<apt-file(1)> in your nightly cron job,
+the first time you run B<dh-make-perl> during the day, you shall wait for the
+cache to be reconstructed. With this option, you can move the cache re-creation
+to the cron job, right after C<apt-file update>.
+
+Does nothing if the cache is newer that the Contents files.
+
+=item dump-config
+
+Causes the current config, including any default settings to be printed to the
+standard output.
+
+Useful for populating L<dh-make-perl.conf> file.
+
+=item help
+
+Displays short usage information.
+
+=back
+
+=head2 OPTIONS
+
+=over
+
+=item B<--apt-contents-dir> I<dir>
+
+Location of L<apt-file> Contents directory. Default is
+F</var/cache/apt/apt-file>
+
+=item B<--arch> I<any> | I<all>
+
+This switches between arch-dependent and arch-independet packages. If B<--arch>
+isn't used, B<dh-make-perl> uses a relatively good-working algorithms to
+decide this alone.
+
+=item B<--backups> | B<--no-backups>
+
+In L</refresh> mode, create backups of F<debian/copyright> and
+F<debian/rules> before overwritting them. On by default.
+
+=item B<--basepkgs>
+
+Explicitly gives a comma-separated list of packages to consider "base"
+packages (i.e. packages that should always be available in Debian
+systems). This option defaults to C<perl,perl-base> - it
+is used to check for module dependencies. If a needed module is in the
+C<basepkgs>, it won't be mentioned in the C<depends:> field of
+C<debian/control>.
+
+If this option is specified, the above mentioned default packages will
+not be included (but will be mentioned as explicit dependencies in the
+resulting package). You can, of course, mention your own modules
+and explicitly specify the default values.
+
+Note that this option should be used sparsingly and with care, as it
+might lead to packages not being rebuildable because of unfulfilled
+dependencies.
+
+=item B<--bdepends> I<BUILD-DEPENDS>
+
+Manually specify the string to be used for the module's build-dependencies
+(that is, the packages and their versions that have to be installed in order to
+successfully build the package). Keep in mind that packages generated by
+B<dh-make-perl> require debhelper to be specified as a build dependency. Same note
+as for --depends applies here - use only when needed.
+
+=item B<--bdependsi> I<BUILD-DEPENDS-INDEP>
+
+Manually specify the string to be used for the module's build-dependencies
+for architecture-independent builds. Same notes as those for the --depends
+and --bdepends options apply here.
+
+Note that for --depends, --bdepends and --bdependsi you can also specify that
+the field should not appear in debian/rules (if you really mean it, of course
+;-) ) by giving it an empty string as an argument.
+
+=item B<--build>
+
+Builds the binary package (i.e. the .deb file) after setting the
+package directory up.
+
+NB: This builds only a binary package (by calling "fakeroot debian/rules
+binary") and does not sign the package. It is meant for a quick local
+install of a package, not for creating a package ready for submission to the
+Debian archive.
+
+=item B<--build-source>
+
+Builds the source package (i.e. the .dsc and .debian.tar.gz files)
+after setting the package directory up.
+
+NB: This builds only a source package (by calling "dpkg-source -b")
+and does not sign the package. It is meant for a quick local install
+of a source package to be thrown into e.g. a pbuilder, not for
+creating a source package ready for submission to the Debian archive.
+
+=item B<--closes> I<ITPBUG>
+
+Manually specify the ITP bug number that this package closes. If not
+given, B<dh-make-perl> will try to connect to bugs.debian.org to fetch the
+appropriate bug number, using WWW::Mechanize.
+
+=item B<--core-ok>
+
+Allows building core Perl modules. By default, B<dh-make-perl> will not allow
+building a module that is shipped as part of the standard Perl library; by
+specifying this option, B<dh-make-perl> will build them anyway.
+
+Note that, although it is not probable, this might break unrelated items in
+your system - if a newer version of a core module breaks the API, all kinds
+of daemons might get upset ;-)
+
+=item B<--cpan> I<MODULE>|I<DIST>
+
+Instructs B<dh-make-perl> to fetch and extract the given CPAN module or
+distribution. Works both with C<Foo::Bar> and C<Foo-Bar>.
+
+=item B<--cpan-mirror> I<MIRROR>
+
+Specifies a CPAN site to use as mirror.
+
+=item B<--data-dir> I<DIRECTORY>
+
+Use another data directory, instead of the default, C</usr/share/dh-make-perl>
+
+Data directory is were B<dh-make-perl> looks for its default rules.* templates.
+It is similar to B<--home-dir>, but does not change the location of the APT
+Contents cache file. If both are given, B<--home-dir> takes precedence.
+
+=item B<--depends> I<DEPENDS>
+
+Manually specify the string to be used for the module's dependencies. This
+should be used when building modules where B<dh-make-perl> cannot guess the Perl
+dependencies (such as modules built using L<Module::Install>), or when the
+Perl code depends on non-Perl binaries or libraries. Usually, B<dh-make-perl>
+will figure out the dependencies by itself. If you need to pass B<dh-make-perl>
+dependency information, you must do it using the debian package format. i.e.
+
+    dh-make-perl --depends libtest-more-perl
+
+=item B<--desc> I<SHORT DESCRIPTION>
+
+Uses the argument to --desc as short description for the package.
+
+=item B<--dh> I<VERSION>
+
+Set desired debhelper compatibility level. The default is 8 for
+architecture-independent packages, and 9 for architecture-dependent packages
+(XS).
+
+Since version 0.77, B<dh-make-perl> only supports debhelper compatibility
+levels B<< >=8 >>.
+
+See L<debhelper(1)>.
+
+=item B<--dist> I<DISTRIBUTION>
+
+Limit the distributions whose C<Contents> files are parsed. The argument is a distribution name.
+
+Default: empty, meaning no filtering.
+
+Example:
+    dh-make-perl --dist etch
+
+=item B<--email> | B<-e> I<EMAIL>
+
+Manually specify the Maintainer email address to use in debian/control and
+in debian/changelog.
+
+=item B<--exclude> | B<-i> [I<REGEX>]
+
+This allows you to specify a PCRE to exclude some files from the search for
+docs and stuff like that. If no argument is given (but the switch is specified
+- not specifying the switch will include everything), it defaults to
+dpkg-source's default values.
+
+=item B<--install>
+
+Installs the freshly built package. Specifying --install implies --build - The
+package will not be installed unless it was built (obviously ;-) )
+
+=item B<--intrusive>
+
+When determining module dependencies, if L<Module::Depends> fails, tries again
+with L<Module::Depends::Intrusive>. M:D:I loads all .pm files, intercepting
+loading of other modules, effectively running untrusted code on your behalf.
+Use with caution.
+
+=item B<--network>
+
+Enables querying of Debian WNPP lists for ITP and similar bugs. Enabled by
+default, use C<--no-network> to disable.
+
+=item B<--notest>
+
+This option for not running the automatic testing of the module as part of
+the build script has been removed in 0.54. Please put nocheck in the
+DEB_BUILD_OPTIONS environment variable if you want to skip the tests when
+building a package.
+
+=item B<--home-dir> I<DIRECTORY>
+
+Where APT Contents and other caches are stored.
+
+Default: ~/.dh-make-perl
+
+=item B<--packagename> | B<-p> I<PACKAGENAME>
+
+Manually specify the Package Name, useful when the module has dashes in its
+name.
+
+=item B<--pkg-perl>
+
+Useful when preparing a package for the Debian Perl Group
+L<http://pkg-perl.alioth.debian.org>.
+
+Sets C<Maintainer>, C<Uploaders>, C<Vcs-Git> and C<Vcs-Browser> fields in
+F<debian/control> accordingly. Also, when C<--vcs git> is used (the default),
+sets up a Git remote pointing to the right place on I<git.debian.org>.
+
+=item B<--recursive>
+
+Valid only in L</make> mode with L</--cpan> or I<directory> arguments. Causes
+dh-make-perl to try to create packaging (and possibly build and install the
+packages if L</--build> and L</--install> options are also given) for any
+dependencies which are missing packages.
+
+This works like this: when the 'main' package is constructed, any missing
+packages are put in a list, and then the debianisaion procedure is run in turn
+on each of them, recursively.
+
+=item B<--requiredeps>
+
+Fail if a dependency Perl package was not found (dependency tracking
+requires the apt-file package installed and updated)
+
+=item B<--source-format> I<format>
+
+When creating or refreshing packaging, use the specified source format.
+Defaults to C<3.0 (quilt)>.
+
+=item B<--sources-list> I<FILE>
+
+Instruct the C<Contents> file parser to use this B<file> when determining if a
+given file should be parsed or not. Contents files not matching any line in
+B<sources.list> are not parsed in order to save you time parsing old files from
+mirrors you no longer use.
+
+Default: apt's default.
+
+=item B<--vcs> I<VCS>
+
+In B<--pkg-perl> mode, use the specified version control system in the
+generated I<Vcs-*> fields. The default is C<git>.
+
+If I<VCS> is C<git>, C<dh-make-perl> will setup a Git repository with three
+branches:
+
+=over
+
+=item upstream
+
+The initial branch containing upstream sources
+
+=item master
+
+The branch where packaging is done, forked off C<upstream> and with the
+contents of the C<debian/> directory added.
+
+=item pristine-tar
+
+A branch to keep L<pristine-tar(1)> data.
+
+=back
+
+If B<--pkg-perl> is also given, an C<origin> remote is added pointing to the
+repository on I<git.debian.org>.
+
+=item B<--verbose> | B<--no-verbose>
+
+Print additional information while processing.
+
+--verbose is on by default in L</make> mode, off otherwise.
+
+=item B<--version> I<VERSION>
+
+Specifies the version of the resulting package.
+
+=back
+
+=head1 FILES
+
+The following directories will be searched to find additional files
+required by B<dh-make-perl>:
+
+	/usr/share/dh-make-perl/
+	$HOME/.dh-make-perl/
+
+=over 4
+
+=item * dh-make-perl.conf
+
+User configuration. The file is in YAML format. The keys are option names,
+as documented in L</OPTIONS> (without leading I<-->).
+
+See the output of C<dh-make-perl --dump-config>, which can also be used for
+population of F<dh-make-perl.conf>.
+
+=back
+
+=head1 ENVIRONMENT
+
+HOME - get user's home directory
+
+DEBFULLNAME - get the real name of the maintainer
+
+LOGNAME or USER - get the username
+
+DEBEMAIL or EMAIL - get the email address of the user
+
+=head1 BUGS
+
+Several, let me know when you find them.
+
+=head1 AUTHOR
+
+Paolo Molaro E<lt>lupus@debian.orgE<gt> (MIA)
+
+Maintained for a time by Ivan Kohler E<lt>ivan-debian@420.amE<gt>.
+
+Maintained for a time by Marc Brockschmdit E<lt>marc@dch-faq.deE<gt>.
+
+Maintained for a time by Gunnar Wolf E<lt>gwolf@gwolf.orgE<gt>.
+
+Now team-maintained by the Debian Perl Group, http://alioth.debian.org/projects/pkg-perl.
+
+Patches from:
+
+=over
+
+=item Adam Sjoegren E<lt>asjo@koldfront.dkE<gt>
+
+=item Adrian Phillips E<lt>adrianp@powertech.noE<gt>
+
+=item Amos Shapira E<lt>amos.shapira@gmail.comE<gt>
+
+=item Ansgar Burchardt E<lt>ansgar@debian.orgE<gt>
+
+=item Axel Beckert E<lt>abe@debian.orgE<gt>
+
+=item Christian Kurz E<lt>shorty@debian.orgE<gt>
+
+=item Damyan Ivanov E<lt>divanov@creditreform.bgE<gt>
+
+=item David Paleino E<lt>d.paleino@gmail.comE<gt>
+
+=item David Pashley E<lt>david@davidpashley.comE<gt>
+
+=item Dima Kogan E<lt>dima@secretsauce.netE<gt>
+
+=item Edward Betts E<lt>edward@debian.orgE<gt>
+
+=item Fermin Galan E<lt>galan@dit.upm.esE<gt>
+
+=item Geoff Richards E<lt>qef@ungwe.orgE<gt>
+
+=item Gergely Nagy E<lt>algernon@bonehunter.rulez.orgE<gt>
+
+=item gregor herrmann E<lt>gregoa@debian.orgE<gt>
+
+=item Hilko Bengen E<lt>bengen@debian.orgE<gt>
+
+=item Kees Cook E<lt>keex@outflux.netE<gt>
+
+=item Jesper Krogh E<lt>jesper@krogh.ccE<gt>
+
+=item Johnny Morano E<lt>jmorano@moretrix.comE<gt>
+
+=item Juerd E<lt>juerd@ouranos.juerd.netE<gt>
+
+=item Marc Chantreux (mail withheld)
+
+=item Matt Hope E<lt>dopey@debian.orgE<gt>
+
+=item Matthew Gabeler-Lee E<lt>cheetah@fastcat.orgE<gt>
+
+=item Maximilian Gass E<lt>mxey@cloudconnected.orgE<gt>
+
+=item Noel Maddy E<lt>noel@zhtwn.comE<gt>
+
+=item Oleg Gashev E<lt>oleg@gashev.netE<gt>
+
+=item Oliver Gorwits E<lt>oliver.gorwits@oucs.ox.ac.ukE<gt>
+
+=item Paul Fenwick E<lt>pjf@perltraining.com.auE<gt>
+
+=item Peter Flanigan E<lt>Support@RoxSoft.co.ukE<gt>
+
+=item Peter Moerch E<lt>mn3k66i02@sneakemail.comE<gt>
+
+=item Peter Pentchev E<lt>roam@ringlet.netE<gt>
+
+=item Ryan Niebur E<lt>ryanryan52@gmail.comE<gt>
+
+=item Salvatore Bonaccorso E<lt>carnil@debian.orgE<gt>
+
+=item Stephen Oberholtzer E<lt>oliverklozoff@gmail.comE<gt>
+
+=item Tim Retout E<lt>diocles@debian.orgE<gt>
+
+=item Ton Nijkes E<lt>tonn@wau.mis.ah.nlE<gt>
+
+=back
+
+... And others who, sadly, we have forgot to add :-/
+
+=cut
+
+# vim: set ts=8 sw=4 et ft=perl :

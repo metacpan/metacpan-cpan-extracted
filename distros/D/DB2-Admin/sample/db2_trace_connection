@@ -1,0 +1,423 @@
+#!/usr/bin/perl
+#
+# db2_trace_connection - Trace activity for a DB2/Linux connection
+#
+# $Id: db2_trace_connection,v 145.1 2007/08/06 16:55:00 biersma Exp $
+#
+
+#
+# Make this work even if a client has already been loaded
+#
+BEGIN {
+    foreach my $var (qw(DB2INSTANCE)) {
+	delete $ENV{$var};
+    }
+}
+
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+use Socket;
+use DB2::Admin;
+use Text::FormatTable;
+
+#
+# Command line parameters:
+#
+# Parameters:
+# -dbname (required)
+# -user (optional)
+# -agent (optional)
+# -time (optional)
+#
+our %args = ('time' => '5');
+GetOptions(\%args,
+           qw(dbname=s user=s agent=i time=i repeat)) ||
+  pod2usage();
+pod2usage() if (@ARGV);         # Unprocessed arguments
+foreach my $req (qw(dbname time)) {
+    next if (defined $args{$req});
+    pod2usage(-message => "Required argument '-$req' missing");
+}
+
+#
+# If agent not specified, query and display all applications
+# (optionally filter on user)
+#
+unless (defined $args{agent}) {
+    display_connections();
+} else {
+    trace_connection();
+}
+exit(0);
+
+# ------------------------------------------------------------------------
+
+#
+# Display connections.  Optionally filter on user.
+#
+sub display_connections {
+    DB2::Admin::->SetOptions('RaiseError' => 1);
+    DB2::Admin::->Attach();
+
+    #
+    # Set minimal monitoring options for the application snapshot
+    #
+    DB2::Admin::->
+	SetMonitorSwitches('Switches' => { 'BufferPool' => 0,
+					   'Lock'       => 0,
+					   'Sort'       => 0,
+					   'Statement'  => 0,
+					   'Table'      => 0,
+					   'UnitOfWork' => 0,
+					   'Timestamp'  => 1,
+					 },
+			  );
+    my $snap = DB2::Admin::->
+      GetSnapshot('Subject' => { 'Type'   => 'SQLMA_DBASE_APPLS',
+				 'Object' => $args{dbname},
+			       },
+		  'Node'    => 'SQLM_ALL_NODES',
+		 );
+    DB2::Admin::->Detach();
+
+    my @appl_info;		# APPL_INFO nodes for matching apps
+    my %users;
+    foreach my $node ($snap->findNodes('APPL')) {
+	my $values = $node->findNode('APPL_INFO')->getValues();
+
+	#
+	# Match on userid
+	#
+	$values->{'PRIMARY_AUTH_ID'} =~ s/\s+$//;
+	$values->{'EXECUTION_ID'} =~ s/\s+$//;
+	if (defined $args{user}) {
+	    next if (lc $values->{'PRIMARY_AUTH_ID'} ne lc $args{user} &&
+		     lc $values->{'EXECUTION_ID'} ne lc $args{user});
+	}
+
+	#
+	# Calculate CPU time used while we have the snapshot node
+	# (it's not in the APPL_INFO block)
+	#
+	my $cpu = 0;
+	foreach my $key (qw(AGENT_USR_CPU_TIME AGENT_SYS_CPU_TIME)) {
+	    $cpu += $node->findValue("$key/SECONDS") +
+	      ($node->findValue("$key/MICROSEC") / 1_000_000);
+	}
+	$values->{CPU} = sprintf "%.2f", $cpu;
+
+	push @appl_info, $values;
+	$users{ lc $values->{'PRIMARY_AUTH_ID'} } += 1;
+    }
+
+    #
+    # If we have more than 20 connections and the user argument wasn't
+    # specified, construct a view by user.
+    #
+    if (! defined $args{user} && keys %users > 1 && @appl_info > 20) {
+	print "More than 20 connections exist - displaying connections per user\n";
+	my $table = Text::FormatTable::->new('| l | r |');
+	$table->head('AuthId', '# connections');
+	$table->rule('=');
+	foreach my $userid (sort { $users{$b} <=> $users{$a} ||
+				   $a cmp $b
+                                 } keys %users) {
+	    $table->row($userid, $users{$userid});
+	}
+	print $table->render();
+	print "\n", "Re-run this command with the relevant -user parameter\n";
+	return;
+    }
+
+    #
+    # Display applications of interest - either less than 20 in total,
+    # or for one user.
+    #
+    my $table = Text::FormatTable::->new('| r | l | l | l | r |');
+    $table->head('Agent', 'AuthId', 'Host', 'Program', 'CPU time');
+    $table->rule('=');
+    foreach my $values (sort { $a->{AGENT_ID} <=> $b->{AGENT_ID}
+			     } @appl_info) {
+	my $hostname = $values->{'CLIENT_NNAME'};
+	unless (defined $hostname && $hostname =~ /\S/) {
+	    # FIXME: fix this for IPv6 in V9.1;
+	    # should be method in data-element.
+	    my $hostname = '';
+	    my ($ip_addr) = ($values->{'APPL_ID'} =~ /^(\S+) port/);
+	    if (defined $ip_addr) {
+		my $host = gethostbyaddr(inet_aton($ip_addr), AF_INET);
+		$host = undef if ($host =~ /^dynamic-(?:\d[\d\-]+)$/);
+		$hostname = $host || $ip_addr;
+	    }
+	}
+	$table->row($values->{AGENT_ID},
+		    lc $values->{PRIMARY_AUTH_ID},
+		    $hostname,
+		    $values->{APPL_NAME},
+		    $values->{CPU},
+		   );
+    }
+    print $table->render();
+    print "\n", "Re-run this command with the relevant -agent parameter\n";
+}
+
+
+#
+# Trace a specific connection
+#
+sub trace_connection {
+    DB2::Admin::->SetOptions('RaiseError' => 1);
+    DB2::Admin::->Attach();
+
+    #
+    # Set monitoring options for the detailed application snapshot for
+    # just the one agent
+    #
+    DB2::Admin::->
+	SetMonitorSwitches('Switches' => { 'BufferPool' => 0,
+					   'Lock'       => 1,
+					   'Sort'       => 0,
+					   'Statement'  => 1,
+					   'Table'      => 0,
+					   'UnitOfWork' => 1,
+					   'Timestamp'  => 1,
+					 },
+			  );
+
+    print "Getting first snapshot\n";
+    my $snap1 = DB2::Admin::->
+      GetSnapshot('Subject' => { 'Type'    => 'SQLMA_AGENT_ID',
+				 'AgentId' => $args{agent},
+			       },
+		  'Node'    => 'SQLM_ALL_NODES',
+		 );
+
+    unless (defined $snap1) {
+	print "Application with agent id '$args{agent}' not found\n";
+	return;
+    }
+    my $app_node1 = $snap1->findNode('APPL');
+    my $info_node1 = $app_node1->findNode('APPL_INFO');
+    my $vals1 = { %{ $app_node1->getValues() }, %{ $info_node1->getValues() } };
+    my $stmt1 = $app_node1->findNode('STMT')->getValues();
+
+    #
+    # Anything running at snapshot 1?
+    #
+    my $uow_start1 = $app_node1->findValue('UOW_START_TIME/SECONDS');
+    my $uow_stop1 = $app_node1->findValue('UOW_STOP_TIME/SECONDS');
+    if ($uow_start1 && !$uow_stop1) {
+	print "Current unit of work started executing at ",
+	  scalar(localtime $uow_start1), "\n";
+	print "Current statement type: $stmt1->{STMT_TYPE}; operation: $stmt1->{STMT_OPERATION}\n";
+	if ($stmt1->{STMT_TEXT}) {
+	    print "Statement: $stmt1->{STMT_TEXT}\n";
+	}
+    } elsif ($uow_start1) {
+	print "Application has been idle since ",
+	  scalar(localtime $uow_stop1), "\n";
+    } else {			# uow_start1 is zero
+	print "No application activity since connection started\n";
+    }
+
+    my $repeats = 1;
+    while (1) {			# See last at bottom
+	print "Waiting $args{time} seconds\n";
+	sleep($args{time});
+
+	print "Getting next snapshot\n";
+	my $snap2 = DB2::Admin::->
+	  GetSnapshot('Subject' => { 'Type'    => 'SQLMA_AGENT_ID',
+				     'AgentId' => $args{agent},
+				   },
+		      'Node'    => 'SQLM_ALL_NODES',
+		     );
+	
+	unless (defined $snap2) {
+	    print "Application with agent id '$args{agent}' not found in latest snapshot\n";
+	    return;
+	}
+	my $app_node2 = $snap2->findNode('APPL');
+	my $info_node2 = $app_node2->findNode('APPL_INFO');
+	my $vals2 = { %{ $app_node2->getValues() }, %{ $info_node2->getValues() } };
+	my $stmt2 = $app_node2->findNode('STMT')->getValues();
+
+	#
+	# Anything running at snapshot 2?
+	#
+	my $uow_start2 = $app_node2->findValue('UOW_START_TIME/SECONDS');
+	my $uow_stop2 = $app_node2->findValue('UOW_STOP_TIME/SECONDS');
+	if ($uow_start2 && !$uow_stop2) {
+	    if ($uow_start1 != $uow_start2) {
+		print "New unit of work started executing at ",
+		  scalar(localtime $uow_start2), "\n";
+	    } else {
+		print "Unit of work still executing\n";
+	    }
+	    print "Current statement type: $stmt2->{STMT_TYPE}; operation: $stmt2->{STMT_OPERATION}\n";
+	    if ($stmt2->{STMT_TEXT}) {
+		if ($stmt1->{STMT_TEXT} ne $stmt2->{STMT_TEXT}) {
+		    print "Executing the same SQL statement\n";
+		} else {
+		    print "Statement: $stmt2->{STMT_TEXT}\n";
+		}
+	    }
+	} else {
+	    if ($uow_start2) {
+		print "Application has been idle since ",
+		  scalar(localtime $uow_stop2), "\n";
+	    } else {
+		print "No application activity since connection started\n";
+	    }
+	    if ($uow_start1 == $uow_start2) {
+		if ($args{repeat}) {
+		    goto NEXT_ROUND;
+		} else {
+		    last;
+		}
+	    }
+	}
+
+	#
+	# Compute CPU time and add it to the values hashes
+	#
+	foreach my $pair ( [ $app_node1, $vals1 ], [ $app_node2, $vals2 ]) {
+	    my ($node, $vals) = @$pair;
+	    my $cpu = 0;
+	    #print $node->Format(); exit(1);
+	    foreach my $key (qw(AGENT_USR_CPU_TIME AGENT_SYS_CPU_TIME)) {
+		$cpu += $node->findValue("$key/SECONDS") +
+		  ($node->findValue("$key/MICROSEC") / 1_000_000);
+	    }
+	    $vals->{CPU_TIME} = $cpu;
+	}
+
+	#
+	# Output all relevant info in tabular format
+	#
+	my $table = Text::FormatTable::->new('| l | r | r | r |');
+	my $user = lc $vals1->{PRIMARY_AUTH_ID};
+	$table->head("$user - $args{agent}", 'Previous', 'Current', 'Difference');
+	$table->rule('=');
+	foreach my $fld (qw(CPU_TIME ROWS_READ ROWS_WRITTEN
+			    DYNAMIC_SQL_STMTS STATIC_SQL_STMTS
+			    SELECT_SQL_STMTS UID_SQL_STMTS
+			    COMMIT_SQL_STMTS ROLLBACK_SQL_STMTS
+			    ROWS_SELECTED ROWS_INSERTED ROWS_UPDATED ROWS_DELETED
+			    TOTAL_SORTS TOTAL_SORT_TIME SORT_OVERFLOWS
+			    UOW_LOG_SPACE_USED
+			    LOCKS_HELD DEADLOCKS LOCKS_WAITING)) {
+	    my $label = ucfirst lc $fld;
+	    $label =~ s/_/ /g;
+	    $label =~ s/\b(cpu|sql|uid|uow)\b/\U$1/gi;
+	    my $diff = $vals2->{$fld} - $vals1->{$fld};
+	    if ($diff ne int($diff)) {
+		$diff = sprintf "%.2f", $diff;
+	    }
+	    $table->row($label, $vals1->{$fld}, $vals2->{$fld}, $diff);
+	}
+	print $table->render();
+
+	last unless ($args{repeat});
+
+      NEXT_ROUND:
+	#
+	# Use most recent snapshot as first one
+	#
+	$snap1 = $snap2;
+	$app_node1 = $app_node2;
+	$info_node1 = $info_node2;
+	$vals1 = $vals2;
+	$stmt1 = $stmt2;
+
+	#
+	# Safeguard against a user running this forever - end after
+	# 100 repeats (close to 10 minutes).
+	#
+	if (++$repeats > 100) {
+	    warn "Existing after 100 repeats\n";
+	    last;
+	}
+    }				# End: while(1)
+}
+
+__END__
+
+=head1 NAME
+
+db2_trace_connection - Trace a DB2 connection
+
+=head1 SYNOPSIS
+
+  db2_trace_connection -dbname <database>
+                     [ -user <userid> ]
+                     [ -agent <agent id> ]
+                     [ -time <wait time> ]
+                     [ -repeat ]
+
+=head1 EXAMPLE
+
+  db2_trace_connection -dbname FOOBAR
+  db2_trace_connection -dbname FOOBAR -user myuserid
+  db2_trace_connection -dbname FOOBAR -agent 789
+
+=head1 DESCRIPTION
+
+The C<db2_trace_connection> script is used to trace a DB2 connection.
+It runs two application snapshots in close succession, then shows
+application activity in between the snapshots.
+
+When invoked with only a C<-dbname> parameter, it displays a list of
+users connected to the database.  When the C<-user> parameter is
+added, it displays a list of database connections for that userid.
+The application snapshot is only collected when the C<-agent>
+parameter is specified.
+
+=head1 OPTIONS
+
+=head2 -dbname <database>
+
+This mandatory option specifies the database name.  This must be a
+database name or alias defined in the local database directory.
+
+If no other options are specified, the script will display a list of
+connected users.
+
+=head2 -user <userid>
+
+This option specifies a userid for which connections should be listed.
+It is ignored in the presence of the C<-agent option>.  When C<-user>
+is specified, the script will display a list of active connections for
+the application.
+
+=head2 -agent <agent id>
+
+This option specifies the agent id to be traced.
+
+=head2 -time <delay>
+
+This option specifies the delay between snapshots in seconds.  The
+default is 5 seconds.
+
+=head2 -repeat
+
+This option causes C<db2_trace_connection> to keep getting snapshots
+every few seconds and to display the incremental changes.
+
+=head1 BUGS
+
+As it stands, this script only runs locally, i.e. on the database
+server.  If you have SYSMON privilege and can map from database alias
+to instance name (based on the node directory), you can make it work
+remotely as well.
+
+=head1 AUTHOR
+
+  Hildo Biersma
+
+=head1 SEE ALSO
+
+  DB2::Admin(3)
+
+=cut

@@ -1,0 +1,45 @@
+Device-IRU_GE version 0.90
+==========================
+
+The module provides a software interface to the General Electric 
+North Finding Module (NFM) also known as Interial Reference Unit (IRU) 
+or a component of the Land Navigation System (LNS).
+
+This module implements several of the functions defined in the GE Aviation Systems document:
+
+"RS-422 Interface Protocol Specification for the Operational Vehicle Program of the Inertial Reference Unit"
+
+To obtain more information on the device contact 
+
+GE Aviation Systems LLC 
+3290 Patterson Avenue SE 
+Grand Rapids, MI 49512-1991 USA
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules
+
+Device::SerialPort
+Time::HiRes
+Math::Trig
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Steven Troxel
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+

@@ -1,0 +1,5 @@
+UV			T_UV
+
+OUTPUT
+T_UV
+	sv_setuv($arg, (UV)$var);

@@ -1,0 +1,7 @@
+[%##-*- Mode: CPerl -*-
+  ##
+  ## File: corpus.ttk
+  ## Description: example corpus.ttk for DiaColloDB::WWW distribution (Template-Toolkit format)
+  ##  + see "dc-common.ttk" and/or "dstar/common.ttk" for supported variables
+  ##
+%]

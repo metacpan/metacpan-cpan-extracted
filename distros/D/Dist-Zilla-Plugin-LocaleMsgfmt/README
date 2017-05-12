@@ -1,0 +1,36 @@
+NAME
+    Dist::Zilla::Plugin::LocaleMsgfmt - compiles .po files to .mo files with
+    Local::Msgfmt
+
+VERSION
+    version 1.203
+
+DESCRIPTION
+    Put the following in your dist.ini :
+
+        [LocaleMsgfmt]
+        locale = share/locale ; this is the default
+
+    This plugin will compile all of the .po files it finds in the locale
+    directory into .mo files, via Locale::Msgfmt.
+
+ATTRIBUTES
+  recursive
+    Whether to look up in the locale files recursively.
+
+  locale
+    Path to the directory containing the locale files.
+
+TODO
+    Remove the generated files after the build finishes, or better yet do
+    the generation inside the build dir.
+
+AUTHOR
+    Patrick Donelan <pdonelan@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Patrick Donelan.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

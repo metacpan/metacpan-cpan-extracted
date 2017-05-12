@@ -1,0 +1,56 @@
+Please see the README for instructions common to all platforms and
+descriptions of the options mentioned here.
+
+
+	Linux.
+
+Most modern Linux distributions use Linux-PAM with a password changing
+module which understands "use_authtok".  Thus, you may choose which
+module prompts for the old password, things should work either way.
+
+
+	FreeBSD 5+, DragonFly BSD 2.2+.
+
+FreeBSD 5 and newer, as well as DragonFly BSD 2.2 and newer, include
+pam_passwdqc in the base system.  You should be able to use either the
+included or the distributed separately version of pam_passwdqc with
+these systems.  There's a commented out usage example in the default
+/etc/pam.d/passwd.
+
+FreeBSD 4 and older used a cut down version of Linux-PAM (not OpenPAM)
+and didn't use PAM for password changing.
+
+
+	OpenBSD.
+
+OpenBSD does not use PAM, however it is able to use passwdqc's pwqcheck
+program.  Insert the line ":passwordcheck=/usr/bin/pwqcheck -1:\" into
+the "default" section in /etc/login.conf.
+
+
+	Solaris, HP-UX 11.
+
+On Solaris 2.6, 7, and 8 (without patch 108993-18/108994-18 or later)
+and on HP-UX 11, pam_passwdqc has to ask for the old password during
+the update phase.  Use "ask_oldauthtok=update check_oldauthtok" with
+pam_passwdqc and "use_first_pass" with pam_unix.
+
+On Solaris 8 (with patch 108993-18/108994-18 or later), 9, and 10,
+use pam_passwdqc instead of both pam_authtok_get and pam_authtok_check,
+and set "retry=1" with pam_passwdqc as the passwd command has its own
+handling for that.
+
+You will likely also need to set "max=8" in order to actually enforce
+not-so-weak passwords with the obsolete traditional DES-based hashes
+that most Solaris systems use and the flawed approach HP-UX uses to
+process characters past 8.  Of course this way you only get about one
+third of the functionality of pam_passwdqc.  As a better alternative,
+on modern Solaris systems you may edit the "CRYPT_DEFAULT=__unix__" line
+in /etc/security/policy.conf to read "CRYPT_DEFAULT=2a" to enable the
+OpenBSD-style bcrypt (Blowfish-based) password hashing.
+
+There's a wiki page with detailed instructions specific to Solaris:
+
+http://openwall.info/wiki/passwdqc/solaris
+
+$Owl: Owl/packages/passwdqc/passwdqc/PLATFORMS,v 1.15 2010/06/22 23:07:24 solar Exp $

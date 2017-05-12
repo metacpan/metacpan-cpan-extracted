@@ -1,0 +1,27 @@
+# NAME
+
+Dist::Zilla::PluginBundle::DANIELP - (you shouldn't) use Dist::Zilla like DANIELP
+
+# DESCRIPTION
+
+This is the plugin bundle that Daniel uses; it is a bit quirky and probably
+not very well suited to use by anyone else.  After all, I am a fairly new CPAN
+author, and the last thing you want to do is emulate __my__ public mistakes.
+
+This integrates with the way I use git to manage my software, and applies
+automatic tests that I consider reasonable.  For details, see the source;
+until I consider my work suitable for someone else to emulate, I don't see
+that making it easy is going to help anyone out.
+
+# AUTHORS
+
+- Daniel Pittman <daniel@rimspace.net>
+
+- Based on work by Ricardo Signes in [Dist::Zilla::PluginBundle::RJBS](http://search.cpan.org/perldoc?Dist::Zilla::PluginBundle::RJBS)
+
+# COPYRIGHT AND LICENSE
+
+Based on [Dist::Zilla::PluginBundle::RJBS](http://search.cpan.org/perldoc?Dist::Zilla::PluginBundle::RJBS), which is Copyright 2010 by
+Ricardo Signes.
+
+Copyright 2010 by Daniel Pittman.

@@ -1,0 +1,27 @@
+Build.PL
+Changes
+Makefile.PL
+lib/DateTime/Calendar/Discordian.pm
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-signature.t
+t/01-load.t
+t/cardinals.t
+t/clone.t
+t/day_name.t
+t/day_abbr.t
+t/days_till_x.t
+t/holydays.t
+t/from_object.t
+t/locale.t
+t/randexcl.t
+t/season_boundaries.t
+t/st_tibs.t
+t/strftime.t
+t/utc_rd_values.t
+t/validation.t
+META.json
+SIGNATURE    Added here by Module::Build

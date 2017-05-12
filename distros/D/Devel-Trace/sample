@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+
+print "Statement 1 at line 4\n";
+print "Statement 2 at line 5\n";
+print "Call to sub x returns ", &x(), " at line 6.\n";
+
+exit 0;
+
+
+sub x {
+  print "In sub x at line 12.\n";
+  return 13;
+}

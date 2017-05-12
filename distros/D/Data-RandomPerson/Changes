@@ -1,0 +1,32 @@
+Revision history for perl module Data::RandomPerson
+
+0.60 2016-06-30
+ - Depend on Data::Random 0.12 so we no longer need Date::Calc
+ - Add available_types() call to request available name backends
+ - Add lists of Dutch names
+ - Add scripts/randompersonlist.pl to quickly generate lists of
+   names.
+
+0.51 2014-12-24
+ - Changed __DATA__ sections to File::ShareDir because of problems
+   with preloading and DuckDuckGo!
+   See https://github.com/duckduckgo/zeroclickinfo-goodies/issues/857
+
+0.50 2014-12-17
+ - Changed name lists to __DATA__ sections for smaller module size.
+ - Moved dist to Dist::Zilla & git.
+ - Moved dependency on Date::Calc to Data::Random for Date of Birth
+   generation.
+
+0.4  2005-09-13
+ - Added loads of tests
+
+0.3  2005-05-22  
+ - Added loads of new name data from Chris Pound's language machines
+   page at http://www.ruf.rice.edu/~pound/#scripts 
+
+0.2  2005-05-20
+ - Fixed spelling errors in POD.
+
+0.1  2005-05-19
+ - First release to CPAN.

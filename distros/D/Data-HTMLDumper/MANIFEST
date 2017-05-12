@@ -1,0 +1,19 @@
+Changes
+HTMLDumper.pm
+HTMLDumper/Output.pm
+Makefile.PL
+MANIFEST
+README
+t/01_simple.t
+t/02_funky_chars.t
+t/03_objects.t
+t/04_quotes.t
+t/05_undef.t
+t/06_empty_structs.t
+t/07_multiarg.t
+t/08_specialvars.t
+t/09_oo_calls.t
+t/10_inside_out_obj.t
+examples/code
+examples/code.html
+META.yml                                 Module meta-data (added by MakeMaker)

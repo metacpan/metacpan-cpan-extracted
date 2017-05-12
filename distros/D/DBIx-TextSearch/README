@@ -1,0 +1,33 @@
+NAME
+    DBIx::TextSearch
+
+SYNOPSIS
+    Database independent modules to index and search text/HTML files.
+    Supports indexing local files and fetching files by HTTP and FTP.
+
+     use DBIx::TextSearch;
+     use DBIx::TextSearch::Pg; # to use postgresql
+
+     $dbh = DBI->connect(...); # see the DBD documentation
+
+     $index = DBIx::TextSearch->new($dbh,
+                                   'index_name');
+
+     $index = DBIx::TextSearch->open($dbh,
+                                     ' index_name');
+
+     # uri is file:// ftp:// or http://
+     $index->index_document(-uri => $location);
+
+     # $results is a ref to an array of hashrefs
+     $results = $index->find_document('foo and not bar');
+
+     $index->FlushIndex(); # clear the index
+
+DESCRIPTION
+    DBIx::TextSearch consists of an abstraction layer (TextSearch.pm)
+    providing a set of standard routines to index text and HTML files. These
+    routines interface to a set of database specific routines (not
+    separately documented) in much the same way as the perl DBI and DBD::foo
+    modules do.
+

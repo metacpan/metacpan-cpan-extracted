@@ -1,0 +1,39 @@
+---
+abstract: 'Template::Flute wrapper for Dancer2'
+author:
+  - 'Stefan Hornburg (Racke) <racke@linuxia.de>'
+build_requires:
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  Plack: '1.0029'
+  Test::Deep: '0'
+  Test::More: '0.94'
+  XML::Twig: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-TemplateFlute
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Dancer2: '0.200000'
+  Dancer2::Core::Types: '0'
+  Module::Runtime: '0'
+  Moo: '2.000000'
+  Scalar::Util: '0'
+  Template::Flute: '0.014'
+  Try::Tiny: '0'
+  namespace::clean: '0'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  repository: https://github.com/interchange/Dancer2-Template-TemplateFlute.git
+version: '0.203'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

@@ -1,0 +1,52 @@
+div.comment {
+  border-top: 1px solid blue;
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 0.8em;
+}
+
+span.comment_user_name, span.comment_realm_name {
+  color: blue;
+  font-weight: bold;
+}
+
+time.comment_time {
+  float: right;
+  border-bottom: 1px solid blue;
+  font-variant: small-caps;
+  margin-top: 2px;
+}
+
+div.comment_msg {
+  margin-top: 8px;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+div.new_comment_box_wrapper {
+  width: 95%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+div.new_comment_box {
+  display: none;
+  position: absolute;
+  background-color: white;
+  border: 1px solid blue;
+  padding: 4px;
+}
+
+div.new_comment_box table {
+  margin: 0;
+}
+
+div.new_comment_box textarea {
+  border: 1px solid blue;
+}
+
+div.new_comment_box input[type="button"] {
+  width: 75px;
+  border: 0;
+}

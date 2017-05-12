@@ -1,0 +1,9 @@
+lib/Bundle/DBD/Yaswi.pm
+lib/DBD/Yaswi/Summary.pm
+Makefile.PL
+MANIFEST
+README
+t/1.t
+Yaswi.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+Changes

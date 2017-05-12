@@ -1,0 +1,57 @@
+{
+   "abstract" : "Predicates for relationship accessors",
+   "author" : [
+      "Wallace Reis <wreis@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Relationship-Predicate",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0",
+            "Sub::Name" : "0",
+            "parent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "Path::Class" : "0",
+            "SQL::Translator" : "0.11006",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/wreis/DBIC-Relationship-Predicate/issues"
+      },
+      "homepage" : "https://github.com/wreis/DBIC-Relationship-Predicate",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/wreis/DBIC-Relationship-Predicate.git",
+         "web" : "https://github.com/wreis/DBIC-Relationship-Predicate"
+      }
+   },
+   "version" : "0.07"
+}
+

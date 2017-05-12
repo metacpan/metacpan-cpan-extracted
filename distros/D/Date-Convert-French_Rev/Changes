@@ -1,0 +1,57 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+Revision history for Perl extension Date::Convert::French_Rev.
+
+0.08  Tridi 23 Thermidor CCXXIII, jour de la lentille (Monday 2015-08-10,
+      which, according to the Gregorian calendar, is the 223rd anniversary
+      of the storming of the Tuileries palace)
+        - fix prerequisite: Date::Convert 0.16 is fine, 0.14 is not.
+          Actually, RT ticket 90470 was prematurely and erroneously declared
+          as "fixed".
+        - improve the documentation of method "change_to".
+        - add more tests
+
+0.07  Décadi 10 Thermidor CCXXIII, jour de l'arrosoir (Tuesday 2015-07-28, also
+      the 221st anniversary of Robespierre's death)
+        - fix prerequisite: Date::Convert 0.16 is fine, 0.14 is not (RT ticket 90470)
+        - test file to check the parameter checks (mistakenly not included in 0.06)
+        - a few documentation fixes
+        - fix the mojibake bug (similar to RT ticket 100311 for DT::C::FR)
+        - add an alternate API to convert from French Revolutionary to other calendar
+
+0.06  Octidi 18 Brumaire CCXXII, jour de la dentelaire (Friday 2013-11-08, also
+      the 214th anniversary of Bonaparte's coup agains the Directorate)
+        - kwalitee issues: license, style, META.{yml,json}
+        - use UTF-8 instead of ISO-8859-1, use spaces instead of tabs
+        - more tests, more modern tests
+
+0.05  Nonidi 9 Floréal CCXI, jour de la jacinthe (Monday 2003-04-28)
+        - last version compatible with Date::Convert, next one will
+        be in the DateTime::Calendar namespace, compatible with DateTime.pm
+        - I had always believed that the additional days were not called
+        Primidi, Duodi etc. But I have found a document where they are
+        called Primidi etc. The bug in the module is fixed.
+
+0.04  Tridi 13 Fructidor CCX, jour de l'épine-vinette (Friday 2002-08-30)
+	- reorganise the directory structure along Matt Sergeant's tips
+        - include the 4000-modulus rule for leap years (according to emacs-21.2)
+        - reorganise the absolute -> FR conversion
+	- rephrase the README file
+	- add the  prerequisite for Date::Convert  in Makefile.PL (the
+	use statement and the @ISA array are not sufficient)
+        - add a few examples in the eg/ subdirectory
+	- fix a few bugs: $_ was squashed by date_string, the month value
+	was not checked
+	- compatibility with diagnostics-1.2
+
+0.03  Décadi 20 Thermidor CCIX, jour de l'écluse (Tuesday 2001-08-07)
+        - rewrite the Changes file, with proper dates
+        - it seems that the 4th additional day should rather be "jour
+	de l'opinion"
+	- reformat the code
+
+0.02  Nonidi 19 Prairial CCIX, jour du tilleul (Thursday 2001-06-07)
+        - add the prerequisite for Roman.pm in Makefile.PL
+        - extend the "SEE ALSO" section
+
+0.01  Quartidi 4 Prairial CCIX, jour de l'angélique (Wednesday 2001-05-23)
+	- original version; created by h2xs 1.19

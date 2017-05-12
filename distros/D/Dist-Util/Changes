@@ -1,0 +1,41 @@
+Revision history for Dist-Util
+
+0.06    2014-12-26 (PERLANCAR)
+
+	- Note about the fact that many linux distros strip .packlist
+	  files.
+
+	- Move bin/packlist-for to App-DistUtils.
+
+
+0.05    2014-12-03 (PERLANCAR)
+
+	- Rename dist from SHARYANTO-Dist-Util to Dist-Util.
+
+        - Add function: list_dists().
+
+
+0.04    2014-11-20 (PERLANCAR)
+
+	- Accept Foo-Bar as well as Foo::Bar.
+
+
+0.03    2014-07-02 (SHARYANTO)
+
+        - No functional changes.
+
+        - [Bugfix] scripts/ or bin/ files need to have something like #!perl and
+          not #!/usr/bin/env perl so it can be replaced to the path of perl when
+          installing [RT#96884]
+
+
+0.02    2014-04-11 (SHARYANTO)
+
+        - Add command-line script: packlist-for.
+
+        - Add function: list_dist_modules().
+
+
+0.01    2014-04-05 (SHARYANTO)
+
+        - First release.

@@ -1,0 +1,160 @@
+NAME
+
+    Data::Transpose - iterate, filter and validate data, and transpose to
+    different field names
+
+DESCRIPTION
+
+    Caters to your needs for manipulating data by different operations,
+    which are filtering records, iterating records, validating and
+    transposing to different field names.
+
+VERSION
+
+    Version 0.0023
+
+SYNOPSIS
+
+        use warnings;
+        use strict;
+        
+        use Data::Transpose::Prefix;
+        use Data::Dumper;
+        
+        my $data = {
+            first => 'John',
+            last  => 'Doe',
+            foo   => 'bar',
+        };
+        
+        my $dtp = Data::Transpose::Prefix->new(prefix => 'user.');
+        foreach my $needs_prefix ( qw(first last) ) {
+            $dtp->field( $needs_prefix );
+        }
+        
+        my $output = $dtp->transpose( $data );
+        
+        print Data::Dumper->Dump([$data, $output], [qw(data output)]);
+
+    outputs:
+
+        $data = {
+                  'first' => 'John',
+                  'last' => 'Doe',
+                  'foo' => 'bar'
+                };
+        $output = {
+                    'user.last' => 'Doe',
+                    'user.first' => 'John',
+                    'foo' => 'bar'
+                  };
+
+REFERENCE
+
+    Validator
+
+      Data::Transpose::Validator
+
+    Iterator
+
+      Data::Transpose::Iterator
+
+METHODS
+
+ new
+
+    Parameters for the constructor are:
+
+    unknown
+
+      Determines how to treat fields in the input hash which are not known
+      to the Data::Transpose object:
+
+      fail
+
+	The transpose operation fails.
+
+      pass
+
+	Unknown fields in the input hash appear in the output hash. This is
+	the default behaviour.
+
+      skip
+
+	Unknown fields in the input hash don't appear in the output hash.
+
+      This doesn't apply to the "transpose_object" method.
+
+ field
+
+    Add a new field object and return it:
+
+        $tp->field('email');
+
+ group
+
+    Add a new group object and return it:
+
+        $tp->group('fullname', $tp->field('firstname'), $tp->field('lastname'));
+
+ transpose
+
+    Transposes input:
+
+       $new_record = $tp->transpose($orig_record);
+
+ transpose_object
+
+    Transposes an object into a hash reference.
+
+AUTHOR
+
+    Stefan Hornburg (Racke), <racke at linuxia.de>
+
+BUGS
+
+    Please report any bugs or feature requests at
+    https://github.com/racke/Data-Transpose/issues. I will be notified, and
+    then you'll automatically be notified of progress on your bug as I make
+    changes.
+
+SUPPORT
+
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::Transpose
+
+    You can also look for information at:
+
+      * Github's issue tracker (report bugs here)
+
+      https://github.com/racke/Data-Transpose/issues
+
+      * AnnoCPAN: Annotated CPAN documentation
+
+      http://annocpan.org/dist/Data-Transpose
+
+      * CPAN Ratings
+
+      http://cpanratings.perl.org/d/Data-Transpose
+
+      * Search CPAN
+
+      http://search.cpan.org/dist/Data-Transpose/
+
+ACKNOWLEDGEMENTS
+
+    Peter Mottram (GH #19, #28). Lisa Hare (GH #27). Marco Pessotto (GH #6,
+    #7, #14, #24, #26). Slaven Rezić (GH #25). Sam Batschelet (GH #16,
+    #18). Todd Wade (GH #5, #11, #12, #13).
+
+LICENSE AND COPYRIGHT
+
+    Copyright 2012-2016 Stefan Hornburg (Racke).
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

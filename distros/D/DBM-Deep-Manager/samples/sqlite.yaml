@@ -1,0 +1,7 @@
+---
+dbi:
+  dsn: dbi:SQLite:dbname=sb.sqlite
+  username:
+  password:
+  connect_args:
+

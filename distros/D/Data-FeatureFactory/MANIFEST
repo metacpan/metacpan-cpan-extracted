@@ -1,0 +1,10 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Data/FeatureFactory.pm
+t/00-evaluate.t
+t/01-translate.t
+t/OuterModule.pm
+t/lcletters.txt
+t/__Example.pm

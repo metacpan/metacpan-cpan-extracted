@@ -1,0 +1,78 @@
+Device/Conrad/RelaisControl 
+========================================
+
+This module supports access to a Conrad RelaisCard. Conrad
+is a large german electronic stuff dealer. They are selling
+a self manufactured card with 8 relais on it. The card
+is accessed via serial communication. The card is also
+cascadeable up to 255 cards in a ring. 
+
+While the task of accessing such a card is very simple
+this distribution contains 3 module files. These are
+the abstraction of the whole cascade, the card and the
+communcation.
+
+Frame.pm contains the protocol which is used to talk to
+the card. RelaisCard.pm is the owner of one single card.
+RelaisControl.pm is the container for an arbitrary number
+of cards.
+
+For simple tasks you only need the RelaisControl module.
+It allows direct access to any port on any card. 
+
+THINGS TO KNOW
+
+- At the moment I don't have a card to test further things. If
+  there are important issues to resolve I will get me one :)
+- I was never able to test the cascading stuff. The things
+  implemented for using multiple cards are just programmed as
+  they are documented.
+- There are still things hardcoded while they aren't supposed
+  to. This includes the location of the lockfile for the serial
+  port and the port speed settings. It defaults to 19200,8,n,1
+  without any handshake or flowcontrol. I'm not quite sure if
+  the card is operating on any other setting.
+
+CAUTION
+
+The card is very dump when it comes to communication. If the
+card goes out of acknowledged communication there is no way 
+to reinitialize the card and gain control again.
+This is very problematic if you have electronics that should
+only switched up to a few seconds. If something goes wrong
+after you closed the circuit and before opening again your
+circuit will stay closed. The only possible action to force
+the card to open a circuit is to take away the power supply :(
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::SerialPort
+
+CONTACT
+
+If you found a bug or have any question about the module you may
+contact me at noha@cpan.org
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2002 Norbert Hartl.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Credits
+
+Thanks for reporting bugs and asking questions go to:
+
+- Ullrich Wuerfel

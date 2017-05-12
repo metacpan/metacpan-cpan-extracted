@@ -1,0 +1,19 @@
+Build.PL
+Changes
+lib/Dancer/Plugin/Locale.pm
+lib/Dancer/Plugin/Locale/Detect.pm
+lib/Dancer/Plugin/Locale/TextDomain.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/00-load.t
+t/01-detect-locale.t
+t/locale/en_CA/LC_MESSAGES/messages.mo
+t/locale/en_CA/LC_MESSAGES/messages.po
+t/locale/fr/LC_MESSAGES/messages.mo
+t/locale/fr/LC_MESSAGES/messages.po
+t/locale/nl/LC_MESSAGES/messages.mo
+t/locale/nl/LC_MESSAGES/messages.po

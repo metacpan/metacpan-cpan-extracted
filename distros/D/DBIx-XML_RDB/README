@@ -1,0 +1,31 @@
+DBIx::XML_RDB creates XML from select statements to DBI datasources.
+It also includes an import utility xml2sql that allows you to copy
+data from one database to another.
+
+SYNOPSIS
+      use DBIx::XML_RDB;
+      my $xmlout = DBIx::XML_RDB->new($datasource,
+                    "ODBC", $userid, $password, $dbname) || die "Failed to make new xmlout";
+      $xmlout->DoSql("select * from MyTable");
+      print $xmlout->GetData;
+
+The format of the XML output is something like this:
+
+    <?xml version="1.0"?>
+    <DBI driver="dbi:Sybase:database=foo">
+            <RESULTSET statement="select * from Table">
+                    <ROW>
+                    <Col1Name>Data</Col1Name>
+                    <Col2Name>Data</Col2Name>
+                    ...
+                    </ROW>
+                    <ROW>
+                    ...
+                    </ROW>
+            </RESULTSET>
+            <RESULTSET statement="select * from OtherTable">
+            ...
+            </RESULTSET>
+    </DBI>
+
+Matt Sergeant, matt@sergeant.org

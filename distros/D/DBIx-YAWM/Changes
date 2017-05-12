@@ -1,0 +1,73 @@
+Revision history for Perl extension DBTools.
+
+2.0		4/19/02 14:49:02
+		Initial revision to use autosplit
+
+2.0.1	5/6/02 19:02:04
+		fixed many bugs in DBInsert.
+		now supports Ints option which allows you to define certain
+		fields as neing integers. 
+		To Do: define arbirary data types to field names
+		To Do: quote charachter set to " ... make it so you can modify that for
+				databases which like other quote characters.	
+
+2.0.2	5/7/02 12:46:04
+		fixed problems with escaping quote character in DBInsert
+		
+2.0.3	5/31/02 16:24:04
+		fixed typo in ParseDiary
+
+2.0.4	6/7/02	15:21:04
+		fixed annother typo in ParseDiary ... $errstr to $self->{errstr}
+2.0.5	7/2/02	11:14:30
+		added $sth->finish() 's to BQuery and DBInsert at the behest of the server ops
+		DBAs. Also did away with the SecsupConfig hooks ... no real need for 'em.
+		Added documentation in DBTools.pod
+2.0.6	8/6/02	18:01:06
+		Port can now be specified at object creation for oracle databases. Allowing you 
+		to live apart from the tnsnames.ora file.
+2.0.7	9/18/02	11:00:16
+		Date conversion in ParseDiary is now optional via the DateConvert option.
+
+Namespace changed to DBIx::YAWM for release to CPAN
+
+2.0.8	10/24/02 16:19:00
+		initial release to CPAN under DBIx::YAWM namespace
+		YAWM stands for Yet Annother Wrapper Module
+2.0.9	10/25/02 09:47:05
+		fixed 'use' statement in test.pl so that it will at least
+		pass CPAN testers. Still needs real test suite though.
+2.2		12/06/02 11:32:10
+		now throws error if require failes on DBD module in Login
+2.2.1	2/24/03 13:55:50
+		added 'Do' method to handle raw sql statements.
+		perhaps good for pl/sql stuffs.
+2.2.2	2/27/03 13:32:00
+		added mysql support. Probably should find a better way of handling 
+		new DBTypes in future versions.
+2.2.3	3/9/03 21:59:30
+		removed 'Pass' as required opton to new. Some databases support users w/no pass
+2.2.4	3/24/03 17:59:54
+		added Update function
+		now uses dbi's 'quote' function so that we don't have to guess about the correct 
+		type of quotation char.
+
+2.2.5	7/25/03	14:26:55
+		fixed bug in Insert which was causing double quoting.
+		added 'NoQuote' option to replace undocumented 'Ints' option in Insert function
+
+2.3		Thu Sep 29 15:00:24 EDT 2005
+		added 'options' argument to Update, Insert and Query.
+		this allows one to set (mysql) options on these statements 
+		such as 'LOW_PRIORITY'
+
+2.31	Mon Apr 24 17:08:26 GMT 2006
+		added flatQuery which brings us into the late 90's with fetchrow_hashref()
+		yay for select aliases.
+		
+2.32	Tue May  2 14:32:09 EDT 2006
+		added 'lc' option to flatQuery, it translated DBI::getchrow_hashref()'s default
+		all caps output to lowercase
+		
+2.34    Tue Aug  7 18:31:30 GMT 2012
+                added ORA-03114 "not connected to oracle" detection on flatQuery (will auto-reconnect)

@@ -1,0 +1,256 @@
+{$autogen_warning}
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+{$name} - {$description}
+
+=head1 DESCRIPTION
+
+This pod file contains examples of the locale data available for the
+{$locale->name} locale.
+
+=head2 Days
+
+=head3 Wide (format)
+
+{
+  for my $day ( @{ $locale->day_format_wide } ) {
+      $OUT .= "  $day\n"
+  }
+}
+=head3 Abbreviated (format)
+
+{
+  for my $day ( @{ $locale->day_format_abbreviated } ) {
+      $OUT .= "  $day\n"
+  }
+}
+=head3 Narrow (format)
+
+{
+  for my $day ( @{ $locale->day_format_narrow } ) {
+      $OUT .= "  $day\n"
+  }
+}
+
+=head3 Wide (stand-alone)
+
+{
+  for my $day ( @{ $locale->day_stand_alone_wide } ) {
+      $OUT .= "  $day\n"
+  }
+}
+=head3 Abbreviated (stand-alone)
+
+{
+  for my $day ( @{ $locale->day_stand_alone_abbreviated } ) {
+      $OUT .= "  $day\n"
+  }
+}
+=head3 Narrow (stand-alone)
+
+{
+  for my $day ( @{ $locale->day_stand_alone_narrow } ) {
+      $OUT .= "  $day\n"
+  }
+}
+=head2 Months
+
+=head3 Wide (format)
+
+{
+  for my $month ( @{ $locale->month_format_wide } ) {
+      $OUT .= "  $month\n"
+  }
+}
+=head3 Abbreviated (format)
+
+{
+  for my $month ( @{ $locale->month_format_abbreviated } ) {
+      $OUT .= "  $month\n"
+  }
+}
+=head3 Narrow (format)
+
+{
+  for my $month ( @{ $locale->month_format_narrow } ) {
+      $OUT .= "  $month\n"
+  }
+}
+
+=head3 Wide (stand-alone)
+
+{
+  for my $month ( @{ $locale->month_stand_alone_wide } ) {
+      $OUT .= "  $month\n"
+  }
+}
+=head3 Abbreviated (stand-alone)
+
+{
+  for my $month ( @{ $locale->month_stand_alone_abbreviated } ) {
+      $OUT .= "  $month\n"
+  }
+}
+=head3 Narrow (stand-alone)
+
+{
+  for my $month ( @{ $locale->month_stand_alone_narrow } ) {
+      $OUT .= "  $month\n"
+  }
+}
+=head2 Quarters
+
+=head3 Wide (format)
+
+{
+  for my $quarter ( @{ $locale->quarter_format_wide } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+=head3 Abbreviated (format)
+
+{
+  for my $quarter ( @{ $locale->quarter_format_abbreviated } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+=head3 Narrow (format)
+
+{
+  for my $quarter ( @{ $locale->quarter_format_narrow } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+
+=head3 Wide (stand-alone)
+
+{
+  for my $quarter ( @{ $locale->quarter_stand_alone_wide } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+=head3 Abbreviated (stand-alone)
+
+{
+  for my $quarter ( @{ $locale->quarter_stand_alone_abbreviated } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+=head3 Narrow (stand-alone)
+
+{
+  for my $quarter ( @{ $locale->quarter_stand_alone_narrow } ) {
+      $OUT .= "  $quarter\n"
+  }
+}
+=head2 Eras
+
+=head3 Wide (format)
+
+{
+  for my $era ( @{ $locale->era_wide } ) {
+      $OUT .= "  $era\n"
+  }
+}
+=head3 Abbreviated (format)
+
+{
+  for my $era ( @{ $locale->era_abbreviated } ) {
+      $OUT .= "  $era\n"
+  }
+}
+=head3 Narrow (format)
+
+{
+  for my $era ( @{ $locale->era_narrow } ) {
+      $OUT .= "  $era\n"
+  }
+}
+=head2 Date Formats
+
+{
+  $_->set_locale($locale) for @example_dts;
+  for my $length (qw( full long medium short )) {
+      my $meth = 'date_format_' . $length;
+      $OUT .= "=head3 \u$length\n\n";
+      for my $dt (@example_dts) {
+          $OUT .= sprintf(
+              '  %20s = %s',
+              $dt->iso8601,
+              $dt->format_cldr( $locale->$meth )
+          );
+          $OUT .= "\n";
+      }
+      $OUT .= "\n";
+  }
+}
+=head2 Time Formats
+
+{
+  for my $length (qw( full long medium short )) {
+      my $meth = 'time_format_' . $length;
+      $OUT .= "=head3 \u$length\n\n";
+      for my $dt (@example_dts) {
+          $OUT .= sprintf(
+              '  %20s = %s',
+              $dt->iso8601,
+              $dt->format_cldr( $locale->$meth )
+          );
+          $OUT .= "\n";
+      }
+      $OUT .= "\n";
+  }
+}
+=head2 Datetime Formats
+
+{
+  for my $length (qw( full long medium short )) {
+      my $meth = 'datetime_format_' . $length;
+      $OUT .= "=head3 \u$length\n\n";
+      for my $dt (@example_dts) {
+          $OUT .= sprintf(
+              '  %20s = %s',
+              $dt->iso8601,
+              $dt->format_cldr( $locale->$meth )
+          );
+          $OUT .= "\n";
+      }
+      $OUT .= "\n";
+  }
+}
+=head2 Available Formats
+
+{
+  for my $key ( sort { $a cmp $b } $locale->available_formats ) {
+      my $fmt = $locale->format_for($key);
+      $OUT .= "=head3 $key ($fmt)\n\n";
+      for my $dt (@example_dts) {
+          $OUT .= sprintf(
+              '  %20s = %s',
+              $dt->iso8601,
+              $dt->format_cldr($fmt)
+          );
+          $OUT .= "\n";
+      }
+      $OUT .= "\n";
+  }
+}
+=head2 Miscellaneous
+
+=head3 Prefers 24 hour time?
+
+{ $locale->prefers_24_hour_time ? 'Yes' : 'No' }
+
+=head3 Local first day of the week
+
+{ $locale->first_day_of_week } ({ $locale->day_stand_alone_wide->[ $locale->first_day_of_week - 1 ] })
+
+=head1 SUPPORT
+
+See L<DateTime::Locale>.
+
+=cut

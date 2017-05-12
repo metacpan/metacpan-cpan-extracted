@@ -1,0 +1,192 @@
+#
+#     English strings for the examples scripts of DateTime::Calendar::FrenchRevolutionary
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016 Jean Forget, all rights reserved
+#
+#     This program is distributed under the same terms as Perl 5.16.3:
+#     GNU Public License version 1 or later and Perl Artistic License
+#
+#     You can find the text of the licenses in the F<LICENSE> file or at
+#     L<http://www.perlfoundation.org/artistic_license_1_0>
+#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#
+#     Here is the summary of GPL:
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 1, or (at your option)
+#     any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software Foundation,
+#     Inc., <http://www.fsf.org/>.
+#
+#
+# The labels hash, under an assumed name
+#
+use utf8;
+use strict;
+use warnings;
+
+my %labels =
+(  calendar  => 'Calendar'
+ , month3    => [ qw(Jan Feb Mar Apr May Jun Jul Aug Sep Oct Nov Dec) ]
+ , week1     => [ qw(M T W T F S S) ]
+ , add_days  => 'Additional Days'
+ , month     => [ qw(January February March April May June July August September 
+                 October November December) ]
+ , title1    => "Year to letter"
+ , title2    => { b => "Beginning of Year", m => "Middle of Year", e => "End of Year" }
+ , title3    => "Month names and day names"
+ , year_ttl  => "Year"
+ , titleg2r  => "Converting dates from Gregorian to French Revolutionary"
+ , titler2g  => "Converting dates from French Revolutionary to Gregorian"
+);
+
+#
+# Formatting a Gregorian date
+#
+$labels{format} = sub {
+  my ($y, $m, $d, $l) = @_;
+  return "$d $labels{month}[$m-1] $y" if ($l eq 'en');
+  return "$labels{month}[$m-1] $d, $y"
+};
+
+#
+# Instructions for use, for greg to rev
+#
+$labels{usage1} =  <<'EOT';
+<h3>How to convert $gr_date</h3>
+<p>Look at the first table. The Gregorian year <strong>$y</strong> belongs to the interval
+<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em> and its last two digits are 
+<em>$y2</em>. 
+The cell in the corresponding
+line and column contains the three letters <em>$word</em>. 
+<p>Look at the next three tables. 
+The month <strong>$labels{month}[$m-1]</strong> appears in the <em>$labels{title2}{$part}</em> table, at
+the head of which is the fomula <em>$labels{year_ttl}&nbsp;-&nbsp;$offset</em>.
+So you can compute that the French Revolutionary year is <strong>$ryear</strong>.
+Of the three letters <em>$word</em>, the letter <em>$letter</em> appears
+in the same table. The corresponding cell contains two formulas: 
+<em>@formulas</em>. Choose the one that will convert the day number <strong>$d</strong>
+into a number in the 1-30 range. That is, up to and including 
+<strong>$limit $labels{month}[$m - 1]</strong>, use
+the first formula <em>$formulas[0]</em>, and later use the second formula <em>$formulas[1]</em>.
+Since the Gregorian day number is <strong>$d</strong>, you use <em>$formula</em>, and you get
+<strong>$abridged</strong>. The final step consists in retrieving the day's full name
+and the month's full name in the last table, which gives 
+<strong>$rev_date</strong>.
+EOT
+
+$labels{usage2} = <<'EOT';
+<h3>How to convert $gr_date</h3>
+<p>What about September? The first step is the same, and gives the same three letters 
+<em>$word</em>.
+<p>But <strong>$labels{month}[8]</strong> 
+appears both in the 
+<em>$labels{title2}{m}</em> 
+table, and in the 
+<em>$labels{title2}{e}</em> 
+table. The first one gives two formulas for the day: 
+<em>$formulas[0]</em> 
+and 
+<em>$formulas[1]</em> (<em>$mletter</em>
+column), and one for the year: 
+<em>$labels{year_ttl}&nbsp;-&nbsp;1792</em>. 
+The second table gives 
+<em>$formulas[2]</em> for the day 
+(<em>$eletter</em>
+column) and 
+<em>$labels{year_ttl}&nbsp;-&nbsp;1791</em>
+for the year. 
+<p>Try the last formula <em>$formulas[2]</em>,
+then the prior one <em>$formulas[1]</em>, then the first one <em>$formulas[0]</em>, 
+until you have a result greater than or equal to 1.
+<p>For <strong>$d $labels{month}[8] $y</strong>, you would choose <em>$formula</em>,
+with the corresponding year formula <em>$labels{year_ttl}&nbsp;-&nbsp;$offset</em>,
+which gives you <strong>$abridged</strong>, or better
+<strong>$rev_date</strong>.
+EOT
+
+#
+# Instructions for French Rev to Gregorian
+#
+$labels{usage3} = <<'EOT';
+<h3>How to convert $title_date</h3>
+<p>Look at the first table. The French Revolutionary year 
+<strong>$y</strong> 
+belongs to the interval
+<em>$begint&nbsp;-&nbsp;$end_of_interval{$begint}</em> 
+and its last two digits are 
+<em>$y2</em>. 
+The cell in the corresponding
+line and column contains the two letters 
+<em>$word</em>. 
+<p>Look at the next two tables. The month 
+<strong>$fr_month[$m-1]</strong> 
+appears in the 
+<em>$labels{title2}{$part}</em> 
+table. Of the two letters 
+<em>$word</em>, 
+the letter 
+<em>$letter</em> 
+appears in the same table. The corresponding cell contains two formulas: 
+<em>@formulas</em>. 
+Choose the one that will convert the day number 
+<strong>$d</strong>
+into a number in the proper range for the Gregorian month. That is, up to and including 
+<strong>$limit $fr_month[$m - 1]</strong>, 
+use the first formula 
+<em>$formulas[0]</em>, 
+and later use the second formula 
+<em>$formulas[1]</em>.
+Since the French Revolutionary day number is 
+<strong>$d</strong>, 
+you use <em>$formula</em>. Using the year formula next to the column headers, you get
+<strong>$gr_date</strong>.
+EOT
+$labels{usage4} = <<'EOT';
+<h3>Special cases</h3>
+<p>For 
+<strong>$labels{add_days}</strong>,
+there is only one formula, which is much simpler.
+<p>For 
+<strong>$fr_month[3]</strong>,
+the cell is split in two, because there are two formulas for the year,
+<em>$labels{year_ttl}&nbsp;+&nbsp;1791</em>
+and
+<em>$labels{year_ttl}&nbsp;+&nbsp;1792</em>.
+<p><strong>$fr_month[5]</strong> 
+is in both tables. For
+<strong>$fr_month[5] $y</strong>,
+in column
+<em>$bletter</em>
+you obtain the 
+<em>$formulas[0]</em>
+formula, and in column
+<em>$eletter</em>
+you obtain the 
+<em>$formulas[1]</em>
+formula. Except for that, everything else is the same. That is, up to and including 
+<strong>$limit $fr_month[5]</strong>, 
+use the first formula 
+<em>$formulas[0]</em>, 
+and later use the second formula 
+<em>$formulas[1]</em>.
+For example, if you want to convert
+<strong>$title_date</strong>, 
+since the French Revolutionary day number is 
+<strong>$d</strong>, 
+you use <em>$formula</em>, and you get
+<strong>$gr_date</strong>.
+EOT
+
+#
+# do cannot return a list value. Therefore, instead of a hash, we return a
+# hash reference.
+#
+\%labels;

@@ -1,0 +1,70 @@
+# NAME
+
+Dist::Zilla::Plugin::ChangeStats::Git - add code churn statistics to the changelog
+
+# VERSION
+
+version 0.6.0
+
+# SYNOPSIS
+
+```
+In the dist.ini:
+
+[ChangeStats::Git]
+group=STATISTICS
+skip_match=^meta
+```
+
+# DESCRIPTION
+
+Adds a line to the changelog giving some stats about the
+code churn since the last release, which will look like:
+
+```
+- code churn: 6 files changed, 111 insertions(+), 1 deletions(-)
+```
+
+# ARGUMENTS
+
+## group
+
+If given, the line is added to the specified group.
+
+## develop\_branch
+
+The master developing branch. Defaults to _master_.
+
+## auto\_previous\_tag
+
+If enabled, look in the guts of the [Dist::Zilla::Plugin::Git::Tag](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Tag) plugin in order to find the
+previous release's tag. This will be then compared against the develop\_branch. Defaults to false (0).
+
+## release\_branch
+
+The branch recording the releases. Defaults to _releases_.
+
+## text
+
+The text before git output. If it is a non-empty string, `:<space>` will be appended. Defaults to _code churn_.
+
+## skip\_file
+
+A complete path (from the distribution root) that should not be included in the statistics. Can be given
+multiple times.
+
+## skip\_match
+
+A part of a regex used to match against complete paths. Paths that match are not included in the statistics. Can be
+given multiple times.
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

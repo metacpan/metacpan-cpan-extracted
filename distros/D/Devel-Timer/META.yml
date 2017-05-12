@@ -1,0 +1,31 @@
+---
+abstract: 'Track and report execution time for parts of code'
+author:
+  - 'Jason Moore'
+build_requires:
+  Capture::Tiny: 0.25
+  Test::More: 1.00
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Timer
+provides:
+  Devel::Timer:
+    file: lib/Devel/Timer.pm
+    version: 0.12
+requires:
+  Time::HiRes: 0
+  perl: 5.008
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/Manwar/Devel-Timer
+  repository: https://github.com/Manwar/Devel-Timer.git
+version: 0.12
+x_serialization_backend: 'YAML::Tiny version 1.56'

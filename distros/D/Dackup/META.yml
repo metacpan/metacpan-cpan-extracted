@@ -1,0 +1,38 @@
+--- #YAML:1.0
+name:               Dackup
+version:            0.44
+abstract:           Back up files over the network
+author:
+    - Leon Brocard <acme@astray.com>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Data::Stream::Bulk:   0
+    DBD::SQLite:          0
+    DBI:                  0
+    Devel::CheckOS:       0
+    Digest::MD5::File:    0
+    File::HomeDir:        0
+    File::Temp:           0
+    Moose:                0
+    MooseX::StrictConstructor:  0
+    MooseX::Types::Path::Class:  0
+    Net::Amazon::S3:      0.50
+    Net::Mosso::CloudFiles:  0.41
+    Net::OpenSSH:         0.30
+    Number::DataRate:     0
+    Path::Class:          0
+    Term::ProgressBar::Simple:  0.03
+    Test::More:           0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

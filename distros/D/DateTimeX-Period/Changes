@@ -1,0 +1,11 @@
+Revision history for DateTimeX-Period
+
+0.03    02/09/2014
+        Released 0.03 version, the only change is that it better lists issues
+		this module is trying to solve.
+
+0.02    30/08/2014
+        Released second version, that fixes bug #1 and updates documentation.
+
+0.01    17/08/2014
+        First version, released on an unsuspecting world.

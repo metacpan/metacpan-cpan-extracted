@@ -1,0 +1,64 @@
+Revision history for Perl module Data::Random
+
+0.12	2015-05-25T10:44:00-0700
+        - convert from Date::Calc to Time::Piece
+            - require Time::Piece 1.16 because it has add_year()
+            - fixed rand_datetime on MSWin32 after Time::Piece
+            - fixed tests to work for local timezone
+        - convert to File::Temp
+        - lots of cleanup
+        Thanks to mbeijen (Michiel Beijen) for these improvements!
+        - colors can only go up to 255 (RT/100995)
+        Thanks to jrosenboom
+
+0.11    2014-01-01T15:09:57-0800
+        - remove MYMETA.* from dist and add them to MANIFEST.SKIP (RT/89174)
+
+0.10    2013-10-30T20:37:08-0700
+        - rand_chars() will now return a string when called in scalar context
+        - tidied up this file according to CPAN::Changes::Spec
+
+0.09    2013-09-14 00:06:55 PDT
+        - getting new Module::Install::GithubMeta (RT/88089)
+        - remove some spurious files from MANIFEST
+
+0.08    2012-09-17 22:57:33 PDT
+        - fixing even more random tests that fail on midnight and zero seconds
+
+0.07    2012-06-02 16:44:53 PDT
+        - fixed distro bugs (RT/73551, RT/75507, RT/77290)
+
+0.06    2011-11-14 20:23:22 PST
+        - fixed bug where .. was added to @INC (RT/71346)
+        - tweaked POD
+        - improved tests/fixed many CPAN Testers failures
+
+0.05    2003-02-20
+        - added default wordlist (copy of linux.words)
+        - fixed tests again so they don't fail if Date::Calc or
+          GD are not installed
+
+0.04    2002-02-26
+        - removed false dependency on Perl 5.005_62
+        - only load Data::Random::WordList when needed
+          (Thanks to Mark Stosberg)
+        - fixed tests so they skip appropriate tests if Date::Calc or
+          GD are not installed
+
+0.03    2001-08-20
+        - added rand_image()
+        - used Carp::cluck() and returned undef on errors instead of
+          calling die, thus making it a little more friendly
+
+0.02    2001-05-30
+        - correctly made "shuffle" flag default to 1 for rand_words(),
+          rand_chars() and rand_set()  (Thanks to David Sarno)
+        - fixed bug where rand_words() would sometimes return less words
+          than what's specified in "min"  (Thanks to David Sarno)
+        - allowed results of rand_set() to be unshuffled
+        - added a plethora of tests (how's one supposed to
+          accurately the test validity of random data anyway?)
+
+0.01    2000-10-31
+        - original version
+

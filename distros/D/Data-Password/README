@@ -1,0 +1,111 @@
+NAME
+    Data::Password - Perl extension for assessing password quality.
+
+SYNOPSIS
+            use Data::Password qw(IsBadPassword);
+
+            print IsBadPassword("clearant");
+
+            # Bad password - contains the word 'clear', only lowercase
+
+            use Data::Password qw(:all);
+
+            $DICTIONARY = 0;
+
+            $GROUPS = 0;
+   
+            $SKIPCHAR = 0;
+
+            print IsBadPassword("clearant");
+
+DESCRIPTION
+    This module checks potential passwords for crackability. It checks that
+    the password is in the appropriate length, that it has enough character
+    groups, that it does not contain the same characters repeatedly or
+    ascending or descending characters, or charcters close to each other in
+    the keyboard. It will also attempt to search the ispell word file for
+    existance of whole words. The module's policies can be modified by
+    changing its variables. (Check "VARIABLES"). For doing it, it is
+    recommended to import the ':all' shortcut when requiring it:
+
+    *use Data::Password qw(:all);*
+
+FUNCTIONS
+    1   IsBadPassword(password)
+
+        Returns undef if the password is ok, or a textual description of the
+        fault if any.
+
+    2   IsBadPasswordForUNIX(user, password)
+
+        Performs two additional checks: compares the password against the
+        login name and the "comment" (ie, real name) found on the user file.
+
+VARIABLES
+    1   $DICTIONARY
+
+        Minimal length for dictionary words that are not allowed to appear
+        in the password. Set to false to disable dictionary check.
+
+    2   $FOLLOWING
+
+        Maximal length of characters in a row to allow if the same or
+        following. If $FOLLOWING_KEYBOARD is true (default), the module will
+        also check for alphabetical keys following, according to the English
+        keyboard layout. Set $FOLLOWING to false to bypass this check.
+
+    3   $GROUPS
+
+        Groups of characters are lowercase letters, uppercase letters,
+        digits and the rest of the allowed characters. Set $GROUPS to the
+        number of minimal character groups a password is required to have.
+        Setting to false or to 1 will bypass the check.
+
+    4   $MINLEN
+
+        $MAXLEN
+
+        Minimum and maximum length of a password. Both can be set to false.
+
+    5   @DICTIONARIES
+
+        Location where we are looking for dictionary files. You may want to
+        set this variable if you are using not *NIX like operating system.
+
+    6   $SKIPCHAR
+
+        Set $SKIPCHAR to 1 to skip checking for bad characters.
+
+    7   $BADCHARS
+
+        Prohibit a specific character range. Excluded character range
+        regualr experssion is expect. (You may use ^ to allow specific
+        range) Default value is: '\0-\x1F\x7F' For ASCII only set value
+        $BADCHARS = '^\x20-\x7F'; Force numbers and upper case only
+        $BADCHARS = '^A-Z1-9';
+
+FILES
+    *   /usr/dict/web2
+
+    *   /usr/dict/words
+
+    *   /etc/passwd
+
+SEE ALSO
+    See Data::Password::BasicCheck if you need only basic password checking.
+    Other modules Data::Password::Common, Data::Password::Check,
+    Data::Password::Meter, Data::Password::Entropy and
+    String::Validator::Password
+
+AUTHOR
+    Ariel Brosh (RIP), January 2002.
+
+    Oded S. Resnik, from April 2004.
+
+COPYRIGHT
+    Copyright (c) 2001 - 2014 Raz Information Systems Ltd.
+    <http://www.raz.co.il/>
+
+    This package is distributed under the same terms as Perl itself, see the
+    Artistic License on Perl's home page.
+

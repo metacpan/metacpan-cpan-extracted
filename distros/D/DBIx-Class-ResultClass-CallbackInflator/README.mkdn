@@ -1,0 +1,64 @@
+# NAME
+
+DBIx::Class::ResultClass::CallbackInflator - Easier way to make a quick, custom inflator
+
+# SYNOPSIS
+
+    use DBIx::Class::ResultClass::CallbackInflator;
+
+    my $result_instance = DBIx::Class::ResultClass::CallbackInflator
+      ->new(callback=>$callback, args=>\@args);
+
+    my $person_resultset = $schema
+        ->resultset('Person')
+        ->resultclass($result_instance);
+
+    # Alternatively
+    my $person_resultset = $schema
+        ->resultset('Person')
+        ->search(+{}, +{result_class=>$result_instance});
+
+# DESCRIPTION
+
+You might wish to review [DBIx::Class::ResultSet::CallbackInflator](https://metacpan.org/pod/DBIx::Class::ResultSet::CallbackInflator) which is probably
+the most easy way to actually make use of this in a resultset.
+
+# ATTRIBUTES
+
+This class defines the following attributes.
+
+## callback
+
+This is the callback with receives the row level data for the resultset as it gets it
+from the database and is responsible for returning a reference to a version of that
+data suitable for a user.
+
+## args
+
+Arguments passed to the callback.
+
+# METHODS
+
+This component defines the following methods.
+
+## inflate\_result
+
+Provides the method needed to call table data on your custom callback (with any passed
+arguments).
+
+# AUTHOR
+
+John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+With thanks to mst for the original code suggestion!
+
+# SEE ALSO
+
+[DBIx::Class](https://metacpan.org/pod/DBIx::Class), [DBIx::Class::ResultClass::HashRefInflator](https://metacpan.org/pod/DBIx::Class::ResultClass::HashRefInflator).
+
+# COPYRIGHT & LICENSE
+
+Copyright 2017, John Napiorkowski [email:jjnapiork@cpan.org](email:jjnapiork@cpan.org)
+
+This library is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.

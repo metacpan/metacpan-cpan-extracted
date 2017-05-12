@@ -1,0 +1,2 @@
+INSERT INTO foo_test VALUES (4);
+INSERT INTO foo_test VALUES (5);

@@ -1,0 +1,15 @@
+SYNOPSIS
+
+DESCRIPTION
+
+    NOTE: EARLY RELEASE AND MINIMAL FUNCTIONALITIES
+
+    This module provides a set of functions to get information and modify
+    your DBI database. The functions are suitable in RPC-style or stateless
+    client/server (like HTTP) API.
+
+    Every function accepts dbh argument, but for convenience database
+    handle can also be set via the $dbh package variable.
+
+SEE ALSO
+

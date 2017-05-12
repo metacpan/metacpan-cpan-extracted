@@ -1,0 +1,189 @@
+<HTML>
+<HEAD>
+<TITLE>stag-ir</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+		<UL>
+
+			<LI><A HREF="#d db_name">-d DB_NAME</A></LI>
+			<LI><A HREF="#clear">-clear</A></LI>
+			<LI><A HREF="#insertonly">-insertonly</A></LI>
+			<LI><A HREF="#newonly">-newonly</A></LI>
+			<LI><A HREF="#transaction_size">-transaction_size</A></LI>
+			<LI><A HREF="#r relationname">-r RELATION-NAME</A></LI>
+			<LI><A HREF="#k uniquekey">-k UNIQUE-KEY</A></LI>
+			<LI><A HREF="#u uniquekey">-u UNIQUE-KEY</A></LI>
+			<LI><A HREF="#create">-create</A></LI>
+			<LI><A HREF="#idtype type">-idtype TYPE</A></LI>
+			<LI><A HREF="#p parser">-p PARSER</A></LI>
+			<LI><A HREF="#q queryid">-q QUERY-ID</A></LI>
+			<LI><A HREF="#top nodename">-top NODE-NAME</A></LI>
+			<LI><A HREF="#qf queryfile">-qf QUERY-FILE</A></LI>
+			<LI><A HREF="#keys">-keys</A></LI>
+		</UL>
+
+	</UL>
+
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-ir.pl - information retrieval using a simple relational index</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-ir.pl -r person -k social_security_no -d Pg:mydb myrecords.xml
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -q 888-8888-8888</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>Indexes stag nodes (XML Elements) in a simple relational db structure
+- keyed by ID with an XML Blob as a value</P>
+<P>Imagine you have a very large file of data, in a stag compatible
+format such as XML. You want to index all the elements of type
+<STRONG>person</STRONG>; each person can be uniquely identified by
+<STRONG>social_security_no</STRONG>, which is a direct subnode of <STRONG>person</STRONG></P>
+<P>The first thing to do is to build the index file, which will be stored
+in the database mydb</P>
+<PRE>
+  stag-ir.pl -r person -k social_security_no -d Pg:mydb myrecords.xml</PRE>
+<P>You can then use the index ``person-idx'' to retrieve <STRONG>person</STRONG> nodes by
+their social security number</P>
+<PRE>
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 &gt; some-person.xml</PRE>
+<P>You can export using different stag formats</P>
+<PRE>
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -w sxpr &gt; some-person.xml</PRE>
+<P>You can retrieve multiple nodes (although these need to be rooted to
+make a valid file)</P>
+<PRE>
+  stag-ir.pl -d Pg:mydb -q 999-9999-9999 -q 888-8888-8888 -top personset</PRE>
+<P>Or you can use a list of IDs from a file (newline delimited)</P>
+<PRE>
+  stag-ir.pl -d Pg:mydb -qf my_ss_nmbrs.txt -top personset</PRE>
+<P>
+<H2><A NAME="arguments">ARGUMENTS</A></H2>
+<P>
+<H3><A NAME="d db_name">-d DB_NAME</A></H3>
+<P>This database will be used for storing the stag nodes</P>
+<P>The name can be a logical name or DBI locator or DBStag shorthand -
+see <A HREF="./DBIx/DBStag.html">the DBIx::DBStag manpage</A></P>
+<P>The database must already exist</P>
+<P>
+<H3><A NAME="clear">-clear</A></H3>
+<P>Deletes all data from the relation type (specified with <STRONG>-r</STRONG>) before loading</P>
+<P>
+<H3><A NAME="insertonly">-insertonly</A></H3>
+<P>Does not check if the ID in the file exists in the db - will always
+attempt an INSERT (and will fail if ID already exists)</P>
+<P>This is the fastest way to load data (only one SQL operation per node
+rather than two) but is only safe if there is no existing data</P>
+<P>(Default is clobber mode - existing data with same ID will be replaced)</P>
+<P>
+<H3><A NAME="newonly">-newonly</A></H3>
+<P>If there is already data in the specified relation in the db, and the
+XML being loaded specifies an ID that is already in the db, then this
+node will be ignored</P>
+<P>(Default is clobber mode - existing data with same ID will be replaced)</P>
+<P>
+<H3><A NAME="transaction_size">-transaction_size</A></H3>
+<P>A commit will be performed every n UPDATEs/COMMITs (and at the end)</P>
+<P>Default is autocommit</P>
+<P>note that if you are using -insertonly, and you are using
+transactions, and the input file contains an ID already in the
+database, then the transaction will fail because this script will try
+and insert a duplicate ID</P>
+<P>
+<H3><A NAME="r relationname">-r RELATION-NAME</A></H3>
+<P>This is the name of the stag node (XML element) that will be stored in
+the index; for example, with the XML below you may want to use the
+node name <STRONG>person</STRONG> and the unique key <STRONG>id</STRONG></P>
+<PRE>
+  &lt;person_set&gt;
+    &lt;person&gt;
+      &lt;id&gt;...&lt;/id&gt;
+    &lt;/person&gt;
+    &lt;person&gt;
+      &lt;id&gt;...&lt;/id&gt;
+    &lt;/person&gt;
+    ...
+  &lt;/person_set&gt;</PRE>
+<P>This flag should only be used when you want to store data</P>
+<P>
+<H3><A NAME="k uniquekey">-k UNIQUE-KEY</A></H3>
+<P>This node will be used as the unique/primary key for the data</P>
+<P>This node should be nested directly below the node that is being
+stored in the index - if it is more that one below, specify a path</P>
+<P>This flag should only be used when you want to store data</P>
+<P>
+<H3><A NAME="u uniquekey">-u UNIQUE-KEY</A></H3>
+<P>Synonym for <STRONG>-k</STRONG></P>
+<P>
+<H3><A NAME="create">-create</A></H3>
+<P>If specified, this will create a table for the relation name specified
+below; you should use this the first time you index a relation</P>
+<P>
+<H3><A NAME="idtype type">-idtype TYPE</A></H3>
+<P>(optional)</P>
+<P>This is the SQL datatype for the unique key; it defaults to <CODE>VARCHAR(255)</CODE></P>
+<P>If you know that your id is an integer, you can specify INTEGER here</P>
+<P>If your id is always a 8-character field you can do this</P>
+<PRE>
+  -idtype 'CHAR(8)'</PRE>
+<P>This option only makes sense when combined with the <STRONG>-c</STRONG> option</P>
+<P>
+<H3><A NAME="p parser">-p PARSER</A></H3>
+<P>This can be the name of a stag supported format (xml, sxpr, itext) -
+XML is assumed by default</P>
+<P>It can also be a module name - this module is used to parse the input
+file into a stag stream; see <A HREF="./Data/Stag/BaseGenerator.html">the Data::Stag::BaseGenerator manpage</A> for details
+on writing your own parsers/event generators</P>
+<P>This flag should only be used when you want to store data</P>
+<P>
+<H3><A NAME="q queryid">-q QUERY-ID</A></H3>
+<P>Fetches the relation/node with unique key value equal to query-id</P>
+<P>Multiple arguments can be passed by specifying -q multple times</P>
+<P>This flag should only be used when you want to query data</P>
+<P>
+<H3><A NAME="top nodename">-top NODE-NAME</A></H3>
+<P>If this is specified in conjunction with <STRONG>-q</STRONG> or <STRONG>-qf</STRONG> then all the
+query result nodes will be nested inside a node with this name (ie
+this provides a root for the resulting document tree)</P>
+<P>
+<H3><A NAME="qf queryfile">-qf QUERY-FILE</A></H3>
+<P>This is a file of newline-seperated IDs; this is useful for querying
+the index in batch</P>
+<P>
+<H3><A NAME="keys">-keys</A></H3>
+<P>This will write a list of all primary keys in the index</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="./Data/Stag.html">the Data::Stag manpage</A></P>
+<P>For more complex stag to database mapping, see <A HREF="./DBIx/DBStag.html">the DBIx::DBStag manpage</A> and the
+scripts</P>
+<P><EM>stag-db.pl</EM> use file DBM indexes</P>
+<P><EM>stag-storenode.pl</EM> is for storing fully normalised stag trees</P>
+<P><EM>selectall_xml</EM></P>
+
+</BODY>
+
+</HTML>

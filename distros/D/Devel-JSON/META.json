@@ -1,0 +1,68 @@
+{
+   "abstract" : "Easy JSON output for one-liners",
+   "author" : [
+      "Olivier Mengué <dolmen@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Devel-JSON",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Kwalitee" : "1.21",
+            "Test::More" : "0.88"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Encode" : "2.73",
+            "JSON::MaybeXS" : "1.003003"
+         },
+         "requires" : {
+            "Encode" : "2.05",
+            "Filter::Simple" : "0",
+            "JSON::MaybeXS" : "0",
+            "encoding" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/dolmen/p5-Devel-JSON",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dolmen/p5-Devel-JSON.git",
+         "web" : "https://github.com/dolmen/p5-Devel-JSON"
+      }
+   },
+   "version" : "1.000"
+}
+

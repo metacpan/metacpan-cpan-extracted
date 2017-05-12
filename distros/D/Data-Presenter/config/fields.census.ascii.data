@@ -1,0 +1,31 @@
+# fields.census.data
+
+@fields = qw(
+    lastname
+    firstname
+    cno
+    unit
+    ward
+    dateadmission
+    datebirth
+);
+
+%parameters = (
+    $fields[0]  => [14, 'U', 's', 'Last Name'],
+    $fields[1]  => [10, 'U', 's', 'First Name'],
+    $fields[2]  => [ 6, 'U', 'n', 'C No.'],
+    $fields[3]  => [ 6, 'U', 'a', 'Unit'],
+    $fields[4]  => [ 4, 'U', 'n', 'Ward'],
+    $fields[5]  => [10, 'U', 'a', 'Date of Admission'],
+    $fields[6]  => [10, 'U', 'a', 'Date of Birth'],
+);
+
+#                    ^   ^    ^    ^
+#                    width of field in output
+#                        U:  sort ascending (up); D: sort descending (down)
+#                             a:  alphabetical (case-insensitive)
+#                             n:  numerical
+#                             s:  ASCII-betical (case-sensitive)
+#                                  column header for use in &writeformat_plus_header
+
+$index = 2;

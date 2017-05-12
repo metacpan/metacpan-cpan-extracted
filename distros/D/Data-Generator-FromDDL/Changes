@@ -1,0 +1,32 @@
+Revision history for Perl extension Data-Generator-FromDDL
+
+0.06 2014-05-25T00:21:04Z
+
+    - Fixed bugs
+    - Updated document
+
+0.05 2014-05-21T15:24:53Z
+
+    - Support float, double, and boolean types.
+
+0.04 2014-05-18T12:30:52Z
+
+    - Changed 'INSERT INTO' statement to 'INSERT IGNORE INTO' for suppressing record duplicate error.
+
+0.03 2014-05-04T03:56:40Z
+
+    - Reduced memory usage to half.
+
+    - 25% speed up generating time.
+
+0.02 2014-05-01T06:11:15Z
+
+    - Added '--bytes_per_sql' option to datagen_from_ddl(1)
+      - This option is releated to MySQL's 'max_allowed_packet' variable. For details, see datagen_from_ddl(1).
+
+    - Fixed bugs
+
+0.01 2014-04-30T04:51:32Z
+
+    - original version
+

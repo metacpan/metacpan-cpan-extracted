@@ -1,0 +1,287 @@
+Revision history for DBIx-Perlish
+
+0.64 Wed Feb 11 13:02:55 CET 2015
+       Optimize multi-inserts a bit (use prepare/execute where feasible)
+
+0.63 Wed Oct 15 15:30:09 CEST 2014
+       From szabgab: add GitHub link to META files and thus to MetaCPAN.org
+
+0.62 Fri Aug  8 13:37:34 CEST 2014
+       Work around DBD::Pg NAME_uc/NAME_lc quoted fields bug
+
+0.61 Wed Dec  4 12:50:25 CET 2013
+       Initial support for HAVING.
+
+0.60 Wed Aug 28 13:35:17 CEST 2013
+       Fixes for perl 5.18.
+
+0.59  Fri Apr  6 19:35:38 CEST 2012
+       Fixes for perl 5.15.
+
+0.58  Tue Dec 20 12:32:16 CET 2011
+       Fix a bug with hash accesses within compound queries.
+
+0.57  Wed Nov 16 13:41:31 CET 2011
+       Fix a bug with arrays within compound queries.
+
+0.56  Thu Jul 14 10:41:45 CEST 2011
+       Relax hash reference extraction.
+
+0.55  Thu Sep 10 21:50:03 CEST 2009
+       Fix string concatenation with MySQL driver.
+
+0.54  Fri Jun 12 12:28:54 CEST 2009
+       Significantly improve handling of key fields.
+       This introduces a minor incompatibility, please
+       see INCOMPATIBILITIES section in the documentation
+       for detailed description.
+
+0.53  Fri May 29 20:13:34 CEST 2009
+       Support exponentiation operator with pg and pglite drivers.
+
+0.52  Mon Feb 16 13:03:17 CET 2009
+       Support parse-time conditional expressions with real
+       if statements.
+
+0.51  Fri Jan  9 16:50:15 CET 2009
+       Chase another problem with multiple joins.
+       Support REs as a term.
+
+0.50  Mon Dec  8 13:32:20 CET 2008
+       Fix multiple joins bug introduced in 0.48.
+       Change docs to reflect established best practices.
+
+0.49  Fri Nov 21 16:04:31 CET 2008
+       Add support for PgLite databases.
+
+0.48  Mon Nov 17 13:35:52 CET 2008
+       Better handling of multiple joins.  There are
+       probably still some rough edges in this code.
+       Reported by Mathieu Arnold.
+
+0.47  Thu Nov 13 09:50:25 CET 2008
+       Understand 0 in last unless 0..9.
+       Reported by Mathieu Arnold.
+
+0.46  Sat Nov  8 18:28:13 CET 2008
+       Understand global vars as variable table names.
+       Understand string constants as variable table names.
+       Support for database schemas "schemaname.tablename"
+       in table specifications, see the docs for details.
+       Thanks for Mathieu Arnold for bugreport and discussion.
+
+0.45  Thu Oct 16 10:15:08 CEST 2008
+       Add special handling for the "extract" function.
+
+0.44  Mon Sep  8 09:47:09 CEST 2008
+       Remove overoptimizations made in multiple DB
+       handlers code.
+
+0.43  Thu Aug 28 13:10:17 CEST 2008
+       Understand global hash vars in query subs.
+
+0.42 Thu Jun 26 14:04:29 2008
+       Add an ability for db_fetch {} to return a hash
+       keyed by one or more "key fields", similar to
+       selectall_hashref.
+
+0.41 Tue Jun 24 23:14:40 2008
+       Do not allow unfiltered updates and deletes
+       unless enabled with an "exec".
+
+0.40 Tue May 27 12:33:44 2008
+       Recognize integer values that are not IVs internally
+       in label syntax expressions.
+       In regexes, left-hand side can be a full term now,
+       not just a column specification.
+       Emulate case-insensitive regex match when possible.
+
+0.39  Thu Apr 24 16:04:21 2008
+       Fix handling of bound values in joins.
+
+0.38  Wed Feb 27 10:48:52 2008
+       Fix metacharacter escaping in regexes.
+
+0.37  Thu Feb  7 12:21:04 2008
+       Understand global scalar vars in query subs.
+
+0.36  Tue Jan 15 16:33:52 2008
+       Add an ability to register driver-dependent quirks.
+       Add "table_func_cast" quirk for Oracle.
+
+0.35  Tue Jan  8 16:53:06 2008
+       Add support for table functions.
+
+0.34  Mon Jan  7 17:19:15 2008
+       Add support for getting next value of a sequence
+       using "next" with a label argument syntax.
+       Selects without table specification are valid if there
+       is anything to return.  Still handle Oracle specially.
+
+0.33  Wed Dec 12 11:43:20 2007
+       Fix a bug in special import syntax implementation.
+       Add special import syntax tests.
+
+0.32  Tue Nov  6 10:07:13 2007
+       Fix incorrect regex handling with sqlite driver.
+
+0.31  Wed Oct 17 13:14:54 2007
+       Add new import syntax to ease working with
+       multiple DB handles at the same time, and
+       document various ways to use multiple database
+       handles with Perlish.
+       Add support for sort as an alternative to
+       order_by: label syntax.
+
+0.30  Tue Oct 16 14:31:59 2007
+       When run under Devel::Cover, do some cheating,
+       so that query subs that are parsed appear to
+       be "covered" (statements & subs).
+       Add tests to provide better test coverage.
+       Implement explicit logical AND.
+       Fix logical OR precedence problems in generated SQL.
+       Allow returns to be evaluated conditionally
+       (so that a single query sub can return different
+       things, depending on the outside information).
+       Please CPAN::Reporter.
+
+0.29  Tue Oct  9 15:16:48 2007
+       Allow aliased constants in return statements.
+
+0.28  Mon Oct  1 09:32:55 2007
+       Add support for inline views.
+
+0.27  Wed Jul 11 16:53:40 2007
+       Fix a tricky bug with outer lexical variables used inside a union
+       and friends.
+       Do not require semicolons between chained union-like constructs.
+
+0.26  Fri Jun 22 15:25:10 2007
+       Specialcase selects from DUAL in Oracle.
+
+0.25  Thu May 10 12:48:40 2007
+       Bugfix for inherited db handles.
+
+0.24  Thu May  3 09:30:20 2007
+       Understand ++,+= etc in updates.
+       Various documentation fixes.
+       Add support $m = {%h} syntax for bulk updates.
+
+0.23  Mon Mar 26 23:44:14 2007
+       Support inherited database handles.
+       Add special handling for package global $dbh.
+
+0.22  Tue Mar 20 12:10:33 2007
+       Understand multi-level hash dereferencing.
+       Make empty updates not valid.
+
+0.21  Thu Mar  8 16:45:26 2007
+       Understand `` for verbatim SQL.
+       Fixes to make it work with 5.9.5.
+
+0.20  Tue Mar  6 12:24:35 2007
+       Add support for variable column names.
+       Make the module be compatible with Error.pm.
+
+0.19  Wed Feb 28 16:58:35 2007
+       Modify the code so that it is usable with Safe.pm.
+       Better daignostic messages.
+       Joins understand <= as well as => delimiter.
+       Make db_select {} an alias to db_fetch {}.
+       Add support for <- @$ary and <- [1,2,3].
+
+0.18  Wed Feb 21 19:57:17 2007
+       Comparisons with undefined values are converted into
+       proper SQL syntax.
+       Inside regular expressions, interpolate hash and hashref
+       elements.
+       Implemented except {}.
+       Various types of joins implemented (by Dmitry Karasik).
+
+0.17  Tue Feb 20 10:26:21 2007
+       Added autogrouping when aggregates were seen in the return statement.
+
+0.16  Fri Feb 16 21:49:06 2007
+       Column descriptors can be embedded in strings.
+       More tests.
+       More docs.
+       Pod coverage test fix.
+       Added support for defined() as IS NOT NULL.
+       Added support for tab->id  <-  @ary syntax.
+
+0.15  Fri Feb 16 10:26:44 2007
+       sql() is now prototyped.
+       Implemented union {} and intersect {}.
+       String concatenation is now supported.
+
+0.14  Tue Feb 13 16:32:50 2007
+       Added post-if parse-time simple conditionals.
+       Added interpolation of scalars in regular expresions.
+       Added special handling of sysdate() in Oracle.
+       Verbatim sql() in inserts.
+       Verbatim sql() in query subs.
+       Support expressions in return statements.
+
+0.13  Fri Feb  9 12:28:20 2007
+       Added an ability to return complete table (tab.*).
+       Added two ways to specify table names at run-time.
+       Added an ability to use $hash{const} and $hash->{const} as values.
+       More tests.
+       More docs.
+
+0.12  Wed Feb  7 13:24:19 2007
+       Documentation and makefile cleanup.
+
+0.11  Wed Feb  7 12:38:38 2007
+       Sub-queries can refer to tables in the outer scope.
+       Translate "lc" and "uc" to "lower" and "upper", respectively.
+       Added support to EXISTS-style sub-queries.
+       Added support for SELECT DISTINCT.
+       Added support for special labels syntax.
+
+0.10  Tue Feb  6 09:46:58 2007
+       Added support for simple funcalls.
+       PadWalker module is now optional.
+       Terms can stand by themselves.
+
+0.09  Mon Feb  5 14:27:52 2007
+       Added db_update().
+
+0.08  Mon Feb  5 12:16:22 2007
+       Added support of subselects on threaded perls.
+       Regexes on older versions of SQLite made to work.
+       Implemented db_insert().
+
+0.07  Sun Feb  4 23:18:07 2007
+       Added regex support for SQLite.
+       Added support for "OR".
+
+0.06  Sun Feb  4 19:07:15 2007
+       Db_delete & delete implemented.
+       Native regexes are used if supported by RDBMS.
+       Case-insensitive regex matching supported.
+
+0.05  Sat Feb  3 23:28:15 2007
+       Subselects with <- syntax added.
+
+0.04  Thu Feb  1 13:08:29 2007
+       More docs.
+       Added OO interface.
+       Added init().
+       Fixed parsing of the constants in perl 5.8.4.
+       Added support for return ($u->id, foo => $z->name).
+       Added suppression of some warnings.
+
+0.03  Thu Feb  1 13:08:29 2007
+       More docs.
+       Introduce $SQL & @BIND_VALUES globals (for debugging).
+
+0.02  Thu Feb  1 10:06:49 2007
+       Binary comparison operators work.
+       Four binary arithmetic operators work.
+       last unless 5..20 works.
+       First cut at working db_fetch {}.
+
+0.01  Fri Jan 26 14:54:23 2007
+       Initial release.
+

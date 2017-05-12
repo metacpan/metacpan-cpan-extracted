@@ -1,0 +1,21 @@
+#!/opt/bin/perl
+
+use Deliantra::Map;
+
+for my $path (@ARGV) {
+   eval {
+      open my $fh, "<:raw:perlio:utf8", $path
+         or die "$path: $!\n";
+
+      <$fh> =~ /^arch map$/
+         or die "$path: not a deliantra map file\n";
+
+      my $map = new_from_file Deliantra::Map $path
+         or die "$path: file load error\n";
+
+      $map->write_file ($path);
+
+      1
+   } or warn $@;
+}
+

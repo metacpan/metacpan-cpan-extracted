@@ -1,0 +1,43 @@
+---
+abstract: 'A Mercurial plugin for Dist::Zilla'
+author:
+  - 'Shlomi Fish <shlomif@cpan.org>'
+build_requires:
+  Test::Kwalitee: '0'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Mercurial
+provides:
+  Dist::Zilla::Plugin::Mercurial:
+    file: lib/Dist/Zilla/Plugin/Mercurial.pm
+    version: '0.08'
+  Dist::Zilla::Plugin::Mercurial::Check:
+    file: lib/Dist/Zilla/Plugin/Mercurial/Check.pm
+    version: '0.08'
+  Dist::Zilla::Plugin::Mercurial::Push:
+    file: lib/Dist/Zilla/Plugin/Mercurial/Push.pm
+    version: '0.08'
+  Dist::Zilla::Plugin::Mercurial::Tag:
+    file: lib/Dist/Zilla/Plugin/Mercurial/Tag.pm
+    version: '0.08'
+  Dist::Zilla::PluginBundle::Mercurial:
+    file: lib/Dist/Zilla/PluginBundle/Mercurial.pm
+    version: '0.08'
+requires:
+  Dist::Zilla: '3'
+  File::Slurp: '0'
+  IPC::System::Simple: '0'
+  Moose: '0'
+  autodie: '0'
+  perl: '5.012'
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Mercurial
+  repository: https://bitbucket.org/shlomif/perl-dist-zilla-plugin-mercurial
+version: '0.08'

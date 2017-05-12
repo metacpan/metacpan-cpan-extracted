@@ -1,0 +1,5 @@
+~/projects/(project)/t/go/
+
+Contains symlinks to actual test scripts in t/all/.
+
+These scripts are intended to ship with the project distribution. 

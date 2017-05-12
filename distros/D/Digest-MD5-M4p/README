@@ -1,0 +1,4 @@
+The Digest::MD5 module is cloned from the Digest::MD5 module to support a variant 
+Apple iTunes implementation of the MD5 algorithm. If you don't know why this
+is so, don't bother with this module! It is incompatible with RSA and RFC 
+standards!

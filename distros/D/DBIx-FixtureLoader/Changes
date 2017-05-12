@@ -1,0 +1,39 @@
+Revision history for Perl extension DBIx-FixtureLoader
+
+0.12 2015-04-12T14:47:07Z
+    - support TSV files
+
+0.11 2013-10-21T13:23:47Z
+    - add `delete` option (delete all data before inserting.)
+
+0.10 2013-10-21T12:59:08Z
+    - depend on DBIx::TransactionManager for more flexible control
+
+0.09 2013-09-28T08:56:56Z
+    - add `skip_null_column` constructor option
+
+0.08 2013-09-04T04:43:18Z
+    - fix error for handling empty data file (taiyoh)
+
+0.07 2013-07-10T08:25:17Z
+    - fix test case (02_utf8.t) only
+
+0.06 2013-06-28T16:54:12Z
+    - fix test case only
+
+0.05 2013-06-26T01:38:31Z
+    - forcing Text::CSV_PP in 02_utf.t and 03_mysql.t if $Text::CSV_XS::VERSION < 1.00. ref #1
+      (Thank eserte for reporting)
+
+0.04 2013-06-25T14:04:35Z
+    - add `ignore` option for `INSERT IGNORE INTO`
+
+0.03 2013-06-18T04:41:17Z
+    - fix up dependencies
+
+0.02 2013-06-16T16:09:52Z
+    - fix `update` option handling
+    - update document
+
+0.01 2013-06-16T14:10:00Z
+    - original version

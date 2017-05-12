@@ -1,0 +1,6 @@
+Revision history for Perl extension Digest::FNV.
+
+0.01  Wed Sep  1 22:35:41 2010
+	- original version; created by h2xs 1.23 with options
+		-O -n Digest::FNV ./Digest-FNV/fnvlib/fnv.h
+

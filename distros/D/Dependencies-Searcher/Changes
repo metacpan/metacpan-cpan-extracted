@@ -1,0 +1,148 @@
+Revision history for Dependencies-Searcher
+
+0.65 2016-02-13 21:11 CET 
+ [FIX]
+ - #53 clean_everything() didn't clean when some underscores where
+   found. Also, qw(xxx) wasn't cleaned
+ - cpanfile not generated on perl 5.22
+ [EHANCEMENT]
+ - Add a one-liner from @climagic that is supposed to achieve the same aim
+   than this module (see documentation CAVEATS section)
+
+0.64 2014-07-16 17:15 UTC
+ [FIX]
+ - Fix some "qw/ xxx /" and "qw( xxx )" that weren't cleaned
+ [EHANCEMENT]
+ - Add a link to Dist::Zilla::Plugin::AutoPrereqs in the SEE ALSO section 
+   thanks to dolmen
+
+0.063 2014-07-15 19:29
+ [FIX]
+ - Fix #48 : some tests fails because we use modules that where supposed
+   to not be in core but are in recent version of Perl (especially with 
+   Module::CoreList)
+ - If we don't find a specific module version, we format the cpanfile
+   line in the right way anyway
+
+0.062 2014-02-16 00:09
+ [FIX]
+ - Now use the standard cpanfile syntax
+ - Now use appropriate version numbers (thanx chorny) 
+
+0.06.1 2014-01-06 09:25
+ [FIX]
+ - A pod error, need to deploy it again to run the tests
+
+0.06 2014-01-05 21:28
+ [FIX]
+ - First stable release !
+ - Only change some typos, since all the issues have been resolved
+
+0.05_11 2013-11-10 20:55
+ [EHANCEMENT]
+ - Remove some tests that weren't possible to pass
+
+0.05_10 2013-11-09 23:44
+ [FIX]
+ - Use a full path for Ack use tests, because the simple 'ack' command is not portable
+ - Fix bug #39, modules array that was supposed to be in scalar context but wasn't
+ - Broken link in POD
+ [EHANCEMENT]
+ - Moved some tests from the full-impl test suite to ack-requester test suite
+
+0.05_09 2013-11-03 23:08
+ [FIX]
+ - Fix the issue #37, POD lines starting by use or requires are not considered as code anymore
+ - Fix the issue #30 , using Path::Class for making the module portable (especially path separators) 
+ - A pod error
+ [EHANCEMENTS]
+ - Tests for found patterns (POD or code)
+ - Activate tests for POD
+ - Tests for cpanfile
+
+0.05_08 2013-10-20 21:58
+ [EHANCEMENTS]
+ - Format and clean code
+ - Write AckRequester Documentation
+ - Complete and correct Dependencies::Searcher documentation
+
+0.05_07 2013-10-04 21:23
+ [FIX]
+ - Close bug #25 about modules in corelist with a fresher version 
+ - New regex for cleaning, now everything is clean
+ - Module '1' were appearing when merging 2 use and require arrays
+ - Force the use of IPC::Run and add it (and IPC::Cmd) to Makefile.PL requirements
+ [EHANCEMENTS]
+ - Better logs 
+ - Make log file directory cross-platform (thanx mishin)
+
+0.05_06 2013-09-24 08:57
+ [FIX]
+ - Translate some french doc and remove some non UTF-8 stuff
+
+0.05_05 2013-09-23 20:45
+ [EHANCEMENTS]
+ - Log to a /tmp file
+ - Removes version numbers
+ [FIX]
+ - Stupid typo in Makefile.PL prerequisites
+
+0.05_04 2013-09-22 20:02
+ [EHANCEMENTS]
+ - Upgrade documentation
+ - Logs system with File::Stamped & Log::Minimal
+ - Use Module::Version's Perl API, not command line (avoid problems reported by Smoke testers)
+ - Now implement the Module::CoreList 2.99 instead of 2.4902  to use it's is_core() method (avoids to use another IPC::Cmd)  
+
+0.05_03 2013-09-17 07:51
+ [FIXES]
+ - A pod error
+ - Add App::Ack and Module::Version to TEST_REQUIRES in Makefile.PL
+
+0.05_02 2013-09-16 22:11
+ [FIXES]
+ - get_modules() method rewriting, using IPC::Cmd, not exec() or system()
+ - Fix crash when not finding any use or require
+ - Make the module more portable by using Cwd to get some dynamic path and avoid relative path problems
+ [EHANCEMENTS]
+ - Make Dependencies::Searcher using Dependencies::Searcher::AckRequester
+ - Build an independant module for the Ack part, that returns an array containing interesting lines
+ - Add a MIN_PERL_VERSION (5.010) in Makefile.PL as recommanded at CPANTS
+
+0.05_01 2013-09-10 23:10
+ [EHANCEMENTS]
+ - Test Ack availability in tests
+ - Remove tests that asks for a static number of results (non-predictable) 
+
+0.04    2013-09-09 17:38:24 
+ [FIXES]
+ - [RT #88528] Dependencies::Searcher::Utils have been removed
+   trying to clean up test failures
+
+0.03    2013-09-04 01:45
+ [FIXES]
+ - [RT #88392] Fix a bug about version number in Changes file
+ - Use the CPAN App::Ack, not the the one from packages managers 
+
+ [EHANCEMENTS]
+ - Can now get the count of core / non-core modules 
+ - Add some Moose helper traits for ArrayRef attributes, now you can
+   add and count and the code is easiest to read !
+ - Clean a lot of logs
+ - Change the dissociate() implementation with Moose traits 
+ - Add clean_everything(), uniq() and dissociate() methods
+ - Add two Moose attributes for core / non-core modules
+ - Ignore use warnings FATAL => 'all'; 
+ - Ignore parsed modules minimal perl versions.
+ - Moosification of the module.
+
+0.02    2013-09-02 20:48
+ - First version, released on an unsuspecting world. 
+ - Exile the module from the Shurf::Wax distribution because it seems 
+   it could be re-used for other projects and by you. 
+      
+0.01    2013-07-21
+ - Begin it as a script embedded in a Catalyst app.
+   See https://github.com/smonff/Shurf/commits/master/script/uses_finder.pl
+        
+

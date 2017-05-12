@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<employees page="1" pagesize="3">
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer" id="5">
+    <name>Mickey Mouse</name>
+  </employee>
+</employees>

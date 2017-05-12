@@ -1,0 +1,62 @@
+{
+   "abstract" : "Perl client for Disque, an in-memory, distributed job queue",
+   "author" : [
+      "Ezequiel Lovelle <ezequiellovelle@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "keywords" : [
+      "disque"
+   ],
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Disque",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Digest::SHA" : "0",
+            "Test::More" : "0.96",
+            "Test::TCP" : "1.17"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Encode" : "0",
+            "List::Util" : "0",
+            "Redis" : "1.97",
+            "perl" : "5.008004"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/lovelle/perl-disque/issues"
+      },
+      "homepage" : "https://github.com/lovelle/perl-disque",
+      "license" : [
+         "https://github.com/lovelle/perl-disque/blob/master/LICENSE"
+      ],
+      "repository" : {
+         "url" : "git://github.com/lovelle/perl-disque"
+      }
+   },
+   "version" : "0.04"
+}

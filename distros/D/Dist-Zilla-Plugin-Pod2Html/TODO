@@ -1,0 +1,7 @@
+* tests
+  - encoding?
+* what about encoding?
+* - a method for setting charset
+    (should be the default UTF-8 or ISO-8859-1?)
+
+

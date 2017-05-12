@@ -1,0 +1,8 @@
+---
+- |-
+  create table aa (
+      id      integer primary key,
+      name    varchar not null
+  )
+- "insert into aa values ( 1, 'aa1' )"
+- grant all on aa to test@192.168.0.10

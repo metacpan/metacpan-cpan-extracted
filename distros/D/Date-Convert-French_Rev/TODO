@@ -1,0 +1,22 @@
+-*- encoding: utf-8; indent-tabs-mode: nil -*-
+
+Todo list: mainly play the CPANTS game.
+
+In late October 2013, the CPANTS rating of Date::Convert::French_Rev
+was 103.33 (core kwalitee 83.33). Fails include:
+
+-- several fails caused by the absence of META.yaml
+-- POD errors
+-- list of prerequisites
+-- use warnings
+-- separate LICENSE file
+-- two experimental fails for Fedora
+-- being a prerequisite for another module.
+
+The 0.06 version aims to remove all these issues except for the Fedora
+issues and  for being a prerequisite.   But if some  issues remains or
+appears, the 0.07 issue will remove them.
+
+Well, when releasing version 0.07,  I did not check the META.json file
+and the  prereqs were missing.  So I had  to release version  0.08 and
+check the prereqs are there.

@@ -1,0 +1,22 @@
+language: "perl"
+perl:
+  - "5.16"
+  - "5.10"
+
+#before_script:
+#    - cpanm Moose  Moose::Role  MooseX::Types::Moose
+
+install:
+    - cpanm -v --installdeps --notest .
+
+script: "perl Makefile.PL; make test"
+# branches:
+#   only:
+#     - master
+notifications:
+  recipients:
+    - dana@acm.org
+  email:
+    on_success: change
+    on_failure: always
+#env:

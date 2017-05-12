@@ -1,0 +1,47 @@
+---
+abstract: 'Dist::Zilla plugin to set a minimum allowed version for prerequisites'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  CPAN::Meta: '0'
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::More: '0.96'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.033, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Prereqs-Floor
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::Prereqs::Floor:
+    file: lib/Dist/Zilla/Plugin/Prereqs/Floor.pm
+    version: '0.001'
+requires:
+  Dist::Zilla: '5'
+  Dist::Zilla::Role::PrereqSource: '0'
+  Moose: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-Prereqs-Floor.git
+version: '0.001'
+x_authority: cpan:DAGOLDEN

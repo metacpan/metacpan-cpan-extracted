@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/Device/DSE/Q1573.pm
+Q1573.xs
+test.pl
+t/001_load.t
+META.yml                                 Module meta-data (added by MakeMaker)

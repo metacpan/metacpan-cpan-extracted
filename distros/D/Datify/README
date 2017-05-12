@@ -1,0 +1,13 @@
+NAME
+    Datify - Simple stringification of data.
+
+DESCRIPTION
+    "Datify" is very similar to Data::Dumper, except that it's easier to
+    use, has better formatting and options, and is invented here.
+
+AUTHOR
+    Bob Kleemann
+
+SEE ALSO
+    Data::Dumper
+

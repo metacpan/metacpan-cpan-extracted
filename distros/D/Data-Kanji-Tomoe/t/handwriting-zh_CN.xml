@@ -1,0 +1,43 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE dictionary SYSTEM "dict.dtd">
+<!-- This is a chopped down file for testing the parser. -->
+<dictionary name="Tomoe Handwriting Dictionary">
+  <character>
+    <utf8>&#x4E00;</utf8>
+    <strokes>
+      <stroke>
+        <point x="75" y="464"/>
+        <point x="923" y="468"/>
+      </stroke>
+    </strokes>
+  </character>
+  <character>
+    <utf8>&#x4E01;</utf8>
+    <strokes>
+      <stroke>
+        <point x="93" y="198"/>
+        <point x="913" y="205"/>
+      </stroke>
+      <stroke>
+        <point x="495" y="203"/>
+        <point x="470" y="847"/>
+        <point x="405" y="784"/>
+      </stroke>
+    </strokes>
+  </character>
+  <character>
+    <utf8>&#x4E03;</utf8>
+    <strokes>
+      <stroke>
+        <point x="85" y="508"/>
+        <point x="895" y="338"/>
+      </stroke>
+      <stroke>
+        <point x="465" y="120"/>
+        <point x="483" y="802"/>
+        <point x="860" y="800"/>
+        <point x="905" y="667"/>
+      </stroke>
+    </strokes>
+  </character>
+</dictionary>

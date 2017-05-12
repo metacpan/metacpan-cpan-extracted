@@ -1,0 +1,36 @@
+{
+  "schema": {
+    "type": "//all",
+    "of": [
+      {
+        "type": "//rec",
+        "rest": "//any",
+        "required": { "key": { "type": "//int" } }
+      },
+      {
+        "type": "//rec",
+        "rest": "//any",
+        "required": { "opt": { "type": "//bool" } }
+      }
+    ]
+  },
+
+  "pass": { "obj": [ "key-0-opt-T", "key-0-opt-T-rest-F" ] },
+
+  "fail": {
+    "arr" : { "*": [ { "error": [ "type" ], "data": [ ], "check": [ "of", 0 ] } ] },
+    "bool": { "*": [ { "error": [ "type" ], "data": [ ], "check": [ "of", 0 ] } ] },
+    "null": { "*": [ { "error": [ "type" ], "data": [ ], "check": [ "of", 0 ] } ] },
+    "num" : { "*": [ { "error": [ "type" ], "data": [ ], "check": [ "of", 0 ] } ] },
+    "obj" : {
+      "key-0": [ { "error": [ "missing" ], "data": [ ], "check": [ "of", 1 ] } ],
+      "key-1": [ { "error": [ "missing" ], "data": [ ], "check": [ "of", 1 ] } ],
+      "opt-T": [ { "error": [ "missing" ], "data": [ ], "check": [ "of", 0 ] } ],
+
+      "key-pants"    : [ { "error": [ "type" ], "data": [ "key" ], "check": [ "of", 0, "required", "key" ] } ],
+      "key-1-unknown": [ { "error": [ "missing" ], "data": [ ],       "check": [ "of", 1 ] } ],
+      "alpha-num"    : [ { "error": [ "missing" ], "data": [ ],       "check": [ "of", 0 ] } ]
+    },
+    "str" : { "*": [ { "error": [ "type" ], "data": [ ], "check": [ "of", 0 ] } ] }
+  }
+}

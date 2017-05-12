@@ -1,0 +1,39 @@
+NAME
+    Dist::Zilla::Plugin::Meta::Dynamic::Config - set dynamic_config in
+    resultant META files
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+      # In dist.ini
+
+      [Meta::Dynamic::Config]
+
+DESCRIPTION
+    Dist::Zilla::Plugin::Meta::Dynamic::Config is a Dist::Zilla plugin that
+    allows an author to specify in the "META.json" and/or "META.yml" files
+    produced by Dist::Zilla that their distribution performs some dynamic
+    configuration as per CPAN::Meta::Spec.
+
+    Normally this would not be required, but if you are providing your own
+    "Makefile.PL" or Build.PL and asking questions, sensing the environment,
+    etc. to generate a list of prereqs then "dynamic_config" should be set
+    to a true value to satisfy the Meta specification.
+
+SEE ALSO
+    Dist::Zilla
+
+    CPAN::Meta::Spec
+
+    Dist::Zilla::Plugin::FakeFaker
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2011 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

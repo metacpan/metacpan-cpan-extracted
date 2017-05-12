@@ -1,0 +1,14 @@
+SYNOPSIS
+
+     use Dist::Zilla::Util::MergePrereqsFromDistInis qw(merge_prereqs_from_dist_inis);
+    
+     my $merged_prereqs = merge_prereqs_from_dist_inis(paths => ["../Dist1/dist.ini", "../Dist2/dist.ini"]);
+
+DESCRIPTION
+
+    This module provides merge_prereqs_from_dist_inis().
+
+SEE ALSO
+
+    Dist::Zilla
+

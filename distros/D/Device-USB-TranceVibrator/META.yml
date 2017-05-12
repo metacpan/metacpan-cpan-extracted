@@ -1,0 +1,22 @@
+---
+abstract: 'interface to toy Trance Vibrator'
+author:
+  - 'HIROSE Masaaki, C<< <hirose31@gmail.com> >>'
+build_requires:
+  Test::Base: 0
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.71'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Device-USB-TranceVibrator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Device::USB: 0
+  UNIVERSAL::require: 0
+version: 0.01

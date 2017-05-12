@@ -1,0 +1,49 @@
+Data-Range-Compare-Stream 
+======================================
+
+This module is intended to get past the horizontal scaling limits of Data::Range::Compare.
+Although similar to Data::Range::Compare, the module itself is complete depature in both design
+and implementation.
+
+Take a look at the perl scripts in the "examples" folder to get a good idea of how to use and
+extend this module for your own needs.
+
+INSTALLATION
+
+Before you upgrade to version 3.x or 4.x.
+
+Changes that may break your code between version 2.020 and 3.021 and up.
+
+1. Data::Range::Compare::Stream::Iterator::Compare::ColumnRelations has been remoevd!
+   The features have been moved into Data::Range::Compare::Stream::Iterator::Compare::Result
+
+2. Iterator objects no longer support $iterator->set_root_column_id($id);
+
+3. Data::Range::Compare::Stream::Iterator::Consolidate::OverlapAsColumn had a race condition that prevented 
+  root column_ids from being set, this has been resovled.
+
+4. Generic factory constructors have been added as of 4.x.
+  a. All iterator classes and subclasses support the factory_instance=>$obj argument.
+  b. All range objects now support $range->factory($start,$end,$data);
+  c. A generic callback OO range class has been added see:  Data::Range::Compare::Stream::CallBack 
+    c.1 when using  Data::Range::Compare::Stream::CallBack, make sure to set the factory_instance=>$obj 
+      in any iterator you create!
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+COPYRIGHT AND LICENCE
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available.
+
+

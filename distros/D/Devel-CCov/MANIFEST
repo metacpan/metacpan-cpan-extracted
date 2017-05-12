@@ -1,0 +1,14 @@
+CCov.xs
+CHANGES
+MANIFEST
+Makefile.PL
+README
+TODO
+ccovanalyze
+ccovinstrument
+lib/Devel/CCov.pm
+lib/Devel/CCov/ccov_registry.c
+patch/Makefile.PL.patch
+patch/README
+patch/TEST.patch
+patch/makeperl.patch

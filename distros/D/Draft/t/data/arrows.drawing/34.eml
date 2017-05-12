@@ -1,0 +1,13 @@
+Units: mm
+0: 170
+0: -130
+0: 0
+Location: ../arrow.drawing/
+Location: ../arrow-mod.drawing/
+Ignore: ../arrow.drawing/1.eml
+Ignore: ../arrow.drawing/2.eml
+Ignore: ../arrow.drawing/7.eml
+License: http://creativecommons.org/licenses/sa/1.0/
+Copyright: Bruno Postle <bruno@postle.net>
+Type: reference
+Version: draft1

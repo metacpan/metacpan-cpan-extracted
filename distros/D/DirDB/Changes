@@ -1,0 +1,27 @@
+Revision history for Perl extension DirDB.
+
+0.01  Mon Jun  3 15:59:28 2002
+	- original version; created by h2xs 1.20 with options
+		-A -X -n DirDB
+0.05 11 Nov 2003  dln
+	added saving of hash references
+	added check for "$rootpath LOCK$key" to go away in FETCH 
+	added tying of stored hashrefs
+	
+0.06 18 Nov 2003 dln
+	added recursive return of deleted directories into hashrefs
+
+0.08 8 Dec dln
+	moved Storable function to DirDB::Storable
+	more documentation
+
+0.09 27 Jan 2004
+        remove Storable from dependency list in makefile
+
+0.10 10 Mar 2004
+        add BLESS metadata.  When set, a hashref will be blessed
+	accordingly.  And it will be set when a blessed hashref is stored.
+
+0.12 15 Jan 2008
+	explicitly closing dirhandles that caused test failures on cygwin/5.8.8
+

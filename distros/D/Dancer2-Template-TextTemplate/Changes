@@ -1,0 +1,39 @@
+Revision history for Dancer2-Template-TextTemplate
+
+1.003     2014-04-17 19:04:56+02:00 Europe/Paris
+
+    - bump version to make it an official release
+
+1.002     2014-04-15 23:50:09+02:00 Europe/Paris (TRIAL RELEASE)
+
+    - require perl-5.10.0 instead of perl-5.8.9:
+      Perl 5.8.9's "warnings" pragma uses "Carp", which calls eval(). Since
+      "use warnings" is (rightfully imho) a default in the
+      D2::T::TextTemplate's "prepend" option, and since eval() is (even more
+      rightfully) forbidden by default in a Safe compartment, I see no other
+      solution.
+
+1.001     2014-04-15 05:57:08+02:00 Europe/Paris
+
+    - make changes introduced by 1.0 official
+    - remove ExtUtils::MakeMaker dependency
+
+1.0       2014-04-14 02:57:57+02:00 Europe/Paris (TRIAL RELEASE)
+
+    - replace the ":load" optag by the "require", "caller" and "dofile"
+      opcodes (perl-5.8.9 version of the Opcode module doesn't define ":load")
+    - requires IPC::System::Simple for "use autodie ':all'" in tests
+    - add Module::Build
+    - fix POD errors
+
+0.2       2014-04-10 00:27:31+02:00 Europe/Paris
+
+    - safe, safe_opcodes and safe_disposable options implemented
+    - cache_stringrefs option implemented
+    - prepend option implemented
+    - fixed a bug in render()'s return value that warns only in perl-5.19.x
+    - improved build system (more tests, cpanfile)
+
+0.1       2014-04-09 05:10:53+02:00 Europe/Paris
+
+    - first version, not tested enough

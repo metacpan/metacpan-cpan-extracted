@@ -1,0 +1,54 @@
+---
+abstract: 'Text::Template engine for Dancer2'
+author:
+  - 'Thibaut Le Page <thilp@cpan.org>'
+build_requires:
+  File::Temp: '0'
+  IPC::System::Simple: '0'
+  Module::Build: '0.3601'
+  Test::API: '0'
+  Test::Fatal: '0'
+  Test::More: '0.88'
+  autodie: '0'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Template-TextTemplate
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+  package:
+    - DB
+provides:
+  Dancer2::Template::TextTemplate:
+    file: lib/Dancer2/Template/TextTemplate.pm
+    version: '1.003'
+  Dancer2::Template::TextTemplate::FakeEngine:
+    file: lib/Dancer2/Template/TextTemplate/FakeEngine.pm
+    version: '1.003'
+requires:
+  CHI: '0'
+  Carp: '0'
+  Dancer2::Core::Role::Template: '0'
+  Dancer2::Core::Types: '0'
+  Moo: '0'
+  MooX::Types::MooseLike::Base: '0'
+  Safe: '2.26'
+  Scalar::Util: '0'
+  Text::Template: '1.46'
+  namespace::clean: '0'
+  perl: 5.010_000
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/thilp/Dancer2-Template-TextTemplate/issues
+  homepage: https://github.com/thilp/Dancer2-Template-TextTemplate
+  repository: https://github.com/thilp/Dancer2-Template-TextTemplate.git
+version: '1.003'

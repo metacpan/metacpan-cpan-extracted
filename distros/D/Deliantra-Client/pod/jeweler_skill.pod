@@ -1,0 +1,106 @@
+=head1 X<jeweler_skill>Jeweler skill
+
+Last update: Fri Sep  2 18:46:53 CEST 2006
+
+Here the system and usage of the B<new> jeweler skill is described.
+
+=head2 Where to get it? How to!? What??
+
+You can learn the jeweler skill by reading a I<scroll of jewelers>. If
+you want to make rings and amulets you also have to find a I<jewelers
+workbench>. The easiest place to find that is in a I<Jewelers Workshop> which
+can be found in towns (for example in Scorn).
+
+=head2 Identifying jewelery
+
+The most basic function of the jeweler skill is identifying rings and
+amulets, the higher your jeweler level is the more and the better you can
+identify jewelery.
+
+You identify jewelery by standing above it or having it in your inventory
+and entering:
+
+   use_skill jeweler
+
+You will see the information about the identified jewelery and will gain
+exp for the identified objects.
+
+=head2 Generating blank rings and amulets
+
+For this you need to find a I<jewelers workbench>. You can generate blank
+rings and amulets of adornment from B<large gold nuggets>, but you need
+at least B<10 large gold nuggets> for a ring or an amulet!  ou can place
+multiples of 10 nuggets in the bench and such make multiple rings or
+amulets of adornment at once.
+
+So place 10 large gold nuggets in the bench and then enter:
+
+   use_skill jeweler make ring
+
+Or if you want to make a blank amulet of adornment:
+
+   use_skill jeweler make amulet
+
+=head2 Analyzing jewelery
+
+If you want to know what your chances are for crafting a specific ring or
+amulet place it in the workbench and enter:
+
+   use_skill jeweler analyze
+
+You will get output like the following, which gives you a clue whether
+it's futile or not to try to make this ring at your current level in the
+jeweler skill:
+
+   ring (str+1)(dex+2): Projected success rate: Way above your skill
+   ring (resist electricity +22)(con-1): Projected success rate: Way above your skill
+
+=head2 Merging rings or amulets
+
+You can merge the abilities of two rings or amulets, or even between a
+ring and an amulet. For example: toss two rings in the workbench, and
+type:
+
+   use_skill jeweler merge analyze
+
+And you will get a similar output as for C<use_skill jeweler analyze>,
+which tells you whether you have a chance. If you are confident enter this
+command to merge the jewelery:
+
+   use_skill jeweler merge
+
+You either get the merged improved ring/amulet or a very bad ring/amulet.
+
+=head2 Improving rings and amulets
+
+Improving rings is a bit more complicated, but it generally follows this
+schema:  You have to put N base items, which indicate your plan, into the
+workbench. For example two B<potions of strength> indicate that you want to
+improve a ring from (Str+0) to (Str+1).
+
+Then you just use your jeweler skill to calculate how many additional gems
+you need to fullfill that plan:
+
+   use_skill jeweler
+
+You will get an output similar to this (here a B<ring (str+1)(dex+2)> and
+two B<wisdom potions> were placed in the workbench):
+
+   You want to make a ring (wis+1)(str+1)(dex+2): Projected success rate: Slightly above 50:50
+   You recognize that you are short of: 200 times gem, 1600 times ruby
+
+Next you put 200 diamonds and 1600 rubies in the bench and try your luck
+with the same command. You either see:
+
+   You succeed.
+
+And have a B<ring (Str+1)(Dex+2)(Wis+1)> in your workbench, or you see:
+
+   You fail!
+
+And have a B<ring (Str-1)(Dex-2)(Wis-1)> in your workbench.
+
+If you succeed to make the ring, you will get more experience. The more
+difficult crafting a ring is, the more experience you get.
+
+

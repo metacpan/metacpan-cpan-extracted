@@ -1,0 +1,267 @@
+# NAME
+
+DBIx::Class::DeleteAction - Define delete triggers
+
+# SYNOPSIS
+
+ # Actor DBIC class
+ package Your::Schema::Actor;
+ use strict;
+ use warnings;
+ 
+
+ use base 'DBIx::Class';
+
+ __PACKAGE__->load_components("DeleteAction","PK","Core");
+ 
+
+ __PACKAGE__->table("actor");
+ __PACKAGE__->add_columns(qw/id name/);
+ __PACKAGE__->set_primary_key('id');
+ 
+
+ __PACKAGE__->has_many(
+    'actorroles' => 'MyDB::Schema::ActorRole',
+    { 'foreign.actor' => 'self.id' },
+    { delete_action => 'delete' }
+ );
+ 
+
+ # Actor Role DBIC class
+ package Your::Schema::ActorRole;
+ use strict;
+ use warnings;
+ 
+
+ use base 'DBIx::Class';
+ 
+
+ __PACKAGE__->load_components("DeleteAction","PK","Core");
+ 
+
+ __PACKAGE__->table("actor_role");
+ __PACKAGE__->add_columns(qw/id name actor production/);
+ __PACKAGE__->set_primary_key('id');
+ 
+
+ __PACKAGE__->belongs_to(
+    'actor' => 'MyDB::Schema::Actor',
+    { 'foreign.id' => 'self.actor' },
+    { delete_action => 
+        sub {
+            my ($self,$params) = @_;
+            # Do something special
+        } 
+    }
+ );
+ 
+
+ __PACKAGE__->belongs_to(
+    'production' => 'MyDB::Schema::Production',
+    { 'foreign.id' => 'self.production' },
+    { delete_action => 'deny' }
+ );
+ 
+
+ # Somewhere else
+ $schema->txn_do(sub {
+    $actor->delete();    
+ });
+ # Deletes all related actorroles only if they don't have a production
+ # Finally deletes the actor itself (Always use transactions!!!)
+ 
+
+ $schema->txn_do(sub {
+    $actor_role->delete();    
+ });
+ # Calls custom subroutine on actor
+ # Denies deletion if a production is related
+
+# DESCRIPTION
+
+With this DBIx::Class component you can specify actions that should be
+triggered on a row delete. A delete action is specified by adding the
+'delete_action' key to the optional attribute HASH reference when specifing
+a new relation (see [DBIx::Class::Relationship](http://search.cpan.org/search?mode=module&query=DBIx::Class::Relationship)).
+
+The following delete actions are supported:
+
+- * null
+
+Set all columns in related rows pointing to this record to NULL. Only works
+on 'has_many' relationships.
+
+- * delete OR cascade
+
+Delete all related records one by one. This can trigger further delete 
+actions.
+
+- * deleteall
+
+Delete all related records in a single step. This does not trigger further 
+delete actions.
+
+Only works on 'has_many' relationships.
+
+- * deny
+
+Deny deletion if this record is being referenced from other rows.
+
+- * CODE reference
+
+Executes the code referece on delete. The current [DBIx::Class::Row](http://search.cpan.org/search?mode=module&query=DBIx::Class::Row) object 
+and the name of the relation are passed to the code reference.
+
+- * STRING
+
+Execute a method with the given name. The method will be called on the current
+[DBIx::Class::Row](http://search.cpan.org/search?mode=module&query=DBIx::Class::Row) object and will be passed the name of the relation.
+
+- * ignore
+
+Do nothing
+
+## Custom delete handlers
+
+If you set the `delete_action` to execute a method or a code reference the
+method will be called with the following parameters:
+
+- * $self
+
+The [DBIx::Class::Row](http://search.cpan.org/search?mode=module&query=DBIx::Class::Row) object the delete action has been called upon.
+
+- * HASHREF
+
+A hashref of named parameters
+
+    - * relationship
+
+    The name of the relationship that is currently being processed.
+
+    - * related
+
+    The related object(s) for the given object and relationship.
+
+    Depending on the type of the relationship this can either be a 
+    [DBIx::Class::Row](http://search.cpan.org/search?mode=module&query=DBIx::Class::Row) or a [DBIx::Class::ResultSet](http://search.cpan.org/search?mode=module&query=DBIx::Class::ResultSet) object.
+
+    - * seen 
+
+    An arraryref with object identifiers which have already been processed.
+    If you want to call another [delete](http://search.cpan.org/search?mode=module&query=delete) method from your code you MUST
+    pass on this variable so that we can ensure that each object/row is handled
+    only once. 
+
+    - * Extra values
+
+    Any other values that you pass to 'delete'.
+
+## delete
+
+ $object->delete();
+ OR
+ $object->delete(HASHREF);
+
+This method overdrives the [DBIx::Class::Row](http://search.cpan.org/search?mode=module&query=DBIx::Class::Row) delete method. You can
+add arbitrary data as HASHREF which will be passed to your custom
+delete handles. 
+
+Make sure that you ALWAYS call `delete` always inside a TRANSACTION 
+block. 
+
+If you call another `delete` from within a custom delete handler always pass 
+on the `seen` parameter.
+
+# EXAMPLE
+
+## Tree example
+
+This example shows a very simple tree schema, where each node points to its
+parent node. Once you delete an item from the tree, all child nodes will be
+appended to the parent node of the deleted node.
+
+ package MyApp::Treenode;
+ use strict;
+ use warnings;
+ 
+
+ use parent qw(DBIx::Class);
+ 
+
+ __PACKAGE__->load_components(
+   "+DBIx::Class::DeleteAction",
+   "PK",
+   "Core",
+ );
+ 
+
+ __PACKAGE__->table("treenode");
+ __PACKAGE__->add_columns(qw/id name parent/);
+ __PACKAGE__->set_primary_key("id");
+ 
+
+ # Do not delete parent node
+ __PACKAGE__->might_have(
+    'parent' => 'MyApp::Treenode',
+    { "foreign.id" => "self.parent" },
+    { delete_action => 'ignore' },
+ );
+ 
+
+ # Update all child nodes
+ __PACKAGE__->has_many(
+    'children' => 'MyApp::Treenode',
+    { "foreign.parent" => "self.id" },
+    { delete_action => sub {
+        my ($self,$params) = @_;
+        $params->{related}->update({
+            parent  => $self->get_column('parent'), 
+        });
+    } },
+ );
+
+## Debugging
+
+Use `DBIC_TRACE=1` or set `__PACKAGE__-`storage->debug(1);> to see what
+is exactly going on.
+
+# CAVEATS
+
+Note that the `delete` method in [DBIx::Class::ResultSet](http://search.cpan.org/search?mode=module&query=DBIx::Class::ResultSet) will not run 
+DeleteAction triggers. See `delete_all` if you need triggers to run.
+
+Any database-level cascade, restrict or trigger will be performed AFTER 
+DBIx-Class-DeleteAction based triggers.
+
+Always use transactions, or else you might end up with inconsistent data.
+
+# SUPPORT
+
+Please report any bugs or feature requests to 
+L<bug-dbix-class-deleteaction@rt.cpan.org>, or through the web interface at
+<http://rt.cpan.org/Public/Bug/Report.html?Queue=DBIx::Class::DeleteAction>.
+I will be notified, and then you'll automatically be notified of progress on 
+your report as I make changes.
+
+# AUTHOR
+
+    Maroš Kollár
+    CPAN ID: MAROS
+    maros [at] k-1.com
+    L<http://www.revdev.at>
+
+# ACKNOWLEDGEMENTS 
+
+This module was written for Revdev <http://www.revdev.at>, a nice litte
+software company I run with Koki and Domm (<http://search.cpan.org/~domm/>).
+
+# COPYRIGHT
+
+DBIx::Class::DeleteAction is Copyright (c) 2008-9 Maroš Kollár 
+- <http://www.revdev.at>
+
+This program is free software; you can redistribute it and/or modify it under 
+the same terms as Perl itself.
+
+The full text of the license can be found in the
+LICENSE file included with this module.

@@ -1,0 +1,49 @@
+---
+abstract: 'coveralls backend for Devel::Cover'
+author:
+  - 'Kan Fushihara <kan.fushihara@gmail.com>'
+build_requires:
+  FindBin: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Cover-Report-Coveralls
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::Cover::Report::Coveralls:
+    file: lib/Devel/Cover/Report/Coveralls.pm
+    version: '0.11'
+requires:
+  Devel::Cover: '1.02'
+  HTTP::Tiny: '0.043'
+  IO::Socket::SSL: '1.42'
+  JSON::PP: '0'
+  Mozilla::CA: '0'
+  Net::SSLeay: '1.49'
+  YAML: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kan/coveralls-perl/issues
+  homepage: https://github.com/kan/coveralls-perl
+  repository: git://github.com/kan/coveralls-perl.git
+version: '0.11'
+x_contributors:
+  - 'Masayuki Matsuki <y.songmu@gmail.com>'
+  - 'David Steinbrunner <dsteinbrunner@pobox.com>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'James Raspass <jraspass@gmail.com>'

@@ -1,0 +1,49 @@
+---
+abstract: 'Authenticate with Twitter'
+author:
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+  - 'Dancer Core Developers'
+build_requires:
+  Dancer::Test: '0'
+  File::Spec: '0'
+  HTTP::Request::Common: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::MockObject::Extends: '0'
+  Test::More: '0.88'
+  lib: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Auth-Twitter
+provides:
+  Dancer::Plugin::Auth::Twitter:
+    file: lib/Dancer/Plugin/Auth/Twitter.pm
+    version: '0.07'
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Net::Twitter::Lite::WithAPIv1_1: '0.12006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter/issues
+  homepage: https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter
+  repository: https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter.git
+version: '0.07'
+x_authority: cpan:SUKRIA
+x_contributors:
+  - 'Alexis Sukrieh <alexis@weborama.com>'
+  - 'Michal Wojciechowski <odyniec@odyniec.net>'
+  - 'Simon Elsbrock <simon@iodev.org>'
+  - 'Vyacheslav Matyukhin <mmcleric@yandex-team.ru>'
+  - 'Will Orr <will@worrbase.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

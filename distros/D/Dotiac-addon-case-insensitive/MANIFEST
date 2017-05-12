@@ -1,0 +1,14 @@
+lib/Dotiac/DTL/Addon/case_insensitive.pm
+Makefile.PL
+MANIFEST
+LICENSE
+Changes
+META.yml
+README
+t/4_pod.t
+t/7_special_ci.t
+t/special_ci.html
+t/special_ci2.html
+t/special_ci_off.html
+t/special_ci_static.html
+t/Dtest.pm

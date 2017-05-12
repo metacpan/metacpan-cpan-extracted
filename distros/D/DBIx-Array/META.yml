@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                DBIx-Array
+version:             0.49
+abstract:            This module is a wrapper around DBI with array interfaces
+license:             ~
+author:              
+    - Michael R. Davis (domain=>stopllc,tld=>com,account=>mdavis)
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DBD::CSV:                      0
+    DBI:                           0
+    Package::New:                  0
+    Test::Simple:                  0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

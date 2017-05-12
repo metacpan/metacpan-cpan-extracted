@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d699314121a92f76527dd7c04412b85572b36055 AUTHOR_PLEDGE
+SHA1 45f6f99911546372dadc770383df104e62054659 CONTRIBUTORS
+SHA1 183f869578bfc9af9ff24f2d6006ce7cbdc15434 Changes
+SHA1 ab406460d3128626ee056ba0eaec875869047d6e INSTALL
+SHA1 4635555632db4eb10b992acc94a499271d2044ef LICENSE
+SHA1 0168da5d2e99672d95a6d2e07cfee7c64961355f MANIFEST
+SHA1 54d5ce1d3ec61d907da329787b0852d16d8fa96d MANIFEST.SKIP
+SHA1 822eb5e81bb1dc654f8580e97832c833c932fa89 META.json
+SHA1 f13f1bb13ffed3fe7f9558c7d11ebf051956fa0a META.yml
+SHA1 219249e6417d5b1a1618dfd005d210cd2ddf7384 Makefile.PL
+SHA1 562380ceae826b7f87efa889f32b5c0174a1be0f README
+SHA1 9439558ea8192dfd4359a13c014596e299e10606 corpus/lib/DZT/Sample.pm
+SHA1 f6da95f3654d29c7b2a4c1615e1b216ba7502fd0 cpanfile
+SHA1 f0173bd78acaadcfad6e0c69a14f2050b67d38c8 dist.ini
+SHA1 7adf1b2da9b1399ba584338f55b687621aa13dd5 doap.xml
+SHA1 8b42a9205548d8a0a02c983ac7779c132f16d0fe lib/Dist/Zilla/Plugin/NextVersion/Semantic.pm
+SHA1 cbeaae04027d4507b14388138919550fa276b14b lib/Dist/Zilla/Plugin/PreviousVersion/Changelog.pm
+SHA1 c4fd7e33a007106f600185f6c14f296be2c257e9 lib/Dist/Zilla/Role/YANICK/PreviousVersionProvider.pm
+SHA1 708ad9bc626dd8f225c2e7ee6b6c7dfdff6943e3 t/00-compile.t
+SHA1 0f9d10fed1e1c1bee581018c1eb8769fc67b1a6e t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 65381af3e57600011d31d116a017815c8e67715b t/basic.t
+SHA1 866c813c8868603e7d3c14b67401c88439238110 t/format.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlV/MFcACgkQ34Hwf+GwC4zUYgCgjf4MFK7POrwsXQ9TfZBa/HOe
+/uIAoPmeQo7JTWarJ6F8McS/086KNVX7
+=g1Q9
+-----END PGP SIGNATURE-----

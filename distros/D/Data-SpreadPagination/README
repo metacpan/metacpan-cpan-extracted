@@ -1,0 +1,144 @@
+NAME
+    Data::SpreadPagination - Page numbering and spread pagination
+
+SYNOPSIS
+      use Data::SpreadPagination;
+      my $pageInfo = Data::SpreadPagination->new({
+        totalEntries      => $totalEntries, 
+        entriesPerPage    => $entriesPerPage, 
+        # Optional, will use defaults otherwise.
+        # only 1 of currentPage / startEntry can be provided.
+        currentPage       => $currentPage,
+        startEntry        => $startEntry,
+        maxPages          => $maxPages,
+      });
+
+      # General page information
+      print "         First page: ", $pageInfo->first_page, "\n";
+      print "          Last page: ", $pageInfo->last_page, "\n";
+      print "          Next page: ", $pageInfo->next_page, "\n";
+      print "      Previous page: ", $pageInfo->previous_page, "\n";
+
+      # Results on current page
+      print "First entry on page: ", $pageInfo->first, "\n";
+      print " Last entry on page: ", $pageInfo->last, "\n";
+
+      # Page range information
+      my $pageRanges = $pageInfo->page_ranges;
+
+      # Print out the page spread
+      foreach my $page ($pageInfo->pages_in_spread()) {
+        if (!defined $page) {
+          print "... ";
+        } elsif ($page == $pageInfo->current_page) {
+          print "<b>$page</b> ";
+        } else {
+          print "$page ";
+        }
+      }
+
+DESCRIPTION
+    The object produced by Data::SpreadPagination can be used to create a
+    spread pagination navigator. It inherits from Data::Page, and has access
+    to all of the methods from this object.
+
+    In addition, it also provides methods for creating a pagination spread,
+    to allow for keeping the number of pagenumbers displayed within a
+    sensible limit, but at the same time allowing easy navigation.
+
+    The object can easily be passed to a templating system such as Template
+    Toolkit or be used within a script.
+
+METHODS
+  new()
+      my $pageInfo = Data::SpreadPagination->new({
+        totalEntries      => $totalEntries, 
+        entriesPerPage    => $entriesPerPage, 
+        # Optional, will use defaults otherwise.
+        # only 1 of currentPage / startEntry can be provided.
+        currentPage       => $currentPage,
+        startEntry        => $startEntry,
+        maxPages          => $maxPages,
+      });
+
+    This is the constructor of the object. It requires an anonymous hash
+    containing the 'totalEntries', how many data units you have, and the
+    number of 'entriesPerPage' to display. Optionally the 'currentPage' /
+    'startEntry' (defaults to page/entry 1) and 'maxPages' (how many pages
+    to display in addition to the current page) can be added.
+
+  max_pages()
+      print "Maximum additional pages to display is ", $pageInfo->max_pages(), "\n";
+
+    This method returns the maximum number of pages that are included in the
+    spread pagination in addition to the current page.
+
+  page_ranges()
+      $ranges = $pageInfo->page_ranges();
+      for my $qtr (1..4) {
+        my $range = $ranges->[$qtr-1];
+        if (defined $range) {
+          print "Qtr $qtr: no pages\n";
+        } else {
+          print "Qtr $qtr: pages " . $range->[0] . " to " . $range->[1] . "\n";
+        }
+      }
+
+    This method returns either an array or an arrayref (based upon context)
+    of the page ranges for each of the four quarters in the spread. Each
+    range is either undef for an empty quarter, or an array of the lower and
+    upper pages in the range.
+
+  pages_in_spread_raw()
+      # Print out the page spread
+      foreach my $page ($pageInfo->pages_in_spread_raw()) {
+        if ($page == $pageInfo->current_page) {
+          print "<b>$page</b> ";
+        } else {
+          print "$page ";
+        }
+      }
+
+    This method returns either an array or an arrayref (based upon context)
+    of purely the page numbers within the spread.
+
+  pages_in_spread()
+      # Print out the page spread
+      foreach my $page ($pageInfo->pages_in_spread()) {
+        if (!defined $page) {
+          print "... ";
+        } elsif ($page == $pageInfo->current_page) {
+          print "<b>$page</b> ";
+        } else {
+          print "$page ";
+        }
+      }
+
+    This method returns either an array or an arrayref (based upon context)
+    of the page numbers within the spread. Breaks in the sequence are
+    indicated with undef's.
+
+BUGS
+    Hopefully there aren't any nasty bugs lurking in here anywhere. However,
+    if you do find one, please report it via RT.
+
+ALGORITHM
+    The algorithm used to create the pagination spread was
+    reverse-engineered out of Squirrelmail by myself, and then reimplemented
+    from description only by Alex Gough.
+
+THANKS, MANY
+    Alex Gough for implementing the central algorithm from my description.
+
+AUTHOR
+    Jody Belka "knew@cpan.org"
+
+SEE ALSO
+    Data::Page.
+
+COPYRIGHT AND LICENSE
+    Copyright 2004 by Jody Belka
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

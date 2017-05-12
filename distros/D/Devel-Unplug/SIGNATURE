@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d04a4328f1b5f60da07f3361a1b72700d2f86281 Changes
+SHA1 fdfc6c8fa4b679f9ae88cd98534dcfa70644684b MANIFEST
+SHA1 df63b0c13c441b557503db421b7108d9a16f1e27 META.yml
+SHA1 736340c7bd58c5dd92af5dd8cea23c036a3baa05 Makefile.PL
+SHA1 a195048bfca2334ef7be0ce2a0919b8a3252c663 README
+SHA1 44bd4d0465ffe7ee67c196d929b672f626cbd7ca lib/Devel/Unplug.pm
+SHA1 2c29e22c4063077675488e0989bc49cbce50192a lib/Devel/Unplug/OO.pm
+SHA1 9a13ab5bb0a7bfe4331796ce83944feff63e7d25 t/000-load.t
+SHA1 73fbde8d54a40acb26d3256b8f4dd79c08ec9c8e t/commandline.t
+SHA1 da875d6ed7a911602fa95e9c4d4ed719b5bff08f t/lib/Some/Module.pm
+SHA1 2bacacb6977eb14bbb5efc0ea7332b034a7b31d5 t/lib/Some/Other/Module.pm
+SHA1 6931d3cca84843d9350612cc980e56bc1fff03a4 t/nest.t
+SHA1 7f6f800a94b20b2f5e13a9cc080e17d28944f466 t/oo.t
+SHA1 4508430cdcfdc163b261ee5994f803fd5f5dc38c t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+SHA1 e92e942abd5058b56984317cddbe1af9fbc518fd t/unplug.t
+SHA1 900b51b36b46cde642beb8d47650891761e749ae t/wildcard.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHOzAXwoknRJZQnCERAmivAJ4tSilb0muqUXzCrYlJvE6oJbReKgCfSpTL
+MPZjgg9NsjuHkbCA4+CXsI8=
+=YHSB
+-----END PGP SIGNATURE-----

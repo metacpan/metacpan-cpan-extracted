@@ -1,0 +1,78 @@
+Revision history for Dist-Zilla-Plugin-PerlTidy
+
+0.21    2015-02-12
+        no code changes
+
+0.20    2015-02-12
+        include nst/nse options to cancel any st/se in perltidyrc (Michael Jemmeson)
+
+0.19    2014-10-31
+        use FileFinderUser to skip Build.PL/Makefile.PL etc.
+
+0.18    2014-10-19
+        simply skip Dist::Zilla::Plugin::Test::Compile (RT 88601)
+
+0.17    2014-10-03
+        Fix to prevent certain Perl files from being skipped (by Steven Lee)
+
+0.16    2014-03-21
+        do not try to read binary file
+
+0.15    2014-01-22
+        fix tests
+
+0.14    2014.01.04
+        command perltidy ignoring .build and Module-VERSION (RT 91288, patches from KENTNL)
+
+0.13    2012.02.22
+        Add support for alternative tidy backends (Kent Fredric)
+        Fix the excessive production of *.LOG files (Kent Fredric)
+
+0.12    2011.08.04
+        Permit 'dzil perltidy' to work without any configuration at all - kentnl
+
+        Permit '[PerlTidy]' to omit a configuration file path and defer to default - kentnl
+
+        Add notices about '~' and co not being expanded in configuration paths - kentnl
+
+        Misc distribution fixes - kentnl
+
+        Added minor behaviour tests - kentnl
+
+0.11    2011.07.21
+        reverting to previous patch - ignoring FromCode (Alexei (RUSSOZ))
+
+0.10    2011.07.20
+        fixes for ref($file) eq 'Dist::Zilla::File::FromCode' (Alexei (RUSSOZ))
+
+0.09    2010.06.03
+	    perltidyrc is now resolved using Perl::Tidy defaults if not
+	    specified (robinsmidsrod)
+
+0.08_01 2010.03.31
+        fix for Dist::Zilla 2's removal of dzil_app (gardnerm)
+        additional POD (gardnerm)
+
+0.08    2009.09.17
+        fix duplication POD
+
+0.07    2009.09.17
+        fix as '~/.dzil/config.ini' in POD (kentfredric)
+
+0.06    2009.09.16
+        fix PkgVersion by dos2unix
+
+0.05    2009.09.16
+        for the new dzil
+
+0.04    2009.4.5
+        typo fix
+
+0.03    2009.4.5
+        perltidyrc config
+
+0.02	2009.4.4
+        fix Prereqs
+
+0.01    2009.4.4
+        First version, released on an unsuspecting world.

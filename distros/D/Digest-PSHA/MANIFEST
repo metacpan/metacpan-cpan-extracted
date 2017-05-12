@@ -1,0 +1,9 @@
+# $Id: MANIFEST,v 1.2 2014-10-23 12:21:56 swaj Exp $
+Changes
+Makefile.PL
+MANIFEST
+README
+t/0.load.t
+t/1.psha1_256.t
+lib/Digest/PSHA.pm
+META.yml                                 Module meta-data (added by MakeMaker)

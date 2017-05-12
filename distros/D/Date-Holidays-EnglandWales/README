@@ -1,0 +1,35 @@
+Date-Holidays-EnglandWales version 
+==================================
+
+This module can be used to determine whether a given date is a bank 
+holiday in England and Wales. 
+
+It is not suitable for determining bank holidays in Scotland or 
+Northern Ireland.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Time::Piece
+  Time::Seconds
+  DateTime::Event::Easter
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Jason Clifford
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. This means under either the 
+Artistic License or the GNU GPL version 2 or later.
+
+

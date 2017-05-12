@@ -1,0 +1,83 @@
+NAME
+    Data::Page::Tied - Tied interface for the Data::Page module
+
+SYNOPSIS
+      use Data::Page::Tied;
+      $handler = tie @data,
+                 'Data::Page::Tied',
+                 [qw(some data to start with)],
+                 $entries_per_page,
+                 $current_page;
+
+      push @data, @more_data;
+      print "first entry on page ", $handler->current_page(),
+            " is ",                 $handler->first();
+
+DEPENDENCIES
+    This module depends on "Data::Page" and "Test::Simple".
+
+DESCRIPTION
+    The "Data::Page::Tied" module adds a tied interface to the
+    object-oriented interface defined by Leon Brocard's "Data::Page" module.
+    It also adds several methods to set and get the current page and the
+    number of data items per page.
+
+    Please read Data::Page as "Data::Page::Tied" inherits all methods from
+    "Data::Page".
+
+    The tying constructor has the following syntax:
+
+      tie @ary, 'Data::Page::Tied', ARRAYREF,
+                INTEGER,            INTEGER;
+
+    Where the referenced array may contain any data to start with and the
+    integers denote the number of entries per page and the current page
+    respectively.
+
+  Methods
+    new This is the constructor. It is invoked by the tied interface, but
+        using it directly allows for two distinct ways of creating new
+        objects:
+
+        You may use the same syntax as the tied interface or you may use the
+        following syntax to get an ordinary "Data::Page" object instead of a
+        "Data::Page::Tied" object:
+
+          Data::Page::Tied->new( INTEGER, @args );
+
+        Where the integer is the number of elements.
+
+    total_entries
+        This method returns the number of items in the tied array.
+
+    set_current_page
+        This method sets the current page. You may find the current page by
+        using the inherited "current_page" method.
+
+    set_entries_per_page
+        This method sets the number of items displayed per page. You may
+        find the current number of items displayed per page by using the
+        inherited "entries_per_page" method.
+
+    entry
+        This accessor is used to get or set any specific entry. It takes one
+        or two arguments. The first argument is always the array index and
+        the second (optional) argument is the value you want to set
+        $array[$index] to.
+
+    set_entry
+        Additional method to make the interface more consistent. Takes two
+        arguments. See entry.
+
+AUTHOR
+    Steffen Mueller, <smueller@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2002-2006 Steffen Mueller
+
+    This module is free software; you can redistribute it or modify it under
+    the same terms as Perl itself.
+
+SEE ALSO
+    Data::Page
+

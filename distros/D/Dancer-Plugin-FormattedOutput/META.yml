@@ -1,0 +1,21 @@
+---
+abstract: 'Provide output in a variety of formats'
+author:
+  - 'Alex Kalderimis <alex kalderimis at gmail dot com>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3624'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-FormattedOutput
+provides:
+  Dancer::Plugin::FormattedOutput:
+    file: lib/Dancer/Plugin/FormattedOutput.pm
+    version: 0.01
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.01

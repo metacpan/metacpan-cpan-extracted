@@ -1,0 +1,17 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Devel::MAT;
+
+my $df = Devel::MAT->load( $ARGV[0] // die "Need dumpfile\n" )->dumpfile;
+
+my $addr = $ARGV[1] // die "Need addr\n";
+$addr = hex $addr if $addr =~ m/^0x/;
+
+my $sv = $df->sv_at( $addr );
+$sv or die sprintf "No SV at %#x\n", $addr;
+$sv->type eq "SCALAR" or die "SV is not a SCALAR\n";
+defined( my $pv = $sv->pv ) or die "SV does not have a PV\n";
+print $pv;

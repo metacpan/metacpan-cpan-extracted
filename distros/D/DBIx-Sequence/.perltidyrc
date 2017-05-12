@@ -1,0 +1,43 @@
+#perltidy options for this stuff
+#get perltidy at http://perltidy.sourceforge.net/
+#Please run perltidy dbix-sequence on your patches before sending them.
+#THanks! Ben.
+dbix-sequence {
+-nohtml
+-recombine
+-add-newlines
+-add-whitespace
+-blanks-before-blocks
+-blanks-before-comments
+-blanks-before-subs
+-check-syntax
+-comma-break-flag=0
+-continuation-indentation=2
+-fuzzy-line-length
+-indent-block-comments
+-indent-columns=4
+-nodelete-old-whitespace
+-nologfile
+-maximum-fields-per-table=-1
+-maximum-consecutive-blank-lines=1
+-maximum-line-length=160
+-maximum-space-to-comment=16
+-minimum-space-to-comment=4
+-maximum-whitespace-columns=32
+-nocuddled-else
+-opening-brace-on-new-line
+-outdent-long-lines
+-noswallow-optional-blank-lines
+-delete-old-newlines
+-noquiet
+-brace-tightness=2
+-paren-tightness=2
+-square-bracket-tightness=2
+-nospace-for-semicolon
+-delete-semicolons
+-add-semicolons
+-noshow-options
+-tidy-output
+-tabs
+-break-after-comma-arrows
+}

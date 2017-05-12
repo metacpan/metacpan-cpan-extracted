@@ -1,0 +1,18 @@
+Revision history for Deeme
+
+0.05 2014-09-29T20:38:56Z
+        - Added jobs() in Deeme::Worker, fixed POD
+
+0.04  2014-06-29 11:27:19 CEST
+        - fixes to POD
+
+0.03  2014-06-27 15:21:51 CEST
+        - Deeme can act also as a job queue
+        - added Deeme::Worker (job consumer) and Deeme::Job (the actual job)
+
+0.02  2014-06-24 11:17:43 CEST
+        - Created Deeme::Obj to get rid of all Mojolicious deps
+        - Defaulting to Deeme::Backend::Memory if backend option is not specified
+
+0.01  2014-06-22 11:32:45 CEST
+        - Initial release

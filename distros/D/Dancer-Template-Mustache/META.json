@@ -1,0 +1,82 @@
+{
+   "abstract" : "Wrapper for the Mustache template system",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Template-Mustache",
+   "no_index" : {
+      "directory" : [
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "0",
+            "FindBin" : "0",
+            "Moo" : "0",
+            "Template::Mustache" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::FileUtils" : "0",
+            "Dancer::Test" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Template::Mustache" : {
+         "file" : "lib/Dancer/Template/Mustache.pm",
+         "version" : "v0.3.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Dancer-Template-Mustache/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dancer-Template-Mustache/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dancer-Template-Mustache.git",
+         "web" : "https://github.com/yanick/Dancer-Template-Mustache"
+      }
+   },
+   "version" : "0.3.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ]
+}
+

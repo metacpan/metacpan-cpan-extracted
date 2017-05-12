@@ -1,0 +1,21 @@
+---
+abstract: 'A simple Date and Time formatting object '
+author:
+  - 'trey <trey-b@cox.net>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300037, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Formatter
+requires:
+  DateTime::Locale: 0.01
+  Scalar::Util: 1.10
+  Test::Exception: 0.15
+  Test::More: 0.47
+  Time::Local: 1.06
+version: 0.11

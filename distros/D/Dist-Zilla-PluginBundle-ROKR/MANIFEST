@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/Plugin/CopyMakefilePLFromBuild.pm
+lib/Dist/Zilla/Plugin/DynamicManifest.pm
+lib/Dist/Zilla/Plugin/SurgicalPkgVersion.pm
+lib/Dist/Zilla/Plugin/SurgicalPodWeaver.pm
+lib/Dist/Zilla/Plugin/UpdateGitHub.pm
+lib/Dist/Zilla/PluginBundle/ROKR.pm
+lib/Dist/Zilla/PluginBundle/ROKR/Basic.pm
+t/01-basic.t

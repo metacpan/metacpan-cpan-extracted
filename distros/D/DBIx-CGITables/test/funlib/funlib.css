@@ -1,0 +1,27 @@
+BODY {
+	background-color : #CCFF99;
+	font-family : Verdana, Helvetica, Arial, sans-serif;
+}
+
+TD{
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+}
+
+TH {
+	font-family : Verdana, Helvetica, Arial, sans-serif;
+	background-color: #FF9966;
+}
+
+.mod2 {
+	font-family: Verdana, Helvetica, Arial, sans-serif;
+	background-color: #99CC99;
+}
+
+B {
+	font-weight : bold;
+}
+
+P, H1, H2, H3, H4, H5, H6 {
+	font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+}
+

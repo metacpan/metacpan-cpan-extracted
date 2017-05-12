@@ -1,0 +1,73 @@
+{
+   "abstract" : "Generate and compare checksums of database schematas",
+   "author" : [
+      "Thomas Klausner <domm@cpan.org>",
+      "Maroš Kollár <maros@cpan.org>",
+      "Klaus Ita <koki@worstofall.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-SchemaChecksum",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "Digest::SHA1" : "0",
+            "File::Find::Rule" : "0",
+            "IO::Prompt::Tiny" : "0",
+            "Moose" : "0",
+            "Moose::Role" : "0",
+            "MooseX::App" : "1.21",
+            "MooseX::App::Command" : "0",
+            "Path::Class" : "0",
+            "Try::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.35",
+            "File::Copy" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Module::Pluggable" : "0",
+            "Test::More" : "0",
+            "Test::Most" : "0",
+            "Test::Trap" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://code.validad.net/validad/dbix-schemachecksum"
+      }
+   },
+   "version" : "1.006"
+}
+

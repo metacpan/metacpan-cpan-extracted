@@ -1,0 +1,19 @@
+DBD::drizzle - A Perl5 Database Interface to the Drizzle database
+=============================================================
+
+ Prerequisites
+----------------
+* Perl
+* Drizzle (bzr branch lp:drizzle)
+* libdrizzle (bzr branch lp:libdrizzle)
+* C compiler
+
+Installation
+-------------
+You should only have to run the following:
+
+perl Makefile.PL --cflags=-I/usr/local/drizzle/include/ --libs=-"L/usr/local/drizzle/lib -ldrizzle"
+
+
+Depending on where libdrizzle is installed. Also, you'll want to make 
+sure that ldconfig has configured libdrizzle to be in your library path 

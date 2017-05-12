@@ -1,0 +1,80 @@
+{
+   "abstract" : "Chained actions for Dancer",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Chain",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "0",
+            "Dancer::Plugin" : "0",
+            "Moose" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer::Test" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Plugin::Chain" : {
+         "file" : "lib/Dancer/Plugin/Chain.pm",
+         "version" : "v0.1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dancer-plugin-chain at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Plugin-Chain"
+      },
+      "homepage" : "http://search.cpan.org/dist/Dancer-Plugin-Chain/",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dancer-Plugin-Chain.git",
+         "web" : "https://github.com/yanick/Dancer-Plugin-Chain"
+      }
+   },
+   "version" : "0.1.0",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Yanick Champoux <yanick@cpan.org>"
+   ]
+}
+

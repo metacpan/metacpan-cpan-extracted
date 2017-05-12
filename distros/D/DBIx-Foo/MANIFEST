@@ -1,0 +1,26 @@
+.project
+Changes
+DBIx-Foo-0.01.tar.gz
+DBIx-Foo-0.02.tar.gz
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBIx/Foo.pm
+lib/DBIx/Foo/SearchQuery.pm
+lib/DBIx/Foo/SimpleQuery.pm
+lib/DBIx/Foo/UpdateQuery.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.md
+t/01_use.t
+t/02_simple_queries.t
+t/03_sql_lite.t
+t/04_update_query.t
+t/99_pod.t
+test.db

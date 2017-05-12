@@ -1,0 +1,102 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::CallBack - Dynamic compare support plugin
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream::CallBack qw(%HELPER);
+
+  # create the factory instance we will hand around
+  my $factory_instance=new Data::Range::Compare::Stream::CallBack(\%HELPER);
+
+=head1 DESCRIPTION
+
+This module module provides a dynamic method of supporting diffrent data types without the need to subclass Data::Range::Compare::Stream.  Note:  this class does in fact subclass Data::Range::Compare::Stream.
+
+=head1 Exports
+
+%HELPER is exported by default.
+
+%HELPER is a hash that contains 3 anonymous functions.
+
+  our %HELPER=(
+    sub_one=>sub { $_[0] - 1 },
+    add_one=>sub { $_[0] + 1 },
+    cmp_values=>sub { $_[0] <=> $_[1] },
+  );
+
+
+=head1 OO Methods
+
+This section covers the OO Methods in the package.
+
+=over 3
+
+=item * my $range=new Data::Range::Compare::Stream::CallBack(\%HELPER,$range_start,$range_end);
+
+=item * my $range=new Data::Range::Compare::Stream::CallBack(\%HELPER$range_start,$range_end,$data);
+
+=item * my $factory_instance=new Data::Range::Compare::Stream::CallBack(\%HELPER);
+
+Object constructor: Creates a new instance of Data::Range::Compare::Stream.
+
+Arguments an their meanings:
+
+  \%HELPER  -- Required.
+    This hash ref use used to handle comparison, addition and subtraction
+
+  $range_start -- Required
+    Represents the start of this given range
+
+  $range_end -- Required
+    Represents the end of this range.
+
+  $data -- Optional
+    Used to tag this range with your data
+
+=item * my $new_value=$range->sub_one($value);
+
+Computes and returns the object that came before this $value.  This function uses the helper->{sub_one} code ref to handle the call.
+
+=item * my $new_value=$range->add_one($value)
+
+Computes and returns the object that comes after this $value.  This function uses the $helper->{add_one} code ref to handle the call.
+
+=item * my $cmp=$range->cmp_values($value_a,$value_b)
+
+Returns -1,0,1 similar to <=> or cmp.  This function uses the $helper->{cmp_values} code ref to handle the call.
+
+=item * my $range=$factory_instance->factory(0,1);
+
+=item * my $range=$factory_instance->factory(0,1,$data);
+
+Given an instance of Data::Range::Compare::Stream::CallBack, this function is used to create a new range object that will also contain the related %HELPER function.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

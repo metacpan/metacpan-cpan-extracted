@@ -1,0 +1,19 @@
+Revision history for Data-Sah-Params
+
+0.003   2016-05-30 (PERLANCAR)
+
+	- No functional changes.
+
+	- [doc] Mention Params::Sah.
+
+	- [doc] Forgot to document want_source option.
+
+
+0.002   2016-05-26 (PERLANCAR)
+
+	- Add option: want_source like in Type::Params.
+
+
+0.001   2016-05-26 (PERLANCAR)
+
+         - First release.

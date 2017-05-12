@@ -1,0 +1,43 @@
+---
+abstract: 'Minting profile'
+author:
+  - 'Erik Carlsson <info@code301.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, Dist::Iller version 0.1204, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-MintingProfile-Iller-CSSON
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+provides:
+  Dist::Zilla::MintingProfile::Iller::CSSON:
+    file: lib/Dist/Zilla/MintingProfile/Iller/CSSON.pm
+    version: '0.0101'
+requires:
+  Carp: '0'
+  Dist::Zilla::Role::MintingProfile: '5.000'
+  File::ShareDir: '0'
+  Moose: '2.00'
+  Path::Class: '0'
+  namespace::autoclean: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-MintingProfile-Iller-CSSON
+  repository: https://github.com/Csson/p5-Dist-Zilla-MintingProfile-Iller-CSSON.git
+version: '0.0101'

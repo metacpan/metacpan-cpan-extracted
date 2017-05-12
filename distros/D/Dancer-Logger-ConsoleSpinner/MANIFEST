@@ -1,0 +1,15 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dancer/Logger/Spinner.pm
+t/00-compile.t
+t/advance_spinner.t
+t/author-critic.t
+t/core.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

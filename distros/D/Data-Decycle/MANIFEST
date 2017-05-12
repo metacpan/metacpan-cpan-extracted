@@ -1,0 +1,14 @@
+Changes
+MANIFEST			This list of files
+Makefile.PL
+README
+lib/Data/Decycle.pm
+t/00-load.t
+t/01-has_scalar_ref.t
+t/02-decycle_deeply.t
+t/03-weaken_deeply.t
+t/04-may_leak.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

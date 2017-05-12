@@ -1,0 +1,67 @@
+#!/icg/bin/perl
+# ABSTRACT: run dns-o!
+package
+  dnsoterica;
+use strict;
+use warnings;
+use lib 'lib'; # XXX: temporary for now -- rjbs, 2009-01-30
+
+use DNS::Oterica::App;
+use File::Find::Rule;
+use Getopt::Long::Descriptive;
+use YAML::XS ();
+
+my ($opts, $usage) = describe_options(
+  "usage: %c %o <root>",
+  [ 'ns-family=s', 'DNS::Oterica node family for NS records',
+    { required => 1, } ],
+  [ 'hostmaster=s', 'hostmaster email',
+    { required => 1, } ],
+);
+
+my $root = shift @ARGV;
+$usage->die if @ARGV;
+
+my $app = DNS::Oterica::App->new(
+  root          => $root,
+  hub_args      => $opts,
+);
+
+$app->populate_networks;
+$app->populate_domains;
+$app->populate_hosts;
+
+my @nodes = sort { $a->fqdn cmp $b->fqdn } $app->hub->nodes;
+
+print sort map {; $_->as_data_lines } $app->hub->networks;
+print "\n";
+print $_->as_data_lines for @nodes;
+print "\n";
+print $_->as_data_lines, "\n" for $app->hub->node_families;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+dnsoterica - run dns-o!
+
+=head1 VERSION
+
+version 0.304
+
+=head1 AUTHOR
+
+Ricardo SIGNES <rjbs@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Ricardo SIGNES.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

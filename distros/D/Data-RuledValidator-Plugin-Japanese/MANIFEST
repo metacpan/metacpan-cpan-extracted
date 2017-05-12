@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Data/RuledValidator/Plugin/Japanese.pm
+lib/Data/RuledValidator/Language/Japanese.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/jp.t
+t/jp_lang.t

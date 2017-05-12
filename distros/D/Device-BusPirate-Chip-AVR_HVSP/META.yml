@@ -1,0 +1,26 @@
+---
+abstract: 'high-voltage serial programming for F<AVR> chips'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-BusPirate-Chip-AVR_HVSP
+provides:
+  Device::BusPirate::Chip::AVR_HVSP:
+    file: lib/Device/BusPirate/Chip/AVR_HVSP.pm
+    version: '0.03'
+  Device::BusPirate::Chip::AVR_HVSP::FuseInfo:
+    file: lib/Device/BusPirate/Chip/AVR_HVSP/FuseInfo.pm
+    version: '0.03'
+requires:
+  Device::BusPirate::Chip: '0'
+  Struct::Dumb: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.03'

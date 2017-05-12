@@ -1,0 +1,87 @@
+Revision history for Data-Collector
+
+0.15    03.09.12
+        * Fix changes to data attribute.
+
+0.14    02.09.12
+        * Clean up merge mess.
+        * Merge stuff from both 0.12 versions.
+          (only update if data changes)
+        * Remove strictures, MooseX::StrictConstructor.
+
+0.13    29.08.12
+        * Clean up code.
+        * Clean up tests.
+
+0.12    21.08.12
+        * Caused some breakaged by not completely copy-pasting stuff.
+          (thanks, Peter Sørensen)
+
+0.12    27.03.11
+        * Only update collected data hash if you get data from the info.
+
+0.11    26.09.10
+        * Allowing homefolder configuration (~/.data_collector.yaml)
+        * Fixing non-existent global configuration file missing bug
+        * Tests more immune against existing Infos
+
+0.10    05.09.10
+        * strictures needs indirect installed, adding it to dist.ini
+
+0.09    26.08.10
+        * No more bundled Infos for now. You should remove previous installed
+            with App::pmuninstall
+        * Cleaned up a few tests
+        * Not requiring XML::* for those sample serializers
+
+0.08    24.08.10
+        * Adding Fedora recognition
+
+0.07    24.08.10
+        * Engine doesn't have to set connected() anymore.
+        * Resolved GH #1.
+        * Added "pipe" cmd to OpenSSH engine
+        * Probably other stuff...
+
+0.06    13.04.10
+        * Resolved GH #8.
+        * Resolved GH #7.
+        * Resolved GH #4 - Adding info_keys method to Info.pm.
+        * Refactored Info::IFaces using List::Util::first.
+        * Adding List::Util to prereqs.
+
+0.05    11.04.10
+        * -- API Change: --
+          register_keys   -> register,
+          unregister_keys -> unregister,
+        * Resolving GH #2, double collection now possible!
+        * Renamed "script" folder to "bin", to have the app installed.
+        * Updating prereqs (adding LWP::UserAgent)
+
+0.04    08.04.10
+        * Fixed file_exists() in Engine.pm
+        * Adding Data::Collector::IFaces
+        * Resolving GH #9, adding run_if_exists to Engine.pm
+        * Data::Collector::Commands now has "ifconfig"
+        * Data::Collector::Commands now has "netstat"
+        * Data::Collector::Commands now has "ifconfig" (only RH supported)
+        * Some speed improvements
+
+0.03    07.04.10
+        * Script should be named "data-collector", not "data-scanner"
+        * Adding Data::Collector::Commands role
+        * Fixed tests by overriding ExternalIP
+        * Fixed parsing IP from HTML in ExternalIP
+
+0.02    07.04.10
+        * Fixed bug disallowing multiple Infos
+        * Adding Data::Collector::Engine::Local
+        * Adding Data::Collector::Info::CPU
+        * Adding Data::Collector::Info::OS, only CentOS so far
+        * Adding Data::Collector::Info::ExternalIP
+        * Adding file_exists to Engine.pm base class
+        * Correct POD section names for Infos
+
+0.01    06.04.10
+        First version, so many features already included... tsk tsk
+

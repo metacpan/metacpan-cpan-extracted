@@ -1,0 +1,538 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DOCSIS3.0 Cable Modem</title>
+<meta http-equiv="content-type" content="application/xhtml+xml"; charset="utf-8" />
+
+<link rel="stylesheet" type="text/css" href="../css/web.css"/>
+<!--[if IE 6]>
+<link rel="stylesheet" type="text/css" href="../css/ie6.css"/>
+<script type="text/javascript" language="Javascript" src="../js/hover.js"></script>
+<![endif]-->
+<!--[if IE 7]>
+<link rel="stylesheet" type="text/css" href="../css/ie7.css"/>
+<![endif]-->
+
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/js/dict.js"></script>
+
+
+<script language="JavaScript">
+var c_status = {
+"CmDsLockStatus": [],
+"CmDsFrequency": [],
+"CmDsQam": [],
+"CmDsChannelPowerBmV": [],
+"CmDsSnr": [],
+"CmDsChannelId":[],
+"CmUsChannelId": [],
+"CmUsFrequency": [],
+"CmUsBw": [],
+"CmUsSCDMAmode": [],
+"CmUsChannelPower": [],
+"CoSData": [],
+"QoSData": [],
+"networkaccess":"1",
+"DisplayCmConfig":"1",
+"CmConfig":"d11_m_5341.cm",
+"cable_status":"12",
+"DisplayIp":"1",
+"CmIpAddress":"",
+"CmNetMask":"",
+"CmGateway":"",
+"CmIpAddressIpv6":"2001:627:8100:16:203:BDDE:FAFA:CA18/128",
+"CmNetMaskIpv6":"scope: Global",
+"CmGatewayIpv6":"fe80::c670:feff:fe31:8eb2",
+"CmIpLeaseDuration":"D: -- H: -- M: -- S: --",
+"CmNonvolDsFreq":"573",
+"CmProvActiveMode":"1",
+"CmDsStatus": [],
+"LearnTableData": []
+}
+
+var CmDownstreamDSLockStatusBase = "(not support yet)";
+var CmDownstreamFrequencyBase = "573.0000|567.0000|0.0000|585.0000|0.0000|0.0000|0.0000|0.0000|";
+var CmDownstreamQamBase = "256 QAM|256 QAM|256 QAM|256 QAM|256 QAM|256 QAM|256 QAM|256 QAM|";
+var CmDownstreamChannelPowerdBmVBase = "-2.5822|-1.3753|-4.2284|-3.0640|0.0000|0.0000|0.0000|0.0000|";
+var CmDownstreamSnrBase = "35.418|35.780|35.247|35.973|35.418|35.780|35.247|35.973|";
+var CmDownstreamChannelIdBase = "50|49|51|52|0|0|0|0";
+var CmUpstreamChannelIdBase = "2|0|0|1|";
+var CmUpstreamFrequencyBase = "27900000|10000000|10000000|34800000|";
+var CmUpstreamBwBase = "6400000|6400000|6400000|6400000|";
+var CmUpstreamSCDMAmodeBase="0|0|0|0|";
+var CmUpstreamChannelPowerBase = "41.7500|-1.0000|-1.0000|43.2500|";
+var CoSDataBase = "NULL";
+var QoSDataBase = "NULL";
+var LearnTableDataBase = "00:00:00:00:00:00|1|";
+var CmDsStatusDataBase = "1|1|1|1|0|0|0|0|";
+
+c_status.cable_status&=0xffff;
+
+function getArrayData5(paraBase, arrayName, delimiter)
+{
+var paraArray = paraBase.split(delimiter);
+
+for (i=0;i<(paraArray.length-1);i++)
+{
+c_status[arrayName][i]=paraArray[i];
+}
+}
+
+function getArrayData4(paraBase, arrayName, delimiter)
+{
+var paraArray = paraBase.split(delimiter);
+
+for (i=0;i<(paraArray.length);i++)
+{
+c_status[arrayName][i]=paraArray[i];
+}
+}
+
+getArrayData4(CmDownstreamDSLockStatusBase, "CmDsLockStatus", "|");
+getArrayData5(CmDownstreamFrequencyBase, "CmDsFrequency", "|");
+getArrayData5(CmDownstreamQamBase, "CmDsQam", "|");
+getArrayData4(CmDownstreamChannelPowerdBmVBase, "CmDsChannelPowerBmV", "|");
+getArrayData4(CmDownstreamSnrBase, "CmDsSnr", "|");
+getArrayData4(CmDownstreamChannelIdBase,"CmDsChannelId","|");
+getArrayData5(CmUpstreamChannelIdBase, "CmUsChannelId", "|");
+getArrayData5(CmUpstreamFrequencyBase, "CmUsFrequency", "|");
+getArrayData4(CmUpstreamBwBase, "CmUsBw", "|");
+getArrayData5(CmUpstreamSCDMAmodeBase, "CmUsSCDMAmode", "|");
+getArrayData4(CmUpstreamChannelPowerBase, "CmUsChannelPower", "|");
+getArrayData5(CoSDataBase, "CoSData", "|");
+getArrayData5(QoSDataBase, "QoSData", "|");
+getArrayData5(LearnTableDataBase, "LearnTableData", "|");
+getArrayData5(CmDsStatusDataBase, "CmDsStatus", "|");
+function load()
+{
+document.getElementById("li-cable-status").className = "cur";
+document.getElementById("li_Menu_Cable").className = "cur";
+
+if (c_status.DisplayCmConfig == "1"){
+var ConfigFileTD=document.getElementById("general").insertRow(0);
+var ConfigFile=ConfigFileTD.insertCell(0);
+var ConfigFileName=ConfigFileTD.insertCell(1);
+ConfigFile.className="item";
+ConfigFile.innerHTML="<span class=LANGS id=Cable_Status_CmConfigfileName>CM Configuration file name:</span>";
+ConfigFileName.innerHTML=c_status.CmConfig;
+
+var NetworkAccessTD=document.getElementById("general").insertRow(1);
+var NetworkAccess=NetworkAccessTD.insertCell(0);
+var NetworkAccessName=NetworkAccessTD.insertCell(1);
+NetworkAccess.className="item";
+NetworkAccess.innerHTML="<span class=LANGS id=Cable_Status_NetworkAccess>Network Access:</span>";
+if(c_status.cable_status < 10)
+NetworkAccessName.innerHTML="Process...";
+if(c_status.cable_status>=10 && c_status.cable_status != 23 && c_status.cable_status !=22 && c_status.cable_status !=14 && c_status.cable_status !=15 && c_status.cable_status !=16 && c_status.cable_status !=17)
+{
+if(c_status.networkaccess == 1)		NetworkAccessName.innerHTML="Permitted";
+else if(c_status.networkaccess == 0)	NetworkAccessName.innerHTML="Denied";
+else 	NetworkAccessName.innerHTML="Unknown";
+}
+}
+
+var cf = document.dsForm;
+cf.CmNonvolDsFreq.value = c_status.CmNonvolDsFreq.substring(0,3);
+
+
+var CmUpstreamChannelId_inuse = parseInt(c_status.CmUsChannelId[0]) + parseInt(c_status.CmUsChannelId[1]) + parseInt(c_status.CmUsChannelId[2]) + parseInt(c_status.CmUsChannelId[3]);
+var cf = document.usForm;
+cf.CmNonvolUsChID.value = CmUpstreamChannelId_inuse;
+
+for (var i=0; i<8; i++)
+{
+var ChannelDCID = document.getElementById("channeldcid").insertCell(i+1);
+if(c_status.CmDsFrequency[i]==0)
+{
+c_status.CmDsChannelId[i]="   ";
+}
+ChannelDCID.innerHTML = c_status.CmDsChannelId[i];
+
+var ChannelFrequency = document.getElementById("channelfrequency").insertCell(i+1);
+if(c_status.CmDsFrequency[i]==0)
+{
+c_status.CmDsFrequency[i]="   ";
+}
+ChannelFrequency.innerHTML = c_status.CmDsFrequency[i].substring(0,7);
+
+var Modulation = document.getElementById("modulation").insertCell(i+1);
+if(c_status.CmDsStatus[i]==0)
+{
+c_status.CmDsQam[i]="   ";
+}
+Modulation.innerHTML = c_status.CmDsQam[i];
+
+var SignalStrength = document.getElementById("signalstrength").insertCell(i+1);
+if(c_status.CmDsStatus[i]==0)
+{
+c_status.CmDsChannelPowerBmV[i]="   ";
+}
+SignalStrength.innerHTML = c_status.CmDsChannelPowerBmV[i].substring(0,5);
+
+var SignalnoiSeratio = document.getElementById("signalnoiseratio").insertCell(i+1);
+if(c_status.CmDsStatus[i]==0)
+{
+c_status.CmDsSnr[i]="   ";
+}
+SignalnoiSeratio.innerHTML = c_status.CmDsSnr[i].substring(0,6);
+}
+var tmpUCID = new Array(4);
+for (var i=0; i<4; i++)
+{
+if(parseInt(c_status.CmUsChannelId[i]) ==0)
+tmpUCID[i] = 10;
+else
+tmpUCID[i] = parseInt(c_status.CmUsChannelId[i]);
+}
+for (var i=0; i<4; i++)
+{
+for(var j=i+1; j<4; j++)
+{
+if(tmpUCID[j] < tmpUCID[i])
+{
+var tmp = tmpUCID[i];
+tmpUCID[i] = tmpUCID[j];
+tmpUCID[j] = tmp;
+tmp = c_status.CmUsChannelId[i];
+c_status.CmUsChannelId[i] = c_status.CmUsChannelId[j];
+c_status.CmUsChannelId[j] = tmp;
+tmp = c_status.CmUsFrequency[i];
+c_status.CmUsFrequency[i] = c_status.CmUsFrequency[j];
+c_status.CmUsFrequency[j] = tmp;
+tmp = c_status.CmUsBw[i];
+c_status.CmUsBw[i] = c_status.CmUsBw[j];
+c_status.CmUsBw[j] = tmp;
+tmp = c_status.CmUsSCDMAmode[i];
+c_status.CmUsSCDMAmode[i] = c_status.CmUsSCDMAmode[j];
+c_status.CmUsSCDMAmode[j] = tmp;
+tmp = c_status.CmUsChannelPower[i];
+c_status.CmUsChannelPower[i] = c_status.CmUsChannelPower[j];
+c_status.CmUsChannelPower[j] = tmp;
+}
+}
+}
+for (var i=0; i<4; i++)
+{
+var ChannelID = document.getElementById("channelid").insertCell(i+1);
+if(c_status.CmUsChannelId[i]==0)
+{
+c_status.CmUsChannelId[i]="  ";
+}
+ChannelID.innerHTML = c_status.CmUsChannelId[i];
+/*ChannelID.className = "item1_underline";*/
+
+var UpstreamFrequency = document.getElementById("upstreamFrequency").insertCell(i+1);
+if(c_status.CmUsChannelId[i]==0)
+{
+c_status.CmUsFrequency[i]="  ";
+}
+UpstreamFrequency.innerHTML = c_status.CmUsFrequency[i];
+
+var UpstreamBandWidth = document.getElementById("upstreambandwidth").insertCell(i+1);
+if(c_status.CmUsChannelId[i]==0)
+{
+c_status.CmUsBw[i]="  ";
+}
+UpstreamBandWidth.innerHTML = c_status.CmUsBw[i];
+
+var SCDMAmode = document.getElementById("scdmamode").insertCell(i+1);
+if(c_status.CmUsChannelId[i]==0)
+{
+c_status.CmUsSCDMAmode[i]="  ";
+}
+SCDMAmode.innerHTML = c_status.CmUsSCDMAmode[i];
+
+var TransmissionSignalStrength = document.getElementById("transmissionsignalstrength").insertCell(i+1);
+if(c_status.CmUsChannelId[i]==0)
+{
+c_status.CmUsChannelPower[i]="  ";
+}
+TransmissionSignalStrength.innerHTML = c_status.CmUsChannelPower[i];
+
+}
+
+var IPAddress = document.getElementById("ipaddress").insertCell(1);
+var SubnetMask = document.getElementById("subnetmask").insertCell(1);
+var GatewayIP = document.getElementById("gatewayip").insertCell(1);
+var DHCPLeaseTime = document.getElementById("dhcpleasetime").insertCell(1);
+var IPV6Address=document.getElementById("ipv6address").insertCell(1);
+var GatewayIPV6=document.getElementById("gatewayipv6").insertCell(1);
+
+if (c_status.DisplayIp == "1"){
+
+if(c_status.CmIpAddressIpv6 == "" && c_status.CmIpAddress == ""){
+document.getElementById("cable_IPInfo").style.display="none";
+}
+else
+{
+if(c_status.CmIpAddressIpv6 != ""){
+document.getElementById("contentIpv6").style.display="";
+IPV6Address.innerHTML=c_status.CmIpAddressIpv6;
+GatewayIPV6.innerHTML = c_status.CmGatewayIpv6;
+}
+else{
+document.getElementById("contentIpv6").style.display="none";
+}
+
+if(c_status.CmIpAddress != ""){
+document.getElementById("contentIpv4").style.display="";
+IPAddress.innerHTML=c_status.CmIpAddress;
+SubnetMask.innerHTML = c_status.CmNetMask;
+GatewayIP.innerHTML = c_status.CmGateway;
+DHCPLeaseTime.innerHTML = c_status.CmIpLeaseDuration;
+}
+else{
+document.getElementById("contentIpv4").style.display="none";
+}
+}
+
+}
+else{
+/*IPAddress.innerHTML = "0.0.0.0";
+SubnetMask.innerHTML = "0.0.0.0";
+GatewayIP.innerHTML = "0.0.0.0";
+DHCPLeaseTime.innerHTML = "-1";*/
+document.getElementById("cable_IPInfo").style.display="none";
+}
+
+InitLang();
+}
+
+function changeFreq()
+{
+var cf = document.dsForm;
+if(cf.CmNonvolDsFreq.value == c_status.CmNonvolDsFreq)
+{
+alert("Nothing Changed!");
+return false;
+}
+var ret = submitCheck(document.dsForm.CmNonvolDsFreq.value*1000000, "Downstream Frequency", 91000000, 1002000000, document.dsForm, 0);
+if (ret==false)
+return false;
+document.dsForm.submit();
+}
+
+function changeUsID()
+{
+var cf = document.usForm;
+var CmUpstreamChannelId_inuse = parseInt(c_status.CmUsChannelId[0]) + parseInt(c_status.CmUsChannelId[1]) + parseInt(c_status.CmUsChannelId[2]) + parseInt(c_status.CmUsChannelId[3]);
+if(cf.CmNonvolUsChID.value == CmUpstreamChannelId_inuse)
+{
+alert("Nothing Changed!");
+return false;
+}
+else
+document.usForm.submit();
+}
+
+function submitCheck(value, name, begin, end, form, flag)
+{
+if (isNaN(value) || parseInt(value)!=value)
+{
+alert('Fill in the '+name+' blank with suitable value.');
+return false;
+}
+
+if (value < begin || value > end)
+{
+alert(name+' must be between '+begin+' and '+end+'.');
+return false;
+}
+
+if (flag)
+form.submit();
+else
+return true;
+}
+</script>
+
+</head>
+<body onload="load()">
+<div id="boundary">
+
+<div id="header">
+<ul id="top">
+<li><span class="LANGS" id="Language">language:</span></li>
+<li>
+<select id="language_choose" onchange="changeLangs(this.value);InitLang();">
+<option value ="lang_en">English</option>
+<!--<option value ="lang_span">Español</option>-->
+</select>
+</li>
+
+
+<li><a href="help.asp" target="_blank"><span class="LANGS" id="Help">Help</span></a></li>
+</ul>
+</div>
+
+
+<div id="leftcol">
+<ul id="navleft">
+<li id="li_Menu_Cable" onclick="document.location='cable-initial.asp'"><a href="cable-initial.asp"><span class="LANGS" id="Menu_Cable">Cable</span></a></li>
+<li></li>
+</ul>
+
+</div>
+
+<div id="rightsec">
+
+<div id="topcol">
+<ul id="navtop">
+<li id="li-cable-systeminfo"><a href="cable-Systeminfo.asp">
+<span class="LANGS" id="Menu_Cable_SystemInfo">System Info</span></a></li>
+<li id="li-cable-initialization"><a href="cable-initial.asp">
+<span class="LANGS" id="Menu_Cable_Initialization">Initialization</span></a></li>
+<li id="li-cable-status"><a href="cable-status.asp">
+<span class="LANGS" id="Menu_Cable_Status">Status</span></a></li>
+<li id="li-cable-eventlog"><a href="cable-eventlog.asp">
+<span class="LANGS" id="Menu_Cable_EventLog">Event log</span></a></li>
+<li id="li-cable-password"><a href="cable-password.asp">
+<span class="LANGS" id="Menu_Cable_Password">Password</span></a></li>
+<li id="li-cable-button"></li>
+<li id="li-cable-blank"></li>
+</ul>
+</div>
+
+
+<div id="content">
+<div id="maincontent">
+<p id="introduction"><span class="LANGS" id="Cable_Status_PageDescription">This menu displays both upstream and downstream signal parameters and Attached Devices</span></p>
+<div id="content1">
+<table class="checklist" id="general">
+</table>
+</div>
+
+<p id="title"><span class="LANGS" id="Cable_Status_Title_DownStream">Downstream</span></p>
+<div id="cablecontent">
+<table class="checklist">
+<form name="dsForm" action="/goform/Cable" method="post">
+<tr id="frequency">
+<input type="hidden" value="cable-status" name="file">
+<input type="hidden" value="admin/" name="dir"/>
+<td class="item"><span class="LANGS" id="Cable_Status_FrequencyToTune">Frequency to tune to</span></td>
+<td><input type=text name="CmNonvolDsFreq" size="9" maxlength="9" class="input-mid">
+<span class="LANGS" id="Cable_Status_FrequencyToTuneToApply"><input type="button" value="Apply" align="middle" class="button_in_content1" onClick="changeFreq()"></span>
+</td>
+</tr>
+</form>
+</table>
+<table class="checklist1" id="downstream">
+<tr id="tableheader">
+<td class="item"><span class="LANGS" id="Cable_Status_Port">Port</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel1">1</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel2">2</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel3">3</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel4">4</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel5">5</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel6">6</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel7">7</span></td>
+<td class="item2_underline"><span class="LANGS" id="Cable_Status_Channel8">8</span></td>
+</tr>
+<tr id="channelfrequency">
+<td class="item"><span class="LANGS" id="Cable_Status_ChannelFrequency">Frequency (MHz)</span></td>
+</tr>
+<tr id="modulation">
+<td class="item"><span class="LANGS" id="Cable_Status_Modulation">Modulation</span></td>
+</tr>
+<tr id="signalstrength">
+<td class="item"><span class="LANGS" id="Cable_Status_SignalStrength">Signal strength (dBmV)</span></td>
+</tr>
+<tr id="signalnoiseratio">
+<td class="item"><span class="LANGS" id="Cable_Status_SignalNoiseRatio">Signal noise ratio (dB)</span></td>
+</tr>
+<tr id="channeldcid">
+<td class="item"><span class="LANGS" id="Cable_Status_ChannelDCId">Channel ID</span></td>
+</tr>
+</table>
+</div>
+
+<p id="title"><span class="LANGS" id="Cable_Status_Title_Upstream">Upstream</span></p>
+<div id="cablecontent">
+<table class="checklist">
+<form name="usForm" action="/goform/Cable" method="post">
+<tr id="channelidtune">
+<input type="hidden" value="cable-status" name="file">
+<input type="hidden" value="admin/" name="dir"/>
+<td class="item"><span class="LANGS" id="Cable_Status_ChannelIdToTune">Channel ID to tune to</span></td>
+<td colspan="3"><input type=text name="CmNonvolUsChID" size="9" maxlength="9" class="input-mid">
+<span class="LANGS" id="Cable_Status_changeUsIDApply"><input type="button" value="Apply" align="middle" class="button_in_content1" onClick="changeUsID()"></span>
+</td>
+</tr>
+</form>
+</table>
+
+<table class="checklist1" id="upstream">
+<tr id="tableheader">
+<td class="item"><span class="LANGS" id="Cable_Status_Port">Port</span></td>
+<td class="item1_underline"><span class="LANGS" id="Cable_Status_Channel1">1</span></td>
+<td class="item1_underline"><span class="LANGS" id="Cable_Status_Channel2">2</span></td>
+<td class="item1_underline"><span class="LANGS" id="Cable_Status_Channel3">3</span></td>
+<td class="item1_underline"><span class="LANGS" id="Cable_Status_Channel4">4</span></td>
+</tr>
+<tr id="upstreamFrequency">
+<td class="item"><span class="LANGS" id="Cable_Status_UpstreamFrequency">Frequency (Hz)</span></td>
+</tr>
+<tr id="upstreambandwidth">
+<td class="item"><span class="LANGS" id="Cable_Status_UpstreamBandwidth">Bandwidth (kbps/KHz)</span></td>
+</tr>
+<tr id="scdmamode">
+<td class="item"><span class="LANGS" id="Cable_Status_SCDMA">SCDMA mode</span></td>
+</tr>
+<tr id="transmissionsignalstrength">
+<td class="item"><span class="LANGS" id="Cable_Status_TransimissionSignalStrength">Signal strength (dBmV)</span></td>
+</tr>
+<tr id="channelid">
+<td class="item"><span class="LANGS" id="Cable_Status_ChannelId">Channel ID</span></td>
+</tr>
+</table>
+</div>
+
+<div id="cable_IPInfo">
+<p id=title><span class="LANGS" id="Cable_Status_Title_CableModemIpInformation">Cable Modem IP Information</span></p>
+<div id="contentIpv4">
+<table class="checklist" id="cable">
+<tr id="ipaddress">
+<td class="item"><span class="LANGS" id="Cable_Status_IpAddress">IPv4 Address</span></td>
+</tr>
+<tr id="subnetmask">
+<td class="item"><span class="LANGS" id="Cable_Status_SubMask">Subnet Mask</span></td>
+</tr>
+<tr id="gatewayip">
+<td class="item"><span class="LANGS" id="Cable_Status_Gateway">Gateway IP</span></td>
+</tr>
+<tr id="dhcpleasetime">
+<td class="item"><span class="LANGS" id="Cable_Status_DhcpLeaseTime">DHCP Lease Time</span></td>
+</tr>
+</table>
+</div>
+<div id="contentIpv6">
+<table class="checklist" id="cable">
+<tr id="ipv6address">
+<td class="item"><span class="LANGS" id="Cable_Status_Ipv6Address">IPv6 Address</span></td>
+</tr>
+<tr id="gatewayipv6">
+<td class="item"><span class="LANGS" id="Cable_Status_Gatewayipv6">Gateway IP</span></td>
+</tr>
+
+</table>
+</div>
+</div>
+
+</div> <!-- end of maincontent -->
+</div> <!-- end of content -->
+
+
+﻿</div> <!-- end of rightsec -->
+
+<div id="bottom"></div>
+
+
+<!--p id="footer"> &copy; 2010 <a href="http://www.hitrontech.com/">Hitron Technologies </a>Inc.. All rights reserved.</p-->
+<!--<p id="footer"></p>-->
+
+</div> <!-- end of boundary -->
+
+</body>
+</html>
+

@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Dancer2' => '0.15000',
+                                      'Dancer2::Core::Role::SessionFactory::File' => '0',
+                                      'Dancer2::Core::Types' => '0',
+                                      'Moo' => '0',
+                                      'Sereal::Decoder' => '0',
+                                      'Sereal::Encoder' => '0',
+                                      'perl' => '5.008001',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'Dancer2' => '0.15000',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0.22',
+                                   'HTTP::Cookies' => '0',
+                                   'HTTP::Date' => '0',
+                                   'HTTP::Request::Common' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'JSON' => '0',
+                                   'Plack::Test' => '0',
+                                   'Test::More' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

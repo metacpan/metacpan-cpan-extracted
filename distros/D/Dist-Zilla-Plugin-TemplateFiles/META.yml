@@ -1,0 +1,24 @@
+---
+abstract: 'Use files to template a distribution'
+author:
+  - 'Jonathan Scott Duff <duff@pobox.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.032, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-TemplateFiles
+requires:
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  Moose: '0'
+  Moose::Autobox: '0'
+  namespace::autoclean: '0'
+resources:
+  bugtracker: http://github.com/perlpilot/Dist-Zilla-Plugin-TemplateFiles/issues
+  repository: git://github.com/perlpilot/Dist-Zilla-Plugin-TemplateFiles.git
+version: '0.03'

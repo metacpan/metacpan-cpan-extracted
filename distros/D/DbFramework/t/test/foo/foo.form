@@ -1,0 +1,6 @@
+(
+  foo => qq{<DbField foo.foo>
+<DbField foo.bar value=www.motorbase.com>
+<DbField foo.baz value=1 type=INT>},
+  bar => q{bar},
+)

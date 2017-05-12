@@ -1,0 +1,66 @@
+<HTML>
+<HEAD>
+<TITLE>stag-autoddl</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-autoddl.pl</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  stag-autoddl.pl -parser XMLAutoddl -handler ITextWriter file1.txt file2.txt</PRE>
+<PRE>
+  stag-autoddl.pl -parser MyMod::MyParser -handler MyMod::MyWriter file.txt</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>script wrapper for the Data::Stag modules</P>
+<DL>
+<DT><STRONG><A NAME="item_%2Dhelp%7Ch">-help|h</A></STRONG><BR>
+<DD>
+shows this document
+<P></P>
+<DT><STRONG><A NAME="item_%2Dp%7Cparser_FORMAT">-p|parser FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dw%7Cwriter_FORMAT">-w|writer FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>This is only used if transforms are required on the data to turn it
+into relational form; the transformed xml (or other stag format) is
+stored in the file specified by -t</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dlink%7Cl_NODE_NAME">-link|l NODE_NAME</A></STRONG><BR>
+<DD>
+this node name will be used as a linking table
+<P>multiple linking nodes can be set:</P>
+<PRE>
+ -l foo2bar -l x2y -l bim2bum</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dt_TRANSFORMED_FILE_NAME">-t TRANSFORMED_FILE_NAME</A></STRONG><BR>
+<DD>
+the transformed input file is written here
+<P></P></DL>
+
+</BODY>
+
+</HTML>

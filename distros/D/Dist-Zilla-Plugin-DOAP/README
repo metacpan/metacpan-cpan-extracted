@@ -1,0 +1,89 @@
+NAME
+    Dist::Zilla::Plugin::DOAP - create a doap.xml file for your project
+
+SYNOPSIS
+    In dist.ini:
+
+       [DOAP]
+
+    Or even:
+
+       [DOAP]
+       xml_filename = project.xml
+       ttl_filename = project.ttl
+
+DESCRIPTION
+    This is a small plugin for Dist::Zilla, enabling you to bundle a DOAP
+    file with your distribution.
+
+  The Straight DOAP
+    So what is DOAP? This explanation is lifted from Wikipedia
+    <http://en.wikipedia.org/wiki/DOAP>.
+
+    *DOAP (Description of a Project) is an RDF Schema and XML vocabulary to
+    describe software projects, in particular free and open source
+    software.*
+
+    *It was created and initially developed by Edd Dumbill to convey
+    semantic information associated with open source software projects.*
+
+    *It is currently used in the Mozilla Foundation's project page and in
+    several other software repositories, notably the Python Package Index.*
+
+  Configuration
+    This plugin has three settings that you can tweak in your "dist.ini"
+    file:
+
+    "xml_filename"
+        The filename for DOAP output, serialized as XML. Defaults to
+        "doap.xml". Set this to the empty string to disable XML output.
+
+    "ttl_filename"
+        The filename for DOAP output, serialized in the slightly more
+        readable Turtle format. Defaults to undef. Set this to a filename to
+        output some Turtle.
+
+    "process_changes"
+        A boolean indicating whether your "Changes" file should be processed
+        to generate a release history. Defaults to 0 (no).
+
+  Hints
+    For the most part, everything should "just work". The plugin will figure
+    out everything it needs from your "distmeta" (i.e. META.json) and
+    "Changes" file (if it exists). Here are a few hints though...
+
+    *   For this module to have the best chance of reading your changelog,
+        format it as per CPAN::Changes::Spec.
+
+    *   DOAP represents people as structured resources, while META.json
+        represents them as strings. This module expects authors and
+        contributors listed in META.json to conform to one of the following
+        formats:
+
+           Joe Bloggs (JOEB) <joe.bloggs@example.net>
+           Joe Bloggs <joe.bloggs@example.net>
+           Joe Bloggs
+
+        (Assuming that "JOEB" is Joe's PAUSE login.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Zilla-Plugin-DOAP>.
+
+SEE ALSO
+    RDF::DOAP, RDF::DOAP::Lite.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

@@ -1,0 +1,39 @@
+Revision history:
+
+0.09  Thu Apr  6 14:36:36 EDT 2017
+    - refactored increment/decrement in order to properly
+      handle DST transitions as perl RT #120789
+
+0.08  Thu Jun 10 16:54:11 EDT 2010
+    - Added match() for checking cron hits
+
+0.07  Mon Mar 29 16:54:25 CST 2004
+    - Patched next() and previous() to work with new DateTime::Set
+
+0.06  Tue Dec 30 14:28:32 CST 2003
+    - Added user-mode auto-detection
+    - Added original() method to return original
+      unparsed cron strings
+
+0.05  Tue Nov 11 22:40:16 CST 2003
+    - Retains command and user strings if present
+    - Switched to named parameters for constructors
+    - Added 'user_mode' parameter for crontab formats
+      that include user names before the command.
+    - Added command() and user() methods
+
+0.04  PAUSE fodder
+
+0.03  Wed May  7 17:09:38 EDT 2003
+    - more edge cases detected/prevented
+    - dependencies added
+    - removal of 'our'
+
+0.02  Fri May  2 00:22:52 EDT 2003
+    - changed API
+    - fixed some boundary cases
+    - streamlined, added some helper classes with cron sets
+    - CPAN
+
+0.01  Tue Apr 22 19:52:56 EDT 2003
+    - initial release

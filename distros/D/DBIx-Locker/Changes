@@ -1,0 +1,48 @@
+Revision history for DBIx-Locker
+
+0.100118  2016-07-17 15:59:46-04:00 America/New_York
+        - fixes to typos in documentation (thanks, Sergiy Borodych)
+
+0.100117  2014-05-19 17:38:21-04:00 America/New_York
+        - Fix tests on DBD::SQLite 1.42 (frew)
+
+0.100116  2013-12-17 13:08:36-0500 America/New_York
+        - tweak test expectations to allow for multiline unique key error
+          (seems to be found in older SQLite?)
+
+0.100115  2013-11-27 22:40:10 America/New_York
+          Add lockstring method to ::Lock (frew)
+
+          Add is_locked flag to ::Lock to make unlock idempotent (frew)
+
+0.100114  2013-07-30 18:03:23 America/New_York
+          Include errstr from underlying db (frew)
+
+          update bugtracker
+
+0.100113  2013-07-05 21:13:26 America/New_York
+          fix typo, update bugtracker
+
+0.100112  2012-11-06 12:01:01 America/New_York
+          Add MSSQL DDL (frew)
+          Add documentation of the storage table (frew)
+          Factor out last_insert_id for other drivers (frew)
+
+0.100111  2010-01-11 19:24:02 America/New_York
+          oops, previous release was missing a commit!
+
+0.100110  2010-01-11 18:59:08 America/New_York
+          do not require anyone to install JSON::XS
+
+0.092650  2009-09-22
+          correctly convert timestamps to strings when updating expiry
+          a few error handling improvemens
+
+0.092600  2009-09-17
+          make ->expires a mutator (APEIRON)
+
+0.091350  2009-05-15 12:27:49 UTC
+          add sqlite prereq
+
+0.091340
+          first release to the CPAN

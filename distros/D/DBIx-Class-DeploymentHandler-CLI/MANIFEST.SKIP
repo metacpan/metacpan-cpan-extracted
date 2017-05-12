@@ -1,0 +1,5 @@
+^\.git\/
+^.*.bak
+^.*.old
+^.*.swp
+.gitignore

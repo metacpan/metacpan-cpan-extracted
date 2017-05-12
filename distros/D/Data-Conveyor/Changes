@@ -1,0 +1,104 @@
+Revision history for Perl extension Data-Conveyor
+
+1.103130  2010-11-09 13:41:33 Europe/Vienna
+    - D::C::YAML::Marshall::Payload::InstructionContainer: be more flexible in
+      generating instructions - anything the instruction factory can generate
+      is ok
+
+1.103010  2010-10-28 00:44:55 Europe/Vienna
+    - fixed POD
+    - removed plugin mechanism. Plugins based on Moose roles are superior.
+
+1.102250  2010-08-13 14:46:36 Europe/Vienna
+
+1.101690  2010-06-18 12:52:52 Europe/Vienna
+    - D::C::Monitor: added get_activity(), get_activity_running,
+      count_open_regtransfers() so we don't have to go directly to the storage.
+    - D::C::Ticket::Payload::Instruction::Container: override stringify() for
+      the Web API because container items don't stringify well
+    - D::C::Ticket::Payload->get_all_exceptions now returns the list of
+      exceptions without duplicates
+
+1.100870  2010-03-28 12:03:22 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.11 Mon 2010.02.01 20:41:59 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - support for versioned payload objects
+    - convert to new-style PTAGS handling (see Vim::Tag)
+
+0.10 Thu 2009.11.05 15:47:09 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - performance tuning
+
+0.09 Thu 2009.11.05 00:15:44 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - D::C::Ticket::Payload->get_list_for_object_type caches the method name
+
+0.08 Mon 2009.11.02 18:11:40 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - support for Class-Scaffold's subtests
+    - no longer need to call named_test(), but leave it in here for now so
+      (legacy?) subclasses can use it
+
+0.07 Tue Sep 29 16:04:45 MSZ 2009 (Marcel Gruenauer <marcel@cpan.org>)
+    - repo maintenance
+    - added author requirements; fixed auxiliary files; use once.pm
+    - updated MANIFEST and MANIFEST.SKIP
+    - support for YAML::Marshall
+    - remove stray warn() debug calls
+    - D::C::Storage::DBI: added cached_statement()
+    - Merge branch 'master' of git@github.com:hanekomu/data-conveyor
+    - C::S::Environment: get_max_length_for can now handle cases where there's
+      no object type
+
+0.06 Mon Jul  6 13:31:02 CEST 2009 (Marcel Gruenauer <marcel@cpan.org>)
+     - added HTTP::Engine-based webserver
+     - added extra tests (xt/)
+     - added requirements to Makefile.PL
+     - doc fixes
+
+0.05  Mon Oct 20 23:11:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - Data::Conveyor::App::Test::Stage: don't delete the ticket because during
+       testing, we rollback anyway and deleting is expensive
+     - Data::Conveyor::App::Test::Stage: don't call comparable() on the ticket
+       in test_expectations() because subclasses will call comparable() on
+       relevant parts and making the whole ticket is very expensive.
+
+0.04  Thu, 29 May 2008 12:02:48 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.04
+     - Data::Conveyor::Stage::TransactionHandler: run the transaction handler
+       before the <stage>.<object-type>.<command> hook
+     - added storage setup code
+     - .shipit: fixed svk.tagpattern
+
+0.03  Wed, 26 Mar 2008 16:50:19 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - set the version to 0.03
+     - added plugin mechanism
+     - Data::Conveyor::Charset::ViaHash is no longer a singleton, but avoids
+       re-converting already converted characters
+
+0.02  Wed, 13 Feb 2008 10:23:48 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - Data::Conveyor::Charset::ViaHash is now a singleton to make repeated
+       instantions work; also added tests to verify that
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - Makefile.PL: added Date::Calc as a requirement
+     - Data::Conveyor::Exception::ServiceMethodHelp->run_method() now catches
+       now catches and rethrows Data::Conveyor::Exception::ServiceMethodHelp
+       exceptions
+     - updated t/perlcriticrc
+     - Makefile.PL: require v0.03 of Class::Scaffold
+     - set_state service method is no more; use set_stage
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - removed unnecessary imports from some modules
+     - added Data::Conveyor::Service::Result::Tabular_TEST
+     - updated MANIFEST
+     - added lib/Data/Conveyor/Service/Result/Tabular_TEST.pm
+     - tags: NEWFEATURE
+
+0.01  Wed, 07 Nov 2007 15:49:49 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

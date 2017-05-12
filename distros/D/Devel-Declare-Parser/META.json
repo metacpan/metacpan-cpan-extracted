@@ -1,0 +1,68 @@
+{
+   "abstract" : "Higher level interface to Devel-Declare",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4212",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Declare-Parser",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Compiling" : "0.02",
+            "B::Hooks::EndOfScope" : "0.08",
+            "Carp" : "0",
+            "Devel::Declare" : "0.006",
+            "Scalar::Util" : "0",
+            "Test::Exception::LessClever" : "0.005",
+            "Test::Simple" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Declare::Interface" : {
+         "file" : "lib/Devel/Declare/Interface.pm"
+      },
+      "Devel::Declare::Parser" : {
+         "file" : "lib/Devel/Declare/Parser.pm",
+         "version" : "0.020"
+      },
+      "Devel::Declare::Parser::Codeblock" : {
+         "file" : "lib/Devel/Declare/Parser/Codeblock.pm"
+      },
+      "Devel::Declare::Parser::Emulate" : {
+         "file" : "lib/Devel/Declare/Parser/Emulate.pm"
+      },
+      "Devel::Declare::Parser::Method" : {
+         "file" : "lib/Devel/Declare/Parser/Method.pm"
+      },
+      "Devel::Declare::Parser::Sublike" : {
+         "file" : "lib/Devel/Declare/Parser/Sublike.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Devel-Declare-Parser/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Devel-Declare-Parser"
+      }
+   },
+   "version" : "0.020"
+}

@@ -1,0 +1,30 @@
+---
+abstract: 'remember complex information without giving yourself a headache'
+author:
+  - 'Andrew Sterling Hanenkamp <hanenkamp@cpan.org>'
+build_requires:
+  POE: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Remember
+requires:
+  Carp: 0
+  Class::Load: 0
+  DBM::Deep: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+  YAML::Syck: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Remember
+  repository: git://github.com/zostay/Data-Remember.git
+version: 0.140490

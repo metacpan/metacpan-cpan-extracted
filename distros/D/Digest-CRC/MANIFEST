@@ -1,0 +1,8 @@
+Changes
+CRC.xs
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Digest/CRC.pm
+t/crc.t

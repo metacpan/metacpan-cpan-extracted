@@ -1,0 +1,64 @@
+Size Limits
+===========
+
+Remove array size limit. Size encoding should be 
+
+    0x0000 - 0x7FFF =>  size is 0 - 32767
+    0x8000 - 0xFFFF =>  this is the low 15 bits of the size with another
+                        16 bits to follow
+
+Version
+=======
+
+Add version encoding. Version object has tag 0xFF and follows the FMB
+header. The following u16 gives the schema number. If no version
+present schema version 1 is assumed. Bit 16 of the schema number is set
+if this stream might contain backrefs. This is a hint to the decoder
+that it needs to remember objects that it has created so that it can
+refer back to them. See "Back References" below.
+
+Objects
+=======
+
+Add a new tag (0x13) for real objects and rename 0x11 has HASH. Objects
+are serialised in the same way as hashes except that the object class
+name is encoded before the element count using normal string encoding.
+
+The encoder and decoder should provide hooks to map the class names
+stored in the file to some portable variant. So for example a Perl
+encoder might want to translate classnames like
+
+    MyApp::UserData
+    MyApp::SessionState
+
+into
+
+    UserData
+    SessionState
+    
+and then a JS or PHP decoder would remap those names to whatever
+classes it uses.
+
+Back References
+===============
+
+Add a new tag (0x14) for back references to previously encoded items.
+When an item that has already been encoded is encountered again a
+reference to it will be written as 0x14 followed by the ordinal position
+of the original object in the stream encoded using the extended array
+size encoding described above.
+
+It is possible for an object to refer to itself:
+
+    my $hash = { };
+    $hash->{abc} = $hash;
+    
+    $enc->encode( $hash );
+    
+    0x11 0x01 0x00 0x61 0x62 0x63 0x00 0x14 0x00 0x00
+    \____________/ \_________________/ \____________/
+      hash, 1 el          'abc'          back ref #0
+
+At the discretion of the encoder this technique may be used for repeated
+scalars (numbers and strings) as well as hashes and arrays if this would
+make the encoded data more compact.

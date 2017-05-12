@@ -1,0 +1,43 @@
+{
+   "abstract" : "Methods for wrapping the Neurio API calls so that they are                   accessible via Perl",
+   "author" : [
+      "Kedar Warriner"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Neurio",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "JSON" : "2.90",
+            "LWP::UserAgent" : "6.05",
+            "MIME::Base64" : "3.14"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.16"
+}

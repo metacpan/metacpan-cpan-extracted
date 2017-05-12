@@ -1,0 +1,79 @@
+#!perl
+use strict;
+use warnings;
+use IO::Interactive::Tiny;
+use Encode qw//;
+
+my $encoding = shift @ARGV;
+
+unless ( IO::Interactive::Tiny::is_interactive(*STDIN) ) {
+    my $dump_str = join '', <STDIN>;
+    $dump_str =~ s/\\x\{([0-9a-f]+)\}/_unescape($1)/ge;
+    print $dump_str;
+}
+
+sub _unescape {
+    my ($code) = @_;
+
+    Encode::encode($encoding || 'utf8', chr(hex $code));
+}
+
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+edumper - unescaping the dumped multibyte strings by Data::Dumper
+
+=head1 SYNOPSIS
+
+For example.
+
+    $ cat hoge.pl
+    use utf8;
+    use Data::Dumper;
+    print Dumper ['日本語表示能力'];
+
+Normaly, escaped like below.
+
+    $ perl hoge.pl
+    $VAR1 = [
+              "\x{65e5}\x{672c}\x{8a9e}\x{8868}\x{793a}\x{80fd}\x{529b}"
+            ];
+
+Piped L<edumper>.
+
+    $ perl hoge.pl | edumper
+    $VAR1 = [
+              "日本語表示能力"
+            ];
+
+CONGRATS!
+
+
+=head1 OPTIONS
+
+=head2 encoding
+
+If dumped string is not utf8, then you should pass the encoding option to L<edumper>.
+
+    $ perl hoge.pl | edumper cp932
+
+
+=head1 AUTHOR
+
+Dai Okabayashi E<lt>bayashi@cpan.orgE<gt>
+
+=head1 SEE ALSO
+
+L<Data::Dumper::AutoEncode>
+
+L<Data::Dumper>
+
+=head1 LICENSE
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See L<perlartistic>.
+
+=cut

@@ -1,0 +1,41 @@
+Revision history for DBIx-Table-TestDataGenerator
+
+0.005 2013-01-XXXXX
+
+    - Support for auto-increment primary key columns added.
+
+    - One can now configure if for a self-reference, new root nodes should have NULL or their own primary key value as the value for the column referencing the parent record.
+
+    - The generated test data can now be dumped to a csv file with bulk inserts in mind.
+
+    - Fixes in license information and documentation.
+
+    - Another bigger refactoring: The old TableProbe class was way too big. It has been replaced by smaller classes with definite responsibilities.
+
+0.004 2012-12-19
+
+    - A big refactoring has been done, the module is now based on DBIx::Class for all database related things, in particular it does not contain DBMS specific code apart from DBD::SQLite, which is used to define in-memory databases to allow running tests during the installation of the module.
+
+    - Currently, there is no seed functionality since for random selection of records we now use DBIx::Class::Helper::ResultSet::Random and for the time being no seed can be configured there.
+
+0.003 2012-12-14
+
+    Bugfixes:
+
+    - TestDataGenerator.pm line 234: condition used "keys $hash_ref" instead of "keys %hash"
+
+    - replaced smart match operator ~~ by use of grep to make it work with Perl versions older than 5.10
+
+0.002 2012-12-05
+
+    Bugfixes:
+
+    - Database schema argument was declared optional, but in fact needed, resulting in an error (https://rt.cpan.org/Ticket/Display.html?id=81689)
+
+    - Missing install dependencies (https://rt.cpan.org/Ticket/Display.html?id=81687 and https://rt.cpan.org/Ticket/Display.html?id=81685)
+
+    - Errors in POD usage section (https://rt.cpan.org/Ticket/Display.html?id=81686)
+
+0.001 2012-10-28
+
+    - First version, supports Oracle, PostgreSQL and SQLite.

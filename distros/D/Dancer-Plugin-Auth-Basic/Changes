@@ -1,0 +1,20 @@
+Revision history for Dancer-Plugin-Auth-Basic
+
+0.030     2014-04-14
+          Switched to using Dist::Zilla.
+
+0.02      2012-06-25
+          * Added support for encrypted passwords in configuration files
+          * The REMOTE_USER request variable is now set upon authorization
+
+0.012     2012-06-06
+          * Fixed README* permission problems [RT #72587]
+          * Fixed deprecation warnings [RT #76320]
+
+0.011     2011-11-13
+          * Updated the request path matching code so that the longest matching
+          path is found first
+          * Added missing requirements to build script
+
+0.01      2011-10-06
+          First version, released on an unsuspecting world.

@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5d2b1310967dc55ae32b75916ee08df2fb2e7842 Changes
+SHA1 27cf078faac611b6a6bb94ab8dd9d9b463defb6c LICENSE
+SHA1 7f0d02abc32dd5107126c8b60bc5933366241025 MANIFEST
+SHA1 dba2d4c04c2d0ac03ebe2e0bd80ec7ac9d9f1a1d META.json
+SHA1 6fbb2adc6d90ce9ea8f3d230bc75a83241b15c9b META.yml
+SHA1 3b18602ae9820aa09ef8675729cbe5672f7277d7 Makefile.PL
+SHA1 d1d2c52943c2135bd4ac121a7718e604a50e7ff6 README
+SHA1 cf7fa183859412616af217cff812832a3bd6d395 lib/Data/Dumper/Concise/Aligned.pm
+SHA1 548a25b9f820c97f6dd9efaeb68750ea880eaac4 t/Data-Dumper-Concise-Aligned.t
+SHA1 9e6e8302c6371ed788b40cd7ecff1eaed834b22f t/pod-coverage.t
+SHA1 6c20761b6a8f5ab2e199ce47aa25b1413ca0115e t/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJU1og9AAoJEDTEVWqwTuCUNecIAKzMwmvqb74ZNQjMaHJ56KZ/
+SlJ3draiVIkDF4JR6T1GM0lq1Gy5ZetKto/se2gKiAk69YeMJJFDKOuoeBesTbMt
+8jM/zmyF2uEV+I4JS0FeTsSyKk2SLSvSq5mgR5yFMb9XEmPadiJzA8at65Q/7jzM
+USGdwWWPvEyEj2b16+4lc4LqnHY/l1kUBOyd6j7xHNvBNbEA6BLS+8Qu3xZtwqBf
+db40BvOZWvcaFYBh9VugU+ARIeQVxIkoKzsplDwUE4xUZnV8tRF0H2j5c81pPqcP
+VyDf9ZiHzOkpET12OfW68+zn5fGlM1SEAKJxwJVhaGpWPlL/Fu2PyDdlxVz22N0=
+=v2bN
+-----END PGP SIGNATURE-----

@@ -1,0 +1,199 @@
+---
+abstract: 'Plugin bundle used by ALEXBIO'
+author:
+  - 'Alessandro Ghedini <alexbio@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  File::ShareDir::Install: 0.03
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-Author-ALEXBIO
+requires:
+  Config::Identity: 0
+  Dist::Zilla: 0
+  Dist::Zilla::Plugin::Clean: 0
+  Dist::Zilla::Plugin::Git: 0
+  Dist::Zilla::Plugin::GitHub: 0.35
+  Dist::Zilla::Plugin::InstallRelease: 0
+  Dist::Zilla::Plugin::MakeMaker::Awesome: 0
+  Dist::Zilla::Plugin::Test::CheckManifest: 0
+  Dist::Zilla::Plugin::Test::Compile: 2.033
+  Dist::Zilla::Role::MintingProfile::ShareDir: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+version: 2.07
+x_Dist_Zilla:
+  perl:
+    version: 5.018001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Author::ALEXBIO/GatherDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Author::ALEXBIO/PruneCruft'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Author::ALEXBIO/ManifestSkip'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Author::ALEXBIO/MetaYAML'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Author::ALEXBIO/License'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Author::ALEXBIO/Readme'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Author::ALEXBIO/ExtraTests'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Author::ALEXBIO/ExecDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Author::ALEXBIO/ShareDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Author::ALEXBIO/Manifest'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Author::ALEXBIO/TestRelease'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Author::ALEXBIO/ConfirmRelease'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Author::ALEXBIO/MakeMaker'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Git::NextVersion
+      name: '@Author::ALEXBIO/Git::NextVersion'
+      version: 2.019
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@Author::ALEXBIO/MetaConfig'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@Author::ALEXBIO/MetaJSON'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: '@Author::ALEXBIO/AutoPrereqs'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PodVersion
+      name: '@Author::ALEXBIO/PodVersion'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@Author::ALEXBIO/PkgVersion'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: '@Author::ALEXBIO/NextRelease'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          filename: t/00-compile.t
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
+      name: '@Author::ALEXBIO/Test::Compile'
+      version: 2.037
+    -
+      class: Dist::Zilla::Plugin::Test::CheckManifest
+      name: '@Author::ALEXBIO/Test::CheckManifest'
+      version: 0.04
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@Author::ALEXBIO/PodSyntaxTests'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Author::ALEXBIO/Git::Commit'
+      version: 2.019
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Author::ALEXBIO/Git::Tag'
+      version: 2.019
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Author::ALEXBIO/UploadToCPAN'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::InstallRelease
+      name: '@Author::ALEXBIO/InstallRelease'
+      version: 0.008
+    -
+      class: Dist::Zilla::Plugin::Clean
+      name: '@Author::ALEXBIO/Clean'
+      version: 0.07
+    -
+      class: Dist::Zilla::Plugin::ModuleShareDirs
+      name: ModuleShareDirs
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.006
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.006

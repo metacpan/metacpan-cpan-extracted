@@ -1,0 +1,13 @@
+Revision history for Dancer-Plugin-Auth-Tiny
+
+0.002     2012-12-20 11:16:59 America/New_York
+
+  [ADDED]
+
+  - The 'passthrough' feature allows some query parameters
+    in the original request to be passed through to the login request
+
+0.001     2012-12-18 22:44:27 America/New_York
+
+  - First release
+

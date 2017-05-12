@@ -1,0 +1,23 @@
+--- 
+abstract: Resolve an Organizationally Unique Identifier
+author: 
+  - Jason Kohles C<< <email@jasonkohles.com> >>.
+build_requires: 
+  FindBin: 0
+  Test::More: 0
+distribution_type: module
+generated_by: Module::Install version 0.68
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+name: Device-OUI
+no_index: 
+  directory: 
+    - inc
+    - t
+recommends: 
+  LWP::Simple: 0
+requires: 
+  IO::File: 0
+version: 0.01

@@ -1,0 +1,118 @@
+Data-XHash
+
+FROM THE DESCRIPTION
+
+Data::XHash provides an object-oriented interface to tied, ordered
+hashes. Hash elements may be assigned keys explicitly or automatically
+in mix-and-match fashion like arrays in PHP.
+
+It also includes support for trees of nested XHashes, tree traversal,
+and conversion to and from native Perl data structures.
+
+Suggested uses include structured configuration information or HTTP
+query parameters in which order may at least sometimes be significant,
+for passing mixed positional and named parameters, or for porting PHP
+code.
+
+
+ALTERNATIVES (FROM SEE ALSO)
+
+Array::AsHash
+   An array wrapper to manage elements as key/value pairs.
+
+Array::Assign
+   Allows you to assign names to array indexes.
+
+Array::OrdHash
+   Like Array::Assign, but with native Perl syntax.
+
+Data::Omap
+   An ordered map implementation, currently implementing an array of
+   single-key hashes stored in key-sorting order.
+
+Tie::IxHash
+   An ordered hash implementation with a different interface and data
+   structure and without auto-indexed keys and some of Data::XHash's
+   other features.
+
+Tie::Hash::Array
+   Hashes stored as arrays in key sorting-order.
+
+Tie::LLHash
+   A linked-list-based hash like Data::XHash, but it doesn't support
+   the push/pop/shift/unshift array interface and it doesn't have
+   automatic keys.
+
+Tie::StoredOrderHash
+   Hashes with items stored in least-recently-used order.
+
+
+RATIONALE AND DIFFERENCES
+
+Hashes are a natural data structure for organizing information, and arrays
+are a natural data structure for building ordered lists. Sometimes you
+want your organized data (hashes) to be ordered too, like an array. One
+example would be resource configuration information, organized by
+resource name, for resources that must be loaded in a specific order
+(e.g. due to dependencies) rather than some pseudo-random order.
+
+Some of the key features that distinguish Data::XHash from other
+implementations are as follows:
+
+1) The ability to mix-and-match values with and without explicit keys.
+   Values without keys are assigned a sequential index as key
+   automatically. PHP, for example, also supports this.
+
+2) Built-in path traversal that supports auto-vivification of nested
+   data structures just like you would expect when using native hashrefs
+   and arrayrefs.
+
+3) Easy conversion to or from native Perl hashes and arrays either at
+   the level of a single XHash or as a nested tree of XHash, with
+   either an array-based or hash-based emphasis.
+
+4) Calling new() returns a blessed reference to a tied hash, so you can
+   use standard Perl hashref-like references *and* call methods on it.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::XHash
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-XHash
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-XHash
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-XHash
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-XHash/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2012 Brian Katzung
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

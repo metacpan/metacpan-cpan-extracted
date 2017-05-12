@@ -1,0 +1,36 @@
+Device/ParallelPort/JayCar
+==========================
+
+This module allows you to write to and control a Rellay Controller card made by
+JayCar. However it is very easily adapted to almost any rellay card.
+
+This particular rellay card requires that you not only set the values for each
+of the 8 output rellays but also requires that you strobe the address of the
+card. This is a great feature as it allows you to plug up to 8 of these cards
+in (mmmm - 256 rellay outputs, and 256 inputs :-). 
+
+This means it is a more complicated example, thus allowing you to write a
+simpler version from this one. This code is about 50 linues (a little over 100
+with all of the POD) so it should be simple to adapt.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::ParallelPort
+
+COPYRIGHT AND LICENCE
+
+Distributed under the Perl Artistic License
+
+Copyright (C) 2002,2004 Scott Penrose - scottp@dd.com.au
+

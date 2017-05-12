@@ -1,0 +1,5 @@
+---
+dsn: 'dbi:SQLite:dbname=:memory:'
+user: 'root'
+password: ''
+crypt_key: 'lxsafadsfadskl23239210453453802xxx02-487900-=+1!:)'

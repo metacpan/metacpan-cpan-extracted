@@ -1,0 +1,135 @@
+=head1 NAME
+
+DBIx::XMLServer::Field - base class for field types in DBIx::XMLServer
+
+=head1 SYNOPSIS
+
+  package MyField;
+  our @ISA = ('DBIx::XMLServer::Field');
+
+  sub init { };
+  sub where { };
+  sub select { };
+  sub value { };
+  sub join { };
+
+=head1 DESCRIPTION
+
+This package is the base class for field type classes in
+DBIx::XMLServer.  Both built-in and user-supplied field types are
+derived from this class.  This documentation describes the methods of
+the class and how they should be overridden in derived classes.  All
+methods have sensible base implementations; many classes will only
+need to override one or two methods.
+
+All methods of this class are executed inside B<eval>s; any errors
+thrown will be reported back to the user.
+
+For examples on how to derive your own field types, see the built-in
+type packages.
+
+=head2 B<init> method
+
+  $field->init();
+
+The B<init> method is called at the end of the class constructor.
+Any initialisation needed by the class should be put here.  The
+default is to do nothing.
+
+=head2 B<where> method
+
+  $sql_expression = $field->where($condition);
+
+The B<where> method takes a condition such as "=Fred*" or ">21" and
+converts it to an SQL expression such as S<"NAME LIKE FRED%"> or S<<
+"AGE > 21" >>.  The argument is the remainder of a fragment of the
+HTTP query, after the initial XPath expression selecting the field has
+been removed.  This method will often want to call the B<select>
+method to get the SQL name of the field.  The default method returns
+'1'.
+
+=head2 B<select> method
+
+  $sql_expression = $field->select();
+
+The B<select> method returns the SQL expression(s) for the field.  The
+default is to return the value of the B<expr> attribute of the field's
+B<< <sql:field> >> element.  This method may return a list, if the
+value of the field depends on more than one SQL expression.
+
+=head2 B<value> method
+
+  $xml_node = $field->value(\@results);
+
+The B<value> method takes the result of the SQL query and converts it
+to a fragment of XML.  The resulting fragment of XML replaces the B<<
+<sql:field> >> element in the output record.  The return value of this
+method should be: an C<XML::LibXML::Element>; a
+C<XML::LibXML::DocumentFragment>; a scalar value, which will be put
+into a new XML text node; or B<undef>, indicating a null value.
+Should the return value be B<undef>, the outcome in the result record
+is determined by the field's B<null> attribute as described in
+L<DBIx::XMLServer>.  If the field is an attribute field, only scalar
+or B<undef> return values are allowed.
+
+The argument is an array reference whose elements are the values of
+the columns in the result of the SQL SELECT statement.  This method
+should B<shift> its columns out of the array; normally only one column
+will be used, but if the B<select> method returns more than one
+expression then this method should remove the same number of values
+from the array.
+
+The default behaviour is to shift one element from the array and
+return it as a scalar.
+
+=head2 B<join> method
+
+  $table = $field->join()
+
+This method returns the names of any tables which should be joined to
+the main table in order for this field to exist.  The default is to
+return the value of the B<join> attribute of the B<< <sql:field> >>
+element.
+
+=head1 OBJECT DATA
+
+There are two items of object data which may be useful to classes:
+
+=over
+
+=item Node reference
+
+The expression C<< $self->{node} >> gives the C<XML::LibXML::Element>
+object representing the B<< <sql:field> >> element which defined this
+field.
+
+=item Owner reference
+
+The expression C<< $self->{XMLServer} >> gives the C<DBIx::XMLServer>
+element associated to the field.  The main use of this is probably to
+access the database handle stored in C<< $self->{XMLServer}->{dbh} >>,
+for purposes such as string escaping; and to get at the XML document
+object at C<< $self->{XMLServer}->{doc} >> for creating new nodes.
+Those wishing to access other data should look at the source to see
+what's there.
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIx::XMLServer>, L<DBIx::XMLServer::TextField>,
+L<DBIx::XMLServer::NumberField>, L<DBIx::XMLServer::DateField>,
+L<DBIx::XMLServer::DateTimeField>
+
+=head1 AUTHOR
+
+Martin Bright E<lt>martin@boojum.org.ukE<gt>
+
+=head1 COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-4 Martin Bright
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut

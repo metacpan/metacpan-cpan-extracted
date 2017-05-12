@@ -1,0 +1,46 @@
+---
+abstract: 'Defer messages or data across redirections'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  LWP::UserAgent: 0
+  Test::More: 0.96
+  Test::TCP: 0
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Deferred
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer::Plugin::Deferred:
+    file: lib/Dancer/Plugin/Deferred.pm
+    version: 0.003
+requires:
+  Carp: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  URI: 0
+  URI::QueryParam: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/dancer-plugin-deferred/issues
+  homepage: https://metacpan.org/release/Dancer-Plugin-Deferred
+  repository: git://github.com/dagolden/dancer-plugin-deferred.git
+version: 0.003

@@ -1,0 +1,211 @@
+==================================================
+Changes from 2013-10-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.005 at 2014-10-28 18:09:26 +0000
+------------------------------------------
+
+  Change: 7f6133e5a3cf725f8933c01b01f16aab01a0fef7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-28 10:47:48 +0000
+
+    use the more lightweight Git::Contributors plugin 
+
+  Change: 49cabc5cc91038b1fd002bdd8f8216b5ea23684b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-28 10:43:34 +0000
+
+    drop DualBuilders 
+
+  Change: d61babf8c949c6ae2e6fc9b9b9bd3bf983aa63c3
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 13:41:49 +0000
+
+    add mailmap so we fix CONTRIBUTORS hah 
+
+------------------------------------------
+version 0.004 at 2014-10-25 20:28:49 +0000
+------------------------------------------
+
+  Change: 1ce5a6fa1523f4af1d964ee8396be926429e196b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 13:28:49 +0000
+
+    New CPAN release of Dist-Zilla-PluginBundle-Apocalyptic - v0.004
+
+    Added a bunch of plugins! wheee :)
+
+    Tweaked the Changes format to be CPAN::Changes::Spec compatible!
+
+    Changed to DZP::ReadmeAnyFromPod instead of DZP::ReadmeFromPod as we
+    now generate a README.pod in the root for github, thanks RT#85019
+
+    Enabled ConfigSlicer and PluginRemover for easier bundle
+    manipulation, thanks DAGOLDEN
+
+    Enabled the Pod::Weaver options to preserve original source code line
+    numbering on munging, thanks DAGOLDEN 
+
+  Change: 1fce61fb808f8b6c2a8de923c6142df060d3b5dd
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-25 13:08:31 +0000
+
+    Add Changes to allow_dirty to force @Git to commit it... 
+
+  Change: de4d7c689bc5ab060d8aa9cedcc679585b7c3d31
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 22:27:15 +0000
+
+    rename EXIT to LEAVE for clarity 
+
+  Change: 57ea801ecbe8bb813294276ca84d670e5ce6b24c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 21:59:55 +0000
+
+    fix conflicting names for ReadmeAny 
+
+  Change: 30c016d24dbb1180c66324911158a4f3ccdfafc4
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 21:41:56 +0000
+
+    use PromptIfStale, ETHER++ 
+
+  Change: 620ebbdc716ecf6858818560a95dbc022af14086
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 21:22:17 +0000
+
+    fix ReportPhase weirdness and load it only on verbose 
+
+  Change: a27986afeab1d359d40e92100dda24f380961e30
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 19:38:21 +0000
+
+    tweak http links to pass PodNo404s 
+
+  Change: a3f8fc6bd9766ebcb74ac4c85e12cf39f6e1eefc
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 17:57:03 +0000
+
+    add Git::Remote::Check and change README.pod to be generated during
+    release phase, thanks ETHER 
+
+  Change: 4febddf2dc958669d38f633709eb1faf94798b2e
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-24 00:11:56 +0000
+
+    preserve original line numbers on munging 
+
+  Change: 9faf0ece54d38345151e6c9b1677c63fb3a9297b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 23:56:35 +0000
+
+    use Git::GatherDir so we can ignore README.pod 
+
+  Change: fe361a4bf1e0d80971a4415c0c0f5a3dfc6222b1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 23:48:40 +0000
+
+    use ConfigSlicer and PluginRemover for easier management 
+
+  Change: 75f253212f8fb2d6f91f6133a43073e6f47bc663
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 23:26:07 +0000
+
+    dont use Git::CheckFor::Fixups yet as we need it to use
+    version_regexp 
+
+  Change: 3e2c7220644b8e89bbbeaee8839e7a51c2696cab
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 22:59:28 +0000
+
+    use the @Git::CheckFor bundle 
+
+  Change: a9d2cd65dd6ab2fa2d387efd9963d14b68f8ed76
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 21:42:04 +0000
+
+    fix pod for dumpphases 
+
+  Change: 58aab49282ec2100cca417e13760cde7623429dd
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 21:35:23 +0000
+
+    generate README.pod in root 
+
+  Change: cd9dc1548e557a29a68ba711e390e4967ccdc6c1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 21:08:43 +0000
+
+    tweak changes 
+
+  Change: 13b1efa9f7241bd5b0cd838f84ee1d1f9e401fd7
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 20:58:35 +0000
+
+    tweak Changes format 
+
+  Change: fe4f40e1a4d9c69aba1711a7f0b23d61ce6e2b6a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 20:52:48 +0000
+
+    add DZP::ReportPhase, thanks kentnl for tracking down weirdness 
+
+  Change: 22edbe12e0bf2fac937340ddaafdf2003df9b183
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 18:12:55 +0000
+
+    fix docs 
+
+  Change: 1ac1330e9243e5c502e1bb005c2e2d9b07d8344a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:53:22 +0000
+
+    add DZP::CPANFile to generate it 
+
+  Change: 1e1aca246a5ac69c20b0676a6f7b1d951e21b49a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:50:42 +0000
+
+    add DZP::ContributorsFromGit 
+
+  Change: c82351e7ef4d7e02186a981335c45cd3a15fe449
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:47:28 +0000
+
+    use DZP::Git::Describe to insert a short git description in the main
+    module 
+
+  Change: 52d6e86b875fddc4571e16f634ed00a38f7b5196
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:45:46 +0000
+
+    add DZP::CheckSelfDependency for sanity 
+
+  Change: c38b293a0d46d57a455e2099eff62ca969b7ba71
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:10:12 +0000
+
+    add DZP::SchwartzRatio to inform us of old releases on CPAN 
+
+  Change: 47104d35bc2989bf1765b855ff90844081428c3e
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 17:07:05 +0000
+
+    add DZP::CheckIssues so we can review RT/github issues before release 
+
+  Change: fc048fd55defa38faedef91d9c4cbe1c0eb81d85
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 15:52:19 +0000
+
+    use the DZP:Covenant module to generate an AUTHOR_PLEDGE file 
+
+  Change: 5a9032501be411c71f14a478edd69b6eb7a5cfde
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-23 15:20:41 +0000
+
+    use DZP::DOAP to auto-create doap.xml 
+
+================================================
+Plus 3 releases after 2013-10-28 00:00:00 +0000.
+================================================

@@ -1,0 +1,401 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        coverable: 
+          caption: Coverable
+          f: "%d"
+          fs: ''
+        coverage: 
+          caption: Coverage
+          f: "%.1f%%"
+          fs: "%.1f%%"
+        covered: 
+          caption: Covered
+          f: "%d"
+          fs: ''
+        criterion: 
+          caption: Criterion
+          class: head
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - criterion
+        - coverable
+        - covered
+        - coverage
+      label: "Coverage summary:"
+      rows: 
+        - 
+          coverable: 12
+          coverage: 
+            class: c4
+            v: 100
+          covered: 12
+          criterion: Statement
+      summary: 
+        - 
+          coverage: 
+            class: c4
+            v: 100
+          criterion: Overall coverage
+    - 
+      headers: 
+        branch: 
+          caption: Br.
+          f: "%d%%"
+          fs: "%.1f%%"
+        command: 
+          caption: Command
+          class: file
+          f: "%s"
+          fs: "%s"
+        condition: 
+          caption: Cond.
+          f: "%d%%"
+          fs: "%.1f%%"
+        pod: 
+          caption: POD
+          f: "%d%%"
+          fs: "%.1f%%"
+        run: 
+          caption: Run
+          class: head
+          f: "%d"
+          fs: "%d"
+        statement: 
+          caption: St.
+          f: "%d%%"
+          fs: "%.1f%%"
+        subroutine: 
+          caption: Sub.
+          f: "%d%%"
+          fs: "%.1f%%"
+        time: 
+          caption: Time
+          f: "%.3fs"
+          fs: "%.3fs"
+      headers_order: 
+        - run
+        - statement
+        - command
+      label: "Covered by:"
+      rows: 
+        - 
+          command: 
+            href: t-Foo-t-1253384591.6375.39890
+            v: t/Foo.t
+          run: 1
+          statement: 
+            class: c4
+            v: 100
+      summary: 
+        - 
+          command: Total coverage
+          run: 2
+          statement: 
+            class: c4
+            v: 100
+    - 
+      headers: 
+        branch: 
+          caption: Br.
+          f: "%d"
+          fs: "%.1f%%"
+        condition: 
+          caption: Cond.
+          f: "%d"
+          fs: "%.1f%%"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        pod: 
+          caption: POD
+          f: "%d"
+          fs: "%.1f%%"
+        source: 
+          caption: Source code
+          class: src
+          f: "%s"
+          fs: "%s"
+        statement: 
+          caption: St.
+          f: "%d"
+          fs: "%.1f%%"
+        subroutine: 
+          caption: Sub.
+          f: "%d"
+          fs: "%.1f%%"
+        time: 
+          caption: Time
+          f: "%.3fs"
+          fs: "%.3fs"
+        vcs_author: 
+          caption: Author
+          class: vcs
+          f: "%s"
+          fs: "%s"
+        vcs_rev: 
+          caption: VCS Id
+          class: vcs
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - line
+        - statement
+        - source
+      label: "Overall file coverage:"
+      rows: 
+        - 
+          branch: []
+
+          condition: []
+
+          line: 1
+          pod: []
+
+          source: "#!/usr/bin/perl\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 2
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 3
+          pod: []
+
+          source: "use FindBin qw( $Bin );\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 4
+          pod: []
+
+          source: "use lib $Bin .q{/../lib};\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 5
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 6
+          pod: []
+
+          source: "use Test::More;\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 7
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 8
+          pod: []
+
+          source: "require $Bin . q{/../lib/Sample/Simple/Foo.pm};\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 9
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 10
+          pod: []
+
+          source: "plan tests => 1;\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 11
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 12
+          pod: []
+
+          source: "ok (-e $Bin . q{/../lib/Sample/Simple/Foo.pm}, q{Foo exists.});\n"
+          statement: 
+            - 
+              class: c4
+              v: 1
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 13
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+      summary: 
+        - 
+          branch: 
+            class: c0
+            v: ~
+          condition: 
+            class: c0
+            v: ~
+          line: 13
+          pod: 
+            class: c0
+            v: ~
+          src: Total coverage
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c0
+            v: ~
+          time: 
+            class: c0
+            v: ~
+metadata: 
+  title: "Coverage: t/Foo.t"
+  version: 0.05

@@ -1,0 +1,39 @@
+---
+abstract: 'display variables helpfully for debugging'
+author:
+  - 'Andrew Main (Zefram) <zefram@fysh.org>'
+build_requires:
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+dynamic_config: 0
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Debug-Show
+provides:
+  Debug::Show:
+    file: lib/Debug/Show.pm
+    version: 0
+requires:
+  B: 0
+  B::CallChecker: 0
+  B::Compiling: 0.01
+  B::Deparse: 0.64
+  B::Generate: 1.33
+  Carp: 0
+  Data::Dumper: 2.11
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.000

@@ -1,0 +1,25 @@
+Change History for Devel::PreProcessor
+
+2003-11-28 Workaround for scoping issue to allow "strict". Updated docs.
+
+1999-02-20 Fixed anoying "Argument ... isn't numeric" warning.
+1999-02-08 Preserve the __DATA__ section from the outermost file.
+1999-02-07 Incorporated AutoLoader support based on Del's implementation.
+1999-02-05 Merged do_use, do_require, and new support for "no foo". -Simon
+1999-02-04 For 5.005, add ".pm" to package name used in %INC. -Del
+
+1998-11-01 Now using IO::File. Fixed POD =cut line for -Includes handling.
+1998-09-19 Cleaned up format of POD documentation.
+1998-09-08 Updated documentation to cover @INC overrides.
+1998-06-30 Added comment about handling "no" statements.
+1998-05-23 Added support for overriding @INC.
+
+1998-03-24 Minor doc fixup.
+1998-02-24 Removed leading whitespace from POD regexes (thanks Del)
+1998-02-23 Changed regex for use statements to break at parenthesis.
+
+1998-02-19 Moved general-purpose code to new Devel::PreProcessor package.
+1998-02-19 Added $Conditionals mechanism.
+1998-02-19 Added $INC{$module} to output to prevent run-time reloads.
+1998-01-26 Modified to imports and eval in the same begin block. 
+1998-01-20 Hacked ActiveWare source; changed pragma import calls -Simon

@@ -1,0 +1,24 @@
+text file parser is really rudimentary. can I allow people to pass in a ref to 
+one of their own?
+
+use strict		  	OK
+use warnings		  	OK	undef'd vars in SGML::StripParser
+
+create index		  	OK
+open index		  	OK
+FlushIndex		  	OK
+
+run query		  	OK	simple and advanced tested
+timestamp checks 	  	OK
+http  HTML file			OK
+local HTML file as file:///	OK
+local HTML file as /foo		OK	
+ftp with login HTML file  	OK
+ftp anonymous HTML file		OK
+
+http text file		  	OK
+local text file as file:///	OK	undef'd var in TextSearch.pm 312
+local text file as /foo		OK	undef'd var in TextSearch.pm 312
+ftp with login text file  	OK
+ftp anonymous text file		OK
+

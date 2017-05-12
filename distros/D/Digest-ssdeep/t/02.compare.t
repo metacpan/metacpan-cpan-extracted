@@ -1,0 +1,40 @@
+use Test::More tests => 19;
+
+use Digest::ssdeep qw/ssdeep_compare/;
+
+while (my $line = <DATA>) {
+	next unless $line =~ /^\d+,/;
+
+	my ($expected, $hashA, $hashB) = split /,/, $line;
+
+	my $result = ssdeep_compare($hashA, $hashB);
+	ok ( $result == $expected, "Expected $expected got $result" );
+}
+
+# Test array inputs
+my @a = qw{12 0HRluo1TQSDWvSIQLx6MI4kl0TZQ1I8g1Lwzg9/ZtLFlJlVtD5HaEmzm2 0H910SiKIU6MI4klIQ1Ymzg9BlVz6k2};
+my @b = qw{12 qw4HGEhP87m4TAnveuu5LL6n0X56kluo1TQSDWvSIQLx6MI4kl0TZG qwcGEhgmLve9Sn0pJ10SiKIU6MI4klIG};
+my $result = ssdeep_compare(\@a, \@b);
+ok ( $result == 49, "Array inputs" );
+
+
+
+__DATA__
+0,96:5oCWg1vDT2ioEb9wa6XLN95Mz7TAu+HktzDO3s4OqoNPFGTnNnJJ:1vDT2mbj6Z9Eyi/nvKp3,3:69PRML+LFJz+JRjA+TwSXiwKX3FuglXSF8XRKFVEXEtk9J2MZALNfy+vFzuFJnML:tLy5SRjAnSXuQ+DReVE3oeupvFuFJMLn
+0,12:sOI4kl0TZQ1I8g1Lwzg9/ZtLFlJlVtD5HaEmzmQSD6ecw/kP1Nbgi2:sOI4klIQ1Ymzg9BlVz6kQXwu4,6:QkluDCwgF9nebATXgFSHpXriQKStdWuKJfKHoZuESI0Lx6LkLILtWk0bXeENpXzA:Qkluo1TQSDWvSIQLx6MI4kl0Ts
+36,48:EtzDRs3ns4VcOFMPNyy5CsGLve9SnqJS9xJ5lIsFUzLzGXww:EtzDO3s4OqoNPFGTnNnJ4XzGXH,96:HtgFlk/vOAm4hGOjaoCWg1vDT2ioEb9wa6XLN95Mz7TAu+HktzDO3s4OqoNPFGTi:OryvOshGfvDT2mbj6Z9Eyi/nvKpk
+40,48:UYq+C3O2xFLyW9I8MzCIBTASrh+HnktzDRs3ns4VcOFMPNyy5Cw:J6XLN95Mz7TAu+HktzDO3s4OqoNPf,24:wYfnsz38augbOFMPNyyoobuwcGEhgmLve9Sn0pJ10F:rns4VcOFMPNyy5CsGLve9SnqJSF
+49,12:0HRluo1TQSDWvSIQLx6MI4kl0TZQ1I8g1Lwzg9/ZtLFlJlVtD5HaEmzm2:0H910SiKIU6MI4klIQ1Ymzg9BlVz6k2,12:qw4HGEhP87m4TAnveuu5LL6n0X56kluo1TQSDWvSIQLx6MI4kl0TZG:qwcGEhgmLve9Sn0pJ10SiKIU6MI4klIG
+52,48:t1iswmvOfLGMmyGmiQqhm8sxbSmGJXTyVV1QuNWg1UAbBc2T2ixuerlPD99ygGny:t/vOAm4hGOjaoCWg1vDT2ioEb9w+,96:jGOjaoCWg1vDT2ioEb9wa6XLN95Mz7TAu+HktzDO3s4OqoNPFq:jGfvDT2mbj6Z9Eyi/nvq
+57,96:jv1+OCIZXltgFlk/vOAm4hGOjaoCWg1vP:jt+AZXEryvOshGfvP,96:FL/i2TzD8PIfD4PGFJE0h40u7fpdv1+OCIZXltgFlk/vOAm4hGU:FL6lP44P+JEH77fHt+AZXEryvOshGU
+58,192:v77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpq:vnfHt+2XSyPhGfrTH/6Z9jQnCpq,96:PL/i2TzD8PIfD4PGFJE0h40u7fpdv1+OCIZXltgFlk/vOAm4hGOjaoCWg1vDT2iP:PL6lP44P+JEH77fHt+AZXEryvOshGfvb
+61,192:F4P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpQ:FQ++HnfHt+2XSyPhGfrTH/6Z9jQnCpQ,96:sv1+OCIZXltgFlk/vOAm4hGOjaoCWg1vDT2ioEb9wt:st+AZXEryvOshGfvDT2mbO
+72,192:G7fHt+AZXEryvOshGfvDT2mbj6Z9Eyi5:ifHt+2XSyPhGfrTH/6Z9jg,96:51gFlk/vOAm4hGOjaoCWg1vDT2ioEb9wa6XLN95E:5mryvOshGfvDT2mbj6Z9i
+75,96:Av1+OCIZXltgFlk/vOAm4hGOjaoCWg1vDT2ioEb9wa6XLN95MV:At+AZXEryvOshGfvDT2mbj6Z9A,192:t44P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyx:t4Q++HnfHt+2XSyPhGfrTH/6Z9jx
+86,96:oL/i2TzD8PIfD4PGFJE0h40u7fpdv1+OCIZXltgFlk/vOAm4hGOjaoCWg1vV:oL6lP44P+JEH77fHt+AZXEryvOshGfvV,192:XL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbj6E:XOlP4Q++HnfHt+2XSyPhGfrTH/6E
+93,192:jL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpSzh:jOlP4Q++HnfHt+2XSyPhGfrTH/6Z9jQV,192:sLpL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpF:sVOlP4Q++HnfHt+2XSyPhGfrTH/6Z9j9
+29,96:7v1+OCIZXltgFlk/vOAm4hGOjaoCWg1vDT2ioEb9wa6s:7t+AZXEryvOshGfvDT2mbj6s,96:aT2ioEb9wa6XLN95Mz7TAu+HktzDO3s4OqoNPFGTnNnJ4:aT2mbj6Z9Eyi/nvKpC
+27,48:T9ygGnpLYq+C3O2xFLyW9I8MzCIBTASrh+HnktzDRs3ns4V8:Twa6XLN95Mz7TAu+HktzDO3s42,96:clk/vOAm4hGOjaoCWg1vDT2ioEb9wa6XLN9N:ayvOshGfvDT2mbj6Z9N
+24,192:EHLpL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbjR:uVOlP4Q++HnfHt+2XSyPhGfrTH/R,96:PaoCWg1vDT2ioEb9wa6XLN95Mz7TAu+HktzDO3s4OqoNPFGTnNnJ4XzGX:CvDT2mbj6Z9Eyi/nvKpSza
+24,48:IOfLGMmyGmiQqhm8sxbSmGJXTyVV1QuNWg1UAN:IOAm4hGOjaoCWg1vN,48:XV1QuNWg1UAbBc2T2ixuerlPD99ygGnpLYq+C3O2xFLyW9I8MzCIBTASi:XoCWg1vDT2ioEb9wa6XLN95Mz7TAz
+100,192:jL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpSzh:jOlP4Q++HnfHt+2XSyPhGfrTH/6Z9jQV,192:jL6lP44P+JEH77fHt+AZXEryvOshGfvDT2mbj6Z9Eyi/nvKpSzh:jOlP4Q++HnfHt+2XSyPhGfrTH/6Z9jQV

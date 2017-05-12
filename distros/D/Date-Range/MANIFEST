@@ -1,0 +1,9 @@
+Changes
+lib/Date/Range.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/01.t
+t/pod-coverage.t
+t/pod.t

@@ -1,0 +1,26 @@
+Changes
+DBSchema.pm
+DBSchema/Column.pm
+DBSchema/DBD.pm
+DBSchema/DBD/Oracle.pm
+DBSchema/DBD/Pg.pm
+DBSchema/DBD/SQLite.pm
+DBSchema/DBD/Sybase.pm
+DBSchema/DBD/mysql.pm
+DBSchema/ForeignKey.pm
+DBSchema/Index.pm
+DBSchema/Table.pm
+DBSchema/_util.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+t/load-mysql.t
+t/load-oracle.t
+t/load-pg.t
+t/load-sqlite.t
+t/load-sybase.t
+t/load.t
+t/mysql-text-default.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

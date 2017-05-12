@@ -1,0 +1,544 @@
+=head1 Database and Driver Characteristics
+
+This document is designed to give you a flavour of the functionality
+and quirks of the different DBI drivers and their databases.
+
+The line between the functionality and quirks of a given driver and the
+functionality and quirks of its corresponding database is blurred. In
+some cases the database has functionality that the driver can't or
+doesn't access, in others the driver may emulate functionality that the
+database doesn't support, like placeholders. So when you see the terms
+driver and database below, take them with a pinch of salt.
+
+We don't attempt to describe the drivers and database in full detail
+here, we're only interested in the key features that are most commonly
+used. And for those features we're just providing an outline guide.
+Consult the database documentation for full details.
+
+The primary goals are:
+
+  - to provide a simple overview of each driver and database.
+  - to help you initially select a suitable DBI driver and database.
+  - to help you quickly identify potential issues if you need to port
+     an application from one driver and database to another.
+
+=head2 Driver Name, Version, Author and Contact Details
+
+This driver summary is for DBD::XBase version 0.130.
+
+The driver author is Jan Pazdziora and he can be contacted at
+jpx dash perl at adelton dot com.
+
+=head2 Supported Database Versions and Options
+
+The DBD::XBase module supports dBaseIII and IV and Fox* flavors of
+dbf files, including their dbt and fpt memo files.
+
+
+=head2 Connect Syntax
+
+     Details of the syntax of the dsn including any optional parts.
+
+The DBI->connect Data Source Name (DSN) should include the directory
+where the dbf files are located as the third part.
+
+  dbi:XBase:/path/to/directory
+
+It defaults to current directory.
+
+     Details of any driver specific attributes applicable to the
+     connect method.
+
+There are no driver specific attributes for the DBI->connect method.
+
+
+=head2 Numeric Data Handling
+
+     What numeric data types do the database and driver support? (INTEGER,
+     FLOAT, NUMBER(p,s) etc).  What is the maximum scale and precision for
+     each type?
+
+DBD::XBase supports generic NUMBER(p,s), FLOAT(p,s) and INTEGER(l)
+types. Maximul scale and precision unknown, limited by Perl's handling
+of numbers. In the dbf files, the numbers are stored as ASCII strings,
+or binary integers or floats.
+
+Existing dbf files come with the field types defined in the dbf file
+header. Numeric types can be either stored as ASCII string or in some
+binary format. DBD::XBase (via XBase.pm) parses this information and reads and
+writes the fields in that format.
+
+When you create a I<new> dbf file (via CREATE TABLE), the numeric
+fields are always created in the traditional XBase way, as an ASCII
+string.  (The XBase.pm module offer more control over this.)
+
+     Does the database and driver support numbers outside the valid range
+     for perl numbers?
+     Are numbers returned as strings in this case?
+
+Numeric fields are always returned as perl numeric values, not strings,
+so numbers outside of Perl's valid range are not possible (this
+restriction might be withdrawn in the future).
+
+
+=head2 String Data Handling
+
+     What string data types does the database support? (CHAR, VARCHAR, etc)
+
+DBD::XBase knows CHAR(length) and VARCHAR(length), both are stored as
+fixed length chars however. These can contain any binary values.
+
+     What is the maximum size for each type?
+
+The maximum length is 65535 characters for both types (even if the
+older dBase's only allowed 255 characters, so created dbf might not be
+portable to other xbase compatible software).
+
+     Are any types blank padded? If so which, e.g., CHAR.
+
+Both CHAR and VARCHAR are blank padded (unless ChopBlanks set).
+
+     How does the database handle data with the 8th bit set (national
+     language character sets etc)?
+
+Data with the 8th bit set are handles transparently, no national
+language character set conversions are done.
+
+     Is Unicode supported?
+
+Since the string types can store binary data, Unicode strings can be
+stored.
+
+
+=head2 Date Data Handling
+
+     What date, time and date+time data types are supported
+     and what is their valid range and resolution?
+
+     What is the default output format for each?
+
+     What is the default input format for each?
+     Are multiple input format recognised?
+
+DBD::XBase supports these date and time types:
+
+  DATE
+  DATETIME
+  TIME
+
+The DATE type holds an eight character string in the format
+`YYYYMMDD'.  Only that format can be used for input and output.
+DBD::XBase doesn't check for validity of the values.
+
+The DATETIME and TIME types store (internally) a 4 byte integer day
+value (Julian Day System) and a 4 byte integer seconds value (that
+counts 1/1000's of a second since midnight).  DBD::XBase inputs and
+outputs these types using a floating point unix-style
+seconds-since-epoch value (possibly with decimal part and possibly
+negative). This might change in the future.
+
+
+     If only part of a date is specified, how does the rest default?
+
+     If two digit years can be used, how is the century determined?
+
+N/A
+
+     Can the default format be changed? If so, how (both for a single
+     expression in an sql statement, and as a database connection default)?
+
+No.
+
+     How can I get the current date+time in an SQL expression?
+
+There is no way to get the current date/time.
+
+     How can I input date and date+time values in other formats?
+
+     How can I output date and date+time values in other formats?
+
+N/A
+
+     What kinds of date and time arithmetic and functions are supported?
+
+None.
+
+     What SQL expression can be used to convert from an integer "seconds
+     since 1-jan-1970 GMT" value to the corresponding database date+time?
+     If not possible, then what perl expression can be used?
+
+N/A
+
+     What SQL expression can be used to convert from a database date+time
+     value into the corresponding "seconds since 1-jan-1970 GMT" value?
+     If not possible, then what perl expression can be used?
+
+N/A
+
+     How does the database deal with time zones, especially where the
+     client inserting a date, the server and a client reading the date
+     are all in different time zones?
+
+There is no time zone handling.
+
+
+=head2 LONG/BLOB Data Handling
+
+     What LONG/BLOB data types does the database support?
+     (LONG, LONG RAW, CLOB, BLOB, BFILE etc)
+
+DBD::XBase supports a MEMO data type. BLOB can be used as an alias for
+MEMO.
+
+With dBaseIII dbt files, the memo
+field cannot contain \x1a byte, with dBaseIV and Fox* dbt/fpt's any
+value can be stored.
+
+     What are their maximum sizes?
+
+At least 2 GB are possible for all types of memo files.
+
+     Which types, if any, must be passed to and from the database as pairs
+     of hex digits?
+
+N/A
+
+     Do the LongReadLen and LongTruncOk attributes work as defined?
+     What is the maximum value, if any, for LongReadLen?
+
+The LongReadLen and LongTruncOk attributes are ignored/are broken
+(will be fixed).
+
+     Is special handling required for some or all LONG/BLOB data types?
+
+N/A
+
+
+=head2 Other Data Handling issues
+
+     Does the driver support type_info method?
+
+The DBD::XBase driver supports the type_info method.
+
+
+=head2 Transactions and Transaction Isolation
+
+     Does the database support transactions?
+
+DBD::XBase does not support transactions.
+
+     If so, what is the default transaction isolation level?
+
+N/A
+
+     What other isolation levels are supported and how can they
+     be enabled per-connection or per-transaction?
+
+N/A
+
+
+=head2 Explicit Locks
+
+     What is the default locking behaviour for reading and writing?
+
+DBD::XBase does not lock the tables (files) it is working on.
+(Hopefully some mechanism will be provided in the future.)
+
+     What statements can be used to explicitly lock a table with
+     various types/levels of lock? E.g., "lock table ...".
+
+N/A
+
+     How can a select statement be modified to lock the selected rows
+     from being changed by another transaction.
+     E.g., "select ... for update".
+
+N/A
+
+
+=head2 No-Table Expression Select Syntax
+
+     What syntax is used for 'selecting' a constant expression
+     from the database? E.g., "select 42 from dual" (Oracle).
+
+You can't select a constant expression using DBD::XBase. Only
+table field names, or * for all, can be selected.
+
+
+=head2 Table Join Syntax
+
+     If equi-joins are supported but don't use the standard
+     "WHERE a.field = b.field" syntax, then describe the syntax.
+
+DBD::XBase does not support table joins.
+
+     Are 'outer joins' supported, if so with what syntax?
+
+N/A
+
+
+=head2 Table and Column Names
+
+     What is the max size of table names? And column names?
+
+The XBase format stores each table as a distinct file. The
+table names are limited by filesystem's maximum filename length.
+
+Column names are limited to 11 characters.
+
+     What characters are valid without quoting?
+
+Table and field names have to start with letter, a combination of
+letters, digits and underscores may follow.
+
+     Can table and field names be quoted? If so, how?
+     What characters are valid with quoting?
+
+DBD::XBase does not support putting quotes around table or column names.
+
+     Are table/column names stored as uppercase, lowercase or
+     as-entered?
+     Are table/column names case sensitive?
+
+Table names are stored and treated as entered. The case sensitivity
+depends on the filesystem that the file is stored on.  Column names are
+stored as uppercase and are not case sensitive.
+
+     Can national character sets (with the 8th bit set) be used?
+
+National character sets can be used.
+
+
+=head2 Case sensivity of like operator
+
+     Is the LIKE operator case sensitive?
+     If so, how can case insensitive LIKE operations be performed?
+
+The LIKE operator is not case sensitive. There is (currently) no case
+sensitive operator.
+
+
+=head2 Row ID
+
+     If the database supports a 'row id' pseudocolumn, what is
+     it called? E.g., 'rowid' in Oracle, 'tid' in Ingres.
+
+DBD::XBase does not support a 'row id' pseudocolumn.
+
+     Can it be treated as a string when fetching and reusing in
+     later statements? If not, what special handling is required?
+
+N/A
+
+
+=head2 Automatic Key or Sequence Generation
+
+     Does the database offer automatic key generation such as
+     'auto increment' or 'system generated' keys?
+
+     Does the database support sequence generators?
+     If so, what syntax is used?
+
+DBD::XBase does not support automatic key generation or sequence
+generators owing to the limitations of the XBase format.
+
+
+=head2 Automatic Row Numbering and Row Count Limiting
+
+     Can you select a row-numbering pseudocolumn and if so, what
+     is it called?
+
+DBD::XBase does not support a row-numbering pseudocolumn.
+
+
+=head2 Parameter binding
+
+     Is parameter binding supported by the database, emulated by the
+     driver or not supported at all?
+
+Parameter binding is implemented in the driver.
+
+     If parameter binding is supported, is the :1 placeholder style also
+     supported?
+
+The :1 placeholder style is not (yet) supported.
+
+     Does the driver support the TYPE attribute do bind_param?
+     If so, which types are supported and how do they affect the bind?
+
+No.
+
+     Do unsupported values of the TYPE attribute generate a warning?
+
+N/A
+
+
+=head2 Stored procedures
+
+     What syntax is used to call stored procedures and, where possible,
+     get results?
+
+Stored procedures are not applicable in the XBase format.
+
+
+=head2 Table Metadata
+
+     Does the driver support table_info method?
+
+DBD::XBase supports the table_info method.
+
+     How can detailed information about the columns of a table be fetched?
+
+There si no way to get that information (at the moment).
+
+     How can detailed information about the indexes of a table be fetched?
+
+Indexes are not supported.
+
+     How can detailed information about the keys of a table be fetched?
+
+Keys are not supported.
+
+
+=head2 Driver-specific database handle attributes
+
+xbase_ignorememo.
+
+XXX expand description
+
+
+=head2 Driver-specific statement handle attributes
+
+xbase_ignorememo.
+
+
+=head2 Default local row cache size and behaviour
+
+     Does the driver or database implement a local row cache when fetching
+     rows from a select statement? What is the default size?
+
+DBD::XBase doesn't maintain a row cache (not applicable since the data
+file is local to the driver).
+
+
+=head2 Positioned updates and deletes
+
+     Does the driver support positioned updates and deletes (also called
+     updatable cursors)?  If so, what syntax is used? E.g, "update ...
+     where current of $cursor_name".
+
+DBD::XBase does not support positioned updates or deletes.
+
+
+=head2 Differences from the DBI specification
+
+     List any significant differences in behaviour from the current DBI
+     specification.
+
+DBD::XBase has no known significant differences in behaviour from the
+current DBI specification.
+
+
+=head2 URLs to more database/driver specific information
+
+  http://www.clicketyclick.dk/databases/xbase/format/
+
+
+=head2 Multiple concurrent database connections
+
+     Does the driver allow multiple concurrent database connections
+     to the same database?
+
+DBD::XBase supports an unlimited number of concurrent database
+connections to one or more databases.
+
+
+=head2 Concurrent use of multiple statement handles from same $dbh.
+
+     Does the driver allow a new statement handle to be prepared and used
+     while still fetching data from another statment handle associated
+     with the same database handle?
+
+DBD::XBase supports the preparation and execution of a new statement
+handle while still fetching data from another statment handle
+associated with the same database handle.
+
+
+=head2 Driver specific methods
+
+     What generally useful private ($h->func(...)) methods are provided?
+
+DBD::XBase has no generally useful private methods.
+
+
+=head2 Future Changes Planned for the Driver
+
+Adding :1 style of placeholders; handling numbers outside of Perl's
+numeric range.
+
+=head2 How to get value of auto-increment field
+ 
+        If your database supports some kind of auto-increment key
+        then how can a script get the value of the key used for
+        the most recent insert statement?
+
+DBD::XBase does not support auto-increment keys.
+
+=head2 Auto conversion of numbers to strings and strings to numbers?
+
+        Does your database automatically convert strings to numbers
+        and number to strings as needed? E.g. does
+                INSERT INTO foo (num_field, str_field) VALUES ('42',42)
+        work? If not, what type conversion functions are needed.
+ 
+Yes, DBD::XBase automatically converts between strings and numbers.
+
+=head2 And strings to date and dates to strings?
+
+        Does your database automatically convert strings to dates
+        and dates to strings as needed? E.g. does
+                INSERT INTO foo (date_field) VALUES ('...date string...')
+        work? If not, what type conversion functions are needed.
+
+Yes, DBD::XBase automatically converts between dates and strings.
+
+=head2 Which character types can store embedded nulls?
+
+        Any? None?
+
+Any.
+
+=head2 Does commit close/finish all prepared statements?
+
+        Yes? No? Yes but the driver hides this by re-preparing as needed?
+
+N/A, only AutoCommit mode is supported.
+
+=head2 Are any emulations of other interfaces supplied?
+
+        Like Ingperl, Oraperl etc
+
+No emulation layers are supported.
+
+=head2 String concatenation operator
+
+        || or + or CONCAT() or what?
+
+String concatenation is not supported.
+
+=head2 NUM_OF_FIELDS set by prepare or execute?
+
+        Which?
+
+NUM_OF_FIELDS is set by execute.
+
+=head2 Other Significant Database Features
+
+        This is where you get a chance to 'sell' your database and driver.
+        What's most important to most potential perl DBI users?
+
+It's a lovely piece of software, especially when you have to deal with
+dbf files.
+
+=cut
+

@@ -1,0 +1,24 @@
+0.26 Sat Jun 10 08:44:46 EDT 2006
+        - Remvoed spell.t as it fails on many systems and is only need
+          for development.
+        - Skipping in t/spreadsheet.t was not correct.
+	- removed references to Data::Tabular::XML as it does not exist yet.
+        - fix to Data::Tabular::Extra::get() method. It now works
+          correctly in an array context.
+
+0.25 May 30, 2006
+        - Added use of formulas for sum and average of rows and columns.
+        - More general clean up.
+
+0.24
+
+0.23
+        - Added more tests
+        - General clean up
+        - Added Build.PL
+
+0.22
+        - General clean up
+
+0.21-oe
+        - Original CPAN release

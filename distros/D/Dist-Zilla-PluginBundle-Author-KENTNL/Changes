@@ -1,0 +1,1578 @@
+Revision history for Dist-Zilla-PluginBundle-Author-KENTNL
+
+2.025021 2017-03-04T02:54:50Z 57634ed
+ [Bugfix]
+ - Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-PluginBundle-Author-KENTNL/issues/3
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.025020, see misc/*.deps* for details
+ - develop: +1 ↑1
+ - runtime: ↑1 -1 (recommends: -5)
+ - test: ↓1
+
+ [Internals]
+ - Remove usage of ConfigDumper
+
+2.025020 2016-06-19T07:19:45Z 9153e61
+ [Dependencies::Stats]
+ - Dependencies changed since 2.025010, see misc/*.deps* for details
+ - test: ↑1 -1
+
+ [Features]
+ - 'bumpversions' moved to 'bump_versions', but legacy interface retained.
+ - 'srcreadme' moved to 'src_readme' but legacy interface retained.
+ - 'copyfiles' moved to 'copy_files' but legacy interface retained.
+ - Remove residual reliance on Path::Class ( Requires DZil >5.038 )( Closes #1 )
+
+2.025010 2015-11-15T02:28:17Z f61f784
+ - Provision more files during minting instead of relying on generation on the first invocation of `dzil build`
+
+2.025003 2015-10-19T14:11:40Z 834555c
+ [Bugfix]
+ - Avoid test failures on Dzil 5.040 by not expecting pod-* tests anymore.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.025002, see misc/*.deps* for details
+ - develop: +2 ↑1
+
+2.025002 2015-08-14T12:13:53Z 6d20907
+ [Bugfix]
+ - Ensure declared minimum version of MinimumPerl
+ - Provision a bunch of stock files I tend to need.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.025001, see misc/*.deps* for details
+ - configure: ↓1
+ - runtime: ↑1 ↓1 -1
+ - test: ↓1
+
+2.025001 2015-07-05T03:52:11Z 31e79e3
+ [Bugfix]
+ - Use a newer contributing module in pre-emption of ether accepting my patch
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.025000, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑1
+
+ [Note]
+ - I really hate having so many plugins, and I really hate everyone needing my bundle
+ - But I also hate anyone needing my bundle.
+
+ [Todo]
+ - Have a system where more static stuff happens at a dedicated phases instead of part of the build cycle
+ - Not have contributors need to execute that to simply refresh files that are already there.
+
+2.025000 2015-06-30T02:35:26Z 8f4450c
+ [00 Features]
+ - copyfiles now copies LICENSE and Makefile.PL by default.
+ - RemovePrereqs::Provided is now standard issue.
+ - default_branch now specified for headless Git::NextRelease
+ - Inject a CONTRIBUTING document standard
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.024002, see misc/*.deps* for details
+ - develop: +1 (suggests: -1)
+ - runtime: +2
+
+2.024002 2015-06-21T22:23:14Z b786cb3
+ [Dependencies::Stats]
+ - Dependencies changed since 2.024001, see misc/*.deps* for details
+ - develop: +2 -2 (suggests: ↑2)
+ - runtime: +1 -1
+
+ [Minor]
+ - Now uses MetaYAML::Minimal to generate a reduced META.yml
+
+2.024001 2015-03-01T10:38:03Z 57fafd2
+ [Bugfix]
+ - Closing the loop with inherently co-depedendent changes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.024000, see misc/*.deps* for details
+ - develop: +1 ↑2 (suggests: ↑1)
+ - runtime: ↑2
+ - test: ↑1
+
+2.024000 2015-02-28T17:36:05Z ffe5dea
+ [Compatibility Breaking Changes]
+ - CommitBuild now builds to 'builds' regardless what branch you're on. This is mostly to negate hassle  involved with
+   working on multiple branches blocking activity due to 'dzil build' doing the wrong thing and creating new, disjoint
+   branches on its own.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.023003, see misc/*.deps* for details
+ - develop: -1 (suggests: ↑1)
+
+2.023003 2015-02-05T10:55:56Z 66ca3cb
+ [Bugfix]
+ - Ensure quoted YAML via Travis stack upgrades.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.023002, see misc/*.deps* for details
+ - develop: ↑1 (suggests: ↑1)
+ - runtime: (recommends: +1)
+
+2.023002 2015-01-14T07:26:23Z cdffce2
+ [Dependencies::Stats]
+ - Dependencies changed since 2.023001, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +1 ↓56 -1 (recommends: ↓1, suggests: +1)
+ - runtime: +1 ↓59 -16 (recommends: +18)
+ - test: ↓11 (recommends: +2 ↓3)
+
+ [Features]
+ - Use a less aggressive technique for recommending newer EUMM/TB to be slightly more stable and do 99% of what I mean
+   without so much commit churn.
+ - Selected packages auto-recommend selected versions as implied upgrade ( much more preceise and less automatic than
+   all my random 'MatchInstalled' rubbish
+
+ [Packaging]
+ - Moved a boatload of hard required deps that were really mostly recommendations to where they belong.
+ - Drop "ramp all the things" version insanity ( caveat: more things are going to break now due to not knowing all
+   minimum deps )
+
+2.023001 2015-01-13T12:12:42Z 9c13379
+ [Bugfix]
+ - Stop injecting TravisCI in newly minted dists ( superceded by bundle changes )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.023000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: ↑2
+ - runtime: ↑3
+ - test: (recommends: ↑1)
+
+2.023000 2015-01-13T08:13:40Z 8d47bcc
+ [API]
+ - Missing constructor arguments are now only warnings
+ - Now does :PluginRemover and :Config::Slicer plugin bundle roles.
+ - Inject TravisCI plugin standard.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022005, see misc/*.deps* for details
+ - develop: ↑18 (recommends: ↑1)
+ - runtime: +3 ↑21 -2
+ - test: ↑2 (recommends: ↑1)
+
+ [Internals]
+ - No more MX::AttributeShortcuts
+ - No more StrictConstructor
+
+2.022005 2015-01-05T20:16:46Z cba7b74
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022004, see misc/*.deps* for details
+ - develop: +1 ↑18 -1
+ - runtime: +1 ↑21 -1
+ - test: ↑2
+
+ [Minor]
+ - Switch to Readme::Brief
+
+2.022004 2015-01-02T03:00:30Z 07c5593
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022003, see misc/*.deps* for details
+ - develop: +1 ↑1
+ - runtime: ↑4
+ - test: +1
+
+ [Minor]
+ - use new travis generator
+ - inject new travis generator into new dists
+ - inject vim syntax stanza into new dists
+
+2.022003 2014-12-29T11:33:17Z c7a0caa
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022002, see misc/*.deps* for details
+ - develop: +1 ↑22 (recommends: ↑1)
+ - runtime: +1 ↑26
+ - test: ↑1 (recommends: ↑1)
+
+ [Minor]
+ - Switch to Pod2Readme for shipped readme because I much prefer how it renders
+
+2.022002 2014-12-14T09:15:08Z ed0dd28
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022001, see misc/*.deps* for details
+ - configure: ↑1
+ - develop: ↑19
+ - runtime: ↑22
+ - test: ↑1
+
+ [Minor]
+ - Drop BuiltWith data from META.* and isolate in own file.
+
+2.022001 2014-12-10T09:57:13Z d29ce03
+ [00 Minor]
+ - Drop ReadmeFromPod until its at least usable again.
+ - Drop utf8 and 5.008 from the default module template.
+
+ [Bugfix]
+ - Make miniting profile tests happy by giving a valid abstract by default
+ - Anticipate needing 5.006 as a prereq.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.022000, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: ↑29 -1 (recommends: ↑1, suggests: ↑1)
+ - runtime: ↑37 -1
+ - test: +1 ↑5 (recommends: ↑3)
+
+2.022000 2014-10-25T09:54:57Z 784f4f1
+ [00 Minor]
+ - Replace EOLTests with Test::EOL
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.021000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 ↑26 -1 (recommends: +1, suggests: ↑1)
+ - runtime: +1 ↑29 -1
+ - test: ↑2 (recommends: ↑2)
+
+ [Utils]
+ - use canonicalised Sereal keys
+
+2.021000 2014-10-05T11:28:53Z 7814800
+ [00 Minor]
+ - Inject Prereqs::AuthorDeps to auto discover develop deps.
+ - Add shortend SHA1 to changes headers.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.020005, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: +1 ↑1
+
+2.020005 2014-10-03T07:04:22Z
+ [Bugfix]
+ - dep_changes.pl: Use a flattened key value because the previous release started segv-ing and eating all my ram
+   shortly after release.
+
+ [Utils]
+ - dep_changes.pl: Shard out LMDB namespaces to distinct DBs till I can work out a better way to see wtf is going on
+   inside them.
+
+2.020004 2014-10-03T06:41:47Z
+ [Dependencies::Stats]
+ - Dependencies changed since 2.020003, see misc/*.deps* for details
+ - develop: ↑4
+ - runtime: ↑8 (recommends: +2 -2)
+ - test: ↑1 (recommends: ↑1)
+
+ [Utils]
+ - dep_changes.pl : Use LMDB driver by default
+ - dep_changes.pl : Add several more levels of advanced caching for blazing fast performance.
+
+2.020003 2014-09-23T14:54:27Z
+ [Dependencies::Stats]
+ - Dependencies changed since 2.020002, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑1
+
+ [Minting]
+ - Minted dist.ini's don't default to wrong twitter hash tag syntax.
+
+2.020002 2014-09-20T21:00:28Z
+ [Dependencies::Stats]
+ - Dependencies changed since 2.020001, see misc/*.deps* for details
+ - develop: ↑8
+ - runtime: ↑12
+ - test: ↑2
+
+ [Utils]
+ - dep_changes: Enable LMDB Backend as an option.
+ - dep_changes: Cleanup CHI code to be more efficient and understandable.
+ - dep_changes: Be more graceful about 'releases' branch being missing.
+
+2.020001 2014-09-06T03:22:12Z
+ [Bugfix]
+ - dont set git_versions in new dists.
+ - add dump_config to MinimumPerl
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.020000, see misc/*.deps* for details
+ - develop: ↑7
+ - runtime: +1 ↑10
+ - test: ↑1 (recommends: ↑1)
+
+ [Metadata]
+ - Specifiy an email address for copyright holder.
+
+2.020000 2014-08-20T15:50:05Z
+ [00 Major]
+ - 'git_versions' is now both optional, and an ignored parameter.
+ - 'normal_form' is now optional, and defaults to 'numify'
+ - 'mantissa' is now optional, and defautls to 6.
+ - Discrepancies with any of the above will be offloaded into the RecommendChanges plugin.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.019000, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑1
+
+2.019000 2014-08-18T03:48:49Z
+ [00 Minor]
+ - Test and dependency recommendation adjustments.
+ - no code changes.
+
+ [Dependencies::Noteworthy]
+ - Cpanel::JSON::XS and JSON::MaybeXS now in runtime.recommends instead of JSON{,::XS}
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.018000, see misc/*.deps* for details
+ - develop: ↑2
+ - runtime: ↑2 (recommends: +2 -2)
+ - test: -1
+
+ [Tests]
+ - Tests no longer require parsing JSON manually to validate themselves and instead just read distmeta.
+
+2.018000 2014-08-16T21:56:32Z
+ [00 Minor]
+ - CPANDAY!
+ - Add new KENTNL::RecommendFixes trick.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.017002, see misc/*.deps* for details
+ - develop: +1 ↑11 (suggests: ↑1)
+ - runtime: +1 ↑15
+ - test: ↑2
+
+2.017002 2014-08-15T20:54:32Z
+ [00 Trivial]
+ - util updates.
+ - whitespace adjustment
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Utils]
+ - dep_changes: Greatly increase the cache timing to 5h instead of 30m now it proves to be more stable.
+
+2.017001 2014-08-15T01:59:33Z
+ [00 Bugfix]
+ - Use a version of Git::Contributors that is safe for testing and general use.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.017000, see misc/*.deps* for details
+ - develop: ↑3
+ - runtime: ↑6
+ - test: ↑1
+
+2.017000 2014-08-11T20:48:43Z
+ [00 Minor]
+ - Start using Git::Contributors.
+ - dep_changes: more cache levels
+ - dep_changes: cache loaded CPAN::Meta objects for unique file SHAs
+ - dep_changes: use Sereal for the CHI cache serializer.
+ - dep_changes: group per-location caches by directory with cwd + base64 filter
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016008, see misc/*.deps* for details
+ - develop: +1
+ - runtime: +1 (recommends: +1)
+
+2.016008 2014-08-11T10:42:36Z
+ [00 Minor]
+ - dep_utils: fail better when build/master doesn't exist
+ - dep_utils: try use META.yml if META.json doesn't exist
+ - tests: update reportprereqs test
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016007, see misc/*.deps* for details
+ - develop: ↑4
+ - runtime: ↑6
+ - test: ↑1 -2
+
+2.016007 2014-08-01T12:30:36Z
+ [00 Minor]
+ - dep_utils: continued refactoring, now based on simple CPAN::Changes::Dependencies::Details
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016006, see misc/*.deps* for details
+ - develop: ↑2
+ - runtime: ↑2 (recommends: +1 -1)
+ - test: ↑1 -1
+
+2.016006 2014-07-30T04:27:01Z
+ [Bug Fixes]
+ - dep_utils: Less aggressive caching because [ commitish , path ] being cached can lead to wrong results.
+ - tests: don't fail on newer dzil
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016005, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: ↑19
+ - runtime: ↑22
+ - test: ↑1 -1 (recommends: -2)
+
+2.016005 2014-07-27T06:49:27Z
+ [00 Minor]
+ - dep_utils: Cache misc lookup calls to git for speed.
+ - dep_utils: Use new CPAN::Changes attach syntax
+ - dep_utils: Use new group Dependencies::Details
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016004, see misc/*.deps* for details
+ - develop: ↑10
+ - runtime: ↑11 (recommends: +4 ↑1)
+ - test: +3 ↑2 (recommends: +1 ↑1)
+
+2.016004 2014-07-16T12:05:55Z
+ [00 Minor]
+ - dep_utils: Factor out primary summary logic into its own dist.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016003, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑1 (recommends: +1)
+
+2.016003 2014-07-15T09:01:30Z
+ [00 Minor]
+ - dep_utils: avoid annoying deprecation warning about { chars
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016002, see misc/*.deps* for details
+ - develop: ↑2
+ - runtime: ↑4
+
+2.016002 2014-07-13T06:25:05Z
+ [00 Minor]
+ - dep_changes util adds preludes describing the files.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016001, see misc/*.deps* for details
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - runtime: ↑4
+ - test: ↑2
+
+2.016001 2014-06-21T08:22:53Z
+ [00 Minor]
+ - Rework dep_changes util to use CPAN::Meta::Prereqs::Diff
+ - generated perlcritic generator uses misc/ now instead.
+ - generated modules come with 5.008, utf8, AUTHORITY and bumpversion ready
+ - generated dist.ini comes with bumpversions enabled
+ - generated dist.ini comes with copylicense
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.016000, see misc/*.deps* for details
+ - develop: ↑7
+ - runtime: ↑10 (recommends: +4 -1)
+ - test: ↑1
+
+2.016000 2014-06-06T07:53:47Z
+ [00 Major]
+ - add copyfiles attribute to easily support copying files from build.
+ - add srcreadme attribute to control how README is generated in the build tree.
+ - Changes.deps* generator now writes files in misc/ to keep top level clutter down.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.015000, see misc/*.deps* for details
+ - develop: +1
+ - runtime: +1 ↑2
+ - test: ↑2
+
+2.015000 2014-06-03T05:21:36Z
+ [00 Major]
+ - Bundle now adjusted for use with `dzil bakeini`
+ - ini file now baked and bundle free.
+ - This means 'dzil authordeps' will cease needing a bundle install ;)
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.014001, see misc/*.deps* for details
+ - develop: +40 (suggests: +1 -1)
+ - runtime: +1
+ - test: ↑1
+
+2.014001 2014-06-02T10:43:25Z
+ [Bugfix]
+ - Remove trailing whitespace in a parameter.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.014000, see misc/*.deps* for details
+ - runtime: ↑3
+ - test: (recommends: ↑1)
+
+2.014000 2014-05-31T22:25:17Z
+ [01 Non-Trial release of new experimental feature]
+ - See 'bumpversions' note in previous change entry.
+
+ [Bugfix]
+ - has_twitter_hash_tags predicate was not configured to exist.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.013005, see misc/*.deps* for details
+ - runtime: ↑3
+ - test: ↑1
+
+2.013005 2014-05-26T01:40:29Z
+ [01 new experimental feature]
+ - new attribute 'bumpversions'
+ - uses a combination of BumpVersionAfterRelease and RewriteVersion::Santized instead of Git::NextVersion and
+   PkgVersion.
+
+ [02 utils/dep_changes]
+ - Wrap length extended to 120 chars.
+ - Line breaks no longer occur at (narrow)? no-break space
+ - hugelines now 'overflow' instead of hard wrapping.
+ - optional dependencies now have their own file.
+
+ [Dependencies::Aggregate]
+ - 5.010001 : 297 → 299
+ - 5.012005 : 290 → 292
+ - 5.018002 : 285 → 288
+ - 5.019009 : 277 → 279
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.013004, see misc/*.deps* for details
+ - develop: ↑4
+ - runtime: +2 ↑23 -2 (recommends: +1)
+ - test: +1 ↑1
+
+2.013004 2014-05-17T15:32:46Z
+ [Bugfix]
+ - dotfiles now install due to dzil fix for File::ShareDir::Install.
+
+ [Dependencies::Aggregate]
+ - 5.010001 : 293 → 297
+ - 5.012005 : 286 → 290
+ - 5.018002 : 285
+ - 5.019009 : 275 → 277
+ - https://gist.github.com/kentfredric/1ac2697f6d6a4112c798#file-5-010-analysis
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.013003, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: ↑5
+ - runtime: ↑35
+ - test: ↑4 (recommends: ↑2)
+
+2.013003 2014-04-13T03:33:11Z
+ [00 Minor]
+ - Stop shortening the URLs and let twitter handle it.
+ - Unmess something in the docs.
+
+2.013002 2014-04-12T19:23:55Z
+ [00 Minor]
+ - Change Tweet URL to point to the release page at #whatsnew instead of the full changelog
+ - Fully document attributes and fix a few mistakes.
+
+2.013001 2014-04-12T10:22:38Z
+ [00 Minor]
+ - Minor doc fixes.
+ - Dep bumps
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.013000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - runtime: ↑5
+ - test: (recommends: ↑1)
+
+2.013000 2014-04-11T03:02:57Z
+ [00 Major - Dist Minting Changes]
+ - Now default to EUMM
+ - Now default to soft tooling
+ - Now come with my PerlCritic compiler thing
+ - Now come with a different perlcritic.rc
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.012002, see misc/*.deps* for details
+ - develop: ↑1
+ - runtime: ↑3
+
+2.012002 2014-03-31T04:16:46Z
+ [00 Minor]
+ - Update utils.
+ - dep_changes now qualifies numbers better
+ - strip_eol gives a little match context
+ - Dep bump
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.012001, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: ↑3
+ - runtime: ↑25
+ - test: ↑2 (recommends: ↑2)
+
+2.012001 2014-03-17T18:59:57Z
+ [00 Minor]
+ - default to jobs = 10
+
+ [Dependencies::Aggregate]
+ - 5.010 : 294 → 293
+ - 5.012 : 284 → 286
+ - 5.019 : 277 → 275
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.012000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: ↑3
+ - runtime: ↑35
+ - test: ↑4 (recommends: ↑2)
+
+2.012000 2014-01-30T08:12:10Z
+ [00 Possible Downstream Toolbugs]
+ - This distribution switching to EUMM.
+ - Future release may default to EUMM
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.011001, see misc/*.deps* for details
+ - build: -1 (recommends: -1)
+ - configure: +2 -1 (recommends: +1 -1)
+ - runtime: +1 -1
+ - test: +1 ↓1 (recommends: +1)
+
+2.011001 2014-01-30T05:38:14Z
+ [00 Bugfix]
+ - Fix regression where hardness value regulated develop time dependencies.
+ - Work around weird behaviour in Config::MVP with attribute propagation causing errors.
+
+2.011000 2014-01-29T21:19:25Z
+ [00 Major]
+
+ [01 - Toolkit alternation]
+ - attribute `toolkit` now exists.
+ - can be any of `eumm` `mb` or `mbtiny` and will do the right things.
+
+ [02 - Toolkit hardness variation]
+ - attribute `tookit_hardness` exists.
+ - `hard` = ramp dependencies on toolkit so everyone gets the latest
+ - `soft` = copy dependencies on toolkit to recommended, and ramp recommended
+
+ [03 - More Recommended deps by far]
+ - All the top 3 are now pulled by --recommended
+ - All the perl critic modules I use are now pulled by --recommended
+ - Both the hardness support modules are pulled by --recommended
+
+ [04 - Softer Deps on this dist]
+ - No more forced upgrading MB on Perl >5.11
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.010001, see misc/*.deps* for details
+ - build: ↓1 (recommends: +1)
+ - configure: ↓1 (recommends: +1)
+ - develop: ↑1
+ - runtime: +1 ↑2 -1 (recommends: +18)
+ - test: +2 ↑1 ↓1 (recommends: +1)
+
+2.010001 2014-01-22T03:16:45Z
+ [00 Bugfix]
+ - mantissa should now only be required if normal_form eq numify
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.010000, see misc/*.deps* for details
+ - develop: ↑3
+ - runtime: ↑28
+ - test: ↑2 ↓1
+
+2.010000 2014-01-14T23:07:57Z
+ [00 Major]
+ - use Test::ReportPrereqs
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.009000, see misc/*.deps* for details
+ - develop: -1
+ - runtime: +1 ↑2 -1
+ - test: +3 ↑1 (recommends: +2)
+
+2.009000 2014-01-13T07:42:49Z
+ [00 Major]
+ - use # AUTHORITY comments
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.008001, see misc/*.deps* for details
+ - runtime: ↑2
+
+2.008001 2014-01-12T22:12:04Z
+ [00 Maintenace]
+ - Dep ramping
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.008000, see misc/*.deps* for details
+ - develop: ↑3
+ - runtime: ↑22
+ - test: ↑1
+
+2.008000 2014-01-12T11:21:22Z
+ [00 Major]
+ - use Git::NextRelease for commit-oriented timestamps in Changes. This adds 2 new mandatory parameters: normal_form
+   and mantissa.
+ - use PerlMunger replace-with-blank for better line consistency.
+ - usual dependency bumping
+
+ [Dependencies::Noteworthy]
+ - need Dist::Zilla::Plugin::Git::NextRelease
+ - need Pod::Elemental::PerlMunger 0.200000
+ - Module::Build upgraded
+ - perl 5.8 minimum ( Unusable below 5.10 anyway )
+ - Dzil upgrade for new package version magic
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.007003, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: ↑3
+ - runtime: +3 ↑26 -1
+ - test: ↑1
+
+2.007003 2014-01-08T03:36:44Z
+ [00 Minor]
+ - Upgrade Moose depenencies to 2.1200
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.007002, see misc/*.deps* for details
+ - runtime: ↑2
+
+2.007002 2014-01-08T03:20:39Z
+ [00 Minor]
+ - Dependency update to fix UTF8 Encoding problems
+ - Apply some stricter PerlCritic policies
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.007001, see misc/*.deps* for details
+ - develop: ↑4
+ - runtime: ↑26
+ - test: ↑2
+
+2.007001 2013-12-29T09:10:42Z
+ [Dependencies::Stats]
+ - Dependencies changed since 2.007000, see misc/*.deps* for details
+ - develop: ↑5
+ - runtime: ↑25
+ - test: ↑3
+
+ [Minor]
+ - Version bump release.
+
+2.007000 2013-12-01T11:42:18Z
+ - Switch to Git::NextVersion::Sanitized
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.006001, see misc/*.deps* for details
+ - runtime: +1 -1
+
+2.006001 2013-12-01T05:07:52Z
+ - That last release is about to unhappen. kentnl--
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.6.0, see misc/*.deps* for details
+ - runtime: ↑1
+
+2.6.0 2013-12-01T02:35:19Z
+ [00 Major Changes]
+ - Internals revamped to use Object Oriented style closer to ::Role::PluginBundle::Easy, except parameters to bundles
+   are top-level attributes instead of hidden uselessly in ->payload.
+ - Use RunExtraTests instead of CheckExtraTests
+ - All ENV vars are gone, we never used them
+ - No longer upgrades dep to 5.10 when seeing dotted-decimal versions
+ - Experimental utility added that generates a source ⇄ release conversion patch.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.005000, see misc/*.deps* for details
+ - runtime: +4 ↑1 -1
+
+2.005000 2013-11-29T19:31:25Z
+ - Stop using PruneCruft as the number of exclusions being added just keeps growing, and it sucks.
+ - We use Git::GatherDir anyway.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.004002, see misc/*.deps* for details
+ - runtime: -1
+
+2.004002 2013-11-28T13:27:17Z
+ [Bugfix]
+ - Actually skip unwanted tags.
+
+ [Dependencies::Noteworthy]
+ - requires Module::Build 0.4203
+ - requires new versions of lots of plugins
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.004001, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: ↑12
+ - test: ↑1
+
+2.004001 2013-11-22T09:04:57Z
+ [00 Bugfix]
+ - Don't keep trying to parse tree data if no tree data responds to a path
+ - Skip tags that are not versions
+ - Make sure to include the last diff instead of only as far as the second last diff
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.004000, see misc/*.deps* for details
+ - runtime: ↑2
+
+2.004000 2013-11-22T03:04:44Z
+ [00 Minor]
+ - change diff tool augmented to inject statistics into Changes where relevant
+ - change diff tool auto injects references into Changes
+ - change diff tool now +x
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.003000, see misc/*.deps* for details
+ - develop: ↑1
+
+2.003000 2013-11-22T00:30:56Z
+ [00 Minor]
+ - New utility to generate Prereq changes by iterating git tags.
+ - All non-dev prereq changes → Changes.deps
+ - All prereq changes including dev → Changes.deps.all
+ - All dev prereq changes → Changes.deps.dev
+ - Changelog retroactively tidied
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002001, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: ↑1
+ - runtime: ↑4
+ - test: ↑1
+
+2.002001 2013-11-18T03:36:33Z
+ [00 Bugfix]
+ - Use Module::Metadata to get Module::Build version ( avoid bugs with mantissa shortening in tests )
+ - Refactor code to share more logic
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: ↑3
+ - test: +4 -2
+
+2.002000 2013-11-11T11:09:48Z
+ [00 Minor]
+ - Swap out Test::Compile with Test::Compile::PerFile, which is marginally faster.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001000, see misc/*.deps* for details
+ - develop: ↑4
+ - runtime: +1 ↑26 -1
+ - test: ↑1 -3
+
+2.001000 2013-11-05T09:25:27Z
+ [00 Minor]
+ - Reasonably sizeable tooling changes to propagate more develop deps
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +8 ↑1 -1
+ - runtime: +1 ↑37 -9
+ - test: ↑5
+
+2.000000 2013-10-12T05:23:24Z
+ [00 Major]
+ - Versioning scheme now back to single-decimal.
+ - If you are downstream and this breaks things, please learn to normalise upstream versions.
+ - Default versioning scheme for new dists is now single-decimal.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.9.0, see misc/*.deps* for details
+ - develop: ↑2
+ - runtime: +1 ↑7 ↓1
+
+1.9.0 2013-09-26T12:07:46Z
+ [00 Major]
+ - Well not hugely major, declared develop depends change starting this release.
+ - @Author::KENTNL is develop_required ( as you will need that bundle if you do any dev work on consuming things
+   without modifiying them )
+ - @Author::KENTNL::Lite is now develop_suggests only, to indicate that bundle can be somewhat used to work on
+   consuming things, as long as you edit the right dist.ini's to make it so.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.8.4, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: -1, suggests: +1 -1)
+
+1.8.4 2013-09-26T11:16:23Z
+ [Bugfix / Minor]
+ - Update to avoid Win32 Test::Compile issues.
+ - Add a strip eol util
+ - Remove EOL from generated dist.ini
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.8.3, see misc/*.deps* for details
+ - develop: ↑3 (recommends: ↑1, suggests: ↑1)
+ - runtime: ↑39
+ - test: +2 ↑2
+
+1.8.3 2013-08-30T20:30:21Z
+ [!Minor]
+ - Revert some far too aggressive version bumps on core things.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.8.2, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: ↓2
+
+1.8.2 2013-08-30T20:05:35Z
+ [!Minor]
+ - Ramping all Dzil deps to latest
+ - Bumping to get newer Test::Compile test
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.8.1, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: ↑28
+ - test: +2 ↑1 -1
+
+ [Utils]
+ - new utility utils/cpan_changes_markdown.pl
+ - utilities +x by default
+ - using /usr/bin/env everywhere instead of /usr/bin/perl
+
+1.8.1 2013-08-22T16:56:50Z
+ [Bug Fixes]
+ - stop dropping travis.yml files
+ - stop being dependent on specific contents for develop_requires
+ - stop loading modules, Dzil does that for us, and doing so inhibits modules that reverse-engineer bundles
+ - stop using autobox, its slow and inhibits us from dropping Moose
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.8.0, see misc/*.deps* for details
+ - develop: +1 ↑2 (suggests: ↑1)
+ - runtime: ↑2 -2
+
+1.8.0 2013-08-08T00:57:13Z
+ [!Major]
+ - The way dependencies are declared for this module are aggressively overhauled and much more tightly follow upstream
+   versions. This is mostly to smoke out any dependencies that need to be added to the exclusion list.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.7, see misc/*.deps* for details
+ - develop: ↑5 (suggests: ↑1)
+ - runtime: +7 ↑48 -1
+ - test: ↑9
+
+1.7.7 2013-08-07T17:33:54Z
+ [BugFix]
+ - Accidentally upgraded dependency on Plugin::Authority to a version that is not on CPAN. Solved. Thanks to Sander
+   Lepik for reporting.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.6, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: ↓1
+
+1.7.6 2013-08-05T07:33:33Z
+ [BugFix]
+ - Fix test failures introduced by new dependencies
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.5, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - runtime: ↑12
+ - test: +1 -2
+
+1.7.5 2013-08-01T09:48:11Z
+ - Minor Changes, backend deps switched.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.4, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +1 -1
+
+1.7.4 2013-06-13T22:56:08Z
+ - Maintenance release
+ - ::Twitter bumped for API v1.0 deprecation
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.3, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (suggests: ↑1)
+ - runtime: ↑1
+
+ [Documentation]
+ - Retroactively modernize Changes
+ - Add MetaPOD and Class Graph
+
+1.7.3 2013-04-26T19:09:26Z
+ - Bugfix for minting failure with Plugin::Test::CPAN::Changes
+ - Ramp bootstrap::lib
+ - add a small arsenal of utils
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.2, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - runtime: ↑2
+
+1.7.2 2013-04-03T02:39:06Z
+ - minor release, packaging / update Module::Build
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: +1
+
+ [Documentation]
+ - Sort changes previous.
+
+ [Packaging]
+ - Update to Module::Build 0.4004 to properly support test requires
+
+1.7.1 2013-03-13T13:31:16Z
+ - Minor release to test changes to DZP:Git
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.7.0, see misc/*.deps* for details
+ - runtime: ↑5
+
+ [Documentation]
+ - utf8ify changes.
+
+1.7.0 2013-01-25T04:24:14Z
+ [!Features]
+ - Add README.mkdn to all dists
+ - Dependencies Ramped.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.6.0, see misc/*.deps* for details
+ - runtime: +3 ↑41
+
+ [Documentation]
+ - Copyright license updated ( Year )
+
+1.6.0 2012-11-10T13:31:13Z
+ [Features]
+ - Bug tracker now defaults to github issues
+ - use <<no_ghissues>> to disable.
+
+1.5.1 2012-11-04T16:03:42Z
+ - maintenance release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.5.0, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +5
+
+ [Tests]
+ - regenerated t/000-report-versions-tiny.t
+
+1.5.0 2012-08-08T02:56:12Z
+ [Features]
+ - added three additional profiles: moo, moo-role and moose-role
+
+ [Tests]
+ - moo, moo-role and moose-role tests added.
+
+1.4.3 2012-07-28T20:37:33Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.4.2, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - runtime: +1 ↑2
+
+1.4.2 2012-07-07T15:40:38Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.4.1, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: -1
+ - runtime: +2
+ - test: ↑1
+
+1.4.0 2012-04-11T20:24:43Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.3.1, see misc/*.deps* for details
+ - test: +1
+
+ [Features]
+ - moved from GatherDir to Git::GatherDir, faster, and less prone to picking up cruft.
+
+1.3.1 2012-03-12T15:17:53Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.3.0, see misc/*.deps* for details
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: ↑1
+
+ [Features]
+ - enabled the show_config option of metadata::builtwith
+
+1.3.0 2012-03-06T22:21:22Z
+ [Features]
+ - Can now disable the 5.10.0 explit x.y.z upgrade via KETNNL_NOFIVETEN=1 and no_fiveten=1
+
+1.2.1 2012-02-27T05:12:12Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.2.0, see misc/*.deps* for details
+ - runtime: +1 ↑3
+
+ [Packaging]
+ - Update LICENSE (Year, Indent)
+
+1.2.0 2011-11-05T06:33:40Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.1.1, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: -1
+
+ [Features]
+ - Removed twitter-only mode.
+ - removed support for autoversion. Git versions now mandatory.
+
+ [Internals]
+ - Reorganised plugin configuration.
+
+1.1.1 2011-10-31T04:25:07Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.1.0, see misc/*.deps* for details
+ - runtime: +1
+
+1.1.0 2011-10-30T18:18:21Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.22, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +4
+
+ [Features]
+ - All newly minted dists get [-Encoding] for free
+ - All dists now get xt/minimum-version.t
+ - All dists will have their Perl's set to 5.10 if they are 3-part.
+ - New dists will dep on 1.1.0
+ - Existing dists will suggest 1.1.0
+
+ [Packages]
+ - new: Dist::Zilla::Plugin::Author::KENTNL::MinimumPerl, contains an additional 3-part version check that forces Perl
+   5.10.0
+
+ [Packaging]
+ - Reformated Props list.
+ - Wrap method names in C<>
+ - Encoding POD lines added.
+
+ [Tests]
+ - new: xt/release/minimum-version.t
+
+1.0.22 2011-10-07T21:14:49Z
+ [Dependencies]
+ - Update dependency on ::Twitter for TRIAL support.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.21, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Internals]
+ - Now properly creates non-broken URI's on -TRIAL releases.
+
+1.0.21 2011-09-10T20:26:52Z
+ [Features]
+ - Tweets URL to the Changelog on MetaCPAN.
+
+1.0.20 2011-09-10T19:45:36Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.19, see misc/*.deps* for details
+ - runtime: +1
+
+ [Features]
+ - Use Authority.
+
+1.0.19 2011-09-06T19:42:54Z
+ [BugFix]
+ - Only call uname on Linux. ( Reported by James Laver )
+
+1.0.18 2011-09-02T10:03:50Z
+ [Documentation]
+ - Credit all the other authors now using @Author::
+
+1.0.17 2011-08-29T19:54:39Z
+ [Dependencies]
+ - Update Test::Compile to circumvent a bug with __END__
+ - Update Test::Kwalitee 1.112410 to avoid a bug with 'plan'
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.16, see misc/*.deps* for details
+ - runtime: +2 ↑1 -2 (suggests: -1)
+
+1.0.16 2011-08-28T07:59:59Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.15, see misc/*.deps* for details
+ - runtime: +2 -2 (suggests: +1)
+ - test: -1
+
+ [Packaging]
+ - All extra-tests now shipped in xt/ instead of t/, and they're only called by Dzil.
+
+1.0.15 2011-08-23T21:48:10Z
+ [Bugs]
+ - Recent Dist::Zilla / Prereq Scanners report strict/warnings which broke tests. Fixed now, thanks tjmc.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.14, see misc/*.deps* for details
+ - runtime: +3 ↑1
+
+ [Internals]
+ - Versions no longer declared in BEGIN { } # new dzil.
+
+1.0.14 2011-07-18T21:23:49Z
+ [Bugs]
+ - Reworked handling of auto_prereqs_skip not to carp needlessly.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.13, see misc/*.deps* for details
+ - test: +1
+
+ [Features]
+ - Can use multiple values of auto_prereqs_skip now.
+ - Now stricter about flags passed to detect typos.
+ - Minted dists now have an example auto_prereqs_skip
+
+ [Tests]
+ - Minter test now tests auto_prereq generation and the auto_prereqs_skip flag.
+
+1.0.13 2011-07-17T01:06:15Z
+ [Bugs]
+ - Fixed an issue where the change of Dzil's Autoprereqs 'skip' parameter started taking an array instead, by using an
+   array. ( External interface is still the same though )
+
+ [Dependencies]
+ - Dist::Zilla 4.200011 is now the minimum requirement, as that has the adjusted Autoprereqs
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.12, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Packaging]
+ - Web metadata now uses HTTPS:// urls.
+
+1.0.12 2011-07-12T09:57:41Z
+ [Dependencies]
+ - Version explicit dependency added to Test::File::ShareDir 0.3.0 which is required for -root to be optional.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.11, see misc/*.deps* for details
+ - test: ↑1
+
+1.0.11 2011-07-11T04:56:38Z
+ [Tests]
+ - Redo the git hack using ENV flags instead of a config file as it still doesn't work as intended. Need both AUTHOR
+   and CONFIG env variables.
+ - Minting test now more detailed with arbitrary pass indicators to indicate where fails occur.
+
+1.0.10 2011-07-11T03:41:19Z
+ [Packaging]
+ - Retroactive Changes normalization
+
+ [Tests]
+ - Change git behaviour in the Minter test so git environment is always sane-ish and doesn't report weirdness.
+
+1.0.9 2011-06-13T23:50:29Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.8, see misc/*.deps* for details
+ - test: +8
+
+ [Features]
+ - Comments out autoversion_relative fields in generated dist.ini as a move towards eliminating it.
+ - Pre-Injects Abstract and Moose to new Modules.
+ - Sets a custom template provider in the profile.
+
+ [MiscFiles::New]
+ - share/profiles/default/ModuleTemplate.pm, template for my modules.
+ - corpus/global/config.ini,  a default "Global" configuaration for test purposes.
+
+ [Tests::New]
+ - 01-Minter.t, A reasonably exhaustive mint > build > testbuild domino test.
+
+1.0.8 2011-06-12T22:41:51Z
+ [Features]
+ - No longer warns about unspecified Autoversion::Relative params when using Git::NextVersion
+
+1.0.7 2011-04-24T13:45:19Z
+ [Dependencies]
+ - Depend on LWP::Protocol::https >= 6.0 to make sure ::Twitter works.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.6, see misc/*.deps* for details
+ - runtime: +1
+
+ [Utils]
+ - Use CPAN::Changes 0.17 instead of hacking it ourself.
+
+1.0.6 2011-04-13T13:15:49Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.5, see misc/*.deps* for details
+ - runtime: +1 -1
+
+ [Features]
+ - Replace CPANChangesTests with Test::CPAN::Changes
+
+1.0.5 2011-04-03T15:21:54Z
+ [Features]
+ - Can now pass 'auto_prereqs_skip' instead of having to filter the bundle and mangle things.
+ - Newly Minted Changes file is more formal and CPAN::Changes-like.
+
+ [Packaging]
+ - Now comes with utils/zuluize.pl to translate Dist::Zilla style datestamps to W3CDTF while retaining accuracy.
+ - Now comes with utils/normalize.pl to run a Changes file through CPAN::Changes and normalize the output.
+ - All code run through Perl::Tidy.
+
+1.0.4 2011-04-03T12:08:53Z
+ [Dependencies]
+ - Upgrade deps to avoid rt#67183
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.3, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Features]
+ - Removed extra whitespace padding on injected release stamp lines. This results in the generated file being the same
+   as a parsed and re-serialized version of the same file as per how CPAN::Changes sees it.
+
+ [Packaging]
+ - Rebuilt with rt#67183 test annoyance solved.
+
+1.0.3 2011-04-03T01:00:33Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.2, see misc/*.deps* for details
+ - runtime: +1
+
+ [Features]
+ - Now generate versions in W3CDTF form for compatibility with CPAN Changes.
+ - Add CPANChangesTests to all generated dists.
+
+ [Packaging]
+ - Reworked Changes file to be closer to CPAN::Changes spec, as well as to be more informative.
+
+1.0.2 2011-02-07T14:53:13Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0.1, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+
+ [Documentation]
+ - Added a rant section on the Author:: scheme.
+ - Cite other authors using the Author:: scheme.
+
+ [Packaging]
+ - Moved to being @Author::KENTNL
+
+1.0.1 2011-01-12T19:03:19Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000.000, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Packaging]
+ - Fix the default version to be unpadded. Its useless with padding anyway.
+
+1.000.000 2011-01-09T10:15:06Z
+ [Features]
+ - Initial version on new dists is now 0.1.0 instead of 0.01000
+
+ [Packaging]
+ - Migrate to Gentoo style version numbers.
+
+0.01023312 2011-01-01T20:01:33Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01023311, see misc/*.deps* for details
+ - runtime: +3 -2
+
+0.01023311 2011-01-01T19:31:37Z
+ [BugFixes]
+ - Ini generation previously produced "Prereq" instead of the now-standard "Prereqs". This is now fixed.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01017322, see misc/*.deps* for details
+ - runtime: +2
+
+ [Features]
+ - Ships now with minting profile 'Author::KENTNL'. New dists can be minted via "dzil new -P Author::KENTNL
+   Some::Dist::Name". This profile is shipped in the ShareDir for this module name.
+ - Consuming dists can now set 'git_versions = 1' as a flag to this plugin to use Git::NextVersion instead of
+   AutoVersion::Relative.
+ - Now ship .perltidyrc files with all dists by adding an exclusion to PruneCruft/GatherDir. Have to drop portability
+   tests as a result.
+
+ [Internals]
+ - Internal Loading code replaced with Class::Load.
+
+0.01017322 2010-11-04T06:56:23Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01017122, see misc/*.deps* for details
+ - runtime: ↑3
+
+0.01017122 2010-11-02T06:00:35Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01017119, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+
+ [Features]
+ - Injects PluginBundle dependencies and suggestions for all modules built with this as "Develop" time requirements.
+
+0.01017119 2010-11-02T03:50:49Z
+ [Internals]
+ - Use AutoPrereqs instead AutoPrereq in the Bundle.
+ - Use Prereqs instead of Prereq in the Bundle.
+
+0.01010423 2010-08-28T07:47:18Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01009310, see misc/*.deps* for details
+ - develop: +1
+
+ [Features]
+ - Author::KENTNL::DistINI injects "Bootstrap::lib" instead of "=inc::lib".
+
+0.01009310 2010-08-16T18:13:54Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01008321, see misc/*.deps* for details
+ - runtime: +1
+ - test: +1 -2
+
+ [Packaging]
+ - Now uses Bootstrap::lib during develop time instead of bundling an inc:: file in every dist.
+ - inc:: now cleaned out as a result.
+ - perlcriticrc moved to perlcritic.rc as a result of using CriticTests instead of our own shipped tests.
+ - Removed redundant noeol.t which existed purely as a temporary solution.
+
+0.01008321 2010-08-07T05:56:23Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01007922, see misc/*.deps* for details
+ - runtime: ↑1
+
+ [Features]
+ - Author::KENTNL::DistINI generation now inserts in a default 'hash_tags=' for twitter.
+
+0.01007922 2010-08-03T06:25:33Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01007006, see misc/*.deps* for details
+ - runtime: +22 ↑6 -1
+
+ [Features]
+ - Uses new features in MetaData::BuiltWith to display a customised result from uname
+
+0.01007006 2010-07-24T14:40:46Z
+ [Dependencies]
+ - Upgraded a few deps for MetaProvides split.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01006912, see misc/*.deps* for details
+ - runtime: +1 ↑2
+ - test: -1
+
+ [Features]
+ - Consumer can now specify hash tags to append to the tweeted release notice via 'hash_tags'
+
+0.01006912 2010-07-23T20:56:10Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002610, see misc/*.deps* for details
+ - runtime: ↑2
+
+ [Documentation]
+ - Various style and formatting fixes.
+ - A Smattering of spelling fixes.
+
+ [Internals]
+ - Now supports [ "Plugin" , "alias" ] for a plugin name to manually specify the aliases name where it was previously
+   autogenerated and derived from the Plugin name itself. ( This proves to be a problem when you want to use the same
+   plugin twice ).
+
+0.01002610 2010-06-11T18:44:05Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002504, see misc/*.deps* for details
+ - runtime: +2 ↑2 -1
+
+ [Features]
+ - Dists will now ship with MetaData explaining What they were built with.
+ - Metadata plugins that do work with Git repos now only triggered when git is enabled.
+
+0.01002504 2010-06-10T12:10:51Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002419, see misc/*.deps* for details
+ - runtime: +3
+
+ [Features]
+ - Now ships Dist::Zilla::Plugin::Author::KENTNL::DistINI to make dist minting easier. Now I can just 'dzil new
+   Module-Name' and start hacking =).
+
+0.01002419 2010-06-10T03:38:51Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002321, see misc/*.deps* for details
+ - runtime: +2
+ - test: +2
+
+ [Features]
+ - Adds End of line Tests via EOLTests plugin.
+
+ [Packaging]
+ - Ships a hardcoded temporary replacement for Test::EOL while Test::EOL fixes get done.
+
+0.01002321 2010-06-09T05:13:23Z
+ [Dependencies]
+ - added precursors for Net::Twitter on Win32
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01002309, see misc/*.deps* for details
+ - runtime: +2
+
+ [Packaging]
+ - This release is also intending to test my patched version of Dist::Zilla.
+
+0.01002309 2010-06-08T17:47:53Z
+ [BugFix]
+ - inc::lib hack fixed to work with Dist::Zilla 4 series.
+
+ [Dependencies]
+ - Dist::Zilla moved to 4.101582 from 2.101310
+ - Added KwaliteeTests plugin version 1.101420
+ - Added PortabilityTests 1.101420 Plugin.
+ - Added ReportVersions::Tiny 1.01 Plugin.
+ - ReademeFromPod plugin moved from 0.04 to 0.12
+ - Added Pod::Coverage::TrustPod
+ - Added Test::CPAN::Meta
+
+ [Dependencies::Build]
+ - Adds File::Temp
+ - Test::More moves to 0.88
+ - Test::Kwalitee removed as its only a release test now.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01001714, see misc/*.deps* for details
+ - build: -4
+ - runtime: +5 ↑2
+ - test: +4
+
+ [Features]
+ - Twitter can be disabled via notwitter.
+ - Adds MetaTests to the Test cycle.
+ - Adds ReportVersions::Tiny to all distributions to give nice installtime diagnostics.
+ - Adds Kwalitee and Portability release tests for QA purposes.
+
+ [Internals]
+ - Added small system for generating feature set toggles in the bundle.
+
+ [Packaging]
+ - Handwritten kwalitee.t is replaced by generated one from the KwaliteeTests plugin.
+
+0.01001714 2010-06-02T22:11:42Z
+ [Documentation]
+ - Improved Bundle synopsis explaining toggle switches.
+ - Add ENV flags that also toggle things.
+
+ [Features]
+ - Can now specify that we only want to tweet a release with KENTNL_TWITTER_ONLY=1 dzil release and get a dumb no-git
+   no-cpan twitter release.
+
+0.01001713 2010-06-02T21:04:31Z
+ [Packaging]
+ - Re-attempted release of 0.01001712  except with a (hopefully) working .netrc so  the twitter thing Actually
+   Works(TM).
+
+0.01001712 2010-06-02T20:54:05Z
+ [Dependencies]
+ - Added Dist::Zilla::Plugin::Twitter 0.007
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.01000600, see misc/*.deps* for details
+ - runtime: +1
+
+ [Features]
+ - Can now tweet releases if your .netrc is set up correctly.
+
+0.01000600 2010-05-22T08:33:14Z
+ - First version.

@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+eg/example.pl
+eg/sample.txt
+lib/Data/Iterator/SlidingWindow.pm
+t/00.load.t
+t/01_basic.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+META.yml
+MANIFEST

@@ -1,0 +1,24 @@
+---
+abstract: 'Detect what database you are connected to'
+author:
+  - 'Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>'
+build_requires:
+  DBD::SQLite: '1.4'
+  Test::More: '0.99'
+  Test::Roo: '1.002'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Introspector
+requires:
+  DBI: '1.628'
+  Moo: '1.003001'
+resources:
+  homepage: https://github.com/frioux/DBIx-Introspector
+  repository: https://github.com/frioux/DBIx-Introspector.git
+version: '0.001005'

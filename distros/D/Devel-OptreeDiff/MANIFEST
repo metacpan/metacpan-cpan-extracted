@@ -1,0 +1,12 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/or_die.pl
+lib/Devel/OptreeDiff.pm
+t/1-use.t
+t/2-or-die.t
+t/3-and-or.t

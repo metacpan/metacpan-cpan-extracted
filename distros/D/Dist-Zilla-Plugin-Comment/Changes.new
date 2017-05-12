@@ -1,0 +1,13 @@
+Revision history for Dist-Zilla-Plugin-Comment
+
+0.02    2016-12-25 (PERLANCAR)
+
+	- [Bugfix] Fix log message generated when a file is modified to
+	  explicitly call ->name on the Dist::Zilla::Role::File object we're
+	  passed, rather than depending on stringification being overloaded to
+	  provide the file's name. (Thanks Packy Anderson)
+
+
+0.01     2015-06-11 (PERLANCAR)
+
+         - First release.

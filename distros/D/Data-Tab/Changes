@@ -1,0 +1,9 @@
+Revision history for Data::Tab
+
+0.02 2014-09-13
+
+ - Fixed dependency on DBI (thanks, CPANtesters!)
+
+0.01 2014-09-09
+
+ - Initial release

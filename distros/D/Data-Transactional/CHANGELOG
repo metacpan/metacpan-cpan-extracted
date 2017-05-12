@@ -1,0 +1,21 @@
+2016-09-27      1.04    Clean up some nasty old code, no functional changes
+
+2015-11-22      1.03    Fix tests to work with perl 5.22 and higher
+
+2008-06-16      1.02    Remove more 'use diagnostics' (and forgot to update
+                        the CHANGES file)
+
+2008-06-16      1.01    Remove 'use diagnostics'
+
+2007-08-28      1.0     Bug fix - now works under 5.9.5.  Removed
+                        POD-testing dependency, making those tests
+                        only run if the relevant modules are
+                        installed
+2004-11-06      0.1     First release of Data::Transactional
+
+2004-05-28      Tie::Hash::Transactional 1.1 released.  Only change is
+                documentation updates to note that limitation, and
+                to also note that it is deprecated
+2001-06-13      Original release of Tie::Hash::Transactional.  This
+                only supported transactions in the top level of a
+                multi-level data structure.

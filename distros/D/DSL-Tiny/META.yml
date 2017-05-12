@@ -1,0 +1,51 @@
+---
+abstract: 'A simple yet powerful DSL builder.'
+author:
+  - 'George Hartzell <hartzell@alerce.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Moo: 0
+  Moose: 0
+  Test::Deep: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DSL-Tiny
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  DSL::Tiny::InstanceEval:
+    file: lib/DSL/Tiny/InstanceEval.pm
+    version: 0.001
+  DSL::Tiny::Role:
+    file: lib/DSL/Tiny/Role.pm
+    version: 0.001
+requires:
+  Data::OptList: 0
+  Moo::Role: 0
+  MooX::Types::MooseLike::Base: 0
+  Params::Util: 0
+  Sub::Exporter: 0
+  Sub::Exporter::Util: 0
+  perl: 5.014
+resources:
+  bugtracker: https://github.com/hartzell/dsl-tiny/issues
+  homepage: https://metacpan.org/release/DSL-Tiny
+  repository: git://github.com/hartzell/dsl-tiny.git
+version: 0.001

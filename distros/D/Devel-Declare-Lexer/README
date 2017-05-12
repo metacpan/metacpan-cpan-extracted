@@ -1,0 +1,47 @@
+                =============================================
+                Package "Devel::Declare::Lexer" Version 0.014
+                =============================================
+
+
+Abstract:
+---------
+
+This package provides an easy interface to Devel::Declare using a token
+stream which can be manipulated at build time prior to parsing by the Perl
+parser.
+
+Copyright & License:
+--------------------
+
+This package with all its parts is
+
+Copyright (c) 2013 Ian Kent
+All rights reserved.
+
+This package is free software; you can use, modify and redistribute
+it under the same terms as Perl itself, i.e., at your option, under
+the terms either of the "Artistic License" or the "GNU General Public
+License".
+
+Installation:
+-------------
+
+You can install directly from CPAN: 
+
+    install Devel::Declare::Lexer
+
+Alternatively, you can build and install the module yourself:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Under Windows, depending on your environment,
+use "nmake" or "dmake" instead of "make".
+
+Contact Author:
+---------------
+
+Ian Kent <iankent@cpan.org>
+http://www.iankent.co.uk/

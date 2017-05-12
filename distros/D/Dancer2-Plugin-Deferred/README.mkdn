@@ -1,0 +1,98 @@
+# NAME
+
+Dancer2::Plugin::Deferred - Defer messages or data across redirections
+
+# VERSION
+
+version 0.007017
+
+# SYNOPSIS
+
+    use Dancer2::Plugin::Deferred;
+
+    get '/defer' => sub {
+      deferred error => "Klaatu barada nikto";
+      redirect '/later';
+    }
+
+    get '/later' => sub {
+      template 'later';
+    }
+
+    # in template 'later.tt'
+    <% IF deferred.error %>
+    <div class="error"><% deferred.error %></div>
+    <% END %>
+
+# DESCRIPTION
+
+This [Dancer2](https://metacpan.org/pod/Dancer2) plugin provides a method for deferring a one-time message across
+a redirect.  It is similar to "flash" messages, but without the race conditions
+that can result from multiple tabs in a browser or from AJAX requests.  It is
+similar in design to [Catalyst::Plugin::StatusMessage](https://metacpan.org/pod/Catalyst::Plugin::StatusMessage), but adapted for Dancer2.
+
+It works by creating a unique message ID within the session that holds deferred
+data.  The message ID is automatically added as a query parameter to redirection
+requests.  It's sort of like a session within a session, but tied to a request
+rather than global to the browser.  (It will even chain across multiple
+redirects.)
+
+When a template is rendered, a pre-template hook retrieves the data and
+deletes it from the session.  Alternatively, the data can be retrieved manually
+(which will also automatically delete the data.)
+
+Alternatively, the message ID parameters can be retrieved and used to
+construct a hyperlink for a message to be retrieved later.  In this case,
+the message is preserved past the template hook.  (The template should be
+sure not to render the message if not desired.)
+
+# USAGE
+
+## deferred
+
+    deferred $key => $value;
+    $value = deferred $key; # also deletes $key
+
+This function works just like `var` or `session`, except that it lasts only
+for the current request and across any redirects.  Data is deleted if accessed.
+If a key is set to an undefined value, the key is deleted from the deferred
+data hash.
+
+## all\_deferred
+
+    template 'index', { deferred => all_deferred };
+
+This function returns all the deferred data as a hash reference and deletes
+the stored data.  This is called automatically in the `before_template_render`
+hook, but is available if someone wants to have manual control.
+
+## deferred\_param
+
+    template 'index' => { link => uri_for( '/other', { deferred_param } ) };
+
+This function returns the parameter key and value used to propagate the
+message to another request.  Using this function toggles the `var_keep_key`
+variable to true to ensure the message remains to be retrieved by the link.
+
+# CONFIGURATION
+
+# SEE ALSO
+
+# ACKNOWLEDGMENTS
+
+Thank you to mst for explaining why [Catalyst::Plugin::StatusMessages](https://metacpan.org/pod/Catalyst::Plugin::StatusMessages) does
+what it does and putting up with my dumb ideas along the way.
+
+# AUTHORS
+
+- David Golden <dagolden@cpan.org>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+- Deluxaran <deluxaran@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2012 by David Golden.
+
+This is free software, licensed under:
+
+    The Apache License, Version 2.0, January 2004

@@ -1,0 +1,37 @@
+NAME
+
+Data::Alias - Comprehensive set of aliasing operations
+
+DESCRIPTION
+
+Aliasing is the phenomenon where two different expressions actually
+refer to the same thing.  Modifying one will modify the other, and if
+you take a reference to both, the two values are the same.
+
+Data::Alias is a module that allows you to apply "aliasing semantics"
+to a section of code, causing aliases to be made whereever Perl would
+normally make copies instead.  You can use this to improve efficiency
+and readability, when compared to using references.
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+AUTHOR
+
+Matthijs van Duin <xmath@cpan.org> developed the module originally,
+and maintained it until 2007.  Andrew Main (Zefram) <zefram@fysh.org>
+updated it to work with Perl versions 5.11.0 and later.
+
+COPYRIGHT
+
+Copyright (C) 2003-2007  Matthijs van Duin.
+Copyright (C) 2010, 2011, 2013, 2015 Andrew Main (Zefram) <zefram@fysh.org>.
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

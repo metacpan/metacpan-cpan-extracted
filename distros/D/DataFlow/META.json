@@ -1,0 +1,71 @@
+{
+   "abstract" : "A framework for dataflow processing",
+   "author" : [
+      "Alexei Znamensky <russoz@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DataFlow",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Dumper" : "0",
+            "DateTime" : "0.51",
+            "Encode" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Moose::Exporter" : "0",
+            "Moose::Role" : "0",
+            "Moose::Util::TypeConstraints" : "1.01",
+            "MooseX::Aliases" : "0",
+            "MooseX::Attribute::Chained" : "0",
+            "MooseX::OneArgNew" : "0",
+            "MooseX::Types" : "0",
+            "MooseX::Types::IO" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Queue::Base" : "2.1",
+            "SQL::Abstract" : "0",
+            "Scalar::Util" : "0",
+            "Text::CSV::Encoded" : "0",
+            "autodie" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0.88",
+            "Test::UseAllModules" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {},
+      "homepage" : "https://github.com/russoz/DataFlow",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/russoz/DataFlow.git",
+         "web" : "https://github.com/russoz/DataFlow"
+      }
+   },
+   "version" : "1.121830"
+}
+

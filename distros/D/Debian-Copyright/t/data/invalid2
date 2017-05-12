@@ -1,0 +1,9 @@
+Format: http://svn.debian.org/wsvn/dep/web/deps/dep5.mdwn?op=file&rev=135
+Upstream-Contact: Nicholas Bamber <nicholas@periapt.co.uk>
+Source: http://github.com/periapt/pkg-components
+Upstream-Name: pkg-components
+
+Blah: *
+Blah2: 
+ 2010-2011, Nicholas Bamber <nicholas@periapt.co.uk>
+Blah3: Artistic or GPL-2+

@@ -1,0 +1,12 @@
+plugins:
+  DBIC:
+    default:
+      options:
+        on_connect_do: 'SET client_min_messages=WARNING;'
+        quote_names: 1
+session: DBIC
+engines:
+  session:
+    DBIC:
+      db_connection_name: default
+

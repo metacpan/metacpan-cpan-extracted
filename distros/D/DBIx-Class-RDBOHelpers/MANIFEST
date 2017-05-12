@@ -1,0 +1,18 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DBIx/Class/RDBOHelpers.pm
+t/00-load.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+t/01-rdbohelpers.t
+t/lib/MyDBIC/Schema.pm
+t/lib/MyDBIC/Schema/Artist.pm
+t/lib/MyDBIC/Schema/Cd.pm
+t/lib/MyDBIC/Schema/CdTrackJoin.pm
+t/lib/MyDBIC/Schema/Track.pm
+t/lib/MyDBIC/Schema/CdToItself.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

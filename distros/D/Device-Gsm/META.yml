@@ -1,0 +1,27 @@
+---
+abstract: 'Perl extension to interface GSM phones / modems'
+author:
+  - 'Cosimo Streppone <cosimo@cpan.org>, Grzegorz WoÅºniak <wozniakg@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Gsm
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Device::Modem: '1.47'
+  Device::SerialPort: '0'
+  Test::More: '0'
+resources:
+  repository: git://github.com/cosimo/perl5-device-gsm.git
+version: '1.61'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

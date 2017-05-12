@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<people>
+  <person xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>John Smith</name>
+  </person>
+</people>

@@ -1,0 +1,33 @@
+#!/usr/bin/perl -w
+
+#
+# This example shows how to copy a table to a new one. Note the new
+# and drop that will ensure delete on previous copy. Then you use
+# create as the method of the old table, so that you do not need to
+# specify the fields. Then get_record and set_record in the new
+# table in the while loop, skipping (next) those with _DELETED flag
+# set.
+#
+
+use strict;
+use XBase;
+
+my $dir = ( -d 't/' ? 't/' : '' );
+my $table = new XBase("${dir}test") or die XBase->errstr();
+
+my $newtable;
+$newtable = new XBase("jezek");
+$newtable->drop() if defined $newtable;
+$newtable = $table->create("name" => "jezek") or die $table->errstr();
+
+my $outno = 0;
+for my $recno (0 .. $table->last_record())
+	{
+	my @data = $table->get_record($recno) or die $table->errstr();
+	next if shift @data;
+	$newtable->set_record($outno++, @data) or die $newtable->errstr();
+	}
+
+$table->close() or die $table->errstr();
+$newtable->close() or die $newtable->errstr();
+

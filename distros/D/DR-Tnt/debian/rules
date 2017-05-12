@@ -1,0 +1,37 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
+
+MAIN_MODULE	= lib/DR/Tnt.pm
+
+DEBVERSION = $(shell dpkg-parsechangelog \
+	|grep ^Version|awk '{print $$2}'|sed 's/-.*//' )
+PERLVERSION = $(shell grep '^our[[:space:]]\+$$VERSION' $(MAIN_MODULE) \
+	|head -n 1 \
+	|awk '{print $$4}'|sed "s/[';']//g" )
+
+install/libdr-tnt-perl::
+	test $(DEBVERSION) = $(PERLVERSION)
+	make tardist
+
+clean::
+	rm -f Makefile.old	
+	rm -fr .pc
+	rm -f DR-Tnt-*.tar.gz*
+
+manifest: clean
+	find -type f | grep -v '^./\.git'|sed 's/^..//' | sort -u > MANIFEST
+
+tarball:
+	cd .. && tar \
+		--exclude=debian \
+		--exclude=.git \
+		--transform='s,^\.,libdr-tnt-perl_$(DEBVERSION),S' \
+		-cJf libdr-tnt-perl_$(DEBVERSION).orig.tar.xz \
+		`basename $(CURDIR)`
+
+
+DEB_INSTALL_CHANGELOGS_ALL :=
+DEB_DH_INSTALLCHANGELOGS_ARGS := -XChanges
+

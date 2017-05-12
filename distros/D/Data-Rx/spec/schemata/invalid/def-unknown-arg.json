@@ -1,0 +1,8 @@
+{
+  "invalid": true,
+
+  "schema" : {
+    "type"    : "//def",
+    "unknown" : "this will cause things to explode"
+  }
+}

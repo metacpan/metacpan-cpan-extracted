@@ -1,0 +1,243 @@
+Revision history for Dist-Zilla-Plugin-PromptIfStale
+
+0.053     2017-04-19 02:19:30Z
+          - all tests are skipped when installing this distribution under
+            travis (unless it is this distribution testing ourselves), to
+            avoid failing tests due to many layers of various detection logic
+
+0.052     2017-02-13 23:50:54Z
+          - work around a problematic Log::Dispatch version that does not like
+            us trying to log blank lines (RT#120218)
+
+0.051     2016-06-19 04:03:22Z
+          - allow setting the index_base_url via a new env var,
+            CPAN_INDEX_BASE_URL. Patch by Dave Rolsky. GitHub #5.
+
+0.050     2016-06-06 03:29:58Z
+          - by default, build checks are no longer performed under Travis
+            Continuous Integration (see 'run_under_travis' config)
+
+0.049     2016-04-19 05:34:06Z
+          - now using distinctive log messages for each phase
+          - now using Module::Metadata rather than Module::Path to look for
+            installed modules in @INC
+
+0.048     2016-04-01 05:25:37Z
+          - avoid loading Module::CoreList until it is needed, for a faster
+            runtime (Olivier Mengué)
+          - now using List::Util::uniq
+
+0.047     2015-09-07 01:02:36Z
+          - 'dzil stale' now returns a non-zero exit status if a full prereq
+            check cannot be done (i.e. there is still more work to be done).
+
+0.046     2015-08-22 05:18:01Z
+          - fix tests that started failing with Dist::Zilla 5.038, which now
+            injects a licence provider class into authordeps
+          - pull in an updated Log::Dispatch if it was in the version range
+            that causes issues for App::Cmd testing
+
+0.045     2015-06-17 03:42:30Z
+          - fix false negatives on MSWin32 if a module is installed to a
+            different volume than the current working directory (thanks
+            for helping me track this down, Mithaldu!!)
+
+0.044     2015-05-23 17:05:24Z
+          - eliminate remaining uses of List::MoreUtils
+
+0.043     2015-05-23 03:11:25Z
+          - make a 'dzil stale' warning about authordeps a little more visible
+            by using ANSI colours
+          - fix version range in prerequisites that is problematic for
+            ExtUtils::MakeMaker
+
+0.042     2015-04-21 21:22:51Z
+          - fix tests that will fail with an upcoming change to
+            Test::DZil (Dist::Zilla::Tester and Dist::Zilla::Chrome::Term will
+            no longer always be loaded)
+
+0.041     2015-04-10 19:13:59Z
+          - 'dzil stale' now provides extra output (to stderr) when not all
+            stale modules can be found in a single pass
+          - eliminate loading modules up front in the 'stale' command, to
+            speed up all dzil commands (RT#103435)
+
+0.040     2015-03-08 00:05:42Z
+          - properly understand error strings when a plugin bundle is stale,
+            from changes in Dist::Zilla 5.033
+
+0.039     2015-03-07 05:26:43Z
+          - fix tests that fail when Carp is installed at a dev release
+          - fix shortened plugin names returned when Config::MVP::Section is
+            an old version
+
+0.038     2015-02-12 01:42:54Z
+          - 'dzil stale' command now also properly detects modules and plugins
+            that are loaded indirectly, e.g. via a plugin bundle
+
+0.037     2015-01-30 03:06:09Z
+          - fix test failure in 0.036 caused by assuming a module is loaded
+            when it isn't always on all platforms
+
+0.036     2015-01-24 06:09:05Z
+          - fixed bad parsing of response from cpanmetadb, which resulted in
+            false negatives when checking dual-life upstream-cpan modules
+
+0.035     2015-01-18 00:36:26Z
+          - now properly detects when running under travis, to prevent
+            prompting when trying to perform 'dzil listdeps' as a preliminary
+            step to testing a distribution
+
+0.034     2015-01-12 00:17:50Z
+          - avoid prompting for unindexed core modules (RT#101293)
+
+0.033     2015-01-03 20:27:49Z
+          - bump Module::Metdata prereq for $VERSION parsing (RT#101095)
+
+0.032     2014-11-22 03:36:00Z
+          - better way of avoiding warnings in perl 5.21.6, while still
+            allowing this dist to install
+          - switch from cpanidx to cpanmetadb index
+
+0.031     2014-11-17 02:51:40Z
+          - add a dynamic test prereq to avoid new warnings added to perl 5.21.6
+
+0.030     2014-11-13 06:48:50Z
+          - make prompt tests unfailable on perls older than 5.16, to work around an
+            apparent issue with IO::Pty
+
+0.029     2014-11-08 23:55:57Z
+          - ensure @INC does not become mangled during tests
+          - use newer Dist::Zilla::Util::AuthorDeps to avoid using Path::Class
+
+0.028     2014-10-12 18:51:44Z
+          - added extra diagnostics on filehandle states when tests fail
+
+0.027     2014-09-24 01:58:26Z
+          - fix tty handling in tests to resolve filehandle issues on linux
+            (RT#99074)
+
+0.026     2014-09-12 03:24:50Z
+          - fix tests (new in 0.025) that fail when stdin is not a tty (e.g.
+            piping module names to cpanm)
+
+0.025     2014-09-09 02:43:51Z
+          - in "fatal" mode, also print the detailed list of what is stale and
+            why, before dying with an advisory to run 'cpanm'
+          - only issue a warning, rather than prompting, when being run
+            non-interactively
+
+0.024     2014-07-23 20:13:17Z
+          - switch from using JSON to JSON::MaybeXS
+          - avoid reporting core (non-duallifed) modules as being stale, since
+            they cannot be updated without updating perl itself
+
+0.023     2014-05-15 20:38:19Z
+          - 'dzil stale' now respects all plugins' skip options
+          - improved debug logging
+          - cache more data for efficiency when multiple plugins, options are
+            used at once
+          - new "check_authordeps" option
+
+0.022     2014-04-19 08:28:04Z
+          - "dzil stale" now falls back even harder to parsing authordeps out
+            of dist.ini when performing the build blew up (such as due to an
+            unsatisfied develop prereq)
+          - new sister plugin, [EnsureNotStale], which aborts instead of
+            prompting (this is for you, Getty - sorry it's too late)
+
+0.021     2014-03-23 05:40:38Z
+          - 'dzil stale' properly falls back to fetching authordeps when a
+            plugin is not at the required version
+
+0.020     2014-03-01 06:49:02Z
+          - fix "dzil stale --all" when no [PromptIfStale] plugins are
+            configured for the distribution
+          - dzil stale now respects the --verbose flag
+          - dzil stale now does the equivalent of 'dzil authordeps' if some
+            plugins are missing, rather than dying -- you can now use 'dzil
+            stale' as your one stop shop for ensuring all requirements are
+            fulfilled
+
+0.019     2014-02-28 04:34:49Z
+          - fix occasional test failures on win32 due to varying directory
+            separators in filenames
+
+0.018     2014-02-23 23:29:22Z
+          - new --all option for "dzil stale"
+
+0.017     2014-02-12 05:20:07Z
+          - fix uninitialized warning when 02packages.details.txt cannot be
+            downloaded
+
+0.016     2014-02-09 03:41:16Z
+          - new "dzil stale" command
+
+0.015     2013-12-10 23:38:52Z, a.k.a. "The Getty Release"
+          - new 'fatal' option, to avoid prompting
+          - new 'index_base_url' option, for using different CPAN indexes
+
+0.014     2013-11-29 05:53:17Z
+          - new 'skip' option
+
+0.013     2013-11-15 04:19:33Z
+          - more diagnostics printed in failing tests
+
+0.012     2013-11-10 19:27:11Z (TRIAL RELEASE)
+          - no longer loading each module being checked in order to get its
+            $VERSION
+          - fix logic for choosing when to pull down a copy of
+            02packages.details.txt (now only doing so when otherwise we would
+            make six or more HTTP hits to PAUSE)
+          - more diagnostics printed in failing tests
+
+0.011     2013-11-10 01:54:55Z
+          - honour check_all_prereqs setting at release time (previously
+            behaviour was always as if it was on); thanks David Golden!
+
+0.010     2013-11-03 20:22:01Z (TRIAL RELEASE)
+          - more diagnostics printed in failing tests
+
+0.009     2013-11-02 21:15:16Z
+          - work around issues with EUMM-bundled version.pm by properly
+            fudging a VERSION during testing (affected perls before 5.13.9)
+
+0.008     2013-10-11 01:47:09Z
+          - now also checks the configure and build prerequisites
+
+0.007     2013-10-02 03:58:16Z
+          - when killing a build after being prompted, include a line that can
+            be copy-pasted to install all the missing modules via cpanm
+          - speed up index querying when checking for 6 or more modules at
+            once by pulling down a copy of 02packages.details.txt.gz
+
+0.006     2013-09-24 04:36:43Z
+          - diagnostic message added before checks begin, so the user isn't
+            wondering why the build/release appears to hang (querying the
+            index can take a little bit of time if there are a lot of modules
+            to check)
+
+0.005     2013-09-16 00:05:07Z
+          - now only prompting once (per phase) for all discrepancies found
+          - no longer prompting for the same module twice, if there are
+            multiple instances of the plugin running
+
+0.004     2013-09-11 01:39:02Z
+          - New "check_all_prereqs" option
+          - warnings tests bypassed during installation
+
+0.003     2013-09-05 07:45:52Z
+          - gracefully handle checking for a module that is not installed
+          - support setting both the check_all_plugins and module configs at
+            once
+
+0.002     2013-08-13 01:04:29Z
+          - fix documentation that referred to an option by the wrong name
+          - inverted prompt, from "abort build?" to "continue anyway?" (with
+            the default remaining as aborting the build/not continuing)
+          - version checks are bypassed for modules provided by the dist being
+            built
+
+0.001     2013-08-12 04:20:18Z
+          - Initial release.
+

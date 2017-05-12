@@ -1,0 +1,49 @@
+---
+abstract: 'model interface which had more data sources unified, a.k.a data/object mapper'
+author:
+  - 'Kazuhiro Osawa <yappo <at> shibuya <dÃ¶t> pl>'
+build_requires:
+  IO::Socket::INET: 0
+  Path::Class: 0
+  Test::Class: 0.34
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build::Tiny: 0.020
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Model
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Carp: 0
+  Class::Trigger: 0
+  DBD::SQLite: 0
+  DBI: 0
+  Encode: 0
+  Params::Validate: 0
+  Storable: 0
+  URI: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/yappo/p5-Data-Model/issues
+  homepage: https://github.com/yappo/p5-Data-Model
+  repository: https://github.com/yappo/p5-Data-Model.git
+version: 0.00008
+x_contributors:
+  - 'Kazuhiro Osawa <yappo@shibuya.pl>'
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+  - 'tokuhirom <tokuhirom@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'yappo <yappo@d0d07461-0603-4401-acd4-de1884942a52>'
+  - 'yappo <yappo@shibuya.pl>'
+  - '大沢 和宏 <yappo>'

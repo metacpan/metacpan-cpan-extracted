@@ -1,0 +1,34 @@
+---
+abstract: 'Add a $AUTHORITY to your packages.'
+author:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+build_requires:
+  Test::DZil: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+  autodie: '0'
+  perl: '5.006001'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-PkgAuthority
+provides:
+  Dist::Zilla::Plugin::PkgAuthority:
+    file: lib/Dist/Zilla/Plugin/PkgAuthority.pm
+    version: '0.05'
+requires:
+  Dist::Zilla: '5.006'
+  Dist::Zilla::Role::FileGatherer: '5.006'
+  Dist::Zilla::Role::PrereqSource: '5.006'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006001'
+resources:
+  repository: https://github.com/manwar/Dist-Zilla-Plugin-PkgAuthority.git
+version: '0.05'

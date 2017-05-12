@@ -1,0 +1,65 @@
+=head1 NAME
+
+Date::EzDate2 - Date and time manipulation made easy
+
+=head1 EzDate2 vs EzDate
+
+EzDate2 is the next generation of the module Date::EzDate. EzDate2 provides
+the same easy interface for dealing with date and time, but uses DateTime
+to provide a wider and more accurate set of services.
+
+EzDate2 is *NOT* a drop-in replacement for EzDate. That's why it's not just
+an updated version of EzDate.
+
+This early release is just to test EzDate2's distribution on CPAN. It's not yet
+ready for prime time.
+
+=head1 SYNOPSIS
+
+An EzDate2 object represents a single point in time and exposes all properties
+of that point.  It also makes it easy to change those properties to produce
+a different point in time.  EzDate2 has many features, here are a few:
+
+ use Date::EzDate2;
+ my $mydate = Date::EzDate2->new();
+
+ # output some date information
+ print $mydate, "\n";  # e.g. output: Fri Jul 22, 2016 16:53:33
+
+=head1 TERMS AND CONDITIONS
+
+Copyright (c) 2016 by Miko O'Sullivan.  All rights reserved.  This program is
+free software; you can redistribute it and/or modify it under the same terms
+as Perl itself. This software comes with B<NO WARRANTY> of any kind.
+
+=head1 AUTHOR
+
+Miko O'Sullivan
+F<miko@idocs.com>
+
+Props also must be given to Dave Rolsky for his excellent DateTime module which
+does the complex date and time calculations used by EzDate2.  Furthermore,
+props also to the many people who have helped Dave with DateTime.
+
+=head1 VERSION
+
+Version: 0.01
+
+=head1 HISTORY
+
+=over 4
+
+=item Version 0.01 July 22, 2016
+
+Initial release.
+
+=item Version 0.02 July 23, 2016
+
+Added support for default time zone.
+
+=item Version 0.03 Aug 6, 2016
+
+Modified to use Tie::Hash.
+
+=back
+

@@ -1,0 +1,137 @@
+Revision history for Digest-Bcrypt
+
+1.209     2017-03-25
+    - Revert to using bytes as that broke salt length tests
+    - Added a few author tests for Data::Entropy::Algorithms::rand_bits()
+
+1.208     2017-03-24
+    - Remove MANIFEST.SKIP as we use .gitignore
+    - Stop using 'bytes' and make use of Encode instead as we're already on at
+      least version 5.8.1
+    - Remove Try::Tiny from runtime requirements as it's only used in testing
+
+1.207     2017-02-11
+    - Added LICENSE and CONTRIBUTING.md files
+    - Added settings attribute
+    - Added documentation on how best to create a salt
+    - Added some extra doc examples
+
+1.206     2016-07-01
+    - Fix errant inclusions in cpanfile
+
+1.205     2016-06-06
+    - Put requirements in a cpanfile
+    - Changed to [Starter]
+
+1.204     2016-03-21
+    - moved to Dist::Zilla
+    - perltidy'd everything
+
+1.203 2016-03-07
+
+    [ TESTS ]
+    * Fixed test reliant upon Perl error messages
+
+1.202 2016-03-05
+
+    [ FEATURE ]
+    * Allowed the constructor to accept a hashref or a hash
+      as requested in issue #1
+
+    [ TESTS ]
+    * Added many more tests to the suite
+
+    [ DOCUMENTATION ]
+    * Updated the documentation to show the ability to add parameters to
+      the constructor.
+    * Moved cost and salt descriptions to a new "attributes" section.
+
+
+1.201 2016-03-05
+
+    [ DOCUMENTATION ]
+    * Added a blurb to use Crypt::Eksblowfish::Bcrypt instead
+
+    [ BUILD ]
+    * Made the build a bit more generic
+
+    [ TESTS ]
+    * Alleviated some of the issues taking lots of TravisCI time
+
+
+1.200_001 2016-03-02
+
+    [ DOCUMENTATION ]
+    * fixed typos
+    * organized methods by constructor, then alphabetical
+    * showed more in-depth examples of how to use the methods
+    * moved example code to the SYNOPSIS section
+    * made a DESCRIPTION section
+    * added Chase Whitener as current maintainer
+
+    [ TESTS ]
+    * Changed to use Try::Tiny instead of raw eval
+
+
+1.0.2   2013-01-23
+
+    [ TESTS ]
+    * Module is now tested by Travis CI
+
+
+1.0.1   2012-04-07
+
+    [ BUGFIX ]
+    * $VERSION was not incremented in previous release.
+
+
+1.0.0   2012-04-07
+
+    [ BUGFIX ]
+    * Remove accidental dependency on perl 5.10
+      introduced in previous revision
+
+    [ FEATURE ]
+    * bcrypt_b64digest method added to return digest
+      base64 encoded using the base 64 alphabet commonly
+      used with bcrypt
+
+    * b64digest method now returns a base64 that is
+      compatible with the standard MIME alphabet.
+
+      To access the version of base64 commonly used with
+      bcrypt, use the new bcrypt_b64digest method
+
+      This is a backwards incompatible change
+
+    [ TESTS ]
+    * Added additional tests for new methods
+
+
+0.1.1   2012-04-05
+
+    [ DOCUMENTATION ]
+    * Fixed typos in base64 method description
+
+    [ FEATURE ]
+    * Improved handling of cases where the cost / salt methods
+      have never been called
+
+    [ TESTS ]
+    * Improved error handling tests
+
+
+0.1.0   2012-03-31
+
+    ** First Public Release **
+
+    [ DOCUMENTATION ]
+    * Added Documentation
+
+    [ TESTS ]
+    * Added Test Suite
+
+
+0.0.1   2011-03-30
+
+    ** First Draft **

@@ -1,0 +1,76 @@
+{
+   "abstract" : "dzil plugin to generate README from POD",
+   "author" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "\u00c6var Arnfj\u00f6r\u00f0 Bjarmason <avar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-ReadmeFromPod",
+   "no_index" : {
+      "directory" : [
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FilePruner" : "0",
+            "Dist::Zilla::Role::InstallTool" : "5",
+            "IO::String" : "0",
+            "List::Util" : "1.33",
+            "Moose" : "0",
+            "Pod::Readme" : "v1.1.1"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-Plugin-ReadmeFromPod@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-ReadmeFromPod"
+      },
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-Plugin-ReadmeFromPod",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/fayland/dist-zilla-plugin-readmefrompod.git",
+         "web" : "http://github.com/fayland/dist-zilla-plugin-readmefrompod"
+      }
+   },
+   "version" : "0.35",
+   "x_authority" : "cpan:FAYLAND"
+}
+

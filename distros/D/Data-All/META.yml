@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-All
+version:      0.042
+version_from: lib/Data/All.pm
+installdirs:  site
+requires:
+    Class::Factory:                
+    File::Spec:                    
+    Regexp::Common:                
+    Test::More:                    0
+    Text::ParseWords:              
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

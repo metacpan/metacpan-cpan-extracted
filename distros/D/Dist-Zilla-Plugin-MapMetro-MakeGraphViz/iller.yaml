@@ -1,0 +1,42 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-MapMetro-MakeGraphViz
+
+prereqs:
+  runtime:
+    recommends:
+    requires:
+     - perl: 5.014000
+     - Moose: 2.0000
+     - MooseX::AttributeShortcuts
+     - Dist::Zilla::Role::Plugin: 5.000
+     - Dist::Zilla::Role::BeforeBuild: 5.000
+     - namespace::autoclean
+     - Path::Tiny
+     - Types::Standard
+     - Types::Path::Tiny
+     - GraphViz2
+     - Map::Metro: 0.2300
+     - String::CamelCase
+
+plugins:
+  - +config: Author::CSSON
+    travis_perl_min: 16
+
+  - +extend_plugin: TravisYML
+    sudo: 1
+    # Parse::Keyword seems to fail on 5.22
+    post_before_install:
+     - cpanm File::Slurp --verbose --force
+     - cpanm Parse::Keyword --verbose --force
+     - sudo apt-get update -qq
+     - sudo apt-get install -y graphviz
+    pre_install: cpanm GraphViz2
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON

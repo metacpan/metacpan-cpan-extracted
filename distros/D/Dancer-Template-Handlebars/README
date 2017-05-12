@@ -1,0 +1,77 @@
+SYNOPSIS
+
+        # in config.yml
+       template: handlebars
+    
+       engines:
+            handlebars:
+                helper_modules:
+                    - MyApp::HandlebarsHelpers
+    
+       # in the app
+       get '/style/:style' => sub {
+           template 'style' => {
+               style => param('style')
+           };
+       };
+    
+       # in views/style.mustache
+       That's a nice, manly {{style}} mustache you have there!
+
+DESCRIPTION
+
+    Wrapper for Text::Handlebars, the Perl implementation of the Handlebars
+    templating system.
+
+ Configuration
+
+    The arguments passed to the 'handlebars' engine are given directly to
+    the Text::Handlebars constructor, with the exception of helper_modules
+    (see below for details).
+
+ Calls to 'template()'
+
+    When calling template, one can use a filename as usual, or can pass a
+    string reference, which will treated as the template itself.
+
+        get '/file' => sub {
+            # look for the file views/my_template.hbs
+            template 'my_template', {
+                name => 'Bob',
+            };
+        };
+    
+        get '/string' => sub {
+            # provide the template directly
+            template \'hello there {{name}}', {
+                name => 'Bob',
+            };
+        };
+
+    The default extension for Handlebars templates is 'hbs'.
+
+ Helper Functions
+
+    Handlebars helper functions can be defined in modules, which are passed
+    via helper_modules in the configuration. See
+    Dancer::Template::Handlebars::Helpers for more details on how to
+    register the functions themselves.
+
+ Layouts
+
+    Layouts are supported. The content of the inner template will be
+    available via the 'content' variable.
+
+    Example of a perfectly valid, if slightly boring, layout:
+
+        <html>
+        <body>
+            {{ content }}
+        </body>
+        </html>
+
+SEE ALSO
+
+    Dancer::Template::Mustache - similar Dancer wrapper for
+    Template::Mustache.
+

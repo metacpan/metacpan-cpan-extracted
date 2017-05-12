@@ -1,0 +1,43 @@
+#==============================================================================#
+  DNS::ZoneEdit
+#==============================================================================#
+
+Access to the ZoneEdit dynamic DNS update API. Included is also an example 
+script that may be all you need to update your DNS.
+
+#==============================================================================#
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+#==============================================================================#
+
+DEPENDENCIES
+
+This module requires at least perl 5.6.0 and these other modules and libraries:
+
+  LWP::UserAgent from the libwww-perl bundle
+
+It is also highly recommended to use SSL to avoid plain text passwords over
+the network. For this, install:
+
+  Crypt::SSLeay
+
+#==============================================================================#
+
+COPYRIGHT AND LICENCE
+
+This module is based on Gavin Brock's DNS::EasyDNS (Copyright(c) 2003 Gavin
+Brock gbrock@cpan.org). It has been modified for use with ZoneEdit by Evan
+Giles (Copyright 2009-2010).
+
+This module is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself.
+
+#==============================================================================#

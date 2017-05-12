@@ -1,0 +1,56 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+
+use DBIx::FileStore;
+
+main();
+
+sub Usage {
+    "fdbcat FILENAME [FILENAMES]\n" . 
+    "  concatenates file contents to stdout, like cat\n";
+}
+
+sub main {
+    $|++;
+
+    GetOptions() || die Usage();    # no options
+
+    my $dbfs = new DBIx::FileStore( );
+
+    die( "fdbcat: pass files to cat from DB\n" . Usage() ) unless @ARGV;
+
+    for my $filename (@ARGV) {
+        unless ($dbfs->name_ok($filename)) {
+            warn "Skipping invalid file named $filename\n";
+            next;
+        }
+        $dbfs->copy_blocks_from_db_to_filehandle( $filename, *STDOUT );
+    }
+}
+
+__END__     
+
+=pod
+            
+=head1 NAME     
+            
+fdbcat - Like cat, but outputs files from DBIx::FileStore
+                    
+=head1 SYNOPSIS     
+                
+  % fdbcat file_store_name.txt
+
+outputs contents of file_store_name.txt to stdout
+
+=head1 AUTHOR
+    
+Josh Rabinowitz <joshr>
+        
+=head1 SEE ALSO
+        
+L<DBIx::FileStore>, L<fdbget>,  L<fdbls>, L<fdbmv>,  L<fdbput>,  L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+        
+=cut    
+

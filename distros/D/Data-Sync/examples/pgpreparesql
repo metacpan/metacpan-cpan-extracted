@@ -1,0 +1,24 @@
+
+use DBI;
+
+my $db = DBI->connect("DBI:Pg:dbname=testdb","","");
+
+$db->do("create table source (name CHAR(20),address CHAR(20),phone CHAR(20))");
+
+$sth=$db->prepare("insert into source (name,address,phone) VALUES (?,?,?)");
+
+for (1..20000)
+{
+	$sth->execute("name $_","address $_","phone $_");
+}
+
+
+$db->do("create table target (name CHAR(20),postal CHAR(20),telephone CHAR(20))");
+
+$sth=$db->prepare("insert into target (name,postal,telephone) VALUES (?,?,?)");
+
+for (1..10)
+{
+	$sth->execute("name $_","postal $_","telephone $_");
+}
+

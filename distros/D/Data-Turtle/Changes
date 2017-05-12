@@ -1,0 +1,20 @@
+Changes for Data::Turtle:
+
+0.0104 2015-12-16
+    - (Attempt to) Fix a sometimes failing test.
+    - Improve documentation.
+
+0.0103 2015-12-16
+    - Add eg/lindenmayer-gd
+
+0.0102 2015-12-16
+    - Use POSIX::ceil() instead of int().
+    - Adjust SYNOPSIS code.
+
+0.0101 2015-12-15
+    - Add eg/synopsis-gd.
+    - Add eg/synopsis-imager.
+    - Improve documentation.
+
+0.01  2015-12-15
+    - Move from personal development repo.

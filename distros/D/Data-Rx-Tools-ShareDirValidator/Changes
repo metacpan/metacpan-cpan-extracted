@@ -1,0 +1,72 @@
+﻿Release history for Data-Rx-Tools-ShareDirValidator
+
+0.1.3 2013-04-03T03:06:35Z
+ - Shift Internals to Path::Tiny
+
+ [Dependencies::Added / runtime requires]
+ - Path::Tiny
+
+ [Dependencies::Removed / runtime requires]
+ - Path::Class::Dir
+
+0.1.2 2013-04-03T02:59:00Z
+ - Maintenance Release for Module::Build 0.4004
+
+ [Dependencies::Added / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta 0
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+ [Dependencies::Added / runtime requires]
+ - perl v5.10
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Dependencies::Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 → v1.7.2
+
+ [Dependencies::Changed / test requires]
+ - Test::More 0.96 → 0.98
+
+ [Documentation]
+ - Update Copyright Year.
+ - Indent License
+ - Update License Address
+
+ [Meta]
+ - Bugtracker to github issues
+
+0.1.1 2011-10-22T15:00:07Z
+ - Maintenance Release
+
+ [Dependencies::New::Runtime]
+ - strict
+ - warnings
+
+ [Dependencies::Removed::Test]
+ - English
+
+ [Internals]
+ - VERSION no longer declared in BEGIN
+ - All Packages declare $AUTHORITY
+ - Added encoding to POD
+
+ [Packaging]
+ - Update LICENSE ( Indentation, Address )
+ - Move author/release tests to xt/
+ - Git repo URI's now point to https://
+ - Added x_authority
+
+0.1.0 2011-04-03T16:24:10Z
+ - First version. Very early release for comments/suggestions/API Changes.
+

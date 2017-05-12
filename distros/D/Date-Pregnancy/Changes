@@ -1,0 +1,110 @@
+Changes file for Date-Pregnancy
+
+0.06 2016-02-16 Maintenance release, update not required
+
+- Spelling corrections from Nick Morrott [RT:112068]
+
+
+0.05 2015-08-18 Maintenance release, update not required
+
+- License upgraded from artistic license 1.0 to artistic license 2.0
+
+- Migrated from Module::Build to Dist::Zilla
+
+
+0.04 2014-0816 Maintenance release, update not required
+
+- Added use of warnings
+
+- Added specification of required Perl version (5.8.0)
+
+
+0.03 2006-08-18 Bug fix release, update required
+
+- Fixed some problem with calculations of both week numbers and month
+  numbers I was making it uncessary complex (and buggy)
+
+- Added MANIFEST.SKIP (default from Module::Build, neat)
+
+- Fixed a bug in _countback method (also fixed a bug in a test relating
+  to this here bug)
+
+- Cleaned Build.PL for files no longer in use
+
+- Removed obsolete tests (these can be handled by Module::Build):
+	t/pod.t
+	t/pod-coverage.t
+
+- Added new unit-test t/warnings.t added tests for getting full coverage
+
+- Updated INSTALL
+
+- Changed to Module::Build instead of ExtUtils::MakeMaker
+
+
+0.02 2005-07-10 Bug fix release, update required
+
+- Changed use of constant module, the syntax use was of a newer version
+  and as such not necessary, this fixes a bug, which appears with the
+  constants module distributed with Perl 5.6. (and prior).
+
+  This addresses test report: 166196  FAIL  5.6.1 on MSWin32 4.0
+
+
+0.01 2004-10-13, Bug fix release, update required
+
+- Due to package name change from:
+  	DateTime::Pregnancy to Date::Pregnancy
+
+  Also the version number has been reset from 0.02 to 0.01
+
+- Added more tests to validate count back method, hence addition of
+  year should be conditional
+
+- Fixed bug in countback method, a year should be added when the first
+  day of the last period happens before april
+
+- Added tests to locate error reported by LTHEGLER
+
+- Fixed Makefile.PL
+
+- Renamed subdir in lib
+
+- Renaming module to Date::Pregnancy
+
+
+0.01 2004-10-10 Initial release
+
+- Released under name: DateTime::Pregnancy
+
+- Added date parameter to calculcate week
+
+- Added several tests
+
+- Added use of clone (now things work as expected)
+
+- Added POD
+
+- Added Villads test
+
+- Added some simple error handling
+
+- Added calculate_month
+
+- Added BUGS file
+
+- Added MANIFEST file
+
+- Menstruation changed to period
+
+- Changed serious spelling error lenght to length
+
+- Separated calculation method into 3 separate parts, implementing:
+
+	- The 40 weeks method
+	- The count_back method
+	- The 266 days method
+
+- Added t/methods.t
+
+- Added use of POSIX, we use floor in the 266days method

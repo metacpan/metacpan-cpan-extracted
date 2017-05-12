@@ -1,0 +1,18 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-MyServer.t
+lib/DBIx/MyServer.pm
+lib/DBIx/MyServer/DBI.pm
+
+examples/dbi.pl
+examples/echo.pl
+examples/myserver.pl
+examples/myserver.conf
+examples/devel.conf
+examples/remotequery.conf
+examples/odbc.conf
+examples/test.conf
+
+META.yml                                 Module meta-data (added by MakeMaker)

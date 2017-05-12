@@ -1,0 +1,18 @@
+Revision history for Perl extension DB-Skip
+
+1.132980  2013-10-25 22:50:08 Europe/Berlin
+    - avoid clash with Devel::Caller by renaming caller reporting test module
+
+1.121090  2012-04-18 17:44:20 Europe/Berlin
+    - added protection against some warnings caused by being run during the END
+      phase
+
+1.113370  2011-12-03 09:30:45 Europe/Berlin
+    - set minimum test dep of C::T to 0.13 to allow capturing of system return
+      value
+
+1.113362  2011-12-03 00:14:10 Europe/Berlin
+    - documentation clarification
+
+1.113360  2011-12-03 00:03:41 Europe/Berlin
+    - original version

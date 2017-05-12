@@ -1,0 +1,14 @@
+Date::Parser
+
+Simple date parsing module
+
+Installing
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+Dependencies
+
+  Date::Format

@@ -1,0 +1,54 @@
+{
+   "abstract" : "Automatically set and update fields",
+   "author" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Install version 1.06, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-DynamicDefault",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.08127"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::DynamicDefault" : {
+         "file" : "lib/DBIx/Class/DynamicDefault.pm",
+         "version" : "0.04"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.04"
+}

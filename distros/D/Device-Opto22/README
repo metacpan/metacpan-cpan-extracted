@@ -1,0 +1,32 @@
+Device-Opto22 version 0.01
+==========================
+
+WHAT IS THIS?
+
+A simple module to communicate and control Opto22 Brains via a Memory Mapped Protocol.
+Opto22 makes a complete line of industrial IO modules.  
+
+HOW DO I INSTALL IT?
+
+To install this module, cd to the directory that contains this README
+file and type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+WHAT SYSTEMS DOES IT WORK WITH?
+
+This module has been used on Linux servers on INTEL/AMD servers. May work 
+under Windows or other O/S but I have not tested on these. 
+
+WHERE ARE THE EXAMPLES?
+
+I have source code available for samples. If you need this contact me. 
+http://perlworks.com
+
+IMPORTANT NOTES:
+
+....
+

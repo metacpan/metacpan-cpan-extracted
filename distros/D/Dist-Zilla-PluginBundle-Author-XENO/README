@@ -1,0 +1,32 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::XENO - Author Bundle for Caleb
+    Cushing
+
+VERSION
+
+    version 0.001007
+
+SYNOPSIS
+
+    in dist.ini
+
+            [@Author::XENO]
+            install = 0 ; optional, disables InstallRelease
+
+METHODS
+
+ configure
+
+AUTHOR
+
+    Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2015 by Caleb Cushing.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

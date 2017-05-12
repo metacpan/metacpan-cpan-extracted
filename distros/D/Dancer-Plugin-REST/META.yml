@@ -1,0 +1,44 @@
+---
+abstract: 'A plugin for writing RESTful apps with Dancer'
+author:
+  - 'Alexis Sukrieh <sukria@sukria.net>'
+  - 'Franck Cuny <franckc@cpan.org>'
+build_requires:
+  Dancer::ModuleLoader: '0'
+  Dancer::Test: '0'
+  File::Spec: '0'
+  HTTP::Headers: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.3601'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  Module::Build: '0.3601'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-REST
+provides:
+  Dancer::Plugin::REST:
+    file: lib/Dancer/Plugin/REST.pm
+    version: '0.11'
+requires:
+  Carp: '0'
+  Dancer: '1.3111'
+  Dancer::Plugin: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/perldancer/Dancer-Plugin-REST/issues
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-REST/
+  repository: https://github.com/perldancer/Dancer-Plugin-REST.git
+version: '0.11'
+x_authority: cpan:SUKRIA
+x_contributors:
+  - 'Breno G. de Oliveira <garu@cpan.org>'
+  - 'James Aitken <loonypandora@gmail.com>'
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'

@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>John Smith</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>Fred Bloggs</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>Ann Other</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>Minnie Mouse</name>
+  </employee>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>Mickey Mouse</name>
+  </employee>
+</employees>

@@ -1,0 +1,46 @@
+Revision history for DBIx-Class-FormTools
+
+0.0.9   Sat Nov 16 01:05:42 CET 2013
+        - Updated Build.PL to no longer create Makefile.PL
+
+0.0.8   Sat Nov 16 00:59:42 CET 2013
+        - Added transaction support. (Play nice with AutoCommit=1)
+
+0.0.7   Sun  6 Jun 2010 12:42:12 CEST
+        - Added Data::Dump to build requires
+        - Use pp instead of dump to avoid name clash with build-in
+        - Removed all references to Data::Dumper
+
+0.0.6   Wed Sep 26 22:33:44 CEST 2007
+        - Fixed fieldname bug we now use the ref name of the class when
+          source_name returns undef
+
+0.0.5   Wed Jul 19 14:14:21 CEST 2006
+        - Fixed version number in docs
+        - Redesigned module as a helper. Warning: Incompatible with 0.0.4
+        - Added passthrough Makefile.PL
+        - Updated docs to reflect changes
+        - Use ':' as id seperator instead of '=' in primary key
+        - Always add colon seperated primary key list in 'fieldname'
+
+0.0.4   Mon May 29 23:04:54 CEST 2006
+        - Fixed "string 'new' not an integer" when searching by id for exising
+          objects.
+        - Fixed "object store not cleared" between calls to
+          formdata_to_objects
+
+0.0.3   Tue May  9 12:59:14 CEST 2006
+        - Updated for DBIx::Class >= 0.06002
+        - Doc cosmetics
+        - Doc improvements
+        - Updated tests with better test data
+        - Renamed test scripts
+        - Hide test modules from pause indexer
+
+0.0.2   Sat Jan  7 03:27:44 CET 2006
+        - Huge improvement to the docs - Now the examples make sense ;)
+        - Removed version.pm dependency, use qv()->numify type version as
+          plain scalar instead
+
+0.0.1   Fri Jan  6 02:50:41 CET 2006
+        - Initial release.

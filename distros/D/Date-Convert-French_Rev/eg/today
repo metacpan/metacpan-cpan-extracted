@@ -1,0 +1,98 @@
+#!/usr/local/bin/perl -w
+# -*- encoding: utf-8; indent-tabs-mode: nil -*-
+#
+#     Example of Date::Convert::French_Rev script to print the date in Gregorian 
+#     and French Revolutionary formats.
+#     Copyright (C) 2001-2003, 2013, 2015 Jean Forget
+#
+#     See the license in the embedded documentation below.
+#
+
+# Check the shebang line, remove sharps depending on which modules
+# are installed
+# and then just call this script from your .profile
+
+use strict;
+use Date::Convert::French_Rev;
+# use Date::Discordian;
+# use Date::Tolkien::Shire;
+# use Date::Maya;
+# use Date::Roman;
+
+my ($y, $m, $d) = (localtime())[5, 4, 3];
+my $day =  new Date::Convert::Gregorian $y + 1900, $m + 1, $d;
+convert Date::Convert::French_Rev $day;
+print $day->date_string("Today is %A %d %B %EY, %Ej%n");
+# convert Date::Convert::Hebrew $day;
+# print "Hebrew: ", $day->date_string(), "\n";
+
+# my $date = Date::Roman->new();
+# print "Roman: ", $date->as_string(), "\n";
+
+# $day =  new Date::Convert::Gregorian $y, $m, $d;
+# my ($long, $tzolkin, $haab) = julian_to_maya($day->absol);
+# print "Maya: long $long, Tzolkin $tzolkin, Haab $haab\n";
+
+# print discordian(time()), "\n";
+
+# my $shiredate = Date::Tolkien::Shire->new(time); 
+# print "Today is ", $shiredate->on_date, "\n";
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+today - Print the current date in Gregorian and French Revolutionary formats.
+
+=head1 SYNOPSIS
+
+  today
+
+=head1 DESCRIPTION
+
+This  program  prints  the   current  date  in  Gregorian  and  French
+Revolutionary  formats.  Other  formats  are  available  if  you  have
+installed the corresponding modules. You  just have to remove the hash
+chars commenting out the conversion lines.
+
+=head1 OPTIONS
+
+None.
+
+=head1 AUTHOR
+
+Jean Forget <JFORGET@cpan.org>
+
+=head1 LICENSE
+
+Copyright (c)  2001, 2002, 2003,  2013, 2015 Jean Forget.   All rights
+reserved.  This program is free software.  You can distribute, modify,
+and otherwise mangle F<g2r_table> under the same terms as Perl 5.16.3:
+GNU Public License version 1 or later and Perl Artistic License
+
+You can  find the text  of the licenses  in the F<LICENSE> file  or at
+L<http://www.perlfoundation.org/artistic_license_1_0> and
+L<http://www.gnu.org/licenses/gpl-1.0.html>.
+
+Here is the summary of GPL:
+
+This program is  free software; you can redistribute  it and/or modify
+it under the  terms of the GNU General Public  License as published by
+the Free  Software Foundation; either  version 1, or (at  your option)
+any later version.
+
+This program  is distributed in the  hope that it will  be useful, but
+WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
+MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
+General Public License for more details.
+
+You  should have received  a copy  of the  GNU General  Public License
+along  with  this  program;  if   not,  write  to  the  Free  Software
+Foundation, Inc.,  59 Temple Place, Suite 330,  Boston, MA 02111-1307,
+USA.
+
+=cut
+
+

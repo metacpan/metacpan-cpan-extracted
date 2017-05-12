@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/DJabberd/Plugin/JabberIqVersion.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/server.t
+t/kwalitee.t
+t/lib/djabberd-test.pl

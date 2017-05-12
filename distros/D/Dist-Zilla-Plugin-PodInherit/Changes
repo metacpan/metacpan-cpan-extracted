@@ -1,0 +1,47 @@
+Revision history for Dist-Zilla-Plugin-PodInherit
+
+0.007     2013-08-04 03:20:10 Europe/London
+	No functional changes
+
+	Dependency fixes:
+	* Test::DZil is only installed on 4.200002+, but use 4.200010 to pick
+	up some fixes which may be relevant
+
+0.006     2013-08-03 03:21:38 Europe/London
+	Bugs fixed:
+	* Skip in-memory files without attempting to process them
+	* Don't log a message for every file we process unless in debug mode
+
+0.005     2013-08-03 02:52:33 Europe/London
+	Functional changes:
+	* Previous attempt to generate in build only was a
+	failure; we now use the FileGatherer role to inject
+	the new .pod files.
+
+	Test fixes:
+	* Test that we're writing to build/, not source/
+	* Also verify that source/ isn't touched
+
+0.004     2013-08-03 02:14:29 Europe/London
+	Functional changes:
+	* Use the FileMunger and FileInjector roles so that
+	we generate POD output in the build directory
+	rather than affecting the original source paths
+
+	Documentation:
+	* Portability note and comment about .pod/.pm split
+
+0.003     2013-08-01 18:27:28 Europe/London
+	No functional changes
+
+	Test fixes:
+	* Remove unused dependencies from basic.t
+
+0.002     2013-07-31 23:01:20 Europe/London
+	No functional changes
+
+	Documentation:
+	* Fix POD formatting issue (NAME section empty)
+
+0.001     2013-07-31 22:52:15 Europe/London
+	Initial CPAN release

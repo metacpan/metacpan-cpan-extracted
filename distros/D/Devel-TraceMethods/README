@@ -1,0 +1,25 @@
+Devel::TraceMethods
+-------------------
+
+Version 1.00, Sat Jul  9 21:27:36 UTC 2005
+
+This module allows you to log all calls to methods of named packages.  This can
+be helpful for debugging.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+There is also a Makefile.PL, but I don't use it.
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2001, 2005 chromatic
+
+This library is free software; you can use, modify, and redistribute it under
+the same terms as Perl itself.

@@ -1,0 +1,12 @@
+use Template::Caribou::Tags::HTML ':all';
+
+sub {
+    my $self = shift;
+
+    html {
+        head { title { 'My App' } };
+        body {
+            $self->inner_template;
+        };
+    }
+}

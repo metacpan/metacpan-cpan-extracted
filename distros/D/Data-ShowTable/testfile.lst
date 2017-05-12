@@ -1,0 +1,23 @@
+Date:	11/14
+Task:	netlogd + iinwatch
+Desc:	To reduce the SCSI bandwidth on the root disk of the 
+      : logging server, iinwatch obtains logging info from a 
+      : network port.
+
+Date:	11/27
+Task:	twremote w/port switch
+Desc:	Implement -p PORT switch.
+
+Date:	12/13
+Task:	STOPSVC -tag broken
+Desc:	Fix bug with failure of -tag to work correctly.
+
+Date:	12/13
+Task:	Topology audit
+Desc:	Add signal/command handler to trigger topology audit.
+
+
+Task:	Oracle 7.3.2 support
+Desc:	Make the apps link and run correctly with the Oracle 7.3.2 
+      : client libraries.
+Date:	1/3/97

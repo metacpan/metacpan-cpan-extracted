@@ -1,0 +1,25 @@
+CHANGES
+lib/Devel/CheckLib.pm
+Makefile.PL
+MANIFEST
+README
+t/00-load.t
+t/exit_with_message.t
+t/found.t
+t/lib/Helper.pm
+t/not_found.t
+TODO
+bin/use-devel-checklib
+t/multi-word-compiler.t
+t/bad-single-word-compiler.t
+t/dash-l-libs.t
+t/headers.t
+t/inc/headerfile.h
+VMS-notes
+t/coverage.sh
+t/cmdline-LIBS-INC.t
+t/custom-function.t
+META.yml                                 Module meta-data (added by MakeMaker)
+t/analyze-binary.t
+t/flags.t
+META.json                                Module JSON meta-data (added by MakeMaker)

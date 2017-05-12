@@ -1,0 +1,6 @@
+This is a CPAN module.  Please see "perldoc DBICx::Deploy".
+
+   perl Makefile.PL
+   make
+   make test
+   sudo make install

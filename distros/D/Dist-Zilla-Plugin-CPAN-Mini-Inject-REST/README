@@ -1,0 +1,29 @@
+NAME
+
+    Dist::Zilla::Plugin::CPAN::Mini::Inject::REST - Uploads to a
+    CPAN::Mini::Inject mirror using CPAN::Mini::Inject::REST
+
+DESCRIPTION
+
+    Like Dist::Zilla::Plugin::Inject, this plugin is a release-stage plugin
+    that uploads to a CPAN::Mini mirror. This one expects that the remote
+    is a CPAN::Mini::Inject::REST server, since it uses
+    CPAN::Mini::Inject::REST::Client::API to do it.
+
+ATTRIBUTES
+
+    This plugin extends CPAN::Mini::Inject::REST::Client::API and therefore
+    all of its properties can be provided. A summary:
+
+    host - Required - without the protocol.
+
+    protocol - Optional. Defaults to http. This differs from the parent
+    class, where it is required.
+
+    port - Optional. Defaults to 80. This differs from the parent class,
+    where it is required.
+
+    username - Optional. Username for HTTP basic auth.
+
+    password - Optional. Password for HTTP basic auth.
+

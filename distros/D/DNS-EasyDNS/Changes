@@ -1,0 +1,12 @@
+Revision history for Perl extension DNS::EasyDNS.
+
+0.04 2006/02/03 Distribution cleanup for blatant CPANTS score padding
+
+0.02 2003/11/06 Fixed one Typo in the synopsis.
+		Added https support for security reasons.
+                Both suggections by Trvor Cordes.
+
+0.02 2002/10/16 Some documentation/POD fixes
+                Added easydns-by-interface example (I'm now on PPPoE).
+
+0.01 2002/09/11 Original version.

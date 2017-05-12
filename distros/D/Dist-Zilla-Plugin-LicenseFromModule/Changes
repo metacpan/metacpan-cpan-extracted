@@ -1,0 +1,17 @@
+Revision history for Dist-Zilla-Plugin-LicenseFromModule
+
+0.05  2014-08-23 14:03:32 PDT
+        - Scan for .pod of the main module if it exists #3 (DarwinAwardWinner)
+        - Add source_file option #3 (DarwinAwardWinner)
+
+0.04  2014-04-03 14:42:38 PDT
+        - use Module::Load instead of Class::MOP::load_class
+
+0.03  2013-04-06 21:42:10 PDT
+        - Bump Dist::Zilla dependency for LicenseProvider
+
+0.02  2013-04-02 22:52:43 PDT
+        - Added undocumented override_author option to set $zilla->authors
+
+0.01  2013-03-26 02:32:45 PDT
+        - Initial release, extracted from Milla

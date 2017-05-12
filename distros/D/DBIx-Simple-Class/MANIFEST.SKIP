@@ -1,0 +1,23 @@
+examples/lib/DSCS.*?\.pm$
+MYMETA
+\.git
+\.komodoproject$ # ignore komodo project files
+~$ # ignore emacs and vim backup files
+.bak$ # ignore manual backups
+\# # ignore CVS old revision files and emacs temp files
+^\.(?!perltidyrc)
+.*\.old$
+.*\.bak$
+.*?\.sqlite$
+^Makefile$
+^Makefile.old$
+^blib                                      
+^pm_to_blib
+^Build
+^_build
+\.tar.gz
+.lwpcookies
+cover_db
+pod2htm*.tmp
+\.perltidyrc
+project|workspace$

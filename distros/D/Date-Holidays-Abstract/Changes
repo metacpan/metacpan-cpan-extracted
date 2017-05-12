@@ -1,0 +1,69 @@
+Changes file for Date-Holidays-Abstract
+
+0.07 2014.09.01, maintenance release, update not necessary
+
+- Updated requirement to Class::Virtually::Abstract instead of Class::Virtual,
+  this was the requirment used but not specified. The first is a compile time
+  check variant of the first
+
+- Updated Dist::Zilla configuration with more plugins to save more time
+
+- Bumped up license to Artistic 2.0 (was done in 0.06, forgot to mention)
+
+
+0.06 2014.08.20, maintenance release, update not necessary
+
+- Migrated from Module::Build to Dist::Zilla
+
+- Added changes.t TEST::CPAN::Changes test
+
+- Updated t/kwalitee.t to more contemporary version
+
+
+0.05 2007.03.13, maintenance release, update not necessary
+
+- Added missing t/perlcriticrc
+
+- Updated to more contemporary versions of:
+    t/pod-coverage.t
+    t/pod.t
+
+  These should be there for the quality, but will not be run as a part of the
+  normal test run, unless the TEST_POD environment variable is set.
+
+  This seem to be the defacto way of doing things.
+
+
+0.04 2007.04.12, maintenance release, update not necessary
+
+- Updated MANIFEST.SKIP to a more contemporary version
+
+- Updated README
+
+- Updated POD, based on output from t/critic
+
+- Added use warnings statement, based on output from t/critic.t
+
+- Added t/critic.t see Test::Perl::Critic
+
+- Changed to Module::Build as primary build system
+
+- Added t/kwalitee.t see Test::Kwalitee
+
+- Corrected a spelling error in this file s/top/tip/
+
+
+0.03 2004.05.31, maintenance release, update not necessary
+
+- Indented code in POD after tip from RJBS
+
+
+0.02 2004.05.26, update not necessary
+
+- Updated this documentation with more in-depth descriptions of the
+  requirements.
+
+
+0.01 2004.05.22, initial release
+
+- Initial release

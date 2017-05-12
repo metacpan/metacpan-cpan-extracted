@@ -1,0 +1,9 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+Todo
+lib/DBIx/Composer.pm
+t/001_load.t
+t/002_compose.t

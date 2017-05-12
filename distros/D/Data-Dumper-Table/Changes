@@ -1,0 +1,33 @@
+Revision history for Data-Dumper-Tabluate
+
+0.010   2014-10-03
+        Doc fix
+
+0.009   2014-10-03
+        Bump the MANIFEST to include the new test script
+
+0.008   2014-09-26
+        Tidy up the output a bit and doc bump the SYNOPSIS to agree
+        Added some preliminary sanity tests
+
+0.007   2014-09-26
+        Doc bump (SYNOPSIS)
+
+0.006   2014-09-26
+        Fix some more formatting bugs
+
+0.005   2014-09-26
+        Fix some doc bugs
+
+0.004   2014-09-26
+        Fix some more formatting bugs
+
+0.003   2014-09-26
+        Fix some more formatting bugs
+
+0.002   2014-09-26
+        Fix some stupid formatting bugs
+
+0.001   2014-09-26
+        First version, released on an unsuspecting world.
+

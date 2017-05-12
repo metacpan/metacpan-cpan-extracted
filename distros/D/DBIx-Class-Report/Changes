@@ -1,0 +1,12 @@
+Revision history for DBIx-Class-Report
+
+0.03    2016-03-16
+        Specify a different base class, allow full column specifications, and
+        let developer specify their own view class name (Mark Zealey - github:mzealey)
+
+0.02    2015-09-17
+        Add arbitrary methdods to each result object returned.
+
+0.01    2015-03-21
+        Build DBIx::Class resultsets from arbitrary SQL
+

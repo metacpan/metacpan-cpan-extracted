@@ -1,0 +1,32 @@
+{
+   "abstract" : "Ultra cheap profiling for use in production environments",
+   "author" : [
+      "Josh Jore <jjore@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-ContinuousProfiler",
+   "prereqs" : {},
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-ContinuousProfiler@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-ContinuousProfiler"
+      },
+      "homepage" : "http://search.cpan.org/dist/Devel-ContinuousProfiler",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jbenjore/Devel-ContinuousProfiler.git",
+         "web" : "http://github.com/jbenjore/Devel-ContinuousProfiler"
+      }
+   },
+   "version" : "0.12"
+}
+

@@ -1,0 +1,26 @@
+---
+name: Date-Korean
+version: 0.0.2
+author:
+  - 'C.H. Kang <chahkang@gmail.com>'
+abstract: Conversion between Korean solar / lunisolar date.
+license: perl
+resources:
+  license: ~
+requires:
+  Date::ISO8601: 0
+  DateTime: 0
+  DateTime::Calendar::Julian: 0
+  Test::More: 0
+  version: 0
+provides:
+  Date::Korean:
+    file: lib/Date/Korean.pm
+    version: 0.0.2
+  Date::Korean::Table:
+    file: lib/Date/Korean/Table.pm
+    version: 0.0.2
+generated_by: Module::Build version 0.31
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

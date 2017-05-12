@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:                Dotiac-addon-markup
+version:             0.2
+abstract: |-
+  Work with common markup languages in Dotiac
+generated_by:        hand
+license:             mit
+author:              
+  - Marc Lucksch
+distribution_type:   module
+requires:     
+    Dotiac::DTL: 0.4
+    Text::Textile: 0
+    Text::Markdown: 0
+recommends:
+    Text::Restructured: 0
+build_requires:
+    Test::More:                      0
+    Test::Pod:                       0
+provides:
+   Dotiac::DTL::Addon::markup:
+     file: lib/Dotiac/DTL/Addon/markup.pm
+     version: 0.2
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.4.html
+    version: 1.4

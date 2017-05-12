@@ -1,0 +1,48 @@
+Revision history for Dist-Zilla-Plugin-Rinci-AbstractFromMeta
+
+0.09    2015-12-09 (PERLANCAR)
+
+	- Don't die when can't get abstract, to allow other plugins to deal
+	  with this.
+
+
+0.08    2015-07-07 (PERLANCAR)
+
+	- Fix logic bug.
+
+
+0.07    2015-07-07 (PERLANCAR)
+
+	- Handle non-ondisk file.
+
+
+0.06    2014-12-17 (PERLANCAR)
+
+	- [Bugfix] sort functions from longest meta dump, not shortest.
+
+
+0.05    2014-12-17 (PERLANCAR)
+
+	- If first function has no summary, try next function; Add logging.
+
+
+0.04    2014-12-16 (PERLANCAR)
+
+	- Skip generated files for now.
+
+
+0.03    2014-12-16 (PERLANCAR)
+
+        - Support Perinci::CmdLine-based scripts (including ones that embed
+          function/metadata in main package).
+
+
+0.02    2014-12-14 (PERLANCAR)
+
+	- [Bugfix] Checking existing abstract # ABSTRACT should be moved to
+	  _get_abstract_from_meta() routine.
+
+
+0.01     2014-12-14 (PERLANCAR)
+
+         - First release.

@@ -1,0 +1,10 @@
+Revision history for DMTF-CIM
+
+0.04  Mon May 7 2012
+       Remove POD and Perl::Critic tests
+       Minor cleanup of DMTF::CIM::Instance::Method::Parameter POD
+       Add terminating true value to end of the _valued class module
+
+0.03  Tue Apr 24 2012
+       Initial public release.
+

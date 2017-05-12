@@ -1,0 +1,22 @@
+[% # creates links correctly:
+   # - if the link starts with foo:// the prefix won't be appended
+   # - strips ./ parts (see the comments below)
+   # 
+   # this template expects these vars to be set:
+   # prefix - dir to prefix
+   # link   - link as defined in the docset
+   #
+   IF link.search('^[^:]+://');
+      return = link; # a complete scheme:// already
+   ELSE;
+       IF prefix;
+           return = "$prefix/$link";
+       ELSE;
+          return = link;
+       END;
+   END;
+   return = return.replace('/\./','/'); # clean a path like foo/.././bar
+   return = return.replace('/\.$','');  # clean a path like foo/../.  
+   return = return.replace('^\./','');  # clean a path like ./foo 
+-%]   
+[%- return -%]

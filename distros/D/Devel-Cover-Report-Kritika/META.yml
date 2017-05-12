@@ -1,0 +1,46 @@
+---
+abstract: 'Cover reporting to Kritika'
+author:
+  - 'Viacheslav Tykhanovskyi, C<vti@cpan.org>.'
+build_requires:
+  Test::MonkeyMock: '0'
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.4, CPAN::Meta::Converter version 2.150010'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Cover-Report-Kritika
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Devel::Cover::Report::Kritika:
+    file: lib/Devel/Cover/Report/Kritika.pm
+    version: '0.05'
+requires:
+  Devel::Cover: '1.11'
+  HTTP::Tiny: '0'
+  JSON: '0'
+  Sereal::Decoder: '0'
+  Sereal::Encoder: '0'
+  perl: '5.008001'
+resources:
+  bugtracker: https://github.com/kritikaio/devel-cover-report-kritika-perl/issues
+  homepage: https://github.com/kritikaio/devel-cover-report-kritika-perl
+  repository: git://github.com/kritikaio/devel-cover-report-kritika-perl.git
+version: '0.05'
+x_authority: cpan:VTI
+x_contributors:
+  - 'vti <viacheslav.t@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

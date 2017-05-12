@@ -1,0 +1,35 @@
+NAME
+
+DateTime::TimeZone::SystemV - System V and POSIX timezone strings
+
+DESCRIPTION
+
+An instance of this class represents a timezone that was specified by
+means of a System V timezone recipe or the POSIX extended form of the
+same syntax.  These can express a plain offset from Universal Time, or
+a system of two offsets (standard and daylight saving time) switching
+on a yearly cycle according to certain types of rule.
+
+This class implements the DateTime::TimeZone interface, so that its
+instances can be used with DateTime objects.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2007, 2009, 2010, 2011, 2012, 2013
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

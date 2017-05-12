@@ -1,0 +1,17 @@
+Revision history for DBIx-ParseDSN
+
+0.9.3  Sat Mar  1 14:41:21 CET 2014
+       Changed to Moo
+
+0.9.2  Tue Feb 25 02:00:45 CET 2014
+       Spelling errors and took out code not in use
+       Added Oracle specific bits to the default parser
+
+0.9.1  Mon Feb 24 22:36:42 CET 2014
+       Fixed @INC handling in one of the tests
+
+0.9.0  Mon Feb 24 03:41:37 CET 2014
+       Working release
+
+0.0.1  Thu Jan 30 01:51:22 2014
+       Initial release.

@@ -1,0 +1,51 @@
+asdf
+{% if
+1 == 1
+and 2 == 2
+and var1 in var2
+%}
+    asdf
+    asdf
+    dd
+    dd
+    f
+    {{
+        blalba
+    }}
+    {% 
+        verbatim %}
+        this is {%if 1 %}
+        plain
+        code
+        {% with %}
+    {% 
+        endverbatim
+        %}
+
+    {% with 
+        bla   = 1 
+        bla1=
+        2 
+    %}
+        {% comment %} this is
+            some
+            kind o
+            of
+            {% if smth %} bla
+            {% endif %}
+        {%endcomment%}
+
+        {% if 
+            2 
+                > 
+            1 and
+            a == b
+        %}
+            thi si
+            test
+        {% endif %}
+        sdfsdfa
+        asdf
+    {% endwith %}
+{% endif %}
+asdfadsf

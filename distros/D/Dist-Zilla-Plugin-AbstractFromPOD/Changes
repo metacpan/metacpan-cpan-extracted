@@ -1,0 +1,12 @@
+Revision history for Dist::Zilla::Plugin::AbstractFromPOD
+
+0.3.1     2015-05-20 05:25:48
+          - Added badges and public repository
+          - Removed Ident and VERSION lines
+
+0.2.1     2013-12-03 14:15:29
+          - Released
+
+0.1.1     2013-12-01 23:43:12
+          - Added project files to master branch
+

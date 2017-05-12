@@ -1,0 +1,16 @@
+---
+name: Data-FormValidator-Filters-HTMLStrip
+version: 0.13
+author:
+  - David Baxter <david@sitesuite.com.au>
+abstract: Filter that removes HTML tags from input
+license: perl
+requires:
+  CGI: 0
+  Data::FormValidator: 0
+  HTML::Strip: 0
+provides:
+  Data::FormValidator::Filters::HTMLStrip:
+    file: lib/Data/FormValidator/Filters/HTMLStrip.pm
+    version: 0.13
+generated_by: Module::Build version 0.2611

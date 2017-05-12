@@ -1,0 +1,10 @@
+To enable pixel perfect images some proprietary files from the
+iRealPro app are required. For copyright reasons, these files cannot
+be included with this program.
+
+The necessary files can be found in the iRealPro APK, folder
+res/drawable-nodpi-v4. Just copy these files to this folder and NPP
+imaging should be functional.
+
+For the hand-written variant you must add the font file
+assets/fonts/Felt-Regular.ttf from the APK to the res/fonts folder.

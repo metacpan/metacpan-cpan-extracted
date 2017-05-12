@@ -1,0 +1,54 @@
+Devel::TraceUse
+---------------
+
+Show the modules your program loads, recursively.
+
+An apparently simple program may load a lot of modules. That's useful, but
+sometimes you may wonder exactly which part of your program loads which module.
+
+Devel::TraceUse can analyze a program to see which part used which module.
+I recommend using it from the command line:
+
+  $ perl -d:TraceUse your_program.pl
+
+This will display a tree of the modules ultimately used to run your program.
+(It also runs your program with only a little startup cost all the way through
+to the end.)
+
+  Modules used from your_program.pl:
+     1.  strict 1.04, your_program.pl line 1 [main]
+     2.  warnings 1.06, your_program.pl line 2 [main]
+     3.  Getopt::Long 2.37, your_program.pl line 3 [main]
+     4.    vars 1.01, Getopt/Long.pm line 37
+     5.      warnings::register 1.01, vars.pm line 7
+     6.    Exporter 5.62, Getopt/Long.pm line 43
+     9.      Exporter::Heavy 5.62, Exporter.pm line 18
+     7.    constant 1.13, Getopt/Long.pm line 226
+     8.    overload 1.06, Getopt/Long.pm line 1487 [Getopt::Long::CallBack]
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+  $ perl Build.PL
+  $ perl ./Build
+  $ perl ./Build test
+  $ sudo perl ./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc
+command.
+
+  $ perldoc Devel::TraceUse
+
+Alternately, read hack #74 in Perl Hacks, published by O'Reilly Media in 2006.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 chromatic.
+
+Copyright (C) 2010 Philippe Bruhat (BooK), for the rewrite.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

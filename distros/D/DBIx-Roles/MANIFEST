@@ -1,0 +1,17 @@
+Roles.pm
+Roles/AutoReconnect.pm
+Roles/Buffered.pm
+Roles/InlineArray.pm
+Roles/Hook.pm
+Roles/RaiseError.pm
+Roles/Shared.pm
+Roles/StoredProcedures.pm
+Roles/SQLAbstract.pm
+Roles/Transaction.pm
+MANIFEST
+Changes
+Makefile.PL
+t/tests.t
+t/pod.t
+META.yml
+README

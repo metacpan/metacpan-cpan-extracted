@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Data-TreeDumper-Renderer-DHTML
+version:             0.09
+abstract:            DHTML renderer for B<Data::TreeDumper>
+license:             ~
+author:              
+    - Nadim ibn Hamouda el Khemir
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

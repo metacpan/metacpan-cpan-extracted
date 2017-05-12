@@ -1,0 +1,68 @@
+{
+   "abstract" : "Dist::Zilla::PluginBundle for BerryGenomics Bioinformatics Department",
+   "author" : [
+      "Huo Linhe <huolinhe@berrygenomics.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-BerryGenomics",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::ChangelogFromGit::CPAN::Changes" : "0",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0",
+            "Dist::Zilla::Plugin::Git" : "2",
+            "Dist::Zilla::Plugin::InstallGuide" : "1.0",
+            "Dist::Zilla::Plugin::OurPkgVersion" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "4",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0",
+            "Dist::Zilla::Plugin::Run" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "Sub::Install" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Module::Find" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.3.2"
+}
+

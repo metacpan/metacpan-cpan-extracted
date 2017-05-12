@@ -1,0 +1,42 @@
+events: Ticks
+
+fl=/home/anyuser/temp/x.pl
+fn=main::cFunction
+22 1033799
+
+fl=/home/anyuser/temp/x.pl
+fn=main::aFunction
+8 6641
+
+fl=/home/anyuser/temp/x.pl
+fn=main::bFunction
+17 15706930
+
+fl=/home/anyuser/temp/x.pl
+fn=main::RUNTIME
+cfl=/home/anyuser/temp/x.pl
+cfn=main::aFunction
+calls=1 8
+2 8355867
+
+fl=/home/anyuser/temp/x.pl
+fn=main::RUNTIME
+cfl=/home/anyuser/temp/x.pl
+cfn=main::aFunction
+calls=1 8
+5 8391503
+
+fl=/home/anyuser/temp/x.pl
+fn=main::aFunction
+cfl=/home/anyuser/temp/x.pl
+cfn=main::cFunction
+calls=2 22
+13 1033799
+
+fl=/home/anyuser/temp/x.pl
+fn=main::aFunction
+cfl=/home/anyuser/temp/x.pl
+cfn=main::bFunction
+calls=200 17
+10 15706930
+

@@ -1,0 +1,21 @@
+0.07 Fri Jan  2 09:35:17 PST 2015
+ - Change IRC channel to irc.perl.org#inline
+
+0.06 Fri Jan  2 09:29:15 PST 2015
+ - Add 'bundle' support
+
+0.05 Thu Jan  1 00:16:35 PST 2015
+ - Update doc
+
+0.04 Thu Dec 25 00:15:05 PST 2014
+ - Update Meta info
+
+0.03 Thu Dec 18 11:17:25 PST 2014
+ - Refactor to newer Inline::Module
+
+0.02 Sat Dec 13 11:34:33 EST 2014
+ - Get this working correctly with latest Inline::Module
+
+0.01 Sat Nov 15 01:15:08 UTC 2014
+ - Initial release
+

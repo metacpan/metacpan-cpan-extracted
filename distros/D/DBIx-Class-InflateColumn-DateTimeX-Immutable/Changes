@@ -1,0 +1,15 @@
+Changes for DBIx::Class::InflateColumn::DateTimeX::Immutable
+
+0.33 - Tue Jan  6 09:52:42 EST 2015
+    Adds prereq (DateTime::Format::SQLite) that is apparently required for
+    testing.
+
+0.32 - Wed Dec 24 08:47:26 EST 2014
+    Adds SQL::Translator to testing prereqs for deploy()
+
+0.31 - Fri Dec 19 17:10:17 EST 2014
+    Initial release
+
+0.30 - Thu Dec 18 14:32:37 EST 2014
+    Initial conversion to a releasable module
+

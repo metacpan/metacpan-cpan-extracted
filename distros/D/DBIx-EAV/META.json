@@ -1,0 +1,101 @@
+{
+   "abstract" : "Entity-Attribute-Value data modeling (aka 'open schema') for Perl",
+   "author" : [
+      "Carlos Fernando Avila Gratz <cafe@kreato.com.br>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.3",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-EAV",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : "0",
+            "DBI" : "0",
+            "Lingua::EN::Inflect" : "1.899",
+            "Moo" : "0",
+            "SQL::Abstract" : "0",
+            "SQL::Translator" : "0.11021",
+            "Scalar::Util" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010",
+            "strictures" : "2.000003"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "1.50",
+            "Test2::Suite" : "0",
+            "YAML" : "1.15"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::EAV" : {
+         "file" : "lib/DBIx/EAV.pm",
+         "version" : "0.09"
+      },
+      "DBIx::EAV::Cursor" : {
+         "file" : "lib/DBIx/EAV/Cursor.pm"
+      },
+      "DBIx::EAV::Entity" : {
+         "file" : "lib/DBIx/EAV/Entity.pm"
+      },
+      "DBIx::EAV::EntityType" : {
+         "file" : "lib/DBIx/EAV/EntityType.pm"
+      },
+      "DBIx::EAV::ResultSet" : {
+         "file" : "lib/DBIx/EAV/ResultSet.pm"
+      },
+      "DBIx::EAV::Schema" : {
+         "file" : "lib/DBIx/EAV/Schema.pm"
+      },
+      "DBIx::EAV::Table" : {
+         "file" : "lib/DBIx/EAV/Table.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cafe01/dbix-eav/issues"
+      },
+      "homepage" : "https://github.com/cafe01/dbix-eav",
+      "repository" : {
+         "url" : "git://github.com/cafe01/dbix-eav.git",
+         "web" : "https://github.com/cafe01/dbix-eav"
+      }
+   },
+   "version" : "0.09"
+}

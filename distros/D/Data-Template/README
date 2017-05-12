@@ -1,0 +1,8 @@
+This is alpha release 0.02 of Data::Template.
+
+Data::Template is a kind of template engines for
+data structures rather than text. But it works just
+the same, only producing structured data
+without need for parsing.
+
+Adriano Ferreira <ferreira@cpan.org> May 29 2006

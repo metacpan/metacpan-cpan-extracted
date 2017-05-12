@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Dist/Zilla/Plugin/MatchManifest.pm
+t/00-all_prereqs.t
+t/00-compile.t
+t/10-manifest.t
+t/corpus/DZT/MANIFEST.SKIP
+t/corpus/DZT/dist.ini
+t/corpus/DZT/lib/DZT/Sample.pm
+xt/release/pod-coverage.t
+xt/release/pod-syntax.t

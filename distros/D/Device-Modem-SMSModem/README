@@ -1,0 +1,95 @@
+Device-Modem-SMSModem version 0.01
+==================================
+
+The module is high level extension of Device::Modem intended to be be used as high level 
+API to handle SMS in USB dongles
+
+Example:
+
+#! /usr/bin/perl
+
+use Device::Modem::SMSModem;
+
+ my $modem = new Device::Modem::SMSModem(
+     port     => '/dev/ttyUSB0',
+     log      => 'file,smstest.log',
+     loglevel => 'info');
+ 
+ if ($modem->connect(baudrate => 38400)) {
+     print "Modem connected\n";
+ }
+ else {
+     die "Couldn't connect $!, stopped\n";
+ }
+
+# get operator MCC+MNC
+my $op= $modem->get_operator_info();
+print "Operator name: ".$op->{"long_name"}." MCC ".$op->{"mcc"}." MNC:".$op->{"mnc"}."\n";
+# LAC+BTS ID
+my $loc= $modem->get_lac_dec();
+print "LAC: ".$loc->{"lac"}." CELL ID ".$loc->{"cell_id"}."\n";
+
+print "IMSI: ".$modem->get_imsi()."\n";
+
+# SMSC addr 
+print "SMSC address: ".$modem->get_smsc_address()."\n";
+
+print "Setting up SM storage...\n";
+$modem->init_sms_storage("SM");
+
+print "Cleaning up storage...\n";
+$modem->clean_sms_storage();
+
+print "Getting number of messages...\n";
+
+print "Number of messages in the storage: ".$modem->read_sms_count()."\n";
+
+print "Looking for new messages...\n";
+
+while(1)
+{
+	
+	my $n= $modem->new_sms_count();
+	if($n)
+	{
+		print "Got $n new messages...\n";
+		my $last= $modem->sms_count()-1; 
+		my $sms= $modem->read_sms($last);
+		print $sms->{"status"}." ".$sms->{"from"}." ".$sms->{"date_time"}." ".$sms->{"smsc"}." ".$sms->{"text"}."\n";
+		$modem->delete_sms($last);
+	}
+	else
+	{
+		print "No new messages...\n";		
+	}       	
+	sleep(10);
+}
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Device::Modem
+  Carp
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2015, Dmitry Cheban, dmitriii@gmail.com
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+

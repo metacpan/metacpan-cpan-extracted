@@ -1,0 +1,4 @@
+: cascade cascade_base
+: around body -> {
+body
+: }

@@ -1,0 +1,193 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::DBOOK - A plugin bundle for
+    distributions built by DBOOK
+
+SYNOPSIS
+
+     [@Author::DBOOK]
+     pod_tests = 1
+     installer = MakeMaker::Awesome
+     MakeMaker::Awesome.test_file[] = t/*.t
+     Git::GatherDir.exclude_filename[0] = bad_file
+     Git::GatherDir.exclude_filename[1] = another_file
+
+DESCRIPTION
+
+    This is the plugin bundle that DBOOK uses. It is equivalent to:
+
+     [GithubMeta]
+     issues = 1
+     user = Grinnz
+     
+     [ReadmeAnyFromPod / Readme_Github]
+     type = pod
+     filename = README.pod
+     location = root
+     phase = release
+     
+     [GenerateFile / Generate_Contrib]
+     filename = CONTRIBUTING.md
+     content = ...
+     
+     [MetaConfig]
+     [MetaProvides::Package]
+     [Prereqs::FromCPANfile]
+     [Git::Contributors]
+     [MetaNoIndex]
+     directory = t
+     directory = xt
+     directory = inc
+     directory = share
+     directory = eg
+     directory = examples
+     
+     [CheckChangesHasContent]
+     [Git::Check]
+     allow_dirty = dist.ini
+     allow_dirty = Changes
+     allow_dirty = README.pod
+     [RewriteVersion]
+     [NextRelease]
+     format = %-9v %{yyyy-MM-dd HH:mm:ss VVV}d%{ (TRIAL RELEASE)}T
+     [CopyFilesFromRelease]
+     filename = INSTALL
+     filename = LICENSE
+     filename = CONTRIBUTING.md
+     filename = META.json
+     filename = Makefile.PL
+     [Git::Commit]
+     add_files_in = /
+     allow_dirty = dist.ini
+     allow_dirty = Changes
+     allow_dirty = README.pod
+     allow_dirty = INSTALL
+     allow_dirty = LICENSE
+     allow_dirty = CONTRIBUTING.md
+     allow_dirty = META.json
+     allow_dirty = Makefile.PL
+     [Git::Tag]
+     [BumpVersionAfterRelease]
+     munge_makefile_pl = 0
+     munge_build_pl = 0
+     [Git::Commit / Commit_Version_Bump]
+     allow_dirty_match = ^(?:lib|script|bin)/
+     commit_msg = Bump version
+     [Git::Push]
+     
+     [Test::ReportPrereqs]
+     [Git::GatherDir]
+     exclude_filename = INSTALL
+     exclude_filename = LICENSE
+     exclude_filename = CONTRIBUTING.md
+     exclude_filename = META.json
+     exclude_filename = Makefile.PL
+     exclude_filename = Build.PL
+     [Regenerate::AfterReleasers]
+     plugin = Readme_Github
+     plugin = CopyFilesFromRelease
+     [PruneCruft]
+     [ManifestSkip]
+     [MetaYAML]
+     [MetaJSON]
+     [License]
+     [ReadmeAnyFromPod]
+     [ExecDir]
+     [ExecDir / ScriptDir]
+     dir = script
+     [ShareDir]
+     [MakeMaker]
+     [RunExtraTests]
+     [InstallGuide]
+     [Manifest]
+     [TestRelease]
+     [ConfirmRelease]
+     [UploadToCPAN]
+
+    This bundle assumes that your git repo has the following: a cpanfile
+    with the dist's prereqs, a Changes populated for the current version
+    (see Dist::Zilla::Plugin::NextRelease), and a .gitignore including
+    /Name-Of-Dist-* but not Makefile.PL/Build.PL or META.json.
+
+    To faciliate building the distribution for testing or installation
+    without Dist::Zilla, and provide important information about the
+    distribution in the repository, several files can be copied to the
+    repository from the build by running dzil regenerate, and are copied
+    and committed automatically on release. These files are:
+    CONTRIBUTING.md, INSTALL, LICENSE, Makefile.PL/Build.PL, and META.json.
+    The file README.pod will also be generated in the repository (but not
+    the build) by dzil regenerate and dzil release.
+
+    To test releasing, set the env var FAKE_RELEASE=1 to run everything
+    except the upload to CPAN.
+
+     $ FAKE_RELEASE=1 dzil release
+
+OPTIONS
+
+    This bundle composes the
+    Dist::Zilla::Role::PluginBundle::Config::Slicer role, so options for
+    any included plugin may be specified in that format. It also composes
+    Dist::Zilla::Role::PluginBundle::PluginRemover so that plugins may be
+    removed. Additionally, the following options are provided.
+
+ github_user
+
+     github_user = gitster
+
+    Set the user whose repository should be linked in metadata. Defaults to
+    Grinnz, change this when the main repository is elsewhere. Set to an
+    empty string value to use the GitHub remote URL as found in the local
+    repository, as Dist::Zilla::Plugin::GithubMeta does by default.
+
+ installer
+
+     installer = MakeMaker::Awesome
+     MakeMaker::Awesome.WriteMakefile_arg[] = (clean => { FILES => 'autogen.dat' })
+     MakeMaker::Awesome.delimiter = |
+     MakeMaker::Awesome.footer[00] = |{
+     MakeMaker::Awesome.footer[01] = |  ...
+     MakeMaker::Awesome.footer[20] = |}
+    
+     installer = ModuleBuildTiny
+     ModuleBuildTiny.version_method = installed
+
+    Set the installer plugin to use. Allowed installers are MakeMaker,
+    MakeMaker::Awesome, ModuleBuildTiny, and ModuleBuildTiny::Fallback. The
+    default is MakeMaker. Options for the selected installer can be
+    specified using config slicing.
+
+ irc
+
+     irc = irc://irc.perl.org/#distzilla
+
+    Set the x_IRC resource metadata using
+    Dist::Zilla::Plugin::MetaResources.
+
+ pod_tests
+
+     pod_tests = 1
+
+    Set to a true value to add Dist::Zilla::Plugin::PodSyntaxTests and
+    Dist::Zilla::Plugin::PodCoverageTests. Set to syntax to only add the
+    syntax tests.
+
+BUGS
+
+    Report any issues on the public bugtracker.
+
+AUTHOR
+
+    Dan Book, dbook@cpan.org
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015, Dan Book.
+
+    This library is free software; you may redistribute it and/or modify it
+    under the terms of the Artistic License version 2.0.
+
+SEE ALSO
+
+    Dist::Zilla, cpanfile, Dist::Zilla::MintingProfile::Author::DBOOK
+

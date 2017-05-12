@@ -1,0 +1,35 @@
+---
+abstract: 'Thomson Reuters SAFE SSO authentication plugin for Dancer2'
+author:
+  - 'Konstantin Matyukhin <kmatyukhin@gmail.com>'
+build_requires:
+  Dancer2: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  JSON: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-SAFE
+requires:
+  Const::Fast: '0'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin: '0'
+  DateTime: '0'
+  Digest::MD5: '0'
+  HTTP::Status: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kmatyukhin/Dancer2-Plugin-Auth-SAFE/issues
+  repository: git://github.com/kmatyukhin/Dancer2-Plugin-Auth-SAFE.git
+version: '0.002'
+x_serialization_backend: 'YAML::Tiny version 1.69'

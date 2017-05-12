@@ -1,0 +1,47 @@
+[% IF NOT merge OR merge AND NOT no_data %]
+[% IF hostname %]
+dpkg - Report for [% hostname %]
+
+-------------------------
+[% ELSE %]
+dpkg - Report for localhost
+---------------------------
+[% END %]
+[% IF no_data %]
+No data available.
+[% END %]
+[% IF from AND to %]
+Reporting period: [% from %] - [% to %]
+
+[% END %]
+[% IF newly_installed_packages %]
+Newly installed packages:
+[% FOREACH package IN newly_installed_packages.sort('name') %]
+[% package.name %]
+
+[% END %]
+[% END %]
+[% IF upgraded_packages %]
+
+Upgraded packages:
+[% FOREACH package IN upgraded_packages.sort('name') %]
+[% package.name %] ([% package.old_version %] -> [% package.version %])
+[% END %]
+[% END %]
+[% IF removed_packages %]
+
+Removed packages:
+[% FOREACH package IN removed_packages.sort('name') %]
+[% package.name %][% " " %]
+
+[% END %]
+[% END %]
+[% IF halfconfigured_packages %]
+
+Packages in state "half-configured":
+[% FOREACH entry IN halfconfigured_packages.sort('name') %]
+[% entry %][% " " %]
+
+[% END %]
+[% END %]
+[% END %]

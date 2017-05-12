@@ -1,0 +1,17 @@
+0.05    10.03.11
+        * Minimal Dancer prereq version 1.3012 because of API changes.
+
+0.04    08.03.11
+        * FIX: Call init() on SUPER to conform to new Dancer and set ID.
+        (reported by ambs, fix by dams)
+
+0.03    30.11.10
+        * Improving documentation.
+        * Updating warning about new default backend.
+
+0.02    30.11.10
+        * Using KiokuDB::Backend::Hash as default now.
+        * kiokudb_backend_opts no longer required.
+
+0.01    30.11.10
+        It starts, and it apparently works. :)

@@ -1,0 +1,39 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.003002
+ [Added / configure suggests]
+ - JSON::PP 2.27300
+
+0.003001 2015-02-04T09:48:39Z
+ [Added / runtime recommends]
+ - Moose 2.000
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001006 → 0.99
+
+0.003000 2014-09-11T04:07:09Z
+ [Changed / test recommends]
+ - Test::More 1.001003 → 1.001006
+
+0.002001 2014-08-16T20:14:31Z
+ [Changed / test recommends]
+ - CPAN::Meta 0 → 2.120900
+
+ [Removed / test recommends]
+ - CPAN::Meta::Requirements 2.120900
+
+0.002000 2014-06-03T06:53:36Z
+ [Added / configure recommends]
+ - ExtUtils::MakeMaker 6.98
+
+ [Added / test recommends]
+ - CPAN::Meta
+ - CPAN::Meta::Requirements 2.120900
+ - ExtUtils::MakeMaker 6.98
+ - Test::More 1.001003
+
+0.001001 2013-10-12T07:07:17Z

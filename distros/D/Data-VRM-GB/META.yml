@@ -1,0 +1,35 @@
+---
+abstract: 'Extract data about British vehicle registration marks'
+author:
+  - 'Nicholas Booker <nick.booker@opusvl.com>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142060'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-VRM-GB
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+provides:
+  Data::VRM::GB:
+    file: lib/Data/VRM/GB.pm
+    version: '0.03'
+requires:
+  DateTime: '0'
+  Exporter::Easy: '0'
+resources:
+  bugtracker: https://github.com/OpusVL/p5-Data-VRM-GB/issues
+  homepage: https://github.com/OpusVL/p5-Data-VRM-GB
+  repository: https://github.com/OpusVL/p5-Data-VRM-GB.git
+version: '0.03'

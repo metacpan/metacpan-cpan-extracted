@@ -1,0 +1,97 @@
+ 
+                  License Agreement for DBD::DB2
+ 
+__________________________________________________________________
+ 
+PLEASE READ THIS AGREEMENT CAREFULLY BEFORE INSTALLING OR USING
+THIS PROGRAM.  IF YOU INSTALL OR USE THIS PROGRAM, YOU AGREE TO
+THESE TERMS.
+__________________________________________________________________
+ 
+1.   This DBD::DB2 code "Program" is owned by International
+     Business Machines Corporation or its subsidiaries (IBM) or
+     IBM's suppliers, and is copyrighted and licensed, not sold.
+     IBM retains title to the Program, and grants the user of the
+     Program "You" an:
+ 
+     irrevocable, worldwide, nonexclusive, perpetual, royalty-free
+     and fully paid-up license
+     (i)   to use, execute, display, perform, and reproduce the
+           Program,
+     (ii)  to prepare derivative works based on the Program,
+     (iii) to distribute copies of the Program and derivative
+           works thereof, and
+     (iv)  to authorize others to do all of the above.
+ 
+2.   You must reproduce the copyright notice and any other legend
+     of ownership on each copy or partial copy of the Program.
+ 
+3.   IBM would appreciate receiving a copy of derivative works of
+     the Program that You create.  You may provide to IBM such
+     derivative works pursuant to the terms of this Agreement and
+     the directions in the README file contained within the
+     Program directory.  You represent and warrant to IBM that You
+     are the sole author of, and/or have full exclusive right,
+     title and interest to any and all derivative works You
+     provide to IBM.  You further represent that You are under no
+     obligation to assign your rights in such derivative works to
+     any third-party, including without limitation, any current or
+     former employer.
+ 
+4.   You agree that IBM may utilize all information, ideas,
+     concepts, know-how or techniques furnished by You to IBM in
+     connection with any derivative works You make or have made to
+     the IBM Program, and that You provide to IBM and IBM may, but
+     shall not be obligated to, include such derivative works in
+     the IBM Program or in any IBM product without accounting to
+     You.
+ 
+5.   With respect to any derivative works of the Program You
+     provide to IBM, You grant to IBM an:
+ 
+     irrevocable, worldwide, non-exclusive, perpetual, royalty--
+     free and fully paid-up license
+     (i)   to use, execute, display, perform, and reproduce your
+           derivative works,
+     (ii)  to prepare derivative works based upon your derivative
+           works,
+     (iii) to distribute copies of your derivative works, and
+     (iv)  to authorize others to do all of the above.
+ 
+6.   YOU UNDERSTAND THAT THE PROGRAM IS BEING PROVIDED TO YOU "AS
+     IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+     INCLUDING BUT NOT LIMITED TO ANY IMPLIED WARRANTIES OF
+     MERCHANTABILITY, QUALITY, PERFORMANCE, INTELLECTUAL PROPERTY
+     INFRINGEMENT OR FITNESS FOR ANY PARTICULAR PURPOSE.  IBM has
+     no obligation to provide service, defect correction, or any
+     maintenance for the Program.  IBM has no obligation to supply
+     any Program updates or enhance-ments to You even if such are
+     or later become available.
+ 
+7.   IBM accepts no liability for damages You may suffer as a
+     result of your use of the Program.  Under no circumstances is
+     IBM liable for any of the following:
+ 
+      1.   third-party claims against You for losses or damages;
+      2.   loss of, or damage to, your records or data; or
+      3.   direct damages, lost profits, lost savings, incidental,
+           special, or indirect damages or consequential damages,
+           even if IBM or its authorized supplier, has been
+           advised of the possibility of such damages.
+ 
+8.   Some jurisdictions do not allow these limitations or
+     exclusions, so they may not apply to You.
+ 
+9.   You are responsible for the payment of any taxes resulting
+     from this license.
+ 
+10.  You agree not to bring a legal action more than two years
+     after the cause of action arose.
+ 
+11.  This license will be governed by and interpreted in
+     accordance with the laws of the State of New York.
+ 
+12.  This license is the only understanding and agreement we have
+     for your use of the Program.
+ 
+ 

@@ -1,0 +1,49 @@
+t/007-auxiliary.t .. 
+1..37
+ok 1 - Same md5_hex for identically written files
+ok 2 - Got expected count of different digests
+ok 3 - Got expected error message for non-array-ref argument to validate_list_sequence()
+# List starts with undef
+ok 4 - validate_list_sequence() returned true value
+ok 5 - validate_list_sequence() returned array ref
+ok 6 - validate_list_sequence() returned array with 3 elements
+ok 7 - list not validated
+ok 8 - Failure to validate at index 0
+ok 9 - first element undefined
+# List ends with undef
+ok 10 - validate_list_sequence() returned true value
+ok 11 - validate_list_sequence() returned array ref
+ok 12 - validate_list_sequence() returned array with 3 elements
+ok 13 - list not validated
+ok 14 - Failure to validate at index 36
+ok 15 - last element undefined
+# List ends with previously seen value
+ok 16 - validate_list_sequence() returned true value
+ok 17 - validate_list_sequence() returned array ref
+ok 18 - validate_list_sequence() returned array with 3 elements
+ok 19 - list not validated
+ok 20 - Failure to validate at index 36
+ok 21 - element beta previously observed
+# List ends with undef, then previously seen value
+ok 22 - validate_list_sequence() returned true value
+ok 23 - validate_list_sequence() returned array ref
+ok 24 - validate_list_sequence() returned array with 3 elements
+ok 25 - list not validated
+ok 26 - Failure to validate at index 37
+ok 27 - element beta previously observed
+# Sequence not closed off, ends with undef
+ok 28 - validate_list_sequence() returned true value
+ok 29 - validate_list_sequence() returned array ref
+ok 30 - validate_list_sequence() returned array with 3 elements
+ok 31 - list not validated
+ok 32 - Failure to validate at index 17
+ok 33 - Got expected error message
+# Good list
+ok 34 - validate_list_sequence() returned true value
+ok 35 - validate_list_sequence() returned array ref
+ok 36 - validate_list_sequence() returned array with 1 element
+ok 37 - validate_list_sequence() has true status
+ok
+All tests successful.
+Files=1, Tests=37,  0 wallclock secs ( 0.02 usr  0.00 sys +  0.05 cusr  0.00 csys =  0.07 CPU)
+Result: PASS

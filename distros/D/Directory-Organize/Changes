@@ -1,0 +1,28 @@
+2012-07-20 18:45 CEST (mathias) Version 0.9.6
+	- t/script-mkdir_heute: skip test on MSWin32
+
+2011-11-02 21:28 CET (mathias) Version 0.9.5
+	- t/script-mkdir_heute: add -l option to script invocation
+
+2011-11-02 10:01 CET (mathias) Version 0.9.4
+	- t/script-mkdir_heute: additional diagnostics
+
+2011-10-31 18:22 CET (mathias) Version 0.9.3
+	- added 'perl' and '-Ilib' to invocation of script in
+	  t/script-mkdir_heute
+
+2011-10-31 11:47 CET (mathias) Version 0.9.2
+	- tests for script mkdir_heute
+
+2011-10-15 09:49 CEST (mathias)
+	- mkdir_heute: show text from selection at exit
+
+2011-10-12 11:11 CEST (mathias)
+	- mkdir_heute: exit cleanly (with '.') on EOF in input
+
+2009-07-16 19:18 CEST (mathias) Version 0.9.1
+	- added DIAGNOSTIC to POD for mkdir_heute
+
+2009-06-10 11:34 CEST (mathias) Version 0.9
+	- added command line arguments --basedir and --listlines
+	- small fixes in POD

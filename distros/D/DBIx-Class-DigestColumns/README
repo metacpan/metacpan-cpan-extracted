@@ -1,0 +1,177 @@
+NAME
+    DBIx::Class::DigestColumns - Automatic digest columns
+
+SYNOPSIS
+    In your DBIx::Class table class:
+
+      __PACKAGE__->load_components(qw/DigestColumns ... Core/);
+
+      #automatically generate a method "check_password" in result class
+      __PACKAGE__->add_columns(
+        'password' => {
+          data_type => 'char',
+          size      => 32,
+          digest_check_method => 'check_password',
+      }
+      __PACKAGE__->digestcolumns(
+          columns   => [qw/ password /],
+          algorithm => 'MD5',
+          encoding  => 'base64',
+          dirty     => 1,
+          auto      => 1,
+      );
+
+    Note: The component needs to be loaded *before* Core.
+
+    Alternatively you could call each method individually
+
+      __PACKAGE__->digest_columns(qw/ password /);
+      __PACKAGE__->digest_algorithm('MD5');
+      __PACKAGE__->digest_encoding('base64');
+      __PACKAGE__->digest_dirty(1);
+      __PACKAGE__->digest_auto(1);
+
+DESCRIPTION
+    This DBIx::Class component can be used to automatically insert a message
+    digest of selected columns. By default DigestColumns will use
+    Digest::MD5 to insert a 128-bit hexadecimal message digest of the column
+    value.
+
+    The length of the inserted string will be 32 and it will only contain
+    characters from this set: '0'..'9' and 'a'..'f'.
+
+    If you would like to use a specific digest module to create your message
+    digest, you can set "digest_algorithm":
+
+      __PACKAGE__->digest_algorithm('SHA-1');
+
+Options added to add_column
+  digest_check_method => $method_name
+    By using the digest_check_method attribute when you declare a column you
+    can create a check method for that column. The check method accepts a
+    plain text string, performs the correct digest on it and returns a
+    boolean value indicating whether this method matches the
+    currently_stored value.
+
+      $row->password('old_password');
+      $row->update;
+      $row->password('new_password');
+      $row->check_password('new_password'); #returns true
+      $row->check_password('old_password'); #returns false
+      $row->update;
+
+METHODS
+  digestcolumns
+      __PACKAGE__->digestcolumns(
+          columns   => [qw/ password /],
+          algorithm => $algorithm',
+          encoding  => $encoding,
+          dirty     => 1,
+          auto      => 1,
+      );
+
+    Calls "digest_columns", "digest_algorithm", and "digest_encoding" and
+    "digest_auto" if the corresponding argument is defined.
+
+  register_column
+    Override the original register_column to handle the creation of check
+    methods.
+
+  digest_columns
+    Takes a list of columns to be convert to a message digest during insert.
+
+      __PACKAGE__->digest_columns(qw/ password /);
+
+  digest_algorithm
+    Takes the name of a digest algorithm to be used to calculate the message
+    digest.
+
+      __PACKAGE__->digest_algorithm('SHA-1');
+
+    If a suitible digest module could not be loaded an exception will be
+    thrown.
+
+    Supported digest algorithms are:
+
+      MD5
+      MD4
+      MD2
+      SHA-1
+      SHA-256
+      SHA-384
+      SHA-512
+      CRC-16
+      CRC-32
+      CRC-CCITT
+      HMAC-SHA-1
+      HMAC-MD5
+      Whirlpool
+      Adler-32
+
+    digest_algorithm defaults to "MD5".
+
+  digest_encoding
+    Selects the encoding to use for the message digest.
+
+      __PACKAGE__->digest_encoding('base64');
+
+    Possilbe encoding schemes are:
+
+      binary
+      hex
+      base64
+
+    digest_encoding defaults to "hex".
+
+  _get_digest_string $value
+    Handles the actual encoding of column values into digests. When given a
+    $value it will return the digest string for that value. This is the
+    method used by "_digest_column_values" So you can use it to create an
+    identical digest if you need one for comparison (e.g. password
+    authentication).
+
+  _digest_column_values
+    Go through the columns and digest the values that need it.
+
+    This method is called by insert and update when automatic digests are
+    turned on. If dirty is enabled it will only digest the values of dirtied
+    columns.
+
+  digest_auto
+      __PACKAGE__->digest_auto(1);
+
+    Turns on and off automatic digest columns. When on, this feature makes
+    all UPDATEs and INSERTs automatically insert a message digest of
+    selected columns.
+
+    The default is for digest_auto is to be on.
+
+  digest_dirty
+      __PACKAGE__->digest_dirty(1);
+
+    Turns on and off the limiting of automatic digests to only dirty
+    columns. When on, only columns that have been dirtied will have their
+    values digested during UPDATEs and INSERTs. If auto is set to off this
+    option does nothing.
+
+    The default is for digest_dirty is to be off to mantain compatibility
+    with older versions of this module.
+
+EXTENDED METHODS
+    The following DBIx::Class::Row methods are extended by this module:-
+
+    insert
+    update
+
+SEE ALSO
+    DBIx::Class, Digest
+
+AUTHOR
+    Tom Kirkpatrick (tkp) <tkp@cpan.org>
+
+    With contributions from Guillermo Roditi (groditi) <groditi@cpan.org>
+    and Marc Mims <marc@questright.com>
+
+LICENSE
+    You may distribute this code under the same terms as Perl itself.
+

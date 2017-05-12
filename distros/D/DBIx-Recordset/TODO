@@ -1,0 +1,46 @@
+
+Features
+--------
+- Add push, pop, shift, unshift for result array (only available in perl5.005)
+
+- Recheck selected values before UPDATE
+
+- Support cursors, to fetch only those data which is absolutly necessary
+
+- ::Hash -> New record, then retrieve autoincrement value -> force reselect?
+
+- unique names for multiple links to same table
+
+- UPDATE/INSERT/DELETE for mulitple tables [Robert 1.1.2000]
+
+- Readd placeholders [Peter Zeltins 2.2.2000]
+
+- Parameter patch [Garrett Goebel 3.2.2000]
+
+- !DebugLevel !DebugFile [Terrence Brannon 2.4.00]
+
+- Do not insert empty numeric fields [Robert 1.5.00]
+
+- arrayref for tabreleation [Jason R.Smith 18.3.01]
+
+- ListTables Oracle [Peter Gordon 8.11.01]
+
+Bugs
+----
+
+- INSERT $rc = undef -> $rc = 1 -> mult linked nested objects (ka aktuell)
+
+- invalidate active statements with links
+
+- sometimes errors are not reported when updateing an array, until
+  Flush is called [Robert 1.5.00]
+
+- Informix: NAME_lc -> NAME  [Yevgeniy Furman 21.6.00]
+
+Tests
+-----
+
+Doku 
+----
+
+- !PrimKey needed for Array Update

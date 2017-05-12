@@ -1,0 +1,21 @@
+Revision history for Perl module Deep::Hash::Utils
+
+0.04 2015-11-02 NEILB
+    - Switched to Dist::Zilla
+    - Updated github repo URL, after changing my github username
+
+0.03 2014-04-22
+    - Fixed abstract to follow the CPAN convention
+    - Specified min perl version 5.6.0 in metadata & .pm
+    - Added github repo to metadata and doc
+    - Specified license type as 'perl_5' in metadata
+    - Added simple test for reach() in t/01-reach.t
+    - Added PREREQ_PM, TEST_REQUIRES and CONFIGURE_REQUIRES
+
+0.02 2012-07-06
+    - Fixes in README
+
+0.01 2009-01-30
+    - original version; created by h2xs 1.23
+      with options -AXn Deep::Hash::Utils -v 0.01
+

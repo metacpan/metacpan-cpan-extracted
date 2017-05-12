@@ -1,0 +1,5 @@
+[% SET menu = generator.navigation_menu(file, url) -%]
+[% IF menu.size -%]
+<h2 class="no-css">Navigation</h2>
+[% INCLUDE nav_menu_sub.tt items = menu %]
+[% END -%]

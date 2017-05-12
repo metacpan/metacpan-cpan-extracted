@@ -1,0 +1,70 @@
+######################################################################
+    Device::MAS345 0.03
+######################################################################
+
+NAME
+    Device::MAS345 - Reading the Mastech MAS-345 Multimeter
+
+SYNOPSIS
+      use Device::MAS345;
+
+      my $mas = Device::MAS345->new( port => "/dev/ttyS0" );
+
+      my($val, $unit, $mode) = $mas->read();
+
+DESCRIPTION
+    "Device::MAS345" reads data from a Mastech MAS-345 multimeter connected
+    to the computer's serial port.
+
+    This cheap (less than $50) multimeter measures voltage, current,
+    temperature, resistance, capacity, and features a serial cable to hook
+    it up to a PC.
+
+    Using "Device::MAS345", you can connect to the multimeter and read out
+    the currently displayed value, along with the selected mode and a units
+    character.
+
+    Reading data returns three values:
+
+      my($val, $unit, $mode) = $mas->read();
+
+    $val is the numeric value displayed on the multimeter (e.g. -0.015),
+    $unit holds the measurement unit (e.g. "V") and $mode adds an additional
+    mode setting (e.g. "DC").
+
+    On error, "Device::MAS345" throws exceptions. If you want to catch them,
+    use "eval {}". The cause for the error can be seen by calling the
+    object's "error" message, which returns the string of the last
+    exception.
+
+  Debugging
+    "Device::MAS345" is "Log::Log4perl"-enabled. To turn on debugging, just
+    add
+
+        use Log::Log4perl qw(:easy);
+        Log::Log4perl->easy_init($DEBUG);
+
+    at the start of your code.
+
+  Serial Ports
+    The constructor can be called without arguments. The optional "ports"
+    parameter defaults to "/dev/ttyS0", the first serial port.
+
+  Gotchas
+    If you want to run this as a non-root user, make sure that
+
+        ls -l /dev/ttyS0
+
+    (or whatever serial port the multimeter is connected to) is
+    read/writeable by the user.
+
+    The multimeter has to be turned on for the connection to succeed.
+
+LEGALESE
+    Copyright 2007 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
+
+AUTHOR
+    2007, Mike Schilli <cpan@perlmeister.com>
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-Migration-RunScript-Trait-AuthenPassphrase,
+version 0.002:
+
+  RunScript trait to encode values in DBIx::Class::Migration::RunScript
+
+This software is copyright (c) 2013 by John Napiorkowski.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

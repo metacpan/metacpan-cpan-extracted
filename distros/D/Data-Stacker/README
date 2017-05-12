@@ -1,0 +1,23 @@
+Data::Stacker
+==============
+
+Data::Stacker provides concise text serialization for nested hash/array structs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Data::Stacker does not use libraries other than core perl.
+
+COPYRIGHT AND LICENCE
+
+See `COPYING' file for full GPL license text.
+
+Copyright (C) 2016 Vladi Belperchinov-Shabanski <cade@cpan.org> <cade@bis.bg>

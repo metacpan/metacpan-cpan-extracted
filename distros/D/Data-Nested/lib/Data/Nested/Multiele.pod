@@ -1,0 +1,673 @@
+=pod
+
+=head1 NAME
+
+Data::Nested::Multiele - A set of data structures with the same structure
+
+=head1 SYNOPSIS
+
+  use Data::Nested::Multiele;
+
+=head1 DESCRIPTION
+
+This module allows you to work with a set of elements, each of which
+may be a complex, arbitrarily deep, nested data structure. The nested
+data structures must consist only of scalars, hashes, and lists. The
+set of elements is stored either as a hash or a list.
+
+This module makes use of the Data::Nested module for most of handling of
+each element, and a working knowledge of that module is assumed here.
+
+Every elements must be based on the same structure (though it is not
+required that all elements contain all of the structure). Each element
+must be uniquely named if they are stored in a hash, or they will be
+accessed by index if stored as a list.
+
+This module allows you to do several things:
+
+=over 4
+
+=item Easily access the data stored somewhere in an element
+
+This module will use a path (described below) to traverse
+through the data structure to return only the segment needed.
+
+=item Enforce structural integrity of each element
+
+Every element is required to have the same structure (although it is
+not necessary that all parts of the structure be present in all
+elements). This module will ensure that that is the case, and will
+report any errors.
+
+=item Supply defaults for missing data
+
+Defaults data structures can be used to supply defaults for missing
+data.
+
+=item May handle (in the future) different types of data sources
+
+Currently, all data sources are YAML files, but potentially databases,
+hash files, text files, or other typess may be added.
+
+=item Additional data checking
+
+Planned for a future release is the ability to add additional
+constraints to the data (for example, define which values are
+valid, etc.).
+
+=back
+
+=head1 USES AND LIMITATIONS OF THIS MODULE
+
+A frequent problem is that of defining a set of complex objects in a
+uniform way. Often, it is useful to defined these objects as data
+structures, as opposed to using a database or other data handling
+schemes. Unfortunately, although there is a lot of support for
+database operations, handling arbitrary data structures is less
+well supported. This module is an attempt to correct that.
+
+If you want to define a set of objects, and each object as an
+arbitrarily complex data structure, and all of the objects have the
+same structure, then this module can be used to automate most of the
+task. It imposese a uniform structure on each object. It includes
+automatic error checking to make sure that the objects are defined in
+the same way. It can provide default values for missing data.
+
+In sum, it automates many of the common parts of this type of task.
+
+The most important limitation is that (currently) only YAML data is
+supported. If your data cannot be stored in a YAML file for whatever
+reason, then this module will not be of use. Since there are very
+few ways to store arbitrary data structures, and YAML is well understood
+and supported, this is hopefully not a severe limitation.
+
+Since this module is written completely in perl, and does a great deal
+of complex checking on every piece of data, it is probably not
+suitable for applications where speed is critical. It would be better
+to write data checking procedures specifically for the structures you
+are working with in order to improve speed.
+
+This module reads in all of the elements from a data source, and
+stores two copies of everything (the raw data and a version with
+defaults merged in). As such, it is not useful for working with data
+sets which cannot be stored easily in memory. Also, if each element is
+a simple structure, the overhead of this module is proably not worth
+it.
+
+But for working with relatively small sets of data (up to thousands of
+elements) which consist of at least 2 or 3 levels of nested data
+structure, this module will dramatically increase the ease of using
+and maintaing that data, and will add enormous amounts of error
+checking automatically, at no effort on your part.
+
+=head1 DATA ELEMENTS
+
+A Data::Nested::Multiele object is associated with a single data source.
+That source contains multiple elements, each one a similarly structured
+NDS. Each Data::Nested::Multiele object is also associated with a single
+Data::Nested object which is used to store structural information about
+the elements, perform data validity checks, etc.
+
+The data source contains either a list or a hash. If it is a list, each
+member of the list is an element. If it is a hash, each key is the name
+of an elements, and the value of that key is the element.
+
+Handling of individual elements is done using the Data::Nested module,
+so an understanding of that module is assumed.
+
+When referring to an individual element in any of the methods below,
+$ele is either an index (if the elements are given as a list) or a
+key (if they are given as a hash).
+
+It should be noted that if a file contains a list of elements, the
+default elements (if any) must come first. See the following section
+for information about default elements.
+
+If the data source consists of a hash, then every key in that hash is
+the name of an element. Referring to an element is always done by
+name, and that element is always available, even if it's value in the
+data source is undefined. In that case, the full element would consist
+only of default values, as described next.
+
+If the data source consists of a list, then there are two ways to
+regard the elements: ordered and unordered. In an unordered list, as
+discussed in the Data::Nested module, the order of the elements is
+unimportant. Deleting an element is doable, and is done by completely
+removing
+
+If the list is ordered however, it means that the position in the list
+has meaning, and if an element is removed, an undefined place holder
+must remain in order to preserve the position of higher elements.  As
+such, in an unordered list, it is impossible to actually delete
+elements that come before the last element in the list. Undefined
+elements take default values, but no other values.
+
+=head1 DEFAULT DATA
+
+In each data source, some of the elements may be used to supply
+defaults for other elements. Default elements are not used when
+examing the set of data elements. So, for example, if you look for a
+set of elements which have a certain property, the default elements
+will not be examined. The defaults are used only to fill in data for
+the other elements.
+
+Default elements are included in the data source, and are structurally
+identical to all other elements.
+
+Default elements may apply for all other elements, or for a subset
+of elements. The latter apply to elements which meet some condition.
+For example, a default element may be used for all elements which have
+a certain value specified at a certain path in the element.
+
+Default elements are specified in the program (using the default_element
+method described below). They are applied in the order they are specified,
+so multiple default elements may apply for each element (and conditional
+defaults may be triggered by a previously applied default).
+
+For example, if you have two default elements:
+
+  $default1 = { a => 1 }
+
+  $default2 = { b => 2 }
+
+and several elements:
+
+  $ele1 = { a => 1 }
+  $ele2 = { a => 2 }
+  $ele3 = { c => 3 }
+
+and $default1 is applied first universally and $default2 is applied
+conditionally for elements which have the path /a equal to 1, then the
+full value (after defaults have been applied) are:
+
+  $ele1 = { a => 1,
+            b => 2 }
+  $ele2 = { a => 2 }
+  $ele3 = { a => 1,
+            b => 2,
+            c => 3 }
+
+$default1 is applied to $ele1, but since $ele1 already has a value for
+/a, the default is ignored. $default2 is then applied since /a equals 1,
+so /b is set to 2.
+
+$default1 is applied to $ele1, but since /a already has a value, the
+default is ignored. $default2 does not apply since /a is not equal to 1.
+
+$default1 is applied to $ele1 setting /a to 1. Then, $default2 is applied
+(since /a is 1) and that sets /b to 2.
+
+Defaults may be applied using any ruleset (see Data::Nested for a description
+fo rulesets), but by default, the ruleset named "default" is used.
+
+When working with a data source containing lists of elements, default
+elements must be the first elements in the list, and they are used in
+the order they are included in the list (though some may still be
+conditional). After reading all elements, they are removed from the
+list of elements before any other operations.
+
+For example, if you have a list of elements:
+
+  [ def1, def2, ele1, ele2, ele3 ]
+
+Then you would first call the default_element method twice, and that
+would leave the list:
+
+  [ ele1, ele2, ele3 ]
+
+From then on, the index of the elements would be the index in the
+list with the defaults removed.
+
+=head1 METHODS
+
+=over 4
+
+=item new
+
+=item file
+
+=item ordered_list
+
+A new Data::Nested::Multiele object can be created, and assigned to a
+data source, several variations of calls can be used depending on
+the type of data stored in the data source.
+
+If the data source contains a hash, or an unordered list of
+elements, the Data::Multiele object can be created and attached
+to that data using a two call method:
+
+   $obj = new Data::Nested::Multiele [NDS];
+   $obj->file(FILE);
+
+or an equivalent one call method:
+
+   $obj = new Data::Nested::Multiele [NDS,] FILE;
+
+If the data source contains an ordered list, the object can be created
+using a three call method:
+
+   $obj = new Data::Nested::Multiele [NDS];
+   $obj->ordered_list();
+   $obj->file(FILE);
+
+or an equivalent one call method:
+
+   $obj = new Data::Nested::Multiele [NDS,] FILE,1;
+
+A Data::Nested object is needed. If one is passed in as an argument to
+the new method, it is used. By creating an NDS, and then passing it in
+to the new method, the same NDS can be used for multiple
+Data::Nested::Multiele objects, each reading a separate data source.
+In this way, all structural information in the NDS applies to both
+files.
+
+If no Data::Nested object is passed in, one is created.
+
+Creating two Data::Nested::Multiele objects which use the same NDS can be
+done in the following way:
+
+   $NDS  = new Data::Nested;
+   $obj1 = new Data::Nested::Multiele $NDS [,FILE1 [,1]];
+   $obj2 = new Data::Nested::Multiele $NDS [,FILE2 [,1]];
+
+The same effect can be achieved with:
+
+   $obj1 = new Data::Nested::Multiele [,FILE1 [,1]];
+   $obj2 = $obj1->new([FILE2 [,1]]);
+
+If no file is passed in to the new method, you need to use the file
+method to set it and read the data.
+
+An error code is set if the file cannot be read for any reason.
+
+The file method can have one optional argument. If the structure of the
+NDS is already completely defined, a non-zero second argument can be
+passed in:
+
+   $obj->file(FILE,1);
+
+which will require that the structure of all data be part of the
+structure already defined in the NDS.
+
+=item version
+
+   $version = $obj->version;
+
+Returns the version of this modules.
+
+=item nds
+
+   $NDS = $obj->nds;
+
+Returns the Data::Nested object associated with the object.
+
+=item err
+
+=item errmsg
+
+  $err = $obj->err();
+
+This tests to see if the last function failed. If it did, $err is the
+error code set by that function.
+
+Error codes in this module described and listed below in the ERROR CODES
+section.
+
+Every error also produces a text version of the error. The function:
+
+  $msg = $obj->errmsg();
+
+will return the text version of the error.
+
+=item eles
+
+   @eles = $obj->eles([$exists]);
+
+Returns a list of all element names or indices in the data for non-empty
+elements.
+
+If $exists is passed in and is non-zero, a list of all existing element
+names are returned (some of which may be empty).
+
+=item ele
+
+   $flag = $obj->ele($ele [,$exists]);
+
+Returns 1 if $ele is a non-empty element (or if it exists, possibly
+empty if $exists is non-zero) in the data.
+
+=item default_element
+
+   $obj->default_element([$ele,] [$ruleset,] [$path,$val,...]);
+
+This is used to declare that one of the elements that was read
+in from the data file is used to provide defaults for other elements.
+
+If the data file contains a list of elements (ordered or unordered),
+$ele is NOT passed in.  The first element in the list is removed and
+used as a default. Additional calls to default_element will remove
+additional elements from the modified list.  If the data file contains
+a hash of elements, $ele is required, and is the name of one of the
+elements.
+
+$ruleset is optional and is the ruleset to use to merge the default
+elements in to the other non-default elements. If $ruleset is omitted,
+it defaults to "default". Please see the Data::Nested documentation for
+more details on rulesets.
+
+If no other arguements are given, then the default is applied to
+all elements. Otherwise, pairs of $path/$val arguments can be provided.
+$path is a path in an NDS, and $val is any value that it might take
+(it can also be any valid string used in the which method described
+below).
+
+NOTE: it is important that default_elements be specified immediately
+after the data file is read in or unexpected results may occur.
+
+=item which
+
+  @ele = $obj->which($path,$cond [,$path,$cond,...]);
+
+This returns a list of all elements which have meet all of the conditions
+in the list. Any number of pairs of ($path,$cond) may be included, and
+all of them must match for an element to be included in the return set.
+
+The path/cond pairs are described in the test_conditions method of the
+Data::Nested module.
+
+An error code is any argument is invalid.
+
+=item path_valid
+
+   $flag = $obj->path_valid($path);
+
+Returns 1 if $path is a valid path that could be used in an element.
+
+=item value
+
+=item keys
+
+=item values
+
+   $val  = $obj->value($ele,$path [,$copy,$raw]);
+   @keys = $obj->keys($ele,$path [,$empty,$raw]);
+   @val  = $obj->values($ele,$path [,$empty,$copy,$raw]);
+
+These functions return data stored in an element.
+
+The value method returns the value or data structure (or a copy of the
+structure if $copy is non-zero) in the element. $path can point to
+any type of structure.
+
+The keys method will work with $path pointing to either a list or
+a hash. It will set an error code if it points to a scalar.
+
+If $path refers to a list, keys will return a list of indices
+for elements in the list. By default, it will return indices
+for all non-empty elements, but if a non-zero value of $empty
+is passed in, it will include indices for all defined elements.
+
+Likewise, if $path refers to a hash, it will return a list of
+keys. By default, only keys with non-empty values will be
+returned, but if $empty is non-zero, all existing keys will
+be returned.
+
+The values method is similar to the keys method, but will return
+the non-empty values (or all values if $empty is non-zero) in
+the list, or the hash values. The values can be returned exactly
+as they are stored, or as a copy if $copy is non-zero.
+
+If $raw is passed in, it works with the raw data instead of the
+full value with defaults merged in.
+
+=item path_values
+
+   %ele = $obj->path_values($path [,$empty,$copy]);
+
+This will return a hash of every element with a value at the given
+path, and the value stored there. By default, only elements with
+non-empty values will be added to the hash, but if $empty is passed
+in, then even elements with empty values will be included.
+
+If $copy is non-zero, copies of the values, rather than the values
+themselves, will be stored as values in the returned hash.
+
+=item path_in_use
+
+   $flag = $obj->path_in_use($path [,$empty]);
+
+This will return 1 if the $path is currently used in at least one
+element. By default, only elements with non-empty values will
+be treated as being in use, but if $empty is passed in, then
+an element with an empty value will be treated as in use.
+
+=item delete_ele
+
+   $obj->delete_ele($ele);
+
+This deletes the element named $ele. This only affects the working
+copy of the data. To actually save the data, use the save method.
+
+=item rename_ele
+
+   $obj->rename_ele($ele,$newele);
+
+This renames an element from $ele to $newele. It sets an error code if
+the operation cannot be performed because there is already an element
+named $newele. This only affects the working copy of the data. To
+actually save the data, use the save method.
+
+The rename_ele method is not applicable to a file containing an
+unordered list of elements since the order of the elements is not
+currently used.  It MAY be used on an ordered list.
+
+=item add_ele
+
+   $obj->add_ele([$ele,] $nds [,$new]);
+
+This adds a new element to the list. The new element is checked for
+validity, and then added. Note that the element is not actually
+stored in the data file. Use the save method to do that.
+
+Because the NDS does not have defaults applied, the new element may
+have additional data present once defaults are applied.
+
+If the data file consists of list of elements, $ele is optional. If it
+is absent, the new element is pushed onto the end of the list. If it
+is present, there are some differences between unordered and ordered
+lists are handled.
+
+When $ele is present for an unordered list, $ele must refer to an
+existing element. The new element is inserted into the list before
+this element.
+
+When $ele is present for an ordered list, $ele may refer to an
+existing, but empty element. In this case, the new element is put
+there. $ele may refer to a non-existant element (i.e. an element past
+the end of the list), in which case the element is put there. If $ele
+refers to an existing, and non-empty element, the new element is
+inserted into the list before that element and all higher elements are
+shifted to one higher position.
+
+If the data file contains a hash, the $ele arguement is required
+to be the name of a new or empty element.
+
+=item copy_ele
+
+   $obj->copy_ele($ele [,$newele]);
+
+This will create a new element which is a copy of another element.
+The new element is created in the same way as the add_ele method
+based on the value of $newele and the type of data.
+
+=item update_ele
+
+   $obj->update_ele($ele,$path);
+   $obj->update_ele($ele,$path,$val [,$new] [,$ruleset]);
+
+This will set the value for an element at a given path. This only
+affects the working copy of the data. To actually save the data, use
+the save method.
+
+If $val is not passed in, the given path will be erased from the
+element. It should be noted that the path is only removed from the
+raw data. If a value is supplied by a default element, it is not
+erased.
+
+If $val is passed in, it will be stored at the given path, provided it
+has the correct structure.
+
+By default, when updating an element, the new value will replace any
+existing value. If a ruleset is passed in, the new value will be
+merged into the existing element using those rules.
+
+=item is_default_value
+
+   $flag = $obj->is_default_value($ele,$path);
+
+This returns 0 if the value stored at $path is in the raw data (i.e.
+is included in the explicitly defined values for the element) or 1
+if it is not stored (i.e. the value was provided by a default element).
+
+=item dump
+
+   $string = $obj->dump($ele,$path,%opts);
+
+This will create a string containing the value of the given element at
+the given path. %opts is a set of options suitable for passing to the
+print method in the Data::Nested module.
+
+=item save
+
+   $obj->save();
+
+This will save all modified data sources. Although typically called at
+the end of a program, it can safely be called at any time.
+
+=back
+
+Any method not documented here, especially those beginning with an
+underscore (_), are for internal use only. Please do not use them.
+Absolutely no support is offered for them.
+
+=head1 ERROR CODES
+
+Each error code produced by a method in the Data::Nested::Multiele module
+is prefixed by the characters "nme", followed by a 3 character
+operation code which tells what type of operation failed, followed
+by 2 digits.
+
+The following error codes are used to identify problems working
+with files containing data:
+
+   nmefil01   A file has already been set for this object.
+              Each Multiele object can read a single file.
+   nmefil02   The file was not found.
+   nmefil03   The file not readable.
+   nmefil04   The file is not a valid YAML file containing either
+              a list or a hash.
+   nmefil05   An invalid element is in the file. An invalid
+              element is one in which the structure differs
+              from other elements read in previously.
+   nmefil06   An operation has been done before a file
+              was set for the object.
+   nmefil07   Unable to backup data file before saving a new
+              version.
+   nmefil08   Unable to write data file.
+   nmefil09   It is not valid to specify ordered for a file
+              containing a hash.  Ordered only applies to lists.
+
+The following error codes are related to default element handling:
+
+   nmedef01   Element name required for hashes when specifying
+              default elements.
+   nmedef02   The named element does not exist and cannot be
+              used for a default element.
+   nmedef03   An invalid ruleset specified for merging defaults.
+   nmedef04   An invalid path specified in a default condition.
+   nmedef06   An undefined/empty element may not be used as
+              a default.
+
+The following error codes are related to accessing an element by
+name:
+
+   nmeele01   The specified element does not exist.
+   nmeele02   Attempt to overwrite an existing element.
+   nmeele03   An element must be included when adding to a hash.
+   nmeele04   Attempt to add element to an unordered list using
+              a non-existant element.
+
+The following error codes are related to accessing data elements:
+
+   nmeacc01   When specifying conditions, an even number of
+              arguments is required.
+   nmeacc02   When specifying conditions, a valid path is
+              required.
+   nmeacc03   Attempt to access data with an invalid path.
+   nmeacc04   The path does not exist in this element.
+   nmeacc05   Keys method may not be used with a scalar path.
+   nmeacc06   Values method may not be used with a scalar path.
+
+The following error codes refer to problems that occur in working
+with an NDS in the operation:
+
+   nmends01   The NDS has an invalid structure.
+   nmends02   Problem encountered while erasing a path.
+   nmends03   The value had an invalid structure.
+
+Additional misc. error codes are:
+
+   nmeerr01   An invalid ruleset was passed in.
+   nmeerr02   Cannot call ordered_list after a file is read.
+   nmeerr03   An existing element is required when inserting
+              a new element into a list.
+   nmeerr04   Attempt to delete an element outside of a list.
+
+=head1 BUGS AND QUESTIONS
+
+If you find a bug in this module, please send it directly to me (see
+the AUTHOR section below).  Alternately, you can submit it on CPAN. This
+can be done at the following URL:
+
+   http://rt.cpan.org/Public/Dist/Display.html?Name=Data-NDS-Multiele
+
+Please do not use other means to report bugs (such as usenet newsgroups,
+or forums for a specific OS or linux distribution) as it is impossible
+for me to keep up with all of them.
+
+When filing a bug report, please include the following information:
+
+=over 4
+
+=item *
+
+The version of the module you are using.  You can get this by using
+the script:
+
+        use Data::Nested::Multiele;
+        $obj = new Data::Nested::Multiele;
+        print $obj->version(),"\n";
+
+=item *
+
+The output from "perl -V"
+
+=back
+
+If you have a problem using the module that perhaps isn't a bug (can't
+figure out the syntax, etc.), you're in the right place.  Go right back to
+the top of this manual and start reading.  If this still doesn't answer
+your question, mail me directly.
+
+=head1 KNOWN PROBLEMS
+
+None at this point.
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)

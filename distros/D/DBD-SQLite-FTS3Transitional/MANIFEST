@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/DBD/SQLite/FTS3Transitional.pm
+t/01-translate.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml

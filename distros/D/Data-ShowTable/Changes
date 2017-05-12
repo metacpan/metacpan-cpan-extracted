@@ -1,0 +1,37 @@
+Modified "ShowTable.pm":
+
+  Added "showmode" argument to ShowTableValue so it could handle HTML
+  embedded text correctly.  ShowTableValue now uses a string substitution
+  "%s" for any values with embedded HTML tokens, even if defined as an
+  integer or real.
+
+  Changed how URLs work: now %K and %V are substituted into the URL
+  corresponding to the given field name key.  No other insertions are
+  done, so the URL is completely specified by the user otherwise.
+
+  Added tableAttrs argument to ShowHTMLTable allowing other stuff to be
+  inserted within the TABLE token (ie: <TABLE $table_attrs>).
+
+  Changed the regexp in &PlainText to avoid the multiple null string
+  matches.
+
+  Changed htmltext to substitute blanks if the optional second argument
+  is non-null (which is used when creating URLs).
+
+  Allow column indexes, as well as column names, to be mapped to URLs.
+
+  Added %I (column index) key to the url substitutions.
+
+  Removed Sys::OutPut usage.  Added "put" and "out" subs directly.
+
+  Fixed small documentation problems.
+
+Modified "showtable":
+
+  Added -urls option to support URL mappings for fields.
+
+  Added -attributes option to support table_attributes argument.
+
+Added Changes file.
+
+Added t/html-urls.t test file.

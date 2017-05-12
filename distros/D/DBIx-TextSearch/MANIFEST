@@ -1,0 +1,15 @@
+test-pg.pl
+test-db2.pl
+test-mysql.pl
+Makefile.PL
+README
+TextSearch.txt
+Tests
+lib/DBIx/TextSearch.pm
+lib/DBIx/TextSearch/Pg.pm
+lib/DBIx/TextSearch/DB2.pm
+lib/DBIx/TextSearch/mysql.pm
+lib/DBIx/TextSearch/developing.pod
+MANIFEST
+INSTALL
+META.yml                                 Module meta-data (added by MakeMaker)

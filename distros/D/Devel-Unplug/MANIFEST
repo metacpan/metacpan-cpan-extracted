@@ -1,0 +1,18 @@
+Changes
+lib/Devel/Unplug.pm
+lib/Devel/Unplug/OO.pm
+Makefile.PL
+MANIFEST
+README
+t/000-load.t
+t/commandline.t
+t/lib/Some/Module.pm
+t/lib/Some/Other/Module.pm
+t/nest.t
+t/oo.t
+t/pod-coverage.t
+t/pod.t
+t/unplug.t
+t/wildcard.t
+META.yml                                 Module meta-data (added by MakeMaker)
+SIGNATURE                                Public-key signature (added by MakeMaker)

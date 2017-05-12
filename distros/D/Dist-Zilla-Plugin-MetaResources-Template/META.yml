@@ -1,0 +1,57 @@
+---
+abstract: 'Use Perl code in distribution "resource" metadata'
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  Dist::Zilla::Plugin::Manifest: '0'
+  Dist::Zilla::Plugin::MetaResources: '4.300039'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  Dist::Zilla::Role::TextTemplater: v0.8.0
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  IPC::System::Simple: '0'
+  Software::License::Perl_5: '0'
+  Test::Deep: '0'
+  Test::DiagINC: '0.002'
+  Test::Dist::Zilla::Build: '0'
+  Test::More: '0'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  autodie: '0'
+  blib: '1.01'
+  if: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MetaResources-Template
+provides:
+  Dist::Zilla::Plugin::MetaResources::Template:
+    file: lib/Dist/Zilla/Plugin/MetaResources/Template.pm
+    version: v0.4.7
+requires:
+  Dist::Zilla::Plugin::MetaResources: '4.300039'
+  Dist::Zilla::Role::TextTemplater: v0.8.0
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  version: '0.77'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaResources-Template
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-MetaResources-Template
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-Plugin-MetaResources-Template
+version: v0.4.7

@@ -1,0 +1,40 @@
+Revision history for Perl extension Data-Container
+
+1.100840  2010-03-25 22:01:38 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.07  Wed 2010.02.10 11:29:36 CET (Marcel Gruenauer <marcel@cpan.org>)
+     - Updated skeleton
+     - Better documentation
+     - Removed unnecessary requirements
+
+0.06  Mon Oct 20 19:12:09 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+     - Changed dist style and Changes back to standard. People didn't like it -
+       the nail that sticks out gets hammered down.
+     - Added standard test files; this will also help with CPANTS.
+     - don't call NEXT::prepare_comparable() anymore; too slow and never used
+
+0.05  Thu, 29 May 2008 12:02:43 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+     - Converted Changes file to YAML style
+     - .shipit: added Twitter step
+     - Makefile.PL: added auto_install() and process_templates()
+     - lib/*: converted to template
+     - updated MANIFEST
+     - added t/perlcriticrc
+     - updated MANIFEST
+     - moved generated documentation of interited methods to after
+       documentation of this class' methods so the manpage is more readable
+     - .shipit: fixed svk.tagpattern
+     - tags: NEWFEATURE
+
+0.04  Sat, 20 Oct 2007 22:20:15 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - simplified accessor declaration
+
+0.03  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - fixed version requirement of Test::More
+
+0.02  Wed, 17 Oct 2007 17:00:05 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - switched from Class::MethodMaker to Class::Accessor::Complex
+
+0.01  Thu, 04 Oct 2007 19:13:52 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+     - original version

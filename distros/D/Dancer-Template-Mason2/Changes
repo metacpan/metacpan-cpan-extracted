@@ -1,0 +1,25 @@
+Revision history for Dancer-Template-Mason2
+
+** denotes an incompatible change
+
+0.05  May 20, 2015
+
+- Allow dhandlers by letting Mason2 decide if the view file exists rather than Dancer - https://github.com/jonswar/perl-dancer-template-mason2/pull/1 (Michael Scoltock)
+
+0.04  May 20, 2012
+
+- convert slashes on Windows - RT #76934 (George Rogers)
+
+0.03  Sep 23, 2011
+
+- in 02-basic.t, touch template so it will be recompiled, and switch to 'has' syntax
+- remove t/data from distribution
+
+0.02  Mar 10, 2011
+
+- Use new Mason 2.05 default file extensions (.mc) in documentation and tests
+
+0.01  Feb 21, 2011
+
+- Initial version
+

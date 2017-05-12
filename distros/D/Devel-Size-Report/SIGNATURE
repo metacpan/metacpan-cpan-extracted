@@ -1,0 +1,60 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 511d1522a6029dcb186970a7c34cf68383bab95c BUGS
+SHA1 04fc71537492eaef230599347edc89f94362b8fd CHANGES
+SHA1 b27d26a5087b8785371ba3978fbe9570a9f82df0 CREDITS
+SHA1 d6a6c30ee6d9ba6b9afab8bbf6a25e1b23c744e0 LICENSE
+SHA1 d4ebef972e20d2e3134e2eecbb7d027a8b28b4e2 MANIFEST
+SHA1 665052fd6c536a9c55cc4a29ba4ca118cd39e193 MANIFEST.SKIP
+SHA1 fe7ee89cebe3939413df83ee8e2dd3f414ca9329 META.yml
+SHA1 d2313d2b15330ee98cc87c49addc8e9783cd0945 Makefile.PL
+SHA1 8bc151f9aba057b31a4c7a5bedd14742bdd8dd70 README
+SHA1 8fafbbfea684e2cf778c3989e7d2e1b6ac748d03 TODO
+SHA1 946a5abde8700e72afd791631f63bb36903b7567 example/grind
+SHA1 a2a26a9111f11ce0e2ea861ef2cfe935a3784e00 example/psize
+SHA1 8ad4cbfa2aad66813d8b56c72a852a2a3f8e36ab example/size.pl
+SHA1 d8f6d2df4e75cb9e6e77a8377457f0ececd00e31 inc/Module/Install.pm
+SHA1 03590cde5c3de0d0d8a84d2b96917ed1a2cf9a30 inc/Module/Install/Base.pm
+SHA1 8ef3c70e905be7d1007b446f21d4eb3ff6ae24cb inc/Module/Install/Can.pm
+SHA1 79054604a1cd4e99443b05cbb62832568a204a33 inc/Module/Install/Fetch.pm
+SHA1 dfa433f2f41d990946f1b3d68a29299539f2dea6 inc/Module/Install/Makefile.pm
+SHA1 72cab336b6be5716aae0a1cb6d9add6c98a7a1f5 inc/Module/Install/Metadata.pm
+SHA1 35a62725a7eade0fa617ef2ba4cf2f4d4a69a3fe inc/Module/Install/Win32.pm
+SHA1 19dcc6d1e9f02c56d3f6d184642f4cd68aa371e6 inc/Module/Install/WriteAll.pm
+SHA1 da9ccca8086ad05d819f7770439854c46a5406c0 lib/Devel/Size/Report.pm
+SHA1 6b9fffc67c38613c062233851c4361e801379ad2 t/00_basic.t
+SHA1 f8346cebb10354658c564a0fdb40608a17310ce8 t/01_track.t
+SHA1 c968747658092aa36b1da3592e446f4647b0974a t/02_report.t
+SHA1 ceea59141915749053792644c3cea0b0d0437f58 t/03_format.t
+SHA1 cdb4dae0cfe722ee4d8f339ef0e7e82fecd0aa0c t/04_cycle.t
+SHA1 40a509edec7d1fe5bb866acaa1b083176bd8297b t/05_address.t
+SHA1 bab8666b42d7a61df0d3880e4a1c9ea6d166a2bd t/06_error.t
+SHA1 b70e031be219bc58a9263cc5125fde95861262ae t/07_double.t
+SHA1 670ac5dd7f5f6986bfaca49421f76f8e036764f0 t/08_size.t
+SHA1 b2c7f06ee02386ac2a999d5b9ef16b1183c853ec t/09_pod.t
+SHA1 1f98af5a7f04ebe37fa0fda5f2dddcf9ae78372e t/10_pod_cov.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.6 (GNU/Linux)
+
+iQEVAwUBR/jndncLPEOTuEwVAQKGCAf+Lmx8aSeK8NHG4z3jwrH/xFEd6kGbcyao
++XJ/aSPnBKeO6SkUBIVepHIFl7K+2CjNrg3b1m5l9jwKAVN96JNgPrdbXhj6a5Ve
+DB+CS7/NfA87WwJnBWY4FkS9qHtoH/pM7dDRMRl22Q3hAVM58PPjlMhE/7sy+3vI
+kxlYj48ht1ZFmgrj1gY6+vXLV3g0I+kVp5PQ/jOxwNBbrfS+iELgs2Ak6zq3oKOc
+hnTpdIzc5OPcmLOnxIEtG1rRiLPKgWNg08W+XyJj0luFcfNHmSPyRYFrMXQbbowY
+M4as+TJtoaHRpxCr1Hj61XMjg9iFja+7UKLdQjDAF+dTixCSPhLVZA==
+=HCl7
+-----END PGP SIGNATURE-----

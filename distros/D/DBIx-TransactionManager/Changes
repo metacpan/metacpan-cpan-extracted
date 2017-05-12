@@ -1,0 +1,74 @@
+Revision history for Perl extension DBIx::TransactionManager
+
+1.13
+   2015-05-29
+        - disbale rollback in child process. (thanks kazeburo)
+
+1.12
+   2013-02-15
+        - split document for users and developers. (thanks tokuhirom)
+
+1.11
+   2011-12-20
+        - not execute begin_work at AutoCommit=0.
+
+1.10
+   2011-12-06
+        - Fixed the bug that errors occur when $dbh->{AutoCommit} is off.
+
+1.09
+   2011-03-03
+        - Only store the txn information *AFTER* a successful begin_work() call.
+          This silences bogus errors claiming that a transaction was active
+          during a subsequent reconnect() call.
+
+1.08
+   2011-02-21
+        - fixed in_transaction doc potition.(thanks tokuhirom)
+
+1.07
+   2011-02-10
+        - stack transaction starting potition and pid.(thanks lestrrat)
+
+1.06
+   2011-02-06
+        - Allow passing caller information to txn_scope to allow better
+          diagnostics by users of DBIx::TransactionManager
+
+1.05
+   2011-02-02
+        - Change cluck to warn, because we now can tell where the error happened without a stacktrace (thanks lestrrat)
+
+1.04
+   2011-02-02
+        - fixed DESTROY cluck message.
+
+1.03
+   2011-01-19
+        - add in_transaction method.
+        - add xt/mysql.t xt/pg.t
+
+1.02
+   2010-12-08
+        - refactoring.
+
+1.01
+   2010-12-07
+        - s/carp/cluck/; by ScopeGuard#DESTROY.
+        - don't rollback txn_commit by rollbacked_in_nested_transaction case.
+
+1.00
+   2010-12-06
+        - no code change. this version is stable.
+
+0.03
+   0210-12-06
+        - FIXED : Makefile.PL. Test::More require 0.96
+
+0.02
+   2010-12-05
+        - FIXED : requiers DBI.
+
+0.01
+   2010-12-03
+        - original version

@@ -1,0 +1,22 @@
+Revision history for Perl extension DateTimeX-Moment
+
+0.05 2016-04-13T03:39:17Z
+
+    - more increase compatibility with DateTime (thanks chansen)
+
+0.04 2016-04-07T02:12:01Z
+
+    - increase compatibility with DateTime (thanks chansen)
+
+0.03 2016-03-18T10:45:30Z
+
+    - no require DateTime/DateTime::Duration for testing.
+
+0.02 2016-02-15T06:47:15Z
+
+    - fixed deps
+
+0.01 2016-02-13T00:36:17Z
+
+    - original version
+

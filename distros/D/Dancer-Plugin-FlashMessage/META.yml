@@ -1,0 +1,35 @@
+---
+abstract: "Dancer plugin to display temporary messages, so called \"flash messages\"."
+author:
+  - "Damien \"dams\" Krotkine"
+build_requires:
+  Dancer::Test: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-FlashMessage
+provides:
+  Dancer::Plugin::FlashMessage:
+    file: lib/Dancer/Plugin/FlashMessage.pm
+    version: 0.314
+requires:
+  Carp: 0
+  Dancer: 1.3001
+  Dancer::Plugin: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: http://search.cpan.org/dist/Dancer-Plugin-FlashMessage
+  repository: http://github.com/dams/Dancer-Plugin-FlashMessage
+version: 0.314

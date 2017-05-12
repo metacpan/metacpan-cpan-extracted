@@ -1,0 +1,48 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertExecsList]
+
+    In lib/Foo.pm:
+
+     ...
+    
+     =head1 DESCRIPTION
+    
+     This distribution contains the following utilities:
+    
+     #INSERT_EXECS_LIST
+    
+     ...
+
+    After build, lib/Foo.pm will contain:
+
+     ...
+    
+     =head1 DESCRIPTION
+    
+     This distribution contains the following utilities:
+    
+     =over
+    
+     =item * L<script1>
+    
+     =item * L<script2>
+    
+     =item * L<script3>
+    
+     =back
+    
+     ...
+
+DESCRIPTION
+
+    This plugin finds # INSERT_EXECS_LIST directive in your POD/code and
+    replace it with a POD containing list of scripts/executables in the
+    distribution.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertModulesList
+

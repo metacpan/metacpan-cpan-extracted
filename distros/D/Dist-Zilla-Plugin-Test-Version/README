@@ -1,0 +1,79 @@
+NAME
+
+    Dist::Zilla::Plugin::Test::Version - Author Test::Version tests
+
+VERSION
+
+    version 1.09
+
+SYNOPSIS
+
+    in dist.ini
+
+      [Test::Version]
+      is_strict   = 0
+      has_version = 1
+
+DESCRIPTION
+
+    This module will add a Test::Version test as a author test to your
+    module.
+
+ATTRIBUTES
+
+ is_strict
+
+    set Test::Version is_strict
+
+    In addition to a boolean value, you may specify adaptive to indicate
+    that is_strict should be true for production releases, but false for
+    trial or development releases.
+
+ has_version
+
+    set Test::Version has_version
+
+ filename_match
+
+    set Test::Version filename_match
+
+ multiple
+
+    set Test::Version multiple
+
+ finder
+
+    This is the name of a Dist::Zilla::Role::FileFinder for finding files
+    to check. If this is specified then version_ok will be used for each
+    file that matches, otherwise version_all_ok will be used, and the file
+    discovery will be handled by Test::Version.
+
+METHODS
+
+ register_prereqs
+
+    Register Test::Version as an a development prerequisite.
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/plicease/dist-zilla-plugin-test-version/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHORS
+
+      * Graham Ollis <plicease@cpan.org>
+
+      * Caleb Cushing <xenoterracide@gmail.com>
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2016 by Caleb Cushing
+    <xenoterracide@gmail.com>.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

@@ -1,0 +1,8 @@
+Changes
+lib/DBIx/InterpolationBinding.pm
+Makefile.PL
+MANIFEST
+README
+t/01-overloading.t
+t/02-dbi.t
+META.yml                                 Module meta-data (added by MakeMaker)

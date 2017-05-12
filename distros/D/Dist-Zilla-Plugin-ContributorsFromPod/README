@@ -1,0 +1,38 @@
+NAME
+    Dist::Zilla::Plugin::ContributorsFromPod - Populate meta x_contributors
+    from CONTRIBUTORS POD in the dist
+
+SYNOPSIS
+    in dist.ini:
+
+      [ContributorsFromPod]
+
+DESCRIPTION
+    If you have a
+
+      =head1 CONTRIBUTORS
+
+    section in your main file in your distribution, this Dist::Zilla plugin
+    will populate your META.json x_contributors list from it.
+
+    The format should be:
+
+      Some Name <some@email.com>
+
+    nicknames are also supported:
+
+      ircnick: Some Name <some@email.com>
+
+    NOTE: the word "CONTRIBUTORS" must be in upper case, and the following
+    "=head1" section must also be in upper case. "CONTRIBUTORS" being the
+    last "=head1" section is also fine. This is because we use a regex to
+    parse out the list from Pod::Text.
+
+SEE ALSO
+    *   Dist::Zilla::Plugin::ContributorsFromGit
+
+    *   Dist::Zilla::Role::MetaProvider
+
+AUTHOR
+    Rafael Kitover <rkitover@cpan.org>
+

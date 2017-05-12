@@ -1,0 +1,45 @@
+NAME
+    Data::Package::CSV - A Data::Package class for CSV data using Parse::CSV
+
+DESCRIPTION
+    The Data::Package::CSV package provides a subclass of
+    Data::Package::File that provides data from a CSV file by integrating
+    with Parse::CSV.
+
+METHODS
+  csv_options
+    The cvs_options method is the most direct method, with full control over
+    the creation of the Parse::CSV object. If a fully compliant options hash
+    is returned (as a list) then no other methods need to be defined.
+
+    The list returned by the cvs_options method will be passed directly to
+    the Parse::CSV constructor. Read the documentation for Parse::CSV for
+    more details on what you should return to match your data.
+
+    By default, the null list is return, specifying entirely default options
+    to the Parse::CSV constructor (array mode) and not specifying any
+    filters or parsing variations.
+
+    If it list that is returned does not have either a data source (either a
+    "handle" param or "file" param) then the "file" method for the parent
+    class will be called to locate a file.
+
+SUPPORT
+    Bugs should always be submitted via the CPAN bug tracker.
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Package-CSV>
+
+    For other issues, contact the maintainer
+
+AUTHOR
+    Adam Kennedy <adamk@cpan.org>
+
+COPYRIGHT
+    Copyright 2007 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

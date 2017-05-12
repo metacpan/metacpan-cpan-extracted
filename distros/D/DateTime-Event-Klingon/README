@@ -1,0 +1,73 @@
+DateTime-Event-Klingon
+----------------------
+
+Use this module to determine dates and times with special significance to the
+Star Trek universe's Klingons.  So far there is only one event:
+
+Heghlu'meH QaQ jajvam'a' -- Is this a good day to die?
+
+INSTALLATION
+
+If you have the Module::Signature module installed, you can verify the
+integrity of this distribution by typing:
+
+    cpansign -v
+        
+Then to install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+Or:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+This module does not require any other modules not included in the standard
+perl distribution version 5.8.0 and above.
+
+At build time you will need the following if you want to run all the tests:
+
+DateTime
+Module-Signature
+Test-Pod 1.22
+Test-Pod-Coverage 1.04
+Test-Perl-Critic (This test will only run if the env var TEST_AUTHOR = 1)
+
+They are all available on CPAN (http://www.cpan.org)
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DateTime::Event::Klingon
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Event-Klingon
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DateTime-Event-Klingon
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DateTime-Event-Klingon
+
+    Search CPAN
+        http://search.cpan.org/dist/DateTime-Event-Klingon
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Consolidated Braincells Inc.,  All rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+$Id: /svn/DateTime-Event-Klingon/tags/VERSION_1_0_1/README 329 2008-04-03T21:18:38.075810Z jaldhar  $

@@ -1,0 +1,12 @@
+Revision history for Perl module DBIx::Class::VirtualColumns
+
+1.03 Mon Nov 30 2009
+    - Clarified documentation
+1.02 Mon Nov 23 2009
+    - Fixed typos and wrong formats in POD 
+    - Test coverage to 95.9%
+    - Fixed RT51801 (Reported and fixed by Doug Bell)
+1.01 Wed May 21 2008
+    - Removed Perl 5.10 operators (now also works with < 5.10)
+1.00 Wed May 21 2008
+    - original version

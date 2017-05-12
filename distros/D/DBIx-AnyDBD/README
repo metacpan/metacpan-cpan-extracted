@@ -1,0 +1,16 @@
+This class is an alternative approach to developing database independant
+code, which differs from modules that write SQL for you (such as 
+DBIx::Recordset). Instead this module provides an OO inheritance
+hierarchy for putting methods that do your SQL.
+
+For example, you create a Default.pm file (in the class hierarchy of your
+choosing, for example My::Application::DB::Default), which contains your
+default platform's SQL methods. Then you can provide an Oracle.pm, a
+Sybase.pm, etc, that implement methods where a particular SQL statement
+in Default.pm doesn't work on that platform. DBIx::AnyDBD knows what
+platform you are connecting to, and calls the right methods in the right
+class at runtime.
+
+DBIx::AnyDBD also does the right thing on ADO and ODBC connections, so that
+if you're connecting to Sybase via ODBC, it doesn't just call methods in
+the ODBC.pm file, it will call those in Sybase.pm instead.

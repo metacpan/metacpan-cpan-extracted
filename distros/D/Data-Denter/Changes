@@ -1,0 +1,37 @@
+Revision history for Perl extension Data::Denter.
+
+---
+version: 0.14
+date:    Fri Oct 18 00:04:09 PDT 2002
+changes: 
+  - Applied patches from Tatsuhiko Miyagawa, Leon Brocard, Slaven Rezic,
+    and Michael Schwern
+
+0.13  Tue May 15 00:52:54 PDT 2001
+	- Undent was returning the wrong thing in scalar context.
+	  Needed to use wantarray.
+
+0.12  Sun May  6 17:49:06 PDT 2001
+	- Fixed a bug that was caused by an old Perl bug being fixed in 5.7.0.
+	  Data::Denter should now work with 5.7.0+. (And everything else 
+	  5.005_03 and above)
+
+0.12  Sun May  6 15:11:32 PDT 2001
+	- Escape binary data using URI style encoding (%xx),
+
+0.12  Sun May  6 15:11:32 PDT 2001
+	- Added MaxLines option and HashMode option.
+
+0.12  Sun May  6 15:11:32 PDT 2001
+	- Sort hash keys by default for Indent(). Controlled by 
+	  $Data::Denter::Indent,
+
+0.11  Fri Apr 27 07:43:14 PDT 2001
+	- Forgot to test under -w. Oops. Fixed.
+
+0.10  Fri Apr 27 00:20:34 PDT 2001
+	- First version ready for CPAN.
+
+0.01  Tue Apr 10 10:54:39 2001
+	- original version; created by h2xs 1.19
+

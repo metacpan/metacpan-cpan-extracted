@@ -1,0 +1,78 @@
+
+DBIx::Browse::CGI - Module to browse related tables with a CGI interface.
+(c) Copyright 2000 Evilio José del Río Silván <edelrio@icm.csic.es>
+
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
+Description
+-----------
+
+DBIx::Browse::CGI is a module to facilitate the the Web browsing (INSERT,
+UPDATE and DELETE) of related database tables.
+
+
+Build and Install
+-----------------
+
+This module is automatically installed with DBIx::Browse.
+
+
+Usage Overview
+--------------
+
+Basically, you must write a CGI script (whit the use of the CGI
+module) with an active DBI connection. Then you use DBIx::Browse::CGI to
+browse a given table. You can look at the file DemoDBIxBrowse to see
+an example.
+
+         use DBIx::Browse::CGI;
+         my ($dbh, $dbb, $q);
+         $dbh = DBI->connect("DBI:Pg:dbname=enterprise")
+           or croak "Can't connect to database: $@";
+        $q   = new CGI;
+        $dbb = new  DBIx::Browse({
+           dbh => $dbh,
+           table => 'employee',
+           proper_fields => [ qw ( name fname ) ],
+           linked_fields => [ qw ( department category office ) ],
+           linked_tables => [ qw ( department category office ) ],
+           linked_values => [ qw ( name       name     phone  ) ],
+           linked_refs   => [ qw ( id         id       ide    ) ],
+           aliases       => [ qw ( name fname department category phone )],
+           primary_key   => 'id',
+           cgi           => $q
+       });
+        print
+           $q->start_html(
+                          -title => "Test DBIx::Browse"
+                          );
+        $dbb->list_form({
+           field_order  => [  1,  0,  4,  3,  2 ],
+           field_length => [ 14, 15, 15, 15, 10 ]
+        });
+
+       ...etc
+
+
+
+
+
+
+Author
+------
+
+Evilio José del Río Silván <edelrio@icm.csic.es>

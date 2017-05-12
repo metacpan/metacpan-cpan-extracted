@@ -1,0 +1,34 @@
+<foo>
+  <!-- note: in this xort-xml, the object_id is completely implicit -->
+  <component>
+    <name>1</name>
+    <part_of>
+      <subject_id>
+        <component>
+          <name>1a</name>
+        </component>
+      </subject_id>
+    </part_of>
+    <part_of>
+      <subject_id>
+        <component>
+          <name>1b</name>
+          <part_of>
+            <subject_id>
+              <component>
+                <name>1b-I</name>
+              </component>
+            </subject_id>
+          </part_of>
+          <part_of>
+            <subject_id>
+              <component>
+                <name>1b-II</name>
+              </component>
+            </subject_id>
+          </part_of>
+        </component>
+      </subject_id>
+    </part_of>
+  </component>
+</foo>

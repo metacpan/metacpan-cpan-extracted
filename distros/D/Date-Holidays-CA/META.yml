@@ -1,0 +1,27 @@
+---
+abstract: 'Holidays for Canadian locales'
+author:
+  - 'Rick Scott <rick@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Holidays-CA
+provides:
+  Date::Holidays::CA:
+    file: lib/Date/Holidays/CA.pm
+    version: 0.03
+requires:
+  Carp: 0
+  DateTime: 0
+  DateTime::Event::Easter: 0
+  perl: v5.6.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.03

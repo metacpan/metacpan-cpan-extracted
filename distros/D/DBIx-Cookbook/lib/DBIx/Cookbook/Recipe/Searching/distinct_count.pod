@@ -1,0 +1,70 @@
+
+=pod
+
+=head1 NAME
+
+DBIx::Cookbook::Recipe::Searching::distinct_count - DISTINCT(COUNT)? query
+
+=head1 DESCRIPTION
+
+As a function of the input option C<count>, a DISTINCT query will return a
+resultset, or a count of the resultset, leading to concrete queries:
+
+  SELECT DISTINCT(last_name) FROM actor
+
+or
+
+  SELECT COUNT(DISTINCT(last_name)) FROM actor
+
+Sample Usage:
+
+  ${orm}_cmd distinct_count          # orm = dbic, skinny, rose, etc
+  ${orm}_cmd distinct_count --count  # to get the count of the SELECT
+
+=head1 RECIPES
+
+=head2 DBIx::Class
+
+    package DBIx::Cookbook::DBIC::Command::distinct_count;
+    use Moose;
+    extends qw(MooseX::App::Cmd::Command);
+    
+    use Data::Dump;
+    
+    has 'count' => (
+    	       traits => [qw(Getopt)],
+    	       isa => "Bool",
+    	       is  => "rw",
+    	       documentation => "count rows"
+    	      );
+    
+    sub execute {
+      my ($self, $opt, $args) = @_;
+    
+      my $rs = do {
+        
+        my $where = { last_name => { LIKE => 'A%' } } ;
+        my $attr = {
+    		columns =>  [ qw(last_name) ],
+    		distinct => 1  # or: { group_by => last_name }
+    	       };
+    
+        $self->app->schema->resultset('Actor')->search($where, $attr);
+      };
+    
+      if ($opt->{count}) {
+        warn $rs->count;
+      } else {
+    
+        while (my $row = $rs->next) {
+          use Data::Dump qw(dump);
+          my %data = $row->get_columns;
+          warn dump(\%data);
+        }
+    
+      }
+    
+    }
+    
+    1;
+

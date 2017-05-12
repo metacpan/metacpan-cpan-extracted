@@ -1,0 +1,18 @@
+README
+t/00-load.t
+t/plugin-provider-database.t
+t/database/config1.sql
+t/database/config2.sql
+t/database/config3.sql
+t/database/testapp.ddl
+t/lib/environments/provider-database.yml
+t/manifest.t
+t/pod.t
+t/pod-coverage.t
+lib/Dancer2/Plugin/Auth/Extensible/Provider/Database.pm
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Changes
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

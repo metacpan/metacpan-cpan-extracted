@@ -1,0 +1,188 @@
+<?xml version="1.0" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBIx::PgLink::Manual::Install</title>
+<link rel="stylesheet" href="../../../../../Active.css" type="text/css" />
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rev="made" href="mailto:" />
+</head>
+
+<body>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;DBIx::PgLink::Manual::Install</span></strong></big>
+</td></tr>
+</table>
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#prerequisites">PREREQUISITES</a></li>
+	<li><a href="#building">BUILDING</a></li>
+	<li><a href="#testing">TESTING</a></li>
+	<li><a href="#installing">INSTALLING</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright_and_license">COPYRIGHT AND LICENSE</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>Installation of DBIx::PgLink</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="prerequisites">PREREQUISITES</a></h1>
+<ul>
+<li>
+<p>PostgreSQL 8.2 or later</p>
+</li>
+<li>
+<p>Perl 5.8.6 or later</p>
+</li>
+<li>
+<p>Perl modules</p>
+<pre>
+     DBI
+     DBD::Pg
+     Moose
+     MooseX::Method
+     Tie::Cache::LRU</pre>
+<pre>
+     DBD driver for remote database</pre>
+<p>Moose requires <a href="../../../../../site/Class/MOP.html">the Class::MOP manpage</a> module. 
+Ensure that you have latest Class::MOP version installed, 
+for notable performance boost in 0.49.</p>
+</li>
+<li>
+<p>Superuser account on local PostgreSQL server</p>
+<p>Must logon without password typing, i.e. use 'trust' authentication 
+or store password in .pgpass/pgpass.conf file</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="building">BUILDING</a></h1>
+<p>Run</p>
+<pre>
+  perl Makefile.PL
+  make</pre>
+<p>(on Windows with Microsoft Visual Studio use 'nmake')</p>
+<p>or</p>
+<pre>
+  perl Build.PL
+  ./Build</pre>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="testing">TESTING</a></h1>
+<ul>
+<li>
+<p>Change t/test.conf for your environment. It's in YAML format.</p>
+<p>First configuration entry named 'TEST' describe local PostgreSQL connection.
+Test will log on to this server as specified user,
+drop and create test database and install all database object.</p>
+<p><strong>WARNING: all previous content of database will be lost</strong></p>
+<p>This database also will be used as 'remote' database for testing.</p>
+<p>Other entries are commented by default.</p>
+</li>
+<li>
+<p>Check PostgreSQL account</p>
+<p>Ensure that PostgreSQL owner (operating system account, usually 'postgres')
+can connect to his own server with specified in t/test.conf credentials.
+If used .pgpass file, place it to 'postgres' home directory.</p>
+</li>
+<li>
+<p>Change permission on some directories for PostgreSQL owner account</p>
+<dl>
+<dt><strong><a name="item_read_permissions_for__2e_2fblib">read permissions for ./blib</a></strong>
+
+<dd>
+<pre>
+  chmod -R o=r,+X blib</pre>
+</dd>
+<dt><strong><a name="item_read_and_write_permissions_for__2e_2fexamples">read and write permissions for ./examples</a></strong>
+
+<dd>
+<pre>
+  chmod -R o=rw,+X examples</pre>
+</dd>
+<dd>
+<p>Only if you plan testing of XBase or SQLite data sources</p>
+</dd>
+</dl>
+<li>
+<p>Run test</p>
+<pre>
+  make test</pre>
+<p>or</p>
+<pre>
+  ./Build test</pre>
+<p>Check for errors.</p>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="installing">INSTALLING</a></h1>
+<ul>
+<li>
+<p>Install Perl module</p>
+<p>Run as root</p>
+<pre>
+  make install</pre>
+<p>or</p>
+<pre>
+  ./Build install</pre>
+</li>
+<li>
+<p>Install database objects</p>
+<p>Run</p>
+<pre>
+  psql -h &lt;host&gt; -p &lt;port&gt; -U &lt;superuser&gt; -f _install.sql &lt;database&gt;</pre>
+</li>
+</ul>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p><a href="../../../../../site/lib/DBIx/PgLink/Manual/Usage.html">the DBIx::PgLink::Manual::Usage manpage</a>,
+<a href="http://pgfoundry.org/projects/dbi-link/">http://pgfoundry.org/projects/dbi-link/</a></p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Alexey Sharafutdinov &lt;<a href="mailto:alexey.s.v.br@gmail.com">alexey.s.v.br@gmail.com</a>&gt;</p>
+<p>
+<a href="#__index__"><small>Back to Top</small></a>
+</p>
+<hr />
+<h1><a name="copyright_and_license">COPYRIGHT AND LICENSE</a></h1>
+<p>Copyright (C) 2007 by Alexey Sharafutdinov</p>
+<p>This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.</p>
+<p><a href="#__index__"><small>Back to Top</small></a></p>
+<table border="0" width="100%" cellspacing="0" cellpadding="3">
+<tr><td class="block" valign="middle">
+<big><strong><span class="block">&nbsp;DBIx::PgLink::Manual::Install</span></strong></big>
+</td></tr>
+</table>
+
+</body>
+
+</html>

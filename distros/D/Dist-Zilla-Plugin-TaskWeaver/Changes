@@ -1,0 +1,49 @@
+Revision history for Dist-Zilla-Plugin-TaskWeaver
+
+0.101628  2015-07-24 22:02:12-04:00 America/New_York
+        - do not bring in the mvp_ methods from the Plugin role!
+          doing things this way seems to be exposing a bit of a stink…
+
+0.101627  2014-11-09 21:49:19-05:00 America/New_York
+        - make the generation of the placeholder test file optional
+        - also, rename it from bogus-test to placeholder-test
+        - no longer using MooseX::Autobox
+
+0.101626  2013-07-25 16:05:35 America/Los_Angeles
+          fix git repo metadata
+
+0.101625  2013-07-25 16:02:36 America/Los_Angeles
+          update preferred bugtracker
+
+0.101624  2012-04-25 11:06:39 America/New_York
+          accept =pkggroup where =pkgroup was expected... but work
+
+0.101623  2012-04-25 09:59:34 America/New_York
+          accept =pkggroup where =pkgroup was expected
+
+0.101622  2012-03-30 12:58:32 Europe/Paris
+          treat "no version" as 0 and not undef
+
+0.101621  2011-02-05 14:26:07 America/New_York
+          minor doc fixe; thanks, Glenn Fowler
+
+0.101620  2010-06-11 18:53:23 America/New_York
+          L<>-ify package names, RT #56818
+
+0.100890  2010-03-30 16:10:23 America/New_York
+          updated to work with Dist::Zilla v2
+
+0.093450  2009-12-11 15:55:53 America/New_York
+          fix a few more prereqs.  should be using AutoPrereq :-/
+
+0.093420  2009-12-08 21:29:09 America/New_York
+          fix a few more prereqs
+
+0.093390  2009-12-05 08:45:24 America/New_York
+          fix a few prereqs
+
+0.093370  2009-12-03 20:40:10 America/New_York
+          auto-create a test so that CPAN, etc, will not refuse install
+
+0.093330  2009-11-29 11:45:00 America/New_York
+          first release

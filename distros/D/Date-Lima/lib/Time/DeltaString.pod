@@ -1,0 +1,128 @@
+=head1 NAME
+
+Time::DeltaString - A time interval format (2d4h1m4s) like convert_time() from Lima mudlib.
+
+=head1 SYNOPSIS
+
+    use Time::DeltaString qw/delta_string/;
+
+    my $d1 = delta_string( "127:34" ); # 1h40m
+    my $d2 = delta_string("2:46:40" ); # 2h46m40s
+    my $d3 = delta_string( 7654321 );  # 2mo4w14h12m1s
+
+    my $ds = rev("9h22m5s"); # 33_725
+
+=head2 B<delta_string()>
+
+L<delta_string()> takes a single argument.  The argument can be a number of
+seconds, an hours-minutes string, or an hours-minutes-seconds string.
+
+=head2 B<rev()> B<interval2seconds()>
+
+L<rev()> (aka L<interval2seconds()>) does the reverse of L<delta_string()>:
+converts interval format back to seconds.
+
+=head1 TUNING CONVERSIONS
+
+There are a few pre-built conversions you can use, but you can also fine tune
+this as much as you like.
+
+    # bring in all the conversion methods along with delta_string():
+
+    use Time::DeltaString qw(:all);
+
+=over 4
+
+=item B<nomonth_conversions()>
+
+Disable the C<'mo'> time units.
+
+    nomonth_conversions();
+
+    my $d4 = delta_string( 7654321 );  # 12w4d14h12m1s
+
+=item B<weeklargest_conversions()>
+
+Disable both the year and the month conversions.
+
+    weeklargest_conversions();
+
+    my $d5 = delta_string( 7654321 );  # 12w4d14h12m1s
+
+=item B<daysmallest_conversions()>
+
+Ignore the hours, minutes and seconds
+
+    daysmallest_conversions();
+    my $days = delta_string(86400*32 + 3600*12 + 77); # 1mo2d
+
+=item B<sidereal_conversions()>
+
+Use the sidereal year length as an important unit for C<y> and C<mo>.
+
+    my $sidereal_year  = 365.256_363_051 * 24 * 60 * 60;
+    my $sidereal_month = $sidereal_year / 12;
+
+    @conversions = (
+        [  y => $sidereal_year  ],
+        [ mo => $sidereal_month ],
+
+        [  w => 7*24*60*60 ],
+        [  d =>   24*60*60 ],
+        [  h =>      60*60 ],
+        [  m =>         60 ],
+    );
+
+=item B<default_conversions()>
+
+You do not normally need to run this.  It's handy for putting things back they
+way they were.
+
+    daysmallest_conversions();
+    my $days = delta_string(86400*32 + 3600*12 + 77); # 1mo2d
+
+    default_conversions();
+    my $interval = delta_string(86400*32 + 3600*12 + 77); # 1mo2d12h1m17s
+
+=item B<@Time::DeltaString::conversions>
+
+There will obviously be some disagreement about how long a "week" or a "month"
+is.  You can define your own in this way:
+
+    @Time::DeltaString::conversions = (
+        [ d => 86400 ], # days are 86400 seconds
+        [ E => 1337 ], # elite time unit
+        [ m => 60 ], # minutes are 60 seconds
+        [ s => 1 ], # seconds are 1 second
+    );
+
+    my $weird = delta_string( 7777777 ); # 90d1E7m20s
+
+This will not work right unless the largest units are first.  It's up to you to
+make sure they're ordered largest to smallest.
+
+=back
+
+=head1 AUTHORS
+
+C<< <dorn@bakhara.org> >> -- Updated, maintained and republished this module.
+
+C<< <nichus@bakhara.org> >> -- Wrote the initial version.
+
+This module is now being maintained by Paul Miller C<< <jettero@cpan.org> >>.
+
+=head1 COPYRIGHT
+
+Copyright 1997-2009 Dorn, Nichus, Paul Miller, Orien Vandenburg -- licensed under LGPL
+
+=head1 NOTE
+
+L</convert_time()> was technically written by cowl originally, but it exists in
+its present form because of beek.  Also, this pseudo-historical information goes
+back to about 1990.  Seems like yesterday.
+
+=head1 SEE ALSO
+
+perl(1).
+
+=cut

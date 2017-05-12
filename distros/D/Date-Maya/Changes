@@ -1,0 +1,14 @@
+Version 2010011301 Wed Jan 13 22:00:24 CET 2010
++ Kwalitee test is author only.
+
+Version 2009112301
++ POD & Kwalitee checks.
++ Add requirements to Makefile.PL.
++ Add NoWarnings test.
+
+Version 2009102801
++ Remove execute bit from Makefile.PL
+
+Version 2009102701
++ Added Changes & README files.
++ Modernized Makefile.PL.

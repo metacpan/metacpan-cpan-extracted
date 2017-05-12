@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+
+BEGIN {
+    # tell debugger of sub enter/exit,
+    $^P |= 0x01  if     $ENV{TRACE_DJABBERD};
+    # keep descriptive string value of all anon subs maintained per coderef:
+    $^P |= 0x200 unless $ENV{NDEBUG_SUB_NAMES};
+};
+
+use lib 'lib';
+use vars qw($DEBUG $daemonize $conffile $logconf);
+use Getopt::Long;
+
+BEGIN {
+    # We need to set up the logger before we "use DJabberd", because
+    # most of the DJabberd libs will immediately make calls into
+    # DJabberd::Log.
+
+    $DEBUG = 0;
+    $daemonize = 0;
+    $conffile = undef;
+    $logconf = undef;
+
+    Getopt::Long::GetOptions(
+        'd|daemon'     => \$daemonize,
+        'debug=i'      => \$DEBUG,
+        'conffile=s'   => \$conffile,
+        'logconf=s'    => \$logconf,
+    );
+
+    my @try_logconf_conf = ();
+    if (defined($logconf)) {
+        die "Can't find logging configuration file $logconf" unless -e $logconf;
+        @try_logconf_conf = ( $logconf );
+    }
+    else {
+        @try_logconf_conf = ( "etc/log.conf", "/etc/djabberd/log.conf", "etc/log.conf.default" );
+    }
+    use DJabberd::Log;
+    DJabberd::Log->set_logger(@try_logconf_conf);
+
+}
+
+use DJabberd;
+use FindBin qw($Bin);
+BEGIN {
+    # while the core ("use DJabberd" above) must be in normal paths,
+    # we open up the lib paths here, so make it easy to work in
+    # the subversion directories and have cousin plugins in their
+    # dev locations, but not system-wide installed.
+    if (-e "$Bin/Makefile.PL") {  # lame check to see if we're in dev directory
+        opendir(my $dh, "$Bin/../");
+        foreach my $d (grep { /^DJabberd-/ } readdir($dh)) {
+            my $dir = "$Bin/../$d/lib";
+            next unless -d $dir;
+            unshift(@INC, $dir);
+        }
+    }
+}
+
+
+my $server = DJabberd->new(
+                           daemonize => $daemonize
+                           );
+
+if (defined $conffile) {
+    die "Can't find configuration file ".$conffile unless -e $conffile;
+}
+my @try_conf = defined $conffile ? ($conffile) : ( "/etc/djabberd/djabberd.conf", "djabberd.conf" );
+shift @try_conf while @try_conf && ! -e $try_conf[0];
+die "No configuration file found; please specify --conffile argument.\n" unless @try_conf;
+
+$server->load_config($try_conf[0]);
+
+$server->run;
+
+package DB;
+no strict 'refs';
+no utf8;
+
+sub DB{};
+sub sub {
+    # localize CALL_DEPTH so that we don't need to decrement it after the sub
+    # is called
+    local $DB::CALL_DEPTH = $DB::CALL_DEPTH+1;
+    #my @foo = @_;
+    my $fileline = "";
+    if (ref $DB::sub eq "CODE") {
+        my @caller = caller;
+        my $pkg = $caller[0];
+        my $line = $caller[2];
+        $fileline = " called from $pkg, line $line";
+    }
+    warn ("." x $DB::CALL_DEPTH . " ($DB::CALL_DEPTH) $DB::sub$fileline\n");
+
+    # Call our subroutine. @_ gets passed on for us.
+    # by calling it last, we don't need to worry about "wantarray", etc
+    # by returning it like this, the caller's expectations are conveyed to
+    # the called routine
+    &{$DB::sub};
+}

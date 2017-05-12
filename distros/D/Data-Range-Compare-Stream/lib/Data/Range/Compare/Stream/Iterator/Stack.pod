@@ -1,0 +1,94 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Stack - Walk many iterators with one interface
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::File;
+  use Data::Range::Compare::Stream::Iterator::Stack;
+
+  my $stack=new Data::Range::Compare::Stream::Iterator::Stack;
+
+  my $iterator_a=Data::Range::Compare::Stream::Iterator::File->new(
+    filename=>'some_file.csv',
+  );
+
+  $stack->stack_push($iterator_a);
+
+  my $iterator_b=Data::Range::Compare::Stream::Iterator::File->new(
+    filename=>'some_file.csv',
+  );
+
+  $stack->stack_push($iterator_b);
+
+  while($stack->has_next) {
+    my $next_range=$stack->get_next;
+    print $next_range,"\n";
+  }
+
+=head1 DESCRIPTION
+
+Allows seamless iteration through multiple objects that implement: Data::Range::Compare::Stream::Iterator::Base.  Data::Range::Compare::Stream::Iterator::Stack extends Data::Range::Compare::Stream::Iterator::Base and can be passed to another instance of itself.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $iterator=new Data::Range::Compare::Stream::Iterator::File;
+
+Instance Constructor, all arguments are optional
+  
+Optional arguments:
+
+   stack=>[]
+     # an array ref of objects that implement Data::Range::Compare::Stream::Iterator::Base
+
+   parse_line=>undef|code_ref
+     # Default: undef, Sets the code ref to be used when parsing a line
+     # if not set the default internals will be used
+
+   result_to_line=>undef|code_ref
+     # Default: undef, Sets the code ref used to convert a result to a line that can be parsed
+     # if not set the default internals will be used
+
+=item * while($iterator->has_next) { ... }
+
+Returns true when one or more objects on the stack has_next.
+
+=item * my $result=$iterator->get_next;
+
+Returns the next $result from the given source file.
+
+=item * $stack->stack_push($iterator);
+
+This interface can be used to add an iterator onto the stack.  Objects being added to the stack need to implement or extend Data::Range::Compare::Iterator::Base.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

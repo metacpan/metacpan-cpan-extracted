@@ -1,0 +1,48 @@
+{
+   "abstract" : "The parser for Fennec syntax.",
+   "author" : [
+      "Chad Granum <exodist7@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Declare-Parser-Fennec",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Declare::Parser" : "0.017",
+            "Exporter::Declare::Magic" : "0.107"
+         }
+      }
+   },
+   "provides" : {
+      "Devel::Declare::Parser::Fennec" : {
+         "file" : "lib/Devel/Declare/Parser/Fennec.pm",
+         "version" : "0.005"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/exodist/Devel-Declare-Parser-Fennec/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/exodist/Devel-Declare-Parser-Fennec"
+      }
+   },
+   "version" : "0.005"
+}

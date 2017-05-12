@@ -1,0 +1,18 @@
+--- #YAML:1.0
+name:                DBIx-TextIndex
+version:             0.28
+abstract:            Perl extension for full-text searching in SQL databases
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.32
+distribution_type:   module
+requires:     
+    Bit::Vector:                   6.3
+    DBI:                           1.43
+    Exception::Class:              1.12
+    HTML::Entities:                1.22
+    Text::Balanced:                1.83
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Daniel Koch <dkoch@cpan.org>

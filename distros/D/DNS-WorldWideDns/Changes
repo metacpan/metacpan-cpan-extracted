@@ -1,0 +1,10 @@
+Revision history for Perl module DNS::WorldWideDns
+
+0.0102 Thu Nov 27 22:55:00 2008
+    - Relaxed some of the dependency version numbers a little.
+    - Fixed a typo in the pod.
+    - Changed a test that requires a network to skip if a network is not available.
+
+0.0101 Sun Nov 23 14:15:00 2008
+    - Initial version supporting basic CRUD for the WorldWideDNS.net site.
+

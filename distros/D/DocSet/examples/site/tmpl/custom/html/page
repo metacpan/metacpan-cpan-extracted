@@ -1,0 +1,61 @@
+[%- INCLUDE head
+    paget   = doc.meta.title
+    title   = "mod_perl: $paget"
+    content = ''
+-%]
+
+<!-- Swishcommand noindex -->
+
+<!-- logobox begin -->
+<div class="logobox">
+    <table border="0" cellspacing="0" cellpadding="0" width="100%">
+        <tr valign="top">
+
+            [%- INCLUDE logo;
+            
+                INCLUDE navbar_global
+                    nav=doc.nav
+                    rel_doc_root=doc.dir.rel_doc_root;
+
+                INCLUDE navbar_local_top
+                    nav=doc.nav
+                    rel_doc_root=doc.dir.rel_doc_root;
+
+                INCLUDE title;
+            -%]
+    </table>
+</div>
+<!-- logobox end -->
+
+<!-- left box begin -->
+<div class="leftbox">
+
+    [%- INCLUDE left_box
+        nav=doc.nav
+        rel_doc_root=doc.dir.rel_doc_root;
+    -%]
+
+</div>
+<!-- left box end -->
+
+<!-- right box begin-->
+<div class="rightbox">
+
+    [%- INCLUDE page_body -%]
+
+</div>
+<!-- right box end -->
+
+[%-
+    INCLUDE navbar_local_bottom
+            nav=doc.nav
+            rel_doc_root=doc.dir.rel_doc_root;
+%]
+
+[%- INCLUDE tail
+        nav=doc.nav
+        docset_rel_root=doc.dir.rel_doc_root;
+-%]
+
+</body>
+</html>

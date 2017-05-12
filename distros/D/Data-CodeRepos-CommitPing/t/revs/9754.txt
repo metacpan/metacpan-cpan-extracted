@@ -1,0 +1,106 @@
+---
+author: hanekomu
+comment: |-2
+   r6072@nbgr:  marcel | 2008-04-18 16:27:50 +0200
+   lang/perl/Data-Comparable: initial commit
+date: 2008-04-18 23:28:31 +0900
+files:
+  - path: lang/perl/
+    status: _U
+  - path: lang/perl/Data-Comparable/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/.shipit
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/Changes
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/MANIFEST
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/Makefile.PL
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/README
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/lib/Data/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/lib/Data/Comparable.pm
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/t/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/t/01_all.t
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/t/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/t/lib/Age.pm
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.01/t/lib/Unprepared.pm
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/.shipit
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/Changes
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/MANIFEST
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/Makefile.PL
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/README
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/lib/Data/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/lib/Data/Comparable.pm
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/t/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/t/01_all.t
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/t/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/t/lib/Age.pm
+    status: A
+  - path: lang/perl/Data-Comparable/tags/Data-Comparable-0.02/t/lib/Unprepared.pm
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/.shipit
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/Changes
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/MANIFEST
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/MANIFEST.SKIP
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/Makefile.PL
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/README
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/lib/Data/
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/lib/Data/Comparable.pm
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/01_all.t
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/lib/
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/lib/Age.pm
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/lib/Unprepared.pm
+    status: A
+  - path: lang/perl/Data-Comparable/trunk/t/perlcriticrc
+    status: A
+rev: 9754

@@ -1,0 +1,42 @@
+NAME
+    Data::Dumper::GUI - just what Data::Dumper needed... a GUI
+
+SYNOPSIS
+       use Data::Dumper::GUI;
+   
+       print Dumper(@variables);
+
+DESCRIPTION
+    Data::Dumper::GUI is a little like Data::Dumper, but as well as printing
+    out a dump of the variables it is passed, it also shows them in a pretty
+    GUI (graphical user interface) with a tree view, allowing you to expand
+    and collapse nodes, etc.
+
+    It has special secret sauce support for Moose objects. (And for Moo
+    objects too, if you make sure Moose is loaded before dumping them.)
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Data-Dumper-GUI>.
+
+SEE ALSO
+    Data::Dumper, Prima.
+
+    Shortcut: ddGUI.
+
+    Internals: ddGUI::Window.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2013 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

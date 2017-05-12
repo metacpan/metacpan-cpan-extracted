@@ -1,0 +1,28 @@
+[DZ] building distribution under .build/aLJ43uhjZH for installation
+[DZ] beginning to build Devel-Quick
+[@Filter/ExtraTests] rewriting release test xt/release/pod-syntax.t
+[DZ] guessing dist's main_module is lib/Devel/Quick.pm
+[DZ] extracting distribution abstract from lib/Devel/Quick.pm
+[DZ] writing Devel-Quick in .build/aLJ43uhjZH
+Checking if your kit is complete...
+Looks good
+Generating a GNU-style Makefile
+Writing Makefile for Devel::Quick
+Writing MYMETA.yml and MYMETA.json
+cp lib/Devel/Quick.pm blib/lib/Devel/Quick.pm
+Manifying blib/man3/Devel::Quick.3pm
+PERL_DL_NONLAZY=1 /usr/bin/perl "-MExtUtils::Command::MM" "-MTest::Harness" "-e" "undef *Test::Harness::Switches; test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+Variable "$x" is not imported at (eval 9) line 30.
+Subroutine DB redefined at (eval 9) line 8.
+Variable "$x" is not imported at (eval 10) line 30.
+Subroutine DB redefined at (eval 12) line 8.
+Subroutine DB redefined at (eval 13) line 8.
+Subroutine DB redefined at (eval 14) line 8.
+Subroutine DB redefined at (eval 15) line 8.
+Subroutine DB redefined at (eval 16) line 8.
+t/00-basic.t ............ ok
+t/release-pod-syntax.t .. skipped: these tests are for release candidate testing
+All tests successful.
+Files=2, Tests=12,  0 wallclock secs ( 0.03 usr  0.00 sys +  0.03 cusr  0.00 csys =  0.06 CPU)
+Result: PASS
+[DZ] all's well; removing .build/aLJ43uhjZH

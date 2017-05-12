@@ -1,0 +1,406 @@
+Revision history for Dancer::Plugin::Interchange6
+
+0.121 Sun Aug 7 16:39:43 2016 CEST
+
+    * Deprecate in favour of Dancer2::Plugin::Interchange6
+
+0.120 Wed May 25 12:42:30 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Adjust to new 'combine' and 'extra' attributes (Peter Mottram).
+
+    * Rework load_saved_products method in Cart (Peter Mottram):
+      - load old carts and related products in a single query
+      - update/add Cart::Product objects in cart not just in database
+      - delete old CartProducts after manipulation of current cart is complete
+
+    [TESTS]
+
+    * Make disabled_cart_and_checkout.t RELEASE_TESTING only
+      (Peter Mottram, GH #55).
+
+0.111 Wed Mar 16 14:48:26 2016 CET
+
+    [TESTS]
+
+    * Improve debug on failure in disabled_cart_and_checkout.t
+      (Peter Mottram).
+    * Fix POD coverage test (Peter Mottram).
+    * Force rounding in hook tests to avoid SQLite rounding errors
+      (Peter Mottram).
+
+0.110 Mon Mar 14 21:40:10 2016 CET
+
+    [ENHANCEMENTS]
+
+    * Pass dbic_product in cart BUILD and add but do not set selling_price
+      (Peter Mottram).
+    * Add product_class attribute to Cart (Peter Mottram).
+    * Add Dancer::Plugin::Cart::Product class (Peter Mottram).
+      Subclasses Interchange6::Cart::Product adding dbic_product attribute
+      along with lazy builder for selling_price attrbute which is cleared when
+      quantity is changed.
+    * Pass dbic_product attribute in Cart route 'add' (Peter Mottram).
+    * Switch from Class::Load to Module::Runtime (Peter Mottram).
+    * Switch to using Interchange6::Types (Peter Mottram).
+
+0.101 Sun Feb 28 08:10:37 2016 CET
+
+    [BUG FIXES]
+
+    * cart param in cart route was not setting cart name correctly
+      (Peter Mottram).
+    * Fix bug in update method of Cart class and a few POD corrections
+      (Peter Mottram).
+
+    [ENHANCEMENTS]
+
+    * product and navigation find now use ->single and active => 1
+      (Peter Mottram).
+    * Set new current_user attribute of the schema in the before hook
+      (Peter Mottram).
+    * Remove unreachable code from shop_setup_routes config parser
+      (Peter Mottram).
+    * Use var with parentheses when getting carts stash in shop_cart dsl
+      function (Peter Mottram).
+    * Remove unnecessary `exists` condition from shop_charge
+      (Peter Mottram).
+    * Remove unnecessary condition from flypage route (Peter Mottram).
+    * Simplify cart route where param cart is passed in (Peter Mottram).
+    * Change warn for missing maximum for navigation routes to warning
+      (Peter Mottram).
+    * Check quantity in Routes::Cart update to be defined not truthy
+      (Peter Mottram).
+    * Lower minimum Perl version to 5.10 (Peter Mottram).
+    * Remove BUILDARGS from Cart class and stash DBIC cart in attributes
+      (Peter Mottram).
+
+    [TESTS]
+
+    * Add numerous tests for full code coverage (Peter Mottram).
+
+0.100 Mon Aug 31 17:24:07 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Switch Cart class to Type::Tiny and
+      MooseX::CoverableModifiers (Peter Mottram).
+    * Add shop_redirect keyword (Peter Mottram).
+
+0.086 Wed Jul  1 17:17:19 2015 CEST
+
+    [ENHANCEMENTS]
+
+    * Order cart products on cart load from database (Peter Mottram).
+    * Add prerequisite on Net::HTTPS 0.11 to avoid weird installation
+      failure (Peter Mottram, GH #1).
+    * Apply per-page navigation.records config limit only if defined
+      (Peter Mottram, GH #46).
+
+    [BUG FIXES]
+
+    * Remove possible debug data leak (Peter Mottram).
+
+    [DOCUMENTATION]
+
+    * Improve documentation for cart_class and carts_var_name config options
+      (Peter Mottram).
+
+0.080 Sun Mar 15 09:49:06 2015 CET
+
+    [FEATURES]
+
+    * Cart class now configurable to allow subclassing (Peter Mottram)
+
+    [ENHANCEMENTS]
+
+    * Add product canonical_sku to Cart BUILD and add (Peter Mottram)
+    * Add product weight to Cart BUILD and add (Peter Mottram)
+    * stash carts in a var to avoid reloading from DB during request
+      (Peter Mottram)
+
+    [TESTS]
+
+    * use Travis containerised build instead of VM (Peter Mottram)
+
+    [BUG FIXES]
+
+    * Bump up prerequisite on Dancer::Session::DBIC for UTF-8 bug fix
+      (Stefan Hornburg)
+    * Remove use of 'authenticated' role from Cart as it is no longer used
+      (Peter Mottram)
+
+0.071 Sat Jan  3 11:13:55 2015 CET
+
+    [BUG FIXES]
+
+    * Fix prerequisite on Interchange6::Schema (Stefan Hornburg).
+
+0.070 Fri Jan  2 09:52:14 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Add before_navigation_search hook to navigation route
+      (Peter Mottram, GH #47).
+    * Adjust navigation route to new Product resultset listing method
+      (Peter Mottram).
+    * Simplify navigation and product route since uri is unique column
+      (Peter Mottram).
+    * Add product variant to cart without attributes/values (Peter Mottram).
+
+    [DOCUMENTATION]
+
+    * Adjust POD for before_navigation_display_hook (Peter Mottram).
+
+0.061 Fri Nov 28 12:07:35 2014 CET
+
+    [BUG FIXES]
+
+    * Bump up prerequisite on Interchange6 (GH #41, Stefan Hornburg).
+
+0.060 Thu Nov 27 16:59:29 2014 CET
+
+    [API CHANGES]
+
+    * Move hooks from Interchange6 (Peter Mottram).
+
+    [ENHANCEMENTS]
+
+    * Add "update" to cart route (Peter Mottram).
+    * Redirect after cart route remove get requests (Peter Mottram).
+    * Improve cart error handling (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Fix usage of 'scalar' in cart route (GH #40, Jeff Boes, Peter Mottram).
+
+0.060_03 Thu Nov 27 15:15:18 2014 CET
+
+    [API CHANGES]
+
+    * Adjust to Interchange6::Schema changes (Peter Mottram).
+    * Die on cart errors instead of calling set_error method (Peter Mottram).
+
+    [ENHANCEMENTS]
+
+    * Add before/after_cart_product_set_quantity hooks (Peter Mottram).
+    * Add quantity and uri to cart->add arguments in cart_route (Peter Mottram).
+    * Support selling price in cart (Peter Mottram).
+    * Add debug message for the case that navigation template is changed by
+      navigation attribute (Stefan Hornburg).
+
+    [DOCUMENTATION]
+
+    * Extend description of before_navigation_display hook (Stefan Hornburg).
+
+    [TESTS]
+
+    * Use fixtures from Interchange6::Schema (Peter Mottram).
+    * Add tests for putting variants into the cart (Peter Mottram).
+    * Fix for routes due to total number formatting in new cart (Peter Mottram).
+
+0.051 Fri Aug 15 11:34:47 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add shop_state keyword (Stefan Hornburg).
+
+    [DOCUMENTATION]
+
+    * Add minimal documentation about shop_ keywords (Stefan Hornburg).
+
+    [TESTS]
+
+    * Move tests to using Test::Roo (Peter Mottram).
+    * Add Travis configuration file (Stefan Hornburg, Peter Mottram).
+
+0.040 Wed Jul  2 12:27:52 2014 CEST
+
+    [API CHANGES]
+
+    * Update relationships to new naming standards (Peter Mottram, GH #24).
+
+0.031 Tue Apr  8 11:16:55 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Mimic usage of return_url parameter in Dancer::Plugin::Auth::Extensible.
+
+0.030 Fri Apr  4 20:34:21 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Extend cart with products id and move it from Cart::DBIC to Cart
+      (Peter Mottram, GH #21).
+
+0.021 Wed Apr  2 09:07:12 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Use quantity parameter from user input for cart add action.
+
+    * Add remove action to cart route.
+
+0.020 Tue Apr  1 13:21:37 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Retrieve template value from navigation attributes
+      (Stefan Hornburg (Racke), GH #19).
+
+    * Save error code and error message from payment failure into payment order
+      (Stefan Hornburg (Racke)).
+
+    [TESTS]
+
+    * Enable show_errors in configuration for route tests (Stefan Hornburg (Racke)).
+
+0.019 Sat Mar 22 19:27:39 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for paging to navigation routes.
+
+    [TESTS]
+
+    * Add DBD::SQLite driver version to routes test report (Peter Mottram).
+    * Change price values from decimal string to float in routes test
+      (Peter Mottram).
+    * Pass option deprecated in Dancer::Plugin::DBIC (Peter Mottram).
+
+    [BUG FIXES]
+
+    * Remove Interchange6::Class dependency (GH #16, Peter Mottram).
+
+0.010 Wed Mar 12 18:24:02 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Switch to DPIC6::Cart::DBIC->new instead of IC6::Class::instantiate
+      (Peter Mottram, GH #13).
+    * Add payment_order attribute to OnlinePayment class.
+
+0.009 Tue Mar 11 19:18:50 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Moo cart rewrite (Peter Mottram).
+    * Add option to use return_url after login success (Peter Mottram).
+    * Add login failure message to login get route (Peter Mottram).
+
+    [TESTS]
+
+    * Routes tests (Peter Mottram, GH #9).
+
+0.008 Sun Feb 23 12:25:00 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add shop_order and shop_review keywords.
+    * Update payment_order after payment transaction.
+    * Add active configuration option for cart and checkout routes.
+    * Allow URIs for cart and checkout routes to be configured.
+    * Acknowledge schema key passed to shop_schema.
+    * Handle created and last_modified as DateTime objects
+      (Peter Mottram, GH #5)
+
+    [BUG FIXES]
+
+    * Use different schema keys for each database driver to fix test
+      failures with new tests.
+    * Exclude inactive products from navigation search results.
+    * Use Dancer qw(:tests) to avoid clashing with Test::More
+      (Peter Mottram, GH #3).
+
+    [TESTS]
+
+    * Add Product and Review result class tests.
+
+0.007 Mon Jan 27 18:57:07 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add shop_attribute keyword.
+    * Checking variants before adding an item to the cart.
+
+    * Include product uri into attributes loaded into the cart.
+    * Add script to expire/manage DBIC sessions/carts
+
+0.006 Thu Jan  2 17:20:57 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add shop_cart keyword as alias for cart keyword.
+    * Add hooks before_cart_set_users_id,after_cart_set_users_id,
+      before_cart_set_sessions_id and after_cart_set_sessions_id.
+    * Update users_id resp. sessions_id in cart on login/logout.
+
+    [BUG FIXES]
+
+    * Pass same tokens to before_product_display hook and product template.
+    * Redirect to application root from login get route when user is already
+      logged in.
+
+    [DOCUMENTATION]
+
+    * Add section about Dancer::Session::DBIC requirement.
+
+    [TESTS]
+
+    * Add tests for creating an user and show_states field for country
+      result class.
+    * Prefer to use plugin keywords.
+
+0.005 Fri Dec 27 13:48:36 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Add login and logout routes.
+    * Add support for online payment transactions through shop_charge keyword.
+    * Add shop_schema, shop_address and shop_user keyword.
+    * Save session id into the cart at creation time.
+
+    [BUG FIXES]
+
+    * Access cart resultset via $self->{sqla} to avoid odd test failure on MSWin32-x86-multi-thread.
+
+    [TESTS]
+
+    * Add tests with Test::Database.
+
+0.004 Tue Dec 17 13:56:50 2013 CET
+
+    [API CHANGES]
+
+    * Remove keyword shop_product_class.
+
+    [ENHANCEMENTS]
+
+    * Add shop_country keyword.
+
+0.003 Sun Dec  8 12:28:18 2013 CET
+
+    [API CHANGES]
+
+    * Use {product => $product} instead of just $product as tokens for product route.
+
+    [BUG FIXES]
+
+    * Fix search for related products for navigation routes.
+
+    [DOCUMENTATION]
+
+    * Add documentation about shop_setup_routes to main POD.
+
+0.002 Sun Dec  1 17:15:10 2013 CET
+
+    [BUG FIXES]
+
+    * Add missing code for loading cart.
+    * Fix capturing of return value for cart add.
+    * Adjust code to retrieve navigation information to DBIC.
+
+0.001 Sat Nov 30 17:41:34 2013 CET
+
+    * Initial release.

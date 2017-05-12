@@ -1,0 +1,11 @@
+Revision history for DateTime-Format-MSSQL
+
+1.001000  2014-04-23 18:10:15-05:00 CST6CDT
+    - Allow passing time_zone during instantiation (Fixes RT#92844)
+
+1.000000  2012-11-17 16:55:58 CST6CDT
+    - Use nicer version scheme
+    - Put MetaYAML back in dist
+
+0.092950  2009-10-21 22:00:00
+    - first release

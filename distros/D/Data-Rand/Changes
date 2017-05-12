@@ -1,0 +1,24 @@
+Revision history for Data-Rand
+
+0.0.4  Thu Jul 23 10:21:25 2008
+    - added seed_calc_with()
+    - removed 'use_time_hires', 'skip_seen_check', and 'srand_seeder_coderef' option keys (no longer applicable)
+    - added 'get_random_index' option key
+    - no implicit and multiple srand() 
+    - 10K dupe test to 10000K
+    - optional 1 million dupe test (!default due to time and memory for tracking hash)
+    - finally this module is what I originally intended
+
+0.0.3  Sun Jul 20 17:24:41 2008
+    - remove incorrect references to strength of randomness
+    - Time::HiRes in srand default behavior
+    - no List::Util shuffle since it doesn't give us any more randomness really.
+    - "seen" check and corresponding 'skip_seen_check'
+    - duplicate test (10000 calls w/ no arguments)
+    
+0.0.2  Sat Sep 29 15:33:25 2007
+		Made perlcritic test optional as per http://rt.cpan.org/Ticket/Display.html?id=29554#txn-364766'
+
+0.0.1  Fri Aug 17 22:34:16 2007
+       Initial release.
+

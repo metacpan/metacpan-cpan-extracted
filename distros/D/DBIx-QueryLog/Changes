@@ -1,0 +1,129 @@
+Revision history for Perl extension DBIx::QueryLog
+
+0.41 2015-07-31T08:19:07Z
+    - Fixed exception when using EXPLAIN if statement error.
+
+0.40 2015-06-22T16:14:20Z
+    - Fixed regression by DBD::SQLite 1.48
+
+0.39 2014-09-03T12:14:36Z
+    - requires 'Text::ASCIITable' (kamipo++)
+
+0.38 2014-01-17T09:00:16Z
+    - Fixed test (makamaka++)
+
+0.37 2013-06-05T15:04:12Z
+    - Fixed test (syohex++)
+
+0.36 2013-06-04T22:26:20Z
+    - Support EXPLAIN for SQLite (cho45++)
+    - Swtich lexical some variables to constant.
+
+0.35 2013-05-21T08:02:59Z
+    - Repackaging
+
+0.34 2013-05-16T11:34:41Z
+    - Using Minilla
+
+0.33  Sat Feb 16 18:24:54 2013
+    - Added ignore_trace()
+
+0.32  Wed Dec 19 18:29:20 2012
+    - Added is_enabled()
+
+0.31  Sat Nov 17 19:14:01 2012
+    - Fixed Pg tests (makamaka)
+
+0.30  Sun Nov 11 20:46:24 2012
+    - Support PostgreSQL (makamaka++)
+
+0.29  Tue Oct 16 15:31:36 2012
+    - Added guard method (tokuhitom++)
+
+0.28  Tue Apr  3 22:53:44 2012
+    - Fixed regexp for explain
+
+0.27  Sat Mar 10 02:20:42 2012
+    - Support show_data_source option (riywo++)
+
+0.26  Wed Feb 15 00:45:59 2012
+    - added notes for explain option, no code changes (tomi-ru++)
+
+0.25  Fri Jan  6 00:13:11 2012
+    - Fix: skip explain unless "select ... from" for FOUND_ROWS() (kamipo++)
+
+0.24  Thu Dec 22 01:26:51 2011
+    - Support explain option (kamipo++)
+
+0.23  Thu Dec  8 02:49:36 2011
+    - Supported some more environment variables
+
+0.22  Wed Nov 23 02:08:01 2011
+    - Fixed an issue that has not been reused SQL TYPE
+
+0.21  Wed Nov 16 20:00:36 2011
+    - removed SQL::Tokenizer
+
+0.20  Sat Nov  5 04:45:18 2011
+    - Fixed doc (no code changes)
+
+0.19  Sat Nov  5 03:43:22 2011
+    - Added alias of `begin` as `enable` and `end` as `disable`
+
+0.18  Wed Nov  2 02:19:23 2011
+    - Added bind_params parameter to logger (requested by tokuhitom++)
+
+0.17  Tue Nov  1 00:39:58 2011
+    - Added: specify code ref to $OUTPUT
+
+0.16  Mon Oct 31 17:15:38 2011
+    - Changed s/compress/compact/
+
+0.15  Mon Oct 31 00:32:27 2011
+    - Fix: compress with useqq was broken
+
+0.14  Wed Oct 26 14:32:28 2011
+    - Fixed typo
+
+0.13  Wed Oct 26 14:21:24 2011
+    - Added some options
+    - Added $OUTPUT variable
+    - Changed localtime format
+
+0.12  Thu Sep 15 02:42:42 2011
+    - Fix duplicate logging for selectall_arrayref() (DBD::mysql only) 
+
+0.11  Sun Apr 24 20:59:46 2011
+    - Supported SQL TYPE for bind_param
+
+0.10  Thu Apr 21 01:16:10 2011
+    - Supported bind_param
+
+0.09  Thu Feb 24 23:56:36 2011
+    - Fixed problem on DBD::mysql. limit after the placeholder was quoted. but should not be it. (yibe++)
+
+0.08  Thu Dec 30 20:20:36 2010
+    - Fixed pod syntax (no code change)
+
+0.07  Fri Dec 17 01:56:36 2010
+    - Fixed unimport DBI::db::do not working
+    - Optimized
+
+0.06  Sat Nov 27 13:21:11 2010
+    - Fix accessors issue
+
+0.05  Sat Nov 27 01:05:36 2010
+    - Fix multi line query problem for mysql
+    - Supported select(all|row)_array*
+
+0.04  Sun Nov  7 18:17:11 2010
+    - Fix broken links for document
+
+0.03  Sun Nov  7 12:55:09 2010
+    - added to Test::Requires test_requires
+
+0.02  Sat Nov  6 02:08:15 2010
+    - remove POSIX::strftime (for unsupported System)
+
+0.01  Wed Nov  3 04:03:24 2010
+    - original version

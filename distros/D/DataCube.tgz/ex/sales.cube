@@ -1,0 +1,86 @@
+#!/usr/bin/env perl
+
+use DataCube;
+use DataCube::Schema;
+
+my $schema = DataCube::Schema->new;
+
+$schema->add_dimension('country');
+$schema->add_dimension('product');
+$schema->add_dimension('salesperson');
+$schema->add_hierarchy('year','quarter','month','day');
+$schema->add_measure('sum','units_sold');
+$schema->add_measure('sum','dollar_volume');
+$schema->add_measure('average','price_per_unit');
+
+
+my @data = get_data();
+
+my $cube = DataCube->new( $schema );
+
+$cube->insert( $_ ) for @data;
+
+$cube->rollup;
+
+$cube->report_html('html');
+
+
+sub get_data {
+    my( @data, @columns );
+    row:
+    while (my $line = <DATA>) {
+        chomp $line;
+        my @line = split/\s+/,$line;
+        @columns = @line and next row unless @columns;
+        my %record = map { $columns[$_] => $line[$_] } ( 0 .. $#columns );
+        push @data, \%record;
+    }
+    return @data;
+}
+
+
+__DATA__
+country day dollar_volume   month   price_per_unit  product quarter salesperson units_sold  year
+US  15  167.44  03  2.99    Pencil  Q1  Sorvino 56  2005
+US  07  139.93  03  19.99   Binder  Q1  Sorvino 7   2006
+US  24  825.00  08  275.00  Desk    Q3  Sorvino 3   2006
+US  27  151.24  09  1.99    Pen Q3  Sorvino 76  2006
+US  22  63.68   05  1.99    Pencil  Q2  Thompson    32  2005
+US  14  1139.43 10  19.99   Binder  Q4  Thompson    57  2006
+US  18  149.25  04  1.99    Pencil  Q2  Andrews 75  2005
+US  10  131.34  04  1.99    Pencil  Q2  Andrews 66  2006
+US  31  147.06  10  1.29    Pencil  Q4  Andrews 114 2006
+US  21  139.72  12  4.99    Binder  Q4  Andrews 28  2006
+CA  26  1019.49 02  19.99   Pen Q1  Gill    51  2005
+CA  15  413.54  01  8.99    Binder  Q1  Gill    46  2006
+CA  14  121.26  05  1.29    Pencil  Q2  Gill    94  2006
+CA  31  916.98  05  8.99    Binder  Q2  Gill    102 2006
+CA  10  126.42  09  1.29    Pencil  Q3  Gill    98  2006
+UK  09  623.75  02  4.99    Pencil  Q1  Jardine 125 2005
+UK  05  449.10  05  4.99    Pencil  Q2  Jardine 90  2005
+UK  24  379.24  03  4.99    PenSet  Q1  Jardine 76  2006
+UK  17  194.61  11  4.99    Binder  Q4  Jardine 39  2006
+UK  04  1879.06 12  19.99   Binder  Q4  Jardine 94  2006
+US  23  999.50  01  19.99   Binder  Q1  Kivell  50  2005
+US  25  479.04  11  4.99    PenSet  Q4  Kivell  96  2005
+US  17  625.00  06  125.00  Desk    Q2  Kivell  5   2006
+US  07  1005.90 08  23.95   PenSet  Q3  Kivell  42  2006
+UK  25  449.10  06  4.99    Pencil  Q2  Morgan  90  2005
+UK  05  251.72  10  8.99    Binder  Q4  Morgan  28  2005
+UK  21  686.95  07  12.49   PenSet  Q3  Morgan  55  2006
+US  01  250.00  09  125.00  Desk    Q3  Smith   2   2005
+US  12  86.43   12  1.29    Pencil  Q4  Smith   67  2005
+US  01  1305.00 02  15.00   Binder  Q1  Smith   87  2006
+US  12  57.71   07  1.99    Binder  Q3  Howard  29  2005
+US  27  479.04  04  4.99    Pen Q2  Howard  96  2006
+CA  06  189.05  01  1.99    Pencil  Q1  Jones   95  2005
+CA  01  379.24  04  4.99    Binder  Q2  Jones   76  2005
+CA  08  539.40  06  8.99    Binder  Q2  Jones   60  2005
+US  15  174.65  08  4.99    Pencil  Q3  Jones   35  2005
+US  18  255.84  09  15.99   PenSet  Q3  Jones   16  2005
+US  22  575.36  10  8.99    Pen Q4  Jones   64  2005
+CA  18  19.96   02  4.99    Binder  Q1  Jones   4   2006
+CA  04  304.39  07  4.99    PenSet  Q3  Jones   61  2006
+UK  29  1619.19 07  19.99   Binder  Q3  Hogan   81  2005
+UK  08  239.88  11  19.99   Pen Q4  Hogan   12  2005
+UK  29  1183.26 12  15.99   PenSet  Q4  Hogan   74  2005

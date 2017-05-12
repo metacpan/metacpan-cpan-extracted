@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Device-VantagePro.t
+lib/Device/VantagePro.pm
+META.yml                                 Module meta-data (added by MakeMaker)

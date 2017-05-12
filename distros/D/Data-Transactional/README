@@ -1,0 +1,22 @@
+Data::Transactional provides data structures with RDBMS-like transactional
+abilities, so changes can be rolled back.  A very primitive earlier attempt
+at the same problem is also included, Tie::Hash::Transactional.
+
+To install, perform the usual dance of:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Also included in this distribution is a plugin for Data::Compare so that
+it does (what I think is) the Right Thing when looking at Data::Transactional
+objects.  See:
+
+   perldoc Data::Compare::Plugins::Data::Transactional and
+   perldoc Data::Compare
+
+for details.
+
+Please note that Tie::Hash::Transactional is DEPRECATED.  It will be
+removed at some point in the future.

@@ -1,0 +1,46 @@
+Digest-FNV-PurePerl
+
+A PurePerl implementation of the Fowler/Noll/Vo 32 and 64 bit hashing
+algorithms.  The algorithm itself works well for arbitrary length strings. 
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Digest::FNV::PurePerl
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Digest-FNV-PurePerl
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Digest-FNV-PurePerl
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Digest-FNV-PurePerl
+
+    Search CPAN
+        http://search.cpan.org/dist/Digest-FNV-PurePerl/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Jeffrey Webster
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

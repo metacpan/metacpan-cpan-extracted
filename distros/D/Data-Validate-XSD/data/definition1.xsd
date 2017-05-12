@@ -1,0 +1,17 @@
+<?xml version='1.0'?>
+<!DOCTYPE xs:schema PUBLIC "-//W3C//DTD XMLSCHEMA 200102//EN" "XMLSchema.dtd">
+
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="input" type="news"/>
+
+  <xs:complexType name="news">
+      <xs:element name="title"   type="xs:string"   maxLength="20"/>
+      <xs:element name="content" type="xs:string"  minLength="20"/>
+      <xs:element name="author"  type="xs:token"   maxLength="40"/>
+      <xs:element name="editor"  type="xs:token"    minOccurs="0" />
+      <xs:element name="created" type="xs:datetime" />
+      <xs:element name="edited"  type="xs:datetime" maxOccurs="3" />
+  </xs:complexType>
+
+</xs:schema>

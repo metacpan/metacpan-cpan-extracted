@@ -1,0 +1,15 @@
+1.007           - Revert changes in 1.006 - need to change to suit the new
+                  Elasticsearch API.
+
+1.006           - Replace ElasticSearch with Elasticsearch
+
+1.005           - Not available for perl version < 5.10
+
+1.004           - Faster sessions renamed "lazy"
+
+1.003           - Add support for faster sessions (don't hit ES for every
+                  get or set - just once for each retrieve & flush cycle
+
+0.008           - Added signing of the session ID to make it tamper-proof
+
+0.001 - 0.007   - Formative stuff.

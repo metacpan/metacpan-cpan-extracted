@@ -1,0 +1,31 @@
+<sql:spec xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+
+  <sql:type name="text">
+    <sql:module>DBIx::XMLServer::TextField</sql:module>
+  </sql:type>
+
+  <sql:type name="number">
+    <sql:module>DBIx::XMLServer::NumberField</sql:module>
+  </sql:type>
+
+  <sql:table name="employees" sqlname="dbixtest1"/>
+  <sql:table name="departments" sqlname="dbixtest2"
+    join="left" jointo="employees" refcolumn="dept" keycolumn="id"/>
+ 
+  <sql:template table="employees">
+    <employees>
+      <sql:record>
+      	<employee id="foo">
+      	  <sql:field type="number" attribute="id" expr="employees.id"/>
+      	  <name>
+	    <sql:field type="text" expr="employees.name"/>
+      	  </name>
+          <department>
+      	    <sql:field type="text" expr="departments.name" join="departments"/>
+      	  </department>
+      	</employee>
+      </sql:record>
+    </employees>
+  </sql:template>
+	
+</sql:spec>

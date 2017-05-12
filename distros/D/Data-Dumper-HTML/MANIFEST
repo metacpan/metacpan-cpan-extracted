@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Data-Dumper-HTML.t
+lib/Data/Dumper/HTML.pm
+META.yml                                 Module meta-data (added by MakeMaker)

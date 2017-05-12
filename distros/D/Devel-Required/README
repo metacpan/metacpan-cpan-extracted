@@ -1,0 +1,18 @@
+README for Devel::Required
+
+Automatic update of required modules documentation.
+
+Copyright (c) 2003, 2004, 2006, 2007, 2009, 2012  Elizabeth Mattijsen
+<liz@dijkmat.nl>. All rights reserved.  This program is free software; you
+can redistribute it and/or modify it under the same terms as Perl itself.
+
+Version:
+ 0.14
+
+Required Modules:
+ (none)
+
+perl Makefile.PL
+make
+make test
+make install

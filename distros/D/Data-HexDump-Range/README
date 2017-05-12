@@ -1,0 +1,16 @@
+Data::HexDump::Range
+====================
+
+'Hexadecial Range Dumper'  with color, bitfields and skip ranges
+
+INSTALLATION
+------------
+
+To install this module type the following:
+
+   perl Build.PL
+   ./Build
+   ./Build test
+   ./Build install
+
+

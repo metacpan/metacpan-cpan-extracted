@@ -1,0 +1,97 @@
+0.27      2016-11-28 15:37:24+00:00 Europe/London
+
+0.26      2016-11-25 16:28:29+00:00 Europe/London
+
+0.25      2016-11-25 15:41:41+00:00 Europe/London
+
+0.24      2016-11-25 13:16:56+00:00 Europe/London
+    - Swap to Dist::Zilla::Plugin::Test::Kwalitee - RT#105665
+    - Swap to MakeMaker - RT#118935
+    - Remove incorrect build prereqs - GH issue #7 on html-formatter
+    - No longer prune dist.ini - RT#107311
+
+0.23      2016-04-13 11:47:50+01:00 Europe/London
+    - Implemented disable_pod_spelling_tests
+      I was convinced this had been in for years, but it appears not.
+      Its needed for POD that results from converting schema files!
+
+0.22      2015-05-12 14:34:52+01:00 Europe/London
+    - Changed the github URLs to be https based and https for git too
+    - Explicit identification of git repository sources
+
+0.21      2015-05-07 14:13:47+01:00 Europe/London
+    - Added a batch of git check modules
+    - then removed [Git::CheckFor::Fixups] as it gets versioning wrong
+
+0.20      2015-03-19 17:03:00+00:00 Europe/London
+    - Force the test modules from previous change to be included
+      as pre-requisites.
+
+0.19      2015-03-08 12:23:48+00:00 Europe/London
+    - Fix up deprecated test modules - see 
+      https://github.com/nigelm/dist-zilla-pluginbundle-nigelm/pull/2
+      https://github.com/nigelm/dist-zilla-pluginbundle-nigelm/pull/1
+      Thanks to skington and mrcaron
+
+0.18      2014-03-12 14:45:05+00:00 Europe/London
+    - Corrected fix in ReadmeAnyFromPod config
+    - Added perltidy.LOG to list of excludes
+    - Referred to issue that broke Pod::Simple::Text and so broke
+      ReadmeAnyFromPod
+
+0.17      2014-01-16 14:30:57+00:00 Europe/London
+    - Fixed fault in ReadmeAnyFromPod config
+
+0.16      2012-02-11 22:11:08 Europe/London
+
+0.15      2012-02-11 14:01:46 Europe/London
+
+0.14      2012-01-28 17:37:00 Europe/London
+    - Support for a different build process
+    - Fixed a documentation fault.
+    - Defaults to using Metacpan rather than search.cpan
+
+0.13      2011-06-06 15:09:35 Europe/London
+
+0.12      2011-04-15 10:38:21 Europe/London
+    - Now uses OurPkgVersion (requires source modules change)
+    - Authority insert is now done at comment position
+    - 2 changes above require a # VERSION and # AUTHORITY comments
+      to be inserted into your modules.
+    - Change to ModuleBuild instead of MakeMaker
+
+0.11      2011-02-18 11:00:51 Europe/London
+    - Fixed CommitBuild release messages
+    - Slightly improved docs
+    - No longer produces CommitBuilds for every build...
+    - Now uses [Bootstrap::lib] to reduce the build dance
+    - Got README handling as I want it, finally
+    - Realised that Changes handling is now wrong - needs fixing later
+
+0.07      2011-02-11 13:22:07 Europe/London
+    - Made [Git::CommitBuild] push to a cpan branch
+    - Removed the [CopyReadmeFromBuild] due to issues
+
+0.06      2011-02-11 13:05:57 Europe/London
+    - Added [CopyReadmeFromBuild]
+    - Added [Git::CommitBuild]
+    - Made pod coverage and no tabs tests optional
+
+0.05      2011-02-10 13:43:53 Europe/London
+    - Rehased based on MARCEL bundle
+    - Better POD weaving
+
+0.04      2011-02-07 13:17:32 Europe/London
+    - Fixed stupid mistake where managed to put FLORAs info back in
+    - And similarly for the rafl github user...
+    - Minor doc updates.
+
+0.03      2011-02-05 22:34:01 Europe/London
+    - Now uses AutoPrereqs instead of deprecated AutoPrereq
+    - Uses Git::NextRelease module, with appropriate regex
+
+0.02      2011-02-05 16:27:58 Europe/London
+    - Moved to use itself for release
+
+0.01      2011-02-05 16:21:31 Europe/London
+    - Initial construction of module

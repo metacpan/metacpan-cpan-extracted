@@ -1,0 +1,180 @@
+Release history for Dist-Zilla-Plugin-Prereqs-Plugins
+
+1.003003 2017-03-07T14:44:51Z fcd6150
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Remove use of ConfigDumper util
+ - Wean tests of Test::KENTNL/dztest
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.003002, see misc/*.deps* for details
+ - configure: (suggests: +1)
+ - develop: +6 ↑2 -2 (suggests: ↑2)
+ - runtime: -1
+ - test: ↓1 -1
+
+1.003002 2015-04-10T04:14:50Z 817b488
+ - Bugfix: Don't randomly fail on early Moose which don't set INC in 'use Moose'
+
+1.003001 2015-04-05T16:37:33Z ebbbba8
+ [Trivial]
+ - Just re-releasing because somehow I fubared the dependency diff. Script adjusted to avoid this issue in future.
+
+1.003000 2015-04-05T16:21:31Z 54f2666
+ [00 MAJOR / Internals Reinvention]
+ - Due to Dist::Zilla versions 5.032 and higher now ripping out :version from the payloads prior to anything being able
+   to see it[1,2], the implementation details have had to be reinvented.
+ - This was arguably a bad idea in the first place to use a property you had to traverse 2 seperate private methods to
+   find in the first place.
+ - However, the new technology is based on my bakeini stack work, and is thus partially fragile in that it inherently
+   parses and processes dist.ini ( and any bundles in it ) in a way slightly different to Dist::Zilla.
+ - Thus, there are 2 parses of dist.ini going on, and any bundles will now be invoked *twice* in the same process, thus
+   opening for risk any kind of code that did not expect that to happen.
+ - This is hopefully not the long term solution, and hopefully Config::MVP itself can be augmented to expose this data
+   better without needing to resort to the second parse stack.
+ - 1: https://metacpan.org/source/RJBS/Dist-Zilla-5.034/Changes#L14
+ - 2:
+   https://metacpan.org/diff/file?target=RJBS/Dist-Zilla-5.032/lib/Dist/Zilla/MVP/Section.pm&source=RJBS/Dist-Zilla-5.031/lib/Dist/Zilla/MVP/Section.pm
+
+ [01 Minor / Increased visibility of top level :version]
+ - One fringe benefit of the changes however is the increased visibility of the ":version" statement that can appear on
+   its own at the top of a dist.ini declaring a minimum dzil version. This value is now consumed if present and
+   communicated as a dependendy on that Dist::Zilla version.
+ - Thus, this plugin is more comparable to DZP:AuthorDeps in exposing dependencies, while still superceding it in terms
+   of reporting deep bundle-specific deps.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.002001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +12 ↑3 -2 (recommends: +2, suggests: ↑2)
+ - runtime: +5 ↓1 -1 (recommends: +2)
+ - test: +1 (recommends: ↑1 ↓1)
+
+1.002001 2014-10-05T10:24:47Z
+ [00 Minor]
+ - 1.002000 except without -trial bits
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.002000, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+1.002000 2014-09-06T11:37:39Z
+ [00 Major]
+ - WARNING: EXPERIMENTAL
+ - Method of action moved deeper to Dzil internals
+ - can now divine the value of :version passed anywhere in dist.ini or @Bundles
+ - however, due to switching to the DZil Section Sequence assembly, plugins that modify $zilla->plugins directly willl
+   not be seen.
+ - If you have such a plugin and you wish to fix this, perhaps look at DZ:Util::PluginLoader
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.001000, see misc/*.deps* for details
+ - develop: -1 (suggests: ↑1)
+ - runtime: -1
+ - test: +1
+
+1.001000 2014-09-04T21:25:40Z
+ [00 Minor]
+ - Internals changed.
+ - Tests redesigned.
+ - metadata
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000002, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - runtime: +1
+ - test: +1 -4 (recommends: ↑1)
+
+ [Internals]
+ - dump_config implemented in config_dumper
+
+ [Metadata]
+ - fix author = kentnl
+
+ [Tests]
+ - tests reimplemented in terms of dztest
+
+1.000002 2014-08-16T19:59:38Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests updated.
+ - metadata updated.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +2 ↑1 (suggests: ↑2)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Metadata]
+ - move to kentnl org.
+ - recognise 1x contributor.
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - Test::ReportPrereqs updated.
+
+1.000001 2014-06-03T21:48:19Z
+ [Bugfix]
+ - stop using 5.10 code in tests.
+ - stop using needless dependencies in tests.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.000000, see misc/*.deps* for details
+ - test: +1 -2
+
+1.000000 2014-06-03T08:02:18Z
+ [00 Major]
+ - Packaging changes sufficient to annoy downstreams working by hand.
+
+ [01 Version Scheme]
+ - Migrating from x.y.z to x.yyyyyy
+ - this is the primary reason for the 1.x on the box.
+
+ [02 Migrating to EUMM for installer]
+ - EUMM now used to install
+ - "latest" Dependencies now only bump recommends, not requires.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.3, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 ↑1 ↓39 -13 (recommends: -1, suggests: +1 ↑1)
+ - runtime: +1 ↓5
+ - test: +4 ↓6 -3 (recommends: +4)
+
+0.1.3 2013-09-25T16:20:24Z
+ [00 Bugfix/Minor]
+ - Upgrade Test::Compile test to avoid Win32 bugs.
+ - Add a basic test.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.2, see misc/*.deps* for details
+ - develop: ↑29 (recommends: ↑1)
+ - runtime: ↑3
+ - test: +7
+
+0.1.2 2013-08-31T02:30:12Z
+ [Bugfix]
+ - Revert regression introduced by MatchInstalled + core modules
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.1, see misc/*.deps* for details
+ - develop: ↑1
+ - test: ↓2
+
+0.1.1 2013-08-31T02:22:18Z
+ [!Minor]
+ - Rebuilt with newer toolkits/tests
+ - Ramp dzil deps
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.1.0, see misc/*.deps* for details
+ - develop: +2 ↑26 (suggests: ↑1)
+ - runtime: ↑2
+ - test: +2 -2
+
+0.1.0 2013-08-08T00:30:03Z
+ - First version.

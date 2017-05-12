@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution DBIx-Class-Snowflake, version
+0.10:
+
+  Easily use DBIC with snowflake schemas.
+
+This software is copyright (c) 2009 by Matt Follett and Beck Automation.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as perl itself.
+

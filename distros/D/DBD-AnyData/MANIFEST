@@ -1,0 +1,12 @@
+Build.PL
+Changes
+lib/DBD/AnyData.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml
+README
+t/00-load.t
+t/01-basic.t
+t/manifest.t
+t/pod.t

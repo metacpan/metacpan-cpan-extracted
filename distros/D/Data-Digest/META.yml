@@ -1,0 +1,31 @@
+---
+abstract: 'Objects that represent a digest values'
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec: 0.80
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.76'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Data::Digest
+name: Data-Digest
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Digest: 1.06
+  Digest::MD5: 2.33
+  Digest::SHA: 5.34
+  IO::File: 0
+  IO::Handle: 0
+  Params::Util: 0.10
+  perl: 5.005
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.04

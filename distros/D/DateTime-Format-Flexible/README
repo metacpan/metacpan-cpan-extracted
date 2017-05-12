@@ -1,0 +1,153 @@
+NAME
+    DateTime::Format::Flexible - DateTime::Format::Flexible - Flexibly parse
+    strings and turn them into DateTime objects.
+
+SYNOPSIS
+      use DateTime::Format::Flexible;
+      my $dt = DateTime::Format::Flexible->parse_datetime( 'January 8, 1999' );
+      # $dt = a DateTime object set at 1999-01-08T00:00:00
+
+DESCRIPTION
+    If you have ever had to use a program that made you type in the date a
+    certain way and thought "Why can't the computer just figure out what
+    date I wanted?", this module is for you.
+
+    DateTime::Format::Flexible attempts to take any string you give it and
+    parse it into a DateTime object.
+
+    The test file tests 2500+ variations of date/time strings. If you can
+    think of any that I do not cover, please let me know.
+
+USAGE
+    This module uses DateTime::Format::Builder under the covers.
+
+  build, parse_datetime
+    build and parse_datetime do the same thing. Give it a string and it
+    attempts to parse it and return a DateTime object.
+
+    If it can't it will throw an exception.
+
+     my $dt = DateTime::Format::Flexible->build( $date );
+
+     my $dt = DateTime::Format::Flexible->parse_datetime( $date );
+
+     my $dt = DateTime::Format::Flexible->parse_datetime(
+         $date,
+         strip    => [qr{\.\z}],
+         tz_map   => {EDT => 'America/New_York'},
+         european => 1
+     );
+
+    *   "strip"
+
+        Remove a substring from the string you are trying to parse. You can
+        pass multiple regexes in an arrayref.
+
+        example:
+
+         my $dt = DateTime::Format::Flexible->parse_datetime(
+             '2011-04-26 00:00:00 (registry time)' ,
+             strip => [qr{\(registry time\)\z}] ,
+         );
+         # $dt is now 2011-04-26T00:00:00
+
+        This is helpful if you have a load of dates you want to normalize
+        and you know of some weird formatting beforehand.
+
+    *   "tz_map"
+
+        map a given timezone to another recognized timezone Values are given
+        as a hashref.
+
+        example:
+
+         my $dt = DateTime::Format::Flexible->parse_datetime(
+             '25-Jun-2009 EDT' ,
+             tz_map => {EDT => 'America/New_York'}
+         );
+         # $dt is now 2009-06-25T00:00:00 with a timezone of America/New_York
+
+        This is helpful if you have a load of dates that have timezones that
+        are not recognized by DateTime::Timezone.
+
+    *   "european"
+
+        If european is set to a true value, an attempt will be made to parse
+        as a DD-MM-YYYY date instead of the default MM-DD-YYYY. There is a
+        chance that this will not do the right thing due to ambiguity.
+
+        example:
+
+         my $dt = DateTime::Format::Flexible->parse_datetime(
+             '16/06/2010' , european => 1 ,
+         );
+         # $dt is now 2010-06-16T00:00:00
+
+  Example formats
+    A small list of supported formats:
+
+    YYYYMMDDTHHMMSS
+    YYYYMMDDTHHMM
+    YYYYMMDDTHH
+    YYYYMMDD
+    YYYYMM
+    MM-DD-YYYY
+    MM-D-YYYY
+    MM-DD-YY
+    M-DD-YY
+    YYYY/DD/MM
+    YYYY/M/DD
+    YYYY/MM/D
+    M-D
+    MM-D
+    M-D-Y
+    Month D, YYYY
+    Mon D, YYYY
+    Mon D, YYYY HH:MM:SS
+    ...
+
+    there are 9000+ variations that are detected correctly in the test files
+    (see t/data/* for most of them).
+
+NOTES
+    The DateTime website http://datetime.perl.org/?Modules as of march 2008
+    lists this module under 'Confusing' and recommends the use of
+    DateTime::Format::Natural.
+
+    Unfortunately I do not agree. DateTime::Format::Natural currently fails
+    more than 2000 of my parsing tests. DateTime::Format::Flexible supports
+    different types of date/time strings than DateTime::Format::Natural. I
+    think there is utility in that can be found in both of them.
+
+    The whole goal of DateTime::Format::Flexible is to accept just about any
+    crazy date/time string that a user might care to enter.
+    DateTime::Format::Natural seems to be a little stricter in what it can
+    parse.
+
+BUGS
+    You cannot use a 1 or 2 digit year as the first field:
+
+     YY-MM-DD # not supported
+     Y-MM-DD  # not supported
+
+    It would get confused with MM-DD-YY
+
+AUTHOR
+        Tom Heady
+        CPAN ID: thinc
+        Punch, Inc.
+        cpan@punch.net
+        http://www.punch.net/
+
+COPYRIGHT and LICENSE
+    Copyright 2007-2009 Tom Heady
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    DateTime::Format::Builder, DateTime::Timezone, DateTime::Format::Natural
+

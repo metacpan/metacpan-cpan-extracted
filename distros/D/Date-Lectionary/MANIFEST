@@ -1,0 +1,23 @@
+lib/Date/Lectionary.pm
+lib/Date/Lectionary/Day.pm
+lib/Date/Lectionary/Year.pm
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+share/acna_lect.xml
+share/date_lectionary_xref.xml
+share/rcl_lect.xml
+t/00-load.t
+t/01-year.t
+t/02-day-commonName.t
+t/03-day-displayName-acna.t
+t/04-day-displayName-rcl.t
+t/05-readings.t
+t/06-day-altName.t
+t/07-day-feasts.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

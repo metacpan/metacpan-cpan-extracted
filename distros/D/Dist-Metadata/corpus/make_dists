@@ -1,0 +1,94 @@
+#!/usr/bin/env perl
+#
+# This file is part of Dist-Metadata
+#
+# This software is copyright (c) 2011 by Randy Stauner.
+#
+# This is free software; you can redistribute it and/or modify it under
+# the same terms as the Perl 5 programming language system itself.
+#
+
+# This script is used for generating test data when the dist is built
+
+use strict;
+use warnings;
+use FindBin;       # core
+use Archive::Any::Create;
+use File::Find;    # core
+use Path::Class 0.24;
+use IO::File;      # core
+use Data::Dumper ();  # core
+
+my $work_dir = $FindBin::Bin;
+my $structs;
+my $dists = {
+  metafile => {
+    dir  => 'Dist-Metadata-Test-MetaFile-2.2',
+  },
+  metafile_incomplete => {
+    dir  => 'Dist-Metadata-Test-MetaFile-Incomplete-2.1',
+  },
+  nometafile => {
+    dir  => 'Dist-Metadata-Test-NoMetaFile-0.1',
+  },
+  nometafile_dev_release => {
+    dir  => 'Dist-Metadata-Test-NoMetaFile-DevRelease-0.1_1',
+  },
+  index_like_pause => {
+    dir  => 'Dist-Metadata-Test-LikePause-0.1',
+  },
+  subdir => {
+    dir  => 'Dist-Metadata-Test-SubDir-1.5',
+    cd   => 'subdir',
+  },
+  noroot => {
+    dir  => '.',
+    cd   => 'noroot',
+    file => 'noroot',
+  },
+};
+
+while( my ($name, $dist) = each %$dists ){
+  my $archive = Archive::Any::Create->new;
+  my $struct = {};
+
+  my $wd = $dist->{cd}
+    ? dir( $work_dir, $dist->{cd} )
+    : $work_dir;
+  my $fd = dir( $wd, $dist->{dir} );
+
+  my @files;
+  find({
+      wanted => sub {
+        push @files, $_
+          if -f $_;
+      },
+      no_chdir => 1,
+    },
+    $fd
+  );
+
+  foreach my $file ( @files ){
+    my $rel = file($file)->relative($wd);
+    my $content = slurp($file);
+    $archive->add_file( $rel => $content );
+    # convert relative file path from Native to Unix since DM Struct defaults to Unix.
+    $struct->{ $rel->as_foreign('Unix') } = $content;
+  }
+
+  my $base  = $dist->{file} || $dist->{dir};
+  $archive->write_file(file($work_dir, "$base.$_")->stringify)
+    for qw(tar.gz zip);
+  $structs->{$name} = $struct;
+}
+
+{
+  local $Data::Dumper::Indent = 1;
+  spit(
+    file($work_dir, 'structs.pl'),
+    Data::Dumper->Dump( [$structs], ['Dist::Metadata::Test::Structs'] )
+  );
+}
+
+sub slurp { local $/; IO::File->new($_[0], 'r')->getline }
+sub spit  {           IO::File->new($_[0], 'w')->print($_[1]) }

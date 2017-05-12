@@ -1,0 +1,17 @@
+Revision history for Data-Printer-Filter-DBIx-Class
+
+0.000004  2016-02-05 12:10:57-05:00 America/Toronto
+    - Bumps minimum version of Data::Printer to 0.38
+
+0.000003  2016-02-04 15:19:07-05:00 America/Toronto
+    - $ENV{DDP_DBIC_ROW_LIMIT} can be used to control how many ResultSet rows
+      get printed for a given object.
+
+0.000002  2016-01-22 18:13:52-05:00 America/Toronto
+    - Allow for resultsets which don't return objects (Reported by Peter
+      Rabbitson)
+    - Allow for objects which overload boolean comparisons (Reported by Peter
+      Rabbitson)
+
+0.000001  2016-01-20 14:45:53-05:00 America/Toronto
+    - Initial release.

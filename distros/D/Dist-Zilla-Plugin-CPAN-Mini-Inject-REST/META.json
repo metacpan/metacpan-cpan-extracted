@@ -1,0 +1,67 @@
+{
+   "abstract" : "Uploads to a L<CPAN::Mini::Inject> mirror using L<CPAN::Mini::Inject::REST>",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CPAN-Mini-Inject-REST",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.002"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN::Mini::Inject::REST::Client::API" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CPAN::Mini::Inject::REST" : {
+         "file" : "lib/Dist/Zilla/Plugin/CPAN/Mini/Inject/REST.pm",
+         "version" : "0.004"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST/issues"
+      },
+      "homepage" : "https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST.git",
+         "web" : "https://github.com/Altreus/Dist-Zilla-Plugin-CPAN-Mini-Inject-REST"
+      }
+   },
+   "version" : "0.004",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>",
+      "Colin Newell <colin@opusvl.com>"
+   ]
+}
+

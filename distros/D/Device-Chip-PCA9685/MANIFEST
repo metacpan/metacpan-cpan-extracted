@@ -1,0 +1,20 @@
+CHANGES
+examples/sweep.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/Device/Chip/PCA9685.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README.pod
+t/00use.t
+t/01enable.t
+t/02set_frequency.t
+t/10set_channel_value.t
+t/99pod.t

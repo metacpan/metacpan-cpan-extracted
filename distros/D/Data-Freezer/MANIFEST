@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Data/Freezer.pm
+lib/Data/Freezer/FreezingBag.pm
+lib/Data/Freezer/Tomato.pm
+lib/Data/Freezer/Steak.pm
+t/00-load.t
+t/01-use.t
+t/pod.t

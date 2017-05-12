@@ -1,0 +1,24 @@
+---
+abstract: ~
+author:
+  - 'Ryan Voots, <simcop2387@simcop2387.info>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-Chip-PCA9685
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+requires:
+  Device::Chip: 0
+version: v0.9

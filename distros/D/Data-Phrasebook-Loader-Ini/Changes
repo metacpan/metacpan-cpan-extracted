@@ -1,0 +1,69 @@
+Changes log for Data-Phrasebook-Loader-Ini
+==========================================
+
+0.14	2014-08-24
+        - fixed license fields in META.json to be lists.
+        - added repository link to META.yml.
+        - extended test suite.
+
+0.13	2013-06-02
+        - change file dates changed to meet W3CDTF standards.
+        - clarified licensing text.
+
+0.12    2012-07-29
+        - added Carp as a prerequisite.
+        - implemented Perl::Critic suggestions.
+
+0.11    2012-07-28
+        - spelling fix. (thanks to Nicholas Bamber, Florian Schlichting & 
+          Gregor Herrmann).
+        - removed License files from distro.
+        - Artistic License v2 now sole license.
+        - removed DSLIP info.
+        - added minimum perl version (5.006).
+        - reworked Makefile.PL for clarity.
+        - updated META.yml testing.
+        - added META.json
+        - added Changes file tests.
+
+0.10    2007-03-01
+        - Fixed META.yml typos.
+        - Added META.yml test script.
+
+0.09    2007-02-22
+        - Handwritten META.yml to conform to current specs.
+        - Changed all instances of LICENCE to LICENSE as *apparently*, to all
+          non-British users of this module, this a bug! I beg to differ -
+          http://dictionary.reference.com/search?q=licence
+        - Added an examples directory. Nothing in it yet, except a request
+          for interesting scripts.
+
+0.08    2005-08-09
+        - upped prerequisite for Data::Phrasebook to 0.23.
+        - added keywords() support.
+        - added POD for continuation lines.
+
+0.07    2005-06-15
+        - upped prerequisite for Data::Phrasebook to 0.22.
+
+0.06    2005-06-13
+        - dictionary reload bug spotted (Sam Tregar).
+        - added dicts() support.
+
+0.05    2005-03-25
+        - Added DSLIP information
+        - Rewrote test scripts
+        - Devel::Cover - 98.2%
+
+0.04    2005-03-03
+        - POD updates.
+
+0.03    2005-03-02
+        - Removed Test::MockObject from tests. No longer needed.
+
+0.02    2005-02-23
+        - revamped and renamed as part of the Data::Phrasebook framework
+
+0.01    2004-01-31
+        - Extracted from main Phrasebook distribution
+

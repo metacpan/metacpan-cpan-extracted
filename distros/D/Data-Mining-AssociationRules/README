@@ -1,0 +1,265 @@
+NAME
+    Data::Mining:AssociationRules - Mine association rules and frequent sets
+    from data.
+
+SYNOPSIS
+     use Data::Mining::AssociationRules;
+
+     my %transaction_map;
+     my $transaction_file = "foo.txt";
+
+     read_transaction_file(\%transaction_map, $transaction_file);
+
+     generate_frequent_sets(\%transaction_map, $output_file_prefix,
+                            $support_threshold, $max_n);
+
+     generate_rules($output_file_prefix, $support_threshold,
+                    $confidence_threshold, $max_n);
+
+     read_frequent_sets($set_map_ref, $file_prefix)
+
+     set_debug(1);
+
+     perl arm.pl -transaction-file foo.txt -support 2 -confidence-threshold 0.01 -max-set-size 6
+
+     See also FUNCTIONS, DESCRIPTION, and EXAMPLES below.
+
+INSTALLATION
+    The typical:
+
+    0 perl Makefile.PL
+    0 make test
+    0 make install
+
+FUNCTIONS
+  read_transaction_file($transaction_map_ref, $transaction_file)
+    Read in a transaction map from a file which has lines of two
+    whitespace-separated columns:
+
+         transaction-id item-id
+
+  generate_frequent_sets ($transaction_map_ref, $file_prefix, $support_threshold, $max_n)
+    Given
+
+    0 a map of transactions
+    0 a file prefix
+    0 a support threshold
+    0 a maximum frequent set size to look for (optional)
+
+    generate the frequent sets in some files, one file per size of the set.
+    That is, all 1-sets are in a file, all 2-sets in another, etc.
+
+    The files are lines of the form:
+
+         support-count item-set
+
+    where
+
+    0 support-count is the number of transactions in which the item-set
+    appears
+    0 item-set is one or more space-separated items
+
+  read_frequent_sets($set_map_ref, $file_prefix)
+    Given
+
+    0 a set map
+    0 a file prefix
+    0 support threshold
+    0 max frequent set size (optional)
+
+    read all the frequent sets into a single map, which has as its key the
+    frequent set (joined by single spaces) and as its value the support.
+
+  generate_rules($file_prefix, $support_threshold, $max_n)
+    Given
+
+    0 a file prefix
+    0 a support threshold (optional)
+    0 a confidence threshold (optional)
+    0 maximum frequent set size to look for (optional)
+
+    create a file with all association rules in it. The output file is of
+    the form:
+
+     support-count confidence left-hand-set-size right-hand-set-size frequent-set-size left-hand-set => right-hand-set
+
+DESCRIPTION
+    This module contains some functions to do association rule mining from
+    text files. This sounds obscure, but really measures beautifully simple
+    things through counting.
+
+  FREQUENT SETS
+    Frequent sets answer the question, "Which events occur together more
+    than N times?"
+
+   The detail
+    The 'transaction file' contains items in transactions. A set of items
+    has 'support' s if all the items occur together in at least s
+    transactions. (In many papers, support is a number between 0 and 1
+    representing the fraction of total transactions. I found the absolute
+    number itself more interesting, so I use that instead. Sorry for the
+    confusion.) For an itemset "A B C", the support is sometimes notated
+    "T(A B C)" (the number of 'T'ransactions).
+
+    A set of items is called a 'frequent set' if it has support at least the
+    given support threshold. Generating frequent set produces all frequent
+    sets, and some information about each set (e.g., its support).
+
+  RULES
+    Association rules answer the (related) question, "When these events
+    occur, how often do those events also occur?"
+
+   The detail
+    A rule has a left-hand set of items and a right-hand set of items. A
+    rule "LHS => RHS" with a support s and 'confidence' c means that the
+    underlying frequent set (LHS + RHS) occured together in at least s
+    transactions, and for all the transactions LHS occurred in, RHS also
+    occured in at least the fraction c (a number from 0 to 1).
+
+    Generating rules produces all rules with support at least the given
+    support threshold, and confidence at least the given confidence
+    threshold. The confidence is sometimes notated "conf(LHS => RHS) = T(LHS
+    + RHS) / T(LHS)". There is also related data with each rule (e.g., the
+    size of its LHS and RHS, the support, the confidence, etc.).
+
+   FREQUENT SETS AND ASSOCIATION RULES GENERALLY USEFUL
+    Although association rule mining is often described in commercial terms
+    like "market baskets" or "transactions" (collections of events) and
+    "items" (events), one can imagine events that make this sort of counting
+    useful across many domains. Events could be
+
+    0 stock market went down at time t
+    0 patient had symptom X
+    0 flower petal length was > 5mm
+
+    For this reason, I believe counting frequent sets and looking at
+    association rules to be a fundamental tool of any data miner, someone
+    who is looking for patterns in pre-existing data, whether commercial or
+    not.
+
+EXAMPLES
+    Given the following input file:
+
+     234 Orange
+     463 Strawberry
+     53 Apple
+     234 Banana
+     412 Peach
+     467 Pear
+     234 Pear
+     147 Pear
+     141 Orange
+     375 Orange
+
+    Generating frequent sets at support threshold 1 (a.k.a. 'at support 1')
+    produces three files:
+
+    The 1-sets:
+
+     1 Strawberry
+     1 Banana
+     1 Apple
+     3 Orange
+     1 Peach
+     3 Pear
+
+    The 2-sets:
+
+     1 Banana Orange
+     1 Banana Pear
+     1 Orange Pear
+
+    The 3-sets:
+
+     1 Banana Orange Pear
+
+    Generating the rules at support 1 produces the following:
+
+      1 0.333 1 1 2 Orange => Pear
+      1 0.333 1 1 2 Pear => Orange
+      1 1.000 1 2 3 Banana => Orange Pear
+      1 0.333 1 2 3 Orange => Banana Pear
+      1 1.000 2 1 3 Banana Orange => Pear
+      1 0.333 1 2 3 Pear => Banana Orange
+      1 1.000 2 1 3 Banana Pear => Orange
+      1 1.000 2 1 3 Orange Pear => Banana
+      1 1.000 1 1 2 Banana => Orange
+      1 0.333 1 1 2 Orange => Banana
+      1 1.000 1 1 2 Banana => Pear
+      1 0.333 1 1 2 Pear => Banana
+
+    Generating frequent sets at support 2 produces one file:
+
+     3 Orange
+     3 Pear
+
+    Generating rules at support 2 produces nothing.
+
+    Generating rules at support 1 and confidence 0.5 produces:
+
+      1 1.000 1 2 3 Banana => Orange Pear
+      1 1.000 2 1 3 Banana Orange => Pear
+      1 1.000 2 1 3 Banana Pear => Orange
+      1 1.000 2 1 3 Orange Pear => Banana
+      1 1.000 1 1 2 Banana => Orange
+      1 1.000 1 1 2 Banana => Pear
+
+    Note all the lower confidence rules are gone.
+
+ALGORITHM
+  Generating frequent sets
+    Generating frequent sets is straight-up Apriori. See for example:
+
+    http://www.almaden.ibm.com/software/quest/Publications/papers/vldb94_rj.
+    pdf
+
+    I have not optimized. It depends on having the transactions all in
+    memory. However, given that, it still might scale decently (millions of
+    transactions).
+
+  Generating rules
+    Generating rules is a very vanilla implementation. It requires reading
+    all the frequent sets into memory, which does not scale at all. Given
+    that, since computers have lots of memory these days, you might still be
+    able to get away with millions of frequent sets (which is <<millions of
+    transactions).
+
+BUGS
+    There is an existing tool (written in C) to mine frequent sets I kept
+    running across:
+
+    http://fuzzy.cs.uni-magdeburg.de/~borgelt/software.html#assoc
+
+    I should check it out to see if it is easy or desirable to be file-level
+    compatible with it.
+
+    One could imagine wrapping it in Perl, but the Perl-C/C++ barrier is
+    where I have encountered all my troubles in the past, so I wouldn't
+    personally pursue that.
+
+VERSION
+    This document describes Data::Mining::AssociationRules version 0.1.
+
+AUTHOR
+     Dan Frankowski
+     dfrankow@winternet.com
+     http://www.winternet.com/~dfrankow
+
+     Hey, if you download this module, drop me an email! That's the fun
+     part of this whole open source thing.
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    in the distribution and available in the CPAN listing for
+    Data::Mining::AssociationRules (see www.cpan.org or search.cpan.org).
+
+DISCLAIMER
+    To the maximum extent permitted by applicable law, the author of this
+    module disclaims all warranties, either express or implied, including
+    but not limited to implied warranties of merchantability and fitness for
+    a particular purpose, with regard to the software and the accompanying
+    documentation.
+

@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<rdf:RDF
+ xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+ xmlns="http://purl.org/rss/1.0/"
+ xmlns:georss="http://www.georss.org/georss"
+ xmlns:taxo="http://purl.org/rss/1.0/modules/taxonomy/"
+ xmlns:dc="http://purl.org/dc/elements/1.1/"
+ xmlns:syn="http://purl.org/rss/1.0/modules/syndication/"
+ xmlns:gml="http://www.opengis.net/gml"
+ xmlns:datacasting="http://datacasting.jpl.nasa.gov/datacasting"
+ xmlns:admin="http://webns.net/mvcb/"
+>
+
+<channel rdf:about="http://omiopsmds1:8202/service/rss?esdt=OMTO3">
+<title>OMTO3</title>
+<link>http://omiopsmds1:8202/service/rss?esdt=OMTO3</link>
+<description>OMTO3 data</description>
+<dc:language>en-us</dc:language>
+<dc:date>2007-03-13T07:00+00:00</dc:date>
+<dc:subject>rss feed for OMTO3 data</dc:subject>
+<syn:updatePeriod>daily</syn:updatePeriod>
+<syn:updateFrequency>1</syn:updateFrequency>
+<syn:updateBase>1901-01-01T00:00+00:00</syn:updateBase>
+<items>
+ <rdf:Seq>
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/data/8adf4a35531501f5fd89a4523386b901/OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/data/60e58cfa2421b6aa3f7d46d142bc081a/OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/data/9b8478aa4bf6cb2b70f7e49c09592797/OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/data/04055d2f6a84a662e57b4a6dfae2df73/OMI-Aura_L2-OMTO3_2007m1203t1053-o18002_v003-2007m1207t214123.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/data/8ffb77692799e529a9423467de3bdc08/OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5" />
+  <rdf:li rdf:resource="https://omisips1.omisips.eosdis.nasa.gov/service/rss?esdt=OMTO3&amp;date=2007-12-07 16:20:10-05&amp;count=5" />
+ </rdf:Seq>
+</items>
+</channel>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov/data/8adf4a35531501f5fd89a4523386b901/OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5">
+<title>OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov/data/8adf4a35531501f5fd89a4523386b901/OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2007-11-14 20:13:52-05
+esdt: OMTO3
+fileid: 1456934
+filename: OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5
+filesize: 50475262
+ingesttime: 2007-12-07 15:59:09-05
+lastchange: 2007-12-07 15:59:09-05
+md5: 8adf4a35531501f5fd89a4523386b901
+orbit: 17733
+source: OMI
+starttime: 2007-11-14 18:34:59-05
+</description>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:fileid>1456934</datacasting:fileid>
+<datacasting:dataSource>OMTO3</datacasting:dataSource>
+<datacasting:channelUID>OMTO3</datacasting:channelUID>
+<datacasting:esdt>OMTO3</datacasting:esdt>
+<datacasting:filesize>50475262</datacasting:filesize>
+<datacasting:unique_identifier>10003=OMTO3=17733</datacasting:unique_identifier>
+<datacasting:filename>OMI-Aura_L2-OMTO3_2007m1114t2334-o17733_v003-2007m1207t205841.he5</datacasting:filename>
+<datacasting:orbit>17733</datacasting:orbit>
+<datacasting:starttime>2007-11-14 18:34:59-05</datacasting:starttime>
+<datacasting:lastchange>2007-12-07 15:59:09-05</datacasting:lastchange>
+<datacasting:endtime>2007-11-14 20:13:52-05</datacasting:endtime>
+<datacasting:md5>8adf4a35531501f5fd89a4523386b901</datacasting:md5>
+<datacasting:ingesttime>2007-12-07 15:59:09-05</datacasting:ingesttime>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov/data/60e58cfa2421b6aa3f7d46d142bc081a/OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5">
+<title>OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov/data/60e58cfa2421b6aa3f7d46d142bc081a/OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5</link>
+<description>---
+archivesets: 10003
+endtime: 2007-12-03 05:53:15-05
+esdt: OMTO3
+fileid: 1457244
+filename: OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5
+filesize: 50444694
+ingesttime: 2007-12-07 16:19:50-05
+lastchange: 2007-12-07 16:19:50-05
+md5: 60e58cfa2421b6aa3f7d46d142bc081a
+orbit: 18001
+source: OMI
+starttime: 2007-12-03 04:14:22-05
+</description>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:unique_identifier>10003=OMTO3=18001</datacasting:unique_identifier>
+<datacasting:fileid>1457244</datacasting:fileid>
+<datacasting:dataSource>OMTO3</datacasting:dataSource>
+<datacasting:channelUID>OMTO3</datacasting:channelUID>
+<datacasting:esdt>OMTO3</datacasting:esdt>
+<datacasting:filesize>50444694</datacasting:filesize>
+<datacasting:filename>OMI-Aura_L2-OMTO3_2007m1203t0914-o18001_v003-2007m1207t214107.he5</datacasting:filename>
+<datacasting:orbit>18001</datacasting:orbit>
+<datacasting:starttime>2007-12-03 04:14:22-05</datacasting:starttime>
+<datacasting:lastchange>2007-12-07 16:19:50-05</datacasting:lastchange>
+<datacasting:endtime>2007-12-03 05:53:15-05</datacasting:endtime>
+<datacasting:md5>60e58cfa2421b6aa3f7d46d142bc081a</datacasting:md5>
+<datacasting:ingesttime>2007-12-07 16:19:50-05</datacasting:ingesttime>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov/data/9b8478aa4bf6cb2b70f7e49c09592797/OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5">
+<title>OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov/data/9b8478aa4bf6cb2b70f7e49c09592797/OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5</link>
+<description>
+
+    This file will start with urn 10003+XYZ and AS 10003.
+    It will change to be urn 70003 and AS 700003.
+    TODO document this
+
+    XYZ="OMTO3=18000"
+
+
+
+
+</description>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:archivesets>10003</datacasting:archivesets>
+<datacasting:unique_identifier>10003=OMTO3=18000</datacasting:unique_identifier>
+<datacasting:fileid>1457251</datacasting:fileid>
+<datacasting:dataSource>OMTO3</datacasting:dataSource>
+<datacasting:channelUID>OMTO3</datacasting:channelUID>
+<datacasting:esdt>OMTO3</datacasting:esdt>
+<datacasting:filesize>50444694</datacasting:filesize>
+<datacasting:filename>OMI-Aura_L2-OMTO3_2007m1203t0735-o18000_v003-2007m1207t211934.he5</datacasting:filename>
+<datacasting:orbit>18000</datacasting:orbit>
+<datacasting:starttime>2007-12-03 02:35:29-05</datacasting:starttime>
+<datacasting:lastchange>2007-12-07 16:20:02-05</datacasting:lastchange>
+<datacasting:endtime>2007-12-03 04:14:22-05</datacasting:endtime>
+<datacasting:md5>9b8478aa4bf6cb2b70f7e49c09592797</datacasting:md5>
+<datacasting:ingesttime>2007-12-07 16:20:02-05</datacasting:ingesttime>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov/data/04055d2f6a84a662e57b4a6dfae2df73/OMI-Aura_L2-OMTO3_2007m1203t1053-o18002_v003-2007m1207t214123.he5">
+<title>OMI-Aura_L2-OMTO3_2007m1203t1053-o18002_v003-2007m1207t214123.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov/data/04055d2f6a84a662e57b4a6dfae2df73/OMI-Aura_L2-OMTO3_2007m1203t1053-o18002_v003-2007m1207t214123.he5</link>
+<description>
+
+    This file will start with urn 70003+XYZ, but the urn will change
+    to be 10003+XYZ, superceding the above file.
+
+    (this would be in a separate feed in reality)
+
+</description>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:archivesets>70003</datacasting:archivesets>
+<datacasting:unique_identifier>70003=OMTO3=18000</datacasting:unique_identifier>
+<datacasting:fileid>1457256</datacasting:fileid>
+<datacasting:dataSource>OMTO3</datacasting:dataSource>
+<datacasting:channelUID>OMTO3</datacasting:channelUID>
+<datacasting:esdt>OMTO3</datacasting:esdt>
+<datacasting:filesize>50475262</datacasting:filesize>
+<datacasting:filename>file_that_superceded_10003</datacasting:filename>
+<datacasting:orbit>18000</datacasting:orbit>
+<datacasting:starttime>2007-12-03 05:53:15-05</datacasting:starttime>
+<datacasting:lastchange>2007-12-07 16:20:08-05</datacasting:lastchange>
+<datacasting:endtime>2007-12-03 07:32:07-05</datacasting:endtime>
+<datacasting:md5>04055d2f6a84a662e57b4a6dfae2df73</datacasting:md5>
+<datacasting:ingesttime>2007-12-07 16:20:08-05</datacasting:ingesttime>
+</item>
+
+<item rdf:about="https://omisips1.omisips.eosdis.nasa.gov/data/8ffb77692799e529a9423467de3bdc08/OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5">
+<title>OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5</title>
+<link>https://omisips1.omisips.eosdis.nasa.gov/data/8ffb77692799e529a9423467de3bdc08/OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5</link>
+<description>---
+archivesets: 10003 70003 90003
+endtime: 2007-12-03 09:11:00-05
+esdt: OMTO3
+fileid: 1457258
+filename: OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5
+filesize: 50475262
+ingesttime: 2007-12-07 16:20:10-05
+lastchange: 2007-12-07 16:20:10-05
+md5: 8ffb77692799e529a9423467de3bdc08
+orbit: 18003
+source: OMI
+starttime: 2007-12-03 07:32:07-05
+</description>
+<datacasting:source>OMI</datacasting:source>
+<datacasting:archivesets>10003 70003 90003</datacasting:archivesets>
+<datacasting:unique_identifier>10003=OMTO3=18003</datacasting:unique_identifier>
+<datacasting:fileid>1457258</datacasting:fileid>
+<datacasting:dataSource>OMTO3</datacasting:dataSource>
+<datacasting:channelUID>OMTO3</datacasting:channelUID>
+<datacasting:esdt>OMTO3</datacasting:esdt>
+<datacasting:filesize>50475262</datacasting:filesize>
+<datacasting:filename>OMI-Aura_L2-OMTO3_2007m1203t1232-o18003_v003-2007m1207t211940.he5</datacasting:filename>
+<datacasting:orbit>18003</datacasting:orbit>
+<datacasting:starttime>2007-12-03 07:32:07-05</datacasting:starttime>
+<datacasting:lastchange>2007-12-07 16:20:10-05</datacasting:lastchange>
+<datacasting:endtime>2007-12-03 09:11:00-05</datacasting:endtime>
+<datacasting:md5>8ffb77692799e529a9423467de3bdc08</datacasting:md5>
+<datacasting:ingesttime>2007-12-07 16:20:10-05</datacasting:ingesttime>
+</item>
+
+</rdf:RDF>

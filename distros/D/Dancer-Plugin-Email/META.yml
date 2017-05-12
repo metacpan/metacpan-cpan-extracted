@@ -1,0 +1,38 @@
+---
+abstract: 'Simple email sending for Dancer applications'
+author:
+  - 'Naveed Massjouni <naveed@vt.edu>'
+  - 'Al Newkirk <awncorp@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Email
+requires:
+  Authen::SASL: 2.16
+  Dancer: 0
+  Dancer::Plugin: 0
+  Email::Date::Format: 0
+  Email::Sender::Simple: 0
+  File::Type: 0
+  MIME::Base64: 3.14
+  MIME::Entity: 0
+  Module::Load: 0
+  Net::SMTP::SSL: 1.01
+  Net::SSLeay: 1.58
+resources:
+  bugtracker: http://github.com/ironcamel/Dancer-Plugin-Email/issues
+  repository: git://github.com/ironcamel/Dancer-Plugin-Email.git
+version: 1.0400

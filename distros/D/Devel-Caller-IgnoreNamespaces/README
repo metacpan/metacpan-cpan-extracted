@@ -1,0 +1,12 @@
+This module extract the Deeply Magical caller() function from
+Hook::LexWrap and makes it available to other modules.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under either the Artistic
+Licence or the GNU GPL version 2.  See the ARTISTIC.txt or GPL2.txt files
+for the full texts of the licences.

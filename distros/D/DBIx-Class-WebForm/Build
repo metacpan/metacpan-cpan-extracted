@@ -1,0 +1,53 @@
+#! /usr/bin/perl
+
+use strict;
+use Cwd;
+use File::Spec;
+
+BEGIN {
+  $^W = 1;  # Use warnings
+  my $curdir = File::Spec->canonpath( Cwd::cwd() );
+  unless ($curdir eq '/usr/src/perl/dbix-class/bast/trunk/DBIx-Class-WebForm') {
+    die ('This script must be run from /usr/src/perl/dbix-class/bast/trunk/DBIx-Class-WebForm, not '."$curdir\n".
+	 "Please re-run the Build.PL script here.\n");
+  }
+  @INC = 
+    (
+     '/home/castaway/perl/lib',
+     '/home/theorb/perl/lib',
+     '/usr/lib/perl5/5.8.4/i686-linux-thread-multi',
+     '/usr/lib/perl5/5.8.4',
+     '/usr/lib/perl5/site_perl/5.8.4/i686-linux-thread-multi',
+     '/usr/lib/perl5/site_perl/5.8.4',
+     '/usr/lib/perl5/site_perl/5.8.2/i686-linux-thread-multi',
+     '/usr/lib/perl5/site_perl/5.8.2',
+     '/usr/lib/perl5/site_perl/5.8.1',
+     '/usr/lib/perl5/site_perl/5.8.0',
+     '/usr/lib/perl5/site_perl/5.6.1',
+     '/usr/lib/perl5/site_perl/5.6.0',
+     '/usr/lib/perl5/site_perl/5.005',
+     '/usr/lib/perl5/site_perl',
+     '/usr/lib/perl5/site_perl/5.8.2/i686-linux-thread-multi',
+     '/usr/lib/perl5/site_perl/5.8.2',
+     '/usr/lib/perl5/site_perl/5.8.1',
+     '/usr/lib/perl5/site_perl/5.8.0',
+     '/usr/lib/perl5/site_perl/5.6.1',
+     '/usr/src/perl/dbix-class/bast/trunk/DBIx-Class-WebForm'
+    );
+}
+
+use Module::Build;
+
+if (-e 'Build.PL' and not Module::Build->up_to_date("Build.PL", $0)) {
+   warn "Warning: Build.PL has been altered.  You may need to run 'perl Build.PL' again.
+";
+}
+
+# This should have just enough arguments to be able to bootstrap the rest.
+my $build = Module::Build->resume (
+  properties => {
+    config_dir => '/usr/src/perl/dbix-class/bast/trunk/DBIx-Class-WebForm/_build',
+  },
+);
+
+$build->dispatch;

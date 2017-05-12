@@ -1,0 +1,53 @@
+{
+   "abstract" : "Parse and format LDAP datetime strings (Generalized Time)",
+   "author" : [
+      "Ashley Willis <ashley+perl@gitable.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.020, CPAN::Meta::Converter version 2.142060",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-LDAP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "Params::Validate" : "0",
+            "perl" : "v5.8.0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::LDAP" : {
+         "file" : "lib/DateTime/Format/LDAP.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://gitable.org/ashley/datetime-format-ldap.git",
+         "web" : "https://gitable.org/ashley/datetime-format-ldap.git"
+      }
+   },
+   "version" : "0.002"
+}
+

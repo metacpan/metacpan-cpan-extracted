@@ -1,0 +1,97 @@
+NAME
+    DateTime::Event::Zodiac - Return zodiac for a given date
+
+SYNOPSIS
+      use DateTime::Event::Zodiac qw(zodiac_date_name zodiac_date_symbol zodiac_astro_name zodiac_astro_symbol);
+      
+  my $dt = DateTime->new( 
+           year   => 1979,
+           month  => 3,
+           day    => 27,
+      );
+
+      print zodiac_date_name($dt);
+      print zodiac_astro_symbol($dt);
+
+    Returns the latin zodiac name or alternatively the unicode zodiac symbol
+    for the given date. The zodiac may be calculated using either fixed
+    dates or using the longitude/position of the sun.
+
+    The module exports no symbols by default. All used functions must be
+    requested in the use statement.
+
+    All methods return undef on failiure.
+
+DESCRIPTION
+  zodiac_date_name
+     $name = zodiac_date_name($dt);
+
+    Latin zodiac name: aries, taurus, gemini, ... Fixed dates.
+
+  zodiac_date_symbol
+     $symbol = zodiac_date_symbol($dt);
+
+    Unicode zodiac symbol positions U+2648 to U+2653 Fixed dates.
+
+  zodiac_astro_name
+     $name = zodiac_astro_name($dt);
+
+    Latin zodiac name: aries, taurus, gemini, ... Calculated from the
+    longitude/position of the sun.
+
+  zodiac_astro_symbol
+     $symbol = zodiac_astro_symbol($dt);
+
+    Unicode zodiac symbol positions U+2648 to U+2653 Calculated from the
+    longitude/position of the sun.
+
+  zodiac_date
+    Simply computes the zodiac from the date and returns a hash with the
+    keys name, symbol, start and end.
+
+    Used internally by "zodiac_date_name" and "zodiac_date_symbol"
+
+  zodiac_astro
+    Computes the zodiac from the position of the sun and returns a hash with
+    the keys name, symbol, start and end. The keys start and end should be
+    ignored since they are used for the "zodiac_date" function.
+
+    May differ from the results of "zodiac_date" depending on the solar year
+    (leap year ect).
+
+    See DateTime::Util::Astro::Sun for notes on accuracy. If computed
+    accurately enough this module should be also able to get the correct
+    zodiac for the exact time of birth.
+
+    Used internally by "zodiac_astro_name" and "zodiac_astro_symbol"
+
+DISCLAIMER
+    The author of this module regads astrology as being a pseudoscience and
+    superstition. I wrote this module for my job. I was young, foolish and I
+    needed the money.
+
+TODO
+    The "zodiac_astro_horoscope" and "zodiac_date_horoscope" functions have
+    not yet been implemented ;-)
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "datetime-event-zodiac@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org>. I will be notified, and then you'll automatically
+    be notified of progress on your bug as I make changes.
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+        L<http://www.k-1.com>
+
+COPYRIGHT
+    DateTime::Event::Zodiac is Copyright (c) 2006,2007 Maroš Kollár.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

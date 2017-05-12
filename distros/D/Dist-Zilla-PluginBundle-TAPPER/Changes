@@ -1,0 +1,25 @@
+Revision history for Dist-Zilla-PluginBundle-TAPPER
+
+0.006     2017-02-08
+        - add Test::Compile with option 'test_compile_skip'
+
+0.005     2015-12-09
+        - do not require release branch anymore
+
+0.004     2015-09-08
+        - dependencies cleanup
+        - add [Test::Compile]
+
+0.003     2015-09-08
+        - replace [PodCoverageTests] with [Test::Pod::Coverage::Configurable],
+          now allowing an additional regex which modules to skip:
+            skip_pod_modules = qr/^My::Known::Undocumented::Plugins::/
+
+0.002     2015-04-02
+        - dzil pluginbundle TAPPER
+        - switch [NoTabsTests] to [Test::NoTabs]
+          and    [EOLTests]    to [Test::EOL]
+          as the previous plugins are now deprecated.
+
+0.001     2012-11-19
+        - Dist::Zilla pluginbundle for all Tapper libs

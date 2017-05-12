@@ -1,0 +1,16 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+#use Test::More 0.88;
+use Test::DZil;
+use Moose::Autobox;
+
+my $zilla = Builder->from_config ({ dist_root => 'corpus/DZT' });
+$zilla->build;
+
+my $file = $ARGV[0] || 'docs/DZT.html';
+my $content = $zilla->files->grep ( sub { $_->name eq $file } )->head->content;
+print STDOUT $content;
+
+__END__

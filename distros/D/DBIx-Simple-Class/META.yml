@@ -1,0 +1,37 @@
+---
+abstract: 'Advanced object construction for DBIx::Simple!'
+author:
+  - "Ð\x9AÑ\x80Ð°Ñ\x81Ð¸Ð¼Ð¸Ñ\x80 Ð\x91ÐµÑ\x80Ð¾Ð² <berov@cpan.org>"
+build_requires:
+  Cwd: '0'
+  DBD::SQLite: '1.42'
+  File::Basename: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.142060'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Simple-Class
+no_index:
+  directory:
+    - t
+    - inc
+    - t
+requires:
+  Carp: '0'
+  DBIx::Simple: '1.35'
+  Data::Dumper: '0'
+  File::Path: '2.07'
+  File::Spec: '0'
+  IO::File: '0'
+  Params::Check: '0'
+  Test::More: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/kberov/DBIx--Simple--Class/issues
+  license: http://www.opensource.org/licenses/artistic-license-2.0
+  repository: https://github.com/kberov/DBIx--Simple--Class
+version: '1.009'

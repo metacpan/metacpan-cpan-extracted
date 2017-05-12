@@ -1,0 +1,67 @@
+2.06 Wednesday 16th January, 2013
+       Corrected some pod syntax RT#56456
+       Handle the new padrange op added in 5.17 RT#81704
+
+2.05 Thursday 8th April, 2010
+	Don't call B::PADOP->gv.  Work by by Florian Ragwitz
+	http://github.com/rafl/perl-devel-caller/commit/248a23390eef48a73bb717be085da58ce50ff784
+
+2.04 Tuesday 16th February, 2010
+	Use CxTYPE macro rather than directly inspecting cx->cx_type
+	http://rt.cpan.org/Public/Bug/Display.html?id=33005
+
+2.03 Tuesday 8th January, 2008
+	Rerelease from a linux host to avoid hateful OSX and its
+	hateful resource forks http://rt.cpan.org/Ticket/Display.html?id=32154
+
+2.02 Friday 28th December, 2007
+	Make use of INT2PTR macro for great justice! (or 64-bit stuff,
+	it's hard to tell)
+
+2.01 Thursday 27th December, 2007
+	Translated the XS and C into perl using B.  Though the perl looks
+	much like C this gives a chance to make it more perlish in the future.
+  	There's a tiny bit of XS left to expose some internals to perl space.
+	
+	Dropped compatibilty for older perls (PadWalker doesn't work 
+	there anyway)
+
+0.11 Sunday 9th July, 2006
+	Fudge around the segfaults in 5.8.x ithreaded builds by
+	not looking up what the package variable is.
+
+0.10 Wednesday 5th July, 2006
+	Use strlen rather than playing with SvLEN/SvCUR to determine
+	the length of identifiers in the pad.  It's a theoretical
+	segfault waiting to happen, but one that isn't tickled by the
+	current test suite.  Fixes failures under perl 5.8.8 as
+	reported by clkao.
+
+0.09 Sunday 5th October, 2003
+	Split Changes out from HISTORY pod section.
+	Port to Module::Build
+	We can now determine constant values in called_with.
+	Partial fixes for http://rt.cpan.org/NoAuth/Bug.html?id=2878
+
+0.08 2003-03-28
+	Added caller_vars as a synonym for called_with
+	Added caller_args
+
+0.07 2002-11-21
+	Fix to called_as_method from Rafael Garcia-Suarez to handle
+	$foo->$method() calls.
+
+0.06 2002-11-20
+	Added called_as_method routine
+
+0.05 2002-07-25
+	Fix a segfault under ithreads.  
+	Cleaned up some development cruft that leaked out while
+	rushing.
+
+0.04 2002-07-01
+	Decode glob params too.
+
+0.03 2002-04-02
+	Refactored to share the upcontext code from PadWalker 0.08
+

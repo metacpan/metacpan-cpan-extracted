@@ -1,0 +1,11 @@
+Build.PL
+Changelog.ini
+CHANGES
+examples/test-hash2table.pl
+lib/DBIx/Hash2Table.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/pod.t
+t/test.t

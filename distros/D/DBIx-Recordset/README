@@ -1,0 +1,130 @@
+
+DBIx::Recordset - Perl extension for DBI recordsets
+
+Copyright (c) 1997-2001 Gerald Richter / ECOS
+
+You may distribute under the terms of either the GNU General Public 
+License or the Artistic License, as specified in the Perl README file.
+
+THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED 
+WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF 
+MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+
+
+OVERVIEW
+
+DBIx::Recordset is a perl module for abstraction and simplification of
+database access.
+
+The goal is to make standard database access (select/insert/update/delete)
+easier to handle and independend of the underlying DBMS. Special attention is
+made on web applications to make it possible to handle the state-less access
+and to process the posted data of formfields, but DBIx::Recordset is not
+limited to web applications.
+
+
+The main features of DBIx::Recordset are:
+
+- it has a compact interface, normaly only one function call is necessary
+  for setup and data retrival/inseration/deletion
+
+- it takes care about type conversion and quoting
+
+- it is able to access/modify tables via arrays and hashs
+
+- it can automaticly create sub-objects for tables which are logical linked
+  together
+
+- it can automatily create joins based on logical links
+
+- it has input/output filters on a per field/per type basis
+
+- it can create WHERE expression from a hash, which is especially usefull in
+  a cgi environement, where you can simply pass all paramters posted to your cgi
+  script to DBIx::Recordset and DBIx::Recordset creates an corresponding SELECT.
+
+- it can create previous/next buttons for html output
+
+- it works together with HTML::Embperl for easily genration of HTML output
+
+- it has an own database abtraction class DBIx::Compat which gives all the
+  necessary information, so that DBIx::Recordset is able to work with
+  different database systems
+
+- The new class DBIx::Database is able to retrieve and store meta infomation
+  of the database in a centralised location, which can be used for later
+  setup. This is also usefull when running under mod_perl, because you can do
+  all the setup and configuration work at webserver startup time, speeding up
+  your scripts when a actual request is processed.
+
+
+DBIx::Recordset use the DBI API to access the database, so it should work with
+every database for which a DBD driver is available (see also DBIx::Compat)
+
+
+For more information look at perldoc DBIx::Recordset.
+An introduction to DBIx::Recordset can be view with perldoc Intrors.pod.
+The introduction can also be viewed online at 
+
+  http://perl.apache.org/embperl/Intrors.pod.cont.html
+
+
+
+INSTALLATION
+
+As usual start with
+
+perl Makefile.PL
+
+The makefile tries to detecd your installed DBD drivers and asks you
+for a database for performing the tests. The database must exist before
+the make test can run!
+
+Now you are ready todo a
+
+make
+
+and
+
+make test
+
+if make test runs ok, do a make install and you are ready. If not you should
+check if a entry for your DBD driver exists in the file Compat.pm.
+If not create one. For more information how todo this look at
+
+perldoc Compat
+
+Currently there are entries for
+- DBD::mSQL
+- DBD::mysql
+- DBD::Pg
+- DBD::Solid
+- DBD::ODBC
+- DBD::Oracle (requires DBD::Oracle 0.60 or higher)
+- DBD::Sybase 
+- DBD::CSV
+- DBD::Informix 
+- DBD::InterBase
+
+If you create your own entry please send it to me, so I can include it
+in the next release.
+
+After changing the Compat.pm rerun make test to make sure it works!
+
+If you don't get make test to work for you, please send me the file
+test.log (Normaly it should be enought to send the part for the test,
+that fails) along with the versions of DBI and the DBD driver you are using.
+
+
+EXAMPLES
+
+The perldoc DBIx::Recordset contains a lot of examples for function calls.
+The directory eg/ contains examples for HTML::Embperl and CGI.pm
+Also you can look at test.pl, which should use most aspects of DBIx::Recordset
+
+
+
+SUPPORT
+
+As far as possible for me, support will be available directly from me or via the
+DBI Users mailinglist.

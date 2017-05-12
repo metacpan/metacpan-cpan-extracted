@@ -1,0 +1,10 @@
+Revision history for Devel-Trace-Fork
+
+0.11    2010-05-06
+        Added timestamp, $? to output. Default output is to
+	file, with Devel::Trace::Fork::Stderr to send output
+	to STDERR.
+
+0.10    2010-02-10
+        First version, released on an unsuspecting world.
+

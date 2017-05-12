@@ -1,0 +1,7 @@
+Revision history for Dancer2-Logger-Multiplex
+
+0.02  2017-01-21 15:40:19 SGT
+        - Run POD-related tests only for authors
+
+0.01  2017-01-19 18:00:22 SGT
+        - Initial release

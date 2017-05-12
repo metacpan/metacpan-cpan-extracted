@@ -1,0 +1,55 @@
+---
+abstract: 'I2C interface to PCA9685 16 channel 12 bit PWM Generator'
+author:
+  - 'Shantanu Bhadoria <shantanu at cpan dott org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  blib: 1.01
+  perl: 5.010
+configure_requires:
+  ExtUtils::MakeMaker: 0
+  perl: 5.010
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-PCA9685
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Device::PCA9685:
+    file: lib/Device/PCA9685.pm
+    version: 0.004
+  Device::PWMGenerator::PCA9685:
+    file: lib/Device/PWMGenerator/PCA9685.pm
+    version: 0.004
+requires:
+  Device::SMBus: 0
+  Moose: 0
+  POSIX: 0
+  Time::HiRes: 0
+  constant: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-device-pca9685/issues
+  homepage: https://metacpan.org/release/Device-PCA9685
+  repository: git://github.com/shantanubhadoria/perl-device-pca9685.git
+version: 0.004
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'

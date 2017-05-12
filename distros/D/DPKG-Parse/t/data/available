@@ -1,0 +1,61 @@
+Package: cl-infix
+Priority: optional
+Section: non-free/devel
+Installed-Size: 104
+Maintainer: Kevin M. Rosenberg <kmr@debian.org>
+Architecture: all
+Version: 19960628.2-1
+Depends: common-lisp-controller (>= 3.37)
+Filename: pool/non-free/c/cl-infix/cl-infix_19960628.2-1_all.deb
+Size: 15202
+MD5sum: 5d749676987c7822b3bb64fa608d4998
+Description: an infix reader macro for Common Lisp
+ This package provides an infix reader macro for Common Lisp,
+ allowing use of more
+ traditional mathematical syntaxes in Common Lisp programs.
+
+Package: dlint
+Priority: extra
+Section: net
+Installed-Size: 73
+Maintainer: Florian Hinzmann <fh@debian.org>
+Architecture: all
+Version: 1.4.0-4
+Depends: perl, dnsutils
+Filename: pool/main/d/dlint/dlint_1.4.0-4_all.deb
+Size: 21950
+MD5sum: a99a403f81aa2bc65ee11b34acf750fe
+Description: Checks dns zone information using nameserver lookups
+ This program analyzes any DNS zone you specify, and reports any problems it
+ finds by displaying errors and warnings.  Then it descends recursively to
+ examine all zones below the given one (this can be disabled with a command-
+ line option).
+ .
+ You don't have to feed any BIND conffiles to Dlint. Dlint uses
+ nameserver calls to gather information.
+ .
+ Designed for Unix, dlint is written in Bourne Shell and Perl.
+ .
+ You may try it online at http://www.domtools.com/dns/dlint.shtml
+ (this server imposes a timeout period; to lint a big zone, you should
+ install dlint yourself and use it locally - that's what this package is for).
+Task: dns-server
+
+Package: glotski
+Priority: optional
+Section: gnome
+Installed-Size: 180
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Architecture: i386
+Version: 0.2-3
+Depends: gdk-imlib1, libart2 (>= 1.2.13-5), libaudiofile0 (>= 0.2.3-4), libc6 (>= 2.3.2.ds1-4), libdb3 (>= 3.2.9-19), libesd0 (>= 0.2.29-1) | libesd-alsa0 (>= 0.2.29-1), libglib1.2 (>= 1.2.0), libgnome32 (>= 1.2.13-5), libgnomesupport0 (>= 1.2.13-5), libgnomeui32 (>= 1.4.2-3), libgtk1.2 (>= 1.2.10-4), xlibs (>> 4.1.0)
+Filename: pool/main/g/glotski/glotski_0.2-3_i386.deb
+Size: 25330
+MD5sum: a686ab749720aa1af32b317b0835fc7d
+Description: Slide the blocks to reach a goal
+ Simple but smart game, similar to Klotski.
+ .
+ Slide blocks around the puzzle until a certain goal condition is reached.
+ .
+ Screenshot available here: http://gfpoken.bigw.org/glotski/
+

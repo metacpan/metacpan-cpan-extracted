@@ -1,0 +1,57 @@
+# Devel::PreProcessor -- 2003.1128
+
+  Name            DSLIP  Description
+  --------------  -----  ---------------------------------------------
+  Devel::
+  ::PreProcessor  rdpfp  Module inlining and other Perl source manipulations
+
+This package processes Perl source files and outputs a modified
+version acording to several user-setable options, as follows:
+
+If the Includes flag is activated, Devel::PreProcessor will attempt
+to replace C<use> and C<require> statements with inline declarations
+containg the source of the relevant library found in the current
+@INC. The resulting script should operate identically and no longer
+be dependant on external libraries, but note that libraries inlined
+with Includes may not be appropriate on another system, ex, if
+Config is inlined, the script may fail if run on a platform other
+than that on which it was built.
+
+If the StripPods flag is activated, Devel::PreProcessor will not
+include POD documentatation from the source files.
+
+If the Conditionals flag is activated, Devel::PreProcessor will
+utilize a simple conditional inclusion scheme. Lines begining with
+"#__CONDITIONAL__ if ..." will have the remainder of the line
+evaluated as a Perl expression; unless the result is true, the
+following lines will be omitted until a line containing "#__CONDITIONAL__
+endif"
+
+This module has been tested in several environments and no major
+problems have been discovered, but those tests have been somewhat
+limited and you are advised to try it in your environment to confirm
+it works as expected.
+
+You should be able to install this module using the CPAN shell
+interface:
+
+  perl -MCPAN -e 'install Devel::PreProcessor'
+
+Alternately, you may retrieve this package from CPAN or from the
+author's site:
+* http://search.cpan.org/~evo/
+* http://www.cpan.org/modules/by-authors/id/E/EV/EVO
+* http://www.evoscript.org/Devel-PreProcessor/dist/
+
+After downloading the distribution, follow the normal procedure to
+unpack and install it, using the commands shown below or their
+local equivalents on your system:
+
+  tar -xzf Devel-PreProcessor-*.tar.gz
+  cd Devel-PreProcessor-*
+  perl Makefile.PL
+  make test && sudo make install
+  
+---
+Copyright 1998 Evolution Online Systems, Inc.
+You may use this package for free under the terms of the Artistic License.

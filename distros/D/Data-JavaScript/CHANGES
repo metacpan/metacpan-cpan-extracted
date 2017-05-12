@@ -1,0 +1,72 @@
+Revision history for Perl extension Data::JavaScript.
+
+1.13  Thu Aug 14 11:01:10 EDT 2008
+	- Finished implementing import
+	- "Simplified"/unified __quotemeta code forks
+
+1.12  Wed Aug 13 22:48:12 EDT 2008
+	- Some minor refactoring, including the removal of a dependency on
+	  Exporter
+	- Fixed a misnumbered test in 1_11, which was intended to be a
+	  development release.
+	- Escape </script> based on reports of certain stupid browsers
+	  ceasing to parse JavaScript upon encountering this string,
+	  even in strings.
+	- Added explicit license
+
+1_11  Tue Nov 15 14:30:22 EST 2005
+	- Touched up documentation
+	- Fixed syntax errors for hash key names that are also JS keywords
+	  Reported by Kevin J. of Activestate
+	- Hash keys are now dumped in alphabetical order, this makes code
+	  easier to debug (as suggested by Scott Wessels) and is necessary
+	  for thorough testing.
+	- Special characters tab, newline, carriage return, ", and \ are
+	  now escaped in place instead of as hex: \t, \n, \r, \", \\
+
+1.10  Sun Nov 13 03:50 EST 2005
+	- Touched up documentation
+	- Explicitly requires Perl 5
+	- Previously undocumented, "private", quotemeta is now __quotemeta
+	  though you may still import and use it
+	- Defaults to JavaScript1.3 compatible code with Unicode and undefined
+	  support, specifc JS=>1.2 on the use line for backwards compatbility.
+	- Removed unnecessary evaluation of numeric elements, this fixes octal
+	  interpretation of zipcodes, etc. Still, zipcodes such as 02137 would
+	  be *correctly* evaluated by the client as 1119. However, in keeping
+	  with the principle of least surprise any purely numeric string with
+	  a leading zero will be treated as a string and quoted. If you really
+	  meant to send a literal octal value, you can always eval the var
+	  Similarly, engineering and hex notations are passed through to
+	  strings as well.
+
+	  Thanks for reports from Javier Arturo Rodriguez, Marius Feraru,
+	  Joseph Annino, Alan Fairless, Kevin J.
+	- quotemeta has been completely rewritten with support for Unicode
+
+	  Thanks for reports from Slaven Rezic, Marius Feraru, Sean Burke
+
+1.08  Thu Feb 13 09:04:27 EST 2003
+	- Touched up the documentation
+
+1.07  Sat Feb  8 12:40:16 EST 2003
+        - Added means to control how undef is dumped, suggested by Slaven Rezic
+	  In doing so I have removed the undocumented feature that a list
+	  was silently transformed into a list reference.
+	- Touched up the documentation
+
+****
+
+Ariel Brosh passed away a few months ago. I volunteered to maintain this
+module as it was the inspiration for my own Data::JavaScript::LiteObject
+
+http://use.perl.org/article.pl?sid=03/01/12/226258&mode=nested
+
+****
+
+1.04  Thu Jul 19          2001
+	- Fixed quoting back, thanks to Garick Hamlin
+
+1.00  Mon Jun 12 21:03:29 2000
+	- original version; created by h2xs 1.19
+

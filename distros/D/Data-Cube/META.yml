@@ -1,0 +1,39 @@
+---
+abstract: "It's new $module"
+author:
+  - 'muddydixon <muddydixon@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.6.5, CPAN::Meta::Converter version 2.130880'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Cube
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  Data::Cube:
+    file: lib/Data/Cube.pm
+    version: 0.02
+requires:
+  Data::Nest: 0.04
+  Scalar::Util: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/muddydixon/Data-Cube/issues
+  homepage: https://github.com/muddydixon/Data-Cube
+  repository: git://github.com/muddydixon/Data-Cube.git
+version: 0.02

@@ -1,0 +1,112 @@
+NAME
+    Data::Dumper::Sorted - Dumper with repeatable signature
+
+SYNOPSIS - similar to Data::Dumper
+    Data::Dumper::Sorted generates a unique signature for hashs by sorting
+    the keys into alphabetic order.
+
+    Data::Dumper actually does much more than this, however, it does not
+    stringify hash's in a consistent manner. i.e. no SORT
+
+    The routines below, while not covering recursion loops, non ascii
+    characters, etc.... does produce text that can be eval'd and is
+    consistent with each rendering, version of Perl, and platform.
+
+    The module routines may be called as functions or methods.
+
+      use Data::Dumper::Sorted qw(
+            hexDumper
+            hexDumperC
+            hexDumperA
+            Dumper
+            DumperC
+            DumperA
+      };
+
+    OR as methods
+
+      require Data::Dumper::Sorted;
+
+      my $dd = new Data::Dumper::Sorted;
+
+    A blessed reference is not really needed.
+
+      my $dd = 'Data::Dumper::Sorted';
+
+      $countText = $dd->hexDumperC($ref);
+      $evalText  = $dd->hexDumper($ref);
+      ($text,$count) = $dd->hexDumperA($ref);
+
+      $countText = $dd->DumperC($ref);
+      $evalText  = $dd->Dumper($ref);
+      ($text,$count) = $dd->DumperA($ref);
+
+    * $dd = new Data::Dumper::Sorted;
+    This method returns a blessed reference that can be used to access the
+    functions in this modules as methods.
+
+    * $countText = hexDumperC($ref);
+      same as:
+            scalar DumperA($ref);
+
+    It prefixes the dumped text with a COUNT of the nodes in the text
+    instead of a symbol name. This is useful in developing perl test
+    routines.
+
+    i.e 5 { text....
+
+    instead of: $Var = { text....
+
+    * $evalText = hexDumper($ref);
+    Same form as Data::Dumper. This method returns a string which can be
+    eval'd to reconstitute the reference.
+
+    * ($text,$count) = hexDumperA($ref);
+    Returns the text of fully numeric data items converted to hex.
+
+      input:        reference
+      return:       array context
+             text_for_reference_contents,
+             count_of_data_items
+
+                    scalar context
+             count  text_for_reference_contents
+
+    * $countText = DumperC($ref);
+      same as:
+            scalar DumperA($ref);
+
+    It prefixes the dumped text with a COUNT of the nodes in the text
+    instead of a symbol name.. This is useful in developing perl test
+    routines.
+
+    i.e 5 { text....
+
+    instead of: $Var = { text....
+
+    * $evalText = Dumper($ref);
+    Same form as Data::Dumper. This method returns a string which can be
+    eval'd to reconstitute the reference.
+
+    * ($text,$count) = DumperA($ref);
+      input:        reference
+      return:       array context
+             text_for_reference_contents,
+             count_of_data_items
+
+                    scalar context
+             count  text_for_reference_contents
+
+AUTHOR
+    Michael Robinton, <miker@cpan.org>
+
+COPYRIGHT
+    Copyright 2013-2014, Michael Robinton
+
+    This program is free software; you may redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+

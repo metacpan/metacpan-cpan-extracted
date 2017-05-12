@@ -1,0 +1,11 @@
+Revision history for Data-ResultSet
+
+1.001	Mon, 10 Mar 2008 14:07:08 -0400
+	Add missing test dependencies to Makefile.PL
+
+1.000	Fri, 07 Mar 2008 14:35:12 -0500 dmo
+	Convert to Module::Install
+	First CPAN release
+
+0.001	Thu, 03 May 2007 10:53:05 -0400 dmo
+	First working version

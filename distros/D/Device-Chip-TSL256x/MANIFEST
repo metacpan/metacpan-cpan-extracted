@@ -1,0 +1,17 @@
+Build.PL
+Changes
+examples/tsl2560.pl
+lib/Device/Chip/TSL256x.pm
+MANIFEST			This list of files
+t/00use.t
+t/01id.t
+t/02power.t
+t/03config.t
+t/10read-data.t
+t/11read-lux.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

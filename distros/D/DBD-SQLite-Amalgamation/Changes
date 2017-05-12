@@ -1,0 +1,36 @@
+[Changes for 3.6.1.2 (DBD::SQLite 1.14001) - 2008-08-16]
+
+* Skip t/12create_collation.t when running under Perl earlier than 5.8.
+
+* Support for $dbh->column_info for real.
+  Contributed by: Max Maischein
+
+[Changes for 3.6.1.1 (DBD::SQLite 1.14001) - 2008-08-15]
+
+* Support for $dbh->column_info.
+  Contributed by: Max Maischein
+
+* Support for custom "progress_handler" and "create_collation" functions.
+  Contributed by: Dami Laurent
+
+[Changes for 3.6.1 (DBD::SQLite 1.14) - 2008-08-07]
+
+* Updated to SQLite's 3.6.1 release.
+
+[Changes for 3.5.9 (DBD::SQLite 1.14) - 2008-05-16]
+
+* Updated to SQLite's 3.5.9 release.
+
+[Changes for 3.5.8 (DBD::SQLite 1.14) - 2008-03-18]
+
+* Updated to SQLite's 3.5.8 release.
+
+* The FTS3 Full-text search engine is now built by deault.
+
+[Changes for 3.5.7 (DBD::SQLite 1.14) - 2008-03-18]
+
+* Updated to SQLite's 3.5.7 release.
+
+[Changes for 3.5.6 (DBD::SQLite 1.14) - 2008-02-07]
+
+* Initial CPAN release.

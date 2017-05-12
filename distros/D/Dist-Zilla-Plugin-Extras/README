@@ -1,0 +1,42 @@
+SYNOPSIS
+
+    In your dist.ini:
+
+      [Extras]
+      foo = 1
+      bar = 2
+    
+      [Extras / Baz]
+      qux = 1
+      quux = 2
+
+DESCRIPTION
+
+    This plugin lets you specify extra parameters in your dist.ini under
+    the [Extras] section. Other than that it does nothing. It basically
+    serves as "bags" to put parameters in.
+
+    One use-case of this is to put template variables in your dist.ini,
+    e.g.:
+
+     [Extras]
+     name1 = value1
+     name2 = value2
+
+    The parameters are available for other plugins through $zilla
+    (Dist::Zilla object), e.g.:
+
+     my $extras_plugin = grep { $_->plugin_name eq 'Extras' } $zilla->plugins;
+     my $name1 = $extras_plugin->params->{name1}; # -> "value1"
+
+    Another use-case of this is to put stuffs to be processed by other
+    software aside from Dist::Zilla (e.g. see App::LintPrereqs).
+
+ATTRIBUTES
+
+ params => hash
+
+SEE ALSO
+
+    Dist::Zilla
+

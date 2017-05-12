@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+todo.txt
+t/DBIx-LogAny.t
+t/simple.t
+t/lib.pl
+lib/DBIx/LogAny.pm
+lib/DBIx/LogAny/Constants.pm
+lib/DBIx/LogAny/st.pm
+lib/DBIx/LogAny/db.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

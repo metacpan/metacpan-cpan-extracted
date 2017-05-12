@@ -1,0 +1,50 @@
+---
+abstract: 'Wrap any simple class as a service for Dancer2'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0.19'
+  HTTP::Request::Common: '0'
+  HTTP::Tiny: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  JSON: '0'
+  Plack::Test: '0'
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Adapter
+provides:
+  Dancer2::Plugin::Adapter:
+    file: lib/Dancer2/Plugin/Adapter.pm
+    version: '0.007'
+recommends:
+  Class::Load::XS: '0'
+  Dancer2: '0.153000'
+requires:
+  Class::Load: '0'
+  Dancer2::Plugin: '0'
+  perl: '5.008001'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/dancer2-plugin-adapter/issues
+  homepage: https://github.com/PerlDancer/dancer2-plugin-adapter
+  repository: https://github.com/PerlDancer/dancer2-plugin-adapter.git
+version: '0.007'
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Blabos de Blebe <blabos@blabos.org>'
+  - 'mascip (Pierre Masci) <piemas25+git@gmail.com>'
+  - 'Peter Mottram <peter@sysnix.com>'
+  - 'Russell Jenkins <veryrusty@gmail.com>'

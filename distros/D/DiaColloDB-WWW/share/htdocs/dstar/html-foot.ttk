@@ -1,0 +1,20 @@
+<div id="footers">
+  [% IF root_email %]
+  <div id="footer_sig">
+    <address><a href="mailto:[% root_email %]">[% root_email %]</a></address>
+  </div>
+  [% END %]
+  [% IF linkttk %]
+  <div class="linkbar">[% PROCESS "$linkttk" %]</div>
+  [% ELSE %]
+  <p/>
+  [% END %]
+</div>
+<span class="elapsed">[% elapsed() |html %]&#xa0;sec</span>
+<span class="package">[% IF foot_package_text %][% foot_package_text %][% ELSE %][% gen_label |html %] version [% VERSION |html %][% END %]</span>
+[%#--
+  # Local Variables:
+  # mode: nxml
+  # coding: utf-8
+  # End:
+--%]

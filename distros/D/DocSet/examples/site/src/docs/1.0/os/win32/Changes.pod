@@ -1,0 +1,34 @@
+=head1 NAME
+
+Changes
+
+=head1 Description
+
+Refer to this document to learn what changes were made to the
+documents, since you've read these last time.
+
+The most recent changes are listed first.
+
+=head1 ???
+
+* Make the os docset, containing the win32 chapters.
+
+=head1 Thu May 30 13:47:02  SGT 2002
+
+* split content into install and config
+  [Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>]
+
+=head1 Wed Apr  3 16:08:49 SGT 2002
+
+* normalize the case, change the titles slightly (we won't need underscored
+  titles for the documentation, normal ones are much more readable), and
+  corrected some minors things (reference to nmake, and changed some spacing
+  in examples to make it one long code section as is advised in style.pod).
+  [Per Einar Ellefsen E<lt>per.einar@skynet.beE<gt>]
+
+=head1 Fri Dec 21 12:20:02  SGT 2001
+
+* win32::multithread, win32::binaries and win32::compile initial docs
+  submitted by Randy Kobes E<lt>randy@theoryx5.uwinnipeg.caE<gt>
+
+=cut

@@ -1,0 +1,46 @@
+{
+   "abstract" : "Metadata resource URLs from Git configuration",
+   "author" : [
+      "Oliver Gorwits <oliver@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200000, CPAN::Meta::Converter version 2.102400",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-MetaResourcesFromGit",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Config::INI::Reader" : 0,
+            "Dist::Zilla::Plugin::MetaResources" : 0,
+            "Moose" : 0,
+            "Path::Class" : 0,
+            "String::Formatter" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-MetaResourcesFromGit"
+      },
+      "homepage" : "https://github.com/ollyg/Dist-Zilla-Plugin-MetaResourcesFromGit/wiki",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/ollyg/Dist-Zilla-Plugin-MetaResourcesFromGit.git",
+         "web" : "https://github.com/ollyg/Dist-Zilla-Plugin-MetaResourcesFromGit"
+      }
+   },
+   "version" : "1.103620"
+}
+

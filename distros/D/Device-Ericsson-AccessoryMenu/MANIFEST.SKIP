@@ -1,0 +1,11 @@
+^blib/
+^_build/
+^Makefile$
+^Build$
+~$
+^MANIFEST.SKIP$
+\.svn
+^talk/
+^reference/
+^Device-
+^nokia$

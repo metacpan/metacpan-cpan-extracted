@@ -1,0 +1,14 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST
+META.json
+README.md
+cpanfile
+lib/Digest/MurmurHash3/PurePerl.pm
+t/00_compile.t
+t/01_basic.t
+xt/perlcritic.t
+xt/perlcriticrc
+xt/pod_coverage.t
+META.yml

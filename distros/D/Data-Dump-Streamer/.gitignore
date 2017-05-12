@@ -1,0 +1,13 @@
+*~
+.answer
+Build
+MYMETA.yml
+MYMETA.json
+_build/
+build/
+blib/
+lib/Data/Dump/Streamer.c
+lib/Data/Dump/Streamer.o
+*.tar.gz
+lib/DDS.pm
+Data-Dump-Streamer-*/

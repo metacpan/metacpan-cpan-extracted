@@ -1,0 +1,38 @@
+NAME
+
+Data::Domain - Data description and validation
+
+DESCRIPTION
+
+A data domain is a description of a set of values, either scalar or
+structured (arrays or hashes).  The description can include many
+constraints, like minimal or maximal values, regular expressions,
+required fields, forbidden fields, and also contextual
+dependencies. From that description, one can then invoke the domain's
+C<inspect> method to check if a given value belongs to the domain or
+not. In case of mismatch, a structured set of error messages is
+returned, giving detailed explanations about what was wrong.
+
+The motivation for writing this package was to be able to express in a
+compact way some possibly complex constraints about structured
+data. Typically the data is a Perl tree (nested hashrefs or arrayrefs)
+that may come from XML, L<JSON|JSON>, from a database through
+L<DBIx::DataModel|DBIx::DataModel>, or from postprocessing an HTML
+form through L<CGI::Expand|CGI::Expand>. C<Data::Domain> is a kind of
+tree parser on that structure, with some facilities for dealing with
+dependencies within the structure, and with several options to
+finely tune the error messages returned to the user.
+
+The main usage for C<Data::Domain> is to check input from forms in
+interactive applications : the structured error messages make it easy
+to display a form again, highlighting which fields were rejected and
+why. Another usage is for writing automatic tests, with the help of
+the companion module L<Test::InDomain>.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright 2006, 2007, 2012 by Laurent Dami.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

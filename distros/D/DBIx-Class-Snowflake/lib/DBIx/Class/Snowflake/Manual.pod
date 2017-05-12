@@ -1,0 +1,245 @@
+=head1 NAME
+
+DBIx::Class::Snowflake::Manual - Manual for setting up DBIx::Class::Snowflake with Snowflake schemas.
+
+=head1 SYNOPSIS
+
+  package My::Snowflake::DimDate;
+  use base 'DBIx::Class';
+  __PACKAGE__->table('DimDate');
+
+  # makes the class a Dimension of a Snowflake/Star
+  __PACKAGE__->load_components("Snowflake::Dimension");
+  # NECESSARY to use this resultset or something based off of it
+  __PACKAGE__->resultset_class('DBIx::Class::Snowflake::ResultSet::Dimension');
+  # Allows you to tell Snowflake to not pay attention to the ID column
+  __PACKAGE__->ignore_columns('date_id']);
+
+  package My::SnowFlake::FactSale;
+  use base 'DBIx::Class';
+  __PACKAGE__->table('FactSale');
+  # makes the class a Fact of a Snowflake/Star
+  __PACKAGE__->load_components("Snowflake::Fact");
+  # NECESSARY to use this resultset or something based off of it
+  __PACKAGE__->resultset_class('DBIx::Class::Snowflake::ResultSet::Fact');
+  # Allows you to tell Snowflake to not pay attention to the ID column
+  # or other unnecessary columns
+  __PACKAGE__->ignore_columns(['sale_id', 'some_other_bad_column']);
+ 
+  # meanwhile elsewhere in your code...
+  my $possible_attributes = $schema->resultset('FactSale')->attributes();
+  my $wanted_metrics = some_function_to_get_metrics($possible_attributes);
+  my $wanted_filters = some_function_to_setup_filters($possible_attributes);
+  my $report_rs = $schema->resultset('FactSale')->generate_report(
+     {
+        'filters' => $wanted_filters,
+        'metrics' => $wanted_metrics
+     }
+  );
+  # do something with your report...
+
+=head1 DESCRIPTION
+
+The DBIx::Class::Snowflake package provides for components for use with
+snowflake and star schemas to make custom report generation easier.  It
+does not help with the initial setup though, the schema is assumed to
+already be prepared with the proper relationships.
+
+The package provides four components.  Two of the components should be
+loaded on the DBIx:Classes that represent tables.  The other two components
+are custom resultsets that should either be used for your tables or should
+be used be based off of for your resultsets. These are the components:
+
+=head2 DBIx::Class::Snowflake::Fact
+
+This component should be loaded on all Facts, it provides the methods listed
+below.  Simply use:
+
+   __PACKAGE__->load_components('Snowflake::Fact');
+
+* DBIx::Class::Snowflake::Dimension
+
+This component should be loaded on all the Dimensions, it provides the methods
+listed below.  To load it simply do this:
+
+   __PACKAGE__->load_components('Snowflake::Dimension');
+
+* DBIx::Class::Snowflake::ResultSet::Fact
+
+This allows you to treat a resultset and a row in a similar fashion in regards
+to the mehods listed below.  This is required or else calls to methods in
+::Snowflake will fail.
+
+   __PACKAGE__->result_class('DBIx::Class::Snowflake::ResultSet::Fact');
+
+* DBIx::Class::Snowflake::ResultSet::Dimension
+
+This allows you to treat a resultset and a row in a similar fashion in regards
+to the mehods listed below.  This is required or else calls to methods in
+::Snowflake will fail.
+
+   __PACKAGE__->result_class('DBIx::Class::Snowflake::ResultSet::Dimension');
+
+
+=head1 SUBROUTINES/METHODS
+
+B<NOTE>  All subroutines that can be called on a row can be called on a
+resultset and vice versa, they will act the exact same.  That is, if you
+ setup the schema like it says to above, if not then your mileage I<will> vary.
+
+=head2 subs for facts and dimensions
+
+=head3 ignore_columns
+
+B<ignore_columns> takes 1 parameter. The parameter can be a string, a hashref,
+an arrayref, a stringref, or a coderef.  It accepts the parameter and ignores
+those columns B<for that class> not for any dimensions fo that class.
+
+If the B<ignore_columns> subroutine is called on an instance it is only valid
+for that instance, if it is called on the package then it is valid for all
+instances.
+
+B<NOTE:>  The columns are only ignored for that class, you CANNOT set all
+the columns in all of the dimensions to be ignored in the fact and expect that
+to work.
+
+How it handles thing:
+
+=over
+
+=item string
+
+It assumes it is the name of a column to ignore.
+
+=item stringref
+
+It treats the string referred to like a string.
+
+=item hashref
+
+It assumes it is a hash formatted like:
+{ 'ignored_column_A' => 1, 'ignored_column_B' => 1 }
+The value doesn't matter, if the column is a key in this hash it is ignored.
+
+=item arrayref
+
+It assumes each entry in the array is a column name to be ignored
+
+=item coderef
+
+It executes the code referenced and then passes the values into itself
+so that the results of the code are treated as a hashref, etc. would be
+treated.
+
+=item undef
+
+It resets the columns it is remembering to ignore for that class or instance.
+
+=back
+
+=head3 attrs
+
+See attributes.
+
+=head3 attributes
+
+Calling this on a dimension or a fact will recursively search all of the
+dimensions of that class and return a list of all not ignored attributes and
+their types in the following format:
+
+	[
+	   { 'name' => 'tableA.col_A', 'type' => 'integer' },
+	   { 'name' => 'tableA.col_B', 'type' => 'text'    },
+	   { 'name' => 'tableB.col_1', 'type' => 'date'    },
+	   { 'name' => 'tableC.count', 'type' => 'integer' },
+	]
+
+=head2 subs for just facts
+
+=head3 generate_report
+
+B<generate_report> generates a report given some set of metrics and filters.
+This works in the DBIC standard fashion in that when called in an array context
+it returns an array of results and when called in a scalar fashion it returns
+a ResultSet object.
+
+This takes one parameter which is a hashref with the following format:
+
+   {
+      'filters' =>
+         {
+            'dimAuthor.last_name'     => 'Norman',
+            'dimRegion.name'          => 'Missouri',
+            'dimSaleDate.day_of_week' => 3
+         },
+      'metric' =>
+         {
+             'dimBook.EAN_code'       => 1,
+             'dimCity.name'           => 1,
+             'dimCategory.name'       => 1
+         }
+   }
+
+For the filters hash the values should be the value you are filtering on, for
+the metrics hash the value is ignored, it is only formatted like that for
+consistency.
+
+The easiest way to use generate_report is in conjunction with attributes().  
+The names provided by attributes are the same names generate_report expects.
+
+The resultset returned will have columns for each of the metrics requested
+regardless of where they are actually located in the schema, so for exampe.
+
+   $rs = $schema->resultset('FactSales')->generate_report($data_above)
+
+$rs will have a column dimBook.EAN_code, but it won't have an accessor
+to access it do this:
+
+   $rs->get_column('dimBook.EAN_code');
+
+Then you can treat it like a normal column by getting it's values, max, etc.
+
+=head1 DIAGNOSTICS
+
+B<Can't locate object method "generate_report" via package "MySchema::FactB" at ...> - You forgot to load the Snowflake::Fact component for fact table FactB.
+
+B<Can't locate object method "attributes" via package "DBIx::Class::ResultSet" at ...> - You forgot to set the resultset_class to DBIx::Class::Snowflake::ResultSet::Dimension or DBIx::Class::Snowflake::ResultSet::Fact for one of the facts or dimensions in your table.
+
+B<Can't locate object method "_resolve_metrics" via package "MySchema::DimExample" at ...> - You forgot to load the Snowflake::Dimension component for the dimension table DimExample.
+
+B<Unable to resolve dimension 'some_attr', does not exist in snowflake. at...> - You've passed in an attribute inside the filters hash into generate_report that doesn't exist, after it searched all of your dimensions it gave up.
+
+B<Unable to resolve dimension 'some_attr', does not exist in snowflake. at...> - You've passed in an attribute inside your B<metric> hash into generate_report that doesn't exist, after it searched all of your dimensions it gave up.
+
+B<Unable to determine what columns to ignore, I don't know what to do with a 'something'.> - You've passed in something to
+ignore_columns that isn't an acceptable value.  Or, possibly, you passed in a
+coderef that generated a value that wasn't acceptable.
+
+=head1 DEPENDENCIES
+
+This Module requires DBIx::Class.  This module should probably be used in only
+star and snowflake schemas, but if you find another use for this then please
+let me know via email.
+
+=head1 TODO
+
+=over
+
+=item *
+
+Modify generate_report so it generates a smaller set of JOINs
+
+=item *
+
+Modify the filter conversion code to be more efficient.
+
+=back
+
+=head1 BUGS AND LIMITATIONS
+
+The B<generate_report> function could be made to be more efficient.
+
+Please report other problems to Matt Follett<cpan(AT_GOES_HERE)mfollett.com> 
+Patches are welcome.
+
+=cut

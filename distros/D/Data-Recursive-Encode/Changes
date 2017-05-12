@@ -1,0 +1,27 @@
+Revision history for Perl extension Data::Recursive::Encode
+
+0.06 2014-11-17T02:22:16Z
+
+    - Fixed packaging issues.
+      https://github.com/tokuhirom/p5-data-recursive-encode/pull/2
+      (hixi-hyi++)
+
+0.05 2014-10-15T05:15:28Z
+
+    - added $DO_NOT_PROCESS_NUMERIC_VALUE feature(Cside_++)
+
+0.04
+
+        - added from_to method
+
+0.03
+        - Work around cyclic references (gfx)
+
+0.02
+        - Remove useless dependencies and inclusions from Makefile.PL, and fix the version of requires(gfx)
+        - Optimize encoding routines by using encoding instances directly(gfx)
+        - Use of UNIVERSAL:: methods are strongly discouraged. ref() is enough in this case.(gfx)
+
+0.01    Mon Jan 18 11:06:17 2010
+        - original version
+

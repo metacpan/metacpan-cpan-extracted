@@ -1,0 +1,88 @@
+{
+   "abstract" : "Document Viewer written in Perl, to run under Plack.",
+   "author" : [
+      "Shinichiro Aska"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.7.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DocLife",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.42",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Path::Class" : "0",
+            "Plack" : "0",
+            "Pod::Simple::XHTML" : "0",
+            "Text::Markdown" : "0",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "DocLife" : {
+         "file" : "lib/DocLife.pm",
+         "version" : "0.03"
+      },
+      "DocLife::Markdown" : {
+         "file" : "lib/DocLife/Markdown.pm"
+      },
+      "DocLife::Pod" : {
+         "file" : "lib/DocLife/Pod.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/s-aska/DocLife/issues"
+      },
+      "homepage" : "https://github.com/s-aska/DocLife",
+      "repository" : {
+         "url" : "git://github.com/s-aska/DocLife.git",
+         "web" : "https://github.com/s-aska/DocLife"
+      }
+   },
+   "version" : "0.03",
+   "x_authority" : "cpan:ASKADNA",
+   "x_contributors" : [
+      "c9s <cornelius.howl@gmail.com>",
+      "Shinichiro Aska <s.aska.org@gmail.com>"
+   ]
+}

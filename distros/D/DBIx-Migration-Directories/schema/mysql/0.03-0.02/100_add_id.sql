@@ -1,0 +1,6 @@
+
+ALTER TABLE migration_schema_log ADD
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL
+  FIRST;
+
+

@@ -1,0 +1,92 @@
+#!/usr/local/bin/perl -w
+#
+#     Example script for DateTime::Calendar::FrenchRevolutionary:
+#     display the current date in various calendars
+#
+#     Copyright (C) 2003, 2004, 2010, 2011, 2012, 2014, 2016 Jean Forget, all rights reserved
+#
+#     This program is distributed under the same terms as Perl 5.16.3:
+#     GNU Public License version 1 or later and Perl Artistic License
+#
+#     You can find the text of the licenses in the F<LICENSE> file or at
+#     L<http://www.perlfoundation.org/artistic_license_1_0>
+#     and L<http://www.gnu.org/licenses/gpl-1.0.html>.
+#
+#     Here is the summary of GPL:
+#
+#     This program is free software; you can redistribute it and/or modify
+#     it under the terms of the GNU General Public License as published by
+#     the Free Software Foundation; either version 1, or (at your option)
+#     any later version.
+#
+#     This program is distributed in the hope that it will be useful,
+#     but WITHOUT ANY WARRANTY; without even the implied warranty of
+#     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#     GNU General Public License for more details.
+#
+#     You should have received a copy of the GNU General Public License
+#     along with this program; if not, write to the Free Software Foundation,
+#     Inc., <http://www.fsf.org/>.
+#
+
+
+# Check the shebang line and then just call this script from your .profile
+
+use strict;
+use DateTime;
+use Text::Wrap;
+
+$Text::Wrap::columns = 80; # or whatever your console likes
+# or else, read recipe 1.17 from Perl Cookbook (2d ed)
+
+my $dg = DateTime->now;
+print "\nGregorian calendar\n";
+print $dg->iso8601, $dg->strftime(", %A %d %B %Y%n");
+print "JD : ", $dg->jd, " MJD : ", $dg->mjd, "\n";
+
+eval 'use DateTime::Calendar::Julian';
+unless ($@) {
+  my $d = DateTime::Calendar::Julian->now;
+  print "\nJulian calendar\n";
+  print $d->iso8601, $d->strftime(", %A %d %B %Y%n");
+}
+
+eval 'use DateTime::Calendar::Mayan';
+unless ($@) {
+  my $d = DateTime::Calendar::Mayan->now;
+  print "\nMayan calendar\n";
+  print $d->bktuk, " (baktun, katun, tun, uinal, kin)\n";
+}
+
+eval 'use DateTime::Calendar::FrenchRevolutionary';
+unless ($@) {
+  my $dr = DateTime::Calendar::FrenchRevolutionary->now;
+  print "\nFrench Revolution\n";
+  print $dr->iso8601, $dr->strftime(", %A %d %B %EY, %Ej%n"); # in French
+  (my $text = fill('', '', $dr->on_date('en'))) =~ s/\n\n+/\n/g;
+  print $text;                                                # in English
+}
+
+eval 'use DateTime::Calendar::Pataphysical';
+unless ($@) {
+  my $d = DateTime::Calendar::Pataphysical->now;
+  print "\n'Pataphysique\n";
+  print $d->ymd, $d->strftime(", %A %d %B %Y %*%n");
+}
+
+eval 'use DateTime::Format::Roman';
+unless ($@) {
+  my $conv = DateTime::Format::Roman->new(pattern => "%OD %b %y\n");
+  print "Calendrier romain : ", $conv->format_datetime($dg);
+}
+
+eval 'use Date::Discordian';
+unless ($@) {
+  print discordian(time()), "\n";
+}
+
+eval 'use DateTime::Fiction::JRRTolkien::Shire';
+unless ($@) {
+      my $h = DateTime::Fiction::JRRTolkien::Shire->from_object(object => $dg);
+      print "Shire : ", $h->on_date();
+}

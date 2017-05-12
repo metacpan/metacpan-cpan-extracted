@@ -1,0 +1,164 @@
+NAME
+    DBIx::Chart - DBI extension for Rendering Charts and Graphs
+
+SYNOPSIS
+            use DBIx::Chart;
+            use DBI qw(:sql_types);
+            #
+            #       some data to plot
+            #
+            my @data = (
+            [ 10, 23, 102 ],
+            [ 20, 94, 222 ],
+            [ 30, 44, 40 ],
+            [ 40, 64, 38 ],
+            [ 50, 90, 67 ]
+            );
+            #
+            #       type info for DBD::Chart; this is
+            #       ONLY NEEDED FOR DBI DRIVERS WHICH DO NOT RETURN
+            #       NAME OR TYPE INFORMATION!!!!
+            #
+            my $typemap = [
+                    {
+                            NAME => qw[ X1 Y1 Y2 ],
+                            TYPE => [ SQL_INTEGER, SQL_INTEGER, SQL_INTEGER ],
+                            PRECISION => [ 0, 0, 0 ],
+                            SCALE => [0, 0, 0]
+                    }
+            ];
+            #
+            #       connect as usual
+            #
+            $dbh = DBIx::Chart->connect('dbi:CSV:');
+            #
+            #       populate the CSV
+            #
+            $dbh->do('DROP TABLE dbixtst');
+            $dbh->do('CREATE TABLE dbixtst (
+                    x INTEGER, y1 integer, y2 integer)')
+                    or die $dbh->errstr();
+
+            $sth = $dbh->prepare('insert into dbixtst values(?,?,?)');
+            $sth->execute(@{$_})
+                    foreach (@data);
+            #
+            #       now render the graph
+            #
+            $row = $dbh->selectrow_arrayref(
+            "select * from 
+            (select * from dbixtst
+            returning areagraph(x,y1,y2)
+            where colors in ('red','blue')) plot1,
+            (select * from dbixtst
+            returning linegraph(x,y1,y2)
+            where colors in ('black', 'yellow')
+            and linewidth=3
+            and shapes in ('fillsquare', 'opencircle')) plot2
+            returning image, imagemap
+            where width=400 and height=400
+            and title='sample areagraph'
+            and signature='(C) 2002 GOWI Inc.'
+            and mapurl='http://www.goiwsys.com/cgi-bin/sample.pl?x=:X&y1=:Y'
+            and mapname='comparea'
+            and keeporigin=1
+            and showgrid=0");
+            #
+            #       and save it
+            #
+            open(OUTF, '>comparea.png');
+            binmode OUTF;
+            print OUTF $$row[0];
+            close OUTF;
+        
+            $dbh->disconnect;
+
+WARNING
+    THIS IS ALPHA SOFTWARE.
+
+DESCRIPTION
+    The DBIx::Chart extends SQL syntax to provide directives for generating
+    chart images. By subclassing DBI, it makes every SQL capable data source
+    with a DBI driver appear to natively support charting/graphing.
+
+    DBIx::Chart builds on the SQL syntax introduced in DBD::Chart to render
+    pie charts, bar charts, box&whisker charts (aka boxcharts), histograms,
+    Gantt charts, and line, point, and area graphs.
+
+    For detailed usage information, see the included the dbixchart.html
+    manpage webpage. Also refer to the DBD::Chart manpage homepage at
+    www.presicient.com/dbdchart. See the DBI(3) manpage for details on DBI.
+
+  Prerequisites
+
+    Perl 5.6.0 minimum
+    DBI 1.28 minimum
+    DBD::Chart 0.80
+    GD 1.19 minimum
+    GD::Text 0.80 minimum
+    DBD::CSV (for t/plottest.t)
+    Time::HiRes
+    libpng
+    zlib
+    libgd
+    jpeg-6b (only if JPEG output required)
+  Installation
+
+    For Windows users, use WinZip or similar to unpack the file, then copy
+    Chart.pm to wherever your site-specific modules are kept (usually
+    \Perl\site\lib\DBIx for ActiveState Perl installations). Note that you
+    won't be able to execute the install test with this, but you need a copy
+    of 'nmake' and all its libraries to run that anyway. I may whip up a PPM
+    in the future.
+
+    For Unix, extract it with
+
+        gzip -cd DBIx-Chart-0.01.tar.gz | tar xf -
+
+    and then enter the following:
+
+        cd DBIx-Chart-0.01
+        perl Makefile.PL
+        make
+
+    You can test the installation by running
+
+            make test
+
+    this will render a bunch of charts and an HTML page to view them with.
+    NOTE that the test requires the DBD::CSV driver, which is usually
+    bundled with the standard DBI installation. Assuming the test completes
+    successfully, you should use a web browser to view the file
+    t/plottest.html and verify the images look reasonable.
+
+    If tests succeed, proceed with installation via
+
+        make install
+
+    Note that you probably need root or administrator permissions. If you
+    don't have them, read the ExtUtils::MakeMaker man page for details on
+    installing in your own directories. the ExtUtils::MakeMaker manpage.
+
+FOR MORE INFO
+    Check out http://www.presicient.com/dbixchart with your favorite
+    browser. It includes all the usage information.
+
+AUTHOR AND COPYRIGHT
+    This module is Copyright (C) 2001, 2002 by Presicient Corporation
+
+        Email: darnold@presicient.com
+
+    You may distribute this module under the terms of the Artistic License,
+    as specified in the Perl README file.
+
+SEE ALSO
+    the DBI(3) manpage
+
+    For help on the use of DBIx::Chart, see the DBI users mailing list:
+
+      dbi-users-subscribe@perl.org
+
+    For general information on DBI see
+
+      http://dbi.perl.org
+

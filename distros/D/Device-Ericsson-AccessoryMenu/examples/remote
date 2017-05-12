@@ -1,0 +1,150 @@
+#!/usr/local/bin/perl -w
+use lib qw(lib);
+use strict;
+use Device::Ericsson::AccessoryMenu;
+use Device::SerialPort;
+use Xmms::Remote;
+use X11::GUITest qw(SendKeys);
+
+my $xmms = Xmms::Remote->new;
+
+#invoke galeon
+sub galeon ($) {
+    system qw( galeon -x ), "javascript:". shift;
+    return;
+}
+
+#xmms playlist selector
+sub directory_selector {
+    my ($path, $skip) = @_;
+
+    $skip ||= 0;
+    warn "$path $skip";
+    opendir(my $d, $path);
+    my @res;
+
+    my $length = 0;
+    my @content = sort grep { $_ !~ /^[.]/ and $_ ne 'lost+found' } readdir($d);
+
+    foreach my $i ($skip..$#content) {
+	my $n = $content[$i];
+	my $d = $n;
+	$d = substr($d, 0, 12)."..." if length($d) > 15;
+	if (-d "$path/$n") {
+	    push(@res, $d => sub { directory_selector("$path/$n") });
+	}
+	else {
+	    push(@res, $d => sub { $xmms->playlist_add(["$path/$n"]) });
+	}
+	$length += length($d)+3;
+	if ($length > 170 and $i < $#content) { 
+	    push(@res, "-->" => sub { directory_selector("$path", $i+1) });
+	    last;
+	}
+    }
+    closedir($d);
+
+    return \@res;
+}
+
+
+my $port = shift || '/dev/rfcomm0';
+
+my $remote = Device::Ericsson::AccessoryMenu->new(
+    debug => 1,
+    port  => Device::SerialPort->new( $port ) || die,
+    menu  => [
+        'Remote' => [
+            XMMS => [
+                "Play/Pause" => sub {
+                    # start xmms if it isn't already
+                    system ('xmms &') unless $xmms->is_running;
+                    $xmms->is_playing ? $xmms->pause : $xmms->play;
+                },
+                Back   => sub { $xmms->playlist_prev },
+                Next   => sub { $xmms->playlist_next },
+                Stop   => sub { $xmms->stop },
+                Volume => sub {
+                    my $r = shift;
+                    $r->percent_slider(
+                        title    => 'Volume',
+                        value    => $xmms->get_main_volume,
+                        steps    => 10,
+                        callback => sub {
+                            $xmms->set_main_volume( shift )
+                        },
+                       );
+                    return;
+                },
+		"Clear playlist" => sub { $xmms->playlist_clear },
+		"Add to playlist" => sub { directory_selector("/") },
+                "Now Playing"  => sub {
+                    return "nothing" unless $xmms->is_playing;
+                    my $pos = $xmms->get_playlist_pos + 1;
+                    join(' ',
+                         $pos, "of", $xmms->get_playlist_length, ".",
+                         $xmms->get_playlist_titles->[ $pos - 1 ],
+                         $xmms->get_output_timestr
+                        );
+                },
+               ],
+            X11Cursor => [ # slightly fake, but I want the tee
+                Space => sub { SendKeys(" ");     return },
+                Up    => sub { SendKeys("{UP}");  return },
+                Enter => sub { SendKeys("\n");    return },
+                Left  => sub { SendKeys("{LEF}"); return },
+                Down  => sub { SendKeys("{DOW}"); return },
+                Right => sub { SendKeys("{RIG}"); return },
+               ],
+            # a bunch of bookmarklets
+            Galeon => [
+                Space   => sub { SendKeys(" ");     return },
+                Back    => sub { galeon 'back()' },
+                Forward => sub { galeon 'forward()' },
+                Prev    => sub {
+                    galeon q{
+                    LE = document.getElementsByTagName('LINK');
+                    for (i=0; i<LE.length; i++) {
+                        if (LE[i].rel == 'prev')
+                            document.location = LE[i].href;
+                    }
+                };
+                },
+                Next    => sub {
+                    galeon q{
+                    LE = document.getElementsByTagName('LINK');
+                    for (i=0; i<LE.length; i++) {
+                        if (LE[i].rel == 'next')
+                            document.location = LE[i].href;
+                    }
+                };
+                },
+                Down    => sub { galeon 'scrollBy(0,  window.innerHeight)' },
+                Up      => sub { galeon 'scrollBy(0, -window.innerHeight)' },
+                Top     => sub { galeon 'scrollBy(0, -document.body.scrollTop)' },
+               ],
+            Test => [
+                "Send Text" => sub {
+                    my $r = shift;
+                    $r->send_text('hello, world', "isn't this fun");
+                },
+                "Dynamic Menu" => sub { [ Literal => 'What we have here is failure to communicate',] },
+                Mouse  => sub {
+                    my $r = shift;
+                    $r->mouse_mode( callback => sub {
+                                        my ($key, $updown) = @_;
+                                        print "### key $key event $updown\n";
+                                    });
+                },
+               ],
+            Restart => sub { exec $^X, $0 },
+            Quit    => sub { exit },
+           ],
+       ],
+   );
+
+$remote->register_menu;
+
+print "Ready to rock.\n";
+
+$remote->control while 1;

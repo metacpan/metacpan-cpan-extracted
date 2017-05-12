@@ -1,0 +1,19 @@
+---
+name: Dir-Which
+version: 0.3
+author:
+  - 'Jacquelin <jacquelin.charbonnel>'
+abstract: Search for directory entries in a list of directories.
+license: perl
+build_requires:
+  Test::More: 0
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Dir::Which:
+    file: lib/Dir/Which.pm
+    version: 0.3
+resources:
+  license: http://dev.perl.org/licenses/

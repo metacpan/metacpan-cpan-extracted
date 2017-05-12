@@ -1,0 +1,3 @@
+<specification>
+<value name="countries" iterator="countries" iterator_value_key="name" keep="empty_value"/>
+</specification>

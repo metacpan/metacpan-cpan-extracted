@@ -1,0 +1,34 @@
+Revision history for Perl extension Device::BCM2835.
+
+1.9 Thu Jun 13 15:50:08 EST 2013
+    Removed 2 tests that could hang forever when run as an ordinary user on
+    RPi.
+
+1.8 Tue Apr  2 11:43:38 EST 2013
+    Added constants for RPi V2 pins on P1 and P5. Requested by Larry Sellens.
+ 
+1.7 Fri Mar 22 10:08:14 EST 2013
+    Updated author and distribution location details to airspayce.com
+
+1.6 Thu Jan 31 18:01:17 EST 2013
+    Fixed a problem with duplicate definitions of BCM2835_GPIO_PWM introduced
+    in 1.5
+
+1.5 Thu Jan 31 06:57:35 EST 2013
+    Made all constants up to date, including BCM2835_GPIO_PWM, requested by Oskar Norin
+
+1.4 Sun Jan  6 08:20:52 EST 2013
+    Added -lrt to Makefile.pL
+
+1.3 Tue Jun 26 16:01:49 EST 2012
+    mikem added support for bcm2835_spi_transfern function from bcm2835 version 1.3
+    Requires version 1.3 from http://www.airspayce.com/mikem/bcm2835/
+
+1.1 Tue Jun 26 13:31:10 EST 2012
+    mikem added support for bcm2835_spi_* functions from bcm2835 version 1.2
+    Requires version 1.2 from http://www.airspayce.com/mikem/bcm2835/
+
+1.0  Sun Jun 24 16:19:31 2012
+	- original version; created by h2xs 1.23 with options
+		-n Device::BCM2835 /usr/local/projects/bcm2835/src/bcm2835.h -L /usr/local/lib -lbcm2835
+

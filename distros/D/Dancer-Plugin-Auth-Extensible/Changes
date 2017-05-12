@@ -1,0 +1,67 @@
+Revision history for Dancer-Plugin-Auth-Extensible
+
+1.00    2016-08-26
+        [ ENHANCEMENTS ]
+        - Cache logged in user and roles (GH-51)
+
+0.40    2015-04-30
+        [ ENHANCEMENTS ]
+        - Login handlers go straight to homepage if user was already logged in
+          (thanks to @colinmkeith, GH-32)
+        - Kwalitee improvements from Michael Gray (mjg17) as part of the awesome
+          pull request challenge (GH-43, GH-44, GH-45, GH-46)
+        
+        [ SECURITY ]
+        - Ensure the username and password we got were straight scalars, to
+          avoid potential for "JSON SQL injection" if they came from a
+          deserialised JSON POST body, and contained a hashref that, if fed to
+          e.g. SQL::Abstract or such, would cause a different query to what we'd
+          expect.
+
+0.30    2013-11-14
+        [ ENHANCEMENTS ]
+        - Typo fix and whatis entry courtesy of Debian team
+        - POD fix (Matt West)
+
+0.20    2013-01-30
+        [ ENHANCEMENTS ]
+        - Use return_url to redirect back to requested page after logging in
+          (GH #14, thanks to @dagolden)
+        - require_role can now take a regex to match (GH #16, thanks to
+          @chenryn)
+
+        [ BUG FIXES ]
+        - authenticate_user is now exported (thanks to melmothX on IRC)
+
+0.10    2012-12-19
+        [ ENHANCEMENTS ]
+        - WARNING: backwards incompatible change!
+          The original approach using subroutine attributes was pretty, but not
+          always reliable (particularly with regards to thread safety, or
+          running under the debugger or Devel::Cover etc).
+          Since this module is still in it's early life and not widely used,
+          I've refactored entirely, to use new requires_login / requires_role 
+          etc keywords, which wrap the provided coderef in a coderef which 
+          checks if the user is logged in / has the required role(s), before
+          running the route handler provided.
+        - Configurable /login, /logout URLs - Rene (hertell)
+
+0.04    2012-12-15
+        [ BUG FIXES ]
+        - Throw an error properly if not configured correctly - safer to refuse
+          for anything to be served than to potentially serve stuff the user
+          expected to be protected if their config is wrong.
+
+0.03    2012-12-07
+        [ BUG FIXES ]
+        - import Dancer DSL keywords, so call to debug() if user record is not
+          found doesn't cause horrific fiery explosions (reported by rwb)
+
+0.02    2012-12-07
+        [ BUG FIXES ]
+        - Various bug fixes and improvements, including POD fix from cebjyre,
+          fixing broken register_plugin call by racke
+
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

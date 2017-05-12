@@ -1,0 +1,76 @@
+NAME
+    Dancer2::Plugin::Auth::Extensible::Provider::LDAP - LDAP authentication
+    provider for Dancer2::Plugin::Auth::Extensible
+
+DESCRIPTION
+    This class is a generic LDAP authentication provider.
+
+    See Dancer2::Plugin::Auth::Extensible for details on how to use the
+    authentication framework.
+
+ATTRIBUTES
+  host
+    The LDAP host name or IP address passed to "CONSTRUCTOR" in Net::LDAP.
+
+    Required.
+
+  options
+    Extra options to be passed to "CONSTRUCTOR" in Net::LDAP as a hash
+    reference.
+
+  basedn
+    The base dn for all searches (e.g. 'dc=example,dc=com').
+
+    Required.
+
+  binddn
+    This must be the distinguished name of a user capable of binding to and
+    reading the directory (e.g. 'cn=admin,dc=example,dc=com').
+
+    Required.
+
+  bindpw
+    The password for "binddn".
+
+    Required.
+
+  username_attribute
+    The attribute to match when searching for a username.
+
+    Defaults to 'cn'.
+
+  name_attribute
+    The attribute which contains the full name of the user. See also:
+
+    "name" in Dancer2::Plugin::Auth::Extensible::Role::User.
+
+    Defaults to 'displayName'.
+
+  user_filter
+    Filter used when searching for users.
+
+    Defaults to '(objectClass=person)'.
+
+  role_attribute
+    The attribute used when searching for role names.
+
+    Defaults to 'cn'.
+
+  role_filter
+    Filter used when searching for roles.
+
+    Defaults to '(objectClass=groupOfNames)'
+
+  role_member_attribute
+    The attribute who's value should be a user's DN to show the user has the
+    specific "role_attribute"'s value.
+
+    Defaults to 'member'.
+
+METHODS
+  ldap
+    Returns a connected Net::LDAP object.
+
+  authenticate_user $username, $password
+  get_user_details $username
+  get_user_roles

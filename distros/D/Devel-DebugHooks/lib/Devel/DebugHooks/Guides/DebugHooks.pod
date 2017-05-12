@@ -1,0 +1,119 @@
+DB::DB called when any of the variables is true:
+
+    $DB::trace, $DB::single, $DB::signal
+
+And:
+
+    Execution of your program reaches a point that can hold a breakpoint
+
+DB::DB is not called when:
+
+	Code is called from DB::DB
+	sub has not 'is_debuggable' flag (all code compiled at DB has such flag)
+
+
+
+
+
+There are some different context where DB::sub may be called or not.
+You should keep these cases in mind:
+
+The DB::sub is not called when you call a subroutine from DB:: namespace
+
+	sdf {
+		package Test;
+		sub x1 {}
+		sub x2{ x1() }  # Only here DB::sub is called
+	}
+
+
+	sub init {}
+
+	sub DB {
+		init();      # DB::sub not called
+		Test::x1();  # DB::sub not called
+		Test::x2();  # DB::sub not called
+		...
+	}
+
+
+
+NEVER PASS DB:: GLOBALS AS ARGUMENTS TO SUBS
+Because of the @_ has aliases to arguments
+
+	sub test {
+		$DB::single =  1;  # or call to sub which do this change
+		print $_[0]; # Will print "1" instead of "0"
+	}
+
+	$DB::single =  0;
+	test( $DB::single );
+
+	# Example 2:
+	sub test {
+		$@ =  'Oops';
+		my( $x ) =  @_;
+		print $x; # Oops
+	}
+	$@ =  'Exception';
+	test( $@ );
+
+
+When you are in DB::sub
+Frame for target subroutine is NOT created. It is when you pass control by the chain making `return &$DB::sub`. This is the good design to hide debugger frame from client's code. But you probably will have problem making call to some debugger's subs. The problem is the `caller` will show that call is maden from client's code instead of real source -- &DB::sub
+Probably Perl should create origin frame before &DB::sub call and not create frames for any sub call from &DB::sub (to simplify code)
+But it will be cool not create frame only for &$DB::sub sub call
+
+
+When you do internal call to &subname from DB::sub the CORE::caller will see client's $file:$line and your &subname. You should check $DB::sub to see name for original subroutine
+
+NOTE:
+You can not do such thing:
+
+    package Other;
+    sub DB::DB {}
+    sub DB::sub { &$DB::sub }
+
+Because the &DB::sub is compiled at Other namespace the &$DB::sub will recursively call itself. So you **MUST** compile &DB::sub in the DB namespace to prevent that
+
+
+BEWARE:
+When you work with global variables in the debugger you affect user's globals.
+So 'eval' that variable will see debugger's value instead of user's one
+For example:
+
+	# Code in the user's script
+	$_ =  7;
+	1; # Stopped here and the debugger is called
+
+	# Code in the debugger:
+	for( 1..3 ) {
+		print DB::eval( '$_' ); # Will show 1,2,3 instead of expected 7,7,7
+	}
+
+
+
+NOTICE:
+When you want to use this module with modules like Apache::DB you should be aware
+that $DB::single = 1 does not work. Because after returning from module s sub
+old value of $DB::single will be restored by &pop_frame. You should do instead:
+
+    DB::state( 'stack' )->[ -2 ]{ single } =  1;
+
+
+
+NOTICE:
+It will be not possible to debug debugger if commands use package global
+variables. Because of second debugger instance use same ::Commands package and
+its variables. Think of this like second thread visit same sub while first
+thread is paused.
+
+
+
+BEWARE:
+When you &DB::eval user code that code may change any global variables. We can
+not take care about all of them. So we localize only those the debugger make
+change. So you should be carefull when run userland code from debugger because
+this code may change global variables. And the state you return to user will
+be slightly different from that when you have stopped on breakpoint.
+See also interesting case commit:035e182e4f.

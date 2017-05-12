@@ -1,0 +1,31 @@
+Revision history for Dist-Zilla-Plugin-MathInt64
+
+0.09      2016-01-01 07:50:25 -0500
+  - update API to Math::Int64 0.53
+
+0.08      2015-03-25 21:36:14 -0400
+  - Make Path::Class an explicit requirement
+
+0.07      2014-11-03 05:59:25 -0500
+  - update API to Math::Int64 0.34 (now includes sv_seti64 and sv_setu64 macros)
+
+0.06      2013-12-31 12:30:02 -0500
+  - Support Perl 5.8
+  - add optional header perl_math_int64_types.h for int64_t and uint64_t where they aren't otherwise provided
+
+0.05      2013-12-11 02:47:23 -0500
+  - added typemap_path option
+  - switched to Module::Build
+
+0.04      2013-11-26 11:30:32 -0500
+  - documentation improvements
+  - first CPAN release
+
+0.03      2013-11-20 10:10:11 -0500
+  - add Math::Int64 as a prereq of target dist
+
+0.02      2013-11-19 12:20:14 -0500
+  - create/update typemap
+
+0.01      2013-11-19 10:59:02 -0500
+  - initial version

@@ -1,0 +1,8 @@
+Revision history for Perl extension DBIx::TransactionManager::EndHook
+
+0.02 2013-03-08
+    - rollback bugfix (mash)
+
+0.01 2013-03-08
+    - original version; created by dim
+      at Mon Jan 14 10:37:05 2013.

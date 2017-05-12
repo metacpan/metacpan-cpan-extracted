@@ -1,0 +1,16 @@
+[%- # render one level of toc and call recursively itself if there are
+   # nested levels.
+   # expected args:
+   # subs - an array with keys indentical to 'toc' from above.
+-%]
+
+        <ul class="toc">
+[%- FOREACH sec = subs -%]
+
+            <li>
+                <a name="[%- sec.toc_link -%]"></a><a href="[%- sec.link -%]">[%- sec.title -%]</a>[%- IF sec.abstract -%]<br>[%- sec.abstract -%]<br><br>[%- END -%][%- IF sec.subs -%][%- PROCESS page_toc_section subs=sec.subs -%][%- END -%]
+                
+            </li>
+[%- END -%]
+
+        </ul>

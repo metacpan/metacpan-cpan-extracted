@@ -1,0 +1,307 @@
+2006-12-02 [r573]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Release of version 0.06
+
+2006-12-02 [r572]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added comments to the dbd_st_execute_array code.
+
+2006-12-02 [r571]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added rpm and srpm target to build packages.
+
+2006-12-02 [r570]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Updated 60array.t test cases, testing similar limits that are
+	  done in 22numeric.t
+
+2006-12-02 [r569]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Modified the execute_array procedure to pre-scan the rows in a
+	  column to determine the proper cbValueMax.
+
+2006-12-02 [r568]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Bumped version number to 0.06 for future release.
+
+2006-12-02 [r567]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Updated MANIFEST to include 60array.t, 21long.t, and 22numeric.t
+
+2006-12-02 [r566]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Release of version 0.05
+
+2006-12-02 [r565]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Fixed issues with bulk inserting numeric values.
+	* Enabled numeric test cases in t/60array.t
+
+2006-12-01 [r558]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Reformatted some parts of the code.
+
+2006-11-30 [r557]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Fixed file name 22numeric.c -> 22numeric.t
+
+2006-11-30 [r556]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed property on t/60array.t
+
+2006-11-30 [r555]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added in bulk insert logic, only catch is it only seems to work
+	  for character types (see comments in t/60array.t). Not sure when
+	  I will get around to fixing this one, I think I have to convert
+	  the strings to native types (int, long, etc).
+
+2006-11-30 [r554]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed some internal static functions.
+	* Removed some redundant code in handle_outparams.
+	* Removed some redundant code in dbd_st_prepare.
+	* Removed unused variables in imp_fbh_st and imp_sth_st.
+
+2006-11-30 [r553]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed utility functions used for debugging.
+
+2006-11-30 [r552]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Rewrote routine to describe parameters, now passes back cbColDef,
+	  ibScale, fNullable, fSqlType, and fCType attributes via the
+	  placeholder structure.
+	* Heavy clean-up with bind routines, based on what is going on in
+	  DBD::Oracle.
+	* Disabled logic to deal with BLOB's, hopefully makes the code
+	  simplier. Left it in if they decide to support BLOB's later. (Not
+	  sure why they would).
+	* Added test cases to deal with 4MB VARCHAR's.
+	* Added test cases to deal with various numeric data types.
+
+2006-11-28 [r551]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Applied patch for SvGROW issue & perl 5.8.8.
+
+2006-11-28 [r550]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Pulled in some outstanding patches against DBD::ODBC into the
+	  DBD::TimesTen codebase.
+
+2006-11-27 [r549]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Release of version 0.04
+
+2006-11-26 [r548]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Updated README.
+
+2006-11-26 [r547]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Renamed AllODBCErrors to dbd_error_flush, also rewrote it to
+	  recursively flush errors from hstmt, hdbc, and henv.
+	* Removed DSN= and DRIVER= handling logic.
+
+2006-11-26 [r546]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added Id tags.
+
+2006-11-26 [r545]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Cleaned up test cases, removed test cases carried over from
+	  DBD::ODBC.
+
+2006-11-26 [r544]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Renamed attribute odbc_ignored_named_placedholders to
+	  ttIgnoreNamedPlaceholders.
+	* Renamed attribute odbc_default_bind_type to ttDefaultBindType.
+
+2006-11-26 [r543]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added RPM spec file.
+
+2006-11-26 [r542]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added 50unicode.t to MANIFEST.
+
+2006-11-26 [r541]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed SQL_WVARCHAR and SQL_WCHAR to use SQL_C_BINARY data type.
+	* Added unicode test cases.
+
+2006-11-26 [r540]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added a few more test cases.
+
+2006-11-26 [r539]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed a few more instances of unsupport LONG datatypes.
+
+2006-11-26 [r538]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Merged dbd_error2 function into dbd_error.
+
+2006-11-26 [r537]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed a few functions to static.
+	* Removed sol_type and sol_length attributes from the statement
+	  handles.
+
+2006-11-26 [r536]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed GetTypeInfo private function.
+	* Adjusted a few of the test cases to use the type_info method.
+
+2006-11-26 [r535]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed odbc_SQL_DBMS_NAME attribute, should be using get_info
+	  method.
+	* Added SQLGetInfo constants, can be imported using the
+	  sql_getinfo_options tag.
+
+2006-11-26 [r534]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed odbc_defer_binding code, TimesTen seems to behave fine
+	  without it.
+
+2006-11-26 [r533]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed the odbc_err_handler and odbc_SQL_ROWSET_SIZE attributes.
+	  The odbc_err_handler would seem to be more useful for an
+	  asynchronous setup, and odbc_SQL_ROWSET_SIZE requires use of
+	  SQLExtendedFetch.
+
+2006-11-26 [r532]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added the ttIsolationLevel attribute.
+	* Added constants for the isolation levels.
+
+2006-11-25 [r531]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Clean up dbd_discon_all.
+
+2006-11-25 [r530]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed DescribeCol st method.
+
+2006-11-25 [r529]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed private function GetFunctions.
+
+2006-11-25 [r528]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Renamed internal calls to align with DBI naming.
+
+2006-11-25 [r527]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Moved primary_keys call from st class to db class, and renamed to
+	  align with DBI naming.
+	* Renamed foreign_keys calls to align with DBI naming.
+	* Removed private functions GetInfo, ExecDirect, ColAttributes,
+	  GetStatistics, GetPrimaryKeys, and GetForeignKeys.
+	* Removed columns method from db class, column_info is equivalent.
+
+2006-11-25 [r526]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added branches to the svn2log exclude list.
+
+2006-11-25 [r525]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed the svnlog build rule.
+
+2006-11-25 [r524]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Release of version 0.03
+
+2006-11-25 [r523]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed the asynchronous code, will add it back in later if there
+	  is significant demand for it. I don't imagine most people would
+	  need asynchronous for a purely in-memory database, I could be
+	  wrong :).
+	* Renamed QueryTimeout parameter to ttQueryTimeout. Decided that
+	  non-standard DBI/DBD items would be prefixed with tt.
+	* Renamed odbc_exec_direct parameter to ttExecDirect.
+	* Removed odbc_force_rebind parameter.
+	* Removed code to check for SQLDescribeParam function, it is
+	  supported atleast with TimesTen 6.0 clients. We can add it back
+	  in later, if necessary.
+
+2006-11-23 [r522]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed odbc_sql_driver_odbc_ver attribute.
+
+2006-11-23 [r521]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Added missing prototypes.
+	* Removed odbc_version attribute.
+	* Removed unnecessary get_primary_keys call, redundant.
+	* Removed unused dbd_caution function.
+	* Removed unused dbtype_is_string function.
+
+2006-11-22 [r520]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Clean up docs.
+
+2006-11-22 [r519]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed unused variables, clean up.
+	* Removed odbc_more_results feature, not supported.
+	* Removed odbc_cursor_type feature.
+	* Removed 09multi test suite
+
+2006-11-22 [r518]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed Changes POD.
+	* Added svnlog target, automatically creates ChangeLog from SVN.
+
+2006-11-22 [r517]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Bumped version, not yet released.
+
+2006-11-22 [r516]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Fixed the query timeout, TimesTen uses ODBC 2.x style for this
+	  option.
+	* Renamed odbc_query_timeout attribute to QueryTimeout during
+	  connect phase.
+	* Renamed some internal functions.
+
+2006-11-22 [r515]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Removed some dead & commented code.
+
+2006-11-22 [r514]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Tagging 0.02 release.
+
+2006-11-22 [r513]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Fixed potential namespace issues.
+
+2006-11-22 [r512]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Tagging 0.01 release.
+
+2006-11-22 [r511]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Updated docs
+
+2006-11-22 [r510]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed properties.
+
+2006-11-22 [r509]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Changed properties
+
+2006-11-22 [r508]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Initial import of DBD::TimesTen
+
+2006-11-22 [r507]  Chad Wagner <chad.wagner@gmail.com>
+
+	* Created repository structure for DBD::TimesTen
+

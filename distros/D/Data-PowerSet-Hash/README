@@ -1,0 +1,51 @@
+NAME
+    Data::PowerSet::Hash - Power sets of hashes
+
+VERSION
+    version 0.04
+
+DESCRIPTION
+    This provides you with a power set (basically all combinational
+    iterations) for your hashes. This only does it for hashes, if you want
+    them done for arrays, I suggest using Data::PowerSet. Please view the
+    *SEE ALSO* section below.
+
+SUBROUTINES/METHODS
+  hash_powerset
+    Create a powerset from hash keys.
+
+        use Data::PowerSet::Hash 'hash_powerset';
+
+        my @pset = hash_powerset(
+            husband => 'Homer Simpson',
+            wife    => 'Marge Simpson',
+        );
+
+        # @pset = (
+        #     {
+        #         husband => 'Homer Simpson',
+        #         wife    => 'Marge Simpson',
+        #     },
+        #     { husband => 'Homer Simpson' },
+        #     { wife    => 'Marge Simpson' },
+        #     {},
+        # )
+
+  EXPORT
+   hash_powerset(%hash)
+    See documentation for it above.
+
+SEE ALSO
+    For arrays, you should check out Data::PowerSet or List::PowerSet.
+
+AUTHORS
+    *   Sawyer X <xsawyerx@cpan.org>
+
+    *   Mirela Iclodean <imirela@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Sawyer X.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

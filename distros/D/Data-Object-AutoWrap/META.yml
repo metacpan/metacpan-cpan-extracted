@@ -1,0 +1,25 @@
+---
+name: Data-Object-AutoWrap
+version: 0.02
+author:
+  - 'Andy Armstrong <andy.armstrong@messagesystems.com>'
+abstract: Autogenerate accessors for R/O object data
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Object-AutoWrap
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/AndyA/Data--Object--AutoWrap.git
+requires:
+  Scalar::Util: 0
+  Test::More: 0
+provides:
+  Data::Object::AutoWrap:
+    file: lib/Data/Object/AutoWrap.pm
+    version: 0.02
+  Data::Object::AutoWrap::Hash:
+    file: lib/Data/Object/AutoWrap/Hash.pm
+    version: 0.02
+generated_by: Module::Build version 0.33
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

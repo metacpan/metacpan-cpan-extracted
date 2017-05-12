@@ -1,0 +1,194 @@
+=pod
+
+=for vim
+   vim: tw=72 ts=3 sts=3 sw=3 et ai :
+
+=encoding utf8
+
+=head1 NAME
+
+Data::Tubes::Util::Output
+
+=head1 DESCRIPTION
+
+Class for automatic handling of output files, with tracking capabilies
+for written records/characters and automatic generation of file names in
+a sequence. It is also possible to set a header that will be
+automatically written when a file is opened, and a footer for when the
+file is closed. This automatic handling is the main reason why this
+module is object-oriented (as the C<DESTROY> method takes care to print
+out the footer in case it has not been written yet, but the file is
+open).
+
+The class is realized via L<Mo>. You can extend it, to a certain degree.
+
+=head1 CLASS METHODS
+
+=head2 B<< new >>
+
+   my oh = Data::Tubes::Util::Output->new(%args);
+
+constructor for the class.
+
+=head2 B<< writer >>
+
+   my oh = Data::Tubes::Util::Output->writer(%args);
+
+shorthand to create a C<Data::Tubes::Util::Output> object (via L</new>,
+passing C<%args>) and return a sub reference that will delegate to
+L</print> at each call.
+
+=head1 ACCESSOR METHODS
+
+=head2 B<< binmode >>
+
+value used for calling C<binmode> after a file is opened;
+
+=head2 B<< footer >>
+
+a footer that will be written at the end of a file, just before it is
+closed;
+
+=head2 B<< header >>
+
+a header that will be written in every newly opened file, just after it
+has been opened;
+
+=head2 B<< interlude >>
+
+a string that will be written between two successive prints;
+
+=head2 B<< output >>
+
+whatever is set as an I<output channel>. It might be multiple things:
+
+=over
+
+=item I<factory>
+
+i.e. a subroutine reference, that will be used every time a new file
+will be needed. It is supposed to return either a filehandle or a
+filename; in case a filehandle is returned, it will not be passed
+through C<binmode> but it will be closed eventually;
+
+=item I<filehandle>
+
+this will be used as the output channel. It will not be closed
+automatically;
+
+=item I<filename>
+
+this will be opened and then C<binmode> will be called on the resulting
+filehandle. This handle will be eventually closed.
+
+=back
+
+A valid I<filename> (either set as output or returned by the I<factory>)
+can be whatever is good for plain old C<open>, i.e. a real filename or a
+reference to a string.
+
+=head2 B<< policy >>
+
+a policy is a hash containing rules associated to the handler, whatever
+it means. By default, it can contain either C<records_threshold> or
+C<characters_threshold> (or both), that will be used as thresholds for
+printint out records/characters. If you extend this class you can of
+course implement your own policies.
+
+=head2 B<< track >>
+
+a hash reference that tracks the printing process. You should usually
+not need to fiddle with this... or you'd better take a look at the code.
+
+=head1 BUSINESS LOGIC METHODS
+
+=head2 B<< checker >>
+
+   my $checker = $o->checker();
+
+returns a checking function to be used after every call to L</print>.
+The function will be called with the object, so a method is good as
+well. If the class contains a C<check> method, it will be used.
+
+In case C<check> is not present, the L</default_check> will be used if a
+L</policy> is set, nothing otherwise (and this is the reason why we
+don't set a C<check> method in this base class).
+
+=head2 B<< close >>
+
+   $o->close($filehandle, $tracker);
+
+print the footer, then L</release_fh>. If you just want to close... call
+L</just_close>.
+
+=head2 B<< default_check >>
+
+a checker function that uses the policy as described in L</policy>. See
+L</checker>.
+
+=head2 B<< get_fh >>
+
+   my ($fh, $releaser) = $o->get_fh($channel);
+
+get a filehandle, whatever the C<$channel> is. If C<$channel> is not
+provided, then L</output> will be used. See L</output> to see what
+C<$channel> should be.
+
+Returns a filehandle and a I<releaser> for the filehandle. This will be
+called when it's time to close the filehandle, so if you override this
+you have to provide both the opened handle and this releasing
+functionality.
+
+=head2 B<< just_close >>
+
+close whatever is open, flushing the footer if needed.
+
+=head2 B<< open >>
+
+   my $filehandle = $o->open($channel);
+
+opens a handle based on the C<$channel> or whatever L</output> gives
+back. Resets a few counters in the tracking object, then calls
+L</get_fh>, prints the header on the new handle, and eventually returns
+the handle.
+
+=head2 B<< print >>
+
+   $o->print($iterator); # OR
+   $o->print(@records);
+
+prints things out. Accepts as input either an iterator or a list of
+records, where an iterator is a reference to a sub that will emit a
+record at each call. In this context, a valid record is everything that
+is not C<undef> (and that is possible to print, of course).
+
+If L</interlude> is set, each record that is printed is prefixed with
+its value, except for the very first one.
+
+=head2 B<< release_fh >>
+
+   $o->release_fh($filehandle);
+
+uses the I<filehandle releaser> (see L</open>), if present, then gets
+rid of the currently tracked filehandle.
+
+=head1 SEE ALSO
+
+L<Data::Tubes> is a valid entry point of all of this.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2016 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software. You can redistribute it and/or modify it
+under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

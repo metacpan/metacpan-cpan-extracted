@@ -1,0 +1,16 @@
+Revision history for DBD-XMLSimple
+
+0.05	Sun Sep  4 15:04:42 EDT 2016
+	Support more free form input data
+
+0.04	Sun Sep  4 07:53:01 EDT 2016
+	Added data.xml to the pre-requisites
+
+0.03	Sat Sep  3 09:08:15 EDT 2016
+	Added SQL::Statement to the pre-requisites
+
+0.02	Fri Sep  2 12:24:46 EDT 2016
+	Added README and bin/xml to the MANIFEST
+
+0.01    Wed Aug 31 11:52:07 EDT 2016
+        First draft

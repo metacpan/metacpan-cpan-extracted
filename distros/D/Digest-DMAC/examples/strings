@@ -1,0 +1,23 @@
+#!/usr/local/bin/perl
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::DMAC qw(dmac hexdigest base64digest);
+
+print "Enter key: ";
+my $key = <STDIN>;
+chomp $key;
+
+print "Enter cipher: ";
+my $cipher = <STDIN>;
+chomp $cipher;
+
+print "Enter string: ";
+my $str = <STDIN>;
+chomp $str;
+
+my $mac = dmac($key, $cipher, $str);
+print hexdigest($mac), "\n";
+print base64digest($mac), "\n";
+

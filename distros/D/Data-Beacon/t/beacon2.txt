@@ -1,0 +1,8 @@
+#FORMAT:  BEACON
+#PREFIX: baz:
+#DESCRIPTION: This is a test
+
+a|http://example.com/foo
+a|b|http://example.com/bar
+
+

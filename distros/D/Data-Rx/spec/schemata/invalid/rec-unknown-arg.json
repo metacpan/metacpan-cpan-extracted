@@ -1,0 +1,8 @@
+{
+  "invalid": true,
+
+  "schema" : {
+    "type"    : "//rec",
+    "unknown" : "this will cause things to explode"
+  }
+}

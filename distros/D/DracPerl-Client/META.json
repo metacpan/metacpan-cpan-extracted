@@ -1,0 +1,81 @@
+{
+   "abstract" : "API Client for Dell's management interface (iDRAC)",
+   "author" : [
+      "Jules Decol (@Apcros)"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.4",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DracPerl-Client",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "LWP::Protocol::https" : "0",
+            "LWP::UserAgent" : "0",
+            "Log::Any" : "0",
+            "Moose" : "0",
+            "XML::Simple" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "LWP::UserAgent::Mockable" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DracPerl::Client" : {
+         "file" : "lib/DracPerl/Client.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/apcros/Drac-Perl/issues"
+      },
+      "homepage" : "https://github.com/apcros/Drac-Perl",
+      "repository" : {
+         "url" : "git://github.com/apcros/Drac-Perl.git",
+         "web" : "https://github.com/apcros/Drac-Perl"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [
+      "Apcros <apcros.mail@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

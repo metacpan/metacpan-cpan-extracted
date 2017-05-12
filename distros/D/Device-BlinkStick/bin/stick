@@ -1,0 +1,219 @@
+#!/usr/bin/env perl
+# PODNAME: stick - simple script to control a blinkstick
+# ABSTRACT: Control a Blinkstick
+
+=head1 NAME
+
+stick
+
+=head1 SYNOPSIS
+
+  Syntax: stick [options] 
+  
+  About:  Control a BlinkStick
+  
+  [options]
+    -h, -?, --help                    Show help
+    --blink                           number of times to blink
+    -b, --brightness                  set LED brightness percentage, 0..100 [DEFAULT: 20]
+    --channel                         blinkstick pro only, which block of 64 LEDs to write to
+    -c, --color                       set color by name, hex triplet or random
+    --delay                           Delay time in msecs between blinks [DEFAULT: 150]
+    -d, --device                      use device/serial what ever matches
+    -i, --index                       blinkstick pro only, which LED in block to write to
+    --info                            get info about connected devices
+    --inverse                         original blinkstick only, use inverse mode,
+    -m, --mode                        blinkstick pro only, set mode, 0 normal, 1 inverse, 2 WS2812, 3 WS2812 mirror
+    --name                            use device that has this name
+    --serial                          Use device that has this serial number
+    --set_leds                        blinkstick pro only, set number of leds attached to device
+    --set_name, --set-infoblock1      Set name into infoblock 1
+    --set_token, --set-infoblock2     Set access token into infoblock 2
+    -v, --verbose                     Dump extra useful information
+
+=head1 DESCRIPTION
+
+Control a USB blinkstick L<http://blinkstick.com>
+  
+=cut
+
+#
+# (c) Kevin Mulholland, moodfarm@cpan.org
+# this code is released under the Perl Artistic License
+
+# notes
+# serial number ends
+#   * -1.2 standard stick
+#   * -2.1 pro stick
+#   * -3.0 blinkstrip/square (8 leds)
+#   * nano has 2 leds
+#   * flex (32 pixels)
+# if multiple sticks and no device picked then error
+# if pro action on a std stick then either ignore or error
+
+use 5.10.0 ;
+use strict ;
+use warnings ;
+use App::Basis ;
+use Device::BlinkStick ;
+use Data::Printer ;
+
+# -----------------------------------------------------------------------------
+
+use constant DEFAULT_BLINK_TIME => 150 ;
+use constant MODE_INVERSE       => 1 ;
+
+# -----------------------------------------------------------------------------
+
+sub show_info
+{
+    my $stick = shift ;
+    my $info  = $stick->info() ;
+    
+    # Manufacturer:   $info->{manufacturer}
+    # Description:    $info->{product}
+    say "Device $info->{serial_number}" ;
+    say "    Name:   $info->{device_name}"  if ( $info->{device_name} ) ;
+    say "    Token:  $info->{access_token}" if ( $info->{access_token} ) ;
+    say "    Color:  " . $info->{colorname} ;
+    say "    Mode:   $info->{mode}" ;
+    say "    Type:   $info->{type}" ;
+    say "    Leds:   $info->{leds}" if ( $info->{type} eq 'pro' ) ;
+}
+
+# -----------------------------------------------------------------------------
+# main
+
+my $program = get_program() ;
+my $action  = 0 ;
+
+my %opt = init_app(
+    help_text    => "Control a BlinkStick",
+    help_cmdline => "",
+    options      => {
+        'verbose|v' => 'Dump extra useful information',
+        'inverse'   => 'original blinkstick only, use inverse mode,',
+        'color|c=s' => { desc => 'set color by name, hex triplet or random' },
+        'mode|m=i'  => {
+            desc =>
+                'blinkstick pro only, set mode, 0 normal, 1 inverse, 2 WS2812, 3 WS2812 mirror',
+            # validate => sub { my $m = shift ; $m > 0 && $m <= 3 ; }
+        },
+        'info'                       => 'get info about connected devices',
+        'set_name|set-infoblock1=s'  => 'Set name into infoblock 1',
+        'set_token|set-infoblock2=s' => 'Set access token into infoblock 2',
+        'set_leds=i' =>
+            'blinkstick pro only, set number of leds attached to device',
+        'serial=s'   => 'Use device that has this serial number',
+        'name=s'     => 'use device that has this name',
+        'device|d=s' => 'use device/serial what ever matches',
+        "index|i=i" =>
+            { desc => "blinkstick pro only, which LED in block to write to" },
+        "channel=i" => {
+            desc => "blinkstick pro only, which block of 64 LEDs to write to"
+        },
+        "brightness|b=i" => {
+            desc    => "set LED brightness percentage, 0..100",
+            default => 20
+        },
+        "delay=i" => {
+            desc    => "Delay time in msecs between blinks",
+            default => DEFAULT_BLINK_TIME
+        },
+        "blink=i" =>
+            { desc => "number of times to blink", requires => 'color' },
+    },
+) ;
+
+my $bs = Device::BlinkStick->new(
+    verbose => $opt{verbose},
+    inverse => $opt{inverse},
+) ;
+
+my $stick ;
+my $devices = $bs->devices() ;
+if ( $opt{serial} || $opt{name} || $opt{device} ) {
+    # decide which parameter to use
+    my $name = $opt{serial} || $opt{name} || $opt{device} ;
+    # do we have it
+    $stick = $bs->find($name) ;
+
+    if ( !$stick ) {
+        msg_exit( "A matching device could not be found", 1 ) ;
+    }
+}
+if ( $opt{info} ) {
+    if ($stick) {
+        show_info($stick) ;
+    } else {
+        foreach my $s ( sort keys %$devices ) {
+            show_info( $devices->{$s} ) ;
+        }
+    }
+    exit ;
+}
+
+# set a default stick
+$stick = $bs->first() if ( !$stick ) ;
+
+if ( !$stick ) {
+    msg_exit( "Could not find any Blinkstick devices", 1 ) ;
+}
+
+if ( $opt{mode} ) {
+    if ( $stick->type eq 'pro' ) {
+        $stick->set_mode( $opt{mode} ) ;
+    } elsif ( $opt{mode} == MODE_INVERSE ) {
+        $stick->inverse(1) ;
+    } else {
+        say STDERR "Mode note suitable for device" ;
+    }
+}
+
+if ( $opt{set_leds} ) {
+    if ( $stick->type ne 'pro' ) {
+        say STDERR "Cannot set number of LEDs on this type of device" ;
+    } else {
+        $action++ ;
+        # set the number of leds connected to this device
+        $stick->set_leds( $opt{set_leds} ) ;
+    }
+}
+
+if ( $opt{set_name} ) {
+    $action++ ;
+    $stick->set_device_name( $opt{set_name} ) ;
+}
+if ( $opt{set_token} ) {
+    $action++ ;
+    $stick->set_access_token( $opt{set_token} ) ;
+}
+
+if ( $opt{brightness} ) {
+    $stick->brightness( $opt{brightness} ) ;
+}
+
+if ( $opt{color} ) {
+    $action++ ;
+
+    $opt{index}-- if ( $opt{index} ) ;    # e.g. 0..7
+    if ( $opt{blink} ) {
+        $stick->blink(
+            color   => $opt{color},
+            times   => $opt{blink},
+            delay   => $opt{delay},
+            channel => $opt{channel},
+            index   => $opt{index}
+        ) ;
+    } else {
+        $stick->led(
+            color   => $opt{color},
+            channel => $opt{channel},
+            index   => $opt{index}
+        ) ;
+    }
+}
+
+if ( !$action ) {
+    show_usage("No useful parameters passed") ;
+}

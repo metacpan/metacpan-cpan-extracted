@@ -1,0 +1,250 @@
+Tue Sep  4 09:40:36 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 1.05.
+
+Sun Sep  2 23:06:10 PDT 2001 <blair@orcaware.com> Blair Zajac
+	
+	* lib/DateTime/Precise.pm: Change the default value of
+	  $USGSMidnight from 1 to 0, which in dprintf now disables
+	  treating midnight (00:00) of one day as 24:00 from the
+	  previous day.  This results in odd behavior when the date is
+	  printed using dprintf, as it will return the previous date.
+	  Fix the POD documentation for $USGSMidnight to complete the
+	  end of the sentence.
+	* lib/DateTime/Precise.pm: Optimize dprintf to use a series of
+	  elsif's instead of a series of if's when deciding what to do
+	  with a %X string.
+	* lib/DateTime/Precise.pm: Do not put &IsLeapYear and
+	  &DaysInMonth in @EXPORT, instead put them in @EXPORT_OK to
+	  reduce namespace pollution.
+	* lib/DateTime/Precise.pm: Instead of doing multiple shift's
+	  in subroutines to get the subroutine's parameter, set the
+	  variables directly from @_.
+	* lib/DateTime/Precise.pm: Change the variables
+	  $Secs_per_week, $Secs_per_day, $Secs_per_hour and
+	  $Secs_per_minute to constant subroutines to improve the
+	  performance of the module.
+	* t/01date_time.t: Ditto.
+	* lib/DateTime/Precise.pm: Make minor formatting changes to
+	  reflect my current coding style.
+
+Tue Aug 28 13:16:59 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* Release version 1.04.
+
+Tue Aug 28 13:14:01 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* README: Update Blair Zajac's email address to
+	  blair@orcaware.com.  Remove reference to the Caltech FTP
+	  site for a secondary repository of Blair Zajac's Perl
+	  modules.
+	* lib/DateTime/Precise.pm: Update Blair Zzajac's email address
+	  to blair@orcaware.com.
+
+Tue Aug 28 12:34:15 PDT 2001 <blair@orcaware.com> Blair Zajac
+
+	* lib/DateTime/Precise.pm: The $VERSION variable was being set
+	  using
+
+	  $VERSION = substr q$Revision: 1.04 $, 10;'
+
+	  which did not properly set $VERSION to a numeric value in
+	  Perl 5.6.1 probably due to the trailing ' ' character after
+	  the number.  This resulted in 'use DateTime::Precise 1.03'
+	  failing to force Perl to use version 1.03 or newer of
+	  DateTime::Precise even if 1.02 or older was installed
+	  because $VERSION was set using substr and Perl would not
+	  consider $VERSION to be set.  Now use the longer but
+	  effective:
+
+	  $VERSION = sprintf '%d.%02d', '$Revision: 1.04 $' =~ /(\d+)\.(\d+)/;
+
+Sun Jun 10 20:10:19 PDT 2001
+
+	* Release 1.03.
+
+Sun Jun 10 18:54:44 PDT 2001 <blair@orcaware.com> (Blair Zajac) 
+ 
+	* lib/DateTime/Precise.pm: Try to import Time::HiRes::time to
+	  load a high resolution time.  Fix a bug when the time was
+	  modified using seconds() and the time had previously a
+	  non-zero fractional second component.  The previous
+	  fractional seconds would be included in a sum with the
+	  argument to seconds().  Now reset the fractional part of the
+	  time to 0 before using the seconds() argument.
+	* t/01date_time.t: Reorder a test to ensure that the above bug
+	  in seconds() is checked.
+
+Thu Feb 22 20:37:22 PST 2001 <blair@orcaware.com> (Blair Zajac)
+
+	* Release version 1.02.
+
+Thu Feb 22 20:27:46 PST 2001 <blair@orcaware.com> (Blair Zajac)
+
+	* Fix a bug where if 0 is passed to an increment or decrement
+	  function, then it would actually increment the time by 1 unit.
+	  Check for a defined value instead of a non-0 or non-'' value.
+
+Wed Jan 31 15:24:17 PST 2001 <blair@orcaware.com> (Blair Zajac)
+
+	* Release version 1.01.
+
+Wed Jan 31 15:09:10 PST 2001 <blair@orcaware.com> (Blair Zajac)
+
+	* Fix a bug where a \s was not being properly added to a regular
+	  expression.  This also fixes the 'Unrecognized escape \s
+	  passed through at Precise.pm line 1483' warning when using
+	  Perl 5.6.0.
+
+Thu Apr  8 10:20:30 PDT 1999 <blair@orcaware.com> (Blair Zajac)
+
+	* Have ok() in t/*.t return the success or failure of the
+	  test instead of the number of tests performed.
+
+	* Release version 1.00.
+
+Thu Oct 22 09:11:09 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Fix a bug in new() where it wouldn't correctly set the time
+	  using the one argument form of time.  This bug found by
+	  Joe Pepin <joepepin@att.com>.
+
+	* Fix some spelling mistakes.
+
+	* Release version 0.04.
+
+Sun Jun 28 11:56:40 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Add dscanf('%u') which loads GMT time into the object.
+	  This complements dscanf('%U') which loads local time into
+	  the object.
+
+	* lib/DateTime/Precise.pm: Update the POD to reflect the change
+	  in dscanf.
+
+	* Change test #8 to use %u instead of %U so the test will succeed
+	  in any timezone.
+
+	Release version 0.03.
+
+Fri Jun 26 16:57:37 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Add a new jday() method that returns day_of_year() - 1.
+
+Fri Jun 26 15:06:52 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* New() didn't properly initialize the underlying representation
+	  of DateTime::Precise before it was passed off to set_time().
+	  Add a new test to cover this case.
+
+	* Update the POD a little.
+
+	* Release version 0.02.
+
+Mon Jun 22 13:46:03 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Add a new method copy, which creates a new copy of an
+	  existing DateTime::Precise object.  Use copy to create
+	  copies of times instead of new and clone.  Add tests for
+	  copy.
+
+	* Add comparison test between integer and fractional times.
+
+Sun Jun 21 12:05:38 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Have overloaded neg operator state the class of the offending
+	  object instead of DateTime::Precise.
+
+	* Have all of the set_* methods return the newly set object if
+	  the set was successful, undef otherwise.
+
+Thu Apr 24 12:00:00 PDT 1998 <blair@orcaware.com> (Blair Zajac)
+
+	* Version 0.01
+	  First version.
+
+	* Merge jpltime.pl from the JPL GPS group and DateTime.pm from
+	  Greg Fast into this package.
+
+	* The changes below refer to the DateTime part of this package
+	  written by Greg Fast.
+
+	Revision history for DateTime.pm
+	Version numbers refer to RCS/CVS revision number.
+
+	1.4.1
+	r1.17 Thu Apr  2 1998
+	- damn.  set_from_epoch time was broken.  serves me right for
+	  not running my own 'make test'.
+
+	1.4
+	r1.16 Mon Mar 30 1998 
+	- redid documentation.  cleaned up, etc.  nothing exciting.
+	- ignored Changes file long enough for it to no longer be valid.
+
+	1.3.2
+	r1.8  Mon Sep 15 15:00:00 1997
+	- oops.  addSec was behaving very wrong on day boundaries.
+
+	1.3.1 
+	r1.7  Thu Sep 11 18:50:04 CDT 1997
+	- squashed bug in passing new a dt of form "yyyy.mm.dd" (no time)
+
+	1.3
+	r1.5  Thu Sep 11 10:20:04 CDT 1997
+	- switched internal obj storage from hash to scalar.
+
+	1.2.6
+	r1.3  Wed Sep 10 18:47:36 1997
+	- imported to CVS
+	- added 22 deadly (heh) tests to test.pl
+	- fixed subtle bug in overloaded <=> and cmp (in comparing
+	  objects with non-objects)
+
+	1.21  Fri Sep 05 20:45:55 1997
+	- suppressed some warnings	 
+
+	1.20  Fri Sep 05 20:12:22 1997
+	- added new-from-internalfmt capability.	 
+
+	1.19  Thu Sep 04 23:30:34 1997
+	- properly reset $VERSION	 
+
+	1.18  Thu Jul 31 20:42:19 1997
+	- replaced some tr///s with lc()s	 
+
+	1.17  Thu Jul 31 19:35:28 1997
+	- whee	 
+
+	1.16  Thu Jul 31 19:28:39 1997
+	- dscanf now works quietly, and doesn't die on failure.	 
+
+	1.15  Thu Jul 31 19:08:31 1997
+	- dscanf works properly	 
+
+	1.14  Thu Jul 31 18:48:51 1997
+	- functional, but vapid, dscanf inserted	 
+
+	1.13  Tue Jul 29 00:08:54 1997
+	- interim random checkin.	 
+
+	1.12  Thu Jun 19 16:42:50 1997
+	- weekday tested.  bug in AUTOLOADING of dec_* fixed.	 
+
+	1.10  Thu Jun 19 16:25:01 1997
+	- typo	 
+
+	1.9  Thu Jun 19 16:20:41 1997
+	- added weekday(), dprintf("%w")	 
+
+	1.8  Fri Jun 06 20:28:08 1997
+	- doco fixes	 
+
+	1.4  Thu May 22 20:05:07 1997
+	- started doco.  (copied to nwisw tree)	 
+
+	1.2  Fri May 09 02:23:55 1997
+	- fixed all references to Gtime	 
+
+	1.1  Tue Apr 29 22:45:51 1997
+	- Initial revision	 

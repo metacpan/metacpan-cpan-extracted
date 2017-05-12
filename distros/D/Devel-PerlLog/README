@@ -1,0 +1,62 @@
+NAME
+    Devel::PerlLog - Log Information When `perl` Runs
+
+SYNOPSIS
+        export PERL5OPT='-MDevel::PerlLog=/tmp/perl.log'
+
+DESCRIPTION
+    Perl gets run a lot. Many times by things that you didn't even know were
+    Perl. Even simple things that you know are Perl end up spawning lots of
+    other Perl processes. This can make some things hard to figure out.
+
+    For instance, when you run "make" (after running "perl Makefile.PL"),
+    over 10 Perl processes are started.
+
+    This module gives you a way of logging every time a new Perl process
+    starts, and giving you specific information about that Perl process. You
+    just need to load this module using the "PERL5OPT" environment variable.
+
+CONFIGURATION
+    All the configuration options for this module are made as arguments to
+    "- MDevel::PerlLog". For example:
+
+          export PERL5OPT="-MDevel::PerlLog=$PWD/perl.log,all"
+
+    This section documents the configuration options.
+
+  Log Path
+    By default, loggin will be done to STDOUT. If you pass an argument
+    string containing a "/" or a "." then that will be used as the file
+    path. You should take care to use an absolute file path, or else a new
+    log will be started relative to where the Perl starts.
+
+  Plugins
+    The following arguments are responsible for reporting certain
+    information about the Perl process:
+
+    "argv"
+        This will dump the @ARGV at the start of the process.
+
+    "cwd"
+        This will show the cwd at the start of the process.
+
+    "pid"
+        This will report the Perl process id (PID).
+
+  Groups
+    Since there are so many plugins, you can specify groups:
+
+    "all"
+        "argv", "cwd", "pid"
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2011-2015. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See <http://www.perl.com/perl/misc/Artistic.html>
+

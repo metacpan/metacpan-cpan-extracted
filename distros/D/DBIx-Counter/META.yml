@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                DBIx-Counter
+version:             0.03
+abstract:            Manipulate named counters stored in a database
+license:             perl
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Carp:                          0.01
+    DBI:                           1.06
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Rhesa Rozendaal <rhesa@cpan.org>

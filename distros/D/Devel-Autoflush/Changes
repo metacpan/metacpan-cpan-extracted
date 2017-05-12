@@ -1,0 +1,26 @@
+Revision history for Devel-Autoflush
+
+0.06      2014-02-26 19:31:45-05:00 America/New_York
+
+    [CHANGED]
+
+    - Updated distribution metadata, repo and bugtracker
+
+    - Switch to managing with Dist::Zilla
+
+0.05 Mon Feb 23 06:53:45 EST 2009
+    - Vanity fix: fool CPANTS about 'use strict' since *by design* this 
+      module *must not* use strict as older stricts had side effects
+      
+0.04 Wed Oct  1 23:06:51 EDT 2008
+    - Bug fix: no longer uses string eval to set $VERSION (broke testing of
+      overload::eval
+
+0.03 Mon Sep 15 17:24:41 EDT 2008
+    - No longer loads any modules (e.g. vars, strict) for minimal side effects
+
+0.02 Fri May 23 20:41:34 EDT 2008
+    - Remove 'our' keyword for backwards compatibility
+
+0.01 Wed May 21 23:27:32 EDT 2008
+    - Initial release

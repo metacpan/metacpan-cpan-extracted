@@ -1,0 +1,64 @@
+{
+   "abstract" : "Manipulate dates in various traditional Indian calendar systems.",
+   "author" : [
+      "Jaldhar H. Vyas <jaldhar@braincells.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4204",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Indic",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Event::Sunrise" : "0",
+            "DateTime::Util::Calc" : "0.13",
+            "Params::Validate" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Calendar::HalariSamvata" : {
+         "file" : "lib/DateTime/Calendar/HalariSamvata.pm",
+         "version" : "0.1"
+      },
+      "DateTime::Calendar::ShalivahanaShaka::Southern" : {
+         "file" : "lib/DateTime/Calendar/ShalivahanaShaka/Southern.pm",
+         "version" : "0.1"
+      },
+      "DateTime::Calendar::VikramaSamvata::Gujarati" : {
+         "file" : "lib/DateTime/Calendar/VikramaSamvata/Gujarati.pm",
+         "version" : "0.1"
+      },
+      "DateTime::Indic::Chandramana" : {
+         "file" : "lib/DateTime/Indic/Chandramana.pm",
+         "version" : "0.2"
+      },
+      "DateTime::Indic::Utils" : {
+         "file" : "lib/DateTime/Indic/Utils.pm",
+         "version" : "0.3"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/jaldhar/panchanga/tree/master/perl"
+      }
+   },
+   "version" : "0.2"
+}

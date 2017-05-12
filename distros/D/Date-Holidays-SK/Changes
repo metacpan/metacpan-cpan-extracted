@@ -1,0 +1,8 @@
+Revision history for Date-Holidays-SK
+
+0.02    20 Apr 2014
+        * add is_sk_holiday_today()
+
+0.01    20 Apr 2014
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,16 @@
+=head2 Distribution
+
+Distribution should be made as easy as possible for various
+installation and packaging formats.
+
+=head3 Docker
+
+* ulimit for crawling processes
+
+=head3 Windows distribution
+
+* C<.msi> package including Perl, Apache Tika and Elasticsearch
+
+* Debian package
+
+=cut

@@ -1,0 +1,7 @@
+Changes
+lib/Date/Simple/Month.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+t/00_compile.t
+t/01_new.t

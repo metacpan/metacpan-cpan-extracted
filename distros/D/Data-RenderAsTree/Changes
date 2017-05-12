@@ -1,0 +1,16 @@
+Revision history for Perl extension Data::RenderAsTree.
+
+1.03  Sun Jul 12 17:01:00 2015
+	- Remove the max_key_length and max_value_length options from t/ref.t so truncation of strings
+		does not cause tests to fail. Also, scripts/ref.pl has been changed to match.
+
+1.02  Mon Jul  6 12:43:00 2015
+	- Add method run(), which does not call tree2string() automatically the way render() does.
+		run() is used by MarpaX::Languages::Lua::Parser.
+	- Add option clean_nodes() to stop undef warnings when printing via tree2string().
+
+1.01  Mon Mar 16 12:44:00 2015
+	- Remove scripts/data.tree.dumper.pl, which required the dread Data::TreeDumper.
+
+1.00  Sun Mar  7 17:12:00 2015
+	  - Original version

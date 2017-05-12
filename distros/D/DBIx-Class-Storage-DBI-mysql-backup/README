@@ -1,0 +1,45 @@
+NAME
+    DBIx::Class::Storage::DBI::mysql::backup
+
+SYNOPSIS
+        package MyApp::Schema;
+        use base qw/DBIx::Class::Schema/;
+    
+        our $VERSION = 0.001;
+    
+        __PACKAGE__->load_classes(qw/CD Book DVD/);
+        __PACKAGE__->load_components(qw/
+            Schema::Versioned
+            Storage::DBI::mysql::backup
+        /);
+
+DESCRIPTION
+    Adds "backup" method to DBIx::Class::Storage::DBI::mysql.
+
+    This plugin enables "backup" in DBIx::Class::Schema::Versioned when
+    using MySQL.
+
+FUNCTIONS
+  backup ( $to_dir )
+    writes SQL file as "backup_filename" to $to_dir. returns SQL filename.
+
+  backup_filename
+    returns filename of backup *$DB_NAME-YYYYMMDD-hhmmss.sql*
+
+  dump
+    returns dumped SQL
+
+SEE ALSO
+    * DBIx::Class::Schema::Versioned
+
+    * MySQL::Backup
+
+AUTHOR
+    Atsushi Nagase <ngs@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2011 Atsushi Nagase <ngs@cpan.org>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

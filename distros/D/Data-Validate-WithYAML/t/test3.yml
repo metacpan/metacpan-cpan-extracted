@@ -1,0 +1,4 @@
+---
+step1:
+    ip_ranges:
+        sub: '$_ =~ m/^\d+\.\d+/'

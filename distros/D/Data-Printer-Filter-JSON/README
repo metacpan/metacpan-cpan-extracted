@@ -1,0 +1,102 @@
+NAME
+    Data::Printer::Filter::JSON - pretty-print your decoded JSON structures!
+
+VERSION
+    Version 0.03
+
+SYNOPSIS
+    # In your program:
+
+        use Data::Printer filters => {
+            -external => [ 'JSON' ],
+        };
+
+    # or, in your `.dataprinter' file:
+
+        {
+            filters => {
+                -external => [ 'JSON' ],
+            },
+        };
+
+    # You can also tweak the colors:
+
+        use Data::Printer {
+            filters => {
+                -external   => [ 'JSON' ],
+            }, color => {
+                JSON  => {
+                  true  => 'bright_blue on_black',
+                  false => 'black on_bright_blue'
+                }
+            },
+        };
+
+DESCRIPTION
+    Almost every JSON decoder on CPAN handles JavaScript's booleans with
+    objects, and some even reuse them in the resulting data structure. The
+    result? A tiny JSON like this:
+
+        {
+          "alpha": true,
+          "beta" : false,
+          "gamma": true,
+          "zeta" : false
+        }
+
+    Results in this Data::Printer output:
+
+        \ {
+            alpha   JSON::XS::Boolean  {
+                Parents       JSON::Boolean
+                public methods (0)
+                private methods (1) : __ANON__
+                internals: 1
+            },
+            beta    JSON::XS::Boolean  {
+                Parents       JSON::Boolean
+                public methods (0)
+                private methods (1) : __ANON__
+                internals: 0
+            },
+            gamma   var{alpha},
+            zeta    var{beta}
+        }
+
+    While all I wanted was this:
+
+        \ {
+            alpha   true,
+            beta    false,
+            gamma   true,
+            zeta    false
+        }
+
+    This module fixes that! :)
+
+  Handles
+    JSON::XS and JSON::PP (JSON 2.x), JSON::NotString (JSON 1.x),
+    JSON::DWIW, JSON::Parser, JSON::SL, Mojo::JSON, boolean (used by
+    Pegex::JSON) and JSON::JOM.
+
+    JSON::JOM Caveat
+    When working with JSON::JOM, make sure you load it after loading
+    Data::Printer. This is a known bug and garu's working on it!.
+
+  Can't Handle
+    The output of any JSON decoder that does NOT use a blessed reference for
+    its booleans, like JSON::Syck or JSON::Streaming::Reader.
+
+AUTHOR
+    Nuba Princigalli <nuba@stastu.com>
+
+CONTRIBUTORS
+    Tim Heaney <oylensheegul@gmail.com>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2012, Nuba Princigalli <nuba@stastu.com>. All rights
+    reserved.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

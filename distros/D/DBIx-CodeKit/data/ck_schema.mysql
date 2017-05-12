@@ -1,0 +1,10 @@
+
+CREATE TABLE ck_code (
+  code_set varchar(16) binary NOT NULL default '',
+  code_code varchar(32) binary NOT NULL default '',
+  code_desc blob NOT NULL,
+  code_order smallint(6) NOT NULL default '0',
+  code_flag char(1) binary NOT NULL default '',
+  PRIMARY KEY  (code_set, code_code)
+);
+

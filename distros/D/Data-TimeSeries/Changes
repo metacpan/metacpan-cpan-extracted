@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::TimeSeries.
+
+0.01  Sun Jun  6 11:35:33 2004
+	- original version; created by h2xs 1.22 with options
+		-AX Data::TimeSeries
+

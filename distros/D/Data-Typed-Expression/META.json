@@ -1,0 +1,45 @@
+{
+   "abstract" : "Parsing typed expressions",
+   "author" : [
+      "Przemyslaw Wesolek <jest@go.art.pl>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Typed-Expression",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Parse::RecDescent" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0",
+            "Test::More" : "0.81_01"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jest/perl.mod.Data-Typed-Expression.git",
+         "web" : "https://github.com/jest/perl.mod.Data-Typed-Expression"
+      }
+   },
+   "version" : "0.005"
+}
+

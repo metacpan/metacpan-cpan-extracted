@@ -1,0 +1,18 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "empty_vrf",
+          "TABLE_addrf": {
+            "ROW_addrf": {
+              "addrf": "ipv4"
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

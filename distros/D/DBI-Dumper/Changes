@@ -1,0 +1,34 @@
+Revision history for Perl extension DBI::Dumper.
+
+2.01 Fri Feb 17 2005
+	- fixed bug with DBI's NAME statement handle attribute
+
+2.00c Mon Feb 13 2005
+	- documentation fix
+
+2.00b Mon Feb 13 2005
+	- fixed bug with NULL columns
+	- profiled and improved Inline::C builder
+
+2.00a Fri Feb 10 2005
+	- added Inline::C string builder
+	- optimized PurePerl builder
+	- separated PRD grammar and added to build process
+
+1.41  Fri Feb 03 2005
+	- fixed bug with only having left delimiter
+	- fixed bug with zero ("0") as a false value
+
+1.40  Mon Jan 22 2006
+	- added support for comments in control file
+
+1.30  Thu Jan 19 2006
+	- fixed ability to to os auth (userid=/)
+
+1.21  Wed Jan 18 2006
+	- remove dependency on Class::Accessor::Fast
+
+0.01  Fri Dec 30 09:41:58 2005
+	- original version; created by h2xs 1.23 with options
+		-PX DBI::Dumper
+

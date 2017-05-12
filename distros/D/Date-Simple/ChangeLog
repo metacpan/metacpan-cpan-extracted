@@ -1,0 +1,99 @@
+2008-01-12  Igor Sutton <igor.sutton@yahoo.co.uk>
+
+	* Subclassing should now work with today, ymd and d8
+	constructors (bug #32250).
+	
+2008-01-10  Igor Sutton <igor.sutton@yahoo.co.uk>
+
+	* Copy default_format from old Date::Simple object when adding or
+	subtracting (bug #31037).
+	
+2008-01-09  Igor Sutton <igor.sutton@yahoo.co.uk>
+
+	* Applied patch proposed for 64bit support (bug #28549).
+
+2004-12-18  Yves Orton <demerphq@hotmail.com>
+
+        * YO --  Version number kick to 3.02, doc fix. Patch merge.
+
+2004-11-27  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* Simple.xs (is_leap_year): Fixed math for dates before
+	1900-03-01.  Thanks to Anil Natha for finding the bug.
+
+	* t/date.t: Added day_of_week tests.
+
+
+2004-04-02  Yves Orton <demerphq@hotmail.com>
+
+	* lib/Date/Simple.pm ($VERSION): Version 3.
+	  Added formatting support and as_iso() XS method.
+	  Switched to using Test::More instead of Test.
+	  Prereqs expanded to include Test::More and Scalar::Util
+	  Both are standard distro in later perls.
+
+	* Makefile.pl: Dont mess with filenames xs is true.
+
+2002-12-06  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* lib/Date/Simple.pm ($VERSION): Version 2.04.
+
+	* lib/Date/Simple.pm (use overload): Overload more operators: ==
+	!= eq ne
+	(_inval): Stylistic changes.
+	(_new): New sub, built from the old 'new'.  Accept YYYYMMDD
+	strings without hyphens.  Return undef rather than dying on
+	unrecognized format.  ('new' still dies for compatibility.)
+	(date): Use '_new'.  Avoid use of 'eval' and $@.
+	(new): Use '_new'.
+	(pod): Update docs.
+
+	* lib/Date/Simple/NoXS.pm (_eq): New sub.
+	(_ne): New sub.
+
+	* Simple.xs (is_object): New function.
+	(new_for_cmp): New function.
+	(_add): Use is_object().
+	(_subtract): Use is_object().
+	(_compare): Use is_object() and new_for_cmp().
+	(_eq): New sub.
+	(_ne): New sub.
+
+	* t/date.t: Test new equality operators.
+
+	* README: Regenerated from lib/Date/Simple.pm.
+
+2002-03-11  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* lib/Date/Simple.pm ($VERSION): Version 2.03.
+
+	* t/date.t: Remove a locale dependency.  Thanks to ASSAD Arnaud
+	for the fix.
+
+2001-10-02  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* lib/Date/Simple.pm ($VERSION): Version 2.02.
+
+	* Simple.xs (days_in_month): avoid crash due to reversed args.
+
+2001-08-27  John Tobey  <jtobey@john-edwin-tobey.org>
+
+	* lib/Date/Simple.pm: Version 2.01.
+
+	* t/date.t: Test today() fix.
+
+	* lib/Date/Simple.pm (today): Replace use of deleted function.
+
+	* Version 2.00.
+
+	* Added functional interface (date, d8, ymd).
+
+	* Load POSIX module only when needed.
+
+	* Crunch numbers in C if compiler found.  (Install with 'perl
+	Makefile.PL noxs' to select the pure Perl implementation.)
+
+	* Can calculate the day of the week.
+
+	* Reduced dependence on time_t, most functions work for dates up
+	to 9999.

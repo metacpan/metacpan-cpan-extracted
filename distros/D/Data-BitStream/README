@@ -1,0 +1,66 @@
+Data::BitStream version 0.08
+
+A Moo class providing read/write access to bit streams.  This includes many
+integer coding methods as well as straightforward ways to implement new codes.
+
+Bit streams are often used in data compression and in embedded products where
+memory is at a premium.  Using variable length codes allows high performance
+compression of integer data.
+
+The Data::BitStream::XS module is also available, and is a near drop-in
+replacement for this module, though it does not use Moo.  The Data::BitStream
+module will internally use the XS module if it is found, giving a lot of the
+performance benefit without any other changes necessary.
+
+
+SYNOPSIS
+
+  use Data::BitStream;
+  my $stream = Data::BitStream->new;
+  $stream->put_gamma($_) for 1..20;
+  $stream->rewind_for_read;
+  my @values = $stream->get_gamma(-1);
+
+See the POD module documentation for examples and more information on all the
+methods included.  There are also examples and benchmarks in the examples
+directory in the distribution, including a functional lossless image codec.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Test::More
+  Moo
+  Moo::Role
+  MooX::Types::MooseLike
+
+It works identically with Moo, Mouse, or Moose.  Moo with Class::XSAccessor
+installed is as fast as Mouse for some operations, but not all.  If speed
+is important, install Data::BitStream::XS.  If speed is more important than
+extensibility, use Data::BitStream::XS directly.
+
+I have tested this using perl versions 5.6.2 to 5.20.0.
+
+It works with Perl 5.6.2, with a caveat.  On 32-bit O/S, 64-bit Perl can have
+broken arithmetic (two unequal 64-bit numbers will compare as equal).  We force
+maxbits to 32 if it looks like it won't work with 64.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2011-2014 by Dana Jacobsen <dana@acm.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.1 or,
+at your option, any later version of Perl 5 you may have available.

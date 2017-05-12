@@ -1,0 +1,63 @@
+0.81 - Mon 24 Nov 2014 10:11:50 PST
+    * Add Makefile.PL back into MANIFEST  (fixes RT 100524)
+    * Remove MYMETA.* files from MANIFEST (fixes RT 100525)
+
+0.8  - Fri 21 Nov 2014 11:26:57 PST
+    * Update docs
+    * Fix some timezone bugs (Fixes RT 43610 and RT 99804 - thanks Sterling Hanenkamp)
+    * Refactor for more DRYness
+    * Add URL field
+    * Update Module::Install to add META.yml (fixes RT 80668)
+    * Add a note about all day events (RT 63049)
+
+0.7  - Thu 29 Nov 2007 16:45:39 GMT
+    * Add VERSION to .ics files since new Data::ICal requires it
+
+0.65 - Mon Feb 20 12:24:18 GMT 2006
+    * New Data::ICal does quoting for us
+
+0.64 - Wed Oct 12 13:59:39 BST 2005
+    * Split events() up into events() and collapse()
+    * Fix a bug with exploding floating events
+
+0.63 - Mon Oct 10 12:20:33 BST 2005
+    * Added support for comma seperated (EX|R)DATES
+    * Fix floating events - the way we were doing it before is wrong and there is now a floating() method
+
+0.62 - Tue Oct  4 15:32:57 BST 2005
+    * Added auto setting of end if you set all_day without an existing end
+    * Related to that worked round a bug related to Palm floating events noticed by Graham Gough
+    * Documentation patches
+    * Adding setting of exdates and rdates
+
+0.61 - Wed Sep 21 17:48:36 BST 2005
+    * Make Clone a prereq
+
+0.6 - Tue Sep 20 12:40:43 BST 2005
+    * Make setting of recurrence work
+    * Add reference to original untainted object
+    * Expose split_up method 
+    * Escape and Unescape summary and description
+
+0.5 - Wed Sep  7 17:58:07 BST 2005
+    * Tests (and setting) for all_day 
+    * Fix all day events
+    * Fix recurrence-id for exploded events
+
+0.4 - Sat Sep  3 10:10:06 BST 2005
+    * Add recurrence-id support for event updates
+    * Add all_day and uid methods
+    * Make sure that recurring events get exploded
+
+0.3 - Wed Aug 17 11:52:24 BST 2005
+    * match Data::ICal 0.03 API change
+
+0.2 - Mon Aug 15 10:36:01 BST 2005
+    * More support for timezones
+    * Note some todos
+    * Fix a bug with premature truncation of RRULEs
+    * Added EXRULE, EXDATE and RDATE support - we 
+      can now parse London.pm's insane meeting shcedule. YAY!
+
+0.1 - Tue Aug  9 09:44:22 BST 2005
+    * initial release

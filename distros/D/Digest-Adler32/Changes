@@ -1,0 +1,22 @@
+2003-11-30   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.03
+
+   Faster and simpler add().  José Micó <jmico@citynet.net.ar>
+   found that some expressions could be moved outside of the
+   inner loop.
+
+
+
+2003-11-28   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.02
+
+   Drat!  Forgot PREREQ_PM in the Makefile.PL
+
+
+
+2003-11-28   Gisle Aas <gisle@ActiveState.com>
+
+   Release 0.01
+

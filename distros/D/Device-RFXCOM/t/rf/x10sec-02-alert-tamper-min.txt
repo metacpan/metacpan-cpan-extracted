@@ -1,0 +1,10 @@
+20010e44bb
+
+master x10security 20.010e44bb:
+  security/x10sec80/alert/tamper/min
+  sensor/x10sec80[battery]=90%
+
+
+
+
+

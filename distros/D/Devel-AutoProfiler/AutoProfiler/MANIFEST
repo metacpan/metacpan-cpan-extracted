@@ -1,0 +1,7 @@
+AutoProfiler.pm
+Changes
+MANIFEST
+Makefile.PL
+test.pl
+wantarray.pl
+callback.pl

@@ -1,0 +1,15 @@
+Changes
+Build.PL
+Makefile.PL
+MANIFEST
+README
+META.yml
+README
+Todo.txt
+
+lib/Directory/Scratch/Structured.pm
+
+t/001_0_load.t
+t/001_1_load.t
+t/004_create.t
+t/005_bad_arguments.t

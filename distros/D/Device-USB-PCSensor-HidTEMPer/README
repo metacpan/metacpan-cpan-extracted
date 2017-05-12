@@ -1,0 +1,84 @@
+Device-USB-PCSensor-HidTEMPer version 0.04
+==========================================
+
+This module contains an interface to the PCSensor HidTEMPer and PCSensor 
+HidTEMPerNTC temperature sensors. There are also the common functions for the
+device itself (Device) and the sensors (Sensor) laying the grounds for other 
+HidTEMPer versions to be added later on. 
+
+The current temperature can be returned either using the Celsius 
+scale or the Fahrenheit scale.
+
+WARNING 
+
+The results returned from this code needs to undergo more testing. If the
+code used to write to the device is not used with extreme care it may 
+destroy the device.
+
+TODO
+
+Please contact me if you find anything to be missing.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This modules uses the following other modules:
+
+use Carp
+use Device::USB
+use Device::USB::Device
+use Time::HiRes qw / sleep /
+
+This module uses the strict and warning pragmas.
+
+DEVICE COMMANDS
+
+Get information from the device:
+
+Command: 0x52
+Returns 8 bytes of interest:
+1) Unknown 
+2) Device ID 
+3) Inner calibration 
+4) Inner calibration
+5) Outer calibration
+6) Outer calibration
+7) unknown
+8) unknown
+
+Command: 0x61
+Set gain value, the command equals the gain to be set, 0x61, 0x62....0x68
+
+Command: 0x53 or 0x54 depending on device and sensor
+Returns 3 bytes of value
+1) Primary value
+2) Decimal value 
+3) unknown
+
+Command: 0x41
+Returns 3 bytes of value
+1) Part one of the float number
+2) Part two of the float number
+3) Part three of the float number
+
+Command: 0x43
+Set configuration of the device to 0
+
+ACKNOWLEDGEMENTS
+
+Thanks to Daniel Fahlgren for updating different commands.
+
+COPYRIGHT AND LICENSE
+
+Copyright (c) 2010-2011 Magnus Sulland
+
+This program is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.

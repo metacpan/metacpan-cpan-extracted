@@ -1,0 +1,48 @@
+Revision history for Dancer2-Plugin-Adapter
+
+0.007 2016-01-19
+  - Make changes to have the plugin compatible with the new
+    backward-compatible interface. (GH#5, Peter Mottram)
+
+  [ STATISTICS ]
+    - code churn: 4 files changed, 45 insertions(+), 39 deletions(-)
+
+0.006 2015-05-28
+  [ FIXED ]
+    - Remove ':syntax' argument. (GH#3, mascip)
+    - Bring plugin up-to-speed with current Dancer2. (GH#4, veryrusty)
+
+  [ STATISTICS ]
+    - code churn: 12 files changed, 235 insertions(+), 511 deletions(-)
+
+0.005 2013-03-06T14:38:55Z America/New_York
+  [ CHANGED ]
+    - Forked into Dancer2::Plugin::Adaptor for proper Dancer2 support
+
+  [ REMOVED ]
+    - Removed 'session' scope because storing objects in session data is
+      just a bad idea all around.
+    - PRIOR HISTORY REFERS TO Dancer-Plugin-Adaptor ***
+
+0.004 2013-01-25T22:12:51Z America/New_York
+  [ FIXED ]
+    - Added JSON as a prereq for testing
+
+0.003 2012-12-24T14:49:57Z America/New_York
+  [ ADDED ]
+    - Added 'scope' option to control lifecycle of created objects
+
+  [ CHANGED ]
+    - Default scope is now 'request' instead of (effectively) 'singleton'
+      in the previous implementation.  This makes the default behavior
+      safer to ensure data is not leaked between requests.
+
+0.002 2012-12-14T12:28:27Z America/New_York
+  [ DOCUMENTATION ]
+    - Fixed URL for issues
+
+  [ OTHER ]
+    - Added Class::Load::XS as recommended
+
+0.001 2012-12-14T12:15:44Z America/New_York
+  - First release

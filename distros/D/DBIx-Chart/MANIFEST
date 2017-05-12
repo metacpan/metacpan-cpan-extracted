@@ -1,0 +1,10 @@
+Makefile.PL
+MANIFEST
+Chart.pm
+dbixchart.html
+README
+t/plottest.t
+t/pumpkin.png
+t/turkey.png
+t/gowilogo.png
+

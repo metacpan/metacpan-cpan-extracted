@@ -1,0 +1,273 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+use Getopt::Long;
+use Pod::Usage;
+use Config::Any;
+use File::Slurp;
+use Data::Dump qw( dump );
+use Parallel::Forker;
+use Parallel::Scoreboard;
+use Dezi::Bot;
+
+our $VERSION = '0.001';
+
+my $help;
+my $debug;
+my $verbose;
+my $config_file;
+my $urls_file;
+my $workers;
+my $pool_size;
+
+GetOptions(
+    'help'          => \$help,
+    'debug:i'       => \$debug,
+    'verbose:i'     => \$verbose,
+    'config_file=s' => \$config_file,
+    'urls=s'        => \$urls_file,
+    'workers=i'     => \$workers,
+    'pool_size=i'   => \$pool_size,
+) or pod2usage(2);
+pod2usage(1) if $help;
+
+my @urls = @ARGV;
+
+# merge with any urls in file
+if ($urls_file) {
+    push @urls, grep { !m/^[#|\s]/ } read_file($urls_file);
+}
+
+if ( !@urls ) {
+    pod2usage(1);
+}
+
+my $config;
+if ($config_file) {
+    $config = Config::Any->load_files(
+        {   files   => [$config_file],
+            use_ext => 1
+        }
+    )->[0]->{$config_file};
+}
+
+# merge config, allowing command line to override file
+$config->{debug}   = $debug;
+$config->{verbose} = $verbose;
+for my $key (qw( spider_config queue_config cache_config handler_config )) {
+    $config->{$key}->{verbose} = $verbose if defined $verbose;
+    $config->{$key}->{debug}   = $debug   if defined $debug;
+}
+
+# make sure our URL list is unqiue
+my %uniq;
+my @uniq_urls;    # preserve order
+for my $u (@urls) {
+    if ( $uniq{$u}++ ) {
+        warn "Skipping duplicate URL '$u'\n";
+        next;
+    }
+    push @uniq_urls, $u;
+}
+my $n_urls = scalar(@uniq_urls);
+$workers   ||= 1;
+$pool_size ||= int( $n_urls / $workers );
+
+$debug and dump $config;
+
+# simple case, no parallel
+if ( $workers == 1 ) {
+    my $bot   = Dezi::Bot->new(%$config);
+    my $total = $bot->crawl(@uniq_urls);
+    $verbose and warn "crawled $total URLs\n";
+    exit(0);
+}
+
+# set up the parallel manager
+my $manager = Parallel::Forker->new( use_sig_child => 1 );
+
+# signal handling (propagate death)
+$SIG{CHLD} = sub { Parallel::Forker::sig_child($manager) };
+$SIG{TERM} = sub {
+    if ( $manager && $manager->in_parent ) {
+        $manager->kill_tree_all('TERM');
+        die "Quitting...\n";
+    }
+};
+
+# if urls <= workers, no problem.
+if ( $n_urls <= $workers ) {
+    for my $url (@uniq_urls) {
+        my $process = $manager->schedule(
+            name         => $url,    # unique
+            run_on_start => sub {
+                my $proc = shift;
+                if ($verbose) {
+                    warn sprintf( "[%s] starting %s\n", $$, $proc->name );
+                }
+                my $bot = Dezi::Bot->new(%$config);
+                $bot->crawl( $proc->name );
+            },
+            run_on_finish => sub {
+                my ( $proc, $exit_status ) = @_;
+                if ($verbose) {
+                    warn sprintf( "crawl(%s) exited with %s\n",
+                        $proc->name, $exit_status );
+                }
+            },
+        );
+        $process->ready();
+    }
+    $manager->poll();        # start ready workers
+    $manager->wait_all();    # block till we're done
+    exit(0);
+}
+
+# TODO
+# if urls > workers, divide urls into pools
+# of $pool_size, and assign each pool to a worker.
+# if we can't schedule all urls immediately,
+# then schedule the rest of the pools to start as each
+# worker finishes. The goal is to keep all workers busy,
+# not to wait on the slowest.
+else {
+
+    exit(0);
+}
+
+__END__
+
+=head1 NAME
+
+dezibot - parallel web crawler
+
+=head1 SYNOPSIS
+
+ # crawl 2 sites
+ % dezibot http://dezi.org http://swish-e.org
+ 
+ # crawl a list of sites
+ % dezibot --urls file_with_urls
+ 
+ # pass in stored config
+ % dezibot --config botconfig.pl
+ 
+ # crawl in parallel
+ % dezibot --workers 5 --urls file_with_urls
+ 
+=head1 DESCRIPTION
+
+B<dezibot> is a command line tool wrapping the Dezi::Bot module. 
+
+B<dezibot> can:
+
+=over
+
+=item 
+
+read from a config file or take options on the command line
+
+=item 
+
+read URLs from a file or from @ARGV
+
+=item
+
+spawn multiple parallel spiders
+
+=back
+
+=head1 OPTIONS
+
+The following options are supported.
+
+=head2 --help
+
+Print this message.
+
+=head2 --debug
+
+Spew lots of information to stderr. Overrides any setting in B<--config>.
+
+=head2 --verbose
+
+Print some status information to stderr. Overrides any setting in B<--config>.
+
+=head2 --config I<file>
+
+Read config from I<file> using L<Config::Any>. The parsed
+config is passed directly to Dezi::Bot->new().
+
+=head2 --urls I<file>
+
+Read URLs to crawl from I<file>. Lines starting with whitespace or C<#>
+are ignored.
+
+=head2 --workers I<n>
+
+Spawn I<n> workers to crawl in parallel. The default is to crawl
+serially. If I<n> is less than the number of URLs, the list of URLs
+will be sliced and apportioned among the I<n> workers according
+to B<--pool_size>.
+
+=head2 --pool_size I<n>
+
+The max number of URLs per worker. Default is to divide the number
+of URLs by the number of workers, but you might want to set the size I<n>
+to a lower number in order to minimize wait time between
+crawls.
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi-bot at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-Bot>.  
+I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Dezi::Bot
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-Bot>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi-Bot>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi-Bot>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dezi-Bot/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2013 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut
+

@@ -1,0 +1,995 @@
+
+Feature oriented Revision history for Devel-PerlySense
+======================================================
+
+0.0218 -- 2016-07-26 12:22:22 UTC
+
+* Fixed broken docs image links after a PAUSE cleanup.
+
+
+
+0.0217 -- 2016-07-21 12:53:23 UTC
+
+* Feature: Edit - Copy Package Name From File Name -- C-o e c P.
+  Assuming the file is a Perl module in a lib directory, copy the
+  corrsponding package name to the kill ring.
+
+  Useful when you've just created a new .pm file.
+
+* Edit - Copy Package Name: if there is no package declaration in the
+  source, fall back to using the package name from the file name.
+
+* Extract Variable fixes: symbol boundary and case sensitive search
+  and replace.
+
+* When identifying an object method in "$self->abc", assume
+  "shift->abc" means $self if there is no $self already used in the
+  sub.
+
+
+
+0.0216 -- 2015-08-16 22:44:23 UTC
+
+* Feature: Edit - Visualize Callers -- "C-o e v c". Visualize the
+  callers comment created by "Find Callers" using GrapViz. Requires
+  GraphViz "dot" to be installed.
+
+* Fix: Find Callers highlights part of method as being already present
+  in the call tree. Use regex symbol boundary instead of word
+  boundary.
+
+
+
+0.0215 -- 2015-07-19 19:24:38 UTC
+
+* Feature: Edit - Find Callers -- "C-o e f c". Find callers of a
+method in the current project, and insert the package->sub as a
+comment.
+
+This is for understanding where in the code base method calls
+originate.
+
+
+
+0.0214 -- 2015-07-15 21:01:20 UTC
+
+* Allow Ack file type options (e.g. --perl, --sql) to be toggled, so
+  they can be removed and allow all files to be matched.
+
+* Silence random warnings from loading CPAN modules (they go to the
+  debug log)
+
+
+
+0.0213 -- 2014-10-12 14:42:24 UTC
+
+* Feature: Run File under Devel::CoverX::Covered -- C-o r c. This is
+  the same as Run File, but collect test coverage information using
+  Devel::CoverX::Covered and enable Code Coverage Visualization.
+
+
+
+0.0211 -- 2013-11-25 19:21:46 UTC
+
+* Feature: Edit - Copy Package Name -- "C-o e c p". Copy the current
+  package statement name to the clipboard (kill-ring) and display it
+  in the echo area.
+
+
+
+0.0210 -- 2013-11-25 15:47:30 UTC
+
+* In ack 2.0, the option --all is replaced with --known-types.
+
+  So in "Find with Ack" (C-o f a), while editing the search string in
+  the minibuffer, the current shortcut (C-o a) to toggle "--all" is
+  now useless if you use the later version of ack.
+
+  New shortcut "C-o k" to toggle the option "--known-types".
+
+
+
+0.0209 -- 2013-11-22 21:34:48 UTC
+
+* Upgrade lang-refactor-perl to 0.1.5 with proper word boundary
+  matching.
+
+
+
+0.0208 -- 2013-11-22 18:20:03 UTC
+
+* When acking for sub/method declarations, also look for Moose has declarations
+  (This is a quickie which doesn't account for quoting etc.)
+
+* Improve the regex for files in error message for "C-o g e" to
+  include "-".
+
+* Fix failing test because the inheritance diagram is non-deterministic.
+
+
+
+0.0207 -- 2013-02-26 23:09:26 UTC
+
+* Feature: Refactoring - Extract Variable -- "C-o e e v". This uses
+  the lang-refactor-perl elisp library.
+
+  See also Refactoring - Highlight Remove - "C-o e h" to remove any
+  highlights remaining after Extract Variable.
+
+
+
+0.0206 -- 2012-10-20 17:23:47 UTC
+
+* Bug #79817: "Go to Module" fails on numeric characters.
+  Thanks to Mark A. Flacy for report and solution.
+
+
+
+0.0204 -- 2012-06-17 12:52:45 UTC
+
+* Bug #77711: Run ack with --nopager
+
+
+
+0.0203 -- 2012-06-16 17:18:13 UTC
+
+* Feature: identify base classes via "use parent".
+
+* Correctly identify Test::Class .pm files as tests if they're below
+  the t/ directory
+
+
+
+0.0202 -- 2012-06-07 20:09:55 UTC
+
+* Fixed deep recursion bug when a Module claims to be a base class to
+  itself
+
+
+
+0.0201 -- 2012-06-06 21:32:57 UTC
+
+* Fixed deep recursion bug when finding a Module file, where
+  e.g. Bar::Baz would be shadowed by Foo::Bar::Baz.
+
+
+
+0.0200 -- 2012-06-01 11:37:30 UTC
+
+* Test release
+
+
+
+0.0199 -- whenever
+
+* Feature: Added missing -i toggle for the ack command
+
+  "C-o i" toggle  -i
+
+* Feature: Go To Find Buffer -- "C-o g f" to go to the B<*grep*>
+  buffer.
+
+
+
+0.0198 -- whenever
+
+* Feature: Edit - Add Use Statement using "C-o e a u". Add a 'use
+  Module' statement to the 'use Module' section at the top. Default
+  Module name is module at point.
+
+* Changed Ack key bindings to use the C-o prefix instead of C-c, to
+  avoid stomping on someone's personal config more than necessary.
+  (also updated the Changes entry below to reflect the current
+  bindings)
+
+
+
+0.0197 -- 2012-05-29 22:39:02 UTC
+
+* Fixed problem during startup where C-o f a won't work until the
+  "grep" package is loaded (it's autoloaded during normal interactive
+  use).
+
+* Changed commands that run from the Project Directory so that they
+  don't blow up if there is no Project Directory. Instead just run
+  from the current directory.
+
+* Add convenience key bindings for "Find with Ack" -- "C-o f a".
+
+  When editing the ack command you can use the following keys to set options
+  "C-o w" toggle  -w
+  "C-o q" toggle  -Q
+  "C-o a" use    --all
+  "C-o p" use    --perl
+  "C-o s" use    --sql
+
+* Feature: Run File with Alternate Command using "C-u C-o C-r".  You
+  need to configure the Alternate Command to do somethign useful in
+  the PerlySenseProject config file.
+
+* Feature: Debug File with Alternate Command using "C-u C-o r d".  You
+  need to configure the Alternate Command to do somethign useful in
+  the PerlySenseProject config file.
+
+
+
+0.0195 -- 2012-05-21 13:55:44 UTC
+
+* Fixed t/PerlySense-find-file-inc.t which fails if there is no
+  .PerlySenseProject in the build directory (which there typically
+  isn't).
+
+
+0.0194 -- 2012-05-21 12:58:40 UTC
+
+* Fixed dzil config re: $VERSION variable
+
+
+
+0.0193 -- 2012-05-20 18:09:05 UTC
+
+* Catch exceptions during flymake and log them to avoid returning a
+  positive error code that flymake will interpret as "Configuration
+  error has occurred while running" etc.
+
+* Improve error reporting for badly formed YAML config files.
+
+* #70203: Missing close paren in emacs lisp
+  _Finally_ fixed pathetic elisp syntax error w/ missing closing paren.
+
+  Thanks to SPACEBAT and Sebastian Willert for reporting
+
+
+
+0.0191 -- 2011-07-31 21:07:42 UTC
+
+* Config project/inc_dir now used not only to set @INC when running
+  programs, but also to find files and modules.
+
+* Running programs using the prepared shell commands now more solid
+  across various Emacs versions / platforms.
+
+* Provide a default .PerlySenseProject/.perlcritic file when running
+  perly_sense create_project. (If you run this again, the existing project.yml
+  will be backed up.)
+
+
+
+0.0190 -- 2011-05-12 21:12:24 UTC
+
+* #68144: Unable to install PerlySense-0.0189
+  Thanks to David McWilliams for a quick bug report.
+
+
+
+0.0189 -- 2011-05-08 22:55:00 UTC
+
+Bug fix release. Thanks to John SJ Anderson for prodding me to get RT
+patches applied.
+
+* Bug #65259 - sub prototype causes failure in perl 5.12 in emacs on
+  mac. Thanks to VANAMBURG for the bug report and fix.
+
+* Bug #42827 - Flymake warnings not displayed with latest Perl::Critic
+  Thanks to Jan Tatarik for the bug report and fix.
+
+* Bug #61640 - perly-sense.el regexps
+  Thanks to Kevin Ryde for the bug report and John SJ Anderson for the
+  patch.
+
+
+
+0.0188 -- 2011-05-08 21:15:38 UTC
+
+* Dist::Zilla build files
+
+
+
+0.0186
+------
+
+* Removed non ascii char form Build.PL to avoid not-utf8 warnings.
+
+
+
+0.0185
+------
+
+* Fixed bad YAML in default config file which breaks YAML::Tiny
+  1.46. Thanks to Thomas Kappler for finding this.
+
+  !!!NOTE!!! If you have existing .PerlySense/project.yml files, they
+  are broken. A scalar string with : followed by a space is illegal
+  and now needs to be quoted.
+
+  In the previous default config, the regex under "bookmark:" is
+  broken and the "rex:" should now be
+      - "qr/\# \s* TODO \s* : \s* (.+?) \s*$/x"
+
+  Remember: you need to find *all* your .PerlySense/project.yml files
+  and fix them:
+    ack -fa | ack PerlySenseProject/project.yml
+
+* Better error output when YAML::Tiny dies
+
+* Updated default config to use "prove --nocolor". Because it's 2011
+  now.
+
+
+
+0.0184
+------
+
+* No-op
+
+
+
+0.0183
+------
+
+* New command: C-o g r -- Go to Run buffer.
+
+* Fixed Test::Class current method bug when re-running.
+
+
+
+0.0182
+------
+
+* Minor "Test::Class" usability improvements.
+
+
+
+0.0181
+------
+
+* Support for running a single method in Test::Class. Mark a method
+  with C-o t m, then run the test class with C-o C-r as usual.
+
+
+
+0.0180
+------
+
+* Adjusted "Find with Ack" to work with Emacs 23 as well.
+
+
+
+0.0179
+------
+
+* Feature request from Joshua McMIchael: make flymake display its
+  errors in the minibuffer.
+
+  This is done automatically if the display isn't graphical, or if the
+  ps/flymake-prefer-errors-in-minibuffer variable is customized.
+
+
+
+0.0178
+------
+
+* Bug http://rt.cpan.org/Public/Bug/Display.html?id=42577
+  - Test::More output "# Looks like you planned 1 test but ran 2."
+    singular not recognized. Thanks to Kevin Ryde for noticing!
+  - Also relaxed singular/plural for other phrases
+
+
+
+0.0177
+------
+
+* Debugger
+  - Fixed a bug with the working directory.
+  - Proper docs
+
+
+
+0.0176
+------
+
+* Run in Debugger -- C-o r d
+  - !NOTE! Requires you to re-create the .project config file !NOTE!
+  - Run current file from the project directory
+  - With proper -I include directories
+
+
+
+
+0.0175
+------
+
+* Fixed problem with shell dialect syntax in directory names for
+  prepare-shell-command. Now works on Unixen too.
+
+
+
+0.0174
+------
+
+* New specific Overview commands:
+  - C-o o i -- Inheritance
+  - C-o o a -- API
+  - C-o o b -- Bookmarks
+  - C-o o u -- Uses
+  - C-o o h -- NeighbourHood
+
+* Beta: Run calls to perly_sense as a prepared shell command, if the
+  variable ps/use-prepare-shell-command is non-nil.
+
+  (setq ps/use-prepare-shell-command t) to enable in your config.
+
+  This will shave around 1.8s off each call, which is
+  significant. This makes most things _a_lot_ snappier.
+
+* Removed the NeighbourHood from Class Overview. This was making Class
+  Overview too slow to be useful, and provided little benefit.
+
+  You can still use C-o o h if you want to see the NeighbourHood.
+
+
+
+0.0173
+------
+
+* Moved screen shots to web pages, linked from POD
+
+
+
+0.0172
+------
+
+*Fixed bug: If displaying method docs with an =item in the POD, it
+  will render with a warning.
+
+
+
+0.0171
+------
+
+* Screenshots in the documentation and other docs improvements.
+
+
+
+0.0170
+------
+
+* Find with Ack quotes the search properly.
+
+* Find Sub Declarations and Find Method Calls identify methods when
+  point is on the object too.
+
+
+
+0.0169
+------
+
+* Find sub declarations in Project of method or name at point.
+  C-o f s.
+
+* Find method calls in Project of method or name at point.
+  C-o f c.
+
+* Fixed problem with missing --nogroup ack option on some
+  environments.
+
+* Better Find usability:
+  - Sensible default point position in input buffer.
+
+* Numerous minor POD fixes.
+
+
+
+0.0168
+------
+
+* Find using "ack" in Project. C-o f a.
+
+* Rearranged the docs to provide more readable sub headings.
+
+
+
+0.0167
+------
+
+* Fixed bug: missing (require 'pc-select) in elisp.
+  Thanks to Sebastian Willert for catching this.
+  https://rt.cpan.org/Ticket/Display.html?id=41416
+
+
+
+0.0166
+------
+
+* Removed "Coverage information loaded" message that appears when
+  Devel::CoverX::Covered info is loaded. This messed up the echo area
+  for other messages.
+
+* Release related bugs fixed. Thanks to Lucien Hantute for spotting
+  the reason.
+
+
+
+0.0165
+------
+
+* Moose syntax plugin, supporting the "has", "extends", and "with"
+  keywords. See the Devel::PerlySense::Plugin::Syntax::Moose docs.
+
+  Not yet spliced off to its own distro.
+
+* Test fix (accidental // as part of a path seems to break some
+  platforms).
+
+
+
+0.0164
+------
+
+* Moose plugin, supporting "extends" and "with". The plugin is still
+  in this distro, it will eventually get it's own distribution.
+
+
+
+0.0163
+------
+
+* Another attempt, this time by introducing files in otherwise empty
+  directories. Maybe different versions of tar extract files
+  differently.
+
+
+
+0.0162
+------
+
+* Fucking about with this problem: http://www.perlmonks.org/?node_id=714227
+
+  This attempt: http://rt.cpan.org/Public/Bug/Display.html?id=39804
+
+
+
+0.0161
+------
+
+* Failed release
+
+
+
+0.0160
+------
+
+* Git support (Magit) for the Version Control commands.
+  See: http://zagadka.vm.bytemark.co.uk/magit/
+
+* Fixed bug: Coverage visualization always instantiates an empty
+  "covered" directory, even if there isn't any coverage to begin with.
+
+* Fixed bug: Nothing happens after choosing between > 1 base classes
+  in "Go to Base class" (response key named "class-description"
+  instead of "class_description").
+
+
+
+0.0159
+------
+
+* Go To Project's Other Files - C-o g p o -- If you have a
+  .corresponding_files in the .PerlySenseProject directory, this will
+  let you navigate to those other files. See File::Corresponding for
+  more info.
+
+
+
+0.0158
+------
+
+* Changed call to collect coverage information to be asynchronous.
+
+
+
+0.0157
+------
+
+* Fixed (potential) bug in covered visualization, when trying to
+  fontify a killed buffer.
+
+
+
+0.0156
+------
+
+* Added configuration tips to the Cookbook on how to run Test::Class
+  and custom test framework files.
+
+* Go To Tests - Other Files: C-o g t o -- Now sub-aware, i.e. when the
+  point is on a line with "sub name", the list is limited to that
+  sub. Requires Devel::CoverX::Covered >= 0.011 .
+
+
+
+0.0155
+------
+
+* Fixed various Coverage fontification bugs. This didn't work at all
+  well with subs with _ in them.
+
+* New customization -- only indicate bad subroutine coverage
+
+
+
+0.0154
+------
+
+* New feature: Display code coverage in the source using
+  Devel::CoverX::Covered.
+
+  First release of this, so may be immature. Feedback wanted.
+
+* Print out log file at beginning of doing process_inc or
+  process_project
+
+* New feature: "perly_sense log_file" prints the log file name. Useful
+  for "tail -f `perly_sense log_file`.
+
+
+
+0.0153
+------
+
+* Fixed http://rt.cpan.org/Public/Bug/Display.html?id=35934.
+
+  "memory leak" during "perly_sense process_inc" caused by an
+  in-memory cache of Perl documents.
+
+* New feature "perly_sense process_project [--dir=.]".
+
+
+
+0.0152
+------
+
+* All actions in perly_sense now use the serialization format, which
+  means all actions can potentially work in Vim.
+
+
+
+0.0151
+------
+
+* BIG CONFIG CHANGE! all Emacs variables are renamed from perly-sense-
+  to ps/ . Update the section in your .emacs file that loads
+  PerlySense!
+
+
+
+0.0150
+------
+
+* If more than 30 items in a dropdown, use completing read instead.
+  This is customized with the
+  perly-sense-dropdown-max-items-to-display variable.
+
+
+
+0.0149
+------
+
+* Go To Tests - Other Files: C-o g t o -- If you have
+  Devel::CoverX::Covered installed and have build a cover_db in the
+  project root directory, this command will let you choose to go to
+  any related test or source files.
+
+  See Devel::CoverX::Covered for details.
+
+  Ironically, this isn't very well unit tested yet...
+
+
+
+0.0148
+------
+
+* Eye-candy release: use dropdown-list.el when choosing between
+  multiple classes.
+
+* Note that two configuration colors were added, so revisit the "Emacs
+  installation" section in the docs to set that up.
+
+
+0.0147
+------
+
+* Vim serialization support
+
+
+
+0.0146
+------
+
+* Edit Test Count: C-o e t c. Increase the test count specified by use
+  "Test::More tests => 42;" and the like.
+
+* Assist-with Test Count: C-o a t. Synchronize invalid test count in
+  .t file with the *compilation* buffer.
+
+
+
+0.0145
+------
+
+* Go to Version Control now properly supports: svn, none
+
+* Doc Uses: C-o d u -- Display used Module in the echo area.
+
+* Go To Uses: C-o g u -- Go to the 'use Module' section of the current
+  buffer.
+
+* Edit Move Use Statement: C-o e m u -- Move 'use Module' statement to
+  the end of the 'use Module' section at the top of the file.
+
+
+
+0.0144
+------
+
+* Go To 'new': C-o g n -- Go to the 'new' method of the current class.
+
+* Go to Version Control: C-o g v -- Go to the Project view of the
+  current Version Control system.
+
+* Document Inheritance: C-o d i -- display the Inheritance hierarchy
+  for the current class.
+
+* Documentation: Key binding conventions
+
+
+
+0.0143
+------
+
+* More clever Goto Base Class:
+
+  - If target source file is already open, don't move point to top of
+    file by default
+
+  - If the current location is in a sub
+    - display that sub if it exists in any base class
+    - go to that sub in the base class if it exists
+
+
+
+0.0142
+------
+
+* C-o g b - Goto Base Class. Basic functionality, but can handle MI,
+  letting you choose which class to go to.
+
+
+
+0.0141
+------
+
+* Bundle regex-tool 1.2
+
+  C-o a r - Assist-with Regex
+
+
+
+0.0140
+------
+
+* In Class Overview, display documentation for each method, or the
+  method name if no doc is found. This is taken from the POD for each
+  method.
+
+
+
+0.0139
+------
+
+* Fiddled with failing test, fixed typo.
+
+
+
+0.0138
+------
+
+* Tried fixing test which failed on some platforms.
+
+
+
+0.0137
+------
+
+* Debug diagnostics for the failing test that doesn't appear on
+  Windows.
+
+
+
+0.0136
+------
+
+* In Class Overview, don't display private methods in base classes
+  outside the current Project. TBD: config setting for this
+
+* Made headings in Class Overview less huge
+
+* Fixed bug with missing face dependency loaded from another Emacs package
+
+
+
+0.0135
+------
+
+* Changed key binding for Class Overview from C-o C-c (focusing on
+  Class) to C-o C-o (focusing on Overviwe). This is to bring it in
+  line with the convention of having the first keystroke be an
+  "action", not an "object".
+
+* "perly_sense info" displays Version
+
+* Removed dependency on "grep-mode" which was only used for the faces.
+
+* Faces are now dealt with properly in the customize-group perly-sense
+  (if you use PerlySense in text-only mode, please let me know if it
+  looks ok).
+
+
+
+0.0134
+------
+
+* Docs and Goto now works on Methods in the Class Overview.
+
+* Bug: Goto method declaration goes to the POD rather than the sub {}
+  if found in base classes.
+
+
+
+0.0133
+------
+
+* Cookbook.pod added
+
+* Class Overview
+  - reorder the things displyed to bring the more useful stuff to the top
+  - display API methods in columns
+
+
+
+0.0132
+------
+
+* "perly_sense info" provides useful information about what the
+  current project directory, user home directory, etc. is.
+
+* Class Overview lists the API, i.e. methods and properties.
+
+
+
+0.0131
+------
+
+* Fixed broken Build.PL which didn't properly install the .el files
+  into the lib directory. The Makefile.PL worked earlier though...
+
+
+
+0.0130
+------
+
+* Fist non-developer release!
+
+* New .emacs load procedure, read the docs again.
+
+* Automatic identification of elisp files using "perly_sense
+  external_dir".
+
+* Configurable Emacs prefix. Default is C-o.
+
+
+
+0.01_29
+-------
+
+* Fixed failing test.
+
+* Fixed broken initial project config (bad bookmark regexp)
+
+
+
+0.01_28
+-------
+
+* Fixed another most likely insignificant failing test, added debug
+  output for another one. Bring on the CPAN testers! (kudos guys!)
+
+
+
+0.01_27
+-------
+
+* Fixed annoying failing Win/Unix newline test. Nothing else.
+
+
+
+0.01_26
+-------
+
+* Fixed bug #30775: "Flymake not showing Perl::Critic warnings" which
+  was caused by redirecting warnings into the debug log.
+
+* Bookmark support (recreate the project config and check out the
+  "bookmark" entry).
+
+
+
+0.01_25
+-------
+
+* Fixed: Flymake emits redefined warnings for subs with namespace
+  qualifiers.
+
+* Debug logging in the HOME/.PerlySense/log directory
+
+* Warnings go to the debug log
+
+
+
+0.01_24
+-------
+
+* Fixed potential breaking flymake elisp.
+
+* If the *compiation* buffer is already visible in any frame, switch
+  to that first, so we don't get to see two *compiation* buffers next
+  to each other. That just looks silly.
+
+* Perl::Critic using Flymake - first draft
+
+
+
+0.01_23
+-------
+
+* Run File uses the Project config, and supports syntax checking .pm
+  files, running .pl files, etc. as well.
+
+* New config keys added, so run "perly_sense create_project" to
+  re-generate a default project.yml which you can then diff against
+  the old one (renamed with datestamp).
+
+* Flymake support - highlight syntax errors and warnings in the source
+  while editing (continously or at every save).
+
+  Note: new elisp file to install, and some .emacs configuration.
+
+
+
+0.01_22
+-------
+
+* Docs about projects, etc.
+
+* If Run File is perfomed from within the compile buffer, do a
+  recompile.
+
+* C-p r r -- If not even the *compilation* buffer is visible, issue
+  Re-Run File from anywhere.
+
+* "perly_sense create_project" renames existing project.yml with
+  datestamp
+
+
+
+Earlier
+-------
+
+* Stuff happened.
+
+* Time passed.
+
+* Code got written. Bugs were introduced and removed. Ideas were had,
+  fleshed out, xdiscarded. Sometimes implemented.
+
+But that was then.

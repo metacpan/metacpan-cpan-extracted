@@ -1,0 +1,11 @@
+# $Header: $
+
+=pod
+
+This is a test file for B<Devel::Refactor>.
+
+For example, we might want to see if the I<rename_subroutine> method
+finds this line of text, because it contains oldSub, but it shouldn't find
+this line, which contains oldSubroutine.
+
+=cut

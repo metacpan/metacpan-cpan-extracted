@@ -1,0 +1,15 @@
+Revision history for Perl extension Data::FormValidator::Filters::HTMLScrubber.
+
+Legenda:
+   + = new feature
+   ! = updated feature/bug fix
+   * = incompatible changes
+   - = removed feature
+  
+0.02  Fri Mar 24 17:50:08 2006  
+	+ Added docs and test
+	
+0.01  Tue Mar 21 17:50:08 2006
+	+ original version; created by h2xs 1.23 with options
+		-X -n Data::FormValidator::Filters::HTMLScrubber
+

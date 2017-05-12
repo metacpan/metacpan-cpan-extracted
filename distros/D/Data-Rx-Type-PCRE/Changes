@@ -1,0 +1,17 @@
+Revision history for Data-Rx-Type-PCRE
+
+0.005     2013-12-22 21:59:16-0500 America/New_York
+          update github links
+
+0.004     2013-07-05 22:05:59 America/New_York
+          update packaging, new bug tracker
+
+0.003     2012-09-18 11:06:18 America/New_York
+          update for Data::Rx 0.200000
+
+0.002     2008-12-03
+          remove spurious loading of a Moose class
+
+0.001     2008-10-04
+          first revision
+

@@ -1,0 +1,9 @@
+severity = 5
+
+[-TestingAndDebugging::RequireUseStrict]
+
+[-TestingAndDebugging::RequireUseWarnings]
+
+[-RegularExpressions::RequireExtendedFormatting]
+
+[-Moose::RequireCleanNamespace]

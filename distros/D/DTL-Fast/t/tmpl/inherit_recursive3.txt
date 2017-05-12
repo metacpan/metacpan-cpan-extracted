@@ -1,0 +1,5 @@
+{% extends "inherit_recursive0.txt" %}
+
+{% block block_name %}
+blabla
+{% endblock %}

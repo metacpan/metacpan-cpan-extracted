@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Device/Pertelian.pm
+script/hello_pert.pl
+share/pertd.tgz
+t/00-load.t
+t/01-basic.t
+xt/boilerplate.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml
+MANIFEST

@@ -1,0 +1,41 @@
+---
+abstract: "Adds a Coderwall 'endorse' button to README Markdown file"
+author:
+  - 'Yanick Champoux <yanick@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  JSON::Any: 0
+  Module::Build: 0.3601
+  Test::DZil: 0
+  Test::More: 0.96
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CoderwallEndorse
+provides:
+  Dist::Zilla::Plugin::CoderwallEndorse:
+    file: lib/Dist/Zilla/Plugin/CoderwallEndorse.pm
+    version: v0.2.0
+requires:
+  Dist::Zilla::Role::File::ChangeNotification: 0
+  Dist::Zilla::Role::FileMunger: 0
+  Dist::Zilla::Role::Plugin: 0
+  List::Util: 0
+  Moose: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CoderwallEndorse
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-CoderwallEndorse/
+  repository: https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse.git
+version: 0.2.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

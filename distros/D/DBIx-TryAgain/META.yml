@@ -1,0 +1,32 @@
+---
+abstract: "If at first you don't succeed, try, try again."
+author:
+  - 'Brian Duggan <bduggan@matatu.org>'
+build_requires:
+  DBD::SQLite: 1.37
+  DBI: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.4
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-TryAgain
+provides:
+  DBIx::TryAgain:
+    file: lib/DBIx/TryAgain.pm
+    version: 0.05
+  DBIx::TryAgain::db:
+    file: lib/DBIx/TryAgain/db.pm
+    version: 0
+  DBIx::TryAgain::st:
+    file: lib/DBIx/TryAgain/st.pm
+    version: 0
+requires:
+  perl: 5.006
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

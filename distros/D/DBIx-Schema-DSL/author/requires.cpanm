@@ -1,0 +1,13 @@
+# for DBIx-Schema-DSL
+
+# author's tests
+Test::Pod
+Test::Pod::Coverage
+Test::Spelling
+Test::Perl::Critic
+Test::Synopsis
+
+# Release tools
+ShipIt
+ShipIt::Step::ChangeAllVersions
+CPAN::Uploader

@@ -1,0 +1,31 @@
+{---}
+{abstract: Provides WSMan CIM binding}
+{author:}
+{  - 'Stephen James Hurd <shurd@broadcom.com>'}
+{build_requires:}
+{  ExtUtils::MakeMaker: 0}
+{configure_requires:}
+{  ExtUtils::MakeMaker: 0}
+{dynamic_config: 1}
+{generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112621'}
+{license: unknown}
+{meta-spec:}
+{  url: http://module-build.sourceforge.net/META-spec-v1.4.html}
+{  version: 1.4}
+{name: DMTF-CIM-WSMan}
+{no_index:}
+{  directory:}
+{    - t}
+{    - inc}
+{requires:}
+{  DMTF::CIM: 0}
+{  DMTF::CIM::Instance: 0}
+{  DMTF::WSMan: 0}
+{  DateTime::Duration: 0}
+{  MIME::Base64: 0}
+{  Test::More: 0}
+{  URI: 0}
+{  URI::Escape: 0}
+{  XML::Twig: 0}
+{  version: 0}
+{version: v0.9.0}

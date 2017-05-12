@@ -1,0 +1,252 @@
+Revision for history for perl distribution Dist-Zilla-PluginBundle-BerryGenomics
+
+0.3.2 2015-12-24T08:38:41
+ - Use %v in tag_format (Huo Linhe)
+ - Auto commited by dzil with version 0.3.1 at 18-Dec-2015 (Huo Linhe)
+ - Use more verbose auto commit message. (Huo Linhe)
+ - Auto commited by dzil with version 0.3.0 at 18-Dec-2015 (Huo Linhe)
+ - Improve changelog generation, add perltidy (Huo Linhe)
+ - Fix typo in document (Huo Linhe)
+ - Auto commited by dzil with version 0.2.1 at 31-Jul-2015 (Huo Linhe)
+ - Fix pulgin syntax error (Huo Linhe)
+
+0.3.1 2015-12-18T02:29:41Z
+ - Use more verbose auto commit message. (Huo Linhe)
+ - Auto commited by dzil with version 0.3.0 at 18-Dec-2015 (Huo Linhe)
+ - Improve changelog generation, add perltidy (Huo Linhe)
+ - Fix typo in document (Huo Linhe)
+ - Auto commited by dzil with version 0.2.1 at 31-Jul-2015 (Huo Linhe)
+ - Fix pulgin syntax error (Huo Linhe)
+
+0.3.0 2015-12-18T02:17:30Z
+ - Improve changelog generation, add perltidy (Huo Linhe)
+ - Fix typo in document (Huo Linhe)
+ - Auto commited by dzil with version 0.2.1 at 31-Jul-2015 (Huo Linhe)
+ - Fix pulgin syntax error (Huo Linhe)
+
+0.2.1 2015-07-31T05:25:24Z
+ [Huo Linhe]
+ - Fix pulgin syntax error
+ - Auto commited by dzil with version 0.2.0 at 31-Jul-2015
+ - Auto commited by dzil with version 0.1.10 at 31-Jul-2015
+ - Include dotfile while gather dir
+ - Improve gitlab-ci config
+ - Include dot files in Git::Gather, mainly for .gitlab-ci.yml
+ - Auto commited by dzil with version 0.1.9 at 21-Jul-2015
+ - Fix syntax error in multiple settings for one plugin
+ - Auto commited by dzil with version 0.1.8 at 21-Jul-2015
+ - Follow the bundle changes
+ - Fix ] Lost README in build directory
+ - Auto commited by dzil with version 0.1.7 at 16-Jul-2015
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.2.0 2015-07-31T03:51:50Z
+ [Huo Linhe]
+ - Auto commited by dzil with version 0.1.10 at 31-Jul-2015
+ - Include dotfile while gather dir
+ - Improve gitlab-ci config
+ - Include dot files in Git::Gather, mainly for .gitlab-ci.yml
+ - Auto commited by dzil with version 0.1.9 at 21-Jul-2015
+ - Fix syntax error in multiple settings for one plugin
+ - Auto commited by dzil with version 0.1.8 at 21-Jul-2015
+ - Follow the bundle changes
+ - Fix ] Lost README in build directory
+ - Auto commited by dzil with version 0.1.7 at 16-Jul-2015
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.10 2015-07-31T03:31:06Z
+ [Huo Linhe]
+ - Include dotfile while gather dir
+ - Improve gitlab-ci config
+ - Include dot files in Git::Gather, mainly for .gitlab-ci.yml
+ - Auto commited by dzil with version 0.1.9 at 21-Jul-2015
+ - Fix syntax error in multiple settings for one plugin
+ - Auto commited by dzil with version 0.1.8 at 21-Jul-2015
+ - Follow the bundle changes
+ - Fix ] Lost README in build directory
+ - Auto commited by dzil with version 0.1.7 at 16-Jul-2015
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.9 2015-07-21T07:22:55Z
+ [Huo Linhe]
+ - Fix syntax error in multiple settings for one plugin
+ - Auto commited by dzil with version 0.1.8 at 21-Jul-2015
+ - Follow the bundle changes
+ - Fix ] Lost README in build directory
+ - Auto commited by dzil with version 0.1.7 at 16-Jul-2015
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.8 2015-07-21T04:07:09Z
+ [Huo Linhe]
+ - Follow the bundle changes
+ - Fix ] Lost README in build directory
+ - Auto commited by dzil with version 0.1.7 at 16-Jul-2015
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.7 2015-07-16T09:12:23Z
+ [Huo Linhe]
+ - Lost Dist::Zilla::Plugin::Run
+ - Auto commited by dzil with version 0.1.6 at 16-Jul-2015
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.6 2015-07-16T06:35:20Z
+ [Huo Linhe]
+ - Only install missing package in Gitlab CI
+ - Fix git config error in Gitlab CI
+ - Add .gitlab-ci.yml to integrate with Gitlab CI
+ - Auto commited by dzil with version 0.1.5 at 16-Jul-2015
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.5 2015-07-16T06:18:35Z
+ [Huo Linhe]
+ - Downgrade prereqs
+ - Auto commited by dzil with version 0.1.4 at 16-Jul-2015
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.4 2015-07-16T06:11:04Z
+ [Huo Linhe]
+ - Add prereqs packages in dist.ini
+ - Auto commited by dzil with version 0.1.3 at 19-May-2015
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.3 2015-05-19T05:52:24Z
+ [Huo Linhe]
+ - Revert "[TEMP] fix Chinese character error in Changes"
+ - Auto commited by dzil with version 0.1.2 at 12-May-2015
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.2 2015-05-12T08:20:29Z
+ [Huo Linhe]
+ - [TEMP] fix Chinese character error in Changes
+ - Auto commited by dzil with version 0.1.1 at 30-Jan-2015
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.1 2015-01-30T08:49:12Z
+ [Huo Linhe]
+ - Update dist.ini, use what the bundle is
+ - Rename Readme.md to README.md
+
+0.1.0 2015-01-16T08:32:14Z
+ [Huo Linhe]
+ - Remove PodSyntaxTests(generated at .dzil profile.ini)
+
+0.0.1 2015-01-16T07:24:44Z
+ [Huo Linhe]
+ - Add documents
+ - Fix unrequires
+ - Fix error[NOT a array reference]
+ - Add plugins requres
+ - Initialize gitrepo with `dzil new`

@@ -1,0 +1,78 @@
+ProductID,ProductName,CategoryID,UnitPrice,UnitsInStock,Discontinued
+1,Chai,1,18,39,FALSE
+2,Chang,1,19,17,FALSE
+3,Aniseed Syrup,2,10,13,FALSE
+4,Chef Anton's Cajun Seasoning,2,22,53,FALSE
+5,Chef Anton's Gumbo Mix,2,21.35,0,TRUE
+6,Grandma's Boysenberry Spread,2,25,120,FALSE
+7,Uncle Bob's Organic Dried Pears,7,30,15,FALSE
+8,Northwoods Cranberry Sauce,2,40,6,FALSE
+9,Mishi Kobe Niku,6,97,29,TRUE
+10,Ikura,8,31,31,FALSE
+11,Queso Cabrales,4,21,22,FALSE
+12,Queso Manchego La Pastora,4,38,86,FALSE
+13,Konbu,8,6,24,FALSE
+14,Tofu,7,23.25,35,FALSE
+15,Genen Shouyu,2,15.5,39,FALSE
+16,Pavlova,3,17.45,29,FALSE
+17,Alice Mutton,6,39,0,TRUE
+18,Carnarvon Tigers,8,62.5,42,FALSE
+19,Teatime Chocolate Biscuits,3,9.2,25,FALSE
+20,Sir Rodney's Marmalade,3,81,40,FALSE
+21,Sir Rodney's Scones,3,10,3,FALSE
+22,Gustaf's Knackebrod,5,21,104,FALSE
+23,Tunnbrod,5,9,61,FALSE
+24,Guarana Fantastica,1,4.5,20,TRUE
+25,NuNuCa Nub-Nougat-Creme,3,14,76,FALSE
+26,Gumbar Gummibarchen,3,31.23,15,FALSE
+27,Schoggi Schokolade,3,43.9,49,FALSE
+28,Rossle Sauerkraut,7,45.6,26,TRUE
+29,Thuringer Rostbratwurst,6,123.79,0,TRUE
+30,Nord-Ost Matjeshering,8,25.89,10,FALSE
+31,Gorgonzola Telino,4,12.5,0,FALSE
+32,Mascarpone Fabioli,4,32,9,FALSE
+33,Geitost,4,2.5,112,FALSE
+34,Sasquatch Ale,1,14,111,FALSE
+35,Steeleye Stout,1,18,20,FALSE
+36,Inlagd Sill,8,19,112,FALSE
+37,Gravad lax,8,26,11,FALSE
+38,Cote de Blaye,1,263.5,17,FALSE
+39,Chartreuse verte,1,18,69,FALSE
+40,Boston Crab Meat,8,18.4,123,FALSE
+41,Jack's New England Clam Chowder,8,9.65,85,FALSE
+42,Singaporean Hokkien Fried Mee,5,14,26,TRUE
+43,Ipoh Coffee,1,46,17,FALSE
+44,Gula Malacca,2,19.45,27,FALSE
+45,Rogede sild,8,9.5,5,FALSE
+46,Spegesild,8,12,95,FALSE
+47,Zaanse koeken,3,9.5,36,FALSE
+48,Chocolade,3,12.75,15,FALSE
+49,Maxilaku,3,20,10,FALSE
+50,Valkoinen suklaa,3,16.25,65,FALSE
+51,Manjimup Dried Apples,7,53,20,FALSE
+52,Filo Mix,5,7,38,FALSE
+53,Perth Pasties,6,32.8,0,TRUE
+54,Tourtiere,6,7.45,21,FALSE
+55,Pate chinois,6,24,115,FALSE
+56,Gnocchi di nonna Alice,5,38,21,FALSE
+57,Ravioli Angelo,5,19.5,36,FALSE
+58,Escargots de Bourgogne,8,13.25,62,FALSE
+59,Raclette Courdavault,4,55,79,FALSE
+60,Camembert Pierrot,4,34,19,FALSE
+61,Sirop d'erable,2,28.5,113,FALSE
+62,Tarte au sucre,3,49.3,17,FALSE
+63,Vegie-spread,2,43.9,24,FALSE
+64,Wimmers gute Semmelknodel,5,33.25,22,FALSE
+65,Louisiana Fiery Hot Pepper Sauce,2,21.05,76,FALSE
+66,Louisiana Hot Spiced Okra,2,17,4,FALSE
+67,Laughing Lumberjack Lager,1,14,52,FALSE
+68,Scottish Longbreads,3,12.5,6,FALSE
+69,Gudbrandsdalsost,4,36,26,FALSE
+70,Outback Lager,1,15,15,FALSE
+71,Flotemysost,4,21.5,26,FALSE
+72,Mozzarella di Giovanni,4,34.8,14,FALSE
+73,Rod Kaviar,8,15,101,FALSE
+74,Longlife Tofu,7,10,4,FALSE
+75,Rhonbrau Klosterbier,1,7.75,125,FALSE
+76,Lakkalikoori,1,18,57,FALSE
+77,Original Frankfurter grune Sobe,2,13,32,FALSE

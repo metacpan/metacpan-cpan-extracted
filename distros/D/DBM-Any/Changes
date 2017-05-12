@@ -1,0 +1,7 @@
+Revision history for Perl extension DBM::Any.
+
+0.1	Wed Jul 25 11:33:38 2001
+	- original version; created by h2xs 1.21 with options
+		-O -f -n DBM::Any
+
+$Id: Changes,v 1.1 2002/07/19 20:41:53 tony Exp $

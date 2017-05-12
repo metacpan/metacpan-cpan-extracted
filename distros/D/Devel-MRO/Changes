@@ -1,0 +1,21 @@
+Revision history for Perl extension Devel::MRO
+
+0.05 Mon Feb 16 12:54:44 2009
+	- fix tests for blead (5.11.0)
+	- include ExtUtils::Depends
+
+0.04 Wed Feb 11 11:06:55 2009
+	- add tests and benchmarks
+
+0.03 Tue Feb 10 13:06:36 2009
+	- re-packaging
+
+0.02 Tue Feb 10 12:33:02 2009
+	- ** The module interface has been changed **
+		- mro_compat.h is installed as a library
+		- see perldoc Devel::MRO for details
+	- use ExtUtils::Depends for Makefile.PL, advised by chocolateboy
+	- add a complete example, MyMRO distribution
+
+0.01 Wed Dec  3 12:18:10 2008
+	- original version; created by Module::Setup

@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+Makefile_PL_settings
+README
+lib/Data/Munge.pm
+t/00-load.t
+t/01-compile.t
+t/eval.t
+t/torgox.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

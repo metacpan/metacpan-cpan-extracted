@@ -1,0 +1,72 @@
+{
+   "abstract" : "Common API for data with semantics attached to them",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.101582, CPAN::Meta::Converter version 2.101591",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Semantic",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor::Complex" : 0,
+            "Data::Inherited" : 0,
+            "Regexp::Common" : 0,
+            "Test::CompanionClasses::Base" : 0,
+            "Test::More" : 0,
+            "constant" : 0,
+            "parent" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Semantic" : {
+         "file" : "lib/Data/Semantic.pm",
+         "version" : "1.101620"
+      },
+      "Data::Semantic::RegexpAdapter" : {
+         "file" : "lib/Data/Semantic/RegexpAdapter.pm",
+         "version" : "1.101620"
+      },
+      "Data::Semantic::Test" : {
+         "file" : "lib/Data/Semantic/Test.pm",
+         "version" : "1.101620"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-data-semantic at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Semantic"
+      },
+      "homepage" : "http://search.cpan.org/dist/Data-Semantic/",
+      "repository" : {
+         "url" : "http://github.com/hanekomu/Data-Semantic"
+      }
+   },
+   "version" : "1.101620"
+}
+

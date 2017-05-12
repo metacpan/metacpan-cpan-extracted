@@ -1,0 +1,103 @@
+{
+   "abstract" : "Logging queries for DBI",
+   "author" : [
+      "xaicron <xaicron {at} cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-QueryLog",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.59"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "DBD::Pg" : "0",
+            "DBD::SQLite" : "0",
+            "DBD::mysql" : "0"
+         },
+         "requires" : {
+            "DBI" : "0",
+            "Data::Dumper" : "0",
+            "Term::ANSIColor" : "0",
+            "Text::ASCIITable" : "0",
+            "Time::HiRes" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "Test::PostgreSQL" : "0.10",
+            "Test::mysqld" : "0.17"
+         },
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::QueryLog" : {
+         "file" : "lib/DBIx/QueryLog.pm",
+         "version" : "0.41"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/xaicron/p5-DBIx-QueryLog/issues"
+      },
+      "homepage" : "https://github.com/xaicron/p5-DBIx-QueryLog",
+      "repository" : {
+         "url" : "git://github.com/xaicron/p5-DBIx-QueryLog.git",
+         "web" : "https://github.com/xaicron/p5-DBIx-QueryLog"
+      }
+   },
+   "version" : "0.41",
+   "x_contributors" : [
+      "Yuki Ibe <yibe@yibe.org>",
+      "tokuhirom <tokuhirom@gmail.com>",
+      "cho45 <cho45@lowreal.net>",
+      "Syohei YOSHIDA <syohex@gmail.com>",
+      "makamaka <makamaka.donzoko@gmail.com>",
+      "Ryuta Kamizono <kamipo@gmail.com>",
+      "Kenichi Ishigaki <ishigaki@cpan.org>",
+      "xaicron <xaicron@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

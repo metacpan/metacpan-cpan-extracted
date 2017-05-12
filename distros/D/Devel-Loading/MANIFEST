@@ -1,0 +1,10 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Devel/Loading.pm
+t/001-basic.t
+t/lib/MyTest/Module.pm
+t/lib/MyTest/Other/Module.pm

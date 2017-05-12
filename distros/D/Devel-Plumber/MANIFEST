@@ -1,0 +1,12 @@
+lib/Devel/Plumber.pm		Devel::Plumber
+Makefile.PL			Makefile
+MANIFEST			This list of files
+plumber				Main executable
+test.pl				Test running script
+test/Makefile			Makefile
+test/decode-expected-blocks.pl	Helper for test framework
+test/framework.c		Basic test framework
+test/framework.h		Basic test framework
+test/t001.c			Test source
+test/t002.c			Test source
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,120 @@
+dbix-easy-perl (0.19-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Stefan Hornburg (Racke) <racke@linuxia.de>  Sun, 22 Jan 2012 14:07:20 +0100
+
+dbix-easy-perl (0.18-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Stefan Hornburg (Racke) <racke@linuxia.de>  Thu,  8 Jan 2009 19:33:37 +0100
+
+dbix-easy-perl (0.17-1) unstable; urgency=low
+
+  * New upstream version
+  * Use $(CURDIR) instead of $(PWD) in debian/rules
+  * Increase debhelper compatibility level to 5
+  * Increase standards version to 3.7.2
+  * Use Build-Depends instead of Build-Depends-Indep for debhelper
+  
+ -- Stefan Hornburg (Racke) <racke@linuxia.de>  Mon, 21 May 2007 11:38:02 +0200
+
+dbix-easy-perl (0.16-1) unstable; urgency=low
+
+  * New upstream version which fixes filename with quotes produced by
+    dbs_dumptabstruct (Closes: #276578)
+  * Added Suggests for the supported DBD packages in Debian
+  * Added new drivers from 0.15 release to package description
+  * Bumped up Standards-Version
+  * Changed section from interpreters to perl
+  
+ -- Stefan Hornburg (Racke) <racke@linuxia.de>  Sat,  8 Oct 2005 01:13:57 +0200
+
+dbix-easy-perl (0.15-2) unstable; urgency=low
+
+  * New maintainer
+
+ -- Stefan Hornburg (Racke) <racke@linuxia.de>  Sat,  2 Oct 2004 10:50:02 +0200
+
+dbix-easy-perl (0.15-1) unstable; urgency=low
+
+  * New upstream version (Closes: #135638)
+
+ -- Dennis Schoen <dennis@debian.org>  Sat, 16 Mar 2002 12:54:12 +0100
+
+dbix-easy-perl (0.14-1) unstable; urgency=low
+
+  * New upstream version (Closes: #119282) 
+
+ -- Dennis Schoen <dennis@debian.org>  Sun,  9 Dec 2001 02:13:00 +0100
+
+dbix-easy-perl (0.13-2) unstable; urgency=low
+
+  * removed manpage in /usr/man (Closes: #116051)
+
+ -- Dennis Schoen <dennis@debian.org>  Thu, 18 Oct 2001 11:45:37 +0200
+
+dbix-easy-perl (0.13-1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Dennis Schoen <dennis@debian.org>  Thu, 20 Sep 2001 21:07:31 +0200
+
+dbix-easy-perl (0.12-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Dennis Schoen <dennis@debian.org>  Tue, 17 Jul 2001 13:35:36 +0200
+
+dbix-easy-perl (0.11-2) unstable; urgency=low
+
+  * no longer ship .packlist file (Closes: #104756)
+
+ -- Dennis Schoen <dennis@debian.org>  Tue, 17 Jul 2001 11:51:08 +0200
+
+dbix-easy-perl (0.11-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Dennis Schoen <dennis@debian.org>  Sun, 24 Jun 2001 23:49:04 +0200
+
+dbix-easy-perl (0.10-1) unstable; urgency=low
+
+  * New upstream version
+
+ -- Dennis Schoen <dennis@debian.org>  Tue,  6 Feb 2001 14:07:09 +0100
+
+dbix-easy-perl (0.09-1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Dennis Schoen <dennis@debian.org>  Mon, 15 Jan 2001 23:18:36 +0100
+
+dbix-easy-perl (0.08-1) unstable; urgency=high
+
+  * New upstream version
+  * HTMLized manual pages added
+  
+ -- Dennis Schoen <dennis@debian.org>  Tue,  5 Sep 2000 15:20:44 +0200
+
+dbix-easy-perl (0.07-1) unstable; urgency=low
+
+  * New upstream Version and new maintainer
+  * Closes:Bug#70348
+
+ -- Dennis Schoen <dennis@debian.org>  Fri, 23 Jun 2000 18:29:55 +0200
+
+dbix-easy-perl (0.06-2) unstable; urgency=low
+
+  * Sponsoring upload for Dennis Schoen
+
+ -- Dennis Schoen and Alexander Koch <perl@argh.org>  Mon,  1 Jan 2000 10:04:13 +0100
+
+dbix-easy-perl (0.06-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Dennis Schoen <dschoen@rio.gt.owl.de>  Thu, 25 Nov 1999 19:03:09 +0100
+
+

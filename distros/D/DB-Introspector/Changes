@@ -1,0 +1,30 @@
+Version .08
+* Fixed bug# 7499, which caused a DB::Introspector::MySQL::Introspector
+  incompatibility with MySQL index introspection for MySQL version before 4.0.
+  https://rt.cpan.org/Ticket/Display.html?id=7499
+* DB::Introspector::Base::SpecialColumn was added to capture all column types
+  that are not mapped by the introspector driver. Previously, the behavior was
+  to die when an unknown column was found. 
+* Added Function based index support for DB::Introspector::Oracle::Introspector
+
+Version .07
+* DB::Introspector::Util::RelInspect produced backwards paths (each element in
+  the path seemed to be reversed), this is now fixed
+* DB::Introspector::Oracle::Introspector is now compatible with Oracle 8i. It
+  was previously only compatible with Oracle 9i.
+
+Version .05
+* First implementation of DB::Introspector::SerializeUtil, which is used to
+  cache DB::Introspector instances for those cases (when using Oracle) when
+  metadata traversal is slow.
+
+Version .04
+* Implemented support for Indexes
+* Fixed find_table bug (exploited when find_all_tables was called before find_table)
+* Added more helpful comments in POD
+* Added Test::Unit::TestRunner as a dependency of this project
+
+Version .03
+* Implemented MySQL support (Alpha)
+* Handling type attributes (length, not null, etc)
+* Refactored a bit out of CommonRDB and placed into Introspector.pm

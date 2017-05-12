@@ -1,0 +1,70 @@
+0.14     2016-08-21
+    - Require Net::Domain::TLD 1.74. This fixes some failures seen on CPAN
+      Testers, and if you're validating domains you really want the latest
+      version of this module.
+
+0.13     2016-08-21
+    - Accept trailing dot on hostnames as well. Implemented by Greg
+      Oschwald. GitHub #6.
+    - The option domain_disable_tld_validation was added to allow disabling
+      TLD validation. This may be useful if you need to check domains with new
+      gTLDs that have not yet been added to Net::Domain::TLD. Implemented by Greg
+      Oschwald. GitHub #8.
+
+0.12     2016-06-05
+    - Accept trailing dot on a domain name ("example.com."). This is an
+      absolute name per RFCs 1034 & 1035, and will be accepted by any DNS
+      resolution library or tool. Reported by Rob J. Epping.
+
+0.11     2015-05-05
+    - Don't allow non-ASCII digits in domain labels, RT #103121.
+
+0.10     2010-12-29
+    - Fixed bug 41033, no longer allows \n in domain_labels
+        Thanks to marek.miska@netart.pl for reporting the bug
+
+0.09     2008-02-18
+    - Added new option of domain_allow_underscore to allow this module
+      to be used for validating domainnames like _spf.neely.cx if the option is set
+      Default behavior was not changed
+
+0.08     2007-05-17
+    - Ugh, forgot to add new tests to MANIFEST
+
+0.07     2007-05-17
+    - Added POD testing, and minor cleanup related to that
+
+0.06     2007-05-16
+    - Updated contact information to be neil@neely.cx, this is a purely cosmetic change
+
+0.05     2006-12-04
+    - Added Support for compiled regular expressions to the private_domain_tld option.
+        - Thanks to Berhhard Graf <graf@augensalat.de> for the suggestion.
+
+0.04     2006-12-01
+    - Added support for options to alter behavior of is_domain with these new
+      options is_domain will be able to work with private domains with custom TLD's.
+        - Special Thanks to Len Reed <lreed@levanta.com> for not only
+          suggesting the need for this but supplying several patches to help
+          steer this solution in the right direction.  Also made several
+          documentation improvements.
+        - Additional thanks to Richard Sonnen <sonnen@richardsonnen.com> for
+          helping flush out the details of how to utilize options in the
+                  Data::Validate name space portably.
+
+0.03     2005-11-03
+    - Updated to support new procedural version of Net::Domain::TLD
+        - Thanks to Ricardo Signes <rjbs@cpan.org> for letting me know about his new interface
+
+0.02     2005-10-28
+    - added is_hostname method (which is valid for either somehost or somehost.domain.com)
+    - modified is_domain to verify TLD of domain supplied (Uses Net::Domain::TLD)
+    - Fixed bug that allowed domain.com... to return the same results as domain.com
+    - Will no longer consider domain.com. to be valid
+        - Thanks to Smylers <smylers@donhost.co.uk> for the detailed bug
+          report and suggested fixes.
+
+0.01     2005-03-04
+    - original version; created by h2xs 1.23 with options
+        -AXn Data::Validate::Domain
+

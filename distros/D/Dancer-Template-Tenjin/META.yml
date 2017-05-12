@@ -1,0 +1,29 @@
+---
+abstract: 'Tenjin wrapper for Dancer'
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Dancer::FileUtils: 0
+  Test::More: 0
+  utf8: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110580'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-Tenjin
+requires:
+  Carp: 0
+  Dancer::Config: 0
+  Dancer::Template::Abstract: 0
+  File::Basename: 0
+  Tenjin: 0.070001
+  Try::Tiny: 0
+  perl: 5.008
+resources:
+  homepage: http://github.com/ido50/Dancer-Template-Tenjin/tree
+  repository: git://github.com/ido50/Dancer-Template-Tenjin.git
+version: 0.5

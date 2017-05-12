@@ -1,0 +1,556 @@
+package Data::MuForm::Manual::Fields;
+# ABSTRACT: brief documentation of available fields
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Fields - brief documentation of available fields
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+See also L<Data::MuForm::Field> for a description of the base
+field attributes.
+
+The inheritance hierarchy of Data::MuForm Fields
+
+   Text
+      Currency
+      Password
+      Hidden
+      Integer
+      Float
+      Date
+      Email
+   TextArea
+   Select
+      Multiple
+   Checkbox
+      Boolean
+   Compound
+      Repeatable
+      CompoundDateTime
+   Submit
+   Reset
+   Button
+   Display
+   PrimaryKey
+   Upload
+
+=head1 DESCRIPTION
+
+A form's fields are created from the 'has_field' and 'field_list' definitions.
+MuForm processes the field lists and creates an array of
+L<Data::MuForm::Field> objects. The "type" of a field
+determines which field class to use. The field class determines which
+attributes are valid for a particular field. A number of field classes are
+provided by MuForm. You can customize the validation in your form on a
+per field basis, but validation that will be used for more than one field
+might be more easily handled in a custom field class.
+
+Fields are accessed with C<< form->field('name') >>.
+Field errors are in C<< $field->errors >>.
+
+If the 'field_namespace' is not set, fields will be loaded from the
+Data::MuForm::Field namespace. If you provide a 'field_namespace'
+it will be searched before MuForm. If you want to explicitly list the
+field's package, prefix it with a plus sign. The field_namespace plus the
+default name spaces 'Data::MuForm::Field' and 'Data::MuFormX::Field'
+will be searched for fields.
+
+    has '+field_namespace' => ( default => 'MyApp::Form::Field' );
+    has_field 'name' => ( type => 'Text' ); # Data::MuForm::Field::Text
+    has_field 'name' => ( type => '+My::FieldType' ); # My::Fieldtype
+    has_field 'foo'  => ( type => '+Foo' );  # MyApp::Form::Field::Foo
+      or
+    has_field 'foo'  => ( type => 'Foo' );  # MyApp::Form::Field::Foo
+
+=head1 Field categories
+
+If you are using MuForm as a validator, you will probably pick from the
+fields that are mostly about validation and not about form processing.
+
+Fields that are useful as validators:
+
+   Text
+   Currency
+   Integer
+   Float
+   Date
+   Email
+   TextArea
+   Boolean
+   URI
+   List
+   Password
+
+Fields that are primarily for HTML forms:
+
+   CompoundDateTime
+   Submit
+   Reset
+   Button
+   Display
+   Upload
+
+Field necessary for DBIC updates:
+
+   PrimaryKey
+
+Functional fields that may be needed for both validation and HTML
+forms:
+
+   Compound
+   Repeatable
+
+Fields that take an arrayref:
+
+   Select (multiple - not nestable)
+   List (not nestable)
+   Repeatable (nestable)
+
+Field that takes a hashref:
+
+   Compound
+
+When you are picking fields to represent the structure of your data, you
+will need to match the scalar/hashref/arrayref nature of your data to the
+appropriate field.
+
+The most basic type is "Text", which can contain any kind of string, and is
+represented in an HTML form as a text input. If the type of a field is not specified,
+it will be set to 'Text'.
+
+Many field classes contain only a list of constraints and transformations
+to apply. Some use the 'validate' method, which is called before the actions
+are applied. Some build a custom select list using 'build_options'.
+
+There are two rough categories of Field classes: those that do extra processing
+and those that are simple validators. The 'Compound', 'Repeatable', and
+'Select' fields are fields that contain code to perform extra processing.
+
+=head1 Field names
+
+The standard way to use MuForm is with field names that match your
+database accessors. If you want to prepend the HTML field names with a
+name plus dot, you can set 'field_prefix' attribute to a string that
+will be used as a prefix in the field names used when rendering.
+The preifx will be stripped from the beginning of the HTML fields
+before processing, and will be added back in 'fif'. The field's
+'prefixed_name' convenience attribute will return this name for use in templates.
+
+If you want the MuForm field name to be different than the
+database accessor, set 'accessor' on your fields. (It defaults to the field
+name.) You could then use any name that you want for your field.
+
+There are a number of name-related field attributes. The 'name' is
+the name used to identify this particular field in this fields array.
+The 'full_name' includes the names of all parents of this field,
+like 'address.street.streetname'. The 'prefixed_name' is the same as the
+'full_name' unless you have set the 'field_prefix' flag, in which case
+it includes the prefix: 'myform.address.street.streetname'.
+
+To retrieve a field by name, you can use either the full_name or a
+chain: C<< $form->field('address')->field('street')->field('streetname') >>
+or: C<< $form->field('address.street.streetname') >>.
+
+=head1 Creating custom fields
+
+Subclass a custom field from L<Data::MuForm::Field>, or one of the
+existing subclasses. Almost everything that is done in a custom field
+class can also be done in form code. The advantage of a field class
+is that it can simplify declaration of often-repeated sets of attributes.
+
+The simplest subclasses contain only a 'validate' routine or an 'apply' attribute,
+which are called during validation processing.
+
+If the field's value will be an object instead of a simple scalar, such
+as a DateTime, and you want to use the transformed value to fill in the
+form, then you will also need some kind of transformation
+to reformat the object into a form suitable for an HTML form field.
+See L<Data::MuForm::Manual::Transforms> for more info.
+
+Some custom fields might only require setting certain attributes to
+defaults.  A 'select' field might have a special build_options method.
+A field may add additional attributes, or set the 'required' message.
+
+An alternative to new field classes for many field validations might
+be roles with collections of validations.
+
+=head1 Fields supplied by MuForm
+
+=head2 Basic fields
+
+The fields in this section are the basic fields, the commonly used fields
+that will be most often used.
+
+=head3 Text
+
+A string data type that will be formatted as an HTML text field. Has 'minlength'
+and 'maxlength' attributes.
+
+L<Data::MuForm::Field::Text>
+
+=head3 Select
+
+A field formatted as a select element.
+
+L<Data::MuForm::Field::Select>
+
+=head3 Checkbox
+
+A field formatted as a checkbox. If not in params, will be forced to
+'false' value by 'input_without_param' attribute (0 by default).
+
+L<Data::MuForm::Field::Checkbox>
+
+=head3 Hidden
+
+A hidden field.
+
+L<Data::MuForm::Field::Hidden>
+
+=head3 Password
+
+A password field. The value is not re-displayed.
+
+L<Data::MuForm::Field::Password>
+
+=head3 Textarea
+
+A textarea field.  Has 'cols' and 'rows' attributes.
+
+L<Data::MuForm::Field::TextArea>
+
+=head3 Upload
+
+A file upload field that takes a filehandle or a Catalyst upload object (an
+object with a 'size' method).
+
+L<Data::MuForm::Field::Upload>
+
+=head3 Submit
+
+A submit field.
+
+L<Data::MuForm::Field::Submit>
+
+=head3 Reset
+
+A reset field.
+
+L<Data::MuForm::Field::Reset>
+
+=head2 Complex Fields (Compound and Repeatable)
+
+These fields are complex fields which contain a fair amount of
+special code. They do not map to a single element; they contain
+multiple subfields.
+
+=head3 Compound
+
+A compound field is a field that has sub-fields. Compound fields can be
+created in two ways: 1) using a field class, 2) by declaration.
+
+To create a compound field class, you must extend
+L<Data::MuForm::Field::Compound> and use L<Data::MuForm::Meta> to
+allow declaring fields:
+
+  package MyApp::Field::Duration;
+  use Moo;
+  use Data::MuForm::Meta;
+  extends 'Data::MuForm::Field::Compound';
+
+  has_field 'month' => (type => 'Integer');
+  has_field 'day' => ( type => 'Integer' );
+  has_field 'minutes' => ( type => 'Integer' );
+
+Then in the form:
+
+  has_field 'my_duration' => ( type => 'Duration' );
+
+To create a compound field by declaration, declare the containing
+compound field and subfields, prefixing the subfield names
+with the name of the containing compound field plus a dot:
+
+   package MyApp::Form;
+   use Moo;
+   use Data::MuForm::Meta;
+   extends 'Data::MuForm';
+
+   has_field 'duration' => ( type => 'Compound' );
+   has_field 'duration.month' => ( type => 'Integer' );
+   has_field 'duration.day' => ( type => 'Integer' );
+   has_field 'duration.year' => ( type => 'Integer' );
+
+In an HTML form the name of the field must be the complete name
+with dots. The 'html_name' field attribute can be used to get
+this name, C<< $field->html_name >>.
+
+A compound field can be used for a database relation that will have only
+one row (belongs_to or has_one). If the relation has a compound primary
+key, you may need to provide the primary key columns, either through
+hidden fields or by setting them in the C<< $form->value >> hash before
+'update_model' is called.
+
+See also L<Data::MuForm::Field::Compound>.
+
+=head3 Repeatable
+
+Repeatable fields are used for arrays of compound fields.
+
+   has_field 'addresses' => ( type => 'Repeatable' );
+   has_field 'addresses.address_id' => ( type => 'PrimaryKey' );
+   has_field 'addresses.street';
+   has_field 'addresses.city';
+   has_field 'addresses.country' => ( type => 'Select' );
+
+The arrays of fields will be built from arrays passed in the params, or from
+related ('has_many') rows in the database.
+
+It is also used for arrays of single fields using the 'contains' keyword:
+
+  has_field 'tags' => ( type => 'Repeatable' );
+  has_field 'tags.contains' => ( type => '+Tag' );
+
+See L<Data::MuForm::Field::Repeatable> for more information.
+
+=head2 Text Fields
+
+Fields subclassed from the Text field.
+
+=head3 Text
+
+Text field.
+
+L<Data::MuForm::Field::Text>
+
+=head3 Money
+
+Positive or negative real value, formatted to two decimal places.
+
+L<Data::MuForm::Field::Money>
+
+=head3 Date
+
+Date field that can be used by jQuery datepicker plugin.
+
+L<Data::MuForm::Field::Date>
+
+=head3 DateMDY
+
+A subclass of 'Date' with the "%m/%d/%Y" format.
+
+L<Data::MuForm::Field::DateMDY>
+
+=head3 Email
+
+Uses Email::Valid for validation.
+
+L<Data::MuForm::Field::Email>
+
+=head3 Integer
+
+Positive and negative integers. Can use range_start and range_end.
+
+L<Data::MuForm::Field::Integer>
+
+=head3 PosInteger
+
+A positive integer field.
+
+L<Data::MuForm::Field::PosInteger>
+
+=head3 Float
+
+Float field that allows you to set size, precision, decimal_symbol, and
+decimal_symbol_for_db.
+
+L<Data::MuForm::Field::Float>
+
+=head3 TextCSV
+
+A text field that takes multiple values from a database and converts
+them to comma-separated values. This is intended for javascript fields
+that require that, such as 'select2'. This is the only 'multiple' text
+field. This text field would be a select-type field for the user.
+
+L<Data::MuForm::Field::TextCSV>
+
+=head2 Compound Fields
+
+Fields subclassed from 'Compound'.
+
+=head3 Compound
+
+L<Data::MuForm::Field::Compound>
+
+=head3 Repeatable
+
+L<Data::MuForm::Field::Repeatable>
+
+=head3 Duration
+
+Compound field with possible subfields: years, months, weeks, days, hours,
+minutes, seconds, nanoseconds.
+
+L<Data::MuForm::Field::Duration>
+
+=head3 DateTime
+
+A compound field that requires you to provide the subfields that
+you want. (month/day/year/hour/minutes)
+
+L<Data::MuForm::Field::DateTime>
+
+=head2 Checkbox Fields
+
+Fields that inherit from 'Checkbox'.
+
+=head3 Checkbox
+
+L<Data::MuForm::Field::Checkbox>
+
+=head3 Boolean
+
+Checkbox that return 1 or 0.
+
+L<Data::MuForm::Field::Boolean>
+
+=head2 Select Fields
+
+Fields that inherit from 'Select'.
+
+=head3 Select
+
+L<Data::MuForm::Field::Select>
+
+=head3 Multiple
+
+Multiple select. Also sorts the selected options to the top of
+the select list.
+
+L<Data::MuForm::Field::Multiple>
+
+=head2 SelectCSV
+
+A multiple select field for comma-separated values in the database.
+It expects database values like: '1,5,7'. The string will be inflated
+into an arrayref for validation and form filling, and will be deflated
+into a comma-separated string in the output value.
+
+L<Data::MuForm::Field::SelectCSV>
+
+=head3 BoolSelect
+
+A field with three possible values: empty/0/1.
+
+L<Data::MuForm::Field::BoolSelect>
+
+=head3 Hour
+
+Integer select range field from 0-23.
+
+L<Data::MuForm::Field::Hour>
+
+=head3 Second
+
+Select field with range from 0-59.
+
+L<Data::MuForm::Field::Second>
+
+=head3 IntRange
+
+An integer select field. Can set label format with 'label_format'.
+
+L<Data::MuForm::Field::IntRange>
+
+=head3 Month
+
+Select field with range from 1 - 12.
+
+L<Data::MuForm::Field::Month>
+
+=head3 MonthDay
+
+Select field with range from 1 - 31.
+
+L<Data::MuForm::Field::MonthDay>
+
+=head3 MonthName
+
+Select field with month name labels, value 1-12.
+
+L<Data::MuForm::Field::MonthName>
+
+=head3 Minute
+
+Select field with range from 0-59.
+
+L<Data::MuForm::Field::Minute>
+
+=head3 Weekday
+
+A select field where the labels are the names of the week, and the
+values are 0-6.
+
+L<Data::MuForm::Field::Weekday>
+
+=head3 Year
+
+Select field providing year list 5 years back and 10 years forward.
+
+L<Data::MuForm::Field::Year>
+
+=head2 Fields that don't provide a 'value'
+
+=head3 Submit
+
+L<Data::MuForm::Field::Submit>
+
+=head3 Reset
+
+L<Data::MuForm::Field::Reset>
+
+=head3 Button
+
+Button field that is rendered by the Button widget.
+
+L<Data::MuForm::Field::Button>
+
+=head3 Display
+
+Non-data field used for inserting HTML into the form.
+
+L<Data::MuForm::Field::Display>
+
+=head2 Other fields
+
+=head3 PrimaryKey
+
+Hidden field that provides the primary key for Repeatable fields.
+
+L<Data::MuForm::Field::PrimaryKey>
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

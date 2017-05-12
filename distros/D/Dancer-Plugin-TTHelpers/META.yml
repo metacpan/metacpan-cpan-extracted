@@ -1,0 +1,28 @@
+---
+abstract: 'Useful routines for generating HTML for use with Dancer + TT'
+author:
+  - 'author = Jonathan Scott Duff <duff@pobox.com>'
+build_requires:
+  Template: 0
+  Test::XPath: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300024, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-TTHelpers
+requires:
+  Dancer: 0
+  HTML::FormHelpers: 0
+  Scalar::Util: 0
+  Try::Tiny: 0
+  perl: v5.10.0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://github.com/perlpilot/Dancer-Plugin-TTHelpers/issues
+  repository: git://github.com/perlpilot/Dancer-Plugin-TTHelpers.git
+version: 0.005

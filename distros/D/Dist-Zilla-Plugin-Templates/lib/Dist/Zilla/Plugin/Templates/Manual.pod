@@ -1,0 +1,694 @@
+#   ---------------------------------------------------------------------- copyright and license ---
+#
+#   file: lib/Dist/Zilla/Plugin/Templates/Manual.pod
+#
+#   Copyright © 2015, 2016 Van de Bugger.
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Templates.
+#
+#   perl-Dist-Zilla-Plugin-Templates is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the Free Software Foundation,
+#   either version 3 of the License, or (at your option) any later version.
+#
+#   perl-Dist-Zilla-Plugin-Templates is distributed in the hope that it will be useful, but WITHOUT
+#   ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+#   PURPOSE. See the GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along with
+#   perl-Dist-Zilla-Plugin-Templates. If not, see <http://www.gnu.org/licenses/>.
+#
+#   ---------------------------------------------------------------------- copyright and license ---
+
+# PODNAME: Dist::Zilla::Plugin::Templates::Manual
+# ABSTRACT: C<Templates> plugin user manual
+
+#pod =for :this This is C<Templates> user manual. Read this if you want to treat source files as templates.
+#pod
+#pod =for :those If you are going to hack or extend C<Dist-Zilla-Plugin-Templates>, read the L<module
+#pod documentation|Dist::Zilla::Plugin::Templates>. General topics like getting source, building, installing, bug
+#pod reporting and some others are covered in the F<README>.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+#pod
+#pod =head1 SYNOPSIS
+#pod
+#pod In your F<dist.ini>:
+#pod
+#pod     name    = Assa
+#pod     version = 0.007
+#pod     …
+#pod     [Templates]
+#pod         templates = :InstallModules
+#pod             ; ^ Treat these files as templates.
+#pod         package = MY
+#pod             ; ^ Evaluate Perl fragments in context of this package.
+#pod         prepend = use strict;
+#pod             ; ^ Prepend this to the beginning of each fragment.
+#pod     …
+#pod
+#pod In F<lib/Assa.pm>:
+#pod
+#pod     package Assa;
+#pod     our $VERSION = '{{ $dist->version }}';
+#pod     …
+#pod     1;
+#pod
+#pod     =head1 RATIONALE
+#pod
+#pod     {{
+#pod         # Include content of doc/rationale.pod file
+#pod         # (with expanding templates, if any):
+#pod         include( "doc/rationale.pod" )->fill_in;
+#pod     }}
+#pod
+#pod     =head1 EXAMPLES
+#pod
+#pod     =head2 example.pl
+#pod
+#pod     {{
+#pod         # Include content of eg/example.pl file,
+#pod         # strip trailing newlines,
+#pod         # indent entire text to make it verbatim:
+#pod         include( "eg/example.pl" )->chomp->indent;
+#pod     }}
+#pod
+#pod     =head1 COPYRIGHT AND LICENSE
+#pod
+#pod     {{ $dist->license->notice }}
+#pod
+#pod     =cut
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 DESCRIPTION
+#pod
+#pod C<Templates> is a C<Dist::Zilla> plugin. More precisely it a file munger. It munges source files
+#pod found by the file finder(s) enlisted in the C<templates> option, e. g.:
+#pod
+#pod     [Templates]
+#pod         templates = :InstallModules
+#pod         templates = :PerlExecFiles
+#pod
+#pod BTW, the term I<source files> means "arbitrary text files in the source tree", not just "Perl
+#pod sources".
+#pod
+#pod C<Templates> treats files specified by the file finders as I<templates>. See the L<C<TextTemplater>
+#pod manual|Dist::Zilla::Role::TextTemplater::Manual> for explanation what I<template> is.
+#pod
+#pod =head2 Predefined Variables
+#pod
+#pod There are few variables defined by C<TextTemplater>, see L<Predefined
+#pod Variables|Dist::Zilla::Role::TextTemplater::Manual/"Predefined Variables"> in the
+#pod L<C<TextTemplater> manual|Dist::Zilla::Role::TextTemplater::Manual>. C<Templates> does not
+#pod introduce any more variables.
+#pod
+#pod =head2 Predefined Functions
+#pod
+#pod C<Templates> define only one (but frequently used) function for file inclusion, C<include>.
+#pod
+#pod Do not forget that full Perl power is in your hands: code fragments can use any Perl built-in
+#pod function or any third-party module.
+#pod
+#pod See also: L<Text::Template/"Including files into templates">.
+#pod
+#pod =head3 C<include>
+#pod
+#pod     include( $filename )
+#pod
+#pod The function C<include> returns a reference to an object of C<Dist::Zilla::Plugin::Templates::File>
+#pod class (which is a descendant of C<Dist::Zilla::File::InMemory> class). The object being evaluated
+#pod in string context returns the file content, so
+#pod
+#pod     {{ include( 'eg/example.pl' )->content; }}
+#pod
+#pod can be shortened to
+#pod
+#pod     {{ include( 'eg/example.pl' ); }}
+#pod
+#pod C<Templates::File> defines few methods which can be useful in Perl code and/or POD templates:
+#pod
+#pod     {{ include( 'eg/example.pl' )->indent; }}
+#pod
+#pod     {{
+#pod         include( 'doc/caveats.pod' )->fill_in .
+#pod         include( 'doc/feedback.pod' )->fill_in;
+#pod     }}
+#pod
+#pod Since many C<Templates::File> methods return self-reference, calls may be chained:
+#pod
+#pod     {{ include( 'eg/example.pl' )->fill_in->chomp->indent; }}
+#pod
+#pod See C<Dist::Zilla::Plugin::Templates::File> for the list of methods.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 OPTIONS
+#pod
+#pod The plugin defines only one option C<templates>. Other options (C<package>, C<prepend>,
+#pod C<delimiter>, …) are provided by the C<Dist::Zilla::Role::TextTemplater> role, so see
+#pod L<C<TextTemplater> manual|Dist::Zilla::Role::TextTemplater::Manual> for description.
+#pod
+#pod =option template
+#pod
+#pod =option templates
+#pod
+#pod Name of file finder to provide files to be treated as templates. The default value is C<:NoFiles>.
+#pod
+#pod Use any of standard finders like C<:MainModule>, C<:InstallModules>, C<:AllFiles> (see
+#pod L<Dist::Zilla::Role::FileFinderUser/"default_finders">), or create your own finder with
+#pod C<FileFinder::ByName> and C<FileFinder::Filter> plugins:
+#pod
+#pod     [FileFinder::ByName/Examples]
+#pod         dir = eg
+#pod     [Templates]
+#pod         templates = Examples
+#pod
+#pod Option may be specified several times, e. g.:
+#pod
+#pod     templates = :InstallModules
+#pod     templates = :TestFiles
+#pod
+#pod Each selected file will be processed only once, even if a file "found" by more than one finder:
+#pod
+#pod     templates = :InstallModules
+#pod     templates = :AllFiles
+#pod
+#pod C<template> is an alias for C<templates>.
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 EXAMPLES
+#pod
+#pod =head2 Including Examples
+#pod
+#pod Including an example into documentation is trivial:
+#pod
+#pod     =head1 EXAMPLES
+#pod
+#pod     =head2 Example Assa
+#pod
+#pod     {{ include( "eg/Assa.pl" )->chomp->indent; }}
+#pod
+#pod But let's include several examples:
+#pod
+#pod     =head1 EXAMPLES
+#pod
+#pod     {{
+#pod         for my $file ( qw{ Assa.pl Shooba.pm Dooba.sh } ) {
+#pod             $OUT .= "=head2 $file\n\n";
+#pod             $OUT .= include( "eg/$file" )->chomp->indent . "\n\n";
+#pod         };
+#pod     }}
+#pod
+#pod Or all the examples:
+#pod
+#pod     {{
+#pod         use Path::Tiny;
+#pod         for my $file ( sort( path( "eg" )->children ) ) {
+#pod             # the same as above
+#pod         };
+#pod     }}
+#pod
+#pod =head2 Documenting Default Values
+#pod
+#pod Let's assume your module has an option with some default value:
+#pod
+#pod     $option = 72;
+#pod
+#pod When you writing documentation, you have to write down its default value once again:
+#pod
+#pod     =head2 option
+#pod
+#pod     ... by default 72 ...
+#pod
+#pod Now you have the same value scattered in the source. When you decide to change default, you have to
+#pod remember to update documentation too. However, you can avoid duplication:
+#pod
+#pod     $option = {{$option = 72}};
+#pod
+#pod     =head2 option
+#pod
+#pod     ... by default {{$option}} ...
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =bug Unicode characters
+#pod
+#pod C<include(…)-E<gt>pod2text> may munge Unicode characters due to a bug in C<Pod::Simple>.
+#pod C<Templates> test suite includes C<Unicode characters> test. The test fails with C<Pod:Simple> 3.20
+#pod (and earlier versions) and passes with C<Pod::Simple> 3.28 (and later versions).
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 SEE ALSO
+#pod
+#pod =begin :list
+#pod
+#pod = L<Dist::Zilla>
+#pod Distribution builder.
+#pod
+#pod = L<Dist::Zilla::Role::TextTemplate>
+#pod Bridge between C<Dist::Zilla> and C<Text::Template>, provides templating capabilities to
+#pod C<Dist::Zilla> plugins. It is a part of C<Dist::Zilla> distribution. It has limited template engine
+#pod control and awful error reporting (as of 5.037).
+#pod
+#pod = L<Dist::Zilla::Role::TextTemplater>
+#pod An alternative to standard C<Dist::Zilla::Role::TextTemplate>, it uses the same template engine,
+#pod C<Text::Template>, but provides better engine control and error reporting.
+#pod
+#pod = L<Dist::Zilla::Plugin::TemplateFiles>
+#pod Alternative approach. It does not use file finders, so you have to specify every template file
+#pod individually. It also uses C<Dist::Zilla> standard C<Dist::Zilla::Role::TextTemplate> role with all
+#pod the subsequences.
+#pod
+#pod = L<Dist::Zilla::Plugin::GatherDir::Template>
+#pod A combo of file gathering and templating capabilities. It uses standard
+#pod C<Dist::Zilla::Role::TextTemplate> role.
+#pod
+#pod = L<Text::Template>
+#pod The great templating engine used by both C<Dist::Zilla::Role::TextTemplate> and
+#pod C<Dist::Zilla::Role::TextTemplater> roles.
+#pod
+#pod = L<Dist::Zilla::Plugin::Templates>
+#pod
+#pod =end :list
+#pod
+#pod =for comment ---------------------------------------------------------------------------------------
+#pod
+#pod =head1 COPYRIGHT AND LICENSE
+#pod
+#pod Copyright (C) 2015, 2016 Van de Bugger
+#pod
+#pod License GPLv3+: The GNU General Public License version 3 or later
+#pod <http://www.gnu.org/licenses/gpl-3.0.txt>.
+#pod
+#pod This is free software: you are free to change and redistribute it. There is
+#pod NO WARRANTY, to the extent permitted by law.
+#pod
+#pod
+#pod =cut
+
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/what.pod
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Templates.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHAT?
+#pod
+#pod C<Dist-Zilla-Plugin-Templates> (or just C<Templates> for brevity) is a C<Dist-Zilla> plugin allowing developers
+#pod to insert Perl code fragments into arbitrary source text files, which become I<templates>. When
+#pod C<Dist::Zilla> builds the distribution each code fragment is evaluated and replaced with result of
+#pod evaluation.
+#pod
+#pod =cut
+
+# end of file #
+#   ------------------------------------------------------------------------------------------------
+#
+#   file: doc/why.pod
+#
+#   This file is part of perl-Dist-Zilla-Plugin-Templates.
+#
+#   ------------------------------------------------------------------------------------------------
+
+#pod =encoding UTF-8
+#pod
+#pod =head1 WHY?
+#pod
+#pod Because I was not satisfied with the existing solutions.
+#pod
+#pod C<GatherDir::Template> (shipped as a part of C<Dist::Zilla>) combines two tasks: it adds files to
+#pod distribution I<and> does template processing. Such coupling introduces some limitations: All the
+#pod templates must be in a separate directory, you cannot freely mix template and non-template files.
+#pod If you use source manifest and adds files to distribution with C<Manifest::Read> or
+#pod C<GatherFromManifest> plugins, you cannot manifest your templates — it causes "attempt to add
+#pod I<filename> multiple times" error.
+#pod
+#pod C<TemplateFiles> solves this problem, but has its own limitations. It requires to list all the
+#pod templates individually, you cannot use C<Dist::Zilla> file finders to declare all install modules
+#pod (or all tests, or all files, etc).
+#pod
+#pod Both C<GatherDir::Template> and C<TemplateFiles> suffer from disadvantages of C<Dist::Zilla>
+#pod C<TextTemplate> role: lack of control over C<Text::Template> engine and awful error reporting.
+#pod
+#pod Thus, C<Templates> plugin:
+#pod
+#pod =over
+#pod
+#pod =item *
+#pod
+#pod Uses C<TextTemplater> role to provide better control over C<Text::Template> engine and better
+#pod error reporting.
+#pod
+#pod =item *
+#pod
+#pod Uses C<Dist::Zilla> file finders to select files.
+#pod
+#pod =back
+#pod
+#pod =cut
+
+# end of file #
+
+
+# end of file #
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Plugin::Templates::Manual - C<Templates> plugin user manual
+
+=head1 VERSION
+
+Version v0.6.4, released on 2016-12-28 20:24 UTC.
+
+=head1 WHAT?
+
+C<Dist-Zilla-Plugin-Templates> (or just C<Templates> for brevity) is a C<Dist-Zilla> plugin allowing developers
+to insert Perl code fragments into arbitrary source text files, which become I<templates>. When
+C<Dist::Zilla> builds the distribution each code fragment is evaluated and replaced with result of
+evaluation.
+
+This is C<Templates> user manual. Read this if you want to treat source files as templates.
+
+If you are going to hack or extend C<Dist-Zilla-Plugin-Templates>, read the L<module
+documentation|Dist::Zilla::Plugin::Templates>. General topics like getting source, building, installing, bug
+reporting and some others are covered in the F<README>.
+
+=for test_synopsis BEGIN { die "SKIP: Not Perl code.\n" };
+
+=head1 SYNOPSIS
+
+In your F<dist.ini>:
+
+    name    = Assa
+    version = 0.007
+    …
+    [Templates]
+        templates = :InstallModules
+            ; ^ Treat these files as templates.
+        package = MY
+            ; ^ Evaluate Perl fragments in context of this package.
+        prepend = use strict;
+            ; ^ Prepend this to the beginning of each fragment.
+    …
+
+In F<lib/Assa.pm>:
+
+    package Assa;
+    our $VERSION = '{{ $dist->version }}';
+    …
+    1;
+
+    =head1 RATIONALE
+
+    {{
+        # Include content of doc/rationale.pod file
+        # (with expanding templates, if any):
+        include( "doc/rationale.pod" )->fill_in;
+    }}
+
+    =head1 EXAMPLES
+
+    =head2 example.pl
+
+    {{
+        # Include content of eg/example.pl file,
+        # strip trailing newlines,
+        # indent entire text to make it verbatim:
+        include( "eg/example.pl" )->chomp->indent;
+    }}
+
+    =head1 COPYRIGHT AND LICENSE
+
+    {{ $dist->license->notice }}
+
+    =cut
+
+=head1 DESCRIPTION
+
+C<Templates> is a C<Dist::Zilla> plugin. More precisely it a file munger. It munges source files
+found by the file finder(s) enlisted in the C<templates> option, e. g.:
+
+    [Templates]
+        templates = :InstallModules
+        templates = :PerlExecFiles
+
+BTW, the term I<source files> means "arbitrary text files in the source tree", not just "Perl
+sources".
+
+C<Templates> treats files specified by the file finders as I<templates>. See the L<C<TextTemplater>
+manual|Dist::Zilla::Role::TextTemplater::Manual> for explanation what I<template> is.
+
+=head2 Predefined Variables
+
+There are few variables defined by C<TextTemplater>, see L<Predefined
+Variables|Dist::Zilla::Role::TextTemplater::Manual/"Predefined Variables"> in the
+L<C<TextTemplater> manual|Dist::Zilla::Role::TextTemplater::Manual>. C<Templates> does not
+introduce any more variables.
+
+=head2 Predefined Functions
+
+C<Templates> define only one (but frequently used) function for file inclusion, C<include>.
+
+Do not forget that full Perl power is in your hands: code fragments can use any Perl built-in
+function or any third-party module.
+
+See also: L<Text::Template/"Including files into templates">.
+
+=head3 C<include>
+
+    include( $filename )
+
+The function C<include> returns a reference to an object of C<Dist::Zilla::Plugin::Templates::File>
+class (which is a descendant of C<Dist::Zilla::File::InMemory> class). The object being evaluated
+in string context returns the file content, so
+
+    {{ include( 'eg/example.pl' )->content; }}
+
+can be shortened to
+
+    {{ include( 'eg/example.pl' ); }}
+
+C<Templates::File> defines few methods which can be useful in Perl code and/or POD templates:
+
+    {{ include( 'eg/example.pl' )->indent; }}
+
+    {{
+        include( 'doc/caveats.pod' )->fill_in .
+        include( 'doc/feedback.pod' )->fill_in;
+    }}
+
+Since many C<Templates::File> methods return self-reference, calls may be chained:
+
+    {{ include( 'eg/example.pl' )->fill_in->chomp->indent; }}
+
+See C<Dist::Zilla::Plugin::Templates::File> for the list of methods.
+
+=head1 OPTIONS
+
+The plugin defines only one option C<templates>. Other options (C<package>, C<prepend>,
+C<delimiter>, …) are provided by the C<Dist::Zilla::Role::TextTemplater> role, so see
+L<C<TextTemplater> manual|Dist::Zilla::Role::TextTemplater::Manual> for description.
+
+=head2 template
+
+=head2 templates
+
+Name of file finder to provide files to be treated as templates. The default value is C<:NoFiles>.
+
+Use any of standard finders like C<:MainModule>, C<:InstallModules>, C<:AllFiles> (see
+L<Dist::Zilla::Role::FileFinderUser/"default_finders">), or create your own finder with
+C<FileFinder::ByName> and C<FileFinder::Filter> plugins:
+
+    [FileFinder::ByName/Examples]
+        dir = eg
+    [Templates]
+        templates = Examples
+
+Option may be specified several times, e. g.:
+
+    templates = :InstallModules
+    templates = :TestFiles
+
+Each selected file will be processed only once, even if a file "found" by more than one finder:
+
+    templates = :InstallModules
+    templates = :AllFiles
+
+C<template> is an alias for C<templates>.
+
+=head1 KNOWN BUGS
+
+=head2 Unicode characters
+
+C<include(…)-E<gt>pod2text> may munge Unicode characters due to a bug in C<Pod::Simple>.
+C<Templates> test suite includes C<Unicode characters> test. The test fails with C<Pod:Simple> 3.20
+(and earlier versions) and passes with C<Pod::Simple> 3.28 (and later versions).
+
+=head1 WHY?
+
+Because I was not satisfied with the existing solutions.
+
+C<GatherDir::Template> (shipped as a part of C<Dist::Zilla>) combines two tasks: it adds files to
+distribution I<and> does template processing. Such coupling introduces some limitations: All the
+templates must be in a separate directory, you cannot freely mix template and non-template files.
+If you use source manifest and adds files to distribution with C<Manifest::Read> or
+C<GatherFromManifest> plugins, you cannot manifest your templates — it causes "attempt to add
+I<filename> multiple times" error.
+
+C<TemplateFiles> solves this problem, but has its own limitations. It requires to list all the
+templates individually, you cannot use C<Dist::Zilla> file finders to declare all install modules
+(or all tests, or all files, etc).
+
+Both C<GatherDir::Template> and C<TemplateFiles> suffer from disadvantages of C<Dist::Zilla>
+C<TextTemplate> role: lack of control over C<Text::Template> engine and awful error reporting.
+
+Thus, C<Templates> plugin:
+
+=over
+
+=item *
+
+Uses C<TextTemplater> role to provide better control over C<Text::Template> engine and better
+error reporting.
+
+=item *
+
+Uses C<Dist::Zilla> file finders to select files.
+
+=back
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=head1 EXAMPLES
+
+=head2 Including Examples
+
+Including an example into documentation is trivial:
+
+    =head1 EXAMPLES
+
+    =head2 Example Assa
+
+    {{ include( "eg/Assa.pl" )->chomp->indent; }}
+
+But let's include several examples:
+
+    =head1 EXAMPLES
+
+    {{
+        for my $file ( qw{ Assa.pl Shooba.pm Dooba.sh } ) {
+            $OUT .= "=head2 $file\n\n";
+            $OUT .= include( "eg/$file" )->chomp->indent . "\n\n";
+        };
+    }}
+
+Or all the examples:
+
+    {{
+        use Path::Tiny;
+        for my $file ( sort( path( "eg" )->children ) ) {
+            # the same as above
+        };
+    }}
+
+=head2 Documenting Default Values
+
+Let's assume your module has an option with some default value:
+
+    $option = 72;
+
+When you writing documentation, you have to write down its default value once again:
+
+    =head2 option
+
+    ... by default 72 ...
+
+Now you have the same value scattered in the source. When you decide to change default, you have to
+remember to update documentation too. However, you can avoid duplication:
+
+    $option = {{$option = 72}};
+
+    =head2 option
+
+    ... by default {{$option}} ...
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=for comment ---------------------------------------------------------------------------------------
+
+=head1 SEE ALSO
+
+=over 4
+
+=item L<Dist::Zilla>
+
+Distribution builder.
+
+=item L<Dist::Zilla::Role::TextTemplate>
+
+Bridge between C<Dist::Zilla> and C<Text::Template>, provides templating capabilities to
+C<Dist::Zilla> plugins. It is a part of C<Dist::Zilla> distribution. It has limited template engine
+control and awful error reporting (as of 5.037).
+
+=item L<Dist::Zilla::Role::TextTemplater>
+
+An alternative to standard C<Dist::Zilla::Role::TextTemplate>, it uses the same template engine,
+C<Text::Template>, but provides better engine control and error reporting.
+
+=item L<Dist::Zilla::Plugin::TemplateFiles>
+
+Alternative approach. It does not use file finders, so you have to specify every template file
+individually. It also uses C<Dist::Zilla> standard C<Dist::Zilla::Role::TextTemplate> role with all
+the subsequences.
+
+=item L<Dist::Zilla::Plugin::GatherDir::Template>
+
+A combo of file gathering and templating capabilities. It uses standard
+C<Dist::Zilla::Role::TextTemplate> role.
+
+=item L<Text::Template>
+
+The great templating engine used by both C<Dist::Zilla::Role::TextTemplate> and
+C<Dist::Zilla::Role::TextTemplater> roles.
+
+=item L<Dist::Zilla::Plugin::Templates>
+
+=back
+
+=head1 AUTHOR
+
+Van de Bugger <van.de.bugger@gmail.com>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015, 2016 Van de Bugger
+
+License GPLv3+: The GNU General Public License version 3 or later
+<http://www.gnu.org/licenses/gpl-3.0.txt>.
+
+This is free software: you are free to change and redistribute it. There is
+NO WARRANTY, to the extent permitted by law.
+
+=cut

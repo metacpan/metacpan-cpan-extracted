@@ -1,0 +1,768 @@
+=head1 Usage of DBIx::PgLink
+
+=head1 ARCHITECTURE
+
+  -------------              .- - - -  - -.
+   |        |                | Views, etc |<- - - - .
+   |        |                `- - - -  - -'         .
+   |    PostgreSQL                 |                .
+   |     database        .---------------------.    .
+   |        |            |  PL/Perl functions  |<- -.
+   |        |            `---------------------'    .
+   |       ---                /             \       .
+   |        |         .--------------.  .---------------------.
+   |        |         | DBIx::PgLink |  | DBIx::PgLink::Local |
+   |        |         `--------------'  `---------------------'
+ Local      |                |                      .
+ server     |         .--------------.              .
+   |        |         |   Connector  |              .
+   |        |         `--------------'              .
+   |      Perl          /          \                .
+   |     modules  .-----------. .----------.        .
+   |        |     |  Adapter  | | Accessor |. . . . .
+   |        |     `-----------' `----------'
+   |        |           |
+   |        |     .===========.
+   |        |     | DBI + DBD |
+   |        |     `==========='
+   |       ---          |
+   |        |     .- - - - - - - - - - - - - - -.
+   |        |     | Driver  (native, ODBC, etc) |
+  -------------   `- - - - - - - - - - - - - - -'
+   Network              |
+  -------------   .-------------------.
+  Remote server   |  Remote database  |
+                  `-------------------'
+
+
+=over
+
+=item I<Views>, I<PL/Perl functions>
+
+Provides SQL interface for remote data source.
+
+=item L<DBIx::PgLink/>
+
+Collection of named Connectors used in session.
+
+=item L<DBIx::PgLink::Adapter/>
+
+Provides interface for DBI, handles driver incompatibilities 
+and adds extra functions.
+
+=item L<DBIx::PgLink::Accessor/>
+
+Store and retrieve metadata for remote objects in PostgreSQL database, 
+builds persistent accessor functions/views/triggers.
+
+=item L<DBIx::PgLink::Connector/>
+
+Initialize connection, join adapter and accessors together. 
+Interface for PL/Perl functions.
+
+=item L<DBIx::PgLink::Local/>
+
+Emulation of DBI for local PostgreSQL database. 
+
+=back
+
+Metadata and helper functions stored in PostgreSQL I<dbix_pglink> schema.
+
+
+=head1 CONNECTION SETUP
+
+=head2 Main connection record
+
+=over
+
+=item *
+
+Ensure that DBD driver works properly.
+
+Simple test perl script provided
+
+  ./util/dbd_check.pl --dsn="dbi:..." --user=... --password=...
+
+It is OK to fail some catalog information tests, 
+if exists adapter for your database that cover that issues.
+If not, you cannot use persistent accessor, but (probably) can use ad-hoc queries.
+
+=item *
+
+Login to PostgreSQL database as PostgreSQL superuser
+
+Run C<psql> or C<pgAdmin> or another query tool of your choice.
+
+=item *
+
+Create main connection record:
+
+SELECT C<dbix_pglink.create_connection>(I<conn_name>, I<data_source>,
+I<adapter_class>, I<logon_mode>, I<use_libs>, I<comment>);
+
+or
+
+SELECT C<dbix_pglink.create_connection>(I<conn_name>, I<data_source>, I<comment>)
+
+where
+
+=over
+
+=item I<conn_name> (TEXT, mandatory)
+
+Connection name
+
+=item I<data_source> (TEXT, mandatory)
+
+DBI connection string ('dbi:Driver:params...')
+
+=item I<adapter_class> (TEXT)
+
+Perl module name for used database, guessed if not specified.
+
+=item I<logon_mode> (TEXT, mandatory)
+
+Tells what credentials are used when no mapping exists
+between local PostgreSQL login and remote user
+
+=over
+
+=item 'empty'
+
+Connect with empty user name and empty password
+
+=item 'current'
+
+Connect as session_user without password
+
+=item 'default'
+
+Connect as default user with default password (see below).
+
+This is default value.
+
+=item 'deny'
+
+Connection refused
+
+=back
+
+=item I<use_libs> (TEXT[])
+
+List of directories, which will be appended to Perl library path (@INC global variable).
+Useful when part of code resides out of default Perl locations (or PERL5LIB environment variable)
+and restart of main PostgreSQL process is undesirable.
+
+Main Connector class loaded *before* using this libs. 
+Setting this attribute can affects only class or role loaded at runtime.
+
+=back
+
+=item *
+
+To modify connection update of I<dbix_pglink.connections> table directly.
+
+=item *
+
+To delete connection:
+
+SELECT C<dbix_pglink.delete_connection>(I<conn_name>) 
+
+All metadata and database objects will be deleted as well.
+
+=back
+
+Example:
+
+  SELECT dbix_pglink.create_connection(
+    'NORTHWIND',
+    'dbi:ODBC:Northwind',
+    'Sample database'
+  );
+
+  or
+
+  SELECT dbix_pglink.create_connection(
+    'NORTHWIND',
+    'dbi:ODBC:Northwind',
+    'DBIx::PgLink::Adapter::MSSQL',
+    'empty',           --use integrated security
+    NULL,
+    'Sample database'  --comment
+  );
+
+
+
+=head2 Mapping between local and remote user
+
+SELECT C<dbix_pglink.set_user>(I<conn_name>, I<local_user>, I<remote_user>, I<remote_password>);
+
+SELECT C<dbix_pglink.delete_user>(I<conn_name>, I<local_user>);
+
+This is optional when
+
+  - no authentication required (desktop database like DBF, SQLite)
+
+  - OS-level authentication of 'postgres' account on remote server
+    (MSSQL with integrated security mode, PostgreSQL with sspi)
+
+
+There can be special <default> user entry for each connection, where I<local_user> = '' (empty string).
+
+B<WARNING: Password stored as plain text>
+
+=head2 Roles
+
+Roles requires disconnect from remote database to apply.
+
+
+SELECT C<dbix_pglink.set_conn_role>(I<conn_name>, I<local_user>, I<role_kind>, I<role_name>, I<position>, I<replace>);
+
+SELECT C<dbix_pglink.delete_conn_role>(I<conn_name>, I<local_user>, I<role_kind>, I<role_name>);
+
+where
+
+=over
+
+=item I<role_kind> (TEXT)
+
+To which object role will be applied, 'Adapter' or 'Connector'
+
+=item I<local_user> (TEXT)
+
+PostgreSQL user name or '' (empty string) for global.
+
+=item I<role_name> (TEXT)
+
+Perl class name.
+
+Can be full name like 'DBIx::PgLink::Adapter::Roles::InitSession' or just 'InitSession'.
+
+See directory lib/DBIx/PgLink/Roles.
+
+=item I<position> (INTEGER)
+
+For some roles loading order can matter. Use NULL to append role to end of list.
+
+=item I<replace> (BOOLEAN)
+
+If true replace role in specified I<position>. If false insert role in I<position> and shift list down.
+
+=back
+
+=head2 Attributes
+
+There is L<DBI> database handle attibutes (with name in CamelCase) 
+and Adapter object attributes (with name in lower case). 
+Some roles may add extra Adapter attributes.
+
+SELECT C<dbix_pglink.set_conn_attr>(I<conn_name>, I<local_user>, I<name>, I<value>);
+
+SELECT C<dbix_pglink.delete_conn_attr>(I<conn_name>, I<local_user>, I<name>);
+
+See description of DBI attributes in L<DBI/ATTRIBUTES COMMON TO ALL HANDLES>:
+
+=head2 Environment variables
+
+Environment variables will be set for backend process before connection start.
+Use it when environment of different connections conflicts with each others
+or PostgreSQL restart is not desirable.
+
+SELECT C<dbix_pglink.set_conn_env>(I<conn_name>, I<local_user>, I<name>, I<value>);
+
+SELECT C<dbix_pglink.delete_conn_env>(I<conn_name>, I<local_user>, I<name>);
+
+Requires installation of C<Environment> role.
+
+SELECT C<dbix_pglink.set_role>(I<conn_name>, '', 'Connector', 'Environment');
+
+=head1 AD-HOC QUERIES
+
+Note: first time in every session the PL/Perl function that initiates connection 
+take a lot of CPU for several seconds. 
+
+This is a price for using great object system for Perl 5, L<Moose>.
+
+After initialization all functions works pretty fast, 
+although not so fast as Perl code that use plain DBI.
+
+
+
+=head2 Set-returning queries
+
+Function family for set-returning ad-hoc queries:
+
+=over
+
+=item *
+
+C<dbix_pglink.query>(I<conn_name>, I<query_text>)
+
+=item *
+
+C<dbix_pglink.query>(I<conn_name>, I<query_text>, I<param_values>)
+
+=item *
+
+C<dbix_pglink.query>(I<conn_name>, I<query_text>, I<param_values>, I<param_types>)
+
+=back
+
+where
+
+=over
+
+=item I<query_text> (TEXT)
+
+Any text passed to remote database. Can contains positional parameter placeholders (?).
+
+Using of dollar-quoting for literal queries is preferable.
+
+=item I<param_values> (array of TEXT)
+
+List of values for parameterized query.
+All values must be converted to text, database driver do reverse conversion.
+
+=item I<param_types> (array of TEXT)
+
+List of parameter type names. 
+Use it when driver require explicit parameter type or value need conversion.
+Currently supported only SQL standard types.
+
+=back
+
+Example:
+
+  SELECT *
+  FROM dbix_pglink.query(
+    'NORTHWIND',
+    $$SELECT OrderID, OrderDate FROM Orders$$
+  ) as s("OrderID" int, "OrderDate" timestamp); -- <-- column definition
+
+  SELECT *
+  FROM dbix_pglink.query(
+    'NORTHWIND',
+    $$SELECT OrderID, OrderDate FROM Orders
+     WHERE CustomerID = ? AND OrderDate >= ?$$,
+    ARRAY['VINET', '1997-01-01'],
+    ARRAY['VARCHAR', 'DATE']
+  ) as s("OrderID" int, "OrderDate" timestamp);
+
+B<Important note: column definition list is required>
+
+You can write custom function that wraps C<query()> with proper column definition list,
+or use persistent accessors.
+
+
+=head2 Data modification and DDL queries
+
+Function family for non-returning data ad-hoc queries:
+
+=over
+
+=item *
+
+C<dbix_pglink.exec>(I<conn_name>, I<query_text>)
+
+=item *
+
+C<dbix_pglink.exec>(I<conn_name>, I<query_text>, I<param_values>)
+
+=item *
+
+C<dbix_pglink.exec>(I<conn_name>, I<query_text>, I<param_values>, I<param_types>)
+
+=back
+
+Example:
+
+  SELECT dbix_pglink.exec(
+    'NORTHWIND',
+    $$UPDATE Orders SET OrderDate='2000-01-01' WHERE OrderID=42$$
+  );
+
+  SELECT dbix_pglink.exec(
+    'NORTHWIND',
+    $$INSERT INTO Orders (CustomerID,EmployeeID,OrderDate) VALUES (?,?,?)$$,
+    ARRAY['foo','5','2001-01-01']
+  );
+
+  SELECT dbix_pglink.exec(
+    'NORTHWIND',
+    $$UPDATE Orders SET OrderDate=? WHERE OrderID=?$$,
+    ARRAY['2000-01-01', '42'],
+    ARRAY['DATE', 'INTEGER']
+  );
+
+  SELECT dbix_pglink.exec(
+    'NORTHWIND',
+    $$CREATE VIEW MyOrders AS SELECT * FROM Orders WHERE EmployeeID=5$$
+  );
+
+
+
+=head1 TRANSACTIONS
+
+=over
+
+=item *
+
+C<dbix_pglink.begin>(I<conn_name>)
+
+=item *
+
+C<dbix_pglink.rollback>(I<conn_name>)
+
+=item *
+
+C<dbix_pglink.commit>(I<conn_name>)
+
+=back
+
+
+
+=head1 DISCONNECTION
+
+=over
+
+=item *
+
+C<dbix_pglink.disconnect>(I<conn_name>)
+
+=back
+
+
+
+
+=head1 PERSISTENT ACCESSORS
+
+Accessor is mapping of remote database object to local object.
+
+The benefits of accessors:
+
+=over
+
+=item *
+
+No need to describe output result-set for every query
+
+=item *
+
+Provides safe access to remote database
+
+By default, users have no priveleges to any accessor. 
+You can grant/revoke permission as for usual PostgreSQL object.
+
+=back
+
+
+=head2 Building accessors
+
+
+SELECT dbix_pglink.build_accessors(
+I<conn_name>, I<local_schema>,
+I<remote_catalog>, I<remote_schema>, I<remote_object>,
+I<remote_object_types>, I<object_name_mapping>
+);
+
+or
+
+SELECT dbix_pglink.build_accessors(I<conn_name>, I<local_schema>, I<remote_schema>);
+
+where
+
+=over
+
+=item I<local_schema> (TEXT)
+
+Name of local PostgreSQL schema where accessors will be created.
+
+Schema created automatically if not exists.
+
+=item I<remote_catalog>, I<remote_schema>, I<remote_object> (TEXT)
+
+Used for enumeration of remote objects. Like pattern allow '%' to list all objects.
+
+(I<remote_catalog> is database name for Sybase/MSSQL)
+
+=item I<remote_object_types> (array of TEXT)
+
+Mandatory. Specify object types like 'TABLE', 'VIEW', 'FUNCTION', 'PROCEDURE'
+
+=item I<object_name_mapping> (array of TEXT)
+
+Can be NULL. Each array element must have format 'remote_name=>local_name'.
+
+=back
+
+Creates function-based view for remote table/view and function for remote routine (stored procedure/function).
+
+Old accessors will be dropped unless exists dependent user objects.
+
+If you want to rebuild accessor you must drop dependent object manually
+or change its definition.
+
+To relax dependency chain in PL/PgSQL use dynamic EXECUTE.
+
+
+Example:
+
+  SELECT dbix_pglink.build_accessors(
+    'NORTHWIND', --connection name
+    'northwind', --new local schema
+    'dbo'        --remote schema (owner)
+  );
+
+  or
+
+  SELECT dbix_pglink.build_accessors(
+    'NORTHWIND', --connection name
+    'northwind', --new local schema
+    'northwind', --remote catalog (database)
+    'dbo',       --remote schema (owner)
+    '%',         --all remote objects
+    ARRAY['TABLE','VIEW','PROCEDURE'], --object types
+    ARRAY[
+      'Alphabetical list of products', 'products_with_category',
+      'Current Product List', 'products'
+    ]  --name mapping
+  );
+
+=head3 Stored procedures
+
+Notes for Microsoft SQL Server / Sybase ASE users:
+
+=over
+
+=item *
+
+In general, stored procedure have no fixed resultset
+and therefore cannot be used as PostgreSQL function.
+PgLink adapter tries to detect resultset of procedure, calling it with NULL parameters in FMTONLY mode.
+It works only if procedure output same resultset structure for every input 
+and does not exit before returning resultset (when checks input parameters).
+
+You can create accessor for procedure with explicit resultset:
+
+C<dbix_pglink.build_procedure>(I<conn_name>, I<local_schema>, I<remote_catalog>, I<remote_schema>, I<remote_procedure>, I<local_name>, I<column_info>)
+
+where I<column_info> is array of text containing pairs of 'column_name', 'remote_type'.
+
+  --function installed with Connector role 'SQLServerProc'
+  SELECT dbix_pglink.set_role('NORTHWIND','Connector','SQLServerProc');
+  --reconnect needed
+  SELECT dbix_pglink.disconnect('NORTHWIND');
+
+
+  SELECT dbix_pglink.build_procedure('NORTHWIND', 'northwind', 'Northwind', 'dbo', 'CustOrderHist',
+    ARRAY[
+      'ProductName', 'NVARCHAR',
+      'Total', 'INT'
+    ]
+  );
+
+=item *
+
+Procedure return code and output parameters are not supported
+
+=item *
+
+Multiple resultsets are not supported
+
+=back
+
+
+=head2 Using accessors
+
+For each table or view created several functions and one updatetable view.
+
+For each routine created one function.
+
+=head3 Accessor functions for table/view
+
+=over
+
+=item *
+
+I<table>$()
+
+Fetch all data rows from table or view (but see L</Query filter> below).
+
+I<table> is table or view name, with '$' suffix appended.
+Suffix prevents name clash of table and function accessors.
+
+=item *
+
+I<table>$(I<where>, I<param_values>, I<param_types>)
+
+I<where> is literal WHERE clause, appended to SELECT statement that will be executed on remote database.
+
+This is effective way to limit number of fetched rows, but require forming of literal SQL with proper value quoting.
+
+By default, no SQL check performed, so it opens a security hole to remote database.
+You can add basic checks with optional adapter role C<CheckWhereClause>, which requires L<SQL::Statement> module.
+C<CheckWhereClause> role pass only basic ANSI SQL statement.
+
+I<param_values> is array of TEXT, that elements will be binded.
+
+I<param_types> is array of TEXT.
+
+=back
+
+
+Example:
+
+  --fetch all rows from table
+  SELECT * FROM northwind."Orders$"();
+
+  --fetch all rows (BAD) and apply local condition
+  SELECT * FROM northwind."Orders$"() WHERE "OrderID" = 1;
+
+  --apply condition on remote site and fetch only needed rows
+  SELECT * FROM northwind."Orders$"('WHERE OrderID = 1', NULL, NULL);
+
+  --same
+  SELECT * FROM northwind."Orders$"('WHERE OrderID = ?', ARRAY['1'], NULL);
+
+  --same
+  SELECT * FROM northwind."Orders$"('WHERE OrderID = ?', ARRAY['1'], ARRAY['integer']);
+
+
+  --stored procedure call
+  SELECT * FROM northwind."CustOrderHist"('VINET')
+
+
+=head3 Accessor view
+
+Accessor view built on accessor function without arguments
+and fetch all rows (but see L</Query filter> below).
+
+Example:
+
+  --fetch all rows
+  SELECT * FROM northwind."Orders";
+
+  --fetch all rows (BAD) and apply local filter
+  SELECT * FROM northwind."Orders" WHERE "OrderID" = 1;
+
+
+=head3 Modification of table/view
+
+Each table/view accessor view has rules that make it updatable.
+
+UPDATE/DELETE queries first fetch all data rows from accessor view,
+than apply local WHERE condition,
+than post changes back row-by-row.
+
+This is a major flaw both in I<dbi_link> project and I<DBIx::PgLink>.
+
+B<Do not use SELECT, UPDATE, DELETE on large table without query filter!>
+
+INSERT queries do not fetch remote data and relatively fast
+(but 2-3x times slower than plain DBI).
+
+Accessor has statement-level trigger that start remote transaction before local statement and commit it after.
+
+There is unresolved problem with transaction coordination and error handling.
+Remote transaction rollback only if error occurs for row processing on remote site, 
+but stalls if error occured at local database before local statement end.
+You need explicitly call C<SELECT dbix_pglink.rollback()> in exception handler of your application.
+2PC protocol is not used.
+
+Each SQL statement stored in I<dbix_pglink.queries> table and can be manually tuned
+(and SELECT statement as well).
+
+Updated/deleted rows must be located by I<search key>.
+If table has primary key and DBD can recognise it, than primary key columns used as search key.
+Otherwise search key contains all table columns.
+
+Example:
+
+  INSERT INTO northwind."Orders" ("CustomerID", "EmployeeID", "OrderDate")
+  VALUES ('foo', 5, '2001-01-01');
+
+  --fetch all data (BAD), apply local condition
+  UPDATE northwind."Orders" SET "OrderDate" = '2001-01-01'
+  WHERE "OrderID" = 1;
+
+  --fetch all data (BAD), apply local condition
+  DELETE northwind."Orders" WHERE "OrderID" = 1;
+
+
+
+=head3 Query filter
+
+Currently, PostgreSQL don't have parametrized views
+and PL/Perl can't get text of SQL query that call function.
+
+Query filter is a way to pass WHERE-clause to SELECT accessor (which used in UPDATE and DELETE too).
+It is not elegant solution, but do the job: 
+update/delete of remote table does not require fetching of all table.
+
+The worse disadvantage is that you need to repeat select criteria twice.
+
+Each table accessor has two functions:
+
+=over
+
+=item I<table>C<_set_filter>(I<where>, I<param_values>, I<param_types>)
+
+Remember supplied WHERE-clause and parameters.
+Arguments stored as session global variable and used until disconnect or reset.
+
+=item I<table>C<_reset_filter>()
+
+Clear stored WHERE-clause and parameters.
+
+=back
+
+Note, that in UPDATE/DELETE operation filter is NOT applied to each modified row.
+Each row located by search key only.
+This is feature, not a bug: you can set broad "window" of remote data
+just to limit traffic and apply precise condition on PostgreSQL side.
+
+Filter stored in global session variable for each accessor and not transactional.
+
+Example:
+
+  --set filter (no actual data fetch)
+  SELECT northwind."Orders_set_filter"('WHERE EmployeeID = 5', null, null);
+
+  --now all SELECT/UPDATE/DELETEs work with subset of table with EmployeeID=5
+  SELECT * FROM northwind."Orders";
+
+  --update filtered rows with EmployeeID = 5
+  UPDATE northwind."Orders" SET "OrderDate"='2001-01-01'
+  WHERE "OrderID" = 1 and "EmployeeID" = 5; --double-check
+
+  --do the same
+  UPDATE northwind."Orders" SET "OrderDate"='2001-01-01'
+  WHERE "OrderID" = 1;
+
+  --remove filter
+  SELECT northwind."Orders_reset_filter"();
+
+  --now query returns whole table
+  SELECT * FROM northwind."Orders";
+
+
+
+=head1 SEE ALSO
+
+L<DBIx::PgLink::Manual::Install>,
+L<http://pgfoundry.org/projects/dbi-link/>
+
+=head1 AUTHOR
+
+Alexey Sharafutdinov E<lt>alexey.s.v.br@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Alexey Sharafutdinov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

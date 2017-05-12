@@ -1,0 +1,48 @@
+Revision history for Perl extension Data::TreeDumper::Renderer::DHTML.
+
+0.08  Sunday Dec 7 13:30:00 2008
+	FIXED: properly close ul+li after last element to allow proper display of consecutive data dump
+
+0.07  Saturday Oct 22 20:00:00 2005
+	FIXED: RT 15191, no address displayed when node is not terminal
+	CHANGED: Refactored node rendering code
+	
+0.06  Mon Aug 22 22:00:00 2005
+	FIXED: possibility to have multiple dumps in a single page and still have the expand collapse buttons working
+	ADDED: example for multiple dump
+	ADDED: a working, though simple, search functionality
+	CHANGED: the documentation accordingly
+
+0.05  Mon Oct 11 20:00:00 2004
+	FIXED: Javascript element was not taken into acount (I have to learn to test better!)
+	ADDED: output example (dhtml_test.html)
+	FIXED: Error in validaty text
+
+0.04  Thu Sep 30 20:00:00 2004
+	ADDED: Expand and collapse buttons
+	ADDED: TD link is now a real html link
+	FIXED: HTML source indentation
+	FIXED: W3C validation
+	PROTOTYPE: very simple search
+	ADDED: example
+
+0.03  Mon July 1 21:30:00 2004
+	FIXED: replaced <pre> with <span>
+	
+0.02  Mon Jun 28 22:30:00 2004
+	FIXED: unique IDs
+	FIXED: separate dump from style
+	FIXED: tag to lower case
+	FIXED: use of unique class
+	CHANGED: glyphs are output byt the renderer instead for relying on browser
+	ADDED: {RENDERER}{NO_GLYPHS}
+	ADDED: {RENDERER}{STYLE}
+	ADDED: {RENDERER}{NO_STYLE}
+	ADDED: {RENDERER}{CLASS}
+	CHANGED: use <pre> instead for &nbsp;
+	ADDED: Attempt to support older browsers
+	
+0.01  Sat Jun 26 23:29:05 2004
+	- original version; created by h2xs 1.21 with options
+		-X -n Data::TreeDumper::Renderer::DHTML
+

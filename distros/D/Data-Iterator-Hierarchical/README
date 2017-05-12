@@ -1,0 +1,44 @@
+Data-Iterator-Hierarchical
+
+This module allows nested loops to iterate in the natural way over a
+sorted rowset as would typically be returned from an SQL database
+query that is the result of naturally left joining several tables.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::Iterator::Hierarchical
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Iterator-Hierarchical
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-Iterator-Hierarchical
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-Iterator-Hierarchical
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Iterator-Hierarchical
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Brian McCauley
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

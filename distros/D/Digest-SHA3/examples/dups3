@@ -1,0 +1,62 @@
+#!perl
+
+	# dups3: simple script for showing duplicate files
+
+=head1 NAME
+
+dups3 - Show Duplicate Files
+
+=head1 SYNOPSIS
+
+ Usage: dups3 files ...
+
+ dups3 is a fast script for discovering duplicate files.  It achieves
+ its efficiency by comparing file digests rather than the file
+ contents themselves, the latter being much larger in general.
+
+ The NIST Secure Hash Algorithm 3 (SHA-3) is highly collision
+ resistant, meaning that two files with the same SHA-3 digest have
+ an almost certain probability of being identical.
+
+ The dups3 script works by computing the SHA3-224 digest of each
+ file and looking for matches.  The search can reveal more than
+ one set of duplicates, so the output is written as follows:
+
+ match1_file1
+	match1_file2
+	match1_file3
+	etc.
+
+ match2_file1
+	match2_file2
+	etc.
+
+=head1 AUTHOR
+
+Mark Shelor <mshelor@cpan.org>
+
+=head1 SEE ALSO
+
+Perl module L<Digest::SHA3>
+
+=cut
+
+use strict;
+use Digest::SHA3;
+
+die "usage: dups3 files ...\n" unless @ARGV;
+
+my @files = grep { -f $_ } @ARGV;
+
+my %dups3;
+for (@files) {
+	my $digest = Digest::SHA3->new->addfile($_, "b")->hexdigest;
+	push(@{$dups3{$digest}}, $_);
+}
+
+for (keys %dups3) {
+	my $ref = $dups3{$_};
+	if (scalar(@$ref) > 1) {
+		print join("\n\t", @$ref), "\n\n";
+	}
+}

@@ -1,0 +1,28 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2007 Martin Becker.  All rights reserved.
+# This package is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+# today - is today a business day in New York?
+#
+# This example uses DateTime to find out the current date and time.
+
+use strict;
+use warnings;
+use DateTime;
+use Date::Gregorian::Business;
+
+my $now  = DateTime->now(time_zone => 'America/New_York');
+my $date = Date::Gregorian::Business->new('us')->set_datetime($now);
+
+print
+    join(' / ',
+	'New York', $now->ymd, $now->hms,
+	!$date->is_businessday?  'closed all day':
+	$now->hour < 9?          'still closed':
+	17 <= $now->hour?        'already closed':
+	'open'
+    ), "\n";
+
+__END__

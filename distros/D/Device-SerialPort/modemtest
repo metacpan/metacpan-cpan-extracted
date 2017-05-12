@@ -1,0 +1,275 @@
+#!/usr/bin/perl
+#
+# This tool is used to check how Device::SerialPort is behaving on
+# your machine.  It will list all the possible values for each function
+# as it runs.  Edit this tool to test various settings.
+#
+# $Id: modemtest 281 2004-02-24 05:27:24Z nemies $
+#
+# Copyright (C) 2000-2003 Kees Cook
+# kees@outflux.net, http://outflux.net/
+#
+# This program is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# http://www.gnu.org/copyleft/gpl.html
+
+use Device::SerialPort qw (:STAT);
+use strict;
+use warnings;
+
+=head1 NAME
+
+modemtest - Tool to examining your modem through Perl's Device::SerialPort
+
+=head1 SYNOPSIS
+
+modemtest [OPTS] [DEVICE [BAUD [DATA [PARITY [STOP [FLOW]]]]]]
+
+ DEVICE    Device to use as a serial port (default: "/dev/modem")
+ BAUD      Serial speed to use            (default: 9600)
+ DATA      Number of databits to use      (default: 8)
+ PARITY    Type of parity to use          (default: "none")
+ STOP      Number of stop bits to use     (default: 1)
+ FLOW      Kind of flow control to use    (default: "none")
+
+ -h, --help           Help report
+     --skip-status    Skip modem status bit tests
+     --hide-possible  Don't show all possible settings
+
+=head1 DESCRIPTION
+
+Some systems, serial ports, and modem behave in strange ways.  To test
+the capabilities of Perl's Device::SerialPort, this tool queries the
+system settings for the given DEVICE, and attempts to set up the port
+and send the initialization string "ATE1" to the modem, reporting the
+results seen.
+
+=head1 SEE ALSO
+
+L<Device::SerialPort(3)>
+
+L<perl(1)>
+
+=head1 AUTHOR
+
+Kees Cook <kees@outflux.net>.
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2000-2004 by Kees Cook <kees@outflux.net>.
+
+This program is free software; you may redistribute it and/or modify
+it under the same terms ans Perl itself.
+
+=cut
+
+printf "Device::SerialPort v%d.%d.%d loaded.\n",
+        int(${Device::SerialPort::VERSION}),
+        (int(${Device::SerialPort::VERSION}*1000)=~/(\d{3})$/),
+        (int(${Device::SerialPort::VERSION}*1000000)=~/(\d{3})$/);
+
+my $opt_skip_status=0;
+my $opt_hide_possible=0;
+
+# quick params
+if ($ARGV[0] eq "-h" ||
+    $ARGV[0] eq "--help") {
+    die "Usage: $0 [DEVICE [BAUD [DATABITS [PARITY [STOPBITS [FLOW]]]]]]
+ -h, --help           Help report
+     --skip-status    Skip modem status bit tests
+     --hide-possible  Don't show all possible settings
+";
+}
+
+while ($ARGV[0]=~/^--(.*)/) {
+    if ($1 eq "skip-status") {
+        $opt_skip_status=1;
+    }
+    elsif ($1 eq "hide-possible") {
+        $opt_hide_possible=1;
+    }
+    else {
+        die "Unknown option '--$1'.  Try '--help'.\n";
+    }
+    shift @ARGV;
+}
+
+# your serial port.
+my ($device,$baudrate,$databits,$parity,$stopbits,$handshake)=@ARGV;
+$device    ||= "/dev/modem";
+$baudrate  ||= "9600";
+$databits  ||= "8";
+$parity    ||= "none";
+$stopbits  ||= "1";
+$handshake ||= "none";
+
+my $port=new Device::SerialPort($device) || die "new($device): $!\n";
+print "Port '$device' open\n";
+
+# Are the ioctls loaded?
+my $bool=$port->can_ioctl();
+print "can ioctl: ",($bool ? "Yes" : "No"),"\n";
+if (!$bool) {
+        die "The rest of this test is useless without ioctl methods.\n";
+}
+
+# Handshaking
+if (!$opt_hide_possible) {
+    my @handshakes=$port->handshake;
+    print "Handshakes:\n";
+    grep(print("\t$_\n"),sort(@handshakes));
+}
+$handshake=$port->handshake($handshake);
+print "Got handshake: $handshake\n";
+
+# Baud rate
+if (!$opt_hide_possible) {
+    my @bauds=$port->baudrate;
+    print "Bauds:\n";
+    grep(print("\t$_\n"),sort { $b <=> $a } @bauds);
+}
+$baudrate=$port->baudrate($baudrate);
+print "Got baud: $baudrate\n";
+
+# Databits
+if (!$opt_hide_possible) {
+    my @databits=$port->databits;
+    print "Databits:\n";
+    grep(print("\t$_\n"),sort { $b <=> $a } @databits);
+}
+$databits=$port->databits($databits);
+print "Got databits: $databits\n";
+
+# Parity
+if (!$opt_hide_possible) {
+    my @parity=$port->parity;
+    print "Parity:\n";
+    grep(print("\t$_\n"),sort @parity);
+}
+$parity=$port->parity($parity);
+print "Got parity: $parity\n";
+
+# Stopbits
+if (!$opt_hide_possible) {
+    my @stopbits=$port->stopbits;
+    print "Stopbits:\n";
+    grep(print("\t$_\n"),sort { $b <=> $a } @stopbits);
+}
+$stopbits=$port->stopbits($stopbits);
+print "Got stopbits: $stopbits\n";
+
+if (!$opt_skip_status) {
+    linestatus();
+    print "\n";
+
+    my $delay=3;
+
+    # Flip on DTR and RTS
+    my $dtr=$port->dtr_active(1) ? "okay" : "failed";
+    my $rts=$port->rts_active(1) ? "okay" : "failed";
+    print "Activated DTR($dtr) and RTS($rts) ... pausing for $delay seconds\n";
+    linestatus();
+    print "\n";
+    sleep $delay;
+
+    $dtr=$port->dtr_active(0) ? "okay" : "failed";
+    $rts=$port->rts_active(0) ? "okay" : "failed";
+    print "Deactivated DTR($dtr) and RTS($rts) ... pausing for $delay seconds\n";
+    linestatus();
+    print "\n";
+    sleep $delay;
+
+    $dtr=$port->dtr_active(1) ? "okay" : "failed";
+    print "Activated DTR($dtr) ... pausing for $delay seconds\n";
+    linestatus();
+    print "\n";
+    sleep $delay;
+
+    $rts=$port->rts_active(1) ? "okay" : "failed";
+    print "Activated RTS($rts) ... pausing for $delay seconds\n";
+    linestatus();
+    print "\n";
+    sleep $delay;
+}
+
+# Just in case: reset our timing and buffers
+$port->lookclear();
+$port->read_const_time(100);
+$port->read_char_time(5);
+
+# Turn on parity checking:
+#$port->stty_inpck(1);
+#$port->stty_istrip(1);
+
+# Read a chunk
+my ($count,$str,$got,$cnt);
+readchunk();
+
+# Write some AT commands to the modem
+writechunk("ATE1\r");
+
+# Read a few chunks
+readchunk();
+readchunk();
+
+print "\n";
+linestatus();
+
+# close the port
+undef $port;
+print "Port closed\n";
+
+sub writechunk
+{
+    my $str=shift;
+
+    my $count = $port->write($str);
+    print "wrote: $count\n";
+    $str=~s/([^\040-\176])/sprintf("{0x%02X}",ord($1))/ge;
+    print "written ->$str<-\n";
+}
+
+sub readchunk
+{
+	# read a chunk of data
+	sleep 1;
+	my ($count,$str)=$port->read(1);
+    my $got;
+	$cnt=$count;
+	while ($count>0) {
+		($count,$got)=$port->read(1);
+		$str.=$got;
+		$cnt+=$count;
+	}
+	print "read: $cnt\n";
+    $str=~s/([^\040-\176])/sprintf("{0x%02X}",ord($1))/ge;
+	print "saw ->$str<-\n";
+}
+
+sub linestatus
+{
+    my $status = $port->modemlines;
+    printf("Modem status = 0x%04X (DTR=%s CTS=%s RTS=%s DSR=%s RNG=%s CD=%s)\n",
+        $status,
+        ($status & MS_DTR_ON) ? "ON " : "off",
+        ($status & MS_CTS_ON) ? "ON " : "off",
+        ($status & MS_RTS_ON) ? "ON " : "off",
+        ($status & MS_DSR_ON) ? "ON " : "off",
+        ($status & MS_RING_ON) ? "ON " : "off",
+        ($status & MS_RLSD_ON) ? "ON " : "off",
+    );
+
+}
+
+# /* vi:set ai ts=4 sw=4 expandtab: */

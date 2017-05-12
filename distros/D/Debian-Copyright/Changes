@@ -1,0 +1,13 @@
+Revision history for Debian-Copyright
+
+0.2    23-07-2012
+        Added support for full bodies that occur in License
+        clauses in  Files stanzas
+        Added some real life copyright tests from mysql
+        Used comments from Charles Plessy, Closes: #70544
+        Worked through some of the missing test coverage
+        Updated copyright notices
+
+0.1    12-08-2011
+        First version, released on an unsuspecting world.
+

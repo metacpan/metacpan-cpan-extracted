@@ -1,0 +1,26 @@
+
+======== version history of Data::DublinCore
+
+version 1.00: Tue Jul 21 14:09:00 CEST 2015
+	- use ::Cache::addPrefixes()
+	- get it to work with recent XML::Compile's
+	- modern documentation style
+	- all attributes are included now
+
+	- bump version number to signal that implementers must
+	  be careful in upgrading.
+
+version 0.04: Mon Jun 14 09:19:50 CEST 2010
+	- avoid memory leak via any_type handler
+	- require newer version of XML::Compile
+
+version 0.03: Fri Jun 11 10:22:19 CEST 2010
+	- fix tests for newer versions of XML::Compile (>1.10), which
+	  do prefix namespaced attributes for the HASH key.
+	  [cpantesters]
+
+version 0.02: Thu Jan 14 13:22:35 CET 2010
+	- fix tests
+
+version 0.01: Mon Jun 22 12:08:57 CEST 2009
+	- initial

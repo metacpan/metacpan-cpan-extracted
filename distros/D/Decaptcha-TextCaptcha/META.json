@@ -1,0 +1,47 @@
+{
+   "abstract" : "solve captchas from textcaptcha.com",
+   "author" : [
+      "gray <gray@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Decaptcha-TextCaptcha",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.52"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Lingua::EN::Words2Nums" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/gray/decaptcha-textcaptcha"
+      }
+   },
+   "version" : "0.02"
+}

@@ -1,0 +1,10 @@
+# This file was generated with Dist::Zilla::Plugin::Manifest::Write v0.9.6.
+Build.PL       # 3rd party file built by ModuleBuildTiny
+COPYING        #     Dummy file added by GatherDir
+Changes        #     Dummy file added by GatherDir
+MANIFEST       #  metainfo file built by Manifest::Write
+META.yml       #  metainfo file built by MetaYAML
+README         #     Dummy file added by GatherDir
+dist.ini       #     Dummy file added by GatherDir
+lib/Dummy.pm   #     Dummy file added by GatherDir
+t/00-compile.t # 3rd party file built by Test::Compile

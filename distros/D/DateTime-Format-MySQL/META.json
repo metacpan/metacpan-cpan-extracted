@@ -1,0 +1,47 @@
+{
+   "abstract" : "Parse and format MySQL dates and times",
+   "author" : [
+      "Dave Rolsky <autarch@urth.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.421",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-MySQL",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0",
+            "DateTime::Format::Builder" : "0.6"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::MySQL" : {
+         "file" : "lib/DateTime/Format/MySQL.pm",
+         "version" : "0.06"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.06"
+}

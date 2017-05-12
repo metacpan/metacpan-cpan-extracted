@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.44.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 cd14cda34781e143c73c252fb59dacd1834c2a86 Build.PL
+SHA1 cf756914ec51f52f9c121be247bfda232dc6afd2 COPYING.LESSER
+SHA1 4487ba2812cd0c318e7ae6bc9aceed51ecf48093 ChangeLog
+SHA1 b1d0e346e7199f81419de341b62fd92b3248c5e9 MANIFEST
+SHA1 2ccbd2894280e6848945c325efd7f0f6b2d2c92a META.yml
+SHA1 07e9f731045077df62537ce557709f6cf491ee9e Makefile.PL
+SHA1 d2ae44cbc79ed8c7d3c9e5366293a156c0a89155 NEWS
+SHA1 d4719df45c2d61df0e2b8aeeced29123ce49a7b8 README
+SHA1 d2ae44cbc79ed8c7d3c9e5366293a156c0a89155 ReleaseNotes
+SHA1 7db05162d55861348dbcd76f0acb84e3e65f2d09 lib/Data/Walk.pm
+SHA1 c99a7be6b4c122a8d2f098257608034b04ad59d9 t/TC_Basic.pm
+SHA1 94a02e7ad32d45452465af97d4191cddd85da7cc t/TC_Bugs.pm
+SHA1 4a3f5fa155f7f7257ed1883dc7819767532b6acc t/TC_ByDepth.pm
+SHA1 b52e1825ee46da5c0428c220c92ef7667367816e t/TC_Copy.pm
+SHA1 3c3dfba4dd59c3892969dd6709f31dbda46ca6de t/TC_Examples.pm
+SHA1 c8b798dece21a9c66ea12ac3c65849e6ddcba7bf t/TC_Follow.pm
+SHA1 7c4360baacf829f2e9512f4b6f8df047a37a5e7c t/TC_PostProcess.pm
+SHA1 d4eaa13a99ec59029e5f9edf316efd07a0171d59 t/TC_PreProcess.pm
+SHA1 01be03c11cfb262bef8372062ef73ddbf4ec9494 t/TS_All.pm
+SHA1 a92bc61ceade3316a432cabc3a4c08f73b952911 t/TS_Basic.pm
+SHA1 0566fd2a65501085f0c20ab17c3015477ec9e6b6 t/TS_Options.pm
+SHA1 1b2d4ace36c65a7469ca04b1c4908871c426e6e5 t/testrunner.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.2.2 (GNU/Linux)
+
+iD8DBQFEY0ZqOo0HNPWNDz0RAiYUAKCCDzGqrytzQpWSa7yd/2xqIYkbMgCg8oT0
+ko/I4f00Ft9E+2odtzcyBNA=
+=8xB+
+-----END PGP SIGNATURE-----

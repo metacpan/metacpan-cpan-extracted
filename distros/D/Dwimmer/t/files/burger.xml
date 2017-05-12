@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+<link href="http://perl6maven.com/atom" rel="self" />
+<title>Perl 6 Maven</title>
+<id>http://perl6maven.com/</id>
+<updated>2012-06-27T19:56:00Z</updated>
+<entry>
+  <title>Parsing command line arguments in Perl 6</title>
+  <summary type="html"><![CDATA[<p>
+How can you let your Perl 6 application to accept command line arguments?
+<p>
+]]></summary>
+  <updated>2012-09-14T10:52:03Z</updated>
+  <link rel="alternate" type="text/html" href="http://perl6maven.com/parsing-command-line-arguments-perl6" />  <id>http://perl6maven.com/parsing-command-line-arguments-perl6</id>
+<author>
+  <name>szabgab</name>
+</author>
+</entry>
+</feed>

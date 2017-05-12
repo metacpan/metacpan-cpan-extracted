@@ -1,0 +1,37 @@
+#!/bin/sh
+
+# set VIAMAN if you wish to generate man pages via "nroff -man"
+
+VIAMAN=
+
+P2M=pod2man
+NROFF='nroff -man'
+M2H='man2html'
+
+P2H=pod2html
+
+VER=`grep VERSION Makefile.PL | awk '{print $NF}' | tr -d "',"`
+
+if [ -n "$VIAMAN" ]; then
+
+    echo "Converting ShowTable.pm -> Data-ShowTable-$VER.html"
+    $P2M ShowTable.pm | 
+    $NROFF |
+    $M2H -title 'Data::ShowTable(3) Man Page' > Data-ShowTable-$VER.html
+
+    echo "Converting showtable -> showtable-$VER.html"
+    $P2M showtable | 
+    $NROFF |
+    $M2H -title 'showtable(1) Man Page' > showtable-$VER.html
+
+else
+    echo "Converting ShowTable.pm -> Data-ShowTable-$VER.html"
+    cp ShowTable.pm Data-ShowTable-$VER.pm
+    $P2H --infile=Data-ShowTable-$VER.pm --outfile=Data-ShowTable-$VER.html
+    rm Data-ShowTable-$VER.pm
+
+    echo "Converting showtable -> showtable-$VER.html"
+    cp showtable showtable-$VER
+    $P2H --infile=showtable-$VER --outfile=showtable-$VER.html
+    rm showtable-$VER
+fi

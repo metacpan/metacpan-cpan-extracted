@@ -1,0 +1,25 @@
+.gitignore
+Changes
+contrib/dir-project-init.el
+contrib/dir-project.el
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml			Module meta-data (added by MakeMaker)
+Project.pm
+project_bin
+project_dir
+project_dir.mk
+README
+t/00_pod.t
+t/01_manifest.t
+t/02_help.t
+t/03_spaces.t
+t/10_project.t
+t/20_project_dir.t
+t/30_project_bin.pl
+t/30_project_bin.t
+t/40_make.mk
+t/40_make.t
+t/test_utils.pl
+META.json                                Module JSON meta-data (added by MakeMaker)

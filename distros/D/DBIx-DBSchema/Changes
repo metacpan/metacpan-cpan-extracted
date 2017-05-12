@@ -1,0 +1,208 @@
+Revision history for Perl module DBIx::DBSchema
+
+0.45 Wed May  6 22:17:33 PDT 2015
+    - MySQL does not support DEFAULT for TEXT/BLOB columns, closes: CPAN#58505
+    - doc: Add repository information
+    - fix SQLite reverse-engineering, closes: CPAN#95961
+    - fix Pg reverse-engineering of foreign key MATCH/ON DELETE/ON UPDATE
+      clauses
+
+0.44 2013-11-15 17:54:37 PST
+    - POD fixes from Xavier Guimard <x.guimard@free.fr> and Damyan Ivanov
+      <dmn@debian.org> of the Debian Perl Group, closes: CPAN#82187
+    - More foreign key support
+      + Table alteration (removing foreign keys)
+      + Fix MATCH / ON DELETE / ON UPDATE
+
+0.43 2013-11-04 14:58;32 PST
+    - Incorporate CPAN::Changes::Spec-compliant Changes file from Neil Bowers
+      <neilb@cpan.org>, closes: CPAN#90023, thanks!
+    - Fix table creation broken by 0.42
+    - Create/alter tables before foreign key changes
+
+0.42 2013-11-03 01:09:27 PST
+    - Basic foreign key support
+      + table creation
+      + table alteration (adding new foreign keys)
+      + reverse-engineering (Pg driver)
+
+0.41_01 not released
+    - consolidate multiple ADD/ALTER COLUMN statements into one ALTER TABLE
+
+0.40 2011-12-17 17:03:51 PST
+    - doc: sql_update_schema link to sql_add_column misspelled
+    - Pg: fix mapping for DOUBLE PRECISION type to avoid needless alter cols
+    - mysql: implement altering column types & lengths
+
+0.39 2010-03-26 20:24:58 PDT
+    - mysql: TEXT->LONGTEXT
+    - mysql: when reverse engineering, transform a default of
+      CURRENT_TIMESTAMP into the more common NOW()
+    - mysql: fix reverse-engineering of empty string default
+
+0.38 2010-01-14 15:26:13 PST
+    - Bump version number for ->quoted_default availability & default
+      reverse-engineering changes
+
+0.37 not released
+    - Patch from Slavin Rezic <srezic@cpan.org> to prevent quoting around
+      numeric defaults in Pg.
+    - Pg: use default_db_schema when adding SERIAL columns instead of
+      hardcoding "public".
+    - Pg: Initial support for handling changes to a column's type or size.
+    - Case sensitivity fix for Slavin's patch to prevent quoting around
+      numeric defaults in Pg.
+    - Column default values: refactor handling, improve Pg reverse
+      engineering and implement schema changes.
+
+0.36 2007-12-13 17:49:35 PST
+    - Patch from ISHIGAKI@cpan.org to suppress unnecessary warnings about
+      undefined local_options, thanks!
+    - fix bug preventing adding new columns as primary keys under Pg
+
+0.35 2007-10-29 18:58:36 PDT
+    - Fix minor breakage (pretty_print) resulting from Jesse's changes.
+    - Update mysql driver to handle BIGSERIAL columns
+    - Update Column.pm, move all mysql and Pg-specific code to DBD driver
+      callbacks
+    - Update Table.pm, add local_options
+    - Fix mysql NULL reverse-engineering and updating code
+
+0.34 2007-08-19 10:08:51 PDT
+    - More work on update schema from Slaven Rezic <srezic@cpan.org>,
+      thanks!
+      + implement table dropping (closes: CPAN#27936)
+      + implement column dropping (closes: CPAN#27896)
+    - Fix to quiet warnings from internal use of old API from Jesse Vincent
+      <jesse+cpan@fsck.com>, thanks! (closes: CPAN#27958)
+    - Make table dropping optional, not the default.
+
+0.33 2007-06-28 18:46:15 PDT
+    - Overhaul of index representation: indices (both normal and unique)
+      now have names and are DBIx::DBSchema::Index objects
+    - update_schema now handles indices!
+    - Bump version numbers in Table.pm, Column.pm and DBD.pm
+    - Pg reverse-engineering fix for column order in multi-column indices,
+      to prevent needless drop/add of identical indices
+    - mysql reverse-engineering patch from Brian Phillips
+      <bphillips@cpan.org>, closes: CPAN#17582, thanks!
+    - mysql NAME vs NAME_lc patch from Ralf Hack <ralf@beetlecraft.net>,
+      closes: CPAN#16715, thanks!
+    - mysql fix for additional column data from Chris Mungall
+      <cjm@fruitfly.org>, closes: CPAN#20859, thanks!
+    - SQLite SERIAL patch from IN SUK JOUNG <i.joung@gmail.com>, and fix
+      for mis-application of said patch from Slaven Rezic
+      <srezic@cpan.org>, thanks!
+    - Update README wrt current CVS info and URL, closes: CPAN#27577
+
+0.32 2007-04-18 15:02:25 PDT
+    - increment the version numbers in Column.pm and Table.pm and the
+      "use" statements accordingly
+    - Error reporting for load constructor
+    - Update documentation wrt supported databases and new update_schema
+      stuff
+    - Fixes for dropping nullability on old Pg (<= 7.2)
+    - Fixes for adding nullability on old Pg (<= 7.3)
+    - Throw a warning if pg_server_version is unavailable, assume >= 7.3
+    - fix POD error in DBSchema::DBD::SQLite that confused pod2man and
+      prevented the documentation from being installed.  Patch from Niko
+      Tyni <ntyni@iki.fi>, thanks!
+
+0.31 2006-03-30 05:28:20 PST
+    - more schema update stuff:
+    - added Column::sql_alter_column
+    - added Table::sql_alter_table
+    - added DBSchema::sql_update_schema and DBSchema::update_schema
+
+0.30 2006-02-16 16:43:01 PST
+    - "Too much uptime"
+    - Remove buggy debugging from Column.pm
+    - Remove removed TODO from MANIFEST
+
+0.29 2006-02-16 13:54:42 PST
+    - Column::sql_add_column fix when adding primary keys to Pg 7.2.x
+    - workaround for PAUSE parsing of DBIx::DBSchema::DBD::Pg version: move
+      DBD::Pg verison checking after $VERSION declaration, thanks Andreas!
+    - kludge: allow scalar ref default to force quoting off, to add things
+      like functions and empty values as defaults
+    - Move TODO file to DBSchema.pm and DBS/Column.pm BUGS sections
+
+0.28 2005-11-30 09:46:47 PST
+    - Initial SQLite support from Jesse Vincent
+    - fix typo in DBIx::DBSchema::DBD POD doc
+
+0.27 2005-08-15 23:31:54 PDT
+    - MySQL patch for enum types from Andy Orr
+    - new Column::sql_add_column method!
+
+0.26 2005-04-07 01:09:53 PDT
+    - ask for "public" db schema only from Pg
+
+0.25 2005-04-06 16:12:38 PDT
+    - depend on DBD::Pg 1.32 or 1.41+ (1.40 was bunk)
+
+0.24 2005-03-11 02:20:55 PST
+    - Oracle driver from Daniel Hanks <hanksdc@about-inc.com> and Peter
+      Bowen <pbowen@aboutws.com>.
+    - Switch from FreezeThaw to Storable, keep ability to read old files
+
+0.23 2004-02-16 17:35:54 PST
+    - Update Pg dependancy to 1.32
+    - Update the simple load test so it skips DBIx::DBSchema::DBD::Pg if
+      DBD::Pg 1.32 is not installed.
+
+0.22 2003-10-23 15:18:21 PDT
+    - Pg reverse-engineering fix: varchar with no limit
+    - Pg needs (unreleased) DBD::Pg 1.30 (or deb 1.22-2... interesting)
+
+0.21 2002-09-19 05:04:18 PDT
+    - Pg reverse-engineering fix: now sets default
+
+0.20 2002-03-04 04:58:34
+    - documentation updates
+    - fix Column->new when using named params
+    - fix Pg driver reverse-engineering length of numeric columns:
+      translate 655362 to 10,2, etc.
+    - fix Pg driver reverse-engineering of text columns (don't have a
+      length)
+
+0.19 2001-10-23 08:49:12
+    - documentation for %typemap
+    - preliminary Sybase driver from Charles Shapiro
+      <charles.shapiro@numethods.com> and Mitchell J. Friedman
+      <mitchell.friedman@numethods.com>.
+    - Fix Column::line to return a scalar as documented, not a list.
+    - Should finally eliminate the Use of uninitialized value at
+      ... DBIx/DBSchema/Column.pm line 251
+
+0.18 2001-08-10 17:07:28
+    - Added Table::delcolumn
+    - patch from Charles Shapiro <cshapiro@numethods.com> to add
+      `ORDER BY a.attnum' to the SQL in DBIx::DBSchema::DBD::Pg::columns
+
+0.17 2001-07-07 17:55:33
+    - Rework Table->new interface for named params
+    - Fixes for Pg blobs, yay!
+    - MySQL doesn't need non-standard index syntax anymore (since 3.22).
+    - patch from Mark Ethan Trostler <mark@zzo.com> for generating
+      tables without indices.
+
+0.16 2001-01-05 15:55:50
+    - Don't overflow index names.
+
+0.15 2000-11-24 23:39:16
+    - MySQL handling of BOOL type (change to TINYINT)
+
+0.14 2000-10-24 14:43:16
+    - MySQL handling of SERIAL type (change to INTEGER AUTO_INCREMENT)
+
+0.13 2000-10-11 10:47:13
+    - fixed up type mapping foo, added default values, added named
+      parameters to Column->new, fixed quoting of default values
+
+0.11 2000-09-28 02:16:25
+    - oops, original verison got 0.10, so this one will get 0.11
+
+0.01 2000-09-17 07:57:35
+    - original version; created by h2xs 1.19
+

@@ -1,0 +1,16 @@
+Revision history for Perl extension Data::Formatter::Text.
+
+1.0  Sun Sept 23 11:30:00 2012
+    - Added META.yml and an example script, dir_listing.pl
+
+0.03  Fri Apr 18 15:30:00 2008
+    - Fixed a typo in the documentation that was kindly pointed out by 
+	user "skim".
+
+0.02  Wed Feb 06 15:45:00 2008
+    - Enhanced documentation and added some tests. Also exposed some configuration variables.
+
+0.01  Sun Jan 27 17:12:45 2008
+	- original version; created by h2xs 1.23 with options
+		-AX Data::Formatter::Text
+

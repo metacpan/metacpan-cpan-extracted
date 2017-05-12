@@ -1,0 +1,71 @@
+{
+   "abstract" : "Install/remove/upgrade/downgrade SQL schemas",
+   "author" : [
+      "Tyler \"Crackerjack\" MacDonald <japh@crackerjack.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Migration-Directories",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Dumper" : "2.10",
+            "Module::Build" : "0.27_03"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBI" : "1.41",
+            "DBIx::Transaction" : "0.005",
+            "File::Basename::Object" : "0.01",
+            "Pod::Usage" : "1"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Migration::Directories" : {
+         "file" : "lib/DBIx/Migration/Directories.pm",
+         "version" : "0.12"
+      },
+      "DBIx::Migration::Directories::Base" : {
+         "file" : "lib/DBIx/Migration/Directories/Base.pm"
+      },
+      "DBIx::Migration::Directories::Build" : {
+         "file" : "lib/DBIx/Migration/Directories/Build.pm"
+      },
+      "DBIx::Migration::Directories::Build::Base" : {
+         "file" : "lib/DBIx/Migration/Directories/Build/Base.pm"
+      },
+      "DBIx::Migration::Directories::Database" : {
+         "file" : "lib/DBIx/Migration/Directories/Database.pm"
+      },
+      "DBIx::Migration::Directories::Database::SQLite2" : {
+         "file" : "lib/DBIx/Migration/Directories/Database/SQLite2.pm"
+      },
+      "DBIx::Migration::Directories::Database::mysql" : {
+         "file" : "lib/DBIx/Migration/Directories/Database/mysql.pm"
+      },
+      "DBIx::Migration::Directories::Test" : {
+         "file" : "lib/DBIx/Migration/Directories/Test.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.12"
+}

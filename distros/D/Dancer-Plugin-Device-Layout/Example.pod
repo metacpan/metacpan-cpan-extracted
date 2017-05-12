@@ -1,0 +1,117 @@
+=encoding utf8
+
+=head1 NAME
+
+Dancer::Plugin::Device::Layout::Example - Sample real life web application.
+
+=head1 DESCRIPTION
+
+This example should help you understand how L<Dancer::Plugin::Device::Layout>
+works and how you can integrate the plugin in your existing L<Dancer> web
+application.
+
+=head1 THE BIG PICTURE
+
+You have created a realy cool web application which looks great on desktop
+computers (big screens) but is nearly unreadable on mobile devices such as
+smartphones or tablets because of its small display size? This is where
+L<Dancer::Plugin::Device::Layout> can help you with.
+
+L<Dancer::Plugin::Device::Layout> provides a subroutine that detects the
+remote device on the base of the user agent of every web request. This
+subroutine returns in a array/hash context the L<Dancer/template|template>
+option key value pair for the layout.
+
+With L<Dancer::Plugin::Device::Layout> default settings
+L<Dancer::Plugin::Device::Layout/device_layout|device_layout> is assigning
+the layout 'tablet' to tablet devices, 'mobile' to smartphones and 'normal'
+to all other devices. So you need theese three layouts within 'views/layouts'.
+
+The layouts can help you easily setup device (mostly screen size) optimized
+looks for your web application.
+
+=head1 MyApp
+
+I<MyApp> is the web application used for this example.
+
+=head2 Import plugin
+
+You need to load the plugin first ofcourse.
+
+    package MyApp;
+    use Dancer ':syntax';
+    use Dancer::Plugin::Device::Layout;
+    
+    our $VERSION = '0.1';
+    
+    get '/' => sub {
+        template 'index';
+    }
+    
+    true;
+
+=head2 Update L<Dancer/template|template> calls
+
+You need to update every L<Dancer/template|template> call.
+
+    package MyApp;
+    use Dancer ':syntax';
+    use Dancer::Plugin::Device::Layout;
+    
+    our $VERSION = '0.1';
+    
+    get '/' => sub {
+        my $tokens  = {};
+        my $options = { device_layout };
+        template 'index', $tokens, $options;
+    }
+    
+    true;
+
+=head2 Update C<config.yml>
+
+Now you can modify the defaults of L<Dancer::Plugin::Device::Layout> by
+update your C<config.yml>.
+
+    # This is the main configuration file of your Dancer app
+    # env-related settings should go to environments/$env.yml
+    # all the settings in this file will be loaded at Dancer's startup.
+    
+    # Your application's name
+    appname: "MyApp"
+    
+    # The default layout to use for your application (located in
+    # views/layouts/main.tt)
+    layout: "main"
+    
+    # when the charset is set to UTF-8 Dancer will handle for you
+    # all the magic of encoding and decoding. You should not care
+    # about unicode within your app when this setting is set (recommended).
+    charset: "UTF-8"
+    
+    # template engine
+    # simple: default and very basic template engine
+    # template_toolkit: TT
+    
+    template: "simple"
+    
+    # template: "template_toolkit"
+    # engines:
+    #   template_toolkit:
+    #     start_tag: '[%'
+    #     end_tag:   '%]'
+    
+    # Here comes the Dancer::Plugin::Device::Layout configuration.
+    plugins:
+      Device::Layout:
+        normal_layout:    normal
+        mobile_layout:    mobile
+        tablet_layout:    tablet
+        no_tablet:        0
+        tablet_as_mobile: 0
+        no_mobile:        0
+
+=head2 Done
+
+Now you are done with integrate L<Dancer::Plugin::Device::Layout> in your
+L<Dancer> web application.

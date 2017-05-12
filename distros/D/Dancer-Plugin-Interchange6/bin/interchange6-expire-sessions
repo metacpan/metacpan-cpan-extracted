@@ -1,0 +1,45 @@
+#!/usr/bin/env perl
+
+=pod
+
+=head1 NAME
+
+interchange6-session-expires - Expire DBIC sessions
+
+=head1 SYNOPSIS
+
+Usage:
+
+If --expire is not set the script will attempt to use
+session_expires value from config.yml.
+
+  bin/interchange6-session-expires
+
+  bin/interchange6-session-expires --expire='2hours'
+
+  bin/interchange6-session-expires --expire='7200'
+
+=head1 DESCRIPTION
+
+NOTE: This script should be copied to your Dancer App/bin
+directory to work correctly.
+
+=cut
+
+use strict;
+use warnings;
+
+use Dancer ':script';
+use Getopt::Long;
+use Dancer::Plugin::Interchange6;
+
+my $duration;
+GetOptions (
+        "expire=s"  => \$duration,
+) or die("Error in command line arguments\n");
+
+my $schema = shop_schema;
+
+$duration ||= config->{session_expires};
+
+$schema->resultset('Session')->expire($duration);

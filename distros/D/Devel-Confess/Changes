@@ -1,0 +1,147 @@
+Release history for Devel-Confess
+
+0.009004 - 2017-02-14
+  - prevent handlers from recursing, such as if our handlers are wrapped by other
+    code.  IO::All for example will do this.
+
+0.009003 - 2016-11-18
+  - more complete prereq list
+  - fix inf handling
+  - work around UNIVERSAL::isa and UNIVERSAL::can
+
+0.009002 - 2016-09-04
+  - fix test failures on perl 5.10.0
+  - fix regex warnings in perl 5.6
+  - work around threads issue in Carp in Safe compartments
+  - don't skip dump test on Carp versions that use Carp::Heavy
+  - test diagnostic and formatting improvements
+  - avoid triggering overloads when checking for exception existence
+
+0.009001 - 2016-08-19
+  - fix handling of infinite options (dump, source, evalsource)
+  - fix evalsource test by running with the debugger
+
+0.009000 - 2016-08-18
+  - documentation fixes and improvements
+  - more accurate handling of existing %SIG handlers
+  - updated option parsing to allow setting specific values, such as color=force
+  - stop relying on . being in @INC in tests
+  - source option now accepts a number of lines of context to show
+  - added evalsource option, which shows the source only of string evals
+  - fix adding redundant trace information when errors are rethrown
+  - improved warning messages when source option can't find source to display
+
+0.008000 - 2015-06-26
+  - if dump option is used, bare references and objects without stringify
+    overloads will be dumpered when being output to the screen
+  - stack trace properly attached to bare references are rethrown and will be
+    output to the screen
+  - avoid Test::More in threads test to limit code run as much as possible
+  - other test cleanups
+  - fix DEBUGGING detection in newer perls
+  - protect tests against DEVEL_CONFESS_OPTIONS set in environment
+
+0.007012 - 2015-03-30
+  - avoid re-throwing errors during END on debugging perls
+
+0.007011 - 2015-02-03
+  - avoid triggering overloads when CLONEing
+
+0.007010 - 2015-01-29
+  - fix incorrect version check that prevented using better names option
+  - fix removing hooks when unimport called
+  - fix stringifying refs in stack trace inside a Safe compartment on old perl
+  - avoid updating stored refaddrs when they haven't changed
+  - less noise when checking for broken threads
+  - prevent leaking namespaces even in broken threads
+  - fix version check for broken threads
+
+0.007009 - 2015-01-23
+  - prevent segfaults on perl 5.10.0 and 5.8.9 with threads
+  - fix leaking exception objects if another is thrown or a thread created
+
+0.007008 - 2015-01-20
+  - don't attempt threading tests if threading is broken
+
+0.007007 - 2015-01-19
+  - fatal warnings in destructors can cause segfaults, so disable them
+  - protect against losing information during global destruction and then
+    triggering our own errors
+  - improve stack trace formatting when generated during global destruction
+
+0.007006 - 2015-01-08
+  - don't delete packages that exceptions are currently blessed as
+  - protect tests against other loaded modules effecting hooks
+  - add test for warning passing fix from 0.007005
+
+0.007005 - 2014-12-16
+  - fix how we pass options on to other warn/die handlers (RT#100951)
+  - minor pod cleanups
+  - improve diagnostics for bad options in DEVEL_CONFESS_OPTIONS
+
+0.007004 - 2014-09-22
+  - make sure unwanted debugging flags are disabled as early as possible,
+    fixing several possible crashes
+
+0.007003 - 2014-07-26
+  - fix leak test on new versions of Test::More
+  - prevent PAUSE from trying (and failing) to index an internal package
+
+0.007002 - 2014-07-16
+  - further fixes for interactions with Safe.pm on perl 5.8
+
+0.007001 - 2014-06-27
+  - fix Safe.pm interaction in perls older than 5.20
+
+0.007000 - 2014-06-26
+  - fix dist name in metadata
+  - add dump1, dump2, etc options to control dump max depth
+  - quote arguments differently, ensuring they will always be on one line
+  - fix issues when triggered in Safe compartments
+
+0.006001 - 2014-03-06
+  - fix test failures on Windows when optional module not installed
+
+0.006000 - 2014-03-04
+  - rewrote docs with better enables
+  - allow DEVEL_CONFESS_OPTIONS to use comma separators
+  - no longer disables itself during global destruction
+  - warnings and errors can now be enabled/disabled individually
+  - use Win32::Console::ANSI for color on Windows if available
+
+0.005000 - 2013-11-07
+  - add source option to dump source of code surrounding trace.
+
+0.004000 - 2013-11-05
+  - rename 'hacks' option and module to 'builtin'
+  - add dump option to include contents of references in traces.
+  - add color option to colorize warnings or errors in terminal.
+  - fix handling of outer __DIE__ hooks
+  - prevent slowdown when loaded via -d
+  - fixed Exception::Base builtin handling
+
+0.003001 - 2013-10-07
+  - fix compatibility with perl 5.6
+  - fix some minor memory leaks
+  - trigger overloads more carefully
+  - check roles using ->does as well as ->DOES
+
+0.003000 - 2013-10-04
+  - Rename to Devel::Confess instead of having an alias
+    (I am bad at naming things)
+  - Ouch exceptions can now work without hacks
+
+0.002002 - 2013-09-21
+  - fix 5.8 compatibility
+
+0.002001 - 2013-09-20
+  - properly list Scalar::Util as a prereq
+  - fix tests on Windows
+
+0.002000 - 2013-09-19
+  - rename module from Carp::Always::AndRefs to Carp::Always::EvenObjects
+  - some documentation tweaks
+  - fix using Devel::Confess under debugger
+
+0.001000 - 2013-09-19
+  - initial release

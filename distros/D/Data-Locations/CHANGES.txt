@@ -1,0 +1,158 @@
+                  =========================================
+                    Package "Data::Locations" Version 5.5
+                  =========================================
+
+
+                 Copyright (c) 1997 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Version history:
+----------------
+
+Version 5.5   07.10.2009
+
+ +  Minor bugfixes and updates
+
+Version 5.4   25.10.2004
+
+ +  Fixed test file "02___refcount.t" to auto-adjust
+    the offset dealing with self-ties not incrementing
+    the refcount in some Perl versions.
+ +  Added a warning to "Makefile.PL" that Perl versions
+    including and between v5.6.1 and v5.7.0 are not fully
+    supported (test file "11_______dump.t" dumps core).
+
+Version 5.3   24.10.2004
+
+ +  Re-applied the refcount offset in "02___refcount.t" to
+    Perl versions >= 5.008005 in order to fix the failing
+    tests. See also version 5.1 below.
+
+Version 5.2a  19.03.2001
+
+ +  Restricted the refcount offset in "02___refcount.t" to
+    Perl versions >= 5.00503 and < 5.007 in order to fix
+    the failing tests. See also version 5.1 below.
+
+Version 5.2   06.05.1999
+
+ +  Fixed a bug in method "read()" which prevented empty lines
+    to be read back in list context (empty lines were mistaken
+    for the end-of-file marker).
+ +  When an item in a location has the value "undef", the method
+    "read()" now returns the empty string instead. You would have
+    mistaken this for the end-of-file marker in previous versions.
+
+Version 5.1   03.05.1999
+
+ +  Fixed the test script "t/02___refcount.t" which failed under
+    Perl 5.005_03 due to an incompatibility between this and all
+    previous versions of Perl (self-referential ties do not
+    increment the reference count of their tied object anymore).
+
+Version 5.0   28.04.1999
+
+ +  All global or "class" methods (except "Data::Locations->new()",
+    of course) are gone. This allows several modules to use this
+    module simultaneously without interfering with each other.
+ +  All locations are local ("my" or "lexically scoped") variables
+    now in the sense that they are automatically destroyed (and
+    automatically dumped, if desired) whenever your last reference
+    of a location goes out of scope. It's the Perl way now :-).
+ +  All locations are dumped automatically now at shutdown time of
+    this module (and also when the last reference of a location goes
+    out of scope) if and only if a filename has been provided previously.
+ +  The method "toplevel()" cannot be used to artificially set or reset
+    the "toplevel" status of a location anymore. A location is a "toplevel"
+    location (by definition) whenever it is not embedded in any other
+    location. The method "toplevel()" now only allows to test this
+    condition.
+ +  The code in general, the regression test suite and the documentation
+    have been overhauled a great deal.
+
+Version 4.3   25.02.1999
+
+ +  Fixed the bug in "new()" which manifested itself with perl 5.005 and
+    which caused ``print $location "Text";'' to fail.
+ +  Added a warning to the documentation that class methods such as
+    "Data::Locations->dump();" should only be used if your script
+    has the exclusive use of the "Data::Locations" module.
+ +  Finally managed to add a (still rudimentary) regression test suite.
+
+Version 4.2   07.09.1998
+
+ +  Added a warning to the documentation that inheritance is a no-no with
+    an example of how to use embedding/delegation instead.
+ +  Introduced an additional header "Preface" in the POD documentation to
+    avoid clobbering of the information displayed by CPAN.pm et al.
+ +  Added the new attributes to "Makefile.PL" for ActiveState's port
+    of Perl 5.005 to the Win32 platform.
+
+Version 4.1   06.06.1998
+
+ +  Fixed "delete()" to clear the self-references which prevented the eventual
+    garbage-collection.
+ +  Also fixed "delete()" to free the occupied memory at the time of the call
+    of this method rather than at shutdown time of the Perl interpreter.
+ +  Removed the unnecessary calls of the "FETCH()" method, resulting in an
+    improved performance.
+ +  Minor changes to make the code clearer and cleaner.
+ +  "Bug fixes" and additions in the documentation.
+
+Version 4.0   23.05.1998
+
+ +  Extensive rewrite of this module and its documentation.
+ +  The companion modules "Tie::Handle", "Data::Locations::Proxy"
+    and "Data::Locations::Shell" are GONE, because "Data::Locations"
+    now are OBJECTS *and* FILE HANDLES *at the same time*, making
+    these three modules obsolete (this also means that this module
+    doesn't need ANY external modules anymore, except the core
+    modules from the standard Perl distribution "strict",
+    "Exporter", "Carp" and "Symbol").
+ +  This module now definitely needs Perl version 5.004 or better.
+ +  Enhanced support for Windows NT/95.
+ +  Added method "toplevel()".
+ +  BEWARE that embedding a top-level location in some other location
+    now automatically causes it to lose its "top-level" status, as
+    opposed to previous versions of this module.
+
+Version 3.0   29.07.1997
+
+ +  Added modules "Data::Locations::Proxy" and "Data::Locations::Shell"
+    in order to make statements such as print $FH "text"; and $text = <$FH>;
+    possible.
+ +  The two methods "set_filename()" and "get_filename()" have been
+    replaced by a single method, "filename()".
+
+Version 2.1   25.07.1997
+
+ +  Intermediate development version not publicly released.
+
+Version 2.0   24.07.1997
+
+ +  Changed the name of this module from "Locations" to "Data::Locations".
+ +  Added new methods "printf()", "read()", "reset()" and "tie()".
+ +  Introduced a companion module "Tie::Handle" to tie file handles to
+    locations, in order to be able to print/read to/from locations using
+    Perl's built-in operators for accessing file handles instead of method
+    calls.
+
+Version 1.2   18.07.1997
+
+ +  Intermediate development version not publicly released.
+
+Version 1.1   16.07.1997
+
+ +  Fixed a bug in the automatic detection of potential infinite recursions.
+    (This bug did not cause any malfunction, but degraded performance
+    unnecessarily.)
+ +  Cleanup of the code of remnants such as "carp - exit" instead of "croak".
+ +  Improved the documentation.
+
+Version 1.0   14.07.1997
+
+ +  First release.
+
+----------------------------------------------------------------------------
+

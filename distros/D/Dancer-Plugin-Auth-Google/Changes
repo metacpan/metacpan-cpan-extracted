@@ -1,0 +1,21 @@
+Revision history for Dancer-Plugin-Auth-Google
+
+0.06    2014-12-27
+    - added missing prereq.
+
+0.05    2014-12-12
+    - added missing prereq.
+
+0.04    2014-12-12
+    - improved error handling.
+
+0.03    2014-07-15
+    - workaround for JSON::bool objects being
+      stored in the session, until Dancer::Session::Cookie
+      is patched.
+
+0.02    2014-04-27
+    - updating docs (thanks mnikhil and Jacques Lareau)
+
+0.01    2014-04-20
+    - initial release.

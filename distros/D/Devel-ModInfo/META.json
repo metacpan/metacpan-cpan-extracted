@@ -1,0 +1,65 @@
+{
+   "abstract" : "Perl extension for providing metadata about a module's methods, properties, and arguments",
+   "author" : [
+      "James Tillman <jtillman@bigfoot.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.94, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "artistic_1"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-ModInfo",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "MyModule"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.3"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Dumper" : "0",
+            "Exporter" : "0",
+            "File::Spec::Functions" : "0",
+            "IO::File" : "0",
+            "Parse::RecDescent" : "0",
+            "Template" : "0",
+            "XML::DOM" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/neilbowers/Devel-ModInfo.git",
+         "web" : "https://github.com/neilbowers/Devel-ModInfo"
+      }
+   },
+   "version" : "2.04"
+}

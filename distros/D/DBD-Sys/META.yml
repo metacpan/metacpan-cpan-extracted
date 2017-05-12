@@ -1,0 +1,100 @@
+---
+abstract: 'System tables interface via DBI'
+author:
+  - 'Jens Rehsack <rehsack@cpan.org>, Alexander Breibach <alexander.breibach@googlemail.com>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBD-Sys
+provides:
+  Bundle::DBD::Sys:
+    file: lib/Bundle/DBD/Sys.pm
+    version: 0.102
+  DBD::Sys:
+    file: lib/DBD/Sys.pm
+    version: 0.102
+  DBD::Sys::CompositeTable:
+    file: lib/DBD/Sys/CompositeTable.pm
+    version: 0.102
+  DBD::Sys::Plugin:
+    file: lib/DBD/Sys/Plugin.pm
+    version: 0.102
+  DBD::Sys::Plugin::Any:
+    file: lib/DBD/Sys/Plugin/Any.pm
+    version: 0.102
+  DBD::Sys::Plugin::Any::FileSys:
+    file: lib/DBD/Sys/Plugin/Any/FileSys.pm
+    version: 0.102
+  DBD::Sys::Plugin::Any::FileSysDf:
+    file: lib/DBD/Sys/Plugin/Any/FileSysDf.pm
+    version: 0.102
+  DBD::Sys::Plugin::Any::NetIfconfigWrapper:
+    file: lib/DBD/Sys/Plugin/Any/NetIfconfigWrapper.pm
+  DBD::Sys::Plugin::Any::NetInterface:
+    file: lib/DBD/Sys/Plugin/Any/NetInterface.pm
+  DBD::Sys::Plugin::Any::Procs:
+    file: lib/DBD/Sys/Plugin/Any/Procs.pm
+    version: 0.102
+  DBD::Sys::Plugin::Meta:
+    file: lib/DBD/Sys/Plugin/Meta.pm
+    version: 0.1
+  DBD::Sys::Plugin::Meta::AllTables:
+    file: lib/DBD/Sys/Plugin/Meta/AllTables.pm
+    version: 0.102
+  DBD::Sys::Plugin::Unix:
+    file: lib/DBD/Sys/Plugin/Unix.pm
+    version: 0.102
+  DBD::Sys::Plugin::Unix::Groups:
+    file: lib/DBD/Sys/Plugin/Unix/Groups.pm
+    version: 0.102
+  DBD::Sys::Plugin::Unix::Logins:
+    file: lib/DBD/Sys/Plugin/Unix/Logins.pm
+    version: 0.102
+  DBD::Sys::Plugin::Unix::Lsof:
+    file: lib/DBD/Sys/Plugin/Unix/Lsof.pm
+    version: 0.102
+  DBD::Sys::Plugin::Unix::Users:
+    file: lib/DBD/Sys/Plugin/Unix/Users.pm
+    version: 0.102
+  DBD::Sys::Plugin::Win32:
+    file: lib/DBD/Sys/Plugin/Win32.pm
+    version: 0.102
+  DBD::Sys::Plugin::Win32::Groups:
+    file: lib/DBD/Sys/Plugin/Win32/Groups.pm
+    version: 0.102
+  DBD::Sys::Plugin::Win32::Procs:
+    file: lib/DBD/Sys/Plugin/Win32/Procs.pm
+    version: 0.102
+  DBD::Sys::Plugin::Win32::Users:
+    file: lib/DBD/Sys/Plugin/Win32/Users.pm
+    version: 0.102
+  DBD::Sys::PluginManager:
+    file: lib/DBD/Sys/PluginManager.pm
+    version: 0.102
+  DBD::Sys::Statement:
+    file: lib/DBD/Sys.pm
+  DBD::Sys::Table:
+    file: lib/DBD/Sys/Table.pm
+    version: 0.1
+  DBD::Sys::db:
+    file: lib/DBD/Sys.pm
+  DBD::Sys::dr:
+    file: lib/DBD/Sys.pm
+  DBD::Sys::st:
+    file: lib/DBD/Sys.pm
+recommends:
+  DBI: 1.612
+  SQL::Statement: 1.28
+requires:
+  DBI: 1.612
+  Module::Pluggable: 3.9
+  Params::Util: 1.00
+  SQL::Statement: 1.28
+  Scalar::Util: 1.00
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.102

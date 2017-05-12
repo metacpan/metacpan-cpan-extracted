@@ -1,0 +1,51 @@
+Revision history for Perl extension Devel::ebug::Wx.
+
+0.09  Tue May  1 00:13:22 CEST 2007
+	- Avoid program crashes when hiding package browser view.
+
+0.08  Sat Apr 28 16:02:36 CEST 2007
+	- Add configuration manager service and configuration
+	  dialog to manage user-configurable options.
+	- Fix the expression and package browser views under wxWidgets 2.8.
+	- Make the eval and code display views partially configurable.
+	- Utility class for all plugins, allows declaring
+	  commands/views/services/configuration views using
+	  attributes.
+
+0.07  Sun Apr 15 17:16:47 CEST 2007
+	- Added a package/subroutine browser.
+	- Improved visualization for hash/array in expression
+	  view.
+
+0.06  Sun Mar 25 20:18:49 CEST 2007
+	- Allow saving/restoring program/view state.
+
+0.05  Mon Mar 19 22:05:24 CET 2007
+	- Keep breakpoints when program is restarted.
+	- Depend on Devel::ebug 0.47.
+
+0.04  Sat Mar 17 21:05:06 CET 2007
+	- Always use Config::IniFiles for program configuration.
+	- Add serialization (via YAML) to the configuration manager.
+	- Make the view manager more resilient to inconsistent AUI state.
+	- More graceful handling for program termination (notify user
+	  and do not crash)
+
+0.03  Sun Mar 11 18:40:45 CET 2007
+	- Add expression display and console output views.
+	- Allow putting multiple views in a notebook to save space.
+	- Begin documenting the various services.
+	- Fix some bugs in view handling, and improve behaviour.
+	- Use Alt+key intead of a single key for accelerators.
+	- Display breakpoints ordered by file and line.
+
+0.02  Tue Mar  6 23:48:59 CET 2007
+	- Save window state between debugging sessions.
+	- Add a 'service' concept and introduce ViewManager
+	  and Configuration services.
+	- Add "File -> Load file" and "Run -> Restart" commands.
+	- Load all breakpoints when displaying the relative view.
+	- Add view to show console output and a real expression eval view.
+	
+0.01  Sun Mar  4 17:21:25 CET 2007
+	- First public release.

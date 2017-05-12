@@ -1,0 +1,4 @@
+Revision history for Dist::Zilla::Plugin::ContributorsFromPod
+
+0.01 2014-05-18 13:21:36
+    - initial release, needs tests

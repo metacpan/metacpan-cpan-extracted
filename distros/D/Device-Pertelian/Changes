@@ -1,0 +1,17 @@
+Revision history for Device-Pertelian
+
+0.03 2015-09-30T22:22:59Z
+
+		Convert to Minilla. Fix cpantesters
+		FAILs by requiring Test::NoWarnings on test.
+		No functional change.
+
+0.02    2015-09-29
+
+		Added a link to Github to meta.
+		No functional change.
+
+0.01    2015-09-29
+
+		I do not have a Pertelian device anymore, so this is
+		a code dump. And a small one to boot.

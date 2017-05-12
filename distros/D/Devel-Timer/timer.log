@@ -1,0 +1,8 @@
+
+
+MyTimer Report -- Total time: 0.0005 secs
+Interval  Time    Percent
+----------------------------------------------
+00 -> 01  0.0005  96.93%  INIT -> first db query
+01 -> 02  0.0000   2.11%  first db query -> second db query
+02 -> 03  0.0000   0.96%  second db query -> END

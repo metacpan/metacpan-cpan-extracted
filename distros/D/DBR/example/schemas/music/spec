@@ -1,0 +1,15 @@
+schema=music	table=artist	field=royalty_rate	cmd=TRANSLATOR	translator=PERCENT
+schema=music	table=album	field=artist_id	cmd=RELATION	reltable=artist	relfield=artist_id	relname=artist	reverse_name=albums	type=CHILDOF
+schema=music	table=album	field=rating	cmd=TRANSLATOR	translator=ENUM
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=lv_evry_sec	override_id=100	name=Loved Every Second
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=exceptional	override_id=200	name=Exceptional
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=great	override_id=300	name=Great
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=good	override_id=400	name=Good
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=fair	override_id=500	name=Fair
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=poor	override_id=600	name=Poor
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=sucks	override_id=700	name=It Sucks
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=stinks	override_id=800	name=Absolutely Stinks
+schema=music	table=album	field=rating	cmd=ENUMOPT	handle=earbleed	override_id=900	name=My Ears are Bleeding
+schema=music	table=album	field=date_released	cmd=TRANSLATOR	translator=UNIXTIME
+schema=music	table=track	field=album_id	cmd=RELATION	reltable=album	relfield=album_id	relname=album	reverse_name=tracks	type=CHILDOF
+schema=music	table=track	field=name	cmd=REGEX	regex=^[A-Za-z0-9 %]+$

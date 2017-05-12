@@ -1,0 +1,17 @@
+ChangeLog
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+docs/Dist-Zilla-Plugin-CheckEmacsChangeLog.html
+lib/Dist/Zilla/Plugin/CheckEmacsChangeLog.pm
+t/00-compile.t
+t/00-load.t
+t/author-critic.t
+t/author-pod-spell.t
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-syntax.t

@@ -1,0 +1,116 @@
+NAME
+
+    Device::Chip::MAX7219 - chip driver for a MAX7219
+
+SYNOPSIS
+
+     use Device::Chip::MAX7219;
+    
+     my $chip = Device::Chip::MAX7219->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     $chip->power(1)->get;
+    
+     $chip->intensity( 2 )->get;
+     $chip->limit( 8 )->get;
+    
+     $chip->displaytest( 1 )->get;
+     $chip->shutdown( 0 )->get;
+    
+     sleep 3;
+    
+     $chip->displaytest( 0 )->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Maxim
+    Integrated MAX7219 chip attached to a computer via an SPI adapter. As
+    the MAX7221 chip operates virtually identically, this chip will work
+    too.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+METHODS
+
+ write_bcd
+
+       $chip->write_bcd( $digit, $val )->get
+
+    Writes the value at the given digit, setting it to BCD mode if not
+    already so. $val should be a single digit number or string, or one of
+    the special recognised characters in BCD mode of -, E, H, L, P or
+    space. The value may optionally be followed by a decimal point ., which
+    will be set on the display.
+
+    Switches the digit into BCD mode if not already so.
+
+ write_raw
+
+       $chip->write_raw( $digit, $bits )->get
+
+    Writes the value at the given digit, setting the raw column lines to
+    the 8-bit value given.
+
+    Switches the digit into undecoded raw mode if not already so.
+
+ write_hex
+
+       $chip->write_hex( $digit, $val )->get
+
+    Similar to write_bcd, but uses a segment decoder written in code rather
+    than on the chip itself, to turn values into sets of segments to
+    display. This makes it capable of displaying the letters A to F, in
+    addition to numbers, - and space.
+
+ set_decode
+
+       $chip->set_decode( $bits )->get
+
+    Directly sets the decode mode of all the digits at once. This is more
+    efficient for initialising digits into BCD or raw mode, than individual
+    calls to write_bcd or write_raw for each digit individually.
+
+ intensity
+
+       $chip->intensity( $value )->get
+
+    Sets the intensity register. $value must be between 0 and 15, with
+    higher values giving a more intense output.
+
+ limit
+
+       $chip->limit( $columns )->get
+
+    Sets the scan limit register. $value must be between 1 and 8, to set
+    between 1 and 8 digits. This should only be used to adjust for the
+    number of LED digits or columns units physically attached to the chip;
+    not for normal display blanking, as it affects the overall intensity.
+
+    Note that this is not directly the value written to the LIMIT register.
+
+ shutdown
+
+       $chip->shutdown( $off )->get
+
+    Sets the shutdown register, entirely blanking the display and turning
+    off all output if set to a true value, or restoring the display to its
+    previous content if set false.
+
+    Note that this is not directly the value written to the SHUTDOWN
+    register.
+
+ displaytest
+
+       $chip->displaytest( $on )->get
+
+    Sets the display test register, overriding the output control and
+    turning on every LED if set to a true value, or restoring normal
+    operation if set to false.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

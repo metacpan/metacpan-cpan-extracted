@@ -1,0 +1,167 @@
+# NAME
+
+Data::SearchEngine::ElasticSearch - ElasticSearch support for Data::SearchEngine
+
+# VERSION
+
+version 0.21
+
+# SYNOPSIS
+
+    use Data::SearchEngine::Query;
+    use Data::SearchEngine::ElasticSearch;
+
+    my $dse = Data::SearchEngine::ElasticSearch->new(
+        servers => [ '127.0.0.1:9200' ]
+    );
+
+    my $query = Data::SearchEngine::Query->new(
+        index => 'tweets',
+        page => 1,
+        count => 10,
+        order => { _score => { order => 'asc' } },
+        type => 'query_string',
+        facets => {
+            etype => { terms => { field => 'etype' } },
+            author_organization_literal => { terms => { field => 'author_organization_literal' } },
+            author_literal => { terms => { field => 'author_literal' } },
+            source_literal => { terms => { field => 'source_literal' } },
+        }
+    );
+
+    my $results = $dse->search($query);
+
+# DESCRIPTION
+
+Data::SearchEngine::ElasticSearch is a backend for Data::SearchEngine.  It
+aims to generalize the features of [ElasticSearch](http://search.cpan.org/perldoc?ElasticSearch) so that application
+authors are insulated from _some_ of the differences betwene search modules.
+
+# IMPLEMENTATION NOTES
+
+This module is opinionated. ElasticSearch's query language and features are
+powerful and difficult to reign in.  Therefore this module has taken some
+steps to bring things toward a more central feature set.
+
+## Incomplete
+
+ElasticSearch's query DSL is large and complex.  It is not well suited to
+abstraction by a library like this one.  As such you will almost likely find
+this abstraction lacking.  Expect it to improve as the author uses more of
+ElasticSearch's features in applications.
+
+## Resultes
+
+The `_index` and `_version` keys will both be populated in the returned
+[Data::SearchEngine::Item](http://search.cpan.org/perldoc?Data::SearchEngine::Item).
+
+## Explanations
+
+Setting `debug` to a true value will cause <explain> to be set when the query
+is sent to ElasticSearch.  You can find the explanation by examining the
+`raw` attribute of the [Data::SearchEngine::Results](http://search.cpan.org/perldoc?Data::SearchEngine::Results) object.
+
+## Queries
+
+It is expected that if your [Data::SearchEngine::Query](http://search.cpan.org/perldoc?Data::SearchEngine::Query) object has __any__
+`query` set then it must also have a `type`.
+
+The query is then passed on to [ElasticSearch](http://search.cpan.org/perldoc?ElasticSearch) thusly:
+
+    $es->search(
+        # ...
+        query => { $query->type => $query->query }
+        # ...
+    );
+
+So if you want to do a query\_string query, you would set up your query like
+this:
+
+    my $query = Data::SearchEngine::Query->new(
+        # ...
+        type => 'query_string',
+        query => { query => 'some query text' }
+        # ...
+    );
+
+See the documents for
+[ElasticSearch's DLS](http://www.elasticsearch.org/guide/reference/query-dsl/)
+for more details.
+
+## Indexing
+
+ElasticSearch wants an `index` and `type` for each Item that is indexed. It
+is expected that you will populate these values in the item thusly:
+
+    my $item = Data::SearchEngine::Item->new(
+      id => $something,
+      values => {
+          index => 'twitter',
+          type => 'tweet',
+          # and whatever else
+      }
+    );
+    $dse->add($item);
+
+## Filters
+
+If you set multiple filters they will be ANDed together.  If you want to change
+this behavior then you can supply an additional argument to the `query` method:
+
+    $dse->search($query, 'or');
+
+This defaults to 'and'.
+
+## Facets & Filters
+
+If you use facets then any filters will be copied into the facet's
+`facet_filter` so that the facets are limited similarly to the results.
+
+# ATTRIBUTES
+
+## servers
+
+The servers to which we'll be connecting.
+
+## transport
+
+The transport to use.  Refer to [ElasticSearch](http://search.cpan.org/perldoc?ElasticSearch) for more information.
+
+# METHODS
+
+## add (\[ $items \])
+
+Add items to the index.  Keep in mind that the [Data::SearchEngine::Item](http://search.cpan.org/perldoc?Data::SearchEngine::Item)
+should have values set for [index](http://search.cpan.org/perldoc?index) and [type](http://search.cpan.org/perldoc?type).
+
+## engine
+
+Returns the underlying ElasticSearch implementation.
+
+## present ($item)
+
+Returns true if the [Data::SearchEngine::Item](http://search.cpan.org/perldoc?Data::SearchEngine::Item) is present.  Uses the item's
+`id`.
+
+## remove\_by\_id ($item)
+
+Remove the specified item from the index.  Uses the item's `id`.
+
+## search ($query)
+
+Search!
+
+## find\_by\_id ($index, $type, $id)
+
+Find a document by it's unique id.
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

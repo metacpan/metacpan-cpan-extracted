@@ -1,0 +1,45 @@
+NAME
+    DBIx::Class::ResultSet::Data::Pageset - Get a Data::Pageset pager from a
+    resultset
+
+SYNOPSIS
+        # in your resultsource class
+        __PACKAGE__->resultset_class( 'DBIx::Class::ResultSet::Data::Pageset' );
+    
+        # in your calling code
+        my $rs = $schema->resultset('Foo')->search( { }, { pages_per_set => 5 } );
+        my $pager = $rs->pageset;
+    
+        # sliding pager
+        my $rs2 = $schema->resultset('Foo')->search( { }, { pageset_mode => 'slide' } );
+
+DESCRIPTION
+    This is a simple way to allow you to get a Data::Pageset object for
+    paging rather than the standard Data::Page object.
+
+INSTALLATION
+        perl Makefile.PL
+        make
+        make test
+        make install
+
+METHODS
+  pageset( )
+    Returns a Data::Pageset object for paging. This will grab the
+    "pages_per_set" option (default: 10) and the "pageset_mode" option
+    (default: "fixed") from the resultset attributes.
+
+AUTHOR
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2007-2009 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    *   DBIx::Class
+
+    *   Data::Pageset
+

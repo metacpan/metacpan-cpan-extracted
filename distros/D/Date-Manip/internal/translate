@@ -1,0 +1,204 @@
+#!/usr/bin/perl -w
+
+# This will create the YAML portion of the translation file from
+# two sources:
+#    the locale files
+#    a google translation
+#
+# To do this, first translate the file 'dm_translate.html' at
+#    http://translate.google.com/
+# and paste the results into the file:
+#    /tmp/translate
+#
+# Next set the locale in the following line, and then run the
+# program.
+
+$locale = 'tr';
+
+##########################################################################
+
+use DateTime::Locale;
+use Encode;
+
+my $obj = DateTime::Locale->load($locale);
+my $tim = $obj->time_format_medium();
+
+my @trans = `cat /tmp/translate`;
+chomp(@trans);
+
+while (! $trans[0]) {
+   shift(@trans);
+}
+
+##########################################################################
+
+my($hm,$ms);
+if ($tim =~ /hh(.)mm/i) {
+   $hm = '"[' . $1 . ']"';
+}
+if ($tim =~ /mm(.)ss/i) {
+   $ms = '"[' . $1 . ']"';
+}
+print_list(1,"ampm",     $obj->am_pm_abbreviated());
+
+###
+
+@list = translate(\@trans);
+print_list(0,"at",\@list);
+
+###
+
+print_list(1,"day_abb",  $obj->day_format_abbreviated(),   $obj->day_stand_alone_abbreviated());
+print_list(1,"day_char", $obj->day_format_narrow(),        $obj->day_stand_alone_narrow());
+print_list(1,"day_name", $obj->day_format_wide(),          $obj->day_stand_alone_wide());
+
+###
+
+@list = translate(\@trans);
+print_list(0,"each",\@list);
+
+@list = translate(\@trans);
+print_list(0,"fields",\@list);
+
+@list = translate(\@trans);
+print_list(0,"last",\@list);
+
+@list = translate(\@trans);
+print_list(0,"mode",\@list);
+
+###
+
+print_list(1,"month_abb", $obj->month_format_abbreviated(), $obj->month_stand_alone_abbreviated());
+print_list(1,"month_name",$obj->month_format_wide(),        $obj->month_stand_alone_wide());
+
+###
+
+@list = translate(\@trans);
+print_list(0,"nextprev",\@list);
+
+###
+
+@list = translate(\@trans);
+print "nth:\n";
+foreach my $line (@list) {
+   $line =~ s/^ \S+ ,\s* \S+ ,\s* \S+ \s+//x;
+   if ($line =~ / (.*?) ,\s* (.*?) ,\s* (.*) $/x) {
+      ($nth,$num,$numth) = ($1,$2,$3);
+      print "  -\n";
+      print "    - $nth\n";
+      print "    - ''\n";
+      print "    - $num\n";
+      print "    - $numth\n"  if ($num ne $numth);
+   } else {
+      print "  -\n";
+      print "    - $line\n";
+   }
+}
+
+###
+
+@list = translate(\@trans);
+print_list(0,"of",\@list);
+
+@list = translate(\@trans);
+print_list(0,"offset_date",\@list);
+
+@list = translate(\@trans);
+print_list(0,"offset_time",\@list);
+
+@list = translate(\@trans);
+print_list(0,"on",\@list);
+
+###
+
+print_val ("sephm",$hm);
+print_val ("sepms",$ms);
+
+###
+
+@list = translate(\@trans);
+print_list(0,"times",\@list);
+
+@list = translate(\@trans);
+print_list(0,"when",\@list);
+
+##########################################################################
+
+sub translate {
+   my($trans) = @_;
+
+   while (! $$trans[0]) {
+      shift(@$trans);
+   }
+
+   my @ret;
+   while ($$trans[0]) {
+      push(@ret,shift(@$trans));
+   }
+
+   return @ret;
+}
+
+sub print_val {
+   my($label,$val) = @_;
+   return  if (! $val);
+
+   print "$label:\n";
+   print "  - $val\n";
+}
+
+sub print_list {
+   my($utf,$label,$vals,$vals2) = @_;
+   my @vals;
+   if (ref($vals)) {
+      @vals = @$vals
+   } elsif ($vals) {
+      @vals = ($vals);
+   }
+
+   my @vals2;
+   if (ref($vals2)) {
+      @vals2 = @$vals2;
+   } elsif ($vals2) {
+      @vals2 = ($vals2);
+   }
+
+   print "$label:\n";
+
+   if (@vals) {
+      foreach my $val (@vals) {
+         $val = encode_utf8(lc($val))  if ($utf);
+         print "  -\n";
+
+         if ($utf) {
+            my $ascii = decode_utf8($val);
+            $ascii    = encode("ascii",$ascii);
+            if ($ascii ne $val) {
+               print "    - $ascii\n";
+            }
+         }
+
+         print "    - $val\n";
+         if (@vals2) {
+            $val2 = encode_utf8(lc(shift(@vals2)));
+            if ($val2 ne $val) {
+               print "    - $val2\n";
+            }
+         }
+      }
+
+   } else {
+      print "  TRANSLATE\n";
+   }
+}
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

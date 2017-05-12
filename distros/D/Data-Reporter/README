@@ -1,0 +1,113 @@
+Data::Reporter module for Perl
+----------------------
+version 1.4
+
+Ricardo Vazquez
+rvazquez_a@yahoo.com
+
+This module generates ascii reports from a Database or a plain ascii file.
+
+
+Data::Reporter has a series of components. The user has only to define the 
+contents or functions that each component will use or display. Some are 
+mandatory (Header, Title, Detail) while others are optional to the user.
+Here is the list of all the components:
+   - Header
+   - Title
+   - Detail
+   - Breaks
+   - Final
+   - Footer
+
+Because of perl's multiple plataform availability, the same report program 
+can be run in many platforms with no changes in the code. The modules have been tested on Solaris, Windows NT and Windows 95.
+
+A visual report generator called VisRep.pl is also included. This is based
+on PerlTk. This program generates perl programs, that can be executed. 
+VisRep.pl can be later used to edit such generated programs.
+
+Four examples are included:
+example1.pl    Uses a Sybase datasource.
+               This program has been created with VisRep.pl
+example2.pl    Uses a plain ascii file example2.dat as datasource.
+               This program was created with VisRep.pl
+example3.pl    The same program as example1.pl, but created by hand.
+example4.pl    The same program as example2.pl, but created by hand.
+
+Files Manifest:
+---------------
+README                               This file
+Makefile.PL                          Perl script to generate Makefile
+bin/VisRep.pl                        Visual report generator
+bin/Sources.cfg                      Available data sources for VisRep.pl 
+                                     (only Sybsource at this time)
+examples/example1.pl                 Example for Sybase source
+examples/example2.pl                 Example for a plain ascii file source
+examples/example3.pl                 Example for Sybase source 
+examples/example4.pl                 Example for a plain ascii file source 
+examples/example2.dat                Source data for example1.pl and example4.pl
+Reporter.pm                          Main module to generate reports
+Reporter/Datasource.pm               Abstract class for sources
+Reporter/Filesource.pm               File source class
+Reporter/Sybsource.pm                Sybase source class
+Reporter/Sybsource.pm                Oracle source class
+Reporter/RepFormat.pm                Module to manipulate text in memory
+Reporter/IBsource.pm                 Handler for Interbase/Firebird connection
+Reporter/VisSection.pm               Module to manipulate report sections 
+                                     (used only by VisRep.pl)
+Reporter/RepFormat.xs                XS code for RepFormat
+Reporter/Makefile.PL                 Perl script for RepFormat's Makefile
+Reporter/typemap
+Reporter/test.pl                     Test script for RepFormat
+Reporter/libRepFormat/Makefile.PL    Makefile for Repformat library
+Reporter/libRepFormat/RepFormat.c    C code for RepFormat
+Reporter/libRepFormat/RepFormat.h    Header file for RepFormat
+
+Install:
+--------
+Type:
+perl Makefile.PL
+make 
+make test
+make install
+
+Changes:
+--------
+1.2 - 1.3
+   -Use of functions to access the report's variables
+   -Module RepFormat has been migrated to C to improve performance.
+   -Add the use of pictures to print (example: "999,999.99")
+   -rtrim in all lines of the output file
+   -Changes in the internals to improve performance (Thanks to Humberto Hernandez)
+   *Note
+   Credits for version 1.3 are for Humberto Hernandez and his teamwork. Thanks :-)
+
+1.3 - 1.3.1
+   -Add Orasource module (Created by Vecchio Fabrizio). Thanks Vecchio :-)
+
+1.3.1 - 1.4
+   -Add various functions to RepFormat.c  (By Ilya Verlinsky)
+   -Add IBsource module                   (By Ilya Verlinsky)
+   -Changed call to time() to call to 
+    CORE::time() to avoid warning when
+    calling perl with -w switch           (By Alberto Lago da Silva)
+   -Created mode 3 in method date() to 
+    generate dates with AAAA-MM-DD format (By Alberto Lago da Silva) 
+   -Added the possibility of passing a    (By Alberto Lago da Silva)
+    hash ref with user data. This was 
+    added this because the need to have 
+    dynamic headers in some reports.
+   -Added method userdata() to access the (By Alberto Lago da Silva)
+    user data
+   -Bug fix in _print_header              (By Alberto Lago da Silva)
+   -Library fix to pass test #3 on linux  (By Ricardo Vazquez Armenta)
+	
+   *Note
+   Credits for version 1.4 are for Alberto Lago da Silva and for Ilya Verlinsky, because THEY MADE ALL THE IMPROVEMENTS!! :-)
+   
+Please send any comments or suggestions
+
+Copyright (c) 1999 Ricardo Vazquez. All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as
+Perl itself.
+

@@ -1,0 +1,263 @@
+body {
+    font-family: Arial, Gill Sans, sans-serif;
+    font-size: 11pt;
+    height: 100%;
+    margin: 0;
+    overflow: hidden;
+    padding: 0;
+}
+
+.container:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+#window {
+    height: 100%;
+    overflow: hidden;
+}
+
+h1 {
+    background: #555;
+    background-image: -moz-linear-gradient(top, #777 0%, #333 100%);
+    border-radius: 0.3em;
+    -moz-border-radius: 0.3em;
+    color: #fff;
+    font-size: 140%;
+    margin: 0 0 0.11em 0;
+    padding: 0.2em 0.4em;
+    text-shadow: 0px 0px 2px #000;
+}
+
+.screen {
+    overflow: hidden;
+    padding: 0.4em;
+    position: relative;
+}
+
+.page-list {
+    float: left;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.page-list li {
+    background: #ddd;
+    border-radius: 0.5em;
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 0.2em;
+    margin: 0.15em 0.2em 0.15em 0;
+    padding: 0.2em 0.8em;
+}
+
+.page-list li.active {
+    background: #cdf;
+}
+
+.pages {
+    /* clear: both; */
+    display: inline-block;
+    margin-top: 0.15em;
+    width: 100%;
+}
+
+.scrolled {
+    border: solid 1px #bbb;
+    height: 100%;
+    overflow: auto;
+}
+
+.scrolled h2 {
+    background: #ddd;
+    color: #333;
+    font-size: 115%;
+    margin: 0;
+    padding: 0.1em;
+}
+
+.widget.text {
+    font-family: monospace;
+    font-size: 9pt;
+    white-space: pre;
+}
+
+.widget.data-structure ul {
+    font-family: monospace;
+    font-size: 9pt;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.widget.data-structure ul li {
+    /* background: #f4f4f4 -moz-linear-gradient(top, #fff 0px, #f4f4f4 20px); */
+    border-bottom: solid 1px #ccc;
+    clear: both;
+    display: block;
+    height: 100%;
+    line-height: 180%;
+    /* position: relative; */
+}
+
+.widget.data-structure ul li li:first-child {
+    border-top: solid 1px #ccc;
+}
+
+.widget.data-structure ul li li:last-child {
+    border-bottom: none;
+}
+
+.widget.data-structure ul li li {
+    margin: 0;
+    padding: 0;
+    xtext-indent: 2em;
+}
+
+.widget.data-structure li div span:first-child,
+.widget.data-structure .value-empty:first-child {
+    margin-left: 2em;
+}
+
+.widget.data-structure li li div span:first-child,
+.widget.data-structure li .value-empty:first-child {
+    margin-left: 4em;
+}
+
+.widget.data-structure li li li div span:first-child,
+.widget.data-structure li li .value-empty:first-child {
+    margin-left: 6em;
+}
+
+.widget.data-structure li li li li div span:first-child,
+.widget.data-structure li li li .value-empty:first-child {
+    margin-left: 8em;
+}
+
+.widget.data-structure li li li li li div span:first-child,
+.widget.data-structure li li li li .value-empty:first-child {
+    margin-left: 10em;
+}
+
+.widget.data-structure div.field {
+    height: 100%;
+    position: relative;
+    vertical-align: middle;
+}
+
+.widget.data-structure span.expand,
+.widget.data-structure span.placeholder {
+    display: inline-block;
+    font-family: monospace;
+    font-size: 9pt;
+    height: 1em;
+    line-height: 1em;
+    margin: auto 0.6em;
+    width: 1em;
+    vertical-align: text-top;
+}
+
+.widget.data-structure span.expand {
+    background: #fff center center;
+    background-image: url("images/expand.png");
+    border: solid 1px #888;
+    border-radius: 0.1em;
+    -moz-border-radius: 0.1em;
+    box-shadow: 1px 1px 1px #888;
+    cursor: pointer;
+    text-align: center;
+}
+
+.widget.data-structure .expanded span.expand {
+    background-image: url("images/collapse.png");
+}
+
+.widget.data-structure span.placeholder {
+    padding: 1px;
+}
+
+.widget.data-structure ul span.name {
+    position: relative;
+}
+
+.widget.data-structure ul span.set {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+.widget.data-structure div.field {
+    display: inline-block;
+    width: 25%;
+    vertical-align: top;
+}
+
+.widget.data-structure div.field.wide {
+    width: 100%;
+}
+
+.widget.data-structure div.value {
+    display: inline-block;
+    max-width: 75%;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+.widget.data-structure div.value-number {
+    color: #45e;
+}
+
+.widget.data-structure div.value-string {
+    color: #0a1;
+}
+
+.widget.data-structure div.value-undefined,
+.widget.data-structure div.value-empty {
+    color: #888;
+    font-style: italic;
+}
+
+.widget.data-structure span.matching {
+    color: green;
+}
+
+/* --- */
+
+.screen.routes .field.pattern {
+    font-family: Arial, Gill Sans, sans-serif;
+    font-size: 11pt;
+    font-weight: bold;
+}
+
+.screen.routes .field.pattern.matching {
+    color: green;    
+}
+
+.page.queries ul.queries {
+    font-size: 9pt;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.page.queries ul.queries li {
+    border-bottom: solid 1px #ccc;
+    font-family: monospace;
+    white-space: pre;
+}
+
+.page.queries ul.queries li pre {
+    margin: 0;
+    padding: 0.2em;
+    white-space: pre;
+}
+
+.page.templates h2 .engine {
+    color: #777;
+    float: right;
+    font-weight: normal;
+}

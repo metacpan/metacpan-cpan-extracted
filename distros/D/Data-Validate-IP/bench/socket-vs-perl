@@ -1,0 +1,52 @@
+use strict;
+use warnings;
+
+use Benchmark qw( cmpthese );
+
+use Data::Validate::IP;
+
+unless ($Data::Validate::IP::HAS_SOCKET) {
+    warn "Cannot load inet_pton from Socket\n";
+    exit;
+}
+
+my @bad = ('a' .. 'z', undef, 0);
+
+my @ipv4 = @bad;
+for (1 .. 500) {
+    push @ipv4, _random_ipv4();
+}
+
+my @ipv6 = @bad;
+push @ipv6, '::', '::0';
+for (1 .. 500) {
+    push @ipv6, _random_ipv6();
+}
+
+cmpthese(
+    10000,
+    {
+        'pure Perl ipv4' =>
+            sub { Data::Validate::IP::_slow_is_ipv4($_) for @ipv4 },
+        'Socket ipv4' =>
+            sub { Data::Validate::IP::_fast_is_ipv4($_) for @ipv4 },
+    }
+);
+
+cmpthese(
+    10000,
+    {
+        'pure Perl ipv6' =>
+            sub { Data::Validate::IP::_slow_is_ipv6($_) for @ipv6 },
+        'Socket ipv6' =>
+            sub { Data::Validate::IP::_fast_is_ipv6($_) for @ipv6 },
+    }
+);
+
+sub _random_ipv4 {
+    return join '.', map { int(rand(256)) } 1 .. 4;
+}
+
+sub _random_ipv6 {
+    return join '::', map { sprintf('%4x', int(rand(2**16))) } 1 .. 8;
+}

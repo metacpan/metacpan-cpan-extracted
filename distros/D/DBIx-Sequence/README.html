@@ -1,0 +1,433 @@
+<HTML>
+<HEAD>
+<TITLE>DBIx::Sequence</TITLE>
+</HEAD>
+<BODY BGCOLOR="#ffffff" TEXT="#000000">
+<UL>
+<LI><A HREF="#NAME">NAME
+
+</A></LI>
+<LI><A HREF="#SYNOPSIS">SYNOPSIS
+
+</A></LI>
+<LI><A HREF="#DESCRIPTION">DESCRIPTION
+
+</A></LI>
+<LI><A HREF="#INSTALLATION">INSTALLATION
+
+</A></LI>
+<LI><A HREF="#BASIC%20USAGE">BASIC USAGE
+
+</A></LI>
+<UL>
+<LI><A HREF="#INIT">INIT
+
+</A></LI>
+<LI><A HREF="#GETTING%20THE%20NEXT%20ID">GETTING THE NEXT ID
+
+</A></LI>
+<LI><A HREF="#RELEASING%20ID'S.">RELEASING ID'S.
+
+</A></LI>
+<LI><A HREF="#PERMANENTLY%20REMOVING%20A%20DATASET">PERMANENTLY REMOVING A DATASET
+
+</A></LI>
+<LI><A HREF="#BOOTSTRAPPING%20A%20DATASET%20FROM%20EXISTING%20DATA">BOOTSTRAPPING A DATASET FROM EXISTING DATA
+
+</A></LI>
+<LI><A HREF="#OVERLOADING">OVERLOADING
+
+</A></LI>
+</UL>
+<LI><A HREF="#SPECIAL%20NOTE%20ON%20DATABASE%20HANDLE%20OPTIONS">SPECIAL NOTE ON DATABASE HANDLE OPTIONS
+
+</A></LI>
+<LI><A HREF="#CVS%20AND%20BLEEDING%20VERSIONS">CVS AND BLEEDING VERSIONS
+
+</A></LI>
+<LI><A HREF="#TODO">TODO
+
+</A></LI>
+<LI><A HREF="#AUTHOR">AUTHOR
+
+</A></LI>
+<LI><A HREF="#NOTES">NOTES
+
+</A></LI>
+<LI><A HREF="#CONTRIBUTORS">CONTRIBUTORS
+
+</A></LI>
+<LI><A HREF="#SEE%20ALSO">SEE ALSO
+
+</A></LI>
+<LI><A HREF="#COPYRIGHT">COPYRIGHT
+
+</A></LI>
+</UL>
+<HR>
+<H1><A NAME="NAME">NAME
+
+</A></H1>
+
+<P>DBIx::Sequence - A simple SQL92 ID generator 
+
+</P><H1><A NAME="SYNOPSIS">SYNOPSIS
+
+</A></H1>
+
+<PRE>  use DBIx::Sequence;</PRE>
+
+<PRE>  my $sequence = new DBIx::Sequence({ dbh =&gt; $dbh });
+  my $next_id = $sequence-&gt;Next('dataset');
+</PRE>
+<H1><A NAME="DESCRIPTION">DESCRIPTION
+
+</A></H1>
+
+<P>This module is intended to give easier portability to Perl database application by providing
+a database independant unique ID generator. This way, an application developer is not
+bound to use his database's SEQUENCE or auto_increment thus making his application 
+portable on multiple database environnements.
+
+</P>
+<P>This module implements a simple Spin Locker mechanism and is garanteed to return
+a unique value every time it is called, even with concurrent processes. It uses
+your database for its state storage with ANSI SQL92 compliant SQL. All SQL queries
+inside DBIx::Sequence are pre cached and very efficient especially under mod_perl.
+
+</P><H1><A NAME="INSTALLATION">INSTALLATION
+
+</A></H1>
+
+<PRE>	perl Makefile.PL
+	make
+	make test
+	make install</PRE>
+
+<P>Note:
+
+</P>
+<P>If you decide to run extended tests for the module, you will have to provide the
+make test with a DSN (connect string) to your database (dbi:Driver:db;host=hostname)
+and a valid username/password combination for a privileged user.
+
+</P>
+<P>DBIx::Sequence uses 2 tables for its operation, namely the dbix_sequence_state and the
+dbix_sequence_release tables. Those tables will be created if you run extended tests, if 
+not you will need to create them yourself. 
+
+</P>
+<PRE>	dbix_sequence_state:
+	| dataset  | varchar(50) |      
+	| state_id | int(11)     |    </PRE>
+
+<PRE>	dbix_sequence_release:
+	| dataset     | varchar(50) |     
+	| released_id | int(11)     |     </PRE>
+
+<P>Those table names are overloadable at your convenience, see the OVERLOADING section
+for details.
+
+</P><H1><A NAME="BASIC%20USAGE">BASIC USAGE
+
+</A></H1>
+
+<P>The basic usage of this module is to generate a unique ID to replace the use of your
+database's SEQUENCE of auto_increment field. 
+
+</P><H2><A NAME="INIT">INIT
+
+</A></H2>
+
+<P>First, you need to create the sequence object:
+
+</P>
+<PRE>	use DBIx::Sequence;
+	my $sequence = new DBIx::Sequence({
+						db_user =&gt; 'scott',
+						db_pw =&gt; 'tiger',
+						db_dsn =&gt; 'dbi:mysql:scottdb',
+						allow_id_reuse =&gt; 1,
+						});</PRE>
+
+<P>DBIx::Sequence can be used to manage multiple sets of ID's (perhaps you could have one dataset 
+per table, or one and only one dataset). This permits you to handle multiple applications with 
+the same sequence class.  The dataset is normally simply a token string that represents your ID 
+set. If the dataset does not exists, DBIx::Sequence will create automagically for you. No special 
+steps are involved in the creation of a dataset.
+
+</P>
+<P>The arguments contains the database informations, db_user, db_pw and db_dsn and are stored
+in a hash reference.
+
+</P>
+<P>At this point, the object has pre cached all of the SQL that will be used to generate
+the spin locker race. It is normally a good idea to have a shared sequence object (especially)
+under mod_perl to save the prepare overhead.  The 'allow_id_reuse' argument can be passed to 
+the constructor to either allow the use of the Release() or deny it. (True value makes it allowed)
+
+</P><H2><A NAME="GETTING%20THE%20NEXT%20ID">GETTING THE NEXT ID
+
+</A></H2>
+
+<P>To get the next id, you simpy have to use the Next() method of your sequence while specifying the
+dataset you are getting the next id for.
+
+</P>
+<PRE>	my $next_id = $sequence-&gt;Next($dataset);</PRE>
+<H2><A NAME="RELEASING%20ID'S.">RELEASING ID'S.
+
+</A></H2>
+
+<P>Generated ID's can be _explicitly_ released in your application.  When an ID is released, 
+the sequence will be able to give this id back to you throught the Next() method.
+
+</P>
+<P>This is how it is done:
+
+</P>
+<PRE>	$sequence-&gt;Release($dataset, $id);</PRE>
+
+<P>Note:
+
+</P>
+<P>You must use release only when you are _CERTAIN_ that your ID is not used anymore and that
+you want it to be recycled. The Spin Locking mechanism will also take place on released id's
+to ensure that no two processes can get the same ID.
+
+</P><H2><A NAME="PERMANENTLY%20REMOVING%20A%20DATASET">PERMANENTLY REMOVING A DATASET
+
+</A></H2>
+
+<P>To make DBIx::Sequence forget about an existing dataset, you need to use the Delete_Dataset()
+method.
+
+</P>
+<PRE>	$sequence-&gt;Delete_Dataset($dataset);</PRE>
+
+<P>This will clear all state and existence for this dataset and will also clear it's
+released id's. Note that if your application still uses this dataset, it will be
+automatically recreated blank.
+
+
+</P><H2><A NAME="BOOTSTRAPPING%20A%20DATASET%20FROM%20EXISTING%20DATA">BOOTSTRAPPING A DATASET FROM EXISTING DATA
+
+</A></H2>
+
+<P>It is possible to sync the state of a DBIx::Sequence dataset by using the Bootstrap()
+method. 
+
+</P>
+<PRE>	$sequence-&gt;Bootstrap('my_dataset','my_bootstrap_table','my_primary_field');</PRE>
+
+<P>Bootstrap() takes 3 arguments. 
+
+</P><DL><DT><A NAME="*%20The%20dataset%20to%20bootstrap">* The dataset to bootstrap
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20The%20table%20from%20wich%20you%20will%20bootstrap">* The table from wich you will bootstrap
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20The%20field%20in%20the%20bootstrap%20table%20that%20will%20be%20used%20to%20bootstrap%20the%20dataset.">* The field in the bootstrap table that will be used to bootstrap the dataset.
+
+</A></DT>
+<DD>
+</DD>
+</DL>
+
+<P>Bootstrap will then sync up the DBIx::Sequence's state with the maximum id of the 
+'my_primary_field' in 'my_bootstrap_table'. The bootstrap field must be a numeric
+field as you can suspect. The SQL function MAX() will be called on it during the 
+bootstrap process.
+
+</P>
+<P>Note: The bootstrap method _can_ be used at runtime since it will initiate a race
+for updating the value thus following the same algorithm. It is recommended though
+that you use Bootstrap() when no other concurrent processes are requesting id's.
+
+</P><H2><A NAME="OVERLOADING">OVERLOADING
+
+</A></H2>
+
+<P>It is possible to create an overloaded class of DBIx::Sequence. 
+This permits you to create a DBIx::Sequence that has different properties than 
+the orignal one. The only thing you really have to overload to modify the behaviour
+of DBIx::Sequence are some constants:
+
+</P><DL><DT><A NAME="*%20STATE_TABLE%20%3a%20Defines%20the%20table%20used%20by%20DBIx%3a%3aSequence%20to%20store%20dataset's%20states.">* STATE_TABLE : Defines the table used by DBIx::Sequence to store dataset's states.
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20RELEASE_TABLE%20%3a%20Defines%20the%20table%20used%20by%20DBIx%3a%3aSequence%20to%20store%20released%20id's.">* RELEASE_TABLE : Defines the table used by DBIx::Sequence to store released id's.
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20COLUMN_PREFIX%20%3a%20A%20string%20to%20be%20prepended%20to%20every%20column%20in%20the%20internal%20SQL%20statements.">* COLUMN_PREFIX : A string to be prepended to every column in the internal SQL statements.
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20DEFAULT_INIT_VALUE%20%3a%20Value%20used%20to%20initialize%20a%20dataset%20when%20it%20is%20first%20created.">* DEFAULT_INIT_VALUE : Value used to initialize a dataset when it is first created.
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20DEFAULT_ALLOW_ID_REUSE%20%3a%20When%20set%20to%20true%2c%20will%20allow%20the%20use%20of%20Release()%20if%20not%20specified%20in%20the%20constructor.%20(allow_id_reuse)">* DEFAULT_ALLOW_ID_REUSE : When set to true, will allow the use of Release() if not specified in the constructor. (allow_id_reuse)
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20DEBUG_LEVEL%20%3a%20When%20set%20to%20true%2c%20will%20enable%20debugging%20to%20STDERR.">* DEBUG_LEVEL : When set to true, will enable debugging to STDERR.
+
+</A></DT>
+<DD>
+</DD>
+</DL>
+
+<P>So it is very easy to specify the behaviour of DBIx::Sequence that you wish to use
+by creating an overloaded class.
+
+</P>
+<P>Also, a very important method to overload is the getDbh() method. This is the 
+function that returns the database handle to the DBIx::Sequence. Your overloaded
+class should redefine the getDbh method.
+
+</P>
+<P>Overloading getDbh will make your sequence class integrate more cleanly with your application.
+
+</P>
+<P>i.e.
+
+</P>
+<PRE>	package MySequence;</PRE>
+
+<PRE>	use DBI;
+	use DBIx::Sequence;</PRE>
+
+<PRE>	use vars qw(@ISA);
+	@ISA = qw(DBIx::Sequence);</PRE>
+
+<PRE>	use constant STATE_TABLE =&gt; 'my_state_table';
+	use constant RELEASE_TABLE =&gt; 'my_release_table';
+	use constant COLUMN_PREFIX =&gt; '';
+	use constant DEFAULT_INIT_VALUE =&gt; '100';
+	use constant DEFAULT_ALLOW_ID_REUSE =&gt; 1;
+	use constant DEBUG_LEVEL =&gt; 0;</PRE>
+
+<PRE>	sub getDbh
+	{
+		my $self = shift;</PRE>
+
+<PRE>		return MyApplication::MyDBModule::getDbh();
+	}</PRE>
+
+<PRE>	1;</PRE>
+
+<P>Then, your code can use this class for its sequencing. Notice that since we overloaded getDbh(), we don't
+need to pass a second parameter to new().
+
+
+</P>
+<PRE>	use MySequence;</PRE>
+
+<PRE>	my $sequence = new MySequence();
+	my $next_id = $sequence-&gt;Next($dataset);
+
+</PRE>
+<H1><A NAME="SPECIAL%20NOTE%20ON%20DATABASE%20HANDLE%20OPTIONS">SPECIAL NOTE ON DATABASE HANDLE OPTIONS
+
+</A></H1>
+
+<P>DBIx::Sequence requires that the dbh object you passe to it has the AutoCommit flag
+set to 1. The main reason for this is that if AutoCommit is off, DBIx::Sequence will have
+to do an implicit commit() call, wich in most cases is a bad idea, especially when the dbh
+passed to the sequence object already has transactions prelogged in it. 
+
+
+</P><H1><A NAME="CVS%20AND%20BLEEDING%20VERSIONS">CVS AND BLEEDING VERSIONS
+
+</A></H1>
+
+<P>For the latest development information, CVS access and Changelog, please visit:
+
+</P>
+<P>http://labs.turbulent.ca
+
+</P>
+<P>If you use this module in a project, please let me know!
+
+</P>
+<P>Your comments and rants are more than welcomed!
+
+</P>
+<P>Commercial support for this module is available, please contact me for info!
+
+</P><H1><A NAME="TODO">TODO
+
+</A></H1>
+<DL><DT><A NAME="*%20Implement%20multiple%20locking%20mechanism%20(semaphore%2c%20spin%2c%20db%20locker)">* Implement multiple locking mechanism (semaphore, spin, db locker)
+
+</A></DT>
+<DD>
+</DD>
+<DT><A NAME="*%20Implement%20pluggable%20locking%20module%20support">* Implement pluggable locking module support
+
+</A></DT>
+<DD>
+</DD>
+</DL>
+<H1><A NAME="AUTHOR">AUTHOR
+
+</A></H1>
+
+<P>Benoit Beausejour, &lt;bbeausej@pobox.com&gt;
+
+</P><H1><A NAME="NOTES">NOTES
+
+</A></H1>
+
+<P>This code was made possible by the help of individuals:
+
+</P>
+<P>Philippe &quot;Gozer&quot; M. Chiasson &lt;gozer@cpan.org&gt;
+
+</P>
+<P>Thanks to Uri Guttman for documentation checks ;)
+
+</P><H1><A NAME="CONTRIBUTORS">CONTRIBUTORS
+
+</A></H1>
+
+<P>Here are the people who submitted patches and changes to the module, they have 
+my thanks for their contributions:
+
+</P>
+<P>Trevor Shellhorn &lt;trevor.schellhorn-perl@marketingtips.com&gt;
+
+</P>
+<P>Dan Kubb &lt;dkubb@cpan.org&gt;
+
+</P><H1><A NAME="SEE%20ALSO">SEE ALSO
+
+</A></H1>
+
+<P>perl(1).
+
+</P><H1><A NAME="COPYRIGHT">COPYRIGHT
+
+</A></H1>
+
+<P>Copyright (c) 2000 Benoit Beausejour &lt;bbeausej@pobox.com&gt;
+All rights reserved. This program is free software, you can
+redistribute it and/or modify it under the same terms as
+Perl itself.
+
+</P>
+</BODY>
+</HTML>

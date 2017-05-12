@@ -1,0 +1,32 @@
+---
+abstract: 'Dist::Zilla like FAYLAND when you build your dists'
+author:
+  - 'Fayland Lam <fayland@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-FAYLAND
+requires:
+  Dist::Zilla: '5'
+  Dist::Zilla::Plugin::CheckChangeLog: '0.01'
+  Dist::Zilla::Plugin::Git::Contributors: '0.004'
+  Dist::Zilla::Plugin::PerlTidy: '0.06'
+  Dist::Zilla::Plugin::PodWeaver: '3.092971'
+  Dist::Zilla::Plugin::ReadmeFromPod: '0.20'
+  Dist::Zilla::Plugin::Repository: '0.08'
+  Dist::Zilla::Plugin::Test::Compile: '0.05'
+resources:
+  repository: git://github.com/fayland/dist-zilla-pluginbundle-fayland.git
+version: '0.14'
+x_contributors:
+  - 'Olivier Mengué <dolmen@cpan.org>'

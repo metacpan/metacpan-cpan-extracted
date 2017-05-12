@@ -1,0 +1,54 @@
+{
+   "abstract" : "support notifications in your Dancer2 web application",
+   "author" : [
+      "Samuel Smith <esaym@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-FlashNote",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.0001",
+            "Dancer2::Core::Types" : "0.0001",
+            "Dancer2::Plugin" : "0.0001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "https://github.com/smith153/Dancer2-Plugin-FlashNote"
+      }
+   },
+   "version" : "0.02"
+}

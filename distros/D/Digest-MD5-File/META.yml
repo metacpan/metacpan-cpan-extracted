@@ -1,0 +1,23 @@
+--- #YAML:1.0
+name:               Digest-MD5-File
+version:            0.08
+abstract:           Perl extension for getting MD5 sums for files and urls. 
+author:
+    - Daniel Muey <http://drmuey.com/cpan_contact.pl>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Digest::MD5:     0
+    LWP::UserAgent:  0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

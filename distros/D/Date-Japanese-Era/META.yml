@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Date-Japanese-Era
+version:      0.06
+version_from: lib/Date/Japanese/Era.pm
+installdirs:  site
+requires:
+    Date::Calc:                    4.3
+    Encode:                        2.1
+    Lingua::JA::Numbers:           0.04
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

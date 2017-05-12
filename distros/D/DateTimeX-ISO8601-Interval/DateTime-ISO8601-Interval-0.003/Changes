@@ -1,0 +1,10 @@
+Revision history for DateTime-ISO8601-Interval
+
+0.003     2014-10-02 21:02:58-05:00 America/Chicago
+	- re-namespaced for release, finally
+
+0.002     2014-01-02 16:47:52 CST6CDT
+  - ignore local cpanm repo from distribution :(
+
+0.001     2014-01-02 16:42:19 CST6CDT
+  - initial release

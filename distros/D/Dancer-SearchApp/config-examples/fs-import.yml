@@ -1,0 +1,10 @@
+elastic_search:
+    index: dancer-searchapp
+fs:
+    directories:
+        - folder: "C:\\Users\\Corion\\Projekte\\App-StarTraders"
+          recurse: true
+          exclude:
+             - ".git"
+        - folder: "t\\documents"
+          recurse: true

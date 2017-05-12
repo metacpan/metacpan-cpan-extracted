@@ -1,0 +1,65 @@
+This change log is for the Device::Davis module and vanprod.  My first 
+intention was not to distribute either of these at all, but some friends
+talked me into it, so I have broken the daemon and the module apart into
+their own distributions, in order to follow the accepted conventions on
+CPAN.  Device::Davis and vanprod were written and developed by Stan
+Sander.  Vanprod started on 9/27/03 after I discovered that Davis Instruments
+had released a  technical reference document detailing the protocol used for
+communicating with the Vantage Pro weather station.  I had previously hacked
+together a workable daemon that read the values from the station, updated 
+weatherunderground, loaded the daily minimum and maximum values into a mysql
+database, and generated some plain text files that were parsed by two other
+scripts I wrote.  This original daemon was based on some C code written by
+Lew Riley (rileyle@earlham.edu http://www.cs.earlham.edu/~weather/) for 
+communicating with a Davis Weatherlink station and also some pre-release
+information courtesy of Davis Weather Instruments. 
+
+10/8/03
+Started documentation.
+
+10/11/2003 version 0.5
+Well the re-write seems to be pretty much in order.  All of the functionality
+of the original is still intact and some of the routines have been improved.
+I'll call this version 0.5, since I do have several
+enhancements on my list of things that I want to do.  It does function well
+enough to be a version 1.0, but I'm just not ready to go that far yet. 
+ 
+0.55 
+
+Added crc_accum function to calculate crc's to be sent or recieved from the 
+weather station.
+
+0.61
+
+Added station_open function to ensure that the tty was opened with the correct
+parameters.  Somehow once I rebooted my system, I discovered that what I had 
+written using POSIX calls from perl didn't quite do the right things. 
+
+1.0  10/25/03
+
+Seperated the module and the daemon.  Uploaded the module to CPAN.  Daemon 
+should follow shortly in the scripts area.  
+
+1.01 12/24/03
+
+Minor bugfix release.  Fixed error in test.pl script that called the module 
+incorrectly.  
+
+1.1 12/31/03
+
+Added put_unsigned function for sending numeric values to the station as a
+single byte of data.
+
+1.1.1 1/02/04
+
+Bugfix release.  Re-did lots of stuff in the test.pl script.  Added output to
+a test.log file to make debugging problems easier. 
+
+1.2  8/7/04
+
+Incorporated a patch by Wes Young.  This enables the module to function 
+correctly on a Mac (OS X) platform.   
+
+1.2.2
+
+Made some changes in order to be CPAN tester friendly.

@@ -1,0 +1,33 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use DNS::BL;
+use Fcntl qw(:DEFAULT);
+use MLDBM qw(DB_File Storable);
+
+tie my %edb, 'MLDBM', $ARGV[0], O_RDONLY, 0640
+    or die "Failed to tie $ARGV[0]: $!\n";
+
+# Verify index integrity
+for my $k (keys %edb)
+{
+    next unless $k =~ /^index:/;
+    my $r_idx = $edb{$k};
+
+    warn "Empty index $k\n" unless @$r_idx;
+    
+    for my $n (grep { m/^index:/ } @$r_idx)
+    {
+	warn "Index $k contains dangling index pointer $n\n"
+	    unless exists $edb{$n};
+    }
+
+    for my $n (grep { m/^node:/ } @$r_idx)
+    {
+	my $a = substr($n, 5);
+	warn "Index $k contains dangling node pointer $n\n"
+	    unless exists $edb{$a};
+    }
+}

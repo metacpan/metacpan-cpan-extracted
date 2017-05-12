@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Debug/LTrace.pm
+t/00-load.t
+t/Foo.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+examples/example.pl
+META.yml                                 Module meta-data (added by MakeMaker)

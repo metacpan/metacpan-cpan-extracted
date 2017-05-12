@@ -1,0 +1,23 @@
+Revision history for Dist-Zilla-Plugin-MakeMaker-SkipInstall
+
+1.201  Tue Aug 30 11:28:25 UTC 2016
+         - Drop dependency on Path::Class (ANDK@cpan.org RT 117312)
+         - Make sure all dependencies are declared
+
+1.200  Sat Aug 27 12:21:23 UTC 2016
+         - Fix test with un-escaped regexp's with more recent perl's (SREZIC@cpan.org RT 117247)
+
+1.100  Sun Apr 10 20:20:42 UTC 2011
+         - Upgrade to dzil 4.x (jquelin@cpan.org RT 66682)
+
+1.002  Sun Oct 11 07:14:39 UTC 2009
+         - Fix dependencies (again...)
+
+1.001  Sat Oct 10 12:41:01 UTC 2009
+         - Fixed dependencies
+
+1.0    Wed Oct  7 11:55:35 UTC 2009
+         - First public release
+
+0.1    Wed Oct  7 10:36:07 UTC 2009
+         - First version

@@ -1,0 +1,12 @@
+Revision history for Data-Dump-Ruby
+
+0.02     2013-09-09 (SHARYANTO)
+
+         - No functional changes. Rebuild with MakeMaker instead of
+           Module::Build because the latter is deprecated from core in 5.19.
+
+
+0.01   2011-08-12 (SHARYANTO)
+
+       - First release. Code is copied from Data-Dump-PHP-0.07 (which is copied
+           from Data-Dump-1.15).

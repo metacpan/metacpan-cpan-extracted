@@ -1,0 +1,104 @@
+NAME
+
+    Dist::Zilla::Plugin::Test::Inline - Create test files from inline tests
+    in POD sections
+
+VERSION
+
+    version 0.011005
+
+SYNOPSIS
+
+    In your dist.ini:
+
+            [Test::Inline]
+
+    In your module:
+
+            # My/AddressRange.pm
+    
+            =begin testing
+    
+            use Test::Exception;
+            dies_ok {
+                    My::AddressRange->list_from_range('10.2.3.A', '10.2.3.5')
+            } "list_from_range() complains about invalid address";
+    
+            =end testing
+            
+            =cut
+            
+            sub list_from_range {
+                    # ...
+            }
+
+    This will result in a file t/inline-tests/my_addressrange.t in your
+    distribution.
+
+DESCRIPTION
+
+    This plugin integrates Test::Inline into Dist::Zilla.
+
+    It scans all non-binary files in the lib path of your distribution for
+    inline tests in POD sections that are embedded between the keywords
+
+            =begin testing
+            ...
+            =end testing
+
+    These tests are then exported into t/inline-tests/*.t files when
+    Dist::Zilla builds your module. Multiple of test sections may be
+    specified within one file.
+
+    Please note that this plugin (in contrast to pure Test::Inline) can
+    also handle Moops-like class and role definitions.
+
+ Files to be scanned for inline tests
+
+    Only files already gathered by previous file gatherer plugins are
+    scanned. In other words: tests will not be extracted for files which
+    have been excluded.
+
+    Example:
+
+            [GatherDir]
+            exclude_match = Hidden\.pm
+            [Test::Inline] 
+
+    This will lead to Dist::Zilla::Plugin::Test::Inline ignoring Hidden.pm.
+
+METHODS
+
+ gather_files
+
+    Required by role Dist::Zilla::Role::FileGatherer.
+
+    Searches for inline test code in POD sections using Test::Inline,
+    creates in-memory test files and passes them to Dist::Zilla.
+
+ register_prereqs
+
+    Required by role Dist::Zilla::Role::PrereqSource.
+
+    Adds Test::More to the list of prerequisites (as Test::Inline inserts
+    use Test::More;) for the distribution that uses this plugin.
+
+ACKNOWLEDGEMENTS
+
+    The code of this Dist::Zilla file gatherer plugin is based on
+    https://github.com/moose/moose/blob/master/inc/ExtractInlineTests.pm.
+
+      * Dave Rolsky <autarch@urth.org>, who basically wrote most of this
+      but left the honor of making a plugin out of it to me ;-)
+
+AUTHOR
+
+    Jens Berthold <jens.berthold@jebecs.de>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2015 by Jens Berthold.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

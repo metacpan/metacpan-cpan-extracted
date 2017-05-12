@@ -1,0 +1,16 @@
+SYNOPSIS
+
+     % perl -MDevel::End::PrintINCVersion -e'...'
+
+DESCRIPTION
+
+    After loading this module, when program ends, versions of files
+    (modules) listed in %INC will be printed to STDOUT. The versions are
+    extracted using ExtUtils::MakeMaker's parse_version.
+
+SEE ALSO
+
+    Devel::EndHandler::PrintINCVersion
+
+    Other Devel::End::* modules
+

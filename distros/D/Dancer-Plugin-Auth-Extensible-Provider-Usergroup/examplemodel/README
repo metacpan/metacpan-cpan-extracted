@@ -1,0 +1,5 @@
+To use this provider you need a DBIx::Class schema.
+
+Get your code for free using:
+
+dbicdump - Dump a schema using DBIx::Class::Schema::Loader

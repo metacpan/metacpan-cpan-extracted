@@ -1,0 +1,52 @@
+---
+abstract: 'Wrapper for the Handlebars template system'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  Dancer: '0'
+  Dancer::Test: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  lib: '0'
+  parent: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Template-Handlebars
+provides:
+  Dancer::Template::Handlebars:
+    file: lib/Dancer/Template/Handlebars.pm
+    version: v0.2.2
+  Dancer::Template::Handlebars::Helpers:
+    file: lib/Dancer/Template/Handlebars/Helpers.pm
+    version: v0.2.2
+requires:
+  Dancer::Config: '0'
+  Dancer::Template::Abstract: '0'
+  Module::Runtime: '0'
+  Moo: '0'
+  Sub::Attribute: '0'
+  Text::Handlebars: '0'
+  Try::Tiny: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer-Template-Handlebars/issues
+  homepage: https://github.com/yanick/Dancer-Template-Handlebars
+  repository: https://github.com/yanick/Dancer-Template-Handlebars.git
+version: 0.2.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+  - 'Yanick Champoux <yanick@cpan.org>'

@@ -1,0 +1,15 @@
+Revision history for Perl module DateTime::Format::JSON::MicrosoftDateFormat
+
+0.03 2014-02-18
+  - Updated POD Documentation
+  - Added Example Scripts
+    - convert_blessed.pl
+    - format_datetime.pl
+    - parse_datetime.pl
+
+0.02 2014-02-17
+  - Updated import method to only import TO_JSON when requested
+  - Added Millisecond tests
+
+0.01 2014-02-17
+  - original version; created by ExtUtils::ModuleMaker 0.51

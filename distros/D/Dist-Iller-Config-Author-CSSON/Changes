@@ -1,0 +1,316 @@
+Revision history for Dist-Iller-Config-Author-Csson
+
+0.0315 2017-04-30 17:33:10 UTC
+ [Config Changes]
+ - Bump some plugin versions.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 5 insertions(+), 4 deletions(-)
+ - (run req) ~ Types::Standard 1.000005 --> 1.000006
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.163040 -->
+   0.170880
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package 2.003001 -->
+   2.004003
+ - (dev req) ~ Dist::Zilla::Plugin::PromptIfStale (any) --> 0.053
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0313 --> 0.0315
+
+0.0314 2017-03-31T19:26:57Z UTC
+ [Config Changes]
+ - Bump Type::Tiny default prereq version.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 4 insertions(+), 4 deletions(-)
+
+0.0313 2016-11-26T14:18:23Z UTC
+ [Requirements]
+ - Bump plugin versions.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 9 insertions(+), 9 deletions(-)
+ - (dev req) ~ Dist::Zilla 5.000 --> 6.008
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild 0.151680 -->
+   0.163040
+ - (dev req) ~ Dist::Zilla::Plugin::Git 2.036 --> 2.041
+ - (dev req) ~ Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013 -->
+   0.014
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors 0.017 --> 0.029
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod 0.150250 --> 0.163250
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile 2.054 --> 2.056
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0312 --> 0.0313
+
+0.0312 2016-09-20T13:20:05Z UTC
+ [Config Changes]
+ - A version requirement bump.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 3 insertions(+), 3 deletions(-)
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+   --> 0.0200
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0311 --> 0.0312
+
+0.0311 2016-08-11T23:12:59Z UTC
+ [Config Changes]
+ - dist.ini: Add [PromptIfStale]
+ - weaver.ini: Send 'author' to the Kwalitee badge constructor.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 6 insertions(+), 2 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::PromptIfStale (any)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0310 --> 0.0311
+
+0.0310 2016-06-30T21:01:03Z UTC
+ [Config Changes]
+ - Bump default Moose version to 2.1803 (avoid 2.1802 due to Type::Tiny
+   problems).
+ - Bump default minimum Perl version to test on travis to 5.14 (due to
+   Dist::Zilla 5.14 requirement) for now.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 4 insertions(+), 4 deletions(-)
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0309 --> 0.0310
+
+0.0309 2016-04-21T20:55:49Z UTC
+ [Config Changes]
+ - dist.ini: Add [MetaConfig].
+ - weaver.ini: Replace [Source::DefaultGitHub] and [Source::DefaultCPAN]
+   with [GenerateSection].
+ - Bump default List::Util version to 1.45 (uniq!).
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 14 insertions(+), 9 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::MetaConfig (any)
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) ~ Dist::Iller 0.1407 --> 0.1408
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0308 --> 0.0309
+
+0.0308 2016-02-18T21:47:28Z UTC
+ [Config Changes]
+ - Add versions on all (non-core) Dist::Zilla plugins.
+ - Add some default prereq versions.
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 82 insertions(+), 9 deletions(-)
+ - (run req) ~ MooseX::AttributeDocumented (any) --> 0.1003
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Types::Path::Tiny (any) --> 0.005
+ - (run req) ~ Types::Standard (any) --> 1.000005
+ - (run req) ~ namespace::autoclean (any) --> 0.22
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Prereqs (any)
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Badge::Depot (any) --> 0.0103
+ - (dev req) ~ Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+   --> 0.0100
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::NextRelease::Grouped (any) --> 0.0200
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.054
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOF (any) --> 0.0501
+ - (dev req) ~ Dist::Zilla::Plugin::Test::EOL (any) --> 0.18
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Kwalitee::Extra (any) --> v0.2.1
+ - (dev req) ~ Dist::Zilla::Plugin::Test::NoTabs (any) --> 0.15
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Version (any) --> 1.05
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Homepage::DefaultCPAN (any) --> 0.05
+ - (dev req) ~ Pod::Weaver::Section::Source::DefaultGitHub (any) --> 0.07
+ - (dev req) ~ Test::NoTabs (any) --> 1.4
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev sug) ~ Dist::Iller 0.1406 --> 0.1407
+ - (dev sug) ~ Dist::Iller::Config::Author::CSSON 0.0307 --> 0.0308
+
+0.0307 2016-02-18T01:53:35Z UTC
+ [New Features]
+ - Use the new plugin-adds-prereqs to add all badges as develop prereqs.
+ - New attribute 'badges' determines if badges should be added.
+
+ [Other Changes]
+ - More badges.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 22 insertions(+), 4 deletions(-)
+ - (dev req) + Badge::Depot (any)
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) ~ Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   (any) --> 0.007
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) - Dist::Iller
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::Prereqs
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev sug) + Dist::Iller 0.1406
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0307
+
+0.0306 2016-02-15T16:50:13Z UTC
+ [Enhancements]
+ - Improve git commits around release and tagging.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 10 insertions(+), 5 deletions(-)
+ - (dev req) ~ Dist::Iller::Config::Author::CSSON 0.0305 --> 0.0306
+
+0.0305 2016-02-15T13:37:13Z UTC
+ [Requirements]
+ - Lower to 5.10.0 everywhere.
+
+ [Stats & Dependency Changes]
+ - 3 files changed, 3 insertions(+), 3 deletions(-)
+ - (run req) ~ perl 5.010001 --> 5.010000
+ - (dev req) ~ Dist::Iller::Config::Author::CSSON 0.0304 --> 0.0305
+
+0.0304 2016-02-15T13:10:37Z UTC
+ [Enhancements]
+ - Added plugins to config.
+ - Improved (hopefully) the order of some plugins.
+
+ [Stats & Dependency Changes]
+ - 4 files changed, 49 insertions(+), 10 deletions(-)
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git (any)
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) ~ Dist::Iller 0.1402 --> 0.1405
+ - (dev req) ~ Dist::Iller::Config::Author::CSSON 0.0303 --> 0.0304
+ - (dev req) ~ Dist::Zilla::Plugin::RewriteVersion::Transitional (any) -->
+   0.007
+
+0.0303 2016-02-08T21:24:59Z UTC
+ [Config Changes]
+ - dist.ini: Remove [NextRelease].
+ - dist.ini: Update name of [NextRelease::Grouped].
+ - dist.ini: Remove fallback version provider for
+   [RewriteVersion::Transitional].
+
+0.0302 2016-02-07T15:22:41Z UTC
+ [Config Changes]
+ - dist.ini: Added [Changelog::Grouped].
+ - dist.ini: Replaced [RewriteVersion] and [BumpVersionAfterRelease] with
+   ::Transitional.
+ - dist.ini: Remove more plugins when FAKE_RELEASE=1.
+
+ [Requirements]
+ - Bump Dist::Iller to 0.1402.
+ - Dist::Zilla::Plugin::PreviousVersion::Changelog is the fallback version
+   provider for [RewriteVersion::Transitional].
+
+ [Other Changes]
+ - ::MapMetro now inherits ::CSSON (so that the properties are available
+   for the end using distribution).
+
+0.0301 Unreleased
+
+0.0300 2016-02-06T11:16:48Z UTC
+ [Config Changes]
+ - dist.ini: Added [RewriteVersion] and [BumpVersionAfterRelease].
+ - dist.ini: Removed [ReversionOnRelease], [OurPkgVersion],
+   [PreviousVersion::Changelog] and [NextVersion::Semantic].
+
+ [Enhancements]
+ - Become compatible with Dist::Iller 0.1400+.
+
+0.0202 2016-02-03T17:29:13Z UTC
+ [Requirements]
+ - Bump Dist::Iller to 0.1301 (for +version).
+ - When using Pod::Elemental::Transformer::Splint, require 0.1201 (for 5.10
+   compatibility).
+
+0.0201 2016-01-29T15:43:46Z UTC
+ [New Features]
+ - Two new attributes: travis_perl_min and travis_perl_max for easier
+   setting of version interval to test.
+
+ [Requirements]
+ - No longer uses block package syntax, so should now work on 5.10+ (once
+   Dist::Iller does).
+
+0.0200 2016-01-26T22:59:24Z UTC
+ [Config Changes]
+ - Remove env variable ILLERAT for including some test plugins (now they
+   are always there).
+ - Add Test::NoTabs as a develop prereq.
+
+0.0107 2016-01-23T22:09:06Z UTC
+ [Enhancements]
+ - ::MapMetro should require Map::Metro instead of Map::Metro::Plugin::Map.
+ - ::MapMetro should add namespace::autoclean as a runtime dependency.
+
+0.0106 2016-01-23T15:18:02Z UTC
+ [Enhancements]
+ - Use itself to generate dist.ini & weaver.ini (instead of maintaining a
+   separate iller.yaml).
+
+ [Requirements]
+ - Add missing (since 0.0105) prereqs: Types::Path::Tiny,
+   namespace::autoclean.
+
+ [Other Changes]
+ - Add itself as a develop requirement upon use in an iller.yaml.
+ - Not a Moops class anymore.
+
+0.0105 2016-01-22T17:23:26Z UTC
+ [New Features]
+ - Add ::MapMetro config.
+
+ [Enhancements]
+ - Add [Test::Compile].
+ - For this dist: [RunExtraTests] instead of [ExtraTests].
+
+0.0104 2016-01-21T14:50:11Z UTC
+ [Other Changes]
+ - Remove [CheckExtraTests] from config.
+ - Specify perl version in .pm and use warnings (kwalitee fix).
+
+0.0103 2016-01-19T20:42:16Z UTC
+ [Enhancements]
+ - Added coverage badge.
+
+ [Other Changes]
+ - Actually change copyright_year to 2016.
+
+0.0102 2016-01-11T14:57:03Z UTC
+ [Requirements]
+ - New runtime prereq: MooseX::AttributeDocumented
+ - New runtime prereq: Pod::Elemental::Transformer::Splint
+
+ [Other Changes]
+ - Changed copyright_year in author-csson.yaml to 2016.
+
+ [Documentation]
+ - Documentation for attributes (with Pod::Elemental::Transformer::Splint).
+
+0.0101 2016-01-09T22:25:48Z UTC
+ [New Features]
+ - New attribute 'travis' (defaults to true). Set to false to avoid testing
+   on Travis-ci.
+
+ [Enhancements]
+ - Changed groups for [NextVersion::Semantic] slightly
+ - Added [Clean] and [InstallRelease] to dist.ini configuration
+
+ [Requirements]
+ - New Dist::Zilla plugins used: D::Z::P::Clean and D::Z::P::InstallRelease
+
+ [Bug Fixes]
+ - Fixed bug where FAKE_RELEASE=1 would still release to CPAN.
+
+0.0100 2015-11-24T14:47:35Z UTC
+ - Initial release

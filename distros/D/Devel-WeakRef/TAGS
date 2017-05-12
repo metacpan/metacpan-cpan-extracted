@@ -1,0 +1,24 @@
+
+lib/Devel/WeakRef.pm,0
+
+WeakRef.xs,240
+static int actual_free 31,1115
+static int cell_munge 44,1464
+static SV *get_cell(58,1901
+new(class, obj)93,3094
+new(93,3094
+deref(self)104,3310
+empty(self)125,3764
+empty(125,3764
+STORE(self, key, val)139,4054
+ if (!SvROK(152,4327
+
+WeakRef.c,156
+static int actual_free 40,1341
+static int cell_munge 53,1690
+static SV *get_cell(67,2127
+XS(99,3264
+XS(123,3819
+XS(157,4607
+XS(182,5154
+XS(222,6188

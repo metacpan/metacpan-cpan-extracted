@@ -1,0 +1,35 @@
+Revision history for Digest::Spooky
+
+1.05 2014-09-11T17:49:42Z
+    - Fixed violation of CPAN Meta Spec
+
+1.04 2013-06-26T17:16:01Z
+    - Big endian machine unsupported
+
+1.03 2013-06-25T11:19:55Z
+    - Use BYTESWAP64() in big endian machine
+
+1.02 2013-06-23T08:07:18Z
+    - Switch authoring tool to Minilla
+
+1.01    Tue Apr 16 21:40:00 2014
+    - Improved document
+    - Indicate 'OS unsupported' message
+
+1.00    Sun Apr 14 11:00:00 2013
+    - Increment major version
+
+0.05    Sat Apr 13 21:15:00 2013
+    - Change required perl version
+
+0.04    Sat Apr 13 17:15:00 2013
+    - Indicate message for unspported platform
+
+0.03    Sat Apr 13 15:20:00 2013
+    - Indicate 'OS unsupported' message
+
+0.02    Mon Apr  8 19:30:00 2013
+    - [BUGFIX] Fixed Link error in some version of gcc
+
+0.01    Wed Apr  3 23:05:42 2013
+    - Initial release

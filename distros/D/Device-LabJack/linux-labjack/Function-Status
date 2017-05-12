@@ -1,0 +1,57 @@
+Testing check-list:
+
+Functions           Linux-kernel 2.4                    Linux-kernel 2.6
+AISample            Yes                                 Yes
+AIBurst             Yes                                 Yes
+AIStreamStart       No				                    No
+AIStreamRead        No				                    No 
+AIStreamClear       No				                    No
+AOUpdate            Yes                                 Yes
+AsynchConfig        Not tested                          Not tested
+Asynch              Not tested                          Not tested
+BitsToVolts         Yes                                 Yes
+VoltsToBits         Yes                                 Yes
+Counter             Yes                                 Yes
+DigitalIO           Yes                                 Yes
+EAnalogIn           Yes                                 Yes
+EAnalogOut          Yes                                 Yes
+ECount              Yes                                 Yes
+EDigitalIn          Yes                                 Yes
+EDigitalOut         Yes                                 Yes
+GetDriverVersion    Yes                                 Yes
+GetErrorString      Yes                                 Yes
+GetFirmwareVersion  Yes                                 Yes
+GetWinVersion       Not used in Linux                   Not used in Linux
+ListAll             Yes                                 Yes
+LocalID             Yes                                 Yes
+NoThread            No, do not use                      No, do not use
+PulseOut            Not tested                          Not tested
+PulseOutStart       Not tested                          Not tested
+PulseOutFinish      Not tested                          Not tested
+PulseOutCalc        Not tested                          Not tested
+ReEnum              No                                  Yes
+Reset               No                                  Yes
+ResetLJ             No                                  Yes
+SHT1X               Yes                                 Yes
+SHTCRC              Yes                                 Yes
+SHTComm             Not tested                          Not tested
+Synch               Not tested                          Not tested
+Watchdog            Not tested                          Not tested
+ReadMem             Yes                                 Yes
+WriteMem            Yes                                 Yes
+OpenLabJack         Yes                                 Yes
+WriteRead           Yes                                 Yes
+WriteLabJack        Yes                                 Yes
+ReadLabJack         Yes                                 Yes
+ReadInputThread     Not used                            Not used
+ReadFeatureThread   Not used                            Not used
+CloseAll            Yes                                 Yes
+BuildAICommand      Yes                                 Yes
+BuildGainMuxCommand Yes                                 Yes
+ParseAIResponse     Yes                                 Yes
+ApplyCal            Yes                                 Yes
+BuildAOCommand      Yes                                 Yes
+ParseAOResponse     Yes                                 Yes
+RoundFL             Yes                                 Yes
+SHTWriteRead        Yes                                 Yes
+ 

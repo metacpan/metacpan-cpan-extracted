@@ -1,0 +1,54 @@
+NAME
+    DBIx::TextIndex - Perl extension for full-text searching in SQL
+    databases
+
+SYNOPSIS
+     use DBIx::TextIndex;
+
+     $index = DBIx::TextIndex->new({
+         index_dbh => $index_dbh,
+         collection => 'collection_name',
+         doc_fields => ['field1', 'field2'],
+     });
+
+     $index->initialize();
+
+     $index->add( key1 => { field1 => 'some text', field2 => 'more text' } );
+
+     $results = $index->search({
+         field1 => '"a phrase" +and -not or',
+         field2 => 'more words',
+     });
+
+     foreach my $key
+         (sort {$$results{$b} <=> $$results{$a}} keys %$results ) 
+     {
+         print "Key: $key Score: $$results{$key} \n";
+     }
+
+DESCRIPTION
+    DBIx::TextIndex was developed for doing full-text searches on BLOB
+    columns stored in a database. Almost any database with BLOB and DBI
+    support should work with minor adjustments to SQL statements in the
+    module. MySQL, PostgreSQL, and SQLite are currently supported.
+
+    As of version 0.24, data from any source outside of a database can be
+    indexed by passing the data to the "add()" method as a string.
+
+CHANGES
+
+0.27
+
+    Fixed POD coverage test error
+
+0.26
+
+    Fixed problem with re-indexing a document several times with
+    SQLite (rt.cpan.org #16247)
+
+    Stoplists now work with QueryParser
+
+    unscored_search() was returning internal document ids instead of keys
+
+    Fixed table_exists() in case schema name is prefixed to table name
+    in results of DBI->tables() call

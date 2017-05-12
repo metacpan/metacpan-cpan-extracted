@@ -1,0 +1,20 @@
+---
+abstract: 'Dist::Zilla plugin to upload the distribution tarball using rsync.'
+author:
+  - 'Tomáš Znamenáček <zoul@fleuron.cz>'
+build_requires:
+  Module::Build: 0.3601
+configure_requires:
+  Module::Build: 0.3601
+generated_by: 'Dist::Zilla version 2.101310'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Rsync
+recommends: {}
+requires:
+  CLASS: 0
+  Dist::Zilla::Role::Releaser: 0
+  Moose: 0
+version: 0.1

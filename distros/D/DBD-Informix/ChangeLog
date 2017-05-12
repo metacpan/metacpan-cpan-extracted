@@ -1,0 +1,1306 @@
+Change Log for Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) (aka DBD::Informix)
+
+2015.1101 Release
+-----------------
+2015-11-01: Upload to PAUSE and CPAN.
+2015-10-31: Revise notes on release process to use apply.setminref.pl and
+            setminref.pl.  Update release tools on release platform so it
+            works.  Otherwise, no change to the product.
+
+2015.1031 Release
+-----------------
+2015-10-31: Upload to PAUSE and CPAN.  Announcement not sent.
+2015-10-28: Resolve RT#108030.  Use code fragment from 'perldoc perlvar' to
+            find Perl executable via Config module.  Problem reported by
+            Curtis Leach <CLEACH@cpan.org>.
+2015-10-28: Resolve RT#108031.  MANIFEST listed setmincur.pl but file was
+            renamed to setminref.pl before prior release.  Problem reported
+            by Curtis Leach <CLEACH@cpan.org>.
+
+2015.0826 Release
+-----------------
+2015-08-26: Upload to PAUSE and CPAN.
+2015-08-26: Automatically deal with Perl and DBI minimum versions since the
+            previous releases had a mish-mash of version numbers scattered
+            through the code.
+2015-08-26: Fix DBD::Informix::TechSupport module, thereby fixing the
+            TechSupport and ItWorks scripts too.
+2015-08-26: Announce that IBM Informix ClientSDK (CSDK) 3.50 will be the
+            oldest supported version from 2016-01-01 onwards.
+
+2015.0825 Release
+-----------------
+2015-08-25: Upload to PAUSE and CPAN.
+2015-08-25: Partially resolve RT#55100 (improve compiler detection).
+            Unresolved: Command line override of OTHERLDFLAGS.
+2015-08-21: Update minimum version of Perl to 5.8.1 and DBI to 1.607.
+2015-08-21: Rework esqlcc, esqlld, esqlsed to deal with modified
+            ExtUtils::MakeMaker behaviour of enclosing FULLPERL in double
+            quotes, after multiple reports and much cogitation.
+            Resolve: RT#101802, RT#101803, RT#101804, RT#103834.
+2015-08-21: Upgrade esqltest.ec and esqlbasic.ec to compile more cleanly.
+2015-07-13: Fix up after change of email back to <jleffler@us.ibm.com>.
+2015-07-07: Demonstrate that DBD::Informix works with threaded Perl on
+            Mac OS X 10.10.4 with Perl 5.18.2 (multi, thread, 64-bit),
+            and with Perl 5.10.1 (multi, thread, 64-bit).
+2014-04-21: All Perl files contain use strict and use warn.
+2013-11-12: Fix RT#90263 from John Beranek <john@redux.org.uk>.  Handle
+            non-transactional temporary tables because of TEMPTBL_NOLOG
+            configuration parameter (also John Beranek).  Clean test files
+            of &function() calls.
+
+2013.0521 Release
+-----------------
+2013-05-21: Upload to PAUSE and CPAN.
+2013-05-21: Fix up after change of email to <jleffler@google.com>.
+
+2013.0206 Release
+-----------------
+2013-02-06: Release to a few parties; there's another fix pending for GA.
+2013-02-06: Recognize ESQL/C 4.10 from 2013 as valid.  Do not try this with
+            ESQL/C 4.10 from 1989; the code will not compile using the
+            archaic ESQL/C.  I had no say in the reuse of version numbers.
+
+2013.0118 Release
+-----------------
+2013-01-18: Upload to PAUSE and CPAN.
+2013-01-18: Workaround for CQ idsdb00247065, the error -1820 problem.  You
+            cannot reuse an SQL descriptor for LVARCHAR variables upon
+            reopening the cursor unless the size for the LVARCHAR variables
+            is set to the original size.  So, store the original size for
+            each LVARCHAR and reinstate that size in the SQL descriptor
+            before the first FETCH (actually, after the OPEN).  Reported
+            this time by Robert Carew <Robert.Carew@mpi.govt.nz>, but also
+            reported by a number of other people previously.
+2012-05-19: Use $Config{so} as well as $Config{dlext} searching for ESQL/C
+            libraries.  Ticket 77286 at rt.cpan.org, submitted by n4zmz.
+2011-09-25: Despite some misgivings, add a $dbh->ping method (using SELECT
+            1 FROM "informix".systables WHERE TabID = 1).  The misgivings
+            are for MODE ANSI databases; a transaction may be started.
+2011-09-25: Modify dbdattr.ec, dbdimp.ec, dbdimp.h to provide optional UTF8
+            support.  Patch from Sergey Leschenko <sergle.ua@gmail.com>.
+2011-06-20: Modify Makefile.PL build of test to include @ldflags (reported
+            and patched by Julian Bridle <julian.bridle@pacepetroleum.com>).
+2011-06-16: Handle Perl regex metacharacters in $INFORMIXDIR (reported and
+            patched by Julian Bridle <julian.bridle@pacepetroleum.com>).
+
+2011.0612 Release
+-----------------
+2011-06-12: Upload to PAUSE and CPAN.
+2011-06-12: Fix smart blob space detection to work with MODE ANSI.
+2011-06-12: Disable test of DISTINCT type of LVARCHAR with NOT NULL.
+2011-05-28: Check build against Perl 5.14.0 and DBI 1.616.
+2011-01-22: Fix build issues on AIX.
+2010-08-31: Null terminate string from ifx_int8toasc() because the
+            function does not do so.  (Dan Hebert <dhebert@us.ibm.com>).
+2010-08-31: Fix PERL_POLLUTE issues (na, sv_yes, sv_no, sv_undef, newRV).
+2010-01-29: Fix some 64-bit compilation warnings.
+
+2008.0513 Release
+-----------------
+2008-05-13: Upload to PAUSE and CPAN.
+2008-05-13: Fix warnings for unset $INFORMIXDIR on Windows (Yunming Wang,
+            yunming@us.ibm.com)
+2008-05-11: Finish adding basic support for BIGINT, after finding CQ
+            idsdb00158856 (fixed in GA version of CSDK 3.50.xC1) and CQ
+            idsdb00159790 (not found until after GA).  Configuration work
+            for down-versions still to be done, but code passes under CSDK
+            3.50.UC1 with Perl 5.10.0 and CSDK 3.50.FC1 with Perl 5.8.8.
+2008-04-17: Fix $sth->{TYPE}: return 9 (SQL_DATE) not -1 (SQL_LVARCHAR),
+            fixing an 11-year old bug (Ravi Krishna <srkrishna@yahoo.com>).
+2008-03-07: Add support for BIGINT in ESQL/C 3.50.
+2008-03-07: CPAN Testers reporting issues because Makefile.PL not exiting
+            successfully when pre-requisites not met.
+2008-03-07: ESQL/C 3.50 (for IDS 11.50) typedefs ifx_loc_t - update
+            dumpesql.h to cope (Joe R Plugge <jrplugge@west.com>).
+2008-03-07: ESQL/C test fails when $Config{ccflags} has leading spaces
+            (Michael Lieman, <michael.lieman@bankofamerica.com>), and
+            several other people too.  Records show this problem also
+            affected Dr Guenther Seifert <guenther-h.seifert@t-systems.com>
+            in June 2007.  Apologies for not getting it fixed sooner.
+
+2008.0229 Release
+-----------------
+2008-02-29: Upload to PAUSE and CPAN.
+2008-02-29: Release - only once in 4 years can you do it on Leap Day.
+2008-02-29: RT#32975: Add $h->{ix_serial} and $h->{ix_serial8} (requested
+            by John Siracusa <siracusa@gmail.com>), and $h->{ix_bigserial}
+            to be added soon.
+2007-09-27: Problems with INT8 to long conversions on 64-bit Linux reported
+            by Clive Eisen <clive@serendipita.com>.  Resolved as a bug in
+            ESQL/C 2.90 on 32-bit Linux platforms, fixed in ESQL/C
+            3.00.UC2.
+
+2007.0914 Release
+-----------------
+2007-09-14: Upload to PAUSE and CPAN.
+2007-09-14: RT#29364: tab changed to blank in library detection, reported
+            by Stephan Hendl <Stephan.Hendl@lds.brandenburg.de>.  Fix
+            ensures literal tab isn't needed.
+
+2007.0904 Release
+-----------------
+2007-09-04: Upload to PAUSE and CPAN.
+2007-09-04: Rework ExtUtils::AutoInstall code.
+2007-09-03: Fix Announce and ChangeLog.
+
+2007.0903 Release
+-----------------
+2007-09-03: Released without fixing Announce or ChangeLog.
+2007-09-03: Redo the fixes to ESQL/C 5.20 for decimals.
+2007-09-02: Various minor cleanups in build and release system.
+2007-08-31: Get server version via DBINFO('version','major') when possible.
+            Prompted by comment from Oyvind Gjerstad <ogj@tollpost.no>.
+
+2007.0826 Release
+-----------------
+2007-08-26: Upload to PAUSE and CPAN.
+2007-08-26: Fix compilation with ESQL/C 5.20 and 7.24.  Modify t/t32nulls.t
+            and t/t61varchar.t to skip when test won't pass on server.
+2007-08-25: Declare RT#13708 (and IBM CQ idbsdb00139040) resolved by CSDK
+            3.00.xC2. This is another LVARCHAR problem, related
+            to LVARCHAR NOT NULL on non-temp tables with (mainly) 32-bit
+            CSDK.  See bug-lvcnn.ec for the pure ESQL/C reproduction;
+            bug-lvcnn.pl for the Perl version.
+2007-08-25: Finally work out how to deal with CLVCHARPTRTYPE properly.
+2007-08-24: Fix problem with DBD_INFORMIX_DEBUG_ESQLCC=yes found by
+            Piotr Poloczek <poloczekp@interia.pl>.
+2007-06-10: Fetch UDTs into SQLLVARCHAR instead of CHAR(256).
+2007-06-09: Makefile.PL now detects 32-bit Perl vs 64-bit ESQL/C, etc.
+2007-06-09: RT#14954: only test smart blobs if smart blob space exists.
+2007-06-09: RT#14095: CLONE function added to driver 2005-08-12.
+2007-06-09: Rework dbd_ix_debug() and eliminate variants.
+2007-06-03: Fix leak from LVARCHAR handling - pointed to by valgrind.
+2007-06-02: Remove #if 0 code from dbdimp.ec.
+
+2007.0226 Release
+-----------------
+2007-02-26: Upload to PAUSE and CPAN.
+2007-02-26: Fix Announce file problems.
+
+2007.0225 Release
+-----------------
+2007-02-25: Upload to PAUSE and CPAN.
+2007-02-25: Miscellaneous cleanups for the last 2 years or so.
+2007-02-25: Fix formatting of ISAM error for AMD x86_64 after report from
+            Jim Kenedy <jimkenedy@gmail.com>.
+2006-11-15: Next release of CSDK will be 3.00 - fix conditionals.
+2006-07-14: Update esqltype.h to handle ESQL/C 5.x (after CSDK 2.9x).
+2005-08-17: Reinstate jtypes.c, stderr.c, stderr.h for older versions of
+            ESQL/C (pre-dating IUS 9.00).  Update Makefile.PL to handle
+            this edge case automatically.  Problem found by Piotr Poloczek
+            <poloczekp@interia.pl> and Gerardo Santana
+            <gerardo.santana@gmail.com> in June 2005.
+2005-08-12: Windows fixes started based on extensive feedback from Brian D
+            Campbell <campbelb@lucent.com>.
+
+2005.02 Release
+---------------
+2005-07-29: Upload to PAUSE and CPAN.
+2005-07-28: Logged bug B173776 against ESQL/C - SQL DESCRIPTORS mishandle
+            zero-length non-null VARCHAR values.  This prevents a solution
+            to a problem report from Vàclav Ovsík <vaclav.ovsik@i.cz>.
+2005-07-27: Fix INT8 handling bugs for 64-bit CSDK; fix and extend tests in
+            t/t95int8.t.  Rewrite t/t50update.t - does not create database.
+            Add DBD_INFORMIX_NO_DBCREATE environment variable; set to a
+            Perl true value (eg 'yes') if your test user cannot create
+            databases.  Add DBD_INFORMIX_NO_RESOURCE environment; set to a
+            Perl true value if your test user does not have RESOURCE (or
+            DBA) privileges on the test database.
+2005-07-25: ClientSDK 2.90.FCx on AIX 5.2 using the AIX C compiler sets
+            '-qlanglvl=ansi' but Perl does not.  On similar platforms
+            (possibly older versions of CSDK, possibly 32-bit CSDK,
+            possibly older versions of AIX), you need to manually set
+            DBD_INFORMIX_ESQLCC_REMOVE_OPTIONS_REGEX="-qlanglvl=ansi".
+            Problem found by Darryl Priest <darryl.priest@dlapiper.com> and
+            Durga Pullakandam <durga.pullakandam@mci.com> at the same time.
+            Add warning to esqlcc.
+2005-07-25: Various build problems with new versions of CSDK on new
+            platforms, and some older ones.  Improve the debugging in
+            esqlcc, esqlld, and the ESQL/C test code in Makefile.PL.
+
+2005.01 Release
+---------------
+2005-03-14: Upload to PAUSE and CPAN.
+2005-03-14: Final cleanups before release.
+2004-12-01: Revert to SQL DESCRIPTORS.  Cleanup version detection.
+2004-11-24: Conversion to MSD/NMD distribution mechanism.
+2004-10-21: Pre-emptive fix for version detection problems in ClientSDK
+            2.90 (which will have ESQL/C 2.90, instead of 9.x).
+2004-09-13: Fix problem in dbdimp.ec v100.36.1.x related to formatting
+            SQLFLOAT and SQLSMFLOAT; bug reported by Will Rutherford
+            <will.rutherford@sciatl.com>
+2004-08-04: Perl 5.5.x requires prototypes - Makefile.PL should not fuss
+            about setting __STDC__ etc on any platforms.  Fixes problem
+            reported by Václav Ovsík <vaclav.ovsik@i.cz>.
+2004-04-01: Enable hold cursors test (t/t33holdcurs.t).  Update documentation.
+2004-01-16: Import updated sqltoken.c which handles C-style comments, just
+            like the servers do.
+2003-10-17: Fix version detection problem with ESQL/C on RedHat 9, reported
+            by Jay Hannah <jhannah@omnihotels.com>.  Fix problems with
+            dates in t/t09exec.t - I don't know whom to credit for this
+            (let me know if it was you).
+2003-09-30: Add t/t98pod.t, but do not distribute as it requires Test::Pod,
+            which is far from being universally installed.
+2003-09-09: Detect and object when a $dbh is used by a child process.
+            (Response to an old bug report, but name/email missing.)
+2003-09-08: Upgrade esqlld to do substitutions on arguments via
+            DBD_INFORMIX_ESQLLD_REPLACE_OPTIONS_REGEX, and to delete
+            multiple arguments at a time (-z ignore, for Solaris 8, for
+            example) via DBD_INFORMIX_ESQLLD_REMOVE_OPTION_PAIRS.  The
+            result is baroque in its complexity, and yet probably still not
+            adequate (if you need to do two distinct substitutions, for
+            example: -xarch=v9 to -m64 and -KPIC to -fPIC).
+2003-07-15: Merge the partial fix for INT8/SERIAL8 values sent to Steve
+            Vornbrock <stevev@wamnet.com> on 2003-07-01 and the fix for the
+            DECIMAL/INTEGER conversion problem sent to Darryl Priest
+            <darryl.priest@piperrudnick.com> into both the 100.36.1.2 and
+            2003.6 versions of dbdimp.ec.
+2003-05-02: DBD::Informix::TechSupport needs Configure, not Configuration.
+2003-05-02: Jay Hannah <jhanna@omnihotels.com> noted problems when
+            $INFORMIXSERVER is not set, so ensure it is set when needed.
+            Jay also noted that Configure.pm is confused by the warning
+            from RedHat 9 about "Incorrectly built binary which accesses
+            errno, h_errno or _res directly.  Needs to be fixed."
+2003-04-25: Fix problems with non-default DBDATE value in server and no
+            value for DBDATE in client (reported by Margit Schubert-While).
+            Use new get_date_as_string() function in TestHarness.pm which
+            returns the server-side and client-side strings representing
+            the given date.  Never was a problem if the client sets DBDATE.
+2003-04-18: Improve t92rows.t so it works even if t91udts.t fails, spotted
+            by Margit Schubert-While <margitsw@t-online.de>.  Also improved
+            README file after comments from Margit.
+2003-03-11: Improve TestHarness.pm; cleanup_database now does a name-based
+            search on data types, private synonyms, and stored procedures.
+2003-03-10: Fix up TechSupport.pm; implement 'id' command and 'egrep' on
+            $INFORMIXSQLHOSTS in Perl, not shell, to improve reliability.
+            Also fix code to use connect_to_primary() instead of obsolete
+            connect_quietly() - Andy Bach <andy_bach@wiwb.uscourts.gov>.
+2003-03-06: Problem with data_sources reported by Boban Acimovic again, and
+            by Jonathan I Kamens <jonathank@worldwinner.com> and Stefan
+            Meyer <st-meyer@foni.net> (http://rt.cpan.org/ bug #2183).  The
+            problem is on Linux with both Perl 5.6.0 and 5.6.1, using
+            vendor supplied versions of Perl.
+
+2003.04 Release
+---------------
+2003-03-04: Upload to PAUSE and CPAN.  NB: dbdimp.ec, dbdimp.h, dbdattr.ec
+            again based on RCS release 100, not 2003.
+2003-03-04: Unfortunately, neither CPAN nor CPANPLUS really handles 3-part
+            version numbers, so revert to 2-part numbers (year, release
+            number within year).  It is difficult to find these things out
+            without trying.
+
+2003.03.0401 Release
+--------------------
+2003-03-04: Upload to PAUSE and CPAN.  NB: dbdimp.ec, dbdimp.h, dbdattr.ec
+            again based on RCS release 100, not 2003.
+2003-03-04: Resolve CPAN $VERSION problems in DBD::Informix::* sub-modules.
+
+2003.03.0400 Release
+--------------------
+2003-03-04: Upload to PAUSE and CPAN.  NB: dbdimp.ec, dbdimp.h, dbdattr.ec
+            again based on RCS release 100, not 2003.
+2003-03-04: Remove data_sources from Informix.xs now that it is provided by
+            DBI; a problem reported by Boban Acimovic <acim@mbl.is>.
+2003-03-04: Install Bundle::DBD::Informix again as otherwise CPAN/PLUS does
+            not recognize that the install is complete.
+2003-03-03: Add $VERSION to GetInfo.pm so PAUSE can index it.  Note that
+            PAUSE indexes the prior release as 2003.03, so we may have to
+            release this with a unique two-part version number after all.
+2003-03-03: Fix the previous release version and date information from the
+            recorded 2003.02.2800 to the actual 2003.03.0303, and add
+            missing attributions, etc.
+
+2003.03.0303 Release
+--------------------
+2003-03-03: Upload to PAUSE and CPAN.  NB: dbdimp.ec, dbdimp.h, dbdattr.ec
+2003-02-28: Improve (fix) formatting of DECIMAL numbers, prompted by
+            Jeffery Sumler <jsumler@attbi.com>.
+2003-02-27: Do not support ESQL/C versions 5.0x, 6.0x, 7.0x, 7.1x, 7.2x
+            before 7.24, 9.0x or 9.1x before 9.16 (CSDK 2.10) any more.
+            FUTURE DIRECTION: ESQL/C versions 5.0x, and 8.xy will not be
+            supported in the next release; nor will compilation with I4GL.
+2003-01-03: Improve get_info testing, but there are still no teeth in it.
+            Clean up various tests.  Revise test code to use stmt_nok
+            instead of stmt_fail in more places.  Validate more of the data
+            selected by tests - eliminating unchecked select_some_data
+            method from test harness.
+2002-12-31: Add method validate_unordered_unique_data() to TestHarness.pm
+            to stringently validate selected data.  Use it in some places.
+            Revert to 3-part version based on release date (eg 2003.01.01).
+2002-12-23: Use ExtUtils::AutoInstall (after helping fix it; thanks to
+            Autrijus Tang <atrijus@autrijus.org> for assistance).  Move
+            directory lib/DBD to DBD and lib/Bundle to Bundle.  Rename the
+            ESQL/C configuration module to DBD::Informix::Configure.
+2002-12-17: Add support for type_info_all via DBD::Informix::TypeInfo
+            package after creating DBI::DBD::TypeInfo and write_typeinfo()
+            method.
+2002-12-16: Use metadata methods directly without importing them.  Add
+            DBD::Informix::GetInfo package, after debugging DBD::ODBC
+            enough to be able to use write_getinfo_pm() from a modified
+            version of DBI::DBD.
+2002-12-15: Separate the Metadata code into DBD::Informix::Metadata.  Do
+            not need to install Bundle/DBD/Informix.pm.
+2002-12-14: Revert to 2-part version numbering.  Note that if you cannot
+            upgrade to DBI 1.33, you can probably edit Informix.xs, change
+            the reference to dbd_xx_data_sources to dbd_dr_data_sources,
+            and edit Makefile.PL and Informix.pm to reference your earlier
+            version of the code (which should not be earlier than DBI 1.25
+            unless you also undo the changes for DBIc_DBISTATE, see below).
+2002-12-13: Report error on failure to connect via imp_drh, not imp_dbh.
+            Pre-requisite version of DBI is 1.33 (not yet released).
+2002-12-11: Migrate code for data_sources into dbdimp.ec, and other
+            clean-ups to bring DBD::Informix into line with documented
+            practices in DBI::DBD, which is being heavily revised at the
+            same time.
+2002-12-09: Replace PERL_DBI_DEBUG with DBI_TRACE.
+2002-12-06: Fix problem with stray trailing nulls on LVARCHAR data
+            (reported by Mike Langen <mike.langen@tamedia.ch>)
+2002-12-05: Change version numbering (drop .PC1 in favour of .00) and
+            document intended next version number (2003.00.00) in Announce.
+2002-12-02: Fix overlong table name in t/t35cursor.t; fix test_for_ius() in
+            TestHarness.pm to use primary_connection() (reported by Andrew
+            Hamm <AHamm@civica.com.au>).  Fix pre-requisite version of DBI
+            to 1.30 for DBIc_DBISTATE support (reported by Christopher
+            Cosby <christopher.cosby@sciatl.com> but misdiagnosed, then
+            reported by Mike Langen <mike.langen@tamedia.ch> and diagnosed
+            correctly).  If upgrading DBI is unacceptable, change the
+            prerequisite DBI version number in Informix.pm and Makefile.PL
+            (several places) and change uses of DBIc_DBISTATE(xxh) to DBIS
+            in Informix.xs and dbdimp.ec.
+
+1.04.PC1 Release
+----------------
+2002-11-21: Upload to PAUSE and CPAN.
+2002-11-21: Fix the information in Announce and create new version.  The
+            revised release should have been 1.03.PC2.
+
+1.03.PC1 Release
+----------------
+2002-11-21: Upload to PAUSE and CPAN.
+2002-11-19: Remove MD5 checksum material.  Move DBD::Informix::* files from
+            DBD to lib/DBD.
+2002-11-18: Add support for ix_WithoutReplication based on work by Bryan
+            Castillo <Bryan_Castillo@eFunds.com>.  Clean up some of the
+            documentation in Informix.pm, removing most references to
+            behaviour in versions prior to 1.00.
+2002-11-06: Retrofit INSTALLVENDORARCH (courtesy Roderick Schertler
+            <roderick@argon.org> circa 2002-07) and SITEARCHEXP (courtesy
+            Joachim Schrod <jscrod@acm.org> circa 1998-01) into list of
+            directories that might contain the DBI headers.  Add
+            DBD_INFORMIX_ESQLCC_REMOVE_OPTIONS_REGEX to parallel
+            DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX, and fix that so it
+            works.  Partly inspired by an old email from Roderick Schertler
+            again, and partly by testing I4GL compilation.  Note that the
+            tests claim that I4GL 7.3x cannot handle IUS data types -
+            technically true but also slightly misleading (because the
+            ESQL/C that is used with I4GL 7.3x can handle them).  Added
+            DBD_INFORMIX_NO_SBSPACE for IDS 9.x systems with no smart blob
+            spaces defined (see also DBD_INFORMIX_SBSPACE).
+2002-11-05: Guy Fawkes Night - gunpowder, treason and plot (1605-11-05).
+            Add new function date_as_string to TestHarness.pm to ensure
+            that dates are handled properly when client does not set DBDATE
+            and server has DBDATE set to non-default value - a problem
+            previously reported by others, but fixed in response to bug
+            report by Arlene Gelbolingo <Gelbolingo.Arlene@menlolog.com>.
+2002-10-17: Rework release sequence on master machine.
+2002-09-13: Handle CSDK 2.80 (ESQL/C 9.52) revised output from 'esql -V'.
+2002-08-12: Migrate code back to RCS from Atria.
+
+1.02.PC1 Release
+----------------
+2002-06-01: Release 1.02.PC1 stalled.
+2002-02-12: Generate DBD::Informix::Defaults from Makefile.PL to avoid the
+            need for the pause_hack.  Renames Informix.pm.PL as a result.
+2002-01-31: Fix memory leak when statements with input parameters (eg
+            SELECT * FROM SomeTable WHERE SomeColumn = ?) are released
+            without being used.  Problem reported by Polak Michal
+            <Michal.Polak@tconsult.cz> on 2002-01-30, but essentially a
+            repeat of other previous memory leak reports.  Trouble was in
+            dbdimp.ec allocating a descriptor which is not released.
+2002-01-30: Various changes made last year committed.
+2001-08-xx: Some changes made but not committed until 2002.
+
+1.00.PC2 Release
+----------------
+2002-01-31: Update email addresses, web sites, copyright information.
+            Purely repackaging; no functional changes whatsoever.  Change
+            official name to "IBM Informix Database Driver for Perl".
+
+1.01.PC1 Release
+----------------
+2001-05-04: Semi-official release of 1.01.PC1 - not sent to PAUSE and CPAN.
+2001-04-04: Add DBD_INFORMIX_SBSPACE environment variable, defaulting to
+            sbspace, to locate smart blobs for t/t91udts.t test.
+2001-02-26: Change documentation because DBI mailing lists moved from
+            isc.org to perl.org and DBI home page moved from
+            symbolstone.org to dbi.perl.org.
+2001-01-29: Update the esqlc.h header to use esqltypes.h, and the
+            esql7_20.h to work with HP ANSI C compiler.
+2001-01-22: Remove warnings from Makefile.PL when $Config{optimizer} or
+            $Config{ccflags} undefined; problem found by Mike Steinfeld
+             <mikes@openbsdbox.com>.
+2000-09-29: Add support for blob update via use DBD::Informix qw(:ix_types)
+            and $sth->bind_param($n, $val, { ix_type => IX_BYTE }); or
+            $sth->bind_param($n, $val, { ix_type => IX_TEXT });  Yea!
+2000-09-25: Add $DBD_INFORMIX_ESQLLD_NO_G_OPTION to fix problem found on
+            SCO 3.2v5.0.2 by Brad Huan-Ming Kao <proton@iiidns.iii.org.tw>,
+            and $DBD_INFORMIX_ESQLLD_REMOVE_OPTIONS_REGEX to provide a
+            general solution to problems with unwanted linker options.
+2000-09-20: Install INSERT CURSOR code from Paul Palacios <paul@c-group.com>.
+2000-06-08: Add notes on DATABASE EXCLUSIVE, etc, after questions from
+            Jenny Liu <Jenny.Liu@medic.com>.
+2000-05-24: Add FAQ on error -369 from Kevin Brannen.
+2000-05-15: Clarify README file and mention Perl 5.6.x after questions from
+            Georg Schlykow <georg.schlykow@fashy.blackbox-rz.de>.
+2000-05-12: Add LVARCHAR bug fix from Franky Wong <fwong@seattletimes.com>.
+2000-05-12: Rewrite MD5 check sum code using Perl to work on Unix or NT.
+2000-03-28: Add optional fourth argument to TestHarness select_some_data()
+            to map nulls to a visible string.  Avoid dereferencing undefs.
+2000-03-22: Fix decimal formatting (especially for zero); a bug report from
+            Keith Johnson <keith@netcentral.net>
+2000-03-22: Remove drh from private data in database handle.
+
+1.00.PC1 Release
+----------------
+2000-03-17: Upload to PAUSE and CPAN.
+2000-03-03: Code frozen.
+2000-02-29: Bug fix for crash on free() under ActiveState Perl.  Finalize
+            for release to Informix operations and PAUSE/CPAN.
+2000-02-25: Improve build for NT and ActiveState Perl.  Fix memory leak
+            found by Wang Yan <wangyan@buptnortel.com> and Kevin Brannen
+            <kbrannen@physiciansdata.com>.  Add memory_leak_test method to
+            TestHarness, and assume that NT does not support shared memory
+            connections.
+2000-02-17: Finalize the tech support arrangements for this release.
+2000-02-15: Rename Informix.faq to FAQ and merge Informix.Licence and
+            updating.blobs into it.
+2000-02-11: Fix t/t50update.t to use username and password instead of
+            username twice -- spotted by Nick Goddard <nickg@clic.co.uk>.
+2000-02-10: Since XPS does not support unlogged databases at all, skip the
+            unlogged database test.  Some versions of ESQL/C 7.2x (and
+            7.1x) will only link with static libraries regardless of
+            command line options (Bug 102265).  The shared libraries are
+            distributed, so Makefile.PL creates and uses a hacked version
+            of the ESQL/C compiler script.
+2000-02-08: Use inelegant but effective workaround to dynamically find the
+            number of elements to specify in ALLOCATE DESCRIPTOR.  Remove
+            recently added FAQ.  Kludge needed to test ix_NativeTypeNames
+            etc on tables with 400+ columns.
+2000-02-08: Add note to DBD/Informix/TechSupport.pm about Perl 5.005_03 bug
+            tickled by the original version of the detailed test case in
+            bug_report (previously BugReport).  Info from Doug Wilson
+            <dougw@safeguard.net>, who reported the bug and obtained the
+            patch for Perl.  This can be removed in some future incarnation
+            when the fix is generally available.
+2000-02-07: Deprecate ix_NativeTypeNames (plural) attribute and implement
+            ix_NativeTypeName as documented, fixing problem found by Dror
+            Matalon <dror@dnai.com>.  Annotate documentation; add tests.
+            Add notes to FAQs on avoiding -479 errors.
+2000-02-04: Fix licence number handling in Makefile.PL for NT as nmake does
+            not like ${VAR}; found by Tom Kliethermes <tomk@informix.com>.
+            Revise README file.
+2000-02-03: If username and password are specified, connect to '@server'
+            rather than DEFAULT -- improves testing using remote database.
+            Fix Configuration.pm so that it has a sub did_not_read.  Map
+            shared library names from relative to absolute when using 'ld'
+            well as when using 'cc'.
+2000-02-01: Generate error -402, not core dump, on $dbh->prepare(undef).
+2000-02-01: Change official name to "Informix Database Driver for Perl" to
+            avoid trademark problems.  The acronym DBD is claimed by two
+            other companies in the USA, DBD Group (http://www.dbd.com) and
+            Digital By Design (http://www.digitalbydesign.net).  Upgrades
+            to documentation in Informix.pm, thanks to Informix Tech Pubs.
+2000-01-31: Add note in Notes/hpux about Sys::Syslog (email dated
+            1998-08-12 from Kurt D Starsinic <kstar@chapin.edu>).
+2000-01-28: Peeter Pirn <PPirn@lnc.com> reported link problems on AIX 4.2
+            with ESQL/C 9.15.UCx.  The $INFORMIXDIR/lib/libnetstub.so
+            library is rejected by the loader.  Modify the libraries from
+            the esql script to use $INFORMIXDIR/lib/libnetstubshr.a
+            instead, verifying that the file exists and with the override
+            environment variables DBD_INFORMIX_AIX_USENETSTUB to leave
+            things alone.
+2000-01-28: On HP-UX 11.00, ClientSDK 2.40.HC1 (ESQL/C 9.30.HC1) lists the
+            system libraries '-lV3 -lcl -l:libcl.1'.  The first appears to
+            be unused; the second causes the test phase to fail.  Remove
+            these options from the 'ld' link line, and the tests pass.  Two
+            new environment variables, DBD_INFORMIX_HPUX_USELIBV3 and
+            DBD_INFORMIX_HPUX_USELIBCL, can be set to force the link to use
+            those libraries, but this is not recommended.  Note that it is
+            possible to use dynamic loading of the DBD::Informix module on
+            HP-UX 11.00 (and, indeed, on HP-UX 10.20) -- see the notes on
+            HP-UX in the Notes sub-directory!
+2000-01-27: Reinstate the default values of INFORMIXDIR and INFORMIXSERVER
+            after extensive testing with versions such as 0.96.PC1 and
+            0.97002 on CPAN/PAUSE.  Thanks to Honza Pazdzoria for providing
+            an upgraded system to do this.  The technology also allows
+            Informix licence numbers to be inserted.  These are not
+            required for ordinary use of the product, but if you buy
+            Informix Technical Support, you will be given a licence number
+            which can be branded into the product.  Reinstate the test
+            harness as a full-blown module, DBD::Informix::TestHarness; add
+            DBD::Informix::TechSupport and DBD::Informix::Configuration.
+            Merge shared memory connection test into the TestHarness.
+            Remove perlsubs sub-directory, which also makes the test
+            scripts more flexible; after installation, they can be run
+            outside the build directory.  Revise the BugReport and ItWorks
+            scripts to use the new modules.  Add InformixTechSupport as an
+            installed Perl script to: report version numbers, set licence
+            number, do a bug report, and produce the ItWorks output.
+2000-01-14: Fix the BugReport script so that PERL_DBI_DEBUG=9 part works.
+2000-01-01: Control transferred to Informix Software.  The code will now be
+            maintained under Atria Clearcase.  Subject only to PAUSE/CPAN
+            accepting them, the version numbers will conform to Informix
+            standards.  The 1.00 is pretty much self-explanatory.  The P
+            stands for Perl.  The C1 indicates the first production release
+            (Ax and Bx are never used).  If an emergency patch port is
+            made, then the version number will change to 1.00.PC1X1.  You
+            may occasionally encounter 1.00.PC1[ABG]1 versions, which are
+            alpha, beta or gamma version numbers.  Version number stamping
+            is quite different under ClearCase.
+
+Test Releases
+-------------
+The following experimental releases were placed on CPAN to check that
+certain aspects of the distribution actually worked.  The 0.96 series of
+releases and 0.97.PC1 were primarily to check whether CPAN/PAUSE would
+accept the non-numeric characters in the version number (it does).  The
+0.9700x series of releases could be regarded as beta versions.  Any of
+these versions still on CPAN will soon be removed.
+
+2000-02-10: Version 0.97005
+2000-02-10: Version 0.97004
+2000-02-07: Version 0.97003
+2000-01-24: Version 0.97002
+2000-01-19: Version 0.97001
+2000-01-19: Version 0.97.PC1
+2000-01-17: Version 0.96.PC2X2
+2000-01-17: Version 0.96.PC2X1
+2000-01-17: Version 0.96.PC2
+2000-01-17: Version 0.96.PC1X1
+2000-01-17: Version 0.96.PC1
+
+0.95 Release
+------------
+1999-12-30: Create ItWorks script to report on working versions.  Update
+            README; annotate DELIMIDENT as a source of test failures on NT
+            in particular, and probably in general.  Fix esqltest.ec and
+            esqlbasic.ec to accomodate error +25507, as reported by Carrie
+            Coy <carriec@doc.state.vt.us>.  Note that all other ESQL/C
+            error messages are negative, but it only takes one exception to
+            cause problems.  Set version to 0.95 and dispatch to PAUSE and
+            CPAN.  With luck, DBD::Informix gets handed over to Michael
+            Kopchenov <myk@informix.com> from now on.  Jonathan Leffler
+            remains in place as 'product manager'.
+            Wishing everybody a Happy New Millenium (unless you want to
+            wait an extra 367 days for the next millenium to begin).
+1999-12-30: Create 0.95b2 with more NT-inspired changes from MYK.
+1999-12-29: Create 0.95b1 for testing at Informix.  Final release of
+            version 0.95 scheduled for 1999-12-31.  Includes some NT build
+            fixes from Michael Kopchenov <myk@informix.com>.
+1999-12-28: Reorganization of Makefile.PL with subroutines at end was
+            suggested by Medi Montaseri <medi@CyberShell.com> on
+            1998-05-20.  Changes were made for the 0.61 release.
+1999-12-21: Added '-qlanglvl=ansi' change to Makefile.PL for AIX suggested
+            by Joachim Schrod <jscrod@acm.org> in January 1998, and added
+            note about SITEARCHEXP as an alternative to INSTALLSITEARCH.
+            Long overdue -- sorry Joachim.
+1999-12-04: Add notes on URL of Japanese translation of DBD::Informix POD
+            by Kawai Takanori <kawai@nippon-rad.co.jp>.  Modify more tests
+            to skip when appropriate.
+1999-11-27: Modify esqltest to allow shared memory connections.  Modify the
+            multiple connection tests so that they are skipped.  Update notes
+            to match.
+1999-11-19: Make ix_AutoErrorReport obsolete and ineffective.
+1999-11-18: Remove the 'record INFORMIXDIR and INFORMIXSERVER' code and
+            reinstate Informix.pm (instead of Informix.pm.PL) because PAUSE
+            and CPAN get confused when there is no Informix.pm file.  Use
+            SQL_COLNAMELEN instead of NAMESIZE for the column names in
+            dbdimp.ec and dbdattr.ec after bug report and proposed (but
+            different) patch from Nick Osborn <nick@bibliotech.net>.  Pass
+            $NTConfiguration as argument to find_informixdir_and_esql(), a
+            problem afflicting NT builds first reported by Ti Lian Hwang
+            <tilh@sin-co.sg.dhl.com>.  Add ix_ServerVersion, ix_BlobSupport
+            and ix_StoredProcedure attributes to help with XPS support
+            (Robert Wyrick <rob@wyrick.org> helped with XPS testing).
+            Amend tests and documentation.
+1999-11-16: Add Notes/environment.variables after a report from Claude
+            Chartier <cbos@pophost.eunet.lu> that it would be helpful to
+            have INFORMIXCONTIME etc documented.  Add Notes/web.servers for
+            same reason; the notes need to be upgraded to discuss mod_perl
+            for Apache.  Reinstate Bundle::DBD::Informix based on what is
+            in the DBI 1.13 bundle, which seems to work (unlike the attempt
+            at distributing Bundle::DBD::Informix 0.62 as a separate item,
+            which fails).
+1999-11-10: Add MD5 check sums for source code in MD5-DIGEST.  This will
+            allow the DBD::Informix maintenance team to identify any
+            changed source files.  Use the md5.verify script to ensure
+            that the individual files are OK.  To check that MD5-DIGEST
+            itself has not been modified, you run "perl md5.chksum
+            MD5-DIGEST" and compare the output with the official value,
+            which has to be stored somewhere.  In the short term, it
+            will go on a web site (URL to be decided).  All this assumes
+            you have the optional Digest::MD5 module on your machine,
+            so it is listed in the Bundle::DBD::Informix pre-requisites.
+1999-11-02: BugReport needs to be careful of 'id -a' which is an SVR4
+            variation on the POSIX.2 standard.  On Solaris, use
+            /usr/xpg4/bin/id if available, else '/usr/bin/id -a'; on
+            other platforms, assume 'id' lists the auxilliary groups.
+            Probably won't be accurate for some SVR4 systems other than
+            Solaris, but probably won't matter either.  Problem
+            highlighted by Marc Esser <esserma@cerf.net>.
+1999-09-23: Decide that next release will be 0.95.  Create the release
+            checklist file to help ensure that things are done properly.
+            Modify esqlld so that Informix shared libaries are linked with
+            absolute pathnames unless DBD_INFORMIX_RELOCATABLE_INFORMIXDIR
+            is set in the environment.  Won't help if esqlld is not used,
+            as on some machines (eg AIX).
+
+0.62 Release
+------------
+1999-09-19: Change all dates in this file to use 1999 instead of 99.  Add
+            BugReport script to generate information for failure reports,
+            and document accordingly.  Uses "perlsubs/esqlc.pl" for common
+            subroutines shared with Makefile.PL, so make corresponding
+            changes.  Replace DBD::InformixTest (which was never a DBD
+            driver) with "perlsubs/InformixTest.pl"; do not install it.
+            Modify tests and documentation accordingly.  Improve build on
+            AIX 4.2 (no wittering about duplicate symbols).  Move materials
+            from hints subdirectory and auxilliary documentation like
+            Informix.Licence into (new) Notes sub-directory.
+1999-09-17: The DBI headers might be in $INSTALLARCHLIB rather than
+            $INSTALLSITEARCH.  This is the case under Debian.  Problem
+            reported by Roderick Schertler <roderick@argon.org>.  Also, AIX
+            4.2 requires the use of ld to create shared libraries, so do
+            not complain on AIX about the use of ld.
+1999-08-30: Add notes on SERIAL and $sth->{ix_salerrd}[1] after extensive
+            discussions with Kevin Brannen <kbrannen@physiciansdata.com> on
+            this and related matters.  Chase down references to fugue.com
+            and replace with the updated isc.org equivalents.  Add basic
+            support for HOLD cursors (when available, which means with
+            AutoCommmit Off -- AutoCommit On always uses HOLD CURSORS;
+            think about it).  Bill Rothanburg <brothanb@fll-ro.dhl.com>
+            supplied the patch, to whom many thanks.  There are hooks for
+            supporting scroll cursors too, but the actual FETCH code
+            doesn't know how to handle these.  DBI 1.13 doesn't support any
+            attribute on any of the fetch methods, which makes it difficult
+            to do much until DBI moves on.  Fix t/t30update.t to work in
+            non-US locales - problem reported by Arnar M Hrafnkelsson
+            <amh@mbl.is>.
+1999-08-23: Add (remarkably simple) fix to error -451 problem, and test
+            t/t76blob.t to verify the fix.  Fix supplied by Richard Jones
+            <rich@annexia.org>.  Does not appear to fix the t75blob.t core
+            dump problem.
+1999-07-26: Add Informix.faq file with two questions.  Both questions have
+            been asked many times by many people.  Fix mistake in
+            documentation of $sth->{ix_sqlerrd} and $sth->{ix_sqlwarn}, a
+            problem found by Gerd Mucha <Gerd.Mucha@Sisis.de>.
+1999-06-09: Fix top of README file (hint from Veit Jakof <vjakof@baan.nl>).
+1999-05-26: Fix warning about ambiguous use of ${DBI::errstr}, again thanks
+            to David M Davisson <davisson@emuni.com>.  Maybe ${DBI::errstr}
+            should be replaced by ${DBI}::errstr if the braces are
+            retained?  However, removing the braces also removes the
+            warning.
+1999-05-13: Fix CGI examples to use CGI::TR method; info and revisions
+            thanks to David M Davisson <davisson@emuni.com>.  Reduce
+            verbosity of Makefile.PL in default cases -- leave messages for
+            exceptional situations very verbose.
+1999-05-11: Remove trailing newline from error messages after suggestion
+            from Andrew Pimlott <pimlott@abel.math.harvard.edu>.  Also have
+            to modify some of the test code.  Change mind and renumber
+            release from 0.61_03 to 0.62.
+1999-04-28: Modify README file to clarify still more the prerequisites
+            after problems encountered by Cliff J Larson
+            <clarson@aisp.net>.  Change references from GCC to EGCS.  Split
+            t01stproc.t from t00basic.t.  Combine old t72blob.t and
+            t73blob.t into t72blob.t (self-contained test, now).  Revise
+            t73blob.t to test UPDATE of blobs; currently fails.  Revise
+            reference to arcana.co.uk to symbolstone.org.
+1999-04-01: Add $dbh->table_info based on original code from David Bitseff
+            <dbitsef@uswest.com>, and t/t56tabinfo.t to test it.  Add
+            t/t57tables.t to test $dbh->tables.  Override DBD::_::db::tables
+            to get the correct quoting for owner names.
+1999-03-31: Remove $style argument from connect_to_test_database method in
+            InformixTest package.  Corresponding changes in test suite.
+            Increase maximum number of columns in descriptor from 128 to 256.
+            Split old-connection test into t/t83oconn.t.  Update README to
+            refer to t/t00basic.t instead of t/basic00.t, and deprecate the
+            old connection method in t83oconn.t instead of t00basic.t.
+1999-02-16: Fix precision on numeric values in dbd_ix_bindsv, as suggested by
+            David Haubenstricker <haubend@dominos.com>.
+1999-01-11: Fix new variant on password problem in t00basic.t after report
+            (with solution) from Jeff DeFay <jfdefay@acm.org>.
+1998-12-31: Fix bugs when compiling with ESQL/C 5.08.  Problem reported by
+            Larry Timmins <ftiadmin@fhb.clickcharge.com> and Patrick Sweeney
+            <ftidev@fhb.clickcharge.com>.
+1998-12-14: Commence work on major defects in 0.61_02 release.
+
+0.61_02 Release
+---------------
+1998-12-14: Go for general release with known 'bad free()' problems.
+
+0.61_01 Release
+---------------
+1998-12-07; Released internally at Informix.
+1998-11-25: Fix the code to detect NT (Win32) using suggestion from Andy
+            Williams <andy_williams@pa.press.net>.  Ken Scott
+            <kscott@pcisys.net> first identified the problem and sent in an
+            alternative fix using an exact match rather than a regular
+            expression.
+1998-11-23: The code did not get uploaded to CPAN.  Proving tests show that
+            there were problems, especially bad frees on blob testing when
+            run with 'make test', but not when run with the test.one script.
+            Added t/t99clean.t to remove most of the debris from the test
+            database, and add warning to README emphasizing this.  Need to
+            split dbdimp.ec into components (eg dbdimpdr.ec, dbdimpdb.ec,
+            dbdimpst.ec) and amend dbdimp.h to declare newly visible
+            functions because it's over 2000 lines, it's too damn big, and
+            it's going to grow some more before IUS support is really
+            complete.  Drop version numbers from MANIFEST, and tools to
+            maintain them.
+1998-11-17: Add code from Honza Pazdziora <adelton@fi.muni.cz> which records
+            the value of INFORMIXDIR and INFORMIXSERVER used at build time to
+            set the defaults at run-time.  Set version 0.61_01 (experimental).
+1998-11-09: Add DBD_INFORMIX_ESQLC_LINKAGE environment variable after report
+            by Duc H Nguyen <dhn@benvolio.nova.att.com> who states that
+            ESQL/C 7.24.UC[56] (probably on HP-UX 10.20) links with static
+            libraries by default.  He provided a workaround hacking esql.
+            Robert Cowham <CowhamR@logica.com> ran into this problem.
+1998-11-04: Revise assert handling so that assertions are off by default.
+            Code now ignores DBD_INFORMIX_DISABLE_ASSERT and only responds to
+            DBD_INFORMIX_ENABLE_ASSERT instead.
+1998-11-03: Remove test for __STDC__ in esqltest.ec -- it causes unwarranted
+            problems on, for example, AIX and NT and gives minimal benefit on
+            any system, especially since Perl 5.005 has to be compiled by an
+            ANSI C compiler (prototype aware compiler).  Reported by both
+            David Edge <dedge@ak.blm.gov> and Geoffrey Rommel
+            <grommel@sears.com>.
+1998-11-02: Add bundles for DBI and DBD::Informix to simplify the builds.
+1998-10-29: Merge in threading patch from Jan Iven <j.iven@rz.uni-sb.de>.
+1998-10-28: Commence work on IUS compatability.  Abolish DBD_INFORMIX_SERVER;
+            DBD_INFORMIX_DATABASE should contain required server information
+            in the appropriate format.  Add variables DBD_INFORMIX_USERNAME2
+            and DBD_INFORMIX_PASSWORD2.  Fix multi-connection tests so that
+            they use the username and password information (problem found by
+            both Ben Laurie <ben@algroup.co.uk> and Geoffrey Rommel
+            <grommel@sears.com>).  Add and use DBD_IX_BOOLEAN macro to fix
+            problems with MSVC on NT found by Manish Dharwadker
+            <manishd@informix.com>.
+1998-10-27: Add examples subdirectory, and initial examples.
+1998-09-25: Fix esqlc.h for 7.1x ESQL/C so it explicitly includes value.h,
+            thanks to David Edge <dedge@ak.blm.gov>.
+1998-09-04: Fix misuse of $user for $pass in t/t00basic.t, thanks to Kevin
+            White <kwhite@redroof.com>.
+1998-08-13: Version numbering changes.
+
+0.60 Release
+------------
+1998-08-12: Final tidying up and release.
+1998-08-10: Release to Albert W Dorrington <awdorrin@ictest.delcoelect.com>
+            as 0.60b1 to give him HP-UX and GCC fixes.  Partially rework the
+            t00basic.t test to fix the problems accessing databases which
+            require a username and password.
+1998-08-06: Fix problem with error -608 originally reported by Kenji Hino
+            <kenji@alcatraz.net>, related to handling a null blobs.  Maybe
+            this fix also fixed the -451 errors reported by both John Keston
+            <jkeston@wamnet.com> and Brian Renaud <renaud@ans.net>; the
+            change could plausibly resolve that error too, but none of us was
+            able to reproduce the -451 error on demand, so we don't know for
+            sure.
+1998-08-05: Integrate changes by R Bernstein <rocky@panix3.panix.com> which
+            give support for IUS datatype BOOLEAN.  This has not been fully
+            tested on an IUS (IDS/UDO) engine, and may not handle nulls
+            correctly.  It is not complete IUS support by any stretch of the
+            imagination.  Add some new material to the hints directory, even
+            though they are not hints about compiling DBD::Informix.
+1998-07-30: Revise the data_sources method to include the 'dbi:Informix:'
+            prefix mandated by the DBI specification.
+1998-07-29: Finish renaming the tests.  Use MSD/NMD technology to create
+            directory from which distribution is made -- to ensure that
+            correct versions of all library files which are not mastered
+            under the DBD/Informix directory are fully up to date.  Drop
+            sqlcmd.sh as it is (a) unused and (b) superseded by DBI::Shell.
+            Add two new attributes, $sth->{ix_StatementText} and
+            $dbh->{ix_DatabaseName}.  Note that $dbh->{Name} returns the name
+            of the database when DBI->connect() is called, but the name of
+            he current database can be changed by things such as CLOSE
+            DATABASE and DATABASE or CREATE DATABASE statements;
+            $dbh->{ix_DatabaseName} reports the current database name.  When
+            last row is fetched, implicitly close (finish) the cursor, as
+            requested by Tim Bunce.  Explicit finish is only required if the
+            loop is terminated early.
+1998-06-25: Include notes from Yang-Chao lin <ylin@sr.hp.com> about compiling
+            on HP-UX with ESQL/C 5.x or 6.x.  Also upgrade the comments about
+            IUS types for those who do not know anything other than IUS, such
+            as Stephen Pillinger <S.M.Pillinger@cs.bham.ac.uk> who first
+            alerted me to this problem.
+1998-06-16: Include notes from Alex Shah <ashah@atg.eb.com> on __eprintf().
+1998-06-15: Incorporate __eprintf() fix from Bernd Gill <bernd@dsi.co.nz>.
+            Include the HP-UX 10.20 build notes from Reed White
+            <REED_WHITE@HP-Corvallis-om1.om.hp.com>.  Improve esqltest.ec.
+            Add new environment variables DBD_INFORMIX_USE_EPRINTF_CODE and
+            DBD_INFORMIX_DISABLE_ASSERT to Makefile.PL.
+1998-05-19: Change test to fail after trying to drop table dbd_ix_blobtest
+            in t/blob02.t when table exists but cannot be dropped by user.
+            Problem found by Nuno Carneiro de Moura <ncmoura@net.mailcom.pt>.
+1998-03-11: Version numbering changes.
+
+0.59 Release
+------------
+1998-03-11: Make a release to try and resolve ongoing problems at AirTouch.
+            NB: this release not sent to CPAN.
+1998-03-04: Chuck Collins <Chuck.Collins@AirTouch.COM> discovered that the
+            dbd_ix_preparse() routine gets confused by DATETIME and INTERVAL
+            literals -- it was treating '30:20:10' as '30??' because the
+            literals are not inside a string.  Fixed by not recognizing
+            Oracle-style numeric place-holders (Oracle-style named place-holders
+            were already ignored because they can be confused with dbase:table).
+1998-02-20: Chuck Collins <Chuck.Collins@AirTouch.COM> discovered an assertion
+            failing in MODE ANSI databases when an UPDATE didn't update any
+            rows.  Fix assertion to cover this case.  Testing reveals that if
+            you create a database, the logging status, etc, are not set
+            correctly.  This also causes an assertion to fire.
+1998-02-17: DBI 0.93 released with fix for '.xsi' problem.
+1998-02-11: Problem with Informix.xsi resolved.  Needs extra dependency in
+            generated Makefile, which is triggered by the DBI version.
+1998-02-06: Document problems with DBI 0.92 (no Informix.xsi file).
+
+0.58 Release
+------------
+1998-01-15: Finish up NT build work, and release in time for the Win32 Perl
+            Resource Book deadline (phew) and also just before switching jobs
+            from Informix to Visa.  Fix Makefile.PL and README file to make
+            warnings about using ld to create shared libraries with gcc more
+            stringent.  Kevin White <kwhite@redroof.com> and Michael Chandler
+            <mpchandler@fedex.com> both had major problems on HP-UX 10.20
+            with this, and the problems were not fully resolved at release
+            time.  One issue was that the notation 'ENVVAR=value command' did
+            not seem to be setting the environment variable, but Makefile.PL
+            assumes this will work.  Maybe it should use Perl's %ENV instead.
+1998-01-14: More work on NT builds with help from Ken Scott <ken@apisys.net>
+            and Patrick-James Dionisio <dionisio@netscape.com>.
+1998-01-13: Use warn instead of die to report lower than ideal DBI version in
+            Makefile.PL.  Also make corrections for NT builds based on
+            feedback from Ken Scott <kscott@pcisys.net>.
+1998-01-12: Fix dbd_ix_preparse() so it does not convert :alpha into ? after
+            Chuck Collins <Chuck.Collins@AirTouch.COM> pointed out that
+            SELECT * FROM sysmaster:systabnames gives a syntax error in 0.57.
+1998-01-07: Initial attempt at integrating Makefile.NT into Makefile.PL.
+1998-01-06: Modify Makefile.PL to give a reason for failure when stating that
+            you did not read the README file after Michael Chandler
+            <mpchandler@fedex.com> ran into problems identifying the source
+            of such a failure.
+1998-01-05: Update copyright dates.  Change email address for maintainer.
+1997-12-03: Simplify the version testing to ignore the lists of libraries.
+            The test compilation ensures that everything is OK, or not.
+            Also, simply use the local copy of odbctype.h, without checking
+            whether any ODBC is available or not.
+1997-11-18: Steven Hronek <hronek@lsil.com> asked whether ESQL/C was still
+            necessary.  Ensure that README is absolutely clear that it is,
+            and mention DBD::ODBC as a possible alternative.
+
+0.57 Release
+------------
+1997-11-17: Final clean up and testing.  Version 0.56 released.
+1997-10-19: Handle the 'esql -libs' process rather differently, because of
+            the bug in older versions of the esql script which do not echo
+            the name of the netstub library when necessary (a problem found
+            by Rodger Anderson <rodger@hpbs2245.boi.hp.com> in July, but only
+            now resolved).  Record information about compiling with c4gl only
+            in Informix.Licence, after answering questions from Paul Falbe
+            <paul@cassens.com>.
+1997-10-08: Change the name of the sqlca element of imp_dbh to ix_sqlca to
+            avoid the macro renaming used in threaded versions of ESQL/C such
+            as on Windows 95 and Windows NT.  This change and success with a
+            Windows 95 and Windows NT port reported by Harald Ums
+            <Harald.Ums@sevensys.de>.  Also a change to esqlc.h, triggered by
+            the need to use sqlproto.h, and use io.h in place of unistd.h in
+            ixblob.ec, and do not release 'unreleased' blobs...  Makefile.PL
+            still to be upgraded.
+1997-10-08: Record Informix ESQL/C's ability to change the environment
+            without Perl knowing about it, after the problem found by Jay
+            Ludoviconi <jludovic@paging.mot.com> was tracked down.
+1997-10-03: Add Working.Versions file after a suggestion by Nuno Carneiro de
+            Moura <ncmoura@net.mailcom.pt>
+1997-08-13: Add file hints/static.build with info about building statically
+            linked Perl executables from Kent S Gordon <kgor@inetspace.com>.
+            Clean up function entry and exit reporting.
+1997-08-01: Add _tables and _columns metadata methods.
+1997-07-29: Update to use the templates from DBI v0.89, etc.  Amend README
+            after Kent S Gordon <kgor@inetspace.com> noted that the engine
+            version information could be useful.
+1997-07-21: Add dbd_ix_preparse() (based on code in DBD::ODBC 0.15) to
+            pre-process an SQL statement, replacing Oracle-style :x notation
+            with question mark place holders.  This allows DBD::Informix to
+            support $sth->{NUM_PARAMS} properly, and reinstates functionality
+            present in DBD::Informix 0.24 but summarily removed in version
+            0.25.  Interestingly, of course, noone has complained, or even
+            commented on this.
+1997-07-16: Kenji Hino <kenji@alcatraz.net> found that the test t/blob02.t
+            failed for logged OnLine databases because of the changed
+            AutoCommit handling; alter the criterion for doing $dbh->commit.
+            Jason Bodnar <jcbodnar@mail.utexas.edu> found that the
+            documentation for $dbh->do() was faulty; add the undef parameter
+            for the unused \%attr documented by DBI.
+1997-07-14: Deal with the last of the deprecated attributes.  Work around the
+            oddities (changes) introduced by ESQL/C 9.12.
+
+0.56 Release
+------------
+1997-07-10: Final clean up and testing (and workaround for problem in DBI
+            0.85 when connections fail at connect time).
+            Version 0.56 released.
+1997-07-09: Establish that DBI->connect(...,{AutoCommit=>0}) does not set the
+            AutoCommit attribute until after the basic connect operation is
+            complete.  DBD::Informix therefore cannot reject connections on
+            unlogged databases in the basic connect operation.  Modified
+            Informix.Licence after Raj Goel <frostbit@brainlink.com> needed
+            to ask questions.  The difficulty with 'newbies' is that they
+            quickly cease to be newbies so you need a continuous supply of
+            new newbies.  Fix documentation in Informix.pm for AutoCommit,
+            and behaviour of ix_InTransaction attribute.  Many thanks to Hank
+            Robinson <cudau@csv.warwick.ac.uk> for his help clarifying the
+            required behaviour of AutoCommit, and apologies for omitting his
+            name in the original version of the 0.56 release notes.
+1997-07-08: Make $dbh->{ix_AutoErrorReport} a synonym for $h->{PrintError}.
+1997-07-07: Jason Bodnar <jcbodnar@mail.utexas.edu> pointed out that
+            $sth->execute() is not returning undef when an error occurs.
+1997-06-25: Roderich Schupp <roderich@nodebonn.muc.bmw.de> found a similar
+            problem using $dbh->do($stmt, undef, $arg1, $arg2), core dumping
+            in the link code.  This could be reproduced with the as-released
+            0.55 DBD::Informix but appears to be fixed, presumably by the fix
+            for Fred's problem.  Also, ensure the t/dbase.t unsets both
+            $ENV{DBI_DSN} and $ENV{DBI_DBNAME} to allow the implicit connect
+            test to work (deduced from test output sent by Fred Arnold).
+            Move comments about Solaris compiler into new file hints/solaris.
+            Move README.M88K.SVR4 to hints/M88K.SVR4.
+1997-06-24: Found problems in DBI 0.84 where PrintError, RaiseError, ChopBlanks
+            as handled by DBI cannot be unset -- Tim confirmed it is a bug in
+            DBI and will be fixed in the next release.
+1997-06-23: Core dump problem found by Fred Arnold <ftarnol@uswest.com> in the
+            code in link.c and the way it is used.  One part of the problem
+            was that the IMPSET flag for a statement was not being set soon
+            enough, so that DBI was not releasing the statement from the
+            linked lists correctly.  The temporary fix includes a bodge that
+            converts the deleted link into a single item linked list, so that
+            when it is released again, it doesn't screw things up.  This
+            needs to be cleaned up.  A 0.56a1 release was sent to Fred to get
+            him over the immediate problem.
+1997-06-17: Jason Bodnar <jcbodnar@mail.utexas.edu> pointed out that BEGIN
+            WORK is not being recognized via $dbh->do().  Testing showed a
+            problem during disconnect on 7.1x servers (related to the B42204
+            problem fixed on 97-05-30).  Fixing the disconnect was relatively
+            simple.  Fixing the BEGIN WORK issues required the removal of the
+            custom implementation of $dbh->do(), and some other changes.
+1997-06-13: Where there's one bug, there are usually others.  The other array
+            attributes for statements (such as $sth->{NAME}) were not being
+            mortalized and could be made to eat up memory if used inside an
+            inner loop.  Upgrade non-distributed test bug001.t to catch these
+            leaks too.
+1997-06-12: Fix trailing blanks on $sth->{NAME} attributes after problem
+            reported by Roderich Schupp <roderich@nodebonn.muc.bmw.de>.  Also
+            fix t/chopblanks.t not to create VARCHAR columns in SE.
+1997-05-30: Fix memory leak when using the $sth->{ix_sqlerrd} and
+            $sth->{ix_sqlwarn} attributes repeatedly, reported by Oyvind
+            Gjerstad <ogj@tglobe1.tollpost.no>.  The arrays in newSqlerrd()
+            and newSqlwarn() were not being mortalized as they should be.
+1997-05-30: Only set -Ae on HP-UX when using cc, as reported by Nathan
+            Neulinger <nneul@umr.edu> who was using gcc.  Also find and
+            implement the CLOSE DATABASE workaround for bugs B42204 and
+            B64926 which lead to -1800 errors when a 7.x ESQL/C application
+            is talking to a 5.0x engine, also reported by Nathan.
+1997-05-29: Add support for $sth->rows and add simple test.
+1997-05-26: Add support for DBI->DataSources from DBI v0.82.  Update required
+            software accordingly.
+1997-05-23: Fix Makefile.PL to recognize $INFORMIXDIR/bin at end of PATH,
+            thanks to Paul Kulchenko <paul@mega.donetsk.ua>.
+1997-05-20: Change the handling of deprecated attributes per Informix.pm.
+            Fix esqltest.ec when the same MODE ANSI database is used for both
+            connections (thanks to Kent S Gordon <kgor@inetspace.com> for
+            reporting this).
+
+0.55 Bug-Fix Release
+--------------------
+1997-05-20: ESQL/C Version 5.0x testing previously inadequate, and SQLSTATE
+            does not exist in 5.0x, sothe compilation fails.  Also fixed the
+            core dumps from t/nulls01.t and t/nulls02.t (nasty workaround)
+            and the failure message in t/dbase.t.  Tested with 5.06.UC1,
+            6.00.UE1, 7.22.UC2 and 9.10.UC2 on Sun Sparc 20 running Solaris
+            2.5.1, using 2 Perl configurations: Perl 5.003 with GCC 2.7.2.2
+            and Perl 5.004 with SUNWspro C Compiler SC3.0.1 -- all OK.
+            Version 0.55 released.
+1997-05-19: Change the handling of deprecated attributes per Informix.pm.
+
+0.54 Release
+------------
+1997-05-16: Another major rework on Informix.Licence to make the requirements
+            clearer to people with minimal exposure to Informix, after Honza
+            Pazdziora <adelton@fi.muni.cz> had some problems with it.  Add
+            notes from Anibal Jodorcovsky <anibal@nortel.ca> about
+            compilation on Motorola M88K SVR4 machines in README.M88K.SVR4.
+            Version 0.54 released.
+1997-05-15: ChopBlanks code added and tested.  VARCHAR was bad!  Statement
+            level ChopBlanks attribute not tested (probably not operational;
+            attribute probably remains as it was when the statement was
+            prepared).
+1997-05-13: Finish adding driver fetch function, and consequential changes.
+            SQLSTATE now available via DBI::state!
+1997-05-05: Revise ixblob.ec to use ixblob.h and transfer to general library.
+            Eliminate BLOB_DUMMY_VALUE and BLOB_NULL_VALUE (can't think what
+            they were to be used for!).  Consequential changes.
+1997-04-24: Add fix in Makefile.PL for DEC OSF/1 and ESQL/C 7.22 from Andrew
+            Hunt <andy@toolshed.com>.  Reverse order of updates in ChangeLog.
+            DEC OSF/1 changes also reported later by Debbie Ingram
+            <djingram@mindspring.com>.
+1997-04-08: Add attribute $sth->{ix_Fetchable} to determine whether the
+            statement needs data fetching or not.  Add this to sqlcmd.sh, which
+            enables basic simulation of the full SQLCMD program.  Still need
+            better Getopt module which allows for multiple occurrences of a
+            single option on the command line (eg: multiple -e or -f options).
+            Also need better handling of filenames versus commands in the rest
+            of the arguments.  Note that the build process does not (yet) do
+            anything with the source code of sqlcmd.sh.
+1997-04-01: Add '-Ae' for HP-UX unless $Config{ccflags} includes -Aa or -Ae,
+            per information from Oyvind Gjerstad <ogj@tglobe1.tollpost.no>.
+            Include $Config{ccflags} in the command line when building the
+            ESQL/C test program.
+1997-03-28: Correct the handling of $dbase2 in multiple connections tests when
+            DBD_INFORMIX_DATABASE2 is not set.  Fix required after John C
+            Hossfeld <john@netpub.com> had problems.  Also report which database
+            is being connected to!  Problem (and solution) also subsequently
+            reported by James F Miner <jfm@winternet.com>.
+1997-03-26: Add ODBC type handling.
+1997-03-20: Update Makefile.PL to handle relocated DBIXS.h header, again.
+1997-03-18: Change the handling of deprecated attributes per Informix.PM.
+
+0.53 Release
+------------
+1997-03-06: Change the handling of deprecated attributes per Informix.PM.
+            Update the README file to spell out the pre-requisites better.
+            Update Makefile.PL with 0.53a1 version number, and so that it
+            insists that $INFORMIXDIR is set, and that $INFORMIXDIR/bin is in
+            $PATH.  Update tests to use the non-deprecated attributes.  Add the
+            test program esqltest.ec to check that the ESQL/C environment is OK
+            before creating the Makefile.
+1997-03-10: No changes over the weekend - the skiing at Squaw was fabulous!
+            Update the POD to encourage the use of DBI->connect() in preference
+            to $drh = DBI->install_driver().  Add two new, but fore-shadowed,
+            driver attributes, ix_CurrentConnection and ix_ActiveConnections,
+            though they're currently only set when the driver is loaded.
+1997-03-17: Update Informix.Licence to contain more comprehensive information
+            on licencing and Netscape's LiveWire Pro.  Update t/updcursor.t so
+            it passes on a logged (non-MODE ANSI) database.  Fix the problem
+            with nulls found by Oyvind Gjerstad <ogj@tglobe1.tollpost.no> and
+            now immortalized in the test case t/nulls02.t.  Change version to
+            0.53 and release.
+
+0.52 Release
+------------
+1997-03-05: Add ESQL/C => DBD::Informix statement mapping to POD in Informix.PM,
+            after suggestion by Bill Mitlyng <Bill.Mitlyng@abnamro.com>.
+1997-03-03: Use $DBI::VERSION to determine where DBIXS.h should be found.
+1997-03-02: Split attribute handling code from dbdimp.ec into dbdattr.ec.
+            Add dbd_ix_module() function.  Revise the interface to the functions
+            dbd_st_{FETCH|STORE} to match dbd_db_{FETCH|STORE} (they now take a
+            pointer to imp_sth_t argument instead of a pointer to SV).
+1997-02-28: Add the Informix.Licence file to explain the licencing issues for
+            Informix-ESQL/C.  Update the README file.  Fix the caching of
+            attributes.  Add 'deprecated' warning to the system, and a way of
+            turning the deprecated warnings off.  Use this method in
+            InformixTest.pm.  Add the attribute handling of ix_XyZ as well as
+            deprecating the corresponding XyZ attribute.  Fix the handling of
+            SQLCA so that the inserted serial number is available, etc.  Version
+            bumped to 0.52.
+
+0.51 Release
+------------
+1997-02-26: Add $sth->{CursorName} and $dbh->{ConnectionName}.  Add test
+            updcursor.t to check that you can do 'UPDATE ... WHERE CURRENT OF'.
+            Add ".DEFAULT." as an explicit way of making the default connection.
+            Release version 0.51, and a patch, version 0.51p1.
+1997-02-25: Version bumped to 0.51.  Nulls on SELECT handled correctly.  Test
+            nulls01.t added.  Notes on access to the SQLCA record added to the
+            POD in Informix.PM, after this omission was noted by Torsten Stein
+            <stein@cls.de>.
+1997-01-23: Fix InformixTest.pm so it works with perldoc.  It seems that perldoc
+            does not like lines which start with a single quote.  Thanks to
+            Jason Bodnar <jcbodnar@mail.utexas.edu> for pointing this problem
+            out. Add and use stmt_err to report errors or warnings, and document
+            it.
+
+0.50 Release
+------------
+1997-02-13: Version 0.50 released.  Handle null database names on connect so
+            that CREATE DATABASE, etc, can be used.  ESQL/C 5.0x has to handle
+            this by doing nothing (successfully) in dbd_ix_database(), but the
+            disconnect code needs to know that there is no database so it
+            doesn't try to close the current database.  This requires interface
+            changes for dbd_ix_database() and dbd_ix_connect().  Add testing.
+            Thanks to Serge Davidov <serge@fcmc.com> for finding the problem.
+            You can also use DBI->connect('@server','','','Informix'), which
+            actually worked in v0.25.  DBD::Informix is still confused, in
+            general, by statements such as CLOSE DATABASE.
+1997-01-12: Version bumped to 0.50p1, for consistency with documented intentions
+            when 0.25 release was made.
+
+0.26 Release
+------------
+1997-01-12: Use cursors WITH HOLD when a MODE ANSI database is working with
+            AutoCommit set On.  Make transaction tests more sensitive.
+            This release never made public.
+1997-01-09: Updated copyright messages.  Improved documentation.  Fixed tests.
+            Add $dbh->{InTransaction} query.  Clean up dbdimp.ec so that
+            AutoCommit works better. Etc.  Version 0.26a2.
+1996-12-20: Get transaction stuff to work, more or less, with AutoCommit On or
+            Off, in MODE ANSI or Logged databases.  Tests t/transact0[123].t
+            added, but these still need to be more formally verified.  They
+            pass with OnLine and any type of database.  Clean up various tests
+            so that they pass on MODE ANSI databases.  Add select_some_data
+            and select_zero_data functions to InformixTest.pm. Etc.  Version
+            0.26a1.  Use bug-fixed version of decsci.c (ouch!).
+1996-12-19: Add install instructions to README file after Wes Gamble
+            <wgamble@informix.com> pointed out this omission.  Add extensive
+            notes to Informix.PM on transaction management.  Implement most
+            of what those notes say (WITH HOLD cursors omitted at the
+            moment).
+1996-12-18: Fix bug in patched Makefile.PL (need space before __H_LOCALEDEF).
+            Updated dbd_ix_setconnection() to take connection information, and
+            updated code in dbdimp.ec to ensure that the correct connection is
+            set before starting work.  Simple testing more or less works.  Some
+            more major revisions, such as not passing SV* to most of the code in
+            dbdimp.ec (let the Informix.c code convert as much as possible to
+            plain C).  Rework the 'do' function to completely override
+            DBI::_::db::do, avoiding problems with the rows() function.
+
+0.25 Patch 2
+------------
+1996-12-13: Update Makefile.PL to help the AIX people.  Version 0.25p2 created
+            but only the Makefile.PL changes sent to the dbi-users@fugue.com so
+            not released officially, though available publicly.
+
+0.25 Patch 1
+------------
+1996-12-10: Handle 5.00 and 5.01 by supplying actual array names to GET
+            DESCRIPTOR, thus bypassing the bug.  Note that it does affect 5.01
+            too; edited esql5_00.h to match.  Patch sent to Jeff Rowe who
+            confirms it works.  (Note to JL: 5.01 found on Godzilla; what is
+            installed as 5.00 is actually 4.10 ESQL/C).  Version 0.25p1 created
+            but not released officially or publicly.
+
+0.25 Release
+------------
+1996-12-09: Finally worked out how SQL descriptors handle blobs.  Code now works
+            safely with blobs located in memory.  However, with ESQL/C 7.21.UC1
+            on Solaris 2.4, there is a memory leak corresponding to the space
+            allocated for the blobs for a given statement unless you manually
+            release it before deallocating the descriptor.  This is nasty, and
+            may not be true of other versions.  Added test t/blob02.t.  Note
+            that t/blob03.t uses the data created by t/blob02.t, so it must be
+            run (reasonably successfully) before t/blob03.t can be run
+            successfully.  Use decsci.[ch] code (plus auxilliary function
+            decgen() inside dbdimp.ec) to format FLOAT, SMALLFLOAT, DECIMAL and
+            MONEY quantities.  The 5.0x and 6.0x libraries do not always handle
+            these gracefully.
+
+With Thanks to the DBD::Informix v0.25 Testing Team:
+John Wang - wangj@aromat.com
+Del Simmons - del@infoman.com
+Dave Thomas - dave@thomases.com
+Oyvind Gjerstad - ogj@tglobe1.tollpost.no
+Jeff Rowe - j.p.rowe@larc.nasa.gov
+Rodlyn Joseph - bluephi@sharpcomm.com
+Duc Nguyen - dhn@benvolio.nova.att.com
+Serge Davidov - serge@fcmc.com
+
+1996-12-05: More revisions to Makefile.PL, some putting teeth into the
+            prerequisites, some more dealing with DEC OSF (there's a compiler
+            flag to say set __STDC__, as there usually is).  Rename nm_* inside
+            the imp_sth structure.  Redefine the type of imp_sth->blobs and
+            upgrade code to match.  Test t/blob03.t passes; some work to do to
+            get t/blob04.t to pass.  Improved README.  Etc.
+1996-12-04: Update Makefile.PL to overcome Dave Thomas problems on DEC OSF
+            (version 25.13 sent to him for approval, and comments incorporated
+            into version 25.14 .. 25.16).  Also finish converting the tests in
+            the t directory.
+1996-12-03: Update Makefile.PL (and esqlcc) to use '$(FULLPERL) esqlcc' etc.
+            Rename the extratests directory to t for automatic testing as
+            documented in the Test::Harness module.  Create (and document)
+            InformixTest.pm to help with the test programs.  Note that
+            test.pl does not exploit it all that much because it has to test
+            some more basic stuff.  However, the other tests do use it.
+            NB: ESQL/C 5.00 and 5.01 have a bug in the SQL descriptor code
+            which means that using 'char *' as a type restricts you to precisely
+            3 characters of data.  This is fixed in 5.02 and above.  Dammit!
+1996-12-02: Release 0.25b3 with some work incomplete.  Update Makefile.PL so
+            that "make perl" works.  Note that INSERT and blobs does not work!
+1996-12-01: Upgrade Makefile.PL to use new Perl scripts esqlcc, esqlsed and
+            esqlld to protect platforms such as DEC OSF/1 where the C
+            compiler is not used to link shared libraries.  Also, only use
+            GCC warnings when DBD_GCC_DEBUG is set in the environment.  Also
+            use $(RM_F) to remove the generated C files instead of $(RM) so
+            that it works for platforms like SCO where $(RM) is not defined
+            by MAKE automatically.
+1996-11-30: Move sqlca handling to connection (not statement).
+            Fix blob handling to the extent that SELECT works.  (INSERT and
+            UPDATE still need fixing.  INSERT will probably be able to adapt
+            the SELECT code to handle blobs.  UPDATE will be very tricky.
+            Memory leaks may (probably) occur.
+            Upgrade Makefile.PL to always set INFORMIXC when compiling ESQL/C.
+1996-11-26: Feedback from beta testers incorporated into build process.
+            Not all problems will be resolved yet.  Version 0.25b2.
+1996-11-25: Changes leading up to 0.25b1 release.  Add sqlca record handling
+            for statements.  Add use of EXEC IMMEDIATE when feasible.
+1996-11-19: Rewrite of dbdimp.ec more or less complete.  The ESQL/C code
+            has been almost totally rewritten; the Perl interface code is
+            still similar to what was there previously.  Nearly ready to go
+            into release.  5.0x ESQL/C not linking OK on Solaris; not sure
+            why.  7.21 is doing fine.
+1996-11-01: Control transferred to Jonathan Leffler <johnl@informix.com>.
+
+0.24 Release
+------------
+1996-09-26: Patches from Terry arrived.  This'll be the 0.25 release.  Seems to
+            work.
+
+0.23 Release
+------------
+1996-09-18: Wrapped in a patch to Makefile.PL from Christophe Martin.  Added
+            some other Makefile.PL patches of my own.  It should now support
+            cleaner builds on HP-UX (spit!) and correctly detect when dbdimp.ec
+            has changed.
+1996-09-18: Wrapped in patches by Terry Nightingale based on Bill Hailes'
+            isqlperl for supporting multi-cursors.  Cleaned the type handling
+            code again.
+1996-09-17: Added patch for bad column names as show in George Vicherek's
+            splendid test case. (extratests/primitives.pl exercises this)
+
+0.22 Release
+------------
+1996-09-10: Fixed all numeric types to return correctly.  CHAR fields don't
+            quite behave as planned, or perhaps they do.  Added 'multicursor'
+            test which proves that simultaneous multiple cursors fail miserably.
+1996-09-09: Added @ary = $drh->func('_ListDBs'); method for getting a list of
+            extant databases on the local Informix server.  (From original code
+            and suggestion by George.Vicherek@Sciatl.COM)
+
+0.21 Release
+------------
+1995-09-01: Fixed truncated INTEGER bug.  Other numerical types still screwed.
+            Patch on the way.
+
+Pre-Release
+-----------
+1996-04-14: Added support for CREATE, DROP, INSERT, UPDATE and DELETE.  Fixed
+            $DBI::errnum and $DBI::errstr problems.  Fixed Informix.pm to stop
+            reporting MSQL_HOME errors.  Fixed Makefile.PL.  Removed hacky
+            'build' file and uses Makefile.PL exclusively now.
+1995-10-17: After a good break of about a month and a half, back in the saddle.
+            We have data from SELECTs coming back from the database!  Released
+            0.20pl0 Disney on ftp.mcqueen.com.  Limited hacker release.
+1995-08-18: Started.  Version 0.0.0 (Totally pre-alpha!)
+
+--------------
+
+Jonathan Leffler <jleffler@google.com>
+@(#)$Id: ChangeLog,v 2015.4 2015/11/01 06:49:48 jleffler Exp $

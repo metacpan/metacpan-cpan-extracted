@@ -1,0 +1,53 @@
+- remove shared variables (our ())
+- use strict 'refs' in DB/DbgrProperties.pm, DB/DbgrContext.pm and perl5db.pl
+- breakpoint on error
+- breakpoint on return should break before the function
+  returns, otherwise they're not that useful
+- breakpoint on return don't work for lvalue subroutines when using
+  the pure-Perl debugger
+  (probably not possible with pure Perl)
+- make stop not exit
+- check if it is possible to remove the eval() from context_get
+- fix stack depth/context id handling in properrty_get
+  - stack depth > 0 for anything but function arguments
+  - if there is both a lexical $foo and a package $foo, there is no
+    way of fetching the package variable
+- fix breakpoint_set return value
+- fix the fact that breakpoint_set can set multiple breakpoints
+- fix breakpoint_update -n option
+- watchpoints do not distinguish undef from empty string
+  (because of eval)
+- sub eval {} goes to great lenghts to always produce at least one value
+  which looks suspicious
+- breakpoint_update to disable does not work with watchpoints
+- add extended_properties feature
+- aggressively disable DB::DB/DB::sub
+  - when entering DB::DB
+  - when evaluating breakpoint conditions
+  - when calling DB::RedirectStdOutput methods
+- try very hard not to reset iterator state on arrays/hashes,
+  or at least try to restore it afterwards
+- source command on Perl 5.8 and 5.10 does not return POD
+  check in-memory and on-disk source match and get the POD from the disk file
+- property_set
+  - implement data page, context id, stack depth
+  - get rid of the special case that tries to manually quote strings
+- test
+  - interactive mode (prints banner when used with -e, maybe it does
+    other stuff as well)
+  - feature_set/feature_get
+    - individual features
+  - breakpoints
+    - breakpoint_get/update/remove/list for all breakpoint types
+      (line/call/return/conditional/watch)
+    - temporary breakpoints for all breakpoint types, plus
+      interaction with enable/disable
+  - context_get (combinations of stack depth and context)
+  - property_get/property_value
+    - stck depth/context combination
+    - max size
+    - long names
+    - treatment of tied/overloaded values
+      (not sure whether is should bypass tie/overload or not)
+  - break
+- (maybe) replace DB::Data::Dump with a trampoline that loads data dumper

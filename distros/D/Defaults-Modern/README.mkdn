@@ -1,0 +1,157 @@
+# NAME
+
+Defaults::Modern - Yet another approach to modernistic Perl
+
+# SYNOPSIS
+
+    use Defaults::Modern;
+
+    # Function::Parameters + List::Objects::WithUtils + types ->
+    fun to_immutable ( (ArrayRef | ArrayObj) $arr ) {
+      # blessed() and confess() are available (amongst others):
+      my $immutable = immarray( blessed $arr ? $arr->all : @$arr );
+      confess 'No items in array!' unless $immutable->has_any;
+      $immutable
+    }
+
+    package My::Foo {
+      use Defaults::Modern;
+
+      # define keyword for defining constants ->
+      define ARRAY_MAX = 10;
+
+      # Moo(se) with types ->
+      use Moo;
+
+      has myarray => (
+        is      => 'ro',
+        isa     => ArrayObj,
+        writer  => '_set_myarray',
+        coerce  => 1,
+        builder => sub { [] },
+      );
+
+      # Method with optional positional param and implicit $self ->
+      method slice_to_max (Int $max = -1) {
+        my $arr = $self->myarray;
+        $self->_set_myarray( 
+          $arr->sliced( 0 .. $max >= 0 ? $max : ARRAY_MAX )
+        )
+      }
+    }
+
+    # Optionally autobox list-type refs via List::Objects::WithUtils ->
+    use Defaults::Modern 'autobox_lists';
+    my $obj = +{ foo => 'bar', baz => 'quux' }->inflate;
+    my $baz = $obj->baz;
+
+    # See DESCRIPTION for complete details on imported functionality.
+
+# DESCRIPTION
+
+Yet another approach to writing Perl in a modern style.
+
+. . . also saves me extensive typing ;-)
+
+When you `use Defaults::Modern`, you get:
+
+- [strictures](https://metacpan.org/pod/strictures) (version 2), which enables [strict](https://metacpan.org/pod/strict) and makes most warnings
+fatal; additionally [bareword::filehandles](https://metacpan.org/pod/bareword::filehandles) and [indirect](https://metacpan.org/pod/indirect) method calls are
+disallowed explicitly (not just in development environments)
+- The `v5.14` feature set (`state`, `say`, `unicode_strings`, `array_base`) -- except for
+`switch`, which is deprecated in newer perls (and [Switch::Plain](https://metacpan.org/pod/Switch::Plain) is
+provided anyway).
+
+    `experimental` warnings are also disabled on `v5.18+`.
+
+- **carp**, **croak**, and **confess** error reporting tools from [Carp](https://metacpan.org/pod/Carp)
+- **blessed**, **reftype**, and **weaken** utilities from [Scalar::Util](https://metacpan.org/pod/Scalar::Util)
+- All of the [List::Objects::WithUtils](https://metacpan.org/pod/List::Objects::WithUtils) object constructors (**array**,
+**array\_of**, **immarray**, **immarray\_of**, **hash**, **hash\_of**, **immhash**,
+**immhash\_of**)
+- **fun** and **method** keywords from [Function::Parameters](https://metacpan.org/pod/Function::Parameters) configured to
+accept [Type::Tiny](https://metacpan.org/pod/Type::Tiny) types (amongst other reasonably sane defaults including
+arity checks)
+- The full [Types::Standard](https://metacpan.org/pod/Types::Standard) set and [List::Objects::Types](https://metacpan.org/pod/List::Objects::Types) -- useful in
+combination with [Function::Parameters](https://metacpan.org/pod/Function::Parameters) (see the ["SYNOPSIS"](#synopsis) and
+[Function::Parameters](https://metacpan.org/pod/Function::Parameters) POD)
+- **try** and **catch** from [Try::Tiny](https://metacpan.org/pod/Try::Tiny)
+- The **path** object constructor from [Path::Tiny](https://metacpan.org/pod/Path::Tiny) and related types/coercions
+from [Types::Path::Tiny](https://metacpan.org/pod/Types::Path::Tiny)
+- **maybe** and **provided** definedness-checking syntax sugar from [PerlX::Maybe](https://metacpan.org/pod/PerlX::Maybe)
+- A **define** keyword for defining constants based on [PerlX::Define](https://metacpan.org/pod/PerlX::Define)
+- The **|M|** match operator from [match::simple](https://metacpan.org/pod/match::simple)
+- The **sswitch** and **nswitch** switch/case constructs from [Switch::Plain](https://metacpan.org/pod/Switch::Plain)
+- The **qc**, **qcw**, and **qc\_to** code-interpolating keywords from
+[Quote::Code](https://metacpan.org/pod/Quote::Code) (as of Defaults::Modern `v0.11.1`)
+- [true](https://metacpan.org/pod/true).pm so you can skip adding '1;' to all of your modules
+
+If you import the tag `autobox_lists`, ARRAY and HASH type references are autoboxed
+via [List::Objects::WithUtils](https://metacpan.org/pod/List::Objects::WithUtils):
+
+    use Defaults::Modern 'autobox_lists';
+    my $itr = [ 1 .. 10 ]->natatime(2);
+
+[Moo](https://metacpan.org/pod/Moo) version 2+ is depended upon in order to guarantee availability, but not
+automatically imported:
+
+    use Defaults::Modern;
+    use Moo;
+    use MooX::TypeTiny;   # recommended for faster inline type checks
+
+    has foo => (
+      is  => 'ro',
+      isa => ArrayObj,
+      coerce  => 1,
+      default => sub { [] },
+    );
+
+If you're building classes, you may want to look into [namespace::clean](https://metacpan.org/pod/namespace::clean) /
+[namespace::sweep](https://metacpan.org/pod/namespace::sweep) or similar -- [Defaults::Modern](https://metacpan.org/pod/Defaults::Modern) imports an awful lot of
+Stuff:
+
+    use Defaults::Modern;
+    use Moo;
+    use namespace::clean;
+    # ...
+
+# SEE ALSO
+
+This package just glues together useful parts of CPAN, the
+most visible portions of which come from the following modules:
+
+[Carp](https://metacpan.org/pod/Carp)
+
+[Function::Parameters](https://metacpan.org/pod/Function::Parameters)
+
+[List::Objects::WithUtils](https://metacpan.org/pod/List::Objects::WithUtils) and [List::Objects::Types](https://metacpan.org/pod/List::Objects::Types)
+
+[match::simple](https://metacpan.org/pod/match::simple)
+
+[Path::Tiny](https://metacpan.org/pod/Path::Tiny)
+
+[PerlX::Maybe](https://metacpan.org/pod/PerlX::Maybe)
+
+[Quote::Code](https://metacpan.org/pod/Quote::Code)
+
+[Scalar::Util](https://metacpan.org/pod/Scalar::Util)
+
+[Switch::Plain](https://metacpan.org/pod/Switch::Plain)
+
+[Try::Tiny](https://metacpan.org/pod/Try::Tiny)
+
+[Types::Standard](https://metacpan.org/pod/Types::Standard)
+
+[Type::Tiny](https://metacpan.org/pod/Type::Tiny)
+
+# AUTHOR
+
+Jon Portnoy &lt;avenj@cobaltirc.org>
+
+Licensed under the same terms as Perl.
+
+Inspired by [Defaults::Mauke](https://metacpan.org/pod/Defaults::Mauke) and [Moops](https://metacpan.org/pod/Moops).
+
+The code backing the **define** keyword is forked from TOBYINK's
+[PerlX::Define](https://metacpan.org/pod/PerlX::Define) to avoid the [Moops](https://metacpan.org/pod/Moops) dependency and is copyright Toby
+Inkster.

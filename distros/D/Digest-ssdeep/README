@@ -1,0 +1,29 @@
+Digest-ssdeep version 0.9.0
+
+This module provides simple implementation of ssdeep fuzzy hashing also known
+as Context Triggered Piecewise Hashing (CTPH).
+
+Please, refer to Jesse Kornblum's paper for a detailed discussion (L<SEE ALSO>).
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES
+
+Text::WagnerFischer - An implementation of the Wagner-Fischer edit distance.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013, Reinoso Guzman
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

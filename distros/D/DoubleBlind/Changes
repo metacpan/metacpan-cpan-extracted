@@ -1,0 +1,6 @@
+Revision history for Perl extension DoubleBlind.
+
+0.01  Wed Feb 20 14:07:28 2008
+	- original version; created by h2xs 1.23 with options
+		-AOXn DoubleBlind -b 5.5.0
+

@@ -1,0 +1,16 @@
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+t/date.t
+t/bug31037.t
+t/bug32315.t
+lib/Date/Simple.pm
+lib/Date/Simple/Fmt.pm
+lib/Date/Simple/ISO.pm
+lib/Date/Simple/D8.pm
+lib/Date/Simple/NoXS.pm
+README
+COPYING
+Simple.xs
+ChangeLog
+META.yml                                 Module meta-data (added by MakeMaker)

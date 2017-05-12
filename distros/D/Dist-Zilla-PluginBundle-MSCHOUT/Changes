@@ -1,0 +1,87 @@
+Revision history for Dist::Zilla::PluginBundle::MSCHOUT
+
+0.31  2016-08-30
+    - Configure Git::Push to also push build/releases if it exists on origin
+    - signature test: skip generated files
+
+0.30  2016-08-30
+    - Mention use_travis and use_twitter options in POD docs
+    - add MetaJSON plugin
+
+0.29  2016-07-04
+    - 0.28 accidentally completely removed Git::Push. Fixed.
+
+0.28  2016-07-04
+    - back out build/releases push config - this auto pushes anayway if remote
+      branch exists.
+
+0.27  2016-07-04
+    - add use_travis option to enable the TravisYML plugin
+    - configure Git::Push to push build/releases as well as master branch
+
+0.26  2016-07-02
+    - fix typo causing breakage if use_twitter was set (oops)
+
+0.25  2016-07-02
+    - enable Twitter plugin if 'use_twitter' is set
+    - use RemovePrereqs to remove Module::Signature from prereqs since its
+      optional
+    - add missing dependency CheckPrereqsIndexed
+
+0.24  2016-06-30
+    - PodWeaver: allow SOURCE and AUTHOR(S) sections to be overridden.
+
+0.23  2016-06-27
+    - switch from deprecated BumpVersionFromGit to Git::NextVersion.  This is a
+      drop-in replacement.
+
+0.22  2011-05-30
+    - use CheckPrereqsIndexed plugin
+    - add "task" option which replaces Pod::Weaver with Task::Weaver, and uses
+      AutoVersion
+
+0.21  2011-05-13
+    - use Pod::Elemental::Transformer::List
+
+0.20  2011-02-01
+    - add Pod::Weaver::PluginBundle::MSCHOUT
+
+0.19  2011-01-25
+    - code cleanups.
+    - doc fixes.
+    - add release_branch configuration arg
+
+0.18  2011-01-24
+    - enable Git::CommitBuild, building releases on build/releases branch.
+    - Git::Tag tags on build/releases branch now
+
+0.17  2011-01-18
+    - update to work with Dist::Zilla 4.x [(Auto)Prereq -> (Auto)Prereqs)]
+    - require Dist::Zilla 4.102341
+
+0.16  2010-05-03
+    - add NextRelease back in - was missing since 0.13
+
+0.15
+    - add Git::CommitBuild plugin
+
+0.14
+    - if no_upload is true, remove ConfirmRelease
+
+0.13  2010-04-14
+    - simplify with Dist::Zilla::PluginBundle::Easy
+    - require Dist::Zilla 2.101040
+
+0.12  2010-04-09
+    - add Pod::Weaver::Section::SourceGitHub, Pod::Weaver::Section::BugsRT
+      to prereq's
+    - use ArchiveRelease plugin
+    - add BumpVersionFromGit plugin
+    - use FakeRelease releaser
+    - BumpVersionFromGit fix first_version
+
+0.11  2010-03-29
+    - turn off CPAN uploads, use ArchiveRelease releaser plugin
+
+0.10  2010-03-29
+    - initial release

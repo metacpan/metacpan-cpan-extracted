@@ -1,0 +1,64 @@
+#
+#	IMG release 10.3.3 ER2+
+#	Version: dictionary.cantata,v1.3 2007/06/29
+#
+VENDOR	Cantata	2754
+
+#
+#	Standard attribute
+#
+ATTRIBUTE	Cantata-AVPair           	1	string	Cantata
+ATTRIBUTE	Cantata-NAS-Port         	2	string	Cantata
+
+#
+#	Voice over IP attributes
+#
+ATTRIBUTE	Cantata-voip-dst-sig-ip-in	23	string	Cantata
+ATTRIBUTE	Cantata-h323-conf-id     	24	string	Cantata
+ATTRIBUTE	Cantata-setup-time       	25	string	Cantata
+ATTRIBUTE	Cantata-call-origin      	26	string	Cantata
+ATTRIBUTE	Cantata-call-type        	27	string	Cantata
+ATTRIBUTE	Cantata-connect-time     	28	string	Cantata
+ATTRIBUTE	Cantata-disconnect-time  	29	string	Cantata
+ATTRIBUTE	Cantata-Q931-disconnect-cause	30	string	Cantata
+ATTRIBUTE	Cantata-h323-gw-id       	33	string	Cantata
+ATTRIBUTE	Cantata-h323-incoming-conf-id	35	string	Cantata
+ATTRIBUTE	Cantata-voip-dst-rtp-ip-in	36	string	Cantata
+ATTRIBUTE	Cantata-media-dst-rtp-ip 	37	string	Cantata
+ATTRIBUTE	Cantata-release-source   	38	string	Cantata
+ATTRIBUTE	Cantata-dnis-pre-translate	39	string	Cantata
+ATTRIBUTE	Cantata-ani-pre-translate	40	string	Cantata
+ATTRIBUTE	Cantata-dnis-post-translate	41	string	Cantata
+ATTRIBUTE	Cantata-ani-post-translate	42	string	Cantata
+ATTRIBUTE	Cantata-call-direction   	43	string	Cantata
+ATTRIBUTE	Cantata-trunk-grp-in     	44	string	Cantata
+ATTRIBUTE	Cantata-trunk-grp-out    	45	string	Cantata
+ATTRIBUTE	Cantata-voip-src-rtp-ip-in	46	string	Cantata
+ATTRIBUTE	Cantata-lost-packets     	47	string	Cantata
+ATTRIBUTE	Cantata-voip-src-sig-ip-in	48	string	Cantata
+ATTRIBUTE	Cantata-voip-dst-sig-ip-out	49	string	Cantata
+ATTRIBUTE	Cantata-voip-dst-rtp-ip-out	50	string	Cantata
+ATTRIBUTE	Cantata-voip-src-rtp-ip-out	51	string	Cantata
+ATTRIBUTE	Cantata-voip-src-sig-ip-out	52	string	Cantata
+ATTRIBUTE	Cantata-translate-cause-code	53	string	Cantata
+ATTRIBUTE	Cantata-voip-src-rtp-fqdn	54	string	Cantata
+ATTRIBUTE	Cantata-voip-src-sig-fqdn	55	string	Cantata
+ATTRIBUTE	Cantata-voip-dst-rtp-fqdn	56	string	Cantata
+
+ATTRIBUTE	Cantata-credit-time      	102	string	Cantata
+ATTRIBUTE	Cantata-h323-return-code 	103	string	Cantata
+ATTRIBUTE	Cantata-redirect-number  	106	string	Cantata
+
+#
+#	SIP Attributes
+#
+ATTRIBUTE	Cantata-call-id          	141	string	Cantata
+ATTRIBUTE	Cantata-prev-hop-via     	144	string	Cantata
+ATTRIBUTE	Cantata-prev-hop-ip      	145	string	Cantata
+ATTRIBUTE	Cantata-incoming-req-uri 	146	string	Cantata
+ATTRIBUTE	Cantata-outgoing-req-uri 	147	string	Cantata
+ATTRIBUTE	Cantata-next-hop-ip      	148	string	Cantata
+ATTRIBUTE	Cantata-next-hop-dn      	149	string	Cantata
+ATTRIBUTE	Cantata-sip-resp-code    	150	string	Cantata
+ATTRIBUTE	Cantata-sip-attempt-info 	151	string	Cantata
+

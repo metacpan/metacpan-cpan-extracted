@@ -1,0 +1,15 @@
+Release history for Dist-Zilla-Util-Git-Refs
+
+0.002000 2013-12-20T14:54:30Z
+ - Reimplement internals with UtilRole::MaybeGit
+ - Update the tests to work on git 1.3, the earliest I can test.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see Changes.deps{,.all,.dev} for
+   details
+ - runtime: +1 -2
+ - test: +2
+
+0.001000 2013-12-09T09:54:07Z
+ - First version.
+

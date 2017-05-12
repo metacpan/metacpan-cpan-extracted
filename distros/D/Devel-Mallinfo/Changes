@@ -1,0 +1,59 @@
+Copyright 2007, 2008, 2009, 2010, 2011, 2014 Kevin Ryde
+
+This file is part of Devel-Mallinfo.
+
+Devel-Mallinfo is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License as
+published by the Free Software Foundation; either version 3, or (at
+your option) any later version.
+
+Devel-Mallinfo is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+General Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with Devel-Mallinfo.  If not, see <http://www.gnu.org/licenses/>.
+
+
+Version 14, December 2014
+    - config.pl in top directory might help non-Unix systems
+
+Version 13, August 2014
+    - debian bits Pre-Depends
+
+Version 12, November 2011
+    - doc tweaks
+
+Version 11, February 2011
+    - fixes for perl 5.6 and earlier
+
+Version 10, September 2010
+    - test manifest only as an author test
+
+Version 9, July 2010
+    - MANIFEST.SKIP also .obj
+
+Version 8, July 2010
+    - MANIFEST.SKIP vc80.pdb so as not to tickle 0-Test-DistManifest.t
+
+Version 7, July 2010
+    - relax the compile+link test to try to work on ms-dos
+
+Version 6, January 2010
+    - tests add MANIFEST.SKIP gcc built files on msdos for Test::DistManifest
+
+Version 5, January 2010
+    - new glibc malloc_stats(), malloc_stats(), malloc_trim(), when available
+
+Version 4, August 2009
+    - new home page
+
+Version 3, April 2008
+    - debian dir fixes, attempt config.pl fixes for msdos
+
+Version 2, December 2007
+    - notice missing malloc.h in the build
+
+Version 1, December 2007
+    - the first version

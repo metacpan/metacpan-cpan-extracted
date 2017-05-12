@@ -1,0 +1,26 @@
+CHANGES
+inc/Module/AutoInstall.pm
+inc/Module/Install.pm
+inc/Module/Install/AutoInstall.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Include.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DateTime/Util/Calc.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+t/01-poly.t
+t/02-minmax.t
+t/03-trig.t
+t/05-search.t
+t/06-moment.t
+t/07-mod.t
+t/08-truncate.t
+t/99-pod-coverage.t
+t/99-pod.t

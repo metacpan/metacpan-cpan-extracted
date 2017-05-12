@@ -1,0 +1,41 @@
+Revision history for Perl extension GTM.
+
+0.01  Wed Jan 19 08:31:42 2005
+	- original version; created by h2xs 1.22 with options
+		-A -n gtm2perl
+	- Functions imported from previous project
+	- GTM Database functions working as &gtm2perl::funcname()
+	- Perl wrappers for all core functions (to validate GVNs)
+0.05  Sat Feb 05 15:23:10 2005
+	- All functions rewritten as XSUBs, speed improved
+	- Perl wrappers removed
+0.10  Tue Feb 08 10:28:37 2005
+	- Package reworked into an object with parallel access support
+	- Documentation started
+1.00  Tue Feb 08 13:54:39 2005
+	- Support for TIEHASH and TIESCALAR functions
+	- copy() enhanced to copy one objects into another
+1.10  Wed Feb 09 19:06:22 2005
+	- sub() function added, merge() destination now optional
+	- haschildren() function added, children() bug fixed
+1.11  Fri Feb 11 09:28:18 2005
+	- Renamed package from GTM to Db::GTM, submitted to CPAN
+	- Adjusted internal references, test scripts, etc..
+1.12  Mon Feb 14 15:27:34 2005
+	- Fixed a bug with clobber() in 'extapi.m'
+1.20  Fri Feb 18 09:52:13 2005
+	- get, order, query, children use buffers for increased speed
+	- GT.M version detection
+	- limits imposed on global names, support for long names in GTM 5
+        - warnings to STDERR disabled by default when called as an object;
+          enabled by default when used as tied scalar/hash
+	- Strings passed to GTM as structures for increased speed 
+1.21  Mon Apr 4 14:34:02 2005
+	- order/first/last/next/prev etc.. return the full name as a
+	  list when called in list context
+	- Get/Order/Children/Query will short-circuit exit when called
+	  in void context (they won't call-in to GTM at all)
+1.27  Mon Sep 12 19:15:43 PDT 2005
+	- Transaction support added (painfully)
+	- Support for the M locking system
+        - Bugfix to using a $db->node as the 2nd argument to copy()

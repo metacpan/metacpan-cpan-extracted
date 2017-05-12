@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+LICENSE
+
+lib/Date/Discordian.pm
+t/00load.t
+t/01basic.t
+t/02inverse.t
+t/03object.t
+t/04bugs.t
+t/05nonepoch.t
+

@@ -1,0 +1,48 @@
+---
+abstract: 'There can be only one'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MakeMaker-Highlander
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::MakeMaker::Highlander:
+    file: lib/Dist/Zilla/Plugin/MakeMaker/Highlander.pm
+    version: '0.004'
+requires:
+  Dist::Zilla::Role::InstallTool: '0'
+  List::Util: '1.33'
+  Moose: '2'
+  namespace::autoclean: '0'
+  perl: v5.10.0
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-MakeMaker-Highlander.git
+version: '0.004'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+  - 'Karen Etheridge <ether@cpan.org>'

@@ -1,0 +1,11 @@
+1.20110709 2011-07-08 17:37:36 America/Los_Angeles
+    - fixed typo (Alex Hartmaier, RT #69074)
+
+1.20110621 2011-06-21 08:02:00 America/Los_Angeles
+    - fixed documentation typo (Caleb Cushing, GH #1)
+
+1.20110614 2011-06-14 16:04:43 America/Los_Angeles
+    - fixed type coercion errors, with help from #moose
+
+1.20110611.0641 2011-06-10 23:41:23 America/Los_Angeles
+    - first version released to a hopeful world

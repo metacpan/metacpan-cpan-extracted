@@ -1,0 +1,191 @@
+
+
+		    SYBASE, INC.
+
+       SOFTWARE DOWNLOAD LICENSE AGREEMENT 
+
+NOTICE TO USER: BY INSTALLING THIS SOFTWARE YOU ACCEPT ALL THE TERMS
+AND CONDITIONS OF THIS AGREEMENT. PLEASE READ THEM CAREFULLY.
+
+THIS SOFTWARE DOWNLOAD LICENSE AGREEMENT (THE "AGREEMENT") ACCOMPANIES
+THE PERL DRIVER PROGRAM AND RELATED EXPLANATORY MATERIALS (THE
+"PROGRAMS"). THE TERM "PROGRAMS" ALSO SHALL INCLUDE ANY MODIFIED
+VERSIONS OR UPDATES OF THE PROGRAMS PROVIDED TO YOU BY SYBASE. AT THE
+END OF THIS AGREEMENT, YOU WILL BE ASKED TO ACCEPT IT TO CONTINUE TO
+INSTALL THE PROGRAMS. IF YOU DO NOT ACCEPT THIS AGREEMENT YOU MAY NOT
+DOWNLOAD THE PROGRAMS.
+
+UPON YOUR ACCEPTANCE OF THIS AGREEMENT, SYBASE GRANTS YOU A LIMITED,
+NON-EXCLUSIVE LICENSE TO USE THE PROGRAMS AS FOLLOWS:
+
+  1.LICENSE GRANT.
+    Subject to the terms and conditions of this Agreement, You are
+    granted a non-exclusive, non-transferable, royalty free license
+    to:
+
+    (a) reproduce, install and use the Programs solely for your
+    internal business purposes;
+
+    (b) reproduce and distribute the unmodified Programs : (i) on a
+    stand-alone basis; or (ii) incorporated into an application
+    developed by You using the Adaptive Server® Anywhere program (or
+    SQL Anywhere program) licensed by you under the terms of a
+    separate license agreement entered into between You and Sybase,
+    Inc. ("Your Application");
+
+  2.LICENSE RESTRICTIONS; DISTRIBUTION REQUIREMENTS.  
+    In consideration for and as a condition to exercising the rights
+    granted under 1(b) above, You agree that:
+
+    (a) If You are distributing the Programs on a stand-alone basis,
+    in the form made available to you by Sybase, You will include a
+    copy of this license Agreement with the Programs;
+
+    (b) If You are distributing the Programs incorporated into Your
+    Application, You will distribute the Programs pursuant to a
+    written agreement between You and your end user, which at a
+    minimum, substantially containsincludes the substance of the
+    provisions in Sections 3,4,6,8,9 and 10 of this Agreement;
+
+    (c) You are not authorized to distribute the Adaptive Server
+    Anywhere program or portions thereof unless authorized to do so
+    under the terms of a written agreement entered into between You
+    and Sybase, Inc.;
+
+    (d) You will not charge a fee for the Programs, although You may
+    charge a fee for Your Application;
+
+    (e) You will not use any Sybase product name, logo(s) or
+    trademarks in connection with Your Application unless authorized
+    to do so under the terms of a written agreement entered into
+    between You and Sybase, Inc.;
+
+    (f) Sybase reserves all rights not expressly granted;
+
+    (g) You agree to defend, indemnify and hold Sybase harmless from
+    and against all claims, liabilities, damages and suits
+    (collectively "Claims"), including reasonable attorneys' and
+    expert fees arising out of or in connection with the use or
+    distribution of the Programs, except to the extent that such claim
+    is directly based on the unmodified Programs as originally
+    provided by Sybase;
+
+    (h) Sybase will have no obligation to provide support to You or
+    your end users in connection with the Programs.
+
+  3.COPY RESTRICTIONS AND OTHER RESTRICTIONS.
+    Except as specifically permitted in the documentation, you may not
+    modify or adapt the Programs in whole or in part (including but
+    not limited to translating or creating derivative works) or
+    reverse engineer, decompile or disassemble the Programs (except to
+    the extent applicable laws specifically prohibit such
+    restriction). You may not use the Programs for timesharing, rental
+    or service bureau purposes. You shall not remove any copyright
+    notices or other proprietary notices from the Programs or
+    Documentation and you must reproduce such notices on all copies or
+    extracts of the Programs and Documentation. Results of benchmark
+    or other performance tests run on the Programs may not be
+    disclosed to any third party without Sybase's prior written
+    consent.
+
+  4.COPYRIGHT AND OWNERSHIP.
+    The Programs are owned by Sybase, its subsidiaries or their
+    suppliers and are protected by copyright laws and international
+    treaty provisions. You acquire only the non-exclusive right to use
+    the Programs as permitted herein and do not acquire any rights of
+    ownership in the Programs.
+
+  5.SUPPORT.
+    These download Programs are provided on an "as is" basis and are
+    unsupported. This Agreement does not entitle you to any
+    maintenance or other services or any updates or new versions of
+    the Programs.
+
+  6.U.S. GOVERNMENT RESTRICTED RIGHTS.
+    The Programs are restricted commercial computer software. If this
+    license is acquired under a U.S. Government contract, Use,
+    duplication or disclosure by the U.S. Government is subject to
+    restrictions set forth in this Agreement or in a written license
+    agreement which incorporates applicable FAR provisions, for
+    example FAR subparagraphs 52.227-19. Sybase reserves all
+    unpublished rights under the United States copyright laws.
+
+  7.TERMINATION.
+    This Agreement and your license to use the Programs will continue
+    so long as you remain in compliance with the terms and conditions
+    of this AgreementSybase reserves the right to revise or terminate
+    this Agreement upon notice to You. Notice may be posted online, or
+    sent via email or postal mail to the address you provided during
+    registration. All disclaimers of warranties and limitations of
+    liability shall survive any termination of this
+    Agreement. Termination of this Agreement will not affect any
+    licenses to use the Programs properly granted prior to such
+    termination. Sybase may immediately terminate your license to use
+    the Programs on notice to you if you breach any of your
+    obligations hereunder. Upon termination of your license to use the
+    Programs, you shall cease using the Programs and shall destroy all
+    copies of the Programs (and associated Documentation) in any
+    form. All disclaimers of warranties and limitations of liability
+    shall survive any termination of this Agreement. Termination will
+    not affect any licenses to the Programs proprly granted by You
+    prior to such termination.
+
+  8.LIMITED WARRANTY.
+    The Programs are provided AS IS, without any warranty
+    whatsoever. You assume the full responsibility for the selection
+    of the Programs to achieve your intended results and for the
+    installation, use and results obtain from the Programs. SYBASE
+    DISCLAIMS ALL WARRANTIES AND CONDITIONS, EXPRESS OR IMPLIED,
+    INCLUDING WITHOUT LIMITATION THE IMPLIED WARRANTIES OR CONDITIONS
+    OF MERCHANTABLE QUALITY, NONINFRINGEMENT, AND FITNESS FOR A
+    PARTICULAR PURPOSE.
+
+  9.LIMITATION ON LIABILITY.
+    NEITHER SYBASE, ITS SUBSIDIARIES NOR ANY OF ITS LICENSORS SHALL BE
+    LIABLE FOR ANY LOSS OR DAMAGE HEREUNDER, INCLUDING, WITHOUT
+    LIMITATION, ANY LOSS OR INACCURACY OF DATA, LOSS OF PROFITS OR
+    DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES,
+    EVEN IF SUCH PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+
+ 10.EXPORT.
+    You agree to fully comply with all laws and regulations of the
+    United States and other countries ("Export Laws") to assure that
+    neither the Programs or any direct products thereof are (1)
+    exported, directly or indirectly, in violation of Export Laws, or
+    (2) are used for any purpose prohibited by Export Laws, including,
+    without limitation, nuclear, chemical or biological weapons
+    production.
+
+ 11.GOVERNING LAW; COMPLETE AGREEMENT.
+    This Agreement constitutes the complete agreement between the
+    parties with respect to the Programs and is governed by the laws
+    of the State of California (other than its conflict of law
+    provisions).
+
+BY SELECTING BELOW "YES I AGREE TO THE ABOVE CONDITIONS", YOU
+ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD AND AGREE TO BE BOUND BY
+THE TERMS AND CONDITIONS OF THE SOFTWARE LICENSE AGREEMENT, THAT YOU
+ARE DULY AUTHORIZED TO DO SO AND THAT YOU REPRESENT AND WARRANT YOUR
+COMPLIANCE WITH EACH OF THE FOLLOWING STATEMENTS:
+
+1. You are not a citizen, national or resident of, or under the
+control of the government of Cuba, Iran, Iraq, Libya, North Korea,
+Sudan, Syria, Yugoslavia or any other country to which the United
+States has prohibited export.
+
+2. You will not export or re-export the Programs, directly or
+indirectly, to the above mentioned countries nor to citizens, natonals
+or residents of those countries.
+
+You are not listed on the U.S Department of Commerce Table of Denial
+Orders and you agree not export or re-export the Programs, directly or
+indirectly, to persons on this list.
+
+You agree not to use, or permit the use of, the Programs for any
+purposes prohibited by U.S. law, including, without limitation, for
+the development, design or production of nuclear, chemical or
+biological weapons.
+
+
+___________ Yes, I agree to the above conditions

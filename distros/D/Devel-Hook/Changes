@@ -1,0 +1,46 @@
+Revision history for Devel-Hook.
+
+0.006   Fri Feb 27 2014
+        - BUG FIX: in CPAN RT #87054 Reini Urban
+          pointed POD mistakes for the newer Perl's
+        - Fixed t/03meta.t - warning about 
+              use Test::More no_plan => 1;
+
+0.005   Fri Mar  3 2008
+        - fixed silly mistake in regex at t/10error.t
+        - corrected the docs about the direct relationship
+          of order in the array of blocks versus the
+          execution order
+        - added a test to verify the straighforward
+          relation between array order and execution
+          order of blocks
+        - I discovered that in XS code testing for 
+          PL_unitcheckav (with #ifdef) did not work as 
+          intented - now trying with KEY_UNITCHECK
+        - added an exploratory test for Perl semantics
+          of special code blocks
+
+0.004   Sun Mar  2 2008
+        - support manipulating array of UNITCHECK blocks
+          (for Perls that have it)
+        - new test for bad block arguments
+        - no actual need for ppport.h (considering API
+          for 5.006+ Perls)
+
+0.003   Sat Mar  1 2008
+        - enable prototypes in Hook.xs
+        - it is useless to try to support 5.005
+          (big API changed introduced by 5.006 seems
+          to have changed a lot of things)
+        - perl minimum version is 5.006
+
+0.002   Sat Mar  1 2008
+        - fixed mistake and omissions in Makefile.PL
+        - no 'our' for 5.005's sake
+        - require warnings::compat (if < 5.006)
+        - POD and POD coverage tests
+        - (will it be enough to build/test/install in 5.005?)
+
+0.001   Fri Feb 29 2008
+        - first working and half-documented version
+

@@ -1,0 +1,62 @@
+{
+   "abstract" : "Automatically include GitHub meta information in META.yml",
+   "author" : [
+      "Chris Williams <chris@bingosnet.co.uk>",
+      "Ricardo SIGNES <rjbs@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-GithubMeta",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "4.101582",
+            "Dist::Zilla::Role::MetaProvider" : "4.101582",
+            "IPC::Cmd" : "0",
+            "Moose" : "1.07",
+            "MooseX::Types::URI" : "0.03",
+            "Try::Tiny" : "0",
+            "perl" : "5.008005",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/bingos/dist-zilla-plugin-githubmeta",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/bingos/dist-zilla-plugin-githubmeta.git",
+         "web" : "https://github.com/bingos/dist-zilla-plugin-githubmeta"
+      }
+   },
+   "version" : "0.54"
+}
+

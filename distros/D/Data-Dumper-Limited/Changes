@@ -1,0 +1,11 @@
+Revision history for Perl extension Data-Dumper-Limited
+
+0.03  Wed Oct 02 12:53 2013
+  - Don't ship MYMETA.* to CPAN.
+
+0.02  Sat Aug 18 12:18 2012
+  - Memory allocation fix - prevents segfaults on large structures.
+
+0.01  Tue Aug  8 17:09 2012
+  - original version as uploaded to CPAN.
+

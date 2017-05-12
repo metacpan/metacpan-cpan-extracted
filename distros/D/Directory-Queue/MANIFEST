@@ -1,0 +1,22 @@
+Changes
+MANIFEST			This list of files
+META.yml			Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+VERSION
+eg/README
+eg/dqt.pl
+lib/Directory/Queue.pm
+lib/Directory/Queue/Normal.pm
+lib/Directory/Queue/Null.pm
+lib/Directory/Queue/Set.pm
+lib/Directory/Queue/Simple.pm
+t/1main.t
+t/1normal.t
+t/1null.t
+t/1simple.t
+t/2frontend.t
+t/2set.t
+t/2table.t
+t/3pod.t
+t/4podcov.t

@@ -1,0 +1,13 @@
+Current structure of the *_data tables:
+1. Blob
+	word  - contains word to look up
+	idx - blob containing id's of all documents containg that word
+		along with number of occurances
+2. Column
+	word_id - contains id of word to look up
+	doc_id - contains id of doc
+	count - contains number of occurances
+3. Phrase
+	word_id - contains id of word to look up
+	doc_id - contains id of doc
+	idx - contains locations of occurances

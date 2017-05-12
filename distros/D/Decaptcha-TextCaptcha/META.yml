@@ -1,0 +1,25 @@
+---
+abstract: 'solve captchas from textcaptcha.com'
+author:
+  - 'gray <gray@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.52'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Decaptcha-TextCaptcha
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Lingua::EN::Words2Nums: '0'
+  perl: '5.010'
+resources:
+  repository: https://github.com/gray/decaptcha-textcaptcha
+version: '0.02'

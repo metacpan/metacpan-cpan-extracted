@@ -1,0 +1,18 @@
+Changes for DateTimeX::Immutable
+
+0.36 - Fri Oct 16 10:54:41 EDT 2015
+    Wraps methods that return durations object as they mutate their arguments.
+    These methods shouldn't throw exceptions, but need special treatment.
+    [Recommend all users upgrade]
+
+0.35 - Mon Dec 22 09:23:13 EST 2014
+    Adds Class::Method::Modifiers to the prereqs. I knew Role::Tiny needed
+    this to use method modifiers, just forgot to include it. Thanks
+    cpantesters.
+
+0.34 - Fri Dec 19 17:10:58 EST 2014
+    Initial release
+
+0.33 - Fri Dec 12 17:44:33 EST 2014
+    Cleaned up initial implementation
+

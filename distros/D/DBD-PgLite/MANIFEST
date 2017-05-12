@@ -1,0 +1,11 @@
+MANIFEST
+README
+LICENSE
+Todo
+Changes
+Makefile.PL
+lib/DBD/PgLite.pm
+lib/DBD/PgLite/MirrorPgToSQLite.pm
+t/001_pglite_tests.t
+t/002_mirror_tests.t
+META.yml                                 Module meta-data (added by MakeMaker)

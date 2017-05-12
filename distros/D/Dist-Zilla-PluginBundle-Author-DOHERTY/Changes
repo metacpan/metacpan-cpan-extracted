@@ -1,0 +1,163 @@
+Revision history for Perl module Dist-Zilla-PluginBundle-Author-DOHERTY
+
+0.40      2016-06-11
+  - switch installer default from [DualBuilders] to [MakeMaker] (GH#8, ether)
+
+0.39      2014-09-08
+  - Allow specifying which remote to get metadata from
+
+0.38      2014-08-27
+  - Include intallation instructions
+  - Munge POD before converting to README.mkdn
+  - Bootstrap ourselves
+  - Include github metadata [gh-5]
+
+0.37      2013-08-07
+  - Fix sharedir validation
+
+0.36      2013-08-04
+  - Support custom sharedir locations
+
+0.35      2013-03-30
+  - Bump Dist::Zilla version requirement for test_requires support
+  - Require DZP::App::Command::cover
+
+0.34      2013-03-02
+  - Allow configuring max_target_perl for Test::MinimumVersion
+
+0.33      2013-02-02
+  - Replace makemaker/modulebuild settings with custom_build
+
+0.32      2012-11-24
+  - Check that we're on the right branch before releasing
+  - Check that there are no fixup! or squash! commits
+  - Require Git::Check 1.122460 - allow_dirty is once again an
+    exact string match, but if your repo_root is not the dzil
+    root, then the paths in allow_dirty are interpreted
+    relative to the dzil root, instead of the repo_root [RT #78898]
+  - Permit setting whether to include MB or EUMM tools
+
+0.31      2012-07-29
+  - Allow setting is_strict and has_version in Test::Version
+
+0.30      2012-06-16
+  - Add fork_is_authoritative to make GitHub::Meta point
+    to your fork instead of the parent repo (ie in the
+    case where you are the new maintainer)
+  - Allow releasing to Google Code
+  - Use DualBuilders to make Module::Build and ExtUtils::MakeMaker
+    play nicer together
+  - Totally revamp the internals
+  - Allow --release-to, --fake-release, and --offline flags
+  - Set NO_TEST=1 to skip TestRelease and CheckExtraTests
+
+0.29      2012-06-14
+  - Adjust the files that can be dirty for Git::Check
+
+0.28      2012-06-14
+  - Only do post-release stuff if it was a real release
+  - Require @GitHub 0.22
+    - bug related to finding a fork's parent repo
+    - Now uses Config::Identity to get credentials
+
+0.27      2012-05-25
+  - Add SchwartzRatio plugin
+  - Allow setting github = 0 to disable GitHub::Meta and GitHub::Update
+
+0.26      2012-03-03
+  - Produce README.mkdn
+  - Actually accept push_to multiple times, as advertised
+
+0.25      2012-01-17
+  - Bump version prereq for my Pod Weaver pluginbundle - bugfixes
+
+0.24      2011-12-15
+  - Don't include dist.ini in the dist
+  - Don't index corpus/
+  - Don't include v in the version number
+  - Don't use prereqs, just list them as prereqs
+
+v0.23     2011-08-27
+  - Also make GH URL point at metacpan
+  - Make signed tags
+  - Include -TRIAL on trial releases
+  - Allow specifying the git remote to push to after release
+
+0.021     2011-08-24
+  - Fix documentation for enabling/disabling TestingMania tests
+  - Require newer Dist::Zilla::Plugin::GitHub, which points metadata to parent forks on GH
+  - Tweet URL to metacpan
+
+0.020     2011-07-08
+  - Also ship Build.PL
+
+0.019     2011-05-09
+  - Bump MinimumPerl version to scan only perl files
+  - Add Clean plugin to run clean automatically after release
+  - Renamed no_twitter to twitter
+
+0.017     2011-04-19
+  - Use goo.gl for URL shortening
+
+0.016     2011-04-17
+  - Update Github plugins
+  - Remove TestingMania version prerequisite
+  - Remove Repository/Bugtracker (covered by Github::Meta)
+
+0.015     2011-04-02
+  - Add support for specifying the changelog filename
+
+0.014     2011-02-18
+  - Attempt to use Git::Commit and Git::Push properly
+  - Use OurPkgVersion instead of PkgVersion - much better
+  - Require 0.0017 for ROKR's plugins - bugfixes
+
+0.012     2011-02-06
+  - Require D::Z::PB::TestingMania 0.003 for a better dep tree & PodLinkTests
+  - Add CopyMakefilePLFromBuild
+
+0.011     2011-01-24
+  - Use new name for Pod::Weaver pluginbundle
+
+0.010     2011-01-24
+  - Renamed to Dist::Zilla::PluginBundle::Author::DOHERTY
+  - Added support for using SurgicalPodWeaver via surgical in dist.ini
+  - Bumped minimum version of InstallRelease to hopefully detect failed installs
+
+0.009     2011-01-23
+  - Handle the case where it is a fake release
+  - Use is.gd to shorten URL for Twitter
+
+0.008     2011-01-18
+  - Fixed spurious warning
+  - Require support for p3rl.org in GithubUpdate
+
+0.007     2011-01-18
+  - Fixed undef plugin error when no_twitter is set
+  - Allow README to be dirty when releasing (again?)
+
+0.006     2011-01-18
+  - Tweet releases
+  - Update github information on release
+  - Relicensed under the same terms as Perl 5
+
+0.005     2011-01-11
+  - Re-upload properly - no changes since 0.004
+
+0.004     2011-01-11
+  - Avoid circular depenencies in Dist::Zilla::PluginBundle::ROKR (which
+    provides CopyReadmeFromBuild)
+  - Add Dist::Zilla::Plugin::CheckExtraTests dependency, which provides the
+    xtest command in addition to the plugin itself
+  - Fix Git::Commit so it really commits
+  - Bumped version of Pod::Weaver::PluginBundle::DOHERTY
+
+0.003     2010-11-24
+  - Require Pod::Weaver::PluginBundle::DOHERTY
+  - Allow README to be dirty - it always will be since we copy from build
+
+0.002     2010-11-13
+  - Fix passing skip_tests and add_tests to Dist::Zilla::PluginBundle::TestingMania
+
+0.001     2010-10-31
+  - Initial version

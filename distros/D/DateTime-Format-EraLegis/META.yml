@@ -1,0 +1,30 @@
+---
+abstract: 'DateTime formatter for Era Legis (http://oto-usa.org/calendar.html)'
+author:
+  - 'Clay Fouts <cfouts@khephera.net>'
+build_requires:
+  DBD::SQLite: 0
+  DateTime: 0
+  DateTime::Format::ISO8601: 0
+  Encode: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-EraLegis
+requires:
+  Any::Moose: 0
+  Carp: 0
+  DBI: 0
+  Method::Signatures: 0
+  Roman::Unicode: 0
+  perl: 5.010
+  utf8: 0
+version: 0.006

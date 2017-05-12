@@ -1,0 +1,24 @@
+Revision history for Dist-Zilla-Plugin-Git-Describe
+
+0.007     2016-07-14 22:26:07-04:00 America/New_York
+        - improved testing of git directories under MSWin32
+
+0.006     2015-08-01 22:01:34-04:00 America/New_York
+        - remove fatal warnings from the test suite (future proofing)
+
+0.005     2015-03-26 18:29:45-04:00 America/New_York
+        - make sure PPI::Document is loaded before using it (thanks, Karen
+          Etheridge!)
+
+0.004     2014-12-27 18:52:08-05:00 America/New_York
+        - don't die if there's a $VERSION assignment
+        - put the comment on the package line, if on_package_line is set
+
+0.003     2013-07-01 22:32:59 America/New_York
+          release with a compile test to stem the tide of UNKNOWN test reports
+
+0.002     2012-06-28 16:09:04 America/New_York
+          cope with the output from 'git describe' when there are tags, but
+          none can describe the head; just use git describe --always --long
+
+0.001     2012-06-07 10:42:45 America/New_York

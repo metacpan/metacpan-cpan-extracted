@@ -1,0 +1,25 @@
+Revision history for Data::Tabulate
+===================================
+
+0.07    2015-02-02
+
+ [MISC]
+ * dzillify dist
+
+0.06    2010-08-19
+
+        - changed algorithm to tabulate the data (the new one is ~30% faster)
+        - moved from Module::Build to ExtUtils::MakeMaker
+        - relicense under Artistic License 2.0
+
+0.05    2009-05-12
+        - add fill_with to fill the table with a user specified value instead of undef
+
+0.0401  2009-02-12
+
+        - bugfix in 02_render.t
+
+0.01    2006-12-27
+
+        First version, released on an unsuspecting world.
+

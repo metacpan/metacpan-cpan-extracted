@@ -1,0 +1,42 @@
+Revision history for Devel-Refcount
+
+0.10    CHANGES:
+         * Added assert_oneref()
+
+0.09    CHANGES:
+         * Use Test::Fatal instead of Test::Exception
+         * Provide fallback PP implementation using B
+         * Don't skip Regexp tests dependent on Perl version since all stable
+           Perl releases are fine now
+
+(0.08 skipped because I messed up the alpha version numbering of 0.08_001. Oops).
+
+0.07    CHANGES:
+         * Don't use base 'Exporter'
+         * Use XSLoader instead of DynaLoader
+
+0.06    CHANGES:
+         * Added SEE ALSO to Test::Refcount
+         * Various small updates to keep CPANTS happy
+
+0.05    CHANGES:
+         * use warnings
+         * Added (C) declaration to main file
+
+0.04    BUGFIXES:
+         * Declare ExtUtils::CBuilder and Module::Build as configure_requires
+
+0.03    BUGFIXES:
+         * TEMPORARY workaround for bleadperl's behaviour on Regexp references
+         * Declare dependence on ExtUtils::CBuilder
+
+0.02    BUGFIXES:
+         * Make sure Regexp refs have count 1 even on perl 5.11, which seems
+           to share references
+
+        CHANGES:
+         * Expanded documentation about the difference between refcount() and
+           Devel::Peek::SvREFCNT().
+
+0.01    First version, released on an unsuspecting world.
+

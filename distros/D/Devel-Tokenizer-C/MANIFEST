@@ -1,0 +1,13 @@
+Changes
+lib/Devel/Tokenizer/C.pm
+Makefile.PL
+MANIFEST
+README
+t/001_init.t
+t/101_misc.t
+t/102_warnings.t
+t/201_pod.t
+t/202_podcov.t
+t/301_build.t
+t/common.sub
+META.yml                                 Module meta-data (added by MakeMaker)

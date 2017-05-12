@@ -1,0 +1,26 @@
+{
+  "schema": {
+    "type"    : "//arr",
+    "contents": { "type": "//int" },
+    "length"  : { "max": 3 }
+  },
+
+  "pass": {
+    "arr": [ "empty", "0", "0-1", "0-1-1" ]
+  },
+
+  "fail": {
+    "arr" : {
+      "str-1"  : { "data": [ 0 ], "check": [ "contents" ], "error": [ "type" ] },
+      "0-s1-1" : { "data": [ 1 ], "check": [ "contents" ], "error": [ "type" ] },
+      "0-1-1-2": { "data": [   ], "check": [            ], "error": [ "size" ] },
+      "0-str"  : { "data": [ 1 ], "check": [ "contents" ], "error": [ "type" ] },
+      "0-str-3": { "data": [ 1 ], "check": [ "contents" ], "error": [ "type" ] }
+    },
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "num" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "str" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } }
+  }
+}

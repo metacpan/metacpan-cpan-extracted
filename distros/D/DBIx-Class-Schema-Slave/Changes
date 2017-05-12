@@ -1,0 +1,51 @@
+Revision history for Perl extension DBIx::Class::Schema::Slave
+
+0.02400
+        - Added CAUTION heading.
+        - Changed DBIx::Class::Schema::Slave::slave_connection to
+          DBIx::Class::Schema::Slave::slave_schema.
+        - Changed DBIx::Class::Schema::Slave::connect_slave to
+          DBIx::Class::Schema::Slave::slave_connect.
+
+0.02300  Wed May 14 02:12:48 2008
+        - Delgated mapping class_mappings and source_registrations to
+          DBIx::Class::Schema::register_source.
+        - Added method DBIx::Class::Schema::Slave::_slave_relationships
+        - Tweaked tests (t/06_search_related.t, t/33_related_resultset.t)
+          Testing to resolve reverse relationships
+
+0.02210  Mon May 10 08:15:12 2008
+        - Fixed bug rewrited class_mappings
+
+0.02200  Sat May 10 13:30:18 2008
+        - Fixed conflicting between Clone::clone() and DBIx::Class::Schema::clone()
+          This bug is included Version 0.02000 - 0.02101
+
+0.02101  Mon May 5 03:56:34 2008
+        - Tweaked POD
+
+0.02100  Mon May 5 03:00:18 2008
+        - Modified method DBIx::Class::Row::Slave::is_slave
+        - Tweaked some tests
+        - Tweaked POD
+
+0.02000  Sun May 4 18:50:50 2008
+        - Work out with DBIx::Class::Schema::Loader
+        - Added method DBIx::Class::Schema::Slave::is_slave
+        - Added some tests
+        - Removed test t/pod.t, t/pod_coverage.t
+        - Tweaked POD
+
+0.01101  Mon Apr 28 17:19:50 2008
+        - Removed Version from lib/DBIx/Class/Row/Slave.pm
+        - Tweaked POD
+
+0.01100  Mon Apr 28 01:58:23 2008
+        - Added many tests
+        - These tests need DBD::SQLite
+
+0.01001  Tue Apr 25 03:29:41 2008
+        - Modified document
+
+0.01  Tue Apr 25 01:15:40 2008
+        - Initial revision (EXPERIMENTAL)

@@ -1,0 +1,17 @@
+cabbage:
+    cooked: okay
+    raw: better
+potato:
+    grow: easy
+    cook: easy
+    cooked: great
+    raw: disaster
+sprout:
+    dog: dislikes
+    cat: likes
+    cooked: terrible
+    raw: great
+onion:
+    nice: yummy
+    notnice: strong
+    perl: 'just right'

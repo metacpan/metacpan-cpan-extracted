@@ -1,0 +1,25 @@
+README
+CHANGES
+lib/Data/Toolkit.pm
+lib/Data/Toolkit/Map.pm
+lib/Data/Toolkit/Entry.pm
+lib/Data/Toolkit/Connector.pm
+lib/Data/Toolkit/Connector/LDAP.pm
+lib/Data/Toolkit/Connector/CSV.pm
+lib/Data/Toolkit/Connector/DBI.pm
+tests/4-csv1.csv
+tests/4.connectors.t
+tests/1.entryclass.t
+tests/start-slapd
+tests/clear-slapd
+tests/2.mapclass.t
+tests/3.entrymaps.t
+tests/slapd.conf.test
+tests/5.ldapconnector.t
+tests/6.dbiconnector.t
+tests/stop-slapd
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

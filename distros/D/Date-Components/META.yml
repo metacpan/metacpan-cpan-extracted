@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:                Date-Components
+version:             0.2.1
+abstract:            Parses, processes and formats ONLY dates and date components
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Carp:                          1.04
+    Readonly:                      1.03
+    Readonly::XS:                  1.04
+    Test::Manifest:                1.22
+    Test::More:                    0.74
+    Test::Pod:                     1.26
+    Test::Pod::Coverage:           1.08
+    version:                       0.74
+    warnings:                      1.05
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - David McAllister <perldave@gmail.com>

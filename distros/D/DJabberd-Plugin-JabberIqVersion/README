@@ -1,0 +1,24 @@
+DJabberd-Plugin-JabberIqVersion
+
+DJabberd::Plugin::JabberIqVersion is a plugin to add the support of XEP 0092 
+for DJabberd. This enable to answer to query about software version, as 
+described in the XEP. You can change the information given by the plugin in 
+the configuration file. Please take a look at the pod for the exct syntax
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Michael Scherer
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

@@ -1,0 +1,95 @@
+Revision history for Data-Domain
+
+1.05 05.04.2014
+  - #94464 fix missing dependency on List::MoreUtils
+
+1.05 04.08.2013
+  - additional options -keys and -values for Struct
+
+1.04 16.06.2013
+  - use experimental 'smartmatch' to avoid warnings from perl 5.18 
+
+1.03 01.12.2012
+  - fixed definition of 'Class' and added new option "-package"
+
+1.02 27.10.2012
+  - better check of min/max values
+  - revised documentation
+  - new options :  -ref, -isweak, -readonly, -tainted
+  - most options moved to parent inspect() -- now they apply to all domains
+  - new domains : 'Nat', 'Handle'
+  - new shortcuts : 'Regexp', 'Obj', 'Class', 'Ref', 'Unref'
+  - changed names of export groups ('constructors' and 'shortcuts')
+  - experimental support for checking method calls and coderef calls
+  - added $MAX_DEEP to control the recursion level 
+
+1.01 21.10.2012
+  - removed internal domain _None (useless because same as 'Empty')
+  - fiddle with Sub::Exporter to support use Data::Domain qw/:all !Date/   
+
+1.00 11.10.2012
+  - use Scalar::Does instead of UNIVERSAL::isa
+  - new Whatever options : -blessed, -matches, -does
+  - overloads stringification and smart match operators
+  - use Sub::Exporter for exporting functions
+  - exports builtin domains : True, False, Blessed, Defined, etc.
+  - new domain generator 'All_of'
+  - tests structured in subtests
+
+0.16 11.08.2011
+  - specify POD =encoding so that new Pod::Simple is happy
+
+0.15 29.09.2011
+  - https://rt.cpan.org/Ticket/Display.html?id=71188 (String accepts non-scalar)
+
+0.14 01.07.2009
+  - undef not allowed in Enum list
+
+0.13 24.02.2009
+  - added builtin Empty domain
+
+0.12 23.01.2009
+  - catch errors in lazy domain creation (reported as INVALID)
+
+0.11 02.12.2008 
+  - parse Date in an eval && check_date to generate 
+    INVALID => msg instead of low-level exception
+
+0.10   04.06.2008
+  - renamed internal subclasses as ::Ctor::.. to avoid name clashes
+    with the functional interface (i.e Data::Domain::Num(...), 
+    Data::Domain::Ctor::Num->new(...) ).
+
+0.09   04.02.2008
+  - removed warning in Time::_print_time
+  - check that lazy domains return proper domains
+  - fixes in documentation
+
+0.08
+  - changed messages in Time() to display real time for dynamic times
+
+0.07
+  - changed messages in Date() to display real dates for dynamic dates
+
+0.06
+  - typos in doc
+
+0.05    
+  - Bug fix : wrong message in List(-any)
+  - renamed build.pl in build.PL
+
+0.04    07.03.2006
+  - Fixed dependencies in Build.PL
+  - Revisited code for List(-any) 
+
+0.03    23.02.2006
+  - Bug fix in method msgs()
+
+0.02    27.12.2006
+  - Documentation restructured and completed (esp. -messages option)
+  - minor modifications in msg() method
+  - added range options (e.g. -size=>[$min, $max])
+
+0.01    01.10.2006
+  - initial release
+

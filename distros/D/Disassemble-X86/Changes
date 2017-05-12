@@ -1,0 +1,23 @@
+Revision history for Perl extension Disassemble::X86.
+
+0.13  13 Sep 2002
+        - better branch hint support
+        - less bogosity in far pointer arguments
+
+0.12  25 Aug 2002
+        - improved handling of opcode prefixes
+
+0.11  8 Aug 2002
+        - updated test script
+        - tweaked output format
+
+0.10  Mon Jul 15 2002
+        - rewritten to produce tree-structured output
+        - use autosplit
+        - expanded test script
+        - bugfixes
+
+0.01  Fri Jun 28 2002
+        - original version; created by h2xs 1.21 with options
+            -AX -n Disassemble::X86
+

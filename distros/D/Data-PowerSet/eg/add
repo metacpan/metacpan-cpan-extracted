@@ -1,0 +1,23 @@
+#! /usr/local/bin/perl -w
+#
+# add - add up different selections of numbers
+#
+# This script can help you answer the question "what change amounts
+# can I make with the coins 1, 2, 5, 10, 10, 50?"
+#
+# Copyright (C) David Landgren 2005 
+
+use strict;
+use Data::PowerSet;
+
+my $d = Data::PowerSet->new( @ARGV ); 
+
+while( my $r = $d->next ) {
+    print sum(@$r), "\t(@$r)\n";
+}
+
+sub sum {
+    my $s = 0;
+    $s += $_ for @_;
+    return $s;
+}

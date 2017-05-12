@@ -1,0 +1,15 @@
+Revision History for Data-SplitSerializer
+=========================================
+
+v0.91 2013-08-09
+----------------
+
+commit f9b2b1037d89e6e48b7254f84b8a0555044ee320
+Author: Brendan Byrd <Perl@ResonatorSoft.org>
+Date:   Fri Aug 9 22:00:36 2013 -0400
+
+    Fix dependencies so that Parse::Path doesn't get missed
+
+===================================
+End of changes in the last 365 days
+===================================

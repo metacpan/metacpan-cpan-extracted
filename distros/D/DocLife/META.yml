@@ -1,0 +1,50 @@
+---
+abstract: 'Document Viewer written in Perl, to run under Plack.'
+author:
+  - 'Shinichiro Aska'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.7.2, CPAN::Meta::Converter version 2.132661'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DocLife
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+provides:
+  DocLife:
+    file: lib/DocLife.pm
+    version: 0.03
+  DocLife::Markdown:
+    file: lib/DocLife/Markdown.pm
+  DocLife::Pod:
+    file: lib/DocLife/Pod.pm
+requires:
+  Path::Class: 0
+  Plack: 0
+  Pod::Simple::XHTML: 0
+  Text::Markdown: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/s-aska/DocLife/issues
+  homepage: https://github.com/s-aska/DocLife
+  repository: git://github.com/s-aska/DocLife.git
+version: 0.03
+x_authority: cpan:ASKADNA
+x_contributors:
+  - 'c9s <cornelius.howl@gmail.com>'
+  - 'Shinichiro Aska <s.aska.org@gmail.com>'

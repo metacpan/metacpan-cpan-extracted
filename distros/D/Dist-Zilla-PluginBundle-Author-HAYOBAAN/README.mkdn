@@ -1,0 +1,359 @@
+# NAME
+
+Dist::Zilla::PluginBundle::Author::HAYOBAAN - Hayo Baan's Dist::Zilla configuration
+
+# VERSION
+
+version 0.012
+
+# DESCRIPTION
+
+This is a [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) PluginBundle. It installs and configures
+[Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) plugins according to HAYOBAAN's preferences. The
+following plugins are (conditionally) installed and configured:
+
+- [AutoVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::AutoVersion)
+- [Author::HAYOBAAN::NextVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Author::HAYOBAAN::NextVersion)
+- [OurPkgVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::OurPkgVersion)
+- [GatherDir](https://metacpan.org/pod/Dist::Zilla::Plugin::GatherDir)
+- [Git::GatherDir](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::GatherDir)
+- [PruneCruft](https://metacpan.org/pod/Dist::Zilla::Plugin::PruneCruft)
+- [ManifestSkip](https://metacpan.org/pod/Dist::Zilla::Plugin::ManifestSkip)
+- [PodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::PodWeaver) (or [SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver) when enabled)
+- [ReadmeAnyFromPod](https://metacpan.org/pod/Dist::Zilla::Plugin::ReadmeAnyFromPod) (both Text and Markdown generation are configured)
+- [License](https://metacpan.org/pod/Dist::Zilla::Plugin::License)
+- [InstallGuide](https://metacpan.org/pod/Dist::Zilla::Plugin::InstallGuide)
+- [MinimumPerl](https://metacpan.org/pod/Dist::Zilla::Plugin::MinimumPerl)
+- [AutoPrereqs](https://metacpan.org/pod/Dist::Zilla::Plugin::AutoPrereqs)
+- [MetaNoIndex](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaNoIndex)
+- [GitHub::Meta](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Meta)
+- [MetaJSON](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaJSON)
+- [MetaYAML](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaYAML)
+- [MetaProvides::Package](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaProvides::Package)
+- [MetaProvides::Class](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaProvides::Class)
+- [ExecDir](https://metacpan.org/pod/Dist::Zilla::Plugin::ExecDir)
+- [ShareDir](https://metacpan.org/pod/Dist::Zilla::Plugin::ShareDir)
+- [MakeMaker](https://metacpan.org/pod/Dist::Zilla::Plugin::MakeMaker) (default)
+- [ModuleBuild](https://metacpan.org/pod/Dist::Zilla::Plugin::ModuleBuild) (optional)
+- [Manifest](https://metacpan.org/pod/Dist::Zilla::Plugin::Manifest)
+- [CopyFilesFromBuild](https://metacpan.org/pod/Dist::Zilla::Plugin::CopyFilesFromBuild)
+- [Run::AfterBuild](https://metacpan.org/pod/Dist::Zilla::Plugin::Run::AfterBuild)
+- [GitHubREADME::Badge](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHubREADME::Badge)
+- [CheckChangesHasContent](https://metacpan.org/pod/Dist::Zilla::Plugin::CheckChangesHasContent)
+- [Git::CheckFor::CorrectBranch](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch)
+- [Git::Check](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Check)
+- [CheckMetaResources](https://metacpan.org/pod/Dist::Zilla::Plugin::CheckMetaResources)
+- [CheckPrereqsIndexed](https://metacpan.org/pod/Dist::Zilla::Plugin::CheckPrereqsIndexed)
+- [Test::Compile](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Compile)
+- [Test::Perl::Critic](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Perl::Critic)
+- [Test::EOL](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::EOL)
+- [Test::NoTabs](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::NoTabs)
+- [Test::Version](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Version)
+- [Test::MinimumVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::MinimumVersion)
+- [MojibakeTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MojibakeTests)
+- [Test::Kwalitee](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Kwalitee)
+- [Test::Portability](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Portability)
+- [Test::UnusedVars](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::UnusedVars)
+- [Test::CPAN::Changes](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::CPAN::Changes)
+- [Test::DistManifest](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::DistManifest)
+- [Test::CPAN::Meta::JSON](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON)
+- [MetaTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaTests)
+- [PodSyntaxTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodSyntaxTests)
+- [PodCoverageTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodCoverageTests)
+- [Test::Pod::LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Pod::LinkCheck)
+- [Test::Synopsis](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Synopsis)
+- [TestRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::TestRelease)
+- [RunExtraTests](https://metacpan.org/pod/Dist::Zilla::Plugin::RunExtraTests)
+- [ConfirmRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::ConfirmRelease)
+- [UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN)
+- [SchwartzRatio](https://metacpan.org/pod/Dist::Zilla::Plugin::SchwartzRatio)
+- [FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease)
+- [NextRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::NextRelease)
+- [Git::Commit](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Commit)
+- [Git::Tag](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Tag)
+- [Git::Push](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Push)
+- [GitHub::Update](https://metacpan.org/pod/Dist::Zilla::Plugin::GitHub::Update)
+- [Run::AfterRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::Run::AfterRelease)
+- [Clean](https://metacpan.org/pod/Dist::Zilla::Plugin::Clean)
+
+# USAGE
+
+    # In dist.ini
+    [@Author::HAYOBAAN]
+
+# OPTIONS
+
+The following additional command-line option is available for the `dzil` command.
+
+## --local-release-only
+
+Adding this option to the `dzil` command will set the
+["local\_release\_only"](#local_release_only) attribute to _true_.
+
+`--local`, `--local-only`, and `--local-release` are synonyms for
+this option.
+
+## --make-minor-release
+
+Adding this option to the `dzil` command will set the
+["make\_minor\_release"](#make_minor_release) attribute to _true_.
+
+`--minor`, `--minor-release`, and `--make-minor` are synonyms for
+this option.
+
+Note: Implied with ["--local-release-only"](#local-release-only), overriden by ["--make-major-release"](#make-major-release).
+
+## --make-major-release
+
+Adding this option to the `dzil` command will set the
+["make\_major\_release"](#make_major_release) attribute to true.
+
+`--major`, `--major-release`, and `--make-major` are synonyms for
+this option.
+
+Note: Overrides [--make-minor-release](https://metacpan.org/pod/--make-minor-release).
+
+## --keep-version
+
+Adding this option will force keep the version number the same (regardless of the other settings above!).
+
+`--keep` is a synonym for this option.
+
+# ATTRIBUTES
+
+## is\_cpan
+
+Specifies that this is a distribution that is destined for CPAN. When
+true, releases are uploaded to CPAN using
+[UploadToCPAN](https://metacpan.org/pod/Dist::Zilla::Plugin::UploadToCPAN). If false, releases
+are made using [FakeRelease](https://metacpan.org/pod/Dist::Zilla::Plugin::FakeRelease).
+
+Default: _false_.
+
+## is\_github\_hosted
+
+Specifies that the distribution's repository is hosted on GitHub.
+
+Default: _false_ (note: setting ["is\_cpan"](#is_cpan) enforces ["is\_github\_hosted"](#is_github_hosted)
+to _true_)
+
+## git\_remote
+
+Specifies where to push the distribution on GitHub. Can be used
+multiple times to upload to multiple branches.
+
+Default: `origin`
+
+## no\_git
+
+Specifies that the distribution is not under git version control.
+
+Default: _false_ (note: setting ["is\_github\_hosted"](#is_github_hosted) enforces this
+setting to _false_)
+
+## local\_release\_only
+
+Setting this to _true_ will:
+
+- inhibit uploading to CPAN,
+- inhibit git checking, tagging, commiting, and pushing,
+- inhibit checking the `Changes` file,
+- include a minor version number (e.g., `_001`) in the version string (see ["make\_minor\_release"](#make_minor_release)).
+
+When releasing, the ["run\_after\_release"](#run_after_release) code is still run so you can
+use this flag to _release_ a development version locally for further
+use or testing, without e.g., fixing a new major version number.
+
+`local`, `local_only`, and `local_release` are synonyms for
+this setting.
+
+Default: _false_
+
+## make\_minor\_release
+
+If the version string does not yet have a minor release number, this will add one with the value of `_001`.
+
+`minor`, `minor_release`, and `make_minor` are synonyms for this
+setting.
+
+Default: value of ["local\_release\_only"](#local_release_only)
+
+Note: Overridden by ["make\_major\_release"](#make_major_release).
+
+## make\_major\_release
+
+Removes any minor version from the version string.
+
+`major`, `major_release`, and `make_major` are synonyms for this
+setting.
+
+Default: _false_
+
+Note: Overrides ["make\_minor\_release"](#make_minor_release).
+
+## keep\_version
+
+Will keep the current version number the same when building/releasing.
+
+## use\_makemaker
+
+Uses MakeMaker as build method.
+
+Default: _true_
+
+Note: When both `use_makemaker` and `use_modulebuild` are _false_, MakeMaker will be used!
+
+## use\_modulebuild
+
+Uses [Module::Build](https://metacpan.org/pod/Module::Build) as build method.
+
+Default: _false_
+
+## run\_after\_build
+
+Specifies commands to run after the release has been built (but not yet released). Multiple
+["run\_after\_build"](#run_after_build) commands can be specified.
+
+The commands are run from the root of your development tree and has the following special symbols available:
+
+- `%d` the directory in which the distribution was built
+- `%n` the name of the distribution
+- `%p` path separator ('/' on Unix, '\\\\' on Win32... useful for cross-platform dist.ini files)
+- `%v` the version of the distribution
+- `%t` -TRIAL if the release is a trial release, otherwise the empty string
+- `%x` full path to the current perl interpreter (like $^X but from Config)
+
+Default: _nothing_
+
+## run\_after\_release
+
+Specifies commands to run after the release has been made. Use it to e.g.,
+automatically install your distibution after releasing. Multiple
+run\_after\_release commands can be specified.
+
+The commands are run from the root of your development tree and has
+the same symbols available as the ["run\_after\_build"](#run_after_build), plus the
+following:
+
+- `%a` the archive of the release
+
+Default: `cpanm './%d'`
+
+### Examples:
+
+To install using cpanm (this is the default):
+
+    run_after_release = cpanm './%d'
+
+To install using cpan:
+
+    run_after_release = %x -MCPAN -einstall './%d'
+
+To not do anything:
+
+    run_after_release =
+
+## additional\_test
+
+Additional test plugin to use. Can be used multiple times to add more
+than one additional test.
+
+By default the following tests are executed:
+
+- [Test::Compile](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Compile) -- Checks if perl code compiles correctly
+- [Test::Perl::Critic](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Perl::Critic) -- Checks Perl source code for best-practices
+- [Test::EOL](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::EOL) -- Checks line endings
+- [Test::NoTabs](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::NoTabs) -- Checks for the use of tabs
+- [Test::Version](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Version) -- Checks to see if each module has the correct version set
+- [Test::MinimumVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::MinimumVersion) -- Checks the minimum perl version, using ["max\_target\_perl"](#max_target_perl)
+- [MojibakeTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MojibakeTests) -- Checks source encoding
+- [Test::Kwalitee](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Kwalitee) -- Checks the Kwalitee
+- [Test::Portability](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Portability) -- Checks portability of code
+- [Test::UnusedVars](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::UnusedVars) -- Checks for unused variables
+- [Test::CPAN::Changes](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::CPAN::Changes) -- Validation of the Changes file
+- [Test::DistManifest](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::DistManifest) -- Validation of the MANIFEST file
+- [Test::CPAN::Meta::JSON](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::CPAN::Meta::JSON) -- Validation of the META.json file -- only when hosted on GitHub
+- [MetaTests](https://metacpan.org/pod/Dist::Zilla::Plugin::MetaTests) -- Validation of the META.yml file -- only when hosted on GitHub
+- [PodSyntaxTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodSyntaxTests) -- Checks pod syntax
+- [PodCoverageTests](https://metacpan.org/pod/Dist::Zilla::Plugin::PodCoverageTests) -- Checks pod coverage
+- [Test::Pod::LinkCheck](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Pod::LinkCheck) -- Checks pod links
+- [Test::Synopsis](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::Synopsis) -- Checks the pod synopsis
+
+## disable\_test
+
+Specifies the test you don't want to be run. Can bu used more than
+once to disable multiple tests.
+
+Default: _none_ (i.e., run all default and ["additional\_test"](#additional_test) tests).
+
+## max\_target\_perl
+
+Defines the highest minimum version of perl you intend to require.
+This is passed to [Test::MinimumVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::MinimumVersion), which generates
+a `minimum-version.t` test that'll warn you if you accidentally used features
+from a higher version of perl than you wanted. (Having a lower required version
+of perl is okay.)
+
+Default: `5.006`
+
+## surgical
+
+If this is set to _true_,
+[SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver) is used
+instead of the standard [PodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::PodWeaver)
+plugin. [SurgicalPodWeaver](https://metacpan.org/pod/Dist::Zilla::Plugin::SurgicalPodWeaver)
+only munges files that contain either a `# ABSTRACT` or a `#
+Dist::Zilla: +PodWeaver` line.
+
+Default: _false_
+
+## weaver\_config
+
+Specifies the configuration for [Pod::Weaver](https://metacpan.org/pod/Pod::Weaver).
+
+Default: `@Author::HAYOBAAN`.
+
+## tag\_format
+
+Specifies the format for tagging a release (see
+[Git::Tag](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::Tag) for details).
+
+Default: `v%v%t`
+
+## version\_regexp
+
+Specifies the regexp for versions (see
+[Git::NextVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::Git::NextVersion) for details).
+
+Default: `^v?([\d.]+(?:_\d+)?)(?:-TRIAL)?$`
+
+Note: Only used in case of git version controlled repositories
+([AutoVersion](https://metacpan.org/pod/Dist::Zilla::Plugin::AutoVersion) is used in case of
+non-git version controlled repositories).
+
+# BUGS
+
+Please report any bugs or feature requests on the bugtracker
+[website](https://github.com/HayoBaan/Dist-Zilla-PluginBundle-Author-HAYOBAAN/issues).
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+# CREDITS
+
+I took inspiration from many people's [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) and [Pod::Weaver](https://metacpan.org/pod/Pod::Weaver) PluginBundles. Most notably from:
+
+- David Golden [DAGOLDEN](https://metacpan.org/pod/Dist::Zilla::PluginBundle::DAGOLDEN)
+- Mike Doherty [DOHERTY](https://metacpan.org/pod/Dist::Zilla::PluginBundle::Author::DOHERTY)
+
+# AUTHOR
+
+Hayo Baan <info@hayobaan.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Hayo Baan.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

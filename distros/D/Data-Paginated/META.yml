@@ -1,0 +1,11 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-Paginated
+version:      1.01
+version_from: lib/Data/Paginated.pm
+installdirs:  site
+requires:
+    Data::Pageset:                 0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

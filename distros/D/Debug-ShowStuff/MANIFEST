@@ -1,0 +1,12 @@
+MANIFEST
+Changes
+LICENSE
+Makefile.PL
+Build.PL
+META.yml
+README
+lib/Debug/ShowStuff.pod
+lib/Debug/ShowStuff.pm
+lib/Debug/ShowStuff/ShowVar.pod
+lib/Debug/ShowStuff/ShowVar.pm
+t/test.t

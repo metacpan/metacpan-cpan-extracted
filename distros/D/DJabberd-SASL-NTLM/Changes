@@ -1,0 +1,6 @@
+Revision history for Perl extension DJabberd::SASL::NTLM.
+
+0.03  Thu Mar 31 11:00:10 2011
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.8.9 -n DJabberd::SASL::NTLM -v 0.03
+

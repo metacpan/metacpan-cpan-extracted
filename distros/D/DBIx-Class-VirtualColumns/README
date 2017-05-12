@@ -1,0 +1,169 @@
+NAME
+    DBIx::Class::VirtualColumns - Add virtual columns to DBIx::Class
+    schemata
+
+SYNOPSIS
+     package Your::Schema::Class;
+     use strict;
+     use warnings;
+ 
+     use base 'DBIx::Class';
+ 
+     __PACKAGE__->load_components(
+       "VirtualColumns",
+       "PK",
+       "Core",
+     );
+ 
+     __PACKAGE__->table("sometable");
+     __PACKAGE__->add_columns(qw/dbcol1 dbcol2/);
+     __PACKAGE__->add_virtual_columns(qw/vcol1 vcol2 vcol3/);
+ 
+     # =========================================================
+     # Somewhere else
+ 
+     my $item = $schema->resultset('Artist')->find($id);
+     $item->vcol1('test'); # Set 'test'
+     $item->get_column('vcol1'); # Return 'test'
+ 
+     my $otheritem = $schema->resultset('Artist')->create({
+         dbcol1 => 'value1',
+         dbcol2 => 'value2',
+         vcol1  => 'value3',
+         vcol2  => 'value4',
+     });
+ 
+     $otheritem->vcol1(); # Now is 'value3'
+ 
+     # Get the column metadata just like for a regular DBIC column
+     my $info = $result_source->column_info('vcol1');
+
+DESCRIPTION
+    This module allows to specify 'virtual columns' in DBIx::Class schema
+    classes. Virtual columns behave almost like regular columns but are not
+    stored in the database. They may be used to store temporary information
+    in the DBIx::Class::Row object and without introducting an additional
+    interface.
+
+    Most DBIx::Class methods like "set_column", "set_columns", "get_column",
+    "get_columns", "column_info", ... will work with regular as well as
+    virtual columns.
+
+USAGE
+    Use this module if you want to add 'virtual' columns to a DBIC class
+    which behave like real columns (e.g. if you want to use the
+    "set_column", "get_column" methods)
+
+    However if you only want to add non-column data to DBIx::Class::Row
+    objects, then there are easier/better ways:
+
+     __PACKAGE__->mk_group_accessors(simple => qw(foo bar baz));
+
+METHODS
+  add_virtual_columns
+    Adds virtual columns to the result source. If supplied key => hashref
+    pairs, uses the hashref as the column_info for that column. Repeated
+    calls of this method will add more columns, not replace them.
+
+     $table->add_virtual_columns(qw/column1 column2/); 
+     OR 
+     $table->add_virtual_columns(column1 => \%column1_info, column2 => \%column2_info, ...);
+
+    The column names given will be created as accessor methods on your
+    "DBIx::Class::Row objects", you can change the name of the accessor by
+    supplying an "accessor" in the column_info hash.
+
+    The following options are currently recognised/used by
+    DBIx::Class::VirtualColumns:
+
+    *   accessor
+
+        Use this to set the name of the accessor method for this column. If
+        not set, the name of the column will be used.
+
+  add_virtual_column
+    Shortcut for add_virtual_columns
+
+  has_any_column
+    Returns true if the source has a virtual or regular column of this name,
+    false otherwise.
+
+  has_virtual_column
+    Returns true if the source has a virtual column of this name, false
+    otherwise.
+
+  remove_virtual_columns
+     $table->remove_columns(qw/col1 col2 col3/);
+
+    Removes virtual columns from the result source.
+
+  remove_virtual_column
+    Shortcut for remove_virtual_columns
+
+  _virtual_filter
+    Splits attributes for regular and virtual columns
+
+  new
+    Overloaded method. "new" in DBIx::Class::Row
+
+  get_column
+    Overloaded method. "get_colum" in DBIx::Class::Row
+
+  get_columns
+    Overloaded method. "get_colums" in DBIx::Class::Row
+
+  store_column
+    Overloaded method. "store_column" in DBIx::Class::Row
+
+  set_column
+    Overloaded method. "set_column" in DBIx::Class::Row
+
+  column_info
+    Overloaded method. "column_info" in DBIx::Class::ResultSource
+
+    Additionally returns the HASH key 'virtual' which indicates if the
+    requested column is virtual or not.
+
+  update
+    Overloaded method. "update" in DBIx::Class::Row
+
+CAVEATS
+    The best way to add non-column data to DBIC objects is to use
+    Class::Accessor::Grouped.
+
+     __PACKAGE__->mk_group_accessors(simple => qw(foo bar baz));
+
+    Use DBIx::Class::VirtualColumns only if you rely on DBIx::Class::Row
+    methods like "set_column", "get_column", ...
+
+SUPPORT
+    This module was just a proof of concept, and is not actively developed
+    anymore. Patches are still welcome though.
+
+    Please report any bugs to "bug-dbix-class-virtualcolumns@rt.cpan.org",
+    or through the web interface at
+    <http://rt.cpan.org/Public/Bug/Report.html?Queue=DBIx::Class::VirtualCol
+    umns>. I will be notified, and then you'll automatically be notified of
+    progress on your report as I make changes.
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+        L<http://www.revdev.at>
+
+ACKNOWLEDGEMENTS
+    This module was written for Revdev <http://www.revdev.at>, a nice litte
+    software company I run with Koki and Domm
+    (<http://search.cpan.org/~domm/>).
+
+COPYRIGHT
+    DBIx::Class::VirtualColumns is Copyright (c) 2008 Maroš Kollár -
+    <http://www.revdev.at>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

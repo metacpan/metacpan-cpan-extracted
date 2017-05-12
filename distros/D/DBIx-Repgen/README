@@ -1,0 +1,33 @@
+DBIx/Repgen version 0.01
+========================
+
+This package implements class C<DBIx::Repgen>, which is simple
+report generator from data received from relational database
+by some select-statement. Such a report can contain hyerarchical
+grouping by field values, record counters and cumulative totals
+(sums) of numeric fields for each group as well as for whole
+report. Each rerort part formatting may be set as literal string,
+arguments of C<sprint> function or be code reference.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+  DBD::Sponge (for testing only)
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2004 Anatoly K. Lasareff
+
+This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.

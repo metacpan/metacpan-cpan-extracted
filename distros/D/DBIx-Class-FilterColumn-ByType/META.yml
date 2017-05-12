@@ -1,0 +1,206 @@
+---
+abstract: 'Apply FilterColumn by type instead of name'
+author:
+  - 'Matthew Phillips <mattp@cpan.org>'
+build_requires:
+  Carp: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::Schema: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::Deep: 0
+  Test::More: 0.94
+  perl: 5.004
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300020, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-FilterColumn-ByType
+requires:
+  DBIx::Class::FilterColumn: 0
+  SQL::Translator: 0.11006
+  base: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/mphill22/DBIx-Class-FilterColumn-ByType/issues
+  homepage: https://github.com/mphill22/DBIx-Class-FilterColumn-ByType/wiki
+  repository: git://github.com/mphill22/DBIx-Class-FilterColumn-ByType.git
+version: 1.122121
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::AutoVersion
+      name: AutoVersion
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Git/Check'
+      version: 1.121820
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Git/Commit'
+      version: 1.121820
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Git/Tag'
+      version: 1.121820
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Git/Push'
+      version: 1.121820
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Filter/GatherDir'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Filter/PruneCruft'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Filter/ManifestSkip'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Filter/MetaYAML'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Filter/License'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Filter/Readme'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Filter/ExtraTests'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Filter/ExecDir'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Filter/ShareDir'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Filter/MakeMaker'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Filter/Manifest'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Filter/TestRelease'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Filter/ConfirmRelease'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Filter/UploadToCPAN'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ReportVersions
+      name: ReportVersions
+      version: 1.110730
+    -
+      class: Dist::Zilla::Plugin::OurPkgVersion
+      name: OurPkgVersion
+      version: 0.004000
+    -
+      class: Dist::Zilla::Plugin::Prepender
+      name: Prepender
+      version: 1.112280
+    -
+      class: Dist::Zilla::Plugin::AutoPrereqs
+      name: AutoPrereqs
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::MinimumPerl
+      name: MinimumPerl
+      version: 1.003
+    -
+      class: Dist::Zilla::Plugin::Test::Compile
+      name: Test::Compile
+      version: 1.112820
+    -
+      class: Dist::Zilla::Plugin::CheckChangeLog
+      name: CheckChangeLog
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PruneFiles
+      name: PruneFiles
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+      name: ReadmeMarkdownFromPod
+      version: 0.120120
+    -
+      class: Dist::Zilla::Plugin::MetaResourcesFromGit
+      name: MetaResourcesFromGit
+      version: 1.103620
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: PodWeaver
+      version: 3.101641
+    -
+      class: Dist::Zilla::Plugin::Run::BeforeRelease
+      name: Run::BeforeRelease
+      version: 0.013
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 4.300020
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 4.300020
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 4.300020

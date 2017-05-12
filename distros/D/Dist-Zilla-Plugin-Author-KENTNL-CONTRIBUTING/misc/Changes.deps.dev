@@ -1,0 +1,48 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+0.001006
+ [Added / develop requires]
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025003 → 2.025020
+
+0.001005 2015-11-14T04:44:40Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::GenerateFile::FromShareDir 0.006
+ - English
+ - Software::License::Perl_5
+
+ [Changed / develop requires]
+ - Test::More 0.88 → 0.96
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025001 → 2.025003
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::GenerateFile::ShareDir
+
+0.001004 2015-07-05T06:07:52Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.025000 → 2.025001
+
+0.001003 2015-06-30T05:57:29Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::GenerateFile::ShareDir
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024002 → 2.025000
+
+0.001002 2015-06-30T02:08:26Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::ShareDir
+
+0.001001 2015-06-30T00:24:44Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING

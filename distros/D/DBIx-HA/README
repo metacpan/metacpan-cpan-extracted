@@ -1,0 +1,75 @@
+DBIx/HA version 1.00
+====================
+
+DBIx::HA is a High Availability module for DBI. It is implemented by
+overloading the DBI connect, prepare and execute methods and can
+be seamlessly used without code modification except for initialization.
+
+DBIx::HA also works seamlessly with Apache::DBI when available, and
+ensures that cached database handles in the Apache::DBI module are properly
+released when failing over.
+
+Features of DBIx::HA are:
+
+- multiple failovers
+Should a datasource become unavailable, queries are automatically sent to
+the next available datasource in a user-configured datasource stack.
+All subsequent queries continue to hit the failover server until
+reinitialized. This ensures that a failed datasource can be properly brought
+back online before it is put back in service.
+
+- timeouts
+Database calls are wrapped in user-configurable timeouts. Connect and execute
+timeouts are handled independently.
+
+- configurable retries
+Queries can be retried n times before a datasource is considered failed.
+
+- callback function
+A user-defined callback function can be called upon abnormal failure and
+disconnection from a datasource in order to clean locally cached handles and
+perform other housekeeping tasks.
+
+- inter-process automatic failover under mod_perl
+Failover can be triggered for a single process or a set of processes at the
+application level. Specifically designed for Apache's multi-process model,
+if one mod_perl process triggers a failover, it is propagated to all other
+mod_perl processes using the same database handle.
+
+
+DBIx::HA was designed primarily for reliability and speed. Functionality
+that would compromise speed was not considered. This module has been tested
+extensively at very high loads in the Apache/mod_perl/Sybase environment.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make install
+
+DEPENDENCIES
+
+This modules requires Perl >= 5.6.0.
+It also requires DBI >= 1.49
+Apache::DBI is recommended when using mod_perl (v1 only).
+If using Apache::DBI, version 0.89 or above is required.
+
+WEBSITE AND SVN REPOSITORY
+
+The DBIx::HA sourcecode is hosted on Google Code:
+  http://code.google.com/p/perl-dbix-ha/
+
+Please submit bug reports or feature improvements in at the site above.
+The SVN repository can likewise be accessed at:
+  http://perl-dbix-ha.googlecode.com/svn/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003-2006 Henri Asseily <henri@asseily.com>.
+
+All rights reserved. This library is free software; you can
+redistribute it and/or modify it under the same terms as Perl
+itself. 
+

@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     % perl -MDevel::DieHandler::Pwd -e'...'
+
+DESCRIPTION
+
+    When imported, this module installs a __DIE__ handler which prints
+    working directory to STDERR, then calls the previous handler (or die).
+
+    Unimporting (via no Devel::DieHandler::Pwd) after importing restores
+    the previous handler.
+

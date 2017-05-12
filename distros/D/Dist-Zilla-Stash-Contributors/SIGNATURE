@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.68.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 21ca4eb8306a2312d0899510ca7c5b11f55f2b34 AUTHOR_PLEDGE
+SHA1 07f038023a770ea3d29d940423911f3a8d420655 Build.PL
+SHA1 8d9c3eea4c7129266b45d221b04a240e65a5d01f Changes
+SHA1 c425fdfd60e000bc7aa90fb968ceb1297a792b64 INSTALL
+SHA1 cf5dc9c929415cfa7133eed863def866ade9774d LICENSE
+SHA1 27b24e599d8a4d7c00c4071393a0f5e1f7a6934f MANIFEST
+SHA1 08cb9c23ba12c22fccbfa6749e767c8a00f8cbc0 META.json
+SHA1 5b0b7372f0d4ef5becc03034fd563ff6c4fdb890 META.yml
+SHA1 f99d63c7377e5ecebda0633875e89b2f490fd6e5 README
+SHA1 2ca6604a67493e41506a8b1a725aaa56c8275f6d README.mkdn
+SHA1 50035ab614171d4cee8fb2aa541a990ff0e298be lib/Dist/Zilla/Stash/Contributors.pm
+SHA1 602e42ed381ac5ff53f9e9edc583ae116a87d036 lib/Dist/Zilla/Stash/Contributors/Contributor.pm
+SHA1 3cbe905b92fbc69d59a06031d5ce6c837b352aa2 t/00-compile.t
+SHA1 b342b63ef55184fe1cdc62974a5360416c4b6c07 t/000-report-versions-tiny.t
+SHA1 25fed10885fe91715d8fc46c579ccdf4c92dc1b8 t/basic.t
+SHA1 ec3f84bfd7a9ce3246e7592f4134100c6b5ce02b xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+iEYEARECAAYFAlFLs7oACgkQ34Hwf+GwC4ySwwCfYP2mh7DvLWjQRSRn8bz2woGj
+AvAAoNF/6CREhZ8bvdjiYbYn1jsdIIVq
+=W9jx
+-----END PGP SIGNATURE-----

@@ -1,0 +1,19 @@
+---
+abstract: 'Validate the NAPTR Regexp field per RFC 2915 / RFC 3403 Section 4'
+author:
+  - 'Matthew Horsfall (alh) <WolfSage@gmail.com>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validate-DNS-NAPTR-Regexp
+resources:
+  homepage: https://github.com/dyninc/Data-Validate-DNS-NAPTR-Regexp
+  repository: git://github.com/dyninc/Data-Validate-DNS-NAPTR-Regexp.git
+version: 0.007

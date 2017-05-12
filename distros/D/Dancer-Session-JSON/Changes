@@ -1,0 +1,6 @@
+0.002   21.04.16
+        * Previous version (0.001) assumed on universal TO_JSON in
+          JSON.pm (which is horrible!) - thanks, Ishigaki-san! :)
+
+0.01    05.10.11
+        It starts, and it apparently works. :)

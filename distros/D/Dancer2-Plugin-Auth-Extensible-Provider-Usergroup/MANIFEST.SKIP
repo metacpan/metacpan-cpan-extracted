@@ -1,0 +1,5 @@
+^\.git/*
+\.swp$
+Makefile\.old
+README\.md
+bin/create_readme

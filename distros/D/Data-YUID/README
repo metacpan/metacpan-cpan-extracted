@@ -1,0 +1,28 @@
+$Id$
+
+This is Data::YUID, a distributed ID allocator that generates unique
+64-bit integers.
+
+PREREQUISITES
+
+    * Danga::Socket
+    * URI::Escape
+    * 64-bit Perl
+
+INSTALLATION
+
+Data::YUID installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % perl -MCPAN -e 'install Data::YUID'
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+Six Apart / cpan@sixapart.com

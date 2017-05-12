@@ -1,0 +1,15 @@
+---
+name: Date-Holidays-DK
+version: 0.03
+author: ~
+abstract: Determine Danish public holidays
+license: perl
+requires:
+  Date::Easter: 0
+  Date::Simple: 0
+  Test::More: 0
+provides:
+  Date::Holidays::DK:
+    file: DK.pm
+    version: 0.03
+generated_by: Module::Build version 0.2611

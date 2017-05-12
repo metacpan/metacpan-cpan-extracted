@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/MintingProfile/Author/Caelum.pm
+profiles/default/Module.pm
+profiles/default/profile.ini
+profiles/default/skel/dist.ini
+t/00-compile.t
+t/release-pod-syntax.t

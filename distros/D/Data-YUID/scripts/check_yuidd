@@ -1,0 +1,53 @@
+#!/usr/bin/perl -w
+use strict;
+
+## Nagios plugin to check the healthiness of a yuidd server.
+
+use utils qw( %ERRORS $TIMEOUT );
+use Getopt::Long qw( :config no_ignore_case );
+use IO::Socket::INET;
+
+GetOptions(
+    'h|help!'     => \my($help),
+    'v|verbose'   => \my($verbose),
+    'ip=s'        => \my($ip),
+    'port=i'      => \my($port),
+);
+
+if ($help) {
+    print "$0 --ip <ip> --port <port>\n";
+    exit $ERRORS{OK};
+}
+
+unless ($ip && $port) {
+    print <<USAGE;
+You have to set the IP (--ip) and port (--port) of the yuidd server.
+
+Example:
+
+    $0 --ip 127.0.0.1 --port 9001
+USAGE
+    exit $ERRORS{UNKNOWN};
+}
+
+sub exit_with {
+    my($code, $msg) = @_;
+    $msg = $msg ? ' - ' . $msg : '';
+    print "yuidd $ip:$port $code$msg";
+    exit $ERRORS{$code};
+}
+
+my $sock = IO::Socket::INET->new(
+        PeerAddr => $ip,
+        PeerPort => $port,
+        Proto    => 'tcp',
+    ) or exit_with 'CRITICAL', "Can't create socket: $!";
+$sock->print("ping\r\n");
+$sock->flush;
+my $line = $sock->getline;
+
+if ($line =~ /^ok/i) {
+    exit_with 'OK';
+} else {
+    exit_with 'CRITICAL', "Didn't get an OK response: '$line'";
+}

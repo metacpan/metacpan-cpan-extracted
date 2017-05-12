@@ -1,0 +1,224 @@
+Revision history for Dancer2::Template::TemplateFlute
+
+0.203 Wed  5 Oct 11:42:20 CEST 2016
+
+    [BUG FIXES]
+
+    * When app was mounted on non-root mount point the TF url rewrite flag
+      was not being set correctly.
+
+0.202 Mon Jun 27 17:01:21 CEST 2016
+
+    [TESTS]
+
+    * set env var DANCER_ENVIRONMENT to undef so tests do not fail when run
+      in an environment that has it set to something else.
+
+0.201 Mon  6 Jun 18:28:40 CEST 2016
+
+    * Remove tests that need the form method from the plugin (tests moved
+      to Dancer2::Plugin::TemplateFlute).
+
+0.200 Tue 19 Apr 17:03:20 CEST 2016
+
+    [DANCER2]
+
+    * First version of original Dancer module reworked for Dancer2
+      (Peter Mottram)
+
+
+Original Dancer::Template::TemplateFlute revision history
+
+0.0150 Fri Jul 31 11:28:20 2015 EEST
+
+    [ENHANCEMENTS]
+
+    * New method error_tokens (Marco Pessotto, GH #16, #17).
+
+    [BUG FIXES]
+
+    * Store the errors in the session when calling errors with an argument
+      (Marco Pessotto, GH #14).
+
+0.0142 Mon Apr 20 16:39:29 2015 CEST
+
+    [BUG FIXES]
+
+    * Make failure method from form plugin more flexible (Stefan Hornburg).
+
+0.0141 Tue Jan 13 15:59:38 2015 CET
+
+    [ENHANCEMENTS]
+
+    * Turn check_dangling on by default in development environment
+      (GH #10, #11, Marco Pessotto).
+
+    [BUG FIXES]
+
+    * Fix assignment to form_errors in failure method from Form plugin
+      (Stefan Hornburg).
+
+0.0140 Thu Oct  2 10:03:13 2014 CEST
+
+    [API CHANGES]
+
+    * Overhaul support for email CIDs (GH #12, Marco Pessotto).
+
+    [BUG FIXES]
+
+    * Prevent crash when $tokens->{form} isn't an object (Stefan Hornburg).
+    * Add more information to missing form debug message (Stefan Hornburg).
+
+0.0113 Tue Apr 15 17:56:39 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for embedding images in emails (GH #11, Marco Pessotto).
+    * Issue debug message if form token is passed, but no form is found in
+      the template.
+    * Don't stringify dump hash produced by dangling check.
+
+    [TESTS]
+
+    * Add tests for checkboxes in lists (Marco Pessotto).
+    * Report XML::Twig version when testing entities (GH #7, Marco Pessotto)
+    * Add test for ampersand crash (GH #7).
+
+0.0106 Sun Mar  9 14:17:03 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for URI adjust feature.
+
+0.0104 Fri Mar  7 13:49:05 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for disabling autodetection (GH #6, Marco Pessotto).
+    * Add support for checking dangling specification elements
+      (GH #4, Marco Pessotto)
+
+0.0103 Wed Mar  5 17:11:34 2014 CET
+
+    [BUG FIXES]
+
+    * Bump up prerequisite on Template::Flute in order to
+      fix duplicate dropdown problem.
+
+    [TESTS]
+
+    * Add tests for duplicate dropdowns (GH #5, Marco Pessotto).
+
+0.0102 Fri Feb 28 23:03:04 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Check first whether one of the form values has a defined value before
+      lowering the pristine flag.
+
+    * Remove spurious warning from Dancer::Plugin::Form.
+
+0.0101 Thu Feb 27 17:21:52 2014 CET
+
+    [ENHANCEMENTS]
+
+    * Pass options to the translation class (GH #3, Marco Pessotto).
+    * Add pristine method to Dancer::Plugin::Form object.
+
+0.0099 Mon Feb 10 21:20:19 2014 CET
+
+    [ENHANCEMENTS]
+ 
+    * Add meta resources to Makefile.PL.
+    * Add I18N support for Template::Flute engine (GH #2, Marco Pessotto).
+
+    [TESTS]
+
+    * Add tests for dropdown failures.
+
+0.0092 Thu Dec 19 16:11:46 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for multiple forms.
+    * Extend values method to allow passing of arbitrary parameters.
+
+0.0061 Mon Mar 25 10:54:39 2013 CET
+
+    [ENHANCEMENTS]
+
+    * Allow URI parameters to be passed into failure method of 
+      Dancer::Plugin::Form.
+
+    [TESTS]
+
+    * Add simple template test.
+
+    [DOCUMENTATION]
+
+    * Add layout section.
+
+0.0060 Thu Jan 24 15:00:33 2013 CET
+
+    * Bump up Template::Flute prerequisite to 0.0060.
+
+    [BUG FIXES]
+
+    * Set form action only if form object carries one.
+
+0.0030 Mon Mar 26 13:29:08 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Add reset method to Dancer::Plugin::Form.
+
+    [BUG FIXES]
+
+    * Select correct form from tokens when using named forms.
+
+0.0025 Fri Feb 10 17:49:06 2012 CET
+
+    [ENHANCEMENTS]
+
+    * Add valid method to Dancer::Plugin::Form class.
+    * Add name method to Dancer::Plugin::Form class.
+
+0.0024 Mon Dec 19 12:08:53 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Add form plugin Dancer::Plugin::Form.
+
+0.0023  Sat Dec 17 07:09:26 2011 CET
+
+    [ENHANCEMENTS]
+
+    * Pass through filter options from configuration.
+    * Pass through selector and children parameters to iterators.
+    * Add form handling to Dancer::Template::TemplateFlute.
+
+    [BUG FIXES]
+
+    * Fix error messages for iterator failures in Dancer::Template::TemplateFlute.
+
+0.0003  Sun Apr  3 07:31:18 2011 CEST
+
+     [ENHANCEMENTS]
+
+     * Add support for Template::Flute iterators in Dancer configuration.
+
+     [BUG FIXES]
+
+     * Fix MANIFEST.
+
+0.0002  Tue Mar 29 15:52:11 2011 CEST
+
+     [ENHANCEMENTS]
+
+     * Use new auto_iterators parameter for render method.
+
+0.0001  Sun Mar 13 15:40:50 2011 CET
+
+     * Initial release.
+
+

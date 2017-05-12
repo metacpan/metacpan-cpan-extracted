@@ -1,0 +1,10 @@
+Changes
+lib/Dancer/Plugin/Auth/Google.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-basic.t
+t/01-parse_response.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

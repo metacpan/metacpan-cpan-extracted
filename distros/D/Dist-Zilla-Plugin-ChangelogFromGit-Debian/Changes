@@ -1,0 +1,22 @@
+Revision history for Dist-Zilla-Plugin-ChangelogFromGit-Debian
+
+0.10 Nov 20 2014
+    - Add allow_empty_head option to allow HEAD versions with no changes
+      to be entered into the changelog. This is a selfish feature that I
+      need for something I'm doing. Yay me!
+
+0.07 Feb 8 2012
+    - Add maintainer email and name as Debian doesn't like multiple folks
+      being attributed. This should clean up a lot of warnings in debuild's
+      processing of changelogs. Defaults to CPAN Author <cpan@example.org>
+
+0.06 Jan 17 2012
+    - Add leading asterisk to change lines and indent additional lines past
+      the first-lines asterisk. Refs IIOSS-26
+
+0.05 Dec 29 2011
+    - Default package name to lc($self->zilla->name) to match other plugins
+
+0.04 Nov 14 2011
+    - Use @GPHAT plugin bundle for dzil
+    - Add dist_name config option

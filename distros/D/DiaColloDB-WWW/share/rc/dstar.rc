@@ -1,0 +1,14 @@
+##-*- Mode: CPerl -*-
+##
+## File: dstar.rc
+## Description: example dstar.rc for DiaColloDB::WWW distribution
+
+#$dstar{server_host}="127.0.0.1";			##-- server_host : remote host of associated ddc server (if any)
+#$dstar{server_port}="50011";				##-- server-port : port of associated ddc server (if any)
+#$dstar{corpus}="example";				##-- corpus      : symbolic name of this corpus (for display)
+#$dstar{www_host}="localhost";				##-- www_host    : www server host
+#$dstar{www_path}="/dstar/example";			##-- www_path    : www server path to top-level dstar corpus directory
+#$dstar{www_url}="http://localhost/dstar/example";	##-- www_url     : full url to level dstar corpus directory, e.g. for KWIC-links
+
+1; ##-- return a true value
+

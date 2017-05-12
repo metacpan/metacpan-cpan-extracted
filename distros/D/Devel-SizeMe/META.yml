@@ -1,0 +1,35 @@
+---
+abstract: unknown
+author:
+  - unknown
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-SizeMe
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: 1.37
+  DBI: 0
+  Devel::Dwarn: 0
+  HTML::Entities: 0
+  JSON::XS: 0
+  Moo: 1.000007
+  Test::More: 0.98
+  XSLoader: 0
+  autodie: 2.12
+  perl: 5.008
+resources:
+  homepage: https://github.com/timbunce/devel-sizeme
+  x_Metaspec:
+    version: 2
+version: 0.19

@@ -1,0 +1,60 @@
+#!/usr/bin/env perl
+# PODNAME: ddc
+# ABSTRACT: Dump file(s) coloured
+
+use strict;
+use warnings;
+use DDC;
+
+$|=1;
+
+while (<>) {
+  pc($_);
+  print "\n" if eof;
+}
+
+__END__
+
+=pod
+
+=head1 NAME
+
+ddc - Dump file(s) coloured
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+  ddc somefile
+
+=head1 DESCRIPTION
+
+Display coloured dump of file
+
+=encoding utf8
+
+=head1 SUPPORT
+
+Repository
+
+  https://github.com/Getty/p5-anyevent-itm
+  Pull request and additional contributors are welcome
+
+Issue Tracker
+
+  https://github.com/Getty/p5-anyevent-itm/issues
+
+=head1 AUTHOR
+
+Torsten Raudssus <torsten@raudss.us>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Torsten Raudssus.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

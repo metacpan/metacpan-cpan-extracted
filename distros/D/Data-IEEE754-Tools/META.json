@@ -1,0 +1,71 @@
+{
+   "abstract" : "Various tools for understanding and manipulating the underlying IEEE-754 representation of floating point values",
+   "author" : [
+      "Peter C. jones <petercj AT cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "keywords" : [
+      "IEEE-754",
+      "floating point representation"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-IEEE754-Tools",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Config" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Test::More" : "0.86",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Exporter" : "0",
+            "perl" : "5.006000",
+            "strict" : "0",
+            "version" : "0.77",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Config" : "0",
+            "Test::More" : "0.86",
+            "constant" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Data-IEEE754-Tools@rt.cpan.org",
+         "web" : "https://github.com/pryrt/Data-IEEE754-Tools/issues"
+      }
+   },
+   "version" : "v0.016",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

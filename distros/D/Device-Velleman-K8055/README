@@ -1,0 +1,52 @@
+Device-Velleman-K8055
+
+The Velleman K8055 interface board has 5 digital input channels and 8 digital output channels.
+In addition, there are two analogue inputs, two analogue voltage outputs and two PWM
+(Pulse Width Modulation) outputs with 8 bit resolution. The number of inputs/outputs can be
+further expanded by connecting more (up to a maximum of four) cards to the PC's USB connectors.
+
+For more information on this board, visit http://www.velleman.be
+
+Currently this module is just a Win32::API wrapper around the K8055D.dll that Velleman
+supplies with the board. Since that will only work on Win32 systems, I intend
+to write something myself that will be portable to other platforms...patches for
+this are welcome.
+
+You need to copy K8055D.dll in a directory in your path (e.g. C:\\WINDOWS)
+The DLL can be found inside this package.
+
+INSTALLATION
+
+First of all, make sure you have connected the K8055 device to one of your PC's USB
+ports. You also need to set the device number. The tests supplied with this module
+assume that you have set your device number to 0. This is the default setting on the
+board.
+You can change this setting by modifying the jumpers SK5 and SK6 according to this table:
+
+SK5   SK6    CARD ADDRESS
+ON    ON     0
+OFF   ON     1
+ON    OFF    2
+OFF   OFF    3
+
+Note: These settings must be done before the USB cable is connected to the K8055 card or before
+turning the PC on.
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    nmake
+    nmake test
+    nmake install
+
+If you indeed choose to run 'make test', please keep an eye on your screen to see what
+tests are run. One of the tests requires you to press the buttons on the K8055 board.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 Jouke Visser
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

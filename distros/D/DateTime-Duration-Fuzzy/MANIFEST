@@ -1,0 +1,8 @@
+Build.PL
+Changes
+MANIFEST
+META.yml
+README
+lib/DateTime/Duration/Fuzzy.pm
+t/01-time_ago.t
+t/manifest.t

@@ -1,0 +1,8 @@
+Revision history for Perl extension DLM::Client.
+
+0.01  Tue Sep  7 15:11:14 2010
+	- original version; created by h2xs 1.23 with options
+		-n DLM::Client /usr/include/libdlm.h
+0.02  
+      Reduced perl version dependency to 5.8.8
+

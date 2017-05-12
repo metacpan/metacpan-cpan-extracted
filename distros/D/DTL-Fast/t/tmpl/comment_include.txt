@@ -1,0 +1,6 @@
+commented {% comment Some comment %}
+This part
+should 
+not 
+be 
+rendered{% endcomment %} test

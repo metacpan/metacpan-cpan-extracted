@@ -1,0 +1,48 @@
+#!/usr/local/bin/perl
+
+# Copyright (C) 2003 Julius C. Duque
+
+use diagnostics;
+use strict;
+use warnings;
+use Digest::SHA2;
+
+my $string1 = "This is a string.";
+my $string2 = "This is another string.";
+my $string3 = "This is a string.This is another string.abc";
+my $string4 = "abc";
+
+my $sha2obj = new Digest::SHA2 256;
+
+$sha2obj->add($string1);
+
+# append $string2 to original object
+$sha2obj->add($string2);
+
+my $clone = $sha2obj->clone();   # clone SHA-2 object
+
+my $partialsig = $sha2obj->clone->hexdigest;
+print "partial digest\n";
+print "$partialsig\n\n";
+
+# append $string4 to original object
+$sha2obj->add($string4);
+my $digest1 = $sha2obj->hexdigest();  # digest of original
+
+# append $string4 to cloned object
+$clone->add($string4);
+my $digest2 = $clone->hexdigest();    # digest of clone
+
+my $newobj = new Digest::SHA2 256;    # make another object
+$newobj->add($string3);
+my $digest3 = $newobj->hexdigest();
+
+if (($digest1 eq $digest2) and ($digest2 eq $digest3)) {
+    print "All digests OK\n";
+} else {
+    print "ERROR!\n";
+    print "$digest1  Digest1\n";
+    print "$digest2  Digest2\n";
+    print "$digest3  Digest3\n";
+}
+

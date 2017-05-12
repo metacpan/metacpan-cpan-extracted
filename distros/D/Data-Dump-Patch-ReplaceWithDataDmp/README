@@ -1,0 +1,12 @@
+SYNOPSIS
+
+     use Data::Dump::Patch::ReplaceWithDataDmp;
+
+DESCRIPTION
+
+    This patch module is for testing. It will replace Data::Dump's dump()
+    routine with one that uses Data::Dmp, so any other code that uses
+    Data::Dump will dump using Data::Dmp instead.
+
+SEE ALSO
+

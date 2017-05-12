@@ -1,0 +1,35 @@
+DMTF-CIM version 0.04
+
+Perl interface to the DMTF's CIM model.  This module is intended to provide a
+common API for accessing CIM data via various other modules.  Instances,
+properties (including references), methods, and method parameters are all
+modeled as unique classes with their own API.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+Alternatively, to install with Module::Build, you can use the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Broadcom Corporation
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

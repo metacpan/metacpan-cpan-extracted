@@ -1,0 +1,16 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DJabberd-Plugin-PrivateStorage
+version:      0.60
+version_from: lib/DJabberd/Plugin/PrivateStorage.pm
+installdirs:  site
+requires:
+    DJabberd:                      0
+    File::Basename:                0
+    File::Path:                    0
+    File::Slurp:                   0
+    Test::More:                    0
+    URI::Escape:                   0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

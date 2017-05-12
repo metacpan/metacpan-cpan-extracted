@@ -1,0 +1,45 @@
+Revision history for Dist-Zilla-Plugin-Author-Plicease
+
+2.12      2017-03-22 11:58:24 -0400
+  - Update default .travis.yml
+
+2.11      2017-01-23 13:45:17 -0500
+  - If Test2::Suite is required, that implies 0.000060 or better
+
+2.10      2016-10-04 12:42:03 -0400
+  - Use ratbat for deployment of non-CPAN modules
+  - [Author::Plicease::MakeMaker] includes .pod files along with .pm files
+
+2.09      2016-07-12 08:38:42 -0400
+  - Fixed additional Dist::Zilla 6.x compat
+
+2.07      2016-06-23 08:24:35 -0400
+  - Fixed bug where minting profile was failing on fresh install
+
+2.06      2016-05-10 21:22:24 -0400
+  - These tests are not stored in the modul repos anymore:
+    changes, fixme
+  - These tests are now author tests instead of release tests:
+    pod_coverage, pod_spelling_common, pod_spelling_system, version
+  - The same tests are not stored in the module repos anymore
+  - The config file xt/release/release.yml is now called
+    author.yml
+  - Coalesce Test2 and Test2::Suite requirements
+  - No longer recommend YAML::XS when we need YAML
+
+2.05      2016-05-10 10:07:09 -0400
+  - These tests are now author tests instead of release tests:
+    eol, no_tabs, pod, strict
+  - The same tests are not stored in the module repos anymore
+
+2.04      2016-05-03 06:05:52 -0400
+  - require IPC::System::Run for autodie ':system';
+
+2.03      2016-04-24 19:04:41 -0400
+  - Dist::Zilla 6.x compatability
+
+2.02      2016-03-08 09:50:55 -0500
+  - Move mint mechanisms into this dist from the bundle
+
+2.01      2016-03-08 09:18:38 -0500
+  - initial version

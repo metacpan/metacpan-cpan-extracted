@@ -1,0 +1,29 @@
+use 5.10.1;
+use strict;
+use warnings;
+
+package {{$name}};
+
+# VERSION
+# ABSTRACT: Short intro
+
+
+
+1;
+
+
+__END__
+
+=pod
+
+=head1 SYNOPSIS
+
+    use {{$name}};
+
+=head1 DESCRIPTION
+
+{{$name}} is ...
+
+=head1 SEE ALSO
+
+=cut

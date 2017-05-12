@@ -1,0 +1,21 @@
+################################################################################
+#
+#   File name: Illustra.mtest
+#   Project: DBD::Illustra
+#   Description: module specific definitions for an 'Illustra' database
+#
+#   Author: Peter Haworth
+#   Date created: 11/08/1998
+#
+#   sccs version: 1.1    last changed: 09/29/98
+#
+#   Copyright (c) 1998 Institute of Physics Publishing
+#   You may distribute under the terms of the Artistic License,
+#   as distributed with perl, with the exception that it cannot be placed
+#   on a CD-ROM or similar media for commercial distribution without the
+#   prior approval of the author.
+#
+################################################################################
+
+
+1;

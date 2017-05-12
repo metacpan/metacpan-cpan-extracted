@@ -1,0 +1,59 @@
+Revision history for Devel-GlobalDestruction
+
+0.14 - 2016-10-31
+  - stop relying on . being in @INC
+  - switch to ExtUtils::HasCompiler to detect presence of a compiler
+
+0.13 - 2014-08-16
+  * include README
+  * include minimum perl version 5.6 in metadata
+
+0.12  Fri, 01 Nov 2013
+  * Fix detection when loaded during global destruction by checking B::main_cv
+    instead of B::main_start
+  * Bump Sub::Exporter::Progressive dependency to fix loading in global
+    destruction
+
+0.11  Wed, 03 Apr 2013
+  * Fix upgrading from version 0.09 or older
+
+0.10  Tue, 26 Mar 2013
+  * Rewrite pure-perl implementation in terms of B::main_start
+    (greatly simplifies code)
+  * Fix pure-perl behavior under $^C (RT#78619))
+  * Separate XS portion into a compiler-optional dependency
+    Devel::GlobalDestruction::XS
+
+0.09  Wed, 08 Aug 2012
+  * Rewrite completely broken pure-perl GD detection under threads
+  * Fix pure-perl implementation incorrectly reporting GD during END phase
+
+0.08  Tue, 31 Jul 2012
+  * Switch to Sub::Exporter::Progressive
+
+0.07  Wed, 25 Jul 2012
+  * Actually detect errors in pure-perl test
+  * Add prototype to pure-perl pre-5.14 version
+
+0.06  Thu, 14 Jun 2012
+  * De-retardize XS-less behavior under SpeedyCGI
+  * Test suite now works from within space-containing paths
+
+0.05  Thu, 26 Apr 2012
+  * Pure-perl implementation for situations where neither ${^GLOBAL_PHASE} nor
+    XS are available
+
+0.04  Sun, 03 Jul 2011 11:28:51 +0200
+  * To detect a perl with ${^GLOBAL_PHASE}, check for the feature itself instead
+    of a specific perl version (doy).
+  * Update the documentation to reflect the use of ${^GLOBAL_PHASE} if available
+    (doy).
+  * Stop depending on Scope::Guard for the tests (doy).
+  * Upgrade ppport.h from version 3.13 to 3.19.
+
+0.03
+  * Drop the XS code on perl versions recent enough to have ${^GLOBAL_PHASE}.
+  * Drop code to support perls older than 5.6.  We've always been depending on
+    5.6 anyway.
+    + Use XSLoader without a fallback to DynaLoader.
+    + Use our instead of use vars.

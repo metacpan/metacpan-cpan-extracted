@@ -1,0 +1,20 @@
+Revision history for Devel-REPL-Plugin-DDP
+
+0.05  2014-12-11 13:51:06 PST
+        - Avoid uninitialized value warnings by not chomping undef values.
+          (Thanks Andreas Voegele!)
+
+0.04  2014-07-25 14:13:25 PDT
+        - Pass all return values through DDP instead of potentially
+          stringifying single objects or using single, non-ref values as-is.
+          Consistency consistency consistency.
+
+0.03  2013-12-10 16:45:27 PST
+        - Stop leaking internal representation of return values to the user
+          (persistent enclosing outer arrayref)
+
+0.02  2013-07-23 18:56:51 PDT
+        - Fix deps
+
+0.01  2013-07-22 20:12:07 PDT
+        - Initial release

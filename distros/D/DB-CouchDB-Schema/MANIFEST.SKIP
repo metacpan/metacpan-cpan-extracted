@@ -1,0 +1,4 @@
+^\.git\/
+blib
+pm_to_blib
+.gitignore

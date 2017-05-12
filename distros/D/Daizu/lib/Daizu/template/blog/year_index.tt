@@ -1,0 +1,21 @@
+<div class="article-index hfeed" id="blog-index">
+ <h2>[% page_title |encode |html %]</h2>
+ [% INCLUDE prev_next_nav.tt %]
+
+[% FOREACH month = months %]
+ <h3><a href="[% month.month_url %]">[% month.month_date.strftime('%B') %]</a></h3>
+ <ul>
+ [% FOREACH entry = month.articles %]
+  <li class="hentry">
+   <a href="[% entry.permalink |html %]" rel="bookmark" class="entry-title">[% entry.title |encode |html %]</a>
+   <abbr class="published" title="[% entry.issued_at.ymd %]T[% entry.issued_at.hms %]Z">[% entry.issued_at.strftime('%A %e at&nbsp;%H:%M') %]</abbr>
+   [% IF entry.description %]
+    <br><small class="entry-summary">[% entry.description |encode |html %]</small>
+   [% END %]
+  </li>
+  [% END %]
+ </ul>
+[% END %]
+
+ [% INCLUDE prev_next_nav.tt %]
+</div>

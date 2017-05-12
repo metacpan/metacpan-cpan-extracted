@@ -1,0 +1,19 @@
+Changes
+lib/Date/Exception.pm
+lib/Date/Exception/InvalidDay.pm
+lib/Date/Exception/InvalidDayCount.pm
+lib/Date/Exception/InvalidMonth.pm
+lib/Date/Exception/InvalidMonthCount.pm
+lib/Date/Exception/InvalidYear.pm
+lib/Date/Exception/InvalidYearCount.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/manifest.t
+t/pod.t
+t/changes.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

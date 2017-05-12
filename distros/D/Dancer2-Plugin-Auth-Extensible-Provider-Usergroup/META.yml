@@ -1,0 +1,32 @@
+---
+abstract: 'authenticate as a member of a group'
+author:
+  - 'Henk van Oers <hvo.pm@xs4all.nl>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-Extensible-Provider-Usergroup
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2: '0.200000'
+  Dancer2::Plugin::Auth::Extensible: '0.620'
+  Dancer2::Plugin::DBIC: '0.0012'
+  Dancer2::Plugin::Passphrase: '3.000002'
+  Test::More: '0'
+  perl: '5.010001'
+resources:
+  bugtracker: https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/issues
+  homepage: https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup/
+  repository: https://github.com/hvoers/Dancer2-Plugin-Auth-Extensible-Provider-Usergroup
+version: '0.620'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

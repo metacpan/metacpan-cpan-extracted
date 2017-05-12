@@ -1,0 +1,9 @@
+Revision history for DBI-NamedBinding
+
+0.02    2008-02-26
+        Require perl 5.006 and DBD::SQLite (thanks CPAN testers!)
+
+0.01    2008-02-22
+        Based on a crazy idea at a SPUG meeting (Seattle.pm), I set out to
+        make it a reality.
+

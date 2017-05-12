@@ -1,0 +1,31 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertCommandOutput]
+     ;make_verbatim=1
+
+    In your POD:
+
+     # COMMAND: netstat -anp
+
+DESCRIPTION
+
+    This module finds # COMMAND: ... directives in your POD, pass it to the
+    Perl's backtick operator, and insert the result into your POD as a
+    verbatim paragraph (unless if you set make_verbatim to 0, in which case
+    output will be inserted as-is). If command fails ($? is non-zero),
+    build will be aborted.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertCodeResult, which can also be used to
+    accomplish the same thing, e.g. with # CODE: my $res = `netstat -anp`;
+    die if $?; $res except the DZP::InstallCommandResult plugin is shorter.
+
+    Dist::Zilla::Plugin::InsertCodeOutput, which can also be used to
+    accomplish the same thing, e.g. with # CODE: system "netstat -anp"; die
+    if $?.
+
+    Dist::Zilla::Plugin::InsertExample
+

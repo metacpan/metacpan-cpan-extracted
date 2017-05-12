@@ -1,0 +1,160 @@
+=head1 NAME
+
+Installation of DBIx::PgLink
+
+=head1 PREREQUISITES
+
+=over
+
+=item *
+
+PostgreSQL 8.2 or later
+
+=item *
+
+Perl 5.8.6 or later
+
+=item *
+
+Perl modules
+
+     DBI
+     DBD::Pg
+     Moose
+     MooseX::Method
+     Tie::Cache::LRU
+
+     DBD driver for remote database
+
+Moose requires L<Class::MOP> module. 
+Ensure that you have latest Class::MOP version installed, 
+for notable performance boost in 0.49.
+
+=item *
+
+Superuser account on local PostgreSQL server
+
+Must logon without password typing, i.e. use 'trust' authentication 
+or store password in .pgpass/pgpass.conf file
+
+=back
+
+=head1 BUILDING
+
+Run
+
+  perl Makefile.PL
+  make
+
+(on Windows with Microsoft Visual Studio use 'nmake')
+
+or
+
+  perl Build.PL
+  ./Build
+
+=head1 TESTING
+
+=over
+
+=item *
+
+Change t/test.conf for your environment. It's in YAML format.
+
+First configuration entry named 'TEST' describe local PostgreSQL connection.
+Test will log on to this server as specified user,
+drop and create test database and install all database object.
+
+B<WARNING: all previous content of database will be lost>
+
+This database also will be used as 'remote' database for testing.
+
+Other entries are commented by default.
+
+
+=item *
+
+Check PostgreSQL account
+
+Ensure that PostgreSQL owner (operating system account, usually 'postgres')
+can connect to his own server with specified in t/test.conf credentials.
+If used .pgpass file, place it to 'postgres' home directory.
+
+
+=item *
+
+Change permission on some directories for PostgreSQL owner account
+
+=over
+
+=item read permissions for ./blib
+
+  chmod -R o=r,+X blib
+
+=item read and write permissions for ./examples
+
+  chmod -R o=rw,+X examples
+
+Only if you plan testing of XBase or SQLite data sources
+
+=back
+
+=item *
+
+Run test
+
+  make test
+
+or
+
+  ./Build test
+
+Check for errors.
+
+=back
+
+=head1 INSTALLING
+
+=over
+
+=item *
+
+Install Perl module
+
+Run as root
+
+  make install
+
+or
+
+  ./Build install
+
+=item *
+
+Install database objects
+
+Run
+
+  psql -h <host> -p <port> -U <superuser> -f _install.sql <database>
+
+=back
+
+=head1 SEE ALSO
+
+L<DBIx::PgLink::Manual::Usage>,
+L<http://pgfoundry.org/projects/dbi-link/>
+
+=head1 AUTHOR
+
+Alexey Sharafutdinov E<lt>alexey.s.v.br@gmail.comE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2007 by Alexey Sharafutdinov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

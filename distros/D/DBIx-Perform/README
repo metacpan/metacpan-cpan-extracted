@@ -1,0 +1,126 @@
+DBIx/Perform version 0.01
+=========================
+
+
+DBIx::Perform - Informix Perform(tm) emulator
+
+
+Emulates the Informix Perform character-terminal-based database query
+and update utility.  
+
+DESCRIPTION
+
+The filename given to the I<perform> command may be a Perform
+specification (.per) file.  The call to the I<run> function may be a
+filename of a .per file or of a file pre-digested by the
+DBIx::Perform::DigestPer class (extension .pps).  [Using pre-digested
+files does not appreciably speed things up, so this feature is not highly recommended.]
+
+The argument to the I<run> function may also be a string holding the
+contents of a .per or .pps file, or a hash ref with the contents of a
+.pps file (keys db, screen, tables, attrs).
+
+The database named in the screen spec may be a DBI connect argument, or
+just a database name.  In that case, the database type is taken from
+environment variable DB_CLASS.  The username and password are taken from
+DB_USER and DB_PASSWORD, respectively.
+
+Supports the following features of Informix's Perform:
+
+ Field Attributes: COLOR, NOENTRY, NOUPDATE, DEFAULT, UPSHIFT, DOWNSHIFT,
+		   INCLUDE, COMMENTS
+
+ 2-table Master/Detail  (though no query in detail mode)
+
+ VERY simple control blocks (nextfield= and let f1 = f2 op f3-or-constant)
+
+
+INSTALLATION
+
+You know the drill:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI  DBD::whatever
+  Curses  Curses::Application Curses::Forms  Curses::Widgets::*
+
+FUNDING CREDIT
+
+Development of DBIx::Perform was generously funded by Telecom
+Engineering Associates of San Carlos, CA, a full-service 2-way radio
+and telephony services company primarily serving public-sector
+organizations in the SF Bay Area.  On the web at
+http://www.tcomeng.com/  (do I sound like Frank Tavares yet?).
+
+AUTHOR
+
+Eric C. Weaver  E<lt>weav@sigma.netE<gt> 
+
+COPYRIGHT AND LICENSE
+
+Copyright 2003 by Eric C. Weaver and 
+Telecom Engineering Associates (a California corporation).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+
+=======================================================================
+=======================================================================
+=======================================================================
+DBIx::Perform, version 0.694, 2007 Oct 5.
+
+Many, many changes and improvements.  And perhaps some regressions too.
+In order to better duplicate the original, database operations have
+unfortunately become much more Informix specific, with much use of "rowid".
+
+Some of the improvements from version 0.05:
+Screen, Table, Master, Detail, and Current buttons are implemented.
+Most of the attributes and instructions now work.
+Query results more closely match the original utility's results.
+
+
+NOT IMPLEMENTED
+View and Output buttons.
+'!' key.
+Without Null Input in the Database section (p. 2-9).
+Alias and Owner in the Table section (p. 2-18).
+Color, Invisible, Verify, Wordwrap, Zerofill attributes.
+Allowing Input in the Displayonly attribute (p. 2-24).
+Delimiters, On Beginning, and On Ending instructions.
+Current in the Default attribute.
+Today, Current, Max, Min, Count, Total, and Average in the Let instruction.
+Datetime and Interval data types (p. 3-11).
+All the returns (lngreturn, floreturn, etc.) except intreturn (p. 6-21).
+pf_gettype external function for use by external C functions (p. 6-23).
+
+DEPENDENCIES
+In addition to those listed above, also need:
+  YAML
+  RecdescentParser
+
+FUNDING CREDIT
+This project was done at:
+
+Valtech
+5080 Spectrum Drive - Suite 700 west
+Addison, Texas 75001
+
+This project was paid by and done for:
+
+Essilor of America
+13515 North Stemmons Freeway
+Dallas, Texas 75234
+
+AUTHORS
+
+  Martin Baer     2007/1/1  -  2007/7/14
+  Brenton Chapin  2007/3/16 -  2007/9/12  (chapinb@acm.org)
+

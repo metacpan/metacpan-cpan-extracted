@@ -1,0 +1,10 @@
+name:               Date-MonthSet
+version:            0.2
+abstract:           simple interface to a collection of months
+license:            perl
+version_from:       lib/Date/MonthSet.pm
+installdirs:        site
+distribution_type:  module
+generated_by:       Mike Eldridge <diz@cpan.org>
+author:
+  - Mike Eldridge <diz@cpan.org>

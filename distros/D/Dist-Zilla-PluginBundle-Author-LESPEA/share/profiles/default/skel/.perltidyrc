@@ -1,0 +1,11 @@
+#  Tell Perl::Tidy how I want my code formatted
+
+-l 140                              #  I have a modern wide-screen monitor thank you
+-nolq                               #  Don't put long comments at indent 0
+-sot                                #  Stack opening tokens
+-lp -vt=2                           #  Don't put multiple statements on seperate lines
+-nsbl                               #  Opening sub brace
+-ole=unix                           #  Always use unix line endings :)
+-csc                                #  In long brace statements, identify what each one closes
+-sbc --static-block-comments        #  Allow "static block comments"
+-mbl=3                              #  Allow up to 3 blank lines in a row!

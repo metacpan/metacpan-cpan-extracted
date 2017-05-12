@@ -1,0 +1,4 @@
+name = "Data-XLSX-Parser"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

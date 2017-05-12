@@ -1,0 +1,19 @@
+#!/usr/bin/env perl
+
+use YAML::Tiny qw(DumpFile);
+use Path::Class;
+use strict;
+use warnings;
+
+my $data_file = file('share/USC/SIPI/data.yml');
+my $top = dir('/tmp/sipi');
+my @list;
+$top->recurse( callback => sub {
+	push @list, $_[0]->relative($top) if -f $_[0];
+});
+
+my %data = map { (
+	"$_" => { name => ($_->basename =~ s/\.tiff$//r), description => '', size => 512, type => 'monochrome' }
+) } @list;
+	
+# DumpFile( $data_file, \%data );

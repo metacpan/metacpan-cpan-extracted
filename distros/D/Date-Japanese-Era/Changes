@@ -1,0 +1,26 @@
+Revision history for Perl extension Date::Japanese::Era.
+
+0.06  Thu Jun 15 11:07:39 JST 2006
+        - Oops, forgot to update Changes
+
+0.05  Thu Jun 15 11:07:02 JST 2006
+        * Support single argument like "昭和五十二年". Uses
+          Lingua::JA::Numbers for conversion.
+
+0.04  Thu Jun 15 10:27:08 JST 2006
+        * [BACKWARD INCOMPATIBLE CHANGE]
+          Refactored how to handle encodings. Deprecated old codeset()
+          APIs and now it just requires Unicode flagged string as method
+          input/output.
+
+0.03  Mon Dec 10 16:47:30 JST 2001
+	- forgot to update MANIFEST
+
+0.02  Wed Nov 21 02:30:13 JST 2001
+	* Added Date::Japanese::Era::Table::JIS_X0301
+	  (Thanks to Junio Hamano <junio@twinsun.com>)
+	- Raise warnings before 1872 (non-gregorian calendar)
+
+0.01  Fri Aug 31 21:33:16 2001
+	- original version; created by h2xs 1.19
+

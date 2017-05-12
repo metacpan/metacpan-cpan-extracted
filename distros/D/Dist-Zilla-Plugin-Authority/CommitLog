@@ -1,0 +1,107 @@
+==================================================
+Changes from 2013-10-28 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.009 at 2014-10-28 03:40:30 +0000
+------------------------------------------
+
+  Change: 9f0cbc25374574a18076d268de134e460e697e5b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 20:34:49 +0000
+
+    fix unshift arrayref error, thanks kentnl and ether 
+
+------------------------------------------
+version 1.008 at 2014-10-27 21:35:22 +0000
+------------------------------------------
+
+  Change: 163678b66715dbc3cc39576972a39dd8d700878d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 14:35:22 +0000
+
+    New CPAN release of Dist-Zilla-Plugin-Authority - v1.008
+
+    Made sure that we cannot be loaded with different authorities via
+    RT#86710 ( thanks ETHER! ) 
+
+  Change: c463f59de9eae958be01cde63d59a09ec6111a4a
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 14:33:01 +0000
+
+    allow only one authority 
+
+  Change: fdf6034e9ed3b2b839b147990a9eff302a4b3cc1
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 13:42:53 +0000
+
+    arg readme 
+
+------------------------------------------
+version 1.007 at 2014-10-27 20:42:35 +0000
+------------------------------------------
+
+  Change: 95682816b55168c84d0efdbb7174002715d85ef5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 13:42:35 +0000
+
+    New CPAN release of Dist-Zilla-Plugin-Authority - v1.007
+
+    Rewrote how we assign the $AUTHORITY variable to use 'our' instead of
+    the crufty pkg declaration format via gh-5 and gh-6 and RT#86611 (
+    thanks KENTNL + ETHER ) 
+
+  Change: 48e8c8e8b29d9a8a37c8846167fec224aea19d7b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 13:16:33 +0000
+
+    switch to using our instead of pkg, yay 
+
+  Change: fbd174529eef85cf9b23a2d86cb10caac3810e38
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-27 12:16:48 +0000
+
+    Merge pull request #5 from kentfredric/pkg_block
+
+    Pkg block syntax support 
+
+  Change: 2dbde0294c55761250af0440b5332530e4a93b87
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 11:50:40 +0000
+
+    tweak gitignore 
+
+  Change: 9eba234bc2f0108f447031d5b427d3bc4b988813
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 11:50:11 +0000
+
+    tweak changes 
+
+  Change: 4aeb0089dcd961d49065d38708e528aa2eb33a3d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 11:47:32 +0000
+
+    add mailmap 
+
+  Change: d32a7dfbaff4a205550269c8c0ab2017a113540c
+  Author: Kent Fredric <kentnl@cpan.org>
+  Date : 2013-01-07 05:30:18 +0000
+
+    Add support for the BLOCK form of package statements 
+
+  Change: eff878610cbc4d27091deb59bae6e44427fb53ac
+  Author: Kent Fredric <kentnl@cpan.org>
+  Date : 2013-01-07 05:30:18 +0000
+
+    refactor the code that handles pkg authorities 
+
+  Change: 11320ff1b75794a7429c622ed62d94a4b3a8c6ac
+  Author: Kent Fredric <kentnl@cpan.org>
+  Date : 2013-01-07 05:30:18 +0000
+
+    Authority.pm: defer comment processing code to a seperate sub,
+    Refactor the <our AUTHORITY> code into several pices 
+
+================================================
+Plus 7 releases after 2013-10-28 00:00:00 +0000.
+================================================

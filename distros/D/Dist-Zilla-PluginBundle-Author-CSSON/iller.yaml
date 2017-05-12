@@ -1,0 +1,43 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-PluginBundle-Author-CSSON
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Moose
+      - MooseX::AttributeShortcuts
+      - Types::Standard
+      - Dist::Zilla::Role::PluginBundle::Easy
+      - Dist::Zilla::Role::PluginBundle::PluginRemover
+      - Dist::Zilla::Role::PluginBundle::Config::Slicer
+      - namespace::autoclean
+      - List::AllUtils
+      - Config::INI
+      - Path::Tiny
+
+plugins:
+ - +config: Author::CSSON
+
+ - +plugin: Deprecated
+
+---
+doctype: weaver
+
+plugins:
+ - +config: Author::CSSON
+   badges: 0
+
+---
+doctype: cpanfile
+
+---
+doctype: gitignore
+
+config: Author::CSSON
+
+always:
+ - /Dist-Zilla-PluginBundle-Author-CSSON-*

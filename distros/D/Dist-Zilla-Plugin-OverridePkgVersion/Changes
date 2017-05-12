@@ -1,0 +1,9 @@
+Revision history for Perl extension Dist-Zilla-Plugin-OverridePkgVersion
+
+0.002     2014-08-15 20:41:18-04:00 America/New_York
+    - include README in dist
+    - include additional metadata
+    - include compile test
+
+0.001     2013-03-21 23:05:16 America/New_York
+    - Initial CPAN release

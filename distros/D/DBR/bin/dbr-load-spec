@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+
+use strict;
+use DBR;
+use DBR::Util::Logger;
+use DBR::Config::SpecLoader;
+
+
+my ($conffile, $spec_file) = @ARGV;
+my $confdb = 'dbrconf';
+
+my $logger = new DBR::Util::Logger(-logpath => 'dbr_loadspec.log', -logLevel => 'debug3') or die "Failed to create logger";
+my $dbr    = new DBR(
+		     -logger => $logger,
+		     -conf   => $conffile,
+		     -admin  => 1,         # This flag allows us to update definitions through the DBR::Conf objects
+		    ) or die "Failed to create DBR";
+
+my $conf_instance = $dbr->get_instance($confdb) or die "No config found for confdb $confdb";
+
+my $loader = DBR::Config::SpecLoader->new(
+					  session => $dbr->session,
+					  conf_instance => $conf_instance,
+					  dbr => $dbr,
+					 );
+
+
+my $spec = $loader->parse_file( $spec_file ) or die "Failed to open $spec_file";
+$loader->process_spec( $spec ) or die "Failed to process specs";
+

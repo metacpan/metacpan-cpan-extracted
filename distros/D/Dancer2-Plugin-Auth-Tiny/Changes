@@ -1,0 +1,53 @@
+Revision history for Dancer2-Plugin-Auth-Tiny
+
+0.008     2016-01-23 18:20:25+01:00 Europe/Amsterdam
+
+    [CHANGED]
+
+    - Stop using deprecated plugin_args, removes warnings.
+      (Peter Mottram)
+
+0.007     2015-10-02 19:21:33+02:00 Europe/Amsterdam
+
+    [DOCUMENTED]
+
+    - Fix/update documentation for references.
+      (Jason Crome, Jim Davis)
+
+0.005     2014-11-24 00:58:46+01:00 Europe/Amsterdam
+
+    [CHANGED]
+
+    - Revert fix since Dancer2 0.154000 fixed it itself.
+
+0.004     2014-11-03 19:41:23+01:00 Europe/Amsterdam
+
+    [CHANGED]
+
+    - Updated to support latest Dancer2 (now requires 0.153000)
+
+    - Fixed a bug when path creation for mounted applications
+
+0.003     2013-03-06 19:16:46 America/New_York
+
+    [CHANGED]
+
+    - Forked into Dancer2::Plugin::Auth::Tiny for proper Dancer2 support
+
+    [DOCUMENTED]
+
+    - fixed a typo in an example
+
+***** Prior history refers to Dancer::Plugin::Auth::Tiny *****
+
+0.002     2012-12-20 11:16:59 America/New_York
+
+    [ADDED]
+
+    - The 'passthrough' feature allows some query parameters in the
+      original request to be passed through to the login request
+
+0.001     2012-12-18 22:44:27 America/New_York
+
+    - First release
+

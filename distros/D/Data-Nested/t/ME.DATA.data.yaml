@@ -1,0 +1,68 @@
+---
+def1:
+  dh1:
+    a: def1a
+    b: def1b
+def2:
+  dh2:
+    a: def2a
+    c: def2c
+  usedef3: 1
+def3:
+  dh2:
+    d: def3d
+a:
+  usedef1: 0
+  usedef2: 0
+  h1:
+    a:
+  l1:
+b:
+  usedef1: 0
+  usedef2: 1
+  dh1:
+    a: valBa
+  h1:
+    a: ''
+  l1:
+    -
+c:
+  usedef1: 0
+  usedef2: 0
+  usedef3: 0
+  dh1:
+    b: valCb
+  h1:
+    a: valCh1a
+  l1:
+    - ''
+d:
+  usedef1: 0
+  usedef2: 1
+  usedef3: 0
+  dh1:
+    a: valDa
+    b: valDb
+  l1:
+    - valDl1_0
+e:
+  usedef1: 1
+  usedef2: 0
+f:
+  usedef1: 1
+  usedef2: 1
+  dh1:
+    a: valFa
+g:
+  usedef1: 1
+  usedef2: 0
+  usedef3: 0
+  dh1:
+    b: valGb
+h:
+  usedef1: 1
+  usedef2: 1
+  usedef3: 0
+  dh1:
+    a: valHa
+    b: valHb

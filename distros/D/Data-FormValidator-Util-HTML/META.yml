@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Data-FormValidator-Util-HTML
+version: 0.10
+license: perl
+distribution_type: module
+requires:
+  HTML::TokeParser::Simple: 0
+  Params::Validate: 0
+recommends: {}
+build_requires: {}
+conflicts: {}
+provides:
+  Data::FormValidator::Util::HTML:
+    file: lib/Data/FormValidator/Util/HTML.pm
+    version: 0.10
+generated_by: Module::Build version 0.21

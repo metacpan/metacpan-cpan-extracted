@@ -1,0 +1,272 @@
+Revision history for Perl extension DBIx::Abstract.
+
+1.04   2014-01-15
+	- Explicitly order options hashes to make log output deterministic.
+
+1.03   2014-01-14
+        - We were explicitly returning undef for failure, which is basically
+          always wrong.  Corrected this.
+
+1.02   2014-01-14
+	- Update documentation, etc, to point to github version
+	- Make SQL generation deterministic, rather than depending on hash
+	  order, to ease testing and predictability.
+	- Misc minor code cleanups.
+	- Move to more of my standard Dist::Zilla config.
+
+1.01   2011-08-23
+        - Update to modern build practices.
+        - Make tests work with SQLite, so they don't need to be configured.
+        - Document its depricated status.
+
+1.006  2005-04-23
+        - Fixed a bug discovered by Jan Martin Mathiassen
+          <reaper@mindriot.as>.  If you pass in a password but no username
+          it's supposed to ignore the password.  Instead it was clearing it
+          in the hash that you passed in but still using it.
+        - Removed Test::More and Test::Builder from the distribution-- put
+          Test::Simple in the prerequisites.
+
+1.005  2003-03-14 -- The "I broke the build and install process" release
+       - Fixed a stupid problem where Test::Builder and Test::More would be
+         installed by this package.  Ack.
+       - Made the Makefile.PL default to not providing a database driver. 
+         Tests will be skipped if you do this.  (This way automated module
+         testing won't break when it shouldn't.)
+       - Added a dependency on Scalar::Util.
+
+1.004  2003-02-17
+       - ensure_connection did not work correctly if DBI was set to die on
+         errors.
+       - Back ported test suite and makefile from 1.1.  Back ported patch to
+         fix mysqlPP compatibility issues.
+       - Made clone weaken references it takes so that it won't leak memory. 
+         Added memory leak test.
+       - A bug fix relating to select_one_* and select_all_* where if the
+         query failed and returned undef, the routine would crash.  This is
+         now fixed and it just propagates the undef.
+
+1.003  2002-09-23
+       - Fixed Win32 bug found by Kanji T Bates.
+       - Connect for oracle can look a bit more like those for other DBD
+         drivers now.  You may now specify your SID in the dbname field.
+
+1.002  2001-09-05
+       - Fixed bug introduced in 1.001 where trying to read ->opt always
+         produced undef.
+
+1.001  2001-09-05
+       - Made it so that opt can now take any DBI attribute.
+
+1.000  2001-09-04
+       - Now produces a better error that config/DSN is not defined.
+       - When the DBIx::Abstract object is destroyed it usually closes any
+         associated database handles (if it's the last clone alive), now it
+         will only do this if it created the handle.  This way, if you pass
+         in a handle it will survive its use by DBIx::Abstract.
+
+0.96   2001-07-07
+       - Fixed stupid bug that made it not accept DBI handles.  I can't
+         believe I actually took eight months to check this in.
+
+0.95   2000-11-12
+       - Changed how CVSVERSION and LAST_CHANGE are calculated.             
+       - Made it so that you can pass routines literal strings instead of
+         variables (variables are used with bind_params when possible) by
+         passing a scalar reference.
+       - I also allow array references to do this (in some circumstances)
+         but this is deprecated.
+       - Made connect optionally accept DBI handles instead of connection
+         info, by recommendation of Mark Stosberg <mark@summersault.com>.
+       - Changed how self was obtained to be (IMHO) stylistically better.
+
+0.94   2000-08-04
+        - Removed an annoying warn that only shows up unpredictably.  I
+          think it has to do with Perls garbage collection not working the
+          way I thought it worked.  Meanwhile I may have fixed the
+          undocumented dataseek method.  But probably not.
+        - Made it so that updates and inserts can produce nulls, eg:
+            $dbh->update('foo',{bar=>undef});
+          Would set the 'bar' column to NULL.
+        - Fixed tyop, s/STOCK TRACE/STACK TRACE/g.
+        - Made connected method safer.  It won't crash if the DBI handle is
+          invalid or non-existent.
+
+
+0.93   2000-04-17
+        - Fixed a problem with cloning.  Clones other then the first clone
+          were getting a copy of the clone list.  This caused unexpected
+          calls to the classes DESTROY method.  This produced warnings, but
+          there shouldn't have been any errors.
+
+0.921  2000-04-07
+        - Well I managed to check in the last version without including the
+          bug fix.
+        - Added select_one_to_array and select_one_to_arrayref.
+        - Fixed a nasty little bug involving CLONES.  It had been failing to
+          register clones of clones.  This was causing a memory leak.
+
+0.920  2000-04-07
+        - Added ability to inserts with literal values.
+
+0.910  2000-03-31
+        - Fixed bug in make test that caused it to fail when a password was
+          needed for testing.  This didn't effect me as my database accepts
+          anonymous connections to the test database over loopback.
+        - Fixed some warnings when username or password were undefined.
+
+0.900  2000-03-03
+        - Changed name to DBIx::Abstract in preparation for addition to
+          CPAN.
+        - Updated README to be accurate regarding the current version.
+        - Fixed a bug where an empty where would produce invalid SQL.
+        - Changed version to reflect the fact that it is VERY close to being
+          ready for 1.0.
+
+0.079  2000-03-03
+        - Fixed a bug where an empty where would produce invalid SQL.
+        - Fixed a bug that caused death under S
+
+0.078  2000-02-18
+        - Added 'saveSQL' option which, with each query, stuffs the generated
+          SQL into the 'lastsql' key in the self payload.
+        - Changed logging code for sql to log a single string (with quoted
+          parameters) instead of a string with ?'s and a bind_params array.
+
+0.07.7 2000-01-19
+        - Fixed some memory leaks (these were only a problem if you were
+          creating SQL::DBI objects in a loop).
+        - Moved from test.pl to t/basic.t for better testing.
+
+0.07.6 1999-12-29
+        - Another dumb bug... tried calling __logwrite before I had actually
+          created the SQL::DBI object.
+
+0.07.5 1999-12-21
+        - Found stupid bug where if you called a statement handle specific
+          method before doing a query (and creating one) it would crash. 
+          Normally I would shrug my shoulders and say "Don't be dumb", but
+          it is handy to be able to call "finish" regardless.
+
+0.07.4 1999-12-09
+        - Made select_one_to_hashref and select_all_to_hashref accept the same
+          parameters as select.
+        - Made select accept both table and tables, as well as field and
+          fields.
+
+0.07.3 1999-12-03
+        - Fixed bug Mike <michael@mint.net> found in the new special happy
+          join syntax.  Maybe I should have tested it.  Created more bugs,
+          then fixed those too.
+
+0.07.2 1999-11-02
+        - Fixed the bug JasonJ <kyroraz@jmac.org> found.  The connected and 
+          the reconnect methods were failing due to a call to logwrite (the
+          real method name is __logwrite).  I've also added tests for this
+          to the 'make test'.
+        - Added "join" and "group" params to select.  This allows group bys
+          and easier joins.
+
+0.07.1 1999-07-28
+        - Made it so that wheres can have arrays nested in them.
+        - Added code to make where generation code easier to debug.
+
+0.07.0 1999-06-25
+        - Changed version numbering system so that I can have major and
+          minor releases more easily.
+        - Fixed a warning in select about a twice 'my'ed variable, thanks
+          Jmac.
+        - Fixed a bug that stopped people from passing a DBI data_source to
+          connect.
+        - Fixed logging to include @bind_params.
+        - Added warnings to test
+        - Changed all doubled quoted strings that didn't need to be double
+          quoted single quotes.
+        - Changed connect to log if it fails to connect.  Improved die if
+          SQL::DBI is unable to create a data source.        
+        - Added method ``connected''.  It returns true if dbh->{'Active'} is
+          true.
+        - Added method ``reconnect''.  Reconnects if this object has been
+          connected before.
+        - Added method ``ensure_connection''.  Ensures that the object is
+          connected and that the connection is valid (by doing a ``SELECT
+          1'').  Tries to reconnect if it isn't connected.  Dies if it is
+          unable to provide a connection.
+        - Changed select so that table is optional.  That is, db->select(1)
+          will produce ``SELECT 1'' instead of ``SELECT 1 FROM''
+        - Updated documentation to reflect that loglevel 0 is used for fatal 
+          errors.
+
+0.06   1999-04-23
+        - Fixed documentation where it used "is like" instead of "like".
+        - Modified all routines to use bind_params instead of 'quote'.
+          This should only effect users in positive ways, if at all.
+        - Changed connect to use 'dbname' instead of 'db' for compatibility
+          with ODBC.  This change won't break legacy code: If you use 'db' it
+          will be renamed to 'dbname' for you.
+        - Changed DEFAULT connect type to simply generate an arbitrary
+          data_source based on the config hash you pass.  So if you pass:
+          { driver=>'foo', bar=>'baz', blat='bar' }
+          Your data_source will be dbi:foo:bar=baz;blat=bar
+
+0.05   1999-03-23
+        - Added "kill kill kill" and "die die die" as per jak's suggestion.
+        - Changed "kill kill kill" and "die die die" to all caps as per
+          jmac's suggestion.
+        - Added a few, undocumented "Mysql" compatibility functions
+        - Made insert, replace and update accept scalars as well as hashses
+          for all of their parameters.
+        - Documented the new alternative interface for passing all
+          parameters.
+        - Fixed bug in changes file... 0.03 and 0.04 were listed with the
+          wrong dates.
+
+0.04   1999-02-26
+        - Added commit and rollback pass throughs.
+        - Added 'AutoCommit' option which works like DBH hash value, with
+          one difference:  It will warn instead of die if you give it an invalid
+          value.
+        - Added DESTROY method.  Now handles finish and disconnect calls on
+          its own.
+
+0.03   1999-02-23
+        - Changed method of selecting the DBI datasource, should be easier
+          to add new datasources now.
+        - Now allows the datasource to be passed in as a scalar (for
+          databases not explicitly supported).  This should allow this
+          module to work with any database supported by DBI.
+        - Now stores all of the information used to create the DBI
+          connection just in case we need it later.
+        - Changed fetchrow_hash to return values the same way
+          Mysql->fetchhash does.  This should stop
+          'while(%hash=$db->fetchrow_hash)' constructs from breaking.
+        - Added dataseek function.  Currently this is only useful with the
+          mysql driver, which is why it isn't documented yet.  Hopefully
+          something like this is available with the other database drivers,
+          however if it isn't then i will remove it.  (So don't use it yet!)
+        - Removed undocumented "join" feature of select.  It was possible to
+          do it without an extra feature.
+        - Made all functions accept hashes as well as parameter lists.  This
+          will be reaching the documentation in the next release, once it's
+          a bit more polished.
+
+0.02a  1999-01-20
+        - Argh.  Made it so that you can actually do a 'make install'.
+          (Broke with change to SQL::DBI.)
+
+0.02   1999-01-14
+        - Changed name to SQL:DBI from Shashou.
+
+0.01   1999-01-06
+        - Built a proper package for the module using h2xs
+        - Moved change log to 'Changes' file.
+        - Added the ability to support drivers other then MySQL.  Now has
+          PostgreSQL support.
+
+0.00   1999-01-05
+        - Added CHANGE LOG section.
+        - Started versioning (version 0.0)
+        - Moved PERLDOC section to bottom
+        - Made methods return $self my default
+        - Improved examples
+

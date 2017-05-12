@@ -1,0 +1,24 @@
+Changes
+Makefile.PL
+Config.PL
+MANIFEST
+README
+t/data/dive.txt
+t/Buhlmann.t
+t/Deco-Tissue.t
+t/Deco-Dive.t
+t/Deco-Dive-Plot.t
+t/Deco-Dive-Table.t
+t/config.t
+lib/Deco.pm
+lib/Deco/Tissue.pm
+lib/Deco/Dive.pm
+lib/Deco/Dive/Plot.pm
+lib/Deco/Dive/Table.pm
+bin/diveplot.pl
+docs/Deco.tex
+docs/Deco.pdf
+conf/haldane.cnf
+conf/foobar.cnf
+conf/buhlmann.cnf
+META.yml                                 Module meta-data (added by MakeMaker)

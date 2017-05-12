@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-PassphraseColumn,
+version 0.02:
+
+  Automatically hash password/passphrase columns
+
+This software is copyright (c) 2011 by Florian Ragwitz.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

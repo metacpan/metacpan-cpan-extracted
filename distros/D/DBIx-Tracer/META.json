@@ -1,0 +1,80 @@
+{
+   "abstract" : "Easy tracer for DBI",
+   "author" : [
+      "Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v2.5.0",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Tracer",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.48",
+            "DBI" : "0",
+            "parent" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Tracer" : {
+         "file" : "lib/DBIx/Tracer.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/tokuhirom/DBIx-Tracer/issues"
+      },
+      "homepage" : "https://github.com/tokuhirom/DBIx-Tracer",
+      "repository" : {
+         "url" : "git://github.com/tokuhirom/DBIx-Tracer.git",
+         "web" : "https://github.com/tokuhirom/DBIx-Tracer"
+      }
+   },
+   "version" : "0.03",
+   "x_contributors" : [
+      "Tokuhiro Matsuno <tokuhirom@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

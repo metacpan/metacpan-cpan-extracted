@@ -1,0 +1,26 @@
+0.08  Sat, 17 Aug 2013 21:15:58 +0200
+  * Make the XS code work with perl 5.16.
+
+0.07  Fri, 15 Oct 2010 20:54:24 +0200
+  * Declare dependency on a Test::More with done_testing.
+  * Add more tests.
+
+0.06  Sun, 10 Oct 2010 06:36:48 +0200
+  * Fix a tiny documentation error introduced in 0.05. Thanks again, Karen!
+
+0.05  Sun, 10 Oct 2010 06:23:42 +0200
+  * Improve the documentation further, especially regarding the non-lexical
+    effect of change_package. Thank you, Ricardo SIGNES, Chad Granum, and Karen
+    Etheridge for helping me with this.
+
+0.04  Sun, 10 Oct 2010 05:40:21 +0200
+  * Improve documentation.
+
+0.03  Sat, 09 Oct 2010 16:42:10 +0200
+  * Fix repo url.
+
+0.02  Sat, 09 Oct 2010 16:22:39 +0200
+  * Fix typo in the abstract.
+
+0.01  Sat, 09 Oct 2010 03:24:12 +0200
+  * Initial release.

@@ -1,0 +1,8 @@
+hostname: a-lb-mx-fastnet
+domain: example.com
+location: megacenter
+ip: 10.1.0.100
+aliases:
+  - almf.example.com
+families:
+  - com.example.mx

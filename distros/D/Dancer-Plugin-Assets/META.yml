@@ -1,0 +1,26 @@
+---
+abstract: 'Manage and minify .css and .js assets in a Dancer application'
+author:
+  - 'Michael Vu <email@michael.vu>'
+build_requires:
+  Test::Cucumber::Tiny: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Assets
+requires:
+  CSS::Minifier: 0
+  CSS::Minifier::XS: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  File::Assets: 0
+  JavaScript::Minifier: 0
+  JavaScript::Minifier::XS: 0
+  URI: 0
+version: 1.52

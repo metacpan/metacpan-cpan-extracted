@@ -1,0 +1,33 @@
+---
+abstract: 'Dist::Zilla plugins for gphat'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-PluginBundle-GPHAT
+requires:
+  Dist::Zilla::Plugin::AutoMetaResources: 0
+  Dist::Zilla::Plugin::CopyFilesFromBuild: 0
+  Dist::Zilla::Plugin::Git: 0
+  Dist::Zilla::Plugin::Git::NextVersion: 0
+  Dist::Zilla::Plugin::GithubMeta: 0
+  Dist::Zilla::Plugin::PodWeaver: 0
+  Dist::Zilla::Plugin::ReadmeMarkdownFromPod: 0
+  Dist::Zilla::Plugin::Test::Synopsis: 0
+  Dist::Zilla::Role::PluginBundle::Easy: 0
+  Moose: 0
+resources:
+  bugtracker: https://github.com/gphat/dist-zilla-pluginbundle-gphat/issues
+  homepage: https://github.com/gphat/dist-zilla-pluginbundle-gphat
+  repository: https://github.com/gphat/dist-zilla-pluginbundle-gphat.git
+version: 0.06

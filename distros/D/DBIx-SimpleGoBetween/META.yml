@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                DBIx-SimpleGoBetween
+version:             1.003
+abstract:            DBI Wrapper interface
+license:             ~
+author:              
+    - Michael Shipper
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

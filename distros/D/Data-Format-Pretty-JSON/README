@@ -1,0 +1,48 @@
+SYNOPSIS
+
+     use Data::Format::Pretty::JSON qw(format_pretty);
+     print format_pretty($data);
+
+DESCRIPTION
+
+    This module uses JSON::MaybeXS or JSON::Color to encode data as JSON.
+
+FUNCTIONS
+
+ format_pretty($data, \%opts)
+
+    Return formatted data structure as JSON. Options:
+
+      * color => BOOL (default: from env or 1 on interactive)
+
+      Whether to enable coloring. The default is the enable only when
+      running interactively.
+
+      * pretty => BOOL (default: 1)
+
+      Whether to pretty-print JSON.
+
+      * linum => BOOL (default: from env or 0)
+
+      Whether to add line numbers.
+
+ content_type() => STR
+
+    Return application/json.
+
+ENVIRONMENT
+
+ COLOR => BOOL
+
+    Set color option (if unset).
+
+ LINUM => BOOL
+
+    Set linum option (if unset).
+
+FAQ
+
+SEE ALSO
+
+    Data::Format::Pretty
+

@@ -1,0 +1,62 @@
+# sample data file
+package This::That 0.01;
+#package This::Those 0.01;
+
+#
+sub one {
+    xxx trace();
+    # one
+sub one_inner {
+        trace();
+        sub one_inner_two {
+            trace();
+            # nothing 
+        }
+        return 0;
+    }
+    # two
+    # three
+}
+sub two {
+    trace();
+    my $x = 0;
+    my $y = 0;
+    my $result = function( $x, $y );
+}
+sub three {
+    trace();
+
+    # four
+    # five
+    my $str = 'this';
+    # six
+
+}
+sub four {
+    trace();
+    # hello
+    # there
+    # wonderful
+    # world
+}
+sub function {
+    trace();
+    my ( $x, $y ) = @_;
+    return $x * $y;
+}
+    sub five {
+        trace();
+        my $str = this;
+}
+sub six {
+    trace();
+    my $str = 'this';
+}
+sub seven {
+    trace();
+    my $str = this;
+    }
+sub eight {
+    trace();
+    my $str = this;
+}

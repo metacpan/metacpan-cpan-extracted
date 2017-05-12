@@ -1,0 +1,26 @@
+---
+abstract: 'Perl interface to the GOST R 34.11-94 digest algorithm'
+author:
+  - 'gray <gray@cpan.org>'
+build_requires:
+  Test::More: 0.82
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Digest-GOST
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest: 0
+  XSLoader: 0
+  parent: 0
+resources:
+  repository: http://github.com/gray/digest-gost
+version: 0.06

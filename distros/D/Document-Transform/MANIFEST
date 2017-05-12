@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Document/Transform.pm
+lib/Document/Transform/Backend/MongoDB.pm
+lib/Document/Transform/Role/Backend.pm
+lib/Document/Transform/Role/Transformer.pm
+lib/Document/Transform/Transformer.pm
+t/00-load.t
+t/01-basic.t
+t/release-pod-syntax.t
+weaver.ini

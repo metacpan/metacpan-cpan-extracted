@@ -1,0 +1,56 @@
+Some note on testing with Ingres
+================================
+
+Remember to set up the environment variable II_SYSTEM before starting
+pNETagent.
+
+        setenv II_SYSTEM  /usr/local/db
+
+Settings for the client:
+
+        setenv DBI_DSN    DBI:Ingres:test
+        setenv DBI_USER   dau
+        setenv DBI_PASS   *secret*
+        setenv II_HOST    foo.bar.com
+
+I did not adapt most of the non-DBI calls. In fact I only wrote the
+ListTables stuff. Therefore the "advanced" tests will fail.
+
+Expect the test output to look like:
+
+% make test
+PERL_DL_NONLAZY=1 /usr/local/perl-5.004_02/bin/perl -I./blib/arch -I./blib/lib -I/usr/local/perl-5.004_02/lib/sun4-solaris/5.00402 -I/usr/local/perl-5.004_02/lib -e 'use Test::Harness qw(&runtests $verbose); $verbose=0; runtests @ARGV;' t/*.t
+t/00base............ok
+t/10dsnlist.........skipping test on this platform
+t/20createdrop......ok
+t/30insertfetch.....ok
+t/40bindparam.......skipping test on this platform
+t/40blobs...........Can't locate object method "quote" via package "DBD::mysql::db" at t/40blobs.t line 112.
+FAILED tests 4-11
+        Failed 8/11 tests, 27.27% okay
+t/40listfields......FAILED test 8
+        Failed 1/13 tests, 92.31% okay
+t/40nulls...........FAILED tests 6-8
+        Failed 3/11 tests, 72.73% okay
+t/40numrows.........FAILED tests 7, 13, 19
+        Failed 3/22 tests, 86.36% okay
+t/50chopblanks......Use of uninitialized value at t/50chopblanks.t line 143.
+Use of uninitialized value at t/50chopblanks.t line 143.
+Use of uninitialized value at t/50chopblanks.t line 143.
+FAILED tests 9-10, 18-19, 27-29
+        Failed 7/32 tests, 78.12% okay
+t/ak-dbd............Allocation too large at /home/upf/lib/perl5/site_perl/auto/Storable/thaw.al line 13, at /home/upf/lib/perl5/site_perl/RPC/pClient.pm line 303
+Database handle destroyed without explicit disconnect.
+FAILED tests 7, 21, 26-27, 31-51
+        Failed 25/51 tests, 50.98% okay
+Failed Test  Status Wstat Total Fail  Failed  List of failed
+------------------------------------------------------------------------------
+t/40blobs.t                  11    8  72.73%  4-11
+t/40listfields.              13    1   7.69%  8
+t/40nulls.t                  11    3  27.27%  6-8
+t/40numrows.t                22    3  13.64%  7, 13, 19
+t/50chopblanks.              32    7  21.88%  9-10, 18-19, 27-29
+t/ak-dbd.t                   51   25  49.02%  7, 21, 26-27, 31-51
+Failed 6/11 test scripts, 45.45% okay. 47/160 subtests failed, 70.62% okay.
+*** Error code 29
+make: Fatal error: Command failed for target `test_dynamic'

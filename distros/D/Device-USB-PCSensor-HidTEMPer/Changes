@@ -1,0 +1,38 @@
+Revision history for Perl extension Device::USB::PCSensor::HidTEMPer
+
+0.04 14 Aug 2011
+	- Support for new device added by Daniel Fahlgren (TEMPer2).
+
+0.0302 02 Aug 2011
+	- Fixed CPAN upload of version 0.0301 (damaged archive).
+
+0.0301 02 Aug 2011
+	- Removed syntactic sugar that only works with perl 5.10 and newer, 
+	thanks to Elan Ruusamäe for spotting and fixing the problems.
+
+0.03 25 Jan 2011
+	- Added initialization of the devices. Thanks to Jeremy G for 
+	noticing that this was missing and providing a fix. 
+	- Added fix received from Jean F. Delpech making the device return
+	temperatures bellow 0 Celsius correctly.
+
+0.0201 28 Jul 2010
+	- Removed the misplaced Makefile from the tarball.
+	- Cleaned up Changes.
+
+0.02  26 Jul 2010
+	- Updated example in HidTEMPer.pm
+	- Updated Makefile.PL
+	- Updated README.
+	- Updated Changes
+	- Updated documentation in all files.
+	- Removed the self->{devices}=() bug.
+	- Removed Perl 5.10 dependencies.
+	- Change license requirements to normal Perl license.
+	- Removed the transform function, replaced with init to some extent.
+	- Changed bug reporting actions to be used.
+	- Added support for retrieval of a single device without using a array
+	- Changed the function type() info identifier()
+
+0.01  07 Feb 2010 (first release)
+	- Original version.

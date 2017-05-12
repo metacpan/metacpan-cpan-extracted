@@ -1,0 +1,33 @@
+---
+abstract: 'Query utilities for ddc-concordance search engine'
+author:
+  - 'Bryan Jurish <moocow@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DDC-Concordance
+no_index:
+  directory:
+    - t
+    - inc
+recommends:
+  Alien::DDC::Concordance: '0.002'
+  DDC::XS: '0.14'
+requires:
+  IO::Socket::INET: '0'
+  JSON: '0'
+  NetServer::Generic: '1.03'
+  Parse::Yapp: '0'
+  Test::More: '0'
+  Text::Wrap: '0'
+  perl: '5.01'
+resources:
+  repository: svn://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/
+version: '0.37'

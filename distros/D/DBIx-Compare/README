@@ -1,0 +1,34 @@
+DBIx::Compare version 1.7
+=========================
+
+DBIx::Compare takes two database handles and performs low-level and row-by-row comparisons of their table content.
+
+Testing requires two existing databases, test and test2, and a user 'test' with a blank password and create table, insert, update and select privileges. 
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI
+
+The test scripts accompanying the modules require the following modules and libraries:
+
+  Test::More
+  Test::Group
+  Test::Differences
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 by Christopher Jones
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself

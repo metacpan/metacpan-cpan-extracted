@@ -1,0 +1,105 @@
+NAME
+    Dancer::Plugin::StreamData - stream responses that are of indeterminate
+    (but potentially long) length
+
+SYNOPSIS
+        package MyWebApp;
+    
+        use Dancer;
+        use Dancer::Plugin::StreamData;
+    
+        get '/some_route' => sub {
+
+            # ...
+        
+            return stream_data($data_obj, \&stream_my_data);
+        };
+    
+        sub stream_my_data {
+    
+            my ($data_obj, $writer) = @_;
+        
+            while ( $output = $data_obj->get_some_data() )
+            {
+                $writer->write($output);
+            }
+        
+            $writer->close();
+        }
+
+DESCRIPTION
+    This plugin is useful for situations in which a Dancer application wants
+    to return a large set of data, of indeterminate length, such as the
+    results from a database query. This is especially important where the
+    result set might total tens or hundreds of megabytes, which would be
+    awkward to marshall within the memory of a single server process and
+    could lead to a long delay before the start of data delivery.
+
+    The "stream_data" function allows the application to stream a response
+    one chunk at a time. For example, the data could be fetched row by row
+    from a database server, with each row processed and then dispatched to
+    the client via the write() method.
+
+    This module can be used with any PSGI compatible web server that
+    supports streaming.
+
+USAGE
+  stream_data
+    This function takes two parameters: a data object, and a stream
+    callback. The data object need not contain the data itself; it may be a
+    database handle or other reference by means of which the data will be
+    obtained. The callback can be specified either as a code reference, or
+    as a string. In the latter case, it will be invoked as a method call on
+    the data object.
+
+    Before calling "stream_data", the HTTP status and response headers may
+    be set by the usual mechanisms of Dancer. A call to "stream_data" will
+    terminate route processing, analagous to "send_file". Any further code
+    in the route will be ignored. If an 'after' hook is defined in this app,
+    it will be called as usual after route processing and may modify the
+    response status and/or headers.
+
+    The callback is invoked after the response headers have been sent. Its
+    job is to stream the body of the response. The callback is passed two
+    parameters: the data object, and a 'writer' object.
+
+    The writer object, as specified by PSGI, implements two methods:
+
+   write
+    Sends its argument immediately to the client as part of the response
+    body. You can call this method as many times as necessary to send all of
+    the data.
+
+   close
+    Closes the connection to the client, terminating the response. It is
+    important to call "close" at the end of processing, otherwise the client
+    will erroneously report that the connection was closed prematurely
+    before all of the data was sent.
+
+  server_supports_streaming
+    This function returns true if the server you are working with supports
+    PSGI-style streaming, false otherwise.
+
+        if ( server_supports_streaming ) {
+            stream_data($query, 'streamResult');
+        } else {
+            return $query->generateResult();
+        }
+
+AUTHOR
+    Michael McClennen, <mmcclenn@umich.edu>
+
+SEE ALSO
+    Dancer
+
+    PSGI
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2012 by Michael McClennen
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

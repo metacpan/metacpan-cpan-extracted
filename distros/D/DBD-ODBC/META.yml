@@ -1,0 +1,67 @@
+#--- #YAML:1.0
+name: DBD-ODBC
+abstract: ODBC DBD for Perl DBI
+version: 1.56
+version_from: ODBC.pm
+author:
+  - Martin J. Evans <mjevans@cpan.org>
+  - Tim Bunce
+  - Jeff Urlwin
+license: perl
+distribution_type: module
+requires:
+    DBI: 1.609
+    perl: 5.008
+    Test::Simple: 0.90
+#
+# Added build_requires/configure_requires DBI as DBD::ODBC needs DBI::DBD to
+# get postamble etc
+#
+build_requires:
+  DBI: 1.21
+  ExtUtils::MakeMaker: 0
+  Test::Simple: 0.90
+  Config: 0
+  Data::Dumper: 0
+  Devel::Peek: 0
+  B: 0
+  overload: 0
+  strict: 0
+  warnings: 0
+  utf8: 0
+configure_requires:
+  DBI: 1.21
+  ExtUtils::MakeMaker: 0
+recommends:
+  Test::Version: 1.002001
+# add provides in 1.54 (initially) but without the version number the distrib won't index
+# without the provides the indexer extracts the version itself and with provides and
+# no version it assumes 0
+#provides:
+#  DBD::ODBC:
+#    file: ODBC.pm
+#  DBD::ODBC::dr:
+#    file: ODBC.pm
+#  DBD::ODBC::db:
+#    file: ODBC.pm
+#  DBD::ODBC::st:
+#    file: ODBC.pm
+dynamic_config: 1
+resources:
+  homepage: http://search.cpan.org/dist/DBD-ODBC/
+  license: http://dev.perl.org/licenses/
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBD-ODBC
+  MailingList: http://dbi.perl.org/support
+  repository: https://github.com/perl5-dbi/DBD-ODBC.git
+# this would be x_IRC if using v2 meta-spec
+  IRC: irc://irc.perl.org/#dbi
+installdirs:  site
+keywords:
+  - ODBC
+  - DBD
+  - DBI
+meta-spec:
+  version: 1.4
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+generated_by: Martin J. Evans
+# ensure there is a newline at the end of this file or pause objects

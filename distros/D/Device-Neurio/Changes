@@ -1,0 +1,57 @@
+Revision history for Device-Neurio
+
+0.01    June 18, 2014
+        First version, contains first 5 API calls available for beta testers
+0.02    June 23, 2014
+        Improved POD documentation
+        Added checking for required parameters
+        Added support for optional parameters
+0.03    June 23, 2014
+        Added pre-requisite of LWP::UserAgent to Makefile.PL
+        Added more detailed error messages on failures
+0.04    June 25, 2014
+        Added error checking for Granularity
+        Added error checking for Frequency in Energy_Stats
+        Added general comments to code
+        Added details of data structures in POD
+0.05    skipped since I burned this during my initial attempts to upload
+0.06    skipped since I burned this during my initial attempts to upload
+0.07    June 25, 2014
+        Adjusted Makefile.PL with specific requirements
+0.08    June 25, 2014
+        Updated README
+        Updated Device-Neurio.t with only the 'use' test
+        Added EXPORT section
+0.09    June 29, 2014
+        Added support for page and perPage parameters
+0.10    July 01, 2014
+        Added references to documentation for ISO8601 for time specification
+0.11    July 19, 2014
+        Update documentation
+        Added option for debug printouts
+        Moved all the URLs to $self
+        Added a function to dump the contents of $self
+0.12    July 24, 2014
+        Added decoding of the HTTP code and reason for most recent request
+        Added functions to fetch last code and last reason
+        Moved common code to __process_get
+0.13    Sept 07, 2014
+        Corrected a bug in __process_get()
+        implemented the storing of "code" and "reason" from the most recent API call
+        Added support for new 'Appliance' API features
+        Changed the names of existing 'Samples' functions to follow a more consistent naming scheme
+        Updated documentation
+0.14    Oct 19, 2014
+        Added separate functions for fetching events per appliance or per location
+        Added support for 'since' option when getting appliance events by location
+0.15    Oct 31, 2014
+        Added calculation of execution of Fetch commands
+        Added funciton to retrieve time of last execution
+0.16    Sept 06, 2015
+        Added DESTROY function
+        Added Debug function to support debug logging
+        Removed unnecessary validation of parameters that is performed by the REST interface
+        Corrected fetch_Appliances_Events_by_Location
+        Added 'put', 'patch', 'post' and 'delete funcitons
+        General cleanup of documentation
+        

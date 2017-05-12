@@ -1,0 +1,19 @@
+severity = brutal
+verbose = 8
+exclude = Editor::RequireEmacsFileVariables Miscellanea::RequireRcsKeywords Modules::RequireExplicitInclusion Modules::RequireExplicitPackage Tics::ProhibitLongLines Documentation::RequirePODUseEncodingUTF8
+
+[Lax::RequireExplicitPackage::ExceptForPragmata]
+allowed_pragmata = perlversion strict warnings utf8
+
+[CodeLayout::RequireTidyCode]
+perltidyrc = xt/author/perltidy.rc
+
+[Documentation::PodSpelling]
+stop_words = bugtracker Perldoc perldoc annonations PASSed netrc dzil ini username SFTP plugin inhouse
+
+[Documentation::RequirePodSections]
+lib_sections = NAME | VERSION | DESCRIPTION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+script_sections = NAME | USAGE | DESCRIPTION | CONFIGURATION | SUPPORT | AUTHOR | COPYRIGHT AND LICENSE
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::has Moose::with MooseX::Has::Sugar::lazy_build MooseX::Has::Sugar::required MooseX::Has::Sugar::ro Try::Tiny::catch Try::Tiny::try

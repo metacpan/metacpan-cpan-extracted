@@ -1,0 +1,99 @@
+# ABSTRACT: Contributing to Data::Sah
+# PODNAME: Data::Sah::Manual::Contributing
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Sah::Manual::Contributing - Contributing to Data::Sah
+
+=head1 VERSION
+
+This document describes version 0.87 of Data::Sah::Manual::Contributing (from Perl distribution Data-Sah), released on 2016-09-14.
+
+=head1 DESCRIPTION
+
+This document explains how to contribute to L<Data::Sah> developments.
+
+To contribute, you can send a pull request on GitHub, or contact me personally.
+Thanks for contributing.
+
+=head1 IMPLEMENTING
+
+=head2 Implementing clauses
+
+Some clauses are not yet implemented. If you are interested in helping out
+implementing these, you can first find the list of not-yet-implemented clauses
+from the main L<Data::Sah> POD, or from C<t/spectest-perl.t> or
+C<t/spectest-js.t>.
+
+You should first uncomment the clause in C<t/spectest-perl.t> or
+C<t/spectest-js.t> so that the to-be-implemented clause can be tested.
+
+You should take a look at another implemented clause in
+L<Data::Sah::Compiler::perl::TH::$TYPE>, L<Data::Sah::Compiler::js::TH::$TYPE>,
+L<Data::Sah::Compiler::human::TH::$TYPE> for example. You'll need to implement
+the clause in all of these compilers, for completeness. But it is okay if you
+leave out some compilers, I and others will try to help implementing it for you.
+
+You should also update C<Data::Sah> POD (the Status section) to let users know
+that the clause has been implemented.
+
+=head2 Implementing other aspects
+
+For example: functions, expression, subschema, etc. Please contact me personally
+to discuss things first.
+
+=head2 CREATING TRANSLATION
+
+Translations are put in L<Data::Sah::Lang::$LANGCODE>. Since I am Indonesian,
+language C<id_ID> is the most complete. You can use the utility
+C<devscripts/list-missing-translations> to list which translation strings are
+missing between C<id_ID> and your target language.
+
+=head2 WRITING TUTORIAL/DOCUMENTATION
+
+Tutorials should be put in C<Data::Sah::Manual::Tutorial>. Cookbook-type
+documentation are also welcome, they should be put in
+C<Data::Sah::Manual::Cookbook> or C<Data::Sah::Manual::Cookbook::*>.
+
+=head2 EXTENDING
+
+L<Data::Sah> is created with extension in mind. You can create new types, add
+clauses to existing types, or create a schema that can be shared for others.
+Please see L<Data::Sah::Manual::Extending> for more details. The extensions can
+be packaged in separate distributions, so you can release them independently of
+Data::Sah.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

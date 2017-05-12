@@ -1,0 +1,30 @@
+SYNOPSIS
+
+     use Data::Clean::ToStringyNumber;
+     my $cleanser = Data::Clean::ToStringyNumber->get_cleanser;
+     my $data     = ["a", 1, "1.2", []];
+     my $cleaned  = $cleanser->clean_in_place($data); # -> ["a", "1", "1.2", []]
+
+DESCRIPTION
+
+    This class can convert non-stringy numbers in your data to stringy
+    ones.
+
+METHODS
+
+ CLASS->get_cleanser => $obj
+
+    Return a singleton instance.
+
+ $obj->clean_in_place($data) => $cleaned
+
+    Clean $data. Modify data in-place.
+
+ $obj->clone_and_clean($data) => $cleaned
+
+    Clean $data. Clone $data first.
+
+SEE ALSO
+
+    Data::Clean::ToNonStringyNumber
+

@@ -1,0 +1,4 @@
+Revision history for DBIx::Class::Schema::Loader::DBI::RelPatterns
+
+0.01043 2015-05-15
+    - first public release

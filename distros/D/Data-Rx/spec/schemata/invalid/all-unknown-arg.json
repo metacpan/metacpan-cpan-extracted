@@ -1,0 +1,9 @@
+{
+  "invalid": true,
+
+  "schema" : {
+    "type"    : "//all",
+    "of"      : [ ],
+    "unknown" : "this will cause things to explode"
+  }
+}

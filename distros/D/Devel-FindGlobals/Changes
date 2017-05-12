@@ -1,0 +1,11 @@
+* v0.03, October 8, 2004
+
+   Make latest perl happy; dunno why it was UNhappy.
+
+* v0.02, May 21, 2003
+
+   Forgot to add Test::More to PREREQ_PM.
+
+* v0.01, May 20, 2003
+
+   First release.

@@ -1,0 +1,32 @@
+NAME
+
+Data::Float - details of the floating point data type
+
+DESCRIPTION
+
+This module is about the native floating point numerical data type.
+A floating point number is one of the types of datum that can appear
+in the numeric part of a Perl scalar.  This module supplies constants
+describing the native floating point type, classification functions,
+and functions to manipulate floating point values at a low level.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2006, 2007, 2008, 2010, 2012
+Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

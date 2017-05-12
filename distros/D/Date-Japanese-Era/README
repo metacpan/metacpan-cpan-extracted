@@ -1,0 +1,113 @@
+NAME
+    Date::Japanese::Era - Conversion between Japanese Era / Gregorian
+    calendar
+
+SYNOPSIS
+      use Date::Japanese::Era;
+
+      # from Gregorian (month + day required)
+      $era = Date::Japanese::Era->new(1970, 1, 1);
+
+      # from Japanese Era
+      $era = Date::Japanese::Era->new('¾¼ÏÂ', 52);
+
+      $name      = $era->name;         # '¾¼ÏÂ' in EUC-jp (default)
+      $gengou    = $era->gengou;       # same
+
+      $year      = $era->year;         # 52
+      $gregorian = $era->gregorian_year;       # 1977
+
+DESCRIPTION
+    Date::Japanese::Era handles conversion between Japanese Era and
+    Gregorian calendar.
+
+METHODS
+    codeset
+          $codeset = Date::Japanese::Era->codeset;
+          Date::Japanese::Era->codeset($encoding);
+
+        sets / gets external encoding of Japanese era names. For example
+        with the following code, input and output of era names are encoded
+        in UTF-8.
+
+          Date::Japanese::Era->codeset('utf8');
+          $era = Date::Japanese::Era->new($name, $year); # $name is UTF-8
+          print $era->name;                              # also UTF-8
+
+        You need Jcode module installed to make use of this feature.
+        Otherwise, calls to codeset() are simply ignored (with warning).
+
+    new
+          $era = Date::Japanese::Era->new($year, $month, $day);
+          $era = Date::Japanese::Era->new($era_name, $year);
+
+        Constructs new Date::Japanese::Era instance. When constructed from
+        Gregorian date, month and day is required. You need Date::Calc to
+        construct from Gregorian.
+
+        Name of era can be either of Japanese / ASCII. Input encodings can
+        be specified via codeset(), suppose you have Jcode module installed.
+        Default is EUC-JP.
+
+        Exceptions are thrown when inputs are invalid (e.g: non-existent era
+        name and year combination, unknwon era-name, etc.).
+
+    name
+          $name = $era->name;
+
+        returns era name in Japanese. Encoding can be specified via
+        codeset() class method. Default is EUC-JP.
+
+    gengou
+        alias for name().
+
+    name_ascii
+          $name_ascii = $era->name_ascii;
+
+        returns era name in US-ASCII.
+
+    year
+          $year = $era->year;
+
+        returns year as Japanese era.
+
+    gregorian_year
+          $year = $era->gregorian_year;
+
+        returns year as Gregorian.
+
+EXAMPLES
+      use Date::Japanese::Era;
+
+      # 2001 is H-13
+      my $era = Date::Japanese::Era->new(2001, 8, 31);
+      printf "%s-%s", uc(substr($era->name_ascii, 0, 1)), $era->year;
+
+      # to Gregorian
+      my $era = Date::Japanese::Era->new('Ê¿À®', 13);
+      print $era->gregorian_year;   # 2001
+
+CAVEATS
+    *   Days when era just changed are handled as newer (later) one.
+
+    *   Currently supported era is up to 'meiji'.
+
+    *   If someday current era (heisei) is changed,
+        Date::Japanese::Era::Table should be upgraded. (Table is declared as
+        global variable, so you can overwrite it if necessary).
+
+TODO
+    *   Date parameters can be in various format. I should replace
+        Date::Simple or whatever for that.
+
+    *   Support earlier eras.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Date::Calc manpage, the Jcode manpage, the Date::Simple manpage
+

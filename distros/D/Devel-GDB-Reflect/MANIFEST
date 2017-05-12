@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Devel-GDB-Reflect.t
+lib/Devel/GDB/Reflect.pm
+lib/Devel/GDB/Reflect/DelegateProvider/STL.pm
+lib/Devel/GDB/Reflect/DelegateProvider/Fallback.pm
+lib/Devel/GDB/Reflect/MessageMethod.pm
+lib/Devel/GDB/Reflect/PrettyPrinter.pm
+yp/GDBGrammar.yp

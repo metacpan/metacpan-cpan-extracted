@@ -1,0 +1,28 @@
+Changes
+lib/Devel/Trace/Subs.pm
+lib/Devel/Trace/Subs/HTML.pm
+lib/Devel/Trace/Subs/Text.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+src/templates/flow.tpl
+src/templates/stack.tpl
+t/00-load.t
+t/01-base_testing.t
+t/02-store.t
+t/03-install_trace.t
+t/04-remove_trace.t
+t/05-html.t
+t/06-text.t
+t/install_trace_orig.pl
+t/manifest.t
+t/orig/install_trace.pl
+t/orig/remove_trace.pl
+t/pod-coverage.t
+t/pod.t
+t/sample.pl
+t/trace_sample.pl
+xt/boilerplate.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

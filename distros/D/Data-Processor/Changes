@@ -1,0 +1,67 @@
+0.4.3  2017-03-09 08:41:07 CET
+    - error collection to_string, documentation
+
+0.4.2  2015-02-17 17:14:31 CET
+    - bugfixes by @oetiker++
+
+0.4.1  2015-02-16 08:31:53 CET
+    - fix transformer by @oetiker++
+    - syntax Improvements
+
+0.4.0  2015-02-01 18:03:22 CET
+    - Improvements by @hadfl++ (Merge schemas, tests)
+    - Install by EUMM
+
+0.3.3  2015-01-25 13:03:07 CET
+    - bugfixes
+
+0.3.2  2015-01-24 23:44:06 CET
+    - bugfix (minor), removal of spurious file
+
+0.3.1  2015-01-24 23:27:50 CET
+    - fix test for Perl 5.10.1
+
+0.3.0  2015-01-24 23:01:34 CET
+    - data template generator
+
+0.2.0  2015-01-24 22:12:26 CET
+    - Pod writer
+    - schema validator
+
+0.1.7  2015-01-23 20:31:53 CET
+    - Transformer, basic (not very useful yet)
+
+0.1.6  2015-01-23 16:50:55 CET
+    - no more "require"
+    - code cleanup
+
+0.1.5  2015-01-22 16:50:24 CET
+    - Interface change: use positional parameters for $schema, $data
+
+0.1.4  2015-01-22 16:22:30 CET
+    - array support as of t/013_array.t 
+    - Transformer object
+    - Error::Instance handles more
+
+0.1.3  2015-01-20 09:43:14 CET
+    - not-ready and interface change warning added
+
+0.1.2  2015-01-19 11:15:29 CET
+    - Makefile.PL instead of Build.PL
+
+0.1.1  2015-01-18 21:48:47 CET
+    - more test (mostly ported from old module)
+    - ValidatorFactory
+
+0.1.0  2015-01-18 16:50:50 CET
+    - Error Collector added
+    - Basic functionality: validation without frills
+
+0.0.3  2015-01-15 21:37:19 CET
+    0.0.3 pod up
+
+0.0.2  2015-01-15 21:31:16 CET
+    - Code Layout
+
+0.0.1  2015-01-15 19:09:03 CET
+        - Initial release

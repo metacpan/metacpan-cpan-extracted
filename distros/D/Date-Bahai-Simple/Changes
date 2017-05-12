@@ -1,0 +1,85 @@
+Revision history for Date::Bahai::Simple
+
+0.20  Wed Jan 18 18:35:00 2017
+      - Updated the dependency on Date::Utils v0.22.
+
+0.19  Tue Dec 13 10:35:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.18  Fri Nov 25 15:25:00 2016
+      - Added method get_date() and is_same().
+
+0.17  Wed Nov 23 13:30:00 2016
+      - Improved method from_gregorian().
+
+0.16  Thu Nov 03 09:40:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.15  Wed Aug 03 12:25:00 2016
+      - Updated the dependency on Date::Utils v0.21.
+
+0.14  Mon Jul 18 10:50:00 2016
+      - Updated the dependency on Date::Utils v0.20.
+      - Dropped method get_calendar() as it's no longer relevant here.
+
+0.13  Thu May 12 10:35:00 2016
+      - Added the dependency on Date::Utils v0.18.
+      - Updated method get_calendar() and method as_string() to use get_month_name().
+      - Updated method validate_month() to validate month name.
+      - Renamed method bahai_months() to months().
+      - Renamed method bahai_days() to days().
+      - Updated method get_calendar() to respect the above changes.
+      - Added test to validate month name.
+      - Added section "SEE ALSO".
+
+0.12  Thu Apr 28 10:20:00 2016
+      - Updated the dependency on Date::Utils v0.16.
+      - Added $AUTHORITY.
+      - Updated copyright year information.
+
+0.11  Mon Aug 24 11:45:00 2015
+      - Added the dependency on Date::Utils v0.11.
+      - Updated method validate_day() and validate_month() to make use of Date::Exception package.
+
+0.10  Tue Jul 14 14:05:00 2015
+      - Added the dependency on Date::Utils v0.10.
+      - Added method get_calendar().
+
+0.09  Fri Jul 03 11:00:00 2015
+      - Added the dependency on Date::Utils v0.09.
+      - Tidied up pod document in general.
+
+0.08  Tue Jun 23 09:50:00 2015
+      - Updated method to_gregorian() to return (yyyy,mm,dd) to be consistent with other Date::* packages of mine.
+      - Updated unit test to reflect the above changes.
+      - Updated section "SYNOPSIS" to reflect the above changes.
+      - Also add example for method from_gregorian() and from_julian().
+
+0.07  Mon Jun 15 17:00:00 2015
+      - Updated the following methods to handle undef (day and month).
+        - validate_day()
+        - validate_month()
+
+0.06  Mon May 25 02:45:00 2015
+      - Released pull request change #1 from syohex (github username).
+
+0.05  Mon May 25 00:25:00 2015
+      - Added unit tests for newly added methods.
+      - Updated description in the pod for method from_julian().
+      - Updated description in the pod for method from_gregorian().
+      - Added description to the pod for method get_major_cycle_year().
+      - Updated code in the section "SYNOPSIS".
+
+0.04  Sun May 24 21:05:00 2015
+      - Removed the dependency on Date::Utils::Bahai as it's no longer exists.
+      - Added the dependency on Date::Utils v0.08.
+      - Merged the code from Date::Utils::Bahai into Date::Bahai::Simple.
+
+0.03  Sat May 23 22:45:00 2015
+      - Updated method to_julian() to make use of Date::Utils::Bahai::bahai_to_julian().
+
+0.02  Thu Apr 23 23:25:00 2015
+      - Re-structured and consumed Date::Utils::Bahai as Moo Role.
+
+0.01  Sat Apr 18 02:00:00 2015
+      - First version, released.

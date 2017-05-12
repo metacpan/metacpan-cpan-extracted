@@ -1,0 +1,9 @@
+CHANGES
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/Dancer/Plugin/Bcrypt.pm
+t/001_basics.t
+t/002_keywords.t

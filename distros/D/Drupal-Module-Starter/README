@@ -1,0 +1,42 @@
+Drupal::Module::Starter
+ 
+Take the tedium out of starting up Drupal modules from scratch.
+
+This module's release was graciously supported by F5 Site Design 
+(http://www.f5sitedesign.com) - purveyors of Open Source Web Applications
+
+This software should be considered alpha quality.  It seems to do what it's supposed to.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+Example using the supplied drupal-module-starter script: 
+
+drupal-module-starter --module=Recording,Artist,Track,Discography,Review,PodCastGenerator,Pony \
+  --author="Steve McNabb" --email="smcnabb@cpan.org" \
+  --dir=/tmp/drupal/module/example  --hooks=xmlrpc,form,help,info,init,insert,delete,update
+  
+ This would create the 7 listed modules, each in its own directory under --dir, with stubs installed for
+ the listed --hooks (if any).
+  
+  
+hook_name and hook_perm are always generated.
+
+TODO:
+
+* add page_ hook support: each page_foo callback should get a simple stub and/or return 
+  some dummy content, and a menu item should be generated as well.  
+ * remove use of /usr/bin/php from test harness and add skippable PHP.pm test
+  
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Steve McNabb - smcnabb@cpan.org
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

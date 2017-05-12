@@ -1,0 +1,173 @@
+#!/usr/bin/perl
+#$Id$
+#
+# lfile, Laola File
+#
+# A kind of file(1) for Office files.
+#
+# Note: For now I don't care about the application building a document, but 
+# for the document format only. Then I pretend a document of a specific
+# format to be built of the application that's most connected to this format.
+# So the info about a Word6 style document written by StarWriter would simply
+# be: "MS Word", "6.0", "Windows".
+#
+# To run lfile you need perl >=5.004 and four modules:
+#
+#     Document::Info
+#     OLE::Storage
+#     Unicode::Map 
+#     Startup
+#
+# to be found at my directory at your favorite CPAN location or at:
+#
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/perl/
+#
+# See also usage() of this file. General information at:
+#
+# Copyright (C) 1999 Martin Schwartz
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, you should find it at:
+#
+#    http://wwwwbs.cs.tu-berlin.de/~schwartz/pmh/COPYING
+#
+# You can contact me via schwartz@cs.tu-berlin.de
+#
+
+use strict;
+
+use Getopt::Long;
+use Document::Info;
+
+#
+# Property keys == command line options
+#
+sub cType       { "type" }
+sub cLocale     { "locale" }
+sub cRevision   { "revision" }
+sub cOS         { "os" }
+
+my ( $separator, $Info );
+
+my %opt  = (
+    cType()     => 1,
+    cRevision() => 1,
+    noise       => 1, # a bit noisy
+);
+my %prop = ( );
+sub cFile { "file" } 
+
+main: {
+    $|=1;
+    GetOptions ( \%opt,
+        # flow
+        "help",
+        "info",
+        "noise=i",
+        # prop
+        cType(),
+        cLocale(),
+        cOS(),
+        cRevision(),
+        # special
+        "file",
+    );
+    info () if $opt{info};
+    usage () if $opt{help} || !@ARGV;
+
+    my $maxNameLen = 0;
+    for ( @ARGV ) {
+        $maxNameLen = length($_) if length($_)>$maxNameLen;
+    }
+
+    my $filesProcessed = 0;
+    foreach my $infile (@ARGV) {
+        printFileName ( $infile, $maxNameLen );
+        $separator = "";
+        $Info = Document::Info -> new ( $infile );
+        $filesProcessed++;
+        if ( $Info ) {
+            reportProp ( $Info, cType() );
+            reportProp ( $Info, cRevision() );
+            reportProp ( $Info, cLocale() );
+            reportProp ( $Info, cOS() );
+        } else {
+            if ( $opt{file} ) {
+                my $fileB = `file -b "$infile"`;
+                $fileB =~ s/\n//g;
+                reportProp ( $fileB, cFile() );
+            } else {
+                print "unknown";
+            }
+        }
+        print "\n";
+    }
+    exit $filesProcessed;
+}
+
+sub info {
+    print "INFO\n";
+    print "To be done!\n";
+    exit 0;
+}
+
+sub usage {
+    print "lfile 0.1 (Mar/11/1999) - determine file type for Documents\n";
+    print "usage: lfile [-flors] {document}\n";
+    print "   --file     Use file(1) if file type cannot get determined.\n";
+    print "   --info     To be done: Info about supported document types.\n";
+    print "   --locale   To be done: Locale of document\n";
+    print "   --noise=i  Noise level i (0=little 1=medium 2=loud, default=1)\n";
+    print "   --os       Operating System used to create document. (default)\n";
+    print "   --revision Revision of file type. (default)\n";
+    exit 0;
+}
+
+sub reportProp {
+    my ( $Info, $key ) = @_;
+
+    return unless $opt{$key};
+
+    my $value = "";
+    if ( 0 ) {
+    } elsif ( $key eq cType() ) {
+        $value = $Info -> getType ( );
+    } elsif ( $key eq cLocale() ) {
+        $value = $Info -> getLocale ( );
+    } elsif ( $key eq cRevision() ) {
+        $value = $Info -> getRevision ( );
+    } elsif ( $key eq cOS() ) {
+        $value = $Info -> getOS ( );
+    } elsif ( $key eq cFile() ) {
+        $value = $Info;
+    }
+
+    if ( $value ) {
+        if ( $opt{noise}>0 ) {
+            print "$separator$key='$value'";
+            $separator = " ";
+        } else {
+            print $separator.$value;
+            $separator = " ";
+        }
+    } elsif ( $opt{noise}>1 ) {
+        print "$separator$key='unknown'";
+        $separator = " ";
+    }
+}
+
+sub printFileName {
+     my ( $str, $nextPos ) = @_;
+     print "$str: ".(" "x($nextPos-length($str)));
+}
+

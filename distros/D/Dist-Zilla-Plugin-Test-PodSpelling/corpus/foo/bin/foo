@@ -1,0 +1,11 @@
+#!perl
+
+print "foo\n";
+
+=head1 Foo
+
+Prints "foo".
+
+bigfatspellingerrorajoidufhlsidufmahiefmhregrge
+
+=cut

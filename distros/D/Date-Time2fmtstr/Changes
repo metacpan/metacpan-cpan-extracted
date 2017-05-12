@@ -1,0 +1,8 @@
+Revision history for Date::Time2fmtstr
+
+1.00    2016-01-09
+        First version, released on an unsuspecting world.
+1.01    2016-01-19
+        Fix bug in processing 2-digit years.
+1.02    2016-01-21
+        Fix another bug in processing 2-digit years.

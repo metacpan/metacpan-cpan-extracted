@@ -1,0 +1,95 @@
+NAME
+    Data::Domain::SemanticAdapter - Adapter for Data::Semantic objects
+
+VERSION
+    version 1.100840
+
+DESCRIPTION
+    This class is an adapter (wrapper) that turns Data::Semantic objects
+    into Data::Domain objects.
+
+    It, and therefore all the subclasses, support a "-not_in" options. If
+    given, the data must be different from all values in the exclusion set,
+    supplied as an arrayref.
+
+METHODS
+  semantic_class_name
+    Returns the corresponding semantic class name. This method provides a
+    default mapping, the idea of which is to mirror the layout of the
+    Data::Semantic class tree. If you have a different mapping, override
+    this method in a subclass.
+
+    So in the Data::Domain::URI::http class, it will return
+    "Data::Semantic::URI::http".
+
+  adaptee
+    Takes the results of "semantic_class_name()" and "semantic_args()",
+    loads the semantic data class and returns a semantic data object with
+    the given args passed to its constructor.
+
+  semantic_args
+    Turns the object's options, specified via "OPTIONS()", into arguments to
+    be passed to the semantic data object's constructor. Returns a hash.
+
+  _inspect
+    Inspects the data using the "adaptee()". See Data::Domain for more
+    information. Respects the "-not_in" option and returns a "EXCLUSION_SET"
+    message, if appropriate. If the adaptee() says that the data is not
+    valid under the given options, an "INVALID" message is returned.
+
+  install_shortcuts
+    This is a convenience function (not method) that installs shortcuts into
+    the calling package. It expects a mapping hash whose keys are the
+    shortcuts to be created and whose values are the package names relative
+    to "Data::Domain::". See Data::Domain, section *Shortcut functions for
+    domain constructors*, for more information on shortcuts.
+
+    Here is an example from Data::Domain::Net:
+
+        our %map = (
+            IPv4 => 'Net::IPAddress::IPv4',
+            IPv6 => 'Net::IPAddress::IPv6',
+        );
+
+        Data::Domain::SemanticAdapter::install_shortcuts(%map);
+
+    This installs two functions, "IPv4()" and "IPv6()", into
+    Data::Domain::Net. Now code that wants to use network-based domain
+    objects can just say:
+
+        use Data::Domain::Net ':all';
+
+        my $domain = IPv4(-not_in => [ ... ]);
+        $domain->inspect(...);
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Domain-SemanticAd
+    apter>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-Domain-SemanticAdapter/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Domain-SemanticAdapter/>. Instead of
+    sending patches, please fork this project using the standard git and
+    github infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

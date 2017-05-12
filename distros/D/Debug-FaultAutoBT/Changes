@@ -1,0 +1,25 @@
+Revision history for Perl extension Debug-SIGSEGV.
+
+v0.02 Wed Aug  7 11:57:15 SGT 2002
+
+- added another test with SIGABRT
+
+- now supporting the following signals SIGQUIT SIGILL SIGTRAP SIGABRT
+  SIGEMT SIGFPE SIGBUS SIGSEGV SIGSYS
+
+- backported to 5.005_03 (what a pain!)
+
+- renamed Debug::SIGSEGVFault to Debug::DumpCore
+
+- renamed the Debug::SIGSEGVTrace package to be Debug::FaultAutoBT,
+  planning to trap other signals that result in a core dump.
+
+- changed the default backtrace base filename to be "core.backtrace."
+  rather than "core." (which was misleading).
+
+- split SIGSEGVTrace.xs into SIGSEGVFault.xs and SIGSEGVTrace.xs
+
+v0.01 Wed Jul 31 23:22:35 SGT 2002
+
+- First Debug::SIGSEGVTrace version
+

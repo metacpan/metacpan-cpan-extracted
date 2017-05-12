@@ -1,0 +1,19 @@
+
+Quantity
+    Number	a number with no scale
+    Bytecount	a number of bytes
+    Currency	a number of dollars (or other currency units)
+    Currencies	a collection of currency values
+    Date	a diurnal period in the history/future of the Earth
+    Time	a number of seconds since midnight - time within a 24:00 clock
+    Moment	a date or a date and a time
+    Period	a range of moments
+    Duration	a number of seconds (or minutes, hours, days, months, years)
+    Weekday
+    OrdinalWeekdayOfMonth
+    DayOfMonth
+    MonthOfYear
+    DayMonthOfYear
+    Year
+   
+    

@@ -1,0 +1,39 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.81.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 76085d7698e84bf76d7ffc576a256d598479055b Changes
+SHA1 1a8c5d596cff0111353e14fa44e6caca7cce8c13 MANIFEST
+SHA1 6236051bc6f6b1f86b8aa9b29901e40f0f431319 META.json
+SHA1 fcc59c27ba127d01d52da5ff0672f0c48c2bc70d META.yml
+SHA1 fe3b80d5f1faa1ac94d5e05832aef0da8a4eb306 Makefile.PL
+SHA1 8133699b30ab8ed3b6a176caafd587f3831f5299 README
+SHA1 b3d427cbe0fc78d6757a8087d2e3cb6547e18bac lib/Devel/Symdump.pm
+SHA1 fef2e4c5ea88bd09f2af618e32a58ee87be965a4 lib/Devel/Symdump/Export.pm
+SHA1 6fbcf9e39c02e9889a6d8bf9cb2c6444967dc841 t/autogen.t
+SHA1 ac80cb093bffdce80ea28209197e58ec40b0cdd4 t/diff.t
+SHA1 6bc8983394b0a72d8ee3234b4788f9f81fbefca1 t/export.t
+SHA1 2c06c8719cca447d6ffa97081cf213eabbad35ad t/glob_to_local_typeglob.t
+SHA1 889f97a506e0781a6600dc15804485aa068a6c1f t/pod.t
+SHA1 bb02a8211bc11f5e05a40d4fa426e9a23e1e1dd7 t/podcover.t
+SHA1 a3c92f14ca7be245384a8a9f1425f6b99c2f42f1 t/recur.t
+SHA1 eb77a889d1fbfc55658cb80e9791c63b10b369bd t/symdump.t
+SHA1 d7e8e57a5c9676c8fd716b6b0fe13559c83d8711 t/tree.t
+-----BEGIN PGP SIGNATURE-----
+
+iF0EARECAB0WIQRQoO0miqKVvSygQR7sgDnwoxfBXQUCWJkEaAAKCRDsgDnwoxfB
+XT2MAJ45dnDpSOxtF03dJ7EWooiisJTlVwCfR4Qm2wgMsVqBLNhHUZuqSO4o4RE=
+=HKOq
+-----END PGP SIGNATURE-----

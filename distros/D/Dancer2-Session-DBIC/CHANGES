@@ -1,0 +1,82 @@
+Revision history for Dancer2::Session::DBI
+
+0.110 Thu Jul  7 18:37:35 2016 CEST
+
+    [ENHANCEMENTS]
+
+    * Add _change_id method to support Dancer2's new change_session_id
+      method (Peter Mottram).
+    * Add tests for new change_session_id method in Dancer2::Core::App
+      (Peter Mottram).
+
+0.102 Sun Mar 27 08:49:17 2016 CEST
+
+    [BUG FIXES]
+
+    * Check for YAML minimum version before using YAML serializer in
+      schema tests (Stefan Hornburg/Racke, GH #11).
+    * Require Dancer2::Plugin::DBIC 0.0009 to run plugin tests
+      (Stefan Hornburg/Racke, GH #12).
+
+0.101 Sat Mar 26 16:50:35 2016 CET
+
+    [BUG FIXES]
+
+    * Require minimum version of 1.15 for YAML (Peter Mottram, GH #11).
+
+    [TEST]
+
+    * Add diagnostics to DBIC plugin test (Peter Mottram, GH #12).
+
+0.100 Fri Mar 25 07:23:18 2016 CET
+
+    [ENHANCEMENTS]
+
+    * Add support for serializers other than JSON and custom serializers.
+      We include now JSON, YAML and Sereal serializers (Peter Mottram).
+    * Use DBIx::Sugar (Peter Mottram).
+    * Switch from Class::Load try_load_class to Module::Runtime use_module
+      (Peter Mottram).
+    * Use Dancer2::Serializer::JSON instead of JSON (Peter Mottram).
+    * Allow non primary key as session id column (Andy Jack, GH #2).
+
+    [BUG FIXES]
+
+    * Fix generating new sessions for every request
+      (Peter Mottram, Rory Zweistra, GH #9).
+    * Use decoded_content instead of content in UTF-8 tests
+      (Peter Mottram, GH #8).
+
+    [TESTS]
+
+    * Stop Test::More complaining about wide chars in print (Peter Mottram).
+    * Add tests for UTF-8 data in the session (Stefan Hornburg/Racke).
+    * Add test for correct primary key in sessions table
+      (Stefan Hornburg/Racke).
+
+0.007 Wed Aug  6 11:03:52 2014 CEST
+
+    [BUG FIXES]
+
+    * Fix session destruction and tweak tests to maintain the session
+      (GH #4, #5, #6, Marco Pessotto).
+
+0.006 Tue Aug  5 16:24:29 2014 CEST
+
+    [BUG FIXES]
+
+    * Use try_class_load to test schema module (GH #3, Andy Jack).
+
+0.005 Tue Apr 29 10:06:16 2014 CEST
+
+    [ENHANCEMENTS]
+
+    * Adjust schema test to Dancer2 API change.
+
+0.004 Thu Apr 24 15:27:10 2014 CEST
+
+    * Update CHANGES and README.
+
+0.003 Thu Apr 24 14:17:42 2014 CEST
+
+    * First official release to CPAN.

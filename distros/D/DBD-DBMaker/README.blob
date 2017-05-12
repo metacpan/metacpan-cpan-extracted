@@ -1,0 +1,136 @@
+DBD::DBMaker long support
+=======================
+
+There are two methods to handle LONG data:
+
+I. use LongReadLen and blob_read
+
+a. You may use the 'LONG VARCHAR' or 'LONG VARBINARY' fields like the normal
+   ones, provided you have enough memory to fetch them.
+   This can be done by giving an attribute value when preparing the
+   statement:
+   	$sth = $dbh->prepare("select * from foo",
+		             { 'LongReadLen' => 4096, }
+		             );
+   
+
+b. Additional, starting with v0.04, you may read the data out of a LONG
+   column using the function blob_read().  This allows to read the whole
+   data in the LONG field from a fetched row; each subsequent call to
+   blob_read returns another part of the data within the LONG column.
+   
+   Example: After executing this code fragment you will have the
+            entire contents of column 34 of a fetched row in $data.
+   
+   my $data = "";
+   my $offset = 0;
+   my $chunk = "";
+   $dbh->{LongReadLen} = 0
+   while ($chunk = $sth->blob_read(34, $offset, 4096))
+   	{
+	$offset += length($chunk);
+	$data .= $chunk;
+	}
+
+II. Handle BLOB field via file with DBMaker
+
+1. Output BLOB to user's file:
+
+In DBI, you can set LongReadLen to set the buffer length for getting
+your blob data. However, BLOB field's data maybe too large to malloc
+buffer for storing it, and it may be a little troublesome to call
+blob_read many times. By BindColToFile, you can redirect the 
+column's output to a file, and you can continue to access the blob
+on the local file.  Because this function will create many files
+when you try to fetch in a table which holds many rows, please 
+remember to clean up the files when you finish your program.
+
+$sth->func($colno, $prefix_filename, $fgOverwrite, 'BindColToFile')
+
+NOTE: set fgOverwrite 1 or 0 to specify whether your local file with same
+name be overwritten or not.
+
+For example:
+$sql = qq{ SELECT c1 FROM blobt1};
+$sth = $dbh->prepare( $sql );
+ 
+$sth->func(1, "perl_outfile.txt", 1, 'BindColToFile');
+ 
+$sth->execute()||die "$DBI::errstr";
+ 
+my $c1;
+ 
+$sth->bind_columns( undef, \$c1);
+while( $sth->fetch() ) {  
+    print "c1 = $c1\n"; 
+}
+
+After running this program, you will notice there's many file called
+perl_outfile.txt, perl_outfile1.txt,...perl_outfilen.txt in your local
+directory.  You need to remember to delete these files if they are no
+longer necessary.
+
+2. Use file as input parameter to a BLOB column
+
+a. store file content for BLOB field
+
+When this attribute value is 1 and user add quote for a file name as 
+input parameter value, and the parameter's SQL type is SQL_LONGVARCHAR/
+SQL_LONGVARBINARY/SQL_FILE, DBMaker will store the file's content into
+database.
+
+  Example:
+  $dbh->do("create table blobt1 (c1 long varchar)");
+  my $sql=qq{INSERT INTO blobt1 values(?)};
+  my $sth = $dbh->prepare($sql);
+ 
+  # By default, DBMaker will try to open a blob file name (for example: test.gif), 
+  # read the file and then store into the database
+  $sth->bind_param(1,"'test.gif'");
+  $sth->execute();
+
+  # If you want to store a blob file name (for example: test.gif) with string quote 
+  # into database
+  $sth->{dbmaker_file_input} = 0;
+  $sth->bind_param(1,"'test.gif'");
+  $sth->execute();
+
+You can select c1 from this table and see what's the difference between these two
+insert.
+
+b. Store file name only for FILE column
+
+When dbmaker_file_input statement attribute sets on, there are 
+difference when you input file name with or without single quote for
+DBMaker's SQL_FILE type.  When you do not add single quote with
+the input string,  DBMaker will check if the file name is accessible
+by DBMaker server, and store the file name into the database.  For
+detail description for DBMaker's SQL_FILE type, please reference 
+DBMaker's manual.
+
+NOTE: In order to tell DBMaker to store file name, you should make
+sure you have set DB_USRFO=1 in dmconfig.ini, and the input file name
+must be full path with file name.
+
+  Example:
+  $dbh->do("create table filet1 (c1 file)");
+  my $sql=qq{INSERT INTO filet1 values(?)};
+  my $sth = $dbh->prepare($sql);
+ 
+  # Test input file name with single quote
+  # You can test with a file in current directory
+  $sth->bind_param(1,"'test.gif'");
+  $sth->execute();
+
+  # If you want to store a data with or without single quote 
+  # into database's FILE column, you should set 
+  # the attribute dbmaker_file_input = 0
+  $sth->{dbmaker_file_input} = 0;
+  $sth->bind_param(1,"test.gif");
+  $sth->execute();
+
+  $sth->bind_param(1,"'test.gif'");
+  $sth->execute();
+
+You can select c1 or select filename(c1) from this table to see what's the difference
+with these inserts.

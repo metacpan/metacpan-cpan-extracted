@@ -1,0 +1,142 @@
+<html>
+<head>
+<title>BabelKit Code Table Update Methods</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="bk_set.html">Code Sets</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_overview.html">Overview</a>]
+</div>
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Code Table Update Methods</h2></center>
+
+These methods update the code table.  They never call
+commit in order to not disturb any transactions in progress.
+If the library handle that you provide to BabelKit is not
+set up to autocommit, call commit yourself after calling
+these methods.
+
+
+<h4>slave()</h4>
+
+<pre>
+$babelkit-&gt;slave($code_set, $code_code, $code_desc);
+</pre>
+
+<p>
+The slave() method creates, updates, or deletes a native
+code description.  This is convenient for situations where
+some legacy database fields need to become multilingual.
+The native language value can be kept and maintained in
+the legacy database field while the translations
+can be kept and maintained in the BabelKit code table.
+
+<p>
+Call the slave() method to update the code table whenever
+the native language value in the legacy table changes.
+
+<p>
+Calling slave() with a blank description will delete
+the code entirely.  Or you can call the remove()
+method when a master record is being deleted.
+
+<p>
+<pre>
+$babelkit-&gt;slave('city', $city_id, $city_name);
+</pre>
+
+
+<h4>remove()</h4>
+
+<pre>
+$babelkit-&gt;remove($code_set, $code_code);
+</pre>
+
+<p>
+The remove() method removes all language descriptions
+for a code.  This can be useful for removing obsolete
+code translations from a slave set.  It can also be useful
+to force retranslation of a slave item.
+
+<p>
+<pre>
+$babelkit-&gt;remove('city_id', $city_id);
+</pre>
+
+
+<h4>get()</h4>
+
+<pre>
+<b># PHP</b>
+list( $code_desc, $code_order, $code_flag ) =
+    $babelkit-&gt;get($code_set, $code_lang, $code_code);
+</pre>
+
+<pre>
+<b># Perl</b>
+( $code_desc, $code_order, $code_flag ) =
+    $babelkit-&gt;get($code_set, $code_lang, $code_code);
+</pre>
+
+This is an internal method used to retrieve all of a code's fields.
+
+
+
+<h4>put()</h4>
+
+<pre>
+$babelkit-&gt;put($code_set,  $code_lang,  $code_code,
+                  $code_desc, $code_order, $code_flag);
+</pre>
+
+This is an internal method used to write all of a code's fields.
+The code is added, updated or deleted as necessary.
+
+Putting a blank native description will remove() the entire code.
+Putting a blank non-native description will delete that language
+translation record.
+
+<p>
+The code_order and code_flag parameters are optional.
+
+<p>
+When a code is first added
+in the native language and the code_order parameter is missing
+or undefined and the code_code value is numeric then the code_code
+value is entered into the code_order field.  This supports
+numeric sorts on numeric codes by default.
+
+
+<p>
+<div align="right">
+[<a href="bk_set.html">Code Sets</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_overview.html">Overview</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

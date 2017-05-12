@@ -1,0 +1,20 @@
+Changes
+Encode.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+META.yml
+lib/Deep/Encode.pm
+lib/Deep/Encode.pod
+t/Deep-Encode-00.t
+t/Deep-Encode-01.t
+t/Deep-Encode-02.t
+t/Deep-Encode-03.t
+t/Deep-Encode-04.t
+t/Deep-Encode-05.t
+t/Deep-Encode-06.t
+t/Deep-Encode-07.t
+t/Deep-Encode-08.t
+t/Deep-Encode-09.t
+META.json                                Module JSON meta-data (added by MakeMaker)

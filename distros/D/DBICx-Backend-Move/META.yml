@@ -1,0 +1,36 @@
+---
+abstract: 'Migrate an existing database to another backend'
+author:
+  - 'Maik Hentsche <caldrin@cpan.org>'
+build_requires:
+  Class::C3: 0
+  DBIx::Class::Core: 0
+  DBIx::Class::FilterColumn: 0
+  DBIx::Class::InflateColumn::DateTime: 0
+  DBIx::Class::Schema: 0
+  DBIx::Class::TimeStamp: 0
+  English: 0
+  MRO::Compat: 0
+  Test::Fixture::DBIC::Schema: 0
+  Test::More: 0
+  parent: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300024, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-Backend-Move
+requires:
+  App::Cmd::Simple: 0
+  DBI: 0
+  DBICx::Deploy: 0
+  Module::Load: 0
+  Moo: 0
+  base: 0
+  perl: 5.010
+  strict: 0
+  warnings: 0
+version: 1.000010

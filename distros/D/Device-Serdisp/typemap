@@ -1,0 +1,12 @@
+TYPEMAP
+Serdisp *		ANY_OBJECT
+gdImagePtr			ANY_OBJECT
+
+OUTPUT
+ANY_OBJECT
+     sv_setref_pv($arg, CLASS, (void*) $var);
+
+INPUT
+ANY_OBJECT
+     $var = ($type) SvIV((SV*)SvRV($arg));
+

@@ -1,0 +1,54 @@
+DBIx-Log4perl version 0.10
+==========================
+
+DBIx-Log4perl is an extension for DBI to selectively log SQL, parameters,
+result-sets, transactions etc to a Log::Log4perl handle.
+
+You will need the DBI and Log::Log4perl modules first.
+
+Please see the NOTES section in the pod for incompatibilities.
+
+Please make sure you have an up to date Test::More before running the
+tests. You will need at least 0.62.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NOTE: To to a full test you need a working DBI and DBD with access to
+a database where you can create a table. Once you have this set up
+you should run perl Makefile.PL like this:
+
+perl Makefile.PL --dsn=dsn --user=dbuser --password=dbpassword --table=table
+
+where:
+
+  dsn is a valid DBI connection dsn e.g. dbd::mysql::database
+  dbuser is a valid user to access database
+  dbpassword is the password for dbuser
+    (may be omitted if not password required)
+  table is the name of a table to create for testing
+    (NOTE: this table will be dropped if it already exists)
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI 1.50
+  Log::Log4perl 1.04
+  Test::More 0.62
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006-2012 by Martin J. Evans
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.7 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,6 @@
+0.35 - Remove stupid incomplete test. Ugh.
+0.34 - Correct minor bug in authentication credentials.
+0.33 - Correct some stuff to increase the kwalitee score.
+0.32 - Prereq version fixes.
+0.31 - Documentation fixes.
+0.30 - Initial release.

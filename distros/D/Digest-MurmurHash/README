@@ -1,0 +1,7 @@
+This is the Perl XS module for the Murmur algorithm by Austin Appleby.
+See the documentation within the module for details.
+
+For more information on the algorithm itself, you can read the explanation
+at: http://murmurhash.googlepages.com/
+
+Toru Maesaka <dev@torum.net>

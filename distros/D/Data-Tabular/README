@@ -1,0 +1,111 @@
+NAME
+    Data::Tabular - Handy Table Manipulation and rendering Object
+
+SYNOPSIS
+     use Data::Tabular;
+
+     $table = Data::Tabular->new(
+         headers => ['one', 'two'],
+         data    => [
+              ['a', 'b'],
+              ['c', 'd']
+         ],
+         extra_headers => [ 'three' ],
+         extra => {
+             'three' => sub {
+                 my $self = shift;
+                 my $a = $self->get('one');
+                 my $b = $self->get('two');
+                 $a . $b;
+             },
+         },
+         group_by => {
+         },
+         output => {
+             headers => [ 'three', 'one', 'two' ],
+         },
+     );
+
+DESCRIPTION
+    Data::Tabular has four major sections:
+
+    The data section. This is the base table, it contains a set of rows that
+    is made up of named columns.
+
+    The extra section. This is a set of named columns that are added to the
+    table.
+
+    The group_by section. This is allows titles, and subtotals to be
+    inserted into table.
+
+    The output section. This allows the output to be formatted and rendered
+    for a particular type of output. Currently HTML and Excel spreadsheets
+    are supported.
+
+    Of these only the data section is required.
+
+Data Section
+    The Data section consists of two pieces of information a list of headers
+    names and a 2 dimensional array of data.
+
+API
+  Constructor
+    new The new method
+
+  Output Control Methods
+    output
+        Get the output object.
+
+  Accessor Methods
+    data_table
+        The data method returns a Data::Table object.
+
+    extra_table
+        The extra method returns a Data::Table::Extra object.
+
+    grouped_table
+        The grouped method returns a Data::Table::Grouped object.
+
+    grouped
+        The grouped method returns a Data::Table::Grouped object.
+
+    headers
+        The headers method returns the available headers in the
+        Data::Table::Extra object. This is the headers from both the data
+        section and the extra section. These are the headers that can be in
+        the output section.
+
+  Configure Methods
+  Display Methods
+    html
+        returns html representation of the table.
+
+    xls returns xls representation of the table.
+
+    txt returns text representation of the table.
+
+    csv returns a comma separated representation of the table.
+
+EXAMPLES
+     my $st = $dbh->prepare('Select * from my_test_table');
+     my $data = selectall_arrayref($st);
+     my $headers = $st->{NAMES}
+     
+ my $table = Data::Tabular->new(
+         data => $data,
+         headers => $headers,
+     );
+
+AUTHOR
+    "G. Allen Morris III" <gam3@gam3.net>
+
+COPYRIGHT
+    Copyright (C) 2003-2008, G. Allen Morris III, all rights reserved
+
+LICENSE
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    Data::Tabular::Table
+

@@ -1,0 +1,136 @@
+#!/usr/bin/perl
+
+# Copyright 2009-2011, Bartłomiej Syguła (perl@bs502.pl)
+#
+# This is free software. It is licensed, and can be distributed under the same terms as Perl itself.
+#
+# For more, see my website: http://bs502.pl/
+
+require 5.6.1;
+
+use strict;
+use warnings;
+
+our $VERSION = "0.05";
+
+use Devel::CoverReport::App::ProveCover 0.05;
+
+exit Devel::CoverReport::App::ProveCover::main(@ARGV);
+
+__END__
+
+=head1 NAME
+
+prove_cover - Run tests (as C<prove> would do) under L<Devel::Cover>, and use L<Devel::CoverReport> for report.
+
+=head1 USAGE
+
+ prove_cover [options] [files or directories]
+
+=head1 OPTIONS
+
+Boolean options:
+
+ -v,  --verbose     Print all test lines.
+ -l,  --lib         Add 'lib' to the path for your tests (-Ilib).
+ -b,  --blib        Add 'blib/lib' and 'blib/arch' to the path for your tests
+ -s,  --shuffle     Run the tests in random order.
+ -c,  --color       Colored test output (default).
+      --nocolor     Do not color test output.
+      --count       Show the X/Y test count when not verbose (default)
+      --nocount     Disable the X/Y test count.
+ -D   --dry         Dry run. Show test that would have run.
+      --ext         Set the extension for tests (default '.t')
+ -f,  --failures    Show failed tests.
+ -o,  --comments    Show comments.
+      --fork        Fork to run harness in multiple processes.
+      --ignore-exit Ignore exit status from test scripts.
+ -m,  --merge       Merge test scripts' STDERR with their STDOUT.
+ -r,  --recurse     Recursively descend into directories.
+      --reverse     Run the tests in reverse order.
+ -q,  --quiet       Suppress some test output while running tests.
+ -Q,  --QUIET       Only print summary results.
+ -p,  --parse       Show full list of TAP parse errors, if any.
+      --directives  Only show results with TODO or SKIP directives.
+      --timer       Print elapsed time after each test.
+      --normalize   Normalize TAP output in verbose output
+ -T                 Enable tainting checks.
+ -t                 Enable tainting warnings.
+ -W                 Enable fatal warnings.
+ -w                 Enable warnings.
+ -h,  --help        Display this help
+ -?,                Display this help
+ -H,  --man         Longer manpage for prove
+      --norc        Don't process default .proverc
+
+Options that take arguments:
+
+ -I                 Library paths to include.
+ -P                 Load plugin (searches App::Prove::Plugin::*.)
+ -M                 Load a module.
+ -e,  --exec        Interpreter to run the tests ('' for compiled tests.)
+      --harness     Define test harness to use.  See TAP::Harness.
+      --formatter   Result formatter to use. See TAP::Harness.
+ -a,  --archive     Store the resulting TAP in an archive file.
+ -j,  --jobs N      Run N test jobs in parallel (try 9.)
+      --state=opts  Control prove's persistent state.
+      --rc=rcfile   Process options from rcfile
+
+Coverage Report options:
+
+     --cover_db     Location of the cover_db directory
+     --no_report    Stop after running tests, do not generate the report itself
+
+See also: C<prove>.
+
+=head1 NOTES
+
+=head2 App::Prove usage
+
+Both C<prove> and C<prove_cover> use L<App::Prove>. The only difference is this line, added to C<prove_cover>:
+
+ $app->{'exec'} = q{/usr/bin/perl -MDevel::Cover=-db,} . $db_path;
+
+That said, C<prove_cover> should be a drop-in replacement for C<prove>, and work the same way (in the 'running tests' part).
+
+=head2 Devel::Cover usage
+
+Since C<prove_cover> must run all tests under L<Devel::Cover>, ther are run by: C</usr/bin/perl -MDevel::Cover=-db,/foo/bar/cover_db>.
+C</foo/bar/cover_db> is the current working directory.
+
+=head2 Devel::CoverReport usage
+
+At this point, there is no way to pass options to L<Devel::CoverReport>. This may change in future release.
+Report will be generated as Html output, with all options set at their default values.
+
+=head1 KNOWN ISSUES
+
+I have observed many times, that when running many tests at once can corrupt Devel::Cover database and thus produce false statistics.
+
+Running with -j 1 (default) should be a safe bet.
+
+=head1 WARNING
+
+Consider this script to be an early ALPHA. It does the job for me, so it's here.
+
+This is my first CPAN module, so I expect that some things may be a bit rough around edges.
+
+The plan is, to fix both those issues, and remove this warning in next immediate release.
+
+=head1 AUTHOR
+
+Bartłomiej Syguła <perl@bs502.pl>
+
+=head1 COPYRIGHT AND DISCLAIMER
+
+Copyright 2009-2011, Bartłomiej Syguła
+
+This is free software. It is licensed, and can be distributed under the same terms as Perl itself.
+
+Parts of the code for C<prove_cover> (especially: options description) borrowed from C<prove> command, by Andy Armstrong.
+
+This script was inspired by C<prove> by Andy Armstrong and L<Devel::Cover> by Paul Johnson.
+
+=cut
+
+# vim: fdm=marker

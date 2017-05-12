@@ -1,0 +1,16 @@
+<div class="article-index hfeed" id="blog-homepage">
+ <h2>[% page_title |encode |html %]</h2>
+
+[% FOREACH entry = articles %]
+<div class="hentry">
+ <h3 class="entry-title"><a href="[% entry.permalink |html %]" rel="bookmark">[% entry.title |encode |html %]</a></h3>
+ [% INCLUDE article_meta.tt %]
+ <div class="entry-content">[% entry.article_snippet_html4 %]</div>
+ <a href="[% entry.permalink |html %]" rel="bookmark">[%
+    IF entry.snippet_is_description %]Read article&#8230;[% # not implemented
+    ELSIF entry.snippet_is_not_whole_article %]Read on&#8230;[%
+    ELSE %]Permalink[% END %]</a>
+</div>
+[% END %]
+
+</div>

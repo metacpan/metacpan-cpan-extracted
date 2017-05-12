@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01basic.t
+t/02more.t
+t/03align.t
+t/04show.t
+t/05chunk.t
+t/06unicode.t
+t/07dups.t
+t/08group.t
+lib/Data/Hexify.pm
+META.yml                                 Module meta-data (added by MakeMaker)

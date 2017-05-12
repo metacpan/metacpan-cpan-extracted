@@ -1,0 +1,81 @@
+{
+   "abstract" : "Handler for running Hook files for Dredd",
+   "author" : [
+      "Mike Eve <ungrim97@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v3.0.1",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dredd-Hooks",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.035"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion::Fast" : "0.04",
+            "Test::PAUSE::Permissions" : "0.04",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Hash::Merge" : "0.200",
+            "IO::All" : "0.86",
+            "JSON" : "2.90",
+            "Moo" : "2.000002",
+            "Sub::Exporter" : "0.987",
+            "Types::Standard" : "1.000005",
+            "perl" : "5.018002"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "Dredd::Hooks" : {
+         "file" : "lib/Dredd/Hooks.pm",
+         "version" : "0.05"
+      },
+      "Dredd::Hooks::Methods" : {
+         "file" : "lib/Dredd/Hooks/Methods.pm"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ungrim97/Dredd-Hooks/issues"
+      },
+      "homepage" : "https://github.com/ungrim97/Dredd-Hooks",
+      "repository" : {
+         "url" : "git://github.com/ungrim97/Dredd-Hooks.git",
+         "web" : "https://github.com/ungrim97/Dredd-Hooks"
+      }
+   },
+   "version" : "0.05"
+}

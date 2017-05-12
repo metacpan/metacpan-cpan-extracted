@@ -1,0 +1,96 @@
+{
+   "abstract" : "Encrypted cookie-based session backend for Dancer",
+   "author" : [
+      "Alex Kapranoff <kappa@cpan.org>",
+      "Alex Sukria <sukria@cpan.org>",
+      "David Golden <dagolden@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Session-Cookie",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Crypt::CBC" : "0",
+            "Crypt::Rijndael" : "0",
+            "Dancer" : "1.3113",
+            "Dancer::Cookie" : "0",
+            "Dancer::Cookies" : "0",
+            "Dancer::Session::Abstract" : "0",
+            "MIME::Base64" : "0",
+            "Session::Storage::Secure" : "0.010",
+            "Storable" : "0",
+            "String::CRC32" : "0",
+            "Time::Duration::Parse" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer::ModuleLoader" : "0",
+            "Dancer::Test" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "FindBin" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.96",
+            "Test::NoWarnings" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer::Session::Cookie" : {
+         "file" : "lib/Dancer/Session/Cookie.pm",
+         "version" : "0.27"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perldancer/Dancer-Session-Cookie/issues"
+      },
+      "homepage" : "https://github.com/perldancer/Dancer-Session-Cookie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perldancer/Dancer-Session-Cookie.git",
+         "web" : "https://github.com/perldancer/Dancer-Session-Cookie"
+      }
+   },
+   "version" : "0.27",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "David Precious <davidp@preshweb.co.uk>",
+      "Michael G. Schwern <schwern@pobox.com>",
+      "Neil Kirsopp <neil@broadbean.com>",
+      "Nick S. Knutov <nick@knutov.com>",
+      "Sawyer X <xsawyerx@cpan.org>"
+   ]
+}
+

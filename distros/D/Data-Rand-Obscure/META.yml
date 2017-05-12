@@ -1,0 +1,25 @@
+---
+name: Data-Rand-Obscure
+version: 0.021
+author:
+  - 'Robert Krimen <rkrimen@cpan.org>'
+abstract: Generate (fairly) random strings easily.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp::Clan: 0
+  Digest: 0
+  Object::Tiny: 0
+build_requires:
+  Test::More: 0
+provides:
+  Data::Rand::Obscure:
+    file: lib/Data/Rand/Obscure.pm
+    version: 0.021
+  Data::Rand::Obscure::Generator:
+    file: lib/Data/Rand/Obscure/Generator.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

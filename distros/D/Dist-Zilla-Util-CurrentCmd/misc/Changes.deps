@@ -1,0 +1,40 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.002003
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.002002 2014-12-25T12:35:22Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - Moose 2.1205
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - Moose 0 → 2.1205
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+0.002001 2014-08-15T21:58:42Z
+
+0.002000 2014-08-03T03:42:00Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+0.001001 2014-07-23T06:27:22Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77

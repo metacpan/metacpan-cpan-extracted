@@ -1,0 +1,21 @@
+NAME
+      Date::Say::Czech - Outputs dates as text as you would speak it
+
+SYNOPSIS
+      use Date::Say::Czech;
+
+      print time_to_say(time());
+      print date_to_say($DAY, $MONTH, $YEAR);
+
+      print day_to_say($DAY);
+      print month_to_say($DAY);
+      print year_to_say($YEAR);
+
+DESCRIPTION
+    This module provides functions to easily convert a date (given
+    as either integer values for a day, a month and a year or as a unix
+    timestamp) into the czech text representation, like you would read
+    it aloud.
+
+AUTHOR
+    Jiri Vaclavik <my name dot my last name at gmail dot com>

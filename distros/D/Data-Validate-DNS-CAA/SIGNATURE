@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 86937149867438932240f7381ea30ba7f25c1be2 Changes
+SHA1 dd31f242fe1032bc39b741771b08dfff7a396aaf LICENSE
+SHA1 fc9d861018fb0a9e5a053515da6f0554efeb82e3 MANIFEST
+SHA1 3caabfe70a163b27e39fea2c0bde9f0842025459 MANIFEST.SKIP
+SHA1 59f13ed6c17536bcf4719f85d19299e4e99fff97 META.json
+SHA1 cf491ed6cd5b18452651171b687e4bee3b50c21e META.yml
+SHA1 7135db6f57dd9e8eeddf840bb7dee75e0229eb1f Makefile.PL
+SHA1 1990fd6569ff1c7b0859c717722f4fb94b0d2f75 README
+SHA1 ee7453a4b7d6fdcf502e0be33afb2823f61bace5 dist.ini
+SHA1 4c4113957f43621ee0b4f1b9987e2b82a60ff31a lib/Data/Validate/DNS/CAA.pm
+SHA1 5387f8ed48de7ef64220c5ed2c77e41ed844adb2 t/author-pod-coverage.t
+SHA1 8efad25309730a4d501fb40fc03eda4697303372 t/author-pod-syntax.t
+SHA1 b33ccee05a514f79e3507a4bcc3b6d8167c3f3ba t/oo.t
+SHA1 101372b8395236a21d43c61438dcd9735e723d2f t/signature.t
+SHA1 afb7e32051615d7cabff0b7a1f40a8c577b28ad0 t/smoke.t
+SHA1 efa33b093cc6a8fc1660080a4255524ed0f04b84 t/taint.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v2
+
+iQIVAwUBWQJ2QKQl27WkM10aAQgJVQ//W7pjvqUTpzWnPwKLoQVCcDO4NEh3AFtj
+28ZcYtCje1jRZU76Nt6I/9NfFGleH6ajHnm+sFnVc5Kb9gwrxIyvfGwLeoSFqzOi
+JOecOq4Vgkq7yvS+gC+jy/SSVPii8vxhXnizbCKgbEi0G4YdvlSD6kNR2351pfTx
+6/0LQ9j1N8qwMsY+DZZjq1yhGJ8TX+wiaTBR9aGtmEm5uPgPxgF0GpSQsttT0tqD
+rXroaIE8//FuiHBSNpbeL2cKe5tYBz6+BywOf3CIsSB25nIfJeuDRMoySOIQOD68
+SnEY3/7e8ZB8UpuBImuiHYMtz5zdTAWTDbBJzgDm1XLfx03V9XE13c/0eqUDkVsQ
+eejqS3mdQOdhQ304zzs/ttYwdu7TU8/WC9xxhRzBzEiZsY821Rt4BtfYlzlJdFxO
+aOXPc6ioxF3NUJJSlRMp9cuXCCqOR8d0dDZNrQEtIM1nAC19I55fnFVtYF73owAs
+KdlPWCpVIUJSiHE4bPE/9J+tSTfESEiBiOUdNvV/NQ3I8cxclshr62lxUcZw8O03
+n/GsJzlKYJAk4UzfAdwhhL8JUm4Q1NVVPoktPln7pPjHU4q9W9m11FZcAELhJ8sd
+KyoK59nxssj8hWwP6FHzxoQBwEjIdnEauaIeT+SfHEgjiLyiBF3eSmBzg/I7Mvd0
+yr2RWywkPPk=
+=YcLX
+-----END PGP SIGNATURE-----

@@ -1,0 +1,259 @@
+NAME
+    Data::ArrayList - java.util.ArrayList for perl
+
+VERSION
+    version 0.01
+
+SYNOPSIS
+        use Data::ArrayList;
+
+        my $dal = Data::ArrayList->new( my $initialCapacity = 20 );
+
+        say "is empty" if $dal->isEmpty;
+
+        $dal->add("at the end");
+
+        $dal->addAll( 1 .. 100 );
+
+        $dal->add("at the end");
+
+        say $dal->get( 12 );
+        # prints 12
+
+        $dal->set(12, "I was 12 before");
+
+        say $dal->indexOf(sub { /^at the end$/ });
+        # prints 0
+
+        say $dal->lastIndexOf(sub { /^at the end$/ });
+        # prints 101
+
+        my $shallowcopy = $dal->clone;
+
+        my @deepcopyofelements = $dal->toArray();
+
+        $dal->ensureCapacity( 1_999_999 );
+        $dal->addAll( 1 .. 1_000_000 );
+
+        say $dal->size;
+        # prints 1000102
+
+        $dal->remove( 12 );
+
+        say $dal->get( 12 );
+        # prints 13
+
+        my $sublist = $dal->subList( 101, 1_000_101 );
+        $sublist->clear;
+
+        say $dal->size;
+        # prints 101
+
+        my $iter = $dal->listIterator();
+
+        while ( $iter->hasNext ) {
+            my $idx = $iter->nextIndex;
+            my $elem = $iter->next;
+
+            $iter->add( "$elem from $idx again" );
+        }
+
+        while ( $iter->hasPrevious ) {
+            my $idx = $iter->previousIndex;
+
+            my $elem = $iter->previous;
+
+            $iter->remove if $elem =~ / again$/;
+        }
+
+        $dal->clear;
+
+        say $dal->size;
+        # prints 0
+
+DESCRIPTION
+    Data::ArrayList is a perl port of *java.util.ArrayList* with some of the
+    methods inherited from *java.util.AbstractList*.
+
+    Please note that the author strongly encourages users of this module to
+    read "Perl Functions by Category " in perlfunc *Functions for real
+    @ARRAYs*, as use of this module introduces significant performance
+    penalties (non-OO with native functions is at least twice as fast).
+
+    However he believes that chance of converting Java developers to perl is
+    worth existence of this module.
+
+    Besides it was also fun to write ;-)
+
+METHODS
+  add
+        $dal->add( $element );
+
+    Appends the specified element to the end of this list.
+
+  addAt
+        $dal->addAt( $index, $element );
+
+    Inserts the specified element at the specified position in this list.
+    Shifts the element currently at that position (if any) and any
+    subsequent elements to the right (adds one to their indices).
+
+  get
+        my $element = $dal->get( $index );
+
+    Returns the element at the specified position in this list.
+
+  addAll
+        $dal->addAll( @elements );
+
+    Appends all of the specified elements to the end of this list, in their
+    current order.
+
+  addAllAt
+        $dal->addAllAt( $index, @elements );
+
+    Inserts all of the specified elements into this list, starting at the
+    specified position. Shifts the element currently at that position (if
+    any) and any subsequent elements to the right (increases their indices).
+    The new elements will appear in the list in their current order.
+
+  clear
+        $dal->clear;
+
+    Removes all of the elements from this list. The list will be empty after
+    this call returns.
+
+  isEmpty
+        $dal->isEmpty;
+
+    Returns *true* if this list contains no elements.
+
+  indexOf
+        my $index = $dal->indexOf( sub { $_ =~ /^value$/ } );
+
+    Returns the index of the first occurrence in this list of the element
+    for which the specified anonymous sub returns true, or -1 if this list
+    does not contain the element.
+
+  lastIndexOf
+        my $index = $dal->lastIndexOf( sub { $_ =~ /^value$/ } );
+
+    Returns the index of the last occurrence in this list of the element for
+    which the specified anonymous sub returns true, or -1 if this list does
+    not contain the element.
+
+  contains
+        $dal->contains( sub { $_ =~ /^value$/ } );
+
+    Returns *true* if the list contains an element for which the specified
+    anonymous sub returns true.
+
+  size
+        my $size_of_list = $dal->size;
+
+    Returns the number of elements in this list.
+
+  clone
+        my $copy = $dal->clone;
+
+    Returns a shallow copy of this instance. The elements themselves are not
+    copied.
+
+  toArray
+        my @elements = $dal->toArray;
+
+    Returns an array containing all of the elements in this list in proper
+    sequence (from first to last element).
+
+    The returned array will be "safe" in that no references to it are
+    maintained by this list. (In other words, this method must allocate a
+    new array). The caller is thus free to modify the returned array.
+
+    Note: The *safeness* of the copy is provided by Data::Clone. Please make
+    sure that all blessed objects implement "clone" to support deep cloning.
+
+  set
+        $dal->set( $index, $value );
+
+    Replaces the element at the specified position in this list with the
+    specified element.
+
+    Returns the element previously at the specified position.
+
+  ensureCapacity
+        $dal->ensureCapacity( $minCapacity );
+
+    Increases the capacity of this instance, if necessary, to ensure that it
+    can hold at least the number of elements specified by the minimum
+    capacity argument.
+
+    Note: This method is not supported by objects returned by "subList".
+
+  remove
+        $dal->remove( $index );
+
+    Removes the element at the specified position in this list. Shifts any
+    subsequent elements to the left (subtracts one from their indices).
+
+    Returns the element that was removed from the list.
+
+  listIterator
+        my $li = $dal->listIterator( $initialPosition );
+
+    Returns a list iterator (Data::ArrayList::ListIterator) of the elements
+    in this list (in proper sequence), starting at the specified position
+    (*default is 0*) in this list. The specified index indicates the first
+    element that would be returned by an initial call to next. An initial
+    call to previous would return the element with the specified index minus
+    one.
+
+    Iterator will die with "ConcurrentModification" if the parent list has
+    been *structurally modified*. Structural modifications are those that
+    change the size of the list, or otherwise perturb it in such a fashion
+    that iterations in progress may yield incorrect results.
+
+  subList
+        my $sl = $dal->subList( $rangeFrom, $rangeTo );
+
+    Returns a view of the portion of this list between the specified
+    "rangeFrom", inclusive, and "rangeTo", exclusive. (If "rangeFrom" and
+    "rangeTo" are equal, the returned list is empty.) The returned list is
+    backed by this list, so non-structural changes in the returned list are
+    reflected in this list, and vice-versa. The returned list supports all
+    of the optional list operations supported by this list.
+
+    This method eliminates the need for explicit range operations (of the
+    sort that commonly exist for arrays). Any operation that expects a list
+    can be used as a range operation by passing a subList view instead of a
+    whole list. For example, the following idiom removes a range of elements
+    from a list:
+
+        $dal->subList($from, $to)->clear();
+
+    Returned sublist is a subclass of Data::ArrayList and supports all of
+    its methods (except the "ensureCapacity").
+
+    Sublists could be nested, as in:
+
+        $dal->subList( 1, 100 )->subList( 20, 20 );
+
+SEE ALSO
+    *   perlfunc
+
+    *   List::MoreUtils
+
+    *   Data::Clone
+
+    *   <http://download.oracle.com/javase/6/docs/api/java/util/ArrayList.ht
+        ml>
+
+AUTHOR
+    Alex J. G. Burzyński <ajgb@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alex J. G. Burzyński
+    <ajgb@cpan.org>.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

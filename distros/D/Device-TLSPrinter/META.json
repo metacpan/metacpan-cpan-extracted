@@ -1,0 +1,55 @@
+{
+   "abstract" : "Module for using a TLS barcode printer",
+   "author" : [
+      "Sebastien Aperghis-Tramoni <sebastien@aperghis.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4002, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-TLSPrinter",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.38",
+            "Test::More" : "0.70"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.40"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Accessor" : "0.31",
+            "IO" : "1.23"
+         }
+      }
+   },
+   "provides" : {
+      "Device::TLSPrinter" : {
+         "file" : "lib/Device/TLSPrinter.pm",
+         "version" : "0.51"
+      },
+      "Device::TLSPrinter::Network" : {
+         "file" : "lib/Device/TLSPrinter/Network.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/maddingue/Device-TLSPrinter.git"
+      }
+   },
+   "version" : "0.51"
+}

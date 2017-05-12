@@ -1,0 +1,36 @@
+Package: cl-infix
+Status: purge ok not-installed
+Priority: optional
+Section: non-free/devel
+
+Package: dlint
+Status: purge ok not-installed
+Priority: extra
+Section: net
+
+Package: glotski
+Status: purge ok not-installed
+Priority: optional
+Section: gnome
+
+Package: alsaplayer
+Status: install ok installed
+Priority: optional
+Section: sound
+Installed-Size: 20
+Maintainer: Ivo Timmermans <ivo@debian.org>
+Architecture: i386
+Version: 0.99.76-0.3
+Replaces: alsaplayer-oss (<< 0.99.22), alsaplayer-alsa (<< 0.99.22), alsaplayer-esd (<< 0.99.22)
+Depends: alsaplayer-gtk | alsaplayer-interface, alsaplayer-oss | alsaplayer-output, alsaplayer-common
+Conflicts: alsaplayer-oss (<< 0.99.22), alsaplayer-alsa (<< 0.99.22), alsaplayer-esd (<< 0.99.22)
+Description: PCM player designed for ALSA
+ Alsaplayer is a PCM player designed specifically for use with ALSA, but
+ works great with OSS or EsounD.  It's heavily threaded which cuts down on
+ skipping, offers optional and even simultaneous visual scopes, plays
+ mp3, mp2, ogg, cdda, audiofs, and lots more.
+ .
+ This empty package provides an easy transition to either the gtk or
+ text frontends; it may be safely removed once all its dependencies
+ are installed.
+

@@ -1,0 +1,32 @@
+---
+abstract: 'serialize / deserialize AMF data'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.00'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-AMF
+no_index:
+  directory:
+    - examples
+    - inc
+    - t
+    - xt
+requires:
+  Any::Moose: 0
+  DateTime: 0
+  Filter::Util::Call: 0
+  Scalar::Util: 0
+  UNIVERSAL::require: 0
+  XML::LibXML: 0
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.09

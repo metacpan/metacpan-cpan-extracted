@@ -1,0 +1,16 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.001002
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.001001 2014-10-20T03:29:42Z
+ [Changed / runtime requires]
+ - Sereal::Decoder 0 → 2.070000
+ - Sereal::Encoder 0 → 2.070000

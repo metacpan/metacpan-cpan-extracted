@@ -1,0 +1,48 @@
+
+Perl5 DUA Extension Module 
+
+This module is based heavily on Eric Douglas' duaperl version 1.0a3,
+and is basically a conversion of the duaperl.mus file to the XS form.
+
+Unlike version 1.x of the module this implementation required some changes
+to Eric's code, in order to allow multiple instances of the class. Basically
+I bundled all the global data structures into one structure 'ldap_session_t'
+which is passed to the dua functions.
+
+I also modified dua_delattr function/method to allow attributes to be deleted
+from an entry, it's a little crude as it deletes the attribute completely
+rather than allowing selective removal of values.
+
+There isn't a 'make test' as it was too difficult to come up with a suitable
+set of tests. There are a couple of examples in the example directory
+illustrating the basic use of the module.
+
+INSTALLATION
+
+i) You'll need to modify the LIBS section Makefile.PL to point to your
+   LDAP libraries.
+
+ii) You'll also need to modify dualib/Makefile to point to your PERL directory
+    & you LDAP include files. (Note: The perl directory is required as dua.c
+    includes perl.h)
+
+iii)
+	perl Makefile.PL
+	make
+	make install
+
+
+DISCLAIMER
+
+The University of Birmingham makes no representations about the suitability
+of this software for any purpose. It is provided "as is" without express or
+implied warranty. The University shall not be liable for any damages suffered
+by the users of this software.
+
+AUTHOR
+
+Stephen Pillinger <S.M.Pillinger@cs.bham.ac.uk>
+School of Computer Science, The University of Birmingham, UK.
+
+Duaperl was written by Eric W. Douglas, California State University, Fresno.
+

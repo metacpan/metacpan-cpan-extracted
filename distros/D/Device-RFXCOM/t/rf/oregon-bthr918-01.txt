@@ -1,0 +1,12 @@
+605a6d00b110236046a3614e5c
+
+master oregon 60.5a6d00b110236046a3614e5c:
+  sensor/bthr918n.b1[temp]=23.1
+  sensor/bthr918n.b1[humidity]=66
+  sensor/bthr918n.b1[pressure]=1019hPa
+  sensor/bthr918n.b1[battery]=100%
+
+
+
+
+

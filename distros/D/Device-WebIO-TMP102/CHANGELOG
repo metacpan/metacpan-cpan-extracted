@@ -1,0 +1,9 @@
+Revision history for perl module Device::WebIO::TMP102
+
+0.002 2014-10-11
+
+- Correct how we read the temperature to match Device::TMP102
+
+0.001 2014-10-10
+
+- Implement basic Device::WebIO::TMP102

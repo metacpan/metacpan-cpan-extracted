@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+ <!DOCTYPE phrasebook [
+	       <!ELEMENT phrasebook (dictionary)*>              
+	       <!ELEMENT dictionary (phrase)*>
+               <!ATTLIST dictionary name CDATA #REQUIRED>
+               <!ELEMENT phrase (#PCDATA)>
+               <!ATTLIST phrase name CDATA #REQUIRED>
+ ]>
+ 
+ <phrasebook>
+ <dictionary name="BASE">
+   <phrase name="empty"></phrase>
+   <phrase name="foo">my world</phrase>
+   <phrase name="baz">
+  1
+ 2 
+ 3
+   </phrase>
+ </dictionary>
+ <dictionary name="OTHER">
+   <phrase name="baz">
+    Welcome to wherever
+   </phrase>
+ </dictionary>
+ </phrasebook>

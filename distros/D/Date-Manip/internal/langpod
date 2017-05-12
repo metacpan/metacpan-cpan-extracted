@@ -1,0 +1,568 @@
+#!/usr/bin/perl -w
+# Copyright (c) 2012-2017 Sullivan Beck.  All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+###############################################################################
+###############################################################################
+# This script is used to automatically generate the language pod files.
+
+use lib "./lib";
+
+require 5.010000;
+use IO::File;
+use strict;
+use warnings;
+require Date::Manip::Lang::index;
+$| = 1;
+
+our $VERSION;
+$VERSION='6.31';
+
+##############################################################################
+# GLOBAL VARIABLES
+###############################################################################
+
+our $langdir  = 'lib/Date/Manip/Lang';
+our $curry    = ( localtime(time) )[5] + 1900;
+
+###############################################################################
+# HELP
+###############################################################################
+
+our ($usage);
+my $COM = $0;
+$COM =~ s/^.*\///;
+
+$usage=
+  "usage: $COM OPTIONS
+      -h/--help       : Print help.
+
+This script will generate the pod files for each of the Date::Manip
+language modules.
+";
+
+###############################################################################
+# PARSE ARGUMENTS
+###############################################################################
+
+while ($_ = shift) {
+   (print $usage),   exit  if ($_ eq "-h"   ||  $_ eq "--help");
+}
+
+############################################################################
+# MAIN PROGRAM
+############################################################################
+
+no warnings;
+my @mod = values %Date::Manip::Lang::index::Lang;
+use warnings;
+
+my %mod = map { $_,1 } @mod;
+@mod    = sort keys %mod;
+
+foreach my $mod (@mod) {
+   write_pod($mod);
+}
+
+############################################################################
+############################################################################
+
+no strict 'refs';
+sub write_pod {
+   my($mod) = @_;
+
+   my $undef = "   Not defined in this language\n";
+   eval "require Date::Manip::Lang::${mod}";
+   my $lang  = ${ "Date::Manip::Lang::${mod}::Language" };
+   my $name  = ${ "Date::Manip::Lang::${mod}::LangName" };
+   my $year0 = ${ "Date::Manip::Lang::${mod}::YearAdded" };
+
+   my $out  = new IO::File;
+   $out->open("> ${langdir}/${mod}.pod");
+   binmode $out, ":encoding(UTF-8)";
+
+   my %words;
+
+   my %lists = ('ampm'       => 2,
+                'day_name'   => 7,
+                'day_abb'    => 7,
+                'day_char'   => 7,
+                'month_name' => 12,
+                'month_abb'  => 12,
+                'fields'     => 7,
+                'nextprev'   => 2,
+                'nth'        => 53,
+                'mode'       => 2,
+                'when'       => 2,
+               );
+   while (my($key,$num) = each %lists) {
+      if (exists $$lang{$key}) {
+         foreach (my $i=0; $i < $num; $i++) {
+            $words{$key}[$i] = '';
+            if (defined ($$lang{$key}[$i])) {
+               my @tmp = @{ $$lang{$key}[$i] };
+               foreach my $tmp (@tmp) {
+                  $words{$key}[$i] .= "   $tmp\n"  if ($tmp);
+               }
+            } else {
+               print "Undefined: $mod,$key\n";
+            }
+            $words{$key}[$i] = $undef  if (! $words{$key}[$i]);
+         }
+      } else {
+         foreach (my $i=0; $i < $num; $i++) {
+            $words{$key}[$i] = $undef;
+         }
+      }
+   }
+
+   my @words = qw(at each last of on);
+
+   foreach my $set (@words) {
+      $words{$set} = '';
+      if (exists $$lang{$set}) {
+         my @tmp = @{ $$lang{$set} };
+         foreach my $tmp (@tmp) {
+            $words{$set} .= "   $tmp\n"  if ($tmp);
+         }
+      }
+      $words{$set} = $undef  if (! $words{$set});
+   }
+
+   @words = qw(offset_date offset_time times);
+
+   foreach my $set (@words) {
+      $words{$set} = '';
+      if (exists $$lang{$set}) {
+         foreach my $key (sort keys %{ $$lang{$set} }) {
+            my $val = $$lang{$set}{$key};
+            $words{$set} .= "   $key" . " "x(20-length($key)) . " $val\n";
+         }
+      }
+      $words{$set} = $undef  if (! $words{$set});
+   }
+
+   if (exists $$lang{"sephm"}) {
+      $words{"seps"} = '';
+      my @hm = @{ $$lang{"sephm"} };
+      my @ms = @{ $$lang{"sepms"} };
+      for (my $i=0; $i <= $#hm; $i++) {
+         $words{'seps'} .= "   $hm[$i]  $ms[$i]\n";
+      }
+   } else {
+      $words{'seps'} = $undef;
+   }
+
+   if (exists $$lang{"sepfr"}) {
+      $words{"sepfr"} = $$lang{"sepfr"};
+   } else {
+      $words{'sepfr'} = $undef;
+   }
+
+   # Try to hide pod so it doesn't get indexed
+   my $e = '=';
+
+   print $out <<"EOF";
+# Copyright (c) $year0-$curry Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+########################################################################
+########################################################################
+
+${e}pod
+
+${e}encoding utf-8
+
+${e}head1 NAME
+
+Date::Manip::Lang::${mod} - ${name} language support.
+
+${e}head1 SYNOPSIS
+
+This module contains a list of words and expressions supporting
+the language. It is not intended to be used directly (other
+Date::Manip modules will load it as needed).
+
+${e}head1 LANGUAGE EXPRESSIONS
+
+The following is a list of all language words and expressions used
+to write times and/or dates.
+
+All strings are case insensitive.
+
+${e}over 4
+
+${e}item B<Month names and abbreviations>
+
+When writing out the name of the month, several different variations may
+exist including full names and abbreviations.
+
+The following month names may be used:
+
+$words{month_name}[0]
+$words{month_name}[1]
+$words{month_name}[2]
+$words{month_name}[3]
+$words{month_name}[4]
+$words{month_name}[5]
+$words{month_name}[6]
+$words{month_name}[7]
+$words{month_name}[8]
+$words{month_name}[9]
+$words{month_name}[10]
+$words{month_name}[11]
+
+The following abbreviations may be used:
+
+$words{month_abb}[0]
+$words{month_abb}[1]
+$words{month_abb}[2]
+$words{month_abb}[3]
+$words{month_abb}[4]
+$words{month_abb}[5]
+$words{month_abb}[6]
+$words{month_abb}[7]
+$words{month_abb}[8]
+$words{month_abb}[9]
+$words{month_abb}[10]
+$words{month_abb}[11]
+
+${e}item B<Day names and abbreviations>
+
+When writing out the name of the day, several different variations may
+exist including full names and abbreviations.
+
+The following day names may be used:
+
+$words{day_name}[0]
+$words{day_name}[1]
+$words{day_name}[2]
+$words{day_name}[3]
+$words{day_name}[4]
+$words{day_name}[5]
+$words{day_name}[6]
+
+The following abbreviations may be used:
+
+$words{day_abb}[0]
+$words{day_abb}[1]
+$words{day_abb}[2]
+$words{day_abb}[3]
+$words{day_abb}[4]
+$words{day_abb}[5]
+$words{day_abb}[6]
+
+The following short (1-2 characters) abbreviations may be used:
+
+$words{day_char}[0]
+$words{day_char}[1]
+$words{day_char}[2]
+$words{day_char}[3]
+$words{day_char}[4]
+$words{day_char}[5]
+$words{day_char}[6]
+
+${e}item B<Delta field names>
+
+These are the names (and abbreviations) for the fields in a delta.  There are
+7 fields: years, months, weeks, days, hours, minutes, seconds.
+
+The names and abbreviations for these fields are:
+
+$words{fields}[0]
+$words{fields}[1]
+$words{fields}[2]
+$words{fields}[3]
+$words{fields}[4]
+$words{fields}[5]
+$words{fields}[6]
+
+${e}item B<Morning/afternoon times>
+
+This is a list of expressions use to designate morning or afternoon time
+when a time is entered as a 12-hour time rather than a 24-hour time.
+For example, in English, the time "17:00" could be specified as "5:00 PM".
+
+Morning and afternoon time may be designated by the following sets of
+words:
+
+$words{ampm}[0]
+$words{ampm}[1]
+
+${e}item B<Each or every>
+
+There are a list of words that specify every occurrence of something.  These
+are used in the following phrases:
+
+   EACH Monday
+   EVERY Monday
+   EVERY month
+
+The following words may be used:
+
+$words{each}
+
+${e}item B<Next/Previous/Last occurrence>
+
+There are a list of words that may be used to specify the next,
+previous, or last occurrence of something.  These words could be used
+in the following phrases:
+
+   NEXT week
+
+   LAST Tuesday
+   PREVIOUS Tuesday
+
+   LAST day of the month
+
+The following words may be used:
+
+Next occurrence:
+
+$words{nextprev}[0]
+
+Previous occurrence:
+
+$words{nextprev}[1]
+
+Last occurrence:
+
+$words{last}
+
+${e}item B<Delta words for going forward/backward in time>
+
+When parsing deltas, there are words that may be used to specify
+the the delta will refer to a time in the future or to a time in
+the past (relative to some date).  In English, for example, you
+might say:
+
+   IN 5 days
+   5 days AGO
+
+The following words may be used to specify deltas that refer to
+dates in the past or future respectively:
+
+$words{when}[0]
+$words{when}[1]
+
+${e}item B<Business mode>
+
+This contains two lists of words which can be used to specify a standard
+(i.e. non-business) delta or a business delta.
+
+Previously, it was used to tell whether the delta was approximate or exact,
+but now this list is not used except to force the delta to be standard.
+
+The following words may be used:
+
+$words{mode}[0]
+
+The following words may be used to specify a business delta:
+
+$words{mode}[1]
+
+${e}item B<Numbers>
+
+Numbers may be spelled out in a variety of ways.  The following sets correspond
+to the numbers from 1 to 53:
+
+$words{nth}[0]
+$words{nth}[1]
+$words{nth}[2]
+$words{nth}[3]
+$words{nth}[4]
+$words{nth}[5]
+$words{nth}[6]
+$words{nth}[7]
+$words{nth}[8]
+$words{nth}[9]
+
+$words{nth}[10]
+$words{nth}[11]
+$words{nth}[12]
+$words{nth}[13]
+$words{nth}[14]
+$words{nth}[15]
+$words{nth}[16]
+$words{nth}[17]
+$words{nth}[18]
+$words{nth}[19]
+
+$words{nth}[20]
+$words{nth}[21]
+$words{nth}[22]
+$words{nth}[23]
+$words{nth}[24]
+$words{nth}[25]
+$words{nth}[26]
+$words{nth}[27]
+$words{nth}[28]
+$words{nth}[29]
+
+$words{nth}[30]
+$words{nth}[31]
+$words{nth}[32]
+$words{nth}[33]
+$words{nth}[34]
+$words{nth}[35]
+$words{nth}[36]
+$words{nth}[37]
+$words{nth}[38]
+$words{nth}[39]
+
+$words{nth}[40]
+$words{nth}[41]
+$words{nth}[42]
+$words{nth}[43]
+$words{nth}[44]
+$words{nth}[45]
+$words{nth}[46]
+$words{nth}[47]
+$words{nth}[48]
+$words{nth}[49]
+
+$words{nth}[50]
+$words{nth}[51]
+$words{nth}[52]
+
+${e}item B<Ignored words>
+
+In writing out dates in common forms, there are a number of words
+that are typically not important.
+
+There is frequently a word that appears in a phrase to designate
+that a time is going to be specified next.  In English, you would
+use the word AT in the example:
+
+   December 3 at 12:00
+
+The following words may be used:
+
+$words{at}
+
+Another word is used to designate one member of a set.  In English,
+you would use the words IN or OF:
+
+   1st day OF December
+   1st day IN December
+
+The following words may be used:
+
+$words{of}
+
+Another word is use to specify that something is on a certain date.  In
+English, you would use ON:
+
+   ON July 5th
+
+The following words may be used:
+
+$words{on}
+
+${e}item B<Words that set the date, time, or both>
+
+There are some words that can be used to specify a date, a
+time, or both relative to now.
+
+Words that set the date are similar to the English words 'yesterday'
+or 'tomorrow'.  These are specified as a delta which is added to the
+current time to get a date.  The time is NOT set however, so the delta
+is only partially used (it should only include year, month, week, and
+day fields).
+
+The following words may be used:
+
+$words{offset_date}
+
+Words that set only the time of day are similar to the English words
+'noon' or 'midnight'.
+
+The following words may be used:
+
+$words{times}
+
+Words that set the entire time and date (relative to the current
+time and date) are also available.
+
+In English, the word 'now' is one of these.
+
+The following words may be used:
+
+$words{offset_time}
+
+${e}item B<Hour/Minute/Second separators>
+
+When specifying the time of day, the most common separator is a colon (:)
+which can be used for both separators.
+
+Some languages use different pairs.  For example, French allows you to
+specify the time as 13h30:20, so it would use the following pairs:
+
+   : :
+   h :
+
+The first column is the hour-minute separator and the second column is
+the minute-second separator.  Both are perl regular expressions.  When
+creating a new translation, be aware that regular expressions with utf-8
+characters may be tricky.  For example, don't include the expression '[x]'
+where 'x' is a utf-8 character.
+
+A pair of colons is ALWAY allowed for all languages.  If a language allows
+additional pairs, they are listed here:
+
+$words{seps}
+
+${e}item B<Fractional second separator>
+
+When specifying fractional seconds, the most common way is to use a
+decimal point (.).  Some languages may specify a different separator
+that might be used.  If this is done, it is a regular expression.
+
+The decimal point is ALWAYS allowed for all languages.  If a language allows
+another separator, it is listed here:
+
+$words{sepfr}
+
+${e}back
+
+${e}head1 KNOWN BUGS
+
+None known.
+
+${e}head1 BUGS AND QUESTIONS
+
+Please refer to the L<Date::Manip::Problems> documentation for
+information on submitting bug reports or questions to the author.
+
+${e}head1 SEE ALSO
+
+L<Date::Manip>       - main module documentation
+
+${e}head1 LICENSE
+
+This script is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+${e}head1 AUTHOR
+
+Sullivan Beck (sbeck\@cpan.org)
+
+${e}cut
+EOF
+
+   $out->close();
+}
+use strict 'refs';
+
+# Local Variables:
+# mode: cperl
+# indent-tabs-mode: nil
+# cperl-indent-level: 3
+# cperl-continued-statement-offset: 2
+# cperl-continued-brace-offset: 0
+# cperl-brace-offset: 0
+# cperl-brace-imaginary-offset: 0
+# cperl-label-offset: 0
+# End:

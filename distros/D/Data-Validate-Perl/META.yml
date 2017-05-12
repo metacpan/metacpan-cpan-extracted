@@ -1,0 +1,23 @@
+---
+abstract: 'validates in-memory perl data using a specification'
+author:
+  - 'Dongxu Ma <dongxu@cpan.org>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.132830'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validate-Perl
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Parse::Yapp: 1.05
+  perl: 5.006
+version: 0.02

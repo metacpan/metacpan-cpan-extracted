@@ -1,0 +1,163 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::Compare::Result - Range Compare Result Object
+
+=head1 DESCRIPTION
+
+This module is a result object for classes that implement:
+
+Data::Range::Compare::Stream::Iterator::Compare::Asc
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $result=new Data::Range::Compare::Stream::Iterator::Compare::Result (COMMON_RANGE,[OVERLAP_RESULTS],[OVERLAP_IDS],[NON_OVERLAP_IDS],[COLUMN_MAP],[ROOT_IDS]);
+
+Object constructor: All arguments are mandatory!
+
+      COMMON_RANGE
+
+        Implements Data::Range::Compare::Stream
+
+      OVERLAP_RESULTS
+        
+	An array ref with any of the following objects
+
+	  Data::Range::Compare::Stream::Consolidate::Result
+
+	  Data::Range::Compare::Stream::Compare::Result
+
+	  undef
+    
+      OVERLAP_IDS
+    
+          An array ref representing the ids in OVERLAP_RESULTS that are not undef
+
+      NON_OVERLAP_IDS
+
+          An array ref representing the ids of OVERLAP_RESULTS that are undef
+      
+      COLUMN_MAP
+        
+	An array ref that maps each element to the root_id column
+
+      ROOT_IDS
+
+	  An array ref that represents the non auto generated columns
+
+      
+=item * print $result
+
+When used in a string context the object will return $result->to_string.
+
+=item * my $range=$result->get_common
+
+Returns the common range.
+
+=item * my $range=$result->get_common_range
+
+Alias to $result->get_common.
+
+=item * my $count=$result->get_overlap_count;
+
+Returns the number of elements in OVERLAP_RESULTS that matched the common range
+
+=item * my $string=$result->to_string;
+
+Returns a string representing the result
+
+=item * my $count=$result->get_column_count;
+
+Returns the number of columns that are in OVERLAP_RESULTS
+
+=item * my $ref=$result->get_overlap_ids;
+
+Returns an array ref of column ids that overlap with the column range
+
+=item * my $ref=$result->get_non_overlap_ids;
+
+Returns an array ref of column ids that do not overlap with the column range
+
+=item * my $count=$result->get_non_overlap_count;
+
+Returns the number of columns that did not overlap with the common range
+
+=item * my $result=$result->get_consolidator_result_by_id($id);
+
+$result will be an object that implements: Data::Range::Compare::Stream::Iterator::Consolidate::Result. When the column $id did not overlap $result will be undef.
+
+=item * my $result=$result->get_result_by_id($id);
+
+Alias to get_consolidator_result_by_id.
+
+=item * my $boolean=$result->is_empty;
+
+$boolean is true when no ranges overlapped with the common range.
+
+=item * my $boolean=$result->none_overlap;
+
+Alias to is_empty.
+
+=item * my $boolean=$result->is_full;
+
+$boolean is true when all OVERLAP_RESULTS overlapped with the common range.
+
+=item * my $ref=$result->get_overlapping_containers;
+
+Returns an array ref of each object that overlapped with the common range.
+
+=item * my $ref=$result->get_all_containers;
+
+Returns an array ref of OVERLAP_RESULTS.
+
+=item * my $ref=$result->get_non_overlapping_containers;
+
+Returns an array ref of undef for every column that did not overlap.
+
+=item * my $ref=$result->get_column_map;
+
+Returns a unique copy of the column map array ref.
+
+=item * my $ref=$result->get_root_ids;
+
+Returns a unique copy of the column map array ref.
+
+=item * my $ref=$result->get_root_results;
+
+Returns an anonymous array: element ids represent the root_ids.  Values are anonymous arrays that contain the result objects from the consolidation process associated with the root_id.
+
+=item * my $ref=$result->get_root_result_ids;
+
+Returns an anonymous array: element ids represent the root_ids.  Values are anonymous arrays that contain the result ids from the consolidation process associated with the root_id.
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Iterator::Compare::Asc
+
+Data::Range::Compare::Stream::Iterator::Compare::Base
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

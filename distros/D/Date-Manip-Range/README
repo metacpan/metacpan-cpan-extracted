@@ -1,0 +1,37 @@
+Date-Manip-Range is Copyright (C) 2016, Robert Wohlfarth.
+
+Date::Manip::Range parses and holds a date range. The range is defined by
+a start and end point. The module accepts ranges as a single string, start
+and end dates, or a list of dates.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Date::Manip
+  Moose
+  String::Util
+
+LICENSE INFORMATION
+
+Copyright (C) 2016  Robert Wohlfarth <rbwohlfarth@gmail.com>
+
+This module is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.0 or,
+at your option, any later version of Perl 5 you may have available. 
+For more details, see the full text of the licenses in the directory 
+LICENSES.
+
+This program is distributed in the hope that it will be useful, but 
+it is provided “as is” and without any express or implied warranties.
+For details, see the full text of the license in the file LICENSE.
+

@@ -1,0 +1,43 @@
+---
+abstract: 'Pull in hand-crafted metadata from a specified file.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-MetaProvides-FromFile
+provides:
+  Dist::Zilla::Plugin::MetaProvides::FromFile:
+    file: lib/Dist/Zilla/Plugin/MetaProvides/FromFile.pm
+    version: '2.001002'
+recommends:
+  Moose: '2.000'
+requires:
+  Carp: '0'
+  Config::INI::Reader: '0'
+  Dist::Zilla::MetaProvides::ProvideRecord: '0'
+  Dist::Zilla::Plugin::MetaProvides: '1.11034201'
+  Dist::Zilla::Role::MetaProvider::Provider: '0'
+  Module::Runtime: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides-FromFile/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides-FromFile
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides-FromFile.git
+version: '2.001002'

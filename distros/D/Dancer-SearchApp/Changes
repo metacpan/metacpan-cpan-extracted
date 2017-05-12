@@ -1,0 +1,29 @@
+0.06 20161214
+    + Deep linking to the correct page of a PDF
+    . We now do our own snippet extraction+highlighting
+      for context
+    + ICal importer
+    ! Elasticsearch 2.x support removed
+      There were too many breaking API changes between Elasticsearch 2.x
+      and 5.x, so I removed the support for 2.x. Sorry.
+    ! Elasticsearch 5.x required
+
+0.05 20160326
+    . File system scanner now recursively imports $HOME by default
+    . Use Boostrap v3 for the web UI
+    . IMAP support finally shipping
+
+0.04 20160315
+    . First stab at a rough (rough) HTTP URL importer
+    . Allow image metadata to be indexed
+      This still longs for a thumbnail to be generated and stored
+    . This is all still very experimental
+
+0.03 20160309
+    . Fix leftover references to Apache::Tika -> CORION::Apache::Tika
+
+0.02 20160307
+    . Fix compilation error in Dancer::SearchApp::IndexSchema
+
+0.01 20160307
+    . Released on an unsuspecting world

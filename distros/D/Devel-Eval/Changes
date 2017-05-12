@@ -1,0 +1,7 @@
+Changes for Perl extension Devel-Eval
+
+1.01 Thu 31 Dec 2009
+	- On Perl 5.8.9 or later, use the $^P 0x800 bit instead of the temp file
+
+1.00 Fri 12 Sep 2008
+	- Creating initial (trivial) release

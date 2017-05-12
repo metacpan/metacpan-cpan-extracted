@@ -1,0 +1,56 @@
+Revision history for Dist::Zilla::Plugin::Catalyst
+
+0.15      2011-02-17
+	- plan does not accept a hash, fix syntax error
+
+0.14      2011-02-16
+	- Create 01app.t
+	- rewrite changes to match CPAN::Changes::Spec
+	- rewrite tests to be more comprehensive, and more DRY
+	- Enable MetaJSON
+	- explicitly depend on Perl 5.6
+
+0.13      2011-01-16
+	- fix bug where Catalyst::Helper::mk_dir was attempting to create dirs in
+	  the location of the profile.ini for
+	  Dist::Zilla::MintingProfile::Catalyst which tends to be in a system
+	  owned directory.
+
+0.12      2011-01-08
+	- skip tests on devel moose
+
+0.11      2011-01-08
+	- add MinterProfile::Catalyst for quickstart
+
+0.10      2011-01-05
+	- skip executable tests on windows
+
+0.09      2011-01-03
+	- move to use Path::Class for OS independant code
+
+0.08      2010-12-12
+	- API: Rename DZ::Plugin::Catalyst::Helper to DZ::Catalyst::Helper. It's
+	  not really a Plugin, but a subclass of Catalyst::Helper.
+
+0.07      2010-12-11
+	- Add minting tests to ensure cli functionality, and correct file creation
+
+0.06      2010-07-26
+	- don't create pod tests which have seperate functions in newer versions
+	  of Catalyst::Devel
+
+0.05      2010-07-22
+	- No longer output the Catalyst templated Changes file
+
+0.04      2010-07-22
+	- add support to get author from config.ini
+
+0.03      2010-07-22
+	- fix perms for script/* should have been executable
+
+0.02      2010-06-29
+	- Updated SubmittingPatches doc and moved it's location. re-releasing to
+	  attempt to fix file conflict bug
+
+0.01      2010-06-27
+	- Initial release, patches and comments welcome

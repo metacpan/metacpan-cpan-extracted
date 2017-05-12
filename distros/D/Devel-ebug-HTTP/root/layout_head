@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link rel="stylesheet" type="text/css" href="/default.css"/>
+<link rel="icon" type="image/png" href="/favicon.ico"/>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<script type="text/javascript" src="overlib.js"><!-- overLIB (c) Erik Bosrup --></script>
+<script language="Javascript" type="text/javascript" src="/keys.js"></script>
+<script language="Javascript" type="text/javascript" src="/prototype.js"></script>
+<script language="Javascript" type="text/javascript" src="/tooltip.js"></script>
+<script language="Javascript" type="text/javascript" src="/break_point.js"></script>
+[% subroutine = ebug.subroutine | html %]
+<title>[% page_title | html %]</title>
+</head>
+<body>
+<div id="overDiv" style="position:absolute; visibility:hidden; z-index:1000;"></div>

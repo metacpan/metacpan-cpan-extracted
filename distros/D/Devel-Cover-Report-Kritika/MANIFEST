@@ -1,0 +1,16 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/Devel/Cover/Report/Kritika.pm
+minil.toml
+t/data/devel_cover/cover_db/cover.14
+t/data/devel_cover/cover_db/digests
+t/data/devel_cover/cover_db/structure/aac08bffcc50be96d76f4db59327cefe
+t/data/devel_cover/lib/Foo.pm
+t/data/devel_cover/t/foo._t
+t/kritika.t
+META.yml
+MANIFEST

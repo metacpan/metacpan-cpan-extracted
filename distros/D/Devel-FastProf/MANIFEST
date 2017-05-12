@@ -1,0 +1,13 @@
+Changes
+FastProf.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/Devel-FastProf.t
+t/Devel-FastProf-Reader.t
+t/pods.t
+lib/Devel/FastProf.pm
+lib/Devel/FastProf/Reader.pm
+bin/fprofpp
+META.yml                                 Module meta-data (added by MakeMaker)

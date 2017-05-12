@@ -1,0 +1,15 @@
+Revision history for Perl extension Dancer2-Template-Haml
+
+0.04 2013-12-20T11:41:39Z
+
+    - Fix test fail on windows (subroutine MyApp::path redefined) (TheAthlete)
+
+0.03 2013-12-02T08:30:14Z
+
+    - Fix test fail on windows (TheAthlete)
+    - Fix html escape bug in layouts (TheAthlete)
+
+0.02 2013-11-21T11:15:03Z
+
+    - original version
+

@@ -1,0 +1,71 @@
+{
+   "abstract" : "Dancer2 Plugin for Interchange6 Open Source Shop Machine",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Interchange6",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Temp" : "0",
+            "Module::Find" : "0",
+            "Test::Deep" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.94",
+            "Test::WWW::Mechanize::PSGI" : "0.35"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Business::OnlinePayment" : "3.02",
+            "Dancer2" : "0.200000",
+            "Dancer2::Plugin::Auth::Extensible" : "0.600",
+            "Dancer2::Plugin::Auth::Extensible::Provider::DBIC" : "0.600",
+            "Dancer2::Plugin::DBIC" : "0.0013",
+            "Dancer2::Session::DBIC" : "0.102",
+            "Interchange6" : "0.120",
+            "Interchange6::Schema" : "0.110",
+            "JSON::MaybeXS" : "1.003003",
+            "Module::Runtime" : "0",
+            "MooseX::CoverableModifiers" : "0",
+            "Net::HTTPS::Any" : "0.11",
+            "Scalar::Util" : "0",
+            "YAML" : "0",
+            "namespace::clean" : "0",
+            "perl" : "5.010000"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/interchange/Dancer2-Plugin-Interchange6/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/interchange/Dancer2-Plugin-Interchange6.git"
+      },
+      "x_IRC" : "irc://irc.freenode.net/#interchange"
+   },
+   "version" : "0.203",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

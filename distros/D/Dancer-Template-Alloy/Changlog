@@ -1,0 +1,27 @@
+==============================
+9999-99-99 99:99:99 +0000 HEAD
+==============================
+
+  commit 0c599ed9e83bd54f032aed66fb196afbe73d1018
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sun May 30 22:58:06 2010 +1000
+  
+    Release with ReportVersion::Tiny rather than ReportVersions.
+
+    This should make the system more robust against systems with odd module
+    versions, as well as reducing duplicate code in my package. 
+
+======================================
+2010-05-29 18:06:21 +1000 release-1.01
+======================================
+
+  commit ce78a2a332e1ec6dcd8401c1e46722bb0fcb6496
+  Author: Daniel Pittman <daniel@rimspace.net>
+  Date:   Sat May 29 18:06:21 2010 +1000
+  
+    Explicitly depend on an appropriate version of Dancer for testing to
+    work. 
+
+===================================
+End of changes in the last 365 days
+===================================

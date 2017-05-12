@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<employees>
+  <employee xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+    <name>Ann Other</name>
+    <managerid1>1</managerid1>
+    <managerid2>1</managerid2>
+    <managerid3>1</managerid3>
+    <managerid4>1</managerid4>
+    <nested>
+      <nested>
+        <managerid>1</managerid>
+      </nested>
+    </nested>
+  </employee>
+</employees>

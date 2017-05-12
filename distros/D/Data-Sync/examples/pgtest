@@ -1,0 +1,16 @@
+
+use DBI;
+
+my $db = DBI->connect("DBI:Pg:dbname=testdb","","");
+
+
+$sth=$db->prepare("select * from source");
+my $result = $sth->execute;
+my $counter;
+print "--$result--\n";
+
+while (my $var = $sth->fetchrow_arrayref)
+{
+	$counter++;
+}
+print "\n$counter\n";

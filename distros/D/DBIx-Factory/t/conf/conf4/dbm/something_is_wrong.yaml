@@ -1,0 +1,6 @@
+userid: bahoo
+passwd: typer
+dsn: dbi:Oracle:unexisted
+attr:
+  RaiseError: 0
+  PrintError: 0

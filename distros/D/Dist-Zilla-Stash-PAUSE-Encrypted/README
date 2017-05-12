@@ -1,0 +1,53 @@
+NAME
+    Dist::Zilla::Stash::PAUSE::Encrypted - Keep your PAUSE bits safely
+    encrypted!
+
+VERSION
+    This document describes version 0.003 of
+    Dist::Zilla::Stash::PAUSE::Encrypted - released July 13, 2012 as part of
+    Dist-Zilla-Stash-PAUSE-Encrypted.
+
+SYNOPSIS
+        # ...do the GPG magicky things described by Config::Identity, then:
+
+        # in your ~/.dzil/config.ini
+        [%PAUSE::Encrypted / %PAUSE]
+
+DESCRIPTION
+    This is a simple extension of Dist::Zilla::Stash::PAUSE to use
+    Config::Identity to store and access an encrypted version of your PAUSE
+    user id and password.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Config::Identity
+
+    *   Dist::Zilla::Stash::PAUSE
+
+    *   Dist::Zilla::Plugin::UploadToCPAN
+
+SOURCE
+    The development version is on github at
+    <http://github.com/RsrchBoy/dist-zilla-stash-pause-encrypted> and may be
+    cloned from
+    <git://github.com/RsrchBoy/dist-zilla-stash-pause-encrypted.git>
+
+BUGS
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-stash-pause-encrypted/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,89 @@
+
+=pod
+
+=head1 NAME
+
+DBIx::Cookbook::Recipe::Searching::paged - paged result sets
+
+=head1 DESCRIPTION
+
+As a function of the options C<rows> and C<page>, 
+output the results of the query
+
+  SELECT * FROM actor ORDER BY last_name
+
+The C<rows> option specifies how many rows per page. The C<page> option 
+specifies which page of the resultset to start with. For example, if there 
+are 20 rows in the resultset and C<rows> has been set to 4, then there will 
+be 5 pages. The C<pages> option will specify from which page results should
+be listed, with any number from 1 to 5 being acceptable.
+
+Sample Usage:
+
+  shell> ${orm}_cmd paged  # orm = dbic, skinny, rose, etc
+                           # page=1 and rows=10 are defaults
+  shell> ${orm}_cmd paged  --page=2 rows=4
+
+=head1 RECIPES
+
+=head2 DBIx::Class
+
+    package DBIx::Cookbook::DBIC::Command::paged;
+    use Moose;
+    extends qw(MooseX::App::Cmd::Command);
+    
+    use Data::Dump;
+    
+    has 'rows' => (
+    	       traits => [qw(Getopt)],
+    	       isa => "Int",
+    	       is  => "rw",
+    	       documentation => "number of rows per page"
+    	      );
+    
+    has 'page' => (
+    	       traits => [qw(Getopt)],
+    	       isa => "Int",
+    	       is  => "rw",
+    	       documentation => "page to start output from"
+    	      );
+    
+    
+    sub execute {
+      my ($self, $opt, $args) = @_;
+    
+    
+      $opt->{rows} ||= 10;
+    
+      my $rs = do {
+    
+        my $where = {};
+        my $attr = { 
+    		order_by => 'last_name' ,
+    		page => $opt->{page} ? $opt->{page} : 1 ,
+    		rows => $opt->{rows} 
+    	       };
+    
+        $self->app->schema->resultset('Actor')->search($where, $attr);
+    
+      } ;
+    
+      my $pager = $rs->pager;
+    
+      while (my $row = $rs->next) {
+    
+        warn $row->first_name . " " . $row->last_name . "\n" ;
+    
+      }
+    
+      printf "  -- Page %d of %d --\n", $pager->current_page, $pager->last_page;
+    
+      if (my $next_page = $pager->next_page) {
+        $opt->{page} = $next_page;
+        $self->execute($opt);
+      }
+    
+    }
+    
+    1;
+

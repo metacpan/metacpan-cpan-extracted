@@ -1,0 +1,14 @@
+Build.PL
+Changes
+lib/Data/FormValidator/Filters/Image.pm
+Makefile.PL
+MANIFEST
+META.yml
+README
+t/image_filter.t
+t/pod.t
+t/pod_coverage.t
+t/data/empty.jpg
+t/data/file.txt
+t/data/image.jpg
+t/lib/FakeUpload.pm

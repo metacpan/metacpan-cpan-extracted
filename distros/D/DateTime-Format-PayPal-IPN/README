@@ -1,0 +1,47 @@
+NAME
+    DateTime::Format::PayPal::IPN - Parse PayPal IPN timestamps
+
+VERSION
+    version 0.000001
+
+SYNOPSIS
+        use DateTime::Format::PayPal::IPN;
+
+        my $dt = DateTime::Format::PayPal::IPN->parse_timestamp( '02:35:35 Feb 16, 2010 PST' );
+
+        # 2010-02-16 02:35:35
+        DateTime::Format::PayPal::IPN->format_timestamp($dt);
+
+DESCRIPTION
+    This module parses and formats timestamps returned by PayPal's IPN
+    (Instant Payment Notification) system.
+
+METHODS
+    *   parse_timestamp($string)
+
+        Given a value of the appropriate type, this method will return a new
+        DateTime object. The time zone for this object will always be the
+        'America/Los_Angeles' as all IPN data which I have seen is sent in
+        this time zone format.
+
+        If given an improperly formatted string, this method should die.
+
+    *   format_timestamp($datetime)
+
+        Given a "DateTime" object, this methods returns an appropriately
+        formatted string.
+
+ACKNOWLEDGEMENTS
+    Most of the Pod was directly lifted from Dave Rolsky's
+    DateTime::Format::MySQL.
+
+AUTHOR
+    Olaf Alders <olaf@wundercounter.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by MaxMind, Inc.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

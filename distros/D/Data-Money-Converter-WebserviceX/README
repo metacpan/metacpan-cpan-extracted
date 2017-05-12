@@ -1,0 +1,34 @@
+NAME
+
+Data::Money::Converter::WebserviceX - WebserviceX currency conversion implementation.
+
+SYNOPSIS
+
+    use strict; use warnings;
+    use Data::Money;
+    use Data::Money::Converter::WebserviceX;
+
+    my $curr = Data::Money->new(value => 10, code => 'USD');
+    my $conv = Data::Money::Converter::WebserviceX->new;
+    my $newc = $conv->convert($curr, 'GBP');
+
+    print $newc->value, "\n";
+
+AUTHOR
+
+Cory G Watson.
+Currently maintained by Mohammad S Anwar (MANWAR).
+
+REPOSITORY
+
+https://github.com/manwar/Data-Money-Converter-WebsericeX
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Cory G Watson.
+
+This program is free software; you can redistribute it and/or modify it under the
+terms of either: the GNU General Public License as published by the Free Software
+Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

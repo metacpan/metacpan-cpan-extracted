@@ -1,0 +1,29 @@
+#!/bin/sh
+
+CURDIR=`dirname "$0"`
+TOP="$CURDIR/.."
+LIB="$TOP/lib"
+WORK="$CURDIR/gh-pages"
+GIT_REMOTE="git@github.com:zmughal/p5-Data-TestImage"
+GH_PAGES_BRANCH="gh-pages"
+
+# all git commands will use this
+export GIT_WORK_TREE="$WORK"
+export GIT_DIR="$WORK/.git"
+
+if [ ! -d "$GIT_DIR" ]; then
+	git clone $GIT_REMOTE $WORK
+	cd $WORK
+	git checkout --orphan $GH_PAGES_BRANCH # headless
+fi
+
+#for file in `echo Other USC/SIPI`; do
+	#perl -E 'while(<>) { print if /SYNOPSIS/../^=head1 (?!SYNOPSIS)/ }' $LIB/Data/TestImage/DB/${file}.pm
+#done
+
+mkdir -p $WORK/Other/
+convert $(perl -MData::TestImage::DB::Other -E 'say Data::TestImage::DB::Other->get_image("cameraman")->stringify') $WORK/Other/cameraman.png
+mkdir -p $WORK/USC/SIPI/
+convert $(perl -MData::TestImage::DB::USC::SIPI -E 'say Data::TestImage::DB::USC::SIPI->get_image("mandrill")->stringify') $WORK/USC/SIPI/mandrill.png
+
+git status

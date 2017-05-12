@@ -1,0 +1,49 @@
+{
+   "abstract" : "Search Complex Data Structures",
+   "author" : [
+      "Al Newkirk <anewkirk@ana.io>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Data-Seek",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Object" : "0.57",
+            "perl" : "v5.14.0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "perl" : "v5.14.0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/alnewkirk/Data-Seek/issues"
+      },
+      "homepage" : "http://metacpan.org/release/Data-Seek/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/alnewkirk/Data-Seek.git",
+         "web" : "https://github.com/alnewkirk/Data-Seek"
+      }
+   },
+   "version" : "0.09",
+   "x_authority" : "cpan:AWNCORP"
+}
+

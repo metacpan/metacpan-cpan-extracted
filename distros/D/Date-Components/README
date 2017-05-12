@@ -1,0 +1,101 @@
+Date-Components version 0.2.1
+=======================
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+
+
+This module requires these other modules and libraries:
+
+     warnings              1.05
+     version               0.74
+     Carp                  1.04
+     Readonly              1.03
+     Test::More            0.74
+     Test::Manifest        1.22
+     Test::Pod             1.26
+     Test::Pod::Coverage   1.08
+
+
+   Install but do NOT use.  Readonly accesses it to improve performance
+     Readonly::XS  1.04  
+
+
+
+
+COPYRIGHT AND LICENSE
+
+   Copyright (C) 2008 by David McAllister
+
+   Date::Components version 0.2.1 
+
+   This program is free (or copyleft) software: you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as published by
+   the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.  This software may be used in any
+   state or jurisdiction which does not prohibit the limitation or exclusion of
+   liability for loss or damage caused by negligence, breach of contract or
+   breach of implied terms, or incidental or consequential damages.
+
+
+DISCLAIMER OF WARRANTY
+
+   This Program of Date::Components is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General
+Public License for more details.  You should have received a copy of the GNU
+General Public License along with this program.
+If not, see http://www.gnu.org/licenses/.
+
+
+
+
+DISCLAIMER OF LIABILITY
+
+   THIS PROGRAM AND SOFTWARE IS PROVIDED TO YOU FOR FREE AND ON AN "AS IS" AND
+"WITH ALL FAULTS" BASIS.  YOU EXPRESSLY UNDERSTAND AND AGREE THAT THE AUTHOR OF
+THIS PROGRAM AND SOFTWARE (AND ANY VERSION THEREOF) SHALL NOT BE LIABLE TO YOU
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL OR EXEMPLARY
+DAMAGES, INCLUDING BUT NOT LIMITED TO, DAMAGES FOR LOSS OF PROFITS, GOODWILL,
+USE, DATA OR OTHER INTANGIBLE LOSSES (EVEN IF THE AUTHOR HAS BEEN ADVISED OF
+THE POSSIBILITY OF SUCH DAMAGES) RESULTING FROM: (I) THE USE OR THE INABILITY
+TO USE THE PROGRAM OR SOFTWARE; (II) THE INABILITY TO USE THE PROGRAM OR
+SOFTWARE TO ACCESS CONTENT OR DATA; (III) THE COST OF PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; (IV) UNAUTHORIZED ACCESS TO OR ALTERATION OF YOUR
+TRANSMISSIONS OR DATA; OR (V) ANY OTHER MATTER RELATING TO THE PROGRAM OR
+SOFTWARE.  THE FOREGOING LIMITATIONS SHALL APPLY NOTWITHSTANDING A FAILURE OF
+ESSENTIAL PURPOSE OF ANY LIMITED REMEDY AND TO THE FULLEST EXTENT PERMITTED BY
+LAW.
+
+   NOTHING IN THIS AGREEMENT IS INTENDED TO EXCLUDE OR LIMIT ANY CONDITION,
+WARRANTY, RIGHT OR LIABILITY WHICH MAY NOT BE LAWFULLY EXCLUDED OR LIMITED.
+SOME JURISDICTIONS DO NOT ALLOW THE EXCLUSION OF CERTAIN WARRANTIES OR
+CONDITIONS OR THE LIMITATION OR EXCLUSION OF LIABILITY FOR LOSS OR DAMAGE
+CAUSED BY NEGLIGENCE, BREACH OF CONTRACT OR BREACH OF IMPLIED TERMS, OR
+INCIDENTAL OR CONSEQUENTIAL DAMAGES.  ACCORDINGLY, ONLY THE ABOVE LIMITATIONS
+IN THAT ARE LAWFUL IN YOUR JURISDICTION WILL APPLY TO YOU AND THE AUTHOR'S
+LIABILITY WILL BE LIMITED TO THE MAXIMUM EXTENT PERMITTED BY LAW.
+
+
+
+
+LIMITATION OF LIABILITY
+
+   Notwithstanding any damages that you might incur for any reason whatsoever
+(including, without limitation, all damages referenced above and all direct or
+general damages), your sole and entire remedy for any defect, damage or loss
+arising from a failure of the Program and Software to perform is to stop using
+it.  The foregoing limitations, exclusions, and disclaimers shall apply to the
+maximum extent permitted by applicable law, even if any remedy fails its
+essential purpose.

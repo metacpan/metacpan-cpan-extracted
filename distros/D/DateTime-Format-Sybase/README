@@ -1,0 +1,42 @@
+DateTime-Format-Sybase
+
+A module to parse and format Sybase datetimes.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DateTime::Format::Sybase
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Format-Sybase
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DateTime-Format-Sybase
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DateTime-Format-Sybase
+
+    Search CPAN
+        http://search.cpan.org/dist/DateTime-Format-Sybase/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009 Rafael Kitover
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

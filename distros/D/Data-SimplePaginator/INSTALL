@@ -1,0 +1,11 @@
+Linux standard install:
+
+./configure
+make
+make install
+
+Or you can use the normal perl procedure:
+
+perl Makefile.PL
+make
+make install

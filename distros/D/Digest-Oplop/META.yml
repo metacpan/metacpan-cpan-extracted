@@ -1,0 +1,29 @@
+---
+abstract: 'Generate account passwords based on a nickname and a master password'
+author:
+  - 'Mario Domgoergen C<< <mdom@cpan.org> >>'
+build_requires:
+  Module::Build: 0
+configure_requires:
+  Module::Build: 0
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Digest-Oplop
+provides:
+  Digest::Oplop:
+    file: lib/Digest/Oplop.pm
+    version: 0.01
+requires:
+  Digest::MD5: 0
+  Encode: 0
+  Getopt::Long: 0
+  IO::Prompt: 0
+  Pod::Usage: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mdom/Digest-Oplop/
+version: 0.01

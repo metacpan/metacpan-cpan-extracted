@@ -1,0 +1,94 @@
+Revision history for DBIx-Class-MooseColumns
+
+0.22    2011-05-06 01:28:00+0100
+	Workaround for silly CPAN indexer.
+
+0.21    2011-05-06 01:07:00+0100
+        Made it work in roles (under Moose 2.x). (Attributes with 'add_column'
+            option can be defined in roles and then the role can be applied to
+            DBIC result classes.)
+        Make this module work with roles in Moose 1.9900+. (Dave Rolsky)
+
+0.20    2011-03-20 23:11:00+0100
+        Fixed a test failure with recent DBIx::Class. (TestSchema is not a
+            MooseX::NonMoose class any more to make tests pass.)
+
+0.19    2011-03-15 17:52:00+0100
+        Moose 1.99+ compatibility (but still works with Moose 1.24).
+
+0.18    2011-03-15 13:29:00+0100
+        Workaround for a SQLite sillyness (columns are NOT NULL by default).
+        Removed workaround of a MooseX::NonMoose weirdness. (Now TestSchema does
+            not need a dummy constructor - which, btw, made 01-warnings.t fail.)
+        Fixed some set_column/set_inflated_column copy-paste errors.
+        Fixed a missing semicolon in
+            :Meta::Role::Attribute::DBICColumn::inline_set().
+            (This resulted in a syntax error in the generated accessor when a
+            trigger was defined.)
+        Tests for the trigger method (attribute option).
+
+0.17    2011-01-27 12:11:00+0100
+        Workaround to make it work with new (1.21) Moose.
+
+0.16    2010-12-14 11:19:00+0100
+        Fixed Test::Aggregate dependency.
+
+0.15    2010-11-16 14:52:00+0100
+        Fixed a bug in agg-t/user/01-warnings.t. Used to fail on Perl 5.8.
+
+0.14    2010-11-11 17:10:00+0100
+        Fixed a bug in the fixture (made false test failures with some
+            SQLite/SQL::Translator versions).
+
+0.13    2010-11-09 09:49:00+0100
+        Fixed a silly renaming bug.
+
+0.12    2010-11-07 23:27:00+0100
+        Added tests for the predicate, clearer (TODO), builder, initializer,
+            default value.
+        Made the builder, initializer and default value work.
+        Fixed a bug (typo) in the clearer.
+        Renamed attribute metaclass roles to have ::Role:: in their name.
+        Using MooseX::NonMoose in the result classes of the tests again.
+
+0.11    2010-11-06 14:10:00+0100
+        Reworked tests to test both mutable and immutable classes.
+        Added tests to make sure the features work in subclasses.
+        Re-thought and rewrote the the DBIC proxy of the attributes. (Much
+            cleaner and faster and also works with Moose 1.19. Unfortunately
+            this does not work with older Moose.)
+        Runs the benchmark author tests for both mutable and immutable classes.
+        Added tests for the case when the instance metaclass is non-inlinable.
+
+0.10    2010-06-22 16:43:00+0200
+        Documented the order of "has", "table" and "set_primary_key".
+
+0.09    2010-06-21 15:43:00+0200
+        Fixed a silly quoting issue in the accessor inlining code.
+
+0.08    2010-06-21 15:21:00+0200
+        Does not export Moose sugar any more.
+        Added tests for warnings during "has" processing.
+        Does not store the whole \%column_info in the attribute.
+        Works with DBIx::Class::InflateColumn.
+
+0.07    2010-06-17 17:02:00+0200
+        Added missing test dep for MooseX::NonMoose.
+
+0.06    2010-06-16 14:40:00+0200
+        Renamed from MooseX-DBIC-AddColumn to DBIx-Class-MooseColumns.
+
+0.05    2010-06-16 14:40:00+0200
+        Deprecation in favour of DBIx-Class-MooseColumns.
+
+0.04    2010-06-07 13:09:00+0200
+        Fixed a silly Makefile.PL bug (M:I::Share was missing).
+
+0.03    2010-06-01 16:51:00+0200
+        Fixed synopsis.
+
+0.02    2010-06-01 13:21:00+0200
+        Removed non-ASCII chars from POD.
+
+0.01    2010-05-14 00:10:00+0100
+        First version. We will see where it goes.

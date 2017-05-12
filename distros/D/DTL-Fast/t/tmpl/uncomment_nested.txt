@@ -1,0 +1,10 @@
+commented {% comment Some comment %}
+This part
+    {% uncomment block 1 %}uncommented{% enduncomment %}
+should 
+    {% comment Some other comment %}
+        This one is {% uncomment Block 2 %} block{% enduncomment %}nested comment
+    {% endcomment %}
+not 
+be 
+rendered{% endcomment %} test

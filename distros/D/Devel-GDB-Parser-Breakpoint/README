@@ -1,0 +1,49 @@
+Devel-GDB-Parser-Breakpoint version 0.02
+========================================
+
+SYNOPSIS:
+
+In some Perl program (prog.pl):
+
+    #!/usr/bin/perl
+
+    use strict;
+    use warnings;
+
+    use Devel::GDB::Parser::Breakpoint;
+
+    print "before\n";
+
+    # Call bp(42) during parsing of this line
+    parser_breakpoint 42;
+
+    print "after\n";
+
+  Then:
+
+    $ gdb --args perl ./prog.pl
+    ...
+
+    (gdb) b bp if val == 42
+    Function "bp" not defined.
+    Make breakpoint pending on future shared library load? (y or [n]) y
+
+    Breakpoint 1 (bp if val == 42) pending.
+    (gdb) run
+    Starting program: /usr/bin/perl prog.pl
+    [Thread debugging using libthread_db enabled]
+
+    Breakpoint 1, bp (val=42) at Breakpoint.xs:7
+    7       void bp(int val) {}
+    (gdb)
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2013 by Matthew Horsfall
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

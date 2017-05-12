@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name: Devel-FIXME
+version: 0.01
+author:
+  - Yuval Kogman <nothingmuch@woobling.org>
+abstract: Semi intelligent, pending issue reminder system.
+license: perl
+requires:
+  perl: '>= 5.8.0'
+build_requires:
+  Test::NoWarnings: 0
+  Test::Warn: 0
+  Text::Soundex: 0
+provides:
+  Devel::FIXME:
+    file: lib/Devel/FIXME.pm
+    version: 0.01
+  Devel::FIXME::Rules::PerlFile:
+    file: lib/Devel/FIXME/Rules/PerlFile.pm
+generated_by: Module::Build version 0.250.0

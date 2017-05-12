@@ -1,0 +1,11 @@
+/.build
+/Dist-Zilla-App-Command-dumpphases-*
+/tmp/
+/META.yml
+/META.json
+/MYMETA.json
+/MYMETA.yml
+/Makefile
+/Makefile.old
+/blib/
+/pm_to_blib

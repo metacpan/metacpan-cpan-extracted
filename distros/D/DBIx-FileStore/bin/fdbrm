@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use DBI;
+
+use DBIx::FileStore;
+
+my $verbose  = 0;
+main();
+
+sub Usage {
+    "fdbrm [--verbose] [files]: Removes files from the FileDB\n";
+}
+
+sub main {
+    # fdbrm: copies a file (or files) into the db
+    GetOptions(
+        "verbose" => \$verbose,
+    ) || die Usage();
+
+    my $filestore   = new DBIx::FileStore();
+
+    die( "fdbrm: pass dbfilename(s) to delete\n" . Usage() ) unless @ARGV;
+
+    for my $name (@ARGV) {
+        $filestore->delete_file( $name );
+    }
+}
+
+=pod
+
+=head1 NAME     
+            
+fdbrm - Deletes files from DBIx::Filestore
+                    
+=head1 SYNOPSIS     
+                
+    % fdbrm filename.txt
+
+deletes file filename.txt from filestore
+
+    % fdbrm filename.txt filename2.txt
+
+deletes multiple files from filestore
+
+=head1 DESCRIPTION 
+
+Deletes files from DBIx::Filestore. --verbose option
+shows rows being deleted from the database.
+
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>, L<fdbget>, L<fdbls>, L<fdbmv>, L<fdbput>, L<fdbstat>, L<fdbtidy>
+    
+=cut    
+

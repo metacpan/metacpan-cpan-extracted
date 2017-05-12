@@ -1,0 +1,10 @@
+
+README for perl module Devel::Fail::MakefilePL
+
+This module was created as a debugging aid for mechanized module
+installers such as CPAN and CPANPLUS.
+
+* `perl Makefile.PL` will fail with syntax error
+
+AUTHOR: Martin Thurn <mthurn@cpan.org>
+

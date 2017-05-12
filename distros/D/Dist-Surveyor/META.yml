@@ -1,0 +1,64 @@
+---
+abstract: 'Survey installed modules and determine the specific distribution versions they came from'
+author:
+  - 'Tim Bunce <Tim.Bunce@pobox.com>'
+build_requires:
+  Archive::Tar: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  Test::RequiresInternet: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Surveyor
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+provides:
+  Dist::Surveyor:
+    file: lib/Dist/Surveyor.pm
+    version: '0.016'
+  Dist::Surveyor::DB_File:
+    file: lib/Dist/Surveyor/DB_File.pm
+    version: '0.016'
+  Dist::Surveyor::Inquiry:
+    file: lib/Dist/Surveyor/Inquiry.pm
+    version: '0.016'
+  Dist::Surveyor::MakeCpan:
+    file: lib/Dist/Surveyor/MakeCpan.pm
+    version: '0.016'
+requires:
+  CPAN::DistnameInfo: '0'
+  Compress::Zlib: '0'
+  HTTP::Tiny: '0.014'
+  JSON::MaybeXS: '1.001000'
+  List::Util: '0'
+  Memoize: '0'
+  Module::CoreList: '0'
+  Module::Metadata: '0'
+  Scalar::Util: '0'
+  Storable: '0'
+  perl: '5.006'
+  version: '0'
+resources:
+  homepage: https://github.com/Grinnz/Dist-Surveyor
+  repository: https://github.com/Grinnz/Dist-Surveyor.git
+version: '0.016'
+x_contributors:
+  - 'Dan Book <grinnz@grinnz.com>'
+  - 'Naveed Massjouni <naveedm9@gmail.com>'
+  - 'Nelo Onyiah <nelo.onyiah@gmail.com>'
+  - 'Shmuel Fomberg <shmuelfomberg@gmail.com>'

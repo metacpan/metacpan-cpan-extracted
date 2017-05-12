@@ -1,0 +1,32 @@
+---
+abstract: 'Perl DateTime extension for computing the sunrise/sunset on a given day'
+author:
+  - 'Ron Hill <rkhill@firstlight.net>'
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.57_02
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Event-Sunrise
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DateTime::Event::Sunrise:
+    file: lib/DateTime/Event/Sunrise.pm
+    version: 0.0505
+requires:
+  DateTime: 0.16
+  DateTime::Duration: 0
+  DateTime::Span: 0
+  DateTime::SpanSet: 0
+  perl: v5.8.5
+resources:
+  repository: https://github.com/jforget/DateTime-Event-Sunrise.git
+version: 0.0505

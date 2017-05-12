@@ -1,0 +1,57 @@
+Revision history for perl distribution DBIx-TempDB
+
+0.14 2016-10-25T22:48:20+0200
+ - Removed EXPERIMENTAL notice
+
+0.13 2016-09-08T20:10:34+0200
+ - Skip tests on Windows
+
+0.12 2016-04-17T21:33:34+0200
+ - Change drop_from_child=1 is now default #8
+
+0.11 2015-11-11T13:16:04+0100
+ - Fix execute() to only pass one statement to $dbh->do()
+
+0.10 2015-11-04T19:06:29+0100
+ - Fix parsing "SET foreign_key_checks=0" MySQL statement
+
+0.09 2015-10-07T16:59:12+0200
+ - Will run cleanup from child on INT, QUIT and TERM
+
+0.08 2015-09-22T14:19:21+0200
+ - Fix running multiple commands in MySQL using execute()
+   The parser code is taken from Mojo::mysql, written by Svetoslav Naydenov
+ - Add support for custom "create_database_command"
+ - Add support for custom "drop_database_command"
+ - Allow execute of multiple statements by SQLite driver #6
+
+0.07 2015-09-20T09:40:22+0200
+ - Use URI::db instead of Mojo::URL #4
+   Contributor: Dan Book
+ - Fix duplicate "CREATE DATABASE x" statements fail less
+ - Add warning when DBIX_TEMP_DB_KEEP_DATABASE is set
+
+0.06 2015-09-18T14:52:06+0200
+ - Add support for DBIX_TEMP_DB_KEEP_DATABASE=1
+
+0.05 2015-09-18T14:00:30+0200
+ - Add support for SQLite
+
+0.04 2015-09-18T11:50:41+0200
+ - Add support for "template"
+ - Add drop_from_child=2, which monitor parent with a double forked process
+ - Fix max length for database name is 63 characters (Pg=63, MySQL=64)
+
+0.03 2015-09-17T21:59:16+0200
+ - Add support for "drop_from_child"
+
+0.02 2015-09-17T20:02:12+0200
+ - Fix depending on DBI
+ - Add create_database() sets DBIX_TEMP_DB_URL
+ - Add support for calling dsn() as a class method
+ - Add execute()
+ - Add execute_file()
+
+0.01 2015-09-17T19:12:10+0200
+ - Can make temp database for postgresql
+ - Can make temp database for mysql

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Data-Stream-Bulk-AnyEvent,
+version v0.0.2:
+
+  AnyEvent-friendly Data::Stream::Bulk::Callback
+
+This software is copyright (c) 2012 by Yasutaka ATARASHI.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

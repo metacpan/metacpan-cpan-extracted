@@ -1,0 +1,27 @@
+Revision history for Perl extension DBIx::Class::RandomStringColumns
+
+0.10 2016-05-25T07:37:29Z
+        - fix unit test (thx. eserte)
+
+0.09 2013-08-31T15:11:38Z
+        - fixed pod spelling.
+
+0.08 2013-08-12T05:20:32Z
+        - fixed test problem.
+
+0.07  Wed Oct 28 11:52:56 2009
+        - fixed bug when schema preset resultset attribute prefetch.
+
+0.06  Thu Jun 12 19:55:24 2008
+        - fixed build files.
+        - fixed typo in POD.
+
+0.04  Wed Feb 27 09:52:02 2007
+        - "solt" is typo. change to "salt". (thx. Mr. Abe)
+        - random_string_columns bug fixed (thx. id:nekokak)
+
+0.03  Wed Nov 22 16:42:00 2006
+        - bug fixed (thx. id:nekokak)
+
+0.01  Thu Dec 22 17:53:32 2005
+        - original version

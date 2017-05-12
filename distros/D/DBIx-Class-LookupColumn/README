@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-LookupColumn,
+version 0.10:
+
+  dbic component generating accessors method to get data by a table pointing to a Lookup table (catalog of terms) in a efficient way (cache system)
+
+This software is copyright (c) 2012 by Karl Forner and Thomas Rubattel.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

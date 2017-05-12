@@ -1,0 +1,65 @@
+---
+abstract: 'Stackfree arbitrary data scanner'
+author:
+  - 'Jean-Damien Durand <jeandamiendurand@free.fr>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Scan
+no_index:
+  directory:
+    - examples
+    - t
+    - xt
+provides:
+  Data::Scan:
+    file: lib/Data/Scan.pm
+    version: '0.008'
+  Data::Scan::Impl::Printer:
+    file: lib/Data/Scan/Impl/Printer.pm
+    version: '0.008'
+  Data::Scan::Printer:
+    file: lib/Data/Scan/Printer.pm
+    version: '0.008'
+  Data::Scan::Role::Consumer:
+    file: lib/Data/Scan/Role/Consumer.pm
+    version: '0.008'
+requires:
+  B::Deparse: '0'
+  Class::Inspector: '0'
+  Exporter: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  Perl::OSType: '0'
+  Scalar::Util: '1.26'
+  Term::ANSIColor: '0'
+  Types::Common::Numeric: '0'
+  Types::Standard: '0'
+  perl: '5.010'
+  strict: '0'
+  vars: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Scan
+  homepage: https://metacpan.org/release/Data-Scan
+  repository: git://github.com/jddurand/data-scan.git
+version: '0.008'
+x_authority: cpan:JDDPAUSE
+x_contributors:
+  - 'Mohammad S Anwar <mohammad.anwar@yahoo.com>'
+x_serialization_backend: 'YAML::Tiny version 1.70'

@@ -1,0 +1,13 @@
+Revision history for Devel-DebugHooks
+
+0.03    CHANGES
+	+ Implemented debug debugger debugging
+	+ Extend test coverage
+	+ Improved debugger commands
+	+ Logic moved into debugger commands from &DB::DB
+	* Many small fixes
+
+0.02    CHANGES
+	* Fix debugger. Minimal required version now 5.12.0
+
+0.01    First version, released on an unsuspecting world.

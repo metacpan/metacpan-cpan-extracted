@@ -1,0 +1,13 @@
+Revision history for Dancer-Plugin-Paginate
+
+1.0.2 May-10-2014
+    Added JSON as Test PreReq
+    Dancer Session Variable range_available added
+    Metadata tweaks
+         
+1.0.1 May-05-2014
+    Added YAML as Test PreReq for BSD
+
+1.0.0 Mar-23-2014
+    Plugin created
+

@@ -1,0 +1,74 @@
+print JeffasMysql2SQLite(<STDIN>);
+
+
+
+use Data::Dumper;
+sub JeffasMysql2SQLite {
+    my @Ssql = @_;
+    chomp(@Ssql);
+    my %index;
+    my @tablename;
+
+	my @out;
+    for my $sql( @Ssql ){
+	$sql =~ s/[`]//g;
+	next if $sql =~ /^\s+CONSTRAINT/mi;
+
+        push @tablename, $1 if $sql =~ m/create \s+ table \s+ (\w+) /ix;
+
+        $sql =~ s/\s*(--|#).*$//g;   # chokes on comments
+
+
+        $sql =~ s{^\s*?(KEY(?:\s*[A-Z_-]+\s*)?\(.*)}{
+                    push @{$index{$tablename[-1]}},$1;
+                    "";
+                }giemx;
+        $sql =~ s/auto_increment//ig;      # on 'auto_increment'
+        $sql =~ s/UNSIGNED//ig;
+	$sql =~ s/COMMENT\s+'.*?'//ig;
+        $sql =~ s/TYPE=\w+;/;/gi;          # and on 'TYPE=____'
+        $sql =~ s/\\'/''/g;               # and on escaped '
+
+        $sql =~ s{^\s*?(\w+)\s+(?:SET|ENUM)\((.*)$}{ SetOrEnumToVarchar($1,$2); }exig;
+	if ($sql =~ /^\s*\)\s*\;/){
+		$out[$#out] =~ s/,\s*$//;
+	}
+        next unless $sql;
+	push @out, $sql;
+    }
+    print STDERR Dumper(\%index);
+    my $ret = join ("\n",@out) . "\n";
+
+    for my $tablename( @tablename ){
+
+        for my $ix( @{ $index{$tablename} } ){
+            $ix=~ s/[,\s]+$//;
+
+            if( $ix =~ /\bKEY\((\w+)\)/i ) {
+                $ret.=" CREATE INDEX $1 on $tablename ($1);\n";
+            } elsif( $ix =~ /\bKEY\s+(\w+)\s+\((.*?)\z/i ) {
+                $ret.=" CREATE INDEX $1 on $tablename ($2;\n";
+            }
+        }
+    }
+
+    return $ret;
+}
+
+sub SetOrEnumToVarchar {
+    my( $name, $val ) = @_;
+    my $end   = substr $val, rindex($val,')') + 1;
+       $val   = substr $val, 0, rindex($val,')') - 1;
+    my $q     = substr $val, 0, 1, "";
+     ( $val ) = sort {
+                    $b <=> $a
+                } map {
+                    s/^\"//;
+                    s/\"\$//;
+                    length $_;
+                }   split /$q,$q/, $val;
+
+#warn "\n\t\tname $name\n\t\t val $val\n\t\t end $end\n\t\t   q $q\n\t\t";
+    return "$name VARCHAR($val) $end";
+}
+

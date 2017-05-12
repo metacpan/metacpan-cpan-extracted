@@ -1,0 +1,29 @@
+Revision history for Dist-Zilla-PluginBundle-SHLOMIF
+
+0.000007    2017-04-05
+        - Add CPAN Prereqs to the bundle in dist.ini / Makefile.PL
+
+0.000006    2017-01-14
+        - Set the authority to SHLOMIF instead of DOY in the POD.
+
+0.000005    2016-12-10
+        - Make the distribution self-hosting (= using [@SHLOMIF] instead
+        of [@DOY] ).
+        - Remove [Metadata] because
+        https://metacpan.org/release/Dist-Zilla-Plugins-CJM fails its tests.
+
+0.000004    2016-12-08
+        - Fixes to the links in the distro due to the @DOY defaults.
+
+0.000003    2016-12-08
+        - Try to fix the CPAN Testers' failures, e.g:
+            - http://www.cpantesters.org/cpan/report/35f2558c-bcba-11e6-850a-ec1cdb1d0fc3
+            - Thanks to the reports!
+            - Specify prerequisites.
+
+0.000002    2016-12-07
+        - New version to satisfy @DOY.
+
+0.000001    2016-12-07
+        - Forked from Dist-Zilla-PluginBundle-DOY - thanks!
+        - First CPAN version - here goes nothing.

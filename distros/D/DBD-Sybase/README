@@ -1,0 +1,185 @@
+$Id: README,v 1.27 2011/04/25 08:59:17 mpeppler Exp $
+	
+	   DBD::Sybase  --  a Sybase DBI driver for Perl 5.
+
+   Copyright (c) 1996-2011  Michael Peppler
+
+   You may distribute under the terms of either the GNU General Public
+   License or the Artistic License, as specified in the Perl README file.
+
+
+This Sybase DBI driver is built using the Sybase OpenClient Client
+Library (aka CT-library). You will need to have that installed before
+you can do anything with this package. You will also need Tim Bunce's
+DBI module, latest release. DBI is available from CPAN, in
+
+    "CPAN"/authors/id/TIMB/DBI-1.xx-tar.gz
+
+The Sybase OpenClient libraries are of course available from Sybase.
+See http://www.sybase.com or http://www.peppler.org for details.
+
+An alternative is to use the FreeTDS reimplementation of Client Library.
+With FreeTDS DBD::Sybase can be used to query a MS-SQL 7 or 2000
+database server from a Unix/linux host.
+See http://www.freetds.org for details.
+
+If you use FreeTDS please read the README.freetds file.
+
+DBD::Sybase is a reasonably complete implementation of the DBI spec, but 
+there are still some features that are missing. Please see the DBD::Sybase
+man page for details.
+
+The full write-ups of the bugs that are listed in the CHANGES file as "fixed" 
+can be seen at http://www.peppler.org/bugdb
+
+Getting Help
+============
+
+If you are stuck please start by searching the Web, the appropriate
+mailing lists and my bug database, as it is likely that someone else
+will have experienced the same problem before you. Hint: Google is
+your friend :-)
+
+The sybperl-l mailing list is dedicated to Sybase <-> perl issues and 
+covers both the sybperl modules (Sybase::CTlib, etc.) and DBD::Sybase.
+It is archived and searchable at http://www.peppler.org/archive/sybperl-l/
+
+If after seaching you still don't find any solution then post a question
+(with as much detail as possible) to either dbi-users@perl.org,
+sybperl-l@peppler.org or freetds@lists.ibiblio.org (only use the
+latter if you use the FreeTDS libraries with DBD::Sybase).
+
+For recent changes please see the CHANGES file.
+
+Building:
+---------
+
+Make sure that the SYBASE environment variable points to the Sybase
+installation that you want to use for this build. The easiest way
+to do this is to source the SYBASE.sh/SYBASE.csh or SYBASE.bat file
+in the root directory of the Sybase installation you want to use.
+
+This version attempts to find out which libraries it needs by looking
+at $SYBASE/lib ($SYBASE/$SYBASE_OCS/lib for ASE 12.x installations.) 
+This behaviour works on Unix and VMS systems, but on Win32 you still
+have to edit the CONFIG file the old way). 
+It assumes that $SYBASE is set and points to 
+the Sybase installation directory that you want to use to build 
+DBD::Sybase, and will also use the value of $SYBASE_OCS if it is set.
+
+Then run 
+	perl Makefile.PL
+You will be prompted to choose build options (chained mode for AutoCommit, 
+threaded libraries when using a threaded perl) and for server/user/pwd
+to use for the "make test" step.
+
+If there were warnings about missing libraries, go to the manual 
+configuration, below.
+
+Run
+	make
+If the make failed, go to the manual configuration, below.
+Run
+	make test
+If this succeeds you can install the package, via
+	make install
+(which you probably have to run as root.)
+
+Manual Configuration:
+---------------------
+
+If the automatic configuration fails, then you will have to edit the
+CONFIG file, and set the EXTRA_LIBS entry according to your OS and
+Sybase release, and then run 
+	perl Makefile.PL --file
+
+The CONFIG file can be used to set certain system variables that
+are needed for the build. 
+	SYBASE is the root directory of your Sybase installation. DBD::Sybase
+	will use $SYBASE/lib and $SYBASE/include during the build.
+
+	EXTRA_LIBS lists any extra libraries that are required on your
+	system. For example, Solaris 2.x needs -ltli. See your OS specific
+	documentation supplement from Sybase to determine what is required.
+
+	DBI_INCLUDE is the directory where DBI installed its include files.
+	Makefile.PL will normally deduce this directory from perl's Config
+	module, so you only need to set this if Makefile.PL fails.
+
+	LINKTYPE. Uncomment and set to 'static' if you want to build
+	DBD::Sybase statically (ie always included in a new perl binary).
+
+Edit PWD, and set the user, password and server that you want to use for the 
+'make test'.
+
+Run perl Makefile.PL, make, make test.
+
+If everything's fine, run "make install" to move the files to your 
+installed perl library tree.
+
+Automated build with no prompts:
+--------------------------------
+
+You can run Makefile.PL with command line arguments to accept defaults
+and build DBD::Sybase in an automated manner (without prompts).
+
+The syntax is:
+
+perl Makefile.PL --accept_test_defaults --chained {Y, N} --threaded_libs {Y, N}
+
+
+
+Known Problems:
+===============
+
+Solaris 2.x:
+-----------
+On Solaris 2.x make test will fail if LD_LIBRARY_PATH is set and has
+/usr/lib or /lib before $SYBASE/lib. This is because both Solaris 2.x
+and Sybase have a library called libintl.so, and if /usr/lib is placed 
+before $SYBASE/lib in LD_LIBRARY_PATH the dynamic loader will search
+the wrong library when loading DBD::Sybase. In general it is not
+necessary to set LD_LIBRARY_PATH on Solaris, and it is only rarely
+necessary to include /usr/lib or /lib in the LD_LIBRARY_PATH as those
+directories will be searched by default.
+
+Linux:
+------
+If the LANG or LC_ALL environment variable is set and points to an 
+entry that does not exist in $SYBASE/locales/locales.dat (in the 
+[linux] section) then you may get a core dump. This is an
+OpenClient problem. 
+See http://www.peppler.org/FAQ/linux.html#q1.14 for
+additional details.
+
+FreeTDS:
+--------
+
+See the README.freetds file for details.
+
+Regression Tests:
+-----------------
+
+The regression tests cover the normal operations, but can't check
+for all combination of data and access modes. You should always test
+with your own scripts/data before moving a new release into production.
+
+NOTE: t/fail.t will *fail* on test #8 if you are connecting to 
+      an 11.0.3.3 server. This is a bug in the server, and not something
+      that I can do anything about, unfortunately. It's a fairly
+      obscure constraint violation condition - read the code if
+      you are interested.
+
+I have a simple bug tracking database at http://www.peppler.org/bugdb
+You can use it to check for known problems, and to report new ones.
+
+See perldoc DBD::Sybase for details about the package.
+
+Comments, criticism, etc. welcome!
+
+Michael
+--
+Michael Peppler
+mpeppler@peppler.org
+http://www.peppler.org/
+

@@ -1,0 +1,50 @@
+---
+abstract: 'Set release status from version number patterns'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  JSON::MaybeXS: '0'
+  Test::DZil: '0'
+  Test::More: '0.96'
+  perl: v5.10.0
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: v5.10.0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-ReleaseStatus-FromVersion
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::ReleaseStatus::FromVersion:
+    file: lib/Dist/Zilla/Plugin/ReleaseStatus/FromVersion.pm
+    version: '0.001'
+requires:
+  Dist::Zilla::Role::ReleaseStatusProvider: '0'
+  Moose: '0'
+  Moose::Util::TypeConstraints: '0'
+  constant: '0'
+  perl: v5.10.0
+  strict: '0'
+  version: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-ReleaseStatus-FromVersion/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-ReleaseStatus-FromVersion
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-ReleaseStatus-FromVersion.git
+version: '0.001'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'

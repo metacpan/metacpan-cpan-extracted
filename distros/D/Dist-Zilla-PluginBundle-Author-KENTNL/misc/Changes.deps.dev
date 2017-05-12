@@ -1,0 +1,928 @@
+This file contains changes to DEVELOPMENT dependencies only ( both REQUIRED and OPTIONAL )
+
+2.025021
+ [Added / develop requires]
+ - Test::MinimumVersion
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0 → 0.003902
+
+2.025020 2016-06-19T07:19:45Z
+
+2.025010 2015-11-15T02:28:17Z
+
+2.025003 2015-10-19T14:11:40Z
+ [Added / develop requires]
+ - English
+ - Software::License::Perl_5
+
+ [Changed / develop requires]
+ - Test::More 0.88 → 0.96
+
+2.025002 2015-08-14T12:13:53Z
+
+2.025001 2015-07-05T03:52:11Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001002 → 0.001003
+
+2.025000 2015-06-30T02:35:26Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::CONTRIBUTING 0.001002
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024002
+
+2.024002 2015-06-21T22:23:14Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::MetaYAML::Minimal
+ - Dist::Zilla::Plugin::RemovePrereqs::Provided
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.002000 → 0.002005
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024001 → 2.024002
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::MetaYAML
+ - Dist::Zilla::Plugin::RemovePhasedPrereqs
+
+2.024001 2015-03-01T10:38:03Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.004002
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0 → 0.001002
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.024000 → 2.024001
+
+2.024000 2015-02-28T17:36:05Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.023003 → 2.024000
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed
+
+2.023003 2015-02-05T10:55:56Z
+ [Changed / develop requires]
+ - Test::More 0 → 0.88
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.023002 → 2.023003
+
+2.023002 2015-01-14T07:26:23Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Prereqs::Upgrade
+
+ [Added / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.023002
+
+ [Changed / develop recommends]
+ - Test::More 1.301001_097 → 0.99
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.031 → 5
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.004001 → 0.001001
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001000 → 0
+ - Dist::Zilla::Plugin::AutoPrereqs 5.031 → 0
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.001000 → 0
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease 0.008 → 0
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed 0.013 → 0
+ - Dist::Zilla::Plugin::ConfirmRelease 5.031 → 0
+ - Dist::Zilla::Plugin::CopyFilesFromBuild 0.103510 → 0
+ - Dist::Zilla::Plugin::Git::Check 2.029 → 0
+ - Dist::Zilla::Plugin::Git::Commit 2.029 → 0
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.029 → 0
+ - Dist::Zilla::Plugin::Git::Contributors 0.008 → 0.006
+ - Dist::Zilla::Plugin::Git::GatherDir 2.029 → 0
+ - Dist::Zilla::Plugin::Git::Tag 2.029 → 0
+ - Dist::Zilla::Plugin::GithubMeta 0.46 → 0
+ - Dist::Zilla::Plugin::License 5.031 → 0
+ - Dist::Zilla::Plugin::MakeMaker 5.031 → 0
+ - Dist::Zilla::Plugin::Manifest 5.031 → 0
+ - Dist::Zilla::Plugin::ManifestSkip 5.031 → 0
+ - Dist::Zilla::Plugin::MetaConfig 5.031 → 0
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.004001 → 1.004000
+ - Dist::Zilla::Plugin::MetaJSON 5.031 → 0
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.003000 → 1.14000001
+ - Dist::Zilla::Plugin::MetaTests 5.031 → 0
+ - Dist::Zilla::Plugin::MetaYAML 5.031 → 0
+ - Dist::Zilla::Plugin::MinimumPerl 1.006 → 0
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.031 → 0
+ - Dist::Zilla::Plugin::PodCoverageTests 5.031 → 0
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.031 → 0
+ - Dist::Zilla::Plugin::PodWeaver 4.006 → 0
+ - Dist::Zilla::Plugin::Prereqs 5.031 → 0
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps 0.004 → 0
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled 0.003001 → 0
+ - Dist::Zilla::Plugin::Readme::Brief 0.002002 → 0
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.142470 → 0
+ - Dist::Zilla::Plugin::RemovePhasedPrereqs 0.002 → 0
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001004 → 0
+ - Dist::Zilla::Plugin::RunExtraTests 0.025 → 0
+ - Dist::Zilla::Plugin::Test::CPAN::Changes 0.008 → 0
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0.003000 → 0
+ - Dist::Zilla::Plugin::Test::EOL 0.16 → 0
+ - Dist::Zilla::Plugin::Test::Kwalitee 2.11 → 0
+ - Dist::Zilla::Plugin::Test::MinimumVersion 2.000005 → 0
+ - Dist::Zilla::Plugin::Test::Perl::Critic 2.112410 → 0
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.019 → 0
+ - Dist::Zilla::Plugin::TestRelease 5.031 → 0
+ - Dist::Zilla::Plugin::Twitter 0.026 → 0
+ - Dist::Zilla::Plugin::UploadToCPAN 5.031 → 0
+ - Pod::Coverage::TrustPod 0.100003 → 0
+ - Test::CPAN::Changes 0.30 → 0.19
+ - Test::CPAN::Meta 0.24 → 0
+ - Test::EOL 1.5 → 0
+ - Test::Kwalitee 1.22 → 1.21
+ - Test::Pod 1.48 → 1.41
+ - Test::Pod::Coverage 1.10 → 1.08
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled::All 1.001000
+
+2.023001 2015-01-13T12:12:42Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.002000 → 2.003000
+ - Test::CPAN::Meta 0.23 → 0.24
+
+2.023000 2015-01-13T08:13:40Z
+ [Changed / develop recommends]
+ - Test::More 1.001014 → 1.301001_097
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.030 → 5.031
+ - Dist::Zilla::Plugin::AutoPrereqs 5.030 → 5.031
+ - Dist::Zilla::Plugin::ConfirmRelease 5.030 → 5.031
+ - Dist::Zilla::Plugin::License 5.030 → 5.031
+ - Dist::Zilla::Plugin::MakeMaker 5.030 → 5.031
+ - Dist::Zilla::Plugin::Manifest 5.030 → 5.031
+ - Dist::Zilla::Plugin::ManifestSkip 5.030 → 5.031
+ - Dist::Zilla::Plugin::MetaConfig 5.030 → 5.031
+ - Dist::Zilla::Plugin::MetaJSON 5.030 → 5.031
+ - Dist::Zilla::Plugin::MetaTests 5.030 → 5.031
+ - Dist::Zilla::Plugin::MetaYAML 5.030 → 5.031
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.030 → 5.031
+ - Dist::Zilla::Plugin::PodCoverageTests 5.030 → 5.031
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.030 → 5.031
+ - Dist::Zilla::Plugin::Prereqs 5.030 → 5.031
+ - Dist::Zilla::Plugin::Readme::Brief 0.002000 → 0.002002
+ - Dist::Zilla::Plugin::TestRelease 5.030 → 5.031
+ - Dist::Zilla::Plugin::UploadToCPAN 5.030 → 5.031
+
+2.022005 2015-01-05T20:16:46Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Readme::Brief 0.002000
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.029 → 5.030
+ - Dist::Zilla::Plugin::AutoPrereqs 5.029 → 5.030
+ - Dist::Zilla::Plugin::ConfirmRelease 5.029 → 5.030
+ - Dist::Zilla::Plugin::License 5.029 → 5.030
+ - Dist::Zilla::Plugin::MakeMaker 5.029 → 5.030
+ - Dist::Zilla::Plugin::Manifest 5.029 → 5.030
+ - Dist::Zilla::Plugin::ManifestSkip 5.029 → 5.030
+ - Dist::Zilla::Plugin::MetaConfig 5.029 → 5.030
+ - Dist::Zilla::Plugin::MetaJSON 5.029 → 5.030
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.001002 → 2.002000
+ - Dist::Zilla::Plugin::MetaTests 5.029 → 5.030
+ - Dist::Zilla::Plugin::MetaYAML 5.029 → 5.030
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.029 → 5.030
+ - Dist::Zilla::Plugin::PodCoverageTests 5.029 → 5.030
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.029 → 5.030
+ - Dist::Zilla::Plugin::Prereqs 5.029 → 5.030
+ - Dist::Zilla::Plugin::TestRelease 5.029 → 5.030
+ - Dist::Zilla::Plugin::UploadToCPAN 5.029 → 5.030
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Pod2Readme 0.001
+
+2.022004 2015-01-02T03:00:30Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::TravisCI 0.001000
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.004000 → 1.004001
+
+2.022003 2014-12-29T11:33:17Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Pod2Readme 0.001
+
+ [Changed / develop recommends]
+ - Test::More 1.001009 → 1.001014
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.028 → 5.029
+ - Dist::Zilla::Plugin::AutoPrereqs 5.028 → 5.029
+ - Dist::Zilla::Plugin::ConfirmRelease 5.028 → 5.029
+ - Dist::Zilla::Plugin::Git::Check 2.028 → 2.029
+ - Dist::Zilla::Plugin::Git::Commit 2.028 → 2.029
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.028 → 2.029
+ - Dist::Zilla::Plugin::Git::GatherDir 2.028 → 2.029
+ - Dist::Zilla::Plugin::Git::Tag 2.028 → 2.029
+ - Dist::Zilla::Plugin::License 5.028 → 5.029
+ - Dist::Zilla::Plugin::MakeMaker 5.028 → 5.029
+ - Dist::Zilla::Plugin::Manifest 5.028 → 5.029
+ - Dist::Zilla::Plugin::ManifestSkip 5.028 → 5.029
+ - Dist::Zilla::Plugin::MetaConfig 5.028 → 5.029
+ - Dist::Zilla::Plugin::MetaJSON 5.028 → 5.029
+ - Dist::Zilla::Plugin::MetaTests 5.028 → 5.029
+ - Dist::Zilla::Plugin::MetaYAML 5.028 → 5.029
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.028 → 5.029
+ - Dist::Zilla::Plugin::PodCoverageTests 5.028 → 5.029
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.028 → 5.029
+ - Dist::Zilla::Plugin::Prereqs 5.028 → 5.029
+ - Dist::Zilla::Plugin::TestRelease 5.028 → 5.029
+ - Dist::Zilla::Plugin::UploadToCPAN 5.028 → 5.029
+
+2.022002 2014-12-14T09:15:08Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.027 → 5.028
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.004000 → 0.004001
+ - Dist::Zilla::Plugin::AutoPrereqs 5.027 → 5.028
+ - Dist::Zilla::Plugin::ConfirmRelease 5.027 → 5.028
+ - Dist::Zilla::Plugin::License 5.027 → 5.028
+ - Dist::Zilla::Plugin::MakeMaker 5.027 → 5.028
+ - Dist::Zilla::Plugin::Manifest 5.027 → 5.028
+ - Dist::Zilla::Plugin::ManifestSkip 5.027 → 5.028
+ - Dist::Zilla::Plugin::MetaConfig 5.027 → 5.028
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.003001 → 1.004000
+ - Dist::Zilla::Plugin::MetaJSON 5.027 → 5.028
+ - Dist::Zilla::Plugin::MetaTests 5.027 → 5.028
+ - Dist::Zilla::Plugin::MetaYAML 5.027 → 5.028
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.027 → 5.028
+ - Dist::Zilla::Plugin::PodCoverageTests 5.027 → 5.028
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.027 → 5.028
+ - Dist::Zilla::Plugin::Prereqs 5.027 → 5.028
+ - Dist::Zilla::Plugin::TestRelease 5.027 → 5.028
+ - Dist::Zilla::Plugin::UploadToCPAN 5.027 → 5.028
+
+2.022001 2014-12-10T09:57:13Z
+ [Changed / develop recommends]
+ - Test::More 1.001008 → 1.001009
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.021 → 5.027
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.003006 → 0.004000
+ - Dist::Zilla::Plugin::AutoPrereqs 5.021 → 5.027
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease 0.004 → 0.008
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed 0.012 → 0.013
+ - Dist::Zilla::Plugin::ConfirmRelease 5.021 → 5.027
+ - Dist::Zilla::Plugin::Git::Check 2.025 → 2.028
+ - Dist::Zilla::Plugin::Git::Commit 2.025 → 2.028
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.025 → 2.028
+ - Dist::Zilla::Plugin::Git::GatherDir 2.025 → 2.028
+ - Dist::Zilla::Plugin::Git::Tag 2.025 → 2.028
+ - Dist::Zilla::Plugin::License 5.021 → 5.027
+ - Dist::Zilla::Plugin::MakeMaker 5.021 → 5.027
+ - Dist::Zilla::Plugin::Manifest 5.021 → 5.027
+ - Dist::Zilla::Plugin::ManifestSkip 5.021 → 5.027
+ - Dist::Zilla::Plugin::MetaConfig 5.021 → 5.027
+ - Dist::Zilla::Plugin::MetaJSON 5.021 → 5.027
+ - Dist::Zilla::Plugin::MetaTests 5.021 → 5.027
+ - Dist::Zilla::Plugin::MetaYAML 5.021 → 5.027
+ - Dist::Zilla::Plugin::MinimumPerl 1.003 → 1.006
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.021 → 5.027
+ - Dist::Zilla::Plugin::PodCoverageTests 5.021 → 5.027
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.021 → 5.027
+ - Dist::Zilla::Plugin::Prereqs 5.021 → 5.027
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps 0.003 → 0.004
+ - Dist::Zilla::Plugin::RunExtraTests 0.022 → 0.025
+ - Dist::Zilla::Plugin::Test::EOL 0.14 → 0.16
+ - Dist::Zilla::Plugin::TestRelease 5.021 → 5.027
+ - Dist::Zilla::Plugin::UploadToCPAN 5.021 → 5.027
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001003 → 0.002000
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::ReadmeFromPod 0.21
+
+2.022000 2014-10-25T09:54:57Z
+ [Added / develop recommends]
+ - Test::More 1.001008
+
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Test::EOL 0.14
+ - Test::EOL 1.5
+ - Test::More
+
+ [Changed / develop requires]
+ - Dist::Zilla 5.020 → 5.021
+ - Dist::Zilla::Plugin::Authority 0 → 1.006
+ - Dist::Zilla::Plugin::AutoPrereqs 5.020 → 5.021
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease 0.003 → 0.004
+ - Dist::Zilla::Plugin::ConfirmRelease 5.020 → 5.021
+ - Dist::Zilla::Plugin::Git::Check 2.024 → 2.025
+ - Dist::Zilla::Plugin::Git::Commit 2.024 → 2.025
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.024 → 2.025
+ - Dist::Zilla::Plugin::Git::Contributors 0.007 → 0.008
+ - Dist::Zilla::Plugin::Git::GatherDir 2.024 → 2.025
+ - Dist::Zilla::Plugin::Git::Tag 2.024 → 2.025
+ - Dist::Zilla::Plugin::License 5.020 → 5.021
+ - Dist::Zilla::Plugin::MakeMaker 5.020 → 5.021
+ - Dist::Zilla::Plugin::Manifest 5.020 → 5.021
+ - Dist::Zilla::Plugin::ManifestSkip 5.020 → 5.021
+ - Dist::Zilla::Plugin::MetaConfig 5.020 → 5.021
+ - Dist::Zilla::Plugin::MetaJSON 5.020 → 5.021
+ - Dist::Zilla::Plugin::MetaTests 5.020 → 5.021
+ - Dist::Zilla::Plugin::MetaYAML 5.020 → 5.021
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.020 → 5.021
+ - Dist::Zilla::Plugin::PodCoverageTests 5.020 → 5.021
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.020 → 5.021
+ - Dist::Zilla::Plugin::Prereqs 5.020 → 5.021
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled::All 1.000000 → 1.001000
+ - Dist::Zilla::Plugin::TestRelease 5.020 → 5.021
+ - Dist::Zilla::Plugin::UploadToCPAN 5.020 → 5.021
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001002 → 0.001003
+
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::EOLTests 0.02
+
+2.021000 2014-10-05T11:28:53Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::NextRelease 0.003000 → 0.004000
+
+2.020005 2014-10-03T07:04:22Z
+
+2.020004 2014-10-03T06:41:47Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.003004 → 0.003006
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease 0.002 → 0.003
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.003000 → 1.003001
+ - Dist::Zilla::Plugin::Twitter 0.025 → 0.026
+
+2.020003 2014-09-23T14:54:27Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.003002 → 0.003004
+
+2.020002 2014-09-20T21:00:28Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::Check 2.023 → 2.024
+ - Dist::Zilla::Plugin::Git::Commit 2.023 → 2.024
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.023 → 2.024
+ - Dist::Zilla::Plugin::Git::GatherDir 2.023 → 2.024
+ - Dist::Zilla::Plugin::Git::Tag 2.023 → 2.024
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled 0.002001 → 0.003001
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001003 → 0.001004
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0.002002 → 0.003000
+
+2.020001 2014-09-06T03:22:12Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.002002 → 0.003002
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.000005 → 1.001000
+ - Dist::Zilla::Plugin::Git::NextRelease 0.002012 → 0.003000
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.002000 → 1.003000
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.000004 → 2.001002
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.142250 → 0.142470
+ - Dist::Zilla::Plugin::Test::Kwalitee 2.08 → 2.11
+
+2.020000 2014-08-20T15:50:05Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.002001 → 0.002002
+
+2.019000 2014-08-18T03:48:49Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001 → 0.002001
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.001001 → 1.002000
+
+2.018000 2014-08-16T21:56:32Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Author::KENTNL::RecommendFixes 0.001001
+
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.000004 → 1.000005
+ - Dist::Zilla::Plugin::Git::Contributors 0.006 → 0.007
+ - Dist::Zilla::Plugin::Git::NextRelease 0.002011 → 0.002012
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.001000 → 1.001001
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.000003 → 2.000004
+ - Dist::Zilla::Plugin::PodWeaver 4.005 → 4.006
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled 0.002000 → 0.002001
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001002 → 0.001003
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0.002001 → 0.002002
+ - Dist::Zilla::Plugin::Test::Kwalitee 2.07 → 2.08
+ - Test::Kwalitee 1.19 → 1.22
+
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001001 → 0.001002
+
+2.017002 2014-08-15T20:54:32Z
+
+2.017001 2014-08-15T01:59:33Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::Contributors 0.004 → 0.006
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.142180 → 0.142250
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.018 → 0.019
+
+2.017000 2014-08-11T20:48:43Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Git::Contributors 0.004
+
+2.016008 2014-08-11T10:42:36Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.000003 → 1.000004
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.141760 → 0.142180
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001001 → 0.001002
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.017 → 0.018
+
+2.016007 2014-08-01T12:30:36Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.000001 → 1.001000
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.016 → 0.017
+
+2.016006 2014-07-30T04:27:01Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.019 → 5.020
+ - Dist::Zilla::Plugin::AutoPrereqs 5.019 → 5.020
+ - Dist::Zilla::Plugin::ConfirmRelease 5.019 → 5.020
+ - Dist::Zilla::Plugin::License 5.019 → 5.020
+ - Dist::Zilla::Plugin::MakeMaker 5.019 → 5.020
+ - Dist::Zilla::Plugin::Manifest 5.019 → 5.020
+ - Dist::Zilla::Plugin::ManifestSkip 5.019 → 5.020
+ - Dist::Zilla::Plugin::MetaConfig 5.019 → 5.020
+ - Dist::Zilla::Plugin::MetaJSON 5.019 → 5.020
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.000002 → 2.000003
+ - Dist::Zilla::Plugin::MetaTests 5.019 → 5.020
+ - Dist::Zilla::Plugin::MetaYAML 5.019 → 5.020
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.019 → 5.020
+ - Dist::Zilla::Plugin::PodCoverageTests 5.019 → 5.020
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.019 → 5.020
+ - Dist::Zilla::Plugin::Prereqs 5.019 → 5.020
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.014 → 0.016
+ - Dist::Zilla::Plugin::TestRelease 5.019 → 5.020
+ - Dist::Zilla::Plugin::UploadToCPAN 5.019 → 5.020
+
+2.016005 2014-07-27T06:49:27Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.000002 → 1.000003
+ - Dist::Zilla::Plugin::Git::NextRelease 0.002010 → 0.002011
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.000000 → 1.000001
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled 0.001000 → 0.002000
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001000 → 0.001001
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0.002000 → 0.002001
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.013 → 0.014
+ - Test::CPAN::Changes 0.28 → 0.30
+ - Test::Kwalitee 1.18 → 1.19
+ - Test::Pod::Coverage 1.08 → 1.10
+
+2.016004 2014-07-16T12:05:55Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 1.000001 → 1.000002
+
+2.016003 2014-07-15T09:01:30Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.000001 → 2.000002
+ - Dist::Zilla::Plugin::RunExtraTests 0.021 → 0.022
+
+2.016002 2014-07-13T06:25:05Z
+ [Changed / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001000 → 0.001001
+
+2.016001 2014-06-21T08:22:53Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Git::Check 2.022 → 2.023
+ - Dist::Zilla::Plugin::Git::Commit 2.022 → 2.023
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.022 → 2.023
+ - Dist::Zilla::Plugin::Git::GatherDir 2.022 → 2.023
+ - Dist::Zilla::Plugin::Git::Tag 2.022 → 2.023
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.141120 → 0.141760
+ - Test::CPAN::Changes 0.27 → 0.28
+
+2.016000 2014-06-06T07:53:47Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::CopyFilesFromBuild 0.103510
+
+2.015000 2014-06-03T05:21:36Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Authority
+ - Dist::Zilla::Plugin::AutoPrereqs 5.019
+ - Dist::Zilla::Plugin::BumpVersionAfterRelease 0.002
+ - Dist::Zilla::Plugin::ConfirmRelease 5.019
+ - Dist::Zilla::Plugin::EOLTests 0.02
+ - Dist::Zilla::Plugin::Git::Check 2.022
+ - Dist::Zilla::Plugin::Git::Commit 2.022
+ - Dist::Zilla::Plugin::Git::CommitBuild 2.022
+ - Dist::Zilla::Plugin::Git::GatherDir 2.022
+ - Dist::Zilla::Plugin::Git::NextRelease 0.002010
+ - Dist::Zilla::Plugin::Git::Tag 2.022
+ - Dist::Zilla::Plugin::GithubMeta 0.46
+ - Dist::Zilla::Plugin::License 5.019
+ - Dist::Zilla::Plugin::MakeMaker 5.019
+ - Dist::Zilla::Plugin::Manifest 5.019
+ - Dist::Zilla::Plugin::ManifestSkip 5.019
+ - Dist::Zilla::Plugin::MetaConfig 5.019
+ - Dist::Zilla::Plugin::MetaData::BuiltWith 1.000000
+ - Dist::Zilla::Plugin::MetaJSON 5.019
+ - Dist::Zilla::Plugin::MetaProvides::Package 2.000001
+ - Dist::Zilla::Plugin::MetaTests 5.019
+ - Dist::Zilla::Plugin::MetaYAML 5.019
+ - Dist::Zilla::Plugin::MinimumPerl 1.003
+ - Dist::Zilla::Plugin::PodCoverageTests 5.019
+ - Dist::Zilla::Plugin::PodSyntaxTests 5.019
+ - Dist::Zilla::Plugin::PodWeaver 4.005
+ - Dist::Zilla::Plugin::Prereqs::Recommend::MatchInstalled 0.001000
+ - Dist::Zilla::Plugin::ReadmeAnyFromPod 0.141120
+ - Dist::Zilla::Plugin::ReadmeFromPod 0.21
+ - Dist::Zilla::Plugin::RewriteVersion::Sanitized 0.001000
+ - Dist::Zilla::Plugin::RunExtraTests 0.021
+ - Dist::Zilla::Plugin::Test::CPAN::Changes 0.008
+ - Dist::Zilla::Plugin::Test::Compile::PerFile 0.002000
+ - Dist::Zilla::Plugin::Test::Kwalitee 2.07
+ - Dist::Zilla::Plugin::Test::MinimumVersion 2.000005
+ - Dist::Zilla::Plugin::Test::Perl::Critic 2.112410
+ - Dist::Zilla::Plugin::Test::ReportPrereqs 0.013
+ - Dist::Zilla::Plugin::TestRelease 5.019
+ - Dist::Zilla::Plugin::Twitter 0.025
+ - Dist::Zilla::Plugin::UploadToCPAN 5.019
+
+ [Added / develop suggests]
+ - Dist::Zilla::App::Command::bakeini 0.001000
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.7.2
+
+2.014001 2014-06-02T10:43:25Z
+
+2.014000 2014-05-31T22:25:17Z
+
+2.013005 2014-05-26T01:40:29Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.017 → 5.019
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.017 → 5.019
+ - Dist::Zilla::Plugin::Prereqs 5.017 → 5.019
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps 0.002 → 0.003
+
+2.013004 2014-05-17T15:32:46Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.015 → 5.017
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed 0.010 → 0.012
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.015 → 5.017
+ - Dist::Zilla::Plugin::Prereqs 5.015 → 5.017
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled::All v0.1.2 → 1.000000
+
+2.013003 2014-04-13T03:33:11Z
+
+2.013002 2014-04-12T19:23:55Z
+
+2.013001 2014-04-12T10:22:38Z
+
+2.013000 2014-04-11T03:02:57Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 0.04000002 → 1.000001
+
+2.012002 2014-03-31T04:16:46Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.014 → 5.015
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.014 → 5.015
+ - Dist::Zilla::Plugin::Prereqs 5.014 → 5.015
+
+2.012001 2014-03-17T18:59:57Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.012 → 5.014
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.012 → 5.014
+ - Dist::Zilla::Plugin::Prereqs 5.012 → 5.014
+
+2.012000 2014-01-30T08:12:10Z
+
+2.011001 2014-01-30T05:38:14Z
+
+2.011000 2014-01-29T21:19:25Z
+ [Changed / develop requires]
+ - Test::Kwalitee 1.17 → 1.18
+
+2.010001 2014-01-22T03:16:45Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.011 → 5.012
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.011 → 5.012
+ - Dist::Zilla::Plugin::Prereqs 5.011 → 5.012
+
+2.010000 2014-01-14T23:07:57Z
+ [Removed / develop requires]
+ - version 0.9906
+
+2.009000 2014-01-13T07:42:49Z
+
+2.008001 2014-01-12T22:12:04Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.010 → 5.011
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.010 → 5.011
+ - Dist::Zilla::Plugin::Prereqs 5.010 → 5.011
+
+2.008000 2014-01-12T11:21:22Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.009 → 5.010
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.009 → 5.010
+ - Dist::Zilla::Plugin::Prereqs 5.009 → 5.010
+
+2.007003 2014-01-08T03:36:44Z
+
+2.007002 2014-01-08T03:20:39Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.008 → 5.009
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.008 → 5.009
+ - Dist::Zilla::Plugin::Prereqs 5.008 → 5.009
+ - version 0.9904 → 0.9906
+
+2.007001 2013-12-29T09:10:42Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.006 → 5.008
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed 0.009 → 0.010
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.006 → 5.008
+ - Dist::Zilla::Plugin::Prereqs 5.006 → 5.008
+ - Test::CPAN::Changes 0.26 → 0.27
+
+2.007000 2013-12-01T11:42:18Z
+
+2.006001 2013-12-01T05:07:52Z
+
+2.6.0 2013-12-01T02:35:19Z
+
+2.005000 2013-11-29T19:31:25Z
+
+2.004002 2013-11-28T13:27:17Z
+
+2.004001 2013-11-22T09:04:57Z
+
+2.004000 2013-11-22T03:04:44Z
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.25 → 0.26
+
+2.003000 2013-11-22T00:30:56Z
+ [Changed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 0.04000001 → 0.04000002
+
+2.002001 2013-11-18T03:36:33Z
+
+2.002000 2013-11-11T11:09:48Z
+ [Changed / develop requires]
+ - Dist::Zilla 5.005 → 5.006
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.005 → 5.006
+ - Dist::Zilla::Plugin::Prereqs 5.005 → 5.006
+ - Pod::Coverage::TrustPod 0.100002 → 0.100003
+
+2.001000 2013-11-05T09:25:27Z
+ [Added / develop requires]
+ - Dist::Zilla 5.005
+ - Dist::Zilla::Plugin::Bootstrap::lib 0.04000001
+ - Dist::Zilla::Plugin::CheckPrereqsIndexed 0.009
+ - Dist::Zilla::Plugin::ModuleShareDirs 5.005
+ - Dist::Zilla::Plugin::Prereqs 5.005
+ - Dist::Zilla::Plugin::Prereqs::AuthorDeps 0.002
+ - Dist::Zilla::Plugin::Prereqs::MatchInstalled::All v0.1.2
+ - Dist::Zilla::Plugin::RemovePhasedPrereqs 0.002
+
+ [Changed / develop requires]
+ - Test::Kwalitee 1.15 → 1.17
+
+ [Removed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL 2.000000
+
+2.000000 2013-10-12T05:23:24Z
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.9.0 → 2.000000
+ - Test::CPAN::Changes 0.23 → 0.25
+
+1.9.0 2013-09-26T12:07:46Z
+ [Added / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.9.0
+
+ [Added / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.7.2
+
+ [Removed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.7.2
+
+ [Removed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.7.2
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.4
+
+1.8.4 2013-09-26T11:16:23Z
+ [Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite v1.3.0 → v1.7.2
+
+ [Changed / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0 → v1.7.2
+ - Test::Kwalitee 1.13 → 1.15
+ - version 0.9903 → 0.9904
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.3 → v1.8.4
+
+1.8.3 2013-08-30T20:30:21Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.2 → v1.8.3
+
+1.8.2 2013-08-30T20:05:35Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.1 → v1.8.2
+
+1.8.1 2013-08-22T16:56:50Z
+ [Added / develop requires]
+ - Test::Kwalitee 1.13
+
+ [Changed / develop requires]
+ - Test::CPAN::Changes 0.22 → 0.23
+ - version 0.9902 → 0.9903
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.0 → v1.8.1
+
+1.8.0 2013-08-08T00:57:13Z
+ [Changed / develop requires]
+ - Pod::Coverage::TrustPod 0 → 0.100002
+ - Test::CPAN::Changes 0.19 → 0.22
+ - Test::CPAN::Meta 0 → 0.23
+ - Test::Pod 1.41 → 1.48
+ - version 0.9901 → 0.9902
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.7 → v1.8.0
+
+1.7.7 2013-08-07T17:33:54Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.6 → v1.7.7
+
+1.7.6 2013-08-05T07:33:33Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.5 → v1.7.6
+
+1.7.5 2013-08-01T09:48:11Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.4 → v1.7.5
+
+1.7.4 2013-06-13T22:56:08Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.3 → v1.7.4
+
+1.7.3 2013-04-26T19:09:26Z
+ [Added / develop requires]
+ - Test::CPAN::Changes 0.19
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.3.0 → v1.7.3
+
+1.7.2 2013-04-03T02:39:06Z
+
+1.7.1 2013-03-13T13:31:16Z
+
+1.7.0 2013-01-25T04:24:14Z
+
+1.6.0 2012-11-10T13:31:13Z
+
+1.5.1 2012-11-04T16:03:42Z
+ [Added / develop requires]
+ - Pod::Coverage::TrustPod
+ - Test::CPAN::Meta
+ - Test::Pod 1.41
+ - Test::Pod::Coverage 1.08
+ - version 0.9901
+
+1.5.0 2012-08-08T02:56:12Z
+
+1.4.3 2012-07-28T20:37:33Z
+
+1.4.2 2012-07-07T15:40:38Z
+ [Removed / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib
+
+1.4.1
+
+1.4.0 2012-04-11T20:24:43Z
+
+1.3.1 2012-03-12T15:17:53Z
+ [Changed / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803 → v1.3.0
+
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.2.0 → v1.3.0
+
+1.3.0 2012-03-06T22:21:22Z
+
+1.2.1 2012-02-27T05:12:12Z
+
+1.2.0 2011-11-05T06:33:40Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.1.0 → v1.2.0
+
+1.1.1 2011-10-31T04:25:07Z
+
+1.1.0 2011-10-30T18:18:21Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0 → v1.1.0
+
+1.0.22 2011-10-07T21:14:49Z
+
+1.0.21 2011-09-10T20:26:52Z
+
+1.0.20 2011-09-10T19:45:36Z
+
+1.0.19 2011-09-06T19:42:54Z
+
+1.0.18 2011-09-02T10:03:50Z
+
+1.0.17 2011-08-29T19:54:39Z
+
+1.0.16 2011-08-28T07:59:59Z
+
+1.0.15 2011-08-23T21:48:10Z
+
+1.0.14 2011-07-18T21:23:49Z
+
+1.0.13 2011-07-17T01:06:15Z
+
+1.0.12 2011-07-12T09:57:41Z
+
+1.0.11 2011-07-11T04:56:38Z
+
+1.0.10 2011-07-11T03:41:19Z
+
+1.0.9 2011-06-13T23:50:29Z
+
+1.0.8 2011-06-12T22:41:51Z
+
+1.0.7 2011-04-24T13:45:19Z
+
+1.0.6 2011-04-13T13:15:49Z
+
+1.0.5 2011-04-03T15:21:54Z
+
+1.0.4 2011-04-03T12:08:53Z
+
+1.0.3 2011-04-03T01:00:33Z
+
+1.0.2 2011-02-07T14:53:13Z
+ [Added / develop recommends]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite 0.01009803
+
+ [Added / develop requires]
+ - Dist::Zilla::PluginBundle::Author::KENTNL::Lite
+
+ [Added / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.0.0
+
+ [Removed / develop recommends]
+ - Dist::Zilla::PluginBundle::KENTNL::Lite 0.01009803
+
+ [Removed / develop requires]
+ - Dist::Zilla::PluginBundle::KENTNL::Lite
+
+ [Removed / develop suggests]
+ - Dist::Zilla::PluginBundle::KENTNL v1.0.0
+
+1.0.1 2011-01-12T19:03:19Z
+ [Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::KENTNL 0.01017119 → v1.0.0
+
+1.000.000 2011-01-09T10:15:06Z
+
+0.01023312 2011-01-01T20:01:33Z
+
+0.01023311 2011-01-01T19:31:37Z
+
+0.01017322 2010-11-04T06:56:23Z
+
+0.01017122 2010-11-02T06:00:35Z
+ [Added / develop recommends]
+ - Dist::Zilla::PluginBundle::KENTNL::Lite 0.01009803
+
+ [Added / develop requires]
+ - Dist::Zilla::PluginBundle::KENTNL::Lite
+
+ [Added / develop suggests]
+ - Dist::Zilla::PluginBundle::KENTNL 0.01017119
+
+0.01017119 2010-11-02T03:50:49Z
+
+0.01010423 2010-08-28T07:47:18Z
+ [Added / develop requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib
+
+0.01009310 2010-08-16T18:13:54Z
+
+0.01008321 2010-08-07T05:56:23Z
+
+0.01007922 2010-08-03T06:25:33Z
+
+0.01007006 2010-07-24T14:40:46Z
+
+0.01006912 2010-07-23T20:56:10Z
+
+0.01002610 2010-06-11T18:44:05Z
+
+0.01002504 2010-06-10T12:10:51Z
+
+0.01002419 2010-06-10T03:38:51Z
+
+0.01002321 2010-06-09T05:13:23Z
+
+0.01002309 2010-06-08T17:47:53Z
+
+0.01001714 2010-06-02T22:11:42Z
+
+0.01001713 2010-06-02T21:04:31Z
+
+0.01001712 2010-06-02T20:54:05Z

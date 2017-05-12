@@ -1,0 +1,184 @@
+Revision history for Perl extension DBIx::DWIW.
+
+0.48  Jan 3, 2006
+
+    - fix missing $sth->finish reported by Jeffrey Friedl
+
+0.47  Jan 3, 2006
+
+    - fix syntax error that snuck out in last release!
+
+0.46  Jan 3, 2006
+
+    - catch additional error message for potential retry
+
+    - misc other cleanups merged in
+
+0.44  Oct 1, 2004
+
+    - now works with DBD::mysql v2.9000 and above
+
+0.43  Sep 26, 2004
+
+    - Oops, remove a debugging statement that had leaked into 0.42
+
+0.42  Sep 24, 2004
+
+    - Handle perl failures in a connect attempt (e.g. inability
+      to load an underlying module).
+
+0.41  Sep 13, 2004
+
+    - This release has separate Timeout and QueryTimeout args for the
+      Connect() method.
+
+0.40  Sep 08, 2004
+
+    - Various "internal" releases at Yahoo added some experimental
+      connection related stuff.  See ConnectTimeoutOverride,
+      ConnetTimeoutHook, ExecuteTimeoutHook, and PreConnectHook in the
+      code if you're interested.  It will remain undocumented for now.
+
+    - If Disconnect() is called and there's no valid handle, it
+      shouldn't be an error.  A connectionless object may exist and be
+      destroyed, which triggers a Disconnect() call in the destructor.
+
+0.36  Feb 26, 2004
+
+    - Setting $@ in Connect after $self was blessed didn't work, since
+      $self's DESTROY was overwriting $@. So, undef $self before
+      setting $@, and $@ actually remains available to the caller of
+      Connect.
+
+0.35  Feb 04, 2004
+
+    - Make code match documentation for the NoRetry option.  It only
+      affects the initial connection.
+
+    - RetryWait now retries immediately a few times, before pausing.
+      This provides faster re-connects to healthy servers.
+
+    - Fixed some doc misspellings and updated contributors list.
+
+0.34  Oct 20, 2003
+
+    - MySQL 4.1 will do something substantive with prepare().  This
+      update makes use of that by automatically calling
+      prepare_cached() from any Execute, Scalar, etc, called with a
+      query string and bind-args.  This tends to catch the calls
+      inside loops, while not affecting other calls.
+
+      Prepare() can still be used to manually cache the handle.
+
+0.33  Aug 21, 2003
+
+    - To match documentation as well as common expectations, Begin()
+      returns 1 if called while already in a transaction.  Now you can
+      do Begin() or die $@.
+
+0.32  Thu Apr 17, 2003
+
+    - fix bug in UNIQUE_KEY and %CurrentConnections which caused
+      connections not to be removed from the cache
+
+0.31  Fri Mar 21, 2003
+
+    - don't let RetryWait() get called when a transaction is running
+
+0.30  Wed Mar 19, 2003
+
+    - revert the deadlock changes in 0.29 since it can cause
+      unexpected behavior
+
+0.29  Thu Jan 30, 2003
+
+    - fix bug that cause cached connections not to be removed properly
+
+    - made sure that list-returning functions always return () rather
+      than undef
+
+    - added FlatArrayRef() for working with very large flat lists
+
+    - invoke the Retry/Wait logic on InnoDB deadlocks.
+
+    - revised format of the Changes file so it's easier to read and
+      edit.  It should be auto-generated, but the check-in messages
+      aren't always clear.
+
+0.28  Mon Nov 4, 2002
+
+    - fix class checking in Disconnect() too
+
+0.27  Mon Oct 28, 2002
+
+    - put class checking in Connect().  See the description of
+      Connect() fot details
+
+0.26  ???
+
+    - ???
+
+0.25  Thu Jun 6, 2002
+
+    - version bump for pause.cpan.org problem
+
+0.25  Thu Jun 6, 2002
+
+    -  added Begin(), Commit(), and Rollback() for safe transaction
+       handling
+
+    - cleaned up the output of Dump() so that it doesn't try to dump
+      keys with undef values.
+
+0.24  Mon Apr  8, 2002
+
+    - added Dump() method for debugging what's going on
+
+0.23  Fri Mar 29, 2002
+
+    - implement Timeout option in Connect() as documented
+
+0.22  Fri Mar 22 00:10:47 2002
+	- fixed Makefile.PL to depend on Time::HiRes
+
+0.21  Tue Mar 19 16:26:00 2002
+	- extended the Hash() method to act as an iterator in some cases
+
+0.20  Fri Mar 15 10:00:00 2002
+	- various updates missing between now and 0.14
+
+	- added and documented proxy and timeout support
+
+	- fixed a few stupid bugs and doc problems
+
+0.14  Fri Dec 14 16:05:00 2001
+	- allow generic sql queries to be passed sql with placeholders and
+		bind values
+
+0.13  Tue Nov 27 10:15:00 2001
+	- changed alias setting like *sub2 = *sub1 to *sub2 = \&sub1
+
+0.12  Wed Oct 24 09:51:57 2001
+	- Add Port connection parameter.
+
+0.11  Tue Oct 23 23:58:52 2001
+	- Improve "not connected" error messages.
+
+0.10  Wed Oct 16 11:07:41 2001
+	- I was dumb.
+
+0.09  Wed Oct 16 11:01:41 2001
+	- move DESTROY() code to Disconnect() where it belongs.
+
+0.08  Mon Oct 16 12:25:41 2001
+	- added a $sth->finish() call in DESTROY() for statements.
+
+0.07  Sun Oct 15 15:11:02 2001
+	- fix documentation bug in MyDBI.pm left over from earlier
+
+0.06  Sat Oct 14 22:01:22 2001
+	- first release to CPAN with lots of doc cleanups
+
+0.01  Fri Sep 14 13:58:52 2001
+	- original version; created by h2xs 1.21 with options
+		-X -n DBIx::DWIW

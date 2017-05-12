@@ -1,0 +1,33 @@
+---
+abstract: 'allows for basic data dumping and introspection.'
+author:
+  - "'Paul Seamons <paul@seamons.com>'"
+  - "'Russel Fisher <geistberg@gmail.com>'"
+build_requires:
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Debug
+requires:
+  B::Deparse: 0
+  Carp::Heavy: 0
+  Data::Dumper: 0
+  Exporter: 0
+  base: 0
+  perl: v5.8.0
+  strict: 0
+resources:
+  homepage: https://github.com/geistberg/Data-Debug
+  repository: https://github.com/geistberg/Data-Debug.git
+version: 0.04
+x_contributors:
+  - 'gbingham <gbingham@bluehost.com>'
+  - 'James Lance <james@thelances.net>'
+  - 'Jason Hall <jayce@lug-nut.com>'

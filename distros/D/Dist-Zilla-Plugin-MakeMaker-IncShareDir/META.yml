@@ -1,0 +1,32 @@
+---
+abstract: 'MakeMaker subclass that bundles File::ShareDir::Install in inc/'
+author:
+  - 'Tatsuhiko Miyagawa <miyagawa@bulknews.net>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.025
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-MakeMaker-IncShareDir
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  Dist::Zilla::Role::ModuleIncluder: 0
+  File::ShareDir::Install: 0
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir/issues
+  homepage: https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir
+  repository: https://github.com/miyagawa/Dist-Zilla-Plugin-MakeMaker-IncShareDir.git
+version: 0.01

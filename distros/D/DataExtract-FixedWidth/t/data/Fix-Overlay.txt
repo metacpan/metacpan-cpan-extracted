@@ -1,0 +1,2 @@
+id    name    team
+1     Amy is foobared She likes the bulls.   

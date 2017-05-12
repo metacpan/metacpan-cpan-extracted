@@ -1,0 +1,18 @@
+Revision history for DBD-Safe
+
+0.06    2012-07-19
+        - FETCH/STORE attributes doesn't call stay_connected()
+        - is_connected() now pings database once, not twice
+
+0.04    2010-11-30
+        - remove unneeded (now) eval
+        - add last_insert_id prototype
+
+0.03    2010-11-30
+	Improvements for the case when AutoCommit is off.
+
+0.02    2010-10-30
+        Add retry_cb, reconnect_cb options. Some transaction support.
+
+0.01    2010-09-30
+        First opensource release.

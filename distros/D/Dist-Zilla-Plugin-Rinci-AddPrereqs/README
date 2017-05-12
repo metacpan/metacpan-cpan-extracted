@@ -1,0 +1,36 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Rinci::AddPrereqs]
+
+DESCRIPTION
+
+    This plugin will search Rinci metadata in all modules and add prereqs
+    for the following:
+
+      * For every dependency mentioned in deps property in function
+      metadata, will add a prereq to Perinci::Sub::Dep::NAME.
+
+    This plugin will also search all Perinci::CmdLine-based scripts,
+    request metadata from all local Riap URI's used by the scripts, and add
+    prereqs for the above plus:
+
+      * Add prereq for the module specified in the Riap URL. So for example
+      if script refers to /Perinci/Examples/some_func, then a prerequisite
+      will be added for Perinci::Examples (unless it's from the same
+      distribution).
+
+      * For every entity mentioned in x.schema.entity or
+      x.schema.element_entity in function metadata, will add a prereq to
+      Perinci::Sub::ArgEntity::NAME.
+
+      * For every completion mentioned in x.completion or
+      x.element_completion in function metadata (which have the value of
+      [NAME, ARGS]), will add a prereq to corresponding
+      Perinci::Sub::XCompletion::NAME.
+
+SEE ALSO
+
+    Rinci
+

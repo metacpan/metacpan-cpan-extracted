@@ -1,0 +1,156 @@
+NAME
+    DBIx::ThinSQL::SQLite - add various functions to SQLite
+
+VERSION
+    0.0.17 (2017-01-04) Development release.
+
+SYNOPSIS
+        use DBIx::ThinSQL;
+        use DBIx::ThinSQL::SQLite
+            qw/create_functions
+               create_methods
+               create_sqlite_sequence/;
+
+        my $db = DBIx::ThinSQL->connect('dbi:SQLite:dbname=...');
+
+        # Call once only to initialize permanently
+        create_sqlite_sequence($db);
+
+        # Call after every connect to the database
+        create_functions( $db, qw/ debug create_sequence currval / );
+
+        # Call once every program run
+        create_methods(qw/create_sequence nextval/);
+
+        # Then use SQL functions or Perl methods as required
+        $db->do(q{ SELECT debug('logged via Log::Any->debug'); });
+        $db->do(q{ SELECT create_sequence('name'); });
+        $db->do(q{ SELECT nextval('name'); });
+        $db->create_sequence('othername');
+        $db->nextval('othername');
+
+DESCRIPTION
+    DBIx::ThinSQL::SQLite adds various functions to the SQL syntax
+    understood by SQLite, using the *sqlite_create_function()* and
+    *sqlite_create_aggregate_function()* methods of DBD::SQLite. It also
+    adds sequence methods to DBIx::ThinSQL database handles.
+
+    The following functions are exported on request:
+
+    create_sqlite_sequence( $dbh )
+        [DEPRECIATED - no longer required]
+
+        Ensure that the "sqlite_sequence" table exists. This function must
+        be called on the database (once only - the changes are permanent)
+        before any of the other sequence related functions or methods will
+        work.
+
+        This function works by creating (and dropping) a table with an
+        "INTEGER PRIMARY KEY AUTOINCREMENT" definition. If you are using the
+        sequence support from this module you probably don't want to be
+        creating your own tables with the autoincrement feature, as it may
+        clash with this module.
+
+    create_functions( $dbh, @functions )
+        Add @functions to the SQL understood by SQLite for the database
+        handle $dbh. @functions can be any combination of the following:
+
+        debug( @items )
+            This function called from SQL context logs @items with a
+            "debug()" call to a Log::Any instance. If the first item of
+            @items begins with "/^select/i" then that statement will be run
+            and the result logged using "log_debug" from DBIx::ThinSQL
+            instead.
+
+        warn( @items )
+            This function called from SQL context logs @items using Perl's
+            "warn" function. If the first item of @items begins with
+            "/^select/i" then that statement will be run using the current
+            handle and the result warned instead.
+
+        create_sequence( $name )
+            Create a sequence in the database with name $name.
+
+        nextval( $name ) -> Int
+            Advance the sequence to its next value and return that value.
+
+        currval( $name ) -> Int
+            Return the current value of the sequence.
+
+        If Digest::SHA is installed then the following functions can also be
+        created.
+
+        sha1( $expr, ... ) -> bytes
+            Calculate the SHA digest of $expr and return it in a 20-byte
+            binary form. Unfortunately it seems that the underlying SQLite C
+            sqlite_create_function() provides no way to identify the result
+            as a blob, so you must always manually cast the result in SQL
+            like so:
+
+                CAST(sha1(SQLITE_EXPRESSION) AS blob)
+
+        sha1_hex( $expr, ... ) -> hexidecimal
+            Calculate the SQLite digest of $expr and return it in a
+            40-character hexidecimal form.
+
+        sha1_base64( $expr, ... ) -> base64
+            Calculate the SQLite digest of $expr and return it in a base64
+            encoded form.
+
+        agg_sha1( $expr, $sort_expr ) -> bytes
+        agg_sha1_hex( $expr, $sort_expr ) -> hexidecimal
+        agg_sha1_base64( $expr, $sort_expr ) -> base64
+            These aggregate functions are for use with statements using
+            GROUP BY. $expr is the expression on which to calculate the SHA1
+            hash, and $sort_expr determines the (string) comparison order in
+            which $expr is fed to the SHA1 stream.
+
+        Note that user-defined SQLite functions are only valid for the
+        current session. They must be created each time you connect to the
+        database. You can have this happen automatically at connect time by
+        taking advantage of the DBI "Callbacks" attribute:
+
+            my $db = DBI::ThinSQL->connect(
+                $dsn, undef, undef,
+                {
+                    Callbacks => {
+                        connected => sub {
+                            my $dbh = shift;
+                            create_functions( $dbh,
+                                qw/debug nextval/ );
+                          }
+                    },
+
+                }
+            );
+
+    create_methods( @methods )
+        Add @methods to the DBIx::ThinSQL::db class which can be any
+        combination of the following:
+
+        create_sequence( $name )
+            Create a sequence in the database with name $name.
+
+        nextval( $name ) -> Int
+            Advance the sequence to its next value and return that value.
+
+        currval( $name ) -> Int
+            Return the current value of the sequence.
+
+        These methods are added to a Perl class and are therefore available
+        to any DBIx::ThinSQL handle.
+
+SEE ALSO
+    Log::Any
+
+AUTHOR
+    Mark Lawrence <nomad@null.net>
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2013-2014 Mark Lawrence <nomad@null.net>
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of the GNU General Public License as published by the
+    Free Software Foundation; either version 3 of the License, or (at your
+    option) any later version.
+

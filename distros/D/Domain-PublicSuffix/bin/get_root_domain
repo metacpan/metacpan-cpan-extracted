@@ -1,0 +1,97 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use Domain::PublicSuffix;
+
+my $domain_name = shift(@ARGV);
+usage('Requires a domain name to continue.') unless ( $domain_name );
+
+my $suffix = Domain::PublicSuffix->new();
+
+printf( "%12s: %s\n", 'Domain', $domain_name );
+my $root_domain = $suffix->get_root_domain($domain_name);
+
+if ( $suffix->error ) {
+    printf( "%12s: %s\n", 'Error',       $suffix->error );
+    exit(1);
+} else {
+    printf( "%12s: %s\n", 'Root Domain', $root_domain );
+    printf( "%12s: %s\n", 'Suffix',      $suffix->suffix );
+    printf( "%12s: %s\n", 'TLD',         $suffix->tld );
+}
+
+sub usage {
+	my ( $error ) = @_;
+	
+	print "get_root_domain - Domain::PublicSuffix " . $Domain::PublicSuffix::VERSION . "\n";
+	print "Usage: get_root_domain <domainname>\n";
+	
+	exit(1);
+}
+
+1;
+
+__END__
+
+=head1 NAME
+
+get_root_domain - Retrieve suffix info from a domain using Domain::PublicSuffix
+
+=head1 DESCRIPTION
+
+The get_root_domain utility uses Domain::PublicSuffix to get the root or
+suffix for a fully qualified domain name. Given a FQDN, this utility will output
+the "root domain", and the suffix and TLD used to calculate that root domain.
+
+=over
+
+=item * Public Info Site: 
+
+L<http://publicsuffix.org/>
+
+=back
+
+=head1 SYNOPSIS
+
+get_root_domain <domainname>
+
+=head1 EXAMPLE USAGE
+
+=over
+
+$ get_root_domain www.google.com
+      Domain: www.google.com
+ Root Domain: google.com
+      Suffix: com
+         TLD: com
+
+$ get_root_domain www.google.co.uk
+      Domain: www.google.co.uk
+ Root Domain: google.co.uk
+      Suffix: co.uk
+         TLD: uk
+
+
+=back
+
+=head1 RETURN VALUES
+
+Returns 0 if a successful lookup is done, non-zero otherwise.
+
+=head1 SEE ALSO
+
+Domain::PublicSuffix(3pm)
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-domain-publicsuffix at rt.cpan.org>,
+or through the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Domain-PublicSuffix>.
+I will be notified, and then you'll automatically be notified of progress on
+your bug as I make changes.
+
+=head1 LICENSE
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=cut

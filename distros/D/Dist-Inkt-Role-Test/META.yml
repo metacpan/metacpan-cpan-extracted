@@ -1,0 +1,58 @@
+---
+abstract: 'run various tests on a distribution at build time'
+author:
+  - 'Toby Inkster (TOBYINK) <tobyink@cpan.org>'
+build_requires:
+  Test::More: '0.96'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+dynamic_config: 0
+generated_by: 'Dist::Inkt::Profile::TOBYINK version 0.018, CPAN::Meta::Converter version 2.140640'
+keywords: []
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Inkt-Role-Test
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - t
+    - xt
+optional_features: {}
+provides:
+  Dist::Inkt::Role::Test:
+    file: lib/Dist/Inkt/Role/Test.pm
+    version: '0.002'
+  Dist::Inkt::Role::Test::BumpedVersion:
+    file: lib/Dist/Inkt/Role/Test/BumpedVersion.pm
+    version: '0.002'
+  Dist::Inkt::Role::Test::SaneVersions:
+    file: lib/Dist/Inkt/Role/Test/SaneVersions.pm
+    version: '0.002'
+  Dist::Inkt::Role::Test::TestSuite:
+    file: lib/Dist/Inkt/Role/Test/TestSuite.pm
+    version: '0.002'
+requires:
+  App::Prove: '0'
+  File::chdir: '0'
+  HTTP::Tiny: '0'
+  JSON::PP: '0'
+  Module::Metadata: '0'
+  Moose::Role: '0'
+  Path::Iterator::Rule: '0'
+  Path::Tiny: '0'
+  Try::Tiny: '0'
+  Types::Standard: '0'
+  namespace::autoclean: '0'
+  perl: '5.010001'
+  version: '0.86'
+resources:
+  Identifier: http://purl.org/NET/cpan-uri/dist/Dist-Inkt-Role-Test/project
+  bugtracker: http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Test
+  homepage: https://metacpan.org/release/Dist-Inkt-Role-Test
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/tobyink/p5-dist-inkt-role-test.git
+version: '0.002'

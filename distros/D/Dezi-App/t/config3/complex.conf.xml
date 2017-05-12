@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with Dezi::Indexer::Config ver2_to_ver3()  -->
+<swish>
+ <MetaNames>
+  <advocate alias_for="publisher" />
+  <author bias="10" />
+  <publisher bias="-10" />
+  <writer alias_for="author" />
+ </MetaNames>
+ <PropertyNames>
+  <author />
+  <caseSensitiveTag ignore_case="0" />
+  <datetag type="date" />
+  <limlentag max="100" sort_length="10" />
+  <limsorttag max="100" sort_length="10" />
+  <maxlength alias_for="limlentag" />
+  <numerictag type="int" />
+  <publisher ignore_case="1" />
+  <verbatimtag verbatim="1" />
+  <writer alias_for="author" />
+ </PropertyNames>
+ <Index>
+  <Format>Native</Format>
+ </Index>
+</swish>

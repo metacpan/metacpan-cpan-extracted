@@ -1,0 +1,43 @@
+---
+abstract: 'Collect interesting pages a user has visited in the session'
+author:
+  - 'Peter Mottram (SysPete) <peter@sysnix.com>'
+build_requires:
+  File::Path: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  JSON::MaybeXS: '0'
+  Plack: '1.0031'
+  Test::Fatal: '0'
+  Test::More: '0.94'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-PageHistory
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Dancer2: '0.200000'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin: '0'
+  Data::Structure::Util: '0.16'
+  Moo: '2.000'
+  Scalar::Util: '0'
+  Sub::Quote: '0'
+  URI: '0'
+  namespace::clean: '0'
+  perl: '5.006'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  bugtracker: https://github.com/SysPete/Dancer2-Plugin-PageHistory/issues
+  repository: https://github.com/SysPete/Dancer2-Plugin-PageHistory
+version: '0.210'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

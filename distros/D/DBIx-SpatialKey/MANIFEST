@@ -1,0 +1,10 @@
+README
+Changes
+MANIFEST
+COPYING
+Makefile.PL
+t/00_load.t
+t/01_bmor.t
+SpatialKey.pm
+SpatialKey.xs
+META.yml                                 Module meta-data (added by MakeMaker)

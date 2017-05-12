@@ -1,0 +1,45 @@
+NAME
+
+  DBD::mysqlPPrawSjis - Pure Perl MySQL driver for raw ShiftJIS
+
+SYNOPSIS
+
+    use DBI;
+    $dbh = DBI->connect('dbi:mysqlPPrawSjis:test',...);
+
+DESCRIPTION
+
+  DBD::mysqlPPrawSjis is a Pure Perl MySQL dirver for the Perl5
+  Database Interface(DBI) for raw Sjis data.
+  This software is made based on DBD::mysqlPP of Hiroyuki OYAMA
+  and Takuya Tsuchida.
+
+  Using this software and Sjis software, you can store ShiftJIS
+  literal into MySQL database without code conversion at all.
+  How nifty!
+
+INSTALLATION
+
+  1. Copy DBD/mysqlPPrawSjis.pm to @INC directory.
+
+DEPENDENCIES
+
+This software requires perl5.00503 or later. And requires these other
+modules and libraries:
+
+  DBI
+  Net::MySQL
+
+LICENSE AND COPYRIGHT
+
+This software is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself. See perlartistic.
+
+This software is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+MAINTAINER
+
+This project was originated by INABA Hitoshi <ina@cpan.org>.
+

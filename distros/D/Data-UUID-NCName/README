@@ -1,0 +1,228 @@
+NAME
+    Data::UUID::NCName - Make valid NCName tokens which are also UUIDs
+
+VERSION
+    Version 0.01
+
+SYNOPSIS
+        use Data::UUID::NCName qw(:all);
+
+        my $uuid = '1ff916f3-6ed7-443a-bef5-f4c85f18cd10';
+        my $ncn  = to_ncname($uuid);
+
+        # $ncn is now "EH_kW827XQ6vvX0yF8YzRA".
+
+        # from Test::More, this will output 'ok':
+        is(from_ncname($ncn), $uuid, 'Decoding result matches original');
+
+DESCRIPTION
+    The purpose of this module is to devise an alternative representation of
+    the UUID which conforms to the constraints of various other identifiers
+    such as NCName, and create an isomorphic mapping between them.
+
+RATIONALE & METHOD
+    The UUID is a generic identifier which is large enough to be globally
+    unique. This makes it useful as a canonical name for data objects in
+    distributed systems, especially those that cross administrative
+    jurisdictions, such as the World-Wide Web. The representation, however,
+    of the UUID, precludes it from being used in many places where it would
+    be useful to do so.
+
+    In particular, there are grammars for many types of identifiers which
+    must not begin with a digit. Others are case-insensitive, or prohibited
+    from containing hyphens (present in both the standard notation and
+    Base64URL), or indeed anything outside of `^[A-Za-z_][0-9A-Za-z_]*$'.
+
+    The hexadecimal notation of the UUID has a 5/8 chance of beginning with
+    a digit, Base64 has a 5/32 chance, and Base32 has a 3/16 chance. As
+    such, the identifier must be modified in such a way as to guarantee
+    beginning with an alphabetic letter (or underscore `_', but some
+    grammars even prohibit that, so we omit it as well).
+
+    While it is conceivable to simply add a padding character, there are a
+    few considerations which make it more appealing to derive the initial
+    character from the content of the UUID itself:
+
+    *   UUIDs are large (128-bit) identifiers as it is, and it is
+        undesirable to add meaningless syntax to them if we can avoid doing
+        so.
+
+    *   128 bits is an inconvenient number for aligning to both Base32 (130)
+        and Base64 (132), though 120 divides cleanly into 5, 6 and 8.
+
+    *   The 13th quartet, or higher four bits of the
+        `time_hi_and_version_field' of the UUID is constant, as it indicates
+        the UUID's version. If we encode this value using the scheme common
+        to both Base64 and Base32, we get values between `A' and `P', with
+        the valid subset between `B' and `F'.
+
+    Therefore: extract the UUID's version quartet, shift all subsequent data
+    4 bits to the left, zero-pad to the octet, encode with either
+    *base64url* or *base32*, truncate, and finally prepend the encoded
+    version character. Voilà, one token-safe UUID.
+
+APPLICATIONS
+    XML IDs
+        The `ID' production appears to have been constricted, inadvertently
+        or otherwise, from Name in both the XML 1.0 and 1.1 specifications,
+        to NCName by XML Schema Part 2. This removes the colon character `:'
+        from the grammar. The net effect is that
+
+            <foo id="urn:uuid:b07caf81-baae-449d-8a2e-48c0f5fa5538"/>
+
+        while being a *well-formed* ID *and* valid under DTD validation, is
+        *not* valid per XML Schema Part 2 or anything that uses it (e.g.
+        Relax NG).
+
+    RDF blank node identifiers
+        Blank node identifiers in RDF are intended for serialization, to act
+        as a handle so that multiple RDF statements can refer to the same
+        blank node. The RDF abstract syntax specifies that the validity
+        constraints of blank node identifiers be delegated to the concrete
+        syntax specifications. The RDF/XML syntax specification lists the
+        blank node identifier as NCName. However, according to the Turtle
+        spec, this is a valid blank node identifier:
+
+            _:42df00ec-30a2-431f-be9e-e3a612b325db
+
+        despite an older version listing a production equivalent to the more
+        conservative NCName. NTriples syntax is even more constrained, given
+        as `[A-Za-z][0-9A-Za-z]*'.
+
+    Generated symbols
+            There are only two hard things in computer science: cache
+            invalidation and naming things [and off-by-one errors].
+
+            -- Phil Karlton [extension of unknown origin]
+
+        Suppose you wanted to create a literate programming system (I do).
+        One of your (my) stipulations is that the symbols get defined in the
+        *prose*, rather than the *code*. However, you (I) still want to be
+        able to validate the code's syntax, and potentially even run the
+        code, without having to commit to naming anything. You are (I am)
+        also interested in creating a global map of classes, datatypes and
+        code fragments, which can be operated on and tested in isolation,
+        ported to other languages, or transplanted into the more
+        conventional packages of programs, libraries and frameworks. The
+        Base32 UUID NCName representation should be adequate for placeholder
+        symbols in just about any programming language, save for those which
+        do not permit identifiers as long as 26 characters (which are
+        extremely scarce).
+
+EXPORT
+    No subroutines are exported by default. Be sure to include at least one
+    of the following in your `use' statement:
+
+    :all
+        Import all functions.
+
+    :decode
+        Import decode-only functions.
+
+    :encode
+        Import encode-only functions.
+
+    :32 Import base32-only functions.
+
+    :64 Import base64-only functions.
+
+SUBROUTINES
+  to_ncname $UUID [, $RADIX ]
+    Turn `$UUID' into an NCName. The UUID can be in the canonical
+    (hyphenated) hexadecimal form, non-hyphenated hexadecimal, Base64
+    (regular and base64url), or binary. The function returns a legal NCName
+    equivalent to the UUID, in either Base32 or Base64 (url), given a
+    specified `$RADIX' of 32 or 64. If the radix is omitted, Base64 is
+    assumed.
+
+  from_ncname $NCNAME [, $FORMAT, $RADIX ]
+    Turn an appropriate `$NCNAME' back into a UUID, where *appropriate*,
+    unless overridden by `$RADIX', is defined beginning with one initial
+    alphabetic letter (A to Z, case-insensitive) followed by either:
+
+    25 Base32 characters, or
+    21 Base64URL characters.
+
+    The function will return `undef' immediately if it cannot match either
+    of these patterns. Input past the 21-character mark (for Base64) or
+    25-character mark (for Base32) is ignored.
+
+    This function returns a UUID of type `$FORMAT', which if left undefined,
+    must be one of the following:
+
+    str The canonical UUID format, like so:
+        `33fcc995-5d10-477e-a9b4-c9cc405bbf04'. This is the default.
+
+    hex The same thing, minus the hyphens.
+
+    b64 Base64.
+
+    bin A binary string.
+
+  to_ncname_64 $UUID
+    Shorthand for Base64 NCNames.
+
+  from_ncname_64 $NCNAME [, $FORMAT ]
+    Ditto.
+
+  to_ncname_32 $UUID
+    Shorthand for Base32 NCNames.
+
+  from_ncname_32 $NCNAME [, $FORMAT ]
+    Ditto.
+
+AUTHOR
+    Dorian Taylor, `<dorian at cpan.org>'
+
+BUGS
+    Please report any bugs or feature requests to `bug-data-uuid-ncname at
+    rt.cpan.org', or through the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-UUID-NCName. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Data::UUID::NCName
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-UUID-NCName
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/Data-UUID-NCName
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/Data-UUID-NCName
+
+    * Search CPAN
+        http://search.cpan.org/dist/Data-UUID-NCName/
+
+SEE ALSO
+    Data::UUID
+    OSSP::uuid
+    RFC 4122
+    RFC 4648
+    Namespaces in XML (NCName)
+    W3C XML Schema Definition Language (XSD) 1.1 Part 2: Datatypes (ID)
+    RDF/XML Syntax Specification (Revised)
+    Turtle
+
+    This module lives under the `Data::' namespace for the purpose of
+    hygiene. It *does not* depend on Data::UUID or any other UUID modules.
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Dorian Taylor.
+
+    Licensed under the Apache License, Version 2.0 (the "License"); you may
+    not use this file except in compliance with the License. You may obtain
+    a copy of the License at http://www.apache.org/licenses/LICENSE-2.0 .
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+

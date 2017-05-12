@@ -1,0 +1,40 @@
+Revision history for Device-LaCrosse-WS23xx
+
+0.10    Mon 2016-01-04
+        - bug 110898: fix perl 5.20  "Possible precedence issue" gripe
+
+0.08    Sat 2010-12-25
+	- bug 41461: handle occasional garbage BCD from device.
+
+0.07	Sat 2010-12-11
+	- POD: document default cache values
+        - improve error handling on bad timestamps (eg after device reset)
+
+0.06	Thu 2008-01-03
+	Properly implement destructor.  This lets you undef the $ws
+	object to invoke other Open2300 tools without having to exit,
+	e.g. to invoke a rain-reset at midnight.
+
+	- close(): release the flock
+	- major duh: destructor is named DESTROY(), not DELETE().
+	- test suite: another way to handle time zone differences
+
+0.05	Fri 2007-11-16
+	- test suite: explicitly set time zone
+
+0.04	Fri 2007-11-16
+	- WS23xx.xs : add #include needed by Solaris
+
+0.03	Mon 2007-11-05
+	- _ws_reset() : sometimes we get a '0' back.  Ignore it.
+	- canonicalize() : 'xxx_datetime' was not being parsed
+	  properly.  Thanks to morten bjoernsvik at yahoo dot no
+	  for pointing out.
+
+0.02	Wed 2007-10-31
+	- implemented destructor + close()
+	- for CPAN testing: explicitly require 5.6; disallow building
+	  on Windows; add #include needed by Solaris.
+
+0.01	Sun 2007-10-28
+        - Initial CPAN release

@@ -1,0 +1,18 @@
+---
+abstract: 'Ask your data not what it is, but what it can do for your program'
+author:
+  - 'Matt S. Trout (mst) <mst@shadowcat.co.uk> http://www.shadowcat.co.uk/'
+distribution_type: module
+generated_by: 'Module::Install version 0.79'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-CapabilityBased
+no_index:
+  directory:
+    - inc
+    - t
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001000

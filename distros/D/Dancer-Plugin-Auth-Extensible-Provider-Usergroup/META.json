@@ -1,0 +1,54 @@
+{
+   "abstract" : "authenticate as a member of a group",
+   "author" : [
+      "Henk van Oers <hvo.pm@xs4all.nl>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.84, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-Auth-Extensible-Provider-Usergroup",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.3118",
+            "Dancer::Plugin::Auth::Extensible" : "0",
+            "Dancer::Plugin::DBIC" : "0",
+            "Dancer::Plugin::Passphrase" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hvoers/Dancer-Plugin-Auth-Extensible-Provider-Usergroup/issues"
+      },
+      "homepage" : "https://github.com/hvoers/Dancer-Plugin-Auth-Extensible-Provider-Usergroup/",
+      "repository" : {
+         "url" : "https://github.com/hvoers/Dancer-Plugin-Auth-Extensible-Provider-Usergroup"
+      }
+   },
+   "version" : "0.21"
+}

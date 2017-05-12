@@ -1,0 +1,19 @@
+---
+name: Data-Taxonomy-Tags
+version: 0.05
+author:
+  - 'Thomas Sibley, http://zulutango.org:82/'
+abstract: Easy management of a set of tags for any item
+license: perl
+requires:
+  constant: 0
+  overload: 0
+build_requires:
+  Test::More: 0
+provides:
+  Data::Taxonomy::Tags:
+    file: lib/Data/Taxonomy/Tags.pm
+    version: 0.05
+  Data::Taxonomy::Tags::Tag:
+    file: lib/Data/Taxonomy/Tags/Tag.pm
+generated_by: Module::Build version 0.2611

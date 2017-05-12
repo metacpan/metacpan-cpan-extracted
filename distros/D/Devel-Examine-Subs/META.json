@@ -1,0 +1,61 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Examine-Subs",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Mock::Sub" : "1.06",
+            "Test::More" : "0",
+            "Test::Trap" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Cwd" : "0",
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::Compare" : "0",
+            "Data::Dumper" : "0",
+            "File::Basename" : "0",
+            "File::Edit::Portable" : "1.24",
+            "PPI" : "0",
+            "Symbol" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/stevieb9/devel-examine-subs/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/stevieb9/devel-examine-subs.git",
+         "web" : "https://github.com/stevieb9/devel-examine-subs"
+      }
+   },
+   "version" : "1.69"
+}

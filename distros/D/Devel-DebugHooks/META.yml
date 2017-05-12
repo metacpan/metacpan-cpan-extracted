@@ -1,0 +1,61 @@
+---
+abstract: 'Hooks for perl debugger'
+author:
+  - 'Eugen Konkov <kes-kes@yandex.ru>'
+build_requires:
+  Data::Section::Simple: '0'
+  Test::CheckDeps: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  Test::Output: '0'
+configure_requires:
+  Module::Build: '0'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.422, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-DebugHooks
+provides:
+  Apache::DB:
+    file: lib/Apache/DB.pm
+    version: '0.14'
+  DB::Error:
+    file: lib/Devel/DebugHooks.pm
+  Devel::DebugHooks:
+    file: lib/Devel/DebugHooks.pm
+    version: '0.04'
+  Devel::DebugHooks::Commands:
+    file: lib/Devel/DebugHooks/Commands.pm
+  Devel::DebugHooks::KillPrint:
+    file: lib/Devel/DebugHooks/KillPrint.pm
+  Devel::DebugHooks::Server:
+    file: lib/Devel/DebugHooks/Server.pm
+  Devel::DebugHooks::Terminal:
+    file: lib/Devel/DebugHooks/Terminal.pm
+  Devel::DebugHooks::TraceAccess:
+    file: lib/Devel/DebugHooks/TraceAccess.pm
+  Devel::DebugHooks::TraceCall:
+    file: lib/Devel/DebugHooks/TraceCall.pm
+  Devel::DebugHooks::Verbose:
+    file: lib/Devel/DebugHooks/Verbose.pm
+  Logger:
+    file: lib/Devel/DebugHooks/TraceAccess.pm
+recommends:
+  IO::Async::Loop: '0'
+  Log::Log4perl: '0'
+requires:
+  B::Deparse: '0'
+  Data::Dump: '0'
+  Package::Stash: '0'
+  PadWalker: '0'
+  Scope::Cleanup: '0'
+  Sub::Metadata: '0'
+  perl: v5.12.0
+resources:
+  IRC: irc://irc.perl.org/#debughooks
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/KES777/Devel-DebugHooks
+version: '0.04'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

@@ -1,0 +1,34 @@
+--- 
+abstract: Modified and extended debugging facilities
+author: 
+  - H.Merijn Brand <h.m.brand@xs4all.nl>
+build_requires: 
+  perl: '5.008'
+configure_requires: 
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: Author, CPAN::Meta::Converter version 2.150005
+license: perl
+meta-spec: 
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Peek
+provides: 
+  Data::Peek: 
+    file: Peek.pm
+    version: '0.46'
+recommends: 
+  Data::Dumper: '2.160'
+  Perl::Tidy: 0
+  Test::More: '1.302015'
+requires: 
+  Data::Dumper: 0
+  DynaLoader: 0
+  Test::More: '0.88'
+  Test::NoWarnings: 0
+  perl: '5.008'
+resources: 
+  IRC: irc://irc.perl.org/#csv
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/Tux/Data-Peek
+version: '0.46'

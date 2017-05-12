@@ -1,0 +1,17 @@
+---
+name: Data-SimplePaginator
+version: 0.5
+author:
+  - 'Jonathan Buhacoff <jonathan@buhacoff.net>'
+abstract: "data pagination without assumptions (I think)"
+license: perl
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2
+provides:
+  Data::SimplePaginator:
+    file: lib/Data/SimplePaginator.pm
+    version: 0.5
+resources:
+  license: http://dev.perl.org/licenses/

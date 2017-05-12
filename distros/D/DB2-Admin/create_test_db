@@ -1,0 +1,53 @@
+#!/usr/bin/perl
+#
+# create_test_db - Create a test database for the DB2::Admin test suite
+#
+# $Id: create_test_db,v 165.1 2009/04/22 14:05:49 biersma Exp $
+#
+
+use strict;
+
+foreach my $var (qw(DB2_VERSION DB2INSTANCE)) {
+    next if (defined $ENV{$var});
+    die "Environment variable '$var' not set";
+}
+
+my $version = substr($ENV{DB2_VERSION}, 1); # Vx.y -> x.y
+
+#
+# Create the SAMPLE database using the IBM-supplied 'db2sampl' script.
+# On DB2 V9., create the XML content as well.
+#
+my @call = ('db2sampl');
+if ($version >= 9) {
+    push @call, qw(-sql -xml -force);
+}
+system(@call);
+
+#
+# Connect to the database and create additional tables
+#
+my $fname = "/tmp/commands.sql";
+open(COMMANDS, '>', $fname) ||
+  die "Cannot open '$fname' for output: $!";
+print COMMANDS <<'_END_COMMANDS_';
+connect to sample;
+update db cfg using trackmod yes logretain yes;
+
+create table sales2 like sales;
+create table emp_photo_2 like emp_photo;
+create table sales2_ex like sales;
+alter table sales2_ex add column exception_time timestamp;
+alter table sales2_ex add column exception_msg clob(32768);
+_END_COMMANDS_
+;
+
+if ($version >= 9) {
+    print COMMANDS <<'_END_XML_COMMANDS_';
+create table product2 like product;
+_END_XML_COMMANDS_
+    ;
+}
+close(COMMANDS);
+
+system("db2", "-tvf", $fname);

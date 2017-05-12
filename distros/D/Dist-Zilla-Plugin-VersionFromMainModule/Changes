@@ -1,0 +1,8 @@
+0.02     2017-01-08
+
+- Modules with UTF-8 anywhere caused the plugin the to die.
+
+
+0.01     2017-01-08
+
+- First release upon an unsuspecting world.

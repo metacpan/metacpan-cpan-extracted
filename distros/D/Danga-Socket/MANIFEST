@@ -1,0 +1,12 @@
+CHANGES
+Danga-Socket.spec
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+lib/Danga/Socket.pm
+t/00-use.t
+t/05-postloop.t
+t/10-events.t
+t/12-closerace.t
+examples/subprocess/example.pl
+examples/subprocess/test.pl

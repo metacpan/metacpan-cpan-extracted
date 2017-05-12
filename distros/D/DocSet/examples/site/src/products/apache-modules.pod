@@ -1,0 +1,71 @@
+=head1 NAME
+
+Apache/Perl Modules
+
+=head1 Description
+
+On CPAN you will be able to find a number of Perl modules created to
+run under mod_perl. We will give a presentation of them here and ways
+to get at these modules.
+
+Apache/Perl modules are somewhat different from the many others found
+on CPAN (http://www.cpan.org/).  Most Perl modules are "building
+blocks"; developers use them to build applications or even more
+building blocks.  It just so happens that Apache/Perl modules are
+encapsulted inside a namespace and I<.pm> file.  However, this does
+not make them all building blocks, many are just like Apache modules
+written in C: you install them, edit the server configuration files
+and you're done.
+
+Before you start a new module, consider this: Apache/Perl modules are
+useless outside of mod_perl and Apache.  Do your best to design such
+that your C<Apache::*> module will make good use of the building
+blocks found on CPAN, putting together new building blocks where
+appropriate and simply glue them together with the Apache API, keeping
+the C<Apache::*> modules very small.
+
+These modules will also serve as good examples, showing you where
+modules can step in during a stage of a request with C<Perl*Handler>
+callbacks.  You'll also see how and when to use the Apache API
+methods.
+
+
+=head1 Playing Your Part
+
+Apache and Perl are world-wide collaborative efforts; naturally, the
+Apache/Perl integration project is the same.  You've started on the
+right foot simply by reading this document, thanks! Please make sure
+you've read the main Perl module list at
+http://www.cpan.org/modules/00modlist.long.html, all that is said
+there is relevant here!
+
+If you wish to share your module(s) in the Perl way, by putting them
+on CPAN, send a request to modules@perl.org to get set up with a PAUSE
+user id and directory. See http://www.cpan.org/modules/04pause.html
+for more details.
+
+B<HINT>:  For a nice set of template files try this:
+
+  % h2xs -AX -n Apache::YourPackageName
+
+=head1 The Module List
+
+Like other CPAN modules, the Apache/Perl modules are listed on the
+Perl module list, under the I<World Wide Web> category:
+http://www.cpan.org/modules/00modlist.long.html#ID15_WorldWideW
+. Browse down the page to find the C<Apache::> modules, organized by
+their role in the requets cycle.
+
+=head1 Where Are The Modules Kept?
+
+Modules listed with the B<APML> as is contact are part of the mod_perl
+distribution package.  Other modules can be found on CPAN in the
+http://www.cpan.org/modules/by-module/Apache/ directory.  If they have
+not made it to CPAN yet, they might be found in the mod_perl
+I<contrib> directory at http://perl.apache.org/dist/contrib/.
+Otherwise, feel free to ask the contact author or the list how you can
+go about getting your hands on a copy. The modules listed with B<MPB>
+as the author were present in the I<Writing Apache Modules with Perl
+and C> book by Lincoln Stein and Doug MacEachern. If you can't find
+these modules on CPAN, look for them at
+http://modperl.com:9000/book/source/.

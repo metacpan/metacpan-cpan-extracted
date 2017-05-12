@@ -1,0 +1,12 @@
+{
+	"sets": [{
+		"class": "Photo",
+		"quantity": "all",
+        "external": {
+            "file": {
+                "class": "File",
+                "args": {"path":"__ATTR(photo_dir)__"}
+            }
+        }
+	}]
+}

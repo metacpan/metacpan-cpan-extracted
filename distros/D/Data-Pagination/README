@@ -1,0 +1,19 @@
+Data-Pagination version 0.44
+============================
+
+This class intended for organization of paginal navigation on
+some data. Basically intended for construction of paginal navigation
+panels on web sites.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+AUTHOR
+
+Andrian Zubko <ondr@mail.ru>

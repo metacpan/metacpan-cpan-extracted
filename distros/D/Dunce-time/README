@@ -1,0 +1,49 @@
+NAME
+    Dunce::time - Protects against sloppy use of time.
+
+SYNOPSIS
+      use Dunce::time;
+
+      my $this = time;
+      my $that = time;
+
+      my @sorted = sort $this, $that; # die with an error
+      my @numerically_sorted = sort { $a <=> $b } $this, $that; # OK
+
+DESCRIPTION
+    On Sun Sep 9 01:46:40 2001 GMT, time_t (UNIX epoch) reaches 10 digits.
+    Sorting time()'s as strings will cause unexpected result after that.
+
+    When Dunce::time is used, it provides special version of time() which
+    will die with a message when compared as strings.
+
+USAGE
+    Just use the module. If it detects a problem, it will cause your program
+    to abort with an error. If you don't like this behaviour, you can use
+    the module with tags like ":WARN" or ":FIX".
+
+      use Dunce::time qw(:WARN);
+
+    With ":WARN" tag, it will just warn instead of dying.
+
+      use Dunce::time qw(:FIX);
+      @sorted = sort @time; # acts like sort { $a <=> $b } @time;
+
+    With ":FIX" tag, it will warn and change the comparison behaviour so
+    that it acts like compared numerically.
+
+CAVEATS
+    You store the variables into storage (like DBMs, databases), retrieve
+    them from storage, and compare them as strings ... this can't detect in
+    such a case.
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Dunce::time::Zerofill manpage, the D::oh::Year manpage, the overload
+    manpage, the perl manpage
+

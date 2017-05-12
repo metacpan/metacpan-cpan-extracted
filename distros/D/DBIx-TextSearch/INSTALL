@@ -1,0 +1,11 @@
+INSTALLATION
+
+perl Makefile.PL
+make
+make test
+make install
+should do it. 
+
+If 'make test' fails, try setting the environment variables DB_SERVER,
+DB_PORT, DB_USERNAME, DB_PASSWORD, DB_NAME
+

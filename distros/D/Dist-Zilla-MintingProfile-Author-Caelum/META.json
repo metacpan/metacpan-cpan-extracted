@@ -1,0 +1,70 @@
+{
+   "abstract" : "Basic Minting Profile for @AVAR",
+   "author" : [
+      "Rafael Kitover <rkitover@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-MintingProfile-Author-Caelum",
+   "no_index" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::ShareDir::Install" : "0.03"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::Git::Init" : "0",
+            "Dist::Zilla::Plugin::Git::PushInitial" : "0",
+            "Dist::Zilla::Plugin::GitHub::Create" : "0.30",
+            "Dist::Zilla::PluginBundle::AVAR" : "0.28",
+            "Dist::Zilla::Role::MintingProfile::ShareDir" : "0",
+            "Moose" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "utf8" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Dist-Zilla-MintingProfile-Author-Caelum@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-MintingProfile-Author-Caelum"
+      },
+      "homepage" : "http://metacpan.org/release/Dist-Zilla-MintingProfile-Author-Caelum",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rkitover/dist-zilla-mintingprofile-author-caelum.git",
+         "web" : "http://github.com/rkitover/dist-zilla-mintingprofile-author-caelum"
+      }
+   },
+   "version" : "0.08",
+   "x_authority" : "cpan:RKITOVER"
+}
+

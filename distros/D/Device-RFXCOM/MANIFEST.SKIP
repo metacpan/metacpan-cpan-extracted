@@ -1,0 +1,4 @@
+^cover_db/
+^temp/
+.*~
+^libdevice-rfxcom-perl_.*

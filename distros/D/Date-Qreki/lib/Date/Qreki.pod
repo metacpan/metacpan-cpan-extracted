@@ -1,0 +1,174 @@
+=encoding UTF-8
+
+=head1 NAME
+
+Date::Qreki - convert Gregorian to Japanese "kyureki" dates.
+
+=head1 VERSION
+
+This documents Date::Qreki version 0.07
+corresponding to git commit L<c07982b5dc1b3e61c395505faa297f717276a4e3|https://github.com/benkasminbullock/Date-Qreki/commit/c07982b5dc1b3e61c395505faa297f717276a4e3> released on Tue Jan 31 12:11:14 2017 +0900.
+
+=head1 DESCRIPTION
+
+This module contains functions related to the old Japanese lunar
+calendar.  Convert Western dates to old Japanese lunar calendar dates
+with L</calc_kyureki>. Get the fortune-telling day with
+L</get_rokuyou> or L</rokuyou_unicode>. Check if a date is a solar
+term with L</check_24sekki>.
+
+=head1 FUNCTIONS
+
+=head2 calc_kyureki
+
+	@kyureki = calc_kyureki ($year, $mon, $day);
+
+Given a western date, return the corresponding old Japanese calendar
+date. The return value is an array containing the following fields.
+
+=over
+
+=item kyureki[0] - the corresponding year
+
+=item kyureki[1] - if the month is a leap month (intercalary month)
+
+See L<the Wikipedia article on
+Intercalation|https://en.wikipedia.org/wiki/Intercalation_(timekeeping)>
+for an explanation.
+
+=item kyureki[2] - the corresponding lunar month
+
+=item kyureki[3] - the corresponding day of the lunar month
+
+=back
+
+=head2 get_rokuyou
+
+	$rokuyou = get_rokuyou ($year,$mon,$day);
+
+Get Japanese fortune telling day. Response is from 0 to 5
+corresponding to kanji names 0:大安 1:赤口 2:先勝 3:友引 4:先負 5:仏滅.
+See also L</rokuyou_unicode> for a version which returns the kanji
+names of the days.
+
+=head2 rokuyou_unicode
+
+    my $rokuyou = rokuyou_unicode (2017, 1, 30);
+
+This returns the kanji form of the rokuyou, which are six Japanese
+fortune telling days. The three arguments are year, month, and day in
+the modern calendar. This just calls L</get_rokuyou> with the dates
+then returns a Unicode version of the date. See, for example,
+L<WWWJDIC|http://www.edrdg.org/cgi-bin/wwwjdic/wwwjdic?1C> for the
+meanings of each of these day names.
+
+This function was added in version 0.07 of the module.
+
+=head2 check_24sekki
+
+    my $sekki = check_24sekki ($year, $month, $day);
+
+Is today a L<Solar term|https://en.wikipedia.org/wiki/Solar_term>?  If
+today is a solar term, it returns the Japanese name of the solar term
+corresponding to the date given. The response is in character (utf8)
+format.
+
+=head1 EXPORTS
+
+Nothing is exported by default. All of the functions can be exported
+using the tag ":all".
+
+    use Date::Qreki ':all';
+
+=head1 SEE ALSO
+
+=head2 Other CPAN modules
+
+=over
+
+=item L<Date::Japanese::Era>
+
+Japanese era-based dates.
+
+=item L<DateTime::Calendar::Japanese::Era>
+
+Older Japanese eras
+
+=item L<DateTime::Format::Japanese>
+
+=item L<DateTime::Calendar::Japanese>
+
+=item L<Lingua::JA::FindDates>
+
+Scan text to find dates in Japanese format.
+
+=back
+
+=head1 COPYRIGHT
+
+Date::Qreki is copyright H. Takano, N. Ueno.
+
+=head1 LICENSE
+
+For the original licence, see L<Date::Qreki-ja/配布規定>. The
+following is a translation of the licence.
+
+(Translation by B. Bullock)
+
+19 Conditions for redistribution
+
+I would prefer to release this under the conditions of "whatever
+normal common sense allows", but since there are a variety of people
+in the world, unfortunately I think some form of framework is
+necessary. My wishes are as follows
+
+i. If this script is redistributed, please also include all the
+original scripts, and do not modify the original script and its
+documentation. This also applies if the archive format (.arc, .zip,
+.zoo, etc.) is changed.
+
+ii. I forbid any resale of this program beyond the cost of
+distribution media. (This also applies if the program is translated to
+a different programming language).
+
+iii. If this is translated to a different programming language, or if
+part or all of this script is used as part of another program, please
+be sure to include the original script and this explanation with
+it. If part of this program is used, I retain the copyright of the
+quoted material only and the remaining program remains copyrighted by
+its author.
+
+iv. Please do not allow the author of this software to be placed under
+any restrictions by your redistribution.
+
+In any case, there is absolutely no need to obtain the author's
+consent or notify the author.
+
+=head2 Original files
+
+
+
+As required by the above licence, the original Awk script L<F<qreki.awk>|https://api.metacpan.org/source/BKB/Date-Qreki-0.07/originals/qreki.awk> and its documentation L<F<qreki.doc>|https://api.metacpan.org/source/BKB/Date-Qreki-0.07/originals/qreki.doc> are in the subdirectory F<originals> in the
+distribution. These are text files in
+L<Shift-JIS|http://www.sljfaq.org/afaq/encodings.html#encodings-Shift-JIS>
+format. To read them on a modern terminal, use something like
+
+    iconv -f CP932 -t UTF-8  originals/qreki.doc
+
+or
+
+    perl -MEncode -n -e "print encode_utf8 (decode ('CP932', \$_));" < originals/qreki.doc
+
+Web browsers also may or may not be able to render these
+files. Currently Google Chrome seems to be the only browser with
+Shift-JIS capabilities.
+
+=head1 AUTHOR
+
+Original Awk script by H. Takano. Perl conversion by N. Ueno. This
+CPAN-ification of N. Ueno's Perl script was performed by Ben Bullock.
+
+For enquiries about this Perl module, please contact Ben Bullock
+<bkb@cpan.org>.
+
+

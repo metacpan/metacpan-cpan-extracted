@@ -1,0 +1,11 @@
+CHANGES
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Dancer/Session/DBI.pm
+t/001_basics.t
+t/002_errors.t
+t/003_travis.t

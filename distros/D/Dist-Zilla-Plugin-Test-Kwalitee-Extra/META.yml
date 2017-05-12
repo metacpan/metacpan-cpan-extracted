@@ -1,0 +1,34 @@
+---
+abstract: 'Dist::Zilla plugin for Test::Kwalitee::Extra'
+author:
+  - 'Yasutaka ATARASHI <yakex@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Path::Class: 0
+  Test::More: 0
+  version: 0.77
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Test-Kwalitee-Extra
+requires:
+  Data::Section: 0
+  Dist::Zilla: 0
+  File::Path: 2.08
+  Module::CPANTS::Analyse: 0.87
+  Moose: 0
+  Test::Kwalitee::Extra: v0.2.1
+  Test::More: 0
+  perl: 5.006
+resources:
+  homepage: https://github.com/yak1ex/Dist-Zilla-Plugin-Test-Kwalitee-Extra
+  repository: https://github.com/yak1ex/Dist-Zilla-Plugin-Test-Kwalitee-Extra.git
+version: v0.2.1

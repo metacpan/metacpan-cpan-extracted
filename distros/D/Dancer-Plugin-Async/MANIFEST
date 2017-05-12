@@ -1,0 +1,8 @@
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+eg/foo.pm
+lib/Dancer/Plugin/Async.pm

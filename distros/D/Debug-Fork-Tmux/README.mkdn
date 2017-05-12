@@ -1,0 +1,420 @@
+# NAME
+
+Debug::Fork::Tmux - Makes fork() in debugger to open a new Tmux window
+
+# VERSION
+
+This documentation refers to the module contained in the distribution `Debug-Fork-Tmux` version 1.000012.
+
+# SYNOPSIS
+
+    #!/usr/bin/perl -d
+    #
+    # ABSTRACT: Debug the fork()-contained code in this file
+    #
+    ## Works only under Tmux: http://tmux.sf.net
+    #
+    # Make fork()s debuggable with Tmux
+    use Debug::Fork::Tmux;
+
+    # See what happens in your debugger then...
+    fork;
+
+# DESCRIPTION
+
+Make sure you have the running `Tmux` window manager:
+
+    $ tmux
+
+- Only `Tmux` version 1.6 and higher works with `Debug::Fork::Tmux`.
+See ["DEPENDENCIES"](#DEPENDENCIES).
+- It is not necessary to run this under `Tmux`, see ["Attaching to the other `Tmux` session"](#Attaching to the other `Tmux` session).
+
+Then the real usage example of this module is:
+
+    $ perl -MDebug::Fork::Tmux -d your_script.pl
+
+As Perl's standard debugger requires additional code to be written and used
+when the debugged Perl program use the [fork()](http://search.cpan.org/perldoc?perlfunc#fork) built-in.
+
+This module is about to solve the trouble which is used to be observed like
+this:
+
+    ######### Forked, but do not know how to create a new TTY. #########
+    Since two debuggers fight for the same TTY, input is severely entangled.
+
+    I know how to switch the output to a different window in xterms, OS/2
+    consoles, and Mac OS X Terminal.app only.  For a manual switch, put the
+    name of the created TTY in $DB::fork_TTY, or define a function
+    DB::get_fork_TTY() returning this.
+
+    On UNIX-like systems one can get the name of a TTY for the given window
+    by typing tty, and disconnect the shell from TTY by sleep 1000000.
+
+All of that is about getting the pseudo-terminal device for another part of
+user interface. This is probably why only the `GUI`s are mentioned here:
+`OS/2` 'Command Prompt', `Mac OS X`'s `Terminal.app` and an `xterm`. For
+those of you who develop server-side stuff it should be known that keeping
+`GUI` on the server is far from always to be available as an option no
+matter if it's a production or a development environment.
+
+The most ridiculous for every `TUI` (the `ssh` particularly) user is that
+the pseudo-terminal device isn't that much about `GUI`s by its nature so
+the problem behind the bars of the [perl5db.pl](http://search.cpan.org/perldoc?perl5db.pl) report (see more detailed
+problem description at the [PerlMonks thread](http://perlmonks.org/?node\_id=128283)) is the consoles management.
+It's a kind of a tricky, for example, to start the next `ssh` session
+initiated from the machine serving as an `sshd` server for the existing
+session.
+
+Thus we kind of have to give a chance to the consoles management with a
+software capable to run on a server machine without as much dependencies as
+an `xterm`. This module is a try to pick the [Tmux](http://tmux.sf.net)
+windows manager for such a task.
+
+Because of highly-developed scripting capabilities of `Tmux` any user can
+supply the 'window' or a 'pane' to Perl's debugger making it suitable to
+debug the separate process in a different `UI` instance. Also this adds the
+features like `groupware`: imagine that your mate can debug the process
+you've just `fork()ed` by mean of attaching the same `tmux` you are
+running on a server. While you keep working on a process that called a
+`fork()`.
+
+# SUBROUTINES/METHODS
+
+All of the following are functions:
+
+## PUBLIC
+
+### `DB::get_fork_TTY()`
+
+Finds new `TTY` for the `fork()`ed process.
+
+Takes no arguments. Returns `Str` name of the `tty` device of the <tmux>'s
+new window created for the debugger's new process.
+
+Sets the `$DB::fork_TTY` to the same `Str` value.
+
+## PRIVATE
+
+### `_spawn_tty()`
+
+Creates a `TTY` device and returns `Str` its name.
+
+### `_tmux_new_window()`
+
+Creates a given `tmux` window and returns `Str` its id/number.
+
+### `_tmux_window_tty( $window_id )`
+
+Finds a given `tmux` window's tty name and returns its `Str` name based on
+a given window id/number typically from ["\_tmux\_new\_window()"](#\_tmux\_new\_window()).
+
+### `_read_from_cmd( $cmd => @args )`
+
+Takes the list containing the `Str` [system()](http://search.cpan.org/perldoc?perlfunc#system) command and
+`Array` its arguments and executes it. Reads `Str` the output and returns it.
+Throws if no output or if the command failed.
+
+### `_croak_on_cmd( $cmd => @args, $happen )`
+
+Takes the `Str` command, `Array` its arguments and `Str` the reason of
+its failure, examines the `$?` and dies with explanation on the
+[system()](http://search.cpan.org/perldoc?perlfunc#system) command failure.
+
+# CONFIGURATION AND ENVIRONMENT
+
+The module requires the [Tmux](http://tmux.sf.net) window manager for the
+console to be present in the system.
+
+This means that it requires the `Unix`\-like operating system not only to
+have a [fork](http://search.cpan.org/perldoc?fork) implemented and a `TTY` device name supplement but the
+system should have Tmux up and running.
+
+Therefore `Cygwin` for example isn't in at this moment, see the
+[explanation](http://permalink.gmane.org/gmane.comp.terminal-emulators.tmux.user/1354)
+why.
+
+Configuration is made via environment variables, the default is taken for
+each of them with no such variable is set in the environment:
+
+## `DFTMUX_FQFN`
+
+The `tmux` binary name with the full path.
+
+Default :   The first of those for executable to exist:
+
+- `PATH` environment variable contents
+- Path to the Perl binary interpreter
+- Current directory
+
+and just the `tmux` as a fallback if none of above is the location of the
+`tmux` executable file.
+
+## `DFTMUX_CMD_NEWW`
+
+The [system()](http://search.cpan.org/perldoc?perlfunc#system) arguments for a `tmux`
+command for opening a new window and with output of a window address from
+`tmux`. String is sliced by spaces to be a list of parameters.
+
+Default :  `neww -P`
+
+## `DFTMUX_CMD_NEWW_EXEC`
+
+The [system()](http://search.cpan.org/perldoc?perlfunc#system) or a shell command to be given to the
+`DFTMUX_CMD_NEWW` command to be executed in a brand new created
+window. It should wait unexpectedly and do nothing till the debugger
+catches the device and puts in into the proper use.
+
+Default :  `sleep 1000000`
+
+## `DFTMUX_CMD_TTY`
+
+Command- line  parameter(s) for a  `tmux` command to find a `tty` name in
+the output. The string is sliced then by spaces. The `tmux`'s window
+address is added then as the very last argument.
+
+Default :  `lsp -F #{pane_tty} -t`
+
+## Earlier versions' `SPUNGE_*` environment variables
+
+Till v1.000009 the module was controlled by the environment variables like
+`SPUNGE_TMUX_FQDN`. Those are deprecated and should be replaced in your
+configuration(s) onto the `DFTMUX_`\-prefixed ones.
+
+## Attaching to the other `Tmux` session
+
+For the case you can not or don't want to use the current `tmux` session
+you are running in, you may want to have the separate `tmux` server up and
+running and use its windows or panes to be created. This can be done by mean
+of prepending the correct `-L` or `-S` switch to the start of the every of
+the command-line parameters string to be used, for example:
+
+    $ DFTMUX_CMD_NEWW="-L default neww -P" \
+    > DFTMUX_CMD_TTY="-L default lsp -F #{pane_tty} -t" \
+    > perl -MDebug::Fork::Tmux -d your_script.pl
+
+# DIAGNOSTICS
+
+- `The command ...`
+
+    Typically the error message starts with the command the [Debug::Fork::Tmux](http://search.cpan.org/perldoc?Debug::Fork::Tmux) tried
+    to execute, including the command's arguments.
+
+- `failed opening command: ...`
+
+    The command was not taken by the system as an executable binary file.
+
+- `... didn't write a line`
+- `failed reading command: ...`
+
+    Command did not output exactly one line of the text.
+
+- `... did not finish`
+
+    Command outputs more than one line of the text.
+
+- `provided empty string`
+
+    Command outputs exactly one line of the text and the line is empty.
+
+- `failed to execute: ...`
+
+    There was failure executing the command
+
+- `child died with(out) signal X, Y coredump`
+
+    Command was killed by the signal X and the coredump is (not) located in Y.
+
+- `child exited with value X`
+
+    Command was not failed but there are reasons to throw an error like the
+    wrong command's output.
+
+# DEPENDENCIES
+
+\* `Perl 5.8.9+`
+is available from [The Perl website](http://www.perl.org)
+
+\* [Config](http://search.cpan.org/perldoc?Config), [Cwd](http://search.cpan.org/perldoc?Cwd), [DB](http://search.cpan.org/perldoc?DB), [ExtUtils::MakeMaker](http://search.cpan.org/perldoc?ExtUtils::MakeMaker), [File::Find](http://search.cpan.org/perldoc?File::Find),
+[File::Spec](http://search.cpan.org/perldoc?File::Spec), [File::Basename](http://search.cpan.org/perldoc?File::Basename), [Scalar::Util](http://search.cpan.org/perldoc?Scalar::Util), [Test::More](http://search.cpan.org/perldoc?Test::More) are
+available in core `Perl` distribution version 5.8.9 and later
+
+\* [Const::Fast](http://search.cpan.org/perldoc?Const::Fast)
+is available from `CPAN`
+
+\* [Module::Build](http://search.cpan.org/perldoc?Module::Build)
+is available in core `Perl` distribution since version 5.9.4
+
+\* [Sort::Versions](http://search.cpan.org/perldoc?Sort::Versions)
+is available from `CPAN`
+
+\* [Test::Exception](http://search.cpan.org/perldoc?Test::Exception)
+is available from `CPAN`
+
+\* [Test::Most](http://search.cpan.org/perldoc?Test::Most)
+is available from `CPAN`
+
+\* [Test::Strict](http://search.cpan.org/perldoc?Test::Strict)
+is available from `CPAN`
+
+\* [Env::Path](http://search.cpan.org/perldoc?Env::Path)
+is available from `CPAN`
+
+\* [autodie](http://search.cpan.org/perldoc?autodie)
+is available in core `Perl` distribution since version 5.10.1
+
+\* `Tmux` v1.6+
+is available from [The Tmux website](http://tmux.sourceforge.net)
+
+Most of them can easily be found in your operating system
+distribution/repository.
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [http://bugs.vereshagin.org/product/Debug-Fork-Tmux](http://bugs.vereshagin.org/product/Debug-Fork-Tmux).
+
+# WEB SITE
+
+The web site of
+[Debug::Fork::Tmux](http://gitweb.vereshagin.org/Debug-Fork-Tmux/README.html) currently
+consists of only one page cause it's a very small module.
+
+You may want to visit a [GitHub page](https://github.com/petr999/Debug-Fork-Tmux), too.
+
+# SUPPORT
+
+## Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Debug::Fork::Tmux
+
+## Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+- MetaCPAN
+
+    A modern, open-source CPAN search engine, useful to view POD in HTML format.
+
+    [http://metacpan.org/release/Debug-Fork-Tmux](http://metacpan.org/release/Debug-Fork-Tmux)
+
+- Search CPAN
+
+    The default CPAN search engine, useful to view POD in HTML format.
+
+    [http://search.cpan.org/dist/Debug-Fork-Tmux](http://search.cpan.org/dist/Debug-Fork-Tmux)
+
+- RT: CPAN's Bug Tracker
+
+    The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+    [http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux](http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debug-Fork-Tmux)
+
+- AnnoCPAN
+
+    The AnnoCPAN is a website that allows community annotations of Perl module documentation.
+
+    [http://annocpan.org/dist/Debug-Fork-Tmux](http://annocpan.org/dist/Debug-Fork-Tmux)
+
+- CPAN Ratings
+
+    The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+    [http://cpanratings.perl.org/d/Debug-Fork-Tmux](http://cpanratings.perl.org/d/Debug-Fork-Tmux)
+
+- CPAN Forum
+
+    The CPAN Forum is a web forum for discussing Perl modules.
+
+    [http://cpanforum.com/dist/Debug-Fork-Tmux](http://cpanforum.com/dist/Debug-Fork-Tmux)
+
+- CPANTS
+
+    The CPANTS is a website that analyzes the Kwalitee ( code metrics ) of a distribution.
+
+    [http://cpants.perl.org/dist/overview/Debug-Fork-Tmux](http://cpants.perl.org/dist/overview/Debug-Fork-Tmux)
+
+- CPAN Testers
+
+    The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+
+    [http://www.cpantesters.org/distro/D/Debug-Fork-Tmux](http://www.cpantesters.org/distro/D/Debug-Fork-Tmux)
+
+- CPAN Testers Matrix
+
+    The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+    [http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux](http://matrix.cpantesters.org/?dist=Debug-Fork-Tmux)
+
+- CPAN Testers Dependencies
+
+    The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+    [http://deps.cpantesters.org/?module=Debug::Fork::Tmux](http://deps.cpantesters.org/?module=Debug::Fork::Tmux)
+
+## Email
+
+You can email the author of this module at `peter@vereshagin.org` asking for help with any problems you have.
+
+## Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to `peter@vereshagin.org`, or through
+the web interface at [http://bugs.vereshagin.org/product/Debug-Fork-Tmux](http://bugs.vereshagin.org/product/Debug-Fork-Tmux). You will be automatically notified of any
+progress on the request by the system.
+
+## Source Code
+
+The code is open to the world, and available for you to hack on. Please feel free to browse it and play
+with it, or whatever. If you want to contribute patches, please send me a diff or prod me to pull
+from your repository :)
+
+[http://gitweb.vereshagin.org/Debug-Fork-Tmux](http://gitweb.vereshagin.org/Debug-Fork-Tmux)
+
+    git clone https://github.com/petr999/Debug-Fork-Tmux.git
+
+# AUTHOR
+
+[Peter Vereshagin](http://vereshagin.org) <peter@vereshagin.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by Peter Vereshagin.
+
+This is free software, licensed under:
+
+    The (three-clause) BSD License
+
+# SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+- [Debug::Fork::Tmux::Config](http://search.cpan.org/perldoc?Debug::Fork::Tmux::Config)
+- [http://perlmonks.org/?node\_id=128283](http://perlmonks.org/?node\_id=128283)
+- [nntp://nntp.perl.org/perl.debugger](nntp://nntp.perl.org/perl.debugger)
+- [http://debugger.perl.org/](http://debugger.perl.org/)
+
+# DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.

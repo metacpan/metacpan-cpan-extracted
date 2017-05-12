@@ -1,0 +1,14 @@
+Changes
+lib/DBIx/Class/ParameterizedJoinHack.pm
+lib/DBIx/Class/ResultSet/ParameterizedJoinHack.pm
+maint/Makefile.PL.include
+Makefile.PL
+MANIFEST			This list of files
+t/00basic.t
+t/lib/My/Schema.pm
+t/lib/My/Schema/Result/Person.pm
+t/lib/My/Schema/Result/Task.pm
+t/lib/My/Schema/ResultSet/Person.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)
+README                                   README file (added by Distar)

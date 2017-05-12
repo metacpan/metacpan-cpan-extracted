@@ -1,0 +1,34 @@
+---
+abstract: 'Pull and transform documents from a NoSQL backend'
+author:
+  - 'Nicholas R. Perez <nperez@cpan.org>'
+build_requires:
+  Digest::SHA1: 0
+  Test::Moose: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102341, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Document-Transform
+requires:
+  Data::DPath: 0
+  Devel::PartialDump: 0
+  MongoDB: 0
+  MongoDBx::AutoDeref: 0
+  Moose: 0
+  Moose::Role: 0
+  Moose::Util::TypeConstraints: 0
+  MooseX::Params::Validate: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Structured: 0
+  Throwable::Error: 0
+  Try::Tiny: 0
+  namespace::autoclean: 0
+resources:
+  repository: git://github.com/nperez/document-transform.git
+version: 1.110530

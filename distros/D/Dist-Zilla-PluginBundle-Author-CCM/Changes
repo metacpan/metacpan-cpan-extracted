@@ -1,0 +1,37 @@
+Revision history for Dist-Zilla-PluginBundle-Author-CCM.
+
+0.007     2017-03-11 18:33:58-07:00 MST7MDT
+
+  * Prevent writing wrong version to Changes
+
+0.006     2016-11-28 02:08:07-07:00 MST7MDT
+
+  * Work around a bug in DZP::TravisYML
+
+0.005     2016-11-27 19:52:27-07:00 MST7MDT
+
+  * Move dependencies from cpanfile to dist.ini (fixes testing)
+  * Set copyright year
+
+0.004     2016-11-27 18:28:43-07:00 MST7MDT
+
+  * This bundle now requires at least perl 5.14.0
+  * Add Test::MinimumVersion as a release test
+
+0.003     2016-11-26 00:09:53-07:00 MST7MDT
+
+  * Set default authority to cpan:CCM
+  * Add Test::CPAN::Meta to prereqs
+
+0.002     2016-11-25 22:12:27-07:00 MST7MDT
+
+  * Add DZIL_NO_UPLOAD to enable no_upload mode
+  * Only rewrite repo README on release
+  * Use RunExtraTests instead of ExtraTests
+  * Use Bootstrap::lib
+  * Require Dist::Zilla 5.038 (for :ExtraTestFiles)
+
+0.001     2016-11-25 18:28:13-07:00 MST7MDT
+
+  * Initial version
+

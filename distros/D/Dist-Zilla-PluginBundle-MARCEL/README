@@ -1,0 +1,156 @@
+NAME
+    Dist::Zilla::PluginBundle::MARCEL - Build and release a distribution
+    like MARCEL
+
+VERSION
+    version 1.161760
+
+SYNOPSIS
+    In your dist.ini:
+
+        [@MARCEL]
+        major_version = 1          ; this is the default
+        weaver        = pod        ; default, can also be 'task'
+        skip_prereq   = ::Test$    ; no default
+
+    This bundle implements the PluginRemover and Config::Slicer roles.
+
+DESCRIPTION
+    This is a plugin bundle to load all plugins that I am using. It is
+    equivalent to:
+
+        [AutoVersion]
+
+        ; -- fetch & generate files
+        [GatherDir]
+        exclude_match = ^README$
+        [Test::Compile]
+        [Test::Perl::Critic]
+        [MetaTests]
+        [PodCoverageTests]
+        [PodSyntaxTests]
+        [Test::PodSpelling]
+        stopwords = CPAN
+        stopwords = multi
+        [Test::Kwalitee]
+        [Test::Portability]
+        [Test::Synopsis]
+        [Test::MinimumVersion]
+        [HasVersionTests]
+        [Test::CheckChanges]
+        [Test::DistManifest]
+        [Test::UnusedVars]
+        [Test::NoTabs]
+        [Test::EOL]
+        [InlineFilesMARCEL]
+        [Test::ReportPrereqs]
+
+        ; -- remove some files
+        [PruneCruft]
+        [PruneFiles]
+        filenames = dist.ini
+
+        [ManifestSkip]
+
+        ; -- get prereqs
+        [AutoPrereqs]
+
+        ; -- gather metadata
+        [Repository]
+        [Bugtracker]
+        [Homepage]
+
+        ; -- munge files
+        [ExtraTests]
+        [NextRelease]
+        [PkgVersion]
+        [PodWeaver]
+        config_plugin = '@MARCEL'
+
+        ; -- dynamic meta-information
+        [ExecDir]
+        [ShareDir]
+        [MetaProvides::Package]
+
+        ; -- generate meta files
+        [License]
+        [MakeMaker]
+        [MetaYAML]
+        [MetaJSON]
+        [Pod2Readme]
+        [InstallGuide]
+        [Manifest] ; should come last
+
+        ; -- keep a copy in the repo
+        [CopyFilesFromBuild]
+        copy = README
+
+        ; -- release
+        [CheckChangeLog]
+        [@Git]
+        [UploadToCPAN]
+
+    The following options are accepted:
+
+    *   "major_version" - passed as "major" option to the AutoVersion
+        plugin. Default to 1.
+
+    *   "weaver" - can be either "pod" (default) or "task", to load
+        respectively either PodWeaver or TaskWeaver.
+
+    *   "weaver_finder" - a multi-value argument that overrides the default
+        file finders used by PodWeaver.
+
+    *   "skip_prereq" - passed as "skip" option to the AutoPrereqs plugin if
+        set. No default.
+
+    *   "fake_home" - passed to Test::Compile to control whether to fake
+        home.
+
+METHODS
+  mvp_multivalue_args
+    Defines that "weaver_finder" is a multi-value argument.
+
+  bundle_config
+    Defines the bundle's contents and passes on this bundle's configuration
+    to the individual plugins as described above.
+
+SEE ALSO
+    *   Pod::Weaver::PluginBundle::MARCEL
+
+    *   Dist::Zilla::Role::PluginBundle::PluginRemover
+
+    *   Dist::Zilla::Role::PluginBundle::Config::Slicer
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    You can make new bug reports, and view existing ones, through the web
+    interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundl
+    e-MARCEL>.
+
+AVAILABILITY
+    The project homepage is
+    <http://search.cpan.org/dist/Dist-Zilla-PluginBundle-MARCEL/>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Dist::Zilla::PluginBundle::MARCEL/>.
+
+AUTHORS
+    *   Marcel Gruenauer <marcel@cpan.org>
+
+    *   Jerome Quelin <jquelin@cpan.org>
+
+    *   Olivier Mengue <dolmen@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2016 by Olivier Mengué.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

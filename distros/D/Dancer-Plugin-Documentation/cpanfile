@@ -1,0 +1,10 @@
+requires 'Dancer';
+requires 'Dancer::Plugin';
+requires 'ExtUtils::MakeMaker';
+requires 'ExtUtils::MakeMaker::CPANfile';
+requires 'Moo';
+requires 'MooX::Types::MooseLike::Base';
+requires 'Scalar::Util';
+requires 'Set::Functional';
+requires 'Test::Most';
+requires 'namespace::clean';

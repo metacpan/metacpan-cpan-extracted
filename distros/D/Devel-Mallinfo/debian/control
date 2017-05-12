@@ -1,0 +1,40 @@
+# Copyright 2007, 2009, 2010, 2011, 2012, 2013, 2014 Kevin Ryde
+# 
+# This file is part of Devel-Mallinfo.
+# 
+# Devel-Mallinfo is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License as published by the Free
+# Software Foundation; either version 3, or (at your option) any later
+# version.
+# 
+# Devel-Mallinfo is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# for more details.
+# 
+# You should have received a copy of the GNU General Public License along
+# with Devel-Mallinfo.  If not, see <http://www.gnu.org/licenses/>.
+
+
+# Build-Depends could have the "maximum_tests" modules from META.yml
+# for more tests, but they're optional author tests really and would
+# just make the build tools drag in more stuff.
+
+Source: libdevel-mallinfo-perl
+Section: perl
+Priority: optional
+Build-Depends: liblib-perl | perl (>= 5.001), libtest-perl | perl (>= 5.004.05), cdbs, debhelper (>= 5)
+Maintainer: Kevin Ryde <user42_kevin@yahoo.com.au>
+Standards-Version: 3.9.6
+Homepage: http://user42.tuxfamily.org/devel-mallinfo/index.html
+Bugs: mailto:user42_kevin@yahoo.com.au
+
+Package: libdevel-mallinfo-perl
+Architecture: any
+Pre-Depends: ${misc:Pre-Depends}
+Depends: perl, libvars-perl | perl (>= 5.002), ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Description: mallinfo() memory statistics in Perl, and more
+ This is a Perl interface to the C library mallinfo() statistics on
+ malloc usage.  It's meant for development use, to see how much is
+ used or free in your Perl program.  Other related GNU C Library
+ malloc functions like malloc_info() provided too.

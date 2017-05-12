@@ -1,0 +1,12 @@
+Changes
+MANIFEST
+META.yml
+Makefile.PL
+README
+Swap.xs
+lib/Data/Swap.pm
+t/01_deref.t
+t/02_swap.t
+t/lib/Test/Builder.pm
+t/lib/Test/More.pm
+t/lib/Test/Simple.pm

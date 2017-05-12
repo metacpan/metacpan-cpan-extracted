@@ -1,0 +1,676 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long   qw(GetOptions :config no_ignore_case);
+use File::Basename qw(basename);
+use Pod::Usage     qw(pod2usage);
+use List::Util     qw(min max);
+use Time::Piece    qw(localtime);
+
+$|++;
+
+my $max_proc = 5;
+my $db_lib   = $ENV{DBIX_BULKUTIL_LIB} || 'DBIx::BulkUtil';
+
+GetOptions(
+  "S=s" => \my $server,
+  "D=s" => \my $database,
+  "r=s" => \my $row_delimiter,
+  "t=s" => \my $delimiter,
+  "U=s" => \my $user,
+  "P=s" => \my $password,
+  "f=s" => \my $filter,
+  "c=s" => \my $columns,
+  "C=s" => \my @col_list,
+  "F=s" => \my @filler_list,
+  "T=s" => \my $db_type,
+  "env=s" => \my $env,
+  "A=i"   => \my $packet_size,
+  "O=s{1,}" => \my @pass_thru,
+  n     => \my $no_fix,
+  skip  => \my $skip,
+  "file=s" => \my $table_file,
+  "proc=i" => \$max_proc,
+  "date_fmt=s"        => \my $output_date_format,
+  "datetime_fmt=s"    => \my $output_datetime_format,
+  "datetime_tz_fmt=s" => \my $output_datetime_tz_format,
+  "dfmt=s" => \my $date_format,
+  "tmpdb=s"=> \my $temp_db,
+  "nls_lang=s" => \my $nls_lang,
+  "semantics=s" => \my $semantics,
+  "encoding=s" => \my $encoding,
+  "a=s"    => \my $action,
+  "2S=s"   => \my $to_server,
+  "2D=s"   => \my $to_database,
+  "2SCH=s" => \my $to_schema,
+  "2T=s" => \my $to_db_type,
+  "2t=s" => \my $to_table,
+  "2U=s" => \my $to_user,
+  "2P=s" => \my $to_password,
+  "2env=s" => \my $to_env,
+  "2A=i"   => \my $to_packet_size,
+  "2C=s" => \my @to_col_list,
+  "2F=s" => \my @to_filler_list,
+  "2O=s{1,}" => \my @to_pass_thru,
+  "constant=s" => \my @constants,
+  "fconstant=s"=> \my @f_constants,
+  "when=s"=> \my $when,
+  "dblib=s"=> \$db_lib,
+  nobulk => \my $no_bulk,
+  blank  => \my $preserve_blanks,
+  "blobsz=i" => \my $max_blob_size,
+  trim   => \my $trim_blanks,
+  "commit=i" => \my $commit_size,
+  "errcnt=i" => \my $max_errors,
+  p      => \my $direct_path,
+  dp     => \my $direct_path_parallel,
+  check  => \my $check_only,
+  verify => \my $verify_only,
+  d      => \my $debug,
+  H      => \my $header,
+  "h=i"  => \my $header_rows,
+  q      => \my $quote,
+  help   => \my $help,
+  man    => \my $man,
+) or pod2usage(2);
+
+pod2usage(1) if $help;
+pod2usage(-verbose => 2)  if $man;
+
+pod2usage("Can not both trim and preserve blanks") if $preserve_blanks and $trim_blanks;
+
+pod2usage("Max concurrent processes is 20") if $max_proc > 20;
+
+# We are eval'ing, so do sanity check on db_lib
+for (split /::/, $db_lib) {
+  die "Bad library name $db_lib" unless /^\w+$/;
+}
+
+eval "require $db_lib";
+die $@ if $@;
+
+my $exit_status = 0;
+
+for my $list ( \@col_list, \@filler_list, \@to_col_list, \@to_filler_list ) {
+  next unless @$list;
+  next if @$list > 1;
+
+  @$list = split /\s*,\s*/, $list->[0];
+}
+
+# These options should be able to handle an empty array ref as a no-opt arg,
+# but we'll be certain here, in case old version of DBIx is being used
+my @col_list_opt       = @col_list    ? ( ColumnList => \@col_list    ) : ();
+my @filler_list_opt    = @filler_list ? ( Filler => \@filler_list     ) : ();
+my @to_col_list_opt    = @col_list    ? ( ColumnList => \@to_col_list ) : ();
+my @to_filler_list_opt = @filler_list ? ( Filler => \@to_filler_list  ) : ();
+
+$header = $header_rows if $header_rows;
+
+$direct_path = "P" if $direct_path_parallel;
+
+# Check for passwords from stdin
+for ($password, $to_password) {
+  if ( $_ and $_ eq "-" ) {
+    chomp($_ = <STDIN>);
+  }
+}
+
+my ($table, $in_out, $file);
+my @table_list;
+if (@ARGV == 3) {
+  ($table, $in_out, $file) = @ARGV;
+} elsif (@ARGV == 2) {
+  if ($ARGV[0] =~ /^(in|out)$/) {
+    $in_out = $1;
+    $file = $ARGV[1];
+    $table = basename($file);
+    $table =~ s/\.([^.]*)$//;
+  } elsif ($ARGV[1] =~ /^(in|out)$/) {
+    $in_out = $1;
+    $table = $ARGV[0];
+    $file = "$table.bcp";
+  } else {
+    pod2usage("Must supply bcp direction in or out");
+  }
+} elsif (@ARGV == 1) {
+
+  # Must be using -file option in this section
+  # so only in/out should be specified
+  unless ($ARGV[0] =~ /^(in|out)$/) {
+    pod2usage("Invalid BCP direction $ARGV[0]: must be 'in' or 'out'");
+  }
+  $in_out = $1;
+  unless ($table_file) {
+    pod2usage("Need '-file' option if table/file is not specified");
+  }
+  if ($to_table) {
+    pod2usage("Can not use -file option with -2t option");
+  }
+  open(my $fh, "<", $table_file) or die "Error opening $table_file: $!";
+  while (<$fh>) {
+    next if /^\s*#/;
+    next unless /\S/;
+    s/^\s+//; s/\s+\z//;
+    s/^([\w.:]+)\s*// or die "No table found on line $. of $table_file";
+    my $src_tbl = $1;
+    my $tmp_tgt_tbl = s/^([\w.:]+)\s*// ? $1 : '';
+
+    my $tgt_tbl;
+    if ( $to_server || $to_database ) {
+      $tgt_tbl = $tmp_tgt_tbl || $src_tbl;
+    }
+
+    my %opts;
+    # Parse file options in -key=value pairs
+    # Value can be any non-space string that does not start with quotes
+    # Or any quoted string
+    while ( s/-(\w+)=([^\s'"]\S*|(['"])(?:.*?)\3)\s*// ) {
+      my ($opt,$val) = ($1,$2);
+      $val =~ s/^(['"])(.*)\1$/$2/;
+
+      # Match at least "const" allow "constant"
+      if ( $opt =~ /^const(?:ant)?$/ ) {
+        push @{$opts{const}}, $val;
+      } elsif ( $opt =~ /^fconst(?:ant)?$/ ) {
+        push @{$opts{fconstants}}, $val;
+      } else {
+        $opts{$opt} = $val;
+      }
+    }
+
+    push @table_list, [ $src_tbl, "$src_tbl.bcp", $tgt_tbl, \%opts ];
+  }
+  close $fh;
+  unless (@table_list) {
+    Print("No tables specified in $table_file - exiting");
+    exit 0;
+  }
+} else {
+  pod2usage("Too many arguments")   if @ARGV > 3;
+  pod2usage("Not enough arguments") if @ARGV < 1;
+}
+
+unless ($in_out =~ /^(in|out)$/) {
+  pod2usage("Invalid BCP direction '$in_out': must be 'in' or 'out'");
+}
+
+pod2usage("Can not use bcp in option for bcp out")
+  if $action and ($in_out eq "out") and !($to_server or $to_database or $to_table or $to_env or $to_db_type);
+
+my $bcp = "bcp_${in_out}";
+if ($filter || $columns) {
+
+  # Maybe allow specification of columns later for bcp in
+  # (Oracle could do that, and we could construct an insert
+  # statement for Sybase for row by row insert) but for now
+  pod2usage("Can not use bcp out options for bcp in") if $in_out eq 'in';
+
+  # Sybase can not do native bcp with this option
+  $bcp = 'select2file' if $columns;
+}
+
+$bcp = 'select2file' if $bcp eq 'bcp_out' and $no_bulk;
+
+$delimiter ||= "," if $file and $file =~ /\.csv$/;
+
+my %constant  = parse_constants(@constants);
+my %f_constant   = parse_constants(@f_constants);
+
+my $pm;
+if (@table_list) {
+  if (@table_list > 1) {
+    require Parallel::ForkManager;
+    $pm = Parallel::ForkManager->new($max_proc);
+    $pm->run_on_start( sub {
+      my ($pid, $table) = @_;
+      Print("Started BCP for $table");
+    });
+    $pm->run_on_finish( sub {
+      my ($pid, $status, $table, $signal, $coredump) = @_;
+      if ($status != 0) {
+        $exit_status ||= 1;
+        Print("BCP for $table exited with status $status - check log $table.log");
+      } elsif ($signal > 0) {
+        $exit_status ||= 1;
+        Print("BCP for $table received signal $signal - check log $table.log");
+      } elsif ($coredump) {
+        $exit_status ||= 1;
+        Print("BCP for $table coredumped - check log $table.log");
+      } else {
+        Print("Finished BCP for $table");
+      }
+    });
+  }
+} else {
+  @table_list = ([$table, $file, $to_table, {}]);
+}
+
+for my $tf (@table_list) {
+  my ($table, $file, $tgt, $opts) = @$tf;
+  if ($pm) {
+    $pm->start($table) and next;
+    $exit_status = 0;
+    my $log = "$table.log";
+    open(STDOUT, ">", $log)  or die "Can not redirect STDOUT to $log: $!";
+    open(STDERR, ">&STDOUT") or die "Can not dup STDERR to STDOUT: $!";
+    $|++;
+  }
+  do_bcp($table, $file, $tgt, $opts);
+  $pm->finish($exit_status) if $pm;
+}
+
+$pm->wait_all_children() if $pm;
+
+exit $exit_status;
+
+sub do_bcp {
+  my ($table, $file, $to_table, $opts) = @_;
+
+  pod2usage("File $file does not exist") if !$check_only and ( $in_out eq 'in' and $file ne "-" and ! -f $file );
+
+  my $dbi_opts = {};
+
+  if ($max_blob_size) {
+    $dbi_opts->{LongReadLen} = $max_blob_size;
+  }
+
+  my $constants = \%constant;
+  if ($opts->{const}) {
+    $constants = { parse_constants(@{$opts->{const}}) };
+  }
+  my $f_constants = \%f_constant;
+  if ($opts->{fconst}) {
+    $f_constants = { parse_constants(@{$opts->{fconst}}) };
+  }
+
+  my $nls = $nls_lang || $ENV{NLS_LANG};
+  if ( $nls ) {
+    # Default either one to the other
+    $encoding ||= 'utf8' if $nls =~ /utf8/i;
+    ( $nls_lang ||= $ENV{NLS_LANG} ) =~ s/^\w+\.// if $ENV{NLS_LANG};
+    $ENV{NLS_LANG} ||= "AMERICAN_AMERICA.$nls_lang" if $nls_lang;
+  }
+
+  my $src_type = determine_db_type( $server, $database, $db_type );
+  my $has_tgt  = $to_server || $to_database || $to_table || $to_db_type || $to_env;
+  my $tgt_type = $has_tgt ? determine_db_type( $to_server, $to_database, $to_db_type ) : '';
+
+  # Default datetime format if Oracle to Sybase
+  if ( $src_type eq 'Oracle' && $tgt_type eq 'Sybase' ) {
+    $output_datetime_format ||= 'YYYY-MM-DD HH24:MI:SS.FF3';
+  }
+
+  my ($dbh, $db_util) = $db_lib->connect(
+    Server   => $server,
+    Database => $database,
+    Type     => $db_type,
+    Env      => $env,
+    User     => $user,
+    Password => $password,
+    DateFormat       => $output_date_format,
+    DatetimeFormat   => $output_datetime_format,
+    DatetimeTzFormat => $output_datetime_tz_format,
+    $dbi_opts,
+  );
+
+  $db_type ||= $db_util->type();
+
+  # If it's a sybase source, and we're copying to some other database
+  # don't bother changing the date format
+  # Also, get column info on the table for Oracle to use
+  my $has_char_gt_one;
+  my @col_types;
+  if ( $src_type eq 'Sybase' && $has_tgt ) {
+
+    if ( $bcp eq 'bcp_out' ) {
+      $no_fix = 1;
+      $date_format = '';
+
+      # Need to get char columns w/length > 1 to see if Oracle needs to trim them
+      if ( !$preserve_blanks and !$trim_blanks ) {
+
+        my $info = $db_util->column_info($table);
+        my $cols = $info->{LIST};
+        my $col_map = $info->{MAP};
+        for my $col ( @$cols ) {
+          my $type = $col_map->{$col}{TYPE_NAME};
+          push @col_types, $type;
+          my $size = $col_map->{$col}{COLUMN_SIZE};
+          $has_char_gt_one++ if $type eq 'char' and $size > 1;
+        }
+      }
+    }
+  }
+  my $types;
+  $types = [ @col_types ] if $has_char_gt_one;
+
+  $debug ||= $check_only;
+
+  if ( !$skip && !$verify_only ) {
+    if ( !$check_only || ( $bcp eq 'in' && !$server ) ) {
+
+      if ($opts->{f}) {
+        $filter = $opts->{f};
+      }
+      if ($opts->{a}) {
+        $action = $opts->{a};
+      }
+
+      $db_util->$bcp( $table, $file, {
+        RowDelimiter=> $row_delimiter,
+        Delimiter   => $delimiter,
+        Header      => $header,
+        Filter      => $filter,
+        Columns     => $columns,
+        QuoteFields => $quote,
+        Action      => $action,
+        DirectPath  => $direct_path,
+        DateFormat  => $date_format,
+        NoFix       => $no_fix,
+        NoExec      => $check_only,
+        NLSLang     => $nls_lang,
+        Semantics   => $semantics,
+        Encoding    => $encoding,
+        Debug       => $debug,
+        PreserveBlanks => $preserve_blanks,
+        TempDb      => $temp_db,
+        TrimBlanks  => $trim_blanks,
+        SybaseTypes => $types,
+        Constants   => $constants,
+        FieldRef    => $f_constants,
+        CommitSize  => $commit_size,
+        MaxErrors   => $max_errors,
+        LoadWhen    => $when,
+        PacketSize  => $packet_size,
+        PassThru    => \@pass_thru,
+        @col_list_opt,
+        @filler_list_opt,
+      });
+    }
+  }
+
+  my @from_columns;
+  if ( $to_server || $to_database || $to_table ) {
+    my $sth = $dbh->prepare("SELECT * FROM $table WHERE 1=0");
+    $sth->execute();
+    @from_columns = @{$sth->{NAME_lc}};
+    $sth->finish();
+  }
+
+  $dbh->disconnect;
+
+  return unless $to_server || $to_database || $to_table || $to_env;
+
+  # If we default table, remove existing schema
+  ($to_table = $table) =~ s/.*\.// unless $to_table;
+
+  $to_user     ||= $user;
+  $to_password ||= $password;
+
+  my ($to_dbh, $to_dbutil) = $db_lib->connect(
+    Server   => $to_server,
+    Database => $to_database,
+    Type     => $to_db_type,
+    Env      => $to_env,
+    User     => $to_user,
+    Password => $to_password,
+  );
+  $to_db_type ||= $to_dbutil->type();
+
+  # Check column names and order
+  $to_table = "$to_schema.$to_table" if $to_schema;
+
+  if ($columns) {
+    print "Columns option used: skipping column order check\n";
+  } else {
+    # Remove partition name if it exists
+    (my $tmp_to_table = $to_table) =~ s/:.*//;
+    my $info = $to_dbutil->column_info($tmp_to_table)
+      or die "Table $tmp_to_table does not exist in target db";
+    my @to_columns = @{$info->{LIST}};
+
+    my $last_col = min($#from_columns, $#to_columns);
+
+    # Tables migrated from Sybase to Oracle might have column name changes,
+    # e.g., foobar => foobar_1
+    for my $i (0..$last_col) {
+      my ($from, $to) = ($from_columns[$i], $to_columns[$i]);
+      next if $from eq $to;
+      next if $from =~ /^\Q$to\E(?:_\d+)$/;
+      next if $to   =~ /^\Q$from\E(?:_\d+)$/;
+      print "Warning: Mismatch at col#$i: From: $from_columns[$i] To: $to_columns[$i]\n";
+      $exit_status ||= 1;
+    }
+    $last_col++;
+
+    my $last_mismatch = max($#from_columns, $#to_columns);
+    for my $i ($last_col..$last_mismatch) {
+      $exit_status ||= 1;
+      if ($from_columns[$i]) {
+        print "Warning: Mismatch col#$i: From: $from_columns[$i] To: N/A\n";
+        next;
+      }
+      print "Warning: Mismatch col#$i: From: N/A To: $to_columns[$i]\n";
+    }
+  }
+
+  # If it's Oracle, generate the control file anyway
+  unless ($verify_only) {
+    if ( !$check_only || !$to_server ) {
+
+      if ($opts->{a}) {
+        $action = $opts->{a};
+      }
+      $to_dbutil->bcp_in( $to_table, $file, {
+        RowDelimiter=> $row_delimiter,
+        Delimiter   => $delimiter,
+        Header      => $header,
+        Action      => $action,
+        DirectPath  => $direct_path,
+        QuoteFields => $quote,
+        SybaseDateFmt => $no_fix,
+        NoExec      => $check_only,
+        NLSLang     => $nls_lang,
+        TrimBlanks  => $trim_blanks,
+        PreserveBlanks => $preserve_blanks,
+        SybaseTypes => $types,
+        Debug       => $debug,
+        Constants   => $constants,
+        FieldRef    => $f_constants,
+        CommitSize  => $commit_size,
+        MaxErrors   => $max_errors,
+        LoadWhen    => $when,
+        PacketSize  => $to_packet_size,
+        PassThru    => \@to_pass_thru,
+        @to_col_list_opt,
+        @to_filler_list_opt,
+      });
+    }
+  }
+
+  $to_dbh->disconnect();
+
+}
+
+sub parse_constants {
+  my @list = @_;
+  my %consts;
+  for (@list) {
+    /^(\w+):(.*)/ or pod2usage("Invalid constant $_");
+    my ($name, $val) = ($1, $2);
+    $consts{$name} = $val;
+  }
+  return %consts;
+}
+
+sub determine_db_type {
+  my ($svr, $db, $type) = @_;
+  return $type if $type;
+  return 'Sybase' if $svr;
+  return 'Oracle' if $db;
+  return 'Sybase';
+}
+
+# Returns the current date and time
+sub Timestamp { localtime()->strftime('%Y-%m-%d %H:%M:%S') }
+
+# Print timestamped message
+sub Print { printf("[%s] %s\n", Timestamp(), shift) }
+
+__END__
+
+=head1 NAME
+
+xbcp - Bulk copy for Sybase or Oracle
+
+=head1 SYNOPSIS
+
+xbcp [[database.]owner|schema.]table {in|out} [file] [options]
+
+ Options:
+   -S     server
+   -D     database
+   -r     row terminator (default: "\n")
+   -t     field terminator (default: "|")
+   -T     database type (Oracle|Sybase)
+   -env   environment
+   -U     username
+   -P     password
+   -H     column header row exists in first row of file
+   -h     # of column headers at beginning of file
+   -A     network packet size
+   -O     arbitrary list of options to pass through to bcp
+   -file  file containing list of tables to process (See Table File Format section below)
+   -skip  skip bcp of initial table/file, only bcp for '-2' options
+   -proc  number of concurrent processes (default: 5, max: 20)
+   -dblib Database library to use (default: DBIX_BULKUTIL_LIB env variable or "DBIx::BulkUtil")
+   -d     debug
+   -help  brief help message
+   -man   full documentation
+
+  BCP in options:
+   -a      A=Append(default),R=Replace,T=Truncate (Oracle or Sybase)
+   -commit Commit size in rows
+   -errcnt Max # of errors allowed before abort
+   -C      Comma separated list of columns in file (or
+           this argument may appear multiple times, once
+           for each column).
+   -F      Comma separated list of filler columns in file which
+           will be ignored and not loaded (or this argument
+           may appear multiple times, once for each column).
+
+  BCP in (Oracle only) options:
+   -blank preserve blanks in char/varchar columns
+   -p     Use direct path load (default: conventional)
+   -dp    Use direct path parallel load (does not rebuild
+          indexes after load).
+   -dfmt  Date format (default: YYYY-MM-DD HH24:MI:SS.FF3)
+   -q     fields optionally enclosed by quotes
+   -nls_lang NLS lang to use in control file
+   -check  just generate control file (implies -d)
+   -const  set constant in control file(e.g. fieldname:value)
+           (must be literal value)
+   -fconst set function constant in control file(e.g. fieldname:value)
+           (e.g. asof_date:TO_DATE('2012-01-01', 'YYYY-MM-DD'))
+   -when   Specify a WHEN clause, e.g., to skip comments, "(1:1) != '#'"
+
+  Sybase BCP out && Oracle BCP in options:
+   -n     Sybase native date format
+          (This is the default when BOTH bcp'ing
+           out of Sybase AND using the "bcp into
+           second database" options. Overrides -dfmt).
+          When exporting a large amout of data
+          from Sybase (w/native bcp) it can take a
+          long time when NOT using this option.
+
+  BCP out options:
+   -f      SQL where clause
+   -c      column list (does not use native Sybase bcp)
+   -tmpdb  Database to use for creating temporary views (default: scratchdb).
+   -nobulk Do not use bcp for Sybase export.
+   -blobsz max read size for BLOBs (default: 1MB).
+   -date_fmt        Date format (except for native Sybase bcp).
+                    For Oracle, default is 'YYYY-MM-DD HH:MI:SS'.
+                    For Sybase, default is 'ISO' (see L<DBD::Sybase|DBD::Sybase>.
+   Oracle only:
+   -datetime_fmt    Datetime format (default: 'YYYY-MM-DD HH:MI:SS.FF')
+   -datetime_tz_fmt Datetime tz format (default: 'YYYY-MM-DD HH:MI:SS.FF')
+                    datetime_tz_formate will first default to datetime_fmt, and
+                    then to 'YYYY-MM-DD HH:MI:SS.FF'.
+                    When exporting from Oracle, and into Sybase,
+                    default will be 'YYYY-MM-DD HH:MI:SS.FF3'.
+
+  BCP into a second database:
+   -check  check column names and order and
+           generate control file (bcp file must exist)
+   -verify just check column names and order.
+   -2S     server
+   -2D     database
+   -2SCH   schema
+   -2T     db_type
+   -2env   environment
+   -2t     table
+   -2U     user
+   -2P     password
+   -2A     network packet size
+   -2C     List of columns in file (See -C option).
+   -2F     List of filler columns in file (See -F option).
+   -2O     arbitrary list of bcp options
+
+=head1 DESCRIPTION
+
+B<xbcp> will load data to a table from a file, or extract data from
+a table to a file.
+
+If a server is provided, the database type is assumed to be Sybase.
+If no server but a database is provided, then the default
+database type is Oracle.
+Otherwise the server defaults to the environment variable DSQUERY.
+
+If no file is provided, it is assumed to be the table name with
+a ".bcp" extension. If no table is provided, it is assumed to be
+the file name without the extension.
+
+If the file name has a ".csv" extension, the default field terminator
+is ",".
+
+The where clause for the -f option is just appended to the default
+SQL statement, so it must include the keyword "where".
+When the -f option is used, the native Sybase bcp is not used, and
+the -n option is ignored.
+
+If you bcp a large amount of data out of Sybase, and the native
+Sybase bcp is used, you should SERIOUSLY CONSIDER using the -n
+option. Otherwise, your process will appear to hang for a long
+time after the actual bcp is done.
+
+When loading into Oracle, and any data for for any date column(s)
+is found within the first 1000 rows, xbcp will try to automatically
+determine the date format of the column(s).  If no data is found within
+the first 1000 rows, or if xbcp can not determine the format, then
+the default date format will be used (also see the -dfmt and -n options).
+
+If either of the B<-P> or B<-2P> options are equal to "-", then the
+password(s) will be read from STDIN.
+
+=head2 Table File Format
+
+If the B<-file> option is used to supply a list of tables for bcp, then
+no source/target table nor any bcp file name should be on the command
+line, and the format of the file is:
+
+  # Comments
+  src_table1 [tgt_table1] [options]
+  src_table2 [tgt_table2] [options]
+
+The target table name is optional.
+Options are in the format B<-option=value> or B<-option="some value with spaces">.
+Options in the table file will override
+any options on the command line for that table. The allowed options are
+const, fconst, f, and a.
+
+
+=cut

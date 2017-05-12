@@ -1,0 +1,36 @@
+MANIFEST		This file
+Changes			History of this package
+Makefile.PL		Custom Makefile maker tested on Win32, Mac, and Linux
+LabJack.xs		The "C" code which builds a perl module containing the LabJack routines
+ppport.h
+README			Info about the LabJack device, and this perl driver Device::LabJack
+ljackuw.h		header version 1.18
+ljackuw.lib		a
+ljackuw.dll		a
+ljackuw_1.074.h		a
+ljackuw_1.074.lib	win32 lib
+test.pl			a sample that tries all out
+hello.pl		sample
+META.yml		Version info etc
+const-c.inc		
+const-xs.inc
+ljackuwx.ocx		a
+t/Device-LabJack.t	a
+LabJack.pm		The main Device::LabJack perl library stub (formerly LJperl.pm - the version by Chris Drake)
+linux-labjack/README	Subdirectory containing the source of "linux-LabJack-0.03.tar.gz" (the aug 2005 version) from labjack.com
+linux-labjack/COPYING
+linux-labjack/driver/linux-2.4/labjack.c
+linux-labjack/driver/linux-2.4/Makefile
+linux-labjack/driver/linux-2.6/labjack.c
+linux-labjack/driver/linux-2.6/patch/labjack_urb_kill.patch
+linux-labjack/driver/linux-2.6/Makefile
+linux-labjack/driver/linux-2.6/README
+linux-labjack/liblabjack/ljackul.h
+linux-labjack/liblabjack/Makefile
+linux-labjack/liblabjack/ljackul.c
+linux-labjack/test/firmware-revision.c
+linux-labjack/test/analog-outs.c
+linux-labjack/test/Makefile
+linux-labjack/test/list-all.c
+linux-labjack/Function-Status
+linux-labjack/INSTALL

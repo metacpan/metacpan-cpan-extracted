@@ -1,0 +1,18 @@
+To use the Perl script, "hashfile", type:
+
+        ./hashfile file1 [file2 file3 ...]
+
+where file1, file2, file3, ... are the files you want to hash, e.g.,
+
+        ./hashfile README resume.doc refman.pdf
+
+hashfile takes at least one file as argument.
+
+The Perl script, "strings", hashes different strings. The use of the
+methods hashsize() and rounds() are also illustrated.
+
+The Perl script, "clone" illustrates the use of the clone() method.
+
+AUTHOR:
+Julius C. Duque <{jcduque}{at}{lycos}{dot}{com}>
+

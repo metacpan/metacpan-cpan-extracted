@@ -1,0 +1,56 @@
+{
+   "abstract" : "prototypical value checking",
+   "author" : [
+      "brian d foy <bdfoy@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.86, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [
+      "module",
+      "distribution",
+      "test"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Constraint",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Prototyped" : "0",
+            "Test::More" : "0.95",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Constraint"
+      },
+      "repository" : {
+         "url" : "git://github.com/briandfoy/data-constraint.git"
+      }
+   },
+   "version" : "1.17"
+}

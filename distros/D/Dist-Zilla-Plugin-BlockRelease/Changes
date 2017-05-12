@@ -1,0 +1,13 @@
+Revision history for Dist-Zilla-Plugin-BlockRelease
+
+0.003     2015-12-02 03:05:52Z
+          - use ANSI colours in log messages for visibility
+
+0.002     2014-10-28 02:24:55Z
+          - implement Releaser role so as to not force the use of another
+            Releaser plugin
+          - warn at the start of the build that releases will be prevented
+
+0.001     2014-05-03 22:56:37Z
+          - Initial release, split out from
+            Dist-Zilla-PluginBundle-Author-ETHER.

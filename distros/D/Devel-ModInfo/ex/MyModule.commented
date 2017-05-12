@@ -1,0 +1,36 @@
+#This module is purely for testing ModInfo's
+# installation and capabilities
+#It doesn't do anything useful itself
+
+# MODINFO module MyModule
+package MyModule;
+
+# MODINFO dependency module XML::DOM
+use XML::DOM;
+# MODINFO dependency module CGI
+use CGI;
+# MODINFO dependency module IO::Handle
+use IO::Handle;
+
+# MODINFO parent_class NiceModule
+@ISA = qw/ Exporter Autoloader NiceModule /;
+
+# MODINFO function new
+sub new {
+	#This is my object oriented constructor!
+	my($class) = @_;
+	return bless {} => $class;
+}
+
+# MODINFO function method1
+sub method1 {
+	my($self) = @_;
+	return 1;
+}
+
+# MODINFO function method2
+sub method2($$) {
+	my($self, $message) = @_;
+	print "$message!\n";
+	return 2;
+}

@@ -1,0 +1,15 @@
+<body xmlns="http://www.w3.org/1999/xhtml" xmlns:daizu="http://www.daizucms.org/ns/html-extension/" xmlns:xi="http://www.w3.org/2001/XInclude" xml:base="daizu:///daizucms.org/_index.html">
+
+<p><img src="blog/2005/05/wasp-on-holly-leaf/wasp-on-holly-leaf.jpg" /></p>
+
+<p><img src="blog/2005/05/wasp-on-holly-leaf/wasp-on-holly-leaf.jpg"
+        width="450" title="override title" alt="override alt" /></p>
+
+<p>This one is accessing the thumbnail, which has a different size:
+ <img src="blog/2005/05/wasp-on-holly-leaf/wasp-on-holly-leaf-thm.jpg"
+      alt="" title="" /></p>
+
+<p>Image outside Daizu, which still needs an empty alt attribute:
+ <img src="http://www.daizucms.org/some-image.png"/></p>
+
+</body>

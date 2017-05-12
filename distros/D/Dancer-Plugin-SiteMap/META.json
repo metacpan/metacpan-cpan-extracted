@@ -1,0 +1,51 @@
+{
+   "abstract" : "Automated site map for the Dancer web framework.",
+   "author" : [
+      "James Ronan <james@ronanweb.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.9, CPAN::Meta::Converter version 2.131560",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-SiteMap",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : "1.175",
+            "Test::More" : "0",
+            "XML::Simple" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/jamesronan/Dancer-Plugin-SiteMap/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/jamesronan/Dancer-Plugin-SiteMap"
+      }
+   },
+   "version" : "0.14"
+}

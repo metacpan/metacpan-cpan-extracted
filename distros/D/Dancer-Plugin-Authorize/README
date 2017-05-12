@@ -1,0 +1,53 @@
+Dancer-Plugin-Authorize - Dancer Authentication and Role-Based Access Control Framework!
+
+use Dancer;
+use Dancer::Plugin::Authorize;
+
+post '/login' => sub {
+
+    my $auth = auth(params->{user}, params->{pass});
+    
+    if ($auth) {
+        
+        if ($auth->asa('guest')) {
+            ...
+        }
+        
+        if ($auth->can('manage_accounts')) {
+            if ($auth->can('manage_accounts', 'create')) {
+                ...
+            }
+            else {
+                ...
+            }
+        }
+        
+    }
+
+};
+
+To install this module using code from CPAN,
+run the following commands
+
+perl Makefile.PL
+make
+make test
+make install
+
+To install this module using code from the git repository,
+run the following commands (Dist::Zilla required):
+
+dzil build
+cd Dancer-Plugin-Authorize-#.##
+cpan .
+
+REPOSITORY
+
+  http://github.com/alnewkirk/Dancer-Plugin-Authorize/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 Al Newkirk
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

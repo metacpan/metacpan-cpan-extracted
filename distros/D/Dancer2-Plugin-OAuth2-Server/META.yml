@@ -1,0 +1,43 @@
+---
+abstract: 'Easier implementation of an OAuth2 Authorization Server / Resource Server with Dancer2 Port of Mojolicious implementation : https://github.com/G3S/mojolicious-plugin-oauth2-server'
+author:
+  - 'Pierre Vigier <pierre.vigier@gmail.com>'
+build_requires:
+  HTTP::Request: '0'
+  Plack::Test: '0'
+  Test::More: '0.96'
+  YAML::XS: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.041, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-OAuth2-Server
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Crypt::PRNG: '0'
+  Dancer2: '0.163000'
+  Dancer2::Plugin: '0'
+  MIME::Base64: '0'
+  URI: '0'
+  URI::QueryParam: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/pierre-vigier/dancer2-plugin-oauth2-server/issues
+  homepage: https://github.com/pierre-vigier/dancer2-plugin-oauth2-server
+  repository: https://github.com/pierre-vigier/dancer2-plugin-oauth2-server.git
+version: '0.10'
+x_contributors:
+  - 'Peter Mottram <peter@sysnix.com>'

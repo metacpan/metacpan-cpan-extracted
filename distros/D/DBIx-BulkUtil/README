@@ -1,0 +1,36 @@
+DBIx-BulkUtil version 0.01
+==========================
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Carp
+  DBI
+  Memoize
+  Text::CSV_XS
+
+TODO
+
+Pass in file/log handle to absorb all stdout/stderr (and default to stdout)?
+
+Make bcp_in NoFix option the default?
+
+Break up packages into separate files?
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2015 by Doug Wilson
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.1 or,
+at your option, any later version of Perl 5 you may have available.

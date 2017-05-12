@@ -1,0 +1,50 @@
+{
+   "abstract" : "modules for parsing and generate DIME messages",
+   "author" : [
+      "Domingo Alcazar Larrea <dalcazar@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "gpl_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DIME-Tools",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::UUID" : "0",
+            "IO::File" : "0",
+            "IO::Scalar" : "0",
+            "IO::Wrap" : "0",
+            "perl" : "5.008",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "https://github.com/neilb/DIME-Tools",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/neilb/DIME-Tools.git",
+         "web" : "https://github.com/neilb/DIME-Tools"
+      }
+   },
+   "version" : "0.04"
+}
+

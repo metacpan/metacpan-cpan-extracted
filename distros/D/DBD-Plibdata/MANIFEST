@@ -1,0 +1,12 @@
+CHANGES
+CREDITS
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/DBD/Plibdata.pm
+lib/DBD/Plibdata/Summary.pm
+lib/Plibwrap.pm
+t/1.t
+t/2.t
+t/3.t

@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-Phrasebook-Loader-ApacheFormat
+version:      1.00
+version_from: lib/Data/Phrasebook/Loader/ApacheFormat.pm
+installdirs:  site
+requires:
+    Config::ApacheFormat:          1.2
+    Data::Phrasebook:              0.21
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

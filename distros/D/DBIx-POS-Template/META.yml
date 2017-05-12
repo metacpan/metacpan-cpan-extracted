@@ -1,0 +1,26 @@
+---
+abstract: 'is a fork of L<DBIx::POS>. Define a dictionary of SQL statements in a POD dialect (POS) plus expand template sql with embedded Perl using L<Text::Template>.'
+author:
+  - "Ð\x9CÐ¸Ñ\NÐ°Ð¸Ð» Ð§Ðµ (Mikhail Che) <mche@cpan.org>"
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-POS-Template
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Hash::Merge: '0.2'
+  Pod::Parser: '1.6'
+  Text::Template: '1.46'
+  perl: '5.006'
+version: '0.067'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

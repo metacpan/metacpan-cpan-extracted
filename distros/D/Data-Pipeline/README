@@ -1,0 +1,47 @@
+                             Data::Pipeline 0.02
+
+                toolkit for building data processing pipelines
+
+INSTALLATION
+    Installation follows standard Perl CPAN module installation steps:
+
+     cpan> install Data::Pipeline
+
+    or, if not using the CPAN tool, then from within the unpacked
+    distribution:
+
+     % perl Makefile.PL
+     % make
+     % make test
+     % make install
+
+WHAT IS INSTALLED?
+
+    Data::Pipeline - the Perl modules that make everything work
+
+    data-pipeline - a DSL for describing data pipelines
+
+DESCRIPTION
+
+    The Data::Pipeline package consists of a set of modules, a parser, and
+    a script engine for running data processing pipelines.  For more
+    information, see http://dh.tamu.edu/drw/codex/Data_Pipeline_Scripting
+
+BUGS
+    There are probably quite a few. Certain machine features don't work as
+    expected. There has been no profiling or optimization, so the pipelines
+    will run much slower than they should. The interface design should be
+    good though.
+
+    Bugs may be reported on rt.cpan.org or by e-mailing bug-Data-Pipeline at
+    rt.cpan.org.
+
+AUTHOR
+    James Smith, `<jsmith@cpan.org>'
+
+LICENSE
+    Copyright (c) 2008 Texas A&M University.
+
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

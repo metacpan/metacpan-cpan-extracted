@@ -1,0 +1,17 @@
+dbdimp.psc
+Ingperl.pm
+Ingres.pm
+Ingres.sh
+Ingres.xs
+ingtest.pl
+ingperl.pl
+Makefile.PL
+MANIFEST
+t/datatypes.t
+t/dbi.t
+t/event.t
+t/exec.t
+README
+CHANGES
+
+META.yml                                 Module meta-data (added by MakeMaker)

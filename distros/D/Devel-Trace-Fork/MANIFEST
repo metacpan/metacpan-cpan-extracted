@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Devel/Trace/Fork.pm
+lib/Devel/Trace/Fork/Stderr.pm
+t/00-load.t
+t/01-test.t
+META.yml                                 Module meta-data (added by MakeMaker)

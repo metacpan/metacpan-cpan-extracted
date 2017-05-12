@@ -1,0 +1,39 @@
+Dist::Zilla::Role::BundleDeps
+
+This role attempts to solve the problem of communicating dependencies to
+META.* from bundles in a different way.
+
+My first attempt was "[Prereqs::Plugins]", which added all values that
+are seen in the "dist.ini" to dependencies.
+
+However, that was inherently limited, as the ":version" specifier is
+lost before the plugins appear on "$zilla->plugins"
+
+This Role however, can see any declarations of ":version" your bundle
+advertises, by standing between your "bundle_config" method and
+"Dist::Zilla"
+
+INSTALLATION
+
+This is a Perl module distribution. It should be installed with whichever
+tool you use to manage your installation of Perl, e.g. any of
+
+  cpanm .
+  cpan  .
+  cpanp -i .
+
+Consult http://www.cpan.org/modules/INSTALL.html for further instruction.
+Should you wish to install this module manually, the procedure is
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Kent Fredric
+<kentfredric@gmail.com>.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

@@ -1,0 +1,12 @@
+Revision history for Perl extension DBIx::IO.
+
+1.07  Fri Jul 11 20:45:18 PDT 2008
+        - Get Oracle views in table list
+
+1.06  Thu Jul  3 17:57:03 PDT 2008
+        - Support all the latest datatypes, some cleanup
+
+0.01  Tue Oct  2 18:37:13 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -b 5.5.3 -n DBIx::IO
+

@@ -1,0 +1,49 @@
+ECMAScript and charset support for hjsdump
+
+Encoding, escape [^[:print:]]
+	Doesn't seem to include Unicode in 5.8.4...
+
+Numbers
+	Infinity
+
+	NaN
+
+	const (check attribute?)
+
+Lightweight (object initializer) output for 1.2+
+	JavaScript 1.2 and later support a compact object notation known
+	as object literals. We probably want to walk depth first if using
+	this notation.
+
+	HASH = {key:val}
+	ARRAY= [0, 1, 2]
+
+	See nuclear wessels, wait for Anon/Lite merger because it requires
+	inline dumping
+
+More robust var naming (get & use perl names?)
+
+Unify:
+	How to scan & determine which format is best?
+	constructor, flat, literal, class/prototype
+
+	Data::JavaScript
+	Data::JavaScript::LiteObject
+		allow objects to be stuffed into an array and use the key names
+		as var names? to what end, would have to know var names
+
+	Data::JavaScript::Anon		(Perl : anonymous :: JS : literal)
+		jsdump takes undef as name
+
+		worries too much about valid numbers but not strings,
+		validation belongs elsewhere
+
+	Template::Plugin::JavaScript
+		__quotemeta
+
+	JSON
+		why oh why
+		    is it a top-level name?
+		    didn't he look around first?
+
+	XML feed, Atom feed?

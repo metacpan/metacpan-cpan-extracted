@@ -1,0 +1,63 @@
+Revision history for Dist-Zilla-PluginBundle-Dancer
+
+0.0013 2015-05-23
+
+ [DISTRIBUTION]
+ - Remove Module::Build support. (GH#13)
+
+0.0012 2014-05-29
+
+ [DISTRIBUTION]
+ - Change Dist::Zilla::Plugin::NoTabsTest for DZP::Test::NoTabs (GH#12)
+ - Add Github META info (url + bug tracker). (GH#11)
+
+0.0011 2014-03-26
+
+ [BUG FIXES]
+ - Arguments of Test::Compile were wrong. (GH#9, reported by Racke)
+
+0.0010 2014-02-13
+ [IMPROVEMENTS]
+ - Don't 'use' the plugins in the bundle directly. 
+    (GH#8, pointed out by Kent Fredric)
+
+ [BUG FIXES]
+ - New Config::MVP is breaking on impossible configuration. 
+    (GH#7, reported by Kent Fredric)
+
+0.0009 2014-01-06
+ [IMPROVEMENTS]
+ - Bump the version for Dist::Zilla::Plugin::Test::Compile (to protect
+    ourselves from some buggy releases).
+
+0.0008 2013-09-25
+ [BUG FIXES]
+ - Dist::Zilla::Plugin::Test::Compile was causing test to potentially hang
+   on Windows. (reported by Karen Etheridge)
+
+0.0007 2013-08-25
+    - Bump dependency to Dist::Zilla::Plugin::TestCompile to 2.020.
+
+0.0006 2013-08-01
+    - Temporary removed DZ::P::ContributorsFromGit as it makes Travis
+        fails.
+    - And DZ::P::ContributorsFile, as it depends on DZ::P::CFG. :-(
+
+0.0005  2013-07-31
+    - Add DZ::P::Authority
+    - Add DZ::P::ContributorsFile and DZ::P::ContributorsFromGit
+    - Add DZ::P::UploadToCPAN
+    - Bump the required version for DZ::P::Test::Compile to v2.011
+
+0.0004
+   - Add DZ::P::Test::ReportPrereqs
+
+0.0003
+   - Require 5.10.0.
+
+0.0002
+   - Add dotfiel support.
+
+0.0001
+
+  - First version, unleashed on an unsuspecting world.

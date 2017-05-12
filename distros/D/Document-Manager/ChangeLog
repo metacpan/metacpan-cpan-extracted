@@ -1,0 +1,228 @@
+2005-06-12 18:39  jon
+	* scripts/get_docs scripts/ls_docs scripts/stat_docs
+	  scripts/submit_doc scripts/update_doc: Added support for setting an
+	  environment variable to control the server and resource for the 
+	  commands.
+	
+2005-05-23 17:22  jon
+	* INSTALL: Added notes on install procedure. Also, how to run dms.
+
+2005-05-23 01:34  bryce
+
+	* doc/PLAN, lib/Document/Manager.pm, lib/Document/Object.pm,
+	lib/Document/Repository.pm, scripts/doc_prop, scripts/ls_clipart,
+	scripts/update_clipart: Getting keywords to work correctly (more or
+	less).
+	
+	Filling in documentation for Document::Object and
+	Document::Manager.
+	
+	Removing unimplemented functions.  Removing misc. warnings.
+
+2005-05-16 01:00  bryce
+
+	* ChangeLog, MANIFEST, META.yml, lib/Document/Manager.pm: Updating
+	manifest
+
+2005-05-15 17:38  bryce
+
+	* Makefile.PL, doc/PLAN, lib/Document/Manager.pm,
+	lib/Document/Object.pm, lib/Document/Repository.pm, scripts/dmsd,
+	scripts/ls_docs, scripts/submit_clipart, scripts/update_clipart:
+	Implementing state and keyword tracking
+
+2005-04-24 10:33  bryce
+
+	* lib/Document/Repository.pm: Defaulting _debug in D::Repository
+	and stripping some warning messages
+
+2005-04-24 10:24  bryce
+
+	* META.yml, lib/Document/Manager.pm: Prepping for release
+
+2005-04-24 10:18  bryce
+
+	* MANIFEST: Updating manifest
+
+2005-04-24 10:15  bryce
+
+	* doc/PLAN, lib/Document/Manager.pm, lib/Document/Object.pm,
+	scripts/doc_prop: Adding preliminary capability to store
+	properties.  Initial creation of doc_prop, a script to view or
+	update the properties of a given document.
+
+2005-04-23 20:02  bryce
+
+	* lib/Document/Manager.pm, lib/Document/Object.pm,
+	lib/Document/Repository.pm, scripts/dmsd, scripts/ls_docs,
+	scripts/submit_clipart: * Implementing dms as subclass of
+	TicketAuth::DBI * Fixing some syntax errors * Hooking in
+	Document::Object and fixing some issues * repo() -> _repo() *
+	Adding _STATES and some prelim state tracking
+
+2005-04-18 00:19  bryce
+
+	* scripts/ls_docs: Fixing variable declarations
+
+2005-04-18 00:08  bryce
+
+	* MANIFEST, Makefile.PL: Removing dms script (obsolete)
+
+2005-02-05 23:06  bryce
+
+	* Makefile.PL, README, doc/CONCEPT, doc/PLAN, etc/dms.conf,
+	lib/Document/Manager.pm, lib/Document/Object.pm,
+	lib/Document/Repository.pm, scripts/dms, scripts/dmsd,
+	scripts/ls_docs, scripts/repo_add, scripts/repo_export,
+	scripts/repo_get, scripts/repo_init, scripts/repo_ls,
+	scripts/repo_put, scripts/submit_clipart: Address change
+
+2004-11-29 14:02  bryce
+
+	* scripts/submit_clipart: Adding POD documentation
+
+2004-11-15 01:16  bryce
+
+	* META.yml, Makefile.PL, doc/PLAN, lib/Document/Manager.pm,
+	scripts/submit_clipart: Upping for release.  Removing some
+	scaffolding.
+
+2004-11-15 01:05  bryce
+
+	* lib/Document/: Manager.pm, Object.pm: Checking in version tweaked
+	to work on OCAL site
+
+2004-10-31 01:57  bryce
+
+	* lib/Document/: Manager.pm, Object.pm, Repository.pm: Adding new
+	classes
+
+2004-10-24 00:03  bryce
+
+	* INSTALL, Makefile.PL, doc/PLAN, lib/Document/Manager.pm,
+	scripts/dmsd, scripts/ls_docs, scripts/submit_clipart: Implement
+	MIME encoding for file upload
+
+2004-10-03 21:50  bryce
+
+	* doc/PLAN: Adding todo items based on existing scripts
+
+2004-09-16 15:48  bryce
+
+	* MANIFEST, META.yml, dms.in, doc/PLAN, lib/Document/Manager.pm,
+	scripts/ls_docs, scripts/submit_clipart, t/test.t: Removing some
+	unneeded old files
+
+2004-09-12 00:09  bryce
+
+	* README, lib/Document/Manager.pm, lib/Document/Repository.pm:
+	Fleshing out README a little
+	
+	Adding some error message scaffolding to the perl lib's.
+
+2004-09-12 00:08  bryce
+
+	* scripts/: ls_docs, submit_clipart: Adding client scripts
+
+2004-09-11 23:16  bryce
+
+	* scripts/dmsd: SOAP daemon for managing a document system
+
+2004-09-11 23:15  bryce
+
+	* META.yml, Makefile.PL, doc/PLAN, lib/Document/Manager.pm,
+	lib/Document/Repository.pm, scripts/submit_clipart: Revising how
+	dependencies are detected in Makefile.PL
+	
+	Hooking up Document::Manager to Document::Repository and getting a
+	few routines working.
+	
+	Creating a submit_clipart script
+
+2004-09-11 16:18  bryce
+
+	* doc/: CONCEPT, PLAN, clipart_repo.txt: unifying some docs a bit
+
+2004-09-11 12:14  bryce
+
+	* doc/clipart_repo.txt: New file
+
+2004-08-25 12:13  bryce
+
+	* MANIFEST, Makefile.PL, lib/Document/Manager.pm,
+	lib/Document/Repository.pm: Removing PREREQ_FATAL as per CPAN
+	suggestion
+
+2004-08-15 15:39  bryce
+
+	* scripts/: repo_export, repo_init, repo_ls, repo_put: Adding some
+	new commands to init a repository, put revisions of existing
+	documents, and export documents from the repository.
+
+2004-08-15 13:09  bryce
+
+	* MANIFEST, lib/Document/Manager.pm, lib/Document/Repository.pm,
+	scripts/repo_ls: Adding META.yml and working on pulling out put()
+	from add(), and simplifying several commands...
+
+2004-08-15 11:54  bryce
+
+	* lib/Document/Repository.pm, t/01_repo_basic.t,
+	t/01_repo_create.t, t/zz_dump_config.t: Adding some tests
+
+2004-08-15 11:13  bryce
+
+	* t/01_repo_create.t: Adding new test
+
+2004-08-15 09:46  bryce
+
+	* t/00_initialize.t: Adding a use test
+
+2004-08-15 09:29  bryce
+
+	* MANIFEST, Makefile.PL, doc/PLAN, lib/Document/Manager.pm: Adding
+	repo_get & upping version number
+
+2004-08-15 00:49  bryce
+
+	* lib/Document/Repository.pm, scripts/repo_add, scripts/repo_get:
+	Adding script for getting files in a document Testing and fixing up
+	repo_add and Document::Repository to do add and get
+
+2004-08-14 22:57  bryce
+
+	* MANIFEST, Makefile.PL, doc/PLAN, lib/Document/Manager.pm,
+	lib/Document/Repository.pm, scripts/repo_add: Implementing add
+	document functionality
+
+2004-08-14 12:09  bryce
+
+	* META.yml, doc/CONCEPT: Adding two new files
+
+2004-08-14 12:08  bryce
+
+	* lib/Document/Manager.pm: Adding todo's and some new stubbed
+	functions
+
+2004-08-14 10:35  bryce
+
+	* Makefile.PL, dms.in, scripts/dms: Changing distname from dms to
+	Document-Manager.  Creating preliminary dms script
+
+2004-08-14 09:18  bryce
+
+	* dms-0.01.tar.gz, dms-0.02.tar.gz, doc/PLAN: Cleanup...
+
+2004-08-14 09:17  bryce
+
+	* ChangeLog, INSTALL, MANIFEST, Makefile.PL, README,
+	dms-0.01.tar.gz, dms-0.02.tar.gz, dms.in, etc/dms.conf,
+	lib/Document/Manager.pm, scripts/dms, t/test.t: Initial import of a
+	Document Management System tool
+
+2004-08-14 09:17  bryce
+
+	* ChangeLog, INSTALL, MANIFEST, Makefile.PL, README,
+	dms-0.01.tar.gz, dms-0.02.tar.gz, dms.in, etc/dms.conf,
+	lib/Document/Manager.pm, scripts/dms, t/test.t: Initial revision
+

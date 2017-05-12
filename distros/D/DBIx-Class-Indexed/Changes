@@ -1,0 +1,10 @@
+Revision history for Perl extension DBIx::Class::Indexed.
+
+0.03 2011-10-13
+ - use Module::Load to load indexer modules (Logan Bell)
+
+0.02 2007-04-24
+ - update tests
+
+0.01 2007-04-03
+ - original version;

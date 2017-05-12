@@ -1,0 +1,43 @@
+Data::CGIForm - CGI Paramater Validation
+========================================
+
+Data::CGIForm is a library for managing and testing the data sent 
+from a CGI form.  It provides filtering, testing callbacks, support
+for multiple values, and other features.
+
+See the POD documentation in CGIForm.pm for more information.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires perl 5.6.0 or greater.  The test suite requires
+Test::More which is part of the Test::Simple distribution.
+
+AUTHOR
+
+Tim Wilde
+twilde@cymru.com
+
+Chris Reinhardt
+cpan@triv.org
+
+COPYRIGHT AND LICENCE
+
+Portions Copyright (c) 2007 Tim Wilde.  All rights reserved.
+
+Portions Copyright (c) 2006 Dynamic Network Services, Inc.  All rights
+reserved.
+
+Portions Copyright (c) 1997-2002 Chris Reinhardt.  All rights reserved. 
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+$Id: README 2 2010-06-25 14:41:40Z twilde $

@@ -1,0 +1,53 @@
+---
+abstract: 'Basic HTTP authentication for Dancer web apps'
+author:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'
+build_requires:
+  Dancer::Test: 0
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  List::Util: 0
+  Test::More: 0
+  lib: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.17
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Auth-Basic
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer::Plugin::Auth::Basic:
+    file: lib/Dancer/Plugin/Auth/Basic.pm
+    version: 0.030
+requires:
+  Authen::Passphrase: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  Dancer::Response: 0
+  HTTP::Headers: 0
+  MIME::Base64: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/odyniec/p5-Dancer-Plugin-Auth-Basic/issues
+  homepage: https://github.com/odyniec/p5-Dancer-Plugin-Auth-Basic
+  repository: https://github.com/odyniec/p5-Dancer-Plugin-Auth-Basic.git
+version: 0.030
+x_contributors:
+  - 'Ovid <curtis@weborama.com>'

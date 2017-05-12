@@ -1,0 +1,36 @@
+---
+- attr:
+    target: 1
+    unalias: 1
+  val: targ1
+- attr: {}
+  val: targ2
+- attr:
+    depend: 1
+    md5: 1
+  val: dep1
+- attr:
+    depend: 1
+    md5: 1
+    slurp: ''
+  val: dep2
+- attr:
+    slurp: 33
+  val: frank
+- attr:
+    wave: 1
+  val: -33
+- attr:
+    snooker: 1
+  val: -39
+- attr:
+    frodo: snack
+    temp: 1
+  val: food
+- attr:
+    frodo: flack
+    temp: 1
+  val: jacket
+- attr:
+    hippo: 1
+  val: 99

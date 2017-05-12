@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::DEC.
+
+0.01  Sat Aug 18 23:12:08 2012
+	- original version; created by h2xs 1.23 with options
+		-AX Data::DEC
+

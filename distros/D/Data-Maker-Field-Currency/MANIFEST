@@ -1,0 +1,6 @@
+lib/Data/Maker/Field/Currency.pm
+t/00.t
+Makefile.PL
+MANIFEST
+README
+Changes

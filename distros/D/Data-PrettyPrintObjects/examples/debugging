@@ -1,0 +1,13 @@
+To use PPO during debugging, use it similar to the way you would use
+Data::Dumper:
+
+perl -d myscript.pl
+
+DB<1> use Data::PrettyPrintObjects
+...
+DB<>  p PPO($var)
+
+If you will be doing a lot of debugging, you may want to create a
+YAML file named '.ppo.yaml' in the current directory containing
+PPO_ConfigFile options for how to display an object.
+

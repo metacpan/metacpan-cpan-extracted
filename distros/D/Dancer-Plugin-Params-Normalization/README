@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dancer-Plugin-Params-Normalization,
+version 0.52:
+
+  A plugin for normalizing query parameters in Dancer
+
+This software is copyright (c) 2011 by Damien "dams" Krotkine.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

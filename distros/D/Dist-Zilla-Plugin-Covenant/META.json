@@ -1,0 +1,82 @@
+{
+   "abstract" : "add the author's pledge to the distribution",
+   "author" : [
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.023, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Covenant",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::File::InMemory" : "0",
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "Dist::Zilla::Role::MetaProvider" : "0",
+            "Dist::Zilla::Role::Plugin" : "0",
+            "Dist::Zilla::Role::TextTemplate" : "0",
+            "Moose" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::DZil" : "0",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Covenant" : {
+         "file" : "lib/Dist/Zilla/Plugin/Covenant.pm",
+         "version" : "v0.1.1"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-Covenant/issues"
+      },
+      "homepage" : "https://github.com/yanick/Dist-Zilla-Plugin-Covenant",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yanick/Dist-Zilla-Plugin-Covenant.git",
+         "web" : "https://github.com/yanick/Dist-Zilla-Plugin-Covenant"
+      }
+   },
+   "version" : "0.1.1",
+   "x_author_pledge" : {
+      "version" : 1
+   },
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Apocalypse <APOCAL@cpan.org>"
+   ]
+}
+

@@ -1,0 +1,352 @@
+#!/usr/bin/env perl
+# vim:set ft=perl ai si et ts=4 sts=4 sw=4 tw=0:
+use strict;
+use warnings;
+use IO::File;
+use DBI;
+use DBomb::Generator;
+use Getopt::Long;
+
+my ($host,$port,$user,$pass);
+my ($do_has_a, $do_has_many, $do_split, $do_modules, $split_dir, $module_prefix, $do_pod, $data_source, $db_name, @table_names);
+
+my ($x_decls_only, $x_pod_only); ## internal use by 'dbomb-regen' (not currently used :-P )
+
+GetOptions( ## If you change these, also change build_update_record().
+           'host|h=s'=> \$host,
+           'port|P=i'=> \$port,
+           'user|u=s'=> \$user,
+           'pass|p=s'=> \$pass,
+           'has-a|has_a'  => \$do_has_a,
+           'has-many|has_many'  => \$do_has_many,
+           'all|a'   => sub {$do_has_a = $do_has_many = 1 },
+           'gen-modules' => \$do_modules,
+           'module-prefix=s' => \$module_prefix,
+           'split-dir=s'  => \$split_dir,
+           'data-source=s' => \$data_source,
+           'database|d=s' => \$db_name,
+           'table|t=s' => \@table_names,
+           'pod' => \$do_pod,
+           'x-decls-only' => \$x_decls_only,
+           'x-pod-only' => \$x_pod_only,
+) && 0==@ARGV or fail_usage();
+
+sub fail_usage {
+print(<<ENDUSAGE) and exit;
+Usage: $0 [OPTIONS] --database NAME [--table NAME,...]
+
+Generates DBomb perl code for the given database and tables.
+If no tables are specified, then code for all tables is generated.
+
+See the manual page for dbomb-gen for more details.
+
+ENDUSAGE
+}
+
+
+=head1 NAME
+
+dbomb-gen - Generates perl modules for use with DBomb.
+
+=head1 DESCRIPTION
+
+C<dbomb-gen> generates Perl code that uses C<DBomb> to bind to a database.
+C<dbomb-gen> can generate code snippets or an entire directory of Perl modules.
+
+=head1 QUICK START
+
+  mkdir Foo
+  dbomb-gen -u john -p xxx --all --pod --gen-modules --split-dir=Foo/ --module-prefix="Foo"  -d db
+
+Now you have a directory of Perl modules, one for each Table in the database. Each module name is
+prefixed with "Foo::".
+
+=head1 OPTIONS
+
+  -h,--host HOST        Connect to HOST running server (default: localhost)
+  -P,--port PORT        Connect to PORT on HOST (default: 3306)
+  -u,--user USER        Connect as USER (default: '')
+  -p,--pass PASSWORD    Authenticate with PASSWORD(default: '')
+  --has-a               Generate `has_a' relationships.
+  --has-many            Generate `has_many' relationships.
+  -a,--all              Generate all relationships.
+  --gen-modules         Generate a complete Perl module for each table.
+  --pod                 Generate POD.
+  --module-prefix NAME  Prefix module names with `NAME::'.
+  --split-dir DIR       Split modules into files in DIR. Implies --gen-modules
+  --data-source NAME    Used in the generated code (default: '')
+  -d,--database NAME    Use this database.
+  -t,--table NAME       Generate only these tables (multiple allowed).
+                        If no tables are specified, then generate all tables!
+
+=head1 EXAMPLES
+
+    # get the minimal code snippet:
+    dbomb-gen -u john -p xxx  -d db -t tablename
+
+    # all modules in one file:
+    dbomb-gen -u john -p xxx --all --gen-modules -d db  > DBClasses.pm
+
+    # build a directory of modules:
+    dbomb-gen -u john -p xxx --all --pod --gen-modules --split-dir=libdir/ --module-prefix="PRE"  -d db
+
+=cut
+
+my $OUT = \*STDOUT;
+if (defined $split_dir){
+    if (!-d $split_dir || ! -w $split_dir){
+        die "Error: Bad directory given `$split_dir' -- $!\n";
+    }
+    $do_modules = $do_split = 1;
+}
+my $update_record = build_update_record ();
+
+($module_prefix ||= '') =~ s/::$//;
+$module_prefix .= '::' if length $module_prefix;
+
+
+my $dsn = "dbi:mysql:";
+   $dsn .= "database=$db_name" if defined $db_name;
+   $dsn .= ";host=$host" if defined $host;
+   $dsn .= ";port=$port" if defined $port;
+
+
+## CONNECT
+my $dbh = DBI->connect($dsn, $user, $pass, +{ RaiseError => 1 })
+    or die $DBI::errstr;
+
+## Get a list of ALL tables
+my $a = $dbh->selectcol_arrayref("show tables from $db_name");
+unless (@table_names){
+    @table_names = sort @$a if $a;
+}
+
+## Does this table exist?
+{   my %h=map{$_=>1} @$a;
+    for (@table_names){
+        next if exists $h{$_};
+        fail("table `$_` not found in database.");
+    }
+}
+
+my %all_tables; ## ($tname => +{ $key_field => $key_field } )
+if (@$a){
+    for my $t (@$a){
+        $all_tables{$t} = +{};
+
+        for (@{$dbh->selectall_arrayref("show columns from $t")}){
+            my ($field,$type,$null,$key,$default,$extra) = @$_;
+             $all_tables{$t}->{$field} = $field if $key =~ m/^MUL/i;
+        }
+    }
+}
+
+sub Cname { "$module_prefix$_[0]" }
+
+my $fmt = '%-28s %s';
+for my $t (@table_names){
+
+    my $mname = Cname($t);
+
+    if ($do_split){
+        my $path = "$split_dir/$t.pm";
+        $OUT = new IO::File "> $path" || die "Error: Could not write to file `$path' --  $!\n";
+    }
+
+    if ($do_modules){
+        print $OUT "package $mname;\n"
+                  ."use strict;\n"
+                  ."use warnings;\n"
+                  ."use base qw(DBomb::Base);\n";
+    }
+
+    
+    #print $OUT  "##-# Auto-generated by `dbomb-gen' (See the DBomb manual.).\n";
+    print $OUT  "##-# dbomb-gen:args $update_record --table=$t\n";
+    print $OUT  "##-# dbomb-gen:begin-decls\n";
+    printf $OUT $fmt, "__PACKAGE__->def_data_source", "(@{[defined($data_source) ? qq('$data_source') : q(undef)]}, '$t');\n";
+
+    my @acols;
+    my @pkcols;
+    my @kcols;
+    my @hacols;
+    my @hmcols;
+
+    for (@{$dbh->selectall_arrayref("show columns from $t")}){
+        my ($field,$type,$null,$key,$default,$extra) = @$_;
+
+        my %h;
+        $h{'auto_increment'} = 1 if  $extra =~ m/auto_increment/i;
+
+        printf $OUT $fmt, "__PACKAGE__->def_column", "('$field'";
+        if (scalar keys %h){
+            print $OUT ", {", join(',', map {"$_ => $h{$_}"} keys %h), "}";
+        }
+        print $OUT ");\n";
+
+        push @acols, $field;
+        push @pkcols, $field if $key =~ m/^PRI/i;
+        push @kcols, $field if  $key =~ m/^MUL/i;
+    }
+    warn "table $t has no primary key!" unless @pkcols;
+    printf $OUT $fmt, "__PACKAGE__->def_primary_key","('@pkcols');\n" if @pkcols == 1;
+    printf $OUT $fmt, "__PACKAGE__->def_primary_key","([qw(@{[ join ' ', @pkcols ]})]);\n" if @pkcols > 1;
+    for my $f (@kcols){
+        printf $OUT $fmt, "__PACKAGE__->def_key", "('$f');\n";
+    }
+
+    if ($do_has_a){
+        #print $OUT "\n";
+        for my $f (@kcols){
+            next unless $f =~ m/^ ([\w_]+?) _? (U?ID) $/ix;
+            my ($ft, $fk) = ($1, $2);
+
+            ##my $fpkg = $ft; ## replace _ with :: to create package names
+            ##$fpkg =~ s/_/::/g;
+
+            my $kn = $ft;
+            $kn =~ s/([a-z])([A-Z])/$1\_$2/g;
+            $kn = lc $kn;
+
+            push @hacols, [$kn, $f, $ft];
+            
+
+            printf $OUT $fmt, "__PACKAGE__->def_has_a", qq/('$kn', '$f', '$ft', '$fk');\n/;
+        }
+    }
+
+    if ($do_has_many){
+            #print $OUT "\n";
+            ## Attempt to find incoming foreign keys for has_many relationship.
+            while (my ($ft, $h) = each %all_tables){
+                next if $ft eq $t; ## same table
+                for my $fk (values %$h){
+                    next unless $fk =~ m/^ ([\w_]+?) _? (U?ID) $/ix;
+                    my ($gt, $gk) = ($1, $2); ## guess table, guess key
+
+                    if ($gt eq $t && @pkcols == 1 && $pkcols[0] eq $gk){
+
+                        ## make a nice name
+                        my $fk_n = $ft;
+                        $fk_n =~ s/([a-z])([A-Z])/$1\_$2/g;
+                        $fk_n = (lc $fk_n) . 's';
+
+                        push @hmcols, [$fk_n, $ft];
+
+                        printf $OUT $fmt, "__PACKAGE__->def_has_many", qq/('$fk_n', '$ft', '@{[ $pkcols[0] ]}', '$fk');\n/;
+                    }
+                }
+            }
+    }
+    print $OUT  "##-# dbomb-gen:end-decls\n";
+    #print $OUT  "##-# End auto-generated DBomb code.\n";
+
+    if ($do_modules && $do_pod){
+        print $OUT "\n\n# Called by new().\n"
+                  ."sub init {\n"
+                  ."    my (\$self, \@args) = \@_;\n"
+                  ."    # init code goes here\n"
+                  ."}\n";
+    }
+    print $OUT "\n1;\n__END__\n"  if  $do_modules;
+
+    if ($do_pod){
+        my $somecol = !@acols
+                    ? 'foo'
+                        : @acols >=2
+                    ? $acols[1]
+                    : $acols[0];
+        
+        print $OUT "##-# dbomb-gen:begin-pod\n\n";
+
+        print $OUT "\n=head1 NAME\n\n"
+                  ."$mname - object access to $t table via DBomb\n\n"
+                  ."=cut\n\n";
+        print $OUT "\n=head1 SYNOPSIS\n\n"
+                  ."    \$obj = new $mname();\n"
+                  ."    \$obj->insert;\n\n"
+                  ."    \$obj = new $mname(\$pk_value);\n\n"
+                  ."    \$obj->update;\n"
+                  ."    \$obj->delete;\n\n"
+                  ."    \$all_objs  = $mname->selectall_arrayref;\n"
+                  ."    \$some_objs = $mname->select->where(+{ $somecol => '?'}, 'bar')->selectall_arrayref;\n\n";
+
+        print $OUT "=head1 DESCRIPTION\n\n"
+                  ."C<$mname> provides object-oriented access to the $t table via DBomb.\n"
+                  ."It extends L<DBomb::Base> with an accessor method for each column in the $t table,\n"
+                  ."and methods to get other DBomb-based objects via foreign keys.\n\n";
+
+        print $OUT "=head1 CONSTRUCTORS\n\n"
+                  ."=over\n\n"
+                  ."=item new ()\n\n"
+                  ."Creates a new C<$mname> object. The object is not bound (not in the database).\n"
+                  ."In order to bind it, simply C<insert> it. You must first set the primary key\n"
+                  ."value unless the column is automatically generated (e.g., auto_increment).\n\n"
+
+                  ."=item new (PK_VALUE)\n\n"
+                  ."Creates a new C<$mname> object that is bound by the primary key given by PK_VALUE.\n"
+                  ."Remember to call C<update> to store any changes you make to the object.\n\n"
+                  ."=back\n\n";
+
+        print $OUT "=head1 ACCESSOR METHODS\n\n"
+                  ."The following methods are get/set accessors. With no arguments, you get the column value\n"
+                  ."(possibly triggering a database select). With an argument, you set the\n"
+                  ."value (but no database action is taken).\n\n"
+                  . (join "\n", map {"  $_"} @acols)
+                  ."\n\n";
+
+        if (@hacols || @hmcols){
+            print $OUT "=over\n\n";
+
+            for (@hacols){
+                my ($kn, $f, $ft) = @$_;
+                print $OUT "=item $kn\n\n"
+                          ."Returns a L<@{[Cname($ft)]}> object, or undef if `$f' was NULL.\n\n";
+            }
+            for (@hmcols){
+                my ($kn, $ft) = @$_;
+                print $OUT "=item $kn\n\n"
+                          ."Returns an arrayref of L<@{[Cname($ft)]}> objects, possibly empty.\n"
+                          ."The array is cached. Calling \$obj->$kn(undef) will clear the cache.\n\n";
+            }
+            print $OUT "=back\n\n";
+        }
+
+        print $OUT "=head1 SEE ALSO\n\n"
+                  .(join ",\n", map {"L<$_>"} ("DBomb", map{Cname($_)} (map{$_->[2]} @hacols), (map{$_->[1]} @hmcols)))
+                  ."\n\n";
+
+        print $OUT "##-# dbomb-gen:end-pod\n";
+                                                    
+
+    }
+    $OUT->close() if  $do_split;
+}
+
+## returns all appropriate args except --table, which is generated elsewhere.
+sub build_update_record {
+
+    my %strs = (  #host => $host,  port => $port, user => $user, 
+                 'module-prefix' => $module_prefix, 
+                'data-source' => $data_source, 'database' => $db_name);
+    my %bools = ( 'has-a' => $do_has_a, 'has-many' => $do_has_many, 'pod' => $do_pod);
+
+    foreach (values %strs){
+        s/\s/-/g if defined;
+    }
+    return join ' ',
+             (map {"--$_=$strs{$_}"} grep { defined $strs{$_} } keys %strs),
+             (map {"--$_"} grep {defined $bools{$_}} keys %bools);
+}
+
+sub fail {
+    my @s = grep {defined} @_;
+    @s = ('Unknown error') unless @s;
+    local $" = ':';
+    print STDERR "dbomb-regen: @s\n";
+    exit 1;
+}
+
+1
+__END__
+

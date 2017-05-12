@@ -1,0 +1,515 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"D",
+				"Dumper"
+			],
+			[
+				"Post",
+				"Postalcode"
+			],
+			[
+				"Ex",
+				"Exporter  (module)"
+			],
+			[
+				"test",
+				"testmethod	Function"
+			],
+			[
+				"perl",
+				"perlcritic"
+			],
+			[
+				"no_",
+				"no_of_violations"
+			],
+			[
+				"no",
+				"no_of_patterns"
+			],
+			[
+				"s",
+				"sibling"
+			],
+			[
+				"for",
+				"fore	Loop"
+			],
+			[
+				"use",
+				"strictures  (module)"
+			],
+			[
+				"requie",
+				"requirement"
+			],
+			[
+				"st",
+				"stats"
+			],
+			[
+				"file",
+				"filename"
+			],
+			[
+				"cl",
+				"cli"
+			],
+			[
+				"wf",
+				"wf_class"
+			],
+			[
+				"sor",
+				"sorted_incidents"
+			],
+			[
+				"SERVICE_WINDOW_MAY",
+				"SERVICE_WINDOW_MAY2013_UP"
+			],
+			[
+				"iso",
+				"iso_8859_1_encoded_domain"
+			],
+			[
+				"id",
+				"idn_domain"
+			],
+			[
+				"di",
+				"idn_domain"
+			],
+			[
+				"dkhm",
+				"dkhmencode"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 87.0,
+		"selected_items":
+		[
+			[
+				"q",
+				"Git: Quick Commit"
+			],
+			[
+				"gist",
+				"Gist: Insert Gist"
+			],
+			[
+				"g",
+				"Git: Commit"
+			],
+			[
+				"git ad",
+				"Git: Add Current File"
+			],
+			[
+				"qui",
+				"Git: Quick Commit"
+			],
+			[
+				"tra",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"perl",
+				"PerlTidy: Tidy"
+			],
+			[
+				"trail",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"space",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"git add",
+				"Git: Add Current File"
+			],
+			[
+				"tidy",
+				"PerlTidy: Tidy"
+			],
+			[
+				"quic",
+				"Git: Quick Commit"
+			],
+			[
+				"syntax perl",
+				"Set Syntax: Perl"
+			],
+			[
+				"commit",
+				"Git: Quick Commit"
+			],
+			[
+				"git comm",
+				"Git: Commit"
+			],
+			[
+				"git",
+				"Git: Commit"
+			],
+			[
+				"lc",
+				"Convert Case: Lower Case"
+			],
+			[
+				"synta",
+				"Set Syntax: Perl"
+			],
+			[
+				"trai",
+				"Trailing Spaces: Delete Trailing Spaces"
+			],
+			[
+				"sort",
+				"Sort Lines"
+			],
+			[
+				"syn",
+				"Set Syntax: Perl"
+			],
+			[
+				"synta pe",
+				"Set Syntax: Perl"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"install ",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install package",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: ins",
+				"Package Control: Install Package"
+			],
+			[
+				"Package Control: install ",
+				"Package Control: Install Package"
+			]
+		],
+		"width": 476.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/jonasbn/develop/github/Date-Holidays-Abstract/.gitignore",
+		"/Users/jonasbn/develop/github/Date-Holidays-Abstract/README.mkdn",
+		"/Users/jonasbn/develop/github/XML-Conf/gs",
+		"/Users/jonasbn/develop/github/XML-Conf/.gitignore",
+		"/Users/jonasbn/develop/github/Date-Holidays-Super/README.mkdn",
+		"/Users/jonasbn/develop/github/Date-Holidays-Super/.gitignore",
+		"/Users/jonasbn/develop/github/perl-workflow/README",
+		"/Users/jonasbn/develop/github/Games-Bingo/lib/Games/Bingo.pm",
+		"/Users/jonasbn/develop/github/Games-Bingo/lib/Games/Bingo/Constants.pm",
+		"/Users/jonasbn/develop/github/Games-Bingo/lib/Games/Bingo/ColumnCollection.pm",
+		"/Users/jonasbn/develop/github/Games-Bingo/lib/Games/Bingo/Column.pm",
+		"/Users/jonasbn/develop/github/Games-Bingo/lib/Games/Bingo/Card.pm",
+		"/Users/jonasbn/develop/github/Games-Bingo/MANIFEST",
+		"/Users/jonasbn/develop/github/Games-Bingo/CHANGES",
+		"/Users/jonasbn/develop/github/XML-Conf/.travis.yml",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/dist.ini",
+		"/Users/jonasbn/develop/github/XML-Conf/dist.ini",
+		"/Users/jonasbn/develop/github/Tie-Tools/dist.ini",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/lib/Business/Tax/VAT.pm",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/t/changes.t",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/Changes",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/README.mkdn",
+		"/Users/jonasbn/.pause",
+		"/Users/jonasbn/develop/github/Games-Bingo/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/Games-Bingo/t/changes.t",
+		"/Users/jonasbn/develop/github/Games-Bingo/bin/bingo.pl",
+		"/Users/jonasbn/develop/github/Games-Bingo/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/Games-Bingo/Build.PL",
+		"/Users/jonasbn/develop/github/Date-Holidays/MANIFEST",
+		"/Users/jonasbn/develop/github/Date-Holidays/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/t/changes.t",
+		"/Users/jonasbn/develop/github/Date-Holidays/Changes",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/UnsupportedMethod.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/SuperAdapterLoad.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/NoCountrySpecified.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/InvalidCountryCode.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/AdapterLoad.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Exception/AdapterInitialization.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/PT.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/NO.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/JP.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/GB.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/FR.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/ES.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/DK.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/DE.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/lib/Date/Holidays/Adapter/AU.pm",
+		"/Users/jonasbn/develop/github/Date-Holidays/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/bdkfi/Build.PL",
+		"/Users/jonasbn/develop/github/bdkfi/Changes",
+		"/Users/jonasbn/develop/github/bdkfi/lib/Business/DK/FI.pm",
+		"/Users/jonasbn/develop/github/bdkfi/lib/Class/Business/DK/FI.pm",
+		"/Users/jonasbn/develop/github/bdkfi/lib/Data/FormValidator/Constraints/Business/DK/FI.pm",
+		"/Users/jonasbn/develop/github/bdkfi/LICENSE",
+		"/Users/jonasbn/develop/github/Date-Pregnancy/lib/Date/Pregnancy.pm",
+		"/Users/jonasbn/develop/github/Date-Pregnancy/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/Date-Pregnancy/Changes",
+		"/Users/jonasbn/develop/github/bdkphn/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/XML-Conf/t/basic.t",
+		"/Users/jonasbn/develop/github/XML-Conf/t/private.t",
+		"/Users/jonasbn/develop/github/XML-Conf/t/advanced.t",
+		"/Users/jonasbn/develop/github/XML-Conf/lib/XML/Conf.pm",
+		"/Users/jonasbn/develop/github/XML-Conf/Changes",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/Collection.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/DeepTied.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/Depth.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/Func.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/NormalArray.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/Parent.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/Tools.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/Changes",
+		"/Users/jonasbn/develop/github/Tie-Tools/lib/Tie/dbi/ER.pm",
+		"/Users/jonasbn/develop/github/Tie-Tools/README.mkdn",
+		"/Users/jonasbn/develop/github/Tie-Tools/.gitignore",
+		"/Users/jonasbn/develop/github/Tie-Tools/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/Business-Tax-VAT/.travis.yml",
+		"/Users/jonasbn/develop/github/bdkphn/Changes",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/t/get_all_data.t",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/lib/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/Build.PL",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/lib/Class/Business/GL/Postalcode.pm",
+		"/Users/jonasbn/develop/github/perl-Business-GL-Postalcode/.gitignore",
+		"/Users/jonasbn/develop/github/bglpst/lib/Class/Business/DK/Postalcode.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/.travis.yml",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes/Release.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes.pm",
+		"/Users/jonasbn/develop/github/cpan-changes/lib/CPAN/Changes/Spec.pod",
+		"/Users/jonasbn/develop/github/cpan-changes/t/read_timestamp.t",
+		"/Users/jonasbn/develop/github/cpan-changes/t/read_multiple_releases_with_hints.t",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/multiple_releases_with_hints.changes",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/multiple_releases.changes",
+		"/Users/jonasbn/develop/github/cpan-changes/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/cpan-changes/t/corpus/basic.changes",
+		"/Users/jonasbn/develop/github/testt/Build.PL",
+		"/Users/jonasbn/develop/github/testt/t/kwalitee.t",
+		"/Users/jonasbn/develop/github/testt/lib/Test/Timer/TimeoutException.pm",
+		"/Users/jonasbn/develop/github/testt/lib/Test/Timer.pm",
+		"/Users/jonasbn/develop/github/testt/Changes",
+		"/Users/jonasbn/develop/github/testt/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/testt/t/boilerplate.t",
+		"/Users/jonasbn/develop/github/testt/t/time_nok.t",
+		"/Users/jonasbn/develop/github/testt/t/time_ok.t",
+		"/Users/jonasbn/develop/github/testt/t/critic.t",
+		"/Users/jonasbn/develop/github/testt/README.mkdn",
+		"/Users/jonasbn/develop/github/testt/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/testt/MANIFEST",
+		"/Users/jonasbn/develop/github/testt/t/00-load.t",
+		"/Users/jonasbn/develop/github/testt/.gitignore",
+		"/Users/jonasbn/develop/github/testt/Test-Timer-0.07.tar.gz",
+		"/Users/jonasbn/develop/github/bdkcpr/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkcpr/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkcvr/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkcvr/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkfi/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkfi/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkphn/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkpo/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkpo/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bdkpst/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bdkpst/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bjonasbn/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bjonasbn/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/bopcc/.git/COMMIT_EDITMSG",
+		"/Users/jonasbn/develop/github/bopcc/MANIFEST.SKIP",
+		"/Users/jonasbn/develop/github/dand/.git/COMMIT_EDITMSG"
+	],
+	"find":
+	{
+		"height": 35.0
+	},
+	"find_in_files":
+	{
+		"height": 0.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"-",
+			"$self",
+			"s",
+			"$self",
+			"|/",
+			"perl",
+			"â€“",
+			"â€˜",
+			"â€™",
+			"â€",
+			"branches",
+			"run_command(\"git checkout \\\"#{branch}\\\"\")",
+			"TODO",
+			"Dumper",
+			"PCPLPSD",
+			"PCPLPSDD",
+			"+",
+			"Use specified requirement for package naming",
+			"Package naming is not complying with required standard",
+			"left",
+			"running",
+			"Devel::Cover",
+			"-",
+			"-\\d+\\.\\d+",
+			"noegleindehaver",
+			"sub _auth",
+			"createKey",
+			"Dumper",
+			"validate",
+			"server",
+			"check",
+			"clearRedelRequest",
+			"email",
+			"bashrc",
+			"perlbrew"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"::",
+			"$validator",
+			"\";\n",
+			"World",
+			"print",
+			"--",
+			"'",
+			"\"",
+			"DAND",
+			"PCPLPSD",
+			"",
+			"Use specified requirement for package naming for This::Is::A::Test",
+			"Package name: This::Is::A::Test is not complying with required standard",
+			"::",
+			""
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 30.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.git":
+	{
+		"height": 94.0
+	},
+	"output.sftp":
+	{
+		"height": 94.0
+	},
+	"replace":
+	{
+		"height": 64.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"selected_items":
+		[
+		],
+		"width": 380.0
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 194.0,
+	"status_bar_visible": true
+}

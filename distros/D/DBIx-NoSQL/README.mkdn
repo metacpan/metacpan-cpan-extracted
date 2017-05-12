@@ -1,0 +1,247 @@
+# NAME
+
+DBIx::NoSQL - NoSQL-ish overlay for an SQL database
+
+# VERSION
+
+version 0.0021
+
+# SYNOPSIS
+
+```perl
+use DBIx::NoSQL;
+
+my $store = DBIx::NoSQL->connect( 'store.sqlite' );
+
+$store->set( 'Artist' => 'Smashing Pumpkins' => {
+    name => 'Smashing Pumpkins',
+    genre => 'rock',
+    website => 'smashingpumpkins.com',
+} );
+
+$store->exists( 'Artist' => 'Smashing Pumpkins' ); # 1
+
+$store->set( 'Artist' => 'Tool' => {
+    name => 'Tool',
+    genre => 'rock',
+} );
+
+$store->search( 'Artist' )->count; # 2
+
+my $artist = $store->get( 'Artist' => 'Smashing Pumpkins' );
+
+# Set up a (searchable) index on the name field
+$store->model( 'Artist' )->index( 'name' );
+$store->model( 'Artist' )->reindex;
+
+for $artist ( $store->search( 'Artist' )->order_by( 'name DESC' )->all ) {
+    ...
+}
+
+$store->model( 'Album' )->index( 'released' => ( isa => 'DateTime' ) );
+
+$store->set( 'Album' => 'Siamese Dream' => {
+    artist => 'Smashing Pumpkins',
+    released => DateTime->new( ... ),
+} );
+
+my $album = $store->get( 'Album' => 'Siamese Dream' );
+my $released = $album->{ released }; # The field is automatically inflated
+print $release->strftime( ... );
+```
+
+# DESCRIPTION
+
+DBIx::NoSQL is a layer over DBI that presents a NoSQLish way to store and retrieve data. It does this by using a table called `__Store__`. Once connected to a database, it will detect if this table is missing and create it if necessary
+
+When writing data to the store, the data (a HASH reference) is first serialized using [JSON](https://metacpan.org/pod/JSON) and then inserted/updated via [DBIx::Class](https://metacpan.org/pod/DBIx::Class) to (currently) an SQLite backend
+
+Retrieving data from the store is done by key lookup or by searching an SQL-based index. Once found, the data is deserialized via [JSON](https://metacpan.org/pod/JSON) and returned
+
+The API is fairly sane, though still beta
+
+# USAGE
+
+## $store = DBIx::NoSQL->connect( $path )
+
+Returns a new DBIx::NoSQL store connected to the SQLite database located at `$path`
+
+If the SQLite database file at `$path` does not exist, it will be created
+
+## $store->set( $model, $key, $value )
+
+Set `$key` (a string) to `$value` (a HASH reference) in `$model`
+
+If `$model` has index, this command will also update the index entry corresponding to `$key`.
+
+The `$key` can be omitted, in which case a UUID key will be auto-generated for the entry.
+
+Returns the new entry's key.
+
+## $value = $store->exists( $model, $key )
+
+Returns true if some data for `$key` is present in `$model`
+
+## $value = $store->get( $model, $key )
+
+Get `$value` matching `$key` in `$model`
+
+## $value = $store->delete( $model, $key )
+
+Delete the entry matching `$key` in `$model`
+
+If `$model` has index, this command will also delete the index entry corresponding to `$key`
+
+## $store->reindex
+
+Reindex the searchable/orderable data in `$store`
+
+This method is smart, in that it won't reindex a model unless the schema for $store is different/has changed. That is, if the schema for `$store` is the same as it is in the database, this call will do nothing
+
+Refer to "Model USAGE" below for more information
+
+## $store->dbh
+
+Return the [DBI](https://metacpan.org/pod/DBI) database handle for the store, if you need/want to do your own thing
+
+# Search USAGE
+
+To search on a model, you must have installed an index on the field you want to search on
+
+Refer to "Model USAGE" for indexing information
+
+## $search = $store->search( $model, \[ $where \] )
+
+```perl
+$search = $store->search( 'Artist' => { name => { -like => 'Smashing%' } } )
+```
+
+Return a [DBIx::NoSQL::Search](https://metacpan.org/pod/DBIx::NoSQL::Search) object for `$model`, filtering on the optional `$where`
+
+An index is required for the filtering columns
+
+Refer to [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) for the format of `$where` (actually uses [DBIx::Class::SQLMaker](https://metacpan.org/pod/DBIx::Class::SQLMaker) under the hood)
+
+## @all = $search->all
+
+Returns every result for `$search` in a list
+
+Returns an empty list if nothing is found
+
+## $result = $search->next
+
+Returns the next item found for `$search` via `$search->cursor`
+
+Returns undef if nothing is left for `$search` 
+
+## $sth = $search->cursor->sth
+
+Returns the [DBI](https://metacpan.org/pod/DBI) sth (statement handle) for `$search`
+
+## $search = $search->search( $where )
+
+Further refine the search in the same way `$search->where( ... )` does
+
+## $search = $search->where( $where )
+
+```perl
+$search = $search->where( { genre => 'rock' } ) 
+```
+
+Further refine `$search` with the given `$where`
+
+A new object is cloned from the original (the original `$search` is left untouched)
+
+An index is required for the filtering columns
+
+Refer to [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) for the format of `$where` (actually uses [DBIx::Class::SQLMaker](https://metacpan.org/pod/DBIx::Class::SQLMaker) under the hood)
+
+## $search = $search->order\_by( $order\_by )
+
+```
+$search->order_by( 'name DESC' )
+
+$search->order_by([ 'name DESC', 'age' ])
+```
+
+Return the results in the given order
+
+A new object is cloned from the original, which is left untouched
+
+An index is required for the ordering columns
+
+Refer to [SQL::Abstract](https://metacpan.org/pod/SQL::Abstract) for the format of `$order_by` (actually uses [DBIx::Class::SQLMaker](https://metacpan.org/pod/DBIx::Class::SQLMaker) under the hood)
+
+# Model USAGE
+
+## $model = $store->model( $model\_name )
+
+Retrieve or create the `$model_name` model object
+
+## $model->index( $field\_name )
+
+```
+$store->model( 'Artist' )->index( 'name' ) # 'name' is now searchable/orderable, etc.
+```
+
+Index `$field_name` on `$model`
+
+Every time the store for c<$model> is written to, the index will be updated with the value of `$field`
+
+## $model->index( $field\_name, isa => $type )
+
+```perl
+$store->model( 'Artist' )->index( 'website', isa => 'URI' )
+$store->model( 'Artist' )->index( 'founded', isa => 'DateTime' )
+```
+
+Index `$field_name` on `$model` as a special type/object (e.g. [DateTime](https://metacpan.org/pod/DateTime) or [URI](https://metacpan.org/pod/URI))
+
+Every time the store for c<$model> is written to, the index will be updated with the deflated value of `$field` (since
+[JSON](https://metacpan.org/pod/JSON) can not trivially serialize blessed references)
+
+## $model->reindex
+
+Reindex the `$model` data in the store after making a field indexing change:
+
+```
+1. Rebuild the DBIx::Class::ResultSource
+2. Drop and recreate the search table for $model
+3. Iterate through all the data for $model, repopulating the search table
+```
+
+If `$model` does not have an index, this method will simply return
+
+To rebuild the index for \_every\_ model (on startup, for example), you can do:
+
+```
+$store->reindex
+```
+
+# In the future
+
+Create a better interface for stashing and document it
+
+Wrap things in transactions that need it
+
+More tests: Always. Be. Testing.
+
+# SEE ALSO
+
+[KiokuDB](https://metacpan.org/pod/KiokuDB)
+
+[DBIx::Class](https://metacpan.org/pod/DBIx::Class)
+
+[DBD::SQLite](https://metacpan.org/pod/DBD::SQLite)
+
+# AUTHORS
+
+- Robert Krimen <robertkrimen@gmail.com>
+- Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Robert Krimen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

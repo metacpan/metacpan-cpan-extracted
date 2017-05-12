@@ -1,0 +1,10 @@
+06:33 <@mst>   $self->register_source($_ => $self->_journal_schema->source($_)) for $self->_journal_schema->sources;
+
+
+$resultset->delete and other bulk ops
+  - in DBIC space? need repeatable reads to be safe
+  - otherwise can we get it in the same expr?
+
+$history->restore;
+$changeset->rollback; # all up to this point?
+$changeset->reverse; # only this one

@@ -1,0 +1,106 @@
+NAME
+
+    Device::Chip::SSD1306 - chip driver for monochrome OLED modules
+
+DESCRIPTION
+
+    This abstract Device::Chip subclass provides communication to an
+    SSD1306 or SH1106 chip attached by an adapter. To actually use it, you
+    should use one of the subclasses for the various interface types.
+
+      * Device::Chip::SSD1306::I2C - I²C
+
+      * Device::Chip::SSD1306::SPI4 - 4-wire SPI
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+DEVICE MODELS
+
+    This module supports a variety of actual chip modules with different
+    display sizes. The specific display module is selected by the model
+    argument to the constructor, which should take one of the following
+    values:
+
+    SSD1306-128x64
+
+      An SSD1306 driving a display with 128 columns and 64 rows. The most
+      common of the display modules, often found with a 0.96 inch display.
+
+    SSD1306-128x32
+
+      An SSD1306 driving a display with 128 columns and 32 rows. This is
+      the usual "half-height" display.
+
+    SH1106-128x64
+
+      An SH1106 driving a display with 128 columns and 64 rows. This is the
+      chip that's usually found in the larger display modules, such as 1.3
+      and 1.6 inch.
+
+CONSTRUCTOR
+
+ new
+
+       $chip = Device::Chip::SSD1306->new(
+          model => $model,
+       )
+
+    Returns a new Device::Chip::SSD1306 driver instance for the given model
+    name, which must be one of the models listed in "DEVICE MODELS". If no
+    model option is chosen, the default of SSD1306-128x64 will apply.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ rows
+
+ columns
+
+       $n = $chip->rows
+    
+       $n = $chip->columns
+
+    Simple accessors that return the number of rows or columns present on
+    the physical display.
+
+ init
+
+       $chip->init->get
+
+    Initialise the display after reset to some sensible defaults.
+
+ display
+
+       $chip->display( $on )->get
+
+    Turn on or off the display.
+
+ display_lamptest
+
+       $chip->display_lamptest( $enable )->get
+
+    Turn on or off the all-pixels-lit lamptest mode.
+
+ send_display
+
+       $chip->send_display( $pixels )->get
+
+    Sends an entire screen-worth of pixel data. The $pixels should be in a
+    packed binary string containing one byte per 8 pixels.
+
+TODO
+
+      * More interfaces - 3-wire SPI
+
+      * Maintain a framebuffer. Add some drawing commands like pixels and
+      lines.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

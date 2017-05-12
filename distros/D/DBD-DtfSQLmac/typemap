@@ -1,0 +1,3 @@
+const char *    T_PV
+const void *	T_PV
+DTFDECIMAL *	O_OBJECT

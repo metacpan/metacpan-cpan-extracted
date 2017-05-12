@@ -1,0 +1,44 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PrecomputeVariable]
+     variable = $Some::Module::var1
+     variable = %Some::OtherModule::var2
+     ; add more variables as needed
+
+    in your module lib/Some/Module.pm:
+
+     package Some::Module;
+     our $var1 = do { some expensive operation }; # PRECOMPUTE
+     ...
+
+    in your module lib/Some/OtherModule.pm:
+
+     package Some::OtherModule;
+     my %Some::OtherModule::var2 = some_expensive_func(); # PRECOMPUTE
+     ...
+
+    In the generated lib/Some/Module.pm:
+
+     package Some::Module;
+     our $var1 = ["some", "value"]; # PRECOMPUTED FROM: do { some expensive operation }
+     ...
+
+    In the generated lib/Some/OtherModule.pm:
+
+     package Some::OtherModule;
+     my %Some::OtherModule::var2 = ("some", "value"); # PRECOMPUTED FROM: some_expensive_func();
+     ...
+
+DESCRIPTION
+
+    This plugin can be used to precompute variables values during build
+    time and put the resulting computed value into the built source code.
+    This is useful in some cases to reduce module startup time, especially
+    if it takes some time to compute the value.
+
+SEE ALSO
+
+    Dist::Zilla
+

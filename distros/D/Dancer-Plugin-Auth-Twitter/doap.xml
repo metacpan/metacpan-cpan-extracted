@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Project
+  xmlns="http://usefulinc.com/ns/doap#"
+  xmlns:dc="http://purl.org/dc/terms/"
+  xmlns:foaf="http://xmlns.com/foaf/0.1/"
+  xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+  >
+  <name>Dancer-Plugin-Auth-Twitter</name>
+  <shortdesc>Authenticate with Twitter</shortdesc>
+  <developer>
+    <foaf:Person>
+      <foaf:name>Alexis Sukrieh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:sukria@sukria.net" />
+    </foaf:Person>
+  </developer>
+  <developer>
+    <foaf:Person rdfs:label="Dancer Core Developers" />
+  </developer>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Alexis Sukrieh</foaf:name>
+      <foaf:mbox rdf:resource="mailto:alexis@weborama.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Michal Wojciechowski</foaf:name>
+      <foaf:mbox rdf:resource="mailto:odyniec@odyniec.net" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Simon Elsbrock</foaf:name>
+      <foaf:mbox rdf:resource="mailto:simon@iodev.org" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Vyacheslav Matyukhin</foaf:name>
+      <foaf:mbox rdf:resource="mailto:mmcleric@yandex-team.ru" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Will Orr</foaf:name>
+      <foaf:mbox rdf:resource="mailto:will@worrbase.com" />
+    </foaf:Person>
+  </helper>
+  <helper>
+    <foaf:Person>
+      <foaf:name>Yanick Champoux</foaf:name>
+      <foaf:mbox rdf:resource="mailto:yanick@babyl.dyndns.org" />
+    </foaf:Person>
+  </helper>
+  <license rdf:resource="http://dev.perl.org/licenses/" />
+  <homepage rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter" />
+  <bug-database rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter/issues" />
+  <repository>
+    <GitRepository>
+      <browse rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter" />
+      <location rdf:resource="https://github.com/PerlDancer/Dancer-Plugin-Auth-Twitter.git" />
+    </GitRepository>
+  </repository>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.01</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2010-12-20</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.02</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2011-01-17</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.03</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-05-14</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.04</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-06-06</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.05</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2013-06-06</dc:issued>
+    </Version>
+  </release>
+  <release>
+    <Version>
+      <revision rdf:datatype="http://www.w3.org/2001/XMLSchema#string">0.06</revision>
+      <dc:issued rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2014-02-15</dc:issued>
+    </Version>
+  </release>
+  <programming-language>Perl</programming-language>
+</Project>

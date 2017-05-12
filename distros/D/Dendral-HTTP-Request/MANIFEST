@@ -1,0 +1,16 @@
+Changes
+DefaultParser.c
+MultipartParser.c
+ppport.h
+RequestParser.c
+Request.xs
+typemap
+examples
+MANIFEST
+Makefile.PL
+perlobject.map
+README
+RequestStruct.h
+UrlencodedParser.c
+examples/Mytest.pm
+lib/Dendral/HTTP/Request.pm

@@ -1,0 +1,53 @@
+{
+   "abstract" : "DBIx Class Result ColumnData",
+   "author" : [
+      "Nicolas Oudard"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4205",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Result-ColumnData",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "1.17",
+            "DBIx::Class" : "0.08127",
+            "DBIx::Class::IntrospectableM2M" : "0.001001",
+            "DBIx::Class::Result::Validation" : "0.05",
+            "DateTime" : "0.65",
+            "DateTime::Format::SQLite" : "0.11",
+            "SQL::Translator" : "0.11007",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::Result::ColumnData" : {
+         "file" : "lib/DBIx/Class/Result/ColumnData.pm",
+         "version" : "0.16"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.16"
+}

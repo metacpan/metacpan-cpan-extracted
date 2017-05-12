@@ -1,0 +1,14 @@
+severity  = 3
+only      = 0
+force     = 1
+verbose   = 4
+top       = 50
+theme     = core || unicode || swift
+exclude   = RequirePODUseEncodingUTF8
+criticism-fatal = 1
+color     = 1
+allow-unsafe = 1
+pager     = less
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 5

@@ -1,0 +1,124 @@
+# NAME
+
+Dancer::Template::Caribou - Template::Caribou wrapper for Dancer
+
+# VERSION
+
+version 1.0.1
+
+# SYNOPSIS
+
+```perl
+# in 'config.yml'
+template: Caribou
+
+engines:
+  Caribou:
+    namespace:               MyApp::View
+    layout_namespace:        MyApp::View::Layout
+    default_template:        inner_page
+    default_layout_template: page
+
+# and then in the application
+get '/' => sub { 
+    ...;
+
+    template 'main' => \%options;
+};
+```
+
+# DESCRIPTION
+
+`Dancer::Template::Caribou` is an interface for the [Template::Caribou](https://metacpan.org/pod/Template::Caribou)
+template system. Be forewarned, both this module and `Template::Caribou`
+itself are alpha-quality software and are still subject to any changes. 
+**Caveat Maxima Emptor**.
+
+## Basic Usage
+
+At the base, if you do
+
+```perl
+get '/' => sub {
+    ...
+
+    return template 'MyView', \%options;
+};
+```
+
+the template name (here _MyView_) will be concatenated with the 
+configured view namespace (which defaults to _Dancer::View_)
+to generate the Caribou class name. A Caribou object is created
+using `%options` as its arguments, and its default template (defaulting to `page`) 
+is then
+rendered. In other words, the last line of the code above becomes 
+equivalent to 
+
+```
+return Dancer::View::MyView->new( %options )->page;
+```
+
+### Layouts as roles
+
+Layouts, just like templates, are package names. They are expected to be
+roles that will be composed with the template class.
+
+# CONFIGURATION
+
+- default\_template
+
+    The name of the entry template to use. In other words, with the configuration
+    given in the SYNOPSIS, the dancer code
+
+    ```
+    return template 'MyThing';
+    ```
+
+    is equivalent to
+
+    ```
+    return MyApp::View::MyThing->page;
+    ```
+
+    Defaults to `page`.
+
+- default\_layout\_template
+
+    Entry template to use when a layout is provided. Defaults to `page`.
+
+- namespace 
+
+    The namespace under which the Caribou template classes are.
+    defaults to `Dancer::View`.
+
+    Template names can be prefixed with a plus sign if you want it to be used as an absolute namespace.
+
+    ```
+    template 'Relative::View';       # -> Dancer::View::Relative::View
+    template '+My::Absolute::View';  # -> My::Absolute::View
+    ```
+
+- layout\_namespace 
+
+    The namespace under which the Caribou layout roles are.
+    defaults to the `::Layout` sub-namespace under the template
+    namespace.
+
+    Like template names, layout names can be prefixed with a plus sign for
+    absolute namespaces;
+
+    ```perl
+    set layout => 'My::Relative';  # -> Dancer::View::Layour::My::Relative
+    set layout => '+My::Absolute'; # -> My::Absolute
+    ```
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

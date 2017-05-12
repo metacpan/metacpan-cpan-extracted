@@ -1,0 +1,88 @@
+NAME
+
+    Data::Demos - Database Migration Demos
+
+VERSION
+
+    This document describes Data::Demos version 0.0.2. ";
+
+SYNOPSIS
+
+        data-demo list    - List open data sources
+        data-demo import  - Import an open data source into a local db
+        data-demo migrate <story>  - Apply a Migration Story
+
+DESCRIPTION
+
+    Data::Demos is set of tools for quickly creating demo databases and
+    applying migration stories to them.
+
+    It has the following concepts:
+
+    data-demo
+
+      The command line tool for interacting with Data::Demos.
+
+    Sources
+
+      Open data provider web sites
+
+    Datasets
+
+      Various collections of data around a topic
+
+    Database
+
+      Specific database engines to import datasets into:
+
+	* PostgreSQL
+
+	* MySQL
+
+	* SQLite
+
+	* more
+
+    Schemata
+
+      Definitions of columns, types and relations for a dataset
+
+    Stories
+
+      Common tasks for dataset migrations
+
+    Functions
+
+      Named migration code that can be applied to a dataset (does a
+      migration)
+
+    Demos
+
+      Visual views of the data that can show off interesting things about a
+      dataset
+
+DESIGN
+
+    This project is primarily/initially a way to see various Perl database
+    tools, and specifically Class::DBIx::DeploymentHandler in action. From
+    there people can add stories and actions for more and more useful
+    things needed in dealing with dataset migration.
+
+STATUS
+
+    This project is currently in the concept and planning phase. Join the
+    conversation if you are interested. Wait a while for useful code.
+
+AUTHOR
+
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    Copyright 2015. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

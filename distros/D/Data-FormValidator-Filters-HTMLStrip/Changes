@@ -1,0 +1,9 @@
+Revision history for Perl extension Data::FormValidator::Filters::HTMLStrip.
+
+0.13  Tue Oct 14 2008
+
+    - fixed syntax error in META.yml
+
+0.10  Thu Oct 9 EST 2008
+
+    - original version

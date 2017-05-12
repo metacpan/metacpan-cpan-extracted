@@ -1,0 +1,10 @@
+Build.PL
+Changes
+MANIFEST
+README
+lib/DB/Pluggable/Dumper.pm
+t/00-load.t
+xt/pod-coverage.t
+xt/pod.t
+Makefile.PL
+META.yml

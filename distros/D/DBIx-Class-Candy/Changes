@@ -1,0 +1,88 @@
+Revision history for DBIx-Class-Candy
+
+0.005002  2016-04-29 09:20:41-07:00 America/Los_Angeles
+  - Fix test issue when run under `prove -lr` (Thanks Peter Rabbitson!)
+
+0.005001  2015-11-20 23:26:06-08:00 America/Los_Angeles
+  - Fix test failure on Win32 (Thanks Peter Evans!)
+
+0.005000  2015-08-02 20:37:38-07:00 America/Los_Angeles
+  - Add 'singular' autotable version (Good idea Dagfinn Ilmari Mannsåker!)
+    (Resolves GH#10)
+
+0.004001  2015-07-01 15:13:21-07:00 America/Los_Angeles
+  - Set C3 on ResultClasses in addition to ResultSets
+
+0.004000  2015-06-04 23:05:14-07:00 America/Los_Angeles
+  - Add `-experimental` import
+
+0.003001  2015-04-14 13:01:19-05:00 America/Chicago
+  - Fix Changes (frew--)
+
+0.003000  2015-04-14 12:25:12-05:00 America/Chicago
+  - Add DBIx::Class::Candy::ResultSet
+
+0.002107  2014-10-30 19:53:58-05:00 America/Chicago
+  - Fix `export_method_aliases` (Thanks Denis Ibaev! See GH#7)
+
+0.002106  2014-10-17 15:26:43-05:00 America/Chicago
+  - Fix bug causing infinite recursion when you redefine a package (Thanks
+    Graham Knop for fix, and Wes Malone for bug report!)
+  - Simplify sub installer by using Sub::Exporter more correctly (Thanks RJBS!)
+  - Stop calling ->table many times per ResultClass (Good catch RJBS!)
+
+0.002105  2014-04-12 08:51:04-05:00 America/Chicago
+  - Fix warnings in test (thanks for the report Zefram!) (Fixes RT#91976)
+
+0.002104  2013-05-13 09:29:37 CST6CDT
+  - Fix stupid doc examples
+
+0.002103  2012-12-23 17:42:36 CST6CDT
+  - Lazily load deps for autotable
+  - Remove HERE BE DRAGONS warning, this module is totally stable \o/
+
+0.002102  2012-11-17 15:43:18 CST6CDT
+  - Put MetaYAML back in dist
+
+0.002101  2012-08-21 17:47:50 America/Chicago
+  - remove VERSION from pod because yuck
+  - fix repo url
+
+0.002100  2012-03-13 20:31:45 America/Chicago
+  - primary_column may be called multiple times to define a multicolumn pk
+
+0.002001  2011-08-10 20:03:18 CST6CDT
+  - autotable v1 now dies on unrecognized naming scheme
+  - autotable v1 works with simply ::Result:: and not just ::Schema::Result::
+
+0.002000  2011-03-09 12:03:50 CST6CDT
+  - Add unique_column sugar
+  - Allow Candy to automatically set table name
+  - Allow Candy subclass to define default base and default perl version
+  - Add missing docs for primary_column sugar
+
+0.001006  2011-03-01 22:44:45 CST6CDT
+  - Add primary_column sugar
+  - Fix incorrectly named export (inflate_colum .= n)
+
+0.001005  2010-12-25 10:06:15 CST6CDT
+  - Initial sketches of "Moosey" API
+  - Merry Christmas!!!
+
+0.001004  2010-07-31 01:46:04 CST6CDT
+  - Fix a bug that only appears in perl 5.8
+
+0.001003  2010-07-29 20:20:14 CST6CDT
+  - Fix more bugs, this time the are from inheriting from other
+    other results
+  - Make ::Exports actually work
+
+0.001002  2010-07-24 01:21:49 CST6CDT
+  - Fix bug uncovered by doing belongs_to twice in a class
+
+0.001001  2010-07-21 17:48:14 CST6CDT
+  - Don't require parent for tests
+
+0.001000  2010-07-21 00:18:10 CST6CDT
+  - Initial Release
+

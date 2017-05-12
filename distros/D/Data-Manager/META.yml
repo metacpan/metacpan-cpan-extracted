@@ -1,0 +1,31 @@
+---
+abstract: 'The Marriage of Message::Stack & Data::Verifier'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Data::Verifier: 0
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Manager
+requires:
+  JSON::Any: 0
+  JSON::XS: 0
+  Message::Stack: 0
+  Message::Stack::Parser: 0.05
+  Message::Stack::Parser::DataVerifier: 0
+  Moose: 0
+  MooseX::Storage: 0
+  MooseX::Storage::Deferred: 0
+resources:
+  bugtracker: https://github.com/gphat/data-manager/issues
+  homepage: https://github.com/gphat/data-manager
+  repository: https://github.com/gphat/data-manager.git
+version: 0.10

@@ -1,0 +1,109 @@
+NAME
+
+    Data::Printer::Filter::URI - pretty-printing URI objects
+
+VERSION
+
+    version 0.008
+
+SYNOPSIS
+
+    # In your program:
+
+        use Data::Printer filters => {
+            -external => [ 'URI' ],
+        };
+
+    # or, in your .dataprinter file:
+
+        {
+            filters => {
+                -external => [ 'URI' ],
+            },
+        };
+
+    # You can also setup color and display details:
+
+        use Data::Printer {
+            filters => {
+                -external   => [ 'URI' ],
+            }, color => {
+                uri_scheme  => 'bright_green',
+                uri_host    => 'bold',
+            },
+        };
+
+DESCRIPTION
+
+    This is a filter plugin for Data::Printer. It filters through several
+    URI manipulation classes and displays the URI as a fancy string.
+
+ Parsed Protocols
+
+      * data
+
+      * file
+
+      * ftp
+
+      * gopher
+
+      * http
+
+      * https
+
+      * ldap
+
+      * ldapi
+
+      * ldaps
+
+      * mailto
+
+      * mms
+
+      * news
+
+      * nntp
+
+      * pop
+
+      * rlogin
+
+      * rsync
+
+      * rtsp
+
+      * rtspu
+
+      * scp (if URI::scp is present)
+
+      * sftp (if URI::sftp is present)
+
+      * sip
+
+      * sips
+
+      * snews
+
+      * ssh
+
+      * telnet
+
+      * tn3270
+
+      * urn
+
+    Mojo::URL is also supported.
+
+AUTHOR
+
+    Stanislaw Pusep <stas@sysd.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Stanislaw Pusep.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

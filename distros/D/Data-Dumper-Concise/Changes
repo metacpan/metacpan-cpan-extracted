@@ -1,0 +1,53 @@
+Revision history for Data-Dumper-Concise
+
+2.022 Mar 21 2014
+  - Fix repo metadata
+
+2.021 Dec 31 2013
+  - Make Dwarn output all arguments even in scalar context
+     (retun val is still the same though)
+
+2.020 Jan 20 2011
+  - Add DumperObject for getting at the underlying obj
+  - create DwarnF for formatting Dumper'd output
+  - Create Ddie for die'ing output
+
+2.012 Aug 31 2010
+  - Make DwarnN test still work if Devel::ArgNames isn't installed
+
+2.011 Aug 30 2010
+  - add $DwarnN export
+  - make Devel::ArgNames an optional dep
+
+2.010 Jul 29 2010
+  - add $Dwarn export
+
+2.001 Jul 23 2010
+  - add documentation for DwarnN
+
+2.000 Jul 22  2010
+  - remove Dumper() returning object
+  - add DwarnN
+  - add DwarnL
+  - make Dwarn contextual
+  - document ::Dwarn idiom
+
+1.200 Feb 13 2010
+  - make sure Devel::Dwarn::Dwarn and Devel::Dwarn::DwarnS work
+
+1.100 Dec 10 2009
+  - add Data::Dumper::Concise::Sugar containing Dwarn and DwarnS
+    helper functions
+  - add Devel::Dwarn as a more concise alias for ::Sugar
+
+1.002 Nov 22 2009
+  - open up non-ref and multiple arguments since I've not seen any other
+    viable use for the additional syntax
+
+1.001 Oct 5 2009
+  - more explanation of purpose, limitations and alternatives in the POD
+
+1.000 Oct 3 2009
+  - Dumper() returns concise Data::Dumper object
+  - Dumper($ref) returns concisely dumped ref
+  - anything else die()s

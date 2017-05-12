@@ -1,0 +1,65 @@
+Revision history for Perl extension DBIx::PDlib.
+
+2008-01-27 23:06  jmiller
+
+	* Changes: Fixed number of tests in test file.
+
+2004-05-09 20:36  jmiller
+
+	* Changes: Tagging release and distributing
+
+2004-03-15 08:46  sjackson
+
+	* PDlib.pm: added a line under the if for oracle so that it will
+	add the oracle home dir.
+
+2004-02-15 17:55  jmiller
+
+	* README: updated README
+
+2004-02-15 17:52  jmiller
+
+	* PDlib.pm: fixed some typo's
+
+2003-12-16 16:07  jmiller
+
+	* MANIFEST: updated manifest
+
+2003-12-16 10:54  jmiller
+
+	* PDlib.pm: added documentation on quoting.
+
+2003-12-15 15:33  jmiller
+
+	* PDlib.pm: changed handling of NULL values in insert() and
+	update(). Now, to insert or update to a NULL value, pass in 'undef'
+	(or a undefined variable).
+
+2003-12-15 15:07  jmiller
+
+	* Makefile.PL, PDlib.pm, t/1.t: !!!Changed all method names!!!
+	Added testing (borrowed from DBIx::Abstract).
+
+2003-12-15 11:52  jmiller
+
+	* t/dbia.config: adding conifg file
+
+2003-12-14 02:29  jmiller
+
+	* PDlib.pm: changed connect() to work the way DBIx::Abstract does
+	(uses most of it's connect() code)
+
+2003-12-14 01:46  jmiller
+
+	* PDlib.pm: fixed un-my()'d vars
+
+2003-12-14 01:42  jmiller
+
+	* Changes, MANIFEST, Makefile.PL, PDlib.pm, README, t/1.t: Initial
+	revision
+
+2003-12-14 01:42  jmiller
+
+	* Changes, MANIFEST, Makefile.PL, PDlib.pm, README, t/1.t:
+	importing DBIx-PDlib
+

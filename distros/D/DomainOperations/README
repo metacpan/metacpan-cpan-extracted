@@ -1,0 +1,37 @@
+DomainOperations::ResellerClubHTTP
+
+1)Synopsis (example)
+2)Description
+3)Author
+4)Licence
+
+
+SYNOPSIS
+
+
+	use DomainOperations::ResellerClubHTTP;
+	use Data::Dumper;
+	my $do = DomainOperations::ResellerClubHTTP->new(username=>'USER',password=>'PASS',account=>'Sandbox');
+
+	print Dumper $do->checkDomainAWithoutSuggestion({'domains'=>['thisisthedomain' ],'tlds'=>['com' ,'net']});
+
+
+DESCRIPTION
+
+DomainOperations::ResellerClubHTTP - A class to search and book a Domain Name via ResellerClub HTTP API!
+
+Replace the various variables namely username and password and execute the script.
+
+Please contact Abhishek jain , he generally have time to help guys on Perl and scripts of all nature.
+
+Abhishek wont mind been contacted.
+
+Virus free , Spam Free , Spyware Free Software .
+
+AUTHOR
+
+<Abhishek jain>
+goyali at cpan.org
+
+LICENCE
+You are not allowed to modify the script unless having the written permission of abhishek jain

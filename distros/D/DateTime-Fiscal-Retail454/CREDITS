@@ -1,0 +1,15 @@
+The API was inspired by the parent module DateTime.  The source for DateTime
+was reviewed numerous times to gleen ideas for implementation techniques and
+to insure compatibility.
+
+This module is indebted to the all of the work that has previously gone into
+DateTime and the associated modules it depends upon.
+
+Kudos to the National Retail Federation for granting persmission to reference
+their webiste in the module's documentaiton for details on the
+Retail 4-5-4 calendar.  The NRF was very helpful with details on how
+merchants deal with years in the calendar that have 53 weeks.
+
+Jim Bacon
+North Texas Consulting
+

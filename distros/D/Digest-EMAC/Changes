@@ -1,0 +1,16 @@
+1.2     2004 July 2 
+        Removed module diagnostics, as suggested by Edmund von der Burg
+        (evdb (at) ecclestoad (dot) co (dot) uk).  as it is causing some
+        unintended warnings
+
+        Removed module warnings as well
+        
+1.1     MIME::Base64 is now required
+        Changed function "dmac" to "emac"
+
+1.0     Initial release
+        Formerly called Digest::DMAC
+        Digest::EMAC is the same as Digest::DMAC; only the name has
+        changed, to be consistent with what it is officially called
+        today
+

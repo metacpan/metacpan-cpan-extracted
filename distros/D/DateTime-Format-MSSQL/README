@@ -1,0 +1,46 @@
+NAME
+    DateTime::Format::MSSQL - parse and format MSSQL DATETIME's
+
+VERSION
+    version 1.001000
+
+SYNOPSIS
+      use DateTime::Format::MSSQL;
+
+      my $dt = DateTime::Format::MSSQL->parse_datetime(
+        '2004-08-21 14:36:48.080'
+      );
+
+      DateTime::Format::MSSQL->format_datetime($dt); # '2004-08-21 14:36:48.080'
+
+DESCRIPTION
+    This is just a basic module to help parse dates formatted from SQL
+    Server.
+
+METHODS
+  new
+    Instantiate a new "DateTime::Format::MSSQL". You can override the
+    "time_zone" that the parsed date is returned as by passing it as an
+    argument:
+
+     DateTime::Format::MSSQL->new(
+        time_zone => 'local',
+     )->parse_datetime($str)
+
+  parse_datetime
+    Parse a string returned by SQL Server for a "DATETIME" column in the
+    default format.
+
+  format_datetime
+    Format a DateTime object into a string in the SQL Server expected
+    format.
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2014 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

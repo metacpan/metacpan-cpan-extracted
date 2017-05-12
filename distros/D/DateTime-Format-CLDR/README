@@ -1,0 +1,541 @@
+NAME
+    DateTime::Format::CLDR - Parse and format CLDR time patterns
+
+SYNOPSIS
+        use DateTime::Format::CLDR;
+
+        # 1. Basic example
+        my $cldr1 = DateTime::Format::CLDR->new(
+            pattern     => 'HH:mm:ss',
+            locale      => 'de_AT',
+            time_zone   => 'Europe/Vienna',
+        );
+
+        my $dt1 = $cldr1->parse_datetime('23:16:42');
+
+        print $cldr1->format_datetime($dt1);
+        # 23:16:42
+
+        # 2. Get pattern from selected locale
+        # pattern is taken from 'date_format_medium' in DateTime::Locale::de_AT
+        my $cldr2 = DateTime::Format::CLDR->new(
+            locale      => 'de_AT',
+        );
+
+        print $cldr2->parse_datetime('23.11.2007');
+        # 2007-11-23T00:00:00
+
+        # 3. Croak when things go wrong
+        my $cldr3 = DateTime::Format::CLDR->new(
+            locale      => 'de_AT',
+            on_error    => 'croak',
+        );
+
+        $cldr3->parse_datetime('23.33.2007');
+        # Croaks
+
+        # 4. Use DateTime::Locale
+        my $locale = DateTime::Locale->load('en_GB');
+        my $cldr4 = DateTime::Format::CLDR->new(
+            pattern     => $locale->datetime_format_medium,
+            locale      => $locale,
+        );
+
+        print $cldr4->parse_datetime('22 Dec 1995 09:05:02');
+        # 1995-12-22T09:05:02
+
+DESCRIPTION
+    This module provides a parser (and also a formater) for datetime strings
+    using patterns as defined by the Unicode CLDR Project (Common Locale
+    Data Repository). <http://unicode.org/cldr/>.
+
+    CLDR format is supported by DateTime and DateTime::Locale starting with
+    version 0.40.
+
+METHODS
+  Constructor
+   new
+     DateTime::Format::CLDR->new(%PARAMS);
+
+    The following parameters are used by DateTime::Format::CLDR:
+
+    *   locale
+
+        Locale.
+
+        See locale accessor.
+
+    *   pattern (optional)
+
+        CLDR pattern. If you don't provide a pattern the
+        "date_format_medium" pattern from DateTime::Local for the selected
+        locale will be used.
+
+        See pattern accessor.
+
+    *   time_zone (optional)
+
+        Timezone that should be used by default. If your pattern contains
+        timezone information this attribute will be ignored.
+
+        See time_zone accessor.
+
+    *   on_error (optional)
+
+        Set the error behaviour.
+
+        See on_error accessor.
+
+    *   incomplete (optional)
+
+        Set the behaviour how to handle incomplete date information.
+
+        See incomplete accessor.
+
+  Accessors
+   pattern
+    Get/set CLDR pattern. See "CLDR PATTERNS" or "CLDR Patterns" in DateTime
+    for details about patterns.
+
+     $cldr->pattern('d MMM y HH:mm:ss');
+
+    It is possible to retrieve patterns from DateTime::Locale
+
+     $dl = DateTime::Locale->load('es_AR');
+     $cldr->pattern($dl->datetime_format_full);
+
+   time_zone
+    Get/set time_zone. Returns a "DateTime::TimeZone" object.
+
+    Accepts either a timezone name or a "DateTime::TimeZone" object.
+
+     $cldr->time_zone('America/Argentina/Mendoza');
+     OR
+     my $tz = DateTime::TimeZone->new(name => 'America/Argentina/Mendoza');
+     $cldr->time_zone($tz);
+
+   locale
+    Get/set a locale. Returns a "DateTime::Locale" object.
+
+    Accepts either a locale name or a "DateTime::Locale::*" object.
+
+     $cldr->locale('fr_CA');
+     OR
+     $dl = DateTime::Locale->load('fr_CA');
+     $cldr->locale($dl);
+
+   on_error
+    Get/set the error behaviour.
+
+    Accepts the following values
+
+    *   'undef' (Literal) (default)
+
+        Returns undef on error and sets errmsg
+
+    *   'croak'
+
+        Croak on error
+
+    *   CODEREF
+
+        Run the given coderef on error.
+
+   incomplete
+    Set the behaviour how to handle incomplete Date information.
+
+    Accepts the following values
+
+    *   '1' (default)
+
+        Sets the missing values to '1'. Thus if you only parse a time sting
+        you would get '0001-01-01' as the date.
+
+    *   'incomplete'
+
+        Create a DateTime::Incomplete object instead.
+
+    *   CODEREF
+
+        Run the given coderef on incomplete values. The code reference will
+        be called with the "DateTime::Format::CLDR" object and a hash of
+        parsed values as supplied to "DateTime->new". It should return a
+        modified hash which will be passed to "DateTime->new".
+
+  Public Methods
+   parse_datetime
+     my $datetime = $cldr->parse_datetime($string);
+
+    Parses a string and returns a "DateTime" object on success (If you
+    provide incomplete data and set the incomplete attribute accordingly it
+    will return a "DateTime::Incomplete" object). If the string cannot be
+    parsed an error will be thrown (depending on the "on_error" attribute).
+
+   format_datetime
+     my $string = $cldr->format_datetime($datetime);
+
+    Formats a "DateTime" object using the set locale and pattern. (not the
+    time_zone)
+
+   errmsg
+     my $string = $cldr->errmsg();
+
+    Stores the last error message. Especially useful if the on_error
+    behavior of the object is 'undef', so you can work out why things went
+    wrong.
+
+  Exportable functions
+    There are no methods exported by default, however the following are
+    available:
+
+   cldr_format
+     use DateTime::Format::CLDR qw(cldr_format);
+     &cldr_format($pattern,$datetime);
+
+   cldr_parse
+     use DateTime::Format::CLDR qw(cldr_parse);
+     &cldr_parse($pattern,$string);
+     OR
+     &cldr_parse($pattern,$string,$locale);
+
+    Default locale is 'en'.
+
+CLDR PATTERNS
+  Parsing
+    Some patterns like day of week, quarter, ect. cannot be used to
+    construct a date. However these patterns can be parsed, and a warning
+    will be issued if they do not match the parsed date.
+
+    Ambigous patterns (eg. narrow day of week formats for many locales) will
+    be parsed but ignored in datetime calculation.
+
+  Supported CLDR Patterns
+    See "CLDR Patterns" in DateTime.
+
+    CLDR provides the following patterns:
+
+    *   G{1,3}
+
+        The abbreviated era (BC, AD).
+
+    *   GGGG
+
+        The wide era (Before Christ, Anno Domini).
+
+    *   GGGGG
+
+        The narrow era, if it exists (and it mostly doesn't).
+
+        Not used to construct a date.
+
+    *   y and y{3,}
+
+        The year, zero-prefixed as needed.
+
+    *   yy
+
+        This is a special case. It always produces a two-digit year, so
+        "1976" becomes "76".
+
+    *   Y{1,}
+
+        The week of the year, from "$dt->week_year()".
+
+    *   u{1,}
+
+        Same as "y" except that "uu" is not a special case.
+
+    *   Q{1,2}
+
+        The quarter as a number (1..4).
+
+        Not used to construct a date.
+
+    *   QQQ
+
+        The abbreviated format form for the quarter.
+
+        Not used to construct a date.
+
+    *   QQQQ
+
+        The wide format form for the quarter.
+
+        Not used to construct a date.
+
+    *   q{1,2}
+
+        The quarter as a number (1..4).
+
+        Not used to construct a date.
+
+    *   qqq
+
+        The abbreviated stand-alone form for the quarter.
+
+        Not used to construct a date.
+
+    *   qqqq
+
+        The wide stand-alone form for the quarter.
+
+        Not used to construct a date.
+
+    *   M{1,2}
+
+        The numerical month.
+
+    *   MMM
+
+        The abbreviated format form for the month.
+
+    *   MMMM
+
+        The wide format form for the month.
+
+    *   MMMMM
+
+        The narrow format form for the month.
+
+    *   L{1,2}
+
+        The numerical month.
+
+    *   LLL
+
+        The abbreviated stand-alone form for the month.
+
+    *   LLLL
+
+        The wide stand-alone form for the month.
+
+    *   LLLLL
+
+        The narrow stand-alone form for the month.
+
+    *   w{1,2}
+
+        The week of the year, from "$dt->week_number()".
+
+        Not used to construct a date.
+
+    *   W
+
+        The week of the month, from "$dt->week_of_month()".
+
+        Not used to construct a date.
+
+    *   d{1,2}
+
+        The numeric day of of the month.
+
+    *   D{1,3}
+
+        The numeric day of of the year.
+
+        Not used to construct a date.
+
+    *   F
+
+        The day of the week in the month, from "$dt->weekday_of_month()".
+
+        Not used to construct a date.
+
+    *   g{1,}
+
+        The modified Julian day, from "$dt->mjd()".
+
+        Not supported by DateTime::Format::CLDR
+
+    *   E{1,3}
+
+        The abbreviated format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   EEEE
+
+        The wide format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   EEEEE
+
+        The narrow format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   e{1,2}
+
+        The *local* day of the week, from 1 to 7. This number depends on
+        what day is considered the first day of the week, which varies by
+        locale. For example, in the US, Sunday is the first day of the week,
+        so this returns 2 for Monday.
+
+        Not used to construct a date.
+
+    *   eee
+
+        The abbreviated format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   eeee
+
+        The wide format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   eeeee
+
+        The narrow format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   c
+
+        The numeric day of the week (not localized).
+
+        Not used to construct a date.
+
+    *   ccc
+
+        The abbreviated stand-alone form for the day of the week.
+
+        Not used to construct a date.
+
+    *   cccc
+
+        The wide stand-alone form for the day of the week.
+
+        Not used to construct a date.
+
+    *   ccccc
+
+        The narrow format form for the day of the week.
+
+        Not used to construct a date.
+
+    *   a
+
+        The localized form of AM or PM for the time.
+
+    *   h{1,2}
+
+        The hour from 1-12.
+
+    *   H{1,2}
+
+        The hour from 0-23.
+
+    *   K{1,2}
+
+        The hour from 0-11.
+
+    *   k{1,2}
+
+        The hour from 1-24. Note that hour 24 is equivalent to midnight on
+        the date being parsed, not midnight of the next day.
+
+    *   j{1,2}
+
+        The hour, in 12 or 24 hour form, based on the preferred form for the
+        locale. In other words, this is equivalent to either "h{1,2}" or
+        "H{1,2}".
+
+    *   m{1,2}
+
+        The minute.
+
+    *   s{1,2}
+
+        The second.
+
+    *   S{1,}
+
+        The fractional portion of the seconds, rounded based on the length
+        of the specifier. This returned without a leading decimal point, but
+        may have leading or trailing zeroes.
+
+    *   A{1,}
+
+        The millisecond of the day, based on the current time. In other
+        words, if it is 12:00:00.00, this returns 43200000.
+
+        Not supported by DateTime::Format::CLDR
+
+    *   z{1,3}
+
+        The time zone short name.
+
+    *   zzzz
+
+        The time zone long name.
+
+    *   Z{1,3}
+
+        The time zone offset.
+
+    *   ZZZZ
+
+        The time zone short name and the offset as one string, so something
+        like "CDT-0500".
+
+    *   v{1,3}
+
+        The time zone short name.
+
+    *   vvvv
+
+        The time zone long name.
+
+    *   V{1,3}
+
+        The time zone short name.
+
+    *   VVVV
+
+        The time zone long name.
+
+CAVEATS
+    Patterns without separators (like 'dMy' or 'yMd') are ambigous for some
+    dates and might fail.
+
+    Quote from the Author of "DateTime::Format::Strptime" which also applies
+    to this module:
+
+     "If your module uses this module to parse a known format: stop it. This module
+     is clunky and slow because it can parse almost anything. Parsing a known
+     format is not so difficult, is it? You'll make your module faster if you do.
+     And you're not left at the whim of my potentially broken code."
+
+SUPPORT
+    Please report any bugs or feature requests to
+    "datetime-format-cldr@rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/Public/Bug/Report.html?Queue=DateTime::Format::CLDR>
+    . I will be notified and then you'll automatically be notified of the
+    progress on your report as I make changes.
+
+SEE ALSO
+    datetime@perl.org mailing list
+
+    <http://datetime.perl.org/>
+
+    DateTime, DateTime::Locale, DateTime::TimeZone and
+    DateTime::Format::Strptime
+
+AUTHOR
+        Maroš Kollár
+        CPAN ID: MAROS
+        maros [at] k-1.com
+
+        http://www.k-1.com
+
+COPYRIGHT
+    DateTime::Format::CLDR is Copyright (c) 2008-2012 Maroš Kollár -
+    <http://www.k-1.com>
+
+LICENCE
+    This library is free software, you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

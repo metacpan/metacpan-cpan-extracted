@@ -1,0 +1,23 @@
+Revision history for Perl extension D64::Disk::BAM.
+
+0.04  2013-03-10
+    - Fixed failing unit-tests for Perl 5.6.2 by switching from IO::Capture
+      to Capture::Tiny which, unlikely its predecessor, is able to correctly
+      capture the contents written into a standard error filehandle also for
+      Perl 5.6.2
+
+0.03  2013-02-22
+    - added "print_out_disk_header" and "print_out_blocks_free" methods, which
+      become handy while printing out a disk image directory listing
+    - extended "num_free_sectors" method to accept an additional parameter
+      ('all'), which enables it to fetch number of free sectors from an entire
+      disk
+
+0.02  2013-01-15
+    - fixed "Use of uninitialized value in numeric lt (<)" warning when
+      creating a new D64::Disk::BAM object without specific sector data
+
+0.01  2011-04-25
+    - initial version (provides methods to access, manage and manipulate the
+      contents of the BAM area of the Commodore disk images (supporting D64
+      format only)

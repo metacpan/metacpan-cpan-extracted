@@ -1,0 +1,11 @@
+Revision history for Data-Validate-Common
+
+0.3     2012-01-12T10:13:08
+        test cleanup
+
+0.2     2011-08-16T17:08:40
+        added accessor methods that can be tested with true/false
+
+0.1     2011-08-15T17:11:38
+        First version, released on an unsuspecting world.
+

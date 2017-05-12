@@ -1,0 +1,212 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Mojo::Template;
+
+use Getopt::Long;
+use Pod::Usage;
+
+my ( $dsn, $db_user, $db_password, $fact_table, @dimensions );
+
+my $result = GetOptions(
+    'dsn=s'                    => \$dsn,
+    'db_user|user|u=s'         => \$db_user,
+    'db_password|password|p=s' => \$db_password,
+    'fact=s'                   => \$fact_table,
+    'dimension|dim=s'          => \@dimensions,
+);
+
+pod2usage(1) if !$dsn or !$fact_table or !@dimensions;
+
+my $mt = Mojo::Template->new();
+
+my ($template,$data) = do { local $/ = '__DATA__'; <DATA> };
+
+my %param = (
+    dsn         => $dsn,
+    db_user     => $db_user,
+    db_password => $db_password,
+    dimensions  => [ map { _fake_dimension($_) } @dimensions ],
+    fact_table  => $fact_table,
+);
+
+my $output = $mt->render($template,%param);
+
+print $output, $data;
+
+sub _fake_dimension {
+    my $name = shift;
+    return {
+        name        => $name,
+        attributes  => [ 'foo', 'bar', 'baz' ],
+        natural_key => "$name\_id",
+    };
+}
+
+=head1 NAME
+
+dw-nav - generate a web based Data Warehouse Navigator
+
+=head1 SYNOPSIS
+
+    dw-nav [options]
+
+=head1 OPTIONS
+
+=over
+
+=item --dsn
+
+=item --db_user
+
+=item --db_password
+
+=item --fact
+
+The name of the fact table.
+
+=item --dimension
+
+The name of one or more dimensions.
+
+=back
+
+=head2 EXAMPLE
+
+    dw-nav --dsn='dbi:SQLite:dbname=test.db' \
+           --fact='sales' \
+           --dimension='user' \
+           --dimension='product'
+
+=head1 DESCRIPTION
+
+dw-nav will create the base of a simple Data Warehouse Navigator.
+
+=head2 AGGREGATE NAVIGATOR
+
+One of the main features of the Data Warehouse Navigator is the
+transparent Aggregate Navigator.
+
+The Aggregate Navigator will intercept SQL queries and generate
+aggregate tables, whenever is possible.
+
+The use of aggregate tables can speed up Data Warehouse by 100s
+or 1000s of times.
+
+=head1 AUTHOR
+
+Nelson Ferraz, C<< <nferraz at gmail.com> >>
+
+=head1 ACKNOWLEDGEMENTS
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2010 Nelson Ferraz.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=cut
+
+
+__END__
+% my %param = @_;
+#!/usr/bin/perl
+
+use lib './lib';
+
+use Mojolicious::Lite;
+
+use DataWarehouse::Fact;
+use Data::Dumper;
+
+my $fact = DataWarehouse::Fact->new(
+    dsn       => '<%= $param{dsn} %>',
+    name      => '<%= $param{fact_table} %>',
+    dimension => [qw/<%= join(' ', map { $_->{name} } @{$param{dimensions}}) %>/],
+);
+
+# /
+get '/' => sub {
+    my $self = shift;
+
+    $self->render(
+        template => 'index',
+        fact     => $fact,
+    );
+};
+
+get '/report' => sub {
+    my $self = shift;
+
+    my @dim_attr = grep { $self->param($_) eq 'on' } $self->param();
+    my @where = ();
+    my $query = $fact->aggr_query(\@dim_attr,\@where);
+
+    my $sth = $fact->prepare($query);
+
+    my $rv = $sth->execute();
+
+    my $data = $sth->fetchall_arrayref();
+
+    $self->render(
+        template => 'report',
+        query    => $query,
+        fact     => $fact,
+        header   => \@dim_attr,
+        rows     => $data,
+    );
+};
+
+app->start;
+
+__DATA__
+@@ index.html.ep
+
+<h1><%= $fact->{name} %></h1>
+
+<h2>Dimensions</h2>
+
+<form method="get" action="/report">
+
+% for my $d (@{ $fact->{dimension} }) {
+<h3><%= $d %></h3>
+%   for my $c ($fact->dimension($d)->column_names) {
+<input type="checkbox" name="<%= $d %>.<%= $c %>"><%= $d %>.<%= $c %><br>
+%   }
+% }
+
+<input type="submit">
+
+</form>
+
+@@ report.html.ep
+
+<h1>Report</h1>
+
+<form>
+<textarea cols="60" rows="10">
+<%= $query %>
+</textarea>
+</form>
+
+<table>
+<tr>
+% for my $h ( @{$header} ) {
+    <th><%= $h %></th>
+% }
+</tr>
+% for my $row ( @{$rows} ) {
+    <tr>
+%   for my $col ( @{$row} ) {
+        <td><%= $col %></td>
+%   }
+    </tr>
+% }
+</table>

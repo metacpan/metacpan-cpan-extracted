@@ -1,0 +1,22 @@
+SYNOPSIS
+
+        # dist.ini
+        [@FAYLAND]
+
+    It is equivalent to:
+
+        [@Filter]
+        bundle = @Classic
+        remove = PodVersion
+        remove = BumpVersion
+        remove = Readme
+    
+        [PodWeaver]
+        [Test::Compile]
+        [PerlTidy]
+        [Repository]
+        [ReadmeFromPod]
+        [CheckChangeLog]
+        [MetaJSON]
+        [Git::Contributors]
+

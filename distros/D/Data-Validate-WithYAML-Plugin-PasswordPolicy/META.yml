@@ -1,0 +1,21 @@
+---
+abstract: 'Plugin to check passwords against a policy '
+author:
+  - 'Renee Baecker <reneeb@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.132830'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validate-WithYAML-Plugin-PasswordPolicy
+requires:
+  Data::Validate::WithYAML: 0.14
+resources:
+  bugtracker: http://github.com/reneeb/Data-Vaidate-WithYAML-Plugin-PasswordPolicy/issues
+  homepage: http://github.com/reneeb/Data-Vaidate-WithYAML-Plugin-PasswordPolicy
+  repository: http://github.com/reneeb/Data-Vaidate-WithYAML-Plugin-PasswordPolicy.git
+version: 0.02

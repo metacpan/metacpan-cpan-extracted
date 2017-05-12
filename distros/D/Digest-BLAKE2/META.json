@@ -1,0 +1,54 @@
+{
+   "abstract" : "Perl XS interface to the BLAKE2 algorithms",
+   "author" : [
+      "Tasuku SUENAGA a.k.a. gunyarakun <tasuku-s-cpanATATtitech.ac>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4203",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Digest-BLAKE2",
+   "no_index" : {
+      "directory" : [
+         "inc",
+         "author"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::CBuilder" : "0",
+            "Module::Build::Pluggable::XSUtil" : "1.02",
+            "Test::Exception" : "0",
+            "Test::More" : "0.98",
+            "Test::Requires" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Devel::CheckCompiler" : "0.01",
+            "ExtUtils::ParseXS" : "2.21",
+            "Module::Build" : "0.4003",
+            "Module::Build::Pluggable::XSUtil" : "1.02"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "XSLoader" : "0.02",
+            "perl" : "5.008005"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

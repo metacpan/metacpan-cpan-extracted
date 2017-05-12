@@ -1,0 +1,17 @@
+use strict;
+use warnings;
+
+use Test::More;
+
+use_ok 'Foo';
+
+ok Foo->new;
+ok Foo->new;
+
+Foo->new->bar;
+
+Foo->new->baz;
+Foo->new->baz(1);
+Foo->new->baz(1);
+
+done_testing;

@@ -1,0 +1,64 @@
+{
+   "abstract" : "Component for DBIx::Class that allows the use of accessor names in search/create/etc",
+   "author" : [
+      "Mark Grimes E<lt>mgrimes@cpan.orgE<gt>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "App::ModuleBuildTiny version 0.011",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-ResultSet-AccessorsEverywhere",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "App::ModuleBuildTiny" : "0.011"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBIx::Class" : "0",
+            "Module::Build::Tiny" : "0.011",
+            "autovivification" : "0",
+            "perl" : "5.010"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "DBD::SQLite" : "0",
+            "SQL::Translator" : "0.11018",
+            "Try::Tiny" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::ResultSet::AccessorsEverywhere" : {
+         "file" : "lib/DBIx/Class/ResultSet/AccessorsEverywhere.pm",
+         "version" : "0.10"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/mvgrimes/DBIC-ResultSet-AccessorsEverywhere/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/mvgrimes/DBIC-ResultSet-AccessorsEverywhere.git",
+         "web" : "http://github.com/mvgrimes/DBIC-ResultSet-AccessorsEverywhere"
+      }
+   },
+   "version" : "0.10",
+   "x_contributors" : [],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

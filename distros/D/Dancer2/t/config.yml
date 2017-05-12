@@ -1,0 +1,6 @@
+log: "info"
+logger: "Note"
+
+plugins:
+  "FooPlugin":
+    plugin: 42

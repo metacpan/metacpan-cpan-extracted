@@ -1,0 +1,23 @@
+Maypole-TestTools
+
+Builds a database and a simple application driver, ready to use in test 
+scripts for Maypole plugins and components.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 David Baird
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

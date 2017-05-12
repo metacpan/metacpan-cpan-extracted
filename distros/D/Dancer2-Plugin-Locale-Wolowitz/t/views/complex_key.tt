@@ -1,0 +1,1 @@
+[% l('path_not_found %1', [ appdir ]) -%]

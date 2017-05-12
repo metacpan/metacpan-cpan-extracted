@@ -1,0 +1,30 @@
+0.06    6 June 2012
+        Integrated some remarks / notions from last nights's Amsterdam PM
+        meeting.
+
+0.05    4 June 2012
+        Argh, missed some -die-s and superfluous newlines.  Now fixed.
+
+0.04    4 June 2012
+        Always exit with failure if there is an internal error (instead of
+        useing -die-, which would get hidden by the eval).
+
+0.03    3 June 2012
+        Finally wrote the test-suite.  Fixed some small problems that the
+        test-suite uncovered.
+
+        "threadsforks" helper file will now exit with value 1 to indicate
+        a problem if threads / forks are not available.  This value will
+        be properly propagated to the calling process even the first time
+        the Makefile.PL is changed (and it is being executed internally with
+        a different perl).
+
+        "threadsforks" helper file now has a version and time and date stamp
+        for easier remote debugging if necessary.
+
+0.02    2 June 2012
+        Auto-generated file now also contains version number and generation
+        date and time.
+
+0.01    31 May 2012
+        First version of Devel::ThreadsForks.  No real tests yet.

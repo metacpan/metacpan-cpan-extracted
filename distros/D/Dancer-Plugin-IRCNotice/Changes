@@ -1,0 +1,22 @@
+Revision history for Dancer-Plugin-IRCNotice
+
+0.06  2014-10-09 16:26:05 MST
+  - Add option to choose message type
+  - Remove forking nonsense
+
+0.05  2014-04-21 15:50:34 MST
+  - Switch to MIT license
+
+0.04  2013-09-11 09:40:33 MST
+  - Fix use of //=
+  - Fix issues with forking
+
+0.03  2013-09-09 19:08:03 MST
+  - Fixed dependencies again
+  - Added LICENSE
+
+0.02  2013-08-30 12:19:56 MST
+  - Fixed dependencies
+
+0.01  2013-08-30 11:58:28 MST
+  - Initial release

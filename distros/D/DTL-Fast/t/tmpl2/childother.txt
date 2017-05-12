@@ -1,0 +1,5 @@
+
+{% extends "parent.txt" %}
+simple3-text
+
+{% block more_text %}Override from another directory{% endblock %}

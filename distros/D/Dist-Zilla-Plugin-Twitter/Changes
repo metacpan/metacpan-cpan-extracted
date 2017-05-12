@@ -1,0 +1,92 @@
+Revision history for Dist-Zilla-Plugin-Twitter
+
+0.026     2014-10-02
+  - Fixed the test suite for compatibility with WWW::Shorten v0.1.1,
+    which removed Metamark support [gh-8]
+
+0.025     2014-01-16
+  - Twitter API is now SSL-only, so use SSL to connect to Twitter
+
+0.024     2013-11-27
+  - Add "=head1 NAME" so the pod will get munged during test
+
+0.023     2013-10-18
+  - Improved compile test
+
+0.022     2013-09-27
+  - Add new ways of interpolating metadata into tweet text, and
+    use that to fix the failing tests.
+
+0.021     2013-06-13
+  - API v1.1 support [GH #5]
+
+0.020     2013-02-02
+  - Link to doherty's github repo instead of dagolden's
+
+0.019     2013-02-02
+  - Fix a typo in the default tweet spec
+
+0.018     2013-02-02
+  - Allow adding any information from META [Yanick Champoux] and
+    add a link to the repo's web URL by default
+
+0.017     2012-07-06
+  - Use url_shortener=none to use the full URL (which Twitter will
+    shorten with t.co)
+
+0.016     2012-05-18
+  - Don't treat the PIN as a password [GH #1]
+
+0.015     2012-04-01 22:40:05 EST5EDT
+  - Update Twitter authentication method [RT #75995 - Mike Doherty]
+    - This will require all users to re-authorize the application
+      at Twitter, and will fetch & store an access token + secret
+      pair instead of using passwords. You may delete the section
+      in your .netrc file for api.twitter.com unless you need it
+      for something else.
+
+0.014     2012-01-13 12:36:58 EST5EDT
+  - distribution abstract now available for use in tweets [Harley Pig]
+
+0.013     2011-12-01 09:06:37 EST5EDT
+  - changed default URL to metacpan [Mike Doherty]
+
+0.012     2011-11-22 17:04:03 EST5EDT
+  - better handling of missing .netrc auth data [William Orr]
+
+0.011     2011-10-07 16:11:01 EST5EDT
+  - add support for -TRIAL dists [Kent Fredric]
+
+0.010     2011-01-23 15:53:51 EST5EDT
+  - add 'url_shortener' option [Mike Doherty]
+
+0.009     2010-07-27 11:32:57 EST5EDT
+  - bump Dist::Zilla prereq to 4
+
+0.008     2010-07-26 20:14:54 EST5EDT
+  - document that FakeRelease may also be used [contributed by kent fredric]
+  - add some alternate sources for username since dist-zilla
+    may have renamed what gets defined by release plugins
+  - update dist.ini to @DAGOLDEN bundle (but still twitter it)
+
+0.007     2010-04-29 10:09:15 EST5EDT
+  - add 'hash_tags' option to append custom tags [contributed by mschout]
+
+0.006     2010-04-28 13:10:03 EST5EDT
+  - use xauth authentication
+
+0.005     2010-04-27 10:06:14 EST5EDT
+  - turn on auto collection of prerequisites (duh)
+
+0.004     2010-04-26 17:12:38 EST5EDT
+  - don't index sample distributin for testing
+
+0.003     2010-04-26 00:26:26 EST5EDT
+  - no changes -- releasing to test the new URL
+
+0.002     2010-04-26 00:19:42 EST5EDT
+  - change url from frepan to the README on cpan.cpantesters.org;
+    this is one of the fastest hyperlinks to be available after upload
+
+0.001     2010-04-25 23:46:15 EST5EDT
+  - first draft

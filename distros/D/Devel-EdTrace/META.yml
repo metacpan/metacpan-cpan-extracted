@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name                    : Devel-EdTrace
+version                 : .95
+abstract                : verbose tracer of perl code
+author:              
+  - Ed Peschko <horos11@gmail.com>
+
+license                 : perl
+distribution_type       : module
+dynamic_config          : 1
+
+recommends:
+
+  PadWalker             : 1
+  Devel::LexAlias       : 1
+
+resources:
+  homepage              : http://search.cpan.org/dist/Devel-EdTrace/
+  license               : http://dev.perl.org/licenses/
+  bugtracker            : http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-EdTrace
+
+meta-spec:
+  version               : .95
+
+generated_by            : vim

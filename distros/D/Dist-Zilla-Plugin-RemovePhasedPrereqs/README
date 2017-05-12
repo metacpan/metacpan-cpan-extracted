@@ -1,0 +1,67 @@
+NAME
+    Dist::Zilla::Plugin::RemovePhasedPrereqs - Remove gathered prereqs from
+    particular phases
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+    In dist.ini:
+
+        [RemovePhasedPrereqs]
+        remove_runtime = Foo
+        remove_runtime = Bar
+
+DESCRIPTION
+    This module is adapted from Dist::Zilla::Plugin::RemovePrereqs to let
+    you specify particular requirements sections to remove from instead of
+    removing from all of them.
+
+    Valid configuration options are:
+
+    *   remove_build
+
+    *   remove_configure
+
+    *   remove_develop
+
+    *   remove_runtime
+
+    *   remove_test
+
+    These may be used more than once to remove multiple modules.
+
+    Modules are removed from all types within a section (e.g. "requires",
+    "recommends", "suggests", etc.).
+
+SEE ALSO
+    *   Dist::Zilla::Plugin::Prereqs
+
+    *   Dist::Zilla::Plugin::AutoPrereqs
+
+    *   Dist::Zilla::Plugin::RemovePrereqs
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/dagolden/dist-zilla-plugin-removephasedprereqs/issue
+    s>. You will be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/dagolden/dist-zilla-plugin-removephasedprereqs>
+
+      git clone git://github.com/dagolden/dist-zilla-plugin-removephasedprereqs.git
+
+AUTHOR
+    David Golden <dagolden@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2013 by David Golden.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

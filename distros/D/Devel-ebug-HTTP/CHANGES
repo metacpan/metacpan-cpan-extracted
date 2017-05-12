@@ -1,0 +1,13 @@
+Revision history for Perl module Devel::ebug::HTTP
+
+0.32 Thu Oct 16 20:15:56 BST 2008
+     - add human-readable license to the documentation
+
+0.31 Mon Mar  6 20:49:33 GMT 2006
+     - update to work around Module::Install breakage
+
+0.30 Mon Mar  6 20:49:33 GMT 2006
+     - update to work with recent Catalyst
+
+0.29 Fri Sep  2 15:01:42 BST 2005
+     - moved ebug_http into its own distribution (patch by Jesse Vincent)

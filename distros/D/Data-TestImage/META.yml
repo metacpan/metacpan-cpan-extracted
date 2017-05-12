@@ -1,0 +1,44 @@
+---
+abstract: 'interface for retrieving test images'
+author:
+  - 'Zakariyya Mughal <zmughal@cpan.org>'
+build_requires:
+  Test::More: 0
+  lib: 0
+  perl: v5.14.0
+configure_requires:
+  Archive::Extract: 0
+  ExtUtils::MakeMaker: 0
+  File::ShareDir::Install: 0.03
+  File::Temp: 0
+  HTTP::Tiny: 0
+  Module::Load: 0
+  Path::Class: 0
+  Try::Tiny: 0
+  perl: 5.004
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-TestImage
+requires:
+  Archive::Extract: 0
+  File::ShareDir: 0
+  File::Temp: 0
+  HTTP::Tiny: 0
+  List::AllUtils: 0
+  Module::Load: 0
+  Path::Class: 0
+  Try::Tiny: 0
+  YAML::Tiny: 0
+  constant: 0
+  parent: 0
+  perl: v5.14.0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/zmughal/p5-Data-TestImage
+  repository: https://github.com/zmughal/p5-Data-TestImage.git
+version: 0.007

@@ -1,0 +1,49 @@
+{
+   "abstract" : "remove duplicated item from array",
+   "author" : [
+      "Yasuhiro Matsumoto <mattn.jp@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.0.49",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Deduper",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Filter::Util::Call" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Data::Deduper" : {
+         "file" : "lib/Data/Deduper.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mattn/p5-Data-Deduper/issues"
+      },
+      "homepage" : "https://github.com/mattn/p5-Data-Deduper",
+      "repository" : {
+         "url" : "https://github.com/mattn/p5-Data-Deduper",
+         "web" : "https://github.com/mattn/p5-Data-Deduper"
+      }
+   },
+   "version" : "0.03"
+}

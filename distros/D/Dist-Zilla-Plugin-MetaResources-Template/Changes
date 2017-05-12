@@ -1,0 +1,111 @@
+Release history for perl-Dist-Zilla-Plugin-MetaResources-Template.
+
+v0.4.7 @ 2015-11-05 20:49 UTC
+
+    -   License resource in `Dist::Zilla::MetaResources` 4.300039 converted from `Str` to
+        `ArrayRef[Str]`. Attempt to tune test behavior to work with both variants failed: old
+        (pre-4.300039) `Dist::Zilla` with modern `CPAN::Meta` causes error:
+
+            [MetaYAML] Invalid META structure. Errors found:
+            [MetaYAML] Expected a list structure (license) [Validation: 2]
+
+        I see no point in complicating the test, so let me just require appropriate `Dist::Zilla`
+        version.
+
+v0.4.6 @ 2015-11-02 22:24 UTC
+
+    -   One test fails with old `Dist::Zilla` because `license` resource is a string, not an array
+        as expected by the test. The test skipped if `Dist::Zilla` is too old for the test.
+
+v0.4.5 @ 2015-10-31 22:53 UTC
+
+    -   Dependency on internal module does not work well: `cpanm` successfully installs
+        `ErrorLogger` (in spite of the fact it is already installed), then fails because
+        `ErrorLogger::Exception::Abort` is not installed. Problem fixed by requiring `ErrorLogger`
+        v0.9.0, not `ErrorLogger::Exception::Abort`.
+
+v0.4.4 @ 2015-10-30 22:07 UTC
+
+    [Tests]
+
+    -   Test updated to work with ErrorLogger v0.9.0.
+
+    -   Helper test module eliminated by inlining into the test.
+
+v0.4.3 @ 2015-10-22 14:22 UTC
+
+    [Documentation]
+
+    -   Two real site names replaced with `example.org`.
+
+    -   Short version of license note used in POD.
+
+    [Internals]
+
+    -   Distribution rebuilt with the latest `@Author::VDB` plugin bundle. It includes few more
+        tests.
+
+    -   `aspell.en.pws` file renamed to `aspell-en.pws` to make `Test::Portability` happy.
+
+    [Tests]
+
+    -   Code formatting changed a bit to use less parentheses.
+
+    -   `# REQUIRE:` hint used instead of direct `use`.
+
+v0.4.2 @ 2015-09-24 20:42 UTC
+
+    -   The test fails with Perl 5.8.9:
+
+            Dist::Zilla::Role::TextTemplater version 0.004 required--this is only version v0.8.1
+
+        `use version 0.77` added. Required version changed from `0.004` to `'v0.4.0'`. Probably it
+        will help.
+
+v0.4.1 @ 2015-09-20 21:38 UTC
+
+    -   One test failed with `Dist::Zilla` 5.020 because it does not allow existing but empty
+        `homepage` meta resource. The test fixed.
+
+v0.4.0 @ 2015-09-18 21:14 UTC
+
+    -   Error message now includes problem resource name. However, there is a minor drawback:
+        resources are always fit one line, so error messages (designed for general multi-line case)
+        look a bit redundant. Also, `license` resource internally is represented as array, it
+        affects error message too.
+
+    -   Few tests added.
+
+    -   `ReadMe.pod` dropped.
+
+    -   `TextTemplater` v0.8.0 changed error messages. This change affected
+        `MetaResources-Template` tests. Tests were updated to work with `TextTemplater` v0.8.0, but
+        `TextTemplater` v0.8.0 is required to run tests, because older `TextTemplater` causes test
+        failure. `MetaResources-Template` itself does *not* require `TextTemplater` 0.004, but due
+        to bug in `AutoPrereqs` (it blames long-standing bug in `CPAN`, see
+        <https://github.com/rjbs/Dist-Zilla/issues/492>) distribution meta information says
+        `TextTemplater` v0.8.0 is a runtime requirement.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.003 @ 2015-07-22 13:18 UTC
+
+    -   Bug found: `MetaResources::BUILDARGS` treats all the arguments as meta resources. So
+        neither `delimiters`, nor `package` nor `prepend` argument has desired effect. Instead,
+        they are treated as (invalid) meta resources. Problem fixed by adding own `BUILDARGS` which
+        hides `TextTemplate` arguments from parent `BUILDARGS`. But fix requires `TextTemplater`
+        v0.003.
+
+0.002 @ 2015-07-15 10:42 UTC
+
+    -   `TextTemplater` role used for better error reporting.
+
+    -   Example added to distribution.
+
+    -   Test fails on systems with `Dist::Zilla` older than v5.300039, because in older versions
+        the license resource was a `Str` (now `ArrayRef[Str]`). Test fixed to work with both
+        representations.
+
+0.001 @ 2015-07-09 18:08 UTC
+
+    -   Initial release. Functionality is implemented; test is written; doc is in place.

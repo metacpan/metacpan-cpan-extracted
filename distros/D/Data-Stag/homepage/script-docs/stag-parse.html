@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+<TITLE>stag-parse</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#arguments">ARGUMENTS</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>stag-parse.pl - parses a file and fires events (e.g. sxpr to xml)</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  # convert XML to IText
+  stag-parse.pl -p xml -w itext file1.xml file2.xml</PRE>
+<PRE>
+  # use a custom parser/generator and a custom writer/generator
+  stag-parse.pl -p MyMod::MyParser -w MyMod::MyWriter file.txt</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>script wrapper for the Data::Stag modules</P>
+<P>feeds in files into a parser object that generates nestarray events,
+and feeds the events into a handler/writer class</P>
+<P>
+<HR>
+<H1><A NAME="arguments">ARGUMENTS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dp%7Cparser_FORMAT">-p|parser FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>this is the class that parsers the input <CODE>file(s)</CODE> and generates stag
+events</P>
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dw%7Cwriter_FORMAT">-w|writer FORMAT</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>this is the class that catches the events thrown by the parser; it can
+be any class, but the class is typically a writer</P>
+<P>xml assumed as default</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Do%7Cout_FILE">-o|out FILE</A></STRONG><BR>
+<DD>
+the writer will use this file (defaults to STDOUT)
+<P></P>
+<DT><STRONG><A NAME="item_%2De%7Cerrf_FILE">-e|errf FILE</A></STRONG><BR>
+<DD>
+file to store parse error handler output
+<P></P>
+<DT><STRONG><A NAME="item_%2Derrhandler_FORMAT%2FMODULE">-errhandler FORMAT/MODULE</A></STRONG><BR>
+<DD>
+FORMAT is one of xml, sxpr or itext, or the name of a perl module
+<P>all parse error events go to this module</P>
+<P></P>
+<DT><DD>
+<DT><STRONG><A NAME="item_%2Dr%7Croot_NODE_NAME">-r|root NODE_NAME</A></STRONG><BR>
+<DD>
+if this is specified, NODE_NAME becomes the root of the stag tree, and
+anything that was previously the root is placed below this.
+<P>this happens automatically if more than one file is parsed (because
+there can only be one tree root)</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dcolor">-color</A></STRONG><BR>
+<DD>
+Works only if the output handler is able to provide ASCII-colors
+(currently supported for itext and xml)
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P><A HREF="./Data/Stag.html">the Data::Stag manpage</A></P>
+<P>This script is a wrapper for the method</P>
+<PRE>
+  Data::Stag-&gt;parse()</PRE>
+
+</BODY>
+
+</HTML>

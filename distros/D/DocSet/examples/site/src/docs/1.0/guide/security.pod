@@ -1,0 +1,97 @@
+=head1 NAME
+
+Protecting Your Site
+
+=head1 Description
+
+Securing your site should be your first priority, because of the
+consequences a break-in might have. We discuss the various
+authentication and authorization techniques available, a very
+interesting use of mod_perl.
+
+
+=head1 The Importance of Your site's Security
+
+Let's face it, your site or service can easily become a target for
+Internet "terrorists". It can be because of something you said, the
+success of your site, or for no obvious reason whatever. If your site
+security is compromised, all your data can be deleted or important
+information can be stolen.  You may risk legal action or the sack if
+this happens.
+
+Your site can be paralyzed through a _simple_ I<denial of service>
+(DoS) attack.
+
+Whatever you do, as long as you are connected to the network your site
+will be vulnerable. Cut the connections, turn off your machine and put
+it into a safe.  Now it is protected--but useless.
+
+So what can you do?
+
+Let's first get acquainted with some security related terminology:
+
+=over 4
+
+=item Authentication
+
+When you want to make sure that a user is who he claims to be, you
+generally ask her for a username and a password. Once you have both,
+you can check them against your L<database of username/password
+pairs|guide::databases/>.  If they match, the user has passed the
+B<Authentication> stage. From now on if you keep the
+L<session|guide::modules/Apache__Session___Maintain_session_state_across_HTTP_requests> open all you need to
+do is to remember the username.
+
+=item Authorization
+
+You might want to allow user B<foo> to have access to some resource,
+but restrict her from accessing another resource, which in turn is
+accessible only for user B<bar>. The process of checking access rights
+is called B<Authorization>. For B<Authorization> all you need is an
+authenticated username or some other attribute which you can authorize
+against. For example, you can authorize against IP number, allowing only
+your local users to use some service. But be warned that IP numbers or
+session_ids can be spoofed (forged), and that is why you should not do
+B<Authorization> without B<Authentication>.
+
+=back
+
+Actually you've been familiar with both these concepts for a while.
+
+When you telnet to your account on some machine you go through a login
+process (B<Authentication>).
+
+When you try to read some file from your file systems, the kernel
+checks the permissions on this file (B<Authorization>). You may hear
+about B<Access control> which is another name for the same thing.
+
+
+=head1 Maintainers
+
+Maintainer is the person(s) you should contact with updates,
+corrections and patches.
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+
+=head1 Authors
+
+=over
+
+=item *
+
+Stas Bekman E<lt>stas (at) stason.orgE<gt>
+
+=back
+
+Only the major authors are listed above. For contributors see the
+Changes file.
+
+
+=cut

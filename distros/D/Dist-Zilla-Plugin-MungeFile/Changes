@@ -1,0 +1,7 @@
+Revision history for Dist-Zilla-Plugin-MungeFile
+
+0.009     2015-08-19 00:14:21Z
+          - new distribution, refactored out of
+            Dist::zilla::Plugin::MungeFile::WithDataSection and
+            Dist::Zilla::Plugin::MungeFile::WithConfigFile for greater
+            visibility

@@ -1,0 +1,145 @@
+Revision history for perl distribution DOCSIS-ConfigFile
+
+0.71 2016-12-11T10:08:41+0100
+ - Fix encoding config with IpTos #jhthorsen/app-docsisious#2
+
+0.70 2015-10-15T01:30:14+0200
+ - Add support for decode_docsis \$path_to_file
+ - Remove deprecated methods
+
+0.69 2015-04-07T21:13:47Z
+ - MtaConfigDelimiter is optional when creating MTA config files
+ - Add support for eRouter MangemnetServer TLV #5 Contributor: Josh Galvez
+
+0.68 2015-01-05T10:15:21Z
+ - Add configuration tree structure to DOCSIS::ConfigFile::Syminfo pod
+ - Require Perl 5.10.1
+
+0.67 2015-01-05T02:34:42Z
+ - Add test for handling of 0x0A value in VendorSpecific Contributor:
+   dragic.dusan@gmail.com, RT#87812
+
+0.66 2015-01-05T02:09:43Z
+ - Fix SnmpCpeAccessControl should be uchar instead of uint Contributor:
+   Josh Galvez, RT#99468
+ - Use Digest::SHA instead of Digest::SHA1 Contributor:
+   dragic.dusan@gmail.com, RT#87814
+
+0.65 2015-01-05T02:01:30Z
+ - New API: Will deprecate object oriented API with function based
+ - Add decode_docsis() and encode_docsis()
+ - Add DOCSIS related MIB files
+ - Add debug output with DOCSIS_CONFIGFILE_DEBUG
+ - Add support for string OID with optional SNMP.pm dependency
+
+0.64 2013-08-16T23:33:13Z
+ - Fix handling of 0x0a value in vendorspec()
+ - Add support for VendorSpecific TLVs in Service Flow configuration.
+   Contributor Dušan Dragić
+
+0.6302 2013-07-25T21:56:00Z
+ - Fix RT83013: Using the right value when checking high/low values
+
+0.6301 2013-07-25T21:12:15Z
+ - Fix RT87301: "return" binds stronger than "or". Contributor
+   rurban@x-ray.at
+
+0.63 2012-10-10T00:49:37Z
+ - Fix RT72511 Contributor velladecin@hotmail.com
+
+0.62 2012-04-29T10:56:44Z
+ - Add SnmpCpeAccessControl to Syminfo Contributor: Elliot
+
+0.61 2011-10-03T21:58:40Z
+ - Fix RT70882: ServiceClassName need to be zero-terminated This is
+   optional in input data structure and removed/not visible in decoded tree
+   either
+
+0.6004 2010-09-12T21:51:02Z
+ - Fix #61267: Encode::int() fails on 64b systems: 1234567890 >> 8 ==
+   72057594033105405 != 11954685
+
+0.6003 2010-09-05T20:38:25Z
+ - Fix uint() cannot return negative integers Contributor: canni
+ - Add int() to handle (possible) signed integers Contributor: canni
+ - Fix Decode::string() decodes % as %25
+ - Add no_value() dec/encode function
+ - Change Decode.pm and Encode.pm to confess on errors
+ - Change add_symbol() will confess if the symbol already exists
+ - Change Encode functions return a list (wantarray is history)
+ - Change examples/docsis.pl is renamed and use JSON instead of YAML. Might
+   change to Config::Any in the future.
+
+0.6002 2010-09-04T11:34:58Z
+ - Fix dump_symbol_tree() can print large numbers
+ - Fix dump_symbol_tree() can also follow "vendorspec"
+ - Fix remove duplicates from Syminfo table
+
+0.6001 2010-09-04T04:02:29Z
+ - Fix use Carp qw/.../
+ - Add support for Syminfo->dump_symbol_tree()
+ - Restructured symbol table and documentation
+ - Don't need Data::Dumper to run tests
+
+0.60 2010-09-04T00:26:27Z
+ - Fix uninitialized warnings in Decode::uint() Contributor: canni
+ - Change from logger() and errors() to carp() and confess()
+ - Add Encode::mic() to avoid warnings about Undefined decode function for
+   PCODE/CODE (0/255)
+ - Add DESCRIPTION
+
+0.5901 2010-04-03T13:04:38Z
+ - Update t/
+ - Update Changes
+ - Fix dist structure
+
+0.59 2010-01-23T10:19:00Z
+ - Fix symbol table is read from a string
+
+0.58 2009-12-08T22:45:00Z
+ - Fix 01-pod-coverage.t
+
+0.57 2009-11-08T16:52:00Z
+ - Fix decode of uint
+
+0.56 2009-04-07T15:41:00Z
+ - Add decoding of TLV64
+ - Fix string(): better detection for hexstrings
+ - Add add_symbol() for custom syminfo symbols
+
+0.54 2009-01-08T23:00:00Z
+ - Fix SNMP objects starting with "0x30 0x82 ... " fail to decode
+ - Update POD and formatting of code
+
+0.52 2008-04-14T12:40:00Z
+ - Fix undefined $VERSION.
+
+0.51 2008-04-14T00:19:00Z
+ - Update POD
+
+0.50 2008-04-13T21:15:00Z
+ - Fix RT34547 should be able to handle ->unlimited values :)
+ - Fix RT34548 no warnings when decoding CmMic and CmtsMic
+ - Update 10-encode-decode test
+ - Change output format: hex-values start with '0x'
+
+0.40 2007-12-05T11:23:00Z
+ - Hopefully made a decent release for CPAN.
+ - Add example script  which should be quite useful: docsis_yaml.pl.
+
+0.30 2007-12-04T22:32:00Z
+ - Update encode/decode test.
+ - API change: not compatible with old version.
+ - Add support for normal/advanced output. (Sorry for the version jump -
+   Really bad typo)
+
+0.02 2007-12-04T16:10:00Z
+ - Add deps to makefile.
+ - Change error reporting to Log4perl.
+ - Add encode/decode test.
+ - Move syminfo to DOCSIS::ConfigFile::Syminfo.
+ - Update POD.
+
+0.01 2007-12-03T23:49:00Z
+ - First release of DOCSIS::ConfigFile
+

@@ -1,0 +1,14 @@
+DBIx::YAWM 
+====================
+
+YAWM.pm - Yet Annother Wrapper Module
+Provides yet annother wrapper interface to DBI.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

@@ -1,0 +1,11 @@
+Revision history for DBIx-CheckConnectivity
+
+0.02  Tue Mar 31 09:23:36 CST 2009
+
+* refactor a lot
+* remove auto create related stuff, it's not so *right* to put it in this module
++ Oracle support
+       
+0.01  Mon Mar 30 08:50:32 2009
+       Initial release.
+

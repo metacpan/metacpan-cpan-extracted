@@ -1,0 +1,9 @@
+Revision history for Perl extension DBIx::Class::InflateColumn::URI.
+
+0.01002  Mon Jul 23 11:43:20 2007
+	- updated dependency info in Makefile.PL
+
+0.01001  Tue Jul 17 14:44:18 2007
+	- original version; created by h2xs 1.23 with options
+		-AXn DBIx::Class::InflateColumn::URI -b 5.6.1
+

@@ -1,0 +1,50 @@
+---
+abstract: "IDOPEREL's plugin bundle for Dist::Zilla."
+author:
+  - 'Ido Perlmuter <ido@ido50.net>'
+build_requires:
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-IDOPEREL
+requires:
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::Encoding: '0'
+  Dist::Zilla::Plugin::GitHub::Meta: '0'
+  Dist::Zilla::Plugin::InstallGuide: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::Prereqs: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::Signature: '0'
+  Dist::Zilla::Plugin::Test::DistManifest: '0'
+  Dist::Zilla::Plugin::TestRelease: '0'
+  Dist::Zilla::Plugin::VersionFromModule: '0'
+  Dist::Zilla::PluginBundle::Basic: '0'
+  Dist::Zilla::PluginBundle::Filter: '0'
+  Dist::Zilla::PluginBundle::Git: '0'
+  Dist::Zilla::Role::MintingProfile::ShareDir: '0'
+  Dist::Zilla::Role::PluginBundle::Config::Slicer: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::PluginBundle::PluginRemover: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/ido50/Dist-Zilla-PluginBundle-IDOPEREL/issues
+  homepage: http://search.cpan.org/dist/Dist-Zilla-PluginBundle-IDOPEREL
+  repository: git://github.com/ido50/Dist-Zilla-PluginBundle-IDOPEREL.git
+version: '1.001000'
+x_serialization_backend: 'YAML::Tiny version 1.62'

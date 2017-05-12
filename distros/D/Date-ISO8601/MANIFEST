@@ -1,0 +1,16 @@
+.cvsignore
+Build.PL
+Changes
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+lib/Date/ISO8601.pm
+t/pod_cvg.t
+t/pod_syn.t
+t/y.t
+t/yd.t
+t/ymd.t
+t/ywd.t
+SIGNATURE    Added here by Module::Build

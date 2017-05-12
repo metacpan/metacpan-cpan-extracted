@@ -1,0 +1,9 @@
+0.02     2017-01-08
+
+- The last version was quite broken.
+
+
+0.01     2017-01-08
+
+- First release upon an unsuspecting world. This used to live in my bundle as
+  Dist::Zilla::Plugin::DROLSKY::CheckChangesHasContent.

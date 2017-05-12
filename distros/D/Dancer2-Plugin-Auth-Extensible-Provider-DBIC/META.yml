@@ -1,0 +1,41 @@
+---
+abstract: 'authenticate via the L<Dancer2::Plugin::DBIC> plugin'
+author:
+  - 'Andy Beverley <andy@andybev.com>'
+build_requires:
+  DateTime::Format::SQLite: '0'
+  Test::MockObject: '0'
+  Test::More: '0'
+  Test::Warn: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Auth-Extensible-Provider-DBIC
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  DBIx::Class::ResultClass::HashRefInflator: '0'
+  Dancer2: '0.200000'
+  Dancer2::Core::Types: '0'
+  Dancer2::Plugin::Auth::Extensible: '0.703'
+  Dancer2::Plugin::DBIC: '0.0012'
+  DateTime: '0'
+  Moo: '0'
+  Scalar::Util: '0'
+  String::CamelCase: '0'
+  namespace::clean: '0'
+resources:
+  IRC: irc://irc.perl.org/#dancer
+  bugtracker: https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC/issues
+  homepage: https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC/
+  repository: https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC
+version: '0.623'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

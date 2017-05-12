@@ -1,0 +1,26 @@
+
+README file for DBIx::Broker
+
+This Perl module provides a cleaner and more manageable API
+to use for interaction with DBI-compatible databases.  Queries,
+updates, inserts, counts, deletions, and even arbitrary SQL
+statements can be executed in one line of top-level code, rather
+than the usual three or four that contain that ugly ->prepare()
+and ->execute() clutter.  SELECT row results may be retrieved
+either all at once (returned as an array of hash/arrayrefs,
+unless only one column's values are desired) or incrementally (a
+hash/arrayref at a time).  It is also possible to print debugging
+messages (the raw SQL statements) to any valid handle.
+
+To install this module, use the standard Perl installation
+procedure:
+
+perl Makefile.PL
+make
+make test
+make install
+
+Then, to view the full documentation, type 
+
+perldoc DBIx::Broker
+

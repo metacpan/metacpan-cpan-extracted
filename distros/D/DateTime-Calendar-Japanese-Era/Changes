@@ -1,0 +1,45 @@
+Changes
+=======
+
+0.08003 2016-10-05T13:29:15Z
+  - Fix compilation issue(#1)
+
+0.08002 2016-02-21T22:31:17Z
+  - No code change, updated packaging (rt #79788)
+
+0.08001 25 Aug 2008
+  - Require File::ShareDir 1.00, and update Module::Install (oh boy)
+  - Require Encode. decode everything.
+  - I lied about ERA_NAME_ENCODING in my previous release. there's no
+    such thing
+
+0.08000 04 Nov 2007
+  - Migrate to Module::Install
+  - No longer inherit from Exporter
+  - use Class::Accessor::Fast/Class::Data::Inheritable
+  - Refactored data out to share/eras.yaml and share/south-eras.yaml,
+    and use File::ShareDir to store these
+  - Era names are now returned as UTF-8, but you can override that
+    if you have Encode.pm and set ERA_NAME_ENCODING=euc-jp or some such
+
+0.07 06 Jul 2006
+  - Add registered() method
+
+0.06 05 Jul 2006
+  - Add name -> era lookup. 
+  - Add pod tests
+
+0.05 06 Sep 2005
+  - use 'traditional' Makefile.PL
+
+0.04 03 Feb 2004
+  - Fix mispelling and other inconsistencies in the era IDs
+
+0.03 23 Jan 2004
+  - Remove Math::Round (I guess I didn't use it anymore)
+
+0.02 22 Jan 2004
+  - Fix edge case where date falls on the first day of new era
+
+0.01 12 Jan 2004
+  - initial release

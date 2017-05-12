@@ -1,0 +1,7 @@
+Revision history for Dancer2-Plugin-HTTP-ContentNegotiation
+
+0.02    Mon, 23 Nov 2015 21:38:17 GMT
+        Missing dependecies.
+
+0.01    Sat, 21 Nov 2015 18:23:17 CET
+        First version, with most functionallity.

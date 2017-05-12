@@ -1,0 +1,733 @@
+#Year 52 BC (702 AUC)
+kal 1 702;-510101;1/1/52 BC;day => 01,month => 01,year => -51;base => kal,mons => 1,annus => 702
+4 non 1 702;-510102;2/1/52 BC;day => 02,month => 01,year => -51;base => non,mons => 1,annus => 702,ad => 4
+3 non 1 702;-510103;3/1/52 BC;day => 03,month => 01,year => -51;base => non,mons => 1,annus => 702,ad => 3
+pd non 1 702;-510104;4/1/52 BC;day => 04,month => 01,year => -51;base => non,mons => 1,annus => 702,ad => 2
+non 1 702;-510105;5/1/52 BC;day => 05,month => 01,year => -51;base => non,mons => 1,annus => 702
+8 id 1 702;-510106;6/1/52 BC;day => 06,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 8
+7 id 1 702;-510107;7/1/52 BC;day => 07,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 7
+6 id 1 702;-510108;8/1/52 BC;day => 08,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 6
+5 id 1 702;-510109;9/1/52 BC;day => 09,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 5
+4 id 1 702;-510110;10/1/52 BC;day => 10,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 4
+3 id 1 702;-510111;11/1/52 BC;day => 11,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 3
+pd id 1 702;-510112;12/1/52 BC;day => 12,month => 01,year => -51;base => id,mons => 1,annus => 702,ad => 2
+id 1 702;-510113;13/1/52 BC;day => 13,month => 01,year => -51;base => id,mons => 1,annus => 702
+19 kal 2 702;-510114;14/1/52 BC;day => 14,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 19
+18 kal 2 702;-510115;15/1/52 BC;day => 15,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 18
+17 kal 2 702;-510116;16/1/52 BC;day => 16,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 17
+16 kal 2 702;-510117;17/1/52 BC;day => 17,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 16
+15 kal 2 702;-510118;18/1/52 BC;day => 18,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 15
+14 kal 2 702;-510119;19/1/52 BC;day => 19,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 14
+13 kal 2 702;-510120;20/1/52 BC;day => 20,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 13
+12 kal 2 702;-510121;21/1/52 BC;day => 21,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 12
+11 kal 2 702;-510122;22/1/52 BC;day => 22,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 11
+10 kal 2 702;-510123;23/1/52 BC;day => 23,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 10
+9 kal 2 702;-510124;24/1/52 BC;day => 24,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 9
+8 kal 2 702;-510125;25/1/52 BC;day => 25,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 8
+7 kal 2 702;-510126;26/1/52 BC;day => 26,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 7
+6 kal 2 702;-510127;27/1/52 BC;day => 27,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 6
+5 kal 2 702;-510128;28/1/52 BC;day => 28,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 5
+4 kal 2 702;-510129;29/1/52 BC;day => 29,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 4
+3 kal 2 702;-510130;30/1/52 BC;day => 30,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 3
+pd kal 2 702;-510131;31/1/52 BC;day => 31,month => 01,year => -51;base => kal,mons => 2,annus => 702,ad => 2
+kal 2 702;-510201;1/2/52 BC;day => 01,month => 02,year => -51;base => kal,mons => 2,annus => 702
+4 non 2 702;-510202;2/2/52 BC;day => 02,month => 02,year => -51;base => non,mons => 2,annus => 702,ad => 4
+3 non 2 702;-510203;3/2/52 BC;day => 03,month => 02,year => -51;base => non,mons => 2,annus => 702,ad => 3
+pd non 2 702;-510204;4/2/52 BC;day => 04,month => 02,year => -51;base => non,mons => 2,annus => 702,ad => 2
+non 2 702;-510205;5/2/52 BC;day => 05,month => 02,year => -51;base => non,mons => 2,annus => 702
+8 id 2 702;-510206;6/2/52 BC;day => 06,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 8
+7 id 2 702;-510207;7/2/52 BC;day => 07,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 7
+6 id 2 702;-510208;8/2/52 BC;day => 08,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 6
+5 id 2 702;-510209;9/2/52 BC;day => 09,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 5
+4 id 2 702;-510210;10/2/52 BC;day => 10,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 4
+3 id 2 702;-510211;11/2/52 BC;day => 11,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 3
+pd id 2 702;-510212;12/2/52 BC;day => 12,month => 02,year => -51;base => id,mons => 2,annus => 702,ad => 2
+id 2 702;-510213;13/2/52 BC;day => 13,month => 02,year => -51;base => id,mons => 2,annus => 702
+16 kal 3 702;-510214;14/2/52 BC;day => 14,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 16
+15 kal 3 702;-510215;15/2/52 BC;day => 15,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 15
+14 kal 3 702;-510216;16/2/52 BC;day => 16,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 14
+13 kal 3 702;-510217;17/2/52 BC;day => 17,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 13
+12 kal 3 702;-510218;18/2/52 BC;day => 18,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 12
+11 kal 3 702;-510219;19/2/52 BC;day => 19,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 11
+10 kal 3 702;-510220;20/2/52 BC;day => 20,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 10
+9 kal 3 702;-510221;21/2/52 BC;day => 21,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 9
+8 kal 3 702;-510222;22/2/52 BC;day => 22,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 8
+7 kal 3 702;-510223;23/2/52 BC;day => 23,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 7
+6 kal 3 702;-510224;24/2/52 BC;day => 24,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 6
+5 kal 3 702;-510225;25/2/52 BC;day => 25,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 5
+4 kal 3 702;-510226;26/2/52 BC;day => 26,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 4
+3 kal 3 702;-510227;27/2/52 BC;day => 27,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 3
+pd kal 3 702;-510228;28/2/52 BC;day => 28,month => 02,year => -51;base => kal,mons => 3,annus => 702,ad => 2
+kal 3 702;-510301;1/3/52 BC;day => 01,month => 03,year => -51;base => kal,mons => 3,annus => 702
+6 non 3 702;-510302;2/3/52 BC;day => 02,month => 03,year => -51;base => non,mons => 3,annus => 702,ad => 6
+5 non 3 702;-510303;3/3/52 BC;day => 03,month => 03,year => -51;base => non,mons => 3,annus => 702,ad => 5
+4 non 3 702;-510304;4/3/52 BC;day => 04,month => 03,year => -51;base => non,mons => 3,annus => 702,ad => 4
+3 non 3 702;-510305;5/3/52 BC;day => 05,month => 03,year => -51;base => non,mons => 3,annus => 702,ad => 3
+pd non 3 702;-510306;6/3/52 BC;day => 06,month => 03,year => -51;base => non,mons => 3,annus => 702,ad => 2
+non 3 702;-510307;7/3/52 BC;day => 07,month => 03,year => -51;base => non,mons => 3,annus => 702
+8 id 3 702;-510308;8/3/52 BC;day => 08,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 8
+7 id 3 702;-510309;9/3/52 BC;day => 09,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 7
+6 id 3 702;-510310;10/3/52 BC;day => 10,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 6
+5 id 3 702;-510311;11/3/52 BC;day => 11,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 5
+4 id 3 702;-510312;12/3/52 BC;day => 12,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 4
+3 id 3 702;-510313;13/3/52 BC;day => 13,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 3
+pd id 3 702;-510314;14/3/52 BC;day => 14,month => 03,year => -51;base => id,mons => 3,annus => 702,ad => 2
+id 3 702;-510315;15/3/52 BC;day => 15,month => 03,year => -51;base => id,mons => 3,annus => 702
+17 kal 4 702;-510316;16/3/52 BC;day => 16,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 17
+16 kal 4 702;-510317;17/3/52 BC;day => 17,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 16
+15 kal 4 702;-510318;18/3/52 BC;day => 18,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 15
+14 kal 4 702;-510319;19/3/52 BC;day => 19,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 14
+13 kal 4 702;-510320;20/3/52 BC;day => 20,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 13
+12 kal 4 702;-510321;21/3/52 BC;day => 21,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 12
+11 kal 4 702;-510322;22/3/52 BC;day => 22,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 11
+10 kal 4 702;-510323;23/3/52 BC;day => 23,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 10
+9 kal 4 702;-510324;24/3/52 BC;day => 24,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 9
+8 kal 4 702;-510325;25/3/52 BC;day => 25,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 8
+7 kal 4 702;-510326;26/3/52 BC;day => 26,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 7
+6 kal 4 702;-510327;27/3/52 BC;day => 27,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 6
+5 kal 4 702;-510328;28/3/52 BC;day => 28,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 5
+4 kal 4 702;-510329;29/3/52 BC;day => 29,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 4
+3 kal 4 702;-510330;30/3/52 BC;day => 30,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 3
+pd kal 4 702;-510331;31/3/52 BC;day => 31,month => 03,year => -51;base => kal,mons => 4,annus => 702,ad => 2
+kal 4 702;-510401;1/4/52 BC;day => 01,month => 04,year => -51;base => kal,mons => 4,annus => 702
+4 non 4 702;-510402;2/4/52 BC;day => 02,month => 04,year => -51;base => non,mons => 4,annus => 702,ad => 4
+3 non 4 702;-510403;3/4/52 BC;day => 03,month => 04,year => -51;base => non,mons => 4,annus => 702,ad => 3
+pd non 4 702;-510404;4/4/52 BC;day => 04,month => 04,year => -51;base => non,mons => 4,annus => 702,ad => 2
+non 4 702;-510405;5/4/52 BC;day => 05,month => 04,year => -51;base => non,mons => 4,annus => 702
+8 id 4 702;-510406;6/4/52 BC;day => 06,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 8
+7 id 4 702;-510407;7/4/52 BC;day => 07,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 7
+6 id 4 702;-510408;8/4/52 BC;day => 08,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 6
+5 id 4 702;-510409;9/4/52 BC;day => 09,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 5
+4 id 4 702;-510410;10/4/52 BC;day => 10,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 4
+3 id 4 702;-510411;11/4/52 BC;day => 11,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 3
+pd id 4 702;-510412;12/4/52 BC;day => 12,month => 04,year => -51;base => id,mons => 4,annus => 702,ad => 2
+id 4 702;-510413;13/4/52 BC;day => 13,month => 04,year => -51;base => id,mons => 4,annus => 702
+18 kal 5 702;-510414;14/4/52 BC;day => 14,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 18
+17 kal 5 702;-510415;15/4/52 BC;day => 15,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 17
+16 kal 5 702;-510416;16/4/52 BC;day => 16,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 16
+15 kal 5 702;-510417;17/4/52 BC;day => 17,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 15
+14 kal 5 702;-510418;18/4/52 BC;day => 18,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 14
+13 kal 5 702;-510419;19/4/52 BC;day => 19,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 13
+12 kal 5 702;-510420;20/4/52 BC;day => 20,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 12
+11 kal 5 702;-510421;21/4/52 BC;day => 21,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 11
+10 kal 5 702;-510422;22/4/52 BC;day => 22,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 10
+9 kal 5 702;-510423;23/4/52 BC;day => 23,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 9
+8 kal 5 702;-510424;24/4/52 BC;day => 24,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 8
+7 kal 5 702;-510425;25/4/52 BC;day => 25,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 7
+6 kal 5 702;-510426;26/4/52 BC;day => 26,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 6
+5 kal 5 702;-510427;27/4/52 BC;day => 27,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 5
+4 kal 5 702;-510428;28/4/52 BC;day => 28,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 4
+3 kal 5 702;-510429;29/4/52 BC;day => 29,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 3
+pd kal 5 702;-510430;30/4/52 BC;day => 30,month => 04,year => -51;base => kal,mons => 5,annus => 702,ad => 2
+kal 5 702;-510501;1/5/52 BC;day => 01,month => 05,year => -51;base => kal,mons => 5,annus => 702
+6 non 5 702;-510502;2/5/52 BC;day => 02,month => 05,year => -51;base => non,mons => 5,annus => 702,ad => 6
+5 non 5 702;-510503;3/5/52 BC;day => 03,month => 05,year => -51;base => non,mons => 5,annus => 702,ad => 5
+4 non 5 702;-510504;4/5/52 BC;day => 04,month => 05,year => -51;base => non,mons => 5,annus => 702,ad => 4
+3 non 5 702;-510505;5/5/52 BC;day => 05,month => 05,year => -51;base => non,mons => 5,annus => 702,ad => 3
+pd non 5 702;-510506;6/5/52 BC;day => 06,month => 05,year => -51;base => non,mons => 5,annus => 702,ad => 2
+non 5 702;-510507;7/5/52 BC;day => 07,month => 05,year => -51;base => non,mons => 5,annus => 702
+8 id 5 702;-510508;8/5/52 BC;day => 08,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 8
+7 id 5 702;-510509;9/5/52 BC;day => 09,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 7
+6 id 5 702;-510510;10/5/52 BC;day => 10,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 6
+5 id 5 702;-510511;11/5/52 BC;day => 11,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 5
+4 id 5 702;-510512;12/5/52 BC;day => 12,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 4
+3 id 5 702;-510513;13/5/52 BC;day => 13,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 3
+pd id 5 702;-510514;14/5/52 BC;day => 14,month => 05,year => -51;base => id,mons => 5,annus => 702,ad => 2
+id 5 702;-510515;15/5/52 BC;day => 15,month => 05,year => -51;base => id,mons => 5,annus => 702
+17 kal 6 702;-510516;16/5/52 BC;day => 16,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 17
+16 kal 6 702;-510517;17/5/52 BC;day => 17,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 16
+15 kal 6 702;-510518;18/5/52 BC;day => 18,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 15
+14 kal 6 702;-510519;19/5/52 BC;day => 19,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 14
+13 kal 6 702;-510520;20/5/52 BC;day => 20,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 13
+12 kal 6 702;-510521;21/5/52 BC;day => 21,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 12
+11 kal 6 702;-510522;22/5/52 BC;day => 22,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 11
+10 kal 6 702;-510523;23/5/52 BC;day => 23,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 10
+9 kal 6 702;-510524;24/5/52 BC;day => 24,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 9
+8 kal 6 702;-510525;25/5/52 BC;day => 25,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 8
+7 kal 6 702;-510526;26/5/52 BC;day => 26,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 7
+6 kal 6 702;-510527;27/5/52 BC;day => 27,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 6
+5 kal 6 702;-510528;28/5/52 BC;day => 28,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 5
+4 kal 6 702;-510529;29/5/52 BC;day => 29,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 4
+3 kal 6 702;-510530;30/5/52 BC;day => 30,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 3
+pd kal 6 702;-510531;31/5/52 BC;day => 31,month => 05,year => -51;base => kal,mons => 6,annus => 702,ad => 2
+kal 6 702;-510601;1/6/52 BC;day => 01,month => 06,year => -51;base => kal,mons => 6,annus => 702
+4 non 6 702;-510602;2/6/52 BC;day => 02,month => 06,year => -51;base => non,mons => 6,annus => 702,ad => 4
+3 non 6 702;-510603;3/6/52 BC;day => 03,month => 06,year => -51;base => non,mons => 6,annus => 702,ad => 3
+pd non 6 702;-510604;4/6/52 BC;day => 04,month => 06,year => -51;base => non,mons => 6,annus => 702,ad => 2
+non 6 702;-510605;5/6/52 BC;day => 05,month => 06,year => -51;base => non,mons => 6,annus => 702
+8 id 6 702;-510606;6/6/52 BC;day => 06,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 8
+7 id 6 702;-510607;7/6/52 BC;day => 07,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 7
+6 id 6 702;-510608;8/6/52 BC;day => 08,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 6
+5 id 6 702;-510609;9/6/52 BC;day => 09,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 5
+4 id 6 702;-510610;10/6/52 BC;day => 10,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 4
+3 id 6 702;-510611;11/6/52 BC;day => 11,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 3
+pd id 6 702;-510612;12/6/52 BC;day => 12,month => 06,year => -51;base => id,mons => 6,annus => 702,ad => 2
+id 6 702;-510613;13/6/52 BC;day => 13,month => 06,year => -51;base => id,mons => 6,annus => 702
+18 kal 7 702;-510614;14/6/52 BC;day => 14,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 18
+17 kal 7 702;-510615;15/6/52 BC;day => 15,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 17
+16 kal 7 702;-510616;16/6/52 BC;day => 16,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 16
+15 kal 7 702;-510617;17/6/52 BC;day => 17,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 15
+14 kal 7 702;-510618;18/6/52 BC;day => 18,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 14
+13 kal 7 702;-510619;19/6/52 BC;day => 19,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 13
+12 kal 7 702;-510620;20/6/52 BC;day => 20,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 12
+11 kal 7 702;-510621;21/6/52 BC;day => 21,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 11
+10 kal 7 702;-510622;22/6/52 BC;day => 22,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 10
+9 kal 7 702;-510623;23/6/52 BC;day => 23,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 9
+8 kal 7 702;-510624;24/6/52 BC;day => 24,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 8
+7 kal 7 702;-510625;25/6/52 BC;day => 25,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 7
+6 kal 7 702;-510626;26/6/52 BC;day => 26,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 6
+5 kal 7 702;-510627;27/6/52 BC;day => 27,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 5
+4 kal 7 702;-510628;28/6/52 BC;day => 28,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 4
+3 kal 7 702;-510629;29/6/52 BC;day => 29,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 3
+pd kal 7 702;-510630;30/6/52 BC;day => 30,month => 06,year => -51;base => kal,mons => 7,annus => 702,ad => 2
+kal 7 702;-510701;1/7/52 BC;day => 01,month => 07,year => -51;base => kal,mons => 7,annus => 702
+6 non 7 702;-510702;2/7/52 BC;day => 02,month => 07,year => -51;base => non,mons => 7,annus => 702,ad => 6
+5 non 7 702;-510703;3/7/52 BC;day => 03,month => 07,year => -51;base => non,mons => 7,annus => 702,ad => 5
+4 non 7 702;-510704;4/7/52 BC;day => 04,month => 07,year => -51;base => non,mons => 7,annus => 702,ad => 4
+3 non 7 702;-510705;5/7/52 BC;day => 05,month => 07,year => -51;base => non,mons => 7,annus => 702,ad => 3
+pd non 7 702;-510706;6/7/52 BC;day => 06,month => 07,year => -51;base => non,mons => 7,annus => 702,ad => 2
+non 7 702;-510707;7/7/52 BC;day => 07,month => 07,year => -51;base => non,mons => 7,annus => 702
+8 id 7 702;-510708;8/7/52 BC;day => 08,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 8
+7 id 7 702;-510709;9/7/52 BC;day => 09,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 7
+6 id 7 702;-510710;10/7/52 BC;day => 10,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 6
+5 id 7 702;-510711;11/7/52 BC;day => 11,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 5
+4 id 7 702;-510712;12/7/52 BC;day => 12,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 4
+3 id 7 702;-510713;13/7/52 BC;day => 13,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 3
+pd id 7 702;-510714;14/7/52 BC;day => 14,month => 07,year => -51;base => id,mons => 7,annus => 702,ad => 2
+id 7 702;-510715;15/7/52 BC;day => 15,month => 07,year => -51;base => id,mons => 7,annus => 702
+17 kal 8 702;-510716;16/7/52 BC;day => 16,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 17
+16 kal 8 702;-510717;17/7/52 BC;day => 17,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 16
+15 kal 8 702;-510718;18/7/52 BC;day => 18,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 15
+14 kal 8 702;-510719;19/7/52 BC;day => 19,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 14
+13 kal 8 702;-510720;20/7/52 BC;day => 20,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 13
+12 kal 8 702;-510721;21/7/52 BC;day => 21,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 12
+11 kal 8 702;-510722;22/7/52 BC;day => 22,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 11
+10 kal 8 702;-510723;23/7/52 BC;day => 23,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 10
+9 kal 8 702;-510724;24/7/52 BC;day => 24,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 9
+8 kal 8 702;-510725;25/7/52 BC;day => 25,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 8
+7 kal 8 702;-510726;26/7/52 BC;day => 26,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 7
+6 kal 8 702;-510727;27/7/52 BC;day => 27,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 6
+5 kal 8 702;-510728;28/7/52 BC;day => 28,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 5
+4 kal 8 702;-510729;29/7/52 BC;day => 29,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 4
+3 kal 8 702;-510730;30/7/52 BC;day => 30,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 3
+pd kal 8 702;-510731;31/7/52 BC;day => 31,month => 07,year => -51;base => kal,mons => 8,annus => 702,ad => 2
+kal 8 702;-510801;1/8/52 BC;day => 01,month => 08,year => -51;base => kal,mons => 8,annus => 702
+4 non 8 702;-510802;2/8/52 BC;day => 02,month => 08,year => -51;base => non,mons => 8,annus => 702,ad => 4
+3 non 8 702;-510803;3/8/52 BC;day => 03,month => 08,year => -51;base => non,mons => 8,annus => 702,ad => 3
+pd non 8 702;-510804;4/8/52 BC;day => 04,month => 08,year => -51;base => non,mons => 8,annus => 702,ad => 2
+non 8 702;-510805;5/8/52 BC;day => 05,month => 08,year => -51;base => non,mons => 8,annus => 702
+8 id 8 702;-510806;6/8/52 BC;day => 06,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 8
+7 id 8 702;-510807;7/8/52 BC;day => 07,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 7
+6 id 8 702;-510808;8/8/52 BC;day => 08,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 6
+5 id 8 702;-510809;9/8/52 BC;day => 09,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 5
+4 id 8 702;-510810;10/8/52 BC;day => 10,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 4
+3 id 8 702;-510811;11/8/52 BC;day => 11,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 3
+pd id 8 702;-510812;12/8/52 BC;day => 12,month => 08,year => -51;base => id,mons => 8,annus => 702,ad => 2
+id 8 702;-510813;13/8/52 BC;day => 13,month => 08,year => -51;base => id,mons => 8,annus => 702
+19 kal 9 702;-510814;14/8/52 BC;day => 14,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 19
+18 kal 9 702;-510815;15/8/52 BC;day => 15,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 18
+17 kal 9 702;-510816;16/8/52 BC;day => 16,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 17
+16 kal 9 702;-510817;17/8/52 BC;day => 17,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 16
+15 kal 9 702;-510818;18/8/52 BC;day => 18,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 15
+14 kal 9 702;-510819;19/8/52 BC;day => 19,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 14
+13 kal 9 702;-510820;20/8/52 BC;day => 20,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 13
+12 kal 9 702;-510821;21/8/52 BC;day => 21,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 12
+11 kal 9 702;-510822;22/8/52 BC;day => 22,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 11
+10 kal 9 702;-510823;23/8/52 BC;day => 23,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 10
+9 kal 9 702;-510824;24/8/52 BC;day => 24,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 9
+8 kal 9 702;-510825;25/8/52 BC;day => 25,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 8
+7 kal 9 702;-510826;26/8/52 BC;day => 26,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 7
+6 kal 9 702;-510827;27/8/52 BC;day => 27,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 6
+5 kal 9 702;-510828;28/8/52 BC;day => 28,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 5
+4 kal 9 702;-510829;29/8/52 BC;day => 29,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 4
+3 kal 9 702;-510830;30/8/52 BC;day => 30,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 3
+pd kal 9 702;-510831;31/8/52 BC;day => 31,month => 08,year => -51;base => kal,mons => 9,annus => 702,ad => 2
+kal 9 702;-510901;1/9/52 BC;day => 01,month => 09,year => -51;base => kal,mons => 9,annus => 702
+4 non 9 702;-510902;2/9/52 BC;day => 02,month => 09,year => -51;base => non,mons => 9,annus => 702,ad => 4
+3 non 9 702;-510903;3/9/52 BC;day => 03,month => 09,year => -51;base => non,mons => 9,annus => 702,ad => 3
+pd non 9 702;-510904;4/9/52 BC;day => 04,month => 09,year => -51;base => non,mons => 9,annus => 702,ad => 2
+non 9 702;-510905;5/9/52 BC;day => 05,month => 09,year => -51;base => non,mons => 9,annus => 702
+8 id 9 702;-510906;6/9/52 BC;day => 06,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 8
+7 id 9 702;-510907;7/9/52 BC;day => 07,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 7
+6 id 9 702;-510908;8/9/52 BC;day => 08,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 6
+5 id 9 702;-510909;9/9/52 BC;day => 09,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 5
+4 id 9 702;-510910;10/9/52 BC;day => 10,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 4
+3 id 9 702;-510911;11/9/52 BC;day => 11,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 3
+pd id 9 702;-510912;12/9/52 BC;day => 12,month => 09,year => -51;base => id,mons => 9,annus => 702,ad => 2
+id 9 702;-510913;13/9/52 BC;day => 13,month => 09,year => -51;base => id,mons => 9,annus => 702
+18 kal 10 702;-510914;14/9/52 BC;day => 14,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 18
+17 kal 10 702;-510915;15/9/52 BC;day => 15,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 17
+16 kal 10 702;-510916;16/9/52 BC;day => 16,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 16
+15 kal 10 702;-510917;17/9/52 BC;day => 17,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 15
+14 kal 10 702;-510918;18/9/52 BC;day => 18,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 14
+13 kal 10 702;-510919;19/9/52 BC;day => 19,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 13
+12 kal 10 702;-510920;20/9/52 BC;day => 20,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 12
+11 kal 10 702;-510921;21/9/52 BC;day => 21,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 11
+10 kal 10 702;-510922;22/9/52 BC;day => 22,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 10
+9 kal 10 702;-510923;23/9/52 BC;day => 23,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 9
+8 kal 10 702;-510924;24/9/52 BC;day => 24,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 8
+7 kal 10 702;-510925;25/9/52 BC;day => 25,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 7
+6 kal 10 702;-510926;26/9/52 BC;day => 26,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 6
+5 kal 10 702;-510927;27/9/52 BC;day => 27,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 5
+4 kal 10 702;-510928;28/9/52 BC;day => 28,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 4
+3 kal 10 702;-510929;29/9/52 BC;day => 29,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 3
+pd kal 10 702;-510930;30/9/52 BC;day => 30,month => 09,year => -51;base => kal,mons => 10,annus => 702,ad => 2
+kal 10 702;-511001;1/10/52 BC;day => 01,month => 10,year => -51;base => kal,mons => 10,annus => 702
+6 non 10 702;-511002;2/10/52 BC;day => 02,month => 10,year => -51;base => non,mons => 10,annus => 702,ad => 6
+5 non 10 702;-511003;3/10/52 BC;day => 03,month => 10,year => -51;base => non,mons => 10,annus => 702,ad => 5
+4 non 10 702;-511004;4/10/52 BC;day => 04,month => 10,year => -51;base => non,mons => 10,annus => 702,ad => 4
+3 non 10 702;-511005;5/10/52 BC;day => 05,month => 10,year => -51;base => non,mons => 10,annus => 702,ad => 3
+pd non 10 702;-511006;6/10/52 BC;day => 06,month => 10,year => -51;base => non,mons => 10,annus => 702,ad => 2
+non 10 702;-511007;7/10/52 BC;day => 07,month => 10,year => -51;base => non,mons => 10,annus => 702
+8 id 10 702;-511008;8/10/52 BC;day => 08,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 8
+7 id 10 702;-511009;9/10/52 BC;day => 09,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 7
+6 id 10 702;-511010;10/10/52 BC;day => 10,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 6
+5 id 10 702;-511011;11/10/52 BC;day => 11,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 5
+4 id 10 702;-511012;12/10/52 BC;day => 12,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 4
+3 id 10 702;-511013;13/10/52 BC;day => 13,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 3
+pd id 10 702;-511014;14/10/52 BC;day => 14,month => 10,year => -51;base => id,mons => 10,annus => 702,ad => 2
+id 10 702;-511015;15/10/52 BC;day => 15,month => 10,year => -51;base => id,mons => 10,annus => 702
+17 kal 11 702;-511016;16/10/52 BC;day => 16,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 17
+16 kal 11 702;-511017;17/10/52 BC;day => 17,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 16
+15 kal 11 702;-511018;18/10/52 BC;day => 18,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 15
+14 kal 11 702;-511019;19/10/52 BC;day => 19,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 14
+13 kal 11 702;-511020;20/10/52 BC;day => 20,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 13
+12 kal 11 702;-511021;21/10/52 BC;day => 21,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 12
+11 kal 11 702;-511022;22/10/52 BC;day => 22,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 11
+10 kal 11 702;-511023;23/10/52 BC;day => 23,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 10
+9 kal 11 702;-511024;24/10/52 BC;day => 24,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 9
+8 kal 11 702;-511025;25/10/52 BC;day => 25,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 8
+7 kal 11 702;-511026;26/10/52 BC;day => 26,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 7
+6 kal 11 702;-511027;27/10/52 BC;day => 27,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 6
+5 kal 11 702;-511028;28/10/52 BC;day => 28,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 5
+4 kal 11 702;-511029;29/10/52 BC;day => 29,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 4
+3 kal 11 702;-511030;30/10/52 BC;day => 30,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 3
+pd kal 11 702;-511031;31/10/52 BC;day => 31,month => 10,year => -51;base => kal,mons => 11,annus => 702,ad => 2
+kal 11 702;-511101;1/11/52 BC;day => 01,month => 11,year => -51;base => kal,mons => 11,annus => 702
+4 non 11 702;-511102;2/11/52 BC;day => 02,month => 11,year => -51;base => non,mons => 11,annus => 702,ad => 4
+3 non 11 702;-511103;3/11/52 BC;day => 03,month => 11,year => -51;base => non,mons => 11,annus => 702,ad => 3
+pd non 11 702;-511104;4/11/52 BC;day => 04,month => 11,year => -51;base => non,mons => 11,annus => 702,ad => 2
+non 11 702;-511105;5/11/52 BC;day => 05,month => 11,year => -51;base => non,mons => 11,annus => 702
+8 id 11 702;-511106;6/11/52 BC;day => 06,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 8
+7 id 11 702;-511107;7/11/52 BC;day => 07,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 7
+6 id 11 702;-511108;8/11/52 BC;day => 08,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 6
+5 id 11 702;-511109;9/11/52 BC;day => 09,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 5
+4 id 11 702;-511110;10/11/52 BC;day => 10,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 4
+3 id 11 702;-511111;11/11/52 BC;day => 11,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 3
+pd id 11 702;-511112;12/11/52 BC;day => 12,month => 11,year => -51;base => id,mons => 11,annus => 702,ad => 2
+id 11 702;-511113;13/11/52 BC;day => 13,month => 11,year => -51;base => id,mons => 11,annus => 702
+18 kal 12 702;-511114;14/11/52 BC;day => 14,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 18
+17 kal 12 702;-511115;15/11/52 BC;day => 15,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 17
+16 kal 12 702;-511116;16/11/52 BC;day => 16,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 16
+15 kal 12 702;-511117;17/11/52 BC;day => 17,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 15
+14 kal 12 702;-511118;18/11/52 BC;day => 18,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 14
+13 kal 12 702;-511119;19/11/52 BC;day => 19,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 13
+12 kal 12 702;-511120;20/11/52 BC;day => 20,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 12
+11 kal 12 702;-511121;21/11/52 BC;day => 21,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 11
+10 kal 12 702;-511122;22/11/52 BC;day => 22,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 10
+9 kal 12 702;-511123;23/11/52 BC;day => 23,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 9
+8 kal 12 702;-511124;24/11/52 BC;day => 24,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 8
+7 kal 12 702;-511125;25/11/52 BC;day => 25,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 7
+6 kal 12 702;-511126;26/11/52 BC;day => 26,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 6
+5 kal 12 702;-511127;27/11/52 BC;day => 27,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 5
+4 kal 12 702;-511128;28/11/52 BC;day => 28,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 4
+3 kal 12 702;-511129;29/11/52 BC;day => 29,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 3
+pd kal 12 702;-511130;30/11/52 BC;day => 30,month => 11,year => -51;base => kal,mons => 12,annus => 702,ad => 2
+kal 12 702;-511201;1/12/52 BC;day => 01,month => 12,year => -51;base => kal,mons => 12,annus => 702
+4 non 12 702;-511202;2/12/52 BC;day => 02,month => 12,year => -51;base => non,mons => 12,annus => 702,ad => 4
+3 non 12 702;-511203;3/12/52 BC;day => 03,month => 12,year => -51;base => non,mons => 12,annus => 702,ad => 3
+pd non 12 702;-511204;4/12/52 BC;day => 04,month => 12,year => -51;base => non,mons => 12,annus => 702,ad => 2
+non 12 702;-511205;5/12/52 BC;day => 05,month => 12,year => -51;base => non,mons => 12,annus => 702
+8 id 12 702;-511206;6/12/52 BC;day => 06,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 8
+7 id 12 702;-511207;7/12/52 BC;day => 07,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 7
+6 id 12 702;-511208;8/12/52 BC;day => 08,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 6
+5 id 12 702;-511209;9/12/52 BC;day => 09,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 5
+4 id 12 702;-511210;10/12/52 BC;day => 10,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 4
+3 id 12 702;-511211;11/12/52 BC;day => 11,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 3
+pd id 12 702;-511212;12/12/52 BC;day => 12,month => 12,year => -51;base => id,mons => 12,annus => 702,ad => 2
+id 12 702;-511213;13/12/52 BC;day => 13,month => 12,year => -51;base => id,mons => 12,annus => 702
+19 kal 1 703;-511214;14/12/52 BC;day => 14,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 19
+18 kal 1 703;-511215;15/12/52 BC;day => 15,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 18
+17 kal 1 703;-511216;16/12/52 BC;day => 16,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 17
+16 kal 1 703;-511217;17/12/52 BC;day => 17,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 16
+15 kal 1 703;-511218;18/12/52 BC;day => 18,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 15
+14 kal 1 703;-511219;19/12/52 BC;day => 19,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 14
+13 kal 1 703;-511220;20/12/52 BC;day => 20,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 13
+12 kal 1 703;-511221;21/12/52 BC;day => 21,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 12
+11 kal 1 703;-511222;22/12/52 BC;day => 22,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 11
+10 kal 1 703;-511223;23/12/52 BC;day => 23,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 10
+9 kal 1 703;-511224;24/12/52 BC;day => 24,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 9
+8 kal 1 703;-511225;25/12/52 BC;day => 25,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 8
+7 kal 1 703;-511226;26/12/52 BC;day => 26,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 7
+6 kal 1 703;-511227;27/12/52 BC;day => 27,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 6
+5 kal 1 703;-511228;28/12/52 BC;day => 28,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 5
+4 kal 1 703;-511229;29/12/52 BC;day => 29,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 4
+3 kal 1 703;-511230;30/12/52 BC;day => 30,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 3
+pd kal 1 703;-511231;31/12/52 BC;day => 31,month => 12,year => -51;base => kal,mons => 1,annus => 703,ad => 2
+#Year 2000AD (2753 AUC)
+kal 1 2753;20000101;1/1/2000AD;day => 01,month => 01,year => 2000;base => kal,mons => 1,annus => 2753
+4 non 1 2753;20000102;2/1/2000AD;day => 02,month => 01,year => 2000;base => non,mons => 1,annus => 2753,ad => 4
+3 non 1 2753;20000103;3/1/2000AD;day => 03,month => 01,year => 2000;base => non,mons => 1,annus => 2753,ad => 3
+pd non 1 2753;20000104;4/1/2000AD;day => 04,month => 01,year => 2000;base => non,mons => 1,annus => 2753,ad => 2
+non 1 2753;20000105;5/1/2000AD;day => 05,month => 01,year => 2000;base => non,mons => 1,annus => 2753
+8 id 1 2753;20000106;6/1/2000AD;day => 06,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 8
+7 id 1 2753;20000107;7/1/2000AD;day => 07,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 7
+6 id 1 2753;20000108;8/1/2000AD;day => 08,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 6
+5 id 1 2753;20000109;9/1/2000AD;day => 09,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 5
+4 id 1 2753;20000110;10/1/2000AD;day => 10,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 4
+3 id 1 2753;20000111;11/1/2000AD;day => 11,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 3
+pd id 1 2753;20000112;12/1/2000AD;day => 12,month => 01,year => 2000;base => id,mons => 1,annus => 2753,ad => 2
+id 1 2753;20000113;13/1/2000AD;day => 13,month => 01,year => 2000;base => id,mons => 1,annus => 2753
+19 kal 2 2753;20000114;14/1/2000AD;day => 14,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 19
+18 kal 2 2753;20000115;15/1/2000AD;day => 15,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 18
+17 kal 2 2753;20000116;16/1/2000AD;day => 16,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 17
+16 kal 2 2753;20000117;17/1/2000AD;day => 17,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 16
+15 kal 2 2753;20000118;18/1/2000AD;day => 18,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 15
+14 kal 2 2753;20000119;19/1/2000AD;day => 19,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 14
+13 kal 2 2753;20000120;20/1/2000AD;day => 20,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 13
+12 kal 2 2753;20000121;21/1/2000AD;day => 21,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 12
+11 kal 2 2753;20000122;22/1/2000AD;day => 22,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 11
+10 kal 2 2753;20000123;23/1/2000AD;day => 23,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 10
+9 kal 2 2753;20000124;24/1/2000AD;day => 24,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 9
+8 kal 2 2753;20000125;25/1/2000AD;day => 25,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 8
+7 kal 2 2753;20000126;26/1/2000AD;day => 26,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 7
+6 kal 2 2753;20000127;27/1/2000AD;day => 27,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 6
+5 kal 2 2753;20000128;28/1/2000AD;day => 28,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 5
+4 kal 2 2753;20000129;29/1/2000AD;day => 29,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 4
+3 kal 2 2753;20000130;30/1/2000AD;day => 30,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 3
+pd kal 2 2753;20000131;31/1/2000AD;day => 31,month => 01,year => 2000;base => kal,mons => 2,annus => 2753,ad => 2
+kal 2 2753;20000201;1/2/2000AD;day => 01,month => 02,year => 2000;base => kal,mons => 2,annus => 2753
+4 non 2 2753;20000202;2/2/2000AD;day => 02,month => 02,year => 2000;base => non,mons => 2,annus => 2753,ad => 4
+3 non 2 2753;20000203;3/2/2000AD;day => 03,month => 02,year => 2000;base => non,mons => 2,annus => 2753,ad => 3
+pd non 2 2753;20000204;4/2/2000AD;day => 04,month => 02,year => 2000;base => non,mons => 2,annus => 2753,ad => 2
+non 2 2753;20000205;5/2/2000AD;day => 05,month => 02,year => 2000;base => non,mons => 2,annus => 2753
+8 id 2 2753;20000206;6/2/2000AD;day => 06,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 8
+7 id 2 2753;20000207;7/2/2000AD;day => 07,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 7
+6 id 2 2753;20000208;8/2/2000AD;day => 08,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 6
+5 id 2 2753;20000209;9/2/2000AD;day => 09,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 5
+4 id 2 2753;20000210;10/2/2000AD;day => 10,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 4
+3 id 2 2753;20000211;11/2/2000AD;day => 11,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 3
+pd id 2 2753;20000212;12/2/2000AD;day => 12,month => 02,year => 2000;base => id,mons => 2,annus => 2753,ad => 2
+id 2 2753;20000213;13/2/2000AD;day => 13,month => 02,year => 2000;base => id,mons => 2,annus => 2753
+16 kal 3 2753;20000214;14/2/2000AD;day => 14,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 16
+15 kal 3 2753;20000215;15/2/2000AD;day => 15,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 15
+14 kal 3 2753;20000216;16/2/2000AD;day => 16,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 14
+13 kal 3 2753;20000217;17/2/2000AD;day => 17,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 13
+12 kal 3 2753;20000218;18/2/2000AD;day => 18,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 12
+11 kal 3 2753;20000219;19/2/2000AD;day => 19,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 11
+10 kal 3 2753;20000220;20/2/2000AD;day => 20,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 10
+9 kal 3 2753;20000221;21/2/2000AD;day => 21,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 9
+8 kal 3 2753;20000222;22/2/2000AD;day => 22,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 8
+7 kal 3 2753;20000223;23/2/2000AD;day => 23,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 7
+b6 kal 3 2753;20000224;24/2/2000AD;day => 24,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 6,bis => 1
+6 kal 3 2753;20000225;25/2/2000AD;day => 25,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 6
+5 kal 3 2753;20000226;26/2/2000AD;day => 26,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 5
+4 kal 3 2753;20000227;27/2/2000AD;day => 27,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 4
+3 kal 3 2753;20000228;28/2/2000AD;day => 28,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 3
+pd kal 3 2753;20000229;29/2/2000AD;day => 29,month => 02,year => 2000;base => kal,mons => 3,annus => 2753,ad => 2
+kal 3 2753;20000301;1/3/2000AD;day => 01,month => 03,year => 2000;base => kal,mons => 3,annus => 2753
+6 non 3 2753;20000302;2/3/2000AD;day => 02,month => 03,year => 2000;base => non,mons => 3,annus => 2753,ad => 6
+5 non 3 2753;20000303;3/3/2000AD;day => 03,month => 03,year => 2000;base => non,mons => 3,annus => 2753,ad => 5
+4 non 3 2753;20000304;4/3/2000AD;day => 04,month => 03,year => 2000;base => non,mons => 3,annus => 2753,ad => 4
+3 non 3 2753;20000305;5/3/2000AD;day => 05,month => 03,year => 2000;base => non,mons => 3,annus => 2753,ad => 3
+pd non 3 2753;20000306;6/3/2000AD;day => 06,month => 03,year => 2000;base => non,mons => 3,annus => 2753,ad => 2
+non 3 2753;20000307;7/3/2000AD;day => 07,month => 03,year => 2000;base => non,mons => 3,annus => 2753
+8 id 3 2753;20000308;8/3/2000AD;day => 08,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 8
+7 id 3 2753;20000309;9/3/2000AD;day => 09,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 7
+6 id 3 2753;20000310;10/3/2000AD;day => 10,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 6
+5 id 3 2753;20000311;11/3/2000AD;day => 11,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 5
+4 id 3 2753;20000312;12/3/2000AD;day => 12,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 4
+3 id 3 2753;20000313;13/3/2000AD;day => 13,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 3
+pd id 3 2753;20000314;14/3/2000AD;day => 14,month => 03,year => 2000;base => id,mons => 3,annus => 2753,ad => 2
+id 3 2753;20000315;15/3/2000AD;day => 15,month => 03,year => 2000;base => id,mons => 3,annus => 2753
+17 kal 4 2753;20000316;16/3/2000AD;day => 16,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 17
+16 kal 4 2753;20000317;17/3/2000AD;day => 17,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 16
+15 kal 4 2753;20000318;18/3/2000AD;day => 18,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 15
+14 kal 4 2753;20000319;19/3/2000AD;day => 19,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 14
+13 kal 4 2753;20000320;20/3/2000AD;day => 20,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 13
+12 kal 4 2753;20000321;21/3/2000AD;day => 21,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 12
+11 kal 4 2753;20000322;22/3/2000AD;day => 22,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 11
+10 kal 4 2753;20000323;23/3/2000AD;day => 23,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 10
+9 kal 4 2753;20000324;24/3/2000AD;day => 24,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 9
+8 kal 4 2753;20000325;25/3/2000AD;day => 25,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 8
+7 kal 4 2753;20000326;26/3/2000AD;day => 26,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 7
+6 kal 4 2753;20000327;27/3/2000AD;day => 27,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 6
+5 kal 4 2753;20000328;28/3/2000AD;day => 28,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 5
+4 kal 4 2753;20000329;29/3/2000AD;day => 29,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 4
+3 kal 4 2753;20000330;30/3/2000AD;day => 30,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 3
+pd kal 4 2753;20000331;31/3/2000AD;day => 31,month => 03,year => 2000;base => kal,mons => 4,annus => 2753,ad => 2
+kal 4 2753;20000401;1/4/2000AD;day => 01,month => 04,year => 2000;base => kal,mons => 4,annus => 2753
+4 non 4 2753;20000402;2/4/2000AD;day => 02,month => 04,year => 2000;base => non,mons => 4,annus => 2753,ad => 4
+3 non 4 2753;20000403;3/4/2000AD;day => 03,month => 04,year => 2000;base => non,mons => 4,annus => 2753,ad => 3
+pd non 4 2753;20000404;4/4/2000AD;day => 04,month => 04,year => 2000;base => non,mons => 4,annus => 2753,ad => 2
+non 4 2753;20000405;5/4/2000AD;day => 05,month => 04,year => 2000;base => non,mons => 4,annus => 2753
+8 id 4 2753;20000406;6/4/2000AD;day => 06,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 8
+7 id 4 2753;20000407;7/4/2000AD;day => 07,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 7
+6 id 4 2753;20000408;8/4/2000AD;day => 08,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 6
+5 id 4 2753;20000409;9/4/2000AD;day => 09,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 5
+4 id 4 2753;20000410;10/4/2000AD;day => 10,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 4
+3 id 4 2753;20000411;11/4/2000AD;day => 11,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 3
+pd id 4 2753;20000412;12/4/2000AD;day => 12,month => 04,year => 2000;base => id,mons => 4,annus => 2753,ad => 2
+id 4 2753;20000413;13/4/2000AD;day => 13,month => 04,year => 2000;base => id,mons => 4,annus => 2753
+18 kal 5 2753;20000414;14/4/2000AD;day => 14,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 18
+17 kal 5 2753;20000415;15/4/2000AD;day => 15,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 17
+16 kal 5 2753;20000416;16/4/2000AD;day => 16,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 16
+15 kal 5 2753;20000417;17/4/2000AD;day => 17,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 15
+14 kal 5 2753;20000418;18/4/2000AD;day => 18,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 14
+13 kal 5 2753;20000419;19/4/2000AD;day => 19,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 13
+12 kal 5 2753;20000420;20/4/2000AD;day => 20,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 12
+11 kal 5 2753;20000421;21/4/2000AD;day => 21,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 11
+10 kal 5 2753;20000422;22/4/2000AD;day => 22,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 10
+9 kal 5 2753;20000423;23/4/2000AD;day => 23,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 9
+8 kal 5 2753;20000424;24/4/2000AD;day => 24,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 8
+7 kal 5 2753;20000425;25/4/2000AD;day => 25,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 7
+6 kal 5 2753;20000426;26/4/2000AD;day => 26,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 6
+5 kal 5 2753;20000427;27/4/2000AD;day => 27,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 5
+4 kal 5 2753;20000428;28/4/2000AD;day => 28,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 4
+3 kal 5 2753;20000429;29/4/2000AD;day => 29,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 3
+pd kal 5 2753;20000430;30/4/2000AD;day => 30,month => 04,year => 2000;base => kal,mons => 5,annus => 2753,ad => 2
+kal 5 2753;20000501;1/5/2000AD;day => 01,month => 05,year => 2000;base => kal,mons => 5,annus => 2753
+6 non 5 2753;20000502;2/5/2000AD;day => 02,month => 05,year => 2000;base => non,mons => 5,annus => 2753,ad => 6
+5 non 5 2753;20000503;3/5/2000AD;day => 03,month => 05,year => 2000;base => non,mons => 5,annus => 2753,ad => 5
+4 non 5 2753;20000504;4/5/2000AD;day => 04,month => 05,year => 2000;base => non,mons => 5,annus => 2753,ad => 4
+3 non 5 2753;20000505;5/5/2000AD;day => 05,month => 05,year => 2000;base => non,mons => 5,annus => 2753,ad => 3
+pd non 5 2753;20000506;6/5/2000AD;day => 06,month => 05,year => 2000;base => non,mons => 5,annus => 2753,ad => 2
+non 5 2753;20000507;7/5/2000AD;day => 07,month => 05,year => 2000;base => non,mons => 5,annus => 2753
+8 id 5 2753;20000508;8/5/2000AD;day => 08,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 8
+7 id 5 2753;20000509;9/5/2000AD;day => 09,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 7
+6 id 5 2753;20000510;10/5/2000AD;day => 10,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 6
+5 id 5 2753;20000511;11/5/2000AD;day => 11,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 5
+4 id 5 2753;20000512;12/5/2000AD;day => 12,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 4
+3 id 5 2753;20000513;13/5/2000AD;day => 13,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 3
+pd id 5 2753;20000514;14/5/2000AD;day => 14,month => 05,year => 2000;base => id,mons => 5,annus => 2753,ad => 2
+id 5 2753;20000515;15/5/2000AD;day => 15,month => 05,year => 2000;base => id,mons => 5,annus => 2753
+17 kal 6 2753;20000516;16/5/2000AD;day => 16,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 17
+16 kal 6 2753;20000517;17/5/2000AD;day => 17,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 16
+15 kal 6 2753;20000518;18/5/2000AD;day => 18,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 15
+14 kal 6 2753;20000519;19/5/2000AD;day => 19,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 14
+13 kal 6 2753;20000520;20/5/2000AD;day => 20,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 13
+12 kal 6 2753;20000521;21/5/2000AD;day => 21,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 12
+11 kal 6 2753;20000522;22/5/2000AD;day => 22,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 11
+10 kal 6 2753;20000523;23/5/2000AD;day => 23,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 10
+9 kal 6 2753;20000524;24/5/2000AD;day => 24,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 9
+8 kal 6 2753;20000525;25/5/2000AD;day => 25,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 8
+7 kal 6 2753;20000526;26/5/2000AD;day => 26,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 7
+6 kal 6 2753;20000527;27/5/2000AD;day => 27,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 6
+5 kal 6 2753;20000528;28/5/2000AD;day => 28,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 5
+4 kal 6 2753;20000529;29/5/2000AD;day => 29,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 4
+3 kal 6 2753;20000530;30/5/2000AD;day => 30,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 3
+pd kal 6 2753;20000531;31/5/2000AD;day => 31,month => 05,year => 2000;base => kal,mons => 6,annus => 2753,ad => 2
+kal 6 2753;20000601;1/6/2000AD;day => 01,month => 06,year => 2000;base => kal,mons => 6,annus => 2753
+4 non 6 2753;20000602;2/6/2000AD;day => 02,month => 06,year => 2000;base => non,mons => 6,annus => 2753,ad => 4
+3 non 6 2753;20000603;3/6/2000AD;day => 03,month => 06,year => 2000;base => non,mons => 6,annus => 2753,ad => 3
+pd non 6 2753;20000604;4/6/2000AD;day => 04,month => 06,year => 2000;base => non,mons => 6,annus => 2753,ad => 2
+non 6 2753;20000605;5/6/2000AD;day => 05,month => 06,year => 2000;base => non,mons => 6,annus => 2753
+8 id 6 2753;20000606;6/6/2000AD;day => 06,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 8
+7 id 6 2753;20000607;7/6/2000AD;day => 07,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 7
+6 id 6 2753;20000608;8/6/2000AD;day => 08,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 6
+5 id 6 2753;20000609;9/6/2000AD;day => 09,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 5
+4 id 6 2753;20000610;10/6/2000AD;day => 10,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 4
+3 id 6 2753;20000611;11/6/2000AD;day => 11,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 3
+pd id 6 2753;20000612;12/6/2000AD;day => 12,month => 06,year => 2000;base => id,mons => 6,annus => 2753,ad => 2
+id 6 2753;20000613;13/6/2000AD;day => 13,month => 06,year => 2000;base => id,mons => 6,annus => 2753
+18 kal 7 2753;20000614;14/6/2000AD;day => 14,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 18
+17 kal 7 2753;20000615;15/6/2000AD;day => 15,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 17
+16 kal 7 2753;20000616;16/6/2000AD;day => 16,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 16
+15 kal 7 2753;20000617;17/6/2000AD;day => 17,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 15
+14 kal 7 2753;20000618;18/6/2000AD;day => 18,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 14
+13 kal 7 2753;20000619;19/6/2000AD;day => 19,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 13
+12 kal 7 2753;20000620;20/6/2000AD;day => 20,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 12
+11 kal 7 2753;20000621;21/6/2000AD;day => 21,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 11
+10 kal 7 2753;20000622;22/6/2000AD;day => 22,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 10
+9 kal 7 2753;20000623;23/6/2000AD;day => 23,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 9
+8 kal 7 2753;20000624;24/6/2000AD;day => 24,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 8
+7 kal 7 2753;20000625;25/6/2000AD;day => 25,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 7
+6 kal 7 2753;20000626;26/6/2000AD;day => 26,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 6
+5 kal 7 2753;20000627;27/6/2000AD;day => 27,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 5
+4 kal 7 2753;20000628;28/6/2000AD;day => 28,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 4
+3 kal 7 2753;20000629;29/6/2000AD;day => 29,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 3
+pd kal 7 2753;20000630;30/6/2000AD;day => 30,month => 06,year => 2000;base => kal,mons => 7,annus => 2753,ad => 2
+kal 7 2753;20000701;1/7/2000AD;day => 01,month => 07,year => 2000;base => kal,mons => 7,annus => 2753
+6 non 7 2753;20000702;2/7/2000AD;day => 02,month => 07,year => 2000;base => non,mons => 7,annus => 2753,ad => 6
+5 non 7 2753;20000703;3/7/2000AD;day => 03,month => 07,year => 2000;base => non,mons => 7,annus => 2753,ad => 5
+4 non 7 2753;20000704;4/7/2000AD;day => 04,month => 07,year => 2000;base => non,mons => 7,annus => 2753,ad => 4
+3 non 7 2753;20000705;5/7/2000AD;day => 05,month => 07,year => 2000;base => non,mons => 7,annus => 2753,ad => 3
+pd non 7 2753;20000706;6/7/2000AD;day => 06,month => 07,year => 2000;base => non,mons => 7,annus => 2753,ad => 2
+non 7 2753;20000707;7/7/2000AD;day => 07,month => 07,year => 2000;base => non,mons => 7,annus => 2753
+8 id 7 2753;20000708;8/7/2000AD;day => 08,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 8
+7 id 7 2753;20000709;9/7/2000AD;day => 09,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 7
+6 id 7 2753;20000710;10/7/2000AD;day => 10,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 6
+5 id 7 2753;20000711;11/7/2000AD;day => 11,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 5
+4 id 7 2753;20000712;12/7/2000AD;day => 12,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 4
+3 id 7 2753;20000713;13/7/2000AD;day => 13,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 3
+pd id 7 2753;20000714;14/7/2000AD;day => 14,month => 07,year => 2000;base => id,mons => 7,annus => 2753,ad => 2
+id 7 2753;20000715;15/7/2000AD;day => 15,month => 07,year => 2000;base => id,mons => 7,annus => 2753
+17 kal 8 2753;20000716;16/7/2000AD;day => 16,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 17
+16 kal 8 2753;20000717;17/7/2000AD;day => 17,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 16
+15 kal 8 2753;20000718;18/7/2000AD;day => 18,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 15
+14 kal 8 2753;20000719;19/7/2000AD;day => 19,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 14
+13 kal 8 2753;20000720;20/7/2000AD;day => 20,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 13
+12 kal 8 2753;20000721;21/7/2000AD;day => 21,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 12
+11 kal 8 2753;20000722;22/7/2000AD;day => 22,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 11
+10 kal 8 2753;20000723;23/7/2000AD;day => 23,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 10
+9 kal 8 2753;20000724;24/7/2000AD;day => 24,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 9
+8 kal 8 2753;20000725;25/7/2000AD;day => 25,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 8
+7 kal 8 2753;20000726;26/7/2000AD;day => 26,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 7
+6 kal 8 2753;20000727;27/7/2000AD;day => 27,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 6
+5 kal 8 2753;20000728;28/7/2000AD;day => 28,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 5
+4 kal 8 2753;20000729;29/7/2000AD;day => 29,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 4
+3 kal 8 2753;20000730;30/7/2000AD;day => 30,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 3
+pd kal 8 2753;20000731;31/7/2000AD;day => 31,month => 07,year => 2000;base => kal,mons => 8,annus => 2753,ad => 2
+kal 8 2753;20000801;1/8/2000AD;day => 01,month => 08,year => 2000;base => kal,mons => 8,annus => 2753
+4 non 8 2753;20000802;2/8/2000AD;day => 02,month => 08,year => 2000;base => non,mons => 8,annus => 2753,ad => 4
+3 non 8 2753;20000803;3/8/2000AD;day => 03,month => 08,year => 2000;base => non,mons => 8,annus => 2753,ad => 3
+pd non 8 2753;20000804;4/8/2000AD;day => 04,month => 08,year => 2000;base => non,mons => 8,annus => 2753,ad => 2
+non 8 2753;20000805;5/8/2000AD;day => 05,month => 08,year => 2000;base => non,mons => 8,annus => 2753
+8 id 8 2753;20000806;6/8/2000AD;day => 06,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 8
+7 id 8 2753;20000807;7/8/2000AD;day => 07,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 7
+6 id 8 2753;20000808;8/8/2000AD;day => 08,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 6
+5 id 8 2753;20000809;9/8/2000AD;day => 09,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 5
+4 id 8 2753;20000810;10/8/2000AD;day => 10,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 4
+3 id 8 2753;20000811;11/8/2000AD;day => 11,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 3
+pd id 8 2753;20000812;12/8/2000AD;day => 12,month => 08,year => 2000;base => id,mons => 8,annus => 2753,ad => 2
+id 8 2753;20000813;13/8/2000AD;day => 13,month => 08,year => 2000;base => id,mons => 8,annus => 2753
+19 kal 9 2753;20000814;14/8/2000AD;day => 14,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 19
+18 kal 9 2753;20000815;15/8/2000AD;day => 15,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 18
+17 kal 9 2753;20000816;16/8/2000AD;day => 16,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 17
+16 kal 9 2753;20000817;17/8/2000AD;day => 17,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 16
+15 kal 9 2753;20000818;18/8/2000AD;day => 18,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 15
+14 kal 9 2753;20000819;19/8/2000AD;day => 19,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 14
+13 kal 9 2753;20000820;20/8/2000AD;day => 20,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 13
+12 kal 9 2753;20000821;21/8/2000AD;day => 21,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 12
+11 kal 9 2753;20000822;22/8/2000AD;day => 22,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 11
+10 kal 9 2753;20000823;23/8/2000AD;day => 23,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 10
+9 kal 9 2753;20000824;24/8/2000AD;day => 24,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 9
+8 kal 9 2753;20000825;25/8/2000AD;day => 25,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 8
+7 kal 9 2753;20000826;26/8/2000AD;day => 26,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 7
+6 kal 9 2753;20000827;27/8/2000AD;day => 27,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 6
+5 kal 9 2753;20000828;28/8/2000AD;day => 28,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 5
+4 kal 9 2753;20000829;29/8/2000AD;day => 29,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 4
+3 kal 9 2753;20000830;30/8/2000AD;day => 30,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 3
+pd kal 9 2753;20000831;31/8/2000AD;day => 31,month => 08,year => 2000;base => kal,mons => 9,annus => 2753,ad => 2
+kal 9 2753;20000901;1/9/2000AD;day => 01,month => 09,year => 2000;base => kal,mons => 9,annus => 2753
+4 non 9 2753;20000902;2/9/2000AD;day => 02,month => 09,year => 2000;base => non,mons => 9,annus => 2753,ad => 4
+3 non 9 2753;20000903;3/9/2000AD;day => 03,month => 09,year => 2000;base => non,mons => 9,annus => 2753,ad => 3
+pd non 9 2753;20000904;4/9/2000AD;day => 04,month => 09,year => 2000;base => non,mons => 9,annus => 2753,ad => 2
+non 9 2753;20000905;5/9/2000AD;day => 05,month => 09,year => 2000;base => non,mons => 9,annus => 2753
+8 id 9 2753;20000906;6/9/2000AD;day => 06,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 8
+7 id 9 2753;20000907;7/9/2000AD;day => 07,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 7
+6 id 9 2753;20000908;8/9/2000AD;day => 08,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 6
+5 id 9 2753;20000909;9/9/2000AD;day => 09,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 5
+4 id 9 2753;20000910;10/9/2000AD;day => 10,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 4
+3 id 9 2753;20000911;11/9/2000AD;day => 11,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 3
+pd id 9 2753;20000912;12/9/2000AD;day => 12,month => 09,year => 2000;base => id,mons => 9,annus => 2753,ad => 2
+id 9 2753;20000913;13/9/2000AD;day => 13,month => 09,year => 2000;base => id,mons => 9,annus => 2753
+18 kal 10 2753;20000914;14/9/2000AD;day => 14,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 18
+17 kal 10 2753;20000915;15/9/2000AD;day => 15,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 17
+16 kal 10 2753;20000916;16/9/2000AD;day => 16,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 16
+15 kal 10 2753;20000917;17/9/2000AD;day => 17,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 15
+14 kal 10 2753;20000918;18/9/2000AD;day => 18,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 14
+13 kal 10 2753;20000919;19/9/2000AD;day => 19,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 13
+12 kal 10 2753;20000920;20/9/2000AD;day => 20,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 12
+11 kal 10 2753;20000921;21/9/2000AD;day => 21,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 11
+10 kal 10 2753;20000922;22/9/2000AD;day => 22,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 10
+9 kal 10 2753;20000923;23/9/2000AD;day => 23,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 9
+8 kal 10 2753;20000924;24/9/2000AD;day => 24,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 8
+7 kal 10 2753;20000925;25/9/2000AD;day => 25,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 7
+6 kal 10 2753;20000926;26/9/2000AD;day => 26,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 6
+5 kal 10 2753;20000927;27/9/2000AD;day => 27,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 5
+4 kal 10 2753;20000928;28/9/2000AD;day => 28,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 4
+3 kal 10 2753;20000929;29/9/2000AD;day => 29,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 3
+pd kal 10 2753;20000930;30/9/2000AD;day => 30,month => 09,year => 2000;base => kal,mons => 10,annus => 2753,ad => 2
+kal 10 2753;20001001;1/10/2000AD;day => 01,month => 10,year => 2000;base => kal,mons => 10,annus => 2753
+6 non 10 2753;20001002;2/10/2000AD;day => 02,month => 10,year => 2000;base => non,mons => 10,annus => 2753,ad => 6
+5 non 10 2753;20001003;3/10/2000AD;day => 03,month => 10,year => 2000;base => non,mons => 10,annus => 2753,ad => 5
+4 non 10 2753;20001004;4/10/2000AD;day => 04,month => 10,year => 2000;base => non,mons => 10,annus => 2753,ad => 4
+3 non 10 2753;20001005;5/10/2000AD;day => 05,month => 10,year => 2000;base => non,mons => 10,annus => 2753,ad => 3
+pd non 10 2753;20001006;6/10/2000AD;day => 06,month => 10,year => 2000;base => non,mons => 10,annus => 2753,ad => 2
+non 10 2753;20001007;7/10/2000AD;day => 07,month => 10,year => 2000;base => non,mons => 10,annus => 2753
+8 id 10 2753;20001008;8/10/2000AD;day => 08,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 8
+7 id 10 2753;20001009;9/10/2000AD;day => 09,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 7
+6 id 10 2753;20001010;10/10/2000AD;day => 10,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 6
+5 id 10 2753;20001011;11/10/2000AD;day => 11,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 5
+4 id 10 2753;20001012;12/10/2000AD;day => 12,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 4
+3 id 10 2753;20001013;13/10/2000AD;day => 13,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 3
+pd id 10 2753;20001014;14/10/2000AD;day => 14,month => 10,year => 2000;base => id,mons => 10,annus => 2753,ad => 2
+id 10 2753;20001015;15/10/2000AD;day => 15,month => 10,year => 2000;base => id,mons => 10,annus => 2753
+17 kal 11 2753;20001016;16/10/2000AD;day => 16,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 17
+16 kal 11 2753;20001017;17/10/2000AD;day => 17,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 16
+15 kal 11 2753;20001018;18/10/2000AD;day => 18,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 15
+14 kal 11 2753;20001019;19/10/2000AD;day => 19,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 14
+13 kal 11 2753;20001020;20/10/2000AD;day => 20,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 13
+12 kal 11 2753;20001021;21/10/2000AD;day => 21,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 12
+11 kal 11 2753;20001022;22/10/2000AD;day => 22,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 11
+10 kal 11 2753;20001023;23/10/2000AD;day => 23,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 10
+9 kal 11 2753;20001024;24/10/2000AD;day => 24,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 9
+8 kal 11 2753;20001025;25/10/2000AD;day => 25,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 8
+7 kal 11 2753;20001026;26/10/2000AD;day => 26,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 7
+6 kal 11 2753;20001027;27/10/2000AD;day => 27,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 6
+5 kal 11 2753;20001028;28/10/2000AD;day => 28,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 5
+4 kal 11 2753;20001029;29/10/2000AD;day => 29,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 4
+3 kal 11 2753;20001030;30/10/2000AD;day => 30,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 3
+pd kal 11 2753;20001031;31/10/2000AD;day => 31,month => 10,year => 2000;base => kal,mons => 11,annus => 2753,ad => 2
+kal 11 2753;20001101;1/11/2000AD;day => 01,month => 11,year => 2000;base => kal,mons => 11,annus => 2753
+4 non 11 2753;20001102;2/11/2000AD;day => 02,month => 11,year => 2000;base => non,mons => 11,annus => 2753,ad => 4
+3 non 11 2753;20001103;3/11/2000AD;day => 03,month => 11,year => 2000;base => non,mons => 11,annus => 2753,ad => 3
+pd non 11 2753;20001104;4/11/2000AD;day => 04,month => 11,year => 2000;base => non,mons => 11,annus => 2753,ad => 2
+non 11 2753;20001105;5/11/2000AD;day => 05,month => 11,year => 2000;base => non,mons => 11,annus => 2753
+8 id 11 2753;20001106;6/11/2000AD;day => 06,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 8
+7 id 11 2753;20001107;7/11/2000AD;day => 07,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 7
+6 id 11 2753;20001108;8/11/2000AD;day => 08,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 6
+5 id 11 2753;20001109;9/11/2000AD;day => 09,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 5
+4 id 11 2753;20001110;10/11/2000AD;day => 10,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 4
+3 id 11 2753;20001111;11/11/2000AD;day => 11,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 3
+pd id 11 2753;20001112;12/11/2000AD;day => 12,month => 11,year => 2000;base => id,mons => 11,annus => 2753,ad => 2
+id 11 2753;20001113;13/11/2000AD;day => 13,month => 11,year => 2000;base => id,mons => 11,annus => 2753
+18 kal 12 2753;20001114;14/11/2000AD;day => 14,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 18
+17 kal 12 2753;20001115;15/11/2000AD;day => 15,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 17
+16 kal 12 2753;20001116;16/11/2000AD;day => 16,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 16
+15 kal 12 2753;20001117;17/11/2000AD;day => 17,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 15
+14 kal 12 2753;20001118;18/11/2000AD;day => 18,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 14
+13 kal 12 2753;20001119;19/11/2000AD;day => 19,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 13
+12 kal 12 2753;20001120;20/11/2000AD;day => 20,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 12
+11 kal 12 2753;20001121;21/11/2000AD;day => 21,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 11
+10 kal 12 2753;20001122;22/11/2000AD;day => 22,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 10
+9 kal 12 2753;20001123;23/11/2000AD;day => 23,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 9
+8 kal 12 2753;20001124;24/11/2000AD;day => 24,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 8
+7 kal 12 2753;20001125;25/11/2000AD;day => 25,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 7
+6 kal 12 2753;20001126;26/11/2000AD;day => 26,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 6
+5 kal 12 2753;20001127;27/11/2000AD;day => 27,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 5
+4 kal 12 2753;20001128;28/11/2000AD;day => 28,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 4
+3 kal 12 2753;20001129;29/11/2000AD;day => 29,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 3
+pd kal 12 2753;20001130;30/11/2000AD;day => 30,month => 11,year => 2000;base => kal,mons => 12,annus => 2753,ad => 2
+kal 12 2753;20001201;1/12/2000AD;day => 01,month => 12,year => 2000;base => kal,mons => 12,annus => 2753
+4 non 12 2753;20001202;2/12/2000AD;day => 02,month => 12,year => 2000;base => non,mons => 12,annus => 2753,ad => 4
+3 non 12 2753;20001203;3/12/2000AD;day => 03,month => 12,year => 2000;base => non,mons => 12,annus => 2753,ad => 3
+pd non 12 2753;20001204;4/12/2000AD;day => 04,month => 12,year => 2000;base => non,mons => 12,annus => 2753,ad => 2
+non 12 2753;20001205;5/12/2000AD;day => 05,month => 12,year => 2000;base => non,mons => 12,annus => 2753
+8 id 12 2753;20001206;6/12/2000AD;day => 06,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 8
+7 id 12 2753;20001207;7/12/2000AD;day => 07,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 7
+6 id 12 2753;20001208;8/12/2000AD;day => 08,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 6
+5 id 12 2753;20001209;9/12/2000AD;day => 09,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 5
+4 id 12 2753;20001210;10/12/2000AD;day => 10,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 4
+3 id 12 2753;20001211;11/12/2000AD;day => 11,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 3
+pd id 12 2753;20001212;12/12/2000AD;day => 12,month => 12,year => 2000;base => id,mons => 12,annus => 2753,ad => 2
+id 12 2753;20001213;13/12/2000AD;day => 13,month => 12,year => 2000;base => id,mons => 12,annus => 2753
+19 kal 1 2754;20001214;14/12/2000AD;day => 14,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 19
+18 kal 1 2754;20001215;15/12/2000AD;day => 15,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 18
+17 kal 1 2754;20001216;16/12/2000AD;day => 16,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 17
+16 kal 1 2754;20001217;17/12/2000AD;day => 17,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 16
+15 kal 1 2754;20001218;18/12/2000AD;day => 18,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 15
+14 kal 1 2754;20001219;19/12/2000AD;day => 19,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 14
+13 kal 1 2754;20001220;20/12/2000AD;day => 20,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 13
+12 kal 1 2754;20001221;21/12/2000AD;day => 21,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 12
+11 kal 1 2754;20001222;22/12/2000AD;day => 22,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 11
+10 kal 1 2754;20001223;23/12/2000AD;day => 23,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 10
+9 kal 1 2754;20001224;24/12/2000AD;day => 24,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 9
+8 kal 1 2754;20001225;25/12/2000AD;day => 25,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 8
+7 kal 1 2754;20001226;26/12/2000AD;day => 26,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 7
+6 kal 1 2754;20001227;27/12/2000AD;day => 27,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 6
+5 kal 1 2754;20001228;28/12/2000AD;day => 28,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 5
+4 kal 1 2754;20001229;29/12/2000AD;day => 29,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 4
+3 kal 1 2754;20001230;30/12/2000AD;day => 30,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 3
+pd kal 1 2754;20001231;31/12/2000AD;day => 31,month => 12,year => 2000;base => kal,mons => 1,annus => 2754,ad => 2

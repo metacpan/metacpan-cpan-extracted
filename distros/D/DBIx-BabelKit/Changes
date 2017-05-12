@@ -1,0 +1,26 @@
+    BabelKit Release Versions
+    -------------------------
+
+BabelKit-1.07 released 2003.05.12
+
+Moved Perl regression testing from t/test.t
+to regression.test.  test.pl now succeeds and is
+CPAN friendly.  Licenced under Perl or LGPL.
+
+BabelKit-1.06 released 2003.05.07
+
+Added an FAQ page.
+Added data/bk_demo.utf8 file.
+License changed from GPL to LGPL.
+Added this CHANGELOG
+
+BabelKit-1.05 released 2003.04.23
+
+You can now pass in in html select options such
+as 'onchange="submit()"'.  The PHP version now
+supports ADODB in addition to PEAR and phplib.
+Improved documentation and setup instructions. 
+
+BabelKit-1.04 released 2003.04.03
+
+Initial release.

@@ -1,0 +1,275 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+dist_surveyor - determine exactly what dist versions are installed
+
+=head1 VERSION
+
+version 0.016
+
+=head1 SYNOPSIS
+
+  dist_surveyor [options] /some/perl/lib/dir
+
+Typically a perl library directory will have an architecture specific library
+as a subdirectory. The dist_surveyor script will detect and add it automatically
+if the perl being used has the same 'archname' the same as the one in the library.
+If not, then specify the "archlib" directory explicitly I<first>:
+
+  dist_surveyor [options] /some/perl/lib/dir/archname /some/perl/lib/dir
+
+=head1 DESCRIPTION
+
+This utility examines all the modules installed within the specified perl
+library directory and uses the metacpan API to work out what versions of what
+distributions could have provided those modules. It then works out which of
+those candidate distributions is the most likely one.
+
+It is fairly robust and copes well with edge cases like installation of
+non-released versions from git repos and local modifications.
+
+Distributions are written to stdout. Progress and issues are reported to stderr.
+
+It can take a long time to run for the first time on a directory with a
+large number of modules and candidate distributions.  The data fetched from
+metacpan is cached so future runs are much faster.  (The system this code was
+tested on took about 60 minutes to process around 500 distributions with no
+cached data, and under 10 minutes for later runs that could reuse the cached
+data. The cache file ended up about 40MB in size.)
+
+=head1 Fatpacked script
+
+A fatpacked version of this script exists in:
+L<https://raw.github.com/Grinnz/Dist-Surveyor/master/dist_surveyor_packed.pl>
+
+Please note that the packed version expects that any standard core perl
+modules, including the modules L<List::Util>, L<Scalar::Util>, and L<Storable>,
+are already installed on the local system. If you are planing to --makecpan,
+you also need L<Compress::Zlib>.
+
+=head1 OPTIONS
+
+    --verbose    Show more detailed progress
+
+    --debug      Show much more information
+
+    --match R    Ignore modules that don't match regex R (unanchored)
+
+    --perlver V  Ignore modules that are shipped with perl version V
+
+    --remnants   Include old distribution versions that have left old modules behind
+
+    --uncached   Don't use or update the persistent cache
+
+    --makecpan D Create a CPAN repository in directory D
+
+    --output S   List of field names to output, separate by spaces.
+                 
+    --format S   Printf format string with a %s for each field in --output
+
+=head2 --makecpan
+
+Creates a CPAN repository in the specified directory by fetching the selected
+distributions into authors/id/... and writing the index files into modules/...
+
+If the directory already exists then selected distributions that already exist
+are not refetched, any distributions that already exist but aren't selected by
+this run are left in place.
+
+New package distribution information is merged into the modules/02packages index file.
+
+Some additional files are written into a dist_surveyor subdirectory:
+
+=head3 dist_surveyor/token_packages.txt
+
+This file lists one unique 'token package' per distribution. It's very useful
+to speed up re-running a full install after some distributions have failed.
+
+=head1 SURVEY USAGE
+
+Run a survey and create a mini-CPAN repository containing the distributions:
+
+    dist_surveyor --makecpan my_cpan /some/perl/lib/dir > installed_dists.txt
+
+It's important to give the correct perl lib directory path.
+
+It's important to check the results related to any modules that generated
+warnings during the run.
+
+=head1 INSTALLATION USAGE
+
+Then, to install those distributions into a new library:
+
+    cpanm --mirror file:$PWD/my_cpan --mirror-only [-l new_lib] < installed_dists.txt
+
+It's very likely that some distributions will fail tests and not install,
+which will, in turn, cause others to fail. Once the initial run is complete
+study the cpam build log file carefully and resolve the test failures.
+
+Running cpanm with a list of distributions, as above, will always reinstall
+I<all> the listed distributions. Even those already sucessfully installed.
+
+It's much (I<much>) faster to give cpanm a list of package names as that allows
+it to skip those that it knows are already installed. The L</--makecpan> option
+writes a list of 'token packages', one per distribution, so you can use that
+with cpanm:
+
+    cpanm --mirror file:$PWD/my_cpan --mirror-only [-l new_lib] < my_cpan/dist_surveyor/token_packages.txt
+
+When a distro fails tests I use the cpanm C<--look> option to investigate:
+
+    cpanm --mirror file:$PWD/my_cpan --mirror-only --look Some::Package
+
+I'll often end up building, testing and installing the distro from within that
+cpanm look shell. Once installed I'll rerun cpanm using the full C<token_packages.txt>
+file again. If there are more failures I'll repeat that sequence till they're all resolved.
+
+=head1 BUGS
+
+Probably.
+
+=head1 TODO
+
+    * Auto-detect when directory given isn't the root of a perl library dir tree.
+        E.g. by matching file names to module names
+
+    * Add support for matching Foo.pm.PL files (e.g. FCGI and common::sense)
+
+    * For installed modules get the file modification time (last commit time)
+        and use it to eliminate candidate dists that were released after that time.
+
+    * Consider factoring in release status ('authorized') so rogue releases
+        that ship copies of many other modules (like Net-Braintree-0.1.1)
+        are given a lower priority.
+
+    * Sort out ExtUtils::Perllocal::Parser situation
+        Avoid hard-coded %distro_key_mod_names related to perllocal.pod where the
+        dist name doesn't match the key module name.
+        Or maybe just remove use of distro_key_mod_names and perllocal entirely?
+
+    * Optimise use of metacpan. Check caching. Use ElasticSearch.pm.
+
+    * Fully handle merging of pre-existing --makecpan directory data files.
+
+    * Consider factoring install date in the output ordering. May help with edge cases
+        where a package P is installed via distros A then B. If A is reinstalled after B
+        then the reinstalled P will be from A but should be from B. (I don't know of any
+        cases, but it's certainly a possibility. The LWP breakup and Class::MOP spring to
+        mind as possible candidates.)
+
+=cut
+
+use strict;
+use warnings;
+use Getopt::Long; # core
+use Config; # core
+
+$| = 1;
+
+use Dist::Surveyor;
+use Dist::Surveyor::Inquiry; # internal
+use Dist::Surveyor::MakeCpan;
+
+use constant PROGNAME => 'dist_surveyor';
+
+GetOptions(
+    'match=s' => \my $opt_match,
+    'v|verbose!' => \my $opt_verbose,
+    'd|debug!' => \my $opt_debug,
+    # target perl version, re core modules
+    'perlver=s' => \my $opt_perlver,
+    # include old dists that have remnant/orphaned modules installed
+    'remnants!' => \my $opt_remnants,
+    # don't use a persistent cache
+    'uncached!' => \my $opt_uncached,
+    'makecpan=s' => \my $opt_makecpan,
+    # e.g., 'download_url author'
+    'output=s' => \(my $opt_output ||= 'url'),
+    # e.g., 'some-command --foo --file %s --authorid %s'
+    'format=s' => \my $opt_format,
+) or exit 1;
+
+$opt_verbose++ if $opt_debug;
+$opt_perlver = version->parse($opt_perlver || $])->numify;
+
+our $VERBOSE = $opt_verbose;
+our $DEBUG = $opt_debug;
+
+my $major_error_count = 0; # exit status
+
+my $distro_key_mod_names = {
+    'PathTools' => 'File::Spec',
+    'Template-Toolkit' => 'Template',
+    'TermReadKey' => 'Term::ReadKey',
+    'libwww-perl' => 'LWP',
+    'ack' => 'App::Ack',
+};
+
+sub main {
+
+    die "Usage: $0 perl-lib-directory [...]\n"
+        unless @ARGV;
+    my @libdirs = @ARGV;
+
+    # check dirs and add archlib's if appropriate
+    for my $libdir (@libdirs) {
+        die "$libdir isn't a directory\n"
+            unless -d $libdir;
+
+        my $archdir = "$libdir/$Config{archname}";
+        if (-d $archdir) {
+            unshift @libdirs, $archdir
+                unless grep { $_ eq $archdir } @libdirs;
+        }
+    }
+
+    $::DEBUG = $opt_debug;
+    $::VERBOSE = $opt_verbose;
+    Dist::Surveyor::Inquiry->perma_cache() unless $opt_uncached;
+
+    my $options = {
+        opt_match => $opt_match,
+        opt_perlver => $opt_perlver,
+        opt_remnants => $opt_remnants,
+        distro_key_mod_names => $distro_key_mod_names,
+    };
+    my @installed_releases = determine_installed_releases($options, \@libdirs);
+    write_fields(\@installed_releases, $opt_format, [split ' ', $opt_output], \*STDOUT);
+
+    warn sprintf "Completed survey in %.1f minutes using %d metacpan calls.\n",
+        (time-$^T)/60, $Dist::Surveyor::Inquiry::metacpan_calls;
+
+
+    if ($opt_makecpan) {
+        my $cpan = Dist::Surveyor::MakeCpan->new(
+            $opt_makecpan, PROGNAME, $distro_key_mod_names);
+
+        warn "Updating $opt_makecpan for ".@installed_releases." releases...\n";
+
+        for my $ri (@installed_releases) {
+            $cpan->add_release($ri);
+        }
+        $cpan->close();
+        $major_error_count += $cpan->errors();
+    }
+
+    exit $major_error_count;
+}
+
+sub write_fields {
+    my ($releases, $format, $fields, $fh) = @_;
+
+    $format ||= join("\t", ('%s') x @$fields);
+    $format .= "\n";
+
+    for my $release_data (@$releases) {
+        printf $fh $format, map {
+            exists $release_data->{$_} ? $release_data->{$_} : "?$_"
+        } @$fields;
+    }
+}
+
+main(@ARGV);
+
+exit 0;

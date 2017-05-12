@@ -1,0 +1,29 @@
+branches:
+  only:
+    - master
+
+init:
+  - git config --global core.autocrlf input
+
+install:
+  - choco install strawberryperl -version 5.20.1.1
+  - SET PATH=C:\strawberry\c\bin;C:\strawberry\perl\site\bin;C:\strawberry\perl\bin;%PATH%
+  - cpanm --notest --quiet Carton
+  - carton install
+
+build: off
+
+test_script:
+  - carton exec prove --norc --rc=.proverc -r t/codecov
+
+  - SET HARNESS_PERL_SWITCHES="-MDevel::Cover=+ignore,^t/Util.pm|^t/data/proj/t/|^local/"
+  - carton exec prove -r t/data/proj/t
+
+  - SET PERL5LIB=%CD%\lib
+  - SET PATH=%CD%\local\bin;%PATH%
+  - carton exec cover -report codecov
+
+cache:
+  - local
+
+shallow_clone: true

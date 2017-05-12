@@ -1,0 +1,33 @@
+Revision history for Dist-Zilla-Plugin-CheckBin
+
+0.007     2014-11-12 05:47:53Z
+          - fix optional tests of interaction with [MakeMaker::Fallback] that
+            broke with its newest release
+          - avoid testing with [MakeMaker::Awesome] if its version is too old
+
+0.006     2014-11-11 06:53:09Z
+          - fix optional tests of interaction with
+            [ModuleBuildTiny::Fallback] that broke with its newest release
+
+0.005     2014-10-18 04:41:51Z
+          - bump optional dependency on [MakeMaker::Awesome] to avoid old bug
+            with loaded modules
+
+0.004     2014-09-06 02:26:15Z
+          - now also testing interaction with [MakeMaker::Fallback],
+            [ModuleBuildTiny::Fallback] -- the latter requiring fixes
+
+0.003     2014-09-04 06:31:38Z
+          - now also testing interaction with [ModuleBuild],
+            [ModuleBuildTiny], and [MakeMaker::Awesome]
+          - Makefile.PL/Build.PL content inserted a little lower in the file
+          - now munging the file at the proper phase, if the plugin generating
+            the file also does so
+
+0.002     2014-04-11 03:50:21Z
+          - add a runtime prereq on Devel::CheckBin, so that the generated
+            Makefile.PL can be successfully executed during a 'dzil test' or
+            'dzil release'
+
+0.001     2014-04-11 02:36:16Z
+          - Initial release.

@@ -1,0 +1,185 @@
+=pod
+
+README for DiaColloDB
+
+=head1 ABSTRACT
+
+DiaColloDB - diachronic collocation database
+
+
+=head1 REQUIREMENTS
+
+
+=head2 Perl Modules
+
+The following non-core perl modules are required,
+and should be available from L<CPAN|http://www.cpan.org>.
+
+=over 4
+
+=item DDC::Concordance (formerly ddc-perl)
+
+Perl module for DDC client connections.
+Available from CPAN,
+or via SVN from <https://svn.code.sf.net/p/ddc-concordance/code/ddc-perl/trunk>
+
+=item DDC::XS (formerly ddc-perl-xs)
+
+XS wrappers for DDC query parsing.
+Available from CPAN,
+or via SVN from L<https://svn.code.sf.net/p/ddc-concordance/code/ddc-perl-xs/trunk>
+
+=item File::Map
+
+=item File::Temp
+
+=item JSON
+
+=item IPC::Run
+
+=item Log::Log4perl
+
+=item LWP::UserAgent
+
+For querying external servers via L<DiaColloDB::Client::http>.
+
+=item PDL
+
+(optional)
+
+Perl Data Language for fast fixed-size numeric data structures,
+used by the TDF (term-document frequency matrix) relation type.
+It should still be possible to build, install, and run the DiaColloDB distribution
+on a system without PDL installed, but use of the
+the TDF (term x document) matrix relation type will be disabled.
+
+=item PDL::CCS
+
+(optional)
+
+PDL module for sparse index-encoded matrices,
+used by the TDF (term-document frequency matrix) relation type.
+See the caveats under L<PDL|/PDL>.
+
+=item Tie::File::Indexed
+
+For handling large (temporary) arrays during index creation.
+
+=item XML::LibXML
+
+(optional)
+
+Required for index compilation from
+L<TCF|DiaColloDB::Document::TCF> or
+L<TEI|DiaColloDB::Document::TEI>
+corpus sources.
+
+=back
+
+=head2 Additional Requirements
+
+In order to make use of this module,
+you will also need either a corpus to index
+or an existing index to query.
+See L<DiaColloDB::Document/SUBCLASSES> for
+a list of supported corpus input formats.
+
+
+
+=head1 DESCRIPTION
+
+The DiaColloDB package provides a set of object-oriented Perl modules
+and a command-line utility suite for constructing and querying native
+diachronic collocation indices
+with optional inclusion of a DDC server back-end for fine-grained queries.
+
+=head1 INSTALLATION
+
+Issue the following commands to the shell:
+
+ bash$ cd DiaColloDB-0.01 # (or wherever you unpacked this distribution)
+ bash$ perl Makefile.PL   # check requirements, etc.
+ bash$ make               # build the module
+ bash$ make test          # (optional): test module before installing
+ bash$ make install       # install the module on your system
+
+See L<perlmodinstall> for details.
+
+=head1 USAGE
+
+Assuming you have a raw text corpus you'd like to access via this module,
+the following steps will be required:
+
+=head2 Corpus Annotation and Conversion
+
+Your corpus must be tokenized and annotated with whatever word-level attributes and/or
+document-level metadata you wish to be able to query; in particular document date is
+required. See L<DiaColloDB::Document/SUBCLASSES> for a list of currently supported
+corpus formats.
+
+=head2 DiaCollo Index Creation
+
+You will need to compile a L<DiaColloDB|DiaColloDB> index for your corpus.
+This can be accomplished using the L<dcdb-create.perl(1)|dcdb-create.perl>
+script from this distribution.
+
+=head2 Command-Line Queries
+
+Once you have compiled a local index, you can query it from the command-line
+using the L<dcdb-query.perl(1)|dcdb-query.perl> script from this distribution.
+
+=head2 (Optional) WWW Wrappers
+
+If you want online visualization of a local index, consider installing
+the L<DiaColloDB::WWW|DiaColloDB::WWW> distribution (available on CPAN)
+and following the instructions in its README.txt file.
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+The L<DiaColloDB|DiaColloDB> module documentation describes the API of the
+underlying perl module; when in doubt, look here.
+
+=item *
+
+The L<dcdb-create.perl(1)|dcdb-create.perl> script
+can be used to create a L<DiaColloDB|DiaColloDB> index for a corpus
+in one of the L<supported corpus formats|DiaColloDB::Document/SUBCLASSES>.
+
+=item *
+
+The L<dcdb-query.perl(1)|dcdb-query.perl> script
+can execute runtime queries over a local
+L<DiaColloDB|DiaColloDB> index or a remote web-service
+via the L<DiaColloDB::Client|DiaColloDB::Client> interface.
+
+=item *
+
+L<http://kaskade.dwds.de/dstar/dta/diacollo/> contains a live web-service
+wrapper for a DiaCollo index over the I<Deutsches Textarchiv> corpus of historical German,
+including a user-oriented help page (in English).
+
+=item *
+
+The L<DiaColloDB::WWW|DiaColloDB::WWW> distribution contains scripts and utilities
+for creating HTTP-based web-services for local DiaCollo indices,
+including various online visualizations.
+
+=item *
+
+The CLARIN-D DiaCollo Showcase
+at L<http://clarin-d.de/de/kollokationsanalyse-in-diachroner-perspektive>
+contains a brief example-driven tutorial on using the
+web-services provided by the L<DiaColloDB::WWW|DiaColloDB::WWW> distribution
+(in German).
+
+=back
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=cut

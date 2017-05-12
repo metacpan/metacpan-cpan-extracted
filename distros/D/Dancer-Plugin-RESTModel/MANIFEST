@@ -1,0 +1,13 @@
+Changes
+lib/Dancer/Plugin/RESTModel.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00.load.t
+t/01.rest.t
+t/02.app.t
+xt/perlcritic.t
+xt/pod-coverage.t
+xt/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

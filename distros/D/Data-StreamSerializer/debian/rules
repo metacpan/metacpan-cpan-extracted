@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/perlmodule.mk
+
+MAIN_MODULE	= lib/Data/StreamSerializer.pm
+
+DEBVERSION = $(shell dpkg-parsechangelog \
+	|grep ^Version|awk '{print $$2}'|sed 's/-.*//' )
+PERVERSION = $(shell grep '^our[[:space:]]\+\$$VERSION' $(MAIN_MODULE) \
+	|awk '{print $$4}'|sed "s/[';']//g" )
+
+install/libdata-streamserializer-perl::
+	@set -e; \
+	if ! test "x$(DEBVERSION)" = "x$(PERVERSION)"; then \
+		echo "Error: changelog has version $(DEBVERSION) " \
+			"but module has $(PERVERSION)"; \
+		false; \
+	fi
+
+clean::
+	rm -f const-c.inc
+	rm -f const-xs.inc	

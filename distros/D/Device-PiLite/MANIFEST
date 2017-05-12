@@ -1,0 +1,19 @@
+Build.PL
+Changes
+examples/bargraph.pl
+examples/pacman.pl
+examples/scroll_char.pl
+examples/simple_pixels.pl
+lib/Device/PiLite.pm
+LICENSE
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/00-load.t
+t/boilerplate.t
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+Makefile.PL
+META.yml
+META.json

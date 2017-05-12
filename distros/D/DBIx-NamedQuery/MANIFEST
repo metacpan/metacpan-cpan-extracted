@@ -1,0 +1,8 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-NamedQuery.t
+t/test_queries.sql
+lib/DBIx/NamedQuery.pm
+META.yml                                 Module meta-data (added by MakeMaker)

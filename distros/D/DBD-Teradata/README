@@ -1,0 +1,109 @@
+NAME
+    DBD::Teradata - DBI driver for Teradata
+
+SYNOPSIS
+      use DBI;
+
+      $dbh = DBI->connect('dbi:Teradata:hostname', 'user', 'password');
+
+    See DBI for more information.
+
+DESCRIPTION
+    Refer to the included doc/index.html, or
+    http://www.presicient.com/tdatdbd for detailed information.
+    
+    NOTE: This version of the driver has been deprecated in favor of the
+    more complete and maintained GPL version available at
+    http://www.presicient.com/tdatdbd
+
+  PREREQUISITES
+    Install Perl (minimum version 5.8).
+
+    Build, test and install the DBI module (minimum version 1.36).
+
+    Remember to *read* the DBI README, this README, and the included
+    doc/index.html CAREFULLY!
+
+    I had a lot of info to distill, and POD, though quaint and convenient
+    for READMEs like this, just isn't as expressive as HTML...hence
+    doc/index.html. Please refer to doc/index.html for detailed usage
+    information.
+
+  *** BUILDING:
+   NOTE
+    The provided test suite is not suitable for normal Perl "make test", as
+    it requires a Teradata database and a username and password for an
+    account with various privileges (e.g., CREATE PROCEDURE).
+
+    After installing, you can verify the install by running
+
+            perl t/test.pl <host> <user> <password>
+
+    where <host> is the name of your Teradata server. NOTE that CLI does NOT
+    support numeric IP addresses, nor addresses with the COPn suffix already
+    applied, i.e.,
+
+            perl t/test.pl 129.123.345.78 dbc dbc   # WRONG
+
+            perl t/test.pl DBCCOP1 dbc dbc          # WRONG
+
+            perl t/test.pl DBC dbc dbc              # RIGHT!
+
+   Building For Microsoft Windows
+    You'll need the nmake utility, available with the various Visual Studio
+    tools. You'll also need to make sure your command prompt is configured
+    to find nmake; see the Visual Studio documents for how to do that.
+
+    To build:
+
+        perl Makefile.pl    # use a perl that's in your PATH
+        nmake
+        nmake install
+
+   Building For UNIX/Linux
+        perl Makefile.pl    # use a perl that's in your PATH
+        make
+        make install
+
+  IF YOU HAVE PROBLEMS
+    Please read the doc/index.html file which includes important
+    information, including tips and workarounds for various
+    platform-specific problems.
+
+  SUPPORT INFORMATION
+    For the latest DBD::Teradata information, please see
+    <http://www.presicient.com/tdatdbd.html>.
+
+    Bug reports/Comments/suggestions/enhancement requests may be sent to
+    <mailto:support@presicient.com>.
+
+    Please note: This free version of DBD::Teradata is a minimal
+    implementation of the GPL version available at
+    <http://www.presicient.com/tdatdbd>.
+
+   MAILING LISTS
+    As a user or maintainer of a local copy of DBD::Teradata, you need to be
+    aware of the following addresses:
+
+    The DBI mailing lists located at
+
+            dbi-announce@perl.org          for announcements
+            dbi-dev@perl.org               for developer/maintainer discussions
+            dbi-users@perl.org             for end user level discussion and help
+
+    Refer to <http://dbi.perl.org/support/> for details on subscribing to
+    these lists.
+
+  COPYRIGHT, AUTHOR, and LICENSE
+    Copyright(C) 2001-2009, Presicient Corporation, USA. All rights
+    reserved.
+
+    Permission is granted to use this software according to the terms of the
+    Perl Artistic License, as specified in the Perl README file.
+
+    This software is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+    Teradata(R) is a registed trademark of Teradata Corporation.
+

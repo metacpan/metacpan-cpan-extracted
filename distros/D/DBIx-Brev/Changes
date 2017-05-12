@@ -1,0 +1,11 @@
+Revision history for Perl extension DBI::Brev.
+
+0.02  Tue Oct 15
+	- made it PPM, no need to install - just put to PERL5LIB path and it's ready to use,
+	see PPM chapter in POD
+	- inserts is more flexible to make it possible to work with binary literals
+
+0.01  Fri May 31 09:22:27 2013
+	- original version; created by h2xs 1.23 with options
+		-AX DBI::Brev
+

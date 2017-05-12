@@ -1,0 +1,350 @@
+---
+doctype: dist
+
+header:
+  author: Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+default_prereq_versions:
+ - Carp: 1.38
+ - DateTime: 1.05
+ - File::chdir: 0.1010
+ - File::ShareDir: 1.102
+ - JSON::MaybeXS: 1.003003
+ - List::Util: 1.45
+ - List::MoreUtils: 0.408
+ - Module::Load: 0.26
+ - Moose: 2.1803
+ - MooseX::AttributeDocumented: 0.1003
+ - MooseX::AttributeShortcuts: 0.028
+ - MooseX::StrictConstructor: 0.19
+ - namespace::autoclean: 0.22
+ - Path::Tiny: 0.072
+ - PerlX::Maybe: 1.001
+ - Safe::Isa: 1.000005
+ - String::CamelCase: 0.02
+ - Try::Tiny: 0.24
+ - Type::Tiny: 1.000006
+ - Types::Standard: 1.000006
+ - Types::Path::Tiny: 0.005
+ - version: 0.9913
+ - YAML::Tiny: 1.67
+
+prereqs:
+  test:
+    requires:
+      - Test::More: 0.96
+
+  develop:
+    requires:
+      - Dist::Zilla: 6.008
+      - Test::Warnings: 0.026
+      - Test::NoTabs: 1.4
+
+plugins:
+ - +plugin: Git::GatherDir
+   +prereqs:
+    - develop_requires: Dist::Zilla::Plugin::Git 2.041
+   exclude_filename:
+   - META.json
+   - LICENSE
+   - README.md
+   - $self.build_file
+
+ - +plugin: PromptIfStale
+   +version: 0.053
+   check_all_plugins: 1
+
+ - +plugin: CopyFilesFromBuild
+   +version: 0.170880
+   copy:
+   - META.json
+   - LICENSE
+   - $self.build_file
+
+ - +plugin: Authority
+   +version: 1.009
+   authority: 'cpan:CSSON'
+   locate_comment: 1
+
+ - +plugin: RewriteVersion::Transitional
+   +version: 0.007
+
+ - +plugin: ChangeStats::Dependencies::Git
+   +version: 0.0200
+   group: Stats & Dependency Changes
+   add_to_first_release: 1
+   do_stats: 1
+   stats_text: ~
+   stats_skip_file:
+    - META.json
+    - Changes
+    - LICENSE
+    - dist.ini
+    - weaver.ini
+    - cpanfile
+    - .gitignore
+    - .travis.yml
+    - Makefile.PL
+    - README.md
+
+ - +plugin: NextRelease::Grouped
+   +remove_if: $env.fake_release
+   +version: 0.0200
+   groups: API Changes, New Features, Enhancements, Requirements, Testing, Other Changes, Bug Fixes, Documentation, Stats & Dependency Changes
+   format_date: "%{yyyy-MM-dd HH:mm:ss VVV}d"
+   auto_order: 0
+
+ - +plugin: TaskWeaver
+   +add_if: $self.is_task
+   +version: 0.101628
+
+ - +plugin: PodWeaver
+   +remove_if: $self.is_task
+   +version: 4.006
+
+ - +plugin: Git::Check
+   allow_dirty:
+   - dist.ini
+   - Changes
+   - META.json
+   - README.md
+   - README
+   - $self.build_file
+
+ - +plugin: GithubMeta
+   +remove_if: $self.is_private
+   +version: 0.54
+   issues: 1
+   homepage: $self.homepage
+
+ - +plugin: Readme
+
+ - +plugin: ReadmeAnyFromPod
+   +version: 0.163250
+   filename: README.md
+   type: markdown
+   location: root
+
+ - +plugin: MetaNoIndex
+   directory:
+   - t
+   - xt
+   - inc
+   - share
+   - eg
+   - examples
+
+ - +plugin: $self.installer
+
+ - +plugin: MetaConfig
+
+ - +plugin: MetaJSON
+
+ - +plugin: MetaProvides::Package
+   +version: 2.004003
+
+ - +plugin: DistIller::MetaGeneratedBy
+
+ - +plugin: Git::Contributors
+   +version: 0.029
+
+ - +plugin: Test::Kwalitee::Extra
+   +version: v0.2.1
+
+ - +plugin: Test::NoTabs
+   +version: 0.15
+
+ - +plugin: Test::EOL
+   +version: 0.18
+
+ - +plugin: Test::EOF
+   +version: 0.0501
+
+ - +plugin: Test::Version
+   +version: 1.05
+
+ - +plugin: Test::Compile
+   +version: 2.056
+
+ - +plugin: Test::ReportPrereqs
+   +version: 0.021
+
+ - +plugin: PodSyntaxTests
+ - +plugin: MetaYAML
+ - +plugin: License
+
+ - +plugin: RunExtraTests
+   +version: 0.028
+
+ - +plugin: ShareDir
+ - +plugin: ExecDir
+
+ - +plugin: Manifest
+ - +plugin: ManifestSkip
+
+ - +plugin: CheckChangesHasContent
+   +version: 0.008
+
+ - +plugin: Git::CheckFor::CorrectBranch
+   +version: 0.014
+   release_branch:
+    - master
+    - release
+
+ - +plugin: TestRelease
+
+ - +plugin: ConfirmRelease
+
+ - +plugin: FakeRelease
+   +add_if: $env.fake_release
+
+ - +plugin: UploadToStratopan
+   +add_if: $self.is_private_release
+   +version: 0.012
+
+ - +plugin: UploadToCPAN
+   +add_if: $self.is_cpan_release
+
+ - +plugin: TravisYML
+   +add_if: $self.travis
+   +version: 1.15
+   perl_version: $self.travis_perl
+
+ - +plugin: CommitBeforeTag
+   +base: Git::Commit
+   allow_dirty_match: .
+   commit_msg: 'Release %v%n%n%c'
+
+ - +plugin: Git::Tag
+   +remove_if: $env.fake_release
+   tag_format: '%v'
+   tag_message: 'Release %v%n%n%c'
+
+ - +plugin: InstallRelease
+   +remove_if: $env.fake_release
+   +version: 0.008
+   install_command: cpanm .
+
+ - +plugin: BumpVersionAfterRelease::Transitional
+   +version: 0.007
+   +remove_if: $env.fake_release
+
+ - +plugin: CommitAfterRelease
+   +base: Git::Commit
+   allow_dirty_match: .
+   commit_msg: 'Bump version after %v'
+
+ - +plugin: Git::Push
+   +remove_if: $env.fake_release
+   remotes_must_exist: 1
+
+ - +plugin: Clean
+   +remove_if: $env.fake_release
+   +version: 0.07
+
+---
+doctype: weaver
+
+plugins:
+ - +plugin: '@CorePrep'
+
+ - +plugin: -SingleEncoding
+
+ - +plugin: Name
+
+ - +plugin: Badges
+   +add_if: $self.badges
+   +version: 0.0401
+   +prereqs:
+    - develop_requires: Badge::Depot 0.0103
+    - develop_requires: Badge::Depot::Plugin::Perl
+    - develop_requires: Badge::Depot::Plugin::Travis
+    - develop_requires: Badge::Depot::Plugin::Kwalitee
+    - develop_requires: Badge::Depot::Plugin::Cpantesters
+    - develop_requires: Badge::Depot::Plugin::Coverage
+    - develop_requires: Pod::Weaver::Section::Badges 0.0401
+   badge:
+    - perl
+    - travis
+    - kwalitee
+    - cpantesters
+    - coverage
+   formats: html, markdown
+   -kwalitee_author: CSSON
+
+ - +plugin: Version
+   format: Version %v, released %{YYYY-MM-dd}d.
+
+ - +plugin: prelude
+   +base:  Region
+
+ - +plugin: Synopsis
+   +base:  Generic
+
+ - +plugin: Description
+   +base:  Generic
+
+ - +plugin: Overview
+   +base:  Generic
+
+ - +plugin: Attributes
+   +base:  Collect
+   command: attr
+
+ - +plugin: Methods
+   +base:  Collect
+   command: method
+
+ - +plugin: Functions
+   +base:  Collect
+   command: func
+
+ - +plugin: Leftovers
+
+ - +plugin: postlude
+   +base:  Region
+
+ - +plugin: SOURCE
+   +add_if: $self.add_default_github
+   +base: GenerateSection
+   +version: 1.01
+   text: L<{{$repository_web}}>
+
+ - +plugin: HOMEPAGE
+   +add_if: $self.add_default_github
+   +base: GenerateSection
+   text: L<{{$homepage}}>
+
+ - +plugin: Authors
+
+ - +plugin: Legal
+
+ - +plugin: List
+   +base: -Transformer
+   +in: Elemental
+   transformer: List
+
+ - +plugin: Splint
+   +base: -Transformer
+   +in: Elemental
+   +add_if: $self.splint
+   +version: 0.1201
+   transformer: Splint
+
+---
+doctype: gitignore
+
+always:
+ - /.build
+ - /_build*
+ - /Build
+ - MYMETA.*
+ - '!META.json'
+ - /.prove
+
+onexist:
+ - .coverhistory.json
+ - inc

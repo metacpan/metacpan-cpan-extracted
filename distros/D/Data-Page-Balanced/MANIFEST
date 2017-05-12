@@ -1,0 +1,15 @@
+# $Id: MANIFEST 2 2007-10-27 22:08:58Z kim $
+
+Build.PL
+Changes
+MANIFEST
+MANIFEST.SKIP
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Data/Page/Balanced.pm
+t/00.load.t
+t/01.calculations.t
+t/02.exceptions.t
+t/pod-coverage.t
+t/pod.t

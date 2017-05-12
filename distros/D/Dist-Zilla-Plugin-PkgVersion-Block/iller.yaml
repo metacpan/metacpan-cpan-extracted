@@ -1,0 +1,36 @@
+---
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-PkgVersion-Block
+
+
+prereqs:
+  runtime:
+    requires:
+     - perl: 5.014000
+     - namespace::autoclean
+     - Moose: 2.0000
+     - PPI: 1.215
+     - MooseX::Types::Perl
+     - Dist::Zilla::Role::FileMunger: 5.000
+     - Dist::Zilla::Role::FileFinderUser: 5.000
+     - Dist::Zilla::Role::PPI: 5.000
+  test:
+    requires:
+     - Test::DZil: 5.000
+     - autodie: 2.00
+
+plugins:
+  - +config: Author::CSSON
+
+  - +add_plugin: TravisYML
+    +before: Git::Tag
+    perl_version: 5.14 5.16 5.18 5.20
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+  - +remove_plugin: Splint

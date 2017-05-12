@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DateTime::Cron::Simple - Parse a cron entry and check against current time</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<li><a href="#example">EXAMPLE</a></li>
+	<li><a href="#changes">CHANGES</a></li>
+	<li><a href="#todo">TO-DO</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#copyright">COPYRIGHT</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DateTime::Cron::Simple - Parse a cron entry and check against current time</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  use DateTime::Cron::Simple;</pre>
+<pre>
+  $c = DateTime::Cron::Simple-&gt;new($cron);</pre>
+<pre>
+  $boolean = $c-&gt;validate_time;</pre>
+<pre>
+  $c-&gt;new_cron($cron);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module is a quick and dirty way to determine if a cron time format is valid for the current date and time.</p>
+<p>A cron entry follows the cron format from crontab(5).</p>
+<p>The validate_time function uses the current date and time for comparison, but will also accept a valid DateTime object as a parameter.</p>
+<p>
+</p>
+<hr />
+<h1><a name="example">EXAMPLE</a></h1>
+<pre>
+  use DateTime::Cron::Simple;</pre>
+<pre>
+  $c = DateTime::Cron::Simple-&gt;new('0-59/2 10,12 * * 5');</pre>
+<pre>
+  if($c-&gt;validate_time) { ... }</pre>
+<pre>
+  $c-&gt;new_cron('* * 1 * 0');</pre>
+<pre>
+  if($c-&gt;validate_time) { ... }</pre>
+<p>
+</p>
+<hr />
+<h1><a name="changes">CHANGES</a></h1>
+<p>Please see the CHANGES file in the module distribution.</p>
+<p>
+</p>
+<hr />
+<h1><a name="todo">TO-DO</a></h1>
+<pre>
+ - currently does not handle ! and &gt; or &lt; in cron entries
+ - better code implementation</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Brendan Fagan &lt;suburbanantihero (at) yahoo (dot) com&gt;. Comments, bug reports, patches and flames are appreciated.</p>
+<p>
+</p>
+<hr />
+<h1><a name="copyright">COPYRIGHT</a></h1>
+<p>Copyright (c) 2004 - Brendan Fagan</p>
+
+</body>
+
+</html>

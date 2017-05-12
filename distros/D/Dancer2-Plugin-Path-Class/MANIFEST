@@ -1,0 +1,15 @@
+Changes
+lib/Dancer2/Plugin/Path/Class.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.md
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/public/img/image1.jpg
+t/public/img/image2.png
+t/public/img/image3.gif
+t/test-plugin.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

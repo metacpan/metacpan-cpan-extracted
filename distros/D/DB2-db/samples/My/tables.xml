@@ -1,0 +1,4 @@
+<table package="My::Options">
+  <column name="VARIABLE" type="CHAR" length="30" />
+	<column name="VALUE" type="VARCHAR" length="60" />
+</table>

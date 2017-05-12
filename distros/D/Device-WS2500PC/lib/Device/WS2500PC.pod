@@ -1,0 +1,226 @@
+=pod
+
+=head1 NAME
+
+Device::WS2500PC - Interfacing the WS2500PC Weather Logger from ELV 
+
+=head1 SYNOPSIS
+
+    use Device::WS2500PC;
+    my %result;
+    if (ws2500_GetDataset('/dev/ttyS0',\%result,'next')) {
+ 	    if ($result{'dataset'}->{'status'} eq 'dataset' and
+	        $result{'dataset'}->{"temp$x"}->{'status'} ne 'n/a')
+		    print "Temperature Sensor 1: $result{'dataset'}->{'temp1'}->{'temperature'} Celcius\n";
+	    }
+    }  
+
+    # More usage examples:
+    ws2500_GetTime        ('/dev/ttyS0');
+    ws2500_GetStatus      ('/dev/ttyS0',\%result);
+    ws2500_NextDataset    ('/dev/ttyS0');
+    ws2500_GetDataset     ('/dev/ttyS0',\%result,'next');
+    # Advanced functions
+    ws2500_GetDatasetBulk ('/dev/ttyS0',\%result,10);
+    ws2500_FirstDataset   ('/dev/ttyS0');
+    ws2500_InterfaceInit  ('/dev/ttyS0',\%setup_data);
+    ws2500_SetDebug       (1);
+    
+=head1 DESCRIPTION
+
+The Device::WS2500PC is a library for reading data from the interface
+WS2500PC distributed by the German company ELV (http://www.elv.de).
+This interface collects data from various sensors (temperature, wind,
+rain, etc), and stores them in a buffer. This buffer can be read with
+the serial interface.
+The library implements all documented commands with complete wrappers,
+so that all data returned can easily be processed.
+
+=head2 General Usage
+
+All functions will return true or false. If any failure, like a communication
+error, occurs, false will be returned. Note that the return code only signals
+if the communication with the interface succeeded, not if any data has been 
+returned. See the individual functions to check wheter any valid data has
+been recorded.
+Every function can be used independently of the user. On each call the interface
+will be initialized again.
+
+=head2 Normal operation
+
+Following functions are automatically imported with 'use Device::WS2500PC'. All 
+functions require at least the interface device, where the WS2500PC logger is
+installed.
+
+B<ws2500_GetTime ($port,[$dcf_handling])>
+
+Reads the received DCF from the interface. Port is the interface to use. The
+variable $dcf_handling is optional. The interface signals if the internal received 
+DCF time is available (in sync) or not. When DCF-Handling is set to 1, the routine 
+will return 0 upon DCF failure. The default behaviour is to ignore whether the
+DCF-clock is in sync or not. The function will return 1 upon success or 0 when
+a communication error has occured.
+
+B<ws2500_GetStatus ($port,$result)>
+
+This will give detailed information about the interface. $port is the interface
+to be used, and $result is a hash reference which will be filled in. When everything
+works, this function will return 1, else upon a communication error 0. The filled
+in hash has the following structure:
+  {valid}                          Is set to 1, when the hash contains valid data
+  {sensors}->{<name>}               Status about all sensors. Name is 'temp1'...'temp8',
+                                   'rain', 'wind', 'light' or 'inside'
+  {sensors}->{<name>}->{status}    Either 'OK', or 'n/a' when this sensor does not exit
+  {sensors}->{<name>}->{dropouts}  The Number of dropouts (not received sensor data)
+  {sensors}->{address}             The address of the sensor
+  {interface}->{interval}          The interval in minutes the interface records data
+  {interface}->{language}          Language ('English' or 'German'), don't know what this means
+  {interface}->{sync_dcf}          Boolean, contains whether the DCF-clock is in sync
+  {interface}->{with_dcf}          Boolean, true if DCF is available
+  {interface}->{protocol}          The uses protocol version for the sensors, either '1.1' or '1.2'
+  {interface}->{type}              Interface type. Either 'PC_WS2500' or 'WS2500'
+  {interface}->{version}           Hardware version of the interface (?)
+
+A simple example (without any error checking) will look like this:
+  my %status;
+  ws2500_GetStatus ('/dev/ttyS0',\%status);
+  print "Recording interval: Each $status{'interface'}->{'interval'} minutes\n";
+
+B<ws2500_NextDataset ($port)>
+
+Normally when a dataset is requested from the interface, the internal pointer
+does not increase. Use this function to advance to the next dataset, if any.
+The only parameter is $port, which indicates which interface to use. The
+function will return following conditions:
+  0  Error during communication
+  1  Success
+  -1 No next dataset available
+
+B<ws2500_GetDataset ($port,$result,$type)>
+
+This function reads the current dataset, to which the internal pointer is set.
+There are three parameters. $port indicates the interface to use and $result is
+a hash reference, which will be filled with data. The third parameter is a text
+string, which can be of two forms:
+  'current': Get the current dataset, but do not increase to next pointer
+  'next'   : Get the current dataset. After the data has been successfully retrieved,
+             advance the internal pointer to the next dataset
+
+The function will return 1 upon success else 0. Use $result{'dataset'}->{'status'} to
+check whether a a new dataset has been retrieved (then the variable contains 'dataset'), or
+no new data is available (when using 'next' as type parameter; then this variable will contain 'nonew').
+
+The returned hash reference has following structure:
+  {valid}                             This hash contains valid data, when set to 1
+  {interface}->{timestamp}            The current DCF-time
+  {interface}                         See status hash returned by ws2500_GetStatus
+  {sensors}                           See status hash returned by ws2500_GetStatus
+  {dataset}->{status}                 Either 'dataset' for a valid dataset, or 'nonew' when no dataset is available
+  {dataset}->{block}                  Block number of dataset
+  {dataset}->{timestamp}              Timestamp of dataset
+  {dataset}->{tempX}                  Temperature sensors, X is 1 to 8
+  {dataset}->{tempX}->{status}        1 if this sensor contains valid data, 'n/a' when not available
+  {dataset}->{tempX}->{new}           New flag is set
+  {dataset}->{tempX}->{temperature}   Temperature in Celcius
+  {dataset}->{tempX}->{humidity}      Humidity in %, 'n/a' if this sensor is missing
+  {dataset}->{wind}->{status}         1 if this sensor contains valid data, 'n/a' when not available
+  {dataset}->{wind}->{new}            The new flag is set
+  {dataset}->{wind}->{speed}          Wind speed in km/h
+  {dataset}->{wind}->{direction}      Direction in degree
+  {dataset}->{wind}->{accuracy}       Average devivation for direction in degree
+  {dataset}->{inside}->{status}       1 if this sensor contains valid data, 'n/a' when not available
+  {dataset}->{inside}->{new}          New flag is set
+  {dataset}->{inside}->{temperature}  Temperature in Celcius
+  {dataset}->{inside}->{humidity}     Humidity in %, 'n/a' if this sensor is missing
+  {dataset}->{inside}->{pressure}     Pressure in hPa
+  {dataset}->{rain}->{status}         1 if this sensor contains valid data, 'n/a' when not available
+  {dataset}->{rain}->{new}            New flag is set
+  {dataset}->{rain}->{counter_ml}     Current counter
+  {dataset}->{rain}->{counter_ml}     Current rain counter in ml, delta to previous call is the rainfall
+  {dataset}->{light}->{status}        1 if this sensor contains valid data, 'n/a' when not available
+  {dataset}->{light}->{new}           New flag is set
+  {dataset}->{light}->{duration}      Counter in minutes with brightness > 20.000 Lux
+  {dataset}->{light}->{brightness}    Sun brightness in Lux
+  {dataset}->{light}->{sunflag}       Sunflag is set, undocumented
+  
+See the Synopsis of this perldoc page for an usage example.
+
+=head2 Advanced Usage
+
+Following functions must be explicitly imported to your namespace, e.g. 
+'use Device::WS2500PC qw (ws2500_FirstDataset)'. Use this functions with care.
+
+B<ws2500_GetDatasetBulk ($port,$result,$bulkcount)>
+
+Whereas the normal ws2500_GetDataset function initializes and closes the interface for each
+dataset, this function opens the communication only once, and serveral dataset are
+then transferred in batch. This greatly improves the performance. $port is the port
+to use and $result is a reference which receives the result. $bulk is an integer
+and contains the number of datasets which should be retrieved. The result hash
+contains following data:
+  {valid}        If this bulkdata is valid
+  {bulkcount}    The actual number of retrieved datasets
+  {bulk}         An array. Each element contains a dataset hash reference
+                 See the ws2500_GetDataset function for the structure
+  {interface}    See ws2500_GetDataset function
+  {sensors}      See ws2500_GetDataset function
+
+This functions always returns true.
+
+B<ws2500_FirstDataset ($port)>
+
+Puts the dataset on the oldest record available. All data which has been already
+retrieved will be new again. Use this function with care. The only parameter is
+$port, which indicates the interface to use. The function will return 1 upon 
+success, else 0.
+  
+B<ws2500_InterfaceInit ($port,$data)>
+
+This functions initializes the interface with new operational parameters. $port
+is the interface to use. $data is a hash reference containing the following keys:
+  {first}        Minutes to wait after init to resume normal operation, 0..63 minutes
+  {interval}     The interval in minutes to record data, 2..63 minutes
+  {addr-rain}    The address of the rain sensor, 0..7
+  {addr-wind}    The address of the wind sensor, 0..7
+  {addr-inside}  The address of the inside sensor, 0..7
+  {addr-light}   The address of the light sensor, 0..7
+  {version}      The protocal version to use: 1 (V1.1) or 2 (V1.2)
+
+All keys must be set, or an error is issued. The function will return 1 upon success,
+else 0. Please not that you should query the interface for at least {first} minutes, so
+that the interface has time to stabilize and discover all sensors.
+
+B<ws2500_SetDebug ($debug)>
+
+This enables debug output, which will be written to STDOUT. All communication will 
+be logged. Set $debug to 1 for debugging, and 0 to disable (default). This function
+always returns true.
+
+=head1 NOTES
+
+The protocol for interfacing is very time critical. On slow systems this may
+fail. Please report this to the author.
+
+Please make sure that you have read and write access to the serial device.
+
+The installation tarball contains a directory 'examples' with a command line
+driven programm, which displays all retrievable data.
+
+This library was written and tested under linux. Please drop me a note, if you
+get it to run on other non UNIX-platforms.
+
+=head1 AUTHORS
+
+ Magnus Schmidt (ws2500@27b-6.de)
+ Thanks to Rainer Krienke for the documentation
+
+=head1 COPYRIGHT AND LICENCE
+
+ Copyright (C) 2004 by Magnus Schmidt (ws2500@27b-6.de)
+ http://ducts.27b-6.de/ws2500pc
+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+

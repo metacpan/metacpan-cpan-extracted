@@ -1,0 +1,50 @@
+Date: Wed, 13 Aug 1997 13:02:04 -0500 (CDT)
+From: "Kent S. Gordon" <kgor@inetspace.com>
+Subject: Re: Easy way to force static Informix libraries with DBD:Informix
+
+>> "kgor" == Kent S Gordon <kgor@inetspace.com> wrote:
+> Is there a easy way to create a DBD:Informix that uses static Informix
+> libraries, but dynamic system libraries for everything else.
+
+I have succeeded in building a perl witn DBD:Informix that uses dynamic
+loading for every except DBD:Informix and DBI.  I got a runtime error of
+not being able to find the symbol of boot_DBI if DBI was also not
+statically built into perl.  Here is a short discription of what I did.
+
+1)  Built perl 5.004_2 normally.
+2)  Installed perl.
+3)  Built DBI statically (make static).
+4)  Installed DBI (make install).  This is not just the install of the perl
+    binary, since DBI.a is needed later.
+5)  Changed DBD Makefile.pl to call esql -static and esql -static -libs
+    instead of esql and esql -libs.
+6)  Created DBD Makefile using perl Makefile.PL.
+7)  Built DBD statically (make static and make perl, etc.)
+8)  The make test_static failed, due to wanting to create a dynamic object
+    (Informix.sl failed due to trying fixup a symbol)
+9)  Installed with make -k install to get pass error creating Informix.sl,
+    while still installing Informix.pm (could not find a special install
+    for static perl.
+10) Installed new perl executable.  It seems to work after some initial
+    test.
+
+Kent S. Gordon
+Senior Software Engineer
+iNetSpace Co.
+voice: (972)851-3494 fax:(972)702-0384 e-mail:kgor@inetspace.com
+
+--
+1997-09-30: Jonathan Leffler notes:
+
+Kent must be building on HP-UX because of the references to Informix.sl.
+
+Be wary of the licencing issues with the Informix software (as distinct
+from DBD::Informix).  As of 13th August 1997, it is not absolutely clear
+whether copying the Perl executable to a machine without an Informix
+runtime licence is legal, but it probably isn't.  And with the more
+recent versions of Informix, it (probably) won't work either because you
+will need the GLS locale information.  And not having the message files
+reduces the friendliness of the error messages produced by DBD::Informix.
+
+$Id: static.build,v 100.1 2002/02/08 22:50:03 jleffler Exp $
+

@@ -1,0 +1,16 @@
+Changes
+lib/Devel/Spy.pm
+lib/Devel/Spy/_constants.pm
+lib/Devel/Spy/_obj.pm
+lib/Devel/Spy/TieArray.pm
+lib/Devel/Spy/TieHandle.pm
+lib/Devel/Spy/TieHash.pm
+lib/Devel/Spy/TieScalar.pm
+lib/Devel/Spy/Util.pm
+overload.PL
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/lib/Devel/Spy/Test.pm
+t/runtests.t

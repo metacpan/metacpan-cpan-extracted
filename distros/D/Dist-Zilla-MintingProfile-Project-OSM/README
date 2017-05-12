@@ -1,0 +1,16 @@
+NAME
+    Dist::Zilla::MintingProfile::Project::OSM - A minting profile for
+    Modules written for Project OSM
+
+VERSION
+    version 0.2.0
+
+AUTHOR
+    DBR <dbr@cpan.org>, AHERNIT <tech@tool.de>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by DBR, AHERNIT.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

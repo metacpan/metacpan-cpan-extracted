@@ -1,0 +1,81 @@
+[%- # parent-docsets navigation bar
+    # expects to be set:
+    # nav          - cache navigator object
+    # rel_doc_root - relative docs path (only for chapters!)
+-%]
+[%- IF nav -%]
+
+[%- # prepare the sects to show where are we relative 
+    # to the absolute root
+    parents = [];
+    p = nav.up;
+    nav_not_empty = 0;
+    WHILE p;
+        parents.unshift(p);
+        p = p.up;
+        nav_not_empty = 1; 
+    END;
+
+    sects = [];
+    FOREACH p = parents;
+        SET path = [];
+        IF p.parent_rel_path.defined; # top level has no rel_path
+            path.push(p.parent_rel_path);
+        END;
+        IF rel_doc_root.defined;
+            path.push(rel_doc_root);
+        END;
+        nav_not_empty = 1; 
+        link = path.join("/");
+        sects.push({link => "$link/index.html", text => p.index_node.stitle});
+    END;
+    # a page has index as its parent, so we push it here
+    IF rel_doc_root.defined;
+        nav_not_empty = 1; 
+        sects.push({link => "$rel_doc_root/index.html", 
+                    text => nav.index_node.stitle});
+    END;
+-%]
+
+
+            <!-- breadcrumb and topline begin -->
+            <td width="100%" align="left">
+                <table border="0" cellspacing="0" cellpadding="0" width="100%">
+                    <tr valign="bottom">
+                        <td class="navbarglobal" height="31" width="100%">
+                            <!-- breadcrumb start -->
+                [%- IF nav_not_empty == 1 -%]
+                    [%- WRAPPER button 
+                            width = "100%"
+                            align = 'left'
+                    -%]
+                        [%- FOREACH sec = sects -%]
+
+                            <a href="[%- sec.link -%]"><b>[%- sec.text -%]</b></a> / 
+                        [%- END -%]
+                    [%- END -%]
+                [%- ELSE -%]
+                    <br>
+                [%- END -%]
+
+                            <!-- breadcrumb end -->
+                        </td>
+                    </tr>
+                    <tr valign="top">
+                        <td height="6"><br class="smallbr"></td>
+                    </tr>
+                    <!-- topline begin -->
+                    <tr valign="top">
+                        <td height="1" class="camel-line-top"><br class="smallbr"></td>
+                    </tr>
+                    <tr valign="top">
+                        <td height="1" class="camel-line-bottom"><br class="smallbr"></td>
+                    </tr>
+                    <!-- topline end -->
+                    <tr valign="top">
+                        <td height="6"><br class="smallbr"></td>
+                    </tr>
+                </table>
+            </td>
+            <!-- breadcrumb and topline end -->
+[%- END -%]

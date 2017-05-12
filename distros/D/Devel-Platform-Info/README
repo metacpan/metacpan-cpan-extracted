@@ -1,0 +1,78 @@
+NAME
+       Devel::Platform::Info - Unified framework for obtaining common platform
+       metadata
+
+SYNOPSIS
+         use Devel::Platform::Info;
+         my $info = Devel::Platform::Info->new();
+         my $data = $info->get_info();
+
+DESCRIPTION
+       This module is a wrapper to the drivers which can determine platform
+       metadata regarding the currently running operating system.
+
+       The intention of this distribution is to provide key identifying compo-
+       nents regarding the platform currently being used, for the CPAN Testers
+       test reports. Currently the reports do not often contain enough infor-
+       mation to help authors understand specific failures, where the platform
+       may be a factor.
+
+       However, it is hoped that this distribution will find more uses far
+       beyond the usage for CPAN Testers.
+
+INTERFACE
+       The Constructor
+
+
+       * new
+           Simply constructs the object.
+
+       Methods
+
+
+       * get_info
+           Returns a hash reference to the platform metadata.
+
+           Returns at least the following keys:
+
+             source
+             archname
+             osname
+             osvers
+             oslabel
+             is32bit
+             is64bit
+             osflag
+
+           Note that the 'source' key returns the commands and output used to
+           obtain the metadata for possible future use.
+
+           Further keys may be available to provide additional information if
+           applicable to the specific operating system.
+
+REFERENCES
+       The following links were used to understand how to retrieve the meta-
+       data:
+
+         * http://alma.ch/perl/perloses.htm
+
+BUGS, PATCHES & FIXES
+       There are no known bugs at the time of this release. However, if you
+       spot a bug or are experiencing difficulties, that is not explained
+       within the POD documentation, please send bug reports and patches to
+       the RT Queue (see below).
+
+       RT Queue: http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Plat-
+       form-Info
+
+AUTHORS
+         Barbie (BARBIE) <barbie@cpan.org>
+         Brian McCauley (NOBULL) <nobull67@gmail.com>
+         Colin Newell http://colinnewell.wordpress.com/
+         Jon 'JJ' Allen (JONALLEN) <jj@jonallen.info>
+
+COPYRIGHT & LICENSE
+         Copyright (C) 2010-2016 Birmingham Perl Mongers
+
+         This distribution is free software; you can redistribute it and/or
+         modify it under the Artistic License 2.0.

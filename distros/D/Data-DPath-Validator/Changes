@@ -1,0 +1,7 @@
+Revision history for Data-DPath-Validator: 0.093411
+
+0.093411  2009-12-07 10:55:53 America/Chicago
+        Fix bug regarding top level elements depth behavior
+
+0.093410  2009-12-07 09:36:32 America/Chicago
+        Initial release

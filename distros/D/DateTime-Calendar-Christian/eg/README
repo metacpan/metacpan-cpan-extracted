@@ -1,0 +1,14 @@
+This directory contains examples of using DateTime::Calendar::Christian.
+Specifically:
+
+README
+    This file.
+
+which-calendar
+    Given an ISO-8601-ish date on the command line, this Perl script
+    displays which calendar is appropriate. A command option specifies
+    the reform date. If desired, another command option will get you
+    output from other methods than the default calendar_name(). The
+    --help option gets you the POD for the script.
+
+# ex: set filetype=text textwidth=72 autoindent :

@@ -1,0 +1,101 @@
+Changelog for Dist-Zilla-Plugin-ChangelogFromGit-CPAN-Changes
+
+0.110 2016-06-23T17:22:15Z
+ - Update travis config (Ioan Rogers)
+ - [Closes #24] dzil > 6 has replaced Path::Class with Path::Tiny (Ioan
+   Rogers)
+
+0.109 2016-01-25T06:12:12Z
+ - [Closes #16] amend tag_regexp default to cater for dev tags (Lisa Hare)
+ - Fixed README (Ioan Rogers)
+ - Added a license file (Ioan Rogers)
+
+0.108 2015-07-10T03:23:30Z
+ - [Closes #22] Revert test changes for reverted CPAN::Changes fixes (Ioan
+   Rogers)
+
+0.107 2015-06-11T03:01:07Z
+ - Missing Proc::InvokeEditor is now a nonfatal warning (Ioan Rogers)
+ - Setting NO_EDIT_CHANGES will override changelog editing override of
+   editing (Ioan Rogers)
+
+0.106 2015-06-03T03:57:14Z
+ - There's no real point using semantic versioning for this module (Ioan
+   Rogers)
+ - Fix tests for CPAN::Changes 0.400001 (Tim Retout)
+
+0.0.14_01 2014-06-04T06:07:07Z
+ - [gh#14] Try to munge git version, leave debugging in to see what
+   CPANtesters finds (Ioan Rogers)
+
+0.0.15 2015-01-18T06:02:39Z
+ - explicitly define prereq on Path::Class (Doug Bell)
+
+0.0.14 2014-06-04T06:07:07Z
+ [Bugfixes]
+ - gh#15. If author and subject are not tagged utf8, try decoding (Ioan
+   Rogers)
+ - gh#14. Remove debugging output for git version parsing (Ioan Rogers)
+
+0.0.13 2014-05-29T03:43:56Z
+ [Bugfixes]
+ - require perl 5.10.1 rather than the non-existent 5.10.2 (Jakob Voss)
+
+ [Other]
+ - Disable Test::NoTabs until I can be bothered to work how to stop it
+   checking a .tar.gz (Ioan Rogers)
+
+0.0.12 2014-03-03T12:26:15Z
+ [Bugfixes]
+ - Fixed prereqs
+
+ [Features]
+ - Allow 'semantic' or 'decimal' as args to tag_regexp. Closes #10 (Ioan
+   Rogers)
+
+0.0.11 2014-03-02T07:12:44Z
+ [Bugfixes]
+ - Fixed incorrect log method (Ioan Rogers)
+ - Don't try to 'use-mailmap' for git < 1.8.2. Closes #12 (Ioan Rogers)
+
+ [Other]
+ - Use my dzil plugin bundle (Ioan Rogers)
+ - Log the tag_regexp being used when debugging (Ioan Rogers)
+ - Added some tests, Closes #7 (Ioan Rogers)
+
+0.0.10 2014-02-23T00:57:09Z
+ [Bugfixes]
+ - square parens makes CPAN::Changes think author is group. Change to().
+   Closes #11. Thanks @tobyink for reporting (Ioan Rogers)
+ - don't try to show author when there are no commits (Ioan Rogers)
+
+0.0.9 2014-02-21T09:40:43Z
+ - Fix calling each and values with a hashref on perls < 5.14 (Ioan Rogers)
+
+0.0.8 2014-02-21T05:50:05Z
+ - Fixed prereqs (Ioan Rogers)
+
+0.0.7 2014-02-21T05:41:38Z
+ - Always ignore tags predating latest in changelog (Ioan Rogers)
+ - When doing test runs there may be no commits so add a placeholder entry
+ - (Ioan Rogers)
+
+0.0.6 2014-02-20T02:49:23Z
+ - Allow manually editing changelog before release. Closes #4. (Ioan
+   Rogers)
+ - No longer subclass DZP::ChangelogFromGit. Closes #2. (Ioan Rogers)
+
+0.0.5 2013-11-30T05:51:37Z
+ - prevent hanging on Windows (Alexandr Ciornii)
+ - (Feature) Create CPAN::Changes compliant version numbers from
+   non-compliant git tags. Closes #6 (Shantanu Bhadoria)
+
+0.0.4 2013-09-06T08:39:23Z
+ - Add an option to omit authors (Jakob Voss)
+ - (Closes #1) Get HEAD version from Git::Tag if available. Thanks to
+   @jddurand for reporting (Ioan Rogers)
+ - Default to omitting author email. Don't group by author, instead add
+   name to end of message. (Ioan Rogers)
+
+0.0 2014-02-21T09:41:18Z
+ - Fix calling each and values with a hashref on perls < 5.14 (Ioan Rogers)

@@ -1,0 +1,14 @@
+Changes
+lib/Devel/Command.pm
+lib/Devel/Command/DBSub/DB_5_6.pm
+lib/Devel/Command/DBSub/DB_5_8_5.pm
+lib/Devel/Command/DBSub/DB_5_8_6.pm
+lib/Devel/Command/DBSub/DB_5_10.pm
+lib/Devel/Command/HelloWorld.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/Devel-Command.t
+t/pod-coverage.t
+t/pod.t

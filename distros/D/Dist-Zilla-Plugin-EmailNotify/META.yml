@@ -1,0 +1,29 @@
+---
+abstract: 'send an email on dist release'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.142690'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-EmailNotify
+requires:
+  Dist::Zilla: 0
+  Email::Stuffer: 0
+  IO::File: 0
+  Moose: 0
+  namespace::autoclean: 0
+  perl: 5.008
+resources:
+  bugtracker: https://github.com/xsawyerx/dist-zilla-plugin-emailnotify.git
+  repository: git://github.com/xsawyerx/dist-zilla-plugin-emailnotify.git
+version: 0.004

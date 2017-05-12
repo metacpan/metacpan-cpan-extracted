@@ -1,0 +1,37 @@
+2003-12-15 14:17  cvsjohan
+
+	* META.yml, bin/minisscii: Changed the Config::Auto to accept the
+	~/.minissciirc config file
+
+2003-12-15 14:08  cvsjohan
+
+	* Build.PL: Other tar name ...
+
+2003-12-15 14:04  cvsjohan
+
+	* META.yml: Added this file also ... albeit generated
+
+2003-12-15 14:02  cvsjohan
+
+	* MANIFEST: Forgot META.yml in MANIFEST
+
+2003-12-15 13:59  cvsjohan
+
+	* MANIFEST: Added manifest file
+
+2003-12-15 13:58  cvsjohan
+
+	* bin/minisscii, lib/Device/MiniSSCII.pm: Added a 'close' method on
+	the MiniSSCII.pm Added documentation to minisscii file
+
+2003-12-15 13:22  cvsjohan
+
+	* Build.PL, bin/minisscii, lib/Device/MiniSSCII.pm,
+	t/001_device_minisscii.t, t/002_pod.t: Initial revision
+
+2003-12-15 13:22  cvsjohan
+
+	* Build.PL, bin/minisscii, lib/Device/MiniSSCII.pm,
+	t/001_device_minisscii.t, t/002_pod.t: A module to control the Mini
+	SSC II
+

@@ -1,0 +1,26 @@
+---
+abstract: 'Perl interface to the MD-5 algorithm'
+author:
+  - 'Gisle Aas <gisle@activestate.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Digest-MD5
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Digest::base: '1.00'
+  XSLoader: '0'
+  perl: '5.006'
+resources:
+  repository: https://github.com/gisle/digest-md5
+version: '2.55'

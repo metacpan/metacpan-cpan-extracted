@@ -1,0 +1,28 @@
+If you have Date::Manip 5.xx installed (which is the case if you
+have a perl version less than 5.010), the examples are included
+in the Date::Manip man page.
+
+If you have Date::Manip 6.xx installed, examples are included
+in the Date::Manip::Examples man page, and in this directory.
+
+This directory contains two scripts which use Date::Manip to
+duplicate the functionality of two common unix scripts.
+
+The dm_date script duplicates the functionality of the unix 'date'
+command with a few differences.
+
+   o  It does not include the functionality to set the
+      system date.
+
+   o  The date strings that can be read (using the -d
+      or -f options) are anything that Date::Manip can
+      parse.
+
+   o  The format string is any string suitable for passing
+      to the Date::Manip::Date::printf function.
+
+The dm_zdump duplicates the functionality of the unix 'zdump'
+command. This should be a drop-in replacement for the zdump
+command except that the first two lines and the last two lines
+of zdump output do not contain any useful output. The dm_zdump
+command does not reproduce these lines.

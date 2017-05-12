@@ -1,0 +1,26 @@
+--- #YAML:1.0
+name:               Date-ICal
+version:            2.678
+abstract:           ~
+author:  []
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Date::Leapyear:  1.03
+    Storable:        0
+    Test::Harness:   2.25
+    Test::More:      0.45
+    Time::HiRes:     0
+    Time::Local:     0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.56
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

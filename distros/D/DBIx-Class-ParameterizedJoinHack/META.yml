@@ -1,0 +1,25 @@
+---
+abstract: 'Parameterized Relationship Joins'
+author:
+  - 'Matt S. Trout <mst@shadowcat.co.uk>'
+build_requires:
+  SQL::Translator: '0.11018'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  DBIx::Class: '0.082820'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-ParameterizedJoinHack
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBIx::Class: '0'
+  perl: '5.006'
+version: '0.002001'

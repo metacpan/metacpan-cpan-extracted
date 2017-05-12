@@ -1,0 +1,14 @@
+_Inline.*
+.*\.svn.*
+pm_to_blib
+.*\.old
+.*\.bak
+.*\.swp
+blib/.*
+images/.*
+.*\.inl
+^Makefile$
+^usb-sh$
+^synchtest.pl$
+^Device-USB-.*\.tar\.gz$
+\d+_local_

@@ -1,0 +1,14 @@
+---
+author: tokuhirom
+comment: RefererCutter ?\227?\129?\170?\227?\129?\138?\227?\129?\151?\227?\129?\159?\227?\128?\130
+date: 2008-04-19 19:25:16 +0900
+files:
+  - path: lang/perl/Moxy/branches/CC/config.yaml
+    status: U
+  - path: lang/perl/Moxy/branches/CC/lib/Moxy/Plugin/Filter/RefererCutter.pm
+    status: U
+  - path: lang/perl/Moxy/branches/CC/t/Plugins/
+    status: A
+  - path: lang/perl/Moxy/branches/CC/t/Plugins/RefererCutter.t
+    status: A
+rev: 9895

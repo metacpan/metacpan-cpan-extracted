@@ -1,0 +1,3 @@
+<% where %>:
+   '<% IF flash.warn %><% flash.warn %><% END %>'
+   '<% IF flash.error %><% flash.error %><% END %>'

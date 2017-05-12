@@ -1,0 +1,471 @@
+@prefix cpan-uri: <http://purl.org/NET/cpan-uri/terms#> .
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/project>
+	a                    doap:Project;
+	cpan-uri:x_help_wanted <http://usefulinc.com/ns/doap#documenter>, <http://usefulinc.com/ns/doap#tester>;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "CPAN::Changes 0"^^doap-deps:CpanId ], [ doap-deps:on "CPAN::Meta 0"^^doap-deps:CpanId ], [ doap-deps:on "Moose 2.0800"^^doap-deps:CpanId ], [
+		doap-deps:on "Path::Iterator::Rule 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Path::Tiny 0"^^doap-deps:CpanId ], [ doap-deps:on "Path::FindDev 0"^^doap-deps:CpanId ], [ doap-deps:on "RDF::DOAP::Lite 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Software::License 0"^^doap-deps:CpanId;
+	], [
+		doap-deps:on "Types::Path::Tiny 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Types::Standard 0"^^doap-deps:CpanId ], [
+		doap-deps:on "namespace::autoclean 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "perl 5.010001"^^doap-deps:CpanId ], [
+		doap-deps:on "CPAN::Meta::Requirements"^^doap-deps:CpanId;
+	], [ doap-deps:on "Data::Dump 0"^^doap-deps:CpanId ], [ doap-deps:on "File::chdir 0"^^doap-deps:CpanId ], [ doap-deps:on "List::MoreUtils 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Module::CPANfile 1.0002"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Metadata 0"^^doap-deps:CpanId ], [
+		doap-deps:on "Module::Signature 0"^^doap-deps:CpanId;
+	], [ doap-deps:on "Module::Runtime 0"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::More 0.96"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt>;
+	doap:category        [ rdfs:label "CPAN" ], [ rdfs:label "Perl" ], [ rdfs:label "Package" ], [ rdfs:label "Distribution" ], [ rdfs:label "Release" ];
+	doap:created         "2013-08-07"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Dist-Inkt>;
+	doap:homepage        <https://metacpan.org/release/Dist-Inkt>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Dist-Inkt";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-004>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-005>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-006>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-007>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-008>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-009>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-010>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-011>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-012>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-013>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-014>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-015>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-016>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-017>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-018>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-019>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-020>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-021>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-022>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-023>, <http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-024>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-dist-inkt>;
+	];
+	doap:shortdesc       "yet another distribution builder";
+	doap:wiki            <https://github.com/tobyink/p5-dist-inkt/wiki>.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "Initial release";
+	dc:identifier        "Dist-Inkt-0.001"^^xsd:string;
+	dc:issued            "2013-08-09"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-002>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.002"^^xsd:string;
+	dc:issued            "2013-08-09"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Add shebang to `bin/distinkt-dist`.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Avoid creating empty 'x_contributors' keys in META.json/META.yml.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.003"^^xsd:string;
+	dc:issued            "2013-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Don't pass ExtUtils::MakeMaker the AUTHOR as an arrayref unless its version number >= 6.5702.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-004>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.004"^^xsd:string;
+	dc:issued            "2013-08-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Attempt to support ExtUtils::MakeMaker 6.17. Don't pass WriteMakefile a LICENSE unless EUMM >= 6.3001; don't pass it a DISTVNAME at all.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "For ExtUtils::MakeMaker versions that don't support TEST_REQUIRES, bundle it in with BUILD_REQUIRES, not CONFIGURE_REQUIRES.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "For ExtUtils::MakeMaker versions that don't support BUILD_REQUIRES, bundle it in with PREREQ_PM, not CONFIGURE_REQUIRES.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-005>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.005"^^xsd:string;
+	dc:issued            "2013-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Use the shiny, new RDF::DOAP for a lot of the behind-the-scenes DOAP processing.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Support the `x_help_wanted` key for META.json/META.yml.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.005.tar.gz>;
+	doap:revision        "0.005"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-006>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.006"^^xsd:string;
+	dc:issued            "2013-08-13"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Guess some copyrights for the COPYRIGHT file.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.006.tar.gz>;
+	doap:revision        "0.006"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-007>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.007"^^xsd:string;
+	dc:issued            "2013-08-27"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Rename META.ttl -> doap.ttl.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.007.tar.gz>;
+	doap:revision        "0.007"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-008>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.008"^^xsd:string;
+	dc:issued            "2013-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Perform conflicts checking in Makefile.PL.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Add `x_breaks` key to META.json if appropriate.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Don't add `x_provides_scripts` to META.json unless scripts are actually provided.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Allow `source_for_readme` to be set in Dist::Inkt constructor (and thus in dist.ini).";
+		], [
+			a doap-changeset:Packaging;
+			rdfs:label "Depend on a newer version of RDF::DOAP, thus we get more awesome Changes files.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.008.tar.gz>;
+	doap:revision        "0.008"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-009>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.009"^^xsd:string;
+	dc:issued            "2013-09-06"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Correct %script to %scripts in Dist::Inkt::Role::MetaProvidesScripts.";
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Replace => with = in assignment in Makefile.PL.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>;
+		], [
+			a doap-changeset:Bugfix;
+			rdfs:label "Make sure EUMM $VERSION gets evaled.";
+			doap-changeset:thanks <http://purl.org/NET/cpan-uri/person/haarg>;
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.009.tar.gz>;
+	doap:revision        "0.009"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-010>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.010"^^xsd:string;
+	dc:issued            "2013-09-11"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Support `feature` property from DOAP deps.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Output optional_features in META.json.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Use dynamic config in Makefile.PL to add dependencies for optional features.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Output an INSTALL file.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.010.tar.gz>;
+	doap:revision        "0.010"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-011>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.011"^^xsd:string;
+	dc:issued            "2013-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "META.json/yml license codes now conform to CPAN::Meta::Spec 2.0 instead of META-spec 1.4.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.011.tar.gz>;
+	doap:revision        "0.011"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-012>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.012"^^xsd:string;
+	dc:issued            "2013-09-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Generating LICENSE files now understands CPAN::Meta::Spec 2.0 license codes.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.012.tar.gz>;
+	doap:revision        "0.012"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-013>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.013"^^xsd:string;
+	dc:issued            "2013-09-22"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Generated Makefile.PL performs a better check for minimum Perl version.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.013.tar.gz>;
+	doap:revision        "0.013"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-014>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.014"^^xsd:string;
+	dc:issued            "2014-01-21"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Generated Makefile.PL explicitly lists test suite directories.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Use Path::Tiny's `subsumes` method over home-brew version.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Bundle a `distinkt-travisyml` script to automate creating .travis.yml files.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.014.tar.gz>;
+	doap:revision        "0.014"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-015>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.015"^^xsd:string;
+	dc:issued            "2014-03-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Guess repository details from repository web URL for github.com.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.015.tar.gz>;
+	doap:revision        "0.015"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-016>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.016"^^xsd:string;
+	dc:issued            "2014-05-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Split out a lot of functionality into Dist-Inkt-DOAP.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Dist::Inkt::Profile::Simple.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Dist::Inkt::Role::CPANfile.";
+		], [
+			a doap-changeset:Addition;
+			rdfs:label "Dist::Inkt::Role::WriteDOAPLite.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.016.tar.gz>;
+	doap:revision        "0.016"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-017>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.017"^^xsd:string;
+	dc:issued            "2014-05-26"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Simplify usage of Dist::Inkt::Profile::Simple, and example.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.017.tar.gz>;
+	doap:revision        "0.017"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-018>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.018"^^xsd:string;
+	dc:issued            "2014-06-14"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing File::chdir dependency.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.018.tar.gz>;
+	doap:revision        "0.018"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-019>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.019"^^xsd:string;
+	dc:issued            "2014-06-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add missing Path::FindDev dependency.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Cope when ~/perl5/standard-documents/ is missing.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Support PERL_DIST_INKT_NOSIGNATURE environment variable to skip building a SIGNATURE file.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.019.tar.gz>;
+	doap:revision        "0.019"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-020>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.020"^^xsd:string;
+	dc:issued            "2014-06-16"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improvements to command line scripts.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Better integration with haarg's perl-travis-helper stuff.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Added stub pod to command line scripts.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.020.tar.gz>;
+	doap:revision        "0.020"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-021>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.021"^^xsd:string;
+	dc:issued            "2014-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Documentation;
+			rdfs:label "Fix documentation of the `--TRAVIS` option.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Generated Makefile.PL should cope better if CPAN::Meta::Requirements is missing.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.021.tar.gz>;
+	doap:revision        "0.021"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-022>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.022"^^xsd:string;
+	dc:issued            "2014-06-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Bugfix;
+			rdfs:label "Fix check for existence of meta/META.PL.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Filter $meta->{provides} using $meta->{no_index}.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.022.tar.gz>;
+	doap:revision        "0.022"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-023>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.023"^^xsd:string;
+	dc:issued            "2014-09-17"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Change;
+			rdfs:label "Improve command-line option handling.";
+		], [
+			a doap-changeset:Change;
+			rdfs:label "Avoid outputting anonymous class names.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.023.tar.gz>;
+	doap:revision        "0.023"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Dist-Inkt/v_0-024>
+	a                    doap:Version;
+	dc:identifier        "Dist-Inkt-0.024"^^xsd:string;
+	dc:issued            "2017-05-05"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Addition;
+			rdfs:label "Support x_static_install.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Dist-Inkt-0.024.tar.gz>;
+	doap:revision        "0.024"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/haarg>
+	a                    foaf:Person;
+	foaf:name            "Graham Knop";
+	foaf:nick            "HAARG";
+	foaf:page            <https://metacpan.org/author/HAARG>.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

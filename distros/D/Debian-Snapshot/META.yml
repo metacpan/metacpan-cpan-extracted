@@ -1,0 +1,25 @@
+---
+abstract: 'interface to snapshot.debian.org'
+author:
+  - 'Ansgar Burchardt <ansgar@43-1.org>'
+build_requires:
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 3.101461, CPAN::Meta::Converter version 2.101461'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Debian-Snapshot
+requires:
+  Any::Moose: 0
+  Digest::SHA1: 0
+  File::Spec: 0
+  JSON: 0
+  LWP::UserAgent: 0
+  List::MoreUtils: 0
+resources:
+  repository: git://github.com/aburch/Debian-Snapshot.git
+version: 0.003

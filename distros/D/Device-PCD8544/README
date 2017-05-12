@@ -1,0 +1,4 @@
+Driver for the PCD8544 LCD controller, which is used in the Nokia 5110 display.
+
+Special thanks to SparkFun and AdaFruit, who each produced a lot of example code 
+and notes that was instrumental in getting this working.

@@ -1,0 +1,451 @@
+% Template for a long, formal document.  Be sure to run latex twice, 
+% or the table of contents will be correct.  Modify the definition and
+% content sections.
+
+
+%%%%%%%%%%%%%%%% Add definitions here %%%%%%%%%%%%%%%%%%%%%%%
+\def\title{Decompression Theory}
+\def\version{1.0}
+\def\author{Jaap Voets}
+\def\date{08-05-2006}
+%%%%%%%%%%%%%%%% End definition section %%%%%%%%%%%%%%%%%%%%%
+
+\documentclass[11pt]{report}
+%\usepackage{a4}
+\usepackage[pdftex]{graphicx}
+\usepackage{xspace}
+\usepackage{url}
+%\usepackage{fancyhdr}
+\usepackage[usenames]{color}
+\usepackage{eurosym}
+%\newcommand{\blinck}{Blinck International BV\xspace}
+
+%%%% Headers %%%%
+%\pagestyle{fancyplain}
+%\lhead[{\includegraphics[scale=0.05]{images/blincklogo.png}}]{\small \title}
+%\rhead[{\small \title}]{\includegraphics[scale=0.05]{images/blincklogo.png}}
+%\fancyfoot{} % Clear out the existing page number
+%\lfoot{{\slshape Version \version, \date}} 
+%\rfoot{\thepage}
+%\renewcommand{\headrulewidth}{0.4pt}
+%\renewcommand{\footrulewidth}{0.4pt}
+
+%%%% Title page %%%%
+\begin{document}
+\thispagestyle{empty}
+%\includegraphics[scale=0.3]{images/blincklogo.png} \vfill
+\begin{flushright}
+\LARGE \title\\ \normalsize \vspace{0.3in} \author \vfill
+\end{flushright}
+\begin{flushleft}
+\scriptsize \hrule \smallskip \date\hfill Version \version\\
+\end{flushleft}\normalsize
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% Begin Content %%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{Decompression theory}
+This document accompanies the perl module Deco.pm. It will give you a basic background on the Haldanian model used in the module.
+Many thanks go to the authors of www.deepocean.net who created the text from which I borrowed heavily.
+
+\section{History}
+
+ In modern diving, tables and schedules are common for estimating no-decompression limits, decompression profiles  and saturation levels. 
+ Use of a diving computer during the dive is most common nowadays. Tables and computers are based on decompression theory, which describes inert 
+ gas uptake and saturation of bodily tissue when breathing compressed air (or other gas mixtures). The development of this theory was started in 
+ 1908 by John Scott Haldane c.s. Haldane, an English physiologist, described the Nitrogen saturation process by using a body model which comprises 
+ several hypothetical tissue 'compartments'.\\
+ 
+A compartment can be characterized by a variable called 'half-time', which is a measure for inert gas 
+ uptake. Theory was further developed during the years '50 and '60 by U.S. Navy. The concept of 'M-values' was developed by Robert D. Workman of 
+ the U.S. Navy Experimental Diving Unit (NEDU). In the early '70s Schreiner applied the theory to changing pressure (ascending/descending). 
+ Recently Bühlmann improved the theory and developed ZH-12L and ZH-16L model, which are quite popular in current diving computers. 
+ At this moment a lot is still unknown about the exact processes which take place during saturation and decompression. 
+ Most of the theory presented has been found empirically, i.e. by performing tests on human subjects in decompression chambers and from 
+ decompression accident statistics. Recently, a more physical approach resulted in bubble theories. These theories physically describe what 
+ is happening during decompression.
+ 
+\section{Inert gas saturation and supersaturation}
+When you breathe a breathing gas that contains an inert gas (gasses which do not take part in the oxidative metabolism and are not 'used' by the body) 
+like Nitrogen (N2) or Helium (He2), this gas is dissolved in the blood by means of gas exchange in the lungs. Blood takes the dissolved gas to the 
+rest of the bodily tissue. Tissue takes up dissolved gas from the blood. Gas keeps on dissolving in blood and tissue until the partial pressure 
+of the dissolved gas is equal to the partial pressure of the gas breathed in, throughout the entire body. This is called saturation. 
+Rates of saturation vary with different parts of the body. 
+The nervous system and spine get saturated very fast (fast tissues), whereas fat and bones saturate very slowly 
+(slow tissues).\\
+
+When staying at sea level for a long time, like most of us do, and breathing air, again like most of us do, the entire body is saturated with 
+Nitrogen, which makes up the air for 78\%. Since at sea level air pressure is roughly 1 bar (we can neglect barometric air pressure variations, 
+which are expressed in milli-bar), the partial pressure of the dissolved Nitrogen thoughout the entire body is 1 bar * 78\%=0.78 bar (actually it 
+is a bit less, as we will see later, but for the moment this will do). If a diver dives to 20 meter, he breathes air at 3 bar. Partial Nitrogen 
+pressure in the air he breathes is 3 bar * 78\% = 2.34 bar. If the diver sits down and wait for quite a long time, the diver's body gets saturated 
+with Nitrogen at a partial pressure of 2.34 bar (the fastest tissues saturate in 25 minutes, the slowest take two and a half day to saturate). 
+So far, so good (at least if our diver has enough air supply).\\
+
+If the diver goes back to the surface, however, he arrives with his body saturated 
+with Nitrogen at a partial 2.34 bar pressure, whereas the air he breathes at the surface has a partial Nitrogen pressure of 0.78 bar. The body 
+is supersaturated. Dissolved Nitrogen in the tissue and blood will go back to the free gas phase, in order to equalize the pressures. 
+The Nitrogen forms micro bubbles, which are transported by the blood and removed from the body by the respiratory system. However, if to much 
+Nitrogen goes back to the free phase, micro bubbles grow and form bubbles that may block veins and arteries. The diver gets bent and will develop 
+decompression sickness (DCS) symptoms.\\
+
+A certain amount of supersaturation is allowed, without getting bent (at least with low risk of getting bent). In fact, supersaturation 
+(a pressure gradient) is needed in order to decompress (get rid of the excess Nitrogen). The amount of allowed supersaturation is different 
+for various types of tissue. This is the reason the body is divided in hypothetical tissue 'compartments' in most decompression models. 
+Each compartment is characterized by its half-time. This is the period the tissue takes a partial inert gas pressure which is half way between 
+the partial pressure before and after a pressure change of the environment. Haldane suggested two compartments, recent theories (like ZH-16L) 
+use up to 16 compartments. Decompression theory deals with two items:\\
+
+\begin{itemize}
+\item Modeling the inert gas absorption in the bodily tissue
+\item Estimate limits of supersaturation for each tissue, beyond which decompression sickness (DCS) symptoms develop
+\end{itemize}
+If these items are known, one can fill in tables, estimate no-decompression times, calculate decompression profiles, plan dives, etc. 
+
+\section{Calculating inert gas absorption by the tissue}
+
+In this section we will derive the equations which describe inert gas uptake by bodily tissue. If you get frightened by a bit of mathematics, 
+please skip the derivation, but have a look at the end result in the high lighted boxes (equation (\ref{haldane}) and (\ref{schreiner})). 
+The rate a particular tissue (compartment) takes up inert gas (i.e. the rate of change in partial pressure of that gas in the tissue) is 
+proportional to the partial pressure difference between the gas in the lungs and the dissolved gas in the tissue. We can express this 
+mathematically by:
+\begin{equation}  	
+\frac{d}{{dt}}P_t \left( t \right) =  k  [ P_{alv}  \left( t \right)  - P_t  \left( t \right) ] 
+\end{equation}  
+
+where
+\begin{itemize}
+\item $P_t\left(t\right)$ Partial pressure of the gas in the particular tissue ($bar$)
+\item $P_{alv}\left(t\right)$ Partial pressure of the gas in the breathing mix. To be precise: 
+Gas exchange takes place in the lungs (alveoli). Hence, we have to consider the gas alveolar partial pressure. 
+This pressure may be changing with time, if the diver changes depth ($bar$)
+\item $k$ A constant depending on the type of tissue ($min^{-1}$)
+\item $t$ Time ($min$)
+\end{itemize}
+
+This is a differential equation which is quite familiar in physics and apply to many processes like diffusion and 
+heat transfer. Solving this equation requires following steps:
+
+\begin{enumerate}
+\item Write the equation to the familiar form (a.k.a. the inhomogenous differential equation):
+
+\begin{equation}  	
+\frac{d}{{dt}}P \left( t \right) +  k  P_t \left( t \right) = k P_{alv}  \left( t \right)
+\label{haldane01}
+\end{equation}  
+
+
+\item Solve the homogenous equation (\ref{haldane02}) by trying $P_{th}\left(t\right) = C_0e^{-\lambda t}$ and solve for $\lambda$.
+\begin{equation}
+\frac{d}{{dt}}P_{th} \left( t \right) +  k  P_{th} \left( t \right) = 0
+\label{haldane02}
+\end{equation}
+
+The 'h' in $P_{th}$ denotes that we are dealing with the homogenous equation. Substituting the solution in (\ref{haldane02}) 
+results in $\lambda = k$. So the homogenous solution of the equation (\ref{haldane02}) is:
+\begin{equation}
+P_{th}  \left( t \right)   =  C_0 e^{-kt}
+\label{haldane03}
+\end{equation}
+
+\item Find the particular solution for the inhomogenous equation (\ref{haldane01}) and solve constants using boundary conditions. In order to solve this equation, 
+we have to know more about the partial gas pressure Palv(t). Two useful situations described in literature are a 
+situation in which $P_{alv}\left(t\right)$ is constant (corresponding to remaining at a certain depth) and a 
+situation in which $P_{alv}\left(t\right)$ varies linearly with time (corresponding to ascending/descending with 
+constant speed). We will have a look at both situations.
+
+\subsection{constant ambient pressure}
+
+We look at the situation in which the alveolar partial pressure of the gas remains constant: $P_{alv}\left(t\right) = P_{alv0}$.
+This corresponds to a diving situation in which the diver remains at a certain depth. Equation (\ref{haldane01}) becomes:
+
+\begin{equation}
+\frac{d}{{dt}}P_{t} \left( t \right) +  k  P_{t} \left( t \right) = k P_{alv0}
+\label{haldane04}
+\end{equation}
+
+We 'try' the solution:
+  
+\begin{equation}
+P_{t}  \left( t \right)   =  C_0 e^{-kt} + C_1
+\label{haldane05}
+\end{equation}	
+
+If we subsitute solution (\ref{haldane05}) in equation (\ref{haldane04}) the e's cancel out and we are left with $C_1 = P_{alv0}$. 
+Now we have to think of a boundary condition, in order to find $C_0$. We assume some partial pressure in the tissue 
+$P_t\left(0\right) = P_{t0}$ at $t=0$. If we substitute this into equation (\ref{haldane05}) we find that 
+$C_0 = [P_{t0} - P_{alv0} ]$. So we are left with the following equation for the partial pressure in a 
+specific type of tissue (characterized by the constant $k$):
+
+  
+\begin{equation}
+P_{t}  \left( t \right)   =  P_{alv0} + [P _{t0} - P_{alv0}]  e^{-kt} 
+\label{haldane06}
+\end{equation}
+
+where
+
+\begin{itemize}
+\item $P_t\left(t\right)$ Partial pressure of the gas in the tissue ($bar$)
+\item $P_{t0}$ Initial partial pressure of the gas in the tissue at t=0 ($bar$)
+\item $P_{alv0}$ Constant partial pressure of the gas in the breathing mix in the alveoli ($bar$)
+\item $k$ A constant depending on the type of tissue ($min^{-1}$)
+\item $t$ Time ($min$)
+\end{itemize}
+
+This equation is known in literature as the {\bf Haldane equation}. We can rewrite it a bit so that it corresponds to 
+a form which is familiar in decompression theory literature:
+  	
+\begin{equation}
+P_{t}  \left( t \right)   =  P_{t0} + [ P_{alv0} - P _{t0} ]  [ 1 - e^{-kt} ]
+\label{haldane}
+\end{equation}
+
+	
+\subsection{linearly varying ambient pressure}
+
+Very few divers plunge into the deep and remain at a certain depth for a long time. For that reason we will 
+look at the situation in which the diver ascends or descends with constant speed. This means the partial 
+pressure of the gas he breathes varies linearly with time. Going back to equation (\ref{haldane01}) this means $P_{alv}$ can be 
+writen as $P_{alv} = P_{alv0} + Rt P_{alv0}$ is the initial partial pressure of the gas in the breathing mixture at t=0, 
+and R is the change rate (in bar/minute) of the partial pressure of this gas in the alveoli. Note: R is positive 
+for descending (pressure increase) and negative for ascending (pressure decrease). Substituting this in (\ref{haldane01}) gives us:
+  
+\begin{equation}
+\frac{d}{{dt}}P_{t} \left( t \right) +  k  P_{t} \left( t \right) = k P_{alv0} + k R t
+\label{schreiner01}
+\end{equation}	
+
+We 'try' the solution:
+  	
+\begin{equation}
+P_{t}  \left( t \right)   =  C_0 e^{-kt} + C_1 t + C_2
+\label{schreiner02}
+\end{equation}
+
+Substituting solution (\ref{schreiner02}) in equation (\ref{schreiner01}) leaves us with:
+
+\begin{equation}
+[ k C_1 - k R ]  t +  [ C_1 + k C_2 - k P_{alv0} ]   =  0
+\label{schreiner03}
+\end{equation}
+
+To find a solution for $C_1$ and $C_2$ that hold for every t we have to make both parts between the square brackets 
+in (\ref{schreiner03}) equal to 0. This results in $C_1 = R$ and $C_2 = P_{alv0} - \frac{R}{k}$. In this way we find:
+	
+\begin{equation}
+P_{t}  \left( t \right)   =  C_0 e^{-kt} +R t + P_{alv0} - \frac{R}{k}
+\label{schreiner05}
+\end{equation}
+
+Again we use as boundary condition $P_t\left(0\right) = P_{t0}$ at t=0 in order to find $C_0$. 
+Substituting this in (\ref{schreiner05}) 
+we find $C_0 = P_{t0} - P_{alv0} + R/k.$ So for the ultimate solution we find:
+
+
+\begin{equation}
+P_{t}  \left( t \right)   = P_{alv0} + R [t +  - \frac{R}{k}] - [ P_{alv0} - P_{t0}  - \frac{R}{k} ] e^{-kt}
+\label{schreiner}
+\end{equation}
+
+where 
+
+\begin{itemize}
+\item $P_t\left(t\right)$    Partial pressure of the gas in the tissue (bar)
+\item $P_{t0}$    Initial partial pressure of the gas in the tissue at t=0 (bar)
+\item $P_{alv0}$    Initial (alveolar) partial pressure of the gas in the breathing mix at t=0 (bar)
+\item $k$    A constant depending on the type of tissue
+\item $R$    Rate of change of the partial inert gas pressure in the breathing mix in the alveoli (bar/min) R=Q Ramb, 
+    in which Q is the fraction of the inert gas and Ramb is the rate of change of the ambient pressure.
+\item $t$    Time (min)
+\end{itemize}
+
+This solution was first proposed by Schreiner and hence known as the {\bf Schreiner equation}. 
+If we set the rate of change R to 0 (remaining at constant depth), the equation transforms in the Haldane 
+equation (\ref{haldane}). The Schreiner equation is excellent for application in a simulation as used in diving computers. 
+With the same frequency of measuring of the environment pressure and performing the calculation, applying the 
+Schreiner equation gives a more precise approximation of the actual pressure profile in the bodily tissue than 
+the Haldane equation. 
+\end{enumerate}
+
+\section{Half times}
+So we see an exponential behavior. When we look at the first situation (constant depth) we have a tissue with in 
+initial partial pressure $P_{t0}$. Eventually the partial pressure of gas in the tissue will reach the partial 
+pressure of the gas in the breathing mixture $P_{alv0}$. We can calculate how long it takes for the partial pressure 
+to get half way in between, i.e. $e^{-k\tau} = \frac{1}{2}$. The variable $\tau$ (tau) is called the 'half-time' and is 
+usually used for characterizing tissue (compartments). Rewriting: $-k\tau = \ln\left(\frac{1}{2}\right) = -\ln\left(2\right)$. 
+So the relation between $k$ and the half-time $\tau$ is:
+ 
+\begin{equation}
+\tau = \frac{\ln\left(2\right)}{k}
+\label{halftime1}
+\end{equation}
+
+and
+\begin{equation}
+k = \frac{\ln\left(2\right)}{\tau}
+\label{halftime2}
+\end{equation}
+
+\section{The alveolar partial pressure}
+
+So far we did not worry about the values of $P_{alv}$. We will have a closer look at this alveolar partial pressure 
+of the inert gas and how it is related to the ambient pressure. The pressure of the air (or gas mixture) 
+the diver breathes is equal to the ambient pressure Pamb surrounding the diver. The ambient pressure depends on the 
+water depth and the atmospheric pressure at the water surface. To be precise: it is equal to the atmospheric 
+pressure (1 bar at sea level) increased with 1 bar for every ten meters depth. The partial pressure of the inert gas 
+in the alveoli depends on several factors:
+
+\begin{itemize}
+\item The partial pressure (fraction Q) of the inert gas in the air or gas mixture breathed in
+\item The water vapor pressure. The dry air breathed in is humidified completely by the upper airways 
+(nose, larynx, trachea). Water vapor dilutes the breathing gas. A constant vapor pressure at 37 degrees Celsius 
+of 0.0627 bar (47 mm Hg) has to be subtracted from the ambient pressure
+\item Oxygen O$_2$ is removed from the breathing gas by respiratory gas exchange in the lungs
+\item Carbon Dioxide CO$_2$ is added to the breathing gas by gas exchange in the lungs. Since the partial pressure 
+of CO$_2$ in dry air (and in common breathing mixtures) is negligible, the partial pressure of the CO$_2$ in the lungs 
+will be equal to the arterial partial pressure. This pressure is 0.0534 bar (40 mm Hg).
+\end{itemize}
+
+The process of Oxygen consumption and Carbon Dioxide production is characterized by the respiratory quotient RQ, 
+the volume ratio of Carbon Dioxide production to the Oxygen consumption. Under normal steady state conditions the 
+lungs take up about 250 ml of Oxygen, while producing about 200 ml of Carbon Dioxide per minute, resulting in an 
+RQ value of about 200/250=0.8. Depending on physical exertion and nutrition RQ values range from 0.7 to 1.0. 
+Schreiner uses RQ=0.8 , US Navy uses RQ=0.9 and Bühlmann uses 1.0.\\
+
+The alveolar ventilation equation gives us the partial pressure of the inert gas with respect to the ambient pressure:
+\begin{equation}  	
+P_{alv}  =   [ P_{amb} - P_{H2O} - P_{CO2} + \Delta P_{O2} ]  Q
+\end{equation} 
+
+or after rewriting
+\begin{equation}  
+P_{alv}  =   [ P_{amb} - P_{H2O} + \frac{1 - RQ}{RQ}  P_{CO2} ] Q
+\label{alveolar}
+\end{equation} 
+
+where 
+\begin{itemize}
+\item $P_{alv}$    Partial pressure of the gas in the alveoli (bar)
+\item $P_{amb}$    Ambient pressure, i.e. the pressure of the breathing gas(bar)
+\item $P_{H2O}$    Water vapor pressure, at 37 degrees Celsius 0.0627 bar (47 mm Hg)
+\item $P_{CO2}$    Carbon Dioxide pressure, we can use 0.0534 bar (40 mm Hg) 
+\item $\Delta P_{O2}$    Decrease in partial Oxygen pressure due to gas exchange in the lungs 
+\item $RQ$    Respiratory quotient: ratio of Carbon Dioxide production to Oxygen consumption
+\item $Q$    Fraction of inert gas in the breathing gas. For example N2 fraction in dry air is 0.78
+\end{itemize}
+
+The Schreiner RQ value is the most conservative of the three RQ values. Under equal circumstances using the 
+Schreiner value results in the highest calculated partial alveolar pressure and hence the highest partial 
+pressure in the tissue compartments. This leads to shorter no decompression times and hence to less risk for DCS. 
+
+\section{Example}
+We will have a look at our diver who plunges to 30 m and stays there for a while. 
+The diver breathes compressed air and did not dive for quite a while before this dive. 
+So at the start of the dive, all his tissue is saturated with Nitrogen at a level that corresponds to sea level. 
+We neglect the period of descending. In particular, we will look at two types of tissue in his body with a half 
+time of 4 minutes (the fastest tissue) resp. 30 minutes (medium fast tissue). The ambient pressure at 30 meters is 
+4 bar. Equation (\ref{alveolar}) gives us a partial alveolar N2 pressure of 3.08 bar at 30 meters and 0.736 bar at 
+sea level, using the RQ=0.9 value of the US Navy. Substituting these values in equation (\ref{haldane}) result in (14), 
+predicting the partial pressure in the tissues. This pressure is shown in figure 1:
+
+\begin{equation}
+P_{t4}  \left( t \right)   =  3.08 + [ 0.736 - 3.08 ]  [ 1 - e^{- \frac{\ln(2)}{4}t} ]
+\end{equation}
+
+\includegraphics[scale=0.6]{images/tissue4.png} \vfill
+After 10 minutes at 30 meters, this diver comes up to 20 meters, will stay there for another 5, then goes on to 10 meters 
+for another 5 minutes and finally surfaces. As you can see in figure \ref{fig_tissue4} the pressure 
+increases with the predicted exponential form, untile we decrease the ambient pressure. A distinct
+ ``knack'' in de the graph marks the start of the off-gassing phase.
+
+\section{Supersaturation limits and M-Values}
+
+So we are now able to calculate inert gas levels and the amount of supersaturation in all tissue
+ compartments of the diver. As we stated a certain amount of supersaturation is allowed, without
+  developing DCS symptoms. In this section we will define limits applying to supersaturation levels. 
+  As we will see these limits depend on:
+\begin{itemize}
+\item Type (half-time) of the tissue
+\item Ambient pressure, i.e. the pressure of the breathing gas (depending on depth and atmospheric pressure)
+\end{itemize}
+
+\subsection{Limits according to Haldane}
+
+In 1908 Haldane presented the first model for decompression. He noticed that divers could surface from a depth of 10 meter, 
+without developing DCS. He concluded that the pressure in the tissue can exceed the ambient pressure by a factor of 2. 
+(Actually the factor the partial pressure of the Nitrogen in the body exceeds the ambient pressure is 0.78*2=1.56, as Workman concluded)
+
+Haldane used this ratio to construct the first decompression tables. Up to 1960 ratio's were used. Different ratio's were defined by various scientists. 
+In that period most of the US Navy decompression tables were calculated using this method.  
+
+
+\subsection{Workman M-values}
+
+At longer and deeper dives, the ratio limits did not provide enough safety. Further research into supersaturation limits was performed by 
+Robert D. Workman around 1965. Workman performed research for the U.S. Navy Experimental Diving Unit (NEDU). He found that each tissue compartment had a 
+different partial pressure limit, above which DCS symptoms develop. He called this limiting pressure M. He found a linear relationship between this M-value and depth. 
+Hence he defined this relationship as: 
+\begin{equation}
+M  =  M_0 + \Delta M d
+\label{workman}
+\end{equation}
+
+where
+
+\begin{itemize}
+\item $M$    Partial pressure limit, for each tissue compartment (bar)
+\item $M_0$    The partial pressure limit at sea level (zero depth), defined for each tissue compartment (bar)
+\item $\Delta M$   Increase of M per meter depth, defined for each compartment (bar/m)
+\item $d$    Depth (m) 
+\end{itemize}
+
+\section{No-decompression times}
+
+A number of tables, like the PADI RDP express no-decompression times. These are maximum times a diver can stay at a certain depth being able to go to the surface 
+without the need for decompression stops. Based on equation (\ref{haldane}) we can calculate this time for a particular tissue compartment:
+
+\begin{equation}  
+t_{no\_deco}  =   - \frac{1}{k} \ln \left ( \frac{ P_{no\_deco} - P_{alv0} } { P_{t0} - P_{alv0} } \right )
+\label{no_deco_time}
+\end{equation}
+
+Ofcourse we have to calculate this time for every tissue and take the minimum value as limit for 
+the diver to remain at the depth. 
+
+\chapter{Oxygen}
+
+Oxygen is the gas that keeps you alive. The human body needs oxygen to generate energy. We can't do very long 
+without it. Oxygen however can also kill you. In certain cases, it becomes poisenous. In recreational diving with
+air you will hardly run into the oxygen limits. If you stick to not going deeper than the advised maximum depth
+of 40 meters and keeping within the no-decompression limits.
+
+\section{CNS}
+There are 2 ways in which oxygen becomes toxic. The first one is directly related to the depth and gas you are breathing.
+When the partial pressure of oxgyen (the $pO_2$) exceeds 1.6 bar, you are at direct risk of convulsing.
+This would be pretty harmless if you weren't submerged. A diver convulsing is bound to lose his regulator and drown.
+So to avoid problems it is advised to keep the $pO_2$ below 1.4 and only use 1.6 when in rest during a decompression stop.
+
+
+\section{Pulmonary Oxygen Toxicity}
+
+When the lungs are exposed to partial oxygen pressures of 0.5 bar or more, they become irritated. This version of
+oxygen toxicity is not life threatening, but a temporary drop in the functioning of your breathing apparatus.
+To track the exposure to high oxygen levels, the \bf{Oxygen Tolerance Units} have been invented. These are defined as:
+\begin{equation}  
+OTU  =   t * \left ( \frac{pO_2 - 0.5} { 0.5 } \right ) ^ { - \frac{5}{6} }     , when pO_2 > 0.5
+\label{otu}
+\end{equation}
+
+where
+
+\begin{itemize}
+\item $pO_2$ partial Oxygen pressure in bar
+\item $t$    time in minutes exposed to the $pO_2$
+\end{itemize}
+
+Depending on how many days in a row you are diving there are limits on the number of OTU's you can acquire.
+
+\section{CNS}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%% End Content %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

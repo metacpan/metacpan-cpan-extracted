@@ -1,0 +1,3 @@
+/* iid = <%= $iid %> */
+
+% include 'usual_select', id => $iid

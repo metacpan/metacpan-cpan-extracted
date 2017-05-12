@@ -1,0 +1,85 @@
+DBIx/Informix/Perform version 0.01
+=========================
+
+
+DBIx::Informix::Perform - Informix Perform(tm) emulator
+
+
+Emulates the Informix Perform character-terminal-based database query
+and update utility.  
+
+DESCRIPTION
+
+The filename given to the I<perform> command may be a Perform
+specification (.per) file.  The call to the I<run> function may be a
+filename of a .per file or of a file pre-digested by the
+DBIx::Informix::Perform::DigestPer class (extension .pps).  [Using
+pre-digested files does not appreciably speed things up, so this
+feature is not highly recommended.]
+
+The argument to the I<run> function may also be a string holding the
+contents of a .per or .pps file, or a hash ref with the contents of a
+.pps file (keys db, screen, tables, attrs).
+
+The database named in the screen spec may be a DBI connect argument, or
+just a database name.  In that case, the database type is taken from
+environment variable DB_CLASS.  The username and password are taken from
+DB_USER and DB_PASSWORD, respectively.
+
+Supports the following features of Informix's Perform:
+
+ Field Attributes: COLOR, NOENTRY, NOUPDATE, DEFAULT, UPSHIFT, DOWNSHIFT,
+		   INCLUDE, COMMENTS
+
+ 2-table Master/Detail  (though no query in detail mode)
+
+ VERY simple control blocks (nextfield= and let f1 = f2 op f3-or-constant)
+
+
+INSTALLATION
+
+You know the drill:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI  DBD::whatever
+  Curses  Curses::Application Curses::Forms  Curses::Widgets::*
+
+LIMITATIONS
+
+ It has been tested on Postgres and MySQL only (the open_db function
+ only has provision for those two DBI connection_arg syntaxes).
+
+ Anyone wishing to whip it into shape on Oracle, Sybase, Informix (heh)
+ or DB2 would be welcomed.
+
+
+FUNDING CREDIT
+
+Development of DBIx::Informix::Perform was generously funded by Telecom
+Engineering Associates of San Carlos, CA, a full-service 2-way radio
+and telephony services company primarily serving public-sector
+organizations in the SF Bay Area.  On the web at
+http://www.tcomeng.com/  (do I sound like Frank Tavares yet?).
+
+AUTHOR
+
+Eric C. Weaver  E<lt>weav@sigma.netE<gt> 
+
+
+COPYRIGHT AND LICENSE and other legal stuff
+
+Copyright 2003 by Eric C. Weaver and 
+Telecom Engineering Associates (a California corporation).
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+INFORMIX is a registered trademark of Informix Software, Inc.

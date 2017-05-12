@@ -1,0 +1,45 @@
+    ! Need to add a test for removal of code
+    ! Consider adding the DSN as __FILE__
+
+0.08 20140924
+    * Changed Everything website (RT #39669), noted by DUNCAND
+    * Fix for Perl 5.21.4
+
+0.07 20080928
+    * Added DBIx/VersionedSubs/Hash.pm
+    * More tests for ::Hash
+
+0.06 20070819
+    * Documentation updates
+    * t/99-versions.t needs File::Slurp
+    * No code changes, no upgrade neccessary
+
+0.05 20070513
+    * The code now gets put not only into the right package
+      but it also gets compiled with the right package, so
+      BEGIN{...} blocks can be used to declare variables.
+    * Added tests for syntax errors in blocks
+    * Added tests for strict errors in blocks
+    * Added tests for __PACKAGE__
+
+0.04 20060806
+    * ::AutoLoad didn't remove subroutines that had
+      expired. This bug remains open but there is a
+      workaround in place which replaces changed subs
+      with code that re-fires AUTOLOAD.
+
+0.03 20060804
+    * Added AutoLoad.pm which does lazy loading of code
+      instead of loading all of the code all of the time
+    * Added tests for AutoLoad.pm which ensure that the
+      behaviour is identical across the two versions
+      except where it isn't.
+
+0.02 20060726
+    * Added SEE ALSO and ALTERNATIVE NAMES sections, credited Tye for the name
+    * Added missing prerequisites for the examples
+    * No functional changes in the main code
+    * Added more pod discussing the database tables
+
+0.01 20060726
+    * Released on the unsuspecting world

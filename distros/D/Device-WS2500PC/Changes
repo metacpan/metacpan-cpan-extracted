@@ -1,0 +1,14 @@
+Revision history for Perl extension Device::WS2500PC.
+
+0.99b 2005-02-09
+	- Bugfix: Reading of other sensors than temp1-temp8 issued warnings
+	- Added: ws2500_GetDatasetBulk
+	- Modified: example program now uses the new bulk function
+
+0.99a 2004-02-08
+	- Bugfix: make will now also work with other perl versions
+	- Bugfix: make test work also with older installations
+
+0.99  2004-02-06 
+	- Inital release
+

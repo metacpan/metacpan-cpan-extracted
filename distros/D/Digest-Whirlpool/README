@@ -1,0 +1,94 @@
+NAME
+    Digest::Whirlpool - A 512-bit, collision-resistant, one-way hash
+    function
+
+ABSTRACT
+    WHIRLPOOL is a 512-bit, collision-resistant, one-way hash function
+    developed by Paulo S. L. M. Barreto and Vincent Rijmen. It has been
+    recommended by the NESSIE project (along with SHA-256/384/512) and
+    adopted as ISO/IEC 10118-3.
+
+SYNOPSIS
+    In programs:
+
+        # Using L<Digest> (recommended)
+        use Digest;
+
+        my $whirlpool = Digest->new( 'Whirlpool' );
+
+        # Get a hash and reset the object
+        $whirlpool->add( "hash this" );
+        my $hexdigest = $whirlpool->hexdigest;
+
+        # Populate the object again, and clone it before getting the
+        # digest to avoid resetting
+        $whirlpool->add( "hash this" );
+        my $b64digest = $whirlpool->clone->b64digest;
+        $whirlpool->add( "add this to the hash" );
+
+        # Using this module directly (same interface)
+        use Digest::Whirlpool;
+        my $whirlpool = Digest->new( 'Whirlpool' );
+        $whirlpool->add( ... );
+        ....
+
+    From the command line:
+
+        whirlpoolsum files
+        whirlpoolsum --help
+
+DESCRIPTION
+    Provides an interface to the WHIRLPOOL hash algorithm. This module
+    subclasses Digest::base and can be used either directly or through the
+    Digest meta-module. Using the latter is recommended.
+
+EXPORT
+    None.
+
+METHODS
+    Since this module implements the standard Digest interface and should be
+    used through the Digest module you should look at that documentation for
+    the general interface, below is a description of methods that differ.
+
+  clone
+    Copy the internal state of the current object into a new object and
+    return it.
+
+  reset
+    Resets the object to the same internal state it was in when it was
+    constructed.
+
+    This works exactly like "new" except it doesn't allocate new memory for
+    its internal state.
+
+  base64digest
+    An legacy alias for the b64digest method which should be used instead.
+
+  hashsize
+    Returns the size (in bits) of a WHIRLPOOL hash, i.e. 512.
+
+SEE ALSO
+    *   NESSIE consortium, *Portfolio of recommended cryptographic
+        primitives*, February 27, 2003.
+
+    *   <http://paginas.terra.com.br/informatica/paulobarreto/WhirlpoolPage.
+        html>
+
+AUTHORS & HISTORY
+    The original version of this package was written by Julius C. Duque in
+    2003. It was rewritten by Ævar Arnfjörð Bjarmason <avar@cpan.org> in
+    January 2007 who added compatability with the Digest interface, improved
+    documentation and a whirlpoolsum(1) command-line utility amongst other
+    things.
+
+BUGS
+    Please report any bugs that aren't already listed at
+    <http://rt.cpan.org/Dist/Display.html?Queue=Digest-Whirlpool> to
+    <http://rt.cpan.org/Public/Bug/Report.html?Queue=Digest-Whirlpool>
+
+LICENSE
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    Copyright 2003 Julius C. Duque and 2007 Ævar Arnfjörð Bjarmason.
+

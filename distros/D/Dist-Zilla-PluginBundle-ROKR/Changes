@@ -1,0 +1,33 @@
+TODO:
+    - Uhh, tests
+
+0.0019 Tuesday August 23 11:51:06 PDT 2011:
+    - Place CopyReadmeFromBuild into a dedicated distribution (rt70435)
+
+0.0018 Monday February 21 08:37:22 PST 2011:
+    - Changed environment variable to _CopyFromBuildAfterBuild
+
+0.0017 Friday February 18 11:22:57 PST 2011:
+    - Fixed issue with *CopyFromBuild not working
+
+0.0016 Thursday February 17 22:24:47 PST 2011:
+    - Added DZIL_CopyFromBuildAfter environment option
+    - Run CopyMakefilePLFromBuild and CopyReadmeFromBuild as AfterRelease (DOHERTY)
+
+0.0015 Sunday November 21 10:16:07 PST 2010:
+    - Fixed circular dependency (thanks DOHERTY)
+
+0.0014 Tuesday October 12 15:46:04 PDT 2010:
+    - Fixed undef payload issue
+
+0.0013 Sunday October 10 13:41:42 PDT 2010:
+    - Updated build/release process
+
+0.0012 Sunday May 16 20:16:49 PDT 2010:
+    - Look for README.mkdn as well
+
+0.0011 Thursday May 13 11:40:11 PDT 2010:
+    - Added basic loading test
+
+0.0010 Wednesday May 12 09:18:36 PDT 2010:
+    - Initial release

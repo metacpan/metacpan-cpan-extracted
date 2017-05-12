@@ -1,0 +1,26 @@
+---
+abstract: 'load data from F<Atmel> F<AVR Studio> device files'
+author:
+  - 'Paul Evans <leonerd@leonerd.org.uk>'
+build_requires:
+  Test::More: '0.88'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-AVR-Info
+provides:
+  Device::AVR::Info:
+    file: lib/Device/AVR/Info.pm
+    version: '0.01'
+  Device::AVR::Info::Module:
+    file: lib/Device/AVR/Info/Module.pm
+    version: '0.01'
+requires:
+  Struct::Dumb: '0'
+  XML::Smart: '0'
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

@@ -1,0 +1,26 @@
+---
+abstract: 'Build and upload source package to ppa.launchpad.net'
+author:
+  - 'Sergei Svistunov <sergei-svistunov@yandex.ru>'
+build_requires:
+  Test::DZil: 0
+  Test::More: 0.88
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-LaunchpadPPA
+requires:
+  Archive::Tar: 0
+  Dist::Zilla::Role::Releaser: 0
+  Dpkg::Changelog::Parse: 0
+  File::pushd: 0
+  Moose: 0
+  Path::Class: 0
+version: 0.1

@@ -1,0 +1,200 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>DBIx::MyPassword - Store database authentication information in a CSV file</title>
+<link rev="made" href="mailto:root@localhost" />
+</head>
+
+<body style="background-color: white">
+
+<p><a name="__index__"></a></p>
+<!-- INDEX BEGIN -->
+
+<ul>
+
+	<li><a href="#name">NAME</a></li>
+	<li><a href="#synopsis">SYNOPSIS</a></li>
+	<li><a href="#description">DESCRIPTION</a></li>
+	<ul>
+
+		<li><a href="#password_file_contents">Password File Contents</a></li>
+		<li><a href="#specifying_the_password_file_location">Specifying The Password File Location</a></li>
+		<li><a href="#securing_the_password_file">Securing The Password File</a></li>
+	</ul>
+
+	<li><a href="#subroutine_details">SUBROUTINE DETAILS</a></li>
+	<ul>
+
+		<li><a href="#connect_virtual_user_"><code>connect(virtual_user)</code></a></li>
+		<li><a href="#getvirtualusers__"><code>getVirtualUsers()</code></a></li>
+		<li><a href="#checkvirtualuser_virtual_user_"><code>checkVirtualUser(virtual_user)</code></a></li>
+		<li><a href="#getuser_virtual_user_"><code>getUser(virtual_user)</code></a></li>
+		<li><a href="#getpassword_virtual_user_"><code>getPassword(virtual_user)</code></a></li>
+		<li><a href="#getdatasource_virtual_user_"><code>getDataSource(virtual_user)</code></a></li>
+		<li><a href="#getoptions_virtual_user_"><code>getOptions(virtual_user)</code></a></li>
+	</ul>
+
+	<li><a href="#install">INSTALL</a></li>
+	<li><a href="#author">AUTHOR</a></li>
+	<li><a href="#see_also">SEE ALSO</a></li>
+</ul>
+<!-- INDEX END -->
+
+<hr />
+<p>
+</p>
+<h1><a name="name">NAME</a></h1>
+<p>DBIx::MyPassword - Store database authentication information in a CSV file</p>
+<p>
+</p>
+<hr />
+<h1><a name="synopsis">SYNOPSIS</a></h1>
+<pre>
+  #--&gt; Include the module, letting it search for a password file
+  use DBIx::MyPassword;</pre>
+<pre>
+  #--&gt; Include the module, giving it an explicit file
+  use DBIx::MyPassword qw(/password/file.csv);</pre>
+<pre>
+  #--&gt; Connect to database returning DBI database handle
+  my $dbh = DBIx::Password-&gt;connect($user);</pre>
+<pre>
+  #--&gt; Get a list of all available virtual users
+  DBIx::MyPassword-&gt;getVirtualUsers();</pre>
+<pre>
+  #--&gt; Check to see if a virtual user exits
+  DBIx::MyPassword-&gt;checkVirtualUser($user);</pre>
+<pre>
+  #--&gt; Get the real database user for a virtual user
+  DBIx::MyPassword-&gt;getUser($user);</pre>
+<pre>
+  #--&gt; Get the database password for a virtual user
+  DBIx::MyPassword-&gt;getPassword($user);</pre>
+<pre>
+  #--&gt; Get the data source information for a virtual user
+  DBIx::MyPassword-&gt;getDataSource($user);</pre>
+<pre>
+  #--&gt; Get any database options for a virtual user
+  DBIx::MyPassword-&gt;getOptions($user);</pre>
+<p>
+</p>
+<hr />
+<h1><a name="description">DESCRIPTION</a></h1>
+<p>This module was largely motivated by DBIx::Password.  It is a different take that gives you the ability to keep many different password files.  This helps on multi-user machines, where each user can have their own protected password file and still get the benefits of using aliases.</p>
+<p>Keeping all of your password information in one place has many benefits.  For one, if you have a security policy that forces you to periodically change your database password, you only have to make the change in one place to change it for all of your scripts.  Also, with all of your passwords in one spot, you can make sure that the security on your password file is tight.</p>
+<p>
+</p>
+<h2><a name="password_file_contents">Password File Contents</a></h2>
+<p>This module assumes that all of your database connection information is stored in a standard CSV file.  This file (or files) can have as many records as you would like.  The fields found in each record include:</p>
+<ol>
+<li><strong><a name="item_alias">Alias</a></strong><br />
+</li>
+The only non-connection field, this is the alias that you will use to reference the connection information
+<p></p>
+<li><strong><a name="item_user">User</a></strong><br />
+</li>
+The database user
+<p></p>
+<li><strong><a name="item_password">Password</a></strong><br />
+</li>
+The password for the database user
+<p></p>
+<li><strong><a name="item_data_source">Data Source</a></strong><br />
+</li>
+A DBI data source, for instance ``dbi:mysql:test''
+<p></p>
+<li><strong><a name="item_options">Options</a></strong><br />
+</li>
+DBI options that will be eval'ed into a hash, for instance ``RaiseError=&gt;1,PrintError=&gt;1''
+<p></p></ol>
+<p>
+</p>
+<h2><a name="specifying_the_password_file_location">Specifying The Password File Location</a></h2>
+<p>Currently, there are four places that this module searches for your password file.  The order of the search is:</p>
+<ol>
+<li><strong><a name="item_explicit_file_via_use">Explicit File Via use</a></strong><br />
+</li>
+File specified in when 'use'ing the module
+<p></p>
+<li><strong><a name="item_explicit_file_via_environment">Explicit File Via Environment</a></strong><br />
+</li>
+File specified by the MYPASSWORD environment variable
+<p></p>
+<li><strong><a name="item_current_working_directory">Current Working Directory</a></strong><br />
+</li>
+A file named '.mypassword' in the current working directory
+<p></p>
+<li><strong><a name="item_home_directory">Home Directory</a></strong><br />
+</li>
+A file named '.mypassword' in the users home directory, as specified by the HOME environment variable
+<p></p></ol>
+<p>
+</p>
+<h2><a name="securing_the_password_file">Securing The Password File</a></h2>
+<p>One of the primary reasons that this module was developed was so that I could secure my password information in a shared environment.  Here is how I do it.  If you see holes in this, please let me know.  Also, I do most of my development on some flavor of UNIX, Linux, AIX, etc.  These systems are what I know best.  If there is a better (or just plain different) way to do security on another system, let me know and I'll include it here.</p>
+<p>For *X, all that you have to do is change the permissions on your password file so that you are the only person who can read it.  A simple:</p>
+<pre>
+        chmod 400 .mypassword</pre>
+<p>is all that it takes.  Each user can have their own password file that only they can read.  The caveat of this is that only scripts executed by you can read the file too... not sure how that fairs for web development.</p>
+<p>
+</p>
+<hr />
+<h1><a name="subroutine_details">SUBROUTINE DETAILS</a></h1>
+<p>
+</p>
+<h2><a name="connect_virtual_user_"><code>connect(virtual_user)</code></a></h2>
+<p>An override of the of the DBI::connect subroutine.  This method looks up the specified virtual user and returns a standard DBI connection.</p>
+<p>
+</p>
+<h2><a name="getvirtualusers__"><code>getVirtualUsers()</code></a></h2>
+<p>Return a sorted list of virtual users.</p>
+<p>
+</p>
+<h2><a name="checkvirtualuser_virtual_user_"><code>checkVirtualUser(virtual_user)</code></a></h2>
+<p>Returns true if the specified virtual user exists, false if not.</p>
+<p>
+</p>
+<h2><a name="getuser_virtual_user_"><code>getUser(virtual_user)</code></a></h2>
+<p>Return database user for the specified virtual user.</p>
+<p>
+</p>
+<h2><a name="getpassword_virtual_user_"><code>getPassword(virtual_user)</code></a></h2>
+<p>Return password for the specified virtual user.</p>
+<p>
+</p>
+<h2><a name="getdatasource_virtual_user_"><code>getDataSource(virtual_user)</code></a></h2>
+<p>Return data source information for the specified virtual user.</p>
+<p>
+</p>
+<h2><a name="getoptions_virtual_user_"><code>getOptions(virtual_user)</code></a></h2>
+<p>Return options for the specified virtual user.</p>
+<p>
+</p>
+<hr />
+<h1><a name="install">INSTALL</a></h1>
+<p>Just a standard module install will get the job done.  If you would like, you can set the environment variables MP_DBUSER, MP_DBPASS, MP_DBDS, and MP_DBOPTS to allow the test scripts to connect to a real database.</p>
+<pre>
+        MP_DBUSER -&gt; A real database user name
+        MP_DBPASS -&gt; The database user's password
+        MP_DBDS   -&gt; A DBI data source, for instance &quot;dbi:mysql:test&quot;
+        MP_DBOPTS -&gt; Any DBI connection options, for instance &quot;RaiseError =&gt; 1, PrintError =&gt; 1&quot;</pre>
+<p>Environment variables are not, these are the commands to install:</p>
+<pre>
+        perl Makefile.PL
+        make
+        make test
+        make install</pre>
+<p>
+</p>
+<hr />
+<h1><a name="author">AUTHOR</a></h1>
+<p>Josh McAdams, joshua.mcadams at gmail dot com</p>
+<p>
+</p>
+<hr />
+<h1><a name="see_also">SEE ALSO</a></h1>
+<p>perl(1); DBI(3); DBIx::Password(3);</p>
+
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+Build.PL
+COPYING
+Changes
+INSTALL
+LICENSE
+MANIFEST
+META.json
+META.yml                                Module meta-data (added by MakeMaker)
+Makefile.PL
+README
+examples/perl-line-traces.txt
+examples/test.pl
+inc/Test/Run/Builder.pm
+lib/Devel/LineTrace.pm
+t/00onetrace.t
+t/01twotraces.t
+t/02cancelled.t
+t/cpan-changes.t
+t/input/cancelled_trace.txt
+t/input/onetrace.txt
+t/input/twotraces.txt
+t/pod-coverage.t
+t/pod.t
+t/scripts/script1.pl
+t/style-trailing-space.t

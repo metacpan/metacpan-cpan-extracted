@@ -1,0 +1,29 @@
+---
+abstract: 'Framework wrapper around DBD::DB2 for a specific database'
+author:
+  - 'Darin McBride <dmcbride@naboo.to.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DB2-db
+provides:
+  DB2::Row:
+    file: lib/DB2/Row.pm
+    version: 0.23
+  DB2::Table:
+    file: lib/DB2/Table.pm
+    version: 0.23
+  DB2::db:
+    file: lib/DB2/db.pm
+    version: 0.25
+requires:
+  DBD::DB2: 0.78
+  Test::More: 0.88
+  Test::NoWarnings: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.25

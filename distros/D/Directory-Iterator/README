@@ -1,0 +1,43 @@
+Directory-Iterator version 1.000
+===============================
+
+This is a simple, efficient way to get a recursive list of all files under a
+specified directory.
+
+It implements a typical iterator interface, making it simple to convert code
+that processes a list of files to use this instead.  The directory is read
+as the list is consumed, so memory overhead is minimal.
+
+This module simply loads the appropriate backend; either
+Directory::Iterator::PP or Directory::Iterator::XS.  With the
+pure-perl backend, the speed is equivalent to File::Find; the XS backend
+is a few times faster.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Directory::Iterator::PP - The pure-perl backend
+
+  If available, the recommended Directory::Iterator::XS will be used instead
+  as it is a few times faster.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012 by Steve Sanbeg
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+

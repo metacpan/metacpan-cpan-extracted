@@ -1,0 +1,72 @@
+---
+abstract: 'configure Dist::Zilla like DOHERTY'
+author:
+  - 'Mike Doherty <doherty@cpan.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  blib: '1.01'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-DOHERTY
+no_index:
+  directory:
+    - corpus
+    - examples
+    - inc
+requires:
+  Dist::Zilla: '4.300032'
+  Dist::Zilla::App::Command::cover: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckExtraTests: '0'
+  Dist::Zilla::Plugin::Clean: '0'
+  Dist::Zilla::Plugin::CopyFilesFromBuild: '0'
+  Dist::Zilla::Plugin::Git::Check: '1.122460'
+  Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch: '0'
+  Dist::Zilla::Plugin::Git::CheckFor::Fixups: '0'
+  Dist::Zilla::Plugin::Git::Commit: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::Git::Tag: '1.112380'
+  Dist::Zilla::Plugin::GitHub: '0.22'
+  Dist::Zilla::Plugin::InstallGuide: '0'
+  Dist::Zilla::Plugin::InstallRelease: '0.006'
+  Dist::Zilla::Plugin::MakeMaker: '0'
+  Dist::Zilla::Plugin::MinimumPerl: '1.003'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeFromPod: '0'
+  Dist::Zilla::Plugin::ReadmeMarkdownFromPod: '0'
+  Dist::Zilla::Plugin::SchwartzRatio: '0'
+  Dist::Zilla::Plugin::SurgicalPodWeaver: '0.0015'
+  Dist::Zilla::Plugin::Twitter: '0.010'
+  Dist::Zilla::Plugin::UploadToGoogleCode: '0'
+  Dist::Zilla::PluginBundle::TestingMania: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Getopt::Long: '0'
+  List::MoreUtils: '0'
+  Moose: '0.99'
+  Moose::Autobox: '0'
+  Moose::Util::TypeConstraints: '0'
+  Pod::Weaver::PluginBundle::Author::DOHERTY: '0.006'
+  Pod::Weaver::Section::BugsAndLimitations: '1.102670'
+  WWW::Shorten::Googl: '0'
+  feature: '0'
+  namespace::autoclean: '0.09'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY/issues
+  homepage: http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-DOHERTY/
+  repository: git://github.com/doherty/Dist-Zilla-PluginBundle-Author-DOHERTY.git
+version: '0.40'

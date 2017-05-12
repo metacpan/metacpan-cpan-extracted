@@ -1,0 +1,15 @@
+README for github as dzil plugin
+parallel forky each
+doc @_ passing
+type errors, lint, die
+path utils demo & test
+overlay dogfood for compose
+combinatorial testing
+state threading example
+test memory sharing
+$overlay = diff($old,$new)
+GLOB, SCALAR, REF, blessed
+recursive default?
+
+Melb.pm: defor, Math::BigFloat & dumping, =namespace config,
+    blessing the overlay objects (as a way to tag actions out of band)

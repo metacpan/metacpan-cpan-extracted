@@ -1,0 +1,75 @@
+NAME
+    Device::KeyStroke::Mobile - Calculate key stroke times with mobile phone
+    keypads
+
+SYNOPSIS
+      use Device::KeyStroke::Mobile;
+      my $typing_times = calc_keystroke('example.com');
+
+DESCRIPTION
+    Device::KeyStroke::Mobile is a module to calculate how many times you
+    need to type keypads in mobile phone to build a word. For example, when
+    you type "example.com" with a mobile keypad,
+
+      e: 3 3
+      x: 9 9
+      a: 2
+      m: 6
+      p: 7
+      l: 5 5 5
+      e: 3 3
+      .: *
+      c: 2 2 2
+      o: 6 6 6 >
+      m: 6
+
+    you need to type keys 21 times.
+
+    This module would be useful when you conider taking a new domain name
+    which is easy to type with mobile phones.
+
+FUNCTIONS
+    This module exports following functions by default.
+
+    calc_keystroke
+          $typing_times = calc_keystroke($text);
+
+        takes any text you wish to type in mobile phone and calculates how
+        many typings you need to build it. If $text includes non-allowed
+        characters (see the section on "KEY MAPPING"), it would throw an
+        exception. Note that this function u2c()es $text first, so it
+        ignores cases.
+
+KEY MAPPING
+    By default this module uses following key mapping:
+
+            <   >
+
+      [ 1 ] [ 2 ] [ 3 ]
+             ABC   DEF
+
+      [ 4 ] [ 5 ] [ 6 ¡×
+       GHI   JKL   MNO
+
+      [ 7 ] [ 8 ] [ 9 ]
+      PQRS   TUV  WXYZ
+
+      [ * ] [ 0 ] [ # ]
+      .-@_/
+
+    This mapping is defined in $KeyMapping package variable (hash-ref) in
+    Device::KeyStroke namespace. You can modify it like:
+
+      $Device::KeyStroke::Mobile::KeyMapping->{1} = q[.@-_/:~];
+      $Device::KeyStroke::Mobile::KeyMapping->{*} = q[];
+      $Device::KeyStroke::Mobile::KeyMapping->{#} = q[,!?()#];
+
+AUTHOR
+    Tatsuhiko Miyagawa <miyagawa@bulknews.net>
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    the Text::T9 manpage
+

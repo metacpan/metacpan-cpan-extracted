@@ -1,0 +1,34 @@
+Revision history for Dispatch-Declare
+
+0.1.2  Wed Nov 14 2007
+       Missing Dispatch::Declare::Attr
+
+0.1.1  Wed Nov 14 2007
+       Add Dispatch::Declare::Attr
+       Remove version.pm dependency
+
+0.1.0  Tues Sept 4 2007
+       Port to Module::Install
+       Add link to git repository
+
+0.0.9  Tues Sept 4 2007
+       More documentation updates
+
+0.0.8  Tues Sept 4 2007
+       Documentation updates
+
+0.0.7  Tues Sept 4 2007
+       From an anonymous contributor:
+       Allow run to accept arguments
+
+
+0.0.4  Wed Feb 14 2007
+       From the suggestions of Dan Muey:
+       Apply uc to the key in the run sub.
+       Add the possibility of a default action.
+
+0.0.3  Fri Feb  9 2007
+       Added undeclare sub.
+
+0.0.2  Fri Feb  9 2007
+       Initial release.

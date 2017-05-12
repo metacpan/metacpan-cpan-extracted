@@ -1,0 +1,25 @@
+Revision history for Perl extension Data-Domain-Net
+
+1.100840  2010-03-25 22:26:29 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+
+0.03  Thu, 29 May 2008 12:03:00 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.03
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - .shipit: fixed svk.tagpattern
+
+0.02  Thu, 22 Nov 2007 13:07:25 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.02
+    - Makefile.PL: now requires Test::CompanionClasses 0.03; earlier versions
+      had a bug in make_real_object()
+
+0.01  Wed, 21 Nov 2007 18:21:47 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version
+    - added documentation
+    - updated t/perlcriticrc

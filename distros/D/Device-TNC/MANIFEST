@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+Makefile.PL
+README
+TODO
+example/read_kiss_tnc.pl
+lib/Device/TNC.pm
+lib/Device/TNC/KISS.pm
+t/01_initialise.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,164 @@
+=pod
+
+=encoding utf-8
+
+=for :stopwords Randy Stauner ACKNOWLEDGEMENTS INI PluginBundles cpan testmatrix url
+annocpan anno bugtracker rt cpants kwalitee diff irc mailto metadata
+placeholders metacpan
+
+=head1 NAME
+
+Dist::Zilla::Plugin::BundleInspector - Gather prereq and config info from PluginBundles
+
+=head1 VERSION
+
+version 0.003
+
+=head1 SYNOPSIS
+
+  ; in dist.ini
+  [Bootstrap::lib]
+  [BundleInspector]
+
+=head1 DESCRIPTION
+
+This plugin is useful when using L<Dist::Zilla> to release
+a plugin bundle for L<Dist::Zilla> or L<Pod::Weaver>
+(others could be supported in the future).
+
+Each bundle inspected will be loaded to gather the plugin specs.
+B<Note> that this means you will probably want to use
+L<Dist::Zilla::Plugin::Bootstrap::lib>
+in order to inspect the included bundle
+(rather than an older, installed version).
+
+This plugin does L<Dist::Zilla::Role::PrereqSource>
+and the bundle's plugin specs will be used
+to determine additional prereqs for the dist.
+
+Additionally this plugin does L<Dist::Zilla::Role::FileMunger>
+so that if you include a line in the pod of your plugin bundle
+of exactly C<=bundle_ini_string> it will be replaced with
+a verbatim block of the roughly equivalent INI config for the bundle.
+
+=head1 ATTRIBUTES
+
+=head2 bundle
+
+Specify the name of a bundle to inspect.
+Can be used multiple times.
+
+If none are specified the plugin will attempt to discover
+any included bundles.
+
+=for Pod::Coverage munge_file
+mvp_multivalue_args
+register_prereqs
+
+=head1 SEE ALSO
+
+=over 4
+
+=item *
+
+L<Config::MVP::Writer::INI>
+
+=item *
+
+L<Config::MVP::BundleInspector>
+
+=item *
+
+L<Dist::Zilla::Config::BundleInspector>
+
+=back
+
+=head1 SUPPORT
+
+=head2 Perldoc
+
+You can find documentation for this module with the perldoc command.
+
+  perldoc Dist::Zilla::Plugin::BundleInspector
+
+=head2 Websites
+
+The following websites have more information about this module, and may be of help to you. As always,
+in addition to those websites please use your favorite search engine to discover more resources.
+
+=over 4
+
+=item *
+
+Search CPAN
+
+The default CPAN search engine, useful to view POD in HTML format.
+
+L<http://search.cpan.org/dist/Dist-Zilla-Plugin-BundleInspector>
+
+=item *
+
+RT: CPAN's Bug Tracker
+
+The RT ( Request Tracker ) website is the default bug/issue tracking system for CPAN.
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-BundleInspector>
+
+=item *
+
+CPAN Ratings
+
+The CPAN Ratings is a website that allows community ratings and reviews of Perl modules.
+
+L<http://cpanratings.perl.org/d/Dist-Zilla-Plugin-BundleInspector>
+
+=item *
+
+CPAN Testers
+
+The CPAN Testers is a network of smokers who run automated tests on uploaded CPAN distributions.
+
+L<http://www.cpantesters.org/distro/D/Dist-Zilla-Plugin-BundleInspector>
+
+=item *
+
+CPAN Testers Matrix
+
+The CPAN Testers Matrix is a website that provides a visual overview of the test results for a distribution on various Perls/platforms.
+
+L<http://matrix.cpantesters.org/?dist=Dist-Zilla-Plugin-BundleInspector>
+
+=item *
+
+CPAN Testers Dependencies
+
+The CPAN Testers Dependencies is a website that shows a chart of the test results of all dependencies for a distribution.
+
+L<http://deps.cpantesters.org/?module=Dist::Zilla::Plugin::BundleInspector>
+
+=back
+
+=head2 Bugs / Feature Requests
+
+Please report any bugs or feature requests by email to C<bug-dist-zilla-plugin-bundleinspector at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-Zilla-Plugin-BundleInspector>. You will be automatically notified of any
+progress on the request by the system.
+
+=head2 Source Code
+
+
+L<https://github.com/rwstauner/Dist-Zilla-Plugin-BundleInspector>
+
+  git clone https://github.com/rwstauner/Dist-Zilla-Plugin-BundleInspector.git
+
+=head1 AUTHOR
+
+Randy Stauner <rwstauner@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Randy Stauner.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

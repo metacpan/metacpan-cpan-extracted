@@ -1,0 +1,34 @@
+Revision history for Perl extension Device::Jtag::USB::FTCJTAG.
+
+0.01  Sun May 20 09:24:21 2007
+    - original version; created by h2xs 1.23 with options
+        -Xn Device::Jtag::USB::FTCJTAG
+
+0.02  May 21 2007
+    - removed autoloader from FTCJTAG.pm file
+
+0.03  May 25 2007
+    - fixed prereqs in Makefile.PL
+
+0.04  May 27 2007
+    - changed to .tar.gz archive type.
+
+0.05  June 6 2007
+    - commented out "use 5.008008" from Makefile.PL and FTCJTAG.pm
+
+0.06  June 19 2007
+    - Fixed bug with writing to data register of any device not located at scan chain position 1.
+    - Added debugging report levels 0-2.
+    - Added auto-detection of scan chain devices with auto-assignment of name and instruction register codes.
+
+0.10  Aug 20, 2007
+    - Incorporated Bit::Vector module to allow JTAG reads/writes of arbitary length.
+    - Modified function calls to take a single hash reference parameter, thus v0.10 is not compatible with previous FTCJTAG.pm versions.
+
+0.11  Nov 3, 2008
+    - Added support for Xilinx XC3S400 FT256 and XC3S500E FT256 devices.
+    
+0.12  Feb 01, 2010
+    - No changes, just updating version to get latest package on Activestate PPM repositories because currently only version 0.10 has
+      been mirrored to those repositories.
+        

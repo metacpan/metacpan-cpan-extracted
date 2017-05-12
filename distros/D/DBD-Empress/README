@@ -1,0 +1,159 @@
+                     Empress Perl Interface DBD::Empress
+
+                  an Empress interface for Perl 5 using DBI
+
+------------------------------------------------------------------------
+
+Portions Copyright (c) 1997, 1999 Empress Software Inc
+
+You may distribute under the terms of either the GNU General Public License
+or the Artistic License, as specified in the Perl README file.
+
+-- The following is a standard warning for all DBI and DBD::* software --
+
+WARNING: THIS IS ALPHA SOFTWARE. IT IS POSSIBLY UNRELIABLE!
+
+------------------------------------------------------------------------
+
+Introduction
+
+The Empress Perl interface DBD::Empress is a module which can be added to an
+existing perl 5 installation to allow users to access Empress databases
+through perl scripts.
+
+This interface between the Empress RDBMS and Perl uses the DBI database
+interface module. Details about this perl module can be found at:
+
+        ftp://ftp.demon.co.uk:/pub/perl/db
+	http://www.symbolstone.org/technology/perl/DBI/index.html
+
+as well as at a number of CPAN sites which mirror perl and perl-related
+modules.
+
+This module was developed using the following software
+
+        perl            5.004
+        DBI             0.89
+        db engine       Empress version 6.10 and above
+
+It will probably not work with earlier versions of either perl or the DBI
+module. In particular, it will _not_ work with perl v4.x. Both of these
+pieces of software can be retrieved from any of the official perl 'CPAN'
+(Comprehensive Perl Archive Network) sites.
+
+A good starting point for retrieving data about Perl and its modules is:
+
+        http://www.perl.com/
+
+
+Note
+
+If you installed Empress Perl Interface DBD::Empress through Empress
+Hypermedia Installation, you do not need to install DBD::Empress again using
+the following instructions. The Empress Hypermedia Installation program can
+install a pre-configured Perl, Perl DBI and DBD::Empress for you. However,
+if you are advance Perl programmer/administrator, you may choose to
+DBD::Empress into your own Perl environment. Then, you need the following
+information.
+
+f you have the Empress CDROM, you can find the DBD::Empress package in:
+
+    /CDROM/hypmedia/empperl/package/dbdemp.tgz
+
+You can find the latest DBD::EmpressNet for your system in:
+http://www.empress.com.
+
+You can install both DBD::Empress and DBD::EmpressNet onto your Perl
+installation.
+
+------------------------------------------------------------------------
+
+Prerequisites
+
+To install this interface, there are the following prerequisite steps:
+
+1. install perl 5.004
+
+ * the source code for perl 5.004 is freely available from the CPAN sites
+(some of which are listed above). Refer to its README file for installation
+instructions.
+
+ * NOTE: one area of difficulty which can cause problems in the later steps
+is whether you want your version of perl to support dynamic loading of
+modules.  Note that on some systems dynamic loading does not work.  If you
+choose dynamic loading, and it is broken, then the tests will fail and you
+will have to reinstall with this option turned off.
+
+ * make sure you run the built-in tests, and that they pass before
+proceeding.
+
+2. install the perl module, DBI 0.89
+
+ * the source code for DBI 0.89 is freely available from the CPAN sites
+(some of which are listed above).  Refer to its README file for installation
+instructions.
+
+ * make sure you run the built-in tests, and that they pass before
+proceeding.
+
+ * some systems do not have dynamic module loading; in this case, you must
+the follow the special instructions that come with the DBI module for this
+case.
+
+3. install Empress RDBMS V6.10 or higher
+
+ * the environment variable MSPATH must be set to the directory where
+Empress is installed.
+
+ * make sure $MSPATH/bin is in your PATH.
+
+4. install the Interface Driver (libdse.a)
+
+   If you have downloaded the DBD-Empress package from an Internet Site, 
+   you will need to add the libdse.a driver library to the lib directory 
+   located in the DBD-Empress directory itself. This library is included 
+   in the Empress Perl distribution on the Empress CD. However, if you 
+   want to use a driver for a different platform. These are available for 
+   free from the Empress Web site:
+
+	http://www/product/download.htm
+
+You are now ready to install the DBD::Empress module.
+
+------------------------------------------------------------------------
+
+Installation
+
+The installation of the Empress perl interface proceeds as follows depends
+on the type of module loading desired (or available) with your version of
+perl. You may choose from either static or dynamic module loading; refer to
+the perl documentation for further details.
+
+
+1. static module loading:
+
+	% perl mklibms.pl
+        % perl Makefile.PL LINKTYPE=static
+        % make
+        % make perl
+        % make -f Makefile.aperl inst_perl
+        % make install
+
+2. dynamic module loading:
+
+	% perl mklibms.pl
+        % perl Makefile.PL
+        % make
+        % make install
+
+To run the tests:
+        % perl test.pl
+
+
+------------------------------------------------------------------------
+
+How to Use the Empress Interface
+
+Refer to the test program 'test.pl' in the main directory for examples of
+the syntax and techniques for using the Empress interface for common types
+of database access.

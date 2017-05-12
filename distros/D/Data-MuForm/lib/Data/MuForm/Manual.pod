@@ -1,0 +1,118 @@
+package Data::MuForm::Manual;
+# ABSTRACT: MuForm manual
+
+
+
+1;
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual - MuForm manual
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+This is the Data::MuForm manual.
+
+Data::MuForm performs validation and is a framework for processing
+forms.
+
+One of the main goals of MuForm is flexibility. There are many customizable
+methods and transforms, and a number of official hooks for changing class behavior.
+In addition, since MuForm is written in Moo, you can override almost everything.
+
+You can split the pieces of your forms up into logical parts and compose
+complete forms from MuForm classes, roles, fields, collections of
+validations, transformations and type constraints.
+You can write custom methods to process forms, add any attribute you like,
+and use method modifiers.  MuForm validators/forms are Perl classes, so there's
+a lot of flexibility in what you can do.
+
+=head1 SECTIONS
+
+=head2 L<Data::MuForm::Manual::FormHandlerDiff>
+
+Some of the differences between FormHandler and MuForm.
+
+=head2 L<Data::MuForm::Manual::Intro>
+
+Creating MuForm validators or forms and interfacing them
+with your controllers.
+
+=head2 L<Data::MuForm::Manual::Fields>
+
+Organized list of MuForm fields, with links to specific
+documentation.
+
+=head2 L<Data::MuForm::Manual::Hooks>
+
+Documents the standard places to override form processing.
+
+=head2 L<Data::MuForm::Manual::Defaults>
+
+Description of the various ways of setting defaults.
+
+=head2 L<Data::MuForm::Manual::Transformations>
+
+Transformation of input and value attributes at various points in
+the validation and update process.
+
+=head2 L<Data::MuForm::Manual::Validation>
+
+Validation of fields
+
+=head2 L<Data::MuForm::Manual::Errors>
+
+Errors: setting them, getting them.
+
+=head2 L<Data::MuForm::Manual::Rendering>
+
+How to render and write your own custom rendering code.
+
+=head2 L<Data::MuForm::Manual::Testing>
+
+Test your forms
+
+=head2 L<Data::MuForm::Manual::Cookbook>
+
+'Howto' recipes
+
+=head2 L<Data::MuForm::Manual::Reference>
+
+Quick reference of MuForm interface
+
+=head1 SUPPORT
+
+IRC:
+
+   Join #formhandler on irc.perl.org
+
+Mailing list:
+
+  http://groups.google.com/group/formhandler
+
+=head1 AUTHOR
+
+gshank: Gerda Shank <gshank@cpan.org>
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

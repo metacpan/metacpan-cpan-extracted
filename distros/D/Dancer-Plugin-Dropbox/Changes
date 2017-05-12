@@ -1,0 +1,8 @@
+Revision history for Dancer-Plugin-Dropbox
+
+0.01    2013-06-07
+        Initial release, providing the DSL keywords
+
+0.02    2013-06-07
+        New keyword: dropbox_ajax_listing
+

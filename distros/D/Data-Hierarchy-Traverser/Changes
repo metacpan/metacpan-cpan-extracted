@@ -1,0 +1,6 @@
+Revision history for Perl extension Data::Hierarchy::Traverser.
+
+0.01  Thu Feb 15 21:53:12 2007
+	- original version; created by h2xs 1.23 with options
+		-A -X -n Data::Hierarchy::Traverser
+

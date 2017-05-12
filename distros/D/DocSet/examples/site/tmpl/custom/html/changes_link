@@ -1,0 +1,12 @@
+[%-# changes button
+   # nav             - cache navigator object
+   # docset_rel_root - relative docs path
+    changes_id = nav.index_node.extra.changes;
+
+    IF changes_id && changes_id != nav.id;
+
+        changes_nav = nav.by_id(changes_id);
+-%]
+<a href="[% docset_rel_root %]/[% changes_nav.meta.link %]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/page_changes.gif" width="60" height="16" border="0" alt="Changes file"></a>
+<br><br>
+[%  END -%]

@@ -1,0 +1,71 @@
+---
+abstract: 'Dummy data generator from DDL statements'
+author:
+  - 'Yuuki Furuyama <addsict@gmail.com>'
+build_requires:
+  Test::More: 0.98
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.14.1, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Generator-FromDDL
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Generator::FromDDL:
+    file: lib/Data/Generator/FromDDL.pm
+    version: 0.06
+  Data::Generator::FromDDL::Builder:
+    file: lib/Data/Generator/FromDDL/Builder.pm
+    version: 0
+  Data::Generator::FromDDL::Builder::SerialOrder:
+    file: lib/Data/Generator/FromDDL/Builder/SerialOrder.pm
+    version: 0
+  Data::Generator::FromDDL::CLI:
+    file: lib/Data/Generator/FromDDL/CLI.pm
+    version: 0
+  Data::Generator::FromDDL::Director:
+    file: lib/Data/Generator/FromDDL/Director.pm
+    version: 0
+  Data::Generator::FromDDL::Formatter:
+    file: lib/Data/Generator/FromDDL/Formatter.pm
+    version: 0
+  Data::Generator::FromDDL::RecordSet:
+    file: lib/Data/Generator/FromDDL/RecordSet.pm
+    version: 0
+  Data::Generator::FromDDL::Util:
+    file: lib/Data/Generator/FromDDL/Util.pm
+    version: 0
+requires:
+  Class::Accessor::Lite: 0
+  Class::Data::Inheritable: 0
+  Compress::Zlib: 0
+  Exporter: 0
+  Getopt::Long: 0
+  JSON: 0
+  List::MoreUtils: 0
+  List::Util: 0
+  SQL::Translator: 0
+  Term::ANSIColor: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/addsict/Data-Generator-FromDDL/issues
+  homepage: https://github.com/addsict/Data-Generator-FromDDL
+  repository: git://github.com/addsict/Data-Generator-FromDDL.git
+version: 0.06
+x_contributors:
+  - 'Kenta Kase <kesin1202000@gmail.com>'

@@ -1,0 +1,74 @@
+{
+   "abstract" : "Include stack traces on all warnings and errors",
+   "author" : [
+      "haarg - Graham Knop (cpan:HAARG) <haarg@haarg.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Confess",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Class::Throwable" : "0",
+            "Exception::Base" : "0",
+            "Exception::Class" : "0",
+            "Ouch" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Scalar::Util" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IPC::Open3" : "0",
+            "Safe" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Devel-Confess@rt.cpan.org",
+         "web" : "https://rt.cpan.org/Public/Dist/Display.html?Name=Devel-Confess"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/haarg/Devel-Confess",
+         "web" : "https://github.com/haarg/Devel-Confess"
+      }
+   },
+   "version" : "0.009004",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

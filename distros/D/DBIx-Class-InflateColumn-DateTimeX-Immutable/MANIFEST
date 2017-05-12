@@ -1,0 +1,23 @@
+Build.PL
+Changes
+lib/DBIx/Class/InflateColumn/DateTimeX/Immutable.pm
+MANIFEST			This list of files
+t/00-load.t
+t/10-basic.t
+t/lib/Test/Schema.pm
+t/lib/Test/Schema/Result/Example.pm
+TODO
+xt/check-changes.t
+xt/critic.t
+xt/fixme.t
+xt/hasversion.t
+xt/kwalitee.t
+xt/manifest.t
+xt/meta.t
+xt/minimumversion.t
+xt/perlcriticrc
+xt/pod-coverage.t
+xt/pod.t
+README
+META.yml
+META.json

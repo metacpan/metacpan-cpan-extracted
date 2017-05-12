@@ -1,0 +1,12 @@
+IN: RSS
+OUT: CSV
+USE: Filter
+
+#TO: STDOUT
+FROM: url: "http://feeds.feedburner.com/FreeiTunesDownloads"
+
+PIPELINE DOES IN ORDER:
+    RSS
+    => Filter: filters: title: qr/^\[mus/
+    => CSV: column_names: [qw(title)]
+DONE

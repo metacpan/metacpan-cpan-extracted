@@ -1,0 +1,39 @@
+#!/usr/bin/perl -w
+use strict;
+use Benchmark qw/ cmpthese /;
+use Getopt::Long qw/ GetOptions :config no_ignore_case /;
+
+my %opts = (
+	iterations => 100,    # number of iterations
+	size       => 0.5,    # data size in MB
+);
+GetOptions( \%opts, 'iterations|i=i', 'size|s=f', );
+
+my $data = "abcdefghij" x ( $opts{size} * 100_000 );
+
+use Digest            ();
+use Digest::Skein     ();
+use Digest::MD5       ();
+use Digest::SHA1      ();
+use Digest::SHA       ();
+use Digest::Whirlpool ();
+##use Digest::Tiger   ();    # dumps core :-/
+
+my %algo = (
+	sha_256    => sub { Digest::SHA::sha256($data) },
+	sha_512    => sub { Digest::SHA::sha512($data) },
+	skein_256  => sub { Digest::Skein::skein_256($data) },
+	skein_512  => sub { Digest::Skein::skein_512($data) },
+	skein_1024 => sub { Digest::Skein::skein_1024($data) },
+	md5        => sub { Digest::MD5::md5($data) },
+	whirlpool  => sub { Digest->new('Whirlpool')->add($data)->digest },
+##	tiger      => sub { Digest::Tiger::hash($data) },
+);
+
+# pre-load everything just in case
+$_->() for values %algo;
+
+# run the benchmark
+cmpthese( $opts{iterations}, \%algo, );
+
+# vim: ts=4 sw=4 noet

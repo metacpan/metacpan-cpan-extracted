@@ -1,0 +1,54 @@
+Revision history for Perl extension DBIx::Migration::Directories.
+
+0.12  Mon Mar 18 11:24:05 2013
+        - Use "ENGINE=InnoDB" instead of "TYPE=InnoDB" when creating
+          MySQL tables (RT#83954, Vita Cizek)
+
+0.11  Thu Aug 20 11:06:00 2009
+        - Don't consider files that end with a tilde (~) to be schema
+          files. (This extension is commonly chosen as a 'backup' file
+          by editors such as joe, gedit, etc)
+        - Added some (very basic) documentation to
+          DBIx::Migration::Directories::Test
+
+0.10  Fri Feb 27 11:32:00 2009
+        - Added "--force-current-version" flag to migrate-database-schema.
+          Why? Because when a MySQL migration fails halfway though, the DDL
+          is already committed, but we can't increment the version number
+          in the database because, well, we failed.
+          So the only sane way to roll back is to say
+          "--force-current-version=new.version --desired-version=old.version"
+
+0.09  Wed Feb 11 10:30:00 2009
+        - Skip file-permission-based tests when running as root, since
+          root has access to everything...
+
+0.08  Tue Nov 18 11:17:00 2008
+        - Got rid of "id" column in the migration_schema_log
+          This means that the log no longer has a primary id -- this also
+          means that MySQL can replicate migrations properly.
+          Since SQLite 2.x doesnt have support for ALTER TABLE, I've
+          left the ID column there for now.
+
+0.07  Thu Jun 5  11:56:00 2008
+        - Moved database-dependant operations into their own class.
+        - Updated build process to work with the latest and greatest
+          Module::Build
+
+0.06  Tue Jun 3  22:04:00 2008
+        - Removed need for Class::Clone, since it doesn't work with perl 5.10.
+
+0.05  Wed Mar 8  08:45:00 2006
+        - "Hopefully the last release this week"
+        - Fixed the "install_path" thing added yesterday.
+        - Support $SCHEMA_VERSION global variable so that
+          you can still use desired_version_from without binding your
+          schema version -directly- to a perl package version.
+
+0.02  Mon Mar  6 13:14:00 2006
+        - Documentation improvements.
+        - Disabled 02_Build_PL.t until it's improved
+        - Updated to use new Module::Build "install_path" options
+
+0.01  Tue Feb 14 13:07:57 2006
+        - Initial public release, started on Nov.28th, 2005.

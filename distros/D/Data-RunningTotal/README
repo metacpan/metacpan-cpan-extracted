@@ -1,0 +1,34 @@
+Data-RunningTotal version 0.01
+==============================
+
+This module keeps track of multi-dimensional running totals over time  
+After information has been entered, it is easy to get totals for
+a point or volume within the multi-dimensional space at any specified time
+or get a list of changes for a point/volume over a specified time period.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Carp
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009 by Edward Funnekotter
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.6 or,
+at your option, any later version of Perl 5 you may have available.
+
+

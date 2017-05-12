@@ -1,0 +1,310 @@
+# NAME
+
+Date::Calc::Endpoints - Generate start/end dates easily, based on type (year, month,...),
+number of consecutive entities ("4 months"), number of intervals from the current date,
+and direction (past/future).
+
+# VERSION
+
+1.03
+
+# SYNOPSIS
+
+    use Date::Calc::Endpoints;
+    
+    my $dr = Date::Calc::Endpoints->new(%params);
+    
+    my ($start_date,$end_date,$last_date) = $dr->get_dates();
+    
+    my ($start_date,$end_date,$last_date) = $dr->get_dates(%params);
+    
+    $dr->set_type([ YEAR | QUARTER | MONTH | WEEK | DAY ]);
+    
+    $dr->set_intervals(n);
+    
+    $dr->set_span(n);
+    
+    $dr->set_sliding_window([ 0 | 1 ]);
+    
+    $dr->set_direction([ '+' | '-' ]);
+    
+    $dr->set_start_day_of_week([ MONDAY | TUESDAY | ...]);
+    
+    $dr->set_start_day_of_month([ 1, 2, 3, ... 28 ]);
+    
+    $dr->set_start_month_of_year([ 1, 2, 3, ... 12 ]);
+    
+    $dr->set_today_date('YYYY-MM-DD');
+    
+    $dr->get_error();
+
+# DESCRIPTION
+
+Date::Calc::Endpoints calculates a start/end date based on a interval type, and a number of intervals from the current date.
+This is often required in running scheduled and ad-hoc reports using the same script, where the desired date range
+has the requirement of, "7 months ago", or, "5 weeks ago, running Tuesday to Monday".
+
+Three dates are returned for the given interval:
+
+- First date of the interval
+- First date of the next interval
+- Last date of the interval
+
+Two "end" dates are returned for convenience, as a report using a date+time field may require a query from
+"2015-10-01 through 2015-11-01", but the title of the report may be, "Output for 2015-10-01 through 2015-10-31".
+
+Date ranges are calculated based on the following parameters:
+
+- type - the basic time interval for the report \[ YEAR | QUARTER | MONTH | WEEK | DAY \] - no default, must be specified
+
+    Note: QUARTER calculates the ranges for (Jan-Mar / Apr-Jun / Jul-Sep / Oct-Dec)
+
+- intervals - how many "units in the past" (eq, "4 months ago") - default = 1
+- span - number of consecutive units (eq, "5 month window") - default = 1
+- sliding\_window - Applicable if span > 1.  If sliding\_window is set, each interval back will slide by one
+unit of type.  If sliding window is not set, each interval back will slide by (span) units of type. - default = 0
+- direction - If set to "-", each positive value for "intervals" goes further into the past, and each negative value for "intervals"
+goes further into the future.  If set to "+", the opposite applies.
+- start\_day\_of\_week - For type = WEEK, the day which should be used as the first day of the week (SUNDAY, MONDAY, ...) - default = MONDAY
+- start\_day\_of\_month - For type = MONTH, the day which should be used as the start date of the month.  Valid values are 1..28.
+Date::Calc is used for these calculations.  If adding/subtracting months, and the day component of the start month is greater
+than the number of days in the resulting month (ex, "Feb 30"), Date::Calc extends the calculation into the following month ("Mar 2").
+To prevent confusion, Date::Calc::Endpoints only supports start\_dom of 1 to 28.
+- start\_month\_of\_year - For type = YEAR, the month which should be used as the first day of the year.  Valid values are 1..12.
+This would be applicable for fiscal years, which do not always start with _January_.
+- today\_date - Overrides the current date, typically for development/test purposes.
+
+The current window (intervals = 0) contains the current date.
+
+## Illustrations
+
+The following tables illustrate the effect of various values of direction, sliding window, and interval, assuming
+span = 2.  Notice in each case, "interval=1" is one unit away from the one containing the current date (C).
+
+<div>
+    <pre>
+
+    Direction = "-", sliding window = 0
+         -3| -2| -1| C | 1 | 2 | 3 
+        ---|---|---|---|---|---|---
+    -1)    |   |   |   |   |xxx|xxx
+     0)    |   |   |xxx|xxx|   |   
+     1)    |xxx|xxx|   |   |   |   
+    <br>
+    Direction = "-", sliding window = 1
+         -3| -2| -1| C | 1 | 2 | 3 
+        ---|---|---|---|---|---|---
+    -1)    |   |   |xxx|xxx|   |   
+     0)    |   |xxx|xxx|   |   |   
+     1)    |xxx|xxx|   |   |   |   
+    <br>
+    Direction = "+", sliding window = 0
+         -3| -2| -1| C | 1 | 2 | 3 
+        ---|---|---|---|---|---|---
+    -1) xxx|xxx|   |   |   |   |   
+     0)    |   |xxx|xxx|   |   |   
+     1)    |   |   |   |xxx|xxx|   
+    <br>
+    Direction = "+", sliding window = 1
+         -3| -2| -1| C | 1 | 2 | 3 
+        ---|---|---|---|---|---|---
+    -1)    |   |xxx|xxx|   |   |   
+     0)    |   |   |xxx|xxx|   |   
+     1)    |   |   |   |xxx|xxx|   
+
+    </pre>
+</div>
+
+# METHODS
+
+## new
+
+Object constructor.  Parameters can be set here, or in get\_dates, or by set\__param_ methods.
+
+- Arguments: _\\%parameters_
+
+    my ($start, $end, $last) = $dr->new(_\\%parameters_);
+
+- type => \[ _YEAR | QUARTER | MONTH | WEEK | DAY_ \]
+
+    Interval type.  No default value - must be specified.
+
+- intervals => _n_
+
+    Number of intervals to move back/forth from the current interval.  Default = 1.
+
+- span => _n_
+
+    Number of _type_ to include in the range.  Default = 1.
+
+- start\_day\_of\_week => \[ _MONDAY | TUESDAY | WEDNESDAY | ..._ \]
+
+    For _type = WEEK_, the day to denote the first day of the week.  Default = MONDAY.
+
+- start\_day\_of\_month => \[ _1, 2, 3...28_ \]
+
+    For _type = MONTH_, the day to denote the first day of the month.  Default = 1.
+
+- sliding\_window => \[ _O | 1_ \]
+
+    Applicable when span > 1.  If _sliding\_window=1_, each successive _intervals_
+    results in a shift of _span_ (years, months, etc).  If _sliding\_window=0_,
+    each successive _intervals_ results in a shift of one (year, month, etc).
+    Default = 0.
+
+- direction => \[ _"+" | "-"_ \]
+
+    If _direction="-"_, _intervals_ progresses further into the past.
+    If _direction="+"_, _intervals_ progresses further into the future.
+    Default = "-".
+
+## get\_dates
+
+Main method.  Returns _start\_date_, _end\_date_, and _last\_date_.
+
+- Arguments: _\\%Parameters_
+
+    my ($start, $end, $last) = $dr->get\_dates(_\\%parameters_);
+
+    Any of the parameters set in _new_ may be set/overridden here.
+
+## Accessors
+
+Each of the parameters may be set/restrieved using set\__param_ / get\__param_ methods.
+
+### set\_intervals / get\_intervals
+
+Interval type: \[ _YEAR | QUARTER | MONTH | WEEK | DAY_ \].  No default - must be specified.
+
+### set\_span / get\_span
+
+Overrides the ranges running only one year/quarter/month/week/day at a time.  Default = 1.
+
+### set\_start\_day\_of\_week / get\_start\_day\_of\_week
+
+For weekly ranges, defines the starting day to be used for the week, \[ _MONDAY | TUESDAY | WEDNESDAY | ..._ \].
+Default = Monday.
+
+### set\_start\_day\_of\_month / get\_start\_day\_of\_month
+
+For monthly ranges, defines the starting day to be used for the month.  Only supported values are 1-28, as 
+months with less than 31 days may yield results unexpected by the end user.  Default = 1.
+
+### set\_start\_month\_of\_year / get\_start\_month\_of\_year
+
+For yearly ranges, defiens the starting month to be used.  The starting day is fixed at 1.  Default = 1 (January)..
+
+### set\_today\_date / get\_today\_date
+
+By default, the current date is used.  This can be overridden, for development/test purposes.
+Format must be YYYY-MM-DD.
+
+### set\_sliding\_window / get\_sliding\_window
+
+Applicable if span > 1.  Determines whether successive intervals move an entire span, or just a single
+amount of type.  For instance, if type = MONTH and span = 5, should each successive value of _intervals_
+advance one month at a time, or five months at a time.  Default = 0 ("five months at a time").
+
+### set\_direction / get\_direction
+
+The direction which successive intervals progresses. This allows for positive values of _interval_, whether
+looking into the past, or into the future.  To get date ranges which are further into the past, recommend
+setting direction to "-".  If date ranges in the future are required, recommend setting direction to "+".
+Default = "-".  Refer to the Illustrations section for examples.
+
+## get\_error
+
+Retrieve any errors detected by the object.
+
+## clear\_error
+
+Reset the error stack
+
+# EXAMPLES
+
+Date is 2015-10-10, type = 'MONTH', direction = '-', span = 1.  Such a setup would be used for running monthly reports.
+
+Intervals = 0 would be the current month:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH');
+    my ($start, $end, $last) = $dr->get_dates(intervals => 0);
+        (2015-10-01, 2015-11-01, 2015-10-31)
+
+Intervals = 4 would be four months prior to this:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH');
+    my ($start, $end, $last) = $dr->get_dates(intervals => 4);
+        (2015-06-01, 2015-07-01, 2015-06-30)
+
+If "intervals" is a negative number, ranges would be in the future (improbable, but supported):
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH');
+    my ($start, $end, $last) = $dr->get_dates(intervals => -1);
+        (2015-11-01, 2015-12-01, 2015-11-30)
+
+Date is 2015-10-10, type = 'MONTH', direction = '-', span = 5. Sliding window now becomes relevant.
+
+Intervals = 1 should still be the most recent, completed period.  If sliding\_window = 0:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH', span => 5);
+    my ($start, $end, $last) = $dr->get_dates(intervals => 1);
+        (2015-05-01, 2015-10-01, 2015-09-30)
+
+Intervals = 0 will be the next period, starting with the current month:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH', span => 5);
+    my ($start, $end, $last) = $dr->get_dates(intervals => 0);
+        (2015-10-01, 2016-03-01, 2016-02-29)
+
+Now, if sliding window is enabled, intervals = 1 should still be the most recent, completed period:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH', span => 5, sliding_window => 1);
+    my ($start, $end, $last) = $dr->get_dates(intervals => 1);
+        (2015-05-01, 2015-10-01, 2015-09-30)
+
+This time, intervals = 0 will end with the current month:
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH', span => 5, sliding_window => 1);
+    my ($start, $end, $last) = $dr->get_dates(intervals => 0);
+        (2015-06-01, 2015-11-01, 2015-10-31)
+
+All parameters can be set at instantiation, set distinctly, or passed in with get\_dates.
+
+    my $dr = Date::Calc::Endpoints->new(type => 'MONTH', intervals => 1);
+    my ($start, $end, $last) = $dr->get_dates();
+        (2015-09-01, 2015-10-01, 2015-09-30)
+
+    $dr->set_intervals(2);
+    my ($start, $end, $last) = $dr->get_dates();
+        (2015-08-01, 2015-09-01, 2015-08-31)
+
+    my ($start, $end, $last) = $dr->get_dates(intervals => 3);
+        (2015-07-01, 2015-08-01, 2015-07-31)
+
+# DIAGNOSTICS
+
+Any errors detected may be retrieved via _$dr->get\_errors_.  Errors are accumulated as they are encountered.
+They are cleared only when _$dr-_clear\_errors> is invoked.
+
+# DEPENDENCIES
+
+[Class::Accessor](https://metacpan.org/pod/Class::Accessor)
+
+[Date::Calc](https://metacpan.org/pod/Date::Calc)
+
+# AUTHOR
+
+T. Olenchuk
+
+# LICENSE / COPYRIGHT / DISCLAIMER
+
+This is free software, you may use it and distribute it under the same terms as Perl itself.
+There is no warranty of any kind, either expressed or implied.
+
+# LIMITATIONS
+
+- The only allowed format for returned dates is 'YYYY-MM-DD'.  
+- "Start day-of-month" is only valid only for values 1-28.  This was to avoid trying to use last-day-of-month,
+which becomes problematic for days with less than 31 days.  Arguments could be made that, "one month after
+the last day of January" is Feb 28, or March 3, or even March 4 on a leap year.
+- Any date calculations not supported by Date::Calc are not supported here, such as "3000 years ago".

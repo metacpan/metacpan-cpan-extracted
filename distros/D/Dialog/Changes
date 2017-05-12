@@ -1,0 +1,12 @@
+# $Id: Changes,v 1.1 2000/06/06 07:05:36 mike_s Exp $
+
+Revision history for Perl extension Dialog.
+
+0.03 Nov 11, 2000
+  - ncurses instr conflicts with Perl instr, so I just added
+    "#define" before "#include <dialog.h>". Now it's being
+    compiled happily in FreeBSD 4.x
+
+0.01  Thu Feb 13 14:45:32 1997
+	- original version; created by h2xs 1.16
+

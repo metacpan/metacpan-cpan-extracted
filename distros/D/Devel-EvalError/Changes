@@ -1,0 +1,8 @@
+Revision history for Perl extension Devel::EvalError.
+
+0.001_002 2008-07-04
+    - Added full documentation
+    - Added Erase(), Reuse(), AllReasons()
+
+0.001_001 2008-06-27
+    - Basic functionality, passes the basic tests

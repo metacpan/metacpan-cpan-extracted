@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 2b2a2741c0b31ae3eb19d185ecd6ce089fb45e0b Build.PL
+SHA1 404b86347117998dd19e6ab0c1e6362ab5c279cd Changes
+SHA1 7293e276711ec3ffb1a41f6b57387720d1cf3d24 LICENSE
+SHA1 552ced0a98ecf8fd021030eb5354ac1336e7433c MANIFEST
+SHA1 0b3f05271fa73d0b641acd9a8c028835971af836 META.json
+SHA1 bd6ed9d7dd090ae79ab675c3a532fcc865f21d68 META.yml
+SHA1 164eedd692ec812b25034392ee5eb1facc836efc README
+SHA1 e3b5e8945d395b7bd28e86779093ee757fc7e0a0 corpus/DZ/Changes
+SHA1 9645b199f5c66fcf0b2c55bd88b476242d918ebe corpus/DZ/dist.ini
+SHA1 dc18621224688cc6708c2d52afe4cacea900a9b4 corpus/DZ/foobar
+SHA1 238327468547629255e6e2d802fba43c3cceaca2 corpus/DZ/lib/Foo.pm
+SHA1 ee3b51fda39560fe5ea4aee2c39e58e3c4e65820 corpus/DZ/t/foo.t
+SHA1 04e67ab9522e9cc962a65297506c64493b7f8bb2 lib/Dist/Zilla/Plugin/Test/ReportMetadata.pm
+SHA1 74a99ec7ba46620a06df3747a7c5f8a734e76974 t/00report-metadata.dd
+SHA1 c7d9429f60087220bf7b11ad1f97c7af9a647fa7 t/00report-metadata.t
+SHA1 f6d57d8f933efb33cc057c265798688e69971860 t/02pod.t
+SHA1 378c0b8a1bf6d248e0025321be971f3d360c983b t/03podcoverage.t
+SHA1 ec69eb3d114489b222043cf3726cb4ef26b3bf51 t/05kwalitee.t
+SHA1 230ce4beccce2b8d03267940e81fcd403d2f6860 t/06yaml.t
+SHA1 7456af67a86f180d4105ce01b24b04d144bc587e t/07podspelling.t
+SHA1 b5180dc465ec838e0a625e9e609c7fbfd0bc4805 t/10test_script.t
+SHA1 5ca3d33e602461489c4795ecea1c3adc200530c3 t/boilerplate.pm
+SHA1 343c22f57a67984108eba6fb16bc7c73d472d168 t/exceptions.dd
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.12 (GNU/Linux)
+
+iQEcBAEBAgAGBQJYSa22AAoJEK492j4Im1Bp1N8H/jJCFCZAwaE+XDvlk1DVw4Ru
+2LLA/05WSpQq5K/ZvQPA/b+K3HqQ7KDsPtN8n1e+3B575poPtvygt6TQQYbzOB1T
+6cuN2tQtXPc495uRVC5fINSRANKXG6jBGdW3jot3F5J56KId5pAZ2zwSulbWlU5k
+SXhqUBLIXXRL1SALR9d5O4h2jIaSgs3n2JxdD7VWPYdXB/eKNsvu3nSwmHk/nVW5
+alKauCAOSIYTP+3Ot2ROcpAl1Vdj4Voreji7rXgnwS/v8B76mfr51liYABjMsU8i
+3lexiuESsouaVmPufJaW5+D5Q/BVX+DIRi+edjU3PbTwlFHvYI5SeRzb5Ylsw+Y=
+=+gO0
+-----END PGP SIGNATURE-----

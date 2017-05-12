@@ -1,0 +1,4 @@
+DiskImage * T_PTROBJ
+FileType    T_ENUM
+ImageFile * T_PTROBJ
+ImageType   T_ENUM

@@ -1,0 +1,27 @@
+Revision history for Perl extension Data-Miscellany
+
+1.100850  2010-03-26 10:27:51 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.04  Sun 2009.12.06 23:44:41 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - reduced dependencies using author tests
+    - better dist engineering (INSTALL, README, README.mkdn etc.)
+
+0.03  Thu, 29 May 2008 12:03:21 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - Converted Changes file to YAML style
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - .shipit: fixed svk.tagpattern
+    - tags: NEWFEATURE
+
+0.02  Thu, 18 Oct 2007 10:09:39 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - fixed version requirement of Test::More
+
+0.01  Thu, 04 Oct 2007 19:16:00 +0200 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

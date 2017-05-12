@@ -1,0 +1,35 @@
+Devel-Decouple version 0.0.1
+
+OVERVIEW:
+
+This module is distributed with POD documentation. Please issue the command 
+'perldoc Devel::Decouple' from the top-level of this distribution to read about 
+what this module is for and how to use it... or simply visit 
+http://search.cpan.org/~mconner/Devel-Decouple-v0.0.1/lib/Devel/Decouple.pm.
+
+
+INSTALLATION:
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+DEPENDENCIES:
+
+This module depends on the following CPAN distributions:
+
+  Class::Inspector
+  PPI::Document
+  PPI::Find
+  Monkey::Patch
+
+
+INCOMPATIBILITIES:
+
+None reported.
+
+

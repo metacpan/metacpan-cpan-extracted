@@ -1,0 +1,68 @@
+NAME
+    Dist::Inkt::Role::Test - run various tests on a distribution at build time
+
+SYNOPSIS
+       package Dist::Inkt::Profile::JOEBLOGGS;
+   
+       use Moose;
+       extends qw(Dist::Inkt);
+       with (
+          ...,
+          "Dist::Inkt::Role::Test",
+          ...,
+       );
+   
+       after BUILD => sub {
+          my $self = shift;
+      
+          # Run a test before attempting to build
+          # the dist dir.
+          #
+          $self->setup_prebuild_test(sub {
+             die "rude!" if $self->name =~ /Arse/;
+          });
+      
+          # Run a test after building the dist dir.
+          #
+          $self->setup_build_test(sub {
+             die "missing change log" unless -f "Changes";
+          });
+      
+          # Run a test after tarballing the dist dir.
+          #
+          $self->setup_tarball_test(sub {
+             my $tarball = $_[1]
+             die "too big" if $tarball->stat->size > 1_000_000;
+          });
+       };
+   
+       1;
+
+DESCRIPTION
+    This role exists to provide hooks for Dist::Inkt subclasses and other
+    roles to run tests.
+
+    Bundled with this role are a few other roles that consume it in useful
+    ways.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt-Role-Test>.
+
+SEE ALSO
+    Dist::Inkt.
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

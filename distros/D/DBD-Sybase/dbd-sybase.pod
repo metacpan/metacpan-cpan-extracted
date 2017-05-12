@@ -1,0 +1,687 @@
+=head1 DBD::Sybase - Driver and Database Characteristics
+
+=begin docbook
+<sect1></sect1>
+
+=end docbook
+
+
+=head2 Driver Name, Version, Author and Contact Details
+
+This driver summary is for DBD::Sybase version 0.90.
+
+The driver author is Michael Peppler and he can be contacted via the
+dbi-users mailing list, or at mpeppler@peppler.org
+
+
+=head2 Supported Database Versions and Options
+
+The DBD::Sybase module supports Sybase 10.x, 11.x and 12.x, and offers
+limited support for accessing Microsoft MS-SQL 6.x and 7.x (as SP2)
+server.  Assuming that OpenClient 10.x or 11.x is available DBD::Sybase
+can be used to connect to Sybase 4.x servers.
+
+In addition DBD::Sybase can be used in combination with the
+FreeTDS reimplementation of OpenClient to connect to MS-SQL or
+Sybase servers from platforms where Sybase OpenClient is not available.
+See http://www.freetds.org for details.
+
+=head2 Connect Syntax
+
+The DSN for DBD::Sybase is of the general form 
+"dbi:Sybase:attr=value;attr=value". The following attributes are supported:
+
+=over 8
+
+=item server
+
+Specify the Sybase server to connect to.
+
+=item database
+
+Specify the database within the server that should be made the default 
+database (via "use $database").
+
+=item charset
+
+Specify the client character set to use. Useful if the client's default
+character set is different from the server. Using this will enable
+automatic character conversion from one character set to the other.
+
+=item packetSize
+
+Set the network packetSize. Setting a larger packet size can increase the
+network throughput. See the Sybase documentation on how to use this as
+it may require changing the server configuration values.
+
+=item hostname
+
+Set the hostname that will be stored in the sysprocesses table for this
+process.
+
+=item loginTimeout
+
+Specify the number of seconds that DBI->connect() will wait for a
+response from the Sybase server. The default is 60 seconds. (This
+was added in the 0.14 release.)
+
+=item timeout
+
+Specify the number of seconds that DBD::Sybase will wait for a server
+response.  If no response is received within that timeframe the command
+fails with a timeout error and the connection is marked dead. The
+default is to not timeout.  Setting a timeout of 0 is the same as no
+timeout. (This was added in the 0.14 release.)
+
+=item interfaces
+
+Specify the location of an alternate I<interfaces> file:
+
+=item scriptName
+
+Specify the name for this connection that will be displayed in sp_who
+(ie in the sysprocesses table in the I<program_name> column).
+
+=item hostname
+
+Specify the hostname that will be displayed by sp_who (and will be stored
+in the hostname column of sysprocesses)..
+
+=item tdsLevel
+
+Specify the TDS protocol level to use when connecting to the server.
+Valid values are CS_TDS_40, CS_TDS_42, CS_TDS_46, CS_TDS_495 and CS_TDS_50.
+In general this is automatically negotiated between the client and the 
+server, but in certain cases this may need to be forced to a lower level
+by the client. 
+
+    $dbh->DBI->connect("dbi:Sybase:tdsLevel=CS_TDS_42", $user, $password);
+
+B<NOTE>: Setting the tdsLevel below CS_TDS_495 will disable a number of
+features, ?-style placeholders and CHAINED non-AutoCommit mode, in particular.
+
+=item encryptPassword
+
+Specify the use of the client password encryption supported by CT-Lib.
+Specify a value of 1 to use encrypted passwords.
+
+    $dbh->DBI->connect("dbi:Sybase:encryptPassword=1", $user, $password);
+
+=back
+
+
+=head2 Numeric Data Handling
+
+The driver supports INTEGER, SMALLINT, TINYINT, MONEY, SMALLMONEY,
+FLOAT, REAL, DOUBLE, NUMERIC(p,s) and DECIMAL(p,s).
+
+All but the NUMERIC/DECIMAL datatypes are hardware specific, but INTEGER
+is always a 32bit int, SMALLINT is 16bit, TINYINT is 8bit.
+
+Precision for numeric/decimal is from 1 to 38, and scale is from 0 to 38.
+
+Numeric/decimal values are returned as perl strings by default, even if the 
+scale is 0 and the precision is small enough to fit in an integer value.
+All other numbers are returned in native format.
+
+
+=head2 String Data Handling
+
+DBD::Sybase supports CHAR/VARCHAR/BINARY/VARBINARY, limited to 255
+characters in length up to version 12.0x.  As of 12.5 these datatypes can 
+be up to 16K in size - but supporting the larger sizes requires that
+Open Client 12.5 or later be used. Note that the CHAR type is fixed 
+length (blank padded).
+
+Sybase automatically converts CHAR and VARCHAR data between the
+character set of the server (see the syscharset system table) and the
+character set of the client, defined by the locale setting of the
+client. The BINARY and VARBINARY types are not converted.
+UTF-8 is supported.
+
+See the OpenClient International Developer's Guide in the Sybase
+OpenClient manuals for more on character set issues.
+
+Strings can be concatenated using the C<+> SQL operator.
+
+
+=head2 Date Data Handling
+
+Sybase supports the DATETIME and SMALLDATETIME values. A DATETIME can 
+have a value from Jan 1 1753 to Dec 31, 9999 with a 300th of a second
+resolution. A SMALLDATETIME has a range of Jan 1 1900 to Jun 6 2079
+with a 1 minute resolution.
+
+The current date on the server is obtained with the GETDATE() SQL
+function.
+
+The Sybase date format depends on the locale settings for the client.
+The default date format is based on the 'C' locale:
+
+  Feb 16 1999 12:07PM
+
+In this same locale Sybase understands several input formats in
+addition to the one above:
+
+  2/16/1998 12:07PM
+  1998/02/16 12:07
+  1998-02-16 12:07
+  19980216 12:07
+
+If the time portion is omitted it is set to 00:00.  If the date portion
+is omitted it is set to Jan 1 1900.  If the century is omitted it is
+assumed to be 1900 if the year is <50 and 2000 if the year >= 50.
+
+You can use the special _date_fmt() private method (accessed via
+$dbh->func()) to change the date input and output format.
+The formats are based on Sybase's standard conversion routines. The
+following subset of available formats has been implemented:
+
+  LONG        - Nov 15 1998 11:30:11:496AM
+  SHORT       - Nov 15 1998 11:30AM
+  DMY4_YYYY   - 15 Nov 1998
+  MDY1_YYYY   - 11/15/1998
+  DMY1_YYYY   - 15/11/1998
+  HMS         - 11:30:11
+
+Use the CONVERT() SQL function to convert date and time values from
+other formats. For example:  
+
+   UPDATE a_table 
+      SET date_field = CONVERT(datetime_field, '1999-02-21', 105)
+
+CONVERT() is a generic conversion function that can convert to/from
+most datatypes.  See the CONVERT() function in Chapter 2 of the Sybase
+Reference Manual.
+
+Arithmetic on date time types is done on dates via the DATEADD(),
+DATEPART(), DATEDIFF() Transact SQL functions.  For example:
+
+  SELECT DATEDIFF(ss, date1, date2)
+
+returns the difference in seconds between date1 and date2.
+
+Sybase does not understand time zones at all, except that the GETDATE()
+SQL function returns the date in the time zone that the server is running
+in (via localtime).
+
+The following SQL expression can be used to convert an integer "seconds
+since 1-jan-1970" value ('unix time') to the corresponding database
+date time:
+
+  DATEADD(ss, unixtime_field, 'Jan 1 1970')
+
+Note however that the server does not understand time zones, and will 
+therefore give the 'server I<local> unixtime' and not the correct value
+for the GMT time zone.
+
+If you know that the server runs in the same timezone as the client then
+you can use
+
+	use Time::Local;
+	$time_to_database = timegm(localtime($unixtime));
+
+to convert the unixtime value before sending it to Sybase.
+
+To do the reverse, converting from a database date time value to 'unix
+time', you can use:
+
+  DATEDIFF(ss, 'Jan 1 1970', datetime_field)
+
+The same GMT vs localtime caveat applies in this case. If you know that the 
+server runs in the same timezone as the client you can convert the returned
+value to the correct GMT based value with this perl expression:
+
+	use Time::Local;
+	$time = timelocal(gmtime($time_from_database));
+
+
+
+=head2 LONG/BLOB Data Handling
+
+Sybase supports an IMAGE and a TEXT type for LONG/BLOB data.  Each type
+can hold up to 2GB of binary data, including nul characters. The main
+difference between an IMAGE and a TEXT column lies in how the client
+libraries treat the data on input and output. TEXT data is entered and
+returned "as is". IMAGE data is returned as a long hex string, and
+should be entered in the same way.
+
+The default size limit for TEXT/IMAGE data is 32Kb, but this can be 
+changed by setting the LongReadLen attribute.
+
+Bind parameters can I<not> be used to insert TEXT or IMAGE data to
+Sybase.
+
+
+=head2 Other Data Handling issues
+
+Sybase does not differentiate between CHAR and VARCHAR or BINARY and
+VARBINARY on returned data, so you will never get a TYPE value of
+SQL_VARCHAR or SQL_VARBINARY when querying the $h->{TYPE} attribute
+for a result set.
+
+Sybase does not automatically convert numbers to strings or strings to
+numbers.  You need to explicitly call the C<CONVERT> SQL function.
+However, placeholders don't need special handling because DBD::Sybase
+knows what type each placeholder needs to be.
+
+
+=head2 Transactions, Isolation and Locking
+
+DBD::Sybase supports transactions.
+The default transaction isolation level is 'Read Commited'.
+
+Sybase supports READ COMMITED, READ UNCOMMITED and SERIALIZABLE
+isolation levels.  The level be changed per-connection or
+per-statement by executing a "SET TRANSACTION_ISOLATION LEVEL x",
+where x is 0 for READ UNCOMMITED, 1 for READ COMMITED, and 3 for
+SERIALIZABLE. 
+
+By default a READ query will aquire a shared lock on each page that it 
+reads. This will allow any other process to read from the table,
+but will block any process trying to obtain an exclusive lock (for
+update). The shared lock is only maintained for the time the server needs 
+to actually read the page, not for the entire length of the SELECT
+operation. Sybase 11.9.2 and later include optional row-level locking
+("datarows" locking) which can be set on a table by table basis. See the
+Sybase manuals for details.
+
+There is an explicit LOCK TABLE statement (from 11.9.2 onwards) but
+you should not normally need to use it.
+Appending "WITH HOLDLOCK" to a SELECT statement can be used to force an
+exclusive lock to be aquired on a table. It is usually called within a
+transaction. In general this call is not needed.
+
+The correct way to do a multi-table update with Sybase is to wrap the entire
+operation in a transaction. This will ensure that locks will be aquired in 
+the correct order, and that no intervening action from another process
+will modify any rows that your operation is currently modifying.
+
+
+=head2 No-Table Expression Select Syntax
+
+To select a constant expression (one that doesn't involve data from a
+database table or view) you can select it without naming a table:
+
+  SELECT getdate()
+
+
+=head2 Table Join Syntax
+
+Outer joins are supported using the =* (right outer join) and *= (left 
+outer join) operators:
+
+  SELECT customer_name, order_date 
+  FROM customers, orders 
+  WHERE customers.cust_id =* orders.cust_id
+
+For all rows in the customers table that have no matching rows in the
+orders table, Sybase returns NULL for any select list expressions
+containing columns from the orders table.
+
+ASE 12.0 and later supports the ANSI syntax for left/right outer 
+joins.
+
+=head2 Table and Column Names
+
+The names of Sybase identifiers, such as tables and columns, cannot
+exceed 30 characters in length.
+
+The first character must be an alphabetic character (as defined by the
+current server character set) or _ (underscore). Subsequent characters
+can be alpha, and may include currency symbols, @, # and _. Identifiers
+can't include embedded spaces or the %, !, ^, * or . symbols.  In
+addition, identifiers must not be on the "reserved word" list (see the
+Sybase documentation for a complete list).
+
+Table names or column names I<may> be quoted if the B<set quoted_identifier>
+option is turned on. This allows the user to get around the reserved word
+limitation. When this option is set, character strings enclosed in double
+quotes are treated as identifiers, and strings enclosed in single quotes
+are treated as literal strings.
+
+By default identifiers are case-sensitive. This can be turned off by
+changing the default sort order for the B<server>.
+
+National characters can be used in identifier names without quoting.
+
+
+=head2 Case sensitivity of like operator
+
+The Sybase LIKE operator is case sensitive.
+
+The UPPER function can be used to force a case insensitive match, e.g.,
+UPPER(name) LIKE 'TOM%' (although that does prevent Sybase from making
+use of any index on the name column to speed up the query).
+
+
+=head2 Row ID
+
+Sybase does not support a pseudo 'row id' column.
+
+
+=head2 Automatic Key or Sequence Generation
+
+Sybase supports an IDENTITY feature for automatic key generation.
+Declaring a table with an IDENTITY column will generate a new value for
+each insert. The values are monotnonically increasing, but are not
+guaranteed to be sequential.
+
+To fetch the value generated and used by the last insert, you can
+
+  SELECT @@IDENTITY
+
+Sybase does not support sequence generators, although ad-hoc stored
+procedures to generate sequence numbers are quite easy to write. See
+http://techinfo.sybase.com/css/techinfo.nsf/DocID/ID=860 for a
+complete explanation of the various possibilities.
+
+
+=head2 Automatic Row Numbering and Row Count Limiting
+
+Sybase does not offer a pseudocolumn that sequentially numbers the rows
+fetched by a select statement.
+
+However, using 
+
+	SET ROWCOUNT xxx
+
+will limit the number of rows returned in a SELECT statement I<or>
+the number of rows affected by a DELETE, INSERT or UPDATE statement.
+
+
+=head2 Parameter binding
+
+Parameter binding is directly suported by Sybase. However, there are
+two downsides that one should be aware of:
+
+Firstly, Sybase creates an internal stored procedure for each prepare()
+call that includes ? style parameters. These stored procedures live in
+the tempdb database, and are only destroyed when the connection is
+closed. It is quite possible to run out of tempdb space if a lot of
+prepare() calls with placeholders are being made in a script.
+
+Secondly, because all the temporary stored procedures are created in
+tempdb this causes a potential hot-spot due to the locking of system
+tables in tempdb. This hot-spot is a problem in Sybase 11.5.1 and
+earlier, but has been lifted in 11.9.2 and later releases.
+
+The :1 placeholder style is not supported and the TYPE attribute to
+bind_param is currently ignored, so unsupported values don't generate a
+warning.  However, trying to bind a TEXT or IMAGE datatype will fail.
+
+
+=head2 Stored procedures
+
+Sybase stored procedures are written in Transact-SQL, Sybase's
+procedural extension to SQL.
+
+Stored procedures are called exactly the same way as regular SQL, and
+can return the same types of results (ie a SELECT in the stored
+procedure can be retrieved with $sth->fetch).
+
+If the stored procedure returns data via OUTPUT parameters, then these 
+must be declared first:
+
+  $sth = $dbh->prepare(qq[
+     declare \@name varchar(50)
+     exec getName 1234, \@name output
+  ]);
+
+Stored procedures can't be called with bind (?) parameters - so this
+would be illegal:
+
+  $sth = $dbh->prepare("exec my_proc ?");
+  $sth->execute('foo');
+
+so use
+
+  $sth = $dbh->prepare("exec my_proc 'foo'");
+  $sth->execute;
+
+instead.
+
+Because Sybase stored procedures almost always return more than one
+result set you should always make sure to use a loop until the
+B<syb_more_results> is 0:
+
+  do {
+    while($data = $sth->fetch) {
+       ...
+    }
+  } while($sth->{syb_more_results});
+
+
+=head2 Table Metadata
+
+DBD::Sybase supports the table_info method.
+
+The syscolumns table has one row per column per table. See the
+definitions of the Sybase system tables for details. However, the
+easiest method is to use the sp_help stored procedure.
+
+The easiest way to get detailed information about the indexes of a
+table is to use the sp_helpindex (or sp_helpkey) stored procedure.
+
+
+=head2 Driver-specific attributes and methods
+
+DBD::Sybase has the following driver specific database handle attributes:
+
+=over 8
+
+=item syb_show_sql
+
+If set then the current statement is included in the string returned by 
+$dbh->errstr.
+
+=item syb_show_eed
+
+If set, then extended error information is included in the string returned 
+by $dbh->errstr. Extended error information include the index causing a
+duplicate insert to fail, for example.
+
+=item syb_err_handler
+
+This attribute is used to set an ad-hoc error handler callback (ie a perl 
+subroutine) that gets called before the normal error handler does it's job.
+If this subroutine returns 0 then the error is ignored. This is useful
+for handling PRINT statements in Transact-SQL, for handling messages
+from the Backup Server, showplan output, dbcc output, etc.
+
+The subroutine is called with 7 parameters: the Sybase error number,
+the severity, the state, the line number in the SQL batch, the server name 
+(if available), the stored procedure name (if available), and the message
+text.
+
+Example:
+
+    %showplan_msgs = map { $_ => 1}  (3612 .. 3615, 6201 .. 6225);
+    sub err_handler {
+        my($err, $sev, $state, $line, $server, $proc, $msg) = @_;
+
+        if($showplan_msgs{$err}) { # it's a showplan message
+            print SHOWPLAN "$err - $msg\n";
+            return 0;    # This is not an error
+        }
+
+        return 1;
+    }
+
+    $dbh = DBI->connect('dbi:Sybase:server=troll', 'sa', '');
+    $dbh->{syb_err_handler} = \&err_handler;
+    $dbh->do("set showplan on");
+    open(SHOWPLAN, ">>/var/tmp/showplan.log") || die "Can't open showplan log: $!";
+    $dbh->do("exec someproc");    # get the showplan trace for this proc.
+    $dbh->disconnect;
+
+=item syb_flush_finish
+
+If $dbh->{syb_flush_finish} is set then $dbh->finish will drain
+any results remaining for the current command by actually fetching them.
+The default behaviour is to issue a ct_cancel(CS_CANCEL_ALL), but this
+I<appears> to cause connections to hang or to fail in certain cases (although
+I've never witnessed this myself.)
+
+=item syb_dynamic_supported
+
+This is a read-only attribute that returns TRUE if the dataserver
+you are connected to supports ?-style placeholders. Typically placeholders are
+not supported when using DBD::Sybase to connect to a MS-SQL server.
+
+=item syb_chained_txn
+
+If set then we use CHAINED transactions when AutoCommit is off. 
+Otherwise we issue an explicit BEGIN TRAN as needed. The default is off.
+
+This attribute should usually be used only during the connect() call:
+
+    $dbh = DBI->connect('dbi:Sybase:', $user, $pwd, {syb_chained_txn => 1});
+
+Using it at any other time with B<AutoCommit> turned B<off> will 
+B<force a commit> on the current handle.
+
+=item syb_use_bin_0x
+
+If set, BINARY and VARBINARY values are prefixed with '0x' in the
+result. Default is off.
+
+=item syb_binary_images
+
+If set, IMAGE data is returned in raw binary format. Otherwise the data is
+converted to a long hex string. The default is off.
+
+=item syb_quoted_identifier (bool)
+
+If set, then identifiers that would normally clash with Sybase reserved
+words can be quoted using C<"identifier">. In this case strings must
+be quoted with the single quote.
+
+Default is for this attribute to be B<off>.
+
+=item syb_rowcount (int)
+
+Setting this attribute to non-0 will limit the number of rows returned by
+a I<SELECT>, or affected by an I<UPDATE> or I<DELETE> statement to the
+I<rowcount> value. Setting it back to 0 clears the limit.
+
+Default is for this attribute to be B<0>.
+
+=item syb_do_proc_status (bool)
+
+Setting this attribute causes $sth->execute() to fetch the return status
+of any executed stored procs in the SQL being executed. If the return
+status is non-0 then $sth->execute() will report that the operation 
+failed (ie it will return C<undef>)
+
+Setting this attribute does B<NOT> affect existing $sth handles, only
+those that are created after setting it. To change the behavior of 
+an existing $sth handle use $sth->{syb_do_proc_status}.
+
+The default is for this attribute to be B<off>.
+
+=item syb_oc_version (string)
+
+Returns the identification string of the version of Client Library that
+this binary is currently using. This is a read-only attribute.
+
+For example:
+
+    troll (7:59AM):348 > perl -MDBI -e '$dbh = DBI->connect("dbi:Sybase:", "sa"); print "$dbh->{syb_oc_version}\n";' 
+    Sybase Client-Library/11.1.1/P/Linux Intel/Linux 2.2.5 i586/1/OPT/Mon Jun  7 07:50:21 1999
+
+This is very useful information to have when reporting a problem.
+
+
+=back
+
+And the following driver specific statement handle attributes:
+
+=over 8
+
+=item syb_more_results
+
+See the discussion on handling multiple result sets above.
+
+=item syb_result_type
+
+Returns the numeric result type of the current result set. Useful when 
+executing stored procedurs to determine what type of information is
+currently fetchable (normal select rows, output parameters, status results,
+etc...).
+
+=back
+
+
+One private method is provided:
+
+=over 8
+
+=item _date_fmt
+
+Set the default date conversion and display formats. See the
+description elsewhere in this document.
+
+=back
+
+
+=head2 Positioned updates and deletes
+
+Sybase does not support positioned updates or deletes.
+
+
+=head2 Differences from the DBI specification
+
+Note that DBD::Sybase does not fully parse the statement until
+it's executed. Thus attributes like $sth->{NUM_OF_FIELDS} are not
+available until after $sth->execute has been called. This is valid
+behaviour but is important to note when porting applications
+originally written for other drivers.
+
+
+=head2 URLs to more database/driver specific information
+
+  http://www.sybase.com
+  http://techinfo.sybase.com
+  http://sybooks.sybase.com
+
+
+=head2 Concurrent use of multiple handles
+
+DBD::Sybase supports up to 25 concurrent database
+connections to one or more databases.
+
+It is not normally possible for Sybase clients to prepare/execute
+a new statement handle while still fetching data from another
+statment handle associated with the same database handle. However,
+DBD::Sybase emulates this by opening a new connection that will
+automatically be closed when the new statement handle is destroyed.
+You should be aware that there are some subtle but significant
+transaction issues with this approach.
+
+=head2 Other Significant Database or Driver Features
+
+Sybase and DBD::Sybase allow multiple statements to be prepared with
+one call and then executed with one call. The results are fed back to
+the client as a stream of tabular data. Stored procedures can also
+return a stream of multiple data sets. Each distinct set of results
+is treated as a normal single result set so C<fetch> returns undef at
+the end of each set. To see if there are more data sets to follow the
+C<syb_more_results> attribute can be checked. A typical loop making use
+of this Sybase specific feature looks like:
+
+  do {
+    while($d = $sth->fetch) {
+      ... do something with the data
+    }
+  } while($sth->{syb_more_results});
+
+Sybase also has rich and powerful stored procedure and trigger
+functionality and encourages you to use them.
+
+=cut
+
+# This driver summary for DBD::Sybase is Copyright (c) 1999 Tim Bunce
+# and Michael Peppler.
+# $Id: dbd-sybase.pod,v 1.8 2003/03/31 23:55:11 mpeppler Exp $
+

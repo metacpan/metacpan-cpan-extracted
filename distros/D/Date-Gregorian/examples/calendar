@@ -1,0 +1,50 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2007 Martin Becker.  All rights reserved.
+# This package is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+# calendar - display a calendar of the current month
+#
+# The current date will be indicated by square brackets.
+# Non-business-days will be indicated by a trailing '*'.
+
+use strict;
+use warnings;
+use Date::Gregorian qw(MONDAY JANUARY);
+use Date::Gregorian::Business;
+
+my @months = qw(
+    January February March April May June July
+    August September October November December
+);
+
+my $today = Date::Gregorian::Business->new('us')->set_today;
+my ($year, $month, $day) = $today->get_ymd;
+my $begin = $today->new->set_ymd($year, $month, 1);
+my $limit = $today->new->set_ymd($year, $month + 1, 1);
+my $date  = $begin->new->set_weekday(MONDAY, '<=');
+my $biz   = $begin->get_businessdays_until($limit);
+my $off   = $begin->get_days_until($limit) - $biz;
+
+print "$months[$month - JANUARY] $year\n";
+print "      ($biz business days, $off days off)\n";
+print "      Mon  Tue  Wed  Thu  Fri  Sat  Sun\n";
+while ($date->compare($limit) < 0) {
+    printf "(%2d) ", ($date->get_ywd)[1];
+    foreach my $weekday (1..7) {
+	if ($date->compare($begin) < 0) {
+	    print '     ';
+	}
+	elsif ($date->compare($limit) < 0) {
+	    print $date->compare($today) == 0? '[': ' ';
+	    printf '%2d', ($date->get_ymd)[2];
+	    print $date->is_businessday? ' ': '*';
+	    print $date->compare($today) == 0? ']': ' ';
+	}
+	$date->add_days(1);
+    }
+    print "\n";
+}
+
+__END__

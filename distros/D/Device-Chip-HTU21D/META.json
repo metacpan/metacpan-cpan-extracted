@@ -1,0 +1,48 @@
+{
+   "abstract" : "chip driver for F<HTU21D>",
+   "author" : [
+      "Paul Evans <leonerd@leonerd.org.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4218",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Chip-HTU21D",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4004"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::Chip" : "0.03"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Device::Chip::Adapter" : "0.09",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Device::Chip::HTU21D" : {
+         "file" : "lib/Device/Chip/HTU21D.pm",
+         "version" : "0.01"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.01",
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

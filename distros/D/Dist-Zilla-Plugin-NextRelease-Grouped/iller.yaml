@@ -1,0 +1,52 @@
+---
+# This file is used together with Dist::Iller and
+# Dist::Iller::Config::Author::CSSON to generate
+# dist.ini and weaver.ini.
+doctype: dist
+
+header:
+  name: Dist-Zilla-Plugin-NextRelease-Grouped
+  author:
+    - Erik Carlsson <info@code301.com>
+  license: Perl_5
+  copyright_holder: Erik Carlsson
+  copyright_year: 2016
+
+prereqs:
+  runtime:
+    requires:
+      - perl: 5.010000
+      - Dist::Zilla::Role::Plugin: 5.000
+      - Dist::Zilla::Role::FileMunger: 5.000
+      - Dist::Zilla::Role::AfterRelease: 5.000
+      - Dist::Zilla::Stash::User: 5.000
+      - Moose: 2.1400
+      - MooseX::AttributeShortcuts
+      - namespace::autoclean: 0.16
+      - Types::Standard: 1.000000
+      - Path::Tiny
+      - CPAN::Changes: 0.400002
+      - DateTime: 1.05
+      - String::Formatter: 0.102082
+      - Safe::Isa
+      - List::Util
+
+  test:
+    requires:
+      - String::Cushion
+      - syntax
+      - Syntax::Feature::Qi
+      - Test::DZil: 5.000
+      - Dist::Zilla::Plugin::RewriteVersion
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: weaver
+
+plugins:
+  - +config: Author::CSSON
+
+---
+doctype: cpanfile

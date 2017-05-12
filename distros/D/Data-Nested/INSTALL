@@ -1,0 +1,41 @@
+INSTALLING AUTOMATICALLY
+------------------------
+
+The easiest way to install a perl module is to use the
+CPAN or CPANPLUS methods.
+
+This can be done in the following ways:
+
+CPAN:
+
+   % perl -MCPAN -e shell
+   > install _MODULE_
+   > quit
+
+CPANPLUS:
+
+   % cpanp
+   > i _MODULE_
+   > q
+
+In both cases _MODULE_ is the name of the module. Please refer to the
+documentation on CPAN or CPANPLUS for more information.
+
+
+INSTALLING MANUALLY
+-------------------
+
+If Module::Build is installed, you can install it by running:
+
+    perl Build.PL
+    perl Build
+    perl Build test
+    perl Build install
+
+Or using the older Makefile.PL method:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+

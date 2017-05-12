@@ -1,0 +1,16 @@
+
+Makefile
+Makefile.old
+MYMETA.*
+*.bak
+.*.swp
+*.tar.gz
+blib
+pm_to_blib
+sql
+logs
+sessions
+
+# Patch stuff
+*.orig
+*.rej

@@ -1,0 +1,243 @@
+Revision history for Debug-Easy
+
+0.01    2011
+        Initial private use release.
+
+0.02    June 14, 2013
+        Actual public release
+
+0.03    January 8, 2014
+        Minor operational improvements
+
+0.04    March 11, 2014
+        Parameters for initialization are now case-insensitive.
+
+0.05    April 14, 2014
+        Multiline output only shows the benchmark time for the first line to
+        avoid confusion.  This fix was previously listed in version 0.04, but
+        was never actually implemented, sorry.
+
+0.06    July 18, 2014
+        Benchmark data turned on for first line only for multiline output.
+
+	    Corrections and additions to documentation.
+
+        Additions to code comments
+
+        Simplified 'debug' object and split it into two.
+
+        Added tests to build process
+
+0.07    July 19, 2014
+        Added the ability to customize the debug level labels
+        
+        Fixed the warning message in the END block that was reported during testing.
+        This was caused when the module is loaded, but the object never created (which
+        happens in one of the tests).
+        
+        Additional code comments added
+        
+        Tweaks to the Makefile.PL build script to allow for parallel testing
+
+0.08    July 23, 2014
+        Added DEBUGWAIT experimental debug level.
+
+0.09    July 25, 2014
+        Removed the Perldocs for 'send_to_logger' and made it an
+        internal class only by renaming it '_send_to_logger'.
+        
+        Made 'Data::Dumper::Simple' optional, and will fall back to
+        just 'Data::Dumper' if it cannot find it.
+
+0.10    November 26, 2014
+        Made the LogLevel parameter case-insensitive.
+        Tweaked the Makefile.PL to be more CPAN friendly.
+
+0.11    November 26, 2014
+        Data::Dumper::Simple is now a requirement.
+
+        Some of the test files worked incorrectly in Perl versions < 5.10
+        That should be fixed now.
+
+0.12    November 27, 2014
+        Modified Makefile.PL to be more platform friendly.
+
+0.20    March 21, 2015
+        Version number bump, because of the drastic change of switching to
+        Data::Printer and removing Data::Dumper::Simple.
+        
+        Data:Printer's format more closely goes along with this module's
+        output format.
+
+        Fixed a small bug if you passed a mixture of strings and references
+        in the anonymous array.  Now references are now passed properly
+        through Dumper.
+
+0.30    March 31, 2015
+        Another version number bump.  I did a little bit of backtracking.
+        'Data::Printer' and 'Data::Dumper::Simple' are now optional.  They
+        will be used if available, otherwise 'Data::Dumper' is used.
+        
+        Also, '__LINE__' is no longer necessary.  '__LINE__' was used as
+        'caller' never seemed to give the right line number.  I believe I
+        have solved that problem.  The code checks for a '__LINE__' parameter,
+        but doesn't use it.  You may leave this parameter out entirely.
+
+0.31    April 06, 2015
+        Ouch, it seems 'Module::Load::Conditional' is more trouble than it
+        is worth.  Hopefully, this fix will allow more tests to succeed on
+        different platforms, as version 0.30 failed a lot of them. Seriously,
+        I got a lot of failed Test::Reporter reports back.  I am so sorry.
+
+        I have chosen my own way of testing and loading modules, and it
+        seems to be working much better.
+
+0.32    May 24, 2015
+        Improved (fixed really) the PREFIX setting.
+
+0.33    May 25, 2015
+        Added %F to th prefix fields.  It inserts the script's name.
+
+0.34    May 31, 2015
+        The Data::* module loading has been fixed, and yes, another
+        required module has been added to the install.
+
+        ** Please don't use this version.  It's output is ugly and messed up.
+
+0.35    June 10, 2015
+        Wow, I sure screwed up 0.34.  Sorry about that.  I put the padding in
+        the wrong portion of the output.  I'm not sure if it's worth placing
+        in there anymore anyway.
+
+        Added a few new filters to 'prefix'.
+
+        It now detects if running as a child, and indicates as such.  Helpful
+        for forking scripts.
+
+0.36    June 13, 2015
+        Lots of fixes.
+        
+        * Complete rewrite of the line number and caller location algorithmn.
+          It now properly prints exactly the calling location, it's proper line
+          number, and the preceeding line numbers from where those subroutines
+          were called.  You get the entire tree in names and line numbers.
+          This may slightly slow down the output, but it's very neglegible.
+
+        * Indenting of output for nested calls done properly now.  Only one
+          space per level.  No need to use up even more precious line space.
+
+        * Line number(s) are auto-padded for proper alignment (at least in
+          subsequent output).  This behavior matches the subroutine name
+          padding behavior.
+        
+        * Speaking of subroutine name padding... the default has been changed
+          from 25 spaces to 15.  You, of course, can change that when you
+          instantiate the object, as usual.
+
+        * Line number padding is adjustable now too.
+
+        * You can now indicate on output whether running as a forked child or
+          the parent.  This is with the "%f" prefix placeholder.  It only
+          prints a "P" for parent, or "C" for child.  This adds to the
+          behavior of version 0.35, where it only printed it was a child
+          when the child exited (which it still does).
+
+0.37    June 13, 2015
+        Important fix
+        
+        Ok, the verbosity of the tree was a bit much I see.  So... I added
+        a couple new prefix options.
+        
+        * %s gives you just the caller line number, no nested numbers
+        * %S gives you just the caller name, no nested names mile long.
+        
+        Also, you can define a specific prefix for each log level.  The default
+        is short (above) callers and numbers, BUT the DEBUGMAX prefix is
+        using the detailed %P and %l.
+
+1.00    June 15, 2015
+        Major changes, thus a version upgrade.  Also, this is not backwards
+        compatible with earlier versions that have custom prefixes.  You have
+        been warned!
+
+        The filters are completely different.  Read the POD to find out.
+        Nevertheless, they are easier to read now, and no longer cryptic.
+        This renders the older versions obsolete.
+        
+        Log level checking is faster, and thus will not significantly slow
+        down your code.
+
+        ** This version was removed from CPAN due to a prefix error related
+           to the new changes
+
+1.01    July 1, 2015
+        Prefix issues have been fixed.  Everything is back to normal.
+
+1.02    July 1, 2015
+        Ugh... missed the date and time
+
+1.03    July 10, 2015
+        Benchmarking fixes.
+
+1.04    July 10, 2015
+        Made some changes in benchmarking and loglevel output. Nothing major.
+        Mostly fixes and cosmetic changes.
+
+1.05    July 10, 2015
+
+        Renaming of some internal variables for easier reading.
+        Cleaned up with Perltidy.
+
+1.06    October 12, 2015
+
+        Restored basic Data::Dumper support, but only for legacy compatibility.
+
+1.11    February 10, 2016
+
+        Revamped the documentation to make it easier to read.  There were
+        previous POD issues.  They should be corrected now.  Consolidated
+        some documentation, once again for readability.
+
+        Discouraged the usage of the "debug" method in favor of the direct
+        ERR, WARN etc. methods.  "debug" remains for legacy compatibility,
+        however.
+
+1.13    July 19, 2016
+
+        Added option for Threads.
+
+1.14    July 30, 2016
+
+        Addressed threading code for non-threaded Perls, at install
+        instead of runtime.  Build.PL and MakeMaker.PL actually
+        physically removes the code reporting on thread-specific
+        information.
+
+1.15    October 19, 2016
+
+        Fixed thread labeling sprintf issue
+
+1.16    November 22, 2016
+
+        Removed the now defunct "$Modules" from the exportable variables.
+
+        Fixed the code in the "examples" directory.  I am terribly sorry
+        these were not working.  I have brought them up to date, and they
+        should be functioning properly.
+
+1.17    December 18, 2016
+
+        Added "Best" module dependency.  This was added to allow for automatic
+        loading of "Data::Dumper::Simple" or "Data::Dumper", depending on what
+        the user has installed in their system.  The "Data::Dumper" package is
+        included with the Perl core installation.  So at least "Data::Dumper"
+        will work.  The "Data::Dumper::Simple" module is very handy for
+        debugging, and I deemed it important to use if it is available.
+
+        If "Data::Dumper" nor "Data::Dumper::Simple" is not your preference
+        for variable structure representation, then you will have to load
+        your own and use it to generate the debugging output desired.
+
+1.18    March 10, 2017
+
+        Some minor documentation and threads check changes.

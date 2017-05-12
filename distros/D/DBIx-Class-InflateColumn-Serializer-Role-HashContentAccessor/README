@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-InflateColumn-Serializer-Role-HashContentAccessor,
+version 0.001000:
+
+  Parameterized Moose role which provides accessor methods for values stored in a hash-like structure
+
+This software is copyright (c) 2015 by Manfred Stock.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

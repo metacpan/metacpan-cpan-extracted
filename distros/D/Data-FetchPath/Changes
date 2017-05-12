@@ -1,0 +1,8 @@
+Revision history for Data-FetchPath
+
+0.02    20/05/2009
+        - Sort the paths in the tests to halt some test failures.
+
+0.01    19/05/2009
+        - Find arbitrary paths through data structures.
+

@@ -1,0 +1,47 @@
+---
+abstract: 'Ensure META includes resources'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  Capture::Tiny: 0
+  Dist::Zilla::Tester: 0
+  File::Find: 0
+  File::Temp: 0
+  Path::Class: 0.26
+  Test::More: 0.88
+  Try::Tiny: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300018, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CheckMetaResources
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::CheckMetaResources:
+    file: lib/Dist/Zilla/Plugin/CheckMetaResources.pm
+    version: 0.001
+requires:
+  Dist::Zilla: 4
+  Dist::Zilla::Role::BeforeRelease: 0
+  Moose: 0.99
+  autodie: 2.00
+  namespace::autoclean: 0.09
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-CheckMetaResources
+  homepage: https://github.com/dagolden/dist-zilla-plugin-checkmetaresources
+  repository: https://github.com/dagolden/dist-zilla-plugin-checkmetaresources.git
+version: 0.001

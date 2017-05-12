@@ -1,0 +1,9 @@
+{% extends "child3.txt" %}
+
+{% block "block4" %}
+Inherited block 4
+
+{% include "stackoverflow_homepage.html" %}
+
+{{ var4 }}
+{% endblock %}

@@ -1,0 +1,28 @@
+Revision history for Perl extension Date-Holidays-KR
+
+0.06 2016-01-05T07:52:05Z
+        - Add holiday(Day of Hangul)
+
+0.05 2013-08-01T14:09:12Z
+        - Fix http://www.cpantesters.org/cpan/report/0bab814a-f52b-11e2-9591-b4ba88f30751
+        - Use Minilla
+        
+0.0402  Wed Feb 29 18:00:00 2012 KST
+        - DRY
+
+0.0401  Thu Feb 16 01:00:00 2012 KST
+        - Requires DateTime, Try::Tiny
+
+0.04    Wed Feb 15 21:00:00 2012 KST
+        - Add failed test to check Korean New Year ( @keedi++ ↓)
+        - Remove tab and trailling spaces
+        - Korean New Year patch for is_holiday()
+        - Add failed test for holidays() function
+        - Korean New Year patch for holidays()
+
+0.03    Wed Feb  8 12:00:00 2012 KST
+        - Add META.yml
+0.02    Wed Feb  8 11:00:00 2012 KST
+        - Requires Date::Korean
+0.01    Tue Feb  7 18:12:47 2012 KST
+        - Original version

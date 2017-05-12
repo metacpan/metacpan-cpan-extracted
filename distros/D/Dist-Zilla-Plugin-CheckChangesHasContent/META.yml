@@ -1,0 +1,67 @@
+---
+abstract: 'Ensure Changes has content before releasing'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+  - 'Karen Etheridge <ether@cpan.org>'
+build_requires:
+  Capture::Tiny: '0'
+  Cwd: '0'
+  Dist::Zilla::Tester: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Path::Tiny: '0'
+  Test::Harness: '0'
+  Test::More: '0.88'
+  Try::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150005'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-CheckChangesHasContent
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::CheckChangesHasContent:
+    file: lib/Dist/Zilla/Plugin/CheckChangesHasContent.pm
+    version: '0.010'
+  Dist::Zilla::Plugin::Test::ChangesHasContent:
+    file: lib/Dist/Zilla/Plugin/Test/ChangesHasContent.pm
+    version: '0.010'
+requires:
+  Data::Section: '0.200002'
+  Dist::Zilla: '2.100950'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::FileGatherer: '0'
+  Dist::Zilla::Role::FileMunger: '0'
+  Dist::Zilla::Role::TextTemplate: '0'
+  File::pushd: '0'
+  Moose: '0.99'
+  Moose::Util::TypeConstraints: '0'
+  Sub::Exporter::ForMethods: '0'
+  autodie: '2.00'
+  namespace::autoclean: '0.09'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent/issues
+  homepage: https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent
+  repository: https://github.com/dagolden/Dist-Zilla-Plugin-CheckChangesHasContent.git
+version: '0.010'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'David Golden <xdg@xdg.me>'
+  - 'Randy Stauner <randy@magnificent-tears.com>'

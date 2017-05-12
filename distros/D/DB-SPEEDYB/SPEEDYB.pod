@@ -1,0 +1,60 @@
+=head1 NAME
+
+DB::SPEEDYB - Look up records in a Speedyb constant database
+
+=head1 SYNOPSIS
+
+use DB::SPEEDYB;
+
+    my $db = DB::SPEEDYB->new();
+    $db->open('tiny.db') or die "Failed to open db: $!";
+    my $res = $db->get("Alice");
+
+    while (my($k,$v) = $DB->each()) {
+        ...
+    }
+
+=head1 DESCRIPTION
+
+This module performs lookups in a Speedyb constant database.  Currently,
+you must create the database with the Python speedyb module.
+
+Speedyb is a high performance, memory-mapped key-value store.
+
+You can share a speedyb handle across forked child processes.  There are
+no locking issues.
+
+=head2 Functions
+
+=over 4
+
+=item B<open($filename);>
+
+Open the file for reading.
+
+=item B<get($key);>
+
+Return the value for this key, or undef if not found.  Only strings are
+supported as keys and values.
+
+=item B<each()>
+
+Iterate over all items in the database, returning $key, $value.  Returns undef
+when items are exhausted.
+
+=back
+
+=head2 ERRORS
+
+Open returns undef on failure.  get returns undef if they keys is not found.
+
+=head1 HISTORY
+
+Written by Asher Blum E<lt>F<asher@wildsparx.com>E<gt> and Robert Lehr in 2012.
+
+=head1 COPYRIGHT
+
+Copyright (C) 2012 Asher Blum and Robert Lehr.  All rights reserved.
+This code is free software; you can redistribute it and/or modify it under
+the same terms as Perl itself
+

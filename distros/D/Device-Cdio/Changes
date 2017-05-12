@@ -1,0 +1,86 @@
+Revision history for Device-Cdio
+
+0.2.4  Sept 2, 2006
+
+- Fix bad allocation in strncpy_pad
+
+- Fix bugs in Device::Cdio::ISO9600::FS::readddir() and 
+  Device::Cdio::ISO9600::FS::find_lsn(). Thanks to Shannon.
+
+- Fix bug in strncpy_pad().
+
+- Start MMC interface
+
+- Small documentation and example changes
+
+0.2.3  Mar 22, 2006
+
+- Take advantage of bugs fixed upstream in libcdio 0.77. In particular
+  some of the time setting/getting routines
+
+- Misc Documentation fixups
+
+0.2.2  Mar 3, 2006
+
+- Changes dictated by CPAN: copy of SWIG-generated files from blib/lib
+  to lib
+
+- Add version numbers for SWIG Perl modules
+
+- Add ISO9660::IFS and ISO9660::FS regression tests
+
+- Better "Synopsis" documentation on IFS and FS.
+
+- add create_makefile_pl => passthrough for Makefile.PL compatibility
+
+0.2.0  Mar 2, 2006
+
+Interrum hand-hacked package to get CPAN to index. 
+
+0.2.0  Mar 1, 2006
+
+- Add rudimentary ISO 9660 library. See iso1.pl, iso2.pl, iso3.pl
+  and 07.iso.t
+
+- Include more C files from SWIG. (In other words drop requirement that
+  SWIG is installed - this time, for sure!)
+
+0.0.2  Feb 13, 2006
+
+- Drop requirement that SWIG is installed.
+
+- $dev->get_device() is a little more useful.
+
+- Fixes for Darwin (and remove some invalid pointer references too and
+  guard accessing outside of fixed-length hwinfo arrays).
+
+- Allow Perl 5.8.6.
+
+- synch up version numbers in Cdio/Track.pm and Cdio/Device.pm with Cdio.pm
+       
+0.0.1  Feb 10, 2006
+       Initial release. 
+
+What's here from libcdio. Most everything from 
+  <cdio/audio.h> 
+  <cdio/device.h>
+  <cdio/disc.h> 
+  <cdio/read.h> 
+  <cdio/track.h>
+
+In lay terms, this is the audio CD controls, device controls, disc
+classification, various block CD read routines, and some track
+routines.
+
+What's not here (yet) is CD-Text reading, CD-Paranoia interface, the
+ISO 9660 library or the (SCSI) MMC command interface.
+
+An oft-asked for request is for UDF support, analogous to the ISO
+9660 support. That's currently missing in libcdio.
+
+If there is something in this list you want, dig in. Much of it is
+this is straightforward based on continuing what's here.
+
+It was an incredible amount of work to get just this far.
+
+$Id$

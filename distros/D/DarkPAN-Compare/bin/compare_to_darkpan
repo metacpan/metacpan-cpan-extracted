@@ -1,0 +1,61 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use DarkPAN::Compare;
+
+die "usage: compare_to_darkpan <darkpan_url>\n" unless $ARGV[0];
+
+my $compare = DarkPAN::Compare->new(darkpan_url => $ARGV[0]);
+$compare->run;
+
+my $format = "%-45s %15s\n";
+printf $format, "Extra modules", "version";
+printf "-"x79 . "\n";
+printf $format, $_->{name}, $_->{version}
+    for @{ $compare->extra_modules };
+
+print "\n";
+
+$format = "%-45s %15s %15s\n";
+printf $format, "Modules with version mismatch", "darkpan version", "local version";
+printf "-"x79 . "\n";
+printf $format, $_->{name}, $_->{darkpan_version}, $_->{local_version}
+    for @{ $compare->modules_with_version_mismatch };
+
+=head1 NAME
+
+compare_to_darkpan - script to compare local Perl packages/versions with your DarkPAN
+
+=head1 SYNOPSIS
+
+    $ compare_to_darkpan https://darkpan.yourcompany.com
+    Extra modules                                         version
+    -------------------------------------------------------------------------------
+    Acme::LookOfDisapproval                                 0.006
+    Fortune                                                   0.2
+
+    Modules with version mismatch                 darkpan version   local version
+    -------------------------------------------------------------------------------
+    CGI                                                      3.65            4.13
+    Image::Size                                             3.232           3.300
+    Imager                                                   0.98           1.001
+    Imager::File::GIF                                        0.88            0.90
+
+=head1 DESCRIPTION
+
+Compare local Perl modules/versions with whats in your darkpan (pinto or
+orepan2 or whatever).
+
+=head1 LICENSE
+
+Copyright (C) Eric Johnson.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Eric Johnson E<lt>eric.git@iijo.orgE<gt>
+
+=cut

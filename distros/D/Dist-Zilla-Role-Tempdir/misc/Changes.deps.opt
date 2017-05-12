@@ -1,0 +1,52 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001003
+
+1.001002 2016-05-01T00:22:36Z
+ [Added / runtime recommends]
+ - Moose 2.000
+ - Path::Tiny 0.058
+
+ [Added / test recommends]
+ - Dist::Zilla 5
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.00
+ - Test::More 1.001003 → 0.99
+
+1.001001 2014-08-15T21:39:24Z
+ [Changed / test recommends]
+ - CPAN::Meta 0 → 2.120900
+
+ [Removed / test recommends]
+ - CPAN::Meta::Prereqs
+ - CPAN::Meta::Requirements 2.120900
+
+1.001000 2014-07-29T09:21:17Z
+
+1.000001 2014-07-29T06:22:12Z
+ [Added / test recommends]
+ - CPAN::Meta::Prereqs
+
+1.000000 2014-05-16T19:09:54Z
+ [Added / configure recommends]
+ - ExtUtils::MakeMaker 6.98
+
+ [Added / test recommends]
+ - CPAN::Meta
+ - CPAN::Meta::Requirements 2.120900
+ - ExtUtils::MakeMaker 6.98
+ - Test::More 1.001003
+
+0.01053722 2013-04-08T08:04:30Z
+
+0.01053721 2012-02-02T19:54:07Z
+
+0.01053720 2011-04-05T19:34:41Z
+
+0.01027622 2010-07-23T21:29:14Z
+
+0.01021401 2010-05-23T00:16:50Z

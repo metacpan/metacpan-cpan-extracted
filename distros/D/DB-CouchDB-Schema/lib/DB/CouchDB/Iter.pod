@@ -1,0 +1,63 @@
+=head1 NAME
+
+DB::CouchDB::Iter - a result iterator object for CouchDB views
+
+=head1 DESCRIPTION
+
+Gives you some convenience functions for dealing with CouchDB view results
+
+=head1 SYNOPSIS
+
+    my $iter = $db->view($viewname);
+    
+    if ($rs->err) {
+        die $rs->errstr;
+    }
+    while ( my $doc = $iter->next() ) {
+        my $doc_id = $doc->{_id};
+        my %result = %$doc;
+    }
+    while ( my $doc = $iter->next_for_key($key) ) {
+        my $doc_id = $doc->{_id};
+        my %result = %$doc;
+    }
+
+=head1 Methods
+
+=head2 err
+
+Returns the error from couchdb if there was an error.
+
+=head2 errstr
+
+Returns the error string from couchdb if there was an error.
+
+=head2 count
+
+Returns the record count returned for the view.
+
+=head2 offset
+
+Returns the offset of the records returned.
+
+=head2 data
+
+Returns all the rows returned by the view.
+
+=head2 next
+
+Return the next row in the result set or undef if no more rows are left.
+
+=head2 next_key
+
+Returns the next key in the result set from a view. Does not return the results for that key though.
+
+=head2 next_for_key
+
+    while ( my $result = $db->next_for_key($key) ) {
+        ... # do something with the result
+     }
+
+Returns the next result for a key in the results for a view
+
+=cut

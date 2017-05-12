@@ -1,0 +1,6 @@
+Revision history for Perl extension DBedit.
+
+1.96  Sat Feb 16 15:42:38 2002
+	- original version; created by h2xs 1.21 with options
+		-X -n DBedit
+

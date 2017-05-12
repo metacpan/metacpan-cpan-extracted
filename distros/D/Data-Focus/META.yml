@@ -1,0 +1,41 @@
+---
+abstract: 'generic getter/setter/traverser for complex data structures'
+author:
+  - 'Toshio Ito <toshioito@cpan.org>'
+build_requires:
+  Exporter: '0'
+  Scalar::Util: '0'
+  Test::Fatal: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.42'
+  Module::Build::Prereqs::FromCPANfile: '0.02'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4205, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Focus
+no_index:
+  directory:
+    - t
+    - xt
+    - eg
+    - inc
+    - share
+    - benchmark
+  file:
+    - README.pod
+    - README.md
+requires:
+  Carp: '0'
+  Exporter: '0'
+  Scalar::Util: '0'
+  Test::More: '1.00'
+  overload: '0'
+  parent: '0'
+resources:
+  bugtracker: https://github.com/debug-ito/Data-Focus/issues
+  repository: git://github.com/debug-ito/Data-Focus.git
+version: '0.03'

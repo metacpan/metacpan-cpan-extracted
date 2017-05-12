@@ -1,0 +1,30 @@
+---
+abstract: 'a pretty printing module with better support for objects'
+author:
+  - 'Sullivan Beck <sbeck@cpan.org>'
+build_requires:
+  Archive::Zip: 0
+  Date::Manip::Date: 0
+  Test::Inter: 0
+  Test::Pod: 1.0
+  Test::Pod::Coverage: 1.0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-PrettyPrintObjects
+provides:
+  Data::PrettyPrintObjects:
+    file: lib/Data/PrettyPrintObjects.pm
+    version: 1.00
+requires:
+  Exporter: 0
+  Scalar::Util: 0
+  YAML::Syck: 0
+  perl: 5.00000
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution DBICx-DataDictionary, version
+0.002:
+
+  Define a data dictionary to use with your DBIx::Class Schema
+
+This software is copyright (c) 2010 by Pedro Melo.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

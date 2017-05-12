@@ -1,0 +1,23 @@
+---
+abstract: "The Perl \"Vital Statistics\" Library"
+author:
+  - 'Adam Kennedy <adamk@cpan.org>'
+build_requires:
+  File::Spec: 0.82
+  Test::ClassAPI: 1.02
+  Test::More: 0.47
+distribution_type: module
+generated_by: 'Module::Install version 0.75'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.3.html
+  version: 1.3
+module_name: Data::Vitals
+name: Data-Vitals
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.005
+version: 1.06

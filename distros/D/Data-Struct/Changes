@@ -1,0 +1,19 @@
+Revision history for Data::Struct
+
+1.701	2011-11-23
+	Documentation improvements.
+
+1.700	2011-11-21
+	Rewritten for 'struct' API.
+	Eliminate 'eval'.
+	Add validity checks on accessors.
+	Determine call type on context.
+
+1.699   2011-11-14
+	Renamed to Data::Struct.
+
+1.698   2011-03-10
+        First version, cloned from Object::Tiny.
+	Note that the initial version number is arbitrary.
+
+

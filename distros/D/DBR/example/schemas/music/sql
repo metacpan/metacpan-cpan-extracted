@@ -1,0 +1,38 @@
+
+CREATE TABLE artist (
+  artist_id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  name varchar(250),
+  genre int,
+  status int,
+  royalty_rate double,
+  date_founded datetime
+);
+
+CREATE TABLE album (
+  album_id INTEGER PRIMARY KEY DEFAULT NULL,
+  artist_id int NOT NULL,
+  name varchar(250) NOT NULL,
+  rating smallint unsigned,
+  date_released int unsigned
+);
+
+CREATE TABLE track (
+  track_id INTEGER PRIMARY KEY DEFAULT NULL,
+  album_id int NOT NULL,
+  name varchar(250) NOT NULL
+);
+
+INSERT INTO "artist" VALUES(1,'Artist A',NULL,NULL,9.000,'1999-04-20 16:20:00 UTC');
+INSERT INTO "artist" VALUES(2,'Artist B',NULL,NULL,2.391,'2000-01-01 00:00:00 UTC');
+
+INSERT INTO "album" VALUES( 1,1,'Album AA', 500,1244926800 );
+INSERT INTO "album" VALUES( 2,2,'Album BA', 600,1253219901 );
+INSERT INTO "album" VALUES( 3,2,'Album BB', 700,1253219912 );
+
+INSERT INTO "track" VALUES( 1,1, 'Track AA1' );
+INSERT INTO "track" VALUES( 2,1, 'Track AA2' );
+INSERT INTO "track" VALUES( 3,1, 'Track AA3' );
+INSERT INTO "track" VALUES( 4,2, 'Track BA1' );
+INSERT INTO "track" VALUES( 5,2, 'Track BA2' );
+INSERT INTO "track" VALUES( 6,2, 'Track BA3' );
+INSERT INTO "track" VALUES( 7,3, 'Track BB1' );

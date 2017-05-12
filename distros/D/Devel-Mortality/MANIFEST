@@ -1,0 +1,13 @@
+Changes
+Devel_Mortality.h
+LICENSE
+MANIFEST
+Makefile.PL
+Mortality.xs
+README
+lib/Devel/Mortality.pm
+ppport.h
+t/Devel-Mortality.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

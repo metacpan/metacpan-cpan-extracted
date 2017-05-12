@@ -1,0 +1,36 @@
+{
+   "abstract" : "Provide results as a list in the order",
+   "author" : [
+      "unknown"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Validator-Role-Ordered",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Validator" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Data::Validator::Role::Ordered" : {
+         "file" : "lib/Data/Validator/Role/Ordered.pm",
+         "version" : 0
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.03"
+}

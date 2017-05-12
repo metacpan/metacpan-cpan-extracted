@@ -1,0 +1,2 @@
+{% for var in array3 %}Here {% cycle escape1 "static < value" "static < value"|safe escape2|safe escape3 escape4|safe escape5 %} escaped
+{% endfor %}

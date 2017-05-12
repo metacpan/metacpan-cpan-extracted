@@ -1,0 +1,16 @@
+Revision history for Perl extension DBIx::Simple::Inject
+
+0.04  Sat Oct 27 17:25:55 JST 2012
+        - Update Module::Install
+          respond to http://weblog.bulknews.net/post/33907905561/do-not-ship-modules-with-module-install-1-04
+
+0.03  Dec  2 12:44:45 JST 2011
+        - add SQL::Abstract to requires.
+          You can change "abstract" class, but DBIx::Simple code calls SQL::Abstract.
+          (this is lvalue limitation I think)
+
+0.02  Wed Nov 30 16:17:59 JST 2011
+        - first CPAN release
+
+0.01  
+        - original version

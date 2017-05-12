@@ -1,0 +1,47 @@
+#!/usr/local/bin/perl -w
+
+use 5.01;
+use strict;
+use utf8;
+use warnings;
+
+use Device::Inverter::KOSTAL::PIKO;
+
+die "USAGE: $0 <file>+\n" unless @ARGV;
+
+my $tty;
+if   ( open $tty, '>', '/dev/tty' ) { $tty->autoflush }
+else                                { undef $tty }
+sub progress($) { print $tty shift if defined $tty }
+
+sub records($;$) {
+    my ( $records, $prefix ) = @_;
+    $prefix //= '';
+    "$records ${prefix}record" . ( $records != 1 && 's' );
+}
+
+my $piko = Device::Inverter::KOSTAL::PIKO->new;
+
+my $data;
+for (@ARGV) {
+
+    ( my $file = $piko->load( $_ eq '-' ? \*STDIN : $_ ) )->close;
+
+    progress( 'Read '
+          . records( $file->logdata_records )
+          . ' from '
+          . ( $_ eq '-' ? 'standard input' : qq(file "$_") ) );
+
+    if ($data) {
+        my $new_records = $data->merge($file);
+        progress( ' => ' . records( $new_records, 'new ' ) );
+    }
+    else {    # first file
+        $data = $file;
+    }
+
+    progress("\n");
+}
+
+binmode STDOUT, ':crlf';
+$data->print;

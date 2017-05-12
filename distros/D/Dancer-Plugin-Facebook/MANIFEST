@@ -1,0 +1,14 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+acceptance
+dist.ini
+lib/Dancer/Plugin/Facebook.pm
+t/application.t
+t/auth.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t
+t/zzz_bailout.t

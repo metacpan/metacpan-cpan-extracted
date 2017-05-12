@@ -1,0 +1,61 @@
+{
+   "abstract" : "Date conversions using the French Revolutionary calendar",
+   "author" : [
+      "Jean Forget <JFORGET@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Date-Convert-French_Rev",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Convert" : "0.16",
+            "Roman" : "0",
+            "perl" : "5.008008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Exception" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Date::Convert::French_Rev" : {
+         "file" : "lib/Date/Convert/French_Rev.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/jforget/Date-Convert-French_Rev.git",
+         "web" : "https://github.com/jforget/Date-Convert-French_Rev"
+      }
+   },
+   "version" : "0.08"
+}

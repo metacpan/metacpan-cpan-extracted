@@ -1,0 +1,32 @@
+---
+abstract: 'Perl DateTime extension for a Local Mean Time time zone'
+author:
+  - 'Rick Measham <rickm@cpan.org>'
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.57_02
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-TimeZone-LMT
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DateTime::TimeZone::LMT:
+    file: lib/DateTime/TimeZone/LMT.pm
+    version: 1.01
+requires:
+  Carp: 0
+  DateTime: 0.12
+  DateTime::TimeZone: 0.13
+  Params::Validate: 0
+  perl: v5.6.1
+resources:
+  repository: https://github.com/jforget/DateTime-TimeZone-LMT.git
+version: 1.01

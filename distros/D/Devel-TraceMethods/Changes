@@ -1,0 +1,24 @@
+Revision history for Perl extension Devel::TraceMethods.
+
+1.00  Sat Jul  9 21:33:09 UTC 2005
+	- reorganized distribution
+	- ported tests to Test::More
+	- added callback tests
+	- allow per-package callback
+	- added POD, POD coverage, and signature tests
+	- ported to Module::Build, autogenerate Makefile.PL
+	- added README
+	- bumped up version number
+
+0.50  10 June 2001
+	- don't clobber non-CODE slots in logged typeglobs
+	- distributable module created by h2xs 1.19
+
+	  13 June 2001
+	- allow callback() to be called as a class method as well as function
+	- include Carp::croak() so callback() works correctly
+	- added pod within module
+	- added first 8 tests in test.pl
+
+0.01  29 May 2001
+	- original idea, conceived at http://perlmonks.org/index.pl?node_id=84134

@@ -1,0 +1,123 @@
+=head1 NAME
+
+Disk::SMART - Provides an interface to smartctl to return disk stats and to run tests.
+
+=head1 SYNOPSIS
+
+Disk::SMART is an object oriented module that provides an interface to get SMART disk info from a device as well as initiate testing. An exmple script using this module can be found at https://github.com/paultrost/linux-geek/blob/master/sysinfo.pl
+
+    use Disk::SMART;
+
+    my $smart = Disk::SMART->new('/dev/sda', '/dev/sdb');
+
+    my $disk_health = $smart->get_disk_health('/dev/sda');
+
+=head1 CONSTRUCTOR
+
+=head2 B<new(DEVICE)>
+
+Instantiates the Disk::SMART object
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive, or a list. If no devices are supplied then it runs get_disk_list() which will return an array of detected sdX and hdX devices.
+
+    my $smart = Disk::SMART->new();
+    my $smart = Disk::SMART->new( '/dev/sda', '/dev/sdb' );
+    my @disks = $smart->get_disk_list();
+
+Returns C<Disk::SMART> object if smartctl is available and can poll the given device(s).
+
+=head1 USER METHODS
+
+=head2 B<get_disk_attributes(DEVICE)>
+
+Returns hash of the SMART disk attributes and values
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive
+
+    my %disk_attributes = $smart->get_disk_attributes('/dev/sda');
+
+=head2 B<get_disk_errors(DEVICE)>
+
+Returns scalar of any listed errors
+
+C<DEVICE> - Device identifier of a single SSD/ Hard Drive
+
+    my $disk_errors = $smart->get_disk_errors('/dev/sda');
+
+=head2 B<get_disk_health(DEVICE)>
+
+Returns the health of the disk. Output is "PASSED", "FAILED", or "N/A". If the device has positive values for the attributes listed below then the status will output that information.
+
+Eg. "FAILED - Reported_Uncorrectable_Errors = 1"
+
+The attributes are:
+
+5 - Reallocated_Sector_Count
+
+187 - Reported_Uncorrectable_Errors
+
+188 - Command_Timeout
+
+197 - Current_Pending_Sector_Count
+
+198 - Offline_Uncorrectable
+
+If Reported_Uncorrectable_Errors is greater than 0 then the drive should be replaced immediately. This list is taken from a study shown at https://www.backblaze.com/blog/hard-drive-smart-stats/
+
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive
+
+    my $disk_health = $smart->get_disk_health('/dev/sda');
+
+=head2 B<get_disk_list>
+
+Returns list of detected hda and sda devices. This method can be called manually if unsure what devices are present. 
+
+    $smart->get_disk_list;
+
+=head2 B<get_disk_model(DEVICE)>
+
+Returns the model of the device. eg. "ST3250410AS".
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive
+
+    my $disk_model = $smart->get_disk_model('/dev/sda');
+
+=head2 B<get_disk_temp(DEVICE)>
+
+Returns an array with the temperature of the device in Celsius and Farenheit, or N/A.
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive
+
+    my ($temp_c, $temp_f) = $smart->get_disk_temp('/dev/sda');
+
+=head2 B<run_short_test(DEVICE)>
+
+Runs the SMART short self test and returns the result.
+
+C<DEVICE> - Device identifier of SSD/ Hard Drive
+
+    $smart->run_short_test('/dev/sda');
+
+=head2 B<update_data(DEVICE)>
+
+Updates the SMART output and attributes for each device. Returns undef.
+
+C<DEVICE> - Device identifier of a single SSD / Hard Drive or a list of devices. If none are specified then get_disk_list() is called to detect devices.
+
+    $smart->update_data('/dev/sda');
+
+=head1 COMPATIBILITY
+
+  This module should run on any UNIX like OS with Perl 5.10+ and the smartctl progam installed from the smartmontools package.
+
+=head1 AUTHOR
+
+ Paul Trost <ptrost@cpan.org>
+
+=head1 LICENSE AND COPYRIGHT
+
+ Copyright 2015 by Paul Trost
+ This script is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License v2, or at your option any later version.
+ <http://gnu.org/licenses/gpl.html>
+

@@ -1,0 +1,21 @@
+1.131120  2013-04-22 15:36:30 EST5EDT
+  * fix bug in member collections that uses singular_resource instead of
+  * override params if specified
+
+1.122280  2012-08-15 14:07:36 EST5EDT
+  * bugfix - :params route was getting declared _after_, not before the nonparam
+   route. this was causing the nonparam route to take dispatcher precedence.
+  * bufxi - skip_prepare_serializer option was not properly being respected.
+
+1.121953  2012-07-13 16:52:00 EST5EDT
+  * params functionality update - '_id' was getting incorrectly appended in params.
+
+1.121952  2012-07-13 16:21:25 EST5EDT
+  * more pod fixes.
+
+1.121951  2012-07-13 16:08:45 EST5EDT
+  * pod fixes
+
+1.121950  2012-07-13 15:30:02 EST5EDT
+  * Fork from Dancer::Plugin::REST
+  * Adds new ':inflect' resource functionality.

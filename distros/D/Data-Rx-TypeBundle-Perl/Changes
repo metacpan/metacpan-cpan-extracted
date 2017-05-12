@@ -1,0 +1,27 @@
+Revision history for Data-Rx-TypeBundle-Perl
+
+0.009     2013-12-22 22:05:12-0500 America/New_York
+          fix dist name
+
+0.008     2013-12-22 21:56:26-0500 America/New_York
+          update github links
+
+0.007     2013-07-05 22:08:56 America/New_York
+          update bug tracker
+
+0.006     2012-09-18 16:54:25 America/New_York
+          put newer (correct) Data::Rx in prereqs
+
+          get rid of a "local $@" that broke the Obj type on old perls
+
+0.005     2012-09-18 10:55:31 America/New_York
+          update for structured failures and Data::Rx 0.200
+
+0.004     2010-09-01 16:27:29 America/New_York
+          add /perl/ref
+
+0.003     2009-03-12
+          add /perl/code
+
+0.001     2009-01-29
+          first release

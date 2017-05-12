@@ -1,0 +1,37 @@
+---
+abstract: 'Perl module to control Onkyo/Integra AV equipment'
+author:
+  - 'Mark Hindess <soft-cpan@temporalanomaly.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::More: '0'
+  Test::Requires: '0'
+  Test::SharedFork: '0'
+  base: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Device-Onkyo
+requires:
+  Carp: '0'
+  Fcntl: '0'
+  Getopt::Long: '0'
+  IO::Select: '0'
+  IO::Socket::INET: '0'
+  Pod::Usage: '0'
+  Socket: '0'
+  Symbol: '0'
+  Time::HiRes: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/beanz/device-onkyo-perl/issues
+  repository: git://github.com/beanz/device-onkyo-perl.git
+version: '1.143640'

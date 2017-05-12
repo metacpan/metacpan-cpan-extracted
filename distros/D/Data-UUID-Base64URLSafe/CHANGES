@@ -1,0 +1,13 @@
+ChangeLog for Data::UUID::Base64URLSafe:
+
+0.34 Tue Jun 23 16:37:15 BST 2009
+    - added the other methods that a uuid formatter should have
+      (patch by Jesse Vincent)
+
+0.33 Wed Oct  8 15:05:07 BST 2008
+    - add abstract to the Makefile.PL
+    - add human-readable license to the documentation
+
+0.32 Thu May  1 18:00:04 BST 2008
+    - first release
+

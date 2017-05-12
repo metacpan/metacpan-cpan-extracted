@@ -1,0 +1,328 @@
+==================================================
+Changes from 1742-07-17 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.010 at 2016-04-30 01:27:33 +0000
+------------------------------------------
+
+  Change: 1bcfb672803e1fc00d84e8adec2ffcddb46737fa
+  Author: Manfred Stock <mstock@cpan.org>
+  Date : 2016-04-30 13:13:11 +0000
+
+    Add support for generating addons.apt_packages entries
+
+    This allows for the installation of packages in the container based
+    infrastructure. See [1] for details.
+
+    Test included.
+
+    Closes #9
+
+    [1] http://docs.travis-ci.com/user/apt-packages/ 
+
+  Change: bc929bfb51d8887032e9cd3b0abc0065c83e06ca
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2016-04-30 12:42:01 +0000
+
+    Add Beam::Event/Emitter support via a modify_travis_yml event.
+
+    A basic example is available in the "beam" release test.
+
+    ( PR #10 ) 
+
+  Change: 8df0f08495012d79e5b879933b1fc923ebfb1397
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2016-04-30 12:27:58 +0000
+
+    Add a test for existing modify_travis_yml via subclass 
+
+  Change: f36f409c5d0e65f651445da5be62bf8b10faf8d4
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2016-04-30 12:26:33 +0000
+
+    Added a low level basic feature test. 
+
+  Change: bdf6dc7ee1a62fec1fc01757c1f1ac6238643f5f
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2016-04-30 12:23:01 +0000
+
+    Remove unneeded deps on Path::Class and File::Slurp
+
+    This closes #8 
+
+------------------------------------------
+version 0.009 at 2016-02-19 01:44:50 +0000
+------------------------------------------
+
+  Change: 7053e8f8b4fbbfa758f20836f5c582dcce17ff3e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2016-02-19 02:44:50 +0000
+
+    Added perl 5.22 to generation and so added new .travis.yml to dist 
+
+------------------------------------------
+version 0.008 at 2015-02-05 04:27:28 +0000
+------------------------------------------
+
+  Change: 269be3d31f083036b3d8f286e5d82731a13e7e16
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2015-02-05 05:27:28 +0000
+
+    Merge pull request #6 from kentfredric/w32
+
+    Make Win32 emits \n instead of \r\n 
+
+  Change: 45acb8c00ff848ee217ba87f6dbe599b035eded4
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2015-02-05 05:27:20 +0000
+
+    Merge pull request #5 from kentfredric/master
+
+    Use latest YAML and QuoteNumericStrings feature. 
+
+  Change: c0bc21608f7ba894e4d9886bac51e6b98ebffc5f
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2015-01-19 20:10:09 +0000
+
+    Unify output logic and ensure EOL stles is consistent on Win32
+
+    This closes #1 
+
+  Change: 5aff49ab4f17853ff609ae14c45518dd4519a41e
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2015-01-18 21:45:57 +0000
+
+    Use latest YAML and QuoteNumericStrings feature.
+
+    This is to ensure that strings that resemble numeric keys are encoded
+    quoted as strings such that decoders correctly decode them as
+    strings, not numbers.
+
+    Thus, trailing 0's ( which are significant ) are not lost, and
+    there's no subsequent
+
+    Perl: 5.1
+
+    Perl: 5.2
+
+    Craziness in your travis smoke list.
+
+    ( Which are perls version 5.10 and 5.20 respectively ) 
+
+------------------------------------------
+version 0.007 at 2015-01-01 20:45:31 +0000
+------------------------------------------
+
+  Change: 47a9ec82d58338f5c1bf2975db325dc3f0368482
+  Author: Torsten Raudssus <github@raudssus.de>
+  Date : 2015-01-01 21:45:31 +0000
+
+    Merge pull request #4 from kentfredric/master
+
+    Move "write to root" to AfterBuild phase. 
+
+  Change: 115607c307ed5198f72cd61ec106ce1e6633ec1f
+  Author: Kent Fredric <kentfredric@gmail.com>
+  Date : 2015-01-02 09:25:47 +0000
+
+    Move "write to root" to AfterBuild phase.
+
+    Also:
+
+    - new 'write_to' attribute.
+
+    - valid optios 'root' and 'build'
+
+    - 'build' writes to the shipped dist.
+
+    - both can be used in conjunction, but extra care may be needed.
+
+    - sensitivity to the future Path::Class apocalypse averted. 
+
+------------------------------------------
+version 0.006 at 2015-01-01 19:36:37 +0000
+------------------------------------------
+
+  Change: 70c21b7778fd07732197b819d3a6513bf7bf3c56
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2015-01-01 20:36:37 +0000
+
+    Added modify_travis_yml 
+
+------------------------------------------
+version 0.005 at 2014-11-27 04:23:46 +0000
+------------------------------------------
+
+  Change: c2b6cab5b115aec105dee6517fbf7b61e74423e3
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-11-27 05:23:46 +0000
+
+    Revert revert, error was in bundle 
+
+  Change: 2a592200f204cbf5f3868909fb0a90ac99a6653c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-11-27 05:06:56 +0000
+
+    Added perl 5.20 to the perls, changed requires attribute name for
+    now... (WIP) 
+
+  Change: 281e7b74fbac4fa9fc009c4de2a27da012d2100c
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-11-27 04:20:21 +0000
+
+    Revert "Using App::CPAN::Fresh for installing authordeps, directly
+    testing this..."
+
+    This reverts commit 987a8e419dfee79a8214b6c25bf9ca24e876caa9. 
+
+  Change: 987a8e419dfee79a8214b6c25bf9ca24e876caa9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-11-25 17:36:20 +0000
+
+    Using App::CPAN::Fresh for installing authordeps, directly testing
+    this... 
+
+------------------------------------------
+version 0.004 at 2014-02-16 01:30:45 +0000
+------------------------------------------
+
+  Change: f81da909afa1e8b93200a32655a37b0fbe15e2b6
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-02-16 02:30:45 +0000
+
+    New travis.yml 
+
+  Change: 02e8e906f515243f1909a0190f7d29cd21185e2e
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2014-02-16 02:29:27 +0000
+
+    Merge pull request #3 from crazedpsyc/master
+
+    Install latest versions, don't skip everything 
+
+  Change: 635107eb1fd7af58a7dc35824f7f2ebaa6aa277a
+  Author: Michael Smith <crazedpsyc@duckduckgo.com>
+  Date : 2014-02-15 17:57:49 +0000
+
+    Install latest versions, don't skip everything
+
+    cpanm --skip-satisfied Some::Thing skips anything which is already
+    installed, regardless of the version. --skip-installed checks for the
+    latest version on CPAN. 
+
+------------------------------------------
+version 0.003 at 2013-09-10 22:21:20 +0000
+------------------------------------------
+
+  Change: 8f0cc1753b48f536f2ceecba48522f7e84beec5a
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 00:21:20 +0000
+
+    Own new .travis.yml 
+
+  Change: 095f0fe28389c70cc0006b415d3316ea58bd8749
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 00:20:36 +0000
+
+    Merge branch 'master' of
+    github.com:Getty/p5-dist-zilla-plugin-travisci 
+
+  Change: aec19cffaa9eb1f66cebd122812e20e52b7ce5a5
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-10 15:20:31 +0000
+
+    Merge pull request #2 from dolmen/lazy-loading
+
+    Lazy loading 
+
+  Change: 8b289f14051304dc9e50963f05540e2ae1b4488b
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-09-11 00:18:18 +0000
+
+    Added Perl 5.18 to default setup 
+
+  Change: 6f23ba994ca1ae5d6ea48c635bab204d9c2866df
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-18 15:11:19 +0000
+
+    Output the file in the root of the distribution source
+
+    The code was already doing that (because $zilla->built_in is empty
+    when the plugin runs), but just by accident! 
+
+  Change: aa3deb85c7259f5bfe21ccb127ad1a2d4edaf7d1
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-18 14:53:53 +0000
+
+    Lazy load dependencies 
+
+  Change: 78247dcb6aeea77ae5ff9aa84fd3abe96768f7a0
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-18 14:49:41 +0000
+
+    Build our dist with our version of the plugin
+
+    ... thanks to [Bootstrap::lib] 
+
+  Change: f846ad160483b7466cdd842a13626f508e9ab7f9
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-06-17 16:37:16 +0000
+
+    New travisyml with the new grep 
+
+  Change: a4df7085573f437f4f40719a1e95a34a5ae7c5a2
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-06-17 16:36:29 +0000
+
+    If travis ever changes the platform, this grep replacement will work
+    on a wider range of systems 
+
+  Change: 9d7e549c0b24e4a0f00626f08f245ca4e651a1a8
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-03 03:36:41 +0000
+
+    coveralls implementation (so far, not working yet) 
+
+  Change: 00ae81d275c87840fd4fa01c835f586c1b214d54
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 23:21:07 +0000
+
+    Fixed POD a bit 
+
+------------------------------------------
+version 0.002 at 2013-05-02 21:17:58 +0000
+------------------------------------------
+
+  Change: be15a3888b7ff339df4119e9f1a21e1a93c45dc4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 23:17:58 +0000
+
+    More details, more documentation (with default config), so also
+    updated .travis.yml 
+
+  Change: d9185874b577e61859ddbaf1661a14d28d8d1ce4
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 08:00:42 +0000
+
+    Tighten requirements, removed namespace::autoclean 
+
+------------------------------------------
+version 0.001 at 2013-05-02 11:53:23 +0000
+------------------------------------------
+
+  Change: 91a450b82c9839956d61afb4b264d148cfb8a502
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 07:53:23 +0000
+
+    Added .travis.ym 
+
+  Change: af75087879521033a7e5cc3844fdf68648cc9796
+  Author: Torsten Raudssus <torsten@raudss.us>
+  Date : 2013-05-02 07:49:44 +0000
+
+    First version 
+
+================
+End of releases.
+================

@@ -1,0 +1,13 @@
+Build.PL
+lib/Data/Bitfield.pm
+MANIFEST			This list of files
+t/00use.t
+t/01boolfield.t
+t/02intfield.t
+t/03enumfield.t
+t/99pod.t
+Makefile.PL
+README
+LICENSE
+META.yml
+META.json

@@ -1,0 +1,29 @@
+NAME
+	Date::Namedays::Simple - A lightweight package for finding namedays for a given date
+
+DESCRIPTION
+	Install and see the man pages!
+	
+	Please note: this is an alpha software. VERY alpha. Even this REAMDE is unfini...
+	
+INSTALL
+	Just the usual way... download the tarball, un-tar-gz (e.g. "tar xfvz <packagename>"), cd 
+	to the directory and:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+Optionally, you can:
+
+perl -MCPAN -e shell
+cpan> install Date::Namedays::Simple
+
+
+BUGS
+	Please send any bugreports, patches, suggestions to: con-NOSPAM-cept@conceptonline.hu 
+	to the author, Csongor Fagyal.

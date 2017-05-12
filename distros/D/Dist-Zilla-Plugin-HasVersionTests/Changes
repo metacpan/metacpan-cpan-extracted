@@ -1,0 +1,8 @@
+Revision history for Perl extension Dist-Zilla-Plugin-HasVersionTests
+
+1.101420  2010-05-22 16:58:24 Europe/Vienna
+    - removed weaver.ini since that's handled in Dist::Zilla's [@MARCEL] now
+    - list Test::HasVersion in dist.ini so we don't use() it anymore
+
+1.100700  2010-03-11 09:42:47 Europe/Vienna
+    - original version

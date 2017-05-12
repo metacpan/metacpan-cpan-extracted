@@ -1,0 +1,32 @@
+2000-03-06  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Adjusted for DB_File 1.72
+
+1999-12-04  Andreas J. Koenig  <andreas.koenig@anima.de>
+
+	* Adjusted for DB_File 1.71
+
+1998-02-xx  Andreas J. Koenig
+
+	* Makefile.PL clean target removed SV18x.pm. No restricted to
+	SV18[56].*.
+
+	On a RedHat 5.0 I found out that hash/hash.h needs a patch that I
+	haven't seen mentioned yet. That's for both 1.85 and 1.86:
+
+	    --- /tmp/db.1.86/hash/hash.h    Sat Jan  4 20:27:56 1997
+	    +++ db.1.86/hash/hash.h Sat Feb 21 08:56:22 1998
+	    @@ -36,6 +36,10 @@
+	      *     @(#)hash.h      8.4 (Berkeley) 11/2/95
+	      */
+
+	    +#ifdef errno
+	    +#undef errno
+	    +#endif
+	    +
+	     #include <sys/queue.h>
+
+	     #include <mpool.h>
+
+	I have yet to find out, how to get that patch in somewhere :-(
+

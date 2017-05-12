@@ -1,0 +1,58 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 a679d98cb7145fb68be7570425370ce6224689c0 AUTHORS
+SHA1 be0627fff2e8aef3d2a14d5d7486babc8a4873ba Artistic
+SHA1 357d0bf457b5d3f7e5ffa264745b0ca936ec1800 Build.PL
+SHA1 8624bcdae55baeef00cd11d5dfcfa60f68710a02 COPYING
+SHA1 a286ec26956d71dbff229e86bea7e989943822a6 Changes
+SHA1 f571fb7a3ede932cd7af4464f53e307b0ef0a345 MANIFEST
+SHA1 4ed7c30f29bcfb84abded747fc65d57439f9c0d5 META.yml
+SHA1 e5b82da01a02ce61f3eefa98d0fcf370c918fd07 Makefile.PL
+SHA1 819243ec435702f419673c0b0e52074928091c02 README
+SHA1 069311923a9a5ce342bed8daafcead7a173ada4a TODO
+SHA1 d738fc0c4750e5cca4c5331a7f81b642c74c6ca8 forms/dbforms.cgi
+SHA1 3838d1387f5d1d4587a75d720069a6a9dd40d71b lib/DbFramework/Attribute.pm
+SHA1 66566a46862c7335d4cca4dcce86f6628c8e6ab7 lib/DbFramework/Catalog.pm
+SHA1 7eeebafc4dddc5f0821bee571ece66460e08f4d0 lib/DbFramework/DataModel.pm
+SHA1 b55df0160345f967d3a620d761e952f8b06e8121 lib/DbFramework/DataModelObject.pm
+SHA1 bbfba57d46163b15cba222875987da0fa35874fa lib/DbFramework/DataType/ANSII.pm
+SHA1 e2bb3c108f3f8e5c415a000a077a95c9a28de12c lib/DbFramework/DataType/Mysql.pm
+SHA1 03b5b99f872e57e69d3c9c51221d4135a1fa7b61 lib/DbFramework/DefinitionObject.pm
+SHA1 007da37acd0b05d39eb5a22722067c7c1d5a3627 lib/DbFramework/ForeignKey.pm
+SHA1 bea535189a79352154d8bd3fcabfd9766042ca45 lib/DbFramework/Key.pm
+SHA1 607f0330f2f423df32eb77dd357f0eb3371e690f lib/DbFramework/Persistent.pm
+SHA1 93cf31db275578e1dd81543aff64227b4bda30c8 lib/DbFramework/PrimaryKey.pm
+SHA1 337e27a37b0ebf173b1307af3ce4899c3b93f635 lib/DbFramework/Relationship.pm
+SHA1 73e4b0973cd54cde69dc8313bf3daaa3816d0953 lib/DbFramework/Table.pm
+SHA1 d295442819c677ea01b3f1c0fb1903a473c9d5d9 lib/DbFramework/Template.pm
+SHA1 7d6b52232e52dcd4026ac52176ba53790ade83c0 lib/DbFramework/Util.pm
+SHA1 025178ab79a02175f0078661ead7aa978b1a48a4 t/10base.t
+SHA1 038c3ed12c48d1ccb523cb29c41c88a24803a0cd t/15catalog.t
+SHA1 360cef80c3cafeefcd47717d75d868a89a9f33f6 t/17datatype.t
+SHA1 f13586408a7e059991b0191b6d7cb4f496693df7 t/20table.t
+SHA1 2e11ee0000d5eac1ec349be010ee6e5d8dc81ce3 t/30persistent.t
+SHA1 61d3a46315dc447e8e1d1976676fe57ac992b063 t/40template.t
+SHA1 ed7b13a575d7eb7b31eb1530976030c2a990fb30 t/template
+SHA1 f7888dea771f14b105c2628711bc112b79a90737 t/test/foo/foo.form
+SHA1 567aa1bf40d2fd42957d0ca95d815790c35f8752 t/util.pl
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.9 (GNU/Linux)
+
+iEYEARECAAYFAkgbysIACgkQi9gubzC5S1wSgQCgno1FWlFS4rbsFZ071jnqMm8R
+/oEAoKmcZnpQmb3q0wCL6kUibBV0lZZM
+=xchz
+-----END PGP SIGNATURE-----

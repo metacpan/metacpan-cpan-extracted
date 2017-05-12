@@ -1,0 +1,40 @@
+---
+abstract: 'A collection of Utility modules'
+author:
+  - 'Kan Liu <kan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DynGig-Util
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  Cwd: 0
+  DBI: 0
+  DateTime: 0
+  DynGig::Range::Time: 0
+  Errno: 0
+  Fcntl: 0
+  File::Copy: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Select: 0
+  POSIX: 0
+  Socket: 0
+  Test::More: 0
+  Thread::Queue: 2.12
+  Thread::Semaphore: 2.12
+  Time::HiRes: 0
+  YAML::XS: 0.38
+  threads: 1.86
+version: 1.04

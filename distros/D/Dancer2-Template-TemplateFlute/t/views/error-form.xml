@@ -1,0 +1,6 @@
+<specification>
+  <value name="errors" />
+  <form name="edit">
+    <field name="input" id="input" />
+  </form>
+</specification>

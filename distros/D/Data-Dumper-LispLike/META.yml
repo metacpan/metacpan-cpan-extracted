@@ -1,0 +1,15 @@
+---
+abstract: 'Dump perl data structures formatted as Lisp-like S-expressions'
+author:
+  - 'Sergey Redin <sergey@redin.info>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300005, CPAN::Meta::Converter version 2.112621'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Dumper-LispLike
+version: 0.004

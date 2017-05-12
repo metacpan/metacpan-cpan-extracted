@@ -1,0 +1,44 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+use Lucy;
+
+my $usage = "$0 path/to/index\n";
+
+die $usage unless @ARGV;
+
+binmode STDOUT, ":utf8";
+
+for my $invindex (@ARGV) {
+    my $reader      = Lucy::Index::IndexReader->open( index => $invindex );
+    my $schema      = $reader->get_schema();
+    my $fields      = $schema->all_fields();
+    my $seg_readers = $reader->seg_readers;
+    for my $seg_reader (@$seg_readers) {
+        my $seg_name = $seg_reader->get_seg_name;
+        my $seg_num  = $seg_reader->get_seg_num;
+        my $num_docs = $seg_reader->doc_max;
+        printf( "Segment %s [%d] has %s docs\n",
+            $seg_name, $seg_num, $num_docs );
+
+        my $lex_reader = $seg_reader->obtain('Lucy::Index::LexiconReader');
+        my $plist_reader
+            = $seg_reader->obtain('Lucy::Index::PostingListReader');
+        for my $field (@$fields) {
+            my $lexicon = $lex_reader->lexicon( field => $field );
+            while ( $lexicon && $lexicon->next ) {
+                my $seg_freq = 0;
+                my $plist    = $plist_reader->posting_list(
+                    field => $field,
+                    term  => $lexicon->get_term
+                );
+                while ( $plist->next ) {
+                    $seg_freq++;
+                }
+                printf( " %24s: %s [%d]\n",
+                    $field, $lexicon->get_term, $seg_freq );
+            }
+        }
+    }
+
+}

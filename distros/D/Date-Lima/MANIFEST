@@ -1,0 +1,28 @@
+.perlcriticrc
+Changes
+lib/Time/DeltaString.pm
+lib/Time/DeltaString.pod
+Lima.pm
+Lima.pod
+Makefile.PL
+MANIFEST
+README
+t/01_main.t
+t/02_podt.t
+t/03_nomonths.t
+t/04_weeklargest.t
+t/05_oddball.t
+t/07_rev.t
+t/75_day_conversions.t
+t/9901_main.t
+t/9902_podt.t
+t/9903_nomonths.t
+t/9904_weeklargest.t
+t/9905_oddball.t
+t/9907_rev.t
+t/9975_day_conversions.t
+t/critic.t
+t/pod.t
+t/pod_coverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

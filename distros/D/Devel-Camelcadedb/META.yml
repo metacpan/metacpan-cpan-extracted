@@ -1,0 +1,35 @@
+---
+abstract: unknown
+author:
+  - 'Alexandr Evstigneev <hurricup@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-Camelcadedb
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  B::Deparse: '0'
+  Cwd: '0'
+  Encode: '0'
+  Hash::StoredIterator: '0'
+  IO::Socket::INET: '0'
+  JSON::XS: '3.02'
+  PadWalker: '2.2'
+  Scalar::Util: '0'
+  perl: '5.008'
+resources:
+  bugtracker: https://github.com/hurricup/Perl5-IDEA-Debugger/issues
+  license: http://www.opensource.org/licenses/mit-license.php
+  repository: https://github.com/hurricup/Perl5-IDEA-Debugger
+version: '2017.1'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'

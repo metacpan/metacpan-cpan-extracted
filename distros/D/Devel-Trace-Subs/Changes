@@ -1,0 +1,82 @@
+Revision history for Devel-Trace-Subs
+
+0.22    2016-01-18
+        - no functional code changes
+        - bumped prereq of Devel::Examine::Subs to 1.61 due to bug introduced
+          into previous version, breaking tests
+
+0.21    2016-01-04
+        - no functional code changes
+        - modified tests to work with DES 1.55 through 1.58 (CPAN Testers
+          failure)
+        - bumped req ver of DES to 1.58
+        - build now requires Mock::Sub, due to adding significant tests for
+          coverage
+
+0.20    2015-10-29
+        - DES is now loaded from within eval() in install and remove only. This fixes
+          a bug where if DTS was loaded in a script before anything that uses DES,
+          *trace() would get clobbered and would be unavailable
+        - removed various PREREQ_PMs that are no longer required  
+
+0.19    2015-10-23
+        - modified pod to reflect Devel::Examine::Subs API change in
+          handling 'extensions'. We now accept anything that File::Find::Rule::name()
+          accepts within this param
+        - numerous tests added to test against extension param functionality
+
+0.18    2015-10-23
+        - no functional changes
+        - refactored to work on perl v5.8+, previously we only ran on
+          v5.12+
+
+0.17    2015-09-30
+        - bumped DES req to 1.54
+
+0.16    2015-09-30
+        - setting $ENV{DTS_FLUSH_FLOW} = 1 will now output a single line
+          of codeflow info each time trace() is called
+        - bumped DES req to 1.45 due to Symbol bug
+
+0.12    2015-09-17
+        - min perl ver required: 5.12
+        - fixed Makefile.PL to fix tests on MSWin32 platform
+
+0.10    2015-09-15
+        - moved repo from bitbucket to https://github.com/stevieb9/devel-trace-subs
+        - requires Perl v5.10+
+        - requires DES v1.31+
+
+0.08    2015-09-15
+        - added 'inject' param to install_trace(), allows custom code to be
+          installed
+
+0.07    2015-09-14
+        - bumped DES req to v1.30
+
+0.06    2015-09-14
+        - install_trace() now uses DES->inject(inject_after_sub_def => [])
+          instead of DES->inject_after()
+        - modules no longer have to be loaded prior to install/remove,
+          as a bug was fixed in DES
+        - include/exclude parameters no longer are useful, all subs will
+          be injected to
+
+0.04    2015-09-13
+        - install_trace() now accepts extensions => []
+
+0.03    2015-09-13
+        - updated sub regex to catch subs with open brace on next line
+        - "" "" "" to catch subs with close brace on same line
+        - "" "" "" to catch anon subs (but skip the one-liners)
+        - updated install_trace() to call remove_trace() so that
+          duplicate installs don't happen
+
+0.02    2015-09-13
+        - install_trace() added
+        - remove_trace() added
+        - renamed module from Devel::Trace::Flow to Devel::Trace::Subs
+
+0.01    2015-09-10
+        - initial version
+

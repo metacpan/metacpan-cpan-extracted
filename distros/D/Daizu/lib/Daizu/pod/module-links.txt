@@ -1,0 +1,40 @@
+# Modules for which documentation can be found on search.cpan.org, but
+# not using the /perldoc? redirector.
+XML::LibXML::Attr	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Attr.pod
+XML::LibXML::CDATASection	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/CDATASection.pod
+XML::LibXML::Comment	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Comment.pod
+XML::LibXML::DOM	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/DOM.pod
+XML::LibXML::Document	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Document.pod
+XML::LibXML::DocumentFragment	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/DocumentFragment.pod
+XML::LibXML::Dtd	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Dtd.pod
+XML::LibXML::Element	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Element.pod
+XML::LibXML::InputCallback	http://search.cpan.org/~pajas/XML-LibXML/lib/XML/LibXML/InputCallback.pod
+XML::LibXML::Namespace	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Namespace.pod
+XML::LibXML::Node	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Node.pod
+XML::LibXML::Parser	http://search.cpan.org/~phish/XML-LibXML/lib/XML/LibXML/Parser.pod
+
+# I publish my own version of the Daizu perl docs, because that way they
+# get pretty syntax highlighting.
+Daizu	http://www.daizucms.org/doc/api/Daizu.html
+Daizu::Feed	http://www.daizucms.org/doc/api/Daizu/Feed.html
+Daizu::File	http://www.daizucms.org/doc/api/Daizu/File.html
+Daizu::Gen	http://www.daizucms.org/doc/api/Daizu/Gen.html
+Daizu::Gen::Blog	http://www.daizucms.org/doc/api/Daizu/Gen/Blog.html
+Daizu::HTML	http://www.daizucms.org/doc/api/Daizu/HTML.html
+Daizu::Plugin::DisplayPicture	http://www.daizucms.org/doc/api/Daizu/Plugin/DisplayPicture.html
+Daizu::Plugin::HeaderAnchor	http://www.daizucms.org/doc/api/Daizu/Plugin/HeaderAnchor.html
+Daizu::Plugin::ImageMetadata	http://www.daizucms.org/doc/api/Daizu/Plugin/ImageMetadata.html
+Daizu::Plugin::PictureArticle	http://www.daizucms.org/doc/api/Daizu/Plugin/PictureArticle.html
+Daizu::Plugin::PodArticle	http://www.daizucms.org/doc/api/Daizu/Plugin/PodArticle.html
+Daizu::Plugin::RelatedLinks	http://www.daizucms.org/doc/api/Daizu/Plugin/RelatedLinks.html
+Daizu::Plugin::SyntaxHighlight	http://www.daizucms.org/doc/api/Daizu/Plugin/SyntaxHighlight.html
+Daizu::Plugin::XHTMLArticle	http://www.daizucms.org/doc/api/Daizu/Plugin/XHTMLArticle.html
+Daizu::Preview	http://www.daizucms.org/doc/api/Daizu/Preview.html
+Daizu::Publish	http://www.daizucms.org/doc/api/Daizu/Publish.html
+Daizu::Publish::Editor	http://www.daizucms.org/doc/api/Daizu/Publish/Editor.html
+Daizu::Revision	http://www.daizucms.org/doc/api/Daizu/Revision.html
+Daizu::TTProvider	http://www.daizucms.org/doc/api/Daizu/TTProvider.html
+Daizu::Test	http://www.daizucms.org/doc/api/Daizu/Test.html
+Daizu::Util	http://www.daizucms.org/doc/api/Daizu/Util.html
+Daizu::Wc	http://www.daizucms.org/doc/api/Daizu/Wc.html
+Daizu::Wc::UpdateEditor	http://www.daizucms.org/doc/api/Daizu/Wc/UpdateEditor.html

@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+mysqlPP.pm
+README
+script/mysql.pl
+t/0.base.t
+t/01_mysqlpp_bind_statement.t

@@ -1,0 +1,138 @@
+NAME
+    Data::Sorting - Multi-key sort using function results
+
+ABSTRACT
+    Data::Sorting provides functions to sort the contents of arrays based on
+    a collection of extraction and comparison rules. Extraction rules are
+    used to identify the attributes of array elements on which the ordering
+    is based; comparison rules specify how those values should be ordered.
+
+    Index strings may be used to retrieve values from array elements, or
+    function references may be passed in to call on each element. Comparison
+    rules are provided for numeric, bytewise, and case-insensitive orders,
+    as well as a 'natural' comparison that places numbers first, in numeric
+    order, followed by the remaining items in case-insensitive textual
+    order.
+
+SYNOPSIS
+      use Data::Sorting qw( :basics :arrays :extras );
+  
+      # Sorting functions default to simple string comparisons 
+      @names = qw( Bob Alice Ellen Charlie David );
+      @ordered = sorted_by( undef, @names );
+  
+      # Various options can be passed before the list values
+      @ordered = sorted_by( [ -order=>'reverse' ], @names );
+
+      # You can also generate a sorting function and then apply it
+      $function = sort_function(); 
+      @ordered = $function->( @names );  # or &{$function}(@names)
+      @ordered = sort_function( -order=>'reverse' )->( @names );
+  
+      # The :array functions are prototyped to take the array first
+      @ordered = sorted_array( @names );
+      @ordered = sorted_arrayref( \@names );
+
+      # You can also sort an array in place, changing its internal order
+      sort_array( @names );
+      sort_arrayref( \@names );
+  
+      # There are several sorting options, such as -compare => 'natural'
+      @movies = ( 'The Matrix', 'Plan 9', '2001', 'Terminator 2' );
+      @ordered = sort_function( -compare => 'natural' )->( @movies );
+      # @ ordered now contains '2001', 'The Matrix', 'Plan 9', 'Terminator 2'
+  
+      # To sort numbers, pass the -compare => 'numeric' option
+      @numbers = ( 18, 5, 23, 42, 156, 91, 64 );
+      @ordered = sorted_by( [ -compare => 'numeric' ], @numbers );
+      @ordered = sort_function( -compare => 'numeric' )->( @numbers );
+      @ordered = sorted_array( @numbers, -compare => 'numeric' );
+      sort_array( @numbers, -compare => 'numeric' );
+  
+      # You can sort by the results of a function to be called on each item
+      sort_array( @numbers, -compare => 'numeric', sub { $_[0] % 16 } );
+      # @numbers now contains 64, 18, 5, 23, 42, 91, 156
+  
+      # For arrays of datastructures, pass in keys to extract for sorting
+      @records = ( 
+        { 'rec_id'=>3, 'name'=>{'first'=>'Bob', 'last'=>'Macy'} },
+        { 'rec_id'=>1, 'name'=>{'first'=>'Sue', 'last'=>'Jones'} },
+        { 'rec_id'=>2, 'name'=>{'first'=>'Al',  'last'=>'Jones' } },
+      );
+      @ordered = sorted_array( @records, 'rec_id' );
+
+      # For nested data structures, pass an array of keys to fetch
+      @ordered = sorted_array( @records, ['name','first'] );
+
+      # Pass multiple sort keys for multiple-level sorts
+      @ordered = sorted_array( @records, ['name','last'], ['name','first'] );
+  
+      # Any selected sort options are applied to all subsequent sort keys
+      @ordered = sorted_array( @records, 
+                    -order => 'reverse', ['name','last'], ['name','first'] );
+  
+      # Options specified within a hash-ref apply only to that key
+      @ordered = sorted_array( @records, 
+                    { order=>'reverse', sortkey=>['name','last'] }, 
+                    ['name','first'] );
+  
+      # Locale support is available if you have Perl 5.004 or later and POSIX
+      POSIX::setlocale( POSIX::LC_COLLATE(), 'en_US' );
+      POSIX::setlocale( POSIX::LC_CTYPE(), 'en_US' );
+      @ordered = sorted_array( @records, 
+                     -compare=>'locale', ['name','last'], ['name','first'] );
+
+STATUS AND SUPPORT
+    This release of Data::Sorting is intended for public review and
+    feedback.
+
+      Name            DSLIP  Description
+      --------------  -----  ---------------------------------------------
+      Data::
+      ::Sorting       bdpfp  Multi-key sort using function results
+
+    Further information and support for this module is available at
+    www.evoscript.org.
+
+    Please report bugs or other problems to <bugs@evoscript.com>.
+
+BUGS AND TO DO
+    The following issues have been noted for future improvements:
+
+    Convert more types of comparisons to packed-default sorts for speed.
+
+    Further investigate the current status of the Sort::Records module.
+
+    Add a comparator function for an alpha-numeric-spans sorting model like
+    Sort::Naturally.
+
+    Interface to Sort::PolySort for alternate comparator styles, like "name"
+    and "usdate".
+
+    For non-scalar values, compare referents along the lines of
+    Ref::cmpref().
+
+    Provide better handling for nested sorts; perhaps throw an exception
+    from the inner instance to the outer, catch and set $PreCalculate, then
+    go back into the loop?
+
+    Replace dynamic scoping with object instances for thread safety. May not
+    be necessary given changes in threading models.
+
+CREDITS AND COPYRIGHT
+  Developed By
+
+      M. Simon Cavalletto, simonm@cavalletto.org
+      Evolution Softworks, www.evoscript.org
+
+  Copyright
+
+    Copyright 2003 Matthew Cavalletto.
+
+    Portions copyright 1996, 1997, 1998, 1999 Evolution Online Systems, Inc.
+
+  License
+
+    You may use, modify, and distribute this software under the same terms
+    as Perl.
+

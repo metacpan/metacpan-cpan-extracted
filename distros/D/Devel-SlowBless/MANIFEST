@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+ppport.h
+README
+SlowBless.xs
+t/Devel-SlowBless.t
+lib/Devel/SlowBless.pm
+META.yml                                 Module meta-data (added by MakeMaker)

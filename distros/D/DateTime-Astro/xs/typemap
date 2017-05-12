@@ -1,0 +1,23 @@
+TYPEMAP
+mpfr_t T_MPFR
+SV_TO_MPFR T_SV_TO_MPFR
+
+OUTPUT
+T_MPFR
+    {
+        char buf[STR_MPFR_BUFSIZ];
+        SV *fmt_sv = get_sv( "DateTime::Util::Astro::MPFR_FORMAT", 0 );
+        char *fmt = fmt_sv ? SvPV_nolen(fmt_sv) : "%.64RNf";
+
+        mpfr_snprintf(buf, STR_MPFR_BUFSIZ, fmt, $var);
+        sv_setpv($arg, buf);
+        mpfr_clear( $var );
+    }
+
+INPUT
+T_SV_TO_MPFR
+    {
+        char *buf = SvPV_nolen($arg);
+        mpfr_init_set_str( $var, buf, 10, GMP_RNDN );
+    }
+

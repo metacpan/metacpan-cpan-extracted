@@ -1,0 +1,181 @@
+package Data::MuForm::Manual::Rendering;
+# ABSTRACT: Rendering documentation
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Rendering - Rendering documentation
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+Note: The rendering is still very much a work in process.
+
+One of the main goals of this new rendering system is to make it easier to
+render forms in templates in ways that allow the classes and other html
+rendering pieces to be kept out of the Perl class definitions. You should be
+able to do it in Perl if you want, but it should be easy and possible to
+keep almost all of that in the templates.
+
+The form has a 'renderer' object, with a number of defaults that you can customize.
+The default renderer is 'Data::MuForm::Renderer::Base'.
+The expectation is that most people who do much rendering will create a subclass
+of the renderer to implement their specific requirements. A renderer can be specified
+in the form:
+
+    package MyApp::Form::Test;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    sub build_renderer_class { 'MyApp::Form::Renderer' }
+    sub build_renderer_args {
+       { default_wrapper_class => '..', default_cb_layout => '...' }
+    }
+
+See L<Data::MuForm::Renderer::Base> for the current defaults that can be specified.
+
+There is a 'render_args' hashref for every field, which will contain attributes for
+the various parts of the field that need to be rendered.
+
+   # field render_args
+   render_args => {
+       wrapper => { },
+       layout_type => '..',
+       input_type => '...',
+       element_attr => { class => 'xxx', placeholder => 'Type here' },
+       label_attr => { },
+       error_attr => { },
+       wrapper_attr => { },
+       element_wrapper_attr => { },
+   },
+
+There are 'shortcuts' to specify the various attribute hashrefs.
+
+    render_args  - ra
+    element_attr - ea
+    label_attr   - la
+    error_attr   - era
+    wrapper_attr - wa
+    element_wrapper_attr - ewa
+
+Examples:
+
+    ra => { ... }
+    'ra.ea.class' => ['myclass', 'mb10'],
+
+    has_field 'foo' => ( 'ra.wa.class' => 'ww34' );
+
+Because render_args is a plain hashref, you don't have to add new
+attributes or flags in order to implement a custom renderer.
+
+A few attributes are still defined in fields because they are structural or necessary
+to the code, like the field name, id, and value (and fif). Some field attributes are part of
+validation, like 'maxlength'.
+
+Each field class will include particular render_args in a 'base_render_args' method.
+The field definition render_args will be merged with the base render_args.
+
+Note that if you want to put as much of the HTML as possible in the templates, you
+shouldn't have to specify anything in the form's field definitions.
+
+=head1 NAME
+
+Data::MuForm::Manual::Rendering
+
+=head1 FORM METHODS
+
+=head2 render
+
+For rendering the entire form automatically:
+
+    [% form.render %]
+
+=head2 render_start
+
+Render the opening <form> tag, including id, name, enctype.
+
+    [% form.render_start %]
+
+=head2 render_end
+
+For the completists out there... Just does '</form>', but might be useful
+to override if you have a wrapper for the whole form.
+
+    [% form.render_end %}
+
+=head1 FIELD METHODS
+
+=head2 render
+
+  [% form.field('foo').render({ element_attr = { class = 'xxx ppp' }, layout = 'bare'} }) %]
+
+=head2 render_element
+
+The hashref passed in is the 'element_attr' hashref.
+
+  [% form.field('foo').render_element({ class = 'ddd xxx' }) %]
+
+Note that this method doesn't work with fields with multiple elements, like
+checkbox group, radio group, list, compound, and repeatable. For those fields
+you will need to loop through the options or the fields. It works for standard
+input, select, and checkbox fields.
+
+=head2 render_label
+
+The hashref passed in is the 'label_attr' hashref.
+
+  [% form.field('foo').render_label({ ... }) %]
+
+=head2 render_errors
+
+'error_attr' - not currently used in rendering code, but you could use
+if you implement your own 'render_errors'.
+
+  [% form.field('foo').render_errors({ ... }) %]
+
+=head2 render_option
+
+For the select field, including 'select', 'radiogroup' and 'checkboxgroup' rendering.
+
+  [% field = form.field('foo') %]
+  [% FOR option IN field.options %]
+    <div>
+      <label>[% option.label %]
+      [% field.render_option(option) %]
+      </label>
+    </div>
+  [% END %]
+
+=head1 Rendering loops
+
+=head2 all_sorted_fields
+
+   [%  FOR field IN form.all_sorted_field %]
+      <div class="...">
+        [% field.render %]
+      </div>
+   [% END %]
+
+1;
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,130 @@
+=pod
+
+=head1 NAME
+
+Dirbuster::Parser - Parse Dirbuster scan data with Perl
+
+=head1 VERSION
+
+This document describes Dirbuster::Parser version .02
+
+=head1 SYNOPSIS
+
+ my $dpx = new Dirbuster::Parser;
+
+ my $parser = $dpx->parse_file('test1.xml');
+    #a Dirbuster::Parser Object
+
+ my @results = $parser->get_all_results();
+    #an Array of Dirbuster::Parser::Result Objects
+ 
+ foreach my $h ( grep($_->type eq 'Dir', $parser->get_all_results()) ) {
+    print "Type: " . $h->type . "\n";
+    print "Path: " . $h->path . "\n";
+    print "Response Code: " . $h->response_code . "\n";
+ }
+ 
+I<For a full listing of methods see the documentation corresponding to each object.>
+
+=head1 DESCRIPTION
+
+
+=head1 OVERVIEW
+
+
+ Dirbuster::Parser                         -- Core parser
+ |
+ +--Dirbuster::Parser::Session             -- Dirbuster scan session information
+ |  
+ +--Dirbuster::Parser::Target              -- General target information
+ |  |
+ |  |--Dirbuster::Parser::Target::Result   -- Result information
+ |  |  |
+
+
+=head1 METHODS
+
+=head2 Dirbuster::Parser
+
+The main idea behind the core modules is, you will first parse the scan data
+then extract the information. Therefore, you should run parse_file then the you can use any of the subroutines of the objects.
+
+=over 4
+
+=item B<parse_file($xml_file)>
+
+Parse a Dirbuster XML file. This subroutine returns a Dirbuster::Parser object containing the information from the XML.
+
+=item B<get_session()>
+
+Obtain the Dirbuster::Parser::Session object which contains the session scan information.
+
+=item B<get_all_results()>
+
+Obtain an Array of Dirbuster::Parser::Target::Result objects which contain file and directory information.
+
+=back
+
+=head2 Dirbuster::Parser::Target::Result
+
+This object contains the information for a result
+
+=over 4
+
+
+=item B<type()>
+
+Returns a string which contains the type (File or Dir)
+
+=item B<response_code()>
+
+Returns the response code from the request.
+
+=item B<path()>
+
+Returns the path.
+
+=back 
+
+=head1 EXAMPLES
+
+
+Here is an example of parsing an XML file using Dirbuster::Parser:
+
+ my $dpx = new Dirbuster::Parser;
+
+ my $parser = $dpx->parse_file('test1.xml');
+
+ print "Directories:\n";
+ foreach my $h ( grep($_->type eq "Dir", $parser->get_all_results()) ) {
+    print "Type: " . $h->type . "\n";
+    print "Path: " . $h->path . "\n";
+    print "Response Code: " . $h->response_code . "\n";
+ }
+
+ print "Files:\n";
+ foreach my $h ( grep($_->type eq "File", $parser->get_all_results()) ) {
+   print "Type: " . $h->type . "\n";
+   print "Path: " . $h->path . "\n";
+   print "Response Code: " . $h->response_code . "\n";
+ }
+
+
+=head1 SEE ALSO
+
+ Dirbuster, XML::LibXML and Object::InsideOut
+ 
+=head1 AUTHOR
+
+Joshua "Jabra" Abraham, S<E<lt>jabra AT spl0it DOT orgE<gt>>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright 2009 Joshua D. Abraham. All rights reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=cut
+
+

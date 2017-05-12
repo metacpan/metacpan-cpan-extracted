@@ -1,0 +1,42 @@
+events: Ticks
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::calc
+21 401810
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::aFunction
+8 665321
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::bFunction
+15 136329
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::RUNTIME
+cfl=/home/hernitsc/temp/m.pl
+cfn=main::aFunction
+calls=1 8
+2 1000962
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::RUNTIME
+cfl=/home/hernitsc/temp/m.pl
+cfn=main::bFunction
+calls=1 15
+5 202498
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::bFunction
+cfl=/home/hernitsc/temp/m.pl
+cfn=main::calc
+calls=10000 21
+17 66169
+
+fl=/home/hernitsc/temp/m.pl
+fn=main::aFunction
+cfl=/home/hernitsc/temp/m.pl
+cfn=main::calc
+calls=50000 21
+10 335641
+

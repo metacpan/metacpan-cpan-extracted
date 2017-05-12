@@ -1,0 +1,16 @@
+Revision history for Devel-OverloadInfo
+
+0.004     2015-08-13 17:35:32+01:00 Europe/London
+  - Document that existence of undef 'fallback' varies between perl versions
+  - Add tests for empty, inherited-only and no overloading
+  - Add is_overloaded() function
+
+0.003     2015-08-12 19:35:45+01:00 Europe/London
+  - Return an empty hash instead of undef for classes with no overloads
+  - Work around overload inheritance corruption before 5.16 (RT#106379)
+
+0.002     2014-03-26 12:02:38+00:00 Europe/London
+  - Specify minimum required versions of Package::Stash and Exporter
+
+0.001     2014-03-23 18:41:17+00:00 Europe/London
+  - Initial release

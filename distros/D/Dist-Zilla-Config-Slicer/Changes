@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-Config-Slicer
+
+0.201     2015-05-05T14:07:52Z
+
+  [Documentation]
+  - Clarify syntax example and link to Config::MVP::Slicer "configuration syntax"
+    section.
+
+0.200     2012-03-31T18:34:10Z
+
+  - Create @ConfigSlicer (like @Filter) to enable ad-hoc config slicing.
+
+0.100     2011-10-19T05:25:10Z
+
+  - Initial release

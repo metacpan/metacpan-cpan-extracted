@@ -1,0 +1,49 @@
+---
+abstract: 'use dh-make-perl to generate .deb archives from your CPAN package'
+author:
+  - 'Shantanu Bhadoria <shantanu@cpan.org> L<https://www.shantanubhadoria.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Spec: 0
+  File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Test::More: 0
+  perl: 5.006
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-App-Command-dhmakeperl
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+    - inc
+  package:
+    - DB
+provides:
+  Dist::Zilla::App::Command::dhmakeperl:
+    file: lib/Dist/Zilla/App/Command/dhmakeperl.pm
+    version: 0.007
+requires:
+  DhMakePerl: 0
+  Dist::Zilla::App: 0
+  autodie: 0
+  perl: 5.006
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/shantanubhadoria/perl-dist-zilla-app-command-dhmakeperl/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-App-Command-dhmakeperl
+  repository: git://github.com/shantanubhadoria/perl-dist-zilla-app-command-dhmakeperl.git
+version: 0.007
+x_contributors:
+  - 'Shantanu <shantanu@cpan.org>'
+  - 'Shantanu Bhadoria <shantanu@cpan.org>'

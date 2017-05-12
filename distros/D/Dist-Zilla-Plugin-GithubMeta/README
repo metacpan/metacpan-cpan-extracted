@@ -1,0 +1,68 @@
+SYNOPSIS
+
+      # in dist.ini
+    
+      [GithubMeta]
+    
+      # to override the homepage
+    
+      [GithubMeta]
+      homepage = http://some.sort.of.url/project/
+    
+      # to override the github remote repo (defaults to 'origin')
+      [GithubMeta]
+      remote = github
+
+DESCRIPTION
+
+    Dist::Zilla::Plugin::GithubMeta is a Dist::Zilla plugin to include
+    GitHub https://github.com meta information in META.yml.
+
+    It automatically detects if the distribution directory is under git
+    version control and whether the origin is a GitHub repository and will
+    set the repository and homepage meta in META.yml to the appropriate
+    URLs for GitHub.
+
+    Based on Module::Install::GithubMeta which was based on
+    Module::Install::Repository by Tatsuhiko Miyagawa
+
+ ATTRIBUTES
+
+    remote
+
+      The GitHub remote repo can be overridden with this attribute. If not
+      provided, it defaults to origin. You can provide multiple remotes to
+      inspect. The first one that looks like a GitHub remote is used.
+
+    homepage
+
+      You may override the homepage setting by specifying this attribute.
+      This should be a valid URL as understood by MooseX::Types::URI.
+
+    issues
+
+      If true, a bugtracker URL will be added to the distribution metadata
+      for the project's GitHub issues page.
+
+    user
+
+      If given, the user parameter overrides the username found in the
+      GitHub repository URL. This is useful if many people might release
+      from their own workstations, but the distribution metadata should
+      always point to one user's repo.
+
+    repo
+
+      If give, the repo parameter overrides the repository name found in
+      the GitHub repository URL.
+
+ METHODS
+
+    metadata
+
+      Required by Dist::Zilla::Role::MetaProvider
+
+SEE ALSO
+
+    Dist::Zilla
+

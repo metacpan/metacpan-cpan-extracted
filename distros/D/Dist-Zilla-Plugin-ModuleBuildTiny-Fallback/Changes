@@ -1,0 +1,109 @@
+Revision history for Dist-Zilla-Plugin-ModuleBuildTiny-Fallback
+
+0.025     2017-03-05 01:31:22Z
+          - fix test failure that occurs in combination with a particular
+            version of Log::Dispatch (due to loading Devel::Confess)
+
+0.024     2017-02-28 02:54:46Z
+          - fix test to not rely on . in @INC
+
+0.023     2016-03-13 00:12:36Z
+          - provide more information when failing due to something else having
+            already modified Build.PL
+
+0.022     2015-11-09 04:19:35Z
+          - be more tolerant in regexp of text produced by Data::Dumper
+          (in test added in 0.021)
+
+0.021     2015-11-07 07:28:46Z
+          - when Module::Build runs instead of Module::Build::Tiny, now
+          capturing all errors (from MBT or other configure prerequisites)
+          and printing them
+
+0.020     2015-08-20 01:08:45Z
+          - use TODO around tests that fail on perl 5.8.x due to the buggy
+            handling of qr/...$/m
+
+0.019     2015-08-18 01:05:07Z
+          - fixed formatting of quoted Build.PL by marking a verbatim section,
+            rather than simply indenting by 4 columns
+          - fixed the inverted check of PERL_MB_FALLBACK_SILENCE_WARNING
+            (broken since 0.016)
+
+0.018     2015-07-12 22:45:04Z
+          - pass all extra options along to [ModuleBuild] and
+            [ModuleBuildTiny], not just default_jobs
+
+0.017     2015-06-11 03:53:35Z
+          - fix new test that breaks with older Build.PL-providing plugins
+            that did not create Build.PL at file gathering time
+
+0.016     2015-06-10 04:20:18Z
+          - if PERL_MB_FALLBACK_SILENCE_WARNING is set, do not sleep after
+            "showing" the silenced warning
+          - if another plugin added content at the head of Build.PL, it is
+            preserved at the head when we wrap the remaining content with new
+            code
+
+0.015     2015-01-24 06:37:33Z
+          - remove the noisy "Congratulations!" in Build.PL when the
+            installation environment is properly configured
+
+0.014     2014-11-14 03:19:43Z
+          - and another (sigh)
+
+0.013     2014-11-14 01:24:36Z
+          - avoid more test failures with older [ModuleBuildTiny]
+
+0.012     2014-11-12 05:34:24Z
+          - avoid test failure with older [ModuleBuildTiny]
+
+0.011     2014-11-11 06:45:37Z
+          - now checks if all configure prereqs are installed, not just
+            Module::Build::Tiny
+          - warn the user if something else added content to Build.PL,
+            which might make it not a good idea to use this plugin
+
+0.010     2014-11-02 05:47:11Z
+          - keep Build.PL in the file list between phases to allow other
+            plugins to add to its content
+
+0.009     2014-10-02 04:55:27Z
+          - more fixes as in 0.008 and 0.007
+
+0.008     2014-09-28 01:59:03Z
+          - fix test failure caused by unstated assumption that
+            Dist::Zilla::Role::TestRunner is a very recent version
+
+0.007     2014-09-14 01:36:01Z
+          - fix breakage caused by unstated assumption that
+            Dist::Zilla::Role::TestRunner is a very recent version
+
+0.006     2014-09-06 01:18:50Z
+          - now dumping config data for [MetaConfig], including the configs
+            used by [ModuleBuild] and [ModuleBuildTiny] (composed by this
+            plugin)
+          - ensure 'use strict; use warnings;' remains near the top of
+            Build.PL, as some plugins use it as a matching point for adding
+            new content
+
+0.005     2014-06-08 06:12:39Z
+          - lowered default minimum Module::Build version from 0.3601 to 0.28,
+            to handle more legacy systems; documented the configuration
+            options better
+
+0.004     2014-06-06 05:37:01Z
+          - add 'mb_version', 'mbt_version' options, for specifying the
+            minimum required version of Module::Build and Module::Build::Tiny
+
+0.003     2014-05-29 21:47:58Z
+          - skip [ModuleBuild]'s configure_requires declaration, because if
+            Module::Build is running, the prereqs were being ignored anyway
+
+0.002     2014-05-23 07:47:57Z
+          - minor doc fixes
+          - handle some potential future changes to [ModuleBuild],
+            [ModuleBuildTiny]
+
+0.001     2014-05-22 07:31:17Z
+          - Initial release.

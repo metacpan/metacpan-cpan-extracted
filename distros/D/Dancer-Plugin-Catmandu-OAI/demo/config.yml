@@ -1,0 +1,33 @@
+log: debug
+show_errors: true
+charset: "UTF-8"
+plugins:
+  'Catmandu::OAI':
+    store: oai
+    bag: data
+    datestamp_field: datestamp
+    repositoryName: "My OAI DataProvider"
+    uri_base: "http://oai.service.com/oai"
+    adminEmail: me@example.com
+    earliestDatestamp: "1970-01-01T00:00:01Z"
+    cql_filter: "datestamp>1970-01-01T00:00:01Z"
+    deletedRecord: persistent
+    repositoryIdentifier: oai.service.com
+    limit: 200
+    delimiter: ":"
+    sampleIdentifier: "oai:oai.service.com:1585315"
+    fix:
+      - append(title.*, .)
+    metadata_formats:
+      -
+        metadataPrefix: oai_dc
+        schema: "http://www.openarchives.org/OAI/2.0/oai_dc.xsd"
+        metadataNamespace: "http://www.openarchives.org/OAI/2.0/oai_dc/"
+        template: oai_dc.tt
+        fix:
+            - upcase(title.*)
+    sets:
+      -
+        setSpec: test
+        setName: My Demo Set
+        cql: "set = test"

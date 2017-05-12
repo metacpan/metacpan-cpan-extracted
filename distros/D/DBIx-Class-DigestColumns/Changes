@@ -1,0 +1,27 @@
+0.06000 2007-03-27
+	- POD oops
+	- digest_auto oops
+0.05000 2007-03-27
+	- Local copy of args in ->update unnecessary
+	- Added test for Marc's patch
+	- Add digest_check_method functionality
+
+0.04000	2007-03-05
+	- Patch by Marc Mims to fix ->update bug
+
+0.03000	2007-01-23
+	- Added dirty option
+	- Added dirty POD
+	- Added dirty test
+	- Moved digest column to _digest_column_values
+
+0.02000	2006-06-04
+	- fixed digestcolumns()
+	- documentation alterations
+
+0.01000	2006-06-04
+	- Added digestcolumns()
+	- Documentation fixes
+	
+0.00001	2006-06-04
+	- Initial release

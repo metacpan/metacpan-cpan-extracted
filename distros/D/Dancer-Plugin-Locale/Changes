@@ -1,0 +1,15 @@
+Revision history for Dancer-Plugin-Locale
+
+0.0103  2014-02-24
+  - bump required libintl version
+
+0.0102  2014-02-21
+  - fix locale detect from Accept-Language header
+  - tests
+
+0.0101  2013-03-26
+  - import confess
+
+0.01    2012-05-05
+  - initial release
+

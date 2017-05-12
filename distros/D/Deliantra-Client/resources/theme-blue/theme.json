@@ -1,0 +1,9 @@
+{
+  "tooltip_border" : [0.7, 0.7, 1],
+  "tooltip_fg"     : [1, 1, 1],
+  "tooltip_bg"     : [0, 0, 0.3],
+  "tooltip_style"  : 0,
+
+  "fancyframe"     : [0, 0, 1],
+  "entry_outline"  : [0, 0, 1],
+}

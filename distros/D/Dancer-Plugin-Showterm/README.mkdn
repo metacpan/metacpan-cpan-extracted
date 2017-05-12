@@ -1,0 +1,103 @@
+# NAME
+
+Dancer::Plugin::Showterm - Replay terminal typescript captures
+
+# VERSION
+
+version 0.0.2
+
+# SYNOPSIS
+
+In `config.yml`:
+
+    plugins:
+        Showterm:
+            stylesheet: /my_showterm.css
+
+In your app:
+
+    package MyApp;
+    use Dancer ':syntax';
+
+    use Dancer::Plugin::Showterm;
+
+    ...
+
+# DESCRIPTION
+
+This plugin is a [Dancer](https://metacpan.org/pod/Dancer) port of the wonderful [http://showterm.io](http://showterm.io), which allows
+terminal screen captures taken via the UNIX tool [script](http://man7.org/linux/man-pages/man1/script.1.html) to be 
+replayed in the browser. 
+
+The plugin will intercept any request for files with a `.showterm` extension and will generate an
+html page that will be able to replay the same file, but with the `.typescript` extension.
+
+In other words, if you put the file `mysession.typescript` in the `public` folder of the app, then the
+url `/mysession.showterm` will display its webified version. The webified version can also be embedded in other 
+pages via iframes:
+
+        <iframe src="/mysession.showterm" 
+                width="660" height="360" style="border: 1px solid #444">
+        </iframe>
+
+# CAPTURING THE ACTION
+
+The cli capture is done using the UNIX utility c<script>. 
+The plugin assumes that the captured screen is 80 columns by 24 rows.
+
+    $ script -ttiming
+    ... everything you do here will be recorded ...
+    ^D  
+    $ echo '---' | cat - timing >> typescript
+    $ mv typescript /path/to/dancer/app/public/myscreen.typescript
+
+Note that the c<typescript> file the plugin uses is the concatenation of the
+original produced typescript with its timing file, separated with a type dash 
+on a single line.
+
+# ADDED ROUTES
+
+## /showterm/\*
+
+The plugin adds the javascript and stylesheets assets required by the 
+webified typescript under `/showterm`.  Those are bundled with the plugin as shared tarball.
+If you want to see where this tarball is on your filesystem, you can do
+
+    use Dancer;
+    use Dancer::Plugin::Showterm;
+
+    print Dancer::Plugin::Showterm->instance->assets_dir;
+
+or
+
+    $ perl -MFile::ShareDir=dist_dir -E'say dist_dir("Dancer-Plugin-Showterm")'
+
+## \*.showterm
+
+Any request for a file with the extension `.showterm` will be served the showterm
+page, using the same uri with its extension changed to `.typescript` as the script to play.
+
+# CONFIGURATION
+
+    plugins:
+        Showterm:
+            stylesheet: /my_showterm.css
+
+## stylesheet
+
+If provided, will be added to the showterm page.
+
+# SEE ALSO
+
+- [http://showterm.io](http://showterm.io) - the original service
+
+# AUTHOR
+
+Yanick Champoux <yanick@cpan.org> [![endorse](http://api.coderwall.com/yanick/endorsecount.png)](http://coderwall.com/yanick)
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

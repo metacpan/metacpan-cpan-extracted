@@ -1,0 +1,24 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [InsertCodeResult]
+     ;make_verbatim=1
+
+    In your POD:
+
+     # CODE: require MyLib; MyLib::gen_stuff("some", "param");
+
+DESCRIPTION
+
+    This module finds # CODE: ... directives in your POD, evals the
+    specified Perl code, and insert the result into your POD as a verbatim
+    paragraph (unless you set make_verbatim to 0, in which case output will
+    be inserted as-is). If result is a simple scalar, it is printed as is.
+    If it is undef or a reference, it will be dumped using Data::Dump. If
+    eval fails, build will be aborted.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::InsertExample
+

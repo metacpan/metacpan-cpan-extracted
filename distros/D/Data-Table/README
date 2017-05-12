@@ -1,0 +1,42 @@
+Table - Data type related to database tables, spreadsheets, CSV/TSV files, HTML table displays, etc.
+
+Copyright (c) 1998-2006  Yingyao Zhou & Guangzhou Zou
+
+See COPYRIGHT section in Table.pm for usage and distribution rights.
+
+The Table.pm file contains the documentation.
+You can obtained the most recent version from
+ 
+#http://www.geocities.com/easydatabase/
+# this URL is obsolete, please use CPAN URL
+
+See also http://www.perl.com/CPAN/
+
+BUILDING
+
+    perl Makefile.PL
+    make
+    make test
+    make install (if the tests look okay)
+
+PROBLEMS
+
+  1. Perl version is older than 5.005
+    The package uses operator qr, which was introduced in 5.005
+    If you have older perl versions, follow the instructions inside Table.pm.
+    The instructions are started with '###', three steps in total --
+    comment out two lines, uncomment one line.
+
+    Instructions in Table.pm looks like the following:
+
+       ### comment out next line if your perl version < 5.005 ###
+       $r = ($caseIgn)?qr/$s/i : qr/$s/;
+
+       ### comment out the next line if your perl version < 5.005
+       if ($elm =~ /$r/) {
+       ### uncomment the next line if your perl version < 5.005
+       # if ($elm =~ /$s/ || ($elm=~ /$s/i && $caseIgn)) {
+
+  2. Others
+    # easydatabase@yahoo.com # this email account has been flooded by spam, please use below
+    easydatabase at gmail dot com

@@ -1,0 +1,55 @@
+StackedHash version 0.99
+========================
+
+The StackedHash module implements a stack of PERL hashes; the whole
+stack acts collectively as a single hash, that is you can perform the
+usual operations (fetching/storing values, *keys*, *delete*, etc.) on
+it.
+
+Assigning a value to a key, as in "$h{'a'}=1", puts the key/value pair
+into the hash at the top of the stack. Reading a key off the stack of
+hashes searches the whole stack, from the topmost hash to the bottom
+one, until it finds a hash which holds some value associated to the
+given key; returns "undef" if no match was found.
+
+All the PERL bultins on hashes are supported.
+
+Example code:
+
+      use StackedHash;
+
+      tie %h, StackedHash;
+
+      $h{'a'}=1;
+      $h{'b'}=2;
+      tied(%h)->push; # put a new (empty) hash on the stack
+      $h{'a'}=3;      # override value of key 'a'
+        ...
+      tied(%h)->pop;  # remove top hash from the stack,
+                      # $h{'a'} == 1 again
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+DEPENDENCIES
+
+This module should run fine with any standard PERL later than version
+5.006.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Riccardo Murri, <riccardomurri@yahoo.it>. All
+rights reserved.
+
+This package is free software and is provided "as is" without express
+or implied warranty.  It may be used, redistributed and/or modified
+under the same terms as Perl itself.

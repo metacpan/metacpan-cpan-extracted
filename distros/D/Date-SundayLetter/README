@@ -1,0 +1,71 @@
+NAME
+    Date::SundayLetter - Calculates the Sunday Letters for a given year
+
+SYNOPSIS
+      use Date::SundayLetter;
+      $letter = sundayletter( 1996 );
+
+      - or just - 
+
+      $letter = letter( 1996 );
+
+DESCRIPTION
+    Sunday Letters are an important concept from calendrics. Stated very
+    simply, the sunday letter represents how many days after January 1 the
+    first Sunday of the year is. Knowing the makes it easy to calculate the
+    day of the week of a given day, when Easter falls, and a variety of
+    other things.
+
+    There is a full treatment of Sunday Latters in The Oxford Companion to
+    the Year (Blackburn, Holford-Strevens).
+
+    For example, the following table shows the Sunday Letters, given the day
+    of the week of January 1:
+
+     1 January      First Sunday    Sunday Letter
+     Sunday         1 January       A
+     Monday         7 January       G
+     Tuesday        6 January       F
+     Wednesday      5 January       E
+     Thursday       4 January       D
+     Friday         3 January       C
+     Saturday       2 January       B
+
+    In leap years, you have two Sunday Letters. After leap day, you have a
+    Sunday Letter calculated with the usual formulae. Before leap day, the
+    Sunday Letter is one place ahead of that (with A being considered one
+    latter after G).
+
+    Given the Sunday Letter and the Golden Number (see Date::GoldenNumber),
+    you can immediately look up the dates for Easter (Gregorian or Julian)
+    in a simple table. That is, if you happen to have said table. I'll try
+    to put this table on my web site, but I need to ask the authors of The
+    Oxford Companion first.
+
+SUPPORT
+    For support, email me directly (drbacchus@drbacchus.com) or subscribe to
+    datetime@perl.org (see http://lists.perl.org/ for subscription
+    information) and ask there.
+
+AUTHOR
+            Rich Bowen
+            CPAN ID: RBOW
+            rbowen@rcbowen.com
+            http://www.rcbowen.com
+
+COPYRIGHT
+    Copyright (c) 2001 Rich Bowen. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+     perl(1).
+     Date::ICal
+     Reefknot (http://reefknot.org/)
+     Date::Easter
+     Date::Passover
+     Date::Leapyear
+

@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/Dist/Zilla/Plugin/Dpkg/PerlbrewStarman.pm
+pod2htmd.tmp
+pod2htmi.tmp
+t/load.t
+t/release-pod-syntax.t

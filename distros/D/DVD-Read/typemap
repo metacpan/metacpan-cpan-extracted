@@ -1,0 +1,19 @@
+TYPEMAP
+dvd_reader_t       *  O_OBJECT
+ifo_handle_t       *  O_OBJECT
+sv_pgc_t           *  O_OBJECT
+sv_cell_playback_t *  O_OBJECT
+dvd_file_t         *  O_OBJECT
+
+INPUT
+O_OBJECT
+    if (sv_isobject($arg) && (SvTYPE(SvRV($arg)) == SVt_PVMG))
+        $var = ($type)SvIV((SV*)SvRV( $arg ));
+    else {
+        warn( \"${Package}::$func_name() -- $var is not a blessed SV reference\" );
+        XSRETURN_UNDEF;
+    }
+
+OUTPUT
+O_OBJECT
+        sv_setref_pv( $arg, (char *)CLASS, (void*)$var );

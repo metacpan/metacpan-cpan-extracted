@@ -1,0 +1,14 @@
+Revision history for Digest-Luffa
+
+0.04  Mon Nov 29 11:04:26 UTC 2010
+    - Converted hex and base64 encoders to C.
+    - Added implicit reset upon call to digest method.
+
+0.03  Thu Nov 11 19:16:03 UTC 2010
+    - Fixed reset method.
+
+0.02  Wed Nov 10 05:32:39 UTC 2010
+    - Updated add_bits to accept bit strings that are not a multiple of 8.
+
+0.01  Mon Nov  8 20:56:35 UTC 2010
+    - Initial distribution.

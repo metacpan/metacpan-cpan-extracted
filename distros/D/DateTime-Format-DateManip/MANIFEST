@@ -1,0 +1,10 @@
+Build.PL
+Changes
+LICENSE
+MANIFEST			This list of files
+META.yml
+Makefile.PL
+README
+lib/DateTime/Format/DateManip.pm
+t/00load.t
+t/01conversions.t

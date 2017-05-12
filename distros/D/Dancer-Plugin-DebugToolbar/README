@@ -1,0 +1,136 @@
+NAME
+    Dancer::Plugin::DebugToolbar - A debugging toolbar for Dancer web
+    applications
+
+VERSION
+    Version 0.016
+
+SYNOPSIS
+    Add the plugin to your web application:
+
+        use Dancer::Plugin::DebugToolbar;
+
+    And enable it in the configuration file, preferably in the development
+    environment ("environments/development.yml"):
+
+        plugins:
+            DebugToolbar:
+                enable: 1
+
+DESCRIPTION
+    Dancer::Plugin::DebugToolbar allows you to add a debugging toolbar to
+    your Dancer web application.
+
+CONFIGURATION
+    To enable and configure the plugin, add its settings to the Dancer
+    configuration file, under "plugins":
+
+        plugins:
+            DebugToolbar:
+                enable: 1
+                ...
+
+    You can do this either in the main configuration file ("config.yml"), or
+    in the configuration file for a specific environment (under
+    "environments/"). Normally, you'll want to enable the toolbar for the
+    development enviroment ("environments/development.yml").
+
+    The available configuration settings are described below.
+
+  enable
+    This setting enables the debugging toolbar.
+
+    Example:
+
+        enable: 1
+
+  show
+    The "show" setting lets you choose which information will be provided by
+    the debugging toolbar.
+
+    Example:
+
+        show:
+            database: 1
+            routes: 1
+
+    The available options are:
+
+    *   data
+
+        Data inspection screen. Allows you to inspect the "config",
+        "request", "session", and "vars" data structures.
+
+    *   database
+
+        Database information screen. Shows DBI trace and queries log.
+
+    *   templates
+
+        Templates screen. Displays the names of rendered templates and lets
+        you inspect the data that was passed to them.
+
+    *   routes
+
+        Routes screen. Shows all the routes defined in the application, and
+        indicates the matching routes.
+
+    If the "show" setting is not defined, the "data" and "routes" screens
+    are displayed by default.
+
+  path_prefix
+    The "path_prefix" setting allows you to change the URL path prefix that
+    the toolbar uses to access its resources (e.g., CSS and JavaScript
+    files). By default, it's set to "/dancer-debug-toolbar".
+
+    Example:
+
+        path_prefix: /toolbar-files
+
+AUTHOR
+    Michal Wojciechowski, "<odyniec at cpan.org>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-dancer-plugin-debugtoolbar at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dancer-Plugin-DebugToolb
+    ar>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Dancer::Plugin::DebugToolbar
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dancer-Plugin-DebugToolbar
+        >
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Dancer-Plugin-DebugToolbar>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Dancer-Plugin-DebugToolbar>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Dancer-Plugin-DebugToolbar/>
+
+ACKNOWLEDGEMENTS
+    Uses icons from the Fugue Icons set (<http://p.yusukekamiyamane.com/>).
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 Michal Wojciechowski.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

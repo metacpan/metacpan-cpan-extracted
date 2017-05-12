@@ -1,0 +1,22 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [Rinci::AddToDb]
+     ;dsn=...
+     ;username=...
+     ;password=...
+
+DESCRIPTION
+
+    This plugin will search Rinci metadata in all modules and scripts, and
+    add them to database using rimetadb. Later, you can gather various
+    statistics from the database, e.g. average number of arguments per
+    function, top argument types, etc.
+
+SEE ALSO
+
+    Rinci
+
+    App::rimetadb
+

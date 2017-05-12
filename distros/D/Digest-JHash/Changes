@@ -1,0 +1,54 @@
+Revision history for Perl extension Digest::JHash.
+
+0.10    2016-11-18
+    - Avoid stray backup files.
+        - https://rt.cpan.org/Ticket/Display.html?id=118830
+        - Thanks to KENTNL.
+    - Avoid duplicate test files.
+        - https://rt.cpan.org/Ticket/Display.html?id=118830
+        - Thanks to KENTNL.
+
+0.09    2015-05-30
+    - Convert to Dist-Zilla.
+        - This implies several enhancements including links to the VCS
+        repositories in META.yml/META.json.
+
+0.08    2014-01-27
+    - Add a minimal version on perl-5.8.0.
+        - For CPANTS Kwalitee.
+    - Add t/cpan-changes.t
+    - Add a LICENSE file (for CPANTS Kwalitee).
+
+0.07    2010-09-04
+    - Got rid of the SIGNATURE file which was out-of-date.
+        - https://rt.cpan.org/Ticket/Display.html?id=61053
+
+0.06    2010-07-26
+    - Reuploading to get rid of the world-writable files and directories
+    in the archive.
+
+0.05    2008-06-06
+    - Patched to make algorithm compatible with unwanted 64 bit int in U32
+
+0.04    2008-06-04
+    - Moved developer only tests kwalitee.t and spelling.t to misc/ to
+      stop kwalitee from demanding they be listed as build pre-reqs in META.yml
+
+0.03    2008-06-04
+    - Repackaged into Kwalitee compliant package
+
+0.02    2003-04-07
+    - Changed untar dir structure to standard one
+    - Modified JHash.pm @EXPORT_OK so jhash() function can be exported on demand
+    - A small clean up to handle undef and null string input cases
+    - Added tests for the undef and null string input cases
+    - finished POD
+    - Added speed note to pod and demo script to misc/oo_vs_func.pl
+    - Added DEBUG const to C code for conveneience and to conform
+      with coding conventions of PHB
+    - Cleaned up Makefile.PL to minimal case
+
+0.01    2003-04-06
+    - original version; created by h2xs 1.21 with options
+        -An Digest::JHash
+

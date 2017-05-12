@@ -1,0 +1,56 @@
+Data/Password/BasicCheck version 2.00
+=====================================
+
+    Data::Password::BasicChecker objects do these kind of checks on the
+    given passwords:
+
+    *   password length is in a defined range that is estabilished at
+        object creation;
+
+    *   there are at least pL symbols in password, where L is password
+        length and p is 0 < p =< 1. If not specified at object creation
+        we assume p = 2/3 (that is: 0.66666...)
+
+    *   password contains alphabetic characters, digits and
+        non-alphanumeric characters;
+
+    *   rotations of the password don't match it (e.g.: the password
+        a1&a1& matches itself after three rotations)
+
+    *   after cleaning away digits and symbols, the password, its
+        reverse and all possible rotations don't match any personal
+        information given (name, surname, city, username)
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2003 Marco Marongiu
+
+This program is free software; you can redistribute it
+and/or modify it under the terms of the GNU General
+Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at
+your option) any later version.
+
+This program is distributed in the hope that it will be
+useful, but WITHOUT ANY WARRANTY; without even the
+implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General
+Public License along with this program; if not, write
+to the Free Software Foundation, Inc., 59 Temple Place
+- Suite 330, Boston, MA 02111-1307, USA.
+
+
+$Id: README,v 1.5 2003-09-18 20:38:12 bronto Exp $

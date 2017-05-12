@@ -1,0 +1,16 @@
+abstract: Arbitrary sized bollocks straight from middle management
+author: Tels <nospam-abuse@bloodgate.com>
+build_requires: 
+  Test::More: 0.42
+distribution_type: module
+generated_by: Module::Install version 0.64
+license: perl
+name: Dev-Bollocks
+no_index: 
+  directory: 
+    - inc
+    - t
+requires: 
+  Math::BigInt: 1.77
+  Math::String: 1.27
+version: 0.06

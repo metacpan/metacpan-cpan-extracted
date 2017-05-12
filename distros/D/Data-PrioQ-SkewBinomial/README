@@ -1,0 +1,47 @@
+Data-PrioQ-SkewBinomial
+
+A functional priority queue based on skew binomial trees
+
+This module provides a purely functional priority queue. "Purely functional"
+means no method ever modifies a queue; instead they all return a new modified
+object. Most operations provided by this module run in constant time.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Data::PrioQ::SkewBinomial
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-PrioQ-SkewBinomial
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Data-PrioQ-SkewBinomial
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Data-PrioQ-SkewBinomial
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-PrioQ-SkewBinomial
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2008 Lukas Mai
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

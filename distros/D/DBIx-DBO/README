@@ -1,0 +1,44 @@
+DBIx-DBO
+
+An OO interface to SQL queries and results.  Easily constructs SQL queries, and simplifies processing of the returned data.
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::DBO
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-DBO
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-DBO
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-DBO
+
+    Search CPAN
+        http://search.cpan.org/dist/DBIx-DBO
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2009-2013 Vernon Lyon <vlyon AT cpan.org>, all rights reserved.
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+

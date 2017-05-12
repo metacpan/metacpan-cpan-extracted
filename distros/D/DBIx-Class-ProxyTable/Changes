@@ -1,0 +1,8 @@
+Revision history for Perl extension DBIx::Class::ProxyTable
+
+  0.02 2008-06-02
+        - FIX: _dbh to dbh method.
+               and more.
+
+  0.01  Thu Dec 27 18:43:56 2007
+        - original version

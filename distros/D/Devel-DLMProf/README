@@ -1,0 +1,27 @@
+This is Perl module Devel::DLMProf.
+
+INSTALLATION
+
+Devel::DLMProf installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan Devel::DLMProf
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+Devel::DLMProf documentation is available as in POD. So you can do:
+
+    % perldoc Devel::DLMProf
+
+to read the documentation online with your favorite pager.
+
+Takatoshi Kitano

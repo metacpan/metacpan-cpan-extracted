@@ -1,0 +1,40 @@
+For performance comparisons, try the following for a test DIRECTORY.
+My example directory has 4363 files, 1632 directories, and 73MB data.
+
+	time tar -cf /dev/null DIRECTORY
+	# 0.104s
+
+	time find DIRECTORY -type f -print0 | xargs -0 sha1sum > /dev/null
+	# 0.497s
+  
+	time perl -e 'use strict; use warnings;
+		use Digest;
+		sub digestfile {
+			my ($name, $size)= @_;
+			open(my $fh, "<", $name) || die "$!";
+			my $buf= "";
+			while (length($buf) < $size) {
+				sysread($fh, $buf, $size-length($buf), length($buf));
+			}
+			my $hash= Digest->new("SHA-1")->add($buf)->hexdigest;
+		}
+		sub slurpdir {
+			my $name= shift;
+			opendir my $dh, $name || die "$!";
+			my @items= grep { $_ ne "." && $_ ne ".."} readdir($dh);
+			for (@items) {
+				my $subname= $name."/".$_;
+				-d $subname? slurpdir($subname) : digestfile($subname, -s _);
+			}
+		}
+		slurpdir(DIRECTORY);'
+	# 0.751s
+
+	time perl -e 'use strict; use warnings;
+		use DataStore::CAS::Virtual;
+		use DataStore::CAS::FS::DirCodec::Minimal;
+		use DataStore::CAS::FS::Importer;
+		my $cas= DataStore::CAS::Virtual->new();
+		my $importer= DataStore::CAS::FS::Importer->new(dir_format => "minimal", collect_unix_perm => 0, collect_metadata_ts => 0);
+		$importer->import_directory($cas, DIRECTORY);'
+	# 1.770

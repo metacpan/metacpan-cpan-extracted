@@ -1,0 +1,28 @@
+Revision history for Perl extension Directory::Iterator::PP.
+
+0.01  Mon Oct  1 09:13:17 2012
+	- original version; created by h2xs 1.23 with options
+		-X Directory::Iterator::PP -b 5.6.2
+
+1.0 2012-10-07
+  * Backport tp perl 5.6.2
+  * Use File::Spec for directory seperator
+  * Add show_dotfiles
+  * Add method overloads
+
+1.0.1  2012-10-23
+  * Lstat fix from from Neil Bowers 
+  * Update license
+
+1.1 2012-12-08
+  * Add new options:
+    - show_directories
+    - prune_directory
+    - recursive
+
+1.1.1 2012-12-11
+  * Fix test in windows
+
+1.1.3 2013-03-31
+  * Fix bug in recursive
+  * Improve test coverage

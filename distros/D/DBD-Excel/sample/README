@@ -1,0 +1,13 @@
+tex.pl      : Sample script for DBD::Excel
+texj.pl     : Sample script for DBD::Excel(with Japanese)
+testj.pl    : Sample script for DBD::Excel(with Japanese, Japanese named table)
+thidden.pl  : Sample script for DBD::Excel with xl_skiphidden
+res_tex     : result of tex.pl
+res_texj    : result of texj.pl
+res_testj   : result of testj.pl
+res_hidden  : result of thidden.pl
+dbdtest.xls : source Excel file for text.pl
+testj.xls   : source Excel file for testj.pl
+newxl.xls   : result Excel file of tex.pl
+newxlj.xls  : result Excel file of texj.pl
+tskip.xls   : source Excel file for thidden.pl

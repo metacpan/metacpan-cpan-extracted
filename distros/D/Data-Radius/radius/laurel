@@ -1,0 +1,345 @@
+#
+# dictionary.laurel - Laurel Vendor Specific Attributes
+# Copyright (c) 2003-2005 Laurel Networks, Inc.
+# All rights reserved.
+#
+
+VENDOR		Laurel				5395
+
+BEGIN-VENDOR	Laurel
+
+ATTRIBUTE	Laurel-Login-Local-User-Name		1	string
+ATTRIBUTE	Laurel-Login-Allowed-Commands		2	string
+ATTRIBUTE	Laurel-Login-Denied-Commands		3	string
+ATTRIBUTE	Laurel-Login-Allow-Config		4	string
+ATTRIBUTE	Laurel-Login-Deny-Config		5	string
+ATTRIBUTE	Laurel-Virtual-Router-Name		32	string
+ATTRIBUTE	Laurel-Local-Loopback-Interface		33	string
+ATTRIBUTE	Laurel-Local-IP-Address			34	ipaddr
+ATTRIBUTE	Laurel-Local-IP-Netmask			35	ipaddr
+ATTRIBUTE	Laurel-Rpf-Check			36	integer
+ATTRIBUTE	Laurel-Input-Sampling			37	integer
+ATTRIBUTE	Laurel-Output-Sampling			38	integer
+ATTRIBUTE	Laurel-Proxy-ARP			39	integer
+ATTRIBUTE	Laurel-Client-Mac-Address		40	string
+ATTRIBUTE	Laurel-IGMP-Mode			41	integer
+ATTRIBUTE	Laurel-Acct-User-Name			42	string
+ATTRIBUTE	Laurel-Auth-User-Name			43	string
+ATTRIBUTE	Laurel-Service-Tag			44	string
+ATTRIBUTE	Laurel-PPPOE-URL			48	string
+ATTRIBUTE	Laurel-PPPOE-MOTM			49	string
+ATTRIBUTE	Laurel-Primary-Dns			56	ipaddr
+ATTRIBUTE	Laurel-Primary-Wins			57	ipaddr
+ATTRIBUTE	Laurel-Secondary-Dns			58	ipaddr
+ATTRIBUTE	Laurel-Secondary-Wins			59	ipaddr
+ATTRIBUTE	Laurel-Address-Pool-Name		64	string
+ATTRIBUTE	Laurel-Classifier			72	string
+ATTRIBUTE	Laurel-Input-Filter			73	string
+ATTRIBUTE	Laurel-Policer				74	string
+ATTRIBUTE	Laurel-Queue-Block			75	string
+ATTRIBUTE	Laurel-Scheduler			76	string
+ATTRIBUTE	Laurel-Service-Profile			77	string
+ATTRIBUTE	Laurel-Output-Filter			78	string
+ATTRIBUTE	Laurel-Egress-Policer			79	string
+ATTRIBUTE	Laurel-Queue-Block2			80	string
+ATTRIBUTE	Laurel-Scheduler2			81	string
+ATTRIBUTE	Laurel-Queue-Block3			82	string
+ATTRIBUTE	Laurel-Scheduler3			83	string
+ATTRIBUTE	Laurel-Queue-Block4			84	string
+ATTRIBUTE	Laurel-Scheduler4			86	string
+ATTRIBUTE	Laurel-Queue-Block5			87	string
+ATTRIBUTE	Laurel-Scheduler5			88	string
+ATTRIBUTE	Laurel-Queue-Block6			89	string
+ATTRIBUTE	Laurel-Scheduler6			90	string
+ATTRIBUTE	Laurel-Queue-Block7			91	string
+ATTRIBUTE	Laurel-Scheduler7			92	string
+ATTRIBUTE	Laurel-Queue-Block8			93	string
+ATTRIBUTE	Laurel-Scheduler8			94	string
+ATTRIBUTE	Laurel-Policer-Block			95	string
+ATTRIBUTE	Laurel-Tunnel-Group			96	string
+ATTRIBUTE	Laurel-Tunnel-ToS-Setting		97	integer
+ATTRIBUTE	Laurel-Tunnel-Weight			104	integer	has_tag
+ATTRIBUTE	Laurel-Tunnel-Max-Sessions		105	integer	has_tag
+ATTRIBUTE	Laurel-Tunnel-Receive-Window		106	integer	has_tag
+ATTRIBUTE	Laurel-Tunnel-Persist-Timeout		107	integer	has_tag
+ATTRIBUTE	Laurel-Encapsulation			128	integer
+ATTRIBUTE	Laurel-LIF-Idle-Timeout			129	integer
+ATTRIBUTE	Laurel-Protocol				130	integer
+ATTRIBUTE	Laurel-LIF-Queue-Block			136	string
+ATTRIBUTE	Laurel-LIF-Scheduler			137	string
+ATTRIBUTE	Laurel-LIF-Queue-Block2			138	string
+ATTRIBUTE	Laurel-LIF-Scheduler2			139	string
+ATTRIBUTE	Laurel-LIF-Queue-Block3			140	string
+ATTRIBUTE	Laurel-LIF-Scheduler3			141	string
+ATTRIBUTE	Laurel-LIF-Queue-Block4			142	string
+ATTRIBUTE	Laurel-LIF-Scheduler4			143	string
+ATTRIBUTE	Laurel-LIF-Queue-Block5			144	string
+ATTRIBUTE	Laurel-LIF-Scheduler5			145	string
+ATTRIBUTE	Laurel-LIF-Queue-Block6			146	string
+ATTRIBUTE	Laurel-LIF-Scheduler6			147	string
+ATTRIBUTE	Laurel-LIF-Queue-Block7			148	string
+ATTRIBUTE	Laurel-LIF-Scheduler7			149	string
+ATTRIBUTE	Laurel-LIF-Queue-Block8			150	string
+ATTRIBUTE	Laurel-LIF-Scheduler8			151	string
+ATTRIBUTE	Laurel-PPPOE-Session-Limit		152	integer
+ATTRIBUTE	Laurel-PPPOE-Src-MAC-Validation		153	integer
+ATTRIBUTE	Laurel-PPP-Authentication		154	integer
+ATTRIBUTE	Laurel-CHAP-Challenge-Interval		155	integer
+ATTRIBUTE	Laurel-CHAP-Retries			157	integer
+ATTRIBUTE	Laurel-PPP-Keepalives			158	integer
+ATTRIBUTE	Laurel-Magic-Number			159	integer
+ATTRIBUTE	Laurel-Maximum-Receive-Unit		160	integer
+ATTRIBUTE	Laurel-Domain-Filter			161	string
+ATTRIBUTE	Laurel-DHCP				168	integer
+ATTRIBUTE	Laurel-DHCP-Host-Limit			169	integer
+ATTRIBUTE	Laurel-Disconnect-Cause-Code		200	integer
+ATTRIBUTE	Laurel-Connect-Progress-Code		201	integer
+ATTRIBUTE	Laurel-Access-Line-Id			202	string
+ATTRIBUTE	Laurel-Acct-SvcP-Rx-Octets		203	string
+ATTRIBUTE	Laurel-Acct-SvcP-Rx-Packets		204	string
+ATTRIBUTE	Laurel-Acct-SvcP-Tx-Octets		205	string
+ATTRIBUTE	Laurel-Acct-SvcP-Tx-Packets		206	string
+ATTRIBUTE	Laurel-Redirect-URL			210	string
+ATTRIBUTE	Laurel-IpAutoSess-IdleTimeout		211	integer
+ATTRIBUTE	Laurel-IpAutoSess-Timeout		212	integer
+ATTRIBUTE	Laurel-Service-Type			213	integer
+ATTRIBUTE	Laurel-Idle-Direction			214	integer
+
+##############################################################################
+# enumeration values
+##############################################################################
+
+VALUE	Laurel-Connect-Progress-Code	No-Progress		0
+VALUE	Laurel-Connect-Progress-Code	Unspecified		1
+VALUE	Laurel-Connect-Progress-Code	LCP-State-Initial	5
+VALUE	Laurel-Connect-Progress-Code	LCP-State-Starting	10
+VALUE	Laurel-Connect-Progress-Code	LCP-State-Request-Sent	15
+VALUE	Laurel-Connect-Progress-Code	LCP-State-Ack-Received	20
+VALUE	Laurel-Connect-Progress-Code	LCP-State-Ack-Sent	25
+VALUE	Laurel-Connect-Progress-Code	Lcp-Opened		30
+VALUE	Laurel-Connect-Progress-Code	Auth-Pending		35
+VALUE	Laurel-Connect-Progress-Code	Auth-Succeeded		40
+VALUE	Laurel-Connect-Progress-Code	IP-Interface-Created	43
+VALUE	Laurel-Connect-Progress-Code	IPv4CP-Opening		45
+VALUE	Laurel-Connect-Progress-Code	IPv4CP-Opened		50
+VALUE	Laurel-Connect-Progress-Code	Lac-Creating-tx		55
+VALUE	Laurel-Connect-Progress-Code	Lac-Tx-Created		60
+VALUE	Laurel-Connect-Progress-Code	Lac-Session-Created	65
+VALUE	Laurel-Connect-Progress-Code	Call-Up			70
+
+VALUE	Laurel-DHCP			None			0
+VALUE	Laurel-DHCP			Relay			1
+VALUE	Laurel-DHCP			Proxy			2
+
+VALUE	Laurel-Disconnect-Cause-Code	Invalid			0
+VALUE	Laurel-Disconnect-Cause-Code	Unspecified		1
+VALUE	Laurel-Disconnect-Cause-Code	Npb-Hotswap		2
+VALUE	Laurel-Disconnect-Cause-Code	Clear-Subscriber	3
+VALUE	Laurel-Disconnect-Cause-Code	Auth-Bad-Password	4
+VALUE	Laurel-Disconnect-Cause-Code	Auth-Unknown-User	5
+VALUE	Laurel-Disconnect-Cause-Code	Domain-Filter-Reject	6
+VALUE	Laurel-Disconnect-Cause-Code	CHAP-Auth-Failure	7
+VALUE	Laurel-Disconnect-Cause-Code	CHAP-Restart-Timeout	8
+VALUE	Laurel-Disconnect-Cause-Code	PAP-Auth-Failure	9
+VALUE	Laurel-Disconnect-Cause-Code	Remote-Auth-Failure	10
+VALUE	Laurel-Disconnect-Cause-Code	IP-Address-Unavailable	11
+VALUE	Laurel-Disconnect-Cause-Code	IP-Address-Used		12
+VALUE	Laurel-Disconnect-Cause-Code	PPP-LCP-Timeout		13
+VALUE	Laurel-Disconnect-Cause-Code	PPP-LCP-Negotiation-Failed 14
+VALUE	Laurel-Disconnect-Cause-Code	PPP-Remote-Terminate	15
+VALUE	Laurel-Disconnect-Cause-Code	CHAP-Negotiation-Falure	16
+VALUE	Laurel-Disconnect-Cause-Code	PAP-Negotiation-Falure	17
+VALUE	Laurel-Disconnect-Cause-Code	Invalid-QOS-Attributes	18
+VALUE	Laurel-Disconnect-Cause-Code	Pending-Session-Timeout	19
+VALUE	Laurel-Disconnect-Cause-Code	Memory-Monitor-Reject	20
+VALUE	Laurel-Disconnect-Cause-Code	PPP-IPCP-Timeout	21
+VALUE	Laurel-Disconnect-Cause-Code	L2tpv2-Session-Down-Unspecified 22
+VALUE	Laurel-Disconnect-Cause-Code	L2tpv2-Tunnel-Down-Unspecified 23
+VALUE	Laurel-Disconnect-Cause-Code	AD-Filter-With-FW-Filter 24
+VALUE	Laurel-Disconnect-Cause-Code	AD-Filter-Translation-Failure 25
+VALUE	Laurel-Disconnect-Cause-Code	TLV-Processing-Error	26
+VALUE	Laurel-Disconnect-Cause-Code	Lac-Bind-To-Tunnel-Failed 27
+VALUE	Laurel-Disconnect-Cause-Code	Lac-Bind-To-Tunnel-Group-Failed 28
+VALUE	Laurel-Disconnect-Cause-Code	Dhcp-Remote-Address-Assignment 29
+VALUE	Laurel-Disconnect-Cause-Code	Authentication-Not-RADIUS 30
+VALUE	Laurel-Disconnect-Cause-Code	No-Source-Interface	31
+VALUE	Laurel-Disconnect-Cause-Code	Source-Interface-Unnumbered 32
+VALUE	Laurel-Disconnect-Cause-Code	No-Initial-Routing-Instance 33
+VALUE	Laurel-Disconnect-Cause-Code	Routing-Instance-Not-Found 34
+VALUE	Laurel-Disconnect-Cause-Code	Bad-Radius-Authentication-Type 35
+VALUE	Laurel-Disconnect-Cause-Code	No-Radius-Context	36
+VALUE	Laurel-Disconnect-Cause-Code	Resource-Allocation-Failure 37
+VALUE	Laurel-Disconnect-Cause-Code	IP-Interface-Create-Failure 38
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-With-Routing-Instance 39
+VALUE	Laurel-Disconnect-Cause-Code	Auto-Non-Auto-Subscriber-Attr 40
+VALUE	Laurel-Disconnect-Cause-Code	Invalid-Tunnel-Password	41
+VALUE	Laurel-Disconnect-Cause-Code	Invalid-TOS-Value	42
+VALUE	Laurel-Disconnect-Cause-Code	Invalid-Egress-Policer-Format 43
+VALUE	Laurel-Disconnect-Cause-Code	Lac-Session-Complete-Failed 44
+VALUE	Laurel-Disconnect-Cause-Code	Lac-TX-update-failed	45
+VALUE	Laurel-Disconnect-Cause-Code	Lac-Session-Setup-Failed 46
+VALUE	Laurel-Disconnect-Cause-Code	Duplicate-IP-Address	47
+VALUE	Laurel-Disconnect-Cause-Code	Output-Filter-Create-Failed 48
+VALUE	Laurel-Disconnect-Cause-Code	Shaper-Without-QBlock	49
+VALUE	Laurel-Disconnect-Cause-Code	Classifier-With-Policer	50
+VALUE	Laurel-Disconnect-Cause-Code	Classifier-With-Service-Profile 51
+VALUE	Laurel-Disconnect-Cause-Code	Invalid-MTU		52
+VALUE	Laurel-Disconnect-Cause-Code	Unsupported-IGMP-Mode	53
+VALUE	Laurel-Disconnect-Cause-Code	IGMP-Create-Failed	54
+VALUE	Laurel-Disconnect-Cause-Code	Arp-Param-Id-Changed	55
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Retransmission-Timeout 56
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Control-Channel-Error 57
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Authentication-Failed 58
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Disabled		59
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Invalid-Client-Endpoint 60
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Instance-Disabled 61
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-No-Route		62
+VALUE	Laurel-Disconnect-Cause-Code	L2TPv2-Internal-Network-Failure 63
+VALUE	Laurel-Disconnect-Cause-Code	QBlock-Not-Configured	64
+VALUE	Laurel-Disconnect-Cause-Code	Classifier-Not-Configured 65
+VALUE	Laurel-Disconnect-Cause-Code	ServiceProfile-Not-Configured 66
+VALUE	Laurel-Disconnect-Cause-Code	Scheduler-Not-Configured 67
+VALUE	Laurel-Disconnect-Cause-Code	Input-Filter-Not-Configured 68
+VALUE	Laurel-Disconnect-Cause-Code	Output-Filter-Not-Configured 69
+VALUE	Laurel-Disconnect-Cause-Code	Address-Pool-Not-Configured 70
+VALUE	Laurel-Disconnect-Cause-Code	Egress-Policer-Not-Configured 71
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Group-Not-Configured 72
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Switching-Not-Supported 73
+VALUE	Laurel-Disconnect-Cause-Code	LAC-Disabled		74
+VALUE	Laurel-Disconnect-Cause-Code	LAC-Drain-Enabled	75
+VALUE	Laurel-Disconnect-Cause-Code	Policer-Not-Configured	76
+VALUE	Laurel-Disconnect-Cause-Code	Input-Filter-Create-Failed 77
+VALUE	Laurel-Disconnect-Cause-Code	Incompatible-Scheduler	78
+VALUE	Laurel-Disconnect-Cause-Code	Lcp-Renegotiation	79
+VALUE	Laurel-Disconnect-Cause-Code	Routing-Inst-Already-Changed 80
+VALUE	Laurel-Disconnect-Cause-Code	Unsupported-QBlockSched-Combo 81
+VALUE	Laurel-Disconnect-Cause-Code	PBlock-Not-Configured	82
+VALUE	Laurel-Disconnect-Cause-Code	SessionTimeout-too-large 83
+VALUE	Laurel-Disconnect-Cause-Code	IdleTimeout-too-large	84
+VALUE	Laurel-Disconnect-Cause-Code	CoA-Completed		85
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-No-Info-Available 100
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Admin-Disconnect 101
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Renog-Disabled 102
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Normal-Disconnect-Rmt 103
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Normal-Disconnect-Lcl 104
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Peer-Refused-Encryption 105
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Encryption-Refused 106
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-FSM-Timeout	107
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-No-Packets-Received 108
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Magic-Number-Error 109
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Echo-Req-Timeout 110
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Unexp-Ep-Descr 111
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Unexp-MRRU	112
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Unexp-Short-Seq 113
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Peer-Refused-Cb 114
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-LCP-Refused-Cb	115
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-FSM-Timeout 116
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-Unexp-Auth-Name 117
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-Peer-Rej-Protocol 118
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-Protocol-Rej 119
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-Auth-Failure-Lcl 120
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Chap-Auth-Failure-Rmt 121
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-FSM-Timeout	122
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-Unexp-Auth-Name 123
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-Peer-Rej-Protocol 124
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-Rej-Protocol 125
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-Auth-Failure-Lcl 126
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Pap-Auth-Failure-Rmt 127
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-IPv4CP-FSM-Timeout 128
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-IPv4CP-Not-Available 129
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Convergence-Failure-Rmt 130
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Convergence-Failure-Lcl 131
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Peer-Rej-Local-Addr 132
+VALUE	Laurel-Disconnect-Cause-Code	PPP-DCC-Rej-Remote-Addr	133
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Invalid-Persist-Timeout 150
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Invalid-Rcv-Window-Size 151
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Invalid-Weight	152
+VALUE	Laurel-Disconnect-Cause-Code	Tunnel-Invalid-Max-Session 153
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-General-Clear 200
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Tunnel-Exists 201
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Auth-Failure 202
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Ver-Unsupported 203
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Shutdown	204
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-FSM-Error	205
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Invalid-Length 206
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Out-Of-Range 207
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-No-Resources 208
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Vendor-Specific 209
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Try-Another 210
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-StopCCN-Unknown-Mand-Avp 211
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Loss-Of-Carrier 220
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Admin-Disconnect 221
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Temp-No-Resources 222
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Perm-No-Resources 223
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Invalid-Destination 224
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-No-Carrier	225
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Busy-Signal	226
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-No-Dial-Tone	227
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Exceeded-Alloted-Time 228
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Invalid-Framing 229
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-No-Tunnel	230
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Invalid-Length	231
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Out-Of-Range	232
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-No-Resources	233
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Invalid-Id	234
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Vendor-Specific 235
+VALUE	Laurel-Disconnect-Cause-Code	L2tp-Cdn-Unknown-Avp	236
+
+VALUE	Laurel-Encapsulation		Encap-1483-Bridged	0
+VALUE	Laurel-Encapsulation		Encap-1483-Routed	1
+VALUE	Laurel-Encapsulation		Encap-1483-Autosense	2
+VALUE	Laurel-Encapsulation		Encap-Vc-Mux		3
+VALUE	Laurel-Encapsulation		Encap-Autosense		4
+
+VALUE	Laurel-IGMP-Mode		Disabled		0
+VALUE	Laurel-IGMP-Mode		Enabled			1
+VALUE	Laurel-IGMP-Mode		Enabled_V1		2
+VALUE	Laurel-IGMP-Mode		Enabled_V2		3
+
+VALUE	Laurel-Idle-Direction		DIRECTION_RX		1
+VALUE	Laurel-Idle-Direction		DIRECTION_TX		2
+
+VALUE	Laurel-Input-Sampling		No			0
+VALUE	Laurel-Input-Sampling		Yes			1
+
+VALUE	Laurel-Magic-Number		Disable			0
+VALUE	Laurel-Magic-Number		Enable			1
+
+VALUE	Laurel-Output-Sampling		No			0
+VALUE	Laurel-Output-Sampling		Yes			1
+
+VALUE	Laurel-PPP-Authentication	Null			0
+VALUE	Laurel-PPP-Authentication	PAP			1
+VALUE	Laurel-PPP-Authentication	CHAP			2
+VALUE	Laurel-PPP-Authentication	PAP-then-CHAP		3
+VALUE	Laurel-PPP-Authentication	CHAP-then-PAP		4
+
+VALUE	Laurel-PPP-Keepalives		Disable			0
+VALUE	Laurel-PPP-Keepalives		Enable			1
+
+VALUE	Laurel-PPPOE-Src-MAC-Validation	No			0
+VALUE	Laurel-PPPOE-Src-MAC-Validation	Yes			1
+
+VALUE	Laurel-Protocol			None			0
+VALUE	Laurel-Protocol			PPP			1
+VALUE	Laurel-Protocol			PPPoE			2
+VALUE	Laurel-Protocol			PPPandPPPoE		3
+VALUE	Laurel-Protocol			IP			4
+VALUE	Laurel-Protocol			IPandPPP		5
+VALUE	Laurel-Protocol			IPandPPPoE		6
+VALUE	Laurel-Protocol			IPandPPPandPPPoE	7
+
+VALUE	Laurel-Proxy-ARP		Disabled		0
+VALUE	Laurel-Proxy-ARP		Enabled			1
+VALUE	Laurel-Proxy-ARP		Ignore-Local-Subnet	2
+VALUE	Laurel-Proxy-ARP		Local-Subnet-Only	3
+
+VALUE	Laurel-Rpf-Check		No			0
+VALUE	Laurel-Rpf-Check		Yes			1
+
+VALUE	Laurel-Service-Type		PPP			0
+VALUE	Laurel-Service-Type		DHCP			1
+VALUE	Laurel-Service-Type		IP-AUTO			2
+VALUE	Laurel-Service-Type		AutoSubscriber		3
+
+END-VENDOR	Laurel

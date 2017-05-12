@@ -1,0 +1,9 @@
+t/compiles.t
+example.db
+Makefile.PL
+README
+MANIFEST
+test_notes.txt
+lib/DJabberd/Authen/DBI.pm
+example.conf
+META.yml                                 Module meta-data (added by MakeMaker)

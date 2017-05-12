@@ -1,0 +1,33 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PerlStripper]
+
+DESCRIPTION
+
+    This module lets you strip your modules/scripts with Perl::Stripper
+    during build.
+
+CONFIGURATION
+
+ maintain_linum => bool
+
+ strip_ws => bool
+
+ strip_comment => bool
+
+ strip_pod => bool
+
+ strip_log => bool
+
+ stripped_log_levels => str
+
+    Comma-separated string.
+
+SEE ALSO
+
+    Dist::Zilla
+
+    Perl::Stripper
+

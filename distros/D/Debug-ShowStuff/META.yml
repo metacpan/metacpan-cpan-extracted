@@ -1,0 +1,24 @@
+---
+abstract: 'Debug::ShowStuff - A collection of handy debugging routines for displaying the values of variables with a minimum of coding.'
+author:
+    - "Miko O'Sullivan <miko@idocs.com>"
+generated_by: home grown
+license: perl
+name: Debug::ShowStuff
+provides:
+    Debug::ShowStuff:
+        file: lib/Debug/ShowStuff.pm
+        version: 1.16
+    Debug::ShowStuff::ShowVar:
+        file: lib/Debug/ShowStuff/ShowVar.pm
+        version: 0.11
+requires:
+    Class::ISA: 0
+    Devel::StackTrace: 0
+    Scalar::Util: 0
+    String::Util: 0
+    Term::ReadKey: 0
+    Text::TabularDisplay: 0
+    Tie::IxHash: 0
+    perl: 5.003
+version: 1.16

@@ -1,0 +1,166 @@
+Data::Taxi version 0.96
+=========================
+
+NAME
+    Data::Taxi - Taint-aware, XML-ish data serialization
+
+    PLEASE NOTE: Data::Taxi is no longer being developed or supported.
+
+SYNOPSIS
+      use Data::Taxi ':all';
+      my ($ob, $str);
+  
+      $ob = MyClass->new();
+      $str = freeze($ob);
+      $ob = thaw($str);
+
+INSTALLATION
+    Data::Taxi can be installed with the usual routine:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+    You can also just copy Taxi.pm into the Data/ directory of one of your
+    library trees.
+
+DESCRIPTION
+    Taxi (Taint-Aware XML-Ish) is a data serializer with several handy
+    features:
+
+    Taint aware
+        Taxi does not force you to trust the data you are serializing. None
+        of the input data is executed.
+
+    Human readable
+        Taxi produces a human-readable string that simplifies checking the
+        output of your objects.
+
+    XML-ish
+        While I don't (currently) promise full XML compliance, Taxi produces
+        a block of XML-ish data that could probably be read in by other XML
+        parsers.
+
+EXPORT
+    None by default. freeze and thaw with ':all':
+
+       use Data::Taxi ':all';
+
+Subroutines
+  freeze($ob, %opts)
+    "freeze" serializes a single scalar, hash reference, array reference, or
+    scalar reference into an XML string, "freeze" can recurse any number of
+    levels of a nested tree and preserve multiple references to the same
+    object. Let's look at an example:
+
+            my ($tree, $format, $members, $bool, $mysca);
+        
+            # anonymous hash
+            $format = {
+                    'app'=>'trini',
+                    'ver'=>'0.9',
+                    'ver'=>'this &amp; that',
+            };
+        
+            # anonymous array
+            $members = ['Starflower', 'Mary', 'Paul', 'Hallie', 'Ryan'];
+        
+            # blessed object
+            $bool = Math::BooleanEval->new('whatever');
+        
+            # scalar reference (to an anonymous hash, no less)
+            $mysca = {'name'=>'miko', 'email'=>'miko@idocs.com', };
+        
+            # the whole thing
+            $tree = {
+                    'dataformat' => $format,
+                    'otherdataformat' => $format,
+                    'bool' => $bool,
+                    'members' => $members,
+                    'myscaref' => \$mysca,
+            };
+        
+            $frozen = freeze($tree);
+
+    "freeze" accepts one object as input. The code above results in the
+    following XML-ish string:
+
+       <taxi ver="1.00">
+          <hashref id="0">
+             <hashref name="otherdataformat" id="1">
+                <scalar name="ver" value="this &#38;amp; that"/>
+                <scalar name="app" value="trini"/>
+             </hashref>
+             <scalarref name="myscaref" id="2">
+                <hashref id="3">
+                   <scalar name="email" value="miko@idocs.com"/>
+                   <scalar name="name" value="miko"/>
+                </hashref>
+             </scalarref>
+             <hashref name="bool" id="4" class="Math::BooleanEval">
+                <hashref name="blanks" id="5">
+                </hashref>
+                <scalar name="pos" value="0"/>
+                <arrayref name="arr" id="6">
+                   <scalar value="whatever"/>
+                </arrayref>
+                <scalar name="expr" value="whatever"/>
+             </hashref>
+             <hashref name="dataformat" id="1" redundant="1"/>
+             <arrayref name="members" id="7">
+                <scalar value="Starflower"/>
+                <scalar value="Mary"/>
+                <scalar value="Paul"/>
+                <scalar value="Hallie"/>
+                <scalar value="Ryan"/>
+             </arrayref>
+          </hashref>
+       </taxi>
+
+  thaw
+    "thaw" accepts one argument, the serialized data string, and returns a
+    single value, the reconstituted data, rebuilding the entire data
+    structure including blessed references.
+
+       $tree = thaw($frozen);
+
+IS TAXI DATA XML?
+    Although Taxi's data format is XML-ish, it's not fully compliant to XML
+    in all regards. For now, Taxi only promises that it can input its own
+    output. The reason I didn't go for full XML compliance is that I wanted
+    to keep Taxi as light as possible while achieving its main goal in life:
+    pure-perl serialization. XML compliance is not part of that goal. If you
+    want to help make Taxi fully XML compliant w/o making it bloated, that's
+    cool, drop me an email and we can work together.
+
+TODO
+    Tied scalars don't work. The code started getting spaghettish trying to
+    implement them, so I decided to use the Asimov method and stop thinking
+    about it for a while. Tied hashes and arrays should work fine.
+
+TERMS AND CONDITIONS
+    Copyright (c) 2002 by Miko O'Sullivan. All rights reserved. This program
+    is free software; you can redistribute it and/or modify it under the
+    same terms as Perl itself. This software comes with NO WARRANTY of any
+    kind.
+
+AUTHOR
+    Miko O'Sullivan miko@idocs.com
+
+VERSION
+     Version 0.90    June 15, 2002
+     initial public release
+
+     Version 0.91    July 10, 2002
+     minor improvment to documentation
+
+     Version 0.94    April 26, 2003
+     Fixed problem handling undefined scalars.
+
+     Version 0.95    Oct 31, 2008
+     Adding notice of last release
+
+     Version 0.96    Nov 14, 2010
+     Fixing bug:
+

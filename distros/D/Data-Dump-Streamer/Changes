@@ -1,0 +1,343 @@
+2.40
+
+Fixup issues with JSON and with non-Padwalker builds (thanks to FC)
+various other tweaks and cleanups to build on newer Perls. Updated
+meta files, etc.
+
+2.37
+
+Various changes. See github log for changes.
+
+NOTE, I have little time to maintain this package. If a secondary maintainer
+wants to step up I would be happy to grant the appropriate permissions so that
+new releases do not take so long.
+
+2.36
+
+Er... I forgot to update the changes file for this release.
+
+2.35
+Apply patches by Ilmari and D. Steinbrunner.
+
+Should work on 5.18 now.
+
+2.34
+Administrative release to eliminate build dependency on module
+used only for testing.
+
+2.33
+Caught up with various RT reports, and fixed a bunch of them.
+
+[RT #74198] fixed dumps containing read-only objects (obtained via JSON::XS)
+
+[RT #74198], Fixed stringification of code compiled under strict in later
+perls. Thanks to Father Chrysotomos for the patch and nudge.
+
+Also eliminated a false-fail prone test which was actually pretty useless,
+which should close several tickets which I wont bother to list.
+
+This release also is the first from the new git repository at
+https://github.com/demerphq/Data-Dump-Streamer
+
+
+2.32
+Disable overloading in a <=5.8.8 safe way [RT #53700]
+
+2.31
+React to Strawberry perl $. strangeness [RT #58528]
+
+2.29
+Add .answer to .gitignore
+Update t/madness for perl-5.6
+Syntax fix print() for perl-5.6
+Correct ${^WARNING_BITS} in t/madness.t for perl-5.8.7 and earlier
+
+2.28
+Strip illegal regexp modifiers [RT #65355]
+Update file permissions
+
+2.27
+Test for new regexp /u flag [RT #65339]
+Import less private functions
+Removed obsolete svn version info
+
+2.26
+Keep a glob reference open while inspecting through it with B. [RT #65272]
+
+2.25 (2011-01-24)
+Oops, add ppport.h to the packaged distribution
+
+2.24 (2011-01-23)
+Fix weakref breakage from perl-5648c0a. [RT #62605]
+Add ppport.h
+Add .gitignore
+
+2.23 (2011-01-18)
+Fix DumpLex for bug #44621
+
+2.22 (2010-07-11)
+
+Build.PL fixed to accept DDS and NODDS again
+
+2.21 (2010-06-19)
+
+Resynchronize internal VERSION declarations
+
+2.20
+
+Skipped version 2.20 because version numbers don't play nice when they
+end in zeros.
+
+2.19 (2010-06-19)
+
+Tweak t/madness.t to deal with how perl-5.8.[0-8] deparses the pragma
+`use warnings' differently.
+
+2.18 (2010-06-12)
+
+Continue to refine t/lexicals.t response to Perl commit
+"e02c0f79a8059eaf4981f798cc21d7dc3c8b916e shift; optimization". The
+change happened after 5.13.0 and is released in 5.13.1.
+
+2.17 (2010-06-11)
+
+Declare ExtUtils::CBuilder as a build_requries dependency
+
+2.16 (2010-06-11)
+
+Manually add VERSION to Data::Dump::Streamer::Deparser to make CPAN
+indexer happy.
+
+2.15 (2010-06-11)
+
+Perl commit "538f5756c002f0583190831238bbf6bd54855cdc shift;
+optimization" changed B::Deparse
+
+Switch from ExtUtils::MakeMaker to Module::Build for
+configure_requires support
+
+2.14 (2010-06-08)
+
+Our Makefile.PL must abort if we're going to need to build B::Utils
+but we don't have ExtUtils::Depends because it doesn't work to let the
+build chain do this dependency resolution. Perhaps there is a version
+that this all "just works" in?
+
+t/dump.t required some styling state changes but was skipping them
+when some modules weren't installed.
+
+2.13 (2010-04-05)
+
+No really, *actually* removed re.pm debugging code
+
+2.12 (2010-04-05)
+
+Removed re.pm debugging code (which also broke compat w/ perl-5.8
+
+2.11 (2010-04-04)
+
+perl-5.12.0 blesses file handles into IO::File, not IO::Handle
+
+2.10 (2010-04-04)
+
+Perl-5.12.0 has:
+  - qr// as a native
+  - $! isn't auto-filled with 'Bad file descriptor' as often
+
+2.09 (2009-03-24)
+
+Hashkeys ending in newline were incorrectly quoted. Sorry Ambrus.
+
+Make it possible to hackily dump *GLOB{IO} objects. This is mostly
+to make merijn happy. Afaik we dont have the information to do it
+properly.
+
+2.08 (2007-12-22 01:34:13)
+
+Hashkeys starting with '-' were sometimes incorrectly quoted.
+See RT #29608 at
+    http://rt.cpan.org/Ticket/Display.html?id=29608
+Thanks to Maddingue for the heads up.
+
+2.07 (2007-12-22 01:10:02)
+
+Version 2.06 broke on Perls < 5.10 due to a stupid thinko. Should
+build on the main Perls fine now.
+
+2.06 (2007-12-21 22:27:45)
+
+Finally got DDS running under blead/Perl 5.10
+
+Currently we duplicate code that is in Perl 5.10's Hash::Util (*),
+this code should not be compiled under Perl 5.10 and we should
+just use Hash::Util instead.
+
+(*) Actually Hash::Util duplicates this code, but whatever, thats
+called progress. :-)
+
+2.05 (2007-08-23 00:23:19)
+
+Fix http://rt.cpan.org/Ticket/Display.html?id=28053, where undef
+and '' are confused inside of repeat value folding logic.
+
+2.04 (2007-08-23 00:09:55)
+
+Remove various unsavoury items from INSTALL.SKIP and bump the version
+number.
+
+2.03
+
+Fixed some issues with dmping proxy objects with circular links.
+
+Started integrating subversion into the perl build process to prevent
+stuff like releasing unchecked in code, and to include the subversion
+build number in the distribution file name.
+
+Reversed the order of the change file so that newest stuff is at top.
+
+2.02
+
+Added OptSpace() which can be used to control optional whitespace.
+Indent(0) automatically disables optional whitespace.
+
+String compression support has been provided. Use Compress()
+to specify how long a string should be before it is compressed.
+Use Compressor() to supply a callback to handle the compression.
+
+More tests, better documentation.
+
+2.01
+
+Bug fixes, documentation patches and a few more tests.
+
+DumpNames() renamed to DumpVars().
+
+This fixes test failures that were coming from lexicals.t
+
+2.00
+
+*WARNING* Interface change!!
+
+This release is interface incompatible with earlier releases.
+
+The whole framework for overriding how objects and classes are represented
+has been changed, hopefully, to be more intuitive and easier to use.
+
+All of the previous Freeze related functionality has been replaced by the
+new Freezer() method and interface. There is now support for class
+authors to add a DDS_freeze() method to control serialization and
+deserialization.
+
+HashKeys has had an interface change and has been renamed to KeyOrder.
+HashKeys() is still maintained but undocumented at this time.
+
+Added more documentation.
+
+Added support for Padwalker functionality that Robin Housten implemented.
+
+Long quoted strings are now split to be easier to read.
+
+1.14
+
+Jim Cromie put together a patch to make aliasing less intrusive. As the term alias was
+fairly heavily used already I changed his 'alias' mechanism to 'as', blame me not him
+for the silly name. Also includes a few minor fixes, and a little bit of pod cleanup.
+
+1.12
+
+Dan Brook noticed that closures that referenced closures were not being handled properly
+as the code wasnt iterating into the nested closures. This is fixed now.
+
+1.11
+
+Reworked how objects blessed into classes with overloads are handled to prevent
+any overloaded methods from firing during the eval of their dump. There may be
+problems with this and the Freeze/Thaw processing so YMMV. Thanks to [diotalevi]
+from perlmonks for the base implementation of this.
+
+Added support for weakreferences. Under some circumstances weakrefs caused DDS
+to get very confused, and there was no support for recreating weakrefs in the
+structure. This has been rectified. Its possible that output including weakrefs
+may not eval correctly as the restored data may be missing external references
+that keep the overall data structure alive. For instance if everything in the
+dump is a weakref the resulting vars may have returned to undef prior to completing
+the eval. YMMV. Thanks to [ysth] from perlmonks for the pointer to how weakrefs work.
+
+Added method behaviour to Dump() so its not just subroutine based. This should make
+using it as a method more or less DWIM. Also thanks to [diotalevi]
+
+Added support for dumping the lexical context of CODE refs. Heavily experimental,
+YMMV.
+
+1.10
+
+Added dualvar support. Added support for a low purity mode and Purity() overall.
+Refactored some code. More tests.
+
+1.09
+
+Changed the way DDS is implemented to something a little simpler. Also enhanced
+the Makefile.pl stuff, and added mention of it to D::D::S's pod.
+
+1.08
+
+Doc fixes, and removed a relic of earlier development that polluted @INC.
+
+1.07
+
+Fixed some incorrect error messages in Streamer.xs. Updated CHANGES with 1.06
+info which I forgot from that release. Fixed utf8 related error. Thanks to
+Yitzchak for the patch. Provided a way to optionally install a 'DDS' alias
+for the module so that its easier to use from the command line. Doesn't install
+it by default, or via a normal CPAN install for namespace pollution reasons,
+and because I hate modules that dont automatically install. If you do
+
+  perl Makefile.PL DDS [STANDARD OPTS]
+
+then it will be installed. To disable this once its enabled you can say
+
+  perl Makefile.PL NODDS [STANDARD OPTS]
+
+1.06
+
+Added additional support for utf8 and some minor doc fixes. Thanks to
+Yitzchak yet again for the patches and advice.
+
+1.05
+
+Added support for locked hashes. Probably there are still bugs in here,
+but for now it looks good. Thanks to Yitzchak for pointing out this wasn't
+implemented.
+
+Also started adding support for a "smart indent mode". Try using Indent(1)
+instead of Indent(2).
+
+1.03, 1.04
+
+Enhanced format support for FORMAT refs. Yitzchak pointed out some
+bugs in the original handling. DeparseFormat() has been removed. It
+should never have existed in the first place. DeparseGlob() was the
+correct method/attribute to use. FormatStub() attribute added.
+
+This release I'm introducing some new testing code that im trying out.
+Once im happy with it I intend to convert all my old tests to use it
+and do away with the really quite horrible same() and _same() in
+test_helper.pl.
+
+1.02
+
+Changed test 14 of dump.t, added a few tests, and some support code
+for future enhancements, and most notably support for deparsing
+formats. Thanks to Yitzchak Scott-Thoennes for the latter.
+
+1.01
+
+Post-release minor fix to provide SortKeys and Hashkeys aliases to
+both SortKeys and HashKeys. Thanks to Slaven Rezic for the heads up.
+Added documentation improvements and fixes as well as a very slight
+and subtle change to the behaviour of Dump() in list context.
+
+1.0
+
+Release version. Name changed to Data::Dump::Streamer which will be
+future name.

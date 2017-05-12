@@ -1,0 +1,121 @@
+body {
+  font-family: sans-serif;
+}
+
+#footer {
+  color: #666;
+  font-size: smaller;
+  text-align: center;
+}
+
+hr {
+  background: #777;
+  border: none;
+  height: 1px;
+}
+
+table.listing {
+  width: 100%;
+}
+
+table.listing tr:hover {
+  background: #eee;
+}
+
+table.listing th {
+  background: #ccc;
+  padding: 0.3em 0.4em;
+}
+
+table.listing td {
+  padding: 0.2em 0.4em;
+}
+
+table.listing td.size {
+  color: #777;
+  text-align: center;
+}
+
+table.listing td.type {
+  color: #777;
+  text-align: center;
+}
+
+table.listing td.mtime {
+  color: #777;
+  text-align: center;
+}
+
+.file .name a {
+  background: url('unknown.png') left center no-repeat;
+  padding-left: 24px;
+  text-decoration: none;
+}
+
+.file .name a:hover {
+  text-decoration: underline;
+}
+
+.file a.parent-directory {
+  background-image: url('go-up.png');
+}
+
+.file a.directory {
+  background-image: url('inode-directory.png');
+}
+
+.file a.file-application-javascript {
+  background-image: url('application-javascript.png');
+}
+
+.file a.file-application-msword {
+  background-image: url('application-msword.png');
+}
+
+.file a.file-application-pdf {
+  background-image: url('application-pdf.png');
+}
+
+.file a.file-application-vnd-ms-excel {
+  background-image: url('application-vnd.ms.excel.png');
+}
+
+.file a.file-application-vnd-oasis-opendocument-spreadsheet {
+  background-image: url('application-vnd.oasis.opendocument.spreadsheet.png');
+}
+
+.file a.file-application-vnd-oasis-opendocument-text {
+  background-image: url('application-vnd.oasis.opendocument.text.png');
+}
+
+.file a.file-application-x-perl {
+  background-image: url('application-x-perl.png');
+}
+
+.file a.file-application-x-php {
+  background-image: url('application-x-php.png');
+}
+
+.file a.file-application-xml {
+  background-image: url('application-xml.png');
+}
+
+.file a.file-application-zip {
+  background-image: url('application-zip.png');
+}
+
+.file a.file-image-x-generic {
+  background-image: url('image-x-generic.png');
+}
+
+.file a.file-text-html {
+  background-image: url('text-html.png');
+}
+
+.file a.file-text-plain {
+  background-image: url('text-plain.png');
+}
+
+.file a.file-text-x-csrc {
+  background-image: url('text-x-csrc.png');
+}

@@ -1,0 +1,57 @@
+NAME
+    Devel::Caller::Perl - Perl only implementation.
+
+SYNOPSIS
+     use Devel::Caller::Perl qw[called_with];
+ 
+     sub permute_args {
+       my @args = @_;
+       my @caller_args = called_with( 0 );
+   
+       my %caller_args =
+         map { $_ => $caller_args[$_] } 0 .. $#caller_args;
+   
+       return \%caller_args;
+     }
+
+     sub dodad {
+       my $args = permute_args;
+
+       print $args->{0};
+       # ...
+     }
+
+ABSTRACT
+    This module allows a method to get at arguments passed to subroutines
+    higher up in the call stack.
+
+DESCRIPTION
+  FUNCTIONS
+
+   called_with [LEVEL]
+
+    "called_with" returns the arguments to the subroutine at LEVEL in the
+    call stack. If no level is specified, 0 (zero) is assumed, that being
+    our caller. If a list is expected, it will be returned. When a scalar is
+    expected, a list reference will be returned.
+
+    If you want the number of arguments passed to the subroutine at LEVEL,
+    there's nothing stopping you from getting it from "caller".
+
+     my $number = (caller $level)[4];
+
+AUTHOR
+    Casey West <casey@geeknest.com>
+
+THANKS
+    Rocco Caputo -- Much help with code and overall inspiration.
+
+COPYRIGHT
+    Copyright (c) 2003 Casey West. All rights reserved. This program is free
+    software; you can redistribute it and/or modify it under the same terms
+    as Perl itself.
+
+SEE ALSO
+    the perl manpage, the Devel::Caller manpage, the DB manpage, the
+    perldebguts manpage.
+

@@ -1,0 +1,43 @@
+NAME
+
+    DBIx::Class::QueryProfiler - DBIx::Class profiler
+
+DESCRIPTION
+
+    Profiler for DBIx::Class. Also it provides more usable output or queries.
+
+SYNOPSYS
+
+In order to start using just declare in your schema the code
+
+    use DBIx::Class::QueryProfiler;
+
+    sub connection {
+        my $self = shift;
+        my $response = $self->next::method(@_);
+        $response->storage->auto_savepoint(1);
+        $response->storage->debug(1);
+        $response->storage->debugobj(DBIx::Class::QueryProfiler->new);
+        return $response;
+    }
+
+Possible to use debugfh () to select right output debuging filehandle
+
+    $response->storage->debugfh(IO::File->new('/tmp/trace.out', 'w'));
+
+or it can be set through an environment variable DBIC_TRACE
+
+    export DBIC_TRACE="1=/tmp/trace.out"
+
+BUGS
+    No bugs. Found? Report please :-)
+
+AUTHORS
+    Andrey Kostenko <andrey@kostenko.name>, Mons Anderson <mons@cpan.org>
+
+COMPANY
+    Rambler Internet Holding
+
+CREATED
+    15.04.2009 19:28:45 MSD
+

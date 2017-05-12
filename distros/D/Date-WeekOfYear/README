@@ -1,0 +1,44 @@
+Date/WeekOfYear version 0.01
+============================
+
+Date::WeekOfYear is small and efficient. 
+The only purpose is to return the week of the year. 
+This can be called in either a scalar or list context.
+
+As from version 1.5 the returned week and year are based
+in ISO 8601.  The previous functionality can be accessed by
+passing a second, true argment.
+
+In a scalar context, just the week number is returned (the year starts at 
+week 1).
+
+In a list context, both the week number and the year (YYYY) are returned. 
+This ensures that you know which year the week number relates too. 
+This is only an issue in the week where the year changes (ie depending on 
+the day you can be in either week 52, 53 or week 1.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  Time::Local - Now standard
+
+COPYRIGHT AND LICENCE
+
+Greg George, IT Technology Solutions P/L, Australia
+Mobile: +61-404-892-159, Email: gng@cpan.org
+
+Copyright (C) 2004 Greg George
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

@@ -1,0 +1,63 @@
+DBIx/Migrate version 0.01
+=========================
+
+SYNOPSIS
+       use DBI;
+       use DBIx::Migrate;
+
+       $source = DBI->connect('dbi:Oracle:dbase1', ...);
+
+       $target = DBI->connect('dbi:mysql:dbase2', ...);
+
+       $migration =
+           DBIx::Migrate->new(SOURCE => $source,
+                              TARGET => $target,
+           # optional         CLOBBER => 1,
+                              TABLES => [ qw(tbl1 tb12 ..etc..) ]
+           # optional         TYPE_TRANSLATE => $hash_ref
+                             );
+
+       $tables_copied = $migration->migrate;
+
+DESCRIPTION
+       DBIx::Migrate is a DBI extension for 'batch-mode' table migration.
+       Let's suppose you want to create a MySQL mirror of several related
+       tables in an Oracle database.  DBIx::Migrate will do just that.  If the
+       target MySQL table does not exist, an attempt is made to create a MySQL
+       version of the original Oracle table structure.  The big problem here
+       is that not all databases use universal data types.  So depending on
+       the driver, you'll probably need to alter the TYPE_TRANSLATE parameter.
+       By default, the TYPE_TRANSLATE parameter looks like this:
+
+       TYPE_TRANSLATE = { qw!  1 char 2 numeric 3 decimal 4 integer 5 smallint
+       6 float 7 real 8 double 9 date 10 time 11 timestamp 12 varchar -1 text
+       -2 binary -3 varbinary -4 blob -5 bigint -6 tinyint -7 bit -8 wchar -9
+       wvarchar -10 wlongvarchar ! };
+
+       Please note that DBIx::Migrate does not create indexes on target
+       tables.  You'll have to do that by hand.
+
+       Also, a fatal error will result if you attempt to create a table that
+       already exists in the target database.  If you want to override this
+       behavior, set the CLOBBER parameter to true.
+
+SEE ALSO
+       http://www.gnusto.net is the official home page for DBIx::Migrate.
+
+AUTHOR
+       Nathaniel Graham, <nate@gnusto.net>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENSE
+       Copyright 2003 by Nathaniel Graham
+ 
+       This module is free software; you can redistribute it and/or modify it
+       under the same terms as Perl itself.

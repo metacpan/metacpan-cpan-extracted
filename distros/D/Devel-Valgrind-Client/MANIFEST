@@ -1,0 +1,9 @@
+Client.xs
+lib/Devel/Valgrind/Client.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+t/01.load.t
+t/02.no_valgrind.t
+t/03.leak_check.t
+META.yml                                 Module meta-data (added by MakeMaker)

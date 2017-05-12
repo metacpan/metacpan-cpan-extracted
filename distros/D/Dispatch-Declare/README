@@ -1,0 +1,22 @@
+Dispatch-Declare version 0.1.0
+
+INSTALLATION
+
+    perl Build.PL
+    ./Build
+    ./Build test
+    ./Build install
+
+
+
+DEPENDENCIES
+
+None.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007, Robert Boone
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

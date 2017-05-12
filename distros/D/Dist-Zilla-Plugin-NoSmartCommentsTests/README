@@ -1,0 +1,78 @@
+NAME
+
+    Dist::Zilla::Plugin::NoSmartCommentsTests - Make sure no
+    Smart::Comments escape into the wild
+
+VERSION
+
+    This document describes version 0.009 of
+    Dist::Zilla::Plugin::NoSmartCommentsTests - released October 09, 2016
+    as part of Dist-Zilla-Plugin-NoSmartCommentsTests.
+
+SYNOPSIS
+
+        ; In C<dist.ini>:
+        [Test::NoSmartComments]
+
+DESCRIPTION
+
+    This is an extension of Dist::Zilla::Plugin::InlineFiles, providing the
+    following file:
+
+      xt/release/no-smart-comments.t - test to ensure no Smart::Comments
+
+METHODS
+
+ register_prereqs
+
+    Registers a 'develop' phase requirement for Test::NoSmartComments with
+    the Dist::Zilla object.
+
+NOTE
+
+    The name of this plugin has turned out to be somewhat misleading, I'm
+    afraid: we don't actually test for the _existance_ of smart comments,
+    rather we ensure that Smart::Comment is not used by any file checked.
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Smart::Comments
+
+      * Test::NoSmartComments
+
+BUGS
+
+    Please report any bugs or feature requests on the bugtracker website
+    https://github.com/RsrchBoy/dist-zilla-plugin-nosmartcommentstests/issues
+
+    When submitting a bug or request, please include a test-file or a patch
+    to an existing test-file that illustrates the bug or desired feature.
+
+AUTHOR
+
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+ I'm a material boy in a material world
+
+    Please note I do not expect to be gittip'ed or flattr'ed for this work,
+    rather it is simply a very pleasant surprise. I largely create and
+    release works like this because I need them or I find it enjoyable;
+    however, don't let that stop you if you feel like it ;)
+
+    Flattr
+    <https://flattr.com/submit/auto?user_id=RsrchBoy&url=https%3A%2F%2Fgithub.com%2FRsrchBoy%2Fdist-zilla-plugin-nosmartcommentstests&title=RsrchBoy's%20CPAN%20Dist-Zilla-Plugin-NoSmartCommentsTests&tags=%22RsrchBoy's%20Dist-Zilla-Plugin-NoSmartCommentsTests%20in%20the%20CPAN%22>,
+    Gratipay <https://gratipay.com/RsrchBoy/>, or indulge my Amazon
+    Wishlist <http://bit.ly/rsrchboys-wishlist>... If and *only* if you so
+    desire.
+
+COPYRIGHT AND LICENSE
+
+    This software is Copyright (c) 2011 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

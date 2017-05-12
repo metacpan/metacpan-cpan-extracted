@@ -1,0 +1,321 @@
+                     =====================================
+                       Package "Date::Pcalc" Version 6.1
+                     =====================================
+
+
+                  Copyright (c) 1995 - 2009 by Steffen Beyer.
+                             All rights reserved.
+
+
+Contents:
+---------
+
+    +   Prerequisites
+    +   Preliminary steps for use with ActiveState's port of Perl 5
+    +   How to install additional languages
+    +   Installation
+
+
+Prerequisites:
+--------------
+
+Perl version 5.000 or higher.
+
+Module "Carp::Clan" version 5.3 or higher.
+
+Optionally, module "Bit::Vector" version 7.1 or newer.
+
+If you plan to use the modules "Date::Pcalendar" or
+"Date::Pcalendar::Year" from this package, you will
+also need the module "Bit::Vector" version 7.1 or
+newer (which needs an ANSI C compiler, however!).
+
+Otherwise you may safely ignore the warning message
+"Warning: prerequisite Bit::Vector 7.1 not found at ..."
+when running "perl Makefile.PL".
+
+Anyway, you can always install "Bit::Vector" later
+at any time if you change your mind.
+
+Note that in order to compile Perl modules which contain
+C (and/or XS) code (such as Bit::Vector), you always HAVE
+to use the very same compiler your Perl itself was compiled
+with.
+
+Many vendors nowadays ship their operating system already
+comprising a precompiled version of Perl. Many times the
+compilers used to compile this version of Perl are not
+available to or not usually used by the users of these
+operating systems.
+
+In such cases building Bit::Vector (or any other Perl
+module containing C and/or XS code) will not work. You
+will either have to get the compiler which was used to
+compile Perl itself (see for example the section "Compiler:"
+in the output of the command "perl -V"), or to build
+your own Perl with the compiler of your choice (which
+also allows you to take advantage of the various compile-
+time switches Perl offers).
+
+Note that Sun Solaris and Red Hat Linux frequently were
+reported to suffer from this kind of problem.
+
+Moreover, you usually cannot build any such modules under
+Windows 95/98 since the Win 95/98 command shell doesn't
+support the "&&" operator. You will need the Windows NT
+command shell ("cmd.exe") or the "4DOS" shell to be
+installed on your Windows 95/98 system first. Note that
+Windows NT, Windows 2000 and Windows XP are not affected
+and just work fine. I don't know about Windows Vista and
+Windows 7, however.
+
+Note that ActiveState provides precompiled binaries of
+Bit::Vector for their Win32 port of Perl ("ActivePerl")
+on their web site, which you should be able to install
+simply by typing "ppm install Bit-Vector" in your MS-DOS
+command shell (but note the "-" instead of "::" in the
+package name!). This also works under Windows 95/98 (!).
+
+If your firewall prevents "ppm" from downloading
+this package, you can also download it manually from
+http://www.activestate.com/ppmpackages/5.005/zips/ or
+http://www.activestate.com/ppmpackages/5.6/zips/.
+Follow the installation instructions included in
+the "zip" archive.
+
+
+Preliminary steps for use with ActiveState's port of Perl 5:
+------------------------------------------------------------
+
+(For the Win32 platform)
+
+Edit the file "Makefile.PL" and remove all of the "#" characters
+which currently comment out the lines involved with the setting
+of the attributes "ABSTRACT", "AUTHOR" and "CAPI".
+
+
+How to install additional languages:
+------------------------------------
+
+Unfortunately, UNIX and Windows NT/95 lack a "Resource Fork" concept
+as provided by the MacOS (Apple Macintosh Operating System).
+
+Therefore you will have to make changes to the source code of this
+package whenever you want to change existing resources or if you want
+to add more languages.
+
+Fortunately, though, adding a new language is quite simple:
+
+Edit the file "Pcalc.pm", locate the "RESOURCES" section,
+and do the following:
+
+1) Increment the number in the line
+
+    my $DateCalc_LANGUAGES = 14;
+
+   as necessary.
+
+2) Add a new entry to the bottom of the array "@DateCalc_Month_to_Text_"
+   of the following form:
+
+    [
+        "???", "January", "February", "March", "April", "May", "June",
+        "July", "August", "September", "October", "November", "December"
+    ]
+
+   Don't forget to add a comma after the closing bracket of the immediately
+   preceding entry above your new entry.
+
+3) Add a new entry to the bottom of the array "@DateCalc_Day_of_Week_to_Text_"
+   of the following form:
+
+    [
+        "???", "Monday", "Tuesday", "Wednesday",
+        "Thursday", "Friday", "Saturday", "Sunday"
+    ]
+
+   Don't forget to add a comma after the closing bracket of the immediately
+   preceding entry above your new entry.
+
+4) Add a new entry to the bottom of the array "@DateCalc_Day_of_Week_Abbreviation_"
+   of the following form:
+
+    [
+        "", "", "", "", "", "", "", ""    #  15  #
+    ]
+
+   Don't forget to add a comma after the closing bracket of the immediately
+   preceding entry above your new entry.
+
+   Fill this entry with values *ONLY* if you need special abbreviations
+   for the names of the days of week (i.e., if you need abbreviations
+   other than the first three letters of the entries in the array
+   "@DateCalc_Day_of_Week_to_Text_" immediately above)!
+
+   If you do so, remember to fill the first (dummy) field in this entry
+   with some non-empty string (such as "???", for example), since this
+   field is used to flag the existence of special abbreviations in this
+   package.
+
+5) Add a new entry to the bottom of the array "@DateCalc_Date_Long_Format_"
+   of the following form:
+
+    "%s, %d %s %d"                      #  15  Language     #
+
+   Don't forget to add a comma after the closing double quote of
+   the immediately preceding entry above your new entry.
+
+   You may change this format to suit your preferences, but the number,
+   type and order of variables is fixed (day of week, day, month, year).
+
+   In case you want to use a different scheme, you will have to
+   add a new "case" to the "switch" statement in the function
+   "DateCalc_Date_to_Text_Long()" and provide the "sprintf()"
+   statement with the necessary arguments yourself.
+
+6) Finally, append the name of the language you have just added
+   *WRITTEN IN THIS VERY LANGUAGE*, to the end of the array
+   "@DateCalc_Language_to_Text_". (And don't forget the comma...)
+
+   The name of the language should be written in that very language
+   itself because the name for any given language usually varies
+   considerably from language to language. The only way to uniquely
+   identify any language is to use the way it is written by native
+   writers of that language itself.
+
+   The abbreviations for names of languages as defined by ISO 639 cannot
+   take account of all languages (there are only 26 * 26 = 676 possible
+   abbreviations as designated by this standard, as opposed to the many
+   thousand different languages in this world), which is the reason why
+   they are not used here.
+
+7) If you have never built this version of this package on the current
+   machine before, just proceed with the instructions in the section
+   "Installation" following immediately below.
+
+   Otherwise, rebuild the package with "make" (as described in the
+   section below) and re-install it with "make install".
+
+   If you want to start over from scratch instead, enter the command
+   "make realclean" and proceed as described in the section below,
+   from the beginning.
+
+8) Some additional remarks:
+
+   This module doesn't support any other character sets than ISO-Latin-1.
+
+
+Installation:
+-------------
+
+=============================================================================
+ALWAYS unpack and build Perl modules OUTSIDE the Perl source and installation
+tree! (You might otherwise inadvertently corrupt your Perl installation!)
+=============================================================================
+
+Quick installation guide for experienced users:
+-----------------------------------------------
+
+    UNIX:                 Win32/Borland C++:      Win32/MS Visual C++:
+    =====                 ==================      ====================
+
+    % perl Makefile.PL    % perl Makefile.PL      % perl Makefile.PL
+    % make                % dmake                 % nmake
+    % make test           % dmake test            % nmake test
+    % make install        % dmake install         % nmake install
+
+Detailed installation guide:
+----------------------------
+
+ 1) Change directory to the directory that has been created by unpacking this
+    package ("cd Date-Pcalc-6.1").
+
+ 2) Type "perl Makefile.PL" (or whatever the name and path of your Perl 5
+    binary is).
+
+    This will create a "Makefile" with the appropriate parameters for your
+    system (for instance, where the install directories are, and so on).
+
+    See "man ExtUtils::MakeMaker" or "perldoc ExtUtils::MakeMaker" for
+    other useful options to this command, like setting a different
+    installation PREFIX.
+
+ 3) Type "make".
+
+    (For installation under Windows NT/95, use "dmake" (Borland C++) or
+    "nmake" (MS Visual C++) instead!)
+
+    This will prepare the relevant files for testing and installation.
+
+ 4) Now issue "make test" (or "dmake test" or "nmake test", respectively).
+
+    The output should look somewhat like this:
+
+    PERL_DL_NONLAZY=1 /v/guest/sw/bin/perl "-MExtUtils::Command::MM"
+    "-e" "test_harness(0, 'blib/lib', 'blib/arch')" t/*.t
+    t/f000.t .. ok
+    t/f001.t .. ok
+    t/f002.t .. ok
+    t/f003.t .. ok
+    t/f004.t .. ok
+    t/f005.t .. ok
+    t/f006.t .. ok
+    t/f007.t .. ok
+    t/f008.t .. ok
+    t/f009.t .. ok
+    t/f010.t .. ok
+    t/f011.t .. ok
+    t/f012.t .. ok
+    t/f013.t .. ok
+    t/f014.t .. ok
+    t/f015.t .. ok
+    t/f016.t .. ok
+    t/f017.t .. ok
+    t/f018.t .. ok
+    t/f019.t .. ok
+    t/f020.t .. ok
+    t/f021.t .. ok
+    t/f022.t .. ok
+    t/f023.t .. ok
+    t/f024.t .. ok
+    t/f025.t .. ok
+    t/f026.t .. ok
+    t/f027.t .. ok
+    t/f028.t .. ok
+    t/f029.t .. ok
+    t/f030.t .. ok
+    t/f031.t .. ok
+    t/f032.t .. ok
+    t/f033.t .. ok
+    t/f034.t .. ok
+    t/f035.t .. ok
+    t/f036.t .. ok
+    t/f037.t .. ok
+    t/m001.t .. ok
+    t/m002.t .. ok
+    t/m003.t .. ok
+    t/m004.t .. ok
+    t/m005.t .. ok
+    t/m006.t .. ok
+    t/m007.t .. ok
+    t/m008.t .. ok
+    t/m009.t .. ok
+    t/m010.t .. ok
+    t/m011.t .. ok
+    t/m012.t .. ok
+    t/m013.t .. ok
+    All tests successful.
+    Files=51, Tests=3378,  5 wallclock secs ( 0.73 usr  0.20 sys +  2.42 cusr  1.41 csys =  4.77 CPU)
+    Result: PASS
+
+ 5) At last, type "make install" (or "dmake install", "nmake install").
+
+ 6) Now you can run the example applications from the "examples"
+    subdirectory in this distribution.
+
+    Please refer to the file "EXAMPLES.txt" in this distribution for
+    more details!
+
+ 7) Share and enjoy!
+
+

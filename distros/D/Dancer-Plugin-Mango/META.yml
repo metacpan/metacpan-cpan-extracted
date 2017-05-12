@@ -1,0 +1,24 @@
+---
+abstract: 'Dancer plugin for MongoDB - Using Mango'
+author:
+  - 'Tyler Hardison <tyler@seraph-net.net>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.96'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Mango
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer::Plugin: '0'
+  Mango: '0.30'
+  perl: '5.006000'
+version: '0.41'

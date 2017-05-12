@@ -1,0 +1,41 @@
+DB::Appgen  -  Copyright (c) 2000 XAO, Inc., Andrew Maltsev <am@xao.com>
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+**** 1/14/2005 - I don't use APPGEN any more and don't have any
+**** access to it either. The module is provided as is, if you want
+**** to take over its maintaining/development please let me know.
+*********************************************************************
+
+This is DB::Appgen - low-level functions for APPGEN database
+manipulations (you probably already know what appgen is if you loaded
+this module, but if you don't please visit http://appgen.com/ - in short
+it is the sytem behind these green salesman terminals you see in various
+ikeas, sears and so on).
+
+All this was made in about four hours including reading perlxstut
+manpage, so do not expect something pretty. Although it appears to be
+working OK in my tests.
+
+I'll be doing some bigger data manipulations using this extension in the
+next couple of days and I will probably build some kind of higher level
+interface. If you don't see it on CPAN yet feel free to ask me about it.
+
+INSTALLATION
+~~~~~~~~~~~~
+
+I failed to find a simple way in MakeMaker to give exact paths to
+libraries, so you need to create directory somewhere and put (or better
+symlink) the following files from your APPGEN developer kit into it
+under the following names:
+
+libappgen_appl.a -> APPL.a
+libappgen_strings.a -> strings.a
+libappgen.a -> appgen.a
+
+Then you need to edit Makefile.PM and point $appgenlibdir variable to
+your directory. Alternatively, just name (or sym-link) your directory
+'appgen-libs' in the top distribution directory -- that's the default
+name.
+
+Yours,
+Andrew

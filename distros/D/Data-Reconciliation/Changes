@@ -1,0 +1,10 @@
+2002-01-08   Martial Châteauvieux  <Martial.Chateauvieux@sfs.siemens.de>
+
+	* t/reconc.t: Added use fileHandle. thanks to riechert@pobox.com
+
+Revision history for Perl extension Data::Reconciliation.
+
+0.01  Wed Oct 24 11:17:19 2001
+	- original version; created by h2xs 1.20 with options
+		-n Data::Reconciliation -A -X
+

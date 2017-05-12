@@ -1,0 +1,13 @@
+Revision history for perl module Dancer::Template::Caml
+
+0.10 2012-01-25
+
+ - Made path manipulations portable
+
+0.00902 2011-10-04
+
+ - Fixed path setting
+
+0.00901 2011-08-23
+
+ - Initial release

@@ -1,0 +1,18 @@
+[%-# render one level of toc and call recursively itself if there are
+   # nested levels.
+   # expected args:
+   # subs         - an array with keys indentical to 'toc' from above.
+   # chap_counter - is a global variable, which should be set to 0 
+   #                in the caller for the first loop
+-%]
+
+[%- FOREACH sec = subs -%]
+    [% SET chap_counter = chap_counter + 1%]
+        <dl>
+            <dt><a href="[%- sec.link -%]"><img src="[%- doc.dir.abs_doc_root -%]/images/nav/arrow_right.gif" alt="-" align="bottom" border="0" height="10" width="18">[%- chap_counter -%]. [%- sec.title -%]</a></dt>
+
+    [%- IF sec.abstract -%]
+            <dd>[%- sec.abstract -%]</dd>
+    [%- END -%]
+        </dl>
+[%- END -%]

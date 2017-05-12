@@ -1,0 +1,47 @@
+To install this module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.
+
+
+NAME
+     DBIx::File2do - Execute SQL scripts from Perl.
+
+SYNOPSIS
+      use File2do;
+      $SQL = File2do->new($dbh);
+
+      ... do something ...
+
+      $SQL->execute_script('filename.txt');
+
+      ... do something else ...
+
+      $SQL->execute_script('file_name.sql');
+
+DESCRIPTION
+      This module will run a SQL script from Perl.  
+
+USAGE
+      use File2do;
+      $SQL=File2do->new($dbh);  ### pass the db handle.
+
+AUTHOR
+        Jack Bilemjian
+        CPAN ID: JACKB
+        jck000@gmail.com
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+SEE ALSO
+    perl(1), DBI.
+

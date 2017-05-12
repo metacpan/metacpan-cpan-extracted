@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.66.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA256
+
+SHA1 0ed34fcb7428141b468122524300138d5bbb3829 Build.PL
+SHA1 97a500e43b3f67298e194c92ce109ef25cf024eb Changes
+SHA1 296afab11451d2129927fd8ae8d387caa797ed2b LICENSE
+SHA1 397fbf54d41b2a3eaf0cebd18267bfe8a4669ca8 MANIFEST
+SHA1 5da1309e2285cd8a60dbd31a0b32f4a80080f15f META.json
+SHA1 2dc5981c15b53e0c299b263ff5f45ead21d6b08f META.yml
+SHA1 67bf778e25c1e2b35d9b09d32865e93b8d616f61 Makefile.PL
+SHA1 6549b01dc2a308e55c3dcd968b9b10f770f4963c README
+SHA1 64dd7a7fc190e631b5e364aac3607ec30f44cbf6 lib/DateTime/Format/DBI.pm
+SHA1 349e4053592a462bc3a19e647253201e7bb2dfd0 t/00basic.t
+SHA1 0ed7a7c687eafb552ddd99f2f99268fd613cda00 t/10pod.t
+SHA1 8f5a4f1ff1108a5169d651a71a52ea2543ec1419 t/11pod_cover.t
+SHA1 e67a2bdbabd19b3ad6a7b0a29b28e9f8ef0172ee t/withsqlite.t
+SHA1 5b481cdbfd03f5875304f8532f3ccbd9b09dda9d t/withtestdb.t
+-----BEGIN PGP SIGNATURE-----
+
+iQEcBAEBCAAGBQJSZwZGAAoJEIS+srvgrWBm4H0H/0VVrt1MluDmdcjcH4OGbi6R
+AJ3qMB7OR4yg+4neuldT9+wkveVuzSCHtkqijhAIOvYuXvKpaht+l77kdPzj642i
+rS58zTle+d6buFGZ5nRHwp9PvSWvkh9NGSXtZiQ+8VAovDUqiXN8unnXO/GWaxrK
++VGlZfx/SaGX0ETozM/k/3c7tQ0405ykVuvqj4VWng6ORKklmzXfKp0AedVCydyq
+zfYDBf3OjNQan7791DwTyKSLnlJPOLsQ4W6pMTrZx598M9LSPzFpR8H1MdNxZpB0
+y4blNH23EoHPXQC4UDb3uloKU4Cd7UsTYQFa/MC5wP7YLTd0v/rZyvqS7qBOe4o=
+=KDb7
+-----END PGP SIGNATURE-----

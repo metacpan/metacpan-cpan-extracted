@@ -1,0 +1,254 @@
+NAME
+    Debuggit - A fairly simplistic debug statement handler
+
+SYNOPSIS
+        use Debuggit DEBUG => 1;
+
+        # say you have a global hashref for your site configuration
+        # (not to imply that global vars are good)
+        our $Config = get_global_config();
+
+        # now we can set some config things based on whether we're in debug mode or not
+        $Config->{'DB'} = DEBUG ? 'dev' : 'prod';
+
+        # maybe we need to pull our local Perl modules from our VC working copy
+        push @INC, $Config->{'vcdir/lib'} if DEBUG;
+
+        # basic debugging output
+        debuggit("only print this if debugging is on");
+        debuggit(3 => "only print this if debugging is level 3 or higher");
+
+        # show off our formatting
+        my $var1 = 6;
+        my $var2;
+        my $var3 = " leading and trailing spaces   ";
+        # assuming debugging is enabled ...
+        debuggit("var1 is", $var1);   # var1 is 6
+        debuggit("var2 is", $var2);   # var2 is <<undef>>
+        debuggit("var3 is", $var3);   # var3 is << leading and trailing spaces   >>
+        # note that spaces between args, as well as final newlines, are provided automatically
+
+        # use "functions" in the debugging args list
+        my $var4 = { complex => 'hash', with => 'lots', of => 'stuff' };
+        # this will call Data::Dumper::Dumper() for you
+        # (even if you've never loaded Data::Dumper)
+        debuggit("var4 is", DUMP => $var4);
+
+        # or maybe you prefer Data::Printer instead?
+        use Debuggit DEBUG => 1, DataPrinter => 1;
+        debuggit("var4 is", DUMP => $var4);
+
+        # make your own function
+        Debuggit::add_func(CONFIG => 1,
+                sub { my ($self, $var) = $_; return (lc($self), 'var', $var, 'is', $Config->{$var}) });
+        # and use it like so
+        debuggit(CONFIG => 'DB');     # config var DB is dev
+
+DESCRIPTION
+    You want debugging? No, you want sophisticated, full-featured, on-demand
+    debugging, and you don't want to take it out when you release the code
+    because you might need it again later, but you also don't want it to
+    take up any space or cause any slowdown of your production application.
+    Sound impossible? Nah. Just use Debuggit.
+
+  Quick Start
+    To start:
+
+        use strict;
+        use warnings;
+
+        use Debuggit;
+
+
+        my $var = 6;
+        debuggit(2 => "var is", $var);      # this does not print
+        debuggit(4 => "var is", $var);      # neither does this
+
+    Later ...
+
+        use strict;
+        use warnings;
+
+        use Debuggit DEBUG => 2;
+
+
+        my $var = 6;
+        debuggit(2 => "var is", $var);      # now this prints
+        debuggit(4 => "var is", $var);      # but this still doesn't
+
+    That's it. Really. Everything else is just gravy.
+
+  Documentation
+    This POD explains just the basics of using "Debuggit". For full details,
+    see Debuggit::Manual.
+
+EXPORTS
+  DEBUG
+    DEBUG is a constant integer set to whatever value you choose:
+
+        use Debuggit DEBUG => 2;
+
+    or to 0 if you don't choose:
+
+        use Debuggit;
+
+    Actually, failure to specify a value only defaults to 0 the first time
+    in a program this is seen. Subsequent times (e.g. in modules included by
+    the main script), DEBUG will be set to the first value passed in. In
+    this way, you can set DEBUG in the main script and have it "fall
+    through" to all included modules. See "The DEBUG Constant" in
+    Debuggit::Manual for full details.
+
+  Functions exported
+    Only "debuggit" is exported.
+
+FUNCTIONS
+  debuggit
+    Use this function to conditionally print debugging output. If the first
+    argument is a positive integer, the output is printed only if DEBUG is
+    set to that number or higher. The remaining arguments are concatenated
+    with spaces, a newline is appended, and the results are printed to
+    STDERR. Some minor formatting is done to help distinguish "undef" values
+    and values with leading or trailing spaces. To get further details, or
+    to learn how to override any of those things, see "The debuggit
+    function" in Debuggit::Manual.
+
+  default_formatter
+    This is what "debuggit" is set to initially. You can call it directly if
+    you want to "wrap" "debuggit". For examples of this, see "Wrapping the
+    debugging output" in Debuggit::Cookbook.
+
+  add_func
+  remove_func
+    Add or remove debugging functions. Please see "Debugging Functions" in
+    Debuggit::Manual.
+
+DIAGNOSTICS
+    *   Cannot redefine DEBUG; original value of %s is used
+
+        It means you did something like this:
+
+            use Debuggit DEBUG => 2;
+            use Debuggit DEBUG => 3;
+
+        only probably not nearly so obvious. Debuggit tries to be very
+        tolerant of multiple imports into the same package, but the "DEBUG"
+        symbol is a constant function and can't be redefined without
+        engendering severe wonkiness, so Debuggit won't do it. As long as
+        you pass the same value for "DEBUG", that's okay. But if the second
+        (or more) value is different from the first, then you will get the
+        original value regardless. At least this way you'll be forewarned.
+
+PERFORMANCE
+    Debuggit is designed to be left in your code, even when running in
+    production environments. Because of this, it needs to disappear entirely
+    when debugging is turned off. It can achieve this unlikely goal via the
+    use of a compile-time constant. Please see "Performance Considerations"
+    in Debuggit::Manual for full details.
+
+BUGS and CAVEATS
+    *   Once you set "DEBUG", you can't change it. Even if you try, you get
+        the original value. See "DIAGNOSTICS".
+
+    *   Doing:
+
+            debuggit(0 => "in production mode");
+
+        never prints anything, even when "DEBUG" is 0. That's because
+        "debuggit" is guaranteed to be an empty function when debugging is
+        turned off.
+
+    *   Doing:
+
+            debuggit($var, "is the value");
+
+        is inherently dangerous. If $var is a positive integer, "debuggit"
+        would interpret it as a debug level, and not print it. So, either do
+        this:
+
+            debuggit(1 => $var, "is the value");
+
+        or this:
+
+            debuggit("the value is", $var);
+
+        Or, to look at it another way, you can pass a value as the first arg
+        to print, or you can leave off a debugging level altogether, but
+        don't try to do both at once.
+
+    *   Doing:
+
+            my $var1 = "DUMP";
+            my $var2 = "stuff";
+            debuggit(1 => "vars are", $var1, $var2);
+
+        is equivalent to:
+
+            debuggit(1 => "vars are", DUMP => $var2);
+
+        which is probably not going to do what you want, assuming the
+        default functions are still in place. See "IMPORTANT CAVEAT!" in
+        Debuggit::Manual for full details.
+
+    *   Doing:
+
+            debuggit(2 => "first thousand elements:", @array[0..999]);
+
+        is likely going to have a performance impact even when debugging is
+        off. Instead, do:
+
+            debuggit("first thousand elements:", @array[0..999]) if DEBUG >= 2;
+
+        See "Style Considerations" in Debuggit::Manual for another example
+        and details on the problem.
+
+    That's all I know of. However, lacking omniscience, I welcome bug
+    reports.
+
+SUPPORT
+    Debuggit is on GitHub at barefootcoder/debuggit. Feel free to fork and
+    submit patches. Please note that I develop via TDD (Test-Driven
+    Development), so a patch that includes a failing test is much more
+    likely to get accepted (or least likely to get accepted more quickly).
+
+    If you just want to report a problem or request a feature, that's okay
+    too. You can create an issue on GitHub, or a bug in CPAN's RT (at
+    http://rt.cpan.org). Or just send an email to bug-Debuggit@rt.cpan.org.
+
+AUTHOR
+        Buddy Burden
+        CPAN ID: BAREFOOT
+        Barefoot Software
+        barefootcoder@gmail.com
+
+COPYRIGHT
+    This program is free software licensed under
+
+        The Artistic License
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+
+    This module is copyright (c) 2008-2015, Barefoot Software. It has many
+    venerable ancestors (some more direct than others), including but not
+    limited to:
+
+    *   "Barefoot::debug", (c) 2000-2006 Barefoot Software, 2004-2006
+        ThinkGeek
+
+    *   "Barefoot::base", (c) 2001-2006 Barefoot Software
+
+    *   "Geek::Dev::Debug", (c) 2004 ThinkGeek
+
+    *   "VCtools::Base", (c) 2004-2008 Barefoot Software, 2004 ThinkGeek
+
+    *   "Barefoot", (c) 2006-2009 Barefoot Software
+
+    *   "Company::Debug", (c) 2008 Rent.com
+
+SEE ALSO
+    Log::Log4perl, debug, Debug, Debug::Message, Debug::EchoMessage.
+
+    Comparison with most of these (and others) can be found in "Comparison
+    Matrix" in Debuggit::Manual.
+

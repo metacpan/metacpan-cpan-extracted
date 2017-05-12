@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-AlwaysUpdate,
+version 0.001:
+
+  Always update the result on ->update, independent of changes
+
+This software is copyright (c) 2011 by Raudssus Social Software.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

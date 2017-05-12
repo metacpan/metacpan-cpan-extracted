@@ -1,0 +1,32 @@
+---
+abstract: '(DEPRECATED) Print your alien distributions alien prerequisites'
+author:
+  - 'Graham Ollis <plicease@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  Test::More: '0.94'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.009, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-aliendeps
+no_index:
+  directory:
+    - corpus
+requires:
+  Dist::Zilla::App: '0'
+  Ref::Util: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/Perl5-Alien/Dist-Zilla-App-Command-aliendeps/issues
+  homepage: https://metacpan.org/pod/Dist::Zilla::App::Command::aliendeps
+  repository: git://github.com/Perl5-Alien/Dist-Zilla-App-Command-aliendeps.git
+version: '0.03'
+x_deprecated: 1
+x_serialization_backend: 'YAML::Tiny version 1.70'

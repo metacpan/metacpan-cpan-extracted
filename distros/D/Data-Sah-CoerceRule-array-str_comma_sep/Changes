@@ -1,0 +1,28 @@
+Revision history for Data-Sah-CoerceRule-array-str_comma_sep
+
+0.005   2016-05-23 (PERLANCAR)
+
+	- Adjust to Data::Sah::Coerce 0.011 (coerce_from & dont_coerce_from
+	  have been replaced with coerce_rules).
+
+
+0.004   2016-05-22 (PERLANCAR)
+
+        - Bump rule metadata version to 2 (Data::Sah::Coerce 0.10+).
+
+
+0.003   2016-05-21 (PERLANCAR)
+
+	- [test] Skip js tests when node.js is not available [CT].
+
+
+0.002   2016-05-19 (PERLANCAR)
+
+	- No functional changes.
+
+	- Fix examples.
+
+
+0.001   2016-05-19 (PERLANCAR)
+
+        - First release.

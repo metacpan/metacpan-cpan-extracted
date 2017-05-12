@@ -1,0 +1,27 @@
+This is Perl module DBIx::AssertIndex.
+
+INSTALLATION
+
+DBIx::AssertIndex installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan DBIx::AssertIndex
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+DBIx::AssertIndex documentation is available as in POD. So you can do:
+
+    % perldoc DBIx::AssertIndex
+
+to read the documentation online with your favorite pager.
+
+mixi-inc

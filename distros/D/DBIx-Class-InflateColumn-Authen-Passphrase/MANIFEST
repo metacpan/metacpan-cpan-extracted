@@ -1,0 +1,16 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/DBIx/Class/InflateColumn/Authen/Passphrase.pm
+t/basic.t
+t/lib/TestSchema.pm
+t/lib/TestSchema/Result/Foo.pm
+t/release-eol.t
+t/release-no-tabs.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

@@ -1,0 +1,12 @@
+\bblib\b
+%$
+~$
+\.(bak|old|o|c|bs|gz)$
+\b(pm_to_blib|Makefile)$
+\B\.git\b
+\B\.gitignore\b
+how-to-make-a-release\.txt
+^MYMETA.yml$
+^MYMETA\.json$
+^README.pod$
+^\.travis\.yml$

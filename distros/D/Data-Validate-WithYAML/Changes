@@ -1,0 +1,55 @@
+Revision history for Data::Validate::WithYAML
+=============================================
+
+0.16    2014-03-03
+        - removed -T from t/ scripts
+
+0.15    2014-01-16
+        + added "datatype" (incl. tests)
+        - removed boilerplate tests
+        + added tests for exceptions
+
+0.14    2013-10-25
+        + added "depends_lax" (incl. tests)
+        + added docs for config settings
+
+0.13    2013-10-24
+        + added PodWeaver in dist.ini
+
+0.12    2013-10-24
+        + add a testfile for "depends_on"
+
+0.11    2013-10-22
+        + add method to get config for a field (fieldinfo)
+
+0.10    2013-10-14
+        + Update Meta files
+        + when configuration files are splitted in single files, they won't have "steps".
+          Enable "no_steps" feature...
+
+0.09    2012-01-29
+        + bring "validate" to life
+        + now you can depend on other fields when you use "validate"
+        + add "no_validate" to yaml spec
+        + add tests for new features
+
+0.08    2012-01-03
+        + switch to Dist::Zilla
+
+0.07    2011-11-15
+        + pass config to plugin
+
+0.06    2011-11-15
+        + added "subs" to execute user defined code
+        + added "exception" to fieldnames to exclude a given list
+        + added check_list to check a list of values for a given field
+
+0.05    2009-09-08
+        + add methods "set_optional" and "set_required"
+
+0.04    2009-07-26
+        + add method "message" to return a specified error message
+
+0.01    2006-02-09
+        First version, released on an unsuspecting world.
+

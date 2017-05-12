@@ -1,0 +1,88 @@
+NAME
+
+  DBD::PgPPSjis - Pure-Perl DBI driver for (not raw) ShiftJIS
+
+SYNOPSIS
+
+    use DBI;
+    $dbh = DBI->connect('dbi:PgPPSjis:test',...);
+
+DESCRIPTION
+
+  This software was made from DBD::PgPP to support ShiftJIS scripting.
+
+  DBD::PgPPSjis is a pure-Perl client interface for the PostgreSQL database.
+  This module implements the network protocol that allows a client to
+  communicate with a PostgreSQL server, so you don't need an external PostgreSQL
+  client library like libpq for it to work.  That means this module enables you
+  to connect to PostgreSQL server from platforms where there's no PostgreSQL
+  port, or where installing PostgreSQL is prohibitively hard.
+
+INSTALLATION
+
+  1. Copy DBD/PgPPSjis.pm to @INC directory.
+
+DEPENDENCIES
+
+  This module uses the following other modules and libraries:
+
+    DBI
+    IO::Socket (ships with supported Perl versions)
+    Digest::MD5 (ships with supported Perl versions)
+
+TESTING
+
+  The test suite requires access to a suitable PostgreSQL server; without
+  that, only an extremely limited form of testing is possible.
+
+  To tell the test suite how to find a PostgreSQL server, set the following
+  environment variables:
+
+  DBI_DSN (required)
+    A DBI "data source name" indicating the location of the database.  For
+    example, to connect to the database named "abc" over a Unix-domain
+    socket stored in /var/run/postgresql, use this DSN:
+
+      export DBI_DSN='dbi:PgPPSjis:dbname=abc;path=/var/run/postgresql'
+
+    Or to connect to a database of the same name, using a TCP connection to
+    pg.example.com, use this:
+
+      export DBI_DSN='dbi:PgPPSjis:dbname=abc;host=pg.example.com'
+
+    See the DBD::PgPPSjis documentation for full details on what can go into
+    a DBD::PgPPSjis DSN.
+
+  DBI_USER (optional)
+    The username to connect as; defaults to the database name
+
+  DBI_PASS (optional)
+    The password needed to allow the given user to authenticate to the
+    server.  Some configurations of PostgreSQL allow connection without a
+    password; you don't need to set a DBI_PASS in such cases.
+
+REPORTING BUGS
+
+  If you find what seems to be a bug in DBD::PgPPSjis, please use RT to report
+  it to the maintainers:
+
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-PgPPSjis
+
+  Please supply any information that could help with reproducing the bug.
+  For example, if the bug only appears when DBD::PgPPSjis is used with certain
+  database schemas, a description (or even a dump) of the schema in question
+  would be useful.
+
+COPYRIGHT AND LICENCE
+
+  ShiftJIS support 2015 INABA Hitoshi
+  Copyright (C) 2004 Hiroyuki OYAMA.  All rights reserved.
+  Copyright (C) 2004, 2005, 2009, 2010 Aaron Crane.  All rights reserved.
+
+  DBD::PgPPSjis is free software; you can redistribute it and/or modify it
+  under the terms of Perl itself, that is to say, under the terms of either:
+
+  * The GNU General Public License as published by the Free Software Foundation;
+    either version 2, or (at your option) any later version, or
+
+  * The "Artistic License" which comes with Perl.

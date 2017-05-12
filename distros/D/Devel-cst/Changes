@@ -1,0 +1,50 @@
+Revision history for Devel-cst
+
+0.010     2016-11-25 13:20:55+01:00 Europe/Amsterdam
+          - No longer use alternative signal stack for bus faults
+          - Free buffer in stacktrace function
+          - Explicitly add SA_NODEFER to signal flags
+
+0.009     2016-03-24 19:07:08+01:00 Europe/Amsterdam
+          - Correctly destruct the alternative stack
+          - Run overload recursion test correctly
+          - Double alternative stacksize
+          - Print signal info before backtracing
+          - Don't continue trying to write backtrace when signal info failed
+
+0.008     2016-03-21 15:39:11+01:00 Europe/Amsterdam
+          - Don't take shortcuts when setting up alternative stack
+          - Allow a different error message on OS X
+          - Don't add libexec on gnukfreebsd
+
+0.007     2016-03-20 19:01:22+01:00 Europe/Amsterdam
+          Drop dependency on Sub::Exporter::Progressive
+          Add libexecinfo on bsdish operating systems
+          Eliminate Test::Exception dependency
+
+0.006     2014-02-06 02:19:52CET+0100 Europe/Amsterdam
+          Preload debugging libraries
+          Load cst earlier in test files
+
+0.005     2013-05-19 19:21:40 Europe/Amsterdam
+          Skip failing test harder on 5.18+
+
+0.004     2012-10-29 18:05:37 Europe/Amsterdam
+          Add PPPort
+          Bring errors in line with psiginfo
+          Allow debugger stacking
+          Handle SIGABRT, SIGTRAP and SIGQUIT too
+
+0.003     2012-09-29 21:37:00 Europe/Amsterdam
+          Accept any kind of pointer stringification
+
+0.002     2012-09-26 16:30:47 Europe/Amsterdam
+
+          Disable need for DB::DB
+          Skip signal handler in stacktrace
+          Add tests for the debugger
+          Set signal stack size to system default
+
+0.001     2012-09-20 01:36:41 Europe/Amsterdam
+          First version, released on an unsuspecting world.
+

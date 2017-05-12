@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<atom:feed xmlns:atom="http://www.w3.org/2005/Atom" xmlns="http://www.w3.org/2005/Atom">
+  <atom:author>
+  <atom:name>Global Hydrology and Climate Center (GHRC)</atom:name>
+    <atom:uri>http://ghrc.nsstc.nasa.gov</atom:uri>
+    <atom:email>ghrc@eos.nasa.gov</atom:email>
+  </atom:author>
+  <atom:category term="Search results"/>
+  <atom:id>http://ghrc.nsstc.nasa.gov/hydro/snowman.pl</atom:id>
+  <atom:link rel="self" href="http://ghrc.nsstc.nasa.gov/hydro/snowman.pl?ds=mif15clws&amp;start=1&amp;limit=2&amp;aoi=-120,20,-90,50&amp;from=2006-06-01T00:00:00Z&amp;thru=2006-06-11T00:00:00Z&amp;format=atom"/>
+  <atom:link rel="next" href="http://ghrc.nsstc.nasa.gov/hydro/snowman.pl?ds=mif15clws&amp;start=3&amp;limit=2&amp;aoi=-120,20,-90,50&amp;from=2006-06-01T00:00:00Z&amp;thru=2006-06-11T00:00:00Z&amp;format=atom"/>
+  <atom:title>Search results from GHRC for MSFC SSM/I Daily Swath Cloud Liquid Water from DMSP F15</atom:title>
+  <atom:updated>2009-07-24T11:32:18Z</atom:updated>
+  <atom:entry>
+    <atom:id>ftp://ghrc.nsstc.nasa.gov/pub2/data/ssmi/f15/clw/swath/2006/mic15S06.151_hdf.tar</atom:id>
+    <atom:title>mic15S06.151_hdf.tar</atom:title>
+    <atom:updated>2006-05-31T00:28:33Z</atom:updated>
+    <atom:content type="html">
+      <a href="ftp://ghrc.nsstc.nasa.gov/pub2/data/ssmi/f15/clw/swath/2006/mic15S06.151_hdf.tar">mic15S06.151_hdf.tar</a> (2.06 MiB)
+    </atom:content>
+  </atom:entry>
+  <atom:entry>
+    <atom:id>ftp://ghrc.nsstc.nasa.gov/pub2/data/ssmi/f15/clw/swath/2006/mic15S06.152_hdf.tar</atom:id>
+    <atom:title>mic15S06.152_hdf.tar</atom:title>
+    <atom:updated>2006-06-01T00:13:01Z</atom:updated>
+    <atom:content type="html">
+      <a href="ftp://ghrc.nsstc.nasa.gov/pub2/data/ssmi/f15/clw/swath/2006/mic15S06.152_hdf.tar">mic15S06.152_hdf.tar</a> (2.11 MiB)
+    </atom:content>
+  </atom:entry>
+</atom:feed>
+

@@ -1,0 +1,11 @@
+^\.git\/
+^.*\.tar.gz$
+^.*.bak
+^.*.old
+^.*.swp
+.gitignore
+.travis.yml
+t/not_tested
+README.md
+bin/generate_readme
+session

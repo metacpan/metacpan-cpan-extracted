@@ -1,0 +1,83 @@
+Date/DayOfNthWeek version 1.0
+==============================
+
+This is a simple Perl module for finding the first, last or
+the Nth Tuesday (or any other day) of the month.
+
+Has three functions:
+
+	first_week($); # day is in the first week of the month
+
+Takes an int between 0 and 6 and returns 1 if today is 
+the first (Sun .. Sat) of the month 
+
+	last_week($);  # day is in the last week of the month
+
+Takes an int between 0 and 6 and returns 1 if today is 
+the last (Sun .. Sat) of the month 
+
+	day_week($$); # day is in the Nth week of the month
+
+Takes an int between 0 and 6 [Sun - Sat] and an int for week of the
+month [1-6].  Returns 1 if today is the that day of the Nth week of
+the month.
+
+I wrote this to send out use in a cron job to send out reminders about
+the Morris County Perl Mongers monthly meetings.  Using Date::Calc and
+Date::Manip were more than what I needed.
+
+I am using this to send out a reminder about the Morris County Perl
+Mongers meetings.  We meet in a local Irish Pub on the 3rd Tuesday of
+the month.
+
+#!/usr/local/bin/perl
+
+use Date::DayOfNthWeek qw(day_week);
+
+my $d = 2; # set to the day of week I want SUNDAY=0
+my $w = 2; # set to the week PRIOR to the meeting so I can send out the reminder
+
+my $ok = day_week($d,$w);
+
+if ($ok) { &nextweek; }
+else     {
+    my $ww = $w+1;             # keeps me from changing the value of $w 
+	if ($ww > 6) { $ww = 1; }  # fixes range input errors for wrapping to next month
+	$ok = day_week($d,$ww);
+	if ($ok) { &tonight; }
+	else {
+		$d--;                   # see if this is the day before the meeting
+		if ($d < 0) { $d = 6; } # fixes range input error for wrapping to previous week day
+		$ok = day_week($d,$w);
+		&tomorrow if $ok;		
+	}
+} 
+
+sub nextweek { print "Meeting is next week\n"; }
+sub tomorrow { print "Meeting is tomorrow\n";  }
+sub tonight  { print "Meeting is tonight\n";   }
+
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires no other modules and libraries.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2002 Andy Murren
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

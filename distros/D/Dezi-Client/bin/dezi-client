@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+use Dezi::Client;
+use Getopt::Long;
+
+our $VERSION = '0.001002';
+
+my $THIS = $0;
+
+my $USAGE = <<EOF;
+usage: $THIS [--server url] file [...fileN]
+usage: $THIS [--server url] -q <query>
+
+$THIS is an example application using Dezi::Client
+
+EOF
+
+my $server = 'http://localhost:5000';
+my $debug  = 0;
+my $query;
+my $commit;
+my $rollback;
+my $username;
+my $password;
+GetOptions(
+    'debug'      => \$debug,
+    'server=s'   => \$server,
+    'query=s'    => \$query,
+    'commit'     => \$commit,
+    'rollback'   => \$rollback,
+    'username=s' => \$username,
+    'password=s' => \$password,
+) or die $USAGE;
+
+if ( !@ARGV and !$commit and !$rollback and !defined $query ) {
+    die $USAGE;
+}
+
+my $client = Dezi::Client->new(
+    server   => $server,
+    debug    => $debug,
+    username => $username,
+    password => $password,
+);
+
+if ( defined $query ) {
+
+    # search the index
+    my $response = $client->search( q => $query );
+
+    # check for error
+    if ( !$response ) {
+        die sprintf(
+            "Dezi search failed: %s\n%s\n",
+            $client->last_response->status_line,
+            $client->last_response->content
+        );
+    }
+
+    # iterate over results
+    for my $result ( @{ $response->results } ) {
+        printf( "--\n uri: %s\n title: %s\n score: %s\n",
+            $result->uri, $result->title, $result->score );
+    }
+
+    # print stats
+    print '=' x 40, "\n";
+    printf( "       hits: %d\n", $response->total );
+    printf( "search time: %s\n", $response->search_time );
+    printf( " build time: %s\n", $response->build_time );
+    printf( "      query: %s\n", $response->query );
+    if ( defined $response->suggestions ) {
+        printf( "suggestions: %s\n",
+            join( ', ', @{ $response->suggestions } ) );
+    }
+
+}
+elsif ($commit) {
+    printf( "COMMIT response: %s\n", $client->commit->status_line );
+    printf( "%s\n",                  $client->last_response->content );
+}
+elsif ($rollback) {
+    printf( "ROLLBACK response: %s\n", $client->rollback->status_line );
+    printf( "%s\n",                    $client->last_response->content );
+}
+else {
+    for my $file (@ARGV) {
+        my $resp = $client->index($file);
+        $debug and print $resp->content;
+    }
+}
+
+__END__
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi-client at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi-Client>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find documentation for this module with the perldoc command.
+
+    perldoc Dezi::Client
+
+
+You can also look for information at:
+
+=over 4
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi-Client>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi-Client>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi-Client>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dezi-Client/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+
+=cut

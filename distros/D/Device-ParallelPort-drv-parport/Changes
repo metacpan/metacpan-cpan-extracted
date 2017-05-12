@@ -1,0 +1,13 @@
+Revision history for Perl extension Device::ParallelPort::drv::parport.
+
+0.01  Fri May  3 09:50:32 2002
+	- Initial alpha release
+
+0.02  Mon May  6 09:50:32 2002
+	- Fix missing header file and LICENSE
+
+0.03  Thu May  9 20:44:41 EST 2002
+	- Wrong type needs char not int
+
+0.04  Sat May 11 08:18:01 EST 2002
+	- Include Perl Dependencies

@@ -1,0 +1,44 @@
+---
+abstract: 'An OO interface to SQL queries and results.  Easily constructs SQL queries, and simplifies processing of the returned data.'
+author:
+  - 'Vernon Lyon <vlyon@cpan.org>'
+build_requires:
+  File::Temp: 0
+  Module::Build: 0.30
+  Test::More: 0.62
+configure_requires:
+  Module::Build: 0.30
+dynamic_config: 1
+generated_by: 'Module::Build version 0.38, CPAN::Meta::Converter version 2.110440'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-DBO
+provides:
+  DBIx::DBO:
+    file: lib/DBIx/DBO.pm
+    version: 0.40
+  DBIx::DBO::Query:
+    file: lib/DBIx/DBO/Query.pm
+    version: 0
+  DBIx::DBO::Row:
+    file: lib/DBIx/DBO/Row.pm
+    version: 0
+  DBIx::DBO::Table:
+    file: lib/DBIx/DBO/Table.pm
+    version: 0
+recommends:
+  DBD::Oracle: 1.13
+  DBD::Pg: 2
+  DBD::SQLite: 1.31
+  DBD::mysql: 4.004
+  Storable: 2.38
+requires:
+  DBI: 1.50
+  perl: 5.008001
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-DBO
+  license: http://dev.perl.org/licenses/
+  repository: https://vlyon.svn.beanstalkapp.com/src/dbo
+version: 0.40

@@ -1,0 +1,37 @@
+---
+abstract: 'Dancer plugin for reading dynamically-updated configuration files'
+author:
+  - 'Kurt Starsinic <kstarsinic@gmail.com>'
+build_requires:
+  Dancer: 0
+  Dancer::Config: 0
+  Dancer::FileUtils: 0
+  Dancer::ModuleLoader: 0
+  Dancer::Plugin: 0
+  Dancer::Test: 0
+  Encode: 0
+  File::Temp: 0
+  JSON::XS: 0
+  Test::Most: 0
+  Time::HiRes: 0
+  Try::Tiny: 0
+  YAML: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-DynamicConfig
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+resources:
+  bugtracker: https://github.com/kstarsinic/dancer-plugin-dynamic-config/issues
+  homepage: https://github.com/kstarsinic/dancer-plugin-dynamic-config
+  repository: git://github.com/kstarsinic/dancer-plugin-dynamic-config.git
+version: 0.07

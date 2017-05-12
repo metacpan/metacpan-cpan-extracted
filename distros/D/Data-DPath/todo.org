@@ -1,0 +1,26 @@
+Idea collection
+
+* XPath localization paths
+  - [ ] ancestor
+        - http://doc.ddart.net/xmlsdk/htm/xpath_syntax2_3prn.htm
+        - examples:
+          * Find the nearest book ancestor of the current element:
+            ancestor::book[1]
+          * Find the nearest ancestor book that has an author element:
+            ancestor::book[author][1]
+          * Find the nearest ancestor author element that is contained
+            in a book element:
+            ancestor::author[parent::book][1]        
+  - [ ] preceding-sibling
+  - [ ] preceding
+        - might not work well with hashes
+        - still useful, as data could be tied to Tie::IxHash?
+        - else ignore the wrong order, it's the user's responsibility
+          to (not) use it this way, as it is the same with ordinary
+          perl % and @
+* Functions for node collections
+  - [ ] position()
+  - [ ] last()
+  - [ ] count()
+  - [ ] id()
+  - [ ] 

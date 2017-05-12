@@ -1,0 +1,20 @@
+Data::Toolkit 0.10
+
+	Return list of map outputs in sorted order.
+
+Data::Toolkit 0.9
+
+	Added explicit reference to Data::Toolkit::Entry module in connectors.
+	Added control over attributes with missing or empty values in Map class.
+		This applies equally to all attributes in the map at present,
+		but could be extended to individual attributes in future.
+
+Data::Toolkit 0.8
+
+	Version numbers now consistent in the code
+
+Data::Toolkit 0.7
+
+	Attribute names can now be set to non-case-sensitive
+	The current entry in an LDAP connector can now be set from a Data::Toolkit::Entry object
+

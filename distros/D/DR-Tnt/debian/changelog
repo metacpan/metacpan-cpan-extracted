@@ -1,0 +1,35 @@
+libdr-tnt-perl (0.13-1) nowtaxi; urgency=medium
+
+  * JSON::XS::Boolean is checked, too.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 24 Mar 2017 00:56:08 +0300
+
+libdr-tnt-perl (0.12-1) nowtaxi; urgency=medium
+
+  * Serialize JSON::XS::true/false
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 24 Mar 2017 00:05:31 +0300
+
+libdr-tnt-perl (0.11-1) nowtaxi; urgency=medium
+
+  * Fix tests by CPAN testers report.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Fri, 02 Dec 2016 12:36:51 +0300
+
+libdr-tnt-perl (0.10-1) nowtaxi; urgency=medium
+
+  * Add some require/reconnect tests.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 30 Nov 2016 12:24:20 +0300
+
+libdr-tnt-perl (0.09-1) nowtaxi; urgency=medium
+
+  * Fix connect/reconnect cases, bump version.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Tue, 29 Nov 2016 17:14:14 +0300
+
+libdr-tnt-perl (0.08-1) nowtaxi; urgency=medium
+
+  * First Debian package release.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 13 Oct 2016 12:36:09 +0300

@@ -1,0 +1,63 @@
+{
+  "title" : "Testing polls",
+  "id"    : "testing-polls",
+  "questions" : [
+     {
+        "text" : "Where do you get your Perl related news from?",
+        "id"   : "source_of_perl_news",
+        "type" : "multiple_choice",
+        "limit" : 5,
+        "other" : 1,
+        "answers" : [
+           "Perl Buzz",
+           "Planet Perl Iron Man",
+           "Perlsphere",
+           "Perl Weekly",
+           "blogs.perl.org",
+           "use.perl.org",
+           "Perl Foundation news blog",
+           "perlnews.org",
+           "Following Perl on Reddit"
+        ]
+     },
+     {
+        "text" : "How do you improve your perl knowledge?",
+        "id"   : "how_improves_perl",
+        "type" : "multiple_choice",
+        "limit" : 5,
+        "other" : 1,
+        "answers" : [
+           "Attending Perl Workshop(s), YAPCs",
+           "Attending Perl Monger meetings",
+           "On the job from more experienced peers",
+           "On the job while trying to figure out how to implement things",
+           "Attending courses with live trainers",
+           "Reading books about Perl",
+           "Reading The Effective Perler blog",
+           "Reading the Modern Perl books blog",
+           "Asking questions on PerlMonks",
+           "Asking questions on StackOverflow"
+        ]
+     },
+     {
+        "text" : "What kind of articles would you like to read?",
+        "id"   : "what_articles",
+        "type" : "multiple_choice",
+        "limit" : 5,
+        "other" : 1,
+        "answers" : [
+           "Examples how to use Perl for Unix/Linux system administration",
+           "Generic examples on how to to use perl. (data structures, I/O, files, conditions etc)",
+           "Introduction to Moose",
+           "Advanced topics about Moose",
+           "How to maintain old code",
+           "How to write (unit) tests?",
+           "How to write a modern web application in Perl?",
+           "Advanced topic in core Perl",
+           "Regular expressions",
+           "Perl for bioinformatics",
+           "Perl for testers"
+        ]
+     }
+  ]
+}

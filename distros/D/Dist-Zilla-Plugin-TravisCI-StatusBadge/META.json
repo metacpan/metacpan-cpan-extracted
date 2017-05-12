@@ -1,0 +1,93 @@
+{
+   "abstract" : "Get Travis CI status badge for your markdown README",
+   "author" : [
+      "Anton Gerasimov <chim@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.029, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-TravisCI-StatusBadge",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "eg",
+         "examples",
+         "corpus"
+      ],
+      "namespace" : [
+         "t::lib"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "Moose" : "0",
+            "Path::Tiny" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.008009",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::Exception" : "0.32",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Spec" : "0.47"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::TravisCI::StatusBadge" : {
+         "file" : "lib/Dist/Zilla/Plugin/TravisCI/StatusBadge.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge/issues"
+      },
+      "homepage" : "https://metacpan.org/release/Dist-Zilla-Plugin-TravisCI-StatusBadge",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge.git",
+         "web" : "https://github.com/Wu-Wu/Dist-Zilla-Plugin-TravisCI-StatusBadge"
+      }
+   },
+   "version" : "0.006",
+   "x_authority" : "cpan:CHIM"
+}
+

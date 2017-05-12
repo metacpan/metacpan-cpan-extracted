@@ -1,0 +1,183 @@
+Revision history for Dist-Zilla-PluginBundle-RJBS
+
+5.010     2016-04-23 15:22:59+01:00 Europe/London
+        - fix homepage argument
+        - add package_name_version argument, for DZv6
+
+5.009     2015-04-16 15:42:45+02:00 Europe/Berlin
+        - add missing Contributors section plugin
+
+5.008     2015-03-29 22:04:49-04:00 America/New_York
+        - add missing prereq
+
+5.007     2015-02-24 21:19:34-05:00 America/New_York
+        - add Contributors section to Pod::Weaver!  bam!
+
+5.006     2015-02-03 23:01:27-05:00 America/New_York
+        - drop requirement of Moose::Autobox
+
+5.005     2014-10-27 22:11:18-04:00 America/New_York
+        - allow homepage to be overridden
+
+5.004     2014-03-16 16:52:01+01:00 Europe/Paris
+        - default_jobs for makemaker is now 9
+
+5.003     2014-01-11 23:03:20-05:00 America/New_York
+        - make it fatal for PkgVersion to try inserting new lines
+
+5.002     2014-01-11 14:43:39-05:00 America/New_York
+        - start replacing woven Pod with comments, instead of just deleting
+
+5.001     2013-11-24 07:39:19 America/New_York
+        - fix repo links
+
+5.000     2013-10-20 08:27:49 America/New_York
+        - require and cope with Dist::Zilla v5 and Pod::Weaver v4
+
+1.018     2013-10-19 09:46:28 America/New_York
+        - add PromptIfStale to prereqs
+        - remove Test::Compile
+
+1.017     2013-09-23 10:36:29 America/New_York
+        - turn on PromptIfStale
+        - BAIL_OUT on compilation failures
+
+1.016     2013-08-25 21:47:21 America/New_York
+        - PkgVersion die_on_existing_version is now true by default
+
+1.015     2013-06-18 13:27:39 America/New_York
+        - default to github issues
+
+1.014     2013-01-30 21:52:52 America/New_York
+        - set remotes_must_exist=0 for @Git, to work around a bug that
+          breaks pushing to named branches
+
+1.013     2012-12-24 23:18:05 America/New_York
+        - when pushing, push all matching remotes
+
+1.012     2012-07-01 18:10:21 America/New_York
+        - add Test::ChangesHasContent
+        - add CheckExtraTests
+        - add CheckPrereqsIndexed
+        - add ReportVersions::Tiny
+        - add Test::Compile
+
+1.011     2012-05-11 10:35:26 America/New_York
+        - add CheckExtraTests to prereqs
+
+1.010     2012-05-04 21:35:32 America/New_York
+        - replace ExtraTests with CheckExtraTests
+
+1.009     2012-04-12 18:53:14 America/New_York
+        - replace GatherDir with Git::GatherDir
+
+1.008     2012-03-31 18:15:50 Europe/Paris
+        - actually *remove* Repository
+
+1.007     2011-05-03 16:46:12 America/New_York
+        - replace Repository with GithubMeta
+
+1.006     2011-02-06 15:30:10 America/New_York
+        - BumpVersionFromGit is not a prereq
+
+1.005     2011-02-04 18:07:28 America/New_York
+        - add CheckPrereqsIndexed
+
+1.004     2010-10-23 17:59:42 America/New_York
+        - always require Test::More; it's just easier than thinking
+
+1.003     2010-10-18 21:44:49 America/New_York
+        - push to both origin *and* github when releasing
+
+1.002     2010-10-14 22:44:46 America/New_York
+        - use Git::NextVersion, not BumpVersionFromGit
+
+1.001     2010-09-17 19:16:59 America/New_York
+        - use AutoPrereqs, not AutoPrereq
+
+1.000     2010-09-04 15:48:21 America/New_York
+        - switch most dists to BumpVersionFromGit
+
+0.101620  2010-06-11 16:08:42 America/New_York
+        - correct "task" argument; had stopped working
+
+0.101270  2010-05-07 22:48:51 America/New_York
+        - stability section
+        - weaver_config option
+
+0.101040  2010-04-14 22:49:15 America/New_York
+        - use PluginBundle::Easy
+
+0.101020  2010-04-12 13:10:37 America/New_York
+
+0.100990  2010-04-09 22:45:50 America/New_York
+        - @RJBS now builds on @Basic, not @Classic
+
+0.100910  2010-04-01 12:32:12 America/New_York
+        - add manual_version
+        - update documentation
+
+0.100890  2010-03-30 18:04:42 America/New_York
+        - require Dist::Zilla 2
+        - remove PodCoverageTests
+        - add MetaConfig
+
+0.100650  2010-03-06 14:19:04 America/New_York
+        - name bundle contents better (for easier log reading)
+
+0.100500  2010-02-19 11:40:21 America/New_York
+        - @Git must come after NextRelease (thanks, jquelin)
+
+0.100490  2010-02-18 13:20:23 America/New_York
+        - include @Git (finally)
+
+0.100310  2010-01-31 15:41:03 America/New_York
+        - fix docs (we do not exclude MetaYAML anymore)
+        - add AutoPrereq
+        - require latest Pod::Weaver
+
+0.093580  2009-12-24 21:29:10 America/New_York
+        - replace WikiDoc with List
+
+0.093330  2009-11-29 12:04:56 America/New_York
+        - allow "task" option to build a task with TaskWeaver
+
+0.093200  2009-11-16
+        - stop removing MetaYAML so cpants can index my dists
+
+0.093000  2009-10-27
+        - now there's @RJBS for Pod::Weaver, too!
+
+0.092971  2009-10-24
+        - bring all prereqs for Pod::Weaver up to date
+
+0.092970  2009-10-24
+        - use Pod::Weaver, not Pod::Purler
+
+0.092830  2009-10-10
+        - make 'dzil rjv' match the rest of the code, time-zone wise
+
+0.092361  2009-08-24
+        - rjbs lives in Bethlehem, PA
+        - number his releases according to the date in his local time zone
+
+0.092360  2009-08-24
+        - add rjbsver (rjv) command to predict next release version mantissa
+
+0.092210  2009-08-09
+        - restore the functioning of DEV and N environment variables
+
+0.092070  2009-07-26
+        - updates to work with new Dist::Zilla
+
+0.091560  2009-06-05
+        - env var "DEV" now causes _zzz version suffix
+
+0.091390  2009-05-19
+        - env var "N" now sets final digit of autoversion
+
+0.091370  2009-05-12
+        - replace MetaYAML with MetaJSON
+
+0.091320  2009-05-12
+        - add NextRelease to the bundle

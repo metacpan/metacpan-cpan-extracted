@@ -1,0 +1,59 @@
+Revision history for Dist-Zilla-PluginBundle-Git-CheckFor
+
+0.014     2016-10-10 10:27:02 CDT-0500
+	* Drop dependency on List::MoreUtils (thanks, @karenetheridge!)
+
+0.013     2015-03-10 19:33:10 PDT-0700
+	* Drop autobox usage (thanks, @karenetheridge!)
+
+0.012     2015-02-23 20:47:40 PST-0800
+	* Switch tests to Test::TempDir::Tiny (thanks @karenetheridge! closed #19)
+
+0.011     2014-04-11 12:57:35 PDT-0700
+	* Set GIT_AUTHOR_EMAIL, etc, in our tests to prevent git identity crises;
+	  closes #13
+	* Rework a commit message in t/plugin/fixups.t; this closes #16 (or
+	  should, at any rate)
+
+0.010     2014-04-11 11:48:23 PDT-0700
+    * use CheckForBin, not RequiresExternal in our dzil config; this should
+	  stop false fails from being reported (and be nicer in general) when git
+	  is not installed on some system
+
+0.009     2014-01-28 15:50:28 PST-0800
+    * merge github #11, github #15
+
+0.008     2013-11-10 22:55:17 PST-0800
+    * fix issue with parsing utf8-encoded files
+
+0.007     2013-09-29 17:04:08 PDT-0700
+	* Fix issues with travis and our test suite (aka set user.name, user.email
+	  in our test repositories)
+
+0.006     2012-11-14 22:14:15 PST8PDT
+	* Add plugin to check for common merge mishaps [Mike Doherty]
+	* Add explicit dependency on the git executable
+
+0.005     2012-10-03 22:10:53 PST8PDT
+	* make our test suite usable on !unix platforms (github #4, #5)
+	* Fix breakage introduced by the git NextVersion plugin in  1.122770 by
+	  pulling over the removed code and integrating it here.  This is expected
+	  to be a temporary measure as we figure out a more permanent (and
+	  hopefully cooperative) solution.
+
+0.004     2012-05-04 14:53:44 America/Los_Angeles
+	* [Git::CheckFor::CorrectBranch] now permits releases from multiple brnaches
+	  (Karen Etheridge)
+
+0.003     2012-05-02 11:11:39 America/Los_Angeles
+	* handle version tags where '-TRIAL' is appeneded.  We'll need to revisit this
+	  later to make things Work Better, but for now it works and with a minimum of
+	  fuss.
+
+0.002     2012-04-13 14:16:08 America/Los_Angeles
+	* no functional changes!
+	* bump Test::Moose::More prereq to 0.008, as we need a version of
+	  has_attribute_ok that handles checking roles w/o barfing (as Test::Moose now
+	  seems to)
+
+0.001     2012-02-06 13:11:50 America/Los_Angeles

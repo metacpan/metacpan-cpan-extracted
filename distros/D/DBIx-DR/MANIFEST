@@ -1,0 +1,30 @@
+Changes
+debian/changelog
+debian/compat
+debian/control
+debian/copyright
+debian/rules
+debian/watch
+lib/DBIx/DR/ByteStream.pm
+lib/DBIx/DR/Iterator.pm
+lib/DBIx/DR/PerlishTemplate.pm
+lib/DBIx/DR/PlPlaceHolders.pm
+lib/DBIx/DR.pm
+lib/DBIx/DR/Util.pm
+Makefile.PL
+MANIFEST
+t/000-dr-iterator.t
+t/005-dr-iterator-keep-bless.t
+t/010-dr-perl-ish-template.t
+t/015-dr-pl-placeholders.t
+t/020-util.t
+t/035-dr.t
+t/benchmarks/01_transform.pl
+t/sql/include.sql.ep
+t/sql/select_ids.sql.ep
+t/sql/stacktrace.sql.ep
+t/sql/unknown_function.sql.ep
+t/sql/usual_select.sql.ep
+LICENSE
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

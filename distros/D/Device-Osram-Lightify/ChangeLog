@@ -1,0 +1,27 @@
+
+0.1 - 2016/01/01
+  * Initial release of the module to CPAN.
+  * Sending "all on" and "all off" events works.
+  * Detecting and displaying details about light-bulbs works.
+
+0.2 - 2016/01/01
+  * Controlling a bulb individually works:
+	* Turning on.
+	* Turning off.
+	* Setting brightness.
+	* Setting RGBW values.
+        * Setting the temperature.
+
+0.3 - 2016/01/01
+  * Repacking update to allow CPAN to index.
+    * Zero code-changes.
+
+0.4 - 2016/01/02
+  * Significant updates to the POD/documentation.
+    * Zero code-changes.
+
+0.5 - 2016/01/09
+  * Added module beneath Power::Outlet namespace.
+
+0.6 - 2016/10/01
+  * Minor documentation updates for the Power::Output support.

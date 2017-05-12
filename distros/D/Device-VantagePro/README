@@ -1,0 +1,43 @@
+Device-VantagePro version
+=========================
+
+A module to provide direct access to many of the features of the Davis
+VantagePro Weather family of weather stations. 
+
+This module was developed and tested on a Linux operating system and relies
+upon the Unix specific Device::SerialPort module. A port to Windows could be
+accomplished using the Win32::SerialPort module which uses the same calls. See
+code for more details. 
+
+See the Changes file for a log of changes within versions.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Device::SerialPort
+Time::HiRes
+use POSIX qw(:errno_h :fcntl_h strftime)
+use Time::Local 
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2010 by Steve Troxel 
+Copyright (C) 2014 by Ctrl O
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.8 or,
+at your option, any later version of Perl 5 you may have available.
+
+

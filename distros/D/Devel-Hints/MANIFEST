@@ -1,0 +1,26 @@
+Changes
+Hints.pm
+Hints.xs
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Compiler.pm
+inc/Module/Install/DSL.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/ReadmeFromPod.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+ppport.h
+ptable.h
+README
+t/1-basic.t
+t/2-write.t
+t/3-coderef.t
+t/4-file-line.t
+typemap
+SIGNATURE                                Public-key signature (added by MakeMaker)

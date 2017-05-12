@@ -1,0 +1,151 @@
+version 0.010; 2013-09-21
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::SystemV to
+    handle ->offset_for_local_datetime with perpetual-DST ruleset that
+    can arise with a version-3 tzfile
+
+version 0.009; 2013-09-20
+
+  * support version 3 of the tzfile format
+
+version 0.008; 2013-07-14
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::SystemV to
+    handle POSIX-TZ field showing transitions occurring at 24:00
+
+  * in META.{yml,json}, point to public git repository
+
+version 0.007; 2012-03-10
+
+  * bugfix: recognise zone disuse indicator if it comes in the form of
+    the POSIX-TZ extension rule
+
+  * distinguish between zone disuse and missing data
+
+  * eliminate use of Date::JD, because it's too heavy to justify the
+    minimal convenience gained from it
+
+  * eliminate use of constant.pm, for stylistic consistency
+
+  * test more error cases
+
+  * test behaviour around leap seconds
+
+  * factor out date/time presentation code used for error messages
+
+  * for CRLF test, use a smaller tzfile that tickles the same potential
+    bug
+
+  * give test tzfiles appropriately capitalised names
+
+  * convert .cvsignore to .gitignore
+
+version 0.006; 2011-09-27
+
+  * include the time and zone name in error messages about non-existent
+    local time and unrepresented time
+
+  * check argument types in constructor
+
+  * make test suite work even if DateTime is not available
+
+version 0.005; 2011-04-05
+
+  * bugfix: read tzfiles in binary mode
+
+  * include META.json in distribution
+
+  * add MYMETA.json to .cvsignore
+
+version 0.004; 2010-08-31
+
+  * for the Olson "Factory" timezone, which has a pseudo-abbreviation
+    containing spaces, don't process the TZ value that it contains,
+    because it's invalid and DateTime::TimeZone::SystemV objects to it
+
+  * tighten the criteria for recognising the special observance that
+    indicates that local time is not defined (abbreviation "zzz" was
+    previously the sole criterion, now also require zero offset and
+    not DST)
+
+  * allow the ->is_olson and ->category values to be specified to the
+    constructor, instead of having fixed values
+
+  * when a local time is non-existent due to an undefined observance,
+    give an error message that says so, rather than conflating it with
+    local time being non-existent due to an offset change
+
+  * add DateTime::TimeZone::Olson, Time::OlsonTZ::Data, and
+    Time::OlsonTZ::Download to the "see also" list
+
+  * test the error message that is given when a local time does not
+    exist due to an offset change
+
+version 0.003; 2010-07-30
+
+  * in documentation, correct one use of "filename" to "filehandle"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * abandon use of the "fields" module
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-03-22
+
+  * with a version-1 tzfile, treat the last observance as continuing
+    indefinitely, rather than as having no rule for the future
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * drop prototypes from method subs (where the prototypes have no effect)
+
+  * in tests, avoid unreliable "\d" regexp element
+
+  * typo fix in documentation
+
+  * really complete dependency list (was missing "integer", and
+    build_requires was missing "IO::File")
+
+  * include "distribution_type" entry in META.yml to satisfy CPANTS
+
+  * in documentation, separate "license" section from "copyright" section
+
+  * use full stricture in Build.PL
+
+  * remove from .cvsignore items that don't occur with Module::Build
+
+version 0.001; 2007-09-12
+
+  * bugfix: override any ambient $SIG{__DIE__} handler when using eval { }
+
+  * bugfix: require bugfixed version of DateTime::TimeZone::SystemV
+    (for $SIG{__DIE__} handling)
+
+  * new key/value constructor parameter style
+
+  * constructor option to set timezone name independently from filename
+
+  * constructor option to supply an open filehandle
+
+  * use "fields" module to structure object
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+version 0.000; 2007-02-10
+
+  * initial released version

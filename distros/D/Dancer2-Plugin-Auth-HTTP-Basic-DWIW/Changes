@@ -1,0 +1,25 @@
+Revision history for Dancer2-Plugin-Auth-HTTP-Basic-DWIW
+
+0.04    2016-04-23
+        - patch for Dancer2 plugin api changes
+        - fixed duplicate sections in pod
+        - minor code formatting
+
+0.03    2015-05-12
+        - Fixed problems on Perl versions prior to 5.14
+        - Migrated from Convert::Base64 to MIME::Base64, which
+          is included in perl by default.
+        - Migrated to Dist::Zilla
+
+0.0202  2015-05-07
+        - Missing Build requirement: Convert::Base64
+         
+0.0201  2015-05-06
+        - Fixed the version number in POD.
+
+0.02    2015-05-06
+        - Made the error handling nicer and more robust
+
+0.01    2015-05-02
+        - First version, released on an unsuspecting world.
+

@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Skinny::Mixin::BulkInsertWithTrigger
+
+0.02    Tue Jul  6 00:07:30 JST 2010
+        - trivial change.
+0.01    Wed Apr 21 23:59:01 2010
+        - original version

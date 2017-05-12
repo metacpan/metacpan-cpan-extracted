@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Code::TidyAll' => '0.24',
+                                      'File::Spec' => '0',
+                                      'IO::Handle' => '0',
+                                      'IPC::Open3' => '0',
+                                      'Perl::Critic' => '1.123',
+                                      'Perl::Tidy' => '20140711',
+                                      'Test::CPAN::Changes' => '0.19',
+                                      'Test::Code::TidyAll' => '0.24',
+                                      'Test::EOL' => '0',
+                                      'Test::More' => '0.88',
+                                      'Test::NoTabs' => '0',
+                                      'Test::Pod' => '1.41',
+                                      'Test::Spelling' => '0.12',
+                                      'Test::Version' => '1'
+                                    }
+                    },
+       'runtime' => {
+                      'requires' => {
+                                      'Code::TidyAll' => '0',
+                                      'Cwd' => '0',
+                                      'Dist::Zilla::Role::FileMunger' => '0',
+                                      'Dist::Zilla::Role::PrereqSource' => '0',
+                                      'Moose' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900'
+                                   },
+                   'requires' => {
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'Test::More' => '0.96',
+                                   'strict' => '0',
+                                   'warnings' => '0'
+                                 }
+                 }
+     };
+  $x;
+ }

@@ -1,0 +1,218 @@
+# ABSTRACT: Validating function/method parameters using Data::Sah
+# PODNAME: Data::Sah::Manual::ParamsValidating
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Sah::Manual::ParamsValidating - Validating function/method parameters using Data::Sah
+
+=head1 VERSION
+
+This document describes version 0.87 of Data::Sah::Manual::ParamsValidating (from Perl distribution Data-Sah), released on 2016-09-14.
+
+=head1 OVERVIEW
+
+There are several choices when it comes to validating function/method parameters
+using L<Sah> schemas and L<Data::Sah>. The job of Data::Sah is just to generate
+Perl code from a L<Sah> schema. The Perl code can be integrated into your code
+in several ways. The final result might or might not need Data::Sah itself.
+
+The document is divided into two parts depending on where the Sah schemas are
+put.
+
+=head1 IF YOU PUT SCHEMAS IN RINCI METADATA
+
+One recommended way to put the schemas are in the L<Rinci> function metadata.
+With Rinci metadata you specify more than just types/constraints for your
+function parameters/arguments, including: summary & description, return value,
+command-line short options, tab completion, and so on.
+
+Once you have your Rinci metadata, e.g.:
+
+ $SPEC{foo} = {
+     v => 1.1,
+     summary => 'Does foo',
+     args => {
+         a1 => {
+             summary => 'First argument',
+             schema => 'int*',
+             req => 1,
+         },
+         a2 => {
+             summary => 'Second argument',
+             schema => ['array', of=>'int*', min_len=>1],
+             default => [1],
+         },
+     },
+ };
+ sub foo {
+     my %args = @_;
+     ...
+ }
+
+You can decide whether you want to depend on Data::Sah or not during runtime.
+
+=head2 Dist::Zilla::Plugin::Rinci::Validate
+
+If you do not want to depend on Data::Sah, what you can do is insert the
+generated validator code:
+
+     my %args = @_; # VALIDATE_ARGS
+
+This requires that your code be organized as a Perl distribution, and you use
+L<Dist::Zilla> to build your distribution, and you use the
+L<Dist::Zilla::Plugin::Rinci::Validate> plugin to scan for the C<#
+VALIDATE_ARGS> labels and insert the validator code there (all in one long line,
+as to not mess with line numbers). Also, the validator code will only be present
+in the built version of your code. But this way, you can avoid an extra sub call
+to the validator code and the validator code no longer needs need Data::Sah. The
+the overhead of compilation from Sah schema to Perl code is moved into
+distribution build time.
+
+If you use this method, it is advisable that you also put this attribute in your
+Rinci metadata (the dzil plugin will remind you):
+
+ 'x.func.validate_args' => 1
+
+This is to express that your function already performs argument validation and
+other tools/frameworks (e.g. L<Perinci::CmdLine::Lite> or
+L<Perinci::Sub::Wrapper>, see below) can skip doing argument validation again.
+Forgetting to add this attribute is not dangerous, it just means you're
+validating twice (where once is already enough).
+
+=head2 Perinci::Sub::ValidateArgs
+
+If you find the above method too cumbersome, you can also generate the validator
+dynamically using L<Perinci::Sub::ValidateArgs>.
+
+ use Perinci::Sub::ValidateArgs;
+
+ $SPEC{foo} = {
+     ...
+ };
+ sub foo {
+     state $validator = gen_args_validator();
+     my %args = @_;
+     if (my $err = $validator->(\%args)) { return $err }
+
+     ...
+ }
+
+or, if you want to die on validation failure:
+
+ $SPEC{foo} = {
+     ...
+ };
+ sub foo {
+     state $validator = gen_args_validator(die => 1);
+     my %args = @_;
+     $validator->(\%args);
+
+     ...
+ }
+
+Perinci::Sub::ValidateArgs will retrieve the Rinci metadata from the caller's
+C<%SPEC> package variable, then generate Perl validator code for all the
+arguments specified in the Rinci metadata, and compose them into a single
+arguments validator subroutine which is then returned for you to use. This
+generation process is only done once, the first time your function is called.
+The subsequent call will be faster since the arguments validator routine is
+cached by the state variable. Note that state variable is available from perl
+5.010. If you are stuck with older perl, you can use the alternative solution
+like:
+
+ my $validator_foo;
+ sub foo {
+     $validator_foo ||= gen_args_validator();
+     if (my $err = $validator_foo->(\%args)) { return $err }
+     ...
+ }
+
+or perhaps:
+
+ {
+     my $validator;
+     sub foo {
+         $validator ||= gen_args_validator();
+         if (my $err = $validator->(\%args)) { return $err }
+         ...
+     }
+ }
+
+Using Perinci::Sub::ValidateArgs is more convenient than using the dzil plugin
+because you do not need to build a Perl distribution first. But this method is a
+tiny bit slower during runtime and will require Data::Sah during runtime.
+
+Two other alternatives are available under some situation.
+
+=head2 Perinci::CmdLine::Lite and Perinci::CmdLine::Inline
+
+If you only use your function through a CLI using L<Perinci::CmdLine::Lite> or
+L<Perinci::CmdLine::Inline> framework, you can skip validating in the function
+body and let the framework validate (or generate a validator) for you.
+
+During runtime, Perinci::CmdLine::Lite will retrieve your function's Rinci
+metadata and generate Data::Sah validators for all the specified arguments and
+check them. This means you will require Data::Sah during runtime.
+
+Perinci::CmdLine::Inline on the other hand will generate a CLI script with the
+arguments validator embedded in it. Data::Sah will no longer be required during
+runtime.
+
+Note that if your Rinci metadata already contains this attribute
+C<x.perl.validate_args> set to true, argument validation will not be done.
+
+=head2 Perinci::Sub::Wrapper (used by e.g. Perinci::CmdLine::Classic)
+
+L<Perinci::Sub::Wrapper> will create a wrapper for your function and add
+functionalities (including argument validation) according to information from
+Rinci metadata. This can be done dynamically, or the wrapper code can be
+included in the source code during distribution build time using
+L<Dist::Zilla::Plugin::Rinci::Wrap>.
+
+L<Perinci::CmdLine::Classic> is a CLI framework which uses Perinci::Sub::Wrapper
+to perform argument validation.
+
+=head1 IF YOU DO NOT PUT SCHEMAS IN RINCI METADATA
+
+TBD. L<Data::Sah::Params>.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 SEE ALSO
+
+Alternatives to L<Sah>/L<Data::Sah> to validate your function/method parameters:
+L<Params::Validate>, L<Type::Tiny>/L<Type::Params> (see
+L<Type::Tiny::Manual::Params>).
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,45 @@
+{
+   "abstract" : "Collects data, counts frequency, and makes up a multi-level counting report",
+   "author" : [
+      "Mahiro Ando <mahiro@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.76, CPAN::Meta::Converter version 2.132620",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Freq",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Date::Parse" : "1.20",
+            "List::Util" : "1.22",
+            "Pod::Usage" : "1.36",
+            "Scalar::Util" : "1.22",
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.05"
+}

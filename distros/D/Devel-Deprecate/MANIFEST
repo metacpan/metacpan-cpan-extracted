@@ -1,0 +1,13 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Devel/Deprecate.pm
+t/00-load.t
+t/deprecate.t
+t/do_not_break_production.t
+t/errors.t
+t/lib/TestDeprecate.pm
+t/pod-coverage.t
+t/pod.t
+META.yml

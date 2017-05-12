@@ -1,0 +1,23 @@
+NAME
+    deliantra - A Deliantra MORPG game client
+
+SYNOPSIS
+       deliantra [--profile name] [host [user [password]]]
+       deliantra --help
+
+USAGE
+    The deliantra client utilises OpenGL for all UI elements and the game.
+    It is supposed to be used in fullscreen mode and interactively.
+
+DEBUGGING
+    DELIANTRA_DEBUG - environment variable
+
+       1   draw borders around widgets
+       2   add low-level widget info to tooltips
+       4   show fps
+       8   suppress tooltips
+      16   show bandwidth downstream
+
+AUTHOR
+    Marc Lehmann <deliantra@schmorp.de>, Robin Redeker <elmex@ta-sa.org>
+

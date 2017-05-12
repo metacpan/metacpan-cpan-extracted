@@ -1,0 +1,14 @@
+Revision history for Dancer2-Plugin-HTTP-Auth-Extensible
+
+0.121 Wed Jan 20 20:29:56 2016 GMT
+
+     Lets include the module itself too
+
+0.120 Wed Jan 20 20:29:56 2016 GMT
+
+     Tests pass again
+
+0.301 Sat Oct 25 21:26:39 2014 CEST
+
+    Initial port from Dancer1 (Stefan Hornburg).
+

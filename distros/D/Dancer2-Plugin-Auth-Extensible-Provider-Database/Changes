@@ -1,0 +1,21 @@
+Revision history for Dancer2-Plugin-Auth-Extensible-Provider-Database
+
+0.620 Thu  3 Nov 17:22:41 CET 2016
+
+    * Update to new requirements of plugin version 0.620
+
+0.600 Thu 26 May 18:07:21 CEST 2016
+
+	[ENHANCEMENTS]
+
+    * Add new set_user_details and set_user_password methods.
+
+    [MISC]
+
+    * Split out Dancer2::Plugin::Auth::Extensible::Provider::Database from
+      the Dancer2::Plugin::Auth::Extensible distribution.
+    * Provider is now a Moo class and has been rehacked to be compatible
+      with Plugin2. This means thus provider is not compatible with Dancer2
+      releases <= v0.166001.
+
+    For earlier changes please see Dancer2::Plugin::Auth::Extensible's Changes.

@@ -1,0 +1,126 @@
+{
+   "abstract" : "Parse informal natural language date/time strings",
+   "author" : [
+      "Steven Schubiger <schubiger@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4216",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-Natural",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Find" : "0",
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Module::Util" : "0",
+            "Test::MockTime" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.42"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Date::Calc" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Clone" : "0",
+            "DateTime" : "0",
+            "DateTime::TimeZone" : "0",
+            "Exporter" : "0",
+            "Getopt::Long" : "0",
+            "List::MoreUtils" : "0",
+            "Params::Validate" : "0",
+            "Scalar::Util" : "0",
+            "Storable" : "0",
+            "Term::ReadLine" : "0",
+            "boolean" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::Natural" : {
+         "file" : "lib/DateTime/Format/Natural.pm",
+         "version" : "1.05"
+      },
+      "DateTime::Format::Natural::Calc" : {
+         "file" : "lib/DateTime/Format/Natural/Calc.pm",
+         "version" : "1.41"
+      },
+      "DateTime::Format::Natural::Compat" : {
+         "file" : "lib/DateTime/Format/Natural/Compat.pm",
+         "version" : "0.07"
+      },
+      "DateTime::Format::Natural::Duration" : {
+         "file" : "lib/DateTime/Format/Natural/Duration.pm",
+         "version" : "0.06"
+      },
+      "DateTime::Format::Natural::Duration::Checks" : {
+         "file" : "lib/DateTime/Format/Natural/Duration/Checks.pm",
+         "version" : "0.04"
+      },
+      "DateTime::Format::Natural::Expand" : {
+         "file" : "lib/DateTime/Format/Natural/Expand.pm",
+         "version" : "0.03"
+      },
+      "DateTime::Format::Natural::Extract" : {
+         "file" : "lib/DateTime/Format/Natural/Extract.pm",
+         "version" : "0.11"
+      },
+      "DateTime::Format::Natural::Formatted" : {
+         "file" : "lib/DateTime/Format/Natural/Formatted.pm",
+         "version" : "0.07"
+      },
+      "DateTime::Format::Natural::Helpers" : {
+         "file" : "lib/DateTime/Format/Natural/Helpers.pm",
+         "version" : "0.06"
+      },
+      "DateTime::Format::Natural::Lang::Base" : {
+         "file" : "lib/DateTime/Format/Natural/Lang/Base.pm",
+         "version" : "1.08"
+      },
+      "DateTime::Format::Natural::Lang::EN" : {
+         "file" : "lib/DateTime/Format/Natural/Lang/EN.pm",
+         "version" : "1.62"
+      },
+      "DateTime::Format::Natural::Rewrite" : {
+         "file" : "lib/DateTime/Format/Natural/Rewrite.pm",
+         "version" : "0.06"
+      },
+      "DateTime::Format::Natural::Test" : {
+         "file" : "lib/DateTime/Format/Natural/Test.pm",
+         "version" : "0.10"
+      },
+      "DateTime::Format::Natural::Utils" : {
+         "file" : "lib/DateTime/Format/Natural/Utils.pm",
+         "version" : "0.05"
+      },
+      "DateTime::Format::Natural::Wrappers" : {
+         "file" : "lib/DateTime/Format/Natural/Wrappers.pm",
+         "version" : "0.03"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/stsc/DateTime-Format-Natural"
+      }
+   },
+   "version" : "1.05",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,38 @@
+Revision history for Dancer-Plugin-Feed 
+
+1.131470  2013-05-27 16:23:48 Europe/Paris
+
+1.123370  2012-12-02 23:58:01 Europe/Paris
+
+    * Support Dancer 2 (while remaining compatible with Dancer 1).
+      (Alexis Sukrieh)
+
+0.8 10/07/2012
+    * [Tests] 01-basic: Fix wrong namespace (Closes #7) (Hobbestigrou)
+    * [Configuration] Dist: Fix minimal version of Dancer. (Hobbestigrou)
+ 
+0.7 17/04/2012 
+    * [Core] Feed: Adapt to Dist::Zilla. (Hobbestigrou)
+    * [Configuration] Dist: Use Dist::Zilla. (Hobbestigrou)
+    * [Documentation] Changes: Typo. (Hobbestigrou)
+    * [Documentation] Todo: Remove old useless file todo. (Hobbestigrou)
+    * id is required in feed tag for Atom (Fayland Lam)
+    * [Core] Feed: Use Dancer::Exception for manage error. (Hobbestigrou)
+    
+0.6 12/09/2011
+    Simplifying the example code in the pod. Thanks to Naveed Massjouni.
+    
+0.5 09/09/2011
+    Add support for RSS enclosure. Thanks to Tyler Durden.
+    
+0.4 12/07/2011
+    Some docs, thanks to ambs.
+    
+0.3 05/05/2011
+    Quick fix in a basic test.
+    
+0.2 17/04/2011
+    Fix encoding in a pod, and little clean.
+    
+0.1 16/10/2010
+    Initial version developed.

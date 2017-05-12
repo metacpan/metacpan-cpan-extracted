@@ -1,0 +1,60 @@
+{
+   "abstract" : "Search for modules used or required by a distribution and build a report that can be used as L<Carton|Carton> cpanfile .",
+   "author" : [
+      "smonf <smonff@riseup.net>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dependencies-Searcher",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "App::Ack" : "2.1",
+            "IO::File" : "0",
+            "Module::Version" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.48",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.74"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "App::Ack" : "2.1",
+            "Data::Printer" : "0.35",
+            "File::HomeDir" : "1",
+            "File::Spec::Functions" : "3.4",
+            "File::Stamped" : "0.03",
+            "IPC::Cmd" : "0",
+            "IPC::Run" : "0.9",
+            "Log::Minimal" : "0.16",
+            "Module::CoreList" : "2.99",
+            "Module::Version" : "0.12",
+            "Moose" : "2.0602",
+            "Path::Class" : "0.32",
+            "Test::More" : "0",
+            "Version::Compare" : "0.14",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.065"
+}

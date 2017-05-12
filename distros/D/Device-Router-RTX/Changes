@@ -1,0 +1,19 @@
+Revision history for perl module Device::Router::RTX
+
+0.06 2017-01-25
+
+* Documentation
+
+0.05 2014-02-07
+
+* Add minimum Perl version to "Makefile.PL". 
+
+0.04 2013-11-30
+
+* Add "Changes"
+
+0.03 2013-04-01
+
+0.02 2012-05-04
+
+0.01 2012-05-03

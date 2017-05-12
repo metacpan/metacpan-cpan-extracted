@@ -1,0 +1,41 @@
+---
+abstract: 'digging types from data structures'
+author:
+  - 'ANTONC <antonc@cpan.org>'
+  - 'ANTONC <antonc@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Modern::Perl: 0
+  Test::More: 0
+  Test::Spec: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+  Module::Install: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: artistic2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Type-Digger
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Clone: 0.37
+  Config: 0
+  Cwd: 0
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Path: 0
+  File::Spec: 0
+  Modern::Perl: 1.2
+  Module::Install::Base: 0
+  Scalar::Util: 1.42
+  perl: 5.14.0
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Type-Digger
+  license: http://www.perlfoundation.org/artistic_license_2_0
+version: 0.06

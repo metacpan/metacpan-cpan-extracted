@@ -1,0 +1,77 @@
+---
+abstract: 'Dump data and repopulate a database using rules'
+author:
+  - 'Luke Saunders <luke@shadowcatsystems.co.uk>'
+build_requires:
+  DBIx::Class::InflateColumn::FS: '0.01007'
+  Devel::Confess: '0'
+  ExtUtils::MakeMaker: '6.59'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.98'
+configure_requires:
+  ExtUtils::MakeMaker: '6.59'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Fixtures
+no_index:
+  directory:
+    - t/lib
+    - t/var
+requires:
+  Class::Accessor::Grouped: '0.1001'
+  Config::Any: '0.23'
+  DBIx::Class: '0.08102'
+  DBIx::Class::Schema::Loader: '0.07035'
+  Data::Dump::Streamer: '2.05'
+  Data::Visitor: '0.3'
+  DateTime: '1.03'
+  DateTime::Format::MySQL: '0'
+  DateTime::Format::Pg: '0'
+  DateTime::Format::SQLite: '0.1'
+  File::Copy::Recursive: '0.38'
+  File::Temp: '0.2304'
+  Hash::Merge: '0.1'
+  IO::All: '0.85'
+  JSON::Syck: '1.27'
+  MIME::Base64: '0'
+  Path::Class: '0.32'
+  Scalar::Util: '1.27'
+  Test::Compile::Internal: '0'
+  Test::TempDir::Tiny: '0'
+  perl: v5.6.1
+resources:
+  repository: https://github.com/dbsrgits/DBIx-Class-Fixtures.git
+version: '1.001036'
+x_authority: cpan:SKAUFMAN
+x_contributors:
+  - 'Ash Berlin <ash_github@firemirror.com>'
+  - 'Chris Akins <chris.hexx@gmail.com>'
+  - 'Chris Weyl <cweyl@alumni.drew.edu>'
+  - 'Dagfinn Ilmari Mannsåker <ilmari@ilmari.org>'
+  - 'Drew Taylor <taylor.andrew.j@gmail.com>'
+  - 'Frank Switalski <fswitalski@gmail.com>'
+  - 'Frank Switalski <fswitalski@workstation.(none)>'
+  - 'Graham Knop <haarg@haarg.org>'
+  - 'hatorikibble <at.peter.mayr@gmail.com>'
+  - 'Jay Hannah <jay.hannah@iinteractive.com>'
+  - 'Jens Gassmann <jens.gassmann@atomix.de>'
+  - 'John Goulah <jgoulah@cpan.org>'
+  - 'John Napiorkowski <jjn1056@yahoo.com>'
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+  - 'Justin Hunter <justin.d.hunter@gmail.com>'
+  - 'Luke Saunders <luke.saunders@gmail.com>'
+  - 'Mike Francis <ungrim97@gmail.com>'
+  - 'Patrick Simon <pas.freelance@googlemail.com>'
+  - 'Peter Rabbitson <devel@rabbit.us>'
+  - 'Ramin Motakef <ramin@motakef.de>'
+  - 'Rob Kinyon <rob.kinyon@gmail.com>'
+  - 'Samuel Kaufman <sam@socialflow.com>'
+  - 'Samuel Kaufman <skaufman@cpan.org>'
+  - 'Tim Bunce <Tim.Bunce@ig.co.uk>'
+  - 'Tom Bloor <t.bloor@shadowcat.co.uk>'

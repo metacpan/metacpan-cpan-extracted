@@ -1,0 +1,9 @@
+Check if HTML::Parser is faster at decoding XML.
+Dump glob content
+Dump io
+Regexp objects?
+LVALUE objects
+
+Use "a", "b", ... for IDs instead of "r1", "r2", "r3",...
+Dump empty strings as <str/>
+

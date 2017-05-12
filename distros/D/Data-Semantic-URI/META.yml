@@ -1,0 +1,96 @@
+---
+abstract: 'Semantic data classes for URI-related data'
+author:
+  - 'Marcel Gruenauer <marcel@cpan.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.11
+generated_by: 'Dist::Zilla version 1.100711'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Semantic-URI
+provides:
+  Data::Semantic::URI:
+    file: lib/Data/Semantic/URI.pm
+    version: 1.100850
+  Data::Semantic::URI::TestData::fax:
+    file: lib/Data/Semantic/URI/TestData/fax.pm
+    version: 1.100850
+  Data::Semantic::URI::TestData::file:
+    file: lib/Data/Semantic/URI/TestData/file.pm
+    version: 1.100850
+  Data::Semantic::URI::TestData::ftp:
+    file: lib/Data/Semantic/URI/TestData/ftp.pm
+    version: 1.100850
+  Data::Semantic::URI::TestData::http:
+    file: lib/Data/Semantic/URI/TestData/http.pm
+    version: 1.100850
+  Data::Semantic::URI::fax:
+    file: lib/Data/Semantic/URI/fax.pm
+    version: 1.100850
+  Data::Semantic::URI::fax_TEST:
+    file: lib/Data/Semantic/URI/fax_TEST.pm
+    version: 1.100850
+  Data::Semantic::URI::file:
+    file: lib/Data/Semantic/URI/file.pm
+    version: 1.100850
+  Data::Semantic::URI::file_TEST:
+    file: lib/Data/Semantic/URI/file_TEST.pm
+    version: 1.100850
+  Data::Semantic::URI::ftp:
+    file: lib/Data/Semantic/URI/ftp.pm
+    version: 1.100850
+  Data::Semantic::URI::ftp_TEST:
+    file: lib/Data/Semantic/URI/ftp_TEST.pm
+    version: 1.100850
+  Data::Semantic::URI::gopher:
+    file: lib/Data/Semantic/URI/gopher.pm
+    version: 1.100850
+  Data::Semantic::URI::http:
+    file: lib/Data/Semantic/URI/http.pm
+    version: 1.100850
+  Data::Semantic::URI::http_TEST:
+    file: lib/Data/Semantic/URI/http_TEST.pm
+    version: 1.100850
+  Data::Semantic::URI::news:
+    file: lib/Data/Semantic/URI/news.pm
+    version: 1.100850
+  Data::Semantic::URI::pop:
+    file: lib/Data/Semantic/URI/pop.pm
+    version: 1.100850
+  Data::Semantic::URI::prospero:
+    file: lib/Data/Semantic/URI/prospero.pm
+    version: 1.100850
+  Data::Semantic::URI::tel:
+    file: lib/Data/Semantic/URI/tel.pm
+    version: 1.100850
+  Data::Semantic::URI::telnet:
+    file: lib/Data/Semantic/URI/telnet.pm
+    version: 1.100850
+  Data::Semantic::URI::tv:
+    file: lib/Data/Semantic/URI/tv.pm
+    version: 1.100850
+  Data::Semantic::URI::wais:
+    file: lib/Data/Semantic/URI/wais.pm
+    version: 1.100850
+requires:
+  Carp: 0
+  Data::Semantic::RegexpAdapter: 0
+  Data::Semantic::Test: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::CompanionClasses: 0
+  Test::Differences: 0
+  Test::More: 0.88
+  constant: 0
+  parent: 0
+  perl: 5.008
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Semantic-URI
+  homepage: http://search.cpan.org/dist/Data-Semantic-URI/
+  repository: http://github.com/hanekomu/Data-Semantic-URI
+version: 1.100850

@@ -1,0 +1,96 @@
+package Dist::Zilla::Plugin::PERLANCAR::BeforeBuild;
+
+our $DATE = '2017-02-09'; # DATE
+our $VERSION = '0.55'; # VERSION
+
+use 5.010001;
+use strict;
+use warnings;
+
+use Moose;
+use namespace::autoclean;
+
+use Module::Version 'get_version';
+
+with (
+    'Dist::Zilla::Role::BeforeBuild',
+);
+sub before_build {
+    my $self = shift;
+
+    my %min_versions = (
+        "CPAN::Meta::Prereqs" => "2.150006", # preserves x_* phases/rels
+    );
+    for (sort keys %min_versions) {
+        my $min_v = $min_versions{$_};
+        my $installed_v = get_version($_);
+        if (version->parse($installed_v) < version->parse($min_v)) {
+            die "$_ version must be >= $min_v";
+        }
+    }
+}
+
+__PACKAGE__->meta->make_immutable;
+1;
+# ABSTRACT: Do stuffs before building
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Dist::Zilla::Plugin::PERLANCAR::BeforeBuild - Do stuffs before building
+
+=head1 VERSION
+
+This document describes version 0.55 of Dist::Zilla::Plugin::PERLANCAR::BeforeBuild (from Perl distribution Dist-Zilla-PluginBundle-Author-PERLANCAR), released on 2017-02-09.
+
+=head1 SYNOPSIS
+
+In F<dist.ini>:
+
+ [PERLANCAR::BeforeBuild]
+
+=head1 DESCRIPTION
+
+Currently what this does:
+
+=over
+
+=item * Ensure that the versions of some required modules are recent enough
+
+=back
+
+=for Pod::Coverage .+
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-PERLANCAR>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Dist-Zilla-PluginBundle-Author-PERLANCAR>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-PERLANCAR>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017, 2016, 2015, 2014, 2013, 2012 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

@@ -1,0 +1,5 @@
+session: Memcached
+engines:
+    session:
+        Memcached:
+            memcached_servers: 127.0.0.1:11211

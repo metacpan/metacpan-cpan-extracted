@@ -1,0 +1,14 @@
+Revision history for DateTime-TimeZone-ICal
+
+0.04    Sat Mar 14 10:10:50 PDT 2015
+        Fixing tests so cpantesters stops complaining
+
+0.03    Thu Mar  5 10:16:38 PST 2015
+        Misc. fixes
+
+0.02    Wed Mar  4 12:30:25 PST 2015
+        Fix packaging
+
+0.01    Thu Feb 26 05:15:00 PST 2015
+        First rough-in attempt
+

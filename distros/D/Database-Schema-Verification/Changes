@@ -1,0 +1,13 @@
+Revision history for Perl extension Database::Schema::Verification.
+
+1.02  Wed May  3 13:26:00 2006
+	- Fixed Makefile.PL, added the dependancies
+
+1.00  Wed Apr 26 16:00:00 2006
+	- Finished POD for release
+	- Cleaned up CGI script in contrib DIR
+
+0.01  Mon Apr 24 15:09:29 2006
+	- original version; created by h2xs 1.23 with options
+		-AXc -n Database::Schema::Verification --skip-exporter
+

@@ -1,0 +1,29 @@
+Changelog for Dist-Zilla-App-Command-dhmakeperl
+
+0.007 2015-03-23T06:49:32
+ - dist.ini changes, added author website (Shantanu Bhadoria)
+
+0.006 2015-03-15T03:30:50Z
+ - Added DhMakePerl to dependencies (Shantanu Bhadoria)
+
+0.005 2014-12-08T05:17:54Z
+ - Fixed POD::wikidoc issues (Shantanu Bhadoria)
+
+0.004 2014-12-08T03:22:05Z
+ - No changes found
+
+0.003 2014-12-05T07:05:27Z
+ - rebuilt pod and changes files (Shantanu Bhadoria)
+ - Fixed a spelling mistake in the pod (Shantanu Bhadoria)
+ - Added some more documentation (Shantanu Bhadoria)
+
+0.002 2013-10-06T03:17:16Z
+ - Added POD Documentation and versioning support in generated deb files
+
+ [Shantanu]
+
+0.001 2013-10-05T05:11:33Z
+ - v0.001 - First Commit [Shantanu] - First Commit [Shantanu] [Shantanu]
+ - First Commit [Shantanu]
+ - First Commit [Shantanu]
+

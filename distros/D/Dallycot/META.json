@@ -1,0 +1,90 @@
+{
+   "abstract" : "A linked open code language and processor",
+   "author" : [
+      "James Smith <jgsmith@gmail.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.036, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dallycot",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.28"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "Module::Build" : "0.28",
+            "perl" : "5.020"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Devel::PPPort" : "3.23"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AnyEvent" : "7",
+            "Array::Utils" : "0",
+            "CHI" : "0.59",
+            "Data::UUID" : "1",
+            "DateTime" : "0",
+            "DateTime::Calendar::Hebrew" : "0",
+            "DateTime::Calendar::Hijri" : "0",
+            "DateTime::Calendar::Julian" : "0",
+            "DateTime::Calendar::Mayan" : "0",
+            "DateTime::Calendar::Pataphysical" : "0",
+            "DateTime::Format::Flexible" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
+            "Lingua::Sentence" : "1.05",
+            "Lingua::StopWords" : "0.09",
+            "Lingua::YALI" : "0.015",
+            "List::MoreUtils" : "0.23",
+            "List::Util" : "1.41",
+            "Markdent" : "0.25",
+            "Marpa::R2" : "3",
+            "Math::BaseCalc" : "0",
+            "Math::BigInt::Random" : "0.04",
+            "Math::BigRat" : "0.2606",
+            "Module::Pluggable" : "5.1",
+            "Mojolicious" : "5.65",
+            "Moose" : "0.34",
+            "MooseX::Getopt" : "0.24",
+            "MooseX::Singleton" : "0.04",
+            "MooseX::Types::Moose" : "0",
+            "Promises" : "0.01",
+            "RDF::Query" : "2.912",
+            "RDF::RDFa::Parser" : "1.097",
+            "RDF::Trine" : "1.011",
+            "Readonly" : "0",
+            "Scalar::Util" : "0",
+            "String::Escape" : "0",
+            "Term::ReadLine" : "0",
+            "URI" : "0",
+            "URI::WithBase" : "2.19",
+            "experimental" : "0.013",
+            "perl" : "5.020"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "EV" : "4.18",
+            "perl" : "5.020"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.151630",
+   "x_authority" : "cpan:JSMITH"
+}
+

@@ -1,0 +1,24 @@
+Revision history for Dist-Zilla-Plugin-PERLANCAR-GenTodoMd
+
+0.04    2015-04-10 (PERLANCAR)
+
+	- Try to fix escaping to avoid 'Unrecognized escape \Q passed
+	  through ...' perl warning, this double escaping is tricky.
+
+
+0.03    2015-01-04 (PERLANCAR)
+
+	- Add sanity check to avoid (mis)exporting unrelated todo entries.
+
+
+0.02    2015-01-03 (PERLANCAR)
+
+	- [dist] Add dependency to App::OrgUtils (filter-org-by-headlines).
+
+	- Tweak Markdown: add blank line before the next headline if
+	  previous headline has text.
+
+
+0.01     2015-01-03 (PERLANCAR)
+
+         - First release.

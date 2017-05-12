@@ -1,0 +1,222 @@
+<html>
+<head>
+<title>BabelKit Code Table Setup</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/babelkit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+<div align="right">
+[<a href="bk_faq.html">Requirements and FAQ</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_setup_php.html">PHP Setup</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/babelkit">BabelKit</a>
+Code Table Setup</h2></center>
+
+How to set up a BabelKit code table.  This consists of
+the database table definition and at least five core code records
+that need to be loaded for the BabelKit Translation Utility to function.
+
+
+<h4>Sample Schema</h4>
+
+Here is a sample MySQL code table schema definition plus
+a few example English and French month code records.
+Feel free to adapt these field definitions to your needs
+and your database management system as outlined below.
+
+<pre>
+CREATE TABLE bk_code (
+  code_set varchar(16) binary NOT NULL default '',
+  code_lang varchar(5) binary NOT NULL default '',
+  code_code varchar(32) binary NOT NULL default '',
+  code_desc blob NOT NULL,
+  code_order smallint(6) NOT NULL default '0',
+  code_flag char(1) binary NOT NULL default '',
+  PRIMARY KEY  (code_set, code_lang, code_code)
+);
+
+INSERT INTO bk_code VALUES ('month', 'en', '5',  'May',      5,'');
+INSERT INTO bk_code VALUES ('month', 'en', '10', 'October', 10,'')
+INSERT INTO bk_code VALUES ('month', 'fr', '5',  'mai',      0,'');
+INSERT INTO bk_code VALUES ('month', 'fr', '10', 'octobre',  0,'');
+</pre>
+
+The default code table name is <b>bk_code</b>.  BabelKit can
+support multiple code tables per database, although this
+is rarely necessary.  If your code table name is other than
+'bk_code' pass the code table name into the new BabelKit() method.
+
+<p>
+The <b>code_set</b> field holds the code for the code set
+that each code record belongs to.  For example, each
+code record for the month code set will have a code_set
+value of 'month'.  The code_set field is limited to
+16 characters by the Translation Utility.
+
+<p>
+The <b>code_lang</b> field holds the code for the language
+that each code record belongs to.  For example, each
+French code record will have a code_lang value of 'fr'.
+The code_lang field is limited to 5 characters by the
+Translation Utility.
+This leaves room for the two character language
+code plus a dialect such as 'en-us' for U.S. English.
+All code records must exist first in the native language.
+
+<p>
+The <b>code_code</b> field holds the actual code value.
+For example '10' for the month of October, or 'cad' for
+Canadian Dollars.  The code_code field is limited to 32
+characters by the Translation Utility.
+Codes rarely need to be that long and since long code values
+can take up considerable space in the database proper,
+they should be kept to a reasonable length.
+
+<p>
+Code_set, code_lang and code_code values all consist
+of alphanumeric plus '-' and '_' like this: /^[a-zA-Z_0-9-]+$/.
+Avoid html or url unsafe characters such as [&amp;&lt;&quot&gt;?=]
+or spaces in your codes.  BabelKit assumes that all
+codes are html and url safe and does not encode them.
+
+<p>
+The <b>code_desc</b> field holds the code description for
+the code, one record for each language translation.
+For example 'October' for the English description
+and 'ottobre' for the French description.  None of
+the code_set, code_lang, code_code or code_desc fields
+may be blank.
+
+<p>
+In this example the code_desc field is defined as a
+'blob' which has a limit of 65535 characters under MySQL.
+This would be appropriate if you are using BabelKit to
+support translation of paragraphs or pages of text.  If you
+expect to be keeping only regular code descriptions
+then varchar(255) will be plenty.
+
+<p>
+The <b>code_order</b> field is used to specify the sort
+order for a code set.  It is only set in the native
+language code records, the 'en' records in the example
+above.  If the month sort order were not set,
+'10' would sort before '5', displaying October
+before May.  Negative code_order numbers can be used
+to make a code sort early.  See the 'code_set' records
+below for an example of this.
+
+<p>
+When a code is first added in the native language,
+if the code_order field is not specified and the
+code_code field value is numeric, the code_order field is set
+to the value of the code_code field.  This provides numeric
+sorting by default which can be overridden as necessary
+by specifying the code_order field values.
+
+<p>
+The example schema above defines code_order as a two byte
+signed integer.  If you expect code_order values above 32767
+then define code_order as a four byte signed integer field.
+
+<p>
+The <b>code_flag</b> field is a one character field used
+to tag obsolete records as deprecated with a 'd' value.
+The 'd' flags are only stored in the native language records.
+Deprecated code descriptions are still available for
+display of old database values, but are not available
+for new data entry selections.
+
+
+<h4>Core Data Records</h4>
+
+The BabelKit Translation Utility requires at least
+five core data records to be loaded before it can function properly:
+
+<pre>
+INSERT INTO bk_code VALUES ('code_set',  'en', 'code_set',  'code set',   -3,'');
+INSERT INTO bk_code VALUES ('code_set',  'en', 'code_lang', 'language',   -2,'');
+INSERT INTO bk_code VALUES ('code_set',  'en', 'code_admin','code admin', -1,'');
+
+INSERT INTO bk_code VALUES ('code_admin','en', 'code_admin', 'param=1 slave=1',
+                            0,'');
+
+INSERT INTO bk_code VALUES ('code_lang', 'en', 'en',        'English',    -1,'');
+</pre>
+
+<p>
+Three code_set records define the three core code sets.
+One code_lang record defines the native language.
+
+<p>
+They should all be in the native language.  BabelKit discovers
+which language is the native language for this code table by
+looking at the language of the 'code_admin' 'code_admin' record.
+In this case 'en' for English.
+
+<p>
+To initialize a code table with another native language
+replace the 'en' values above with another language code.
+At some point it might be fun to make the BabelKit Translation
+Utility user interface multilingual.
+
+
+<h4>Loading the Schema Definition and Core Data Records</h4>
+
+Load the schema definition.  With MySQL, do this:
+
+<pre>
+$ mysql yourdatabasename &lt; data/bk_schema.mysql
+</pre>
+
+Load the core data records.  With MySQL, do this:
+
+<pre>
+$ mysql yourdatabasename &lt; data/bk_setup.core
+</pre>
+
+<a name="demodata"></a>
+You can optionally load the demo data records.  With MySQL, do this:
+
+<pre>
+$ mysql yourdatabasename &lt; data/bk_demo.latin1
+</pre>
+
+Make sure that your records are loaded.  With MySQL, do this:
+
+<pre>
+$ mysqldump yourdatabasename bk_code | less
+</pre>
+
+You should see your schema definition and the data
+records that you have loaded.
+
+<p>
+<div align="right">
+[<a href="bk_faq.html">Requirements and FAQ</a>]
+[<a href="index.html">Index</a>]
+[<a href="bk_setup_php.html">PHP Setup</a>]
+</div>
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

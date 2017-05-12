@@ -1,0 +1,81 @@
+NAME
+    Devel::Trace - Print out each line before it is executed (like `sh -x')
+
+SYNOPSIS
+      perl -d:Trace program
+
+
+DESCRIPTION
+    If you run your program with `perl -d:Trace program', this module will
+    print a message to standard error just before each line is executed. For
+    example, if your program looks like this:
+
+            #!/usr/bin/perl
+            
+            
+            print "Statement 1 at line 4\n";
+            print "Statement 2 at line 5\n";
+            print "Call to sub x returns ", &x(), " at line 6.\n";
+            
+            exit 0;
+            
+            
+            sub x {
+              print "In sub x at line 12.\n";
+              return 13;
+            }
+
+
+    Then the `Trace' output will look like this:
+
+            >> ./test:4: print "Statement 1 at line 4\n";
+            >> ./test:5: print "Statement 2 at line 5\n";
+            >> ./test:6: print "Call to sub x returns ", &x(), " at line 6.\n";
+            >> ./test:12:   print "In sub x at line 12.\n";
+            >> ./test:13:   return 13;
+            >> ./test:8: exit 0;
+
+
+    This is something like the shell's `-x' option.
+
+DETAILS
+    Inside your program, you can enable and disable tracing by doing
+
+        $Devel::Trace::TRACE = 1;   # Enable
+        $Devel::Trace::TRACE = 0;   # Disable
+
+
+    or
+
+        Devel::Trace::trace('on');  # Enable
+        Devel::Trace::trace('off'); # Disable
+
+
+    `Devel::Trace' exports the `trace' function if you ask it to:
+
+        import Devel::Trace 'trace';
+
+
+    Then if you want you just say
+
+        trace 'on';                 # Enable
+        trace 'off';                # Disable
+
+
+TODO
+    *   You should be able to send the trace output to the filehandle of your
+        choice.
+
+    *   You should be able to specify the format of the output.
+
+    *   You should be able to get the output into a string.
+
+
+    We'll see.
+
+Author
+    Mark-Jason Dominus (`mjd-perl-trace+@plover.com'), Plover Systems co.
+
+    See the `Devel::Trace.pm' Page at http://www.plover.com/~mjd/perl/Trace
+    for news and upgrades.
+

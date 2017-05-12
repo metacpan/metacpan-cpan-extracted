@@ -1,0 +1,2 @@
+- Subclass/Use Math::Currency
+- Added Auto Discovery of currency code for current computer Locale

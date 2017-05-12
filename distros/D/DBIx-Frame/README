@@ -1,0 +1,47 @@
+DBIx::Frame - a perl module for creating and maintaining DBI frameworks
+=======================================================================
+
+DBIx::Frame is an extension of the standard DBI perl module, designed
+around mysql, and used to create and maintain frameworks for databases.
+It has query logging, and a standardized interface for standard SQL 
+statements like 'update' and 'insert' that doesn't require understanding 
+SQL to any great degree.  Ideally, the user or developer shouldn't have to 
+know too much SQL to be able to administer a database.  On the other hand,
+it does require a certain setup that isn't necessarily easy to pick up,
+and isn't standard SQL - with all the problems that this entails.
+
+Prerequisites
+=============
+
+You must have the following modules installed:
+
+  DBI		   v1.14	(older might work, but 1.14 is known to work)
+  HTML::FormRemove v0.10 	(supplied with package)
+
+You'll probably also want drivers for whatever database you're using (ie
+mysql).  
+
+Installation Notes
+==================
+Installing this software is easy:
+
+  perl Makefile.pl
+  make
+  make test
+  make install
+
+Documentation
+=============
+
+All the documentation should be kept in the manual pages.  If you want to 
+read it in place, 'pod2text Frame.pm | more' ought to cover you.
+
+Web Page
+========
+
+http://www.ks.uiuc.edu/Development/MDTools/dbixframe/
+
+			    - Tim Skirvin (tskirvin@ks.uiuc.edu)
+-- 
+   Theoretical and Computational    http://www.ks.uiuc.edu/~tskirvin/
+Biophysics, Beckman Institute, UIUC    Senior Systems Administrator

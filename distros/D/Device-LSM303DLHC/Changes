@@ -1,0 +1,65 @@
+Changelog for Device-LSM303DLHC
+
+0.014 2016-04-07T06:46:22
+ - Added travis and badges (Shantanu Bhadoria)
+
+0.013 2015-03-25T07:20:05
+ - v0.013 (Shantanu Bhadoria)
+ - Reorganising, extending instead of using (Shantanu Bhadoria)
+
+0.012 2015-03-25T07:18:39
+ - v0.012 (Shantanu Bhadoria)
+ - Reorganising, extending instead of using (Shantanu Bhadoria)
+ - Fixed Raw reading on scale 1 (Shantanu Bhadoria)
+
+0.011 2013-10-05T01:27:58
+ - v0.011 (Shantanu)
+ - small changes (Shantanu Bhadoria)
+
+0.010 2013-10-03T15:24:10
+ - v0.010 (Shantanu)
+ - Non Raw reading scaled between -0.5 and 0.5 (Shantanu)
+
+0.009 2013-10-03T15:22:09
+ - v0.009 (Shantanu)
+ - Non Raw reading scaled between -0.5 and 0.5 (Shantanu)
+
+0.008 2013-09-29T02:48:36
+ - v0.008 (Shantanu)
+ - POD spelling fixes (Shantanu)
+
+0.007 2013-09-27T11:41:12
+ - v0.007 (Shantanu)
+ - Renamed Compass to Magnetometer to use the more scientific term since
+   the term compass is usually used for 2D magnetometers not 3D
+   Magnetometers. (Shantanu)
+
+0.006 2013-09-27T10:50:09
+ - v0.006 (Shantanu)
+ - Removed Math::Trig usage. manually computing trig functions (Shantanu)
+ - Resolved xt test failures (Shantanu)
+ - Refactoring Submodule to allow easy loading of similar subdevices as
+   plugins using a common prefix in MOP (Shantanu Bhadoria)
+ - minor changes (Shantanu Bhadoria)
+
+0.005 2013-09-12T09:23:58
+ - v0.005 (Shantanu)
+ - Added README.pod and Changes (Shantanu)
+
+0.004 2013-09-12T06:47:10
+ - v0.004 (Shantanu)
+ - Moved to ChangelogFromGit compliance with CPAN::Changes::Spec (Shantanu)
+
+0.003 2013-09-12T06:11:56
+ - Moved to ChangelogFromGit compliance with CPAN::Changes::Spec (Shantanu)
+
+0.002 2013-09-11T09:15:31
+ - pod fix (Shantanu)
+
+0.001 2013-09-11T07:46:23
+ -  final mods to the pod` (Shantanu)
+ - Fixed bugs in core module (Shantanu)
+ -  minor commit (Shantanu Bhadoria)
+ - First Commit (Shantanu Bhadoria)
+ - First Push with basic Raw Readings from LSM303DLHC Compass and
+   Accelerometer (Shantanu Bhadoria)

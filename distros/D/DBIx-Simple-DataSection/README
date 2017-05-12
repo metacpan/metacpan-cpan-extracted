@@ -1,0 +1,27 @@
+This is Perl module DBIx::Simple::DataSection.
+
+INSTALLATION
+
+DBIx::Simple::DataSection installation is straightforward. If your CPAN shell is set up,
+you should just be able to do
+
+    % cpan DBIx::Simple::DataSection
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+DOCUMENTATION
+
+DBIx::Simple::DataSection documentation is available as in POD. So you can do:
+
+    % perldoc DBIx::Simple::DataSection
+
+to read the documentation online with your favorite pager.
+
+dann

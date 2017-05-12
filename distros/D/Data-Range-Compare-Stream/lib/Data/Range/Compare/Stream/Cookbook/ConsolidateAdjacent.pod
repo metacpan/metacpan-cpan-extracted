@@ -1,0 +1,65 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Cookbook::ConsolidateAdjacent - HowTo Consolidate Dupplicate, Overlapping, and Adjacent ranges
+
+=head1 DESCRIPTION
+
+This shows how to use the additional consolidation class.
+
+=head1 Special notes
+
+Adjacent ranges only exist when data has an exact begin and end pont.
+Examples that do not work include: Floating points, Analog ranges
+
+The example in this pod relates to data with exact start and end boundries.
+
+=head2 Example code
+
+  use strict;
+  use warnings;
+  use Data::Dumper;
+  
+  use lib qw(../lib);
+  
+  use Data::Range::Compare::Stream;
+  use Data::Range::Compare::Stream::Iterator::Array;
+  use Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc;
+  
+  
+  my $iterator=new Data::Range::Compare::Stream::Iterator::Array;
+  
+  $iterator->create_range(0,0);
+  $iterator->create_range(1,2);
+  $iterator->create_range(4,6);
+  $iterator->create_range(7,9);
+  
+  $iterator->prepare_for_consolidate_asc;
+  my $consolidator=Data::Range::Compare::Stream::Iterator::Consolidate::AdjacentAsc->new($iterator);
+  
+  while($consolidator->has_next) {
+    my $result=$consolidator->get_next;
+    print $result,"\n";
+  }
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

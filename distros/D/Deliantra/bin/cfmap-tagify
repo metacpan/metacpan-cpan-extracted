@@ -1,0 +1,171 @@
+#!/opt/bin/perl
+
+# read through the whole maps at .=/ and replace all exits by
+# tags that point to one of the maps given on the commandline
+# (which must be relative paths starting at .!)
+
+use strict;
+
+use Deliantra;
+use Deliantra::Map;
+use Tie::Cache;
+use Errno;
+
+{
+   package mapcache;
+
+   use base Tie::Cache::;
+
+   sub read {
+      my $map = eval {
+         new_from_file Deliantra::Map $_[1]
+      };
+
+      if ($@) {
+         die unless $@ =~ /No such file or directory/;
+         warn $@;
+      }
+
+      $map
+
+   }
+
+   sub write {
+      my ($self, $path, $map) = @_;
+      $map or return;
+      warn "writing $path\n";#d#
+      $map->write_file ($path);
+   }
+}
+
+our %map;
+tie %map, mapcache::, 100, { Debug => 0, WriteSync => 0 }
+   or die;
+
+Deliantra::load_archetypes;
+
+sub expand {
+   my ($path, $base) = @_;
+
+   $path =~ s/\.map$//;
+
+   return +(substr $path, 1) . ".map" if $path =~ /^\//;
+
+   defined $base
+      or die "relative path without base";
+
+   $path = "$base/../$path.map";
+
+   1 while $path =~ s/\/+[^\/]*\/+\.\./\//;
+   1 while $path =~ s/\/\//\//;
+
+   $path
+}
+
+my %is_exit = ( 41 => 1, 57 => 1, 66 => 1 );
+
+sub gen_tag {
+   my ($path, $suffix, $x, $y) = @_;
+
+   # create a tag name
+   my $tag = $path;
+   $tag =~ s/\.map$//;
+   $tag =~ s/\//_/g;
+   $tag .= $suffix;
+   $tag .= $x <= 0 || $y <= 0 ? "_entrance" : "+${x}+${y}";
+
+   1 while $tag =~ s/\b([^_]+)_\1\b/$1/;
+
+   lc $tag
+}
+
+sub patch_exit {
+   my ($from, $fx, $fy, $path, $x, $y) = @_;
+
+   my $map = $map{$path}
+      or return;
+
+   my $tag;
+
+   my $tag =
+      $path =~ /world/ && $from !~ /world/
+      ? gen_tag $from, "_exit", $fx, $fy
+      : gen_tag $path, "", $x, $y;
+   
+   $x = $map->{info}{enter_x} if $x <= 0;
+   $y = $map->{info}{enter_y} if $y <= 0;
+
+   $x >= 0 && $y >= 0
+      or ((warn "invalid x,y"), return);
+
+   # 1. try to find an existing tag
+   my $os = $map->{map}[$x][$y] ||= [];
+   if (my ($tagged) = grep exists $_->{tag}, @$os) {
+      return $tagged->{tag};
+   }
+   
+   # 2. find an existing exit
+   if (my ($exit) = grep $is_exit{$_->{type} || $ARCH{$_->{_name}}{type}}, @$os) {
+      $exit->{tag} = $tag;
+      $map{$path} = $map;
+      return $tag;
+   }
+
+   # 3. add a tag object to the bottom
+   unshift @$os, { _atype => "arch", _name => "tag", tag => $tag };
+   $map{$path} = $map;
+   $tag
+}
+
+open my $fh, "find * -name '*.map' -type f -print0 |"
+   or die "find: $!";
+
+my %target;
+
+for (@ARGV) {
+   s/\.map$//;
+   s/^\///;
+   s/\/\/+/\//g;
+   $_ .= ".map";
+
+   $target{$_} = 1;
+}
+
+while (defined (my $path = do { local $/ = "\x00"; <$fh> })) {
+   chop $path;
+   my $map = $map{$path};
+
+   for my $fx (0 .. $map->{info}{width} - 1) {
+      for my $fy (0 .. $map->{info}{height} - 1) {
+         my $space = $map->{map}[$fx][$fy]
+            or next;
+
+         for my $o (@$space) {
+            my $a = $Deliantra::ARCH{$o->{_name}}
+               or next;
+
+            if ($is_exit{$o->{type} || $a->{type}}) {
+               my ($exit, $x, $y) = ($o->{slaying}, $o->{hp}, $o->{sp});
+               if ($exit =~ /^[\/0-9a-zA-Z\.]/ && $exit ne "/!") {
+                  $exit = expand $exit, $path;
+                  if ($exit ne $path && $target{$exit}) {
+                     if (my $tag = patch_exit $path, $fx, $fy, $exit, $x, $y) {
+                        delete $o->{sp};
+                        delete $o->{hp};
+                        $o->{slaying} = "*$tag";
+                        $map{$path} = $map;
+
+                        warn "$path: found exit $exit $x $y => *$tag\n";#d#
+                     } else {
+                        warn "$path: $exit $o->{hp} $o->{sp} unpatchable\n";
+                     }
+                  }
+               }
+            }
+         }
+      }
+   }
+}
+
+%map = ();
+

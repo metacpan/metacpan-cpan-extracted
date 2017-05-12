@@ -1,0 +1,106 @@
+NAME
+    `Device::Chip::MCP23x17' - chip driver for the MCP23x17 family
+
+SYNOPSIS
+     use Device::Chip::MCP23S17;
+
+     use constant { HIGH => 0xFFFF, LOW => 0 };
+
+     my $chip = Device::Chip::MCP23S17->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+
+     foreach my $bit ( 0 .. 15 ) {
+        $chip->write_gpio( HIGH, 1 << $bit )->get;
+        sleep 1;
+        $chip->write_gpio( LOW, 1 << $bit )->get;
+     }
+
+DESCRIPTION
+    This Device::Chip subclass provides specific communication to the
+    Microchip MCP23x17 family of chips.
+
+    This module itself is an abstract base; to talk to a specific chip see
+    one of the following subclasses:
+
+        MCP23S17 over SPI - see Device::Chip::MCP23S17
+
+    Aside from the method of communication with the actual chip hardware,
+    these modules all provide the same higher-level API to the containing
+    application.
+
+    This module currently only supports a chip running in the `IOCON.BANK=0'
+    configuration.
+
+MOUNT PARAMETERS
+  reset
+    The name of the GPIO line on the adapter that is connected to the
+    `RESET#' pin of the chip, if there is one. This will be used by the
+    reset method.
+
+METHODS
+    The following methods documented with a trailing call to `->get' return
+    Future instances.
+
+    Each method that takes a `$mask' parameter uses it to select which IO
+    pins are affected. The mask is a 16-bit integer; selecting only those
+    pins for which bits are set. The lower 8 bits relate to the `GPA' pins,
+    the higher 8 to the `GPB' pins. Pins that are not selected by the mask
+    remain unaffected.
+
+  reset
+       $chip->reset->get;
+
+    Resets the cached register values back to their power-up defaults.
+
+    Additionally, if the `reset' mount parameter is defined, pulses the
+    `RESET#' pin of the chip.
+
+  write_gpio
+       $chip->write_gpio( $val, $mask )->get
+
+    Sets the pins named in the `$mask' to be outputs, and sets their values
+    from the bits in `$val'. Both values are 16-bit integers.
+
+  read_gpio
+       $val = $chip->read_gpio( $mask )->get
+
+    Sets the pins named in the `$mask' to be inputs, and reads the current
+    pin values of them. The mask and the return value are 16-bit integers.
+
+  tris_gpio
+       $chip->tris_gpio( $mask )
+
+    Sets the pins named in the `$mask' to be inputs ("tristate"). The mask
+    is a 16-bit integer.
+
+  set_input_polarity
+       $chip->set_input_polarity( $pol, $mask )
+
+    Sets the input polarity of the pins given by `$mask' to be the values
+    given in `$pol'. Pins associated with bits set in `$pol' will read with
+    an inverted sense. Both values are 16-bit integers.
+
+  set_input_pullup
+       $chip->set_input_pullup( $pullup, $mask )
+
+    Enables or disables the input pullup resistors on the pins given by
+    `$mask' as per the values given by `$pullup'. Both values are 16-bit
+    integers.
+
+TODO
+    *   Wrap the interrupt-related registers - `GPINTEN', `DEFVAL',
+        `INTCON', `INTF', `INTCAP'. Support the interrupt-related bits in
+        `IOCON' - `MIRROR', `ODR', `INTPOL'.
+
+    *   Support the general configuration bits in the `IOCON' register -
+        `DISSLW', `HAEN'.
+
+    *   Consider how easy/hard or indeed how useful it might be to support
+        `IOCON.BANK=1' configuration.
+
+    *   Create a Device::Chip::Adapter instance to represent the GPIO pins
+        as a standard adapter.
+
+AUTHOR
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,32 @@
+; vim: syntax=dosini
+name    = Dist-Zilla-Plugin-AutoVersion-Relative
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+; [Bootstrap::lib]
+
+[@Author::KENTNL]
+twitter_extra_hash_tags = #distzilla
+normal_form = numify
+mantissa    = 6
+bumpversions = 1
+toolkit          = eumm
+toolkit_hardness = soft
+copyfiles        = LICENSE
+srcreadme        = mkdn
+
+;version_rel_year = 2009
+;version_rel_month = 08
+;version_rel_day = 23
+;version_rel_hour = 0
+;version_major = 0
+;version_minor = 1
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+Dist::Zilla                 = 2.10131
+namespace::autoclean        = 0.09 ; CMOP FAIL
+MooseX::Types::Moose        = 0
+DateTime                    = 0.50
+MooseX::Types::DateTime     = 0.05

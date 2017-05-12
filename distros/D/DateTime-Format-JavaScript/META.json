@@ -1,0 +1,78 @@
+{
+   "abstract" : "Parses and formats Date of JavaScript",
+   "author" : [
+      "Daisuke (yet another) Maki"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Minilla/v0.8.2",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-JavaScript",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples",
+         "author",
+         "builder"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Prereqs" : "0",
+            "Module::Build" : "0.38"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::MinimumVersion" : "0.10108",
+            "Test::Pod" : "1.41",
+            "Test::Spellunker" : "v0.2.7"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime::Format::Builder" : "0",
+            "DateTime::TimeZone" : "0",
+            "perl" : "5.008001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.98"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::JavaScript" : {
+         "file" : "lib/DateTime/Format/JavaScript.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript/issues"
+      },
+      "homepage" : "https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript",
+      "repository" : {
+         "url" : "https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript.git",
+         "web" : "https://github.com/Maki-Daisuke/p5-DateTime-Format-JavaScript"
+      }
+   },
+   "version" : "0.02",
+   "x_contributors" : [
+      "Daisuke (yet another) Maki <maki.daisuke@gmail.com>"
+   ]
+}

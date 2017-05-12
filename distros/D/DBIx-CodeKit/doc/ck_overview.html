@@ -1,0 +1,167 @@
+<html>
+<head>
+<title>CodeKit Overview</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/codekit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="ck_update.html">Code Table Updates</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_faq.html">Requirements and FAQ</a>]
+</div>
+
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/codekit">CodeKit</a>
+Overview</h2></center>
+
+CodeKit is an interface to a universal database code table.
+CodeKit takes all of the programming work out of maintaining
+multiple database code definition sets.
+
+<p>
+The code administration page lets you define new
+virtual code tables and enter all codes and their descriptions.
+Perl and PHP classes retrieve the code descriptions
+and automatically generate HTML code selection elements.
+
+
+<h4>Traditional Code Set Implementations</h4>
+
+Code sets are an important part of any database.
+They define the choices available for codified fields
+and supply the human readable descriptions for display purposes. 
+
+<p>
+Code sets are usually implemented as database tables,
+one physical database table for each set of codes.
+
+<p>
+Each database table typically needs an administration
+data entry page to allow for code set entry and upkeep.
+Also, each use of each code set requires similar
+but slightly different SQL and application code,
+an opportunity for bugs to slip into the applications.
+
+
+<h4>Universal Code Table</h4>
+
+A universal code table replaces all of the traditional individual
+database code tables with a single database table which
+is structured to hold all of the code sets in the
+entire database.
+
+<p>
+This saves a <b>lot</b> of programmer work in setting up
+the tables and eliminates the need to write multiple
+code set administration data entry pages.  CodeKit
+provides code administration utilities written in
+both PHP and Perl.
+
+<p>
+A single database table makes it easy to write an
+API for each language of interest to perform common
+operations such as looking up a code description
+or displaying code choices to the user.  CodeKit
+currently provides APIs for PHP and Perl.
+
+
+<h4>Code Set Display Order</h4>
+
+It is often necessary to specify the order in
+which code set choices are displayed to the user.
+
+<p>
+CodeKit has a numeric code order field associated
+with each code value.  The sort is first by code order
+numerically, then by code value lexicographically.
+
+The code order field can be specified at data entry time.
+If the order field is not specified and the code value
+is numeric then that numeric value is used as the
+code order value.  This keeps numeric code values
+sorted numerically by default.
+
+
+<h4>Deprecated Codes</h4>
+
+Sometimes codified choices go out of date and are
+no longer available for user selection.  Simply
+removing an obsolete code from the code set creates a
+problem when it comes time to display the code
+descriptions for obsolete code values which are still
+in the database.
+
+<p>
+The solution is to mark obsolete codes as deprecated
+without removing them from the code set.
+This leaves the obsolete code descriptions
+in the code set for display purposes, but does
+not allow new data entry selection of deprecated
+code choices.  CodeKit fully supports deprecated codes.
+
+
+<h4>Phrase and Paragraph User Interface Text</h4>
+
+If you have a web site or user interface which needs
+to display pieces of text CodeKit can help with the
+storage and retrieval of phrases and paragraphs.
+
+<p>
+One approach is to create a code set called 'phrase'
+and another called 'paragraph'.  The phase set
+is used for one line words and phrases.
+The paragraph set can hold multiline paragraphs
+or pages of text.  Check the 'Multiline Set' box
+when creating the paragraph set.
+
+<p>
+For software modularity it helps to use code values which
+are a combination of the module using the phrase
+or paragraph and a short name such as 'member-accepted'
+and 'credit-disclaimer'.  That way you will know
+exactly which modules will be affected by a change
+in phrasing.  Some phrases may be so universal as
+to be invariant, so those can be shared between
+modules as in 'shared-hello'.
+
+
+<h4>Parameter Sets</h4>
+
+It is often a good idea to keep any application parameters
+separate from the application code so that they can
+be changed without source code changes.  Parameter
+sets are a excellent way to accomplish this.
+Use the data() method to get the data.
+
+
+<p>
+<div align="right">
+[<a href="ck_update.html">Code Table Updates</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_faq.html">Requirements and FAQ</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

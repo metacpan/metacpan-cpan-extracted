@@ -1,0 +1,112 @@
+#
+#  Revision history for Digest::SipHash
+#
+#
+$Revision: 0.20 $ $Date: 2016/03/04 13:09:00 $
+  Address RT#112693: siphash32 leaks
+  https://rt.cpan.org/Public/Bug/Display.html?id=112693
+
+0.19 2013/03/05 09:08:12
+! csiphash.c
+  if __BYTE_ORDER__ is not predefined (like FreeBSD), use arch
+
+0.18 2013/03/05 06:52:11
+! t/0?-*.t
+  More compatible with older perls
+! SipHash.xs lib/Digest/SipHash.pm
+  No more unpack()ing -- directly passes UV
+! csiphash.c
+  Stricter little-endian checking.
+  The previous version falsely reported PowerBook G4 is little-endian :-(
+
+0.17 2013/03/02 03:15:44
+! csiphash.c
+  Reverted _le64toh to that of 0.12 - more portable than <endian.h> detection.
+
+0.16 2013/02/28 03:18:03
+! lib/Digest/SipHash.pm lib/Digest/SipHash/PP.pm
+  Addressed: use constant { ... } causing 'Odd number of elements
+  in anonymous hash' errors on some platforms.
+
+0.15 2013/02/27 04:05:09
+! csiphash.c
+  Fixed *BSD* lines that were corrupt
+
+0.14 2013/02/26 04:24:09
+! lib/Digest/SipHash.pm lib/Digest/SipHash/PP.pm
+  64bit support detection no longer relies on Config.pm.
+  (the logic used in Data::MessagePack::PP)
+! csiphash.c
+  Fixed macros that was causing OpenBSD builds to fail.
+
+0.13 2013/02/24 05:51:56
+! SipHash.xs
+  removed unnneeded le64toh()
+! csiphash.c
+  New one pulled from https://github.com/majek/csiphash
+
+0.12 2013/02/19 01:38:07
+! csiphash.c
+  s/le646oh/le64toh/ ; /* shi6! */
+  (un)?fortunately this bug is very unlikely to surface.
+  Your system must be big-endian AND lacks __builtin_bswap64().
+
+0.11 2013/02/18 23:17:48
+! csiphash.c
+  le64toh() is now more portable.
+  Thank Thomas Eckardt for reporting 0.10 was incompatble w/ Windows
+  because of that
+
+0.10 2013/02/18 10:43:55
+! lib/Digest/SipHash/PP.pm
+  instead of $mbi->numify(), 0 + $mbi is used to retrive UV.
+  The former does not work reliabily on older perl.
+  Thank you, travis!
+
+0.09 2013/02/18 10:20:52
++ lib/Digest/SipHash/PP.pm t/02-PP.t
+  Pure-Perl Implementation!
+! lib/Digest/SipHash.pm
+  POD fixes.
+
+0.08 2013/02/17 15:07:36
+! lib/Digest/SipHash.pm t/01-SipHash.t
+  + Added siphash32 to @EXPORT_OK
+  + Added :all to @EXPORT_TAG
+
+0.07 2013/02/17 14:48:20
+! SipHash.xs lib/Digest/SipHash.pm
+  + added siphash32(), just an alias of siphash().
+  ! s/key/seed/g
+    # so less confusing from perl's point of view
+
+0.06 2013/02/17 14:03:18
+! lib/Digest/SipHash.pm t/01-SipHash.t
+  Fixed: siphash() in scalar context
+
+0.05 2013/02/17 13:34:32
+! lib/Digest/SipHash.pm
+  POD fixes.  Functionally identical to the previous version
+
+0.04 2013/02/17 13:23:00
+! SipHash.xs lib/Digest/SipHash.pm t/01-SipHash.t
+  ! siphash() now always returns lower 32-bit first so
+  Hash::Util::hash_value($str)
+    == Digest::SipHash::siphash($str, Hash::Util::hash_seed());
+  always holds true.
+  + siphash64() added for 64-bit platforms
+
+0.03 2013/02/17 10:30:45
+! SipHash.xs lib/Digest/SipHash.pm t/01-SipHash.t
+  Supports 64-bit int if perl supports that.
+
+0.02 2013/02/17 08:30:18
+! t/01-SipHash.t
+  Checks the bug below.
+! lib/Digest/SipHash.pm
+  # forgot the following. oops.
+  use base 'Exporter'; 
+
+0.01 2013/02/17 07:53:54
++ *
+  First Release

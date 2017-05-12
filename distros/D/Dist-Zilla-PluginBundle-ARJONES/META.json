@@ -1,0 +1,99 @@
+{
+   "abstract" : "L<Dist::Zilla> plugins for ARJONES",
+   "author" : [
+      "Andrew Jones <andrew@arjones.co.uk>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-PluginBundle-ARJONES",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Kwalitee" : "1.12",
+            "Test::More" : "0",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "version" : "0.9901"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "2.100922",
+            "Dist::Zilla::App::Command::cover" : "0",
+            "Dist::Zilla::App::Command::perltidy" : "0",
+            "Dist::Zilla::Plugin::Clean" : "0",
+            "Dist::Zilla::Plugin::ContributorsFromGit" : "0",
+            "Dist::Zilla::Plugin::GithubMeta" : "0",
+            "Dist::Zilla::Plugin::NoSmartCommentsTests" : "0",
+            "Dist::Zilla::Plugin::NoTabsTests" : "0",
+            "Dist::Zilla::Plugin::PodWeaver" : "0",
+            "Dist::Zilla::Plugin::ReportVersions::Tiny" : "0",
+            "Dist::Zilla::Plugin::Test::ChangesHasContent" : "0",
+            "Dist::Zilla::Plugin::Test::Compile" : "0",
+            "Dist::Zilla::Plugin::Test::Kwalitee" : "0",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "0",
+            "Dist::Zilla::Plugin::Test::Pod::No404s" : "0",
+            "Dist::Zilla::Plugin::Test::Portability" : "0",
+            "Dist::Zilla::PluginBundle::Basic" : "0",
+            "Dist::Zilla::PluginBundle::Git" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Moose" : "0",
+            "Moose::Autobox" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Elemental::Transformer::List" : "0",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Pod::Weaver::Section::Contributors" : "0.001",
+            "Test::NoSmartComments" : "0",
+            "Test::NoTabs" : "1.3",
+            "Test::Perl::Critic" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/andrewrjones/perl5-Dist-Zilla-PluginBundle-ARJONES/issues"
+      },
+      "homepage" : "https://github.com/andrewrjones/perl5-Dist-Zilla-PluginBundle-ARJONES",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/andrewrjones/perl5-Dist-Zilla-PluginBundle-ARJONES.git",
+         "web" : "https://github.com/andrewrjones/perl5-Dist-Zilla-PluginBundle-ARJONES"
+      }
+   },
+   "version" : "1.133200",
+   "x_contributors" : [
+      "Andrew Jones <andrew.jones@arm.com>",
+      "Andrew Jones <andrew@andrew-jones.com>",
+      "Andrew Jones <andrewjones86@googlemail.com>",
+      "Sergey Romanov <complefor@rambler.ru>",
+      "andrewrjones <andrewjones86@googlemail.com>"
+   ]
+}
+

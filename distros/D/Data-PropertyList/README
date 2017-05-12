@@ -1,0 +1,29 @@
+# Data::PropertyList -- 1998.1217
+
+Name            DSLI  Description
+--------------  ----  ---------------------------------------------
+Data::
+::PropertyList  adpf  Convert arbitrary objects to/from strings
+
+Data::Propertylist provides functions that turn data structures with nested references into NeXT's Property List text format and back again. You may find this useful for saving and loading application information in text files, or perhaps for generating error messages while debugging.
+
+For example, here is a PropertyList representation of hash with two key-value pairs, one refering to a hash and one refering to an array:
+  Viewer = (
+    NSBrowserColumnWidth,
+    "NSWindow Frame Preferences",
+    "5 197 395 309 ",
+  );
+  Workspace = {
+    SelectedTabIndex = 0; 
+    WindowOrigin = "-75.000000"; 
+  };
+
+This release of Data::PropertyList is intended for public review and feedback. It has been tested in several environments and used in commercial production, but it should be considered "alpha" pending that feedback and fixes for some of the known bugs.
+
+To install this package, download and unpack the distribution archive from
+http://www.evoscript.com/dist/ or your favorite CPAN mirror, and execute
+the standard "perl Makefile.PL", "make test", "make install" sequence.
+
+---
+Copyright 1996, 1997, 1998 Evolution Online Systems, Inc.
+You may use this package for free under the terms of the Artistic License.

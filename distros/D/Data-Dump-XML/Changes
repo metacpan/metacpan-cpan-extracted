@@ -1,0 +1,58 @@
+2010-05-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.19
+
+	feature: using TO_XML method when available
+	no more dependency on scalar::util
+
+
+2010-05-15	Ivan Baktsheev <dot.and.thing@gmail.com>
+	
+	Release 1.18
+	
+	fixed issue with parsing xml like <a><b/><c @d="e"/></a>
+
+2009-06-08	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.17
+
+	Fixed thread unsafety bug
+	
+	Fixed issue with localized version in XS
+	
+	Now benchmark contains also tests for 
+		Storable (52x dump / 83x parse faster than Data::Dump::XML) and
+		JSON::XS (35x dump / 72x parse faster)
+
+2009-06-07	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.16
+
+	Resolved various old bugs
+	
+	Parser cleanup
+	
+	Added benchmark
+
+
+2009-06-07	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.15
+
+	More speed improvements (XS)
+	
+
+2009-06-06	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.12
+
+	Speed improvements
+	
+	Code Cleanup
+
+
+2009-06-04	Ivan Baktsheev <dot.and.thing@gmail.com>
+
+	Release 1.11
+
+	Initial CPAN revision

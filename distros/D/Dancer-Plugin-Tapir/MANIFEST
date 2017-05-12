@@ -1,0 +1,16 @@
+Build.PL
+Changes
+lib/Dancer/Plugin/Tapir.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/001_setup.t
+t/002_setup_args.t
+t/003_handler.t
+t/004_docs.t
+t/thrift/bad.thrift
+t/thrift/example.thrift
+t/thrift/invalid.thrift
+SIGNATURE    Added here by Module::Build

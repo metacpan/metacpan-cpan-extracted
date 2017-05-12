@@ -1,0 +1,27 @@
+---
+abstract: 'Determine Austrian holidays'
+author:
+  - 'Matthias Dietrich <perl@rainboxx.de>'
+build_requires:
+  Date::Calc: '5.0'
+  Test::More: '0'
+  version: '0'
+configure_requires:
+  Module::Build: '0.36'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.4202, CPAN::Meta::Converter version 2.141170'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Holidays-AT
+provides:
+  Date::Holidays::AT:
+    file: lib/Date/Holidays/AT.pm
+    version: v0.1.4
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Holidays-AT
+  homepage: http://github.com/rainboxx/Date-Holidays-AT/
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rainboxx/Date-Holidays-AT.git
+version: v0.1.4

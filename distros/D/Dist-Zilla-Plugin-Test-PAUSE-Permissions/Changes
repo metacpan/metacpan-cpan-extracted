@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Plugin-Test-PAUSE-Permissions
+
+0.003     2016-02-25 21:33:16Z
+          - misc tooling and documentation tweaks
+
+0.002     2014-11-22 20:17:39Z
+          - skip running test when perl is older than 5.10,
+            where PAUSE::Permissions does not install
+
+0.001     2014-04-08 03:31:06Z
+          - Initial release.

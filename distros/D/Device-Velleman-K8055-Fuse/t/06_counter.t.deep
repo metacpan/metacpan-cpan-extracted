@@ -1,0 +1,63 @@
+use Test::More tests => 8;
+use Device::Velleman::K8055::Fuse;
+use Data::Dumper;
+use Time::HiRes qw( usleep );
+
+open FILE, "< t/pathToDevice.txt" || die "Unable to open file!$!";
+my $pathToDevice = <FILE>;
+close FILE;
+my $dev = Device::Velleman::K8055::Fuse->new(
+    'pathToDevice' => $pathToDevice,
+    'debug'        => 1
+) || die "Failed to get an object $!";
+
+#<lear the digital signals so we dont have any on states
+#when starting the test.
+$dev->ClearAllDigital();
+$dev->ClearAllDigital();
+$dev->ClearAllDigital();
+$dev->ClearAllDigital();
+$dev->ClearAllDigital();
+$dev->ClearAllDigital();
+
+#reset the counters
+ok( $dev->ResetCounter(1) == 0, '1 Reset counter 1' );
+ok( $dev->ResetCounter(2) == 0, '1 Reset counter 2' );
+
+#test debounce time settings
+ok(
+    $dev->SetCounterDebounceTime( 1, 10 ) == 10,
+    '2 set counter 1 debounce time to 10 ms'
+);
+ok(
+    $dev->SetCounterDebounceTime( 2, 100 ) == 100,
+    '2 set counter 2 debounce time to 100 ms'
+);
+
+#Read the counters
+ok( $dev->ReadCounter(1) == 0, '3 counter 1' );
+ok( $dev->ReadCounter(2) == 0, '3 counter 2' );
+
+print "starting...\n";
+
+#create a square wave of increasing wave length
+for my $dt ( 0 .. 15 ) {
+
+    my $t = 10000 * $dt;
+    $dev->SetDigitalChannel(1);
+    $dev->SetDigitalChannel(2);
+    usleep $t;
+
+    $dev->ClearDigitalChannel(1);
+    $dev->ClearDigitalChannel(2);
+
+    sleep 2;
+    print "------\nperiod:", $t / 1000000, " s\n";
+    print "C1: ", $dev->ReadCounter(1), "\n";
+    print "C2: ", $dev->ReadCounter(2), "\n";
+
+}
+
+ok( $dev->ReadCounter(1) == 4, 'Check counter 1' );
+ok( $dev->ReadCounter(2) == 5, 'Check counter 2' );
+

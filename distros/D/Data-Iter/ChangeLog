@@ -1,0 +1,20 @@
+Revision history for Perl extension Data::Iter.
+
+0.01  Sun Apr  4 08:01:47 2004
+	- original version; created by h2xs 1.23 with options
+		-n Data::Iter -X
+
+0.02	
+	(muenelan) Refactored a lot.
+	- No more global variables like @result, last_counter (reasons for known bugs with get, getvalue).
+	- deprecated getvalue (use $i->get(..)->value instead)
+	- New: GETNEXT points to the next iterator
+	- changed value() and key() functions bug: because if $_[0] was not true when and <undef> was set, changed it to 'if @_';
+
+0.01.10
+	(muenalan) 
+	- added exportable transform_array_to_hash() function
+0.01.11
+	(muenalan)
+	- fixed bug in Data::Iter::Sort function (was using cref for sort instead of functions names)
+	

@@ -1,0 +1,25 @@
+# Changes for DBIx-Shortcuts
+
+0.007 Fri Jan 29 18:26:43 UTC 2010
+     * Add support for find by unique key
+
+0.006 Wed Jan 27 16:17:34 UTC 2010
+     * Use shortcut => undef to disable shortcut creation
+
+0.005 Mon Jan 25 16:55:40 UTC 2010
+     * Added option to create a set of shortcut methods for
+       DBIx::Class::Schema
+     * set DBIC_NO_VERSION_CHECK to true before calling connect(),
+       disable DBIx::Class::Versioned warnings
+
+0.004 Sat Jan 23 11:22:20 UTC 2010
+     * Skip 10-api.t if we don't have a SQL::Translator installed
+
+0.003 Wed 20 Jan 2010 20:58:36 UTC
+     * Skip 05-shortcuts.t if we don't have a SQL::Translator installed
+
+0.002 Ter 19 Jan 2010 07:45:32 UTC
+     * Added missing dependency on parent: older parents don't have it
+
+0.001 Mon Jan 18 12:00:20 UTC 2010
+     * Initial revision

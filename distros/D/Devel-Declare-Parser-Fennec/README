@@ -1,0 +1,48 @@
+NAME
+    Devel::Declare::Parser::Fennec - The parser for Fennec syntax.
+
+FENNEC PROJECT
+    This module is part of the Fennec project. See Fennec for more details.
+    Fennec is a project to develop an extendable and powerful testing
+    framework. Together the tools that make up the Fennec framework provide
+    a potent testing environment.
+
+    The tools provided by Fennec are also useful on their own. Sometimes a
+    tool created for Fennec is useful outside the greator framework. Such
+    tools are turned into their own projects. This is one such project.
+
+    Fennec - The core framework
+      The primary Fennec project that ties them all together.
+
+SYNTAX PROVIDED
+    This parser provides fennec like syntax. This means a keyword, optional
+    name, coderef and options.
+
+    Examples:
+
+        # These automatically give you $self
+        keyword name { ... }
+        keyword 'string name' { ... }
+        keyword name ( KEY => 'VALUE' ) { ... }
+
+        # These do not automatically give you $self
+        # These are not effected by the parser.
+        keyword name => sub { ... };
+        keyword name => (
+            method => sub { ... },
+            ...
+        );
+
+AUTHORS
+    Chad Granum exodist7@gmail.com
+
+COPYRIGHT
+    Copyright (C) 2010 Chad Granum
+
+    Devel-Declare-Parser-Fennec is free software; Standard perl licence.
+
+    Devel-Declare-Parser-Fennec is distributed in the hope that it will be
+    useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the license for
+    more details.
+

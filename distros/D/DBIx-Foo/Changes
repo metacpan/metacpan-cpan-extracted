@@ -1,0 +1,11 @@
+
+2013-02-22
+   - Release 0.02
+   - Added missing test_requires DBD:SQLite
+
+2013-02-20
+   - Release 0.02
+   - Added missing dependency Tie::IxHash
+
+2013-02-19
+   - Initial release

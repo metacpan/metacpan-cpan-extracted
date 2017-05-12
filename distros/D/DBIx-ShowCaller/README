@@ -1,0 +1,11 @@
+
+		--------------------------------
+			DBIx::ShowCaller
+		--------------------------------
+
+This module, when used instead of the DBI module, will prefix
+each SQL command with a comment with an info about the Perl file
+and line that issued the prepare, do or selectall_* call.
+
+The module includes a man page with more info.
+

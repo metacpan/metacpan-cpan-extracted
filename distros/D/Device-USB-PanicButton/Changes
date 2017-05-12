@@ -1,0 +1,16 @@
+Revision history for Perl extension Device::USB::PanicButton.
+
+0.04  Mon Jul 23 08:18:03 2008
+        add install instruction for debian etch in README
+
+0.03  Mon Jul 21 22:19:05 2008
+        update documentation
+
+0.02  Mon Jul 21 14:08:00 2008
+        update example code in perldoc
+
+0.01  Mon Jul 21 00:38:44 2008
+	first public version
+	- original version; created by h2xs 1.23 with options
+		-AX Device::USB::PanicButton
+

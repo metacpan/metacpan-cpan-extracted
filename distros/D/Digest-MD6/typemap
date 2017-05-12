@@ -1,0 +1,5 @@
+md6_state*	T_md6_state
+
+INPUT
+T_md6_state
+	$var = get_md6_ctx(aTHX_ $arg)

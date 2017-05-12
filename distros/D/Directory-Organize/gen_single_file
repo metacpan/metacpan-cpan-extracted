@@ -1,0 +1,40 @@
+#!/usr/bin/perl -w
+# vim: set ts=4 sw=4 tw=78 et si:
+#
+use strict;
+
+while (<>) {
+    if (/^use /) {
+        chomp;
+        print slurp_pm(split(" ",$_,3));
+        next;
+    }
+    print;
+}
+
+sub slurp_pm {
+    my ($use, $pm,@rest) = @_;
+    $pm =~ s|::|/|g;
+    $pm =~ s/;//;
+    my $pmfile = "lib/${pm}.pm";
+    if (open my $PKG, '<', $pmfile) {
+        my $lib = "";
+        while (<$PKG>) {
+            unless ($lib) {
+                if (/^package/) {
+                    $lib .= $_;
+                }
+                next;
+            }
+            next if (/^\s*#/);      # remove comments
+            last if (/^__END__/);
+            $lib .= $_;
+        }
+        close $PKG;
+        $lib .= "package main;\n";
+        return $lib;
+    }
+    else {
+        return join(" ",@_,"\n");
+    }
+} # slurp_pm()

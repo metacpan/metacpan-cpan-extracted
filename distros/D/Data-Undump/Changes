@@ -1,0 +1,58 @@
+Revision history for Perl extension Data::Undump.
+
+0.15 Wed Aug 28 2013
+    - Add support for perl-style comments in the input
+
+0.14 Sun Aug 12 2012
+    - Really fix up issues parsing large numbers
+      (apparently I modified the .c file and not the
+       .xs file, which was then not committed or included
+       in the 0.13 dist - which I knew would be broken
+       somehow.)
+
+0.13 Sun Aug 12 2012
+    - Make it illegal to try to undump duplicate keys
+    - fix up issues parsing large numbers
+
+0.12 Sun Aug 12 2012
+    - Performance improvements. Handle scalar refs.
+
+0.11 Thu Aug  9 2012
+    - v0.10 seems to have lost the octal fix from 0.09
+
+0.10 Thu Aug  9 2012
+    - Rebase of v0.09. Sigh
+
+0.09 Thu Aug  9 2012
+    - Fix octal and speedup strings.
+
+0.08 Mon Jul 30 2012
+    - Fixup 0.07 and 0.06 by adding missing test file.
+      for some reason this test does not fail on all perls.
+      But it does fail on some.
+
+0.07 Mon Jul 30 2012
+    - Silence a warning in 0.06
+
+0.06 Mon Jul 30 2012
+    - Fixed problem with corrupt unicode strings
+
+0.05 Sat June 9 2012
+    - Fixed memory leak
+    - Reordered Changes
+
+0.04 Mon May 21
+    - Added the corpus file to the MANIFEST that was missing in 0.03
+
+0.02 Fri May 18 15:41:56 2012 +0200
+    - Do not require 5.8.8 (and changes to make it pass tests)
+
+0.03 Sun May 20 21:40
+    - Various test improvements - add a large corpus of test dumps
+    - Rework how internal state is stored and passed around so that
+      it is easier to break out functionality into subs, and add or
+      modify what needs to be passed up and down the stack.
+
+0.01  Wed May 16 00:05:34 2012
+    - original version; created by h2xs 1.23 with options
+            -A -n Data::Undump

@@ -1,0 +1,56 @@
+Revision history for Perl extension Date::Discordian.
+
+0.01  Prickle Prickle (Zaraday), Bureaucracy 5 YOLD 3166, 10:37pm
+	- original version; created by h2xs 1.19
+
+1.00  Prickle Prickle (Zaraday), Bureaucracy 5 YOLD 3166, 11:00pm
+	- Initial release to CPAN
+
+1.01  Setting Orange, Bureaucracy 6 YOLD 3166, 12:10am
+	- Decided that returning an array made no sense at all.
+	- Added leap year checking
+
+1.02  Sweetmorn, Bureaucracy 7 YOLD 3166, 10:50pm
+	- Matt added the Holyday handling
+	- Made time the default argument
+	- Additional documentation
+
+1.03  Sweetmorn, Bureaucracy 7 YOLD 3166, 11:28pm
+	- Updated documentation a little
+
+1.04  Boomtime, Bureaucracy 48 YOLD 3166, 12:02am
+     - Added inverse_discordian function
+
+1.26  Pungenday, Confusion 57 YOLD 3167, 22:15:48
+    - It seemed important to give this a new, entirely meaningless
+      version number. 1.26 Seems like a good one. Law of fives: 1 - 2
+      + 6 = 5. 
+    - Added much more thorough testing.
+    - Moved to Date::Leapyear for the leapyear calculations. This
+      increases the Eristic factor of this code, since its
+      dependencies are now spread over more modules. Look out for
+      Date::Calc in the next version.
+    - I would put more quotes from the principia in the code and in
+      the documentation, but (and I know this is a heresy) I don't
+      have a copy with me, and I am temporarily unconnected from that
+      source of all Chaos, the Internet.
+    - But mostly, there's no good reason for this release, except that
+      I'm trying to put off doing real work.
+
+1.34  Pungenday, Aftermath 36 YOLD 3167
+    - There were actually several releases today, but they all had
+      essentially the same purpose. We can now get discordian dates for
+      dates outside of the Unix epoch. This is very big stuff, as
+      everyone needs to know that the Battle of Hastings was on Setting
+      Orange (Mungoday), Chaos 5 YOLD 2232.
+    - There were also some bug fixes - mostly fencepost sorts of things
+      (boundaries between seasons, boundaries between years), and some
+      other odd things related to bugs in Date::ICal (q.v.) - mostly
+      pointed out by Jean Forget <J-FORGET@wanadoo.fr>, the author of
+      Date::Convert::French_Rev. Thanks, Jean.
+    - Note that this version requires the latest Date::ICal. There are
+      some strange problems with earlier Date::ICal's, including an
+      inability to deal with Decembers any time in the 17th or 18th
+      century. Seems like the hand of Eris was in that one.
+
+

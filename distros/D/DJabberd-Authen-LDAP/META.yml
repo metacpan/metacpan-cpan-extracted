@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                DJabberd-Authen-LDAP
+version:             0.04
+abstract:            An LDAP authentication module for DJabberd
+license:             ~
+author:              
+    - Edward Rudd <urkle@outoforder.cc>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    DJabberd:                      0.83
+    Net::LDAP:                     0.34
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

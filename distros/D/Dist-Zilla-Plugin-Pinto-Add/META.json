@@ -1,0 +1,97 @@
+{
+   "abstract" : "Ship your dist to a Pinto repository",
+   "author" : [
+      "Jeffrey Ryan Thalhammer <jeff@stratopan.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.008, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-Pinto-Add",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Module::Build" : "0.4005"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "File::Which" : "0",
+            "Module::Build" : "0.4005"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::BeforeRelease" : "0",
+            "Dist::Zilla::Role::Releaser" : "0",
+            "File::Which" : "0",
+            "IPC::Run" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Moose" : "0",
+            "perl" : "5.006",
+            "version" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "0",
+            "CPAN::Meta::Requirements" : "0"
+         },
+         "requires" : {
+            "Dist::Zilla::Tester" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Path" : "0",
+            "File::Spec::Functions" : "0",
+            "File::Temp" : "0",
+            "List::Util" : "0",
+            "Test::DZil" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0.96",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::Pinto::Add" : {
+         "file" : "lib/Dist/Zilla/Plugin/Pinto/Add.pm",
+         "version" : "0.088"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/thaljef/Dist-Zilla-Plugin-Pinto-Add/issues"
+      },
+      "homepage" : "https://metacpan.org/module/Dist-Zilla-Plugin-Pinto-Add",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/thaljef/Dist-Zilla-Plugin-Pinto-Add.git",
+         "web" : "https://github.com/thaljef/Dist-Zilla-Plugin-Pinto-Add"
+      }
+   },
+   "version" : "0.088"
+}
+

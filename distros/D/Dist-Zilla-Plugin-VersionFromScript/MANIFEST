@@ -1,0 +1,11 @@
+Changes
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+bin/git-logs2version.pl
+bin/svnversion.pl
+dist.ini
+lib/Dist/Zilla/Plugin/VersionFromScript.pm
+t/001-VersionFromScript.t

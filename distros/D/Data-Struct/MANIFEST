@@ -1,0 +1,9 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Data/Struct.pm
+t/00-load.t
+t/10-basic.t
+t/80-exc.t
+META.yml                                 Module meta-data (added by MakeMaker)

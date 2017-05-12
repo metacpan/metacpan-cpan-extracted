@@ -1,0 +1,5 @@
+Revision history for Dancer::Plugin::Apache::Solr
+
+0.001   2015-07-27
+        First Release to CPAN
+        Adapted from v0.2100 of Dancer::Plugin::DBIC

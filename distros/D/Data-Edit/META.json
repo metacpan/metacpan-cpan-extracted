@@ -1,0 +1,50 @@
+{
+   "abstract" : "Perl wrapper around your text editor",
+   "author" : [
+      "Dave Lambley <davel@state51.co.uk>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Edit",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {}
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Cwd" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "Moose" : "0",
+            "MooseX::Types::Moose" : "0",
+            "Try::Tiny" : "0",
+            "YAML::Any" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "url" : "http://github.com/davel/Data-Edit"
+      }
+   },
+   "version" : "0.02"
+}

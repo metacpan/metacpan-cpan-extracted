@@ -1,0 +1,7 @@
+<specification>
+<form name="registration" link="name">
+<field name="email"/>
+<field name="password"/>
+<field name="verify"/>
+</form>
+</specification>

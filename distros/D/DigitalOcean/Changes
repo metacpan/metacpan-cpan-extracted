@@ -1,0 +1,49 @@
+Revision history for DigitalOcean
+
+0.16    April 13, 2016
+        Removed test.pl so tests won't fail and removed debug messages from _request.
+
+0.15    November 1, 2015
+        Updated to new API without finished documentation or tests
+
+0.14    April 26, 2015
+        Made DigitalOcean::Domain::Record::destroy work
+
+0.13    October 7, 2014
+        skip pod-coverage tests that failed and add pod to module that missed it
+
+0.12    September 23, 2014
+        Removed test.pl
+
+0.11    September 23, 2014
+        Fixed missing MANIFEST file issue
+
+0.10    September 22, 2014
+        Added github links
+
+0.09    March 5, 2014
+        Fixed documentation error in DigitalOcean where ssh_pub_key was ssh_key_pub
+
+0.08    January 26, 2014
+        Fixed documentation error in DigitalOcean::Droplet and DigitalOcean. Updated _decode_many function to use map.
+
+0.07    January 21, 2014
+        Fixed documentation error in DigitalOcean::Droplet
+
+0.06    January 20, 2014
+        Changed MooseX::Types dependency to MouseX::Types
+
+0.05    January 20, 2014
+        added documentation to all modules and add MooseX::Types dependency
+
+0.04    January 10, 2014
+        added tests, added Event object, added wait_on_events and wait_on_event, added new attributes to objects that DO added
+
+0.03    December 5, 2013
+        added Method::Signatures::Simple to preqreqs
+
+0.02    November 1, 2013
+        added Object::Tiny::RW::XS and Object::Tiny::XS to preqreqs
+
+0.01    
+        First version, released on an unsuspecting world. Beta release.

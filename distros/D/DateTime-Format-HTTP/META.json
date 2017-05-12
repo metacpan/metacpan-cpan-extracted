@@ -1,0 +1,43 @@
+{
+   "abstract" : "Date conversion routines",
+   "author" : [
+      "Christiaan Kras <ckras@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.133380",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Format-HTTP",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : "0.17",
+            "HTTP::Date" : "1.44",
+            "Test::More" : "0.47"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Format::HTTP" : {
+         "file" : "lib/DateTime/Format/HTTP.pm",
+         "version" : "0.42"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.42"
+}

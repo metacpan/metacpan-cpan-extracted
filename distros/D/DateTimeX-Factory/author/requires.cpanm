@@ -1,0 +1,16 @@
+# for DateTime-Factory
+# Makefile.PL
+Module::Build
+
+# author's tests
+Test::LoadAllModules
+Test::Pod
+Test::Pod::Coverage
+Test::Spelling
+Test::Perl::Critic
+Test::Synopsis
+
+# Release tools
+ShipIt
+ShipIt::Step::ChangeAllVersions
+CPAN::Uploader

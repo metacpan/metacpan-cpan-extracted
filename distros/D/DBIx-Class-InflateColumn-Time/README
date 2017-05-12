@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DBIx-Class-InflateColumn-Time,
+version 0.0.1:
+
+  Automagically inflates time columns into DateTime::Duration objects
+
+This software is copyright (c) 2013 by Robert Stone.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,23 @@
+libdr-msgpuck-perl (0.04-1) nowtaxi; urgency=medium
+
+  * Add msgpuck_check method.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 22 Sep 2016 15:55:15 +0300
+
+libdr-msgpuck-perl (0.03-1) nowtaxi; urgency=medium
+
+  * Add Str/Num classes to force packing these formats.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 23 Jun 2016 19:38:56 +0300
+
+libdr-msgpuck-perl (0.02-1) nowtaxi; urgency=medium
+
+  * Fix cpan testers tests (long double in tests).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Thu, 23 Jun 2016 18:26:38 +0300
+
+libdr-msgpuck-perl (0.01-1) nowtaxi; urgency=low
+
+  * Initial Release.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Sat, 28 May 2016 11:45:16 +0300

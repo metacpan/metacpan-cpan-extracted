@@ -1,0 +1,49 @@
+---
+abstract: 'Remove gathered prereqs from particular phases'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Spec::Functions: 0
+  File::Temp: 0
+  JSON: 2
+  List::Util: 0
+  Test::DZil: 0
+  Test::More: 0.96
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300030, CPAN::Meta::Converter version 2.120921'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-RemovePhasedPrereqs
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Plugin::RemovePhasedPrereqs:
+    file: lib/Dist/Zilla/Plugin/RemovePhasedPrereqs.pm
+    version: 0.002
+requires:
+  Dist::Zilla::Role::PrereqSource: 0
+  Moose: 0
+  Moose::Autobox: 0
+  MooseX::Types::Moose: 0
+  MooseX::Types::Perl: 0
+  namespace::autoclean: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/dagolden/dist-zilla-plugin-removephasedprereqs/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-RemovePhasedPrereqs
+  repository: git://github.com/dagolden/dist-zilla-plugin-removephasedprereqs.git
+version: 0.002

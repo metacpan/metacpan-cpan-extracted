@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dancer-Plugin-GearmanXS,
+version 0.110570:
+
+  a Dancer Gearman::XS client
+
+This software is copyright (c) 2011 by Marco Fontani.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

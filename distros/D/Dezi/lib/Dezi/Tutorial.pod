@@ -1,0 +1,245 @@
+=pod
+
+=head1 NAME
+
+Dezi::Tutorial - getting started with the Dezi search platform
+
+=head1 Installation
+
+Install the Dezi server from CPAN:
+
+ % cpan -i Dezi
+ 
+Install the Dezi client from CPAN:
+
+ % cpan -i Dezi::Client
+
+=head1 Beginner - Hello World
+
+Start the Dezi server:
+
+ % dezi
+
+In a separate terminal, add a small test document to the index:
+
+ % echo '<doc><title>bar</title>hello world</doc>' > test.xml
+ % dezi-client test.xml
+
+Search the index to confirm your test document worked:
+
+ % dezi-client -q bar
+ 
+=head1 Intermediate - The Dezi Demo
+
+The Intermediate tutorial details the specifics behind the Dezi
+demo available at L<http://dezi.org/demo>.
+
+=head2 Download the Reuters corpus
+
+The Reuters News Corpus for Text Classification (Reuters-21578)
+is a common document corpus used for information retrieval projects.
+Other document collections have become more popular since the
+Reuters corpus first appeared (e.g. Wikipedia database) but
+the Reuters corpus is a nice, medium sized collection for demonstrating
+Dezi.
+
+You can find the corpus many places on the internet. The version
+used for the demo came from L<http://svn.peknet.com/search_bench/>.
+The C<2xml.pl> script at that URL will convert the original SGML
+documents to valid XML and split them into about 21k individual documents.
+
+Unpack the tar.gz file somewhere and run the C<2xml.pl> script as described
+in the script's comments.
+
+=head2 Create a Swish3 configuration file
+
+As described in L<Dezi::Architecture>, Dezi is based on Swish3
+L<http://swish3.dezi.org/>. You can index the Reuters corpus
+with the B<deziapp> command that
+comes with L<Dezi::App> (one of the Dezi dependencies).
+
+First, you'll need a configuration file. Here's the one used
+for the Dezi demo:
+
+ DefaultContents XML*
+ StoreDescription XML* <text> 10000
+ PropertyNameAlias swishtitle title
+ MetaNames dates topics people places orgs author swishdocpath
+ PropertyNames dates topics people places orgs author dateline
+ FuzzyIndexingMode Stemming_en1
+
+Save the file as C<dezi.conf>.
+
+More details on Swish3 configuration can be found
+at L<http://swish-e.org/docs/swish-config.html>.
+
+=head2 Index the XML
+
+If your Reuters docs are in a directory called C<reuters>,
+you can create an index with a command like:
+
+ % deziapp -c dezi.conf -i reuters
+ 
+You can index all kinds of document types, not just XML, but for
+the purposes of this tutorial, we'll keep it simple.
+
+=head2 Create a Dezi configuration file
+
+Here's the contents of the demo config file, named C<dezi.config.pl>:
+
+ {
+    engine_config => {
+        facets => { 
+            names => [qw( topics people places orgs author )] 
+        },
+    },
+    ui_class    => 'Dezi::UI',
+    base_uri    => 'http://dezi.org/demo',
+    username    => 'deziuser',
+    password    => 'a-secret',
+ }
+
+B<NOTE> that the username/password is there to prevent unwanted
+modification of the index. Since Dezi supports POST, PUT and DELETE
+HTTP actions on an index, it's a good idea to protect an index,
+particularly if it is on the open internet.
+
+B<NOTE> too the C<Dezi::UI> class is enabled. That requires a separate
+installation from CPAN.
+
+ % cpan -i Dezi::UI
+
+=head2 Start the Dezi server
+ 
+ % dezi --dezi-config dezi.config.pl
+
+From a separate terminal, you can search the index containing text from the Reuters
+corpus:
+
+ % dezi-client -q 'some words'
+
+Thanks to the Dezi::UI module, you can also search via a web browser. Assuming
+you are running the demo on a local machine, you can point your browser at
+L<http://localhost:5000/ui> and explore the index contents graphically.
+
+=head1 Advanced - Roll Your Own
+
+=head2 Write your own client application
+
+ % cat indexer.pl
+
+ #!/usr/bin/env perl
+ use strict;
+ use warnings;
+ 
+ use Dezi::Client;
+ use File::Find;
+ 
+ my $client = Dezi::Client->new( 
+    server => 'http://localhost:5000' 
+ );
+ 
+ find({ 
+    wanted      => \&add_to_index, 
+    follow      => 1, 
+    no_chdir    => 1,
+ }, @ARGV);
+ 
+ my $resp = $client->commit();
+
+ print $resp->content;
+
+ sub add_to_index {
+    my $file = $File::Find::name;
+    
+    # we only want .xml files
+    return unless $file =~ m/\.xml$/;
+    
+    my $resp = $client->index($file);
+    if (!$resp->is_success) {
+        die "Failed to index $file: " . $resp->status_line;
+    }
+ }
+
+=head2 Start your Dezi server
+
+ % dezi 
+
+=head2 Run your indexer
+
+In a separate terminal:
+
+ % perl indexer.pl path/to/xml/docs
+
+=head2 Search with dezi-client
+
+After you're done indexing, look for something:
+
+ % dezi-client -q foo
+
+=head1 AUTHOR
+
+Peter Karman, C<< <karman at cpan.org> >>
+
+=head1 BUGS
+
+Please report any bugs or feature requests to C<bug-dezi at rt.cpan.org>, or through
+the web interface at L<http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dezi>.  I will be notified, and then you'll
+automatically be notified of progress on your bug as I make changes.
+
+=head1 SUPPORT
+
+You can find this documentation with the perldoc command.
+
+    perldoc Dezi::Tutorial
+
+You can also look for information at:
+
+=over 4
+
+=item * Website
+
+L<http://dezi.org/>
+
+=item * IRC
+
+#dezisearch at freenode
+
+=item * Mailing list
+
+L<https://groups.google.com/forum/#!forum/dezi-search>
+
+=item * RT: CPAN's request tracker
+
+L<http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dezi>
+
+=item * AnnoCPAN: Annotated CPAN documentation
+
+L<http://annocpan.org/dist/Dezi>
+
+=item * CPAN Ratings
+
+L<http://cpanratings.perl.org/d/Dezi>
+
+=item * Search CPAN
+
+L<http://search.cpan.org/dist/Dezi/>
+
+=back
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2011 Peter Karman.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+
+=head1 SEE ALSO
+
+L<Dezi::Client>, L<Search::OpenSearch>, L<SWISH::3>, L<Dezi::App>,
+L<Plack>, L<Lucy>
+
+=cut

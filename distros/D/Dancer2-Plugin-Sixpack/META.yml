@@ -1,0 +1,38 @@
+---
+abstract: "Dancer2's plugin for WWW::Sixpack"
+author:
+  - 'Menno Blom, C<< <blom at cpan.org> >>'
+build_requires:
+  Dancer2::Test: '0'
+  Plack::Test: '0'
+  Test::LWP::UserAgent: '0'
+  Test::More: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, Dist::Milla version v1.0.15, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Sixpack
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Dancer2: '0'
+  WWW::Sixpack: '0.02'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/b10m/p5-Dancer2-Plugin-Sixpack/issues
+  homepage: https://github.com/b10m/p5-Dancer2-Plugin-Sixpack
+  repository: https://github.com/b10m/p5-Dancer2-Plugin-Sixpack.git
+version: '0.03'
+x_contributors:
+  - 'B10m <menno@b10m.net>'
+  - 'Menno Blom <menno.blom@booking.com>'

@@ -1,0 +1,9 @@
+Revision history for Perl extension Dispatcher-Small
+
+0.02 2013-09-26T06:40:35Z
+    - change api to PSGI-env from path-string
+
+0.01 2013-09-23T14:22:49Z
+
+    - original version
+

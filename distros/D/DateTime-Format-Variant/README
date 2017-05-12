@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution DateTime-Format-Variant,
+version 0.2:
+
+  convert Win32::OLE::Variant to DateTime object and vice versa.
+
+This software is copyright (c) 2012 by xiaoyafeng.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

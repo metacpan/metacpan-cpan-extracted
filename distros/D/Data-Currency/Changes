@@ -1,0 +1,33 @@
+Revision history for Data::Currency
+
+0.06000 Sun Jul 14 15:00:00 2013
+    - Three way comparison string
+    - Treat undef as 0 on arithmetic operations
+
+0.05001 Sun Jul 14 15:00:00 2013
+    - Corrected POD
+
+0.05 Sun Jul 14 15:00:00 2013
+    - Mathematical Operation overloads
+    - Changed prereq back to 5.6.1
+
+0.04002 Fri May 04 21:43:14 2007
+    - Upgraded to Module::Install 0.65
+
+0.04001 Fri May 04 19:02:26 2007
+    - Finishing out the brainwashing. No code changes.
+
+0.04000 Thur May 03 20:37:54 2007
+    - Converted to Module::Install for no good reason. Everyone's doing it.
+    - Changed version to 0.xxyyy to make things like FBSD port versions happier.
+        (and because everyone's doing it)
+
+0.03 Mon Mar 05 18:54:25 2007
+    - Added workaround for name returning Candian in older Locale::Currency
+    - Imports Locale::Currency::Format constants so eval on strings is happy
+
+0.02 Sun Feb 11 15:37:50 2007
+    - Fixed test skip count when Test::MockObject isn't installed
+
+0.01
+    - First version, released on an unsuspecting world.

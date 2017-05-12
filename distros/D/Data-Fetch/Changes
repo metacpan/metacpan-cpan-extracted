@@ -1,0 +1,25 @@
+Revision history for Data::Fetch
+
+0.05	Wed Nov 23 17:28:06 EST 2016
+	Go back to using threads
+	Return value even when not primed
+
+0.04	Tue, 15 Nov 2016 18:42:11 GMT
+	Improved handling of routines that return undef
+	Ensure different values of prefix don't trash each other
+
+0.03	Tue Nov 15 10:17:45 EST 2016
+	Fix values call in DESTROY
+	Correctly pass arg to thread
+	Use Coro instead of threads
+		this is temporary since Coro only works on <= 5.20 -
+		need to fix threads usage
+
+0.02	Mon Nov 14 22:16:47 EST 2016
+	Specify minimum version of Perl for good thread support
+	Allow an argument to be passed to the message
+	Tidy up fetch() without get() to avoid thread leaks
+	Correct argument call to thread->create
+
+0.01	Mon Nov 14 14:29:08 EST 2016
+        First draft

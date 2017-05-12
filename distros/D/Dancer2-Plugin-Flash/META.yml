@@ -1,0 +1,30 @@
+---
+abstract: 'flash message for Dancer2'
+author:
+  - 'Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>'
+build_requires:
+  HTTP::Request::Common: '0'
+  Plack::Test: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Flash
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer2::Plugin: '0'
+  perl: '5.006'
+resources:
+  bugtracker: https://github.com/shardiwal/cpan-dancer2-plugin-Flash/issues
+  homepage: http://perldancer.org/
+  repository: https://github.com/shardiwal/cpan-dancer2-plugin-Flash
+version: '0.03'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

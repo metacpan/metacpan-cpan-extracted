@@ -1,0 +1,42 @@
+Decision::Markov - Markov models for decision analysis
+
+    Copyright (c) 1998-2002 Alan Schwartz <alansz@uic.edu>. All rights reserved.
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DESCRIPTION
+    This module provides functions used to built and evaluate Markov models
+    for use in decision analysis. A Markov model consists of a set of
+    states, each with an associated utility, and links between states
+    representing the probability of moving from one node to the next. Nodes
+    typically include links to themselves. Utilities and probabilities may
+    be fixed or may be functions of the time in cycles since the model began
+    running.
+
+PREREQUISITES
+    Decision::Markov expects to find some core perl modules, notably
+    FileHandle and Carp.
+
+INSTALLATION
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+REVISION HISTORY
+    0.02    Sept  2002 - Test script improvements
+    0.01    March 1988 - Initial concept.
+
+FUTURE PLANS
+    I'm planning to wire this up as the back end to CGI scripts for
+    teaching Markov models using web-based simulations. Future revisions
+    may include some other ways to display the model, and perhaps a
+    Monte Carlo routine that will run the model X times and produce
+    useful statistics (mean, variance, 95% CI, etc.)
+
+    There may also be other Decision:: models in the future, such
+    as Decision::Tree, Decision::Influence (influence diagrams), 
+    Decision::Utility (utility assessment) and Decision::Bayes
+    (Bayesian updating of priors based on diagnostic tests).
+    But I may not get to them soon. Feel free to get there before me!
+

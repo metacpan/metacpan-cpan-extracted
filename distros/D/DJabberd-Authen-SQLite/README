@@ -1,0 +1,59 @@
+
+			   DJabberd::Authen::SQLite - simple SQLite authentication plugin
+
+
+    Copyright (c) 2007 Piers Harding.
+    All rights reserved.
+    This program is free software; you can redistribute it and/or modify
+    it under the terms of either:
+
+	a) the GNU General Public License as published by the Free
+	Software Foundation; either version 1, or (at your option) any
+	later version, or
+
+	b) the "Artistic License".
+
+
+Whats it for?
+============
+
+DJabberd::Authen::SQLite - is a simple SQLite authentication plugin that uses
+SQLite as a user credentials repository.
+
+
+Installation
+============
+
+In brief, the following should work on most systems:
+  perl Makefile.PL
+	make
+	make test 
+	make install
+
+
+Configuraton
+============
+
+
+    <VHost mydomain.com>
+
+        [...]
+
+        <Plugin DJabberd::Authen::SQLite>
+            DBName               djabberd
+            DBTable              user
+            DBUsernameColumn     username
+            DBPasswordColumn     password
+            DBWhere              canjabber = 1
+        </Plugin>
+    </VHost>
+
+DBName, DBTable, DBUsernameColumn and DBPasswordColumn are required.
+Everything else is optional.
+
+
+Cheers - Piers Harding - R/2 R/3 BASIS, IFACE, JAPH, whatever ...
+
+email: piers@cpan.org
+
+

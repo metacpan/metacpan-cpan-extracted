@@ -1,0 +1,49 @@
+Revision history for perl module Dist::Zilla::Plugin::WSDL
+
+0.207     2015-06-16 21:25:50-04:00 America/New_York
+  - code cleanup, removing unnecessary perlcritic directives, etc.
+  - clean up prerequisites and tests
+0.206     2015-06-10 13:01:48-06:00 America/Denver
+  - #1 test for Internet connectivity before trying to retrieve live WSDL
+  - Ensure portability and synopsis tests are called/not called correctly
+    (thanks SROMANOV)
+  - Reduce cognitive load of switching between Moose and Moo by using
+    MooseX::AttributeShortcuts rather than MooseX::Has::Sugar
+  - Explicitly declare more developer and version dependencies where needed
+  - Report versions during testing with
+    Dist::Zilla::Plugin::Test::ReportPrereqs rather than DZP::ReportVersions
+  - various other documentation and testing tweaks
+0.205     2011-06-14 11:39:39 America/New_York
+  - Fix synopsis POD
+0.204     2011-06-14 11:15:57 America/New_York
+  - Add synopses to POD, remove unused has_prefix predicate method
+  - Get rid of all the type and exception nonsense, let Dist::Zilla and Moose
+    do the work
+0.203     2011-06-13 14:55:06 America/New_York
+  - Log and throw exception if a generated file can't be opened for writing
+  - Fix class name generation to be consistent with wsdl2perl.pl so that
+    everything except server has "s" appended to the name, instead of the other
+    way around
+  - Document default class prefixes, better error message if invalid prefix
+    specified
+0.202     2011-06-13 11:30:48 America/New_York
+  - Log and throw exception if the WSDL parser returns nothing
+0.201     2011-06-10 13:44:50 America/New_York
+  - Actually insert the typemaps specified in dist.ini
+0.200     2011-05-23 13:49:26 America/New_York
+  - Minor code cleanup
+  - Updated POD, copyright, and dependencies
+0.102600  2010-09-17 15:06:07 America/New_York
+  - Save generated classes in lib/ so they can be consulted for POD
+    or debugged
+0.102440  2010-09-01 17:10:02 America/New_York
+  - Downgrade Perl dependency to version 5.8.8
+0.102420  2010-08-30 14:59:03 America/New_York
+  - Minor documentation and maintainability changes
+0.102390  2010-08-27 18:15:04 America/New_York
+  - Use SOAP::WSDL directly instead of wsdl2perl.pl script
+  - Better support for mapping undefined SOAP types to classes
+  - Added test against demo WSDL hosted at whitemesa.com
+  - Better documentation
+0.102370  2010-08-25 15:09:55 America/New_York
+  - First release

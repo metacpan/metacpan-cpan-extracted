@@ -1,0 +1,28 @@
+---
+abstract: 'A class implementing a stream of bits and coding methods'
+author:
+  - 'Dana A Jacobsen <dana@acm.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  Test::More: '0.45'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.140640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-BitStream-XS
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: '0'
+  Exporter: '5.562'
+  XSLoader: '0.01'
+  perl: '5.006002'
+resources:
+  homepage: https://github.com/danaj/BitStreamXS
+version: '0.08'

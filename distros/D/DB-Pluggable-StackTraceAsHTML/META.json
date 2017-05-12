@@ -1,0 +1,65 @@
+{
+   "abstract" : "Add debugger command to see stack trace as HTML",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DB-Pluggable-StackTraceAsHTML",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Browser::Open" : 0,
+            "DB::Pluggable::Role::Initializer" : 0,
+            "Devel::StackTrace::AsHTML" : 0,
+            "Devel::StackTrace::WithLexicals" : 0,
+            "File::Slurp" : 0,
+            "Role::Basic" : 0,
+            "perl" : "5.008"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : 0,
+            "English" : 0,
+            "File::Find" : 0,
+            "File::Temp" : 0,
+            "Scalar::Util" : 0,
+            "Test::More" : "0.94"
+         }
+      }
+   },
+   "provides" : {
+      "DB::Pluggable::Plugin::StackTraceAsHTML" : {
+         "file" : "lib/DB/Pluggable/Plugin/StackTraceAsHTML.pm",
+         "version" : "1.111750"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-db-pluggable-stacktraceashtml at rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DB-Pluggable-StackTraceAsHTML"
+      },
+      "homepage" : "http://search.cpan.org/dist/DB-Pluggable-StackTraceAsHTML/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/hanekomu/DB-Pluggable-StackTraceAsHTML.git",
+         "web" : "http://github.com/hanekomu/DB-Pluggable-StackTraceAsHTML"
+      }
+   },
+   "version" : "1.111750"
+}
+

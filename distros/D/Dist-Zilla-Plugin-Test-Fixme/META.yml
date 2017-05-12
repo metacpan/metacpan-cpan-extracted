@@ -1,0 +1,35 @@
+---
+abstract: 'Check code for FIXMEs.'
+author:
+  - 'Andrew Jones <andrew@arjones.co.uk>'
+build_requires:
+  Dist::Zilla::Tester: 0
+  English: 0
+  File::Find: 0
+  File::Path: 0
+  File::Temp: 0
+  Path::Class: 0
+  Test::More: 0.88
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Test-Fixme
+requires:
+  Data::Section: 0
+  Dist::Zilla::File::InMemory: 0
+  Dist::Zilla::Role::FileGatherer: 0
+  Dist::Zilla::Role::TextTemplate: 0
+  Moose: 0
+  Test::Fixme: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/andrewrjones/perl5-Dist-Zilla-Plugin-Test-Fixme/issues
+  homepage: https://github.com/andrewrjones/perl5-Dist-Zilla-Plugin-Test-Fixme
+  repository: https://github.com/andrewrjones/perl5-Dist-Zilla-Plugin-Test-Fixme.git
+version: 1.123160

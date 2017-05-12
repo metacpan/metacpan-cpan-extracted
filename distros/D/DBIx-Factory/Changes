@@ -1,0 +1,40 @@
+Revision history for DBIx-Factory
+
+0.01    2010/04/11
+        First release as DBI::Factory
+
+0.02    2010/04/18 [API Changed]
+        If you specify an absolute path to the connection info file
+        as "config_file", "config_base" is now always ignored, since
+        this is more intuitive behaviour.
+
+0.03    2010/04/24 [New Feature] [API Changed]
+        You can now invoke "get_dbh" method just like DBI::connect.
+        Thus, you have to specify "dsn" in connection info file,
+        with the prefix of "dbi:".
+
+0.04    2010/04/24
+        Cut down some wastes of codes.
+
+0.05    2010/04/24
+        Fixed a small defection that warns when passing an odd number
+        of elements to get_dbh method during object construction.
+
+0.06    2010/04/24
+        Fixed documentation.
+
+0.07    2010/04/25 [Bugfixes]
+        Fixed some bugs in tests that prevent you from installing this module
+        when DBD::Oracle is not installed on your machine.
+        Besides, since almost all tests requires YAML* modules,
+        added YAML::XS for testing requirement, because Config::Any complains
+        at YAML or YAML::Syck about their deprecation.
+
+0.08    2010/04/26 [Namespace Changed]
+        The namespace of this module has been changed to DBIx::Factory
+        because DBI namespace is reserved for the official DBI project.
+        Thanks to brian d foy for the indication.
+
+0.09    2010/04/27 [Bugfixes]
+        Fixed failing tests on Win32 due to the improper validation of the
+        absolute path.

@@ -1,0 +1,83 @@
+# Translation of perl-DateLocale to English
+# Copyright (C) 2014 Nikolas Shulyakovskiy
+# This file is distributed under the same license as the perl-DateLocale package.
+#
+# Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>, 2014.
+msgid ""
+msgstr ""
+"Project-Id-Version: perl-DateLocale\n"
+"Report-Msgid-Bugs-To: shulyakovskiy@mail.ru\n"
+"PO-Revision-Date: 2014-08-12 18:39+0400\n"
+"Last-Translator: Nikolay Shulyakovskiy <shulyakovskiy@mail.ru>\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "day"
+msgid_plural "day"
+msgstr[0] "day"
+msgstr[1] "days"
+
+msgid "min"
+msgid_plural "min"
+msgstr[0] "minute"
+msgstr[1] "minutes"
+
+msgid "min_ago"
+msgid_plural "min_ago"
+msgstr[0] "minute ago"
+msgstr[1] "minutes ago"
+
+msgid "shortmin"
+msgstr "min"
+
+msgid "weekdaywithtime"
+msgstr "%A at %H:%M"
+
+msgid "monthdaywithtime"
+msgstr "%e %B at %H:%M"
+
+msgid "yeardaywithtime"
+msgstr "%e %B %Y at %H:%M"
+
+msgid "weekdaywithouttime"
+msgstr "%A"
+
+msgid "monthdaywithouttime"
+msgstr "%e %B"
+
+msgid "yeardaywithouttime"
+msgstr "%e %B %Y"
+
+msgid "hour"
+msgid_plural "hour"
+msgstr[0] "hour"
+msgstr[1] "hours"
+
+msgid "hour_ago"
+msgid_plural "hour_ago"
+msgstr[0] "hour ago"
+msgstr[1] "hours ago"
+
+msgid "fmtdateoccured"
+msgstr "On %B %e, %Y"
+
+msgid "today"
+msgstr "today at %H:%M"
+
+msgid "yesterday"
+msgstr "yesterday at %H:%M"
+
+msgid "yesterday_short"
+msgstr "yesterday"
+
+msgid "tommorow"
+msgstr "tommorow at %H:%M"
+
+msgid "datommorow"
+msgstr "day after tommorow at %H:%M"
+
+msgid "recent"
+msgstr "recently"
+

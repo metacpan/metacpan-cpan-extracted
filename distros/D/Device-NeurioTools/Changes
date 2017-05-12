@@ -1,0 +1,29 @@
+Revision history for Perl extension Device::NeurioTools.
+
+0.01    June 28, 2014
+        First version, contains documentation only
+0.02    June 28, 2014
+        added code for basic functions
+0.03    July 01, 2014
+        added support for timezones
+0.04    July 02, 2014
+        changed constructor to accept a Neurio object
+        removed the Connect method
+0.05    July 13, 2014
+        added methods for 'power consumed', 'power generated' and energy consumed'
+0.06    July 19, 2014
+        changed 'rate' methods to 'flat_rate' to accomodate TOU methods coming
+        updated documentation
+        added option to support debug printouts
+        added method for 'get_power_consumed'
+0.07    Oct 19, 2014
+        Added functions to calculate cost for 2-tiered ToU (still under development)
+        Added funcitons for ISO8601 calculations
+        Added funciton to get Appliance ID
+0.08    Sept 06, 2015
+        Added DESTROY Function
+        Added get_number_of_appliances Function
+        Added get_cycle_ID Function
+        Modified get_appliance_ID Function
+        Changed print statements to use Logging function
+         

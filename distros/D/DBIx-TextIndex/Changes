@@ -1,0 +1,493 @@
+Revision history for Perl extension DBIx::TextIndex.
+
+=head1 CHANGES
+
+=head2 0.28
+
+    No changes, updated contact info
+
+=head2 0.27
+
+    Fixed POD coverage test error
+
+=head2 0.26
+
+    Fixed problem with re-indexing a document several times with
+    SQLite (rt.cpan.org #16247)
+
+    Stoplists now work with QueryParser
+
+    unscored_search() was returning internal document ids instead of keys
+
+    Fixed table_exists() in case schema name is prefixed to table name
+    in results of DBI->tables() call
+
+=head2 0.25
+
+    New methods indexed() and last_indexed_key()
+
+    Removed a few stray print statements 
+
+=head2 0.24
+
+    WARNING: indexes must be recreated, format has changed
+
+    Ability to reindex existing documents
+
+    New methods add(), begin_add(), commit_add() with support for arbitrary
+    keys and indexing of data from sources other than a database table
+
+    Made individual database drivers subclasses of DBIx::TextIndex::DBD
+    for easier porting. A new driver can override selected database-specific
+    methods instead of having to rewrite all methods.
+
+    Check for division by zero in _resolve_plural()
+
+    Bug fix for pathological case where only query term is a NOT term
+
+=head2 0.23
+
+    SQLite support
+
+    Changed wildcard syntax slightly: a '?' character matches any
+    single character.  A '+' at the end of a word behaves like the '?'
+    character in previous versions, matching the singular or plural
+    forms of the word.
+
+    Wildcard characters '*' and '?' can now be used in the middle
+    of a query term, as well as at the end of a query term.
+
+    Added error messages error_wildcard_length and
+    error_wildcard_expansion, collection table will be upgraded
+
+    Added argument 'max_wildcard_term_expansion' to new().  This specifies
+    the maximum number of words a wildcard term can expand to before
+    throwing an exception.  The default is 30 words.   
+
+    Fixed incorrect results for Okapi-scored results with wildcard terms
+   
+    Fixed segfault if position index structure is corrupted
+
+    Fixed bug occurring when add_doc() is followed by search() on same
+    instance of $index
+
+=head2 0.22
+
+    WARNING: indexes must be recreated from scratch.
+    Rewrote proximity index code from scratch using XS. New index format
+    is faster, more compact, and scaleable. Flag proximity_index
+    now defaults to 1.
+
+    Removed legacy_tf_idf scoring method.
+
+    Fixed division-by-zero error with wildcard searches
+
+    Added support for PostgreSQL
+
+=head2 0.21
+
+    Fixed bug where proximity search was case-sensitive instead of
+    case-insensitive
+
+    Fixed problem where some punctuation characters in query were
+    treated as query terms instead of ignoring the characters
+    
+
+=head2 0.20
+
+    Added inline fielded queries, e.g.:
+    $index->search( field1 => 'field2:this field3:"that phrase" foo bar' );
+    In previous version, this search could only be represented like this:
+    $index->search( field1 => 'foo bar',
+                    field2 => 'this',
+                    field3 => '"that phrase"');
+
+    The advantage of the new syntax is that fields can be combined in
+    arbitary boolean expressions, where previously only the union of the
+    fields was returned.  For example:
+
+    (field1:this OR field2:that) AND (field3:"foo bar" OR field1:foo)   
+
+    Wild and plural search bug fixes    
+
+    Turned proximity search back on, changed syntax. For example, to
+    find "foo" followed by "bar" with 0, 1 or 2 words between:
+        "foo bar"~3 
+
+
+=head2 0.19
+
+    Rewrote query parser.  Now we support nested subqueries in parentheses,
+    AND/OR/NOT operators, and existing '+/-' operators
+    (this OR that) AND (foo OR bar) +"this phrase" -"not this phrase"
+
+    Changed prefix query syntax slightly: '*' is now prefix operator, '?'
+    is plural operator:
+      dog*  matches dog, dogs, dogma, dogmatic, dogmatically
+      cat?  matches cat, cats
+
+    Rewrote critical loop of Okapi scoring as XSUB.  Search over large
+    collections is much faster.
+
+=head2 0.18
+
+    Fixed bug where Okapi function did not score multiple fields
+
+    Tweaks to improve boolean search performance.
+
+    Added periodic flush of hash tables caches to save memory
+    in long-running instances.
+
+    Used a more compact represention of docweights, index needs to be
+    recreated.
+
+=head2 0.17
+
+    Reduced memory usage by TermDocsCache
+
+    Implemented Okapi BM25 weighting function [S.E. Robertson et al., Google
+    for description] for scoring documents.  Pass scoring_method =>
+    'legacy_tfidf' to new() or search() to use older method.  Thanks to
+    the lucy project (http://www.seg.rmit.edu.au/lucy/) for inspiration.
+
+    Added docweights table to support Okapi BM25 scoring.  Indexes need to
+    be dropped and recreated.
+
+    Pass "update_commit_interval" to new() to control memory usage in
+    index updates.  As the index is built, postings lists are
+    built up in memory; this parameter controls the number of documents
+    held in memory before being flushed to the database.  Default is 20000.
+    To disable, pass 0, and all documents passed to add_doc() will
+    indexed in memory before writing to the database.
+
+    Fixed problem with inaccurate search results if multiple searches were
+    performed on a single instance while another instance was updating index.
+
+=head2 0.16
+
+    Added XSUB pack_term_docs_append_vint to speed up _commit_docs when
+    adding new postings to existing compressed postings
+
+=head2 0.15
+
+    WARNING: indexes will have to be recreated after upgrading to this version
+
+    Changed inverted list tables: renamed "docs" to "term_docs" and removed
+    redundant column "docs_vector".  Bit vectors are now built from postings
+    stored in term_docs column.  Total index size should be reduced
+    significantly with removal of docs_vector column.
+
+    Implemented DBIx::TextIndex::TermDocsCache to reduce database queries
+
+    Fixed bug where single word queries for high doc frequency terms would
+    return no results
+
+=head2 0.14
+
+    Fixed memory leak in integer decoding
+
+=head2 0.13
+    
+    Changed format for inverted list postings to compressed binary
+    format.  Index sizes should be 50% smaller than with previous versions.
+    Implemented XS code for fast coding and decoding.  This format is similar
+    to the format in Lucene (http://jakarta.apache.org/lucene/).
+
+    Renamed 'freq_d' to 'docfreq_t'.
+
+    Bug fix: add_doc will only set bits in all_docs_vector if document
+    was actually added
+
+    UPGRADE warning, indexes will have to be rebuilt.
+
+=head2 0.12
+
+    Added _optimize_or_search(). If query contains just OR words,
+    turn the rarest words into AND words to reduce result set size
+    before scoring.  Practically, this makes queries behave more like
+    "all of the words" instead of "any of the words," which seems to
+    be what the average user expects.
+
+    Changed all symbols 'occurence' to 'freq_d' (frequency of docs in
+    entire collection that contain term)
+
+    Multi-field queries will return the intersection of all fields
+    instead of the union.
+
+    Added method all_doc_ids().
+
+    There is no longer any need to sort doc_ids before passing
+    to add_doc().
+
+    Added more tests. WARNING: MySQL database 'test' must be available
+    on localhost for tests to succeed.
+
+    UPGRADE WARNING: collection table format changed, new index table
+    collection_all_docs_vector added, some field names have changed in
+    inverted tables.  Any indexes created with 0.11 or earlier will have
+    to be deleted and recreated.
+
+    UPGRADE WARNING: all symbols with "document" have been renamed to
+    "doc" for brevity.  Methods have also been renamed, e.g. add_document()
+    is now add_doc().  The old method names will work, but are deprecated.
+
+    Replaced option 'language' with 'charset'.  iso-8859-1 is the
+    default charset.
+
+    Added call to Text::Unaccent::unac_string (www.senga.org) to replace
+    accented characters with plain ASCII equivalent.  Uses 'charset' option
+    to determine mapping.
+   
+    UPGRADE WARNING: added structured exceptions using Exception::Class.
+    Calls to search() now have to be wrapped with eval blocks to catch
+    query exceptions.
+
+=head2 0.11
+
+    Bug fix: HTML tags are now changed to a single space, instead of
+    empty string when indexing document. Prevents concatenation of words
+    in some cases.
+
+=head2 0.10
+
+    Fixed collection table upgrade bug
+
+=head2 0.09 
+
+    Changed $MAX_WORD_LENGTH default to 20
+
+    Allow numbers to be indexed as words
+
+    Use HTML::Entities to decode entities in indexed documents, on by
+    default. Set option decode_html_entities to 0 to disable.
+
+    Use $dbh->tables to check for existence of tables (caution, may not
+    work in DBI > 1.30).
+
+=head2 0.08 
+
+    Bug fix: add_mask() was not inserting masks
+
+=head2 0.07
+
+    UPGRADE WARNING: collection table format changed, use new method
+    $index->upgrade_collection_table() to recreate collection table. 
+    Calling initialize() method for a new collection will also upgrade
+    collection table. Index backup recommended.
+
+    Added error_ prefix to error message column names in collection table
+
+    Added version column to collection table
+
+    Added language column to collection table, removed czech_language column
+
+    UPGRADE WARNING: instead of new({ czech_language => 1}), use
+    new({ language => 'cz' })
+
+    Bug fix: _store_collection_info() error if stop lists are not used
+
+    unscored_search() will now return a scalar error message
+    if an error occurs in search
+
+    search() will croak if passed an invalid field name to search on
+
+    Added documentation for mask operations
+
+=head2 0.06 
+
+    tripie's patch v2 updates:
+
+    - a bug in document removing proccess related to incorrect
+    'occurency' data updates when multi-field documents were removed,
+    was fixed.  The methods remove_document() and _inverted_remove()
+    were affected.
+
+    - a bug related to wildcards in queries in form of "+word +next%"
+    or "+word% +next%" was fixed
+
+    - a bug related to "%" wildcards used while searching of
+    multi-field documents was fixed
+
+    - a bug related to stoplists and phrases that contain a
+    non-stoplisted word together with a stoplisted word was fixed
+
+    - a new full-featured solution of highligting of query words or
+    patterns in content of resulting documents was added
+
+    I've written a new module HTML::Highlight, that can be used
+    either independently or together with DBIx::TextIndex. Its
+    advantages include:
+
+      - it makes highlighting very easy
+      - takes phrases and wildcards into account
+      - supports diacritics insensitive highlighting for iso-8859-2
+        languages
+      - takes HTML tags into account. That means when a user searches
+        for for example 'font', than a FONT element in <FONT COLOR="red">
+        does not get "highlighted".
+		
+    The module provides a very nice Google-like highlighting using
+    different colors for different words or phrases.
+
+    The module works together with DBIx::TextIndex using its new method
+    html_highlight().
+
+    The module can also be used to preview a context in which query
+    words appear in resulting documents.
+		
+    - the old method highlight() was not changed nor removed for sake of
+    compatibility with old code
+	
+    - I put a new 'html_search.cgi' script to examples/ to show how the new
+    highlighting and context previewing works.
+	  
+    - the HTML::Highlight module can be found on CPAN - 
+    http://www.cpan.org/authors/id/T/TR/TRIPIE/
+
+    - the new highlighting solution has been documented in a new section
+    of the documentation
+	  
+  tripie v1 changes:
+
+    NOTE: tripie proximity index is replaced with newer compact index
+    structure as of version 0.22
+    added proximity indexing
+      - based on positions of words in a document
+      - by default it is disabled, activate it by new option "proximity_index"
+      - very efficient for bigger documents, much worse for small ones
+      - it's very big (approx. 20 bytes for each word)
+      - allows fast proximity based searches in form of:
+        ":2 some phrase" => matches "some nice phrase"
+        ":1 some phrase" => matches only exact "some phrase"
+        ":10 some phrase" => matches "some [1..9 words] phrase"
+        defaults to ":1" when omitted
+      - the proximity matches work only forwards, not backwards,
+        that means:
+        ":3 some phrase" does not match "phrase nice some" or "phrase some"
+
+        NOTE: as of version 0.20, this syntax has changed:
+        "some phrase"~3
+
+    rewrote the word splitter and query parser
+      - added support for czech language diacritics insensitive indexing
+        and searching (option "czech_language")
+	(note: changed option to "charset", pass value "iso-8859-2"
+	to enable -dkoch)
+        that is implemented by converting both the indexed data and
+	the query from iso-8859-2 to ASCII
+
+      - this can also be used for other iso-8859-2 based Slavic languages
+
+      - the above is performed by my module "CzFast" that can
+        be found on CPAN (my CPAN id is "TRIPIE"), and is optional
+
+    added partial pattern matching using wildcards "%" or "*"
+      - these wildcards can be used at end of a word to match all words
+        that begin with that word, ie.
+
+        the "%" character means "match any characters"
+
+        car%	==> matches "car", "cars", "careful", "cartel", ....
+
+        the "*" character means "match also the plural form"
+
+        car*	==> matches only "car" or "cars"
+
+      - added option "min_wildcard_length" to specify minimal length of a
+        word base appearing before the "%" wildcard character to avoid
+        selection of excessive amount of results
+
+    added a database abstraction layer - all SQL queries were moved to
+    separate module (see lib/ and the docs for new "db" option) and
+    polished a bit for better maintainability and possible support of
+    other SQL dialects
+
+    added stoplists
+      - some words that are too common (are present in almost every document)
+	are not indexed and are removed from the search query before processing
+	to avoid expensive processing of excessively huge result sets
+      - user is notified when a search does not produce any results because
+	some words he used in his query were stoplisted (no_results_stop)
+      - stoplists can be easily localized or modified 
+      - default is not to use any stoplist, one or more stoplists 
+	can be selected using the "stoplist" option
+      - stoplist data files are in lib/
+      - english (en) and czech (cz) stoplists are included
+      - more than one stoplist can be used
+
+    added a facility to remove documents from the index - 
+      check the documentation for new method "remove_document" for more info.
+	
+      There is no way to recover all the space taken by the documents that are
+      being removed. This method manages to recover approx. 80% of the space.
+	
+      It's recommended to rebuild the index when you remove a
+      significant amount of documents.
+
+    added a facility to obtain some statistical information about the index -
+      check the documentation for new method "stat"
+
+    max_word_length, phrase_threshold and result_threshold are now configurable
+    options
+
+    added configuration options to customize/localize the error messages
+    (no_results etc.)
+
+    all new configuration options are properly stored in collection's data
+
+    max_word_length limit now works much better - all words are stripped
+    down to the maximum size before they are stored to the index,
+    and also all query words are stripped down to the maximum word
+    size before they are proccessed. Now when the max word length
+    is set to, say, six and a user searches for for example
+    "consciousness", all documents containing any words beginning
+    with "consci" are returned Therefore the new max_word_length
+    option is not a limit of a word size, but rather a
+    "resolution" preference.  added some comments and occasionally
+    corrected indentation
+
+    documented the enhancements
+
+    bugfix: when RaiseError was set on a DBI connection, then one
+    query which only switched off PrintError to avoid some problems, failed
+
+    note: the interface was not changed - old code using this module should
+    run without any changes
+
+    Thanks for this excellent module and please excuse my inferior English !
+
+    Tomas Styblo, tripie@cpan.org
+
+=head2 0.05
+
+    Added unscored_search() which returns a reference to an array of
+doc_ids, without scores.  Should be much faster than scored search.
+
+    Added error handling in case _occurence() doesn't return a number.
+
+=head2 0.04
+
+    Bug fix: add_document() will return if passed empty array ref instead
+of producing error.
+
+    Changed _boolean_compare() and _phrase_search() so and_words and
+phrases behave better in multiple-field searches. Result set for each
+field is calculated first, then union of all fields is taken for
+final result set.
+
+    Scores are scaled lower in _search().
+
+=head2 0.03
+
+    Added example scripts in examples/.
+
+=head2 0.02
+
+    Added or_mask_set.
+
+=head2 0.01
+
+    Initial public release.  Should be considered beta, and methods may be
+added or changed until the first stable release.
+
+=cut

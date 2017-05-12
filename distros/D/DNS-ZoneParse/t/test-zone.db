@@ -1,0 +1,105 @@
+;  Database file dns-zoneparse-test.net.dns for dns-zoneparse-test.net zone.
+;      Zone version:  2000100502
+$TTL 1H
+@                           IN	SOA	ns0.dns-zoneparse-test.net.	support\.contact.dns-zoneparse-test.net.	(
+                        2000100502   ; serial number
+                        10801       ; refresh
+                        3600        ; retry
+                        691200      ; expire
+                        86400     ) ; minimum TTL
+
+         43200          IN	NS	ns0.dns-zoneparse-test.net.
+@                       IN	NS	ns1.dns-zoneparse-test.net.
+
+@                       IN	A	127.0.0.1
+@                       IN	MX	10	mail
+ftp                     IN	CNAME	www
+localhost               IN	A	127.0.0.1
+mail                    IN	A	127.0.0.1
+www                     IN	A	127.0.0.1
+                        in      a       10.0.0.2
+www      43200          IN      A       10.0.0.3
+                        IN      MX      10      10.0.0.4
+                                A       10.0.0.5
+                                TXT     "web server"
+foo                     IN      A       10.0.0.6
+mini                            A       10.0.0.7
+icarus                  IN      AAAA    fe80::0260:83ff:fe7c:3a2a
+                                HINFO   server freebsd
+
+$GENERATE 1-10/1 www$ A 10.0.0.$
+
+; This is invalid, but should be loadable anyway. RRs need a consistent TTL,
+; and the top soup line is inheriting the TTL from above.
+soup                    IN      TXT     "This is a text message"
+         86401                  HINFO   server "freebsd"
+txta                            TXT     "This is another text message"
+                                RP      mbox sometext
+
+srvtest1.a              IN      SRV     11 22 33 avalidname
+$origin a
+srvtest2                IN      SRV     11 22 33 avalidname
+
+$ORIGIN net.
+$ORIGIN dns-zoneparse-test
+
+txttest1                        TXT     "I've\"got\\back\\\"slashes;!" ; com\\ent
+txttest2                        TXT     embedded\"quote ;comment
+txttest3                        TXT     noquotes;comment
+txttest4                        TXT     "MORE (complicated) stuff -h343-"
+
+this should fail
+this should fail too
+
+; Believe it or not, named-checkzone accepts this record, so we should too.
+-=+!@#$%^&*`~://+-,[]{}|\\?~`'\"\;          CNAME   ns0.dns-zoneparse-test.net.
+
+borrowed.from.rfc.1876.com.     LOC   42 21 54 N 71 06 18 W -24m 30m
+
+borrowed2.from.rfc.1876.com.    LOC   42 21 43.952 N 71 5 6.344 W -24m 1m 200m
+
+borrowed3.from.rfc.1876.com.    LOC   52 14 05 N 00 08 50 E 10m
+
+borrowed4.from.rfc.1876.com.    LOC   32 7 19 S 116 2 25 E 10m
+
+borrowed5.from.rfc.1876.com.    LOC   ( 42 21 28.764 N 71 00 51.617 W
+                                        -44m 2000m )
+
+notborrowed.from.rfc.1876.com.  LOC   32 7 S 116 E -15m 16m 17m 18m
+
+commenttest0                    HINFO   test test2
+commenttest1                    HINFO   test test2 ; comment
+commenttest2                    HINFO   test test2 ; "comment"
+commenttest3                    HINFO   test test2 ; "com;ment"
+commenttest4                    HINFO   test "test2"
+commenttest5                    HINFO   test "test2" ; comment
+commenttest6                    HINFO   test "test2" ; "comment"
+commenttest7                    HINFO   test "test2" ; "com;ment"
+commenttest8                    HINFO   "test" test2
+commenttest9                    HINFO   "test" test2 ; comment
+commenttest10                   HINFO   "test" test2 ; "comment"
+commenttest11                   HINFO   "test" test2 ; "comm;ent"
+commenttest12                   HINFO   "test" "test2"
+commenttest13                   HINFO   "test" "test2" ; comment
+commenttest14                   HINFO   "test" "test2" ; "comment"
+commenttest15                   HINFO   "test" "test2" ; "com;ment"
+commenttest16                   HINFO   test "tes;t2"
+commenttest17                   HINFO   test "tes;t2" ; comment
+commenttest18                   HINFO   test "tes;t2" ; "comment"
+commenttest19                   HINFO   test "tes;t2" ; "com;ment"
+commenttest20                   HINFO   "test" "tes;t2"
+commenttest21                   HINFO   "test" "tes;t2" ; comment
+commenttest22                   HINFO   "test" "tes;t2" ; "comment"
+commenttest23                   HINFO   "test" "tes;t2" ; "com;ment"
+commenttest24                   HINFO   "te;st" test2
+commenttest25                   HINFO   "te;st" test2 ; comment
+commenttest26                   HINFO   "te;st" test2 ; "comment"
+commenttest27                   HINFO   "te;st" test2 ; "comm;ent"
+commenttest28                   HINFO   "te;st" "test2"
+commenttest29                   HINFO   "te;st" "test2" ; comment
+commenttest30                   HINFO   "te;st" "test2" ; "comment"
+commenttest31                   HINFO   "te;st" "test2" ; "com;ment"
+commenttest32                   HINFO   "te;st" "te;st2"
+commenttest33                   HINFO   "te;st" "te;st2" ; comment
+commenttest34                   HINFO   "te;st" "te;st2" ; "comment"
+commenttest35                   HINFO   "te;st" "te;st2" ; "com;ment"

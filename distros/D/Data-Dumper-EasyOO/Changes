@@ -1,0 +1,112 @@
+0.0503	5/05/05
+
+	supress carping when autoprint => 0 given explicitly,
+	  improving its use for dumping debug output.
+
+0.0502	4/22/05
+
+	remove some =for private pod that went into README on cpan.org
+
+0.0501	4/22/05
+
+	Crap.  Missed incrementing a skip-count for an added test.
+	  Caught by CPANTSer, Max Maischein.
+	added use strict to all the tests, and pod IMPORTS section.
+
+0.05	(Earth Day - help save the world!)
+
+	Added use strict (sometime during 0.05_*)
+	Broadened the SIG{__WARN__} /redefined/ filter.
+	Added t/pod-coverage.t (8 lines, whats all the fuss!)
+	changed private sub to __DONT_TOUCH_THIS package sub,
+	  so that Devel::Cover would see/cover it
+	test tweaks (99_internals.t, autoprint.t) to cover newly
+	  exposed coverage gaps
+
+0.05_02
+
+	Stripped filename from test in t/warns (failed on windows,
+	  apparently due to path separator).
+	Export 'import' along with 'new', so aliased reimports work too;
+	  tested by reimport.t reimport-alias.t
+	CPANTS'ers, please test so I can push out 0.05 soon.
+	
+0.05_01
+
+	Added ezdump(), and export both it and $ezdump (the object
+	  ezdump() uses) by default into callers pkg.
+	Simplified Synopsis, moved previous to FULL-FEATURED EXAMPLE.
+	Both are based upon more feedback from <markstos@cpan.org>
+
+0.04
+
+	Refactored new() to minimize closure size, and call a private
+	  sub (anonymous subref held in a myvar) instead.
+	Simplified t/autoprint a lot using Test::Output, and also
+	  boosted test coverage by doing so. (Shawn Sorichetti, nice module!)
+	pod & test tweaks, various other bits I cant remember.
+
+0.04_03
+
+	fixed some skips to skip the right number
+	tweaks and tests to boost Devel::Cover numbers
+	added multiple init variables
+	added t/emulate.t
+
+0.04_02
+
+      - wholesale POD redo, with benefit of time and distance, I could
+	better appreciate feedback from <mark@summersault.com>
+      - speed test now skipped unless passed a true arg
+      - code tweaks to improve test coverage
+      - better autoprint tests
+      - a few additional warnings, useoptions tests
+
+0.04_01 Sat Jan  1 19:55:33 MST 2005 (detect a pattern here?)
+
+      - yay - I have a user!, with a patch!!
+	chocolate.boy@email.com sent a clean fix for the __SA__ hack.
+      - various minor test fixes, doc tweaks
+	changed diags to pass, to de-clutter test output
+      - warning tests are heavily reliant on Test::Warn
+      - a couple tests break under 5.00504 - due to modules.
+	I just dont have diligence to upgrade my 5.00504 installation
+	to correct all these use-time failures. No *real* breakages
+      - one particular test annoyance:
+	I get: print() on closed filehandle $fh at lib/Data/Dumper/EasyOO.pm
+	just b4 test expecting that errmsg passes.  I cant suppress
+	it.  That 5.5.4 doesnt have warnings.pm further limits my options.
+
+0.03	Christmas/Kwanzaa!  Thu Dec 25 22:42:57 MST 2003
+
+      - new() is now also a copy constructor, ie: $ez2 = $ez1->new()
+      - autoprint.t fixes for WinXP. THANKS! <randy@theoryx5.winnipeg.ca>,
+	and for cygwin (somewhat simplistically - \r\n is FS dependent too)
+
+0.03_01 Wed, 24 Dec 2003 05:53:55 GMT
+
+      - import (init => \our $userEzDD) constructs an EzDD object into
+	the supplied variable (carps if defined $var)
+      - autoprint.t #9 check of $! was linux specific, now handles
+	Solaris too, reported by <mthurn@xcgma001.northgrum.com>. Others TBD. 
+	Also changed some quoting to qq{} for less platform dependence.
+
+0.02	Mon Dec 22 06:07:45 2003 UTC
+
+      - on 5.6.1, t/chains.t tried to use unsupported DD methods,
+	yielding test failures.  Theyre now only called for 5.8
+      - fix double plan() in t/speed.t
+	this and above reported by Barbie <missbarbell@easynet.co.uk>
+      - t/speed.t now uses Test::Benchmark, has old tests as fallback
+      - Reworked POD, based on feedback from <mark@summersault.com>
+      - added autoprint, which prints when called in void context
+      - added use-time print-style control
+      - added pp() and dump() methods
+	
+0.01    released Wed, 03 Dec 2003 18:50:34 GMT
+	pod tweaks, more tests, fixed exposed bugs
+
+0.01_02 after consult with Module-Authors ML:
+	renamed to Data::Dumper::EasyOO
+
+0.01_01 started as Data::Dumper::Functor on Nov 29 12:32

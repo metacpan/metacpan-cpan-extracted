@@ -1,0 +1,8 @@
+README
+Changes
+MANIFEST
+Makefile.PL
+Markov.pm
+test.pl
+Markov/State.pm
+Markov/Makefile.PL

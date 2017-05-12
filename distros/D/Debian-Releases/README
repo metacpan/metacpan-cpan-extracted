@@ -1,0 +1,72 @@
+NAME
+    Debian::Releases - Mapping and comparing Debian release codenames and
+    versions
+
+VERSION
+    version 0.14
+
+SYNOPSIS
+        use Debian::Releases;
+
+        if(Debian::Releases::version_compare('6.0','squeeze')) {
+            print "This is squeeze\n";
+        }
+
+NAME
+    Debian::Releases - Comparing debian releases
+
+SUBROUTINES/METHODS
+  version_compare
+    Compare two debian releases in numerical or codename form.
+
+AUTHOR
+    Dominik Schulz, "<dominik.schulz at gauner.org>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-debian-releases at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Debian-Releases>. I will
+    be notified, and then you'll automatically be notified of progress on
+    your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Debian::Releases
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Debian-Releases>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Debian-Releases>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Debian-Releases>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Debian-Releases/>
+
+LICENSE AND COPYRIGHT
+    Copyright 2012 Dominik Schulz
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+AUTHOR
+    Dominik Schulz <dominik.schulz@gauner.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Dominik Schulz.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

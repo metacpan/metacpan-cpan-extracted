@@ -1,0 +1,30 @@
+DBIx-SimpleGoBetween 
+=================================
+
+Super simple DBI instance wrapper, thats intended to act as a quick
+shortcut for small result sets.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+Source Forge project
+
+If you feel this software is useful please donate!
+https://sourceforge.net/projects/dbix-simplegobe/
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2010 by Michael Shipper
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.4 or,
+at your option, any later version of Perl 5 you may have available.
+
+

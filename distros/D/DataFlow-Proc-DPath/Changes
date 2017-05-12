@@ -1,0 +1,14 @@
+Revision History for DataFlow-Proc-DPath
+========================================
+
+1.112100
+--------
+
+commit d4c777ccb66e53991a99b9ae0f2c52faf3effe7b
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+===================================
+End of changes in the last 365 days
+===================================

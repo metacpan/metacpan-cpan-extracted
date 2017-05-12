@@ -1,0 +1,56 @@
+DBD-SQLite-FTS3Transitional
+
+Starting from version 1.31, C<DBD::SQLite> uses the new, recommended
+"Enhanced Query Syntax" for binary set operators in fulltext FTS3 queries
+(AND, OR, NOT, possibly nested with parenthesis). 
+
+Previous versions of C<DBD::SQLite> used the
+"Standard Query Syntax" (see L<http://www.sqlite.org/fts3.html#section_3_2>).
+Applications built with the old  "Standard Query" syntax,
+have to be migrated, because the precedence of the C<OR> operator
+has changed.
+
+This module helps in the migration process : it provides a function
+to automatically translate from old to new syntax.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBD::SQLite::FTS3Transitional
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBD-SQLite-FTS3Transitional
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/DBD-SQLite-FTS3Transitional
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/DBD-SQLite-FTS3Transitional
+
+    Search CPAN
+        http://search.cpan.org/dist/DBD-SQLite-FTS3Transitional/
+
+
+LICENSE AND COPYRIGHT
+
+Copyright (C) 2010 Laurent Dami
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.
+

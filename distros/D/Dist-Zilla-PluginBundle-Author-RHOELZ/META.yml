@@ -1,0 +1,36 @@
+---
+abstract: 'BeLike::RHOELZ when you build your distributions.'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-RHOELZ
+requires:
+  Dist::Zilla: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::Git::Check: '0'
+  Dist::Zilla::Plugin::Git::ExcludeUntracked: '0'
+  Dist::Zilla::Plugin::GithubMeta: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::Test::DistManifest: '0'
+  Dist::Zilla::Plugin::Test::Kwalitee: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+resources:
+  bugtracker: https://github.com/hoelzro/dist-zilla-pluginbundle-author-rhoelz/issues
+  homepage: https://github.com/hoelzro/dist-zilla-pluginbundle-author-rhoelz
+  repository: https://github.com/hoelzro/dist-zilla-pluginbundle-author-rhoelz.git
+version: '0.07'

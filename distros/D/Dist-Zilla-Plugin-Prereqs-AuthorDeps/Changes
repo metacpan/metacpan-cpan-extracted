@@ -1,0 +1,50 @@
+Revision history for Dist-Zilla-Plugin-Prereqs-AuthorDeps
+
+0.006     2016-05-02 11:06:55-04:00 America/New_York
+
+    [CHANGED]
+
+    - Capped max Dist::Zilla prereq added to 5 until Dist::Zilla v6 is
+      stable.
+
+    [FIXES]
+
+    - Drop vestigial use of Path::Class API to avoid Dist::Zilla 6
+      deprecation warnings.
+
+0.005     2015-08-11 11:39:40-04:00 America/New_York
+
+    [FIXES]
+
+    - Fixes failing test under Dist::Zilla 5.038 or later
+
+0.004     2014-11-04 11:03:34-05:00 America/New_York
+
+    [PREREQS]
+
+    - Dropped Path::Class
+
+    - Added more recent Dist::Zilla
+
+0.003     2014-05-22 15:40:50-04:00 America/New_York
+
+    [CHANGED]
+
+    - Required Dist::Zilla version is now the integer portion only;
+      plugins may require a later version, but this plugin now only
+      mandates the last major release
+
+    [TESTS]
+
+    - Improved test coverage
+
+0.002     2013-11-04 23:02:57 America/New_York
+
+    [FIXED]
+
+    - Fixed tests for old versions of Dist::Zilla
+
+0.001     2013-11-04 21:04:57 America/New_York
+
+    - First release
+

@@ -1,0 +1,76 @@
+NAME
+    Dist::Zilla::Plugin::ContributorsFile - add a file listing all
+    contributors
+
+VERSION
+    version 0.3.0
+
+SYNOPSIS
+    In dist.ini:
+
+        " any plugin populating x_contributors in the META files
+        [Git::Contributors]
+
+        [ContributorsFile]
+        filename = CONTRIBUTORS
+
+DESCRIPTION
+    "Dist::Zilla::Plugin::ContributorsFile" populates a *CONTRIBUTORS* file
+    with all the contributors of the project as found under the
+    *x_contributors* key in the META files.
+
+    The generated file will look like this:
+
+        # FOO-BAR CONTRIBUTORS #
+
+        This is the (likely incomplete) list of people who have helped
+        make this distribution what it is, either via code contributions, 
+        patches, bug reports, help with troubleshooting, etc. A huge
+        'thank you' to all of them.
+
+            * Albert Zoot
+            * Bertrand Maxwell
+
+    Note that if no contributors beside the actual author(s) are found, the
+    file will not be created.
+
+CONFIGURATION OPTIONS
+  filename
+    The name of the contributor file that is created. Defaults to
+    *CONTRIBUTORS*.
+
+TRICKS
+    Refer to David Golden's blog entry at
+    <http://www.dagolden.com/index.php/1921/how-im-using-distzilla-to-give-c
+    redit-to-contributors/> to get introduced to the "Dist::Zilla"
+    contributor modules.
+
+    Git's ".mailmap" file is useful to deal with contributors with several
+    email addresses:
+    <https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html>.
+
+    To give credit to bug reporters and other persons who don't commit code
+    directly, you can use empty git commits:
+
+        git commit --allow-empty --author="David Golden <dagolden@cpan.org>" -m "..."
+
+    To populate the META file with the "x_contributors", you probably want
+    to use either Dist::Zilla::Plugin::Git::Contributors or
+    Dist::Zilla::Plugin::ContributorsFromGit.
+
+SEE ALSO
+    Dist::Zilla::Plugin::ContributorsFromGit
+
+    Dist::Zilla::Plugin::Git::Contributors
+
+    Pod::Weaver::Section::Contributors
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

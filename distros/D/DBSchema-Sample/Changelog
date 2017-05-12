@@ -1,0 +1,22 @@
+2003-09-04  U-THRENODY\Keith  <tbone@cpan.org>
+
+	* Added sub load() which detects DBDs (via the DBI API) and
+	populates the detected databases after valid DBI connection
+	information is given.
+
+2003-09-04  Terrence Brannon  <tbone@cpan.org>
+
+	* Added support for DBD::SQLite... it was quite a simple
+	transition from the MySQL code (in Default.pm), the floating
+	numbers had to have a "." in front of them to be accepted.
+
+2003-09-04  Terrenc Brannon   <tbone@cpan.org>
+
+	* Made DBIx::AnyDBD a requirement
+
+Revision history for Perl extension DBSchema::Sample.
+
+0.01  Mon Aug 25 10:12:04 2003
+	- original version; created by h2xs 1.21 with options
+		-A -X -n DBSchema::Sample
+

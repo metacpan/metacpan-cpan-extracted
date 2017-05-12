@@ -1,0 +1,50 @@
+<scriptlet>
+
+<Registration
+	Description="XMLDB"
+	ProgID="XMLDB.Scriptlet"
+	Version="1.00"
+	ClassID="{78ed0810-69b7-11d2-9335-0060087beaea}"
+>
+</Registration>
+
+<implements id=Automation type=Automation>
+	<property name=XML>
+		<get/>
+	</property>
+	<method name=Init>
+		<PARAMETER name=Datasource/>
+		<PARAMETER name=Driver/>
+		<PARAMETER name=User/>
+		<PARAMETER name=Password/>
+		<PARAMETER name=DBName/>
+	</method>
+	<method name=DoSql>
+		<PARAMETER name=Sql/>
+	</method>
+</implements>
+
+<script language=PerlScript>
+
+use DBIx::XML_RDB;
+
+my $xmlout;
+
+sub get_XML {
+	return $xmlout->GetData;
+}
+
+sub Init {
+	my ($Datasource, $Driver, $User, $Password, $DBName) = @_;
+	$xmlout = DBIx::XML_RDB->new($Datasource, $Driver, $User, $Password, $DBName);
+}
+
+sub DoSql {
+	my ($Sql) = @_;
+	$xmlout->DoSql($Sql);
+
+}
+
+</script>
+</scriptlet>
+

@@ -1,0 +1,38 @@
+Dwimmer is an experiment.
+
+It started as a blog engine with this screencast: http://www.youtube.com/watch?v=NGX5pgKWVoc
+but since then it is all kinds of things.
+
+For example it is a wiki, a CMS, a planet...
+or a beginnnig of either of those.
+
+Mostly it is an experiment to write some stuff.
+
+=================================================
+Setup:
+
+If you already have a CPAN enabled perl installed then type "cpan Dwimmer" in your command prompt.
+If you don't have perl yet then we have a binary packaged version for windows. Install Dwimperl.
+
+dwimmer_admin.pl --setup --password ADMIN_PASSWORD --email email-of-admin@company.com --root path/to/your/installation
+
+------------
+Upgrade:
+
+cpan Dwimmer
+
+dwimmer_admin.pl --upgrade --password ADMIN_PASSWORD --root path/to/your/installation
+
+
+
+==============
+Sources:
+JQuery http://jquery.com/
+http://www.scriptbreaker.com/javascript/script/JQuery-Drop-down-panel-menu
+
+
+
+CLEditor WYSIWYG HTML Editor v1.3.0
+http://premiumsoftware.net/cleditor
+Advanced Table Plug-in Version 1.0.0
+

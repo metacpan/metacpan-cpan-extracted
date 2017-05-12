@@ -1,0 +1,10 @@
+ChangeLog
+Makefile.PL
+MANIFEST
+test.pl
+DPKG/Make.pm
+DPKG/Update.pm
+tmproot/file1.txt
+tmproot/file2.txt
+tmproot/file3.txt
+tmproot/file4.txt

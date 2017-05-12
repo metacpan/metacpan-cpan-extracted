@@ -1,0 +1,973 @@
+#!/usr/bin/env perl
+# showtable - read data and show it
+#
+#    Copyright (C) 1996-2013 Alan K. Stebbens <aks@stebbbens.org>
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program; if not, write to the Free Software
+#    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+#
+# showtable [options] [file]
+#
+# This script acts as a filter, reading data in columns and displaying
+# the data in a nicely formatted output.  The output can be either
+# a list style, simple table, boxed table, or HTML-formatted table.
+#
+# The input styles accepted are: tab-delimited, comma-delimited,
+# list-style, simple-style tables, and boxed tables.
+#
+# The default is tab-delimited data
+#
+# Use -d<char> to set the field separation character. Eg: -d,
+#
+# Other options: -table, -html, -box, -list
+#
+# If no file is given, STDIN is used by default.
+#
+# $Id$
+# $Source$
+#
+# Author: Alan K. Stebbens <aks@stebbens.org>
+#
+
+($DIR,$PROG) = $0 =~ m=^(.*/)?([^/]+)$=;
+chop($DIR = `pwd`) unless defined($DIR);
+$DIR =~ s=/$==; 
+
+$VERSION = '4.5';
+
+unshift(@INC,'.');
+unshift(@INC,'blib/lib') if -d 'blib/lib';	# for testing
+
+use Data::ShowTable;
+
+sub ShowData;
+sub ReadTableInput;
+sub ReadListInput;
+sub NextRow;
+sub max;
+
+sub err {
+    my $fmt = shift;
+    $fmt .= "\n" unless $fmt =~ /\n$/;
+    printf STDERR $fmt,@_;
+}
+
+sub usage {
+    err @_ if $#_ >= 0;
+    err <<EOF;
+usage: $PROG [options] [file]
+Read the file, or STDIN by default, and produce a nicely formatted listing
+of columnar data.  By default, columns of data should be separated by tabs, 
+and is assumed to have no titles.  Lines of all spaces and any of the 
+characters "-+_=" will be ignored as separator lines, unless -nodashes is 
+given.
+
+Options affecting input:
+  -br(eak)=STR  set the inter-column break character to "STR".  The default
+		is "\t" (a tab).
+  -dSTR		set the delimiter string (same as "-break=STR").
+  -nod(ashes)   Do not look for lines of separators, such as dashes, equal 
+		signs, or underlines (if they occur, they will be part of
+		the "data".
+  -t(itles)[=NN] Treat the first NN rows of data as column titles; multiple
+		words in the column titles may wrap vertically. If NN is
+		omitted, it defaults to 1.  If no -titles is given at all,
+		NN defaults to 0.
+  -st(rip)      Strip blanks from around the column values (implied with
+		$InputType eq 'box').
+  -nos(trip)	Don't strip blanks around the column values.
+  -i(nput)=TYPE	Set the input type; currently TYPE can be "list", "box", 
+  		"table", or "simple".  Default is "box".
+
+The options controlling the output are:
+  -s(imple)	use a simple table format (without wrapped columns)
+  -t(able)	use a table format (handles wrapped column values)
+  -l(ist)       use a list style format
+  -b(ox)        use a "boxed" style table
+  -ht(ml)       use HTML-formating
+  -noh(eaders)  do not output any headers on the tables; -titles=0 implies
+		this option.
+  -ti(tles)=name1,name2,...,nameN
+		Define the output column titles explicitly; "name1" cannot 
+		begin with a number.  Implies "-titles=0".
+  -w(idth)=NN	Define the maximum width of the table; if this not given,
+		the maximum is the sum of all given column widths.
+  -cw(idths)=w1,w2,...,wN
+		Define individual column widths; the last width applies to
+		any remaining columns.  Each column may be given as an
+		integer, representing a character count, or a fraction
+		or percentage, representing percentages.
+  -fN1,N2...	select fields to display by index; N-M is a range of fields.
+  -fields=Name1, Name2, ...
+		select fields to display by names.
+  -h(elp)	Display this string.
+
+HTML-only options (their usage implies -html):
+  -noe(scape)	Do not perform HTML escape sequences; this will allow
+		data with embedded HTML to be displayed properly.  Implies
+		the -html option.
+  -attr(ibutes)='attr1 attr2 ...'
+		Define the table attributes, which get inserted into the
+		<TABLE> token.
+  -t(itle)f(ormats)=fmt1;fmt2;...;fmtN
+		Define the HTML formats for the titles.  
+		Implies -html.
+  -d(ata)f(ormats)=fmt1;fmt2;...;fmtN
+		Define the HTML formats for the data values in each column.
+		Implies -html.
+  -url(s)=col1=url1,col2=url2,...
+		Define the URL mappings for given column names.  Multiple
+		-url options may be given.
+EOF
+    exit;
+}
+
+$break_str = "\t";		# tab for default break str
+$Titles = 0;			# assume no input titles
+$#Titles = -1;			# assume no output titles
+@Fields = ();			# no explicit field selections
+%URLs = ();			# no URLs initially
+
+$InputType = '';
+$Strip_Spaces = '';
+$NoStrip_Spaces = '';
+$Show_Mode = 'Box';		# by default
+$Width = 0;			# no width limit by default
+
+$nofile = 1;
+
+while ($_ = shift(@ARGV)) {
+    if (/^-d(\W+)?$/) {				# -dSTR
+	$break_str = $1 || shift || usage "$PROG: Missing argument to -d\n";
+	next;
+    } 
+    if (/^-f(\d.*)/) {				# -fN1,N2,...
+	$value = $1;
+	# convert possible range spec
+	$value =~ s/\b(\d+)-(\d+)\b/join(',',$1..$2)/e;
+	@Fields = split(/[:, ]/,$value);
+	next;
+    }
+    usage if !index('-help',$_);
+    if (!index('-strip',$_)) {			# -strip
+	$Strip_Spaces = 1;
+	$NoStrip_Spaces = '';
+    } elsif (!index('-nostrip',$_)) {		# -nostrip
+	$NoStrip_Spaces = 1;
+	$Strip_Spaces = '';
+    } elsif (!index('-table',$_) || !index('-simple',$_)) {	# -table, -simple
+	$Show_Mode = 'Table';	
+    } elsif (!index('-list', $_)) {		# -list
+	$Show_Mode = 'List';
+    } elsif (!index('-box',$_)) {		# -box
+	$Show_Mode = 'Box';
+	$Strip_Spaces = 1 unless $NoStrip_Spaces;
+    } elsif (!index('-html',$_)) {		# -html
+	$Show_Mode = 'HTML';
+    } elsif (!index('-noescape',$_)) {		# -noescape
+	$No_Escape = 1;
+	$Show_Mode = 'HTML';
+    } elsif (!index('-noheaders',$_)) {		# -noheaders
+	$No_Header = 1;
+    } elsif (!index('-nodashes',$_)) {		# -nodashes
+	$No_Dashes = 1;
+    } elsif (/^(-\w+)(?:[:=](.*))?/) {		# -OPTION=VALUE
+	($_, $value) = ($1, $2);
+        if (!index('-titles',$_)) {		# -titles=NN, -titles=NAME,..
+	    if ($value =~ /^\d/ || $value eq '') { # -titles=NN?
+		$Titles = $value ne '' ? $value : 1;
+	    } else {			# -titles=name,name2,...,nameN
+		@Titles = split(/[:, ]/,$value);
+		$Titles = 0;		# no titles in the datastream
+	    }
+	} elsif (!index('-input',$_)) {		# -input=TYPE?
+	    $value = lc($value);
+	    if (!index('box',$value)) { 	# -input=box?
+		$InputType = 'box';
+		$Titles = 1 unless $Titles >= 1;
+	    } elsif (!index('list',$value))	{# -input=list?
+		$InputType = 'list';
+	    } elsif (!index('table', $value)) {	# -input=table?
+		$InputType = 'table';
+		$Titles = 1 unless $Titles >= 1;
+	    } elsif (!index('simple', $value)) {# -input=simple?
+		$InputType = 'simple';
+	    } else { 
+		usage "$PROG: bad -input TYPE"; 
+	    }
+	} elsif (!index('-fields',$_)) {	# -fields=Name1, Name2, ...
+	    # convert range spec
+	    $value =~ s/\b(\d+)-(\d+)\b/join(' ',$1..$2)/e;
+	    @Fields = split(/[:, ]+/,$value);
+	} elsif (!index('-break',$_)) {		# -break=STR
+	    $break_str = $value ne '' ? $value : "\t";
+	    if ($break_str =~ /\\/) {		# any escape sequences?
+		$break_str =~ s/"/\\"/g;	# yes, escape any quotes
+		$break_str = eval('"'.$break_str.'"');	# evaluate a string
+	    }
+        } elsif (!index('-width',$_)) {		# -width=NUM
+	    $value =~ /^\d+$/ or usage "$PROG: width must be a number.";
+	    $Width =  0 + $value;
+	} elsif (!index('-cwidths',$_)) {	# -cwidths=N1,N2,...,NM
+	    @Cwidths = split(/[,: ]/,$value);	
+	    if (grep(!/^(\.?\d+|\d+%)?$/,@Cwidths)) {
+	    	usage "$PROG: bad format for -cwidths.";
+	    }
+	} elsif (!index('-titleformats',$_) || !index('-tformats',$_)) {
+	    my @tformats = split(/[;|]/,$value); # get the title formats
+	    foreach (@tformats) {
+		next if /^<?($HTML_Elements)/i;	# HTML element ok?
+		usage "$PROG: bad HTML format element: '%s'", $1;
+	    }
+	    push(@Tformats,@tformats);		# allow multiple options
+	    $Show_Mode = 'HTML';
+	} elsif (!index('-dataformats',$_) || !index('-dformats',$_)) {
+	    my @dformats = split(/[;|]/,$value); # get the title formats
+	    foreach (@dformats) {
+		next if /^<?(?:$HTML_Elements)/i;	# HTML element ok?
+		usage "$PROG: bad HTML format element '%s'", $_;
+	    }
+	    push(@Dformats,@dformats);		# allow multiple options
+	    $Show_Mode = 'HTML';
+	} elsif (!index('-urls',$_)) {
+	    # parse COL1=URL1,COL2=URL2,...
+	    #   or: COL1:URL1,COL2:URL2,...
+	    my @urldefs = split(/[,|]/, $value);	# get the different URLs
+	    my $urldef;
+	    foreach $urldef (@urldefs) {
+		my ($col, $url) = split(/[=:]/,$urldef,2);
+		if ($col ne '' && $url ne '') {	# both defined?
+		    $URLs{$col} = $url;		# save the mapping
+		} elsif ($col ne '' || $url ne '') {
+		    usage "$PROG: bad URL format element: '%s'", $urldef;
+		}
+	    }
+	    $Show_Mode = 'HTML';		# make sure
+	} elsif (!index('-attributes',$_)) {
+	    $table_attributes .= ' '.$value;	# build up the list
+	    $Show_Mode = 'HTML';
+	} else {
+	    usage "$PROG: Unknown option: $_";
+	}
+    } elsif (/^-/) {	
+	usage "$PROG: Unknown option: $_"; 
+    } elsif (-f) {		# does the file exist?
+	open(STDIN,"<$_") || 
+	    die "$PROG: Can't open $_ for input: $!\n";
+	ShowData;
+	close(STDIN);
+	$nofile = 0;
+    } else {
+	err "File $_ does not exist.";
+	exit 1;
+    }
+}
+
+ShowData if $nofile;
+
+exit;
+
+
+# $type = guess_type $value
+
+sub guess_type {
+    local $_ = shift;
+    &PlainText if $Show_Mode eq 'HTML';	# remove HTML effects if -html
+					# so they aren't part of the typing
+    s/^\s+//; s/\s+$//;			# trim leading & trailing blanks
+    /^$/				&& return 'null';	# null type
+    /^([01tf]|yes|no|on|off)$/i		&& return 'bool';	# 0, 1, yes, no, on, off, t, f
+    m=^\d{2,4}[-/.]\d{1,2}[-/.]\d{1,2}$= && return 'date';	# mm/dd/yy, yy/mm/dd, yyyy.mm.dd, yyyy-mm-dd
+    m=^\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4}$= && return 'date';	# dd.mm.yyyy, d.m.yy, dd-mm-yy
+    /^\w{3,9} \d{1,2}, \d{4}/		&& return 'date';	# mmmm dd, yyyy
+    /^\d{1,2}[- ]\w{3}[- ]\d{2,4}$/	&& return 'date';	# dd mmm yyyy
+    /^\d\d:\d\d(:\d\d)?$/		&& return 'time';	# hh:mm:ss
+    /^[-+]?\d+$/			&& return 'int';	# +-nnnn
+    /^[-+]?[\d.]+(E[+-]?\d+)?$/		&& return 'real';	# +-nnn.nnn(E+-nn)
+    /^[-+]?[\d.]\%$/			&& return 'pct';	# nn%, nn.n%, -nn.nnn%
+    /^-?\(?\$[ \d,.]+\)?(?: *CR)?$/	&& return 'money';	# $  nn,nnn.nn or ($  nnn,nnn.nn)
+    /^-?\(?[\d]+,[\d,]+(\.(\d\d)?)?\)?$/&& return 'money';	# nnn,nnn.nn or ( nnn,nnn.nn)
+    /^['"]|["']$/			&& return 'string';	# "xxxx"
+    /^\w+$/				&& return 'symbol';
+    /\n/				&& return 'text';
+    					   return 'char';
+}
+
+# Do type conversion
+
+sub new_type {
+    my @types = @_;
+    my $type1 = $types[0];
+    my $type2 = $types[1];
+
+    # trivial conversions
+    $type1 eq '' 	&& return $type2;
+    $type2 eq ''	&& return $type1;
+    $type1 eq $type2	&& return $type1;
+
+    # handle null types
+    $type1 eq 'null'	&& return $type2;
+    $type2 eq 'null'	&& return $type1;
+
+    # These types supercede others
+    grep(/text/i,	@types)	&& return 'text';
+    grep(/string/i,	@types)	&& return 'string';
+    grep(/char/i,	@types)	&& return 'char';
+
+    # Now do finer-grain conversions
+    grep(/money/i,	@types)	&& return 'money';
+    grep(/pct/i,        @types) && return 'pct';
+    grep(/real/i,	@types) && return 'real';
+    grep(/int/i,	@types) && return 'int';
+    grep(/symbol/i,	@types) && return 'symbol';
+    grep(/bool/i,	@types) && return 'bool';
+
+    $type1;		# huh?
+}
+
+sub ShowData {
+    @Data = ();
+    # reset titles if they are coming from the data stream
+    #@Titles = () if $Titles > 0;	
+    @Types = ();
+    @Widths = ();
+    my ($titles, $data, $maxcols);
+    if ($InputType eq 'list') {
+	($titles, $data, $maxcols) = ReadListInput;
+    } else {
+	($titles, $data, $maxcols) = ReadTableInput;
+    }
+    my @titles = @$titles;
+    @Data = @$data;
+
+    # Make the fields selection
+    if (@Fields) {
+	# build a field index list
+	my ($f,$fx);
+	my %fields = ();
+	my @fields = ();			# an index list
+	@fields{@titles} = (0..$#titles);	# generate indexes
+	foreach $f (@Fields) {
+	    if ($f =~ /^\d+$/) {		# a numeric index?
+		$f--;				# convert to origin zero
+		push(@fields,$f) if $f <= $maxcols && $f >= 0;
+		next;
+	    }
+	    # Lookup a field name and use its index
+	    if (($fx = $fields{$f}) ne '') {
+		push(@fields,$fx);
+	    }
+	}
+	# now, given the field index array, splice each row array according
+	# to the field indexes
+	my $r;
+	for ($r = 0; $r <= $#Data; $r++) {	# foreach row of data..
+	    $row = $Data[$r];			# get the row
+	    @$row = @$row[@fields];		# slice out the desired fields
+	}
+	$maxcols = $#fields;			# set the other vars
+	@titles  = @titles[@fields];		# slice out the titles
+    }
+
+    # Now, map external titles onto the titles array, allowing
+    # user-given titles to override the built-in titles (if any).
+    if ($No_Header) {				# if no headers, no titles
+    	@titles = ();
+    } elsif ($#Titles >= 0) {			# map @Titles onto @titles
+	my ($c,$t);
+	for ($c = 0; $c <= $maxcols; $c++) {
+	    if (($t = $Titles[$c]) ne '') {	# user-given title
+		$titles[$c] = $t;		# overrides built-in title
+	    } elsif ($titles[$c] eq '') {	# otherwise, use default title
+		$titles[$c] = sprintf("Field_%d", $c + 1);
+	    }
+	}
+    }
+
+    # Scan the column widths, where none are given, and if a total width
+    # was given, calculate a fraction.
+    my $cols_left = length($Width) ? $Width : 	# maximum columns left
+    	$Show_Mode ne 'HTML' ? $ENV{'COLUMNS'} : 0;	
+
+    if ($cols_left > 0) {			# cols == 0 means no limit
+	# We must reduce the available columns by the formatting requirements
+	# of the display format
+	$cols_left -= $maxcols * 3 + 2 if $Show_Mode eq 'Box';
+	$cols_left -= $maxcols * 2 - 1 if $Show_Mode eq 'Table';
+
+	my ($c, $w, $cols);
+	for ($c = 0; $c <= $maxcols; $c++) {	# for each column..
+	    $w = $c <= $#Cwidths ? $Cwidths[$c] : $Cwidths[$#Cwidths];
+	    if ($w ne '') {			# is there a value?
+		# If the width is a fraction or percentage...
+		if ($w =~ /[.%]/ || ($w > 0 && $w < 1.0)) {
+		    $w = $1 / 100.0 if $w =~ /^(\d+)%/; # convert NN% to fraction
+		    $w = int($cols_left * $w);	# convert fraction to width
+		} 
+		$w = 1 unless $w > 0;		# guarantee 1 col min
+		$cols_left -= $w;		# keep an accounting
+		$cols_left = 0 if $cols_left < 0;# keep sane
+		$Widths[$c] = $w;		# set the column width
+	    }
+	}
+    }
+
+    my ($c, $r, $val, $row, $type, $newtype);	# some vars
+    # Now let's analyze the data
+    for ($c = 0; $c <= $maxcols; $c++) {	# Scan each column
+	$type = '';				# assume no default
+	for ($r = 0; $r <= $#Data; $r++) {	# scan each row
+	    $row = $Data[$r];			# get the row data
+	    if (defined($row->[$c])) {
+		$val = $row->[$c];		# get the column data
+	    } else {
+		$row->[$c] = '';
+	    }
+	    $newtype = guess_type $val;
+	    $type = new_type $type, $newtype;
+	}
+	$Types[$c] = $type;
+    }
+
+    local $theRow;
+    my $theRowSub = sub { &ShowRow( $_[0], \$theRow, \@Data ); };
+    ShowTable 
+    	{ show_mode	=> $Show_Mode,
+	  max_width	=> $Width > 0 ? $Width : '',
+	  titles	=> \@titles,
+	  types		=> \@Types,
+	  widths	=> \@Widths,
+	  row_sub	=> $theRowSub,
+	  no_escape	=> $No_Escape,
+	  table_attrs	=> $table_attributes,
+	  tformats	=> \@Tformats,
+	  dformats	=> \@Dformats,
+	  url_keys	=> \%URLs,
+	};
+}
+
+# ($titles, $data, $maxcols) = ReadTableInput
+#
+# $titles is a ref to an array of titles
+# $data is a ref to an array of rows (arrays of values)
+# $maxcols is the maximum columns index in any of the rows.
+
+# The global $Titles determines how many titles rows there are.
+# Unless $NoDashes is set, this can be determined imperically 
+# if there are titles and a separator row, or explicitly with
+# -titles=NN.
+
+sub ReadTableInput {
+    my @data;
+    my @titles;
+    my $data;
+    if ($Titles > 0) {
+	@titles = @{&NextRow};
+	# if there are multiple lines of titles, combine them
+	my ($limit, $r, $c);
+	for ($r = 1; $r < $Titles; $r++) {
+	    $data = NextRow;	# get the next row of data
+	    $limit = max $#titles, $#$data;
+	    for ($c = 0; $c <= $limit; $c++) {
+		$titles[$c] .= ' '.$data->[$c];	# combine titles
+	    }
+	}
+	foreach (@titles) {	# clean up the names
+	    s/^\s+//;	# trim leading &
+	    s/\s+$//;	#  trailing blanks
+	    s/\s+/ /g;	# & squeeze middle blanks
+	}
+    } else {
+	$#titles = -1;		# no titles at all
+    }
+    my $maxcols = 0;
+    while ($data = NextRow) {
+	push(@data, $data);	# collect the data
+	$maxcols = $#$data if $#$data > $maxcols;
+    }
+    (\@titles, \@data, $maxcols);
+}
+
+# Read in next row of data into $_; return \@data.
+#
+# If $InputType is 'box', input with "| foo | bar | ... |" is 
+# boxed input, and the bars are removed.  Also, if "|<" or ">|"
+# occur, then the next row of data is appended to the current 
+# row.
+#
+# Unboxed input is split by tabs (or the $break_str)
+
+sub NextRow {
+    my @row;
+    my ($continue, $append);
+    while (1) {
+	$_ = <STDIN>;
+	last unless $_;
+	chomp;
+	unless ($InputType) {
+	    $InputType = 'box' if /^\s*([\+:|*])[-+=:*|_]*$1\s*$/;
+	}
+	next if !$No_Dashes && /^[-_=+ \t]*$/;
+
+	my @data;
+	# If boxed input, remove boxing characters and split with the
+	# box bar character
+	if (/^\s*([|:]).*$1\s*$/ && $InputType eq 'box') {
+	    # The data is boxed--remove boxing data
+	    my $bar = $1;
+	    my $continue = />\Q$bar\E/;	# is there a continuation?
+	    my $append  |= /\Q$bar\E</;	# should this be appended?
+	    s/^\s*\Q$bar\E<?\s*//;	# remove leading bar (if any)
+	    s/\s*>?\Q$bar\E\s*$//;	# remove trailing bar (if any)
+	    if ($NoStrip_Spaces) {	# nostrip?
+		@data = split(/>?\Q$bar\E<?/);
+	    } else {
+		@data = split(/\s*>?\Q$bar\E<?\s*/);
+	    }
+	} else {			# not in box mode
+	    if ($break_str eq " \t" or $break_str eq "\t ") {
+		@data = split(' ');
+	    } elsif ($Strip_Spaces) {
+		@data = split(/\s*\Q$break_str\E\s*/);
+	    } else {
+		@data = split(/\Q$break_str\E/);
+	    }
+	    if ($InputType eq 'table') {	# check for table wraps
+		$append  |= grep(s/^<//,@data);	# see if any appends
+		$continue = grep(s/>$//,@data);	# see if any continuations
+	    }
+	}
+	if ($append) {
+	    my $maxcol = max($#data, $#row);
+	    for ($i = 0; $i < $maxcol; $i++) {
+		$row[$i] .= $data[$i];
+	    }
+	    $append = '';			# append done (for now)
+	} else {
+	    @row = @data;			# initialize the row data
+	}
+	# quit the loop unless we have a continuation of data
+	last unless $continue;
+	$append = $continue;
+	$continue = '';
+    }
+    $#row >= 0 ? \@row : undef;
+}
+
+# ( $titles, $data, $maxcol) = ReadListInput;
+#
+# $titles is a ref to an array of titles.
+# $data is a ref to an array of rows (arrays of columns) of data.
+# $maxcol is the maximum number of columns in any one row of the data.
+
+# The order of the columns in the resulting array of rows is defined
+# by the names in the @Titles array, or the order of occurance of the
+# columns in the lists of column names.
+
+sub ReadListInput {
+    my @data;
+    my @titles;
+    my ($key, $lastkey, $val);
+    local $_ = 'go';
+    my $maxcol = 0;
+    my $titlesref;
+    while (length) {
+	my %row;
+	# Read another "row" of list data
+	while (1) {
+	    defined($_ = <STDIN>) or last;
+	    last if /^\s*$/;	# stop on the row boundary
+	    chomp;
+	    ($key, $val) = /^\s*([\w_.:\/-]+)?\s*:[ \t]?(.*)/;
+	    if ($key ne '') {
+		$row{$lastkey = $key} = $val;
+		push(@titles,$key) unless grep(/^\Q$key\E/,@titles);
+	    } else {
+		$val = ' '.$val 
+		    unless $val =~ /^ / || $row{$lastkey} =~ / $/;
+		$row{$lastkey} .= $val;
+	    }
+	}
+	my @row;
+	$titlesref = $#Titles >= 0 ? \@Titles : \@titles;
+	foreach $column (@$titlesref) {
+	    if (exists $row{$column}) {
+		push(@row,$row{$column});
+	    } else {
+		push(@row,undef);		# same as SQL NULL
+	    }
+	}
+	push(@data,\@row);			# save the row
+	$maxcol = $#row if $#row > $maxcol;
+    }
+    $maxcol = $#titles if $#titles > $maxcol;
+    $titlesref = $#Titles >= 0 ? \@Titles : \@titles;
+    ($titlesref, \@data, $maxcol);
+}
+
+# $max = max @values;
+# Return the maximum of a list of values
+
+sub max {
+    my $max = shift;
+    foreach (@_) { $max = $_ if $_ > $max; }
+    $max;
+}
+
+__END__
+
+=head1 NAME
+
+B<showtable> - Show data in nicely formatted columns
+
+=head1 USAGE
+
+B<showtable> [-I<options>] [I<file>]
+
+=head1 DESCRIPTION
+
+B<Showtable> reads an input data stream and displays it in a nicely
+formatted listing, with exact formatting depending upon the options.
+The input stream, I<file> or C<STDIN> by default should consist of data
+separated by tabs or the defined I<separator> character (see B<-d>).
+
+The actual output formatting is peformed by the B<ShowTable> module.
+
+=head1 OPTIONS
+
+There are two general sets of options: those which help determine the format of the
+input, and those which determine the format of the output.
+
+=head2 B<Options affecting input>
+
+=over 10
+
+=item B<-break=>I<str>
+
+Set the inter-column break string to "I<str>".  The default
+is a tab ("C<\t>").  If B<-strip> is also given, blanks surrounding
+the break string will also be ignored.
+
+=item B<-d>I<str>
+
+This is the same as C<-break=>I<str>.
+
+=item B<-nod(ashes)>
+
+Do not ignore lines of separators, such as dashes, equal 
+signs, or underlines.  If B<-nodashes> is given, and these lines do occur
+in the stream, they will be treated as normal data.
+
+=item B<-ti(tles)[=>I<NN>B<]>
+
+Treat the first I<NN> rows of data as column titles; multiple
+words in the column titles may wrap vertically. If I<NN> is
+omitted, it defaults to 1.  No B<-titles> option is the same
+as B<-titles=0>.
+
+=item B<-in(put)=>I<type>
+
+Set the input type as I<type>, which can be one of: I<box>, I<list>, I<table>,
+or I<simple>.  A I<simple>-type table is the same as a I<table>-type,
+but no wrapping characters are recognized.
+
+=item B<-s(trip)>
+
+Strip blanks from around the column values.
+
+=item B<-nos(trip)>
+
+Do not strip blanks from the input.  Useful if there is formatted or aligned
+data within a boxed table.
+
+=back
+
+=head2 B<Options affecting output>
+
+=over 10
+
+=item B<-t(able)>
+
+Use a I<table> format for output, with wrapping of column values longer 
+than the given or determined column widths.  See L<Data::ShowTable> for 
+more details.
+
+=item B<-si(mple)>
+
+Use a simple table format, without any wrapping of column values.  
+See L<Data::ShowTable> for more details.
+
+=item B<-l(ist)>
+
+Use a list style format.  See L<Data::ShowTable> for more details.
+
+=item B<-b(ox)>
+
+Use a "boxed" style table.  See L<Data::ShowTable> for more details.
+
+=item B<-ht(ml)>
+
+Use HTML-formating.  See L<Data::ShowTable> for more details.
+
+=item B<-ti(tles)=>I<name1>B<,>I<name2>B<,...,>I<nameN>
+
+Define the column names explicitly.  This is useful for naming columns
+of data from C<STDIN>, when B<showtable> is being used as a filter.  The
+first column name, I<name1>, cannot begin with a digit.  This option
+allows any column titles obtained from the input to be overridden.
+
+=item B<-noh(eaders)>
+
+Do not output any headers on the tables; B<-titles=0> implies this option.
+
+=item B<-f>I<n1>[,I<n2>, ..., I<nN>]
+
+Select fields numbered I<n1>, I<n2>, etc., to display.  Each I<nN> is a
+field index, or a range of indexes in the form: C<N>-C<M> The default
+is to show all the fields in each row.  Fields are numbered from 1.  An
+example:  to show the first, and three through five fields of the
+C</etc/passwd> file:
+
+    showtable -d: -f1,2-5 /etc/passwd
+
+=item B<-fields>=I<fname1>[,I<fname2>, ..., I<fnameN>]
+
+Select the named fields to display.  The field names must be available, either
+through the data stream, or by using the B<-titles> option.   The field
+names given must match the existing field names I<exactly>.
+
+Using the file C</etc/passwd> for another example: to show the same first two
+fields, by name:
+
+    showtable -d: -titles=Login,UID -fields=Login,UID /etc/passwd
+
+=item B<-w(idth)>=I<num>
+
+Set the maximum table width.  This value is applied to the variable 
+L<Data::Showtable::Max_Table_Width>.  When the total width of all
+columns to be displayed exceeds this value, all column widths are scaled
+uniformly.  
+
+If B<-width> is not given, then for all output but B<-html>, the default
+value is either "C<COLUMNS>", if defined, or 80, if not.  Whith B<-html>
+mode, there is no default value for B<-width>; in other words, there is
+no limit to the width.
+
+=item B<-cw(idths)>=I<w1>[,I<w2>,...,I<wN>]
+
+Set individual column widths to the specified values.  Empty column
+widths imply no maximum width.  If the B<-width> option is also given,
+then the B<-cwidth> column widths can also be given as fractions or
+percentages. 
+
+Example: To set the maximum width of the third column to 20 characters:
+
+    -cw=,,20
+
+=back
+
+=head2 B<HTML-only options> (the usage of which implies B<-html>)
+
+=over 10
+
+=item B<-noe(scape)>
+
+Do not perform HTML escape sequences on the data; this allows embedded
+HTML text in the data to be displayed properly with the B<-html> option.
+
+=item B<-attributes>='I<attr1> I<attr2> ...'
+
+Declare the table attributes, which are inserted into the C<TABLE>
+token.  For example, the option:
+
+    -attributes='BORDER=0 CELLSPACING=2 CELLPADDING=4'
+
+would cause the following HTML:
+
+    <TABLE BORDER=0 CELLSPACING=2 CELLPADDING=4>
+
+The default table attributes are:
+
+    <TABLE BORDER=1 CELLSPACING=1 CELLPADDING=1>
+
+=item B<-t(itle)_f(ormats)>=I<fmt1>;I<fmt2>;...;I<fmtN>
+
+Set the HTML formats for the column titles.  The B<-title_formats> (or
+just B<-tf>) can be given multiple times, for each column, or formats
+for multiple columns can be given on the same option separated by
+semi-colons "C<;>".
+
+Each I<fmtN> can itself be multiple HTML items, separated by commas.
+Each HTML element can be given either as an HTML token (eg:
+"C<\<BOLD\>>"), or as a plain name (eg: "C<BOLD>").  
+
+For example, here is a title format specification for three columns,
+where the first column title should be bold italic, the second italic,
+and the third italic in a smaller font:
+
+	-tf='BOLD,I;I;<FONT SIZE=-2>,I'
+
+=item B<-d(ata)_f(formats)>=I<fmt1>;I<fmt2>;...;I<fmtN>
+
+The same as B<-title_formats> but applies to the column data.
+
+=item B<-url(s)=I<col1>=I<url1>,I<col2>=I<url2>,...>
+
+Define a mapping from column names, or indexes, to URLs to be inserted
+as <A HREF's> around the values for the named columns.  Each I<colN> is
+a column name or index, and each I<urlN> is a string representing the
+URL to be inserted for the given column.
+
+The URL text may contain these substitution strings:
+
+B<%K> - will be substituted with the current column name (or I<key>). 
+
+B<%V> - will be substituted with the current column value.
+
+Multiple B<-url> options may be given, if desired, rather than
+creating one long argument for a single B<-url>.  For example:
+
+    showtable	-d: -f1,6 -titles=Login,Homedir \
+		-url='Login=mailto:%V' \
+		-url='HomeDir=file:%V' \
+	   	/etc/passwd
+
+=back
+
+=head2 B<Other options>
+
+=over 10
+
+=item B<-help>
+
+Display some help to the user and quit.
+
+=back
+
+=head2 B<Boxed Input>
+
+If the input type is I<box>, then vertical and horizontal box characters
+are removed from the input stream, and blanks surrounding the vertical
+box characters are removed.  The vertical box characters (column
+separaters) are "C<|>" or "C<:>".  The The horizontal box characters are
+"C<+>" and "C<->". 
+
+Morever, data wrapped within a column is recognized and parsed as one
+column value, by recognizing the presence of a I<wrapping prefix> or
+I<wrapping suffix> character.  Currently, the wrapping prefix character
+is "<", and the wrapping suffix character is ">". 
+
+An example of data wrapped within a column is given here.  The table
+below has just two I<logical> rows of data; with both rows having data
+wrapped into multiple I<physical> rows. 
+
+	+---------+---------+---------+
+	|  Col 1  |  Col 2  |  Col 3  |
+	+---------+---------+---------+
+	| This is>| Another>| Row 1,3>|
+	|< a cont>|< value. |<is also>|
+	|<inued  >|         |<long.   |
+	|<value.  |         |         |
+	|This is >| Item2-2 | Item2-3 |
+	+---------+---------+---------+
+
+=head2 B<List Format>
+
+When using the B<-list> or B<-input=list> options, either, or both, the 
+input and output may be in a "list" format, which is implemented
+using the following syntax:
+
+	r1c1_name: r1c1_value
+	r1c2_name: r1c2_value
+	...
+	r1cN_name: r1cN_value
+
+	r2c1_name: r2c1_value
+	r2c2_name: r2c2_value
+		 : r2c2_value_continued
+	...
+	r2cN_name: r2cN_value
+
+	rMc1_name: rMc1_value
+	rMc2_name: rMc2_value
+	...
+	rMcN_name: rMcN_value
+
+Each I<row> of data consists of one or more I<columns>, and ends with
+a blank line.
+
+Each I<column> consists of a I<column name>, followed by a colon ":",
+followed by an optional, single space or tab, followed by the 
+I<column value>, on the same line. 
+
+Continuation lines of the previous column value consist of one or more
+space or tab characters, a colon ":", one optional, single space
+or tab, followed by the continuation value.  In the example above,
+The second column value of the second row was continued.
+
+=head2 B<HTML Input with HTML Output>
+
+When using B<-html> on data already containing HTML-formatted text,
+the B<-noescape> option should be used.  By default, all input
+text is assumed I<not> to be HTML-formatted, and is escaped
+allowing embedded "<", ">" characters, if any, to be displayed
+correctly.
+
+=head1 DEPENDENCIES
+
+=over 10
+
+=item B<Data::ShowTable> module
+
+Performs the actual output formatting.
+
+=back
+
+=head1 AUTHOR
+
+Alan K. Stebbens I<aks@stebbens.org>
+
+=head1 BUGS
+
+=over 5
+
+=item *
+
+Currently, the box formatting characters are not configurable: '+' for
+the corners; '-' and '|' for the tops and sides, respectively.  In an
+ideal world, these things would be configurable.
+
+=item *
+
+The continuation prefix and suffix characters, '<' and '>',
+respectively, are also not configurable:
+
+=item *
+
+When reading I<table> input, any data ending with ">" will
+be considered to be continued by the next row of data.  To avoid
+this, use B<-input=simple>.
+
+=item *
+
+When selecting noncontiguous fields (ie: B<-f1,4>>) without
+field names, the default field names will be consecutively
+numbered from 1, which is counter-intuitive to the original
+selection.  To avoid this, name the fields using the B<-title=...> 
+option.
+
+=back
+
+=cut

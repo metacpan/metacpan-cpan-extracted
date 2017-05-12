@@ -1,0 +1,55 @@
+Revision history for DBIx-NoSQL
+
+0.0021 2017-04-21
+  [ BUGS ]
+    - CREATE TABLE regex modified. (GH#4, nebulous)
+    - set the minimal DBD::SQLite to 1.44 (RT#106903)
+    - change test expected exception for newer DBD::SQLite.
+
+  [ IMPROVEMENT ]
+    - Switch from Any::Moose (which is deprecated) to Moose. (nebulous +
+      yanick)
+    - set() now auto-generate the entry's key if not provided  (and returns
+      the key as its return value). (GH#3, nebulous)
+
+  [ STATISTICS ]
+    - code churn: 37 files changed, 182 insertions(+), 708 deletions(-)
+
+0.0020 Wednesday January 30 16:39:54 PST 2013:
+  - Incorporate yanick's fixes to ->next
+
+0.0019 Wednesday January 23 14:43:28 PST 2013:
+  - Import 'blessed' from Test::Deep explicitly
+
+0.0018 Thursday December 22 18:12:34 PST 2011:
+  - Fix failing test with latest DBIx::Class
+
+0.0017 Thursday April 07 14:19:22 PDT 2011:
+  - Declare the join via DBIC in the correct way
+
+0.0016 Wednesday April 06 20:20:04 PDT 2011:
+  - Better DSN/file detection for automatic delegation to SQLite 
+  - Automatic redeployment of "different" indexing schema
+
+0.0015 Sunday December 05 16:31:55 PST 2010:
+  - Removed superfluous DateTime dependency
+
+0.0014 Saturday December 04 16:51:08 PST 2010:
+  - Added ->exists
+  - Added DBIx::NoSQLite
+  - More documentaiton and tests
+
+0.0013 Saturday December 04 00:36:16 PST 2010:
+  - Documentation and test cleanup
+
+0.0012 Tuesday November 30 21:14:05 PST 2010:
+  - Documentation for ->search
+  - Check for DateTime before running test
+  - Depend on SQL::Translator
+
+0.0011 Sunday November 28 12:26:22 PST 2010:
+  - Added delete delegation to ::Store
+  - Fix record deletion in index
+
+0.0010 Saturday November 27 2010:
+  - Initial release

@@ -1,0 +1,45 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.80.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 5f4e88db8473fc644b3c5b11bd1d8fb084ab3589 Changes
+SHA1 709efca6331736d6a01b3417ec36528ca8d08c41 LICENSE
+SHA1 b8128ac43b33108aef500f30e3a339b882d62185 MANIFEST
+SHA1 4dc05c64995a7d3d55cf22790d30939e548d27aa META.json
+SHA1 45f0c2d03387c2d5eb793f491e763c803bf86668 META.yml
+SHA1 edff1798325b750cd055e4c31f170ebf1f35d9c2 Makefile.PL
+SHA1 47b18604191639f5ce418e102c999f3da666e69a README
+SHA1 76f8fec22ecfcd58e3b53758a54ff3cc307cb1a2 dist.ini
+SHA1 89c98b2ef042f66837490a9d8e83823fb4114858 lib/DBIx/Class/EncodedColumn/Crypt/PBKDF2.pm
+SHA1 a62c17fbdbb5972781e5a76c060c66929a4b5521 t/00-load.t
+SHA1 86b3b9bbddbcfd6937c332149b99fc4cbdaaeb8a t/00-report-prereqs.dd
+SHA1 d102b9c45639416472b593947cb72390e24f8e93 t/00-report-prereqs.t
+SHA1 b2fde2cf35dad9b9f9ef5c9ba3975b2bf90d500c t/01-basic.t
+SHA1 519eeb8342b1615bbc8e2077928e39881b61888e t/author-pod-coverage.t
+SHA1 f406569e6d2f498d09ae9f62baeb9b5b0c84ffbc t/author-pod-syntax.t
+SHA1 17189226c617643890f3b2cc501dd239059cabcf t/author-synopsis.t
+SHA1 047a3c5555572d146d70b92ff44c902eeca81ea7 t/lib/Schema.pm
+SHA1 44b6e05c6d487a134a9ce2f2db0c119290dae32e t/lib/Schema/PBKDF2.pm
+SHA1 a1c3c2f933386cd5500a38e56a2df9ce5b4ebec0 t/release-cpan-changes.t
+SHA1 6969f5c148895a55b39ecd63703098d3757e7ec7 t/release-dist-manifest.t
+SHA1 752bd13d83a21cb0801f08f6c8a776cc0c54b910 t/release-pod-linkcheck.t
+SHA1 cd0d37469e1761a4f309a80bdb39aa31f47adae3 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Comment: GPGTools - http://gpgtools.org
+
+iD8DBQFXz4oilp+7gMsE0ucRAmJSAJ92T1LBti3AxkVWAVQj2ydxXCPQuwCeKpbX
+uK8b4Q2EJSMZoqoLiG+thD8=
+=/1oO
+-----END PGP SIGNATURE-----

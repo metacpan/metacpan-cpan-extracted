@@ -1,0 +1,52 @@
+Revision history for Dancer::Plugin::LDAP
+
+0.0050 Thu Sep  5 12:55:11 2013 CEST
+
+    [ENHANCEMENTS]
+
+    * Add support for comparison operators (<, <=, >, >=).
+
+0.0040 Mon Feb 18 09:45:41 2013 CET
+
+    [BUG FIXES]
+
+    * GH #2: Don't pass empty values to LDAP from quick_insert method
+      (Marco Pessotto).
+    * Decode UTF-8 inside DN's retrieved from LDAP (Marco Pessotto).
+
+0.0030 Thu Feb 14 10:48:30 2013 CET
+
+    [BUG FIXES]
+
+    * GH #1: Fix update of attributes with empty value (Marco Pessotto)
+
+0.0020 Sat Oct  6 14:36:08 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Compatible to Dancer 1 and Dancer 2.
+
+0.0010 Fri Jul 13 14:56:37 2012 CEST
+
+    [ENHANCEMENTS]
+
+    * Use Net::LDAP's socket method to determine whether the LDAP
+      connnection is still alive.
+    * Add dn property of LDAP message object to failure message if present.
+
+0.0002 Wed Feb  1 12:58:41 2012 CET
+
+    [FIXES]
+
+    * Fix UTF-8 encoding on attribute values returned from LDAP search.
+    * Fix passing through of unaccounted parameters in quick_select to
+      Net::LDAP's search method.
+
+    [DOCUMENTATION]
+
+    * Add LDAP bind and password parameters to configuration example.
+
+0.0001 Fri Jan 27 10:03:26 2012 CET
+
+    * Initial release.
+

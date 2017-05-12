@@ -1,0 +1,16 @@
+SIGNATURE
+Safe.pm
+Safe.pm.html
+README
+INSTALL
+LICENSE
+TODO
+Changes
+META.yml
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+.perlcriticrc
+t/01safe.t
+t/02perlcritic.t
+t/03db.t

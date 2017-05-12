@@ -1,0 +1,70 @@
+{
+   "abstract" : "A minting profile for Modules written with MooseX::Declare",
+   "author" : [
+      "Daniel B <dbr@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-MintingProfile-MooseXDeclare",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::ShareDir::Install" : "0.03",
+            "Module::Build" : "0.3601"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::DBR" : "0",
+            "Dist::Zilla::Role::MintingProfile::ShareDir" : "0",
+            "Moose" : "0",
+            "Pod::Weaver::Plugin::Encoding" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Carp" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec::Functions" : "0",
+            "List::Util" : "0",
+            "Scalar::Util" : "0",
+            "Test::CheckDeps" : "0.006",
+            "Test::More" : "0.94",
+            "Test::UseAllModules" : "0",
+            "perl" : "5.004",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::MintingProfile::MooseXDeclare" : {
+         "file" : "lib/Dist/Zilla/MintingProfile/MooseXDeclare.pm",
+         "version" : "0.200"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.200",
+   "x_authority" : "cpan:DBR"
+}
+

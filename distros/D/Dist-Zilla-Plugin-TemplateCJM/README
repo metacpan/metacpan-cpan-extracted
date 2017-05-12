@@ -1,0 +1,50 @@
+Dist::Zilla::Plugin::TemplateCJM version 5.001, released December 12, 2015
+
+
+Dist::Zilla::Plugin::TemplateCJM is a plugin I've written for
+Dist::Zilla.  It used to be distributed in Dist-Zilla-Plugins-CJM, but
+when I added DateTime::Format::Natural as a prerequisite, I decided to
+split it out.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                        Minimum Version
+  ------------------------------ ---------------
+  DateTime::Format::Natural       
+  Dist::Zilla                     5
+  Dist::Zilla::Role::ModuleInfo   
+  List::Util                      
+  Moose                           
+  Moose::Util::TypeConstraints    
+  constant                        
+  version                         0.77
+
+
+
+CHANGES
+    Here's what's new in version 5.001 of Dist::Zilla::Plugin::TemplateCJM:
+    (See the file "Changes" for the full revision history.)
+
+	- don't add coercions to named types
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

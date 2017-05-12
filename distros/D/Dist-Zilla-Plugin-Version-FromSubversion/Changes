@@ -1,0 +1,30 @@
+Changes for Dist-Zilla-Plugin-Version-FromSubversion
+
+1.000019  2012-01-13 01:26:10 Europe/Paris
+	Fixes repository metadata in META.json.
+
+1.000017  2012-01-13 01:19:13 Europe/Paris
+	Add 'fallback_file' option.
+	Fixes 'fallback_revision' error in svn:keywords check.
+	Add repository metadata in META.json.
+
+1.000012  2011-11-26 00:18:35 Europe/Paris
+	Add 'fallback_revision' option to enable support for distribution
+	  source exported (svn export) from Subversion. When working from a
+	  working copy, the file dist.ini is checked for having 'svn:keywords'
+	  enabled so that the expansion will work.
+
+1.000008  2011-11-23 00:11:14 Europe/Paris
+	No code change in the plugin. Only dist fixes.
+	Add a test to avoid the broken version number in the D:Z:P:V:FS release
+	  1.000002, due to PkgVersion (not a bug in the D:Z:P:V:FS code itself)
+	Fix dist dependencies:
+	- remove Test::Pod, Test::PodCoverage, Test::Kwalitee which are only
+	  for release testing
+	- add Dist::Zilla
+	- replace Alien::SVN with SVN::Core: SVN::Core may be installed from
+	  an other source than Alien::SVN, for example directly from the
+	  original sources on Debian/Ubuntu
+
+1.000002  2011-11-22 01:56:35 Europe/Paris
+	Initial release.

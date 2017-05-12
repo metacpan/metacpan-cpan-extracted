@@ -1,0 +1,120 @@
+#!/usr/bin/env perl
+
+use 5.006002;
+
+use strict;
+use warnings;
+
+use Date::Tolkien::Shire;
+use Getopt::Long 2.33 qw{ :config auto_version };
+use Pod::Usage;
+use Time::Local;
+
+our $VERSION = '1.901';
+
+my %opt = (
+    format	=> '%Ex%n%En%Ed',
+);
+
+GetOptions( \%opt,
+    qw{ format=s shire! },
+    help => sub { pod2usage( { -verbose => 2 } ) },
+) and @ARGV <= 3 or pod2usage( { -verbose => 0 } );
+
+my $dts;
+
+if ( $opt{shire} ) {
+    my %arg;
+    if ( 3 == @ARGV ) {
+	@arg{ qw{ year month day } } = @ARGV;
+    } else {
+	@arg{ qw{ year holiday } } = @ARGV;
+    }
+    defined $arg{year}
+	or die "You must specify the year with -shire\n";
+    $dts = Date::Tolkien::Shire->from_shire( %arg );
+} elsif ( @ARGV ) {
+    my ( $year, $month, $day ) = @ARGV;
+    $month ||= 1;
+    $day ||= 1;
+    $dts = Date::Tolkien::Shire->new(
+	timelocal( 0, 0, 0, $day, $month - 1, $year ) );
+} else {
+    $dts = Date::Tolkien::Shire->today();
+}
+
+$dts->error()
+    and die $dts->error(), "\n";
+
+print $dts->strftime( $opt{format} ), "\n";
+
+
+__END__
+
+=head1 TITLE
+
+on-date - Lord Of THe Rings events on a given Gregorian date
+
+=head1 SYNOPSIS
+
+ on-date
+ on-date 2010 6 23
+ on-date -shire 1419 3 25 # Rethe 25 - Ring destroyed
+ on-date -shire 1419 3    # Midyear's day - Arwen & Aragorn wed
+ on-date -help
+ on-date -version
+
+=head1 OPTIONS
+
+=head2 -format
+
+ -format
+
+This option specifies the format string to use in generating the output.
+
+The default is C<'%Ex%n%En%Ed'>, which produces output like C<on_date()>.
+
+=head2 -help
+
+This option displays the documentation for this script. The script then
+exits.
+
+=head2 -shire
+
+If this option is asserted, the arguments are dates in the Shire
+calendar: either year, month, and day numbers, or year and holiday
+numbers.
+
+The default is C<-noshire>, which causes the arguments to be interpreted
+as Gregorian year, month and day numbers.
+
+=head2 -version
+
+This option displays the version of this script. The script then exits.
+
+=head1 DETAILS
+
+This Perl script calls the L<Date::Tolkien::Shire|Date::Tolkien::Shire>
+L<strftime()|Date::Tolkien::Shire/strftime> method to format and print
+the Shire Reckoning equivalent to a Gregorian date specified on the
+command line. The default is the current local date.
+
+=head1 AUTHOR
+
+Thomas R. Wyant, III F<wyant at cpan dot org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2017 by Thomas R. Wyant, III
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl 5.10.0. For more details, see the full text
+of the licenses in the directory LICENSES.
+
+This program is distributed in the hope that it will be useful, but
+without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut
+
+# ex: set textwidth=72 :

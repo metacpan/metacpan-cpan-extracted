@@ -1,0 +1,27 @@
+Revision history for Perl extension Distribution-Metadata
+
+0.05  2015-10-08 00:16:24 JST
+
+    - fix bug agian; should have cache install.json per directories
+    - document that paths are Cwd::abs_path()-ed (#6 reported by zachthompson)
+
+0.04  2015-07-27 00:29:08 JST
+
+    - fix bug; should have cache install.json per directories
+
+0.03  2015-07-26 18:42:39 JST
+
+    - introduce Factory class, which gives speed improvement
+    - fix #2 (distributions which have no "main module" cannot be gathered)
+
+0.02 2015-03-15T19:49:21Z
+
+    - document that this module is still in development phase, and API will change without notice
+    - speed improvements; cache core packlist, try to search naively guessed packlist and meta directory first
+    - add name, version, distvname, author, pathname methods
+    - other fixes (see #1)
+
+0.01 2015-02-22T07:15:59Z
+
+    - original version
+

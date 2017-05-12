@@ -1,0 +1,35 @@
+Revision history for Dancer2-Template-Xslate
+
+v0.1.1    2016-01-06 00:35:14-06:00 America/Chicago
+    - Raised Dancer2 version requirement to 0.15.
+
+v0.1.0    2016-01-03 19:24:06-06:00 America/Chicago
+    - Lowered Perl version requirement to v5.8 (wyoung on GitHub).
+
+v0.0.7    2014-08-31 11:30:11-05:00 America/Chicago
+    - Fixed tests, code. Now works with Dancer2 0.150000. (Sawyer X)
+
+v0.0.6    2014-01-04 09:57:20 America/Chicago
+    - Fixed issue causing template path to not be found when a PSGI dispatcher
+      is in a directory other than the default (contributed by patzim on
+      GitHub).
+
+v0.0.5    2013-10-08 11:55:13 America/Chicago
+    - Bumped Dancer2 version requirement.
+    - Promoted to full release.
+
+v0.0.4    2013-10-07 10:15:35 America/Chicago
+    - Handled Xslate configuration options presumptively inserted by Dancer2.
+    - Fixed pathing issues on MS Windows (contributed by Sören Kornetzki on
+      GitHub).
+
+v0.0.3    2013-03-07 20:20:53 America/Chicago
+    - Fixed configuration example in POD.
+
+v0.0.2    2013-03-03 14:28:01 America/Chicago
+    - Improved accomodatation of using either Dancer's "views" or
+      Xslate's "path" configuration options.
+    - Promoted to full release.
+
+v0.0.1    2013-03-02 23:49:16 America/Chicago
+    - First version, released on an unsuspecting world.

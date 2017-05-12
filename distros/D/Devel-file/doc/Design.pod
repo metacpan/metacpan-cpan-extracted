@@ -1,0 +1,267 @@
+=pod Not really yet
+
+=head1 PRINCIPLES
+
+ * Be safe.  Don't introduce bugs.  Don't lose error messages (append only).
+   Don't mess with die in eval by default.  Take care with errors and
+   warnings in the handlers themselves.
+
+ * If you don't have anything constructive to say, don't say anything.
+   Meaning the if we can't find a file, or load a module, stay mum.
+   -d:file=verbose to diagnose.
+
+ * Prefer to use -d and it's information.  Has the file and eval source
+   already in an array without any dependencies.
+
+ * Defaults should do the right thing
+
+ * Release early.  Don't get hung up on highlighting, etc.
+
+ * Safe for use switched on in environment during development
+
+=head1 HANDLER PATTERNS
+
+ 1 Replace
+ 2 Stash old in lexical and
+   * run afterwards
+   * restore on disable 
+ 3 Wrap with closure
+   $SIG{__WARN__} = sub { $old; $us } OR sub { $us; $old }
+ 4 Fail by default and ask for configuration
+   Wanted defaults to be safe above.
+
+How do these interract with $^S states?  They don't.
+How do these interract with localized versions?
+Could it be applied to itself?
+Can we end up with the same handler multiple times, or detect this?
+Is lexical too restrictive?  Can't have separate setups
+    could keep our own stack during enable/disable - still global
+Do odd patterns of enable and disable make a mess?  (Who cares?)
+Should the original run before of after?  Before, I would guess.
+    Dev::SW is after (+END) and diag is before
+    Running the original would be good, Summarized + -d:file
+Can't/should wrapping be treated differently for warn/die?
+diagnostics also checks for internal exceptions/warnings
+
+Replace: no incoherent nexting, can be applied to itself,
+don't need to check when replacing, client can use local($SIG{*}) to
+do localized w/ restore.  Local isn't an option via import (can't be)
+without $^H support.
+
+Stash old in lexical: only one so can't stack, can run afterwards/before,
+enable/disable mismatch vulnerable, local might be a bit weird if you
+expect replacement, 
+
+Wrap with closure: harder to tell if we're currently installed possibly
+leading to multiple wrappings unless care is taken.
+
+easy to test $SIG{__DIE__} == \&handler;
+closure?  
+    bless it so it isa dfile 
+    can't run it, might not be us
+    track "our" closures globally, blegh
+    other tacked on attribute? can't think of one
+
+From SummarizedWarnings:
+
+ sub install_handler {
+    my $old_handler = $SIG{'__WARN__'};
+    my $new_handler =
+    ( $old_handler
+      ? sub { &$old_handler; &append_to_warning_log; }
+      : \&append_to_warning_log );
+    
+    $INSTALLED_HANDLER = $SIG{'__WARN__'} = $new_handler;
+    
+    return;
+ }
+
+This means that &$old_handler still warns to STDERR as well.
+Can it catch the output of $old_handler?  Not really, only with
+co-operation, if the wrapper calls the inner instead of warn.
+
+diagnostics:
+If an extant $SIG{__WARN__} handler is discovered, it will continue
+to be honored, but only after the diagnostics::splainthis() function 
+(the module's $SIG{__WARN__} interceptor) has had its way with your
+warnings.
+
+Differences currently:
+    perl -Mdiagnostics -d:file t/syn1.pl                # diag
+    perl -Mdiagnostics -d:file -MDevel::file t/syn1.pl  # nodiag
+    perl -Mdiagnostics -MDevel::file t/syn1.pl          # nodiag
+    perl -MDevel::file -Mdiagnostics  t/syn1.pl         # diag
+Looks like -d happens before -M (as it should!)
+diags is nice but we're not, or our futzing confuses it..?
+perl -e 'BEGIN { $diagnostics::DEBUG++ }; use diagnostics; 1/0' 
+perl -Mdiagnostics -MDevel::file -we 'eval { 12/$n }'
+# constant folding at compile time: !!!
+perl -Mdiagnostics -MDevel::file -we 'eval { 12/0 }'
+
+
+=head1 SCRATCH
+
+http://search.cpan.org/src/JJORE/Devel-SummarizedWarnings-0.01/SummarizedWarnings.pm
+http://search.cpan.org/src/SAPER/Devel-SimpleTrace-0.06/lib/Devel/SimpleTrace.pm
+
+perl -MDevel::SummarizedWarnings -we '$_ .= undef for (1..3)'
+Use of uninitialized value in concatenation (.) or string on line 1 (x3)
+
+perl -Mdiagnostics -d:file  -we '$_ .= undef for (1..3)'
+
+In Carp:
+# The members of %Internal are packages that are internal to perl.
+# Carp will not report errors from within these packages if it
+# can.  The members of %CarpInternal are internal to Perl's warning
+# system.  Carp will not report errors from within these packages
+# either, and will not report calls *to* these packages for carp and
+# croak.  They replace $CarpLevel, which is deprecated.    The
+# $Max(EvalLen|(Arg(Len|Nums)) variables are used to specify how the eval
+# text and function arguments should be formatted when printed.
+
+
+debug and non-debug (fallback) mode
+only the debug mode can see eval strings, command-line
+    perl -d:file -we '$v++'
+
+Try to be compatible with Devel-SummarizedWarnings
+show source once only on uninitialized
+
+Stackable handlers
+
+perlvar for __WARN___ info
+
+       $EXCEPTIONS_BEING_CAUGHT
+       $^S     Current state of the interpreter.
+
+                   $^S         State
+                   ---------   -------------------
+                   undef       Parsing module/eval
+                   true (1)    Executing an eval
+                   false (0)   Otherwise
+
+               The first state may happen in $SIG{__DIE__} and $SIG{__WARN__}
+               handlers.
+
+       $DEBUGGING
+       $^D     The current value of the debugging flags.  (Mnemonic: value of
+               -D switch.) May be read or set. Like its command-line
+               equivalent, you can use numeric or symbolic values, eg "$^D =
+               10" or "$^D = "st"".
+
+perldiag for warnings strings, diagnostics.pm
+perldebguts - file and eval contents
+
+print lines context
+filename
+highlight like ack
+
+-d:line=c3,hi
+
+check grep/ack for hints
+
+editor help
+format string to print
+command to run
+extendable for user's modules and messages (warnings)
+safe opening of files (no dev, dir, ??)
+only use a 2-char margin to avoid wrapping on 80 columns
+tab 4,8 spaces, autodetect
+lexical version, only my warnings/errors, use warnings hierarchy
+Deparse=-p, maybe pipeable into -p
+show whole sub or block
+think OO for different configs somehow co-existing?
+do handlers in eval or not?  default no?
+    eval+__DIE__ "may be fixed in a future release." perldoc -f eval
+should handlers wrap and pass on by default? may not be compatible
+line numbers or marking (*,>,=) multiple errors on a line, multiple
+    errors in a window, how to distinguish
+    debugger uses ==>
+CORE::GLOBAL::{warn,die}
+file names with spaces, strange chars and " at " or " line " in them
+interraction with Carp in it's referring of problems..?
+
+eval '' - sees scope of first non DB module (perldoc -f eval)
+
+use perl's t/warn   (./perl-5.8.8/t/lib/warnings)
+
+Related:
+Devel::ebug diagnostics/splain Devel::SimpleTrace perl5db.pl
+
+splain:
+There is a $diagnostics::DEBUG variable you may set if you're desperately
+curious what sorts of things are being intercepted.
+
+    BEGIN { $diagnostics::DEBUG = 1 } 
+
+# don't know what this is:
+use Carp;
+$Carp::Internal{__PACKAGE__.""}++;
+
+perldiag.pod found in diagnostics $PODFILE
+
+local $| = 1;
+
+enable and disable in splain
+keeps and calls $olddie $oldwarn
+
+$@ objects? stringify
+perldoc -f die
+ die @_ if $^S; # as the first line of the handler
+
+allow others to do:
+    local($SIG{__WARN__}) = Devel::file->get_warn_handler();
+
+could dump variables on the line referred to (non-syntax errors)
+
+                # Append a newline if the line doesn't have one. Can happen
+                # in eval'ed text, for instance.
+                $after = ( $dbline[$i] =~ /\n$/ ? '' : "\n" );
+
+
+# t/syn1.pl has two errors on the line, same file, near each other
+# many errors could lose the thing, only show the first
+#$e#
+#Global symbol "$one" requires explicit package name at warn.pl line 6.
+syntax error at warn.pl line 8, near "print"
+Execution of warn.pl aborted due to compilation errors.
+#  warn.pl (6):
+
+perl5db.pl - the perl debugger
+  DB<2> -
+1       #!/usr/bin/perl -w
+2:      use strict;
+3       
+4==>    $a++;
+5       
+6:      print "hello";
+
+    # Since DB::DB gets called after every line, we can use caller() to
+    # figure out where we last were executing. Sneaky, eh? 
+
+    # Returned value from find_sub() is fullpathname:startline-endline.
+    find_sub($subname) =~ /^(.*):(\d+)-(\d+)$/;
+
+cmd_l
+            # Line the prompt up; print a newline if the last line listed
+            # didn't have a newline.
+            print $OUT "\n" unless $dbline[ $i - 1 ] =~ /\n$/;
+
+perl5db.pl has it's own DIE & WARN: dbwarn dbdie
+
+# secure? \0 in source?
+( $stop, $action ) = split( /\0/, $dbline{$i} )
+
+
+
+perlvar BUGS:
+
+       Having to even think about the $^S variable in your exception handlers
+       is simply wrong.  $SIG{__DIE__} as currently implemented invites
+       grievous and difficult to track down errors.  Avoid it and use an
+       "END{}" or CORE::GLOBAL::die override instead.
+
+perl -MDevel::file -e ' die [],1223'
+perl -mDevel::file -e ' die [],1223'
+perl -mDevel::file -e 'Devel::file->enable; die [],1223'
+

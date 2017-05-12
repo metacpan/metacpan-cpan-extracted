@@ -1,0 +1,63 @@
+{
+   "abstract" : "remember complex information without giving yourself a headache",
+   "author" : [
+      "Andrew Sterling Hanenkamp <hanenkamp@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300038, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Remember",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "DBM::Deep" : "0",
+            "Scalar::Util" : "0",
+            "Sub::Exporter" : "0",
+            "YAML::Syck" : "0",
+            "base" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "POE" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-Yukki@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Remember"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/zostay/Data-Remember.git",
+         "web" : "http://github.com/zostay/Data-Remember"
+      }
+   },
+   "version" : "0.140490"
+}
+

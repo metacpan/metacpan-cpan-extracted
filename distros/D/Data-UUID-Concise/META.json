@@ -1,0 +1,77 @@
+{
+   "abstract" : "Encode UUIDs to be more concise or communicable",
+   "author" : [
+      "Nathaniel Reindl <nrr@corvidae.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300013, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-UUID-Concise",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "examples",
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Data::UUID" : "0",
+            "List::MoreUtils" : "0",
+            "Math::BigInt" : "0",
+            "Moo" : "0",
+            "MooX::Types::MooseLike::Base" : "0",
+            "charnames" : "0",
+            "open" : "0",
+            "perl" : "5.010",
+            "strictures" : "1",
+            "utf8" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Find" : "0",
+            "File::Temp" : "0",
+            "Test::Exception" : "0",
+            "Test::More" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::UUID::Concise" : {
+         "file" : "lib/Data/UUID/Concise.pm",
+         "version" : "0.121240"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "nrr+bug-DATA-UUID-CONCISE@corvidae.org",
+         "web" : "https://github.com/nrr/Data-UUID-Concise/issues"
+      },
+      "homepage" : "https://github.com/nrr/Data-UUID-Concise",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/nrr/Data-UUID-Concise.git",
+         "web" : "https://github.com/nrr/Data-UUID-Concise"
+      }
+   },
+   "version" : "0.121240"
+}
+

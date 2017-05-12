@@ -1,0 +1,25 @@
+Revision history for Perl extension Date::Object.
+
+0.06  2005-01-05
+      - Fixed bug on method set() that forgot to set the new internal value of time.
+      - Force reset of key time when set_local(), set_zone() and set_gmt() are called.
+
+0.05  2005-01-05
+      - Fixed sub_day bug.
+      - Added method set() where is possible to reset parts of the date.
+      - Methods set*, add*, sub* will return the object to allow chain calls.
+
+0.04  2004-10-16
+      - Added storable support.
+
+0.03  2004-08-20
+      - Fixed comment placeholder when $#_ found.
+      - Added support to create a Date::Object with input "dd/mm/yyyy hh:mm:ss" format.
+
+0.02  2004-06-29
+      - Fixed leap years method.
+      - Added key access of the attributes.
+
+0.01  2004-03-19 01:08:48
+      - original version;
+

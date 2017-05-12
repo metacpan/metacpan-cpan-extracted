@@ -1,0 +1,10 @@
+3000f0000600fb
+
+master rfxmeter 30.00f0000600fb
+
+Unsupported rfxmeter message identification packet
+Hex: 00f0000600fb
+
+
+
+

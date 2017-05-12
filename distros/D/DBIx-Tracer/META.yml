@@ -1,0 +1,43 @@
+---
+abstract: 'Easy tracer for DBI'
+author:
+  - 'Tokuhiro Matsuno <tokuhirom AAJKLFJEF@ GMAIL COM>'
+build_requires:
+  Test::More: '0.98'
+  Test::Requires: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v2.5.0, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Tracer
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Tracer:
+    file: lib/DBIx/Tracer.pm
+    version: '0.03'
+requires:
+  DBD::SQLite: '1.48'
+  DBI: '0'
+  parent: '0'
+  perl: '5.008008'
+resources:
+  bugtracker: https://github.com/tokuhirom/DBIx-Tracer/issues
+  homepage: https://github.com/tokuhirom/DBIx-Tracer
+  repository: git://github.com/tokuhirom/DBIx-Tracer.git
+version: '0.03'
+x_contributors:
+  - 'Tokuhiro Matsuno <tokuhirom@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.017'

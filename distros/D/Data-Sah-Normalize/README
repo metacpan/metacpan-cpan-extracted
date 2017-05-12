@@ -1,0 +1,36 @@
+SYNOPSIS
+
+     use Data::Sah::Normalize qw(normalize_clset normalize_schema);
+    
+     my $nclset = normalize_clset({'!a'=>1}); # -> {a=>1, 'a.op'=>'not'}
+     my $nsch   = normalize_schema("int");    # -> ["int", {}, {}]
+
+DESCRIPTION
+
+    This often-needed functionality is split from the main Data::Sah to
+    keep it in a small and minimal-dependencies package.
+
+FUNCTIONS
+
+ normalize_clset($clset) => HASH
+
+    Normalize a clause set (hash). Return a shallow copy of the original
+    hash. Die on failure.
+
+    TODO: option to recursively normalize clause which contains sah clauses
+    (e.g. of).
+
+ normalize_schema($sch) => ARRAY
+
+    Normalize a Sah schema (scalar or array). Return an array. Produce a
+    2-level copy of schema, so it's safe to add/delete/modify the
+    normalized schema's clause set and extras (but clause set's and extras'
+    values are still references to the original). Die on failure.
+
+    TODO: recursively normalize clause which contains sah clauses (e.g.
+    of).
+
+SEE ALSO
+
+    Sah, Data::Sah
+

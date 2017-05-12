@@ -1,0 +1,93 @@
+<html>
+<head>
+<title>CodeKit HTML Select Method</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/codekit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="ck_select.html">HTML Select</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_update.html">Code Table Updates</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/codekit">CodeKit</a>
+Code Set Method</h2></center>
+
+Sometimes we need access to a full code data set.
+
+
+<h4>code_set()</h4>
+
+<pre>
+$rows = $codekit-&gt;code_set($code_set);
+</pre>
+
+
+<p>
+The code_set() method returns an array of code row arrays
+for the code set specified.
+
+<p>
+Each row consists of the code_code, code_desc, code_order
+and code_flag fields sorted by code_order and code_code.
+
+<p>
+Here are some examples that print out the non-deprecated
+month codes and their descriptions:
+
+<pre>
+<b># PHP</b>
+print "&lt;pre&gt;\n";
+$set_list = $codekit-&gt;code_set('month');
+foreach ( $set_list as $row ) {
+    list( $code_code, $code_desc, $code_order, $code_flag ) = $row;
+    if ($code_flag == 'd') continue;
+    printf("%2d - %s\n", $code_code, $code_desc);
+}
+print "&lt;/pre&gt;\n";
+</pre>
+
+<pre>
+<b># Perl</b>
+print "&lt;pre&gt;\n";
+my $set_list = $codekit-&gt;code_set('month');
+for my $row ( @$set_list ) {
+    my ( $code_code, $code_desc, $code_order, $code_flag ) = @$row;
+    next if $code_flag eq 'd';
+    printf("%2d - %s\n", $code_code, $code_desc);
+}
+print "&lt;/pre&gt;\n";
+</pre>
+
+
+<p>
+<div align="right">
+[<a href="ck_select.html">HTML Select</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_update.html">Code Table Updates</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

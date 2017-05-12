@@ -1,0 +1,12 @@
+
+
+This archive contains the distribution DBICx-Shortcuts, version
+0.007:
+
+  Setup a class with shortcut methods to the sources of a DBIx::Class-based schema
+
+This software is copyright (c) 2010 by Pedro Melo.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+

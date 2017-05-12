@@ -1,0 +1,8 @@
+---
+author: charsbar
+comment: 'lang/perl/Jipotter: get timelines from db'
+date: 2008-04-19 17:06:27 +0900
+files:
+  - path: lang/perl/Jipotter/branches/Cipotter/lib/Cipotter/Model/DB.pm
+    status: U
+rev: 9879

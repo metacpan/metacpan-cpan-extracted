@@ -1,0 +1,38 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 becfb0bd3a15df00302a76f6b6977b68f6267ad3 Changes
+SHA1 fd0d9c445bde3b754feec29dea5d23ed4d792c8e MANIFEST
+SHA1 2d25fec830240f376cd3a48f1fdddca367d4c3af META.json
+SHA1 4dec63195691fcd30aae5ebf2a5c7b7533767a59 META.yml
+SHA1 9c617b58b6a08a503913d52db63dca841031c52c Makefile.PL
+SHA1 5dc9c87707833d904a31726a51f5e94e5880eee3 README
+SHA1 e8304838e14d372d10fdfa3f451b3ffeb9f58112 lib/Data/YAML.pm
+SHA1 3ed7d664338a32a9e11217f51c5c215170183160 lib/Data/YAML/Reader.pm
+SHA1 1e1094f83e1892efbcaf80cb0ecbb74d37bd032f lib/Data/YAML/Writer.pm
+SHA1 4cf9e6d03b2ba3e3ab482d138a94e95c6ecf6492 t/00.load.t
+SHA1 161ecef48d8e921399c3406cc2b2ca85442bd0e7 t/10-input.t
+SHA1 e3de4eff0004dcaf16aaed29a3df478f50a7058c t/20-reader.t
+SHA1 ae69251cc811bc4934ad08c165f34be398474e4f t/30-output.t
+SHA1 1cb8c953dd1add1869211b5b67762247a0cd3008 t/40-writer.t
+SHA1 aeaa691851a425f07ab6a8d4f825e2ad9d92b8ee t/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 t/pod.t
+-----BEGIN PGP SIGNATURE-----
+
+iEYEARECAAYFAlUxEScACgkQwoknRJZQnCEkCwCfUayd/BZens7RbbFlCE5c6bwk
+geYAoNyheKi9cnkxqmulIleAHdAVGm4H
+=EmOT
+-----END PGP SIGNATURE-----

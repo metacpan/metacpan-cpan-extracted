@@ -1,0 +1,56 @@
+NAME
+    Digest::Perl::MD4 - Perl implementation of Ron Rivests MD4
+    Algorithm
+
+DISCLAIMER
+    This is not C-code interface (like `Digest::MD5') but a Perl-only
+    implementation of MD4 (like `Digest::Perl::MD5'). Because of this, it is
+    slow but avoids platform specific complications. For efficiency you
+    should use `Digest::MD4' instead of this module if it is available.
+
+SYNOPSIS
+     # Functional style
+     use Digest::Perl::MD4 qw(md4 md4_hex md4_base64);
+
+     $hash = md4 $data;
+     $hash = md4_hex $data;
+     $hash = md4_base64 $data;
+
+     # OO style
+     use Digest::Perl::MD4;
+
+     $ctx = Digest::Perl::MD4->new;
+
+     $ctx->add($data);
+     $ctx->addfile(*FILE);
+
+     $digest = $ctx->digest;
+     $digest = $ctx->hexdigest;
+     $digest = $ctx->b64digest;
+
+MANIFEST
+
+README		This file.
+MD4.pm		The Perl code implementing Rivest's MD4 algorithm.
+Digest-MD4.pm	A wrapper module called Digest::MD4.
+test.pl		A test program for the MD4 module.
+
+The MD4 module's interface should be compatible with the C-code MD4
+module written by Mike McCauley <mikem@open.com.au>.  The Digest-MD4.pm
+is provided which makes the MD4 module available as the shorter module
+Digest::MD4.  It should *not* be installed as is if Mike's module is
+already installed.  If you want both of these installed (e.g. multiple
+platforms are using the same installation), the adaptive aspects of
+Digest-MD4.pm will have to be merged with the Mike's actual MD4.pm code.
+
+Assuming "Perl-site-lib" is one of the directories listed in @INC,
+install the module like this:
+
+file		Perl-site-lib
+----		------------------
+MD4.pm		Digest/Perl/MD4.pm
+Digest-MD4.pm	Digest/MD4.pm		# if C-code MD4 is NOT installed
+
+AUTHOR
+
+Ted Anderson <tedanderson@mindspring.com>

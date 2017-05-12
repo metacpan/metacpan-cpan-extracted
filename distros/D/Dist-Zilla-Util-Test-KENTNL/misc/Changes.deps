@@ -1,0 +1,188 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.005014
+
+1.005013 2015-10-19T11:29:36Z
+ [Added / configure requires]
+ - CPAN::Meta::Requirements 2.120620
+ - Module::Metadata
+
+1.005012 2015-04-13T03:25:53Z
+
+1.005011 2015-04-12T03:04:32Z
+ [Changed / configure requires]
+ - perl 5.008 → 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.005010 2015-04-11T10:03:55Z
+ [Added / runtime requires]
+ - Data::DPath
+ - Moo
+
+ [Removed / runtime requires]
+ - Moose
+
+1.005000 2014-11-06T15:24:12Z
+ [Added / runtime requires]
+ - recommended
+
+ [Removed / runtime requires]
+ - constant
+
+1.004002 2014-11-01T11:43:22Z
+ [Changed / runtime requires]
+ - Test::More 0.89 → 0.96
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0.96
+
+1.004001 2014-10-30T12:56:17Z
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Removed / runtime requires]
+ - Data::DPath
+
+1.004000 2014-10-12T15:44:27Z
+ [Added / runtime requires]
+ - Dist::Zilla::App::Tester
+
+ [Added / test requires]
+ - Dist::Zilla::App::Command::authordeps
+
+1.003003 2014-09-28T07:27:06Z
+
+1.003002 2014-09-07T09:07:01Z
+
+1.003001 2014-08-29T09:27:43Z
+ [Changed / runtime requires]
+ - Path::Tiny 0 → 0.050
+
+1.003000 2014-08-29T07:46:22Z
+ [Added / runtime requires]
+ - Dist::Zilla::Util
+ - Module::Runtime
+
+1.002000 2014-08-22T17:40:28Z
+
+1.001002 2014-08-21T05:38:29Z
+
+1.001001 2014-08-18T23:05:17Z
+ [Added / runtime requires]
+ - constant
+
+1.001000 2014-08-18T21:14:28Z
+ [Added / runtime requires]
+ - Data::DPath
+ - Moose
+ - Path::Tiny
+ - Test::Fatal
+ - Test::More 0.89
+
+ [Removed / test requires]
+ - Test::Fatal
+
+1.000003 2014-08-03T12:37:40Z
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+ - Scalar::Util
+ - version 0.77
+
+1.000002 2014-07-25T06:22:28Z
+ [Added / test requires]
+ - File::Spec
+ - Scalar::Util
+
+ [Changed / test requires]
+ - version 0 → 0.77
+
+1.000001 2014-07-13T18:11:06Z
+
+1.000000 2014-02-02T07:19:39Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+ - version
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4202
+
+ [Removed / configure requires]
+ - Module::Build 0.4202
+
+0.01015824 2013-11-21T10:47:13Z
+ [Changed / build requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / configure requires]
+ - Module::Build 0.4004 → 0.4202
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Find
+ - File::Temp
+
+0.01015823 2013-04-09T02:43:44Z
+ [Changed / build requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / configure requires]
+ - Module::Build 0.3601 → 0.4004
+
+ [Changed / test requires]
+ - Test::More 0.88 → 0.98
+
+0.01015822 2012-02-03T03:21:20Z
+ [Added / runtime requires]
+ - perl 5.006
+ - strict
+ - warnings
+
+ [Removed / test requires]
+ - English
+
+0.01015821 2011-04-07T01:33:45Z
+ [Added / runtime requires]
+ - Test::DZil
+
+ [Removed / runtime requires]
+ - Moose::Autobox
+ - Params::Util
+
+0.01000510 2010-11-08T14:01:08Z
+ [Added / test requires]
+ - Test::Fatal
+
+0.01000011 2010-11-03T15:01:43Z
+
+0.01000004 2010-11-03T08:28:59Z

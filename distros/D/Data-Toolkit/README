@@ -1,0 +1,47 @@
+Data::Toolkit
+=============
+
+This is a toolkit for manipulating attribute-value data.
+It is useful in directory synchronisation systems and other data‐pump applications.
+
+Data is modelled as Entries which contain Attributes.
+Each Attribute can contain zero or more Values.
+
+Data::Toolkit provides support for mapping attribute names and values,
+for avoiding duplicate values, and for sorting value sets.
+
+Connectors are provided for CSV files, databases, and LDAP.
+
+There is a discussion list which you can subscribe to:
+
+	http://mailhub.ourshack.com/mailman/listinfo/data-toolkit
+
+Data::Toolkit is licenced on the same terms as Perl itself.
+
+Installation
+============
+
+	make
+	make test
+	make install
+
+Note that the test suite requires the OpenLDAP slapd server.
+
+Documentation
+=============
+
+Once installed, read these pages for detailed information:
+
+	Data::Toolkit::Entry
+	Data::Toolkit::Map
+	Data::Toolkit::Connector
+	Data::Toolkit::Connector::CSV
+	Data::Toolkit::Connector::DBI
+	Data::Toolkit::Connector::LDAP
+
+
+Andrew Findlay
+14 November 2007
+
+andrew.findlay@skills-1st.co.uk
+

@@ -1,0 +1,6 @@
+0.05 Wednesday 16th January, 2013
+        Apply fix for DEBUGGING perls from Reini Urban RT#74862
+        Apply rewrite for 5.17 pad reorganiztion from ? RT#79267
+
+0.04 25th July, 2002
+        Initial release

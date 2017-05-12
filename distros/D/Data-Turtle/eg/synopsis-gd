@@ -1,0 +1,43 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Turtle;
+use GD;
+
+my ( $width, $height ) = ( 500, 500 );
+
+my $img = GD::Image->new( $width, $height );
+
+my %color = (
+    white => $img->colorAllocate( 255, 255, 255 ),
+    black => $img->colorAllocate( 0, 0, 0 ),
+);
+
+$img->transparent($color{white});
+$img->interlaced('true');
+
+my $turtle = Data::Turtle->new(
+    width  => $width,
+    height => $height,
+);
+
+$turtle->pen_up;
+$turtle->turn(45);
+$turtle->forward(10);
+$turtle->goto( 100, 100 );
+$turtle->mirror;
+$turtle->backward(10);
+#my ( $x, $y, $heading, $pen_status, $pen_color, $pen_size ) = $turtle->get_state;
+#$turtle->set_state( $x, $y, $heading, $pen_status, $pen_color, $pen_size );
+$turtle->pen_down;
+for my $i ( 1 .. 4 ) {
+    my @line = $turtle->forward(50);
+    if ( @line ) {
+        $img->setThickness( $line[5] );
+        $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
+    }
+    $turtle->right(90);
+}
+
+print $img->png;

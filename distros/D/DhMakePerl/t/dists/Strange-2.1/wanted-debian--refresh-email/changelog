@@ -1,0 +1,11 @@
+libstrange-perl (3.1-1) UNRELEASED; urgency=low
+
+  * Email change: Joe Maintainer -> joe@debian.org
+
+ -- Florian Geekwurt <florian@geekwurt.org>  Sun, 6 Mar 2011 14:02:37 +0000
+
+libstrange-perl (2.1-1) unstable; urgency=low
+
+  * Initial Release.
+
+ -- Joe Maintainer <joemaint@test.local>  Sat, 29 Nov 2008 23:17:07 +0200

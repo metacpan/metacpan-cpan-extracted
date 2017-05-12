@@ -1,0 +1,1180 @@
+---
+# Volume 1. – TEXTURES
+#       Name               Description                                    Size   Color/Mono
+textures/1.1.01.tiff:
+#       1.1.01             Brodatz - Grass (D9)                           512       Mono
+  description: 'Brodatz - Grass (D9)'
+  name: 1.1.01
+  size: 512
+  type: monochrome
+textures/1.1.02.tiff:
+#       1.1.02             Brodatz - Bark (D12)                           512       Mono
+  description: 'Brodatz - Bark (D12)'
+  name: 1.1.02
+  size: 512
+  type: monochrome
+textures/1.1.03.tiff:
+#       1.1.03             Brodatz - Straw (D15)                          512       Mono
+  description: 'Brodatz - Straw (D15)'
+  name: 1.1.03
+  size: 512
+  type: monochrome
+textures/1.1.04.tiff:
+#       1.1.04             Brodatz - Herringbone weave (D15)              512       Mono
+  description: 'Brodatz - Herringbone weave (D15)'
+  name: 1.1.04
+  size: 512
+  type: monochrome
+textures/1.1.05.tiff:
+#       1.1.05             Brodatz - Woolen cloth (D19)                   512       Mono
+  description: 'Brodatz - Woolen cloth (D19)'
+  name: 1.1.05
+  size: 512
+  type: monochrome
+textures/1.1.06.tiff:
+#       1.1.06             Brodatz - Pressed calf leather (D24)           512       Mono
+  description: 'Brodatz - Pressed calf leather (D24)'
+  name: 1.1.06
+  size: 512
+  type: monochrome
+textures/1.1.07.tiff:
+#       1.1.07             Brodatz - Beach sand (D29)                     512       Mono
+  description: 'Brodatz - Beach sand (D29)'
+  name: 1.1.07
+  size: 512
+  type: monochrome
+textures/1.1.08.tiff:
+#       1.1.08             Brodatz - Water (D38)                          512       Mono
+  description: 'Brodatz - Water (D38)'
+  name: 1.1.08
+  size: 512
+  type: monochrome
+textures/1.1.09.tiff:
+#       1.1.09             Brodatz - Wood grain (D68)                     512       Mono
+  description: 'Brodatz - Wood grain (D68)'
+  name: 1.1.09
+  size: 512
+  type: monochrome
+textures/1.1.10.tiff:
+#       1.1.10             Brodatz - Raffia (D84)                         512       Mono
+  description: 'Brodatz - Raffia (D84)'
+  name: 1.1.10
+  size: 512
+  type: monochrome
+textures/1.1.11.tiff:
+#       1.1.11             Brodatz - Pigskin (D92)                        512       Mono
+  description: 'Brodatz - Pigskin (D92)'
+  name: 1.1.11
+  size: 512
+  type: monochrome
+textures/1.1.12.tiff:
+#       1.1.12             Brodatz - Brick wall (D94)                     512       Mono
+  description: 'Brodatz - Brick wall (D94)'
+  name: 1.1.12
+  size: 512
+  type: monochrome
+textures/1.1.13.tiff:
+#       1.1.13             Brodatz - Plastic bubbles (D112)               512       Mono
+  description: 'Brodatz - Plastic bubbles (D112)'
+  name: 1.1.13
+  size: 512
+  type: monochrome
+textures/1.2.01.tiff:
+#       1.2.01             Brodatz - Grass (D9) *                         512       Mono
+  description: 'Brodatz - Grass (D9) *'
+  name: 1.2.01
+  size: 512
+  type: monochrome
+textures/1.2.02.tiff:
+#       1.2.02             Brodatz - Bark (D12) *                         512       Mono
+  description: 'Brodatz - Bark (D12) *'
+  name: 1.2.02
+  size: 512
+  type: monochrome
+textures/1.2.03.tiff:
+#       1.2.03             Brodatz - Straw (D15) *                        512       Mono
+  description: 'Brodatz - Straw (D15) *'
+  name: 1.2.03
+  size: 512
+  type: monochrome
+textures/1.2.04.tiff:
+#       1.2.04             Brodatz - Herringbone weave (D16) *            512       Mono
+  description: 'Brodatz - Herringbone weave (D16) *'
+  name: 1.2.04
+  size: 512
+  type: monochrome
+textures/1.2.05.tiff:
+#       1.2.05             Brodatz - Woolen cloth (D19) *                 512       Mono
+  description: 'Brodatz - Woolen cloth (D19) *'
+  name: 1.2.05
+  size: 512
+  type: monochrome
+textures/1.2.06.tiff:
+#       1.2.06             Brodatz - Pressed calf leather (D24) *         512       Mono
+  description: 'Brodatz - Pressed calf leather (D24) *'
+  name: 1.2.06
+  size: 512
+  type: monochrome
+textures/1.2.07.tiff:
+#       1.2.07             Brodatz - Beach sand (D29) *                   512       Mono
+  description: 'Brodatz - Beach sand (D29) *'
+  name: 1.2.07
+  size: 512
+  type: monochrome
+textures/1.2.08.tiff:
+#       1.2.08             Brodatz - Water (D38) *                        512       Mono
+  description: 'Brodatz - Water (D38) *'
+  name: 1.2.08
+  size: 512
+  type: monochrome
+textures/1.2.09.tiff:
+#       1.2.09             Brodatz - Wood grain (D68) *                   512       Mono
+  description: 'Brodatz - Wood grain (D68) *'
+  name: 1.2.09
+  size: 512
+  type: monochrome
+textures/1.2.10.tiff:
+#       1.2.10             Brodatz - Raffia (D84) *                       512       Mono
+  description: 'Brodatz - Raffia (D84) *'
+  name: 1.2.10
+  size: 512
+  type: monochrome
+textures/1.2.11.tiff:
+#       1.2.11             Brodatz - Pigskin (D92) *                      512       Mono
+  description: 'Brodatz - Pigskin (D92) *'
+  name: 1.2.11
+  size: 512
+  type: monochrome
+textures/1.2.12.tiff:
+#       1.2.12             Brodatz - Brick wall (D94) *                   512       Mono
+  description: 'Brodatz - Brick wall (D94) *'
+  name: 1.2.12
+  size: 512
+  type: monochrome
+textures/1.2.13.tiff:
+#       1.2.13             Brodatz - Plastic bubbles (D112) *             512       Mono
+  description: 'Brodatz - Plastic bubbles (D112) *'
+  name: 1.2.13
+  size: 512
+  type: monochrome
+textures/1.3.01.tiff:
+#       1.3.01             Brodatz - Grass (D9)                           1024      Mono
+  description: 'Brodatz - Grass (D9)'
+  name: 1.3.01
+  size: 1024
+  type: monochrome
+textures/1.3.02.tiff:
+#       1.3.02             Brodatz - Bark (D12)                           1024      Mono
+  description: 'Brodatz - Bark (D12)'
+  name: 1.3.02
+  size: 1024
+  type: monochrome
+textures/1.3.03.tiff:
+#       1.3.03             Brodatz - Straw (D15)                          1024      Mono
+  description: 'Brodatz - Straw (D15)'
+  name: 1.3.03
+  size: 1024
+  type: monochrome
+textures/1.3.04.tiff:
+#       1.3.04             Brodatz - Woolen cloth (D19)                   1024      Mono
+  description: 'Brodatz - Woolen cloth (D19)'
+  name: 1.3.04
+  size: 1024
+  type: monochrome
+textures/1.3.05.tiff:
+#       1.3.05             Brodatz - Herringbone weave (D16)              1024      Mono
+  description: 'Brodatz - Herringbone weave (D16)'
+  name: 1.3.05
+  size: 1024
+  type: monochrome
+textures/1.3.06.tiff:
+#       1.3.06             Brodatz - Pressed calf leather (D24)           1024      Mono
+  description: 'Brodatz - Pressed calf leather (D24)'
+  name: 1.3.06
+  size: 1024
+  type: monochrome
+textures/1.3.07.tiff:
+#       1.3.07             Brodatz - Beach sand (D29)                     1024      Mono
+  description: 'Brodatz - Beach sand (D29)'
+  name: 1.3.07
+  size: 1024
+  type: monochrome
+textures/1.3.08.tiff:
+#       1.3.08             Brodatz - Water (D38)                          1024      Mono
+  description: 'Brodatz - Water (D38)'
+  name: 1.3.08
+  size: 1024
+  type: monochrome
+textures/1.3.09.tiff:
+#       1.3.09             Brodatz - Wood grain (D68)                     1024      Mono
+  description: 'Brodatz - Wood grain (D68)'
+  name: 1.3.09
+  size: 1024
+  type: monochrome
+textures/1.3.10.tiff:
+#       1.3.10             Brodatz - Raffia (D84)                         1024      Mono
+  description: 'Brodatz - Raffia (D84)'
+  name: 1.3.10
+  size: 1024
+  type: monochrome
+textures/1.3.11.tiff:
+#       1.3.11             Brodatz - Pigskin (D92)                        1024      Mono
+  description: 'Brodatz - Pigskin (D92)'
+  name: 1.3.11
+  size: 1024
+  type: monochrome
+textures/1.3.12.tiff:
+#       1.3.12             Brodatz - Brick wall (D94)                     1024      Mono
+  description: 'Brodatz - Brick wall (D94)'
+  name: 1.3.12
+  size: 1024
+  type: monochrome
+textures/1.3.13.tiff:
+#       1.3.13             Brodatz - Plastic bubbles (D112)               1024      Mono
+  description: 'Brodatz - Plastic bubbles (D112)'
+  name: 1.3.13
+  size: 1024
+  type: monochrome
+textures/1.4.01.tiff:
+#       1.4.01             Brick wall                                     1024      Mono
+  description: 'Brick wall'
+  name: 1.4.01
+  size: 1024
+  type: monochrome
+textures/1.4.02.tiff:
+#       1.4.02             Wood shingle roof                              1024      Mono
+  description: 'Wood shingle roof'
+  name: 1.4.02
+  size: 1024
+  type: monochrome
+textures/1.4.03.tiff:
+#       1.4.03             Wood shingle roof                              1024      Mono
+  description: 'Wood shingle roof'
+  name: 1.4.03
+  size: 1024
+  type: monochrome
+textures/1.4.04.tiff:
+#       1.4.04             Brick wall                                     1024      Mono
+  description: 'Brick wall'
+  name: 1.4.04
+  size: 1024
+  type: monochrome
+textures/1.4.05.tiff:
+#       1.4.05             Tile roof                                      1024      Mono
+  description: 'Tile roof'
+  name: 1.4.05
+  size: 1024
+  type: monochrome
+textures/1.4.06.tiff:
+#       1.4.06             Wood fence                                     1024      Mono
+  description: 'Wood fence'
+  name: 1.4.06
+  size: 1024
+  type: monochrome
+textures/1.4.07.tiff:
+#       1.4.07             Metal grates                                   1024      Mono
+  description: 'Metal grates'
+  name: 1.4.07
+  size: 1024
+  type: monochrome
+textures/1.4.08.tiff:
+#       1.4.08             Brick wall                                     1024      Mono
+  description: 'Brick wall'
+  name: 1.4.08
+  size: 1024
+  type: monochrome
+textures/1.4.09.tiff:
+#       1.4.09             Brick wall                                     1024      Mono
+  description: 'Brick wall'
+  name: 1.4.09
+  size: 1024
+  type: monochrome
+textures/1.4.10.tiff:
+#       1.4.10             Grass                                          1024      Mono
+  description: 'Grass'
+  name: 1.4.10
+  size: 1024
+  type: monochrome
+textures/1.4.11.tiff:
+#       1.4.11             Sand                                           1024      Mono
+  description: 'Sand'
+  name: 1.4.11
+  size: 1024
+  type: monochrome
+textures/1.4.12.tiff:
+#       1.4.12             Sand                                           1024      Mono
+  description: 'Sand'
+  name: 1.4.12
+  size: 1024
+  type: monochrome
+textures/1.5.01.tiff:
+#       1.5.01             Brick wall                                     512       Mono
+  description: 'Brick wall'
+  name: 1.5.01
+  size: 512
+  type: monochrome
+textures/1.5.02.tiff:
+#       1.5.02             Hexagonal hole array                           512       Mono
+  description: 'Hexagonal hole array'
+  name: 1.5.02
+  size: 512
+  type: monochrome
+textures/1.5.03.tiff:
+#       1.5.03             Rough wall                                     512       Mono
+  description: 'Rough wall'
+  name: 1.5.03
+  size: 512
+  type: monochrome
+textures/1.5.04.tiff:
+#       1.5.04             Sand                                           512       Mono
+  description: 'Sand'
+  name: 1.5.04
+  size: 512
+  type: monochrome
+textures/1.5.05.tiff:
+#       1.5.05             Gravel                                         512       Mono
+  description: 'Gravel'
+  name: 1.5.05
+  size: 512
+  type: monochrome
+textures/1.5.06.tiff:
+#       1.5.06             Brick wall                                     512       Mono
+  description: 'Brick wall'
+  name: 1.5.06
+  size: 512
+  type: monochrome
+textures/1.5.07.tiff:
+#       1.5.07             Grass                                          512       Mono
+  description: 'Grass'
+  name: 1.5.07
+  size: 512
+  type: monochrome
+textures/texmos1.p512.tiff:
+#       texmos1.p512       USC texture   mosaic   #1                      512       Mono
+  description: 'USC texture mosaic #1'
+  name: texmos1.p512
+  size: 512
+  type: monochrome
+textures/texmos2.p512.tiff:
+#       texmos2.p512       USC texture   mosaic   #2                      512       Mono
+  description: 'USC texture mosaic #2'
+  name: texmos2.p512
+  size: 512
+  type: monochrome
+textures/texmos2.s512.tiff:
+#       texmos2.s512       USC texture   mosaic   #2 (info)               512       Mono
+  description: 'USC texture mosaic #2 (info)'
+  name: texmos2.s512
+  size: 512
+  type: monochrome
+textures/texmos3.p512.tiff:
+#       texmos3.p512       USC texture   mosaic   #3                      512       Mono
+  description: 'USC texture  mosaic #3'
+  name: texmos3.p512
+  size: 512
+  type: monochrome
+textures/texmos3.s512.tiff:
+#       texmos3.s512       USC texture   mosaic   #3 (info)               512       Mono
+  description: 'USC texture mosaic #3 (info)'
+  name: texmos3.s512
+  size: 512
+  type: monochrome
+textures/texmos3b.p512.tiff:
+#       texmos3b.p512      USC texture   mosaic   #3 (modified)           512       Mono
+  description: 'USC texture mosaic #3 (modified)'
+  name: texmos3b.p512
+  size: 512
+  type: monochrome
+# Volume 2. – AERIALS
+aerials/2.1.01.tiff:
+#  2.1.01                  San Diego, CA (Miramar NAS)         512      Color
+  description: 'San Diego, CA (Miramar NAS)'
+  name: 2.1.01
+  size: 512
+  type: color
+aerials/2.1.02.tiff:
+#  2.1.02                  San Diego, CA                       512      Color
+  description: 'San Diego, CA'
+  name: 2.1.02
+  size: 512
+  type: color
+aerials/2.1.03.tiff:
+#  2.1.03                  San Francisco, CA (Golden Gate)     512      Color
+  description: 'San Francisco, CA (Golden Gate)'
+  name: 2.1.03
+  size: 512
+  type: color
+aerials/2.1.04.tiff:
+#  2.1.04                  Oakland, CA                         512      Color
+  description: 'Oakland, CA'
+  name: 2.1.04
+  size: 512
+  type: color
+aerials/2.1.05.tiff:
+#  2.1.05                  San Diego, CA (North Island NAS)    512      Color
+  description: 'San Diego, CA (North Island NAS)'
+  name: 2.1.05
+  size: 512
+  type: color
+aerials/2.1.06.tiff:
+#  2.1.06                  Woodland Hills, CA                  512      Color
+  description: 'Woodland Hills, CA'
+  name: 2.1.06
+  size: 512
+  type: color
+aerials/2.1.07.tiff:
+#  2.1.07                  Foster City, CA                     512      Color
+  description: 'Foster City, CA'
+  name: 2.1.07
+  size: 512
+  type: color
+aerials/2.1.08.tiff:
+#  2.1.08                  San Diego, CA                       512      Color
+  description: 'San Diego, CA'
+  name: 2.1.08
+  size: 512
+  type: color
+aerials/2.1.09.tiff:
+#  2.1.09                  San Diego, CA (Point Loma)          512      Color
+  description: 'San Diego, CA (Point Loma)'
+  name: 2.1.09
+  size: 512
+  type: color
+aerials/2.1.10.tiff:
+#  2.1.10                  San Diego, CA (Shelter Island)      512      Color
+  description: 'San Diego, CA (Shelter Island)'
+  name: 2.1.10
+  size: 512
+  type: color
+aerials/2.1.11.tiff:
+#  2.1.11                  Earth from space                    512      Color
+  description: 'Earth from space'
+  name: 2.1.11
+  size: 512
+  type: color
+aerials/2.1.12.tiff:
+#  2.1.12                  San Diego, CA (Downtown)            512      Color
+  description: 'San Diego, CA (Downtown)'
+  name: 2.1.12
+  size: 512
+  type: color
+aerials/2.2.01.tiff:
+#  2.2.01                  San Diego, CA                      1024      Color
+  description: 'San Diego, CA'
+  name: 2.2.01
+  size: 1024
+  type: color
+aerials/2.2.02.tiff:
+#  2.2.02                  San Diego, CA                      1024      Color
+  description: 'San Diego, CA'
+  name: 2.2.02
+  size: 1024
+  type: color
+aerials/2.2.03.tiff:
+#  2.2.03                  San Diego, CA                      1024      Color
+  description: 'San Diego, CA'
+  name: 2.2.03
+  size: 1024
+  type: color
+aerials/2.2.04.tiff:
+#  2.2.04                  Richmond, CA                       1024      Color
+  description: 'Richmond, CA'
+  name: 2.2.04
+  size: 1024
+  type: color
+aerials/2.2.05.tiff:
+#  2.2.05                  San Diego, CA (Miramar NAS)        1024      Color
+  description: 'San Diego, CA (Miramar NAS)'
+  name: 2.2.05
+  size: 1024
+  type: color
+aerials/2.2.06.tiff:
+#  2.2.06                  San Francisco, CA (Bay Bridge)     1024      Color
+  description: 'San Francisco, CA (Bay Bridge)'
+  name: 2.2.06
+  size: 1024
+  type: color
+aerials/2.2.07.tiff:
+#  2.2.07                  Oakland, CA                        1024      Color
+  description: 'Oakland, CA'
+  name: 2.2.07
+  size: 1024
+  type: color
+aerials/2.2.08.tiff:
+#  2.2.08                  San Diego, CA                      1024      Color
+  description: 'San Diego, CA'
+  name: 2.2.08
+  size: 1024
+  type: color
+aerials/2.2.09.tiff:
+#  2.2.09                  San Francisco, CA                  1024      Color
+  description: 'San Francisco, CA'
+  name: 2.2.09
+  size: 1024
+  type: color
+aerials/2.2.10.tiff:
+#  2.2.10                  Richmond and San Rafael, CA        1024      Color
+  description: 'Richmond and San Rafael, CA'
+  name: 2.2.10
+  size: 1024
+  type: color
+aerials/2.2.11.tiff:
+#  2.2.11                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.11
+  size: 1024
+  type: color
+aerials/2.2.12.tiff:
+#  2.2.12                  San Francisco and Oakland, CA      1024      Color
+  description: 'San Francisco and Oakland, CA'
+  name: 2.2.12
+  size: 1024
+  type: color
+aerials/2.2.13.tiff:
+#  2.2.13                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.13
+  size: 1024
+  type: color
+aerials/2.2.14.tiff:
+#  2.2.14                  Shreveport, LA                     1024      Color
+  description: 'Shreveport, LA'
+  name: 2.2.14
+  size: 1024
+  type: color
+aerials/2.2.15.tiff:
+#  2.2.15                  San Francisco, CA                  1024      Color
+  description: 'San Francisco, CA'
+  name: 2.2.15
+  size: 1024
+  type: color
+aerials/2.2.16.tiff:
+#  2.2.16                  San Francisco, CA                  1024      Color
+  description: 'San Francisco, CA'
+  name: 2.2.16
+  size: 1024
+  type: color
+aerials/2.2.17.tiff:
+#  2.2.17                  San Francisco, CA                  1024      Color
+  description: 'San Francisco, CA'
+  name: 2.2.17
+  size: 1024
+  type: color
+aerials/2.2.18.tiff:
+#  2.2.18                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.18
+  size: 1024
+  type: color
+aerials/2.2.19.tiff:
+#  2.2.19                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.19
+  size: 1024
+  type: color
+aerials/2.2.20.tiff:
+#  2.2.20                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.20
+  size: 1024
+  type: color
+aerials/2.2.21.tiff:
+#  2.2.21                  San Francisco, CA                  1024      Color
+  description: 'San Francisco, CA'
+  name: 2.2.21
+  size: 1024
+  type: color
+aerials/2.2.22.tiff:
+#  2.2.22                  San Francisco and Oakland, CA      1024      Color
+  description: 'San Francisco and Oakland, CA'
+  name: 2.2.22
+  size: 1024
+  type: color
+aerials/2.2.23.tiff:
+#  2.2.23                  San Diego, CA                      1024      Color
+  description: 'San Diego, CA'
+  name: 2.2.23
+  size: 1024
+  type: color
+aerials/2.2.24.tiff:
+#  2.2.24                  Stockton, CA                       1024      Color
+  description: 'Stockton, CA'
+  name: 2.2.24
+  size: 1024
+  type: color
+aerials/3.2.25.tiff:
+#  3.2.25                  Pentagon building                  1024      Mono
+  description: 'Pentagon building'
+  name: 3.2.25
+  size: 1024
+  type: monochrome
+aerials/wash-ir.tiff:
+#  wash-ir                 Washington, D.C. (infra-red)       2250      Color
+  description: 'Washington, D.C. (infra-red)'
+  name: wash-ir
+  size: 2250
+  type: color
+# Volume 3. – MISCELLANEOUS
+misc/4.1.01.tiff:
+#  4.1.01                  Girl                                       256      Color
+  description: 'Girl'
+  name: 4.1.01
+  size: 256
+  type: color
+misc/4.1.02.tiff:
+#  4.1.02                  Couple                                     256      Color
+  description: 'Couple'
+  name: 4.1.02
+  size: 256
+  type: color
+misc/4.1.03.tiff:
+#  4.1.03                  Girl                                       256      Color
+  description: 'Girl'
+  name: 4.1.03
+  size: 256
+  type: color
+misc/4.1.04.tiff:
+#  4.1.04                  Girl                                       256      Color
+  description: 'Girl'
+  name: 4.1.04
+  size: 256
+  type: color
+misc/4.1.05.tiff:
+#  4.1.05                  House                                      256      Color
+  description: 'House'
+  name: 4.1.05
+  size: 256
+  type: color
+misc/4.1.06.tiff:
+#  4.1.06                  Tree                                       256      Color
+  description: 'Tree'
+  name: 4.1.06
+  size: 256
+  type: color
+misc/4.1.07.tiff:
+#  4.1.07                  Jelly beans                                256      Color
+  description: 'Jelly beans'
+  name: 4.1.07
+  size: 256
+  type: color
+misc/4.1.08.tiff:
+#  4.1.08                  Jelly beans                                256      Color
+  description: 'Jelly beans'
+  name: 4.1.08
+  size: 256
+  type: color
+misc/4.2.01.tiff:
+#  4.2.01                  Splash                                     512      Color
+  description: 'Splash'
+  name: 4.2.01
+  size: 512
+  type: color
+misc/4.2.02.tiff:
+#  4.2.02                  Girl (Tiffany)                             512      Color
+  description: 'Girl (Tiffany)'
+  name: 4.2.02
+  size: 512
+  type: color
+misc/4.2.03.tiff:
+#  4.2.03                  Mandrill (a.k.a. Baboon)                   512      Color
+  description: 'Mandrill (a.k.a. Baboon)'
+  name: 4.2.03
+  size: 512
+  type: color
+misc/4.2.04.tiff:
+#  4.2.04                  Girl (Lena, or Lenna)                      512      Color
+  description: 'Girl (Lena, or Lenna)'
+  name: 4.2.04
+  size: 512
+  type: color
+misc/4.2.05.tiff:
+#  4.2.05                  Airplane (F-16)                            512      Color
+  description: 'Airplane (F-16)'
+  name: 4.2.05
+  size: 512
+  type: color
+misc/4.2.06.tiff:
+#  4.2.06                  Sailboat on lake                           512      Color
+  description: 'Sailboat on lake'
+  name: 4.2.06
+  size: 512
+  type: color
+misc/4.2.07.tiff:
+#  4.2.07                  Peppers                                    512      Color
+  description: 'Peppers'
+  name: 4.2.07
+  size: 512
+  type: color
+misc/5.1.09.tiff:
+#  5.1.09                  Moon surface                               256      Mono
+  description: 'Moon surface'
+  name: 5.1.09
+  size: 256
+  type: monochrome
+misc/5.1.10.tiff:
+#  5.1.10                  Aerial                                     256      Mono
+  description: 'Aerial'
+  name: 5.1.10
+  size: 256
+  type: monochrome
+misc/5.1.11.tiff:
+#  5.1.11                  Airplane                                   256      Mono
+  description: 'Airplane'
+  name: 5.1.11
+  size: 256
+  type: monochrome
+misc/5.1.12.tiff:
+#  5.1.12                  Clock                                      256      Mono
+  description: 'Clock'
+  name: 5.1.12
+  size: 256
+  type: monochrome
+misc/5.1.13.tiff:
+#  5.1.13                  Resolution chart                           256      Mono
+  description: 'Resolution chart'
+  name: 5.1.13
+  size: 256
+  type: monochrome
+misc/5.1.14.tiff:
+#  5.1.14                  Chemical plant                             256      Mono
+  description: 'Chemical plant'
+  name: 5.1.14
+  size: 256
+  type: monochrome
+misc/5.2.08.tiff:
+#  5.2.08                  Couple                                     512      Mono
+  description: 'Couple'
+  name: 5.2.08
+  size: 512
+  type: monochrome
+misc/5.2.09.tiff:
+#  5.2.09                  Aerial                                     512      Mono
+  description: 'Aerial'
+  name: 5.2.09
+  size: 512
+  type: monochrome
+misc/5.2.10.tiff:
+#  5.2.10                  Stream and bridge (only 64 gray levels)    512      Mono
+  description: 'Stream and bridge (only'
+  name: 5.2.10
+  size: 512
+  type: monochrome
+misc/5.3.01.tiff:
+#  5.3.01                  Man                                       1024      Mono
+  description: 'Man'
+  name: 5.3.01
+  size: 1024
+  type: monochrome
+misc/5.3.02.tiff:
+#  5.3.02                  Airport                                   1024      Mono
+  description: 'Airport'
+  name: 5.3.02
+  size: 1024
+  type: monochrome
+misc/7.1.01.tiff:
+#  7.1.01                  Truck                                      512      Mono
+  description: 'Truck'
+  name: 7.1.01
+  size: 512
+  type: monochrome
+misc/7.1.02.tiff:
+#  7.1.02                  Airplane                                   512      Mono
+  description: 'Airplane'
+  name: 7.1.02
+  size: 512
+  type: monochrome
+misc/7.1.03.tiff:
+#  7.1.03                  Tank                                       512      Mono
+  description: 'Tank'
+  name: 7.1.03
+  size: 512
+  type: monochrome
+misc/7.1.04.tiff:
+#  7.1.04                  Car and APCs                               512      Mono
+  description: 'Car and APCs'
+  name: 7.1.04
+  size: 512
+  type: monochrome
+misc/7.1.05.tiff:
+#  7.1.05                  Truck and APCs                             512      Mono
+  description: 'Truck and APCs'
+  name: 7.1.05
+  size: 512
+  type: monochrome
+misc/7.1.06.tiff:
+#  7.1.06                  Truck and APCs                             512      Mono
+  description: 'Truck and APCs'
+  name: 7.1.06
+  size: 512
+  type: monochrome
+misc/7.1.07.tiff:
+#  7.1.07                  Tank                                       512      Mono
+  description: 'Tank'
+  name: 7.1.07
+  size: 512
+  type: monochrome
+misc/7.1.08.tiff:
+#  7.1.08                  APC                                        512      Mono
+  description: 'APC'
+  name: 7.1.08
+  size: 512
+  type: monochrome
+misc/7.1.09.tiff:
+#  7.1.09                  Tank                                       512      Mono
+  description: 'Tank'
+  name: 7.1.09
+  size: 512
+  type: monochrome
+misc/7.1.10.tiff:
+#  7.1.10                  Car and APCs                               512      Mono
+  description: 'Car and APCs'
+  name: 7.1.10
+  size: 512
+  type: monochrome
+misc/7.2.01.tiff:
+#  7.2.01                  Airplane (U-2)                            1024      Mono
+  description: 'Airplane (U-2)'
+  name: 7.2.01
+  size: 1024
+  type: monochrome
+misc/boat.512.tiff:
+#  boat.512                Fishing Boat                               512      Mono
+  description: 'Fishing Boat'
+  name: boat.512
+  size: 512
+  type: monochrome
+misc/elaine.512.tiff:
+#  elaine.512              Girl (Elaine)                              512      Mono
+  description: 'Girl (Elaine)'
+  name: elaine.512
+  size: 512
+  type: monochrome
+misc/gray21.512.tiff:
+#  gray21.512              21 level step wedge                        512      Mono
+  description: '21 level step wedge'
+  name: gray21.512
+  size: 512
+  type: monochrome
+misc/house.tiff:
+#  house                   House                                      512      Color
+  description: 'House'
+  name: house
+  size: 512
+  type: color
+misc/numbers.512.tiff:
+#  numbers.512             256 level test pattern                     512      Mono
+  description: '256 level test pattern'
+  name: numbers.512
+  size: 512
+  type: monochrome
+misc/ruler.512.tiff:
+#  ruler.512               Pixel ruler                                512      Mono
+  description: 'Pixel ruler'
+  name: ruler.512
+  size: 512
+  type: monochrome
+misc/testpat.1k.tiff:
+#  testpat.1k              General test pattern                      1024      Mono
+  description: 'General test pattern'
+  name: testpat.1k
+  size: 1024
+  type: monochrome
+# Volume 4. – SEQUENCES
+#       Name               Description                                       Size   Frames   Color/Mono
+sequences/6.1.01.tiff:
+#       6.1                Walter Cronkite moving head                       256      16        Mono
+  description: 'Walter Cronkite moving head'
+  name: 6.1.01
+  size: 256
+  frames: 16
+  type: monochrome
+sequences/6.1.02.tiff:
+  name: 6.1.02
+  size: 256
+  type: monochrome
+sequences/6.1.03.tiff:
+  name: 6.1.03
+  size: 256
+  type: monochrome
+sequences/6.1.04.tiff:
+  name: 6.1.04
+  size: 256
+  type: monochrome
+sequences/6.1.05.tiff:
+  name: 6.1.05
+  size: 256
+  type: monochrome
+sequences/6.1.06.tiff:
+  name: 6.1.06
+  size: 256
+  type: monochrome
+sequences/6.1.07.tiff:
+  name: 6.1.07
+  size: 256
+  type: monochrome
+sequences/6.1.08.tiff:
+  name: 6.1.08
+  size: 256
+  type: monochrome
+sequences/6.1.09.tiff:
+  name: 6.1.09
+  size: 256
+  type: monochrome
+sequences/6.1.10.tiff:
+  name: 6.1.10
+  size: 256
+  type: monochrome
+sequences/6.1.11.tiff:
+  name: 6.1.11
+  size: 256
+  type: monochrome
+sequences/6.1.12.tiff:
+  name: 6.1.12
+  size: 256
+  type: monochrome
+sequences/6.1.13.tiff:
+  name: 6.1.13
+  size: 256
+  type: monochrome
+sequences/6.1.14.tiff:
+  name: 6.1.14
+  size: 256
+  type: monochrome
+sequences/6.1.15.tiff:
+  name: 6.1.15
+  size: 256
+  type: monochrome
+sequences/6.1.16.tiff:
+  name: 6.1.16
+  size: 256
+  type: monochrome
+sequences/6.2.01.tiff:
+#       6.2                Chemical plant flyover (close view)               256      32        Mono
+  description: 'Chemical plant flyover (close view)'
+  name: 6.2.01
+  size: 256
+  frames: 32
+  type: monochrome
+sequences/6.2.02.tiff:
+  name: 6.2.02
+  size: 256
+  type: monochrome
+sequences/6.2.03.tiff:
+  name: 6.2.03
+  size: 256
+  type: monochrome
+sequences/6.2.04.tiff:
+  name: 6.2.04
+  size: 256
+  type: monochrome
+sequences/6.2.05.tiff:
+  name: 6.2.05
+  size: 256
+  type: monochrome
+sequences/6.2.06.tiff:
+  name: 6.2.06
+  size: 256
+  type: monochrome
+sequences/6.2.07.tiff:
+  name: 6.2.07
+  size: 256
+  type: monochrome
+sequences/6.2.08.tiff:
+  name: 6.2.08
+  size: 256
+  type: monochrome
+sequences/6.2.09.tiff:
+  name: 6.2.09
+  size: 256
+  type: monochrome
+sequences/6.2.10.tiff:
+  name: 6.2.10
+  size: 256
+  type: monochrome
+sequences/6.2.11.tiff:
+  name: 6.2.11
+  size: 256
+  type: monochrome
+sequences/6.2.12.tiff:
+  name: 6.2.12
+  size: 256
+  type: monochrome
+sequences/6.2.13.tiff:
+  name: 6.2.13
+  size: 256
+  type: monochrome
+sequences/6.2.14.tiff:
+  name: 6.2.14
+  size: 256
+  type: monochrome
+sequences/6.2.15.tiff:
+  name: 6.2.15
+  size: 256
+  type: monochrome
+sequences/6.2.16.tiff:
+  name: 6.2.16
+  size: 256
+  type: monochrome
+sequences/6.2.17.tiff:
+  name: 6.2.17
+  size: 256
+  type: monochrome
+sequences/6.2.18.tiff:
+  name: 6.2.18
+  size: 256
+  type: monochrome
+sequences/6.2.19.tiff:
+  name: 6.2.19
+  size: 256
+  type: monochrome
+sequences/6.2.20.tiff:
+  name: 6.2.20
+  size: 256
+  type: monochrome
+sequences/6.2.21.tiff:
+  name: 6.2.21
+  size: 256
+  type: monochrome
+sequences/6.2.22.tiff:
+  name: 6.2.22
+  size: 256
+  type: monochrome
+sequences/6.2.23.tiff:
+  name: 6.2.23
+  size: 256
+  type: monochrome
+sequences/6.2.24.tiff:
+  name: 6.2.24
+  size: 256
+  type: monochrome
+sequences/6.2.25.tiff:
+  name: 6.2.25
+  size: 256
+  type: monochrome
+sequences/6.2.26.tiff:
+  name: 6.2.26
+  size: 256
+  type: monochrome
+sequences/6.2.27.tiff:
+  name: 6.2.27
+  size: 256
+  type: monochrome
+sequences/6.2.28.tiff:
+  name: 6.2.28
+  size: 256
+  type: monochrome
+sequences/6.2.29.tiff:
+  name: 6.2.29
+  size: 256
+  type: monochrome
+sequences/6.2.30.tiff:
+  name: 6.2.30
+  size: 256
+  type: monochrome
+sequences/6.2.31.tiff:
+  name: 6.2.31
+  size: 256
+  type: monochrome
+sequences/6.2.32.tiff:
+  name: 6.2.32
+  size: 256
+  type: monochrome
+sequences/6.3.01.tiff:
+#       6.3                Chemical plant flyover (far view)                 256      11        Mono
+  description: 'Chemical plant flyover (far view)'
+  name: 6.3.01
+  size: 256
+  frames: 11
+  type: monochrome
+sequences/6.3.02.tiff:
+  name: 6.3.02
+  size: 256
+  type: monochrome
+sequences/6.3.03.tiff:
+  name: 6.3.03
+  size: 256
+  type: monochrome
+sequences/6.3.04.tiff:
+  name: 6.3.04
+  size: 256
+  type: monochrome
+sequences/6.3.05.tiff:
+  name: 6.3.05
+  size: 256
+  type: monochrome
+sequences/6.3.06.tiff:
+  name: 6.3.06
+  size: 256
+  type: monochrome
+sequences/6.3.07.tiff:
+  name: 6.3.07
+  size: 256
+  type: monochrome
+sequences/6.3.08.tiff:
+  name: 6.3.08
+  size: 256
+  type: monochrome
+sequences/6.3.09.tiff:
+  name: 6.3.09
+  size: 256
+  type: monochrome
+sequences/6.3.10.tiff:
+  name: 6.3.10
+  size: 256
+  type: monochrome
+sequences/6.3.11.tiff:
+  name: 6.3.11
+  size: 256
+  type: monochrome
+sequences/motion01.512.tiff:
+#       motion             Toy vehicles                                      512      10        Mono
+  description: 'Toy vehicles'
+  name: motion01.512
+  size: 512
+  frames: 10
+  type: monochrome
+sequences/motion02.512.tiff:
+  description: ''
+  name: motion02.512
+  size: 512
+  type: monochrome
+sequences/motion03.512.tiff:
+  description: ''
+  name: motion03.512
+  size: 512
+  type: monochrome
+sequences/motion04.512.tiff:
+  description: ''
+  name: motion04.512
+  size: 512
+  type: monochrome
+sequences/motion05.512.tiff:
+  description: ''
+  name: motion05.512
+  size: 512
+  type: monochrome
+sequences/motion06.512.tiff:
+  description: ''
+  name: motion06.512
+  size: 512
+  type: monochrome
+sequences/motion07.512.tiff:
+  description: ''
+  name: motion07.512
+  size: 512
+  type: monochrome
+sequences/motion08.512.tiff:
+  description: ''
+  name: motion08.512
+  size: 512
+  type: monochrome
+sequences/motion09.512.tiff:
+  description: ''
+  name: motion09.512
+  size: 512
+  type: monochrome
+sequences/motion10.512.tiff:
+  description: ''
+  name: motion10.512
+  size: 512
+  type: monochrome

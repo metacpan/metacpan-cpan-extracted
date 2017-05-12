@@ -1,0 +1,12 @@
+Data::TemporaryBag - Handle long size data using temporary file .
+
+Install:
+
+  perl Makefile.PL
+  make
+  make test
+  make install
+
+See perldoc Data::TemporaryBag for further information.
+
+Yasuhiro Sasama (ySas), <ysas@nmt.ne.jp>

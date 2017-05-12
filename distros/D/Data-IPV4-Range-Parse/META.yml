@@ -1,0 +1,13 @@
+--- #YAML:1.0
+name:                Data-IPV4-Range-Parse
+version:             1.05
+abstract:            Perl extension parsing ipv4 ranges
+license:             ~
+author:              
+    - Michael Shipper
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

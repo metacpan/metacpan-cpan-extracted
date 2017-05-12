@@ -1,0 +1,53 @@
+---
+abstract: 'gantry to hang a model layer onto Dancer2'
+author:
+  - 'Christian Walde <walde.christian@gmail.com>'
+build_requires:
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::InDistDir: '0'
+  Test::More: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150005'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Model
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::AppRole::Model:
+    file: lib/Dancer2/Plugin/AppRole/Model.pm
+    version: '1.152120'
+  Dancer2::Plugin::Model:
+    file: lib/Dancer2/Plugin/Model.pm
+    version: '1.152120'
+requires:
+  Dancer2: '0'
+  Dancer2::Plugin: '0'
+  Dancer2::Plugin::AppRole::Helper: '0'
+  Module::Runtime: '0'
+  Moo::Role: '0'
+  Types::Standard: '0'
+  perl: '5.006'
+  strictures: '2'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer2-Plugin-Model
+  homepage: https://github.com/wchristian/Dancer2-Plugin-Model
+  repository: https://github.com/wchristian/Dancer2-Plugin-Model.git
+version: '1.152120'

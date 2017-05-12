@@ -1,0 +1,85 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Osram::Lightify::Hub;
+
+use Getopt::Long;
+use Pod::Usage;
+
+
+#
+#  The configuration variables
+#
+my %CONFIG;
+
+#
+#  Parse the command-line
+#
+exit
+  unless (
+           Getopt::Long::GetOptions( "all-off", \$CONFIG{ 'all-off' },
+                                     "all-on",  \$CONFIG{ 'all-on' },
+                                     "help",    \$CONFIG{ 'help' },
+                                     "hub=s",   \$CONFIG{ 'hub' },
+                                     "list",    \$CONFIG{ 'list' },
+                                     "off=s",   \$CONFIG{ 'off' },
+                                     "on=s",    \$CONFIG{ 'on' },
+                                   ) );
+
+#
+# Connect to the hub
+#
+my $hub = Device::Osram::Lightify::Hub->new( host => $CONFIG{ 'hub' } );
+
+#
+#  Now run the actions
+#
+if ( $CONFIG{ 'all-on' } )
+{
+    # All on
+    $hub->all_on();
+}
+if ( $CONFIG{ 'all-off' } )
+{
+    # ALl off
+    $hub->all_off();
+}
+if ( $CONFIG{ 'on' } )
+{
+    # Set a light on
+    foreach my $light ( $hub->lights() )
+    {
+        if ( $light->name() eq $CONFIG{ 'on' } )
+        {
+            $light->set_on();
+            print("Set $CONFIG{'on'} on.\n");
+            exit(0);
+        }
+    }
+
+}
+if ( $CONFIG{ 'off' } )
+{
+    # Set a single light off
+    foreach my $light ( $hub->lights() )
+    {
+        if ( $light->name() eq $CONFIG{ 'off' } )
+        {
+            $light->set_off();
+            print("Set $CONFIG{'off'} off.\n");
+            exit(0);
+        }
+    }
+}
+if ( $CONFIG{ 'list' } )
+{
+
+    foreach my $light ( $hub->lights() )
+    {
+        print $light;
+    }
+}
+
+exit 0;

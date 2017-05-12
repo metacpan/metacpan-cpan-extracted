@@ -1,0 +1,13 @@
+Changes
+Client.xs
+Makefile.PL
+MANIFEST
+ppport.h
+README
+t/DLM-Client.t
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/DLM/Client.pm
+lib/DLM/Client/Simple.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

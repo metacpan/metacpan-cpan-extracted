@@ -1,0 +1,100 @@
+Revision history for Data-Couplet
+
+0.02004314 2011-10-28T14:54:15Z
+ [Dependencies]
+ - changed: runtime requires Moose 0.84 -> 0.90
+ - dropped: runtime requires MooseX::Has::Sugar
+
+ [Features]
+ - Added (private) accessors for everything moose can do on the ::Private
+   core. This is soley to discourage consumers from accesing the hash
+   internals directly to provide better encapsulation. Maybe one day
+   ::Private will be entirely replaced with XS and you want it to remain
+   working.
+ - Added a basic Type Library, Data::Couplet::Types
+
+0.02004313 2011-10-28T14:24:40Z
+ - Maintenance release, no non-packaging changes in this release.
+
+ [Dependencies::New]
+ - Data::Dumper
+
+ [Dependencies::Removed]
+ - Test::use::ok
+ - ok
+
+ [Internals]
+ - packages now set $VERSION without 'our'
+ - packages now have $AUTHORITY
+
+ [Packaging]
+ - Much needed regeneration of Build.PL
+ - Changes file migrated to CPAN::Changes format.
+ - Copyright License updated ( Date, Indentation, Address )
+ - No longer ships a Makefile.PL ( EUMM Sucks )
+ - perlcriticrc -> perlcritic.rc
+ - Moved to Git versioning
+ - moved to Author::KENTNL
+ - Repository metadata more featureful and uses https://
+ - license is now 'perl_5' not 'perl'
+ - dependencies now properly qualified.
+ - now ship x_authority.
+ - Pod overhaulled and rewoven.
+ - Ship .perltidyrc
+ - Tidy all code.
+
+ [Tests]
+ - added version reporting test.
+ - t/* moved to xt/*
+ - hand-written xt/* replaced by generated ones.
+ - xt:added release/cpan-changes
+ - xt:added release/distmeta
+ - xt:added release/eol
+ - xt:added release/kwalitee
+ - xt:added release/pod-coverage
+ - xt:added release/pod-syntax
+
+0.02004312 2009-09-13T12:20:00Z
+ - Moved last_id to last_index ( was a bad name anyway )
+ - Added ->indices to the KeyCount plug. 
+ - Added KeyPlug tests.
+ - This is a minor release to tweak -last_index prior to S::F release
+
+0.02004302 2009-09-13T02:06:26Z
+ - Added a Ease-Of-Use subclassing utility.
+ - Moved D::C core to the subclassing utility.
+ - Added subclassing example.
+
+0.02004222 2009-09-12T22:23:22Z
+ - Added a plugin infrastructure w/ Roles.
+ - Moved ->count to role composition ( you wont notice this )
+ - Increased input strictness with really basic MX::Types based input
+   validation. ( if you're going to be using _key or _at methods, use them
+   properly ! :) )
+ - Added ->last_id via Counter plug.
+ - Moved the non-working sorting routines to a plug. Maybe they'll see some
+   love there.
+
+0.02004206 2009-09-12T06:01:08Z
+ - Support for multiple-value commands ( Thanks James Laver )
+ - Support for ->count() mechanism     ( Thanks James Laver )
+
+0.02003813 2009-09-08T13:10:54Z
+ - Clone Support works and tested.
+ - Clones are MX::Cloned, and deep.
+ - minor++ # version scheme incompatible
+ - dist.ini now shipping with dist
+ - DZIL CompileTests
+ - Versioning Scheme switched to AutoVersion::Relative
+ - Added MooseX::Clone support
+ - Added MooseX::Types Deps
+ - Added MooseX::Has::Sugar Deps
+ - Added more author tests
+ - Assload of Typos Fixed
+
+0.0101 2009-08-22T10:09:57Z
+ - Fixed some build deps
+
+0.0100 2009-08-21T16:24:40Z
+ - First version.
+

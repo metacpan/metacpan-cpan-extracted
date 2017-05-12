@@ -1,0 +1,218 @@
+Release history for Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes
+
+0.005004 2017-03-05T06:13:51Z 085066a
+ [Checks]
+ - Extend support for bundle 2.025020+ arguments with _'s
+ - Add check to ensure >= 2.025020 if using its features
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005003, see misc/*.deps* for details
+ - develop: +1 -1 (suggests: ↑2)
+
+0.005003 2017-03-03T22:36:43Z c92d181
+ [Bugfix]
+ - 1. Avoid test failures on 5.26 w/ -Ddefault_inc_excludes_dot
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-Author-KENTNL-RecommendFixes/issues/2
+ - 2. Avoid weird problems with linecache consistency by reducing code complexity
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005002, see misc/*.deps* for details
+ - develop: +1 ↑2
+ - runtime: -1
+ - test: ↓1 -1
+
+ [Tests]
+ - Stop using dztest
+
+0.005002 2016-09-10T06:01:15Z fa37013
+ [Checks]
+ - Derecommend use of ConfigDumper, it was a nice idea, but the dependency and test complexity I can do without.
+ - Derecommend use of dztest, again, nice idea, but unwanted complexity proliferation.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.005001, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑1)
+
+ [Features / Win32 Ansi Color support]
+ - ANSI Escape code colours should render correctly on Win32 if users have Win32::Console::ANSI installed.
+ - Patched (with thanks) by Roy Ivy III ( #1 )
+
+0.005001 2015-07-11T14:36:47Z 0e55b0c
+ [Checks]
+ - gitignore: Make sure all important paths that are expected to be top-level paths match only top level paths.
+ - gitignore: Make sure the distname is correctly ignored.
+
+0.005000 2015-07-06T08:09:15Z b2c79f6
+ [Checks]
+ - Change recommended preference regarding copyfiles= setting.
+ - Recommend Makefile.PL
+ - Recommend CONTRIBUTING.pod
+ - Recommend INSTALL.SKIP when Makefile.PL exists
+ - Recommend some basic rules for .gitignore
+ - Recommend EUMM cruft exclusions for .gitignore when Makefile.PL exists
+ - Recommend proliferating INSTALL.SKIP with *.pod where relevant.
+ - Derecommend CONTRIBUTING.mkdn when CONTRIBUTING.pod is present
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004003, see misc/*.deps* for details
+ - develop: +3 -1 (suggests: ↑1)
+
+0.004003 2015-06-19T04:15:00Z c32e093
+ [Checks]
+ - make LMU-using dists obvious so I can consider if avoiding it is warranted.
+ - This is not a certainty of removal, simply me acting as a proxy for other peoples concerns, for in cases where I'm
+   indifferent, I defer to the concerns of others.
+ - For instance, the closer my code is to the upstream of the river, the more likely I'll elect to avoid it.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004002, see misc/*.deps* for details
+ - develop: ↑2 (suggests: ↑2)
+
+0.004002 2015-03-01T08:13:27Z fce9161
+ [Checks]
+ - recommend builds instead of build/master
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004001, see misc/*.deps* for details
+ - configure: ↓1 (recommends: ↓1)
+ - develop: +3 ↑2 (recommends: ↓1, suggests: ↑1)
+ - runtime: ↓1 -1 (recommends: +2)
+ - test: ↓1 (recommends: ↓2)
+
+0.004001 2014-12-10T10:06:39Z bec44ae
+ [Checks]
+ - Cry about autobox and friends.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.004000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: -1 (recommends: ↑1, suggests: ↑2)
+ - test: (recommends: ↑2)
+
+0.004000 2014-10-30T12:33:06Z 66bb186
+ [Checks]
+ - Test dist.ini.meta has a syntax vim statement, because vim doesn't autodetect that filetype.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003006, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑1 -1 (recommends: +1, suggests: ↑2)
+ - runtime: +1 -1
+ - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - Inline package _Assertions now replaced with externalised Generic::Assertions
+
+0.003006 2014-09-27T07:03:04Z
+ [Checks]
+ - Make sure weaver_ini_ok runs
+ - Double-check that -Encoding is not specified.
+
+0.003005 2014-09-25T16:09:00Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003004, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+ [Internals]
+ - Prototype the input_transform feature discussed.
+
+0.003004 2014-09-22T19:06:39Z
+ [Checks]
+ - Warn about bad hashtags.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003003, see misc/*.deps* for details
+ - runtime: +1
+
+ [Internals]
+ - Better caching
+ - better assertion generator test
+ - simplified multi-line test
+
+0.003003 2014-09-21T12:42:45Z
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +1 -1
+
+ [Internals]
+ - Factor _Path parts into _Assertion and have generic class prototype.
+ - Factor _Data parts into _Assertion and have generic class prototype.
+
+0.003002 2014-09-04T19:09:39Z
+ [00 Trivial]
+ - Dislike copyrights without an email address
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003001, see misc/*.deps* for details
+ - test: (recommends: ↑1)
+
+0.003001 2014-08-30T11:09:05Z
+ [00 Trivial]
+ - Prefer Sub::Util over Sub::Name
+
+0.003000 2014-08-30T00:17:44Z
+ [00 Major]
+ - Interals overhauled again
+ - new checks
+ - metadata
+
+ [Checks]
+ - Now scrapes lib/ and t/ and recommends various things for DZil plugin work.
+ - author=kentfredric is now warned against.
+ - gitversions is now warned against
+ - failure to have one of bumpversions or gitversions is a serious warning
+ - derecommend Readonly
+ - check mailmap
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002003, see misc/*.deps* for details
+ - runtime: +1
+
+ [Interals]
+ - Internals overhauled to have some private classes, greatly simplifying syntax and logic.
+
+ [Metadata]
+ - use kentnl for author.
+
+0.002003 2014-08-21T05:45:11Z
+ [00 Minor]
+ - Reframe tests in terms of now exported version of dztest.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - test: +1 -2
+
+0.002002 2014-08-18T04:36:16Z
+ [00 Minor]
+ - add Class::Load to things to derecommend: Module::Runtime is muchly preferred.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+0.002001 2014-08-17T18:48:43Z
+ [Bugfix]
+ - 'ok' state tracking within a few subs was wrong, @haarg++
+
+0.002000 2014-08-17T09:16:08Z
+ [00 Minor]
+ - Code internally overhauled to be less spur-of-the-moment and maintainable.
+ - Now has a list of modules to unrecommend if seen in $distmeta;
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - test: +3
+
+ [Tests]
+ - Has some basic tests now.
+
+0.001001 2014-08-16T21:40:56Z
+ [00 Trivial]
+ - don't think misc/ are bad when they're good.
+
+0.001000 2014-08-16T21:38:10Z
+ - CPANDAY!
+ - First version.

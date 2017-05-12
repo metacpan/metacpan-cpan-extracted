@@ -1,0 +1,32 @@
+SYNOPSIS
+
+     use Desktop::Detect qw(detect_desktop);
+     my $res = detect_desktop();
+     say "We are running under XFCE" if $res->{desktop} eq 'xfce';
+
+DESCRIPTION
+
+    This module uses several heuristics to find out what desktop
+    environment is currently running, along with extra information.
+
+FUNCTIONS
+
+ detect_desktop() => HASHREF
+
+    Return a hashref containing information about running desktop
+    environment and extra information.
+
+    Detection is done from the cheapest methods, e.g. looking at
+    environment variables. Several environment variables are checked, e.g.
+    DESKTOP_SESSION, XDG_DESKTOP_SESSION, etc.
+
+    Result:
+
+      * desktop => STR
+
+      Possible values: xfce, kde-plasma, gnome, gnome-classic, cinnamon,
+      lxde, openbox, or empty string (if can't detect any desktop
+      environment running).
+
+SEE ALSO
+

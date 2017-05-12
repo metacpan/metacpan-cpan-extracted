@@ -1,0 +1,140 @@
+#!/usr/bin/perl -w
+#
+#   @(#)$Id: InformixTechSupport,v 2013.1 2013/05/22 05:41:29 jleffler Exp $
+#
+#   Tech Support Tool for Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01)
+#
+#   Copyright 1999 Jonathan Leffler
+#   Copyright 2000 Informix Software Inc
+#   Copyright 2002 IBM
+#
+#   You may distribute under the terms of either the GNU General Public
+#   License or the Artistic License, as specified in the Perl README file.
+
+use strict;
+use Config;
+use DBD::Informix::TechSupport;
+
+use vars qw($opt_l $opt_b $opt_w $opt_v $opt_V $usage);
+use Getopt::Std;
+
+$usage = "Usage: $0 [-b bugtype | -w | -V | -v product]\n";
+
+print STDERR $usage and exit 1
+	if ($#ARGV < 0 || getopts('b:v:wV') == 0);
+
+if ($opt_V)
+{
+	&print_versions('Perl DBI DBD::Informix ESQL/C Licence');
+}
+elsif ($opt_v)
+{
+	&print_versions($opt_v);
+}
+elsif ($opt_b)
+{
+	# Bug Report
+	&bug_report($opt_b, @ARGV);
+}
+elsif ($opt_w)
+{
+	# It Works
+	&it_works;
+}
+else
+{
+	print STDERR "$0: misunderstood your command/options @ARGV\n";
+	print STDERR "$usage";
+	exit 1;
+}
+
+exit 0;
+
+__END__
+
+=head1 NAME
+
+InformixTechSupport - Technical Support tool for Informix Database Driver for Perl DBI
+
+=head1 SYNOPSIS
+
+C<InformixTechSupport -V>
+
+C<InformixTechSupport -v [ Perl | DBI | DBD::Informix | ESQL/C ]>
+
+C<InformixTechSupport -b [ABCD] [test ...]>
+
+C<InformixTechSupport -w>
+
+=head1 DESCRIPTION
+
+The InformixTechSupport script is used for a variety of purposes
+related to technical support of Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01).
+
+=head2 CHECKING SOFTWARE VERSIONS
+
+Use C<InformixTechSupport -V> to discover the version number of each
+of the components listed in the next section.
+
+=head2 CHECKING VERSIONS OF SPECIFIC COMPONENTS
+
+Use C<InformixTechSupport -v component> to discover the version number
+of a component used by DBD::Informix.
+
+The valid component names are:
+
+=over 2
+
+=item *
+
+Perl
+
+=item *
+
+DBI
+
+=item *
+
+DBD::Informix
+
+=item *
+
+ESQL/C
+
+=back
+
+Other component names are silently ignored.
+
+=head2 CREATING A BUG REPORT
+
+Use C<InformixTechSupport -b [class] [tests ...]> to create a basic
+bug report.
+The file Notes/bug.reports contains detailed information about the
+classes of bug reports (which are A, B, C, and D).
+If you have a class D bug, then you can list the specific test(s)
+which are failing on the command line.
+
+The output contains most of the information that will be needed to
+debug your problem.
+If your problem is not with the standard tests, then you should aim to
+create a standalone reproduction of your problem and include that test
+with your bug report.
+
+=head2 CREATING A REPORT THAT IT WORKS
+
+Use C<InformixTechSupport -w> to create a report that Informix Database Driver for Perl DBI Version 2015.1101 (2015-11-01) works.
+You may need to edit the output; you may certainly add comments in the
+'Optional comments' section.
+The output is written to standard output only.
+It is never sent anywhere unless you actually choose to send it.
+
+If you do send the report, please put "DBD::Informix - It Works" in the
+subject line and send the report to C<dbd.informix@gmail.com> (this is a
+change of email address from the instructions in previous versions of
+DBD::Informix).
+
+=head1 AUTHOR
+
+Jonathan Leffler <jleffler@google.com>
+
+=cut

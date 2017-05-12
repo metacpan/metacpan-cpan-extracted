@@ -1,0 +1,31 @@
+Revision history for Perl extension Dancer::Plugin::I18N
+
+0.43    2016.02.02
+		- Big thanks to John Witkowski for send this patches:
+		Remove unused code
+		Call _load_i18n_settings only once when module loads
+		Refactor languages slightly
+		Set language from request in before hook, not in _setup_i18n
+		Directory setting relative to appdir
+		Call _setup_i18n just once, when module loads
+0.42	2014.03.14
+		- Fix documentation error (thanx Hugues Max)
+		- Merge patch from dancer-plugin-i18n (thanx Yanick Champoux)
+0.41	2012.12.27
+		- Put some sugestion from Alexandre (Midnite) Jousset
+0.40	2012.03.29
+		- setting locale
+		- own changed language via param in hook before
+		- exported Lexicon func
+0.22    2012.03.01
+        - Putted own funcs
+0.13    Wed Feb 22 14:55:12 2012
+        - changing documentation
+0.12    Mon Feb 20 18:18:22 2012
+        - changing documentation
+0.11    Mon Feb 20 18:16:22 2012
+        - changing documentation and testing lang
+0.10    Sun Feb 18 02:35:43 2012
+        - putted simillar as from Catalyst::Plugin::I18N
+0.01    Sun Apr 25 15:18:43 2010
+        - original version

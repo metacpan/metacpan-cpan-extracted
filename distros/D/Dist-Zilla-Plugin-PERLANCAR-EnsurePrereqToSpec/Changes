@@ -1,0 +1,25 @@
+Revision history for Dist-Zilla-Plugin-PERLANCAR-EnsurePrereqToSpec
+
+0.04    2016-12-28 (PERLANCAR)
+
+	- Update check: spec relationship is now expressed using
+	  rel=x_spec.
+
+
+0.03    2016-12-27 (PERLANCAR)
+
+	- Update check: spec relationship is now expressed in
+	  DevelopSuggests using _SPEC:: prefix.
+
+
+0.02    2015-12-17 (PERLANCAR)
+
+	- Allow building of dists like Perinci-Access-Lite or
+	  Perinci-Access-Perl which wants to express spec prereq to Rinci
+	  but does not actually define Rinci metadata in %SPEC, by checking
+	  .tag-implements-Rinci file.
+
+
+0.01    2015-09-11 (PERLANCAR)
+
+        - First release.

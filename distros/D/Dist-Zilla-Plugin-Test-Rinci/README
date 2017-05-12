@@ -1,0 +1,9 @@
+DESCRIPTION
+
+    This is an extension of Dist::Zilla::Plugin::InlineFiles, providing the
+    following files:
+
+      xt/release/rinci.t - a standard Rinci metadata test
+
+    This test uses Test::Rinci to check your Rinci metadata.
+

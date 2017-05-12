@@ -1,0 +1,9 @@
+Revision history for DBIx-Class-PhoneticSearch
+
+0.01    2009-06-28
+        - dropped Class::Load because it doesn't play nice with perl 5.10
+        
+
+0.00	2009-05-29
+		- initial release
+

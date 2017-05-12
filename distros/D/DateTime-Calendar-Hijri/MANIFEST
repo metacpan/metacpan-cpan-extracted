@@ -1,0 +1,10 @@
+MANIFEST
+LICENSE
+README
+Changes
+lib/DateTime/Calendar/Hijri.pm
+t/001_load.t
+t/002_basic.t
+t/003_convert.t
+Makefile.PL
+META.yml

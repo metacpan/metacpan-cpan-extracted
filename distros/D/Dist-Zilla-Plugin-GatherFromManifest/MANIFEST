@@ -1,0 +1,11 @@
+GatherFromManifest.pm
+LICENSE
+MANIFEST
+META.yml
+Makefile.PL
+README
+dist.ini
+t/00-use.t
+t/author-critic.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

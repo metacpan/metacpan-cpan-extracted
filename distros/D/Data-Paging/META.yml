@@ -1,0 +1,56 @@
+---
+abstract: 'pagination helper for view'
+author:
+  - '@gmail.com>'
+build_requires:
+  Find::Lib: 0
+  Test::Fatal: 0
+  Test::More: 0.98
+  Test::More::Hooks: 0
+  Test::Pretty: 0
+configure_requires:
+  CPAN::Meta: 0
+  CPAN::Meta::Prereqs: 0
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v0.8.1, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Paging
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Paging:
+    file: lib/Data/Paging.pm
+    version: 0.01
+  Data::Paging::Collection:
+    file: lib/Data/Paging/Collection.pm
+  Data::Paging::Renderer::Base:
+    file: lib/Data/Paging/Renderer/Base.pm
+  Data::Paging::Renderer::NavigationBar:
+    file: lib/Data/Paging/Renderer/NavigationBar.pm
+  Data::Paging::Renderer::NeighborLink:
+    file: lib/Data/Paging/Renderer/NeighborLink.pm
+requires:
+  Class::Accessor::Lite: 0
+  UNIVERSAL::require: 0
+  common::sense: 0
+  perl: 5.008008
+resources:
+  bugtracker: https://github.com/ainame/p5-Data-Paging/issues
+  homepage: https://github.com/ainame/p5-Data-Paging
+  repository: git://github.com/ainame/p5-Data-Paging.git
+version: 0.01
+x_contributors:
+  - 'ainame <s.namai.2012@gmail.com>'
+  - 'satoshi.namai <satoshi.namai@mixi.co.jp>'

@@ -1,0 +1,9 @@
+CHANGES
+MANIFEST
+README
+Makefile.PL
+PreProcessor.pm
+t/includes.t
+t/pragmas.t
+t/t1.pl
+t/t2.pl

@@ -1,0 +1,35 @@
+---
+abstract: 'Virtual Filesystem backed by Content-Addressable Storage'
+author:
+  - 'Michael Conrad <mconrad@intellitree.com>'
+build_requires:
+  Data::Dumper: 0
+  Digest: 0
+  Path::Class: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 1
+generated_by: 'Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DataStore-CAS-FS
+requires:
+  Carp: 0
+  DataStore::CAS: 0.02
+  Fcntl: 0
+  File::Spec: 3.33
+  File::Spec::Functions: 0
+  JSON: 2.53
+  Moo: 1.000007
+  Scalar::Util: 0
+  Socket: 0
+  Try::Tiny: 0.11
+  overload: 0
+  parent: 0
+  perl: 5.008001
+  strict: 0
+  warnings: 0
+version: 0.011000

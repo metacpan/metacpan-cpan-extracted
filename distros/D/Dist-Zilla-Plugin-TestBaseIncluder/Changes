@@ -1,0 +1,28 @@
+0.09 Sat Aug 16 11:01:22 PDT 2014
+ - Meta 0.0.2
+
+0.08 Fri Aug 15 21:39:10 PDT 2014
+ - Don't bug
+
+0.07 Fri Aug 15 21:18:04 PDT 2014
+ - Remove t/use_ok.t
+
+0.06 Fri Aug 15 15:45:33 PDT 2014
+ - Add t/000-compile-modules.t
+ - CPAN Day 2014 - 21 Release Salute!
+
+0.05 Wed Jul 16 22:53:08 PDT 2014
+ - Fix Meta and add Contributing file
+
+0.04 Tue Jun 17 11:04:20 PDT 2014
+ - Use manual VERSION
+
+0.03 Sat Jun 14 12:21:39 PDT 2014
+ - Add badges to doc
+
+0.02 Sat Jun 14 01:08:55 PDT 2014
+ - Change to Zilla::Dist
+
+0.01 Sat Feb  8 14:09:21 PST 2014
+ - first release
+

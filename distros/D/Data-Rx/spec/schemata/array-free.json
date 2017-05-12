@@ -1,0 +1,18 @@
+{
+  "schema": {
+    "type"    : "//arr",
+    "contents": { "type": "//def" }
+  },
+
+  "pass": {
+    "arr": "*"
+  },
+
+  "fail": {
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "num" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "str" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } }
+  }
+}

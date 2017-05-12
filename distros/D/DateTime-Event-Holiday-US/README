@@ -1,0 +1,119 @@
+NAME
+    DateTime::Event::Holiday::US
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+    # This module handles creating a DateTime::Set::ICal object (see #
+    DateTime::Event::Recurrence) that you can use as a US holiday.
+
+      use DateTime::Event::Holiday::US;
+
+      my $thanksgiving = DateTime::Event::Holiday::US::holiday( 'Thanksgiving' );
+      my @holidays = DateTime::Event::Holiday::US::known();
+
+    # $thanksgiving will be a DateTime::Set::ICal object that you can
+    perform # anything you would do with a DateTime::Set object.
+
+    # $holidays will be an array of all holiday names
+    DateTime::Event::Holiday::US # knows about.
+
+NAME
+    DateTime::Event::Holiday::US - US Holiday's as DateTime::Set objects
+
+VERSION
+    Version 0.02
+
+EXPORT
+    Nothing is exported.
+
+SUBROUTINES/METHODS
+  known
+    Returns a list of holiday names DateTime::Event::Holiday::US knows
+    about.
+
+      @known = DateTime::Event::Holiday::US::known();
+
+  holiday
+    Returns the requested holiday as a DateTime::Set::ICal object.
+
+      $thanksgiving = DateTime::Event::Holiday::US::holiday( 'Thanksgiving' );
+
+    $thanksgiving will be a DateTime::Set::ICal object that you can perform
+    anything you would do with a DateTime::Set object.
+
+  holidays
+    Returns a hash reference of DateTime::Set::ICal objects for each
+    holiday.
+
+      $holidays = DateTime::Event::Holiday::US::holidays( 'Thanksgiving', 'Black Friday' );
+
+    $holidays is a hash reference where the key is the name of the holiday
+    and the value is the object.
+
+  holidays_as_set
+    Returns requested holidays as a single DateTime::Set object;
+
+      $holidays = DateTime::Event::Holiday::US::holidays_as_set( 'Thanksgiving', 'Black Friday' );
+
+    $holidays would be a DateTime::Set containing sets for both Thanksgiving
+    and Black Friday
+
+AUTHOR
+    Alan Young, "<alansyoungiii at gmail.com>"
+
+BUGS
+    Please report any bugs or feature requests to
+    "bug-datetime-event-holiday-us at rt.cpan.org", or through the web
+    interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DateTime-Event-Holiday-U
+    S>. I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DateTime::Event::Holiday::US
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-Event-Holiday-US>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/DateTime-Event-Holiday-US>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/DateTime-Event-Holiday-US>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/DateTime-Event-Holiday-US/>
+
+ACKNOWLEDGEMENTS
+LICENSE AND COPYRIGHT
+    Copyright 2010 Alan Young.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Alan Young <harleypig@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2010 by Alan Young.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

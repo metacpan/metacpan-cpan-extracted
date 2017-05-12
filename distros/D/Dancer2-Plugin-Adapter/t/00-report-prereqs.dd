@@ -1,0 +1,48 @@
+do { my $x = {
+       'configure' => {
+                        'requires' => {
+                                        'ExtUtils::MakeMaker' => '0'
+                                      }
+                      },
+       'develop' => {
+                      'requires' => {
+                                      'Test::More' => '0.96',
+                                      'Test::PAUSE::Permissions' => '0',
+                                      'Test::Vars' => '0'
+                                    }
+                    },
+       'runtime' => {
+                      'recommends' => {
+                                        'Class::Load::XS' => '0',
+                                        'Dancer2' => '0.153000'
+                                      },
+                      'requires' => {
+                                      'Class::Load' => '0',
+                                      'Dancer2::Plugin' => '0',
+                                      'perl' => '5.008001',
+                                      'strict' => '0',
+                                      'warnings' => '0'
+                                    }
+                    },
+       'test' => {
+                   'recommends' => {
+                                     'CPAN::Meta' => '2.120900',
+                                     'WWW::Postmark' => '0'
+                                   },
+                   'requires' => {
+                                   'Dancer2' => '0',
+                                   'ExtUtils::MakeMaker' => '0',
+                                   'File::Spec' => '0',
+                                   'File::Temp' => '0.19',
+                                   'HTTP::Request::Common' => '0',
+                                   'HTTP::Tiny' => '0',
+                                   'IO::Handle' => '0',
+                                   'IPC::Open3' => '0',
+                                   'JSON' => '0',
+                                   'Plack::Test' => '0',
+                                   'Test::More' => '0.96'
+                                 }
+                 }
+     };
+  $x;
+ }

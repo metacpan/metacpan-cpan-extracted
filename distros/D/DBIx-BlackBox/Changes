@@ -1,0 +1,8 @@
+Revision history for DBIx-BlackBox
+
+0.02    Thu May 27 10:30:36 2010
+        Add $ENV{DBIBB_TRACE} to see executed SQL.
+
+0.01    Wed Apr 14 12:57:25 2010
+        First version.
+

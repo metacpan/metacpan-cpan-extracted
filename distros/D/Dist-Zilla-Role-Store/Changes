@@ -1,0 +1,9 @@
+Revision history for Dist-Zilla-Role-Store
+
+0.000002  2014-04-26 14:38:45 PDT-0700
+	* Fix _zilla attribute definition and mark required
+	* exclude/also register_component(), rather than modify
+	* Add a couple non-structural tests
+
+0.000001-TRIAL  2014-04-25 21:29:07 PDT-0700
+	* initial release

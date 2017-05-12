@@ -1,0 +1,29 @@
+---
+abstract: 'DBI driver for Crate db'
+author:
+  - 'Mamod Mehyar <mamod.mehyar@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  DBI: '1.5'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBD-Crate
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBI: '1.5'
+  Digest::SHA1: '0'
+  HTTP::Tiny: '0.055'
+  JSON::MaybeXS: '1.003003'
+  Test::More: '0'
+resources:
+  bugtracker: https://github.com/mamod/DBD-Crate/issues
+  repository: git://github.com/mamod/DBD-Crate.git
+version: v0.0.3

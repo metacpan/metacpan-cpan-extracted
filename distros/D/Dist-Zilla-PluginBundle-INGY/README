@@ -1,0 +1,46 @@
+NAME
+    Dist::Zilla::PluginBundle::INGY - BeLike::INGY when you build your dists
+
+SYNOPSIS
+    In your dist.ini:
+
+        [@INGY]
+
+DESCRIPTION
+    This is the plugin bundle that INGY uses. It is more or less equivalent
+    to:
+
+      [Git::GatherDir]
+      [@Basic]
+      ; ...but without GatherDir and ExtraTests
+
+      [AutoPrereqs]
+      [Git::NextVersion]
+      [PkgVersion]
+      [MetaConfig]
+      [MetaJSON]
+      [NextRelease]
+
+      [Test::ChangesHasContent]
+      [PodSyntaxTests]
+      [Test::Compile]
+      [ReportVersions::Tiny]
+
+      [GithubMeta]
+      user = INGY
+      remote = origin
+
+      [@Git]
+      tag_format = %v
+
+AUTHOR
+    Ingy döt Net <ingy@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2013. Ingy döt Net.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    See http://www.perl.com/perl/misc/Artistic.html
+

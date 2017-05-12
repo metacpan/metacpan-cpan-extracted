@@ -1,0 +1,13 @@
+Revision history for Perl extension Data::Pageset::Variable.
+
+0.03  Fri Nov 21 14:00:00 2003
+        - minor doc fixes
+
+0.02  Wed Nov 19 17:00:00 2003
+	- now behaves like Data::Pageset if no variable_entries_per_page
+	  is passed in the constructor
+
+0.01  Thu Feb 20 21:14:10 2003
+	- original version; created by h2xs 1.22 with options
+		-X Data::Pageset::Variable
+

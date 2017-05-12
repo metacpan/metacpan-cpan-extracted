@@ -1,0 +1,34 @@
+---
+abstract: 'Base framework for analyzing program memory usage'
+author:
+  - 'Chad Granum <exodist7@gmail.com>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Memalyzer
+provides:
+  Devel::Memalyzer:
+    file: lib/Devel/Memalyzer.pm
+    version: 0.001
+  Devel::Memalyzer::Base:
+    file: lib/Devel/Memalyzer/Base.pm
+  Devel::Memalyzer::Combine:
+    file: lib/Devel/Memalyzer/Combine.pm
+  Devel::Memalyzer::Plugin:
+    file: lib/Devel/Memalyzer/Plugin.pm
+  Devel::Memalyzer::Plugin::ProcSmaps:
+    file: lib/Devel/Memalyzer/Plugin/ProcSmaps.pm
+  Devel::Memalyzer::Plugin::ProcStatus:
+    file: lib/Devel/Memalyzer/Plugin/ProcStatus.pm
+  Devel::Memalyzer::Runner:
+    file: lib/Devel/Memalyzer/Runner.pm
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.001

@@ -1,0 +1,9 @@
+
+plugins:
+  Github::Webhook:
+    secret: super!s3cret?
+
+github-webhooks:
+  endpoint_a: sk78fozuhv3efgv
+  endpoint_b: 89Av34x!jdfl<
+

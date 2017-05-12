@@ -1,0 +1,64 @@
+---
+abstract: 'Dancer2 plugin for message queue abstractions'
+author:
+  - 'David Golden <dagolden@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  HTTP::Tiny: '0'
+  Test::More: '0'
+  Test::Roo: '0'
+  Test::TCP: '0'
+  perl: '5.010'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.008001'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: apache
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Queue
+no_index:
+  directory:
+    - corpus
+    - examples
+    - t
+    - xt
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::Queue:
+    file: lib/Dancer2/Plugin/Queue.pm
+    version: '0.006'
+  Dancer2::Plugin::Queue::Array:
+    file: lib/Dancer2/Plugin/Queue/Array.pm
+    version: '0.006'
+  Dancer2::Plugin::Queue::Role::Queue:
+    file: lib/Dancer2/Plugin/Queue/Role/Queue.pm
+    version: '0.006'
+  Dancer2::Plugin::Queue::Role::Test:
+    file: lib/Dancer2/Plugin/Queue/Role/Test.pm
+    version: '0.006'
+recommends:
+  Class::Load::XS: '0'
+requires:
+  Class::Load: '0'
+  Dancer2: '0'
+  Dancer2::Plugin: '0'
+  Moo: '0'
+  Moo::Role: '0'
+  MooX::Types::MooseLike::Base: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/PerlDancer/dancer2-plugin-queue/issues
+  homepage: https://github.com/PerlDancer/dancer2-plugin-queue
+  repository: https://github.com/PerlDancer/dancer2-plugin-queue.git
+version: '0.006'
+x_authority: cpan:DAGOLDEN
+x_contributors:
+  - 'Jason A. Crome <jason@crome-plated.com>'
+  - 'Peter Mottram <peter@sysnix.com>'

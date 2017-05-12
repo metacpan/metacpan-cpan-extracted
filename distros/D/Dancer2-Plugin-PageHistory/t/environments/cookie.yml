@@ -1,0 +1,6 @@
+session: Cookie
+engines:
+    session:
+        Cookie:
+            secret_key: VeyrBdaPwordass
+            default_duration: 604800

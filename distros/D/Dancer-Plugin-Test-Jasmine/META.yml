@@ -1,0 +1,49 @@
+---
+abstract: 'Inject and run Jasmine tests in your web pages'
+author:
+  - 'Yanick Champoux <yanick@babyl.dyndns.org>'
+build_requires:
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0.88'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.06'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.034, CPAN::Meta::Converter version 2.142690'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer-Plugin-Test-Jasmine
+provides:
+  Dancer::Plugin::Test::Jasmine:
+    file: lib/Dancer/Plugin/Test/Jasmine.pm
+    version: v0.2.0
+  Dancer::Plugin::Test::Jasmine::Results:
+    file: lib/Dancer/Plugin/Test/Jasmine/Results.pm
+    version: v0.2.0
+requires:
+  Dancer: '0'
+  Dancer::Plugin: '0'
+  Exporter: '0'
+  File::ShareDir::Tarball: '0'
+  Moo: '0'
+  MooX::Singleton: '0'
+  Path::Tiny: '0'
+  Test::More: '0.88'
+  parent: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/yanick/Dancer-Plugin-Test-Jasmine/issues
+  homepage: https://github.com/yanick/Dancer-Plugin-Test-Jasmine
+  repository: https://github.com/yanick/Dancer-Plugin-Test-Jasmine.git
+version: 0.2.0
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK
+x_contributors:
+  - 'Yanick Champoux <yanick@cpan.org>'

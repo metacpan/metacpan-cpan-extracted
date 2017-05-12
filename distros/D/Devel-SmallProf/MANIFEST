@@ -1,0 +1,14 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/Devel/SmallProf.pm
+TODO
+t/part1.t
+t/part1.b
+t/part2.t
+t/part3.t
+t/part3.b
+t/part4.t
+t/pods.t
+META.yml                                 Module meta-data (added by MakeMaker)

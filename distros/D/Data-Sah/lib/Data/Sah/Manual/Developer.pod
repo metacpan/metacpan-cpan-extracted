@@ -1,0 +1,480 @@
+# ABSTRACT: Data::Sah developer information
+# PODNAME: Data::Sah::Manual::Developer
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::Sah::Manual::Developer - Data::Sah developer information
+
+=head1 VERSION
+
+This document describes version 0.87 of Data::Sah::Manual::Developer (from Perl distribution Data-Sah), released on 2016-09-14.
+
+=head1 OVERVIEW
+
+=head1 PERL CODE GENERATION
+
+This section will describe how the schema is converted into Perl code.
+
+From each clause, an equivalent Perl expression will be generated (except for a
+few special clauses). The expression will return true/false depending on whether
+data passes the clause. For example, in the schema:
+
+ ["int", min=>1, max=>10]
+
+the clause C<< min=>1 >> will be translated into something like:
+
+ $data >= 1
+
+and the clause C<< max=>10 >> will be translated into something like:
+
+ $data <= 10
+
+For the type itself (C<int>) we will generate a Perl expression for type
+checking:
+
+ Scalar::Util::Numeric::isint($data)
+
+These Perl expressions are then ordered and combined into a single one. The
+order follows the priorities specified by the L<Sah> specification, as each
+clause has its priority (the lower the number, the higher the priority). The
+C<min> and C<max> clauses are "regular" type constraint clauses so they each
+have a priority of 50. There is a special clause C<req> (unspecified here, the
+default is 0) which have a high priority of 3, which is even higher than the
+type check. The C<req> clause, if given the value of 1/true will require data to
+be defined. On the other hand, if C<req> is false then if data is undefined then
+all the other constraint clauses will be skipped (so C<undef> will pass the
+schema).
+
+After the ordering, the type constraint expressions are joined using the Perl
+operator C<&&> to be able to shortcut after the first failure. The final Perl
+expression becomes:
+
+ (!defined($data) ? 1 :
+     (Scalar::Util::Numeric::isnt($data) &&
+     ($data >= 1) &&
+     ($data <= 10))
+ )
+
+=head2 Default value
+
+The C<default> clause is another special clause that has a high priority,
+evaluated before C<req>, type check, or the other constraint clauses.
+
+ ["int", min=>1, max=>10, default=>1]
+
+The C<default> clause will be translated into this Perl expression:
+
+ (($data //= 1), 1)
+
+What the above expression does is evaluate the argument to the left of the comma
+operator (assigning default value to data) then evaluate the argument to the
+right of the comma, then return that value. So the effect is the above
+expression will always return true, even though the default value given in the
+schema might be false Perl-wise, like C<""> or 0.
+
+So the final expression will become:
+
+ (($data //= 1), 1) &&
+ (!defined($data) ? 1 :
+     (Scalar::Util::Numeric::isnt($data) &&
+     ($data >= 1) &&
+     ($data <= 10))
+ )
+
+=head2 Required value (req=>1)
+
+What if C<req> is true?
+
+ ["int*", min=>1, max=>10] # a.k.a. ["int", req=>1, min=>1, max=>10]
+
+Then the final expression will become this instead:
+
+ (defined($data) &&
+  Scalar::Util::Numeric::isnt($data) &&
+  ($data >= 1) &&
+  ($data <= 10))
+
+And if we add the default value:
+
+ ["int*", min=>1, max=>10, default=>1]
+
+Then the final expression will become this:
+
+ (($data //= 1), 1) &&
+ (defined($data) &&
+  Scalar::Util::Numeric::isnt($data) &&
+  ($data >= 1) &&
+  ($data <= 10))
+
+=head2 Validator subroutine
+
+To generate a validator subroutine, then, is only a matter of adding some bits
+to make a full subroutine. Let's get back to this schema:
+
+ ["int", min=>1, max=>10, default=>1]
+
+The final validator code generated would be something like:
+
+ require Scalar::Util::Numeric;
+ my $validator = sub {
+     my $data = shift;
+
+     (($data //= 1), 1) &&
+     (!defined($data) ? 1 :
+         (Scalar::Util::Numeric::isnt($data) &&
+         ($data >= 1) &&
+         ($data <= 10))
+     )
+
+ };
+
+This is what is returned by the Data::Sah's C<gen_validator()> function. This
+validator will return true when data is valid, or false otherwise. Let's test
+it:
+
+ $validator->("x");   # false (fails the type check, isint())
+ $validator->(-1);    # false (fails the min clause, $data >= 0)
+ $validator->(20);    # false (fails the max clause, $data <= 10)
+ $validator->(5);     # true
+ $validator->(undef); # true (because there is the default value of 1
+
+=head2 String-returning validator
+
+The above is fine if all you want is a validator that returns true/false (bool).
+What if instead you want to return some error message on failure.
+gen_validator() supports this: if you pass the option C<< return_type => "str"
+>> you will get such validator:
+
+ $validator = gen_validator(["int", min=>1, max=>10, default=>1], {return_type=>"str"});
+
+To do this, each Perl expression will need to be able to set an error message:
+
+ require Scalar::Util::Numeric;
+ my $validator = sub {
+     my $data = shift;
+
+     my $err_data;
+
+     (($data //= 1), 1) &&
+     (!defined($data) ? 1 :
+         (Scalar::Util::Numeric::isnt($data) ?      1 : (($err_data //= "Not integer"),0)     ) &&
+         ($data >= 1 ?                              1 : (($err_data //= "Must be at least 1"),0)     ) &&
+         ($data <= 10 ?                             1 : (($err_data //= "Must be at most 10"),0)     )
+     );
+
+     $err_data //= "";
+     $err_data;
+ };
+
+So each constraint expression still either returns true or false like in the
+boolean validator case, but before the expression returns 0, it sets
+C<$err_data> first.
+
+After the whole expression is evaluated, C<$err_data> is returned.
+
+Other possible values for the C<return_type> are:
+
+=over
+
+=item * C<full>
+
+This will generate validator that returns a hash (instead of a single string)
+with more information about all the errors and warnings encountered during
+validation. It works with the same principle.
+
+=item * C<bool+val>
+
+=item * C<str+val>
+
+The C<bool+val> and C<str+val> return types are the same as C<bool> and C<str>
+return types respectively, but instead of a bool (or str), they return an
+array(ref) containing bool (or str) as well as the final input value. Final
+input value means input value that might be the default value, after application
+of coercion and/or filters, the value that usually is used further after the
+validation process.
+
+For the C<full> return type, the final input value is put in the C<value> key.
+
+=back
+
+=head2 Or-logic
+
+Normally all clauses in a clause set must return true for the validation to
+succeed ("and-logic"). However, some other logics are possible: only N clauses
+need to succeed, at most N clauses must succeed, or its combination.
+
+When only one clauses need to succeed, this is called an "or-logic". Example
+schema for a password policy:
+
+ ["str*", {
+     clause => [
+         [min_len => 10],
+         [match => qr/\W/],
+         [match => qr/[A-Z][0-9]|[0-9][A-Z]/i],
+     ],
+     "clause.op" => "or",
+ }]
+
+The above schema says that a password needs to be at least 10 characters long,
+I<or> contains a symbol (non-word character), I<or> contains both letters and
+numbers.
+
+This will be translated into something like this:
+
+ (defined $data) &&
+ (!ref($data)) && # type check for str
+ (do {
+      my $_sahv_ok = 0;
+      my $_sahv_nok = 0;
+
+      (length($data) >= 10                 ? ++$_sahv_ok : ++$_sahv_nok) &&
+      ($data =~ qr/\W/                     ? ++$_sahv_ok : ++$_sahv_nok) &&
+      ($data =~ qr/[A-Z][0-9]|[0-9][A-Z]/i ? ++$_sahv_ok : ++$_sahv_nok) &&
+      $_sahv_ok >= 1;
+ })
+
+XXX shortcut after $_sahv_ok becomes 1?
+
+=head1 HUMAN TEXT GENERATION
+
+This section explains how Sah schema is converted into human description text,
+e.g. C<< [int => div_by=>3] >> into "integer, divisible by 3". This human text
+is used for error messages or for documentation. You should read the previous
+section about code generation first, since text generation is basically the
+same: it's just another "compilation" process. The difference is, instead of
+generating Perl code as in the case of the "perl" compiler
+(L<Data::Sah::Compiler::perl>), the "human" compiler
+(L<Data::Sah::Compiler::human>) generates text as the result.
+
+As in generating code, when generating text, we visit the type handler and then
+clause handler for each clause. Each of these handlers usually calls
+C<add_ccl()> to add a "compiled clause" which will be joined together to create
+the final result.
+
+The type handler usually adds a "noun" compiled clause. For example, for schema
+C<< ["float", min=>1, max=>10] >>, the type handler for float (method
+C<handle_type> in L<Data::Sah::Compiler::human::TH::float>, TH is short for type
+handler) will add this compiled clause:
+
+ {
+   type => 'noun',
+   text => ['decimal number', 'decimal numbers'],
+   xlt  => 1,
+ }
+
+The C<< xlt=>1 >> signifies that the text has been translated (note that the
+human compiler supports producing human text in languages other than English).
+
+Next, the clause handler for clause C<min> (method C<clause_min> in
+L<Data::Sah::Compiler::human::TH::float>) will add this compiled clause:
+
+ {
+   type => 'clause',
+   fmt  => '%(modal_verb)s be at least %s',
+ }
+
+Now, instead of C<text> we have C<fmt>. This will be converted into C<text>
+using sprintfn (see L<Text::sprintfn>) by C<add_ccl()>. The positional arguments
+(like C<%s>) will be fed from clause value (in this case, 1). While the named
+arguments (like C<%(modal_verb)s>) will be supplied by C<add_ccl()>.
+
+Since C<< xlt >> is not set to true, this means the format string needs to be
+translated first. C<add_ccl()> will find a suitable translation first (see
+L</"Translation">) and then call C<sprintfn()> to finally get C<text>. The final
+result of this compiled clause is:
+
+ {
+   type => 'clause',
+   text => 'must be at least 1',
+   xlt  => 1,
+ }
+
+For the last clause C<max>, we'll similarly get a compiled clause:
+
+ {
+   type => 'clause',
+   fmt  => '%(modal_verb)s be at most %s',
+ }
+
+which will become:
+
+ {
+   type => 'clause',
+   text => 'must be at most 10',
+   xlt  => 1,
+ }
+
+Finally, all the compiled clauses will simply be joined and the compilation
+result is:
+
+ "decimal number, must be at least 1, must be at least 10"
+
+=head2 Formats
+
+TBD
+
+=head2 Handling CLAUSE.op and CLAUSE.err_level
+
+Consider this schema:
+
+ [int => 'div_by&' => [3, 5]]
+
+which is a shortcut for:
+
+ [int => 'div_by'=>[3, 5], 'div_by.op'=>'and']
+
+This is a clause with multivalues. This is the compiled clauses that will be
+added during generation:
+
+ {type=>'noun', text=>['integer','integers'], xlt=>1}
+
+and:
+
+ {type=>'clause', fmt=>'%(modal_verb)s divisible by %s'}
+
+which will become:
+
+ {type=>'clause', text=>'must be divisible by 3 and 5', xlt=>1}
+
+In other words, the clause C<fmt> is the same but the arguments supplied to it
+are formatted to contain the multiple values.
+
+Another example, for C<< [int => 'div_by&'=>[2,3,5]] >>, the clause will
+generate this final compiled clause:
+
+ {type=>'clause', text=>'must be divisible by all of [2,3,5]', xlt=>1}
+
+For C<< [int => 'div_by|'=>[2,3,5]] >> (which is shortcut for C<< [int =>
+'div_by'=>[2,3,5], 'div_by.op'=>'or'] >>) the final compiled clause will be:
+
+ {type=>'clause', text=>'must be divisible by one of [2,3,5]', xlt=>1}
+
+For C<< [int => '!div_by'=>3] >> (which is shortcut for C<< [int => 'div_by'=>3,
+'div_by.op'=>'or'] >>) the final compiled clause will be:
+
+ {type=>'clause', text=>'must not be divisible by 3', xlt=>1}
+
+that is, the value for C<modal_verb> named argument supplied by C<add_ccl()> is
+changed from the default C<must> to C<must not>.
+
+For C<< [int => 'div_by'=>3, 'div_by.err_level'=>'warn'] >>, the final compiled
+clause will be:
+
+ {type=>'clause', text=>'should be divisible by 3', xlt=>1}
+
+that is, the value for C<modal_verb> named argument supplied by C<add_ccl()> is
+changed from the default C<must> to C<should>.
+
+Not all clauses can use multiple clause values in its arguments. For example, in
+C<< [int => mod=>[3, 1]] >>, the compiled clause for the C<mod> clause will be:
+
+ {type=>'clause', fmt=>'%(modal_verb)s leave a remainder of %2$s when divided by %1$s', vals=>[3, 1]}
+
+(Note: the C<vals> key supplies positional arguments for C<sprintfn> if you want
+it other than the default clause value. In this case we want to flatten the
+clause value because otherwise the positional arguments array would be C<< [
+[3,1] ] >>. The C<%1$s> and C<%2$s> are printf syntax for using positional
+arguments (see C<sprintf> in L<perlfunc>).
+
+The final compiled clause will become:
+
+ {type=>'clause', text=>'must leave a remainder of 1 when divided by 3', xlt=>1}
+
+Now what if we have this schema: C<< [int => 'mod&' => [ [3,1], [5,1] ] >>. If
+we use the same C<fmt> for multiple values, the final compiled clause will
+become:
+
+ {type=>'clause', text=>'must leave a remainder of [5,1] when divided by [3,1]', xlt=>1}
+
+in which the text doesn't make grammatical sense. In this case, the clause
+handler will need to add a compiled clause of type C<list> instead of of type
+C<clause>:
+
+ {
+   type  =>'list',
+   text  => 'all of the following must be true',
+   items => [
+     {type=>'clause', text='must leave a remainder of 1 when divided by 3', xlt=>1},
+     {type=>'clause', text='must leave a remainder of 1 when divided by 5', xlt=>1},
+   ],
+   xlt   => 1,
+ }
+
+The C<list> compiled clause is used to create text with bullet points (which can
+be inlined into a clause in some cases where possible). The final compilation
+result for the last schema will be:
+
+ "integer, all of the following must be true: must leave a remainder of 1 when
+ divided by 3, must leave a remainder of 1 when divided by 5"
+
+=head2 Coercion (perl)
+
+Coercion rules for perl are organized modularly in
+C<Data::Sah::Coerce::perl::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTION>
+modules, where C<$TARGET_TYPE> is the schema being compiled and
+C<$SOURCE_TYPE_AND_EXTRA_DESCRIPTION> is source type plus some extra
+description. Example:
+
+ Data::Sah::Coerce::perl::date::float_epoch
+
+This module contain rule to convert integer (which assumed to be Unix epoch)
+into date. Another example:
+
+ Data::Sah::Coerce::perl::date::str_iso8601
+
+This is also a module to coerce date from (a subset of) ISO8601 strings.
+
+=head2 Handling expression
+
+TBD
+
+=head2 Translation
+
+TBD
+
+=head1 COERCION
+
+In L<Data::Sah>, coercion rules are organized modularly in
+C<Data::Sah::Coerce::$LANG::$TARGET_TYPE::$SOURCE_TYPE_AND_EXTRA_DESCRIPTION>
+modules, where C<$TARGET_TYPE> is the schema being compiled and
+C<$SOURCE_TYPE_AND_EXTRA_DESCRIPTION> is source type plus some extra
+description. For language-specific information, see L</"Coercion (perl)">.
+
+Code for coercion is generated by collecting all rules from the coercion handler
+modules then combining them and putting it after setting default value and
+before type check.
+
+=head1 HOMEPAGE
+
+Please visit the project's homepage at L<https://metacpan.org/release/Data-Sah>.
+
+=head1 SOURCE
+
+Source repository is at L<https://github.com/perlancar/perl-Data-Sah>.
+
+=head1 BUGS
+
+Please report any bugs or feature requests on the bugtracker website L<https://rt.cpan.org/Public/Dist/Display.html?Name=Data-Sah>
+
+When submitting a bug or request, please include a test-file or a
+patch to an existing test-file that illustrates the bug or desired
+feature.
+
+=head1 AUTHOR
+
+perlancar <perlancar@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by perlancar@cpan.org.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

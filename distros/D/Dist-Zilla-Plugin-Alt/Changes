@@ -1,0 +1,13 @@
+Revision history for Dist-Zilla-Plugin-Alt
+
+0.04      2016-03-15 20:35:47 -0400
+  - Modify Makefile/Build.PL in munge_files instead of setup_installer
+
+0.03      2016-03-11 03:38:29 -0500
+  - First CPAN release
+
+0.02      2016-03-09 17:12:44 -0500
+  - added support for [ModuleBuild]
+
+0.01      2016-03-09 16:46:41 -0500
+  - initial version

@@ -1,0 +1,31 @@
+---
+abstract: 'Container class for currency conversion/formatting'
+author:
+  - 'Christopher H. Laco <claco _at_ chrislaco.com>, Mariano Wahlmann <dichoso _at_ gmail.com>'
+build_requires:
+  Pod::Coverage::TrustPod: 0
+  Test::Perl::Critic: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Currency
+requires:
+  Class::Accessor::Grouped: 0
+  Class::Inspector: 0
+  Finance::Currency::Convert::WebserviceX: 0
+  Locale::Currency: 0
+  Locale::Currency::Format: 0
+  Scalar::Util: 0
+  Test::Exception: 0
+  Test::MockObject: 0
+  Test::More: 0
+  perl: 5.006001
+resources:
+  homepage: https://github.com/bluescreen10/Data-Currency
+  repository: https://github.com/bluescreen10/Data-Currency.git
+version: 0.06000

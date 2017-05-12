@@ -1,0 +1,95 @@
+NAME
+    Dist::Zilla::Role::MetaCPANInterfacer - something that will interact
+    with MetaCPAN's API
+
+SYNOPSIS
+        # in your plugin/etc. code
+        with 'Dist::Zilla::Role::MetaCPANInterfacer';
+ 
+        my $obj = $self->mcpan->fetch(...);
+
+DESCRIPTION
+    This role is simply gives you a MetaCPAN::API object to use with
+    caching, so that other plugins can share that cache. It uses the awesome
+    example provided in the "SYNOPSIS" in MetaCPAN::API, contributed by Kent
+    Fredric.
+
+ATTRIBUTES
+    All of these attributes are f'ing lazy, because they like to sit around
+    the house. They are also read-write, as this is a role, and you might
+    want to change around the defaults.
+
+  mcpan
+    *   Type: A MetaCPAN::API object
+
+    *   Default: A new object, using "mcpan_ua" as the Tiny user agent
+
+  mcpan_ua
+    *   Type: A HTTP::Tiny compatible user agent
+
+    *   Default: A new HTTP::Tiny::Mech object, using "mcpan_mechua" as the
+        Mechanized user agent
+
+  mcpan_mechua
+    *   Type: A WWW::Mechanize compatible user agent
+
+    *   Default: A new WWW::Mechanize::Cached::GZip object, using
+        "mcpan_cache" as the cache attribute, and some UA string changes.
+
+  mcpan_cache
+    *   Type: A caching object
+
+    *   Default: A new CHI object, using the CHI::Driver::File driver
+        pointing to "~/.dzil/.webcache"
+
+TODO
+    The caching stuff could potentially be split, but frankly, none of the
+    existing plugins really need caching all that much. I've at least called
+    the ".webcache" directory a generic name, so feel free to re-use it.
+
+    (Honestly, the only reason why this is a DZ module IS the caching
+    directory name...)
+
+SEE ALSO
+    Dist::Zilla::PluginBundle::Prereqs, which uses this quite a bit.
+
+AVAILABILITY
+    The project homepage is
+    <https://github.com/SineSwiper/Dist-Zilla-Role-MetaCPANInterfacer>.
+
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <https://metacpan.org/module/Dist::Zilla::Role::MetaCPANInterfacer/>.
+
+SUPPORT
+  Internet Relay Chat
+    You can get live help by using IRC ( Internet Relay Chat ). If you don't
+    know what IRC is, please read this excellent guide:
+    <http://en.wikipedia.org/wiki/Internet_Relay_Chat>. Please be courteous
+    and patient when talking to us, as we might be busy or sleeping! You can
+    join those networks/channels and get help:
+
+    *   irc.perl.org
+
+        You can connect to the server at 'irc.perl.org' and talk to this
+        person for help: SineSwiper.
+
+  Bugs / Feature Requests
+    Please report any bugs or feature requests via
+    <https://github.com/SineSwiper/Dist-Zilla-Role-MetaCPANInterfacer/issues
+    >.
+
+AUTHOR
+    Brendan Byrd <BBYRD@CPAN.org>
+
+CONTRIBUTOR
+    Christian Walde <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Brendan Byrd.
+
+    This is free software, licensed under:
+
+      The Artistic License 2.0 (GPL Compatible)
+

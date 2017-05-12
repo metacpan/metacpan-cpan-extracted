@@ -1,0 +1,14 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Date-Biorhythm
+version:      2.2
+version_from: lib/Date/Biorhythm.pm
+installdirs:  site
+requires:
+    Date::Business:                1.2
+    Date::Calc:                    0
+    Math::Trig:                    0
+    Moose:                         0.11
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30

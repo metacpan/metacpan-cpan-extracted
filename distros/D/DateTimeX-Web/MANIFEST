@@ -1,0 +1,21 @@
+Changes
+lib/DateTimeX/Web.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_load.t
+t/basic.t
+t/constructor.t
+t/error.t
+t/format.t
+t/http.t
+t/isa_errors.t
+t/lib/MyFormat.pm
+t/mail.t
+t/mysql.t
+t/strptime.t
+t/wwwc.t
+xt/99_pod.t
+xt/99_podcoverage.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

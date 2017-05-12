@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>CodeKit Code Table Update Methods</title>
+<link rel="STYLESHEET" type="text/css" href="main.css">
+</head>
+
+<!--
+  Copyright (C) 2003 John Gorman <jgorman@webbysoft.com>
+  http://www.webbysoft.com/codekit
+-->
+
+<body bgcolor="#F0FFFF" text="#000000"
+      link="#873852" vlink="#873852" alink="#B52E2E">
+
+<center>
+<table width="600">
+<tr>
+<td>
+
+
+<div align="right">
+[<a href="ck_set.html">Code Sets</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_overview.html">Overview</a>]
+</div>
+
+
+<center><h2>
+<a href="http://www.webbysoft.com/codekit">CodeKit</a>
+Code Table Update Methods</h2></center>
+
+These methods update the code table.  They never call
+commit in order to not disturb any transactions in progress.
+If the library handle that you provide to CodeKit is not
+set up to autocommit, call commit yourself after calling
+these methods.
+
+
+<h4>remove()</h4>
+
+<pre>
+$codekit-&gt;remove($code_set, $code_code);
+</pre>
+
+<p>
+The remove() method removes a code record.
+
+<p>
+<pre>
+$codekit-&gt;remove('city_id', $city_id);
+</pre>
+
+
+<h4>get()</h4>
+
+<pre>
+<b># PHP</b>
+list( $code_desc, $code_order, $code_flag ) =
+    $codekit-&gt;get($code_set, $code_code);
+</pre>
+
+<pre>
+<b># Perl</b>
+( $code_desc, $code_order, $code_flag ) =
+    $codekit-&gt;get($code_set, $code_code);
+</pre>
+
+This is an internal method used to retrieve all of a code's fields.
+
+
+
+<h4>put()</h4>
+
+<pre>
+$codekit-&gt;put($code_set,  $code_code,
+                  $code_desc, $code_order, $code_flag);
+</pre>
+
+This is an internal method used to write all of a code's fields.
+The code is added, updated or deleted as necessary.
+
+Putting a blank description will remove() the code record.
+
+<p>
+The code_order and code_flag parameters are optional.
+
+<p>
+When a code is first added and the code_order parameter is missing,
+blank or undefined and the code_code value is numeric then the code_code
+value is entered into the code_order field.  This supports
+numeric sorts on numeric codes by default.
+
+
+<p>
+<div align="right">
+[<a href="ck_set.html">Code Sets</a>]
+[<a href="index.html">Index</a>]
+[<a href="ck_overview.html">Overview</a>]
+</div>
+
+
+</td>
+</tr>
+</table>
+</center>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+SYNOPSIS
+
+        # dist.ini
+        [CheckChangeLog]
+        
+        # or
+        [CheckChangeLog]
+        filename = Changes.pod
+
+DESCRIPTION
+
+    The code is mostly a copy-paste of ShipIt::Step::CheckChangeLog
+

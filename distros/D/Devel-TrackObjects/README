@@ -1,0 +1,24 @@
+Devel::TrackObjects
+===================
+
+With this module you can track the usage of objects
+and compare it with your expectations. 
+Especially you can use it to find leaks where objects
+don't get destroyed.
+
+By redefining CORE::GLOBAL::bless it will catch the
+creation of objects. Then it will make a weak reference
+to the object which can later be used to decide, if the
+object was destroyed or not.
+
+To work you have to put Devel::Leak early in your
+code, because it will not be able to redefine 'bless'
+in already loaded modules.
+
+It is in some way similar to Devel::Leak but:
+
+ * can only handle objects
+ * can restrict the tracking to specific classes
+ * you don't need to have the perl compiled with
+   -DDEBUGGING to get detailed information
+

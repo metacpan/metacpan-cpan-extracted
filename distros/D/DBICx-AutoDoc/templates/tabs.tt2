@@ -1,0 +1,7 @@
+[%
+    SET tabs = [
+        { template = 'AUTODOC.html' label = 'Schema' }
+        { template = 'AUTODOC-graph.html' label = 'Relationship Graph' }
+        { template = 'AUTODOC-inheritance.html' label = 'Inheritance Graph' }
+    ]
+%]

@@ -1,0 +1,20 @@
+Source: libdevice-megasquirt-perl
+Section: perl
+Priority: optional
+Maintainer: Jeremiah Mahler <jmmahler@gmail.com>
+Uploaders: TBD
+Build-Depends: debhelper (>= 6)
+Build-Depends-Indep: perl
+Standards-Version: 3.7.3
+Homepage: http://search.cpan.org/dist/Device-MegaSquirt/
+Vcs-Git: git://github.com/jmahler/libdevice-megasquirt-perl.git
+Vcs-Browser: http://github.com/jmahler/libdevice-megasquirt-perl
+
+Package: libdevice-megasquirt-perl
+Architecture: all
+Depends: ${perl:Depends}, libdevice-serialport-perl (>= 1.00), libtext-lookuptable-perl (>= 0.03-1)
+Description: Perl5 module for communicating with a MegaSquirt controller
+ Device::MegaSquirt provides operations for communicating with a MegaSquirt
+ controller [http://www.msextra.com].  Operations such as reading/writing tables,
+ reading live data, and writing configuration variables.
+

@@ -1,0 +1,31 @@
+---
+abstract: 'formulas evaluation and calculation'
+author:
+  - 'Jozef Kutej <jkutej@cpan.org>'
+build_requires:
+  Test::Most: '0'
+configure_requires:
+  Module::Build: '0.38'
+dynamic_config: 1
+generated_by: 'Module::Build version 0.421, CPAN::Meta::Converter version 2.142690'
+keywords:
+  - formula
+  - calculation
+  - variables
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Formula
+provides:
+  Data::Formula:
+    file: lib/Data/Formula.pm
+    version: '0.01'
+requires:
+  List::MoreUtils: '0'
+  Moose: '0'
+resources:
+  bugtracker: http://github.com/meon/Data-Formula/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/meon/Data-Formula
+version: '0.01'

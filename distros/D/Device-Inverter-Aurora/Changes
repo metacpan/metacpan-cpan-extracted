@@ -1,0 +1,20 @@
+Revision history for Perl extension Device::Inverter::Aurora.
+0.05  Sat Oct 24 02:33:57 2010
+	- Add option to quiet warnings about read/write errors
+	- Fixed debug flag handling so that a debug message isn't displayed by Device::SerialPort when debug is off
+	- Add method lastError to get the last error/warning message
+	- Fixed a typo in the documentation (let me know if you find more)
+
+0.04  Fri Oct 15 12:59:49 2010
+	- Make tests a little less sensitive to floating point issues
+	- Add version to strings
+	- Restrict version of MakeMaker
+
+0.03  Thu Oct 14 12:14:18 2010
+	- Unbreak distribution
+
+0.02  Thu Oct 14 12:09:22 2010
+	- Fix distribution
+
+0.01  Tue Oct 12 12:15:36 2010
+	- Original release

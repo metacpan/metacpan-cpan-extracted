@@ -1,0 +1,9 @@
+accept localhost
+	users joe
+        encryption DES
+        key 0123456789abcdef
+        encryptModule Crypt::DES
+        joe encrypt="Crypt::IDEA,IDEA,0123456789abcdef0123456789abcdef"
+
+
+deny .*

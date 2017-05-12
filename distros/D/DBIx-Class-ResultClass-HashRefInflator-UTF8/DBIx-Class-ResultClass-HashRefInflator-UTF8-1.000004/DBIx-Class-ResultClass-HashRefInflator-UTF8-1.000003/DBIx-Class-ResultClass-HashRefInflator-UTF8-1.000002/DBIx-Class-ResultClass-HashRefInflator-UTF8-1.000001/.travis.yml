@@ -1,0 +1,27 @@
+language: perl
+perl:
+  - "5.22"
+  - "5.20"
+  - "5.18"
+  - "5.16"
+  - "5.14"
+
+before_install:
+  - "echo 'user AKZHAN' > ~/.pause"
+  - "git config user.email 'akzhan.abdulin@gmail.com'"
+  - "git config user.name 'Akzhan Abdulin'"
+  - "perlbrew --force install-cpanm"
+  - "cpanm --version"
+  - "cpanm --installdeps ."
+
+install:
+  - "dzil authordeps --missing | xargs cpanm -q -n"
+  - "dzil listdeps --missing | xargs cpanm -q -n"
+
+script:
+  - "dzil test --release"
+
+branches:
+  only:
+    - master
+

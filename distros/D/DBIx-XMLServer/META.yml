@@ -1,0 +1,12 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-XMLServer
+version:      0.02
+version_from: XMLServer.pm
+installdirs:  site
+requires:
+    XML::LibXML:                   1.54
+    XML::LibXSLT:                  1.53
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.17

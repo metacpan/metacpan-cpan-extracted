@@ -1,0 +1,47 @@
+Revision history for Perl extension DBD::mysqlPPrawSjis
+
+0.09  Tue Nov 4 00:00:00 JST 2014
+  - fix 'exists' to 'defined'
+
+0.08  Sat Dec 3 00:00:00 JST 2011
+  - Add the prerequisite module(s) to 'PREREQ_PM' => {'Net::MySQL'=>'0'} in Makefile.pl
+    Thanks to Chris Williams (BINGOS) until fix
+
+0.07  Fri Dec 2 00:00:00 JST 2011
+  - Add the prerequisite module(s) to 'PREREQ_PM' => {'DBI'=>'0'} in Makefile.pl
+    Thanks to Chris Williams (BINGOS)
+
+0.06  Sat Nov 19 00:00:00 JST 2011
+  - No escape parameter(s) of LIMIT n and LIMIT m,n
+  - No escape parameter of OFFSET m
+    Inspired from DBD-mysqlPP-0.07
+
+0.05  Wed Apr  1 00:00:00 JST 2009
+  - Raw ShiftJIS version based on DBD::mysqlPP
+  - Avoid warning of perl -cw
+
+0.04  Fri Jan 24 13:42:20 JST 2003
+  - Added local quote() method
+    (Thanks to Aigars Grins & Laird Shaw & Ron Savage
+       http://rt.cpan.org/NoAuth/Bug.html?id=1956
+       http://rt.cpan.org/NoAuth/Bug.html?id=1957
+     and dbi-users.)
+  - Added practical placeholder
+    (Thanks to Aigars Grins, http://rt.cpan.org/NoAuth/Bug.html?id=1979)
+  - Require Net::MySQL v0.08
+
+0.03  Mon Apr 15 19:05:17 JST 2002
+  - Enable 'port' attribute
+  - Enable '_ListDBs' private metadata method
+  - Enable '_ListTables' private metadata method
+  - Enable tables() method
+  - Enable  'thread_id' attribute
+  - Enable 'mysql_insertid' attribute
+
+0.02  Tue Apr  2 21:59:36 JST 2002
+  - Add pod section 'DIFFERENCE FROM "DBD::mysql"'
+  - Surely quote() by execute() method
+  - fetchrow_hashref() method was worked
+
+0.01  Wed Mar 27 04:18:01 JST 2002
+  - original version; created by h2xs 1.21 with options -X -n DBD::mysqlPP

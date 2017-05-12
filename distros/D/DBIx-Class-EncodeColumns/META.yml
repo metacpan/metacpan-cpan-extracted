@@ -1,0 +1,19 @@
+---
+name: DBIx-Class-EncodeColumns
+version: 0.02
+author:
+  - 'Sascha Kiefer <esskar@cpan.org>'
+abstract: Handle column encodings
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBIx::Class: 0
+provides:
+  DBIx::Class::EncodeColumns:
+    file: lib/DBIx/Class/EncodeColumns.pm
+    version: 0.02
+generated_by: Module::Build version 0.2805
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

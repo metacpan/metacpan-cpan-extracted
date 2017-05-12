@@ -1,0 +1,6 @@
+Revision history for Perl extension Device::BCM2835::NES.
+
+0.01  Sat Nov 10 00:03:16 2012
+	- original version; created by h2xs 1.23 with options
+		-XAn Device::BCM2835::NES
+

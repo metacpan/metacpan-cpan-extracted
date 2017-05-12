@@ -1,0 +1,56 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Constants - Constants Export module
+
+=head1 SYNOPSIS
+
+  # to import all constants
+  use Data::Range::Compare::Stream::Constants;
+
+  # to import a select group of constants
+  use Data::Range::Compare::Stream::Constants qw(RANGE_START RANGE_END RANGE_DATA);
+  
+
+=head1 DESCRIPTION
+
+This module defines the constants used by Data::Range::Compare::Stream
+
+=Exports
+
+The following constants are exported by default.
+
+  RANGE_START
+   Defines the key that refers to the range_start raw value
+
+  RANGE_END
+   Defines the key that refers to the range_end raw value
+
+  RANGE_DATA
+    Defines the key that refers to the optional data value
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

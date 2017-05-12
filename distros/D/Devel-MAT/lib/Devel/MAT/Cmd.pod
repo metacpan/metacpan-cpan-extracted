@@ -1,0 +1,17 @@
+=head1 NAME
+
+C<Devel::MAT::Cmd> - abstractions for providing commands for C<Devel::MAT>
+
+=head1 METHODS
+
+=head2 printf
+
+  Devel::MAT::Cmd->printf( $fmt, @args )
+
+Behaves like perl's core C<printf()> function.
+
+=head1 AUTHOR
+
+Paul Evans <leonerd@leonerd.org.uk>
+
+=cut

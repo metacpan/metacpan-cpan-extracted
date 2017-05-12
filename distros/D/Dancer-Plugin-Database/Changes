@@ -1,0 +1,272 @@
+Revision history for Dancer-Plugin-Database
+
+2.13    2016-08-13
+        [ BUG FIXES ]
+        - Require 0.16 of core library, as 0.15 had a bug in :(
+
+2.12    2016-01-24
+
+        [ BUG FIXES ]
+        - skip author tests (thanks to Stefan Hornburg)
+
+2.11    2015-10-02
+
+        [ BUG FIXES ]
+        - Require Dancer::Plugin::Database::Core v0.12, that
+          fixes logging problems
+
+2.10    2014-10-13
+
+        [ ENHANCEMENTS ]
+        - Support dsn_extra option (Thanks to Michael J South)
+
+2.09    2013-12-22
+
+        [ ENHANCEMENTS ]
+        - Tests for cached handle after reconnection
+
+2.08    Sun Sep  1 13:52:52 WEST 2013
+
+        [ ENHANCEMENTS ]
+        - Add quick_count method (Thanks to Colin Ewen)
+
+2.07    Tue Jul 30 18:59:30 WEST 2013
+        - Fix test with wrong base class (part 2)
+
+2.06    Tue Jul 30 18:49:37 WEST 2013
+        - Fix test with wrong base class.
+
+2.05    2013-07-29
+       	- Remove code from module to share with Dancer2 plugin.
+        - Added dependency on Dancer::Plugin::Database::Core
+
+2.04    2013-03-04
+
+        [ ENHANCEMENTS ]
+        - Allow 'sid' to be passed into DSN, for Oracle support.
+
+2.03    2012-12-14
+
+        [ BUGFIX ]
+        - Remove left-over debugging warning (thanks to ofosos for reporting)
+
+2.02    2012-12-07
+
+        [ ENHANCEMENTS ]
+        - If asked for default connection (no connection name given) but
+          there is no default connection configured, throw a more helpful 
+          error message.
+
+2.01    2012-09-18
+
+        [ BUGFIX ]
+        - Fix crashing bug when charset: UTF-8 is present - thanks to Hugh
+          Gallagher for reporting & providing fix in RT #79719.
+          Presumably the test suite doesn't set UTF-8, so this failure 
+          never showed up in testing :(
+
+2.00    2012-09-17
+
+        [ ENHANCEMENTS ]
+        - Support for Dancer 2
+        - Automatic quoting handles e.g. schema.table properly - GH #33,
+          thanks to mscolly for reporting
+        - Accept limit offset,count syntax too - GH #31, thanks to 
+          nicolasfranck for reporting
+        - a value of 0 for connectivity_check_threshold now disables 
+          checking entirely - thanks to knutov in GH #22
+
+1.82    2012-06-28
+
+        [ BUGFIXES ]
+        - Fix for Debian RT #665221 :
+        http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=665221 - avoid issues
+        if we get a hashref of settings occupying the same region of memory as a
+        previous hashref of settings which since went out of scope but which we
+        still have a handle laying around for.
+
+1.81    2012-03-07
+
+        [ BUGFIXES ]
+        - Don't generate invalid SQL with certain uses of where and 
+          order_by clauses together (PR-27, thanks to Michael Stapelberg
+          (mstap))
+
+1.80    2012-02-06
+        [ ENHANCEMENTS]
+        - New hooks 'database_error', 'database_connect_failed',
+          'database_connection_lost'
+        - New option 'handle_class' to allow the database handles to be
+          reblessed into an alternative class, allowing you to subclass
+          D::P::D::Handle if you want to extend it
+        All requested by Nick S. Knutov - thanks Nick!
+
+1.70    2012-01-31
+        [ ENHANCEMENTS ]
+        - New `order_by`, `limit` and `columns` options for quick_select()
+          (Requested by bor in GH-20)
+
+1.60    2011-12-29
+        [ ENHANCEMENTS ]
+        - Hook support, requested by mdom.  Currently supports a
+          database_connected hook position; others may be added in future.
+
+        Happy New Year!
+
+1.51    2011-11-17
+        [ BUGFIXES ]
+        - Handle "is" operator properly (particularly if negated) - Issue 15.
+        - Add =encoding utf8 to POD so contributor names render correctly on
+          search.cpan.org / metacpan.org
+
+1.50    2011-10-18
+        All new features kindly contributed by Mark Allen (@mrallen1) - thanks!
+        - Much more flexible WHERE clauses - e.g.  { foo => { like => 'bar'} }
+        - Ability to select only specific columns in quick_select()
+        - New quick_lookup() syntactic sugar method
+
+1.42    2011-08-19
+        - Don't produce spurious messages about enabling UTF-8 support when
+          we have already done it (PR 9 from James Aitken (LoonyPandora))
+
+1.41    2011-07-24
+        - support where clauses with undef values. (Alberto Simões)
+
+1.40    2011-05-29
+        - Be fork/thread-safe - don't allow processes/threads to share handles.
+          Thanks to Matt S Trout for pointing this out on IRC - cheers mst.
+        - If we're given a pre-assembled DSN, extract the driver from it to
+          avoid a warning, and to allow auto UTF-8 to work.
+          Thanks to Matthew Vickers (mvickers) for bringing this up.
+
+1.30    2011-05-23
+        - Allow passing an empty hashref for where clause to signify that no
+          where clause is desired (i.e. return all rows).
+          Requested by Carlos Sosa (gnusosa) - thanks!
+
+1.24    2011-05-09
+        - Bugfixes in logging - avoid DBI swallowing up the param I'd wrongly
+          named, and avoid warnings if any params are undef.
+          Thanks to Martin J Evans (mje) for bringing this up on IRC - thanks
+          for your help Martin.
+
+1.23    2011-04-15
+        - Only log queries generated by quick_*() helpers in D::P::D::Handle if
+          the log_queries setting was enabled in the configuration.  This avoids
+          the potential for the user to be unwittingly logging sensitive
+          information, and would provide a (tiny) performance boost too.
+
+1.22    2011-04-11
+        - Bugfix: don't needlessly use to_json() in tests, as Dancer doesn't
+          depend on JSON.pm, so tests will fail if it's not available.
+          Reported in RT #66204 by Johnathan (JAWNSY) - thanks!
+
+1.21    2011-03-06
+        - Bugfix: return undef if connection fails, rather than attempting to
+          re-bless and blowing up. Fixes GH-7, thanks to Nick Hibma
+
+1.20    2011-02-23
+        - New feature - automatically enable UTF-8 support if the app's charset
+          setting is set to 'UTF-8' and we know how to enable UTF-8 support for
+          the database driver in use.  This can be disabled with the new
+          auto_utf8 setting in the plugin's config.
+        - Bugfix - create test DB in memory, not a file named ":memory" by
+          accident.  This should fix test failures on Windows, e.g.:
+          http://www.cpantesters.org/cpan/report/d5987aa6-6d07-1014-91a2-7f5be4275be9
+
+
+1.11    2011-02-18
+        - Fix bug RT #65825 - quick_select didn't actually use the where clause
+          correctly.
+        - Extended test suite.
+        
+1.10    2011-02-11
+        - New feature quick_select
+        - Fix bug RT #65651, quick_insert generating SQL which MySQL/Postgres
+          didn't accept due to use of quote() rather than quote_identifier(),
+          thanks to Christian Sánchez and Michael Stiller
+        - Fix GH #5 - named connections not working properly - thanks to
+          "crayon"
+
+1.00    2011-01-10
+        - Bumping to 1.00 to signify being ready for production use, for users
+          who have a mistrust of 0.x version numbers.
+        - Applied Alan Haggai's changes to allow a hashref of settings to be
+          passed to the database() keyword at runtime.  Thanks Alan!
+          (This was released as 0.91_01 for testing first.)
+
+0.91    2010-12-21
+        - Whoah - didn't "use strict" in Dancer::Plugin::Database::Handle!
+          Last tweak release, then I'll push 1.00 out soon.
+
+0.90    2010-12-10
+        - New features quick_insert, quick_update, quick_delete.  The database
+          keyword now returns a Dancer::Plugin::Database::Handle object, which
+          is a subclass of DBI::db so does everything you'd expect a DBI
+          connection handle to do, but adds extra convenience methods.
+        - Fixed test failures on Windows systems.
+
+       (Large version bump due to new features; assuming there are no reports of
+       issues with this version (there shouldn't be!), I'll release 1.0 soon,
+       for those who look for a >= 1.0 version number as an indication of being
+       production-ready.
+
+
+0.12    2010-12-03
+        - Documentation mentioned connectivity-check-threshold instead of the
+          correct connection_check_threshold.  Thanks to bessarabov for catching
+          this and submitting corrections via GitHub!
+
+0.11    2010-11-09 (CoD Black Ops day!)
+        - Bugfix: pass connection settings when reconnecting, too.
+
+0.10    2010-10-30
+        - Add some proper tests [Franck Cuny]
+
+0.09    2010-09-28
+        - Allow definition of multiple connections, and accept a param to the
+          database() keyword to specify which connection you need a handle for.
+          This was released as 0.08_01 for testing.
+
+0.08    2010-09-14
+        - Bugfix - make SQLite DWIMmery from previous version actually work.
+
+0.07    2010-09-06
+        - Extra params in DSN (database, host, port) should be separated with
+          semi-colons, not colons.  Thanks to Steve Atkins for reporting this.
+        - Documentation update to reflect use of $dbh->ping
+        - If connecting to SQLite, which requires 'dbname' rather than
+          'database', provide 'dbname' instead, so it will Just Work
+
+0.06    2010-06-15
+        - Stupid typo fix in documentation for features added in 0.05.  I wish
+          I'd spotted this mistake before releasing 0.05, rather than just
+          after!
+
+0.05    2010-06-15
+        - Allow parameters to be passed to DBI->connect call (e.g. RaiseError),
+          and support providing a set of statements to execute upon connection.
+          Thanks to Igor Bujna for providing this feature!
+
+0.04    2010-05-20
+        - If DBD driver does not implement ping(), perform our own connection
+          check by performing a simple query.  This will check that the DB
+          connection is still alive, and avoid needless re-connects, which are
+          expensive.  Also seems to fix a problem Tadzik saw with a warning from
+          DBD::SQLite when the old handle was thrown away.
+
+0.03    2010-05-17
+        - Fix warning where $last_connection_check was initially undefined but
+          used in numeric comparison.  Thanks to Tadzik for reporting.
+
+0.02    2010-04-18
+        Documentation fixes, thanks to "mrpants" on Github:
+        - Plugin names in config.yml are case-sensitive for current CPAN
+          releases of Dancer; my commit fdc3f3 makes it case-insenitive, but
+          that hasn't hit CPAN yet, so people using CPAN releases could be
+          confused
+        - stray trailing single-quote in example config
+
+0.01    2010-04-14
+        Initial version developed.
+

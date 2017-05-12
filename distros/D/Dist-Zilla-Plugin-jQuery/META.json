@@ -1,0 +1,77 @@
+{
+   "abstract" : "Include jQuery in your distribution",
+   "author" : [
+      "Graham Ollis <perl@wdlabs.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-jQuery",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::FileGatherer" : "0",
+            "File::HomeDir" : "0.91",
+            "File::Temp" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Path::Class" : "0.26",
+            "Resource::Pack::jQuery" : "0",
+            "namespace::autoclean" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.94",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Dist-Zilla-Plugin-jQuery/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Dist-Zilla-Plugin-jQuery",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Dist-Zilla-Plugin-jQuery.git",
+         "web" : "https://github.com/plicease/Dist-Zilla-Plugin-jQuery"
+      }
+   },
+   "version" : "0.04"
+}
+

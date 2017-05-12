@@ -1,0 +1,16 @@
+Revision history for DBIx::Class::DeploymentHandler::CLI
+
+0.002  Tue Jan  3 15:43:59 2017 CET
+
+    * Force current mysql_version for SQL::Translator instead of using the
+      totally outdated default.
+    * Add missing returns to methods to prevent display of implicit return
+      values.
+    * Add "Best Practices" section to documentation.
+    * Handle missing and empty version storage in database_version method.
+
+0.001  Wed Mar  9 10:08:23 2016 CET
+
+        German Perl Workshop 2016 release.
+
+

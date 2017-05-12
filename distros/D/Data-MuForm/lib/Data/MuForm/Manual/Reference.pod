@@ -1,0 +1,201 @@
+package Data::MuForm::Manual::Reference;
+# ABSTRACT: concise reference
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Reference - concise reference
+
+=head1 VERSION
+
+version 0.04
+
+=head1 DESCRIPTION
+
+L<Manual Index|Data::MuForm::Manual>
+
+This is a concise reference of Data::MuForm.
+
+Data::MuForm has a lot of options and many ways to customize your forms.
+More complete documentation can be found in the rest of the manual
+as L<Data::MuForm::Manual> and in L<Data::MuForm>.
+
+=head1 Form
+
+=head2 Form Attributes
+
+   params           Parameters/data; if present validation will be attempted
+   data             Alias for 'params'
+   name             Form name. Used in 'id' of form element
+
+   field_namespace  Where to search for fields
+
+   language         Used by 'localizer' to get the right translation file.
+   ctx              Application context for your use. Weak_ref, cleared on each process call.
+
+   init_values      For default values instead of 'model', or in addition to.
+
+   fields           Field arrayref
+   sorted_fields    The sorted array of fields
+   field( $name )   Returns a field object
+   has_field        Sugar for declaring fields
+   field_list       Non-moose-y way to define fields
+
+   clear            Resets state. Used in persistent forms.
+   values           Returns a hashref of values (with accessor keys)
+   fif              Returns a hashref for filling in form
+
+=head2 Form database attributes
+
+   model            DB row object
+   model_class      Class of db model
+   model_id         Primary key of db model
+   schema           Schema of model
+
+   Also 'update_model' sub
+
+=head2 Form processing
+
+   process           Sets up form, validates, updates model
+   check             Validates, does not update model
+   submitted         Flag to say whether or not to validate, instead of
+                        depending on presence of params
+
+=head3 Validation
+
+   validate        Sub for validation after individual fields are validated
+   validate_model  Sub for additional database type validation
+   validated       Flag that form has validated
+   is_valid        Synonym of 'validated'
+   ran_validation  Flag that validation has already been run
+   validate_$fieldname  Validation routine for field (also 'validate_method')
+
+=head3 Errors
+
+   has_errors      True if any field has errors
+   num_errors      The number of errors (field errors + form errors)
+   error_fields    An array of fields with errors
+   errors          Returns an array of all errors
+   error_field_names Returns an array of field names with errors
+
+=head3 Form Methods and process hooks
+
+   update_model      To perform additional database actions on update
+   init_values       can be a method instead of an attribute
+
+=head3 Form Rendering
+
+   TBD: a work in process, not yet completely designed
+
+   field_prefix       String to prefix to field names when rendered
+                           Useful for multiple instances of the same form
+   http_method         For storing 'post' or 'get'
+   action              Store the form 'action' on submission. No default value.
+   enctype             Request enctype
+   id                  the form tag 'id' attribute is set to the form name
+
+=head2 Field specific form methods
+
+   options_$fieldname   Sub returning options array (also 'options_method')
+   validate_$fieldname  Validation routine for field (also 'validate_method')
+   default_$fieldname   Set default for field (also 'default_method')
+
+=head1 Fields
+
+=head2 Field attributes
+
+   name          Field name. Usually the same as database column name or rel
+   type          Field type. From a Field class: 'Text', 'Select', etc
+   order         Set the order for fields. Default order is set by MuForm, by 5.
+
+   active        Arrayref of fields to set active
+   is_active
+   inactive      Arrayref of fields to set inactive
+   is_inactive
+   input_without_param  The value of the field if there is no input from the submitted form
+
+   default       Default value for the field
+   not_nullable  Don't convert an empty field ('', etc) to undef
+
+   trim          Transform to trim the field
+   transform_value_to_fif    Coderef to deflate the field (for filling in the form)
+   transform_input_to_value  Coderef to inflate the field (before validation)
+   transform_default_to_value  Coderef to inflate value from model/init_values
+   transform_value_after_validate    Coderef to deflate value after validation
+   transform_input_to_value  Coderef to transform input to value
+
+   password      Remove from params and do not display in forms.
+
+=head2 Select fields
+
+   options       Sorted arrayref of hashes; keys: "value", "label"
+   methods => { options => <coderef> } = provide options
+   label_column  Column to use for labels (default: name)
+   active_column Which values to list in options
+   sort_column   Column to use for sorting (default: label_column)
+
+=head2 Field errors
+
+   errors        Errors associated with this field
+                 (also num_errors, clear_errors, has_errors, add_error)
+   messages      Hashref of message identifiers and text
+
+=head2 Field validation
+
+   apply         Array of constraint/coercion/transformation actions
+                 ( type, check, transform, message, when )
+   methods => { validate => <coderef> }  Validation coderef, or 'validate_$fieldname' in form (default)
+   required      Field is required
+   required_when Takes a hashref of field name keys and values
+   maxlength     Text fields. Validated.
+   minlength     Text fields. Used in validation
+   range_start   Range start for number fields
+   range_end     Range end for number fields
+
+=head2 Field attributes for DB
+
+   accessor      Database accessor name if different than field name
+   unique        Field should be unique in the database
+   no_update     Don't include this field in ->values hash. It won't be updated in the database.
+   writeonly     Do not retrieve initial values
+
+   Also see the select field _columns attributes
+
+=head2 Field rendering
+
+   label           Text label for this field. Defaults to ucfirst field name.
+   methods => { build_label => <coderef> }   provide a builder for 'label' attribute
+   id              Useful for javascript (default is prefixed_name. to prefix with
+                       form name, use 'field_prefix' in your form)
+   methods => { build_id => <coderef> } Provide a builder for 'id' attribute
+   size            Text & select fields.
+
+   render          Method to render the field ($field->render)
+   render_element  Method to render unwrapped field ($field->render_element)
+   render_errors
+   render_label
+
+=head2 Field attributes
+
+   init_value    Initial value from the database
+   value         The value of your field.
+   input         Input value from parameter or initial value from database
+   fif           Values for filling in a form, from input or value
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

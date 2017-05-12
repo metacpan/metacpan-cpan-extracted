@@ -1,0 +1,10 @@
+a4c5ec58e800
+
+slave visonic a4.c5ec58e800:
+  security/powercode.c5ec58s/alert/tamper
+  sensor/powercode.c5ec58s[battery]=10%
+
+
+
+
+

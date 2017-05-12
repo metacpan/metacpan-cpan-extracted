@@ -1,0 +1,768 @@
+package WxProf;
+use strict; use warnings;
+use lib '../lib';
+use Wx;
+use base qw(Wx::Frame Class::Accessor::Fast);
+use List::Util qw(first);
+use Wx qw(:textctrl :sizer :window :id);
+use Wx qw(wxDefaultPosition wxDefaultSize wxVERTICAL wxNO_BORDER
+          wxDEFAULT_FRAME_STYLE wxNO_FULL_REPAINT_ON_RESIZE wxCLIP_CHILDREN
+          wxWHITE
+          );
+use Wx::Event qw(
+    EVT_SIZE
+    EVT_TREE_SEL_CHANGED
+    EVT_MENU
+    EVT_CLOSE
+    EVT_GRID_SELECT_CELL
+    EVT_BUTTON
+    EVT_LEFT_DOWN
+    EVT_MOUSE_EVENTS
+    );
+
+use Devel::WxProf::Data;
+use Devel::WxProf::Grid;
+use Devel::WxProf::Reader::WxProf;
+use Devel::WxProf::Reader::DProf;
+use Devel::WxProf::Preferences;
+use Devel::WxProf::Treemap::Output::Imager;
+use Devel::WxProf::Treemap::Squarified;
+
+use UNIVERSAL::require;
+use Module::Pluggable::Object;
+
+use File::Path qw(rmtree);
+
+__PACKAGE__->mk_accessors( qw(
+    preferences
+    filename
+    pkg_grid
+    sub_grid
+    call_grid
+    callee_tree
+    callee_map
+    callee_map_dc
+    callee_map_data
+    notebook) );
+
+my @wx_defaults = (
+        -1,
+        wxDefaultPosition,
+        wxDefaultSize,
+        wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN
+);
+
+sub new {
+    my( $class ) = @_;
+    my $self = $class->SUPER::new(
+        undef,
+        -1,
+        'wxprofile',
+        wxDefaultPosition,
+        [ 1024, 768 ],
+        wxDEFAULT_FRAME_STYLE|wxNO_FULL_REPAINT_ON_RESIZE|wxCLIP_CHILDREN
+    );
+
+    $self->preferences( Devel::WxProf::Preferences->new() );
+
+    Wx::InitAllImageHandlers();
+    # create menu bar
+    my $bar = Wx::MenuBar->new;
+    my $file = Wx::Menu->new;
+    $file->Append( wxID_OPEN, "Open" );
+    $file->Append( wxID_EXIT, "E&xit" );
+
+    my $help = Wx::Menu->new;
+    $help->Append( wxID_ABOUT, "&About..." );
+
+    $bar->Append( $file, "&File" );
+    $bar->Append( $help, "&Help" );
+
+    $self->SetMenuBar( $bar );
+
+    my $main = Wx::ScrolledWindow->new($self, @wx_defaults);
+    $main->SetScrollbars(20, 20, 55, 40);
+    my $main_sizer = Wx::BoxSizer->new(wxVERTICAL);
+    $main->SetSizer($main_sizer);
+
+#    INFO: {
+#        my $parent = Wx::Panel->new($main, @wx_defaults);
+#        Wx::StaticText->new($parent, -1, 'Profile Data - table view');
+#        $parent->Fit();
+#        $main_sizer->AddSpacer(5);
+#        $main_sizer->Add($parent);
+#        $main_sizer->AddSpacer(10);
+#    };
+
+
+    CHILDREN: {
+        my $parent = Wx::Panel->new($main, @wx_defaults);
+        # $parent->SetScrollbars(20, 20, 55, 40);
+
+        my $pkg_label = Wx::StaticText->new( $parent, -1, "Packages");
+        my $pkg_grid = Devel::WxProf::Grid->new($parent, -1);
+
+        my $sizer = Wx::FlexGridSizer->new(4,2,5,5);
+        $parent->SetSizer($sizer);
+
+        $self->setup_grid( $pkg_grid, 200, ('elapsed', 'calls', 'package') );
+        $self->pkg_grid($pkg_grid);
+
+        my $sub_label = Wx::StaticText->new( $parent, -1, "Subroutines",);
+        my $sub_grid = Devel::WxProf::Grid->new($parent, -1);
+        $self->setup_grid( $sub_grid, 400, ('elapsed', 'calls', 'sub') );
+        $self->sub_grid($sub_grid);
+
+        my $call_label = Wx::StaticText->new( $parent, -1, "Calls");
+        my $call_grid = Devel::WxProf::Grid->new($parent, -1);
+        $self->setup_grid( $call_grid, 200, ('elapsed', 'calls', 'sub') );
+        $self->call_grid($call_grid);
+
+        my $tree_label = Wx::StaticText->new( $parent, -1, "Callee Tree");
+
+        my $callee_notebook = Wx::Notebook->new($parent, -1);
+#
+        my $callee_map;
+        CALLEE_MAP: {
+            #my $parent = $callee_notebook;
+            my $parent = Wx::Panel->new($callee_notebook);
+            # create a bitmap
+            my $bmp = Wx::Bitmap->new(500, 400);
+            # create a graphics device context
+            my $temp_dc = Wx::MemoryDC->new();
+            # select bitmap
+            $temp_dc->SelectObject($bmp);
+            # clear bitmap
+            $temp_dc->Clear();
+
+            # add (new cleared) bitmap to StaticBitmap display
+            $callee_map = Wx::StaticBitmap->new($parent, -1, $bmp, wxDefaultPosition, wxDefaultSize, wxNO_BORDER);
+            $callee_map->SetMinSize([500,400]);
+            $callee_map->SetMaxSize([500,400]);
+            $self->callee_map($callee_map);
+            $callee_notebook->AddPage($parent, 'Map');
+        }
+
+        my $callee_tree;
+        CALLEE__TREE: {
+            my $parent = $callee_notebook;
+            $callee_tree = Wx::TextCtrl->new($parent, -1, '', wxDefaultPosition, wxDefaultSize,
+                wxTE_READONLY|wxTE_MULTILINE|wxNO_FULL_REPAINT_ON_RESIZE );
+            $callee_tree->SetMinSize([500,400]);
+
+            $self->callee_tree($callee_tree);
+            $callee_notebook->AddPage($callee_tree, 'Text Tree');
+        };
+
+        foreach my $item (
+                $pkg_label, $call_label,
+                $pkg_grid, $call_grid)
+        {
+            $sizer->Add($item);
+        }
+
+        $sizer->AddSpacer(20);
+        $sizer->AddSpacer(20);
+
+        foreach my $item (
+                $sub_label, $tree_label,
+                $sub_grid, $callee_notebook,
+                ) {
+            $sizer->Add($item);
+        }
+
+        #die $sizer->GetRows();
+
+        $parent->Fit();
+        $parent->FitInside();
+
+        # $navigator_notebook->AddPage($parent, 'List View');
+        EVT_GRID_SELECT_CELL($pkg_grid, sub { $self->on_package_select(@_) } );
+        EVT_GRID_SELECT_CELL($sub_grid, sub { $self->on_sub_select(@_) } );
+        EVT_GRID_SELECT_CELL($call_grid, sub {
+            $self->populate_callee_map(@_);
+            $self->populate_callee_tree(@_);
+        } );
+        $main_sizer->Add($parent, 1, wxEXPAND);
+    }
+    EVT_CLOSE( $self, \&on_close );
+    EVT_MENU( $self, wxID_ABOUT, \&on_about );
+    EVT_MENU( $self, wxID_EXIT, sub { $self->Close } );
+    EVT_MENU( $self, wxID_OPEN, \&on_open );
+
+    $main->Fit();
+    $main->FitInside();
+    $self->SetIcon( Wx::GetWxPerlIcon() );
+    $self->Show;
+
+#    Wx::LogMessage( "Welcome to wxProfile!" );
+
+    return $self;
+}
+
+sub setup_grid {
+    my ($self,$grid, $height, @cols) = @_;
+
+#   wxFont(int pointSize, wxFontFamily family, int style, wxFontWeight weight, const bool underline = false, const wxString& faceName = "", wxFontEncoding encoding = wxFONTENCODING_DEFAULT)
+    my $font = Wx::Font->new(8);
+
+    my $sizer = Wx::FlexGridSizer->new(0, scalar @cols, $#cols);
+
+    $grid->SetSizer($sizer);
+    $grid->CreateGrid(0, scalar @cols, -1);
+    $grid->SetDefaultCellFont($font);
+    $grid->SetLabelFont($font);
+    $grid->SetRowLabelSize(32);
+    $grid->EnableEditing(0);
+    $grid->SetSelectionMode(1); # wxGridSelectRow
+
+    for (0..$#cols) {
+        $grid->SetColLabelValue($_, $cols[$_]);
+    }
+
+    $grid->SetMinSize([500,$height]);
+    $grid->SetMaxSize([500,$height]);
+
+    $grid->Fit();
+    $grid->FitInside();
+}
+
+sub populate_pkg_grid {
+    my ($self, $data) = @_;
+    my $busy = Wx::BusyCursor->new();
+    my $grid = $self->pkg_grid();
+    my $data_from_ref = [ sort { $b->get_elapsed <=> $a->get_elapsed } values %{ $data } ];
+
+    # die Data::Dumper::Dumper $data_from_ref;
+
+    $grid->data($data_from_ref);
+    $grid->AppendRows(scalar @{ $data_from_ref });
+
+    for (my $i = 0; $i<scalar @{ $data_from_ref }; $i++ ) {
+        $grid->SetCellValue($i, 0, $data_from_ref->[$i]->get_elapsed() );
+        $grid->SetCellValue($i, 1, $data_from_ref->[$i]->get_calls() );
+        $grid->SetCellValue($i, 2, $data_from_ref->[$i]->get_package() );
+    }
+    $grid->Fit();
+    $grid->FitInside();
+
+}
+
+sub on_package_select {
+    my ($self, $package_grid, $event) = @_;
+    my $grid = $self->sub_grid();
+    my $pkg = $package_grid->data()->[$event->GetRow()];
+    $self->populate_sub_grid($pkg);
+}
+
+sub populate_sub_grid {
+    my ($self, $pkg) = @_;
+    if (not defined $pkg) {
+        warn "no pkg - called from " , join " ", caller();
+        return;
+    }
+    my $grid = $self->sub_grid();
+    my @row_data = sort { $b->get_elapsed() <=> $a->get_elapsed() } values %{ $pkg->get_function };
+    $grid->data( \@row_data );
+
+    $grid->ClearGrid();
+
+    my $rows = $grid->GetNumberRows();
+    if ($rows > scalar @row_data) {
+        $grid->DeleteRows(scalar @row_data, $rows - scalar @row_data);
+    }
+    elsif ($rows < scalar @row_data) {
+        $grid->AppendRows(scalar @row_data - $rows);
+    }
+
+    for (my $i = 0; $i<scalar @row_data; $i++ ) {
+        # use Data::Dumper; die Dumper $sub_from_ref->[$i]->get_calls;
+        $grid->SetCellValue($i, 0, $row_data[$i]->get_elapsed() );
+        $grid->SetCellValue($i, 1, $row_data[$i]->get_calls() );
+        $grid->SetCellValue($i, 2, $row_data[$i]->get_function() );
+    }
+    $grid->Fit();
+    $grid->FitInside();
+    $grid->Layout();
+    $grid->SelectRow(0);
+}
+
+sub select_package {
+    my ($self, $package) = @_;
+    my $grid = $self->pkg_grid();
+    for my $row(0..$grid->GetNumberRows()) {
+        if ($package eq $grid->GetCellValue($row,2)) {
+            $grid->SelectRow($row);
+            $grid->MakeCellVisible($row,0);
+            return $grid->data()->[ $row ];
+        }
+    }
+    return;
+}
+
+sub select_sub {
+    my ($self, $package) = @_;
+    my $grid = $self->sub_grid();
+    for my $row(0..$grid->GetNumberRows()) {
+        if ($package eq $grid->GetCellValue($row,2)) {
+            $grid->SelectRow($row);
+            $grid->MakeCellVisible($row,0);
+            return $grid->data()->[ $row ];
+        }
+    }
+    return;
+}
+
+sub on_sub_select {
+    my ($self, $sub_grid, $event) = @_;
+    my $pkg = $sub_grid->data()->[ $event->GetRow() ];
+    $self->populate_call_grid($pkg);
+}
+
+sub populate_call_grid {
+    my ($self, $pkg) = @_;
+    my $busy = Wx::BusyCursor->new();
+
+    my @row_data = @{ $pkg->get_child_nodes() };
+    my $grid = $self->call_grid();
+    $grid->data( \@row_data );
+
+    $grid->ClearGrid();
+
+    my $rows = $grid->GetNumberRows();
+    if ($rows > scalar @row_data) {
+        $grid->DeleteRows(scalar @row_data, $rows - scalar @row_data);
+    }
+    elsif ($rows < scalar @row_data) {
+        $grid->AppendRows(scalar @row_data - $rows);
+    }
+
+    for (my $i = 0; $i<scalar @row_data; $i++ ) {
+        # use Data::Dumper; die Dumper $sub_from_ref->[$i]->get_calls;
+        $grid->SetCellValue($i, 0, $row_data[$i]->get_elapsed() );
+        $grid->SetCellValue($i, 1, $row_data[$i]->get_calls() );
+        $grid->SetCellValue($i, 2, $row_data[$i]->get_function() );
+    }
+    $grid->Fit();
+    $grid->FitInside();
+    $grid->Layout();
+    $grid->SelectRow(0);
+}
+
+sub populate_callee_tree {
+    my ($self, $call_grid, $event) = @_;
+    my $busy = Wx::BusyCursor->new();
+    my $data = $call_grid->data()->[ $event->GetRow() ];
+    my $child_nodes = $data->get_child_nodes();
+    my $callee_tree = $self->callee_tree();
+    $callee_tree->Clear();
+    $callee_tree->AppendText($data->get_function() . ": " . $data->get_elapsed() . "\n");
+    $callee_tree->AppendText(join q{}, $self->generate_text_tree({
+        data => $child_nodes,
+        max_depth => 10,
+    }));
+}
+
+sub populate_callee_map {
+    my ($self, $call_grid, $event) = @_;
+    my $busy = Wx::BusyCursor->new();
+    my $data = $call_grid->data()->[ $event->GetRow() ];
+
+    my $callee_map = $self->callee_map();
+
+    my $file_id = ${ $data };
+
+    my $dir = $self->preferences()->get_data_dir() . "/$$";
+    mkdir $dir;
+    my $filename = "$dir/$file_id.png";
+
+    my $preferences = $self->preferences();
+
+    if (! -r $filename) {
+        my $imager = Devel::WxProf::Treemap::Output::Imager->new( WIDTH=>500, HEIGHT=>400,
+            FONT_FILE => join ( '/', $preferences->get_font_dir(), $preferences->get_map_font_file() ),
+            # '/usr/share/fonts/truetype/freefont/FreeSans.ttf',
+            MIN_FONT_SIZE => $self->preferences()->get_map_font_size(),
+            MAX_FONT_SIZE => $self->preferences()->get_map_font_size(),
+        );
+
+        my $map = Devel::WxProf::Treemap::Squarified->new(
+            INPUT => $data,
+            OUTPUT => $imager,
+            SPACING => { left => 1, top => 1, right => 1, bottom => 1, min_width => 10, min_height => 10 },
+            PADDING => { left => 1, top => 12, right => 1, bottom => 1 },
+        );
+
+        my @map_from = $map->map();
+        $self->callee_map_data(\@map_from);
+
+        $imager->save($filename);
+
+    }
+
+    my $file = IO::File->new( $filename, "r" );
+    unless ($file) {
+        print "Can't load $filename.";return undef
+    };
+    binmode $file;
+    my $handler = Wx::PNGHandler->new();
+    my $image = Wx::Image->new();
+    my $bmp;    # used to hold the bitLabelmap.
+    $handler->LoadFile( $image, $file );
+    $bmp = Wx::Bitmap->new($image);
+
+    if( $bmp->Ok() ) {
+        #  create a static bitmap called ImageViewer that displays the
+        #  selected image.
+        $callee_map->SetBitmap( $bmp );
+        # Wx::StaticBitmapWx::StaticBitmap->new($callee_map, -1, $bmp);
+        my $dc = $self->callee_map_dc() || Wx::MemoryDC->new();
+        $dc->SelectObject($bmp);
+        $self->callee_map_dc($dc);
+   }
+}
+
+sub generate_text_tree {
+    my $self = shift;
+    my $arg_ref = shift;
+    my @result = @{ $arg_ref->{ data } };
+    my $max_depth = $arg_ref->{ max_depth };
+    my $indent = q{  };
+    my $depth = 0;
+
+    my @text = ();
+    while (1) {
+        my $node = shift @result;
+        if (not defined $node) {
+            $depth--;
+            last if not @result;
+            next;
+        }
+        push @text, $indent x $depth, $node->get_elapsed , q{ }, $node->get_package, q{ ::}, $node->get_function(), "\n";
+
+        if ($depth < $max_depth) {
+            my $children_from = $node->get_child_nodes;
+            if (@{ $children_from }) {
+                $depth++;
+                @result = (@{ $children_from }, undef, @result);
+
+            }
+        }
+        last if not @result;
+    }
+    return @text;
+}
+
+sub read_profile {
+    my ($self, $filename) = @_;
+    my $busy = Wx::BusyCursor->new();
+    my $data = Devel::WxProf::Data->new({});
+
+    my $reader = ($filename =~m{ tmon\.out$ }x)
+        ? Devel::WxProf::Reader::DProf->new()
+        : Devel::WxProf::Reader::WxProf->new();
+
+    my @result = eval {
+        $reader->read_file($filename)
+    };
+    if ($@) {
+        Wx::LogMessage( "Error: $@");
+        return;
+    }
+    $self->filename($filename);
+    $self->_set_title($filename);
+    $data->set_child_nodes(\@result);
+    $self->populate_pkg_grid($reader->get_packages());
+}
+
+sub ask_for_filename {
+    my ($self, $label) = shift;
+    $label ||= 'Select file';
+    my $default_dir = $self->preferences()->get_default_dir();
+    my $dialog = Wx::FileDialog->new($self, $label, $default_dir);
+    if ($dialog->ShowModal() == wxID_OK) {
+        $self->preferences->set_default_dir($dialog->GetDirectory());
+        return $dialog->GetPath()
+    }
+    return;
+}
+
+sub on_close {
+    my( $self, $event ) = @_;
+
+    Wx::Log::SetActiveTarget( $self->{old_log} );
+    $event->Skip;
+}
+
+sub on_open {
+    my( $self, $event ) = @_;
+    my $filename = $self->ask_for_filename();
+    if ($filename) {
+        $self->read_profile($filename);
+    }
+}
+
+sub on_about {
+    my( $self ) = @_;
+    use Wx qw(wxOK wxCENTRE wxVERSION_STRING);
+
+    Wx::MessageBox( "wxprofile (c) 2008 Martin Kutter\n" .
+                    "wxPerl $Wx::VERSION, " . wxVERSION_STRING,
+                    "About wxprofile", wxOK|wxCENTRE, $self );
+}
+
+sub _set_title {
+    my $self = shift;
+    $self->SetTitle(shift);
+}
+
+sub _add_menus {
+    my( $self, %menus ) = @_;
+
+    while( my( $title, $menu ) = each %menus ) {
+        $self->GetMenuBar->Insert( 1, $menu, $title );
+    }
+}
+
+sub _remove_menus {
+    my( $self ) = @_;
+
+    while( $self->GetMenuBar->GetMenuCount > 2 ) {
+        $self->GetMenuBar->Remove( 1 )->Destroy;
+    }
+}
+
+sub DESTROY {
+    rmtree $_[0]->preferences->get_data_dir() . "/$$";
+}
+
+my $app = Wx::SimpleApp->new;
+my $locale = Wx::Locale->new( Wx::Locale::GetSystemLanguage );
+my $profile = WxProf->new();
+$profile->read_profile($ARGV[0]) if @ARGV;
+
+# add mouse event handler
+# must be added for $app - application filters events.
+EVT_LEFT_DOWN($app, sub {
+    my ($app, $event) = @_;
+
+    # only handle clicks on our map special
+    if ($event->GetEventObject() == $profile->callee_map) {
+        my ($x,$y) = $event->GetPositionXY();
+        my $found = first {
+            $_->[2] > $x && $x > $_->[0]
+            && $_->[3] > $y && $y > $_->[1]
+        } @{ $profile->callee_map_data() };
+
+        if ($found) {
+            my ($package,$sub) = $found->[-1] =~m{^(.+)::([^:]+)$}x;
+            # warn ($package, " ", $sub);
+            # warn Data::Dumper::Dumper($profile->callee_map_data());
+            my $pkg = $profile->select_package($package);
+            if ($pkg) {
+                $profile->populate_sub_grid($pkg);
+                my $sub_data = $profile->select_sub($sub);
+                $profile->populate_call_grid($sub_data)
+                    if ($sub_data);
+            }
+        }
+        else {
+            warn "No sub found for coordinates x=$x, y=$y";
+        }
+    }
+    $event->Skip();
+});
+
+$app->MainLoop;
+
+
+
+exit 0;
+
+
+
+1;
+
+=pod
+
+=head1 NAME
+
+wxprofile - Graphical profile data analyzer
+
+=head2 SYNOPSIS
+
+ @> perl -d:WxProf myscript.pl
+ @> wxprofile
+ @> wxprofile PATH/TO/PROFILE/tmon.out
+
+ # to use Devel::DProf for collecting data
+ @> perl -d:DProf myscript.pl
+ @> wxprofile tmon.out
+
+ # or use Devel::Profiler for collecting data...
+ @> perl "-MDevel::Profiler hz => 100000" myscript.pl
+ @> wxprofile tmon.out
+
+=head1 DESCRIPTION
+
+For collecting profile data see L<Devel::WxProf>.
+
+wxprofile is a graphical profile data analyzer for perl.
+
+It supports the following profile formats:
+
+=over
+
+=item * WxProf
+
+It's own (now deprecated) - Devel::WxProf outputs data compatible to
+Devel::DProf
+
+=item * Devel::DProf
+
+Only Devel::DProf's new format is supported. This means that you cannot use
+Devel::DProfLB - it uses Devel::DProf's old profile data format (as of 0.01).
+
+You can also use Devel::Profiler for collecting profile data.
+
+=back
+
+=head2 Hints on interpreting profile data
+
+wxprofile reports inclusive times. This does not mean, the sub with the
+highest value is slowest - it probably just does most of the work.
+
+wxprofile always displays wallclock ticks as profile data. The actual values
+are dependent on the profile format and the resolution of your system's clock.
+
+Wallclock profilers use the so-called stopwatch approach. Whether this is
+useful or not is highly dependent on the application and the environment:
+Stopwatch results are probably correct on a single user system with low
+load, profiling a non-interactive application. For all other environments and
+applications, stopwatch results have to be used with care.
+
+=head2 Hints on collecting profile data
+
+POSIX::clock() resolution - which is used by most profilers, like Devel::DProf
+- provide 1/100s resolution on most systems. This is far from being useful for
+profiling single runs. Devel::WxProf collects profile data with higher
+resolution - at the cost of accuracy.
+
+Devel::Profiler can be configured to use higher resolution as well, by
+passing a hz value as import flag:
+
+ perl "-MDevel::Profiler hz => 10000" myscript.pl
+
+All perl profilers have their strong and weak points. Here's a quick
+comparison:
+
+=over
+
+=item * Devel::DProf
+
+ Method:                Debugger
+ Times:                 system, user, wall
+ Resolution:            system resolution, usually 1/100s
+ profiles closures:     Yes
+ profiles DESTROY:      Yes
+ sub exit w/o return:   Yes
+ outputs raw data:      Yes
+ data format:           Devel::DProf (new)
+
+=item * Devel::DProfLB
+
+ Method:                Debugger
+ Times:                 system, user, wall
+ Resolution:            system resolution, usually 1/100s
+ profiles closures:     Yes
+ profiles DESTROY:      Yes
+ sub exit w/o return:   ??
+ outputs raw data:      Yes
+ data format:           Devel::DProf (old)
+
+=item * Devel::Profile
+
+ Method:                ??
+ Times:                 system, user, wall
+ Resolution:            system resolution, usually 1/100s
+ profiles closures:     Yes
+ profiles DESTROY:      Yes
+ sub exit w/o return:   ??
+ outputs raw data:      No
+ data format:           Devel::Profile
+
+=item * Devel::Profiler
+
+ Method:                Sub instrumentor
+ Times:                 system, user, wall (only wall with higher resolution)
+ Resolution:            configurable
+ profiles closures:     No
+ profiles DESTROY:      No
+ sub exit w/o return:   ??
+ outputs raw data:      Yes
+ data format:           Devel::DProf (new)
+
+=item * Devel::WxProf
+
+ Method:                Debugger
+ Times:                 wall
+ Resolution:            1/10000s
+ profiles closures:     Yes
+ profiles DESTROY:      Yes
+ sub exit w/o return:   No
+ outputs raw data:      Yes
+ data format:           Devel::DProf
+
+=over
+
+=head1 BUGS AND LIMITATIONS
+
+Many.
+
+See L<Devel::WxProf> for more information
+
+=over
+
+=item * Memory usage
+
+wxprofile eats up around 20x more memory than your profile data.
+
+You have been warned.
+
+=item * Treemap proportions
+
+The treemap proportions do not reflect times exactly. The treemap rectangles
+include an additional top padding to keep the labels readable.
+
+=item * Windows
+
+Due to some incompatibilities in font handling, wxprofile is currently broken
+on windows.
+
+While it can be made to run with some minor changes, it looks a bit strange.
+Don't know where THAT comes from.
+
+Feel free to help ;-)
+
+=back
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2008 Martin Kutter.
+
+This program is free software. You may distribute/modify it under
+the same terms as perl itself
+
+=head1 AUTHOR
+
+Martin Kutter E<lt>martin.kutter fen-net.deE<gt>
+
+=head1 REPOSITORY INFORMATION
+
+ $Rev: 583 $
+ $LastChangedBy: kutterma $
+ $Id: $
+ $HeadURL: $
+
+=cut
+

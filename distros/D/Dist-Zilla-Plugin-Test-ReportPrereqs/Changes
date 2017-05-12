@@ -1,0 +1,205 @@
+Revision history for Dist-Zilla-Plugin-Test-ReportPrereqs
+
+0.027     2017-05-07 22:59:43-04:00 America/New_York
+
+  [Fixed]
+
+  - fixed error in 0.026 that would cause t/00-report-prereqs.dd to be pruned
+    by [PruneCruft]
+
+0.026     2017-05-05 22:30:00-04:00 America/New_York
+
+  [Fixed]
+
+  - Prereq data file is properly sourced in newer perls, when . is no longer
+    in @INC
+
+  [Changed]
+
+  - Improve diagnostics if loading metadata fails.
+
+0.025     2016-06-09 22:08:35-04:00 America/New_York
+
+  [Fixed]
+
+  - Prereq source reported correctly if (MY)META fails to load.
+
+0.024     2016-02-26 13:18:29-05:00 America/New_York
+
+  [Changed]
+
+  - Switched tests to use Path::Tiny over assuming dzil objects are
+    Path::Class.
+
+0.022     2016-02-25 17:15:30-05:00 America/New_York
+
+  [Added]
+
+  - Added option to use Module::Metadata for prereq version extraction
+
+0.021     2015-03-24 23:38:55-04:00 America/New_York
+
+  [Fixed]
+
+  - fixed test corpus to avoid META validation errors
+
+0.020     2015-01-27 09:59:52-05:00 America/New_York
+
+  [Changed]
+
+  - drop the Want column from the "Other Modules" section
+
+0.019     2014-08-13 12:20:18-04:00 America/New_York
+
+  [Changed]
+
+  - Modules included in the dist.ini file are now put in their own report
+    section "Other Modules" instead of being merged into Runtime Requires.
+
+0.018     2014-08-01 12:22:01-04:00 America/New_York
+
+  [Changed]
+
+  - Removes List::Util and Scalar::Util as runtime dependencies for better
+    backward compatibility; also fixes an unintialized value warning in
+    the generated test file when CPAN::Meta isn't installed
+
+  - Removes Path::Class and Cwd as a test dependencies
+
+  - Adds CPAN::Meta as a test dependency (which shouldn't really matter
+    since Dist::Zilla has it as a dependency anyway)
+
+0.017     2014-07-30 16:48:36-04:00 America/New_York
+
+  [Changed]
+
+  - generated test file uses File::Spec instead of File::Spec::Functions
+
+0.016     2014-07-29 14:07:49-04:00 America/New_York
+
+  [Fixed]
+
+  - Fixed how the version regular expression is used (whoops!)
+
+0.015     2014-07-29 13:28:06-04:00 America/New_York
+
+  [Changed]
+
+  - removes dependency on version.pm and uses its regular expression
+    instead.
+
+  [Fixed]
+
+  - generated test file no longer fatal if verifying prereqs without
+    CPAN::Meta installed.
+
+0.014     2014-07-17 18:09:03-04:00 America/New_York
+
+  [Changed]
+
+  - Test file generation split in two.  The test file is gathered early and
+    is available for analysis/munging by other plugins.  The static
+    dependency data is saved into another file late (after prereqs are
+    finalized).  The test file loads the static data at runtime.  This
+    should make this plugin validate with [VerifyPhases].
+
+  - Test report format now splits out report by phase and type.  This means
+    that "Test Requires" are distinct from "Runtime Requires" and if there
+    are different versions required for each phase, those are visible in
+    the report.
+
+0.013     2014-01-24 11:42:12-05:00 America/New_York
+
+  [Changed]
+
+  - Embeds the complete static prerequisite hash into the
+    generated file; no longer creates just a static list
+    (that varied based on AUTHOR_TESTING);
+
+0.012     2014-01-14 15:49:18-05:00 America/New_York
+
+  [Changed]
+
+  - Modifies the test file with the static prerequisite list
+    in memory during the InstallTool phase rather only on disk in
+    the AfterBuild phase (Kent Fredric)
+
+0.011     2014-01-07 11:46:22 America/New_York
+
+  [Fixed]
+
+  - now also verifying develop prereqs, when AUTHOR_TESTING is set
+    (Karen Etheridge)
+
+0.010     2013-10-16 17:02:34 America/New_York
+
+  [Fixed]
+
+  - fixed handling of modules with no $VERSION
+
+0.009     2013-10-15 19:48:32 America/New_York
+
+  [Changed]
+
+  - now injecting test-recommends prereqs to enable prereq verification
+    (Karen Etheridge)
+
+0.008     2013-10-13 15:33:03 America/New_York
+
+  [Fixed]
+
+  - dropped use of newer CPAN::Meta::Requirement method so
+    we're more backwards compatible
+
+0.007     2013-10-12 13:50:23 America/New_York
+
+  [Fixed]
+
+  - 'exclude' option now respected when MYMETA.json is present
+
+  [Changed]
+
+  - now (optionally) reporting on any missing prereqs after listing all module
+    versions [Karen Etheridge]
+  - develop prereqs are now also reported/checked when AUTHOR_TESTING
+
+0.006     2013-02-12 17:48:57 America/New_York
+
+  [Fixed]
+
+  - Don't report on 'develop' prereqs
+
+0.005     2013-02-11 12:26:51 America/New_York
+
+  [Changed]
+
+  - Always reports, regardless of AUTOMATED_TESTING; this way even
+    manual bug reports will give us the information we want
+
+0.004     2012-05-16 11:33:16 America/New_York
+
+  [Added]
+
+  - New 'include' and 'exclude' attributes may be used to add additional
+    modules or to remove modules from the report list [Randy Stauner]
+
+0.003     2012-05-14 15:23:08 America/New_York
+
+  [Fixed]
+
+  - Optional CPAN::Meta requirement of generated test file is now
+    obscured to hide it from prerequisite scanners.
+
+  - Static requirements are merged with dynamic ones to ensure the
+    most complete report possible on modules of interest
+
+0.002     2012-05-14 15:11:36 America/New_York
+
+  [Changed]
+
+  - Fixed formatting in generated test file
+
+0.001     2012-05-14 14:51:15 America/New_York
+
+  - Initial release
+

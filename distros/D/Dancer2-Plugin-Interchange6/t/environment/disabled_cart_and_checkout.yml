@@ -1,0 +1,21 @@
+plugins:
+  DBIC:
+    default:
+      dsn: 'dbi:SQLite:dbname=:memory:'
+      options:
+        on_connect_call: use_foreign_keys
+        on_connect_do: 'PRAGMA synchronous = OFF'
+        quote_names: 1
+        sqlite_unicode: 1
+  'Interchange6::Routes':
+    navigation: ~
+    cart:
+      active: 0
+    checkout:
+      active: 0
+session: DBIC
+engines:
+  session:
+    DBIC:
+      db_connection_name: default
+template: template_flute

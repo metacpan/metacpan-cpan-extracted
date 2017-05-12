@@ -1,0 +1,16 @@
+Revision history for Data-Focus
+
+0.03    2015-04-20
+        [ENHANCEMENT]
+        - Add "allow_blessed" option to Data::Focus::Lens::HashArray::Index.
+        - Add Data::Focus::Lens::Dynamic.
+        - Now non-lenses are coerced into Data::Focus::Lens::Dynamic class.
+        - Add Data::Focus::Lens::Accessor.
+
+0.02    2015-02-08
+        [ENHANCEMENT]
+        - Performance improvement (about 40%)
+
+0.01    2015-01-18
+        First version, released on an unsuspecting world.
+

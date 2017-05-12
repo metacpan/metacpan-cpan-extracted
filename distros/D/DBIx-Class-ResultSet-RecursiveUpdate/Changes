@@ -1,0 +1,83 @@
+Revision history for DBIx::Class::ResultSet::RecursiveUpdate
+
+0.34      2014-02-06 23:37:32 America/New_York
+
+0.34 2014-02-07
+    - More changes to support custom CODE relationship condition
+
+0.33      2014-02-06 14:58:54 America/New_York
+    - Don't die on custom CODE relationship condition
+
+0.32      2014-01-20 19:15:29+01:00 Europe/Vienna
+    - 'id' can't be used any more as an alias for the primary key column name
+      as DBIx::Class doesn't treat it special
+    - Try to construct a new row object with all given update attributes and
+      use it to find the row in the database
+
+0.31 Wed Nov 6, 2013
+    - Fixed failing test when DBIC_TRACE_PROFILE is set
+    - Fix problem with join_type LEFT and undef (rt67528)
+    - discard_changes before handling post_updates
+
+0.30  Fri Jun 7, 2013
+    - Update foreign key instead of related object when all PKs are set on a
+      relationship with accessor single or filter
+
+0.29 Thu May 2, 2013
+    - Remove DBIx::Class::InflateColumn::FS dependency
+
+0.28  Wed Apr 3, 2013
+    - Don't delete and re-add all many-to-many rows. Transform m2m data to
+      recursive has_many data if IntrospectableM2M is loaded.
+
+0.27  Tues Feb 26, 2013
+    - Do an update on the object when there are 'other_updates' in addition
+      to when the row 'is_changed' because of possible custom update methods
+
+0.26  Wed Nov 28, 2012
+    - Fix multi-pk has_many bug
+    - Fix has_many with where conditions
+
+0.25  Thu Apr 12, 2012
+    - Suppress DBIC warnings: NULL/undef values supplied for requested
+      unique constraint 'primary'.
+
+0.24      2011-05-16 15:34:10 America/New_York
+    - Fixed test case that was failing on newer versions of DBIC, which
+      is more strict when inspecting relationship join conditions.  You
+      will need this when you want to upgrade DBIC.
+
+0.23      2011-02-24 18:23:50 Europe/Vienna
+    - Fixed moosified-rs.t failures by making the test skip if not all
+      dependencies are met. Requiring Moose for a compatability test would
+      have been overkill. (thanks CPANTesters & RT#65959)
+
+0.22      2011-02-09 19:06:34 Europe/Vienna
+    - Fixed updating of nullable has_many rels (RT#65561)
+    - Fixed usage with moosified resultsets (RT#64773)
+
+0.21      2010-10-28 16:56:18 Europe/Vienna
+    - Warn instead of throwing an exception if a key is neither
+      a column, a relationship nor a many-to-many helper.
+    - More documentation improvements
+
+0.20      2010-10-19 09:25:33 Europe/Vienna
+    - Support has_many relationships with multi-column primary keys
+
+0.013  Thu Apr 08 15:37:13 UTC  2010
+    - Allow might_have relationships to be empty
+
+0.012  Thu Sep 10 19:44:25 CEST 2009
+    - updating records linked to by many to many
+
+0.009  Sat Jun 20 16:37:57 CEST 2009
+    - if_not_submitted flag (experimental)
+
+0.006  Fri May 15 11:03:48 CEST 2009
+    - Some adjustments for HTML::FormHandler
+
+0.004  Sun Apr 19 11:15:57 CEST 2009
+    - Added functional interface - for easy use in Form Processors
+
+0.001  Wed Jun 18 13:09:28 2008
+    - Initial release.

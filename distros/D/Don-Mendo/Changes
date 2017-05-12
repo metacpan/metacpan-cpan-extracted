@@ -1,0 +1,13 @@
+2010-03-16    <jmerelo@localhost.localdomain>
+
+	* lib/Don/Mendo.pm (jornadas): Just changes in documentation. NO big deal. 
+
+Revision history for Don-Mendo
+
+0.0.5  Mon Oct 20 20:00:00 2008
+       Added a few functions more to the interface, and fixed some bugs.
+       Now with documentation too!
+
+0.0.1  Sun Oct 19 09:51:36 2008
+       Initial release.
+

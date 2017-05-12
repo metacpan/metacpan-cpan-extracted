@@ -1,0 +1,99 @@
+@prefix dc:    <http://purl.org/dc/terms/> .
+@prefix doap:  <http://usefulinc.com/ns/doap#> .
+@prefix doap-changeset: <http://ontologi.es/doap-changeset#> .
+@prefix doap-deps: <http://ontologi.es/doap-deps#> .
+@prefix foaf:  <http://xmlns.com/foaf/0.1/> .
+@prefix property: <http://dbpedia.org/property/> .
+@prefix rdfs:  <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd:   <http://www.w3.org/2001/XMLSchema#> .
+
+<http://dbpedia.org/resource/Bruce_Willis>
+	property:birthDate   "1955-03-19"^^xsd:date.
+
+<http://dev.perl.org/licenses/>
+	dc:title             "the same terms as the perl 5 programming language system itself".
+
+<http://purl.org/NET/cpan-uri/dist/Die-Hard/project>
+	a                    doap:Project;
+	dc:contributor       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap-deps:runtime-requirement [ doap-deps:on "perl 5.008"^^doap-deps:CpanId ], [ doap-deps:on "Moo"^^doap-deps:CpanId ];
+	doap-deps:test-requirement [ doap-deps:on "Test::Exception"^^doap-deps:CpanId ], [ doap-deps:on "Test::More 0.61"^^doap-deps:CpanId ];
+	doap:bug-database    <http://rt.cpan.org/Dist/Display.html?Queue=Die-Hard>;
+	doap:created         "2012-07-02"^^xsd:date;
+	doap:developer       <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:download-page   <https://metacpan.org/release/Die-Hard>;
+	doap:homepage        <https://metacpan.org/release/Die-Hard>;
+	doap:license         <http://dev.perl.org/licenses/>;
+	doap:maintainer      <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:name            "Die-Hard";
+	doap:programming-language "Perl";
+	doap:release         <http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-001>, <http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-002>, <http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-003>, <http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-004>;
+	doap:repository      [
+		a doap:GitRepository;
+		doap:browse <https://github.com/tobyink/p5-die-hard>;
+	];
+	doap:shortdesc       "objects as resistant to dying as John Maclane".
+
+<http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-001>
+	a                    doap:Version;
+	rdfs:label           "You don't like flying, do you?";
+	dc:identifier        "Die-Hard-0.001"^^xsd:string;
+	dc:issued            "2012-07-11"^^xsd:date;
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Die-Hard-0.001.tar.gz>;
+	doap:revision        "0.001"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-002>
+	a                    doap:Version;
+	rdfs:label           "No one kills him but me!";
+	dc:identifier        "Die-Hard-0.002"^^xsd:string;
+	dc:issued            "2013-03-19"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Update;
+			rdfs:label "Move from (deprecated) Any::Moose to Moo.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Die-Hard-0.002.tar.gz>;
+	doap:revision        "0.002"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-003>
+	a                    doap:Version;
+	dc:identifier        "Die-Hard-0.003"^^xsd:string;
+	dc:issued            "2014-09-10"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Switch to Dist::Inkt.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Die-Hard-0.003.tar.gz>;
+	doap:revision        "0.003"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/dist/Die-Hard/v_0-004>
+	a                    doap:Version;
+	rdfs:label           "Zeus! You got a problem with that?";
+	dc:identifier        "Die-Hard-0.004"^^xsd:string;
+	dc:issued            "2014-09-15"^^xsd:date;
+	doap-changeset:changeset [
+		doap-changeset:item [
+			a doap-changeset:Packaging;
+			rdfs:label "Add repo link.";
+		], [
+			a doap-changeset:Documentation;
+			rdfs:label "Mention $_try from Object::Util.";
+		];
+	];
+	doap-changeset:released-by <http://purl.org/NET/cpan-uri/person/tobyink>;
+	doap:file-release    <http://backpan.cpan.org/authors/id/T/TO/TOBYINK/Die-Hard-0.004.tar.gz>;
+	doap:revision        "0.004"^^xsd:string.
+
+<http://purl.org/NET/cpan-uri/person/tobyink>
+	a                    foaf:Person;
+	foaf:mbox            <mailto:tobyink@cpan.org>;
+	foaf:name            "Toby Inkster";
+	foaf:nick            "TOBYINK";
+	foaf:page            <https://metacpan.org/author/TOBYINK>.
+

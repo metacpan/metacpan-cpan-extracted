@@ -1,0 +1,293 @@
+######################################################################
+    DNS::ZoneParse 1.10
+######################################################################
+
+NAME
+    DNS::ZoneParse - Parse and manipulate DNS Zone Files.
+
+SYNOPSIS
+        use DNS::ZoneParse;
+    
+        my $zonefile = DNS::ZoneParse->new("/path/to/dns/zonefile.db", $origin);
+    
+        # Get a reference to the MX records
+        my $mx = $zonefile->mx;
+    
+        # Change the first mailserver on the list
+        $mx->[0] = { host => 'mail.localhost.com',
+                     priority => 10,
+                     name => '@' };
+    
+        # update the serial number
+        $zonefile->new_serial();
+    
+        # write the new zone file to disk 
+        my $newzone;
+        open($newzone, '>', '/path/to/dns/zonefile.db') or die "error";
+        print $newzone $zonefile->output();
+        close $newzone;
+
+INSTALLATION
+       perl Makefile.PL
+       make
+       make test
+       make install
+
+    Win32 users substitute "make" with "nmake" or equivalent. nmake is
+    available at
+    http://download.microsoft.com/download/vc15/Patch/1.52/W95/EN-US/Nmake15
+    .exe
+
+DESCRIPTION
+    This module will parse a Zone File and put all the Resource Records
+    (RRs) into an anonymous hash structure. Various record types are
+    supported, see the methods section for details. It could be useful for
+    maintaining DNS zones, or for transferring DNS zones to other servers.
+    If you want to generate an XML-friendly version of your zone files, it
+    is easy to use XML::Simple with this module once you have parsed the
+    zone file.
+
+    DNS::ZoneParse scans the DNS zone file - removes comments and seperates
+    the file into its constituent records. It then parses each record and
+    stores the records internally. See below for information on the accessor
+    methods.
+
+  METHODS
+    new This creates the DNS::ZoneParse object and loads the zone file.
+
+        Example: my $zonefile = DNS::ZoneParse->new("/path/to/zonefile.db");
+
+        You can also initialise the object with the contents of a file: my
+        $zonefile = DNS::ZoneParse->new( \$zone_contents );
+
+        You can pass a second, optional parameter to the constructor to
+        supply an $origin if none can be found in the zone file.
+
+            my $zonefile = DNS::ZoneParse->new( \$zone_contents, $origin );
+
+        You can pass a third, optional parameter to the constructor to
+        supply a callback which will be called whenever an unparsable line
+        is encountered in the zone file. See "on_unparseable_line" for
+        details on this parameter and how errors are handled when parsing
+        zone files.
+
+        If you plan to pass a on_unparseable_line callback but do not wish
+        to specify an $origin, pass 'undef' as the $origin parameter.
+
+    a(), cname(), srv(), mx(), ns(), ptr(), txt(), hinfo(), rp(), loc()
+        These methods return references to the resource records. For
+        example:
+
+            my $mx = $zonefile->mx;
+
+        Returns the mx records in an array reference.
+
+        All records (except SOA) have the following properties: 'ttl',
+        'class', 'host', 'name', 'ORIGIN'.
+
+        MX records also have a 'priority' property.
+
+        SRV records also have 'priority', 'weight' and 'port' properties.
+
+        TXT records also have a 'text' property representing the record's
+        'txt-data' descriptive text.
+
+        HINFO records also have 'cpu' and 'os' properties.
+
+        RP records also have 'mbox' and 'text' properties.
+
+        LOC records also have 'd1', 'm1', 's1', 'NorS', 'd2', 'm2', 's2',
+        'EorW', 'alt', 'siz', 'hp', and 'vp', as per RFC 1876.
+
+        If there are no records of a given type in the zone, the call will
+        croak with an error message about an invalid method. (This is not an
+        ideal behavior, but has been kept for backwards compatibility.)
+
+        The 'ORIGIN' property is the fully-qualified origin of the record.
+        See fqname for details on constructing a fully qualified domain
+        name. Note: for SOA records, the 'ORIGIN' will match the 'origin'
+        property when the SOA record is specified as fully qualified.
+
+    soa()
+        Returns a hash reference with the following properties: 'serial',
+        'origin', 'primary', 'refresh', 'retry', 'ttl', 'minimumTTL',
+        'email', 'expire', 'class', 'ORIGIN'.
+
+        The 'ORIGIN' property is returned separate from 'origin' property,
+        though the data may be the same. 'ORIGIN' represents the implicit
+        origin for the record while 'origin' represents the origin specified
+        on the SOA line in the file.
+
+        If the 'origin' value is relative (that is, does not end with a
+        '.'), the actual zone for which the SOA line applies must be
+        computed by concatenating the 'origin' and 'ORIGIN' values. See
+        fqname for details. If the 'origin' value is absolute, no
+        computation is necessary and 'origin' is the same as 'ORIGIN'.
+
+    generate()
+        Returns an array of hashes representing $GENERATE directives present
+        in the zone. Note, $GENERATE directives are BIND-specific additions.
+        They are not expanded by DNS::ZoneParse, but users are able to
+        access and modify these directives. The following properties are
+        returned:
+
+        'range', 'lhs', 'ttl', 'class', 'type', 'rhs', 'ORIGIN'.
+
+        See the BIND documentation for details on the syntax and usage of
+        the $GENERATE directive.
+
+    dump
+        Returns a copy of the datastructute that stores all the resource
+        records. This might be useful if you want to quickly transform the
+        data into another format, such as XML.
+
+    fqname
+        Takes a single parameter, a hash reference containing a record.
+
+        Returns the fully qualified name of this record, with a trailing
+        '.'. In most cases this is as simple as concatenating the 'name' and
+        'ORIGIN' with a '.' unless 'name' is '@', in which case the fqname
+        is simply the 'ORIGIN'. For SOA records, the same process is
+        performed on the 'origin' instead of 'name'.
+
+        Please note, fqname will not expand the right hand side of a record
+        (ie, CNAME, SOA, MX, etc). The user must expand these values via the
+        above method.
+
+    ttl_to_int
+        Takes a single parameter, a string representing a valid record TTL.
+
+        Returns an integer representing the number of seconds the TTL
+        represents. Note, this does not take into account any leap-years,
+        leap-seconds, DST changes, etc. It is simply the count of the number
+        of seconds in the specified period of time.
+
+    new_serial
+        "new_serial()" incriments the Zone serial number. It will generate a
+        date-based serial number. Or you can pass a positive number to add
+        to the current serial number.
+
+        Examples:
+
+            $zonefile->new_serial(); 
+                    # generates a new serial number based on date:
+                    # YYYYmmddHH format, incriments current serial
+                    # by 1 if the new serial is still smaller
+
+            $zonefile->new_serial(50);  
+                    # adds 50 to the original serial number
+
+    output
+        "output()" returns the new zone file output as a string. If you wish
+        your output formatted differently, you can pass the output of
+        "dump()" to your favourite templating module.
+
+    last_parse_error_count
+        Returns a count of the number of unparsable lines from the last time
+        a zone file was parsed. If no zone file has been parsed yet, returns
+        0.
+
+        If you want to be sure that a zone file was parsed completely and
+        without error, the return value of this method should be checked
+        after the constructor is called (or after a call to _parse).
+
+    on_unparseable_line
+        "on_unparseable_line()" is an accessor method for the callback used
+        when an unparseable line is encountered while parsing a zone file.
+        If not set, DNS::ZoneParse will "croak" when an unparsable line is
+        encountered, but will continue to parse the file. Each time an
+        unparsable line is encountered, an internal counter is incrememnted.
+        See "last_parse_error_count" for details.
+
+        The callback is passed four parameters, a reference to the
+        DNS::ZoneParse object which is doing the parsing, the text of the
+        line that is unable to be parsed, the text of the reason the line
+        could not be parsed, and the text of the last successfully parsed
+        line.
+
+        If you want to abort parsing when an unparsable line is found, call
+        "die" from within your callback and catch that die with an eval
+        block around the DNS::ZoneParse constructor (or call to _parse).
+
+        The method takes a single optional parameter, a code reference to
+        the function that will be called when an unparsable line is reached.
+        Returns a reference to the last callback. If passed an undefined
+        value, a reference to the current callback is returned. If passed
+        any other value, undef is returned.
+
+  EXAMPLES
+    This script will print the A records in a zone file, add a new A record
+    for the name "new" and then return the zone file.
+
+        use strict;
+        use DNS::ZoneParse;
+    
+        my $zonefile = DNS::ZoneParse->new("/path/to/zonefile.db");
+    
+        print "Current A Records\n";
+        my $a_records = $zonefile->a();
+    
+        foreach my $record (@$a_records) {
+            print "$record->{name} resolves at $record->{host}\n";
+        }
+    
+        push (@$a_records, { name => 'new', class => 'IN',
+                             host => '127.0.0.1', ttl => '' });
+    
+        $zonefile->new_serial();
+        my $newfile = $zonefile->output();
+
+    This script will convert a DNS Zone file to an XML file using
+    XML::Simple.
+
+        use strict;
+        use DNS::ZoneParse;
+        use XML::Simple;
+
+        my $zonefile = DNS::ZoneParse->new("/path/to/zonefile.db");
+
+        my $new_xml = XMLout($zonefile->dump,
+                             noattr => 1,
+                             suppressempty => 1,
+                             rootname => $zonefile->origin);
+
+CHANGES
+    See Changes
+
+API
+    The DNS::ZoneParse API may change in future versions. At present, the
+    parsing is not as strict as it should be and support for $ORIGIN and
+    $TTL is quite basic. It would also be nice to support the "INCLUDE"
+    statement. Furthermore, parsing large zone files with thousands of
+    records can use lots of memory - some people have requested a callback
+    interface.
+
+BUGS
+    I can squash more bugs with your help. Please let me know if you spot
+    something that doesn't work as expected.
+
+    You can report bugs via the CPAN RT:
+    <http://rt.cpan.org/NoAuth/Bugs.html?Dist=DNS-ZoneParse>
+
+    If possible, please provide a diff against t/dns-zoneparse.t and
+    t/test-zone.db that demonstrates the bug(s).
+
+SEE ALSO
+    Other modules with similar functionality:
+
+    Net::DNS::ZoneParser, Net::DNS::ZoneFile, DNS::ZoneFile
+
+AUTHOR
+    Simon Flack
+
+MAINTENANCE
+    Maintainers: Mike Schilli (m@perlmeister.com), John Eaglesham
+    (perl@8192.net).
+
+    Bug queue:
+    http://rt.cpan.org/Public/Dist/Display.html?Name=DNS-ZoneParse
+
+LICENSE
+    DNS::ZoneParse is free software which you can redistribute and/or modify
+    under the same terms as Perl itself.
+

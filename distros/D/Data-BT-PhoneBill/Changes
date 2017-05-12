@@ -1,0 +1,27 @@
+Revision history 
+
+1.00  Tue Sep  6 18:54:49 UTC 2005 [Tony Bowden]
+	- Reference perl.com article
+	- Make fh() and csv() methods private
+
+0.96  Nov 13, 2003 [Tony Bowden]
+	- Fixed test failures
+
+0.95  Oct 20, 2003 [Simon Cozens]
+	- Added new chargecard, installation, line, rebate fields
+
+0.94  Wed Aug 14 2002 [Tony Bowden]
+ 	- Added Prerequisites to Makefile
+
+0.93  Tue Dec 11 2001 [Tony Bowden]
+	- Made the internal Call module 'private'
+	- added a 'fallback' for overloading
+	- documented the call 'type' method
+
+0.92  Mon Dec 10 2001 [Tony Bowden]
+	- Fixed the dependencies in the Makefile
+
+0.91  Mon Dec 10 2001 [Tony Bowden]
+	- Created this
+
+

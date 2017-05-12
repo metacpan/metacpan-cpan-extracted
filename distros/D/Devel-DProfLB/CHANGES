@@ -1,0 +1,6 @@
+
+0.01
+	prevent warnings due to profiling after END
+	prevent failure if POSIX::_SC_CLK_TCK is not defined
+
+

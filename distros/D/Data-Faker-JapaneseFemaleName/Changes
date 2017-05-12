@@ -1,0 +1,13 @@
+Revision history for Data-Faker-JapaneseFemaleName
+
+0.04    2008-08-11 19:47:55+0900
+	fixed bits to pass the test.
+
+0.03    2008-01-07 05:54:46+0900
+	use Module::Install.
+
+0.02    2007-04-13 22:15:34+0900
+        Require dependency Pod::Parser 1.35 because that Pod::Parser 1.14(Nu-CentOS-BQ v4.6) is too slow.
+
+0.01    2007-04-08 17:49:40+0900
+        First version, released on an unsuspecting world.

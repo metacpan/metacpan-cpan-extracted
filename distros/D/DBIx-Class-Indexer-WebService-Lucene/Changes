@@ -1,0 +1,9 @@
+Revision history for Perl extension DBIx::Class::Indexer::WebService::Lucene.
+
+0.02  Web May 02 2007
+    - change hardcoded "all" default field for user-supplied setting.
+      defaults to primary key if none set
+    - fix TimeStamp-based column retrieval
+
+0.01  Tue Apr 03 2007
+    - original version;

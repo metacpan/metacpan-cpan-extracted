@@ -1,0 +1,110 @@
+==================================================
+Changes from 2013-07-08 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.016 at 2014-07-08 07:20:57 +0000
+------------------------------------------
+
+  Change: 69575d802510ce46f92d598e9e0f6341ad4b25f9
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 02:44:12 +0000
+
+    rt.cpan.org 90394. Use Dist::Zilla::File::InMemory so it's always
+    loaded when needed.
+
+    Thanks, Pete Smith, for reporting the problem. 
+
+  Change: 0e8e0c907297022b645ad7f78ae637057a381a57
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2014-07-08 02:43:49 +0000
+
+    Looks like the AutoMetaResources plugin doesn't do license info
+    anymore. 
+
+------------------------------------------
+version 0.015 at 2013-08-11 16:35:25 +0000
+------------------------------------------
+
+  Change: 26417b1c0c702540ab07e88e0cf3310c1b43c002
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-11 12:35:25 +0000
+
+    Exclude some more perl core modules from the versioned dependencies. 
+
+------------------------------------------
+version 0.012 at 2013-08-10 21:11:07 +0000
+------------------------------------------
+
+  Change: e4f06498bfb41e0465bfb90f1fc46377aa2dc651
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-10 17:11:07 +0000
+
+    Exclude versions for modules that would upgrade Perl. 
+
+------------------------------------------
+version 0.011 at 2013-08-10 20:37:39 +0000
+------------------------------------------
+
+  Change: 28486ef8e4d364f31df78cf7ccbf2437ca0d4fa6
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-10 16:37:39 +0000
+
+    Set all prerequisite versions to what's installed.
+
+    Thanks, Kent Fredric, for responding to my bug report/wishlist
+    request with Dist::Zilla::Plugin::Prereqs::MatchInstalled::All. 
+
+------------------------------------------
+version 0.010 at 2013-08-06 00:49:34 +0000
+------------------------------------------
+
+  Change: 4683677453582bf655374e531f8ccb11ca017875
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-05 20:49:34 +0000
+
+    More dist.ini modernization. 
+
+------------------------------------------
+version 0.009 at 2013-08-05 07:08:02 +0000
+------------------------------------------
+
+  Change: 2f3694e12d62da200657ada6e25b94275614a3db
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-05 03:08:02 +0000
+
+    Modernize dependencies and dist.ini idioms. 
+
+------------------------------------------
+version 0.008 at 2013-08-04 18:44:32 +0000
+------------------------------------------
+
+  Change: 5c00f5cd94ded7c9a19999d8c7f0dbc960ddbdc1
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-08-04 14:44:32 +0000
+
+    It's August 2013. About time I changed the copyright notice. 
+
+  Change: 4cd053ec73ce66858dd8b709cc55eb16b9acdce0
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-05 02:09:44 +0000
+
+    Add the new dependency upon IPC::Cmd. 
+
+  Change: 668a94a07d6ad4d07b0a644a9ec7d7cba6c5651e
+  Author: Rocco Caputo <rcaputo@cpan.org>
+  Date : 2013-07-04 23:07:12 +0000
+
+    Merge pull request #9 from jddurand/master
+
+    Portability + log on HEAD detection 
+
+  Change: 2cfaaa70ee7f344d17e6a0de0072dd16daea6fd3
+  Author: Jean-Damien Durand <jeandamiendurand@free.fr>
+  Date : 2013-06-04 01:59:25 +0000
+
+    Portability + logic on detection of HEAD 
+
+================================================
+Plus 6 releases after 2013-07-08 00:00:00 +0000.
+================================================

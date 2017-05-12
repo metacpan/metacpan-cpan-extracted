@@ -1,0 +1,145 @@
+NAME
+    DBIx::Class::PhoneticSearch - Phonetic search with DBIC
+
+SYNOPSIS
+        package MySchema::User;
+  
+        use base 'DBIx::Class';
+
+        __PACKAGE__->load_components(qw(PhoneticSearch Core));
+
+        __PACKAGE__->table('user');
+
+        __PACKAGE__->add_columns(
+          id       => { data_type => 'integer', auto_increment => 1, },
+          surname  => { data_type => 'character varying', 
+                        phonetic_search => 1 },
+          forename => { data_type => 'character varying', 
+                        phonetic_search => { algorithm => 'Koeln', 
+                                             no_indices => 1 } },
+      
+        );
+
+        __PACKAGE__->set_primary_key('id');
+
+        __PACKAGE__->resultset_class('DBIx::Class::ResultSet::PhoneticSearch');
+    
+      # somewhere else
+      $rs = $schema->resultset('User');
+      $rs->create({ forename => 'John', surname => 'Night' });
+  
+      $rs->search_phonetic({ forename => 'Jon' })->first->forename;  # John
+      $rs->search_phonetic({ surname => 'Knight' })->first->surname; # Night
+      $rs->search_phonetic({ forename => 'Jon', 
+                             surname => 'Knight' })->first->surname; # Night
+      $rs->search_phonetic([ surname => 'Smith' ,
+                             surname => 'Knight' ])->first->surname; # Night (ORed)
+  
+DESCRIPTION
+    This components allows for phonetic search of columns. If you add the
+    `phonetic_search' attribute to a column, this component will add an
+    extra column to the result class which is basically an index of the
+    value based on its pronunciation. Every time the column is updated, the
+    phonetic column is set as well. It uses Text::Phonetic to compute the
+    phonetic representation of the value in that column. Use search_phonetic
+    to search for rows which sound similar to a given value.
+
+    The name of the phonetic column consists of the original column name and
+    the algorithm used:
+
+      $column + _phonetic_ + $algorithm
+
+    The above example will require two additional columns:
+
+      surname_phonetic_phonix character varying,
+      forename_phonetic_koeln character varying,
+  
+    Make sure they exist in you database!
+
+    The default algorithm is Text::Phonetic::Phonix.
+
+    This component will also add indices for both the column and the
+    phonetic column. This can be disabled by setting no_indices.
+
+    To set the phonetic column on an already populated resultset use
+    update_phonetic_columns.
+
+RESULTSET METHODS
+  search_phonetic
+    This method is used to search a resultset for a given set of
+    column/value pairs.
+
+    You can call this method with either an arrayref or hashref. Arrayref
+    will cause a query which will join the queries with `OR'. A hashref will
+    join them with an `AND'.
+
+    Returns a DBIx::Class::ResultSet.
+
+  update_phonetic_column
+      $rs->update_phonetic_column('columnname');
+
+    This method will update the phonetic column of a column.
+
+  update_phonetic_columns
+    Calls update_phonetic_column for each column with an phonetic column.
+
+ADVANCED CONFIGURATION
+  algorithm
+    Choose one of `DaitchMokotoff DoubleMetaphone Koeln Metaphone Phonem
+    Phonix Soundex SoundexNara'.
+
+    See Text::Phonetic for more details.
+
+    Defaults to `Phonix'.
+
+  no_indices
+    By default this module will create indices on both the source column and
+    the phonetic column. Set this attribute to a true value to disable this
+    behaviour.
+
+OVERWRITTEN RESULT METHODS
+  register_column
+    Set up the environment and add the phonetic columns.
+
+  store_column
+    Set the phonetic column to the encoded value.
+
+  sqlt_deploy_hook
+    This is where the indices are created.
+
+AUTHOR
+    Moritz Onken, `<onken at netcubed.de>'
+
+BUGS
+    Please report any bugs or feature requests to
+    `bug-dbix-class-phoneticsearch at rt.cpan.org', or through the web
+    interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=DBIx-Class-PhoneticSearch
+    . I will be notified, and then you'll automatically be notified of
+    progress on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc DBIx::Class::PhoneticSearch
+
+    You can also look for information at:
+
+    * RT: CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-PhoneticSearch
+
+    * AnnoCPAN: Annotated CPAN documentation
+        http://annocpan.org/dist/DBIx-Class-PhoneticSearch
+
+    * CPAN Ratings
+        http://cpanratings.perl.org/d/DBIx-Class-PhoneticSearch
+
+    * Search CPAN
+        http://search.cpan.org/dist/DBIx-Class-PhoneticSearch/
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Moritz Onken, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

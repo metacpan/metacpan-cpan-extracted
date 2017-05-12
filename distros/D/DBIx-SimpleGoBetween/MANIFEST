@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-SimpleGoBetween.t
+lib/DBIx/SimpleGoBetween.pm
+META.yml                                 Module meta-data (added by MakeMaker)

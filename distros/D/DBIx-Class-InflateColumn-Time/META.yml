@@ -1,0 +1,33 @@
+---
+abstract: 'Automagically inflates time columns into DateTime::Duration objects'
+author:
+  - 'Robert Stone <drzigman@cpan.org>'
+build_requires:
+  Data::Dumper: 0
+  DateTime: 0
+  File::Spec: 0
+  IO::Handle: 0
+  IPC::Open3: 0
+  Module::Build: 0.3601
+  Test::More: 0
+  Test::Most: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300039, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-InflateColumn-Time
+requires:
+  DBIx::Class: 0
+  DateTime::Duration: 0
+  base: 0
+  namespace::autoclean: 0
+  perl: 5.006
+resources:
+  bugtracker: https://github.com/drzigman/dbix-class-inflatecolumn-time/issues
+  homepage: http://search.cpan.org/dist/DBIx-Class-InflateColumn-Time
+  repository: git://github.com/drzigman/dbix-class-inflatecolumn-time.git
+version: 0.0.1

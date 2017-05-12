@@ -1,0 +1,200 @@
+version 0.012; 2012-02-04
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .gitignore
+
+version 0.011; 2010-10-21
+
+  * port to Perl 5.13.6, where changed behaviour of signed zeroes in
+    Perl arithmetic broke nextdown() and nextafter() and caused false
+    test failures for several other functions
+
+version 0.010; 2010-07-26
+
+  * use simpler "parent" pragma in place of "base"
+
+  * in documentation, use the term "truth value" instead of the less
+    precise "boolean"
+
+  * check for required Perl version at runtime
+
+  * use full stricture in test suite
+
+  * use full stricture in Build.PL
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * remove bogus "exit 0" from Build.PL
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.009; 2008-04-06
+
+  * refer to optional constants more carefully in the code, to avoid
+    syntax problems on systems that lack infinities and NaNs
+
+  * fix a skip count that caused false test failures on systems lacking
+    signed zeroes
+
+version 0.008; 2008-04-02
+
+  * bugfix: in initialisation, correctly override any ambient
+    $SIG{__DIE__}
+
+version 0.007; 2007-10-02
+
+  * close DATA filehandle when finished reading from it
+
+  * fix some tests that were producing false failures on perl 5.6
+
+version 0.006; 2007-10-01
+
+  * bugfix: change behaviour of nextafter() when both arguments are
+    numerically zero to that specified by IEEE 754: the second argument
+    is returned rather than the first
+
+  * bugfix: in hex_float(), cleanly reject non-ASCII digits in exponent
+
+  * bugfix: in float_hex(), cleanly reject non-ASCII digits in an
+    "EXPONENT="-type "zero_strategy" setting
+
+  * add IEEE 754r functions nextup() and nextdown()
+
+  * add IEEE 754r function totalorder()
+
+  * add constant max_number
+
+  * hex_float(): accept IEEE 754r special input strings "infinity" and
+    "snan", in addition to the existing "inf" and "nan"
+
+  * hex_float(): make the "0x" prefix in hexadecimal input optional
+
+  * float_hex(): new option "hex_prefix_string" to control the "0x" prefix
+
+  * test classification functions, examination functions, string
+    conversion functions, and manipulation functions (all the functions
+    that were not being tested)
+
+  * test all functions for lack of side effects on zero arguments and
+    purity of zero results
+
+  * in documentation, note new standard-conforming behaviour of copysign()
+    with a NaN second argument
+
+  * in documentation, note that hex_float() accepts the special "0.0"
+    form of input without a sign, as well as with one
+
+  * in documentation, where the IEEE standard nature of functions is
+    noted, add discussion of non-conforming behaviour on NaNs
+
+  * in documentation, change some variable names in the synopsis for
+    clarity
+
+  * test POD syntax and coverage, and rename some internal functions to
+    satisfy the coverage test
+
+  * tweak tests on constants to avoid infinite loops if importing constant
+    functions fails
+
+  * build with Module::Build instead of ExtUtils::MakeMaker
+
+  * complete dependency list
+
+  * include signature in distribution
+
+  * in documentation, separate "license" section from "copyright" section
+
+version 0.005; 2007-01-25
+
+  * bugfix: change behaviour of copysign() with a NaN as the second
+    argument to that specified by IEEE 754: it is not an error but
+    (in the context of Perl's opaque NaNs) results in copying an
+    unpredictable sign
+
+  * add hex_float() function to input floating point values in hexadecimal
+
+  * add IEEE 754 function signbit()
+
+  * float_id_cmp(): tighten specification of return values to match
+    Perl's <=> operator (actual behaviour always matched the tighter spec,
+    it just wasn't documented and tested)
+
+  * in documentation, note that the string values of float arguments
+    are ignored
+
+  * in documentation, clarify note about implicit conversion of integer
+    to float
+
+  * in documentation, note that both arguments to nextafter() must be
+    floating point values
+
+  * in documentation, note standard nature of signbit(), copysign(),
+    and nextafter()
+
+  * in documentation, note float_id_cmp()'s relation to the IEEE 754r
+    function totalorder()
+
+  * in documentation, note that Perl does not distinguish between
+    different NaNs
+
+  * in documentation, give a second definition of max_integer (equivalent
+    to the first)
+
+  * add test for consistency of constants
+
+  * in documentation, reference Scalar::Number
+
+  * remove now-useless test t/use.t
+
+version 0.004; 2007-01-12
+
+  * bugfix: correct value for max_integer to 2^(significand_bits+1),
+    and correct its description in the documentation
+
+  * make pos_zero and neg_zero constants into non-constant functions
+    that return fresh floating point zeroes, if running on a Perl where
+    floating point zeroes can transmogrify into integer zeroes
+
+  * add float_id_cmp() function for total ordering of floats
+
+  * in documentation, more details of behaviour of zeroes
+
+  * in documentation, discussion of interaction with native integer values
+
+  * in documentation, note truncating behaviour of the % operator
+
+  * in documentation, note the slightly misleading nature of the names
+    "significand_bits" and "max_integer"
+
+  * reference Data::Integer and perlnumber(1) in documentation
+
+version 0.003; 2006-08-08
+
+  * float_hex(): add OPTIONS parameter to control details of output
+    formatting
+
+  * when looking for NaNs, see whether the string "nan" qualifies
+
+  * slight clarification to documentation of significand_step
+
+version 0.002; 2006-08-03
+
+  * bugfix: in mult_pow2(), copysign(), and nextafter(), take care
+    to return a pristine signed zero when returning zero: they were
+    returning zeroes that got broken (due to the Perl bug noted in the
+    documentation) by internal arithmetic
+
+version 0.001; 2006-08-01
+
+  * add IEEE 754 functions copysign() and nextafter()
+
+  * test sign of zero using sprintf() to avoid being confused by dualvars
+
+  * slight expansion of initial paragraph of documentation
+
+version 0.000; 2006-07-30
+
+  * initial released version

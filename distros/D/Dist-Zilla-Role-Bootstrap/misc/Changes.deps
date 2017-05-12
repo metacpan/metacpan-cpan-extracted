@@ -1,0 +1,111 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+1.001004
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+1.001003 2016-04-29T22:50:28Z
+ [Changed / configure requires]
+ - perl 5.008 → 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Changed / test requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+1.001002 2015-07-01T04:05:24Z
+
+1.001001 2015-06-29T09:03:38Z
+
+1.001000 2015-01-20T20:29:54Z
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Removed / runtime requires]
+ - MooseX::AttributeShortcuts 0.015
+
+1.000003 2014-08-15T21:30:54Z
+ [Added / test requires]
+ - File::Spec
+
+ [Changed / configure requires]
+ - ExtUtils::MakeMaker 6.30 → 0
+
+ [Removed / test requires]
+ - File::Spec::Functions
+ - List::Util
+
+1.000002 2014-07-15T09:52:40Z
+
+1.000001 2014-04-05T07:37:23Z
+ [Added / test requires]
+ - FindBin
+
+ [Removed / test requires]
+ - Path::FindDev
+
+1.000000 2014-04-05T05:29:35Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker 6.30
+
+ [Added / runtime requires]
+ - utf8
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec::Functions
+ - List::Util
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4200
+
+ [Removed / configure requires]
+ - Module::Build 0.4200
+
+0.2.3 2013-11-18T17:50:53Z
+ [Changed / runtime requires]
+ - MooseX::AttributeShortcuts 0 → 0.015
+
+0.2.2 2013-11-18T04:24:16Z
+ [Changed / build requires]
+ - Module::Build 0.4007 → 0.4200
+
+ [Changed / configure requires]
+ - Module::Build 0.4007 → 0.4200
+
+ [Changed / runtime requires]
+ - perl v5.10.0 → 5.006
+
+ [Changed / test requires]
+ - Test::More 0.98 → 1.001002
+
+ [Removed / test requires]
+ - File::Spec
+ - IO::Handle
+ - IPC::Open3
+
+0.2.1 2013-09-24T02:37:30Z
+ [Removed / runtime requires]
+ - Cwd
+
+0.2.0 2013-09-21T12:39:54Z
+ [Added / runtime requires]
+ - List::UtilsBy
+ - version
+
+ [Added / test requires]
+ - File::Copy::Recursive
+ - File::Spec

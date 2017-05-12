@@ -1,0 +1,38 @@
+Revision history for Date::Gregorian::Simple
+
+0.10  Sun Jan 15 11:30:00 2017
+      - Updated the dependency on Date::Utils v0.22.
+
+0.09  Wed Dec 14 12:05:00 2016
+      - Added test scripts (t/meta-json.t and t/meta-yml.t).
+
+0.08  Sat Nov 05 13:55:00 2016
+      - Added key 'provides' to the Makefile.PL script.
+
+0.07  Tue Aug 02 11:45:00 2016
+      - Updated the dependency on Date::Utils v0.21.
+
+0.06  Sun Jul 17 10:20:00 2016
+      - Updated the dependency on Date::Utils v0.20.
+      - Dropped method get_calendar() as it's no longer relevant here.
+
+0.05  Sat May 14 05:00:00 2016
+      - Updated the dependency on Date::Utils v0.18.
+      - Updated method get_calendar() and method as_string() to use get_month_name().
+      - Renamed method gregorian_months() to months().
+      - Renamed method gregorian_days() to days().
+      - Updated method get_calendar() to respect the above changes.
+
+0.04  Mon Apr 25 11:20:00 2016
+      - Updated the dependency on Date::Utils v0.16.
+      - Added section "SEE ALSO".
+
+0.03  Thu Apr 07 10:10:00 2016
+      - Added unit test script.
+      - Re-generated meta files correctly.
+
+0.02  Sat Apr 02 14:10:00 2016
+      - Added LICENSE file.
+
+0.01  Wed Mar 16 12:00:00 2016
+      - First version, released.

@@ -1,0 +1,12 @@
+Revision history for Perl extension DataTables.
+
+0.03 Tue July 30 16:54:34 2013
+	- fixed documentation because it looked stupid
+
+0.02
+	- fixed issue where database connecting wasn't dynamic
+
+0.01  Sun Sep 23 20:22:04 2012
+	- original version; created by h2xs 1.23 with options
+		-X -n DataTables
+

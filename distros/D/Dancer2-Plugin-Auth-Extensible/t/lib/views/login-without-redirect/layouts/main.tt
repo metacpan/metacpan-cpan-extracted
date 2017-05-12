@@ -1,0 +1,6 @@
+<html>
+<body>
+<p>This text is in the layout</p>
+[% content %]
+</body>
+</html>

@@ -1,0 +1,16 @@
+---
+abstract: 'create core dumps of the running perl interpreter, without terminating'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: bsd
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-CoreDump
+no_index:
+  directory:
+    - inc
+    - t
+version: 0.02

@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Device::Chip::BV4243;
+use Device::Chip::Adapter;
+
+use Getopt::Long;
+
+GetOptions(
+   'adapter|A=s' => \( my $ADAPTER = "FTDI" ),
+) or exit 1;
+
+my $chip = Device::Chip::BV4243->new;
+$chip->mount(
+   Device::Chip::Adapter->new_from_description( $ADAPTER )
+)->get;
+
+# Clear and home
+$chip->lcd_command( 0x01 )->get;
+$chip->lcd_string( $ARGV[0] // "Hello, world!" )->get;

@@ -1,0 +1,35 @@
+---
+abstract: 'MessagePack serializing/deserializing'
+author:
+  - 'Tokuhiro Matsuno'
+build_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.94
+  Test::Requires: 0
+configure_requires:
+  Devel::PPPort: 3.19
+  ExtUtils::MakeMaker: 6.59
+  ExtUtils::ParseXS: 3.18
+  File::Copy::Recursive: 0
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-MessagePack
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  XSLoader: 0.02
+  perl: 5.8.1
+resources:
+  bugtracker: https://github.com/msgpack/msgpack-perl/issues
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/msgpack/msgpack-perl
+version: '1.00'

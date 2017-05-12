@@ -1,0 +1,112 @@
+SYNOPSIS
+
+    In share/images, put some images e.g. img1.jpg and img2.png.
+
+    In dist.ini:
+
+     [InsertDistImages]
+     ;hosting=metacpan
+     ;include_files=...
+     ;exclude_files=...
+     ;include_file_pattern=...
+     ;exclude_file_pattern=...
+
+    In lib/Foo.pm or bin/bar:
+
+     ...
+    
+     # IMAGE: share/images/img1.jpg
+     # IMAGE: share/images/img2.png
+    
+     ...
+
+    After build, lib/Foo.pm will contain:
+
+     ...
+    
+     =begin html
+    
+     <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img1.jpg" />
+    
+     =end html
+    
+     =begin html
+    
+     <img src="https://api.metacpan.org/source/CPANID/Your-Dist-Name-0.123/share/images/img2.png" />
+    
+     =end html
+
+DESCRIPTION
+
+    This plugin finds # IMAGE directive in your POD/code and replace it
+    with a POD containing HTML snippet to load the images, using the
+    selected hosting provider's URL scheme.
+
+    Rationale: sometimes documentation needs some images. Sometimes the
+    proper (not to mention convenient) place to put the images is within
+    the distribution itself. And you want to be able to view the images
+    when you browse the POD in HTML form.
+
+    The #IMAGE directive must occur at the beginning of line and must be
+    followed by path to the image (relative to the distribution's root). It
+    is recommended to put the images in share/images.
+
+    You can put alternate locations by using |, e.g.:
+
+     # IMAGE: location1.jpg|location2.jpg
+
+    This can be useful if you are using hosting=data (where this plugin
+    needs to read the content of the file) and location1.jpg is produced by
+    another plugin and might not be ready or added to the build at the time
+    this plugin runs (but location2.jpg is the temporary version of the
+    file that already exists).
+
+    Shared image files deployed inside a tarball (such as one created using
+    Dist::Zilla::Plugin::ShareDir::Tarball) are not yet supported.
+
+CONFIGURATION
+
+ hosting => str (default: metacpan)
+
+    Choose hosting provider. Available choices:
+
+      * metacpan
+
+      This is the default because all distributions uploaded to PAUSE/CPAN
+      will normally show up on metacpan.org. Note that some people advise
+      not to abuse metacpan.org to host images because metacpan.org is not
+      an image hosting service. However, at the time of this writing, I
+      couldn't find any mention of this in the metacpan.org FAQ or About
+      pages.
+
+      * github
+
+      This can only be used if the distribution specifies its repository in
+      its metadata, and the repository URL's host is github.com.
+
+      * gitlab
+
+      This can only be used if the distribution specifies its repository in
+      its metadata, and the repository URL's host is gitlab.com.
+
+      * bitbucket
+
+      This can only be used if the distribution specifies its repository in
+      its metadata, and the repository URL's host is bitbucket.org.
+
+      * data
+
+      Instead of using a remote http/https hosting provider, this will
+      instead use data: URIs where the image data is directly embedded in
+      the URL.
+
+ include_files => str+
+
+ exclude_files => str+
+
+ include_file_pattern => re
+
+ exclude_file_pattern => re
+
+SEE ALSO
+

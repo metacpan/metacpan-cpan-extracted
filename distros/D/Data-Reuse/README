@@ -1,0 +1,18 @@
+README for Data::Reuse
+
+Provide an easy way to have constants and literal strings share memory.
+
+Copyright (c) 2006, 2007 Elizabeth Mattijsen <liz@dijkmat.nl>. All rights
+reserved.  This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+Version:
+ 0.10
+
+Required Modules:
+ Data::Alias (1.16)
+
+perl Makefile.PL
+make
+make test
+make install

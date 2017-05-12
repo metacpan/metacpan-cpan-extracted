@@ -1,0 +1,55 @@
+---
+abstract: 'common tests to check for copyright and license notices'
+author:
+  - 'Alan Young <ayoung@cpan.org>'
+build_requires:
+  Carp: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.4208'
+  Scalar::Util: '0'
+  Test::CPAN::Meta::JSON: '0'
+  Test::CheckDeps: '0.010'
+  Test::CheckManifest: '0'
+  Test::ConsistentVersion: '0'
+  Test::DistManifest: '0'
+  Test::HasVersion: '0'
+  Test::MinimumVersion: '0'
+  Test::More: '0.94'
+  Test::NoSmartComments: '0'
+  Test::Perl::Critic: '0'
+  Test::Pod::Content: '0'
+  Test::UseAllModules: '0'
+  Test::Version: '0'
+configure_requires:
+  Module::Build: '0.4208'
+  Module::Build::Version: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-Legal
+no_index:
+  directory:
+    - t
+    - xt
+requires:
+  Dist::Zilla::Plugin::InlineFiles: '0'
+  Moose: '0'
+  namespace::autoclean: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal/issues
+  homepage: https://metacpan.org/release/Dist-Zilla-Plugin-Test-Legal
+  repository: git://github.com/harleypig/Dist-Zilla-Plugin-Test-Legal.git
+version: '0.02'
+x_contributors:
+  - 'Alan Young <harleypig@gmail.com>'
+  - 'Harley Pig <harleypig@gmail.com>'
+  - 'Сергей Романов <sromanov-dev@yandex.ru>'

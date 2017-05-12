@@ -1,0 +1,22 @@
+This is the Debian GNU/Linux libdevice-megasquirt-perl version of the
+Device-MegaSquirt module by Jeremiah Mahler <jmmahler@gmail.com>
+
+Original source can be downloaded from http://search.cpan.org/dist/Device-MegaSquirt/
+
+Files: *
+Copyright: Copyright (c) 2010 Jeremiah Mahler. All Rights Reserved.
+License: (GPL1+|Artistic)
+ This module is free software.  It may be used, redistributed
+ and/or modified under the same terms as Perl itself.
+
+Perl license is:
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of either:
+
+ a) the GNU General Public License as published by the Free Software
+    Foundation; either version 1, or (at your option) any later version, or
+
+ b) the "Artistic License" which comes with Perl.
+
+On Debian GNU/Linux systems, the complete text of these licenses can be found
+in /usr/share/common-licenses/GPL and /usr/share/common-licenses/Artistic.

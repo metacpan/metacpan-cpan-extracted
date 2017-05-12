@@ -1,0 +1,189 @@
+NAME
+    Data::HashArray - An array class of hashes that has magical properties
+    via overloading and AUTOLOAD.
+
+ISA
+    This class does not descend from any other class.
+
+SYNOPSIS
+      my $a = Data::HashArray->new(
+                                              {code=>'FR', name=>'France', size=>'medium'},
+                                              {code=>'TR', name=>'Turkey', size=>'medium'},
+                                              {code=>'US', name=>'United States', size=>'large'}
+                                              );
+
+      print $a->[2]->{name};    # Prints 'United States'. No surprise.
+      print $a->[0]->{name};    # Prints 'France'. No surprise.
+      print $a->{name};             # Prints 'France'. OVERLOADED hash access.
+
+      my $h = $a->hash('code');             # One level hash (returns a hash of a HashArray of hashes)
+      my $h = $a->hash('size', 'code');     # Two level hash (returns a hash of a hash of a HashArray  of hashes)
+
+      my $h = $a->hash('size')                                              # One level hash on 'size'.  
+      my $h = $a->hash(sub { shift->{'size'}; })    # Same as above, but with a CODE reference
+
+DESCRIPTION
+    Normally, Data::HashArray is an array of hashes or hash-based objects.
+    This class has some magical properties that make it easier to deal with
+    multiplicity.
+
+    First, there exist two overloads. One for hash access and the other for
+    stringification. Both will act on the first element of the array. In
+    other words, performing a hash access on an object of this class will be
+    equivalent to performing a hash access on the first element of the
+    array.
+
+    Second, the AUTOLOAD method will delegate any method unkown to this
+    class to the first item in the array as well. For this to work, at least
+    the first item of the array better be an object on which one could call
+    such a method.
+
+    Both of these magical properties make it easier to deal with
+    unpredictable multiplicity. You can both treat the object as an array or
+    as hash (the first one in the array). This way, if your code deosn't
+    know that an element can occur multiple times (in other words, if the
+    code treats the element as singular), the same code should still largely
+    work when the singualr element is replaced by a Data::HashArray object.
+
+    The other practical feature of this class is the capabality to place the
+    objects (or hashes) in the array into a hash keyed on the value of a
+    given field or fields (see the "hash()" method for further details).
+
+OVERLOADS
+    Two overloads are performed so that a Data::HashArray object looks like
+    a simple hash or a singular object if treated like one.
+
+   hash access
+    If an object of this class is accessed as if it were a reference to a
+    hash with the usual "$object->{$key}" syntax, it will *behave* just like
+    a genuine hash. The access will be made on the first item of the array
+    (as this is an array class) assuming this item is a hash or hash-based
+    object.
+
+   stringification
+    If an object of this class is accessed as if it were a string, then the
+    stringification of the first item of the array will be returned.
+
+METHODS
+  CONSTRUCTORS
+   new()
+      my $array = Data::HashArray->new();           # An empty array
+      my $array = Data::HashArray->new(@items);     # An array with initial items in it.
+
+    CONSTRUCTOR.
+
+    The new() constructor method instantiates a new Data::HashArray object.
+    This method is inheritable.
+
+    Any items that are passed in the parameter list will form the initial
+    items of the array.
+
+  OTHER METHODS
+   hash()
+      my $h = $array->hash($field);         # Single hash level with one key field
+      my $h = $array->hash(@fields);        # Multiple hash levels with several key fields
+      
+  my $h = $array->hash('size')                                          # Concrete example. Hash on 'size'.  
+      my $h = $array->hash(sub { shift->{'size'}; })        # Same as above, but with a CODE reference
+
+    OBJECT METHOD.
+
+    Remember that the items of a Data::HashArray object are supposed to be
+    hashes or at least hash-based objects.
+
+    When called with a single argument, the hash() method will create a hash
+    of the items of the array keyed on the value of the argument 'field'.
+
+    An example is best. Assume that we have a Data::HashArray object that
+    looks like the following :
+
+      my $array = bless ([
+                          {code=>'FR', name=>'France', size=>'medium'},
+                          {code=>'TR', name=>'Turkey', size=>'medium'},
+                          {code=>'US', name=>'United States', size=>'large'}
+                         ], 'Data::HashArray');
+
+    Now, if we make a call to hash() as follows:
+
+      my $hash = $array->hash('code');
+
+    Then the resulting hash will look like the following:
+
+      $hash = {
+               FR=> bless ([{code=>'FR', name=>'France', size=>'medium'], 'Data::HashArray'),
+               TR=> bless ([{code=>'TR', name=>'Turkey', size=>'medium'], 'Data::HashArray'),
+               US=> bless ([{code=>'US', name=>'United States', size=>'large'}, 'Data::HashArray')
+      };
+
+    When, multiple fields are passes, then multiple levels of hashes will be
+    created each keyed on the field of the corresponding level.
+
+    If, for example, we had done the following call on the above array: my
+    $hash = $array->hash('size', 'code'};
+
+    We would then get the following hash:
+
+      $hash = {
+            large =>  {
+                    US=> bless ([{code=>'US', name=>'United States', size=>'large'}, 'Data::HashArray')
+                    },
+            medium => {
+                     FR=> bless ([{code=>'FR', name=>'France', size=>'medium'}], 'Data::HashArray'),
+                     TR=> bless ([{code=>'TR', name=>'Turkey', size=>'medium'}], 'Data::HashArrayy')
+                     }
+       };
+
+    Note that the last level of the hierarachy is always a HashArray of
+    hashes. This is done to accomodate the case where more then one item can
+    have the same key.
+
+    Note that the arguments to this method could also be CODE references. In
+    that case, the CODE is executed for each item in the array, passing the
+    item reference as the first argument to the CODE refernce. The code
+    BLOCK should return the expected key value for the item.
+
+    For example, the following are equivalent:
+
+      my $h = $array->hash('size')                                          # Concrete example. Hash on 'size'.  
+      my $h = $array->hash(sub { shift->{'size'}; })        # Same as above, but with a CODE reference passed as an argument.
+
+    .
+
+BUGS & CAVEATS
+    There no known bugs at this time, but this doesn't mean there are aren't
+    any. Use it at your own risk.
+
+    Note that there may be other bugs or limitations that the author is not
+    aware of.
+
+AUTHOR
+    Ayhan Ulusoy <dev@ulusoy.name>
+
+COPYRIGHT
+      Copyright (C) 2006-2008 Ayhan Ulusoy. All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+DISCLAIMER
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

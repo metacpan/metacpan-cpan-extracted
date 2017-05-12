@@ -1,0 +1,104 @@
+DBIx-POS version 0.03
+=====================
+
+DBIx-POS is a subclass of Pod::Parser that creates a POD dialect (POS
+for Plain Old SQL) for defining a SQL dictionary for an application.
+
+The dialect looks like:
+
+  =name domain_for_status
+
+  =desc retrieve the list of available domains with the given status
+
+  You often need to pull the list of domains for a given status (open,
+  closed, pending).
+
+  =param 
+
+  The status you want to use to filter the list of domains
+
+  =sql
+
+  select id,
+         name
+    from domain
+   where status = ?;
+
+  =cut
+
+You should subclass DBIx::POS, and put the definitions for your SQL in
+the .pm file like so:
+
+  package Foo;
+
+  use strict;
+  use base qw{DBIx::POS};
+  __PACKAGE__->instance (__FILE__);
+
+  =name testing
+
+  =desc test the DBI::POS module
+
+  =param
+
+  Some arbitrary parameter
+
+  =sql
+
+  There is really no syntax checking done on the content of the =sql section.
+
+  =cut
+
+and then you can get an instance of the subclass with which you can
+access the SQL statements, like so:
+
+  my $sql = Foo->instance;
+  $dbh->do ($sql->{testing});
+
+The objects accessible through the instances hashref stringify to the
+SQL statement.  You can also have multiple subclasses, each with their
+own set of SQL statements.
+
+By encouraging the centralization of SQL code, DBIx::POS guards
+against SQL statement duplication (and the multiple-update problem
+that can generate).
+
+By moving the SQL code out of the context of its place of use,
+DBIx::POS encourages you to do other things with it---it is easy to
+create a script that can do performance testing of certain SQL
+statements in isolation.
+
+By giving a framework for documenting the SQL, DBIx::POS encourages
+documentation of the intent and/or implementation of the SQL code.  It
+also provides all of that information in a format from which other
+documentation could be generated---say, a chunk of DocBook for
+incorporation into a guide to programming the application.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module depends only upon Pod::Parser, which has been part of the
+standard Perl distribution for some time.
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2004 by Michael Alan Dorman <mdorman@debian.org>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+The instance routine is from Andy Wardley's <abw@cre.canon.co.uk>
+Class::Singleton, and carries the following copyright and license.
+
+Copyright (C) 1998 Canon Research Centre Europe Ltd.  All Rights Reserved.
+
+This module is free software; you can redistribute it and/or modify it under 
+the term of the Perl Artistic License.

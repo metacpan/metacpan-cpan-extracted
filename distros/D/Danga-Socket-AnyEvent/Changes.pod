@@ -1,0 +1,15 @@
+=head1 Changelog for Danga::Socket::AnyEvent
+
+=head2 v0.04, June 18 2012
+
+Fix a bug in the F<Makefile.PL> causing the module to be installed at
+the wrong location.
+
+Fixes: L<http://www.cpantesters.org/cpan/report/e28dffee-b959-11e1-9066-3d54fb7543f5>
+
+=head2 v0.02, v0.03, May, June 2012
+
+Bugfix releases, affecting some corner case situations where events
+were not being woken up, or would wake up in unexpected situations.
+
+=cut

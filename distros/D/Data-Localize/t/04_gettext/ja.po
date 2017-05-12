@@ -1,0 +1,12 @@
+msgid "Hello, stranger!"
+msgstr "%1さん、こんにちは!"
+
+msgid "Dynamically Create Me!"
+msgstr "%test(a,b,c)を動的に作成したぜ!"
+
+msgid "Embedded Dynamic"
+msgstr "%test(%1,%2)を動的に作成したぜ!"
+
+msgid "Embedded Dynamic (function)"
+msgstr "%foo(%1,%2)を動的に作成したぜ!"
+

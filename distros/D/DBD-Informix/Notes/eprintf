@@ -1,0 +1,97 @@
+Date: Mon, 30 Mar 1998 16:48:12 -0800
+From: Alex Shah <ashah@atg.eb.com>
+To: j.leffler@acm.org
+Subject: fix for _eprintf in DBD::Informix
+
+Dear Jonathan,
+
+You mentioned in your README that any solutions to the _eprintf missing
+would be appreciated.
+
+My solution doesn't involve recompiling Perl.  Basically, the _eprintf and
+other functions are in libgcc.a .  I ended up recompiling my libgcc.a,
+setting all the .o to be position independent with the -fpic option.  I can
+then put libgcc.a on the ld line:
+
+ld -G libgcc.a  *.o -o Informix.so
+
+which takes care of the missing function.
+
+---------------------------------------------------------------------------
+
+Date: Mon, 15 Jun 1998 12:09:04 +1200
+From: Bernd Gill <bernd@dsi.co.nz>
+To: j.leffler@acm.org
+Subject: A fix for __eprintf problem under HPUX 10.20 in DBD-Informix-0.58
+
+Hi Jonathan,
+
+In the README for DBD-Informix-0.58 you write:
+
+    * If you are using GCC to compile the software (on Solaris and HP-UX
+      10.20 in particular, but probably on other platforms too), ensure
+      that you also use GCC to build the shared libraries, rather than
+      trying to use 'ld'.  If you use ld instead, you are likely to run
+      into problems with an undefined symbol __eprintf.  If you have this
+      problem, the fix is usually to reconfigure (and therefore rebuild)
+      Perl to use GCC to create the shared libraries.  It is not clear why
+      using GCC gives this problem.  If you know how to get around this
+      problem, please let me know.
+
+I ran into this problem on HP-UX 10.20.
+
+I could not get the loader to link against the standard __eprintf() in
+the gcc library (libgcc.a), so in order to get a shared version of
+Informix.sl I compiled a local copy of eprintf() which is taken
+directly from the GCC source code. I performed the following steps:
+
+1) create eprintf.c with the following contents:
+
+#undef NULL /* Avoid errors if stdio.h and our stddef.h mismatch.  */
+#include <stdio.h>
+/* This is used by the `assert' macro.  */
+void
+__eprintf (string, expression, line, filename)
+     const char *string;
+     const char *expression;
+     int line;
+     const char *filename;
+{
+  fprintf (stderr, string, expression, line, filename);
+  fflush (stderr);
+  abort ();
+}
+
+2) compile eprintf.c:
+   gcc -fpic -c eprintf.c
+
+3) link eprintf.o together with the other files that are used for Informix.sl:
+   I just used the raw 'ld' command (this can probably be properly integrated
+   in the makefile)
+
+   ld -b -L/usr/local/lib -o ./blib/arch/auto/DBD/Informix/Informix.sl \
+      -b -L/usr/local/lib Informix.o dbdimp.o dbdattr.o sqltype.o ixblob.o
+decsci.o \
+      odbctype.o link.o esqlc_v6.o -L/home/ius913/lib -L/home/ius913/lib/esql \
+      -L/home/ius913/lib -L/home/ius913/lib/esql -lifsql -lifasf -lifgen -lifos
+\
+      -lifgls -lV3 -lcl -lsec /home/ius913/lib/esql/checkapi.o -lifglx eprintf.o
+
+There are probably other ways as you suggest above, but I found this one
+relatively quick and easy.
+
+--
+Bernd Gill                                   DSI Consulting
+bernd@dsi.co.nz                              PO Box 11-466
+http://www.netlink.co.nz/~bernd              Wellington
+Phone: +64-4-389-6658, Fax +64-4-389-6798
+
+---------------------------------------------------------------------------
+1999-10-31:
+You can automatically include the code for _eprintf (in file eprintf.c)
+into the build by specifying:
+    export DBD_INFORMIX_USE_EPRINTF_CODE=yes
+    perl Makefile.PL
+You should not need to hack the generated Makefile.
+
+@(#)$Id: eprintf,v 100.1 2000/02/11 20:19:33 jleffler Exp $

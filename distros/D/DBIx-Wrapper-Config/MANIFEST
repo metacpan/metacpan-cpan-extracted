@@ -1,0 +1,8 @@
+MANIFEST
+INSTALL
+README
+WhatsNew
+Makefile.PL
+lib/DBIx/Wrapper/Config.pm
+t/00use.t
+META.yml                                 Module meta-data (added by MakeMaker)

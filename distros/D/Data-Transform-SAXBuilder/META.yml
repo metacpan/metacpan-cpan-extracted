@@ -1,0 +1,28 @@
+---
+abstract: 'A filter for parsing XML with L<XML::LibXML>'
+author:
+  - 'Martijn van Beers  <martijn@cpan.org>'
+build_requires:
+  Test::More: 0
+distribution_type: module
+generated_by: 'Module::Install version 0.77'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+module_name: Data::Transform::SAXBuilder
+name: Data-Transform-SAXBuilder
+no_index:
+  directory:
+    - inc
+    - t
+provides:
+  Data::Transform::SAXBuilder:
+    file: lib/Data/Transform/SAXBuilder.pm
+    version: 0.05
+requires:
+  Class::InsideOut: 0
+  Data::Transform: 0.05_01
+  XML::LibXML: 1.63
+  XML::SAX::IncrementalBuilder::LibXML: 0.02
+version: 0.05

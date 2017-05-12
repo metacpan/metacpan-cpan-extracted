@@ -1,0 +1,15 @@
+MANIFEST
+README
+Makefile.PL
+lib/Device/ISDN/OCLM.pm
+lib/Device/ISDN/OCLM/CurrentStatistics.pm
+lib/Device/ISDN/OCLM/HTML.pm
+lib/Device/ISDN/OCLM/ISDNStatistics.pm
+lib/Device/ISDN/OCLM/Last10Statistics.pm
+lib/Device/ISDN/OCLM/LastStatistics.pm
+lib/Device/ISDN/OCLM/ManualStatistics.pm
+lib/Device/ISDN/OCLM/SPStatistics.pm
+lib/Device/ISDN/OCLM/Statistics.pm
+lib/Device/ISDN/OCLM/SystemStatistics.pm
+lib/Device/ISDN/OCLM/UserAgent.pm
+bin/oclm.PL

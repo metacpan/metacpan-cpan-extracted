@@ -1,0 +1,58 @@
+---
+abstract: 'Simple DBI wrapper'
+author:
+  - 'Masahiro Nagano <kazeburo KZBRKZBR@ gmail.com>'
+build_requires:
+  Capture::Tiny: '0'
+  DBD::SQLite: '1.31'
+  Test::More: '0.98'
+  Test::Requires: '0'
+  Test::TCP: '0'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.10, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Sunny
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  DBIx::Sunny:
+    file: lib/DBIx/Sunny.pm
+    version: '0.23'
+  DBIx::Sunny::Schema:
+    file: lib/DBIx/Sunny/Schema.pm
+  DBIx::Sunny::db:
+    file: lib/DBIx/Sunny.pm
+  DBIx::Sunny::st:
+    file: lib/DBIx/Sunny.pm
+requires:
+  Class::Accessor::Lite: '0.05'
+  Class::Data::Inheritable: '0'
+  DBI: '1.615'
+  DBIx::TransactionManager: '0.13'
+  Data::Validator: '0'
+  Scalar::Util: '0'
+  parent: '0'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/kazeburo/DBIx-Sunny/issues
+  homepage: https://github.com/kazeburo/DBIx-Sunny
+  repository: git://github.com/kazeburo/DBIx-Sunny.git
+version: '0.23'
+x_contributors:
+  - 'motemen <motemen@gmail.com>'
+  - 'nanto_vi <nanto@moon.email.ne.jp>'
+  - 'Masahiro Nagano <kazeburo@gmail.com>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

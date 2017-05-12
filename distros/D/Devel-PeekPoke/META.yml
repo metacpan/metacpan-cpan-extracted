@@ -1,0 +1,32 @@
+---
+abstract: 'All your bytes are belong to us'
+author:
+  - 'ribasushi: Peter Rabbitson <ribasushi@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '6.59'
+  Test::Exception: '0.31'
+  Test::More: '0.88'
+configure_requires:
+  ExtUtils::MakeMaker: '6.59'
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+module_name: Devel::PeekPoke
+name: Devel-PeekPoke
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.8.1
+resources:
+  IRC: irc://irc.perl.org/#pp
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-PeekPoke
+  homepage: http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=p5sagit/Devel-PeekPoke.git
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/p5sagit/Devel-PeekPoke.git
+version: '0.04'

@@ -1,0 +1,23 @@
+Version 0.071
+        * incremented CPAN version
+Version 0.07
+        * fixed issue reported by CPAN Testers
+
+Version 0.06
+        * use sort to return always some order in route_pod_coverage
+        * start using Dist::Zilla
+ 
+Version 0.05
+         
+Version 0.04
+        * no changes, just a proper build with make dist
+ 
+Version 0.03
+        * included verification if package has pod
+ 
+Version 0.02
+        * removed unused variables
+        * inproved substitution regular expression
+ 
+Version 0.01
+        * initial release

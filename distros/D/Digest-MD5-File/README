@@ -1,0 +1,32 @@
+Digest/MD5/File version 0.08
+============================
+
+See Pod for documentation or 
+ perldoc Digest::MD5::File
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+
+   perl -MCPAN -e 'install Digest::MD5::File;'
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+Digest::Md5, Encode, LWP::UserAgent
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

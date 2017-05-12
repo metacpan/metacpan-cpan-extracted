@@ -1,0 +1,40 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 33317486c4fa2cf7fec85bf92ed38ac0f64233a0 CONTRIBUTING
+SHA1 ac7bd5150541cc84c625a657596a845ca1673be2 COPYRIGHT
+SHA1 540e627824058dc4b3f75009923f7af8f8e388c8 CREDITS
+SHA1 816b821af5a59a5a38cac54d195872d59caae30c Changes
+SHA1 1cfdde1d0af0f8e18a3398e9d4b24d4adce6159d INSTALL
+SHA1 34f5e12514b91055de4b164a1f2327ef5c30ba53 LICENSE
+SHA1 da5a442779c000ea10781d3e0a347e7df41db00a MANIFEST
+SHA1 22d8f3aed03252fface25b617df3ee7c337f3790 META.json
+SHA1 abeb9e2ebc053d6c2f077e6e1f686c6641dc9a69 META.yml
+SHA1 7ddc4aeefedacffdb3e9eca4079aede6462515fb Makefile.PL
+SHA1 086efbd094373aa277adf9465928ec68f71c7ca1 README
+SHA1 13280a3b80621eb4ba2df53ce50fac3bc689f1b8 dist.ini
+SHA1 b6bd2a6d37e445ea820ca1eb32adf4bbb0bc9027 doap.ttl
+SHA1 8511366358c3279433e0a6e8518cc1814803119a examples/example.pl
+SHA1 92c171cd680578fb698a6fbab32f848cb05db9fa lib/DateTimeX/Auto.pm
+SHA1 8b2c1876b4c464feb52a3baa71103e11c467c9c1 t/01basic.t
+SHA1 66c4ff3a12a606d57d00f3c3500b9ea86b7a5df1 t/02cloning.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlQTbgEACgkQzr+BKGoqfTkFOQCgt7dGO2RHg0V2+BnSlVSkFiA1
+mzEAn3deyKZlbcf9cAPkqZNWxgqkmU8P
+=pysb
+-----END PGP SIGNATURE-----

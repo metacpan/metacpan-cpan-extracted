@@ -1,0 +1,5 @@
+~/projects/(project)/lib/
+
+This is the project module library. 
+
+Files in this path are project-specific *.pm files only. 

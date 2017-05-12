@@ -1,0 +1,66 @@
+---
+doctype: dist
+
+header:
+  name: My-Own-Dist
+  author:
+   - Erik Carlsson
+   - Ex Ample
+
+prereqs:
+  runtime:
+    requires:
+      - Moose: 2.1400
+  develop:
+    requires:
+      - Another::Thing
+
+plugins:
+ - +config: DistIllerTestConfig
+   no_manifest_skip: 0
+   is_task: 1
+   prompt: $
+
+ - +add_plugin: PlacedBeforeExtraTests
+   +before: ExtraTests
+
+ - +remove_plugin: ExtraTests
+   +if: $env.noextratests
+
+ - +replace_plugin: ExecDir
+   dir: bin
+
+ - +replace_plugin: License
+   +with: LicenseImproved
+   license: perl_5
+
+ - +extend_plugin: Readme
+   +remove: root
+   suffix: md
+   headings:
+   - head2
+
+ - +add_plugin: PlacedAfter::ExecDir
+   +after: ExecDir
+
+ - +plugin: LastPlugin
+   +version: 0.02
+
+---
+doctype: weaver
+
+plugins:
+ - +config: DistIllerTestConfig
+
+---
+doctype: cpanfile
+---
+doctype: gitignore
+
+config: DistIllerTestConfig
+
+always:
+ - MYMETA.*
+
+onexist:
+ - inc

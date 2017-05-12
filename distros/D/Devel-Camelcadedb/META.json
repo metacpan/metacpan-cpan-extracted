@@ -1,0 +1,62 @@
+{
+   "abstract" : "unknown",
+   "author" : [
+      "Alexandr Evstigneev <hurricup@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.16, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-Camelcadedb",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "B::Deparse" : "0",
+            "Cwd" : "0",
+            "Encode" : "0",
+            "Hash::StoredIterator" : "0",
+            "IO::Socket::INET" : "0",
+            "JSON::XS" : "3.02",
+            "PadWalker" : "2.2",
+            "Scalar::Util" : "0",
+            "perl" : "5.008"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/hurricup/Perl5-IDEA-Debugger/issues"
+      },
+      "license" : [
+         "http://www.opensource.org/licenses/mit-license.php"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/hurricup/Perl5-IDEA-Debugger"
+      }
+   },
+   "version" : "2017.1",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

@@ -1,0 +1,208 @@
+=head1 Deliantra Client Tutorial - A gentle introduction to the game client
+
+=head2 What's Deliantra - Basic Game Concepts
+
+Deliantra is a 2D MORPG (Multiplayer Online Role Playing Game). This means
+that you choose a character which will allow you to interact with a fictional
+virtual world. In that world you can meet other people, fight monsters,
+gain experience and gain treasures.
+
+This Tutorial will guide you through the main interface elements of the
+game client for Deliantra.
+
+Later, if you managed to log in, another Tutorial will guide you through
+the main game elements. It will teach you how to interact with the world
+and other players.
+
+Deliantra is freely distributed under the General (Affero)
+Public License (GPL) and the code may be obtained from
+L<http://www.deliantra.net/>.
+
+=head1 Getting Started
+
+First of all, don't be daunted by the apparent complexity of Deliantra -
+in reality, Deliantra is quite easy to play and character generation is
+simple. Later on, when you have some experience playing the game, you may
+wish to read the full manual.
+
+=head2 User Interface Basics
+
+=head3 The Button Bar
+
+First start with the button bar on top of the client window:
+
+=for image sc_button_bar.jpg
+
+That button bar consists of following buttons:
+
+=over 4
+
+=item B<Setup>
+
+Opens the client setup window, where you can make all kinds of client
+related settings. For example setting your login name and password,
+the resolution, whether the client should run in fullscreen or windowed
+mode. And lots of other things.
+
+=item B<Playerbook>
+
+This button will open one of the most important windows in the game: The
+Playerbook. It will tell you many interesting and important statistics about
+your character, for example which stats it got, which magical spells you know
+and probably most importantly, whats in your inventory.
+
+=item B<Save Config>
+
+This button will save all settings you made in the B<Setup> window.
+Also the positions of the windows will be saved, so that you don't have to
+change the layout of the windows everytime you start the client.
+
+=item B<Help!>
+
+The B<Help!> button will open the documentation for the game, where
+you will also find this tutorial. If you are stuck a look at the
+L<Game FAQ|pod/faq> or the other documentation there.
+
+=item B<Quit>
+
+This button will exit the client. Be careful not to just quit the client
+when you are logged in. You should really search for a save bed before
+exiting. Because if you logout while being in a dungeon nasty cave-ins will
+probably kill you if you are away for too long.
+
+=back
+
+=head3 Tooltips
+
+Another B<very important> source of information for beginners are the
+tooltips, which are shown when you hover with the mouse cursor above certain
+user interface elements of the client:
+
+=for image sc_tooltips.png
+
+They often reveal very useful information about the user interface elements.
+Also they answer many of the frequently asked questions about the usage of the
+client.
+
+And before you ask: No you can't disable them.
+
+=head3 Minimap
+
+=for image sc_minimap.png
+
+This minimap can usually be found on the upper left of the client window,
+it shows the rough layout of the map you are currently on. It can be helpful
+to keep track of already explored areas.
+
+=head3 Message Window
+
+Another very important window is the B<Message Window>:
+
+=for image sc_message_window.png
+
+It shows all the important textual information which occur in the game.
+The first tab, the B<Log> tab, usually shows status information about
+the server for example the message of the day.
+
+The next tab usually is the B<Map> tab, which shows any chat activity on the
+map you are currently on.
+
+The most social tab is the B<Chat> tab, where you can chat with all the to other
+players on the server.
+
+=head3 Short Log
+
+The short log, which shows the most recent information which
+occur while playing, for example stat changes (which for example happen
+when you get poisoned) or activity messages.
+
+This image shows the short log shortly after logging in:
+
+=for image sc_short_log.png
+
+=head3 Floorbox
+
+The floorbox can be found on the bottom of the client window,
+right from the middle of the bottom border:
+
+=for image sc_floorbox.png
+
+It shows whats on the floor below your character. With the right click
+context menu you can pickup things or open the inventory with the 'More...'
+button, which appears if there are too many items on the floor.
+
+=head3 Gauges
+
+The gauges on the bottom right of the client window display probably
+the most interesting things while playing:
+
+=for image sc_gauges.png
+
+The blue gauge shows your health. If this gauge hits the bottom you will
+die. The next, very shiny gauge, shows the amount of spell points you
+can spend for casting magial spells. The bluish green gauge shows how
+many grace points you got for using prayers. The last gauge shows
+how much food you got in your belly. If your food is low your health
+won't automatically improve, and you probably will starve to death.
+
+Also remember to read the tooltips about these gauges.
+
+Below those 4 gauges you find a line like this: "Exp: 928,708,227 (lvl 73)".
+It shows how much overall experience your character got. And behind that number
+you will find which level your character is. The character level influences
+many aspects of your character.
+
+Below the "Exp: ..." line you find another set of gauges: The one
+with "90%" on it shows how much experience to the next character level you already
+earned. Below that a gauge shows the same information for the level of
+a specific skill.
+
+And on the very bottom a line like this: "Range*: comet Combat: karate"
+shows which spell or skill you have readied in your "range slot" and
+which combat skill you have readied.
+
+=head2 Start Playing
+
+So, that's it for now to the user interface, you should get start playing now.
+Open the B<Setup> window:
+
+=for image sc_login.jpg
+
+There are two important input boxes there:
+
+=over 4
+
+=item B<Username>
+
+Here you have to enter the character name you would like to play with.  If you
+are playing for the first time, type any name you like; this will be your
+character name for the rest of the life of that character.  As you don't have a
+character yet you have to create a new character. The tutorial and windows
+popping up after you logged in for the first time with that character will
+guide you through the character creation. 
+
+=item B<Password>
+
+Next, type in any password. Remember: you will need to remember the same
+password again to play that character again! You can use B<Save Config> (see
+the buttons on the top of the window) to save your settings, including name and
+password, but if it gets lost recovery is difficult, so remember your password
+or write it down at a safe place.
+
+One more note: it's not a good idea to use "real" passwords to your
+computer accounts! Doing so may make your system vulnerable to
+unscrupulous Deliantra server administrators.
+
+=back
+
+Enter the desired I<Username> and I<Password> and click on I<Login / Register> now.
+
+=head1 Authors
+
+Parts of this document were originally compiled, edited, and written by
+Brian Thomas, Klaus Elsbernd, and John W. Klar. Additional information
+compiled by Maciej Kalisiak, Gorlin, Anton Oussik and Gene Alexander.
+
+Adapted for use by I<Deliantra>, enhanced and corrected by Pippijn van
+Steenhoven, Marc A. Lehmann and Robin Redeker.
+

@@ -1,0 +1,84 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "other_vrf",
+          "TABLE_addrf": {
+            "ROW_addrf": {
+              "addrf": "ipv4",
+              "TABLE_prefix": {
+                "ROW_prefix": [
+                  {
+                    "ipprefix": "1.1.1.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.1.1.1",
+                          "ifname": "Eth1/1",
+                          "uptime": "PT2M5S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "1.1.1.1/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.1.1.1",
+                          "ifname": "Eth1/1",
+                          "uptime": "PT2M5S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "8.8.8.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "false",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ifname": "Null0",
+                          "uptime": "PT13S",
+                          "pref": 1,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "static",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

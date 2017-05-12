@@ -1,0 +1,25 @@
+---
+abstract: 'Get a locale specific string describing the span of a given datetime duration.'
+author:
+  - 'Tore Aursand <toreau@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '7.10'
+  Test::More: '1.001014'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005'
+license: mit
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DateTime-Format-Human-Duration-Simple
+requires:
+  Class::Load: '0.23'
+  DateTime: '0'
+  Moose: '0'
+  namespace::autoclean: '0.28'
+resources:
+  bugtracker: https://github.com/toreau/DateTime-Format-Human-Duration-Simple/issues
+  repository: https://github.com/toreau/DateTime-Format-Human-Duration-Simple
+version: '0.02'

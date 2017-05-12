@@ -1,0 +1,60 @@
+---
+abstract: 'Rule based validator on type constraint system'
+author:
+  - 'Fuji, Goro (gfx) <gfuji@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: 0.88
+  Test::Requires: 0
+configure_requires:
+  Module::Build: 0.38
+dynamic_config: 0
+generated_by: 'Minilla/v2.1.1, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Validator
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::Validator:
+    file: lib/Data/Validator.pm
+    version: 1.07
+  Data::Validator::Role::AllowExtra:
+    file: lib/Data/Validator/Role/AllowExtra.pm
+  Data::Validator::Role::Croak:
+    file: lib/Data/Validator/Role/Croak.pm
+  Data::Validator::Role::Method:
+    file: lib/Data/Validator/Role/Method.pm
+  Data::Validator::Role::NoRestricted:
+    file: lib/Data/Validator/Role/NoRestricted.pm
+  Data::Validator::Role::NoThrow:
+    file: lib/Data/Validator/Role/NoThrow.pm
+  Data::Validator::Role::Sequenced:
+    file: lib/Data/Validator/Role/Sequenced.pm
+  Data::Validator::Role::SmartSequenced:
+    file: lib/Data/Validator/Role/SmartSequenced.pm
+  Data::Validator::Role::StrictSequenced:
+    file: lib/Data/Validator/Role/StrictSequenced.pm
+requires:
+  Mouse: 0.93
+  perl: 5.008001
+resources:
+  bugtracker: https://github.com/gfx/p5-Data-Validator/issues
+  homepage: https://github.com/gfx/p5-Data-Validator
+  repository: git://github.com/gfx/p5-Data-Validator.git
+version: 1.07
+x_contributors:
+  - 'karupanerura <karupa@cpan.org>'
+  - 'Fuji, Goro <fuji.goro@dena.jp>'
+  - 'Fuji, Goro <g.psy.va@gmail.com>'
+  - 'robario <webmaster@robario.com>'

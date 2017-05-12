@@ -1,0 +1,65 @@
+Package: 3dchess
+Priority: optional
+Section: games
+Installed-Size: 152
+Maintainer: Stephen Stafford <bagpuss@debian.org>
+Architecture: i386
+Version: 0.8.1-11
+Depends: libc6 (>= 2.3.2.ds1-4), xaw3dg (>= 1.5+E-1), xlibs (>> 4.1.0)
+Filename: pool/main/3/3dchess/3dchess_0.8.1-11_i386.deb
+Size: 33116
+MD5sum: 7248665d99d529342a5cd050a9128ff6
+Description: 3D chess for X11
+ 3 dimensional Chess game for X11R6.  There are three boards, stacked
+ vertically; 96 pieces of which most are the traditional chess pieces with
+ just a couple of additions; 26 possible directions in which to move.  The
+ AI isn't wonderful, but provides a challenging enough game to all but the
+ most highly skilled players.
+
+Package: 3ddesktop
+Priority: optional
+Section: utils
+Installed-Size: 360
+Maintainer: Mathias Weyland <mathias@weyland.ch>
+Architecture: i386
+Version: 0.2.8-1
+Depends: freeglut3, libc6 (>= 2.3.2.ds1-4), libfreetype6 (>= 2.1.5-1), libgcc1 (>= 1:3.4.1-3), libice6 | xlibs (>> 4.1.0), libimlib2, libsm6 | xlibs (>> 4.1.0), libstdc++5 (>= 1:3.3.4-1), libx11-6 | xlibs (>> 4.1.0), libxext6 | xlibs (>> 4.1.0), libxi6 | xlibs (>> 4.1.0), libxmu6 | xlibs (>> 4.1.0), libxt6 | xlibs (>> 4.1.0), xlibmesa-gl | libgl1, xlibmesa-glu | libglu1, zlib1g (>= 1:1.2.1)
+Suggests: xbindkeys
+Filename: pool/main/3/3ddesktop/3ddesktop_0.2.8-1_i386.deb
+Size: 70682
+MD5sum: 49307a2aa22edffca20b8e40d4875c0e
+Description: "Three-dimensional" desktop switcher
+ 3D-Desktop is an OpenGL program for switching virtual desktops in
+ a seamless 3-dimensional manner.  The current desktop is mapped into a
+ fullscreen 3D environment where you may choose other screens.  Several
+ different visualization modes are available.  A window manager
+ compatible with the GNOME pager standard is required.
+ .
+ The transition from working desktop to fullscreen 3D environment is
+ seamless: when the pager activates you see your current desktop appear
+ to zoom out to a point in space where you can see your other virtual
+ desktops allowing you to select another.
+ .
+ The program is rather memory-hungry and it is CPU intensive, but it's
+ accessible from the command line, which makes it perfect for show
+ floors and impressing your non-UN*X-using friends.
+
+Package: 44bsd-rdist
+Priority: optional
+Section: net
+Installed-Size: 96
+Maintainer: Thomas Quinot <thomas@debian.org>
+Architecture: i386
+Version: 20001111-6
+Depends: libc6 (>= 2.2.5-13)
+Recommends: rdist
+Filename: pool/main/4/44bsd-rdist/44bsd-rdist_20001111-6_i386.deb
+Size: 28176
+MD5sum: 9778b2e4152372d4b148c76572bc1a92
+Description: 4.4BSD rdist.
+ This is the traditional rdist from 4.4BSD Lite with FreeBSD
+ fixes. It is provided for compatibility with third-party rdist
+ implementations.
+ .
+ This is the binary package for 4.4BSD rdist.
+

@@ -1,0 +1,189 @@
+#!/usr/bin/perl
+
+=head1 NAME
+
+mod_status-info - return apache mod_status information in different formats
+
+=head1 SYNOPSIS
+
+    mod_status-info [--type xml|data-dumper|ecsv|yaml|json|rrd] [url]
+    
+        --type     sets the type of the input in which the data should be shown
+                   by default is xml
+
+=head1 DESCRIPTION
+
+Script fetches mod_status generated page and return the information that were
+found there in different formats that can be used for logging, parsing, archiving,
+further processing.
+
+rrd output has this values:
+
+    total_accesses
+    total_traffic
+    current_requests
+    idle_workers
+    waiting
+    starting
+    reading
+    sending
+    keepalive
+    dns_lookup
+    closing
+    logging
+    finishing
+    idle_cleanup
+    open_slot
+
+=cut
+
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use Pod::Usage;
+use Data::Dumper 'Dumper';
+
+use Data::Apache::mod_status;
+
+exit main();
+
+sub main {
+    my $help;
+    my $info_type = 'xml';
+    my $url;
+    my $max_clients;
+    GetOptions(
+        'help|h'        => \$help,
+        'type|t=s'      => \$info_type,
+        'max-clients=s' => \$max_clients,
+    ) or pod2usage;
+    pod2usage if $help;
+    
+    $url = shift @ARGV;
+    pod2usage if not $url;
+    
+    my $mod_status = Data::Apache::mod_status->new(
+        'url' => $url,
+    )->refresh;
+    my $info    = $mod_status->info;
+    my $workers = $mod_status->workers;
+    
+    my %info_hash = (
+        'server_version'           => $info->server_version,
+        'server_build_str'         => $info->server_build_str,
+        'current_time_str'         => $info->current_time_str,
+        'restart_time_str'         => $info->restart_time_str,
+        'parent_server_generation' => $info->parent_server_generation,
+        'server_uptime_str'        => $info->server_uptime_str,
+        'total_accesses'           => $info->total_accesses,
+        'total_traffic_str'        => $info->total_traffic_str,
+        'cpu_usage_str'            => $info->cpu_usage_str,
+        'current_requests'         => $info->current_requests,
+        'idle_workers'             => $info->idle_workers,
+    );
+    
+    if ($info_type eq 'xml') {
+        print $mod_status->xml_dom->toString(1);
+    }
+    elsif ($info_type eq 'data-dumper') {
+        # TODO add workers numbers
+        print Dumper(\%info_hash);
+    }
+    elsif ($info_type eq 'ecsv') {
+        # TODO add workers numbers
+        print join(';', map { '"'.$_.'='.$info_hash{$_}.'"' } sort keys %info_hash), "\n";
+    }
+    elsif ($info_type eq 'yaml') {
+        # TODO add workers numbers
+        print '---', "\n";
+        foreach my $key (sort keys %info_hash) {
+            print $key, ': ', ($info_hash{$key} || q{}), "\n";
+        }
+    }
+    elsif ($info_type eq 'json') {
+        # TODO add workers numbers
+        print
+            '{',
+            join(
+                ',',
+                map {
+                    '"'.$_.'": "'.($info_hash{$_} || q{}).'"'
+                } sort keys %info_hash
+            ),
+            '}',
+            "\n"
+        ;
+    }
+    elsif ($info_type eq 'rrd') {
+        my $current_time_seconds = $info->current_time->epoch;
+        print
+            '-t '.join(':', qw{
+                    total_accesses
+                    total_traffic
+                    current_requests
+                    idle_workers
+                    
+                    waiting
+                    starting
+                    reading
+                    sending
+                    keepalive
+                    dns_lookup
+                    closing
+                    logging
+                    finishing
+                    idle_cleanup
+                    open_slot
+                }, ($max_clients ? 'max_clients' : ())
+            ),
+            q{ },
+            $current_time_seconds.':',
+            join ':',
+            map { defined $_ ? $_ : 'U' }
+            (
+                $info->total_accesses,
+                $info->total_traffic,
+                $info->current_requests,
+                $info->idle_workers,
+                
+                $workers->waiting,
+                $workers->starting,
+                $workers->reading,
+                $workers->sending,
+                $workers->keepalive,
+                $workers->dns_lookup,
+                $workers->closing,
+                $workers->logging,
+                $workers->finishing,
+                $workers->idle_cleanup,
+                $workers->open_slot,
+                ($max_clients ? $max_clients : ())
+            )
+        ;
+    }
+    else {
+        die 'Unknown output type "', $info_type, '"', "\n";
+    }
+    
+    return 0;
+}
+
+__END__
+
+=head1 SEE ALSO
+
+L<examples/rrd/> folder for examples how to create, update and graph C<mod_status>
+data using L<Data::Apache::mod_status> and rrdtool.
+
+=head1 COPYRIGHT AND LICENSE
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Jozef Kutej
+
+=cut

@@ -1,0 +1,208 @@
+Revision history for Perl extension Device::Gsm.
+
+1.61  Tue Jun 21 21:05:12 CEST 2016
+    - Fixed RT#115491, remove the use of the encodings pragma, now deprecated.
+    - Plenty of style, test and functionality fixes contributed by Joel Maslak
+      and Paul Cochrane, as part of the CPAN PR Challenge. Awesome job, thanks!
+    - Amended the main module documentation to make it clear this module is
+      in maintenance mode and hasn't seen any major development work in years.
+
+1.60  Fri Mar 16 12:14:07 CET 2012
+    - Removed the syslog test. Was artificial and pointless,
+      and it failed on Windows and Solaris. Thanks to CPAN testers reports.
+
+1.59  Thu Mar  8 10:13:30 CET 2012
+    - Fixed RT #75619, POD fixes to make the POD clean for Debian packaging.
+    - Applied .perltidyrc to all source files. Watch out if you had patches :)
+
+1.58  Mon Mar  7 22:31:22 EST 2011
+    - Fixed RT #48229, an uninitialized value when registering to the network
+      but getting no answer from the phone.
+
+1.57  Mon Mar  7 20:53:03 EST 2011
+    - Fixed a bug in send_sms() that prevented it from working at all.
+      The bug was introduced with the "assume_registered" option.
+    - Fixed RT #57585. Thanks to Eric Kössldorfer for his patch and
+      test case.
+    - Added PDU<->latin1 conversion functions in Device::Gsm::Pdu
+    - Note to self: first release from Australia!
+
+1.56  Mon Nov 15 21:00:00 CET 2010
+    - When sending messages in text mode, now we wait a bit
+      between the +CMSG command and the actual text.
+      Fixes RT #61729. Thanks to Boris Ivanov for the report.
+    - Added clear example of logging to a custom file
+    - Added a warning for not implemented _read_messages_text()
+    - Added a "assume_registered" option to skip GSM network
+      registration on buggy/problematic devices.
+
+1.55  Sun Jun 27 18:07:11 CEST 2010
+    - Fixed RT #58869, incorrect decoding of text7 messages.
+      Thanks to Alexander Onokhov.
+
+1.54  Sun Sep  6 10:44:53 CEST 2009
+    - Fixed RT #31565, incorrect decoding of outgoing messages
+      due to incorrect removal of zero-length octet in PDU.
+      Thanks to Svami Dhyan Nataraj.
+
+1.53  Fri Aug 14 21:43:37 CEST 2009
+    - Fixed RT #48700, deleting SMS message with index 0 didn't work.
+      Thanks to Vytas M. for reporting the bug.
+
+1.52  Tue Nov 25 21:24:00 CET 2008
+    - Added a longer timeout on call forwarding. Thanks to Marek Jaros.
+
+1.51  Wed Oct 29 22:32:00 CET 2008
+    - Added new method to set/reset call forwarding options
+      (patch contributed by Attila Nagy: thanks!)
+    - Removed the syslog test script (t/04syslog.t).
+      It continuously broke tests on Solaris and basically every
+      other setups where you are not installing as privileged user.
+
+1.50  Tue Sep 30 22:50:00 CEST 2008
+    - Sometimes send_sms() could report success but no sms
+      has really been sent, and we receive garbage.
+      First attempt at a fix for this. Reported by Marek Jaros.
+
+1.49  Sat Aug  9 15:12:00 CEST 2008
+    - Modified manufacturer() to work also with some Motorola phones,
+      that report AT+CGMI in a slightly different way.
+    - Changed my phone number :)
+
+1.48  Wed Feb 28 21:55:23 CET 2007
+    - Fixed CPAN bug #24781, thanks to torsten at archesoft dot de for reporting.
+
+1.47  Tue Feb 13 11:31:24 CET 2007
+    - Fixed t/30networks.t test script.
+
+1.46  Tue Dec 19 22:05:31 CET 2006
+    - Fixed CPAN RT wishlist #23575.
+      Again thanks to Troels for his ideas.
+
+1.45  Tue Oct 17 18:01:43 CEST 2006
+    - Fixed CPAN RT bugs #21991, #21992, #22025.
+      Thanks to Troels Jensen for accurate reporting and patch suggestions.
+
+1.44  Wed Aug 16 08:25:50 CEST 2006
+    - Fixed decoding of alphabetical sender addresses.
+    - Added correct decoding of UCS languages (Russian for example).
+      Thanks to Nikolay Shaplov for the bug report + patch.
+
+1.43  Sun Jul 23 17:40:15 CEST 2006
+    - Added ability to decode alphabetical sender addresses.
+      Thanks to Torsten Mueller for report the issue.
+
+1.42  Mon May  8 21:16:40 CEST 2006
+    - Fixed a bug in Device::Gsm::Sms delete() method that invoked
+      a non-existent Device::Gsm::deleteMessage().
+    - Implemented read and delete of sms messages from different
+      storages (ME, SM, ...). Only for PDU format. Thanks to
+      Jurij Sikorsky for the patch.
+
+1.41  Thu Apr 20 21:52:19 CEST 2006
+    - === Now Device::Gsm 1.39+ requires at least Device::Modem v1.47 ===
+      Check out on CPAN before upgrading.
+    - Some cool fixes for better support of Iridium Satellite phones,
+      GPRS connections and command/response faster cycle.
+      Many thanks to Ed Wildgoose.
+
+1.37  Sat Aug 27 12:53:00 CEST 2005
+    - fixed regexp to extract sim card sms messages information
+      (thanks to Pierre Hilson <zorglups hotmail com>)
+
+1.36
+1.35  Wed Sep 15 23:43:03 CEST 2004
+    - finally added encoding/decoding of sms text between
+      8 bit ASCII (ISO-8859) and 7 bit GSM 03.38
+      (thanks to Stefano Pisani for his feedback)
+
+1.34  Wed Aug 18 09:10:48 CEST 2004
+    - fixed delete_sms() command syntax and results parsing. Thanks
+      to all users that reported problems.
+    - added an example script on how to delete sms messages.
+
+1.33  Wed May 26 13:52:43 CEST 2004
+    - added delete_sms() method. For now, works only in PDU mode.
+    - fixed messages() newline regex split pattern
+    - modified send sms in text mode to cope with slower/older devices
+    - modified message read method to set pdu mode before executing
+
+1.28
+  ||
+1.25  Fri Jan 23 00:59:16 CET 2004
+    - further documentation, troubleshooting and autoscan utility
+      sections
+    - added all new pdu sms token-oriented decoding classes
+      (this is an 80% complete implementation, mostly regarding charset
+      conversion issues)
+    - Device::Gsm::Sms public class is now documented properly
+
+1.24
+  ||
+1.20  Wed Jan 21 23:32:45 CET 2004
+    - completed full documentation (to be revised)
+    - documented working irda/bluetooth connections (always
+      through device::serialport :-)
+
+1.19
+1.18  Mon Mar 24 23:32:27 CET 2003
+    - added a complete interface to read messages on SIM card
+      ( $gsm->messages() method and Device::Gsm::Sms objects )
+    - some minor cleanup
+
+1.17  Thu Sep 12 00:22:06 CEST 2002
+    - added signal_quality() method to measure gsm signal power (dBm)
+    - added an example script in [examples] folder (`report_signal.pl')
+
+1.15
+1.16  Tue Sep  3 23:37:56 CEST 2002
+    - fixed documentation example (thanks to Domenico Viggiani)
+    - added `examples/send_to_cosimo.pl' script to report successful
+      installations of Device::Gsm module :-)
+    - improved test scripts; now work also with env vars, and without too
+      many `connect()'s
+
+1.14  Mon Apr 29 18:54:36 CEST 2002
+    - fixed errors in debugging
+    - fixed errors in AT command response handling (still to-do)
+    - included network registration test (must supply PIN in t/30register.t)
+    - added send_sms.pl in examples/
+
+1.10  Wed Apr 10 00:20:28 CEST 2002
+    - fixed and renamed Pdu.pm functions
+    - send_sms() new parameters that dispatch calls to
+      _send_sms_pdu() and _send_sms_text() to allow text and PDU modes
+    - send_sms() now works! (with siemens C25/35/45)
+
+1.09  Tue Apr  9 00:19:02 CEST 2002
+    - Pdu.pm added with functions to treat PDU encoded data
+    - added _send_sms_pdu() internal method
+
+1.08  Sat Apr  6 00:24:29 CEST 2002
+    - hangup() method
+    - imei() / serial_number() method with test case
+
+1.07  Wed Apr  3 23:38:51 CEST 2002
+    - removed unnecessary javadoc style tags
+    - made use of new parse_answer() call
+    - now service_center() works
+    - device identification functions now work
+    - improved test suite
+    - fixed logging class mechanism
+
+1.06  Sat Mar 30 16:43:55 CET 2002
+    - added manufacturer(), model(), software_version() methods to 
+      get information about the device
+    - added test_command() to test support for a specific GSM command
+
+1.05  Sat Mar 30 15:12:09 CET 2002
+    - added service_number() method
+
+1.04  Mon Mar 25 07:34:52 CET 2002
+    - added pod, html, text docs
+
+0.01  Tue Feb 26 22:15:31 CET 2002
+    - original version; created by h2xs 1.20 with options
+        -A -X -n Device::Gsm -v 0.01
+
+

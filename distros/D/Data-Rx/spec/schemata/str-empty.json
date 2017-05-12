@@ -1,0 +1,25 @@
+{
+  "schema": { "type": "//str", "value": "" },
+  "pass": {
+    "str": [ "empty" ]
+  },
+  "fail": {
+    "arr" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "bool": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "null": { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "num" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "obj" : { "*": { "data": [ ], "check": [ ], "error": [ "type" ] } },
+    "str" : {
+      "x"  : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "0"  : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "5"  : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "05" : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "5.0": { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "5.1": { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "5." : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "true" : { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "false": { "data": [ ], "check": [ ], "error": [ "value" ] },
+      "null" : { "data": [ ], "check": [ ], "error": [ "value" ] }
+    }
+  }
+}

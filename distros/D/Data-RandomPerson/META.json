@@ -1,0 +1,67 @@
+{
+   "abstract" : "Create random person data",
+   "author" : [
+      "Michiel Beijen <michiel.beijen@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-RandomPerson",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30",
+            "File::Share" : "0.06"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Data::Random" : "0.12",
+            "File::Share" : "0.06",
+            "List::Util::WeightedChoice" : "0.06",
+            "Module::Find" : "0",
+            "perl" : "5.008007"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0.88",
+            "Time::Local" : "1.18"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mbeijen/Data-RandomPerson/issues"
+      },
+      "repository" : {
+         "url" : "https://github.com/mbeijen/Data-RandomPerson"
+      }
+   },
+   "version" : "0.60",
+   "x_contributors" : [
+      "Michiel Beijen <michiel.beijen@gmail.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.27300"
+}

@@ -1,0 +1,58 @@
+{
+   "abstract" : "Auto-create boolean objects from columns",
+   "author" : [
+      "Bernhard Graf"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.0401, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-InflateColumn-Boolean",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DBIx::Class" : "0.08",
+            "ExtUtils::MakeMaker" : "0",
+            "Path::Class" : "0",
+            "SQL::Translator" : "0",
+            "Scalar::Util" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.08",
+            "perl" : "5.008003"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/augensalat/DBIx-Class-InflateColumn-Boolean/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/augensalat/DBIx-Class-InflateColumn-Boolean.git"
+      }
+   },
+   "version" : "0.003000"
+}

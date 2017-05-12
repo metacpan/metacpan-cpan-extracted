@@ -1,0 +1,24 @@
+Changes
+lib/Data/Money.pm
+lib/Data/Money/BaseException.pm
+lib/Data/Money/BaseException/ExcessivePrecision.pm
+lib/Data/Money/BaseException/InvalidCurrencyCode.pm
+lib/Data/Money/BaseException/InvalidCurrencyFormat.pm
+lib/Data/Money/BaseException/MismatchCurrencyType.pm
+Makefile.PL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/pod.t
+t/manifest.t
+t/meta-json.t
+t/meta-yml.t
+t/currency.t
+t/format_stripping.t
+t/overload.t
+t/locale.t
+t/subclass.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

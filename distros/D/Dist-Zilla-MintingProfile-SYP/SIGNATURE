@@ -1,0 +1,47 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 d1337bd3a9ad62b65de3f2a98e2b1b9e67f77e19 Changes
+SHA1 d57d49453ae8e1f06611a169b9958fa805fd5f83 LICENSE
+SHA1 8466e97bc6552002faa66f17967da6cada82a12d MANIFEST
+SHA1 bb9e9ec8bb6baada57dd0ab0e8cc8df8cc4b3b16 MANIFEST.SKIP
+SHA1 35b8e155fd3c37519f4009104d2aa60f3b066ef1 META.yml
+SHA1 2e73312ad10fb150ba23ba870ca4e82d1087fc0a Makefile.PL
+SHA1 a05ba9365c390f64c3510211c139edd6baba2ecc README
+SHA1 40c85846fc243e38a7a9f19b8f4eaf633b5053c1 dist.ini
+SHA1 4d9aba3114b884eea3d5d6b55ecfcca809f01464 lib/Dist/Zilla/MintingProfile/SYP.pm
+SHA1 b2133cd4f9451af930c47fa5a5003e9ff78bc297 profiles/default/Module.pm
+SHA1 8f7c247e916501ea9e8f1129d4f13b1a5fb3099d profiles/default/plugins.ini
+SHA1 c12b338667308c30169dca1764e16203d6c55b9a profiles/default/profile.ini
+SHA1 c957939a48c276ecba256a69ea4c0bea9014a9cc profiles/default/skel/MANIFEST.SKIP
+SHA1 9b0bceb3fb8f96be87fd9f7ac00f2bd4f33e5fde profiles/default/skel/gitignore
+SHA1 2361dd3a478c38aa8bcb3eb2ddb43b8cf7d6dc1b profiles/default/skel/mailmap
+SHA1 41b7251366b2eeb10817591a705c1b7150308404 profiles/default/skel/perlcritic.rc
+SHA1 65032386937f9799ad5724bf587a7a159a7a2be4 profiles/default/skel/t/00-load.t
+SHA1 cd0d37469e1761a4f309a80bdb39aa31f47adae3 profiles/default/skel/weaver.ini
+SHA1 96a2e83c3c3fd4c8b08dc8dc9d302195a60c6c24 t/00-load.t
+SHA1 cd0d37469e1761a4f309a80bdb39aa31f47adae3 weaver.ini
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iQEcBAEBAgAGBQJTp/w7AAoJEDlxU7ZVUpmiwG4H/0e41WYMGent+ZL82tsmzgNs
+uiFwbJH4Dhx4pP8XVs38A2DyCHP17/pm5Kqf7NS4pO9GUXi/mJf7brPDGl9tzLpT
+5lrHYSMhonM7YJ8VQ8FKkdUygh4HKvDB4pY+kI16NaDuGP4YPlGygtdrLSBW1tNY
+9UijYCm8AwOR3UO0QCO8uIdXbLxCvjA1R9mgUSjOVut7eLoo3YEt289+mb6SKzzW
+iSK3KG5N1ml/57yOdCKBOHDCwec0ikhZ2yjwJltaK3EoCptusw+vQAJpZ3zPNagZ
+Ev1bXlEr89rqTiQZi3offWQ4F3H83yF/Mkg1TQCCgExiKioBVvKuFc8arG3fTDg=
+=i5xi
+-----END PGP SIGNATURE-----

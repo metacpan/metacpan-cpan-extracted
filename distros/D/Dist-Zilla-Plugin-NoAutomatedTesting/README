@@ -1,0 +1,53 @@
+NAME
+    Dist::Zilla::Plugin::NoAutomatedTesting - Avoid running under CPAN
+    Testers
+
+VERSION
+    version 0.08
+
+SYNOPSIS
+      # In dist.ini - It is important that NoAutomatedTesting follows MakeMaker
+
+      [MakeMaker]
+      [NoAutomatedTesting]
+
+    The resultant distribution will exit at "Makefile.PL" if the
+    "AUTOMATED_TESTING" environment variable is set, indicating a CPAN
+    Tester environment.
+
+DESCRIPTION
+    CPAN Testers are great and do a worthy and thankless job, testing all
+    the distributions uploaded to CPAN. But sometimes we don't want a
+    distribution to be tested by these gallant individuals.
+
+    Dist::Zilla::Plugin::NoAutomatedTesting is a Dist::Zilla plugin that
+    mungles "Makefile.PL" to detect that it is being run by a CPAN Tester
+    and "exit 0" if it is.
+
+    As this plugin mungles the "Makefile.PL" it is imperative that it is
+    specified in "dist.ini" AFTER "[MakeMaker]".
+
+  METHODS
+    These are required by the roles that this plugin uses.
+
+    "setup_installer"
+        Required by Dist::Zilla::Role::InstallTool.
+
+NAME
+    Dist::Zilla::Plugin::NoAutomatedTesting - Avoid running under CPAN
+    Testers
+
+SEE ALSO
+    Dist::Zilla
+
+    <http://wiki.cpantesters.org/>
+
+AUTHOR
+    Chris Williams <chris@bingosnet.co.uk>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2013 by Chris Williams.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

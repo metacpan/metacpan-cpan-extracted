@@ -1,0 +1,13 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+Makefile.PL
+README
+corpus/Changes
+corpus/lib/DZT/Sample.pm
+dist.ini
+lib/Dist/Zilla/PluginBundle/CEBJYRE.pm
+t/build.t
+t/release-pod-coverage.t
+t/release-pod-syntax.t

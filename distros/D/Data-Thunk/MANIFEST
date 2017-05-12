@@ -1,0 +1,15 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Data/Thunk.pm
+lib/Data/Thunk/Code.pm
+lib/Data/Thunk/Object.pm
+lib/Data/Thunk/ScalarValue.pm
+t/01-basic.t
+t/release-eol.t
+t/release-pod-syntax.t

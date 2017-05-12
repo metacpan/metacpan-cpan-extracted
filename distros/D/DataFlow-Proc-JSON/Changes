@@ -1,0 +1,35 @@
+Revision History for DataFlow-Proc-JSON
+=======================================
+
+1.112100
+--------
+
+commit d865b2829bcfed631994894dee6f98636603dbc6
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    added explicit dependency on DataFlow
+
+v1.111910 2011-07-10
+--------------------
+
+commit 4fbffd973075014350bee061095781c1dc8ba6e7
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    dropping JSON::Any, using JSON only
+
+commit 12144510b28e42dbde8701450207137ce3cafda6
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    removed t/00-load.t, using bundle v0.012
+
+v1.111810 2011-06-29
+--------------------
+
+commit bb672c145cdd08106351fece1b73a2a7d4668c55
+Author: Alexei Znamensky <russoz@cpan.org>
+
+    using Moose "builder" rather than "default" (almost everywhere)
+
+===================================
+End of changes in the last 365 days
+===================================

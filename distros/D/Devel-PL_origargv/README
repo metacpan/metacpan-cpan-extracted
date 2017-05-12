@@ -1,0 +1,47 @@
+NAME
+    Devel::PL_origargv - access to the Perl interpreter's argv
+
+SYNOPSIS
+            my @PL_origargv = Devel::PL_origargv->get;
+
+DESCRIPTION
+    If Perl is run with the following command:
+
+            perl -w -Ilib yourscript.pl arg1 arg2
+
+    Then @ARGV will be pre-populated with `arg1` and `arg2`, and $0 will
+    reflect the name of your script, but there's no way to access `-w` or
+    `-Ilib`.
+
+    This module provides one class method that returns Perl's original argv
+    array as a list.
+
+    `get`
+        Returns argv as a list of strings. If called in scalar context,
+        returns argc (i.e. the count of argv).
+
+CAVEATS
+    This module's test suite will not pass when run via `forkprove`. Use the
+    standard `prove` instead.
+
+BUGS
+    Please report any bugs to
+    <http://rt.cpan.org/Dist/Display.html?Queue=Devel-PL_origargv>.
+
+SEE ALSO
+    <https://metacpan.org/source/RGARCIA/perl-5.6.2/perl.c#L856>
+
+AUTHOR
+    Toby Inkster <tobyink@cpan.org>.
+
+COPYRIGHT AND LICENCE
+    This software is copyright (c) 2012-2014 by Toby Inkster.
+
+    This is free software; you can redistribute it and/or modify it under the
+    same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTIES
+    THIS PACKAGE IS PROVIDED "AS IS" AND WITHOUT ANY EXPRESS OR IMPLIED
+    WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTIES OF
+    MERCHANTIBILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+

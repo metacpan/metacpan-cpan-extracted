@@ -1,0 +1,35 @@
+0.005001	2012-10-22
+
+- Rebuild dist with Module::Install 1.06:
+  http://weblog.bulknews.net/post/33907905561
+
+0.005000	2011-12-08
+
+- Bug fix: #44013
+
+0.004000	2011-12-07
+
+- Fixing failing test with DBD::SQLite 1.34_02 ff.
+- Backward incompatible change: integer fields now actually get integer
+  random numbers instead of strings of digits.
+
+0.003001	2008-11-12
+
+- minor documentation fix
+
+0.003000	2008-11-04
+
+- removed code attribute
+- auto-sense for column type (text <-> numeric)
+- tests
+- documentation
+
+0.002000	2006-06-06
+
+- rename attribute 'length' to 'size'
+- default 'size' is now taken from $source->column_info($col)->{size}
+
+
+0.001000	2006-03-15
+
+- Initial alpha release

@@ -1,0 +1,2 @@
+[-RegularExpressions::RequireExtendedFormatting]
+#[-CodeLayout::ProhibitHardTabs]

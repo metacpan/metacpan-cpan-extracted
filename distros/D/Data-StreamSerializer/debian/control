@@ -1,0 +1,12 @@
+Source: libdata-streamserializer-perl
+Section: perl
+Homepage: http://search.cpan.org/~unera/Data-StreamSerializer/
+Maintainer: Dmitry E. Oboukhov <unera@debian.org>
+VCS-Browser: http://git.uvw.ru/?p=data-stream-serializer;a=summary
+
+Package: libdata-streamserializer-perl
+Depends: ${perl:Depends}, ${misc:Depends}, ${shlibs:Depends}
+Architecture: any
+Description: non-blocking serializer
+ The package provides an interface to serialize perl objects in non-blocking
+ mode. It can be used with event machines.

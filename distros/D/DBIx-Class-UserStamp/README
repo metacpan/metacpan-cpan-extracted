@@ -1,0 +1,59 @@
+NAME
+    DBIx::Class::UserStamp - Automatically set update and create user id
+    fields
+
+DESCRIPTION
+    Automatically set fields on 'update' and 'create' that hold user id
+    values in a table. This can be used for any user id based field that
+    needs trigger like functionality when a record is added or updated.
+
+SYNOPSIS
+     package MyApp::Schema;
+
+     __PACKAGE__->mk_group_accessors('simple' => qw/current_user_id/);
+
+     package MyApp::Model::MyAppDB;
+     use Moose;
+
+     around 'build_per_context_instance' => sub {
+       my ($meth, $self) = (shift, shift);
+       my ($c) = @_; # There are other params but we dont care about them
+       my $new = bless({ %$self }, ref($self));
+       my $user_info = $c->_user_in_session; 
+       my $user = $new->schema->resultset('User')->new_result({ %$user_info });
+       $new->schema->current_user_id($user->id) if (defined $user_info);
+       return $new;
+     };
+
+     package MyApp::Schema::SomeTable;
+
+     __PACKAGE__->load_components(qw( UserStamp ... Core ));
+ 
+     __PACKAGE__->add_columns(
+        id => { data_type => 'integer' },
+        u_created => { data_type => 'int', store_user_on_create => 1 },
+        u_updated => { data_type => 'int',
+            store_user_on_create => 1, store_user_on_update => 1 },
+     );
+
+    Now, any update or create actions will update the specified columns with
+    the current user_id, using the current_user_id accessor.
+
+    This is effectively trigger emulation to ease user id field insertion
+
+METHODS
+  get_current_user_id
+    This method is meant to be overridden. The default is to return a schema
+    accessor called current_user_id which should be populated as such.
+
+AUTHOR
+     Matt S. Trout     <mst@shadowcatsystems.co.uk>
+
+CONTRIBUTORS
+     John Goulah     <jgoulah@cpan.org>
+     Florian Ragwitz <rafl@debian.org>
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

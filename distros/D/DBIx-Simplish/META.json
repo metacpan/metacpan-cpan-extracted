@@ -1,0 +1,80 @@
+{
+   "abstract" : "L<DBIx::Simple> + L<DBIx::Connector> + extras.",
+   "author" : [
+      "Hans Staugaard <staugaard@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "DBIx-Simplish",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Changes" : "0.19"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Class::Load" : "0",
+            "DBIx::Connector" : "0",
+            "List::MoreUtils" : "0",
+            "Moo" : "0",
+            "MooX::LazyRequire" : "0",
+            "Regexp::Common" : "0",
+            "SQL::Abstract::Limit" : "0",
+            "SQL::Interp" : "0",
+            "Tie::Cache::LRU" : "0",
+            "Type::Tiny::Enum" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Most" : "0",
+            "Test::Requires" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Simplish" : {
+         "file" : "lib/DBIx/Simplish.pm",
+         "version" : "1.002001"
+      },
+      "DBIx::Simplish::Result" : {
+         "file" : "lib/DBIx/Simplish/Result.pm",
+         "version" : "1.002001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://bitbucket.org/hstaugaard/dbix-simplish/issues"
+      },
+      "homepage" : "https://bitbucket.org/hstaugaard/dbix-simplish",
+      "repository" : {
+         "type" : "hg",
+         "url" : "https://bitbucket.org/hstaugaard/dbix-simplish",
+         "web" : "https://bitbucket.org/hstaugaard/dbix-simplish"
+      }
+   },
+   "version" : "1.002001",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0207"
+}
+

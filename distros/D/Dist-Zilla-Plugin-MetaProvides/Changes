@@ -1,0 +1,453 @@
+Revision history for Dist-Zilla-Plugin-MetaProvides
+
+2.002004 2017-03-01T11:57:55Z fd9040a
+ [Bugfix]
+ - Update tooling to avoid .-in-@INC issues
+ - Closes https://github.com/kentnl/Dist-Zilla-Plugin-MetaProvides/issues/7
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002003, see misc/*.deps* for details
+ - develop: +1 ↑1
+
+2.002003 2016-07-29T22:25:40Z c9860d3
+ - STABLE: This release includes all changes previously stated between 2.002000 and 2.002000 as stable.
+ - SHORTLIST: Better logging about possible issues, Fewer dependencies, Enhanced metaconfig data, MetaNoIndex
+   application now correct.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002002, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+
+2.002002 2016-07-07T11:55:30Z 2a9e822
+ - Adds logging warnings for Provides entries that don't map to shipped files. This should not be a problem for anyone
+   unless you're using custom MetaProvides.
+ - Warn about cuckooed packages at the "provides-to-dzil" level. This enables automatic exposure of all packages where
+   "$filename" !~ "/Module/Name.pm" as being potentially problematic.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002001, see misc/*.deps* for details
+ - test: +1
+
+2.002001 2016-06-29T06:09:34Z 2be5312
+ - Remove usage of ConfigDumper and inline dump_config code instead.
+ - use '$' on front of role-injected '$VERSION' identifier to be clearer.
+ - Remove usage of my dztest testing util.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.002000, see misc/*.deps* for details
+ - runtime: -1
+ - test: +1 -1 (recommends: +1)
+
+2.002000 2016-04-22T14:20:31Z 8cd4f33
+ - IMPORTANT: Previously, MetaNoIndex compatibility implemented the "namespace" feature in contradiction of
+   https://metacpan.org/pod/CPAN::Meta::Spec#namespace , which means packages that exactly matched the "namespace"
+   token were excluded, when they should have not been excluded. This release resolves this issue, as reported at
+   https://github.com/rjbs/Dist-Zilla/issues/204
+
+2.001011 2016-01-24T11:24:45Z b20733b
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001010, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +1
+
+ [Documentation]
+ - Enhanced Synopsis documentation as per #4
+
+ [Features]
+ - Customized Croak message for people who accidentally use [MetaProvides] directly. Closes #4
+
+2.001010 2015-10-09T07:02:08Z d62ab63
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001002, see misc/*.deps* for details
+ - configure: (recommends: ↓1)
+ - develop: +8 ↑3 -1 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +1)
+ - test: (recommends: ↓2)
+
+ [Documentation]
+ - Remove confusing quick reference and try to find a better way another day
+ - kentnl/Dist-Zilla-Plugin-MetaProvides-Package#4
+
+ [Features]
+ - Experimentally injecting the version of the role into `dump_config` data.
+ - Part of request #3
+
+2.001002 2014-12-10T10:16:51Z 6baccf2
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +5 ↑1 -2 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -1
+ - test: +1 (recommends: ↑2)
+
+ [Minor]
+ - Stop requiring 5.008 and utf8 when we don't really need it.
+
+2.001001 2014-08-29T10:07:27Z
+ [Bugfix]
+ - avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.001000, see misc/*.deps* for details
+ - test: ↑1
+
+2.001000 2014-08-22T18:50:50Z
+ [00 Minor]
+ - Rewrite dump_config in terms of new Utility.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000010, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +1
+
+2.000010 2014-08-19T01:26:37Z
+ [Code]
+ - Remove unused Readonly stuff.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000003, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: -1
+ - test: +1 ↑1
+
+ [Documentation]
+ - Add very experimental QUICK REFERENCE sections.
+
+ [Tests]
+ - reimplemented in terms of my newish tester util
+ - some tests split into smaller tests.
+
+2.000003 2014-08-16T00:11:28Z
+ [00 Trivial]
+ - CPANDAY!
+ - metdata changes.
+ - tests augmented.
+ - whitespace adjusted.
+ - some POD tweaked.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000002, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: +1 -3 (recommends: ↑1 -1)
+
+ [Documentation]
+ - Heading order and notation slightly improved.
+
+ [Metadata]
+ - Migrate to kentnl org
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - Update reportprereqs
+
+2.000002 2014-07-13T12:27:14Z
+ [00 Trivial]
+ - Documentation/Spelling errors ( closes #2 )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000001, see misc/*.deps* for details
+ - develop: (suggests: ↑2)
+
+2.000001 2014-07-12T19:31:53Z
+ [00 Trivial]
+ - Misc packaging cleanups.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 2.000000, see misc/*.deps* for details
+ - configure: (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: (recommends: ↑2)
+
+2.000000 2014-02-02T05:17:53Z
+ [00 Major]
+ - Moving to EUMM ( May break non-cpan toolchains that work by HAND )
+ - Mantissa length shortening to 6 for more boring versions. ( Primary reason for 1 → 2 )
+ - Dependencies on EUMM/Test::More downgraded to recommends where possible.
+ - 5.008 minimum
+
+ [Dependencies::Aggregate]
+ - 5.8 : Before = 205, After = 204
+ - 5.10 : Before = 183, After = 183
+ - 5.19 : Before = 169, After = 167
+ - Will be less when Dzil drops Path::Class (somehow)
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.15000200, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +4 ↑1 -5
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+1.15000200 2013-12-29T08:37:43Z
+ [Bugfix]
+ - Avoid bug with Dzil being gc'd
+
+ [Depedencies::Noteworthy]
+ - Module::Build 0.4202 → 0.4203
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.15000100, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +3 ↑1 -4
+
+1.15000100 2013-11-21T09:24:45Z
+ [00 Minor Important Changes]
+ - Remove dependency on EmulatePhase
+
+ [Dependencies::Noteworthy]
+ - Hash::Merge::Simple(+)
+ - Module::Build 0.4007 → 0.4202
+ - Test::More 0.98 → 1.001002
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.15000000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +43 ↑1 -1 (recommends: -1, suggests: +1 -1)
+ - runtime: +1 -1
+ - test: ↑1 -3
+
+ [Documentation]
+ - README.mkdn to MetaCPAN
+
+ [Packaging]
+ - use new Fallback code in MB
+
+ [Tests]
+ - Use Test::Compile::PerFile
+ - Regen Kwalitee
+ - Regen ReportVersions::Tiny to not report develop deps
+
+1.15000000 2013-09-21T07:07:03Z
+ [00 Minor Important Changes]
+ - now exports dump_config data
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.14000001, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +7 (suggests: ↑1)
+ - test: +3 -1
+
+ [Documentation]
+ - Retroactively normalise Changes.
+ - Add README.mkdn
+ - Update Copyright year
+ - Add MetaPOD stuff
+
+ [Meta]
+ - Bug tracker to github
+ - Github URI now Camel/UC firsted
+
+ [Packaging]
+ - use Module::Build 0.4007 w/ test_requires
+
+ [Tests]
+ - Update compile and kwalitee tests
+
+1.14000001 2012-07-26T16:24:41Z
+ [BugFix]
+ - Defer version constraints to as late as possible to allow more circular things to happen, avoiding compile-time
+   failure in bootstrap.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.14000000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: (recommends: ↑1, suggests: ↑1)
+ - runtime: +1
+ - test: ↑1
+
+1.14000000 2012-02-07T08:45:13Z
+ [Features]
+ - Reverted all non-documentation changes since 1.13x. Handling this in the role level was a dumb idea anyway.
+
+1.13000001 2012-02-04T09:04:53Z
+ [Documentation]
+ - Improve documentation of skip_underscores and meta_noindex at the more foward-facing sites.
+
+1.13000000 2012-02-04T07:35:05Z
+ [Features]
+ - Add a provisional filter that eliminates X::_y form namespaces ( a hiding convention ), enabled by default. Toggle
+   skip_underscore to change. Thanks XDG/David Golden for reporting this in rt#74675.
+
+1.12060502 2012-02-04T00:39:26Z
+ - Maintenance Release
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.12060501, see misc/*.deps* for details
+ - develop: (suggests: ↑1)
+ - runtime: +3
+ - test: -1
+
+ [Internals]
+ - added $AUTHORITY to all namespaces
+ - moved $VERSION out of BEGIN in all namespaces
+
+ [Packaging]
+ - update LICENSE ( Year, Address, Indent )
+ - move extra tests to xt/
+ - move git URLs to https://
+ - export x_authority in metadata.
+ - move to git versions
+
+1.12060501 2011-04-08T13:44:56Z
+ [BugFix]
+ - rt#67325 : Should now depend on Test::More 0.96 to solve tests failing on earlier versions.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.12060212, see misc/*.deps* for details
+ - test: ↑1
+
+1.12060212 2011-04-06T00:17:21Z
+ [Dependencies::Stats]
+ - Dependencies changed since 1.12044806, see misc/*.deps* for details
+ - develop: +1 -1 (recommends: +1 -1, suggests: +1 -1)
+
+ [Documentation]
+ - Many miscelany spelling mistakes fixed.
+
+ [Features:Minor/API]
+ - copy_into now returns '1' when done.
+ - ProvideRecord Plugin is now immutablized.
+ - Type libraries no longer erroneously import Moose.
+
+ [Packaging]
+ - Moved to @Author::KENTNL
+ - Reworked Changes to CPAN::Changes spec.
+ - Made critic happy and stricter.
+
+ [Tests]
+ - add CPAN::Changes tests.
+ - remove portability tests.
+
+1.12044806 2010-11-06T18:20:55Z
+ - A little bit more testing of the codebase, tests should be now comprehensive enough to detect most change-bugs.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.12044803, see misc/*.deps* for details
+ - test: +1
+
+1.12044803 2010-11-06T15:26:58Z
+ - Build ourself using MetaNoIndex to hide corpus/ crap.
+ - Add MetaNoIndex to suggest lists.
+ - Fix tests not to fail when there is no MetaNoIndex.
+ - PerlTidy allover.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.12044518, see misc/*.deps* for details
+ - develop: +2
+ - runtime: (suggests: +1)
+ - test: (suggests: +1)
+
+1.12044518 2010-11-04T06:32:54Z
+ - Spliced Test deps into its own module.
+ - Shipped work behind _try_regen_metadata to Dist::Zilla::Util::EmulatePhase
+ - meta_noindex is now *ON* by default. This behavioural change is reason for Bumping the minor to 12. Rationale: If
+   you're using MetaNoIndex and this module, then you want things to get skipped. With provides =>, cpan won't do any
+   indexing itself, so no_index in the data does nothing. So, this module brings that power back to life by
+   implementing it manually.
+ - Add thanks while I remember.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11044405, see misc/*.deps* for details
+ - runtime: +1 -2
+ - test: +1 -4
+
+1.11044405 2010-11-02T17:04:51Z
+ - Drop silly extra depends that sneaked in. It was hobbitses, and they are pesky.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11044404, see misc/*.deps* for details
+ - test: -3
+
+1.11044404 2010-11-02T16:25:56Z
+ - Upgrade to recent @KENTNL changes ( remove inc/ and xt/ from source tree, relocate perlcritic.rc )
+ - Now have a convenience function, usable by all consuming roles that permit filtering packages that match criteira
+   added to MetaNoIndex. Once your role uses this function, the attribute also bolted on by this change ( meta_noindex
+   = 1 ) will control this behaviour. Thanks to xdg/David Golden for this suggestion.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.11034201, see misc/*.deps* for details
+ - develop: +1 (recommends: +1, suggests: +1)
+ - runtime: +2
+ - test: +9
+
+1.11034201 2010-07-24T13:35:56Z
+ - Forked into 4 smaller dists to reduce the installation overheads.
+ - Mostly so that people who want Metaprovides::Package don't have to install MooseX::Declare and friends.
+   ::Plugin::MetaProvides, ::Plugin::MetaProvides::Package, ::Plugin::MetaProvides::Class,
+   ::Plugin::MetaProvides::FromFile
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.10034117, see misc/*.deps* for details
+ - runtime: ↓4 -10
+ - test: ↓1 -10
+
+1.10034117 2010-07-24T05:37:49Z
+ - Dropped xt/author/kwalitee.t to avoid the needless dep. ( Kwalitee Test plugin doesn't have this issue )
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.10027802, see misc/*.deps* for details
+ - build: -13
+ - test: +13
+
+1.10027802 2010-05-22T13:08:02Z
+ - Replaced most of dist.ini with @KENTNL ( Yeilding more accurate t/ depends )
+ - Removed =inc::Dist style loopback in favour of the more reliable and more generic =inc::lib
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.10027518, see misc/*.deps* for details
+ - build: +13
+ - configure: -1
+ - runtime: +4 -6
+
+1.10027518 2010-05-20T05:33:10Z
+ - Upgraded tests to Dist::Zilla 2.x. ( should resolve rt #56482 ) ( Thanks to DAXIM/Lars Dɪᴇᴄᴋᴏᴡ 迪拉斯 for reporting )
+ - Upgraded dist.ini to Dist::Zilla 2.x
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.10001919, see misc/*.deps* for details
+ - build: +1
+ - configure: +2
+ - runtime: ↑1
+
+1.10001919 2009-09-12T06:17:57Z
+ - Dropped the version dep on FindBin because it causes problems for some. Apparently deping on something that may or
+   may not be in core which may or may not be in core later is a bad thing.
+ - Added CompileTests
+ - Add dist.ini to release for diagnostic reasons.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.10000417, see misc/*.deps* for details
+ - runtime: ↓1
+
+1.10000417 2009-08-28T04:52:32Z
+ - Moved the tests around.
+ - More tests.
+ - All versions now maxing out to encourage upgrading.
+ - Moved to relative dating scheme
+ - Tighter DogFeed Loopback in buildsystem.
+ - Critic'd.
+ - Documentation Upped on the plugs.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 1.0920022, see misc/*.deps* for details
+ - runtime: +1 ↑17
+
+1.0920022 2009-07-19T22:52:48Z
+ - Moved Documentation to a .pm file to satisfy Module::Build
+
+1.0920015 2009-07-19T15:31:07Z
+ - Now eating own dog food.
+ - Scan *.pm|*.pod so that .pod files index properly
+ - Only scan lib/
+ - Fixed Bug with META's having ; in them.
+
+1.0920012 2009-07-19T12:24:43Z
+ - First version.

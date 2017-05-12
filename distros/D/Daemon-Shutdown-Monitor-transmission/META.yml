@@ -1,0 +1,57 @@
+---
+abstract: 'Daemon::Shutdown monitor plugin which checks for active transmission downloads'
+author:
+  - 'Ioan Rogers <ioan.rogers@gmail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300002, CPAN::Meta::Converter version 2.112621'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Daemon-Shutdown-Monitor-transmission
+requires:
+  Daemon::Shutdown: 0.07
+  Log::Log4perl: 0
+  Params::Validate: 0
+  Readonly: 0
+  Regexp::Common: 0
+  Transmission::Client: 0
+  Try::Tiny: 0
+  YAML::Any: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/ioanrogers/daemon-shutdown-monitor-transmission/issues
+  repository: git://github.com/ioanrogers/daemon-shutdown-monitor-transmission.git
+version: 0.004
+x_BuiltWith:
+  modules:
+    Daemon::Shutdown: 0.07
+    File::Find: 1.19
+    File::Temp: 0.22
+    Log::Log4perl: 1.33
+    Module::Build: 0.38
+    Params::Validate: 1.00
+    Readonly: 1.03
+    Regexp::Common: 2011041701
+    Test::More: 0.98
+    Transmission::Client: 0.0602
+    Try::Tiny: 0.11
+    YAML::Any: 0.77
+    strict: 1.04
+    warnings: 1.12
+  perl:
+    original: v5.14.1
+    qv: 1
+    version:
+      - 5
+      - 14
+      - 1
+  platform: linux

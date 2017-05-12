@@ -1,0 +1,9 @@
+logger: Null
+plugins:
+  "OAuth2::Server":
+    state_required: 1
+    clients:
+      client1:
+        client_secret: secret
+        scopes:
+          other: 0

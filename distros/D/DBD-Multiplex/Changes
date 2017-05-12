@@ -1,0 +1,100 @@
+Revision History
+
+# 10-10-1999	Thomas Kishel
+
+	Implemented do().
+
+# 07-12-2001	Edwin Pratomo
+
+	Implemented explicit master/slave relationship.
+
+# 03-08-2002	Thomas Kishel	
+
+	Trying to build a release.
+
+# 04-10-2002	Thomas Kishel
+
+	Building a release.
+
+# 11-01-2002	Thomas Kishel
+
+	Added generic error handling. 
+	Added empty DESTROY methods.
+	Added return of multiple results to example.pl.
+	Added connected dsn list attribute.
+	Corrected the return of multiple results. 
+	Normalized code and code formatting.
+
+# 08-24-2004	Thomas Kishel
+
+	Corrected documentation.
+
+# 09-01-2004	Pat Deegan
+
+	Added delete before assignment in mx_method_all and prepare.
+	Corrected mx_default_statement_mode.
+
+# 01-25-2005	Daniel J. Wright
+
+	Corrected the return of results for fetchrow_array.
+
+# 07-19-2005	David Muir Sharnof
+
+	Added ability to pass attributes (other than mx_error_proc) in DSN parameter.
+
+# 10-24-2005	Satoshi Tanimoto 
+
+	Improved SQL statement parsing.
+
+# 05-15-2006	Rhesa Rozendaal
+
+	Added transaction support.
+
+# 01-07-2007	Mark Stos
+
+	#24220 Some SELECTs were being falsely classifed as "modifying" statements.
+	#24219 Support SELECTs that modify.
+
+# 06-25-2007    Thomas Kishel
+
+	# Remember to export COPY_EXTENDED_ATTRIBUTES_DISABLE=true before tar on MacOSX 10.4.
+	# Module cleanup.
+
+# 12-24-2007    Thomas Kishel
+
+	Fixed Bug ID: 31768
+	Old list for DBI functions "Line 576". 
+	Not found info functions like column_info etc.
+
+# 05-07-2008    Naoki Urai
+
+	Added tests to avoid "Use of uninitialized value" warnings. 
+	
+# 05-08-2008    Thomas Kishel
+
+	Rebuilt Makefile.PL and META.yml.
+
+# 07-09-2008	Thomas Kishel
+
+	Purged HFS meta-files.
+	http://we.hates-software.com/index_6.html
+
+# 01-18-2010	Jeff Weisberg
+
+	Corrected AUTOLOAD handler.
+	
+	"Multiplex uses an AUTOLOAD handler to "proxy" many methods,
+	but it is not being called because DBI thinks the methods
+	are not implemented."
+	
+	"Fixed DBI dispatch to not try to use AUTOLOAD for driver methods 
+	unless the method has been declared (as methods should be when using AUTOLOAD)."
+
+# 01-26-2010	Thomas Kishel
+
+	COPY_EXTENDED_ATTRIBUTES_DISABLE now COPYFILE_DISABLE
+	Thanks, Apple!
+	export COPYFILE_DISABLE=true
+	tar --exclude *.DS_Store -cvzf DBD-Multiplex-2.10.tar.gz DBD-Multiplex
+
+

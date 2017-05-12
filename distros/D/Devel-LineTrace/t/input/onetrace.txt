@@ -1,0 +1,2 @@
+t/scripts/script1.pl:8
+    print "\$i=$i\n";

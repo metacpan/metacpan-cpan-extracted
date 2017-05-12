@@ -1,0 +1,13 @@
+DateTime::TimeZone::Alias
+========================
+
+This is a companion module to DateTime/TimeZone.pm. It allows you to generate aliases to timezone information.
+
+INSTALLATION
+
+To install this module type the following:
+
+perl Makefile.PL
+make
+make test
+make install

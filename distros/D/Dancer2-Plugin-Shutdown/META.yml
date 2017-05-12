@@ -1,0 +1,42 @@
+---
+abstract: 'Graceful shutdown your Dancer2 application'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Dancer2: '0'
+  Exporter: '0'
+  File::Copy: '0'
+  File::Temp: '0'
+  HTTP::Cookies: '0'
+  HTTP::Request::Common: '0'
+  Import::Into: '0'
+  Module::Build: '0.28'
+  Plack::Test: '0'
+  Test::Most: '0'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.005, CPAN::Meta::Converter version 2.150001'
+license: open_source
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-Shutdown
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Dancer2::Plugin: '0'
+  Moo::Role: '2'
+  Scalar::Util: '0'
+  constant: '0'
+  perl: '5.010'
+  strictures: '2'
+resources:
+  bugtracker: https://github.com/zurborg/libdancer2-plugin-shutdown-perl/issues
+  homepage: https://github.com/zurborg/libdancer2-plugin-shutdown-perl
+  repository: https://github.com/zurborg/libdancer2-plugin-shutdown-perl.git
+version: '0.002'
+x_contributors:
+  - 'David Zurborg <d.zurborg@vcare24.de>'

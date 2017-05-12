@@ -1,0 +1,25 @@
+
+Moznost stahnout s HTML i obrazky, obecne podpora pro vice vyslednych
+souboru.
+
+Moznost mit jine popisy pS tiskaren pro Word a Excel -- Pavel Smerk
+reportuje, ze
+
+	Z Configu je treba tahat i tiskarny pro Excel, problem nastava
+	tehdy, pokud Office nejsou anglicke - tehdy tiskarna do souboru
+	je ve Wordu "... on FILE:", ale v Excelu "... na FILE:"
+	(prislusny ekvivalent anglickeho "on"). Slo by to resit
+	i obecneji, nez jsem to udelal, ale stejne ty tiskarny moc
+	obecne nejsou (nejake pole jmen tiskaren a automaticke
+	tvoreni ps[cislo], aby nemuseli sahat do Docserver.pm, pokud
+	by jich chteli mit vice), tak je to fuk.
+
+Moznost mit failsafe reseni, kdy se pri nedostupnosti jednech Windows
+pouziji jine.
+
+Zkontrolovat, jestli jedou testy pro Perl v C:\Program Files.
+
+Podpora i jinych oddelovacu v CSV (nyni pouze strednik).
+
+Neprepisovat nastaveni v Docclient::Config.pm.
+

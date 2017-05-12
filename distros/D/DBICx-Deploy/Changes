@@ -1,0 +1,11 @@
+Changelog for DBICx::Deploy
+
+0.02      9 October 2007 later that day :)
+          - add -l and -b options
+          - allow user to pass args to $schema->connect(..., <here>)
+          - fix the test to test this module, not some other one
+          - allow deployment to SQL scripts on the filesystem
+
+0.01      9 October 2007 at 4am
+          - first release upon an unsuspecting world
+          - generally broken because it went from idea to cpan in 25 minutes :)

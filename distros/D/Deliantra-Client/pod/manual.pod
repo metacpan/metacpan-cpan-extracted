@@ -1,0 +1,371 @@
+=head1 Deliantra Manual
+
+=head2 Features
+
+=over 4
+
+=item Fullscreen Map
+
+Deliantra uses a fullscreen map, which greatly enhances how much of the
+game world you can see.
+
+=item Persistent Map Cache
+
+Deliantra can persistently cache all map data it received from the
+server. This not only allows it to display an overview map, but also
+ensures that once-explored areas will be available the next time you want
+to explore more.
+
+=item Hardware acceleration
+
+Deliantra can take advantage of OpenGL hardware acceleration. Most modern
+graphics cards have difficulties with 2D acceleration, while 3D graphics
+is accelerated well.
+
+=item No arbitrary limits
+
+Deliantra does not suffer from arbitrary limits (like a fixed amount of
+face numbers). There are still limits, but they are not arbitrarily low :)
+
+=item High quality text rendering
+
+Although surprising at first, high quality text rendering is a real
+must have feature.  For this, Deliantra leverages Παν語 (PanGo) to offer
+real-world text output quality, so you can chat in 日本語 (japanese),
+ﺎﻠﻋﺮﺒﻳﺓ (arabic) or most any other language/script, as long
+as suitable fonts are installed.
+
+=back
+
+=head1 Usage
+
+=head2 X<the_keyboard>Keyboard/Keymappings
+
+The keyboard works quite similar to other programs: If a widget (e.g. a text entry) has the focus,
+you can enter and edit text there.
+
+Special key bindings apply to the playing area. It needs to be focused to
+work. If it doesn't have the focus, it will be tinted in red, in that case
+you can focus it by clicking into it.
+
+The following keys are available in the playing area:
+
+=over 4
+
+=item B<F1>..B<F9> - open various dialogs (use the right mouse button menu to see which).
+
+=item B<Tab> - toggle (make visible/invisible) the playerbook window.
+
+=item B<Left-Shift-Tab> - toggle (make visible/invisible) the message window.
+
+=item B<Spacebar> - apply the item below you (selected by the server, usually the topmost item).
+
+=item B<Return> - activate the currently-visible entry in the message window.
+
+=item B<Left-Alt-1..9> - activate the nth tab in the message window.
+
+=item B<Left-Alt-x> - close the currently active tab in the message window.
+
+=item B<,> (the comma) - take the item below you (selected by the server, usually the topmost item).
+
+=item Cursor/Arrow Keys, Keypad-B<12346789> - directional movement/attack.
+
+If you press the Alt-Modifier together with a Cursor/Arrow-Key, then you
+will use the next direction counterclockwise, this gives you access to the
+diagonal directions on keyboards without a numeric keypad. This works together
+with other modifiers, too.
+
+=over 4
+
+=item B<Shift>-I<direction> - use your ranged weapon slot to attack the space indicated by the direction key.
+
+=item B<Ctrl>-I<direction> - run into the indicate direction as fast as possible, attacking everything in your way.
+
+=back
+
+=item Keypad-B<5> - use your current range slot on yourself or the space where you are standing.
+
+=item Keypad-B<+> - toggle between your range and combat slots
+
+Only one of them can be active at any specific time. Deliantra
+automatically switches to the right slot when you attack, but sometimes a
+weapon (combat slot) has some specific effect (for example, lets you heal
+faster) which would not be working when your range slot is active.
+
+=item B<'> - open the completer.
+
+=item B<"> - open the completer, presetting it with your current communication command.
+
+=item B<a>-B<z> (lowercase characters) - open the completer, presetting it with the character types.
+
+=item B<Ctrl>-B<Insert> - open the macro recorder/key binding editor and start recording.
+
+=item Keypad-B<enter> - examine item on floor.
+
+=item B<Left-Alt-s> - ready_skill find traps
+
+=item B<Left-Alt-d> - ready_skill disarm traps
+
+=item B<Left-Alt-p> - ready_skill praying
+
+=back
+
+=head2 The Map
+
+The map is always displayed in the background, behind all other windows and UI elements.
+
+#TODO# middle-click scrolls
+#
+# keys:
+#
+# a apply
+# keypad moves, kp_5 applies ranged attack to self
+
+Starting to type enters the I<completion mode>. In that mode, you can type
+abbreviations or commands and have them executed as soon as they match a
+valid command. This is best explained by a few examples:
+
+Typing B<climb> will display a list of commands with I<climb> in their
+name, such as I<ready_skill climbing> and I<use_skill climbing>.
+
+You can abbreviate commands by typing only the first character of every
+word (or even characters within the word - the client will try to make
+a good guess, as long as the characters are in order). For example,
+typing I<iwor> will likely select I<invoke word of recall>, while I<ccfo>
+will select I<cast create food>. Likewise, I<rscli> will likely select
+I<ready_skill climbing> and I<usl> will give you I<use_skill levitation>.
+
+You can enter space and other text as arguemnt to the command. For
+example, C<cfoo waybread> will expand to C<cast create food waybread>.
+
+=head2 The map overview
+
+This is the small mini map in the upper left corner. It displays the areas which
+you already visited before.
+
+=head2 The Status area in the lower right corner
+
+The area in the lower right corner displays the most interesting
+stats while playing. The 4 gauges: Health, Mana/Spellpoints,
+Grace and Food. The top of each gauge shows the current value
+and the bottom value is the maximum value.
+
+Going over each gauge with the mouse cursor will show a tooltip
+with a detailed explanation of each stat.
+
+Below the gauges there is a line that looks like this:
+
+   Exp: ######## (lvl ####)
+
+The former number are the experience points and the number in the parents
+is the level of your character.
+The level of the character depends on the experience points you have.
+If the experience points reach a certain value your level rises or falls.
+This depends on the experience table of the server you are currently playing on.
+
+On the bottom there is a line:
+
+   Rng: xxxxxxxxx
+
+It tells you have you have in your range slot. The range slot is activated
+if you "fire" (by pressing ctrl+direction key). For example there could be a spell
+in your range slot or a weapon (like a bow) you will fire with.
+
+=head2 The Floorbox
+
+Right to the left of the status area there is the floorbox.
+It displays what is on the tile your character stands on. If there are very many
+items there will be a "More..." button which will open up the Inventory.
+
+If you opened a container a button "Close container" will show up.
+
+=head2 Setup
+
+This is the main setup window (opened via the I<Setup> button on the top of
+the client window), with following sub-windows:
+
+=head3 Server
+
+This window is for editing the connection settings and shows
+some information about the currently connected server.
+
+=head3 Pickup
+
+Here you can configure your automatic pickup configuration.
+
+=head3 Graphics
+
+Here you can configure some aspects of the graphical appearance
+of the client.
+
+=head3 Audio
+
+This window lets you enable/disable audio and set the background music
+volume.
+
+=head3 Keyboard
+
+Here you can edit the key bindings you have made.
+
+B<PLEASE DON'T FORGET TO PRESS> I<Save Config> on the top of the client window
+after you are finished.
+
+=head3 Debug
+
+Here are some debugging options, which are maybe only interesting to the developers
+of the client.
+
+=head2 The Playerbook
+
+You can open the Playerbook by pressing B<tab> or by pressing B<F2> for 
+the Statistics, B<F3> for the Skills, B<F4> for the Spellbook or B<F5> for the
+Inventory.
+
+What these are is explained below:
+
+=head3 Statistics
+
+=for image sc_statistics.jpg
+
+You can toggle this windows via B<F2>.
+
+This page tells you about your current status and statistics. 
+The B<Player> frame shows your name, title and current map, and your
+current weight and maximum weight.
+
+The B<Primary/Secondary Statistics> informs you about the status of
+your L<primary statistics|glossary/primary statistics>, which is the group on the left and about the
+L<secondary statistics|glossary/secondary statistics> which is the group on the right.
+
+=head3 Skills
+
+=for image sc_skill_list.jpg
+
+You can toggle this windows via B<F3>.
+
+TBD
+
+=head3 Spellbook
+
+=for image sc_spellbook.jpg
+
+You can toggle this windows via B<F4>.
+
+=head3 X<playerbook_inventory>Inventory
+
+=for image sc_inventory.jpg
+
+You can toggle this windows via B<F5>.
+
+On the left side of this windows you see the player's inventory.
+On top the current weight and maximum weight are listed on the right
+of the B<sort order button>, which reveals following possible orders:
+
+=over 4
+
+=item Type/Name
+
+This order sorts the items first by type, and then by name.
+
+=item Recent/Normal/Locked
+
+This order puts the recently picked up or applied items to the top,
+then it displays the normal not so recently changed items, and to the last
+it displays the locked items.
+
+=item Weight/Type
+
+This order first sorts by weight and then by type.
+
+=back
+
+Below the sort order button there is the item list. You can hover the mouse cursor over
+the items to see what actions you can do with the mouse. Right click will 
+show you the B<context menu>, with the following actions:
+
+=over 4
+
+=item examine
+
+This will let you examine the item further and print informations like this:
+
+   That is cloak (unidentified)
+   It is made of: leather.
+   It goes around your shoulders.
+   It weights 5.000 kg.
+   You reckon it is worth between 1 gold coin and 1 gold coin.
+
+=item mark
+
+This marks the item for further operations, like L<thawing or igniting
+something with a flint and steel|faq_igniteandthaw>.
+
+=item ignite/thaw
+
+This will ignite for example a torch or thaw an icecube with a B<flint &
+steel> L<$ARCH/flint_and_steel.x11>, which is B<required to be in your
+inventory> for this to work.
+
+=item inscribe
+
+This will let you write on something (eg. scrolls) with a B<pen>
+L<$ARCH/stylus.x11>, which is I<required to be in your inventory> for this
+to work.
+
+When you click on this context menu entry a small popup window will open
+where you can type in what you want to inscribe.
+
+=item rename
+
+This lets you rename an item. When you click on this context menu entry
+a small popup window will open and let you type in the new name for the
+item.
+
+=item apply
+
+This L<applies|command/apply> an object.
+
+=item lock/unlock
+
+=item drop/put/take all
+
+=item drop/put/take <n>
+
+=back
+
+On the right side there will be displayed the currently open container
+or the floor on which you stand. There are nearly the same context menu
+operation aviable. On the top the is the name of the currently opened
+container or just 'Floor'.
+
+If a container is open, there will be a button 'Close container' which
+will apply the container in your inventory again to close it.
+
+=head2 X<binding_recorder>Binding Recorder
+
+This is a special facility which lets you record commands issued via the
+completer or the message window and bind them to a key.
+
+(I<Note:> as this facility is quite complicated it might change in future).
+
+It mainly works this way:
+
+First you have to I<start recording> via the button on the top.
+
+Then you can issue commands via the completer, or just run around, the
+commands will be recorded in the background.
+
+If you are finished with the command sequence click on I<stop recording>
+(the same button you used to start recording).
+
+Then you can see a list of the commands you issued and delete them if you
+want.
+
+Next you have to click on I<bind>, which will open a key query, where you
+have to press the corresponding key combination which you want to bind to
+this command sequence.
+
+After you are finished you have to click on B<OK>.
+
+B<Don't forget to> I<Save Config> B<!>
+

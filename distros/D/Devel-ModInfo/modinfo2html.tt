@@ -1,0 +1,95 @@
+<HTML>
+<HEAD>
+<TITLE>[% modinfo.module.name %] [% modinfo.module.version %]</TITLE>
+<STYLE>
+H1 {color: blue; text-align: center}
+.function {font-weight: bold; color: blue}
+</STYLE>
+</HEAD>
+<BODY>
+<h1>[% modinfo.module.name %] [% modinfo.module.version %]</h1>
+
+<h2>Features</h2>
+<UL>
+<LI><a href="#Parent_Classes">Parent Classes</a></LI>
+<LI><a href="#Properties">Properties</a></LI>
+<LI><a href="#Constructors">Constructors</a></LI>
+<LI><a href="#Methods">Methods</a></LI>
+<LI><a href="#Functions">Functions</a></LI>
+<LI><a href="#Dependencies">Dependencies</a></LI>
+</UL>
+
+<h2><a name="Parent_Classes">Parent Classes</a></h2>
+<UL>
+[% FOREACH parent_class = modinfo.module.parent_classes %]
+<LI>[% parent_class.name %]</LI>
+[% END %]
+</UL>
+
+<h2><a name="Properties">Properties</a></h2>
+
+<DL>
+[% FOREACH property = modinfo.properties %]
+<DT>[% property.name %] as [% property.data_type  %]</DT>
+<DD>[% property.short_description %]</DD>
+[% END %]
+</DL>
+
+<h2><a name="Constructors">Constructors</a></h2>
+[% functions = modinfo.constructors %]
+[% INCLUDE function %]
+
+<h2><a name="Methods">Methods</a></h2>
+[% functions = modinfo.methods %]
+[% INCLUDE function %]
+
+<h2><a name="Functions">Functions</a></h2>
+[% functions = modinfo.functions %]
+[% INCLUDE function %]
+
+<h2><a name="Dependencies">Dependencies</a></h2>
+<UL>
+[% FOREACH dependency = modinfo.module.dependencies %]
+<LI>[% dependency.type %] [% dependency.target  %]</LI>
+[% END %]
+</UL>
+</BODY>
+
+[% BLOCK function %]
+	<UL>
+	[% FOREACH function = functions %]
+	<LI><a href="#[% function.name %]">[% function.name %]</a></LI>
+	[% END %]
+	</UL>
+	<DL>
+	[% FOREACH function = functions %]
+		<DT><a class="function" name="[% function.name %]">sub [% function.name %]</a>(</DT>
+		[% IF function.parameters.first %]
+			[% comma = '' %]
+			<DL>
+				[% FOREACH param = function.parameters %]
+					[% IF param.data_type == 'HASH' %]
+						[% comma %]<DT>[% param.name %] (</DT>
+							[% IF param.keys.first %]
+								[% comma2 = '' %]
+								<DL><DT>
+								[% FOREACH pkey = param.keys %]
+									[% comma2 %]<DT>[% pkey.name %] as [% pkey.data_type %]
+									[% comma2 = ",</DT> <DD><i>$pkey.short_description</i></DD>" %]
+								[% END %]		
+								</DT>
+								</DL>
+							[% END %]
+				<DT>) as [% param.data_type %]</DT>
+					[% ELSE %]
+						[% comma %]<DT>[% param.name %] as [% param.data_type %]
+						[% comma = ",  </DT><DD><i>$param.short_description</i></DD>" %]
+					[% END %]
+				[% END %]
+			</DL>
+		[% END %]
+		<DT>) as [% function.data_type or 'VOID'  %]</DT>
+		<DD><I>[% function.short_description %]</I><BR><BR></DD>
+	[% END %]
+	</DL>
+[% END %]

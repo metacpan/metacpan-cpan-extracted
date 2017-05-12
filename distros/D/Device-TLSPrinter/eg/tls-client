@@ -1,0 +1,18 @@
+#!/usr/bin/perl
+use strict;
+use lib 'lib';
+#use Devel::SimpleTrace;
+use Device::TLSPrinter;
+
+$|++;
+my $printer = Device::TLSPrinter->new(type => "network", device => "localhost:1234");
+
+         print "enable feedback: ";             print join(" - ", $printer->sc_enable_feedback_chars), $/;
+sleep 1; print "enable immediate commands: ";   print join(" - ", $printer->sc_enable_immediate_cmds), $/;
+sleep 1; print "firmware version: ";            print join(" - ", $printer->sc_firmware_version), $/;
+sleep 1; print "printer status: ";              print join(" - ", $printer->ic_printer_status), $/;
+sleep 1; print "batch quantity: ";              print join(" - ", $printer->ic_batch_quantity), $/;
+sleep 1; print "touch cell data (ASCII): ";     print join(" - ", $printer->sc_get_touch_cell_data_ascii), $/;
+sleep 1; print "memory information: ";          print join(" - ", $printer->sc_memory_information), $/;
+sleep 1; print "set printer to metric: ";       print join(" - ", $printer->sc_set_printer_to_metric), $/;
+

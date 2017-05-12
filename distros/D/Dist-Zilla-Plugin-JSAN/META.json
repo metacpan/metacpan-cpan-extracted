@@ -1,0 +1,58 @@
+{
+   "abstract" : "a plugin for Dist::Zilla for building JSAN distributions",
+   "author" : [
+      "Nickolay Platonov <nplatonov@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.101670",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-JSAN",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Archive::Tar" : "1.52",
+            "Capture::Tiny" : "0.08",
+            "Data::Section" : "0.004",
+            "Dist::Zilla" : "4.102343",
+            "Dist::Zilla::Plugin::CheckChangesHasContent" : "0.003",
+            "Dist::Zilla::Plugin::Git" : "1.102810",
+            "Dist::Zilla::Plugin::GithubMeta" : "0.10",
+            "File::Find::Rule" : "0.28",
+            "File::Temp" : "0.22",
+            "Getopt::LL" : "1.00",
+            "JSON" : "2.00",
+            "MIME::Types" : 0,
+            "Path::Class" : "0.16",
+            "Text::Markdown" : "v1.0.26",
+            "Text::MultiMarkdown" : "v1.0.29"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://github.com/SamuraiJack/Dist-Zilla-Plugin-JSAN/tree",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/SamuraiJack/Dist-Zilla-Plugin-JSAN.git",
+         "web" : "http://github.com/SamuraiJack/Dist-Zilla-Plugin-JSAN/tree"
+      }
+   },
+   "version" : "0.06"
+}
+

@@ -1,0 +1,40 @@
+---
+abstract: 'RewriteVersion but force normalizing ENV{V} and other sources.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Util::Test::KENTNL: '1.003002'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  perl: '5.008'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.008'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-RewriteVersion-Sanitized
+provides:
+  Dist::Zilla::Plugin::RewriteVersion::Sanitized:
+    file: lib/Dist/Zilla/Plugin/RewriteVersion/Sanitized.pm
+    version: '0.001006'
+recommends:
+  Moose: '2.000'
+requires:
+  Dist::Zilla::Plugin::RewriteVersion: '0'
+  Dist::Zilla::Role::Version::Sanitize: '0'
+  Moose: '0'
+  perl: '5.008'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-Plugin-RewriteVersion-Sanitized/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-Plugin-RewriteVersion-Sanitized
+  repository: https://github.com/kentnl/Dist-Zilla-Plugin-RewriteVersion-Sanitized.git
+version: '0.001006'

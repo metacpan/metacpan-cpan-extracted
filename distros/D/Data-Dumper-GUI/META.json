@@ -1,0 +1,90 @@
+{
+   "abstract" : "just what Data::Dumper needed... a GUI",
+   "author" : [
+      "Toby Inkster (TOBYINK) <tobyink@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Inkt::Profile::TOBYINK version 0.013, CPAN::Meta::Converter version 2.120921",
+   "keywords" : [],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-Dumper-GUI",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "t",
+         "xt"
+      ]
+   },
+   "optional_features" : {},
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "Dist::Inkt" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Devel::Size" : "0.79",
+            "Exporter::Tiny" : "0.026",
+            "Moo" : "1.002000",
+            "Prima" : "1.36",
+            "Types::Standard" : "0.012",
+            "perl" : "5.010001"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "provides" : {
+      "Data::Dumper::GUI" : {
+         "file" : "lib/Data/Dumper/GUI.pm",
+         "version" : "0.006"
+      },
+      "Reply::Plugin::ddGUI" : {
+         "file" : "lib/Reply/Plugin/ddGUI.pm",
+         "version" : "0.006"
+      },
+      "ddGUI" : {
+         "file" : "lib/ddGUI.pm"
+      },
+      "ddGUI::Window" : {
+         "file" : "lib/ddGUI/Window.pm",
+         "version" : "0.006"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "X_identifier" : "http://purl.org/NET/cpan-uri/dist/Data-Dumper-GUI/project",
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Dist/Display.html?Queue=Data-Dumper-GUI"
+      },
+      "homepage" : "https://metacpan.org/release/Data-Dumper-GUI",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/tobyink/p5-data-dumper-gui"
+      }
+   },
+   "version" : "0.006",
+   "x_contributors" : [
+      "Dmitry Karasik (KARASIK) <karasik@cpan.org>"
+   ]
+}

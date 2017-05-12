@@ -1,0 +1,68 @@
+Revision history for
+
+0.11 2014-03-25
+ [BUG FIXES]
+ - Routes with ':id.:format' were not created properly.  (GH#3, reported by
+   garu)
+
+ [STATISTICS]
+ - code churn: 4 files changed, 68 insertions(+), 3 deletions(-)
+
+0.10 2014-03-22
+ [BUG FIXES]
+ - Requires Dancer v1.3111 or better. (GH#2, reported by OverlordQ)
+
+ [ENHANCEMENTS]
+ - 'resource' can now be used with a subset of its actions.
+
+ [STATISTICS]
+ - code churn: 4 files changed, 42 insertions(+), 25 deletions(-)
+
+0.09 2014-03-11
+ [BUG FIXES]
+ - Skip test if XML::Simple is not installed.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 26 insertions(+), 3 deletions(-)
+
+0.08 2014-03-10
+ [BUG FIXES]
+ - 'prepare_serializer_for_format' was clobbering the default serializer.
+   (RT#93478, reported by Pierre Vigier, fix by Yanick Champoux)
+ - serializer not detected in time for first deserialization.  (RT#78437,
+   reported by Andrew Solomon, fix by Yanick Champoux)
+
+ [STATISTICS]
+ - code churn: 12 files changed, 172 insertions(+), 111 deletions(-)
+
+0.07 2011-11-01
+ - Minor updates to fix warnings with Dancer 1.3080
+ - Fix POD (Alexis Sukrieh)
+
+0.06 2011-05-28
+ [TEST SUITE]
+ - Skip test t/03_resource.t if Dancer is not >= 1.3059_01 A bug in
+   Dancer::Test in previous versions prevent the test from passing.
+
+0.05 2011-03-04
+ [BUG FIXES]
+ - Fix the test suite with dancer_response
+ - Fix dependencies: Dancer 1.3014
+
+0.04 2010-12-22
+ - Add all HTTP response status (Alexis Sukrieh)
+
+0.03 2010-10-18
+ - New keywords for ReST response status  (status_ok, status_created, ...)
+   (Franck Cuny)
+
+0.02 2010-10-14
+ - 100% coverage
+ - fix a bug in 'resource' (order of route hander definition)
+
+0.0001_01 2010-05-06
+ - Support for prepare_serializer_for_format keyword autoamtically set a
+   serializer according to params->{format}
+ - Support for resource definition When a resource is defined a set of
+   routes are defined in a RESTful manner.
+

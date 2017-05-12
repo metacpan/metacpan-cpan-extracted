@@ -1,0 +1,142 @@
+NAME
+    Data::Inherited - Hierarchy-wide accumulation of list and hash results
+
+VERSION
+    version 1.100860
+
+SYNOPSIS
+      package Foo;
+      use base 'Data::Inherited';
+      use constant PROPERTIES => (qw/name address/);
+
+      package Bar;
+      use base 'Foo';
+      use constant PROPERTIES => (qw/age/);
+
+      package main;
+      my $bar = Bar->new;
+      print "$_\n" for $bar->every_list('PROPERTIES');
+
+      # prints:
+      #
+      # name
+      # address
+      # age
+
+DESCRIPTION
+    This is a mixin class. By inheriting from it you get two methods that
+    are able to accumulate hierarchy-wide list and hash results.
+
+METHODS
+  every_list(String $method_name, Bool ?$override_cache = 0)
+    Takes as arguments a method name (mandatory) and a boolean indicating
+    whether to override the cache (optional, off by default)
+
+    Causes every method in the object's hierarchy with the given name to be
+    invoked. The resulting list is the combined set of results from all the
+    methods, pushed together in top-to-bottom order (hierarchy-wise).
+
+    "every_list()" returns a list in list context and an array reference in
+    scalar context.
+
+    The result is cached (per calling package) and the next time the method
+    is called from the same package with the same method argument, the
+    cached result is returned. This is to speed up method calls, because
+    internally this module uses NEXT, which is quite slow. It is expected
+    that "every_list()" is used for methods returning static lists (object
+    defaults, static class definitions and such). If you want to override
+    the caching mechanism, you can provide the optional second argument. The
+    result is cached in any case.
+
+    See the synopsis for an example.
+
+  every_hash(String $method_name, Bool ?$override_cache = 0)
+    Takes as arguments a method name (mandatory) and a boolean indicating
+    whether to override the cache (optional, off by default)
+
+    Causes every method in the object's hierarchy with the given name to be
+    invoked. The resulting hash is the combined set of results from all the
+    methods, overlaid in top-to-bottom order (hierarchy-wise).
+
+    "every_hash()" returns a hash in list context and a hash reference in
+    scalar context.
+
+    The cache and the optional cache override argument work like with
+    "every_list()".
+
+    Example:
+
+      package Person;
+      use base 'Data::Inherited';
+
+      sub new {
+        my $class = shift;
+        my $self = bless {}, $class;
+        my %args = @_;
+        %args = ($self->every_hash('DEFAULTS'), %args);
+        $self->$_($args{$_}) for keys %args;
+        $self;
+      };
+
+      sub DEFAULTS {
+        first_name => 'John',
+        last_name  => 'Smith',
+      };
+
+      package Employee;
+      use base 'Person';
+
+      sub DEFAULTS {
+        salary => 10_000,
+      }
+
+      package LocatedEmployee;
+      use base 'Employee';
+
+      # Note: no default for address, but different salary
+
+      sub DEFAULTS {
+        salary     => 20_000,
+        first_name => 'Johan',
+      }
+
+      package main;
+      my $p = LocatedEmployee->new;
+
+      # salary: 20000
+      # first_name: Johan
+      # last_name: Smith
+
+  flush_every_cache_by_key(String $key)
+    Deletes the cache entry for the given key.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Inherited>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-Inherited/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Inherited/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2004 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

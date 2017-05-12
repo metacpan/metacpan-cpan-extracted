@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Data-Properties-JSON
+version:            0.004
+abstract:           JSON test fixtures.
+author:
+    - John Drago <jdrago_999@yahoo.com>
+license:            perl
+distribution_type:  module
+test_requires:
+    Test::More:       0
+requires:
+    JSON::XS:         0
+recommends:
+    ASP4:             1.059
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       Hand
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

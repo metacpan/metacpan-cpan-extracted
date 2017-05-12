@@ -1,0 +1,56 @@
+---
+abstract: 'faster XLSX parser'
+author:
+  - 'Daisuke Murase <typester@cpan.org>'
+build_requires:
+  Test::More: '0.98'
+configure_requires:
+  Module::Build::Tiny: '0.035'
+dynamic_config: 0
+generated_by: 'Minilla/v3.0.1, CPAN::Meta::Converter version 2.150005'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-XLSX-Parser
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+    - author
+    - builder
+provides:
+  Data::XLSX::Parser:
+    file: lib/Data/XLSX/Parser.pm
+    version: '0.14'
+  Data::XLSX::Parser::DocumentArchive:
+    file: lib/Data/XLSX/Parser/DocumentArchive.pm
+  Data::XLSX::Parser::Relationships:
+    file: lib/Data/XLSX/Parser/Relationships.pm
+  Data::XLSX::Parser::SharedStrings:
+    file: lib/Data/XLSX/Parser/SharedStrings.pm
+  Data::XLSX::Parser::Sheet:
+    file: lib/Data/XLSX/Parser/Sheet.pm
+  Data::XLSX::Parser::Styles:
+    file: lib/Data/XLSX/Parser/Styles.pm
+  Data::XLSX::Parser::Workbook:
+    file: lib/Data/XLSX/Parser/Workbook.pm
+requires:
+  Archive::Zip: '0'
+  XML::Parser::Expat: '0'
+  perl: '5.010'
+resources:
+  bugtracker: https://github.com/acidlemon/Data-XLSX-Parser/issues
+  homepage: https://github.com/acidlemon/Data-XLSX-Parser
+  repository: git://github.com/acidlemon/Data-XLSX-Parser.git
+version: '0.14'
+x_contributors:
+  - 'Masatoshi Kawazoe (acidlemon) <kawazoe-masatoshi@kayac.com>'
+  - 'Shinichiro Sei <sei@kayac.com>'
+  - 'Masatoshi Kawazoe <github@beatsync.net>'
+  - 'Masatoshi Kawazoe (acidlemon) <acidlemon@beatsync.net>'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.012'

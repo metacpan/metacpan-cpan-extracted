@@ -1,0 +1,22 @@
+
+* LVALUES don't work
+* Math::BigRat exhibit a similiar problem:
+  # perl -Ilib example/psize "Math::BigRat->new(2)" "c => 1"
+  Size report v0.05 for 'Math::BigRat->new(2)' => '2' (Math::BigRat):
+    Hash (Math::BigRat) 517 bytes (overhead: unknown)
+      '_d' => Hash (Math::BigInt) 299 bytes (overhead: 185 bytes, 61.87%)
+        'value' => Array 72 bytes (overhead: 56 bytes, 77.78%)
+          Scalar 16 bytes
+        '_f' => Scalar 16 bytes
+        'sign' => Scalar 26 bytes
+      '_n' => Hash (Math::BigInt) 299 bytes (overhead: 185 bytes, 61.87%)
+        'value' => Array 72 bytes (overhead: 56 bytes, 77.78%)
+          Scalar 16 bytes
+        '_f' => Scalar 16 bytes
+        'sign' => Scalar 26 bytes
+      'sign' => Scalar 26 bytes
+  Total: 517 bytes
+
+* The same for the summary, referencing the same data twice seems to count it
+  twice. However, the summery also has the problem to include all contained
+  objects in the count, too.

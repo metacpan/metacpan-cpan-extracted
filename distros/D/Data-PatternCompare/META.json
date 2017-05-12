@@ -1,0 +1,42 @@
+{
+   "abstract" : "Module to compare data with pattern",
+   "author" : [
+      "cono <cono@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.132510",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-PatternCompare",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Scalar::Util::Numeric" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/cono/p5-data-patterncompare/issues"
+      },
+      "homepage" : "https://github.com/cono/p5-data-patterncompare",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/cono/p5-data-pattern-compare.git",
+         "web" : "https://github.com/cono/p5-data-pattern-compare"
+      }
+   },
+   "version" : "0.04"
+}
+

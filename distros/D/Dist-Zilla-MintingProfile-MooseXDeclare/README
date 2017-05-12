@@ -1,0 +1,41 @@
+NAME
+    Dist::Zilla::MintingProfile::MooseXDeclare - A minting profile for
+    Modules written with MooseX::Declare
+
+VERSION
+    version 0.200
+
+SYNOPSIS
+         dzil new -P MooseXDeclare -p App New::App
+
+    or
+
+         dzil new -P MooseXDeclare New::App
+
+    This is a minting profile for projects using MooseX::Declare.
+
+    It comes in two flavors: one for Apps (with more boilerplate stuff) and
+    one for "regular" classes.
+
+BUGS AND LIMITATIONS
+    Unfortunately, in the App-flavored Minting Process, I can't get
+    Dist::Zilla to create my favorite structure exactly as I want it, so you
+    need to run `mkdir -p lib/New/App/{Command,Types}; touch $_.pm` after
+    the `dzil new` call.
+
+    (From there copy paste stuff from lib/New/App.pm to the correct places)
+
+    Additionally, I can't get Dist::Zilla to carry out the substituion of
+    `New::App` for `{{$name}}` in the minting process across more that one
+    file. Sorry about that and any inconveniences this may cause you --
+    patches and hints are welcome!
+
+AUTHOR
+    Daniel B <dbr@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Daniel B.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

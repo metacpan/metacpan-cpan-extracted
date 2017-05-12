@@ -1,0 +1,20 @@
+CHANGES
+lib/Devel/Size.pm
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+META.yml            Module meta-data (added by MakeMaker)
+README
+Size.xs
+ppport.h
+t/basic.t
+t/code.t
+t/globs.t
+t/magic.t
+t/pod.t
+t/pod_cov.t
+t/pvbm.t
+t/recurse.t
+t/warnings.t        A rather exhaustive test for the non-exceptional warnings
+typemap             The typemap for UV, missing from 5.005_xx
+META.json                                Module JSON meta-data (added by MakeMaker)

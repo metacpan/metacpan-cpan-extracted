@@ -1,0 +1,11 @@
+Revision history for Dancer-Plugin-Auth-RBAC-Credentials-DBIC
+
+0.003     2011-06-22 10:46:48 Europe/London
+ - Explicitly depend on Dancer::Plugin::DBIC 0.15
+
+0.002     2011-06-20 16:46:30 Europe/London
+ - Require SQL::Translator for tests
+ - Document handle config option
+
+0.001     2011-06-20 09:45:37 Europe/London
+ - Initial release

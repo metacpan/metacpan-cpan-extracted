@@ -1,0 +1,144 @@
+=head1 NAME
+
+DBIx::SQLEngine::Docs::Related - Survey of DBI Wrappers
+
+
+=head1 SYNOPSIS
+
+  http://search.cpan.org/search?mode=module&query=DBIx
+
+
+=head1 DESCRIPTION
+
+Several other CPAN modules provide a similar wrapper around DBI for purposes
+of simplification, abstraction, or portability.
+
+=head2 Caution
+
+I've commented on a few of these below, but please remember that these notes
+were written some time ago and may be somewhat out of date, and many modules
+have been omitted.
+
+
+=head1 RELATED MODULES 
+
+Most of these provide simple wrappers around DBI's connect, prepare, and fetch
+methods, but do not appear to support any kind of cross-DBMS portability
+mechanism. See L<DBIx::Abstract>, L<DBIx::Broker>, L<DBIx::Simple>, and
+L<Sql::Simple> for examples of this group. See also L<DBIx::AbstractLite>,
+L<DBIx::Schema>, L<DBIx::Wrap>, and L<DBIx::YAWM>. Single-platform solutions
+like L<MySQL::Easy> are also available.
+
+Some provide only SQL generation mechanisms. See L<SQL::Abstract>.
+
+Some provide at least partial cross-DBMS support via specialized subclasses
+for the DBDs they support. See L<DBIx::SearchBuilder>, L<DBIx::Easy>, and
+L<DBIx::DWIW> for examples of this group.
+
+The DBIx::Recordset framework provides similar functionality, including a
+substantial library of cross-DBMS compatibilty information.  It also includes
+a tied-hash interface that allows automatic updates on retrieved rows. See
+L<DBIx::RecordSet>, L<DBIx::Database>, and L<DBIx::Compat>.
+
+The Rosetta framework provides a higher-level interface with a great deal of
+portability, including supports non-DBI and non-SQL datasources; see
+L<Rosetta> for details.
+
+The Alzabo framework provides similar functionality, including DBMS-specific
+SQL generation, as part of an RDBMS-OO mapper; see L<Alzabo::Driver> and
+L<Alzabo::SQLMaker>.
+
+There are signs of ongoing development in the L<Class::DBI> framework to
+support cross-DBMS portability, so check CPAN for the latest in this area.
+
+The L<SQL::AnyDBD> is new addition which uses L<DBIx::AnyDBD>.
+
+Some packages focus on storing libraries of pre-defined named queries. See
+L<SQL::Catalog>, L<SQL::Library>, L<DBIx::PhraseBook>,
+L<Class::Phrasebook::SQL>, and L<DBIx::Librarian>.
+
+Some packages focus on managing database schema information. See
+L<DBIx::DataSource>, L<DBIx::Admin::TableInfo>, L<DBIx::SystemCatalog>.
+
+For more information about the object mapping modules, see the Poop-Group comparison page at http://poop.sourceforge.net/.
+
+=head2 Feature Matrix
+
+Please note that much of this information was collected just from scanning documentation, and may be incorrect or out of date. (Corrections welcome!)
+
+  DBI Wrapper     -- Maintains connection to DBI handle.
+  One Call Query  -- Provides combined prepare/fetch/finish method.
+  Data-driven SQL -- Generates queries from Perl-ish arguments.
+  Schema Access   -- Detect or create tables and other structures.
+  Named Configs   -- Manage connection params and query definitions.
+  Portability     -- Consistent way of performing queries across platforms.
+  Object Mapping  -- Treat rows of data as objects or tied references.
+
+Comparison:
+
+ __PACKAGE__        	DBIWrap	OneCall	DataSQL	NameCfg	Schema	Portble	ObjectM
+ 
+ __DBI_Wrappers__
+ DBIx::Abstract        	  Y	  Y	  Y	  -	  -	  -	  -
+ DBIx::AbstractLite	  Y	  -	  Y	  -	  -	  -	  -
+ DBIx::Broker        	  Y	  Y	  Y	  -	  -	  -	  -
+ DBIx::Browse        	  Y	  Y	  Y	  -	  -	  -	  -
+ DBIx::DWIW        	  Y	  Y	  -	  -	  -	  Y/-	  -
+ DBIx::Easy        	  Y	  Y	  Y	  -	  -	  Y/-	  -
+ DBIx::Schema        	  Y	  Y	  Y	  -	  -	  -	  -
+ DBIx::Simple        	  Y	  Y	  -	  -	  -	  -	  -
+ DBIx::Wrap        	  Y	  Y	  Y	  -	  -	  -	  -
+ DBIx::YAWM        	  Y	  Y	  Y	  -	  -	  -	  -
+ MySQL::Easy        	  Y	  Y	  -	  -	  -	  -	  -
+ SQL::AnyDBD/DBIx::AnyDBD Y	  -	  Y	  -	  -	  Y	  -
+ Sql::Simple        	  Y	  Y	  Y	  -	  -	  -	  -
+ 
+ __Named_Configs__
+ DBIx::Librarian	  Y	  -	  -	  Y	  -	  -	  -
+ DBIx::PhraseBook	  Y	  Y	  Y	  Y/-	  -	  -	  -
+ DBIx::SearchProfiles	  Y	  Y	  Y	  Y	  -	  -	  -
+ SQL::Catalog        	  Y	  -	  -	  Y	  -	  -	  -
+ 
+ __Query_Generation__
+ Class::Phrasebook::SQL	  -	  -	  -	  Y	  -	  -	  -	  
+ SQL::Abstract        	  -	  -	  Y	  -	  -	  -	  -
+ SQL::Generator        	  -	  -	  Y	  Y	  -	  -
+ SQL::Library        	  -	  -	  -	  Y	  -	  ?	  -
+ 
+ __Schema_Information__
+ DBIx::Admin::TableInfo	  Y	  -	  -	  -	  Y	  -	  -
+ DBIx::DataSource	  -	  -	  -	  -	  Y	  Y	  -
+ DBIx::SystemCatalog	  Y	  -	  -	  -	  Y	  Y	  -
+ 
+ __Tied_Access__
+ DBIx::RecordSet/Compat	  Y	  ?	  Y	  -	  Y	  Y	  tie
+ Tie::DBI		  Y	  Y	  -	  -	  -	  -	  tie
+ Tie::RDBM/::Cached	  Y	  Y	  -	  -	  Y/-	  -	  tie
+ Tie::Table		  Y	  Y	  -	  -	  -	  -	  tie
+
+ __Object_Mappers__
+ Alzabo                	  Y	  Y	  Y	  -?	  Y	  Y	  Y
+ Class::DBI/Ima::DBI	  Y	  Y	  Y	  Y?	  ?	  Y	  Y
+ Class::Tables		  Y	  Y	  Y/-	  -	  Y	  Y	  Y
+ DBIx::SearchBuilder	  Y	  Y	  Y	  -	  -	  Y	  Y
+ MKDoc::SQL         	  Y	  Y	  Y	  -?	  ?	  Y/-	  Y
+ Rosetta/SQL::Routine     Y	  Y	  Y 	  Y	  Y	  Y	  -
+ SPOPS              	  Y	  Y	  Y	  -	  Y	  Y	  Y
+ Tangram        	  Y	  Y	  Y	  -	  Y?	  Y	  Y
+  
+ __This Module__
+ DBIx::SQLEngine	  Y	  Y	  Y	  Y	  Y	  Y	  Y
+
+                  	DBIWrap	OneCall	DataSQL	NameCfg	Schema	Portble	ObjectM
+
+Items marked C<Y/-> seem to have only partial support for the feature. I've included a question mark for the cases I was least certain about. 
+
+
+=head1 SEE ALSO
+
+See L<DBIx::SQLEngine> for module interface and developer documentation.
+
+See L<DBIx::SQLEngine::Docs::ReadMe> for general information about
+this distribution, including installation and license information.
+
+=cut

@@ -1,0 +1,225 @@
+==================================================
+Changes from 2007-03-28 00:00:00 +0000 to present.
+==================================================
+
+-------------------------------------------
+version 0.0202 at 2017-03-25 14:52:52 +0000
+-------------------------------------------
+
+  Change: d9d6967275df0573314fff766652c3679d0dafbb
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-23 17:37:34 +0000
+
+    change Net::SMTP::SSL dep to Net::SSL
+
+    The new dep is on a version soon after 1.28 which is the point where
+    Net::SMTP::SSL was deprecated. This also means we switch out
+    Net::SSLeay in favour of IO::Socket::SSL. The version of
+    IO::Socket::SSL chosen is what was recent when Net::SMTP 1.30 was
+    released since the Changes file says we need 'a recent
+    IO::Socket::SSL for SSL support'. 
+
+-------------------------------------------
+version 0.0201 at 2016-11-22 17:04:30 +0000
+-------------------------------------------
+
+  Change: dd72053c46cdce30a31bd947a752835c45d7daff
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-22 18:04:30 +0000
+
+    v0.0201 
+
+  Change: 63c3bd918f3faacb8ae58b0c9f87ba09729af0a9
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-22 18:02:35 +0000
+
+    update test deps since Plack::Test has no VERSION
+
+    So set version dep on that to 0 and add a new test dep on Plack. We
+    depend on the first version which has OO interface in Plack::Test. 
+
+  Change: 88aa82da2d810c30032f9b72713147e3078e18a6
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-22 17:14:39 +0000
+
+    Switch from Module::Load to Module::Runtime
+
+    Dancer2 made this switch several releases back so this helps slim
+    down our dependencies even further. 
+
+  Change: 21c0cd230ac5f03019083335ac315fabf251636e
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-22 17:06:57 +0000
+
+    Switch to Plack::Test + HTTP::Request::Common for tests.
+
+    These are Dancer2 test deps so keeps us slimmer by dropping our use
+    of Test::WWW::Mechanize::PSGI. 
+
+-------------------------------------------
+version 0.0200 at 2016-11-17 17:01:44 +0000
+-------------------------------------------
+
+  Change: 7a390f043f644382651cccbb51313d17a68e90f4
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-11-17 18:01:44 +0000
+
+    v0.0200 
+
+  Change: 35803e24203014f22b89d83d4eba8f128a4af44a
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-11-17 11:50:41 +0000
+
+    Merge pull request #7 from SysPete/pure-plugin2
+
+    Convert to pure plugin2 so it can be consumed by other plugins. 
+
+  Change: 1383f8c199daaf51c3acfd49566c5c593676e847
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-10-28 12:51:32 +0000
+
+    Convert to pure plugin2 so it can be consumed by other plugins. 
+
+  Change: 4fef12a438d8ff91b1332fc34df0ec6f20c4747d
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-10-12 12:00:23 +0000
+
+    Merge pull request #6 from Manwar/fix-cpants-issue
+
+    Fix cpants issue 
+
+  Change: 76c3d3bc14bf4e3c8436b98b0976cc81b0cfdaa6
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-08-07 19:45:39 +0000
+
+    Add minimum perl to meta file using dzil plugin [MinimumPerl]. 
+
+  Change: d2c4c4ceb94697a75bdbae98c6f4c08ffeb85e16
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-08-07 19:42:57 +0000
+
+    Autogenerate META.json using dzil plugin [MetaJSON]. 
+
+  Change: b6442411135d7ba0d9658cdc424dd4d0a3cfb853
+  Author: Mohammad S Anwar <mohammad.anwar@yahoo.com>
+  Date : 2016-08-07 19:40:00 +0000
+
+    Add 'use strict; use warnings;' as suggested by CPANTS. 
+
+-------------------------------------------
+version 0.0100 at 2016-08-07 14:42:59 +0000
+-------------------------------------------
+
+  Change: 96b5b2b11666b6c1a998e120f2ffbd8768bc0092
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-08-07 10:42:59 +0000
+
+    v0.0100 
+
+  Change: 2cbfa8610f559bb5d91bbc9cd9828e6f2f39a175
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-08-07 10:41:51 +0000
+
+    updated POD for attach field 
+
+  Change: ea4053ee5008cd3ebf1b813a5ba808c457279406
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-07-12 14:38:32 +0000
+
+    Merge pull request #5 from SysPete/feature/attach-data
+
+    Do not skip attachment if Data is provided 
+
+  Change: 35db3a7fbcbb8928f50f68d56f138518243e5f37
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-07-12 13:56:30 +0000
+
+    Do not skip attachment if Data is provided
+
+    Same as D1 plugin's commit 010ceb54743eb7648f71a1d1be412138c0643d8c 
+
+-------------------------------------------
+version 0.0003 at 2016-05-25 16:45:57 +0000
+-------------------------------------------
+
+  Change: 832b80768d2423eb17d58ef8a793144ecd1c0603
+  Author: Naveed Massjouni <nmassjouni@harmonia.com>
+  Date : 2016-05-25 12:45:57 +0000
+
+    v0.0003 
+
+  Change: b9ca303affe2266bd1ac0e15bddc61e3422e44ff
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-04-21 10:55:44 +0000
+
+    Merge pull request #3 from SysPete/use_app_log
+
+    app->debug and app->warning changed to app->log("{debug|warning}",
+    ...) 
+
+  Change: 44f7a8f099e26dbb5400f4ed9a2b2dc89ed56a37
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-04-21 14:29:44 +0000
+
+    app->debug and app->warning changed to app->log("{debug|warning}",
+    ...) 
+
+-------------------------------------------
+version 0.0002 at 2016-01-05 20:21:34 +0000
+-------------------------------------------
+
+  Change: 05ef68c36ed585f7dfc8b1244f226ab04c5b00b2
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2016-01-05 15:21:34 +0000
+
+    v0.0002 
+
+  Change: f6b2a47896a586a0d26630dbec048898bb81805e
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2016-01-05 15:17:39 +0000
+
+    Merge pull request #2 from SysPete/plugin2-compat
+
+    Plugin2 compatibility: don't 'use Dancer2' 
+
+  Change: d376abc119f9d32d0fe65e5dd9354b32866dd07c
+  Author: Peter Mottram <peter@sysnix.com>
+  Date : 2016-01-05 11:22:01 +0000
+
+    Plugin2 compatibility: don't 'use Dancer2'
+
+    Now access 'debug' and 'warning' DSL subs via $dsl->app->debug, etc. 
+
+  Change: 5870d2dd1e075be4f1710721068c3d6572505814
+  Author: Naveed Massjouni <naveed@vt.edu>
+  Date : 2015-10-22 05:24:41 +0000
+
+    added Test::WWW::Mechanize::PSGI dep 
+
+  Change: 0e12f874fc3a9776e9bb2d306832d4f7d36a3e4c
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2015-10-22 05:22:32 +0000
+
+    Merge pull request #1 from racke/feature/emailtest
+
+    Add email test. 
+
+  Change: e849e35cf4586f8a40c189050fb3f032253189a0
+  Author: Stefan Hornburg (Racke) <racke@linuxia.de>
+  Date : 2015-10-22 11:01:44 +0000
+
+    Add email test. 
+
+-------------------------------------------
+version 0.0001 at 2014-11-17 03:14:11 +0000
+-------------------------------------------
+
+  Change: 5d666ed5eab0174ac36b2ed2d95b5cc67b4f38ff
+  Author: Naveed Massjouni <naveedm9@gmail.com>
+  Date : 2014-11-16 22:14:11 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

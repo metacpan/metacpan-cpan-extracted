@@ -1,0 +1,23 @@
+---
+name: DBIx-Class-Loader-ADO
+version: 0.07
+author:
+  - 'Brian Cassidy <bricas@cpan.org>'
+abstract: DBIx::Class::Loader ADO Implementation.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  DBD::ADO: 0
+  DBIx::Class: 0.07003
+  DBIx::Class::Loader: 0.21
+build_requires:
+  Test::More: 0
+provides:
+  DBIx::Class::Loader::ADO:
+    file: lib/DBIx/Class/Loader/ADO.pm
+    version: 0.07
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

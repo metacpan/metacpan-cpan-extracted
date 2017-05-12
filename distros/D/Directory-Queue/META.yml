@@ -1,0 +1,26 @@
+---
+abstract: 'object oriented interface to a directory based queue'
+author:
+  - 'Lionel Cons <lionel.cons@cern.ch>'
+build_requires:
+  Encode: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.132140'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Directory-Queue
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  No::Worries: 1.1
+  POSIX: 0
+  Time::HiRes: 0
+version: 1.9

@@ -1,0 +1,34 @@
+http://perl-qa.hexten.net/wiki/index.php/Testing_on_VMS
+
+---
+
+15:32 <anomenat> well $Config{cc} will contain 'CC/DECC', which is the right 
+                 command to use but "if -x $cc[0]" will fail
+15:33 <anomenat> then "CC/DECC foo.c" will compile foo.c to foo.obj
+15:37 <DrHyde> how do i pass include paths?
+15:38 <anomenat> CC/DECC/INCLUDE_DIRECTORY=foo
+15:39 <anomenat> I'm still trying to work out the best way to do the linking
+                 bit though
+15:40 <DrHyde> is CC/DECC/INCLUDE_DIRECTORY=foo/INCLUDE_DIRECTORY=bar valid?
+15:41 <anomenat> yes
+15:41 <DrHyde> hurrah!
+15:41 <anomenat> I'm still trying to work out the best way to do linking though
+16:17 <anomenat> well, buggered if I can find a standard place to put libraries
+                 on VMS. There probably is one but my VMS skills are too weak. 
+16:17 <anomenat> anyway, the command is just "LINK foo.obj, bar.obj" where foo 
+                 is the previously compiled foo.c and bar is the library whose 
+                 presence you are testing for
+16:18 <anomenat> but it won't be very portable because "bar.obj" needs to be a 
+                 proper path, unless it is a system library
+16:26 <DrHyde> that's a good start, so thanks!
+16:34 <anomenat> no problem. incidentally, VMS command line options can be 
+                 shortened to their shortest unambiguous form, and so 
+                 /include_directory can actually just be /inc
+16:50 <anomenat> OK, it looks like SYS$LIBRARY is the VMS sort-of-equivalent of
+                 /usr/lib on Linux
+16:52 <anomenat> thus "LINK foo.obj, sys$library:vaxcrtl/share" links foo.obj
+                 with the shared library vaxctrl
+16:54 <anomenat> and "LINK foo.obj, sys$library:ucx$ipc/library" links foo.obj
+                 with the static library ucx$ipc
+16:54 <anomenat> also, "link/exe=bar.exe foo.obj" links foo.obj to create an
+                 executable called bar.exe

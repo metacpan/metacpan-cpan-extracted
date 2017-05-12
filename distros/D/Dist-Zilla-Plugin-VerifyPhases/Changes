@@ -1,0 +1,67 @@
+Revision history for Dist-Zilla-Plugin-VerifyPhases
+
+0.015     2017-04-27 15:58:47Z
+          - remove tracking of _share_dir_map -- it can be legitimately read
+            in the filegathering phase
+
+0.014     2016-02-16 03:10:21Z
+          - also check for premature reading of _share_dir_map
+
+0.013     2015-08-11 03:05:27Z
+          - fix handling of skip_distmeta fields (i.e. special-casing of
+            x_static_install)
+
+0.012     2015-08-09 01:02:10Z
+          - now also checking for prereqs provided with other metadata,
+            and distribution metadata modified after being provided
+
+0.011     2015-05-08 02:52:01Z
+          - also test for premature population of release_status (a new
+            attribute in Dist::Zilla 5.035)
+          - drop requirement for List::MoreUtils
+
+0.010     2015-01-11 07:40:28Z
+          - fix incorrect warning messages when two files are added with the
+            same filename
+
+0.009     2014-11-16 04:02:48Z
+          - bump required version of Term::ANSIColor for bright colours
+
+0.008     2014-11-15 03:02:07Z
+          - fix test failure with older Dist::Zilla and coloured log messages
+
+0.007     2014-11-14 01:34:39Z
+          - use colour in log messages for greater visibility
+
+0.006     2014-11-06 04:35:42Z
+          - now also checking for premature prereq calculation, given a new
+            enough Dist::Zilla
+
+0.005     2014-11-02 05:44:51Z
+          - avoid reporting false positives for core zilla attributes that
+            were set at construction time (via root config or stash)
+
+0.004     2014-11-01 08:47:41Z
+          - fix tests that fail with Dist::Zilla 5.023 (changes to added_by
+            semantics)
+          - also check the execution order of -NameProvider, -LicenseProvider
+            plugins and access time of the abstract, main_module, authors and
+            prereqs attributes
+
+0.003     2014-04-06 20:38:06Z
+          - also check that -VersionProvider plugins do not run too soon
+
+0.002     2014-03-04 06:37:37Z
+          - avoid warning about late modifications to Makefile.PL and
+            Build.PL, as this is normal and expected
+          - also identify the original filename of a file that has been
+            renamed
+          - additional checks for files removed outside the pruning phase or
+            added after the file gathering phase
+          - additional checks for files having their encodings changed outside
+            of the file gathering or encoding provider phase
+          - at the start of the build, adjust the plugin order so we always
+            run last in each phase
+
+0.001     2014-02-23 05:11:23Z
+          - Initial release.

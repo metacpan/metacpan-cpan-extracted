@@ -1,0 +1,10 @@
+
+CREATE TABLE abc (
+  id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  status INTEGER,
+  name VARCHAR(10)
+);
+
+INSERT INTO "abc" VALUES(NULL,1,'first');
+INSERT INTO "abc" VALUES(NULL,2,'second');
+INSERT INTO "abc" VALUES(NULL,3,'third');

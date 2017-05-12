@@ -1,0 +1,58 @@
+[%- WRAPPER wrap_box
+    title = "<a href=\"${doc.dir.abs_doc_root}/docs/offsite/books.html\">Books</a>"
+-%]
+
+        <tr>
+            <td class="menu-border" width="1"><br></td>
+            <td class="ad-bg">
+                <div class="adtext">
+                    The mod_perl Developer's Cookbook<br><br>
+                    <a href="http://www.modperlcookbook.org/">
+                        <img src="[% doc.dir.abs_doc_root %]/images/books/modperlcookbook.jpg" border="1" align="middle" width="113" height="140" class="img-border" alt="The mod_perl Developer's Cookbook"></a>
+                    <br><br>
+                    <em>By Geoffrey Young, Paul Lindner, Randy Kobes</em>
+                </div>
+            </td>
+            <td class="menu-border" width="1"><br></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><small class="nbr"><br class="smallbr"></small></small></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" width="1"><br></td>
+            <td class="ad-bg">
+                <div class="adtext">
+                    mod_perl Pocket Reference<br><br>
+                    <a href="http://www.oreilly.com/catalog/modperlpr/">
+                        <img src="[% doc.dir.abs_doc_root %]/images/books/modperlpr.jpg" border="1" align="middle" width="85" height="140" class="img-border" alt="mod_perl Pocket Reference"></a>
+                        <br><br>
+                        <em>By Andrew Ford</em>
+                </div>
+            </td>
+            <td class="menu-border" width="1"><br></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" width="1"><br></td>
+            <td class="ad-bg">
+                <div class="adtext">
+                <br>Writing Apache Modules with Perl and C<br><br>
+                    <a href="http://www.modperl.com/">
+                        <img src="[% doc.dir.abs_doc_root %]/images/books/wrapmod.jpg" border="1" align="middle" width="107" height="140" class="img-border" alt="Writing Apache Modules with Perl and C"></a>
+                    <br><br>
+                    <em>By Lincoln Stein, Doug MacEachern</em>
+                </div>
+            </td>
+            <td class="menu-border" width="1"><br></td>
+        </tr>
+
+        <tr>
+            <td class="menu-border" colspan="3" height="1"><small class="nbr"><br class="smallbr"></small></td>
+        </tr>
+[% END %]

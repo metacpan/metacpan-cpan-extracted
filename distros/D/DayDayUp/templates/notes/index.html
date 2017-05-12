@@ -1,0 +1,125 @@
+[% USE date %]
+
+<p> <a href="/notes/note/add">Add a Note</a> </p>
+
+[% UNLESS is_in_view_all_page %]
+
+<h3>Open Notes</h3>
+[% IF notes.open.size %]
+
+<table border='1'>
+<tr><th>Note</th><th>Tags</th><th>Created Time</th><th>-</th></tr>
+[% FOREACH note IN notes.open %]
+<tr>
+	<td>[% note.text | html | html_line_break %]</td>
+	<td>[% IF note.tags.size %]
+	        [% FOREACH tag IN note.tags;
+	            tag.name;
+	            UNLESS loop.last;', ';END;
+	        END; %]
+	    [% END %]</td>
+	<td>[% date.format( note.time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td><a href="/notes/[% note.id %]/edit">Edit</a> | <a href="/notes/[% note.id %]/delete">Delete</a> | <a href="/notes/[% note.id %]/update?status=closed">Close</a> | <a href="/notes/[% note.id %]/update?status=suspended">Suspend</a> | <a href="/notes/[% note.id %]/update?status=rejected">Reject</a></td>
+</tr>
+[% END %]
+</table>
+
+[% ELSE %]
+
+<p>nothing is found here</p>
+
+[% END %]
+
+<h3>Suspended Notes</h3>
+[% IF notes.suspended.size %]
+
+<table border='1'>
+<tr><th>Note</th><th>Tags</th><th>Created Time</th><th>-</th></tr>
+[% FOREACH note IN notes.suspended %]
+<tr>
+	<td>[% note.text | html | html_line_break %]</td>
+	<td>[% IF note.tags.size %]
+	        [% FOREACH tag IN note.tags;
+	            tag.name;
+	            UNLESS loop.last;', ';END;
+	        END; %]
+	    [% END %]</td>
+	<td>[% date.format( note.time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td><a href="/notes/[% note.id %]/edit">Edit</a> | <a href="/notes/[% note.id %]/delete">Delete</a> | <a href="/notes/[% note.id %]/update?status=closed">Close</a> | <a href="/notes/[% note.id %]/update?status=open">Open</a> | <a href="/notes/[% note.id %]/update?status=rejected">Reject</a></td>
+</tr>
+[% END %]
+</table>
+
+[% ELSE %]
+
+<p>nothing is found here</p>
+
+[% END %]
+
+[% END; # for UNLESS is_in_view_all_page %]
+
+[% IF NOT is_in_view_all_page OR (is_in_view_all_page AND status == 'closed') %]
+<h3>Closed Notes</h3>
+[% IF notes.closed.size %]
+
+<table border='1'>
+<tr><th>Note</th><th>Tags</th><th>Created Time</th><th>Closed Time</th><th>-</th></tr>
+[% FOREACH note IN notes.closed %]
+<tr>
+	<td>[% note.text | html | html_line_break %]</td>
+	<td>[% IF note.tags.size %]
+	        [% FOREACH tag IN note.tags;
+	            tag.name;
+	            UNLESS loop.last;', ';END;
+	        END; %]
+	    [% END %]</td>
+	<td>[% date.format( note.time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td>[% date.format( note.closed_time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td><a href="/notes/[% note.id %]/edit">Edit</a> | <a href="/notes/[% note.id %]/delete">Delete</a> | <a href="/notes/[% note.id %]/update?status=open">re-Open</a></td>
+</tr>
+[% END %]
+</table>
+
+[% IF notes.closed.size == 5 %]
+<p><a href="/notes/view_all?status=closed">View All Closed</a></p>
+[% END %]
+
+[% ELSE %]
+
+<p>nothing is found here</p>
+
+[% END %]
+[% END; # END for IF NOT is_in_view_all_page OR ... %]
+
+[% IF NOT is_in_view_all_page OR (is_in_view_all_page AND status == 'rejected') %]
+<h3>Rejected Notes</h3>
+[% IF notes.rejected.size %]
+
+<table border='1'>
+<tr><th>Note</th><th>Tags</th><th>Created Time</th><th>Closed Time</th><th>-</th></tr>
+[% FOREACH note IN notes.rejected %]
+<tr>
+	<td>[% note.text | html | html_line_break %]</td>
+	<td>[% IF note.tags.size %]
+	        [% FOREACH tag IN note.tags;
+	            tag.name;
+	            UNLESS loop.last;', ';END;
+	        END; %]
+	    [% END %]</td>
+	<td>[% date.format( note.time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td>[% date.format( note.closed_time, format => '%Y-%m-%d %H:%M:%S' ) %]</td>
+	<td><a href="/notes/[% note.id %]/edit">Edit</a> | <a href="/notes/[% note.id %]/delete">Delete</a> | <a href="/notes/[% note.id %]/update?status=open">re-Open</a> | <a href="/notes/[% note.id %]/update?status=closed">Close</a></td>
+</tr>
+[% END %]
+</table>
+
+[% IF notes.rejected.size == 5 %]
+<p><a href="/notes/view_all?status=rejected">View All Rejected</a></p>
+[% END %]
+
+[% ELSE %]
+
+<p>nothing is found here</p>
+
+[% END %]
+[% END; # END for IF NOT is_in_view_all_page OR ... %]

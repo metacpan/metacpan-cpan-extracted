@@ -1,0 +1,326 @@
+Revision history for Dist-Zilla-PluginBundle-RSRCHBOY
+
+0.075     2017-05-08 22:15:56 CDT-0500
+	* Add CopyrightYearFromGit
+
+0.074     2017-04-15 23:43:04 CDT-0500
+	* Add POD collectors for method modifiers
+	* Drop the increasingly inaccurate "OVERVIEW" section from the POD bundle
+	* Drop ArchiveRelease in favor of Run::AfterRelease
+	* Start tidying up our PW config
+
+0.073     2017-04-01 23:32:36 CDT-0500
+	* Drop "rapid_dev"
+	* ConsistentVersionTest -> 0.03
+	* Don't require ...::Stash::PAUSE::Encrypted
+	* Drop Dist::Zilla::PluginBundle::RSRCHBOY::Role::Git
+	* Bump minimum Perl to v5.20
+
+0.072     2017-03-31 13:09:50 CDT-0500
+	* Add 'PayPal' to stopwords list
+
+0.071     2017-03-23 12:46:12 CDT-0500
+	* Force feed_me to false as default in RSRCHBOY::Authors itself
+
+0.070     2017-02-27 16:01:27 CST-0600
+	* add: MetaData::BuiltWith
+	* Set feed_me => 0 as default (RSRCHBOY::Authors)
+	* GatherDir -> Git::GatherDir
+	* Various doc updates, minor code tweaks
+
+0.069     2016-10-10 21:13:58 CDT-0500
+	* Generate develop requires on certain test packages (e.g. inline
+	  author/release test requirements)
+	* Add a tweet_url template to better handle trial releases
+
+0.068     2016-10-09 00:12:58 CDT-0500
+	* Stop copying back the cpanfile.
+
+0.067     2016-05-05 10:11:44 CDT-0500
+	* allow the pledge drive section of our Authors to be skipped.
+
+0.066     2015-08-07 15:27:00 PDT-0700
+	* add 'formattable' to stopwords
+	* ReportVersions::Tiny -> Test::ReportVersions
+
+0.065     2015-07-12 14:54:18 PDT-0700
+	* TEST_FUNCTIONS -> TEST FUNCTIONS
+
+0.064_01-TRIAL  2015-07-10 21:48:05 PDT-0700
+	* rejigger and add some pod sections
+
+0.064     2015-07-05 20:09:57 PDT-0700
+	* adjust stopwords
+
+0.063     2015-06-30 18:28:14 PDT-0700
+	* [pw] add '=pvt_method'
+
+0.062     2015-05-11 20:59:37 PDT-0700
+	* [dzil] Conditionalize CommitBuild
+
+0.061     2015-05-05 20:26:02 PDT-0700
+	* [pw] drop SourceGitHub
+
+0.060     2015-04-27 22:17:13 PDT-0700
+	* aaaaaand add 'Gratipay' to our list of stopwords
+
+0.059     2015-04-27 22:08:27 PDT-0700
+	* [dzil] use 0 for our version in develop prereq declaration when
+	  unavailable
+	* [dzil] add a coveralls badge
+	* Fix our "material boy" section.  Finally!
+
+0.058     2015-04-21 20:33:51 PDT-0700
+	* [dzil] call VERSION on the right thing *le sigh*
+
+0.057     2015-04-21 20:27:43 PDT-0700
+	* [dzil] add ourself as a versioned develop/requires prerequisite, such
+	  that distributions built with this bundle should develop/require at
+	  the level of this package used to build the distribution.
+
+0.056     2015-04-20 20:27:32 PDT-0700
+	* [dzil] add GitHubREADME::Badge (travis, cpants)
+
+0.055     2014-12-27 21:36:13 PST-0800
+	* [dzil] Reorder certain plugins to get README generation going again.
+
+0.054     2014-12-02 20:03:07 PST-0800
+	* [dzil] ...and allow tweet disabling to work!
+
+0.053     2014-12-02 19:56:57 PST-0800
+	* [dzil] Tweet by default
+
+0.052     2014-11-12 22:09:14 PST-0800
+	* [dzil] EOLTests becomes Test::EOL
+
+0.051     2014-10-14 22:34:15 PDT-0700
+	* Add Dist::Zilla::Plugin::Run::AfterMint as a minting prereq.
+
+0.050     2014-07-05 15:25:22 PDT-0700
+	* Add missing prepreq to dist.ini
+
+0.049     2014-05-12 12:52:47 PDT-0700
+	* [dzil] drop errant File::Slurp usage (closes #6)
+	* [dzil] drop InstallGuide, as all my releases are ABENDing
+	* [pw]   restructure our Authors section a touch; add HTML images / links
+
+0.048     2014-04-29 14:44:00 PDT-0700
+	* [pw] add a custom Authors plugin
+
+0.047     2014-04-17 15:41:19 PDT-0700
+	* [dzil] switch from NoTabsTests to Test::NoTabs
+	* [pw] use SingleEncoding (thanks! issue #5)
+	* [dzil] use Git::Raw to do *some* of the git bits for now
+
+0.046     2014-04-11 14:58:09 PDT-0700
+	* [dzil] Add a helper role for Git::Raw operations
+	* [pw]   Move Pod::Weaver deps into dist.ini
+	* [dzil] move our dependency listing from the bundle to the dist.ini
+	* [dzil] add github_user overrides; use GithubMeta plugin
+
+0.045     2014-04-10 17:29:59 PDT-0700
+	* [dzil] add CheckSelfDependency (ensures no recursive deps)
+	* [dzil] add missing dzil plugin dep to dist.ini *le sigh*
+	* [dzil] make our max_target_perl v5.10.1
+	* [dzil] mark ContributorsFromGit minimum as 0.010
+	* [dzil] move PAUSE::Encrypted dep declaration to dist.ini
+	* [dzil] ...and add missing plugin: Travis::ConfigForReleaseBranch
+	* [dzil] add CheckSelfDependency
+
+0.044     2014-03-03 11:59:20 PST-0800
+	* [dzil] make POD spelling test happy ('dist' makes them sad!)
+	* [dzil] Fix 0.012 release date (github #1; thanks @neilbowers!)
+	* [dzil] update travis config
+	* [dzil] misc cleanups
+	* [dzil] add SchwartzRatio
+	* [dzil] move the unincorporated prereqs over into dist.ini
+	* [dzil] drop ExtraTests, add RunExtraTests and CheckExtraTests
+	* [dzil] auto-remove README.pod, if present (was replaced with the
+	  markdown version a while back)
+
+0.043     2013-08-13 01:23:32 PDT-0700
+	* [dzil] move "missing prereqs" into dist.ini
+	* [dzil] only fetch/update the origin remote once
+	* [dzil] add Travis::ConfigForReleaseBranch
+	* [dzil] add PromptIfStale
+
+0.042     2013-08-04 15:18:09 PDT-0700
+	* add Test::CheckDeps
+	* start prepping dist.ini to hold our prereqs (...maybe)
+	* use Git::Check::Remote to ensure master and release/cpan are in sync before releasing
+	* don't add cpanfile to build in dist.ini, as we're doing it in the bundle now
+	* default => builder; plus a note to clean up this area.
+	* make copy_from_build a private attribute rather than a method
+	* add the PluginRemover role!
+	* add ensure_current() method, to help cope with bundle changes
+	* require a recent version of autodie
+	* rejigger our .travis.yml to be...  well, hopefully better
+	* copy cpanfile back into our root; for travis and others
+
+0.041     2013-07-20 13:23:43 PDT-0700
+	* [dzil] provide a default authority (cpan:RSRCHBOY)
+	* various travis tweaks so we build correctly over there
+
+0.040     2013-07-12 23:34:53 CDT-0500
+	* drop requirement on perl v5.10+; not needed for this package and was
+	  making testing difficult on travis.
+	* [dzil] add Authority, Git::Describe plugins
+	* [dzil] add Test::MinimumVersion w/a default of 5.008008
+
+0.039     2013-04-22 21:23:23 PDT-0700
+	* [dzil] sync git allow dirty files lists (and ensure the new README.mkdn
+	  gets committed appropriately!)
+
+0.038     2013-03-29 22:58:45 PDT-0700
+	* [dzil] allow dev-style versions (x.xxxxxx_xx)
+
+0.037     2013-03-28 21:58:31 PDT-0700
+	* [dzil] remove TravisYML plugin until it's a little more sorted
+	* [dzil] Switch GH readme from POD to Markdown to support badges (travis,
+	  etc)
+
+0.036     2013-03-17 22:12:51 PDT-0700
+	* [dzil] add TravisYML plugin and configuration
+
+0.035     2013-02-23 10:16:16 PST-0800
+	* [dzil] rework how/where we add the git plugins to resolve ordering
+	  dependency issues (Push vs CommitBuild)
+
+0.034     2013-02-23 09:51:18 PST-0800
+	* [dzil] add Git::CommitBuild to track full CPAN releases
+
+0.033     2013-01-09 16:06:50 PST-0800
+	* [dzil] expose trial info in Changes version line
+	* [dzil] add cpanfile to list of files allowed to be dirty
+
+0.032     2012-12-21 21:26:53 CST6CDT
+	* [weaver]: add GeneratedAttributes, LazyAttributes section
+	* [dzil]:	add CPANFile
+	* [dzil]: 	add Test::Pod::LinkCheck plugin
+
+0.031     2012-11-26 23:27:18 PST8PDT
+	* add ContributorsFromGit to dzil bundle
+
+0.030     2012-11-14 21:45:00 PST8PDT
+	* Add CONTRIBUTORS section to our weaver configuration
+
+0.029     2012-11-03 23:26:30 PST8PDT
+	* switch to using the dist-zilla specific pluginbundle slicer role
+	* drop Test::Portability, as the underlying module has been broken for 6
+	  years
+
+0.028     2012-11-03 21:55:56 PST8PDT
+	* add lazy/required attributes sections from CollectWithInfo (that is, we
+	  now have a nice little bit of intro text).
+	* Add 'ROLE PARAMETERS' section
+
+0.027     2012-08-26 12:43:33 America/Los_Angeles
+	* actually copy LICENSE back to root now *sigh*
+	* add 'coderef' to list of stopwords
+
+0.026     2012-07-13 15:06:31 America/Los_Angeles
+	* dzp: CheckChangesHasContent
+	* allow "sign" as an option (set to 0/falsey to disable tag and release
+	  signing)
+	* add Config::MVP::Slicer for broader plugin option coverage
+	* add "tweet" option
+	* initial start of (real) documentation
+
+0.025     2012-06-30 11:05:55 America/Los_Angeles
+	* dzp: Git to 1.121770
+	* dzp: enable tag signing
+
+0.024     2012-06-20 21:12:42 America/Los_Angeles
+	* add dzp Signature
+	* force DZ::PB::Git to 1.121770, for the reworked CommitBuild
+	* drop weaver section Consumes; not quite optimal yet
+
+0.023     2012-06-18 17:07:19 America/North_Dakota/New_Salem
+	* add MetaProvides::Package, MetaNoIndex
+	* add weaver section: Consumes
+
+0.022     2012-06-06 01:44:51 America/Los_Angeles
+	* allow .gitignore to be dirty during pre-release
+	* break "author" tests config out into author_tests() and allow them to be
+	  excluded via "rapid_dev = 1"
+	* break out release plugin config into release_plugins()
+	* add the Pod::Weaver 'StopWords' plugin
+
+0.021     2012-05-29 16:57:02 America/Los_Angeles
+	* add LICENSE to list of files to copy back after building
+
+0.020     2012-05-02 14:52:13 America/Los_Angeles
+	* update our version regexp to handle '-TRIAL'
+
+0.019     2012-04-07 23:19:17 America/Los_Angeles
+	* update stopwords list with some common faux-words
+	* add 'REQUIRED METHODS' section to PodWeaver config
+	* add weaver.ini to list of files allowed to be dirty during release prep
+
+0.018     2012-03-20 10:25:21 America/Los_Angeles
+	* add 'version' before %v in our pod VERSION section format string
+
+0.017     2012-03-09 00:09:36 America/Los_Angeles
+	* add missing Pod::Weaver::Plugin::Encoding dep
+
+0.016     2012-02-14 20:46:10 America/Los_Angeles
+	* add 'metaclass' to stopwords list
+
+0.015     2012-02-06 20:28:06 America/Los_Angeles
+	* DZ: add Test::PodSpelling, @Git::CheckFor
+	* PW: alter version section to be a touch more helpful
+
+0.014     2012-02-05 09:36:35 America/Los_Angeles
+	* switch prereqs indexed? release plugin to before confirm release
+	* add initial Pod::Weaver config bundle
+	* allow a local weaver.ini to override our config
+
+0.012     2012-01-10 America/Los_Angeles
+	* change "cat_app" option to just "app"; preserve cat_app for legacy
+	* dist.ini tweaks
+
+0.011     2011-10-27 10:13:25 America/Los_Angeles
+	* switch to ReportVersions::Tiny
+	* drop Test::UseAllModules for the moment, as it dies horribly when
+	  trying to use a role
+
+0.010     2011-09-29 12:03:52 America/Los_Angeles
+	* additional prereqs (generally Test:: modules that the invoking DZ plugin
+	  doesn't explicitly require
+	* add is_cat_app option + specifc plugins (e.g. copy Makefile.PL back into
+	  repo root so Cat doesn't freak out :))
+
+0.009     2011-09-14 17:35:58 America/Los_Angeles
+	* switch homepage url set on github to metacpan
+	* add Test::UseAllModules
+	* add prepender_skip
+	* PkgVersion => SurgicalPkgVersion
+	* Drop Authority plugin until we decide if we're going to surgicalize it
+
+0.008     2011-09-11 20:04:28 America/Los_Angeles
+	* really remove CompileTests
+
+0.007     2011-09-11 17:21:24 America/Los_Angeles
+	* replace PortabilityTests with Test::Portability
+
+0.006     2011-09-02 21:49:50 America/Los_Angeles
+	* replace CompileTests with Test::Compile
+
+0.005     2011-07-03 16:33:51 America/Los_Angeles
+	* add a bunch of missing prereqs
+	* initial provision for passing in opts to autoprereqs
+
+0.004     2011-05-15 18:50:41 America/Los_Angeles
+	* add initial task support
+	* "use" all our plugins so they're listed as prereqs
+
+0.003     2011-04-29 19:07:44 America/Los_Angeles
+	* Add NoSmartCommentsTests to plugin list
+	* Reorder NextRelease w.r.t. @Git, so hopefully our
+	  stub Changes will get committed on release as well
+
+0.002     2011-04-18 20:35:25 America/Los_Angeles
+	* Correctly specify "files to ignore in root" to @Git
+	* Don't use shell syntax in install command
+
+0.001     2011-04-03 19:07:59 America/Los_Angeles

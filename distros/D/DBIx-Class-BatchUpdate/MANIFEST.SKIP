@@ -1,0 +1,16 @@
+^_build
+^Build$
+^blib
+~$
+\.bak$
+\.bat$
+\.log$
+\.tmp$
+\.out
+\.old$
+CVS
+\.svn
+release.pl
+^\.PerlySenseProject
+^cover_db
+^covered

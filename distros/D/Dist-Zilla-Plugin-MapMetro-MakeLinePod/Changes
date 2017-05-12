@@ -1,0 +1,45 @@
+Revision history for Dist-Zilla-Plugin-MapMetro-MakeLinePod
+
+0.1202 2015-11-02T16:20:07Z UTC
+ [Requirements]
+ - Now uses namespace::autoclean instead of ::sweep.
+ - Now uses [MakeMaker] instead of [ModuleBuild*]
+ - Prereqs is set in dist.ini (cpanfile removed)
+
+0.1201 2015-01-21T16:16:14Z CET
+ [Enhancements]
+ - Now produces a Lines.pod (instead of Lines.pm).
+ - If possible, sorts possible line changes numerically.
+
+ [Requirements]
+ - Changed Syntax::Feature::Qi to ::Qi
+ - Removed some author test dependencies
+
+0.1200 2015-01-07T00:13:48Z CET
+ [Enhancements]
+ - Show each line's color.
+ - All changes and transfers are lined up.
+
+ [Meta]
+ - Adapted to Podweaver.
+ - Changed dist.ini to DZ::PB::Author::CSSON.
+
+0.1101 2015-01-05T21:53:45Z CET
+ [Bug Fixes]
+ - $VERSION was duplicated in the generated pod module.
+
+0.1100 2015-01-05T16:54:35Z CET
+ [Enhancements]
+ - More failsafe formatting of generated pod.
+
+0.1002 2015-01-05T15:52:41Z CET
+ [Enhancements]
+ - Reduce podness of string.
+
+0.1001 2015-01-05T15:45:53Z CET
+ [Enhancements]
+ - Reduce podness of string.
+
+0.10000 2015-01-05T15:37:42Z CET
+ - Initial release
+

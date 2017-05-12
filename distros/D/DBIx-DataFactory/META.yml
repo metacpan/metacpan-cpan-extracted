@@ -1,0 +1,40 @@
+---
+abstract: 'factory method maker for inserting test data'
+author:
+  - 'Yuki Shibazaki <shibayu36 {at} gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Path::Class: 0
+  Test::Class: 0
+  Test::More: 0
+  Test::TypeConstraints: 0
+  Test::mysqld: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.04'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-DataFactory
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Carp: 0
+  Class::Accessor::Fast: 0
+  Class::Data::Inheritable: 0
+  Class::Load: 0
+  DBI: 0
+  DBIx::Inspector: 0
+  SQL::Maker: 0
+  Smart::Args: 0
+  String::Random: 0
+  Sub::Install: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.0.5

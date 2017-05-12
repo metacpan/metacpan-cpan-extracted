@@ -1,0 +1,64 @@
+{
+   "abstract" : "Template::Flute wrapper for Dancer2",
+   "author" : [
+      "Stefan Hornburg (Racke) <racke@linuxia.de>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Template-TemplateFlute",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "Plack" : "1.0029",
+            "Test::Deep" : "0",
+            "Test::More" : "0.94",
+            "XML::Twig" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2" : "0.200000",
+            "Dancer2::Core::Types" : "0",
+            "Module::Runtime" : "0",
+            "Moo" : "2.000000",
+            "Scalar::Util" : "0",
+            "Template::Flute" : "0.014",
+            "Try::Tiny" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/interchange/Dancer2-Template-TemplateFlute.git",
+         "web" : "https://github.com/interchange/Dancer2-Template-TemplateFlute",
+         "x_bugtracker" : "https://github.com/interchange/Dancer2-Template-TemplateFlute/issues"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.203",
+   "x_serialization_backend" : "JSON::PP version 2.27400"
+}

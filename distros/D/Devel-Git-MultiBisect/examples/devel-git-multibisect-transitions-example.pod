@@ -1,0 +1,645 @@
+=head1 DESCRIPTION
+
+This file is an annotated version of a program found in the F<examples/>
+subdirectory, F<transitions_full_lib_locale.pl>, interspersed with excerpts
+from a typescript of its output, F<tfll.typescript>, also found in that
+subdirectory.
+
+=head1 BACKGROUND
+
+The program was developed to address a problem faced by the Perl 5 Porters
+(P5P) in
+October 2016 and discussed in
+L<RT #129953|https://rt.perl.org/Ticket/Display.html?id=129953>.  Prior to that time
+smoke test reports were not being generated on the FreeBSD operating system's
+version 11.0.  It was known that Perl 5.24.0, released in May 2016, built and
+tested successfully on that platform.  But by October Perl's development was
+already up to 5.25.5, reflecting hundreds of commits to the main development
+branch known as F<blead>.  The smoke testing on FreeBSD-11.0 revealed test
+failures -- indeed, segfaults -- in F<lib/locale.t>.
+
+In this situation the first step which P5P would take would be to run a
+program found in the Perl 5 core distribution, F<Porting/bisect.pl>, in order
+to determine the first commit at which F<lib/locale.t> completed with
+C<FAIL> (non-zero exit status) rather than a C<PASS>.  P5P would then build
+a debugging version of Perl at that commit, run F<lib/locale.t> and capture
+its output for examination.
+
+Both of these steps were done, but the outcome was surprising.  The output of
+F<lib/locale.t> at the point of B<first> failure was B<different> from that
+test's output at the HEAD of blead.  This suggested that F<lib/locale.t> had
+failed in multiple, different ways over the course of the five-month period.
+It became important to gather the output of F<lib/locale.t> at each point
+where its test output had changed in any significant way.
+
+The first solution to this problem was simple but non-scaleable:  Build
+F<perl> and run F<lib/locale.t> at B<every> commit to F<blead> over the
+five-month range.  This "worked" in the sense that points where the test
+output changed were identified -- but the program took more than eight hours
+to run.
+
+It became apparent that we would have to use the concept of B<bisection> to
+reduce the number of times F<perl> had to be built in order to identify all
+the B<transitional commits>.  But F<Porting/bisect.pl> -- which is essentially
+a wrapper around F<git bisect> -- was designed to identify B<single> points of
+failure rather than F<multiple, different> points of failure.  A new tool was
+called for; the result was F<Devel-Git-MultiBisect>.
+
+The program below, F<transitions_full_lib_locale.pl>, uses
+F<Devel::Git::MultiBisect::Transitions> to traverse the range of commits in
+question and identify commits where the output of F<lib/locale.t> on
+FreeBSD-11 changed.  The program stores the output of F<lib/locale.t> at
+commits visited during the multisection process on disk.  It also collects
+data about the multisection and makes them available to the user as the result
+of method calls.
+
+=head1 THE PROGRAM
+
+    #!/usr/bin/env perl
+    use v5.10.1;
+    use strict;
+    use warnings;
+    use Carp;
+    use Data::Dump qw(pp);
+    use Cwd;
+
+    use Devel::Git::MultiBisect::Opts ( qw| process_options | );
+    use Devel::Git::MultiBisect::Transitions;
+
+    my ($homedir, $perlgitdir, $workdir, $outputdir);
+    my ($configure_command, $make_command, $test_command);
+    my (%args, $params, $self);
+    my ($first_commit, $last_commit);
+    my ($target_args, $full_targets);
+    my ($rv, $transitions);
+    my ($timings);
+
+F<Devel::Git::MultiBisect> requires the user to designate three directories
+for specific uses:
+
+=over 4
+
+=item 1 C<gitdir>
+
+The directory for the F<git checkout> of the source code being studied.
+
+=item 2 C<workdir>
+
+The directory in which the program will be run.
+
+=item 3 C<outputdir>
+
+A directory set up by the user -- preferably different from C<gitdir> or
+C<workdir> -- to hold files capturing the output of different runs of the test
+programs (which are referred to as B<targets>).
+
+=back
+
+    $homedir = "/home/username";
+    $perlgitdir = "$homedir/gitwork/perl";
+    $workdir = cwd();
+    $outputdir = "$homedir/multisect/outputs";
+
+F<Devel::Git::MultiBisect> requires the user to identify the first and last
+commits in the range to be traversed.  You can use a F<git tag> as well as a
+SHA.
+
+    $first_commit = 'v5.25.1';
+    $last_commit = 'd6e0ab90d221e0e0cbfcd8c68c96c721a688265f';
+
+F<Devel::Git::MultiBisect> requires the user to compose 3 shell commands to
+describe how to configure, build and test the code being studied.  If we were
+multisecting a CPAN distribution these commands would typically be:
+
+    configure_command:      perl Makefile.PL
+    make_command:           make
+    test_command:           prove -vb <target>
+
+When we're multisecting the Perl 5 core distribution these commands get more
+complicated:
+
+    $configure_command  = 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null';
+    $make_command       = 'make test_prep 1>/dev/null 2>&1';
+    $test_command       = 'harness';
+
+During multisection we'll be running F<./Configure> and F<make> many times,
+but we typically don't need to see warnings on each run.  To keep the output
+simpler, we'll discard the output.
+
+In the case of multisection of the Perl 5 core distribution, the value
+C<harness> for C<$test_command> is actually an alias to:
+
+    cd t; ./perl harness -v <target> > <outputfile> 2>&1; cd -
+
+We collect our arguments in a hash which we pass to the helper function
+C<process_options()>.
+
+    %args = (
+        gitdir              => $perlgitdir,
+        workdir             => $workdir,
+        outputdir           => $outputdir,
+        first               => $first_commit,
+        last                => $last_commit,
+        configure_command   => $configure_command,
+        make_command        => $make_command,
+        test_command        => $test_command,
+        verbose             => 1,
+    );
+    $params = process_options(%args);
+
+Output (C<verbose> mode):
+
+    Arguments provided to process_options():
+    $VAR1 = {
+              'verbose' => 1,
+              'test_command' => 'harness',
+              'first' => 'v5.25.1',
+              'configure_command' => 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null',
+              'gitdir' => '/home/username/gitwork/perl',
+              'outputdir' => '/home/username/multisect/outputs',
+              'make_command' => 'make test_prep 1>/dev/null 2>&1',
+              'last' => 'd6e0ab90d221e0e0cbfcd8c68c96c721a688265f',
+              'workdir' => '/usr/home/username/multisect'
+            };
+
+C<process_options()> returns a hash ref which we pass to the
+F<Devel::Git::MultiBisect::Transitions> constructor.
+
+    $self = Devel::Git::MultiBisect::Transitions->new($params);
+
+Now suppose we want a listing of all the commits in the range under study.
+(This is a diagnostic aid but is not, strictly speaking, needed for
+multisection.)  We call C<get_commits_range()>, whose output we can examine
+with F<Data::Dumper> or, as here, F<Data::Dump::pp()> and which we excerpt here:
+
+    my $commits_range = $self->get_commits_range();
+    say STDERR "ZZZ: get_commits_range:";
+    pp($commits_range);
+    say STDERR "ZZZ: items in get_commits_range: ", scalar(@{$commits_range});
+
+Output:
+
+    ZZZ: get_commits_range:
+    [
+      "001761daee58d9e33b457b762adae1f44a887a2d",
+      "7d376cf2211a31aecb2ae5e18343bf0d157125e8",
+      "5b145eb412326b9b57276229cfde0ef09e7ca2bc",
+      # snip over 200 commits
+      "8c3f6b0b0ae614484fa1c408f25a4cfbac77a513",
+      "d3cf57bba0f4ee08a63044d3c9001f1e4ec2d73c",
+      "d6e0ab90d221e0e0cbfcd8c68c96c721a688265f",
+    ]
+    ZZZ: items in get_commits_range: 220
+
+We now must identify the B<targets> -- the test files to be run by the
+C<test_command> at each commit selected for multisection.  The
+C<set_targets()> method returns a hash ref with the full paths to the targets.
+
+    $target_args = [
+        'lib/locale.t',
+    ];
+    $full_targets = $self->set_targets($target_args);
+    say STDERR "AAA: set_targets";
+    pp($full_targets);
+
+Output:
+
+    AAA: set_targets
+    [
+      {
+        path => "/home/username/gitwork/perl/lib/locale.t",
+        stub => "lib_locale_t",
+      },
+    ]
+
+We now get to the real deal:  C<multisect_all_targets()>.
+
+    $rv = $self->multisect_all_targets();
+
+Output (C<verbose> mode):
+
+    Testing commit: 001761daee58d9e33b457b762adae1f44a887a2d
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/001761d.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/001761d.lib_locale_t.output.txt
+    Tested commit:  001761daee58d9e33b457b762adae1f44a887a2d; returning to: blead
+    Commit counter: 1
+    Testing commit: d6e0ab90d221e0e0cbfcd8c68c96c721a688265f
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt
+    Tested commit:  d6e0ab90d221e0e0cbfcd8c68c96c721a688265f; returning to: blead
+    Commit counter: 2
+    target count|sum of status values: 1|0
+    Targeting file: /home/username/gitwork/perl/lib/locale.t
+
+The program configures and builds F<perl> at the first and last commits in the
+test range, runs the target and writes the output of the C<test_command> to a
+file in the C<outputdir>.  Internally, F<Devel::Git::MultiBisect> stores an
+md5_hex digest of the outputfile for the purpose of uniquely identifying its
+content.
+
+Once we know what's happening at the beginning and end of the commit range, we
+start to apply a bisection algorithm.
+
+Output (continued):
+
+    At commit counter 2, preparing to test commit 110 of 220
+    Testing commit: 9c88bb56d60636172f099f56a2808249de0c55a6
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt
+    Tested commit:  9c88bb56d60636172f099f56a2808249de0c55a6; returning to: blead
+    Commit counter: 3
+
+After each commit visited during multisection we compare the digest of the
+outputfile with the digest of the very first commit's outputfile to determine
+which way to turn, earlier or later, for the next commit to be run.  However,
+since we are concerned with the B<transition> in the output from one commit to
+the next (not just with a change from, say, C<PASS> to C<FAIL>), we must first
+run the configure/build/test cycle on the B<immediately preceeding> commit to
+see if we're at a transition point.
+
+Output (continued):
+
+    At commit counter 3, preparing to test commit 109 of 220
+    Testing commit: f71079d3db9617c58ae7b6af4dbc508997966529
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/f71079d.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/f71079d.lib_locale_t.output.txt
+    Tested commit:  f71079d3db9617c58ae7b6af4dbc508997966529; returning to: blead
+    Commit counter: 4
+
+We don't have a transition point, so we apply the bisection principle and
+continue.
+
+Output (continued):
+
+    At commit counter 4, preparing to test commit 55 of 220
+    Testing commit: f17bc913886cd59ab68fde7bec9131dbb90186a0
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt
+    Tested commit:  f17bc913886cd59ab68fde7bec9131dbb90186a0; returning to: blead
+    Commit counter: 5
+
+    At commit counter 5, preparing to test commit 82 of 220
+    Testing commit: e67bc19562c85b51b0d54a3997beeb3ceee2447a
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt
+    Tested commit:  e67bc19562c85b51b0d54a3997beeb3ceee2447a; returning to: blead
+    Commit counter: 6
+
+    At commit counter 6, preparing to test commit 81 of 220
+    Testing commit: c389e68f6ee2168540f4380398361c24e9b985aa
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/c389e68.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/c389e68.lib_locale_t.output.txt
+    Tested commit:  c389e68f6ee2168540f4380398361c24e9b985aa; returning to: blead
+    Commit counter: 7
+
+We'll skip to the end (see F<examples/tfll.typescript> for full output):
+
+Output (continued):
+
+    At commit counter 22, preparing to test commit 59 of 220
+    Testing commit: 59c018b996263ec705a1e7182f7fa996b72207da
+    Running 'sh ./Configure -des -Dusedevel -Duseithreads 1>/dev/null'
+    Running 'make test_prep 1>/dev/null 2>&1'
+    Running 'cd t; ./perl harness -v /home/username/gitwork/perl/lib/locale.t >/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt 2>&1; cd -'
+    Created /home/username/multisect/outputs/59c018b.lib_locale_t.output.txt
+    Tested commit:  59c018b996263ec705a1e7182f7fa996b72207da; returning to: blead
+    Commit counter: 23
+    Ran 23 runs; elapsed: 4297 sec; mean: 186.83 sec
+
+We see above that, out of 220 commits in the commit range, we only had to
+visit 23 of them to complete the multisection process.  Given that, in the
+FreeBSD-11 virtual machine in which this process was run, multisection took
+only 72 minutes (3 minutes and 7 seconds for each configure/build/test cycle),
+the time saving over running all commits was considerable.
+
+What did C<multisect_all_targets()> return?  How did we get the timings?
+
+    say STDERR "BBB: multisect_all_targets: $rv";
+
+    $timings = $self->get_timings();
+    say STDERR "CCC: get_timings";
+    pp($timings);
+
+Output:
+
+    BBB: multisect_all_targets: 1
+    CCC: get_timings
+    { elapsed => 4297, mean => 186.83, runs => 23 }
+
+We call C<get_multisected_outputs()> to get a comprehensive report:
+
+    $rv = $self->get_multisected_outputs();
+    say STDERR "DDD: get_multisected_outputs";
+    pp($rv);
+
+C<get_multisected_outputs()> returns a hash ref keyed on a "stub" version of
+the name of each test file targeted.  The value for each target is an array,
+each of whose elements is a hash ref whose elements identify the commit, the
+output file created when running the target at that commit and the digest for
+that output file.  There's one element in the array for each commit in the
+commit range -- but if we didn't need to visit a particular commit during
+multisection, that element is C<undef>.
+
+Output (excerpt):
+
+    DDD: get_multisected_outputs
+    {
+      lib_locale_t => [
+        {
+          commit => "001761daee58d9e33b457b762adae1f44a887a2d",
+          commit_short => "001761d",
+          file => "/home/username/multisect/outputs/001761d.lib_locale_t.output.txt",
+          md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+        },
+        undef,
+        undef,
+        undef,
+        # snip 'undef' for commits we didn't need to visit
+        undef,
+        undef,
+        undef,
+        {
+          commit => "f17bc913886cd59ab68fde7bec9131dbb90186a0",
+          commit_short => "f17bc91",
+          file => "/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt",
+          md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+        },
+        {
+          commit => "4e615abd31bcd0bb8f321ae4687e5aef1a8aa391",
+          commit_short => "4e615ab",
+          file => "/home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt",
+          md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+        },
+        {
+          commit => "00bf60caa5125511dc13041a21f3d1cf2abff837",
+          commit_short => "00bf60c",
+          file => "/home/username/multisect/outputs/00bf60c.lib_locale_t.output.txt",
+          md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+        },
+        {
+          commit => "165a1c52807daa7ad3ecc83f0811047937088904",
+          commit_short => "165a1c5",
+          file => "/home/username/multisect/outputs/165a1c5.lib_locale_t.output.txt",
+          md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+        },
+        {
+          commit => "59c018b996263ec705a1e7182f7fa996b72207da",
+          commit_short => "59c018b",
+          file => "/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt",
+          md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+        },
+        {
+          commit => "6696cfa7cc3a0e1e0eab29a11ac131e6f5a3469e",
+          commit_short => "6696cfa",
+          file => "/home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt",
+          md5_hex => "b29d11b703576a350d91e1506674fd80",
+        },
+        {
+          commit => "4ebeff162503a0f3c404305458e4730ff29f1dea",
+          commit_short => "4ebeff1",
+          file => "/home/username/multisect/outputs/4ebeff1.lib_locale_t.output.txt",
+          md5_hex => "b29d11b703576a350d91e1506674fd80",
+        },
+        undef,
+        undef,
+        undef,
+        {
+          commit => "ff52fcf1dae90deb49f680d7cdbf78a04458ac47",
+          commit_short => "ff52fcf",
+          file => "/home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt",
+          md5_hex => "b29d11b703576a350d91e1506674fd80",
+        },
+        {
+          commit => "a4a439fb9cd74c575855119abb55dc091955bdf4",
+          commit_short => "a4a439f",
+          file => "/home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "78d57975d5aa732ef6dfba842558183e8880539c",
+          commit_short => "78d5797",
+          file => "/home/username/multisect/outputs/78d5797.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "2fcc0ca9e3b59e6224af067db588ef3249137029",
+          commit_short => "2fcc0ca",
+          file => "/home/username/multisect/outputs/2fcc0ca.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        undef,
+        undef,
+        undef,
+        undef,
+        {
+          commit => "b9f119beb209b721e37523a5a5d1d72c901f3316",
+          commit_short => "b9f119b",
+          file => "/home/username/multisect/outputs/b9f119b.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "cbef69c1c0b28f5a8e50e67afea1ff67dcce20aa",
+          commit_short => "cbef69c",
+          file => "/home/username/multisect/outputs/cbef69c.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        undef,
+        undef,
+        {
+          commit => "c389e68f6ee2168540f4380398361c24e9b985aa",
+          commit_short => "c389e68",
+          file => "/home/username/multisect/outputs/c389e68.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "e67bc19562c85b51b0d54a3997beeb3ceee2447a",
+          commit_short => "e67bc19",
+          file => "/home/username/multisect/outputs/e67bc19.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        # snip 'undef' for commits we didn't need to visit
+        undef,
+        undef,
+        {
+          commit => "bdc905d035d4f835a808f1825dad9a8cd726d1ec",
+          commit_short => "bdc905d",
+          file => "/home/username/multisect/outputs/bdc905d.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "6830146276953868aad3dab123e7048a786f9452",
+          commit_short => 6830146,
+          file => "/home/username/multisect/outputs/6830146.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        # snip 'undef' for commits we didn't need to visit
+        undef,
+        undef,
+        {
+          commit => "f71079d3db9617c58ae7b6af4dbc508997966529",
+          commit_short => "f71079d",
+          file => "/home/username/multisect/outputs/f71079d.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "9c88bb56d60636172f099f56a2808249de0c55a6",
+          commit_short => "9c88bb5",
+          file => "/home/username/multisect/outputs/9c88bb5.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        # snip 'undef' for commits we didn't need to visit
+        undef,
+        undef,
+        {
+          commit => "ee072c898947f5fee316f1381b29ad692addcf05",
+          commit_short => "ee072c8",
+          file => "/home/username/multisect/outputs/ee072c8.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        {
+          commit => "8c4723656080526a8392690f30ec46d642de80ba",
+          commit_short => "8c47236",
+          file => "/home/username/multisect/outputs/8c47236.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        undef,
+        undef,
+        # snip 'undef' for commits we didn't need to visit
+        undef,
+        undef,
+        {
+          commit => "d6e0ab90d221e0e0cbfcd8c68c96c721a688265f",
+          commit_short => "d6e0ab9",
+          file => "/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt",
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+      ],
+    }
+
+That's comprehensive output, but what we really want is just a look at the
+transition points, I<i.e.,> the commits where the output of a target's run
+changed from that of the immediately preceding commit.  We get that with
+C<inspect_transitions()>.
+
+    $transitions = $self->inspect_transitions($rv);
+    say STDERR "EEE: inspect_transitions";
+    pp($transitions);
+
+Output:
+
+    EEE: inspect_transitions
+    {
+      lib_locale_t => {
+        oldest => {
+          file => "/home/username/multisect/outputs/001761d.lib_locale_t.output.txt",
+          idx => 0,
+          md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+        },
+        newest => {
+          file => "/home/username/multisect/outputs/d6e0ab9.lib_locale_t.output.txt",
+          idx => 219,
+          md5_hex => "481032a28823c8409a610e058b34a047",
+        },
+        transitions => [
+          {
+            older => {
+                       file => "/home/username/multisect/outputs/f17bc91.lib_locale_t.output.txt",
+                       idx => 54,
+                       md5_hex => "09431b9e74d329ef9ae0940eb0d279fb",
+                     },
+            newer => {
+                       file => "/home/username/multisect/outputs/4e615ab.lib_locale_t.output.txt",
+                       idx => 55,
+                       md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+                     },
+          },
+          {
+            older => {
+                       file => "/home/username/multisect/outputs/59c018b.lib_locale_t.output.txt",
+                       idx => 58,
+                       md5_hex => "01ec704681e4680f683eaaaa6f83f79c",
+                     },
+            newer => {
+                       file => "/home/username/multisect/outputs/6696cfa.lib_locale_t.output.txt",
+                       idx => 59,
+                       md5_hex => "b29d11b703576a350d91e1506674fd80",
+                     },
+          },
+          {
+            older => {
+                       file => "/home/username/multisect/outputs/ff52fcf.lib_locale_t.output.txt",
+                       idx => 64,
+                       md5_hex => "b29d11b703576a350d91e1506674fd80",
+                     },
+            newer => {
+                       file => "/home/username/multisect/outputs/a4a439f.lib_locale_t.output.txt",
+                       idx => 65,
+                       md5_hex => "481032a28823c8409a610e058b34a047",
+                     },
+          },
+        ],
+      },
+    }
+
+The return value from C<inspect_transitions()> is a hash ref keyed on the stub
+version of each target file.  Each element's value is another hash ref with
+keys C<oldest>, C<newest> and C<transitions>.  C<oldest> and C<newest>, as you
+would expect, hold information about the very first and very last commits in
+the range.
+
+C<transitions> holds an array of hash refs, one for each pair of commits
+(C<older>, C<newer>) between which the output of running the target changed in
+a material way.  It turns out that, over a range of 220 commits, the output of
+F<lib/locale.t> changed only 3 times:
+
+=over 4
+
+=item 1  Between indexes 54 and 55
+
+Inspection of the C<older> and C<newer> output C<file> elements suggested that
+the output here changed only because P5P added one unit test and changed test
+descriptions in F<lib/locale.t>.  The outcome was C<PASS> in both C<older> and
+C<newer>.
+
+=item 2  Between indexes 58 and 59
+
+Inspection of the C<older> and C<newer> output C<file> elements showed that 2
+unit tests were added in commit C<6696cfa>, giving a total of 677 unit tests.
+One showed a C<not ok>, so overall the run now got a C<FAIL>.  Review of the
+source code recommended at this commit point.
+
+=item 3  Between indexes 64 and 65
+
+Inspection of the C<older> and C<newer> output C<file> elements showed that
+F<lib/locale.t> stopped running after test 380.  Re-building and testing at
+commit C<a4a439f> showed that this was the point where the segfault first
+appeared.  Again, review of the source code was recommended.
+
+=back
+
+=cut
+

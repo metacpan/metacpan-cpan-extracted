@@ -1,0 +1,9 @@
+205246330a
+
+master rfxsensor 20.5246330a
+
+RFXSensor Type-3, version 0a, transmit mode fast, initialized
+
+
+
+

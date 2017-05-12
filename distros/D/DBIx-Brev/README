@@ -1,0 +1,45 @@
+DBI-Brev version 0.02
+=====================
+
+Brevity is the soul of wit.
+
+This module provides framework for laconic DBI.
+
+It's suitable for one liners and also if you like laconic style in code.
+
+Under the hood:
+* DBIx::Connector dbh auto-recovering
+* Config::General db alias configuration support to make it easier connect/switch/multi database DBI work
+* SQL::SplitStatement support for sql_exec
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+   
+Notice: it can be used without installation - just download DBIx/Brev.pm and put it where perl will be able to find it.
+
+DEPENDENCIES
+
+This module can use but not requires (can work without) these modules:
+
+DBIx::Connector
+Config::General
+SQL::SplitStatement
+
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2013 by Oleksandr Kharchenko <okharch@gmail.com>
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.16.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

@@ -1,0 +1,12 @@
+---
+default:
+    test_data:
+        type: required
+        datatype: negative_datatype
+    test_sub:
+        type: required
+        sub: '{ 1; }'
+    test_plugin:
+        type: required
+        plugin: TESTNONEXISTANTPLUGIN
+

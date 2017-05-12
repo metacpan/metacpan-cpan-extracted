@@ -1,0 +1,49 @@
+Dist::Zilla::Plugin::PodLoom version 5.001, released July 18, 2015
+
+
+Dist::Zilla::Plugin::PodLoom is a plugin for Dist::Zilla that
+processes your documentation through Pod::Loom.
+
+
+
+INSTALLATION
+
+To install these modules, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+
+
+DEPENDENCIES
+
+  Package                        Minimum Version
+  ------------------------------ ---------------
+  perl                            5.8.0
+  Dist::Zilla                     4.200001
+  Dist::Zilla::Role::FileMunger   
+  Dist::Zilla::Role::ModuleInfo   0.08
+  Hash::Merge::Simple             
+  Moose                           0.65
+  Moose::Autobox                  
+  Pod::Loom                       0.05
+
+
+
+CHANGES
+    Here's what's new in version 5.001 of Dist::Zilla::Plugin::PodLoom:
+    (See the file "Changes" for the full revision history.)
+
+	- When passing 'module' to Pod::Loom, use the filename if the
+	  package is 'main' or undetermined.  This makes it useful for scripts.
+
+
+
+COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2015 by Christopher J. Madsen.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

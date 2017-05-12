@@ -1,0 +1,15 @@
+---
+abstract: 'Generate unique passwords for web sites.'
+author:
+  - 'Søren Lund <soren@lund.org>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200014, CPAN::Meta::Converter version 2.110930001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Digest-PasswordComposer
+version: 0.1

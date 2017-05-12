@@ -1,0 +1,124 @@
+Release history for Dist-Zilla-Plugin-Test-Compile-PerModule
+
+0.004000 2017-03-03T06:03:26Z c739100
+ - Stable release for changes 0.003900-0.003902
+
+ [Highlights]
+ - New template helper "quoted"
+ - Improved quoting in generated tests
+ - New template varible "relpath"
+ - New template "02-raw-require.t"
+ - Generated tests no longer succeptible to "." missing from @INC
+
+0.003902 2017-02-28T23:57:38Z f5d29d9
+ - New templated helper 'quoted' for escaping strings more sensibly. haarg++
+ - Test templates now use improved quoting.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003901, see misc/*.deps* for details
+ - runtime: +1
+
+0.003901 2017-02-28T03:42:06Z a5e9632
+ - New test template 02-raw-require.t
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003900, see misc/*.deps* for details
+ - test: ↓1
+
+0.003900 2017-02-28T02:09:54Z 61cd404
+ - New variable "relpath" that includes the file path with "lib" stripped if present, or with "./" prepended otherwise.
+
+ [Bugfix]
+ - Use properly relativized paths to require_ok to avoid bugs with "no . in @INC"
+ - Closes: https://github.com/kentnl/Dist-Zilla-Plugin-Test-Compile-PerFile/issues/2
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - configure: +1 (recommends: +1 ↑1)
+ - develop: +17 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -2 (recommends: +2)
+ - test: +1 -1 (recommends: ↑1 ↓1)
+
+ [Internals]
+ - Drop use of ConfigDumper
+ - Stop using dztest in tests
+
+0.003000 2014-09-14T14:02:09Z
+ [Bugfix]
+ - Fixed 'file' and 'files' arguments going nowhere due to wrong mvp aliasing.
+ - use 5.8 compatible posix classes.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002002, see misc/*.deps* for details
+ - develop: +1 ↑1 (suggests: ↑2)
+ - runtime: +1
+ - test: +4 (recommends: ↑1)
+
+ [Internals]
+ - Implement dump_config with ConfigDumper
+
+ [Metadata]
+ - set author = kentnl
+
+ [Tests]
+ - Add reasonably comprehensive feature tests.
+
+0.002002 2014-08-15T21:20:26Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - configure: ↓1
+ - develop: +1 (suggests: ↑1)
+ - test: -4 (recommends: ↑1 -2)
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - Update test::reportprereqs
+
+0.002001 2014-07-17T23:32:23Z
+ [00 Trivial]
+ - Misc packaging cleanups
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - configure: ↑1 (recommends: ↑1)
+ - develop: +3 -3 (suggests: +2 -1)
+ - test: +2 ↑1 (recommends: +1 ↑1)
+
+0.002000 2014-04-13T03:23:15Z
+ [00 Major]
+ - Toolking Switched to EUMM.soft
+
+ [Dependencies::Aggregate]
+ - 5.008 : 199 → 202
+ - 5.010 : 177 → 182
+ - 5.019 : 161 → 160
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - build: -1
+ - configure: +2 -1 (recommends: +1)
+ - develop: +7 ↑1 -9
+ - runtime: +1 ↑1
+ - test: +4 ↓1 (recommends: +4)
+
+0.001001 2013-11-13T10:47:34Z
+ [00 Bugfix]
+ - Fix sort order of files in metadata
+ - Properly remove indirect develop dependence on Test::Compile
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - build: ↑1
+ - configure: ↑1
+ - develop: +1 ↑1 -1
+
+0.001000 2013-11-11T09:33:58Z
+ - First version. Not feature compatible with Test::Compile

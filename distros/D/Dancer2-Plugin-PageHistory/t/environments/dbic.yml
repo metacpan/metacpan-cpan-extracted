@@ -1,0 +1,5 @@
+session: DBIC
+engines:
+    session:
+        DBIC:
+            db_connection_name: default

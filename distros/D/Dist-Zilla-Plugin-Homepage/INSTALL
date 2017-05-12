@@ -1,0 +1,27 @@
+
+This is the Perl distribution Dist-Zilla-Plugin-Homepage.
+
+## Installation
+
+Dist-Zilla-Plugin-Homepage installation is straightforward.
+If your CPAN shell is set up, you should just be able to do
+
+    % cpan Dist::Zilla::Plugin::Homepage
+
+Download it, unpack it, then build it as per the usual:
+
+    % perl Makefile.PL
+    % make && make test
+
+Then install it:
+
+    % make install
+
+## Documentation
+
+Dist-Zilla-Plugin-Homepage documentation is available as in POD.
+So you can do:
+
+    % perldoc Dist::Zilla::Plugin::Homepage
+
+to read the documentation with your favorite pager.

@@ -1,0 +1,12 @@
+#! /usr/local/bin/perl -w
+#
+# sel - example script for Data::PowerSet
+#
+# Copyright (C) David Landgren 2005 
+
+use strict;
+use Data::PowerSet 'powerset';
+
+my $p = powerset( {join => ''}, @ARGV );
+
+print "$_\n" for @$p;

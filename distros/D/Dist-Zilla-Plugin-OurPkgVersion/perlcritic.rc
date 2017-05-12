@@ -1,0 +1,9 @@
+severity = 3
+verbose  = 9
+exclude  = ValuesAndExpressions::ProhibitImplicitNewlines
+
+[Subroutines::ProhibitCallsToUndeclaredSubs]
+exempt_subs = Moose::with
+
+[-ErrorHandling::RequireUseOfExceptions]
+[-ValuesAndExpressions::RequireNumericVersion]

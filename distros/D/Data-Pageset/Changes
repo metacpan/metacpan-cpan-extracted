@@ -1,0 +1,48 @@
+Revision history for Perl extension Data::Pageset.
+
+1.06 Sun  3 Jan 2010 17:41:34 GMT
+    - Switch repository to github
+
+1.05 Fri Feb 22 10:46:45 GMT 2008
+	- Fix bug in slide where last slide position is skipped (Ryan)
+
+1.04 Thu Mar  9 22:55:44 GMT 2006
+	- Apply patch from http://rt.cpan.org/Public/Bug/Display.html?id=27384
+	  to fix slider bug - thanks to PLOBBES
+
+1.03 Thu Mar  9 22:55:44 GMT 2006
+	- fix bug in last page of slide mode
+
+1.02 Sat 21st Jan 2006
+	- Added 'mode' option so you can be in 'slide' mode for your page numbers
+
+1.01 Sat 1st Jan 2005
+	- Fixed bug with setting current_page after object construction new()
+	- set default pages_per_set to 10 - was not previously defaulted to anything
+
+1.00 Thurs Oct 26 2004
+	- Added tests to get Devel::Cover to 100%
+	- removed extranious lines of code as checks are in Data::Page
+	- made compatable with Data::Page v 2.00
+
+0.06  Sun Aug 17 08:27:00 2003
+	- Fixed tests that broke from Data::Page bug fix
+	- Made require Data::Page 0.18
+
+0.05  - skipped
+
+0.04  Wed Mar 12 13:13:13 2003
+	- Removed 'our' values so will work with 5.00503
+	- Thanks to Robert Price
+	- Added thanks to Leon in Read me
+
+0.03  Mon Oct 28 13:56:00 2002
+	- Documentation patch - thanks to Robin Szemeti
+
+0.02  Fri Aug 30 16:00:48 2002
+	- First release version.
+
+0.01  Fri Aug 30 11:00:48 2002
+	- original version; created by h2xs 1.21 with options
+		-A -X -n Data::Pageset initial version
+		

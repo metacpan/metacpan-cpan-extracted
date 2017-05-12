@@ -1,0 +1,12 @@
+--- #YAML:1.0
+name: Data-BitMask
+version: 0.91
+author:
+  - Toby Ovod-Everett, toby@ovod-everett.org
+abstract: bitmask manipulation
+license: perl
+provides:
+  Data::BitMask:
+    file: lib/Data/BitMask.pm
+    version: 0.91
+generated_by: Module::Build version 0.24

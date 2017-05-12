@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIPR
+version:      0.01
+version_from: lib/DBIPR.pm
+installdirs:  site
+requires:
+    DBD::Oracle:                   1.19
+    DBI:                           0
+    Test::More:                    0
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.30_01

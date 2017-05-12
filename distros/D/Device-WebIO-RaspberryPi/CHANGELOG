@@ -1,0 +1,41 @@
+Revision history for perl module Device::WebIO::RaspberryPi
+
+0.009 2015-04-05
+
+- I2C methods will cache device
+- I2C methods switched to using HiPi::BCM2835::I2C
+- Audio can be muxed together on the video stream
+
+0.008 2015-01-03
+
+- SPI interface
+
+0.007 2014-11-30
+
+- Video streaming
+
+0.006 2014-11-22
+
+- Use GStreamer to get image rather than calling raspistill
+- Add quality parameter to examples/picture.pl
+
+0.005 2014-11-12
+
+- Add img quality subs for new Device::WebIO version
+
+0.004 2014-10-09
+
+- Implemented I2CProvider role
+
+0.003 2014-10-05
+
+- Implemented StillImageOutput role
+- Added missing dependency for HiPi
+
+0.002 2014-09-20
+
+- all_desc() and pin_desc() implemented
+
+0.001 2014-08-28
+
+- Implement basic Device::WebIO interfaces

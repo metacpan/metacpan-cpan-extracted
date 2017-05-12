@@ -1,0 +1,134 @@
+NAME
+    Data::Pager - flexible data pager
+
+SYNOPSIS
+      use Data::Pager;
+  
+      my $pager = Data::Pager->new({
+        current => 100,
+        perpage => 10,
+        offset  => 5,
+        limit   => 2000,
+      });
+
+      #~ accessors:  
+      $pager->current; # 100
+      $pager->next;    # 101
+      $pager->prev;    # 99
+      $pager->limit;   # 2000
+      $pager->start;   # 1 # not typical start of a programmer
+      $pager->final;   # \
+                          # 400 (which denotes 2000 / 5 pager links)
+      $pager->end;     # /
+      $pager->from;    # 495 (may serve in SQL LIMIT clause)
+      $pager->to;      # 500 (may serve in SQL LIMIT clause)
+      $pager->list;    # 95  96  97  98  99  100  101  102  103  104  105
+  
+DESCRIPTION
+    This class implements the familiar pager where the current position is
+    centered.
+
+CONSTRUCTOR
+  new
+     my $pager = Data::Pager->new({
+       current => 1,      # this is the current pager position
+       perpage => 10,     # the pager consists of this number of links (defaults to 10)
+       offset  => 5,      # this is the number of results (fetched from the DB for example) per result
+       limit   => 100,    # how far is the pager allowed 
+     });
+
+     # sample output from html table:
+ 
+     id ... ..... ... 
+     1. ... ..... ...
+     2. ... ..... ...
+     3. ... ..... ...
+     4. ... ..... ...
+     5. ... ..... ...
+ 
+     1 2 3 4 5 6 7 8 9 10
+
+    Returns object or undef if current position is beyond the limit.
+
+METHODS
+  current
+     $pager->current();
+
+    Returns the current pager position.
+
+  set_current($digit)
+     $pager->set_current(850);
+     $pager->set_current(850)->next();
+ 
+    Sets the current pager position. Returns the pager object on succes,
+    undef on false.
+
+  next
+    Returns the next pager position or undef if this is the last one.
+
+  prev
+    Returns the previous pager position or undef if this is the first one.
+
+  start
+    Returns 1 - the start pager position.
+
+  end
+    Returns the end pager position.
+
+  first
+    Returns the first pager position for this result set.
+
+  last
+    Returns the last pager position for this result set.
+
+  from
+      '1' => {
+        'to' => 5,
+        'next' => 2,
+        'prev' => undef,
+        'from' => 0
+      },
+      '2' => {
+        'to' => 10,
+        'next' => 3,
+        'prev' => 1,
+        'from' => 5
+      },
+      ...
+
+    Returns the start result this pager position refers to.
+
+  to
+    Returns the end result this pager position refers to.
+
+  list
+     @_ = $pager->list;
+     $_ = $pager->list;
+
+    Returns the pager links for this result set. In list context returns the
+    resulting list. In scalar context returns reference to the resulting
+    list.
+
+     # note the alignment
+
+     $pager->set_current(10);
+     print $pager->list;         # 6 7 8 9  [10]  11 12 13 14 15
+     $pager->set_current(33);    
+     print $pager->list;         # 28 29 30 31 32 [33] 34 35 36 37 38
+
+SEE ALSO
+    Data::Page
+
+BUGS
+    What BUGS?
+
+AUTHOR
+    Vidul Nikolaev Petrov, vidul@cpan.org
+
+COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

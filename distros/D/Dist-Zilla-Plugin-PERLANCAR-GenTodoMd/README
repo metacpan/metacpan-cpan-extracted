@@ -1,0 +1,18 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [PERLANCAR::GenTodoMd]
+
+DESCRIPTION
+
+    Currently this is specific to my setup (e.g. the location and format of
+    the todo.org document, the short dist's name). Eventually I'll make it
+    generic and configurable enough.
+
+    If there is no todo.org file, nothing will be generated.
+
+SEE ALSO
+
+    http://neilb.org/2014/12/13/todo-convention-for-cpan.html
+

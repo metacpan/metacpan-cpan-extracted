@@ -1,0 +1,20 @@
+.gitignore
+Makefile.PL
+Changes
+lib/DateTime/Format/RFC3339.pm
+LICENSE.txt
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README.txt
+t/00_load.t
+t/01_devel_mark_check.t
+t/02_devel_version_check.t
+t/03_devel_whitespace.t
+t/04_devel_permissions.t
+t/05_pod.t
+t/06_devel_pod_coverage.t
+t/07_parsing.t
+t/08_formatting.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,98 @@
+{
+   "abstract" : "locate Perl Modules in Debian repositories",
+   "author" : [
+      "Jozef Kutej <jkutej@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.112621",
+   "keywords" : [
+      "debian",
+      "perl",
+      "modules"
+   ],
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Debian-Apt-PM",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build::SysPath" : "0.13",
+            "Test::Differences" : 0,
+            "Test::Exception" : 0,
+            "Test::More" : 0
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3607",
+            "Module::Build::SysPath" : "0.13"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "AptPkg::Config" : 0,
+            "CPAN" : 0,
+            "CPAN::Module" : 0,
+            "CPAN::PackageDetails" : 0,
+            "CPAN::Patches" : 0,
+            "CPAN::Patches::Plugin::Debian" : "0.03",
+            "CPAN::Version" : 0,
+            "Carp" : 0,
+            "Data::Header::Fields" : "0.04",
+            "DateTime" : 0,
+            "Digest::MD5" : 0,
+            "Dpkg::Version" : 0,
+            "File::Basename" : 0,
+            "File::Copy" : 0,
+            "File::Find::Rule" : 0,
+            "File::HomeDir" : 0,
+            "File::Path" : "2.01",
+            "File::Temp" : 0,
+            "File::is" : 0,
+            "Getopt::Long" : 0,
+            "IO::Any" : 0,
+            "IO::Uncompress::Bunzip2" : 0,
+            "IO::Uncompress::Gunzip" : 0,
+            "JSON::Util" : "0.04",
+            "LWP::Simple" : 0,
+            "List::MoreUtils" : 0,
+            "MetaCPAN::API" : 0,
+            "Module::Build::ModuleInfo" : 0,
+            "Module::Depends::Intrusive" : 0,
+            "Moose" : 0,
+            "Parallel::Iterator" : 0,
+            "Parse::Deb::Control" : "0.04",
+            "Pod::Usage" : 0,
+            "Storable" : 0
+         }
+      }
+   },
+   "provides" : {
+      "Debian::Apt::PM" : {
+         "file" : "lib/Debian/Apt/PM.pm",
+         "version" : "0.09"
+      },
+      "Debian::Apt::PM::SPc" : {
+         "file" : "lib/Debian/Apt/PM/SPc.pm",
+         "version" : "0.08"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://github.com/jozef/Debian-Apt-PM/issues"
+      },
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "git://github.com/jozef/Debian-Apt-PM.git"
+      }
+   },
+   "version" : "0.09"
+}

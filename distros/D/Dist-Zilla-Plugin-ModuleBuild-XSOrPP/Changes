@@ -1,0 +1,20 @@
+0.04    2012-02-08
+
+- Just use the Module::Build->have_c_compiler() method instead of doing this
+  by hand. This removes a lot of redundant code.
+
+
+0.03    2012-02-05
+
+- Add a real compiler check to the generated Build.PL. If there is no usable
+  compiler, then XS compilation is automatically disabled.
+
+
+0.02    2010-07-17
+
+- Fix copy-and-paste'o in tests.
+
+
+0.01    2010-07-16
+
+- First release.

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Devel-XRay
+version:             0.95
+abstract:            See What a Perl Module Is Doing
+license:             perl
+author:              
+    - Jeff Bisbee <jbisbee@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.44
+distribution_type:   module
+requires:     
+    Carp:                          0
+    Filter::Simple:                0.78
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

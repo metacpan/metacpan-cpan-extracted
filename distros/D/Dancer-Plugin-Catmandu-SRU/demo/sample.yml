@@ -1,0 +1,20 @@
+---
+_id: 1
+creator:
+ - Musterman, Max
+ - Jansen, Jan
+ - Svenson, Sven
+title:
+ - Test record
+subject:
+ - काठमांडू (UTF-8 test)
+---
+_id: 2
+creator:
+ - Musterman, Max
+ - Svenson, Sven
+title:
+ - Testing is my joy and happiness
+subject:
+ - Programming
+...

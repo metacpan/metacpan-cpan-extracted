@@ -1,0 +1,84 @@
+NAME
+
+    Dist::Zilla::Plugin::GitFmtChanges - Build CHANGES file from a
+    project's git log using git log format.
+
+SYNOPSIS
+
+    In your dist.ini:
+
+            [GitFmtChanges]
+            max_age     = 365
+            tag_regexp  = ^v\d+\.\d+$
+            file_name   = CHANGES
+            log_format  = medium
+
+    The example values are the defaults.
+
+DESCRIPTION
+
+    This Dist::Zilla plugin writes a CHANGES file that contains formatted
+    commit information from recent git logs. The CHANGES file is formatted
+    using the "--format" option of the git log command. This makes it easy
+    to make the CHANGES file look the way you want it to.
+
+    This is based on Dist::Zilla::Plugin::ChangelogFromGit.
+
+    This plugin has the following configuration variables:
+
+      * max_age
+
+      It may be impractical to include the full change log in a mature
+      project's distribution. "max_age" limits the changes to the most
+      recent ones within a number of days. The default is about one year.
+
+      Include two years of changes:
+
+              max_age = 730
+
+      * tag_regexp
+
+      This plugin breaks the changelog into sections delineated by
+      releases, which are defined by release tags. "tag_regexp" may be used
+      to focus only on those tags that follow a particular release tagging
+      format. Some of the author's repositories contain multiple projects,
+      each with their own specific release tag formats, so that changelogs
+      can focus on particular projects' tags. For instance,
+      POE::Test::Loops' release tags may be specified as:
+
+              tag_regexp = ^ptl-
+
+      * file_name
+
+      Everyone has a preference for their change logs. If you prefer
+      lowercase in your change log file names, you might specify:
+
+              file_name = Changes
+
+      * log_format
+
+      Define the format used for the change listing in the CHANGES file.
+      This option is passed through to the git log command. One can use the
+      predefined formats, such as 'oneline', 'short', 'medium' etc.
+
+              log_format = short
+
+      Or one can exersize more control by using the "format" formatting.
+      The following example will give the author and date, a newline, and
+      the "subject" of the change.
+
+              log_format = %ai%n%s
+
+AUTHOR
+
+    Kathryn Andersen <perlkat@katspace.org>
+
+COPYRIGHT AND LICENSE
+
+    This is based on Dist::Zilla::Plugin::ChangelogFromGit by Rocco Caputo.
+
+    This software is copyright (c) 2010 by Kathryn Andersen.
+
+    This is free software; you may redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language itself.
+

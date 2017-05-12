@@ -1,0 +1,21 @@
+Revision history for Perl extension Data::Lotter
+
+0.00004     2014/02/04
+   - bug fix
+
+0.00003     2008/7/09
+   - added _scale_up() method and test code
+
+0.00002     2008/6/30
+   - update version number only
+
+0.00001     2008/6/30
+   - OFFICIAL RELEASE 
+   - rewrite POD blicks in English
+   - added debug() method
+
+0.00001_01  2008/4/4
+   - set '=encoding UTF-8' command paragraph at beginning of POD block
+
+0.00001_00  2008/4/3 
+   - DEVELOPPER'S RELEASE 

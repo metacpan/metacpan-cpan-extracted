@@ -1,0 +1,21 @@
+<sql:spec xmlns:sql="http://boojum.org.uk/NS/XMLServer">
+
+  <sql:type name="text">
+    <sql:module>DBIx::XMLServer::TextField</sql:module>
+  </sql:type>
+
+  <sql:table name="employees" sqlname="dbixtest1"/>
+ 
+  <sql:template table="employees">
+    <employees>
+      <sql:record>
+      	<employee>
+      	  <name>
+      	    <sql:field type="text" expr="employees.name"/>
+      	  </name>
+      	</employee>
+      </sql:record>
+    </employees>
+  </sql:template>
+	
+</sql:spec>

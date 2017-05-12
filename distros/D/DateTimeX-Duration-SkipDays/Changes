@@ -1,0 +1,6 @@
+Revision history for DateTimeX-Duration-SkipDays
+
+0.002     2012-07-28 11:40:12 America/Boise
+  - Updated dist.ini to what I'm currently using
+  - Started using Changes file
+  - Made tests work, and pass

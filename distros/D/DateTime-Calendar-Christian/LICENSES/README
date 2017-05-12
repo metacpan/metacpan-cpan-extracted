@@ -1,0 +1,24 @@
+When I adopted this distribution the lincenses were all in one file,
+named LICENSE. This was divided into three parts. The first part was the
+following statement:
+
+    Terms of Perl itself
+     
+    a) the GNU General Public License as published by the Free
+       Software Foundation; either version 1, or (at your option) any
+       later version, or
+    b) the "Artistic License"
+
+The second and third parts were copies of the Gnu GPL version 2 (sic)
+and the Artistic License. I have taken the liberty of repackaging this
+in my usual way:
+
+- A license statement in the COPYRIGHT section of the POD, which
+  includes language I believe to be equivalent to the above, plus the
+  Perl-Foundation-recommended disclaimer;
+
+- A copy of the Gnu GPL version 1 as LICENSES/Copying;
+
+- A copy of the Artistic license as LICENSES/Artistic.
+
+# ex: set filetype=text textwidth=72 autoindent :

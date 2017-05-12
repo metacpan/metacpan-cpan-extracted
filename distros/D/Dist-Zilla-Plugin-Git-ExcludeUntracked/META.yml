@@ -1,0 +1,33 @@
+---
+abstract: 'Excludes untracked files from your dist [DEPRECATED]'
+author:
+  - 'Rob Hoelz <rob@hoelz.ro>'
+build_requires:
+  Archive::Tar: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Build: '0.28'
+  Test::More: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.040, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Git-ExcludeUntracked
+no_index:
+  directory:
+    - fake-distributions/
+    - t/lib/
+requires:
+  Dist::Zilla: '0'
+  perl: v5.8.8
+resources:
+  bugtracker: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked/issues
+  homepage: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked
+  repository: https://github.com/hoelzro/dist-zilla-plugin-git-excludeuntracked.git
+version: '0.05'
+x_deprecated: 1

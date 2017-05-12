@@ -1,0 +1,884 @@
+4.86 March 26th, 2017
+    [NEW FEATURES]
+    - Add three new profile methods: depedencies_regexp, dependent_optional, dependent_require_some
+
+    [MAINTENANCE]
+    - Bump VERSION in all classes to 5.85
+
+4.85 Feb 25th, 2017
+
+    [MAINTENANCE]
+    - Bump VERSION in all classes to 5.85
+
+4.84 Feb 25th, 2017
+
+    [MAINTENANCE]
+    - Various test file warning fixes
+    - Change conditional loading of CGI to require version 4.35 or higher (4ce9ac9e)
+
+4.83 Feb 23rd, 2017
+
+    [MAINTENANCE]
+    - Re-release of 4.82: tarball was missing files as "make dist" errored when it didn't find MANIFEST
+    - Deleted unused Perl6 files
+
+4.82 Feb 23rd, 2017
+
+    [MAINTENANCE]
+    - Made CGI dependency optional
+    - Replaced Build.PL with Makefile.PL
+    - Updated Makefile.PL constraints
+    - Removed dependency on Perl6::Junctions
+    - Moved the code to GitHub
+    - Applied patches from: RT 77765, 78443, 10489
+    - Added shebang, warnings pragma to all test scripts
+    - Perltidied tests scripts
+    - Replaced is_tainted() sub with Scalar::Util::tainted()
+
+4.81 Jul 19th, 2013
+
+    [DOCUMENTATION]
+    - There is no such thing as "array context". The documentation now refers to "list context"
+      instead.
+
+    - Fix "the the" typos. (Thanks to dsteinbrunner, RT#77901)
+
+    [INTERNALS]
+    - Somewhat modernizer Exporter usage.
+
+4.80 Nov 1st, 2012
+
+    [NEW FEATURES]
+    - New built-in constraint_methods to test the number of values submitted for a
+      particular field:
+
+        FV_num_values(1),
+        FV_num_values_between(1,2),  # inclusive
+
+      One way that garbage can get through a Data::FormValidator profile is
+      when two values are submitted when only one is intended. In this
+      case, this application could end up with a values like this:
+
+          ARRAY(0x841214c)
+
+     Using these new constraints, you can precisely control how many values
+     are allowed for each field.
+
+    [INTERNAL]
+    - Source control hosting has been moved to http://hub.darcs.net
+      You can now browse, pull and fork the darcs repo through this website.
+
+
+4.71 Oct 2nd, 2012
+
+    [BUG FIXES]
+    - Custom messages for built-in constraints work again. It appears that this
+      was broken in 4.70, which triggered a sleeper bug.
+
+      (Thanks to Lee Carmichael, Mark Stosberg, RT#73235)
+
+4.70 11/11/11
+
+    [NEW FEATURES]
+    - Built-in constraints in Constraints.pm can now be renamed:  
+
+        constraint_methods => {
+            first_names =>  {
+                constraint_method => FV_max_length(3),
+                name => 'custom_length',
+            }
+        },
+
+     (Thanks to heinst@arqs.com.br for the suggestion, RT#49477)
+
+    [INTERNALS]
+    - modernize Constraints.pm and Results.pm a bit.
+    - Module::Build added to configure_requires in Build.PL
+
+4.67 11/11/11
+
+    [INTERNALS]
+    - modernize FormValidator.pm internals a bit
+    - Update META.yml to exclude an internal package from getting indexed.
+
+4.66 Wed Feb 24 09:30:17 EST 2010
+
+    [DOCUMENTATION]
+    - Typo fixes (Jonathan Yu)
+
+    [INTERNALS]
+    - Test suite fix for 5.11.1 and newer.
+
+4.65 Wed Dec 30 22:17:33 EST 2009
+
+    [NEW FEATURES]
+    - New FV_replace() filter to simplify basic find-and-replace filters:
+        field_filters => {
+            first_name   => FV_replace(qr/Mark/,'Don'),
+        },
+
+    [BUG FIXES]
+    - Untainted multi-line fields are no longer truncated after the first newline.
+      (RT#44004, Thanks to Matthew Lawrence)
+    - Fix bug when the constraint_method contains a capturing parens and 0 is a valid value.
+      (RT#45177, Thanks to Junior Medina and Mark Stosberg)
+
+    [DOCUMENTATION]
+    - Typo fixes (Lyle)
+
+    [INTERNALS]
+    - Best Practice: Redundant <span> tag was removed from default error message formatting 
+      (RT#42926), Thanks to girlwithglasses)
+    - Best Practice: eliminated some indirect object notation in the tests (Mark Stosberg)
+    - Now require a new CGI.pm for the build stage (RT#49912, thanks to dsteinbrunner)
+    - White space improvements (RT#30205, Thanks to Peter Liscovius)
+    - Fixed a warning in the test suite (RT#42251, Thanks to Frank Wiegand)
+
+4.63 Sat Jan  3 12:46:15 EST 2009
+    [DOCUMENTATION]
+    - Improve docs for writing your own constraints (girlwithglasses) 
+
+4.62 Sat Jan  3 12:10:14 EST 2009
+
+    [DOCUMENTATION]
+    - Fix typo in ConstraintsFactory docs (Geraint A. Edwards)
+    - Clarified docs for get_filtered_data (Lisa Hagemann)
+    - Clarify that 'field_filter_regexp_map' can take coderefs as values (Ron Savage)
+
+    [INTERNALS]
+    - Better diagnostics when load_profiles fails (Thoralf Klein)
+    - Improved portability of t/untaint.t (Alexandr Ciornii)
+    - Make some tests conditional on Date::Calc being installed (Frank Wiles)
+
+4.61 Mon Jun 16 14:37:31 EDT 2008
+
+    [INTERNALS]
+    - packaging issue from Perl 4.60 resolved.
+
+4.60 Mon Jun 16 14:10:14 EDT 2008
+
+    [NEW FEATURES]
+    - Dependencies can now be specified using a code ref.
+      Thanks to Bradley C Bailey, via RT#24935.
+
+    [BUG FIXES]
+    - length constraints for min, max and 'between' now work for lengths
+       of 32k and longer. (Carl Vincent). 
+    - We now use Email::Valid to validate e-mail addresses instead of
+      our own regrex. Email::Valid passed all our our existing regression
+      tests for e-mail addresses that should pass and fail. Email::Valid
+      also correctly recognizes emails with single quote characters in them.
+      These are valid, but our regex didn't recognize them.  (Mark Stosberg)
+
+    [INTERNALS]
+    - Typo in Constraints documentation corrected by K B Shiv Kumar (RT#32358)
+    - Add some tests and docs for "date_and_time" constraint, from
+      Data::FormValidator:::Constraints::Dates.  It appears  there may still
+      exist a leap-year bug with the date parser. See the TODO test in
+      t/dates_closure.t for details. An alternative is to use
+      Data::FormValidator::Constraints::DateTime 
+      (Mark Stosberg, Matt Christian)
+
+4.57 Thu Nov  1 22:47:13 EDT 2007
+    [BUG FIXES]
+    - The min max and length_between constraints now allow multi-line input, 
+      Thanks to Carl Vincent. RT##30221. If we had only used the Regex style
+      prescribed by the Perl Best Practices book in the first place, this
+      wouldn't have been a problem!
+
+    [INTERNALS]
+    - Makefile.PL to updated to explicitly require 5.008;
+    - Fix doc link to "Old School Constraints", thanks to rjbs.    
+
+4.56 Wed Oct 31 12:34:32 EDT 2007
+    [INTERNALS]
+    - declare that we rely on 5.8, because some 5.6 tests were failing.
+      A patch for 5.6 compatibility would be welcome. Thanks to rjbs for the prod.  
+
+4.55 Sun Oct 21 11:41:41 EDT 2007
+    [BUG FIXES]
+    - Constraints in Upload.pm now apply to filtered data, not raw data. 
+     (Graham TerMarsch, Mark Stosberg, RT#24702)
+
+4.54 Sun Oct 21 09:27:07 EDT 2007
+    [INTERNALS]
+    - It looks like 4.53 got uploaded wrong, appearing as the code for 4.50.    
+
+4.53 Sat Oct 20 15:57:56 EDT 2007
+    [BUG FIXES]
+    - Invalid fields should still be invalid, even when missing_optional_valid is true.
+      Patch thanks to Robert Juliano. [RT#28860]
+
+    [INTERNALS]
+    - Improve documentation link, thanks to Robert Stockdale [RT#29510]      
+    - Give a plug to Data::FormValidator::Constraints::MethodsFactory. Recommended!
+    - s/foreach /for /g throughout the code, per Perl Best Practices
+
+4.52 Fri Oct 19 15:39:14 EDT 2007
+    No code changes. 
+
+    [INTERNALS]
+    - Fix PERL5LIB issue with untaint.t, Thanks to Matt Trout and others [RT#30126]
+
+4.51 Fri Jul 13 23:31:43 EDT 2007
+    [BUG FIXES]
+    - Quit assuming that because the first element of an array is undef, the
+      the whole thing is undef. (RT#24703, GTERMARS, Paul Blair)
+
+    - For the "file_format" file upload constraint, File::MMagic sometimes
+      wrongly returns the generic "application/octet-stream" MIME type instead
+      of the correct MIME type. We now this return value as meaning "I don't
+      know" and try the MIME type sent by the browser if this happens.
+      (Mark Stosberg)
+
+    - for the "file_format" file upload constraint, we now do a
+      case-insensitive comparison of the MIME type provided by the browser,
+      following the MIME standard. This bug was masked because we check the 
+      returned MIME type by File::MMagic first. Because it generally works 
+      and returns a lower-case result, it didn't matter. However, it some cases
+      File::MMagic misbehaves under mod_perl, causing the issue to matter.
+      (Matt Christian, Mark Stosberg)
+
+    [INTERNALS]
+    - Start requiring and using Scalar::Util, which prevents UNIVERSAL::can() form generating warnings.
+      (RT#25873, Dave O'Neill)
+
+    - Start requiring Perl6::Junction, which we had previously copy/pasted a bit
+      of into DFV. (Unlike some of the other Perl6 namespace modules, this one 
+      does /not/ use a source filter, and is addictively simple and useful. 
+
+4.50 Mon Dec  4 21:28:09 EST 2006
+
+    [ENHANCEMENTS]
+    - New method for constraint writing: get_filtered_data(). 
+      (Graham TerMarsch, Mark Stosberg, RT#22589)
+
+    - Stronger profile checking, to insure that all constraint_method values
+      are code references. Note: This explicitly simplifies things compared to
+      the 'constraints' system. Bare strings declarations are not allowed with
+      'constraint_methods'. (Mark Stosberg)
+
+    - Numerous documentation and comment typo fixes (Evan Zacks)
+
+    - Clarified the docs for overriding msgs (RT#18050)
+
+    [BUG FIXES]
+    - ':all' was documented as a group of constraints to import, but it didn't
+      work.  The documentation was updated to recommend ':closures' instead.
+      (PURDY, RT#21052)
+
+    - FV_eq_with now works with CGI.pm-style objects as input. (Jason Crummack)
+
+    - Fix documented example of using constraint methods. (Brian Lozier)
+
+    - When a constraint and a constraint_regexp_map matched the same field,
+      only the ones from the map where being used in one case. This was a
+      regression since the 4.0 release. A new regression test was also added
+      for this case.  (Matt Christian)
+
+4.49_01 Tue Oct  3 14:13:59 EDT 2006
+
+    [ENHANCEMENTS]
+    - New defaults_regexp_map profile key, useful for dynamically generated
+      checkbox fields. (Mark Stosberg)
+
+4.40 Mon Aug 21 19:41:24 EDT 2006
+
+    [BUG FIXES]
+    - All FV_ closures are now exported with ":closures". (Ed Pigg, Mark Stosberg)
+
+    [ENHANCEMENTS]
+    - Added new constraint for the common case of comparing one field with another,
+      such as a word confirmation field. Example:
+          constraint_methods => {  
+            password  => FV_eq_with('password_confirm'),
+          }
+      (Mark Stosberg)  
+
+4.30 Mon Jul 10 21:41:37 EDT 2006
+    [ENHANCEMENTS]
+    - A new method for constraint writers has been added: untainted_constraint_value().    
+      If you have written a constraint which untaints, use this method to return the
+      untainted result. It will prepare the right result whether the user has requested
+      untainting or not. (Mark Stosberg)
+
+    - New built-in constraints added:
+
+        FV_min_length(3),
+        FV_max_length(100),
+        FV_length_between(3,100),
+
+        These constraints can optionally perform untainting. (Mark Stosberg)
+
+    - We now work around a bug in File::MMagic which could cause some filehandles
+      to be corrupted after after the file_format constraint was used.  
+
+    [BUG FIXES]
+    - Regexp::Common regular expressions which accepted zero as a valid input would
+      have wrongly failed their constraints unless untainting was enabled. (Mark Stosberg)
+
+    [INTERNALS]
+    - Improved documentation for built-in constraints. (Mark Stosberg)
+
+4.20 Mon Jun 12 20:44:36 EDT 2006
+    [ENHANCEMENTS]
+    - Documentation in Data::FormValidator::Filters has been improved. (Mark Stosberg}
+    - Added FV_split() a new filter that makes it super-easy to apply the same constraint
+      to a list of values passed in a single field, such as a comma separated list of e-mail
+      addresses. (Mark Stosberg). 
+
+    [BUG FIXES]
+    - For input given as a hashref containing array references, values could
+      have been mistakenly modified by reference through filters. We now
+      explicitly copy elements in these case, to avoid modifying the input.
+      (RT#19592) 
+
+4.14 Fri Feb 17 08:59:40 EST 2006
+    [ENHANCEMENTS] 
+    - Consider a field with only a null character to be invalid  (Jamie Krasnoo)
+
+    [BUG FIXES]
+    - Fix bug in cc_number constraint, which was only present when used as a "constraint_method". (Evan A. Zacks)
+
+4.13
+    [BUG FIXES]
+    - Updated overloading syntax to work with Template::Stash (frank)
+
+4.12 Thu Jan  5 21:07:50 EST 2006
+    [INTERNALS]
+    - Fix test suite to pass when CGI::Simple is not installed
+      (Lee Carmichael, Davide Dente)
+
+4.11 Tue Jan  3 18:38:23 EST 2006
+   [ENHANCEMENTS]
+   - A new constraint for minimum image dimensions was added in
+     Data::FormValidator::Constraints::Upload (Lee Carmichael)
+
+   [INTERNALS] 
+   - refactoring of Upload.pm and t/upload.t (Lee Carmichael)
+
+4.10 Thu Dec 22 19:55:34 EST 2005
+
+   [ENHANCEMENTS] 
+   - The msgs key can now take a callback, allow users to override how error
+     message generation is done. Some alternative message generate routines 
+     will hopefully be published soon.  (Cees Hek, Chris Laco and others)
+
+   - New profile key: untaint_regexp_map (Michael Peters)
+
+   [BUG FIXES]
+   - bug was fixed for dependent fields that had false values, but were valid
+     (Emanuele Zeppieri)
+
+   - Failed constraints for multiple fields with the same name no longer return duplicate  
+     error messages (Will Hawes)
+
+   - value of any_errors was wrongly added to msgs even when there are no errors 
+     (RT#14942, report and test script by Michael Graham)
+
+   [INTERNALS] 
+   - bump Date::Calc requirement (RT#15715) 
+
+4.02 Wed Aug 31 21:22:58 EST 2005
+
+    [ENHANCEMENTS]
+    - the use of custom signal handers for "die" has now been localized to
+      avoid interfering with other applications. (Josh Miller). 
+
+    - initial support for qr in constraint_method profile key
+
+    [BUG FIXES]
+     - Updated ::Constraints example docs to be accurate: recommend :closures, not :all
+
+    [INTERNALS] 
+    - provide a more accurate debugging message for constraint_method_regexp_map
+
+4.01 Sat Aug 20 13:16:47 EST 2005
+
+    [ENHANCEMENTS]
+    - get_input_data() now supports the parameters "as_hashref => 1" to 
+      return the input data in a uniform way. 
+
+    [INTERNALS] 
+    - Constraints may refer to fields that are 'unknown' to
+      Data::FormValidator. These unknown values will remain unfiltered
+      as before. (Michael Peters). 
+
+    - _get_data() was renamed to _get_input_as_hash(). You shouldn't care. 
+
+4.00 Sun Aug 14 10:57:25 EST 2005
+
+    *** NOTE ***
+    This a major update with a significant code changes. While the test suite
+    indicates we have 100% compatibility with 3.x, you are encouraged to test
+    this release with your own applications before deploying it in a production
+    environment. 
+
+    [ENHANCEMENTS]
+	- The constraints interface has been overhauled to be more intuitive to use
+	  with parameterized constraints. This included added new two new profile
+	  keys: 'constraint_methods' and 'constraint_method_regexp_map'. All of
+	  the old syntax is still supported, but de-emphasized in the documentation.
+	  See RELEASE_NOTES for details. 
+
+	- A new method has been added to help building custom constraints:
+	  "set_current_constraint_name('foo')" will set the name of a constraint
+	  from within itself. An alias named 'name_this()' is provided for brevity. 
+	  See the section on "Writing your own constraints" in DFV::Constraints
+	  for details. 
+
+    - success() method added to Results object. This is an easy way to check
+      that there were no missing or invalid fields. (Michael Peters). 
+
+    - 'separator' was misspelled consistently in the docs, code and tests.
+      The proper spelling as well as the legacy typo spelling are now
+      supported, although the typo'ed version is no longer documented, except
+      for here. :) Thanks to Terrence Brannon for spotting this.
+
+	- The 'msgs' hash in the profile is now validated to make sure it includes only
+	  valid keys. This should help to spot some errors faster.  
+
+    - ::Constraints::Upload now supports CGI::Simple, thanks to David Emery. 
+
+    - Documentation for required_regexp has been improved. (William McKee)
+
+    - support for coderefs as default values (Marcello)
+
+    - Improved field_filters documentation, thanks to Andrew Brosnan.
+
+    [BUG FIXES]
+	- RT#12220: Canadian Province RE were updated. (Steve Simms).   
+
+    - The preferred MIME type was not being returned by the 'file_format'
+      constraint for file uploads. This would have only affected cases where
+      the mime type sent by the browser differed from the one detected by DFV.
+      Thanks to Randal Schwartz for spotting this. (RT#12744). 
+
+    - Profile re-use when constraint_regexp_map is used is now fixed 
+      (Thanks to Cees Hek).
+
+    - The date_and_time constraint now understands this format: MMDDYYYY. 
+      (RT#12111, thanks to JMAY)
+
+    - This one is worth a brief explanation. When this old syntax was used:
+
+      my ( $valid, $missing, $invalid, $unknown ) = Data::FormValidator->validate({}, {} );
+
+      $invalid would be returned as an empty arrayref if there were no
+      invalids.  This return value was undocumented, and was later changed to
+      be 'undef' sometime between 3.50 and 3.70. However, I found that some
+      applications, including Cascade, depended on the undocumented return
+      value (which they shouldn't have). 
+
+      I have now reverted the behavior to returning an empty arrayref in this
+      case, added a test for it, and updated the docs to be explicit about the
+      return value. This will save some people unexpected breakages when
+      upgrading DFV from a very old version with very old applications. 
+
+      Those who use the $results object are unaffected.
+
+    [INTERALS]
+    - Add many failing TODO tests for built-in filters. See t/filters_builtin.t 
+
+    - A new test was added to check that no warnings are emitted when an untainted
+      constraint returns undef (Michael Peters)
+
+* 3.x releases after 3.63 happened on a different branch. All of the
+  improvements there should be reflected above. 
+
+3.63
+	[BUG FIXES]
+    - email validation was beefed up to not permit spaces with e-mails 
+      or semi-colons to get through. Thanks to Jason Crome for some tests  
+      to this, and the Mail::VRFY module, which was the source of the
+      improved RE. 
+
+    [INTERNALS]
+    - Added a couple more test to the distribution which were missing in
+      the MANIFEST
+
+3.62 Fri Oct  8 22:55:49 EST 2004
+    [INTERNALS]
+    - Removed experimental label from 'msgs' functionality. 
+    - Beefed up test suite for dependencies and dependency_groups (Drew Taylor)
+
+3.61 Mon Sep 20 18:10:23 EST 2004
+	[BUG FIXES]
+	- file_format from ::Constraints::Upload now handles non-existent files more
+	  gracefully. (Evan A. Zacks)
+
+3.60 Mon Sep 20 18:10:23 EST 2004
+	[BUG FIXES]
+	- file_max_bytes seemed to never be reporting failure.
+
+3.59 Thu Jul 02 2004
+    [ENHANCEMENTS]
+    - Added more tests for Date constraints, and removed some more warnings (Michael Dorman)
+
+    [BUG FIXES]
+    - Fixed failing dependency check happening sometimes with a CGI object as input. (Drew Taylor)
+
+3.58 Wed May 05 2004
+    [ENHANCEMENTS]
+    - Test suite has been migrated further to 'Test::More' style, and
+      all tests should complete without any warnings. A big thanks
+      goes to Gabor Szabo for this work.  
+
+3.57 Wed Apr 21 2004 
+    [ENHANCEMENTS]
+    - 'validator_packages' now handles the importing of filters as well as constraints.
+       (Ronald Kimball)
+
+    - Added profile validation check for hashref style constraints. This will
+      make typos in key names easier to find. (Barry Hoggard, for demonstrating
+      the need.) 
+
+    [BUG FIXES]
+    - no longer try to use a Carp module method without having it loaded. Instead,
+      we just call "die" now. (Gunnar Wolf)
+
+3.56 Fri Apr 16 2004 
+    [BUG FIXES]
+    - Fixed a mis-handling of unknown variables. Functionality brought inline
+      with documented behaviour (Richard Clarke)
+    - fixed bug image dimensions test in DFV::Constraints::Upload (Barry Hoggard)
+
+    [ENHANCEMENTS]
+    - added mention of HTML::Template::Associate::FormValidator to SEE ALSO
+
+3.55 Wed Mar 25 2004
+    - better diagnostics when a filters fail.
+
+3.54 Wed Mar 24 2004 
+    [BUG FIXES]
+    - Fixed a mis-handling of invalid constraints introduced in 3.53 (Kevin Baker).  
+
+    [ENHANCEMENTS]
+    - Refactored and improved some contraint related tests (Kevin Baker)
+    - clarified documentation for uploading constraints to mention that a
+      CGI.pm object is needed for input.
+
+3.53 Mon Mar 22 2004
+    [BUG FIXES]
+    - Removed bug introduced in 3.52 that would have mis-handled files that had
+      some filters applied, and were then used as parameters in constraints for
+      multiple fields. (Kevin Baker) 
+    - Possibly fixed t/24_upload.t test on Windows platforms (podmaster)
+
+3.52 Sun Mar 21 2004
+    [BUG FIXES]
+    - After a constraint failed, future constraints relying on the same input
+      parameters may have falsely failed. (Kevin Baker)  
+    - Untainting of false values (such as '0') was broken, and has been fixed.    
+      (Kato Atsushi)
+
+    [ENHANCEMENTS]
+    - the profile syntax checker now reports all invalid keys, instead of just
+      the first one.  Also, this code was refactored to be a bit faster. (Kevin Baker).
+
+
+3.51 Thu Feb 26 2004
+    [THINGS THAT MIGHT BREAK YOUR CODE]
+    - The default formatting now uses the 'class' attribute in the <span> tag instead
+      of the 'id' attribute. This shouldn't be a big deal and may actually make
+      CSS styling easier, but it is a change. (Drew Taylor)
+
+    [BUG FIXES]
+    - In some cases empty fields were marked as 'valid' under mod_perl when they shouldn't be.
+      (Drew Taylor)
+    - Prevent unnecessary death due to $@ being set. (Kevin Baker) 
+    - Fixed documentation typo related to writing your own constraints (Stewart Russell)
+
+    [ENHANCEMENTS]
+    - valid() can now return multiple values in list context.
+    - Mention Data::FormValidator::Util::HTML
+    - Added new t/constraints_builtin.t as a beginning of more through testing
+      of the built-in constraints.  
+    - Several documentation updates (Kevin Baker)
+
+3.50 Mon Jan 12 2004
+    - No functionality changes since 3.49_1, I'm just declaring it stable.
+    - I did sneak in the addition of a $VERSION in a couple included modules
+    where none had been provided before.
+
+3.49_1
+	[THINGS THAT MIGHT BREAK YOUR CODE]
+	- A change has been made to Data::FormValidator::Constraints::Upload,
+	and only affects constraints in that module. Meta data will no longer
+	be provided by adding additional "_info" fields to the valid hash.
+	The same data is now available through the new meta() method of the
+	Data::FormValidator::Results object. 
+
+	[NEW FEATURES]
+	- A new meta() method has been added to the Data::FormValidator::Results
+	class. This function allows constraints to communicate meta data
+	they discover about the values during the validation process. 
+	For example, a file size may be discovered while checking to see
+	if the file size is too large. This is only currently being
+	used in Data::FormValidator::Constraints::Upload.
+
+3.15 Sun Nov 03 2003
+    - Instead of explictly supporting CGI and Apache::Request objects, now any
+      object which has a param() method can be used. In particular, this allows
+      CGI::Simple to be used. 
+
+      Before, if you used an object which was not CGI or Apache::Request, it would
+      treat the object as a hash reference and possibly work. Now it will die
+      with a diagnostic message in this case.  (Cees Hek)
+
+    - Many documentation typo fixes (Cees Hek and Timothy Appnel)
+
+    - The dependency on Module::Build to install the distribution has been
+      removed. Now either Module::Build or the traditional MakeMaker system can
+      be used.
+
+3.14
+    [BUG FIXES]
+    - fixed POD syntax issue in Constraints.pm that was causing a 'make test' 
+      failure with Test::Pod >.96
+
+3.13 Sun Nov 02 2003
+    [THINGS THAT MAY BREAK YOUR CODE] 
+    - How the Regexp::Common integration has changed. The old functionality was
+      to match the regular expression as a substring of the field being
+      testing. Now it is more restrictive and only matches the entire string.
+      This is how all the other filters worked, and is probably how you expected
+      the Regexp::Common filters to work as well.
+
+    [BUG FIXES]
+	- uninitialized values in filters no longer cause warnings. (addresses bug #2751).
+    - documentation typo fixes
+
+    [ENHANCEMENTS]
+	- improved syntax to be compatible with Perl 5.005
+    - Added "cover" method to "Build" script. This uses Devel::Cover to generate
+      a coverage report for the script
+    - About 5 new tests for loading profiles from a file
+
+3.12 Tue Jun 22 2003 
+	- don't die in ::Upload if we can't find the tmp file.
+	  Instead, the constraint fails and a warning is emitted. 
+
+	- Added "image/pjpeg" to list of default mime types to use with file_format.
+	  This is for the "progressive JPEG" format.
+
+    - Several documentation improvements, thanks to Mike Fragassi.
+
+3.11 Tue May 27 2003
+	- Bug Fix: "qr" support now works better with older versions of Perl
+	  (Mike Fragassi)
+
+3.10 Mon May 26 2003 
+	- New Feature: Any regular expression from Regexp::Common can now be used
+	  directly as a named constraint. See Data::FormValidator::Constraints
+	  documentation for an example syntax. 
+
+	- Bug Fix: fixed imported_validators error that could occur if the same
+	  profile was used more than once with the same DFV object.
+
+	- improved support and testing of 'qr' a bit.
+
+
+3.01 Thu May 15 2003
+	This release fixes addresses a couple of issues related to the new support
+	for error message handling through msgs() and "qr" support. If you aren't
+	using these features, there's no need to upgrade. 
+
+	- New Feature: Updated msgs() documentation and removed the requirement
+	that 'msgs' be defined in profile for default formatting to be used with
+	msgs() method call.
+
+	- Bug Fix: Using named constraints wtih the new "qr" support now works.
+
+3.00 Sun May 11 2003
+	- New Feature: added debug option
+	- Make default msgs in "new" constructor work as it was supposed it 2.11_04
+	- Bug Fix: missing_optional_valid now works better when the input data comes
+		from a CGI.pm or Apache::Request object (David Ranney)
+	- Upload.pm syntax updated to no longer require Perl 5.6+ syntax
+	- New Feature: Upload.pm now first tries to use File::MMagic and MIME::Type 
+      to more intelligently determine the file type and an appropriate extension.
+
+2.11_04
+	- Major documentation overhaul. It should now be easier to browse and grok.
+
+	- New Feature: defaults can be passed to new() that will be used for all
+	  forms made from that object.
+
+	- New Feature: Added support for quoting regular expressions using "qr" 
+	  instead of defining them as strings. This is now the preferred method.
+	  Defining regular expressions as strings is deprecated but supported.
+
+	- New Feature: Friendly die statements when you have typos in filter 
+		and constraint names. (Instead of mysterious suicide). 
+
+	- Fixed syntax error in Upload.pm documentation
+	- Bug Fix: error checking in valid_file_format in Upload.pm
+	- Bug Fix: fixed bug related to returning constraint names introduced
+		in 2.11_03.
+
+2.11_03
+	- The code has now been reorganized, following the module of HTML::FormValidator.
+	  Filters, Constraints, and Results are now all handled in their own modules. 
+
+	- The "msgs" error functional has now been re-designed, and is not
+	  backwards compatible. Feedback on this experimental addition is encouraged.
+
+	- New Feature: Added ConstraintsFactory.pm module to distribution
+
+2.11_02
+	- New Feature: Support for Apache::Request objects
+	- New Feature: Now when constraint_regexp_map is used
+		and one or more constraints is already defined, the new
+		matching constraint is added to the list of constraints 
+		applied, rather than superceding the old one. 
+
+2.11_01 (A BETA release)
+
+	- New Feature: Added Data::FormValidator::Constraints::Upload
+		to the distribution.
+
+	- New Feature: Added Data::FormValidator::Constraints::Dates
+		to the distribution.
+
+	- The functionality of returning errors with the experimental 
+	  msgs feature has changed a bit. Now if you define multiple constraints,
+	  the messages will always be returned as an array reference, instead of
+	  when only there was more than one message. This should improve
+	  integration with HTML::Template.
+
+	- New Feature: When using multiple constraints defined as hash references,
+	  the "name" attribute will default to name of the constraint, if it is
+	  being called by name. 
+
+	- added documentation for writing your own validation routines.
+	- New Feature: Added 'valid' accessor/mutator method to manage
+	  and manipulate the result set. This can be useful to modify 
+	  the result set from within a constraint.
+
+	- New Feature: Added "constraint_method" as an alternative
+		to "constraint" in the hash-based constraint definition. 
+		Related to this, there are new accessor methods for use
+		inside of custom constraints:
+			get_input_data();
+			get_current_constraint_field();
+			get_current_constraint_value();
+
+		This whole arrangement brings support for multi-valued constraints with
+		constraint_regexp_map
+
+	- various documentation clean ups
+
+2.10 Sun Apr 20 2003
+	- New Feature: (EXPERIMENTAL) Added support for returning error messages
+	  for missing and invalid fields (Juan Jose Natera Abreu).
+	  This piece of functionality is marked as experimental because
+	  the interface may change in the near future, and it has not been
+	  tested as well as rest of the module. Search in the documentation for
+	  "msgs" for the details.
+
+	- New Feature: added support for building with Module::Build. For more
+	  information on Module::Build, read this:
+	  http://magnonel.guild.net/~schwern/talks/MakeMaker_Is_DOOMED/slides/
+
+	- New Feature: included SIGNATURE file in distribution for verification
+	  with Module::Signature
+
+2.04 Fri Apr 11 2003
+	- Bug Fix: multiple parameters passed to a constraint
+	were not being handled appropriately in some cases. (Markus)
+	- Bug Fix: Calling "validate" as a class method in combination
+	with using "validator_packages no longer causes a problem.
+
+2.03 Thu Apr 10 2003
+     - Bug Fix: use of "delete" syntax with multiple values updated
+	 	to be backwards compatible with Perl 5.005 (Jonathan Buhacoff) 
+
+2.02 Wed Apr 09 2003
+	- Bug Fix: fixed bug with required_regexp and optional_regexp triggered  
+	if there is no required_regexp or optional_regexp in the profile *and*
+	something exists in $@ (Dom)
+
+2.01 Wed Apr 02 2003
+	- Bug Fix: Fix bug introduced in 1.93 which didn't handle
+		input values appropriately that were references to other things
+		besides arrays. (Boris Zentner)
+
+2.00 Sat Mar 22 2003
+	- Bug Fix: Fixed bug where all code references were treated as if the were
+	  using the 'multiple constraints' feature.  This bug was likely introduced
+	  in 1.93 (Chris Spiegel)
+	- Bug Fix: Fixed bug which caused a failllure when using some sides of
+	  subroutine constraints within the "multiple constraints" syntax. 
+	  (Chris Spiegal}
+
+1.93 Sun Mar 09 2003
+	- New Feature: Keys with multiple values are now supported
+	- New Feature: A CGI.pm object can now be used to provide the input data
+	- Bug Fix: pattern matching is faster in some cases now by not using $&
+	  (Tony Stubblebine)
+	- Bug Fix: better support for using valid_* packages imported from other
+	  packages. (Alexander Solovey)
+	- added link to demo site in documentation
+	- fixed typo in documentation example (Kato Atsushi)
+	- added link to Japanese translatation of the documents (Kato Atsushi)
+
+1.92 Sun Dec 22 2002
+    - support for untainting data (Tony Stubblebine)
+	- documentation typo fixes (Charlie Garrison)
+	- validator_packages added to profile specification
+	  allowing import of validation routine from other packages (Jeremy Muhlich)
+	- support for multiple constraints per field added (Jeremy Muhlich)
+	- support for literal values in constraint param field (Jeremy Muhlich)
+
+1.91 Sun Oct 05 2002
+	- Added feature to require some fields in a group. (Brad Smithart)
+	- Bumped version to be greater than 1.9 to make CPAN.pm fetching work again
+
+1.11 Sat Jun 29 2002 
+	- Fixed small bug where constraint arrays were tested with truth rather than length. (Maurice Aubrey) 
+	- Fixed documentation bug for american_phone validation (Dan Puro)
+	- Added documentation for simplified syntax using a class method  
+	- Added profile syntax checking to help catch misspelled keys faster
+
+1.10 Sun Apr 21 2002
+	- Added code for field_filter_regexp_map (Tim Noll)
+
+1.9  Sun Feb 17 2002
+	- Fixed bug introduced in 1.8 which caused missing optional fields to 
+	  wrongly subjected to constraint checking
+
+1.8   Thu Feb 14 2002
+	- Added link to Data::FormValidator::Tutorial in SEE ALSO section
+	- Added "missing_optional_valid" flag to profiles to allow missing
+	  optional fields to be considered valid
+
+1.7   Sat Nov 03 2001
+    - Fixed broken constraint_regexp_map implementation. If you
+	  followed the example syntax in the documentation your regular
+	  expression could have failed to match when it should have
+	  succeeded. This feature now works as advertised in the
+	  documentation. 
+    - Updated documentation to reflect new mailing list and public
+      CVS server.
+
+1.6   Sun Sep 23 2001
+	- Fixed bug with undefined lists by using empty lists instead (Ronald Kimball)
+	- added IP address validation routine (Juan Jose Natera Abreu)
+
+1.5.1 Wed Jul 18 2001
+	- Updated version number to circumvent CPAN issue. No code changes. 
+
+1.5   Thu Jun 28 2001
+	- Added more flexible dependency system (Ade Olonoh)
+
+1.4   Fri Jun 22 2001
+	- Fixed bug with code references (T.J. Mather)
+
+1.3   Tue Jun 19 2001
+	- Now maintained by Mark Stosberg <mark@stosberg.com>
+	- Added constraint_regexp_map, required_regexp, optional_regexp
+	- filter functions are exported
+	- Renamed to Data::FormValidator from HTML::FormValidator
+
+# arch-tag: Mark_Stosberg_<mark@summersault.com>--2004-03-20_18:34:51 

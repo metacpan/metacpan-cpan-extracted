@@ -1,0 +1,95 @@
+#   perl
+# vim:ts=4:sw=4:ai:aw
+
+{
+	#
+	# Options allow any changes, additions, overloading, or removal of
+	# "/option" values or function.  Options is executate when the
+	# configuration is loaded.
+	#
+	'options' => [
+		[ 'editor'  => qq{vim}  ],
+	#	[ 'prompt'  => qq{connect--}  ],
+		[ 'sqlpath' => join( ':', q{.},  qq{$ENV{HOME}/sql}) ],
+		[ 'tmp_dir' => qq{/tmp} ],
+		[ 'tmp_file'=> qq{dbish$$.sql} ],
+	],
+	#
+	# Plug in modules during different stages of the application
+	#
+	'plug-ins' => {
+		'pre-init'     => undef,
+		'post-init'    => [ 
+			  DBI::Shell::Timing
+			, DBI::Shell::Completion
+			, DBI::Shell::Spool 
+			],
+		'pre-connect'  => undef,
+		'post-connect' => {
+			'non-database' => [ DBI::Shell::SQLMinus ],
+			'database' 	=> {
+				'ADO' => { 
+					'options'	=> [ [ 'prompt' => qq{ado--}   ] ] 
+				},
+				'AnyData' => { 
+					'plugin'	=> [ DBI::Shell::AnyData ], 
+					'options'	=> [ [ 'prompt' => qq{anydata--}   ] ] 
+				},
+				'mysql' => { 
+					'options'	=> [ [ 'prompt' => qq{mysql--} ] ] 
+				},
+				'ODBC' => undef,
+				'Oracle' => undef,
+			},
+			'options' => [ [ 'format' => qq{sqlm} ] ],
+		},
+	},
+};
+
+#
+# $Log: dbish_config,v $
+# Revision 11.91  2002/12/13 23:44:56  tlowery
+# Fixed version numbers
+#
+# Revision 11.6  2002/10/28 02:49:57  tlowery
+# Release 11.6
+#
+# Revision 11.5  2002/04/17 15:03:16  tlowery
+# Added the begining of column_info support.
+#
+# Revision 11.4  2002/04/09 10:52:12  tlowery
+# Continued to improve support for formatting.  Added more tests.
+#
+# Revision 11.3  2002/01/02 03:14:59  tlowery
+# Modified to include new formats.
+#
+# Changed displaymode to format.
+#
+# Cleaned up a number of "undefined" messages.
+#
+# Revision 11.2  2001/10/29 15:56:00  tlowery
+# Added timing tests.
+# Added go with empty buffer gets the last command and executes.
+# Added support for negative numbers with get.
+# Fixed undef warnings from histories.
+#
+# Revision 1.10  2001/08/30 12:46:17  tlowery
+# Added "options" call to dbish_config
+#
+# Revision 1.9  2001/05/31 04:21:32  tlowery
+# Continue to modify to support SQLMinus
+#
+# Revision 1.8  2001/05/29 22:59:53  tlowery
+# *** empty log message ***
+#
+# Revision 1.7  2001/04/10 13:35:32  tlowery
+# Tested the ability to comment out parts of the config file.
+#
+# Revision 1.6  2001/04/07 04:01:58  tlowery
+#
+# Added more options to configuration file.
+#
+# Revision 1.5  2001/04/01 17:04:20  tlowery
+# Added cvs tag.
+#
+#

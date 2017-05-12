@@ -1,0 +1,10 @@
+--- 
+abstract: Easily use DBIC with snowflake schemas.
+author: 
+  - Matt Follett
+generated_by: Dist::Zilla::Plugin::MetaYaml version 1.004
+license: perl
+name: DBIx-Class-Snowflake
+requires: 
+  DBIx::Class: any
+version: 0.10

@@ -1,0 +1,12 @@
+Revision history for Digest::BubbleBabble
+
+0.02  2011.03.23
+    - Fixed a bug affecting input strings with an odd number of
+      characters. Thanks to Ken T Takusagawa for the report.
+    - Cleaned up Makefile.PL.
+    - Removed magic svn keywords.
+    - Added author tests (xt/) and modified SYNOPSIS for all modules to
+      make them pass the compilation test.
+
+0.01 2001.05.02
+    - original version; created by h2xs 1.19

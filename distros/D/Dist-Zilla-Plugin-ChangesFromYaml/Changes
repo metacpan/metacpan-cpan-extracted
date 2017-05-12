@@ -1,0 +1,21 @@
+0.005 2016-03-22 02:37:34 +0800
+ - Fixed tests failing with newer version of CPAN::Changes. (Tina Müller)
+ - Fixes encoding issues when converting the YAML. Thanks Tina ;-)
+
+0.004 2014-04-04 01:05:11 +0800
+ - Added abstract to pod; should fix MetaCPAN not showing it correctly.
+   Thanks Neil Bowers.
+
+0.003 2013-10-28 15:13:34 +0800
+ - Handle UTC on date (by replacing it with GMT)
+
+0.002 2013-10-27 02:37:54 +0800
+ - Added support to convert the dates as well
+ - Added Travis-CI integration
+
+
+0.001 2013-10-26 20:51:53 +0800
+ - First release
+
+0.001-TRIAL 2013-10-26 20:47:24 +0800
+ - Initial version

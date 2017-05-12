@@ -1,0 +1,12 @@
+---
+abstract: improve DBIx::Class::ResultSet with void context
+author:
+- Fayland Lam <fayland@gmail.com>
+generated_by: Dist::Zilla::Plugin::MetaYAML version 1.091370
+license: perl
+name: DBIx-Class-ResultSet-Void
+requires:
+  DBIx::Class: '0.08100'
+resources:
+  repository: http://github.com/fayland/dbix-class-resultset-void/tree
+version: '0.06'

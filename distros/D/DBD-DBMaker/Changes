@@ -1,0 +1,35 @@
+Revision history for Perl extension DBD::DBMaker.
+
+0.13 Oct 27. 1999
+. Add support file name in bind_param for blob column, user
+  can specify 'file name' as input parameter, and DBMaker will
+  store the file's content into blob column.  User can
+  use $sth->{dbmaker_file2blob}= 0 to turn off this option.
+  Default is on.
+. Add $sth->func($colno, $prefix_filename, BindColToFile)
+  for user to specify output column to a file, the output
+  file will be named starting by $prefix_filename and the following file
+  will append a sequential number starting from 1.  The existing file with
+  same file name will not be overwritten.  
+. Rename dbh->tables() to dbh->table_info()
+. Fix return error when fetch boundary float/double value 
+. Ignore warning return in sth->execute() will close statement
+  which result in next execute fail
+. Add warning for commit() when AutoCommit on
+. support bind_param_inout
+. Add ODBC catalog functions based on DBD-ODBC 0.20, 0.21
+  SQLGetInfo,SQLGetTypeInfo,SQLColAttributes,
+  SQLGetFunctions,SQLColumns,SQLStatistics,SQLPrimaryKeys,
+  SQLForeignKeys
+
+0.12a Jun 30, 1999
+    Support DBMaker 3.5;
+
+0.12 Feb 22, 1999
+    Added DBI->data_sources('DBMaker');
+
+0.11a Feb 09, 1999
+    Add binary distribution for Win32.
+
+0.11 Jan 29, 1999
+    Released V0.11 base on DBD::Solid

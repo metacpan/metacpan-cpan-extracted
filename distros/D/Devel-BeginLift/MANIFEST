@@ -1,0 +1,17 @@
+BeginLift.xs
+Changes
+example/simple.pl
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/MakeMaker.pm
+inc/Module/Install/Metadata.pm
+lib/Devel/BeginLift.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/constcalc.t
+t/generate.t
+t/liftvar.t
+t/proto.t

@@ -1,0 +1,93 @@
+<?xml version="1.0" standalone="no" ?>
+<!--
+Single SCO content packaging example. SCORM 2004 3rd Edition.
+
+Provided by Rustici Software - http://www.scorm.com
+
+This example demonstrates the simplest possible manifest, containing just one SCO and 
+no metdata or sequencing information.
+-->
+
+<!-- 
+The manifest node contains a unique identifer for this course and the course's version number.
+The schema declartions are important to ensure you are delivering valid XML. For the most part
+these should remain static. Other schema prefixes are allowed, but can limit interoperabilty.
+-->
+<manifest identifier="com.scorm.golfsamples.contentpackaging.singlesco.20043rd" version="1"
+          xmlns="http://www.imsglobal.org/xsd/imscp_v1p1"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:adlcp="http://www.adlnet.org/xsd/adlcp_v1p3"
+          xmlns:adlseq="http://www.adlnet.org/xsd/adlseq_v1p3"
+          xmlns:adlnav="http://www.adlnet.org/xsd/adlnav_v1p3"
+          xmlns:imsss="http://www.imsglobal.org/xsd/imsss"
+          xsi:schemaLocation="http://www.imsglobal.org/xsd/imscp_v1p1 imscp_v1p1.xsd
+                              http://www.adlnet.org/xsd/adlcp_v1p3 adlcp_v1p3.xsd
+                              http://www.adlnet.org/xsd/adlseq_v1p3 adlseq_v1p3.xsd
+                              http://www.adlnet.org/xsd/adlnav_v1p3 adlnav_v1p3.xsd
+                              http://www.imsglobal.org/xsd/imsss imsss_v1p0.xsd">
+	
+  <!--The metadata node simply declares which SCORM version this course operates under.-->
+  <metadata>
+		<schema>ADL SCORM</schema>
+		<schemaversion>2004 3rd Edition</schemaversion>
+	</metadata>
+  <!-- There is just one organization. The organization contains just one item.-->
+	<organizations default="golf_sample_default_org">
+		<organization identifier="golf_sample_default_org">
+			<title>Golf Explained - CP Single SCO</title>
+			<item identifier="item_1" identifierref="resource_1">
+				<title>Golf Explained</title>
+			</item>
+		</organization>
+	</organizations>
+  <!-- 
+  There is just one resource that represents the single SCO that comprises the entirety of this course.
+  The href attribute points to the launch URL for the course and all of the files required by the course
+  are listed.
+  -->
+	<resources>
+		<resource identifier="resource_1" type="webcontent" adlcp:scormType="sco" href="shared/launchpage.html">
+      <file href="Etiquette/Course.html"/>
+      <file href="Etiquette/course.jpg"/>
+      <file href="Etiquette/Distracting.html"/>
+      <file href="Etiquette/distracting.jpg"/>
+      <file href="Etiquette/Play.html"/>
+      <file href="Etiquette/play.jpg"/>
+      <file href="Etiquette/questions.js"/>
+      <file href="Handicapping/calchandi.jpg"/>
+      <file href="Handicapping/calcscore.jpg"/>
+      <file href="Handicapping/CalculatingHandicap.html"/>
+      <file href="Handicapping/CalculatingScore.html"/>
+      <file href="Handicapping/Example.html"/>
+      <file href="Handicapping/example.jpg"/>
+      <file href="Handicapping/Overview.html"/>
+      <file href="Handicapping/overview.jpg"/>
+      <file href="Handicapping/questions.js"/>
+      <file href="HavingFun/friends.jpg"/>
+      <file href="HavingFun/fun.jpg"/>
+      <file href="HavingFun/HowToBeStylish.html"/>
+      <file href="HavingFun/HowToHaveFun.html"/>
+      <file href="HavingFun/MakeFriends.html"/>
+      <file href="HavingFun/questions.js"/>
+      <file href="HavingFun/stylish.jpg"/>
+      <file href="Playing/otherscoreing.jpg"/>
+      <file href="Playing/OtherScoring.html"/>
+      <file href="Playing/Par.html"/>
+      <file href="Playing/par.jpg"/>
+      <file href="Playing/Playing.html"/>
+      <file href="Playing/playing.jpg"/>
+      <file href="Playing/questions.js"/>
+      <file href="Playing/rules.jpg"/>
+      <file href="Playing/RulesOfGolf.html"/>
+      <file href="Playing/Scoring.html"/>
+      <file href="Playing/scoring.jpg"/>
+      <file href="shared/assessmenttemplate.html"/>
+      <file href="shared/background.jpg"/>
+      <file href="shared/cclicense.png"/>
+      <file href="shared/contentfunctions.js"/>
+      <file href="shared/launchpage.html"/>
+      <file href="shared/scormfunctions.js"/>
+      <file href="shared/style.css"/>
+		</resource>
+	</resources>
+</manifest>

@@ -1,0 +1,56 @@
+NAME
+    Dist::Zilla::Util::FileGenerator - helper to generate files with little
+    repetition in a PluginBundle
+
+VERSION
+    version 0.120090
+
+METHODS
+  combine_with
+        my @plugins_with_generated_files = $gen->combine_with( @plain_plugins );
+
+    Given an array containing specs for a plugin bundle this method returns
+    an array with the necessary exclusions, generators and copiers added.
+
+  generators
+        my @generator_plugins = $gen->generators;
+
+    Returns an array with the necessary generators for inclusion in a plugin
+    bundle.
+
+  file_names
+        my @generated_files = $gen->file_names;
+
+    Returns an array with the file names of the generated files.
+
+  copiers
+        my @generated_files = $gen->copiers;
+
+    Returns an array with the necessary copiers for inclusion in a plugin
+    bundle.
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Util-FileGe
+    nerator>. You will be notified automatically of any progress on your
+    issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/wchristian/dist-zilla-util-filegenerator>
+
+      git clone https://github.com/wchristian/dist-zilla-util-filegenerator.git
+
+AUTHOR
+    Christian Walde <walde.christian@googlemail.com>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Christian Walde.
+
+    This is free software, licensed under:
+
+      DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE, Version 2, December 2004
+

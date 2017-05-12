@@ -1,0 +1,50 @@
+Notes for anyone hoping to do DBD::PgPP development or maintenance work
+=======================================================================
+
+Source repository
+-----------------
+
+The code is hosted on GitHub, which should hopefully make it easy for others
+to contribute.  The clone URL is:
+
+  git://github.com/arc/dbd-pgpp.git
+
+Feel free to fork and send me a pull request.
+
+DBI driver prefix registration
+------------------------------
+
+This apparently hasn't been done.  It's not hard: email the dbi-dev list and
+ask for a prefix to be registered.  But I want to get this code released
+without waiting for that to happen.
+
+Debugging protocol interaction
+------------------------------
+
+Your DSN may include, a `debug=1` parameter, thus:
+
+    dbi:PgPP:dbname=blah;debug=1
+
+That enables printing out the type of every packet sent and received, to
+standard output (or, more precisely, to Perl's current default output
+filehandle).
+
+If you additionally want to see a dump of every packet, set
+$DBD::PgPP::Protocol::DEBUG to a true value:
+
+    $DBD::PgPP::Protocol::DEBUG = 1;
+
+It would be good if such debugging messages were better integrated with
+DBI's built-in tracing facility, but it's slightly non-trivial (because the
+code that emits the debug messages doesn't have a DBI handle available) and
+I don't want it to delay the release any further.
+
+Test suite
+----------
+
+You may consider it peculiar that the test suite is in, essentially, two
+halves.  It is indeed a peculiar situation.  The explanation is that the
+current maintainer planned to replace the existing test suite with one
+stolen largely from DBD::Pg, but he turned out to be too feckless to get
+very far with that plan.  So the original test suite is still in place, with
+a new one sitting next to it; neither has particularly good coverage.

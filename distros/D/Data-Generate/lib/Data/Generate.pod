@@ -1,0 +1,817 @@
+
+=pod
+
+=head1 NAME 
+
+Data::Generate - Create various types of synthetic data by parsing 
+"regex-like" data creation rules. 
+
+=head1 VERSION
+
+Version 0.02
+
+=head1 SYNOPSIS
+
+ use Data::Generate;
+ #----------------------------------------#
+ #                 Example 1              #
+ #----------------------------------------# 
+
+ # Output type is varchar with maxlength 2. 
+ # Output data should be letters from q to z.
+ my $input_rule = q { VC(2) [q-z]}; 
+
+ # parse the rule and return a generator object if rule is valid.
+ my $generator= Data::Generate::parse($input_rule) or die "error".$!;
+
+ # prints the maximal number of unique data that can be generated.
+ print $generator->get_degrees_of_freedom(); 
+
+ # create a dataset on the fly and return it in an array of scalars.
+ my $Data= $generator->get_unique_data(10); 
+ # --> $Data contains ['q','r','s','t','u','v','w','x','y','z']; 
+
+ #----------------------------------------#
+ #                 Example 2              #
+ #----------------------------------------#
+
+ # ... a more complex example ...
+ # generate varchar data with 2 kinds of values:
+ #   -> 36% values like ( 12222,15222, ...)
+ #   -> 64% values like (AAXQ,BAXQ,...) 
+ my $input_rule = q { 
+     VC(24) [14][2579]{4}       (36%) 
+            | [A-G]{2}[X-Z][QN] (64%)  
+    };
+
+ my $generator= Data::Generate::parse($input_rule);
+ my $Data= $generator->get_unique_data(10); 
+ ...
+
+
+ #----------------------------------------#
+ #                 Example 3              #
+ #----------------------------------------#
+
+ # ... an example with dates ...
+ # generate a range of dates:
+ my $input_rule = q { 
+     DATE '1999' 'nov' [07,thu-fri] '09' : '09' : '09'  
+ };
+ my $generator= Data::Generate::parse($input_rule);
+ my $Data= $generator->get_unique_data(10); 
+ #   -> returns a set of date values (format 'YYYYMMDD HH:MI:SS') 
+ #      corresponding to  the 7th and all Thursdays and Fridays 
+ #      of November 1999.    
+
+=head1 FUNCTIONS
+
+=over 
+
+=item B<parse(rules)> 
+
+  Parse given data generation rules and load them into a Data::Generate object.
+  Return either an error or a Data::Generate object.
+
+=back
+
+=head1 METHODS
+
+=over 
+
+=item B<$self-E<gt>get_degrees_of_freedom()> 
+
+  Return an integer scalar containig the maximal number of unique values 
+  that can be produced from the current Data::Generate object.  
+
+=item B<$self-E<gt>get_unique_data(nr_of_values)> 
+
+  Return an array of unique values with "nr_of_values" elements.
+  Issue a warning and produce only $self->get_degrees_of_freedom() values
+  if nr_of_values > $self->get_degrees_of_freedom(). 
+
+=back
+
+
+=head1 DESCRIPTION
+
+This module generates data by parsing given text statements 
+(B<data creation rules>). These statements are flexible and powerful 
+C<regex-like> way to control the production of synthetic data. Think about a 
+program that instead of selecting data which matches a regex filter expression, 
+produces it. For example, from the rule [a-c], the generator would produce 
+the array a,b,c. 
+The module works as following:
+
+=over
+
+=item B<Specify data creation rules.> 
+
+my $generator= Data::Generate::parse('VC(24) [0-9][2-3]');
+
+At this step first you define one kind of output datatype (for ex. VC(24)= 
+"output is a string with max length 24") and then with the rest of the expression 
+define what it should look like.
+If parsing is successful a Data Generator object is instantiated. 
+
+=item B<Get data > 
+
+my $Data= $generator->get_unique_data(10);
+
+To really get the data, users must call the C<get_unique_data> method by 
+indicating the desired number of output values. The generator returns 
+the values contained in an array reference. Please remark that B<output format 
+is fixed> according to the data type.
+
+=back
+
+=head1 DESIGN CONCEPTS
+
+This module has been designed so that the returned output 
+array fulfills the following characteristics by efficient memory usage 
+(i.e. no internal generation of output values before knowing the number of rows 
+that should be produced). These are:
+
+=over
+
+=item B<Uniqueness> The returned output array should be composed of the unique 
+values (so that it can for example be used to fill a primary key of a table).
+
+=item B<Defined cardinality>. Given a set of data generation rules, the maximal 
+number of rows should be predictable in advance, so that for ex., when 
+generated values are dependent from each other (see for ex. foreign key 
+dependency in databases), one can predict the cardinality without getting all 
+values before.
+
+=item B<Flat random data distribution>  Distrubution of output values should be
+flat over all possibilities, despite the existence of any internal structure. 
+
+=item B<Data distribution accuracy>  When you have a data generation statement 
+with multiple rules, relative weight between the rules should be (as far as 
+possible) respected (see example 2 above). 
+
+=back
+
+To achieve this, during rule parsing, the module resolves each 
+term internally to a list which contains all possible matching values.
+For example if it has to parse the expression:
+
+ ...[A-C] [1-9]... 
+
+the program expands and keeps in memory the two separate value lists:
+
+ (A,B,C) and (1,2,3,4,5,6,7,8,9).
+
+If data has to be produced, the generator randomly picks up an element 
+from each list and it produces the output value by concatenating 
+all chosen elements together (as a kind of cross product).
+For example, when asked to produce 4 values based on the expression [A-C] [1-9], 
+the generator goes through the two lists (A,B,C) 
+and (1,2,3,4,5,6,7,8,9) and it produces the output by picking up  random 
+combinations (ex. 'B5', 'A1','C7' and 'A2').
+
+B<ERROR HANDLING>
+
+Uniqueness and other characteristics of the data can sometimes be broken 
+very easily by accidental erros in user's statements. 
+Consider for example the expression below (integer type).
+
+ ...[0-1] [0,10] ... 
+
+In this case, if a string type would be used, we could get the values: 
+
+ '00','10','110','010'
+
+however, if a numeric type is used, we only get the values:
+
+ 0,10,110
+
+this is because the program recognizes 010 and 10 as equivalent in respect
+to integers and removes automatically 010 from the output values. 
+Users not aware of this behaviour are likely to overestimate the maximal 
+number of available unique data. 
+To prevent this kind of errors, the program checks user entries against 
+boundary constraints (uniqueness, cardinality, etc.) and tries to fix
+these problems by himself (it generates however a warning to inform the user).
+
+
+=head1 BASIC SYNTAX
+
+
+B<BASIC SYNTAX, TYPE DECLARATION>
+
+The high-level syntax of data creation rules is the combination of 
+following elements: 
+
+B<STATEMENT: TYPE DECLARATION  RULE [WEIGTH] [| RULE [WEIGTH] ...] ; > 
+
+With the B<type declaration> you fix the kind of datatype (string,varchar,
+integer,date or float) that should be produced. The general form above 
+is preserved for all types, however each type has its own specific syntax rules. 
+The (type dependent) data output format is always fixed. We'll  
+come back to these types more in details later.
+
+B<RULES>
+
+The next element, the data creation B<rules> is the combination of one or 
+more B<terms>. White spaces are used as separators between terms:
+
+B<RULE: TERM [ TERM ...]  > 
+
+Term expressions are the lowest level syntax elements. This can be a direct 
+literal value (see for example later quoted string expressions), or a range of
+values. When the program generates the output, it concatenates all term 
+expressions of a rule together (like a kind of AND operation).
+
+
+With the pipe (B<|>) operator you can assign multiple rules to the same 
+output result. The generator in this case, produces the output values 
+by alternatively applying the assigned rules (like a kind of OR operation).   
+In addition you can pass a B<weigth> parameter 
+(syntax: B<(<percent_valueE<gt>%)>), to control how much one or the other rule 
+should be used to produce output data.For example, the statement:
+
+  'VARCHAR(2)[0-9](15.5%)|[A-Z](84.5%);' 
+
+produces a data distribution with about 15% of the values as numbers 
+between 0 and 9 and the rest as the letters from A to Z. 
+
+B<TERM EXPRESSIONS>
+
+Term expressions are in general datatype dependent, however some 
+basic elements are common to several types. These are:
+
+=over 
+
+=item B<File lists>. Syntax: B<'<'file_path'E<gt>'> 
+
+File lists can be used for all datatypes. With this statement you let 
+the program load a file as a list of values.In this case the program goes 
+through all file records and takes those which match the given datatype.
+
+
+=item B<Ranges>. Syntax: B<{ '['low-high']'
+| '['low..high']' | '['value1,value2,value3']' | ... etc .}>   
+
+Range expressions are quick and powerful way to generate a list of values.
+For string types in particular, the syntax is similar to regular expressions
+as shown in examples below:
+
+  ...[A-C]...
+
+returns the characters 'A','B','C' 
+
+  ...[Ace]...
+
+returns the characters 'A','c','e' 
+
+  ...[^A-Z]...
+
+returns anything (B<^> operator) except all uppercase characters. 
+See leter for an exact description of range syntax for each type.
+
+=item B<Literals>. Syntax: B<'value'>
+
+Here the program just takes the quoted string and concatenates to the other 
+terms. Literal values are very useful if you need to pre- or postfix the 
+generated values with some predetermined character sequence.Example:
+
+  ...'0x' [A-C]...
+
+returns the values '0xA','0xB','0xC' 
+
+=item B<Additional Elements, Quantifiers>.Syntax: B<TERM '{'nr of repetitions'}'> 
+
+For many kinds of terms you can give a repetition parameter (<quantifier>).
+In this case the term expression is repeated according to the quantifier.
+Altough this concept is borrowed from regular expression, 
+here the quantifier is fixed and has to be an unsigned integer number.
+Quantifiers can be very practical as following example shows:
+
+  ...[0-1]{8}...
+
+returns the binary representation of numbers from 0 to 256. 
+
+
+For some datatypes (strings) you can use quantifiers for all kinds of terms, 
+also including the lists but for others you cannot. We'll now describe
+the syntax rules of each type in depth.
+
+
+=back 
+
+
+=head1 STRING TYPE SYNTAX. 
+
+B<STATEMENT: 'STRING'  strrule [weigth] [| strrule [weigth] ...];> 
+
+B<strrule: strterm ['{'quantifier'}'] [ strterm ['{'quantifier'}'] ...]> 
+
+B<strterm: { integer | literal | range | filelist}> 
+
+String types allow the most flexibility in the combination of terms
+(for each term type you can use quantifiers). In addition
+no fixed length is required (no type length checking).
+Here the detailed description of all string terms: 
+
+=over 
+
+=item B<Integer>. Syntax: B<'['number1..number2']' ['{'quantifier'}']>. 
+
+This expression is a kind of specialized range term and it returns 
+a range of consecutive numbers between number1 and number2 
+(with optional quantifier) For example: 
+
+ STRING [9..11]{2} 
+
+returns the numeric strings '99','910','911','109','1010','1011','119'
+,'1110','1111'
+
+=item B<Literals>. Syntax: B<'value' ['{'quantifier'}']>.
+
+The quoted string is just taken over and concatenated to the other terms.  
+
+=item B<Ranges>. Syntax: ... see regex syntax for '[' ... ']' expressions.
+
+As stated before the syntax of these expressions in string content is very close 
+to regex syntax. There are however following differences:
+
+  1.Quantifers must be a unsigned integer value. For ex. [0-1]{12} 
+  is allowed but [0-1]{1..12} is forbidden.
+
+  2.You cannot use character classes (\d,\D,\w,\W,etc).
+
+
+See also examples at the end of the string type section.
+
+
+=item B<Filelists>. Syntax: B<'<'file_path'E<gt>'>.
+
+File records are loaded without special checks, quantifiers allowed. 
+
+
+=back
+
+I<Examples>:
+
+  my $generator=parse(q{STRING [0-1] 'AX'{2}});
+  print $generator->get_unique_data(2);
+  # ...returns '0AXAX', '1AXAX'.
+
+  my $generator=parse(q{STRING [AB1-2]{2}});
+  print $generator->get_unique_data(8);
+  # ...returns 'AA','AB','A1','A2','BA',... 
+
+  my $generator=parse(q{ <./family_name> <./first_name> });
+  print $generator->get_unique_data(10);
+  # ...combines two lists togehter   
+
+
+=head1 VARCHAR TYPE SYNTAX. 
+
+B<STATEMENT: { 'VARCHAR'|'VARCHAR2'|'VC'} '('length')' strrule [weigth] [| strrule [weigth] ...];>
+
+Varchar types have the same syntax as string types, except in the declaration,
+where they require a B<maxlength parameter>.The maxlength parameter works in 
+the following way:
+
+  At runtime the program checks if the output string becomes longer than 
+  the maxlength. If that is the case, then the program cuts the last 
+  part of the string and generates a warning.  
+
+I<Example>:
+
+  my $generator=parse(q{VC(4) [0-1]{5}});
+  print $generator->get_unique_data(4);
+  # ...returns '0000', '0001', etc. instead of '00000', '00001'....
+  # and generates a warning due to the truncated values 
+
+=head1 INTEGER TYPE SYNTAX. 
+
+B<STATEMENT: 'INTEGER' '(' length ')' intrule [weigth] [| intrule [weigth] ...];> 
+
+B<intrule: [ '+' | '-' | '+/-' ] integer-term [ '{' quantifier '}' ] [ integer-term [ '{' quantifier '}' ] ...]> 
+
+B<integer-term: { numeric-range | numeric-literal | filelist}> 
+
+
+Integer type declaration requires a length parameter.Unfortunately 
+(due to the internal representation of perl integers) the B<maximal allowed 
+length here is 9 digits>. 
+
+Particularity with integers (and floats too) is the B<optional +/- sign 
+at the beginning>, which controls wheter positive or negative numbers 
+(or both signs) should be generated. 
+
+Integer and all other kinds of numeric datatypes use a specialized version of 
+term expressions. These are B<numeric ranges> and B<numeric literals>.
+These terms have following characteristics:
+
+B<1.Syntax>:
+
+B<  - numeric-literals: value>.
+
+B<  - numeric--ranges:  '[' {lowvalue '-' highvalue | value } 
+       [  ',' {lowvalue '-' highvalue |   value }  ... ]']'>
+
+B<2.Values inside numeric ranges and numeric literals must be 
+     unsigned integer numbers (0,1,2,..etc).>  
+
+B<3.Values are unquoted everywhere.>  
+
+B<4.Values in numeric ranges must be separated by a period 
+  (i.e. here for a range with the numbers 2,25 you write 
+  [2,25] and not [2 25] or [225]).>
+
+
+For integers you can also use filelists at term-level (see later the difference 
+with float filelists). Syntax: 
+
+B<   '<'file_path'E<gt>'['{'quantifier'}']>.
+
+Here file data records have to be unsigned integer numbers (other records get 
+discarded by the program after the file gets loaded). 
+
+For integer datatypes, as for strings, quantifiers are allowed 
+for all kinds of terms. 
+
+B<Please remark also that, due to the numeric nature of integer types, 
+superfluos leading zeros must be taken away from the output values 
+(see also L<DESIGN CONCEPTS>).In addition, for positive numbers, 
+the + sign is also removed from output values.> 
+
+I<Examples>:
+
+  my $generator=parse(q{INT (9) +/- 0 [0,3]{2} });
+  print $generator->get_unique_data(7);
+  # ...returns 0,3,30,33,-3,-30-33  
+  # .ie. no leading zeros, no leading '+' sign 
+
+
+=head1 FLOAT TYPE SYNTAX. 
+
+B<STATEMENT: 'FLOAT' '(' length ')' { floatrule | float-filelist} [weigth] 
+[| { floatrule | float-filelist}[weigth] ...];> 
+
+B<float-filelist: '<'file_path'E<gt>'>
+
+B<floatrule: int_part fraction_part [exponent_part]>
+
+B<int_part: [ '+' | '-' | '+/-' ] integer-term [ '{' quantifier '}' ] [ integer-term [ '{' quantifier '}' ] ...]> 
+
+B<integer-term: { numeric-range | numeric-literal }> 
+
+B<fraction_part: '.'  fractterm [ '{' quantifier '}' ] [ fractterm [ '{' quantifier '}' ] ...]> 
+
+B<fractterm: { numeric-range | numeric-literal  }> 
+
+B<exponent_part: { 'E' [ '+' | '-' ] exponent_number > 
+
+Floats are quite complex numeric types. You can however decompose float syntax into
+these main parts:
+
+=over
+
+=item B<Type declaration.>Float type declaration ('FLOAT (length)' ) requires a 
+length parameter.As integer types there is a limit (14 digits without sign and 
+period) to the maximal length that can be used for a float number.
+
+=item B<Leading part.>
+The syntax of the leading part (which is everything on the mantissa after the 
+declaration and before the decimal point) follows the syntax of  
+integer datatypes with the exception that you cannot use file lists at term level. 
+For the rest see the description of numeric ranges and numeric literals above and the examples below.
+
+=item B<Fractional part.>
+In the fractional part (everything on the mantissa after the decimal point) 
+you can only use numeric ranges and numeric literals.
+Please notice that for this kind of data the module handles zero's 
+in opposite way as for integer types:
+
+B<While in integer expressions, leading zeros required a special treatment 
+(because for example 01 and 1 are the same number), in fractional expressions
+we have to take care of the trailing zeros (because for example 1.010 and 1.01 are 
+the same number).>
+
+=item B<Exponent part.>
+In the exponent part you can only use finite integer numbers ('E +3','E -5' ...).
+This part is an optional component.See examples.  
+
+=back
+
+B<ADDITIONAL REMARKS ON FLOATS>
+
+=over
+
+=item B<File lists> Oppositely to previous datatypes,you cannot use file 
+lists at term level, instead (because of the complexity of float numbers) 
+you can only use them at rule level. In this case, while parsing a file,
+the modules tries to convert each record into a float value or skip it 
+when conversion fails. 
+
+=item B<Output data> Before generating output, the modules tries to compact 
+generated data as much as possible. That means that superflous +signs,exponents
+and decimal points are eliminated from output values. 
+For ex. if the number zero was entered as '-0.000 E + 14' the module returns 
+just '0'.
+
+=back
+
+I<Examples>:
+
+  my $generator=parse(q{ FLOAT (9) +/- [3,0]{2} . [0,5]{2}});
+  print $generator->get_unique_data(10);
+  # ...returns -33.55,-33.05,-33,...,-0.05,0,0.05,...,33.55
+
+  my $generator=parse(q{ FLOAT (9)  <./float_list.txt> );
+  # ...tries to load all records of the file as float values.
+  # Please remark here the monolithic syntax (file lists at rule level): 
+  #   no leading +/- sign, no trailing exponent, no decimal point. 
+
+  my $generator=parse(q{ FLOAT (9) - 1  . [1,2] (50%)| + 3  . 0 [0,6] (50%)});
+  print $generator->get_unique_data(4);
+  # ...returns -1.2,-1.1,3,3.06
+
+
+
+=head1 DATE TYPE SYNTAX
+
+B<STATEMENT: 'DATE' ['(' precision ')'] { daterule | date-filelist} [weigth] 
+[| { daterule | date-filelist}[weigth] ...];> 
+
+B<date-filelist: '<'file_path'E<gt>'>
+
+B<daterule: date-part [ time-part ['.' time-fraction-part] ] >
+
+B<date_part: year-term month-term day-term >
+
+B<year-term: { numeric-range | numeric-literal  }> 
+
+B<month-term: { month-range | month-value  }> 
+
+
+B<month-range:  '[' {month-lowvalue '-' month-highvalue | month-value } 
+       [  ',' {month-lowvalue '-' month-highvalue | month-value  }  ... ]']'>
+
+
+B<month-(low,high)value: { "a number between 1 and 12" | "any valid literal 
+expression for a month (ex. 'jan' for january)" }>
+
+
+B<day-term: { day-range | day-literal  }> 
+
+B<day-range:  '[' {day-lowvalue '-' day-highvalue | day-value } 
+       [  ',' {day-lowvalue '-' day-highvalue | day-value  }  ... ]']'>
+
+B<day-(low,high)value: { "a number between 1 and 31" | "any valid literal 
+expression for a weekday (ex. 'sat' for saturday)" }>
+
+
+B<time-part: hour-term ':'  minute-term ':' second-term >
+
+
+B<hour-term: { numeric-range | numeric-literal  }> 
+
+B<minute-term: { numeric-range | numeric-literal  }> 
+
+B<second-term: { numeric-range | numeric-literal  }> 
+
+
+B<time-fraction-part: '.'  fraction [ '{' quantifier '}' ] [ fraction 
+[ '{' quantifier '}' ] ...]> 
+
+B<fraction: { numeric-range | numeric-literal  }> 
+
+Dates are the most complex datatypes, because they are built up by several components.
+Dates have following basic characteristics:
+
+
+=over 
+
+
+=item * Structure: Date datatypes are composed of a mandatory date portion and an optional 
+time portion. Further, you can also give an extra fractional part to the time portion  
+(fractions of second). 
+
+=item * Precision: If you want to use fractions of seconds, you must give the 
+precision of the fractional part in the declaration. Here you can use  
+a maximal precision of 14 decimal digit positions. 
+
+=item * Quantifiers: in date syntax, repeat expressions (i.e. quantifiers) are forbidden 
+everywhere except for the time fractional part. This because it is difficult and
+not practical to implement quantifiers in such a composite datatype.
+
+=item * External dependencies: This modules parses and calculate date values with the aid of 
+following external libraries:
+
+    -Date::Parse
+    -Date::DayOfWeek
+
+=item * Output format: Date output values are always generated according to 
+the format:
+
+  YYYYMMDD HH24:MI:SS.FRACTION
+
+where the first part (until seconds) is always fixed, and the fractional part
+is printed out in '9999' format according to the precision parameter.
+
+
+=item * Years: year values have to be given as 4-digit unsigned integers.
+Accepted range: 
+
+  1970-2037   (Unix 32 bit date)
+
+=item * Months: month values can be given as a number between 1 and 12 or as 
+month literal value (like jan for january).
+
+=item * Days: day values can be given as a number between 1 and 31 or as 
+a day of the week (like sat for saturday). 
+
+=item * Date check: At parse time the module checks all valid combinations 
+of year,month and day values and it stores them internally.
+If no combination is avaliable (like the combination between 31 and february)
+the modules generates a warning.
+
+=item * Date File lists: As for float values dates have to be given 
+as a whole date expression in file lists. Please remark here that, 
+thanks to the Date::Parse library, you can give date records using several formats. 
+See the Date::Parse library itself for more details about accepted formats.
+
+=item * Hour, minute and second term: here you have to use numeric values in the 
+ranges of the given time unit:
+
+ - hours:    a number from 0 to 23. 
+ - minutes:  a number from 0 to 59. 
+ - seconds:  a number from 0 to 59. 
+
+=back
+
+
+
+I<Examples>:
+
+  my $generator=parse(q{ 
+      DATE [1985-1986][01-3][2-4] [11-15] : [11-15] : [11-15] (50%) |
+        '1998' [01-03,08-09]  [07-15,22] '11' : '12' : '24' (25%) |
+       [2001,2006][09,nov][07,mon,thu-fri] '09' : '09' : '09' (25%) });
+
+  print $generator->get_unique_data(...);
+  # ... returns three different datasets with 1/2 having the dates 1985-1986, 
+  # ... 1/4 for the year 1998 and 1/4 for the years 2001 and 2006.
+
+
+=head1 INTERNAL METHODS
+
+Here a list of the internal methods of the module.
+These methods are not supposed to be called by the user.
+
+=over
+
+=item - add_term_range
+
+=item - add_value_column
+
+=item - add_weekday_term_range
+
+=item - bind_actual_vchain
+
+=item - bind_actual_vcol
+
+=item - bind_vchain
+
+=item - bind_vcol_literal
+
+=item - bind_vcol_range
+
+=item - calculate_degrees_of_freedom
+
+=item - calculate_occupation_levels
+
+=item - calculate_vchain_list_degrees_of_freedom
+
+=item - calculate_vchain_list_weigth
+
+=item - calculate_weigth
+
+=item - check_input_card
+
+=item - check_input_limits
+
+=item - check_range_order
+
+=item - check_reverse_flag
+
+=item - fisher_yates_shuffle
+
+=item - get_value_column_reverse
+
+=item - is_valid
+
+=item - map_vchain_indexes
+
+=item - merge_vchain_float_lists
+
+=item - new
+
+=item - load_parser
+
+=item - reset_actual_vchain
+
+=item - reset_actual_vcol
+
+=item - set_occupation_ratio
+
+=item - vchain_date_fraction_process
+
+=item - vchain_float_process
+
+=item - vchain_fraction_process
+
+=item - vchain_integer_process
+
+=item - vchain_number_reprocess
+
+=item - vcol_chain
+
+=item - vcol_date_process
+
+=item - vcol_file_process
+
+=back
+
+=head1 DEPENDENCIES
+
+Please install following libraries previous running this module:
+
+=over
+
+=item - Parse::RecDescent
+
+=item - Date::Parse
+
+=item - Date::DayOfWeek
+
+=back
+
+
+=head1 TODO
+
+=over
+
+=item - Integration of more datatypes (Bigint,etc).
+
+=item - Integration of character classes (\w,\d, etc).
+
+=item - Better descriptions for warnings and fatal errors. 
+
+=item - Create a method get_nonunique_data . 
+
+=back
+
+
+=head1 BUGS
+
+=over
+
+=item - Special characters ("\n",etc.) are not always handled correctly.
+
+=item - When using numeric files lists in combination with numeric types, 
+not-numbers  (ex 'A') are converted to 0. It would be better if they were 
+skipped.
+
+=back
+
+=head1 CAVEATS
+
+When multiple rules are used (ex ... [14] (36%)|[1-2](64%) ... ) 
+duplicates are only detected at the end, just before output creation.
+This effect may lead to wrong cardinality and to wrong data distributions.
+When this happens the program generates a warning.
+
+=head1 HISTORY
+
+=over
+
+=item - 0.01 Initial version
+
+=item - 0.02 Correct bug in calculation of degrees of freedom 
+
+=back
+
+
+=head1 ACKNOWLEDGEMENTS
+
+ Many thanks to Slawa Kopytek <skopytek@gmail.com> who had the patience to 
+ read and correct my 'swiss-italian' english documentation.
+
+=head1 AUTHOR
+
+ Davide Conti <daconti.mail@gmail.com>
+
+ Copyright (C) 2006 Davide Conti <daconti.mail@gmail.com>
+ All rights reserved.
+
+ You may distribute this package 
+ under the terms of the Artistic License.
+
+ No WARRANTY whatsoever.

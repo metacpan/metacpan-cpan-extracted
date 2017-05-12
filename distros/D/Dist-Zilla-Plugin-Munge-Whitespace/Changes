@@ -1,0 +1,14 @@
+Release history for Dist-Zilla-Plugin-Munge-Whitespace
+
+0.001001 2017-03-07T14:54:22Z a9be5e5
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Drop use of ConfigDumper util
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - develop: +5 ↑2 -1 (suggests: ↑2)
+ - runtime: -1
+ - test: ↓1
+
+0.001000 2015-04-05T22:26:51Z 866b138
+ - First version.

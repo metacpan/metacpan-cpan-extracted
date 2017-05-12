@@ -1,0 +1,145 @@
+0.088     2014-03-18 20:58:57 America/Los_Angeles
+
+    [BUG FIXES]
+
+    - Fixed handling of the "recurse" option.  Code and tests were
+    ontributed by @hartzell. Fixes GH #11
+
+0.087     2014-02-10 21:38:05 America/Los_Angeles
+
+    - This plugin as been entirely re-written to use the pinto command
+    rather than interfacing with the Pinto API directly.  Since the API
+    is still in flux, this should make the plugin more resilient to
+    changes.  But the behavior of the plugin itself is unchanged.
+    However, it now requires Pinto 0.098 or later.
+
+    - The "pinto_exe" configuration option can be used to set the
+    path to the pinto executable.  If not set, it searches your PATH.
+
+    - Nearly all configuration parameters are now optional.  Defaults
+    are based on environment variables or the repository configuration.
+    See the POD for details.
+
+0.086_01  2014-02-02 13:42:38 America/Los_Angeles
+
+    - Changes consolidated above under version 0.087
+
+0.086     2014-01-21 14:01:06 America/Los_Angeles
+
+    [INCOMPATIBLE CHANGES]
+
+    - The "no_recurse" configuration option has been changed to
+    "recurse" which can be either true or false.  If not set, the
+    default recursive behavior is determined by the repository
+    configuration.  If you were using the the "no_recurse" option
+    before, you'll need to replace it with "recurse = 0" in your
+    dist.ini file.
+
+   [BUG FIXES]
+
+   - The plugin was ignoring your authentication credentials when
+   using a remote repository [GitHub #7].  Thanks @hstaugaard.
+
+0.085     2014-01-13 14:48:42 America/Los_Angeles
+
+    [BUG FIXES]
+
+    - Also requires Pinto 0.091 or later at runtime.  I should have
+    done this in the last release.
+
+0.084     2014-01-13 14:39:08 America/Los_Angeles
+
+    [BUG FIXES]
+
+    - Remote repository URLs may now use HTTPS.  Requires Pinto 0.091
+    or later.
+
+0.083     2013-05-02 15:21:03 America/Los_Angeles
+
+    Updated to be compatible with Pinto 0.082 or newer.  Now that
+    Pinto ships with Pinto::Remote, you no longer have to choose
+    which to install.
+
+    However, I've tried to rig it up so that you can install this
+    module in PERL5LIB along with all your other Dzil plugins, whilst
+    using the libraries from a stand-alone Pinto that is installed
+    in PINTO_HOME.
+
+    I'm not sure if this will work out.  Please let me know about
+    your experiences.
+
+0.046     2012-08-13 17:21:31 America/Los_Angeles
+
+    Now requires Pinto-0.46 or Pinto::Remote-0.046.  These are
+    not listed as dependencies, so you can decide which one
+    you need to install.
+
+    You can now specify which stack to put the release on.
+
+    Added functional tests, but they only run if you have
+    the proper Pinto backends installed.
+
+    The "auth" configuration parameter has been renamed
+    to "authenticate" to avoid confusion with the "author"
+    parameter.
+
+0.033     2012-03-17 01:29:36 America/Los_Angeles
+
+    Added support for the "norecurse" option.  This behaves
+    the same way as --norecurse on pinto-admin and pinto-remote.
+    You'll need version 0.033 or better of Pinto or Pinto::Server
+    to use this.  Thanks Karen Etheridge for inspiring this!
+
+0.030     2012-01-26 22:51:38 America/Los_Angeles
+
+    The "repos" attribute is now called "root", which is
+    consistent with the rest of the Pinto tools.  You'll
+    need to change your dist.ini files accordingly.
+
+    You can now release to multiple repositories by specifying
+    multiple values for the "root" attribute. [ Thanks reneeb! ]
+
+    You'll be prompted to enter your author ID if we can't
+    figure out your username.
+
+    Now requires either Pinto-0.030 or Pinto::Remote-0.030 or
+    higher (depending on whether you release to local or
+    remote repositories).  Just as before, neither of these
+    are explicit dependencies, so you have to choose the
+    right one and install it manually.
+
+ 
+0.028     2011-12-12 00:55:13 America/Los_Angeles
+
+    No new functionality, but now matches the API of the current
+    versions of Pinto and Pinto::Remote.  So you must have either
+    Pinto >= 0.028 or Pinto::Rmote >= 0.028.
+
+    The version number for D::Z::P::Pinto::Add has been increased
+    to correspond to the minimum Pinto version that is required.
+
+0.006     2011-09-03 23:32:20 America/Los_Angeles
+
+    We now ping the Pinto repository before trying to release.  If it
+    isn't available, you'll be prompted whether to continue the rest
+    of the release.
+
+0.005     2011-09-02 14:38:20 America/Los_Angeles
+
+    Ok, that last release flopped because my DZ config was borked.
+
+0.004     2011-09-02 14:38:20 America/Los_Angeles
+
+    Renamed from Dist::Zilla::Plugin::ReleaseToPinto to
+    Dist::Zilla::Plugin::Pinto::Add.  This gives me room to grow with
+    more plugins in the D::Z::Plugin::Pinto namespace.
+
+    Also fixed call to undefined method.
+
+0.003     2011-09-01 15:22:20 America/Los_Angeles
+
+    No interface change.  Just an extra log message when releasing.
+
+0.002     2011-09-01 15:13:43 America/Los_Angeles
+
+    Initial release.

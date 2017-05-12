@@ -1,0 +1,80 @@
+Copyright (c) 1996,1997 Doug MacEachern, OSF Research Institute
+
+You may distribute under the terms of either the GNU General Public
+License or the Artistic License, as specified in the Perl README file.
+
+
+The DCE-Perl package provides an OO Perl interface to the DCE security APIs.  
+
+The perl implementation is somewhat different from the C API:
+o It takes advantage of perl's namespace packages, dropping prefixes 
+  such as sec_rgy_, sec_login_, etc.  
+
+o Stuctures such as the login_context or registry_context are held in
+  blessed objects which know what namespace to look for methods in, 
+  DCE::Login, DCE::Registry, etc.  
+
+o Output arguments that are not needed by the underlying
+  C functions are not passed into perl method calls, rather, they are 
+  returned by the method as a list.
+  However, anything that is needed for input that will change outside of 
+  the method call such as a sec_rgy_cursor_t will be passed into the 
+  method call as a reference.
+
+The interface is not complete, but here is the breakdown so far:
+
+o DCE::Registry 
+  The sec_rgy_* functions
+  This class is-a DCE::rgybase where constants from rgy*base.h live 
+
+o DCE::Login 
+  The sec_login_* functions
+  This class is-a DCE::login_base where constants from sec_login_*.h live 
+
+o DCE::ACL
+  The sec_acl_* functions
+  
+o DCE::Status  
+  This module attempts to help make sense of status codes
+
+o DCE::UUID
+  Misc uuid functions
+
+----------------------------------------------------------------
+
+KNOWN BUGS
+
+----------------------------------------------------------------
+
+TODO
+
+o Better documentation and examples
+
+o Complete sec_rgy_*, sec_login_* and *_acl_* interfaces.
+  If there is a function missing you'd like to see implemented or would
+  like to implement and contribute to DCE-Perl, drop a line.
+
+----------------------------------------------------------------
+SUPPORT
+
+For comments, questions, bug-reports, announcements, etc. subscribe to
+the DCE-Perl mailing list <dce-perl@lists.csupomona.edu> by sending mail to:
+<majordomo@lists.csupomona.edu> with a body consisting of "subscribe dce-perl".
+
+----------------------------------------------------------------
+
+ACKNOWLEGEMENTS
+
+Some of this work is based on DCE.xs written by: 
+David J. Bianco <d.j.bianco@larc.nasa.gov>
+
+Extra thanks to Paul Henson <henson@acm.org> for proving the mailing
+list and lots of patience, bug spotting, fixing and ideas while
+DCE-Perl was getting on its feet.
+
+----------------------------------------------------------------
+
+Enjoy,
+-Doug MacEachern <dougm@osf.org>
+
+

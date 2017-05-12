@@ -1,0 +1,11 @@
+Revision history for Dist-Zilla-Plugin-InsertExecsList
+
+0.02    2015-08-31 (PERLANCAR)
+
+	- By default skip completer scripts (currently hardcoded to /^_/
+	  and no configuration to skip this yet).
+
+
+0.01    2015-03-21 (PERLANCAR)
+
+         - First release.

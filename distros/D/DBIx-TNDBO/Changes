@@ -1,0 +1,9 @@
+Revision history for Perl extension DBIx::TNDBO.
+
+0.02  Wed May 01 22:30:58 2013
+    - POD revisions.
+
+0.01  Tue Mar 26 22:58:54 2013
+	- original version; created by h2xs 1.23 with options
+		-XA -n DBIx::TNDBO
+

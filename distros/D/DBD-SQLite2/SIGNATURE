@@ -1,0 +1,108 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 201184d98d5fb9c8acdc842d6c6b13602ad09ac6 Changes
+SHA1 f88ce9a1b86d7b4cc248c1ec56d26952da55e0f7 MANIFEST
+SHA1 dff4a586999ce3a3cd31d928551c8d443148e23a MANIFEST.SKIP
+SHA1 d67dbd24547c65d358b0c12da415de23753f3b1e META.json
+SHA1 7d838ae65d247cce12454e7424534217bb7722b6 META.yml
+SHA1 65055bfe8a7f6ff00d50b1ced66301258e242c68 Makefile.PL
+SHA1 1675bd10f5f5d4e0f9c58a5466ddc7f7f1e35c87 README
+SHA1 c9b5324d791cff4197dcf3920f3c835f573fd2f6 SQLite2.xs
+SHA1 4ad8de8eb7696c0a1817345ce16a1995eb37fe52 SQLiteXS.h
+SHA1 d2e09de9747f15c8d34e634d914aed8946b4819c attach.c
+SHA1 c4ced9d6e3ced330ab711216354299424d08f1d1 auth.c
+SHA1 a657295884e867a03c16956bf5ddb772b81baad5 btree.c
+SHA1 126dac82eda9c1f1e8e6a16f9b3562230d03a883 btree.h
+SHA1 1a984bc5055be40967f64d4089eee07bf3fdeb59 btree_rb.c
+SHA1 43f103dba9e801a4a3d82ec0baa84b15bb068582 build.c
+SHA1 2cabec9fe92d85d3abef78bae18eb4fdd0781671 copy.c
+SHA1 a9b2b9359ee79f66312f81fd5a03b4542020bb0b date.c
+SHA1 366559af3ddacbc3ee3566be5a1addc45d55faf3 dbdimp.c
+SHA1 9d92115e2403988db7b955d783e8811717e54fe6 dbdimp.h
+SHA1 99628b7e697d562814f0f72821a85b666ac3f2c2 delete.c
+SHA1 de01b5b351c2dae2b359f4a00b3109afea3d5b7d encode.c
+SHA1 ce56d91850a563524e174bc2081ef1e3ce7bcb1a expr.c
+SHA1 4aaeca2aee14735554b2ea15e5d528630c392e29 func.c
+SHA1 fba4711f23fe0cfb5a99e8943acf2482d8052b22 getsqlite.pl
+SHA1 7edafe1f1dbb880a65c9d9f0b4f2574a4914157a hash.c
+SHA1 9d06f995521f463b93fcdc5cf4cf277479711e02 hash.h
+SHA1 b4e3daa3864e9ce2272187f6133d4ac45fd43aa5 insert.c
+SHA1 5b6fc6c1e72d0dbab6f69069ce2d52d0b31ddf7a lib/DBD/SQLite2.pm
+SHA1 ddf1714b737c3fa7adf8c1de3403e661b6dcdbc7 main.c
+SHA1 70ba735ff3db323a60b23ead3b11a6be38ae38c2 opcodes.c
+SHA1 ea7104ef30d468ec59d96186f00e79a447395bb6 opcodes.h
+SHA1 d891cc60d6d6da17549672166929b69f022746bd os.c
+SHA1 7c588662dd9c9b7c0d3b3e924bc346d25b46364e os.h
+SHA1 847f8ec4a2a7fa807ca76f2fdfd66392e293fee3 pager.c
+SHA1 e127d8c1a2bd3b55bd11b8049eee3714c0481e25 pager.h
+SHA1 31cccbb03e666cb901efeddb1f0f160db326222d parse.c
+SHA1 a0d66f99119fcff20dac750466f37e654b4e6738 parse.h
+SHA1 76605a207d3fa1ae1ac2ddefcf9c37310ce85e38 pragma.c
+SHA1 378ec63d9303993eef24814a56a9fc7260aacbea printf.c
+SHA1 ce94f0b232b016aeefe9b512895eeee3fda39a56 random.c
+SHA1 fed019b3da523e25bb32b34c42f2f01121452301 select.c
+SHA1 37657be5b663372933889351217f05c2da85c797 sqlite.h
+SHA1 39cf62d1ba693ea8461626c0b36920375934702c sqliteInt.h
+SHA1 9ff97e4d5c6348a9dd1ccb1e783033d2d03e7a47 t/00basic.t
+SHA1 d61dd0940e7fad4bf21c68fc41f05d7d627b0349 t/01logon.t
+SHA1 86ebd19fe808c84fe9d708833f1dfc12c164c95e t/02cr_table.t
+SHA1 7178da1de893b2a7109abfe7bf3ee1d45295d159 t/03insert.t
+SHA1 3cc6b439017e955937222442f14ff316e246933b t/04select.t
+SHA1 523650c4c08d6c8ef23fe4d611afebd8768cab6d t/05tran.t
+SHA1 07c0a71d20dd8ff35d598d4e6cddc2526d229e7d t/06error.t
+SHA1 b1ebae00817471a2c91bdcee490484aad160ef01 t/08create_function.t
+SHA1 58fa7f0815083da769a69b2cef7555d66c7f14af t/09create_aggregate.t
+SHA1 2b7d78dcd4b45b9228a4bfb579bc3fc6905ebfd8 t/10dsnlist.t
+SHA1 5ae9ceafe76b33ebce9052a9e66f625d16430208 t/20createdrop.t
+SHA1 da3ec03acfc2390c29e117afb8d3ec2e75929f5e t/30insertfetch.t
+SHA1 fdd955929baacfa3e47dd91fbbc789f7eab215ec t/40bindparam.t
+SHA1 f41c434e2795ba05aace75cad004ecfa5572f1dd t/40blobs.t
+SHA1 95899a0713eb7196c5f330e4ffa7bc89c78c2f46 t/40listfields.t
+SHA1 afb2e6028b0dbfeac0897c1119ab9b0ebaba5de6 t/40nulls.t
+SHA1 70b64d00565ef2b417cd68e17a821ec58960a03c t/40numrows.t
+SHA1 6261383a438b01d33739e241ccab714a6f027f0a t/50chopblanks.t
+SHA1 29f6c0b427ca2183336c8bf6405aade7bfe60c12 t/50commit.t
+SHA1 6ab8a8d31b4d2f8acaf11ff3bd32423df3c3abb8 t/60metadata.t
+SHA1 4ebb509d199772289d17a4891d47637a14600447 t/90cppcomments.t
+SHA1 1fd17c3b0701204d5c79f31c4d9cffe2d2139637 t/98_kwalitee.t
+SHA1 993b3cef8c06a70d99829facf76140864eb57240 t/98_meta.t
+SHA1 1ce51bd4ebcb568ddd166c32d5dbb57ff2d0b515 t/98_perl_minimum_version.t
+SHA1 26d0ef8e1ecbdb18011dc2947a91abbf2397dc0c t/98_pod-coverage.t
+SHA1 8e6c77dd1d7e2bb99d62e199e1b19b6090e405f5 t/98_pod.t
+SHA1 6a08501574c65203d6300abd10909ac4eea10d5a t/99cleanup.t
+SHA1 1d50f8de5e90e9f250d3655dcddcf3439a25916a t/SQLite2.dbtest
+SHA1 36d44ef1eb314608d302613b0e1acb8e5b40fc92 t/ak-dbd.t
+SHA1 735eb0d5e9bd2081b490b1f07e6d2df6852d11a9 t/dbdadmin.t
+SHA1 83b5d19cddf6451b07db05689045a830f314ac28 t/lib.pl
+SHA1 eea34544be947e4939ba9e46391d5da998f90b84 table.c
+SHA1 fb4b7744144f39089b8d2d131794b1f8fd5cacad tokenize.c
+SHA1 a9927b57c865b6f3df3fb5e40c9824d722660ded trigger.c
+SHA1 9e5cd23e195a9d10e541f42a19992d5dacefbcb6 update.c
+SHA1 34878c01b6ec9c807afa29b9c58c74b3b5a33de1 util.c
+SHA1 6bf77430f09c6be7f5209b59d10a712e28e17f7a vacuum.c
+SHA1 24817ebf4e1f987e21c10dbda9ebeb29034e06ee vdbe.c
+SHA1 fcd3e92f256d7ebbee6a4cef677a4dcf97a04253 vdbe.h
+SHA1 b40ff02ce39fd076e6ff3369e19c1bbfe1986682 vdbeInt.h
+SHA1 14ff0eb6ed9d5998f927433c91b0a3d13d81f4f6 vdbeaux.c
+SHA1 1e5e2f6cd32cf312698df052332dc63278c31f58 where.c
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlZm6OcACgkQmm2SYo/9yUIQ7gCfaLRF11zCEVT59pIRhXYJ47Zn
+rx4AoJTY5g1fQFloxHBONBZyovQYoR81
+=8jll
+-----END PGP SIGNATURE-----

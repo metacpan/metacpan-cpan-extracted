@@ -1,0 +1,11 @@
+DESCRIPTION
+
+    This distribution contains various examples of DefHash hashes files in
+    its per-dist share dir. It will also serve as a spectest.
+
+SEE ALSO
+
+    DefHash
+
+    Hash::DefHash
+

@@ -1,0 +1,33 @@
+Revision history for DBIx-Class-EasyFixture
+
+0.12    2015-08-28
+        - Add support for bi-directional relationships (via github:lohengrin332)
+
+0.11    2014-03-19
+        - Fix dist.ini to properly list dependencies
+        - Instrument tests to try to track down a problem with a (bad?)
+          smoker. Example: http://www.cpantesters.org/cpan/report/c59eb3e6-af3a-11e3-a18e-21107fda8cd6
+
+0.10    2014-03-19
+        - Bugfix: circular definitions no longer cause infinite recursion.
+        - Bugfix: corrected issue where serial "next" definitions in fixtures
+          wouldn't load (spotted by GeJ)
+        - Validate that groups are not empty (GeJ)
+        - Typo fixes (GeJ)
+
+0.04    2014-03-14
+        - Allow users to disable transactions, if needed.
+
+0.03    2014-02-24
+        - load() now returns the dbic objects it loads
+        - Fixture attributes depending on another fixture can be described inline.
+        - Update main docs to give short description of fixtures.
+
+0.02    2014-02-17
+		- Switch to Module::Install for installation.
+        - EasyFixture now validates all fixtures at instantiation time.
+        - Update dependency list.
+
+0.01    2014-02-15
+        - Easy to use DBIx::Class test fixtures
+

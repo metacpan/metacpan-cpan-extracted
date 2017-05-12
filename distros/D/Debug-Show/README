@@ -1,0 +1,36 @@
+NAME
+
+Debug::Show - display variables helpfully for debugging
+
+DESCRIPTION
+
+This module provides a facility for displaying variable values for
+debugging purposes.  Statements in the code determine what values are
+displayed.  Whether the statements actually cause debugging output depends
+on the manner in which C<Debug::Show> was invoked, so the debug statements
+can remain permanently in the code, normally inactive.  When inactive,
+the debug statements impose no runtime overhead.
+
+When the debug statements are active, each value displayed is labelled
+with the expression used to generate it.  This saves the bother of
+manually applying labels.
+
+INSTALLATION
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+AUTHOR
+
+Andrew Main (Zefram) <zefram@fysh.org>
+
+COPYRIGHT
+
+Copyright (C) 2011 Andrew Main (Zefram) <zefram@fysh.org>
+
+LICENSE
+
+This module is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

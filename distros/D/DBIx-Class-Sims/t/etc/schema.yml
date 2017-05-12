@@ -1,0 +1,13 @@
+schema_class: 'MyApp::Schema'
+connect_info:
+  -
+    'dbi:SQLite:dbname=:memory:'
+  -
+    ''
+  -
+    ''
+connect_opts: 
+  name_sep: '.'
+  quote_char: '`'
+deploy_opts: 
+  quote_identifiers: 1

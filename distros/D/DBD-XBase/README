@@ -1,0 +1,108 @@
+
+		------------------------------------
+			XBase and DBD::XBase
+		------------------------------------
+
+This is the README file for the XBase and DBD::XBase packages for work
+with *.dbf files. Please read it if you install this module for the
+first time or if there are any problems with the module.
+
+
+What is this module for:
+	Module XBase provides access to XBase (dBase, Fox*) dbf files.
+	It also handles memo files (dbt, fpt) and to certain extend
+	index files (ndx, ntx, mdx, idx and cdx). The DBD::XBase is
+	a database driver for DBI and provides simple SQL interface for
+	reading and writing the database files. So this package offers
+	two ways of accessing your beloved data in dbf files: XBase.pm
+	and DBD::XBase. I recommend using DBD::XBase and only resort
+	to XBase.pm if you need something special which is not
+	supported by the DBI interface.
+
+	You do not need any other servers/software, these modules
+	directly read and write the dbf (and other) files. The main
+	goal was to create a parser, mainly to work with data from
+	your legacy applications. If you are looking for something
+	more powerfull, check real relation database servers, such as
+	Oracle, MySQL or PostgreSQL.
+
+
+How does the code look like:
+	The DBI (DBD::XBase) way of doing things is
+
+		use DBI;
+		my $dbh = DBI->connect('dbi:XBase:/directory',
+			undef, undef, { RaiseError => 1 });
+		my $data = $dbh->selectall_arrayref(q!
+			select * from table
+			!);
+
+	which is the same as would be with any other database.
+	Remember, this is only a simple parser, so no joins or
+	subselecects are supported.
+
+	If you want to use the base XBase.pm interface, you'd use code
+	like
+
+		use XBase;
+		my $table = new XBase 'table.dbf';
+		my @data = $table->get_record(0);
+
+	The distribution also includes a dbfdump script that prints
+	the content of the table in readable form.
+
+
+Index support:
+	The support for ndx/ntx/idx/mdx/cdx index files still needs
+	quite a lot of work. It currently allows you to search
+	directly to the record you want, using the
+	prepare_select_with_index method of the XBase table object.
+	But you cannot create the index, nor is the index updated
+	when you change the dbf. Check the XBase::Index(3) man page
+	and the eg/ directory for how you can help to make it better.
+
+	Recently, support for SDBM index files was added. I hope to
+	make it a fully working and reference implementation before
+	attacking the world of undocumented mess of XBase index types
+	again.
+
+
+Support, documentation:
+	This module is provided in a hope you might find it useful.
+	My intent is to support as many variations of formats as
+	possible, but I do not have dBase/Fox* and do not plan to
+	have, so send me examples of your data files if you feel your
+	native XBase engines produce data incompatible with this
+	module.
+
+	Man pages for XBase, DBD::XBase, dbfdump, XBase::Index and
+	XBase::SDBM are included, examples of little scripts can also
+	be found in eg/ directory of the distribution. Read the DBI
+	man page for DBI specific issues, and the XBase::FAQ page.
+
+
+Installation:
+	For installation and problem and bug reporting, please read
+	the INSTALL file.
+
+
+If it works for you:
+	I'd appreciate any message if you use the module and find it
+	usefull -- I'm just curious what tasks people use the module
+	for and what they expect from it. You can of course also send
+	something more valuable.
+
+
+Available:
+	http://www.adelton.com/perl/DBD-XBase/ and from your favorite
+	CPAN site in the authors/id/JANPAZ/ directory.
+
+	Contact the author at jpx dash perl at adelton dot com.
+
+
+Copyright: (c) 1997--2016 Jan Pazdziora.
+	All rights reserved. This package is free software; you can
+	redistribute it and/or modify it under the same terms as Perl
+	itself.
+
+

@@ -1,0 +1,21 @@
+Revision history for Dancer-Session-MongoDB
+
+1.000000  2014-04-01 00:44:53+03:00 Asia/Jerusalem
+	- Checking if MongoDB version is v0.502.0 or higher and using
+	  MongoDB::MongoClient instead of MongoDB::Connection if so.
+
+0.3       2012-11-19 01:29:39 Asia/Jerusalem
+	- Fixed bug with the destroy method
+
+0.2       2011-05-28 16:17:20 Asia/Jerusalem
+	- Now relies on MongoDB to generate a session ID.
+	- Now allows passing options to MongoDB::Connection's new() method
+	  from the application configuration.
+	- BACKWORDS COMPATIBILITY BROKEN: the session database parameter
+	  is now called 'mongodb_session_db' (and not 'mongodb_dbname')
+	  and the session collection parameter is now called 'mongodb_session_coll'
+	  (and not 'mongodb_coll').
+
+0.1       2010-08-10 22:11:02 Asia/Jerusalem
+	- Initial release
+

@@ -1,0 +1,182 @@
+==================================================
+Changes from 2013-10-31 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 1.006 at 2014-10-31 21:43:37 +0000
+------------------------------------------
+
+  Change: 9a97c254a7601bf7e9488d17f34389667649ae39
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 14:43:06 +0000
+
+    tweak changes 
+
+  Change: 637cc61614402119d6b08cbfebfdcd37bfa365d5
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-31 14:40:55 +0000
+
+    Merge pull request #5 from karenetheridge/topic/fix_finders
+
+    Fix use of file finders 
+
+  Change: c95e5dda1d8b59630c309e120e152c427b1eb96e
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-10-31 11:04:50 +0000
+
+    again remove the .t, .pm, .pl exclusion - many perl executables do
+    not have a suffix 
+
+  Change: ba2fe54400b1cdcc72ffb10a1cd6afd54b2a9516
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-10-31 11:04:21 +0000
+
+    document the file finder options, their current defaults, and how to
+    change them 
+
+  Change: 1f469c65b5af74f14bad1b15bee9251b5f76576b
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-10-31 10:59:34 +0000
+
+    rename the finder arguments to indicate what they represent, not
+    their (current) default values 
+
+  Change: 3ba746212b88c0a836a7013a21436001ece29038
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-10-31 10:52:48 +0000
+
+    also scan executable files for runtime prereqs 
+
+  Change: 995ee246454aac6d36aa70c870eb63fc34f720f1
+  Author: Karen Etheridge <ether@cpan.org>
+  Date : 2014-10-31 10:45:58 +0000
+
+    move the version requirement to the place it is needed 
+
+------------------------------------------
+version 1.005 at 2014-10-31 17:30:18 +0000
+------------------------------------------
+
+  Change: b16644c110dc261ee59ddfbaba80b23d2f0e6025
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-31 10:30:18 +0000
+
+    New CPAN release of Dist-Zilla-Plugin-MinimumPerl - v1.005
+
+    - Reverted the removal of the filename check while scanning files -
+
+    RT#99935 ( thanks Nigel! )
+
+    [STATISTICS]
+
+    - code churn: 2 files changed, 256 insertions(+) 
+
+  Change: a1491f93cc989f957b6e1c2529b072d228f8c167
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-31 10:24:30 +0000
+
+    Merge pull request #4 from nfg/feature-restore-name-check
+
+    Adding back fix from RT#67355 
+
+  Change: 1c44839935c7c1275e82c8666d90315c1120ac57
+  Author: Nigel Gregoire <nigelg@airg.com>
+  Date : 2014-10-31 14:35:20 +0000
+
+    Adding back fix from RT#67355 
+
+  Change: 41a827e5b2ffb2f6b2334e4e2665e02ef4af1633
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 19:25:01 +0000
+
+    readme... 
+
+------------------------------------------
+version 1.004 at 2014-10-28 02:22:16 +0000
+------------------------------------------
+
+  Change: 27611be09231911d60a01273a1897ed66a6226b4
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 19:22:16 +0000
+
+    New CPAN release of Dist-Zilla-Plugin-MinimumPerl - v1.004
+
+    Expanded the prereq specification so we now separate the configure,
+    test, and runtime phases RT#61028 ( thanks DAGOLDEN! )
+
+    Skip parsing files with encoding == bytes RT#96071 ( thanks ETHER! ) 
+
+  Change: 1cbe128b5ef1abf1636e12fed0ec658da8aee9b6
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 18:52:53 +0000
+
+    skip files with bytes encoding 
+
+  Change: f9f91d3952f49f4ce5d2f24ac7c0fd94700d83eb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 18:42:13 +0000
+
+    separate into the configure, test, and runtime phases 
+
+  Change: b9904b5cbac8eddda10be30351be7ea97352b454
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 15:22:19 +0000
+
+    Merge branch 'master' of
+    github.com:apocalypse/perl-dist-zilla-plugin-minimumperl 
+
+  Change: 4e206f7dad560021edaf065bb20c63907a13f37c
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-27 15:22:09 +0000
+
+    Merge pull request #3 from dolmen/see-also-MinimumPerlFast
+
+    See also: MinimumPerlFast 
+
+  Change: 1ecc934286d8340e99526a77ce917e4e1b4c59ea
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 15:19:58 +0000
+
+    add note about printing several times of the file 
+
+  Change: 71651ad9588ce37a108a6909422f506ea7d08f98
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 15:15:58 +0000
+
+    Merge branch 'master' of
+    github.com:apocalypse/perl-dist-zilla-plugin-minimumperl 
+
+  Change: fc587ab74cae9787b6c6d2eaa85d6656c3bc53e5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-10-27 15:15:54 +0000
+
+    tweak stuff 
+
+  Change: d2ab58124e1b0e8fdd4172c8d528deb7f45c3bcf
+  Author: Apocalypse <apocalypse@users.noreply.github.com>
+  Date : 2014-10-27 15:15:18 +0000
+
+    Merge pull request #2 from melo/patch-1
+
+    Log the file which was used to determine the perl version 
+
+  Change: 8cc33c6f49d4679a3f74b56283c76c0a88bb7730
+  Author: Olivier MenguÃ© <dolmen@cpan.org>
+  Date : 2013-07-21 02:32:55 +0000
+
+    See also: MinimumPerlFast
+
+    [MinimumPerlFast](https://metacpan.org/module/Dist::Zilla::Plugin::Mi
+    nimumPerlFast) is an interesting alternative for perl 5.8+ 
+
+  Change: b76587b016eed0f523726b17821e69565cf36525
+  Author: Pedro Melo <melo@simplicidade.org>
+  Date : 2013-01-15 13:00:51 +0000
+
+    Log the file which was used to determine the perl version
+
+    This makes it easier to track why a specific version was chosen. 
+
+================================================
+Plus 5 releases after 2013-10-31 00:00:00 +0000.
+================================================

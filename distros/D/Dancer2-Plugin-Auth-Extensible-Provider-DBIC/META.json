@@ -1,0 +1,65 @@
+{
+   "abstract" : "authenticate via the L<Dancer2::Plugin::DBIC> plugin",
+   "author" : [
+      "Andy Beverley <andy@andybev.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.22, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Auth-Extensible-Provider-DBIC",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "DateTime::Format::SQLite" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0",
+            "Test::Warn" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DBIx::Class::ResultClass::HashRefInflator" : "0",
+            "Dancer2" : "0.200000",
+            "Dancer2::Core::Types" : "0",
+            "Dancer2::Plugin::Auth::Extensible" : "0.703",
+            "Dancer2::Plugin::DBIC" : "0.0012",
+            "DateTime" : "0",
+            "Moo" : "0",
+            "Scalar::Util" : "0",
+            "String::CamelCase" : "0",
+            "namespace::clean" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC/issues"
+      },
+      "homepage" : "https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC/",
+      "repository" : {
+         "url" : "https://github.com/ctrlo/Dancer2-Plugin-Auth-Extensible-Provider-DBIC"
+      },
+      "x_IRC" : "irc://irc.perl.org/#dancer"
+   },
+   "version" : "0.623",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

@@ -1,0 +1,16 @@
+--- #YAML:1.0
+copyright:
+  - Bruno Postle <bruno@postle.net>
+ignore:
+  - '../data/arrow.drawing/1.eml'
+license: http://creativecommons.org/licenses/sa/1.0/
+location:
+  - '../data/arrow.drawing/'
+points:
+  -
+    - -40.265890674358
+    - 122.616037174381
+    - 0
+type: reference
+units: mm
+version: draft1

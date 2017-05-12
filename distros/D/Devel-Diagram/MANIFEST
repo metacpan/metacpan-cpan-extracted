@@ -1,0 +1,16 @@
+MANIFEST
+Makefile.PL
+README
+CHANGES
+lib/Devel/Diagram.pm
+lib/Devel/Diagram/Render/UXF20.pm
+lib/Devel/Diagram/xsl/uxf20toHtml.xsl
+eg/ClassDiagram.pl
+eg/cd-CGI.html
+eg/cd-CPAN.html
+eg/cd-DBI.html
+eg/cd-HTML.html
+eg/cd-LWP.html
+eg/cd-IO.html
+t/t.t
+test.pl

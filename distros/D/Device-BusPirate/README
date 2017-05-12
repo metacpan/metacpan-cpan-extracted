@@ -1,0 +1,160 @@
+NAME
+
+    Device::BusPirate - interact with a Bus Pirate device
+
+DESCRIPTION
+
+    This module allows a program to interact with a Bus Pirate hardware
+    electronics debugging device, attached over a USB-emulated serial port.
+    In the following description, the reader is assumed to be generally
+    aware of the device and its capabilities. For more information about
+    the Bus Pirate see:
+
+      http://dangerousprototypes.com/docs/Bus_Pirate
+
+    This module and its various component modules are based on Future,
+    allowing either synchronous or asynchronous communication with the
+    attached hardware device. For simple synchronous situations, the class
+    may be used on its own, and any method that returns a Future instance
+    should immediately call the get method on that instance to wait for and
+    obtain the eventual result:
+
+     my $spi = $pirate->enter_mode( "SPI" )->get;
+    
+     $spi->power( 1 )->get;
+     my $input = $spi->writeread_cs( $output )->get;
+
+    A truely-asynchronous program would be built using a subclass that
+    overrides the basic read and sleep methods for some event loop or
+    similar; these can then be chained using the then method:
+
+     my $input = $pirate->enter_mode( "SPI" )
+       ->then( sub {
+          my ( $spi ) = @_;
+    
+          $spi->power( 1 )->then( sub {
+             $spi->writeread_cs( $output );
+          });
+       });
+
+CONSTRUCTOR
+
+ new
+
+       $pirate = Device::BusPirate->new( %args )
+
+    Returns a new Device::BusPirate instance to communicate with the given
+    device. Takes the following named arguments:
+
+    serial => STRING
+
+      Path to the serial port device node the Bus Pirate is attached to. If
+      not supplied, the BUS_PIRATE environment variable is used; falling
+      back on a default of /dev/ttyUSB0.
+
+    baud => INT
+
+      Serial baud rate to communicate at. Normally it should not be
+      necessary to change this from its default of 115200.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ sleep
+
+       $pirate->sleep( $timeout )->get
+
+    Returns a Future that will become ready after the given timeout (in
+    seconds), unless it is cancelled first.
+
+ enter_mutex
+
+       @result = $pirate->enter_mutex( $code )->get
+
+    Acts as a mutex lock, to ensure only one block of code runs at once.
+    Calls to enter_mutex will be queued up; each $code block will only be
+    invoked once the Future returned from the previous has completed.
+
+    Mode implementations should use this method to guard complete
+    wire-level transactions, ensuring that multiple concurrent ones will
+    not collide with each other.
+
+ enter_mode
+
+       $mode = $pirate->enter_mode( $modename )->get
+
+    Switches the attached device into the given mode, and returns an object
+    to represent that hardware mode to interact with. This will be an
+    instance of a class depending on the given mode name.
+
+    BB
+
+      The bit-banging mode. Returns an instance of
+      Device::BusPirate::Mode::BB.
+
+    I2C
+
+      The I2C mode. Returns an instance of Device::BusPirate::Mode::I2C.
+
+    SPI
+
+      The SPI mode. Returns an instance of Device::BusPirate::Mode::SPI.
+
+    Once a mode object has been created, most of the interaction with the
+    device would be done using that mode object, as it will have methods
+    relating to the specifics of that hardware mode. See the classes listed
+    above for more information.
+
+ mount_chip
+
+       $chip = $pirate->mount_chip( $chipname, %opts )->get
+
+    Note: this method is now deprecated in favour of the Device::Chip
+    interface. This distribution provides a class,
+    Device::Chip::Adapter::BusPirate, suitable to connect an instance of
+    the Device::Chip interface to. Any previously-written Bus
+    Pirate-specific chip driver classes should now be changed to target the
+    generic Device::Chip interface instead.
+
+    Constructs a "chip" object; a helper designed to communicate with some
+    particular hardware device (usually a specific chip) attached to the
+    Bus Pirate. This will be a subclass of Device::BusPirate::Chip, and
+    will likely provide various methods specific to the operation of that
+    particular device.
+
+    $chipname should match the name declared by the chip module, and other
+    options passed in %opts will be passed to its constructor.
+
+ start
+
+       $pirate->start->get
+
+    Starts binary IO mode on the Bus Pirate device, enabling the module to
+    actually communicate with it. Normally it is not necessary to call this
+    method explicitly as it will be done by the setup code of the mode
+    object.
+
+ stop
+
+       $pirate->stop
+
+    Stops binary IO mode on the Bus Pirate device and returns it to user
+    terminal mode. It may be polite to perform this at the end of a program
+    to return it to a mode that a user can interact with normally on a
+    terminal.
+
+TODO
+
+      * More modes - UART, 1-wire, raw-wire
+
+      * Documentation/examples/actual implementations of truely-async
+      subclass.
+
+      * PWM, AUX frequency measurement and ADC support.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

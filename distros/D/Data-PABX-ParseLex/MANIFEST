@@ -1,0 +1,15 @@
+Build.PL
+Changelog.ini
+CHANGES
+examples/pabx-a.txt
+examples/pabx-b.txt
+examples/test-parse.log
+examples/test-parse.pl
+lib/Data/PABX/ParseLex.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/pod.t
+t/test.t

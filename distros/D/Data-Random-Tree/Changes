@@ -1,0 +1,44 @@
+Revision history for Data-Random-Tree
+
+0.06    2016-07-03 (PERLANCAR)
+
+	- [Bugfix] Forgot to pass 'parent' argument to
+	  code_instantiate_node.
+
+
+0.05    2016-03-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [build] Rebuild with updated Pod::Weaver::Plugin::Rinci which was
+          broken for a short while.
+
+
+0.04    2016-03-26 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Fix grammar (thanks SHLOMIF).
+
+        - Update/fix test.
+
+
+0.03    2016-03-26 (PERLANCAR)
+
+        - [Incompatible change] Set children using $node->children(\@nodes)
+          instead of $node->children(@nodes) because the latter is incompatible
+          with most class accessors.
+
+        - Fixes.
+
+
+0.02    2016-03-24 (PERLANCAR)
+
+        - No functional changes.
+
+        - Add basic test and more documentation.
+
+
+0.01    2016-03-24 (PERLANCAR)
+
+        - First release.

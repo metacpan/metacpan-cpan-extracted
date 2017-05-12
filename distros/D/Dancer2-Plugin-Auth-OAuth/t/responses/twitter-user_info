@@ -1,0 +1,4 @@
+HTTP/1.1 200 OK
+Content-Type: application/json;charset=utf-8
+
+{"id":666,"id_str":"666","name":"Menno Blom","screen_name":"B10m","location":"Amsterdam"}

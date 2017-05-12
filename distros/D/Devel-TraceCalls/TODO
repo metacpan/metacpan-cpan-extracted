@@ -1,0 +1,10 @@
+BUGS
+
+- using "-d:TraceCalls=Foo->" seems to enable tracing on all calls to
+  Foo's base classes, not just calls for Foo subclasses.
+
+IMPROVEMENTS
+- Allow STRINGIFY to be depth oriented
+- (low priority) use something other than Data::Dumper so's we can print refs
+  as \%{Foo::Bar} (at which point the STRINGIFY feature needs to be renamed
+  something like "OBJRECURSEDEPTH" and "REFRECURSEDEPTH"

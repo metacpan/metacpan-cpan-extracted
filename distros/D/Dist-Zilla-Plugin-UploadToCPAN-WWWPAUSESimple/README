@@ -1,0 +1,23 @@
+SYNOPSIS
+
+    In your dist.ini:
+
+     [UploadToCPAN::WWWPAUSESimple]
+
+DESCRIPTION
+
+    This is a replacement for Dist::Zilla::Plugin::UploadToCPAN. It uses
+    WWW::PAUSE::Simple for the actual upload. It offers some more options,
+    e.g. retries.
+
+CONFIGURATION
+
+ retries => int (default: 2)
+
+    Number of retries to do when received a 5xx HTTP error response from
+    PAUSE (0 = don't retry).
+
+ retry_delay => int (default: 3)
+
+    Number of seconds to wait before retrying.
+

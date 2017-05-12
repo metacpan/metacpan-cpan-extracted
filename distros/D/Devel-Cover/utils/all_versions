@@ -1,0 +1,192 @@
+#!/usr/bin/env perl
+
+# Copyright 2004-2016, Paul Johnson (paul@pjcj.net)
+
+# This software is free.  It is licensed under the same terms as Perl itself.
+
+# The latest version of this software should be available from my homepage:
+# http://www.pjcj.net
+
+use strict;
+use warnings;
+
+use lib "utils";
+
+use Getopt::Long;
+use Parallel::Iterator "iterate_as_array";
+
+use Devel::Cover::BuildUtils qw( prove_command cpus nice_cpus );
+
+my $Options = {
+    build          => 0,
+    dry_run        => 0,
+    force          => 0,
+    ignore_failure => 0,
+    silent         => 1,
+    version        => [],
+};
+
+my $Silent = " >/dev/null 2>&1";
+
+sub get_options {
+    die "Bad option" unless
+        GetOptions($Options, qw(
+            build!
+            dry_run!
+            force!
+            ignore_failure!
+            list!
+            silent!
+            version=s
+         ));
+
+    $Options->{version} = [ map { ($_, "$_-thr") } qw(
+        5.10.0 5.10.1
+        5.12.0 5.12.1 5.12.2 5.12.3 5.12.4 5.12.5
+        5.14.0 5.14.1 5.14.2 5.14.3 5.14.4
+        5.16.0 5.16.1 5.16.2 5.16.3
+        5.18.0 5.18.1 5.18.2 5.18.3 5.18.4
+        5.20.0 5.20.1 5.20.2 5.20.3
+        5.22.0 5.22.1 5.22.2 5.22.3
+        5.24.0 5.24.1
+        5.25.0 5.25.1 5.25.2 5.25.3 5.25.4 5.25.5 5.25.6 5.25.7 5.25.8 5.25.9
+        5.25.10 5.25.11
+    ) ] unless @{$Options->{version}};
+    $Options->{version} =
+        [ grep {
+            my $cmd = "dc-$_ -v$Silent";
+            my $exists = eval { !system $cmd };
+            $Options->{force} || ($exists ^ $Options->{build})
+        } @{$Options->{version}} ];
+    print "Versions: @{$Options->{version}}\n";
+    if ($Options->{list}) {
+        exit;
+    }
+}
+
+sub sys {
+    my ($command, $user) = @_;
+    print "$command\n";
+    return if $Options->{dry_run};
+    $command .= $Silent if $Options->{silent} && !$user;
+    my $ret = system $command;
+    warn "command failed: $?" if $ret && !$Options->{ignore_failure};
+    !$ret
+}
+
+sub _mods {
+    my ($v, $n) = @_;
+
+    my ($s) = $n =~ /(\d+)$/;
+    my $version = version->parse($n);
+
+    my @mods = qw( Test::Harness Test::Warn HTML::Entities );
+
+    return @mods if $v =~ /-thr/ && $s != 1;
+
+    push @mods, qw(
+        Template
+        Pod::Coverage
+        Test::Differences
+        Readonly
+        Parallel::Iterator
+        Sereal
+    );
+
+    push @mods, "Algorithm::C3" if     $n =~ /^5\.8\.9\b/;
+    push @mods, "Moose"         unless $n =~ /^5\.8\.[012]\b/;
+    push @mods, "Moo"           unless $n =~ /^5\.8\.[012]\b/;
+    push @mods, "DBM::Deep"     unless $n =~ /^5\.8\.[01234]\b/;
+    push @mods, "Perl::Tidy"    if !$s ||   $s % 2;
+    push @mods, "PPI::HTML"     if !$s || !($s % 2);
+
+    @mods
+}
+
+sub _build_version {
+    my ($v) = @_;
+
+    print "building $v\n";
+    # sleep 1; return;
+
+    my $dir = ($ENV{PERLBREW_ROOT} || die 'No $PERLBREW_ROOT') .
+                "/perls/dc-$v/bin";
+    my ($n) = $v =~ /(\d+\.\d+\.\d+)/ or die "Can't parse [$v}";
+
+    unless (-d $dir) {
+        my $opts = "";
+        $opts .= " --thread" if $v =~ /thr/;
+        my $j = cpus + 1;
+        sys "perlbrew -v install $n --as dc-$v -j $j $opts --notest --noman" or
+            do {
+                die "perlbrew $v failed";
+                return;
+            };
+        unless (-d $dir) {
+            warn "perl for $v does not exist";
+            return;
+        }
+    }
+
+    $ENV{PATH} = "$dir:$ENV{PATH}";
+    sys "curl -L http://cpanmin.us | perl - App::cpanminus" or do {
+        warn "cpanm installation for $v failed";
+        return;
+    };
+
+    my @mods = _mods($v, $n);
+    sys "cpanm --notest @mods" or do {
+        warn "module installation for $v failed";
+        return;
+    };
+
+    my $ln = "/usr/local/bin/dc-$v";
+    sys "sudo rm $ln$Silent";
+
+    my ($perl) = "$dir/perl";
+    print "$perl => $ln\n";
+    sys "sudo ln -s $perl $ln" or warn "Can't ln $perl => $ln: $!";
+}
+
+sub _build_versions {
+    my ($v) = @_;
+    _build_version $v;
+    _build_version "$v-thr";
+}
+
+sub build {
+    print "Building: @{$Options->{version}}\n";
+    my @res = iterate_as_array(
+        { workers => nice_cpus * 2 },
+        sub {
+            my (undef, $v) = @_;
+            _build_versions($v);
+        },
+        [ grep !/-thr/, @{$Options->{version}} ]
+    );
+    exit;
+}
+
+sub main {
+    get_options;
+    build if $Options->{build};
+
+    my $command = "@ARGV" or die "Usage: $0 [-v version] command\n";
+
+    for my $v (@{$Options->{version}}) {
+        my $perl = "dc-$v";
+        (my $c = $command) =~ s/=perl/$perl/g;
+        # print "Running [$c] from $v\n";
+        # $c =~ s/=v/$v/g;
+        if ($c =~ /^make /) {
+            sys "rm -rf t/e2e";
+            sys "$perl Makefile.PL";
+            sys "make clean";
+            sys "$perl Makefile.PL";
+            sys "make";
+        }
+        sys $c, 1;
+    }
+}
+
+main

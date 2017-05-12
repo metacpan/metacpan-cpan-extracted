@@ -1,0 +1,63 @@
+NAME
+
+    Device::LSM303DLHC - I2C interface to LSM303DLHC 3 axis
+    magnetometer(compass) and accelerometer using Device::SMBus
+
+VERSION
+
+    version 0.014
+
+ATTRIBUTES
+
+ I2CBusDevicePath
+
+    this is the device file path for your I2CBus that the LSM303DLHC is
+    connected on e.g. /dev/i2c-1 This must be provided during object
+    creation.
+
+ Magnetometer
+
+        $self->Magnetometer->enable();
+        $self->Magnetometer->getReading();
+
+    This is a object of Device::Magnetometer::LSM303DLHC
+
+ Accelerometer
+
+        $self->Accelerometer->enable();
+        $self->Accelerometer->getReading();
+
+    This is a object of Device::Accelerometer::LSM303DLHC
+
+SUPPORT
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests through github at
+    https://github.com/shantanubhadoria/perl-device-lsm303dlhc/issues. You
+    will be notified automatically of any progress on your issue.
+
+ Source Code
+
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    https://github.com/shantanubhadoria/perl-device-lsm303dlhc
+
+      git clone git://github.com/shantanubhadoria/perl-device-lsm303dlhc.git
+
+AUTHOR
+
+    Shantanu Bhadoria <shantanu at cpan dott org>
+
+CONTRIBUTOR
+
+    Shantanu <shantanu@cpan.org>
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2016 by Shantanu Bhadoria.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

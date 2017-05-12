@@ -1,0 +1,11 @@
+Revision history for Devel-GlobalDestruction-XS
+
+0.03 - 2016-10-31
+  - stop relying on . being in @INC
+
+0.02 - 2015-10-18
+  - update metadata to include IRC and repository web link
+  - remove unneeded prerequisite on ExtUtils::CBuilder
+
+0.01  2013-03-08 13:48 (UTC)
+  * Extracted XS code from Devel-GlobalDestruction to keep FatPacker happy

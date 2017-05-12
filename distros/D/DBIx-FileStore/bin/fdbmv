@@ -1,0 +1,69 @@
+#!/usr/bin/env perl
+use warnings;
+use strict;
+use Getopt::Long;
+use DBI;
+
+use DBIx::FileStore;
+
+# fdbmv: renames files in FileDB
+
+main();
+
+sub Usage {
+    "fdbmv [--verbose] from to: renames files stored in filedb\n";
+}
+
+sub main {
+    my $verbose = 0;
+    GetOptions(
+        "verbose" => \$verbose,
+    ) || die Usage();
+
+    my $filestore = new DBIx::FileStore();
+
+    die ("fdbmv: pass from and to fdbnames\n" . Usage()) unless @ARGV == 2;
+
+    print "fdbmv: renaming $ARGV[0] to $ARGV[1]\n" if $verbose;
+
+    $filestore->rename_file( $ARGV[0], $ARGV[1] ); 
+}
+
+=pod
+
+=head1 NAME     
+            
+fdbmv - Rename files in DBIx::FileStore
+                    
+=head1 SYNOPSIS     
+                
+    % fdbmv a.txt b.txt
+
+renames a.txt to b.txt in the filestore
+
+    % fdbmv -v a.txt b.txt
+
+renames a.txt to b.txt in the filestore, showing the rows
+being renamed in the database.
+
+See options below for more details.
+
+=head1 DESCRIPTION 
+
+renames files in DBIx::Filestore 
+
+=head1 OPTIONS
+
+=head2 --verbose or -v
+
+Show rows that are being renamed.
+                
+=head1 AUTHOR
+
+Josh Rabinowitz <joshr>
+    
+=head1 SEE ALSO
+    
+L<DBIx::FileStore>, L<fdbcat>,  L<fdbls>, L<fdbput>,  L<fdbrm>,  L<fdbstat>,  L<fdbtidy>
+    
+=cut   

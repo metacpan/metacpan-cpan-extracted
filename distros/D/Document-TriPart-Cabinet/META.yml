@@ -1,0 +1,29 @@
+---
+abstract: 'Document::TriPart::Cabinet '
+author:
+  - 'Robert Krimen <robertkrimen@gmail.com>'
+build_requires:
+  Test::Most: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.110930'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Document-TriPart-Cabinet
+requires:
+  Carp::Clan: 0
+  Data::UUID::LibUUID: 0
+  DateTime: 0
+  DateTimeX::Easy: 0
+  Document::TriPart: 0
+  File::Temp: 0
+  Getopt::Chain: 0
+  Moose: 0
+  Path::Abstract: 0
+  Path::Class: 0
+  Term::Prompt: 0
+  Text::ASCIITable: 0
+version: 0.011

@@ -1,0 +1,13 @@
+--- #YAML:1.0
+uri_base: http://localhost/beerdb/
+rows_per_page: 10
+application_name: The Beer Database
+display_tables: 
+    - beer 
+    - brewery 
+    - pub 
+    - style
+relationships:
+    - a brewery produces beers
+    - a style defines beers
+    - a pub has beers on handpumps

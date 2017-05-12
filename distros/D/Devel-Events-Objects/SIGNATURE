@@ -1,0 +1,33 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ab30a872764cc967bffc5d1d93c54224aa524252 Changes
+SHA1 e788963c498e16f55817b88da141c6e372234db7 MANIFEST
+SHA1 ddb918d4e02cc06f4b9fe77adeca65403f8fdd56 MANIFEST.SKIP
+SHA1 70b07a26e61c8b4c9561d43488947b9530afd4e8 META.yml
+SHA1 9e47b4d695d2b6e87f1b8476bea2790be4bf6a04 Makefile.PL
+SHA1 1121ebc864554aaa5de2655ecb7777e78a1e8667 lib/Devel/Events/Generator/Objects.pm
+SHA1 cba444c5d7ecc13d0d37f639c2d16e0035fe8771 lib/Devel/Events/Handler/ObjectTracker.pm
+SHA1 269a3f40fc5ff4028b2c26c3fc7d361670368434 lib/Devel/Events/Objects.pm
+SHA1 17160557800efc821dce20331c34f222a072943d t/010_generator_objects.t
+SHA1 d0a2087a4409b22d2bb5370690721dfffb547a48 t/031_handler_objecttracker.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFIXUPaVCwRwOvSdBgRAh4pAJ48EzNvJBlxnAwml0stXWoFt/kzEQCcCCEc
+3GEKzCmoQ2z3JYVfTkbV+HM=
+=8Max
+-----END PGP SIGNATURE-----

@@ -1,0 +1,165 @@
+Dist-Inkt
+=========
+
+Created:      2013-08-07
+Home page:    <https://metacpan.org/release/Dist-Inkt>
+Bug tracker:  <http://rt.cpan.org/Dist/Display.html?Queue=Dist-Inkt>
+Wiki:         <https://github.com/tobyink/p5-dist-inkt/wiki>
+Maintainer:   Toby Inkster (TOBYINK) <tobyink@cpan.org>
+
+0.024	2017-05-05
+
+ - Added: Support x_static_install.
+
+0.023	2014-09-17
+
+ - Avoid outputting anonymous class names.
+ - Improve command-line option handling.
+
+0.022	2014-06-19
+
+ [ Bug Fixes ]
+ - Fix check for existence of meta/META.PL.
+
+ [ Other ]
+ - Filter $meta->{provides} using $meta->{no_index}.
+
+0.021	2014-06-19
+
+ [ Documentation ]
+ - Fix documentation of the `--TRAVIS` option.
+
+ [ Other ]
+ - Generated Makefile.PL should cope better if CPAN::Meta::Requirements is
+   missing.
+
+0.020	2014-06-16
+
+ [ Documentation ]
+ - Added stub pod to command line scripts.
+
+ [ Other ]
+ - Better integration with haarg's perl-travis-helper stuff.
+ - Improvements to command line scripts.
+
+0.019	2014-06-15
+
+ [ Packaging ]
+ - Add missing Path::FindDev dependency.
+
+ [ Other ]
+ - Cope when ~/perl5/standard-documents/ is missing.
+ - Support PERL_DIST_INKT_NOSIGNATURE environment variable to skip building
+   a SIGNATURE file.
+
+0.018	2014-06-14
+
+ [ Packaging ]
+ - Add missing File::chdir dependency.
+
+0.017	2014-05-26
+
+ - Simplify usage of Dist::Inkt::Profile::Simple, and example.
+
+0.016	2014-05-26
+
+ [ Packaging ]
+ - Split out a lot of functionality into Dist-Inkt-DOAP.
+
+ [ Other ]
+ - Added: Dist::Inkt::Profile::Simple.
+ - Added: Dist::Inkt::Role::CPANfile.
+ - Added: Dist::Inkt::Role::WriteDOAPLite.
+
+0.015	2014-03-10
+
+ - Guess repository details from repository web URL for github.com.
+
+0.014	2014-01-21
+
+ - Added: Bundle a `distinkt-travisyml` script to automate creating
+   .travis.yml files.
+ - Generated Makefile.PL explicitly lists test suite directories.
+ - Use Path::Tiny's `subsumes` method over home-brew version.
+
+0.013	2013-09-22
+
+ - Generated Makefile.PL performs a better check for minimum Perl version.
+
+0.012	2013-09-19
+
+ [ Bug Fixes ]
+ - Generating LICENSE files now understands CPAN::Meta::Spec 2.0 license
+   codes.
+
+0.011	2013-09-19
+
+ [ Bug Fixes ]
+ - META.json/yml license codes now conform to CPAN::Meta::Spec 2.0 instead
+   of META-spec 1.4.
+
+0.010	2013-09-11
+
+ - Added: Output an INSTALL file.
+ - Added: Output optional_features in META.json.
+ - Added: Use dynamic config in Makefile.PL to add dependencies for
+   optional features.
+ - Updated: Support `feature` property from DOAP deps.
+
+0.009	2013-09-06
+
+ [ Bug Fixes ]
+ - Correct %script to %scripts in Dist::Inkt::Role::MetaProvidesScripts.
+ - Make sure EUMM $VERSION gets evaled.
+   Graham Knop++
+ - Replace => with = in assignment in Makefile.PL.
+   Graham Knop++
+
+0.008	2013-09-06
+
+ [ Packaging ]
+ - Depend on a newer version of RDF::DOAP, thus we get more awesome Changes
+   files.
+
+ [ Other ]
+ - Add `x_breaks` key to META.json if appropriate.
+ - Allow `source_for_readme` to be set in Dist::Inkt constructor (and thus
+   in dist.ini).
+ - Don't add `x_provides_scripts` to META.json unless scripts are actually
+   provided.
+ - Perform conflicts checking in Makefile.PL.
+
+0.007	2013-08-27
+
+ - Rename META.ttl -> doap.ttl.
+
+0.006	2013-08-13
+
+ - Guess some copyrights for the COPYRIGHT file.
+
+0.005	2013-08-13
+
+ - Added: Support the `x_help_wanted` key for META.json/META.yml.
+ - Updated: Use the shiny, new RDF::DOAP for a lot of the behind-the-scenes
+   DOAP processing.
+
+0.004	2013-08-10
+
+ - Attempt to support ExtUtils::MakeMaker 6.17. Don't pass WriteMakefile a
+   LICENSE unless EUMM >= 6.3001; don't pass it a DISTVNAME at all.
+ - For ExtUtils::MakeMaker versions that don't support BUILD_REQUIRES,
+   bundle it in with PREREQ_PM, not CONFIGURE_REQUIRES.
+ - For ExtUtils::MakeMaker versions that don't support TEST_REQUIRES,
+   bundle it in with BUILD_REQUIRES, not CONFIGURE_REQUIRES.
+
+0.003	2013-08-10
+
+ - Don't pass ExtUtils::MakeMaker the AUTHOR as an arrayref unless its
+   version number >= 6.5702.
+
+0.002	2013-08-09
+
+ - Add shebang to `bin/distinkt-dist`.
+ - Avoid creating empty 'x_contributors' keys in META.json/META.yml.
+
+0.001	2013-08-09	Initial release

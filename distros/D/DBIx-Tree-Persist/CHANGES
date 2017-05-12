@@ -1,0 +1,29 @@
+Revision history for Perl extension DBIx::Tree::Persist.
+
+1.04  Thu Nov  8 12:38:00 2012
+	- No code changes.
+	- For pre-reqs such as strict, warnings, etc, which ship with Perl, set the version # to 0.
+		Reported as RT#80663 by Father Chrysostomos for Tree::DAG_Node.
+
+1.03  Web Feb 16 11:53:00 2011
+	- Replace /usr/bin/perl with /usr/bin/env perl.
+	- Replace common::sense with use strict and use warnings, to get uninit var warnings.
+	- Clean up tests to stop uninit warnings.
+
+1.02  Tue Nov 16 15:59:00 2010
+	- Switch from FindBin::Real to FindBin (which is in core).
+
+1.01  Thu Oct  7 10:09:00 2010
+	  - Add dbh as an optional parameter to new(). If not supplied, use the config file to get
+	  	DBI connect options. This makes testing easier, too. Document new parameter.
+	  - Add option data_structure to output a structure which can be turned into JSON.
+	  	This uses the new method build_structure().
+	  - Make pretty-printing the tree a stand-alone method: pretty_print().
+	  - Add Tree::DAG_Node::Persist to See Also.
+	  - Add README file.
+	  - Patch usage of File::Temp in t/test.t for BSD-based systems (EXLOCK => 0). This is part of
+	  	making the code look much more like t/test.t as shipped with Test::DAG_Node::Persist.
+	  - Adopt DBIx::Admin::CreateTable for t/test.t.
+
+1.00  Tue Sep 21  9:14:00 2010
+	  - Original version.

@@ -1,0 +1,19 @@
+Build.PL
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Data/Generate.pm
+lib/Data/Generate.pod
+t/01basic.t
+t/02quantifiers.t
+t/03combined.t
+t/04vchain_list.t
+t/05pod.t
+t/06pod_coverage.t
+t/datelist_01.txt
+t/numberlist_01.txt
+t/numberlist_02.txt
+t/vclist_01.txt
+t/vclist_02.txt

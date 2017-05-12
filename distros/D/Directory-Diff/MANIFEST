@@ -1,0 +1,17 @@
+Changes
+examples/synopsis-out.txt
+examples/synopsis.pl
+lib/Directory/Diff.pm
+lib/Directory/Diff.pod
+lib/Directory/Diff/Copy.pm
+make-pod.pl
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+README
+t/Directory-Diff-Copy.t
+t/Directory-Diff.t
+xt/checkpod.t
+xt/git.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

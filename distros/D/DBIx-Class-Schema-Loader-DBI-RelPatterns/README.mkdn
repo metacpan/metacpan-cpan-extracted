@@ -1,0 +1,332 @@
+# NAME
+
+DBIx::Class::Schema::Loader::DBI::RelPatterns - Relationship patterns for DBIx::Class::Schema::Loader
+
+# SYNOPSIS
+
+    ### DBIx::Class::Schema::Loader synopsis with emphasis on
+    ### loader_class argument and the added constructor options
+
+    # in a script
+    use DBIx::Class::Schema::Loader qw/ make_schema_at /;
+    make_schema_at(
+        'My::Schema',
+        { debug => 1,
+          dump_directory => './lib',
+          rel_constraint => [
+              'bar_id' => 'bars.id',
+              qr/(.*?)s?_?id$/i => qr/(.*?)s?$/i,
+          ],
+          rel_exclude => [
+              'foo_id' => 'foos.',
+              'foos.' => '',
+          ],
+        },
+        [ 'dbi:mysql:dbname="foo"', 'myuser', 'mypassword',
+          { loader_class => '::DBI::RelPatterns' }
+        ],
+    );
+
+    # from the command line or a shell script with dbicdump (distributed
+    # with DBIx::Class::Schema::Loader). Do `perldoc dbicdump` for usage.
+    dbicdump -o dump_directory=./lib \
+             -o components='["InflateColumn::DateTime"]' \
+             -o rel_constraint='[qr/(.*?)s?_?id$/i => qr/(.*?)s?$/i]' \
+             -o rel_exclude='["foo_id" => "foos."]' \
+             -o debug=1 \
+             My::Schema \
+             'dbi:mysql:dbname=foo' \
+             myuser \
+             mypassword \
+             '{ loader_class => "::DBI::RelPatterns" }'
+
+    ### or generate and load classes at runtime
+    # note: this technique is not recommended
+    # for use in production code
+    
+    package My::Schema;
+    use base qw/DBIx::Class::Schema::Loader/;
+    
+    __PACKAGE__->loader_options(
+        rel_constraint => [ qr/(.*?)s?_?id$/i => qr/(.*?)s?$/i ],
+        rel_exclude    => [ 'foo_id' => 'foos.' ],
+        # debug        => 1,
+    );
+
+    ### in application code elsewhere:
+    
+    use My::Schema;
+    
+    my $schema1 = My::Schema->connect($dsn, $user, $password,
+           { loader_class => '::DBI::RelPatterns', %attrs });
+    # -or-
+    my $schema1 = "My::Schema";
+    $schema1->connection(as above);
+    # -or-
+    my $schema1 = "My::Schema";
+    $schema1->loader_class('::DBI::RelPatterns');
+    $schema1->connection($dsn, $user, $password, $attrs);
+
+# DESCRIPTION
+
+DBIx::Class::Schema::Loader::DBI::RelPatterns is a pseudo loader class that provides the means to set up the table relationships when [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader) fails to for any reason. It is designed for use with storage engines that do not support foreign keys, such as MySQL's MyISAM; but should work with pretty much any DBI driver that:
+
+- properly supports `statistics_info` method ([DBD::mysql](https://metacpan.org/pod/DBD::mysql) does starting from version 4.029; [DBD::SQLite](https://metacpan.org/pod/DBD::SQLite) - from 1.40)
+- and, more important, is explicitly supported by [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader) DBI implementation.
+
+Unlike conventional loader classes, DBIx::Class::Schema::Loader::DBI::RelPatterns allows [DBIx::Class::Schema::Loader::DBI](https://metacpan.org/pod/DBIx::Class::Schema::Loader::DBI) to load a driver-specific class, then extends it and wraps some of its methods (hence the word "pseudo"), adding to the mix the relationship patterns, user-definable via ["rel\_constraint"](#rel_constraint) and ["rel\_exclude"](#rel_exclude) options (which are added to the base options of [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader)). If ["rel\_constraint"](#rel_constraint) option is not specified, DBIx::Class::Schema::Loader::DBI::RelPatterns becomes a no-op, passing through to the driver-specific class. Otherwise it helps to set up the relationships whenever corresponding columns in the referencing key and the referenced key meet all of the following conditions:
+
+- they match any of the `rel_constraint` patterns;
+- they match none of the `rel_exclude` patterns;
+- they have exactly the same or similar data types.
+
+In general, the columns also have to be indexed. However, `rel_constraint` patterns allow one to explicitly specify that being indexed is not mandatory. This seems like a bad idea, but you may want to (or even have to) do this if the DBI driver in use does not support `statistics_info` method, which is required to obtain the non-unique index information (which is useless to [DBIx::Class](https://metacpan.org/pod/DBIx::Class) but can help to avoid the false-positive `rel_constraint` pattern matches when patterns are not specific enough). Although in such a case the composite-key relationships may be left out, thus limiting the resulting [DBIx::Class](https://metacpan.org/pod/DBIx::Class) schema to simple-key relationships.
+
+When multiple columns in the referenced table meet the conditions, preference is given - in order of priority - to column that is listed in:
+
+- primary key;
+- unique key;
+- single-column index;
+- composite index as the first column or closer to the first column;
+- largest composite index.
+
+If a relationship pattern is way too vague, you may be warned that multiple columns or even tables meet the conditions for some foreign key and have equal priority. To avoid such warnings, either come up with a more specific relationship pattern or exclude the unwanted columns or tables via ["rel\_exclude"](#rel_exclude) option.
+
+By design, all determined relationships are considered to be _simple-key_ relationships. However, when multiple relationships between two tables are identified, and columns of these relationships are listed in the corresponding composite indexes as the first columns (i.e., they form the leftmost prefixes), then a _composite-key_ relationship is set up instead of multiple _simple-key_ ones.
+
+Note that `rel_constraint` and `rel_exclude` patterns do not affect the relationships that [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader) is able to identify unaided. That is, DBIx::Class::Schema::Loader::DBI::RelPatterns helps to add missing relationships but not alter or remove the ones already identified.
+
+# ADDED CONSTRUCTOR OPTIONS
+
+## rel\_constraint
+
+Specifies the relationship patterns between any two tables. Table relationship is set up only if its condition matches any of the specified patterns. The patterns are processed in the order in which they are specified - first in, first out.
+
+This option takes an arrayref with even number of elements (like in a hashref). Every odd element (pattern's left-hand side, a key) refers to the referencing table, while every even element (pattern's right-hand side, a value) refers to the table being referenced. Elements can be strings, qr// regexps, arrayrefs or hashrefs.
+
+Simplified syntax:
+
+    rel_constraint => [
+        # column foo_id in table bars references column id in table foos
+        'bars.foo_id' => 'foos.id',
+        
+        # column foo_id in any table references primary key in table foos
+        'foo_id' => 'foos.',
+        
+        # column (.+)_id in any table references primary key in table ${1}s
+        # e.g., foo_id => foos.id, bar_id => bars.id, baz_id => bazs.id etc.
+        qr/(.+)_id$/i => qr/(.+)s$/i,
+        
+        # column (.+)_id in any table references column id in table ${1}s
+        # including self-referential relationships
+        [ qr/(.+)s$/i, qr/(.+)_id$/i ] => [ qr/(.+)s$/i, 'id' ],
+    ]
+
+Strings, qr// regexps and arrayrefs actually are shortcuts to the hashrefs:
+
+    rel_constraint => [
+        'bar.foo_id' => 'db1.foos.id',
+        # hashref equivalents:
+        { tab=>'bar', col=>'foo_id' }
+            => { sch=>'db1', tab=>'foos', col=>'id' },
+        
+        'foo_id' => 'foos.id',
+        # hashref equivalents:
+        { col=>'foo_id' }
+            => { tab=>'foos', col=>'id' },
+        
+        qr/(.*?)s?_?id$/i => qr/(.*?)s?$/i,
+        # hashref equivalents:
+        { col=>qr/(.*?)s?_?id$/i }
+            => { tab=>qr/(.*?)s?$/i },
+        
+        [ qr/(.+)s$/i, qr/(.+)_id$/i ] => [ qr/(.+)s$/i, 'id' ],
+        # hashref equivalents:
+        { tab=>qr/(.+)s$/i, col=>qr/(.+)_id$/i }
+            => { tab=>qr/(.+)s$/i, col=>'id' },
+    ]
+
+If elements are qr// regexps, then the _key_ (pattern's left-hand side) refers to the referencing _column_ name, while the _value_ (pattern's right-hand side) refers to the referenced _table_ name.
+
+If element is a string in _'schema.table.column'_ format, then it gets split from right to left into column name, table name and schema name. That is, `'foo'` would be column, `'bar.'` would be table, `'baz..'` would be schema.
+
+The same principle applies to arrayrefs in _\['schema','table','column'\]_ format: `['foo']` would be column, `['bar','']` would be table, `['baz','','']` would be schema. Such an arrayref can contain strings and qr// regexps.
+
+If element is not a shortcut but a hashref, then it can have the following keys:
+
+- sch
+
+    Schema name; string or qr// regexp.
+
+- tab
+
+    Table name; string or qr// regexp.
+
+- col
+
+    Column name; string or qr// regexp.
+
+- index
+
+    Index restrictions. Accepted values:
+
+    - `'primary'` - match only primary keys;
+    - `'unique'` - match unique keys as well;
+    - `'any'` (default) - match also non-unique indexes (in other words, all indexed columns);
+    - `'optional'` (forced when ["tab"](#tab) and ["col"](#col) are non-empty strings) - match everything, including columns that are not indexed.
+
+- type
+
+    Level of similarity between column data types; applies to pattern's right-hand side. Accepted values:
+
+    - `'similar'` - ignore the size of column data types with size restriction (e.g., allow varchar(10) to reference varchar(15));
+    - `'exact'` (default) - require the size to match as well.
+
+- diag
+
+    Diagnostics of failures; false (default) or true, applies to pattern's right-hand side. If true, some diagnostic messages may be emitted, unless suppressed by the base `quiet` option.
+
+["sch"](#sch), ["index"](#index), ["type"](#type) and ["diag"](#diag) defaults can be adjusted by omitting ["tab"](#tab) and ["col"](#col). The following two are equivalent:
+
+    rel_constraint => [
+        # specify sch, index, type and diag explicitly, without touching the defaults
+        { sch=>qr/(.*)/, col=>qr/(.*?)s?_?id$/i, index=>'optional' }
+            => { sch=>qr/(.*)/, tab=>qr/(.*?)s?$/i, index=>'unique', type=>'similar', diag=>1 },
+    ]
+
+    rel_constraint => [
+        # adjust the defaults to forbid cross-schema relationships
+        { sch=>qr/(.*)/ } => { sch=>qr/(.*)/ },
+        # adjust other defaults
+        { index=>'optional' } => { index=>'unique', type=>'similar', diag=>1 },
+        # the adjusted defaults are applied to all patterns below
+        qr/(.*?)s?_?id$/i => qr/(.*?)s?$/i,
+    ]
+
+Note that self-referential relationships are set up only if ["tab"](#tab) is specified on both sides of the relationship pattern:
+
+    rel_constraint => [
+        # self-referential relationship (tab on both sides)
+        'foos.foo_id' => 'foos.id',
+        
+        # not including self-referential relationships;
+        # i.e. does not imply the relationship above
+        'foo_id' => 'foos.id',
+        
+        # self-referential relationships (tab on both sides)
+        [ qr/(.+)s$/i, qr/(.+)_id$/i ] => [ qr/(.+)s$/i, 'id' ],
+        
+        # not including self-referential relationships;
+        # i.e. does not imply the relationships above
+        { col=>qr/(.+)_id$/i } => { tab=>qr/(.+)s$/i, col=>'id' },
+    ]
+
+If qr// regexp creates capture groups, then the relationship is set up only when the captured contents of each regular expression within the given relationship pattern do match - with the exception of the captured contents of ["sch"](#sch) regular expressions because they are matched separately. For example, the following relationship pattern references column `(foo|bar|baz)_id` with column `${1}id` in table `${1}s`:
+
+    rel_constraint => [
+        { col=>qr/^(foo|bar|baz)_id$/ }
+            => { tab=>qr/^(foo|bar|baz)s$/, col=>qr/^(foo|bar|baz)id$/ },
+    ]
+
+Readable equivalent:
+
+    rel_constraint => [
+        'foo_id' => 'foos.fooid',
+        'bar_id' => 'bars.barid',
+        'baz_id' => 'bazs.bazid',
+    ]
+
+Generic version:
+
+    rel_constraint => [
+        qr/(.+)_id$/i => [ qr/(.+)s$/i, qr/(.+)id$/i ],
+    ]
+
+## rel\_exclude
+
+Specifies the relationship pattern exclusions. Table relationship is set up only if its condition matches none of the specified patterns.
+
+The syntax is borrowed from ["rel\_constraint"](#rel_constraint); however, only ["sch"](#sch), ["tab"](#tab), ["col"](#col) keys in hashref elements are supported, and default ["sch"](#sch) cannot be set.
+
+    rel_exclude => [
+        # column foo_id in any table should not reference column id in table foos
+        'foo_id' => 'foos.id',
+        
+        # column (.+)_id in any table should not reference column id in table ${1}s
+        qr/(.+)_id$/ => [ qr/(.+)s$/, 'id' ],
+        
+        # any column in table baz should not reference anything
+        'baz.' => '',
+        
+        # any column in tables like 'foo%' should not reference anything
+        { tab=>qr/^foo/ } => '',
+        
+        # anything in schema db1 should not reference anything in schema db2
+        'db1..' => 'db2..',
+        
+        # self-referential relationships should not be set up
+        { sch=>qr/(.*)/, tab=>qr/(.+)/ } => { sch=>qr/(.*)/, tab=>qr/(.+)/ },
+    ]
+
+# DIAGNOSTICS
+
+The following diagnostic messages, provided that `diag => 1` is in effect, may be emitted to clarify the reasons for some relationships not being set up:
+
+- `index mismatch`
+
+    Referenced column is not listed in an index that meets the chosen ["index"](#index) restrictions.
+
+- `unknown data type`
+
+    Data type of at least one of the corresponding columns is unknown while `type => 'exact'` is in effect.
+
+- `data type mismatch`
+
+    Corresponding columns in the referencing key and the referenced key have different data types.
+
+- `data type size mismatch`
+
+    Size restrictions of the corresponding columns' data types do not match while `type => 'exact'` is in effect.
+
+- `matched but excluded`
+
+    Relationship is excluded by a `rel_exclude` pattern.
+
+- `matched but not leftmost`
+
+    At least one of the corresponding columns is listed in a composite index not as the first column while a composite-key relationship cannot be set up and `index => 'optional'` is not in effect.
+
+- `matched but duplicated`
+
+    Duplicate relationship exists.
+
+# CAVEATS
+
+When DBIx::Class::Schema::Loader::DBI::RelPatterns is unable to obtain the non-unique index information, a warning is emitted, unless suppressed by the base `quiet` option. This happens if the DBI driver in use does not support `statistics_info` method. In such a situation, basically, `index => 'any'`, which is the default, has exactly the same effect as `index => 'unique'`. Most relationships cannot be identified with such restrictions because referencing keys seldom have unique constraints on them. To alleviate this problem, assuming updating the driver is not an option, ["index"](#index) defaults can be adjusted the following way:
+
+    rel_constraint => [
+        { index=>'optional' } => { index=>'unique' },
+        # ...
+    ]
+
+Bear in mind that with `index => 'optional'` the patterns have to be more specific to avoid the false-positive matches.
+
+# PREREQUISITES
+
+DBIx::Class::Schema::Loader::DBI::RelPatterns cannot be used with [DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader) versions prior to 0.05 because the ability to specify the loader class was not supported in the earlier versions.
+
+# SEE ALSO
+
+[DBIx::Class::Schema::Loader](https://metacpan.org/pod/DBIx::Class::Schema::Loader), [DBIx::Class::Relationship](https://metacpan.org/pod/DBIx::Class::Relationship), [DBIx::Class](https://metacpan.org/pod/DBIx::Class).
+
+# AUTHOR
+
+Aleksey Dvoriannikov <lewa::cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 Aleksey Dvoriannikov
+
+This is free software; you can redistribute it and/or modify it under the same terms as the Perl 5 programming language system itself.
+
+This program is distributed in the hope that it will be useful, but without any warranty; without even the implied warranty of merchantability or fitness for a particular purpose. See either the GNU General Public License or the Artistic License for more details.

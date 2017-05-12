@@ -1,0 +1,29 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [EnsureDepakable]
+
+DESCRIPTION
+
+    This plugin helps make sure that you do not add a (direct, or indirect)
+    dependency to a non-core XS module, so that all your distribution's
+    modules can be use-d by a script that wants to be packed so it can be
+    run with only requiring core perl modules.
+
+    See Module::Depakable for more details on the meaning of "depakable".
+
+ENVIRONMENT
+
+ DZIL_ENSUREDEPAKABLE_SKIP => bool
+
+    Can be set to 1 to skip checking depakable.
+
+SEE ALSO
+
+    App::depak
+
+    Module::Depakable, depakable
+
+    Dist::Zilla::Plugin::Depak
+

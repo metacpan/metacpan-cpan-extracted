@@ -1,0 +1,22 @@
+--- #YAML:1.0
+name:               Data-RoundRobinShared
+version:            0.11
+abstract:           Serve data in a round robin manner, keeping the data in a shared memory so that it can be used by multiple processes and each get data in a roundrobin manner.
+author:
+    - S Pradeep <pradeep@pradeep.net.in>
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    IPC::Shareable:  0.6
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.54
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

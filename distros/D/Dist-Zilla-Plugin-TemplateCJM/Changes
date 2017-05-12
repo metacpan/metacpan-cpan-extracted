@@ -1,0 +1,96 @@
+Revision history for Dist::Zilla::Plugin::TemplateCJM
+
+Note: This plugin was previously part of Dist-Zilla-Plugins-CJM.
+Some version numbers are skipped here because there were no changes
+to this plugin in that release of Dist-Zilla-Plugins-CJM.
+
+
+5.001  2015-12-12
+	- don't add coercions to named types
+
+5.000  2015-12-05
+	- don't "use Moose::Autobox" (Dist::Zilla doesn't use it anymore)
+	- drop support for Dist::Zilla 4.
+	  (Tests were failing, and Dist::Zilla 5 is 2 years old now.)
+
+4.24   2015-10-03
+	- Module::Metadata 1.000028 returns "main" as the package
+	  of a pure-POD file with no package statement (while
+	  previous versions returned the empty string).	 TemplateCJM
+	  now handles either case, substituting a module name derived
+	  from the filename.
+	  (TemplateCJM 4.12-4.23 do that only with pre-1.000028)
+
+4.23   2015-07-11
+	- add $filename and $pathname as available template variables
+
+4.22   2014-04-26
+	- can now handle non-ASCII Changes file with Dist::Zilla 5
+
+4.21   2013-09-07
+	- now allows release note if date conforms to CPAN::Changes::Spec
+
+4.20   2013-08-17
+	- now a separate distribution from Dist-Zilla-Plugins-CJM
+	- can now reformat date from Changes (add date_format parameter)
+
+4.12   2013-01-12
+	- handle pure-POD files without package declaration or $VERSION
+	  (Must be named *.pod and found in lib/ directory.)
+
+4.10   2012-08-03
+	- normalize Perl version in dependency_list
+	- remove leading "v" from versions in dependency_list
+
+4.09   2012-06-04
+	- add report_versions parameter
+
+4.00   2011-11-01
+	- Add changelog_re parameter
+	- Tests now use Test::DZil
+
+3.05   2011-05-05
+	- Fix dependency_list to handle no dependencies
+
+3.04   2010-12-20
+	- Updated docs to talk about Module::Metadata
+
+3.03   2010-12-07
+	- Only process comments that contain a {{ }} pair.
+	  Text::Template breaks on strings that have the closing
+	  delimiter without the opening one.
+
+3.00   2010-05-22
+	- Now requires & compatible with Dist::Zilla 3
+
+0.08   2010-04-14
+	- added build_instructions method
+	- In templates, $changes no longer ends with a newline
+
+0.07   2010-04-01
+	- added tests
+
+0.06   2010-04-01
+	- is now a FileFinderUser
+
+0.05   2010-03-30
+	- Add SYNOPSIS
+	- Revised compile tests
+	- Now requires Dist::Zilla 2
+
+0.03   2010-03-15
+	- Includes a new version of Template_strict.patch that
+	  supports scalar references properly
+	- Is now an InstallTool instead of a FileMunger, because
+	  prerequisites have not been calculated at FileMunger time
+	- Added the dependency_link & dependency_list methods
+	- Added a BeforeRelease check to ensure the release date is
+	  not just an uppercase word
+
+0.02   2010-03-07
+	- Added POD tests
+	- Use the plugin's log method so the plugin name appears in the log
+	- Also process comments that start at beginning of line
+
+0.01   2009-10-11
+	- Initial release

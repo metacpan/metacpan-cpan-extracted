@@ -1,0 +1,69 @@
+DBIx::Timeout
+
+DESCRIPTION
+
+    This module provides a safe method of timing out DBI requests. An unsafe
+    method is described in the DBI docs:
+
+       http://search.cpan.org/~timb/DBI/DBI.pm#Signal_Handling_and_Canceling_Operations
+
+    The problem with using POSIX sigaction() is that it relies on unsafe
+    signals to work. Unsafe signals are well known to cause instability. For
+    example, imagine your DB client code is in the middle of updating some
+    global state when the signal arrives. That global state could be left in
+    an inconsitent state, just wait for the next time it is needed to cause
+    problems. Since this will likely occur far from the cause, and only ocur
+    rarely, it can be a very difficult problem to track down.
+
+    Instead, this module:
+
+      - Forks a child process which sleeps for $timeout seconds.
+
+      - Runs your long-running query in the parent process.
+
+      - If the parent process finishes first it kills the child and
+        returns.
+
+      - If the child process wakes up it kills the parent's DB thread and
+        exits with a code so the parent knows it was timed out.
+
+    NOTE: After this call your database connection may be killed even if no
+    timeout occurred. This is due to a race condition - the child may wake
+    up just as parent process finishes. Patches addressing this bug are
+    welcome. Until this is fixed you should be ready to reconnect after
+    call_with_timeout().
+
+DATABASE SUPPORT
+
+    This release supports only MySQL. I would appreciate patches from users
+    of other databases. Your patch will need to provide code to kill a
+    running query. In MySQL this uses the KILL command.
+
+PREREQUISITES
+
+    DBI 1.49
+    Test::More
+    Params::Validate
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc DBIx::Timeout
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2006 Sam Tregar
+
+This program is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.

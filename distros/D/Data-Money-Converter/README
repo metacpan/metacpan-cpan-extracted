@@ -1,0 +1,54 @@
+NAME
+
+Data::Money::Converter - Moo Role for Data::Money Converters.
+
+DESCRIPTION
+
+This simple  module provides a base for building currency conversion backends for
+L<Data::Money>. You can use  this module either as a basis for understanding the
+the common features or as a guide for implmenting your own converter.
+
+SYNOPSIS
+
+    package MoneyConverter;
+
+    use Moo;
+    use namespace::clean;
+    with 'Data::Money::Converter';
+
+    sub convert {
+        my ($self, $money, $code) = @_;
+
+        return $money->clone(
+            value => $money->value * 2,
+            code  => $code
+        );
+    }
+
+    1;
+
+METHODS
+
+This role requires that you  implement  a C<convert> method. It should expect two
+arguments: an isntance of L<Data::Money> and a 3-character currency code. It does
+not do any checking of the code as not all conversion implementations may support
+all codes.  It is recommended that you consult L<Locale::Currency>.
+
+AUTHOR
+
+Cory G Watson.
+Currently maintained by Mohammad S Anwar (MANWAR).
+
+REPOSITORY
+
+https://github.com/manwar/Data-Money-Converter
+
+=head1 COPYRIGHT & LICENSE
+
+Copyright 2010 Cory G Watson.
+
+This program is free software; you can redistribute it and/or modify it under the
+terms of either: the GNU General Public License as published by the Free Software
+Foundation; or the Artistic License.
+
+See http://dev.perl.org/licenses/ for more information.

@@ -1,0 +1,44 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c0bde3831accd6c5514350b48b7be316103a5050 Changes
+SHA1 e882f37776e763ccd10115567224e7c0dca3f940 Fast.xs
+SHA1 2ee21bf2e8ef8293b38a9de8c4f642e011d3f599 MANIFEST
+SHA1 39f45276a11ca6c268ac76811e8111675ab6d696 META.yml
+SHA1 eebd80525a9ed43837619f4de086877f1dfd1c16 Makefile.PL
+SHA1 d40e9bcaebbb63996b1f7655b00a691a5f1b360d README
+SHA1 b2f5809a83ea92c5e6cd7bb569d8443cd474d3da TODO
+SHA1 3f3ab49a357af8667cfc69e9d3893156afa732f1 buffer.c
+SHA1 ec1aaf0b62690aae71dd8367ad0454ccb746b0c8 buffer.h
+SHA1 730e799e2dd115dc73b4feb383682e53a7277873 common.h
+SHA1 47aa7f35a22704f80c8913d14b3b9afee9c05cbe hash.c
+SHA1 8da17d873d339f1f7573a5860ac69310ea22ca0b hash.h
+SHA1 411ffe56b2f7ef3a7a31edf5eb00b554cce6117c lib/Devel/LeakTrace/Fast.pm
+SHA1 2d706099a65edb392a80835515ff0100d4aeb736 list.c
+SHA1 39f22fe33fea82f0f32af2e066c901b44514a022 list.h
+SHA1 c78d376f89ecdc6b99c5e1998b87f081c0c37f70 t/00.load.t
+SHA1 7c82f8b6efe5d2dbf3ca87ba12f21d848ae8206c t/01.basic.t
+SHA1 142e3fbf59ea001ca6c82ef4977ec9921937326a tools.c
+SHA1 ca813a70e5b9642458ab46761a97962b4268d33c tools.h
+SHA1 c513d4aca0ee487340cd4bdb6296ef0db183505a xt/author/pod-coverage.t
+SHA1 0190346d7072d458c8a10a45c19f86db641dcc48 xt/author/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.7 (Darwin)
+
+iD8DBQFHReSswoknRJZQnCERAh5DAKC1ekUI8q6qiIpQROnlj3P6FCiR/wCg2qwd
+qJB77opuBTxEyfWN2dFqgws=
+=uM2Q
+-----END PGP SIGNATURE-----

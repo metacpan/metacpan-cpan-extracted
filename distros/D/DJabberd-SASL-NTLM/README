@@ -1,0 +1,38 @@
+DJabberd-SASL-NTLM
+===============================
+
+Plugin that allow NTLM authentification using samba ntlm_auth helper through winbind
+
+Add this to djabberd conf:
+
+<Plugin DJabberd::SASL::NTLM>
+    Optional yes
+    NTLMAuthHelper /usr/bin/ntlm_auth --helper-protocol=squid-2.5-ntlmssp
+</Plugin>
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+   DJabberd subversion revision >= r864
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2009-2011 by Vladimir Lettiev
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.3 or,
+at your option, any later version of Perl 5 you may have available.
+
+

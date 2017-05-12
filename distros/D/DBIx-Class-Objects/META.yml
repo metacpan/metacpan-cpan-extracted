@@ -1,0 +1,39 @@
+---
+abstract: 'Rewrite your DBIC objects via inheritance'
+author:
+  - 'Dan Burke <dburke@addictmud.org>'
+build_requires:
+  DBIx::Class::Core: '0'
+  DBIx::Class::EasyFixture: '0'
+  DBIx::Class::Schema: '0'
+  DateTime: '0'
+  Test::More: '0'
+  Test::Most: '0'
+  lib: '0'
+  perl: '5.006'
+  utf8: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.037, CPAN::Meta::Converter version 2.150001'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DBIx-Class-Objects
+requires:
+  Carp: '0'
+  Class::Load: '0'
+  Exporter: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Moose::Util: '0'
+  MooseX::Role::Parameterized: '0'
+  base: '0'
+  namespace::autoclean: '0'
+  strict: '0'
+  warnings: '0'
+resources:
+  homepage: https://github.com/dwburke/dbix-class-objects
+  repository: https://github.com/dwburke/dbix-class-objects.git
+version: '0.05'

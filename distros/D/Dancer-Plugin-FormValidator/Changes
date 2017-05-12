@@ -1,0 +1,36 @@
+Revision history for Dancer-Plugin-FormValidator
+
+1.131620  2013-06-11 17:54:22 Europe/Paris
+
+    Use version_for with register_plugin
+
+1.122610  2012-09-17 22:28:13 Europe/Paris
+
+    Fix test check if the module is installed
+
+1.122460  2012-09-02 19:29:52 Europe/Paris
+
+    Add new tests
+    Don't use a global variable to get settings
+    Fix documentation
+    Fix prereqs depends
+
+1.122350  2012-08-22 22:09:39 Europe/Paris
+
+    Accept multiple format for profile file
+    Review documentation
+    Use Dist::Zilla to manage release process
+    Improve code, fix typo and little cosmetic thing
+    Add a new function dfv
+
+0.4 29/04/2011
+    Clean and fix encoding in a pod.
+
+0.3 17/10/2010
+    Use setting('appdir') for to know the path of application, and concat with file name.
+
+0.2 16/10/2010
+    Errors can return hash with errors or use halt().
+
+0.1 11/10/2010
+    Initial version developed.

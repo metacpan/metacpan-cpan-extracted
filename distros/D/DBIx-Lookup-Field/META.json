@@ -1,0 +1,42 @@
+{
+   "abstract" : "Create a lookup hash from a database table",
+   "author" : [
+      "Marcel Gruenauer <marcel@cpan.org>"
+   ],
+   "build_requires" : {
+      "English" : "0",
+      "File::Find" : "0",
+      "File::Temp" : "0",
+      "Scalar::Util" : "0",
+      "Test::More" : "0.94"
+   },
+   "configure_requires" : {
+      "ExtUtils::MakeMaker" : "6.31"
+   },
+   "generated_by" : "Dist::Zilla version 2.100960",
+   "license" : "perl",
+   "meta-spec" : {
+      "url" : "http://module-build.sourceforge.net/META-spec-v1.4.html",
+      "version" : 1.4
+   },
+   "name" : "DBIx-Lookup-Field",
+   "provides" : {
+      "DBIx::Lookup::Field" : {
+         "file" : "lib/DBIx/Lookup/Field.pm",
+         "version" : "2.101420"
+      }
+   },
+   "recommends" : {},
+   "requires" : {
+      "Carp" : "0",
+      "Exporter" : "0",
+      "perl" : "5.008"
+   },
+   "resources" : {
+      "bugtracker" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Lookup-Field",
+      "homepage" : "http://search.cpan.org/dist/DBIx-Lookup-Field/",
+      "repository" : "http://github.com/hanekomu/DBIx-Lookup-Field"
+   },
+   "version" : "2.101420"
+}
+

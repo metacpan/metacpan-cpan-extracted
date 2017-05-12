@@ -1,0 +1,10 @@
+$f=shift@ARGV;
+$_=$f;
+s/\.pm/\.html/;
+s/$\.\./pod/;
+$out = $_;
+$title = $_;
+s/\.html//;
+$cmd = "pod2html -htmlroot '/pod' --infile $f --outfile $out --title $_";
+print "$cmd\n";
+print `$cmd`;

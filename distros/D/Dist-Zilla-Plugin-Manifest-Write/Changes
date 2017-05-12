@@ -1,0 +1,193 @@
+Release history for perl-Dist-Zilla-Plugin-Manifest-Write
+
+v0.9.7 @ 2016-12-14 22:51 UTC
+
+    -   `manifest_skip` option introduced.
+
+    -   `examples.t` fails with `Dist::Zilla` < 5.038 because test uses `:ExtraTestFiles` file
+        finder. The test fixed to skip, not fail (still fails in AUTHOR_TESTING mode).
+
+v0.9.6 @ 2016-12-03 22:41 UTC
+
+    -   `exclude_files` option introduced.
+
+    -   Directory with examples renamed from `ex/` to `eg/`.
+
+v0.9.5 @ 2015-10-30 21:52 UTC
+
+    -   Short license notice used in POD.
+
+    -   Test fails with `ErrorLogger` v0.9.0. Test updated to work with this `ErrorLogger`. Back
+        side is that tests now require `ErrorLogger` v0.9.0.
+
+v0.9.4 @ 2015-10-12 23:30 UTC
+
+    [Infrastructure]
+
+    -   Distribution rebuilt with `Dist-Zilla-PluginBundle-Author-VDB` v0.9.0, which enables few
+        more extra tests.
+
+    [Documentation]
+
+    -   A typo in link found by a new extra test. Fixed.
+
+v0.9.3 @ 2015-10-07 08:03 UTC
+
+    [Tests]
+
+    -   Version of required `Dist::Zilla::Plugin::Test::EOL` specified explicitly as 0.14 to
+        avoid test failure due to different test file name: this version generates `eol.t`,
+        previous versions generate `test-eol.t`.
+
+v0.9.2 @ 2015-10-04 21:21 UTC
+
+    [Tests]
+
+    -   Version of required `Dist::Zilla::Plugin::Test::NoTabs` specified explicitly as 0.09 to
+        avoid test failure due to different test file name: this version generates author test,
+        previous versions generate release test.
+
+v0.9.1 @ 2015-10-03 08:39 UTC
+
+    [Tests]
+
+    -   Cygwin has problem with backslashes. It silently converts backslashes to slashes, e. g.
+        `file\name` becomes `file/name`, and file creation fails because directory `file/` does not
+        exists. Tests modified to not use filenames with backslashes on Cygwin.
+
+v0.9.0 @ 2015-10-02 20:00 UTC
+
+    [Note]
+
+    -   In previous versions of the plugin, the term "plugin name" was not used properly. Actually,
+        sometimes it was used instead of "plugin moniker". "Plugin name" and "plugin moniker" terms
+        are almost interchangeable in trivial cases, but in general case they are not.
+
+    -   In this version, a section explaining these terms is added to the user manual. User manual,
+        code and comments revisited to clarify what is meant or required in each case. If you find
+        the documentation is still unclear, let me know.
+
+    -   I discovered file history log maintained by `Dist::Zilla` is unreliable. Only the file
+        adder (aka injector) is recorded properly, file mungers are guessed, see
+        <https://github.com/rjbs/Dist-Zilla/issues/495>, and "File Mungers" in the user manual.
+        Because of unreliable information, all the file mungers are stripped down from annotations,
+        only file adders left. If you want to enable old behaviour, use `show_mungers` option.
+
+    [Usage]
+
+    -   Options `source_providers` and `metainfo_providers` changed a bit. Now they interpret as
+        delimiter any whitespace character (`\s`) not just plain space (` `).
+
+    -   Options `source_provider` and `metainfo_provider` introduced. Each option treats its value
+        as *one* plugin name. It allows to operate with plugin names containing spaces.
+
+    -   Option `show_mungers` introduced. By default mungers are not shown because this information
+        is unreliable.
+
+    -   `CPANFile` plugin name is added to default metainfo providers.
+
+    [Fixed Bugs]
+
+    -   When the plugin adds itself to the list of metainfo providers, it adds plugin moniker (but
+        should add plugin name).
+
+    -   Plugins used in testing (e. g. `Test::Compile`) are not included into `Meta.JSON` as test
+        requirements, it causes test failure.
+
+    -   If filename includes hash character, filename in manifest is still written as-is. It may
+        cause interpreting such a file as comment.
+
+    [Code]
+
+    -   From user point of view, this version is almost compatible with the previous (except very
+        minor change in `source_providers` and `metainfo_providers`). However, in class interface
+        there are incompatible changes. Some methods are renamed, some changed, so subclasses or
+        other clients should be modified to work with the new version. (Frankly, I do not think
+        someone uses it programmatically.)
+
+    [Tests]
+
+    -   `example.t` test is too sensitive: it requires the manifest samples saved in `ex/`
+        subdirectory, are generated with current version of the plugin, otherwise the test fails
+        due to different files. The test fixed. Now change in the plugin version does not cause the
+        test failure.
+
+    -   Added a test routine (it is used in every test) to read generated manifest with
+        `ExtUtils::Manifest::maniread` and verify read content. That actually means my manifest is
+        tested on compatibility with `MakeMaker`.
+
+    -   Examples are tested now, see `examples.t`.
+
+v0.8.1 @ 2015-09-15 21:00 UTC
+
+    -   Bunch of build infrastructure changes, not visible to end users.
+
+    -   `ReadMe.pod` dropped.
+
+    -   Version switched from old decimal style to new dotted-decimal style.
+
+0.008 @ 2015-08-10 14:37 UTC
+
+    -   Debug message improved. Old message was a caught exception and being printed with no
+        explanation, was a bit frightening.
+
+    -   Packaging bug fixed: `Utils::fill_in` trigged creation metadata too early, even before file
+        gathering is complete. This breaks `MetaProvides::Package` plugin, and leads to empty
+        `provides` metadata, so v0.007 was not properly indexed by CPAN.
+
+0.007 @ 2015-08-09 17:57 UTC
+
+    -   A test module now explicitly requires `Moose` v2.0800. Older `Moose` versions causes test
+        failure.
+
+0.006 @ 2015-07-23 19:11 UTC
+
+    -   Implemented validation of `source_providers` and `metainfo_providers` options.
+
+    -   Implemented option `strict` which controls strictness of checks above.
+
+    -   As usual, bunch of infrastructure changes.
+
+0.005 @ 2015-07-15 20:47 UTC
+
+    -   Added support for templates with non-standard names. e. g. `[=MyLocalPlugin]`.
+
+    -   Word "built" is used instead of "generated" in `MANIFEST`. It is shorter, and has the same
+        lengths as "added", so text now looks much better.
+
+    -   Changed detection of generated files. Now the plugin checks file class — if a file is of
+        `Dist::Zilla::File::OnDisk` class, it is considered as added file, otherwise — -generated-,
+        sorry, built.
+
+    -   Code reorganized for better modularity. Now it is easier to hack the plugin through
+        subclassing.
+
+0.004 @ 2015-07-09 14:23 UTC
+
+    -   **Incompatible change:** `dist.ini` file options `source_provider` and `metainfo_provider`
+        are replaced with plural counterparts: `source_providers` and `metainfo_providers`. New
+        options allow users to specify multiple space-separated providers in one option. Multiple
+        options are also allowed, as before.
+
+    -   Documentation improved.
+
+    -   Bunch of infrastructure changes not visible to the module users: (a) test rewritten with
+        `Test::Routine`, (b) documentation generation reworked, (c) added special test for
+        synopsis, (d) added bunch of generated tests like POD spell checking.
+
+0.003 @ 2015-07-06 13:31 UTC
+
+    -   `Dist-Zilla` older than v5.023 causes runtime error because `_added_by` field was a string,
+        not arrayref. Now `Write.pm` explicitly requires `Dist::Zilla::Role::File` v5.023 to avoid
+        this error.
+
+    -   Build: `Test::PodSpelling` plugin used, few spelling errors found and fixed.
+
+0.002 @ 2015-07-04
+
+    -   `AutoPrereqs` `Dist-Zilla` plugin fails to detect some implicit prereqs in test script, it
+        may cause test failure. Code changed to make that hidden dependencies explicit.
+
+0.001 @ 2015-07-03
+
+    -   Initial revision

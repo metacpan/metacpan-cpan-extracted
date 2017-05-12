@@ -1,0 +1,23 @@
+version 0.002; 2013-08-17
+
+  * in the module used for testing, explicitly export symbols, and
+    declare them at link time with dl_func_list, for those platforms
+    that require it
+
+version 0.001; 2012-02-07
+
+  * duplicate small functions from Params::Classify and Module::Runtime,
+    rather than importing from those modules, to avoid circular dependency
+    problems (affecting both installation and runtime)
+
+  * load modules Carp and DynaLoader lazily, to avoid excessive startup
+    delay and potential circular dependencies
+
+  * make the module used for testing more amenable to picky compilation
+    toolchains
+
+  * convert .cvsignore to .gitignore
+
+version 0.000; 2011-05-16
+
+  * initial released version

@@ -1,0 +1,19 @@
+use lib '/home/nuba/flux/ayuu/wip/ddp/filter/Data-Printer-Filter-JSON/lib';
+
+BEGIN {
+    $ENV{ANSI_COLORS_DISABLED} = 1;
+    delete $ENV{DATAPRINTERRC};
+    use File::HomeDir::Test;    # avoid user's .dataprinter
+}
+
+use Data::Printer { filters => { -external => ['JSON'], }, };
+
+sub input {
+  return '{"alpha":true,"beta":false,"gamma":true,"zeta":false}';
+}
+
+sub expected {
+  return "\\ {\n    alpha   true,\n    beta    false,\n    gamma   true,\n    zeta    false\n}";
+}
+
+1;

@@ -1,0 +1,9 @@
+Dancer-Logger-LogHandler
+
+This class is an interface between Dancer's logging engine abstraction layer
+and the Log::Handler module.
+
+In order to use this engine, set the following setting as follow:
+
+  logger: 'log_handler'
+

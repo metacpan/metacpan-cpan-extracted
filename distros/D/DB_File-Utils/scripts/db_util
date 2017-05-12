@@ -1,0 +1,41 @@
+#!perl
+use DB_File::Utils;
+DB_File::Utils->run;
+
+=encoding UTF-8
+
+=head1 NAME
+
+db_util - some utilities for DB_File managing
+
+=head1 SYNOPSIS
+
+    $ db_util keys dbfile.db > keys.txt
+
+    $ db_util get dbfile.db key > value.txt
+
+=head1 DESCRIPTION
+
+Some basic tools useful when you have DB_Files with textual data
+and need to debug or access their contents, and you are not willing
+to create a script for that task.
+
+=head1 COMMANDS
+
+=head2 keys
+
+Given a list of dbfiles, list their keys, one per line, to the
+standard output.
+
+=head2 get
+
+Given a dbfile and a specific key, prints the respective value
+to the standard output.
+
+=head1 SEE ALSO
+
+DB_File::Utils (3)
+
+=head1 AUTHOR
+
+Alberto Simões C<< <ambs@cpan.org> >>

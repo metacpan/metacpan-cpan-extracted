@@ -1,0 +1,53 @@
+0.13 Tue Aug  5 2014 Pavel Shaydo <zwon@cpan.org>
+    - add filter attribute to EventStream
+
+0.12 Thu Jul 24 2014 Pavel Shaydo <zwon@cpan.org>
+    - change the place from which window_update is called when event is
+      added. This affects aggregators with mixed count/duration windows
+    - improve Statistics::Continuous aggregator
+
+0.11 Wed Jul 23 2014 Pavel Shaydo <zwon@cpan.org>
+    - documentation improvements
+
+0.10 Sun Jul 13 2014 Pavel Shaydo <zwon@cpan.org>
+    - minor test refactoring
+    - added link to gh-pages as home page
+
+0.09 Thu Jun 26 2014 Pavel Shaydo <zwon@cpan.org>
+    - significant performance improvements
+    - get_event(0) now returns oldest event in the window
+    - iterator now iterates from oldest event to most recent
+    - renamed statistics aggregators
+
+0.08 Sun Jun 15 2014 Pavel Shaydo <zwon@cpan.org>
+    - remove shift option for aggregators
+    - add disposable aggregators
+
+0.07 Wed Jun 11 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix failing test
+
+0.06 Wed Jun 11 2014 Pavel Shaydo <zwon@cpan.org>
+    - add aggregators for calculation of sample based and time weighted statistics
+    - add get_iterator method to Window
+    - add next_leave method to EventStream
+    - refactor tests
+    - add simple benchmarking script
+
+0.05 Thu May 22 2014 Pavel Shaydo <zwon@cpan.org>
+    - remove type parameter from aggregators
+    - automatically update model time when event added
+    - support aggregators limited by count and duration at the same time
+    - update time window for count aggregators
+
+0.04 Tue May 20 2014 Pavel Shaydo <zwon@cpan.org>
+    - implement batch mode for time aggregators
+    - require perl 5.10
+
+0.03 Sun May 18 2014 Pavel Shaydo <zwon@cpan.org>
+    - completely reworked version
+
+0.02 Mon Apr  7 2014 Pavel Shaydo <zwon@cpan.org>
+    - fix dependencies
+
+0.01 Sun Apr  6 2014 Pavel Shaydo <zwon@cpan.org>
+    - First version, released on an unsuspecting world.

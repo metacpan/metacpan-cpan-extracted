@@ -1,0 +1,19 @@
+Revision history for Dancer2-Logger-Fluent
+
+0.06  2017-01-25 08:39:14 SGT
+        - Fix deref on pending messages without first checking for existence
+
+0.05  2017-01-21 15:33:04 SGT
+        - Run POD-related tests only for authors (RT #119920)
+
+0.04  2017-01-20 16:22:24 SGT
+        - Fix naked predicate subroutines on Test::Pod::Coverage (RT #119920)
+
+0.03  2017-01-20 12:53:06 SGT
+        - Queue messages for deferred flushing if fluent is down (#1)
+
+0.02  2017-01-20 11:06:56 SGT
+        - Fix tests to not expect fluent to be running
+
+0.01  2017-01-18 17:22:10 SGT
+        - Initial release

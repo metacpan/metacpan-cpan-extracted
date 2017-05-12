@@ -1,0 +1,31 @@
+---
+abstract: 'extract probable dates from strings'
+author:
+  - 'Shawn M Moore, C<< <sartak at bestpractical dot com> >>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+  Test::MockTime: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.17'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Date-Extract
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Carp: 0
+  Class::Data::Inheritable: 0
+  DateTime::Format::Natural: '0.60'
+  List::Util: 0
+  parent: 0
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.06'

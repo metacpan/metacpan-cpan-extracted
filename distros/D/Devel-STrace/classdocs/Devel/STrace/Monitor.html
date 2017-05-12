@@ -1,0 +1,390 @@
+
+<html>
+<head>
+<title>Devel::STrace::Monitor</title>
+</head>
+<body>
+<table width='100%' border=0 CELLPADDING='0' CELLSPACING='3'>
+<TR>
+<TD VALIGN='top' align=left><FONT SIZE='-2'>
+ SUMMARY:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_summary'>METHOD</a>
+ </FONT></TD>
+<TD VALIGN='top' align=right><FONT SIZE='-2'>
+DETAIL:&nbsp;CONSTR&nbsp;|&nbsp;<A HREF='#method_detail'>METHOD</a>
+</FONT></TD>
+</TR>
+</table><hr>
+<h2>Class Devel::STrace::Monitor</h2>
+
+<hr>
+
+Provides a minimal strace/truss-like utility for
+Perl scripts. Using <a href='http://search.cpan.org/perldoc?Devel::RingBuffer'>
+Devel::RingBuffer</a>, each new subroutine call is logged to an mmap'ed shared memory
+region (as provided by <a href='http://search.cpan.org/perldoc?IPC::Mmap'>IPC::Mmap</a>).
+As each statement is executed, the line number and Time::HiRes:;time() timestamp
+are written to the current ringbuffer slot. An external application can
+then monitor a running application by inspecting the mmap'ed area.
+<p>
+Permission is granted to use this software under the same terms as Perl itself.
+Refer to the <a href='http://perldoc.perl.org/perlartistic.html'>Perl Artistic License</a>
+for details.
+
+
+<p>
+
+<dl>
+
+<dt><b>Author:</b></dt>
+	<dd>D. Arnold</dd>
+
+<dt><b>Version:</b></dt>
+	<dd>0.30</dd>
+
+<dt><b>Since:</b></dt>
+	<dd>2006-05-01
+</dd>
+
+<dt><b>See Also:</b></dt>
+	<dd><a href='http://perldoc.perl.org/perldebguts.html'>perdebguts</a></dd>
+
+<p>
+<i>Unless otherwise noted, <code>$self
+</code> is the object instance variable.</i>
+<p>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Constructor Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#Devel::STrace::Monitor'>open</a>($file)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Opens the specified filename, or,
+if no filename is specified, the filename specified by
+the DEVEL_RINGBUF_FILE environment variable, using
+<a href='http://search.cpan.org/perldoc?Devel::RingBuffer'>Devel::RingBuffer</a>
+</td></tr>
+</table><p>
+
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'><th align=left><font size='+2'>Method Summary</font></th></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getPIDTIDs'>getPIDTIDs</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the current list of PID:TID keys
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSignal'>getSignal</a>(@pid_tid_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ringbuffer per-thread signal
+control variable value for the specified PIDs or PID:TIDs
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getSingle'>getSingle</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the current ringbuffer global single
+control variable value
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#getTrace'>getTrace</a>(@pid_tid_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Get the ringbuffer per-thread trace
+control variable value for the specified PIDs or PID:TIDs
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#refresh'>refresh</a>()</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Refresh the PID/TID buffer map
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setSignal'>setSignal</a>(@pid_tid_list, $value)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the ringbuffer per-thread signal
+control variable value for the specified PID or PID:TID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setSingle'>setSingle</a>($value)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the current ringbuffer global single
+control variable value
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#setTrace'>setTrace</a>(@pid_tid_list, $value)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Set the ringbuffer per-thread trace
+control variable value for the specified PID or PID:TID
+</td></tr>
+
+<tr><td align=left valign=top>
+<code><a href='#trace'>trace</a>($trace_cb, @pid_tid_list)</code>
+
+<BR>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Dump the mmap'ed ringbuffer file contents
+</td></tr>
+</table>
+<p>
+
+<a name='constructor_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Constructor Details</font></th>
+</tr>
+</table>
+
+<a name='open'></a>
+<h3>open</h3>
+<pre>
+open($file)
+</pre><p>
+<dl>
+<dd>Opens the specified filename, or,
+if no filename is specified, the filename specified by
+the DEVEL_RINGBUF_FILE environment variable, using
+<a href='http://search.cpan.org/perldoc?Devel::RingBuffer'>Devel::RingBuffer</a>.
+Performs an initial scan of the file to create a PID/TID buffer map.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$file</code> - name of the mmap()'d file (or namespace on Win32)
+</dd>
+<dt><b>Returns:</b><dd>on success, a new Devel::STrace::Monitor object;
+undef on failure.
+</dd>
+</dl></dd></dl><hr>
+
+<p>
+
+<a name='method_detail'></a>
+<table border=1 cellpadding=3 cellspacing=0 width='100%'>
+<tr bgcolor='#9800B500EB00'>
+	<th align=left><font size='+2'>Method Details</font></th>
+</tr></table>
+
+<a name='getPIDTIDs'></a>
+<h3>getPIDTIDs</h3>
+<pre>
+getPIDTIDs()
+</pre><p>
+<dl>
+<dd>Get the current list of PID:TID keys.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>a list of currently active PID:TID keys from the Devel::RingBuffer
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSignal'></a>
+<h3>getSignal</h3>
+<pre>
+getSignal(@pid_tid_list)
+</pre><p>
+<dl>
+<dd>Get the ringbuffer per-thread signal
+control variable value for the specified PIDs or PID:TIDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@pid_tid_list</code> - optional list of PIDs, or "PID:TID", keys to get signal for;
+if no keys are specified, all keys are used
+
+</dd>
+<dt><b>Returns:</b><dd>a hash of the Devel::RingBuffer signal values, keyed
+by the "PID:TID"
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getSingle'></a>
+<h3>getSingle</h3>
+<pre>
+getSingle()
+</pre><p>
+<dl>
+<dd>Get the current ringbuffer global single
+control variable value.
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the current Devel::RingBuffer global single value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='getTrace'></a>
+<h3>getTrace</h3>
+<pre>
+getTrace(@pid_tid_list)
+</pre><p>
+<dl>
+<dd>Get the ringbuffer per-thread trace
+control variable value for the specified PIDs or PID:TIDs.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@pid_tid_list</code> - optional list of PIDs, or "PID:TID", keys to get trace for;
+if no keys are specified, all keys are used
+
+</dd>
+<dt><b>Returns:</b><dd>a hash of the Devel::RingBuffer trace values, keyed
+by the "PID:TID"
+</dd>
+</dl></dd></dl><hr>
+
+<a name='refresh'></a>
+<h3>refresh</h3>
+<pre>
+refresh()
+</pre><p>
+<dl>
+<dd>Refresh the PID/TID buffer map.
+Scans the mmap'ed file to refresh the PID/TID buffer map.
+(in order to collect buffers for new threads/processes, or to discard
+old buffers for threads/processes which have terminated)
+
+
+<p>
+<dd><dl>
+<dt><b>Returns:</b><dd>the Devel::STrace::Monitor object
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setSignal'></a>
+<h3>setSignal</h3>
+<pre>
+setSignal(@pid_tid_list, $value)
+</pre><p>
+<dl>
+<dd>Set the ringbuffer per-thread signal
+control variable value for the specified PID or PID:TID.
+Setting this to a non-zero
+value causes Devel::STrace to trace data for the specified threads
+of the specified processes; setting it to zero <i>may</i> disable
+tracing, <i>but only</i> if the global single variable, and the
+per-thread trace control variables are also set to zero.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@pid_tid_list</code> - optional list of PIDs, or "PID:TID", keys to set signal on;
+if no keys are specified, all keys are used
+</dd>
+<dd><code>$value</code> - new value to assign to signal
+
+</dd>
+<dt><b>Returns:</b><dd>a hash of the prior values of the Devel::RingBuffer signal values, keyed
+by the "PID:TID"
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setSingle'></a>
+<h3>setSingle</h3>
+<pre>
+setSingle($value)
+</pre><p>
+<dl>
+<dd>Set the current ringbuffer global single
+control variable value. Setting this to a non-zero
+value causes Devel::STrace to trace data for all threads
+of all processes; setting it to zero <i>may</i> disable
+tracing, <i>but only</i> if the per-thread trace and signal
+control variables are also set to zero.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$value</code> - new value to assign to single
+
+</dd>
+<dt><b>Returns:</b><dd>the prior value of the Devel::RingBuffer global single value
+</dd>
+</dl></dd></dl><hr>
+
+<a name='setTrace'></a>
+<h3>setTrace</h3>
+<pre>
+setTrace(@pid_tid_list, $value)
+</pre><p>
+<dl>
+<dd>Set the ringbuffer per-thread trace
+control variable value for the specified PID or PID:TID.
+Setting this to a non-zero
+value causes Devel::STrace to trace data for the specified threads
+of the specified processes; setting it to zero <i>may</i> disable
+tracing, <i>but only</i> if the global single variable, and the
+per-thread signal control variables are also set to zero.
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>@pid_tid_list</code> - optional list of PIDs, or "PID:TID", keys to set trace on;
+if no keys are specified, all keys are used
+</dd>
+<dd><code>$value</code> - new value to assign to trace
+
+</dd>
+<dt><b>Returns:</b><dd>a hash of the prior values of the Devel::RingBuffer trace values, keyed
+by the "PID:TID"
+</dd>
+</dl></dd></dl><hr>
+
+<a name='trace'></a>
+<h3>trace</h3>
+<pre>
+trace($trace_cb, @pid_tid_list)
+</pre><p>
+<dl>
+<dd>Dump the mmap'ed ringbuffer file contents.
+Scans the mmap'ed file to refresh the PID/TID buffer map.
+(in order to collect buffers for new threads/processes, or to discard
+old buffers for threads/processes which have terminated)
+
+
+<p>
+<dd><dl>
+<dt><b>Parameters:</b>
+<dd><code>$trace_cb</code> - callback to which ringbuffer contents are posted
+</dd>
+<dd><code>@pid_tid_list</code> - optional list of PID's, or "PID:TID" keys
+for which ringbuffer contents are to be returned;
+if none are specified, all PID/TID keys are used;
+if only a PID is specified, all threads for the process
+are used.
+
+</dd>
+<dt><b>Returns:</b><dd>the Devel::STrace::Monitor object
+</dd>
+</dl></dd></dl><hr>
+
+<small>
+<center>
+<i>Generated by psichedoc on Sun Aug 13 09:26:08 2006</i>
+</center>
+</small>
+</body>
+</html>

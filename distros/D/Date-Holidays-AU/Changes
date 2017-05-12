@@ -1,0 +1,72 @@
+CHANGES
+-------
+
+  0.18 - 18 Jan 2017
+
+      * Documentation fixes
+
+  0.17 - 17 Jan 2017
+
+      * Documentation fixes
+
+  0.16 - 17 Jan 2017
+
+      * Code cleanups.  Added README.  perlcritic passing at -4
+
+  0.15 - 12 Jan 2017
+
+      * Adding VIC Grand Final Eve for 2017, WA Queens Birthday 2018
+
+  0.14 - 24 Jan 2016
+
+      * Adding VIC Grand Final Eve for 2016, WA Queens Birthday 2017
+
+  0.13 - 25 Aug 2015
+
+      * RT #106648 - Adding VIC Grand Final Eve holiday.
+
+  0.12 - 31 Aug 2014
+
+      * RT #98471 - Fixing pod errors.  Patch from JONASBN.
+
+  0.11 - 4 Feb 2014
+
+      * RT #92714 - Changing NSW to not get a ANZAC Day Holiday if ANZAC Day falls on a weekend
+      * RT #92714 - Changing NSW to get "Additional Day" if Christmas Day or Boxing Day falls on a weekend
+
+  0.10 - 5 Jan 2014
+
+      * Adding WA Queens Birthday for 2015 and 2016
+      * perltidy and perlcritic passing at -5
+
+  0.09 - 3 March 2012
+
+      * Adding WA Queens Birthday for 2013 and 2014
+      * Updated the change in WA Queens Birthday for 2011 from October 3 to October 28
+
+  0.08 - 7 March 2011
+
+      * Added Makefile.PL license and abstract entries
+
+  0.07 - 6 March 2010
+
+      * Adding WA Queens Birthday for 2011 and 2012
+
+  0.06 - 9 Feb 2007
+
+      * Fixed WA Queens Birthday for 2010
+
+  0.05 - 11 August 2007
+
+      * Adding WA Queens Birthday for 2008, 2009 and 2010.
+      * Added META.yml file
+
+  0.04 - 17 December 2005
+
+      * Another patch from JONASBN.  Now croaking instead of dying. Handling holidays
+	with reasonable defaults, eg current year and 'VIC' as the state.
+
+  0.03 - 10 December 2005
+
+      * Patch from JONASBN to allow smoother interaction with Date::Holidays
+

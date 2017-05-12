@@ -1,0 +1,28 @@
+---
+abstract: 'Dancer Console Logger that aggregates each requests logs to 1 line.'
+author:
+  - 'Khaled Hussein <khaled.hussein@gmail.com>'
+  - 'William Wolf <throughnothing@gmail.com>'
+build_requires: {}
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Logger-ConsoleAggregator
+requires:
+  Dancer::Hook: 0
+  Dancer::Logger::Abstract: 0
+  DateTime: 0
+  JSON: 0
+  Try::Tiny: 0
+  base: 0
+  strict: 0
+  warnings: 0
+resources:
+  bugtracker: https://github.com/khussein/Dancer-Logger-ConsoleAggregator/issues
+  repository: git://github.com/khussein/Dancer-Logger-ConsoleAggregator.git
+version: 0.004

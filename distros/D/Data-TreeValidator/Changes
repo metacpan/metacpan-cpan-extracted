@@ -1,0 +1,12 @@
+0.04 2012-07-15
+
+   - #78102: Fix the 'options' and 'type' constraints [George Hartzell]
+     They previously did not call fail_constraint, and thus never actually
+     failed.
+   - #77654: Allow 'required' constraint on leafs to pass with '0'.
+
+0.03 2011-02-04
+
+   - Added the 'type' constraint which allows you to use a Moose type
+   - leaf($foo) sugar is now sugar for leaf(constraints => [ type($foo) ])
+

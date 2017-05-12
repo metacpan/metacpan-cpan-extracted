@@ -1,0 +1,132 @@
+doctype: dist
+
+header:
+  author: Erik Carlsson
+
+default_prereq_versions:
+ - Moose: 2.1405
+ - Moo: 2.000000
+ - Pod::Weaver::Section::Authors: 0.001
+
+prereqs:
+  develop:
+    requires:
+      - This::Thing
+
+plugins:
+ - +plugin: GatherDir
+   +documentation: |
+     Gathers all files
+     in the directory
+
+ - +plugin: PruneCruft
+   +prereqs:
+    - test_suggests: Another::Crufter 1.2
+    - runtime_requires: Cruft::Pruner
+
+ - +plugin: ManifestSkip
+   +remove_if: $self.no_manifest_skip
+
+ - +plugin: PodWeaver
+   +remove_if: $self.is_task
+
+ - +plugin: TaskWeaver
+   +add_if: $self.is_task
+
+ - +plugin: GithubMeta
+   homepage: $self.homepage
+   issues: 1
+
+ - +plugin: MetaYAML
+
+ - +plugin: License
+
+ - +plugin: Readme
+   +version: 0.01
+   root: yes
+   more_root: no
+   suffix: txt
+   headings:
+   - head1
+
+ - +plugin: ExtraTests
+
+ - +plugin: ExecDir
+   dir: script
+
+ - +plugin: ShareDir
+
+ - +plugin: MakeMaker
+
+ - +plugin: MakeMaker
+
+ - +plugin: Manifest
+
+ - +plugin: TestRelease
+
+ - +plugin: ConfirmRelease
+   default: $self.confirm_release
+   prompt: $self.prompt
+
+ - +plugin: UploadToCPAN
+
+---
+
+doctype: weaver
+
+plugins:
+ - +plugin: '@CorePrep'
+
+ - +plugin: -SingleEncoding
+
+ - +plugin: Name
+
+ - +plugin: Version
+
+ - +plugin: prelude
+   +base: Region
+
+ - +plugin: Synopsis
+   +base: Generic
+
+ - +plugin: Description
+   +base: Generic
+
+ - +plugin: Overview
+   +base: Generic
+
+ - +plugin: Attributes
+   +base: Collect
+   command: attr
+   header: ATTRIBUTES
+
+ - +plugin: Methods
+   +base: Collect
+   command: method
+   header: METHODS
+
+ - +plugin: Functions
+   +base: Collect
+   command: func
+   header: FUNCTIONS
+
+ - +plugin: Leftovers
+
+ - +plugin: postlude
+   +base: Region
+
+ - +plugin: Authors
+
+ - +plugin: Legal
+
+ - +plugin: List
+   +base: -Transformer
+   +in: Elemental
+   +version: 0.03
+   transformer: List
+
+---
+doctype: gitignore
+
+always:
+ - ThisFile

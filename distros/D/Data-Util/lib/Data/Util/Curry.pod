@@ -1,0 +1,66 @@
+=head1 NAME
+
+Data::Util::Curry - Curries functions and methods
+
+=head1 SYNOPSIS
+
+	use feature 'say';
+	use Data::Util qw(curry);
+
+	sub sum{
+		my $total = 0;
+		for my $x(@_){
+			$total += $x;
+		}
+		return $total;
+	}
+
+	# placeholder "\0" indicates a subscript of the arguments
+	say curry(\&add, \0, 42)->(10); # 52
+
+	# placeholder "*_" indicates all the arguments
+	say curry(\&add, *_)->(1 .. 10); # 55
+
+	# two subscripts and the rest of the arguments
+	say curry(\&add, *_, \1, \0)->(1 .. 5); # 3 + 4 + 5 + 1 + 2
+
+=head1 DESCRIPTION
+
+(todo)
+
+=head1 EXAMPLES
+
+=head2 Currying Functions
+
+	curry(\&f, \0, 2)->(1); # f(1, 2)
+	curry(\&f, 3, \0)->(4); # f(3, 4)
+	curry(\&f, *_)->(5, 6); # f(5, 6)
+
+	curry(\&f, \0, \1, *_)->(1, 2, 3, 4); # f(1, 2, 3, 4)
+	curry(\&f, *_, \0, \1)->(1, 2, 3, 4); # f(3, 4, 1, 2)
+
+=head2 Currying Methods
+
+	curry($obj, 'something', *_)->(1, 2);  # $obj->something(1, 2)
+
+	curry($obj, 'something',
+		foo => \0,
+		bar => \1)->(1, 2); # $obj->something(foo => 1, bar => 2)
+
+	curry(\0, 'something', \1)->($obj, 42);   # $obj->something(42)
+	curry($obj, \0, *_)->('something', 1, 2); # $obj->something(1, 2)
+
+=head2 Argument Semantics
+
+	sub incr{ $_[0]++ }
+
+	my $i = 0;
+	curry(\&incr, \0)->($i); # $i++
+	curry(\&incr, *_)->($i); # $i++
+	curry(\&incr, $i)->();   # $i++
+
+=head1 SEE ALSO
+
+L<Data::Util>.
+
+=cut

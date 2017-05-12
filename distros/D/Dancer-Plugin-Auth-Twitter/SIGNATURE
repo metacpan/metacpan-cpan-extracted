@@ -1,0 +1,43 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9f82436b12dbeff93afe87bd5f202830e238ad8e CONTRIBUTORS
+SHA1 ae73e767dba718e6cd4424ed294a4b916fb29367 Changes
+SHA1 bf946162081dcc2d89295fc6f0022f989c136d06 INSTALL
+SHA1 275383eac567137660ff0ae7fd02ee0ac280093e LICENSE
+SHA1 4314d345fda9a1f636f4a2bb6d0026b1495d4633 MANIFEST
+SHA1 f5815e40dacb6fe052fcbda0a22fbdc5fcaeacf0 META.json
+SHA1 6568858b79508030a453ae68a6ffa60d30b1d607 META.yml
+SHA1 224e4635be38e37bf297615b24a8d220b893fb2f Makefile.PL
+SHA1 710c37911e9f1751558097d0cfd74bcb4e269b12 README
+SHA1 98b3a2b4d82b777e886db5522f63b8cf04a420da README.mkdn
+SHA1 2bb09fbc3f5cabe730c0e7eecc320f32abdf39ce cpanfile
+SHA1 051f4b25dadd3695ac84cbb2160ec1f0edefd2ee doap.xml
+SHA1 99f3ce1f837d90134b3d90dcd28ba335f834a991 lib/Dancer/Plugin/Auth/Twitter.pm
+SHA1 27adf29e5551f1c62872f0dd512dc4ff80b4ebc0 t/00-compile.t
+SHA1 991e97b6e540ab237a6647dbb08e747b24a40855 t/000-report-versions-tiny.t
+SHA1 a7c4f569a931d54f9cf4146a3b6d363d139ef8d9 t/basic-app.t
+SHA1 d1362e03b8ac2eb3e5930ddbcc82f593b76efa3e t/lib/MyApp.pm
+SHA1 0b1c5a2d59be6bfa7d60c64cd964fea6a0331705 xt/pod-coverage.t
+SHA1 640935336dc1123c0069bcf5432bcaedc2cf22d3 xt/pod.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEYEARECAAYFAlTRGg8ACgkQ34Hwf+GwC4xsLQCg60C6CTj9uja/6wmnaZA0sFTu
+feAAn0V6vDdiPatah8Fm4dlyjjI7zM4Z
+=eXju
+-----END PGP SIGNATURE-----

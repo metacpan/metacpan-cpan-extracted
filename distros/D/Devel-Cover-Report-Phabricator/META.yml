@@ -1,0 +1,37 @@
+---
+abstract: 'Produce Phabricator-compatible coverage reports'
+author:
+  - 'Mike Cartmell, C<< <mcartmell at cpan.org> >>'
+build_requires:
+  Cwd: 0
+  ExtUtils::MakeMaker: 6.59
+  File::Temp: 0
+  File::chdir: 0
+  Test::More: 0.98
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-Cover-Report-Phabricator
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  Devel::Cover: 0.99
+  File::Slurp: 9999.19
+  Getopt::Long: 2.38
+  JSON: 2.53
+  List::MoreUtils: 0.33
+  Try::Tiny: 0.12
+  perl: 5.6.0
+resources:
+  bugtracker: http://github.com/mcartmell/Devel-Cover-Report-Phabricator/issues
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/mcartmell/Devel-Cover-Report-Phabricator
+version: 0.01

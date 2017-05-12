@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Sodipodi ("http://www.sodipodi.com/") -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   height="256"
+   id="svg633"
+   sodipodi:docname="warning.svg"
+   sodipodi:version="0.34"
+   version="1.0"
+   width="255.99883"
+   x="0"
+   y="0"
+   inkscape:version="0.48.3.1 r9886"
+   inkscape:export-filename="/home/moocow/work/bbaw/dstar/corpora/dta.beta/web/images/warning.png"
+   inkscape:export-xdpi="11.25"
+   inkscape:export-ydpi="11.25">
+  <metadata
+     id="metadata3">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:title></dc:title>
+        <dc:description />
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>icon</rdf:li>
+            <rdf:li />
+            <rdf:li>lemon_theme_icon</rdf:li>
+            <rdf:li>icons</rdf:li>
+            <rdf:li>hash</rdf:li>
+            <rdf:li>action</rdf:li>
+            <rdf:li>computer</rdf:li>
+            <rdf:li>theme</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+        <dc:publisher>
+          <cc:Agent
+             rdf:about="http://www.openclipart.org">
+            <dc:title>Jose Hevia</dc:title>
+          </cc:Agent>
+        </dc:publisher>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>Jose Hevia</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:rights>
+          <cc:Agent>
+            <dc:title>Jose Hevia</dc:title>
+          </cc:Agent>
+        </dc:rights>
+        <dc:date />
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="http://web.resource.org/cc/PublicDomain" />
+        <dc:language>en</dc:language>
+      </cc:Work>
+      <cc:License
+         rdf:about="http://web.resource.org/cc/PublicDomain">
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Reproduction" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/Distribution" />
+        <cc:permits
+           rdf:resource="http://web.resource.org/cc/DerivativeWorks" />
+      </cc:License>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     id="base"
+     showgrid="false"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     inkscape:zoom="0.7628672"
+     inkscape:cx="98.806881"
+     inkscape:cy="62.574617"
+     inkscape:window-width="1005"
+     inkscape:window-height="714"
+     inkscape:window-x="299"
+     inkscape:window-y="255"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="g4869" />
+  <defs
+     id="defs635">
+    <linearGradient
+       id="linearGradient566">
+      <stop
+         id="stop567"
+         offset="0"
+         style="stop-color:#ffff00;stop-opacity:1;" />
+      <stop
+         id="stop568"
+         offset="1"
+         style="stop-color:#ffffff;stop-opacity:1;" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient569"
+       xlink:href="#linearGradient566" />
+  </defs>
+  <g
+     id="g4869"
+     transform="matrix(0.59596909,0,0,0.59596909,0.00177682,15.587947)">
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:12px;fill:#f4f100;fill-opacity:1;fill-rule:evenodd;stroke:#000000;stroke-width:19.67000008000000122;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1"
+       id="path587"
+       d="m 214.77718,9.835 0,0 204.9403,357.57122 0,0 -409.88248,-0.001 0,0 L 214.77718,9.835 z"
+       inkscape:export-xdpi="11.79"
+       inkscape:export-ydpi="11.79" />
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:12px;fill:#000000;fill-opacity:1;fill-rule:evenodd"
+       id="path641"
+       d="m 177.89298,303.64872 c 0,-16.9988 13.8127,-30.7788 30.8513,-30.7788 17.0385,0 30.8512,13.78 30.8512,30.7788 0,16.9987 -13.8127,30.7786 -30.8512,30.7786 -17.0386,0 -30.8513,-13.7799 -30.8513,-30.7786 z" />
+    <path
+       inkscape:connector-curvature="0"
+       style="font-size:12px;fill:#000000;fill-opacity:1;stroke-width:1"
+       id="path603"
+       d="m 248.57698,131.56732 c -2.5731,19.5653 -19.4098,108.884 -19.8804,118.4116 -2.3414,15.8962 -39.6617,15.8962 -41.0515,0 -0.7713,-9.4592 -14.069,-96.046 -16.8443,-118.4116 -2.7776,-22.3846 80.5538,-21.1229 77.7762,0 z" />
+  </g>
+</svg>

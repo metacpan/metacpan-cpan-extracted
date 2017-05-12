@@ -1,0 +1,27 @@
+---
+abstract: 'Disable QueryLogger instead of all query logging'
+author:
+  - "Arthur Axel \"fREW\" Schmidt <frioux+cpan@gmail.com>"
+build_requires:
+  Test::Deep: 0.112
+  Test::Fatal: 0.013
+  Test::More: 1.001002
+  aliased: 0.31
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.013, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-QueryLog-Conditional
+requires:
+  Moo: 1.004002
+  Sub::Name: 0.05
+  namespace::clean: 0.24
+resources:
+  bugtracker: https://github.com/frioux/DBIx-Class-QueryLog-Conditional/issues
+  homepage: https://github.com/frioux/DBIx-Class-QueryLog-Conditional
+  repository: https://github.com/frioux/DBIx-Class-QueryLog-Conditional.git
+version: 0.001000

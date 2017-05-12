@@ -1,0 +1,89 @@
+==================================================
+Changes from 2013-11-04 00:00:00 +0000 to present.
+==================================================
+
+------------------------------------------
+version 0.001 at 2014-11-04 01:30:27 +0000
+------------------------------------------
+
+  Change: e7c5bdef25278f38672d8027b2f1a259ef2e4f7c
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 16:47:35 +0000
+
+    tweak code 
+
+  Change: 45f5541ef5ad2db97cd6516164f12dece4782b3f
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 16:45:20 +0000
+
+    cleanups for test 
+
+  Change: fc69769603287219f96447757843b0ad31d711dd
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 16:15:53 +0000
+
+    add examples 
+
+  Change: 4f624928cb9371e0e72e29b49658cdb2c4f97dd5
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 16:11:48 +0000
+
+    beautify code 
+
+  Change: 420d6323e73bb8caa0cba664b3d5e22affc5708b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 15:59:49 +0000
+
+    fix the url META 
+
+  Change: 3635c26c79d3cd474898b84f9cc86b11a50b79f0
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 15:09:16 +0000
+
+    add use of Git::Wrapper 
+
+  Change: 2407b336edb38874c27d3b292bfaf64f1bda643b
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 15:02:57 +0000
+
+    set content-type=application/json 
+
+  Change: aabb6c7b94e1d794e28ebbf5e96d2825034940ca
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 15:02:14 +0000
+
+    use File::pushd to help resolve path issues 
+
+  Change: f3ef0c5bb549b6237d4714f3b2dec0b5afa009fb
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 13:57:04 +0000
+
+    add config::identity::bitbucket 
+
+  Change: 06f468caa0145b1e0b4ae5483b4478b48233f440
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 12:54:37 +0000
+
+    finalize stuff and docs 
+
+  Change: 0c5b4adfa8b7278244bedf392bb09aa45a7841ca
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 11:16:12 +0000
+
+    work on Create 
+
+  Change: 26a00d3edd6348890e30e8202dbac979f468c5ed
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 10:01:07 +0000
+
+    copy skeleton from GitHub code 
+
+  Change: ac1bf9384796eae1115f20675a9d7464f515083d
+  Author: Apocalypse <APOCAL@cpan.org>
+  Date : 2014-11-03 09:40:45 +0000
+
+    initial commit 
+
+================
+End of releases.
+================

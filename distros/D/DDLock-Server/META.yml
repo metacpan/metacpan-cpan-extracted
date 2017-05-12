@@ -1,0 +1,38 @@
+---
+abstract: unknown
+author:
+  - 'Brad Fitzpatrick <brad@danga.com>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.120630'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DDLock-Server
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Carp: 0
+  DBI: 0
+  Danga::Socket: 0
+  Errno: 0
+  ExtUtils::MakeMaker: 0
+  Fcntl: 0
+  Getopt::Long: 0
+  IO::Socket::INET: 0
+  POSIX: 0
+  Socket: 0
+  base: 0
+  constant: 0
+  fields: 0
+  lib: 0
+  strict: 0
+  vars: 0
+  warnings: 0
+version: 0.51

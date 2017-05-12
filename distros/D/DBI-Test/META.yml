@@ -1,0 +1,25 @@
+---
+abstract: 'Test suite for DBI API'
+author:
+  - 'The DBI team <dbi-dev@perl.org>'
+build_requires:
+  Test::Simple: 0.90
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBI-Test
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  perl: 5.008001
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/perl5-dbi/DBI-Test
+version: 0.001

@@ -1,0 +1,106 @@
+# Hej, Emacs, give us -*- perl -*- mode here!
+#
+#   $Id: mSQL.dbtest,v 1.1.1.1 1997/09/19 20:34:23 joe Exp $
+#
+# database specific definitions for an 'mSQL' database
+
+
+#   This function generates a mapping of ANSI type names to
+#   database specific type names; it is called by TableDefinition().
+#
+sub AnsiTypeToDb ($;$) {
+    my ($type, $size) = @_;
+    my ($ret);
+
+    if ((lc $type) eq 'int'  ||  (lc $type) eq 'integer') {
+	$ret = $type;
+    } elsif ((lc $type) eq 'char') {
+	$ret = "CHAR($size)";
+    } else {
+	warn "Unknown type $type\n";
+	$ret = $type;
+    }
+    $ret;
+}
+
+
+#
+#   This function generates a table definition based on an
+#   input list. The input list consists of references, each
+#   reference referring to a single column. The column
+#   reference consists of column name, type, size and a bitmask of
+#   certain flags, namely
+#
+#       $COL_NULLABLE - true, if this column may contain NULL's
+#       $COL_KEY - true, if this column is part of the table's
+#           primary key
+#
+#   Hopefully there's no big need for you to modify this function,
+#   if your database conforms to ANSI specifications.
+#
+
+sub TableDefinition ($@) {
+    my($tablename, @cols) = @_;
+    my($def);
+
+    #
+    #   Should be acceptable for most ANSI conformant databases;
+    #
+    #   msql 1 uses a non-ANSI definition of the primary key: A
+    #   column definition has the attribute "PRIMARY KEY". On
+    #   the other hand, msql 2 uses the ANSI fashion ...
+    #
+    my($col, @keys, @colDefs, $keyDef);
+
+    #
+    #   Count number of keys
+    #
+    @keys = ();
+    foreach $col (@cols) {
+	if ($$col[2] & $::COL_KEY) {
+	    push(@keys, $$col[0]);
+	}
+    }
+    if (@keys > 1) {
+	warn "Warning: Your test won't run with msql 1\n";
+    }
+
+    foreach $col (@cols) {
+	my $colDef = $$col[0] . " " . AnsiTypeToDb($$col[1], $$col[2]);
+	if (($$col[3] & $::COL_KEY)  &&  @keys == 1) {
+	    $colDef .= " PRIMARY KEY";
+	} elsif (!($$col[3] & $::COL_NULLABLE)) {
+	    $colDef .= " NOT NULL";
+	}
+	push(@colDefs, $colDef);
+    }
+    if (@keys > 1  ||  defined(&DBD::mSQL::IDX_TYPE)) {
+	$keyDef = ", PRIMARY KEY (" . join(", ", @keys) . ")";
+    } else {
+	$keyDef = "";
+    }
+    $def = sprintf("CREATE TABLE %s (%s%s)", $tablename,
+		   join(", ", @colDefs), $keyDef);
+    if ($::verbose) {
+	print "Table definition: $def\n";
+    }
+    $def;
+}
+
+
+#
+#   This function generates a list of tables associated to a
+#   given DSN. Highly DBMS specific, EDIT THIS!
+#
+sub ListTables($) {
+    my($dbh) = @_;
+    my(@tables);
+
+    if (!defined(@tables = $dbh->func('_ListTables'))  ||  $dbh->errstr) {
+	return undef;
+    }
+    @tables;
+}
+
+
+1;

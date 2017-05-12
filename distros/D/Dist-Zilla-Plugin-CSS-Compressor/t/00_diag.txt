@@ -1,0 +1,9 @@
+CSS::Compressor
+Dist::Zilla::File::FromCode
+Dist::Zilla::Role::FileGatherer
+Dist::Zilla::Role::FileInjector
+ExtUtils::MakeMaker
+Moose
+Test::DZil
+Test::More
+namespace::autoclean

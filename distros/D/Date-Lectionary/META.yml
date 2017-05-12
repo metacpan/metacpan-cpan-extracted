@@ -1,0 +1,59 @@
+---
+abstract: 'Date::Lectionary - Readings for the Christian Lectionary'
+author:
+  - 'Michael Wayne Arnold <marmanold@cpan.org>'
+build_requires:
+  Test::CheckManifest: '0.9'
+  Test::Exception: '0.43'
+  Test::More: '1.302040'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  File::ShareDir::Install: '0.11'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.24, CPAN::Meta::Converter version 2.150010'
+keywords:
+  - lectionary
+  - rcl
+  - acna
+  - readings
+  - christian
+  - liturgical
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Date-Lectionary
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  Date::Lectionary:
+    file: lib/Date/Lectionary.pm
+    version: '1.20161227'
+  Date::Lectionary::Day:
+    file: lib/Date/Lectionary/Day.pm
+    version: '1.20161227'
+  Date::Lectionary::Year:
+    file: lib/Date/Lectionary/Year.pm
+    version: '1.20161227'
+requires:
+  Carp: '1.38'
+  Date::Advent: '1.20160727'
+  Date::Easter: '1.22'
+  Date::Lectionary::Time: '1.20160809'
+  File::Share: '0.25'
+  Moose: '2.1804'
+  Moose::Util::TypeConstraints: '2.1804'
+  MooseX::Aliases: '0.11'
+  Time::Piece: '1.31'
+  Time::Seconds: '1.31'
+  Try::Tiny: '0.24'
+  XML::LibXML: '2.0128'
+  namespace::autoclean: '0.28'
+  perl: '5.022'
+resources:
+  repository: git://github.com/marmanold/Date-Lectionary.git
+version: '1.20161227'
+x_serialization_backend: 'CPAN::Meta::YAML version 0.018'
+x_twitter: https://www.twitter.com/marmanold/

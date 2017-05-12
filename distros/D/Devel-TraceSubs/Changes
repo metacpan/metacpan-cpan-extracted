@@ -1,0 +1,9 @@
+Revision history for Perl extension Devel::TraceSubs.
+
+0.01  Sat Jun 9 12:00:00 2002
+	- original version; created by h2xs 1.21 with options
+		-AX Devel::TraceSubs
+
+0.02  Sat Jul 6 12:00:00 2002
+	- display params
+	- specify untraceable namespaces

@@ -1,0 +1,27 @@
+Changes
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
+lib/DBD/Multi.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+README
+t/dbd-multi-db.t
+t/dbd-multi-dr.t
+t/dbd-multi-multi.t
+t/dbd-multi-st.t
+t/dbd-multi.t
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+t/random.t
+t/lazy-load.t
+t/handle-as-coderef.t
+t/get_info.t
+TODO

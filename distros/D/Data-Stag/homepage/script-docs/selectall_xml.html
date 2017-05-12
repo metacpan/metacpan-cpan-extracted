@@ -1,0 +1,176 @@
+<HTML>
+<HEAD>
+<TITLE>selectall_xml</TITLE>
+<LINK REV="made" HREF="mailto:feedback@suse.de">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#examples">EXAMPLES</A></LI>
+		<LI><A HREF="#templates">TEMPLATES</A></LI>
+		<LI><A HREF="#listing available templates for a db">LISTING AVAILABLE TEMPLATES FOR A DB</A></LI>
+		<LI><A HREF="#listing variables for a template">LISTING VARIABLES FOR A TEMPLATE</A></LI>
+	</UL>
+
+	<LI><A HREF="#environment variables">ENVIRONMENT VARIABLES</A></LI>
+	<LI><A HREF="#command line arguments">COMMAND LINE ARGUMENTS</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>selectall_xml.pl</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  selectall_xml.pl [-d &lt;dbi&gt;] [-f file of sql] [-nesting|n &lt;nesting&gt;] SQL</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This script will query a database using either SQL provided by the
+script user, or using an SQL templates; the query results will be
+turned into XML using the <A HREF="./DBIx/DBStag.html">the DBIx::DBStag manpage</A> module. The nesting of the
+XML can be controlled by the DBStag SQL extension ``USE NESTING...''</P>
+<P>
+<H2><A NAME="examples">EXAMPLES</A></H2>
+<PRE>
+  selectall_xml.pl -d &quot;dbi:Pg:dbname=mydb;host=localhost&quot;\
+        &quot;SELECT * FROM a NATURAL JOIN b&quot;</PRE>
+<P>
+<H2><A NAME="templates">TEMPLATES</A></H2>
+<P>A parameterized SQL template (canned query) can be used instead of
+specifying the full SQL</P>
+<P>For example:</P>
+<PRE>
+  selectall_xml.pl -d genedb /genedb-gene gene_symbol=Adh</PRE>
+<P>Or:</P>
+<PRE>
+  selectall_xml.pl -d genedb /genedb-gene Adh</PRE>
+<P>A template is indicated by the syntactic shorthand of using a slash to
+precede the template name; in this case the template is called
+<STRONG>genedb-gene</STRONG>. the -t option can also be used.</P>
+<P>All the remaining arguments are passed in as SQL template
+parameters. They can be passed in as either name=value pairs, or as a
+simple list of arguments which get passed into the template in order</P>
+<P>To use templates, you should have the environment variable
+<STRONG>DBSTAG_TEMPLATE_DIRS</STRONG> set. See <STRONG>DBIx::DBStag</STRONG> for details.</P>
+<P>
+<H2><A NAME="listing available templates for a db">LISTING AVAILABLE TEMPLATES FOR A DB</A></H2>
+<PRE>
+   selectall_xml.pl -d mydb -h</PRE>
+<P>
+<H2><A NAME="listing variables for a template">LISTING VARIABLES FOR A TEMPLATE</A></H2>
+<PRE>
+   selectall_xml.pl /genedb-gene -h</PRE>
+<P>
+<HR>
+<H1><A NAME="environment variables">ENVIRONMENT VARIABLES</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_DBSTAG_DBIMAP_FILE">DBSTAG_DBIMAP_FILE</A></STRONG><BR>
+<DD>
+A file containing configuration details for local databases
+<P></P>
+<DT><STRONG><A NAME="item_DBSTAG_TEMPLATE_DIRS">DBSTAG_TEMPLATE_DIRS</A></STRONG><BR>
+<DD>
+list of directories (seperated by <STRONG>:</STRONG>s) to be searched when templates
+are requested
+<P></P></DL>
+<P>
+<HR>
+<H1><A NAME="command line arguments">COMMAND LINE ARGUMENTS</A></H1>
+<DL>
+<DT><STRONG><A NAME="item_%2Dh%7Chelp">-h|help</A></STRONG><BR>
+<DD>
+shows this page if no other arguments are given
+<P>if a template is specified, gives template details</P>
+<P>if a db is specified, lists templates for that db</P>
+<P>use in conjunction with -v for full descriptions</P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Dd%7Cdbname_DBNAME">-d|dbname DBNAME</A></STRONG><BR>
+<DD>
+this is either a full DBI locator string (eg
+<STRONG>dbi:Pg:dbname=mydb;host=localhost</STRONG>) or it can also be a shortened
+``nickname'', which is then looked up in the file pointed at by the
+environment variable <STRONG>DBSTAG_DBIMAP_FILE</STRONG>
+<P></P>
+<DT><STRONG><A NAME="item_%2Du%7Cuser_USER">-u|user USER</A></STRONG><BR>
+<DD>
+database user identity
+<P></P>
+<DT><STRONG><A NAME="item_%2Dp%7Cpassword_PASS">-p|password PASS</A></STRONG><BR>
+<DD>
+database password
+<P></P>
+<DT><STRONG><A NAME="item_%2Df%7Cfile_SQLFILE">-f|file SQLFILE</A></STRONG><BR>
+<DD>
+this is a path to a file containing SQL that will be executed, as an
+alternative to writing the SQL on the command line
+<P></P>
+<DT><STRONG><A NAME="item_%2Dn%7Cnesting_NESTING%2DEXPRESSIONS">-n|nesting NESTING-EXPRESSIONS</A></STRONG><BR>
+<DD>
+a bracketed expression indicating how to the resulting objects/XML
+should be nested. See <A HREF="./DBIx/DBStag.html">the DBIx::DBStag manpage</A> for details.
+<P></P>
+<DT><STRONG><A NAME="item_%2Dt%7Ctemplate_TEMPLATE%2DNAME">-t|template TEMPLATE-NAME</A></STRONG><BR>
+<DD>
+the name of a template; see above
+<P></P>
+<DT><STRONG><A NAME="item_%2Dwh%7Cwhere_WHERE%2DCLAUSE">-wh|where WHERE-CLAUSE</A></STRONG><BR>
+<DD>
+used to override the WHERE clause of the query; useful for combining
+with templates
+<P>You can append to an existing where clause by using the prefix <STRONG>+</STRONG></P>
+<P></P>
+<DT><STRONG><A NAME="item_%2Ds%7Cselect_SELECT%2DCOLS">-s|select SELECT-COLS</A></STRONG><BR>
+<DD>
+used to override the SELECT clause of the query; useful for combining
+with templates
+<P></P>
+<DT><STRONG><A NAME="item_%2Drows">-rows</A></STRONG><BR>
+<DD>
+sometimes it is preferable to return the results as a table rather
+than xml or a similar nested structure. specifying -rows will fetch a
+table, one line per row, and columns seperated by tabs
+<P></P>
+<DT><STRONG><A NAME="item_%2Do%7Cout_FILE">-o|out FILE</A></STRONG><BR>
+<DD>
+a file to output the results to
+<P></P>
+<DT><STRONG><A NAME="item_%2Dw%7Cwriter_WRITER">-w|writer WRITER</A></STRONG><BR>
+<DD>
+writer class; can be any perl class, or one of these
+<DL>
+<DT><STRONG><A NAME="item_xml_%5Bdefault%5D">xml [default]</A></STRONG><BR>
+<DD>
+<DT><STRONG><A NAME="item_sxpr">sxpr</A></STRONG><BR>
+<DD>
+lisp S-Expressions
+<P></P>
+<DT><STRONG><A NAME="item_itext">itext</A></STRONG><BR>
+<DD>
+indented text
+<P></P></DL>
+<DT><STRONG><A NAME="item_%2Dcolor">-color</A></STRONG><BR>
+<DD>
+shows results in color (sxpr and itext only)
+<P></P>
+<DT><STRONG><A NAME="item_%2Dshow">-show</A></STRONG><BR>
+<DD>
+will show the parse of the SQL statement
+<P></P></DL>
+
+</BODY>
+
+</HTML>

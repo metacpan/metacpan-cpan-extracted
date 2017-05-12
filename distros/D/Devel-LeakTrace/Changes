@@ -1,0 +1,23 @@
+0.06 Monday 13th March, 2017
+        Changed dependency from glib to glib-2.0 as glib 1.x has been
+        dropped.
+        Update tests to work on 5.8 and later, setting 5.8 as the
+        earliest supported version.
+
+0.05 Friday 19th September, 2003
+	Fix the INIT/BEGIN thing correctly by adding resetting as an
+	independant action
+
+	Small speedup.  At every boundary check that PL_sv_count hasn't 
+	changed.  There's potential for this to fuck up in the case where you
+	free and create an SV in the same statement.  Never mind the 
+	correctness, feel the speed.
+
+0.04 Tuesday 15th July, 2003
+	Port to Module::Build 0.19
+	Couple of speedups in not doing quite as much mallocing - 25% then 2.3%
+
+0.03 Wednesday 7th May, 2003
+	Test suite fixes
+
+0.02

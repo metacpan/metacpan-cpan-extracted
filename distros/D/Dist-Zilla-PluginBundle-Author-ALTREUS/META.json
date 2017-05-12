@@ -1,0 +1,66 @@
+{
+   "abstract" : "BeLike::ALTREUS, who is exactly like DBOOK (except less obsessed with Mojolicious)",
+   "author" : [
+      "Alastair McGowan-Douglas <altreus@altre.us>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.039, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-ALTREUS",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::ALTREUS" : "0.001"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::PluginBundle::Author::DBOOK" : "0.017"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::ALTREUS" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/ALTREUS.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/Altreus/Dist-Zilla-PluginBundle-Author-ALTREUS/issues"
+      },
+      "homepage" : "https://github.com/Altreus/Dist-Zilla-PluginBundle-Author-ALTREUS",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/Altreus/Dist-Zilla-PluginBundle-Author-ALTREUS.git",
+         "web" : "https://github.com/Altreus/Dist-Zilla-PluginBundle-Author-ALTREUS"
+      }
+   },
+   "version" : "0.002",
+   "x_contributors" : [
+      "Alastair McGowan-Douglas <alastair.mcgowan@opusvl.com>"
+   ]
+}
+

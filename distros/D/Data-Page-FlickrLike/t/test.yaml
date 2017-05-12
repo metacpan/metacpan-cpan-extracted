@@ -1,0 +1,242 @@
+## test for 0 page
+## test for weird boundaries
+-
+  input:
+    total_entries: 100
+    entries_per_page: 30
+    current_page: 1
+  expected:
+    navigations: [1, 2, 3, 4]
+    out: 1 | 2 | 3 | 4
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 2
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 4
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 5
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 8, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 6
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 7
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 8
+  expected:
+    navigations: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 0, 66, 67]
+    out: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 9
+  expected:
+    navigations: [1, 2, 0, 6, 7, 8, 9, 10, 11, 12, 0, 66, 67]
+    out: 1 | 2 | ... | 6 | 7 | 8 | 9 | 10 | 11 | 12 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 10
+  expected:
+    navigations: [1, 2, 0, 7, 8, 9, 10, 11, 12, 13, 0, 66, 67]
+    out: 1 | 2 | ... | 7 | 8 | 9 | 10 | 11 | 12 | 13 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 56
+  expected:
+    navigations: [1, 2, 0, 53, 54, 55, 56, 57, 58, 59, 0, 66, 67]
+    out: 1 | 2 | ... | 53 | 54 | 55 | 56 | 57 | 58 | 59 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 57
+  expected:
+    navigations: [1, 2, 0, 54, 55, 56, 57, 58, 59, 60, 0, 66, 67]
+    out: 1 | 2 | ... | 54 | 55 | 56 | 57 | 58 | 59 | 60 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 58
+  expected:
+    navigations: [1, 2, 0, 55, 56, 57, 58, 59, 60, 61, 0, 66, 67]
+    out: 1 | 2 | ... | 55 | 56 | 57 | 58 | 59 | 60 | 61 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 59
+  expected:
+    navigations: [1, 2, 0, 56, 57, 58, 59, 60, 61, 62, 0, 66, 67]
+    out: 1 | 2 | ... | 56 | 57 | 58 | 59 | 60 | 61 | 62 | ... | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 60
+  expected:
+    navigations: [1, 2, 0, 57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 57 | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 61
+  expected:
+    navigations: [1, 2, 0, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 58 | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 62
+  expected:
+    navigations: [1, 2, 0, 59, 60, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 59 | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 63
+  expected:
+    navigations: [1, 2, 0, 60, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 60 | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 64
+  expected:
+    navigations: [1, 2, 0, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 65
+  expected:
+    navigations: [1, 2, 0, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 66
+  expected:
+    navigations: [1, 2, 0, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 67
+  expected:
+    navigations: [1, 2, 0, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1200
+    entries_per_page: 18
+    current_page: 68
+  expected:
+    navigations: [1, 2, 0, 61, 62, 63, 64, 65, 66, 67]
+    out: 1 | 2 | ... | 61 | 62 | 63 | 64 | 65 | 66 | 67
+-
+  input:
+    total_entries: 1000000
+    entries_per_page: 18
+    current_page: 68
+  expected:
+    navigations: [1, 2, 0, 65, 66, 67, 68, 69, 70, 71, 0, 55555, 55556]
+    out: 1 | 2 | ... | 65 | 66 | 67 | 68 | 69 | 70 | 71 | ... | 55555 | 55556
+-
+  input:
+    total_entries: 100000000
+    entries_per_page: 10
+    current_page: 99999999
+  expected:
+    navigations: [1, 2, 0, 9999994, 9999995, 9999996, 9999997, 9999998, 9999999, 10000000]
+    out: 1 | 2 | ... | 9999994 | 9999995 | 9999996 | 9999997 | 9999998 | 9999999 | 10000000
+-
+  input:
+    total_entries: 100000000
+    entries_per_page: 10
+    current_page: 100000
+  expected:
+    navigations: [1, 2, 0, 99997, 99998, 99999, 100000, 100001, 100002, 100003, 0, 9999999, 10000000]
+    out: 1 | 2 | ... | 99997 | 99998 | 99999 | 100000 | 100001 | 100002 | 100003 | ... | 9999999 | 10000000
+-
+  input:
+    total_entries: 100000000
+    entries_per_page: 1
+    current_page: 100000
+  expected:
+    navigations: [1, 2, 0, 99997, 99998, 99999, 100000, 100001, 100002, 100003, 0, 99999999, 100000000]
+    out: 1 | 2 | ... | 99997 | 99998 | 99999 | 100000 | 100001 | 100002 | 100003 | ... | 99999999 | 100000000
+-
+  input:
+    total_entries: 100000000
+    entries_per_page: 100000000
+    current_page: 1
+  expected:
+    navigations: [ 1 ]
+    out: 1
+-
+  input:
+    total_entries: 100000000
+    entries_per_page: 1000000000
+    current_page: 1
+  expected:
+    navigations: [ 1 ]
+    out: 1
+-
+  input:
+    total_entries: 0
+    entries_per_page: 10
+    current_page: 1
+  expected:
+    navigations: [ 1 ]
+    out: 1
+-
+  input:
+    total_entries: 0
+    entries_per_page: 1
+    current_page: 0
+  expected:
+    navigations: [ 1 ]
+    out: 1

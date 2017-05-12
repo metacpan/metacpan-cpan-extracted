@@ -1,0 +1,33 @@
+$Id: README,v 1.2 2006/08/03 19:09:11 ajk Exp $
+
+Data::Passphrase
+================
+
+This mod_perl module provides interfaces for checking passphrase
+strength against a set of customizable rules.  Procedural and
+object-oriented Perl interfances, an HTTP service, and a trivial form
+handler are included.
+
+An application or user may submit the passphrase to be checked via the
+query parameter "passphrase".  The module also supports a "username"
+parameter, which defaults to $r->user().  Sites may wish to configure
+rules to check passphrases based on user-related data, so the
+"username" parameter may be useful for testing.
+
+The response consists only of an HTTP response code and status
+message.  If a passphrase is deemed to weak via a certain rule, the
+error code associated with that rule is returned.  Usually, these
+error codes are in the 4xx range.  If a passphrase passes all rules,
+200 is returned.
+
+This module supports GET and POST request methods, but POST is usually
+appropriate to avoid passphrases being recorded in server logs.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install

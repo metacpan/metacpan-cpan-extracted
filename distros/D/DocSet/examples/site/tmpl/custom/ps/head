@@ -1,0 +1,13 @@
+[%#
+  # header: standard header for HTML pages  
+  # ARGS:
+  #     title       # page title
+-%]
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>[% doc.meta.title %]</title>
+</head>
+
+<body>
+<a name="top"></a>

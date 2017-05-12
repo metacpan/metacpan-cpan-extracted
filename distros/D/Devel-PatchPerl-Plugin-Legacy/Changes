@@ -1,0 +1,11 @@
+Revision history for Devel::PatchPerl::Plugin::Legacy
+
+0.03  2013-05-15
+  * Suppress warning on subroutine redefined
+
+0.02  2013-05-09
+  * Devel::PatchPerl-0.86 includes hsplit rehash patch, so skip patching if Devel::PatchPerl >= 0.86
+
+0.01  2013-05-08
+  * Initial version
+

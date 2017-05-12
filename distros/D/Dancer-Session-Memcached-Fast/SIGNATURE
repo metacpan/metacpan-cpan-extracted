@@ -1,0 +1,49 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.73.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 9e3ab421f51df6517aa1a31d5cc13b1479e7134e Changes
+SHA1 21696e04788daf443832163be15c96a621ae5381 LICENSE
+SHA1 c6da4657c307baa69a950e8a1f354788bf66b603 MANIFEST
+SHA1 60cd40bec7e753601b8488ed2a68e1d35acb3cff META.yml
+SHA1 496e940ff47cb9f11e41a8355897ccf148e35201 Makefile.PL
+SHA1 8b8fa2372bfe421345a8f0a2d0fb3da3cf6b503e README
+SHA1 76b9caf45180f58a7cd387e3b064d67f2560c883 dist.ini
+SHA1 5cdfc7bd7a05ca4215e09fbcd7bbf6eb14271461 lib/Dancer/Session/Memcached/Fast.pm
+SHA1 f214de96cfe8b70da71201ab8859bb32cbdafe1d t/author-critic.t
+SHA1 f8ed6d2f69e821def622393d92419529e69008e7 t/author-memcached.t
+SHA1 c0e3c25f14218b78380147f307a49329860da290 t/base.t
+SHA1 1bf69b71b924777ef46b198af9435e8381149fc7 t/release-cpan-changes.t
+SHA1 bdd52baa1a968cc0e1a577a7b073f046d563a317 t/release-kwalitee.t
+SHA1 ca37d7b91c2299a98877a6f36d3fab51e8dd906f t/release-pod-coverage.t
+SHA1 e7fc4d8f3f29ee522cb53914648393524fc7a6d4 t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+Comment: GPGTools - http://gpgtools.org
+
+iQIcBAEBAgAGBQJUvSqhAAoJEHwWRyBU62lqzuIP+wTEcoZxdJ08tKJsY3AHQZe1
+0zIHJv2IjlAZI/5DklkNyEvl4m4JS7+DXZFN+dPaccxqR3uAcHaKBZox0TdRmpRW
+jeNT1Rcb+LAQYJgmSpzoQdIzc4KSdr1QElAc5GuJh60ERsaLotVN7C6UavhjATTI
+cU6Y01bjc19oVI9A9YmH1eb3PV//pfbA9TcXXyOMeAiZIK3lpsKewOAdH622DBK5
+FJL1p6d633aAFIFErSh/uDMHeCArD117IhgoCoxxZWazjmB4o2VYK1db0+6XLPPt
+IXaOzXG55SLx5jvHne79kGi07yb76wEyqF7OWnaS2UTlIurxeNwAX0Mi8L6zvATq
+jgUBGpRHwuXUjiN71PBGPulVQCyxEbmZUMxLeW4rhotrOY+45ltqvG9fUiXnLV8y
+qvXXZWHi5rsHVqmOf/zJTN3h5I/5a2/Jx4oT16R5YnxZ1QP3ES0tcrlaHObxiaiJ
+X5WySxdfTTvkXIJ3/nT2wddQUidjEuHOY71iGdVRmIDZUhjNKPClNOiLJDOlHAv+
+KNPbM9aevKa634Y5RQyFpgA7UkOJbh15AVWyB78glt4nzDWOxNSKKJbN1l36iIrP
+GbJB8hSw4JnHFA9CGjB8PColmJpl4VvICggLYCmZzfyQyhWsQ4q3WLMSaDgfgjWn
+IxS3KAf2KdQw7UwoN8xX
+=90js
+-----END PGP SIGNATURE-----

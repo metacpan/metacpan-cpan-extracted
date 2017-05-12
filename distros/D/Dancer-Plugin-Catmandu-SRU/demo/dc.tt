@@ -1,0 +1,10 @@
+<srw_dc:dc xmlns:srw_dc="info:srw/schema/1/dc-schema"
+           xmlns:dc="http://purl.org/dc/elements/1.1/"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="info:srw/schema/1/dc-schema http://www.loc.gov/standards/sru/recordSchemas/dc-schema.xsd">
+[%- FOREACH var IN ['title' 'creator' 'subject' 'description' 'publisher' 'contributor' 'date' 'type' 'format' 'identifier' 'source' 'language' 'relation' 'coverage' 'rights'] %]
+    [%- FOREACH val IN $var %]
+    <dc:[% var %]>[% val | html %]</dc:[% var %]>
+    [%- END %]
+[%- END %]
+</srw_dc:dc>

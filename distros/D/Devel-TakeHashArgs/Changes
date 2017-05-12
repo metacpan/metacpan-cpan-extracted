@@ -1,0 +1,22 @@
+Revision history for Devel-TakeHashArgs
+
+0.006   2013-11-30
+        - Minor changes to comply with the spec and Kwalitee game
+        - Moved author tests to xt/
+
+0.005   2008-04-12
+        - fixed a stupid bug in set_self_args_as_hash()
+
+0.004   2008-04-11
+        - Added set_self_args_as_hash()
+
+0.003   2008-03-23
+        - Added checks for valid arguments
+          (the [qw(only these are valid args)] arrayref)
+
+0.002   2008-03-17
+        - Added "mandatory arguments" support
+
+0.001   2008-03-05
+        - First version, released on an unsuspecting world.
+

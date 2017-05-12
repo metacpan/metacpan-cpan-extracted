@@ -1,0 +1,21 @@
+---
+abstract: 'Cassandra client (XS for libcassandra v1.0.x)'
+author:
+  - 'Alexander Borisov <lex.borisov@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150001'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Database-Cassandra-Client
+no_index:
+  directory:
+    - t
+    - inc
+requires: {}
+version: '1'

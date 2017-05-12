@@ -1,0 +1,45 @@
+Revision history for Dist-Zilla-Plugin-MinimumPerl
+
+1.006 2014-10-31T21:43:35Z UTC
+ - extend the scanning of runtime prerequisites to include executables
+ - file finder options are now documented
+ - reverted the reversion of the filename check: a custom filefinder can do
+   this for you if necessary
+
+ [STATISTICS]
+ - code churn: 2 files changed, 42 insertions(+), 14 deletions(-)
+
+1.005 2014-10-31T17:29:36Z UTC
+ - Reverted the removal of the filename check while scanning files -
+   RT#99935 ( thanks Nigel! )
+
+ [STATISTICS]
+ - code churn: 2 files changed, 256 insertions(+)
+
+1.004 2014-10-28T02:21:06Z UTC
+ - Expanded the prereq specification so we now separate the configure,
+   test, and runtime phases RT#61028 ( thanks DAGOLDEN! )
+ - Skip parsing files with encoding == bytes RT#96071 ( thanks ETHER! )
+
+1.003 2011-04-21T16:19:04Z UTC
+ - Make sure that we scan only .t and .pl/pm files ( thanks RT#67355 and
+   DOHERTY )
+
+1.002 2011-04-01T04:25:20Z UTC
+ - Re-release because v1.001 somehow didn't get on CPAN... /me smacks
+   myself!
+ - Minor POD tweaks
+
+1.001 2010-12-08T02:54:32Z UTC
+ - Converted to Dist::Zilla for the release process!
+ - Updated to support Dist::Zilla v4
+ - Use MooseX::Types::Perl to validate the perl attr
+ - Now scans only the t/, lib/, and executable files for perl code ( thanks
+   DAGOLDEN )
+
+0.02 0000-00-00T00:00:00Z UTC
+ - d0h, the logic for finding the minimum Perl version was reversed!
+
+0.01 0000-00-00T00:00:00Z UTC
+ - initial release
+

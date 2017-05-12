@@ -1,0 +1,46 @@
+{
+   "abstract" : "Support for OpenEdge Advance Server",
+   "author" : [
+      "Kevin L. Esteb <kesteb@wsipc.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.4003, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-Storage-DBI-OpenEdge",
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBIx::Class" : "0.08210"
+         }
+      }
+   },
+   "provides" : {
+      "DBIx::Class::Storage::DBI::OpenEdge" : {
+         "file" : "lib/DBIx/Class/Storage/DBI/OpenEdge.pm",
+         "version" : "0.02"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "0.02"
+}

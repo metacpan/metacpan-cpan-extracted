@@ -1,0 +1,85 @@
+{
+   "abstract" : "Include the Math::Int64 C client API in your distribution",
+   "author" : [
+      "Graham Ollis <plicease@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.042, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-MathInt64",
+   "no_index" : {
+      "directory" : [
+         "corpus"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Module::Build" : "0.3601"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.3601",
+            "perl" : "5.006"
+         }
+      },
+      "develop" : {
+         "recommends" : {
+            "YAML::XS" : "0"
+         },
+         "requires" : {
+            "File::Spec" : "0",
+            "FindBin" : "0",
+            "Test::CPAN::Changes" : "0",
+            "Test::EOL" : "0",
+            "Test::Fixme" : "0.07",
+            "Test::More" : "0.94",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "0",
+            "Test::Pod::Coverage" : "0",
+            "Test::Pod::Spelling::CommonMistakes" : "0",
+            "Test::Spelling" : "0",
+            "Test::Strict" : "0",
+            "YAML" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "0",
+            "ExtUtils::Typemaps" : "0",
+            "File::ShareDir" : "0",
+            "Moose" : "0",
+            "Path::Class" : "0.26",
+            "perl" : "5.006"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Path::Class" : "0.26",
+            "Test::More" : "0.88",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/plicease/Dist-Zilla-Plugin-MathInt64/issues"
+      },
+      "homepage" : "http://perl.wdlabs.com/Dist-Zilla-Plugin-MathInt64",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/plicease/Dist-Zilla-Plugin-MathInt64.git",
+         "web" : "https://github.com/plicease/Dist-Zilla-Plugin-MathInt64"
+      }
+   },
+   "version" : "0.09"
+}
+

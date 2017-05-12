@@ -1,0 +1,246 @@
+package DataFlow::QuickStart;
+
+# ABSTRACT: DataFlow Quick Start Guide
+
+# VERSION
+
+1;
+
+
+
+=pod
+
+=encoding utf-8
+
+=head1 NAME
+
+DataFlow::QuickStart - DataFlow Quick Start Guide
+
+=head1 VERSION
+
+version 1.121830
+
+A guide for quick jumping into the DataFlow bandwagon, programming-wise. That
+means that, despite our long term goals of making a framework that can be used
+by non-programmers, we are still living within the sphere of those who can
+code. Code Perl, as of now.
+
+For the purpose of this guide, we are going to distinguish among three
+different types of uses, for people who want to:
+
+=over 4
+
+=item *
+
+Use DataFlow to achieve something in a different project
+
+=item *
+
+Improve DataFlow by adding/improving processors that allow for more sophisticated data manipulation
+
+=item *
+
+Improve DataFlow by adding/improving features in the core components
+
+=back
+
+DataFlow is built upon L<Moose> and it follows the rules of that system.
+
+If you are really serious about submitting code to DataFlow, please read the
+section called "Joining the DataFlow effort" below.
+
+=head1 Using DataFlow
+
+This is covered in the POD documentation elsewhere, so here we present
+just a summary.
+
+=head2 Proc
+
+A L<DataFlow::Proc> is the basic processing unit of DataFlow. It runs the
+closure pointed to by the C<p> parameter with C<$_> localized to the data
+that has to be processed.
+
+One can create a simple Proc (short for Processor) that converts a string to
+uppercase like this:
+
+    $proc = DataFlow::Proc( p => sub { uc } );
+    $result = $proc->process( 'Abracadabra' );
+    # $result is 'ABRACADABRA'
+
+Since the builtin function C<uc> uses C<$_> if an argument is omitted, there
+is no need to explicitly handle parameters, and the result of the Proc is the
+result of the "sub".
+
+One may want to design a Proc where the C<p> sub is applied in only on data
+that conforms to a certain structure, say "only arrays, and leave the scalars
+alone" or "scalars only, throw an error if anything else comes our way". For
+that refer to the L<DataFlow::Role::ProcPolicy> role.
+
+=head2 DataFlow
+
+A L<DataFlow> is a sequence of Procs, arranged so that each Proc's output is
+fed into the next Proc's input. Sort of like a sequence of commands in a
+shell using pipes "|" to connect one command to the next one.
+
+A simple example of a DataFlow could be:
+
+    $flow = DataFlow->new( [
+        'URLRetriever',          # DataFlow::Proc::URLRetriever
+        [                        # DataFlow::Proc::HTMLFilter with param
+          HTMLFilter => { search_xpath => '//table//tr' }
+        ],
+        [                        # DataFlow::Proc::HTMLFilter with params
+          HTMLFilter => {
+              search_xpath => '//td',
+              result_type  => 'VALUE',
+              ref_result   => 1,
+          }
+        ],
+        sub { s/^\s+//; s/\s+$//; return $_ },  # trim leading/trailing spaces
+        CSV => { direction => 'CONVERT_TO', }
+    ] );
+
+Given an URL, this simple dataflow will retrieve its contents (assuming HTML),
+will parse all the tables in it (specific tables or data i nthe HTML can be
+singled-out using proper XPath expressions for them), it will trim the white
+spaces and produce a CSV output, which can be used in a spreadsheet or to
+load a database.
+
+=head1 Creating Processors and/or Flows
+
+To create a new Proc, one must extend L<DataFlow::Proc>.
+When doing that, do refer to Moose best practices.
+One simple example, the file C<< lib/DataFlow/Proc/UC.pm >> contained in this
+distribution, is approximately like this:
+
+    package DataFlow::Proc::UC;
+    
+    use Moose;
+    extends 'DataFlow::Proc';
+    
+    sub _build_p {
+        my $self = shift;  # not using here, but we do have $self
+        return sub { uc };
+    }
+    
+    1;
+
+Any Proc under the C<DataFlow::Proc::> namespace can be used in a DataFlow by
+its last name, in this case C<UC>.
+
+    $flow = DataFlow->new( [
+        # ... something here
+        'UC',
+        # ... something else
+    ] );
+    my @output = $flow->process( @input );
+
+More sophisticated Procs can also be constructed. Take a look at the source
+code of C<DataFLow::Proc::HTMLFilter>, C<DataFlow::Proc::URLRetriever> or
+C<DataFlow::Proc::Converter>.
+
+=head1 Tweaking the Core
+
+DataFlow is not a very sophisticated piece of software on its own, as much
+as a Bourne shell of the 70's was not very sophisticated, 
+but B<it allows and promotes> extending its functionalities to make for 
+sophisticated solutions.
+
+=head2 A DataFlow
+
+A DataFlow is nothing more than queues and processors:
+
+    Information Flow
+
+    ||===>||====>||==  ...  =>||========>||====>||      |
+                                                        |
+                     Queues                             |
+                                                        |
+    Q0    Q1    Q2          Q(n-1)       Qn    Qlast    | => output
+      \  /  \  /  \    ...        \      /  \  /        |
+       P0    P1    P2              P(n-1)    Pn         |
+                                                        |
+                   Processors                           |
+
+Upon calling C<input()>, one adds elements to the B<Q0> queue. When C<output()>
+is called, then the entire flow is run to provide one single element (read
+scalar) at the C<output()> (actually, if C<output()> is called in array context
+it returns all the elements available in B<Qlast> at the time).
+
+When running data through the entire flow, these elements are run, through
+B<P0> and the results (one or many) are enqueued in B<Q1>. One element from
+B<Q1> is then run through  B<P1> and the result (or results) is enqueued into
+B<Q2>, and so forth. Upon running the last processor, B<Pn>, the resulting
+data is put into B<Qlast>, the last queue in the desert.
+
+=head1 Code Repository
+
+DataFlow source code is hosted at the superb L<Github|http://github.com/>
+service, at the address L<http://github.com/russoz/DataFlow>.
+
+Additionally, we strongly recommend that any serious project using Git do take
+a look at gitflow: the
+L<methodology|http://nvie.com/posts/a-successful-git-branching-model/> and the
+L<git flow extension to git|https://github.com/nvie/gitflow>.
+
+DataFlow has been using gitflow for a good while now, but please bear in mind
+that you do not need to have gitflow installed, or even to follow the
+methodology for that matter, to be able to provide a patch or open a pull
+request.
+
+=head1 SEE ALSO
+
+Please see those modules/websites for more information related to this module.
+
+=over 4
+
+=item *
+
+L<DataFlow|DataFlow>
+
+=back
+
+=head1 AUTHOR
+
+Alexei Znamensky <russoz@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2011 by Alexei Znamensky.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=head1 BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at L<http://rt.cpan.org>.
+
+=head1 DISCLAIMER OF WARRANTY
+
+BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE
+SOFTWARE IS WITH YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME
+THE COST OF ALL NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+DAMAGES.
+
+=cut
+
+
+__END__
+

@@ -1,0 +1,32 @@
+---
+abstract: 'Short hand ResultSet Accessors'
+author:
+  - 'Roman F.'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  Test::More: 0.94
+  Test::Warn: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 1.01'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Schema-ResultSetAccessors
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0.08192
+  Lingua::EN::Inflect::Phrase: 0
+  String::CamelCase: 0
+  Sub::Name: 0
+  namespace::clean: 0
+  perl: 5.8.1
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: git://git.shadowcat.co.uk/dbsrgits/DBIx-Class-Schema-ResultSetAccessors.git
+version: 0.001005

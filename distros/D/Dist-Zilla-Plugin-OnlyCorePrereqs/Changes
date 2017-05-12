@@ -1,0 +1,92 @@
+Revision history for Dist-Zilla-Plugin-OnlyCorePrereqs
+
+0.024     2015-03-19 07:04:15Z
+          - fix test failures when Module::CoreList doesn't have information
+            about the current version of perl
+
+0.023     2015-03-14 05:09:37Z
+          - fix test failures (new in 0.021) on *.0 perl releases
+          - give runtime warnings for, and avoid test failures in, blead perl
+            (dev builds that represent an upcoming release of perl)
+
+0.022     2015-02-20 02:55:52Z
+          - dump 'starting_version' field into meta config data properly
+          - fix test failures (new in 0.021) on *.0 perl releases
+
+0.021     2015-02-15 22:51:47Z
+          - new 'also_disallow' option, for prohibiting some core modules
+
+0.020     2015-01-03 20:57:36Z
+          - re-release to fix problematic $VERSION declaration (RT#101095)
+
+0.019     2014-12-18 06:44:28Z
+          - fixed bad parsing of response from cpanmetadb, which resulted in
+            invalid failures for dual-life upstream-blead modules when
+            check_dual_life_versions = 0
+
+0.018     2014-11-22 04:02:17Z
+          - switch from cpanidx to cpanmetadb index
+
+0.017     2014-08-06 05:39:32Z
+          - re-release to remove README.pod from shipped dist
+
+0.016     2014-08-01 02:13:32Z
+          - fix fatal error when [MetaConfig] is used and starting_version is
+            not specified (from 0.015)
+
+0.015     2014-08-01 01:01:20Z
+          - fix fatal error when used in conjunction with [MetaConfig]
+            (introduced in 0.014)
+
+0.014     2014-07-20 15:35:18Z
+          - 'starting_version' now defaults to the perl prerequisite declared
+            in the distribution, if it exists
+
+0.013     2013-12-14 21:09:08Z
+          - now treats dual-lifed modules that did not exist in core at all at
+            the versions being checked against as the same as existing, but
+            not being at a new enough version (relevant when
+            check_dual_life_versions = 0)
+
+0.012     2013-12-02 04:54:15Z
+          - now also checking configure and build prereqs by default
+          (RT#91081)
+          - new "skip" option
+
+0.011     2013-11-30 17:29:54Z
+          - re-release to fix compile test
+
+0.010     2013-11-11 17:02:47Z (TRIAL RELEASE)
+          - fix expected string in tests for pre-5.019 perls
+
+0.009     2013-11-10 19:40:18Z (TRIAL RELEASE)
+          - more diagnostics printed in failing tests
+
+0.008     2013-09-19 03:29:22Z
+          - fix issues with check_dual_life_version feature
+          - remove "check_module_versions" option
+
+0.007     2013-09-18 00:41:19Z
+          - new "check_dual_life_versions" option
+
+0.006     2013-09-11 04:03:33Z
+          - new "check_module_versions" option (removed in 0.008)
+
+0.005     2013-09-07 00:50:54Z
+          - all invalid dependencies are now reported, instead of only the
+            first (David Golden, github PR #1)
+
+0.004     2013-08-21 19:19:54Z
+          - fix bad regexp causing test failure on perls < 5.019
+
+0.003     2013-08-20 06:09:58Z
+          - new config settings for 'starting_version': 'current' and 'latest'
+
+0.002     2013-08-17 17:17:03Z
+          - now respecting the deprecated_ok config
+          - also check that the specific version of the prereq is available in
+            the indicated perl version
+
+0.001     2013-08-17 05:22:00Z
+          - Initial release.
+

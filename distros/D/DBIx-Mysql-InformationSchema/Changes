@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Mysql::InformationSchema.
+
+0.01  Tue May  1 14:04:33 2007
+	- original version; created by h2xs 1.23 with options
+		-A -O -X -c -d --skip-autoloader --skip-ppport --skip-exporter -n DBIx::Mysql::InformationSchema
+

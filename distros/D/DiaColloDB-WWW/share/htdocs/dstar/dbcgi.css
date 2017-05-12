@@ -1,0 +1,494 @@
+/*------------------------------------------------------
+ * Fonts
+ */
+body,h1,h2,h3,h4,h5,h6,p,center,td,th,ul,dl,div {
+  font-family: Bitstream Vera Sans, Arial Unicode MS, Arial, sans-serif;
+}
+h1,h2,h3, .h1,.h2,.h3, .hlb {
+ text-align: left;
+ color: #000099; /* dark blue */
+}
+
+
+/*------------------------------------------------------
+ * Layout: global
+ */
+.outer {
+ width: 100%;
+ margin: 10px auto;
+ background-color: #ffffff;
+ color: #000000;
+ line-height: 130%;
+}
+.invisible {
+visibility: hidden;  /* allocate space but don't display content */
+}
+.hidden {
+ display: none; /* don't display content or allocate space */
+}
+
+/*------------------------------------------------------
+ * Layout: title (top-top)
+ */
+.title {
+ padding: 0;
+ margin:  0;
+ background-color: #ffffff;
+ border: 0;
+}
+.title h1 {
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 0;
+}
+
+
+/*------------------------------------------------------
+ * Layout: headers (top)
+ */
+.headers {
+  padding: 0;
+  margin: 10px auto;
+  background-color: #e8e8e8;/*-- light grey --*/
+  border: 1px solid gray;
+}
+.headers h1, .headers h2, .headers h3 {
+  padding: 0;
+  margin: 10px;
+}
+h1, .h1 { font-size: 150%; }
+h2, .h2 { font-size: 125%; }
+h3, .h3 { font-size: 112%; }
+.headers p {
+  margin: 1em;
+}
+
+/*------------------------------------------------------
+ * Field Titles
+ */
+.headerFieldTitle, .headerTable th, .headerTable label {
+  font-weight: bold;
+  font-variant: small-caps;
+  text-align: right;
+  padding-right: 4px;
+  padding-bottom: 0px;
+}
+
+.headerTable label { 
+  padding-right: 0px;
+  margin-right: 4px;
+}
+
+/*------------------------------------------------------
+ * Field Values
+ */
+.headerFieldValue {
+  font-style: italic;
+}
+.headerFieldValueTT {
+  font-family: monospace;
+  font-weight: normal;
+}
+
+/*------------------------------------------------------
+ * Table alignment: generic
+ */
+table.collapsed {
+  border-collapse: collapse;
+}
+tr {
+  /*vertical-align: top;*/
+  vertical-align: text-top;
+}
+
+/*------------------------------------------------------
+ * Layout: content (all hits)
+ */
+.content, .fcontent {
+  background-color: #ffffff;
+  margin-left: 0;
+  margin-right: 0;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  padding: 0;
+}
+.fcontent { 
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/*------------------------------------------------------
+ * Layout: content: hits
+ */
+.section, .subsection, .row0, .row1 {
+  border: 1px solid gray;
+  margin: 0;
+  margin-top: 0.25em;
+  margin-bottom: 0.25em;
+  padding: 0.25em;
+}
+.section, .subsection {
+  border: 1px solid gray;
+  padding-left: 1em;
+  padding-right: 1em;
+}
+
+h1, h2, h3 {
+  padding: 0px;
+  margin: 0px;
+  padding-top: 0.25em;
+  padding-bottom: 0.25em;
+}
+.subsection {
+  border: 0;
+  margin-left: 2em;
+}
+
+.row0 {
+  /*background-color: #cee8ff;*//*-- aliceblue --*/
+  /*background-color: #99ccff;*//*-- aliceblue-ish(safe) --*/
+  /*background-color: #e8e8e8;*//*-- light grey --*/
+  /*background-color: #e0f0ff;*//*-- very light alice-ish blue --*/
+  background-color: #ccccff;/*-- light purple --*/
+  /*background-color: #f4f4f4;*//*-- very light grey --*/
+  /*background-color: #f4e7c0;*//*-- dta khaki.1-*/
+  /*background-color: #faecc4;*//*-- dta khaki.2-*/
+  /*background-color: #fff0c8;*//*-- dta khaki.3-*/
+  /*background-color: #fff5db;*//*-- dta khaki.4-*/
+}
+.row1 {
+  background-color: #ffffff;
+}
+
+/*------------------------------------------------------
+ * Layout: footers (bottom)
+ */
+.footer {
+  padding: 5px;
+  margin: 0;
+  background-color: #e8e8e8;/*-- light grey --*/
+  border: 1px solid gray;
+}
+
+/*------------------------------------------------------
+ * Buttons etc.
+ */
+.navSep { 
+  padding: 0px;
+  margin-left: 0px;
+  margin-right: 10px;
+}
+.navLink, .navLinkDisabled, .linkButton, .linkButtonSmall, .imgButton, .textButton, .textButtonSmall
+{ 
+  color: #000099;
+  margin: 0;
+  padding: 1px;
+  padding-left: 10px;
+  padding-right: 10px;
+  margin-left: 0px;
+  margin-right: 10px;
+  font-weight: bold;
+  text-decoration: none;
+  background-color: #ffffff;
+  border: 1px solid #000099;
+  cursor: pointer;
+}
+.navLinkDisabled, .textButtonSmallDisabled
+{ 
+  color: #666666;
+  border: 1px solid #666666;
+  font-weight: bold;
+}
+.disabled, .navLinkDisabled, .textButtonSmallDisabled {
+  color: #666666;
+  border-color: #666666;
+}
+.linkButton .linkButtonSmall, .textButton, .textButtonSmall {
+  font-weight: normal;
+}
+.linkButtonSmall, .textButtonSmall {
+  font-size: small;
+}
+.textButton, .textButtonSmall {
+  margin: 0px;
+  padding: 2px;
+}
+
+select, input[type="checkbox"] {
+  cursor: pointer;
+}
+
+
+/*---------------------------------------------------------
+ * Link Colors
+ */
+:link    { color: #000099; }
+:active  { color: #000000; }
+:visited {
+  color: #cc3300;   /*dark orange*/
+}
+a[href]:hover, .hvr:hover, .navLink:hover, .linkButton:hover, .linkButtonSmall:hover, .textButton:hover, .textButtonSmall:hover {
+  /*background-color: #000099;*/ /*dark blue*/
+  /*background-color: #ccccff;*/ /*purple*/
+  /*background-color: #99ffff;*/ /*bright teal*/
+  /*background-color: #ccffff;*/ /*pale teal*/
+  /*background-color: #ffffcc;*/ /*pale cream yellow*/
+  /*background-color: #000000;*/
+  /*background-color: #cc3300;*/   /*dark orange*/
+  /*background-color: #000099;*/ /*dark blue */
+  background-color: #ffbb75; /*light orange (old)*/
+  /*background-color: #ffcc66;*/ /*light orange (safe)*/
+  color: #000099;
+  cursor: pointer;
+}
+
+.navTab:visited, .navTabCur:visited {  color: #000099; }
+
+.searchText, .searchText:hover { background-color: #ffffff; }
+.searchButton, .searchButton:hover   { background-color: #cccccc; }
+
+.searchLabel, .searchLabelDisabled {
+  font-weight: bold;
+  color: #000099;
+  text-align: right;
+  width: 33%;
+}
+.searchLabelDisabled { color: #666666; }
+
+.disabled, .disabled:hover {
+  color: #666666;
+  background-color: inherit;
+  cursor: default;
+}
+
+/*------------------------------------------------------
+ * imgButton
+ */
+
+.imgButton {
+  padding-left: 2px;
+  padding-right: 2px;
+}
+.imgButton:hover {
+  background-color: #ffbb75; /*light-orange*/
+}
+
+
+/*------------------------------------------------------
+ * Layout: tables: dbTable
+ */
+table.dbViewTable
+{
+  max-width: 100%;
+  border: 1px solid grey;    /*-- grey --*/
+  border-collapse: collapse;
+}
+.dbViewTable tr { 
+  border: none;
+}
+.dbViewTable th, .dbViewTable td
+{ 
+  padding: 0.25em;
+  margin: 0px;
+  /*border-left: 1px solid grey; border-right: 1px solid grey; */
+  /*border-left: 1px solid #000099; border-right: 1px solid #000099; */
+  border: 1px solid grey;
+  text-align: center; /*-- bogusly removed by commit 14642? --*/
+}
+.dbViewTable th
+{
+  background-color: #000099;/*-- dark blue --*/
+  color: #ffffff; /*-- white --*/
+  border: 1px solid #c8c8c8;
+}
+
+
+/*------------------------------------------------------
+ * Layout: tables with no borders
+ */
+table.nobTable {
+  border-collapse: collapse;
+}
+.nobTable th, .nobTable td {
+  padding: 0.25em;
+}
+.nobTable th { 
+  font-weight: bold;
+  color: #000099; /* dark blue */
+}
+
+/*------------------------------------------------------
+ * Layout: tables: dbEdit
+ */
+
+table.dbEditTable
+{
+  border-collapse: collapse;
+  width: 100%;
+  margin: 2px;
+  margin-top: 0px;
+  margin-bottom: 5px;
+}
+.dbEditTable th, .dbEditTable td
+{
+  border: none;
+  /*vertical-align: top;*/
+}
+.dbEditTable th, .dbEditHeader
+{
+  font-weight: bold;
+  font-variant: small-caps;
+  text-align: right;
+  padding-right: 4px;
+  padding-bottom: 0px;
+  color: #000099; /*-- dark blue --*/
+  width: 200px;
+}
+
+.dbEditButtons {
+  /*vertical-align: top;*/
+  vertical-align: text-top;
+}
+.dbEditValue {
+  min-width: 25%;
+  max-width: 75%;
+}
+.dbEditAuto {
+  font-weight: bold;
+}
+.dbEditNum {
+  width: 5em;
+}
+.dbEditFlag { 
+  /*width: 25%;*/
+}
+tr.dbEditSection {
+  font-size: large;
+  /*background-color: #000099;*/ /* dark blue */
+}
+tr.dbEditSection th {
+  /*background-color: #000099; /* dark blue */
+  /*color: #ffffff; /*-- white --*/
+  color: #000099; /*-- dark blue-- */
+  background-color: #e8e8e8; /*-- light grey --*/
+  text-align: left;
+  padding: 3px;
+  margin-top: 10px;
+  border: 1px solid grey;
+}
+
+.dbFrame {
+  border: 1px solid gray;
+  margin: 0px;
+  margin-top: 0.5em;
+  background-color: #ffffff;
+}
+
+
+
+/*------------------------------------------------------
+ * Layout: code & pre-formatted
+ */
+pre,code,samp { 
+  /*background-color: #cee8ff;*//*-- aliceblue --*/
+  background-color: #ccccff;/*-- light purple --*/
+}
+pre {
+  border: none;
+  margin-left: 2em;
+  margin-right: 2em;
+  padding: 0.5em;
+}
+
+/*------------------------------------------------------
+ * definition-list stuff
+ */
+DT {
+  font-weight: bold;
+  color: #000099; /* dark blue */
+  margin-left: 1em;
+}
+DD {
+  margin-bottom: 0.5em;
+}
+
+DD DT { font-weight: normal; font-style: italic; }
+
+
+/*------------------------------------------------------
+ * footer stuff: dummy, nopad
+ */
+.nopad {
+  padding: 0;
+  margin: 0;
+}
+.dummy {
+  padding: 0;
+  margin: 0;
+  clear: both;
+}
+.footer_linkbar, .linkbar {
+  margin: 0;
+  padding: 0;
+}
+.footer_sig {
+  float: right;
+  text-align: right;
+  margin: 0;
+  padding: 0;
+}
+
+
+/*------------------------------------------------------
+ * generic fonts
+ */
+.nob { border: none !important; }
+.jl, .jleft, .jleftMid  { text-align: left !important; }
+.jr, .jright, .jrightMid { text-align: right !important; }
+.jc, .jcenter, .jcenterMid { text-align: center !important; }
+.vjmid, .jleftMid, .jrightMid, .jcenterMid { vertical-align: middle !important; }
+.ul, .underline { text-decoration:underline !important; }
+
+.italic, .it { font-style:italic !important; }
+.bold, .bf { font-weight:bold !important; }
+.monospace, .mono {  font-family:monospace !important; font-weight:normal; }
+.smallcaps, .sc { font-variant:small-caps !important; }
+
+
+
+/*------------------------------------------------------
+ * generic colors
+ */
+.hlh { color: #000099; } /*-- hlh: dark-blue-text --*/
+.hla { color: #0000ff; } /*-- hla: pure-blue-text --*/
+.hlb { color: #ffbb99; } /*-- hlb: bright-orange (link) --*/
+.hlw { color: #ffffff; } /*-- hlw: white-text --*/
+.hlbv, .hlvisited, .orange { color: #cc3300; } /*-- hlbv: dark-orange (link:visited) --*/
+.hlc { color: #6600cc; } /*-- hlc: purple-text --*/
+.hlg { color: #808080; } /*-- hlg: grey-text --*/
+.hldis { color: #666666; } /*-- hldis: disabled-text --*/
+.hlred { color: #ff0000; } /*-- hlred: red text --*/
+.hldarkgreen { color: #009900; } /*-- hldarkgreen: dark-green text --*/
+.hlgreen { color: #00ff00; } /*-- hldarkgreen: pure-green text --*/
+
+.bgw { background-color:#ffffff; }
+.bgg       { background-color: #cccccc; } /*-- bgg: bg-grey (dark)) --*/
+.bglg,.bgh { background-color: #e8e8e8; } /*-- bgg: bg-grey (light, header-color)) --*/
+/*.bga, .bgt { background-color:#66ffff;  }*/ /*-- bga: teal-ish background --*/
+.bga, .bgt { background-color:#ccffff;  } /*-- bga: alice-blueish background --*/
+.bgb, .bghover, .bgo { background-color:#ffbb75; } /*-- bgb: light-orange background (link hover) --*/
+.bgc, .bgp { background-color: #ccccff; } /*-- bgc: light-purple background --*/
+.bgpink { background-color:#ffcccc; } /*-- bgpink: pink (light-red) background --*/
+.bgy { background-color: #ffff00; } /*-- bgy: pure-yellow background --*/
+.bggreen { background-color: #66ff66; } /*-- mid-light-green background --*/
+.bglightgreen { background-color: #ccffcc; } /*-- light-green background --*/
+
+.hlth { color:#ffffff; background-color:#000099; } /*-- hlth: white/dark-blue --*/
+.hlhover { color:#000099; background-color:#ffbb75; } /*-- hlhover: dark-blue/light-orange --*/
+
+/*------------------------------------------------------
+ * generic padding
+ */
+.pad0, .nopad { padding:0px; }
+.pad1 { padding:1px; }
+.pad2 { padding:2px; }

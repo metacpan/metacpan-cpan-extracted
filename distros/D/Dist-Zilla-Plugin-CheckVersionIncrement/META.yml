@@ -1,0 +1,41 @@
+---
+abstract: 'Prevent a release unless the version number is incremented'
+author:
+  - 'Ryan C. Thompson <rct@thompsonclan.org>'
+build_requires:
+  Carp: 0
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Scalar::Util: 0
+  Test::DZil: 0
+  Test::More: 0.94
+  Test::Most: 0
+  autodie: 0
+  perl: 5.004
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300015, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-CheckVersionIncrement
+no_index:
+  directory:
+    - corpus
+requires:
+  Dist::Zilla::Role::BeforeRelease: 0
+  Encode: 0
+  JSON::PP: 0
+  LWP::UserAgent: 0
+  Moose: 0
+  perl: 5.006
+  version: 0
+resources:
+  homepage: https://github.com/DarwinAwardWinner/Dist-Zilla-Plugin-CheckVersionIncrement
+  repository: https://github.com/DarwinAwardWinner/Dist-Zilla-Plugin-CheckVersionIncrement.git
+version: 0.121750

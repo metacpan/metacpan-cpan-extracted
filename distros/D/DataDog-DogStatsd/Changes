@@ -1,0 +1,11 @@
+Revision history for DataDog-DogStatsd
+
+0.04  2015-01-13 18:09:20 CST
+        - sprintf %d for timing
+        - more tests
+
+0.03  2015-01-12 18:34:29 CST
+        - add Helper
+
+0.01  2015-01-12 18:30:33 CST
+        - Initial release

@@ -1,0 +1,70 @@
+NAME
+
+    Device::Chip::INA219 - chip driver for an INA219
+
+SYNOPSIS
+
+     use Device::Chip::INA219;
+    
+     my $chip = Device::Chip::INA219->new;
+     $chip->mount( Device::Chip::Adapter::...->new )->get;
+    
+     printf "Current bus voltage is %d mV, shunt voltage is %d uV\n",
+        $chip->read_bus_voltage->get, $chip->read_shunt_voltage->get;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Texas
+    Instruments INA219 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ addr
+
+    The I²C address of the device. Can be specified in decimal, octal or
+    hex with leading 0 or 0x prefixes.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_config
+
+       $config = $chip->read_config->get
+
+    Reads and returns the current chip configuration as a HASH reference.
+
+ change_config
+
+       $chip->change_config( %config )->get
+
+    Changes the configuration. Any field names not mentioned will be
+    preserved.
+
+ read_shunt_voltage
+
+       $uv = $chip->read_shunt_voltage->get
+
+    Returns the current shunt voltage reading scaled integer in microvolts.
+
+ read_bus_voltage
+
+       $mv = $chip->read_bus_voltage->get
+    
+       ( $mv, $ovf, $cnvr ) = $chip->read_bus_voltage->get
+
+    Returns the current bus voltage reading, as a scaled integer in
+    milivolts.
+
+    The returned Future also yields the OVF and CNVR flags.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

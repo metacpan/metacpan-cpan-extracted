@@ -1,0 +1,163 @@
+package Data::MuForm::Manual::Hooks;
+# ABSTRACT: Overriding or supplementing form processing
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Hooks - Overriding or supplementing form processing
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+There are a number of places that you can use to override the processing
+of a form. Some of these are explicitly provided as hooks, others are
+methods that are convenient to override.
+
+A lot of the MuForm (and FormHandler) flexibility comes from the supported
+ability to override parts of form object processing.
+
+Note that these 'supported' hooks do not mean that you can't override other
+methods with 'before', 'around', and 'after', or with a standard override plus
+C<< $self->next::method(@) >>. The methods listed here are just the places
+that handle the most common requirements.
+
+=head1 DESCRIPTION
+
+To understand where in the process these hooks or overrides occur, it's
+probably best to read the MuForm code. The 'process' or 'check' methods
+in Data::MuForm contain the flow in the simplest form.
+
+=head2 after_build_fields
+
+This method is called from BUILD, after the 'build_fields' method completes.
+This is probably the best place to put code that modifies the fields based
+on some attribute, or the place to put things like providing all fields with
+a different build_id method. Code that in FH was handled by 'update_subfields'
+would go here. At this point the "base" fields in a repeatable are most easily
+updated. After the fields are "filled" in 'setup', there may be cloned fields
+to represent the instances of the Repeatable. This would also be a good place
+to do 'add_field', if you're creating a new form object on every request.
+
+    sub after_build_fields {
+        my $self = shift;
+        foreach my $field ( values %{$self->index} ) {
+            $field->{methods}->{build_id} = \&build_id;
+        }
+    }
+
+(Note: the above is purely an example, but you don't need to do that to have
+a common form build_id method. You only have to create a 'build_field_id' sub
+in the form class.)
+
+Note that looking in the 'index' will get you all the fields, but if you use
+the 'all_fields' method, you would only get the top-level fields and would need
+to also loop through sub-fields (such as in a Compound or Repeatable) if you
+have them.
+
+    sub after_build_fields {
+        my $self = shift;
+        foreach my $field ( $self->all_repeatable_fields ) {
+            $field->init_instance({ 'ra.wa.class' => ['rep_elem'] });
+        }
+        foreach my $field ( $self->all_fields ) {
+            if ( $field->type eq 'Select' ) {
+                $field->render_args->{wrapper_attr}{class} = ['sel_wrapper'];
+            }
+            elsif ( $field->type eq 'Boolean' ) {
+                $field->render_args->{element_attr}{class} = ['sel_elem'];
+            }
+        }
+    }
+
+This method is a user hook. No internal MuForm code will use this method.
+
+=head2 in_setup
+
+This comes in the 'setup' sub, right after 'set_active' is called. In
+FormHandler forms, the same point in the process was usually hooked by overriding
+'set_active'. This is a good place to change the status of fields on this process
+call, such as setting fields inactive or active (if done by code instead of with
+arguments in the process call), setting fields disabled or not, etc.
+
+This would probably be a good place to do 'add_field', if you're using that
+instead of activating/inactivating fields or using 'include'.
+
+This method is purely a hook. No internal MuForm code will use this method.
+
+=head2 after_setup
+
+This is called after the 'setup' method completes. This would be useful if you
+want to modify fields after the field values and inputs have been filled in by
+the 'fill_from_object', 'fill_from_fields', and 'fill_from_input' methods have
+completed. (The 'fill_from' methods were '_result_from_*' methods in FH.)
+
+This method is a user hook. No internal MuForm code will use this method.
+
+=head2 validate
+
+This is the normal place to put form-level validation code. No internal MuForm
+code will use this method. Called in 'validate_form' which is called by 'process'
+and 'check'.
+
+=head2 validate_model
+
+This is called by the DBIC model to validate that unique fields are unique. If
+you create your own model you could use it, but otherwise you'd probably just
+use the 'validate' method.
+
+This will not run if you use 'check'.
+
+=head2 update_model
+
+This method is very commonly overridden. If you're using the DBIC model and
+want the normal DBIC model updates to be done, you need to do
+C<< $self->next::method(@_) >> or use some method modifier.
+
+If you want to insert additional column updates that don't come directly from
+the form's fields, you can insert them into the 'values' hashref here, before
+calling 'next::method'.
+
+Some of the ways that relationships like Repeatables are updated don't work
+well with some databases, so this would be the place where you'd handle those
+updates yourself. You can either delete those fields from the 'values' hashref
+and update just those, or handle all of the updates yourself.
+
+This is also the place where you'd do database updates on
+form validation if you're *not* using the DBIC model. A common pattern is
+to add a 'schema' attribute to the form, and then perform the database
+updates from the form data in this method. This treats the form class as
+a kind of 'model', and keeps more code out of the controllers, which lets
+you create better test cases.
+
+This will not run if you use 'check'.
+
+=head2 after_update_model
+
+This method reloads Repeatable fields after processing, but can also be
+overridden if you need to do some similar kind of cleanup. If you have
+Repeatable fields, be sure to allow the base method to run.
+
+This will not run if you use 'check'.
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

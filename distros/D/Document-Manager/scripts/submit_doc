@@ -1,0 +1,206 @@
+#!/usr/bin/perl -w
+
+# This script scans a directory system full of svg files and submits
+# them to a document management system on localhost, port 8012
+
+use strict;
+use Pod::Usage;
+use Getopt::Long;
+use File::Find;
+use File::Spec::Functions ("abs2rel", "rel2abs");
+use SOAP::Lite;
+use MIME::Base64 qw(encode_base64);
+
+# Global options
+our $opt_version;
+our $opt_help;
+our $opt_man;
+our $opt_resource = ($ENV{'DMS_RESOURCE'} or
+                     'http://www.openclipart.org/Document/Manager');
+our $opt_server   = ($ENV{'DMS_SERVER'} or 'http://localhost:8012/');
+our $opt_debug    = 0;
+
+Getopt::Long::Configure ("bundling", "no_ignore_case");
+GetOptions(
+           "version|V"    => \$opt_version,
+           "help|h"       => \$opt_help,
+           "man"          => \$opt_man,
+           'server|s=s'   => \$opt_server,
+           'resource|r=s' => \$opt_resource,
+           "debug|D=i",   => \$opt_debug
+           );
+
+# Handle -V or --version
+if ($opt_version) {
+    print '$0: $Revision: 1.3 $', "\n";
+    exit 0;
+}
+
+# Usage
+pod2usage(-verbose => 2, -exitstatus => 0) if ($opt_man);
+pod2usage(-verbose => 1, -exitstatus => 0) if ($opt_help);
+pod2usage(-verbose => 1, -exitstatus => 0) if (@ARGV < 1);
+
+exit main();
+
+my $soap;
+my $docsys;
+
+sub main {
+    # Connect to the server
+    $soap = create_soap_instance($opt_resource, $opt_server);
+
+    # Create the document manager object
+    my $response = $soap->call(new => 1);
+    soap_assert($response);
+    $docsys = $response->result;
+
+    if (! $docsys) {
+	die "Could not create docsys object\n";
+    }
+
+
+    find({ wanted => \&process_files, no_chdir => 1 }, @ARGV);
+
+    return 0;
+}
+
+sub process_files {
+    if (! -d ) {
+	my $content = '';
+	my $buf = '';
+
+	# Load data from the file, encode it, and store in $content
+	print "Opening file ".$File::Find::name."\n";
+	open(FILE, $File::Find::name) 
+	    or die "Could not open file '$File::Find::name':  $!\n";
+	while (read(FILE, $buf, 60*57)) {
+	    $content .= encode_base64($buf);
+	}
+	close(FILE);
+
+	# Now send the encoded file to the dms server
+	my $response = $soap->add($docsys, $File::Find::name, $content);
+	soap_assert($response);
+
+	my $doc_id = $response->result || 'error';
+
+	# Display results of the upload
+	print "$_ -> $doc_id\n";
+    }
+}
+
+
+# Convenience function to create the soap instance
+sub create_soap_instance {
+    my $resource = shift || return undef;
+    my $server = shift || return undef;
+
+    my $soap = SOAP::Lite
+        -> uri($resource)
+        -> proxy($server,
+                 options => {compress_threshold => 10000});
+    return $soap;
+};
+
+# Convenience function to print out any errors encountered in a soap call
+# and exit.
+sub soap_assert {
+    my $response = shift;
+    if ($response->fault) {
+        print join ', ',
+        $response->faultcode,
+        $response->faultstring;
+        return undef;
+    }
+    return 1;
+}
+
+
+__END__
+
+=head1 NAME
+
+B<submit_doc> - command-line program for submitting a document to a document
+management system.
+
+=head1 SYNOPSIS
+
+submit_clipart file.svg [file2.svg dir/ ...]
+
+    Options:
+   -h, --help                    Prints a brief help message
+   -m, --man                     Displays full man page
+   -D, --debug=integer           Prints debug messages
+   -V, --version                 Prints version information
+   -s, --server                  URL of the dms server
+   -r, --resource                URI for the service
+
+=head1 DESCRIPTION
+
+B<submit_doc> - This program is a client-side tool for submitting
+files to a remote document repository via SOAP.  Specifically, it's used
+for submitting SVG clipart to the Open Clip Art Library.  :-)
+
+It takes as arguments a list of SVG files or directories containing SVG
+files.  (It only submits files with the .svg extension.)
+
+=head1 OPTIONS
+
+=over 8
+
+=item B<-V>, B<--version>
+
+Displays the version number of the script and exits.
+
+=item B<-h>, B<--help>
+
+Displays a brief usage message
+
+=item B<--man>
+
+Displays the man page
+
+=item B<-D> I<num>, B<--debug>=I<num>
+
+Prints debug messages.  The higher I<num>, the more detailed the debug
+messages will be.
+
+=item B<-s> I<server_url>, B<--server>=I<server_url>
+
+The URL of the Document::Manager server to connect to.  By default,
+it uses 'http://localhost:8012'.
+
+=item B<-r> I<resource_uri>, B<--resource>=I<resource_uri>
+
+The URI of the service provided by the server.  By default, it uses
+'http://www.openclipart.org/Document/Manager'.  Users should not typically
+need to alter this setting.
+
+=back
+
+=head1 PREREQUISITES
+
+B<SOAP::Lite>,
+B<Pod::Usage>,
+B<Getopt::Long>
+
+=head1 AUTHOR
+
+Bryce W. Harrington E<lt>bryce at bryceharrington dot comE<gt>
+
+L<http://www.bryceharrington.org>
+
+=head1 COPYRIGHT
+
+Copyright (C) 2004 Bryce W. Harrington.
+All Rights Reserved.
+
+    This module is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=head1 REVISION
+
+Revision: $Revision: 1.3 $
+
+=cut

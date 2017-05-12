@@ -1,0 +1,91 @@
+{
+   "abstract" : "Dancer 2 session storage in secure cookies",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Session-Cookie",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2" : "0.165",
+            "Dancer2::Core::Role::SessionFactory" : "0",
+            "Dancer2::Core::Types" : "0",
+            "Moo" : "0",
+            "Session::Storage::Secure" : "0.010",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0.165",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack" : "1.0029",
+            "Plack::Test" : "0",
+            "Test::MockObject" : "0",
+            "Test::More" : "0.96",
+            "YAML" : "0",
+            "lib" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Session::Cookie" : {
+         "file" : "lib/Dancer2/Session/Cookie.pm",
+         "version" : "0.008"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/PerlDancer/Dancer2-Session-Cookie/issues"
+      },
+      "homepage" : "https://github.com/PerlDancer/Dancer2-Session-Cookie",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/PerlDancer/Dancer2-Session-Cookie.git",
+         "web" : "https://github.com/PerlDancer/Dancer2-Session-Cookie"
+      }
+   },
+   "version" : "0.008",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "Moritz Grosch (LittleFox) <littlefox@fsfe.org>",
+      "Peter Mottram <peter@sysnix.com>",
+      "Russell Jenkins <veryrusty@gmail.com>",
+      "Sawyer X <xsawyerx@cpan.org>",
+      "Yanick Champoux <yanick@babyl.dyndns.org>"
+   ]
+}
+

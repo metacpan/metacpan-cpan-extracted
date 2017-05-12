@@ -1,0 +1,36 @@
+0.006 2015-08-02 16:27:06-0500
+  - add a Chart::Clicker plugin. Much thanks to
+    Zhenyi Zhou (zhouzhen1++) for implementing this.
+
+0.005 2015-05-02 20:08:27-0500
+  - fix to how the kernel spec is written out. Generate the JSON in the
+    bin/iperl script.
+  - remove profile template in share/
+
+0.004 2015-05-02 19:46:58-0500
+  - update the IPython message spec to v5.0
+  - support code completion for the Reply REPL backend
+  - Add a kernel spec so that kernel switching can work in the IPython
+    Notebook. This means that an IPython profile directory
+    (~/.ipython/profile_perl/) is not needed to start a frontend.
+  - add HMAC SHA256 signature to message spec
+
+0.003 2015-03-29 13:04:14-0500
+  - send warnings to frontend
+  - add an environment variable $ENV{PERL_IPERL_IPYTHON} that indicates if
+    IPerl is running under IPython.
+
+0.002 2015-02-15 14:56:18-0600
+  - support using Reply as the REPL backend
+  - add Displayable role
+  - add support for IPerl helpers
+  - add plugin for PDL::Graphics::Gnuplot
+  - add example of rich display system
+  - convert `iperl` script from shell script to Perl
+  - dev: Travis-CI builds
+
+0.001 2014-08-16 18:27:47-0500
+  - initial release
+  - still needs more documentation and testing
+  - release early, release often
+  - happy CPAN Day!

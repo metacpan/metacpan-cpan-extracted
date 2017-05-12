@@ -1,0 +1,12 @@
+Changes
+Makefile.PL
+MANIFEST
+README.pod
+lib/DB/Batch.pm
+lib/DB/Batch/BindValues.pm
+lib/DB/Batch/Do.pm
+lib/DB/Batch/Fetch.pm
+lib/DB/Batch/Main.pm
+lib/DB/Batch/Query.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

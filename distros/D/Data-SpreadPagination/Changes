@@ -1,0 +1,14 @@
+Revision history for Perl module Data::SpreadPagination:
+
+0.1.2 Mon Jul 19 2004
+   - Fixed META.yml file; license field got missed out in
+     the last revision
+
+0.1.1 Mon Jul 19 2004
+   - Added the missing Math::Round dependency
+
+0.1 Sun Jul 18 2004
+   - Created by Jody Belka
+   - Immense thanks to Alex Gough for the implementation
+     of the central algorithm
+

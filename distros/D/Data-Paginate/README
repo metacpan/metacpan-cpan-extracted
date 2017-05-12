@@ -1,0 +1,27 @@
+Data/Paginate version 0.0.6
+==========================
+
+See Pod for documentation or 
+ perldoc Data::Paginate
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+or
+
+  perl -MCPAN -e 'install Data::Paginate;'
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2005 Daniel Muey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 

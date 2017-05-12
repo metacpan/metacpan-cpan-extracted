@@ -1,0 +1,417 @@
+# NAME
+
+Data::Verifier - Profile based data verification with Moose type constraints.
+
+# VERSION
+
+version 0.61
+
+# DESCRIPTION
+
+Data::Verifier allows you verify data (such as web forms, which was the
+original idea) by leveraging the power of Moose's type constraint system.
+
+# MOTIVATION
+
+Data::Verifier firstly intends to leverage Moose's type constraint system,
+which is significantly more powerful than anything I could create for the
+purposes of this module.  Secondly it aims to keep a fairly simple interface
+by leveraging the aforementioned type system to keep options to a minimum.
+
+# NOTES
+
+## Multiple Values
+
+It should be noted that if you choose to make a param a `Str` then validation
+will fail if multiple values are provided.  To allow multiple values you
+must use an `ArrayRef[Str]`.
+
+## ArrayRef based types (more on Multiple Values)
+
+If you use an ArrayRef-based parameterized type (e.g. ArrayRef\[Str\]) then
+Data::Verifier has the following behavior:
+
+Each parameter supplied for the field is checked.  If all the members pass
+then the field is considered valid.  If any of the members fail, then the
+entire field is invalid.  If any of the members pass then those members will
+be included in the `values` attribute.  An example:
+
+    use Moose::Util::TypeConstraints;
+    use Data::Verifier;
+
+    subtype 'Over10'
+    => as 'Num'
+    => where { $_ > 10 };
+
+    my $verifier = Data::Verifier->new(
+    profile => {
+        foos => {
+            type => 'ArrayRef[NumberOver10]',
+        }
+    }
+    );
+
+    my $res = $verifier->verify(foos => [ 1, 2, 30, 40 ]);
+    $res->success; # This is false, as 1 and 2 did not pass
+    $res->get_value('foos'); # [ 30, 40 ] because 30 and 40 passed!
+    $res->original_value('foos); # [ 1, 2, 30, 40 ] because it's all of them!
+
+It should also be noted that `post_check`s that are specified in the profile
+do **not** get applied to the individual members, only to the entire, completed
+field that they are constituents of.
+
+**Note**: Filters and such DO get applied to individual fields, so something
+like:
+
+    my $verifier = Data::Verifier->new(
+      filters => qw(trim),
+      profile => {
+          foos => {
+              type => 'ArrayRef[Str]',
+              filters => 'collapse'
+          }
+      }
+    );
+
+In the above example, both `trim` and `collapse` **bill** be applied to each
+member of foos.
+
+## Stops on First Failure
+
+Data::Verifier stops checking a field (not all, just the failed one) if it
+fails any of it's constraints. Consult the Execution Order below to ascertain
+the order.  For example, if a field exceeds it's max length then it will not
+be checked against it's type constraint.
+
+## Serialization
+
+Data::Verifier uses [MooseX::Storage](https://metacpan.org/pod/MooseX::Storage) to allow serialization of
+[Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results) objects.  You can use this to store results for
+validation across redirects.  Note, however, that the `value`
+attribute is **not** serialized.  Since you can coerce a value into anything
+it is not reasonable to expect to be able to serialize it.  Have a look at
+the `original_value` or `post_filter_value` in [Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results)
+if you want to know more.
+
+## Verifying Objects
+
+Data::Verifier can verify data encapsulated in objects too. Everything works
+the way that it does for hash references.  Each key in the profile is used as
+the name of a method to call on the object. In order to maintain consistency
+with the hash reference case, missing methods pass an 'undef' value into the
+verification process.
+
+## Execution Order
+
+It may be important to understand the order in which the various steps of
+verification are performed:
+
+- Global Filters
+
+    Any global filters in the profile are executed.
+
+- Per-Field Filters
+
+    Any per-field filters are executed.
+
+- Empty String Check
+
+    If the value of the field is an empty string then it is changed to an undef.
+
+- Required Check
+
+    The parameter must now be defined if it is set as required.
+
+- Length Check
+
+    Minimum then maximum length is checked.
+
+- Type Check (w/Coercion)
+
+    At this point the type will be checked after an optional coercion.
+
+- Dependency Checks
+
+    If this field has dependents then those will now be processed.
+
+- Post Check
+
+    If the field has a post check it will now be executed.
+
+- Derived Fields
+
+    Finally any derived fields are run.
+
+# SYNOPSIS
+
+    use Data::Verifier;
+
+    my $dv = Data::Verifier->new(
+        filters => [ qw(trim) ],
+        profile => {
+            name => {
+                required    => 1,
+                type        => 'Str',
+               filters     => [ qw(collapse) ]
+            },
+            age  => {
+                type        => 'Int'
+            },
+            sign => {
+                required    => 1,
+                type        => 'Str'
+            }
+        }
+    );
+
+    # Pass in a hash of data
+    my $results = $dv->verify({
+        name => 'Cory', age => 'foobar'
+    });
+
+    $results->success; # no
+
+    $results->is_invalid('name'); # no
+    $results->is_invalid('age');  # yes
+
+    $results->is_missing('name'); # no
+    $results->is_missing('sign'); # yes
+
+    $results->get_original_value('name'); # Unchanged, original value
+    $results->get_value('name'); # Filtered, valid value
+    $results->get_value('age');  # undefined, as it's invalid
+
+# ATTRIBUTES
+
+## derived
+
+An optional hashref of fields that will be derived from inspecting one or more
+fields in the profile.
+
+The keys for `derived` are as follows:
+
+- **required**
+
+    Marks this derived field as required.  If the `deriver` returns undef then
+    when this is true then the field, any source `fields` and (in turn) the entire
+    profile will be invalid.
+
+- **fields**
+
+    An optional arrayref that contains the names of any "source" fields that
+    should be considered invalid if this field is determiend to be invalid.
+
+- **deriver**
+
+    A subref that is passed a copy of the final results for the profile.  The
+    return value of this subref will be used as the value for the field. A return
+    value of undef will cause the field (and any source fields) to be makred
+    invalid **if** required is true.
+
+An example:
+
+    my $verifier = Data::Verifier->new(
+        profile => {
+            first_name => {
+                required => 1
+            },
+            last_name => {
+                required => 1
+            }
+        },
+        derived => {
+            'full_name' => {
+                required => 1,
+                fields => [qw(first_name last_name)],
+                deriver => sub {
+                    my $r = shift;
+                    return $r->get_value('first_name').' '.$r->get_value('last_name')
+                }
+            }
+        }
+    );
+
+In the above example a field named `full_name` will be created that is
+the other two fields concatenated.  If the derived field is required and
+`deriver` subref returns undef then the derived field **and** the fields
+listed in `fields` will also be invalid.
+
+## filters
+
+An optional arrayref of filter names through which **all** values will be
+passed.
+
+## profile
+
+The profile is a hashref.  Each value you'd like to verify is a key.  The
+values specify all the options to use with the field.  The available options
+are:
+
+- **coerce**
+
+    If true then the value will be given an opportunity to coerce via Moose's
+    type system.  If this is set, coercion will be ignored.
+
+- **coercion**
+
+    Set this attribute to the coercion defined for this type.  If **coerce** is
+    set this attribute will be ignored.  See the `coercion` method above.
+
+- **dependent**
+
+    Allows a set of fields to be specifid as dependents of this one.  The argument
+    for this key is a full-fledged profile as you would give to the profile key:
+
+        my $verifier = Data::Verifier->new(
+            profile => {
+                password    => {
+                    dependent => {
+                        password2 => {
+                            required => 1,
+                        }
+                    }
+                }
+            }
+        );
+
+    In the above example `password` is not required.  If it is provided then
+    password2 must also be provided.  If any depedents of a field are missing or
+    invalid then that field is **invalid**.  In our example if password is provided
+    and password2 is missing then password will be invalid.
+
+- **filters**
+
+    An optional list of filters through which this specific value will be run.
+    See the documentation for [Data::Verifier::Filters](https://metacpan.org/pod/Data::Verifier::Filters) to learn more.  This
+    value my be either a scalar (string or coderef) or an arrayref of strings or
+    coderefs.
+
+- **max\_length**
+
+    An optional length which the value may not exceed.
+
+- **min\_length**
+
+    An optional length which the value may not be less.
+
+- **member\_post\_check**
+
+    A post check that is only to be applied to the members of an ArrayRef based
+    type.  Because it is verified in something of a vacuum, the results object it
+    receives will have no other values to look at.  Therefore member\_post\_check
+    is only useful if you want to do some sort of weird post-check thing that I
+    can't imagine would be a good idea.
+
+- **post\_check**
+
+    The `post_check` key takes a subref and, after all verification has finished,
+    executes the subref with the results of the verification as it's only argument.
+    The subref's return value determines if the field to which the post\_check
+    belongs is invalid.  A typical example would be when the value of one field
+    must be equal to the other, like an email confirmation:
+
+        my $verifier = Data::Verifier->new(
+            profile => {
+                email    => {
+                    required => 1,
+                    dependent => {
+                        email2 => {
+                            required => 1,
+                        }
+                    },
+                    post_check => sub {
+                        my $r = shift;
+                        return $r->get_value('email') eq $r->get_value('email2');
+                    }
+                },
+            }
+        );
+
+        my $results = $verifier->verify({
+            email => 'foo@example.com', email2 => 'foo2@example.com'
+        });
+
+        $results->success; # false
+        $results->is_valid('email'); # false
+        $results->is_valid('email2'); # true, as it has no post_check
+
+    In the above example, `success` will return false, because the value of
+    `email` does not match the value of `email2`.  `is_valid` will return false
+    for `email` but true for `email2`, since nothing specifically invalidated it.
+    In this example you should rely on the `email` field, as `email2` carries no
+    significance but to confirm `email`.
+
+    **Note about post\_check and exceptions**: If have a more complex post\_check
+    that could fail in multiple ways, you can `die` in your post\_check coderef
+    and the exception will be stored in the fields `reason` attribute.
+
+    **Note about post\_check and ArrayRef based types**: The post check is **not**
+    executed for ArrayRef based types.  See the note earlier in this documentation
+    about ArrayRefs.
+
+- **required**
+
+    Determines if this field is required for verification.
+
+- **type**
+
+    The name of the Moose type constraint to use with verifying this field's
+    value. Note, this will also accept an instance of
+    [Moose::Meta::TypeConstraint](https://metacpan.org/pod/Moose::Meta::TypeConstraint), although it may not serialize properly as a
+    result.
+
+# METHODS
+
+## coercion
+
+Define a coercion to use for verification.  This will not define a global
+Moose type coercion, but is instead just a single coercion to apply to a
+specific entity.
+
+    my $verifier = Data::Verifier->new(
+        profile => {
+            a_string => {
+                type     => 'Str',
+                coercion => Data::Verifier::coercion(
+                    from => 'Int',
+                        via => sub { (qw[ one two three ])[ ($_ - 1) ] }
+                ),
+            },
+        }
+    );
+
+## verify (\\%parameters)
+
+Call this method and provide the parameters you are checking.  The results
+will be provided to you as a [Data::Verifier::Results](https://metacpan.org/pod/Data::Verifier::Results) object.
+
+# CONTRIBUTORS
+
+Mike Eldridge
+
+George Hartzell
+
+Tomohiro Hosaka
+
+Stevan Little
+
+Jason May
+
+Dennis Sch�n
+
+J. Shirley
+
+Wallace Reis
+
+Mohammad S Anwar
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2016 by Cold Hard Code, LLC.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

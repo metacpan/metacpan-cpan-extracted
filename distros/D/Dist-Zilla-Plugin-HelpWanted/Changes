@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-Plugin-HelpWanted
+
+0.3.1 2013-09-25
+ [BUG FIXES]
+ - Dist::Zilla::Plugin::Test::Compile was causing test to potentially hang
+   on Windows. (reported by Karen Etheridge)
+
+ [STATISTICS]
+ - code churn: 1 file changed, 18 insertions(+), 6 deletions(-)
+
+0.3.0 2013-08-25
+ [ENHANCEMENTS]
+ - help positions changed to align with DOAP. [GH#1] (tobyink)
+
+ [STATISTICS]
+ - code churn: 7 files changed, 105 insertions(+), 55 deletions(-)
+
+0.2.1 2012-07-02
+ [DOCUMENTATION]
+ - add 'Help Wanted' for MetaCPAN testing
+
+0.2.0 2012-06-28
+ [STATISTICS]
+ - code churn: 4 files changed, 77 insertions(+), 5 deletions(-)
+
+0.1.0 2012-06-28
+ - First version, unleashed on an unsuspecting world.
+

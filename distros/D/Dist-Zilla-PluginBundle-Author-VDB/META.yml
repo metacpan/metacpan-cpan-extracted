@@ -1,0 +1,159 @@
+---
+abstract: "VDB's plugin bundle"
+author:
+  - 'Van de Bugger <van.de.bugger@gmail.com>'
+build_requires:
+  Dist::Zilla::Plugin::FakeRelease: '0'
+  Dist::Zilla::Plugin::Manifest::Write: v0.9.7
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::Role::BeforeBuild: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  File::Which: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Module::Runtime: '0'
+  POSIX: '0'
+  Pod::Simple: '> 3.20'
+  Test::Deep: '0'
+  Test::DiagINC: '0.002'
+  Test::Dist::Zilla::Build: '0'
+  Test::Dist::Zilla::BuiltFiles: v0.3.1
+  Test::Dist::Zilla::Release: '0'
+  Test::More: '0'
+  Test::Routine: '0'
+  Test::Routine::Util: '0'
+  blib: '1.01'
+  if: '0'
+  lib: '0'
+  open: '0'
+  perl: '5.010'
+  strict: '0'
+  utf8: '0'
+  warnings: '0'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: gpl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-VDB
+provides:
+  Dist::Zilla::Plugin::Author::VDB::Hg::Commit:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Hg/Commit.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Hg::Push:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Hg/Push.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Hg::Status:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Hg/Status.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Hg::Tag::Add:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Hg/Tag/Add.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Hg::Tag::Check:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Hg/Tag/Check.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Version::Bump:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Version/Bump.pm
+    version: v0.11.3
+  Dist::Zilla::Plugin::Author::VDB::Version::Read:
+    file: lib/Dist/Zilla/Plugin/Author/VDB/Version/Read.pm
+    version: v0.11.3
+  Dist::Zilla::PluginBundle::Author::VDB:
+    file: lib/Dist/Zilla/PluginBundle/Author/VDB.pm
+    version: v0.11.3
+  Dist::Zilla::Role::Author::VDB::HgRunner:
+    file: lib/Dist/Zilla/Role/Author/VDB/HgRunner.pm
+    version: v0.11.3
+  Dist::Zilla::Role::Author::VDB::ProgramRunner:
+    file: lib/Dist/Zilla/Role/Author/VDB/ProgramRunner.pm
+    version: v0.11.3
+requires:
+  App::Prove: '0'
+  Carp: '0'
+  Data::Section: '0'
+  Dist::Zilla: '5.038'
+  Dist::Zilla::File::InMemory: '0'
+  Dist::Zilla::File::OnDisk: '0'
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::CheckPrereqsIndexed: '0'
+  Dist::Zilla::Plugin::ConfirmRelease: '0'
+  Dist::Zilla::Plugin::FileFinder::ByName: '0'
+  Dist::Zilla::Plugin::GenerateFile: '0'
+  Dist::Zilla::Plugin::Hook: '0'
+  Dist::Zilla::Plugin::Hook::AfterBuild: '0'
+  Dist::Zilla::Plugin::Hook::AfterRelease: '0'
+  Dist::Zilla::Plugin::Hook::BeforeBuild: '0'
+  Dist::Zilla::Plugin::Hook::BeforeRelease: '0'
+  Dist::Zilla::Plugin::Hook::Init: '0'
+  Dist::Zilla::Plugin::Hook::PrereqSource: '0'
+  Dist::Zilla::Plugin::Hook::Releaser: '0'
+  Dist::Zilla::Plugin::Manifest::Read: v0.5.0
+  Dist::Zilla::Plugin::Manifest::Write: v0.9.7
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::MetaResources::Template: '0'
+  Dist::Zilla::Plugin::MetaTests: '0'
+  Dist::Zilla::Plugin::MetaYAML: '0'
+  Dist::Zilla::Plugin::MinimumPerl: '0'
+  Dist::Zilla::Plugin::MojibakeTests: '0'
+  Dist::Zilla::Plugin::NextRelease: '0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::Prereqs::AuthorDeps: '0'
+  Dist::Zilla::Plugin::SurgicalPodWeaver: '0'
+  Dist::Zilla::Plugin::Templates: v0.5.0
+  Dist::Zilla::Plugin::Test::CPAN::Changes: '0'
+  Dist::Zilla::Plugin::Test::CPAN::Meta::JSON: '0'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::Test::DiagINC: '0'
+  Dist::Zilla::Plugin::Test::DistManifest: '0'
+  Dist::Zilla::Plugin::Test::EOL: '0'
+  Dist::Zilla::Plugin::Test::Fixme: '0'
+  Dist::Zilla::Plugin::Test::Kwalitee: '0'
+  Dist::Zilla::Plugin::Test::MinimumVersion: '0'
+  Dist::Zilla::Plugin::Test::NewVersion: '0'
+  Dist::Zilla::Plugin::Test::NoTabs: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::Pod::LinkCheck: '0'
+  Dist::Zilla::Plugin::Test::Pod::No404s: '0'
+  Dist::Zilla::Plugin::Test::PodSpelling: '0'
+  Dist::Zilla::Plugin::Test::Portability: '0'
+  Dist::Zilla::Plugin::Test::Synopsis: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::Plugin::TestRelease: '0'
+  Dist::Zilla::Plugin::UploadToCPAN: '0'
+  Dist::Zilla::Role::AfterRelease: '0'
+  Dist::Zilla::Role::BeforeRelease: '0'
+  Dist::Zilla::Role::ErrorLogger: v0.9.0
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Dist::Zilla::Role::VersionProvider: '0'
+  File::pushd: '0'
+  IPC::Run3: '0'
+  IPC::System::Simple: '0'
+  Moose: '0'
+  Moose::Role: '0'
+  Path::Tiny: '0.070'
+  Perl::PrereqScanner::Scanner::Hint: '0'
+  Perl::Version: '0'
+  Pod::Weaver::PluginBundle::Author::VDB: '0'
+  String::ShellQuote: '0'
+  Sub::Exporter::ForMethods: '0'
+  Try::Tiny: '0'
+  autodie: '0'
+  namespace::autoclean: '0'
+  perl: '5.010'
+  version: '0.77'
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-PluginBundle-Author-VDB
+  homepage: https://metacpan.org/release/Dist-Zilla-PluginBundle-Author-VDB
+  license: http://www.gnu.org/licenses/gpl-3.0.txt
+  repository: https://vandebugger.fedorapeople.org/hg/perl-Dist-Zilla-PluginBundle-Author-VDB
+version: v0.11.3
+x_serialization_backend: 'YAML::Tiny version 1.69'

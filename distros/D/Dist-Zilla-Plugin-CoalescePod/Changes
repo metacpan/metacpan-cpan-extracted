@@ -1,0 +1,28 @@
+Revision history for Dist-Zilla-Plugin-MergePod
+
+0.2.2 2014-10-12
+ [DOCUMENTATION]
+ - Mention that the pod is added before the __DATA__ marker if present.
+   (RT#99440, raised by Thomas Sibley)
+
+ [STATISTICS]
+ - code churn: 5 files changed, 16 insertions(+), 4 deletions(-)
+
+0.2.1 2013-07-18
+ [BUG FIXES]
+ - log message gives filename, not object ref.
+
+ [STATISTICS]
+ - code churn: 2 files changed, 14 insertions(+), 1 deletion(-)
+
+0.2.0 2013-07-13
+ [ENHANCEMENTS]
+ - Now works with files with __DATA__ section. [RT#86844, Michael Jemmeson]
+ - don't try to coalesce pod under anything but /lib.
+
+ [STATISTICS]
+ - code churn: 11 files changed, 92 insertions(+), 12 deletions(-)
+
+0.1.0 2012-02-04
+ - Initial release
+

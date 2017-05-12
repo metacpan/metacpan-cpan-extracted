@@ -1,0 +1,63 @@
+NAME
+
+    Device::Chip::PCF8574 - chip driver for a PCF8574
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a NXP or
+    Texas Instruments PCF8574 attached to a computer via an I²C adapter.
+
+    The reader is presumed to be familiar with the general operation of
+    this chip; the documentation here will not attempt to explain or define
+    chip-specific concepts or features, only the use of this module to
+    access them.
+
+MOUNT PARAMETERS
+
+ addr
+
+    The I²C address of the device. Can be specified in decimal, octal or
+    hex with leading 0 or 0x prefixes.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ write
+
+       $chip->write( $val )->get
+
+    Sets the value of the GPIO pins, as an 8-bit integer.
+
+    Pins set low will sink current suitable for signalling or driving an
+    LED. Pins set high will source current via a weak current-source to act
+    as a pull-up for an active-low input signal, such as a button.
+
+ read
+
+       $val = $chip->read->get
+
+    Reads the current logic levels on the GPIO pins, returned as an 8-bit
+    integer. Pins of interest as inputs should have previously been set to
+    high level using the "write" method.
+
+ as_adapter
+
+       $adapter = $chip->as_adapter
+
+    Returns a new object implementing the Device::Chip::Adapter interface
+    which allows access to the GPIO pins of the chip as if it was a GPIO
+    protocol adapter. The returned instance supports the following methods:
+
+       $protocol = $adapter->make_protocol( 'GPIO' )
+    
+       $protocol->list_gpios
+       $protocol->write_gpios
+       $protocol->read_gpios
+       $protocol->tris_gpios
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

@@ -1,0 +1,30 @@
+Data::Iterator::EasyObj - Turn an array of arrays into an iterator object
+=========================================================================
+
+Data::Iterator::EasyObj makes your array of arrays into a handy iterator object with the ability to further nest additional data structures including Data::Iterator::EasyObj objects.
+
+The iterator object provides direct access to the iterator contents - as well as the ability to add or update fields as you use the object.
+
+The iterator object can also be limited or offset on the fly ideal for paging or grouping data sets.
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module does not require any extra modules and should work with perl 5.5 and greater
+
+COPYRIGHT AND LICENCE
+
+This software is licensed for use under the same conditions of perl itself.
+That means that it is made availabe under the Artistic License and the GNU GPL.
+
+Copyright (C) 2003 A. J. Trevena <teejay@droogs.org>
+

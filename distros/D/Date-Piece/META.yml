@@ -1,0 +1,42 @@
+---
+name: Date-Piece
+version: v0.0.3
+author:
+  - 'Eric Wilhelm @ <ewilhelm at cpan dot org>'
+abstract: efficient dates with Time::Piece interoperability
+license: perl
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Piece
+  homepage: http://scratchcomputing.com/
+  license: http://dev.perl.org/licenses/
+  repository: http://svn.scratchcomputing.com/Date-Piece/trunk
+build_requires:
+  Module::Build: 0.3303
+  Test::More: 0
+requires:
+  Date::Simple: 0
+  Time::Local: 0
+  Time::Piece: 0
+  perl: v5.8.2
+configure_requires:
+  Module::Build: 0.3303
+provides:
+  Date::Piece:
+    file: lib/Date/Piece.pm
+    version: v0.0.3
+  Date::Piece::century_unit:
+    file: lib/Date/Piece.pm
+  Date::Piece::day_unit:
+    file: lib/Date/Piece.pm
+  Date::Piece::month_unit:
+    file: lib/Date/Piece.pm
+  Date::Piece::unit_base:
+    file: lib/Date/Piece.pm
+  Date::Piece::week_unit:
+    file: lib/Date/Piece.pm
+  Date::Piece::year_unit:
+    file: lib/Date/Piece.pm
+generated_by: Module::Build version 0.3303
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4

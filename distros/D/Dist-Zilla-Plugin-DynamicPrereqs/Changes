@@ -1,0 +1,139 @@
+Revision history for Dist-Zilla-Plugin-DynamicPrereqs
+
+0.033     2017-04-30 18:58:42Z
+          - documentation added regarding the lack of ability to use dynamic
+            requires-recommends, requires-suggests etc
+          - add is_miniperl() helper sub
+
+0.032     2016-08-16 01:00:05Z
+          - in _add_prereq sub, do not warn about prereq merging if the
+            previous version being merged into was a mere "0"
+
+0.031     2016-07-03 06:07:23Z (TRIAL RELEASE)
+          - removed dependency on Dist::Zilla::Role::ModuleIncluder by
+            inlining the necessary bits
+
+0.030     2016-07-02 06:34:54Z
+          - fixed a test that fails with newer ModuleIncluder, that changed
+            the text of an error message
+
+0.029     2016-05-06 19:40:13Z
+          - temporarily work around Module::CoreList::is_core issue exposed by
+            include_dependencies feature used in
+            Dist::Zilla::Role::ModuleIncluder 0.005 and later
+
+0.028     2016-05-05 00:53:13Z
+          - fix test failure with MSWin32 path separators
+
+0.027     2016-05-03 00:42:24Z (TRIAL RELEASE)
+          - bundled an updated ExtUtils::HasCompiler for can_xs(), to support
+            building with a noexec $TMPDIR.
+
+0.026     2016-04-22 09:54:05Z (TRIAL RELEASE)
+          - bump version of [MakeMaker::Awesome] needed for optional tests, to
+            skip past some problematic changes to Makefile.PL whitespace
+
+0.025     2016-04-21 15:18:58Z (TRIAL RELEASE)
+          - bumped up "background perl" used in ExtUtils::HasCompiler
+            inlining, to avoid inlining File::Temp and its dependencies
+
+0.024     2016-04-21 11:07:53Z (TRIAL RELEASE)
+          - can_xs() is now implemented with ExtUtils::HasCompiler, rather
+            than ExtUtils::CBuilder
+          - new helper sub: want_pp, for use with can_xs
+
+0.023     2016-04-21 10:44:21Z
+          - really fix all remaining tests that require newer MakeMaker
+            behaviour
+
+0.022     2016-04-18 21:08:47Z
+          - fix test that was written assuming older MakeMaker behaviour
+
+0.021     2016-03-16 20:50:11Z (TRIAL RELEASE)
+          - optimize use of blank lines in modified Makefile.PL content
+
+0.020     2016-03-16 02:42:30Z (TRIAL RELEASE)
+          - perform Makefile.PL content modification at the proper time (as a
+            FileMunger, rather than InstallTool)
+
+0.019     2016-01-20 04:43:24Z
+          - perl prerequisite lowered to 5.8 (Graham Ollis)
+
+0.018     2015-12-02 03:40:03Z
+          - added options '-body', '-body_from_file' as aliases for '-raw',
+            '-raw_from_file'
+          - *_requires subs now warn if adding a prereq that might conflict
+            with one that already exists (prereq merging not yet supported)
+
+0.017     2015-09-27 07:13:45Z
+          - fix new test failure on MSWin32
+
+0.016     2015-09-07 00:12:19Z
+          - added new helper subs: requires, runtime_requires,
+            build_requires, and test_requires, as sugar for updating prereqs
+            in Makefile.PL
+          - the -include_sub option is no longer needed: -raw clauses are also
+            now searched for sub names.
+
+0.015     2015-08-21 23:49:23Z
+          - has_module($module) now returns the $VERSION of the installed
+            module, or undef otherwise, if a second argument is not passed
+
+0.014     2015-07-22 02:41:49Z
+          - new '-condition' option, as sugar to provide expressions to be
+            inserted into Makefile.PL (definitions of referenced subroutines
+            are automatically included)
+
+0.013     2015-05-30 19:16:03Z
+          - require a new enough Module::CoreList in tests to ensure is_core()
+            is available
+
+0.012     2015-05-25 00:47:09Z
+          - fix test failure with PadWalker on older perls
+
+0.011     2015-05-23 18:27:08Z
+          - warn whenever can_xs, can_cc, or can_run is used, until
+            implementation concerns are resolved
+          - add new sub has_module, as an alternative to can_use that does
+            not load the module
+
+0.010     2015-02-15 01:12:41Z (TRIAL RELEASE)
+          - new -raw_from_file option, when content is too long to inline into
+            dist.ini
+          - new -include_sub option, to include definitions of commonly-used
+            helper subroutines
+
+0.009     2014-11-29 06:28:55Z
+          - bump minimum required version of ExtUtils::MakeMaker, to avoid a
+            mess in MYMETA.json during testing
+
+0.008     2014-10-08 04:44:15Z
+          - fix uninitialized warning on 5.10.x and earlier
+
+0.007     2014-09-18 05:26:51Z
+          - new '-delimiter' option, which allows the use of leading whitespace in
+            '-raw' strings
+
+0.006     2014-09-06 08:44:46Z
+          - no longer dropping the last character off Makefile.PL (significant
+            when several copies of this plugin run at once!)
+
+0.005     2014-06-16 00:18:15Z
+          - fix case where Makefile.PL content was not recognized when there
+            were no (static) prerequisites declared for the distribution
+
+0.004     2014-05-19 05:15:36Z
+          - fix tests that fail with older ExtUtils::MakeMaker due two stupid
+            typos that conspired together in a web of evil
+
+0.003     2014-05-17 17:11:46Z
+          - really fix tests this time...
+          - new runtime check for versions of [MakeMaker::Awesome] that are
+            too old to be compatible with the munging done in this plugin
+
+0.002     2014-05-13 05:03:02Z
+          - fix tests that fail when ExtUtils::MakeMaker is at version 6.63_02
+            or older
+
+0.001     2014-05-10 23:04:10Z
+          - Initial release.

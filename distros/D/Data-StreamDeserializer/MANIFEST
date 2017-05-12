@@ -1,0 +1,19 @@
+README
+Makefile.PL
+StreamDeserializer.xs
+t/01_low_level_tests.t
+t/02_objects.t
+t/03_big_object.t
+t/05_object_counter.t
+t/06_regexps.t
+t/07_hashes.t
+t/10_memoryleak.t
+MANIFEST
+ppport.h
+Changes
+lib/Data/StreamDeserializer.pm
+benchmark/tests/01_100x10
+benchmark/tests/02_1000x10
+benchmark/ds_vs_eval.pl
+benchmark/generate_test_array.pl
+META.yml                                 Module meta-data (added by MakeMaker)

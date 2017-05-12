@@ -1,0 +1,18 @@
+Revision history for Dancer2-Session-Sereal
+
+0.003 2016-11-05
+  [ NEW FEATURES ]
+    - Add 'encoder_args' and 'decoder_args' configuration options. (GH#3)
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 113 insertions(+), 12 deletions(-)
+
+0.002 2016-08-16
+  - Convert tests from Test::TCP to Plack::Test
+  - Minimum Dancer2 release is now 0.150000
+
+  [ STATISTICS ]
+    - code churn: 3 files changed, 232 insertions(+), 167 deletions(-)
+
+0.001 2013-02-22T23:40:14Z America/New_York
+  - First release

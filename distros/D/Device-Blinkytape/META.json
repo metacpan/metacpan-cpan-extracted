@@ -1,0 +1,62 @@
+{
+   "abstract" : "Control a BlinkyTape led strip",
+   "author" : [
+      "Oskari Okko Ojala <okko@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-Blinkytape",
+   "optional_features" : {
+      "simulation" : {
+         "description" : "Simulation of a BlinkyTape with Tk",
+         "prereqs" : {
+            "runtime" : {
+               "requires" : {
+                  "Tk" : "0"
+               }
+            }
+         }
+      }
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::SerialPort" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "Moose" : "0",
+            "Moose::Util::TypeConstraints" : "0",
+            "Time::HiRes" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com:okko/perl-Device-BlinkyTape.git",
+         "web" : "https://github.com/okko/perl-Device-BlinkyTape.git"
+      }
+   },
+   "version" : "0.004",
+   "x_authority" : "cpan:OKKO"
+}
+

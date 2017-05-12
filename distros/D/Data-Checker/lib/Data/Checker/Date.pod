@@ -1,0 +1,87 @@
+# Copyright (c) 2016-2016 Sullivan Beck. All rights reserved.
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself.
+
+=pod
+
+=head1 NAME
+
+Data::Checker::Date - check data to see if it contains a valid date
+
+=head1 SYNOPSIS
+
+   use Data::Checker;
+   $obj = new Data::Checker;
+
+   $obj->check($data,"Date",$check_opts);
+
+=head1 DESCRIPTION
+
+This module is meant to be used by the L<Data::Checker> module.
+
+One set of checks that is often done is to see if a piece of
+data is a valid date.
+
+This module performs several date releated checks.
+
+=head1 FUNCTIONS
+
+=over 4
+
+=item B<check>
+
+This is the only function provided by this module, and it is
+intended to be used by the L<Data::Checker> module.
+
+=back
+
+=head1 CHECKS OPTIONS
+
+The C<$check_opts> hashref defines exactly what IP checks to
+perform, and some options used by those checks.  Currently, there
+are no keys used for date checks.
+
+=head1 EXAMPLES
+
+   use Data::Checker;
+   $obj = new Data::Checker;
+
+   $data = ...
+   $opts = ...
+
+   ($pass,$fail,$info,$warn) = $obj->check($data,"Date",$opts);
+
+The value of C<$data> and C<$opts> is listed below in the examples.
+
+=over 4
+
+=item To check that the values are valid dates
+
+   $data = [ 'now', '2016-01-01 12:00:00', 'some-string' ];
+   $opts = { }
+
+This yields:
+
+   $pass = [ 'now', '2016-01-01 12:00:00' ];
+   $fail = { 'some-string' => 'Not a valid date' }
+
+=back
+
+=head1 KNOWN BUGS AND LIMITATIONS
+
+None known.
+
+=head1 SEE ALSO
+
+L<Dat::Checker>, L<Date::Manip>
+
+=head1 LICENSE
+
+This script is free software; you can redistribute it and/or modify it
+under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)
+
+=cut

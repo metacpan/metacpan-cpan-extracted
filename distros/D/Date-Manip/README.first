@@ -1,0 +1,47 @@
+Copyright (c) 1995-2017 Sullivan Beck. All rights reserved.
+This program is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+
+Please send questions or bug reports to me rather than posting them to
+a newsgroup since I may miss them there, BUT read the next paragraph
+before you automatically start firing off email to me!
+
+If you have questions about Date::Manip, refer to the Date::Manip manual.
+Don't know what I'm talking about, or don't know how to access that?  Read
+the perlpod man page.  Alternately, an online version of the Date::Manip
+manual page is included on any CPAN site.
+
+PLEASE read the man page thoroughly before emailing me.  If you've done
+this, I'll be glad to answer any questions not covered or that are unclear
+in the manual.
+
+===
+
+Date::Manip 6.xx represents a complete reorganization (and almost complete
+rewrite) of the module. It includes the original functional Date::Manip
+module, and a number of OO modules which now do the real work. The OO
+modules may also be used directly, bypassing the functional interface.
+
+As of 6.xx, Date::Manip has full support for all timezones in the standard
+Olsen database (and also supports all Windows timezone names, and timezones
+suggested by several other standards). Full support for daylight saving
+time is included.
+
+Please refer to the Date::Manip::Changes5to6 and Date::Manip::Migration5to6
+man pages for a more detailed breakdown of changes made in 6.00, and
+suggestions for a few changes which may be required to get existing code
+to run using the new modules.
+
+It should be noted that version 6.xx required perl 5.10 or higher.
+
+Date::Manip 5.xx is integrated into the package (i.e. both 5.xx and 6.xx
+are available in the 6.xx release), so Date::Manip will continue to run
+(the old version only) on older versions of perl. Please refer to the
+main Date::Manip document for more details.
+
+===
+
+AUTHOR
+
+Sullivan Beck (sbeck@cpan.org)

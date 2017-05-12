@@ -1,0 +1,18 @@
+Revision history for perl module Device::WebIO
+
+0.004 2014-10-??
+
+- Implement temperature sensor interface
+
+0.003 2014-10-03
+
+- Clairify documentation
+- Still Image API sends correct MIME type
+
+0.002 2014-10-04
+
+- Define and implement still image API
+
+0.001 2014-09-20
+
+- Basic REST bindings

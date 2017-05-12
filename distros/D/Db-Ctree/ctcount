@@ -1,0 +1,87 @@
+#/usr/bin/ksh
+
+/usr/bin/perl - "$1" "$2" "$3" <<\END | more
+#!/usr/bin/perl 
+#
+# This script sumarizes the contents of any table by index
+#
+# ctcount table <significant digits> <filter>
+#    for example 
+#        ctcount $SWETN/smdr/smdr.dat 4
+#
+# if specified filter only returns keys matching filter
+#
+#
+$FILE   = shift;
+$SIGDIG = int(shift);
+$FILTER = shift;
+
+die "ctcount table <significant digits> <filter>\n" unless $FILE;
+
+use Db::Ctree qw(:ALL);
+$|=1;
+
+#
+# error handler
+#
+sub Error
+{
+  my $where = shift;
+  print "Error on $where -".&uerr_cod."\n";
+  die   "Error on $where -".&uerr_cod."\n";
+} #Error
+
+$SIG{QUIT}= sub { die "QUIT received\n" };
+$SIG{TERM}= sub { die "TERM received\n" };
+
+#
+# Open dmsraw
+#
+$mode = &VIRTUAL + &CHECKLOCK +	&SHARED + &TRNLOG;
+
+InitISAM(10,2,4);
+
+$FILE .= ".dat" unless $FILE =~ /\.dat$/;
+$FILE="$ENV{PWD}/$FILE" if -e "$ENV{PWD}/$FILE";
+$FILE="/appl/plexar/master/$FILE" if -e "/appl/plexar/master/$FILE";
+
+die "$FILE doesn't exist\n" unless -e $FILE;
+$dbptr = new Db::Ctree(0,$FILE,$mode);
+error("Can't open $FILE") unless $dbptr;
+
+unless ($SIGDIG)
+{
+   $count = NbrOfKeyEntries(1);
+   Error("NbrOfKeysEntries") if &uerr_cod;
+   print "$FILE: $count records\n";
+   exit;
+}
+
+$last_key=' ' x 50;
+$cur_key =' ' x 50;
+while ( GetGTKey(1,$last_key, $cur_key ))
+{
+    $last_key = $cur_key;
+    if (substr($last_key,$SIGDIG-1,1) eq '9')
+    {
+       substr($last_key,$SIGDIG-1,1)='Z'; # force a new key
+    }
+    else
+    {
+       substr($last_key,$SIGDIG-1,1)++; # force a new key
+    }
+    next if ($FILTER and $cur_key !~ /$FILTER/);
+#     print "     $cur_key\n";
+#     print "     $last_key\n";
+    $count = NbrOfKeysInRange(1,$cur_key,$last_key);
+    Error("NbrOfKeysInRange") if &uerr_cod;
+
+    $a = substr($cur_key,0,$SIGDIG);
+    printf "%s - %d\n",$a,$count;
+
+} # next key
+Error("GetGTKEY returned $status on rec $last_key\n") if &uerr_cod;
+
+undef $dbptr; # close database
+exit 0;
+END

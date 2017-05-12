@@ -1,0 +1,107 @@
+{
+   "abstract" : "Copy files from build directory, but filter out lines",
+   "author" : [
+      "David Golden <dagolden@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.003, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered",
+   "no_index" : {
+      "directory" : [
+         "corpus",
+         "examples",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "DB"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.17",
+            "perl" : "5.008001"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Bootstrap::lib" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::PluginBundle::DAGOLDEN" : "0.072",
+            "English" : "0",
+            "File::Spec" : "0",
+            "File::Temp" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Wordlist" : "0",
+            "Software::License::Apache_2_0" : "0",
+            "Test::CPAN::Meta" : "0",
+            "Test::More" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Spelling" : "0.12",
+            "Test::Version" : "1",
+            "blib" : "1.01"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Role::AfterBuild" : "0",
+            "Moose" : "0",
+            "Path::Tiny" : "0",
+            "Try::Tiny" : "0",
+            "perl" : "5.008001",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "File::pushd" : "0",
+            "Test::DZil" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.008001"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::Plugin::CopyFilesFromBuild::Filtered" : {
+         "file" : "lib/Dist/Zilla/Plugin/CopyFilesFromBuild/Filtered.pm",
+         "version" : "0.002"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered/issues"
+      },
+      "homepage" : "https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered.git",
+         "web" : "https://github.com/dagolden/Dist-Zilla-Plugin-CopyFilesFromBuild-Filtered"
+      }
+   },
+   "version" : "0.002",
+   "x_authority" : "cpan:DAGOLDEN",
+   "x_contributors" : [
+      "David Golden <xdg@xdg.me>"
+   ]
+}
+

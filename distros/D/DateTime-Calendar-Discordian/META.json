@@ -1,0 +1,48 @@
+{
+   "abstract" : "Perl extension for the Discordian Calendar",
+   "author" : [
+      "Jaldhar H. Vyas <jaldhar@braincells.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "Module::Build version 0.38, CPAN::Meta::Converter version 2.110440",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-Calendar-Discordian",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.38"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DateTime" : 0,
+            "DateTime::Locale" : 0,
+            "Params::Validate" : 0,
+            "perl" : "5.01"
+         }
+      }
+   },
+   "provides" : {
+      "DateTime::Calendar::Discordian" : {
+         "file" : "lib/DateTime/Calendar/Discordian.pm",
+         "version" : "1.0"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://jaldhar.github.com/DateTime-Calendar-Discordian",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "http://github.com/jaldhar/DateTime-Calendar-Discordian"
+      }
+   },
+   "version" : "1.0"
+}

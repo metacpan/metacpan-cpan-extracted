@@ -1,0 +1,55 @@
+{
+   "abstract" : "flash message for Dancer2",
+   "author" : [
+      "Rakesh Kumar Shardiwal <rakesh.shardiwal@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.18, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Flash",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "HTTP::Request::Common" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Plugin" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/shardiwal/cpan-dancer2-plugin-Flash/issues"
+      },
+      "homepage" : "http://perldancer.org/",
+      "repository" : {
+         "type" : "git",
+         "web" : "https://github.com/shardiwal/cpan-dancer2-plugin-Flash"
+      }
+   },
+   "version" : "0.03",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

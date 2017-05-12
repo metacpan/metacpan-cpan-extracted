@@ -1,0 +1,17 @@
+--- #YAML:1.0
+name:                Data-Page-Balanced
+version:             1.0.0
+abstract:            A data pager that will balance the number of entries per page.
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.36
+distribution_type:   module
+requires:     
+    Class::Accessor::Chained::Fast: 0
+    Data::Page:                    2
+    Test::More:                    0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Kim Ahlström <kim.ahlstrom@gmail.com>

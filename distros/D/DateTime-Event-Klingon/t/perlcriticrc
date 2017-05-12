@@ -1,0 +1,13 @@
+severity = brutal
+
+[-BuiltinFunctions::ProhibitUniversalIsa]
+# remove this after everyone has migrated to 5.10
+
+[-Documentation::RequirePodAtEnd]
+
+[-Documentation::RequirePodSections]
+
+[-Documentation::PodSpelling]
+
+[TestingAndDebugging::ProhibitNoStrict]
+allow = refs

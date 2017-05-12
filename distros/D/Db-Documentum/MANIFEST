@@ -1,0 +1,17 @@
+CHANGES
+Documentum.pm
+Documentum.xs
+Documentum.html
+MANIFEST
+Makefile.PL
+test.pl
+README
+INSTALL
+intro-db-dctm-1-2.pdf
+Documentum/Tools.pm
+Documentum/Tools.html
+etc/dm_check_password.pl
+etc/dm_check_password_smb.pl
+etc/idql.pl
+etc/tickler.pl
+META.yml                                 Module meta-data (added by MakeMaker)

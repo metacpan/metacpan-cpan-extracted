@@ -1,0 +1,135 @@
+Revision history for Perl extension DBD::Solid.
+
+0.20a   9 Feb 2001
+   IMPORTANT fixes:
+   * now links against Solid v3.52 libs
+
+0.13a Nov 9, 1999
+    IMPORTANT fixes:
+	* Added Brian Slesinsky's fix for alignment problem on solaris w/
+          timestamps
+	* Makefile.PL works a little better and detects and warns on Solid
+	  version problems
+    
+0.12 Jul 26, 1999
+    IMPORTANT
+	* New maintainer...me
+
+    Minor fixes:
+        * Now links to Solid 3.0 libaries
+
+0.11 Feb 24, 1998
+    IMPORTANT fix: 
+    	* rebinding of placeholders and NULL values
+    Minor fixes:
+        * $sth->err gets Solid's native error code. 
+       	  Recent versions used to set $xxx->err to -1 independent 
+	  of the error returned by Solid.
+	* SELECT statements not longer require a finish() between 
+	  execute() of the same sth.
+        * All binary columns (including BINARY and VARBINARY
+	  types) may be used from perl in a transparent fashion.
+        * ping() not raising error even if RaiseError is set.
+        * DBD::Solid::Const not longer used inside Solid.pm 
+	  due to problems with mod_perl/embperl. SQL type values 
+	  are included in recent DBI modules.
+	* tests use now DBI_DSN/DBI_USER/DBI_PASS env vars.
+	* Column names of arbitrary length are possible now (although
+	  there is most likely a Solid limit for this).
+
+0.10 Feb 09, 1998
+    * added Win32 ($Config{ostype} == 'MSWin32') to Makefile.PL
+    * added freebsd to Makefile.PL (thanks to Tom)
+    * fixed ping() method for Solid's unix pipe connections 
+    	(thanks to Tom Moertel)
+
+0.09 Nov 20, 1997
+    * added support for InactiveDestroy (as suggested by tim)
+    * added ping() method.
+    * added irix to Makefile.PL (and a note in the README) 
+    * Autocommit relies (again) on the corresponding database
+      function.
+
+0.08
+    Bugfixes:
+        * fixed memory leak in $sth DESTROY function (thanks, Tim)
+	* fixed LINKTYPE=static in Makefile.PL
+    DBI changes:
+	* added $h->{LongReadLen} and $h->{LongTruncOk} for DBI-0.86
+	  [ was already there as solid_blob_size ] 
+	* solid_blob_size now prints warning when used (the 
+		preferred attribute is LongReadLen as specified by DBI.)
+        * README: added statement about DBD::ODBC, linking problems
+        * changed error handling for fetchrow_array() and read_blob(),
+	  so that nothing prints when $h->{PrintError} is active.
+	* $h->err is _only_ set when really an error occured; conditions
+	  like SQL_NO_DATA_FOUND and SQL_SUCCESS_WITH_INFO only
+	  set $h->err when they are not expected.
+        * Like the fetchrow_xxx() functions, the blob_read() function
+	  now returns undef to indicate that all data was fetched from a
+	  field.
+
+0.07   Sun Jun 08 20:14:01 MET DST 1997
+    Bugfixes:
+	* bind_columns now works immediate after prepare().
+	* AutoCommit handled by driver,
+	  rollback/commit at disconnect() depends on AutoCommit value.
+	  This works around a Solid database bug.
+          
+    Enhancements:
+	* The write/only attribute $dbh->{solid_characterset} may be
+	  used to activate Solid's character set translation features.
+	* Makefile.PL knows about more operating systems:
+		linux SCO3.2 hpux irix solaris
+	* changed function names so DBD::Oracle and DBD::Solid may
+	  coexist in a static perl binary
+	* $dbh->{AutoCommit} is now ON by default (to comply 
+	  to DBI spec)
+        * links dynamic by default
+        * $sth->execute() returns the row count [the same value
+          like $h->rows(), so returns -1 after executing a select]
+        * $sth->rows() counts the rows actually fetched from the
+          database.
+    INCOMPATIBILITIES:
+	* It's not longer possible to set the size of the buffer 
+	  used to fetch LONG columns using the $sth->{blob_size} syntax.
+	  You may use either the solid_blob_size attribute to prepare()
+	  or the blob_read function.
+	* After fetching all rows, $sth->err becomes zero instead 
+	  of +100 to suppress weird messages from $h->{PrintError} 
+	  at end of each fetch.
+
+0.06   Tue May 31 1997
+	* Bugfix for perl 5.003: testenv.pm now uses Exporter.
+
+0.05   Sat May 10 03:24:12 MET DST 1997
+	* truncate of LONG fields is now working
+	* some minor bugs, especially tests, are fixed
+	* error handling complies to the DBI draft
+	  ($h->err, $h->errstr and $h->state should be full functional)
+	* Makefile.PL is now a bit more intelligent
+	* Tested with Perl5.003_95 and DBI-0.81
+
+0.04   
+	- The 0.03 test problem is FIXED.
+       	- Bugfix fetchrow(): returns truncated LONG VARCHAR columns now 
+       		with the truncated size, not padded with random 
+		memory contents.
+       	- Bugfix fetchrow(): TIMESTAMP values are now converted to 
+       		ascii without forgetting the time value. This is
+		done using sprintf(). 
+		No way with implicit TIMESTAMP=>C_CHAR conversion (???)
+       	- Makefile.PL: 
+       		added Solid-2.2 filenames.
+		added [experimental] shared linking with static
+			Solid libraries.
+       	- blob_read() works! - at least with Solid-2.2.
+
+0.02  Tue Feb 26 03:12:57 1997
+	- released V0.02
+
+0.01  Tue Dec 31 07:02:39 1996
+	- original version; created by h2xs 1.16
+
+
+

@@ -1,0 +1,63 @@
+Devel::Modlist - Show the modules, with version number, used by a script
+
+Version: 0.801 (see ChangeLog for full history)
+
+WHAT IS IT
+
+Devel::Modlist is a small tool that emits a list of files that were brought
+into a script via 'require' or 'use'. It lists these to the STDOUT descriptor
+at the end of the script's run. Each file is converted to class-like name,
+e.g. IO/File.pm is displayed as IO::File, and the version number, if found,
+is displayed. Files ending in .al (auto-loading routines) and .ix (indices
+for auto-loading) are ignored. Optionally, one can request that files in
+the Perl core library area not be listed (see the manual page).
+
+
+USING Devel::Modlist
+
+The module is designed to be used like most Devel::* packages:
+
+        perl -d:Modlist script
+
+It can also be used via -M:
+
+        perl -MDevel::Modlist script
+
+
+BUILDING/INSTALLING
+
+The package is designed to configure and build like a typical Perl module.
+To build:
+
+        perl Makefile.PL
+        make && make test
+
+(at present, there are no tests defined for Devel::Modlist)
+
+To install:
+
+        make install
+
+You may need super-user priviledges to install.
+
+
+PROBLEMS/BUG REPORTS
+
+Please send any reports of problems or bugs to <rjray@tsoft.com>.
+
+
+CREDITS AND LICENSES
+
+This package is copyright (c) 2000 by Randy Ray (rjray@blackperl.com).
+
+This module and the code within are released under the terms of the Artistic
+License 2.0 (http://www.opensource.org/licenses/artistic-license-2.0.php).
+This code may be redistributed under either the Artistic License or the GNU
+Lesser General Public License (LGPL) version 2.1
+(http://www.opensource.org/licenses/lgpl-2.1.php).
+
+Perl module interface by Randy J. Ray (rjray@blackperl.com), original concept
+and prototype code from Tim Bunce (Tim.Bunce@ig.co.uk).
+
+Special thanks to Andreas König <andreas.koenig@anima.de> for help in adding
+the CPAN support.

@@ -1,0 +1,9 @@
+Revision history for Devel-Command-NewF
+
+0.02 Mon Dec 11 13:42:35 PST 2006
+	- Corrected a problem that sometimes caused the module load to fail
+	- Changed command name to 'fx' to simplfy the interface to the debugger
+
+0.01 Mon Dec 11 12:05:16 2006
+	- Initial release.
+

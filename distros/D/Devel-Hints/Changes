@@ -1,0 +1,53 @@
+[Changes for 0.21 - 2010-11-10]
+
+* Allow modifying hints of arbitrary coderefs, not just stack frames. (doy)
+
+* Fix test failures on perl 5.8. (doy)
+
+[Changes for 0.20 - 2010-11-08]
+
+* LICENSING CHANGE: This compilation and all individual files in it
+  are now under the nullary CC0 1.0 Universal terms:
+
+  To the extent possible under law, 唐鳳 has waived all copyright and
+  related or neighboring rights to Module-Signature.
+
+* Fix test failures by disabling unsupported operations for Perl 5.10 and 5.12.
+
+* Updated Module::Install::DSL to 1.00.
+
+[Changes for 0.11 - 2005-12-30]
+
+* Fix malformed SIGNATURE file;
+  replace ExtUtils::AutoInstall with Module::AutoInstall.
+  Reported by: Andreas Koenig
+* Update ppport.h to work with latest Perl versions.
+* Corrected (harmless) type casting warnings in Hints.xs.
+
+[Changes for 0.10 - 2003-07-27]
+
+* Read/write tests.
+* cop_stash can now be assigned \%hash.
+* cop_filegv can now be assigned \*glob.
+* cop_warnings now correctly returns either a 12-byte string under
+  lexical warnings, or a positive integer otherwise.
+* cop_io now returns an empty string when there's no value available,
+  and undef for perls without perlio.
+
+[Changes for 0.04 - 2003-07-10]
+
+* Now with writable hints!
+* Switch to M::I.
+* Add ppport.
+
+[Changes for 0.03 - 2003-02-05]
+
+* Now with perl 5.6 and file/stash support.
+
+[Changes for 0.02 - 2003-01-29]
+
+* Add the ability to specify uplevels.
+
+[Changes for 0.01 - 2003-01-29]
+
+* Initial CPAN release.

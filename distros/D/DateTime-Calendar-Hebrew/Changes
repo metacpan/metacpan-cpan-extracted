@@ -1,0 +1,30 @@
+Revision history for Perl extension DateTime::Calendar::Hebrew.
+
+.05  Mon 7 Nov 2011
+	- timezone() now returns a floating timezone object instead of the
+	  string 'floating'
+	- utc_rd_values() is protected against undef values in its
+	  return values. Makes interval arithmetic work properly.
+
+.04  Thu Oct 03 12:00:00 2003
+	- moved sunset.pl to eg/sunset.pl. Added more samples.
+	- added to the docs to explain more about the sunset calculations.
+	- ran podchecker on my module
+
+.03  Thu Oct 03 00:00:00 2003
+	- Sunset/truncate error resolved
+	- Subroutines to compare objects & add/subtract Durations
+		- Overloaded operators for comparison & Duration math
+	- All documentation is now embedded in the module
+
+.02  Mon Sep 29 00:00:00 2003
+	- implemented 'floating' timezone properly
+	- implemented after-sunset code properly
+		- takes DateTime::Event::Sunset object for calculation
+	- documentation changes
+		- changed text of README, according to suggestions from Yitzchak Scott-Thoennes
+		- merged multiple READMEs into one, according to suggestion from Dave Rolsky
+
+.01  Tue Sep 23 00:00:00 2003
+	- original version; created by h2xs 1.21 with options
+		-AX -n DateTime::Calendar::Hebrew -v .01

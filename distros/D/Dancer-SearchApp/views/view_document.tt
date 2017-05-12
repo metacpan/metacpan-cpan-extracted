@@ -1,0 +1,77 @@
+<link rel="stylesheet" href="/css/typeahead-bootstrap-3-fix/typeahead.css" />
+
+<!-- Styling for the autosuggestion feature, this should move into
+     its own CSS or the main CSS, some day -->
+<style>
+.tt-highlight { font-weight: 1200 };
+</style>
+<div id="page">
+      <div id="content">
+        <!-- Autocompletion -->
+        <!-- https://www.elastic.co/guide/en/elasticsearch/reference/current/search-suggesters-completion.html -->
+
+        <a href="<% request.uri_for( '/', { q => params.q, type => "" }) %>">All Files</a>
+        <a href="<% request.uri_for( '/', { q => params.q, type => "audio/mpeg" }) %>">Audio Files</a>
+        <form action="/" method="GET" enctype="multipart/form-data">
+          <div class="row">
+          <div class="form-group">
+            <div class="col-xs-11 col-sm-11 col-md-6 col-lg-6">
+                <input id="q" name="q" class="form-control col-xs-12 col-md-12 col-lg-12" type="text" placeholder="Your query" value="<% params.q |html %>">
+            </div>
+            <div class="col-xs-1 col-md-1 col-lg-1">
+                          <button type="submit" name="Go" class="btn btn-default">Go</button>
+            </div>
+          </div>
+          </div>
+
+          <input type="hidden" name="type" value="<% params.type %>">
+        </form>
+        <a href="<% backlink |html %>">Back to results</a>
+        <h3><% result.title |html %></a> - <% result.creation_date |html %> <% result.language %> / <% result.basic_mime_type %></h3>
+        <% IF result.type == 'http' %>
+          <a href="<% result.url %>" >original</a>
+        <% ELSE %>
+          <a href="/inline/<%result.index |uri%>/<%result.type |uri%>/<% result.id | uri | uri %>" >original</a>
+        <% END %>
+        <a href="/open/<%result.index |uri%>/<%result.type |uri%>/<% result.id | uri | uri %>">download</a>
+        <div>
+        <% IF result.basic_mime_type == 'text/plain' %><pre><% result.content |html %></pre>
+        <% ELSE %>
+        <% IF result.basic_mime_type == 'audio/mpeg' %><audio src="/inline/<%result.index |uri%>/<%result.type |uri%>/<% result.id | uri | uri %>" controls="controls" /><%
+           ELSE %>
+           <!-- Until we get a proper HTML cleaner ... -->
+           <% result.content %>
+        <% END %><% END %>
+        </div>
+        <a href="<% backlink |html %>">Back to results</a>
+
+      </div>
+</div>
+<script src="<% request.uri_base %>/javascripts/typeahead/typeahead-0.11.1.bundle.js"></script>
+<script>
+var urlBase = '<% request.uri_for('/suggest') %>';
+var fetch = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('value'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  // prefetch: urlBase,
+  remote: {
+    url: urlBase + '/%QUERY.json',
+    wildcard: '%QUERY'
+  }
+});
+
+$('#q').typeahead({
+    highlight: true,
+    minLength: 1
+  },
+  {
+  name: 'fetch',
+  display: 'value',
+  source: fetch,
+  templates: {
+    suggestion: function(obj) {return '<div><strong>'+obj.value+'</strong><br><small>'+obj.url+'</small></div>'},
+  }
+});
+
+$('#q').focus();
+</script>

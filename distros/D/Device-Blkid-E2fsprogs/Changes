@@ -1,0 +1,118 @@
+Revision history for Perl extension Device::Blkid::E2fsprogs.
+
+0.01  Sat Jan  1 11:35:09 AST 2011
+	- original version; created by h2xs 1.23 with options
+		-A -n Device::Blkid::E2fsprogs
+
+0.10  Tue Jan  4 00:13:24 AST 2011
+	- Moving this to version 0.10 after some feverish cleaning
+        - Package builds, POD is semi-release worthy
+        - Ready for upload on CPAN now as a developer release
+        - still requires test script completion
+
+0.12  Tue Jan  4 18:30:46 AST 2011
+        - Cleaned up POD typos, finished documenting all functions
+        - Added last two function wrappers
+                - blkid_get_library_version()
+                - blkid_parse_tag_string()
+        - Have switched undef return types in object creation functions to
+          instead throw exceptions. This happens when the cache, device and
+          two iterator objects are requested from the lib.
+        - Modified and reogranized README somewhat
+        - Removed Data::Dump dependency from Makefile.PL
+
+0.14  Wed Jan  5 19:11:04 AST 2011
+        - Additional fixes to POD
+        - README updated with build and debug build instructions
+        - Makefile.PL, author email corrected
+ 
+0.16  Sun Jan  9 09:16:04 AST 2011
+        - Added Devel::CheckLib
+        - Modified stock Devel::CheckLib to verify libblkid version < version 2.00.0 (util-linux-ng versions)
+        - Some POD and README tweaks
+        - Makefile.PL changes for Devel::Checklib (defaults not suitable for my needs)
+        - MANIFEST updated with new file additions
+
+0.18  Tue Jan 11 10:29:19 AST 2011
+        - Modified Devel::CheckLib to make calls on libblkid to get version data and return a -D compiler
+          define used to conditionally compile a version specific target of this package
+        - Modified Makefile.PL to work with changes to Devel::CheckLib to support targeted module versions
+        - Re-ordered E2fsprogs.xs file. Functions now ordered in order of their appearance by version
+        - Added C preprocessor directives to E2fsprogs.xs to provide for targeted version builds
+        - Updated README with details about targetting versions and version history of libblkid
+        - Updated lib/Device/Blkid/E2fsprogs.pm POD with details about libblkid version history and targeting
+
+0.20  Tue Jan 11 23:23:54 AST 2011
+        - Added libblkid version numbers to functions in POD (version which function appeared in libblkid)
+        - Cleaned up additional areas of POD in E2fsprogs.pm file.
+        - Added two additional cache tests to unit test script
+        - Additional cleaning to README
+        - Package version bumped to 0.20
+
+0.22  Sat Jan 15 20:25:21 AST 2011
+        - Updated Makefile.PL to provide for optional library version detection via user interaction
+        - Updated Devel::CheckLib to support new optional library version detection via user interaction
+        - Minor updates to POD in E2fsprogs.pm
+        - README has been updated with new interactive installation instructions
+        - E2fsprogs.xs has had the additional C preprocessor defines added to support versions 1.33-1.35
+        - Commented out all but two tests in .t script; these require new approach with dynamic versioning
+        - Package version bumped to 0.22
+
+0.24  Sun Jan 16 20:35:09 AST 2011
+        - Updated Makefile.PL with META_MERGE param to WriteMakefile()
+        - Updated README with additional and more accurate information on installations and creating debug builds
+        - Updated POD in E2fsprogs.pm file; blkid is better detailed. Some minor reorganizations as well.
+        - Package version bumped to 0.24
+
+0.26  Mon Jan 17 06:45:21 AST 2011
+        - Changed Makefile.PL to use its own proper prompt() method rather than my own interactive logic which breaks tests
+        - Bumped versions to 0.26
+
+0.28  Wed Jan 19 23:35:21 AST 2011
+        - Removed interactive version selection from Makefile.PL
+        - Makefile.PL and CheckLib now try detection, on fail build a baseline v1.33 target
+        - Updated README to reflect removal of interactive installation
+        - Updated POD to remove interactive  installation details
+        - Bumped version to 0.28
+
+0.30  Sat Jan 22 18:02:49 AST 2011
+        - Changed blkid_get_dev_size wrapper in E2fsprogs.xs so that it now accepts the string name representation of the
+          device rather than a POSIX file descriptor to achieve a more Perlish interface
+        - The get_dev_size function now returns an exception anytime there is a problem originating from a file descriptor
+          allocation.
+        - Updated POD details on get_dev_size call changes
+        - Added block device test image file to project for unit test scripts ( t/img/ext3.fs )
+        - Added 02-dev_size.t test script
+
+0.3001 Sun Jan 23 21:35:12 AST 2011
+        - Bugfix/package correction push
+        - MANIFEST file correctly updated with new test script
+        - New test script, 03-dev_tag.t added
+        - Changes file corrected
+        - Version bumped to 0.3001
+
+0.32 Mon Jan 24 02:16:53 AST 2011
+        - Bumped bugfix release to version 0.33
+
+0.34 Mon Jan 24 23:49:20 AST 2011
+        - Cleaned up POD in E2fsprogs.pm, typo corrections, clarifications
+        - Added additional tests in 03-dev_tag.t unit test script
+        - Version bumped to 0.34
+
+0.36 Tue Jan 25 07:01:54 AST 2011
+        - Removed C preprocessor debug code from E2fsprogs.xs
+        - Corrected POD typos
+        - Removed debug build information from README, POD
+        - Removed DEBUG define from Makefile.PL
+        - Version bumped to 0.36
+
+0.38 Tue Jan 25 11:16:22 AST 2011
+        - Removed keyboard artifacts from POD in E2fsprogs.pm
+        - Bumped version to 0.38
+
+0.40 Wed Jan 26 01:21:04 AST 2011
+        - Added assert() macros to E2fsprogs.xs on all input arguments
+        - Updated Makefile.PL with NDEBUG define arg to gcc; assert macro's
+          are not compiled by default
+        - Additional POD cleanup in E2fsprogs.pm
+        - Version bump to 0.40

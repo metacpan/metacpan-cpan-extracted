@@ -1,0 +1,27 @@
+---
+abstract: 'Parse the dpkg log'
+author:
+  - 'Patrick Schoenfeld <schoenfeld@debian.org>'
+build_requires:
+  Benchmark: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.200003, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DPKG-Log
+requires:
+  Carp: 0
+  Data::Dumper: 0
+  DateTime::Format::Strptime: 0
+  DateTime::TimeZone: 0
+  Dpkg::Version: 0
+  Exporter: 0
+  Params::Validate: 0
+  overload: 0
+  perl: 5.010
+version: 1.20

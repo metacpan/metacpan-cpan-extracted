@@ -1,0 +1,12 @@
+~$
+\.log
+\.svn
+\.git
+\.DS_Store
+\.bak
+\.old
+\.tar.gz$
+pm_to_blib
+dist
+blib
+Makefile$

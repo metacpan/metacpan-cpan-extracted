@@ -1,0 +1,74 @@
+Revision history for Dist-Zilla-Lump
+
+0.10    2016-02-14 (PERLANCAR)
+
+	- No functional changes.
+
+	- Adjust to App::lcpan::Call 0.07.
+
+
+0.09    2015-08-31 (PERLANCAR)
+
+	- Replace # LUMPED_{MODULES,DISTS}_POD directives.
+
+
+0.08    2015-05-16 (PERLANCAR)
+
+        - No functional changes.
+
+        - [doc] Document about @LUMPED_MODULES and @LUMPED_DISTS.
+
+
+0.07    2015-05-15 (PERLANCAR)
+
+        - Rename dist from DZP-PERLANCAR-AddDeps to DZP-Lump.
+
+        [INCOMPATIBLE CHANGES]
+
+        - Change configuration from 'module' to 'lump_dist' and
+          'lump_dist_and_deps'.
+
+        - Munge files, replace #LUMPED_MODULES and #LUMPED_DISTS with 'our
+          @LUMPED_MODULES = ...' and 'our @LUMPED_DISTS = ...' to help other
+          tools (e.g. lint-prereqs) know the lumped contents.
+
+
+0.06    2015-05-15 (PERLANCAR)
+
+	- [Bugfix] Forgot (again) to add the added modules themselves,
+	  derp.
+
+
+0.05    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Typo.
+
+
+0.04    2015-05-15 (PERLANCAR)
+
+        [INCOMPATIBLE CHANGES]
+
+        - To avoid the added modules being in the prereqs themselves, now the
+          modules to be added are specified in the 'modules' plugin
+          configuration instead of in the Prereqs section.
+
+
+0.03    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- [Bugfix] Avoid proliferation of ' version xxx' text.
+
+
+0.02    2015-05-15 (PERLANCAR)
+
+	- No functional changes.
+
+	- Complete incomplete documentation.
+
+
+0.01     2015-05-15 (PERLANCAR)
+
+         - First release.

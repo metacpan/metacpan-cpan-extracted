@@ -1,0 +1,17 @@
+Build.PL
+Changes
+LICENSE
+META.json
+README.md
+cpanfile
+lib/DBD/BlackHole.pm
+minil.toml
+t/00_compile.t
+t/01_connect.t
+t/02_do.t
+t/03_prepare.t
+t/04_quote.t
+t/05_transaction.t
+t/06_sth.t
+META.yml
+MANIFEST

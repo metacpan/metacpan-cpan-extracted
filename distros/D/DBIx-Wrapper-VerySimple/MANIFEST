@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00_basic.t
+t/mock_lib/DBI.pm
+t/mock_lib/DBI/Mock/dbh.pm
+t/mock_lib/DBI/Mock/sth.pm
+lib/DBIx/Wrapper/VerySimple.pm
+META.yml                                 Module meta-data (added by MakeMaker)

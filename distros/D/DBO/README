@@ -1,0 +1,258 @@
+This is the manifestation of an idea for a database abstraction layer
+built on top of DBI called DBO (Database Objects).  In brief, it uses
+a schema to define a database structure and then uses visitors (see
+Design Patterns) to traverse the schema and perform operations.  It
+uses multimethods (via Class::Multimethods) to permit abstraction and
+extension in 3 orthogonal dimensions: database architecture (Oracle, 
+MySQL, mSQL, etc), query (insert, select, etc) and fields types 
+(string, integer, date, MyCustomField, etc).
+
+This implementation was written by Gareth Rees and is now maintained
+by Andy Wardley <abw@kfs.org> (in the loosest sense because I haven't 
+actually done anything with it yet).  It is perhaps best classified
+as a working research prototype: functional and usable but not 
+necessarily a "mature product".  Other database abstraction tools
+such as Class::DBI, Tangram, DBIx, etc., may well be much better suited 
+to your particular purposes.  Nevertheless, the multimethod/visitor 
+approach employed by DBO does have some notable benefits and we hope 
+that this code might be of use, interest or provide some inspiration.
+
+Ideas, feedback and patches are welcome, although the future development
+of DBO is in no way certain.  We're hoping that the POOP initiative
+(Perl Object Oriented Persistance) will result in a generic and mature 
+solution to this general problem and if the ideas contained herein prove 
+useful and can be integrated or adapted as appropriate, then so much the 
+better. 
+
+                                           Andy Wardley <abw@kfs.org>
+                                           Canon Research Centre Europe.
+
+------------------------------------------------------------------------
+
+NAME
+    `DBO' - Database Objects
+
+SYNOPSIS
+      use DBO ':constructors';
+
+      $dbh = DBO::Handle::DBI::mysql->connect
+        ('dbi:mysql:database:host', 'larry', 'camel');
+
+      $schema = Database
+        ( tables =>
+          [ Table
+            ( name => 'person',
+              columns =>
+              [ Char(name => 'name', max_length => 100 ),
+                Text(name => 'address'),
+                Char(name => 'phone', max_length => 30 )])]);
+
+      $dbo = DBO->new
+      ( handle => $dbh,
+        schema => $schema );
+
+      use DBO::Visitor::Create;
+      $dbo->apply_to_database('DBO::Visitor::Create');
+
+DESCRIPTION
+    `DBO' is an object-oriented database abstraction layer.
+
+    `DBO' is designed to be flexibly extensible in a number of
+    directions - adding new operations on the database, adding new
+    kinds of tables or columns, and applying to new database
+    systems. All extensions can be carried out by creating new
+    classes that inherit from the classes `DBO' defines, and by
+    defining new multimethod instances for those classes.
+
+    `DBO' defines three class hierarchies:
+
+    Database operations
+        An operation on a database is represented by an object
+        belonging to the class `DBO::Visitor'. `DBO' provides a
+        number of operations including `Create', `Insert' and
+        `Select'.
+
+    Schema elements
+        The structure of the database is represented by an object
+        belonging to the class `DBO::Database', which contains a
+        number of tables represented by `DBO::Table', each of which
+        contains a number of columns represented by `DBO::Column'.
+        `DBO' defines many column types, including `Char', `Text',
+        `Unsigned', `Integer' and `Time'.
+
+        Additional features of columns in the schema - such as the
+        values in the column being restricted to a set of options,
+        or the column being one of the keys of the table - are
+        represented by wrapping the column with a `Modifier' class.
+        `DBO' defines the modifier classes `Key', `Option' and
+        `ForeignKey'. Each column object belonging to the modifier
+        class has a reference to another column object that
+        describes the underlying type of the column.
+
+        (This design allows a `ForeignKey' column to be implemented
+        by a `Char' or `Integer' or whatever, as the designer
+        wishes, without needing extra classes `ForeignKey_Char',
+        `ForeignKey_Integer' and so on.)
+
+    Database handles
+        The database itself is represented by an object belong to
+        the class `DBO::Handle'. `DBO' defines the class
+        `DBO::Handle::DBI' as a thin wrapper around `DBI', but the
+        facility is there for `DBO' to be applied to other kinds of
+        database (or to define more sophisticated wrappers around
+        `DBI' such as "virtual databases" - views that include data
+        from more than one database).
+
+    The application of an operation to an element of the schema is
+    represented by a multimethod instance. DBO uses three
+    multimethods:
+
+    visit_database($visitor, $database, $handle)
+    visit_table($visitor, $table, $handle)
+    visit_column($visitor, $column, $handle)
+    When $visitor is the generic visitor `DBO::Visitor',
+    `visit_database' visits all the tables in the database;
+    `visit_table' visits all the columns in the table,
+    `visit_column' visits the base column when $column is a
+    `Modifier' column, and does nothing otherwise.
+
+    See the Class::Multimethods manpage for the full details of the
+    multimethod implementation.
+
+PACKAGE OPTION
+    By default, the `DBO' package exports no names and expects you
+    to use a purely object-oriented interface.
+
+    However, a number of constructor functions simplify the building
+    of schemas, and these can be imported by passing the
+    `:constructors' key to the `use DBO' statement. Then you can
+    write
+
+        Text(name => 'address')
+
+    as a shorthand for
+
+        DBO::Column::Text->new(name => 'address')
+
+THE DBO OBJECT
+    The `DBO' class packages up the database schema and the database
+    handle into one object, with a couple of convenience functions
+    for creating and applying operations. (You don't need to use a
+    `DBO' object if you don't want to.)
+
+    `DBO->new' takes a list of keys and values. The following keys
+    are required:
+
+    `schema'
+        A database schema, represented by an object of class
+        `DBO::Database'.
+
+    `handle'
+        A database handle, represented by an object of class
+        `DBO::Handle'.
+
+SCHEMA ELEMENTS
+    All constructors for schema elements are called `new', and take
+    a list of keys and values.
+
+  `DBO::Database'
+
+    A database. The following key is defined:
+
+    `tables'
+        A reference to an array of the tables in the database (each
+        represented by a `DBO::Table' object). Required.
+
+  `DBO::Table'
+
+    A table; or more specifically a view onto a table (you can have
+    many views onto the same table). The following keys are defined:
+
+    `id'
+        An identifying name for this object. The tables belonging to
+        a particular database must have different `id's (this only
+        matters when there is more than one view onto the same
+        table). If not supplied, the value for the `name' key is
+        used instead.
+
+    `name'
+        The name of the table in the database. Required.
+
+    `columns'
+        A reference to an array of the columns in the table (each
+        represented by a `DBO::Column' object). Required.
+
+  `DBO::Column'
+
+    A generic column.
+
+  `DBO::Column::Base'
+
+    A column implementation in a table in the database. The
+    following keys are defined:
+
+    `name'
+        The name of the column in the table. Required.
+
+    `not_null'
+        True iff entries in the column are allowed to be NULL.
+
+  `DBO::Column::Number'
+
+    A column whose values are numbers.
+
+  `DBO::Column::Integer'
+
+    A column whose values are integers.
+
+  `DBO::Column::Unsigned'
+
+    A column whose values are non-negative integers.
+
+  `DBO::Column::String'
+
+    A column whose values are strings.
+
+  `DBO::Column::Char'
+
+    A column whose values are fixed-length strings. The following
+    key is defined:
+
+    `max_length'
+        The maximum length of a value for the column. Defaults to
+        10.
+
+  `DBO::Column::Text'
+
+    A column whose values are variable-length strings. The following
+    keys are defined:
+
+    `avg_length'
+        The average length of a value for the column. Defaults to
+        100. This is a performance hint for some databases (e.g.
+        mSQL) and ignored elsewhere.
+
+    `max_length'
+        The maximum length of a value for the column. Defaults to
+        1000. For databases that support arbitrarily long strings,
+        this is ignored.
+
+RATIONALE
+SEE ALSO
+    See the Class::Multimethods manpage (Damian Conway) for the
+    implementation of multimethods in Perl.
+
+    See the DBI manpage (Tim Bunce) for Perl's database independent
+    interface.
+
+    "Design patterns: elements of reusable object-oriented software"
+    by Erich Gamma, Richard Helm, Ralph Johnson and John Vlissides
+    (Addison-Wesley 1995) describes the Visitor pattern.
+
+AUTHOR
+    Gareth Rees `garethr@cre.canon.co.uk'.
+
+COPYRIGHT
+    Copyright (c) 1999 Canon Research Centre Europe Ltd. All rights
+    reserved.
+

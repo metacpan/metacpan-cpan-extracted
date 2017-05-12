@@ -1,0 +1,10 @@
+Revision history for Perl module Dist-Zilla-Plugin-UploadToGoogleCode
+
+0.004     2015-03-12
+  - Mark as deprecated: http://google-opensource.blogspot.com/2015/03/farewell-to-google-code.html
+
+0.003     2012-09-01
+  - Require Google::Code::Upload version 0.006
+
+0.002     2012-06-16
+  - Initial, totally experimental, release

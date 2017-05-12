@@ -1,0 +1,88 @@
+{
+   "abstract" : "Hypertext Application Language resource",
+   "author" : [
+      "Lars DÉªá´á´á´á´á´¡ C<< <daxim@cpan.org> >>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Module::Build version 0.4007, CPAN::Meta::Converter version 2.132830",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Data-HAL",
+   "no_index" : {
+      "file" : [
+         "lib/Data/HAL/URI/NamespaceMap.pm"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "Data::Visitor::Callback" : "0",
+            "File::Slurp" : "0",
+            "JSON" : "0",
+            "Log::Any::Adapter" : "0",
+            "Log::Any::Adapter::FileHandle" : "0",
+            "Test::Fatal" : "0",
+            "Test::More" : "0",
+            "strictures" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "Module::Build" : "0.4"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Clone" : "0",
+            "Data::Visitor::Callback" : "0",
+            "HTTP::Headers::Util" : "0",
+            "JSON" : "0",
+            "Log::Any" : "0",
+            "MIME::Type" : "0",
+            "Moo" : "0",
+            "Safe::Isa" : "0",
+            "Scalar::Util" : "0",
+            "Types::Standard" : "0",
+            "URI" : "0",
+            "URI::IRI" : "0",
+            "URI::NamespaceMap" : "0",
+            "URI::Template" : "0",
+            "XML::RegExp" : "0",
+            "boolean" : "0",
+            "failures" : "0",
+            "perl" : "5.008",
+            "strictures" : "0"
+         }
+      }
+   },
+   "provides" : {
+      "Data::HAL" : {
+         "file" : "lib/Data/HAL.pm",
+         "version" : "1.000"
+      },
+      "Data::HAL::Link" : {
+         "file" : "lib/Data/HAL/Link.pm",
+         "version" : "1.000"
+      },
+      "Data::HAL::URI" : {
+         "file" : "lib/Data/HAL/URI.pm",
+         "version" : "1.000"
+      },
+      "Data::HAL::URI::NamespaceMap" : {
+         "file" : "lib/Data/HAL/URI/NamespaceMap.pm",
+         "version" : "1.000"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ]
+   },
+   "version" : "1.000"
+}

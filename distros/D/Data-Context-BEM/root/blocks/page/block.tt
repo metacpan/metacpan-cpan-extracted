@@ -1,0 +1,46 @@
+[%# Page.tt %]
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>[% title || 'BEM Document' | html %]</title>
+        <meta http-equiv="Content-Type"     content="text/html; charset=utf-8" />
+        <meta http-equiv="Content-Language" content="en-au" />
+        [%- FOREACH meta IN block.metadata %]
+        <meta name="[% meta.name | html %]" content="[% meta.value | html %]" />
+        [%- END %]
+        [%- FOREACH css IN block.styles %]
+        <link href="[% css.href || css | html %]" rel="[% css.rel || 'stylesheet' | html %]" type="[% css.type || 'text/css' | html %]" media="[% css.media || 'screen, print' | html %]" />
+        [%- END %]
+        <link href="[% styles.href | html %]" rel="[% styles.rel || 'stylesheet' | html %]" type="[% styles.type || 'text/css' | html %]" media="[% styles.media || 'screen, print' | html %]" />
+    </head>
+    <body>
+    [% INCLUDE content -%]
+    [%- FOREACH script IN block.scripts %]
+    <script type="[% script.type || 'text/javascript' | html %]" src="[% script.src || script | html %]"></script>
+    [%- END %]
+    <script type="[% scripts.type || 'text/javascript' | html %]" src="[% scripts.src || script | html %]"></script>
+    </body>
+</html>
+
+[%- BLOCK content -%]
+[%- # Start Wrap HTML -%]
+
+[%- # content HTML -%]
+[%- FOREACH item IN block.content -%]
+    <div class="[% bem.class(item) %]">
+    [% TRY;
+        template = bem.get_template(item);
+        temp = bem.log.debug('page : loading content ' _ template);
+        INCLUDE $template block = item;
+    CATCH %]
+        <div class="error">
+            Error processing '[% item.block %]'
+            [% "<pre>ERROR!\nTYPE: " _ error.type _ "\nINFO: " _ error.info _ "</pre>" IF bem.debug <= 2 -%]
+        </div>
+    [%- END -%]
+    </div>
+[% END -%]
+
+[%- # End Wrap HTML -%]
+
+[%- END -%]

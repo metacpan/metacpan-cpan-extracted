@@ -1,0 +1,36 @@
+---
+abstract: 'Upload the package to GitHub after release'
+author:
+  - 'David Zurborg <zurborg@cpan.org>'
+build_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+configure_requires:
+  Module::Build: '0.28'
+  perl: '5.010'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-GitHub-UploadRelease
+requires:
+  Dist::Zilla::Plugin::Git::Tag: '0'
+  Dist::Zilla::Plugin::GitHub: '0'
+  Dist::Zilla::Role::AfterRelease: '0'
+  File::Basename: '0'
+  File::Slurp: '0'
+  Git::Wrapper: '0'
+  JSON: '0'
+  MIME::Base64: '0'
+  Moose: '0'
+  Try::Tiny: '0'
+  perl: '5.010'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/zurborg/libdist-zilla-plugin-github-uploadrelease-perl/issues
+  homepage: https://github.com/zurborg/libdist-zilla-plugin-github-uploadrelease-perl
+  repository: https://github.com/zurborg/libdist-zilla-plugin-github-uploadrelease-perl.git
+version: '0.002'

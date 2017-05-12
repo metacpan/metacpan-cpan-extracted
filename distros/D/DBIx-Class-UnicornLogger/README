@@ -1,0 +1,52 @@
+NAME
+    DBIx::Class::UnicornLogger - Pretty Printing DebugObj with nicer logging
+    features
+
+VERSION
+    version 0.001004
+
+SYNOPSIS
+     my $debug_obj = DBIx::Class::UnicornLogger->new(
+        tree => { profile => 'console' },
+     );
+
+METHODS
+  new
+     my $pp = DBIx::Class::UnicornLogger->new(
+       show_progress  => 1,             # tries it's best to make it clear that a SQL
+                                        # statement is still running
+       executing      => '...',         # the string that is added to the end of SQL
+                                        # if show_progress is on.  You probably don't
+                                        # need to set this
+       clear_line     => '<CR><ESC>[J', # the string used to erase the string added
+                                        # to SQL if show_progress is on.  Again, the
+                                        # default is probably good enough.
+
+       squash_repeats => 1,             # set to true to make repeated SQL queries
+                                        # be ellided and only show the new bind params
+
+       format => '[%d][%c]%n ** %m',    # both format and multiline format take the
+       multiline_format => '   %m',     # formats defined in Log::Sprintf.  If only
+                                        # format is defined it will be used for each
+                                        # line of the log; if both are defined, format
+                                        # will be used for the first line, and
+                                        # multiline_format will be used for the rest
+       tree => {
+          profile => 'console',         # any arguments in the tree hashref will be
+       },                               # passed along to the SQL::Abstract::Tree
+                                        # constructor
+       # any other args are passed through directly to SQL::Abstract::Tree
+     );
+
+SEE ALSO
+    DBIx::Class::UnicornLogger::FromProfile, Log::Sprintf
+
+AUTHOR
+    Arthur Axel "fREW" Schmidt <frioux+cpan@gmail.com>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2015 by Arthur Axel "fREW" Schmidt.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

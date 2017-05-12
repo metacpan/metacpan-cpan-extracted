@@ -1,0 +1,47 @@
+---
+abstract: 'Integrate reCAPTCHA into Dancer2 applications'
+author:
+  - 'Pattawan Kaewduangdee <pattawan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  File::Temp: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '6.17'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Plugin-reCAPTCHA
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dancer2::Plugin::reCAPTCHA:
+    file: lib/Dancer2/Plugin/reCAPTCHA.pm
+    version: '0.3'
+requires:
+  Captcha::reCAPTCHA::V2: '0'
+  Dancer2::Plugin: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/Sidnet/p5-Dancer2-Plugin-reCAPTCHA/issues
+  homepage: https://github.com/Sidnet/p5-Dancer2-Plugin-reCAPTCHA
+  repository: https://github.com/Sidnet/p5-Dancer2-Plugin-reCAPTCHA.git
+version: '0.3'
+x_contributors:
+  - 'Michal Wojciechowski <odyniec@cpan.org>'

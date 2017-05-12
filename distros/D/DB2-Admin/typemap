@@ -1,0 +1,142 @@
+#                                                         -*-C-*-
+# Perl XS typemap for DB2 administrative API
+#
+# Copyright (c) 2007, Morgan Stanley & Co. Incorporated
+# See ..../COPYING for terms of distribution.
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation;
+# version 2.1 of the License.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser
+# General Public License for more details.
+# 
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA
+# 02110-1301  USA
+#
+# THE FOLLOWING DISCLAIMER APPLIES TO ALL SOFTWARE CODE AND OTHER
+# MATERIALS CONTRIBUTED IN CONNECTION WITH THIS DB2 ADMINISTRATIVE API
+# LIBRARY:
+#
+# THIS SOFTWARE IS LICENSED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE AND ANY WARRANTY OF NON-INFRINGEMENT, ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+# BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+# LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+# NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+# SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. THIS
+# SOFTWARE MAY BE REDISTRIBUTED TO OTHERS ONLY BY EFFECTIVELY USING
+# THIS OR ANOTHER EQUIVALENT DISCLAIMER AS WELL AS ANY OTHER LICENSE
+# TERMS THAT MAY APPLY.
+#
+# $Id: typemap,v 165.1 2008/12/29 18:20:01 biersma Exp $
+#
+
+struct sqlma* T_SQLMA
+
+INPUT
+#------------------------------------------------------------------------
+T_SQLMA
+  {
+    /*
+     * A 'struct sqlma' is generated from a reference to a
+     * perl array.  Each array element is a either an integer
+     * with the 'Type' value, or a hash reference with :
+     * - 'Type' (required),
+     * - 'AgentId' (optional)
+     * - 'Object' (optional).
+     * We perform error-checking as part of the conversion.
+     *
+     * We only use this to provide an input parameter to
+     * db2GetSnapshot and db2GetSnapshotSize.
+     */
+    int           counter;
+    int           obj_num;        /* # of objects to monitor */
+    size_t        ma_sz;          /* size of sqlma structure */
+    AV           *avref;
+    char         *ptr;
+
+    if (!SvROK($arg))
+         croak(\"Reference expected for parameter $var\");
+    if (SvTYPE(SvRV($arg)) != SVt_PVAV)
+         croak(\"Array reference expected for parameter $var\");
+
+    avref = (AV*)SvRV($arg);
+
+    /* Create a sqlma structure with a size based on the array size */
+    obj_num = av_len(avref) + 1;
+    if (obj_num == 0)
+        croak(\"Parameter $var is empty array - require at least 1 element\");
+    ma_sz = SQLMASIZE(obj_num);
+    Newz(0, ptr, ma_sz, char);
+    $var = (struct sqlma*)ptr;
+    $var->obj_num = obj_num;
+
+    /* Now traverse the array */
+    for (counter = 0; counter < obj_num; counter++) {
+        SV **elem;
+        
+        elem = av_fetch(avref, counter, FALSE);
+        if ((!SvROK(*elem)) && looks_like_number(*elem)) {
+            int val = SvIV(*elem);
+            $var->obj_var[counter].obj_type = val;
+        } else if (SvROK(*elem) && SvTYPE(SvRV(*elem)) == SVt_PVHV) {
+            char *key;
+            I32   keylen;
+            SV   *value;
+            int   have_type = 0;
+
+            while ((value = hv_iternextsv((HV*)SvRV(*elem),
+                                          (char **)&key, &keylen))) {
+                if (strEQ(key, \"Type\")) {
+                    have_type = 1;
+                    if ((!SvROK(value)) && looks_like_number(value)) {
+                        int val = SvIV(value);
+                        $var->obj_var[counter].obj_type = val;
+                    } else {
+                        croak(\"Invalid data in $var elem %d, key %s: not an integer\", counter, key);
+                    }
+                } else if (strEQ(key, \"AgentId\")) {
+                    if ((!SvROK(value)) && looks_like_number(value)) {
+                        int val = SvIV(value);
+                        $var->obj_var[counter].agent_id = val;
+                    } else {
+                        croak(\"Invalid data in $var elem %d, key %s: not an integer\", counter, key);
+                    }
+                } else if (strEQ(key, \"Object\")) {
+                    if ((!SvROK(value)) && SvPOK(value)) {
+                        char  *val;
+                        STRLEN len;
+                        
+                        val = SvPV(value, len);
+                        if (len > SQLM_OBJECT_SZ) {
+                            croak(\"Length of $var elem %d, key %s too long: is %d bytes, max %d bytes\", counter, key, len, SQLM_OBJECT_SZ);
+                        }
+                        memcpy($var->obj_var[counter].object, val, len);
+                    } else {
+                        croak(\"Invalid data in $var elem %d, key %s: not a string\", counter, key);
+                    }
+                } else {
+                    croak(\"Invalid data in $var elem %d: Invalid key %s\", counter, key);
+                }
+            } /* End while: hash iteration */
+            if (have_type == 0) {
+                croak(\"Invalid data in $var elem %d: required key 'Type' missing\", counter);
+            }
+        } else {
+            croak(\"Invalid data in $var elem %d: not an integer or HASH reference\", counter);
+        }
+    } /* End foreach: array element */
+  } /* End T_SQLMA */
+#------------------------------------------------------------------------
+OUTPUT

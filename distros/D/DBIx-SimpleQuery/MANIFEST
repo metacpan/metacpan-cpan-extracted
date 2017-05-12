@@ -1,0 +1,11 @@
+Changes
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/DBIx/SimpleQuery.pm
+lib/DBIx/SimpleQuery/Object.pm
+t/00-use.t
+t/10-defaults.t
+t/20-general.t
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,123 @@
+html {
+    overflow: hidden;
+}
+
+body {
+    font-family: Arial, Gill Sans, sans-serif;
+    font-size: 11pt;
+    margin: 0;
+    padding: 0;
+    white-space: nowrap;
+    width: 3000px;
+}
+
+.container:after {
+    clear: both;
+    content: ".";
+    display: block;
+    height: 0;
+    overflow: hidden;
+    visibility: hidden;
+}
+
+/* Toolbar container */
+div#toolbar {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+/* Toolbar logo */
+.logo {
+    cursor: pointer;
+    float: left;
+    font-size: 12pt;
+    height: 2em;
+    margin: 0 0.5em 0 0;
+    padding: 0;
+}
+
+/* Toolbar buttons */
+.buttons {
+    float: left;
+    height: 2em;
+    line-height: 2em;
+    white-space: nowrap;
+    vertical-align: text-bottom;
+}
+
+/* Button */
+span.button {
+    background: none no-repeat 2px center;
+    background-color: #ddd;
+    border: solid 1px #d2d2d2;
+    border-radius: 0.2em;
+    -moz-border-radius: 0.2em;
+    display: inline-block;
+    float: left;
+    height: 16px;
+    line-height: 16px;
+    margin: 5px 2px;
+    padding: 2px;
+    text-indent: 4px;
+}
+
+/* Close button */
+span.button.close {
+    background-image: url("images/cross.png");
+    margin-left: 6px;
+    padding-left: 18px;
+}
+
+/* Right/left alignment button */
+span.button.align {
+    padding-left: 18px;
+}
+
+span.button.align.left {
+    background-image: url("images/arrow-stop.png");
+}
+
+span.button.align.right {
+    background-image: url("images/arrow-stop-180.png");
+}
+
+/* -------------------------------------------------------------------------- */
+
+/* Dancer-specific rules */
+
+.logo {
+    background-image: url("images/perldancer.png");
+    background-position: 0% 0%;
+    background-size: auto 100%;
+    width: 6.8em;
+}
+
+span.button.time {
+    background-image: url("images/clock.png");
+    padding-left: 18px;
+}
+
+span.button.data {
+    background-image: url("images/report-paper.png");
+    cursor: pointer;
+    padding-left: 18px;
+}
+
+span.button.routes {
+    background-image: url("images/arrow-branch-090.png");
+    cursor: pointer;
+    padding-left: 18px;
+}
+
+span.button.templates {
+    background-image: url("images/document-sub.png");
+    cursor: pointer;
+    padding-left: 18px;
+}
+
+span.button.database {
+    background-image: url("images/database.png");
+    cursor: pointer;
+    padding-left: 18px;
+}

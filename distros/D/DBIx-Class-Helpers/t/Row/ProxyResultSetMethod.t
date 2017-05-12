@@ -1,0 +1,60 @@
+#!perl
+
+use strict;
+use warnings;
+
+use lib 't/lib';
+use Test::More;
+use Test::Deep;
+
+use TestSchema;
+my $schema = TestSchema->deploy_or_connect();
+$schema->prepopulate;
+
+my $g = $schema->resultset('Gnarly')->search({
+   id => 1
+})->single;
+
+subtest 'unloaded data' => sub {
+   is($g->id_plus_one, 2, 'basic test');
+   is($g->id_plus_two, 3, 'slot and specified method');
+   is($g->id_plus_two, 3, 'slot and specified method(2)');
+};
+
+my $g2 = $schema->resultset('Gnarly')->with_id_plus_one->search({
+   id => 2
+})->single;
+
+subtest 'loaded data' => sub {
+   is($g2->id_plus_one, 3, 'basic');
+   is($g2->id_plus_two, 4, 'slot and specified method');
+};
+
+subtest 'copy result' => sub {
+    ok !$schema->resultset('Gnarly')->search({ id => 100 })->count,
+       'will not accidentally collide';
+    ok my $g3 = $g->copy({ id => 100 }), 'Copied result';
+    isa_ok $g3, 'DBIx::Class::Row';
+    is $g3->id, 100, 'id is correctly overridden';
+};
+
+subtest 'copy result without any proxy defined' => sub {
+   my $bloaty = $schema->resultset('Bloaty')->first;
+   ok my $bcopy = $bloaty->copy({ id => 100, name => 'boo' }), 'Copied result';
+   is $bcopy->id, 100, 'id is correctly overridden';
+};
+
+subtest 'update result' => sub {
+   my $g2 = $schema->resultset('Gnarly')->search({
+      id => 2
+   })->single;
+
+   is($g2->id_plus_one, 3, 'basic');
+
+   $g2->update({ literature => 'Expiration Date' });
+
+   ok 1, q(Update didn't explode);
+};
+
+done_testing;
+

@@ -1,0 +1,16 @@
+Changes
+MANIFEST
+META.yml # Will be created by "make dist"
+Makefile.PL
+README
+lib/Drupal/Module/Starter.pm
+lib/Drupal/Module/Starter/4_6_2.pm
+lib/Drupal/Module/Starter/4_7_3.pm
+scripts/drupal-module-starter
+t/00-load.t
+t/01-Drupal-Module-Starter.t
+t/02-Drupal-Module-Starter-4_6_2.t
+t/03-Drupal-Module-Starter-4_7_3.t
+t/pod-coverage.t
+t/pod.t
+t/config.yaml

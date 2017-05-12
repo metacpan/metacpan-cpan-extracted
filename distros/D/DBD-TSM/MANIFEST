@@ -1,0 +1,9 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBD-TSM.t
+lib/DBD/TSM.pm
+lib/DBD/TSM/Functions.pm
+lib/DBD/TSM/configure.pl
+META.yml                                 Module meta-data (added by MakeMaker)

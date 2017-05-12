@@ -1,0 +1,6 @@
+0.03     Tue Jan 4 11:44:11 CST 2011
+        - fix faulty use of coercion
+
+0.01    Sat May 17 18:09:52 JST 2008
+        - initial release (note the time zone)
+

@@ -1,0 +1,30 @@
+Changes
+lib/Dancer2/Plugin/Auth/Extensible/Provider/Usergroup.pm
+LICENSE
+Makefile.PL
+MANIFEST
+MANIFEST.SKIP
+README
+t/00-load.t
+t/ddl/schema1.ddl
+t/ddl/schema2.ddl
+t/ddl/schema3.ddl
+t/lib/config.yml
+t/lib/Schema1.pm
+t/lib/Schema1/Result/Group.pm
+t/lib/Schema1/Result/Membership.pm
+t/lib/Schema1/Result/Role.pm
+t/lib/Schema1/Result/User.pm
+t/lib/Schema2.pm
+t/lib/Schema2/Result/Mygroup.pm
+t/lib/Schema2/Result/Mymembership.pm
+t/lib/Schema2/Result/Myrole.pm
+t/lib/Schema2/Result/Myuser.pm
+t/manifest.t
+t/pod-coverage.t
+t/pod.t
+t/provider-usergroup.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

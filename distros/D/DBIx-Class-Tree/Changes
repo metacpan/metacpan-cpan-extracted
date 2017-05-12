@@ -1,0 +1,50 @@
+
+Revision history for DBIx::Class::Tree
+
+0.03003 2011-01-20
+    - The repository has been migrated from subversion to git
+    - Optimized is_leaf to not trigger another query if the children
+      releationship is prefetched
+
+0.03002 2010-09-23
+    - Added various docs
+    - Added ordered ancesors (nebulous)
+
+0.03001 2010-04-25
+    - Fixed the parents (note the plural) relationship to
+      not have cascade_copy set by default
+
+0.03000 2009-08-18
+    - Removed EXPERIMENTAL flags, because after 2 years there'd be bugs
+      if there were any serious problems. (Ian Wells)
+    - Fix borked tests (DBIx-Class 0.081 got rid of the loophole they used)
+      (ribasushi)
+    - Increase DBIC dependency to 0.08100. (bluefeet)
+
+0.02001 2007-12-16
+    - Remove invalid line.
+
+0.02000 2007-10-29
+    - Use Module::Install instead of Module::Build.
+    - Fixed is_leaf, is_branch, and is_root.
+    - Renamed set_primary_ley as set_primary_key.
+    - New has_descdendant() method.
+    - New repair_tree flag.
+    - parent() now repairs the tree if needed/allowed.
+    - Do not cascade delete via the parents() relationship.
+
+0.01000 2006-11-06
+    - Added is_leaf, is_root, and is_branch to AdjacencyList.
+    - Added a validation override for set_primary_key().
+    - Removed the _grouping_clause override method.
+    - Created a TODO document.
+    - attach_child() attach_sibling() now accept more than
+      one object to attach.
+    - Added tests for Ordered.
+    - Renamed Positional as Ordered.
+    - Added tests for AdjacencyList.
+    - Moved Positional functionality out of AdjacencyList
+      and in to AdjacencyList::Positional.
+    - AdjacencyList module created.
+    - First version.
+

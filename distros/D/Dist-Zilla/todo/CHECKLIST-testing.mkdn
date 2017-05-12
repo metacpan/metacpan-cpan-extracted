@@ -1,0 +1,50 @@
+# METHODS OF Dist::Zilla - these are actually really important (and hard?)
+
+* find_files
+* build, build_in
+* ensure_built_in
+* build_archive
+* test
+* release
+* install
+* clean
+
+# COMMANDS IN Dist::Zilla::App - should stop being interesting as overhauled
+
+* Dist::Zilla::App::Command
+* Dist::Zilla::App::Command::build
+* Dist::Zilla::App::Command::clean
+* Dist::Zilla::App::Command::install
+* Dist::Zilla::App::Command::new
+* Dist::Zilla::App::Command::release
+* Dist::Zilla::App::Command::run
+* Dist::Zilla::App::Command::smoke
+* Dist::Zilla::App::Command::test
+
+# CONFIG STUFF - don't bother until assembly overhaul happens
+
+Dist::Zilla::Config
+Dist::Zilla::Config::Finder
+Dist::Zilla::Config::Perl
+
+# FILE CLASSES - probably tested sufficiently by testing plugins
+
+Dist::Zilla::File::FromCode
+Dist::Zilla::File::InMemory
+Dist::Zilla::File::OnDisk
+
+# PLUGINS
+
+* Dist::Zilla::Plugin::BumpVersion  - not worth testing, doomed to be replaced
+
+* Dist::Zilla::Plugin::InlineFiles  - exercised by other plugins
+* Dist::Zilla::Plugin::UploadToCPAN - difficult to test
+
+# PREREQ HANDLING
+Dist::Zilla::Prereqs
+
+# MISC
+Dist::Zilla::Tester
+Dist::Zilla::Types
+Dist::Zilla::Util
+Dist::Zilla::Util::MVPAssembler

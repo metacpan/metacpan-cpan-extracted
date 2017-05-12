@@ -1,0 +1,29 @@
+Revision history for Dancer-Template-HtmlTemplate
+
+0.07    2012-11-23 (LPW2012-eve)
+        Better documentation, and warn if die_on_bad_params is supplied.
+        Thanks to gjskha for spurring this on.
+
+0.06    2010-10-05
+        Add extra tests; forgot to update MANIFEST with these before building
+        the last release, so they weren't included.  D'oh!
+
+0.05    2010-10-05
+        Flatten nested hashrefs, as HTML::Template doesn't support them.
+        Given params like { foo => { bar => 'Foo' } }, you can access the value
+        Foo with e.g. <tmpl var name="foo.bar">
+        Thanks to Damien Krotkine (dams) for reporting and providing patches via
+        GitHub!
+
+0.04    2010-05-14
+        Added tests, thanks to Franck Cuny
+
+0.03    2010-04-24
+        Remove debug code which required Data::Dump - silly.
+
+0.02    2010-04-22
+        Declaring Dancer & HTML::Template as deps would help.  Idiot.
+
+0.01    2010-04-19
+        First version.
+

@@ -1,0 +1,9 @@
+Revision history for Perl extension Dist-Zilla-App-Command-cover
+
+1.101001  2012-05-30
+  - New maintainer: Mike Doherty <doherty@cpan.org>
+  - fixed POD
+  - Load modules at runtime instead of compile time [RT #72144; dolmen]
+
+1.101000  2010-04-10 15:15:25 Europe/Vienna
+  - original version

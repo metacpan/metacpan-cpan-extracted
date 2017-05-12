@@ -1,0 +1,20 @@
+<p> <a href="/notes/note/add">Add a Note</a> </p>
+
+[% USE FillInForm %]
+[% UNLESS fif.keys %]
+[% fif = c.req.params.as_hash %]
+[% END %]
+
+[% FILTER fillinform fdat => fif %]
+
+<form method='POST'>
+
+<p>Notes:<br /><textarea name="text" cols="40" rows="7"></textarea></p>
+
+<p>Tags:<br /><input type='text' name='tags' /></p>
+
+<p><input type='submit' /></p>
+
+</form>
+
+[% END %]

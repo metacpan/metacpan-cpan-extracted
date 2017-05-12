@@ -1,0 +1,26 @@
+DBIx-Class-TimeStamp-HiRes version 1.0.1
+
+DBIx-Class Component extending DBIx::Class::TimeStamp to inflate/deflate HiRes timestamps.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+
+DEPENDENCIES
+
+DBIx::Class::TimeStamp
+DateTime::HiRes
+
+USAGE
+
+In table class:
+
+    __PACKAGE__->load_components( qw/ TimeStamp::HiRes /);
+
+See TimeStamp usage in DBIx::Class::TimeStamp.

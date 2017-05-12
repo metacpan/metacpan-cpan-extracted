@@ -1,0 +1,42 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        code: 
+          caption: Condition
+          class: src
+          f: "%s"
+          fs: "%s"
+        cover: 
+          caption: "%"
+          f: "%d"
+          fs: "%d"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+      headers_order: 
+        - line
+        - cover
+        - code
+      label: Condition coverage
+      rows: 
+        - 
+          code: $a or $b
+          cover: 
+            class: c0
+            v: 0
+          line: 18
+        - 
+          code: $c > 5 and $c < 10
+          cover: 
+            class: c0
+            v: 0
+          line: 27
+      summary: []
+
+metadata: 
+  title: "Condition coverage: lib/Sample/Simple/Baz.pm"
+  version: 0.05

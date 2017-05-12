@@ -1,0 +1,37 @@
+Release history for Dist-Zilla-Role-PluginLoader
+
+0.001003 2017-03-08T09:45:33Z 3e54ed2
+ - Bugfix: Avoid test failures with -Ddefault_inc_excludes_dot
+ - Roles now export more metadata to metaconfig
+ - Stop using Test::KENTNL/dztest in tests
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001002, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +11 ↑3 -3 (recommends: +1, suggests: ↑2)
+ - runtime: -2 (recommends: +1)
+ - test: +2 ↓1 -1 (recommends: ↑1 ↓1)
+
+0.001002 2014-10-17T08:34:14Z 9f73b47
+ [Bugfix]
+ - Wrap mvp methods from ancestry classes instead of clobbering them.
+ - This also avoids a method collision on older moose.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001001, see misc/*.deps* for details
+ - develop: +2 ↑1 (suggests: ↑1)
+ - test: (recommends: ↑1)
+
+ [Metadata]
+ - author = kentnl@cpan.org
+
+0.001001 2014-08-29T09:59:08Z
+ [Bugfix]
+ - Avoid no-build-dir fails.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - test: ↑1
+
+0.001000 2014-08-28T01:01:08Z
+ - First version.

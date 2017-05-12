@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- converted with Dezi::Indexer::Config ver2_to_ver3()  -->
+<swish>
+ <FollowSymLinks>yes</FollowSymLinks>
+ <!-- WARNING: SourceDir ignored by Swish3 -->
+ <SourceDir>docs /home/otherdocs</SourceDir>
+ <!-- WARNING: SourceOnly ignored by Swish3 -->
+ <SourceOnly>.htm .html</SourceOnly>
+ <UndefinedMetaNames>ignore</UndefinedMetaNames>
+ <MetaNames>
+  <author />
+  <description />
+ </MetaNames>
+ <Index>
+  <Admin>Doc Manager (dmanager@foo.invalid)</Admin>
+  <Description>This is an index of our two document directories.</Description>
+  <File>/home/indexfiles/docs.index</File>
+  <Format>Native</Format>
+  <Name>Test index</Name>
+  <Pointer>http://someplace</Pointer>
+ </Index>
+</swish>

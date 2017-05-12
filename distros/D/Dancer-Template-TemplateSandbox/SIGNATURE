@@ -1,0 +1,41 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 ad72b3b4de7f6ccb9df5a1860de7659590f57343 Build.PL
+SHA1 119f9ce833ba0e94c913e16642e47aeb2706fc4b Changes
+SHA1 138baa522200d979fd4aece2911d3afecfc7b1bc MANIFEST
+SHA1 93b50666d6813622c465d78bb62e069e8024b895 META.yml
+SHA1 07eb319012af5b5d458ea5b3dddf73a5ae941be1 README
+SHA1 a5737656e6ec41492a449c9ea109d407b9299e4d ignore.txt
+SHA1 1fce6c9b29eded1870a663dab11a36d89f4924ab lib/Dancer/Template/TemplateSandbox.pm
+SHA1 11b5cbf78928b680c8a9ed5aa9273f79b82be497 t/00-load.t
+SHA1 3cd4e50928b0ae2274c2bca153f69267be5509ce t/05_template_sandbox.t
+SHA1 eb15b92fd15eff83c879fa00a943f7dd59c353c1 t/index.txt
+SHA1 8bc48f44745e43dabfd218542e37cff869fff550 t/lib/EasyMocker.pm
+SHA1 03df4f382d22e128d81dabb7752261e8aac2328e xt/release/check-changes.t
+SHA1 00f52da37e4c2c2218acdf60d11392abf11a2a8e xt/release/fixme.t
+SHA1 98cdccf1120f3c9b445d6bcfaa10339a9c821d54 xt/release/hasversion.t
+SHA1 e6efcfd6a7173a136748ef560e913465fe03a854 xt/release/meta.t
+SHA1 9f074af0f75805df778e06a6b2c0221aa9ae6a1f xt/release/minimumversion.t
+SHA1 49835efe20e87aef3f67d9fdd75a6593acf811d2 xt/release/pod-coverage.t
+SHA1 8c57f2b89f12c54fd975c39ded1c100796ab5f17 xt/release/pod.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkuwWg0ACgkQk0asf7iG0tTnSgCfS/3zVHAhu90y10qkS3ogEDUE
+3VIAoLk//wRep95SJ5ug/GZQu6/rdvRU
+=1n6u
+-----END PGP SIGNATURE-----

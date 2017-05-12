@@ -1,0 +1,12 @@
+blib/
+Makefile
+Makefile.old
+*.tar.gz
+*.bak
+pm_to_blib
+DBIx-DataAudit-*
+DBIx-DataAudit-*/
+.releaserc
+cover_db
+MYMETA.*
+blibdirs.ts

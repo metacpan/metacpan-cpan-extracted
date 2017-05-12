@@ -1,0 +1,56 @@
+##-*- Mode: Change-Log; coding: utf-8; -*-
+##
+## Change log for perl distribution DiaColloDB::WWW
+
+v0.02.001 Wed, 15 Mar 2017 16:10:30 +0100 moocow
+	* requires DiaColloDB >= v0.12.004
+	* added support for generic DiaColloDB::Client URLs (e.g. rcfile, list; not just local directories anymore)
+	* wrapper directory template updates to dstar-web v0.27 (svn r17143)
+	  - d3 display in single svg (prettier export, added inkscape 'font-weight' hack)
+	  - javascript caches profile data in DOM for offline GUI via browser "Save As"
+	  - added hidden 'eps' parameter
+          - added svg snapshot button for highcharts display mode
+
+v0.01.011 Tue, 24 Jan 2017 15:05:39 +0100 moocow
+	* added support for slice-local N (for DiaColloDB >= v0.12.001)
+	* updated d3.layout.cloud.js to v1.2.4
+
+v0.01.010 Mon, 31 Oct 2016 10:58:29 +0100 moocow
+	* renamed score function mi->milf, added score function mi1
+	* added support for 'extend' queries using "profile=extend-RELATION" paramter to profile.ttk
+	* added option alias -log for -log-level
+	* removed literal http:// schemes from embedded links where appropriate, for painless access via https
+
+v0.01.009 Wed, 29 Jun 2016 08:10:09 +0100 moocow
+	* added missing Template::Plugin:JSON::Escape dependency, for cpan install
+
+v0.01.008 Wed, 27 Apr 2016 09:14:06 +0200 moocow
+	* raised "onepass" option to user-level
+	* band-aided DiaColloDB::WWW::CGI package-global timer reset for standalone server in DiaColloDB::WWW::Handler::cgi
+	  - should really (optionally) use object-local {t_started} in DiaColloDB::WWW::CGI
+
+v0.01.007 Tue, 26 Apr 2016 15:05:28 +0200 moocow
+	* fixed "Use of uninitialized value $cwd in chdir" bug in dcdb-www-server.perl
+	* added pass-through for 'onepass' option in share/htdocs/dc-common.ttk , diacollo.js
+
+v0.01.006 Wed, 13 Apr 2016 13:46:21 +0200 moocow
+	* diacollo.js submit-on-enter for ie 11
+
+v0.01.005 Wed, 13 Apr 2016 13:46:21 +0200 moocow
+	* diacollo.js fixes for internet exploder / win7
+
+v0.01.004 Mon, 07 Mar 2016 09:04:48 +0100 moocow
+	* diacollo.js: use jquery-ui for hicharts 'details' popup
+	  - eliminates need for highslide.js dependency (overly restrictive license)
+	  - enables info popups in standalone mode
+	* added license files for included third-party libraries (d3.layout.cloud.js, purl.js)
+	* added attribution for third-party code to README
+
+v0.01.003 Fri, 04 Mar 2016 14:14:44 +0100 moocow
+	* fixed File::MimeInfo -> MIME::Types dependency
+
+v0.01.002 Fri, 04 Mar 2016 09:01:28 +0100 moocow
+	* added missing prereq DiaColloDB (oops)
+
+v0.01.001 Thu, 03 Mar 2016 15:09:26 +0100 moocow
+	* initial version

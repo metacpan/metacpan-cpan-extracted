@@ -1,0 +1,27 @@
+---
+abstract: 'Create test files from inline tests in POD sections'
+author:
+  - 'Jens Berthold <jens.berthold@jebecs.de>'
+build_requires:
+  Dist::Zilla: '0'
+  Module::Build: '0.28'
+  Test::DZil: '0'
+  Test::Exception: '0'
+  Test::More: '0'
+  autodie: '0'
+configure_requires:
+  Module::Build: '0.28'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-Plugin-Test-Inline
+requires:
+  Dist::Zilla: '0'
+  Moose: '0'
+  Test::Inline: '0'
+  parent: '0'
+  perl: v5.8.8
+version: '0.011005'

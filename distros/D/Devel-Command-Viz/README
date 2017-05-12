@@ -1,0 +1,29 @@
+Devel-Command-Viz version 0.0.1
+
+This module provides a 'viz' command for the debugger, allowing
+you to use GraphViz::Data::Structure to visualize your Perl
+data structrures without leaving the debugger. 
+
+Ite depends upon the Devel::Command module to install the 
+necessary extensions to the debugger to make this command available.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+DEPENDENCIES
+
+Devel::Command.
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2005, Joe McMahon
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.

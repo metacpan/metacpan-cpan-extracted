@@ -1,0 +1,35 @@
+---
+abstract: 'compare perl module namespaces'
+author:
+  - 'Tomoya KABE <limitusus@cpan.org>'
+build_requires:
+  Test::Exception: 0
+  Test::More: 0.88
+configure_requires:
+  Module::Build::Tiny: 0.018
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.2, Dist::Zilla version 4.300034, CPAN::Meta::Converter version 2.130880'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Compare-Module
+no_index:
+  directory:
+    - t
+    - xt
+    - inc
+    - share
+    - eg
+    - examples
+requires:
+  List::Compare: 0
+  Readonly: 0
+  perl: 5.008005
+resources:
+  bugtracker: https://github.com/limitusus/Data-Compare-Module/issues
+  homepage: https://github.com/limitusus/Data-Compare-Module
+  repository: https://github.com/limitusus/Data-Compare-Module.git
+version: 0.03
+x_contributors:
+  - 'limitusus <limit.usus@gmail.com>'

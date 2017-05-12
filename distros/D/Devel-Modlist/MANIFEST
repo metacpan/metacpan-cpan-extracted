@@ -1,0 +1,11 @@
+ChangeLog
+MANIFEST
+MANIFEST.SKIP
+Makefile.PL
+README
+lib/Devel/Modlist.pm
+t/00_signature.t
+t/pod.t
+t/pod_coverage.t
+META.yml
+SIGNATURE    Added here by Module::Build

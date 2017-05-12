@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name: Data-FormValidator-ErrMsgs-JavaScript
+version: 1.00
+author:
+  - Mark Stosberg <mark@summersault.com>
+abstract: Let JavaScript handle DFV error presentation.
+license: perl
+build_requires:
+  Carp: 0
+  Data::FormValidator: 0
+  Test::More: 0
+provides:
+  Data::FormValidator::ErrMsgs::JavaScript:
+    file: lib/Data/FormValidator/ErrMsgs/JavaScript.pm
+    version: 1.00
+generated_by: Module::Build version 0.2611

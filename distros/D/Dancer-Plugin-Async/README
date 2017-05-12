@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Dancer-Plugin-Async,
+version 0.001:
+
+  Dancer plugin to build async route handlers with Twiggy
+
+This software is copyright (c) 2011 by Michael Stapelberg.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

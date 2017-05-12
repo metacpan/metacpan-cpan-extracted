@@ -1,0 +1,42 @@
+---
+abstract: 'bake dist.ini to not need the bundles.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::Util::Test::KENTNL: '1.005000'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  List::Util: '0'
+  Test::DZil: '0'
+  Test::Differences: '0'
+  Test::More: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-bakeini
+provides:
+  Dist::Zilla::App::Command::bakeini:
+    file: lib/Dist/Zilla/App/Command/bakeini.pm
+    version: '0.002006'
+recommends:
+  Path::Tiny: '0.058'
+requires:
+  Carp: '0'
+  Dist::Zilla::App: '0'
+  Dist::Zilla::Util::ExpandINI: '0.003000'
+  Path::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-bakeini/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-bakeini
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-bakeini.git
+version: '0.002006'

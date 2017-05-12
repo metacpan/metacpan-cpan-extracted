@@ -1,0 +1,531 @@
+# NAME
+
+Dist::Zilla::Plugin::ChangelogFromGit - Write a Changes file from a project's git log.
+
+# VERSION
+
+version 0.016
+
+# SYNOPSIS
+
+Here's an example dist.ini section showing all the current options and
+their default values.
+
+        [ChangelogFromGit]
+        max_age     = 365
+        tag_regexp  = ^v(\d+\.\d+)$
+        file_name   = CHANGES
+        wrap_column = 74
+        debug       = 0
+
+Variables don't need to be set to their default values.  This is
+equivalent to the configuration above.
+
+        [ChangelogFromGit]
+
+# DESCRIPTION
+
+This Dist::Zilla plugin turns a project's git commit log into a
+change log file.  It's better than simply running \`git log > CHANGES\`
+in at least two ways.  First, it understands release tags, and it uses
+them to group changes by release.  Second, it reformats the changes to
+make them easier to read.  And third, subclasses can change some or
+all of the reformatting to make change logs even easier to read.
+
+See this project's CHANGES file for sample output.  Yes, this project
+uses itself to generate its own change log.  Why not?
+
+# CONFIGURATION / PUBLIC ATTRIBUTES
+
+As seen in the ["SYNOPSIS"](#synopsis), this plugin has a number of public
+attributes that may be set using dist.ini configuration variables.
+
+## max\_age = INTEGER
+
+The `max_age` configuration variable limits the age of releases to be
+included in the change log.  The default is to include releases going
+back about a year.  To include about two years, one would double the
+default value:
+
+        [ChangelogFromGit]
+        max_age = 730
+
+`max_age` is intended to limit the size of change logs for large,
+long-term projects that don't want to include the entire, huge commit
+history in every release.
+
+## tag\_regexp = REGULAR\_EXPRESSION
+
+`tag_regexp` sets the regular expression that detects which tags mark
+releases.  It also extracts the version numbers from these tags using
+a regular expression back reference or capture.  For example, a
+project's release tags might match 'release-1.000', 'release-1.001',
+etc.  This `tag_regexp` will find them and extract their versions.
+
+        [ChangelogFromGit]
+        tag_regexp = ^release-(\d+.*)$
+
+There is no single standard format for release tags.  `tag_regexp`
+defaults to the author's convention.  It will most likely need to be
+changed.
+
+## file\_name = STRING
+
+`file_name` sets the name of the change log that will be written.  It
+defaults to "CHANGES", but some people may prefer "Changes",
+"Changelog", or something else.
+
+        [ChangelogFromGit]
+        file_name = Changes
+
+## wrap\_column = INTEGER
+
+Different contributors tend to use different commit message formats,
+which can be disconcerting to the typographically aware release
+engineer.  `wrap_column` sets the line length to which all commit
+messages will be re-wrapped.  It's 74 columns by default.  If this is
+too short:
+
+        [ChangelogFromGit]
+        wrap_column = 78
+
+## debug = BOOLEAN
+
+Developers are people, too.  The `debug` option enables some noisy
+runtime tracing on STDERR.
+
+        [ChangelogFromGit]
+        debug = 1
+
+## exclude\_message = REGULAR\_EXPRESSION
+
+`exclude_message` sets a regular expression which discards matching
+commit messages.  This provides a way to exclude commit messages such
+as 'forgot to include file X' or 'typo'.  The regular expression is
+case sensitive.
+
+        [ChangelogFromGit]
+        exclude_message = ^(forgot|typo)
+
+`include_message` can be used to do the opposite: exclude all changes
+except ones that match a regular expression.  Using both at once is
+liable to generate empty change logs.
+
+## include\_message = REGULAR\_EXPRESSION
+
+`include_message` does the opposite of `exclude_message`: it sets a
+regular expression which commit messages must match in order to be
+included in the Changes file.  This means that when making a commit
+with a relevant message, you must include text that matches the
+regular expression pattern to have it included in the Changes file.
+All other commit messages are ignored.
+
+The regular expression is case sensitive.
+
+        [ChangelogFromGit]
+        include_message = ^Major
+
+Using both `include_message` and `exclude_message` at the same time
+will most likely result in empty change logs.
+
+# HOW IT WORKS
+
+Dist::Zilla::ChangelogFromGit collects the tags matching `tag_regexp`
+that are not older than `max_age` days old.  These are used to
+identify and time stamp releases.  Each release is encapsulated into a
+[Software::Release](https://metacpan.org/pod/Software::Release) object.
+
+Git::Repository::Log::Iterator is used to collect the changes prior to
+each release but after the previous release.  Change log entries are
+added to their respective Software::Release objects.
+
+`$self->render_changelog()` is called after all the relevant
+releases and changes are known.  It must return the rendered change
+log as a string.  That string will be used as the content for a
+[Dist::Zilla::File::InMemory](https://metacpan.org/pod/Dist::Zilla::File::InMemory) object representing the new change log.
+
+# SUBCLASSING FOR NEW FORMATS
+
+Dist::Zilla::ChangelogFromGit implement about a dozen methods to
+render the various parts of a change log.  Subclasses may override or
+augment any or all of these methods to alter the way change logs are
+rendered.
+
+All methods beginning with "render" return strings that will be
+incorporated into the change log.  Methods that will not contribute to
+the change log must return empty strings.
+
+## Rendering Entire Change Logs
+
+Methods beginning with "render\_changelog" receive no parameters other
+than $self.  Everything they need to know about the change log is
+included in the object's attributes: `wrap_column`, `releases`,
+`skipped_release_count`, `earliest_date`.
+
+### render\_changelog
+
+render\_changelog() returns the text of the entire change log.  By
+default, the change log is built from a header, zero or more releases,
+and a footer.
+
+        sub render_changelog {
+                my $self = shift();
+                return(
+                        $self->render_changelog_header() .
+                        $self->render_changelog_releases() .
+                        $self->render_changelog_footer()
+                );
+        }
+
+### render\_changelog\_header
+
+render\_changelog\_header() renders some text that introduces the reader
+to the change log.
+
+        sub render_changelog_header {
+                my $self = shift();
+                my $header = (
+                        "Changes from " . $self->format_datetime($self->earliest_date()) .
+                        " to present."
+                );
+                return $self->surround_line("=", $header) . "\n";
+        }
+
+### render\_changelog\_releases
+
+render\_changelog\_releases() iterates through each release, calling
+upon $self to render them one at a time.
+
+        sub render_changelog_releases {
+                my $self = shift();
+
+                my $changelog = '';
+
+                RELEASE: foreach my $release (reverse $self->all_releases()) {
+                        next RELEASE if $release->has_no_changes();
+                        $changelog .= $self->render_release($release);
+                }
+
+                return $changelog;
+        }
+
+### render\_changelog\_footer
+
+render\_changelog\_footer() tells the reader that the change log is
+over.  Normally the end of the file is sufficient warning, but a
+truncated change log is friendlier when the reader knows what they're
+missing.
+
+        sub render_changelog_footer {
+                my $self = shift();
+
+                my $skipped_count = $self->skipped_release_count();
+
+                my $changelog_footer;
+
+                if ($skipped_count) {
+                        my $releases = "release" . ($skipped_count == 1 ? "" : "s");
+                        $changelog_footer = (
+                                "Plus $skipped_count $releases after " .
+                                $self->format_datetime($self->earliest_date()) . '.'
+                        );
+                }
+                else {
+                        $changelog_footer = "End of releases.";
+                }
+
+                return $self->surround_line("=", $changelog_footer);
+        }
+
+## Rendering Individual Releases
+
+Methods beginning with "render\_release" receive $self plus one
+additional parameter: a Software::Release object encapsulating the
+release and its changes.  See [Software::Release](https://metacpan.org/pod/Software::Release) to learn the
+information that object encapsulates.
+
+### render\_release
+
+render\_release() is called upon to render a single release.  In the
+change log, a release consists of a header, one or more changes, and a
+footer.
+
+        sub render_release {
+                my ($self, $release) = @_;
+                return(
+                        $self->render_release_header($release) .
+                        $self->render_release_changes($release) .
+                        $self->render_release_footer($release)
+                );
+        }
+
+### render\_release\_header
+
+render\_release\_header() introduces a release.
+
+        sub render_release_header {
+                my ($self, $release) = @_;
+
+                my $version = $release->version();
+                $version = $self->zilla()->version() if $version eq 'HEAD';
+
+                my $release_header = (
+                        $self->format_release_tag($release->version()) . ' at ' .
+                        $self->format_datetime($release->date())
+                );
+
+                return $self->surround_line("-", $release_header) . "\n";
+        }
+
+### render\_release\_changes
+
+render\_release\_changes() iterates through the changes associated with
+each Software::Release object.  It calls upon render\_change() to
+render each change.
+
+        sub render_release_changes {
+                my ($self, $release) = @_;
+
+                my $changelog = '';
+
+                foreach my $change (@{ $release->changes() }) {
+                        $changelog .= $self->render_change($release, $change);
+                }
+
+                return $changelog;
+        }
+
+### render\_release\_footer
+
+render\_release\_footer() may be used to divide releases.  It's not used
+	by default, but it's implemented for completeness.
+
+        sub render_release_footer {
+                my ($self, $release) = @_;
+                return '';
+        }
+
+## Rendering Individual Changes
+
+Methods beginning with "render\_change" receive two parameters in
+addition to $self: a [Software::Release](https://metacpan.org/pod/Software::Release) object encapsulating the
+release containing this change, and a [Software::Release::Change](https://metacpan.org/pod/Software::Release::Change)
+object encapsulating the change itself.
+
+### render\_change
+
+render\_change() renders a single change, which is the catenation of a
+change header, change message, and footer.
+
+        sub render_change {
+                my ($self, $release, $change) = @_;
+                return(
+                        $self->render_change_header($release, $change) .
+                        $self->render_change_message($release, $change) .
+                        $self->render_change_footer($release, $change)
+                );
+        }
+
+### render\_change\_header
+
+render\_change\_header() generally renders identifying information about
+each change.  This method's responsibility is to produce useful
+information in a pleasant format.
+
+        sub render_change_header {
+                my ($self, $release, $change) = @_;
+
+                use Text::Wrap qw(fill);
+
+                local $Text::Wrap::huge    = 'wrap';
+                local $Text::Wrap::columns = $self->wrap_column();
+
+                my @indent = ("  ", "  ");
+
+                return(
+                        fill(
+                                "  ", "  ",
+                                'Change: ' . $change->change_id
+                        ) .
+                        "\n" .
+                        fill(
+                                "  ", "  ",
+                                'Author: ' . $change->author_name.' <'.$change->author_email.'>'
+                        ) .
+                        "\n" .
+                        fill(
+                                "  ", "  ",
+                                'Date  : ' . $self->format_datetime($change->date())
+                        ) .
+                        "\n\n"
+                );
+        }
+
+### render\_change\_message
+
+render\_change\_message() renders the commit message for the change log.
+
+        sub render_change_message {
+                my ($self, $release, $change) = @_;
+
+                use Text::Wrap qw(fill);
+
+                return '' if $change->description() =~ /^\s/;
+
+                local $Text::Wrap::huge = 'wrap';
+                local $Text::Wrap::columns = $self->wrap_column();
+
+                return fill("    ", "    ", $change->description) . "\n";
+        }
+
+### render\_change\_footer
+
+render\_change\_footer() returns summary and/or divider text for the
+change.
+
+        sub render_change_footer {
+                my ($self, $release, $change) = @_;
+                return "\n";
+        }
+
+## Formatting Data
+
+Dist::Zilla::Plugin::ChangelogFromGit includes a few methods to
+consistently format certain data types.
+
+### format\_datetime
+
+format\_datetime() converts the [DateTime](https://metacpan.org/pod/DateTime) objects used internally
+into friendly, human readable dates and times for the change log.
+
+        sub format_datetime {
+                my ($self, $datetime) = @_;
+                return $datetime->strftime("%F %T %z");
+        }
+
+### format\_release\_tag
+
+format\_release\_tag() turns potentially cryptic release tags into
+friendly version numbers for the change log.  By default, it also
+replaces the 'HEAD' version with the current version being released.
+This accommodates release managers who prefer to tag their
+distributions after releasing them.
+
+        sub format_release_tag {
+                my ($self, $release_tag) = @_;
+
+                return 'version ' . $self->zilla()->version() if $release_tag eq 'HEAD';
+
+                my $tag_regexp = $self->tag_regexp();
+                $release_tag =~ s/$tag_regexp/version $1/;
+                return $release_tag;
+        }
+
+### surround\_line
+
+surround\_line() will surround a line of output with lines of dashes or
+other characters.  It's used to help heading stand out.  This method
+takes two strings: a character (or string) that will repeat to fill
+surrounding lines, and the line to surround.  It returns a three-line
+string: the original line preceded and followed by surrounding lines.
+
+        sub surround_line {
+                my ($self, $character, $string) = @_;
+
+                my $surrounder = substr(
+                        ($character x (length($string) / length($character) + 1)),
+                        0,
+                        length($string)
+                );
+
+                return "$surrounder\n$string\n$surrounder\n";
+        }
+
+# INTERNAL ATTRIBUTES
+
+Dist::Zilla::Plugin::ChangelogFromGit accumulates useful information
+into a few internal attributes.  These aren't intended to be
+configured by dist.ini, but they are important for rendering change
+logs.
+
+## earliest\_date
+
+earliest\_date() contains a [DateTime](https://metacpan.org/pod/DateTime) object that represents the date
+and time of the earliest release to include.  It's initialized as
+midnight for the date max\_age() days ago.
+
+## releases
+
+releases() contains an array reference of [Software::Release](https://metacpan.org/pod/Software::Release) objects
+that will be included in the change log.
+
+### all\_releases
+
+all\_releases() returns a list of the Software::Release objects that
+should be included in the change log.  It's a friendly equivalent of
+`@{$self->releases()}`.
+
+### get\_release
+
+get\_release() returns a single release by index.  The first release
+in the change log may be retrieved as `$self->get_release(0)`.
+
+### releae\_count
+
+release\_count() returns the number of Software::Release objects in the
+["releases"](#releases) attribute.
+
+### sort\_releases
+
+sort\_releases() sorts the Software::Release objects in the releases()
+using some comparator.  For example, to sort releases in time order:
+
+        $self->sort_releases(
+                sub {
+                        DateTime->compare( $_[0]->date(), $_[1]->date() )
+                }
+        );
+
+## skipped\_release\_count
+
+skipped\_release\_count() contains the number of releases truncated by
+max\_age().  The default render\_changelog\_footer() uses it to display
+the number of changes that have been omitted from the log.
+
+# Subversion and CVS
+
+This plugin is almost entirely a copy-and-paste port of a command-line
+tool I wrote a while ago.  I also have tools to generate similar
+change logs for CVS and Subversion projects.  I'm happy to contribute
+that code to people interested in creating Dist::Zilla plugins for
+other version control systems.
+
+We should also consider abstracting the formatting code out to a role
+so that it can be shared among different plugins.
+
+# BUGS
+
+The documentation includes copies of the renderer methods.  This
+increases technical debt, since changes to those methods must also be
+copied into the documentation.  Rocco needs to finish [Pod::Plexus](https://metacpan.org/pod/Pod::Plexus)
+and use it here to simplify maintenance of the documentation.
+
+Collecting all releases and changes before rendering the change log
+may be considered harmful for extremely large projects.  If someone
+thinks they can generate change logs incrementally, their assistance
+would be appreciated.
+
+# AUTHORS
+
+Rocco Caputo <rcaputo@cpan.org> - Initial release, and ongoing
+management and maintenance.
+
+Cory G. Watson <gphat@cpan.org> - Made formatting extensible and
+overridable.
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2010-2013 by Rocco Caputo.
+
+This is free software; you may redistribute it and/or modify it under
+the same terms as the Perl 5 programming language itself.

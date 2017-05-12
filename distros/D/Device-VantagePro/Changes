@@ -1,0 +1,27 @@
+Revision history for Perl extension Device::VantagePro.
+
+Ver 0.25  Mon Apr 28 2014
+  1. Fixed dependencies (added DateTime::TimeZone). Closes #1.
+     Thanks MartinMcGrath.
+
+Ver 0.24  Sun Apr 13 2014
+  1. Added get_timezone function
+
+  2. Add get_setup_bits function to retrieve information of device setup
+
+  3. Documented get_eeprom function and add additional parameters
+
+  4. Added Rain_Rate_clicks parameter in record retrieval
+
+  5. Minor documentation updates. Closes #91709
+
+  6. Updated README file
+
+
+Ver 0.23  Tue Apr 20 2010
+  1. Added Device::SerialPort to PREREQ_PM in Makefile.PM
+ 
+  2. Fixed bug in unpacking UV_MAX changed from s to C
+
+  3. Allowed for 0 date and time stamp in do_dmpaft() 
+

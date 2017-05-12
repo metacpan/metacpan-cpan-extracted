@@ -1,0 +1,415 @@
+NAME
+
+    Dist::Zilla::PluginBundle::Author::LESPEA - LESPEA's Dist::Zilla
+    Configuration
+
+VERSION
+
+    version 1.008000
+
+SYNOPSIS
+
+        #  In dist.ini:
+        [@Author::LESPEA]
+
+DESCRIPTION
+
+    This plugin bundle, in its default configuration, is equivalent to:
+
+        [ArchiveRelease]
+        [Authority]
+        [AutoMetaResources]
+        [AutoPrereqs]
+        [ConfirmRelease]
+        [ConsistentVersionTest]
+        [CopyFilesFromBuild]
+        [DualBuilders]
+        [ExecDir]
+        [ExtraTests]
+        [FakeRelease]
+        [GatherDir]
+        [HasVersionTests]
+        [InstallGuide]
+        [License]
+        [MakeMaker]
+        [ManifestSkip]
+        [Manifest]
+        [MetaConfig]
+        [MetaJSON]
+        [MetaNoIndex]
+        [MetaTests]
+        [MetaYAML]
+        [MinimumPerl]
+        [ModuleBuild]
+        [NextRelease]
+        [NoTabsTests]
+        [PkgVersion]
+        [PodCoverageTests]
+        [PodSyntaxTests]
+        [PodWeaver]
+        [PortabilityTests]
+        [PruneCruft]
+        [ReportVersions::Tiny]
+        [ShareDir]
+        [SynopsisTests]
+        [Test::CPAN::Changes]
+        [Test::Compile]
+        [Test::DistManifest]
+        [Test::EOL]
+        [Test::Kwalitee]
+        [Test::MinimumVersion]
+        [Test::NoTabs]
+        [Test::Perl::Critic]
+        [TestRelease]
+        [UploadToCPAN]
+
+OPTIONS
+
+ -remove
+
+    This option can be used to remove specific plugins from the bundle. It
+    can be used multiple times.
+
+    Obviously, the default is not to remove any plugins.
+
+    Example:
+
+        ; Remove these two plugins from the bundle
+        -remove = CriticTests
+        -remove = SynopsisTests
+
+ copy_file, move_file
+
+    If you want to copy or move files out of the build dir and into the
+    distribution dir, use these two options to specify those files. Both of
+    these options can be specified multiple times.
+
+    The most common reason to use this would be to put automatically
+    generated files under version control. For example, Github likes to see
+    a README file in your distribution, but if your README file is
+    auto-generated during the build, you need to copy each newly-generated
+    README file out of its build directory in order for Github to see it.
+
+    If you want to include an auto-generated file in your distribution but
+    you don't want to include it in the build, use move_file instead of
+    copy_file.
+
+    Example:
+
+        copy_file = README
+        move_file = README.pod
+        copy_file = README.txt
+
+ release
+
+    This option chooses the type of release to do. The default is 'real,'
+    which means "really upload the release to CPAN" (i.e. load the
+    UploadToCPAN plugin). You can set it to 'fake,' in which case the
+    FakeRelease plugin will be loaded, which simulates the release process
+    without actually doing anything. You can also set it to 'none' if you
+    do not want this module to load any release plugin, in which case your
+    dist.ini file should load a release plugin directly. Any other value
+    for this option will be interpreted as a release plugin name to be
+    loaded.
+
+    Examples:
+
+        ; Release to CPAN for real (default)
+        release = real
+        ; For testing, you can do fake releases
+        release = fake
+        ; Or you can choose no release plugin
+        release = none
+        ; Or you can specify a specific release plugin.
+        release = OtherReleasePlugin
+
+ archive, archive_directory
+
+    If set to true, the archive option copies each released version of the
+    module to an archive directory, using the ArchiveRelease plugin. This
+    is the default. The name of the archive directory is specified using
+    archive_directory, which is releases by default.
+
+    Examples:
+
+        ; archive each release to the "releases" directory
+        archive = true
+        archive_directory = releases
+        ; Or don't archive
+        archive = false
+
+ include_dotfiles
+
+    If this is set to true (not the default), then any file that includes a
+    leading '.' will be included in the package
+
+    Example:
+
+        include_dotfiles = true
+
+ compile_synopsis
+
+    If this is set to true (the default), then the SynopsisTests plugin
+    will be enabled. This plugin checks the perl syntax of the SYNOPSIS
+    sections of your modules. Obviously, if your SYNOPSIS section is not
+    perl code (case in point: this module), you should set this to false.
+
+    Example:
+
+        compile_synopsis = false
+
+ add_meta
+
+    If this is set to true (the default), then the AutoMetaResources and
+    Authority plugins will be enabled. These plugins adds various metatdata
+    such as the github repo, cpan links, etc to the metadata of the plugin.
+
+    Example:
+
+        add_meta = false
+
+SEE ALSO
+
+    Please see those modules/websites for more information related to this
+    module.
+
+      * Dist::Zilla::Plugin::ArchiveRelease
+
+      * Dist::Zilla::Plugin::Authority
+
+      * Dist::Zilla::Plugin::AutoMetaResources
+
+      * Dist::Zilla::Plugin::AutoPrereqs
+
+      * Dist::Zilla::Plugin::ConfirmRelease
+
+      * Dist::Zilla::Plugin::ConsistentVersionTest
+
+      * Dist::Zilla::Plugin::CopyFilesFromBuild
+
+      * Dist::Zilla::Plugin::DualBuilders
+
+      * Dist::Zilla::Plugin::ExecDir
+
+      * Dist::Zilla::Plugin::ExtraTests
+
+      * Dist::Zilla::Plugin::FakeRelease
+
+      * Dist::Zilla::Plugin::GatherDir
+
+      * Dist::Zilla::Plugin::HasVersionTests
+
+      * Dist::Zilla::Plugin::InstallGuide
+
+      * Dist::Zilla::Plugin::License
+
+      * Dist::Zilla::Plugin::MakeMaker
+
+      * Dist::Zilla::Plugin::Manifest
+
+      * Dist::Zilla::Plugin::ManifestSkip
+
+      * Dist::Zilla::Plugin::MetaConfig
+
+      * Dist::Zilla::Plugin::MetaJSON
+
+      * Dist::Zilla::Plugin::MetaNoIndex
+
+      * Dist::Zilla::Plugin::MetaTests
+
+      * Dist::Zilla::Plugin::MetaYAML
+
+      * Dist::Zilla::Plugin::MinimumPerl
+
+      * Dist::Zilla::Plugin::ModuleBuild
+
+      * Dist::Zilla::Plugin::NextRelease
+
+      * Dist::Zilla::Plugin::PkgVersion
+
+      * Dist::Zilla::Plugin::PodCoverageTests
+
+      * Dist::Zilla::Plugin::PodSyntaxTests
+
+      * Dist::Zilla::Plugin::PodWeaver
+
+      * Dist::Zilla::Plugin::PruneCruft
+
+      * Dist::Zilla::Plugin::ReadmeAnyFromPod
+
+      * Dist::Zilla::Plugin::ReportVersions::Tiny
+
+      * Dist::Zilla::Plugin::ShareDir
+
+      * Dist::Zilla::Plugin::SpellingCommonMistakesTests
+
+      * Dist::Zilla::Plugin::Test::CPAN::Changes
+
+      * Dist::Zilla::Plugin::Test::Compile
+
+      * Dist::Zilla::Plugin::Test::DistManifest
+
+      * Dist::Zilla::Plugin::Test::EOL
+
+      * Dist::Zilla::Plugin::Test::Kwalitee
+
+      * Dist::Zilla::Plugin::Test::MinimumVersion
+
+      * Dist::Zilla::Plugin::Test::NoTabs
+
+      * Dist::Zilla::Plugin::Test::Perl::Critic
+
+      * Dist::Zilla::Plugin::Test::Portability
+
+      * Dist::Zilla::Plugin::Test::Synopsis
+
+      * Dist::Zilla::Plugin::TestRelease
+
+      * Dist::Zilla::Plugin::UploadToCPAN
+
+INSTALLATION
+
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+
+    Adam Lesperance <lespea@gmail.com>
+
+SUPPORT
+
+ Perldoc
+
+    You can find documentation for this module with the perldoc command.
+
+      perldoc Dist::Zilla::PluginBundle::Author::LESPEA
+
+ Websites
+
+    The following websites have more information about this module, and may
+    be of help to you. As always, in addition to those websites please use
+    your favorite search engine to discover more resources.
+
+      * MetaCPAN
+
+      A modern, open-source CPAN search engine, useful to view POD in HTML
+      format.
+
+      http://metacpan.org/release/Dist-Zilla-PluginBundle-Author-LESPEA
+
+      * Search CPAN
+
+      The default CPAN search engine, useful to view POD in HTML format.
+
+      http://search.cpan.org/dist/Dist-Zilla-PluginBundle-Author-LESPEA
+
+      * RT: CPAN's Bug Tracker
+
+      The RT ( Request Tracker ) website is the default bug/issue tracking
+      system for CPAN.
+
+      http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-PluginBundle-Auth
+      or-LESPEA
+
+      * AnnoCPAN
+
+      The AnnoCPAN is a website that allows community annotations of Perl
+      module documentation.
+
+      http://annocpan.org/dist/Dist-Zilla-PluginBundle-Author-LESPEA
+
+      * CPAN Ratings
+
+      The CPAN Ratings is a website that allows community ratings and
+      reviews of Perl modules.
+
+      http://cpanratings.perl.org/d/Dist-Zilla-PluginBundle-Author-LESPEA
+
+      * CPAN Forum
+
+      The CPAN Forum is a web forum for discussing Perl modules.
+
+      http://cpanforum.com/dist/Dist-Zilla-PluginBundle-Author-LESPEA
+
+      * CPANTS
+
+      The CPANTS is a website that analyzes the Kwalitee ( code metrics )
+      of a distribution.
+
+      http://cpants.perl.org/dist/overview/Dist-Zilla-PluginBundle-Author-L
+      ESPEA
+
+      * CPAN Testers
+
+      The CPAN Testers is a network of smokers who run automated tests on
+      uploaded CPAN distributions.
+
+      http://www.cpantesters.org/distro/D/Dist-Zilla-PluginBundle-Author-LE
+      SPEA
+
+      * CPAN Testers Matrix
+
+      The CPAN Testers Matrix is a website that provides a visual overview
+      of the test results for a distribution on various Perls/platforms.
+
+      http://matrix.cpantesters.org/?dist=Dist-Zilla-PluginBundle-Author-LE
+      SPEA
+
+      * CPAN Testers Dependencies
+
+      The CPAN Testers Dependencies is a website that shows a chart of the
+      test results of all dependencies for a distribution.
+
+      http://deps.cpantesters.org/?module=Dist::Zilla::PluginBundle::Author
+      ::LESPEA
+
+ Bugs / Feature Requests
+
+    Please report any bugs or feature requests by email to
+    bug-dist-zilla-pluginbundle-author-lespea at rt.cpan.org, or through
+    the web interface at
+    http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Dist-Zilla-PluginBundle-
+    Author-LESPEA. You will be automatically notified of any progress on
+    the request by the system.
+
+ Source Code
+
+    The code is open to the world, and available for you to hack on. Please
+    feel free to browse it and play with it, or whatever. If you want to
+    contribute patches, please send me a diff or prod me to pull from your
+    repository :)
+
+    https://github.com/lespea/dist-zilla-pluginbundle-author-lespea
+
+      git clone git://github.com/lespea/dist-zilla-pluginbundle-author-lespea.git
+
+COPYRIGHT AND LICENSE
+
+    This software is copyright (c) 2014 by Adam Lesperance.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT
+    WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER
+    PARTIES PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND,
+    EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

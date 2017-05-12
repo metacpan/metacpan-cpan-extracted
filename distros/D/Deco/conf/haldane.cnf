@@ -1,0 +1,62 @@
+model = Haldane
+name  = Original Haldane
+
+# tissue are specified by
+# halftime in minutes
+# m0 in bar
+# deltaM (bar/m)
+
+ <tissue 1>
+   halftime = 5
+   m0       = 3.17
+   deltaM   = 0.180
+ </tissue>
+
+ <tissue 2>
+   halftime = 10
+   m0       = 2.68
+   deltaM   = 0.160
+ </tissue>
+ 
+ <tissue 3>
+   halftime = 20
+   m0       = 2.19
+   deltaM   = 0.150
+ </tissue>
+ 
+ <tissue 4>
+   halftime = 40
+   m0       = 1.70
+   deltaM   = 0.140
+ </tissue>
+ 
+  <tissue 5>
+   halftime = 80
+   m0       = 1.64
+   deltaM   = 0.130
+  </tissue>
+ 
+  <tissue 6>
+   halftime = 120
+   m0       = 1.58
+   deltaM   = 0.120
+  </tissue>
+ 
+  <tissue 7>
+   halftime = 160
+   m0       = 1.55
+   deltaM   = 0.115
+ </tissue>
+ 
+ <tissue 8>
+   halftime = 200
+   m0       = 1.55
+   deltaM   = 0.110
+ </tissue>
+ 
+ <tissue 9>
+   halftime = 240
+   m0       = 1.52
+   deltaM   = 0.115
+ </tissue>
+

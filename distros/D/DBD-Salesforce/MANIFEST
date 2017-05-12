@@ -1,0 +1,10 @@
+MANIFEST
+META.yml
+Makefile.PL
+README
+lib/DBD/Salesforce.pm
+lib/DBD/Salesforce/db.pm
+lib/DBD/Salesforce/dr.pm
+lib/DBD/Salesforce/st.pm
+lib/SQL/Dialects/Salesforce.pm
+t/load.t

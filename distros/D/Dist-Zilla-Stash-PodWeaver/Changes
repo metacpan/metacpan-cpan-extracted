@@ -1,0 +1,23 @@
+Revision history for Dist::Zilla::Stash::PodWeaver
+
+1.005     2012-12-09T02:11:08Z
+
+  - Require Dist::Zilla::Role::Stash::Plugins 1.006 for bug fix.
+
+1.004     2012-06-18T18:16:00Z
+
+  - Increase dependency on Dist::Zilla::Role::Stash::Plugins to 1.005
+    for bugfix to enable array subscript config lines.
+    Thanks to Keedi Kim for reporting.
+
+1.003     2011-10-20T14:13:08Z
+
+  - Fix tests to work with newest version of Dist::Zilla::Role::Stash::Plugins
+
+1.002     2011-07-15T00:43:17Z
+
+  - Superficial dist/release changes
+
+1.001000  2010-12-16T16:47:46Z
+
+  - Initial release

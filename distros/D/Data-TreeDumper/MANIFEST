@@ -1,0 +1,18 @@
+
+Changes
+Makefile.PL
+MANIFEST
+README
+test.pl
+Todo
+s
+usage.pl
+filters.pl
+colors.pl
+try_it.pl
+tie_bless.pl
+scalar_and_origine.pl
+
+TreeDumper.pm
+
+META.yml                                 Module meta-data (added by MakeMaker)

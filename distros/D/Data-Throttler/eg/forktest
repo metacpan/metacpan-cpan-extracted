@@ -1,0 +1,50 @@
+#!/usr/bin/perl -w
+use strict;
+use Log::Log4perl qw(:easy);
+
+# Log::Log4perl->easy_init({ level => $DEBUG, layout => "%F{1}:%L %m%n"});
+
+use Data::Throttler;
+
+my $db_file = "db_file.dat";
+
+unlink $db_file;
+
+my $throttler = Data::Throttler->new(
+    interval  => 120,
+    max_items =>  1000,
+    backend => 'YAML',
+    backend_options => {
+        db_file => $db_file,
+    }
+);
+
+my $pid = fork();
+
+if( !defined $pid ) {
+    die "fork failed: $!";
+}
+
+if( $pid ) {
+    # parent
+    push_test( $throttler );
+    DEBUG "Parent done";
+    waitpid( $pid, 0 );
+} else {
+    # child
+    push_test( $throttler );
+    DEBUG "Child done";
+    exit 0;
+}
+
+###########################################
+sub push_test {
+###########################################
+    my( $throttler ) = @_;
+
+    for( 1... 100 ) {
+        $throttler->try_push(key => "foobar");
+        $throttler->try_push(key => "foobar");
+        $throttler->try_push(key => "foobar");
+    }
+}

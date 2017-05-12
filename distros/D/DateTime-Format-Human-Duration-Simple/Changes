@@ -1,0 +1,8 @@
+Revision history for DateTime::Format::Human::Duration::Simple
+
+0.02    2015-12-11
+        - API change: Renamed 'formatted_duration' to 'formatted'.
+        - Minor changes under the hood.
+
+0.01    2015-12-11
+        - First release.

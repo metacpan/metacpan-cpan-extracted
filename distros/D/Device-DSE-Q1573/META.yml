@@ -1,0 +1,25 @@
+--- #YAML:1.0
+name:               Device-DSE-Q1573
+version:            0.7
+abstract:           Read from DSE Q1573 / Metex Me-22 DMM
+author:
+    - David Peters (davidp@electronf.com)
+license:            unknown
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Device::SerialPort:  0.01
+    Fcntl:               0.01
+    POSIX:               0.01
+    Test::Simple:        0.44
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.50
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

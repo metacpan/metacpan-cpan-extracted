@@ -1,0 +1,46 @@
+Revision history for Devel-DTrace
+
+0.01    2008-01-06
+        Initial release.
+
+0.02    2008-01-06
+        Added examples to MANIFEST. Oops. Oops. Oops.
+
+0.03    2008-01-06
+        Fixed core dump in case were CvGV of the current CV is null.
+        Added dtperl interpreter.
+
+0.04    2008-01-07
+        Made it work on Mac OS perl 5.8.8.
+
+0.05    2008-01-07
+        Fixed eval double counting
+        Added tests
+
+0.06    2008-01-08
+        Builds on Solaris but dtperl is static.
+
+0.07    2008-01-11
+        Added test for dtrace enabled Perl.
+        Added test for dtrace not supporting -h switch.
+
+0.08	2008-07-20
+        Made detection of need for object file automatic.
+        Made it possible to supply flags to dtrace like this:
+        DTRACEFLAGS=foo make (thanks Theo)
+
+0.09    2008-07-21
+        Warn about unreliability of dtperl on Solaris and skip tests.
+        Fix entry to XS subs.
+
+0.10    2008-07-22
+        Complete rewrite of runops loop. Perl's scope exit mechanism is
+        now used to report subroutine returns. I think it might actually
+        be valid now rather than working more or less by accident as it
+        did previously.
+
+0.11    2008-07-22
+        Improved stack walk that finds sub name so that it crosses
+        stack chunk boundaries. It's unclear whether this ever happens
+        in practice given that we call it on the first OP after
+        subroutine entry.

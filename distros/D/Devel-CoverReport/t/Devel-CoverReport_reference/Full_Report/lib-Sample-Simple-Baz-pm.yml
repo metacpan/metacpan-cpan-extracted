@@ -1,0 +1,879 @@
+--- 
+data: 
+  tables: 
+    - 
+      headers: 
+        coverable: 
+          caption: Coverable
+          f: "%d"
+          fs: ''
+        coverage: 
+          caption: Coverage
+          f: "%.1f%%"
+          fs: "%.1f%%"
+        covered: 
+          caption: Covered
+          f: "%d"
+          fs: ''
+        criterion: 
+          caption: Criterion
+          class: head
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - criterion
+        - coverable
+        - covered
+        - coverage
+      label: "Coverage summary:"
+      rows: 
+        - 
+          coverable: 15
+          coverage: 
+            class: c4
+            v: 100
+          covered: 15
+          criterion: Statement
+        - 
+          coverable: 3
+          coverage: 
+            class: c4
+            v: 100
+          covered: 3
+          criterion: Subroutine
+        - 
+          coverable: 1
+          coverage: 
+            class: c4
+            v: 100
+          covered: 1
+          criterion: POD
+        - 
+          coverable: 6
+          coverage: 
+            class: c4
+            v: 100
+          covered: 6
+          criterion: Branch
+        - 
+          coverable: 6
+          coverage: 
+            class: c4
+            v: 100
+          covered: 6
+          criterion: Condition
+      summary: 
+        - 
+          coverage: 
+            class: c4
+            v: 100
+          criterion: Overall coverage
+    - 
+      headers: 
+        branch: 
+          caption: Br.
+          f: "%d%%"
+          fs: "%.1f%%"
+        command: 
+          caption: Command
+          class: file
+          f: "%s"
+          fs: "%s"
+        condition: 
+          caption: Cond.
+          f: "%d%%"
+          fs: "%.1f%%"
+        pod: 
+          caption: POD
+          f: "%d%%"
+          fs: "%.1f%%"
+        run: 
+          caption: Run
+          class: head
+          f: "%d"
+          fs: "%d"
+        statement: 
+          caption: St.
+          f: "%d%%"
+          fs: "%.1f%%"
+        subroutine: 
+          caption: Sub.
+          f: "%d%%"
+          fs: "%.1f%%"
+        time: 
+          caption: Time
+          f: "%.3fs"
+          fs: "%.3fs"
+      headers_order: 
+        - run
+        - statement
+        - subroutine
+        - pod
+        - branch
+        - condition
+        - time
+        - command
+      label: "Covered by:"
+      rows: 
+        - 
+          branch: 
+            class: c1
+            href: lib-Sample-Simple-Baz-pm-1253384583.6372.60096-branch
+            v: 66.6666666666667
+          command: 
+            href: lib-Sample-Simple-Baz-pm-1253384583.6372.60096
+            v: t/Baz-a.t
+          condition: 
+            class: c1
+            href: lib-Sample-Simple-Baz-pm-1253384583.6372.60096-condition
+            v: 66.6666666666667
+          pod: 
+            class: c4
+            v: 100
+          run: 1
+          statement: 
+            class: c3
+            v: 93.3333333333333
+          subroutine: 
+            class: c4
+            href: lib-Sample-Simple-Baz-pm-1253384583.6372.60096-subroutine
+            v: 100
+          time: 
+            class: c0
+            v: ~
+        - 
+          branch: 
+            class: c1
+            href: lib-Sample-Simple-Baz-pm-1253384586.6373.10649-branch
+            v: 66.6666666666667
+          command: 
+            href: lib-Sample-Simple-Baz-pm-1253384586.6373.10649
+            v: t/Baz-b.t
+          condition: 
+            class: c1
+            href: lib-Sample-Simple-Baz-pm-1253384586.6373.10649-condition
+            v: 66.6666666666667
+          pod: 
+            class: c4
+            v: 100
+          run: 2
+          statement: 
+            class: c3
+            v: 93.3333333333333
+          subroutine: 
+            class: c4
+            href: lib-Sample-Simple-Baz-pm-1253384586.6373.10649-subroutine
+            v: 100
+          time: 
+            class: c0
+            v: ~
+        - 
+          branch: 
+            class: c2
+            href: lib-Sample-Simple-Baz-pm-1253384589.6374.07833-branch
+            v: 83.3333333333333
+          command: 
+            href: lib-Sample-Simple-Baz-pm-1253384589.6374.07833
+            v: t/Baz.t
+          condition: 
+            class: c2
+            href: lib-Sample-Simple-Baz-pm-1253384589.6374.07833-condition
+            v: 83.3333333333333
+          pod: 
+            class: c4
+            v: 100
+          run: 3
+          statement: 
+            class: c3
+            v: 93.3333333333333
+          subroutine: 
+            class: c4
+            href: lib-Sample-Simple-Baz-pm-1253384589.6374.07833-subroutine
+            v: 100
+          time: 
+            class: c0
+            v: ~
+      summary: 
+        - 
+          branch: 
+            class: c4
+            v: 100
+          command: Total coverage
+          condition: 
+            class: c4
+            v: 100
+          pod: 
+            class: c4
+            v: 100
+          run: 4
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            v: 100
+          time: 
+            class: c0
+            v: ~
+    - 
+      headers: 
+        branch: 
+          caption: Br.
+          f: "%d"
+          fs: "%.1f%%"
+        condition: 
+          caption: Cond.
+          f: "%d"
+          fs: "%.1f%%"
+        line: 
+          caption: Line
+          class: head
+          f: "%d"
+          fs: "%d"
+        pod: 
+          caption: POD
+          f: "%d"
+          fs: "%.1f%%"
+        source: 
+          caption: Source code
+          class: src
+          f: "%s"
+          fs: "%s"
+        statement: 
+          caption: St.
+          f: "%d"
+          fs: "%.1f%%"
+        subroutine: 
+          caption: Sub.
+          f: "%d"
+          fs: "%.1f%%"
+        time: 
+          caption: Time
+          f: "%.3fs"
+          fs: "%.3fs"
+        vcs_author: 
+          caption: Author
+          class: vcs
+          f: "%s"
+          fs: "%s"
+        vcs_rev: 
+          caption: VCS Id
+          class: vcs
+          f: "%s"
+          fs: "%s"
+      headers_order: 
+        - line
+        - statement
+        - subroutine
+        - pod
+        - branch
+        - condition
+        - time
+        - source
+      label: "Overall file coverage:"
+      rows: 
+        - 
+          branch: []
+
+          condition: []
+
+          line: 1
+          pod: []
+
+          source: "package Sample::Simple::Baz;\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 2
+          pod: []
+
+          source: "# This file should get FULL coverage over every condition!\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 3
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 4
+          pod: []
+
+          source: "use strict; use warnings;\n"
+          statement: 
+            - 
+              class: c4
+              v: 3
+            - 
+              class: c4
+              v: 3
+            - 
+              class: c4
+              v: 3
+            - 
+              class: c4
+              v: 3
+            - 
+              class: c4
+              v: 3
+            - 
+              class: c4
+              v: 3
+          subroutine: 
+            - 
+              anchor: 4
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-subroutine
+              v: 3
+            - 
+              anchor: 4
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-subroutine
+              v: 3
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 5
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 6
+          pod: []
+
+          source: "=over\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 7
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 8
+          pod: []
+
+          source: "=item foo\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 9
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 10
+          pod: []
+
+          source: "This is a sample function, as it can be observed: it's covered in POD too :)\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 11
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 12
+          pod: []
+
+          source: "=cut\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 13
+          pod: []
+
+          source: "sub foo {\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 14
+          pod: 
+            - 
+              class: c4
+              v: 3
+          source: "    my ($a, $b) = @_;\n"
+          statement: 
+            - 
+              class: c4
+              v: 10
+          subroutine: 
+            - 
+              anchor: 14
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-subroutine
+              v: 10
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 15
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 16
+          pod: []
+
+          source: "    my $c = undef;\n"
+          statement: 
+            - 
+              class: c4
+              v: 10
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 17
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: 
+            - 
+              anchor: 18
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-branch
+              v: 100
+          condition: 
+            - 
+              anchor: 18
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-condition
+              v: 100
+          line: 18
+          pod: []
+
+          source: "    if ($a or $b) {\n"
+          statement: 
+            - 
+              class: c4
+              v: 10
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: 
+            - 
+              anchor: 19
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-branch
+              v: 100
+          condition: []
+
+          line: 19
+          pod: []
+
+          source: "        if ($a) {\n"
+          statement: 
+            - 
+              class: c4
+              v: 9
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 20
+          pod: []
+
+          source: "            $c = $a;\n"
+          statement: 
+            - 
+              class: c4
+              v: 6
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 21
+          pod: []
+
+          source: "        }\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 22
+          pod: []
+
+          source: "        else {\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 23
+          pod: []
+
+          source: "            $c = $b;\n"
+          statement: 
+            - 
+              class: c4
+              v: 3
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 24
+          pod: []
+
+          source: "        }\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 25
+          pod: []
+
+          source: "    }\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 26
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: 
+            - 
+              anchor: 27
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-branch
+              v: 100
+          condition: 
+            - 
+              anchor: 27
+              class: c4
+              href: lib-Sample-Simple-Baz-pm-condition
+              v: 100
+          line: 27
+          pod: []
+
+          source: "    if ($c > 5 and $c < 10) {\n"
+          statement: 
+            - 
+              class: c4
+              v: 10
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 28
+          pod: []
+
+          source: "        $c = 10 * $c;\n"
+          statement: 
+            - 
+              class: c4
+              v: 3
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 29
+          pod: []
+
+          source: "    }\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 30
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 31
+          pod: []
+
+          source: "    return $c;\n"
+          statement: 
+            - 
+              class: c4
+              v: 10
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 32
+          pod: []
+
+          source: "}\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 33
+          pod: []
+
+          source: "\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+        - 
+          branch: []
+
+          condition: []
+
+          line: 34
+          pod: []
+
+          source: "1;\n"
+          statement: []
+
+          subroutine: []
+
+          time: []
+
+      summary: 
+        - 
+          branch: 
+            class: c4
+            v: 100
+          condition: 
+            class: c4
+            v: 100
+          line: 34
+          pod: 
+            class: c4
+            v: 100
+          src: Total coverage
+          statement: 
+            class: c4
+            v: 100
+          subroutine: 
+            class: c4
+            v: 100
+          time: 
+            class: c0
+            v: ~
+metadata: 
+  title: "Coverage: lib/Sample/Simple/Baz.pm"
+  version: 0.05

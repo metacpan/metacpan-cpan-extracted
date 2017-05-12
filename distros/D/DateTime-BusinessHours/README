@@ -1,0 +1,111 @@
+NAME
+    DateTime::BusinessHours - An object that calculates business days and
+    hours
+
+SYNOPSIS
+        my $d1 = DateTime->new( year => 2007, month => 10, day => 15 );
+        my $d2 = DateTime->now;
+
+        my $test = DateTime:::BusinessHours->new(
+            datetime1 => $d1,
+            datetime2 => $d2,
+            worktiming => [ 9, 17 ], # 9am to 5pm
+            # lunch from 12 to 1
+            # worktiming => [ [ 9, 12 ], [ 13, 17 ] ],
+            weekends => [ 6, 7 ], # Saturday and Sunday
+            holidays => [ '2007-10-31', '2007-12-24' ],
+            holidayfile => 'holidays.txt'
+            # holidayfile is a text file with each date in a new line
+            # in the format yyyy-mm-dd  
+        );
+
+        # total business hours
+        print $test->gethours, "\n";
+        # total business days, based on the number of business hours in a day
+        print $test->getdays, "\n";
+
+DESCRIPTION
+    BusinessHours a class for caculating the business hours between two
+    DateTime objects. It can be useful in situations like escalation where
+    an action has to happen after a certain number of business hours.
+
+METHODS
+  new( %args )
+    This class method accepts the following arguments as parameters:
+
+    *   datetime1 - Starting Date
+
+    *   datetime2 - Ending Date
+
+    *   worktiming - May be one of the following:
+
+        *   An array reference with two values: starting and ending hour of
+            the day
+
+        *   An array reference of array references. Each reference being a
+            slice of the 24-hour clock where business is conducted. Useful
+            if you want to leave a "lunch hour" out of the calculation.
+            Defaults to [ [ 9, 17 ] ]
+
+    *   weekends - An array reference with values of the days that must be
+        considered as non-working in a week. Defaults to [6,7] (Saturday &
+        Sunday)
+
+    *   holidays - An array reference with holiday dates in 'yyyy-mm-dd'
+        format
+
+    *   holidayfile - The name of a file from which predefined holidays can
+        be excluded from business days/hours calculation. Defaults to no
+        file
+
+  calculate( )
+    This will force a recalculation of the business hours and days. useful
+    if you've changed any values (datetime1, datetime2, worktiming, etc) or
+    updated the holiday file
+
+  getdays( )
+    Returns the number of business days
+
+  gethours( )
+    Returns the number of business hours.
+
+INSTALLATION
+    To install this module, run the following commands:
+
+            perl Makefile.PL
+            make
+            make test
+            make install
+
+SUPPORT AND DOCUMENTATION
+    After installing, you can find documentation for this module with the
+    perldoc command.
+
+        perldoc DateTime::BusinessHours
+
+    You can also look for information at:
+
+        RT, CPAN's request tracker
+            http://rt.cpan.org/NoAuth/Bugs.html?Dist=DateTime-BusinessHours
+
+        AnnoCPAN, Annotated CPAN documentation
+            http://annocpan.org/dist/DateTime-BusinessHours
+
+        CPAN Ratings
+            http://cpanratings.perl.org/d/DateTime-BusinessHours
+
+        Search CPAN
+            http://search.cpan.org/dist/DateTime-BusinessHours
+
+AUTHOR
+    Antano Solar John <solar345@gmail.com>
+
+MAINTAINER
+    Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright (c) 2007-2011 Antano Solar John, 2012-2013 by Brian Cassidy
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

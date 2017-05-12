@@ -1,0 +1,68 @@
+=head1 NAME
+
+DBIx::Cookbook::Recipe::Searching - Recipes for searching databases
+
+=head1 RECIPES
+
+=head2 Fetch all records from a table
+
+L<DBIx::Cookbook::Recipe::Searching::fetch_all>
+
+=head2 Fetch a single record from a query which could return many
+
+L<DBIx::Cookbook::Recipe::Searching::fetch_single>
+
+=head2 A query with a complex WHERE
+
+L<DBIx::Cookbook::Recipe::Searching::complex_where>
+
+=head2 how to issue a query with a database function as one of the return columns
+
+L<DBIx::Cookbook::Recipe::Searching::db_func> 
+
+=head2 Flexibly return a distinct resultset or the count of it
+
+L<DBIx::Cookbook::Recipe::Searching::distinct_count>
+
+
+=head2 Using GROUP BY
+
+L<DBIx::Cookbook::Recipe::Searching::grouping>
+
+
+=head2 Paged result sets
+
+L<DBIx::Cookbook::Recipe::Searching::paged>
+
+=head2 Storing a predefined search
+
+L<DBIx::Cookbook::Recipe::Searching::predefined_search>
+
+=head2 Specifying which columns to retrieve from a search
+
+L<DBIx::Cookbook::Recipe::Searching::specific_columns>
+
+=head3 Selecting a particular column
+
+L<DBIx::Cookbook::Recipe::Searching::get_column>
+
+=head2 Using SQL on the LHS of an comparison
+
+While not usually advised,
+L<DBIx::Cookbook::Recipe::Searching::sql_lhs>
+contains recipes for using a database function on the LHS of a
+comparison
+
+
+=head2 Subqueries
+
+=head3 Simple
+
+L<DBIx::Cookbook::Recipe::Searching::subquery>
+
+=head3 Correlated
+
+L<DBIx::Cookbook::Recipe::Searching::subquery_correlated>
+
+
+

@@ -1,0 +1,20 @@
+CHANGES
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00-load.t
+t/01-raw754.t
+t/02-floatingpoint.t
+t/03-ulp.t
+t/04-nextupdown.t
+t/05-nextafter.t
+t/06-constants.t
+t/07-info.t
+t/08-totalorder.t
+t/09-signbit.t
+t/10-copysign.t
+TODO
+Tools.pm
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

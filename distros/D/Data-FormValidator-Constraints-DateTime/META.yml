@@ -1,0 +1,30 @@
+---
+abstract: 'D::FV constraints for dates and times'
+author:
+  - 'Michael Peters <mpeters@plusthree.com>'
+build_requires:
+  DateTime::Format::Builder: 0
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-FormValidator-Constraints-DateTime
+provides:
+  Data::FormValidator::Constraints::DateTime:
+    file: lib/Data/FormValidator/Constraints/DateTime.pm
+    version: 1.11
+recommends:
+  DateTime::Format::MySQL: 0.0301
+  DateTime::Format::Pg: 0.050
+requires:
+  Data::FormValidator: 3.61
+  DateTime: 0.23
+  DateTime::Format::Strptime: 1.00
+  Exporter: 0
+  perl: v5.6.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.11

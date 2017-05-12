@@ -1,0 +1,32 @@
+    Implements the required munge_file method for the
+    Dist::Zilla::Role::FileMunger role, munging each Perl file it finds.
+    Files whose names do not end in .pm, .pl, or .t, or whose contents do
+    not begin with #!perl are left alone.
+
+ SYNOPSIS
+
+        # dist.ini
+        [PerlTidy]
+    
+        # or
+        [PerlTidy]
+        perltidyrc = xt/.perltidyrc
+
+ DEFAULTS
+
+    If you do not specify a specific perltidyrc in dist.ini it will try to
+    use the same defaults as Perl::Tidy.
+
+ SEE ALSO
+
+    Perl::Tidy
+
+POD ERRORS
+
+    Hey! The above document had some coding errors, which are explained
+    below:
+
+    Around line 1:
+
+      Unknown directive: =method
+

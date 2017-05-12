@@ -1,0 +1,10 @@
+Changelog for Dist-Zilla-App-Command-pot
+
+2.000     2015-11-23 15:20:43+01:00 Europe/Paris
+
+1.112680  2011-09-25 16:41:50 Europe/Paris
+ - new keyword recognized: __()
+ - new option --input
+
+1.110340  2011-02-03 11:16:01 Europe/Paris
+  - initial release, able to generate a messages.pot file

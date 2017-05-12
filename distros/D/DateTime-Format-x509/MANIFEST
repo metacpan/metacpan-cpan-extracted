@@ -1,0 +1,12 @@
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+README.mkdn
+lib/DateTime/Format/x509.pm
+t/01_load.t
+t/02_parse_datetime.t
+t/release-pod-syntax.t
+t/release-synopsis.t

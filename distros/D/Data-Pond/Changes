@@ -1,0 +1,61 @@
+version 0.004; 2012-02-05
+
+  * in XS, declare "PROTOTYPES: DISABLE" to prevent automatic generation
+    of unintended prototypes
+
+  * in t/setup_pp.pl, avoid a warning that occurs if XSLoader::load()
+    is given no arguments, which is now a valid usage
+
+  * explicitly state version required of Params::Classify
+
+  * in documentation, note that data structures for Pond can't be cyclic
+
+  * correct a typo in documentation
+
+  * correct dynamic_config setting to 0
+
+  * include META.json in distribution
+
+  * convert .cvsignore to .gitignore
+
+  * add MYMETA.json to .cvsignore
+
+version 0.003; 2010-10-20
+
+  * use full stricture in test suite
+
+  * in Build.PL, explicitly declare configure-time requirements
+
+  * in XS, use newSVpvs() and sv_catpvs_nomg() wherever appropriate
+
+  * in XS, use PERL_NO_GET_CONTEXT for efficiency
+
+  * also test POD coverage of pure Perl implementation
+
+  * in Build.PL, explicitly set needs_compiler to avoid bogus
+    auto-dependency on ExtUtils::CBuilder
+
+  * add MYMETA.yml to .cvsignore
+
+version 0.002; 2009-11-04
+
+  * bugfix: in XS implementation, avoid memory leak when parsing hashes
+
+  * port to Perl 5.11, supporting new first-class regexp objects in
+    type checking
+
+  * correct example of pond_write_datum options in synopsis
+
+  * check for required Perl version at runtime
+
+  * remove bogus "exit 0" from Build.PL
+
+version 0.001; 2009-05-15
+
+  * bugfix: correct flags on exported regexps (lack of /x caused these
+    regexps to match the wrong things, but did not affect parsing with
+    pond_read_datum())
+
+version 0.000; 2009-05-14
+
+  * initial released version

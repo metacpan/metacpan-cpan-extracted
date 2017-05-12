@@ -1,0 +1,74 @@
+{
+   "abstract" : "show the modules your program loads, recursively",
+   "author" : [
+      "Philippe Bruhat (BooK) <book@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.047, CPAN::Meta::Converter version 2.150010",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-TraceUse",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::CPAN::Meta" : "0",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Module::CoreList" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "blib" : "1.01",
+            "lib" : "0",
+            "perl" : "5.006",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-devel-traceuse@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-TraceUse"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/book/Devel-TraceUse.git",
+         "web" : "http://github.com/book/Devel-TraceUse"
+      }
+   },
+   "version" : "2.095",
+   "x_contributors" : [
+      "Neil Bowers <neilb@cpan.org>",
+      "Graham Knop <haarg@cpan.org>",
+      "Ioan Rogers <ioanr@cpan.org>",
+      "Olivier Mengu\u00e9 <dolmen@cpan.org>",
+      "David Leadbeater <dgl@cpan.org>",
+      "Apocalypse <apocal@cpan.org>",
+      "chromatic <chromatic@cpan.org>"
+   ]
+}
+

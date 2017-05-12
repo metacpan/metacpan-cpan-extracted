@@ -1,0 +1,110 @@
+NAME
+    DataFax::StudyDB - DataFax DFstudies.db parser
+
+SYNOPSIS
+      use DataFax::StudyDB;
+
+      my $db = DataFax::StudyDB->new('datafax_dir'=>'/opt/datafax', 
+                'datafax_host'=>'mydfsvr');
+      # or
+      my $db = new DataFax::StudyDB 'datafax_dir'=>'/opt/datafax', 
+                'datafax_host'=>'mydfsvr';
+
+DESCRIPTION
+    This class locates DataFax DFstudies.db, parse it and load it to a
+    relational database such as Oracle.
+
+  new (datafax_dir=>'/opt/datafax',datafax_host=>'my_svr')
+    Input variables:
+
+      datafax_dir  - full path to where DataFax system is installled 
+                     If not specified, it will try to get it from
+                     $ENV{DATAFAX_DIR}.
+      datafax_host - DataFax server name or IP address
+                     If not specified, it will try to get it from
+                     $ENV{DATAFAX_HOST} or `hostname` on UNIX system.
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      my $db = DataFax::StudyDB->new('datafax_dir'=>'/opt/datafax', 
+                'datafax_host'=>'mydfsvr');
+    Return: an empty or initialized class object.
+
+    This method constructs a Perl object and capture any parameters if
+    specified. It creates and defaults the following variables:
+
+      datafax_dir  = $ENV{DATAFAX_DIR}
+      datafax_host = $ENV{DATAFAX_HOST} | `hostname` 
+      unix_os      = 'linux|solaris'
+
+  Export Tag: all
+    The :all tag includes the all the methods in this module.
+
+      use DataFax::StudyDB qw(:all);
+
+    It includes the following sub-routines:
+
+   readDFstudies($q, $ar)
+    Input variables:
+
+      $ifn - input file name 
+      $ar  - a parameter array ref
+        source_dir   - source directory
+        datafax_dir  - DataFax directory
+        datafax_host - DataFax server name/IP address
+        real_time    - whether to ge real time data
+
+    Variables used or routines called:
+
+      DataFax::StudySubs
+        get_dfparam - get parameters 
+    
+    How to use:
+
+      my $s = new DataFax::StudyDB;
+      my $ifn = '/opt/datafax/lib/DFstudies.db'; 
+      my $pr = { real_time=>1,datafax_host=>'df_svr',
+                 datafax_usr=>'datafax', datafax_pwd=>'secret'}; 
+      my ($c, $d) = $s->readDFstudies{$ifn);
+      my ($c, $d) = $s->readDFstudies{"", $pr);
+
+    Return: ($c,$d) where $c is an array ref while $d is hash ref.
+
+      $c->[$i][$j] - array ref where 
+           $i is row number and 
+           $j is column number; 
+           $i=0 - the first row contains the column names in the 
+                  following order
+                  study_number,study_title,client_name,study_dir,
+                  source_dir,datafax_dir,host_name,rpc_program,
+                  rpc_program_no,rpc_version_no,study_status,comments
+      $d->{$sn}{$itm} hash ref where
+           $sn is three-digit study number padding with leading zeros
+           $itm is column names as listed in $c->[0]. 
+
+    This method reads DFstudies and parse the file into two arrays.
+
+HISTORY
+    * Version 0.10
+        This version is to create a method to read in DFstudies.db.
+
+          0.11 - use new method from DataFax
+
+    * Version 0.20
+
+SEE ALSO (some of docs that I check often)
+        Oracle::Loader, Oracle::Trigger, CGI::Getopt, File::Xcopy, DataFax,
+        CGI::AppBuilder, etc.
+
+AUTHOR
+        Copyright (c) 2005 Hanming Tu. All rights reserved.
+
+        This package is free software and is provided "as is" without
+        express or implied warranty. It may be used, redistributed and/or
+        modified under the terms of the Perl Artistic License (see
+        http://www.perl.com/perl/misc/Artistic.html)
+

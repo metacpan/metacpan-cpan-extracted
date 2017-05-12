@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+TimeSeries.pm
+TimeSeries/ChronoKey.pm
+t/1.t

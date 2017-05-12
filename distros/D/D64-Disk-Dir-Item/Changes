@@ -1,0 +1,40 @@
+Revision history for Perl extension D64::Disk::Dir::Item.
+
+0.07  2013-03-08
+    - fixed "First argument to Readonly must be a reference" compilation error
+      for Perl 5.6.2 by extracting a complete list of module constants and
+      supplying a backslash over their value assignments (this is needed since
+      Readonly has got a slightly different syntax for versions of Perl prior
+      to 5.8, because it requires a reference as the first parameter)
+    - fixed failing item validation unit-tests for Perl 5.6.2 by forcing an
+      integer value into a SV returned from "size" method (file size in sectors)
+      which is calculated using multiplication operation, because a scalar value
+      of a double type (NV) is always loaded as the result of multiplication for
+      versions of Perl prior to 5.8
+
+0.06  2013-03-04
+    - bug fixed: printing out a directory item in PETSCII mode was previously
+      only spitting out an item data instead of properly formatted disk entry
+    - enhanced "type_to_string" subroutine with the possibility of converting
+      file type also into PETSCII string representation
+
+0.05  2013-02-23
+    - added support for wildcard-based pattern matching of item's filename
+
+0.04  2013-02-17
+    - bug fixed: added missing dependency on parent, which is required to import
+      Clone module that is used to clone disk directory item object
+
+0.03  2013-02-11
+    - added "clone" method that copies an entire D64::Disk::Dir::Item object
+
+0.02  2013-02-09
+    - added implementation of "empty" method, which verifies if directory item
+      contains information about the actual disk file or not
+    - added implementation of "writable" method, which verifies if directory
+      item is writable and can be replaced by any new file that would be written
+      into disk
+
+0.01  2013-02-02
+    - initial version (provides miscellaneous procedures to access and modify
+      individual directory entries of D64/D71/D81 disk images)

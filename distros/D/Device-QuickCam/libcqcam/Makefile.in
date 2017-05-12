@@ -1,0 +1,15 @@
+CXX = @CXX@
+CXXFLAGS = -Wall @DEBUGFLAGS@ @OS_CFLAGS@ @JPEG_CFLAGS@ @LOCKING@ @IO_HEADER@
+RANLIB = @RANLIB@
+
+PROGRAMS = libcqcam.a
+OBJS = camera.o cqcsrv.o imager.o port.o rcfile.o @OS_LIBCQCAM_OBJS@
+
+all: $(PROGRAMS)
+
+clean:
+	rm -f *.o core $(PROGRAMS)
+
+libcqcam.a: $(OBJS)
+	$(AR) r $@ $(OBJS)
+	$(RANLIB) $@

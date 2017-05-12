@@ -1,0 +1,61 @@
+<HTML>
+<HEAD>
+<TITLE>VarPrint - display complex variables on STDOUT</TITLE>
+<LINK REV="made" HREF="mailto:bhcompile@stripples.devel.redhat.com">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<LI><A HREF="#options">OPTIONS</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<H1><A NAME="name">NAME</A></H1>
+<P>VarPrint - display complex variables on STDOUT</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use Data::VarPrint;
+  VarPrint($var1, $var2,... );</PRE>
+<P>or</P>
+<PRE>
+  use Data::VarPrint;
+  VarPrint( { var1 =&gt; $var1, var2 =&gt; $var2,... } );</PRE>
+<P>or</P>
+<PRE>
+  use Data::VarPrint;
+  my $var_string = VarPrintAsString(...);</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P><STRONG>Data::VarPrint</STRONG> module contains two functions: <STRONG>VarPrint</STRONG> and <STRONG>VarPrintAsString</STRONG>.</P>
+<P>Function <STRONG>VarPrint</STRONG> displays its <EM>arguments'</EM> values. The output is structured, so
+that complex structures (combinations of hash and array references) are presented in a
+way which makes them easy to read.</P>
+<P>Function <STRONG>VarPrintAsString</STRONG> returns the same output as a string, which can be usefull 
+with error logs.</P>
+<P>
+<HR>
+<H1><A NAME="options">OPTIONS</A></H1>
+<P><STRONG>VarPrint</STRONG> and <STRONG>VarPrintAsString</STRONG> take list of variables as arguments.</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>Copyright (c) 2002 V. Sego, <A HREF="mailto:vsego@math.hr.">vsego@math.hr.</A> All rights reserved. This program is free
+software; you can redistribute it and/or modify it under the same terms as Perl itself.</P>
+
+</BODY>
+
+</HTML>

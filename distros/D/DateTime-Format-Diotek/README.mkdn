@@ -1,0 +1,25 @@
+# NAME
+
+DateTime::Format::Diotek - parse only YYYYMMDDhhmmss format
+
+# VERSION
+
+version 0.0.1
+
+# SYNOPSIS
+
+    use DateTime::Format::Diotek;
+    my $dt = DateTime::Format::Diotek->parse_datetime('20120203065530'); # YYYYMMDDhhmmss
+    print $dt->ymd; # 2012-02-03
+    print $dt->hms; # 06:55:30
+
+# AUTHOR
+
+Hyungsuk Hong <aanoaa@gmail.com>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Hyungsuk Hong.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

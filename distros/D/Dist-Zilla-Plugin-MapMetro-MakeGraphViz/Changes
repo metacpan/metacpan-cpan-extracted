@@ -1,0 +1,38 @@
+Revision history for Dist-Zilla-Plugin-MapMetro-MakeGraphViz
+
+0.1104  2016-02-07 19:24:01 UTC
+ [New Features]
+ - Support for multiple maps in one distribution.
+
+ [Other Changes]
+ - Moved to BeforeBuild (from AfterBuild).
+ - Now does Dist::Zilla::Role::Plugin.
+
+0.1103 2015-11-02T16:03:55Z UTC
+ [Revision]
+ - Now uses namespace::autoclean instead of namespace::sweep
+ - Now uses [MakeMaker] instead of [ModuleBuild*]
+ - Prereqs is set in dist.ini (cpanfile removed)
+
+0.1102 2015-01-31T17:25:16Z CET
+ [Documentation]
+ - Fixed pod error (pr:1)
+
+0.1101 2015-01-16T22:34:39Z CET
+ [Documentation]
+ - Cleaned up, pod now built with pod weaver
+
+ [Enhancements]
+ - When using hidden lines, make them white, not width 0.
+
+ [Meta]
+ - Added missing prereq.
+
+0.1100 2015-01-04T18:19:04Z CET
+ [Enhancements]
+ - Now uses the local metro file, instead of the installed one.
+ - Requires environment variable to run.
+ - Adds a label with the city name to the generated image.
+
+0.1000 2015-01-03T23:33:22Z CET
+ - Initial release

@@ -1,0 +1,20 @@
+language: perl
+perl:
+  - "5.24"
+  - "5.22"
+  - "5.16"
+  - "5.10"
+before_script:
+  - mysql -e 'CREATE DATABASE scoped_transaction_test;'
+  - psql -c 'CREATE DATABASE scoped_transaction_test;' -U postgres
+  - cpanm --notest DBI
+  - cpanm --notest DBD::Pg
+  - cpanm --notest DBD::mysql
+env:
+  - SCOPED_TRANSACTION_DATABASE=''
+  - SCOPED_TRANSACTION_DATABASE='DBI:mysql:database=scoped_transaction_test;host=127.0.0.1|root|'
+  - SCOPED_TRANSACTION_DATABASE='DBI:Pg:dbname=scoped_transaction_test;host=127.0.0.1|postgres|'
+before_install:
+  cpanm -n Devel::Cover::Report::Coveralls
+script:
+  perl Build.PL && ./Build build && cover -test -report coveralls

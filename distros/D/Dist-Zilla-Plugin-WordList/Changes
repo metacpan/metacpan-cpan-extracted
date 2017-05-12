@@ -1,0 +1,20 @@
+Revision history for Dist-Zilla-Plugin-WordList
+
+0.04    2016-01-13 (PERLANCAR)
+
+	- [Bugfix] Fix num_words_contains_nonword_chars statistics.
+
+
+0.03    2016-01-13 (PERLANCAR)
+
+	- Fix 'unicode' detection.
+
+
+0.02    2016-01-13 (PERLANCAR)
+
+	- Add avg_word_len to statistics.
+
+
+0.01    2016-01-13 (PERLANCAR)
+
+        - First release.

@@ -1,0 +1,8 @@
+Revision history for Data::Apache::mod_status
+
+0.02    7.10.2016
+        - fix Moose subtype naming to compile (RT114389)
+        - move author tests to xt/
+
+0.01    17.11.2008
+        First version, released on an unsuspecting world.

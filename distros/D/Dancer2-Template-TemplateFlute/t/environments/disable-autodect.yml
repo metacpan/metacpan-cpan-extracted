@@ -1,0 +1,7 @@
+engines:
+  template:
+    template_flute:
+      autodetect:
+        disable:
+          - My::Namespace
+          - Other::Namespace

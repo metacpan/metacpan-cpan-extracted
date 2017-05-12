@@ -1,0 +1,10 @@
+Revision history for Perl extension DB::AsKVS.
+
+0.01  Wed May 29 10:37:52 2013
+	- original version; created by h2xs 1.23 with options
+		-A -X -n DB::AsKVS
+      New Creation
+
+0.02  Fri Jun 07 08:59:00 2013
+      Disable the no use module Data::Dumper::Concise.
+

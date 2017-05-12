@@ -1,0 +1,607 @@
+=head1 Changes in the 3.1 release
+
+=head2 Remove support for DB2 releases prior to V8.2
+
+Support for DB2 releases V7.2 and V8.1 has been dropped.
+
+=head2 Improve support for Windows
+
+Mike O'Reilly gracefully and patiently pointed out a number of
+Unix-specific assumptions that have to be corrected to compile the
+module with ActiveState Perl 5.8.8 for 32-bit and 64-bit Windows.
+
+Most of these affect device and filenames
+
+=head2 Add database manager configuration parameters for V9.7
+
+Add the new DB2 V9.7 configuration parameters, most of which are
+SSL-related.
+
+=head2 Generate constants locally
+
+The C<db2_constants.pl> file translates DB2 constants from symbolic
+names to numeric values.  Previous releases generated the file when
+the package was created for distribution; the file will now be
+generated locally as part of the build process.  This is necessary
+because IBM changes the value of some constants in an incompatible
+manner; so a file generated for V9.5 will not work with V8.2.
+
+=head2 ListUtilities fix
+
+The C<ListUtilities> method now supports the C<Version> parameter.
+
+=head1 Changes in the 3.0 release
+
+=head2 Backup
+
+Add support for the Backup command, including support for DPF backups
+(with included logs) in DB2 V9.5.
+
+=head1 Changes in the 2.9 release
+
+=head2 Fix core dump in load from cursor
+
+A second bug in the db2Load command, caused a load from cursor (source
+type "Statement") to perform an invalid free, sometimes leading to a
+core dump. Now fixed.  Have run valgrind on import/export/load to
+verify no additional mistakes are present.
+
+=head1 Changes in the 2.8 release
+
+=head2 Fix core dump in load from cursor
+
+A bug in the db2Load command, introduced in the 2.7 release, caused a
+load from cursor (source type "Statement") to dump core. Now fixed.
+
+=head2 BugFix in Load / Import
+
+A bug in the Load and Import methods prevented load/import operations
+against mixed-case schema and table names (which have to be
+double-quoted when passed to DB2).  Now fixed.
+
+=head2 Add the 'ReOpt' option to the Rebind method
+
+The re-optimization level can now be set at Rebind time.
+
+=head1 Changes in the 2.7 release
+
+=head2 Rename module to DB2::Admin
+
+The modules/classes have been renamed from DB2API to DB2::Admin as
+recommended by Tim Bunce.
+
+=head2 Add "list of files" support for Load of DEL files
+
+The Load method now supports loading a list of DEL files in a single
+command.
+
+=head2 Support new protocol, types for node directory
+
+Support the TCP/IP v4, TCP/IP v6 and TCP/IP v4 using SOCKS protocol
+types for the node directory methods.
+
+=head1 Changes in the 2.6 release
+
+=head2 Add XML support to Export, Import and Load methods
+
+The Export, Import and Load methods now supports the XML options
+introduced in DB2 V9.1 (Export, Import) and DB2 V9.5 (Load).  Note
+that the schema-related XML validate / default / ignore / map options
+are not supported at this time.
+
+=head2 Add connect attributes
+
+Allow the user to specify the program name and connect time-out as
+connect attributes.  Default options can be set with
+C<SetConnectAttributes> and per-connect options can be specified with
+the C<ConnectAttr> parameter to the C<Connect> method.
+
+The default program name is no longer C<perl> or C<perl5.8>, but the
+script name (the basename of C<$0>).
+
+=head1 Changes in the 2.5 release
+
+=head2 Add the NoCharDel option for the import and load commands
+
+The NoCharDel option, which is used to handle files where character
+strings have no delimiters, is now supported for FileOptions
+parameters of the the Import and Load methods.  It was already
+supported for the Import method.
+
+=head2 Support "Update Profile Only" for Runstats
+
+The implementation of the runstats API contained a bug that made
+"update profile only" not work.  This was due to an discrepancy
+between the documented constant name in the IBM documentation
+(DB2RUNSTATS_UPDATE_PROFILE_ONLY) and the actual #define
+(DB2RUNSTATS_UPDA_PROFILE_ONLY), missing the letters TE from the
+middle.
+
+The code now handles both cases
+
+=head2 Fine-tune error handling
+
+The error handling now differentiates between errors and warnings.
+The default behavior is unchanged - error messages are printed for
+errors and warnings, and no exception is thrown.  However, the
+'RaiseError' option now only throws exceptions for errors, not
+warnings - the new 'RaiseWarn' option handles the latter.
+
+=head2 Support the ExcludingXML option for the Runstats command
+
+The new DB2RUNSTATS_EXCLUDING_XML flag for the db2Runstats API is now
+supported as the ExcludingXML option.
+
+=head2 Support the CodePage file type modifier
+
+The Export, Import, and Load commands now support the CodePage file
+type modifier.  The Load command claimed to support this before,. but
+the implementation was incorrect.
+
+=head2 Rename the system admin group constants
+
+The SysAdm, SysMaint, SysCtrl and SysMon group instance configuration
+parameters (SQLF_KTN_xxx_GROUP) were limited to 16 characters in DB2
+V8.1 and before.  With DB2 V8.2, new configuration parameters were
+introduced that changed this limit to 30, but had a different name:
+SQLF_KTN_xxx_GRP.  However, the documentation hides this difference
+and refers to the new parameters by the old name.
+
+DB2 V9.1 introduces a bug in the handling of the old parameters.  In
+order to work around this, the new parameters now override the old
+ones in the parse_constants script.  So in DB2 V8.2 and above, the old
+names (e.g. 'sysadm_group') can be used and do the right thing by
+using the new constants.
+
+=head1 Changes in the 2.4 release
+
+=head2 Changes in db2CfgGet / db2CfgSet for V9.1
+
+The get/update instance/database configuration parameters methods have
+new flags for DB2 V9.1: 'Computed' (get/set) and 'Manual' (set).  Add
+support for these new flags.
+
+The only value that supports 'Computed' as far as I am aware, is
+'database_memory'.  When the Command Line Processor reports it as
+'computed', the admin API can now do the same.
+
+The 'Manual' option allow you to turn off automatic management for
+parameters while DB2 maintains the last automatically set value.
+
+=head2 Support for new format IP v4 for datastream elements
+
+When IP v4 clients running DB2 V9.1 connect to a database, the
+application id has a new format and includes the IP address and port
+in plain text.  Support this new format and straighten out the
+existing IP v4 format so it is now always "<address> port <port>".
+
+=head1 Changes in the 2.3 release
+
+=head2 Changes in db2Load API for V9.1
+
+On DB2 V9.1, use the "iSetIntegrityPending" field for the db2Load API
+instead of the "iCheckPending" field.
+
+=head2 IP v6 support for datastream elements
+
+Support IP v6 addresses for the application-id in snapshot and
+event monitor data elements (untested)
+
+=head2 Add new instance and database configuration parameters for V9.1
+
+The following database manager and database configuration parameters
+are new for DB2 V9.1 and have been added:
+
+=over 4
+
+=item federated_async
+
+=item fcm_num_channels
+
+=item self_tuning_mem
+
+=item db_mem_thresh
+
+=item db_collname
+
+=item restrict_access
+
+=back
+
+=head1 Changes in the 2.2 release
+
+=head2 Add basic support for DB2 V9.1
+
+The module now compiles on DB2 V9.1.  No new features are supported,
+but the makefiles and various utility scripts have been adjusted and
+compile issues fixed.
+
+No support has been added for new instance / database configuration
+parameters or for the new XML-related features of db2Import and
+db2Export.
+
+=head2 Add ClientInfo method
+
+A new ClientInfo method can be used to get/set the TPM client
+information (sqleseti, sqleqryi).
+
+=head1 Changes in the 2.1 release
+
+=head2 Add DPF options to the Load command
+
+Various DPF-related options for the Load command are now supported.
+In addition, a more detailed second return value describes the DPF
+aspects of the load, including each agent, in detail.
+
+=head1 Changes in the 2.0 release
+
+=head2 Add LOB support to the Export, Import and Load methods
+
+Support for the LobPath, LobFile and LobsInFile options of the Export,
+Import and Load methods has been added.  (LobFile is Export specific.)
+
+=head2 Add the 'DelPriorityChar' option 
+
+Support for the 'DelPriorityChar' option for the DEL file type
+modifiers of Import/Load now supports data files with embedded
+newlines in column values.
+
+=head2 Support the DB2 V8.2 FP9 enhanced deadlock event monitor
+
+The enhanced deadlock event monitor in DB2 V8.2.2 (FP9) writes a new
+type of monitoring element, called 'handle' (but really a blob).
+
+Support to decode this has been added (the data is returned as a
+hexadecimal string).
+
+=head1 Changes in the 1.9 release
+
+=head2 Fix bugs in Load option handling
+
+The XS code was handling load options incorrectly, leading the
+'NonRecoverable' flag to set the "HoldQuiesce" flag instead, and
+leading the "Allow Read Access" flag to set the IndexingMode to
+"rebuild".
+
+=head2 Support the SQLM_HEAP_xx constants
+
+The various constants for database manager, database and application
+pool ids are now supported.  Previously, a numeric code was displayed.
+
+=head1 Changes in the 1.8 release
+
+=head2 Support fork()ing programs
+
+The XS code now detects a fork() has occurred and will mark as closed
+database connections opened by the parent.  This requires some care,
+as closing the connection in the child will affect the connections in
+the parent.  And, of course, IBM doesn't properly document this.
+
+=head2 Handle cross-partition connection names
+
+The code parsing connection names got cross-DPF node connections wrong
+and spewed out large amounts of "unitialized value" warnings.  Now
+corrected.
+
+=head1 Changes in the 1.7 release
+
+=head2 Support the ReorgStatus constants
+
+The reorg status constants returned by database snapshots are now
+supported.  Previously, a numeric code was displayed.
+
+=head2 Support the HADR constants
+
+The HADR-related constants returned by database snapshots (HADR role,
+state, syncmode, connection status) are now supported.  Previously, a
+numeric code was displayed.
+
+=head1 Changes in the 1.6 release
+
+=head2 Bugfix for Runstats method
+
+Bugfix for the 'Runstats' method: you can now collect index statistics
+using a previously set profile without collecting/updating column
+statistics.
+
+=head2 Bugfix for Runstats, Rebind methods
+
+Bugfix for the 'Runstats' and 'Rebind' methods: the low-level
+administrative API functions used to implement these methods ignore
+the connection-level auto-commit flag.  This means they will continue
+to hold locks on the catalog until an explicit commit or disconnect is
+issued.
+
+Both methods now explicitly issue a commit (whether the low-level call
+succeeded or not).
+
+=head2 Support 'TempFilesPath' for Load method
+
+A new 'TempFilesPath' parameter for the Load method allows users to
+specify the pathname for load temporary files.
+
+=head1 Changes in the 1.5 release
+
+=head2 Add Runstats method
+
+A new 'Runstats' method can be used to collect table and index
+statistics.  Only a subset of options is supported; specifically, the
+column distribution options and column group features are not
+supported.  This may change in future releases. This method requires
+DB2 V8.
+
+=head2 Minor Load FileOptions changes
+
+Minor changes to the 'FileOptions' parameter to the 'Load' method: fix
+some typos, add 'DumpFileAccessAll', add documentation.
+
+=head2 Bugfix for "load terminate"
+
+The perl and XS code for 'LOAD' got the caller_action wrong; this was
+set to SQLU_TERMINATE for a "LOAD TERMINATE", but should always be set
+to SQLU_INITIAL.  This removes code and is a Good Thing...
+
+=head2 Add ListUtilities method
+
+A new 'ListUtilities' method supports listing currently active
+utilities.  It is implemented using an instance snapshot and requires
+DB2 V8.
+
+=head1 Changes in the 1.4 release
+
+=head2 Support exception tables for Load
+
+The Load method now supports the optional 'ExceptionTabe' and
+'ExceptionSchema' parameters to set the exception table for load
+exceptions.
+
+=head2 Support the 'Utility type' constants
+
+The 'utility type' constants returned by instance snapshots are now
+supported.  Previously, a numeric code was displayed.
+
+=head1 Changes in the 1.3 release
+
+=head2 Add more Export options
+
+Add the 'StripZeros', 'DatesISO' and 'DecPlusBlank' options to the
+Export file modifiers
+
+=head2 Handle quoting for FileOptions
+
+FileOptions for Import, Export and Load that contain embedded blanks
+(e.g. a TimestampFormat like 'MMM D YYY H:M:S') are now quoted before
+being fed to the DB2 APIs.
+
+=head2 Add LoadQuery method
+
+A new LoadQuery method allows you to query the progress of a Load
+command against a table.
+
+=head1 Changes in the 1.2 release
+
+=head2 Add ListHistory command
+
+A new ListHistory method implements the equivalent of the CLP "List
+History" command that allows you to query loads, backups,
+rollforwards, etc.
+
+=head2 Make test suite configurable
+
+A CONFIG file is used to drive the test suite, externalizing the names
+of the test database, test tables, schema names, etc.
+
+=head1 Changes in the 1.1 release
+
+=head2 Add Load method
+
+New Load method provides an API to the table load functions; only a
+subset of features is supported (most notably, partitioned loads,
+table hierarchies, TSM media, LOBs and Data Links are not supported).
+
+=head2 Add TargetColumns, InputColumns to Import method
+
+New parameters to the Import method allow specification of the target
+columns and selection of the relevant columns from the input file (by
+position or DEL files and by name for IXF files).
+
+=head2 Add ImportOptions to Import method
+
+Add import options to the 'Import' method; this allows users to set
+commit count, warning count, row count, skip count, etc.  Most options
+are available only with DB2 V8.2.
+
+=head1 Changes in the 1.0 release
+
+=head2 Add CatalogDatabase / UncatalogDatabase methods
+
+New methods to catalog a database in the database directory or
+uncatalog one.
+
+=head2 Add CatalogNode / UncatalogNode methods
+
+New methods to catalog a node in the node directory or uncatalog one.
+
+=head2 Add CatalogDCSDatabase / UncatalogDCSDatabase methods
+
+New methods to catalog a DCS database in the DCS directory or
+uncatalog one.
+
+=head2 Add import/export options for DEL files
+
+The following import options have been added for DEL files:
+C<DateFormat>, C<TimeFormat>, C<TimestampFormat>, C<ImpliedDecimal>,
+C<StripTBlanks>.
+
+The following export options have been added for DEL files:
+C<NoCharDel>, C<TimestampFormat>.
+
+=head2 Use db2Export/db2Import function for export/import
+
+On DB2 V8.2, the new db2Export function is used instead of sqluexpr
+and the new db2Import function is used instead of sqluimpr.
+
+=head2 Use db2DbDirXXX functions for GetDatabaseDirectory()
+
+The DatabaseDirectory() method now uses the db2DbDirXXX functions when
+available (DB2 V8.2).  For global database directories, this means the
+new 'Alternate Hostname' and 'Alternate Port Number' fields are
+returned for HADR setups.
+
+=head1 Changes in the 0.9 release
+
+=head2 Add import/export functions
+
+Building on the database connection functions, provide limited table
+export/import methods.
+
+=head2 Add database connection functions
+
+New Connect and Disconnect functions allow database connections; this
+is implies the database configuration get/set functions can now use
+the 'Immediate' option.
+
+=head1 Changes in the 0.8 release
+
+=head2 Add more database manager configuration parameters
+
+All medium/high important updatable database manager configuration
+parameters have been added.
+
+=head1 Changes in the 0.7 release
+
+=head2 More value types formatted by DB2API::DataElement
+
+More types of monitor elements are being formatted by the
+DB2API::DataElement class.  This includes lock mode, statement
+type/operation, server platform, application status.
+
+=head2 DB2API::EventParser more tolerant of unexpected files
+
+The EventParser class warns when it encounters un-expected files.  It
+now does not warn for hidden files (dotfiles) that we use internally
+to keep track of event file state.
+
+=head1 Changes in the 0.6 release
+
+=head2 Linux/ia64 (Itanium) support
+
+Make the module work on Linux/ia64 (Itanium) and DB2 V8.2.0
+
+=head2 DB2 V8.2 support on Solaris
+
+Make the module work on Solaris 7/8 with DB2 V8.2.0 (32-bit perl only)
+
+=head1 Changes in the 0.5 release
+
+=head2 Accept unknown elements in DB2API::DataStream, DB2API::DataElement
+
+When an unknown monitoring element / even code is found, the decoding
+functions now return "(unknown element XXX)" instead of die()ing.
+
+=head2 Convert tests to Test::More
+
+All tests have been converted to the Test::More framework
+
+=head2 Add ForceApplications and ForceAllApplications methods
+
+Two new methods can be used to force selected applications or all
+applications.  These should obviously be used with care.
+
+=head2 Add GetDCSDirectory method
+
+A new method allows retrieval of the DCS (gateway) directory
+
+=head2 Change keys in catalog entries
+
+The name of the keys in the GetDatabaseDirectory() and
+GetNodeDirectory() methods has been changed to match the (Morgan
+Stanley private) reverse-engineered catalog decoding/generation code.
+
+=head2 Support for event files
+
+Add an event file parser module, C<DB2API::EventParser> which can
+'tail' growing event files and delete those marked as processed.  A
+sample program provides the skeleton for a minimal event monitor.
+
+=head2 More configuration parameter work
+
+The checking script now warns if IBM-internal configuration parameters
+are used; more V8.2 configuration parameters have been added.
+
+=head1 Changes in the 0.4 release
+
+=head2 Add additional configuration parameters
+
+A number of additional database and database manager configuration
+parameters have been added; this includes support for a 'float' type,
+constants used for both the database and the database manager, and a
+mechanism to try and deal with configuration parameter names that have
+switched to a new constant name and new type between releases.
+
+=head2 Add additional constant categories
+
+Add the 'LockMode' and 'LockObjectType' categories to the
+C<DB2API::Constants> C<Lookup> method; use these in the
+C<DB2API::DataElement> C<getValue> method.
+
+=head1 Changes in the 0.3 release
+
+=head2 Re-implement self-describing data stream class
+
+The C<DB2API::Elements> class has been replaced by
+C<DB2API::DataStream> and C<DB2API::DataElement>, which decode the
+information lazily and provide an object-oriented interface to get the
+data, including a path search loosely modeled after XPath.
+
+=head2 Add GetDatabaseDirectory and GetNodeDirectory methods to DB2API
+
+These new methods allow retrieval of the database directory and node
+directory.
+
+=head2 Database/Dbm Config methods support multiple flags
+
+The database / database manager config methods now support passing in
+a single 'Flag' parameter string, or a reference to a hash with
+multiple flags.
+
+=head2 Bugfixes and V7 inter-operability fixes
+
+Basically, release 0.2 did not work very well in practice (dealing
+with 64-bit values, very slow decoding of snapshot data).  A number of
+small fixes were applied to DB2API::Elements to address this.
+
+=head1 Changes in the 0.2 release
+
+=head2 Add UpdateDatabaseConfig method to DB2API
+
+This new method allows updating of database configuration parameters.
+Until such time that we support database connections, only delayed
+database parameters updates are allowed.
+
+=head2 Add GetDatabaseConfig method to DB2API
+
+This new method allows retrieval of database configuration parameters.
+Until such time that we support database connections, only delayed and
+default database parameters may be retrieved.
+
+=head2 Add UpdateDbmConfig method to DB2API
+
+This new method allows updating of database manager configuration
+parameters.
+
+=head2 Add GetDbmConfig method to DB2API
+
+This new method allows retrieval of database manager configuration
+parameters.
+
+=head2 Add GetConfigParam method to DB2API::Constants
+
+This new method allows lookup of meta-data about configuration
+parameters.  The API is provisional, as I have not yet decided how to
+deal with parameters that change constant name and type between DB2
+releases.
+
+=head2 Add <sqlutil.h> to DB2API::Constants
+
+The constants generated are now for both C<sqlmon.h> and C<sqlutil.h>

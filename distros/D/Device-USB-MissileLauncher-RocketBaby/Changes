@@ -1,0 +1,8 @@
+Revision history for Perl extension Device::USB::MissileLauncher::RocketBaby.
+
+1.01  2007-12-17
+        - add PREREQ_PM
+        - modif pod
+
+1.00  2007-12-16
+	- initial version

@@ -1,0 +1,11 @@
+Revision history for Perl extension MySperql.
+
+1.01  Mon Dec  1 09:55:54 2008
+	- removed tests dependent on live database
+
+1.00  Fri Jul  6 18:54:55 2007
+	- includes minimum SQL functions only
+	- planned upgrades include flextable and ezobject libs
+	- original version; created by h2xs 1.23 with options
+		-AXc -n MySperql
+

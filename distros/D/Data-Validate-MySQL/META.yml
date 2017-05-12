@@ -1,0 +1,13 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         Data-Validate-MySQL
+version:      0.03
+version_from: lib/Data/Validate/MySQL.pm
+installdirs:  site
+requires:
+    Carp:                          
+    Data::Validate:                0.06
+    Math::BigFloat:                
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.23

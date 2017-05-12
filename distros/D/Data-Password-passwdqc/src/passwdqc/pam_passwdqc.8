@@ -1,0 +1,102 @@
+.\" Copyright (c) 2001 Networks Associates Technology, Inc.
+.\" All rights reserved.
+.\" Copyright (c) 2009 Dmitry V. Levin
+.\" All rights reserved.
+.\" Copyright (c) 2009 Solar Designer
+.\" All rights reserved.
+.\"
+.\" Portions of this software were developed for the FreeBSD Project by
+.\" ThinkSec AS and NAI Labs, the Security Research Division of Network
+.\" Associates, Inc.  under DARPA/SPAWAR contract N66001-01-C-8035
+.\" ("CBOSS"), as part of the DARPA CHATS research program.
+.\"
+.\" Redistribution and use in source and binary forms, with or without
+.\" modification, are permitted provided that the following conditions
+.\" are met:
+.\" 1. Redistributions of source code must retain the above copyright
+.\"    notice, this list of conditions and the following disclaimer.
+.\" 2. Redistributions in binary form must reproduce the above copyright
+.\"    notice, this list of conditions and the following disclaimer in the
+.\"    documentation and/or other materials provided with the distribution.
+.\" 3. The name of the author may not be used to endorse or promote
+.\"    products derived from this software without specific prior written
+.\"    permission.
+.\"
+.\" THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+.\" ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+.\" IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+.\" ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+.\" FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+.\" DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+.\" OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+.\" HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+.\" LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+.\" OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+.\" SUCH DAMAGE.
+.\"
+.\" $FreeBSD: src/lib/libpam/modules/pam_passwdqc/pam_passwdqc.8,v 1.4 2002/05/30 14:49:57 ru Exp $
+.\" $Owl: Owl/packages/passwdqc/passwdqc/pam_passwdqc.8,v 1.15 2010/03/13 06:51:46 solar Exp $
+.\"
+.Dd March 13, 2010
+.Dt PAM_PASSWDQC 8
+.Os "Openwall Project"
+.Sh NAME
+.Nm pam_passwdqc
+.Nd Password quality-control PAM module
+.Sh SYNOPSIS
+.Op Ar service-name
+.Ar module-type
+.Ar control-flag
+.Pa pam_passwdqc
+.Op Ar options
+.Sh DESCRIPTION
+The
+.Nm
+module is a simple password strength checking module for
+PAM.
+In addition to checking regular passwords, it offers support for
+passphrases and can provide randomly generated ones.
+.Pp
+The
+.Nm
+module provides functionality for only one PAM management group:
+password changing.
+In terms of the
+.Ar module-type
+parameter, this is the
+.Dq Li password
+feature.
+.Pp
+The
+.Fn pam_chauthtok
+service function may ask the user for a new password, and verify that
+it meets certain minimum standards.
+If the chosen password is unsatisfactory, the service function returns
+.Dv PAM_AUTHTOK_ERR .
+.Pp
+The set of options that may be passed to the module is exactly the
+same as the set of options that may be specified in the
+.Pa /etc/passwdqc.conf
+file.  These options are described in
+.Xr passwdqc.conf 5 .
+.Sh SEE ALSO
+.Xr pam.conf 5 ,
+.Xr passwdqc.conf 5 ,
+.Xr pam 8 .
+.Pp
+http://www.openwall.com/passwdqc/
+.Sh AUTHORS
+The
+.Nm
+module was written for Openwall GNU/*/Linux by
+.An Solar Designer Aq solar at openwall.com .
+This manual page was written for the
+.Fx
+Project by
+ThinkSec AS and NAI Labs, the Security Research Division of Network
+Associates, Inc. under DARPA/SPAWAR contract N66001-01-C-8035
+.Pq Dq CBOSS ,
+as part of the DARPA CHATS research program.
+It has since been revised, most importantly to refer to
+.Xr passwdqc.conf 5
+instead of describing the options right on this page.

@@ -1,0 +1,48 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.003009
+ [Removed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.003001
+
+0.003008 2017-03-01T22:26:39Z
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.003007 2015-07-31T03:43:06Z
+ [Added / configure requires]
+ - perl 5.006
+
+ [Added / test requires]
+ - perl 5.006
+
+ [Changed / runtime requires]
+ - perl 5.008 → 5.006
+
+ [Removed / runtime requires]
+ - utf8
+
+0.003006 2014-10-02T04:27:34Z
+ [Changed / test requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 0.04000000 → 1.000003
+
+0.003005 2014-10-02T04:13:44Z
+ [Changed / test requires]
+ - Dist::Zilla::Plugin::Bootstrap::lib 0 → 0.04000000
+
+0.003004 2014-08-31T21:17:10Z
+
+0.003003 2014-08-30T14:20:07Z
+
+0.003002 2014-08-29T10:02:14Z
+ [Changed / test requires]
+ - Dist::Zilla::Util::Test::KENTNL 1.001 → 1.003001
+
+0.003001 2014-08-27T22:48:37Z
+
+0.003000 2014-08-23T14:08:57Z
+
+0.002001 2014-08-22T18:38:02Z
+
+0.002000 2014-08-22T17:52:30Z
+ [Added / runtime requires]
+ - Carp

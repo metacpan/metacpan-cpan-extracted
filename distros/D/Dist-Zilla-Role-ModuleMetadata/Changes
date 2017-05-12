@@ -1,0 +1,15 @@
+Revision history for Dist-Zilla-Role-ModuleMetadata
+
+0.004     2016-06-21 00:54:35Z
+          - added argument validation
+
+0.003     2015-04-03 03:59:41Z
+          - fix failing tests on older Dist::Zilla by ensuring that the
+            version object in generated data is stringified
+
+0.002     2015-03-29 23:05:41Z
+          - include the Module::Metadata version in dumped config metadata,
+            for future debugging purposes
+
+0.001     2015-03-29 21:01:24Z
+          - Initial release.

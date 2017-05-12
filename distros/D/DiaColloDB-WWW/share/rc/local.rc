@@ -1,0 +1,8 @@
+##-*- Mode: CPerl -*-
+##
+## File: local.rc
+## Description: example local.rc for DiaColloDB::WWW distribution
+##  + settings in this file will override those in "dstar.rc", which see for an example
+
+1; ##-- return a true value
+

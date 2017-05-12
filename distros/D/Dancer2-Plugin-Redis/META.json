@@ -1,0 +1,95 @@
+{
+   "abstract" : "Perl Dancer2 plugin for interaction with key-value-store Redis.",
+   "author" : [
+      "BURNERSK <burnersk@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "mit"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dancer2-Plugin-Redis",
+   "no_index" : {
+      "directory" : [
+         "example",
+         "t"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0",
+            "perl" : "5.006"
+         }
+      },
+      "runtime" : {
+         "recommends" : {
+            "Sereal" : "0"
+         },
+         "requires" : {
+            "Carp" : "0",
+            "Dancer2" : "0.200000",
+            "Dancer2::Plugin" : "0.200000",
+            "Moo" : "0",
+            "Moo::Role" : "0",
+            "Redis" : "0",
+            "Safe::Isa" : "0",
+            "Try::Tiny" : "0",
+            "Type::Tiny" : "0",
+            "Types::Standard" : "0",
+            "perl" : "5.010",
+            "strictures" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Dancer2" : "0.200000",
+            "HTTP::Request::Common" : "0",
+            "Plack::Builder" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0",
+            "Test::NoWarnings" : "0",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::Redis" : {
+         "file" : "lib/Dancer2/Plugin/Redis.pm",
+         "version" : "0.007"
+      },
+      "Dancer2::Plugin::Redis::Serialization::Sereal" : {
+         "file" : "lib/Dancer2/Plugin/Redis/Serialization/Sereal.pm",
+         "version" : "0.001"
+      },
+      "Dancer2::Plugin::Redis::SerializationRole" : {
+         "file" : "lib/Dancer2/Plugin/Redis/SerializationRole.pm",
+         "version" : "0.001"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/burnersk/Dancer2-Plugin-Redis/issues"
+      },
+      "homepage" : "https://github.com/burnersk/Dancer2-Plugin-Redis",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/burnersk/Dancer2-Plugin-Redis.git",
+         "web" : "https://github.com/burnersk/Dancer2-Plugin-Redis"
+      }
+   },
+   "version" : "0.007",
+   "x_contributors" : [
+      "BURNERSK <burnersk@cpan.org>",
+      "SHLOMIF <shlomif@shlomifish.org>",
+      "SIMBABQUE <simbabque@cpan.org>",
+      "SYSPETE <peter@sysnix.com>"
+   ],
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

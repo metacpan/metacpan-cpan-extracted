@@ -1,0 +1,7 @@
+perl Makefile.PL
+make
+make test
+make install
+
+
+See the README for more detailed explanations.

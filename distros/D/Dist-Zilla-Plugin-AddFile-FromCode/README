@@ -1,0 +1,24 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [AddFile::FromCode]
+     code=print "hello\n" for 1..10;
+     dest=share/somefile.txt
+
+    To add more files:
+
+     [AddFile::FromCode / 2]
+     code=print "world\n" for 1..20;
+     dest=share/anotherfile.txt
+
+DESCRIPTION
+
+    This plugin adds a file from output of code specified in dist.ini.
+
+SEE ALSO
+
+    Dist::Zilla::Plugin::AddFile::FromFS
+
+    Dist::Zilla::Plugin::AddFile::FromCommand
+

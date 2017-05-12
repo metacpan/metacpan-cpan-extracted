@@ -1,0 +1,29 @@
+[%- default_headers = {
+        meta => {
+                name => {
+                        author => 'Stas Bekman',
+                        keywords => 'mod_perl modperl perl cgi apache webserver speed fast guide mod_perl asf parent apache guide help info faq mod_perl installation cgi troubleshooting help no sex speedup child rules free open source OSS mod_perl speed suck apache guide manual troubleshoot cgi fast apache sexy',
+                        classification => 'information',
+                },
+                'http-equiv' => {
+                        'Content-Type' => 'text/html; charset=iso-8859-1',
+                },
+        },
+};
+
+abstract = doc.meta.abstract or "Manuals, Hints, Guidelines, Scenarios, Troubleshooting and Help";
+
+-%]
+        <meta name="description" content="mod_perl documentation: [% abstract | html %]">
+[%- FOREACH m = ["name", "http-equiv"];
+        SET merge = {};
+        merge.import(default_headers.meta.$m); # deep copy
+        merge.import(doc.headers.meta.$m);     # merge 
+        FOREACH key = merge.keys; %]
+        <meta [% m %]="[% key %]" content="[% merge.$key | html  %]">
+[%-     END;
+END -%]
+
+[% IF doc.headers.base -%]
+        <base href="[% doc.headers.base | uri | html %]">
+[%- END -%]

@@ -1,0 +1,46 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.79.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 dcfd139fd168ea4b5727b50d5b41a84930bc3ab2 CONTRIBUTING
+SHA1 4bbd608bf45dcb883345dc69da362cd24c6b0d87 CONTRIBUTORS
+SHA1 2f63e97354ea30b546f52fcabc498074fcfc88f1 Changes
+SHA1 3330bd3ff39488899938e79ac16e04227a46830d INSTALL
+SHA1 e188c4892bc1fbfced62c2299a2a24fd21098d81 LICENSE
+SHA1 5d87471271bc5534c89160744dc7193a6911fa56 MANIFEST
+SHA1 cf10a8b9e3ae3db4dc248b5c403c0b7c11cf6d7d META.json
+SHA1 f14746d1aab4bb18d6a78c71eb5c5673e8510961 META.yml
+SHA1 6196b06ab33181a6be37189243354601c7fc03cc Makefile.PL
+SHA1 a206f3565637fc7275348048f5ccdfaee93bcf92 README.mkdn
+SHA1 71c462e90d1fa6cd1d872509ac2fbc97546459ab README.pod
+SHA1 373bbccfcc8c5e38dc0351fedfbbe37c855aa689 cpanfile
+SHA1 8d8b5d447954534bb0c3b983fa6b921e08b4b833 dist.ini
+SHA1 388f71cf52da186c6305838c126233c92adf62d0 doap.xml
+SHA1 68b9c808fd0f8643aa8622a7414b1f00cd7dd30c lib/Dancer2/Session/Memcached.pm
+SHA1 1f47ee757ec59aed2ade535ac0e9e56b6ea9639a perlcritic.rc
+SHA1 1513e8a27981a6b6082054c0eef443a49affad52 t/00-compile.t
+SHA1 46fed9751c3ca31ff7625371570f27d81b7007ea t/00-report-prereqs.dd
+SHA1 504a672015f8761f5bad3863d844954c9e803c3f t/00-report-prereqs.t
+SHA1 edd47131d55140a08ba0c44d32d27eb687026349 t/basic.t
+SHA1 0fe974aff7099794f30455e019124d46fa2b2b7d t/config.t
+SHA1 80ab1faf5d8174920b60461bf8c11e2225861f42 xt/release/pause-permissions.t
+SHA1 d1fe7d94b3edc7847eb187d4ee41f66e19cf8907 xt/release/unused-vars.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1
+
+iEUEARECAAYFAlgeguwACgkQ34Hwf+GwC4zRFgCfQ/GOA9nldHQLvBIQSEU5vjOn
+34IAmOnRglWxEcOu7OIh++3fyJtSV0A=
+=MVhJ
+-----END PGP SIGNATURE-----

@@ -1,0 +1,16 @@
+This file is sorted alphabetically by name.  The fields are: name (N),
+email (E), web-address (W), description (D) and snail-mail address (S).
+
+---
+N: Andreas J. König 
+D: Bug submission (dependencies)  
+
+N: Kevin Field
+D: Bug submission (ON missing Family Day)  
+
+N: Chris McMahon
+D: Bug submission (mojibake in pod)
+
+N: Rick Scott
+D: Author and maintainer
+E: rick@shadowspar.dyndns.org

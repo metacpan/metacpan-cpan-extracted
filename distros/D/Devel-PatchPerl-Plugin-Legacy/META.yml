@@ -1,0 +1,28 @@
+---
+abstract: 'patchperl plugin for EOL Perls'
+author:
+  - 'HIROSE Masaaki <hirose31 _at_ gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: 6.36
+configure_requires:
+  ExtUtils::MakeMaker: 6.36
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Devel-PatchPerl-Plugin-Legacy
+no_index:
+  directory:
+    - inc
+    - t
+    - xt
+requires:
+  Devel::PatchPerl: 0
+  Filter::Util::Call: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: https://github.com/hirose31/devel-patchperl-plugin-legacy
+version: 0.03

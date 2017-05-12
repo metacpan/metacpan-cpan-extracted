@@ -1,0 +1,14 @@
+HTTP/1.1 200 OK                                                                                                                                                                           [31/100]
+Content-Type: application/json; charset=UTF-8
+
+{
+ "id": "666",
+ "email": "blom@cpan.org",
+ "verified_email": "1",
+ "name": "Menno Blom",
+ "given_name": "Menno",
+ "family_name": "Blom",
+ "link": "https://plus.google.com/666",
+ "picture": "https://image",
+ "gender": "male"
+}

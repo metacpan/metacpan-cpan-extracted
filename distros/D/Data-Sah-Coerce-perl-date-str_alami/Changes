@@ -1,0 +1,42 @@
+0.007   2017-01-09 (PERLANCAR)
+
+	- Split str_alami_{en,id} to their own dists.
+
+	- Die on parse failure.
+
+	- [dist] Make DateTime::Format::Alami::{ID,EN} a RuntimeRequires prereq
+	  for convenience of user.
+
+	- Fix/simplify examples.
+
+
+0.006   2016-06-14 (PERLANCAR)
+
+	- Don't require coerce_to=DateTime when using this rule.
+
+
+0.005   2016-05-27 (PERLANCAR)
+
+	- Supply default coerce_to knowledge to each rule, for convenience.
+
+
+0.004   2016-05-23 (PERLANCAR)
+
+	- Adjust to Data::Sah::Coerce 0.011 (coerce_from & dont_coerce_from
+	  have been replaced with coerce_rules).
+
+
+0.003   2016-05-22 (PERLANCAR)
+
+        - Update rule metadata version 1 -> 2 (Data::Sah::Coerce 0.011+): add
+          'precludes'.
+
+
+0.002   2016-05-20 (PERLANCAR)
+
+	- Add rules: str_alami_en, str_alami_id.
+
+
+0.001   2016-05-19 (PERLANCAR)
+
+        - First release.

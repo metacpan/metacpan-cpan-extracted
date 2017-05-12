@@ -1,0 +1,13 @@
+MANIFEST	Your are reading it!
+Makefile.PL	Makefile Maker
+README		Who's who, what's what
+lib/Digest/Perl/MD5.pm	The cause of all this.
+test.pl		Test suite
+tools/md5-test.pl	Compare D::MD5 with D::P::MD5
+tools/md5-bench.pl	Compare speed of D::MD5 and D::P::MD5
+tools/md5	BSD compatible md5(1)
+CHANGES		What's new
+INSTALL		How to install
+rand.f		Random binary data for testing
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

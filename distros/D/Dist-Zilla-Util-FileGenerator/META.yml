@@ -1,0 +1,42 @@
+---
+abstract: 'helper to generate files with little repetition in a PluginBundle'
+author:
+  - 'Christian Walde <walde.christian@googlemail.com>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::InDistDir: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300006, CPAN::Meta::Converter version 2.113640'
+license: unrestricted
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Util-FileGenerator
+no_index:
+  directory:
+    - t
+    - xt
+    - examples
+    - corpus
+  package:
+    - DB
+provides:
+  Dist::Zilla::Util::FileGenerator:
+    file: lib/Dist/Zilla/Util/FileGenerator.pm
+    version: 0.120090
+requires:
+  Moose: 0
+  MooseX::HasDefaults::RO: 0
+  perl: 5.006
+  strictures: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Util-FileGenerator
+  homepage: https://github.com/wchristian/dist-zilla-util-filegenerator
+  repository: https://github.com/wchristian/dist-zilla-util-filegenerator.git
+version: 0.120090

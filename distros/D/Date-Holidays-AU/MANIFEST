@@ -1,0 +1,8 @@
+MANIFEST
+README
+Makefile.PL
+Changes
+t/test.t
+lib/Date/Holidays/AU.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

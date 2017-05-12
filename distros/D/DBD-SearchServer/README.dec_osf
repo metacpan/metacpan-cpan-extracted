@@ -1,0 +1,87 @@
+=head1 NAME
+
+README.dec_osf for DBD::SearchServer
+
+=head1 DESCRIPTION
+
+Instructions to build DBD::SearchServer to match your perl under Digital Unix.
+
+=head1 INSTRUCTIONS
+
+
+Welcome to a mixed 32/64 bit world. You'll find this is not always and easy
+way to live.
+
+SearchServer libraries on DEC OSF/Digital Unix are 32 bit and require a special
+setting when compiling and linking (-taso).
+Unfortunately, you cannot mix 'taso' and 'non-taso' code. So you have a number
+of choices in building DBD::SearchServer.
+
+
+=head2 Your perl is built with -taso
+If you already know about -taso, there's a chance you already built perl with
+this setting. In this case, you can build DBD::SearchServer as a dynamic library.
+Makefile.PL will detect this and set up everything. You can do things 'normally',
+i.e.
+	perl Makefile.PL (notice the warning about finding -taso)
+	make
+	make test
+	make install
+
+=head2 Your perl is built withOUT -taso
+
+If, however, your Perl is built without -taso, you won't be able to build
+DBD::SearchServer using dynamic linking. Instead, you'll have to build a 
+Perl image with DBD::SearchServer statically linked, and use _this_ 'perl'
+binary when using DBD::SearchServer.
+Makefile.PL will detect the absence of -taso but will not be able to set up
+everything for you. It will create a Makefile for building a static perl,
+but due to limitations in my knowledge of MakeMaker, the resulting Makefile(s)
+will have to be hand-tweaked.
+Thus the build process becomes:
+	perl Makefile.PL (notice the warning about static linking)
+	make
+	make Makefile.aperl
+	(edit Makefile.aperl with your favorite editor and change the line
+	that reads
+	MAP_LINKCMD=something
+	to
+	MAP_LINKCMD=something -taso
+	something is whatever was there already - leave it untouched)
+	make test (this will build a static perl in this directory)
+	make install
+
+You know have a binary named (guess what) 'perl' in the DBD::SearchServer build
+directory. Copy this binary wherever you like, renaming it to so that you
+still have a 'stock' perl available, and use THIS perl when running programs that use
+DBD::SearchServer.
+The easiest way is using the static perl in the shebang line of your scripts.
+For instanc, assuming you renamed the static perl to perlss,
+change #!/usr/local/bin/perl to #!/wherever/perlss
+
+=head2 'Unaligned access' messages
+
+However you build perl and DBD::SearchServer, it's easy to bump into problems
+relating to a 'Unaligned access' message (tipically showing on your terminal
+and/or the console).
+This is related to using 32 bit libraries.
+To solve this problem, rea the uac(1) page carefully. You might need help
+from a sytem administrator if you are, say, setting up a web server and do not
+have administrative access to the system.
+
+=head1 NOTES FOR PREVIOUS DBD::Fulcrum USERS
+
+If you were already using DBD::Fulrum, and used the static perl as your
+main perl image, you'll have to use a 'stock' perl to build this driver.
+(You did save that, right?)
+Otherwise, you'll get duplicate definitions errors when linking the module,
+since the SearchServer libraries are already linked into the perl image.
+
+
+=cut
+
+
+
+
+
+

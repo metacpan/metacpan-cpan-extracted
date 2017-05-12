@@ -1,0 +1,8 @@
+Makefile.PL
+MANIFEST
+examples/another.xml
+examples/test.xml
+examples/hosts.xml
+t/DBIx-PhraseBook.t
+lib/DBIx/PhraseBook.pm
+META.yml                                 Module meta-data (added by MakeMaker)

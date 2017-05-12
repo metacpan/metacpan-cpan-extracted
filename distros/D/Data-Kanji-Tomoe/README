@@ -1,0 +1,106 @@
+   ____        _                _  __            _ _       
+  |  _ \  __ _| |_ __ _   _ _  | |/ /__ _ _ __  (_|_)  _ _ 
+  | | | |/ _` | __/ _` | (_|_) | ' // _` | '_ \ | | | (_|_)
+  | |_| | (_| | || (_| |  _ _  | . \ (_| | | | || | |  _ _ 
+  |____/ \__,_|\__\__,_| (_|_) |_|\_\__,_|_| |_|/ |_| (_|_)
+                                              |__/         
+   _____                          
+  |_   _|__  _ __ ___   ___   ___ 
+    | |/ _ \| '_ ` _ \ / _ \ / _ \
+    | | (_) | | | | | | (_) |  __/
+    |_|\___/|_| |_| |_|\___/ \___|
+                                  
+
+
+This is the README for Data::Kanji::Tomoe version 0.05.
+
+Data::Kanji::Tomoe is a "module" for the Perl computer programming
+language, a library of computer code to install on a computer.  This
+document contains four sections:
+
+1. About - what the module does
+
+2. Documentation - how to learn more about the module
+
+3. Installation - how to install this module on a computer
+
+4. Help - what to do if you get stuck
+
+-----------------------------------------------------------------------------
+
+1. ABOUT
+
+Data::Kanji::Tomoe - parse the data files of the Tomoe project
+
+This Perl module parses the kanji or hanzi data files supplied with
+"the Tomoe "handwriting recognition engine"|/Tomoe".
+
+The data itself is not supplied with this module.
+
+The parsing is based on "XML::Parser". It breaks the Tomoe data into
+individual characters, and calls a subroutine supplied by the user
+with the data for each character.
+
+-----------------------------------------------------------------------------
+
+2. DOCUMENTATION
+
+You can read the documentation for the module online at the following
+websites:
+
+    * http://search.cpan.org/perldoc?Data::Kanji::Tomoe
+    * http://metacpan.org/release/Data-Kanji-Tomoe
+
+(These links go to the latest version of the module.)
+
+After installing the module, you can read the documentation on your
+computer using
+
+    perldoc Data::Kanji::Tomoe
+
+-----------------------------------------------------------------------------
+
+3. INSTALLATION
+
+This module requires Perl version 5.8.1 or later.
+
+To install the module from CPAN, use
+
+    cpan Data::Kanji::Tomoe
+
+If you have the App::cpanminus installer, you may prefer
+
+    cpanm Data::Kanji::Tomoe
+
+To install the module from the source file, Data-Kanji-Tomoe-0.05.tar.gz,
+follow this sequence of commands:
+
+    tar xfz Data-Kanji-Tomoe-0.05.tar.gz
+    cd Data-Kanji-Tomoe-0.05
+    perl Makefile.PL
+    make
+    make install
+
+If you want to test the module before installing it, use "make test" after
+"make" and before "make install".
+
+-----------------------------------------------------------------------------
+
+4. HELP
+
+To get help with the module, you can email the author, Ben Bullock, at
+<bkb@cpan.org>. If you think there is a problem in the module, you can
+report a bug at 
+
+<https://github.com/benkasminbullock/Data-Kanji-Tomoe/issues>,
+
+or if you want to alter the source code of Data::Kanji::Tomoe, try the
+public repository on github at 
+
+<https://github.com/benkasminbullock/Data-Kanji-Tomoe>. 
+
+-----------------------------------------------------------------------------
+
+This README was written on Wed Jan 11 09:18:01 2017.
+
+-----------------------------------------------------------------------------

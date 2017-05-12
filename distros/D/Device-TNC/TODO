@@ -1,0 +1,5 @@
+* Check that fix to Win32::SerialPort that causes the connection to the TNC to
+  fail has been fixed when the next version of this module comes out.
+  A work around for this problem is to use a program like UI-View.
+  Check that you can read data then use this module per usual.
+* Implement methods to write frames to the TNC.

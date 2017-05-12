@@ -1,0 +1,7 @@
+
+CREATE TABLE __TABLE_NAME__ (
+	text varchar(__WORD_LENGTH__) binary DEFAULT '' NOT NULL,
+	idx longblob,
+	PRIMARY KEY (text)
+	);
+

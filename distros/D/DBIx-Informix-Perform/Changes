@@ -1,0 +1,12 @@
+Revision history for Perl extension DBIx::Informix::Perform.
+
+0.01  Sat Mar 22 22:55:56 2003
+	- original version; created by h2xs 1.22 with options
+		-b 5.6.0 -AX -n DBIx::Perform
+	  Merged with the pre-module-packaging version by WEAV
+
+0.02  Sat Mar 29 03:57:00 2003
+	- Renamed DBIx::Informix::Perform at the suggestion of 
+	  Autrijus Tang of the CPAN Modules keepers.
+
+

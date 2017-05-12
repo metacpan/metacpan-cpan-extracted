@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+ <head>
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+  <title>Daizu CMS test page</title>
+  <link href="preview:[/style/site.css]" rel="stylesheet" type="text/css">
+  <link href="preview:[/favicon.ico]" rel="shortcut icon" type="image/x-icon">
+  <style>
+    /* this should get filtered as well: */
+    @import "preview:[foo.css]";
+  </style>
+  <script type="text/javascript">
+    // This should be ignored by the filtering stuff.  */
+  </script>
+  <script language="JavaScript" src="preview:[stuff.js]" type="text/javascript"></script>
+ </head>
+ <body>
+
+  <div id="Header"><div class="Box2">
+   <h1>Daizu CMS</h1>
+   <img src="preview:[http://example.com/logo.gif]">
+  </div></div>
+
+  <table id="Layout">
+   <tr>
+    <td id="TableTrick"></td>
+    <td id="Content" rowspan="2">
+     <h2>Daizu CMS blog</h2>
+  </table>
+
+  <h3>Miniblog</h3>
+  <p class="Strapline">(nuggets of inanity)</p>
+  <object archive="preview:[foo.bar baz.quux]" data="preview:[/blog/miniblog.html]" height="400" title="Recent miniblog entries" width="200">
+   <a href="preview:[/blog/2006/02/miniblog/]">Miniblog archive</a>
+  </object>
+
+  <form action="preview:[browse.php]" method="get">
+   <input name="search" size="30" type="text" value=""><br>
+   <input name="cat" type="hidden" value="0">
+   <input checked="checked" name="incldead" type="hidden" value="1">
+   <input style="width:10em" type="submit" value="Search Torrents!">
+  </form>
+
+<object align="middle" classid="preview:[clsid:d27cdb6e-ae6d-11cf-96b8-444553540000]" codebase="preview:[http://fpdownload.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0]" height="300" id="foo" width="300">
+<param name="movie" value="foo.swf?x=1&amp;y=2">
+<param name="allowScriptAccess" value="samedomain">
+<param name="quality" value="high">
+<param name="bgcolor" value="#ffffff">
+<embed align="middle" allowscriptaccess="samedomain" bgcolor="#ffffff" height="300" name="foo" pluginspage="preview:[http://www.macromedia.com/go/getflashplayer]" quality="high" src="preview:[foo.swf?x=1&amp;y=2]" type="application/x-shockwave-flash" width="300"></embed>
+</object>
+
+ </body>
+</html>

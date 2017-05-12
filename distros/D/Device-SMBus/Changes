@@ -1,0 +1,115 @@
+Changelog for Device-SMBus
+
+1.15 2016-05-24T08:19:55
+ - Bump Changes (Shantanu Bhadoria)
+ - Fix non-deterministic destruction issue When the destruction method
+   runs, it is possible for the file handle to already be closed (and set
+   to undef), resulting in an error message. This validates that the file
+   handle is defined before closing it. (Joel Maslak)
+
+1.14 2016-04-07T05:49:32Z
+ - fixing travis (Shantanu Bhadoria)
+ - Test changes (Shantanu Bhadoria)
+ - Added Travis (Shantanu Bhadoria)
+
+1.13 2015-04-03T16:10:17Z
+ - Switched from Moose to Moo to speed up things (Shantanu Bhadoria)
+ - Adding Markdown file (Shantanu Bhadoria)
+
+1.12 2015-03-27T05:24:00Z
+ - Linking to Device::SMBUS in Manual Desc (Shantanu Bhadoria)
+
+1.11 2015-03-25T06:53:48Z
+ - Adding manual for writing i2c device drivers using Device::SMBus
+   (Shantanu Bhadoria)
+
+1.10 2015-03-25T06:51:34Z
+ - Adding manual for writing i2c device drivers using Device::SMBus
+   (Shantanu Bhadoria)
+
+1.09 2015-03-23T06:43:51Z
+ - dist.ini changes, added author website (Shantanu Bhadoria)
+
+1.08 2014-12-08T03:12:11Z
+ - Modified POD documentation, added notes (Shantanu Bhadoria)
+
+1.07 2014-12-02T09:30:11Z
+ - Fixed Spelling Errors, Added new words to stopwords (Shantanu Bhadoria)
+ - addding Changes (Shantanu Bhadoria)
+ - Removed Changes from git repo to avoid dzil release issues (Shantanu
+   Bhadoria)
+ - implemented readBlockData() (wfreller)
+ - Fixes #3 Added return statements to the code to help peopl more used to
+   seeing them (Shantanu Bhadoria)
+
+1.06 2013-12-30T05:18:20Z
+ - v1.06 (Shantanu Bhadoria)
+ - spelling fixes (Shantanu Bhadoria)
+ - Added more documentation, used mailmap to remove duplicates in
+   contributors information, Thanks to git shortlog:
+   https://www.kernel.org/pub/software/scm/git/docs/git-shortlog.html
+   (Shantanu Bhadoria)
+ - add writeBlockData method (Jonathan Stowe)
+
+1.05 2013-12-08T15:07:21Z
+ - v1.05 (Shantanu Bhadoria)
+ - adding spelling stopwords (Shantanu Bhadoria)
+ - Adding information for Angstrom Linux (Shantanu Bhadoria)
+
+1.04 2013-12-08T15:04:49Z
+ - v1.04 (Shantanu Bhadoria)
+ - including i2c-dev.h with the distribution to Avoid issues arising from
+   missing file and the munged up implementation each linux distro makes
+   with this file (Shantanu Bhadoria)
+
+1.03 2013-10-20T01:49:07Z
+ - v1.03 (Shantanu Bhadoria)
+ - Added more documentation (Shantanu Bhadoria)
+
+1.02 2013-10-16T05:13:47Z
+ - v1.02 (Shantanu Bhadoria)
+ - Fixed Changes File to meet spec (Shantanu Bhadoria)
+
+1.01 2013-10-06T03:20:16Z
+ - v1.01 (Shantanu Bhadoria)
+
+1.00 2013-09-27T12:24:47Z
+ - No changes found
+
+0.11 2013-09-27T12:24:47Z
+ - v0.11 (Shantanu Bhadoria)
+ - minor changes (Shantanu Bhadoria)
+
+0.10 2013-09-27T12:23:43Z
+ - v0.10 (Shantanu Bhadoria)
+ - File Error catching logic (Shantanu Bhadoria)
+
+0.09 2013-09-12T09:29:26Z
+ - v0.09 (Shantanu Bhadoria)
+
+0.08 2013-09-12T09:27:16Z
+ - v0.08 (Shantanu Bhadoria)
+ - Reformatted as per CPAN::Changes::Spec (Neil Bowers)
+
+0.07 2013-09-11T07:25:07Z
+ - N Bytes (Shantanu Bhadoria)
+ - N Byte (Shantanu Bhadoria)
+
+0.06 2013-09-08T10:35:28Z
+ - Switch from Moo to Moose to simplify my code (Shantanu Bhadoria)
+
+0.05 2013-09-08T10:19:53Z
+ - Added a few more easy compatibly functions (Shantanu Bhadoria)
+ - Added remaining XS routines to the XS file (Shantanu Bhadoria)
+
+0.04 2013-09-08T07:39:57Z
+ - Final Check on  byteData methods (Shantanu Bhadoria)
+
+0.03 2013-09-07T19:36:13Z
+ - First Release with bare minumum function (Shantanu Bhadoria)
+
+0.02 2013-09-07T19:29:21Z
+ - First Release with bare minumum function (Shantanu Bhadoria)
+
+0.01 2013-09-07T16:58:33Z
+ - First Release with bare minumum function (Shantanu Bhadoria)

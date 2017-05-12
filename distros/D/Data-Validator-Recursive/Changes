@@ -1,0 +1,24 @@
+Revision history for Perl extension Data::Validator::Recursive
+
+0.07 2016-06-30T13:49:17Z
+    - Fixed typo: has_error() to has_errors() (hirose31++)
+    - passthru original error message.
+
+0.06 2014-06-16T10:03:37Z
+    - Allow chain style for with()
+
+0.05 2014-06-16T01:56:59Z
+    - Fixed with('AllowExtra') #2
+    - Applying for ArrayRef #3
+
+0.04 2013-07-16T18:21:11Z
+    - Fixed wrong error message at Exclusive Parameter
+
+0.03 2013-04-19T17:43:46Z
+    - repackaging
+
+0.02 2013-04-07T07:00:20Z
+    - first release
+
+0.01  Sat Feb 23 18:08:21 2013
+    - original version

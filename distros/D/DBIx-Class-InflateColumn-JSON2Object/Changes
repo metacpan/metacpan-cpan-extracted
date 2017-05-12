@@ -1,0 +1,8 @@
+Revision history for DBIx-Class-InflateColumn-JSON2Object
+
+0.900   2017-01-31T15:31:31
+    - added tests and docs
+    - fixed boolean handling
+    - also extraced from oe1 (Maroš Kollár)
+    - extracted from Validad::Tools
+

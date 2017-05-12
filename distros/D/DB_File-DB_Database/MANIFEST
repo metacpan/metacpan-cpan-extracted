@@ -1,0 +1,6 @@
+MANIFEST
+Makefile.PL
+README
+lib/DB_File/DB_Database.pm
+t/1_open_close.t
+t/2_read_write.t

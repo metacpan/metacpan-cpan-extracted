@@ -1,0 +1,4 @@
+name = "Dreamhack-Solitaire-Medici"
+# badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

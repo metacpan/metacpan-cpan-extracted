@@ -1,0 +1,139 @@
+# NAME
+
+Data::Paginator - Pagination with Moose
+
+# VERSION
+
+version 0.08
+
+# SYNOPSIS
+
+    use Data::Paginator;
+
+    my $pager = Data::Paginator->new(
+        current_page => 1,
+        entries_per_page => 10,
+        total_entries => 100,
+    );
+
+    print "First page: ".$pager->first_page."\n";
+    print "Last page: ".$pager->last_page."\n";
+    print "First entry on page: ".$pager->first."\n";
+    print "Last entry on page: ".$pager->last."\n";
+
+# DESCRIPTION
+
+This is yet another pagination module.  It only exists because none of the
+other pager modules are written using Moose.  Sometimes there is a Moose
+feature – MooseX::Storage, in my case – that you need. It's a pain when
+you can't use it with an existing module.  This module aims to be completely
+compatible with the venerable [Data::Page](https://metacpan.org/pod/Data::Page).  In fact, it's a pretty blatant
+copy of Data::Page, lifting code from some of it's methods.
+
+# SETS
+
+This module provides behavior compatible with [Data::PageSet](https://metacpan.org/pod/Data::PageSet), allowing you
+to break your pagination into sets.  For example, if you have a large number
+of pages to show and would like to allow the user to 'jump' X pages at a time,
+you can set the `pages_per_set` attribute to X and populate the links in your
+pagination control with the values from `previous_set` and `next_set`.
+
+# ATTRIBUTES
+
+## current\_page
+
+The current page.  Defaults to 1.  If you set this value to to a page number
+lesser than or greater than the range of the pager, then 1 or the last\_page
+will be returned instead.  It is safe to pass this numbers like -1000 or 1000
+when there are only 3 pages.
+
+## entries\_per\_page
+
+The number of entries per page, required at instantiation.
+
+## last\_page
+
+Returns the number of the last page.  Lazily computed, so do not set.
+
+## next\_set
+
+Returns the number of the next set or undefined if there is no next.
+
+## pages\_per\_set
+
+If you have a large number of pages to show and would like to allow the user
+to 'jump' X pages at a time, you can set the `pages_per_set` attribute to X
+and populate the links in your pagination control with the values from
+`previous_set` and `next_set`.
+
+## previous\_set
+
+Returns the set number of the previous set or undefined if there is no
+previous set.
+
+## total\_entries
+
+The total number of entries this pager is covering.  Required at
+instantiation.
+
+## first
+
+Returns the number of the first entry on the current page.
+
+## first\_page
+
+Always returns 1.
+
+# METHODS
+
+## entries\_on\_this\_page
+
+Returns the number of entries on this page.
+
+## first\_set
+
+Returns 1 if this Paginator has pages\_per\_set.  Otherwise returns undef.
+
+## last
+
+Returns the number of the last entry on the current page.
+
+## next\_page
+
+Returns the page number of the next page if one exists, otherwise returns
+false.
+
+## page\_for ($count)
+
+Returns the page number that the $count item appears on.  Returns undef if
+$count is outside the bounds of this Paginator.
+
+## previous\_page
+
+Returns the page number of the previous page if one exists, otherwise returns
+undef.
+
+## set\_for $page
+
+Returns the set number of the specified page.  Returns undef if the page
+exceeds the bounds of the Paginator.
+
+## splice
+
+Takes in an arrayref and returns only the values which are on the current
+page.
+
+# ACKNOWLEDGEMENTS
+
+Léon Brocard and his work on [Data::Page](https://metacpan.org/pod/Data::Page).
+
+# AUTHOR
+
+Cory G Watson <gphat@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2014 by Cory G Watson.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

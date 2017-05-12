@@ -1,0 +1,164 @@
+---
+abstract: 'DEPRECATED - Release tests to avoid insanity'
+author:
+  - 'Florian Ragwitz <rafl@debian.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 3.101421, CPAN::Meta::Converter version 2.101460'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-SanityTests
+requires:
+  Dist::Zilla::Plugin::InlineFiles: 0
+  Moose: 0
+  Test::EOL: 0
+  Test::NoTabs: 0
+  namespace::autoclean: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-SanityTests
+  homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-SanityTests
+  repository: git://github.com/rafl/dist-zilla-plugin-sanitytests.git
+version: 0.03
+x_Dist_Zilla:
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@FLORA/@Basic/GatherDir'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@FLORA/@Basic/PruneCruft'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@FLORA/@Basic/ManifestSkip'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@FLORA/@Basic/MetaYAML'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@FLORA/@Basic/License'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@FLORA/@Basic/Readme'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@FLORA/@Basic/ExtraTests'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@FLORA/@Basic/ExecDir'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@FLORA/@Basic/ShareDir'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@FLORA/@Basic/MakeMaker'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@FLORA/@Basic/Manifest'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@FLORA/@Basic/TestRelease'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@FLORA/@Basic/ConfirmRelease'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@FLORA/@Basic/UploadToCPAN'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: '@FLORA/MetaConfig'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: '@FLORA/MetaJSON'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: '@FLORA/PkgVersion'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: '@FLORA/PodSyntaxTests'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::NoTabsTests
+      name: '@FLORA/NoTabsTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::EOLTests
+      name: '@FLORA/EOLTests'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: '@FLORA/PodCoverageTests'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: '@FLORA/MetaResources'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::Authority
+      name: '@FLORA/Authority'
+      version: 0.01
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      name: '@FLORA/PodWeaver'
+      version: 3.101470
+    -
+      class: Dist::Zilla::Plugin::AutoPrereq
+      name: '@FLORA/AutoPrereq'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::Prereq
+      config:
+        Dist::Zilla::Plugin::Prereq:
+          phase: runtime
+          type: requires
+      name: Prereq
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::CompileTests
+      name: CompileTests
+      version: 1.100740
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 3.101421
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 3.101421
+  zilla:
+    class: Dist::Zilla
+    config:
+      is_trial: 0
+    version: 3.101421
+x_authority: cpan:FLORA

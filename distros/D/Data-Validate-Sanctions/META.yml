@@ -1,0 +1,34 @@
+---
+abstract: 'Validate a name against sanctions lists'
+author:
+  - 'binary.com <BINARY@cpan.org>'
+build_requires:
+  Class::Unload: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  FindBin: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Path::Tiny: '0'
+  Test::CheckDeps: '0.010'
+  Test::More: '0.96'
+  perl: '5.014000'
+configure_requires:
+  ExtUtils::MakeMaker: '6.48'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.007, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-Validate-Sanctions
+requires:
+  File::Temp: '0'
+  LWP::UserAgent: '0'
+  Text::CSV: '0'
+  perl: '5.014000'
+resources:
+  bugtracker: https://github.com/binary-com/perl-Data-Validate-Sanctions/issues
+  repository: git://github.com/binary-com/perl-Data-Validate-Sanctions.git
+version: '0.10'
+x_serialization_backend: 'YAML::Tiny version 1.66'

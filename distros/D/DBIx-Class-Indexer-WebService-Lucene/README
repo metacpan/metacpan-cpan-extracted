@@ -1,0 +1,131 @@
+NAME
+    DBIx::Class::Indexer::WebService::Lucene - Automatic indexing of
+    DBIx::Class objects via WebService::Lucene
+
+SYNOPSIS
+        package MySchema::Foo;
+    
+        use base qw( DBIx::Class );
+    
+        __PACKAGE__->load_components( qw( Indexed Core ) );
+        __PACKAGE__->table('foo');
+        __PACKAGE__->set_indexer('WebService::Lucene');
+        __PACKAGE__->add_columns(
+            foo_id => {
+                data_type         => 'integer',
+                is_auto_increment => 1
+            },
+            name => {
+                data_type => 'varchar',
+                size      => 10,
+                indexed   => {
+                    type => 'text',
+                }
+            },
+            location => {
+                data_type => 'varchar',
+                size      => 50,
+                indexed   => 'text'
+            }
+        );
+    
+        __PACKAGE__->has_many( widgets => 'widget' );
+        __PACKAGE__->add_index_fields(
+            widget => {
+                source => 'widgets.name'
+                type   => 'unstored'
+            },
+            widget_updated => {
+                source => 'widgets.ctime.epoch',
+            },
+            author => {
+                source => sub {
+                    map {
+                        join ' ', $_->first_name, $_->last_name
+                    } shift->authors
+                },
+            },
+            all => {
+                source => sub {
+                    my $self = shift;
+                    join ' ', map { $self->$_ } qw( name location );
+                }
+                type => 'unstored',
+                role => 'default_field' # will be search if no field prefix
+                                        # is specified
+            }
+        );
+    
+DESCRIPTION
+    This is a DBIx::Class component to make full-text indexing a seamless
+    part of database objects. All that is required is the registration of
+    desired fields for the index. Notice that fields are not necessarily the
+    same as columns. For instance, suppose you have a schema representing a
+    film and its actors. The index representing the film table may have a
+    fields called 'actor' which can have multiple values, depending on the
+    number of actors associated with the film.
+
+        package Film;
+    
+        __PACKAGE__->add_index_fields(
+            actor => {
+                type   => 'text',
+                source => 'actors.name'
+            },
+        );
+    
+METHODS
+  new( \%connect_info, $source_class )
+    Instantiates a new Lucene Web Service indexer.
+
+  setup_index( $source, $index )
+    If the index does not yet exist, this method will create it for you.
+
+  setup_fields( $source )
+    Normalizes the index fields so they all have hashref members with a
+    "type" key at a minimum. It all attemps to figure out which field will
+    be used as the primary identifier and what field might be used for the
+    last updated column (optional).
+
+  field_for_role( $source, $role )
+    Looks through the field list for a member with role equal to $role.
+
+  value_for_field( $object, $key )
+    Uses the indexed fields information to determine how to get the values
+    for $key out of $object.
+
+  as_document( [ $document ] )
+    If a document is passed to the method, it will replaces the document's
+    current fields with those outlined by the source's registered fields. If
+    no document is passed, it will construct a new
+    WebService::Lucene::Document object, populate it, and return it.
+
+  insert( $object )
+    Calls "update_or_create_document".
+
+  update( $object )
+    Calls "update_or_create_document".
+
+  delete( $object )
+    Deletes document from the index.
+
+  update_or_create_document( $object )
+    Will either update or add a document to the index, depending on its
+    existence in the index.
+
+SEE ALSO
+    * DBIx::Class
+    * DBIx::Class::Indexed
+    * WebService::Lucene
+    * The Lucene Web Service (http://www.lucene-ws.net/)
+
+AUTHOR
+    * Adam Paynter <adapay@cpan.org>
+    * Brian Cassidy <bricas@cpan.org>
+
+COPYRIGHT AND LICENSE
+    Copyright 2006 by Adam Paynter
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

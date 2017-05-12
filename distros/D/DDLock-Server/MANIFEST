@@ -1,0 +1,11 @@
+Changes
+ddlockd
+lib/DDLock/Server.pm
+lib/DDLock/Server/Client.pm
+lib/DDLock/Server/Client/DBI.pm
+lib/DDLock/Server/Client/DLMFS.pm
+lib/DDLock/Server/Client/Internal.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

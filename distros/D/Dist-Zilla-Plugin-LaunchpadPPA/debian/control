@@ -1,0 +1,15 @@
+Source: libdist-zilla-plugin-launchpadppa-perl
+Section: perl
+Priority: optional
+Maintainer: Sergei Svistunov <sergei-svistunov@yandex.ru>
+Build-Depends: debhelper (>= 8),
+ libmoose-perl, libdist-zilla-perl, libfile-pushd-perl, libdpkg-perl, libpath-class-perl
+Build-Depends-Indep: perl
+Standards-Version: 3.9.4
+Homepage: http://search.cpan.org/dist/Dist-Zilla-Plugin-LaunchpadPPA/
+
+Package: libdist-zilla-plugin-launchpadppa-perl
+Architecture: all
+Depends: ${misc:Depends}, ${perl:Depends},
+ libmoose-perl, libdist-zilla-perl, libfile-pushd-perl, libdpkg-perl, libpath-class-perl
+Description: Build and upload source package to ppa.launchpad.net

@@ -1,0 +1,29 @@
+---
+abstract: 'UU Encoding serializer for Dancer'
+author:
+  - 'Sawyer X <xsawyerx@cpan.org>'
+build_requires:
+  English: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Test::Fatal: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.31
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.102342, CPAN::Meta::Converter version 2.102400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Serializer-UUEncode
+requires:
+  Carp: 0
+  Dancer: 0
+  Dancer::Serializer::Abstract: 0
+  Storable: 0
+resources:
+  repository: http://github.com/xsawyerx/dancer-serializer-uuencode
+version: 0.02

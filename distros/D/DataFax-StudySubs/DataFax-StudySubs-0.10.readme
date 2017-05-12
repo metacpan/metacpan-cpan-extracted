@@ -1,0 +1,197 @@
+NAME
+    DataFax::StudySubs - DataFax common sub routines
+
+SYNOPSIS
+      use DataFax::StudySubs qw(:all);
+
+DESCRIPTION
+    This class contains the common sub-routines used in DataFax.
+
+Export Tag: all
+    The :all tag includes the all the methods in this module.
+
+      use DataFax::StudySubs qw(:all);
+
+    It includes the following sub-routines:
+
+  dfparam($var, $ar[,$val])
+    Input variables:
+
+      $var - variable name
+      $ar  - parameter hash or array ref
+      $val - value to be added or assigned
+
+    Variables used or routines called:
+
+      None
+
+    How to use:
+
+      use DataFax::DFstudyDB qw(dfparam);
+      my $ar = {a=>1,b=>25};
+      my $br = [1,2,5,10];
+      # for hash ref
+      my $va = $self->dfparam('a',$ar);  # set $va = 1
+      my $v1 = $self->dfparam('v1',$ar); # set $v1 = ""
+      my $v2 = $self->dfparam('b',$ar);  # set $v2 = 25
+      # for array ref
+      my $v3 = $self->dfparam(0,$br);    # set $v3 = 1
+      my $v4 = $self->dfparam(3,$br);    # set $v4 = 10
+      # add or assign values and return array ref
+      $self->dfparam('c',$ar,30);        # set $ar->{c} = 30
+      $self->dfparam(5,$br,50);          # set $br->[5] = 50
+
+    Return: $r - the value in the hash or empty string or array ref.
+
+    This method gets and sets the $var in $ar. If the varirable does not
+    exists in $ar, it tries in $self as well for 'get'.
+
+  get_dfparam($vs, $ar)
+    Input variables:
+
+      $vs  - a list of variable names separated by comma
+      $ar  - parameter hash or array ref
+
+    Variables used or routines called:
+
+      dfparam - get individual parameter
+
+    How to use:
+
+      use DataFax::DFstudyDB qw(:all);
+      my $ar = {a=>1,b=>25};
+      my ($va, $vb) = $self->get_dfparam('a,b',$ar); 
+
+    Return: array or array ref
+
+    This method gets multiple values for listed variables.
+
+  exec_cmd ($cmd, $pr)
+    Input variables:
+
+      $cmd - a full unix command with paraemters and arguments
+      $pr  - parameter hash ref
+        datafax_host - DataFax host name or ip address
+        local_host - local host name or ip address
+        datafax_usr - DataFax user name
+        datafax_pwd - DataFax user password
+
+    Variables used or routines called:
+
+      get_dfparam - get values for multiple parameters
+
+    How to use:
+
+      use DataFax::DFstudyDB qw(:all);
+      # Case 1: hosts are different and without id and password 
+      my $cmd = "cat /my/dir/file.txt"; 
+      my $pr = {datafax_host=>'dfsvr',local_host='svr2'};  
+      my @a = $self->exec_cmd($cmd,$pr);   # uses rsh to run the cmd 
+
+      # Case 2: different hosts with id and password 
+      my $pr = {datafax_host=>'dfsvr',local_host='svr2',
+         datafax_usr=>'fusr', datafax_pwd=>'pwd' };  
+      my @a = $self->exec_cmd($cmd,$pr);   # uses rexec  
+
+      # Case 2: hosts are the same 
+      my $pr = {datafax_host=>'dfsvr',local_host='dfsvr'};  
+      my $ar = $self->exec_cmd('/my/file.txt',$pr); # case 2:  
+
+    Return: array or array ref
+
+    This method opens a file or runs a command and return the contents in
+    array or array ref.
+
+  debug_level($n)
+    Input variables:
+
+      $n   - a number between 0 and 100. It specifies the
+             level of messages that you would like to
+             display. The higher the number, the more
+             detailed messages that you will get.
+
+    Variables used or routines called: None.
+
+    How to use:
+
+      $self->debug_level(2);     # set the message level to 2
+      print $self->debug_level;  # print current message level
+
+    Return: the debug level or set the debug level.
+
+  echo_msg($msg, $lvl, $fh)
+    Input variables:
+
+      $msg - the message to be displayed. No newline
+             is needed in the end of the message. It
+             will add the newline code at the end of
+             the message.
+      $lvl - the message level is assigned to the message.
+             If it is higher than the debug level, then
+             the message will not be displayed.
+      $fh  - file handler, or set the file hanlder in this parameter
+             $ENV{FH_DEBUG_LOG}
+
+    Variables used or routines called:
+
+      debug_level - get debug level.
+
+    How to use:
+
+      # default msg level to 0
+      $self->echo_msg('This is a test");
+      # set the msg level to 2
+      $self->echo_msg('This is a test", 2);
+
+    Return: None.
+
+    This method will display message or a hash array based on *debug_level*
+    level. If *debug_level* is set to '0', no message or array will be
+    displayed. If *debug_level* is set to '2', it will only display the
+    message level ($lvl) is less than or equal to '2'. If you call this
+    method without providing a message level, the message level ($lvl) is
+    default to '0'. Of course, if no message is provided to the method, it
+    will be quietly returned.
+
+    This is how you can call *echo_msg*:
+
+      my $df = DataFax->new;
+         $df->echo_msg("This is a test");   # default the msg to level 0
+         $df->echo_msg("This is a test",1); # assign the msg as level 1 msg
+         $df->echo_msg("Test again",2);     # assign the msg as level 2 msg
+         $df->echo_msg($hrf,1);             # assign $hrf as level 1 msg
+         $df->echo_msg($hrf,2);             # assign $hrf as level 2 msg
+
+    If *debug_level* is set to '1', all the messages with default message
+    level, i.e., 0, and '1' will be displayed. The higher level messages
+    will not be displayed.
+
+    This method displays or writes the message based on debug level. The
+    filehandler is provided through $fh or $ENV{FH_DEBUG_LOG}, and the
+    outputs are written to the file.
+
+  disp_param($arf,$lzp, $fh)
+    Input variables:
+
+      $arf - array reference
+      $lzp - number of blank space indented in left
+      $fh  - file handler
+
+    Variables used or routines called:
+
+      echo_msg - print debug messages
+      debug_level   - set debug level
+      disp_param - recusively called
+
+    How to use:
+
+      use DataFax::StudySubs qw(:echo_msg);
+      my $self= bless {}, "main";
+      $self->disp_param($arf);
+
+    Return: Display the content of the array.
+
+    This method recursively displays the contents of an array. If a
+    filehandler is provided through $fh or $ENV{FH_DEBUG_LOG}, the outputs
+    are written to the file.
+

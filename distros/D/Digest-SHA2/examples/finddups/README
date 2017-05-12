@@ -1,0 +1,84 @@
+Finding Duplicate Files
+by Julius C. Duque
+=======================
+
+Using "find"
+------------
+find  is  a  small  but  powerful utility that  is  available  on  all
+UNIX/Linux  systems. The following command, for example, tells find to
+descend  into /tmp (and recursively descend into all subdirectories it
+encounters),  and print to the standard output the names of all  files
+and subdirectories it finds.
+
+        find /tmp -name "*"
+
+find's output is similar to this:
+
+        /tmp
+        /tmp/tex2pdf-root
+        /tmp/Gladman
+        /tmp/Gladman/sha2.c
+        /tmp/Gladman/uitypes.h
+        /tmp/Gladman/test.c
+        /tmp/Gladman/sha2.h
+        /tmp/Gladman/a.out
+        /tmp/guile-1.6.4
+
+The  best  feature of find, just like any good UNIX tool, is that  its
+output  can be redirected as input to another program. So, instead  of
+displaying find's output to the screen, you can use a pipe to give its
+output to the next program for processing, as in
+
+        find /tmp -name "*" | ./sha
+
+
+The "sha" Perl Script
+---------------------
+The  output of the Perl script, sha, consists of a 40-character  SHA-1
+digest,  followed  by  two single spaces, and lastly,  followed  by  a
+filename.
+
+The output of the command
+
+        find /tmp -name "*" | ./sha
+
+gives us something like:
+
+    912e2e1bea5c3d19393169c58009cd67b816c8eb  /tmp/Gladman/sha2.c
+    4107f5678cb667ad2756d5dd3f4a27035301aa49  /tmp/Gladman/uitypes.h
+    1b11d21492d14f49be8d462607e307012570fa6c  /tmp/Gladman/test.c
+    1b11d21492d14f49be8d462607e307012570fa6c  /tmp/Gladman/sha2.h
+    b1b48c7339e998571e754383b0f50ab827b326c3  /tmp/Gladman/a.out
+
+
+The "finddups" Perl Script
+--------------------------
+"finddups"  produces  an associative array, %dups, using  the  digests
+computed by sha (the first 64 characters) as keys.
+
+If  finddups is  called  with the --verbose (or its  short  form,  -v)
+options  switched  on, the digests for duplicate files are printed  as
+well. For example,
+
+        find ./testdir -name "*" | ./sha | ./finddups --verbose
+
+or
+
+        find ./testdir -name "*" | ./sha | ./finddups -v
+
+produces something like:
+
+        330acbc4480be85ffc3b89a3e89dae74d2dd322eee9ca38a88cebac1f60a133a  
+         ./testdir/sha 
+         ./testdir/testfile2
+
+        71775835eb1b9a75a7065da28ef689e39a696da870dc95d939674c5ae6ce7a70  
+         ./testdir/finddups 
+         ./testdir/testfile1
+
+Here,  the files "sha" and "testfile2" are identical.  Meanwhile,
+"finddups" and "testfile1" are identical as well.
+
+An extended discussion of this technique is featured in the December
+2003 issue of The Perl Journal, written by Julius C. Duque.
+

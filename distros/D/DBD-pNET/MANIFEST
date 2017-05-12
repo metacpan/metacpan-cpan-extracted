@@ -1,0 +1,34 @@
+ChangeLog		Modification logfile
+MANIFEST		This file
+Makefile.PL		Makefile generator
+README			General notes on installation and use
+README.tests		Notes on the test suite
+README.ingres		Notes on 'make test' against an Ingres database
+bindparam.h
+dbdimp.c
+dbdimp.h
+pNET.pm			Perl module
+pNET.xs
+pNETagent.PL		pNET agent
+t/00base.t		Test: Loading module, starting and stopping a server
+t/10dsnlist.t		Test: Generating list of DSN's
+t/20createdrop.t	Test: Create and drop a table
+t/30insertfetch.t	Test: Insert and fetch rows
+t/40bindparam.t		Test: bind_param, bind_col, etc.
+t/40blobs.t		Test: Working with blobs
+t/40listfields.t	Test: Statement attributes
+t/40nulls.t		Test: Working with NULLs
+t/40numrows.t		Test: $sth->rows and friends
+t/50chopblanks.t	Test: $sth->{'ChopBlanks'}
+t/Ingres.dbtest         Core of testing Ingres database access
+t/Ingres.mtest          Core of testing Ingres module
+t/README		Notes on the generic test suite
+t/ak-dbd.t		Test: General DBI
+t/lib.pl		Core of test suite
+t/mSQL.dbtest		Core of testing mSQL database access
+t/mSQL.mtest		Core of testing mSQL module
+t/mysql.dbtest		Core of testing mysql database access
+t/mysql.mtest		Core of testing mysql module
+t/pNET.dbtest		Core of testing pNET database access (dummy)
+t/pNET.mtest		Core of testing pNET database access
+t/skeleton.test		Skeleton test for creating new tests

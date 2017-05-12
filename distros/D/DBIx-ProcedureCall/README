@@ -1,0 +1,64 @@
+DBIx::ProcedureCall version 0.10
+=============================
+
+NOTE:
+While the interface provided by DBIx::ProcedureCall is 
+database-independent,
+only Oracle and PostgreSQL are currently implemented.
+
+When developing applications for a database that supports
+stored procedures, it is a good 
+idea to put all your database access code right into the
+database..
+
+This module provides a convenient way to call these stored
+procedures from Perl by creating wrapper subroutines that
+produce the necessary SQL statements, bind parameters and run
+the query.
+
+	use DBIx::ProcedureCall qw(sysdate);
+	my $conn = DBI->connect(.....);  
+	print sysdate($conn);
+	
+There is also a command line interface: After setting the
+appropriate environment variable with the connection information,
+you can do
+
+	perl -MDBIx::ProcedureCall::CLI -e function sysdate
+
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   # if you want to run  Oracle tests
+   export ORACLE_USERID = 'username/passwd@dbname'
+   # if you want to run PostgreSQL tests
+   export PGUSER = 'username'
+   make test
+   make install
+   
+The ORACLE_USERID and PGUSER environment variables are
+only needed to connect to the database
+during "make test" and will not be stored anywhere.
+The tests use the database read-only.
+
+DEPENDENCIES
+
+This module strictly speaking does not require, but is pretty useless without
+these other modules:
+
+  DBI
+  DBD::Oracle or DBD::Pg
+  
+
+COPYRIGHT AND LICENCE
+
+
+Copyright (C) 2004-06 Thilo Planz
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+

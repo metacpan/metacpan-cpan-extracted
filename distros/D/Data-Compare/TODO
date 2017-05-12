@@ -1,0 +1,13 @@
+add tests to see if plugin loading fails appropriately
+
+fiddle so that we can:
+  optionally only load certain plugins
+  optionally load all plugins except foo bar and baz
+  default to loading all
+the best way to do this is to have our own import() and do it at
+use() time, so dumping Exporter
+
+be paranoid about plugins trampling on each other?
+
+what about plugins overriding default behaviour?
+  hehe, Data::Compare::Approximate :-)

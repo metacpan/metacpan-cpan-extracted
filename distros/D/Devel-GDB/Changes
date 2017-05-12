@@ -1,0 +1,42 @@
+Revision history for Perl extension Devel::GDB.
+
+
+0.01  Mon Oct 15 14:04:09 2001
+        - original version; created by h2xs 1.21 with options
+                -X -n Devel::GDB
+
+1.0   Mon Oct 15 14:30    2001 jezra <jezra@emc.com>
+        - modified as part of creation
+
+1.1   Thu Oct 18 10:42    2001 jezra <jezra@emc.com>
+        - more exmaples and documentation
+
+1.2   Wed Oct 24 11:52    2001 jezra <jezra@emc.com>
+        - Makefile.PL fix
+
+1.21  Thu Nov 15 16:00    2001 jezra <jezra@emc.com>
+        - documentation ..
+
+1.22  Sat Nov 24 14:00    2001 Srebrenko Sehic <haver@insecure.dk>
+        - example fix
+
+1.23  Fri Oct 22 14:00    2004 jezra <jezra@cpan.org>
+        - fixed regular expression to support gdb's "> " prompt
+
+2.0   Tue Feb 20 14:59     2007 Antal Novak <afn@cpan.org>
+        - This is (almost) a complete rewrite of the codebase, so many things
+          have changed.
+        - New features:
+            - Devel::GDB now uses the GDB/MI interpreter (rather than the
+              console interpreter) to communicate with GDB.
+            - Added send_cmd() family of functions to support GDB/MI commands.
+            - Added support for threads.
+        - Deprecated the old get() syntax; callers wishing to use this
+          must explicitly set $Devel::GDB::DEPRECATED = 1.
+
+2.01  Sun Jan 20 13:32   2008 Geert De Peuter <varia@depeuter.org>
+	- bug fix in _unescape function
+
+2.02 Mon Jan 28 16:22:38 2008 Josef Ezra <jezra@cpan.org>
+        - fixed t/expect.t example after it failed on darwin 8.10.1
+

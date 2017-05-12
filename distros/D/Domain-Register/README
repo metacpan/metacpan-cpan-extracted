@@ -1,0 +1,70 @@
+Domain-Register-TK
+
+Domain::Register::TK allows developers to create and maintain domains within 
+the .TK namespace using Dot TK's reseller program API, without having to know 
+the details of how the API program works. Domains can be checked (with price 
+provided in local currency) and updated, including using URL forwarding 
+services, or manipulating nameserver references.
+
+More information about the Dot TK Reseller API program can be found at 
+http://www.dot.tk/en/pageE12.html
+
+DEPENDENCIES
+
+Please note: if you're reading from source, please note that there are 
+dependencies.
+
+The included test suite inside "make test" explicity tests for the modules
+
+XML::Simple
+LWP
+
+*but*
+
+Because the transport used for communication is HTTPS, there needs to be a 
+library installed to enable Secure Socket Layer communications. OpenSSL and 
+Crypt::SSL are suggested as possible options. The test suite will only run
+successfully if this is done.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Domain::Register::TK
+
+You can also look for information at:
+
+    RT, CPAN's request tracker
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Domain-Register-TK
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Domain-Register-TK
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Domain-Register-TK
+
+    Search CPAN
+        http://search.cpan.org/dist/Domain-Register-TK/
+
+
+COPYRIGHT AND LICENCE
+
+Copyright (c) 2010 Dot TK Ltd. 
+
+All Rights Reserved. This module is free software; you can redistribute it and/or modify it 
+under the terms of either:  a) the GNU General Public License as published by the Free Software 
+Foundation; either version 1, or (at your option) any later version, or b) the "Artistic License",
+that is, the same terms as Perl itself.
+
+This module requires that the client user have an active account with Dot TK L<http://www.dot.tk> 
+in order to access it's key functionality

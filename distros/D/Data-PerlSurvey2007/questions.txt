@@ -1,0 +1,63 @@
+Here are the questions asked in the 2007 Perl Survey:
+
+SECTION 1: Basic Demographics
+
+    * Sex
+    * Year of birth
+    * Country of birth
+    * Country of residence
+    * Primary language spoken
+    * Annual personal income (USD equivalent)
+    * What industry/ies do you work in?
+
+SECTION 2: Programming Perl and Other Languages
+
+    * How many years have you been programming Perl?
+    * How many years have you been programming in any language?
+    * What other languages are you fluent in?
+    * What did we miss?
+    * How much of your programming, in the last year, has been in Perl?
+    * What versions of Perl have you used in the last year?
+    * What platforms have you used Perl on in the last year?
+
+SECTION 3: Perl Community
+
+For these sections, check any items you have done in the last twelve months.
+
+Mailing lists and websites
+
+Have you...
+
+    * Been a member/subscriber of a Perl mailing list or Usenet newsgroup
+    * ... and posted to it
+    * Been a member/subscriber of a Perl Mongers mailing list
+    * ... and posted to it
+    * Contributed to Perlmonks
+    * Contributed to other Perl websites (forums, wikis, blogs)
+
+Gatherings
+
+Have you...
+
+    * Attended a Perl Mongers meeting
+    * ... in another city
+    * Attended a Perl conference, or any other conference with considerable Perl content
+    * ... more than 1000km (approx 600 miles) away
+    * Presented at a Perl conference, Perl Monger meeting, or about Perl to any other group
+
+Open source software contributions
+
+Have you...
+
+    * Contributed to CPAN
+    * Contributed to Perl 5 (via p5p)
+    * Contributed to Perl 6 (pugs, parrot, etc)
+    * Contributed Perl code to other open source software projects
+    * Founded or led other open source projects in Perl
+    * Submitted bug reports or feedback to the authors of Perl software
+
+Also:
+
+    * If you contribute to CPAN, how many distributions do you currently maintain?
+
+

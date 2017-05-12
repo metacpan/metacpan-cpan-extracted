@@ -1,0 +1,6 @@
+Revision history for Perl extension DAT::TimTen.
+
+0.01  Mon Nov 28 13:04:42 2016
+	- original version; created by h2xs 1.23 with options
+		-AX DAT::TimTen
+

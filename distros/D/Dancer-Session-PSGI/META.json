@@ -1,0 +1,229 @@
+{
+   "abstract" : "Let Plack::Middleware::Session handle Dancer's session",
+   "author" : [
+      "franck cuny <franck@lumberjaph.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 3.101461",
+   "license" : "perl_5",
+   "meta-spec" : {
+      "url" : "http://github.com/dagolden/cpan-meta/",
+      "version" : 2
+   },
+   "name" : "Dancer-Session-PSGI",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer::Session::Abstract" : "0",
+            "Dancer::SharedData" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0"
+         }
+      }
+   },
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer::Session::PSGI"
+      },
+      "homepage" : "http://search.cpan.org/perldoc?Dancer::Session::PSGI",
+      "repository" : {
+         "url" : "git://github.com/franckcuny/dancer-session-psgi.git"
+      }
+   },
+   "version" : "0.01",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "name" : "@Git/Check",
+            "version" : "1.101330"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "name" : "@Git/Commit",
+            "version" : "1.101330"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "name" : "@Git/Tag",
+            "version" : "1.101330"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "name" : "@Git/Push",
+            "version" : "1.101330"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@Filter/GatherDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Filter/PruneCruft",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@Filter/ManifestSkip",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Filter/MetaYAML",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Filter/License",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@Filter/Readme",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@Filter/ExtraTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Filter/ExecDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@Filter/ShareDir",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@Filter/MakeMaker",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Filter/Manifest",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Filter/TestRelease",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Filter/ConfirmRelease",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@Filter/UploadToCPAN",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "MetaConfig",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "MetaJSON",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "PkgVersion",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "PodSyntaxTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "PodCoverageTests",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "EOLTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "MetaResources",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "PodWeaver",
+            "version" : "3.100710"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereq",
+            "name" : "AutoPrereq",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeFromPod",
+            "name" : "ReadmeFromPod",
+            "version" : "0.11"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckChangeLog",
+            "name" : "CheckChangeLog",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "UploadToCPAN",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "3.101461"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "3.101461"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "3.101461"
+      }
+   }
+}
+

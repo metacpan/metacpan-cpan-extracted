@@ -1,0 +1,22 @@
+0.06 2016-11-10
+ - Fix a POD tag typo
+ - Packaging updates, including fixing a missing META.yml
+
+0.05 2014-06-05
+ - This release is done by SHARYANTO
+ - Add 'format' argument (RT#95998)
+ - Support '13 Nov 1986' format (RT#95999)
+
+0.04 2009-11-18
+ - Improve Date::Extract->extract default handling
+ - Documentation improvements
+ - Repackaging fixes
+
+0.03 2008-05-12
+ - Typo fix so the default 'floating' timezone works
+
+0.02 2008-02-13
+ - month_day regex was backwards, reported and fixed by TSUKAMOTO
+
+0.01 2007-12-13
+ - First version, released on an unsuspecting world.

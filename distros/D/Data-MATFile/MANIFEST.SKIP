@@ -1,0 +1,17 @@
+^(build|make-pod)\.pl$
+blib/.*
+.gitignore
+.git/.*
+Makefile$
+pm_to_blib
+MYMETA.*
+.*.bak
+t/data\.mat
+guff.*
+mat-examples\.txt
+lib/Data/MATFile\.pod\.tmpl
+# MATFile examples
+^[^/]+\.mat$
+^runc\.pl$
+# Author tests
+xt/.*$

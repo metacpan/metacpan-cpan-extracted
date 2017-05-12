@@ -1,0 +1,19 @@
+0.04  2004-01-26
+
+- Found a bug in Date::Manip 5.42a which prevented it from parsing our
+  format_datetime() handoff string... changed the format.
+
+0.03  2004-01-21
+
+- Changed the tests so that they override any Date::Manip config file
+  when setting the timezone.
+
+0.02  2004-01-20
+
+- Changed the format_datetime() code to use a different format when
+  handing off to Date::Manip 
+- Minor POD bug fixed
+
+0.01  2003-07-01
+
+- First release

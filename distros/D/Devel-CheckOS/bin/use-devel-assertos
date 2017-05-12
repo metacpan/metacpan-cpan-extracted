@@ -1,0 +1,172 @@
+#!perl
+
+use strict;
+# NB no warnings because of "implicit split to @_"
+
+$/ = undef;
+
+use File::Spec;
+use Data::Compare;
+
+my @files = grep { -f $_ } qw(Makefile.PL Build.PL);
+
+(my @oses = @ARGV) || die("You must specify at least one OS\n");
+
+eval "use Devel::AssertOS"; # to load AssertOS and CheckOS
+
+my $verbose = 1;
+if($oses[0] eq '-q') { # mostly to make tests shut the hell up
+    $verbose = 0;
+    shift @oses;
+}
+
+if($oses[0] eq '-l') {
+    print join(', ', Devel::CheckOS::list_platforms())."\n";
+    exit(0);
+}
+
+
+if(!-e 'MANIFEST') {
+    open(MANIFEST, '>>MANIFEST') || die("Can't update MANIFEST\n");
+    print MANIFEST "MANIFEST\n";
+    close(MANIFEST);
+}
+if(!@files) { # neither Makefile.PL no Build.PL exists, so create Makefile.PL
+    open(MANIFEST, '>>MANIFEST') || die("Can't update MANIFEST\n");
+    print MANIFEST "Makefile.PL\n";
+    close(MANIFEST);
+}
+
+push @files, 'Makefile.PL' unless(@files);
+
+# NB can't just use scalar list_platforms cos that won't tell us that,
+# eg, Linux::v2_6 also uses Linux
+foreach my $os (@oses) {
+    my $oldinc = { map { $_ => $INC{$_} } keys %INC }; # clone
+    eval "use Devel::AssertOS qw($os)";
+    if(Compare(\%INC, $oldinc)) {
+        print STDERR "Couldn't find a module for $os\n";
+        exit(1);
+    }
+}
+my @modulefiles = keys %{{map { $_ => $INC{$_} } grep { /Devel/i && /(Check|Assert)OS/i } keys %INC}};
+
+mkdir 'inc';
+mkdir 'inc/Devel';
+mkdir 'inc/Devel/AssertOS';
+print "Extra directories created under inc/\n" if($verbose);
+
+open(MANIFEST, '>>MANIFEST') || die("Can't update MANIFEST\n");
+use Data::Dumper;
+foreach my $modulefile (@modulefiles) {
+    my $fullfilename = '';
+    SEARCHINC: foreach (@INC) {
+        if(-e File::Spec->catfile($_, $modulefile)) {
+            $fullfilename = File::Spec->catfile($_, $modulefile);
+            last SEARCHINC;
+        }
+    }
+    die("Can't find a file for $modulefile\n") unless(-e $fullfilename);
+
+    (my $module = join('::', split(/\W+/, $modulefile))) =~ s/::pm/.pm/;
+    my @dircomponents = ('inc', (split(/::/, $module)));
+    my $file = pop @dircomponents;
+
+    mkdir File::Spec->catdir(@dircomponents);
+    
+    open(PM, $fullfilename) ||
+        die("Can't read $fullfilename: $!");
+    (my $pm = <PM>) =~ s/package Devel::/package #\nDevel::/;
+    close(PM);
+    open(PM, '>'.File::Spec->catfile(@dircomponents, $file)) ||
+        die("Can't write ".File::Spec->catfile(@dircomponents, $file).": $!");
+    print PM $pm;
+    print "Copied $fullfilename to\n       ".File::Spec->catfile(@dircomponents, $file)."\n" if($verbose);
+    close(PM);
+
+    print MANIFEST join('/', @dircomponents, $file)."\n";
+}
+close(MANIFEST);
+print "Added necessary modules\n" if($verbose);
+print "Updated MANIFEST\n" if($verbose);
+
+foreach my $file (@files) {
+    my $contents = '';
+    if(open(FILE, $file)) { $contents = <FILE>; close(FILE); }
+    open(FILE, ">$file") || die("Can't write $file\n");
+    print FILE 'use lib inc; use Devel::AssertOS qw('.
+        join(' ', @oses).
+        ");\n\n";
+    print FILE $contents;
+    close(FILE);
+    print "Modified $file\n" if($verbose);
+}
+
+=head1 NAME
+
+use-devel-assertos - a script to package Devel::AssertOS modules
+with your code.
+
+=head1 DESCRIPTION
+
+This script, when run in the directory in which your shiny new module
+lives, will bundle whichever Devel::AssertOS modules you ask it to
+in the C<inc> directory, and update your Makefile.PL (or Build.PL)
+appropriately.  If neither exists, it will create a Makefile.PL.
+The MANIFEST file is updated if any files are created.
+
+=head1 SYNOPSIS
+
+    use-devel-assertos NetBSD OpenBSD FreeBSD
+
+But note that if you use C<Module::Install> you are encouraged to use
+C<Module::Install::AssertOS> instead.
+
+=head1 USAGE
+
+In the example above, this will insert code to make your module
+depend on one of the specified OSes, as well as update Makefile.PL /
+Build.PL / MANIFEST.  By default it's rather noisy, but you can
+suppress that by passing -q as the first parameter.
+
+=head1 SUPPORTED PLATFORMS
+
+To get a list of supported platforms, do this:
+
+    use-devel-assertos -l
+
+=head1 WARNINGS, BUGS and FEEDBACK
+
+This script has not been thoroughly tested.  You should check by
+hand that it has done what you expected after running it.
+
+If you use Module::Build::Compat to write a Makefile.PL, then you
+will need to re-run this script whenever you have generated a new
+Makefile.PL.
+
+I welcome feedback about my code, including constructive criticism.
+Bug reports should be made using L<http://rt.cpan.org/> or by email.
+
+=head1 SEE ALSO
+
+L<Devel::AssertOS>
+
+L<Devel::CheckOS>
+
+L<Module::Install::AssertOS>
+
+=head1 AUTHOR
+
+David Cantrell E<lt>F<david@cantrell.org.uk>E<gt>
+
+=head1 COPYRIGHT and LICENCE
+
+Copyright 2007 David Cantrell
+
+This software is free-as-in-speech software, and may be used, distributed, and modified under the terms of either the GNU General Public Licence version 2 or the Artistic Licence. It's up to you which one you use. The full text of the licences can be found in the files GPL2.txt and ARTISTIC.txt, respectively.
+
+=head1 CONSPIRACY
+
+This software is also free-as-in-mason.
+
+=cut

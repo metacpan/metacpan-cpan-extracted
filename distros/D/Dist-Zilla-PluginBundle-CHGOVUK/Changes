@@ -1,0 +1,27 @@
+Revision history for Dist-Zilla-PluginBundle-CHGOVUK
+
+0.07  2014-08-04
+  - Deprecated 'CopyFilesFromRelease'
+
+0.06  2014-07-25
+  - Swith default installer from MakeMaker to ModuleBuild
+  - Remove ReversionOnRelease and ConfirmRelease
+  - Remove copy of META.json and build_file from build
+  - Add Git::CommitBuild plugin
+  - Change prereqs gathering default to Prereqs::FromCPANfile
+
+0.05  2014-05-22
+  - Get version number from perl module (not git tag)
+  - Copy build file and META.json back from build
+
+0.04  2014-05-12
+  - Fix broken build
+
+0.03  2014-05-09
+  - Add prereqs option to make prereqs gathering configurable
+
+0.02  2014-03-09
+  - Use CHGOVUK PluginBundle to build itself
+
+0.01  2014-03-09
+  - Initial release

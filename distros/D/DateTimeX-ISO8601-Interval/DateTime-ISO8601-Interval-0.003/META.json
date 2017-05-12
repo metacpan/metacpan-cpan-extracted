@@ -1,0 +1,65 @@
+{
+   "abstract" : "Provides a means of parsing and manipulating ISO-8601 intervals and durations.",
+   "author" : [
+      "Brian Phillips <bphillips@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.015, CPAN::Meta::Converter version 2.141170",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DateTime-ISO8601-Interval",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Pod::Coverage::TrustPod" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : "0",
+            "DateTime::Duration" : "0",
+            "DateTime::Format::ISO8601" : "0",
+            "Params::Validate" : "0",
+            "overload" : "0",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "File::Spec" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Test::More" : "0",
+            "perl" : "5.006"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/brianphillips/DateTimeX-ISO8601-Interval/issues"
+      },
+      "homepage" : "http://search.cpan.org/dist/DateTimeX-ISO8601-Interval/",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/brianphillips/DateTimeX-ISO8601-Interval.git",
+         "web" : "https://github.com/brianphillips/DateTimeX-ISO8601-Interval"
+      }
+   },
+   "version" : "0.003",
+   "x_authority" : "cpan:BPHILLIPS"
+}
+

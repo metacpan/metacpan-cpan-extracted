@@ -1,0 +1,191 @@
+#!/usr/bin/env perl
+# ABSTRACT: Render data structures for easy searching and parsing
+# PODNAME: crumbr
+use strict;
+use warnings;
+use Carp;
+use Pod::Usage qw< pod2usage >;
+use Getopt::Long qw< :config gnu_getopt >;
+use English qw< -no_match_vars >;
+
+our $VERSION = '0.0.1';
+
+use Data::Crumbr;
+
+my %config = (
+   encoding => 'utf8',
+   output   => '-',
+   profile  => 'Default',
+   type     => 'yaml',
+);
+GetOptions(
+   \%config,
+   qw<
+     usage! help! man! version!
+     encoding|e=s
+     output|o=s
+     profile|p=s
+     type|t=s
+     >
+) or pod2usage(-verbose => 99, -sections => 'USAGE');
+pod2usage(message => "$0 $VERSION", -verbose => 99, -sections => ' ')
+  if $config{version};
+pod2usage(-verbose => 99, -sections => 'USAGE') if $config{usage};
+pod2usage(-verbose => 99, -sections => 'USAGE|EXAMPLES|OPTIONS')
+  if $config{help};
+pod2usage(-verbose => 2) if $config{man};
+
+# Script implementation here
+crumbr(
+   profile => $config{profile},
+   encoder => {output => get_output(\%config)}
+)->(read_data(\%config, $ARGV[0]));
+
+sub read_data {
+   my ($config, $filename) = @_;
+   $filename //= '-';
+   my $reader = __PACKAGE__->can("read_data_$config->{type}")
+     or die "unsupported input type $config->{type}\n";
+   return $reader->($config, $filename);
+} ## end sub read_data
+
+sub read_data_yaml {
+   my ($config, $filename) = @_;
+   my $unicode_string = slurp($filename, $config{encoding});
+
+   for my $class (qw< YAML::XS YAML YAML::Tiny >) {
+      eval "use $class";
+      next if $EVAL_ERROR;
+      my $function = $class->can('Load');
+      return $function->($unicode_string);
+   } ## end for my $class (qw< YAML::XS YAML YAML::Tiny >)
+   die "cannot find any YAML module\n";
+   return;
+} ## end sub read_data_yaml
+
+sub read_data_json {
+   my ($config, $filename) = @_;
+   my $unicode_string = slurp($filename, $config{encoding});
+
+   require Encode;
+   my $utf8_octets =
+     Encode::encode('UTF-8', $unicode_string, Encode::FB_CROAK());
+
+   my @cs = qw< Cpanel::JSON::XS JSON::XS Mojo::JSON JSON::PP >;
+   for my $class (@cs) {
+      eval "use $class";
+      next if $EVAL_ERROR;
+      my $function = $class->can('decode_json');
+      my $retval = eval { $function->($utf8_octets) };
+      die "errors parsing input: $EVAL_ERROR\n"
+        if $EVAL_ERROR;
+      return $retval;
+   } ## end for my $class (@cs)
+   die "cannot find any JSON module\n";
+   return;
+} ## end sub read_data_json
+
+sub slurp_octets {
+   require Encode;
+   return Encode::encode('UTF-8', slurp(@_), Encode::FB_CROAK());
+}
+
+sub slurp {
+   my ($filename, $encoding) = @_;
+   my $fh = \*STDIN;
+   if ($filename ne '-') {
+      $fh = undef;
+      open $fh, '<', $filename
+        or die "open('$filename'): $OS_ERROR\n";
+   }
+   binmode $fh, ":encoding($encoding)";
+   local $INPUT_RECORD_SEPARATOR = undef;    # slurp mode
+   return <$fh>;
+} ## end sub slurp
+
+sub get_output {
+   my ($config) = @_;
+   my $fh = \*STDOUT;
+   if ($config->{output} ne '-') {
+      $fh = undef;
+      open $fh, '>', $config->{output}
+        or die "open('$config->{output}'): $OS_ERROR\n";
+   }
+   binmode $fh, ":encoding($config->{encoding})";
+   return $fh;
+} ## end sub get_output
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+crumbr - Render data structures for easy searching and parsing
+
+=head1 VERSION
+
+version 0.1.1
+
+=head1 DESCRIPTION
+
+Bottom line is: look for L<https://github.com/polettix/teepee teepee>.
+
+=head1 USAGE
+
+   crumbr [--usage] [--help] [--man] [--version]
+
+   crumbr
+
+=head1 EXAMPLES
+
+   shell$ crumbr
+
+=head1 OPTIONS
+
+=for l'autore, da riempire:
+   Una descrizione di tutte le opzioni possibili nella chiamata allo script
+
+=over
+
+=item --help
+
+print a somewhat more verbose help, showing usage, this description of
+the options and some examples from the synopsis.
+
+=item --man
+
+print out the full documentation for the script.
+
+=item --usage
+
+print a concise usage line and exit.
+
+=item --version
+
+print the version of the script.
+
+=back
+
+=head1 CONFIGURATION AND ENVIRONMENT
+
+crumbr requires no configuration files or environment variables.
+
+=head1 AUTHOR
+
+Flavio Poletti <polettix@cpan.org>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Flavio Poletti <polettix@cpan.org>
+
+This module is free software.  You can redistribute it and/or
+modify it under the terms of the Artistic License 2.0.
+
+This program is distributed in the hope that it will be useful,
+but without any warranty; without even the implied warranty of
+merchantability or fitness for a particular purpose.
+
+=cut

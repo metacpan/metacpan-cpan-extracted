@@ -1,0 +1,9 @@
+Revision history for Perl extension Date::Hijri.
+
+0.02  Tue Aug 26 12:12:59 CEST 2003
+        - first public version
+
+0.01  Mon Aug 18 17:41:01 2003
+	- original version; created by h2xs 1.22 with options
+		-AXc -n Date::Hijri
+

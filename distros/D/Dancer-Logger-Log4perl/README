@@ -1,0 +1,242 @@
+SYNOPSIS
+    In your config.yml
+
+       logger: log4perl
+       log: core
+       log4perl:
+          config_file: log4perl.conf
+
+    In your log4perl.conf
+
+       log4perl.rootLogger              = DEBUG, LOG1
+       log4perl.appender.LOG1           = Log::Log4perl::Appender::File
+       log4perl.appender.LOG1.filename  = /var/log/mylog.log
+       log4perl.appender.LOG1.mode      = append
+       log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
+       log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
+
+DESCRIPTION
+    This class is an interface between Dancer's logging engine abstraction
+    layer and the Log::Log4perl library. In order to use it, you have to set
+    the `logger' engine to `log4perl'.
+
+    You can use either Log::Log4perl or Log::Log4perl::Tiny. If you want to
+    use the latter, just specify the `tiny' option in the specific
+    configuration.
+
+    You can decide to let the module perform the initialisation of the
+    logging system, or you can do it by yourself. In the latter case, you
+    can pass the `no_init' parameter, which instructs the module not to
+    perform the initialisation.
+
+    After initialisation, you can decide to use Dancer's functions or the
+    ones provided by either Log::Log4perl or Log::Log4perl::Tiny, e.g. the
+    stealth loggers in case of a simplified interface.
+
+    Note that Dancer's `log' and `logger_format' options are still honored,
+    which means you need to be aware of the following:
+
+    `logger_format' is still processed and becomes `%m' in Log4perl's format
+    placeholders. This allows you to pass Dancer placeholders that aren't
+    available as Log4perl placeholders.
+
+    Dancer's `core' level messages are passed to Log4perl as level `trace'
+    but will not be passed unless Dancer's `log' config is `core'.
+
+    `log' should be set a lower priority than the lowest priority as set in
+    your Log4perl configuration. If it isn't, Dancer::Logger::Abstract will
+    not pass the message to Log4perl.
+
+CONFIGURATION
+    The configuration capabilities vary depending on the underlying library
+    you have, even though the following configurations are common:
+
+    no_init
+        skip the initialisation phase of the logging module, assuming that
+        it is performed elsewhere.
+
+    tiny
+        allows you to decide whether Log::Log4perl (when set to a false
+        value) or Log::Log4perl::Tiny (when set to a true value) should be
+        used.
+
+  Log::Log4perl
+    If you're using standard Log::Log4perl, then you have two alternatives
+    to pass a configuration:
+
+    config_file
+        via a configuration file, using the `config_file' option:
+
+           logger: log4perl
+           log4perl:
+              config_file: log4perl.conf
+
+    config
+        via a straight configuration text, using the `config' option:
+
+           logger: log4perl
+           log4perl:
+              config: |
+                 log4perl.rootLogger              = DEBUG, LOG1
+                 log4perl.appender.LOG1           = Log::Log4perl::Appender::File
+                 log4perl.appender.LOG1.filename  = /var/log/mylog.log
+                 log4perl.appender.LOG1.mode      = append
+                 log4perl.appender.LOG1.layout    = Log::Log4perl::Layout::PatternLayout
+                 log4perl.appender.LOG1.layout.ConversionPattern = %d %p %m %n
+
+  Log::Log4perl::Tiny
+    If all you have is Log::Log4perl::Tiny, you can set some parameters:
+
+    level
+        the log `level'
+
+           logger: log4perl
+           log4perl:
+              tiny: 1
+              level: INFO
+
+    format
+        the log `format' (aliased to `layout' as well)
+
+           logger: log4perl
+           log4perl:
+              tiny: 1
+              format: [%p] %m%n
+
+EXAMPLES
+    All examples below assume that you have your Log::Log4perl
+    initialisation stuff inside a file called log4perl.conf, e.g. something
+    along the following lines:
+
+       log4perl.logger = INFO, Screen
+       log4perl.appender.Screen = Log::Log4perl::Appender::Screen
+       log4perl.appender.Screen.stderr = 1
+       log4perl.appender.Screen.stdout = 0
+       log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+       log4perl.appender.Screen.layout.ConversionPattern = [%d] [%-5p] %m%n
+
+    The above initialisation text is actually what you get by default.
+
+  Log::Log4perl, Automatic Initialisation, Dancer Logging Interface
+    In this case you'll probably want to let the module handle the
+    initialisation and forget about Log::Log4perl in your code. In the
+    Dancer configuration file:
+
+       # config.yml
+       logger: log4perl
+       log: info
+       log4perl:
+          config_file: log4perl.conf
+
+    In your code:
+
+       # somewhere...
+       get '/please/warn' => sub {
+          warning "ouch!"; # good ol' Dancer warning
+          return ':-)';
+       };
+
+  Log::Log4perl, Manual Initialisation, Log::Log4perl Stealth Interface
+    If you want to use Log::Log4perl's stealth interface, chances are you
+    also want to avoid a full configuration file and rely upon
+    `easy_init()'. In this case, you will probably want to perform the
+    initialisation by your own, so your configuration file will be bare
+    bones:
+
+       # config.yml
+       logger: log4perl
+       log: info
+       log4perl:
+          no_init: 1
+
+    and your code will contain all the meat:
+
+       use Log::Log4perl qw( :easy );
+       Log::Log4perl->easy_init($INFO);
+       get '/please/warn' => sub {
+          WARN 'ouch!'; # Log::Log4perl way of warning
+          return ';-)';
+       };
+
+  Log::Log4perl, Whatever Initialisation, Whatever Interface
+    Whatever the method you use to initialise the logger (but take care to
+    initialise it once and only once, see Log::Log4perl), you can always use
+    both Dancer and Log::Log4perl functions:
+
+       use Log::Log4perl qw( :easy );
+       get '/please/warn/2/times' => sub {
+          warning 'ouch!'; # Dancer style
+          WARN    'OUCH!'; # Log::Log4perl style
+          return ':-D';
+       };
+
+    If you don't like either functional interface, and prefer to stick to
+    Log::Log4perl's object-oriented interface to avoid collisions in
+    function names:
+
+       use Log::Log4perl ();
+       get '/please/warn/2/times' => sub {
+          get_logger()->warn('ouch!'); # Log::Log4perl, OO way
+          return 'B-)';
+       };
+
+    Well, you get the idea... just peruse Log::Log4perl documentation for
+    more!
+
+  Log::Log4perl::Tiny, Automatic Initialisation, Any Interface
+    If you prefer to use Log::Log4perl::Tiny you can put the relevant
+    options directly inside the configuration file:
+
+       # config.yml
+       logger: log4perl
+       log: debug
+       log4perl:
+          tiny: 1
+          level: DEBUG
+          format:  [%p] %m%n
+
+    At this point, you can import the relevant methods in your code and use
+    them as you would with Log::Log4perl:
+
+       use Log::Log4perl::Tiny qw( :easy );
+       get '/please/warn' => sub {
+          WARN 'ouch!'; # Log::Log4perl(::Tiny) way of warning
+          # you can also use Dancer's warning here...
+          warning 'OUCH!';
+          return ';-)';
+       };
+
+  Log::Log4perl::Tiny, Any Initialisation, Any Interface
+    As an alternative to the previous example, you can also limit the
+    configuration file to a minimum:
+
+       # config.yml
+       logger: log4perl
+       log: info
+       log4perl:
+          tiny: 1
+
+    and initialise the logging library inside the code:
+
+       use Log::Log4perl::Tiny qw( :easy );
+       Log::Log4perl->easy_init($INFO);
+       get '/please/warn' => sub {
+          WARN 'ouch!'; # Log::Log4perl(::Tiny) way of warning
+          # you can also use Dancer's warning here...
+          warning 'OUCH!';
+          return ';-)';
+       };
+
+SUPPORT
+    If you find a bug, have a comment or (constructive) criticism you have
+    different options:
+
+    -   just write to the AUTHOR
+
+    -   open a bug request on the relevant RT queue at
+        https://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Logger-Log4
+        perl
+
+    -   open an issue or propose a patch on GitHub at
+        https://github.com/polettix/Dancer-Logger-Log4perl
+

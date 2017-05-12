@@ -1,0 +1,23 @@
+Revision history:
+
+0.05  2009/12/4
+
+	- Dec dates fix
+
+0.04  2009/7/15
+    - POD fix
+    - Switch module usage removed due to the long initialization delay
+    - Fixed bug with literal month names
+
+0.03  2009/6/26
+    - POD fix
+    - prerequisites added to Makefile.PL
+    - more tests added
+
+0.02  2009/6/9
+    - POD fixes
+    - to_array() function added to ::TreeSet
+    - Makefile.PL dependency fixed
+
+0.01  2009/7/6
+    - initial release

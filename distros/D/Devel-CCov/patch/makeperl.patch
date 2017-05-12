@@ -1,0 +1,63 @@
+*** makefile	Tue Jan 13 18:30:52 1998
+--- ../makefile	Tue Jan 13 18:25:39 1998
+***************
+*** 131,137 ****
+  lintflags = -hbvxac
+  
+  .c$(OBJ_EXT):
+! 	$(CCCMD) $(PLDLFLAGS) $*.c
+  
+  all: $(FIRSTMAKEFILE) miniperl $(private) $(plextract) $(public) $(dynamic_ext)
+  	@echo " "; echo "	Everything is up to date."
+--- 131,140 ----
+  lintflags = -hbvxac
+  
+  .c$(OBJ_EXT):
+! 	@test -d CCov || mkdir CCov
+! 	ccovinstrument -c $*.c -o CCov/$*.c -e CCov/$*.err
+! 	$(CCCMD) $(PLDLFLAGS) -I. CCov/$*.c
+! #	$(CCCMD) $(PLDLFLAGS) $*.c
+  
+  all: $(FIRSTMAKEFILE) miniperl $(private) $(plextract) $(public) $(dynamic_ext)
+  	@echo " "; echo "	Everything is up to date."
+***************
+*** 161,166 ****
+--- 164,174 ----
+  perlmain$(OBJ_EXT): perlmain.c
+  	$(CCCMD) $(PLDLFLAGS) $*.c
+  
++ CCOVEXTRA = ccov_registry$(OBJ_EXT)
++ $(CCOVEXTRA):
++ 	ccovinstrument -r
++ 	$(CCCMD) $(PLDLFLAGS) $*.c
++ 
+  # The file ext.libs is a list of libraries that must be linked in
+  # for static extensions, e.g. -lm -lgdbm, etc.  The individual
+  # static extension Makefile's add to it.
+***************
+*** 182,193 ****
+  # build problems but that's not obvious to the novice.
+  # The Module used here must not depend on Config or any extensions.
+  
+! miniperl: $& miniperlmain$(OBJ_EXT) $(LIBPERL)
+! 	$(CC) $(LARGE) $(CLDFLAGS) -o miniperl miniperlmain$(OBJ_EXT) $(LLIBPERL) $(libs)
+  	@./miniperl -w -Ilib -MExporter -e 0 || $(MAKE) minitest
+  
+! perl: $& perlmain$(OBJ_EXT) $(LIBPERL) $(DYNALOADER) $(static_ext) ext.libs
+! 	$(SHRPENV) $(CC) $(LARGE) $(CLDFLAGS) $(CCDLFLAGS) -o perl perlmain$(OBJ_EXT) $(DYNALOADER) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+  
+  pureperl: $& perlmain$(OBJ_EXT) $(LIBPERL) $(DYNALOADER) $(static_ext) ext.libs
+  	$(SHRPENV) purify $(CC) $(LARGE) $(CLDFLAGS) $(CCDLFLAGS) -o pureperl perlmain$(OBJ_EXT) $(DYNALOADER) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)
+--- 190,201 ----
+  # build problems but that's not obvious to the novice.
+  # The Module used here must not depend on Config or any extensions.
+  
+! miniperl: $& miniperlmain$(OBJ_EXT) $(LIBPERL) $(CCOVEXTRA)
+! 	$(CC) $(LARGE) $(CLDFLAGS) -o miniperl miniperlmain$(OBJ_EXT) $(CCOVEXTRA) $(LLIBPERL) $(libs)
+  	@./miniperl -w -Ilib -MExporter -e 0 || $(MAKE) minitest
+  
+! perl: $& perlmain$(OBJ_EXT) $(LIBPERL) $(DYNALOADER) $(static_ext) ext.libs $(CCOVEXTRA)
+! 	$(SHRPENV) $(CC) $(LARGE) $(CLDFLAGS) $(CCDLFLAGS) -o perl perlmain$(OBJ_EXT) $(DYNALOADER) $(static_ext) $(CCOVEXTRA) $(LLIBPERL) `cat ext.libs` $(libs)
+  
+  pureperl: $& perlmain$(OBJ_EXT) $(LIBPERL) $(DYNALOADER) $(static_ext) ext.libs
+  	$(SHRPENV) purify $(CC) $(LARGE) $(CLDFLAGS) $(CCDLFLAGS) -o pureperl perlmain$(OBJ_EXT) $(DYNALOADER) $(static_ext) $(LLIBPERL) `cat ext.libs` $(libs)

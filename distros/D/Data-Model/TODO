@@ -1,0 +1,43 @@
+=head1 NAME
+
+TODO
+
+=head1 WISHLIST
+
+  Data::Model::Driver::Cache::Memcached
+
+  Data::Model::Validate
+  Data::Model::Driver::Pacific
+  Data::Model::Driver::DBM
+  Data::Model::Driver::File
+  Data::Model::Driver::YAML
+
+  Gearman ( Data::ObjectDriver::Driver::GearmanDBI ? )
+  TheSchwartz
+
+  partition
+
+  Paranoia ( by DataMapper )
+
+  Drizzle
+
+=head1 FIXED
+
+  Data::Model::Driver
+  Data::Model::Driver::DBI
+  Data::Model::Driver::DBI::sqlite
+  Data::Model::Driver::Memory
+  Data::Model::Iterator
+  Data::Model::Row
+  Data::Model::SQL
+  Data::Model::Schema::SQL
+  Data::Model::Schema
+
+  Data::Model::Driver::Memcache ?
+  Data::Model::Driver::DBI::mysql ?
+
+  Data::Model::Cache -> Data::Model::Driver::Cache::*
+  replication -> Data::Model::Driver::DBI::MasterSlave
+  ? Data::Model::Schema::ReadOnly -> Data::Model::Driver::DBI::MasterSlave
+
+=cut

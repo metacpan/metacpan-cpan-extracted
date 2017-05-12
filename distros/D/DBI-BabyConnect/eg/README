@@ -1,0 +1,122 @@
+
+Install DBI::BabyConnect and Apache::BabyConnect from CPAN:
+cpan -i DBI::BabyConnect
+cpan -i Apache::BabyConnect
+
+Make sure that you have the current version 0.93 of DBI::BabyConnect and
+Apache::BabyConnect. Prior versions to 0.93 will not work.
+
+The distribution includes a default configuration directory
+and a test directory to get started using the module.
+Locate the configuration directory and edit the databases.pl file.
+The databases.pl contains the database descriptors that you will use
+to connect to the various data sources.
+For instance, if you have extracted the DBI-BabyConnect-0.93.tgz into /opt,
+then a configuration directory can be located in /opt/DBI-BabyConnect-0.93/configuration.
+   # cd /opt/DBI-BabyConnect-0.93/configuration/dbconf
+   # vi databases.pl
+
+edit the databases.pl and make the proper changes to the descriptors, so
+that point to the correct data sources with the proper authentication.
+Refer to DBI::BabyConnect man page for information about the layout of a
+database descriptor.
+
+Edit the global configuration file globalconf.pl located in
+/opt/DBI-BabyConnect-0.93/configuration/dbconf
+and verify that the default setting is:
+DBSETTING_FORCE_SINGLESPACE_FOR_EMPTY_STRING=1
+CALLER_DISCONNECT=0
+ON_FAILED_DBIEXECUTE_ROLLBACK_AND_EXIT=1
+ENABLE_STATISTICS_ON_DO=0
+ENABLE_STATISTICS_ON_SPC=0
+
+
+Note that you can have the configuration directory anywhere on the file system,
+as long as you export the BABYCONNECT environment variable to point to that
+directory. In case the BABYCONNECT environment variable is not set, then
+the module will look for the configuration/ directory relative to the local directory.
+
+To test the module, you need to have MySQL installed on your machine.
+
+Create the database BABYDB in MySQL. You will create the database like
+you do normally, by login to MySQL and using:
+ > create database BABYDB
+
+Export the environment variable BABYCONNECT to point to the configuration
+directory:
+   # export BABYCONNET=/opt/DBI-BabyConnect-0.93/configuration
+
+Change directory to the location where you have the test scripts:
+   # cd /opt/DBI-BabyConnect-0.93/eg
+
+Run the connect.pl test script to test that you can create a DBI::BabyConnect
+object to serve the data source:
+   # connect.pl
+
+Run the create.pl test script to create the test tables:
+   # createtables.pl
+
+The script will create the tables TABLE1 and TABLE2 based on the layout
+$ENV{BABYCONNET}/SQL/TABLES/TEST_TABLE.mysql
+and the table CONCURRENT based on the layout
+$ENV{BABYCONNET}/SQL/TABLES/TEST_CONCURRENT.mysql
+
+You should be able to verify that the tables TABLE1, TABLE2, and CONCURRENT
+have been created in the database BABYDB using the MySQL show command.
+
+You can check all error messages in /tmp/error.log
+The DBI::BabyConnect trace and the DBI trace are in /tmp/db.log
+
+NOTE: the createtables.pl may fail in case you do not have access
+ to /tmp, in which case you need either to modify the directories
+ in HookError() and HookTrace(), or you can simply comment out these lines.
+
+
+Inserting Records:
+===============
+We will use the sqlbnd() method to populate the test tables TABLE1 and TABLE2.
+The script insert.pl will populate TABLE1 and TABLE2.
+
+
+Testing Rollback:
+===============
+See man page, and read the documentation and instructions within the scripts:
+eg/testrollback1.pl
+eg/testrollback2.pl
+
+Inserting a Record:
+===============
+See man page and the following example:
+eg/insertrec.pl
+
+Fetching a Record:
+===============
+See man page and the following examples:
+eg/fetchrec.pl
+eg/fetchrec1.pl
+eg/fetchrec2.pl
+
+
+Recreating Tables:
+===============
+See man page and the following examples:
+eg/createtables.pl
+eg/recreateTableFromString_mysql.pl
+eg/recreateTableFromString_ora.pl
+
+If you run createtables.pl, the script will drop and recreate the tables.
+You need to run insert.pl to populate the tables again. The examples in this
+tutorial and in Apache::BabyConnect use these tables for demonstration.
+
+Oracle Stored Procedure:
+===============
+See man page and the following example:
+eg/spc.pl
+
+Apache::BabyConnet:
+===============
+The perl scripts located in eg/perl/ are to be used when testing persitence
+of DBI::BabyConnect objects with the module Apache::BabyConnet.
+Refer to Apache::BabyConnet for information about how to run these scripts.
+
+

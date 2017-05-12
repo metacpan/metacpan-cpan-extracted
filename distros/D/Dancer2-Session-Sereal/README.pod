@@ -1,0 +1,38 @@
+=head1 DESCRIPTION
+
+This module implements Dancer 2 session engine based on L<Sereal> files.
+
+This backend can be used in single-machine production environments, but two
+things should be kept in mind: The content of the session files is not
+encrypted or protected in anyway and old session files should be purged by a
+CRON job.
+
+=head1 CONFIGURATION
+
+The setting B<session> should be set to C<Sereal> in order to use this session
+engine in a Dancer2 application.
+
+Files will be stored to the value of the setting C<session_dir>, whose default
+value is C<appdir/sessions>.
+
+Arguments for the L<Sereal::Encoder> and L<Sereal::Decoder> objects can be 
+given via the C<encoder_args> and C<decoder_args>. If not provided, they default to
+C<< snappy => 1, croak_on_bless =>1 >> and C<< refuse_objects => 1, validate_utf8 => 1 >>, respectively.
+
+Here is an example configuration that use this session engine and stores session
+files in /tmp/dancer-sessions
+
+    session: "Sereal"
+
+    engines:
+      session:
+        Sereal:
+          session_dir: "/tmp/dancer-sessions"
+          encoder_args:
+            snappy:         1
+            croak_on_bless: 1
+          decoder_args:
+            refuse_objects: 1
+            validate_utf8:  1
+
+

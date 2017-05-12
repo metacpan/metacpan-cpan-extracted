@@ -1,0 +1,5 @@
+this is var1="<TMPL_VAR NAME=var1 >" and var2=<TMPL_VAR NAME= var2 >
+
+another line
+
+<TMPL_VAR NAME=foo> <TMPL_VAR NAME=bar> <TMPL_VAR NAME=baz>

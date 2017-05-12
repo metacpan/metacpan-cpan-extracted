@@ -1,0 +1,14 @@
+#!/usr/bin/env perl
+
+use v5.10;
+use strict;
+use warnings;
+
+use FindBin;
+use lib "$FindBin::Bin/../lib";
+
+use Devel::NYTProf::Callgrind::App::Command ;
+
+Devel::NYTProf::Callgrind::App::Command->run();
+
+

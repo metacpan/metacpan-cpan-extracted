@@ -1,0 +1,151 @@
+# NAME
+
+Data::Riak - An interface to a Riak server.
+
+# VERSION
+
+version 2.0
+
+# SYNOPSIS
+
+    my $riak = Data::Riak->new({
+        transport => Data::Riak::HTTP->new({
+            host => 'riak.example.com',
+            port => '8098',
+            timeout => 5
+        })
+    });
+
+    my $bucket = Data::Riak::Bucket->new({
+        name => 'my_bucket',
+        riak => $riak
+    });
+
+    # Sets the value of "foo" to "bar", in my_bucket.
+    $bucket->add('foo', 'bar');
+
+    # Gets the Result object for "foo" in my_bucket.
+    my $foo = $bucket->get('foo');
+
+    # Returns "bar"
+    my $value = $foo->value;
+
+    # The HTTP status code, 200 on a successful GET.
+    my $code = $foo->status_code;
+
+Most of the interesting methods are really in [Data::Riak::Bucket](http://search.cpan.org/perldoc?Data::Riak::Bucket), so please
+read the documents there as well.
+
+# DESCRIPTION
+
+Data::Riak is a simple interface to a Riak server. It is not as complete as
+[Net::Riak](http://search.cpan.org/perldoc?Net::Riak), nor does it aim to be; instead, it attempts to make the simple
+operations very simple, while still allowing you to do complicated tasks.
+
+# LINKWALKING
+
+One of Riak's notable features is the ability to easily "linkwalk", or traverse
+relationships between objects to return relevant resultsets. The most obvious
+use of this is "Show me all of the friends of people Bob is friends with", but
+it has great potential, and it's the one thing we tried to make really simple
+with Data::Riak.
+
+    # Add bar to the bucket, and list foo as a buddy.
+    $bucket->add('bar', 'value of bar', {
+      links => [ Data::Riak::Link->new(
+        bucket => $bucket_name, riaktag => 'buddy', key =>'foo'
+      ) ]
+    });
+
+    # Add foo to the bucket, and list both bar and baz as "not a buddy"
+    # create the links via the $bucket object and the bucket will be
+    # inferred from the context
+    $bucket->add('foo', 'value of foo', {
+      links => [
+        $bucket->create_link(riaktag => 'not a buddy', key =>'bar'),
+        $bucket->create_link(riaktag => 'not a buddy', key =>'baz')
+      ]
+    });
+
+    # Get everyone in my_bucket who foo thinks is not a buddy.
+    $walk_results = $bucket->linkwalk('foo', [ [ 'not a buddy', 1 ] ]);
+
+    # Get everyone in my_bucket who baz thinks is a buddy of baz, get the people
+    # they list as not a buddy, and only return those.
+    $more_walk_results = $bucket->linkwalk(
+      'baz', [ [ 'buddy', 0 ], [ 'not a buddy', 1 ] ],
+    );
+
+    # You can also linkwalk outside of a bucket. The syntax changes, as such:
+    $global_walk_results = $riak->linkwalk({
+        bucket => 'my_bucket',
+        object => 'foo',
+        params => [ [ 'other_bucket', 'buddy', 1 ] ]
+    });
+
+The bucket passed in on the riak object's linkwalk is the bucket the original
+target is in, and is used as a default if you only pass two options in the
+params lists.
+
+# ATTRIBUTES
+
+## transport
+
+A [Data::Riak::Transport](http://search.cpan.org/perldoc?Data::Riak::Transport) to be used in order to communicate with
+Riak. Currently, the only existing transport is [Data::Riak::HTTP](http://search.cpan.org/perldoc?Data::Riak::HTTP).
+
+# METHODS
+
+## ping
+
+Tests to see if the specified Riak server is answering. Returns 0 for no, 1 for
+yes.
+
+## status
+
+Attempts to retrieve information about the performance and configuration of the
+Riak node. Returns a hash reference containing the data provided by the
+`/stats` endpoint of the Riak node or throws an exception if the status
+information could not be retrieved.
+
+## \_buckets
+
+Get the list of buckets. This is NOT RECOMMENDED for production systems, as Riak
+has to essentially walk the entire database. Here purely as a tool for debugging
+and convenience.
+
+## bucket ($name)
+
+Given a `$name`, this will return a [Data::Riak::Bucket](http://search.cpan.org/perldoc?Data::Riak::Bucket) object for it.
+
+# ACKNOWLEDGEMENTS
+
+Influenced heavily by [Net::Riak](http://search.cpan.org/perldoc?Net::Riak).
+
+I wrote the first pass of Data::Riak, but large sections were
+added/fixed/rewritten to not suck by Stevan Little `<stevan at cpan.org>`
+and Cory Watson `<gphat at cpan.org>`.
+
+# TODO
+
+Docs, docs, and more docs. The individual modules have a lot of functionality
+that needs documented.
+
+# COPYRIGHT & LICENSE
+
+This software is copyright (c) 2012 by Infinity Interactive, Inc..
+
+This is free software; you can redistribute it and/or modify it under the same
+terms as the Perl 5 programming language system itself.
+
+# AUTHORS
+
+- Andrew Nelson <anelson at cpan.org>
+- Florian Ragwitz <rafl@debian.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2013 by Infinity Interactive.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

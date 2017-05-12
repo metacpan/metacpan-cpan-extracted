@@ -1,0 +1,66 @@
+{
+   "abstract" : "Powerful fast feature-rich Perl source code profiler",
+   "author" : [
+      "Tim Bunce <timb@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 6.98, CPAN::Meta::Converter version 2.143240",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Devel-NYTProf",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ],
+      "package" : [
+         "SVG"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "File::Which" : "1.09",
+            "Getopt::Long" : "0",
+            "JSON::MaybeXS" : "0",
+            "List::Util" : "0",
+            "Test::Differences" : "0.60",
+            "Test::More" : "0.84",
+            "XSLoader" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-devel-nytprof@rt.cpan.org",
+         "web" : "https://github.com/timbunce/devel-nytprof/issues"
+      },
+      "homepage" : "https://code.google.com/p/perl-devel-nytprof/",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/timbunce/devel-nytprof.git",
+         "web" : "https://github.com/timbunce/devel-nytprof"
+      },
+      "x_MailingList" : "http://groups.google.com/group/develnytprof-dev"
+   },
+   "version" : "6.04"
+}

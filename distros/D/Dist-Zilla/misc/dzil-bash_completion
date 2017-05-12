@@ -1,0 +1,23 @@
+# dzil(1) completion
+#
+
+_dzil_actions()
+{
+   COMPREPLY=( $( compgen -W 'commands help authordeps build clean install listdeps new nop release run setup smoke test' \
+        -- $cur ) )
+}
+
+_dzil()
+{
+    local cur
+
+    COMPREPLY=()
+    cur=${COMP_WORDS[COMP_CWORD]}
+
+    if [[ $COMP_CWORD -eq 1 ]] ; then
+        _dzil_actions
+    else
+        return 0
+    fi
+}
+complete -F _dzil dzil

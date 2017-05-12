@@ -1,0 +1,36 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.62.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 c8bf94d54b066531e4553e924b33c19b582bf1a5 Changes
+SHA1 101a211fa9ce4133ae9bca6c3488523789bc9e3c LibUUID.xs
+SHA1 ed6c4f57717b82e2eda3caac74c992c2361a144e MANIFEST
+SHA1 71848a36b89aa4332d4f3e26388f6ecc02fe4267 MANIFEST.SKIP
+SHA1 4b7b52ea635cc8fe746f429195d2adef69e8d00f META.yml
+SHA1 3ea2471565b6c4e77386cadd3ebffa19d12bd3d2 Makefile.PL
+SHA1 137d832a046a3aebd9f2b8f645ff4009c1f6a848 hdr_check.h
+SHA1 44a30985d552b26f522572aee16204195908ad2b lib/Data/UUID/LibUUID.pm
+SHA1 cc657ce59a19cfc4daa4a071545bf7873d827337 lib/Data/UUID/LibUUID/DataUUIDCompat.pm
+SHA1 6f942a3aa4b7201650bbc0cc2a3b3b6ca3b6a14c ppport.h
+SHA1 c160cfa4e76929d52995be9efeff7ae96a1ba8ac t/basic.t
+SHA1 fa272c9714cd59ee228b77f614e8267dad9729c9 t/compat.t
+SHA1 6ac7e4f126efc052af0cfe3f2aaa5b9e6b7d3a7c t/fork.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG/MacGPG2 v2.0.12 (Darwin)
+
+iEYEARECAAYFAkwx4aMACgkQVCwRwOvSdBiMTgCgpv/ZojFfATa1mkc5TtjnsO4u
+ioQAmgKX1duqHZ0gotlnFm7Ne2SIdk3A
+=c7s8
+-----END PGP SIGNATURE-----

@@ -1,0 +1,21 @@
+---
+name: Data-FormValidator-Constraints-MethodsFactory
+version: 0.02
+author:
+  - Graham TerMarsch (cpan@howlingfrog.com)
+abstract: Create constraints for Data::FormValidator
+license: perl
+resources:
+  license: ~
+requires:
+  Data::FormValidator: 4
+build_requires:
+  Test::More: 0
+provides:
+  Data::FormValidator::Constraints::MethodsFactory:
+    file: lib/Data/FormValidator/Constraints/MethodsFactory.pm
+    version: 0.02
+generated_by: Module::Build version 0.32
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

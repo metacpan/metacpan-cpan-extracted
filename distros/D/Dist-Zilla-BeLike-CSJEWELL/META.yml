@@ -1,0 +1,93 @@
+---
+abstract: 'Build a modern dist like CSJEWELL does it.'
+author:
+  - 'Curtis Jewell <CSJewell@cpan.org>'
+build_requires:
+  Test::More: 0.88
+  Test::UseAllModules: 0.12
+configure_requires:
+  Module::Build: 0.33
+generated_by: 'Module::Build version 0.3607'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-BeLike-CSJEWELL
+provides:
+  Dist::Zilla::App::Command::configure_CSJEWELL:
+    file: lib/Dist/Zilla/App/Command/configure_CSJEWELL.pm
+    version: 0.900
+  Dist::Zilla::BeLike::CSJEWELL:
+    file: lib/Dist/Zilla/BeLike/CSJEWELL.pm
+    version: 0.901
+  Dist::Zilla::MintingProfile::CSJEWELL:
+    file: lib/Dist/Zilla/MintingProfile/CSJEWELL.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::AuthorTest:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/AuthorTest.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::BeforeBuild:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/BeforeBuild.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::DotFileFix:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/DotFileFix.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::FTPUploadToOwnSite:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/FTPUploadToOwnSite.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::SubversionDist:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/SubversionDist.pm
+    version: 0.900
+  Dist::Zilla::Plugin::CSJEWELL::VersionGetter:
+    file: lib/Dist/Zilla/Plugin/CSJEWELL/VersionGetter.pm
+    version: 0.900
+  Dist::Zilla::PluginBundle::CSJEWELL:
+    file: lib/Dist/Zilla/PluginBundle/CSJEWELL.pm
+    version: 0.900
+  Dist::Zilla::Stash::DefaultURLs:
+    file: lib/Dist/Zilla/Stash/DefaultURLs.pm
+    version: 0.900
+requires:
+  Dist::Zilla: 4.102221
+  Dist::Zilla::Plugin::Mercurial: 0.03
+  Dist::Zilla::Plugin::Twitter: 0.009
+  Email::Address: 0
+  File::ShareDir: 1.00
+  Module::Build: 0.33
+  Moose: 1.09
+  Net::FTP: 2.77
+  Net::Netrc: 2.12
+  PPIx::Regexp: 0
+  PPIx::Utilities::Statement: 0
+  Parse::CPAN::Meta: 1.40
+  Perl::Critic: 1.108
+  Perl::Critic::More: 0
+  Perl::Critic::Utils::Constants: 0
+  Perl::MinimumVersion: 1.26
+  Perl::Tidy: 20090616
+  Pod::Coverage: 0.21
+  Pod::Coverage::Moose: 0.01
+  Pod::Readme: 0.10
+  Pod::Simple: 3.14
+  Pod::Spell::CommonMistakes: 0.01
+  Software::License: 0.101620
+  Test::CPAN::Meta: 0.17
+  Test::CheckChanges: 0.14
+  Test::DistManifest: 1.009
+  Test::Fixme: 0.04
+  Test::HasVersion: 0.012
+  Test::MinimumVersion: 0.101080
+  Test::Perl::Critic: 0
+  Test::Pod: 1.44
+  Test::Pod::Coverage: 1.08
+  Test::Pod::Spelling::CommonMistakes: 0.01
+  Test::Portability::Files: 0.05
+  Test::Prereq::Build: 1.037
+  autodie: 2.10
+  perl: 5.008003
+resources:
+  bugtracker: http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-BeLike-CSJEWELL
+  homepage: http://csjewell.comyr.com/perl/
+  license: http://dev.perl.org/licenses/
+  repository: http://bitbucket.org/csjewell/dist-zilla-belike-csjewell
+version: 0.901

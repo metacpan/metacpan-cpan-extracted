@@ -1,0 +1,16 @@
+Revision history for Datahub-Factory-VKC
+
+0.06  2017-05-04 07:48:16 UTC
+	- Updated documentation for MSK
+
+0.05  2017-05-04 06:48:17 UTC
+	- Updated documentation
+
+0.04  2017-05-04 06:16:37 UTC
+	- Added re-usable PID module
+
+0.03  2017-04-20 08:05:34 UTC
+	- PIDS are now in TMS
+
+0.02  2017-03-28 11:40:32 UTC
+        - Initial release (merge of Datahub::Factory::KMSKA, Datahub::Factory::MSK, Datahub::Factory::PIDS and Datahub::Factory::VKC)

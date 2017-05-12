@@ -1,0 +1,27 @@
+Changes
+lib/Digest/Skein.pm
+Makefile.PL
+MANIFEST
+Optimized_64bit/brg_endian.h
+Optimized_64bit/brg_types.h
+Optimized_64bit/Makefile.PL
+Optimized_64bit/MANIFEST
+Optimized_64bit/SHA3api_ref.c
+Optimized_64bit/SHA3api_ref.h
+Optimized_64bit/skein.c
+Optimized_64bit/skein.h
+Optimized_64bit/skein_block.c
+Optimized_64bit/skein_debug.c
+Optimized_64bit/skein_debug.h
+Optimized_64bit/skein_iv.h
+Optimized_64bit/skein_port.h
+ppport.h
+README
+Skein.xs
+t/00-use.t
+t/01-basic.t
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)
+TODO
+MANIFEST.SKIP
+digest-benchmark

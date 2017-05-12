@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/perl-makemaker.mk
+
+MAIN_MODULE	= lib/DBIx/DR.pm
+
+DEBVERSION = $(shell dpkg-parsechangelog \
+	|grep ^Version|awk '{print $$2}'|sed 's/-.*//' )
+PERLVERSION = $(shell grep '^our[[:space:]]\+$$VERSION' $(MAIN_MODULE) \
+	|head -n 1 \
+	|awk '{print $$4}'|sed "s/[';']//g" )
+
+install/libdbix-dr-perl::
+	test $(DEBVERSION) = $(PERLVERSION)
+	make tardist
+
+clean::
+	rm -f Makefile.old	
+	rm -fr .pc
+	rm -f DBIx-DR-*.tar.gz*
+
+tarball: clean
+	cd .. && tar \
+		--exclude=debian \
+		--exclude=.git \
+		--transform='s,^.*?/,libdbix-dr-perl-$(PERLVERSION),S' \
+		-czvf libdbix-dr-perl_$(DEBVERSION).orig.tar.gz \
+		`basename $(CURDIR)`
+

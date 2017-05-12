@@ -1,0 +1,46 @@
+{
+   "abstract" : "adjust prereqs to use latest version available",
+   "author" : [
+      "Pedro Melo <melo@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "artistic_2"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-LatestPrereqs",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "CPAN" : "1.9402",
+            "CPAN::Meta::Prereqs" : "2.101670",
+            "Dist::Zilla" : "4.0",
+            "Module::CoreList" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.92"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "http://github.com/melo/dist-zilla-tools.git",
+         "web" : "http://github.com/melo/dist-zilla-tools"
+      }
+   },
+   "version" : "0.4"
+}
+

@@ -1,0 +1,21 @@
+Revision history for Data-Compare-Plugins-Set-Object
+
+1.0    Sun Nov  1 21:10:00 2009
+       First non-developer release.
+1.0_5  Wed Sep 30 18:55:00 2009
+       Minor fix to dependencies listing.
+1.0_4  Wed Sep 30 18:05:00 2009
+       Reduce second set by each found element, so there's no need to loop
+       over it again.  This also removes the need for a separate counter
+       variable.
+       Use List::Util's first() for above instead of List::MoreUtils' any().
+       Minor Perl::Critic-instigated fixes, and more code commentary.
+1.0_3  Tue Sep 29 11:30:00 2009
+       Added Test::Perl::Critic to test_requires, reported by Slaven Rezic.
+       Also added Test::Pod and Test::Pod::Coverage to test_requires.
+       Added Set::Object to requirements. (oops!)
+1.0_2  Mon Sep 28 23:00:00 2009
+       Minor documentation fixes and pod formatting.
+1.0_1  Sat Sep 26 21:19:06 2009
+       Initial release.
+

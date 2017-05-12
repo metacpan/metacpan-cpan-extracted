@@ -1,0 +1,65 @@
+
+=head1 NAME
+
+Date::Lectionary::Time
+
+=head1 SYNOPSIS
+
+    use Time::Piece;
+    use Date::Lectionary::Time qw(nextSunday prevSunday closestSunday);
+
+    my $christmasDay = Time::Piece->strptime("2015-12-25", "%Y-%m-%d");
+    my $sundayAfterChristmas = nextSunday($christmasDay);
+    my $sundayBeforeChristmas = prevSunday($christmasDay);
+    my $sundayClosestToChristmas = closestSunday($christmasDay);
+
+=head1 DESCRIPTION
+
+Working in the liturgical time of the lectionary means tracking time relative to Sundays.  This is a quick utility to find the next, previous, or the closest Sunday to a given date.
+
+=head1 INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+The development of this module is hosted on GitHub -- L<https://github.com/marmanold/Date-Lectionary-Time> -- and tested via TravisCI.
+
+=for html <a href="https://travis-ci.org/marmanold/Date-Lectionary-Time"><img src="https://travis-ci.org/marmanold/Date-Lectionary-Time.svg?branch=master" /></a>
+
+=for html <a href='https://coveralls.io/github/marmanold/Date-Lectionary-Time?branch=master'><img src='https://coveralls.io/repos/github/marmanold/Date-Lectionary-Time/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=head1 SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the
+perldoc command.
+
+    perldoc Date::Lectionary::Time
+
+You can also look for information at:
+
+    RT, CPAN's request tracker (report bugs here)
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Date-Lectionary-Time
+
+    AnnoCPAN, Annotated CPAN documentation
+        http://annocpan.org/dist/Date-Lectionary-Time
+
+    CPAN Ratings
+        http://cpanratings.perl.org/d/Date-Lectionary-Time
+
+    Search CPAN
+        http://search.cpan.org/dist/Date-Lectionary-Time/
+
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright (C) 2016 Michael Wayne Arnold
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of either: the GNU General Public License as published
+by the Free Software Foundation; or the Artistic License.
+
+See L<http://dev.perl.org/licenses/> for more information.

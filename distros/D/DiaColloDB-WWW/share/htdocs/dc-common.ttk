@@ -1,0 +1,262 @@
+[% FILTER null %]
+[%#------------------------------------------------------------
+  # File: dc-common.ttk
+  # Description: diacollo: common variables
+ %]
+[% TRY %]
+  [%#-- try to load ../common.ttk for dstar web environment --%]
+  [% PROCESS "../common.ttk" root_dir="../" %]
+  [% SET diacollo_standalone = '' %]
+[% CATCH %]
+  [%#-- standalone mode: simulate dstar/web/common.ttk --%]
+  [% PROCESS "dstar/common.ttk" root_dir="dstar/" %]
+  [% SET diacollo_standalone = 1 %]
+[% END %]
+
+[% PERL %]
+  $stash->set(DIACOLLO_VERSION=>$DiaColloDB::VERSION);
+  $stash->set(DIACOLLO_WWW_CLASS=>ref($stash->get('cdb')));
+  $stash->set(DIACOLLO_WWW_VERSION=>$stash->get('version'));
+  #$stash->set(VERSION=>$stash->get('version'));
+  #print STDERR "root='", $stash->get('root_dir'), "; diacollo_standalone=", $stash->get('diacollo_standalone'), "\n";
+[% END %]
+
+[%# USE Dumper %][%#-- debug: Dumper.dump(variable) %]
+[% USE JSON::Escape(pretty=>0) %][%#-- json() pseudo-method %]
+[% SET
+   package   = "DiaColloDB::WWW"
+   gen_label = "DiaColloDB::WWW"
+%]
+[% SET
+    foot_package_text = "DiaColloDB v" _ DIACOLLO_VERSION _ " / " _ "DiaColloDB::WWW v" _ DIACOLLO_WWW_VERSION;
+%]
+
+
+[% PERL %]
+  ##-- environment
+  $stash->set(ENV=>\%ENV);
+  $stash->set('VERSION'=>"$DiaColloDB::VERSION");
+[% END %]
+
+[%##-- timing %]
+[% db.t_start() %]
+[% PERL %]
+   $stash->set('elapsed'=>sub { $stash->get('cdb')->t_elapsed() });
+[% END %]
+
+[%##---------------------------------------------------------
+  ## DiaColloDB logging
+%]
+[% PERL %]
+my $logLevel = 'WARN';
+#my $logLevel   = 'TRACE'; ##-- DEBUG
+DiaColloDB->ensureLog(level=>$logLevel, rootLevel=>'FATAL');
+[% END %]
+
+
+[%##---------------------------------------------------------
+  ## local db
+ %]
+[% PERL %]
+  ##-- always load db header for local dbdir; check for index_tdf
+  my $dbdir  = (grep {defined($_) && $_ ne ''} map {$stash->get($_)} qw(DIACOLLO_DBDIR dstar.diacollo_dbdir diacollo_dbdir))[0];
+  my $dburl  = (grep {defined($_) && $_ ne ''} map {$stash->get($_)} qw(DIACOLLO_DBURL dstar.diacollo_dburl diacollo_dburl))[0];
+  if (!$dburl) {
+    $dbdir ||= "data";
+    $dburl   = "file://$dbdir";
+  }
+  my $is_dbdir = (-d $dburl);
+  my $is_list  = ($dburl =~ m{^list://}i);
+  #print STDERR "dburl[initial;is_dbdir=".($is_dbdir||0).";is_list=".($is_list||0)."] = $dburl\n";
+
+  ##-- db options: log-level
+  if ($is_list) {
+    $dburl .= ' ?logOpen=debug';
+  } else {
+    $dburl  = $stash->get('cdb')->quri($dburl,{logOpen=>'debug'});
+  }
+  #print STDERR "dburl[debug] = $dburl\n";
+
+  ##-- get basic db info
+  if ($is_dbdir) {
+    ##-- local directory: load JSON header directly
+    $stash->set('dbhdr' => DiaColloDB::Utils::loadJsonFile("$dbdir/header.json") // {});
+  } else {
+    ##-- non-local dburl: use info API (slow)
+    $stash->set('dbhdr' => DiaColloDB::Client->new($dburl)->dbinfo());
+    undef $dbdir;
+  }
+  my $dbhdr = $stash->get('dbhdr');
+
+  ##-- check for relations: tdf
+  $stash->set('tdf_enabled' => ($dbhdr->{tdf_enabled} || $dbhdr->{relations}{tdf}) ? 1 : 0);
+
+  ##-- check for relations: ddc
+  if ($is_dbdir) {
+    ##-- auto-detect ddc server host+port if running under dstar --> update local options
+    my ($ddcsrv);
+    if ( !($ddcsrv=$dbhdr->{ddcServer}) ) {
+      my $ddchost = $stash->get('dstar.server_host');
+      my $ddcport = $stash->get('dstar.server_port');
+      $ddcsrv     = $ddchost && $ddcport ? "${ddchost}:${ddcport}" : undef;
+    }
+    $stash->set('ddc_enabled' => ($ddcsrv ? 1 : 0));
+    $dburl = $stash->get('cdb')->quri($dburl,{ddcServer=>$ddcsrv});
+  }
+  else {
+    ##-- rc-file or other dburl: detect support from db-header
+    $stash->set('ddc_enabled' => ($dbhdr->{ddcServer} || $dbhdr->{relations}{ddc}) ? 1 : 0);
+  }
+
+  ## conundrum: how should we handle ddc "dstar.server_host" for list or rcfile dburls?
+  ## --> ignored for now (Wed, 15 Mar 2017 11:16:55 +0100 moocow)
+
+  ##-- finalize: dburl
+  $stash->set('dburl' => $dburl);
+  #print STDERR map {"$_ = ".$stash->get($_)."\n"} qw(dburl tdf_enabled ddc_enabled);
+[% END %]
+
+[%##-- query parameters
+  ## l     : query LEMMA(S) or /REGEX/  ##-- COMPAT
+  ## q     : query request LEMMA(S) or /REGEX/ or ATTR:VAL1|...|VALn or ATTR:/REGEX/
+  ## d     : query DATE(S) or /REGEX/ or MIN:MAX
+  ## sc    : score function {f,fm,lf,lfm,milf,mi1,mi3,ld,ll}
+  ## k     : pruning: return only k-best items per date
+  ## cut   : pruning: minimum score
+  ## global: pruning: prune globally (vs. slice-locally)?
+  ## diff  : low-level diff operation
+  ## f     : output format {text,json,html}
+  ## debug : debuging mode (boolean)
+  ## onepass : use old, fast, incorrect 1-pass profiling method (cofreqs only)?
+  ##
+  ##-- non-GUI options
+  ## eps : eps (epsilon)
+  ## slice2keys : JSON {$slice:\@keys} map for extend()
+%]
+[% PERL %]
+  my $vars = $stash->get('cdb.vars');
+  $_ =~ s/^\s+$// foreach (values %$vars);
+  $stash->set('qquery'=>(grep {defined($_)} @$vars{map {("a$_",$_)} qw(query q lemmata lemmas lemma lem l)})[0] // '');
+  $stash->set('qdate'=>(grep {defined($_)} @$vars{map {("a$_",$_)} qw(dates date d)})[0] // '');
+  $stash->set('qslice'=>(grep {defined($_)} @$vars{map {("a$_",$_)} qw(dslice slice ds sl s)})[0] // 10);
+  $stash->set('qbquery'=>(grep {defined($_)} @$vars{qw(bquery bq blemmata blemmas blemma blem bl)})[0] // '');
+  $stash->set('qbdate'=>(grep {defined($_)} @$vars{qw(bdates bdate bd)})[0] // '');
+  $stash->set('qbslice'=>(grep {defined($_)} @$vars{qw(bdslice bslice bds bsl bs)})[0] // '');;
+  foreach (qw(date slice)) {
+    $stash->set("qb$_"=>$stash->get("q$_")) if ($stash->get("qb$_") eq '');
+  }
+  foreach (qw(query date slice bquery bdate bslice)) {
+    $stash->set($_=>'') if ($stash->get($_) eq '*');
+  }
+
+  $stash->set('qgroupby'=>(grep {defined($_)} @$vars{qw(groupby group gr gb g)})[0] // '');
+
+  $stash->set('qscore'=>(grep {defined($_)} @$vars{qw(score sc sf)})[0] // 'ld');
+  $stash->set('qscore'=>'milf') if ($stash->get('qscore') eq 'mi'); ##-- backwards-compatible score alias 'mi'->'milf'
+
+  $stash->set('qkbest'=>(grep {defined($_)} @$vars{qw(kbest kb k)})[0] // 10);
+  $stash->set('qcutoff'=>(grep {defined($_)} @$vars{qw(cutoff cut co)})[0] // '');
+  $stash->set('qdiff'=>(grep {defined($_)} @$vars{qw(diffop diff D)})[0] // 'adiff');
+  $stash->set('qglobal'=>(grep {defined($_)} @$vars{qw(global glo gl G)})[0] // '');
+  $stash->set('qdebug'=>(grep {defined($_)} @$vars{qw(debug dbg)})[0] // 0);
+  $stash->set('qonepass'=>(grep {defined($_)} @$vars{qw(onepass 1pass 1p)})[0] // 0);
+  $stash->set('qslice2keys'=>(grep {defined($_)} @$vars{qw(slice2keys slicekeys s2k)})[0] // 0);
+  $stash->set('qeps'=>(grep {defined($_)} @$vars{qw(epsilon eps e)})[0] // 0);
+
+  ##-- parse booleans: allow e.g. "onepass=off"
+  my $setbool = sub {
+    my $key = shift;
+    my $val = $stash->get($key);
+    $val    = 0 if (!$val || $val =~ /^(?:false|f|no|n|off|disabled|null|nil|0)$/i);
+  };
+  $setbool->($_) foreach (qw(qglobal qonepass));
+
+  my $tdf_enabled = $stash->get('tdf_enabled');
+  my $prf = (grep {defined($_)} @$vars{qw(profile prof prf pr p)})[0] // '2';
+  if    ($prf =~ m{^(?:[c]|f?1?2$)}i) { $prf = '2'; }
+  elsif ($prf =~ m{^(?:[uwx]|f?1$)}i)   { $prf = '1'; }
+  elsif ($tdf_enabled && $prf =~ m{^(?:v|vec|vs|vsem|sem|td[mf])$}i) { $prf = 'tdf'; }
+  elsif ($prf =~ m{^(?:ddc$)}i)        { $prf = 'ddc'; }
+  elsif ($prf =~ m{^(?:d(?:iff)?[-/:_]?)(?:[c]|f?1?2$)}i) { $prf = 'diff-2'; }
+  elsif ($prf =~ m{^(?:d(?:iff)?[-/:_]?)(?:[uwx]|f?1$)}i)  { $prf = 'diff-1'; }
+  elsif ($tdf_enabled && $prf =~ m{^(?:d(?:iff)?[-/:_]?)(?:v|vec|vs|vsem|sem|td[mf])$}i) { $prf = 'diff-tdf'; }
+  elsif ($prf =~ m{^(?:d(?:iff)?[-/:_]?)(?i:ddc$)}i)       { $prf = 'diff-ddc'; }
+
+  $stash->set('qprofile'=>$prf);
+
+  my $fmt = (grep {defined($_)} @$vars{qw(format fmt f)})[0] // 'html';
+  my %fmt_alias = (
+		   htm=>'html',
+		   csv=>'text',
+		   tsv=>'text',
+		   txt=>'text',
+		   t=>'text',
+		   js=>'json',
+		   j=>'json',
+		   storable=>'sto',
+		   bin=>'sto',
+		   gm=>'gmotion',
+		   hc=>'hichart',
+		   hi=>'hichart',
+		   chart=>'hichart',
+		   highchart=>'hichart',
+		   highcharts=>'hichart',
+		   b=>'bubble',
+		   bub=>'bubble',
+		   bubbles=>'bubble',
+		   c=>'cloud',
+		   cl=>'cloud',
+		   cld=>'cloud',
+		  );
+  $fmt = $fmt_alias{$fmt} if (exists($fmt_alias{$fmt}));
+  $stash->set('qformat' => $fmt);
+
+  $stash->set('user_query'=>{
+			     (map {($_=>$stash->get("q$_"))}
+			      qw(query date slice bquery bdate bslice groupby score kbest cutoff diff global profile format debug onepass eps))
+			    });
+
+[% END %]
+
+[%##---------------------------------------------------------
+  ## URLs
+%]
+[% DEFAULT
+  dc_root       = cdb.uriDir();
+  dcp_url_base  =  dc_root _ "/profile.perl";
+  dcp_url_local = "./profile.perl";
+  ##--
+  ddc_url_root  = dstar.www_url || (diacollo_standalone ? '' : root_url);
+%]
+[% SET
+   uroot    = cdb.uuri(dc_root);
+   uprofile = cdb.uuri(dcp_url_base, user_query);
+   uplocal  = cdb.uuri(dcp_url_local, user_query);
+%]
+
+[%##---------------------------------------------------------
+  ## db open
+%]
+[% BLOCK opendb %]
+[% PERL ##-- opendb:perl %]
+  ##------------------------------------------------------------
+  ## open DB
+  my $dburl  = $stash->get('dburl');
+  #print STDERR "opendb($dburl)\n";
+
+  my $dbcli  = DiaColloDB::Client->open($dburl)
+   or die("$0: failed to open DiaColloDB URL $dburl: $!");
+   #$dbcli->{ddcServer} = $stash->get('dstar.server_host').":".$stash->get('dstar.server_port');
+  $stash->set('dbcli'=>$dbcli);
+[% END ##--/opendb:perl %]
+[% END ##--/opendb %]
+
+[% SET dc_common_loaded = 1; %]
+
+[% END ##-- end filter null %]
+[%#--
+  # Local Variables:
+  # mode: CPerl
+  # coding: utf-8
+  # End:
+%]

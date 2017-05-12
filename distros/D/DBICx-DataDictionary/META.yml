@@ -1,0 +1,18 @@
+---
+abstract: 'Define a data dictionary to use with your DBIx::Class Schema'
+author:
+  - 'Pedro Melo <melo@cpan.org>'
+generated_by: 'Dist::Zilla version 1.093400'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-DataDictionary
+requires:
+  DBIx::Class: 0
+  Test::Deep: 0
+  Test::More: 0.92
+  parent: 0
+resources:
+  repository: http://github.com/melo/dbic-data-dictionary/
+version: 0.002

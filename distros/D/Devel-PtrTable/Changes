@@ -1,0 +1,5 @@
+Revision history for Devel-PtrTable
+0.03    Fixed breakage on non-threaded perls
+0.01    Date/time
+        First version, released on an unsuspecting world.
+

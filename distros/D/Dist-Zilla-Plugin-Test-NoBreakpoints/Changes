@@ -1,0 +1,8 @@
+Revision history for Dist-Zilla-Plugin-Test-NoBreakpoints
+
+0.0.2     2015-10-26 10:28:20+00:00 Europe/London
+ - use GatherDir to ignore annoyingly generated '-MiniBufExplorer-' file
+
+0.0.1     2015-10-20 18:15:08+01:00 Europe/London
+
+ - Initial release

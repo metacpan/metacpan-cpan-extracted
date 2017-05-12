@@ -1,0 +1,10 @@
+DESCRIPTION
+    Devel::CCompat::C99::VariableLengthArrays - tests support for C99
+    variable length arrays
+
+    A module to highlight platforms which do and do not support variable
+    length arrays.
+
+VERSION
+    Version 0.001
+

@@ -1,0 +1,27 @@
+Build.PL
+Changes
+cpanfile
+ext/perl_math_int64/perl_math_int64.c
+ext/perl_math_int64/perl_math_int64.h
+ext/xxHash/.gitattributes
+ext/xxHash/.travis.yml
+ext/xxHash/cmake_unofficial/CMakeLists.txt
+ext/xxHash/LICENSE
+ext/xxHash/README.md
+ext/xxHash/xxhash.c
+ext/xxHash/xxhash.h
+ext/xxHash/xxhsum.1
+ext/xxHash/xxhsum.1.md
+ext/xxHash/xxhsum.c
+lib/Digest/xxHash.pm
+LICENSE
+MANIFEST			This list of files
+META.json
+META.yml
+ppport.h
+README
+README.md
+t/001_basic.t
+TODO
+typemap
+xxHash.xs

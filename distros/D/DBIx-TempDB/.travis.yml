@@ -1,0 +1,14 @@
+language: perl
+perl:
+  - "5.20"
+  - "5.16"
+  - "5.10"
+addons:
+  postgresql: "9.4"
+env:
+  - "HARNESS_OPTIONS=j2 TEST_PG_DSN=postgresql://postgres@"
+install:
+  - "cpanm -n Test::Pod Test::Pod::Coverage DBD::Pg"
+  - "cpanm -n --installdeps ."
+notifications:
+  email: false

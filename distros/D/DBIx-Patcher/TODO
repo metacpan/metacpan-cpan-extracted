@@ -1,0 +1,25 @@
+key: * todo; + written; - tested
+=== stage 1
+- schema_loader
+- dump schema
+- create run
++ add patch
++ run patch
++ find_patch
+    + create_date desc
++ is_successful
++ --retry if previous failed
++ move import to run and change patcher script
+* clean up
++ --add patches pretending it succeeded
++ use short options ie -d -h -u etc
+- change name space of modules to DBIx::Patcher
+=== stage 2
+* --install
+* --dry
+* --verbose to show cmd run
+* option to do look up based on MD5
+=== stage 3
+* plugin
+    * default values
+    * collate_files($dir)

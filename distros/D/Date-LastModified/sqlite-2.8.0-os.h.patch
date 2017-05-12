@@ -1,0 +1,52 @@
+*** os.h.orig	Mon Feb 17 03:40:51 2003
+--- os.h	Fri May 16 07:26:12 2003
+***************
+*** 18,23 ****
+--- 18,32 ----
+  #define _SQLITE_OS_H_
+  
+  /*
++ ** Handle Cygwin specially for off_t.
++ */
++ #ifdef __CYGWIN__
++ #ifndef _CYGWIN_TYPES_H
++ #include "/usr/include/cygwin/types.h"
++ #endif
++ #endif
++ 
++ /*
+  ** These #defines should enable >2GB file support on Posix if the
+  ** underlying operating system supports it.  If the OS lacks
+  ** large file support, or if the OS is windows, these should be no-ops.
+***************
+*** 82,90 ****
+--- 91,104 ----
+  #  define OS_UNIX 0
+  # endif
+  #else
++ #ifndef OS_MAC
+  # define OS_MAC 0
++ #endif
++ #ifndef OS_WIN
+  # define OS_WIN 0
+  #endif
++ #endif
++ 
+  
+  /*
+  ** A handle for an open file is stored in an OsFile object.
+***************
+*** 119,126 ****
+--- 133,144 ----
+  # if defined(_MSC_VER) || defined(__BORLANDC__)
+      typedef __int64 off_t;
+  # else
++ # if defined(__CYGWIN__)
++     /* use from types.h */
++ # else
+      typedef long long off_t;
+  # endif
++ # endif
+  # define SQLITE_TEMPNAME_SIZE (MAX_PATH+50)
+  # define SQLITE_MIN_SLEEP_MS 1
+  #endif

@@ -1,0 +1,11 @@
+Revision history for Dancer2-Plugin-Sixpack
+
+0.03  2015-12-30 11:27:48 CET
+        Fixes for new plugin framework
+
+0.02    2013-11-13
+        Added force param string parsing
+
+0.01    2013-11-05
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,27 @@
+---
+abstract: 'create a temporary database from a DBIx::Class::Schema'
+author:
+  - 'Jonathan Rockway C<< <jrockway@cpan.org> >>'
+build_requires:
+  DBIx::Class: 0
+  ExtUtils::MakeMaker: 6.36
+  Test::More: 0
+  ok: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 0
+generated_by: 'ExtUtils::MakeMaker version 6.72, CPAN::Meta::Converter version 2.131560'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBICx-TestDatabase
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  DBD::SQLite: 1.29
+  File::Temp: 0
+  SQL::Translator: 0
+version: 0.05

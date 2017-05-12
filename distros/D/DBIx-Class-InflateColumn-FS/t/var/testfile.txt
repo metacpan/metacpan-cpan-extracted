@@ -1,0 +1,1 @@
+Simple file with content for tests.

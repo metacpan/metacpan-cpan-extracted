@@ -1,0 +1,33 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [EnsureSQLSchemaVersionedTest]
+
+DESCRIPTION
+
+    This plugin checks if SQL::Schema::Versioned is in the RuntimeRequires
+    prereq. If it is, then the plugin requires that
+    xt/author/sql_schema_versioned.t exists, to make sure that the dist
+    author has added a test for schema creation/upgrades.
+
+    Typical xt/author/sql_schema_versioned.t is as follow (identifiers in
+    all-caps refer to project-specific names):
+
+     #!perl
+    
+     use PROJ::MODULE;
+     use Test::More 0.98;
+     use Test::SQL::Schema::Versioned;
+     use Test::WithDB::SQLite;
+    
+     sql_schema_spec_ok(
+         $PROJ::MODULE::DB_SCHEMA_SPEC,
+         Test::WithDB::SQLite->new,
+     );
+     done_testing;
+
+SEE ALSO
+
+    SQL::Schema::Versioned
+

@@ -1,0 +1,12 @@
+Revision history for Perl extension DBIx::AbstractLite.
+
+0.02  Thu Mar 29 21:38:00 2001
+(CVS version: 1.05)
+improved destructor.
+added ability to set global fields.
+removed unnecessary dependency on Exporter, AutoLoader.
+corrected Copyright.
+
+0.01  Mon Mar 26 11:00:44 2001
+	- original version; created by h2xs 1.19
+

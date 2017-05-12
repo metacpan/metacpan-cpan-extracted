@@ -1,0 +1,236 @@
+{
+   "abstract" : "Automatically hash password/passphrase columns",
+   "author" : [
+      "Florian Ragwitz <rafl@debian.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200006, CPAN::Meta::Converter version 2.110930",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-PassphraseColumn",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Class::Load" : 0,
+            "DBIx::Class" : 0,
+            "DBIx::Class::InflateColumn::Authen::Passphrase" : 0,
+            "Sub::Name" : 0,
+            "namespace::clean" : 0,
+            "parent" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Authen::Passphrase::RejectAll" : 0,
+            "DBIx::Class::Core" : 0,
+            "DBIx::Class::Schema" : 0,
+            "FindBin" : 0,
+            "SQL::Translator" : 0,
+            "Test::More" : "0.89"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-DBIx-Class-PassphraseColumn@rt.cpan.org",
+         "web" : "http://rt.cpan.org/Public/Dist/Display.html?Name=DBIx-Class-PassphraseColumn"
+      },
+      "homepage" : "http://search.cpan.org/dist/DBIx-Class-PassphraseColumn",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/rafl/dbix-class-passphrasecolumn.git",
+         "web" : "http://github.com/rafl/dbix-class-passphrasecolumn"
+      }
+   },
+   "version" : "0.02",
+   "x_Dist_Zilla" : {
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::GatherDir",
+            "name" : "@FLORA/@Basic/GatherDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@FLORA/@Basic/PruneCruft",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ManifestSkip",
+            "name" : "@FLORA/@Basic/ManifestSkip",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@FLORA/@Basic/MetaYAML",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@FLORA/@Basic/License",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Readme",
+            "name" : "@FLORA/@Basic/Readme",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExtraTests",
+            "name" : "@FLORA/@Basic/ExtraTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@FLORA/@Basic/ExecDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir",
+            "name" : "@FLORA/@Basic/ShareDir",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MakeMaker",
+            "name" : "@FLORA/@Basic/MakeMaker",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@FLORA/@Basic/Manifest",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@FLORA/@Basic/TestRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@FLORA/@Basic/ConfirmRelease",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "@FLORA/@Basic/UploadToCPAN",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@FLORA/MetaConfig",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@FLORA/MetaJSON",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@FLORA/PkgVersion",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@FLORA/PodSyntaxTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NoTabsTests",
+            "name" : "@FLORA/NoTabsTests",
+            "version" : "0.01"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodCoverageTests",
+            "name" : "@FLORA/PodCoverageTests",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaResources",
+            "name" : "@FLORA/MetaResources",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@FLORA/Authority",
+            "version" : "1.005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::EOLTests",
+            "name" : "@FLORA/EOLTests",
+            "version" : "0.02"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "name" : "@FLORA/PodWeaver",
+            "version" : "3.101641"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@FLORA/AutoPrereqs",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "4.200006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "4.200006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : 0
+         },
+         "version" : "4.200006"
+      }
+   },
+   "x_authority" : "cpan:FLORA"
+}
+

@@ -1,0 +1,285 @@
+=head1 NAME
+
+DBIx::TNDBO - Wrapper for DBI offers concise syntax.
+
+=head1 SYNOPSIS
+
+Your Database Module
+
+  package YDB;
+
+  use strict;
+  use warnings;
+  use base qw( DBIx::TNDBO );
+
+  sub credentials {
+      my ($dbname) = @_;
+      return {
+          user   => 'dylan',
+          pass   => 'foobar1',
+          driver => 'mysql',
+          dbname => 'language',
+          host   => 'localhost',
+          port   => 3306,
+      };
+  }
+
+  1;
+
+Your MySQL Table
+
+  mysql> desc word;
+  +---------+----------------------+------+-----+-------------------+----------------+
+  | Field   | Type                 | Null | Key | Default           | Extra          |
+  +---------+----------------------+------+-----+-------------------+----------------+
+  | id      | int(11)              | NO   | PRI | NULL              | auto_increment |
+  | data    | varchar(100)         | YES  |     | NULL              |                |
+  | lang    | enum('en','ja','es') | NO   |     | en                |                |
+  | anagram | varchar(100)         | YES  |     |                   |                |
+  | created | timestamp            | NO   |     | CURRENT_TIMESTAMP |                |
+  +---------+----------------------+------+-----+-------------------+----------------+
+
+Your Program
+
+  #!/usr/bin/perl -Tw
+
+  use strict;
+  use warnings;
+  use YDB qw( :dbname );
+
+  my $word_dbo = YDB();
+
+  $word_dbo->set(
+      {   data => 'hello',
+          lang => 'en',
+      }
+  );
+  my $id = $word_dbo->commit();
+
+  my $word_count = YDB();
+
+  my @word_dbos = YDB( { data => 'hello' } );
+
+  my $word_itr = YDB( { data => 'hello' } );
+
+  while ( my $word_dbo = $word_itr->next() ) {
+
+      my $data = $word_dbo->get();
+
+      my $anagram = join '', sort { -1 + int rand 3 } split //, $data;
+
+      $word_dbo->set( $anagram );
+      $word_dbo->commit();
+
+      print "$word_dbo\n";
+  }
+
+
+=head1 DESCRIPTION
+
+This module is designed to be used as the base class for your own DBI wrapper
+module. Your module will define the credentials() method which is used to
+access the database and examine the schema. The schema data is then used to
+create a schema aware OO interface with abbreviated syntax for generating
+lists, iterators, and record objects. There is also a uniquely abbreviated
+syntax for getters and setters.
+
+
+=head1 USE LINE
+
+The use line for your module is where you state the names of the databases
+you intend to interact with. Otherwise, give the name of the key in the
+credentials hash which has the database name, with a leading colon.
+
+  use YDB qw( :dbname );
+
+In this case the name (or list of names) is the value keyed by dbname in
+the credentials hash.
+
+  use YDB qw( language );
+
+In this case your module will be interacting with the database called
+'language'.
+
+In these examples the names 'YDB' and 'dbname' are just sample names. You will
+choose a package name (and database name) which suits you.
+
+
+=head1 CONSTRUCTORS
+
+Create a new record object.
+
+  my $word_dbo = YDB();
+
+This creates an object with schema relevant getters & setters. In this
+example we've created an instance of the `word` table in the `language` database.
+
+Where clauses are given with a hash reference which is transformed to SQL
+via the L<SQL::Abstract> module.
+
+  my $word_dbo = YDB( { data => 'hello' } );
+
+Scalar context implies that you only want a single result. If more than one
+(or zero) results are matched then undef is returned.
+
+  my @word_dbos = YDB( { data => 'hello' } );
+
+In list context all resuls will be returned. However, if there are likely to
+be a lot of results you might prefer an iterator object.
+
+  my $word_itr = YDB( { data => 'hello' } );
+
+  while ( my $word_dbo = $word_itr->next() ) {
+    ...
+  }
+
+For a count query you can do this.
+
+  my $word_count = YDB( { data => 'hello' } );
+
+
+=head1 METHODS
+
+=head2 Record Objects
+
+=over
+
+=item set( $field )
+
+The set method can assume several forms.
+
+  $word_dbo->set_data( 'hello' );
+  $word_dbo->set( $data );
+  $word_dbo->set( { data => 'hello', lang => 'en' } );
+
+=item get( $field )
+
+The get method also assumes several forms.
+
+  $data = $word_dbo->get();
+  $word_dbo->get( 'data' );
+  { data => $word_dbo->get(), lang => $word_dbo->get() }
+
+=item delete()
+
+This sets a record to be deleted on commit.
+
+=item commit()
+
+Changes made to the object are committed to the database as an update
+or an insert.
+The object will carp on destroy if there are uncommitted modifications.
+
+=item discard()
+
+Use this to discard the changes made to the object.
+The object will carp on destroy if there are uncommitted modifications.
+
+=back
+
+
+=head2 Iterator Objects
+
+Standard iterator interface includes:
+
+=over
+
+=item has_next()
+
+=item next()
+
+=back
+
+=head1 NAMING CONVENTIONS
+
+This module uses source filtering to provide the abbreviated syntax for the
+different record object constructor types and the get/set operations on
+record objects.
+
+Therefore the naming conventions are crucial for directing how a given
+statement should be expaned and also to avoid allowing the source filter to
+inadvertenly modify unrelated code.
+
+Examples:
+
+  # _count suffix necessary to indicate select count(*) query.
+  my $word_count = YDB();
+
+  # _dbo suffix directs expansion for a normal constructor call.
+  my $word_dbo = YDB();
+
+  # _dbos suffix directs expansion for a list constructor call.
+  my @word_dbos = YDB();
+
+  # _itr suffix directs expansion for an iterator constructor call.
+  my $word_itr = YDB();
+
+  # _dbo suffix ensures unrelated code is not modified.
+  my $data = $word_dbo->get();
+  $word_dbo->set( $data );
+
+=head1 LIMITATIONS
+
+=over
+
+=item *
+
+Ambiguous table names
+
+There will be confusion if you have multiple databases which have a table of
+the same name. For example:
+
+  use YDB qw( database_a database_b );
+
+  my $word_dbo = YDB();
+
+If there is both a database_a.word table and a database_b.word table then the
+results in this case are not defined.
+
+=item *
+
+This module was developed and tested with MySQL. It will build a DSN based on
+whatever values are returned from your credentials() function. However, there
+is no accounting for whatever database idiosyncracies there may be.
+
+=back
+
+=head1 ABOUT
+
+This module is not the TierraNet DBO module. This is just a tribute.
+
+The key features of this module are accomplished using:
+
+=over
+
+=item * source filtering
+
+=item * disk caching of schema data
+
+=item * dynamic symbol table manipulation at load time.
+
+=back
+
+
+=head1 SEE ALSO
+
+The L<SQL::Abstract> module already does a great job ad defining a query
+definition syntax.
+
+The L<Filter::Simple> module makes source filtering a snap.
+
+
+=head1 AUTHOR
+
+Dylan Doxey, E<lt>dylan@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2013 by Dylan Doxey
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.10 or,
+at your option, any later version of Perl 5 you may have available.
+
+
+=cut

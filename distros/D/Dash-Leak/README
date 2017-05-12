@@ -1,0 +1,55 @@
+NAME
+    Dash::Leak - Track memory allocation
+
+SYNOPSIS
+    Quick summary of what the module does.
+
+        BEGIN {
+            # enables operation of Dash::Leak, leaksz is a nop without this
+            $ENV{DEBUG_MEM} = 1;
+        }
+
+        use Dash::Leak;
+    
+        {
+            leaksz "block label";
+            # some code, that may leak
+        }
+        # If your code leaked, you'll be noticed about change
+        # of process vsize after leaving block
+    
+        leaksz "tests begin";
+        some_operation($arg);
+        leaksz "some_operation", sub {
+            warn sprintf "We leaked after some_operation($arg) by %+d kilobytes;", shift
+        };
+        another_operation();
+        leaksz "another_operation";
+        # ...
+
+        use Dash::Leak sub { ... }; # Will call this cb for every alloc, instead of warn
+
+EXPORT
+    Export of this module is "virtual", by using Devel::Declare. When
+    $ENV{DEBUG_MEM} is true, it will work, when false, this opcodes will be
+    ignored, like with "leaksz ... if 0";
+
+FUNCTIONS
+  leaksz $label, [$cb->($delta)]
+    Starts tracking current block. If something changed since last note,
+    notice will be warned. If callback is passed, it will be invoked instead
+    of warn.
+
+ACKNOWLEDGEMENTS
+    *   Thanks to knevgen (<http://github.com/knevgen>) for linux version
+        patch
+
+AUTHOR
+    Mons Anderson, "<mons at cpan.org>"
+
+COPYRIGHT & LICENSE
+    Copyright 2010 Mons Anderson, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

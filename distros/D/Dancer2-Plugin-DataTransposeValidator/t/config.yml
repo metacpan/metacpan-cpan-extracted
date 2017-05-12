@@ -1,0 +1,3 @@
+appdir: t/appdir
+logger: capture
+log: debug

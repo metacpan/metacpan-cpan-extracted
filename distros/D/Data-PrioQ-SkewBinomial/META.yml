@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Data-PrioQ-SkewBinomial
+version:             0.03
+abstract:            A functional priority queue based on skew binomial trees
+license:             ~
+author:              
+    - Lukas Mai <l.mai @web.de>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Carp:                          0
+    constant:                      1.04
+    Test::More:                    0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

@@ -1,0 +1,11 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/001_smoke.t
+t/01_pod.t
+t/01_pod_coverage.t
+t/02_use.t
+lib/DBIx/Counter.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+

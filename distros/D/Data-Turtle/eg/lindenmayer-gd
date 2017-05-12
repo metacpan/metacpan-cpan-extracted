@@ -1,0 +1,72 @@
+#!/usr/bin/env perl
+use strict;
+use warnings;
+
+use Data::Turtle;
+use GD;
+
+my $repetitions = shift || 1;
+my $string      = shift || 'A';
+my $distance    = shift || 20;
+my $theta       = shift || 20;
+my $width       = shift || 500;
+my $height      = shift || 500;
+
+my $motion = {
+    distance => $distance,
+    theta    => $theta,
+};
+
+my %rule = (
+#    A => 'BA',
+#    B => 'AB',
+    A => 'GS[-A][+A]',
+    G => 'S',
+#    B => 'C',
+#    C => 'A',
+);
+
+my $turtle = Data::Turtle->new(
+    width  => $width,
+    height => $height,
+    x      => $width / 2,
+    y      => $height,
+);
+
+my $img = GD::Image->new( $width, $height );
+
+my %color = (
+    white => $img->colorAllocate( 255, 255, 255 ),
+    black => $img->colorAllocate( 0, 0, 0 ),
+);
+
+$img->transparent( $color{white} );
+$img->interlaced('true');
+
+my @statestack;
+
+my %translate = (
+    'S' => sub {
+        my @line = $turtle->forward( $motion->{distance} );
+        if ( $turtle->pen_status == 1 && @line ) {
+            $img->setThickness( $line[5] );
+            $img->line( @line[ 0 .. 3 ], $color{ $line[4] } );
+        }
+    },
+    '-' => sub { $turtle->turn( - $motion->{theta} ) },
+    '+' => sub { $turtle->turn( $motion->{theta} ) },
+    'M' => sub { $turtle->mirror },
+    '[' => sub { push @statestack, [ $turtle->get_state ] },
+    ']' => sub { $turtle->set_state( @{ pop @statestack } ) },
+);
+
+for ( 1 .. $repetitions ) {
+    $string =~ s/./defined($rule{$&}) ? $rule{$&} : $&/eg;
+}
+#warn __LINE__,". String: ","$string\n";
+
+for my $command ( split //, $string ) {
+    $translate{$command}->() if $translate{$command};
+}
+
+print $img->png;

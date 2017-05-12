@@ -1,0 +1,56 @@
+This file contains changes in REQUIRED dependencies for standard CPAN phases (configure/build/runtime/test)
+
+0.004002
+ [Added / configure requires]
+ - perl 5.008
+
+ [Added / test requires]
+ - perl 5.008
+
+ [Changed / test requires]
+ - Test::More 0.89 → 0
+
+0.004001 2014-10-26T09:36:03Z
+
+0.004000 2014-08-27T14:16:46Z
+ [Added / configure requires]
+ - ExtUtils::MakeMaker
+
+ [Added / test requires]
+ - ExtUtils::MakeMaker
+ - File::Spec
+
+ [Changed / test requires]
+ - Test::More 1.001002 → 0.89
+
+ [Removed / build requires]
+ - Module::Build 0.4203
+
+ [Removed / configure requires]
+ - Module::Build 0.4203
+
+0.003000 2013-12-20T13:14:46Z
+ [Added / runtime requires]
+ - Moose::Role
+ - utf8
+
+ [Added / test requires]
+ - Log::Contextual::LogDispatchouli
+ - Log::Dispatchouli
+
+ [Changed / runtime requires]
+ - perl 5.006 → 5.008
+
+0.002000 2013-12-14T13:15:29Z
+ [Added / runtime requires]
+ - Dist::Zilla::UtilRole::MaybeZilla
+
+ [Added / test requires]
+ - Sort::Versions
+
+ [Removed / runtime requires]
+ - MooseX::LazyRequire
+
+0.001002 2013-12-09T04:09:39Z
+
+0.001001 2013-12-06T21:46:53Z

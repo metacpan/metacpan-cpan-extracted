@@ -1,0 +1,8 @@
+Changes
+lib/Data/PathSimple.pm
+Makefile.PL
+MANIFEST
+README.md
+t/get.t
+t/set.t
+META.yml                                 Module meta-data (added by MakeMaker)

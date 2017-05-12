@@ -1,0 +1,23 @@
+Revision history for  Dist-Zilla-Plugin-AutoMetaResources
+
+1.21   2015-05-07 23:08:40
+    [gh#2] move off of Test::MockObject
+        Provided by karenetheridge
+    [gh#4] add bitbucket support
+        Provided by xenoterracide
+    [gh#5] convert all references to search.cpan.org to metacpan.org
+        Provided by karenetheridge
+    [gh#6] change PWP::Encoding to PWP::SingleEncoding
+        Provided by sergeyromanov
+
+1.20   2013-04-14 02:54:47
+    FIXES:
+        [rt#84593] Escaping braces in regex for 5.16 compliance.
+        Reported and fixed by GARU.
+
+1.110050    Wed Jan  5 20:48:23 2011
+            github.com is using HTTPS by default
+
+0.01        Wed Nov  3 23:51:16 2010
+            First version.
+

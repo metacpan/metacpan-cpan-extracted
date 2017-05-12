@@ -1,0 +1,15 @@
+# http://module-build.sourceforge.net/META-spec.html
+#XXXXXXX This is a prototype!!!  It will change in the future!!! XXXXX#
+name:         DBIx-Recordset-Playground
+version:      1.9
+version_from: Playground.tt
+installdirs:  site
+requires:
+    DBI:                           1
+    DBIx::Recordset:               0.24
+    DBSchema::Sample:              0.04
+    Text::Template:                1.44
+    Whitespace:                    1.02
+
+distribution_type: module
+generated_by: ExtUtils::MakeMaker version 6.16

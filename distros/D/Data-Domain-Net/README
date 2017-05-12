@@ -1,0 +1,59 @@
+NAME
+    Data::Domain::Net - Data domain classes for IP addresses
+
+VERSION
+    version 1.100840
+
+DESCRIPTION
+    The classes in this distribution are data domain classes for these IP
+    address types:
+
+    IPv4
+        See Data::Domain::Net::IPAddress::IPv4.
+
+    IPv6
+        See Data::Domain::Net::IPAddress::IPv6.
+
+    Besides defining the methods described below, this class also exports,
+    on request, these functions:
+
+    IPv4
+        A shortcut for creating a Data::Domain::Net::IPAddress::IPv4 object.
+        Arguments are passed on to the object's constructor.
+
+    IPv6
+        A shortcut for creating a Data::Domain::Net::IPAddress::IPv6 object.
+        Arguments are passed on to the object's constructor.
+
+    By using the ":all" tag, you can import all of them.
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+BUGS AND LIMITATIONS
+    No bugs have been reported.
+
+    Please report any bugs or feature requests through the web interface at
+    <http://rt.cpan.org/Public/Dist/Display.html?Name=Data-Domain-Net>.
+
+AVAILABILITY
+    The latest version of this module is available from the Comprehensive
+    Perl Archive Network (CPAN). Visit <http://www.perl.com/CPAN/> to find a
+    CPAN site near you, or see
+    <http://search.cpan.org/dist/Data-Domain-Net/>.
+
+    The development version lives at
+    <http://github.com/hanekomu/Data-Domain-Net/>. Instead of sending
+    patches, please fork this project using the standard git and github
+    infrastructure.
+
+AUTHOR
+      Marcel Gruenauer <marcel@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2007 by Marcel Gruenauer.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

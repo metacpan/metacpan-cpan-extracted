@@ -1,0 +1,44 @@
+0.011000   2013-05-13
+
+- Switched to a 3-decimal version string.
+
+- Renamed accessors in Path objects from 'path_ent*' to 'path_dirent*',
+  and 'final_ent' to 'dirent'.  This is an API change, but I don't think
+  anyone is using this module yet anyway.
+
+- Added $path->resolved_canonical_path convenience method to quickly get a
+  unix path string like "/a/b/c" from a $path object.
+  (mostly useful for filters)  Also added ->canonical_path for a quick
+  rendering of the path that was passed to it.
+
+- Added other helpful accessors for path objects: 'type', 'name', 'depth'.
+  Added new methods 'mkdir', 'path_if_exists'.
+
+- Enhanced path resolving, so that a resolved path which you request a
+  subpath from will return a partially-resolved path object, speeding up
+  the "for($path->readdir) { $path->path($_) }" pattern.
+
+- Added $fs->get_dir_entries, $fs->readdir, and $path->readdir, which return
+  a list of directory entries *including* the current un-committed overrides.
+
+- Added $fs->tree_iterator, and $path->tree_iterator, which runs a similar
+  operation to the unix 'find' command on the virtual filesystem.
+
+- Fixed the $fs->unlink feature, which was completely broken before, and added
+  test cases.
+
+0.0101   2013-05-03
+
+- Changed version numbers to strings (used integers by accident)
+
+- Many fixes in POD notation, and documentation in general.
+
+- Removed reference to Carp::Always (was only for debugging)
+
+- Fixed bug in testcase code where I was blessing a reference to a constant
+  string.  Some perl versions didn't like this.
+
+0.0100   2013-05-01
+
+- Initial version.  Directory encoding and decoding is fully functional,
+  resolve_path works well, and set_path and update_path seem to be working.

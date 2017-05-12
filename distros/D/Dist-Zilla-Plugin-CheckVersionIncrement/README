@@ -1,0 +1,73 @@
+NAME
+    Dist::Zilla::Plugin::CheckVersionIncrement - Prevent a release unless
+    the version number is incremented
+
+VERSION
+    version 0.121750
+
+SYNOPSIS
+    In your dist.ini
+
+        [CheckVersionIncrement]
+
+DESCRIPTION
+    This plugin prevents your from releasing a distribution unless it has a
+    version number *greater* than the latest version already indexed on
+    CPAN.
+
+    Note that this plugin doesn't check whether your release method actually
+    involves the CPAN or not. So if you don't use the UploadToCPAN plugin
+    for releases, then you probably shouldn't use this one either.
+
+METHODS
+  before_release
+    This method checks the version of the dist to be released against the
+    latest version already indexed on CPAN. If the version to be released is
+    not greater than the indexed version, it prompts the user to confirm the
+    release.
+
+    This method does nothing if the dist is not indexed at all.
+
+BUGS AND LIMITATIONS
+    Please report any bugs or feature requests to
+    "rct+perlbug@thompsonclan.org".
+
+SEE ALSO
+    *   Dist::Zilla::Plugin::CheckPrereqsIndexed - Used as the example for
+        getting the indexed version of a dist
+
+INSTALLATION
+    See perlmodinstall for information and options on installing Perl
+    modules.
+
+AUTHOR
+    Ryan C. Thompson <rct@thompsonclan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Ryan C. Thompson.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+
+DISCLAIMER OF WARRANTY
+    BECAUSE THIS SOFTWARE IS LICENSED FREE OF CHARGE, THERE IS NO WARRANTY
+    FOR THE SOFTWARE, TO THE EXTENT PERMITTED BY APPLICABLE LAW. EXCEPT WHEN
+    OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES
+    PROVIDE THE SOFTWARE "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER
+    EXPRESSED OR IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE
+    ENTIRE RISK AS TO THE QUALITY AND PERFORMANCE OF THE SOFTWARE IS WITH
+    YOU. SHOULD THE SOFTWARE PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
+    NECESSARY SERVICING, REPAIR, OR CORRECTION.
+
+    IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN WRITING
+    WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY MODIFY AND/OR
+    REDISTRIBUTE THE SOFTWARE AS PERMITTED BY THE ABOVE LICENCE, BE LIABLE
+    TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL, INCIDENTAL, OR
+    CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR INABILITY TO USE THE
+    SOFTWARE (INCLUDING BUT NOT LIMITED TO LOSS OF DATA OR DATA BEING
+    RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR A
+    FAILURE OF THE SOFTWARE TO OPERATE WITH ANY OTHER SOFTWARE), EVEN IF
+    SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH
+    DAMAGES.
+

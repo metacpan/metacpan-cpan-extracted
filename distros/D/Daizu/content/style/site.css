@@ -1,0 +1,307 @@
+body {
+	margin: 0;
+	color: #000;
+	background: #F6FBFF none;
+	font-family: "Times New Roman", Times, serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-weight: normal;
+}
+
+h2, h3 {
+	margin-bottom: 0;
+}
+
+h3 a {
+	text-decoration: none;
+}
+
+p {
+	margin-top: 0.5ex;
+}
+
+/* Make visited and unvisited links blue and purple, Netscape style.
+ * Hovered and 'active' links are a nice cyan.
+ */
+a:link    { color: #00F; background: #F6FBFF none; }
+a:visited { color: #909; background: #F6FBFF none; }
+a:hover   { color: #09F; background: #F6FBFF none; }
+a:active  { color: #09F; background: #F6FBFF none; }
+
+#header h1 {
+	margin: 1ex 1em;
+}
+#header h1 a {
+	text-decoration: none;
+}
+
+#all-cols {
+	position: relative;
+	padding-bottom: 1em;
+	border: 1px solid #F6FBFF;
+}
+
+#content-col {
+	margin-left: 10em;
+	margin-right: 10em;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+#navigation-col, #extras-col {
+	position: absolute;
+	top: 0px;
+	font-size: 90%;
+	width: 9.5em;
+	padding-bottom: 1em;
+}
+
+#navigation-col {
+	left: 0.5em;
+	border-right: 1px solid #004780;
+	padding-right: 0.5em;
+}
+
+#extras-col {
+	right: 0.5em;
+	border-left: 1px solid #004780;
+	padding-left: 0.5em;
+}
+
+#footer {
+	font-size: 75%;
+	margin-top: 3em;
+	text-align: center;
+}
+
+/* Lists in the left and right columns */
+#navigation-col ul, #navigation-col ol, #extras-col ul, #extras-col ol {
+	list-style-type: none;
+	padding-left: 0;
+	margin-left: 0;
+}
+#navigation-col * ul, #navigation-col * ol, #extras-col * ul, #extras-col * ol {
+	padding-left: 1ex;
+	margin-left: 1ex;
+}
+#navigation-col a, #extras-col a {
+	text-decoration: none;
+}
+#navigation-col li, #extras-col li {
+	margin-top: 0.5ex;
+}
+#navigation-col .current, #extras-col .current {
+	font-weight: bold;
+}
+#navigation-col .current ul, #extras-col .current ul {
+	font-weight: normal;
+}
+
+/* Boxes of 'extra information' in the left and (mostly) right columns. */
+.extras-box h2 {
+	font-size: 120%;
+	margin-bottom: 0;
+}
+.extras-box {
+	margin-bottom: 3ex;
+}
+
+/* The Related Links box, added by the Daizu::Plugin::RelatedLinks plugin. */
+#box-related-links ul {
+	margin-top: 1ex;
+	margin-left: 0;
+}
+#box-related-links li {
+	margin-bottom: 0.5ex;
+	margin-left: 0;
+}
+
+/* Indent 'pre' blocks, give them a different background color, and put a
+ * blue fade on the left hand side.
+ */
+pre, blockquote {
+	margin: 1ex 0 1.5ex 1ex;
+	padding: 0.5ex 0.5ex 0.5ex 30px;
+	background-color: white;
+	background-image: url(block-fade.png);
+	background-position: 0 0;
+	background-repeat: repeat-y;
+}
+pre {
+	font-family: monospace;
+}
+
+td, th {
+	vertical-align: top;
+}
+
+dt {
+	padding-top: 1ex;
+	font-weight: bold;
+}
+
+img {
+	border: none;
+}
+
+/* Browsers may vary in what they do with these, so we'll standardize
+ * on italics.  */
+dfn, var {
+	font-style: italic;
+}
+
+/* The small text which appears under the heading for an article.
+ * Can include author tagline, description, etc.  */
+#content-col .entry-meta p {
+	margin-left: 1em;
+	font-size: 90%;
+}
+
+.entry-content p {
+	text-align: justify;
+}
+
+/* Style tables specially, with borders shown.  This is partly to make
+ * them smarter, and partly to make you think twice if you try to use
+ * a table for layout inside an article.  */ 
+.entry-content table {
+	border-collapse: collapse;
+	margin: 1ex auto 1.5ex auto;
+}
+.entry-content td, .entry-content th {
+	padding: 0.5ex;
+	background: #FFF none;
+	border: 1px solid #004780;
+}
+.entry-content th {
+	text-align: center;
+}
+caption {
+	caption-side: bottom;
+	font-style: italic;
+	width: 100%;
+	margin: 1ex auto 1.5ex auto;
+}
+/* Toggle italics so that emphasis shows up in captions */
+caption em, caption i, caption dfn, caption var {
+	font-style: normal;
+}
+
+/* Turn off the dotted underline on <abbr> when it's used in the
+ * datetime microformat design pattern, because it's distracting and
+ * the title is just an unambiguous version of the time, and so is
+ * unlikely to be interesting to users.  */
+abbr.published, abbr.updated {
+	border-bottom: none;
+}
+
+/* The box which appears on articles with the 'retired' flag, warning
+ * that the content may be out of date.  Make it stand out.  */
+.article-retired {
+	border: 2px solid #900;
+	background: #FFF none;
+	color: #000;
+	margin: 2ex;
+	padding: 1ex;
+}
+
+/* The box at the bottom of an article showing which folksonomy tags
+ * it has.  They make sense as a list, but display them inline to save
+ * space.  Clever browsers will get commas and full-stops punctuating
+ * them, but there's a bit of left margin to space them out as well, which
+ * will have to do for IE 6.  */
+.entry-tags {
+	border: 1px solid #004780;
+	background: #FFF;
+	margin: 1ex 1em;
+	padding: 1ex;
+}
+.entry-tags h4 {
+	font-size: 100%;
+	font-weight: bold;
+}
+.entry-tags h4, .entry-tags ul, .entry-tags li {
+	display: inline;
+}
+.entry-tags ul {
+	margin-left: 0;
+	padding-left: 0;
+}
+.entry-tags li {
+	margin-left: 1ex;
+}
+.entry-tags li:after {
+	content: ', ';
+}
+.entry-tags li:last-child:after {
+	content: '.';
+}
+.entry-tags a {
+	text-decoration: none;
+	background: #FFF none;
+}
+
+.no-css {
+	display: none;
+}
+
+/* Syntax coloring, from Text::VimColor. */
+span.syn-comment    { color: #0000FF }
+span.syn-constant   { color: #FF00FF }
+span.syn-identifier { color: #008B8B }
+span.syn-statement  { color: #A52A2A ; font-weight: bold }
+span.syn-preproc    { color: #A020F0 }
+span.syn-type       { color: #2E8B57 ; font-weight: bold }
+span.syn-special    { color: #6A5ACD }
+span.syn-underlined { color: #000000 ; text-decoration: underline }
+span.syn-error      { color: #FFFFFF ; background: #FF0000 none }
+span.syn-todo       { color: #0000FF ; background: #FFFF00 none }
+
+/* Articles */
+.entry-meta p {
+	margin-top: 0;
+	margin-bottom: 0;
+}
+.entry-summary {
+	color: #444;
+}
+
+.next-prev {
+	font-size: 90%;
+	text-align: center;
+	margin-top: 1ex;
+	margin-bottom: 1ex;
+}
+.next-prev a {
+	text-decoration: none;
+	margin: 0 0.5em;
+}
+
+/* Blog archive pages */
+#blog-index ul {
+	list-style: none;
+}
+#blog-index li {
+	margin-bottom: 1ex;
+}
+#blog-index li a {
+	margin-right: 1em;
+}
+
+/* PictureArticle plugin */
+.display-picture {
+	margin: 2ex 1ex;
+	text-align: center;
+}
+.display-picture img {
+	background-color: #FFF;
+	border: 1px solid #004780;
+	margin-bottom: 1ex;
+}
+.display-picture a {
+	/* This is really to avoid an underline on the image. */
+	text-decoration: none;
+}
+
+/* vi:set ts=8 sw=8 noexpandtab: */

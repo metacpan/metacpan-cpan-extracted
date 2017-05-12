@@ -1,0 +1,13 @@
+(
+  { value=>undef,          exp=>q!NULL! }, 
+  { value=>q!hello!,       exp=>q!'hello'! },
+  { value=>q!hello world!, exp=>q!'hello world'! },
+  { value=>q!'hello!,      exp=>q!'''hello'! },
+  { value=>q!hel'lo!,      exp=>q!'hel''lo'! },
+  { value=>q!hello'!,      exp=>q!'hello'''! },
+  { value=>q!hel''lo!,     exp=>q!'hel''''lo'! },
+  { value=>q!hel\\lo!,     exp=>q!E'hel\\\\lo'! },
+  { value=>q!hello\\!,     exp=>q!E'hello\\\\'! },
+  { value=>q!\\hello!,     exp=>q!E'\\\\hello'! },
+  { value=>q!hel\\l'o!,    exp=>q!E'hel\\\\l''o'! },
+);

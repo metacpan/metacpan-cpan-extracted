@@ -1,0 +1,16 @@
+Data-Downloader
+
+The Data-Downloader module is used to download files using RSS
+feeds and/or download templates.  It maintains a cache and also
+maintains symbolic links to files in the cache.
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+	perl Build.PL
+	./Build
+	./Build test
+	./Build install
+
+

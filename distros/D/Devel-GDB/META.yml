@@ -1,0 +1,16 @@
+--- #YAML:1.0
+name:                Devel-GDB
+version:             2.02
+abstract:            Open and communicate a gdb session
+license:             ~
+generated_by:        ExtUtils::MakeMaker version 6.31
+distribution_type:   module
+requires:     
+    Test::More:                    0
+    Thread::Semaphore:             0
+    threads::shared:               0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.2.html
+    version: 1.2
+author:
+    - Antal Novak <afn@cpan.org>, Josef Ezra <jezra@cpan.org>

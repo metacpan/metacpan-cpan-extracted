@@ -1,0 +1,56 @@
+# NAME
+
+Dancer2::Session::Sereal - Dancer 2 session storage in files with Sereal
+
+# VERSION
+
+version 0.003
+
+# DESCRIPTION
+
+This module implements Dancer 2 session engine based on [Sereal](https://metacpan.org/pod/Sereal) files.
+
+This backend can be used in single-machine production environments, but two
+things should be kept in mind: The content of the session files is not
+encrypted or protected in anyway and old session files should be purged by a
+CRON job.
+
+# CONFIGURATION
+
+The setting **session** should be set to `Sereal` in order to use this session
+engine in a Dancer2 application.
+
+Files will be stored to the value of the setting `session_dir`, whose default
+value is `appdir/sessions`.
+
+Arguments for the [Sereal::Encoder](https://metacpan.org/pod/Sereal::Encoder) and [Sereal::Decoder](https://metacpan.org/pod/Sereal::Decoder) objects can be 
+given via the `encoder_args` and `decoder_args`. If not provided, they default to
+`snappy => 1, croak_on_bless =>1` and `refuse_objects => 1, validate_utf8 => 1`, respectively.
+
+Here is an example configuration that use this session engine and stores session
+files in /tmp/dancer-sessions
+
+    session: "Sereal"
+
+    engines:
+      session:
+        Sereal:
+          session_dir: "/tmp/dancer-sessions"
+          encoder_args:
+            snappy:         1
+            croak_on_bless: 1
+          decoder_args:
+            refuse_objects: 1
+            validate_utf8:  1
+
+# AUTHOR
+
+David Golden <dagolden@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is Copyright (c) 2013 by David Golden.
+
+This is free software, licensed under:
+
+    The Apache License, Version 2.0, January 2004

@@ -1,0 +1,17 @@
+Revision history for Data::Dumper::Perltidy
+
+0.03    12 December 2012
+
+        ! Fix for change of default Perl::Tidy behaviour in version
+          Perl-Tidy-20121207.
+
+0.02    28 August 2012
+
+        ! Fix for issue where local .perltidyrc caused tests to fail.
+        RT #78806. Reported by Kevin Dawson.
+
+        + Made access to perltidy options configurable.
+
+0.01    30 January 2009
+
+        First release.

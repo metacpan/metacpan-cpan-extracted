@@ -1,0 +1,25 @@
+---
+abstract: 'Pagination with Moose'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  Test::More: 0
+  strict: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Data-Paginator
+requires:
+  Moose: 0
+  MooseX::Types: 0
+  MooseX::Types::Moose: 0
+resources:
+  bugtracker: https://github.com/gphat/data-paginator/issues
+  homepage: https://github.com/gphat/data-paginator
+  repository: https://github.com/gphat/data-paginator.git
+version: 0.08

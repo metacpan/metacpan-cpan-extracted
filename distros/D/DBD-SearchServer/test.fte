@@ -1,0 +1,32 @@
+-- Creates a table for tests.
+-- $Revision: 1.2 $
+--
+
+DROP TABLE TEST;
+CREATE SCHEMA TEST
+--------
+--
+
+CREATE TABLE TEST (  -- begin column definitions
+------------------
+-- a couple of columns
+------------------
+TITLE		VARCHAR(300)	222,
+FILESIZE	INTEGER		223,
+TODAY		DATE		224
+-- ,
+-----------------
+-- Renamed reserved fields
+-- (not renamed, just shown)
+-----------------
+-- FT_SFNAME
+-- FT_TEXT
+
+)     -- End of column definitions
+
+-------------------
+-- Table Parameters
+-------------------
+PERIODIC
+BASEPATH ''
+;

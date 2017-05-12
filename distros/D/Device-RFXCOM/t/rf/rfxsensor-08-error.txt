@@ -1,0 +1,9 @@
+2003f3831e
+
+master unknown 20.03f3831e
+
+RFXSensor error rfxsensor03f3: 1-wire device connected is not a DS18B20 or DS2438
+
+
+
+

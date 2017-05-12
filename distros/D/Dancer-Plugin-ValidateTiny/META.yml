@@ -1,0 +1,24 @@
+---
+abstract: 'Validate::Tiny Dancer plugin.'
+author:
+  - 'Alexey Kolganov <kalgan@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 0
+configure_requires:
+  ExtUtils::MakeMaker: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.66, CPAN::Meta::Converter version 2.120921'
+license: unknown
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-ValidateTiny
+no_index:
+  directory:
+    - t
+    - inc
+requires:
+  Dancer: 1.305
+  Email::Valid: 0.184
+  Validate::Tiny: 1.501
+version: 0.06

@@ -1,0 +1,38 @@
+NAME
+     Devel::FileProfiler - quick & easy per-file statistical profiler
+
+SYNOPSIS
+     use Devel::FileProfile;
+
+DESCRIPTION
+    Devel::FileProfile is a very simple statistical profiler. Unlike
+    Devel::Profile, it will not slow down the execution of your program and
+    it will not take forever to generate the profile results.
+
+    On the other hand, the profile results are not nearly as detailed.
+
+    To use it, just "use Devel::FileProfile" in any file you want profiled.
+    When your program is done executing, it will dump a partial code-listing
+    to STDERR with the percentage of time spent on each line annotated. It
+    does statistical sampling so most lines won't be listed.
+
+    The output format is:
+
+     %%% line# code
+
+    For each line listed, several lines of the surrounding code are shown to
+    provide context.
+
+    There are many improvements that could be made to this module. Feel free
+    to make them and send a patch to the author. The module meets the
+    author's needs as is. The code is very very simple.
+
+BUGS
+    Devel::FileProfile uses $SIG{ALRM}. It is not currently compatabile with
+    any other uses of $SIG{ALRM}. It potentially could know about things
+    like Event and use them but it does not currently do that.
+
+AUTHOR
+    Copyright (C) 2007, David Muir Sharnoff <muir@idiom.com> This module may
+    be used and copied on the same terms as Perl itself.
+

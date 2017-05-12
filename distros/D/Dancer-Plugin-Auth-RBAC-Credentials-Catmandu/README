@@ -1,0 +1,67 @@
+NAME
+    Dancer::Plugin::Auth::RBAC::Credentials::Catmandu - Catmandu store
+    backend for Dancer::Plugin::RBAC::Credentials
+
+INSTALLATION AND CONFIGURATION
+  install the following perl modules
+    Catmandu
+    Catmandu::DBI
+
+  add the yaml file 'catmandu.yml' to the root directory of your Dancer project
+    store: default: package: Catmandu::Store::DBI options: data_source:
+    "dbi:mysql:database=myapp" username: "admin" password: "admin"
+
+  adjust your Dancer config.yml
+    plugins: Auth::RBAC: credentials: class: Catmandu options: #name of
+    store in catmandu.yml store: 'default' #name of table bag: 'users'
+
+  The table 'users' will be created if not exists already, and will have the following format
+    id  identifier of the user
+
+    data
+        json data, in the following form:
+
+        {
+
+            _id: "njfranck",
+            login: "njfranck",
+            name: "Nicolas Franck",
+            password: "password",
+            roles: ["admin"]
+
+        }
+
+  in order to add users execute the following code
+    Catmandu->store('default')->bag('users')->add({ _id => "user2", name =>
+    "user 2", login => "user2", password => "secret", roles =>
+    ["editor","messenger"]
+
+    });
+
+NOTE
+    The configuration of the store is only a sample. Different other stores
+    exist in Catmandu. See:
+
+    Catmandu::Store::Hash
+
+    Catmandu::Store::Solr
+
+    Catmandu::Store::MongoDB
+
+AUTHOR
+    Nicolas Franck, "<nicolas.franck at ugent.be>"
+
+SEE ALSO
+    Catmandu
+
+    Catmandu::Store::DBI
+
+    Dancer::Plugin::Auth::RBAC
+
+LICENSE AND COPYRIGHT
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

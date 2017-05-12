@@ -1,0 +1,107 @@
+======================================================================
+t/01base................ok
+t/02simple..............ok 1/65#
+# Perl v5.9.5 built for MSWin32-x64-multi-thread
+# Using DBI 1.59
+# Using DBD::ODBC 1.20
+# Using DBMS_NAME 'Microsoft SQL Server'
+# Using DBMS_VER '09.00.3042'
+# Using DRIVER_NAME 'sqlncli10.dll'
+# Using DRIVER_VER '10.00.1049'
+# odbc_has_unicode 1
+t/02simple..............ok
+t/03dbatt...............ok 1/29#
+# N.B. Some drivers (postgres/cache) may return ODBC 2.0 column names for the SQ
+LTables result-set e.g. TABLE_QUALIFIER instead of TABLE_CAT
+t/03dbatt...............ok
+t/05meth................ok
+t/07bind................ok
+t/08bind2...............ok
+t/09multi...............ok
+t/10handler.............ok
+t/12blob................ok
+t/20SqlServer...........ok
+t/30Oracle..............ok
+        3/5 skipped: various reasons
+t/40UnicodeRoundTrip....ok
+t/41Unicode.............ok
+t/pod-coverage..........ok 1/1# Test::Pod::Coverage 1.04 required for testing PO
+D coverage
+t/pod-coverage..........ok
+t/pod...................ok
+        3/3 skipped: various reasons
+t/rt_38977..............ok
+t/rt_39841..............ok 1/28# [Microsoft][SQL Server Native Client 10.0]Inval
+id character value for cast specification (SQL-22018)
+# 22018
+#
+# NOTE: Your SQL Server ODBC driver has a bug which can describe parameters
+# in SQL using sub selects incorrectly. In this case a VARCHAR(8) parameter
+# is described as an INTEGER
+#
+# Checking you can work around bug in SQL Server ODBC Driver
+# Yes you can
+t/rt_39841..............ok
+        5/28 skipped: various reasons
+t/rt_39897..............ok
+t/rt_43384..............ok
+        7/9 skipped: various reasons
+All tests successful, 18 subtests skipped.
+Files=19, Tests=427, 11 wallclock secs ( 0.00 cusr +  0.00 csys =  0.00 CPU)
+======================================================================
+t/01base................ok
+t/02simple..............ok 1/65#
+# Perl 5.7.8
+# osname=linux, osvers=2.6.9-22.0.2.elsmp, archname=i686-linux
+# Using DBI 1.607
+# Using DBD::ODBC 1.21
+# Using DBMS_NAME 'Microsoft SQL Server'
+# Using DBMS_VER '09.00.4035'
+# Using DRIVER_NAME 'esoobclient'
+# Using DRIVER_VER '02.00.0000'
+# odbc_has_unicode 0
+t/02simple..............ok
+t/03dbatt...............ok 1/29#
+# N.B. Some drivers (postgres/cache) may return ODBC 2.0 column names
+for the SQLTables result-set e.g. TABLE_QUALIFIER instead of TABLE_CAT
+t/03dbatt...............ok
+t/05meth................ok
+t/07bind................ok
+t/08bind2...............ok
+t/09multi...............ok
+t/10handler.............ok
+t/12blob................ok
+t/20SqlServer...........ok 54/65# DBD::ODBC::st execute failed:
+[unixODBC][Microsoft][ODBC SQL Server Driver]Connection is busy with
+results for another hstmt (SQL-HY000) at t/20SqlServer.t line 202.
+# DSN=dbi:ODBC:DSN=XXX;MARS_Connection=yes;
+#
+# NOTE: You failed this test because your SQL Server driver
+# is too old to handle the MARS_Connection attribute. This test cannot
+# easily skip this test for old drivers as there is no definite SQL Server
+# driver version it can check.
+#
+t/20SqlServer...........ok
+        1/65 skipped: WARNING: driver does NOT support MARS_Connection
+t/30Oracle..............ok
+        3/5 skipped: Oracle tests not supported using Microsoft SQL Server
+t/40UnicodeRoundTrip....ok
+        61/62 skipped: Unicode-specific tests disabled - not a unicode build
+t/41Unicode.............ok
+        54/55 skipped: Unicode-specific tests disabled - not a unicode build
+t/pod-coverage..........ok 1/1# Test::Pod::Coverage 1.04 required for
+testing POD coverage
+t/pod-coverage..........ok
+t/pod...................ok
+        3/3 skipped: Test::Pod 1.00 required for testing POD
+t/rt_38977..............ok
+        6/11 skipped: Easysoft OOB
+t/rt_39841..............ok
+        25/28 skipped: not SQL Server ODBC or native client driver
+t/rt_39897..............ok
+t/rt_43384..............ok
+        7/9 skipped: Microsoft Access tests not supported using
+Microsoft SQL Server
+All tests successful, 160 subtests skipped.
+Files=19, Tests=430, 15 wallclock secs ( 1.17 cusr +  1.48 csys =  2.65 CPU)
+======================================================================

@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Directory/Iterator/PP.pm
+t/Directory-Iterator-back.t
+t/BackendModule.pm
+t/data/n/1
+t/data/n/2
+t/data/n/3
+t/data/n/n2/4
+t/data/n/.dot
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

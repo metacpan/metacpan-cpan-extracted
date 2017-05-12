@@ -1,0 +1,13 @@
+0.03 2015-10-08T22:09:57+02:00
+ - Add SEE ALSO section to doc.
+ - Improve LICENSE AND COPYRIGHT section in doc.
+ - Move author tests to xt/ directory.
+ - Remove diacritics from author name in Makefile.PL.
+ - Update Module::Install to 1.16 version.
+ - Update copyright years.
+
+0.02 2014-08-26T11:55:29+02:00
+ - Fix module name in Makefile.PL.
+
+0.01 2014-08-26T11:45:37+02:00
+ - First version.

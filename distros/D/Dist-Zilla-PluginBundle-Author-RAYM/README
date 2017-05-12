@@ -1,0 +1,93 @@
+NAME
+    Dist::Zilla::PluginBundle::Author::RAYM - Dist::Zilla plugin bundle used
+    by RAYM
+
+VERSION
+    version 0.002
+
+DESCRIPTION
+    This is the plugin bundle that RAYM uses. It is equivalent to:
+
+     [@Filter]
+     -bundle = @Basic
+     -remove = Readme
+
+     [PodWeaver]
+
+     [ReadmeFromPod]
+
+     [MetaResourcesFromGit]
+
+     [AutoPrereqs]
+
+     [PkgVersion]
+
+     [Test::Compile]
+
+     [NoSmartCommentsTests]
+
+     [NextRelease]
+
+     [FakeRelease]
+
+     [PruneFiles]
+     filename = dist.ini
+
+     [Git::NextVersion]
+
+     [Git::CommitBuild]
+     branch          =
+     release_branch  = releases
+     release_message = <changelog section content>
+
+     [Git::Check]
+
+     [Git::Commit]
+
+     [Git::Tag]
+
+     [Git::Push]
+
+RATIONALE
+    The bundle is desgined for projects which are hosted on "github". More
+    so, the project should have a "master" branch where you do code
+    development, and a separete 'releases' branch which is where the *built*
+    code is committed.
+
+    Use of the Dist::Zilla::Plugin::MetaResourcesFromGit plugin creates
+    links at CPAN which point to the GitHub pages (the wiki page is used as
+    the default Homepage).
+
+CONFIGURATION
+    The package version is determined by the Git::NextVersion plugin; this
+    can be overridden by setting the environment variable "V":
+
+      V=1.000 dzil build ...
+
+    If you provide the "no_cpan" option with a true value to the bundle, or
+    set the environment variable "NO_CPAN" to a true value, then the upload
+    to CPAN will be suppressed.
+
+    If you provide a value to the "skip_deps" option then it will be passed
+    to the "AutoPrereqs" Plugin as the "skip" attribute.
+
+    If you provide a value to the "skip_files" option then it will be passed
+    to the "PruneFiles" Plugin as the "match" attribute.
+
+TIPS
+    Do not include a "NAME", "VERSION", "AUTHOR" or "LICENSE" POD section in
+    your code, they will be provided automatically.
+
+CREDITS
+    This bundle is mostly stolen from
+    Dist::Zilla::PluginBundle::Author::OLIVER.
+
+AUTHOR
+    Ray Miller
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Ray Miller.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

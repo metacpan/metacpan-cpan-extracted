@@ -1,0 +1,121 @@
+NAME
+
+    Device::Chip::SDCard - chip driver for SD and MMC cards
+
+SYNOPSIS
+
+     use Device::Chip::SDCard;
+    
+     my $card = Device::Chip::SDCard->new;
+    
+     $card->mount( Device::Chip::Adapter::...->new )->get;
+    
+     $card->initialise->get;
+    
+     my $bytes = $card->read_block( 0 )->get;
+    
+     print "Read block zero:\n";
+     printf "%v02X\n", $bytes;
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to an SD or
+    MMC storage card attached via an SPI adapter.
+
+    At present it only supports MMC and SDSC ("standard capacity") cards,
+    not SDHC or SDXC.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ initialise
+
+       $card->initialise->get
+
+    Checks that an SD card is present, switches it into SPI mode and waits
+    for its initialisation process to complete.
+
+ size
+
+       $n_bytes = $card->size->get
+
+    Returns the size of the media card in bytes.
+
+ read_csd
+
+       $data = $card->read_csd->get;
+
+    Returns a HASH reference containing decoded fields from the SD card's
+    CSD ("card-specific data") register.
+
+    This hash will contain the following fields:
+
+       TAAC
+       NSAC
+       TRAN_SPEED
+       CCC
+       READ_BL_LEN
+       READ_BL_LEN_PARTIAL
+       WRITE_BLK_MISALIGN
+       READ_BLK_MISALIGN
+       DSR_IMP
+       C_SIZE
+       VDD_R_CURR_MIN
+       VDD_R_CURR_MAX
+       VDD_W_CURR_MIN
+       VDD_W_CURR_MAX
+       C_SIZE_MULT
+       ERASE_BLK_EN
+       SECTOR_SIZE
+       WP_GRP_SIZE
+       WP_GRP_ENABLE
+       R2W_FACTOR
+       WRITE_BL_LEN
+       WRITE_BL_PARTIAL
+       FILE_FORMAT_GRP
+       COPY
+       PERM_WRITE_PROTECT
+       TEMP_WRITE_PROTECT
+       FILE_FORMAT
+
+    The hash will also contain the following calculated fields, derived
+    from the decoded fields above for convenience of calling code.
+
+       blocks          # number of blocks implied by C_SIZE / C_SIZE_MULT
+       bytes           # number of bytes of storage, implied by blocks and READ_BL_LEN
+
+ read_ocr
+
+       $fields = $card->read_ocr->get
+
+    Returns a HASH reference containing decoded fields from the card's OCR
+    ("operating conditions register").
+
+    This hash will contain the following fields:
+
+       BUSY
+       CCS
+       UHS_II
+       1V8_ACCEPTED
+       3V5, 3V4, 3V3, ..., 2V7
+
+ read_block
+
+       $bytes = $card->read_block( $lba )->get
+
+    Returns a 512-byte bytestring containing data read from the given
+    sector of the card.
+
+TODO
+
+      * Support block writing.
+
+      * Support the different initialisation sequence (and block size
+      requirements) of SDHC cards.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

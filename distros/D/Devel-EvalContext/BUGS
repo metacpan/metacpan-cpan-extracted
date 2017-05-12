@@ -1,0 +1,3 @@
+* hints need saving
+
+* lexicals are getting reset after an exception is thrown

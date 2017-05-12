@@ -1,0 +1,309 @@
+#!/usr/bin/perl -w
+# vim: set sw=4 ts=4 tw=78 et si:
+#
+# mkdir_heute - choose or make a dir for 'heute' (today)
+#
+# This script scans a basedir (~/A) for directories named YYYY/MM/DD
+# where YYYY, MM and DD are numbers corresponding to a year, month, day of
+# month and prints them on STDERR. You may choose a directory from the list
+# or a new directory which will be created and named after the current day.
+#
+# The script returns the choosen directory on STDOUT and may be used in a
+# shell alias like this:
+#
+# alias cdheute='cd `mkdir_heute`'
+#
+# so that you may say 'cdheute' on the command line and your working directory
+# will be changed to the choosen directory.
+#
+use strict;
+use warnings;
+
+use Directory::Organize;
+use Getopt::Long;
+use Term::ReadKey;
+
+$|++;
+
+my %params;
+
+init_params(\%params);
+
+print choosedir(\%params);
+
+#----- only subs from now on -----
+
+sub init_params {
+    my ($params) = @_;
+
+    my $clo = {};
+
+    GetOptions($clo, 'basedir=s', 'listlines=i');
+
+    if ($clo->{basedir}) {
+        $params->{basedir} = $clo->{basedir};
+    }
+    else {
+        $params->{basedir} = "$ENV{HOME}/A";
+    }
+
+    if ($clo->{listlines}) {
+        $params->{listlines} = $clo->{listlines};
+    }
+    else {
+        my ($wchar, $hchar, $wpixels, $hpixels) = GetTerminalSize("STDOUT");
+        $params->{listlines} = defined $hchar ? $hchar - 4 : 21;
+    }
+
+    return $params;
+} # init_params()
+
+sub makedir {
+    my $path = shift;
+    my $dir  = '';
+    $path =~ s{^(.*[^/])$}{$1/}; # provide a sentinel
+    while ($path =~ s{^([^/]*)/}{}) {
+        if ($1) {
+            $dir .= $1;
+            (-d $dir) || mkdir($dir,0777) || return 0;
+            $dir .= '/';
+        }
+        else {
+            $dir = '/' unless ($dir);
+        }
+    }
+    return 1;
+} # makedir()
+
+sub choosedir {
+    my ($params)  = @_;
+
+    my $basedir   = $params->{basedir};
+    my $listlines = $params->{listlines};
+    my $firstline = 0;
+
+    my $do = Directory::Organize->new($basedir);
+
+    NEW_DESCRIPTIONS:
+    while (1) {
+        my @directories = $do->get_descriptions();
+        my $lastline  = scalar(@directories) - $listlines - 1;
+
+        SHOW_DESCRIPTIONS:
+        while (1) {
+            show_dirs(\@directories,$listlines,$firstline);
+
+        # let the user choose a directory
+            my $input = '';
+            while (1) {
+                return '.' if eof(STDIN);
+                my $project_text = '';
+                $input = <STDIN>;
+                chomp $input;
+                if ($input =~ /^\d+$/) {
+                    if ($input < scalar @directories) {
+                        printf STDERR "=== %s ===\n", $directories[$input]->[1];
+                        return $basedir . '/' . $directories[$input]->[0];
+                    }
+                }
+                elsif ($input =~ /^f(irst)?$/i) {
+                    $firstline = 0;
+                    next SHOW_DESCRIPTIONS;
+                }
+                elsif ($input =~ /^l(ast)?$/i) {
+                    $firstline = $lastline;
+                    next SHOW_DESCRIPTIONS;
+                }
+                elsif ($input =~ /^n(ext)?$/i) {
+                    $firstline += $listlines;
+                    $firstline = $lastline if ($firstline > $lastline);
+                    next SHOW_DESCRIPTIONS;
+                }
+                elsif ($input =~ /^p(revious)?$/i) {
+                    $firstline -= $listlines;
+                    $firstline = 0 if ($firstline < 0);
+                    next SHOW_DESCRIPTIONS;
+                }
+                elsif ($input =~ /^\/(.*)$/i) {
+                    $do->set_pattern($1);
+                    $firstline = 0;
+                    next NEW_DESCRIPTIONS;
+                }
+                elsif ($input =~ m{^d
+                                     \s*
+                                     (?:
+                                       ([=<>])      # operator
+                                       \s*
+                                       (\d{4})      # year
+                                       -?
+                                       (\d\d)?      # month
+                                       -?
+                                       (\d\d)?      # day
+                                     )?
+                                   }ix) {
+                    $do->set_time_constraint($1,$2,$3,$4);
+                    $firstline = 0;
+                    next NEW_DESCRIPTIONS;
+                }
+                elsif ($input =~ /^(\.|q(uit)?)$/i) {
+                    return '.';
+                }
+                elsif ($input =~ /^\+(.*)$/) {
+                    if ($1) {
+                        $project_text = $1;
+                        $project_text =~ s/^\s+//;
+                        $project_text =~ s/\s+$//;
+                        return $do->new_dir($project_text);
+                    }
+                    next SHOW_DESCRIPTIONS;
+                }
+            }
+        } # SHOW_DESCRIPTIONS
+    } # NEW_DESCRIPTIONS
+} # choosedir()
+
+sub show_dirs {
+    my ($dirs,$listlines,$firstline) = @_;
+    my $i = 0;
+    foreach my $dir (@$dirs) {
+        printf STDERR "%-7s: %-12s: %s\n", $i, $dir->[0], $dir->[1]
+            if ($i >= $firstline);
+        last if ($i - $firstline >= $listlines);
+        $i++;
+    }
+    print STDERR "+(plus): new directory (add description after '+')\n";
+    print STDERR "q      : current directory\n";
+} # show_dirs()
+
+__END__
+
+=head1 NAME
+
+mkdir_heute - create and find directories interactive
+
+=head SYNOPSIS
+
+  mkdir_heute
+
+  mkdir_heute --basedir=~/archive
+
+  mkdir_heute --listlines=15
+
+=head1 VERSION
+
+This documentation refers to version 0.9.
+
+=head1 USAGE
+
+This script scans a basedir (~/A) for directories named YYYY/MM/DD
+where YYYY, MM and DD are numbers corresponding to a year, month, day of
+month and prints them on STDERR.
+
+The script returns the choosen directory on STDOUT and may be used in a
+shell alias like this:
+
+  alias cdheute='cd `mkdir_heute`'
+
+so that you may say 'cdheute' on the command line and your working directory
+will be changed to the choosen directory.
+
+When invoked you may
+
+=over 4
+
+=item *
+
+choose a directory from the list with it's number
+
+=item *
+
+choose the current directory with 'q' or '.'
+
+=item *
+
+advance to the next or last page with 'n' or 'l'
+
+=item *
+
+return to the previous or first page with 'p' or 'f'
+
+=item *
+
+constrain the shown directories with '/' and a pattern
+
+=item *
+
+constrain the creation date of the directories with 'd' followed by '=', '<'
+or '>' and a date (eg. 2009, 2009-04 or 2009-04-24)
+
+=item *
+
+create a new directory with '+' followed by a description for it
+
+=back
+
+=head1 DESCRIPTION
+
+=head2 Command Line Arguments
+
+=over 4
+
+=item --basedir
+
+With this argument it is possible to redirect the script to another base
+directory under which it scans for project descriptions to display. A new
+directory would be created below this directory.
+
+  mkdir_heute --basedir=~/archive
+
+  mkdir_heute -b ~/archive
+
+=item --listlines
+
+Since it is possible that on some systems Term::ReadKey::GetTerminalSize()
+does not deliver a meaningful value, you may skip the invocation of that
+function by providing the nummer of lines for the listing of descriptions on
+the command line.
+
+  mkdir_heute --listlines=15
+
+  mkdir_heute -l 15
+
+=back
+
+=head1 DIAGNOSTICS
+
+=head2 Unable to get Terminal Size. The TIOCGWINSZ ioctl didn't work. The
+ COLUMNS and LINES environment variables didn't work. The resize program
+ didn't work. at /usr/lib/perl5/Term/ReadKey.pm line 343.
+
+This happened to me especially on elder systems when invoked via backtics
+such as
+
+  cd `mkdir_heute`
+
+although the program works fine when invoked directly.
+
+One workaround is to install the program I<resize> which comes on
+Debian GNU Linux within the package I<xutils>.
+
+If you can't install the program I<resize>, you could start I<mkdir_heute>
+with a fixed number of list lines like this
+
+  cd `mkdir_heute -l 25`
+
+=head1 AUTHOR
+
+Mathias Weidner
+
+=head1 LICENCE AND COPYRIGHT
+
+Copyright (c) 2009 Mathias Weidner (mathias@weidner.in-bad-schmiedeberg.de).
+All rights reserved.
+
+This module is free software; you can redistribute and/or modify it
+under the same terms as Perl itself. See L<perlartistic>.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.

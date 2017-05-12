@@ -1,0 +1,36 @@
+---
+abstract: 'do initial git push from your minting profile'
+author:
+  - 'Rafael Kitover <rkitover@cpan.org>'
+build_requires:
+  File::Find: 0
+  File::Temp: 0
+  Test::More: 0
+  strict: 0
+  warnings: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300028, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dist-Zilla-Plugin-Git-PushInitial
+no_index: {}
+requires:
+  Dist::Zilla::Role::AfterMint: 0
+  File::Spec::Functions: 0
+  Git::Wrapper: 0
+  Moose: 0
+  MooseX::Types::Moose: 0
+  Try::Tiny: 0
+  perl: 5.008001
+  utf8: 0
+resources:
+  bugtracker: https://rt.cpan.org/Public/Dist/Display.html?Name=Dist-Zilla-Plugin-Git-PushInitial
+  homepage: http://metacpan.org/release/Dist-Zilla-Plugin-Git-PushInitial
+  license: http://dev.perl.org/licenses/
+  repository: git://github.com/rkitover/dist-zilla-plugin-git-pushinitial.git
+version: 0.02
+x_authority: cpan:RKITOVER

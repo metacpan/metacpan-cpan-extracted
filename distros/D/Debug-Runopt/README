@@ -1,0 +1,111 @@
+Debug-Runopt version 1.01
+=======================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+
+    Debug::Runopt - Customize how to run debugger Specify configurable debug
+    options as part of rc file ie .perldb or ~/.perldb under Unix. Specify
+    runtime debug commands into a file and source to debugger - works for
+    interactive/non interactive both modes
+
+SYNOPSIS
+
+      use Debug::Runopt;
+
+      Debug::Runopt::init();
+
+          - Initializes debugger with a few default parse options eg.
+            NonStop=1 LineInfo=db.out AutoTrace=1 frame=6
+            No source command file given, debugger goes through normal execution flow.
+
+      Debug::Runopt::init({'src'=>'tmp.cmd'});
+
+          - Default parameters for parse_options, commands read from tmp.cmd
+
+      Debug::Runopt::init({'src'=>'tmp.cmd', 'interactive' => 0, 'outputfile' => 'debug.out',
+                         'autotrace' => 0, 'frame' => 2});
+
+          - Sets parse_options as NonStop=0 LineInfo=debug.out AutoTrace=0 frame=2
+
+      Debug::Runopt::init({'src'=>'tmp.cmd','parseoptions' => 'blah blah'});
+
+          - Sets parse_options("blah blah");
+
+      Debug::Runopt::init({'freecontent' => 'free form text blah blah....'});
+   
+          - Writes 'free form text blah blah' to rc file as is.
+            Care should be taken while passing content like this.
+
+      Debug::Runopt::end();
+
+          - This can be optionally called at the end of the debuuged program
+            if rc files created needs to be cleaned up
+
+ABSTRACT
+
+      This module tries to make debugging easy by letting user specify configurable
+      options particulary when running in non-interactive mode.
+
+      Apart from the configurable options, a source can be created on the run with user
+      specified contents and run with debugger.
+
+METHODS
+
+      init() :: public
+
+          - Initializes configurable options and rc file if any.
+
+      end() :: public
+
+          - Cleans up rc files created during execution if any.
+
+      setParseOptions :: private
+
+          - Sets up parse_options and other configurable directives.
+
+      setSourceFile :: private
+
+          - Creates rc file if required.
+
+CAVEATS
+
+      It works only for a few versions of Unix/Linux.
+      Further improvement plan involves avoiding creating of rc file and using debug hooks.
+
+Similar Modules
+
+      Debug::Simple
+
+SUPPORT
+
+      debashish@cpan.org
+
+ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+
+    Copyright 2013 Debashish Parasar, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

@@ -1,0 +1,28 @@
+Revision history for Perl extension DBIx::Skinny::Pager
+
+0.11    Wed Sep 21 10:09:09 JST 2011
+        - fixed installation problem under perl5.12 (thanks tokuhirom)
+0.10    Mon Dec  6 22:52:47 JST 2010
+        - follow DBIx::Skinny 0.0729
+        - fixed pod.
+0.09    Fri Nov 12 07:48:40 JST 2010
+        - Logic::Count: remove order by statement when count query for PostgreSQL.
+0.08    Sat Sep 11 22:16:15 JST 2010
+        - use logic classes in Mixn::Pager for using shared memory on prefork system.
+        - change returning default pager class from DBIx::Skinny::Pager::Page to DBIx::Skinny::Pager::Page::Default. It should be some difference between PlusOne's pager and other logic's pager.
+0.07    Sat Jul  3 09:17:19 JST 2010
+        - trivial update.
+        - skip functional test if DBD::SQLite is not installed.
+0.06    Thu Jul  1 08:18:01 JST 2010
+        - refactoring test to run more under CPAN Testers.
+0.05    Wed Jun 30 08:56:45 JST 2010
+        - added Mixin::SearchWithPager
+0.04    Fri May 21 07:28:16 JST 2010
+        - Fix SQL error when page is 0 or string.
+0.03    Mon Apr  5 07:15:48 JST 2010
+        - added Test::Deep to build_requires.
+0.02    Mon Apr  5 01:48:40 JST 2010
+        - added DBIx::Skinny::Pager::Page to_hash method.
+        - DBIx::Skinny::Pager return DBIx::Skinny::Pager::ResultSet object if not wantarry.
+0.01    Thu Jan 14 00:51:40 2010
+        - original version

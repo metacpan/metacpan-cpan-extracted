@@ -1,0 +1,57 @@
+Revision history for Dist-Zilla-Plugin-Test-CheckDeps
+
+0.014     2016-05-06 05:38:12 +0000
+          - fix tests for changes in Dist::Zilla 6
+
+0.013     2015-08-16 00:12:39 +0000
+          - configuration is dumped to metadata
+
+0.012     2013-12-20 01:21:28 +0000
+          - bump dependency on Test::CheckDeps to keep pace with the version
+            used by the generated test (thanks SineSwiper!)
+          - bump dependency on Dist::Zilla to ensure that META.* files are
+            spec-compliant, to avoid spurious test failures when combined with
+            newer CPAN::Meta::Validator
+
+0.011     2013-12-14 19:19:33 +0000
+          - update configure_requires checking in Makefile.PL, add CONTRIBUTING file
+
+0.010     2013-10-12 22:14:57 +0000
+          - new "todo_when" option, for neutering tests under specific
+            (runtime) conditions
+
+0.009     2013-09-26 03:35:32 +0000
+          - new 'filename' option, for changing the location of the created
+            test
+          - re-release with fixed compile test
+
+0.008     2013-09-19 01:56:35 +0000
+          - bumped required version of Test::CheckDeps to latest
+          - added header to test, indicating the version of the plugin that
+            generated it
+
+0.007     2013-06-23 21:56:19 +0200
+          - allow testing of additional phases/types as TODO tests
+            (Karen Etheridge)
+          - Require latest Test::CheckDeps
+
+0.006     2013-04-28 08:39:02 -0700
+          - require version of Test::More that added is_passing()
+            (RT#84905, Karen Etheridge)
+
+0.005     2012-05-02 23:40:44 +0200
+          - Increase runtime dependency on Test::CheckDeps to 0.002
+
+0.004     2012-05-02 21:54:33 +0200
+          - Inject a test-phase requirement on Test::CheckDeps and Test::More
+            into the distribution being built.
+
+0.003     2012-02-06 23:39:53 +0200
+          - Rename test to t/00-check-deps.t
+          - Add runtime dependency on Test::CheckDeps and Test::More
+
+0.002     2011-10-17 22:56:07 +0200
+          - Renamed to Dist::Zilla::Plugin::Test::CheckDeps
+
+0.001     2011-10-14 20:55:11 +0200
+          - Initial release

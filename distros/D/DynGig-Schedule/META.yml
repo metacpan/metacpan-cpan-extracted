@@ -1,0 +1,27 @@
+--- #YAML:1.0
+name:               DynGig-Schedule
+version:            0.02
+abstract:           Scheduling tool based on DynGig::Range::Time
+author:
+    - Kan Liu <kan@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::MakeMaker:  0
+build_requires:
+    ExtUtils::MakeMaker:  0
+requires:
+    Carp:                 0
+    DateTime:             0
+    DynGig::Range:        0
+    DynGig::Range::Time:  0
+    Test::More:           0
+    YAML::XS:             0
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.57_05
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4

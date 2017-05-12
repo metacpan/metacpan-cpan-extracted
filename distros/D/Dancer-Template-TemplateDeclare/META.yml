@@ -1,0 +1,45 @@
+---
+abstract: 'Template::Declare wrapper for Dancer'
+author:
+  - 'Yanick Champoux'
+build_requires:
+  Dancer: 1.3050
+  Dancer::Test: 0
+  ExtUtils::MakeMaker: 0
+  File::Find: 0
+  File::Temp: 0
+  Module::Build: 0.3601
+  Plack::Handler::FCGI: 0
+  Plack::Runner: 0
+  Template::Declare::Tags: 0
+  Test::More: 0
+  warnings: 0
+configure_requires:
+  Module::Build: 0.3601
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300010, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-TemplateDeclare
+provides:
+  Dancer::Template::TemplateDeclare:
+    file: lib/Dancer/Template/TemplateDeclare.pm
+    version: v0.3.2
+requires:
+  Dancer: 1.3092
+  Dancer::Config: 0
+  Dancer::Template::Abstract: 0
+  FindBin: 0
+  Template::Declare: 0
+  base: 0
+  strict: 0
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Dancer-Template-TemplateDeclare
+  homepage: http://search.cpan.org/dist/Dancer-Template-TemplateDeclare/
+  repository: https://github.com/yanick/Dancer-Template-TemplateDeclare.git
+version: 0.3.2
+x_author_pledge:
+  version: 1
+x_authority: cpan:YANICK

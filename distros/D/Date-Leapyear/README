@@ -1,0 +1,21 @@
+NAME
+    Date::Leapyear - Is a particular year a leap year?
+
+SYNOPSIS
+      use Date::Leapyear;
+      if ( isleap(1945) ) {
+        ...
+      }
+
+DESCRIPTION
+    Date::Leapyear exports one function - isleap - which returns 1 or 0 if a
+    year is leap, or not, respectively.
+
+isleap
+        $true = isleap( 2004 );
+
+    Returns 1 in a leap year, 0 otherwise.
+
+AUTHOR
+    Rich Bowen (rbowen@rcbowen.com)
+

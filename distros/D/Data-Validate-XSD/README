@@ -1,0 +1,42 @@
+Data::Validate::XSD (last updated 2007-09-20)
+
+This module allows the weilder to test data structures against xsd like perl definitions. White magic.
+
+This module is considered Alpha, it has most of the features required but requires a lot of user feedback
+and testing, and tests written in order to solidify it's design and api's
+	
+INSTALLATION
+
+To install this module, run the following commands:
+
+    perl Makefile.PL
+    make
+    make test
+    make install
+
+SUPPORT AND DOCUMENTATION
+
+After installing, you can find documentation for this module with the perldoc command.
+
+    perldoc Data::Validate::XSD
+
+You can also look for information at:
+
+    Search CPAN
+        http://search.cpan.org/dist/Data-Validate-XSD
+
+    CPAN Request Tracker:
+        http://rt.cpan.org/NoAuth/Bugs.html?Dist=Data-Validate-XSD
+
+    AnnoCPAN, annotated CPAN documentation:
+        http://annocpan.org/dist/Data-Validate-XSD
+
+    CPAN Ratings:
+        http://cpanratings.perl.org/d/Data-Validate-XSD
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2007 Martin Owens
+
+This program is free software; you can redistribute it and/or modify it
+under the AGPL.

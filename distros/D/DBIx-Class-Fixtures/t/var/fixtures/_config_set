@@ -1,0 +1,17 @@
+$VAR1 = {
+          'sets' => [
+                      {
+                        'quantity' => 'all',
+                        'class' => 'CD'
+                      }
+                    ],
+          'might_have' => {
+                            'fetch' => 0
+                          },
+          'belongs_to' => {
+                            'fetch' => 1
+                          },
+          'has_many' => {
+                          'fetch' => 0
+                        }
+        };

@@ -1,0 +1,501 @@
+---
+- author: Mario Zieschang
+  entries:
+  - addconstraint:
+      primarykey:
+      - category
+      - permission
+    name: gallery_category_permission_relation
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: gallery_category_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_question_answer
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: gallery_image_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: messages_system
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+    name: localvalues
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+    name: user_has_user_role
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: blog_comments
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - user_role
+      - user_permission
+    name: user_role_has_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: system_layouts
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - question
+    name: profile_interview_answer
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_topics_reports
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: msg_session_member_report
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: msg_session_record_vault
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: venues
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - post
+      - dbuser
+    name: forum_post_hits
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - bleak_post
+      - user_id
+    name: forum_post_bleaks
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: msg_session_messages
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+    name: gallery_count_image_bleaks
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - venue
+    name: venue_clendar
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: message_session_messages
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - lang
+    name: user_forum_language
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_templates
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+    name: gallery_count_image_views
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - msg_session
+      - msg_user
+    name: msg_session_members
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_friends
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - message
+      - dbuser
+    name: messages_reports
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+    name: user_settings
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: messages
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - category
+    name: gallery_category_order_idx
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - head
+    name: forum_head_cat_sort_table
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_closed_topics
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: users
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: gallery_images
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: system_news
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - topic
+    name: forum_count_post
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: msg_sessions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+    name: gallery_count_image_hits
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_settings_profile_overview
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_post
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_head_categories
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - category
+    name: gallery_category_hierarchy
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: clendar_attributes
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - category
+    name: gallery_category_comments
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - bleak_topic
+      - user_id
+    name: forum_topic_bleaks
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_post_answers
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_gb
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_friends_request
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - hit_topic
+      - hit_user
+    name: forum_topic_hits
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_categories
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: imagine_someone
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_roles
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: blog_entries
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_dashboard_widgets
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: messages_record_vault
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+      - nickname
+      - flag
+    name: track_user_nickname
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+      - flag
+    name: track_user_password
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+    name: gallery_image_comments
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: message_session
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - topic
+    name: forum_user_subscription
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - cat
+    name: forum_cat_sort_table
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+      - permission
+    name: gallery_image_permission_relation
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: events
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_password_request
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: message_system
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_topic_bans
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: blog_entry_type
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - session
+      - dbuser
+    name: message_session_members
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_bans
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: system_news_comments
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_settings_attributes
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_post_reports
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_topics
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - system_news
+      - dbuser
+    name: system_news_for_user
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - layout
+    name: user_has_layout
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_interview_question
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+    name: user_settings_forum
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+    name: user_counts
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: msg_session_msg_report
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - owner_by
+      - permission
+    name: gallery_global_permission_relation
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_question
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - lang
+    name: profile_forum_language
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: gallery_categories
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: profile_question_suggestions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - image
+    name: gallery_image_order_idx
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: messages_archives
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - forum_head_category
+    name: forum_head_category_need_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: templates
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: user_changelog
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: forum_warnings
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - venue
+    name: venue_users
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - forum_category
+    name: forum_category_need_permissions
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - dbuser
+      - visitor
+    name: user_visits
+    type: altertable
+  - addconstraint:
+      primarykey:
+      - id
+    name: address_information
+    type: altertable
+  id: 003-maz

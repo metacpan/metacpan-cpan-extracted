@@ -1,0 +1,43 @@
+NAME
+    Dist::Zilla::Plugin::CoderwallEndorse - Adds a Coderwall 'endorse'
+    button to README Markdown file
+
+VERSION
+    version 0.2.0
+
+SYNOPSIS
+        ; in dist.ini
+
+        ; typically, to create the README off the main module
+        [ReadmeMarkdownFromPod]
+
+        [CoderwallEndorse]
+        filename = README.mkdn
+        users = coderwall_name : author name, other_cw_name : other author
+
+DESCRIPTION
+    If a "README.mkdn" file is presents, a Coderwall 'endorse' button will
+    be added beside author names if a author-name-to-coderwall-user mapping
+    has been given.
+
+SEE ALSO
+    <http://www.coderwall.com>
+
+    Dist::Zilla::Plugin::ReadmeMarkdownFromPod
+
+    For an example of what the result of this plugin looks like, see its
+    GitHub main page:
+    <https://github.com/yanick/Dist-Zilla-Plugin-CoderwallEndorse>
+
+    Original blog entry:
+    <http://babyl.dyndns.org/techblog/entry/coderwall-button>
+
+AUTHOR
+    Yanick Champoux <yanick@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is copyright (c) 2012 by Yanick Champoux.
+
+    This is free software; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language system itself.
+

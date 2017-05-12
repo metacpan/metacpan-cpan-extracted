@@ -1,0 +1,17 @@
+Changes
+MANIFEST
+Makefile.PL
+README
+lib/DynGig/Range/Integer/Object.pm
+lib/DynGig/Range/Integer/Parse.pm
+lib/DynGig/Range/Integer.pm
+lib/DynGig/Range/Interface/Object.pm
+lib/DynGig/Range/Interface/Parse.pm
+lib/DynGig/Range/String/Object.pm
+lib/DynGig/Range/String/Parse.pm
+lib/DynGig/Range/String.pm
+lib/DynGig/Range.pm
+t/00-load.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module meta-data (added by MakeMaker)

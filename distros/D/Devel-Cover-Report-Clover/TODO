@@ -1,0 +1,3 @@
+- possibly integrate (optional) Perl::Metrics::Simple for
+  mccabe/cyclomatic complexity calculations
+

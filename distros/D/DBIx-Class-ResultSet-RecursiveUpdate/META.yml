@@ -1,0 +1,218 @@
+---
+abstract: 'like update_or_create - but recursive'
+author:
+  - 'Zbigniew Lukasiak <zby@cpan.org>'
+  - 'John Napiorkowski <jjnapiork@cpan.org>'
+  - 'Alexander Hartmaier <abraxxa@cpan.org>'
+  - 'Gerda Shank <gshank@cpan.org>'
+build_requires:
+  Test::More: 0.88
+  Test::Trap: v0.2.2
+  Test::Warn: 0.20
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.006, CPAN::Meta::Converter version 2.132830'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-ResultSet-RecursiveUpdate
+no_index:
+  directory:
+    - t/lib
+    - t_dbic/lib
+requires:
+  Carp::Clan: 6.04
+  DBD::SQLite: 1.21
+  DBIx::Class: 0.08103
+  DBIx::Class::IntrospectableM2M: 0
+  DateTime: 0
+  List::MoreUtils: 0.22
+  Readonly: 1.03
+  SQL::Translator: 0.11016
+resources:
+  repository: git://github.com/gshank/dbix-class-resultset-recursiveupdate
+version: 0.34
+x_Dist_Zilla:
+  perl:
+    version: 5.018001
+  plugins:
+    -
+      class: Dist::Zilla::Plugin::GatherDir
+      name: '@Basic/GatherDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PruneCruft
+      name: '@Basic/PruneCruft'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ManifestSkip
+      name: '@Basic/ManifestSkip'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaYAML
+      name: '@Basic/MetaYAML'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::License
+      name: '@Basic/License'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Readme
+      name: '@Basic/Readme'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ExtraTests
+      name: '@Basic/ExtraTests'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ExecDir
+      name: '@Basic/ExecDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ShareDir
+      name: '@Basic/ShareDir'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MakeMaker
+      name: '@Basic/MakeMaker'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Manifest
+      name: '@Basic/Manifest'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::TestRelease
+      name: '@Basic/TestRelease'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::ConfirmRelease
+      name: '@Basic/ConfirmRelease'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::UploadToCPAN
+      name: '@Basic/UploadToCPAN'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
+      name: PodWeaver
+      version: 4.001
+    -
+      class: Dist::Zilla::Plugin::PkgVersion
+      name: PkgVersion
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::NextRelease
+      name: NextRelease
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaConfig
+      name: MetaConfig
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaJSON
+      name: MetaJSON
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaNoIndex
+      name: MetaNoIndex
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::MetaResources
+      name: MetaResources
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PodSyntaxTests
+      name: PodSyntaxTests
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::PodCoverageTests
+      name: PodCoverageTests
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Test::Portability
+      name: Test::Portability
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::Test::DistManifest
+      name: Test::DistManifest
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::Synopsis
+      name: Test::Synopsis
+      version: 2.000004
+    -
+      class: Dist::Zilla::Plugin::Test::UnusedVars
+      name: Test::UnusedVars
+      version: 2.000005
+    -
+      class: Dist::Zilla::Plugin::HasVersionTests
+      name: HasVersionTests
+      version: 1.101420
+    -
+      class: Dist::Zilla::Plugin::Git::Check
+      name: '@Git/Check'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Commit
+      name: '@Git/Commit'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Tag
+      name: '@Git/Tag'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Git::Push
+      name: '@Git/Push'
+      version: 2.017
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: runtime
+          type: requires
+      name: Prereqs
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::Prereqs
+      config:
+        Dist::Zilla::Plugin::Prereqs:
+          phase: test
+          type: requires
+      name: TestRequires
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':InstallModules'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':IncModules'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':TestFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ExecFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':ShareFiles'
+      version: 5.006
+    -
+      class: Dist::Zilla::Plugin::FinderCode
+      name: ':MainModule'
+      version: 5.006
+  zilla:
+    class: Dist::Zilla::Dist::Builder
+    config:
+      is_trial: 0
+    version: 5.006

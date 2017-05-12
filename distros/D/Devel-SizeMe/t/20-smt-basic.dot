@@ -1,0 +1,14 @@
+digraph {
+graph [overlap=false, rankdir=LR]
+n5 [ id=5,label="l1/n11/l111/n1111\n +4" ];
+n3 [ id=3,label="l1/n11\n 0+4=4" ];
+n9 [ id=9,label="l2/n21/l211/n2111\n +5" ];
+n11 [ id=11,label="l2/n21/l212/n2121\n +5" ];
+n7 [ id=7,label="l2/n21\n 0+10=10" ];
+n1 [ id=1,label="&quot;label&quot;\nroot\n 13+14=27" ];
+n1 -> n3 [id=2,label="l1"];
+n3 -> n5 [id=4,label="l1/n11/l111"];
+n1 -> n7 [id=6,label="l2"];
+n7 -> n9 [id=8,label="l2/n21/l211"];
+n7 -> n11 [id=10,label="l2/n21/l212"];
+}

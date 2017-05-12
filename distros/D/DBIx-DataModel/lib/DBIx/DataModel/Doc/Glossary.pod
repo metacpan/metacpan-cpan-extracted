@@ -1,0 +1,328 @@
+=encoding ISO8859-1
+
+=head1 NAME
+
+DBIx::DataModel::Doc::Glossary - Terms used in DBIx::DataModel documentation
+
+=head1 DOCUMENTATION CONTEXT
+
+This chapter is part of the C<DBIx::DataModel> manual.
+
+=over
+
+=item * 
+
+L<SYNOPSIS AND DESCRIPTION|DBIx::DataModel>
+
+=item * 
+
+L<DESIGN|DBIx::DataModel::Doc::Design>
+
+=item * 
+
+L<QUICKSTART|DBIx::DataModel::Doc::Quickstart>
+
+=item *
+
+L<REFERENCE|DBIx::DataModel::Doc::Reference>
+
+=item *
+
+L<MISC|DBIx::DataModel::Doc::Misc>
+
+=item *
+
+L<INTERNALS|DBIx::DataModel::Doc::Internals>
+
+=item *
+
+GLOSSARY
+
+=back
+
+
+
+=head1 GLOSSARY
+
+=over
+
+=item API
+
+Application Programming Interface, the set of public attributes,
+methods, arguments, return values for interacting with a software 
+compnent.
+
+=item association
+
+Relationship between tables. 
+In L</UML>, an association declaration states what are the 
+participating tables, what are the L<multiplicities|/multiplicity>,
+and optionally gives names to the association itself and to the
+roles of the partipating tables.
+An association declaration in C<DBIx::DataModel> involves similar 
+information, except that no more than two tables can participate,
+and at least one role name is mandatory.
+
+=item component
+
+The second participant in a L</composition> relationship, i.e.
+some object which "is part of" another object. A component object
+cannot live outside of its composite object.
+
+=item compatibility layer
+
+A module, loaded on demand, that emulates the API of former versions 
+of C<DBIx::DataModel>.
+
+=item composite
+
+The first participant in a L</composition> relationship, i.e.
+some object which "contains" another object. If the composite
+object is deleted, all its components are also deleted.
+
+=item composition
+
+An L</association> which additionally states that records of one
+table (components) cannot exist outside of their composite class;
+therefore when the composite is destroyed, the components must
+be destroyed as well (cascaded delete).
+
+=item column
+
+Within a L</row>, a column is a scalar value 
+corresponding to a given column name. 
+Within a L</table> or L</view>, a column is a 
+a list of scalar values obtained by selecting the
+same column name in every row of the data source.
+Unlike most other Perl L<ORMs|/ORM>, 
+C<DBIx::DataModel> has no class for
+representing a column: since a row is just 
+a blessed hashref, a column is just a value in that hashref.
+As a matter of fact, most columns are unknown to
+the C<DBIx::DataModel> layer; they are just 
+passthrough information, directly propagated from the 
+L<DBI|DBI> layer to the application layer.
+
+=item column type
+
+A collection of callback functions or I<handlers>, 
+declared in a L</schema> through the 
+L<Type()|DBIx::DataModel::Doc::Reference/"Type()">
+method. This column type can then be associated with
+various column names in various tables; as a result, 
+the C<from_DB> and C<to_DB> handlers will be called 
+automatically, respectively  after reading a value
+from the database or before writing a value to the database.
+
+=item compile time
+
+Strictly speaking, Perl is not a compiled language; 
+but liberally speaking, the code that runs in the initial
+phases of a perl program (BEGIN, CHECK, INIT) can be named
+"compile time". 
+
+Within C<DBIx::DataModel>, we speak of "compile-time methods"
+for declarations like C<Schema(...)>, C<Table(...)>, 
+C<Association(...)>, because these declarations
+usually belong to a module that will be
+loaded through L<use|perlfunc/use>, and therefore will be 
+executed at compile-time. 
+
+=item DB
+
+DataBase
+
+=item DBI
+
+The generic database-independent interface for Perl -- see L<DBI>.
+
+=item DBIC
+
+Abreviation for L<DBIx::Class>, another L</ORM> for Perl.
+
+=item dbh
+
+A DBI database handle, created by a call to L<DBI/connect>.
+
+=item fast statement 
+
+A L</statement> in which each row from the database will be retrieved
+into the same memory location, using DBI's L<fetch|DBI/fetch> and
+L<bind_columns|DBI/bind_columns> methods. This is the fastest way to
+get data, but it requires special care to handle each row immediately,
+before that row gets overwritten by the next row.
+
+
+=item foreign key
+
+A column or set of columns that contains the primary key
+of another table.
+
+
+=item inner join
+
+The default form of L</join>, that excludes null values
+in the join condition. 
+Within C<DBIx::DataModel>, inner joins are inferred automatically
+from the L<multiplicities|/multiplicity> in L<associations|/association>,
+or may be explicitly required with a bidirectional arrow: 
+C<< ->join(qw/table <=> role1 <=> role2/) >>.
+
+=item JDBC
+
+Standard API to access databases from Java code.
+Perl code can work with JDBC databases through the L<DBD::JDBC> proxy driver.
+
+The JDBC API is richer than standard DBI for working 
+with result sets : for example it has methods to move the cursor;
+these can be exploited from C<DBIx::DataModel> through the 
+L<DBIx::DataModel::Statement::JDBC|DBIx::DataModel::Statement::JDBC>
+subclass.
+
+=item join
+
+A database operation which consists of taking rows from several sources
+and producing new data rows. The result contains columns merged from 
+those sources, according to the L</join condition>.
+Joins are implemented as subclasses of 
+L<DBIx::DataModel::Source::Join|DBIx::DataModel::Source::Join>
+--- see the 
+L<define_join()|DBIx::DataModel::Reference/define_join()> method.
+
+
+=item join condition
+
+A rule that states which rows from one source will be merged with 
+which rows from another source while performing a join.
+A typical join condition states that the
+L</foreign key> of the first table should match the L</primary key>
+of the second table.
+
+
+=item left join
+
+A particular form of L</join>, in which a row with an empty L</foreign key>
+participates in the final result (while a regular join would ignore
+that row).
+Within C<DBIx::DataModel>, left joins are inferred automatically
+from the L<multiplicities|/multiplicity> in L<associations|/association>,
+or may be explicitly required with a directed arrow: 
+C<< ->join(qw/table => role1 => role2/) >>.
+
+=item multiplicity
+
+A specification on one side of an L</association>, which
+states the minimum and maximum number of times any given record 
+may participate in the association. Typical multiplicities
+are C<0..*>, C<0..1>, C<1..1>, C<1..*>. 
+C<*> is a shorthand for C<0..*>, and 
+C<1> is a shorthand for C<1..1>.
+
+
+=item OO
+
+Object-Oriented.
+
+=item ORM
+
+Object-Relational Management system : a 
+framework of classes and methods
+to encapsulate interactions with a L</RDBMS>.
+There are many ORMs for Perl; C<DBIx::DataModel> is just one of them.
+
+=item path method
+
+A method automatically installed in a L</table> class
+when an L</association> is declared. Path methods
+are used to get access to related records in other tables.
+
+=item primary key
+
+A column or set of columns that uniquely identifies any 
+single row within a table.
+
+=item RDBMS
+
+Relational DataBase Management System.
+
+
+=item role name
+
+In UML notation, each side of an association may be decorated with a
+"role name". These are optional in UML, like many other modeling constructs;
+they are used mainly when a same class participates in several associations,
+and disambiguation is necessary. 
+However, when declaring an 
+L<Association()|DBIx::DataModel::Doc::Reference/"Association()">
+in C<DBIx::DataModel>, role names are mandatory, because they 
+are used to generate path methods for navigating between
+the two participating classes.
+
+=item record
+
+Synonym to L</row>.
+
+=item row
+
+A single data record resulting from a SELECT query to the RDBMS.
+Within C<DBIx::DataModel>, rows are plain hashrefs 
+(C<< { column_name => column_value } >>), blessed as instances of 
+a L</table> or a L</view>.
+
+=item schema
+
+An instance of a subclass of 
+L<DBIx::DataModel::Schema|DBIx::DataModel::Schema>, that
+holds information about its tables, views and associations, and
+encapsulates a L</dbh>.
+
+=item source
+
+Either a L</table> or a L</join>.
+
+=item SQLA
+
+Abreviation for L<SQL::Abstract>, a SQL generator module
+used by several L</ORM>s.
+
+
+=item SQLAM
+
+Abreviation for L<SQL::Abstract::More>, the SQL generator module
+used by C<DBIx::DataModel>.
+
+
+=item statement 
+
+An instance of L<DBIx::DataModel::Statement|DBIx::DataModel::Statement>, 
+that encapsulates an SQL query. 
+See L<DBIx::DataModel::Doc::Reference/"STATEMENT METHODS">.
+
+
+=item sth
+
+A DBI statement handle, created by a call to L<DBI/prepare>.
+C<DBIx::DataModel> encapsulates C<$sth> handles within
+L</statement> objects.
+
+
+=item table
+
+A subclass of L<DBIx::DataModel::Source::Table|DBIx::DataModel::Source::Table>, 
+created by method L<DBIx::DataModel::Doc::Reference/Table()>, 
+that encapsulates access to a database table (or database view).
+
+
+=item UML
+
+The I<Unified Modeling Language>, a graphical notation 
+for modeling software system. An excellent quick reference for
+UML is L<http://www.holub.com/goodies/uml/>.
+
+Association definitions in C<DBIx::DataModel> 
+are closely inspired by UML associations
+(see L<DBIx::DataModel::Doc::Reference/"Association()">).
+
+=back
+
+

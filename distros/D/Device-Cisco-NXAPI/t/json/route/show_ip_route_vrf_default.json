@@ -1,0 +1,210 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "default",
+          "TABLE_addrf": {
+            "ROW_addrf": {
+              "addrf": "ipv4",
+              "TABLE_prefix": {
+                "ROW_prefix": [
+                  {
+                    "ipprefix": "1.2.3.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.2.3.4",
+                          "ifname": "Lo0",
+                          "uptime": "PT3H55M19S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "1.2.3.4/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "1.2.3.4",
+                          "ifname": "Lo0",
+                          "uptime": "PT3H55M19S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "8.8.8.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "false",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ifname": "Null0",
+                          "uptime": "PT3H19M6S",
+                          "pref": 1,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "static",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.1.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.1.4",
+                          "ifname": "Lo1",
+                          "uptime": "PT3H52M39S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.1.4/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.1.4",
+                          "ifname": "Lo1",
+                          "uptime": "PT3H52M39S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.24.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.24.1",
+                          "ifname": "Lo3",
+                          "uptime": "PT3H20M13S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.24.1/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.24.1",
+                          "ifname": "Lo3",
+                          "uptime": "PT3H20M13S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.25.0/24",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.25.1",
+                          "ifname": "Eth1/2",
+                          "uptime": "PT3H16M5S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "direct",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ipprefix": "192.168.25.1/32",
+                    "ucast-nhops": 1,
+                    "mcast-nhops": 0,
+                    "attached": "true",
+                    "TABLE_path": {
+                      "ROW_path": [
+                        {
+                          "ipnexthop": "192.168.25.1",
+                          "ifname": "Eth1/2",
+                          "uptime": "PT3H16M5S",
+                          "pref": 0,
+                          "metric": 0
+                        },
+                        {
+                          "clientname": "local",
+                          "ubest": "true"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

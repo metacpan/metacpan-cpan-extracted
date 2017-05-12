@@ -1,0 +1,39 @@
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+use Getopt::Long;
+use DateTime::TimeZone;
+
+my $verbose = 0;
+my $filter = '';
+
+Getopt::Long::GetOptions(
+    "v|verbose" => \$verbose,
+);
+
+if (@ARGV) {
+    my @quote = $^O eq 'MSWin32' ? ('"', '\"') : ("'", "'\''");
+    $filter = $quote[0] . (join "|", map { s/$quote[0]/$quote[1]/; qq[(?:$_)] } @ARGV) . $quote[0];
+    #print "$filter\n"; exit 0;
+}
+
+open JAVA_TZ, "java AllTZ $filter |" or die "java AllTZ: $!";
+
+while (my $name = <JAVA_TZ>) {
+    chomp $name;
+    my $tz = eval { DateTime::TimeZone->new(name => $name); };
+    if ($@) {
+        warn "$name: $@";
+    } elsif (! defined $tz) {
+        warn "$name: undef\n";
+    } elsif ($verbose) {
+        if ($tz->name ne $name) {
+            warn "$name: ".$tz->name."\n";
+        } else {
+            print "$name: OK\n";
+        }
+    }
+}
+close JAVA_TZ;

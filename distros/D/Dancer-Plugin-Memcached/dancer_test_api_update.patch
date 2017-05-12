@@ -1,0 +1,33 @@
+--- a/t/03-app_set.t    2010-11-03 11:06:16.000000000 +0000
++++ b/t/03-app_set.t    2013-03-01 10:41:37.973611312 +0000
+@@ -30,19 +30,19 @@
+ response_content_is [GET => '/'], "Test Module Loaded", 
+        "got expected response content for GET /";
+ 
+-$response = get_response [GET => '/set_test/'.$time];
++$response = dancer_response [GET => '/set_test/'.$time];
+ is $response->{status}, 200, 'response status is 200 for /set_test';
+ is $response->{content}, $time, "got expected response content for GET
+/set_test";
+ 
+-$response = get_response [POST => '/get_test', {data => '/set_test/'.$time}];
++$response = dancer_response [POST => '/get_test', {data =>
+'/set_test/'.$time}];
+ is $response->{status}, 200, 'response status is 200 for /get_test';
+ is $response->{content}, $time, "got expected response content for POST
+/get_test";
+ 
+-$response = get_response [POST => '/store_test', { key => 'test', data => $time
+}];
++$response = dancer_response [POST => '/store_test', { key => 'test', data =>
+$time }];
+ is $response->{status}, 200, 'response status is 200 for /store_test';
+ is $response->{content}, $time, "got expected response content for POST
+/store_test";
+ 
+-$response = get_response [GET => '/fetch_stored', { key => 'test' }];
++$response = dancer_response [GET => '/fetch_stored', { key => 'test' }];
+ is $response->{status}, 200, 'response status is 200 for /fetch_stored';
+ is $response->{content}, $time, "got expected response content for GET
+/fetch_stored";
+ 

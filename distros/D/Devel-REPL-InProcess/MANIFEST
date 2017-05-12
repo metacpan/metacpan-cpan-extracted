@@ -1,0 +1,15 @@
+Build.PL
+Changes
+lib/Devel/REPL/Client/AnyEvent.pm
+lib/Devel/REPL/Client/AnyEvent/Connection.pm
+lib/Devel/REPL/Client/Select.pm
+lib/Devel/REPL/InProcess.pm
+lib/Devel/REPL/Plugin/InProcess.pm
+lib/Devel/REPL/Server/Select.pm
+MANIFEST			This list of files
+META.yml
+META.json
+scripts/inprocess-repl-client
+t/001_load.t
+t/050_inprocess_plugin.t
+t/lib/Test.pm

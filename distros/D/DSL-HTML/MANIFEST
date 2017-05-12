@@ -1,0 +1,19 @@
+Build.PL
+lib/DSL/HTML.pm
+lib/DSL/HTML/Compiler.pm
+lib/DSL/HTML/Parser.pm
+lib/DSL/HTML/Rendering.pm
+lib/DSL/HTML/STL.pm
+lib/DSL/HTML/Tag.pm
+lib/DSL/HTML/Template.pm
+lib/DSL/HTML/Text.pm
+MANIFEST			This list of files
+META.json
+META.yml
+README
+t/DSL-HTML-Compiler.t
+t/DSL-HTML-Rendering.t
+t/DSL-HTML-STL.t
+t/DSL-HTML-Template.t
+t/DSL-HTML.t
+t/simple.t

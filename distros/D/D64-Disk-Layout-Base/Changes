@@ -1,0 +1,6 @@
+Revision history for Perl extension D64::Disk::Layout::Base.
+
+0.01  2011-01-22
+    - initial version (supports designing physical layouts of various Commodore
+      disk image formats through inheritance, reading and writing physical
+      sector data from/into disk image, and saving data changes to file)

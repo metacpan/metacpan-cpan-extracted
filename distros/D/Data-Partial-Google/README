@@ -1,0 +1,107 @@
+NAME
+    Data::Partial::Google - Filter data structures for "partial responses,"
+    Google style
+
+VERSION
+    version 0.02
+
+SYNOPSIS
+        my $data = {
+            artist => "Alice In Chains",
+            title  => "Sap",
+            year   => 1992,
+            tracks => [
+                { title => "Brother",      length => "4:27" },
+                { title => "Got Me Wrong", length => "4:12" },
+                { title => "Right Turn",   length => "3:17" },
+                { title => "Am I Inside",  length => "5:09" },
+            ]
+        };
+
+        my $filter = Data::Partial::Google->new('artist,title,tracks/title');
+        my $filtered = $filter->mask($data);
+
+        cmp_deeply($data, {
+            artist => "Alice In Chains",
+            title  => "Sap",
+            tracks => [
+                { title => "Brother" },
+                { title => "Got Me Wrong" },
+                { title => "Right Turn" },
+                { title => "Am I Inside" },
+            ]
+        });
+
+        # ok 1
+
+DESCRIPTION
+    This module filters data structures without changing their shape, making
+    it easy to expose only the parts of interest to a consumer. It aims to
+    be compatible with Google's implementation of partial responses using
+    the "fields" parameter, and it is based on the node module "json-mask".
+
+RULES
+  Properties
+    Select one or more properties from an object by seprating them with
+    commas:
+
+        foo,bar,baz
+
+  Descendants
+    Use the slash operator to select properties within properties:
+
+       foo/bar/baz
+
+    will return the 'baz' property of the 'bar' property of the 'foo'
+    property.
+
+    Arrays are handled transparently: if 'foo' is an array, then the rule
+    'bar/baz' will be applied to every entry in 'foo'.
+
+  Sub-selection
+    Use the parentheses to select specific properties from inside another:
+
+        foo(bar,baz)
+
+    selects the 'bar' and 'baz' properties from 'foo' (or from each element
+    in 'foo').
+
+  Wildcards
+    Use the asterisk to select all sub-properties of a property:
+
+        foo/*/baz
+
+    selects the 'baz' property from every property of 'foo' that has a
+    'baz'.
+
+METHODS
+  mask
+    "$filter->mask($data)" returns $data, as modified by $filter's rules. In
+    most senses the returned value will be a deep copy of $data, as hashes
+    and arrays will have been reconstructed, but other values, such as code
+    references and glob references, will be copied directly, so be cautious.
+
+SEE ALSO
+    *   Google Partial Responses:
+        <https://developers.google.com/discovery/v1/performance#partial-resp
+        onse>
+
+    *   json-mask: <https://github.com/nemtsov/json-mask>
+
+AUTHOR
+    Andrew Rodland <arodland@cpan.org>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2014 by Andrew Rodland.
+
+    This is free software, licensed under:
+
+      The MIT (X11) License
+
+ADDITIONAL LICENSE
+    This module contains code and tests from json-mask, Copyright (c) 2013
+    Yuriy Nemtsov.
+
+CREDIT
+    Development of this module is supported by Shutterstock.
+

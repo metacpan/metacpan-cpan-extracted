@@ -1,0 +1,36 @@
+#!perl
+use strict;
+use warnings;
+use Docopt;
+use JSON;
+
+our $VERSION = '0.03';
+
+my $ret = docopt(version => $VERSION);
+print JSON->new->canonical(1)->convert_blessed->encode($ret), "\n";
+
+__END__
+
+=head1 NAME
+
+navel_fate - navel fate?
+
+=head1 SYNOPSIS
+
+    naval_fate ship new <name>...
+    naval_fate ship <name> move <x> <y> [--speed=<kn>]
+    naval_fate ship shoot <x> <y>
+    naval_fate mine (set|remove) <x> <y> [--moored|--drifting]
+    naval_fate -h | --help
+    naval_fate --version
+
+    Options:
+        -h --help     Show this screen.
+        --version     Show version.
+        --speed=<kn>  Speed in knots [default: 10].
+        --moored      Moored (anchored) mine.
+        --drifting    Drifting mine.
+
+=head1 DESCRIPTION
+
+This document is comming from http://docopt.org/.

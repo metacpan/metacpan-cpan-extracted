@@ -1,0 +1,8 @@
+Revision history for Dancer-Plugin-SecureHeaders
+
+1.0.1 05-May-2014
+        Added YAML as test PreReq for BSD
+
+1.0.0 31-Mar-2014
+        Initial release.
+

@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+README
+Tiger.pm
+Tiger.xs
+sboxes.c
+t/tiger.t
+tigerhash.c
+typemap

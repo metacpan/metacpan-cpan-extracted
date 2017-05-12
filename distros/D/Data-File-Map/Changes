@@ -1,0 +1,32 @@
+Changes for perl module Data::File::Map
+
+
+0.09      2014-11-12 23:42:45
+
+0.08      2014-11-12 23:20:57
+- bug fix with add field
+
+0.07      2014-11-12 21:49:22
+- add_field method now accepts a string or string and hashref
+
+0.06      2014-10-17 22:32:40
+- Added get_field method
+
+0.05      2014-10-15 09:26:15
+- Added type coercion to for moose attributes of type Data::File::Map. Will
+coerce Str to a Data::File::Map instance using new_from_file constructor
+using the string value as the file path
+- passing a value of 1 to the "fields" method  returns Date::File::Map::Field
+objects instead of array references 
+
+0.02.1
+
+Fixed bug in "read_file" method
+
+0.02.0
+
+Added "read_file" method
+
+0.01.0
+
+Initial release

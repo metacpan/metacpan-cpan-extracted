@@ -1,0 +1,168 @@
+NAME
+    Data::Vitals - The Perl "Vital Statistics" Library
+
+DESCRIPTION
+    The world of clothing and fashion works to an annoyingly anacronistic
+    and complicated set of measurements. The Perl "Vital Statistics" Library
+    is an attempt to create a comprehensive set of classes, object and
+    algorithms for working with human-describing data such as height, body
+    measurements, shoe, bra and other clothing sizes.
+
+    It is not intended to be the end to a means, or the solution to a
+    specific problem, but rather a general package that can be used to build
+    more specific packages. It is intended that the library should be
+    extremely flexible, highly extendible, support locales in some form, and
+    be heavily unit tested to ensure that packages built on top of
+    Data::Vitals have a reliable base.
+
+    Data::Vitals measurement objects are useful for both male and female
+    measurements.
+
+  Implementation Style
+    As is generally the case with complex and twisty subjects (such as
+    DateTime) this library is implemented in a highly object-orientated
+    form.
+
+    For the sake of completeness we take this to rather extreme levels. For
+    example, a Data::Vitals::Waist object specifically refers for a
+    measurement of the circumference of the torso taken at a waist.
+
+  Metric and Imperial
+    Please note that all measurements are stored and stringified into metric
+    values (although they can be input in various forms). This is for
+    forward compability with the long term worldwide trend towards
+    metrification. For now, locales that use imperial values should
+    explicitly call the various "->as_imperial" methods.
+
+  Class List
+    Data::Vitals::Height - Height measurement
+
+    Data::Vitals::Circumference - General circumference measurement
+
+    Data::Vitals::Hips - Measurement of the circumference around the hips
+
+    Data::Vitals::Waist - Measurement of the circumference around the waist
+
+    Data::Vitals::Frame - The "Frame" measurement. Circumference around the
+    chest, just below the breasts.
+
+    Data::Vitals::Chest - Measurement of the circumference around the chest
+
+    Data::Vitals::Underarm - Measurement of the circumference around the
+    torso at a position under the arms.
+
+STATUS
+    This contains an implementation of Height measurements, plus a number of
+    measurements of the circumference of the torso at various points. i.e.
+    Hips/Waist/Chest/etc
+
+    Unit testing and documentation is up to date.
+
+    Please note that nothing that produces an error (by returning "undef")
+    sets an error message in any form. This will be resolved in a later
+    version.
+
+    Please note that the measurement ranges are very large by default. The
+    maximum allowable values exceed by a small percentage the world records
+    for the various measurements (at the time of writing).
+
+    However, the minimums of the range may be unsuitable for newborn or
+    premature babies. The ability to customise these ranges will be added in
+    a later version.
+
+METHODS
+  height $height
+    The "height" method creates and returns a height object. It takes as
+    argument a "height string".
+
+    Returns a new Data::Vitals::Height object on success, or "undef" on
+    error.
+
+  hips $circumference
+    The "hips" method creates and returns a hip measurement object.
+
+    It takes as argument a "circumference string" (see
+    Data::Vitals::Circumference for details)
+
+    Returns a new Data::Vitals::Hips object, or "undef" on error.
+
+  waist $circumference
+    The "waist" method creates and returns a waist measurement object.
+
+    It takes as argument a "circumference string" (see
+    Data::Vitals::Circumference for details)
+
+    Returns a new Data::Vitals::Waist object, or "undef" on error.
+
+  frame $circumference
+    The "frame" method creates and returns a "frame" measurement object.
+    Mainly used for women, the frame is the circumference of the torso over
+    the rib cage, immediately below the breasts and specifically not
+    included any breast material.
+
+    It takes as argument a "circumference string" (see
+    Data::Vitals::Circumference for details)
+
+    Returns a new Data::Vitals::Frame object, or "undef" on error.
+
+  chest $circumference
+    The "chest" method creates and returns a chest measurement object. For
+    women, this is also known as a "bust" measurement.
+
+    It takes as argument a "circumference string" (see
+    Data::Vitals::Circumference for details)
+
+    Returns a new Data::Vitals::Chest object on success, or "undef" on
+    error.
+
+  bust $circumference
+    The "bust" method is an alias for the chest method.
+
+  underarm $circumference
+    The "underarm" method creates and returns an underarm measurement
+    object, which is the circumference of the torso under the arms and above
+    (for women) the breasts.
+
+    It takes as argument a "circumference string" (see
+    Data::Vitals::Circumference for details)
+
+    Returns a new Data::Vitals::Underarm object, or "undef" on error.
+
+TO DO
+    - Allow for per-measurement ranges, that can be tweaked if needed in
+    special cases.
+
+    - Add Data::Vitals::Weight
+
+    - Add Data::Vitals::Bra
+
+    - Add Data::Vitals::Dress (in the various country standards)
+
+    - Add Data::Vitals::Shoe (in the various country standards)
+
+SUPPORT
+    Bugs should always be reported via the CPAN bug tracker
+
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Data-Vitals>
+
+    For other issues, contact the maintainer.
+
+    As the author is no longer working in the fashion/modelling industry,
+    volunteers for taking over maintenance would be gratefully accepted.
+
+AUTHORS
+    Adam Kennedy <adamk@cpan.org>
+
+ACKNOWLEGEMENTS
+    Thank you to Phase N (<http://phase-n.com/>) for permitting the open
+    sourcing and release of this distribution.
+
+COPYRIGHT
+    Copyright 2004 - 2008 Adam Kennedy.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+    The full text of the license can be found in the LICENSE file included
+    with this module.
+

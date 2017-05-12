@@ -1,0 +1,5 @@
+Revision history for Perl extension Data::BenchmarkResults.
+
+0.01  Mon May 20 21:17:27 2003
+	- original version; Works but isn't too well documented yet.
+

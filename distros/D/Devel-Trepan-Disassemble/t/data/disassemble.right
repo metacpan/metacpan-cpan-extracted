@@ -1,0 +1,39 @@
+-- main::(five.pm:4)
+my $x = "Something simple to demo, 'disassemble'";
+Subroutine five
+---------------
+    main::five:
+    UNOP (0x1234567)
+    	op_next		0
+    	op_sibling	0
+    	op_ppaddr	PL_ppaddr[OP_LEAVESUB]
+    	op_type		1955
+    	op_flags	0000100: want kids
+    	op_private 1027
+    	op_first	0x7654321
+    LISTOP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0
+    	op_ppaddr	PL_ppaddr[OP_LINESEQ]
+    	op_type		1955
+    	op_flags	0001100: parenthesized, want kids
+    	op_private 1027
+    	op_first	0x7654321
+    	op_last		0x7654321
+    # 2:     5;
+    COP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0x7654321
+    	op_ppaddr	PL_ppaddr[OP_DBSTATE]
+    	op_type		1955
+    	op_flags	0000001: want void
+    	op_private 1027
+    SVOP (0x1234567)
+    	op_next		0x7654321
+    	op_sibling	0
+    	op_ppaddr	PL_ppaddr[OP_CONST]
+    	op_type		1955
+    	op_flags	0000010: want scalar
+    	op_private 1027
+    	op_sv		0x7654321
+trepan.pl: That's all, folks...

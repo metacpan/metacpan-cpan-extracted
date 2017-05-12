@@ -1,0 +1,76 @@
+0.900201 2014-09-30
+    - Fix for 5.18 and 5.20
+    - Don't copy column data from schema that does anything other
+      than define data type.  e.g. autoinc stuff
+
+0.900200 2010-07-24
+    - No longer use 'scalar gmtime' for set_date in ChangeSet;
+      that was brittle and doesn't work on many databases, now
+      we just use DBIx::Class::TimeStamp
+
+0.900102 2010-06-23
+    - Fix a bad test and a silly assumption in population code
+
+0.900101 2010-05-11
+    - Reupload because of a missing version number
+
+0.900100 2010-05-11
+    - Tiny bit of doc, besides that it's all of the below.
+
+0.900001_06 2010-04-30
+    - Fixed silly bug where update and delete didn't return what they were supposed to
+
+0.900001_05 2010-04-29
+    - Removed undocumented override of deploy()
+    - Added prepopulate_journal() to bootstrap insert logs, for retrofitting (oliver)
+    - Added bootstrap_journal() which calls deploy_journal() and then prepopulate_journal() (oliver)
+
+0.900001_04 2010-04-27
+    - Lots of documentation tweaks (oliver)
+    - Fix a bug caused by storing state of row BEFORE update instead of after (oliver)
+    - RT56175: allow tables to have a prefix
+    - RT56179: insert change_id, not change object, into audit log
+
+0.900001_03 2010-02-18
+    - Journal schema is now in it's own virtual package instead of being in
+      DBIx::Class::Schema::Journal::DB so a user should be able to have
+      multiple journals without them mingling
+    - No longer depend on Test::TempDir so this should build on windows
+    - Use Class::C3::Componentised instead of DBIx::Class::Componentised
+    - Fixed syntax error in SYNOPSIS
+    - Lots of cleanup (deleting unused files, commented out code, etc)
+    - Switched to Module::Install instead of EU::MM
+
+0.900001_02
+    - The one time I forget to run disttest, the MANIFEST file mysteriously
+      disappears... *sigh*
+
+0.900001_01
+    - insert records a history row as well
+    - SQL::Translator is required to run the test suite
+    - Add EvalWrap subclass, that suppressed errors and warns instead, useful
+      for when having no errors is preferable over partial journal data
+    - various refactoring
+    - correct journalling of recreated data (data with a primary key that
+      previously existed)
+    - update to DBIx::Class's versioning scheme
+
+0.02_01 2008-07-30
+    - deployment at connect time is disabled by default, set journal_auto_deploy to reenable
+    - $main_schema->deploy deploys the journalling tables too
+    - support multi column primary keys
+    - rename Change to ChangeLog to avoid conflict with mysql reserved word
+    - fix schema composition when sharing connection
+    - support for nested transactions (produce one changeset, but support stubs
+      for nested changesets in place)
+    - removed dummy table
+    - various other cleanups
+    - calling current_changeset outside of txn_do is fatal
+    - fix 'now()' default value, timestamp happens in perl space instead
+    - also call txn_do on the journal schema if the storage object differs
+    - don't call txn_begin twice
+
+0.01 2007-08-11:
+Initial version
+
+

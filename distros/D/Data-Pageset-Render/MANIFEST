@@ -1,0 +1,15 @@
+Build.PL
+ChangeLog
+INSTALL
+lib/Data/Pageset/Render.pm
+Makefile.PL
+MANIFEST
+META.yml			Module meta-data (added by MakeMaker)
+README
+t/00-new.t
+t/01-main.t
+t/96-kwalitee.t
+t/97-critic.t
+t/98-pod.t
+t/99-podcoverage.t
+t/perlcriticrc

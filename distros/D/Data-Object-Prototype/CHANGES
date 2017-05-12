@@ -1,0 +1,26 @@
+Changelog for Data-Object-Prototype
+
+0.06 2015-09-27T11:59:15
+ - Updated build.
+ - Updated distro to support Data::Object 0.53+.
+
+0.05 2015-09-26T12:30:08
+ - v0.05
+ - Updated build.
+ - Updated POD.
+
+0.04 2015-06-30T01:55:39
+ - v0.04
+ - Updated POD.
+
+0.03 2015-06-29T08:59:50
+ - v0.03
+ - Completely refactored using Data::Object and better OO.
+
+0.02 2015-05-18T02:37:59
+ - v0.02
+ - Added missing dependency.
+
+0.01 2015-05-17T09:28:30
+ - v0.01
+ - Initial commit.

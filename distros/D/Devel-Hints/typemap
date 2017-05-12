@@ -1,0 +1,21 @@
+GV *	T_GVREF
+
+INPUT
+T_GVREF
+        if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVGV)
+            $var = (GV*)SvRV($arg);
+        else
+            Perl_croak(aTHX_ \"$var is not a glob reference\")
+
+T_HVREF
+        if (SvROK($arg) && SvTYPE(SvRV($arg))==SVt_PVHV)
+            $var = (HV*)SvRV($arg);
+        else
+            Perl_croak(aTHX_ \"$var is not a hash reference\")
+
+OUTPUT
+T_GVREF
+	$arg = newRV((SV*)$var);
+
+T_HVREF
+        $arg = newRV((SV*)$var);

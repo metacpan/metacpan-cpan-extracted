@@ -1,0 +1,68 @@
+Revision history for Dist-Zilla-Plugin-CheckChangesHasContent
+
+0.010     2016-05-25 15:10:26-04:00 America/New_York
+
+    [FIXED]
+
+    - Dropped unintentional test dependency on Dist::Zilla v6
+
+0.009     2016-05-25 05:52:29-04:00 America/New_York
+
+    [FIXED]
+
+    - fixed tests broken by changes in [NextRelease] 6.005
+
+0.008     2015-03-24 23:31:03-04:00 America/New_York
+
+    [FIXED]
+
+    - Avoid meta validation issues during testing
+
+0.007     2014-11-04 07:11:14-05:00 America/New_York
+
+    [OTHER]
+
+    - Generates test file later to give other plugins a chance
+      to generate version information
+
+    [PREREQS]
+
+    - Drops Path::Class and adds Path::Tiny
+
+0.006     2012-07-28 06:51:35 America/New_York
+
+    [BUGFIX]
+
+    - Correctly detect versions with '-TRIAL' appended
+      [Randy Stauner]
+
+0.005     2012-04-11 14:08:40 America/New_York
+
+    [BUGFIX]
+
+    - Fixed Test::More done_testing in END block anti-pattern
+
+    [OTHER]
+
+    - Removed unnecessary IO::Scalar dependency
+
+0.004     2012-04-10 20:18:07 America/New_York
+
+    [ADDED]
+
+    - new module Test::ChangesHasContent contributed by
+      Karen Etheridge to check changes as an xt test
+      (instead of as a pre-release role)
+
+0.003     2010-05-12 21:44:29 America/New_York
+
+    - allow Changes entry to be '$version' alone on a line
+      [bug noted by Apocalypse]
+
+0.002     2010-05-12 18:51:31 America/New_York
+
+    - fix repository information
+
+0.001     2010-05-12 18:38:52 America/New_York
+
+    - first release

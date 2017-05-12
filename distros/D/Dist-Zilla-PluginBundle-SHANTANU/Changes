@@ -1,0 +1,191 @@
+Changelog for Dist-Zilla-PluginBundle-SHANTANU
+
+0.43 2016-05-30T03:29:24
+ - adding badge depot dependencies (Shantanu Bhadoria)
+
+0.42 2016-05-10T04:36:02Z
+ - kwalitee options (Shantanu Bhadoria)
+
+0.41 2016-04-07T03:53:30Z
+ - travis root (Shantanu Bhadoria)
+
+0.40 2016-04-07T03:32:17Z
+ - fixed perl versions for travis; (Shantanu Bhadoria)
+ - modified travis (Shantanu Bhadoria)
+ - travis update (Shantanu Bhadoria)
+ - Updated travis CI file to pre install kwalitee::extra (Shantanu
+   Bhadoria)
+
+0.39 2016-04-04T08:53:56Z
+ - v0.39 (Shantanu Bhadoria)
+ - fixed prereq version (Shantanu Bhadoria)
+ - added coverage (Shantanu Bhadoria)
+ - Modified reamdme (Shantanu Bhadoria)
+ - Added Badges (Shantanu Bhadoria)
+ - Adding a Shantanu badge to use my travis repo naming format (Shantanu
+   Bhadoria)
+ - [ContributorsFromGit] -> [Git::Contributors] (Karen Etheridge)
+
+0.38 2015-05-25T04:26:08Z
+ - v0.38 (Shantanu Bhadoria)
+
+0.37 2015-05-25T04:22:08Z
+ - v0.37 (Shantanu Bhadoria)
+ - Added option to disable compile tests to allow removal of modules
+   manually (Shantanu Bhadoria)
+
+0.36 2015-04-08T09:54:58Z
+ - v0.36 (Shantanu Bhadoria)
+ - Cleanup and fixes (Shantanu Bhadoria)
+
+0.35 2015-04-08T08:39:02Z
+ - v0.35 (Shantanu Bhadoria)
+ - adding mailmap (Shantanu Bhadoria)
+
+0.34 2015-04-08T08:21:46Z
+ - v0.34 (Shantanu Bhadoria)
+
+0.33 2015-04-08T08:10:06Z
+ - v0.33 (Shantanu Bhadoria)
+ - Travis tuning (Shantanu Bhadoria)
+
+0.32 2015-04-08T07:59:36Z
+ - v0.32 (Shantanu Bhadoria)
+
+0.31 2015-04-08T07:47:24Z
+ - v0.31 (Shantanu Bhadoria)
+
+0.30 2015-04-08T07:43:17Z
+ - v0.30 (Shantanu Bhadoria)
+
+0.29 2015-04-08T07:34:42Z
+ - v0.29 (Shantanu Bhadoria)
+ - Added more branched to push list (Shantanu Bhadoria)
+ - added .travis to master (Shantanu Bhadoria)
+
+0.28 2015-04-08T04:52:44Z
+ - v0.28 (Shantanu Bhadoria)
+ - Added .travis.yml to dirty list (Shantanu Bhadoria)
+ - adding travis to git ignore (Shantanu Bhadoria)
+ - Fixed dirty debian files in build Adding the Readmes in git again
+   (Shantanu Bhadoria)
+ - Trying removal of possibly unnecessary files (Shantanu Bhadoria)
+ - local changes (Shantanu Bhadoria)
+
+0.27 2015-03-30T04:57:08Z
+ - v0.27 (Shantanu Bhadoria)
+ - adding markdown file to dirty list (Shantanu Bhadoria)
+
+0.26 2015-03-23T06:40:12Z
+ - v0.26 (Shantanu Bhadoria)
+ - dist.ini changes, added author website (Shantanu Bhadoria)
+
+0.25 2015-03-09T10:05:52Z
+ - v0.25 (Shantanu Bhadoria)
+ - Adding prefixed autometaresources The github repository can now have a
+   prefix of perl-* added to the module name. This allows for seperation of
+   perl repos from others. (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.24 2014-12-05T06:37:57Z
+ - v0.24 (Shantanu Bhadoria)
+ - Added new stopwords for pod spellcheck (Shantanu Bhadoria)
+ - Fixes to Dist Zilla PluginBundle for exclude_match empty Array
+   exceptions (Shantanu Bhadoria)
+ - Mode change and minor mods (Shantanu Bhadoria)
+
+0.23 2013-10-16T04:50:45Z
+ - v0.23 (Shantanu Bhadoria)
+ - Updated to latest Changelogfromgit cpan changes code (Shantanu Bhadoria)
+
+0.22 2013-10-05T03:57:15Z
+ - v0.22 (Shantanu Bhadoria)
+ - Added debian files (Shantanu Bhadoria)
+
+0.21 2013-09-29T02:45:52Z
+ - v0.21 (Shantanu Bhadoria)
+ - Moved Constants and Registers lower (Shantanu Bhadoria)
+
+0.20 2013-09-27T10:08:08Z
+ - v0.20 (Shantanu Bhadoria)
+ - add additional group to Pod weaver (Shantanu Bhadoria)
+
+0.19 2013-09-14T03:38:26Z
+ - v0.19 (Shantanu Bhadoria)
+ - Added inc and corpus directories to no index list (Shantanu Bhadoria)
+
+0.18 2013-09-12T08:49:01Z
+ - v0.18 (Shantanu Bhadoria)
+ - v0.16 (Shantanu Bhadoria)
+
+0.17 2013-09-12T08:45:39Z
+ - v0.17 (Shantanu Bhadoria)
+ - Added README.pod (Shantanu Bhadoria)
+
+0.16 2013-09-12T06:46:08Z
+ - v0.16 (Shantanu Bhadoria)
+ - Commit Changes test (Shantanu Bhadoria)
+ - trying a different Position for Changelog. moveing Changes back to core
+   (Shantanu Bhadoria)
+
+0.15 2013-09-12T06:20:47Z
+ - Renamed CHANGES to Changes (Shantanu Bhadoria)
+
+0.14 2013-09-12T06:14:58Z
+ - Renamed CHANGES to Changes (Shantanu Bhadoria)
+
+0.13 2013-09-12T06:07:57Z
+ - Moved to Changelog From git (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.12 2013-09-11T03:21:17Z
+ - fixed Deps (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.11 2013-07-11T03:37:54Z
+ - v0.11 (Shantanu Bhadoria)
+ - Added Perl Version, few fixes to ignore META.yml for git (Shantanu
+   Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.10 2013-07-11T01:10:14Z
+ - v0.10 (Shantanu Bhadoria)
+ - Added Meta YAML generator to help older parsers and KWalitee (Shantanu
+   Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.09 2013-07-09T13:54:24Z
+ - v0.09 (Shantanu Bhadoria)
+ - Modification for exclude_filename bug (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.08 2013-07-09T10:13:16Z
+ - v0.08 (Shantanu Bhadoria)
+
+0.07 2013-07-09T10:00:24Z
+ - Swapped Dist::Zilla::Plugin::MakeMaker with
+   Dist::Zilla::Plugin::MakeMaker::Awesome (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.04 2013-03-05T12:37:47Z
+ - v0.04 (Shantanu Bhadoria)
+ - Fixed .gitignore to ignore PERLTIDY log (Shantanu Bhadoria)
+ - Fixed a spelling mistake (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.03 2013-03-05T12:09:35Z
+ - v0.03 (Shantanu Bhadoria)
+ - Bump Changes (Shantanu Bhadoria)
+
+0.02 2013-03-05T12:08:16Z
+ - v0.02 (Shantanu Bhadoria)
+ - Fixed VERSION Comment (Shantanu Bhadoria)
+
+0.01 2013-03-05T10:55:51Z
+ - Fixed VERSION Comment (Shantanu Bhadoria)
+ - Added Changelogfromgit plugin (Shantanu Bhadoria)
+ - fixed dist.ini (Shantanu Bhadoria)
+ - Modified gitignore to allow META.yml files added README Pod for githubi
+   and CHangelog file (Shantanu Bhadoria)
+ - Adding Git ignore file (Shantanu Bhadoria)
+ - Initial commit (Shantanu Bhadoria)

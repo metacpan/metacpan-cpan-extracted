@@ -1,0 +1,61 @@
+---
+name: Document-Maker
+version: 0.022
+author:
+  - 'Robert Krimen, C<< <rkrimen at cpan.org> >>'
+abstract: Makefile-like functionality in Perl
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  File::Find::Rule: 0
+  Log::Log4perl: 0
+  Moose: 0.26
+  Path::Class: 0
+  Scalar::Util: 0
+  Sub::Exporter: 0
+build_requires:
+  Test::More: 0
+provides:
+  Document::Maker:
+    file: lib/Document/Maker.pm
+    version: 0.022
+  Document::Maker::Dependency:
+    file: lib/Document/Maker/Dependency.pm
+  Document::Maker::FileFinder::Query:
+    file: lib/Document/Maker/FileFinder/Query.pm
+  Document::Maker::Logger:
+    file: lib/Document/Maker/Logger.pm
+  Document::Maker::Parser:
+    file: lib/Document/Maker/Parser.pm
+  Document::Maker::Pattern:
+    file: lib/Document/Maker/Pattern.pm
+  Document::Maker::Role::Component:
+    file: lib/Document/Maker/Role/Component.pm
+  Document::Maker::Role::Dependency:
+    file: lib/Document/Maker/Role/Dependency.pm
+  Document::Maker::Role::Logging:
+    file: lib/Document/Maker/Role/Logging.pm
+  Document::Maker::Role::Target:
+    file: lib/Document/Maker/Role/Target.pm
+  Document::Maker::Role::TargetMaker:
+    file: lib/Document/Maker/Role/TargetMaker.pm
+  Document::Maker::Source::File:
+    file: lib/Document/Maker/Source/File.pm
+  Document::Maker::Source::FileScan:
+    file: lib/Document/Maker/Source/FileScan.pm
+  Document::Maker::Target::File:
+    file: lib/Document/Maker/Target/File.pm
+  Document::Maker::Target::Group:
+    file: lib/Document/Maker/Target/Group.pm
+  Document::Maker::Target::PatternFile:
+    file: lib/Document/Maker/Target/PatternFile.pm
+  Document::Maker::Target::PatternFileScan:
+    file: lib/Document/Maker/Target/PatternFileScan.pm
+  Document::Maker::Target::Simple:
+    file: lib/Document/Maker/Target/Simple.pm
+generated_by: Module::Build version 0.2806
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

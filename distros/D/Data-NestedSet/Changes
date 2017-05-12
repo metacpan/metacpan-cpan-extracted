@@ -1,0 +1,15 @@
+Revision history for Data-NestedSet
+
+1.03    2008/07/14
+        fix link POD and fix the test suite missing a file.
+
+1.02    2008/07/13
+        fix link and version number in POD.
+
+1.01    2008/07/13
+        Added documentation elements and fixed POD.
+
+
+1.00    2008/07/13
+        First version, released on an unsuspecting world.
+

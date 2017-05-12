@@ -1,0 +1,126 @@
+Revision history for Perl extension Devel::Pragma.
+
+1.1.0 Fri 1 Jul 14:20:06 2016
+    - overhaul ccstash
+        - simplify the tests
+        - improve the documentation
+        - return undef if called outside of a require
+    - remove the do FILE tests from hints.t since
+      Lexical::SealRequireHints doesn't support it (RT#85101)
+
+1.0.1 Tue 28 Jun 10:09:48 2016
+    - META.yml: add the bugtracker link
+    - META.yml: fix the version
+
+1.0.0 Tue 28 Jun 09:15:13 2016
+    - remove on_require
+
+0.62  Mon 26 Oct 12:13:17 2015
+    - update ppport.h
+    - update copyright year
+
+0.61  Mon 26 Oct 11:33:19 2015
+    - specify minimum perl version (thanks Lisa Hare)
+
+0.60  Sun Oct 20 12:24:09 2013
+    - use Lexical::SealRequireHints to fix %^H bugs
+    - rename my_hints -> hints (my_hints is still supported, but deprecated)
+    - update ppport.h from 3.19 to 3.20
+    - code cleanup
+
+0.54  Mon Aug 16 13:54:36 2010
+    - portability fixes for Visual Studio and older GCCs
+
+0.53  Sun Feb 22 01:44:51 2009
+    - yet another metadata fix
+
+0.52  Thu Feb 19 19:47:20 2009
+    - refix META.yml
+
+0.51  Thu Feb 19 16:38:56 2009
+    - fix META.yml
+
+0.50  Thu Feb 19 03:56:55 2009
+    - added on_require
+        - added require.t
+    - ported to B::Hooks::OP::Check/B::Hooks::OP::Annotation
+
+0.40  Sun Feb 1 19:36:21 2009
+    - portability fixes
+    - added new function: fqname
+        - added fqname.t
+    - made require hook exception-safe (Marcus Holland-Moritz++)
+        - added exception.t
+
+0.32  Fri Jan 9 15:26:21 2009
+    - added scope() - unique identifier for the currently-compiling scope
+        - added scope.t
+    - set $^H bit on import
+    - fix :all tag
+        - added tag.t
+    - fix compile-time lexical scoping (leak.t)
+
+0.31  Tue Jan 6 19:55:08 2009
+    - add missing dependency on B::Hooks::EndOfScope (which bumps the minimum perl version up to 5.8)
+
+0.30  Tue Jan 6 19:03:06 2009
+    - more robust/less disruptive %^H clearance
+    - code cleanup
+    - make my_hints apply #33311 lexically (again)
+
+0.22  Tue Jan 6 10:19:40 2009
+    - refine exclusions
+
+0.21  Tue Jan 6 08:10:45 2009
+    - Fix optimize flags in Makefile.PL
+
+0.20  Tue Jan 6 07:16:42 2009
+    - apply the %^H leak fix (by patching PL_ppaddr[OP_REQUIRE] and PL_ppaddr[OP_DOFILE])
+      globally rather than lexically
+    - added leak.t to confirm the bug on perls prior to patch #33311 if Devel::Pragma is not used
+    - added new_scope.t
+    - documentation tweaks
+
+0.12  Mon Jun 23 23:54:04 2008
+    - added an optional argument to new_scope to distinguish
+      between different classes that share the same code
+
+0.11  Mon Jun 23 21:03:44 2008
+    - renamed Devel::Pragma
+    - added function: ccstash
+        - added ccstash.t
+    - fixed MANIFEST (thanks Taro Nishino)
+
+0.10  Mon Jun 23 14:40:42 2008
+    - fix bug that was causing my_hints to clobber %^H
+    - added new_scope function
+    - removed my_hints aliases
+
+0.09  Sat Jun 21 11:06:31 2008
+    - bugfix: return reference to %^H when already in scope
+
+0.08  Sat Jun 21 00:05:44 2008
+    - doc fixlet
+
+0.07  Fri Jun 20 23:47:28 2008
+    - doc fixlet
+
+0.06  Fri Jun 20 20:35:45 2008
+    - my_hh returns a reference to %^H
+    - added another alias: my_hints
+    - future-harden: use the outermost unused PL_hints bit
+
+0.05  Tue Jun 17 23:40:36 2008
+    - lexicalize_hh is now an alias for my_hh
+
+0.04  Tue Jun 17 23:07:09 2008
+    - added dependency on if.pm for perl 5.6.0 and 5.6.1
+
+0.03  Tue Jun 17 21:28:10 2008
+    - added dependency on Test::More for perl 5.6.0 and 5.6.1
+
+0.02  Tue Jun 17 21:15:55 2008
+    - move minimum perl version down from 5.8.0 to 5.6.0 (only tested on 5.6.2)
+
+0.01  Tue Jun 17 20:14:34 2008
+    - original version; created by h2xs 1.23 with options -A -c -n Devel::Hints::Lexical

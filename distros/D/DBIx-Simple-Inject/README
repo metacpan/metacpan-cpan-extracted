@@ -1,0 +1,122 @@
+NAME
+    DBIx::Simple::Inject - Injects DBIx::Simple methods into DBI
+
+SYNOPSIS
+      use DBI;
+      my $dbh = DBI->connect(
+          'dbi:SQLite:dbname=:memory:', '', '', {
+              RootClass          => 'DBIx::Simple::Inject',
+              RaiseError         => 1,
+              PrintError         => 0,
+              ShowErrorStatement => 1,
+          }
+      );
+  
+      # of course can use dbh methods,
+      $dbh->do('create table users (id, name)');
+  
+      # and also can use DBIx::Simple methods!
+      my $row = $dbh->query('select * from users where id = ?', 123)->hash;
+      my $res = $dbh->insert(users => {
+          name => "John",
+      });
+
+DESCRIPTION
+    DBIx::Simple::Inject is-a DBI::db. This module injects DBIx::Simple
+    power into DBI itself. So you can use this module directly or via
+    "RootClass".
+
+      use DBIx::Simple::Inject;
+      my $dbh = DBIx::Simple::Inject->connect( ... );
+
+    or
+
+      use DBI;
+      my $dbh = DBI->connect( ..., {
+          RootClass => 'DBIx::Simple::Inject',
+      });
+
+    This is useful when you use several modules (like DBIx::Connector) that
+    take same as DBI's connect info.
+
+ATTRIBUTE
+    private_dbixsimple
+        You can set or access DBIx::Simple's property using
+        "private_dbixsimple" attribute.
+
+          my $db = DBI->connect(
+              'dbi:...',
+              'user',
+              'pass',
+              {
+                  RootClass  => 'DBIx::Simple::Inject',
+                  RaiseError => 1,
+                  private_dbixsimple => {
+                      lc_columns      => 0,
+                      keep_statements => 20,
+                      result_class    => 'MyApp::Result',
+                      abstract        => 'SQL::Maker',
+                  },
+              },
+          );
+
+        abstract
+            For convenience, "abstract" can take some module names.
+            Supported module names are as follows:
+
+              SQL::Abstract
+              SQL::Abstract::Limit
+              SQL::Maker
+
+            You can also set callback for your own modules as follows.
+
+              my $db = DBI->connect(
+                  ...,
+                  {
+                      RootClass => 'DBIx::Simple::Inject',
+                      private_dbixsimple => {
+                          abstract => sub {
+                              my $dbh = shift;
+                              My::SQL::Generator->new(driver => $dbh->{Driver}{Name});
+                          },
+                      },
+                  },
+              );
+
+INJECT METHODS
+    You can use the following methods from DBIx::Simple in addition to all
+    DBI database handle methods.
+
+    "$dbh->query()", "$dbh->select()", "$dbh->insert()", "$dbh->update()",
+    "$dbh->delete()", "$dbh->iquery()", "$dbh->error()", "$dbh->begin()"
+        Note: Besides these, DBIx::Simple provides "commit()", "rollback()"
+        and "func()", etc. DBI database handles already provides these
+        methods.
+
+    "$dbh->lc_columns()", "$dbh->keep_statements()", "$dbh->result_class()",
+    "$dbh->abstract()"
+        These are accessor methods to DBIx::Simple properties.
+
+ANOTHER DBIx ?
+    Yes.
+
+    OK I know that DBIx namespace is hodgepodge. Several authors should know
+    that DBI itself has a lot of useful features already (like "Callbacks").
+
+    However, if you don't want ORM but want result set object (blessed
+    result), I think DBIx::Simple makes great success. The module has nice
+    API.
+
+    Some useful CPAN modules (that knows DBI's true power) takes $dbh or
+    same arguments as "DBI->connect()". That's why I made this module.
+
+SEE ALSO
+    DBIx::Simple, DBI
+
+AUTHOR
+    Naoki Tomita <tomita@cpan.org>
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

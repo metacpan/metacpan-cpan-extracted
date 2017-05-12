@@ -1,0 +1,85 @@
+{
+   "abstract" : "Defer messages or data across redirections",
+   "author" : [
+      "David Golden <dagolden@cpan.org>",
+      "Yanick Champoux <yanick@cpan.org>",
+      "Deluxaran <deluxaran@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.043, CPAN::Meta::Converter version 2.150001",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer2-Plugin-Deferred",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Test::More" : "0.96",
+            "Test::PAUSE::Permissions" : "0",
+            "Test::Vars" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer2::Plugin" : "0.200000",
+            "URI" : "0",
+            "URI::QueryParam" : "0",
+            "perl" : "5.010",
+            "strict" : "0",
+            "warnings" : "0"
+         }
+      },
+      "test" : {
+         "recommends" : {
+            "CPAN::Meta" : "2.120900"
+         },
+         "requires" : {
+            "Dancer2" : "0",
+            "ExtUtils::MakeMaker" : "0",
+            "File::Spec" : "0",
+            "HTTP::Cookies" : "0",
+            "HTTP::Request::Common" : "0",
+            "IO::Handle" : "0",
+            "IPC::Open3" : "0",
+            "Plack::Test" : "0",
+            "Test::More" : "0.96",
+            "perl" : "5.010"
+         }
+      }
+   },
+   "provides" : {
+      "Dancer2::Plugin::Deferred" : {
+         "file" : "lib/Dancer2/Plugin/Deferred.pm",
+         "version" : "0.007017"
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/perldancer/Dancer2-Plugin-Deferred/issues"
+      },
+      "homepage" : "https://github.com/perldancer/Dancer2-Plugin-Deferred",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/perldancer/Dancer2-Plugin-Deferred.git",
+         "web" : "https://github.com/perldancer/Dancer2-Plugin-Deferred"
+      }
+   },
+   "version" : "0.007017",
+   "x_authority" : "cpan:YANICK",
+   "x_contributors" : [
+      "Damien Krotkine <dams@zarb.org>",
+      "Peter Mottram <peter@sysnix.com>",
+      "Sawyer X <xsawyerx@cpan.org>"
+   ]
+}
+

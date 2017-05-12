@@ -1,0 +1,47 @@
+{
+   "abstract" : "Device::WebIO implementation for the pcDuino",
+   "author" : [
+      "Timm Murray <tmurray@wumpus-cave.net>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.019, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "bsd"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Device-WebIO-PCDuino",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Device::PCDuino" : "0",
+            "Device::WebIO" : "0.002",
+            "Moo" : "0",
+            "namespace::clean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::Pod" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "homepage" : "http://www.wumpus-cave.net",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/frezik/Device-WebIO-PCDuino.git",
+         "web" : "https://github.com/frezik/Device-WebIO-PCDuino"
+      }
+   },
+   "version" : "0.002"
+}
+

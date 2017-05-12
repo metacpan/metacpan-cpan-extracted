@@ -1,0 +1,330 @@
+=head1 NAME
+
+Slides: The Next Generation: mod_perl 2.0
+
+=head1 About
+
+* Why rewrite?
+
+* What's new in Apache 2.0
+
+* What's new in Perl 5.6.0 - 5.8.0
+
+* What's new in mod_perl 2.0
+
+* Installing mod_perl 2.0
+
+* Configuring mod_perl 2.0
+
+* Migrating from 1.0 to 2.0
+
+* New Phases
+
+* Protocol Handlers
+
+* Filter Handlers
+
+
+=head1 Thank you!
+
+* TicketMaster rules!!!
+
+
+
+=head1 Versioning Convention
+
+* To make things simple here and in the new docs:
+
+* mod_perl:
+
+* * mod_perl 1.0 (not mod_perl 1.xx)
+
+* * mod_perl 2.0 (not mod_perl 2.0.xx)
+
+* Apache:
+
+* * Apache 1.3
+
+* * Apache 2.0
+
+
+=head1 Why the 2.0 Rewrite?
+
+* Too patchy (6 years!), backward compatibility with:
+
+* * Apache 1.3.0 - 1.3.27
+
+* * Perl 5.003 - 5.8.0
+
+* mod_perl 2.0 starts afresh with:
+
+* * Apache 2.0 (incompatible with Apache 1.3)
+
+* * Perl 5.6.0 (has semi-thread-safe Perl Interpreters)
+
+* * Threaded mpms: 5.8.0 (really thread-safe)
+
+
+
+=for html <?page-break>
+
+* A new build system autogenerates the code used to
+
+* * autogenerates the code that is used to ...
+
+* * ...
+
+* * which generates the final code ...
+
+* * ... and it all works
+
+* Automatically supports new Apache APIs
+
+
+=head2 The Apache::Test Framework
+
+* The core:
+
+  All tests successful.
+  Files=75, Tests=504, 65 wallclock secs ...
+
+* Any Perl module needing mod_perl 1.0 or 2.0
+
+* Any Apache module (both 1.3 and 2.0), PHP, Python, C...
+
+* Already used by httpd-test to test Apache!!!
+
+
+
+=head1 New in Apache 2.0
+
+* Apache Portable Runtime
+
+* Multi Processing Model modules (MPMs).
+
+* * processes: prefork
+
+* * threads: worker, leader, perchild...
+
+* * os: mpmt_os2, netware, winnt, beos...
+
+* Protocol Modules (HTTP, POP3, SMTP...)
+
+
+=for html <?page-break>
+
+* I/O Filtering
+
+* Bucket Brigades
+
+* Parsed Configuration Tree
+
+* New Hook Scheme (Flexible, Order-able)
+
+* Optional Functions
+
+
+=for html <?page-break>
+
+=for html <img src="../figures/top_view.png" width="659" height="529">
+
+=for html <?page-break>
+
+=for html <img src="../figures/bucket_brigades.png" width="570" height="377">
+
+
+=head1 New in Perl m/5\.(6|8)\.\d/
+
+* Thread-safe Interpreter (5.8.0) via perl_clone()
+
+* Subroutine attributes:
+
+  sub handler : FilterRequestHandler { ... }
+
+* C<CORE::GLOBAL::> subs overriding C<CORE::>
+
+* PerlIO layers =E<gt> C<APR::PerlIO>:
+
+  open my $fh, "<:APR", $file, $r;
+
+* I18n: Unicode, UTF...
+
+
+=head1 New in mod_perl 2.0
+
+* All the new Apache 2.0 and Perl 5.6.0+ features
+
+* Plus its own new features
+
+
+
+=head2 Threads Support
+
+* Thread Interpreters Pool
+
+* scalar @perl_interpreters != scalar @apache_threads
+
+* * no need for front-end/back-end separation
+
+
+
+=for html <?page-break>
+
+* Two classes of interpreters: I<parent> and I<clone>
+
+* parent: preload modules and I<perl_clone()> clones
+
+* clones: do the real work
+
+* * mutable data is copied by the clone
+
+* * read-only data such as the syntax tree is shared
+
+* * clone pools are FIFO =E<gt> memory re-use
+
+
+
+=head2 Thread-safety
+
+* Manipulating Perl data is thread-safe (5.8.0)
+
+  push(), map(), chomp(), ...
+
+* The rest, depends on the underlying implementation
+
+  localtime(), readdir(), srand(), ...
+
+* Thread-safe but Process-scoped
+
+  chdir(), umask(), chroot(), ...
+
+* See perlthrtut(3)
+
+
+
+
+
+=head2 Accessing the Modules
+
+* mod_perl 2.0 Perl libs go to I<Apache2/>
+
+* Adjust C<@INC>:
+
+  use Apache2 ();
+
+  # @INC before:
+  /usr/lib/perl5/site_perl/5.8.0/i686-linux-thread-multi
+  # @INC after:
+  /usr/lib/perl5/site_perl/5.8.0/i686-linux-thread-multi/Apache2
+
+
+=head2 PerlRequire'd Startup File
+
+  use Apache2 ();
+  # use Apache::compat (); # 1.0 compat
+  
+  use lib qw(/home/httpd/perl);
+  
+  use ModPerl::Util (); #for CORE::GLOBAL::exit
+  
+  use Apache::RequestRec ();
+  use Apache::RequestIO ();
+  use Apache::RequestUtil ();
+  
+  use Apache::Server ();
+  use Apache::ServerUtil ();
+  use Apache::Connection ();
+  use Apache::Log ();
+  
+  use APR::Table ();
+  
+  use ModPerl::Registry ();
+  
+  use Apache::Const -compile => ':common';
+  use APR::Const -compile => ':common';
+  
+  1;
+
+
+=head2 C<PerlOptions> Directive
+
+* Disable mod_perl for a given C<VirtualHost>:
+
+  <VirtualHost ...>
+      PerlOptions -Enable
+  </VirtualHost>
+
+* Give the C<VirtualHost> its own interpreter pool.
+
+  <VirtualHost ...>
+      PerlOptions +Clone
+      PerlInterpStart 2
+      PerlInterpMax 2
+  </VirtualHost>
+
+=for html <?page-break>
+
+* Run different versions of the same module:
+
+  <VirtualHost ...>
+      ServerName dev1
+      PerlOptions +Parent
+      PerlSwitches -Mblib=/home/dev1/lib/perl
+  </VirtualHost>
+  
+  <VirtualHost ...>
+      ServerName dev2
+      PerlOptions +Parent
+      PerlSwitches -Mblib=/home/dev2/lib/perl
+  </VirtualHost>
+
+=for html <?page-break>
+
+* disallow certain handlers/options
+
+  <VirtualHost ...>
+      PerlOptions -Authen -Authz -Access -Sections
+  </VirtualHost>
+
+* Or maybe everything but the response handler:
+
+  <VirtualHost ...>
+      PerlOptions None +Response
+  </VirtualHost>
+
+=for html <?page-break>
+
+* Resolve C<Perl*Handlers> at startup time:
+
+  PerlOptions +Autoload
+  PerlResponseHandler Apache::Magick
+
+* Disable the global C<request_rec> (C<Apache-E<gt>request>)
+
+  <Location ...>
+      SetHandler perl-script
+      PerlOptions -GlobalRequest
+      ...
+  </Location>
+
+
+=head1 References
+
+* All the information can be found at:
+
+  http://perl.apache.org/docs/
+
+* Further Questions?
+
+* * Grab me at the corridor and demand answers
+
+* * Ask at modperl@perl.apache.org
+
+
+=head1 A shameless plug
+
+=for html <img src="../figures/practical_mod_perl_comp.gif" width="504" height="661">
+
+
+=cut
+

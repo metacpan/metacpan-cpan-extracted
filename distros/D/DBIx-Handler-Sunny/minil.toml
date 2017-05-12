@@ -1,0 +1,4 @@
+name = "DBIx-Handler-Sunny"
+badges = ["travis"]
+module_maker="ModuleBuildTiny"
+

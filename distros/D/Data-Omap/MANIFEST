@@ -1,0 +1,14 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/01-DO-simple.t
+t/02-DO-ordering.t
+t/03-DO-tied.t
+t/04-DO-tied_ordering.t
+t/05-DO-pod.t
+t/06-DO-api.t
+t/07-DO-nonoop.t
+t/08-DO-nonoop_ordering.t
+lib/Data/Omap.pm
+META.yml                                 Module meta-data (added by MakeMaker)

@@ -1,0 +1,32 @@
+NAME
+
+    Dist::Zilla::Plugin::TemplateFiles - use files as templates to build a
+    distribution
+
+SYNOPSIS
+
+    In your dist.ini:
+
+      [TemplateFiles]
+          filename = README
+          filename = path/to/other/file
+
+DESCRIPTION
+
+    Utilize Text::Template to turn certain files into templates. Each
+    template has available to it the $dist variable that is the instance of
+    Dist::Zilla currently running. Only those files listed in dist.ini as
+    filename = blah will be considered templates. Filenames are given
+    relative to the root of the build.
+
+AUTHOR
+
+    Jonathan Scott Duff <duff@pobox.com>
+
+COPYRIGHT
+
+    This software is copyright (c) 2010 by Jonathan Scott Duff
+
+    This is free sofware; you can redistribute it and/or modify it under
+    the same terms as the Perl 5 programming language itself.
+

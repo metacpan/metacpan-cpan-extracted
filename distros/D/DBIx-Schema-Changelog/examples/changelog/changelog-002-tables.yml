@@ -1,0 +1,2229 @@
+---
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: head
+      type: uuid
+    - name: sort_index
+      type: bigint
+    name: forum_head_cat_sort_table
+    type: createtable
+  id: 002-2-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 255
+      name: name
+      type: varchar
+    name: events
+    type: createtable
+  id: 002-3-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: topic
+      type: uuid
+    - default: '0'
+      name: number
+      type: bigint
+    name: forum_count_post
+    type: createtable
+  id: 002-4-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('forum_categories_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - length: 255
+      name: description
+      type: varchar
+    - name: head
+      type: uuid
+    - default: '0'
+      name: min_age
+      type: integer
+    - default: 0
+      length: 1
+      name: male_ro
+      type: bit
+    - default: 0
+      length: 1
+      name: male_iv
+      type: bit
+    - default: 0
+      length: 1
+      name: female_ro
+      type: bit
+    - default: 0
+      length: 1
+      name: female_iv
+      type: bit
+    name: forum_categories
+    type: createtable
+  id: 002-5-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: forum_category
+      type: uuid
+    - name: user_permission
+      type: uuid
+    name: forum_category_need_permissions
+    type: createtable
+  id: 002-6-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('clendar_attributes_seq'::regclass)
+      name: number
+      type: bigint
+    - length: 255
+      name: name
+      type: varchar
+    - length: 255
+      name: location
+      type: varchar
+    - default: now()
+      name: start_time
+      type: timestamp
+    - name: end_time
+      type: timestamp
+    - default: 0
+      length: 1
+      name: dayly
+      type: bit
+    - default: 0
+      length: 1
+      name: weekly
+      type: bit
+    - default: 0
+      length: 1
+      name: monthly
+      type: bit
+    - default: 0
+      length: 1
+      name: yearly
+      type: bit
+    - default: 0
+      length: 1
+      name: monday
+      type: bit
+    - default: 0
+      length: 1
+      name: tuesday
+      type: bit
+    - default: 0
+      length: 1
+      name: wednesday
+      type: bit
+    - default: 0
+      length: 1
+      name: thursday
+      type: bit
+    - default: 0
+      length: 1
+      name: friday
+      type: bit
+    - default: 0
+      length: 1
+      name: saturday
+      type: bit
+    - default: 0
+      length: 1
+      name: sunday
+      type: bit
+    - default: '0'
+      name: every_x_weeks
+      type: integer
+    - default: '0'
+      name: remember
+      type: integer
+    - name: dbuser
+      type: uuid
+    name: clendar_attributes
+    type: createtable
+  id: 002-7-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: nextval('imagine_someone_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: user_1
+      type: uuid
+    - name: user_2
+      type: uuid
+    - default: 0
+      length: 1
+      name: known_1
+      type: bit
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: 0
+      length: 1
+      name: known_2
+      type: bit
+    name: imagine_someone
+    type: createtable
+  id: 002-8-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: result_topics
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: sys_message
+      type: uuid
+    - length: 255
+      name: optional_reason
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    name: forum_topics_reports
+    type: createtable
+  id: 002-9-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: category
+      type: uuid
+    - name: order_idx
+      type: smallint
+    name: gallery_category_order_idx
+    type: createtable
+  id: 002-10-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: category
+      type: uuid
+    - name: lft
+      type: integer
+    - name: rgt
+      type: integer
+    name: gallery_category_hierarchy
+    type: createtable
+  id: 002-11-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    - name: result_post
+      type: uuid
+    - name: warned_by
+      type: uuid
+    name: forum_warnings
+    type: createtable
+  id: 002-12-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('forum_head_categories_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - length: 255
+      name: description
+      type: varchar
+    - default: '0'
+      name: min_age
+      type: integer
+    name: forum_head_categories
+    type: createtable
+  id: 002-13-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: result_post
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - length: 255
+      name: optional_reason
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    name: forum_post_reports
+    type: createtable
+  id: 002-14-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - length: 1
+      name: active
+      type: bit
+    - default: nextval('forum_post_answers_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: now()
+      length: 255
+      name: name
+      type: varchar
+    - name: dbuser
+      type: uuid
+    - name: topic
+      type: uuid
+    name: forum_post_answers
+    type: createtable
+  id: 002-15-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - length: 5
+      name: locale
+      type: character
+    - default: 0
+      length: 1
+      name: gender
+      type: bit
+    - name: birthday
+      type: date
+    - default: '0'
+      name: mails
+      type: bigint
+    - default: '0'
+      name: forum_posts
+      type: bigint
+    - default: '0'
+      name: logins
+      type: bigint
+    - default: '0'
+      name: forum_topic
+      type: bigint
+    - default: '0'
+      name: session_mails
+      type: bigint
+    - default: 0
+      length: 1
+      name: hide_birthday
+      type: bit
+    - default: 0
+      length: 1
+      name: hide_age
+      type: bit
+    - default: '0'
+      name: visits
+      type: bigint
+    name: localvalues
+    type: createtable
+  id: 002-16-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: topic
+      type: uuid
+    - name: last_post
+      type: uuid
+    name: forum_user_subscription
+    type: createtable
+  id: 002-17-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: sys_message
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    name: forum_topic_bans
+    type: createtable
+  id: 002-18-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: bleak_post
+      type: uuid
+    - name: user_id
+      type: uuid
+    name: forum_post_bleaks
+    type: createtable
+  id: 002-19-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: post
+      type: uuid
+    - name: dbuser
+      type: uuid
+    name: forum_post_hits
+    type: createtable
+  id: 002-20-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: bleak_topic
+      type: uuid
+    - name: user_id
+      type: uuid
+    name: forum_topic_bleaks
+    type: createtable
+  id: 002-21-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: hit_topic
+      type: uuid
+    - name: hit_user
+      type: uuid
+    name: forum_topic_hits
+    type: createtable
+  id: 002-22-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: forum_head_category
+      type: uuid
+    - name: user_permission
+      type: uuid
+    name: forum_head_category_need_permissions
+    type: createtable
+  id: 002-23-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('message_session_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: dbuser
+      type: uuid
+    name: message_session
+    type: createtable
+  id: 002-24-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: (date_part('epoch'::text, now()))::integer
+      name: flag
+      type: bigint
+    - name: created_by
+      type: uuid
+    - name: msg_session
+      type: uuid
+    - name: msg_user
+      type: uuid
+    - name: report_event
+      type: uuid
+    name: msg_session_member_report
+    type: createtable
+  id: 002-25-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - name: created_by
+      type: uuid
+    name: msg_session_record_vault
+    type: createtable
+  id: 002-26-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - length: 5
+      name: lang
+      type: character
+    name: profile_forum_language
+    type: createtable
+  id: 002-27-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 8192
+      name: description
+      type: varchar
+    - name: msg_session
+      type: uuid
+    - name: msg_user
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    - default: 0
+      length: 1
+      name: trash
+      type: bit
+    name: msg_session_messages
+    type: createtable
+  id: 002-28-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: created_by
+      type: uuid
+    name: msg_sessions
+    type: createtable
+  id: 002-29-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: session
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - default: (date_part('epoch'::text, now()))::integer
+      name: last_read
+      type: bigint
+    - default: (date_part('epoch'::text, now()))::integer
+      name: last_message
+      type: bigint
+    name: message_session_members
+    type: createtable
+  id: 002-30-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - default: 1
+      length: 1
+      name: mail_inbox
+      type: bit
+    - default: 1
+      length: 1
+      name: new_friends_blog_entry
+      type: bit
+    - default: 1
+      length: 1
+      name: new_forum_threads
+      type: bit
+    - default: 1
+      length: 1
+      name: new_friends_pics
+      type: bit
+    - default: 1
+      length: 1
+      name: friends_online
+      type: bit
+    - default: 1
+      length: 1
+      name: current_subscriptions
+      type: bit
+    - default: 1
+      length: 1
+      name: system_news
+      type: bit
+    - default: 0
+      length: 1
+      name: calendar
+      type: bit
+    - default: 0
+      length: 1
+      name: meta_datas
+      type: bit
+    - default: 1
+      length: 1
+      name: friends_onnline
+      type: bit
+    name: profile_dashboard_widgets
+    type: createtable
+  id: 002-31-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    - length: 1024
+      name: name
+      type: varchar
+    - length: 15
+      name: category
+      type: varchar
+    name: messages_system
+    type: createtable
+  id: 002-32-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('message_system_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    name: message_system
+    type: createtable
+  id: 002-33-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('messages_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - length: 4096
+      name: description
+      type: varchar
+    - name: sender
+      type: uuid
+    - name: recipient
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    - default: 0
+      length: 1
+      name: trash
+      type: bit
+    name: messages
+    type: createtable
+  id: 002-34-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: number
+      type: bigint
+    - name: flag
+      type: timestamp
+    - length: 4096
+      name: description
+      type: varchar
+    - name: sender
+      type: uuid
+    - name: recipient
+      type: uuid
+    - name: record_vault_owner
+      type: uuid
+    name: messages_record_vault
+    type: createtable
+  id: 002-35-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: message
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - length: 255
+      name: optional_reason
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: 0
+      length: 1
+      name: first
+      type: bit
+    - default: 0
+      length: 1
+      name: second
+      type: bit
+    - default: 0
+      length: 1
+      name: third
+      type: bit
+    - name: first_user
+      type: uuid
+    - name: second_user
+      type: uuid
+    - name: third_user
+      type: uuid
+    name: messages_reports
+    type: createtable
+  id: 002-36-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: nextval('profile_gb_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: dbuser
+      type: uuid
+    - name: guest_user
+      type: uuid
+    name: profile_gb
+    type: createtable
+  id: 002-37-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: (date_part('epoch'::text, now()))::integer
+      name: flag
+      type: bigint
+    - name: created_by
+      type: uuid
+    - name: session_message
+      type: uuid
+    - name: report_event
+      type: uuid
+    name: msg_session_msg_report
+    type: createtable
+  id: 002-38-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - length: 10
+      name: q_type
+      type: varchar
+    - length: 10
+      name: category
+      type: varchar
+    - name: order_idx
+      type: smallint
+    name: profile_question
+    type: createtable
+  id: 002-39-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: question
+      type: uuid
+    - name: order_idx
+      type: smallint
+    name: profile_question_suggestions
+    type: createtable
+  id: 002-40-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 50
+      name: name
+      type: varchar
+    name: system_layouts
+    type: createtable
+  id: 002-41-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('system_news_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    name: system_news
+    type: createtable
+  id: 002-42-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - length: 255
+      name: nickname
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    name: track_user_nickname
+    type: createtable
+  id: 002-43-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    name: track_user_password
+    type: createtable
+  id: 002-44-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 0
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('profile_settings_attributes_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: 0
+      length: 1
+      name: bg_image
+      type: bit
+    - name: dbuser
+      type: uuid
+    - length: 7
+      name: theme_1
+      type: character
+    - length: 7
+      name: theme_2
+      type: character
+    - length: 7
+      name: bordercolor
+      type: character
+    - length: 7
+      name: color
+      type: character
+    - default: 0
+      length: 1
+      name: avatar
+      type: bit
+    name: profile_settings_attributes
+    type: createtable
+  id: 002-45-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - length: 10
+      name: version
+      type: varchar
+    name: templates
+    type: createtable
+  id: 002-46-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - length: 10
+      name: category
+      type: varchar
+    - name: order_idx
+      type: smallint
+    name: profile_interview_question
+    type: createtable
+  id: 002-47-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: question
+      type: uuid
+    - name: suggestions
+      type: uuid
+    - length: 512
+      name: optional
+      type: varchar
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    name: profile_question_answer
+    type: createtable
+  id: 002-48-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - name: system_news
+      type: uuid
+    - name: dbuser
+      type: uuid
+    name: system_news_for_user
+    type: createtable
+  id: 002-49-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: user_role
+      type: uuid
+    name: user_has_user_role
+    type: createtable
+  id: 002-50-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('venues_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: dbuser
+      type: uuid
+    - default: 0
+      length: 1
+      name: verified
+      type: bit
+    - default: 0
+      length: 1
+      name: public
+      type: bit
+    name: venues
+    type: createtable
+  id: 002-51-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - default: 1
+      length: 1
+      name: qoute_message
+      type: bit
+    name: user_settings_forum
+    type: createtable
+  id: 002-52-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: show_base
+      type: bit
+    - default: 1
+      length: 1
+      name: show_character
+      type: bit
+    - default: 1
+      length: 1
+      name: show_external_appearance
+      type: bit
+    - default: 1
+      length: 1
+      name: show_personal
+      type: bit
+    name: user_settings_profile_overview
+    type: createtable
+  id: 002-53-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: flag
+      type: bigint
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    name: user_password_request
+    type: createtable
+  id: 002-54-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - name: creator
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: description
+      type: text
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    name: user_changelog
+    type: createtable
+  id: 002-55-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: friend
+      type: uuid
+    - default: 0
+      length: 1
+      name: denied
+      type: bit
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    name: user_friends_request
+    type: createtable
+  id: 002-56-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: visitor
+      type: uuid
+    - default: 0
+      length: 1
+      name: in_stealth
+      type: bit
+    - default: '1'
+      name: count
+      type: bigint
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    name: user_visits
+    type: createtable
+  id: 002-57-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - default: '0'
+      name: mails
+      type: bigint
+    - default: '0'
+      name: forum_posts
+      type: bigint
+    - default: '0'
+      name: logins
+      type: bigint
+    - default: '0'
+      name: forum_topic
+      type: bigint
+    - default: '0'
+      name: session_mails
+      type: bigint
+    - default: '0'
+      name: wrote_gb_entries
+      type: bigint
+    - default: '0'
+      name: got_gb_entries
+      type: bigint
+    name: user_counts
+    type: createtable
+  id: 002-58-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - length: 5
+      name: lang
+      type: character
+    name: user_forum_language
+    type: createtable
+  id: 002-59-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - name: user_template
+      type: uuid
+    name: user_templates
+    type: createtable
+  id: 002-60-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: layout
+      type: uuid
+    name: user_has_layout
+    type: createtable
+  id: 002-61-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('user_permissions_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    name: user_permissions
+    type: createtable
+  id: 002-62-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('user_roles_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: parent
+      type: uuid
+    name: user_roles
+    type: createtable
+  id: 002-63-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: user_role
+      type: uuid
+    - name: user_permission
+      type: uuid
+    name: user_role_has_permissions
+    type: createtable
+  id: 002-64-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: msg_session
+      type: uuid
+    - name: msg_user
+      type: uuid
+    - default: 0
+      length: 1
+      name: locked
+      type: bit
+    - default: now()
+      name: last_read
+      type: timestamp
+    name: msg_session_members
+    type: createtable
+  id: 002-65-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: dbuser
+      type: uuid
+    - name: friend
+      type: uuid
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    name: user_friends
+    type: createtable
+  id: 002-66-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: topic
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - default: (date_part('epoch'::text, now()))::integer
+      name: last_post_time
+      type: bigint
+    name: forum_post
+    type: createtable
+  id: 002-67-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: question
+      type: uuid
+    - length: 1024
+      name: name
+      type: varchar
+    name: profile_interview_answer
+    type: createtable
+  id: 002-68-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - length: 1
+      name: active
+      type: bit
+    - default: nextval('address_information_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: now()
+      length: 255
+      name: name
+      type: varchar
+    - length: 50
+      name: gln
+      type: varchar
+    - length: 127
+      name: addressline_1
+      type: varchar
+    - length: 127
+      name: addressline_2
+      type: varchar
+    - length: 10
+      name: zip
+      type: varchar
+    - length: 127
+      name: city
+      type: varchar
+    - length: 127
+      name: state
+      type: varchar
+    - length: 127
+      name: country
+      type: varchar
+    - name: country_number
+      type: integer
+    - name: state_number
+      type: integer
+    - name: dbuser
+      type: uuid
+    - length: 10
+      name: zip_2
+      type: varchar
+    name: address_information
+    type: createtable
+  id: 002-69-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('profile_blog_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: dbuser
+      type: uuid
+    - name: entry_year
+      type: smallint
+    - name: entry_month
+      type: smallint
+    - name: entry_type
+      type: uuid
+    name: blog_entries
+    type: createtable
+  id: 002-70-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - default: 0
+      length: 1
+      name: read
+      type: bit
+    - name: result_post
+      type: uuid
+    - name: duration
+      type: smallint
+    - name: flag
+      type: bigint
+    - name: banner
+      type: uuid
+    name: forum_bans
+    type: createtable
+  id: 002-71-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: nextval('blog_comments_number_seq'::regclass)
+      name: number
+      type: bigint
+    - name: blog_entry_id
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - default: '''''::character varying'
+      length: 255
+      name: comment_headline
+      type: varchar
+    - name: comment_text
+      type: text
+    - default: now()
+      name: flag
+      type: timestamp
+    name: blog_comments
+    type: createtable
+  id: 002-72-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - default: 0
+      length: 1
+      name: bg_image
+      type: bit
+    - length: 7
+      name: theme_1
+      type: character
+    - length: 7
+      name: theme_2
+      type: character
+    - length: 7
+      name: bordercolor
+      type: character
+    - length: 7
+      name: color
+      type: character
+    - default: 0
+      length: 1
+      name: avatar
+      type: bit
+    - default: 1
+      length: 1
+      name: auth_online_only
+      type: bit
+    - default: 1
+      length: 1
+      name: auth_friends_only
+      type: bit
+    - default: 1
+      length: 1
+      name: auth_searchable
+      type: bit
+    - default: 0
+      length: 1
+      name: stealth
+      type: bit
+    - default: 1
+      length: 1
+      name: message_sound
+      type: bit
+    - default: 0
+      length: 1
+      name: public_blog
+      type: bit
+    - default: 1
+      length: 1
+      name: smileys
+      type: bit
+    - default: 0
+      length: 1
+      name: hide_birthday
+      type: bit
+    - default: 0
+      length: 1
+      name: hide_age
+      type: bit
+    name: user_settings
+    type: createtable
+  id: 002-73-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('blog_entry_typenumber_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: dbuser
+      type: uuid
+    name: blog_entry_type
+    type: createtable
+  id: 002-74-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: cat
+      type: uuid
+    - name: sort_index
+      type: bigint
+    name: forum_cat_sort_table
+    type: createtable
+  id: 002-75-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: (date_part('epoch'::text, now()))::integer
+      name: flag
+      type: bigint
+    - name: description
+      type: text
+    - name: session
+      type: uuid
+    - name: dbuser
+      type: uuid
+    name: message_session_messages
+    type: createtable
+  id: 002-76-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: venue
+      type: uuid
+    - name: clendar
+      type: uuid
+    - name: dbuser
+      type: uuid
+    name: venue_clendar
+    type: createtable
+  id: 002-77-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: system_news
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - length: 4096
+      name: comment_text
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    name: system_news_comments
+    type: createtable
+  id: 002-78-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: id
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - name: event
+      type: uuid
+    - length: 255
+      name: optional_reason
+      type: varchar
+    - default: now()
+      name: flag
+      type: timestamp
+    name: forum_closed_topics
+    type: createtable
+  id: 002-79-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - length: 4096
+      name: description
+      type: varchar
+    - name: sender
+      type: uuid
+    - name: recipient
+      type: uuid
+    - name: archives_owner
+      type: uuid
+    name: messages_archives
+    type: createtable
+  id: 002-80-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: dbuser
+      type: uuid
+    - name: venue
+      type: uuid
+    - default: 0
+      length: 1
+      name: is_admin
+      type: bit
+    - default: now()
+      name: flag
+      type: timestamp
+    name: venue_users
+    type: createtable
+  id: 002-81-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('forum_topics_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: '''''::character varying'
+      length: 255
+      name: name
+      type: varchar
+    - name: description
+      type: text
+    - name: category
+      type: uuid
+    - name: dbuser
+      type: uuid
+    - default: '0'
+      name: visits
+      type: bigint
+    - length: 5
+      name: lang
+      type: varchar
+    - default: 0
+      length: 1
+      name: closed
+      type: bit
+    - default: (date_part('epoch'::text, now()))::integer
+      name: last_post_time
+      type: bigint
+    - name: last_post
+      type: uuid
+    name: forum_topics
+    type: createtable
+  id: 002-82-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - name: order_idx
+      type: smallint
+    name: gallery_image_order_idx
+    type: createtable
+  id: 002-83-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - name: hited_by
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    name: gallery_count_image_hits
+    type: createtable
+  id: 002-84-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - name: bleaked_by
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    name: gallery_count_image_bleaks
+    type: createtable
+  id: 002-85-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - name: viewed_by
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    name: gallery_count_image_views
+    type: createtable
+  id: 002-86-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: created_by
+      type: uuid
+    - length: 512
+      name: comment
+      type: varchar
+    name: gallery_image_comments
+    type: createtable
+  id: 002-87-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 0
+      length: 1
+      name: active
+      type: bit
+    - default: nextval('users_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: now()
+      name: flag
+      type: timestamp
+    - default: now()
+      length: 255
+      name: nickname
+      type: varchar
+    - length: 255
+      name: firstname
+      type: varchar
+    - length: 255
+      name: lastname
+      type: varchar
+    - length: 255
+      name: pass
+      type: varchar
+    - length: 255
+      name: salt
+      type: varchar
+    - length: 255
+      name: mail
+      type: varchar
+    - name: last_action
+      type: bigint
+    - default: '0'
+      name: last_login
+      type: bigint
+    - default: 0
+      length: 1
+      name: system_user
+      type: bit
+    - default: 1
+      length: 1
+      name: auth_online_only
+      type: bit
+    - default: 1
+      length: 1
+      name: auth_friends_only
+      type: bit
+    - name: last_steahlth
+      type: bigint
+    - default: 1
+      length: 1
+      name: auth_searchable
+      type: bit
+    - default: 0
+      length: 1
+      name: is_stealth
+      type: bit
+    - default: 1
+      length: 1
+      name: message_sound
+      type: bit
+    - default: '0'
+      name: last_idle_remind
+      type: bigint
+    - default: '0'
+      name: last_status
+      type: bigint
+    - default: 0
+      length: 1
+      name: is_blog_public
+      type: bit
+    - default: 1
+      length: 1
+      name: smileys
+      type: bit
+    - default: 0
+      length: 1
+      name: verified
+      type: bit
+    - length: 255
+      name: token
+      type: varchar
+    - default: 0
+      length: 1
+      name: gender
+      type: bit
+    - name: birthday
+      type: date
+    - length: 5
+      name: locale
+      type: character
+    - default: B'0'::bit(1)
+      length: 1
+      name: deleted
+      type: bit
+    - length: 255
+      name: delete_reason
+      type: varchar
+    name: users
+    type: createtable
+  id: 002-88-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: category
+      type: uuid
+    - default: now()
+      name: flag
+      type: timestamp
+    - name: created_by
+      type: uuid
+    - length: 512
+      name: comment
+      type: varchar
+    name: gallery_category_comments
+    type: createtable
+  id: 002-89-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: owner_by
+      type: uuid
+    - name: permission
+      type: uuid
+    name: gallery_global_permission_relation
+    type: createtable
+  id: 002-90-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - name: created_by
+      type: uuid
+    - default: nextval('gallery_categories_number_seq'::regclass)
+      name: number
+      type: bigint
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 64
+      name: name
+      type: varchar
+    - length: 128
+      name: description
+      type: varchar
+    name: gallery_categories
+    type: createtable
+  id: 002-91-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 64
+      name: name
+      type: varchar
+    - length: 128
+      name: description
+      type: varchar
+    name: gallery_category_permissions
+    type: createtable
+  id: 002-92-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 64
+      name: name
+      type: varchar
+    - default: nextval('gallery_images_number_seq'::regclass)
+      name: number
+      type: bigint
+    - length: 512
+      name: description
+      type: varchar
+    - name: category
+      type: uuid
+    - length: 255
+      name: image_path
+      type: varchar
+    - length: 255
+      name: thumb_path
+      type: varchar
+    - default: 0
+      length: 1
+      name: validated
+      type: bit
+    name: gallery_images
+    type: createtable
+  id: 002-93-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - default: (md5(((((current_database())::text || ("current_user"())::text) ||
+        now()) || random())))::uuid
+      name: id
+      type: uuid
+    - default: 1
+      length: 1
+      name: active
+      type: bit
+    - length: 64
+      name: name
+      type: varchar
+    - length: 128
+      name: description
+      type: varchar
+    name: gallery_image_permissions
+    type: createtable
+  id: 002-94-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: category
+      type: uuid
+    - name: permission
+      type: uuid
+    name: gallery_category_permission_relation
+    type: createtable
+  id: 002-95-maz
+- author: Mario Zieschang
+  entries:
+  - columns:
+    - name: image
+      type: uuid
+    - name: permission
+      type: uuid
+    name: gallery_image_permission_relation
+    type: createtable
+  id: 002-96-maz

@@ -1,0 +1,356 @@
+#!/usr/bin/perl
+#
+# This code is Copyright (c) 2015 Johnathan Kupferer. All rights reserved.
+#
+# This program is free software; you can redistribute it and/or modify it
+# under the same terms as Perl itself. This program is provided "AS IS"
+# without warranty of any kind, express or implied.
+#
+use strict;
+use warnings;
+use autodie;
+
+use DBIx::MyDatabaseMunger ();
+
+use constant USAGE => <<EOF;
+Usage: mydbmunger [OPTIONS] COMMAND
+
+Available COMMANDs are "pull", "push", and "make-archive"
+
+  pull
+         Connect to database and pull down current table definitions and
+         trigger definitions.
+  push
+         Connect to database and deploy current table definitions by creating
+         or modifying tables.
+
+  make-archive
+         Write trigger and archive table definitions.
+
+GENERAL OPTIONS:
+  -c, --config=FILE   Read configuration options from a JSON formatted
+                      configuration file. The configuration should be a JSON
+                      object with keys that match the long option names
+                      listed in this help documentation.
+  -D, --dir=PATH      Directory in which to read and write database information.
+                      Default is current directory.
+  -t, --table=TABLE[,TABLE]...
+                      Specify for which tables to perform the given COMMAND. If
+                      not provided, then we will attempt to detect suitable
+                      tables automatically.
+  -T, --exclude-table=TABLE[,TABLE]...
+                      Specify for which tables to exclude. This option
+                      overrides tables included with --table=TABLE.
+  -v, --view=VIEW[,VIEW]...
+                      Specify for which viewss to perform the given COMMAND. If
+                      not provided then views we will be detected automatically.
+  -V, --exclude-view=VIEW[,VIEW]...
+                      Specify for which views to exclude. This option overrides
+                      views included with --view=VIEW.
+  -d, --debug         Show verbose messages.
+
+OPTIONS FOR COMMAND pull OR push:
+      --drop-columns  Drop unmatched columns in database on push.
+  -d, --dryrun        Don't commit any changes, just print SQL that would be
+                      executed.
+  -h, --host=name     Connect to host.
+      --init-trigger-name=NAME
+                      Name to use for any unlabeled trigger fragments. Without
+                      this option, unlabeled fragments are treated as an
+                      error.
+  -p, --password[=PASSWORD] 
+                      Password to use when connecting to server. If password is
+                      not provided on the command line it will asked from the
+                      terminal.
+  -P, --port=#        Port number to use for connection or 0 for default to, in
+                      order of preference, my.cnf, \$MYSQL_TCP_PORT,
+                      /etc/services, built-in default (3306).
+      --remove=[any|procedure|table|trigger|view]
+                      Remove unmatched procedures, tables, or triggers from the
+                      local directories on pull or from the database on push.
+  -s, --schema=DATABASE
+                      MySQL/MariaDB database schema.
+  -u, --user=NAME     User for login if not current user.
+                      
+
+OPTIONS FOR COMMAND make-archive:
+      --actioncol=COLUMN
+                      Column name used in archive table to store the SQL
+                      type of SQL action caused the archive to be created.
+                      Default: "action"
+      --archive-name-pattern=s
+                      How to name archive tables. Specified as a pattern with
+                      a placeholder "%" for the original table name. Default:
+                      "%Archive", so by a table named "Post" would have a
+                      archive table named "PostArchive".
+      --ctime[=COLUMN]
+                      Column name used in the source data and archive tables
+                      used to track record creation time. This must be a
+                      TIMESTAMP or DATETIME data type. If option this option
+                      is given without a value then the column name "ctime"
+                      will be used. Default is no creation time handling.
+      --dbusercol=COLUMN
+                      Column name to be used in archive table to store the
+                      database connection login information. Default: "user"
+      --mtime[=COLUMN]
+                      Column name used in the source data and archive tables
+                      used to track last-modification time. This must be a
+                      TIMESTAMP or DATETIME data type. If option this option
+                      is given without a value then the column name "mtime"
+                      will be used. Default is no modification time handling.
+      --revision=COLUMN
+                      Column name used in the source data and archive tables
+                      to track revision count. Default: "revision"
+      --stmtcol=COLUMN
+                      Column name used in the archive table to record the SQL
+                      query that initiated the table change.
+      --updidcol=COLUMN
+                      Column name used in archive table to store the
+                      application user retrieved from the value of the
+                      variable named by option --updidvar. Default: "\@updid"
+      --updidvar=VARNAME
+                      Variable name used to store an application user and to
+                      store in the column designated by --updidcol.
+
+EOF
+
+=item read_config ( $opt, $config )
+
+=cut
+
+sub read_config ($$)
+{
+    my( $opt, $config_file ) = @_;
+
+    my $conf;
+    eval {
+        # Slurp file.
+        local $/;
+        open my $fh, "<", $config_file;
+
+        use JSON ();
+        my $json = JSON->new->relaxed;
+        $conf = $json->decode( <$fh> );
+        close $fh;
+    };
+    die "Error reading configuration JSON: $@\n" if $@;
+
+    for my $o (qw(archive-name-pattern dir drop-columns init-trigger-name schema updidvar verbose)) {
+        my $f = $o;
+        $f =~ tr/\-/_/;
+        $opt->{$f} = $conf->{$o}
+            if defined $conf->{$o} and not defined $opt->{$f};
+    }
+    for my $f (qw(host password port schema user)) {
+        $opt->{connect}{$f} = $conf->{$f}
+            if defined $conf->{$f} and not defined $opt->{connect}{$f};
+    }
+    for my $f (qw(actioncol ctime dbusercol mtime revision stmtcol updidcol)) {
+        my $col = $f;
+        $col =~ s/col$//;
+        $opt->{colname}{$col} = $conf->{$f}
+            if defined $conf->{$f} and not defined $opt->{colname}{$col};
+    }
+    $opt->{remove} = $conf->{remove}
+        if $conf->{remove} and not defined $opt->{remove};
+
+    if( $conf->{tables} and not @{ $opt->{tables} } ) {
+        $opt->{tables} = $conf->{tables};
+    }
+    if( $conf->{exclude_tables} and not @{ $opt->{exclude_tables} } ) {
+        $opt->{exclude_tables} = $conf->{exclude_tables};
+    }
+
+    if( $conf->{views} and not @{ $opt->{views} } ) {
+        $opt->{views} = $conf->{views};
+    }
+    if( $conf->{exclude_views} and not @{ $opt->{exclude_views} } ) {
+        $opt->{exclude_views} = $conf->{exclude_views};
+    }
+
+    return $opt;
+}
+
+=item parse_commandline ()
+
+Parse the command line and return the initial application state.
+
+=cut
+
+sub parse_commandline
+{
+    use Getopt::Long qw(GetOptions);
+    Getopt::Long::Configure('gnu_getopt');
+    
+    # Bad idea to put passwords on the command line! but mysql supports it, so
+    # try to emulate mysql style... which is a little weird.
+    my $password;
+    foreach ( @ARGV ) {
+        if( s/^(-p|--password=)(.*)/-p/ ) {
+            $password = $2;
+        }
+    }
+
+    # General options.
+    my $config;
+    my $dir;
+    my @exclude_tables;
+    my @tables;
+    my @exclude_views;
+    my @views;
+    # $VERBOSE is global in DBIx::myDatabaseMunger
+
+    # pull/push options
+    # $DRYRUN is global in DBIx::myDatabaseMunger
+    my $drop_columns;
+    my $host;
+    my $init_trigger_name;
+    my $require_password;
+    my $port;
+    my $remove;
+    my $schema;
+    my $user;
+
+    # make-archive options
+    my $actioncol;
+    my $archive_name_pattern;
+    my $ctimecol;
+    my $dbusercol;
+    my $mtimecol;
+    my $revisioncol;
+    my $stmtcol;
+    my $updidcol;
+    my $updidvar;
+
+    GetOptions(
+        # General options.
+        "c|config=s" => \$config,
+        "D|dir=s" => \$dir,
+        "t|table=s" => \@tables,
+        "T|exclude-table=s" => \@exclude_tables,
+        "v|view=s" => \@views,
+        "V|exclude-view=s" => \@exclude_views,
+        "d|debug" => \$DBIx::MyDatabaseMunger::VERBOSE,
+        # pull/push options
+        "drop-columns" => \$drop_columns,
+        "d|dryrun" => \$DBIx::MyDatabaseMunger::DRYRUN,
+        "h|host=s" => \$host,
+        "init-trigger-name=s" => \$init_trigger_name,
+        "p|password" => \$require_password,
+        "P|port=i" => \$port,
+        "remove=s" => \$remove,
+        "s|schema=s" => \$schema,
+        "u|user=s" => \$user,
+        # make-archive options
+        "actioncol=s" => \$actioncol,
+        "ctime:s" => \$ctimecol,
+        "dbusercol=s" => \$dbusercol,
+        "archive-name-pattern=s" => \$archive_name_pattern,
+        "mtime:s" => \$mtimecol,
+        "revision=s" => \$revisioncol,
+        "stmtcol=s" => \$stmtcol,
+        "updidcol=s" => \$updidcol,
+        "updidvar=s" => \$updidvar,
+    ) or die USAGE;
+
+    # Get command from @ARGV
+    my $command = shift @ARGV
+        or die "COMMAND not specified.\n",USAGE;
+    die "Too many non-option arguments.\n",USAGE
+        if @ARGV;
+
+    # Set defaults on mtime and ctime columns if the options were given
+    # without values.
+    $ctimecol = 'ctime'
+        if defined $ctimecol and not $ctimecol;
+    $mtimecol = 'mtime'
+        if defined $mtimecol and not $mtimecol;
+
+    # Allow commas in table and view options.
+    @tables = map { split(',') } @tables;
+    @exclude_tables = map { split(',') } @exclude_tables;
+    @views = map { split(',') } @views;
+    @exclude_views = map { split(',') } @exclude_views;
+
+    # Strip trailing slash from directory option.
+    $dir =~ s{/$}{} if $dir;
+
+    my $opt = {
+        command => $command,
+        dir => $dir,
+        drop_columns => $drop_columns,
+        tables => \@tables,
+        exclude_tables => \@exclude_tables,
+        views => \@views,
+        exclude_views => \@exclude_views,
+        connect => {
+            schema => $schema,
+            host => $host,
+            port => $port,
+            user => $user,
+            password => $password,
+        },
+        colname => {
+            action => $actioncol,
+            updid => $updidcol,
+            ctime => $ctimecol,
+            dbuser => $dbusercol,
+            mtime => $mtimecol,
+            revision => $revisioncol,
+            stmt => $stmtcol,
+        },
+        remove => $remove,
+        updidvar => $updidvar,
+        archive_name_pattern => $archive_name_pattern,
+        init_trigger_name => $init_trigger_name,
+    };
+
+    if( $config ) {
+        read_config( $opt, $config );
+    }
+
+    # Set flag for remove to everything if remove option was specified without
+    # value.
+    if( $opt->{remove} ) {
+        if( $opt->{remove} eq 'any' ) {
+            $opt->{remove} = { procedure => 1, table => 1, trigger => 1, view => 1 };
+        } else {
+            $opt->{remove} = { map { ($_=>1) } split ',', $opt->{remove} };
+        }
+    }
+
+    # Read password from the command line in case it wasn't provided as an
+    # option.
+    use Term::ReadKey;
+    if( $require_password and not $opt->{connect}{password} ) {
+        $| = 1; # Autoflush stdout
+        print "Enter password: ";
+        ReadMode('noecho');
+        chomp( $password = ReadLine(0) );
+        ReadMode('restore');
+        print "\n";
+        $opt->{connect}{password} = $password;
+    }
+
+    return $opt;
+}
+
+### main ###
+
+my $opt = parse_commandline ();
+my $mydbm = new DBIx::MyDatabaseMunger( $opt );
+
+eval {
+    if( $mydbm->{command} eq 'pull' ) {
+        $mydbm->pull();
+    } elsif( $mydbm->{command} eq 'push' ) {
+        $mydbm->push();
+    } elsif( $mydbm->{command} eq 'make-archive' ) {
+        $mydbm->make_archive();
+    } else {
+        die "Unknown command `$mydbm->{command}'\n",USAGE;
+    }
+};
+if( $@ ) { die "Aborted $mydbm->{command} - $@" };
+
+exit 0;

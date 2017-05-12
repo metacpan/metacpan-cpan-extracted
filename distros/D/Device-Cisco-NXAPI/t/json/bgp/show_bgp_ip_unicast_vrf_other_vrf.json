@@ -1,0 +1,48 @@
+{
+  "jsonrpc": "2.0",
+  "result": {
+    "body": {
+      "TABLE_vrf": {
+        "ROW_vrf": {
+          "vrf-name-out": "other_vrf",
+          "TABLE_afi": {
+            "ROW_afi": {
+              "afi": "1",
+              "TABLE_safi": {
+                "ROW_safi": {
+                  "safi": "1",
+                  "table-version": "3",
+                  "router-id": "1.1.1.1",
+                  "TABLE_rd": {
+                    "ROW_rd": {
+                      "TABLE_prefix": {
+                        "ROW_prefix": {
+                          "ipprefix": "8.8.8.0/24",
+                          "TABLE_path": {
+                            "ROW_path": {
+                              "pathnr": "0",
+                              "best": ">",
+                              "status": "*",
+                              "type": "l",
+                              "ipnexthop": "0.0.0.0",
+                              "metric": "",
+                              "localpref": "100",
+                              "weight": "32768",
+                              "aspath": "",
+                              "origin": "i"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "id": 1
+}

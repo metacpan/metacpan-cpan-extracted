@@ -1,0 +1,56 @@
+{
+   "abstract" : "DBIC compat with Rose::DBx::Object::MoreHelpers",
+   "author" : [
+      "Peter Karman <karman@cpan.org>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.1, CPAN::Meta::Converter version 2.140640",
+   "license" : [
+      "unknown"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Class-RDBOHelpers",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBICx::TestDatabase" : "0",
+            "DBIx::Class" : "0",
+            "Data::Dump" : "0",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=DBIx-Class-RDBOHelpers"
+      },
+      "homepage" : "https://github.com/karpet/dbix-class-rdbohelpers",
+      "license" : [
+         "http://dev.perl.org/licenses/"
+      ],
+      "repository" : {
+         "url" : "https://github.com/karpet/dbix-class-rdbohelpers"
+      }
+   },
+   "version" : "0.12"
+}

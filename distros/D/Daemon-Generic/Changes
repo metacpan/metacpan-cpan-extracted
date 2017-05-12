@@ -1,0 +1,54 @@
+Revision history for Perl module Daemon::Generic
+
+
+0.84 2013/10/04
+
+ - Replaced CHANGELOG with Changes
+ - Typo fixes contributed by David Steinbrunner
+
+0.83 2013/04/05
+
+ - Now using File::Flock::Forking so that locks are held on Solaris.  Bug 83085.
+ - Now using $self->{gd_progname} in all messages instead of $0.  Bug 84439.
+ - Added gd_kill_groups().  Bug 83294.
+ - 'status' now says "No $0 running" if the pid file is missing.  Bug 83295.
+ - Defining gd_preconfig is now optional.  Addresses bug 83086
+ - Added gd_reopen_output() to address bug 83087.
+ - Fixed bug 80604: Typos in README
+
+0.82 2012/03/07
+
+ - s/tmpdir/tmpdie/
+
+0.81 2011/07/26
+
+ - Add regression tests.
+ - Add Daemon::Generic::AnyEvent
+
+0.72 2011/05/19
+
+ - Address https://rt.cpan.org/Public/Bug/Display.html?id=63704,
+   call setsid between forks rather than after them.
+ - Address https://rt.cpan.org/Public/Bug/Display.html?id=58995,
+   don't unexpand tabs.
+
+0.71 2010/07/14
+
+ - Fix bug 58287 - close STDIN when daemonizing to complete the
+   detach.
+
+0.61 2009/04/04
+
+ - Stefan Seifert sent in a patch to make it LSB conformant.
+   Note: start now exits with 0 if the daemon is already running.
+ - scips noted an error in the example program.
+
+0.51 2007/08/15
+
+ - Add File::Slurp dependency to Makefile.PL.   Reported
+   by Tom Lea <tom dot lea at zeninternet dot co dot uk>.
+
+0.4 2007/03/27
+
+ - Ronald J Kimball <rjk at tamias dot net> sent in
+   a patch to avoid accidently clobbering $0.

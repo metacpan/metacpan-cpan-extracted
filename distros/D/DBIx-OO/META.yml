@@ -1,0 +1,20 @@
+--- #YAML:1.0
+name:                DBIx-OO
+version:             0.0.9
+abstract:            Database to Perl objects abstraction
+license:             ~
+author:              
+    - Mihai Bazon <mishoo@cpan.org>
+generated_by:        ExtUtils::MakeMaker version 6.42
+distribution_type:   module
+requires:     
+    Class::Data::Inheritable:      0
+    DBI:                           0
+    Module::Load:                  0
+    SQL::Abstract:                 0
+    Test::More:                    0
+    Test::Pod::Coverage:           0
+    version:                       0
+meta-spec:
+    url:     http://module-build.sourceforge.net/META-spec-v1.3.html
+    version: 1.3

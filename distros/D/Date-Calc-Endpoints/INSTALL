@@ -1,0 +1,38 @@
+    Installing Date::Calc::Endpoints
+
+INSTALLATION WITH CPANMINUS
+    If you have cpanm:
+
+        % cpanm Date::Calc::Endpoints
+
+    If you are installing into a system-wide directory, you may need to pass
+    the "-S" flag to cpanm, which uses sudo to istall the module:
+
+        % cpanm -S Date::Calc::Endpoints
+
+INSTALLATION WITH THE CPAN SHELL
+    Alternatively, if your CPAN shell is set up, you should just be able to
+    do:
+
+            % cpan Date::Calc::Endpoints
+
+MANUAL INSTALLATION
+    As a last resort, you can manually install it. Download the tarball and
+    unpack it.
+
+    Consult the file MYMETA.json for a list of pre-requisites. Install these
+    first.
+
+    To build Date-Range:
+
+            % perl Makefile.PL
+            % make && make test
+
+    Then install it:
+
+            % make install
+
+    If you are installing into a system-wide directory, you may need to run:
+
+            % sudo make install
+

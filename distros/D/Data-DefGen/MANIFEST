@@ -1,0 +1,8 @@
+Changes
+LICENSE
+Makefile.PL
+MANIFEST
+README
+lib/Data/DefGen.pm
+t/00_pod.t
+t/01_Data-DefGen.t

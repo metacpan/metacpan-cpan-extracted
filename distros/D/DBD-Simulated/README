@@ -1,0 +1,31 @@
+DBD-Simulated version 0.01
+==========================
+
+Ever tried to test any DBI-based module's error handling?
+
+DBD::Simulated is able to report any error you ask for.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  DBI is suggested but not really required.
+
+COPYRIGHT AND LICENCE
+
+Put the correct copyright and licence information here.
+
+Copyright (C) 2012 by Sebastian Willing, eGENTIC Systems http://egentic-systems.com/karriere/
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.12.4 or,
+at your option, any later version of Perl 5 you may have available.

@@ -1,0 +1,12 @@
+LICENSE
+ChangeLog
+Makefile.PL
+README
+MANIFEST
+
+lib/Date/SundayLetter.pm
+
+t/01load.t
+t/02parameter.t
+t/03letter.t
+

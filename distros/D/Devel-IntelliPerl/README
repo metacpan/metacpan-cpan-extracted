@@ -1,0 +1,206 @@
+NAME
+    Devel::IntelliPerl - Auto-completion for Perl
+
+VERSION
+    version 0.04
+
+SYNOPSIS
+        use Devel::IntelliPerl;
+
+        my $source = <<'SOURCE';
+        package Foo;
+
+        use Moose;
+
+        has foobar => ( isa => 'Str', is => 'rw' );
+        has foo => ( isa => 'Foo', is => 'rw' );
+
+        sub bar {
+            my ($self, $c) = @_;
+            # $c isa Catalyst
+            $self->
+        }
+
+        1;
+        SOURCE
+
+
+        my $ip = Devel::IntelliPerl->new(source => $source, line_number => 10, column => 12);
+    
+        my @methods = $ip->methods;
+
+    @methods contains "bar", "foo", and "foobar" amongst others. Method
+    completion for $c works as well. Using the comment "# $c isa Catalyst"
+    you can specify the variable $c as an object of the "Catalyst" class.
+    This comment can be located anywhere in the current file.
+
+    Even though the example uses Moose, this module works also with non
+    Moose classes.
+
+    See "SCREENCASTS" for usage examples.
+
+ATTRIBUTES
+  line_number (Int $line_number)
+    Required
+
+    Line number of the cursor. Starts at 1.
+
+  column (Int $column)
+    Required
+
+    Position of the cursor. Starts at 1.
+
+  source (Str $source)
+    Required
+
+    Source code.
+
+  filename
+    Optional
+
+    Store the filename of the current file. If this value is set @INC is
+    extended by all "lib" directories found in any parent directory. This is
+    useful if you want to have access to modules which are not in @INC but
+    in your local "lib" folder. This method sets "inc".
+
+    This value is NOT used to retrive the source code! Use source instead.
+
+  inc (ArrayRef[Str] $inc)
+    Optional
+
+    All directories specified will be prepended to @INC.
+
+METHODS
+  error (Str $error)
+    If an error occurs it is accessible via this method.
+
+  line (Str $line)
+    Sets or gets the current line.
+
+  keyword
+    This represents the current keyword.
+
+    Examples ("_" stands for the cursor position):
+
+      my $foo = MyClass->_ # keyword is MyClass
+      my $foo->_           # keyword is $foo
+      my $foo->bar->_      # keyword is $foo->bar
+
+  prefix
+    Part of a method which has been typed already.
+
+    Examples ("_" stands for the cursor position):
+
+      my $foo = MyClass->foo_ # keyword is MyClass, prefix is foo
+      my $foo->bar_           # keyword is $foo,    prefix is bar
+
+  methods
+    Returns all methods which were found for "keyword" and "prefix".
+
+  trimmed_methods
+    Returns "methods" truncated from the beginning by the length of
+    "prefix".
+
+INTERNAL METHODS
+  guess_class (Str $keyword)
+    Given a keyword (e.g. "$foo->bar->file") this method tries to find the
+    class from which to load the methods.
+
+  handle_class
+    Loads the selected class.
+
+  handle_self
+    Loads the current class.
+
+  handle_method
+    This method tries to resove the class of the returned value of a given
+    method. It supports Moose attributes as well as
+    MooseX::Method::Signatures.
+
+    Example for an instrospectable class:
+
+        package Signatures;
+
+        use Moose;
+        use Path::Class::File;
+        use MooseX::Method::Signatures;
+        use Moose::Util::TypeConstraints;
+    
+        has dir => ( isa => 'Path::Class::Dir', is => 'rw' );
+
+        BEGIN { class_type 'PathClassFile', { class => 'Path::Class::File' }; }
+
+        method file returns (PathClassFile) {
+            return new Path::Class::File;
+        }
+
+        1;
+
+    Given this class, Devel::IntelliPerl provides the following features:
+
+      my $sig = new Signatures;
+      $sig->_        # will suggest "dir" and "file" amongst others
+      $sig->file->_  # will suggest all methods from Path::Class::File
+
+  handle_variable
+    Tries to find the variable's class using regexes. Supported syntaxes:
+
+      $variable = MyClass->new
+      $variable = MyClass->new(...)
+      $variable = new MyClass
+      # $variable isa MyClass
+
+  inject_statement (Str $statement)
+    Injects $statement at the current position.
+
+  update_inc
+    Trigger called by "filename".
+
+SCREENCASTS
+    <http://www.screencast.com/t/H5DdRNbQVt>
+
+    <http://www.screencast.com/t/djkraaYgpx>
+
+TODO
+    Support for auto completion in the POD (e.g. "L
+    <Devel::IntelliPerl/[auto complete]>")
+
+AUTHOR
+    Moritz Onken, "<onken at netcubed.de>"
+
+BUGS
+    Please report any bugs or feature requests to "bug-devel-intelliperl at
+    rt.cpan.org", or through the web interface at
+    <http://rt.cpan.org/NoAuth/ReportBug.html?Queue=Devel-IntelliPerl>. I
+    will be notified, and then you'll automatically be notified of progress
+    on your bug as I make changes.
+
+SUPPORT
+    You can find documentation for this module with the perldoc command.
+
+        perldoc Devel::IntelliPerl
+
+    You can also look for information at:
+
+    *   RT: CPAN's request tracker
+
+        <http://rt.cpan.org/NoAuth/Bugs.html?Dist=Devel-IntelliPerl>
+
+    *   AnnoCPAN: Annotated CPAN documentation
+
+        <http://annocpan.org/dist/Devel-IntelliPerl>
+
+    *   CPAN Ratings
+
+        <http://cpanratings.perl.org/d/Devel-IntelliPerl>
+
+    *   Search CPAN
+
+        <http://search.cpan.org/dist/Devel-IntelliPerl/>
+
+COPYRIGHT & LICENSE
+    Copyright 2009 Moritz Onken, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+

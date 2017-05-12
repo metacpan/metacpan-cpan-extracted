@@ -1,0 +1,14 @@
+*HOLIDAYS
+
+# This is a holiday section that fits the Federal Reserve definition:
+#    holidays on Sunday are observed Monday
+#    holidays on any other day (including Saturday) are observed on
+#        that day
+
+# Saturday
+1*1:0:1:0:0:0*IW6               = New Year's Day
+# Sunday (observed Monday)
+1*1:0:1:0:0:0*IW7,FD1           = New Year's Day
+# M-F
+1*1:0:1:0:0:0*IBD               = New Year's Day
+

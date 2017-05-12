@@ -1,0 +1,32 @@
+---
+abstract: 'Faceting for DBIx::Class ResultSets'
+author:
+  - 'Cory G Watson <gphat@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.42
+  MooseX::Iterator: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
+distribution_type: module
+generated_by: 'Module::Install version 0.91'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-ResultSet-Faceter
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class: 0
+  DateTime: 0
+  Moose: 0
+  MooseX::Iterator: 0
+  MooseX::Types: 0
+  Try::Tiny: 0
+resources:
+  license: http://dev.perl.org/licenses/
+  repository: http://github.com/gphat/dbix-class-resultset-faceter
+version: 0.04

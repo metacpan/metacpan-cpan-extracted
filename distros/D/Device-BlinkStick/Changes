@@ -1,0 +1,17 @@
+0.4.0 2016-01-04
+    * fix _Inline files being left around
+    * add colorname to info 
+    * use colorname in stick script
+    * clear first and devices variables before a refresh
+0.3.0 2015-12-30
+    * pod error fixes and added pod.t from MANWAR
+    * pod in stick script updated to reflect command line parameters
+0.2.0 2015-12-23
+    * major overhaul to handle multiple sticks, also faster now, also handles pro sticks
+	* fix some pod errors
+	* use WebColors
+    * stick script has had lots of changes
+    * mode 3 is emulated and has a slight speed impact as we need to slow down writes to USB to prevent errors, only 16 LEDs are emulated
+0.1.0 2014-06-27
+    * first release, things work, 
+    * in bin/stick connect, morph, pulse, blink not yet implemented 

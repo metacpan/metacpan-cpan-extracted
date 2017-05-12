@@ -1,0 +1,24 @@
+---
+abstract: 'Parses Date::Parse compatible formats'
+author:
+  - 'Joshua Hoblitt (JHOBLITT) <jhoblitt@cpan.org>'
+configure_requires:
+  Module::Build: 0.36
+generated_by: 'Module::Build version 0.3601'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-DateParse
+provides:
+  DateTime::Format::DateParse:
+    file: lib/DateTime/Format/DateParse.pm
+    version: 0.05
+requires:
+  Date::Parse: 2.27
+  DateTime: 0.29
+  DateTime::TimeZone: 0.27
+  Time::Zone: 2.22
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.05

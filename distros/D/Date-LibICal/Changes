@@ -1,0 +1,7 @@
+Revision history for Perl extension Date::LibICal.
+
+0.01  Fri Oct 25 18:35:07 2013
+    - implemented expand_recurrence for interpreting ICAL RRULEs
+	- original version; created by h2xs 1.23 with options
+		-A -n Date::LibICal
+

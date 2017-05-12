@@ -1,0 +1,16 @@
+Changes
+const-c.inc
+const-xs.inc
+fallback/const-c.inc
+fallback/const-xs.inc
+lib/Digest/OAT.pm
+Makefile.PL
+MANIFEST			This list of files
+MANIFEST.SKIP
+OAT.bs
+OAT.c
+OAT.xs
+ppport.h
+README
+t/Digest-OAT.t
+META.yml                                 Module meta-data (added by MakeMaker)

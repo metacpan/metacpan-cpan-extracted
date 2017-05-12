@@ -1,0 +1,123 @@
+NAME
+    Data::Password::passwdqc - Check password strength and generate password
+    using passwdqc
+
+SYNOPSIS
+      use Data::Password::passwdqc;
+
+      my $pwdqc = Data::Password::passwdqc->new;
+      print 'OK' if $pwdqc->validate_password('arrive+greece7glove');
+
+      my $is_valid = $pwdqc->validate_password('new password', '0ld+pas$w0rd');
+      print 'Bad password: ' . $pwdqc->reason if not $is_valid;
+
+      my $password = $pwdqc->generate_password;
+
+DESCRIPTION
+    Data::Password::passwdqc provides an object oriented Perl interface to
+    Openwall Project's passwdqc. It allows you to check password strength
+    and also lets you generate quality controllable random password.
+
+ATTRIBUTES
+    *min [Int0, Int1, Int2, Int3, Int4]*
+        Defaults to "[undef, 24, 11, 8, 7]".
+
+        The minimum allowed password lengths for different kinds of
+        passwords and passphrases. "undef" can be used to disallow passwords
+        of a given kind regardless of their length. Each subsequent number
+        is required to be no larger than the preceding one.
+
+        Int0 is used for passwords consisting of characters from one
+        character class only. The character classes are: digits, lower-case
+        letters, upper-case letters, and other characters. There is also a
+        special class for non-ASCII characters, which could not be
+        classified, but are assumed to be non-digits.
+
+        Int1 is used for passwords consisting of characters from two
+        character classes that do not meet the requirements for a
+        passphrase.
+
+        Int2 is used for passphrases. Note that besides meeting this length
+        requirement, a passphrase must also consist of a sufficient number
+        of words (see the "passphrase_words" option below).
+
+        Int3 and Int4 are used for passwords consisting of characters from
+        three and four character classes, respectively.
+
+        When calculating the number of character classes, upper-case letters
+        used as the first character and digits used as the last character of
+        a password are not counted.
+
+        In addition to being sufficiently long, passwords are required to
+        contain enough different characters for the character classes and
+        the minimum length they have been checked against.
+
+    *max Int*
+        Defaults to 40.
+
+        The maximum allowed password length. This can be used to prevent
+        users from setting passwords that may be too long for some system
+        services.
+
+        The value 8 is treated specially: with "max=8", passwords longer
+        than 8 characters will not be rejected, but will be truncated to 8
+        characters for the strength checks and the user will be warned. This
+        is to be used with the traditional DES-based password hashes, which
+        truncate the password at 8 characters.
+
+        It is important that you do set "max=8" if you are using the
+        traditional hashes, or some weak passwords will pass the checks.
+
+    *passphrase_words Int*
+        Defaults to 3.
+
+        The number of words required for a passphrase, or 0 to disable the
+        support for user-chosen passphrases.
+
+    *match_length Int*
+        Defaults to 4.
+
+        The length of common substring required to conclude that a password
+        is at least partially based on information found in a character
+        string, or 0 to disable the substring search. Note that the password
+        will not be rejected once a weak substring is found; it will instead
+        be subjected to the usual strength requirements with the weak
+        substring partially discounted.
+
+        The substring search is case-insensitive and is able to detect and
+        remove a common substring spelled backwards.
+
+    *random_bits Int*
+        Defaults to 47.
+
+        The size of randomly-generated passphrases in bits (26 to 81), or 0
+        to disable this feature.
+
+METHODS
+    validate_password
+          $is_valid = $pwdqc->validate_password('new password');
+          $is_valid = $pwdqc->validate_password('new password', 'old password');
+          print $pwdqc->reason if not $is_valid;
+
+        Checks passphrase quality. Returns a true value on success. If the
+        check fails, it returns a false value and sets "reason".
+
+    generate_password
+          my $password = $pwdqc->generate_password;
+
+        Generates a random passphrase. Throws an exception if passphrase
+        cannot be generated.
+
+AUTHORS
+    Sherwin Daganato <sherwin@daganato.com>
+
+    The copy of passwdqc bundled with this module was written by Solar
+    Designer and Dmitry V. Levin.
+
+LICENSE
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+SEE ALSO
+    <http://www.openwall.com/passwdqc/>
+

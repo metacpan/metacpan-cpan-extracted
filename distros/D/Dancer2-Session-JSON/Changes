@@ -1,0 +1,11 @@
+Revision history for Dancer2-Session-JSON
+
+0.002     2015-10-22 21:43:53-05:00 America/Chicago
+
+    - Fixed broken version check for Dancer2 (David Golden)
+    - Moved tests from Test::TCP to Plack::Test (Jason A. Crome & Dancer Team)
+
+0.001     2013-02-23 22:55:15 America/New_York
+
+    - First release
+

@@ -1,0 +1,47 @@
+{
+   "abstract" : "Apply PodWeaver if there is already Pod",
+   "author" : [
+      "Jonathan Swartz <swartz@pobox.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200008, CPAN::Meta::Converter version 2.113640",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dist-Zilla-Plugin-PodWeaverIfPod",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.30"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla::Plugin::PodWeaver" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "mailto" : "bug-dist-zilla-plugin-podweaverifpod@rt.cpan.org",
+         "web" : "http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-PodWeaverIfPod"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/jonswar/perl-dzil-podweaverifpod.git",
+         "web" : "https://github.com/jonswar/perl-dzil-podweaverifpod"
+      }
+   },
+   "version" : "0.02"
+}
+

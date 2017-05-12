@@ -1,0 +1,17 @@
+Revision history for Perl extension DBIx::OracleSequence.
+
+0.01  Fri Dec  3 10:34:50 1999
+	- original version; created by h2xs 1.19
+
+0.02  Tue Dec 14 13:17:00 1999
+	- corrected duplication of the cycle() method
+
+0.03  Tue May 16 16:37:22 2000
+	- added parameter to cycle and order
+	  order('N') and noorder() are equivalent
+	  cycle('N') and nocycle() are equivalent
+	- added feature to cycle and order so that they now work :-)
+
+0.04  Mon Aug 12 17:12:00 2002
+	- fixed Makefile.PL to require DBD::Oracle and DBI as prerequisites
+	  to keep CPAN testers happy.  They deserve a little happiness.

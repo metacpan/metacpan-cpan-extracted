@@ -1,0 +1,27 @@
+Artistic
+Build.PL			Proto Build creator
+ChangeLog
+GNUmakefile
+MANIFEST			This list of files
+NEWS
+README.md			README in Markdown format for github
+example/five.pl
+gpl-2.0.txt
+example/fib.pl
+example/multiline.pl
+lib/Devel/Trepan/CmdProcessor/Command/Deparse.pm
+lib/Devel/Trepan/CmdProcessor/Command/Set_Subcmd/Auto_Subcmd/Deparse.pm
+lib/Devel/Trepan/CmdProcessor/Command/Show_Subcmd/Auto_Subcmd/Deparse.pm
+lib/Devel/Trepan/Deparse.pm
+t/00load.t
+t/00test-pod.t
+t/10test-cmd-complete.t		Note: 10 tests are unit tests
+t/20test-deparse.t
+t/Helper.pm
+t/Makefile                      boilerplate to rerun in top-level Makefile
+t/data/deparse.cmd
+t/data/deparse.right
+META.yml
+META.json
+Makefile.PL
+SIGNATURE    Added here by Module::Build

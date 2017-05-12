@@ -1,0 +1,33 @@
+
+[0.03]
+    - Added ReturnTrue and ReturnFalse
+    - Added CaseValid
+    - Added OnEvenElements and OnOddElements
+    - Catch unknown Constraints
+    - Added OnArrayElements
+    - Minor POD corrections.
+
+[0.02] Sun Sep 10 23:22:55 CEST 2006
+    - Added IsEq scalar constraint.
+    - Added Scope, SetResult and IsValid.
+    - Fixed error in Or. Correct results are returned now.
+    - Fixed error in OnHashKeys. Hash key constraints are now processed
+      in the order they are defined.
+    - Custom libraries are now possible.
+    - Much better constraint POD.
+    - Interior of Message constraint is now in the _with_message sub.
+    - Introduced use D:C:S-Library import for libraries.
+    - Split of the Library into Sub-Libraries. The Library package itself
+      is now just a bundle of all shipped libraries. It's POD serves as
+      docmap for the constraints.
+    - Corrected minor POD typos.
+    - Stack info now escapes [ and ].
+    - General TODO updates.
+    - Split of the USAGE section into subsections.
+    - Added a Custom constraint to the TODO list.
+    - Forgot to add date to Changes file. /me slaps self.
+
+[0.01] Sat Sep  9 18:22:08 CEST 2006
+    - Initial Release.
+
+

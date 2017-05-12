@@ -1,0 +1,30 @@
+SYNOPSIS
+
+    in dist.ini
+
+            [PERLANCAR::OurPkgVersion]
+
+    in your modules
+
+            # VERSION
+
+    or
+
+            our $VERSION = '0.123'; # VERSION
+
+DESCRIPTION
+
+    This module is like Dist::Zilla::Plugin::OurPkgVersion but can replace
+    the previously generated our $VERSION = '0.123';  bit. If the author of
+    OurPkgVersion thinks this is a good idea, then perhaps this module will
+    be merged with OurPkgVersion.
+
+    Comment/directive below __DATA__ or __END__ will not be replaced.
+
+SEE ALSO
+
+    Dist::Zill::Plugin::OurPkgVersion
+
+    Another approach: Dist::Zill::Plugin::RewriteVersion and
+    Dist::Zill::Plugin:::BumpVersionAfterRelease
+

@@ -1,0 +1,17 @@
+Revision history for Dancer2-Plugin-Locale-Wolowitz
+
+0.05  2016-06-04 13:26:07 CEST
+        Support the third parameter to loc as documented in the original Dancer plugin (thanks to Evan Brown!)
+
+0.04  2016-01-14 15:11:19 CET
+        Fix for new plugin framework
+        Move to Plack::Test
+        Require Dancer2 0.166000
+0.03    2015-09-21
+        Use relative path (Bas Bloemsaat)
+        Better browser header handling with I18N::AcceptLanguage
+0.02    2014-06-26
+        Test patched for Dancer2 > 0.14 support
+0.01    2014-06-26
+        First version, released on an unsuspecting world.
+

@@ -1,0 +1,78 @@
+==================================================
+Changes from 2011-06-06 00:00:00 +0000 to present.
+==================================================
+
+-----------------------------------------
+version 1.03 at 2012-06-05 16:14:11 +0000
+-----------------------------------------
+
+  Change: 097edeeeb3c16403abb1d8c7d775cb7b6fe8ab69
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-06-05 18:13:53 +0000
+
+    Fixes to dist.ini 
+
+  Change: 74a0c8c7f21bb024e323150a5fb75185a080bf39
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-06-05 18:13:37 +0000
+
+    New provider_config option 
+
+-----------------------------------------
+version 1.02 at 2012-02-06 21:18:03 +0000
+-----------------------------------------
+
+  Change: 6f222209e27759f9b07e053f6c1c8b41e931a139
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2012-02-06 22:18:03 +0000
+
+    Remove hard-coded $VERSION to let Dist::Zilla::Plugin::PkgVersion do
+    its job 
+
+-----------------------------------------
+version 1.01 at 2011-11-26 15:11:06 +0000
+-----------------------------------------
+
+  Change: 969c6f4b2c8dcd0981832a7aff9830c82b308bbf
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-11-26 16:11:06 +0000
+
+    Preparing to release 1.01 
+
+-----------------------------------------
+version 1.00 at 2011-11-26 15:02:22 +0000
+-----------------------------------------
+
+  Change: 8f058e90e4891cdc2f778d46e3f505d1ba74e967
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-11-26 16:02:22 +0000
+
+    Some fixes to the Changes file and removed a 1; in the POD 
+
+  Change: 2b98958788b7006c9021a449decf56afeb70e7ee
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-11-26 15:55:21 +0000
+
+    Added .gitignore 
+
+  Change: e0316785a4e3b2a441ab7570af75cdd82ba65138
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-11-26 15:53:02 +0000
+
+    Prepearing to release 
+
+  Change: fd41508823224abb26bda542429cd74126c4a736
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-10-28 13:57:45 +0000
+
+    Added support for formHandlers, namespace and exceptions 
+
+  Change: 4fee58874546b28a10ce687ea1f10db02a2abcdd
+  Author: Alessandro Ranellucci <aar@cpan.org>
+  Date : 2011-10-24 19:44:07 +0000
+
+    Working module. Needs POD, tests and packaging 
+
+================
+End of releases.
+================

@@ -1,0 +1,111 @@
+Name
+
+    Dist::Zilla::Plugin::Test::ReportMetadata - Report on prerequisite
+    versions during automated testing
+
+Synopsis
+
+       # In dist.ini
+       [Test::ReportMetadata]
+
+Description
+
+    The is a clone of Dist::Zilla::Plugin::Test::ReportPrereqs but with the
+    dependency on ExtUtils::MakeMaker replaced with one on
+    Module::Metadata. If you are using Module::Build then Module::Metadata
+    is already a dependency
+
+    Versions are reported based on the result of the version attribute from
+    Module::Metadata
+
+    Additionally a selection of environment variables are also displayed
+
+Configuration and Environment
+
+    Defines the following attributes;
+
+    env_vars
+
+      An array reference of environment variable names displayed on the
+      test report. Set using the multivalued initialisation argument
+      env_var. If the list has no values then nothing is printed. An empty
+      list can be set with
+
+         [Test::ReportMetadata]
+         env_var = none
+
+    excludes
+
+      An array reference of module names to exclude from the test report.
+      Set using the multivalued initialisation argument exclude
+
+    includes
+
+      An array reference of module names to include in the test report. Set
+      using the multivalued initialisation argument include
+
+    verify_prereqs
+
+      A boolean defaulting to true. If true emits lots of warnings if
+      prerequisites are not satisfied
+
+Subroutines/Methods
+
+ gather_files
+
+    Required by Dist::Zilla::Role::FileGatherer
+
+ mvp_multivalue_args
+
+    Returns a list of configuration attribute names that are treated as
+    multi valued
+
+ register_prereqs
+
+    Required by Dist::Zilla::Role::PrereqSource
+
+Diagnostics
+
+    None
+
+Dependencies
+
+    Data::Dumper
+
+    Data::Section
+
+    Dist::Zilla
+
+    Moose
+
+    Sub::Exporter::ForMethods
+
+Incompatibilities
+
+    There are no known incompatibilities in this module
+
+Bugs and Limitations
+
+    There are no known bugs in this module. Please report problems to
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-Test-ReportMetadata.
+    Patches are welcome
+
+Acknowledgements
+
+    Larry Wall - For the Perl programming language
+
+Author
+
+    Peter Flanigan, <pjfl@cpan.org>
+
+License and Copyright
+
+    Copyright (c) 2016 Peter Flanigan. All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE
+

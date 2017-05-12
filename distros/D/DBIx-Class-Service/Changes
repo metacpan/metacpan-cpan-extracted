@@ -1,0 +1,8 @@
+Revision history for DBIx-Class-Service
+
+0.01 2008-04-01 17:32:02
+  * First version
+
+0.02 2008-04-03 18:46
+  * Fixed error handling.
+

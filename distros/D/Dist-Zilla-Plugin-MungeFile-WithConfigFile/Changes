@@ -1,0 +1,16 @@
+Revision history for Dist-Zilla-Plugin-MungeFile-WithConfigFile
+
+0.004     2015-08-19 01:26:05Z
+          - split off much of this distribution into
+            Dist::Zilla::Plugin::MungeFile, for greater visibility
+
+0.003     2015-08-18 02:17:09Z
+          - some documentation fixes
+          - documented the limitations with respect to file decodings
+          - updated some bits of the distribution packaging
+
+0.002     2014-01-28 03:41:49Z
+          - add missing test dependency to read config files
+
+0.001     2014-01-27 01:30:05Z
+          - Initial release.

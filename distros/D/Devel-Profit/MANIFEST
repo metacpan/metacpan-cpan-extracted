@@ -1,0 +1,17 @@
+bin/devel_profit
+CHANGES
+lib/Devel/Profit.pm
+lib/Devel/Profit/Cmd.pm
+lib/Devel/Profit/Cmd/Command.pm
+lib/Devel/Profit/Cmd/Command/File.pm
+lib/Devel/Profit/Cmd/Command/Line.pm
+lib/Devel/Profit/Cmd/Command/Package.pm
+lib/Devel/Profit/Cmd/Command/Profile.pm
+lib/Devel/Profit/Cmd/Command/Subroutine.pm
+lib/Devel/Profit/Cmd/Command/SubroutineLine.pm
+Makefile.PL
+MANIFEST			This list of files
+META.yml
+Profit.xs
+README
+t/01compile.t

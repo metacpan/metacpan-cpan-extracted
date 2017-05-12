@@ -1,0 +1,26 @@
+---
+abstract: 'Perl module to manage PiFace boards'
+author:
+  - 'Roberto Frenna <robertof@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.59
+  Test::More: '0.42'
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.16'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Device-PiFace
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  perl: 5.10.1
+resources:
+  license: http://dev.perl.org/licenses/
+version: '0.01'

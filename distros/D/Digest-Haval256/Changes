@@ -1,0 +1,20 @@
+1.0.5    2004 August 18
+         Modified hashsize() to return number of bits, instead of bytes
+         (to become consistent with Digest::SHA of Mark Shelor)
+
+1.0.4    2003 July 29
+         Minor code cleanup
+
+1.0.3    Revised _haval.c slightly because reset() was not working
+         properly
+
+1.0.2    Optimized even more
+         Refined "files.pl" example script by including error-checking
+
+1.0.1    2003 June 07
+         Added documentation for reset()
+         Updated the "strings.pl" example script
+
+1.0.0    2003 June 07
+         Initial release
+

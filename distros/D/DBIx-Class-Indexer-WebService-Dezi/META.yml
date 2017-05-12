@@ -1,0 +1,38 @@
+---
+abstract: 'An indexer for Dezi/Lucy.'
+author:
+  - 'Logan Bell, C<< <loganbell at gmail.com> >>'
+  - 'Logan Bell <loganbell@gmail.com>'
+build_requires:
+  DBIx::Class::TimeStamp: 0
+  ExtUtils::MakeMaker: 6.59
+  Test::Exception: 0
+  Test::MockModule: 0
+  Test::More: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.59
+distribution_type: module
+dynamic_config: 1
+generated_by: 'Module::Install version 1.06'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DBIx-Class-Indexer-WebService-Dezi
+no_index:
+  directory:
+    - inc
+    - t
+requires:
+  DBIx::Class::Indexed: 0
+  Dezi::Client: 0
+  File::Slurp: 0
+  JSON: 0
+  MIME::Base64: 0
+  Media::Type::Simple: 0
+  Moose: 0
+  XML::Simple: 0
+  perl: 5.14.0
+resources:
+  license: http://dev.perl.org/licenses/
+version: 0.08

@@ -1,0 +1,126 @@
+# NAME
+
+Dist::Zilla::Plugin::ReportVersions::Tiny - (DEPRECATED) reports dependency versions during testing
+
+# VERSION
+
+version 1.12
+
+# SYNOPSIS
+
+In your `dist.ini`, include `[ReportVersions::Tiny]` to load the plugin.
+
+# **THIS PLUGIN IS DEPRECATED!**
+
+**Alert:** This plugin is deprecated! It was already in low maintainance for
+years. [\[Test::ReportPrereqs\]](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::ReportPrereqs) is
+now much better (better implementation, better output, better maintainer),
+so use it instead!
+
+# DESCRIPTION
+
+This module integrates with [Dist::Zilla](https://metacpan.org/pod/Dist::Zilla) to automatically add an additional
+test to your released software.  Rather than testing features of the software,
+this reports the versions of all static module dependencies, and of Perl, at
+the time the tests are run.
+
+The value of this is that when someone submits a test failure report you can
+see which versions of the modules were installed and, hopefully, be able to
+reproduce problems that are dependent on a specific set of module versions.
+
+# Differences from Dist::Zilla::Plugin::ReportVersions
+
+This module has the same goal as [Dist::Zilla::Plugin::ReportVersions](https://metacpan.org/pod/Dist::Zilla::Plugin::ReportVersions), but
+takes a much lighter weight approach: the module that inspired my code bundles
+a copy of YAML::Tiny, reads META.yml, then reports from that.
+
+This gives the most accurate picture, since any requirements added at install
+time will be detected, but is overkill for the vast majority of modules that
+use a simple, static list of dependencies.
+
+This module, rather, generates the list of modules to test at the time the
+distribution is being built, and reports from that static list.
+
+The biggest advantage of this is that I no longer have to bundle a large
+volume of code that isn't really needed, and have a simpler test suite with
+less places that things can go wrong.
+
+# ARGUMENTS
+
+- **exclude**
+
+    Exclude an individual items from version reporting.
+
+    This is most commonly required if some module otherwise interferes with the
+    normal operation of the tests, such as [Module::Install](https://metacpan.org/pod/Module::Install), which does not
+    behave as you might expect if normally `use`d.
+
+- **include**
+
+        [ReportVersions::Tiny]
+        include = JSON:PP 2.27103
+        include = Path::Class
+        include = Some::Thing = 1.1
+
+    Include extra modules in version reporting.
+    This can be specified multiple times.  The module name and version can be
+    separated by spaces (and/or an equal sign).  If no version is specified
+    "0" will be used.
+
+    This can be useful to help track down issues in installation or testing
+    environments.  Perhaps a module used by one of your prereqs is broken
+    and/or has a missing (or insufficient) dependency.  You can use this option
+    to specify multiple extra modules whose versions you would like reported.
+    They aren't modules that you need to declare as prerequisites
+    since you don't use them directly, but you've found installation issues
+    and it would be nice to show which version (if any) is in fact installed.
+
+    This option is inspired by advice from Andreas J. König (ANDK)
+    who suggested adding a list of "interesting modules" to the
+    `Makefile.PL` and checking their version so that the test reports can show
+    which version (if any) is in fact installed
+    (see the [CPAN](https://metacpan.org/pod/CPAN) dist for an example).
+
+# CAVEATS
+
+- The list of prereqs that are reported is built at `dzil build` time. Not at
+install time. This means that if the `configure` step of the
+[builder](https://metacpan.org/pod/Dist::Zilla::Role::Builder) generates the list of prereqs dynamically
+(see ["dynamic\_config" in CPAN::Meta::Spec](https://metacpan.org/pod/CPAN::Meta::Spec#dynamic_config)), that list _may_ not match the real
+list of dependencies given to the CPAN client. In that case, you should use
+instead [Dist::Zilla::Plugin::Test::ReportPrereqs](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::ReportPrereqs). \[[RT#83266](https://rt.cpan.org/Ticket/Display.html?id=83266)\]
+- Modules are loaded (`require`-d, which means `BEGIN` blocks and code outside
+subs will run) to extract their versions. So this may have side effects.
+To fix this, a future version of this plugin may use [Module::Metadata](https://metacpan.org/pod/Module::Metadata) to
+extract versions, and so add this module as a `test` prereqs of your
+distribution. \[[RT#76308](https://rt.cpan.org/Ticket/Display.html?id=76308)\]
+- [Version ranges](https://metacpan.org/pod/CPAN::Meta::Spec#Version-Range) for prereqs are not supported.
+If you use them, you should use instead
+[Dist::Zilla::Plugin::Test::ReportPrereqs](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::ReportPrereqs). \[[RT#87364](https://rt.cpan.org/Ticket/Display.html?id=87364)\]
+
+# SEE ALSO
+
+[Test::ReportPrereqs](https://metacpan.org/pod/Test::ReportPrereqs) and [Dist::Zilla::Plugin::Test::ReportPrereqs](https://metacpan.org/pod/Dist::Zilla::Plugin::Test::ReportPrereqs)
+
+# AUTHORS
+
+Maintainer since 1.04: Olivier Mengué [mailto:dolmen@cpan.org](mailto:dolmen@cpan.org).
+
+Original author: Daniel Pittman <daniel@rimspace.net>.
+
+Contributors:
+
+- Kent Fredric
+- Randy Stauner
+- Karen Etheridge
+- Alexandr Ciornii
+- Apocalypse
+- Ricardo Signes
+
+# COPYRIGHT AND LICENSE
+
+Copyright 2015 by Olivier Mengué [mailto:dolmen@cpan.org](mailto:dolmen@cpan.org)
+All Rights Reserved.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

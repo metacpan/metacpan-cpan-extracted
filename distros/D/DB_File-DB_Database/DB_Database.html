@@ -1,0 +1,368 @@
+<HTML>
+<HEAD>
+<TITLE>DB_File::DB_Database - Perl module for reading and writing the DB_File data as a mutifield table 
+with index file supported.</TITLE>
+<LINK REV="made" HREF="mailto:">
+</HEAD>
+
+<BODY>
+
+<A NAME="__index__"></A>
+<!-- INDEX BEGIN -->
+
+<UL>
+
+	<LI><A HREF="#name">NAME</A></LI>
+	<LI><A HREF="#synopsis">SYNOPSIS</A></LI>
+	<LI><A HREF="#description">DESCRIPTION</A></LI>
+	<UL>
+
+		<LI><A HREF="#general methods">General methods</A></LI>
+		<LI><A HREF="#using it as key /values(list)">Using it as key /values(list)</A></LI>
+		<LI><A HREF="#writing the data">Writing the data</A></LI>
+		<LI><A HREF="#using it as table">Using it as Table</A></LI>
+		<LI><A HREF="#writing the data">Writing the data</A></LI>
+		<LI><A HREF="#using index">Using Index</A></LI>
+		<LI><A HREF="#select records">Select records</A></LI>
+		<LI><A HREF="#dumping the content of the file">Dumping the content of the file</A></LI>
+		<LI><A HREF="#error message">Error Message</A></LI>
+	</UL>
+
+	<LI><A HREF="#bugs">BUGS</A></LI>
+	<LI><A HREF="#internal data types">INTERNAL DATA TYPES</A></LI>
+	<LI><A HREF="#locking">LOCKING</A></LI>
+	<LI><A HREF="#version">VERSION</A></LI>
+	<LI><A HREF="#author">AUTHOR</A></LI>
+	<LI><A HREF="#see also">SEE ALSO</A></LI>
+</UL>
+<!-- INDEX END -->
+
+<HR>
+<P>
+<HR>
+<H1><A NAME="name">NAME</A></H1>
+<P>DB_File::DB_Database - Perl module for reading and writing the DB_File data as a mutifield table 
+with index file supported.</P>
+<P>
+<HR>
+<H1><A NAME="synopsis">SYNOPSIS</A></H1>
+<PRE>
+  use DB_File::DB_Database;
+  my $table   = new DB_File::DB_Database &quot;dbexample&quot; or die DB_File::DB_Database-&gt;errstr;</PRE>
+<PRE>
+  my @data    = $table-&gt;get_record(&quot;Judy&quot;);
+  my $hashref = $table-&gt;get_record_hash('James');</PRE>
+<PRE>
+  $table-&gt;append_record(&quot;Caroline&quot;, &quot;20&quot;, &quot;sister&quot;);
+  $table-&gt;append_record_hash('jimmy', &quot;age&quot; =&gt; 25,
+  $table-&gt;set_record(&quot;Judy&quot;, &quot;18&quot;, &quot;a beauty&quot;);
+  $table-&gt;set_record_hash('Roger', &quot;age&quot; =&gt; 25,&quot;msg&quot; =&gt; 'everything is easy!');
+  $table-&gt;update_record_hash(&quot;Roger&quot;, &quot;MSG&quot; =&gt; &quot;New message&quot;);
+  $table-&gt;delete_record(&quot;Roger&quot;);</PRE>
+<PRE>
+  $table-&gt;prepare_select( &quot;seek&quot;  =&gt; {'index'=&gt; 'indexA',
+                                      'from' =&gt; 10,
+                                      'to'   =&gt; 25},
+                          &quot;where&quot; =&gt; {'msg'=&gt; 'hi'},
+                          &quot;top&quot;   =&gt; 10);
+  $table-&gt;dump_data;
+  $table-&gt;close;</PRE>
+<P>
+<HR>
+<H1><A NAME="description">DESCRIPTION</A></H1>
+<P>This module can handle DB_File data(DB_HASH, key/value pairs) as a mutifield table. 
+It also can create auto updated index <CODE>files(DB_BTREE)</CODE> to faster the searching speed. 
+It is an Beta version, use it at your own risk.</P>
+<P>The following methods are supported by DB_File::DB_Database module:</P>
+<P>
+<H2><A NAME="general methods">General methods</A></H2>
+<DL>
+<DT><STRONG><A NAME="item_new">new</A></STRONG><BR>
+<DD>
+Creates the DB_File::DB_Database object, loads the info about the table form the database file.
+The first parameter could be the name of an existing file (table, in fact). 
+(A suffix .db will be appended if needed.) This method creates and initializes new object, 
+will also open the index files, if needed.
+<P>The parameters can also be specified in the form of hash: value of <STRONG>name</STRONG> is then the 
+name of the table, other flags supported are:</P>
+<P><STRONG>readonly</STRONG> open the database file and the index files only for reading</P>
+<PRE>
+    my $table = new DB_File::DB_Database &quot;dbexample&quot; or die DB_File::DB_Database-&gt;errstr;
+    my $table = new DB_File::DB_Database &quot;name&quot; =&gt; &quot;dbexample&quot;,&quot;readonly&quot; =&gt; 1;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_open">open</A></STRONG><BR>
+<DD>
+Same as new method.
+<PRE>
+    my $table = new DB_File::DB_Database;
+    $table-&gt;open (&quot;name&quot; =&gt; &quot;dbexample&quot;,&quot;readonly&quot; =&gt; 1) or die DB_File::DB_Database-&gt;errstr;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_close">close</A></STRONG><BR>
+<DD>
+Closes the object/file, no arguments.
+<P></P>
+<DT><STRONG><A NAME="item_create">create</A></STRONG><BR>
+<DD>
+Creates new database file on disk and initializes it with 0 records. Parameters to create 
+are passed as hash. Each being a reference to list: <STRONG>field_names</STRONG>, <STRONG>field_types</STRONG>. The field types 
+are specified by one letter strings (C, N). If you set some value as undefined, create will make 
+that field to C. Note that the field type does not actually take effect, it is only used when 
+indexing the field. (To know index it as a string or a number.) Please do not use field names 
+begin with ``__'', it is reserved by DB_File::DB_Database. Default permits of the file is 0640.
+<PRE>
+    my $newtable = DB_File::DB_Database-&gt;create( &quot;name&quot;        =&gt; &quot;dbexample&quot;,
+                                        &quot;field_names&quot; =&gt; [ &quot;Age&quot;, &quot;MSG&quot; ],
+                                        &quot;field_types&quot; =&gt; [ &quot;N&quot;, &quot;C&quot; ],
+                                        'permits'     =&gt; 0640 );</PRE>
+<P>The new file mustn't exist yet -- DB_File::DB_Database will not allow you to overwrite existing table. 
+Use <STRONG>drop</STRONG> (or unlink) to delete it first.</P>
+<P></P>
+<DT><STRONG><A NAME="item_drop">drop</A></STRONG><BR>
+<DD>
+This method closes the table and deletes it on disk (including associated index file, if there is any).
+<P></P>
+<DT><STRONG><A NAME="item_field_names%2C_field_types">field_names, field_types</A></STRONG><BR>
+<DD>
+Return list of field names and so on for the data file.
+<P></P>
+<DT><STRONG><A NAME="item_rows">rows</A></STRONG><BR>
+<DD>
+Return the sum number of records.
+<P></P></DL>
+<P>
+<H2><A NAME="using it as key /values(list)">Using it as key /values(list)</A></H2>
+<P>More than key/value pairs, DB_File::DB_Database can make key / <CODE>values(list)</CODE> pairs.</P>
+<DL>
+<DT><STRONG><A NAME="item_get_record">get_record</A></STRONG><BR>
+<DD>
+Returns a list of data (field values) from the specified record (a unique ID of the line,
+ not one of the field names). The first parameter in the call is the ID of the record. 
+ If you do not specify any other parameters, all fields are returned in the same order 
+ as they appear in the file. You can also put list of field names after the record number 
+ and then only those will be returned. The first value of the returned list is always 
+ the ID of the record. If ID not found, <STRONG>get_record</STRONG> returns empty list.
+<P></P>
+<DT><STRONG><A NAME="item_get_record_nf">get_record_nf</A></STRONG><BR>
+<DD>
+Instead if the names of the fields, you can pass list of numbers of the fields to read.
+<P></P>
+<DT><STRONG><A NAME="item_get_record_hash">get_record_hash</A></STRONG><BR>
+<DD>
+Returns hash (in list context) or reference to hash (in scalar context) containing 
+field values indexed by field names. The only parameter in the call is the ID. 
+The field names are returned as uppercase. The unique ID is put in to field name ``__ID''.
+<P></P></DL>
+<P>
+<H2><A NAME="writing the data">Writing the data</A></H2>
+<P>On success they return true -- the record ID. Index file is automatical updated, if needed.</P>
+<DL>
+<DT><STRONG><A NAME="item_set_record">set_record</A></STRONG><BR>
+<DD>
+As parameters, takes the ID of the record and the list of values of the fields. 
+It writes the record to the file. Unspecified fields (if you pass less than you should) 
+are set to undef/empty.
+<P></P>
+<DT><STRONG><A NAME="item_set_record_hash">set_record_hash</A></STRONG><BR>
+<DD>
+Takes number of the record and hash as parameters, sets the fields, unspecified are undefed/emptied.
+<P></P>
+<DT><STRONG><A NAME="item_update_record_hash">update_record_hash</A></STRONG><BR>
+<DD>
+Like set_record_hash but fields that do not have value specified in the hash retain their value.
+<P></P>
+<DT><STRONG><A NAME="item_delete_record">delete_record</A></STRONG><BR>
+<DD>
+Delete the <CODE>record(s)</CODE> by the ID(s). Return a number of how many records is deleted.
+<P></P></DL>
+<P>Examples of reading and writing:</P>
+<PRE>
+    $table-&gt;set_record(&quot;Judy&quot;, &quot;18&quot;, &quot;a beauty&quot;);
+    my @data = $table-&gt;get_record(&quot;Judy&quot;);
+    my $hashref = $table-&gt;get_record_hash('James');
+    $table-&gt;set_record_hash('Roger', &quot;age&quot; =&gt; 25,
+                                        &quot;msg&quot; =&gt; 'everything is easy!');</PRE>
+<P>This is a code to update field MSG in record where record ID is ``Roger''.</P>
+<PRE>
+    use DB_File::DB_Database;
+    my $table = new DB_File::DB_Database &quot;dbexample&quot; or die DB_File::DB_Database-&gt;errstr;
+    my ($id, $age) = $table-&gt;get_record(&quot;Roger&quot;, &quot;age&quot;)
+    die $table-&gt;errstr unless defined $id;
+    $table-&gt;update_record_hash(&quot;Roger&quot;, &quot;MSG&quot; =&gt; &quot;New message&quot;);</PRE>
+<P>
+<H2><A NAME="using it as table">Using it as Table</A></H2>
+<DL>
+<DT><STRONG>get_record</STRONG><BR>
+<DD>
+the same
+<P></P>
+<DT><STRONG>get_record_nf</STRONG><BR>
+<DD>
+the same
+<P></P>
+<DT><STRONG>get_record_hash</STRONG><BR>
+<DD>
+the same
+<P></P></DL>
+<P>
+<H2><A NAME="writing the data">Writing the data</A></H2>
+<P>Basically like above, but do not specify the ID, leave it to DB_File::DB_Database. 
+The ID will be sequent numbers.
+On success they return true -- the record ID. Index file is automatical updated, if needed.</P>
+<DL>
+<DT><STRONG>set_record</STRONG><BR>
+<DD>
+the same, recommand to use for updating data
+<P></P>
+<DT><STRONG>set_record_hash</STRONG><BR>
+<DD>
+the same, recommand to use for updating data
+<P></P>
+<DT><STRONG>update_record_hash</STRONG><BR>
+<DD>
+the same
+<P></P>
+<DT><STRONG>delete_record</STRONG><BR>
+<DD>
+the same
+<P></P>
+<DT><STRONG><A NAME="item_append_record">append_record</A></STRONG><BR>
+<DD>
+As parameters, takes the list of values of the fields. It append the record to the file. 
+Unspecified fields (if you pass less than you should) are set to undef/empty. 
+ID will be returned.
+<P></P>
+<DT><STRONG><A NAME="item_append_record_hash">append_record_hash</A></STRONG><BR>
+<DD>
+Unspecified fields (if you pass less than you should) are set to undef/empty. 
+ID will be returned.
+<P></P></DL>
+<P>Examples:</P>
+<PRE>
+    $table-&gt;append_record(&quot;Caroline&quot;, &quot;20&quot;, &quot;sister&quot;);
+    $table-&gt;append_record_hash('jimmy', &quot;age&quot; =&gt; 25,
+                                        &quot;msg&quot; =&gt; 'Nothing is easy!');</PRE>
+<P>
+<H2><A NAME="using index">Using Index</A></H2>
+<P>Index file is stored in DB_File BTREE. Once created, all index files will be automatically 
+opened when open the database file, and updated automatically when writing the database file.</P>
+<DL>
+<DT><STRONG><A NAME="item_create_index">create_index</A></STRONG><BR>
+<DD>
+Create index file for one field. Default permits of the index file is 0640. 'name' is the index 
+tag name, 'key' is the formula for indexing. For example:
+<PRE>
+  'key' =&gt; 'Age'            # index by the age, from young to old
+  'key' =&gt; '-Age'           # index by the age, from old to young
+  'key' =&gt; '-Age(3)+Name'   # index by the age(up to 999),then name; from old to young,then from A to Z
+  'key' =&gt; '-Age(3)+-Name'  # index by the age(up to 999),then name; from old to young,then from Z to A</PRE>
+<P>'Age(3)' is similar to 'substr(Age,0,3)', only the length of the last field name appeared in 
+the 'key' can be ommited. '+-' CAN'T be subsituded by '-'.</P>
+<PRE>
+  # Index File name will be dbexample_indexA 
+  print $table-&gt;create_index( 'name'   =&gt; 'indexA' ,
+                              'key'    =&gt; 'Age' ,       # '-Age' means reverse sort,
+                              'permits'=&gt; 0640 );</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_recreate_index">recreate_index</A></STRONG><BR>
+<DD>
+Recreate the index file. Parameter is the index name(s).
+<P></P>
+<DT><STRONG><A NAME="item_drop_index">drop_index</A></STRONG><BR>
+<DD>
+Delete the index file. Parameter is the index name(s).
+<PRE>
+  # delete Index indexA 
+  print $table-&gt;drop_index('indexA');</PRE>
+<P></P></DL>
+<P>
+<H2><A NAME="select records">Select records</A></H2>
+<P>Select matched records, using index will speed up the searching.</P>
+<DL>
+<DT><STRONG><A NAME="item_prepare_select">prepare_select</A></STRONG><BR>
+<DD>
+As parameters, pass a hash as parameters. Almost each value is a hash reference. Eg: 
+  # find people aged form 10 to 25, select the first 10 people. their 'msg' must content 'hi'
+  $table-&gt;prepare_select( ``seek''  =&gt; {'index'=&gt; 'indexA',
+                                      'from' =&gt; 10,
+                                      'to'   =&gt; 25},
+                          ``where'' =&gt; {'msg'=&gt; 'hi'},
+                          ``top''   =&gt; 10);
+<P>If no ``seek'' specified(do not use index), it will search from the first record to the last(or up to the record numbers you needed).``top'' means select the first ? records. You may use ``cut'' instead, ``cut'' =&gt; [2,6] means select from the secord matched record till to the sixth.</P>
+<P>for ``seek'', ``from'' is needed, ``to'' can be omitted(till the last).</P>
+<P>To fetch the selected record. Use get_record, get_record_nf, get_record_hash, leave the ID undef.</P>
+<P></P></DL>
+<P>Examples of selecting record:</P>
+<PRE>
+    use DB_File::DB_Database;
+    my $table = new DB_File::DB_Database &quot;dbexample&quot; or die DB_File::DB_Database-&gt;errstr;
+    my $table = new XBase &quot;names.dbf&quot; or die XBase-&gt;errstr;
+    # find people aged form 10 to 25, select the first 10 people. their 'msg' must content 'hi'
+    $table-&gt;prepare_select( &quot;seek&quot;  =&gt; {'index'=&gt; 'indexA',
+                                        'from' =&gt; 10,
+                                        'to'   =&gt; 25},
+                            &quot;where&quot; =&gt; {'msg'=&gt; 'hi'},
+                            &quot;top&quot;   =&gt; 10);
+    while ( @_ = $table-&gt;get_record(undef,'age','msg') ){
+         ### do something here
+         print ++$i,&quot;\n&quot;;
+         print &quot;@_ &quot;,&quot;\n&quot;;
+    }</PRE>
+<P>
+<H2><A NAME="dumping the content of the file">Dumping the content of the file</A></H2>
+<P>print the database file records and the index files contenting.</P>
+<DL>
+<DT><STRONG><A NAME="item_dump_data">dump_data</A></STRONG><BR>
+<DD>
+Record separator, string, newline by default.
+<P>Example of use is</P>
+<PRE>
+    $table-&gt;dump_data;</PRE>
+<P></P>
+<DT><STRONG><A NAME="item_dump_all">dump_all</A></STRONG><BR>
+<DD>
+dump the object (only for debuging) (Data::Dump is needed)
+<P></P></DL>
+<P>
+<H2><A NAME="error message">Error Message</A></H2>
+<P>if the method fails (returns false or null list), the error message can be retrieved 
+via <STRONG>errstr</STRONG> method. If the new or create method fails, you have no object so you get 
+the error message using class syntax DB_File::DB_Database-&gt;errstr().</P>
+<P>
+<HR>
+<H1><A NAME="bugs">BUGS</A></H1>
+<P>After create_index or recreate_index, file should be closed then open again. 
+or something strange will happed.</P>
+<P>if you found any bugs or make any patches, I would be appriciate to hear from you.</P>
+<P>
+<HR>
+<H1><A NAME="internal data types">INTERNAL DATA TYPES</A></H1>
+<P>Use <CODE>DB_File(DB_HASH)</CODE> to store data (key/value pairs). Value use a CSV (comma separated
+ text) to store a list. No character limits. DB_File::DB_Database do NOT need TEXT::CSV or TEXT::CSV_XS. 
+ but you can easily changed it to that modules.</P>
+<P>Index files are stored as DB_File (DB_BTREE). Key is the text, value is the ID.</P>
+<P>
+<HR>
+<H1><A NAME="locking">LOCKING</A></H1>
+<P>The locking function is a poor. Every opened file has a '_lock' file(non Windows), No 
+locking is done in Windows. </P>
+<P>But to add a locking only need to modify database_lock and database_unlock.</P>
+<P>
+<HR>
+<H1><A NAME="version">VERSION</A></H1>
+<P>0.031</P>
+<P>publish time: 2001.10.22</P>
+<P>
+<HR>
+<H1><A NAME="author">AUTHOR</A></H1>
+<P>(c) 2001 冉宁煜 / Ran Ningyu, &lt;<A HREF="mailto:rny@yahoo.com.cn">rny@yahoo.com.cn</A>&gt; <A HREF="http://perl.yesky.net/">http://perl.yesky.net/</A> or <A HREF="http://www.skybamboo.com/perl/">http://www.skybamboo.com/perl/</A> 
+at SouthEast University, Nanjing, China.</P>
+<P>All rights reserved. This package is free software; you can redistribute it and/or modify it 
+under the same terms as Perl itself.</P>
+<P>
+<HR>
+<H1><A NAME="see also">SEE ALSO</A></H1>
+<P>DB_File</P>
+
+</BODY>
+
+</HTML>

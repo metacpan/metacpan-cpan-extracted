@@ -1,0 +1,133 @@
+ ./README.defrag
+ 
+ Created by ./defrag.pl
+ on Sat Jan  6 12:16:33 2001
+
+
+
+
+  Program 'defrag.pl' uses 5 main SQL statements to retrieve record sets which
+  form the basis of generated DDL.  They are sometimes UNIONed, sometimes 
+  MINUSed, etc., to refine the record sets.  The queries are:
+
+  THE TABLESPACE -- the Tablspace named by the '--tablespace=<name>' argument.
+
+  THE CONSTRAINTS -- provides a substitute for DBA_CONSTRAINTS, sans column
+  SEARCH_CONDITION.
+
+  THE TABLES -- provides a list of Owner/Table_name's which fully reside in
+  THE TABLESPACE.  These are non-partitioned tables plus partitioned tables
+  where every partition and subpartition reside in THE TABLESPACE.  This list 
+  excludes IOT tables.
+
+  THE IOTS -- provides a list of Owner/Table_name's which fully or partially
+  reside in THE TABLESPACE.  In other words, if a partitioned IOT table has
+  even one partition in THE TABLESPACE, it is included in this list.  Reasons
+  these are in  a separate list from THE TABLES include the fact that their 
+  Primary Key is part of the CREATE TABLE syntax, and there are never other 
+  indexes on them,
+
+  THE INDEXES -- provides a list of Owner/Index_name/Table_name's for indexes
+  not belonging to THE TABLES but which fully or partially reside in THE
+  TABLESPACE.  In other words, a partitioned index with even one partition in
+  THE TABLESPACE is included in this list.
+
+  The data in THE TABLES and THE IOTS will be exported, after which members of
+  all 3 of the lists will be dropped before THE TABLESPACE is coalesced into
+  as few as 1 extent per datafile.
+
+  THE PARTITIONS -- provides Owner/Table_name/Partition_name/Segment_type's 
+  for all partitions and subpartitions not belonging to THE TABLES nor to THE
+  IOTS but which are located in THE TABLESPACE.  If any of these exist, the
+  first step will be to perform a 'safety' export of their data directly from
+  THE PARTITIONS.  Under normal circumstances, this export is not used.
+  Rather, for each partition a corresponding 'temp' table is built matching
+  the partition in structure, indexes and Primary Key.  The temp table is then
+  EXCHANGED with the partition; this results in the temp table holding the
+  data and the partition becoming empty.  The empty partition is moved to the
+  alternate tablespace before the coalescing takes place.  The temp table is
+  then treated like a member of THE TABLES (i.e., exported, dropped,
+  recreated, indexed, imported, etc.).  After the temp table has its data
+  imported, it is again EXCHANGED with its original partition, and thus the
+  data once again becomes part of the table in its new, properly sized 
+  segment.
+
+  Note that nothing is done with indexes on the tables of THE PARTITIONS.  In
+  the event that such an index or a partition thereof happens to reside in THE
+  TABLESPACE, it will still be there after all other objects have been dropped 
+  or moved eleehwhere.  Likewise, unless an alternate tablespace other than
+  THE TABLESPACE is given (or if the named alternate tablespace does not
+  exist), then the empty partition segments will also remain in THE TABLESPACE.
+  If either of these conditions occurs, the THE TABLESPACE will not be
+  completely empty when it is coalesced.  This is not necessarily a big
+  problem, it is just not as clean as when THE TABLESPACE becomes completely
+  empty before it is coalesced.
+
+  The following descriptions of the 'Statement Groups' show the sequence of
+  statments used to defragment THE TABLESPACE.  These DDL statements are in
+  3 to 5 files.  Shell scripts are provided which perform the statements in
+  the correct sequence, intermingled with the exports and imports.  The user
+  should check the execution of each shell script for errors before continuing
+  with the next step.  Within the SQL files, each group of statements is
+  delineated by a header record which refers to a 'Statement Group Number'.
+  These groups are defined below.
+  
+  EXPORT the data from THE PARTITIONS. (If all goes well, we won't use this.)
+  
+   1.  For each member of THE PARTITIONS:
+         a.  Create a Temp table.
+         b.  Add appropriate indexes.
+         c.  Add a PK, if any.
+         d.  EXCHANGE the Temp table with the partition.
+         e.  MOVE the [now empty] Temp table to the alternate tablespace.
+  
+  EXPORT the data from THE TABLES, THE IOTS and the Temp tables.
+  
+   2.  DROP the Temp tables created in Group #1.
+  
+   3.  DROP all Foreign Keys referencing THE TABLES, THE IOTS or the tables
+       of THE INDEXES.
+  
+   4.  DROP members of THE TABLES and THE IOTS.  Note: this DROPs all
+       constrints on these tables.
+
+   5.  DROP Primary Keys, Unique Constraints and Check Constraints on the
+       tables of THE INDEXES. 
+
+   6.  DROP members of THE INDEXES unless they enforce a Primay Key or Unique
+       Constraint of the same name -- those that do disappeared in Group #5.
+       Note: this will generate DROP INDEX statements for PK/UK's if the 
+       Constraint name differs from the Index name (e.g., system generated
+       names).  It won't cause any harm, but it will show an error in the log
+       file spooled in SQL*Plus; these should be ignored.  Maybe we'll fix
+       this someday.
+
+   7.  CREATE the Temp tables.
+  
+   8.  CREATE members of THE TABLES and THE IOTS.
+
+  IMPORT the data for THE TABLES, THE IOTS and the Temp tables.
+  
+   9.  CREATE indexes and PK's on the Temp tables.  EXCHANGE them with their
+       corresponding partition, and DROP the now empty Temp tables.
+  
+  10.  CREATE indexes on THE TABLES, plus THE INDEXES themselves.
+
+  11.  CREATE all Constraints on THE TABLES.
+
+  12.  CREATE Check Cosntraints on THE IOTS.
+
+  13.  CREATE Foreign Keys referencing THE TABLES, THE IOTS or the tables
+       of THE INDEXES.
+
+  14.  REBUILD non-partitioned or Global partitioned indexes on THE PARTITIONS
+       (these were marked UNUSABLE during the partition EXCHANGE).
+
+  ONLY IF PROBLEMS OCCURED DURING EXECUTION OF GROUP #1:
+
+  15.  DROP the Temp tables.
+
+  IMPORT the data for THE PARTITIONS.
+
+   --- END OF FILE ---
+

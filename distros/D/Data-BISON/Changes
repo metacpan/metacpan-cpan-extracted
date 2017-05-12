@@ -1,0 +1,11 @@
+Revision history for Data-BISON
+
+0.0.1   2007-02-13
+        Initial release.
+
+0.0.2   2007-02-14
+        Moved constants into Data::BISON::Constants.
+        Added support for schema version and various other extensions to reader.
+
+0.0.3   2007-02-23
+        Added machine readable licence.        

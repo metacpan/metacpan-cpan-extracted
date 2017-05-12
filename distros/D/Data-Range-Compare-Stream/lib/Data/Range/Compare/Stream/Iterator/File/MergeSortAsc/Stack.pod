@@ -1,0 +1,76 @@
+=pod
+
+=head1 NAME
+
+Data::Range::Compare::Stream::Iterator::File::MergeSortAsc::Stack - On Disk Stack
+
+=head1 SYNOPSIS
+
+  use Data::Range::Compare::Stream::Iterator::File::MergeSortAsc::Stack;
+
+  my $stack=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc::Stack;
+
+  $stack->push('some string');
+
+  while($stack->has_next) {
+    my $next=$stack->get_next;
+    print $next,"\n";
+  }
+
+=head1 DESCRIPTION
+
+This is a very simple module that handles data pushed onto the stack in temp files.  At runtime 2 temp files are created: One for reading one for writing.  When the read file is exausted it is deleted and the write file becomes the new read file, at wich point a new write file is created and the process starts over again.  All temp files are deleted when the object passes out of scope.
+
+=head2 OO Methods
+
+=over 3
+
+=item * my $stack=new Data::Range::Compare::Stream::Iterator::File::MergeSortAsc::Stack;
+
+Instance constructor takes one optional argument:
+
+  tmpdir=>undef|'/some/folder'
+      # tmpdir is defined its value is passed to to File::Temp->new(DIR=>$self->{tmpdir});
+
+=item * while(my $state=$stack->has_next) { ... }
+
+Returns true of there are more elements on the stack. $state can be one of 3 values: 0 indicates stack is empty, 1 indicates there is only one element left on the stack, 2 indicates there are 2 or more objects left on the stack.
+
+=item * my $next=$stack->get_next;
+
+Returns the next value from the stack if $stack->get_next is true.
+
+=item * $stack->push('some string');
+
+Pushes the string onto the stack.
+
+=item * my $fh=$stack->get_temp;
+
+Returns a temporary file created from File::Temp->new;
+
+=back
+
+=head1 SEE ALSO
+
+Data::Range::Compare::Stream::Cookbook
+
+=head1 AUTHOR
+
+Michael Shipper
+
+=head1 Source-Forge Project
+
+As of version 0.001 the Project has been moved to Source-Forge.net
+
+L<Data Range Compare|https://sourceforge.net/projects/data-range-comp/>
+L<https://sourceforge.net/projects/data-range-comp/>
+
+=head1 COPYRIGHT
+
+Copyright 2011 Michael Shipper.  All rights reserved.
+
+This library is free software; you can redistribute it and/or
+modify it under the same terms as Perl itself.
+
+=cut
+

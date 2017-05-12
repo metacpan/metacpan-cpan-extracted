@@ -1,0 +1,16 @@
+Revision history for Device-Chip-DS1307
+
+0.03    2016/12/10 23:19:48
+        [CHANGES]
+         * Remove legacy redirection docs from Device::BusPirate::Chip::DS1307
+
+0.02    2015/11/13 00:35:20
+        [CHANGES]
+         * Renamed from Device::BusPirate::Chip::DS1307
+         * Changed to implement Device::Chip interface
+
+Previously, this distrubtion was called Device-BusPirate-Chip-DS1307
+
+0.01    2015/04/06 15:12:27
+        First version, released on an unsuspecting world.
+

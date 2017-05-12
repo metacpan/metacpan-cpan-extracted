@@ -1,0 +1,16 @@
+Changes
+E2fsprogs.xs
+inc/Devel/CheckLib.pm
+lib/Device/Blkid/E2fsprogs.pm
+Makefile.PL
+MANIFEST
+MANIFEST.skip
+ppport.h
+README
+t/00-load.t
+t/01-blkid_cache.t
+t/02-dev_size.t
+t/03-dev_tag.t
+t/img/ext3.fs
+typemap
+META.yml                                 Module meta-data (added by MakeMaker)

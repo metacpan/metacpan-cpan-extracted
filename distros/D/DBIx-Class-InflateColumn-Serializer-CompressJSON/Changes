@@ -1,0 +1,13 @@
+Revision history for DBIx-Class-InflateColumn-Serializer-CompressJSON
+
+0.004   2012-12-18 Nicolas Oudard
+        update manifest
+
+0.003   2012-12-06 Nicolas Oudard
+        make special mysql conversion type with option mysql in add column function
+
+0.002   20121023/170200
+        Add test for compression JSON
+
+0.001   20120928/163000
+        First version, released on an unsuspecting world.

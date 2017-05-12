@@ -1,0 +1,84 @@
+			  =================
+			  Decision::Depends
+			  =================
+
+NAME
+    Decision::Depends - Perform actions based upon file dependencies
+
+DESCRIPTION
+     Decision::Depends is a module which simplifies the creation
+     of procedures with intermediate steps which can be skipped
+     if certain dependencies are met.  Think of it as a
+     procedural version of make.
+
+     Decision::Depends is useful when there are several steps in
+     a process, each of which depends upon the last.  If the
+     process is interrupted, or if it is to be redone with
+     changes to parameters in later steps, and if intermediate
+     results can be kept, then Decision::Depends can insure that
+     only the minimal number of steps be redone.
+
+     Each step must result in a tangible product (a file).  For
+     complicated steps with many products the step's successful
+     completion may be indicated by creating an empty file whose
+     existance indicates completion.  This file (a "status" file
+     in Decision::Depends terminology) can be automatically
+     created if requested.
+
+     Decision::Depends determines if the product for a given step
+     is older than any files required to produce it.  It can also
+     check whether the contents of a file have changed since the
+     product was last created.  This is useful in the case where
+     a configuration file must be created anew each time, but
+     results in action only if changed since the product was last
+     created. Finally, it can determine if a variable's value has
+     changed since the product was last created.
+
+
+DEPENDENCIES
+
+	YAML
+	Test::More
+	Data::Compare
+	Tie::IxHash
+	Clone
+
+INSTALLATION
+
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+CAVEATS
+
+    The tests poke at the innards. Be careful if you use them as
+    examples that you don't use undocumented interfaces, as they may
+    change (in particular, don't use $Decision::Depends::self).
+
+
+COPYRIGHT
+
+    Copyright (C) 2008 Smithsonian Astrophysical Observatory
+
+    This file is part of Decision::Depends
+
+    Decision-Depends is free software: you can redistribute it and/or
+    modify it under the terms of the GNU General Public License as
+    published by the Free Software Foundation, either version 3 of the
+    License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+    General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see
+    <http://www.gnu.org/licenses/>.
+
+
+AUTHOR
+
+    Diab Jerius ( djerius@cpan.org )
+

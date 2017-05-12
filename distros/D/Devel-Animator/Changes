@@ -1,0 +1,11 @@
+Revision history for Perl extension Devel::Animator.
+
+1.00  Thu May 02 12:26:09 EST 2014
+  - initial release
+
+2.20  Thu Nov 02 12:26:09 EST 2014
+  - setup errors
+
+2.30  Thu Jan 02 14:52:00 EST 2015
+  - remove, reverse animation, include line counts
+    for code executed more then once

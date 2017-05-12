@@ -1,0 +1,94 @@
+NAME
+    Dancer2::Plugin::Queue::IronMQ - Dancer2::Plugin::Queue backend using
+    IronMQ
+
+VERSION
+    version 0.002
+
+SYNOPSIS
+      # in config.yml
+
+      plugins:
+        Queue:
+          default:
+            class: IronMQ
+            options:
+              config: <iron json cfg file>
+              queue: <queue-name>
+              timeout: <seconds>
+              wait: <seconds>
+
+      # in Dancer2 app
+
+      use Dancer2::Plugin::Queue;
+
+      get '/' => sub {
+        queue->add_msg( $data );
+      };
+
+DESCRIPTION
+    This module implements a Dancer2::Plugin::Queue using
+    IO::Iron::IronMQ::Client.
+
+USAGE
+    See documentation for Dancer2::Plugin::Queue.
+
+ATTRIBUTES
+  config
+    IronMQ uses a JSON config file to hold the project_id and token, and
+    other config items if necessary. By default iron.json. These config
+    items can also be written individually under *connection_options*. Must
+    be supplied.
+
+  queue
+    Name of the queue. Must be supplied.
+
+  timeout
+    After timeout (in seconds), item will be placed back onto queue. You
+    must delete the message from the queue to ensure it does not go back
+    onto the queue. If not set, value from queue is used. Default is 60
+    seconds, minimum is 30 seconds, and maximum is 86,400 seconds (24
+    hours).
+
+  wait
+    Time to long poll for messages, in seconds. Max is 30 seconds. Default
+    0.
+
+NOTES
+    My thanks to https://metacpan.org/author/DAGOLDEN who's
+    Dancer2::Plugin::Queue::MongoDB I used as an example when building.
+
+SEE ALSO
+    *   Dancer2::Plugin::Queue
+
+    *   IO::Iron
+
+    *   IO::Iron::Applications
+
+SUPPORT
+  Bugs / Feature Requests
+    Please report any bugs or feature requests through the issue tracker at
+    <https://github.com/mikkoi/dancer2-plugin-queue-ironmq/issues>. You will
+    be notified automatically of any progress on your issue.
+
+  Source Code
+    This is open source software. The code repository is available for
+    public review and contribution under the terms of the license.
+
+    <https://github.com/mikkoi/dancer2-plugin-queue-ironmq>
+
+      git clone https://github.com/mikkoi/dancer2-plugin-queue-ironmq.git
+
+AUTHOR
+    Mikko Koivunalho <mikkoi@cpan.org>
+
+CONTRIBUTOR
+    Mikko Johannes Koivunalho <mikko.koivunalho@iki.fi>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2017 by Mikko Koivunalho.
+
+    This is free software, licensed under:
+
+      The Apache License, Version 2.0, January 2004
+

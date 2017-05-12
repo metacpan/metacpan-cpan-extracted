@@ -1,0 +1,5 @@
+code.pl:1:main::foo 1 800
+code.pl:2:main::bar 1 200
+code.pl:2:main::bar,code.pl:5:main::foo 2 800
+code.pl:3:main::zog,code.pl:1:main::bar 2 686
+code.pl:3:main::zog,code.pl:5:main::bar 2 171

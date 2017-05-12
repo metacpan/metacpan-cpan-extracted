@@ -1,0 +1,43 @@
+Revision history for Perl module DateTime::Calendar::Mayan
+
+0.0601 Wed Mar 17 21:56:08 HST 2004
+    - fix test failures
+
+0.06 Tue Jul 29 12:31:29 HST 2003
+    - add nanosecond preservation
+    - fix undef being returned from utc_rd_values for rd_secs when not preserving from an object
+
+0.05 Sun Apr 27 00:52:06 HST 2003
+    - fixed pod formatting
+    - added haab and tzolkin output
+    - split pod into it's own file
+    - more docs/tests
+
+0.04 Tue Apr  8 14:27:22 HST 2003
+    - added Eugene's suggestion for dealing with from_object TZ's
+    - all mutators and accessors/mutators (sorry Dave) now return self
+    - Mayan years now correctly supported (on output)
+    - input validation for mutators that accept hashes
+    - add today constructor, clone
+    - set_ functions aliased to accessors/mutators (i.e. set_baktun to baktun) 
+    - add add_duration/subtract_duration that use DT::Duration
+    - add epoch specifier in new
+    - add set_mayan_epoch, epoch and from_epoch
+    - add mayan_epoch method that returns a DT:C:Mayan object
+    - many more tests
+    - Module::Build
+
+0.03 Thu Apr  3 22:43:53 HST 2003
+    - undo passed objects are now required support a clone method
+    - add accessors/mutators
+    - add subtract/add/set
+    
+0.02 Thu Apr  3 17:39:13 HST 2003
+    - fixed case where a passed objects TZ is not UTC
+    - passed objects are now required support a clone method
+    - spelling fixes/cleanups for POD
+    - preserve seconds when chaining
+    - default separator change
+
+0.01 Tue Apr  1 21:20:58 2003
+    - original version; created by ExtUtils::ModuleMaker 0.31229

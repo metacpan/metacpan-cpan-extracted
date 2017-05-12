@@ -1,0 +1,25 @@
+---
+abstract: 'Template::Sandbox wrapper for Dancer'
+author:
+  - 'Sam Graham <libdancer-template-templatesandbox-perl@illusori.co.uk>'
+build_requires:
+  Test::More: 0
+configure_requires:
+  Module::Build: 0.23
+dynamic_config: 0
+generated_by: 'Module::Build version 0.3603'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Template-TemplateSandbox
+provides:
+  Dancer::Template::TemplateSandbox:
+    file: lib/Dancer/Template/TemplateSandbox.pm
+    version: 1.00
+requires:
+  Dancer: 0
+  Template::Sandbox: 1.03
+resources:
+  license: http://dev.perl.org/licenses/
+version: 1.00

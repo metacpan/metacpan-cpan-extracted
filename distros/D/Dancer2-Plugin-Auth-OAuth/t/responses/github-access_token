@@ -1,0 +1,4 @@
+HTTP/1.1 200 OK
+Content-Type: application/x-www-form-urlencoded; charset=UTF-8
+
+access_token=jhj5j4j44jh29dn&scope=user%2Cgist&token_type=bearer&

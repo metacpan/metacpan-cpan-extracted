@@ -1,0 +1,29 @@
+---
+name: DateTime-Event-Klingon
+version: 1.0.1
+author:
+  - 'Jaldhar H. Vyas <jaldhar@braincells.com>'
+abstract: Determine events of Klingon cultural significance
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+requires:
+  Carp: 0
+  Filter::Util::Call: 0
+  UNIVERSAL: 0
+build_requires:
+  DateTime: 0
+  Module::Signature: 0
+  Pod::Coverage: 0.18
+  Pod::Usage: 0
+  Test::More: 0
+  Test::Pod: 1.22
+  Test::Pod::Coverage: 1.08
+provides:
+  DateTime::Event::Klingon:
+    file: lib/DateTime/Event/Klingon.pm
+    version: 1.0
+generated_by: Module::Build version 0.280801
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

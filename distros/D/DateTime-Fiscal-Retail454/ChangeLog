@@ -1,0 +1,56 @@
+2015-09-14 13:17  jim
+
+	* lib/DateTime/Fiscal/Retail454.pm: Deprecated this module.
+      Please use DateTimeX::Fiscal::Fiscal5253 instead.
+
+2012-07-05 20:27  jim
+
+	* lib/DateTime/Fiscal/Retail454.pm: Added code to differentiate
+	  between versions of DateTime as needed for
+	  constructors to properly add our private attributes.
+
+2012-07-05 20:26  jim
+
+	* t/90_misc.t: Added explanatory comments.
+
+2012-07-05 07:25  jim
+
+	* t/01_sanity.t: Changed how number of tests is calculated.
+
+2012-07-05 07:01  jim
+
+	* t/r454_testdata: Updated to current calendars available at NRF
+
+2006-12-02 00:25  jim
+
+	* ChangeLog: Rename "Changes" to "ChangeLog" for easier use of
+	  svn2cl
+
+2006-12-02 00:21  jim
+
+	* CREDITS: Added proper ackowledgement for National Retail
+	  Federation
+
+2006-12-02 00:17  jim
+
+	* Makefile.PL: Changed AUTHOR email
+
+2006-12-02 00:12  jim
+
+	* t/30_periodmonths.t: Tests for r454_period_month method
+
+2006-12-02 00:10  jim
+
+	* lib/DateTime/Fiscal/Retail454.pm: Added r454_period_month
+	  functionality
+	  Expanded documentation of r454 year start algorythm
+	  Better acknowlegements in SEE ALSO section
+
+2006-11-30 20:45  jim
+
+	* ., CREDITS, Changes, LICENSE, MANIFEST, Makefile.PL, README,
+	  TODO, lib, lib/DateTime, lib/DateTime/Fiscal,
+	  lib/DateTime/Fiscal/Retail454.pm, t, t/00_load.t, t/01_sanity.t,
+	  t/10_constructors.t, t/11_clone.t, t/20_truncate.t, t/90_misc.t,
+	  t/99_pod.t, t/r454_testdata: Initial project import
+

@@ -1,0 +1,37 @@
+Revision history for DateStamp
+
+1.0.4 Thu Apr  6 12:34:15 CDT 2006 
+      Changed a "like" statement in the test case. No changes to actual
+      code, though.
+
+1.0.3 Fri Jan 13 16:55:15 CST 2006 
+      Ah, a new year. A new month. A slew of bugs revealed. Fixed some
+      problems with how the month/day/year was being looked up. No
+      changes to any of the interface methods.
+
+
+1.0.2  Tue Nov 29 19:23:49 CST 2005
+       Fixed %day_alpha error. Renamed entire release from
+       "DateTime::Current" to "DateStamp" because of namespace
+       conflicts. !!! NOTE !!! If--for any reason--you have version
+       1.0.0/1.0.1 of DateTime::Current, please delete it and replace with
+       current version of DateStamp.
+ 
+       >> modules/DateTime-Current-v1.0.0.meta 
+       >> Scheduled for deletion (due at Fri, 02 Dec 2005 15:25:30 GMT)
+
+       >> modules/DateTime-Current-v1.0.0.readme
+       >> Scheduled for deletion (due at Fri, 02 Dec 2005 15:25:30 GMT)
+
+       >> modules/DateTime-Current-v1.0.0.tar.gz
+       >> Scheduled for deletion (due at Fri, 02 Dec 2005 15:25:30 GMT)
+
+
+1.0.1  Mon Nov 28 14:47:30 CST 2005
+       Squashed small bug in _hour value calculation. Initial release to
+       CPAN.
+
+
+1.0.0  Packaged and ready to test/submit.
+       
+

@@ -1,0 +1,67 @@
+#!/usr/bin/perl -w
+use strict;
+use base 'Dyer::CLI';
+use File::PathInfo::Ext;
+
+my $o = gopts('f');
+my $files = argv_aspaths() or man();
+
+scalar @$files or man();
+
+my $f = new File::PathInfo::Ext;
+for (@$files){
+	$f->set($_) or warn("bad file? : $_") and next;
+	$f->is_file or warn("is not file: $_") and next;
+	
+	my $oldname = $f->filename;
+	my $newname = $f->filename_only;
+
+	$newname=~s/\s+/_/g;
+	$newname=~s/^\s+|\s+$//g;
+	$newname=~s/[^\w\.\_\-]+//sig;
+	my $x='';
+	if (-e $f->abs_loc."/$newname.".$f->ext){
+		while ( -e $f->abs_loc."/$newname$x.".$f->ext) {		
+			$x++;
+		}
+	}	
+
+	$newname = "$newname$x.".$f->ext;
+	
+	unless( $o->{f} ){
+		yn("Rename [$oldname] to [$newname]?") or next;		
+	}
+
+	$f->rename($newname);
+}
+
+no warnings;
+
+sub main::man {
+	print STDERR `perldoc $0`;
+	exit;
+}
+
+=pod
+
+=head1 NAME
+
+renamerfpi
+
+=head1 DESCRIPTION
+
+=head1 OPTIONS
+
+	-f force, no prompt
+
+=head1 USAGE
+
+	renamerfpi ./files*jpg
+	renamerfpi -f ./files*jpg
+	
+
+
+=cut
+
+
+

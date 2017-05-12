@@ -1,0 +1,6 @@
+Revision history for Perl extension DBIx::Class::InflateColumn::DateTime::Duration.
+
+0.01  Thu Jun 17 20:13:45 2010
+	- original version; created by h2xs 1.23 with options
+		-AX DBIx::Class::InflateColumn::DateTime::Duration
+

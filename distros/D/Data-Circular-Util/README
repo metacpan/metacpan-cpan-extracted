@@ -1,0 +1,17 @@
+SYNOPSIS
+
+DESCRIPTION
+
+SEE ALSO
+
+    SHARYANTO
+
+    Data::Structure::Util has the XS version of has_circular_ref which is
+    at least around 3 times faster than this module's implementation which
+    is pure Perl. Use that instead if possible (in some cases,
+    Data::Structure::Util fails to build and this module provides an
+    alternative for that function). Data::Structure::Util does not the
+    equivalent of this module's clone_circular_refs though.
+
+    This module is however much faster than Devel::Cycle.
+

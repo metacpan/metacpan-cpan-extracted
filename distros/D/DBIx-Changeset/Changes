@@ -1,0 +1,45 @@
+Revision history for DBIx-Changeset
+
+1.11	2010-11-12
+- Fixed up the File::ShareDir errors, needs to use dist_file apparently..
+- Remove use of the Shell module, perl critic doesnt like this
+
+1.10	2010-08-23
+- Fixed Loader::Pg -p port error ("could not connect on port <password>");
+
+1.09	2008-11-19
+ - Added missing test config file
+
+1.08	2008-10-29
+ - Add missing prereqs: Path::Class, File::ShareDir
+
+1.07	2008-09-24
+ - Removed the use of Dumper for printing messages
+
+1.06	2008-07-21
+ - rename env var DBIX_UPDATE_CONFIG to DBIX_CHANGESET_CONFIG for consistency
+ - add missing prereq Class::Accessor
+ - replace Slurp module with File::Slurp
+ - use default perl in path (/usr/bin/env perl)
+
+1.05	2008-04-01
+ - use data phrasebook in History objects to support different sql dialects
+ - use DateTime to produce a valid timestamp string for sqlite,mysql and postgres
+ - updated history tests to optionaly test either all of sqlite,mysql and postgres
+ - rename original dbix_update.yml to dbix_changeset.yml
+ - cleanup output for readability
+
+1.04	2008-03-08
+ - add loader support for PostgreSQL (via psql)
+
+1.03    2007-12-10
+ - fix db_host to update over a network
+
+1.02	2007-09-21
+ - rename dbix_update.pl to dbix_changeset.pl
+ - tests+fix for rerunning changesets that have been updated.
+ - create command now supports adding to version control ("vcs", "vcsadd" options)
+ - documentation cleanup
+ 
+1.01    2007-03-08
+ - first release version

@@ -1,0 +1,403 @@
+#!/usr/bin/env perl
+
+=head1 NAME
+
+dado - Data::Downloader command-line interface.
+
+=head1 SYNOPSIS
+
+    dado [DEBUG OPTIONS] <config|disk|file|repository|linktree|feed> ACTION [ACTION OPTIONS]
+    dado [DEBUG OPTIONS] <disks|files|repositories|linktrees|feeds> [CRITERIA] ACTION [ACTION OPTIONS]
+
+    # Examples :
+    dado config init --file flickr.yml
+    dado feeds refresh --tags apples
+    dado files download
+
+    dado disk usage --summary --human
+    dado feeds refresh
+    dado files dump
+    dado files download
+    dado linktrees rebuild
+    dado repositories dump_stats
+
+    dado feeds refresh --esdt OMTO3 --startdate 2008-01-01 --archiveset 10003 --count 3
+    dado linktrees --root '/linktree/root' rebuild
+    dado files --md5 a46cee6a6d8df570b0ca977b9e8c3097 download --fake 1
+    dado disks --root '/tmp/foo' usage --human
+    dado feeds --name georss refresh --esdt OMTO3 --download 1
+
+    dado --debug root feeds refresh
+    dado --trace root feeds refresh
+    dado --progress_bars linktrees rebuild
+
+=head1 QUICK START
+
+To use dado to download some scientific data files, here are a few sample repositories
+and sequences of commands to try out :
+
+Example 1 :
+
+    cat > gsics.conf
+    name: gsics
+    storage_root: /tmp/datastore
+    cache_max_size: 2048000
+    cache_strategy: LRU
+    feeds:
+      name: all
+      feed_template: http://gsics.nesdis.noaa.gov/datacast/all.xml
+      file_source:
+        filename_xpath: title
+        url_xpath: enclosure/@url
+      metadata_sources:
+        - name: starttime
+          xpath: datacasting:customElement[@name="validity_start_time"]/@value
+        - name: endtime
+          xpath: datacasting:customElement[@name="validity_end_time"]/@value
+    linktrees:
+      - condition: ~
+        path_template: '<starttime:%Y/%m/%d>'
+        root: /tmp/datalinks
+    ^D
+
+    $ dado config init --filename ./gsics.conf
+    $ dado feeds refresh
+    $ dado files download
+    $ find /tmp/data* -not -type d
+
+Example 2 :
+
+    cat > podaac.conf
+    ---
+    name: podaac
+    storage_root: /tmp/datastore
+    cache_max_size: 2048000
+    cache_strategy: LRU
+    feeds:
+      name: asop2
+      feed_template: http://podaac.jpl.nasa.gov/datacast/PODAAC-ASOP2-25X01-rss.xml
+      file_source:
+        filename_xpath: title
+        url_xpath: enclosure/@url
+      metadata_sources:
+        - name: starttime
+          xpath: datacasting:acquisitionStartDate
+        - name: endtime
+          xpath: datacasting:acquisitionEndDate
+    linktrees:
+      - condition: ~
+        path_template: '<starttime:%Y/%m/%d>'
+        root: /tmp/datalinks
+    ^D
+
+    $ dado config init --filename ./podaac.conf
+    $ dado feeds refresh
+    $ dado files download
+    $ find /tmp/data* -not -type d
+
+=head1 DESCRIPTION
+
+This is the command line interface for L<Data::Downloader>.
+It is used to manage a repository of files, file metadata, and symbolic links.
+
+An invocation of dado is of one of the forms described in the SYNOPSIS above.
+The valid values for DEBUG OPTIONS, CRITERIA, ACTION, and ACTION OPTIONS are
+described below.
+
+The options available when using dado commands correspond to the methods
+available within the corresponding L<Data::Downloader> classes.  Those
+classes are linked to in the headings below.
+
+=head1 DEBUG OPTIONS
+
+These are options to control the verbosity of the output.  See
+L<Log::Log4perl::CommandLine> for a complete description.  Examples :
+
+    dado --debug root ...  # show debug messages
+    dado --trace root ...  # show trace messages
+
+Note that a logging category (e.g. "root"), must be given,
+to disambiugate the logging category from the ITEM or ITEMS.
+
+Additionally, to turn on progress bars, use the --progress_bars
+option (which takes no arguments).  e.g.
+
+    dado --progress_bars linktrees rebuild
+    dado --progress_bars feeds refresh
+
+=head1 ACTION
+
+The valid ACTIONs depend on what item is selected.
+
+=over
+
+=item L<config|Data::Downloader::Config>
+
+Actions : init, update.
+
+Action options : --file
+
+The configuration is stored in an sqlite database located
+in $HOME/.data_downloader.db by default (see L<Data::Downloader::DB>).
+
+Examples:
+
+    dado config init --file my_config_file.txt
+    dado config update --file my_new_config_file.txt
+
+The former creates a new configuration, the latter updates
+an existing one.  Updating a configuration will _not_ make
+any changes to files that have already been downloaded (or
+their symlinks).
+
+The configuration file format is described in detail in L<Data::Downloader::Config>.
+
+=item L<disk|Data::Downloader::Disk>
+
+Actions : --usage
+
+Action options : --summary, --human
+
+=item L<file|Data::Downloader::File>
+
+Actions : download
+
+Action options : --filename, --repository
+
+If the file was in an RSS feed, then the url for this file is
+stored in the database and no other action options are necessary.  However, if
+this is a new file, then additional options may be necessary in order to
+construct the url.  In this case, for instance, if the config file contains :
+
+   name: example_repository
+   file_url_template: 'http://example.com/<url_parameter>/<filename>'
+
+Then this command:
+
+   dado file download \
+         --repository example_repository \
+         --url_parameter 12345 \
+         --filename something.txt
+
+will retrieve http://example.com/12345/something.txt and store
+it under the "storage_root" (also given in the config file).
+
+Symbolic links will be created to this file, as specified, e.g.
+
+    linktrees:
+    - root: /tmp/put_all_files_here
+      condition: ~
+      path_template: '<filename>'
+
+would result in a symlink from /tmp/put_all_files_here/something.txt
+to the location of the actual file.
+
+=item L<file|Data::Downloader::File>s
+
+Valid actions: dump, download, makelinks, remove, check
+
+See L<Data::Downloader::File> for the behavior of each
+of these actions.
+
+CRITERIA may refer to file columns
+(see the L<schema|Data::Downloader/SCHEMA>) or metadata e.g.
+
+  dado files --filename abcdefg.hij dump
+  dado files --on_disk 0 download
+  dado files --esdt XYZPDQ remove
+  dado files check
+
+When giving CRITERIA, the option value may be
+more complex, e.g.
+
+  dado files --on_disk 0 --md5 'like: a%' dump
+
+would select all files whose md5sum begins with "a".
+The value is converted from YAML into a perl data structure
+which is then passed to L<Rose::DB::Object::QueryBuilder>
+to create a query, so things like this are possible :
+
+  # esdt OML1BCAL, orbits 1000-2000 inclusive
+  dado files --esdt OML1BCAL --orbit '[ge: 1000, le: 2000]' dump
+
+  # esdt not equal to OML1BCAL
+  dado files --'!esdt' OML1BCAL dump
+
+Also the skip_re option may be passed to dump in order to
+skip a regex of keys, e.g.
+
+  dado files --esdt OML1BCAL dump --skip_re 'log_entries|atime'
+
+=item L<feed|Data::Downloader::Feed>s
+
+Actions : refresh
+
+Action options : The options will correspond to the variables
+in the template for any RSS feeds.  e.g. this configuration :
+
+  feed_template: 'http://example.com/<param1>/<param2>/feed.xml'
+
+would correspond to this command line :
+
+  dado feeds refresh --param1 12345 --param2 6789
+
+Two more options are:
+
+  --download 1   # download the files
+  --fake 1       # make dummy files (for testing)
+
+Values may be omitted from the command line if they have default
+values set like so :
+
+  feed_parameters:
+    - name: param1
+      default_value: 12345
+
+If one of the parameters is named "count", this will limit
+the number of files to download.
+
+=item L<linktree|Data::Downloader::Linktree>s
+
+Actions : rebuild
+
+This will rebuild all the trees of symlinks (i.e. remove them all and
+re-create them).
+
+When passing CRITERIA, the options may refer to any of the fields
+for linktrees, e.g.
+
+    dado linktrees --root '/linktree/root' rebuild
+    dado linktrees --root 'like: %abc%' rebuild
+
+=item L<repositories|Data::Downloader::Repository>
+
+Repositories are directory trees which contains all of the
+files that been downloaded.  The only valid action is "dump_stats".
+
+=back
+
+=head1 SEE ALSO
+
+L<Data::Downloader>
+
+=cut
+
+BEGIN {
+    our $useProgressBars = grep /--progress_bars/, @ARGV;
+    @ARGV = grep { $_ !~ /--progress_bars/ } @ARGV if $useProgressBars;
+
+}
+use Pod::Usage::CommandLine;
+use Pod::Usage qw/pod2usage/;
+use Data::Dumper;
+use Data::Downloader ( ("-use_progress_bars") x $useProgressBars );
+use YAML::XS qw/Dump Load/;
+use Log::Log4perl::CommandLine (':all', ':loginit' => <<"EOT");
+           log4perl.rootLogger = INFO, Screen
+           log4perl.appender.Screen = Log::Log4perl::Appender::ScreenColoredLevels
+           log4perl.appender.Screen.layout = Log::Log4perl::Layout::PatternLayout
+           log4perl.appender.Screen.layout.ConversionPattern = @{[ $ENV{HARNESS_ACTIVE} ? '#' : '' ]} [%-5p] %d %F{1} (%L) %m %n
+EOT
+
+use warnings;
+use strict;
+
+INIT {
+    my $str = "$0 @ARGV";
+    $str =~ s/password (\S+)/password=XXXXX/;
+    $0 = $str;
+}
+
+BEGIN  {
+    our $VERSION = $Data::Downloader::VERSION;
+}
+
+&main;
+
+sub main {
+    my @command = @ARGV;
+    my ($items,$action);
+    my %args;
+    my %criteria;
+    my %valid = ( config       => { init       => 1,
+				    update     => 1 },
+                  feeds        => { refresh    => 1 },
+                  file         => { download   => 1 },
+                  files        => { dump       => 1,
+				    remove     => 1,
+				    purge      => 1,
+				    download   => 1,
+				    check      => 1,
+				    makelinks  => 1,
+				    list       => 1 },
+		  linktrees    => { rebuild    => 1 },
+                  repositories => { dump_stats => 1 },
+                  disk         => { usage      => 1 },
+                );
+    my $which = \%criteria;
+    while ($_ = shift @command) {
+        s/^--// and do {
+            $which->{$_} = (
+                defined($command[0]) && $command[0] !~ /^--/ ? # lookahead
+                shift @command : # not a boolean
+                1                # boolean
+            );
+            next;
+        };
+        !defined($items)  and do { $items  = $_;  next; };
+        !defined($action) and do { $action = $_; $which = \%args; next; };
+    }
+
+    die "Type 'perldoc dado', or 'dado --help' for documentation.\n"
+         unless $items && $action && $valid{$items}{$action};
+
+    my %manager = (
+        feeds        => "Data::Downloader::Feed::Manager",
+        files        => "Data::Downloader::File::Manager",
+        linktrees    => "Data::Downloader::Linktree::Manager",
+        repositories => "Data::Downloader::Repository::Manager",
+    );
+    my $manageable = join '|', keys %manager;
+    my %manager_args = ( files => { with_objects => "file_metadata" } );
+
+    for ($items) {
+
+        /^(config|file|disk)$/ and do {
+            die "Cannot pass CRITERIA to $_.\nType $0 --help for help.\n" if keys %criteria;
+            my $class = "Data::Downloader::".(ucfirst $_);
+            $class->$action(%args);
+        };
+
+        /^$manageable$/ and do {
+            my @query;
+            for my $field (keys %criteria) {
+                my $val = eval { Load $criteria{$field} };
+                if ($@) {
+                    die "Error '$criteria{$field}' is not valid yaml.\n";
+                }
+                if (!ref($val)) {
+                    push @query, ( $field, $val );
+                } elsif (ref($val) eq 'HASH') {
+                    push @query, ( $field, $val );
+                } elsif (ref($val) eq 'ARRAY') {
+                    push @query, ( $field, $_ ) for @$val;
+                } else {
+                    die "don't know how to handle ".ref($val)." ($criteria{$field}) : ".Dumper($val);
+                }
+            }
+            my $method = "get_${items}";
+            my $objs = $manager{$_}->$method(
+                query => \@query,
+                %{ $manager_args{$items} }
+            );
+            my $db;
+            my $i = 1;
+            for my $obj (@$objs) {
+                $obj->$action(%args);
+            }
+        };
+    }
+}
+
+1;
+

@@ -1,0 +1,13 @@
+
+
+This archive contains the distribution Data-Visitor,
+version 0.30:
+
+  Visitor style traversal of Perl data structures
+
+This software is copyright (c) 2013 by Yuval Kogman.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+

@@ -1,0 +1,33 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+lib/Data/Range/Compare.pm
+lib/Data/Range/Compare.pod
+lib/Data/Range/Compare/Cookbook.pod
+lib/Data/Range/Compare/Cookbook/Recipe_a_to_z.pod
+lib/Data/Range/Compare/Cookbook/Recipe_subclass_a_to_z.pod
+lib/Data/Range/Compare/Cookbook/Instance_and_Constants.pod
+lib/Data/Range/Compare/Cookbook/Recipe_DateTime.pod
+t/Constructor.t
+t/Data-Range-Compare.t
+t/cmp_ops.t
+t/next_previous.t
+t/overlap.t
+t/poc.t
+t/process.t
+t/sort_funcs.t
+t/start_end.t
+t/subclass.t
+t/contains.t
+t/grep_overlap.t
+examples/example_a.pl
+examples/Recipe_subclass_a_to_z.pl
+examples/a_to_z.pm
+examples/example_a.pl
+examples/example_a_to_z.pl
+examples/DateTime.pl
+examples/pod_Comparing_Range_Intersections.pl
+examples/pod_Comparing_Range_Intersections_only.pl
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

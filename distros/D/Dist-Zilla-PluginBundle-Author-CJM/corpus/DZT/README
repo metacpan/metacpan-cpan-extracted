@@ -1,0 +1,32 @@
+DZT-Sample version {{$version}}, released {{$date}}
+
+
+This module is for testing purposes only.
+
+
+
+INSTALLATION
+
+To install this module, run the following commands:
+
+{{ $t->build_instructions }}
+
+
+
+DEPENDENCIES
+
+{{ $t->dependency_list }}
+
+
+
+CHANGES
+    Here's what's new in version {{$version}} of DZT-Sample:
+    (See the file "Changes" for the full revision history.)
+
+{{$changes}}
+
+
+
+COPYRIGHT AND LICENSE
+
+{{ local $_ = $zilla->license->notice; chomp; $_ }}

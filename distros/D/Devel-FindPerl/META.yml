@@ -1,0 +1,39 @@
+---
+abstract: 'Find the path to your perl'
+author:
+  - 'Leon Timmermans <leont@cpan.org>, Randy Sims <randys@thepierianspring.org>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.025, CPAN::Meta::Converter version 2.143240'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Devel-FindPerl
+provides:
+  Devel::FindPerl:
+    file: lib/Devel/FindPerl.pm
+    version: '0.014'
+recommends:
+  ExtUtils::Config: '0.007'
+requires:
+  Carp: '0'
+  Cwd: '0'
+  Exporter: '5.57'
+  File::Basename: '0'
+  File::Spec::Functions: '0'
+  IPC::Open2: '0'
+  Scalar::Util: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=Devel-FindPerl
+  repository: git://github.com/Leont/devel-findperl.git
+version: '0.014'
+x_contributors:
+  - 'cm-perl <cm-perl@users.noreply.github.com>'
+  - 'Leon Timmermans <fawaka@gmail.com>'

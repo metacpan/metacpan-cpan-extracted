@@ -1,0 +1,275 @@
+package Data::MuForm::Manual::Intro;
+# ABSTRACT: introduction to using MuForm
+
+__END__
+
+=pod
+
+=encoding UTF-8
+
+=head1 NAME
+
+Data::MuForm::Manual::Intro - introduction to using MuForm
+
+=head1 VERSION
+
+version 0.04
+
+=head1 SYNOPSIS
+
+L<Manual Index|Data::MuForm::Manual>
+
+Data::MuForm is a data validation and form handling package written in Moo.
+It is a conversion of FormHandler to Moo. The core behavior is the same,
+but things have been regularized, simplified and in some cases re-written.
+Rendering is substantially changed.
+
+A MuForm 'validator' or 'form' is a Perl subclass of L<Data::MuForm>. In your
+class you define fields and validators. Because it's a Perl class written with
+Moo, you have a lot of flexibility and control.
+
+You can validate with Perl methods or Type::Tiny or Moose type constraints;
+you can use your own validation libraries. You can define your own field classes
+that perform specialized validation.
+
+=head1 Basics
+
+=head2 Create a validator/form class
+
+The most common way of using MuForm is to create a new package. You
+must 'use' Moo and Data::MuForm::Meta and 'extend' MuForm.:
+
+    package MyApp::Form::Sample;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+Then you add some fields with 'has_field', and a field 'type' (the short
+name of the field package). (Fields with no type have type 'Text'.)
+
+    has_field 'foo';
+    has_field 'bar' => ( type => 'Select' );
+
+For non-form validators there are field types such as Text, Integer,
+List, Compound, Float, Currency. For forms, common field types
+are Text, Select, Checkbox, Submit, Hidden, Reset, TextArea.
+See L<Data::MuForm::Manual::Fields> for more information.
+
+=head2 Or create a class dynamically
+
+You can also create a class 'dynamically', by creating a 'new'
+Data::MuForm object. Use a 'field_list' parameter to create the fields
+instead of 'has_field'.
+
+    my $validator = Data::MuForm->new( field_list => [
+            'username' => { type => 'Text' },
+            'selections' => { type => 'Select' },
+        ]
+    );
+
+Some features will not be available using this method (like the automatic
+use of 'validate_<field_name>' methods) and it's not as easy to test,
+of course.
+
+=head2 Process the form
+
+The MuForm object's 'check' or 'process' method should be run on each
+request, passing in the data or request parameters:
+
+    $validator->check( data => { .... } );
+
+    $form->process( params => $c->request->body_parameters );
+
+If the data or parameters are not empty, then validation will be performed.
+
+You can set most other MuForm attributes on the 'process' call.,
+One useful feature is that you can activate or inactivate fields:
+
+    $form->process( params => $params, active => ['field1', 'field2'] );
+
+The return value of C<< $form->process >> is the 'validated' flag, or
+the same as C<< $form->validated >>.
+
+See also L<Data::MuForm>.
+
+=head2 Or process a database form
+
+A database form inherits from L<Data::MuForm::Model::DBIC> instead of
+L<Data::MuForm>.  You pass in the DBIC row object on 'process':
+
+    $form->process( model => $row, params => $params );
+
+The 'model' is used for defaults, unless it's a new_result row.
+
+See also L<Data::MuForm::Manual::Database> and
+L<Data::MuForm::Role::Model::DBIC>.
+
+=head2 After processing the form
+
+A database form will have saved the data or created a new row, so often no
+more processing is necessary. You can get the structured field values from
+C<< $form->values >>, and do whatever you want with them.
+
+If the validation succeeded, you may want to redirect:
+
+    $form->process( params => $params );
+    return unless $form->validated
+    $c->res->redirect( .... );
+    -- or --
+    return unless $form->process( params => params );
+    $c->res->redirect;
+
+=head2 Rendering the form
+
+At its simplest, all you need to do is C<< $form->render >> in a
+template.
+
+    [% form.render %]
+
+You can also easily render individual fields:
+
+   [% form.field('foo').render %]
+
+or individual field elements:
+
+   [% form.field('foo').render_element({ class = 'mb20' }) %]
+
+The form object will give you a hashref of values suitable for
+filling in the form with C<< $form->fif >>.
+
+For more rendering info, see L<Data::MuForm::Manual::Rendering>.
+
+=head2 Defaults for form fields
+
+The simplest way to provide defaults is by setting the default attribute
+in a field definition:
+
+   has_field 'my_foo' => ( default => 'my_foo' );
+
+The database row ('model') that is passed in will provide initial values
+for the form, of course. You can also provide default values with an
+'init_values', which acts kind of like a database object:
+
+   $form->process( init_values => { foo => '...', bar => '...' } );
+
+There are a number of other flags and methods for providing defaults.
+See L<Data::MuForm::Manual::Defaults>.
+
+=head2 Validation
+
+You can validate a field with a method in the form 'validate_<field_name>':
+
+    has_field 'foo';
+    sub validate_foo {
+        my ( $self, $field ) = @_; # self is the form
+        unless( $field->value == .... ) {
+            $field->add_error( .... );
+        }
+    }
+
+You can provide a validation coderef that will be a field method:
+
+    has_field 'foo' => ( methods => { validate => \&check_foo } );
+      OR with shortcut
+    has_field 'foo' => ( 'meth.validate' => \&check_foo );
+    sub check_foo {
+        my $self = shift; # self is field
+        unless( $self->value == ... ) {
+            $self->add_error( ... );
+        }
+    }
+
+You can use 'apply' to use Type::Tiny types for validation, from L<Data::MuForm::Types>
+or another Type::Tiny or Moose type collection:
+
+    use Data::MuForm::Types ('NotAllDigits');
+    ...
+    has_field 'my_field' => ( apply => [NotAllDigits] );
+
+Or create validators with check:
+
+    has_field 'quux' => (
+        apply => [ { check => qr/abc/, message => 'Not a valid quux' } ] );
+
+You can also create custom fields with custom validation, or use an
+existing field that does the validation you need.
+
+See L<Data::MuForm::Manual::Validation> for more information on
+validation or L<Data::MuForm::Manual::Fields> for more information
+on fields.
+
+=head2 Organizing your form code
+
+You can use 'has_field' in Moo roles:
+
+    package MyApp::Form::Role::Address;
+    use Moo::Role;
+    use Data::MuForm::Meta;
+
+    has_field 'foo';
+    has_block 'bar';
+
+Your forms can inherit from base classes that set common application
+defaults. You can override field definitions with '+'.
+
+You can create 'compound' fields and include them in a form:
+
+    package MyApp::Form::Field::Complex;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm::Field::Compound';
+
+    has_field 'field1' => ( validate_method => \&validate_field1 );
+    has_field 'field2' => ( type => 'Select',
+        options_method => \&options_field2 );
+    sub validate_field1 { ... }
+    sub options_field2 { ... }
+
+    ...
+
+    package MyApp::Form::Complex;
+    use Moo;
+    use Data::MuForm::Meta;
+    extends 'Data::MuForm';
+
+    has '+field_name_space' => ( default => 'MyApp::Form::Field' );
+    has_field 'compound1' => ( type => 'Complex' );
+    has_field 'compound2' => ( type => 'Complex' );
+
+=head2 Testing
+
+It's much easier to write unit tests for MuForm forms than for
+Catalyst controllers. The 't' directory of the downloaded distribution
+has lots of examples. See L<Data::MuForm::Manual::Testing> for more
+information.
+
+=head1 Localization
+
+MuForm's built-in errors are added to the form fields with
+C<< $field->add_error >>, and to the form with C<< $form->add_form_error >>.
+
+If you wish to skip localization for a particular message (such as for system errors)
+you can use C<< $field->push_error >> or C<< $form->push_form_error >>.
+
+See L<Data::MuForm::Localizer>.
+
+=head1 Performance
+
+MuForm uses Moo, and is significantly faster than FormHandler on form creation. To make validation or
+form processing even faster, use a persistent form class in order to skip the object
+construction overhead. A 'clear' method is called at the beginning of each 'check' or
+process' call, but non-internal state added to the object will have to be cleared
+by the programmer.
+
+=head1 AUTHOR
+
+Gerda Shank
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2017 by Gerda Shank.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
+
+=cut

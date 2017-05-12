@@ -1,0 +1,117 @@
+This file contains changes in OPTIONAL dependencies for standard CPAN phases (configure/build/runtime/test)
+
+2.004003
+
+2.004002 2016-08-03T16:41:52Z
+
+2.004001 2016-07-08T03:22:43Z
+ [Added / test recommends]
+ - Path::Tiny 0.058
+
+2.004000 2016-04-27T02:37:23Z
+
+2.003002 2016-04-15T06:21:44Z
+
+2.003001 2015-01-15T18:39:26Z
+ [Added / runtime recommends]
+ - Moose 2.000
+
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 7.04 → 7.00
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 7.04 → 7.00
+ - Test::More 1.301001_097 → 0.99
+
+2.003000 2015-01-11T04:57:16Z
+ [Changed / test recommends]
+ - Test::More 1.001014 → 1.301001_097
+
+2.002000 2014-12-29T17:46:59Z
+ [Changed / test recommends]
+ - Test::More 1.001009 → 1.001014
+
+2.001003 2014-12-10T10:50:56Z
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.04
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.98 → 7.04
+ - Test::More 1.001006 → 1.001009
+
+2.001002 2014-09-04T19:04:06Z
+ [Changed / test recommends]
+ - Test::More 1.001003 → 1.001006
+
+2.001001 2014-08-29T12:00:46Z
+
+2.001000 2014-08-24T20:33:44Z
+
+2.000004 2014-08-15T21:17:41Z
+ [Changed / test recommends]
+ - CPAN::Meta 0 → 2.120900
+
+ [Removed / test recommends]
+ - CPAN::Meta::Prereqs
+ - CPAN::Meta::Requirements 2.120900
+
+2.000003 2014-07-28T23:48:39Z
+ [Added / test recommends]
+ - CPAN::Meta::Prereqs
+
+2.000002 2014-07-13T19:42:09Z
+ [Changed / configure recommends]
+ - ExtUtils::MakeMaker 6.88 → 6.98
+
+ [Changed / test recommends]
+ - ExtUtils::MakeMaker 6.88 → 6.98
+ - Test::More 1.001002 → 1.001003
+
+2.000001 2014-02-06T17:13:11Z
+
+2.000000 2014-02-02T06:25:35Z
+ [Added / configure recommends]
+ - ExtUtils::MakeMaker 6.88
+
+ [Added / test recommends]
+ - CPAN::Meta
+ - CPAN::Meta::Requirements 2.120900
+ - ExtUtils::MakeMaker 6.88
+ - Test::More 1.001002
+
+1.15000003 2014-01-13T06:37:51Z
+
+1.15000002 2014-01-08T08:12:21Z
+
+1.15000001 2013-11-22T04:02:12Z
+
+1.15000000 2013-09-21T07:43:15Z
+
+1.14000003 2013-07-09T01:30:35Z
+
+1.14000002 2013-04-09T03:09:31Z
+
+1.14000001 2012-02-26T20:46:35Z
+
+1.14000000 2012-02-07T14:46:46Z
+ [Removed / runtime suggests]
+ - Module::Extract::Namespaces 0.1402
+
+1.12060502 2012-02-04T03:50:41Z
+ [Added / runtime suggests]
+ - Module::Extract::Namespaces 0.1402
+
+1.12060501 2011-04-08T13:49:06Z
+
+1.12060213 2011-04-06T01:20:11Z
+
+1.12044908 2010-11-07T20:08:27Z
+ [Added / runtime suggests]
+ - Dist::Zilla::Plugin::MetaNoIndex
+
+ [Added / test suggests]
+ - Dist::Zilla::Plugin::MetaNoIndex
+
+1.11044404 2010-11-02T16:58:53Z
+
+1.11034304 2010-07-25T16:18:01Z

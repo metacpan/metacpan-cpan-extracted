@@ -1,0 +1,81 @@
+##-*- Mode: CPerl -*-
+## Auto-generated from C++ header file(s) by h2xspp.perl; command-line: h2xspp.perl -prefix 'DDC::XS::' QueryOptions.h.in '-vt=^[mb]_' -o QueryOptions '-dn=free' '-dt=FilterWithBounds' '-dm=Compile'
+##  + ... and edited!
+
+=pod
+
+=head1 NAME
+
+DDC::XS::CQueryOptions - XS interface to DDC C++ CQueryOptions objects
+
+=head1 SYNOPSIS
+
+ #----------------------------------------------------------------------
+ # DDC::XS::CQueryOptions : @ISA=qw(DDC::XS::Object);
+ 
+ $CQueryOptions = DDC::XS::CQueryOptions->new();
+ undef $CQueryOptions;                           ##-- auto-magically freed
+ 
+ # Accessors
+ $size_t          = $CQueryOptions->getContextSentencesCount();
+ undef            = $CQueryOptions->setContextSentencesCount($ContextSentencesCount);
+ $bool            = $CQueryOptions->getEnableBibliography();
+ undef            = $CQueryOptions->setEnableBibliography($bEnableBibliography);
+ $bool            = $CQueryOptions->getDebugRank();
+ undef            = $CQueryOptions->setDebugRank($bDebugRank);
+ $bool            = $CQueryOptions->getSeparateHits();
+ undef            = $CQueryOptions->setSeparateHits($bSeparateHits);
+ $int             = $CQueryOptions->getTextAreaNo();
+ undef            = $CQueryOptions->setTextAreaNo($TextAreaNo);
+ \@strings        = $CQueryOptions->getWithin();
+ undef            = $CQueryOptions->setWithin($Within);
+ \@CQFilters      = $CQueryOptions->getQFilters();
+ undef            = $CQueryOptions->setQFilters(\@CQFilters);
+ \@Subcopora      = $CQueryOptions->getSubcorpora();
+ undef            = $CQueryOptions->setSubcorpora(\@Subcorpora);
+ 
+ # Methods
+ undef   = $CQueryOptions->swap($CQueryOptions2);
+ undef   = $CQueryOptions->Clear();
+ $bool   = $CQueryOptions->CanFilterByFile();
+ $string = $CQueryOptions->toString();
+ $string = $CQueryOptions->toJson();
+
+=cut
+
+##======================================================================
+
+=pod
+
+=head1 DESCRIPTION
+
+The DDC::CQueryOptions class provides a perl interface to the DDC C++ CQueryOptions class.
+CQueryOptions objects may be created either manually or by a parsing a query-string
+with a L<DDC::XS::CQueryCompiler|DDC::XS::CQueryCompiler>.
+See the caveats in L<DDC::XS::Object>.
+
+
+=head1 SEE ALSO
+
+perl(1),
+DDC::XS(3perl),
+DDC::XS::Object(3perl),
+DDC::XS::CQueryCompiler(3perl),
+DDC::XS::CQueryFilter(3perl),
+DDC::XS::CQuery(3perl),
+DDC::XS::CQCount(3perl).
+
+
+=head1 AUTHOR
+
+Bryan Jurish E<lt>moocow@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2015 by Bryan Jurish
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.14.2 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

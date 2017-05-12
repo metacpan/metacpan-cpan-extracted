@@ -1,0 +1,17 @@
+libdata-streamserializer-perl (0.07-1) unstable; urgency=low
+
+  * New upstream release (perl 5.12).
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 14 Feb 2011 10:18:30 +0300
+
+libdata-streamserializer-perl (0.05-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Wed, 09 Feb 2011 09:14:05 +0300
+
+libdata-streamserializer-perl (0.04-1) unstable; urgency=low
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Dmitry E. Oboukhov <unera@debian.org>  Mon, 07 Feb 2011 17:57:12 +0300

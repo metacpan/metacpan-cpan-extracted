@@ -1,0 +1,28 @@
+Revision history for Perl extension Dyns::Client.
+
+0.06 Wed May 14 10:40:24 PDT 2003
+	- Moved CLient.pm to lib/Dyns/Client.pm, seemed to break on some lini.
+
+0.05 Tue May 13 23:05:17 PDT 2003
+	- On suggestion from Slaven Rezic, I added a test suite that asks for
+	  testing parameters.
+	- On suggestion from Slaven Rezic, I added his standard script to the
+	  distribution. Added support for Pod::Usage to the script.
+	- On suggestion from Slaven Rezic, I applied his patch to also find the
+	  correct IP address on FreeBSD. I also added (preliminary) support for
+	  Win32.
+
+0.04  Thu Apr  3 01:02:35 CEST 2003
+	- Prepared for CPAN
+
+0.03  Wed May 22 23:33:42 CEST 2002
+	- Fixed the get_ip(), now has a get_ip('iface') method.
+	- Fixed the host parameter for dyns (wrongly documented in the specs)
+
+0.02  Wed May 22 15:20:38 CEST 2002
+	- First version
+
+0.01  Wed May 22 13:54:30 2002
+	- original version; created by h2xs 1.21 with options
+		-XA -n Dyns::Client
+

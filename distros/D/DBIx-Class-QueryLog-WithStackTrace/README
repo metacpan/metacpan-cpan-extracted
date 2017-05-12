@@ -1,0 +1,14 @@
+Ths module extends DBIx::Class::QueryLog to add a stack trace to
+each item in the log so you can see where queries are coming from in
+your application.
+
+To install, do the usual:
+	perl Makefile.PL
+	make
+	make test
+	make install
+
+You may use, modify and distribute this code under the terms of either
+the Artistic Licence or the GNU General Public Licence version 2 - it's up
+to you which one you choose.  The full text of both licences is available
+in the files ARTISTIC.txt and GPL2.txt.

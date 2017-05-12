@@ -1,0 +1,51 @@
+{
+   "abstract" : "Resolve database connection on the environment has many database servers.",
+   "author" : [
+      "=over"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "ExtUtils::MakeMaker version 6.62, CPAN::Meta::Converter version 2.112150",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-DBHResolver",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.36"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : 0
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Carp" : 0,
+            "Class::Accessor::Fast" : 0,
+            "Config::Any" : 0,
+            "DBI" : 0,
+            "Data::Util" : 0,
+            "Filter::Util::Call" : 0,
+            "Hash::Merge::Simple" : 0,
+            "Try::Tiny" : 0,
+            "UNIVERSAL::require" : 0,
+            "YAML" : 0,
+            "parent" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "version" : "0.17"
+}

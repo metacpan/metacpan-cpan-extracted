@@ -1,0 +1,24 @@
+Revision history for DBI::Log
+
+0.07 Mon Feb  6 11:25:17 CST 2017
+    - Use INIT block
+
+0.06  Wed Dec 14 14:40:37 CST 2016
+    - Remove colors
+    - Immediately print queries
+
+0.05  Tue Oct 25 13:24:46 CDT 2016
+    - Test nice
+
+0.04  Fri Oct  2 10:51:16 CDT 2015
+    - Fixed selectcol_arrayref logging
+
+0.03  Thu Sep 17 13:18:08 CDT 2015
+    - Added github links to docs
+
+0.02  Fri Sep 11 18:07:52 CDT 2015
+    - Improved the wording in the docs
+
+0.01  Fri Sep 11 17:33:06 CDT 2015
+    - Set up initial structure for DBI::Log
+

@@ -1,0 +1,74 @@
+NAME
+
+    Device::Chip::DS1307 - chip driver for a DS1307
+
+DESCRIPTION
+
+    This Device::Chip subclass provides specific communication to a Maxim
+    Integrated DS1307 chip attached to a computer via an I²C adapter.
+
+METHODS
+
+    The following methods documented with a trailing call to ->get return
+    Future instances.
+
+ read_FIELD
+
+       $v = $ds->read_I<FIELD>->get
+
+    Reads a timekeeping field and returns a decimal integer. The following
+    fields are recognised:
+
+     seconds minutes hours wday mday month year
+
+    The hours field is always returned in 24-hour mode, even if the chip is
+    in 12-hour ("AM/PM") mode.
+
+ write_FIELD
+
+       $ds->write_I<FIELD>->get
+
+    Writes a timekeeping field as a decimal integer. The following fields
+    are recognised:
+
+     seconds minutes hours wday mday month year
+
+    The hours field is always written back in 24-hour mode.
+
+ read_time
+
+       @tm = $ds->read_time->get
+
+    Returns a 7-element struct tm-compatible list of values by reading the
+    timekeeping registers, suitable for passing to POSIX::mktime, etc...
+    Note that the returned list does not contain the yday or is_dst fields.
+
+    Because the DS1307 only stores a 2-digit year number, the year is
+    presumed to be in the range 2000-2099.
+
+    This method presumes POSIX-compatible semantics for the wday field
+    stored on the chip; i.e. that 0 is Sunday.
+
+    This method performs an atomic reading of all the timekeeping registers
+    as a single I2C transaction, so is preferrable to invoking multiple
+    calls to individual read methods.
+
+ write_time
+
+       $ds->write_time( @tm )->get
+
+    Writes the timekeeping registers from a 7-element struct tm-compatible
+    list of values. This method ignores the yday and is_dst fields, if
+    present.
+
+    Because the DS1307 only stores a 2-digit year number, the year must be
+    in the range 2000-2099 (i.e. numerical values of 100 to 199).
+
+    This method performs an atomic writing of all the timekeeping registers
+    as a single I2C transaction, so is preferrable to invoking multiple
+    calls to individual write methods.
+
+AUTHOR
+
+    Paul Evans <leonerd@leonerd.org.uk>
+

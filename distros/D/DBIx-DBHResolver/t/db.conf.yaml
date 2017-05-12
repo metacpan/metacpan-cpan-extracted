@@ -1,0 +1,32 @@
+connect_info:
+  DB_W:
+    attrs:
+      AutoCommit: 0
+      PrintError: 0
+      RaiseError: 1
+      Warn: 0
+    dsn: dbi:mysql:dbname=user;host=db_w
+    password: ~
+    user: hoge
+  DB_R1:
+    attrs:
+      AutoCommit: 0
+      PrintError: 0
+      RaiseError: 1
+      Warn: 0
+    dsn: dbi:mysql:dbname=user;host=db_r1
+    password: ~
+    user: hoge
+  DB_R2:
+    attrs:
+      AutoCommit: 0
+      PrintError: 0
+      RaiseError: 1
+      Warn: 0
+    dsn: dbi:mysql:dbname=user;host=db_r2
+    password: ~
+    user: hoge
+clusters:
+  DB_R:
+    - DB_R1
+    - DB_R2

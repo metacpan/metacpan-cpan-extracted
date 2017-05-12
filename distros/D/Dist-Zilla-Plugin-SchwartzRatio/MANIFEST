@@ -1,0 +1,16 @@
+Build.PL
+Changes
+INSTALL
+LICENSE
+MANIFEST
+MANIFEST.SKIP
+META.json
+META.yml
+README
+README.mkdn
+SIGNATURE
+a
+dist.ini
+lib/Dist/Zilla/Plugin/SchwartzRatio.pm
+t/00-compile.t
+t/000-report-versions.t

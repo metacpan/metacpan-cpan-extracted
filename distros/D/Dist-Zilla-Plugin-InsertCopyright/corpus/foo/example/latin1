@@ -1,0 +1,7 @@
+#!perl
+@foo = qw(
+    This doc has a shebang line with perl and is in Latin-1 thanks to
+    our favorite canary, Olivier Mengué.  :-)
+);
+
+# COPYRIGHT

@@ -1,0 +1,67 @@
+{
+   "abstract" : "A Perl client for DogStatsd",
+   "author" : [
+      "Stefan Goethals <stefan@zipkid.eu>, Fayland Lam <fayland@binary.com>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 5.031, Dist::Milla version v1.0.9, CPAN::Meta::Converter version 2.142690",
+   "license" : [
+      "apache_2_0"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DataDog-DogStatsd",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "xt",
+         "inc",
+         "share",
+         "eg",
+         "examples"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Milla" : "v1.0.9",
+            "Test::Pod" : "1.41"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "IO::Socket::INET" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.96"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/binary-com/dogstatsd-perl/issues"
+      },
+      "homepage" : "https://github.com/binary-com/dogstatsd-perl",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/binary-com/dogstatsd-perl.git",
+         "web" : "https://github.com/binary-com/dogstatsd-perl"
+      }
+   },
+   "version" : "0.04",
+   "x_contributors" : [
+      "Fayland Lam <fayland@gmail.com>",
+      "Stefan Goethals <stefan@zipkid.eu>"
+   ]
+}
+

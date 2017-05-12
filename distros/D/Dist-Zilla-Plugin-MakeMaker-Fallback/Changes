@@ -1,0 +1,110 @@
+Revision history for Dist-Zilla-Plugin-MakeMaker-Fallback
+
+0.023     2016-06-22 05:07:29Z
+          - display more diagnostics if 'perl Build.PL' failed to properly
+            execute in tests
+
+0.022     2016-03-20 00:47:39Z
+          - regexp patterns tweaked that are used when Makefile.PL is munged,
+            to be more resilient against future layout changes
+
+0.021     2015-09-20 18:27:55Z
+          - fix test that broke when [MakeMaker::Awesome] 0.35 added configs
+
+0.020     2015-08-18 00:26:46Z
+          - fixed formatting of quoted Build.PL by marking a verbatim section,
+            rather than simply indenting by 4 columns
+          - remove the noisy "Congratulations!" in Makefile.PL when the
+            installation environment is properly configured
+
+0.019     2015-07-21 06:40:57Z
+          - fix silly error in Makefile.PL :(
+
+0.018     2015-07-21 03:06:06Z
+          - add dynamic prereq on [MakeMaker::Awesome] to upgrade it in case
+            it is too old to work with newer [MakeMaker]
+
+0.017     2015-06-10 01:47:27Z
+          - if PERL_MM_FALLBACK_SILENCE_WARNING is set, do not sleep after
+            "showing" the silenced warning
+          - guard against older ExtUtils::MakeMaker from adding Build.PL
+            to the default list of files that are executed
+
+0.016     2014-11-12 05:36:19Z
+          - bump up prereq version for [MakeMaker::Awesome] to ensure needed
+            template variables are made available
+
+0.015     2014-11-12 03:53:50Z
+          - remove configure requires declarations added for Makefile.PL
+            (technically they are only needed when configure requires is
+            already not being respected)
+
+0.014     2014-10-29 02:44:49Z
+          - document the double testing behaviour that changed with version
+            0.007 (thanks for noticing, Apocalypse!)
+          - remove perl from the list of configure requires prereqs to check
+            for in Makefile.PL
+
+0.013     2014-08-16 00:02:55Z
+          - fix test from previous release's fix that was incompatible with
+            earlier versions of [MakeMaker]'s practice of always setting
+            eumm_version
+
+0.012     2014-08-14 02:03:30Z
+          - fix munging of "use ExtUtils::MakeMaker <version>" since
+            [MakeMaker::Awesome] version 0.22 changed the template
+          - lower minimum version of perl required by removing a use of \N in
+            a regular expression
+
+0.011     2014-08-07 02:27:53Z
+          - properly include %configure_requires content in Makefile.PL
+            (broken under Dist::Zilla::Plugin::MakeMaker::Awesome 0.23,
+            released 2014-07-30).
+
+0.010     2014-06-07 06:29:43Z
+          - print a useful log message during dzil test --verbose
+          - "use ExtUtils::MakeMaker <version>" now stripped out of
+            Makefile.PL, to allow non-configure-requires-compliant
+            installers to still proceed
+
+0.009     2014-03-24 03:52:26Z
+          - fix test which should be skipped when an optional prereq is not
+            present
+
+0.008     2014-03-23 02:43:22Z
+          - properly dump configs by resolving silent role composition sub
+            clobbering issue
+
+0.007     2014-03-09 05:35:08Z
+          - switch to renamed form of now-deprecated plugin
+            [MungeData::WithDataSection]
+          - "dzil test" will run tests without extra testing variables, for
+            "dzil release" or "dzil test --release" -- this will weed out test
+            issues that only manifest when AUTHOR_TESTING or RELEASE_TESTING
+            are *not* set (e.g. bad test count, conditional module loading).
+
+0.006     2014-01-25 03:52:42Z
+          - now sorting the dumped %configure_requires prereqs, for
+            minimizing diffs between releases
+
+0.005     2013-12-14 17:25:20Z
+          - warnings can now be bypassed entirely with the
+            PERL_MM_FALLBACK_SILENCE_WARNING environment variable
+          - now also mentioning the relevant CPAN.pm/CPANPLUS configuration
+            options
+
+0.004     2013-11-20 21:49:00Z
+          - tighten up the interactive terminal detection logic
+
+0.003     2013-10-15 01:26:28Z
+          - only display the warning if configure_require prereqs are
+            genuinely missing (the user may have explicitly chosen to run
+            Makefile.PL) (RT#89434)
+
+0.002     2013-09-25 02:15:24Z
+          - bump up dependency on [MakeMaker::Awesome] to avoid missing lib
+            errors
+
+0.001     2013-09-22 21:33:34Z
+          - Initial release.
+

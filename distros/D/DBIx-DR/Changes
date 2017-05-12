@@ -1,0 +1,85 @@
+Revision history for Perl extension DBIx::DR
+
+0.01  Thu Oct 27 01:10:36 MSK 2011
+    - first public revision.
+
+0.02  Thu Oct 27 01:29:36 MSK 2011
+    - support dr_sql_dir option.
+
+0.03  Thu Oct 27 15:02:16 MSK 2011
+    - perldoc.
+    - fix dr_get function.
+
+0.04  Thu Oct 27 18:21:16 MSK 2011
+    - add indirect substitutions.
+
+0.05  Mon Oct 31 11:40:17 MSK 2011
+    - add 'push' method in Iterator
+
+0.11  Tue Nov  8 00:38:40 MSK 2011
+    - back-incompatible changes (bump version)
+      - switches to perlish template
+      - rewite documentation
+0.12  Tue Nov  8 14:54:15 MSK 2011
+    - a few fixes in perldoc
+
+0.14  Tue Dec  6 15:43:53 MSK 2011
+    - skip 0.13 version ;)
+    - signals are passed more properly.
+    - You can do typo <%= quote 'abc' %> instead <% quote 'abc'; %>
+      but You can't use semicolon in the first case.
+    - Some perldoc fixes.
+
+0.15  Tue Dec 13 14:36:34 MSK 2011
+    - fix {}-brackets bug in SQL-body.
+
+0.16  Thu Jan 26 12:08:00 MSK 2012
+    - fix multiline perl-blocks
+    - add 'grep' function into iterator.
+
+0.17  Wed Apr 25 15:56:57 MSK 2012
+    - add option 'dr_decode_errors'
+
+0.18  Thu May  3 14:15:22 MSK 2012
+    - make debian package
+    - fix hlist helper
+
+0.19  Fri May 11 09:11:11 MSK 2012
+    - All files are licensed by Artistic.
+
+0.20  Fri May 11 10:19:32 MSK 2012
+    - Add license term in Makefile.PL.
+    - Add debian/watch.
+
+0.21 Sun, 06 Jan 2013 02:32:19 +0400
+    - Add option '-die' for all requests.
+
+0.22 Sun, 14 Apr 2013 21:06:22 +0400
+    - Add option '-warn' for all requests.
+
+0.23 Sun, 14 Apr 2013 21:15:22 +0400
+    - Update perldoc.
+
+0.24 Sat Aug 17 12:35:40 MSK 2013
+    - Fix iterator issue https://rt.cpan.org/Public/Bug/Display.html?id=87313
+    - Update metainformation
+
+0.25 Wed Sep 25 17:24:00 MSK 2013
+    - Fix all warnings with Perl 5.18
+
+0.26 Mon May 23 18:22:42 MSK 2016
+    - Parser was rewritten using state-machine (one pass parser).
+    - Add `stacktrace` helper to default helpers list.
+
+0.29 Mon May 30 15:55:06 MSK 2016
+    - Fix tests for windows.
+    - Update MANIFEST by new files.
+
+0.30 Wed Oct 19 00:31:53 MSK 2016
+    - Add option dr_sql_utf8 (default is true).
+
+0.31 Thu Feb  9 19:27:49 MSK 2017
+    - Add option -keep_blessed (works properly with Moose object lists).
+
+0.32 Tue Apr 18 22:54:10 MSK 2017
+    - Add iterator:pop method.

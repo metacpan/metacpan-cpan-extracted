@@ -1,0 +1,124 @@
+***************
+*** 15,23 ****
+  	# We'll accept your grandmother if you pass her to us.
+  	my %args = @_;
+  
+! 	return bless \%args, $class;
+  }
+  
+  sub AUTOLOAD {
+  
+  	my $attr = $AUTOLOAD;
+--- 15,126 ----
+  	# We'll accept your grandmother if you pass her to us.
+  	my %args = @_;
+  
+! 	return bless \%args, 'DateTime::LazyInit::Constructor_new';
+  }
+  
++ {
++ 	package DateTime::LazyInit::Constructor_new;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub from_epoch {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_from_epoch';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_from_epoch;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub now {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_now';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_now;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub today {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_today';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_today;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub from_object {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_from_object';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_from_object;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub last_day_of_month {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_last_day_of_month';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_last_day_of_month;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ sub from_day_of_year {
++ 	my $class = shift;
++ 
++ 	# NO VALIDATION
++ 	# We'll accept your grandmother if you pass her to us.
++ 	my %args = @_;
++ 
++ 	return bless \%args, 'DateTime::LazyInit::Constructor_from_day_of_year';
++ }
++ 
++ {
++ 	package DateTime::LazyInit::Constructor_from_day_of_year;
++ 	use vars qw/@ISA/;
++ 	@ISA = qw/DateTime::LazyInit/;
++ }
++ 
++ 
+  sub AUTOLOAD {
+  
+  	my $attr = $AUTOLOAD;

@@ -1,0 +1,30 @@
+Changes
+examples/arduino_client.ino
+examples/arduino_test.ino
+examples/CH3000_search_device.pl
+examples/CH3000_set_modbus_addr.pl
+examples/client_arduino.pl
+examples/server_rtu.pl
+examples/server_rtu_check.pl
+examples/simple_client_rtu.pl
+examples/write_new_addr.pl
+lib/Device/Modbus/RTU.pm
+lib/Device/Modbus/RTU/ADU.pm
+lib/Device/Modbus/RTU/Client.pm
+lib/Device/Modbus/RTU/Server.pm
+LICENSE
+Makefile.PL
+MANIFEST			This list of files
+README.pod
+t/adu_rtu.t
+t/client_rtu.t
+t/client_rtu_port.t
+t/lib/Device/SerialPort.pm
+t/long_read.t
+t/server_logging.t
+t/server_rtu.t
+t/server_rtu_2.t
+t/server_rtu_3.t
+t/server_rtu_4.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

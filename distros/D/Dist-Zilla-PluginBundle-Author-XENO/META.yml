@@ -1,0 +1,68 @@
+---
+abstract: 'Author Bundle for Caleb Cushing'
+author:
+  - 'Caleb Cushing <xenoterracide@gmail.com>'
+build_requires:
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  IO::Handle: '0'
+  IPC::Open3: '0'
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.031, CPAN::Meta::Converter version 2.143240'
+license: artistic_2
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-PluginBundle-Author-XENO
+no_index:
+  file:
+    - perlcritic.rc
+provides:
+  Dist::Zilla::PluginBundle::Author::XENO:
+    file: lib/Dist/Zilla/PluginBundle/Author/XENO.pm
+    version: '0.001007'
+requires:
+  Dist::Zilla: '5'
+  Dist::Zilla::Plugin::AutoMetaResources: '0'
+  Dist::Zilla::Plugin::AutoPrereqs: '0'
+  Dist::Zilla::Plugin::CheckChangesHasContent: '0'
+  Dist::Zilla::Plugin::Git::Contributors: '0'
+  Dist::Zilla::Plugin::Git::NextVersion: '0'
+  Dist::Zilla::Plugin::Git::Remote::Check: '0'
+  Dist::Zilla::Plugin::InstallRelease: '0'
+  Dist::Zilla::Plugin::MetaJSON: '0'
+  Dist::Zilla::Plugin::MetaProvides::Package: '0'
+  Dist::Zilla::Plugin::OurPkgVersion: '0'
+  Dist::Zilla::Plugin::PodCoverageTests: '0'
+  Dist::Zilla::Plugin::PodSyntaxTests: '0'
+  Dist::Zilla::Plugin::PodWeaver: '0'
+  Dist::Zilla::Plugin::ReadmeAnyFromPod: '0'
+  Dist::Zilla::Plugin::RunExtraTests: '0'
+  Dist::Zilla::Plugin::Test::CPAN::Changes: '0'
+  Dist::Zilla::Plugin::Test::CPAN::Meta::JSON: '0'
+  Dist::Zilla::Plugin::Test::Compile: '0'
+  Dist::Zilla::Plugin::Test::DistManifest: '0'
+  Dist::Zilla::Plugin::Test::EOL: '0'
+  Dist::Zilla::Plugin::Test::MinimumVersion: '0'
+  Dist::Zilla::Plugin::Test::Perl::Critic: '0'
+  Dist::Zilla::Plugin::Test::Portability: '0'
+  Dist::Zilla::Plugin::Test::ReportPrereqs: '0'
+  Dist::Zilla::Plugin::Test::UnusedVars: '0'
+  Dist::Zilla::Plugin::Test::Version: '0'
+  Dist::Zilla::Role::PluginBundle::Easy: '0'
+  Moose: '0'
+  Pod::Coverage::TrustPod: '0'
+  Test::CPAN::Meta::JSON: '0'
+  Test::EOL: '0'
+  Test::Perl::Critic: '0'
+  perl: '5.008'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/xenoterracide/dist-zilla-pluginbundle-author-xeno/issues
+  homepage: https://metacpan.org/dist/Dist-Zilla-PluginBundle-Author-XENO
+  repository: git://github.com/xenoterracide/dist-zilla-pluginbundle-author-xeno.git
+version: '0.001007'

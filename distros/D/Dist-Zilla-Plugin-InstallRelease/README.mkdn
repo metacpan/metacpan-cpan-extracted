@@ -1,0 +1,53 @@
+# NAME
+
+Dist::Zilla::Plugin::InstallRelease - installs your dist after releasing
+
+# VERSION
+
+version 0.008
+
+# DESCRIPTION
+
+After doing `dzil release`, this plugin will install your dist so you
+are always the first person to have the latest and greatest version. It's
+like getting first post, only useful.
+
+To use it, add the following in `dist.ini`:
+
+    [InstallRelease]
+
+You can specify an alternate install command:
+
+    [InstallRelease]
+    install_command = cpanm .
+
+This plugin must always come before [Dist::Zilla::Plugin::Clean](http://search.cpan.org/perldoc?Dist::Zilla::Plugin::Clean).
+
+# AVAILABILITY
+
+The project homepage is [http://p3rl.org/Dist::Zilla::Plugin::InstallRelease](http://p3rl.org/Dist::Zilla::Plugin::InstallRelease).
+
+The latest version of this module is available from the Comprehensive Perl
+Archive Network (CPAN). Visit [http://www.perl.com/CPAN/](http://www.perl.com/CPAN/) to find a CPAN
+site near you, or see [https://metacpan.org/module/Dist::Zilla::Plugin::InstallRelease/](https://metacpan.org/module/Dist::Zilla::Plugin::InstallRelease/).
+
+# SOURCE
+
+The development version is on github at [http://github.com/doherty/Dist-Zilla-Plugin-InstallRelease](http://github.com/doherty/Dist-Zilla-Plugin-InstallRelease)
+and may be cloned from [git://github.com/doherty/Dist-Zilla-Plugin-InstallRelease.git](git://github.com/doherty/Dist-Zilla-Plugin-InstallRelease.git)
+
+# BUGS AND LIMITATIONS
+
+You can make new bug reports, and view existing ones, through the
+web interface at [https://github.com/doherty/Dist-Zilla-Plugin-InstallRelease/issues](https://github.com/doherty/Dist-Zilla-Plugin-InstallRelease/issues).
+
+# AUTHOR
+
+Mike Doherty <doherty@cpan.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2100 by Mike Doherty.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

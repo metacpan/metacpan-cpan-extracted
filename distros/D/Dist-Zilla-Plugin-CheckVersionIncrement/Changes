@@ -1,0 +1,16 @@
+Revision history for Perl extension Dist-Zilla-Plugin-CheckVersionIncrement
+
+0.121750  2012-06-23 11:31:55 America/Los_Angeles
+    - Skip tests when CPAN index web service returns valid but empty
+      JSON
+
+0.120080  2012-01-08 01:27:38 PST8PDT
+    - Error message now reports version numbers
+    - Add another test
+
+0.120070  2012-01-06 23:14:26 PST8PDT
+    - Add a test
+
+
+0.120050  2012-01-05 11:11:57 PST8PDT
+    - Initial CPAN release

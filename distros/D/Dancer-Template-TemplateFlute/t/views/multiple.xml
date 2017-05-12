@@ -1,0 +1,11 @@
+<specification>
+<form name="registrationtest" link="name">
+<field name="emailtest"/>
+<field name="passwordtest"/>
+<field name="verifytest"/>
+</form>
+<form name="logintest" link="name">
+<field name="emailtest_2"/>
+<field name="passwordtest_2"/>
+</form>
+</specification>

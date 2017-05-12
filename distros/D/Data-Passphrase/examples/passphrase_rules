@@ -1,0 +1,235 @@
+# -*- CPerl -*-
+# $Id: passphrase_rules,v 1.6 2007/08/14 15:45:51 ajk Exp $
+
+use strict;
+use warnings;
+
+use Data::Passphrase;
+use Data::Passphrase::Graph::Roman;
+use Data::Passphrase::Graph::Qwerty;
+use Data::Passphrase::Phrasebook::Bloom;
+use Carp;
+use List::MoreUtils qw/any false/;
+use Readonly;
+
+# constants to be used in the rules
+Readonly my $FAILING_SCORE             => 0.5;
+Readonly my $LDAP_SERVER               => 'ldap.example.com';
+Readonly my $MAXIMUM_TOTAL_CHARACTERS  => 127;
+Readonly my $MINIMUM_TOTAL_CHARACTERS  => 15;
+Readonly my $MINIMUM_UNIQUE_CHARACTERS => 4;
+Readonly my $MINIMUM_UNIQUE_WORDS      => 4;
+Readonly my $PHRASE_DICTIONARY         => 'examples/passphrase_deny';
+Readonly my $STRONG_CHARACTERS         => 25;
+Readonly my $STRONG_WORDS	       => 6;
+
+# predictable pattern graphs
+Readonly my $ALPHA_GRAPH  => Data::Passphrase::Graph::Roman->new();
+Readonly my $QWERTY_GRAPH => Data::Passphrase::Graph::Qwerty->new();
+
+# dictionary of common phrases
+Readonly my $COMMON_PHRASEBOOK
+    => Data::Passphrase::Phrasebook::Bloom->new({
+        file => $PHRASE_DICTIONARY,
+    });
+
+# NOTE: This ruleset is NOT meant to be a complete passphrase policy.
+# It's just here as an example.  I recommend developing your own
+# passphrase policy and then codifying it here.
+
+return [
+
+    # Return "450 Passphrase is too short" for any passphrase shorter
+    # than 15 characters.  The "validate" subroutine can use $_[0] as
+    # a comparator because in numeric context it evaluates to the
+    # length of the passphrase even though it's an Data::Passphrase
+    # object.  The test data is just a string of 14 Xs -- the
+    # passphrase-test script will check to make sure this string
+    # results in a 450.
+    #
+    # The "validate" subroutine can return 0 or 1 to represent fail or
+    # pass, as in
+    #
+    #   validate => sub { $_[0] >= $MINIMUM_TOTAL_CHARACTERS }
+    #
+    # or it can return any value in between to represent a score.  The
+    # example below normalizes based on $STRONG_CHARACTERS such that a
+    # barely passing score of 60% is given for 15 characters, and
+    # anything above and including 25 characters is considered 100%.
+
+    {
+        code     => 450,
+        message  => 'is too short',
+        test     => {
+            'X' x ($MINIMUM_TOTAL_CHARACTERS - 1) => { score => 0  },
+            'to be is to do'                      => { score => 56 },
+        },
+        validate => sub { $_[0] / $STRONG_CHARACTERS },
+    },
+
+    # Same as above, but reject passphrases greater than 127
+    # characters (the limit for Windows).
+
+    {
+        code     => 451,
+        message  => 'is too long',
+        test     => 'X' x ($MAXIMUM_TOTAL_CHARACTERS + 1),
+        validate => sub { $_[0] <= $MAXIMUM_TOTAL_CHARACTERS },
+    },
+
+    # Some Unix systems default to using # for ERASE and @ for KILL,
+    # even when passwords are being entered.  This rule has two test
+    # passphrases (in an anonymous list) to test for both characters.
+
+    {
+        code     => 452,
+        message  => 'may not contain # or @',
+        test     => ['this passphrase contains #', '@ appears in this one'],
+        validate => sub { $_[0] !~ /([#@])/ },
+    },
+
+    # Here's an example of a rule that doesn't test anything -- it
+    # just performs some actions needed by later rules.  The
+    # subsequent rules are word-based, so this rule splits the
+    # passphrase into normalized words (for our own definition of
+    # "word": something delimited by /[^a-z]+/) and stows them in
+    # the object as both an array and a hash.  This rule should never
+    # fail, so there are no tests and we return 1.
+
+    {
+        validate => sub {
+            my ($self) = @_;
+
+            # split into words
+            my @word_list = split /[^a-z]+/i, $self->get_passphrase();
+
+            # build unqiue list of words
+            my %unique_word_hash = map { lc $_ => 1 } @word_list;
+            $self->set_data(word_hash =>      \%unique_word_hash );
+            $self->set_data(words     => [keys %unique_word_hash]);
+
+            return 1;
+        },
+    },
+
+    # The hash of user data is passed as the second argument.  Here we
+    # use it to extract the list of unique words and compare its
+    # length.
+
+    {
+        code     => 460,
+        message  => 'contains too few unique words',
+        test     => {
+            'antidisestablishmentarianism' => { score => 16 },
+            'two words two words'          => { score => 33 },
+        },
+        validate => sub { @{ $_[1]->{words} } / $STRONG_WORDS },
+    },
+
+    # A word must have at least 2 distinct characters.
+
+    {
+        code     => 461,
+        message  => 'contains too few valid words',
+        test     => { 'aaa bbb ccc ddd' => { score => 0 } },
+        validate => sub {
+            return ( false { /^(.)\1*$/ } @{ $_[1]->{words} } )
+                   / $STRONG_WORDS;
+        },
+    },
+
+    # Here's an example of checking for a predictable pattern.
+
+    {
+        code     => 463,
+        message  => 'may not be based on the keyboard layout',
+        test     => {
+            'qaz xsw edc vfr'      => { score => 50 },
+            'qwerty asdf jkl vcxz' => { score => 50 },
+            'okm juh bgt rdx'      => { score => 50 },
+        },
+        validate => sub {
+            return (any { !$QWERTY_GRAPH->has($_) } @{ $_[1]->{words} })
+                   || $FAILING_SCORE;
+        },
+    },
+
+    # This rule queries an LDAP server (using get_display_name(), not
+    # provided) for a user's full name and disallows a passphrase
+    # based on the name.  A subroutine is used to generate test
+    # passphrases.
+
+    {
+        disabled => 1,
+        code     => 464,
+        message  => 'may not be based on your name',
+        test     => sub {
+            my ($self) = @_;
+
+            my $username = $self->get_username() or return;
+
+            my @full_name = split /,? /, get_display_name({
+                ldap_server => $LDAP_SERVER,
+                username    => $username,
+            });
+
+            return {
+                "my username is $username"        => { score => 50 },
+                "my last name is $full_name[0]"   => { score => 50 },
+                "my first name is $full_name[1]"  => { score => 50 },
+                "my middle name is $full_name[2]" => { score => 50 },
+            };
+        },
+        validate => sub {
+            my ($self, $data_hash) = @_;
+
+            # unpack arguments
+            my $debug      = $self->get_debug     ();
+            my $username   = $self->get_username  () or return 1;
+            my $passphrase = $self->get_passphrase();
+            my $word_hash  = $data_hash->{word_hash};
+
+            # quickly fail if username is a word
+            if (exists $word_hash->{$username}) {
+                $debug and warn "contains $username (username)";
+                return $FAILING_SCORE;
+            }
+
+            # get display name
+            my @full_name = map { lc } split /,? /, get_display_name({
+                ldap_server => $LDAP_SERVER,
+                username    => $username,
+            });
+            $debug and warn "full name: @full_name";
+
+            # fail if any part of the full name is a word
+            return any { exists $word_hash->{$_} } @full_name
+                   ? $FAILING_SCORE
+                   : 1
+                   ;
+        },
+    },
+
+    # Look up the passphrase in our phrasebook.
+
+    {
+        code     => 454,
+        message  => 'is too common',
+        test     => {
+            'what a piece of work is man'          => { score => 50 },
+            'a fool and his money are soon parted' => { score => 50 },
+        },
+        validate => sub {
+            my ($input) = @_;
+
+            # normalize for hash lookup
+            my $comparison_key = lc $input;
+            $comparison_key =~ s/[^a-z ]//gi;
+
+            return $COMMON_PHRASEBOOK->has($comparison_key)
+                   ? $FAILING_SCORE
+                   : 1
+                   ;
+        },
+    },
+];

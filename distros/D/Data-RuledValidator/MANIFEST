@@ -1,0 +1,30 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/sentence-cgi.t
+t/sentence-object.t
+t/filter.t
+t/mail.t
+t/pod.t
+t/rule.t
+t/original.rule
+t/original-2.rule
+t/rule-complicate.t
+t/validator.rule
+t/validator_complicate.rule
+t/filter.rule
+t/lib/Data/RuledValidator/Plugin/URL.pm
+t/lib/Data/RuledValidator/Filter/X.pm
+t/lib/Data/RuledValidator/Filter/X2.pm
+t/lib/DRV_Test.pm
+
+lib/Data/RuledValidator.pm
+lib/Data/RuledValidator/Filter.pm
+lib/Data/RuledValidator/Util.pm
+lib/Data/RuledValidator/Closure.pm
+lib/Data/RuledValidator/Plugin/Core.pm
+lib/Data/RuledValidator/Plugin/Email.pm
+lib/Data/RuledValidator/Plugin/EmailLoose.pm
+META.yml                                 Module meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

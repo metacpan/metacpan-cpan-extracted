@@ -1,0 +1,44 @@
+Changes
+lib/DBIx/XHTML_Table.pm
+Makefile.PL
+MANIFEST			This list of files
+readme.md
+t/00-load.t
+t/01-run.t
+t/02-exec-query.t
+t/03-cookbook.t
+t/04-mixed-case-col-keys-array.t
+t/05-mixed-case-col-keys-dbd.t
+t/06-html-encode.t
+t/data/cookbook.csv
+t/data/expected/001-no-modifications.html
+t/data/expected/002-sorted-attributes.html
+t/data/expected/003-table-border.html
+t/data/expected/004-table-inline-css.html
+t/data/expected/005-table-and-cell-inline-css.html
+t/data/expected/006-align-th-right.html
+t/data/expected/007-add-caption.html
+t/data/expected/008-add-caption-css.html
+t/data/expected/009-add-caption-border.html
+t/data/expected/010-put-caption-at-bottom.html
+t/data/expected/011-no-header.html
+t/data/expected/012-color-one-column.html
+t/data/expected/013-color-many-columns.html
+t/data/expected/014-color-alternating-columns.html
+t/data/expected/015-add-column.html
+t/data/expected/016-seperate-groups.html
+t/data/expected/017-calc-totals.html
+t/data/expected/018-calc-subtotals.html
+t/data/expected/019-arbitrary-foot-data.html
+t/data/expected/020-copy-headers-to-foot.html
+t/data/expected/021-set-col-colors.html
+t/data/expected/022-modify-three-colors.html
+t/data/expected/023-modify-four-colors.html
+t/data/expected/024-modify-five-colors.html
+t/data/unit/02/test.csv
+t/data/unit/02/test_copy.csv
+t/data/unit/05/table1.csv
+t/data/unit/05/table2.csv
+t/data/unit/05/table3.csv
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

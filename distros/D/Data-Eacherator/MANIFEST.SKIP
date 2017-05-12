@@ -1,0 +1,6 @@
+\.bak$
+~$
+(^|\/)\.svn\/
+(^|\/)\.svnignore$
+(^|\/)Makefile$
+(^|\/)MANIFEST$

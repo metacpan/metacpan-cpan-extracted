@@ -1,0 +1,23 @@
+Changes
+examples/bitbang-tickit-ui.pl
+examples/max7221-clock.pl
+examples/mpl3115a2.pl
+examples/synopsis.pl
+FTDI.xs
+lib/Device/Chip/Adapter/FTDI.pm
+lib/Device/FTDI.pm
+lib/Device/FTDI/I2C.pm
+lib/Device/FTDI/MPSSE.pm
+lib/Device/FTDI/SPI.pm
+Makefile.PL
+MANIFEST			This list of files
+META.json			Module JSON meta-data (added by MakeMaker)
+META.yml			Module meta-data (added by MakeMaker)
+ppport.h
+README
+t/00-load.t
+t/ftdi.t
+t/manifest.t
+t/pod.t
+typemap
+util/generate_const.pl

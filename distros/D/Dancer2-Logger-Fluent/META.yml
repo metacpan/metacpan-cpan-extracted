@@ -1,0 +1,39 @@
+---
+abstract: 'Dancer2 logger engine for Fluent::Logger'
+author:
+  - 'Arnold Tan Casis <atancasis@cpan.org>'
+build_requires:
+  HTTP::Request::Common: '6.11'
+  Plack::Test: '0'
+  Test::More: '0.96'
+  Test::Pod: '1.51'
+  Test::Pod::Coverage: '1.10'
+configure_requires:
+  Module::Build::Tiny: '0.034'
+dynamic_config: 0
+generated_by: 'Dist::Milla version v1.0.17, Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150005'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dancer2-Logger-Fluent
+no_index:
+  directory:
+    - eg
+    - examples
+    - inc
+    - share
+    - t
+    - xt
+requires:
+  Dancer2: '0.204002'
+  Fluent::Logger: '0.19'
+  Moo: '2.000000'
+  Time::Moment: '0.41'
+  perl: '5.008005'
+resources:
+  bugtracker: https://github.com/atancasis/Dancer2-Logger-Fluent/issues
+  homepage: https://github.com/atancasis/Dancer2-Logger-Fluent
+  repository: https://github.com/atancasis/Dancer2-Logger-Fluent.git
+version: '0.06'
+x_serialization_backend: 'YAML::Tiny version 1.69'

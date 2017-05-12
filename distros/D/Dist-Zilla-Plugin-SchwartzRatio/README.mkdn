@@ -1,0 +1,36 @@
+# NAME
+
+Dist::Zilla::Plugin::SchwartzRatio - display the Schwartz ratio of the distribution upon release
+
+# VERSION
+
+version 0.2.0
+
+# SYNOPSIS
+
+In dist.ini:
+
+    [SchwartzRatio]
+
+# DESCRIPTION
+
+The Schwartz Ratio of CPAN is the number of number of latest
+releases over the total number of releases that CPAN has. For
+a single distribution, it boils down to the less exciting
+number of previous releases still on CPAN. 
+
+After a successful release, the plugin displays
+the releases of the distribution still kickign around on CPAN,
+just to give an idea to the author that maybe it's time
+to do some cleanup.
+
+# AUTHOR
+
+Yanick Champoux <yanick@babyl.dyndns.org>
+
+# COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2012 by Yanick Champoux.
+
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.

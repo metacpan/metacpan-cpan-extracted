@@ -1,0 +1,22 @@
+plugins:
+    Auth::Extensible:
+        realms:
+            config1:
+                provider: Provider::IMAP::WithRoles
+                host: config1
+                users:
+                    - user: dave
+                      roles:
+                          - BeerDrinker
+                          - Motorcyclist
+                    - user: bob
+                      roles:
+                          - CiderDrinker
+            config2:
+                provider: Provider::IMAP::WithRoles
+                priority: 10
+                host: config2
+            config3:
+                provider: Provider::IMAP::WithRoles
+                priority: 2
+                host: config3

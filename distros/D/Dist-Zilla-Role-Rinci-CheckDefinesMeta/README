@@ -1,0 +1,14 @@
+METHODS
+
+ $obj->check_dist_defines_rinci_meta => bool
+
+    Will return true if dist defines Rinci metadata. Currently this is done
+    via the following: 1) load all the module files and check whether %SPEC
+    in the corresponding package contains stuffs; 2) analyze all the
+    scripts using PPI and try to find any assignment like $SPEC{something}
+    = { ... } (this might miss some stuffs).
+
+SEE ALSO
+
+    Rinci
+

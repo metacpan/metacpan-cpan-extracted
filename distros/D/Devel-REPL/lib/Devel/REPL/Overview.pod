@@ -1,0 +1,272 @@
+=pod
+
+=head1 NAME
+
+Devel::REPL::Overview - overview of Devel::REPL.
+
+=head1 DESCRIPTION
+
+=head2 What is a console? How it can assist you?
+
+Most modern languages have consoles. The console is an interactive tool
+that evaluates your input while you type it.
+It gives you several advantages:
+
+=over 2
+
+=item *
+
+Quickly test some thought or tricky expression
+
+=item *
+
+Run some code bigger than one line without a temporary file
+
+=item *
+
+Play around with libraries and modules
+
+=item *
+
+You can even call a console in your script and play around in script's context
+
+=back
+
+For Ruby it would be irb, for Python is... python by itself and for perl...
+and there was nothing for perl (except that ugly perl -d -e "" and several
+failed projects) until L<Devel::REPL> was written by Matt S Trout (a.k.a. mst)
+from ShadowCatSystems L<http://www.shadowcatsystems.co.uk>.
+
+=head2 Devel::REPL - the Perl console
+
+REPL stands for Read, Evaluate, Print, Loop.
+Lets install and try it.
+
+       $ cpan Devel::REPL
+
+After installation you have a lot of new modules,
+but the most interesting things are:
+
+=over 2
+
+=item *
+
+Devel::REPL
+  A top level module.
+
+=item *
+
+re.pl
+  Wrapper script, running console.
+
+=back
+
+And a bunch of plugins (I'll describe them later).
+In command line type:
+
+      $ re.pl
+
+If everything is ok you'll see a prompt (underlined $).
+That's it. You can start typing expressions.
+
+An example session:
+
+  $ sub factorial {
+
+  > my $number = shift;
+
+  > return $number > 1 ? $number * factorial($number-1) : $number;
+
+  > }
+
+  $ factorial 1 # by the way, comments are allowed
+
+  1 # our return value
+
+  $ factorial 5
+
+  120
+
+  $ [1,2,3,4,5,6,7]
+  $ARRAY1 = [
+              1,
+              2,
+              3, # return values are printed with Data::Dumper::Streamer.
+              4, # See Plugins section
+              5,
+              6,
+              7
+            ];
+
+  $ {apple=>1,fruit=>'apple',cart=>['apple','banana']}
+  $HASH1 = {
+            apple => 1,
+            cart  => [
+                      'apple',
+                      'banana'
+            ],
+            fruit => 'apple'
+  };
+
+  $ package MyPackage; # create a package
+
+  $ sub say_hi { # define a sub
+
+  > print "Hi!\n";
+
+  > } # statement is evaluated only after we've finished typing block.
+      # See Plugins section.
+  > __PACKAGE__
+  MyPackage
+  > package main;
+
+  > __PACKAGE_
+  main
+  > MyPackage->say_hi
+  Hi!
+  1
+  $
+
+
+=head2 Control files a.k.a. I don't want to type it every time
+
+L<Devel::REPL> has a control files feature. Control files are
+evaluated on session start in the same way as you would
+type them manually in the console.
+
+The default control file is located at F<$HOME/.re.pl/repl.rc>.
+
+You can store there any statements you would normally type in.
+
+I.e. my F<$HOME/.re.pl/repl.rc> has next lines:
+
+      use feature 'say'; # to don't write \n all the time
+
+      use Data::Dumper;
+
+      # pretty print data structures
+      sub pp { print Data::Dumper->Dump([@_]) }
+
+You can have multiple control files and they can be anywhere in the
+file system. To make F<re.pl> use some rc-file other than F<repl.rc>,
+call it like this:
+
+      $ re.pl --rcfile /path/to/your/rc.file
+
+If your rc-file is in F<$HOME/.re.pl> directory, you can omit the path:
+
+      $ re.pl --rcfile rc.file
+
+If you have rc-file with the same name in current directory
+and you don't want to type path, you can:
+
+      $ re.pl --rcfile ./rc.file
+
+=head2 I want it to bark, fly, jump and swim! or Plugins
+
+Plugins extend functionality and change behavior of Devel::REPL.
+Bundled plugins are:
+
+=over 2
+
+=item *
+
+L<Devel::REPL::Plugin::History>
+  No comments. Simply history.
+
+=item *
+
+L<Devel::REPL::Plugin::!LexEnv>
+  Provides a lexical environment for the Devel::REPL.
+
+=item *
+
+L<Devel::REPL::Plugin::DDS>
+  Formats return values with Data::Dump::Streamer module.
+
+=item *
+
+L<Devel::REPL::Plugin::Packages>
+  Keeps track of which package your're in.
+
+=item *
+
+L<Devel::REPL::Plugin::Commands>
+  Generic command creation plugin using injected functions.
+
+=item *
+
+L<Devel::REPL::Plugin::MultiLine::PPI>
+  Makes Devel::REPL read your input until your block
+  is finished. What does this means: you can type a part of a block
+  on one line and second part on another:
+
+       $ sub mysub {
+
+       > print "Hello, World!\n"; ## notice prompt change
+
+       > }
+
+       $ mysub
+       Hello, World!
+       1
+       $
+
+  but this *doesn't* mean you can print sub name or identifier
+  on several lines. Don't do that! It won't work.
+
+=back
+
+There are lots of contributed plugins you can find at CPAN.
+
+=head1 Profiles
+
+If plugins change and extend functionality of L<Devel::REPL>, profiles
+are changing your environment (loaded plugins, constants, subs and etc.).
+
+For example, the Minimal profile, L<Devel::REPL::Profile::Minimal>:
+
+      package Devel::REPL::Profile::Minimal;
+
+      use Moose; ### advanced OOP system for Perl
+
+      ### keep those exports/imports out of our namespace
+      use namespace::autoclean;
+
+      with 'Devel::REPL::Profile';  ## seem perldoc Muse
+
+      sub plugins { ### plugins we want to be loaded
+        qw(History LexEnv DDS Packages Commands MultiLine::PPI);
+      }
+
+      ### the only required sub for profile,
+      ### it is called on profile activation
+      sub apply_profile {
+        my ($self, $repl) = @_;
+        ### $self - no comments, $repl - current instance of Devel::REPL
+
+        $repl->load_plugin($_) for $self->plugins; ### load our plugins
+      }
+
+      1;
+
+There is also the L<StandardDevel::REPL::Profile::Standard> profile, which contains a number of optional (yet
+very useful) features.
+
+To enable some profile use the C<--profile> switch:
+
+      $ re.pl --profile SomeProfile
+
+Alternatively, you can set the environment variable C<DEVEL_REPL_PROFILE> to
+C<SomeProfile>, or set the C<profile> key in your C<rcfile> (see
+L<Devel::REPL> for more information).
+
+=head1 SEE ALSO
+
+=for :list
+* L<Devel::REPL>
+* L<Devel::REPL::Plugin>
+* L<Devel::REPL::Profile>
+* L<Reply>
+
+=cut

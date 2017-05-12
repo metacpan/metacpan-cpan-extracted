@@ -1,0 +1,528 @@
+#!/usr/local/bin/perl -w
+#
+#     Example script for DateTime::Calendar::FrenchRevolutionary:
+#     print a few tables for an easy conversion of dates from Gregorian to French Revolutionary
+#     Copyright (C) 2003, 2004, 2010, 2011, 2014, 2016 Jean Forget. All rights reserved.
+#
+#     See the license in the embedded documentation below.
+#
+
+use utf8;
+use strict;
+use Getopt::Long;
+use DateTime::Calendar::FrenchRevolutionary;
+use FindBin;
+use constant DEBUG => 0;
+
+my ($columns, $lang, $last, $example, $table_workaround) 
+ = (       9, 'en',   2099, 17991109, 0);
+
+GetOptions('columns=i'        => \$columns
+        ,  'lang=s'           => \$lang
+        ,  'example=s'        => \$example
+        ,  'table-workaround' => \$table_workaround
+       );
+die "At least 5 columns" if $columns < 5;
+die "The number of columns must be a multiple of 4 plus 1 (e.g. 5, 9 or 13)"
+  unless $columns % 4 == 1;
+
+binmode STDOUT, ':utf8';
+
+--$columns; # because actually we do not want to be bothered with the heading column
+
+# Because both the Gregorian leap day and the French Revolutionary leap
+# day occur in the middle of a Gregorian year, each year is divided into
+# three parts: begin (January to February), middle (March to mid-September) and
+# end (mid-September to December).
+my @parts = ('b', 'm', 'e');
+
+# For each year and each part, we store the F_R day number of a specific G day.
+# This specific day is
+#      b => 1 January
+#      m => 1 March
+#      e => 1 October
+# We partially store the reverse : for each part or year and each F_R day number,
+# which year can be taken as an sample.
+my %day_of_yearpart;
+my %year_of_partday;
+
+# We fill the hashes. There is a special case with 1792, because the beginning
+# and middle cannot be converted to F-R. So we store out-of-bounds values in the hash.
+foreach my $part (@parts)
+  { day_of_yearpart($_, $part) foreach (1793..$last) }
+
+$day_of_yearpart{1792}{'b'} = 1;
+$day_of_yearpart{1792}{'m'} = 1;
+day_of_yearpart(1792, 'e');
+
+if (DEBUG)
+  {
+    for my $year (1792 .. $last)
+      {
+        print ' ', day_of_yearpart($year, $_) foreach (@parts);
+        print "\n" if $year % 4 == 3;
+      }
+    print "\n";
+  }
+
+# The output tables do not contain the Jan-Mar-Oct day number, but a letter,
+# which is easier to remember. So to each part - day number combination, we
+# assign a letter.
+my $next_letter = 'a';
+my %letter_of_partday;
+foreach my $part (@parts)
+  {
+    foreach (sort { $a <=> $b } keys %{$year_of_partday{$part}})
+      {
+        # print STDERR "$part $_ $next_letter\n";
+        $letter_of_partday{$part}{$_} = $next_letter ++;
+        ++$next_letter if $next_letter eq 'i'; # To prevent i<->j confusion
+      }
+  }
+$letter_of_partday{'b'}{$day_of_yearpart{1792}{'b'}} = ' ';
+$letter_of_partday{'m'}{$day_of_yearpart{1792}{'m'}} = ' ';
+
+if (DEBUG)
+  {
+    for my $year (1792 .. $last)
+      {
+        print ' ', $year, ' ', word_for_year($year);
+        print "\n" if $year % 4 == 3;
+      }
+    print "\n";
+  }
+
+# The year -> 3-letter word function is periodic, except for a few glitches
+# each time the Gregorian or F-R century changes. So, years are grouped
+# by four, each group is identified by a 12-letter word.
+# The groups are merged into intervals if they have the same word.
+
+my %line_for_interval;
+my %end_of_interval;
+build_intervals();
+
+if (DEBUG)
+  {
+    print "$_ $end_of_interval{$_} $line_for_interval{$_}\n" 
+       foreach (sort { $a <=> $b } keys %line_for_interval);
+  }
+
+# Some language-dependant variables are set in the "done" files.
+# Therefore, they cannot be "my" variables, they must be global.
+# I don't use "our", because it would break in older versions.
+
+my $ref_labels;
+if ($lang eq 'fr')
+  { $ref_labels = do "$FindBin::Bin/labels_fr" }
+else
+  { $ref_labels = do "$FindBin::Bin/labels_en" }
+my %labels = %$ref_labels;
+
+html_0($labels{titleg2r});
+html_1($labels{title1});
+html_2($_) foreach (@parts);
+print "<p>\n";
+html_3($labels{title3});
+print "<p>\n";
+print "<table><tr><td>\n" if $table_workaround;
+usage($example);
+print "</td></tr></table>\n" if $table_workaround;
+print "</body>\n</html>\n";
+
+#
+# Gives the letter for a year and a part
+# creating one if necessary
+#
+sub day_of_yearpart {
+  my ($year, $part) = @_; # year: 1792 to 2300 or so, $part: b, m, e
+
+  # memoized version
+  return $day_of_yearpart{$year}{$part} if $day_of_yearpart{$year}{$part};
+
+  # computed version
+  my $month = $part eq 'b' ? 1 : $part eq 'm' ? 3 : 10;
+  #my $date =  new Date::Convert::Gregorian $year, $month, 1;
+  #convert Date::Convert::FrenchRevolutionary $date;
+  my $dg = DateTime->new(year => $year, month => $month);
+  my $dr = DateTime::Calendar::FrenchRevolutionary->from_object(object => $dg);
+  my $day = $dr->day();
+  # if no sample year yet, remember this one
+  $year_of_partday{$part}{$day} = $year unless $year_of_partday{$part}{$day};
+  $day_of_yearpart{$year}{$part} = $day;
+}
+
+#sub word_for_interval {
+#  my ($year) = @_;
+#  join '', map { word_for_year($year + $_) } (0..3);
+#}
+
+sub word_for_year {
+  my ($year) = @_;
+  join '', map { letter_of_yearpart($year, $_) } @parts;
+}
+
+sub letter_of_yearpart {
+  my ($year, $part) = @_;
+  $letter_of_partday{$part}{$day_of_yearpart{$year}{$part}};
+}
+
+sub build_intervals {
+  my $current_start = 1792;
+  %line_for_interval = (1792 => '   ' x $columns);
+
+  foreach my $year (1792..$last)
+    {
+      my $old_line = $line_for_interval{$current_start};
+      my $new_line = '   ' x $columns;
+      substr($new_line, $year % 100 % $columns * 3, 3) = word_for_year($year);
+      my $intersection = $old_line & $new_line;
+      $intersection =~ tr / /./;
+      unless ($old_line =~ m{$intersection} && $new_line =~ m{$intersection})
+        {
+	  $current_start = $year;
+	  $line_for_interval{$year} = $new_line;
+	}
+      $line_for_interval{$current_start} |= $new_line;
+      $end_of_interval{$current_start} = $year;
+  }
+}
+
+#
+# Compute the formulas for a sample year and for a month.
+# 1st January 1796 is 11 Nivôse IV, and 31 January 1796 is 11 Pluviôse IV.
+# Therefore, for January 1796, we have two formulas : "+10 Niv" and "-20 Plu".
+# Since all French Revolutionary months have 30 days, only one computation is necessary.
+# Exception: the additional days are grouped in a notional 13th month, which lasts
+# either 5 or 6 days. In this case, we have 3 formulas for September, at the cost of 2 conversions.
+#
+sub formulas {
+  my ($year, $month) = @_;
+  my @formulas = ();
+  my @month = qw(Niv Plu Vnt Ger Flo Pra Mes The Fru S-C Vnd Bru Fri Niv);
+  #my $date = new Date::Convert::Gregorian $year, $month, 1;
+  #convert Date::Convert::FrenchRevolutionary $date;
+  my $dg = DateTime->new(year => $year, month => $month);
+  my $dr = DateTime::Calendar::FrenchRevolutionary->from_object(object => $dg);
+  my $offset = $dr->day() - 1;
+  if ($month <= 9) # Have to split in two, because of the additional days within @month
+    {
+      push @formulas, "+$offset $month[$month - 1]";
+      $offset = 30 - $offset;
+      push @formulas, "-$offset $month[$month]";
+    }
+  else
+    {
+      push @formulas, "+$offset $month[$month]";
+      $offset = 30 - $offset;
+      push @formulas, "-$offset $month[$month + 1]";
+    }
+  if ($month == 9)
+    {
+      #$date  = new Date::Convert::FrenchRevolutionary $year - 1791, 1, 1;
+      #convert Date::Convert::Gregorian $date;
+      $dr = DateTime::Calendar::FrenchRevolutionary->new(year => $year - 1791);
+      $dg = DateTime->from_object(object => $dr);
+      $offset = $dg->day() - 1;
+      push @formulas, "-$offset Vnd";
+    }
+
+  @formulas;
+}
+
+sub html_0 {
+  my ($title) = @_;
+  print <<"EOF";
+<html>
+<head>
+<title>$title</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+</head>
+<body>
+<h1>$title</h1>
+EOF
+}
+
+sub html_1 {
+  my ($title1) = @_;
+  print "<table border><tr><td></td><th align='center' colspan='$columns'>$title1</th></tr><tr align='right'><td></td>\n";
+  foreach my $n1 (0 .. $columns - 1)
+    {
+      printf "<td>%2d", $n1;
+      for (my $n0 = $n1 + $columns; $n0 <= 99; $n0 += $columns) 
+        { printf "<br>%2d", $n0 }
+      print "<br>&nbsp;" if $n1 > 99 % $columns; # better aligned numbers
+      print "</td>\n";
+    }
+  print "</tr>\n";
+  foreach my $year1 (sort { $a <=> $b } keys %end_of_interval)
+    {
+      print "<tr align='center'><td>$year1 - $end_of_interval{$year1}";
+      my $line = $line_for_interval{$year1};
+      $line =~ s=(...)=</td><td>$1=g;
+      print $line;
+      print "</td></tr>\n";
+    }
+  print "</table>\n";
+}
+
+sub html_2 {
+  my ($part)  = @_;
+  my @days    = sort { $a <=> $b } grep { $_ != 1 } keys %{$letter_of_partday{$part}};
+  my $colspan = @days + 1;
+  print "<p><table border><tr><th align='center' colspan='$colspan'>$labels{title2}{$part}</th></tr>\n";
+  html_2header($part eq 'e' ? 1791 : 1792, $part);
+  # the part of September in the end of the year
+  if ($part eq 'e')
+    {
+      print "<tr align='center'><td>$labels{month}[8]</td>";
+      foreach (@days)
+        {
+          my $year = $year_of_partday{$part}{$_};
+          my @formulas = formulas($year, 9);
+	  print "<td>$formulas[2]</td>\n";
+	}
+      print "</tr>\n";
+    }
+  # The regular months of the part of the year
+  my @month_list = $part eq 'b' ? (1..2) : $part eq 'm' ? (3..9) : (10..12);
+  foreach my $month (@month_list)
+    {
+      print "<tr align='center'><td>$labels{month}[$month - 1]</td>";
+      foreach (@days)
+        {
+          my $year = $year_of_partday{$part}{$_};
+          my @formulas = formulas($year, $month);
+	  print "<td>$formulas[0]<br>$formulas[1]</td>\n";
+	}
+      print "</tr>\n";
+    }
+
+  print "</table>\n";
+}
+
+sub html_2header {
+  my ($offset, $part) = @_;
+  my @letters = sort grep { $_ ne ' ' } values %{$letter_of_partday{$part}};
+  print "<tr align='center'><th>"
+      , join('</th><th>', "$labels{year_ttl} - $offset", @letters)
+      , "</th></tr>\n"; 
+}
+
+sub html_3 {
+  my ($title3) = @_;
+  print <<"HTML";
+<p>
+<table border>
+<tr><th colspan='7'>$labels{title3}</th></tr>
+<tr><td>Vnd</td><td>Vendémiaire</td><td></td>
+    <td align = 'right'>1</td><td align = 'right'>11</td><td align = 'right'>21</td>
+    <td>Primedi / Primidi</td></tr>
+<tr><td>Bru</td><td>Brumaire</td><td></td>
+    <td align = 'right'>2</td><td align = 'right'>12</td><td align = 'right'>22</td>
+    <td>Duodi</td></tr>
+<tr><td>Fri</td><td>Frimaire</td><td></td>
+    <td align = 'right'>3</td><td align = 'right'>13</td><td align = 'right'>23</td>
+    <td>Tridi</td></tr>
+<tr><td>Niv</td><td>Nivôse</td><td></td>
+    <td align = 'right'>4</td><td align = 'right'>14</td><td align = 'right'>24</td>
+    <td>Quartidi</td></tr>
+<tr><td>Plu</td><td>Pluviôse</td><td></td>
+    <td align = 'right'>5</td><td align = 'right'>15</td><td align = 'right'>25</td>
+    <td>Quintidi</td></tr>
+<tr><td>Vnt</td><td>Ventôse</td><td></td>
+    <td align = 'right'>6</td><td align = 'right'>16</td><td align = 'right'>26</td>
+    <td>Sextidi</td></tr>
+<tr><td>Ger</td><td>Germinal</td><td></td>
+    <td align = 'right'>7</td><td align = 'right'>17</td><td align = 'right'>27</td>
+    <td>Septidi</td></tr>
+<tr><td>Flo</td><td>Floréal</td><td></td>
+    <td align = 'right'>8</td><td align = 'right'>18</td><td align = 'right'>28</td>
+    <td>Octidi</td></tr>
+<tr><td>Pra</td><td>Prairial</td><td></td>
+    <td align = 'right'>9</td><td align = 'right'>19</td><td align = 'right'>29</td>
+    <td>Nonidi</td></tr>
+<tr><td>Mes</td><td>Messidor</td><td></td>
+    <td align = 'right'>10</td><td align = 'right'>20</td><td align = 'right'>30</td>
+    <td>Décadi</td></tr>
+<tr><td>The</td><td>Thermidor</td></tr>
+<tr><td>Fru</td><td>Fructidor</td></tr>
+<tr><td>S-C</td><td colspan='7'>Sans-Culottides / $labels{add_days}</td></tr>
+</table>
+<p>
+HTML
+}
+
+sub usage {
+  my ($day) = @_;
+  my ($y, $m, $d) = unpack "A4A2A2", $day;
+  # We do not want September for the first example, so we choose a random month
+  # except February (in order to punt the problem of a 29th or 30th February)
+  if ($m == 9)
+    {
+      my @m = qw(1 3 4 5 6 7 8 10 11 12);
+      $m = $m[10 * rand];
+    }
+
+  # First example
+  my $gr_date  = &{$labels{format}}($y, $m, $d, $lang);
+  #my $date = new Date::Convert::Gregorian $y, $m, $d;
+  #convert Date::Convert::FrenchRevolutionary $date;
+  my $date = DateTime::Calendar::FrenchRevolutionary->from_object(object => DateTime->new(year => $y, month => $m, day => $d));
+  my $y2       = sprintf "%02d", $y % 100;
+  my $part     = $m <= 2 ? 'b' : $m < 9 ? 'm' : 'e';
+  my $offset   = $part eq 'e' ? 1791 : 1792;
+  my $letter   = letter_of_yearpart($y, $part);
+  my $word     = word_for_year($y);
+  my @formulas = formulas($y, $m);
+  my $limit    = $1 if $formulas[1] =~ /(\d+)/;
+  my $formula  = $formulas[$d <= $limit ? 0 : 1];
+  my $ryear    = $date->year();
+  my $begint; # Beginning of the interval
+  foreach (sort { $a <=> $b } keys %end_of_interval)
+    {
+      last if $y < $_;
+      $begint = $_;
+    }
+  my $abridged  = $date->strftime("%e %b");
+  my $rev_date  = $date->strftime("%A %e %B %EY");
+  $_ = eval "qq($labels{usage1})";
+  print;
+  print "\n";
+
+  # Second example: September
+  # $m = 9;
+  $gr_date  = &{$labels{format}}($y, 9, $d, $lang);
+  #$date = new Date::Convert::Gregorian $y, 9, $d;
+  #convert Date::Convert::FrenchRevolutionary $date;
+  $date = DateTime::Calendar::FrenchRevolutionary->from_object(object => DateTime->new(year => $y, month => 9, day => $d));
+  @formulas   = formulas($y, 9);
+  my $mletter = letter_of_yearpart($y, 'm');
+  my $eletter = letter_of_yearpart($y, 'e');
+  $abridged   = $date->strftime("%e %b %Y");
+  $rev_date   = $date->strftime("%A %e %B %EY");
+  $limit = $1 if $formulas[1] =~ /(\d+)/;
+  if ($d <= $limit)
+    { $formula = $formulas[0]; $offset = 1792 }
+  else
+    {
+      $limit = $1 if $formulas[2] =~ /(\d+)/;
+      if ($d <= $limit)
+        { $formula = $formulas[1]; $offset = 1792 }
+      else
+        { $formula = $formulas[2]; $offset = 1791 }
+    }
+  $_ = eval "qq($labels{usage2})";
+  print;
+}
+
+__END__
+
+=encoding utf8
+
+=head1 NAME
+
+g2r_table -  Print a few  charts which can  be used to convert  a date from the Gregorian calendar to the French Revolutionary calendar.
+
+=head1 SYNOPSIS
+
+g2r_table [--columns=I<number>] [--example=I<date>] [--lang=I<language>] [--table-workaround]
+
+=head1 DESCRIPTION
+
+This program prints five tables, plus  a small text showing how to use
+these tables.   The output uses  UTF-8 encoding and HTML  format. When
+printed  from  a  table-aware   web  browser,  these  tables  allow  a
+computer-less user to convert dates from the Gregorian calendar to the
+French Revolutionary calendar.
+
+=head1 OPTIONS
+
+=over 4
+
+=item columns
+
+The  number of  columns in  the first  table.  This  number must  be a
+multiple of 4  (because of the 4-year quasi-cycle  for leap days) plus
+one (for the first line, giving  year intervals). So you can choose 5,
+9,  13 or  17.  Higher number  are  allowed, but  they  will not  give
+beutiful results.
+
+=item example
+
+The  instructions for  use need  a date  as an  example. The  user can
+select  the date  that will  be used  as an  example  (Gregorian date,
+YYYYMMDD numeric format). Actually, the instructions use two examples:
+the first one  not in September, the second one  in September.  If the
+user provides  a date in September,  the program will  select a random
+month for the first example.
+
+=item lang
+
+Select  the language  that  will be  used  for all  language-dependant
+elements, including the instructions for use.
+
+=over 4
+
+=item en
+
+English (default)
+
+=item us
+
+English, with the Gregorian dates formatted in the US way (December 1,
+2001)
+
+=item fr
+
+French
+
+=back
+
+=item table-workaround
+
+I have noticed that when my  web browser renders and prints tables, it
+has problems with plain text following the tables, and it might skip a
+few plain  text lines.  In  the present case,  the first lines  of the
+instructions for use disappear.   The workaround I have found consists
+in  building a  table around  the  instructions for  use. This  option
+triggers this workaround.
+
+=back
+
+=head1 AUTHOR
+
+Jean Forget <JFORGET@cpan.org>
+
+=head1 LICENSE STUFF
+
+Copyright (c)  2003, 2004,  2010, 2012, 2014,  2016 Jean  Forget.  All
+rights reserved.  This program is  free software. You  can distribute,
+modify,  and otherwise  mangle DateTime::Calendar::FrenchRevolutionary
+under the same terms as perl 5.16.3.
+
+This program is  distributed under the same terms  as Perl 5.16.3: GNU
+Public License version 1 or later and Perl Artistic License
+
+You can find the text of the licenses in the F<LICENSE> file or at
+L<http://www.perlfoundation.org/artistic_license_1_0> and
+L<http://www.gnu.org/licenses/gpl-1.0.html>.
+
+Here is the summary of GPL:
+
+This program is  free software; you can redistribute  it and/or modify
+it under the  terms of the GNU General Public  License as published by
+the Free  Software Foundation; either  version 1, or (at  your option)
+any later version.
+
+This program  is distributed in the  hope that it will  be useful, but
+WITHOUT   ANY  WARRANTY;   without  even   the  implied   warranty  of
+MERCHANTABILITY  or FITNESS  FOR A  PARTICULAR PURPOSE.   See  the GNU
+General Public License for more details.
+
+You  should have received  a copy  of the  GNU General  Public License
+along with this program; if not, see <http://www.gnu.org/licenses/> or
+write to the Free Software Foundation, Inc., L<http://fsf.org>.
+
+=cut
+
+

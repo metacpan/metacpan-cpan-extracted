@@ -1,0 +1,31 @@
+---
+abstract: 'Parse and format baby-style time'
+author:
+  - 'Rick Measham (rickm@cpan.org)'
+  - 'Jean Forget <JFORGET@cpan.org>'
+build_requires:
+  ExtUtils::MakeMaker: 6.57_02
+  Test::More: 0
+dynamic_config: 1
+generated_by: 'ExtUtils::MakeMaker version 6.6302, CPAN::Meta::Converter version 2.120630'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: DateTime-Format-Baby
+no_index:
+  directory:
+    - t
+    - inc
+provides:
+  DateTime::Format::Baby:
+    file: lib/DateTime/Format/Baby.pm
+    version: 1.0200
+requires:
+  Carp: 0
+  DateTime: 0.16
+  Params::Validate: 0
+  perl: v5.6.1
+resources:
+  repository: https://github.com/jforget/DateTime-Format-Baby.git
+version: 1.0200

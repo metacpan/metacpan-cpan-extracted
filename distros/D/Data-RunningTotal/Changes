@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::RunningTotal.
+
+0.01  Fri Nov 13 07:45:08 2009
+	- original version; created by h2xs 1.23 with options
+		-AX Data::RunningTotal
+0.02  Wed Nov 18 2009
+        - improved some of the documentation
+        - added combineChangeLists method
+0.03  Wed Nov 18 2009
+        - Fixed some botched POD
+

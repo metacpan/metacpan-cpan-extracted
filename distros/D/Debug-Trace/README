@@ -1,0 +1,49 @@
+Debug/Trace version 0.04
+========================
+
+Debug::Trace instruments subroutines to provide tracing information
+upon every call and return.
+
+Using Debug::Trace does not require any changes to your sources. Most
+often, it will be used from the command line:
+
+  perl -MDebug::Trace=foo,bar yourprogram.pl
+
+This will have your subroutines foo() and bar() printing call and
+return information.
+
+Subroutine names may be fully qualified to denote subroutines in other
+packages than the default main::.
+
+By default, the trace information is output using the standard warn()
+function.
+
+Modifiers are supported to change the default behavior.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+Minimal Perl version is 5.005_03.
+This module uses Perl core modules Data::Dumper and Carp.
+This module requires no other modules and libraries.
+
+SEE ALSO
+
+Attributes::Control.
+
+COPYRIGHT AND LICENCE
+
+Copyright 2002,2013 Amsterdam.pm -- All Rights Reserved.
+
+This program is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+

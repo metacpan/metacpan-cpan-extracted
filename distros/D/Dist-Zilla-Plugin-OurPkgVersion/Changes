@@ -1,0 +1,96 @@
+Revision history for Dist-Zilla-Plugin-OurPkgVersion
+
+0.10      2016-06-21
+  - Production release identical to 0.09_01
+
+0.09_01   2016-06-20
+  - Also accept perltidy "special side comments" syntax.  Please note
+    that things may break if your dist has the pattern '## VERSION'
+    in a .pm file (iansealy GH# 2)
+
+0.08      2016-04-24
+  - Dist::Zilla 5.x / 6.x and future 7.x compatability
+
+0.07      2016-03-07
+  - Use Dist::Zilla::Role::PPI to avoid reparsing documents (new GH #1)
+
+0.06      2015-05-04
+  - Use [Test::ReportPrereqs] instead of [ReportVersions::Tiny] to remove
+    deprecation warning during dzil build.
+  - Use new github repository in meta
+
+0.005001  2013-12-16
+	- update compile test so that it doesn't hang on windows GH #11 ( chorny )
+	- add contributors plugins
+
+0.005000  2013-09-07
+	- allow comment to be #VERSION
+	  - Github Issue #9
+	  - Reported by Jakob Voss ( nichtich )
+
+0.004000  2012-05-31
+	- skip parsing .pod files Github Issue #6
+	- Change comment to read TRIAL VERSION for trial releases
+	  Github Issue #7
+	  Patch by Christopher J. Madsen
+
+0.003002  2012-01-02
+	- skip if PPI unable to parse
+
+0.003001  2012-01-01
+	- Provide a better error message if PPI fails
+
+v0.3.0    2011-08-10
+	- Allow text after # VERSION comment, see docs for example
+	  Github Issue #5
+      Reported by David Golden
+
+0.2.0     2011-07-31
+	- Add debug logging of successfully adding versions
+	  Github Issue #4
+	  Patch by Christian Walde
+
+0.1.9     2011-07-23
+	- Always warn about missing # VERSION comment
+	  Github Issue #3
+	  Patch by David Golden
+
+0.1.8     2011-06-01
+	- Testing depends on Test::Version 0.04 or later
+
+0.1.7     2011-05-31
+	- use Test::Version::version_ok  to regression test gh issue #1
+
+0.1.6     2011-05-09
+	- version sanity checking now done the same way as PkgVersion
+	- above allows for vstring, e.g 'v3.3.2', style versions,
+	  Github Issue #2
+	  Reported by Mike Doherty
+	- use TestMania
+	- add MetaJSON
+
+0.1.5     2011-02-21
+	- CRITICAL: fix bug where version number wasn't quoted. This would make
+	  multipart versions (e.g. 0.1.0) not evaluate correctly, if you've used
+	  a multipart version with OurPkgVersion, please re-release your module.
+	- make module conform to l3 strictness of Perl::Critic
+	- make changes conform to CPAN::Changes::Spec
+
+0.1.4     2010-11-06
+	- Remove AutoPrereqs from corpus, don't want to depend on that
+
+0.1.3     2010-11-06
+	- Add basic tests specific to this distribution
+	- Add better error handling if no comments present
+	  GitHub Issue #1
+	  Reported by Stephen Clouse
+	- remove cruft copied from PkgVersion that wasn't necessary
+
+0.1.2     2010-08-07
+	- All Prerequisites were not properly defined, this is corrected.
+
+0.1.1     2010-08-07
+	- override munges files to narrow which files will even be looked at
+
+0.1.0     2010-08-03
+	- initial release

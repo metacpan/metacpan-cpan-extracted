@@ -1,0 +1,29 @@
+Revision history for Perl extension Data::Page::Viewport.
+
+1.06  Tue Aug 31 17:09:00 2010
+	- Fix copyright text where a global search-and-replace had corrupted copyright
+	  	to copybottom in a few places.
+
+1.05  Sun Feb 21 12:55:09 2010
+	- Remove text 'All rights reserved' (for Debian licensing).
+	- Remove POD heads 'Required Modules' and 'Changes'.
+
+1.04  Wed Feb 10 14:02:01 2010
+	- MANIFEST.SKIP updated to exclude MYMETA.yml. Add MYMETA.yml.
+
+1.03  Fri Nov 13 13:20:00 2009
+	- Run dos2unix
+	- Rename Changes.txt to CHANGES
+
+1.02  Mon Feb 21 15:06:00 2005
+	- Add an option to sub new() to allow or disable old/new style scrolling.
+		Read the POD for a full explanation of these styles.
+		Note: The default is new style scrolling, because I feel it is more DWIM
+
+1.01  Mon Feb 14 09:55:00 2005
+	- Change scrolling algorithm in sub offset() to make it DWIM
+	- Add sub current() to return the index of the 'current' item on the current page
+	- Fix typo: 'bottom' should have been 'right' in some cases
+
+1.00  Thu Dec  2 12:54:45 2004
+	- Original version

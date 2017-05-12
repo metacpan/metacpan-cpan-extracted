@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/DBIx-SQL-Abstract.t
+lib/DBIx/SQL/Abstract.pm
+META.yml                                 Module meta-data (added by MakeMaker)

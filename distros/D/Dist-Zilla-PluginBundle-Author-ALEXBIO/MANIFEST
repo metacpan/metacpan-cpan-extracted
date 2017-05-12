@@ -1,0 +1,17 @@
+Changes
+LICENSE
+MANIFEST
+META.json
+META.yml
+Makefile.PL
+README
+dist.ini
+lib/Dist/Zilla/MintingProfile/Author/ALEXBIO.pm
+lib/Dist/Zilla/PluginBundle/Author/ALEXBIO.pm
+profiles/default/Module.pm
+profiles/default/profile.ini
+profiles/default/skel/Changes
+profiles/default/skel/dist.ini
+t/00-compile.t
+t/release-check-manifest.t
+t/release-pod-syntax.t

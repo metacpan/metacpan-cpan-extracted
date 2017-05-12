@@ -1,0 +1,37 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.55.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: RIPEMD160
+
+SHA1 836cb5e326f3d9cfc0008dfce009e674c0d27cf7 .perlcriticrc
+SHA1 0768f0bdd9ae1297f7755a995124a7c32bc33021 Changes
+SHA1 12f37cbc7225ed7d23fd859ec025ab8d759eff3c INSTALL
+SHA1 c811e5ddfc5b995c1d73069b0172c7d4b4799338 LICENSE
+SHA1 782ee79322a464d22505171b15b172dbb61aae9c MANIFEST
+SHA1 afa3fac09128e98e9a0377fc70e005f63852caf6 MANIFEST.SKIP
+SHA1 c0aaf0bd0a19bb6bd4718c8ea2089e976e9e3ea2 META.yml
+SHA1 0695dea17c3ac8cc3f6baabe74ac6a91493f872f Makefile.PL
+SHA1 d7abd7ebe5a05b9f61e474a851cfb013bb301e44 README
+SHA1 583615078d83d52526e28e422de342b9364206bd Safe.pm
+SHA1 c7e84b6e2e25d3c505c2c1155d2c5c4dc8e0c718 Safe.pm.html
+SHA1 8cb0df3893f722cae9d0466806bf733926b71c2f TODO
+SHA1 7916f3b998ac39f012db5a74b5a8e5e55c76cdb2 t/01safe.t
+SHA1 35436c9c7ae76cd0e56b23ecc6921486a2cbe269 t/02perlcritic.t
+SHA1 9068bfa2c4c17f31c8b3fac1cc194dc611ae7f48 t/03db.t
+-----BEGIN PGP SIGNATURE-----
+
+iD8DBQFHE7R1vJuQZxSWSsgRA+uuAKC9ZyTwDY49VUP4tpsWzBNtpDUoygCeLKCO
+yDVtEWrrWWCq+0V/xTxWSd8=
+=7PR2
+-----END PGP SIGNATURE-----

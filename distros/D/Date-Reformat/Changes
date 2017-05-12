@@ -1,0 +1,15 @@
+Revision history for Perl extension Date::Reformat.
+
+0.04  Sat Aug 27 13:40:33 2016
+	- Escaped braces in regexes to avoid compilation errors in perl 5.25.
+
+0.03  Sat Mar 21 22:27:49 2015
+	- Added documentation and parameter type checking.
+
+0.02  Sat Feb  7 22:03:10 2015
+	- Basic functionality in place.
+
+0.01  Tue Jan 13 20:25:06 2015
+	- original version; created by h2xs 1.23 with options
+		-AX -b 5.10.0 -n Date::Reformat
+

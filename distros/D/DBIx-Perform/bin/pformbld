@@ -1,0 +1,8 @@
+#!/usr/bin/perl
+
+eval 'exec /usr/bin/perl  -S $0 ${1+"$@"}'
+    if 0; # not running under some shell
+
+use DBIx::Perform::DigestPer 'convert_per_to_yml';
+convert_per_to_yml $ARGV[0];
+

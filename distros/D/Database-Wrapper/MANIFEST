@@ -1,0 +1,9 @@
+MANIFEST
+Makefile.PL
+README
+lib/Database/Wrapper.pm
+lib/Database/Wrapper/MySQL.pm
+lib/Database/Wrapper/ODBC.pm
+lib/Database/Wrapper/Postgres.pm
+lib/Database/Wrapper/SQLite.pm
+META.yml                                 Module meta-data (added by MakeMaker)

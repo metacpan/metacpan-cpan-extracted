@@ -1,0 +1,134 @@
+<!doctype html>
+<html><head><title>Error: Trace begun at test.pl line 9</title>
+<!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/default.min.css" rel="stylesheet">
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/highlight.min.js"></script><link rel="stylesheet" type="text/css" href="" /></head><body style="padding:1em; border-top: 0px;"><h1>Error trace</h1><pre class="message">Trace begun at test.pl line 9</pre><div><h3><tt>main::foo</tt></h3><h5> at test.pl line 9</h5></div><div style="margin-left:2em"><pre><code class="perl">    6: my $html;
+    7: 
+    8: sub foo {
+<strong style="background: #faa">    9:     my $t = Devel::StackTrace::WithLexicals-&gt;new;
+</strong>   10:     $html = $t-&gt;as_html_extended;
+   11:     print $html;
+   12: }
+</code></pre><div class="panel-group" id="accordion-1"><div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a data-toggle="collapse" data-parent="#accordion-1" href="#p-1-args" class="collapse_toggle">View Arguments</a></h5></div><div id="p-1-args" class="panel-collapse collapse in"><div class="panel-body"><table class="table table-hover table-condensed table-bordered"><tr><th>Argument</th><th>Value</th></tr><tr><td class="variable"><tt>$_[0]</tt></td><td class="value"><pre class="pre-scrollable"><code>&#39;bar&#39;</code></pre></td></tr><tr><td class="variable"><tt>$_[1]</tt></td><td class="value"><pre class="pre-scrollable"><code>&#39;test&#39;</code></pre></td></tr><tr><td class="variable"><tt>$_[2]</tt></td><td class="value"><pre class="pre-scrollable"><code>{
+  &#39;nums&#39; =&gt; [
+    2,
+    2,
+    2,
+    1,
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90,
+    91,
+    92,
+    93,
+    94,
+    95,
+    96,
+    97,
+    98,
+    99,
+    100,
+    101,
+    102,
+    103,
+    104,
+    105,
+    106,
+    107,
+    108,
+    109,
+    110,
+    111,
+    112,
+    113,
+    114,
+    115,
+    116,
+    117,
+    118,
+    119,
+    120
+  ],
+  &#39;asdf&#39; =&gt; &#39;asdf&#39;
+}</code></pre></td></tr></table></div></div></div><div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a data-toggle="collapse" data-parent="#accordion-1" href="#p-1-lex" class="collapse_toggle">View Lexicals</a></h5></div><div id="p-1-lex" class="panel-collapse collapse in"><div class="panel-body"><table class="table table-hover table-condensed table-bordered"><tr><th>Variable</th><th>Value</th></tr><tr><td class="variable"><tt>$html</tt></td><td class="value"><pre class="pre-scrollable"><code>undef</code></pre></td></tr></table></div></div></div></div></div><div><h3><tt>main::bar</tt></h3><h5> at test.pl line 14</h5></div><div style="margin-left:2em"><pre><code class="perl">   11:     print $html;
+   12: }
+   13: 
+<strong style="background: #faa">   14: sub bar { foo(&quot;bar&quot;, &quot;test&quot;, { asdf =&gt; &#39;asdf&#39;, nums =&gt; [2,2,2,1, 40..120]}) }
+</strong>   15: bar(2);
+   16: 
+   17: 
+</code></pre><div class="panel-group" id="accordion-2"><div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a data-toggle="collapse" data-parent="#accordion-2" href="#p-2-args" class="collapse_toggle">View Arguments</a></h5></div><div id="p-2-args" class="panel-collapse collapse in"><div class="panel-body"><table class="table table-hover table-condensed table-bordered"><tr><th>Argument</th><th>Value</th></tr><tr><td class="variable"><tt>$_[0]</tt></td><td class="value"><pre class="pre-scrollable"><code>2</code></pre></td></tr></table></div></div></div><div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a data-toggle="collapse" data-parent="#accordion-2" href="#p-2-lex" class="collapse_toggle">View Lexicals</a></h5></div><div id="p-2-lex" class="panel-collapse collapse in"><div class="panel-body"><table class="table table-hover table-condensed table-bordered"><tr><th>Variable</th><th>Value</th></tr><tr><td class="variable"><tt>$html</tt></td><td class="value"><pre class="pre-scrollable"><code>undef</code></pre></td></tr></table></div></div></div></div></div><div><h3>test.pl line 15</h3></div><div style="margin-left:2em"><pre><code class="perl">   12: }
+   13: 
+   14: sub bar { foo(&quot;bar&quot;, &quot;test&quot;, { asdf =&gt; &#39;asdf&#39;, nums =&gt; [2,2,2,1, 40..120]}) }
+<strong style="background: #faa">   15: bar(2);
+</strong>   16: 
+   17: 
+   18: 
+</code></pre><div class="panel-group" id="accordion-3"><div class="panel panel-default"><div class="panel-heading"><h5 class="panel-title"><a data-toggle="collapse" data-parent="#accordion-3" href="#p-3-lex" class="collapse_toggle">View Lexicals</a></h5></div><div id="p-3-lex" class="panel-collapse collapse in"><div class="panel-body"><table class="table table-hover table-condensed table-bordered"><tr><th>Variable</th><th>Value</th></tr><tr><td class="variable"><tt>$html</tt></td><td class="value"><pre class="pre-scrollable"><code>undef</code></pre></td></tr></table></div></div></div></div></div><script>hljs.initHighlightingOnLoad();
+$(".collapse").collapse("hide");
+$(".collapse_toggle").click(
+function () {
+var c = $(this).html();
+if (c.indexOf("View") != -1) {
+c = c.replace("View", "Hide");
+$(this).html(c);
+} else if(c.indexOf("Hide") != -1) {
+c = c.replace("Hide", "View");
+$(this).html(c);
+}
+})
+</script><footer>Generated by Devel::StackTrace::AsHTMLExtended 0.15</footer></body></html>

@@ -1,0 +1,33 @@
+; vim: syntax=dosini
+name    = Dist-Zilla-Role-Tempdir
+author  = Kent Fredric <kentnl@cpan.org>
+license = Perl_5
+copyright_holder = Kent Fredric <kentfredric@gmail.com>
+
+[@Author::KENTNL]
+:version = 2.013
+twitter_extra_hash_tags = #distzilla
+normal_form       = numify
+mantissa          = 6
+toolkit           = eumm
+toolkit_hardness  = soft
+bumpversions      = 1
+srcreadme         = mkdn
+
+;version_major  = 0
+;version_minor  = 1
+;version_rel_year = 2009
+;version_rel_month = 10
+;version_rel_day = 26
+;version_rel_hour = 12
+;version_rel_time_zone = Pacific/Auckland
+
+[Prereqs]
+Moose = 0.92
+namespace::autoclean = 0.09
+File::chdir = 0.1002
+Digest::SHA = 5.47
+;Digest::base = 1.16
+Dist::Zilla = 2.0
+
+

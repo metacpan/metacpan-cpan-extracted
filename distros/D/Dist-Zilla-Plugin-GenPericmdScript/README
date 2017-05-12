@@ -1,0 +1,202 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     ; generate a script, by default called bin/check-palindrome
+     [GenPericmdScript]
+     url=/My/Palindrome/check_palindrome
+    
+     ; generate another script, called bin/lssrv
+     [GenPericmdScript / Gen_lssrv]
+     url=/My/App/list_servers
+     name=lssrv
+
+    After build, bin/check-palindrome and bin/lssrv will be created.
+
+DESCRIPTION
+
+    After you add Rinci metadata to your function, e.g.:
+
+     package My::Palindrome;
+     $SPEC{check_palindrome} = {
+         v => 1.1,
+         args => {
+             text => { schema=>'str*', req=>1, pos=>0 },
+             ci   => { schema=>'bool*', cmdline_aliases=>{i=>{}} },
+         },
+         result_naked => 1,
+     };
+     sub check_palindrome {
+         my %args = @_;
+         my $text = $args{ci} ? lc($args{text}) : $args{text};
+         $text eq reverse($text);
+     }
+
+    you can create a command-line script for that function that basically
+    is not much more than:
+
+     #!perl
+     use Perinci::CmdLine::Any;
+     Perinci::CmdLine::Any->new(url => '/My/Palindrome/check_palindrome');
+
+    This Dist::Zilla plugin lets you automate the creation of such scripts.
+
+    Creating scripts. To create a single script, put this in dist.ini:
+
+     [GenPericmdScript]
+     ;required
+     url=/My/Palindrome/check_palindrome
+     ;optional
+     abstract=Check if a text is a palindrome
+     ; ...
+
+    To create more scripts, load the plugin again using the [Plugin/Name]
+    syntax, e.g.:
+
+     [GenPericmdScript / GenAnotherScript]
+     ...
+
+CONFIGURATION (SCRIPT SPECIFICATION)
+
+ url* => str
+
+    Riap URL. If the script does not contain subcommand, this should refer
+    to a function URL. If the script contains subcommands, this should
+    usually refer to a package URL.
+
+ subcommands => str
+
+    For creating a CLI script with subcommands. Value is a
+    whitespace-separated entries of subcommand specification. Each
+    subcommand specification must be in the form of
+    SUBCOMMAND_NAME=URL[:SUMMARY]. Example:
+
+     delete=/My/App/delete_item add=/My/App/add_item refresh=/My/App/refresh_item:Refetch an item from source
+
+ subcommands_from_package_functions => bool
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+ include_package_functions_match => re
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+ exclude_package_functions_match => re
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+ name => str
+
+    Name of script to create. Default will be taken from function (or
+    package) name, with _ replaced to -.
+
+ summary => str
+
+    Will be passed to Perinci::CmdLine::Gen backend (as script_summary).
+
+ cmdline => str
+
+    Select module to use. Default is Perinci::CmdLine::Any, but you can set
+    this to classic (equals to Perinci::CmdLine::Classic), any
+    (Perinci::CmdLine::Any), or lite (Perinci::CmdLine::Lite) or module
+    name.
+
+ prefer_lite => bool (default: 1)
+
+    If set to 0 and you are using Perinci::CmdLine::Any, -prefer_lite
+    option will be passed in the code.
+
+ enable_log => bool
+
+    Will be passed to Perinci::CmdLine object construction code (as log).
+
+ default_log_level => str
+
+    If set, will add this code to the generated script:
+
+     BEGIN { no warnings; $main::Log_Level = "..." }
+
+    This can be used if you want your script to be verbose by default, for
+    example.
+
+ pass_cmdline_object => bool
+
+    Will be passed to Perinci::CmdLine object construction code.
+
+ extra_urls_for_version => str
+
+    Comma-separated string, will be passed to Perinci::CmdLine object
+    construction code (as array).
+
+ config_filename => str|array[str]
+
+    Will be passed to Perinci::CmdLine object construction code.
+
+ config_dirs => array[str]
+
+    Will be passed to Perinci::CmdLine object construction code.
+
+ ssl_verify_hostname => bool (default: 1)
+
+    If set to 0, will add this code to the generated script:
+
+     $ENV{PERL_LWP_SSL_VERIFY_HOSTNAME} = 0;
+
+    This can be used if the Riap function URL is https and you don't want
+    to verify.
+
+ load_modules => array[str]
+
+    Extra modules to load in the generated script.
+
+ code_before_instantiate_cmdline => str
+
+ code_after_end => str
+
+ default_format => str
+
+    Passed to Perinci::CmdLine object construction code.
+
+ skip_format => bool
+
+    Passed to Perinci::CmdLine object construction code.
+
+ use_utf8 => bool
+
+    Passed to Perinci::CmdLine object construction code.
+
+ allow_prereq => bool
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+ per_arg_json => bool
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+ per_arg_yaml => bool
+
+    Will be passed to Perinci::CmdLine::Gen backend.
+
+CONFIGURATION (OTHER)
+
+ inline_generate_completer => bool (default: 1)
+
+    Perinci::CmdLine::Inline-generated scripts currently cannot do shell
+    completion on its own, but relies on a separate completer script (e.g.
+    if the script is bin/foo then the completer will be generated at
+    bin/_foo). This option can be used to suppress the generation of
+    completer script.
+
+ build_load_modules => array[str]
+
+    Load modules during build process.
+
+SEE ALSO
+
+    Rinci
+
+    Pod::Weaver::Plugin::Rinci to fill more stuffs to the POD of the
+    generated script.
+
+    Dist::Zilla::Plugin::Rinci::* for plugins that utilize Rinci metadata.
+

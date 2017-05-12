@@ -1,0 +1,27 @@
+---
+abstract: 'A pragmatic DBI like evented module.'
+author:
+  - 'Logan Bell <logie@cpan.org>'
+build_requires:
+  DBD::SQLite: '0'
+  Test::Most: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '6.30'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 5.012, CPAN::Meta::Converter version 2.133380'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: DB-Evented
+requires:
+  AnyEvent: '0'
+  AnyEvent::DBI: '0'
+  bareword::filehandles: '0'
+  indirect: '0'
+  multidimensional: '0'
+  strictures: '0'
+resources:
+  bugtracker: https://github.com/logie17/DB-Evented/issues
+  repository: https://github.com/logie17/DB-Evented.git
+version: '0.06'

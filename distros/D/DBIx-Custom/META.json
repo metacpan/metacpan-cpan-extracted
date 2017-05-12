@@ -1,0 +1,53 @@
+{
+   "abstract" : "DBI extension to execute insert, update, delete, and select easily",
+   "author" : [
+      "Yuki Kimoto <kimoto.yuki@gmail.com>"
+   ],
+   "dynamic_config" : 1,
+   "generated_by" : "ExtUtils::MakeMaker version 7.04, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "DBIx-Custom",
+   "no_index" : {
+      "directory" : [
+         "t",
+         "inc"
+      ]
+   },
+   "prereqs" : {
+      "build" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "DBD::SQLite" : "1.25",
+            "DBI" : "1.605",
+            "DBIx::Connector" : "0.56",
+            "Object::Simple" : "3.1",
+            "Test::More" : "0"
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/yuki-kimoto/DBIx-Custom.git",
+         "web" : "https://github.com/yuki-kimoto/DBIx-Custom"
+      }
+   },
+   "version" : "0.40",
+   "x_serialization_backend" : "JSON::PP version 2.27203"
+}

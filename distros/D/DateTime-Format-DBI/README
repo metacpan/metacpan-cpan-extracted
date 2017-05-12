@@ -1,0 +1,29 @@
+DateTime::Format::DBI
+
+This module finds a DateTime::Format::* class that is suitable for the use with
+a given DBI connection (and DBD::* driver).
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+DEPENDENCIES
+
+This module requires these other modules and libraries:
+
+  (one of:)	DateTime::Format::MySQL
+		DateTime::Format::Oracle
+  		DateTime::Format::Pg
+		DateTime::Format::SQLite
+		... 
+		(see man page for a full list of supported
+		formatter/parser modules)
+
+AUTHOR
+
+  Claus Färber <CFAERBER@cpan.org>

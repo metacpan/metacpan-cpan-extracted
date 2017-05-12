@@ -1,0 +1,23 @@
+Revision history for Perl extension Dredd-Hooks
+
+0.05 2016-05-10T11:06:50Z
+
+    - Add code missing in last release
+
+0.04 2016-05-03T09:46:51Z
+
+    - use do rather than require for the hookfiles
+    - prevent warning if input not valid json
+
+0.03 2016-02-15T14:55:17Z
+
+    - Update licencing information
+
+0.02 2016-02-15T14:34:16Z
+
+    - Added missing deps in Cpanfile
+
+0.01 2016-02-15T14:14:04Z
+
+    - original version
+

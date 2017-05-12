@@ -1,0 +1,119 @@
+package DBIx::Schema::Changelog::Cookbook;
+$DBIx::Schema::Changelog::Cookbook::VERSION = '0.9.0';
+__END__
+
+=pod
+
+=head1 NAME
+
+DBIx::Schema::Changelog::Cookbook - A gentle introduction to DBIx::Schema::Changelog
+
+=head1 VERSION
+
+Version 0.9.0
+
+
+=head1 DESCRIPTION
+
+A simple guide to run the DBIx::Schema::Changelog.
+
+=head1 RUNNING A CHANGELOG PROJECT
+ 
+=head2 A simple example to crate a changelog project.
+
+There is a strict hierarchy to read the changelogs.
+
+	/changelog-directory
+		|
+		|-->changelog.<filetype>
+		|-->changelog-<subname_1>.<filetype>
+		|-->changelog-<...>.<filetype>
+		|-->changelog-<subname_2>.<filetype>
+ 
+The names for the sub changelogs can be known for all.
+
+For more information how the changeset is written look at 
+L<DBIx::Schema::Changelog::Cookbook::Changeset>.
+
+=head2 A simple example to crate read the changelog project.
+
+The changelog project can be written stand alone by command line tool.
+
+For standard db C<SQLite>:
+
+	changelog-run -db=<dbname> -s=/path/to/changelog
+
+For specific db:
+
+	changelog-run  -s='<path to changelog-directory>' -db='league;host=127.0.0.1' -u='<user>' -p='<password>' --driver=<driver name>	
+
+And write it directly in your code.
+
+For standard db C<SQLite>:
+
+	my $dbh = DBI->connect( "dbi:SQLite:database=<dbname>" );
+	DBIx::Schema::Changelog->new( dbh => $dbh)->read( '<path to changelog-directory>' );
+
+For specific db:
+
+	my $dbh = DBI->connect( "dbi:Pg:dbname=<dbname>;host=127.0.0.1", <driver name>, '<password>' );
+	DBIx::Schema::Changelog->new( dbh => $dbh, db_driver => 'Pg' )->read( '<path to changelog-directory>' );
+
+If your driver is not supported everyone is invited to read himself driver or write me.
+The for more information to create an own driver look at: L<DBIx::Schema::Changelog::Cookbook::Driver>.
+
+=head2 Create a specific file reader.
+
+The changelog reader expect a hashref in the main changelog file.
+And a arrayref in the sub changelog files.
+
+The for more information to create an own file reader look at: L<DBIx::Schema::Changelog::Cookbook::File>.
+
+=encoding utf8
+
+=head1 AUTHOR
+
+Mario Zieschang, C<< <mziescha at cpan.org> >>
+
+=head1 LICENSE AND COPYRIGHT
+
+Copyright 2015 Mario Zieschang.
+
+This program is free software; you can redistribute it and/or modify it
+under the terms of the the Artistic License (2.0). You may obtain a
+copy of the full license at:
+
+L<http://www.perlfoundation.org/artistic_license_2_0>
+
+Any use, modification, and distribution of the Standard or Modified
+Versions is governed by this Artistic License. By using, modifying or
+distributing the Package, you accept this license. Do not use, modify,
+or distribute the Package, if you do not accept this license.
+
+If your Modified Version has been derived from a Modified Version made
+by someone other than you, you are nevertheless required to ensure that
+your Modified Version complies with the requirements of this license.
+
+This license does not grant you the right to use any trademark, service
+mark, trade name, or logo of the Copyright Holder.
+
+This license includes the non-exclusive, worldwide, free-of-charge
+patent license to make, have made, use, offer to sell, sell, import and
+otherwise transfer the Package with respect to any patent claims
+licensable by the Copyright Holder that are necessarily infringed by the
+Package. If you institute patent litigation (including a cross-claim or
+counterclaim) against any party alleging that the Package constitutes
+direct or contributory patent infringement, then this Artistic License
+to you shall terminate on the date that such litigation is filed.
+
+Disclaimer of Warranty: THE PACKAGE IS PROVIDED BY THE COPYRIGHT HOLDER
+AND CONTRIBUTORS "AS IS' AND WITHOUT ANY EXPRESS OR IMPLIED WARRANTIES.
+THE IMPLIED WARRANTIES OF MERCHANT ABILITY, FITNESS FOR A PARTICULAR
+PURPOSE, OR NON-INFRINGEMENT ARE DISCLAIMED TO THE EXTENT PERMITTED BY
+YOUR LOCAL LAW. UNLESS REQUIRED BY LAW, NO COPYRIGHT HOLDER OR
+CONTRIBUTOR WILL BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, OR
+CONSEQUENTIAL DAMAGES ARISING IN ANY WAY OUT OF THE USE OF THE PACKAGE,
+EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+
+=cut

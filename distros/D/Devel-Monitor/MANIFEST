@@ -1,0 +1,16 @@
+Changes
+Makefile.PL
+MANIFEST
+README
+t/Devel-Monitor.t
+lib/Devel/Monitor.pm
+lib/Devel/Monitor/Common.pm
+lib/Devel/Monitor/Trace.pm
+lib/Devel/Monitor/TraceItem.pm
+lib/Devel/Monitor/Array.pm
+lib/Devel/Monitor/Hash.pm
+lib/Devel/Monitor/Scalar.pm
+lib/Devel/Monitor/TestArray.pm
+lib/Devel/Monitor/TestHash.pm
+lib/Devel/Monitor/TestScalar.pm
+

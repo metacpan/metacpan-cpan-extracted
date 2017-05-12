@@ -1,0 +1,31 @@
+Devel/Malloc version 0.03
+==========================
+
+Low-level memory and atomic operations: _malloc _memset _memget _free.
+The _malloc() function allocates size bytes and returns memory address
+to the allocated memory. You can store strings to memory using _memset() and
+retrieve them using _memget(). The _free() function deallocates memory.
+
+Memory address returned by _malloc() can be used between threads for
+signal-based real time inter-thread communications.
+
+Atomic __sync... operations also provided and can be used for lock-free
+memory access and for low-level mutex creation.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+COPYRIGHT AND LICENCE
+
+Copyright (C) 2012, Yury Kotlyarov
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself. 
+
+

@@ -1,0 +1,1 @@
+this is a {% include "simple.txt" %} include {{ with.substitution }}

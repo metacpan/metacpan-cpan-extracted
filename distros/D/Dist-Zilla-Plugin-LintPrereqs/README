@@ -1,0 +1,17 @@
+SYNOPSIS
+
+    In dist.ini:
+
+     [LintPrereqs]
+     ;lint_prereqs_options = ...
+
+DESCRIPTION
+
+    This plugin will run lint-prereqs during the InstallTool phase (after
+    all files has been gathered/munged). If linting succeeds, the build
+    continues. Otherwise, the build is aborted.
+
+SEE ALSO
+
+    lint-prereqs in App::LintPrereqs distribution.
+

@@ -1,0 +1,87 @@
+Revision history for DBIx-Class-QueryLog
+
+1.005001  2015-12-08 15:43:55-08:00 America/Los_Angeles
+  - Fix bug in ->reset in ::NotifyOnMax
+
+1.005000  2015-12-07 16:08:51-08:00 America/Los_Angeles
+  - Add ::NotifyOnMax subclass to help avoid leaks
+
+1.004001  2015-11-25 22:00:20-08:00 America/Los_Angeles
+  - Fix regression in ::Transaction->count (Thanks Alexander Hartmaier!)
+
+1.004000  2015-11-10 09:26:48-08:00 America/Los_Angeles
+  - Replace Moose with Moo
+
+1.3.3
+  - Bump M:I version
+
+1.3.1
+  - POD fixes (yanick)
+
+1.3
+  - Bump Moose dep version and remove MooseX::AttributeHelpers dep
+
+1.2.3
+  - POD typo fixes (Thanks Nigel McNie)
+  - Version number change
+  - Some Moose cleanup
+
+1.2.2
+  - Don't make QueryLog immutable, as it's ancestor isn't.
+
+1.2.1
+  - Properly set version of DBIx::Class dependency
+
+1.2.0
+  - Mooseification
+
+1.1.5
+  - Correct behavior of reset (thanks to Dmitry Bigunyak)
+
+1.1.4
+  - Fix quoting of 'G' in Author name (thanks rjbs)
+
+1.1.3
+  - Clean up Meta.yml
+
+1.1.2
+  - POD updates
+
+1.1.1
+  - Add get_(fast|slow)est_query_executions to Analyzer
+
+1.1.0
+  - Add buckets to QueryLog
+  - Transaction complete wasn't using add_to_log
+  - Small style fixes
+
+1.0.5
+  - Update main POD to use Analyzer
+
+1.0.4
+  - Typo in Analyzer POD
+
+1.0.3
+  - Repackaged.
+
+1.0.2
+  - Added passthrough option to get queries printing to debugfh like normal (ash)
+
+1.0.1  Tues Aug 31 2007
+  - Remove Sort::Key, since it's not used (thanks nigel)
+
+1.0.0  Mon Aug 30 19:22:11 2007
+  - Remove Sort::Key dependency
+  - Add documentation for a couple of Query methods
+  - Add Analyzer and move get_sorted_queries to same
+
+0.03  Fri Mar 09 18:18:45 2007
+  - Remove OS X resource fork files (thanks jshirley)
+  - Add a missing dependency (Sort::Key)
+
+0.02  Mon Mar 06 23:06:21 2007
+  - Update POD to pass POD coverage tests.
+
+0.01    Wed Feb 28 10:54:23 2007
+  - First version, released on an innocent, unsuspecting world.
+

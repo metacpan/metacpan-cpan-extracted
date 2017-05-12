@@ -1,0 +1,30 @@
+---
+abstract: 'Universally Unique Lexicographically Sortable Identifier'
+author:
+  - 'Baldur Kristinsson <baldur.kristinsson@gmail.com>'
+build_requires:
+  Test::More: '0'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Data-ULID
+requires:
+  DateTime: '0'
+  Encode::Base32::GMP: '0'
+  Exporter: '0'
+  Math::BigFloat: '0'
+  Math::BigInt: '0'
+  Math::Random::Secure: '0'
+  Time::HiRes: '0'
+  base: '0'
+  bytes: '0'
+  constant: '0'
+  strict: '0'
+  warnings: '0'
+version: 1.0.0
+x_serialization_backend: 'YAML::Tiny version 1.69'

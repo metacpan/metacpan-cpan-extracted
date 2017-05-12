@@ -1,0 +1,29 @@
+Data::Sorting Change History
+
+# Current Version
+
+2003-05-24 Packaged for public review and possible distribution.
+2003-05-10 Rewritten.
+
+# Earlier Generation
+
+1999-01-22 Revisions to documentation.
+1998-10-07 Expunged reversal_token and prepend_readable_if_Record.
+1998-09-19 Folded locale support back into this module.
+1998-09-19 Added sort_from_array function, which doesn't modify original.
+1998-07-21 Added $PreCalculate option to avoid simultaneous sort calls.
+1998-07-20 Altered sort_arrayref aliasing; fixed undef sort {} return value
+1998-07-15 Tweaked fall-through logic to match Del's check-once approach.
+1998-07-13 Extracted into new SortingLocale file to resolve dependancies.
+1998-07-13 Overhaul to support reverse sorting, just-in-time calculations, 
+           and an extension mechanism for comparison styles.
+1998-04-21 Experimental locale support.
+1998-04-21 Revision of sorting rules for non-alphanumeric items
+1998-04-18 Refactored to single-function interface.
+1997-11-23 Made sortbycalculation always use text_sort_value.
+1997-11-13 Refactored sortbycalculation, added new sort_inplace function.
+1997-11-04 Yanked these out of the old dataops.pm library into v4 Data::*.
+1997-09-24 Production release of version 3 in IntraNetics97 1.00 build 000
+1997-05-09 Added sortbycalculation.
+1997-01-11 Version 3 forked for use with IWAE.
+1996-11-13 Version 2 of dataops.pm adds sorting wrapper. -Simon

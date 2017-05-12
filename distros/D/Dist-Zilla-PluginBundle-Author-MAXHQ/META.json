@@ -1,0 +1,742 @@
+{
+   "abstract" : "MAXHQ's default Dist::Zilla configuration",
+   "author" : [
+      "Jens Berthold <jens.berthold@jebecs.de>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 6.006, CPAN::Meta::Converter version 2.150005",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : 2
+   },
+   "name" : "Dist-Zilla-PluginBundle-Author-MAXHQ",
+   "no_index" : {
+      "directory" : [
+         "eg",
+         "examples",
+         "inc",
+         "share",
+         "t",
+         "xt"
+      ],
+      "package" : [
+         "Dist::Zilla::Plugin::MAXHQ::BundleDepsDeep",
+         "Dist::Zilla::Plugin::ShareDir::ProjectDistDir"
+      ]
+   },
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "Module::Build::Tiny" : "0.034"
+         }
+      },
+      "develop" : {
+         "requires" : {
+            "Dist::Zilla" : "5",
+            "Dist::Zilla::Plugin::Bootstrap::lib" : "0",
+            "Dist::Zilla::Plugin::Prereqs" : "0",
+            "Dist::Zilla::Plugin::RemovePrereqs" : "0",
+            "Dist::Zilla::Plugin::UploadToCPAN" : "0",
+            "English" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Software::License::Perl_5" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dist::Zilla" : "6.006",
+            "Dist::Zilla::Plugin::Authority" : "1.009",
+            "Dist::Zilla::Plugin::Bootstrap::lib" : "1.001000",
+            "Dist::Zilla::Plugin::CheckSelfDependency" : "0.011",
+            "Dist::Zilla::Plugin::CopyFilesFromBuild" : "0.161350",
+            "Dist::Zilla::Plugin::Git::Check" : "2.039",
+            "Dist::Zilla::Plugin::Git::Commit" : "2.039",
+            "Dist::Zilla::Plugin::Git::GatherDir" : "2.039",
+            "Dist::Zilla::Plugin::Git::Push" : "2.039",
+            "Dist::Zilla::Plugin::Git::Tag" : "2.039",
+            "Dist::Zilla::Plugin::MetaProvides::Package" : "2.003002",
+            "Dist::Zilla::Plugin::ModuleBuildTiny" : "0.015",
+            "Dist::Zilla::Plugin::NextVersion::Semantic" : "v0.2.5",
+            "Dist::Zilla::Plugin::PodWeaver" : "4.008",
+            "Dist::Zilla::Plugin::Prereqs::AuthorDeps" : "0.006",
+            "Dist::Zilla::Plugin::Prereqs::FromCPANfile" : "0",
+            "Dist::Zilla::Plugin::PreviousVersion::Changelog" : "v0.2.5",
+            "Dist::Zilla::Plugin::ReadmeAnyFromPod" : "0.161170",
+            "Dist::Zilla::Plugin::RunExtraTests" : "0.029",
+            "Dist::Zilla::Plugin::Test::EOL" : "0.19",
+            "Dist::Zilla::Plugin::Test::Inline" : "0.011005",
+            "Dist::Zilla::Plugin::Test::NoTabs" : "0.15",
+            "Dist::Zilla::Plugin::Test::Perl::Critic" : "3.000",
+            "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable" : "0.06",
+            "Dist::Zilla::Plugin::Test::Pod::LinkCheck" : "1.002",
+            "Dist::Zilla::Plugin::Test::Pod::No404s" : "1.003",
+            "Dist::Zilla::Role::FileMunger" : "0",
+            "Dist::Zilla::Role::PluginBundle::Easy" : "0",
+            "Dist::Zilla::Role::PrereqSource" : "0",
+            "Dist::Zilla::Role::ShareDir" : "0",
+            "Distribution::Metadata" : "0",
+            "English" : "0",
+            "File::Spec" : "0",
+            "Module::Metadata" : "0",
+            "Moose" : "0",
+            "Pod::Coverage::TrustPod" : "0",
+            "Pod::Elemental::Transformer::List" : "0.102000",
+            "Pod::Weaver::Config::Assembler" : "0",
+            "Test::EOL" : "0",
+            "Test::More" : "0.88",
+            "Test::NoTabs" : "0",
+            "Test::Pod" : "1.41",
+            "Test::Pod::Coverage" : "1.08",
+            "Test::Pod::LinkCheck" : "0",
+            "Test::Pod::No404s" : "0",
+            "namespace::autoclean" : "0"
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : "0.88"
+         }
+      }
+   },
+   "provides" : {
+      "Dist::Zilla::PluginBundle::Author::MAXHQ" : {
+         "file" : "lib/Dist/Zilla/PluginBundle/Author/MAXHQ.pm",
+         "version" : "v3.3.3"
+      },
+      "Pod::Weaver::PluginBundle::Author::MAXHQ" : {
+         "file" : "lib/Pod/Weaver/PluginBundle/Author/MAXHQ.pm",
+         "version" : "v3.3.3"
+      }
+   },
+   "release_status" : "stable",
+   "version" : "3.3.3",
+   "x_Dist_Zilla" : {
+      "perl" : {
+         "version" : "5.020003"
+      },
+      "plugins" : [
+         {
+            "class" : "Dist::Zilla::Plugin::Bootstrap::lib",
+            "config" : {
+               "Dist::Zilla::Role::Bootstrap" : {
+                  "$Dist::Zilla::Role::Bootstrap::VERSION" : "1.001003",
+                  "distname" : "Dist-Zilla-PluginBundle-Author-MAXHQ",
+                  "fallback" : "1",
+                  "try_built" : null,
+                  "try_built_method" : "mtime"
+               }
+            },
+            "name" : "Bootstrap::lib",
+            "version" : "1.001000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::GatherDir",
+            "config" : {
+               "Dist::Zilla::Plugin::GatherDir" : {
+                  "exclude_filename" : [],
+                  "exclude_match" : [
+                     "^(?!(dist|weaver)\\.ini)\\w+\\.ini$",
+                     "^CVS$",
+                     "^\\.build$",
+                     "^\\.git$",
+                     "^\\.svn$",
+                     "^\\w+\\.tar\\.gz$",
+                     "^cpanfile$",
+                     "^cpanfile.snapshot$",
+                     "^extlib$",
+                     "^local$"
+                  ],
+                  "follow_symlinks" : 0,
+                  "include_dotfiles" : 1,
+                  "prefix" : "",
+                  "prune_directory" : [],
+                  "root" : "."
+               },
+               "Dist::Zilla::Plugin::Git::GatherDir" : {
+                  "include_untracked" : 0
+               }
+            },
+            "name" : "@Author::MAXHQ/Git::GatherDir",
+            "version" : "2.039"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PruneCruft",
+            "name" : "@Author::MAXHQ/PruneCruft",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ExecDir",
+            "name" : "@Author::MAXHQ/ExecDir",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ShareDir::ProjectDistDir",
+            "name" : "@Author::MAXHQ/ShareDir::ProjectDistDir",
+            "version" : null
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PkgVersion",
+            "name" : "@Author::MAXHQ/PkgVersion",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextRelease",
+            "name" : "@Author::MAXHQ/NextRelease",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PreviousVersion::Changelog",
+            "name" : "@Author::MAXHQ/PreviousVersion::Changelog",
+            "version" : "0.2.5"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::NextVersion::Semantic",
+            "name" : "@Author::MAXHQ/NextVersion::Semantic",
+            "version" : "0.2.5"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodWeaver",
+            "config" : {
+               "Dist::Zilla::Plugin::PodWeaver" : {
+                  "config_plugins" : [
+                     "@Author::MAXHQ"
+                  ],
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles"
+                  ],
+                  "plugins" : [
+                     {
+                        "class" : "Pod::Weaver::Plugin::EnsurePod5",
+                        "name" : "@CorePrep/EnsurePod5",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::H1Nester",
+                        "name" : "@CorePrep/H1Nester",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Name",
+                        "name" : "@MAXHQ/Name",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Version",
+                        "name" : "@MAXHQ/Version",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@MAXHQ/Prelude",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@MAXHQ/Synopsis",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@MAXHQ/Description",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Generic",
+                        "name" : "@MAXHQ/Overview",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/RexTasks",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/MojoPlugins",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/MojoShortcuts",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/MojoConditions",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/MojoHelpers",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/Functions",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/RoleRequires",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/Attributes",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/ClassMethods",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Collect",
+                        "name" : "@MAXHQ/Methods",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Leftovers",
+                        "name" : "@MAXHQ/Leftovers",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Region",
+                        "name" : "@MAXHQ/postlude",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Authors",
+                        "name" : "@MAXHQ/Authors",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Section::Legal",
+                        "name" : "@MAXHQ/Legal",
+                        "version" : "4.013"
+                     },
+                     {
+                        "class" : "Pod::Weaver::Plugin::Transformer",
+                        "name" : "@MAXHQ/List",
+                        "version" : "4.013"
+                     }
+                  ]
+               }
+            },
+            "name" : "@Author::MAXHQ/PodWeaver",
+            "version" : "4.008"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "@Author::MAXHQ/Prereqs",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::AutoPrereqs",
+            "name" : "@Author::MAXHQ/AutoPrereqs",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RemovePrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::RemovePrereqs" : {
+                  "modules_to_remove" : [
+                     "strict",
+                     "warnings"
+                  ]
+               }
+            },
+            "name" : "@Author::MAXHQ/RemovePrereqs",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CheckSelfDependency",
+            "config" : {
+               "Dist::Zilla::Plugin::CheckSelfDependency" : {
+                  "finder" : [
+                     ":InstallModules"
+                  ]
+               },
+               "Dist::Zilla::Role::ModuleMetadata" : {
+                  "Module::Metadata" : "1.000027",
+                  "version" : "0.004"
+               }
+            },
+            "name" : "@Author::MAXHQ/CheckSelfDependency",
+            "version" : "0.011"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Authority",
+            "name" : "@Author::MAXHQ/Authority",
+            "version" : "1.009"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaProvides::Package",
+            "config" : {
+               "Dist::Zilla::Plugin::MetaProvides::Package" : {
+                  "finder_objects" : [
+                     {
+                        "class" : "Dist::Zilla::Plugin::FinderCode",
+                        "name" : "@Author::MAXHQ/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+                        "version" : "6.006"
+                     }
+                  ]
+               },
+               "Dist::Zilla::Role::MetaProvider::Provider" : {
+                  "Dist::Zilla::Role::MetaProvider::Provider::VERSION" : "2.001011",
+                  "inherit_missing" : "1",
+                  "inherit_version" : "1",
+                  "meta_noindex" : "1"
+               }
+            },
+            "name" : "@Author::MAXHQ/MetaProvides::Package",
+            "version" : "2.003002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaConfig",
+            "name" : "@Author::MAXHQ/MetaConfig",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ModuleBuildTiny",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Author::MAXHQ/ModuleBuildTiny",
+            "version" : "0.015"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Manifest",
+            "name" : "@Author::MAXHQ/Manifest",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaYAML",
+            "name" : "@Author::MAXHQ/MetaYAML",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaJSON",
+            "name" : "@Author::MAXHQ/MetaJSON",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CPANFile",
+            "name" : "@Author::MAXHQ/CPANFile",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::License",
+            "name" : "@Author::MAXHQ/License",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ReadmeAnyFromPod",
+            "config" : {
+               "Dist::Zilla::Role::FileWatcher" : {
+                  "version" : "0.006"
+               }
+            },
+            "name" : "@Author::MAXHQ/ReadmeAnyFromPod",
+            "version" : "0.161170"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MetaNoIndex",
+            "name" : "@Author::MAXHQ/MetaNoIndex",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Inline",
+            "name" : "@Author::MAXHQ/Test::Inline",
+            "version" : "0.011005"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RunExtraTests",
+            "config" : {
+               "Dist::Zilla::Role::TestRunner" : {
+                  "default_jobs" : 1
+               }
+            },
+            "name" : "@Author::MAXHQ/RunExtraTests",
+            "version" : "0.029"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Perl::Critic",
+            "name" : "@Author::MAXHQ/Test::Perl::Critic",
+            "version" : "3.000"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::Coverage::Configurable",
+            "name" : "@Author::MAXHQ/Test::Pod::Coverage::Configurable",
+            "version" : "0.06"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::PodSyntaxTests",
+            "name" : "@Author::MAXHQ/PodSyntaxTests",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::No404s",
+            "name" : "@Author::MAXHQ/Test::Pod::No404s",
+            "version" : "1.003"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::Pod::LinkCheck",
+            "name" : "@Author::MAXHQ/Test::Pod::LinkCheck",
+            "version" : "1.002"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::EOL",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::EOL" : {
+                  "filename" : "xt/author/eol.t",
+                  "finder" : [
+                     ":ExecFiles",
+                     ":InstallModules",
+                     ":TestFiles"
+                  ],
+                  "trailing_whitespace" : 1
+               }
+            },
+            "name" : "@Author::MAXHQ/Test::EOL",
+            "version" : "0.19"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Test::NoTabs",
+            "config" : {
+               "Dist::Zilla::Plugin::Test::NoTabs" : {
+                  "filename" : "xt/author/no-tabs.t",
+                  "finder" : [
+                     ":InstallModules",
+                     ":ExecFiles",
+                     ":TestFiles"
+                  ]
+               }
+            },
+            "name" : "@Author::MAXHQ/Test::NoTabs",
+            "version" : "0.15"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::CopyFilesFromBuild",
+            "name" : "@Author::MAXHQ/CopyFilesFromBuild",
+            "version" : "0.161350"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::TestRelease",
+            "name" : "@Author::MAXHQ/TestRelease",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Check",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Check" : {
+                  "untracked_files" : "die"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "cpanfile"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Author::MAXHQ/Git::Check",
+            "version" : "2.039"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Commit",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Commit" : {
+                  "add_files_in" : [],
+                  "commit_msg" : "Release %v%n%n%c"
+               },
+               "Dist::Zilla::Role::Git::DirtyFiles" : {
+                  "allow_dirty" : [
+                     "Changes",
+                     "cpanfile"
+                  ],
+                  "allow_dirty_match" : [],
+                  "changelog" : "Changes"
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@Author::MAXHQ/Git::Commit",
+            "version" : "2.039"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Tag",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Tag" : {
+                  "branch" : null,
+                  "changelog" : "Changes",
+                  "signed" : 0,
+                  "tag" : "3.3.3",
+                  "tag_format" : "%v",
+                  "tag_message" : ""
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               },
+               "Dist::Zilla::Role::Git::StringFormatter" : {
+                  "time_zone" : "local"
+               }
+            },
+            "name" : "@Author::MAXHQ/Git::Tag",
+            "version" : "2.039"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Git::Push",
+            "config" : {
+               "Dist::Zilla::Plugin::Git::Push" : {
+                  "push_to" : [
+                     "origin"
+                  ],
+                  "remotes_must_exist" : 1
+               },
+               "Dist::Zilla::Role::Git::Repo" : {
+                  "repo_root" : "."
+               }
+            },
+            "name" : "@Author::MAXHQ/Git::Push",
+            "version" : "2.039"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::ConfirmRelease",
+            "name" : "@Author::MAXHQ/ConfirmRelease",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::MAXHQ::BundleDepsDeep",
+            "name" : "@Author::MAXHQ/MAXHQ::BundleDepsDeep",
+            "version" : null
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs::AuthorDeps",
+            "name" : "@Author::MAXHQ/Prereqs::AuthorDeps",
+            "version" : "0.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::RemovePrereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::RemovePrereqs" : {
+                  "modules_to_remove" : [
+                     "Dist::Zilla::Plugin::MAXHQ::BundleDepsDeep",
+                     "Dist::Zilla::Plugin::ShareDir::ProjectDistDir",
+                     "Dist::Zilla::PluginBundle::Author::MAXHQ"
+                  ]
+               }
+            },
+            "name" : "RemovePrereqs",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::UploadToCPAN",
+            "name" : "UploadToCPAN",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":InstallModules",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":IncModules",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":TestFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExtraTestFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ExecFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":PerlExecFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":ShareFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":MainModule",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":AllFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : ":NoFiles",
+            "version" : "6.006"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::FinderCode",
+            "name" : "@Author::MAXHQ/MetaProvides::Package/AUTOVIV/:InstallModulesPM",
+            "version" : "6.006"
+         }
+      ],
+      "zilla" : {
+         "class" : "Dist::Zilla::Dist::Builder",
+         "config" : {
+            "is_trial" : "0"
+         },
+         "version" : "6.006"
+      }
+   },
+   "x_authority" : "cpan:MAXHQ",
+   "x_serialization_backend" : "Cpanel::JSON::XS version 3.0217"
+}
+

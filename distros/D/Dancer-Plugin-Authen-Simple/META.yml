@@ -1,0 +1,30 @@
+---
+abstract: 'Easy Authentication for Dancer applications via Authen::Simple'
+author:
+  - 'Andrew Grangaard <spazm@cpan.org>'
+build_requires:
+  Authen::Simple::Adapter: 0
+  Dancer::Test: 0
+  Test::More: 0
+  base: 0
+configure_requires:
+  ExtUtils::MakeMaker: 6.30
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 4.300003, CPAN::Meta::Converter version 2.120921'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: 1.4
+name: Dancer-Plugin-Authen-Simple
+requires:
+  Authen::Simple: 0
+  Dancer: 0
+  Dancer::Plugin: 0
+  Memoize: 0
+  Module::Load: 0
+  strict: 0
+  warnings: 0
+resources:
+  homepage: https://github.com/spazm/p5-dancer-plugin-authen-simple
+  repository: http://github.com/spazm/p5-dancer-plugin-authen-simple.git
+version: 0.130500

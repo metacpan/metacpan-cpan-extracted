@@ -1,0 +1,11 @@
+Revision history for Perl extension Data::VarPrint.
+
+0.01  Mon Jan 21 21:28:37 2002
+	- original version; created by h2xs 1.19
+
+1.00  Sun Feb 24 3:18:35 2002
+	- first release, some parts rewritten from scratch
+	  to allow more flexibility
+
+1.01  Thu Aug 15 2:08:15 2002
+	- Added test script

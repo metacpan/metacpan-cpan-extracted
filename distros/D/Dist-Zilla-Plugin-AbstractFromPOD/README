@@ -1,0 +1,70 @@
+Name
+
+    Dist::Zilla::Plugin::AbstractFromPOD - Case insensitive head1 POD
+    matching for the Name attribute
+
+Synopsis
+
+       # In dist.ini
+       [AbstractFromPOD]
+
+Version
+
+    This documents version v0.3.$Rev: 1 $ of
+    Dist::Zilla::Plugin::AbstractFromPOD
+
+Description
+
+    Case insensitive head1 POD matching for the Name attribute
+
+    Dist::Zilla should do this by default but unfortunately it's pattern
+    matching is case sensitive so this instead
+
+Configuration and Environment
+
+    Defines no attributes
+
+Subroutines/Methods
+
+ before_build
+
+    Read the main module and extract the abstract (case insensitive
+    matching on the head1 Name POD directive)
+
+Diagnostics
+
+    None
+
+Dependencies
+
+    Dist::Zilla::Role::BeforeBuild
+
+Incompatibilities
+
+    There are no known incompatibilities in this module
+
+Bugs and Limitations
+
+    There are no known bugs in this module. Please report problems to
+    http://rt.cpan.org/NoAuth/Bugs.html?Dist=Dist-Zilla-Plugin-AbstractFrom
+    POD. Patches are welcome
+
+Acknowledgements
+
+    Larry Wall - For the Perl programming language
+
+Author
+
+    Peter Flanigan, <pjfl@cpan.org>
+
+License and Copyright
+
+    Copyright (c) 2015 Peter Flanigan. All rights reserved
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself. See perlartistic
+
+    This program is distributed in the hope that it will be useful, but
+    WITHOUT WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE
+

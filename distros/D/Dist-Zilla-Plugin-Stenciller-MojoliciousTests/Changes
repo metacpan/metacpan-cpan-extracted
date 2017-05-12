@@ -1,0 +1,87 @@
+Revision history for Dist-Zilla-Plugin-Stenciller-MojoliciousTests
+
+0.0200 2016-03-23 22:10:20 UTC
+ [Requirements]
+ - Added missing prereq: Dist::Zilla::Role::FileGatherer
+ - Perl requirement lowered to 5.10 (from 5.14).
+
+ [Bug Fixes]
+ - Fix compatibility with latest Stenciller (0.1400) (fixes #1).
+
+ [Stats & Dependency Changes]
+ - 2 files changed, 83 insertions(+), 76 deletions(-)
+ - (run req) + Dist::Zilla::Role::FileGatherer (any)
+ - (run req) + Types::Path::Tiny 0.005
+ - (run req) + Types::Standard 1.000005
+ - (run req) ~ Moose 2.1400 --> 2.1405
+ - (run req) ~ Path::Tiny (any) --> 0.072
+ - (run req) ~ Stenciller 0.1300 --> 0.1400
+ - (run req) ~ Stenciller::Plugin::ToMojoliciousTest (any) --> 0.0102
+ - (run req) ~ perl 5.014000 --> 5.010000
+ - (dev req) + Badge::Depot 0.0103
+ - (dev req) + Badge::Depot::Plugin::Coverage (any)
+ - (dev req) + Badge::Depot::Plugin::Cpantesters (any)
+ - (dev req) + Badge::Depot::Plugin::Kwalitee (any)
+ - (dev req) + Badge::Depot::Plugin::Perl (any)
+ - (dev req) + Badge::Depot::Plugin::Travis (any)
+ - (dev req) + Dist::Zilla 5.000
+ - (dev req) + Dist::Zilla::Plugin::Authority 1.009
+ - (dev req) + Dist::Zilla::Plugin::BumpVersionAfterRelease::Transitional
+   0.007
+ - (dev req) + Dist::Zilla::Plugin::ChangeStats::Dependencies::Git 0.0100
+ - (dev req) + Dist::Zilla::Plugin::Git 2.036
+ - (dev req) + Dist::Zilla::Plugin::Git::CheckFor::CorrectBranch 0.013
+ - (dev req) + Dist::Zilla::Plugin::Git::Commit (any)
+ - (dev req) + Dist::Zilla::Plugin::NextRelease::Grouped 0.0200
+ - (dev req) + Dist::Zilla::Plugin::RewriteVersion::Transitional 0.007
+ - (dev req) + Dist::Zilla::Plugin::Test::EOF 0.0501
+ - (dev req) + Dist::Zilla::Plugin::Test::EOL 0.18
+ - (dev req) + Dist::Zilla::Plugin::Test::Kwalitee::Extra v0.2.1
+ - (dev req) + Dist::Zilla::Plugin::Test::NoTabs 0.15
+ - (dev req) + Dist::Zilla::Plugin::Test::Version 1.05
+ - (dev req) + Pod::Weaver::Section::GenerateSection 1.01
+ - (dev req) + Test::EOF (any)
+ - (dev req) + Test::EOL (any)
+ - (dev req) + Test::More 0.88
+ - (dev req) + Test::NoTabs 1.4
+ - (dev req) + Test::Version 1
+ - (dev req) ~ Dist::Zilla::Plugin::CheckChangesHasContent (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::Clean (any) --> 0.07
+ - (dev req) ~ Dist::Zilla::Plugin::CopyFilesFromBuild (any) --> 0.151680
+ - (dev req) ~ Dist::Zilla::Plugin::Git::Contributors (any) --> 0.017
+ - (dev req) ~ Dist::Zilla::Plugin::GithubMeta (any) --> 0.54
+ - (dev req) ~ Dist::Zilla::Plugin::InstallRelease (any) --> 0.008
+ - (dev req) ~ Dist::Zilla::Plugin::MetaProvides::Package (any) -->
+   2.003001
+ - (dev req) ~ Dist::Zilla::Plugin::PodWeaver (any) --> 4.006
+ - (dev req) ~ Dist::Zilla::Plugin::ReadmeAnyFromPod (any) --> 0.150250
+ - (dev req) ~ Dist::Zilla::Plugin::RunExtraTests (any) --> 0.028
+ - (dev req) ~ Dist::Zilla::Plugin::Test::Compile (any) --> 2.054
+ - (dev req) ~ Dist::Zilla::Plugin::Test::ReportPrereqs (any) --> 0.021
+ - (dev req) ~ Dist::Zilla::Plugin::TravisYML (any) --> 1.15
+ - (dev req) ~ Pod::Weaver::Section::Badges (any) --> 0.0401
+ - (dev req) ~ Test::Warnings (any) --> 0.026
+ - (dev req) - Dist::Iller::Config::Author::CSSON
+ - (dev req) - Dist::Zilla::Plugin::MetaProvides::Class
+ - (dev req) - Dist::Zilla::Plugin::NextRelease
+ - (dev req) - Dist::Zilla::Plugin::NextVersion::Semantic
+ - (dev req) - Dist::Zilla::Plugin::OurPkgVersion
+ - (dev req) - Dist::Zilla::Plugin::PodnameFromClassname
+ - (dev req) - Dist::Zilla::Plugin::Prereqs::Plugins
+ - (dev req) - Dist::Zilla::Plugin::PreviousVersion::Changelog
+ - (dev req) - Dist::Zilla::Plugin::ReversionOnRelease
+ - (dev req) - Pod::Weaver::Section::Homepage::DefaultCPAN
+ - (dev req) - Pod::Weaver::Section::Source::DefaultGitHub
+ - (dev sug) + Dist::Iller 0.1408
+ - (dev sug) + Dist::Iller::Config::Author::CSSON 0.0309
+
+0.0101 2016-01-25T21:42:53Z UTC
+ [Requirements]
+ - Added missing prereq: Moose
+ - New prereq: namespace::autoclean
+
+ [Other Changes]
+ - Rebuilt with current Dist::Iller::Config::Author::CSSON
+
+0.0100 2015-11-23T09:48:00Z UTC
+ - Initial release

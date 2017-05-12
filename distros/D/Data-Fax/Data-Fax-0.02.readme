@@ -1,0 +1,128 @@
+NAME
+    Data::Fax - Perl extension for setting up DataFAX object.
+
+VERSION
+    This document refers to version 0.01 of Data::Fax released April 25,
+    2001.
+
+SYNOPSIS
+      use Data::Fax;
+      my $df = Data::Fax->new;   # create an empty object
+         $df->debug(1);          # set debug level 
+         $df->reset('N');       # change reset to no
+
+      # we can set it up using one line
+      my $df = Data::Fax->new('debug', '2', 'reset', 'N');  
+
+      # we can define a hash array for the parameters
+      my %param = (     'debug'=>'1',          'reset'=>'N', 
+                   'df_param'=>$ary_ref), 'ss_param'=>\{});
+      my $df = Data::Fax->new(%param); # or
+      my $df = new Data::Fax %param;   # or indirect obj call  
+      my $df = new Data::Fax (%param); # the same with indirect obj call
+
+      # methods to set/get values
+      $df->set_debug(0);        # the same as $df->debug(0);
+      $df->get_debug;           # the same as $df->debug;
+      $df->set_reset('Y');      # the same as $df->reset('Y'); 
+      $df->get_reset;           # the same as $df->reset; 
+
+      # All the methods to get/set scalar value have corresponding
+      # methods without 'get_' or 'set_' prefix. So do the following 
+      # methods:
+      $df->set_FS('\t');        # set field separator
+      $df->get_FS;              # get feild separator
+      $df->set_OFS('|');        # set output field separator
+      $df->get_OFS;             # get output field separator
+      $df->set_DirSep('/');     # set directory separator
+      $df->get_DirSep;          # get directory separator
+      $df->set_first_row('Y');  # indicates the first row is column names
+      $df->set_first_row('N');  # first row does not contain column names
+      $df->get_first_row;       # get first row indicator
+      $df->set_debug(2);        # set msg level to 2
+      $df->get_debug;           # get msg level
+
+      # methods to set/get array or hash array are a little different
+      $df->set_df_param($fn);   # read from a DataFAX initial file
+      $df->set_df_param($arf);  # or set it to a hash array ref
+      %ha=$df->get_df_param;    # get the hash array
+      $df->df_param;            # get hash array ref
+      $df->df_param($key);      # get value of $key from the array
+      $df->df_param($key,$val); # set the $key = $val
+      # the same for ss_param
+      $df->set_ss_param($sn);   # read from DFserver.cf of study number 
+      $df->set_ss_param($arf);  # set it to a hash array ref
+      %ha=$df->get_ss_param;    # get the hash array
+      $df->ss_param;            # get hash array ref
+      $df->ss_param($key);      # get value of $key from the array
+      $df->ss_param($key,$val); # set the $key = $val
+
+      # some utility methods
+      $df->echoMSG($msg, $lvl); # echo message of level $lvl
+      $df->disp_param;          # display all internal parameters
+      $df->debug;               # debug
+
+DESCRIPTION
+    Data::Fax class is intended to be used as parent class for all the
+    sub-sequent classes with Data::Fax name space.
+
+  Overview
+
+    *Data::Fax* is a class for setting up DataFAX and study specific
+    environment and parameters.
+
+  Constructor and initialization
+
+    The constructor is *new*. You can call it directly or indirectly with or
+    without parameters or parameter hash array. Here are some examples:
+
+      # direct call
+      my $df = Data::Fax->new;
+      my $df = Data::Fax->new('p1', 'value1', 'p2', 'value2');
+      my $df = Data::Fax->new(%p);
+
+      # indirect call
+      my $df = new Data::Fax;
+      my $df = new Data::Fax ('p1', 'value1', 'p2', 'value2');
+      my $df = new Data::Fax (%p);
+
+  The Constructor new(%arg)
+
+    Without any input, i.e., new(), the constructor generates an empty
+    object with default values for its parameters.
+
+    If any argument is provided, the constructor expects them in the name
+    and value pairs, i.e., in a hash array.
+
+    The constructor also calls the *set_df_param* method to use an initial
+    file for its system parameters and *set_dfdb* method to use study
+    database for its study parameters.
+
+    The default initial file is DataFAX.ini located in ~/Fax/DataFax/. It
+    can also be set by *init_file* method.
+
+  Class and object methods
+
+    The following are the methods and their usages.
+
+ENVIRONMENT
+    Since DataFAX is primarily on Unix and Lynx, this module is only tested
+    in Unix environment. Other OS environments may tested later.
+
+DIAGNOSTICS
+    I will add more document in this section to address diagnostic issues.
+
+BUGS
+    Please report any bugs to me.
+
+AUTHOR
+    Hanming Tu, hanming_tu@yahoo.com
+
+SEE ALSO
+    Debug::EchoMessage.
+
+COPYRIGHT
+    Copyright (c) 2005, Hanming Tu. All Rights Reserved. This module is free
+    software. It may be used, redistributed and/or modified under the same
+    terms as Perl itself.
+

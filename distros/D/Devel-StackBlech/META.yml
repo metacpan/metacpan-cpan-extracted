@@ -1,0 +1,36 @@
+--- #YAML:1.0
+name:               Devel-StackBlech
+version:            0.06
+abstract:           Dumps your stack, all of it, somewhere
+author:
+    - Josh ben Jore <jjore@cpan.org>
+license:            perl
+distribution_type:  module
+configure_requires:
+    ExtUtils::CBuilder:  0
+    ExtUtils::Depends:   0.302
+build_requires:
+    ExtUtils::CBuilder:  0
+    File::Basename:      0
+    IPC::Run:            0
+    Test::More:          0
+requires:
+    ExtUtils::CBuilder:  0
+    File::Basename:      0
+    IPC::Run:            0
+    perl:                5.005
+    Sub::Exporter:       0
+    Test::More:          0
+resources:
+    repository:  http://github.com/jbenjore/Devel-StackBlech/tree
+no_index:
+    directory:
+        - t
+        - inc
+generated_by:       ExtUtils::MakeMaker version 6.55_02
+meta-spec:
+    url:      http://module-build.sourceforge.net/META-spec-v1.4.html
+    version:  1.4
+keywords:
+    - perl internals
+    - stack

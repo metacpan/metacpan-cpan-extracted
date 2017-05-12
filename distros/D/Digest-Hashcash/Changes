@@ -1,0 +1,21 @@
+Revision history for Perl extension Digest::Hashcash
+
+1.1   Wed Jul 22 12:32:34 CEST 2015
+	- d'oh, forgot perlmulticore.h
+	- improved portability.
+
+1.0   Tue Jul 21 07:10:25 CEST 2015
+        - perlmulticore support.
+	- use better random number generator.
+        - added stability canary support.
+
+0.03  Thu Mar  3 18:00:52 CET 2005
+	- generate more efficient code with gcc-3.4 and later.
+        - change of contact address.
+
+0.02  Thu Sep 11 08:16:54 CEST 2003
+        - some workarounds for antiquated compilers like gcc-2.95.
+
+0.01  Sat Sep  6 17:10:40 CEST 2003
+	- original version; cloned from Crypt::Twofish2
+

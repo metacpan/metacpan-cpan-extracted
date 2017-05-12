@@ -1,0 +1,70 @@
+NAME
+    Dist::Zilla::Role::EnsureStash - Ensure your plugin has access to a
+    certain stash
+
+VERSION
+    This document describes version 0.002 of Dist::Zilla::Role::EnsureStash
+    - released December 30, 2012 as part of Dist-Zilla-Role-EnsureStash.
+
+SYNOPSIS
+        package Dist::Zilla::Plugin::Something;
+
+        use Moose;
+        use namespace::autoclean;
+
+        with
+            'Dist::Zilla::Plugin::BeforeRelease',
+            'Dizt::Zilla::Role::EnsureStash',
+            ;
+
+        sub our_stash_name  { '%ThatStash'                    }
+        sub our_stash_class { 'Dist::Zilla::Stash::ThatStash' }
+
+        sub before_release {
+            my $self = shift @_;
+
+            # returns '%ThatStash' if it exists, otherwise creates, registers,
+            # then returns it
+            my $stash = $self->our_stash;
+
+            # profit!
+        }
+
+DESCRIPTION
+    This is a Dist::Zilla role designed to ensure that if a plugin needs
+    access to a stash, and that stash does not already exist, then it is
+    automatically created and returned.
+
+    This is more intended for helping plugins that need to share common data
+    do so via stashes, rather than specific information (e.g. PAUSE
+    credentials and the like). As such, the stash instances created here are
+    expected to largely be able to do their thing without much (preferably
+    any) external input.
+
+REQUIRED METHODS
+  our_stash_name
+    Just as it sounds; should return something Dist::Zilla will recognize as
+    a stash name (e.g. %SomeStash).
+
+  our_stash_class
+    This is expected to return the class name of the class to be created and
+    registered as "our_stash_name()" if a stash by that name does not exist.
+
+    It is expected to have consumed the Dist::Zilla::Role::Stash role.
+
+SEE ALSO
+    Please see those modules/websites for more information related to this
+    module.
+
+    *   Dist::Zilla::Role::RegisterStash
+
+AUTHOR
+    Chris Weyl <cweyl@alumni.drew.edu>
+
+COPYRIGHT AND LICENSE
+    This software is Copyright (c) 2012 by Chris Weyl.
+
+    This is free software, licensed under:
+
+      The GNU Lesser General Public License, Version 2.1, February 1999
+

@@ -1,0 +1,84 @@
+0.0.17 (2017-01-04)
+
+    API / Behaviour Changes:
+        - Sequences now create a new ${name}_sequence table
+
+    New Features:
+        - None.
+
+    Enhancements:
+        - Reimplement sequence support based on SQLite's
+          last_insert_rowid() function (more reliable)
+
+    Bug Fixes:
+        - Explicitly "use 5.10" due to use of '//'
+        - "local" DBI values don't work
+
+    Dependencies:
+        - None.
+
+0.0.16 (2016-05-20)
+
+    Enhancements:
+        - Recognize pragma statements inside warn() & debug() functions
+          as SQL runnable.
+
+    Bug Fixes:
+        - Force sequence values to be stored as integers
+
+0.0.14 (2015-06-19)
+
+    Enhancements:
+        - Upgrade inclued Module::Install to 1.16.
+
+    Bug Fixes:
+        - Depend on DBIx::ThinSQL 0.0.34 (for log_warn())
+        - Fix broken VERSION (0.0.12 did not index on CPAN)
+
+0.0.12 (2015-06-16)
+
+   New Features:
+      - Use log_warn() from DBIx::ThinSQL for new warn() SQL function
+
+0.0.10 (2014-04-23)
+
+   API Changes:
+      - Restore multiple argument sha1* functions.
+
+0.0.8 (2014-04-22)
+
+    API Changes:
+        - sha1* functions only use first argument as input.
+        - agg_sha1* functions now use first argument for input and
+          the second argument as a sort criteria.
+
+0.0.6 (2013-12-22)
+
+    Enhancements:
+        - Use Log::Any::Test for log tests instead of my filesystem
+          hack.
+        - Don't index the SHA1 aggregate packages on CPAN
+        - Convert to Module::Install/Makefile.PL
+        - Depend on DBIx::ThinSQL 0.0.10.
+
+0.0.4 (2013-06-11)
+
+    API Changes:
+        - thinsql_create_methods() becomes create_methods().
+        - sqlite_create_functions() becomes create_functions().
+        - New function create_sqlite_sequence() has been extracted out
+          of the old create_sequence() function/method where it was
+          actually failing.
+
+    Enhancements:
+        - Logging of the currval() and nextval() functions
+        - Use log_debug() from DBIx::ThinSQL for debug() output
+
+    Bug Fixes:
+        - sha1* functions must accept multiple arguments
+        - Distribution name is now correctly capitalised
+        - Ensure all arguments to debug() are logged
+
+0.0.2 (2013-05-20)
+
+    Initial Release

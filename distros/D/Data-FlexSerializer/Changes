@@ -1,0 +1,67 @@
+Revision history for Perl extension Data::FlexSerializer
+
+1.10 Thu May 30 09:17:55 UTC 2013
+
+ - Changed the API so that you can't change input/output formats on
+   runtime. Supporting this was always a pain in the ass (and largely
+   broken in 1.09).
+
+   Now if you want two different kinds of options you need to make two
+   serializers, not munge an existing one.
+
+1.09 Wed Feb  13 15:00:00 UTC 2013
+
+ - Adding support for custom serialization formats
+
+1.08 Mon Nov  5 13:35:50 UTC 2012
+
+ - Dynamically changing the output_format without a custom
+   serial_encoder didn't work if the output format was set to
+   'sereal'.
+
+   Now we'll dynamically construct a Sereal::Encoder object if needed
+   if the output format changes from e.g. Storable to Sereal.
+
+ - Change the POD tagline to include Sereal.
+
+1.07 Fri Nov  2 14:59:07 CET 2012
+
+ - Add support for the Sereal format. This adds a dependency on
+   Sereal::{Decoder,Encoder}.
+
+ - Remove redundant check of the close() exit code under the autodie
+   pragma.
+
+1.06  Tue Jun 12 19:00 2012
+  - detect_storable docs
+
+1.05  Wed May 09 17:00 2012
+  - Add tests for file/fh (de)serialization
+
+  - Allow (de)serializing from file handles
+
+  - Check status when closing $fh on file (de)serialization
+
+1.04  Tue Feb 21 07:30 2012
+  - Explicit dependency on autodie.
+
+  - Mark POD as utf8 for consumers' benefit.
+
+1.03  Fri Feb 17 07:45 2012
+  - Load File::Spec explicitly in tests.
+
+1.02  Wed Feb 15 14:00 2012
+  - Require new-enough Test::More.
+
+  - More tests.
+
+1.01
+  - We now only use Moose instead of using Any::Moose and trying to be
+    compatible with both Moose and Mouse.
+
+  - The Changes file had the wrong version numbers, it should have had
+    1.00 instead of 0.01.
+
+1.00  Thu Feb  9 18:00 2012
+  - original version
+

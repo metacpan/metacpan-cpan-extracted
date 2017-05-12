@@ -1,0 +1,20 @@
+---
+name: Data-RefQueue
+version: 0.4
+author:
+  - 'Ask Solem <ASKSH@cpan.org>'
+abstract: Queue system based on references and scalars.
+license: perl
+resources:
+  license: http://dev.perl.org/licenses/
+build_requires:
+  Test::More: 0.42
+dynamic_config: 0
+provides:
+  Data::RefQueue:
+    file: lib/Data/RefQueue.pm
+    version: 0.4
+generated_by: Module::Build version 0.2807
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.2.html
+  version: 1.2

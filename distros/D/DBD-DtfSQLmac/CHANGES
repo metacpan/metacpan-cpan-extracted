@@ -1,0 +1,38 @@
+Revision history for Perl module DBD::DtfSQLmac.
+
+0.1201  Thuesday, March 13, 2001
+	- first public release 
+	
+0.2201  Saturday, November 10, 2001
+	- this module now comes with pre-built shared libraries for both MacPerl 5.2.0r4 (5.004) 
+	  and MacPerl 5.6.1 (and higher)
+	    * hence added INSTALL.5004 and INSTALL.561
+        * hence updated documentation in DtfSQL.pm and DtfSQLmac.pm
+	- added minimum RAM requirements for MacPerl 5.6.1: I recommend at least 11MB of RAM for the  
+	  app and 12MB for the tool (more is better :)
+	- some fixes to DtfSQL.xs:
+	    * malloc() -> New()
+	    * free() -> Safefree()
+	    * use sv_setuv() for unsigned longs in DtfResGetField()
+	- changed DtfSQLmac.pm: all unsupported DBI type constants (i.e. all constants added after 
+	  DBI 1.08 incl. SQL_ALL_TYPES !) now trigger an error if used in bind_param() (don't do 
+	  that, boys and girls :)	   
+	- fixed DESTROY() for a statement handle in DtfSQLmac.pm (now simply returns undef during
+	  global destruction)
+	- fixed execute(): values now get bound as string or num by using the $dbh->quote() method;
+	  hence, values that need escaping of any special characters should now be handled correctly 
+	  (e.g. bind qq{don't} as string: 'don''t')
+
+
+0.3201  Saturday, April 06, 2002
+	- modified Makefile.PL so that this distribution can be installed with the installme.plx
+	  droplet under both MacPerl 5.2.0r4 and MacPerl 5.6.1
+	- The DBI SQL type constant SQL_BIGINT is no longer supported, since SQL_BIGINT is (temporary?) 
+	  omitted/deprecated as of DBI 1.21 (see the DBI 1.21 changes). Note that SQL_BIGINT was formerly 
+	  mapped to SQL_INTEGER when used as a type hint, but beginning with this version this mapping is 
+	  no longer provided.
+	- fixed some typos/formatting issues in the DtfSQL.pm and DtfSQLmac.pm documentation 
+	- the DtfSQL shared libraries for both MacPerl 5.2.0r4 and MacPerl 5.6.1 now have version 
+	  resources (so mere mortals can distinguish them :)
+
+

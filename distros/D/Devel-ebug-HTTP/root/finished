@@ -1,0 +1,26 @@
+[% page_title = ebug.program _ " finished!" %]
+
+[% INCLUDE layout_head %]
+
+<div id="body">
+<form name="myform" method="post" action="[% url %]#top">
+<input type="hidden" name="sequence" value="[% sequence %]"/>
+<table id="icon_bar" width="100%">
+<tr>
+[% INCLUDE icon image="stock_undo.png" text="Undo" %]
+[% INCLUDE icon image="stock_first.png" text="Restart" %]
+<td width="100%">[% ebug.program | html %] finished!</td>
+</tr>
+</table>
+</form>
+
+<div id="pad">
+<h3>STDOUT</h3>
+<small>[% stdout | html | replace('\n','<br/>') %]</small>
+
+<h3>STDERR</h3>
+<small>[% stderr | html | replace('\n','<br/>') %]</small>
+</div>
+
+[% INCLUDE layout_tail %]
+

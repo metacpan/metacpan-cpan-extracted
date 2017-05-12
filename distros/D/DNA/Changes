@@ -1,0 +1,13 @@
+Revision history for Perl extension Foo.
+
+0.03  Tue Oct 21 06:04:34 PDT 2003
+    - Louis Selvon noticed that code between chunks of POD wasn't getting
+      encoded nor run.
+
+0.02  Fri Nov 23 20:22:29 EST 2001
+    - Little compatibility fixes for 5.004
+    - Steve Lane pointed out these are Nucleic Acids, not Amino.
+
+0.01  April 1st, 2001
+    - original version
+

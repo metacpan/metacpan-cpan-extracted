@@ -1,0 +1,88 @@
+NAME
+    Dancer::Plugin::EscapeHTML - Escape HTML entities to avoid XSS
+    vulnerabilities
+
+SYNOPSIS
+    This plugin provides convenience keywords `escape_html' and
+    `unescape_html' which are simply quick shortcuts to `encode_entities'
+    and `decode_entities' from HTML::Entities.
+
+        use Dancer::Plugin::EscapeHTML;
+
+        my $encoded = escape_html($some_html);
+
+    It also provides optional automatic escaping of all HTML (see below.)
+
+DESCRIPTION
+    This plugin is intended to provide a quick and simple way to ensure that
+    HTML passed in the tokens hashref to the template is safely escaped
+    (encoded), thereby helping to avoid XSS/cross-site scripting
+    vulnerabilities.
+
+    You can encode specific bits of data yourself using the `escape_html'
+    and `unescape_html' keywords, or you can enable automatic escaping of
+    all values passed to the template.
+
+KEYWORDS
+    When the plugin is loaded, the following keywords are exported to your
+    app:
+
+  escape_html
+    Encodes HTML entities; shortcut to `encode_entities' from HTML::Entities
+
+  unescape_html
+    Decodes HTML entities; shortcut to `decode_entities' from HTML::Entities
+
+Automatic HTML encoding
+    If desired, you can also enable automatic HTML encoding of all params
+    passed to templates.
+
+    To do so, enable the automatic_encoding option in your app's config -
+    for instance, add the following to your `config.yml':
+
+        plugins:
+            EscapeHTML:
+                automatic_escaping: 1
+
+    Now, all values passed to the template will be automatically encoded, so
+    you should be protected from potential XSS vulnerabilities.
+
+    Of course, this has the drawback that you cannot provide pre-prepared
+    HTML in template params to be used "as is". You can get round this by
+    using the `exclude_pattern' option to provide a pattern to match token
+    names which should be exempted from automatic escaping - for example:
+
+        plugins:
+            EscapeHTML:
+                automatic_escaping: 1
+                exclude_pattern: '_html$'
+
+    The above would exclude token names ending in `_html' from being
+    escaped.
+
+    By default, blessed objects being passed to the template will be left
+    unmolested, as digging around in the internals of the object is probably
+    not wise or desirable. However, if you do want this to be done, set the
+    `traverse_objects' setting to a true value, and objects will be treated
+    just like any other hashref/arrayref.
+
+SEE ALSO
+    Dancer
+
+    HTML::Entities
+
+AUTHOR
+    David Precious, `<davidp at preshweb.co.uk>'
+
+ACKNOWLEDGEMENTS
+    Tom Rathborne `<tom.rathborne at gmail.com>'
+
+LICENSE AND COPYRIGHT
+    Copyright 2011 David Precious.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the terms of either: the GNU General Public License as published
+    by the Free Software Foundation; or the Artistic License.
+
+    See http://dev.perl.org/licenses/ for more information.
+

@@ -1,0 +1,68 @@
+Release history for Dist-Zilla-App-Command-lsplugins
+
+0.003001 2017-03-07T16:52:36Z c68ea27
+ - Bugfix: avoid failures with -Ddefault_inc_excludes_dot
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.003000, see misc/*.deps* for details
+ - develop: +8 ↑4 -2 (recommends: ↓1, suggests: ↑2)
+ - runtime: (recommends: +2)
+ - test: ↓1 (recommends: ↓1)
+
+0.003000 2014-10-31T16:43:28Z 70666e2
+ [Bugfix]
+ - Avoid errors with utf8 loading for abstract parsing.
+ - Avoid warnings with empty abstracts
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002001, see misc/*.deps* for details
+ - configure: +1 (recommends: ↑1)
+ - develop: +6 ↑2 -1 (recommends: +1, suggests: ↑2)
+ - runtime: ↓1 -2
+ - test: +1 (recommends: ↑2)
+
+ [Internals]
+ - remove utf8
+ - support 5.006
+ - drop App::Command loading Moose and MooseX::NonMoose
+
+ [Metadata]
+ - author = kentnl@cpan.org
+
+0.002001 2014-08-15T21:14:50Z
+ [00 Trivial]
+ - CPANDAY!
+ - no code changes.
+ - tests augmented.
+ - whitespace adjusted.
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.002000, see misc/*.deps* for details
+ - develop: +1 (suggests: ↑1)
+ - test: -3
+
+ [Misc]
+ - Improve source side POD to reduce build side whitespace.
+
+ [Tests]
+ - update test::reportprereqs
+
+0.002000 2014-08-01T08:09:39Z
+ [00 Major]
+ - Some changes that may affect hand-operated downstreams.
+
+ [01 Toolkit]
+ - Now uses ExtUtils::MakeMaker
+ - "Latest" dependencies now only recommendations.
+ - https://questhub.io/realm/perl/quest/5388cc12bbd0be5b2500011f
+
+ [Dependencies::Stats]
+ - Dependencies changed since 0.001000, see misc/*.deps* for details
+ - build: -1
+ - configure: +1 -1 (recommends: +1)
+ - develop: +9 -11 (suggests: +2 -1)
+ - runtime: +1 ↑1
+ - test: +5 ↓1 (recommends: +3)
+
+0.001000 2013-11-12T02:17:10Z
+ - First version.

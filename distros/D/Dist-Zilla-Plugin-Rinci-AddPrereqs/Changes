@@ -1,0 +1,85 @@
+Revision history for Dist-Zilla-Plugin-Rinci-AddPrereqs
+
+0.13    2016-10-09 (PERLANCAR)
+
+	- [Bugfix] We should be skipping non-ondisk modules only, we can
+	  already process non-ondisk scripts.
+
+
+0.12    2016-09-29 (PERLANCAR)
+
+	- [Bugfix] No need to add prereqs from Sah schema unless for CLI
+	  scripts.
+
+	- Extract functionality to detect required Perinci::Sub::Dep::*
+	  modules to Perinci::Sub::Util::DepModule.
+
+
+0.11    2016-08-31 (PERLANCAR)
+
+	- Get CLI's function meta from dump result, which still works when
+	  Riap URL package is main.
+
+	- Add prereq to Sah::Schema::* even though not from CLI.
+
+
+0.10    2016-07-22 (PERLANCAR)
+
+	- Handle (skip) non-OnDisk files.
+
+
+0.09    2016-06-02 (PERLANCAR)
+
+        - Fix/update to Data::Sah 0.79 which provides more complete information
+          about required modules, so we can add prereqs correctly (e.g.
+          depending whether CLI script is a
+          Perinci::CmdLine::{Lite,Classic}-based or
+          Perinci::CmdLine::Inline-based).
+
+
+0.08    2016-05-20 (PERLANCAR)
+
+	- Add prereq to Sah coercion rule modules
+	  (Data::Sah::Coerce::perl::*) specified in argument schema.
+
+
+0.07    2015-12-25 (PERLANCAR)
+
+	- Add prereq to required Perinci::Sub::Property::* modules.
+
+
+0.06    2015-04-02 (PERLANCAR)
+
+	- Add prereq to Perinci::Sub::XCompletion::*.
+
+
+0.05    2015-03-18 (PERLANCAR)
+
+	- Skip if script refers to Riap URL '/main/*'.
+
+
+0.04    2015-03-17 (PERLANCAR)
+
+	- No functional changes.
+
+	- Use DZR:DumpPerinciCmdLineScript instead of
+	  PWR:DumpPerinciCmdLineScript to be more proper.
+
+
+0.03    2015-03-13 (PERLANCAR)
+
+	- No functional changes.
+
+	- Tweak log statement: show 'Adding prereq MODULE => VER' message
+	  even when not verbose.
+
+
+0.02    2015-03-13 (PERLANCAR)
+
+	- Support Perinci::CmdLine-based CLI scripts, only add prereq to
+	  Perinci::Sub::ArgEntity::* modules for CLI scripts.
+
+
+0.01     2015-03-08 (PERLANCAR)
+
+         - First release.

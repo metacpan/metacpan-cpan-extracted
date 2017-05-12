@@ -1,0 +1,11 @@
+lib/DBIx/Simple/OO.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/00_use.t
+t/01_href_to_obj.t
+t/02_select.t
+t/inc/conf.pl
+META.yml                                 Module meta-data (added by MakeMaker)
+Changes
+META.json                                Module JSON meta-data (added by MakeMaker)

@@ -1,0 +1,46 @@
+---
+abstract: 'build your dist and run Perl::Critic on the built files.'
+author:
+  - 'Kent Fredric <kentnl@cpan.org>'
+build_requires:
+  Dist::Zilla::App::Tester: '0'
+  Dist::Zilla::Plugin::GatherDir: '0'
+  ExtUtils::MakeMaker: '0'
+  File::Spec: '0'
+  Test::DZil: '0'
+  Test::More: '0'
+  Test::TempDir::Tiny: '0'
+  perl: '5.006'
+configure_requires:
+  ExtUtils::MakeMaker: '0'
+  perl: '5.006'
+dynamic_config: 0
+generated_by: 'Dist::Zilla version 6.008, CPAN::Meta::Converter version 2.150010'
+license: perl
+meta-spec:
+  url: http://module-build.sourceforge.net/META-spec-v1.4.html
+  version: '1.4'
+name: Dist-Zilla-App-Command-critic
+provides:
+  Dist::Zilla::App::Command::critic:
+    file: lib/Dist/Zilla/App/Command/critic.pm
+    version: '0.001011'
+recommends:
+  Path::Tiny: '0.058'
+  Term::ANSIColor: '0'
+requires:
+  Dist::Zilla::App: '0'
+  Path::Tiny: '0'
+  Perl::Critic: '0'
+  Perl::Critic::Utils: '0'
+  Perl::Critic::Utils::Constants: '0'
+  Perl::Critic::Violation: '0'
+  Try::Tiny: '0'
+  perl: '5.006'
+  strict: '0'
+  warnings: '0'
+resources:
+  bugtracker: https://github.com/kentnl/Dist-Zilla-App-Command-critic/issues
+  homepage: https://github.com/kentnl/Dist-Zilla-App-Command-critic
+  repository: https://github.com/kentnl/Dist-Zilla-App-Command-critic.git
+version: '0.001011'

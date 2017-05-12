@@ -1,0 +1,19 @@
+Data::Transformator, Data::Merger, Data::Comparator perform
+intelligent operations on nested perl data structures.  The
+transformation engine is a general simple transformation engine and
+can run in a selective mode or a constructive mode.  In the selective
+mode, it behaves like a database query engine.  In the constructive
+mode it constructs a result based on the structure of the original
+data.  Transformations can be cascaded.  The merger also deals with
+general nested perl data structures.  The Comparator generates
+structured differences that mirror the structure of the compared data
+structures.
+
+To install the module...
+
+perl Makefile.PL
+make
+make test
+make install
+
+If you are on a windows box you should use 'nmake' rather than 'make'.

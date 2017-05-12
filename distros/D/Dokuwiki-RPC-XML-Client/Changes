@@ -1,0 +1,10 @@
+Revision history 
+
+0.2     2014-03-18    Marc Chantreux
+
+    * ->value of rs are now called by default
+    * defaut handlers to die when something goes wrong
+    * documentation: notes added about ideas to implement
+    * added empty test on reach parameters
+    * dokuwiki-client cli tool added
+

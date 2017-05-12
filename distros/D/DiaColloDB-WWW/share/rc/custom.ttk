@@ -1,0 +1,7 @@
+[%##-*- Mode: CPerl -*-
+  ##
+  ## File: custom.ttk
+  ## Description: example custom.ttk for DiaColloDB::WWW distribution (Template-Toolkit format)
+  ##  + settings in this file will override those in "custom.ttk", which see for more information
+  ##
+%]

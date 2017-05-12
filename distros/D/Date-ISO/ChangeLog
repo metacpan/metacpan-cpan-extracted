@@ -1,0 +1,242 @@
+2002-11-08 07:57  rbowen
+
+	* lib/Date/ISO.pm (1.29): Patch by Martijn van Beers to make it
+	possible to construct objects with a week number and week day, as
+	per the spec.
+
+2002-01-20 21:13  rbowen
+
+	* lib/Date/ISO.pm (1.28): Patch from Jesse Vincent, to permit the
+	setting of times in ISO dates.
+
+2001-11-29 13:03  rbowen
+
+	* lib/Date/ISO.pm (1.27), t/02new_EPOCH.t (1.8): If offsets are not
+	specified, use GMT. This fixes a problem that has been in the last
+	several releases. Need to add additional tests to test in the
+	system's local time zone.
+
+2001-11-28 19:43  rbowen
+
+	* t/: 01new_ISO.t (1.8), 02new_EPOCH.t (1.7), 03compatible.t (1.5)
+	(utags: Date-ISO-1_26): Force all tests to offset 0.
+
+2001-11-28 17:36  rbowen
+
+	* lib/Date/ISO.pm (1.26, Date-ISO-1_26): Jesse's patch to make
+	offsets work as passed in, rather than setting to 0.
+
+2001-11-26 21:45  rbowen
+
+	* t/03compatible.t (1.4): Set offset to 0 for tests.
+
+2001-11-26 21:45  rbowen
+
+	* Makefile.PL (1.8, Date-ISO-1_26): Remove embedded tests on make
+	realclean
+
+2001-11-26 21:44  rbowen
+
+	* lib/Date/ISO.pm (1.25): If an offset is not provided, explicitly
+	set to 0. We are dealing with dates, not times.
+
+2001-11-26 21:17  rbowen
+
+	* Makefile.PL (1.7): Need ICal 1.54
+
+2001-11-26 21:17  rbowen
+
+	* t/: 01new_ISO.t (1.7), 02new_EPOCH.t (1.6), 03compatible.t (1.3):
+	Change tests to is() rather than ok() so that failures will give me
+	somewhat more meaningful errors.
+
+2001-11-26 21:15  rbowen
+
+	* lib/Date/ISO.pm (1.24): Explicitly set offset to 0 always.
+
+2001-11-26 21:14  rbowen
+
+	* MANIFEST (1.6, Date-ISO-1_26): Readme -> README
+
+2001-11-24 22:55  rbowen
+
+	* lib/Date/ISO.pm (1.23): Code fold. Nothing to see here.
+
+2001-11-24 11:22  rbowen
+
+	* Makefile.PL (1.6): Requires Date::ICal 1.53 for the offset stuff
+	to work properly.
+
+2001-11-24 11:03  rbowen
+
+	* lib/Date/ISO.pm (1.22): Offsets must be explicitly set to 0 in
+	order to get the right epoch time. See Date::ICal for details
+
+2001-11-24 11:02  rbowen
+
+	* Makefile.PL (1.5): Test::Inline
+
+2001-09-11 23:21  rbowen
+
+	* lib/Date/ISO.pm (1.21): remove warnings for 5.005 compatibility
+
+2001-08-22 22:04  rbowen
+
+	* MANIFEST (1.5), Makefile.PL (1.4), README (1.7, Date-ISO-1_26),
+	lib/Date/ISO.pm (1.20), t/01new_ISO.t (1.6), t/03compatible.t
+	(1.2): Thanks to Rick McCarty, conversions from ISO to gregorian
+	are now working correctly. They never worked correctly in earlier
+	versions.  All of the tests have been updated to use is() rather
+	than ok() so that I could actually see what was failing. Schwern++
+
+2001-08-02 21:48  rbowen
+
+	* t/03compatible.t (1.1): We seem to have some problems with the
+	inverse iso conversions.
+
+2001-07-29 20:50  rbowen
+
+	* Makefile.PL (1.3), lib/Date/ISO.pm (1.19), t/01new_ISO.t (1.5),
+	t/02new_EPOCH.t (1.5): Update for the new Date::ICal
+
+2001-07-24 12:08  rbowen
+
+	* t/: 00load.t (1.2, Date-ISO-1_26), 01new_ISO.t (1.4),
+	02new_EPOCH.t (1.4): Better tests.
+
+2001-07-24 12:08  rbowen
+
+	* lib/Date/ISO.pm (1.18): perltidy
+
+2001-07-24 12:07  rbowen
+
+	* Makefile.PL (1.2): Added prereqs
+
+2001-05-01 19:16  rbowen
+
+	* t/02new_EPOCH.t (1.3): Fixed tests. I think.
+
+2001-05-01 19:15  rbowen
+
+	* README (1.6): Updated to new module changes
+
+2001-04-30 09:23  rbowen
+
+	* lib/Date/ISO.pm (1.17): Removed AutoLoader from ISA, since it
+	really isn't.
+
+2001-04-29 17:33  rbowen
+
+	* README (1.5, Date_ISO-1_16): Updated readme to new version.
+
+2001-04-29 17:31  rbowen
+
+	* README (1.4), lib/Date/ISO.pm (1.16, Date_ISO-1_16),
+	t/01new_ISO.t (1.3, Date_ISO-1_16), t/02new_EPOCH.t (1.2,
+	Date_ISO-1_16): Added new tests, and fixed a lot of bugs in the
+	process. Apparently the inverseiso function had never actually
+	worked, and various other functions had some off-by-one problems.
+
+2001-04-28 22:43  rbowen
+
+	* MANIFEST (1.4, Date_ISO-1_16, Date_ISO-1_14): Typo in manifest
+
+2001-04-28 22:42  rbowen
+
+	* MANIFEST (1.3), README (1.3, Date_ISO-1_14), lib/Date/ISO.pm
+	(1.15, Date_ISO-1_14), t/01new_ISO.t (1.2, Date_ISO-1_14),
+	t/02new_EPOCH.t (1.1, Date_ISO-1_14): New Tests.  Updated MANIFEST,
+	Readme for new files, functionality Fixed CVS version number in
+	ISO.pm
+
+2001-04-28 22:36  rbowen
+
+	* lib/Date/ISO.pm (1.14): Added OO interface.  Changed functions to
+	accept 4-digit years and 1-based months.
+
+2001-04-28 21:53  rbowen
+
+	* test.pl (1.2): Moving test suite to t/
+
+2001-04-28 21:53  rbowen
+
+	* t/: 00load.t (1.1, Date_ISO-1_16, Date_ISO-1_14), 01new_ISO.t
+	(1.1): Adding test suites.
+
+2000-08-16 23:44  rbowen
+
+	* Changes (1.4, Date-ISO-1_26, Date_ISO-1_16, Date_ISO-1_14,
+	Date-ISO-1_02): Change log
+
+2000-08-16 23:43  rbowen
+
+	* lib/Date/ISO.pm (1.13, Date-ISO-1_02): 1.02 version number change
+
+2000-08-16 23:42  rbowen
+
+	* README (1.2, Date-ISO-1_02): 1.01 Readme
+
+2000-08-16 23:41  rbowen
+
+	* Changes (1.3): 1.01 Changes
+
+2000-08-16 23:22  rbowen
+
+	* lib/Date/ISO.pm (1.12): inverseiso function
+
+2000-08-16 22:46  rbowen
+
+	* lib/Date/ISO.pm (1.11): iso() returns string unless wantarray.
+
+2000-08-15 23:36  rbowen
+
+	* lib/Date/ISO.pm (1.10): Documentation
+
+2000-08-15 23:26  rbowen
+
+	* README (1.1), MANIFEST (1.2, Date-ISO-1_02) (utags:
+	Date-ISO-1_01): Added Readme
+
+2000-08-15 23:26  rbowen
+
+	* lib/Date/ISO.pm (1.9, Date-ISO-1_01): Documentation
+
+2000-08-15 23:25  rbowen
+
+	* lib/Date/ISO.pm (1.8): Version number
+
+2000-08-15 23:23  rbowen
+
+	* lib/Date/ISO.pm (1.7): Added localiso()
+
+2000-08-15 23:14  rbowen
+
+	* lib/Date/ISO.pm (1.6): Documentation
+
+2000-08-15 23:11  rbowen
+
+	* lib/Date/ISO.pm (1.5): Got iso() working
+
+2000-08-15 22:54  rbowen
+
+	* lib/Date/ISO.pm (1.4): Try again
+
+2000-08-15 22:42  rbowen
+
+	* lib/Date/ISO.pm (1.3): iso function
+
+2000-08-15 22:28  rbowen
+
+	* lib/Date/ISO.pm (1.2): Initial module
+
+2000-08-15 22:27  rbowen
+
+	* Changes (1.2, Date-ISO-1_01): Initial Changes file
+
+2000-08-15 21:33  rbowen
+
+	* Changes (1.1), MANIFEST (1.1), Makefile.PL (1.1, Date_ISO-1_16,
+	Date_ISO-1_14, Date-ISO-1_02, Date-ISO-1_01), test.pl (1.1,
+	Date-ISO-1_02, Date-ISO-1_01), lib/Date/ISO.pm (1.1): Initial h2xs
+	version of Date::ISO
+

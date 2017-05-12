@@ -1,0 +1,23 @@
+.hgignore
+Changes
+lib/Data/Consumer.pm
+lib/Data/Consumer/Dir.pm
+lib/Data/Consumer/MySQL.pm
+lib/Data/Consumer/MySQL2.pm
+Makefile.PL
+MANIFEST
+mysql.pldat
+README
+t/00-load.t
+t/01-mysql.t
+t/02-mysql.t
+t/03-mysql.t
+t/04-mysql.t
+t/05-mysql.t
+t/06-mysql-sweep.t
+t/50-dir.t
+t/boilerplate.t
+t/pod-coverage.t
+t/pod.t
+META.yml                                 Module YAML meta-data (added by MakeMaker)
+META.json                                Module JSON meta-data (added by MakeMaker)

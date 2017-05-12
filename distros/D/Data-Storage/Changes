@@ -1,0 +1,77 @@
+Revision history for Perl extension Data-Storage
+
+1.102720  2010-09-29 14:24:13 Europe/Vienna
+    - added 'ShowErrorStatement' connect option, defaults to 1 (Oracle had this
+      by default, Pg didn't)
+
+1.102520  2010-09-09 21:08:26 Europe/Vienna
+    - D::S::DBI::Pg: fixed <BOOL> replacement (fhelmberger)
+
+1.102250  2010-08-13 14:32:51 Europe/Vienna
+
+1.101700  2010-06-19 11:09:40 Europe/Vienna
+    - converted tabs to spaces
+
+1.100850  2010-03-26 16:22:50 Europe/Vienna
+    - converted the distribution to Dist::Zilla-style
+
+0.11  Wed 2009.11.04 23:46:30 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - Data::Storage::DBI: prepare_named() now uses DBI's prepare_cached()
+
+0.10  Wed 2009.11.04 23:46:30 CET (Marcel Gruenauer <marcel@cpan.org>)
+    - Data::Storage::DBI: omit password in exception if connect fails
+    - Data::Storage::Statement: AUTOLOAD generates methodss so subsequent calls
+      are direct and faster
+
+0.09  Mon Oct 20 23:04:09 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Data::Storage::Null adds empty FIRST_CONSTRUCTOR_ARGS so it doesn't get
+      handled by AUTOLOAD
+    - updated version numbers to 0.09
+
+0.08  Thu Jul 25 15:27:43 CEST 2008 (Marcel Gruenauer <marcel@cpan.org>)
+    - Changed dist style and Changes back to standard. People didn't like it -
+      the nail that sticks out gets hammered down.
+    - Added standard test files; this will also help with CPANTS.
+    - added prepare_named() and other optimizations
+    - commit() returns if AutoCommit is enabled
+
+0.07  Thu, 29 May 2008 12:03:50 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.07
+    - Data::Storage::DBI: avoid rollback and commit if AutoCommit is enabled;
+      this used to cause an error message
+    - .shipit: fixed svk.tagpattern
+
+0.06  Mon, 25 Feb 2008 14:05:30 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.06
+    - moved generated documentation of interited methods to after documentation
+      of this class' methods so the manpage is more readable
+    - Data::Storage now uses mk_constructor and so also derives from
+      Class::Accessor::Complex
+
+0.05  Wed, 28 Nov 2007 22:11:34 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - set the version to 0.05
+    - test
+
+0.04  Wed, 28 Nov 2007 22:07:12 -0000 (Marcel Gruenauer <marcel@cpan.org>)
+    - added requirements for Class::Accessor::Complex,
+      Class::Accessor::Constructor and Error::Hierarchy
+    - .shipit: added Twitter step
+    - Makefile.PL: added auto_install() and process_templates()
+    - lib/*: converted to template
+    - updated MANIFEST
+    - updated t/perlcriticrc
+    - Data::Storage::DBI: added dbhost, port and support for that in
+      connect_string(). Moved this functionality out of
+      Data::Storage::DBI::Postgres
+    - test
+    - tags: BUGFIX
+
+0.03  Wed, 07 Nov 2007 19:32:48 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - removed another dependency on Class::Scaffold. Sigh...
+    - fixed inheritance and constructor in Data::Storage::Statement
+
+0.02  Wed, 07 Nov 2007 18:49:30 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - removed circular dependency on Class::Scaffold
+
+0.01  Wed, 07 Nov 2007 11:39:00 +0100 (Marcel Gruenauer <marcel@cpan.org>)
+    - original version

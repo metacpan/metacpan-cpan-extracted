@@ -1,0 +1,7 @@
+Changes
+Makefile.PL
+MANIFEST
+Pearson.pm
+Pearson.xs
+README
+t/test.t

@@ -1,0 +1,40 @@
+Changelog for Dist-Zilla-PluginBundle-Author-IOANR
+
+1.162691 2016-09-25T14:25:58Z
+ - DZP::AssertOS now required because dzil authordeps doesn't list
+   recommends. Needed for travis-ci (Ioan Rogers)
+ - Use the metacpan for the github page link (Ioan Rogers)
+
+1.162690 2016-09-25T14:24:36Z
+ - DZP::AssertOS now required because dzil authordeps doesn't list
+   recommends. Needed for travis-ci builds(Ioan Rogers)
+ - Use the metacpan for the github page link (Ioan Rogers)
+
+0.006 2015-06-14T03:44:33Z
+ - Make sure Pod::Markdown is installed to create the README (Ioan Rogers)
+ - Make tags before pushing (Ioan Rogers)
+ - Add a travis config (Ioan Rogers)
+ - Make sure the license gets committed (Ioan Rogers)
+
+0.005 2015-06-13T22:23:52Z
+ - Various internal cleanups
+ - Commit LICENSE to repo
+
+0.004 2014-03-03T12:18:58Z
+ - AutoPrereqs had gone missing (Ioan Rogers)
+ - Don't require unreleased versions (Ioan Rogers)
+
+0.003 2014-03-02T09:12:59Z
+ - Don't auto-commit non-release builds in Git::CommitBuild (Ioan Rogers)
+ - Copy readme to root (Ioan Rogers)
+ - Use the new tag_regexp option for changelog (Ioan Rogers)
+ - Update minimum version requirements (Ioan Rogers)
+ - Add a readme (Ioan Rogers)
+ - Add a changelog (Ioan Rogers)
+
+0.002 2014-03-02T07:37:13Z
+ - Make sure generated files are committed (Ioan Rogers)
+ - Disable some problematic tests (Ioan Rogers)
+ - Don't gather files from disk which will be generated (Ioan Rogers)
+ - Update options for DZP CPAN::Changes (Ioan Rogers)
+ - change PWP::Encoding to PWP::SingleEncoding (Sergey Romanov)

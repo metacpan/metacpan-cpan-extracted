@@ -1,0 +1,50 @@
+{
+   "abstract" : "a Dancer Gearman::XS client",
+   "author" : [
+      "Marco Fontani <MFONTANI@cpan.org>"
+   ],
+   "dynamic_config" : 0,
+   "generated_by" : "Dist::Zilla version 4.200004, CPAN::Meta::Converter version 2.110550",
+   "license" : [
+      "perl_5"
+   ],
+   "meta-spec" : {
+      "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
+      "version" : "2"
+   },
+   "name" : "Dancer-Plugin-GearmanXS",
+   "prereqs" : {
+      "configure" : {
+         "requires" : {
+            "ExtUtils::MakeMaker" : "6.31"
+         }
+      },
+      "runtime" : {
+         "requires" : {
+            "Dancer" : 0,
+            "Dancer::Plugin" : 0,
+            "Gearman::XS" : 0,
+            "Gearman::XS::Client" : 0,
+            "Storable" : 0
+         }
+      },
+      "test" : {
+         "requires" : {
+            "Test::More" : 0
+         }
+      }
+   },
+   "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/mfontani/Dancer-Plugin-GearmanXS/issues"
+      },
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/mfontani/Dancer-Plugin-GearmanXS.git",
+         "web" : "https://github.com/mfontani/Dancer-Plugin-GearmanXS"
+      }
+   },
+   "version" : "0.110570"
+}
+

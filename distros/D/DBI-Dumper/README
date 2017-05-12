@@ -1,0 +1,126 @@
+NAME
+    DBI::Dumper - Dump data from a DBI datasource to file.
+
+SYNOPSIS
+            << in test.ctl >>
+            OPTIONS (export=100,rows=100)
+            EXPORT DATA REPLACE INTO FILE 'test.dat'
+            FIELDS TERMINATED BY TAB 
+                    ENCLOSED BY '"' AND '"' 
+                    ESCAPED BY '\'
+            WITH HEADER FROM
+            SELECT * FROM MY_TABLE
+
+            my $dumper = DBI::Dumper->new(
+                    -dbh => $dbh,
+                    -control => 'test.ctl',
+                    -output => 'test.dat',
+            );
+
+            $dumper->prepare;
+            $dumper->execute;
+
+            # have DBI::Dumper login to database
+            my $dumper = DBI::Dumper->new(
+                    -userid => 'user/pass@sid',
+                    ...
+            );
+
+            # send a statement handle instead of database handle
+            my $sth = DBI->connect()->prepare("SELECT * FROM MY TABLE");
+            $dumper->execute($sth);
+
+DESCRIPTION
+    Dumps data from a select statement into an output file. sqldumper tries
+    to mirror the functionality and behavior of sql*loader. The control file
+    syntax is similar, and DBI::Dumper utilizes a subset of the sql*loader
+    options.
+
+    Configuration options can be set either in the control file, passed to
+    the new() method, or by calling the option's accessor.
+
+  Options
+    userid=username/password@sid
+        Login information for database connection.
+
+        If the sid includes a colon, the full string will be used as the DBI
+        dsn. For example:
+
+                userid=username/password@mysql:database
+
+        Will connect to mysql's 'database' database as username.
+
+        Otherwise, DBI::Dumper assumes a dbi:Oracle connection and prefixes
+        the dsn with dbi:Oracle:. If no dsn is passed, DBI::Dumper first
+        looks in $ENV{DBI_DSN} then $ENV{ORACLE_SID}.
+
+    control=filename
+        Input control filename. Defaults to standard input. See "CONTROL
+        FILE" for layout and description.
+
+    output=filename
+        Output filename for data. Defaults to standard output. If rows is
+        given, can contain template consisting of three or more Xs. The Xs
+        will be replaced with the file sequence number. If the template does
+        not contain three or more Xs, the sequence number will be appended
+        to the filename with a dot. Examples:
+
+    rows=n
+        Number of rows per output file. Defaults to all rows in one output
+        file.
+
+    export=n
+        Total number of rows to export. Use to limit output or restart dump.
+
+    skip=n
+        Number of rows to skip from beginning. File sequence number will be
+        preserved, so if rows=n is set, this can be used to restart a job.
+
+    bindsize=n
+        Block size to write file. Defaults to write each record as returned
+        from database. If set, sqldump will collect rows into a buffer at
+        most n bytes large before writing to file.
+
+    silent=true
+        Suppress normal logging information. sqldump will only report
+        errors.
+
+  Exporting to Multiple Files
+    rows=1000 output=outputXXXXX.dat
+        Data will be written to output00001.dat, output00002.dat, etc.
+
+    rows=1000 output=output.dat
+        Data will be written to output.dat.0001, output.dat.0002, etc.
+
+    output=outputXXXXX.dat
+        Data will be written to outputXXXXX.dat
+
+DEPENDENCIES
+    This program depends on the following perl modules, available from a
+    CPAN mirror near you:
+
+    Parse::RecDescent - Recursive parser
+    DBI - Standard database interface
+
+CONTROL FILE
+    The control file used for sqldumper is very similar to sql*loader's. The
+    full specification is:
+
+            [ OPTIONS ([option], ...) ]
+            EXPORT DATA [ REPLACE | APPEND ] [ INTO FILE 'filename' ]
+            [ FIELDS
+                    [ TERMINATED [BY] {TAB | 'string' | X'hexstring'} ] |
+                    [ ENCLOSED [BY] {'string' | X'hexstring'} 
+                            [AND] ['string' | X'hexstring'] ]
+                    [ ESCAPED [BY] {'string' | X'hexstring'} ]
+            ]
+            [ WITH HEADER ]
+            FROM
+            select_statement
+
+AUTHOR
+    Written by Warren Smith (warren.smith@acxiom.com)
+
+BUGS
+    None yet.
+
